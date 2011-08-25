@@ -146,7 +146,7 @@ LibDump::gen_pat(const CellLibrary& library)
     const Cell* cell = library.cell(i);
     ymuint ni = cell->input_num();
     ymuint no = cell->output_num();
-
+#if 0
     if ( cell->is_logic() ) {
       if ( no > 1 ) {
 	// 出力ピンが複数あるセルは対象外
@@ -259,6 +259,7 @@ LibDump::gen_pat(const CellLibrary& library)
 						iq_pos);
       ff_group->add_cell(cell->id());
     }
+#endif
   }
 }
 

@@ -204,6 +204,23 @@ gen_library(const DotlibNode* dt_library)
       }
     }
 
+    // ピン数を数える．
+    ymuint ni = 0;
+    ymuint no = 0;
+    ymuint nio = 0;
+    for (ymuint i = 0; i < npin; ++ i) {
+      const DotlibPin& pin_info = pin_info_array[i];
+      switch ( pin_info.direction() ) {
+      case DotlibPin::kInput:  ++ ni; break;
+      case DotlibPin::kOutput: ++ no; break;
+      case DotlibPin::kInout:  ++ nio; break;
+      case DotlibPin::kInternal: // どうする？
+      default:
+	assert_not_reached(__FILE__, __LINE__);
+	break;
+      }
+    }
+
     const DotlibNode* dt_ff = cell_info.ff();
     const DotlibNode* dt_latch = cell_info.latch();
 
@@ -225,10 +242,10 @@ gen_library(const DotlibNode* dt_library)
       ymuint v2 = ff_info.clear_preset_var2();
 
       cell = library->new_ff_cell(cell_id, cell_name, area,
+				  ni, no, nio, nbus, nbundle,
 				  var1, var2,
 				  next_state, clocked_on, clocked_on_also,
-				  clear, preset, v1, v2,
-				  npin, nbus, nbundle);
+				  clear, preset, v1, v2);
 
       // pin_map に登録しておく
       pin_map.insert(make_pair(var1, npin));
@@ -250,10 +267,10 @@ gen_library(const DotlibNode* dt_library)
       ymuint v2 = latch_info.clear_preset_var2();
 
       cell = library->new_latch_cell(cell_id, cell_name, area,
+				     ni, no, nio, nbus, nbundle,
 				     var1, var2,
 				     data_in, enable, enable_also,
-				     clear, preset, v1, v2,
-				     npin, nbus, nbundle);
+				     clear, preset, v1, v2);
 
       // pin_map に登録しておく
       pin_map.insert(make_pair(var1, npin));
@@ -261,39 +278,43 @@ gen_library(const DotlibNode* dt_library)
     }
     else {
       cell = library->new_logic_cell(cell_id, cell_name, area,
-				     npin, nbus, nbundle);
+				     ni, no, nio, nbus, nbundle);
     }
 
     // ピンの生成
+    ymuint i_pos = 0;
+    ymuint o_pos = 0;
+    ymuint io_pos = 0;
     for (ymuint i = 0; i < npin; ++ i) {
       const DotlibPin& pin_info = pin_info_array[i];
       switch ( pin_info.direction() ) {
       case DotlibPin::kInput:
-	{
+	{ // 入力ピンの生成
 	  CellCapacitance cap(pin_info.capacitance());
 	  CellCapacitance rise_cap(pin_info.rise_capacitance());
 	  CellCapacitance fall_cap(pin_info.fall_capacitance());
-	  library->new_cell_input(cell, i, pin_info.name(),
+	  library->new_cell_input(cell, i_pos, pin_info.name(),
 				  cap, rise_cap, fall_cap);
 	}
+	++ i_pos;
 	break;
 
       case DotlibPin::kOutput:
-	{
+	{ // 出力の生成
 	  CellCapacitance max_fanout(pin_info.max_fanout());
 	  CellCapacitance min_fanout (pin_info.min_fanout());
 	  CellCapacitance max_capacitance(pin_info.max_capacitance());
 	  CellCapacitance min_capacitance(pin_info.min_capacitance());
 	  CellTime max_transition(pin_info.max_transition());
 	  CellTime min_transition(pin_info.min_transition());
-	  library->new_cell_output(cell, i, pin_info.name(),
+	  library->new_cell_output(cell, o_pos, pin_info.name(),
 				   max_fanout, min_fanout,
 				   max_capacitance, min_capacitance,
 				   max_transition, min_transition);
 	  const DotlibNode* func_node = pin_info.function();
 	  if ( func_node ) {
 	    LogExpr expr = dot2expr(func_node, pin_map);
-	    library->set_opin_function(cell, i, expr);
+	    library->set_cell_function(cell, o_pos, expr);
 
 #if 0
 	    TvFunc tv_function = expr_to_tvfunc(expr, ni);
@@ -306,15 +327,15 @@ gen_library(const DotlibNode* dt_library)
 	      bool redundant = false;
 	      if ( ~p_func && n_func ) {
 		if ( ~n_func && p_func ) {
-		  sense_real = kSenseNonUnate;
+		  sense_real = kCellNonUnate;
 		}
 		else {
-		  sense_real = kSenseNegaUnate;
+		  sense_real = kCellNegaUnate;
 		}
 	      }
 	      else {
 		if ( ~n_func && p_func ) {
-		  sense_real = kSensePosiUnate;
+		  sense_real = kCellPosiUnate;
 		}
 		else {
 		  // つまり p_func == n_func ということ．
@@ -331,18 +352,18 @@ gen_library(const DotlibNode* dt_library)
 		}
 	      }
 
-	      tCellTimingSense sense = kSenseNonUnate;
+	      tCellTimingSense sense = kCellNonUnate;
 	      switch ( pt_pin->phase()->type() ) {
 	      case DotlibNode::kNoninv:
-		sense = kSensePosiUnate;
+		sense = kCellPosiUnate;
 		break;
 
 	      case DotlibNode::kInv:
-		sense = kSenseNegaUnate;
+		sense = kCellNegaUnate;
 		break;
 
 	      case DotlibNode::kUnknown:
-		sense = kSenseNonUnate;
+		sense = kCellNonUnate;
 		break;
 
 	      default:
@@ -370,21 +391,22 @@ gen_library(const DotlibNode* dt_library)
 						       CellTime(0.0),
 						       r_r, f_r);
 	      if ( !redundant ) {
-		library->set_opin_timing(opin, i, sense, timing);
+		library->set_cell_timing(cell, i, o_pos, sense, timing);
 	      }
 	    }
-#endif
 	  }
 	  const DotlibNode* three_state = pin_info.three_state();
 	  if ( three_state ) {
 	    LogExpr expr = dot2expr(three_state, pin_map);
 	    library->set_opin_three_state(cell, i, expr);
 	  }
+#endif
 	}
+	++ o_pos;
 	break;
 
       case DotlibPin::kInout:
-	{
+	{ // 入出力ピンの生成
 	  CellCapacitance cap(pin_info.capacitance());
 	  CellCapacitance rise_cap(pin_info.rise_capacitance());
 	  CellCapacitance fall_cap(pin_info.fall_capacitance());
@@ -394,12 +416,13 @@ gen_library(const DotlibNode* dt_library)
 	  CellCapacitance min_capacitance(pin_info.min_capacitance());
 	  CellTime max_transition(pin_info.max_transition());
 	  CellTime min_transition(pin_info.min_transition());
-	  library->new_cell_inout(cell, i, pin_info.name(),
+	  library->new_cell_inout(cell, io_pos, pin_info.name(),
 				  cap, rise_cap, fall_cap,
 				  max_fanout, min_fanout,
 				  max_capacitance, min_capacitance,
 				  max_transition, min_transition);
 	}
+	++ io_pos;
 	break;
 
       case DotlibPin::kInternal:

@@ -127,6 +127,7 @@ restore_library(istream& s)
 	  ymuint pin_id = BinIO::read_32(s);
 	  ymuint timing_id = BinIO::read_32(s);
 	  CiTiming* timing = timing_list[timing_id];
+	  cell->set_timing(
 	  library->set_cell_timing(cell, j, pin_id,
 				   kCellPosiUnate, timing);
 	}

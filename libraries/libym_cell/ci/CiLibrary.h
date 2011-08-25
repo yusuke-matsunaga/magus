@@ -360,66 +360,6 @@ public:
 	     CellResistance rise_resistance,
 	     CellResistance fall_resistance);
 
-  /// @brief セルのタイミング情報を設定する．
-  /// @param[in] cell セル
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-  /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
-  /// @param[in] sense タイミング条件
-  /// @param[in] timing 設定するタイミング情報
-  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->output_num() を使う．
-  /// @note ( *2 ) ipin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->input_num() を使う．
-  void
-  set_cell_timing(CiCell* cell,
-		  ymuint opin_id,
-		  ymuint ipin_id,
-		  tCellTimingSense sense,
-		  CiTiming* timing);
-
-  /// @brief 出力ピンの機能を設定する．
-  /// @param[in] cell セル
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-  /// @param[in] function 機能を表す論理式
-  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->output_num() を使う．
-  void
-  set_opin_function(CiCell* cell,
-		    ymuint opin_id,
-		    const LogExpr& function);
-
-  /// @brief 出力ピンの three_state 条件を設定する．
-  /// @param[in] cell セル
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-  /// @param[in] expr three_state 条件を表す論理式
-  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->output_num() を使う．
-  void
-  set_opin_three_state(CiCell* cell,
-		       ymuint opin_id,
-		       const LogExpr& expr);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief セルにピン数，バス数，バンドル数の設定をする．
-  /// @param[in] cell セル
-  /// @param[in] ni 入力ピン数
-  /// @param[in] no 出力ピン数
-  /// @param[in] nio 入出力ピン数
-  /// @param[in] nb バス数
-  /// @param[in] nc バンドル数
-  void
-  set_pinnum(CiCell* cell,
-	     ymuint ni,
-	     ymuint no,
-	     ymuint nio,
-	     ymuint nb,
-	     ymuint nc);
-
 
 private:
   //////////////////////////////////////////////////////////////////////

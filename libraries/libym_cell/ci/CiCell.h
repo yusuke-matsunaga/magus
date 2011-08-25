@@ -10,8 +10,9 @@
 
 
 #include "ym_cell/Cell.h"
-#include "ym_utils/ShString.h"
 #include "ym_logic/LogExpr.h"
+#include "ym_utils/ShString.h"
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -50,7 +51,7 @@ protected:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // セル情報の取得
+  // 基本情報の取得
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号の取得
@@ -74,8 +75,15 @@ public:
   ymuint
   input_num() const;
 
+  /// @brief 入力ピン+入出力ピン数の取得
+  /// @note input_num() + inout_num() に等しい．
+  virtual
+  ymuint
+  input_num2() const;
+
   /// @brief 入力ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num2() )
+  /// @note pos >= input_num() の場合には入出力ピンが返される．
   virtual
   const CellPin*
   input(ymuint pos) const;
@@ -85,8 +93,15 @@ public:
   ymuint
   output_num() const;
 
+  /// @brief 出力ピン+入出力ピン数の取得
+  /// @note output_num() + inout_num() に等しい．
+  virtual
+  ymuint
+  output_num2() const;
+
   /// @brief 出力ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < output_num() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < output_num2() )
+  /// @note pos >= output_num() の場合には入出力ピンが返される．
   virtual
   const CellPin*
   output(ymuint pos) const;
@@ -150,6 +165,12 @@ public:
   const CellGroup*
   cell_group() const;
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // タイミング情報の取得
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief タイミング情報の取得
   /// @param[in] ipos 開始ピン番号
   /// @param[in] opos 終了ピン番号
@@ -162,6 +183,13 @@ public:
 	 ymuint opos,
 	 tCellTimingSense sense) const;
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 機能情報の取得
+  //////////////////////////////////////////////////////////////////////
+
+#if 0
   /// @brief 組み合わせ論理セルの時に true を返す．
   /// @note type() == kLogic と等価
   virtual
@@ -258,6 +286,63 @@ public:
   virtual
   ymuint
   clear_preset_var2() const;
+#endif
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 設定用の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ピン数，バス数，バンドル数の設定をする．
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] nio 入出力ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
+  /// @param[in] alloc メモリアロケータ
+  void
+  set_pinnum(ymuint ni,
+	     ymuint no,
+	     ymuint nio,
+	     ymuint nb,
+	     ymuint nc,
+	     AllocBase& alloc);
+
+  /// @brief 出力ピンの機能を設定する．
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+  /// @param[in] function 機能を表す論理式
+  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->output_num() を使う．
+  virtual
+  void
+  set_logic_function(ymuint opin_id,
+		     const LogExpr& function);
+
+  /// @brief 出力ピンの three_state 条件を設定する．
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+  /// @param[in] expr three_state 条件を表す論理式
+  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->output_num() を使う．
+  virtual
+  void
+  set_tristate_function(ymuint opin_id,
+			const LogExpr& expr);
+
+  /// @brief タイミング情報を設定する．
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+  /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
+  /// @param[in] sense タイミング条件
+  /// @param[in] timing 設定するタイミング情報
+  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->output_num() を使う．
+  /// @note ( *2 ) ipin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->input_num() を使う．
+  void
+  set_timing(ymuint opin_id,
+	     ymuint ipin_id,
+	     tCellTimingSense sense,
+	     CiTiming* timing);
 
 
 private:
@@ -348,6 +433,22 @@ public:
   virtual
   bool
   is_logic() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 設定用の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 出力ピンの機能を設定する．
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+  /// @param[in] function 機能を表す論理式
+  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->output_num() を使う．
+  virtual
+  void
+  set_logic_function(ymuint opin_id,
+		     const LogExpr& function);
 
 };
 

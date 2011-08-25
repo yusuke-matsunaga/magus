@@ -245,7 +245,7 @@ CiLibrary::new_logic_cell(ymuint cell_id,
   CiCell* cell = new (p) CiLogicCell(cell_id, name, area);
   mCellArray[cell_id] = cell;
 
-  set_pinnum(cell, ni, no, nio, nb, nc);
+  cell->set_pinnum(ni, no, nio, nb, nc, mAlloc);
 
   return cell;
 }
@@ -296,7 +296,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 				  clear_preset_var2);
   mCellArray[cell_id] = cell;
 
-  set_pinnum(cell, ni, no, nio, nb, nc);
+  cell->set_pinnum(ni, no, nio, nb, nc, mAlloc);
 
   return cell;
 }
@@ -347,50 +347,9 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 				     clear_preset_var2);
   mCellArray[cell_id] = cell;
 
-  set_pinnum(cell, ni, no, nio, nb, nc);
+  cell->set_pinnum(ni, no, nio, nb, nc, mAlloc);
 
   return cell;
-}
-
-// @brief セルにピン数，バス数，バンドル数の設定をする．
-// @param[in] cell セル
-// @param[in] ni 入力ピン数
-// @param[in] no 出力ピン数
-// @param[in] nio 入出力ピン数
-// @param[in] nb バス数
-// @param[in] nc バンドル数
-void
-CiLibrary::set_pinnum(CiCell* cell,
-		      ymuint ni,
-		      ymuint no,
-		      ymuint nio,
-		      ymuint nb,
-		      ymuint nc)
-{
-  cell->mInputNum = ni;
-  void* p = mAlloc.get_memory(sizeof(CiPin*) * ni);
-  cell->mInputArray = new (p) CiPin*[ni];
-
-  cell->mOutputNum = no;
-  void* q = mAlloc.get_memory(sizeof(CiPin*) * no);
-  cell->mOutputArray = new (q) CiPin*[no];
-
-  cell->mInoutNum = nio;
-  void* r = mAlloc.get_memory(sizeof(CiPin*) * nio);
-  cell->mInoutArray = new (r) CiPin*[nio];
-
-  ymuint n = (ni + nio) * (no + nio) * 2;
-  void* s = mAlloc.get_memory(sizeof(const CiTiming*) * n);
-  cell->mTimingArray = new (s) CiTiming*[n];
-  for (ymuint i = 0; i < n; ++ i) {
-    cell->mTimingArray[i] = NULL;
-  }
-
-  // バス，バンドル関係は未完
-
-  cell->mBusNum = nb;
-
-  cell->mBundleNum = nc;
 }
 
 // @brief セルの入力ピンの内容を設定する．
@@ -528,66 +487,6 @@ CiLibrary::new_timing(ymuint id,
 					     rise_resistance,
 					     fall_resistance);
   return timing;
-}
-
-// @brief セルのタイミング情報を設定する．
-// @param[in] cell セル
-// @param[in] opin_id 出力(入出力)ピン番号
-// @param[in] ipin_id 関連する入力(入出力)ピン番号
-// @param[in] sense タイミング条件
-// @param[in] timing 設定するタイミング情報
-void
-CiLibrary::set_cell_timing(CiCell* cell,
-			   ymuint opin_id,
-			   ymuint ipin_id,
-			   tCellTimingSense sense,
-			   CiTiming* timing)
-{
-  ymuint base = opin_id * (cell->input_num() + cell->inout_num());
-  switch ( sense ) {
-  case kCellPosiUnate:
-    cell->mTimingArray[base + 0] = timing;
-    break;
-
-  case kCellNegaUnate:
-    cell->mTimingArray[base + 1] = timing;
-    break;
-
-  case kCellNonUnate:
-    cell->mTimingArray[base + 0] = timing;
-    cell->mTimingArray[base + 1] = timing;
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-  }
-}
-
-// @brief 出力ピンの機能を設定する．
-// @param[in] cell セル
-// @param[in] opin_id 出力(入出力)ピン番号
-// @param[in] pin 出力(入出力)ピン
-// @param[in] function 機能を表す論理式
-void
-CiLibrary::set_opin_function(CiCell* cell,
-			     ymuint opin_id,
-			     const LogExpr& function)
-{
-  CiPin* pin = cell->mOutputArray[opin_id];
-  pin->set_function(function);
-}
-
-// @brief 出力ピンの three_state 条件を設定する．
-// @param[in] cell セル
-// @param[in] opin_id 出力(入出力)ピン番号 ( 0 <= pin_id < cell->pin_num() )
-// @param[in] expr three_state 条件を表す論理式
-void
-CiLibrary::set_opin_three_state(CiCell* cell,
-				ymuint opin_id,
-				const LogExpr& expr)
-{
-  CiPin* pin = cell->mOutputArray[opin_id];
-  pin->set_three_state(expr);
 }
 
 END_NAMESPACE_YM_CELL
