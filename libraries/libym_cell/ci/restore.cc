@@ -120,25 +120,6 @@ restore_library(istream& s)
 			       max_f, min_f,
 			       max_c, min_c,
 			       max_t, min_t);
-      for ( ; ; ) {
-	ymuint unate = BinIO::read_8(s);
-	if ( unate == 0 ) break;
-	if ( unate == 1 ) {
-	  ymuint pin_id = BinIO::read_32(s);
-	  ymuint timing_id = BinIO::read_32(s);
-	  CiTiming* timing = timing_list[timing_id];
-	  cell->set_timing(
-	  library->set_cell_timing(cell, j, pin_id,
-				   kCellPosiUnate, timing);
-	}
-	else if ( unate == 2 ) {
-	  ymuint pin_id = BinIO::read_32(s);
-	  ymuint timing_id = BinIO::read_32(s);
-	  CiTiming* timing = timing_list[timing_id];
-	  library->set_cell_timing(cell, j, pin_id,
-				   kCellNegaUnate, timing);
-	}
-      }
     }
 
     // 入出力ピンの設定
@@ -157,24 +138,21 @@ restore_library(istream& s)
 			      max_f, min_f,
 			      max_c, min_c,
 			      max_t, min_t);
-      for ( ; ; ) {
-	ymuint unate = BinIO::read_32(s);
-	if ( unate == 0 ) break;
-	if ( unate == 1 ) {
-	  ymuint pin_id = BinIO::read_32(s);
-	  ymuint timing_id = BinIO::read_32(s);
-	  CiTiming* timing = timing_list[timing_id];
-	  library->set_cell_timing(cell, j + no, pin_id,
-				   kCellPosiUnate, timing);
-	}
-	else if ( unate == 2 ) {
-	  ymuint pin_id = BinIO::read_32(s);
-	  ymuint timing_id = BinIO::read_32(s);
-	  CiTiming* timing = timing_list[timing_id];
-	  library->set_cell_timing(cell, j, pin_id,
-				   kCellNegaUnate, timing);
-	}
+    }
+
+    // タイミング情報の設定
+    for ( ; ; ) {
+      ymuint unate = BinIO::read_32(s);
+      if ( unate == 0 ) {
+	// エンドマーカー
+	break;
       }
+      ymuint ipin_id = BinIO::read_32(s);
+      ymuint opin_id = BinIO::read_32(s);
+      ymuint timing_id = BinIO::read_32(s);
+      CiTiming* timing = timing_list[timing_id];
+      tCellTimingSense sense = ( unate == 1 ) ? kCellPosiUnate : kCellNegaUnate;
+      library->set_cell_timing(cell, ipin_id, opin_id, sense, timing);
     }
   }
 
