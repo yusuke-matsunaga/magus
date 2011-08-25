@@ -278,19 +278,19 @@ private:
   ymuint32 mInputNum;
 
   // 入力ピンの配列
-  CiInputPin** mInputArray;
+  CiPin** mInputArray;
 
   // 出力ピン数
   ymuint32 mOutputNum;
 
   // 出力ピンの配列
-  CiOutputPin** mOutputArray;
+  CiPin** mOutputArray;
 
   // 入出力ピン数
   ymuint32 mInoutNum;
 
   // 入出力ピンの配列
-  CiInoutPin** mInoutArray;
+  CiPin** mInoutArray;
 
   // バス数
   ymuint32 mBusNum;

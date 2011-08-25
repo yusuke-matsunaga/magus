@@ -161,18 +161,6 @@ CiPin::min_transition() const
   return CellTime(0.0);
 }
 
-// @brief タイミング情報の取得
-// @param[in] ipos 開始ピン番号
-// @param[in] timing_sense タイミング情報の摘要条件
-// @return 条件に合致するタイミング情報を返す．
-// @note なければ NULL を返す．
-const CellTiming*
-CiPin::timing(ymuint ipos,
-	      tTimingSense sense) const
-{
-  return NULL;
-}
-
 // @brief 出力ピン(入出力ピン)の関数を設定する．
 // @param[in] function 関数を表す論理式
 void
@@ -185,25 +173,6 @@ CiPin::set_function(const LogExpr& function)
 // @param[in] expr three_state 条件を表す論理式
 void
 CiPin::set_three_state(const LogExpr& expr)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-
-// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
-void
-CiPin::set_timing_array(const CellTiming** timing_array)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-
-// @brief 出力ピン(入出力ピン)のタイミング情報を設定する．
-// @param[in] pin_id 入力ピンのピン番号
-// @param[in] sense タイミング情報の適用条件
-// @param[in] timing 設定するタイミング情報
-void
-CiPin::set_timing(ymuint pin_id,
-		  tTimingSense sense,
-		  const CellTiming* timing)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
@@ -375,6 +344,7 @@ CiOutputPinBase::min_transition() const
   return mMinTransition;
 }
 
+#if 0
 // @brief タイミング情報の取得
 // @param[in] ipos 開始ピン番号
 // @param[in] timing_sense タイミング情報の摘要条件
@@ -390,6 +360,7 @@ CiOutputPinBase::timing(ymuint ipos,
   }
   return mTimingArray[ipos * 2 + offset];
 }
+#endif
 
 // @brief 出力ピン(入出力ピン)の関数を設定する．
 // @param[in] function 関数を表す論理式
@@ -408,12 +379,14 @@ CiOutputPinBase::set_three_state(const LogExpr& three_state)
   mThreeState = three_state;
 }
 
+#if 0
 // @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
 void
 CiOutputPinBase::set_timing_array(const CellTiming** timing_array)
 {
   mTimingArray = timing_array;
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////

@@ -368,16 +368,16 @@ CiLibrary::set_pinnum(CiCell* cell,
 		      ymuint nc)
 {
   cell->mInputNum = ni;
-  void* p = mAlloc.get_memory(sizeof(CiInputPin*) * ni);
-  cell->mInputArray = new (p) CiInputPin*[ni];
+  void* p = mAlloc.get_memory(sizeof(CiPin*) * ni);
+  cell->mInputArray = new (p) CiPin*[ni];
 
   cell->mOutputNum = no;
-  void* q = mAlloc.get_memory(sizeof(CiOutputPin*) * no);
-  cell->mOutputArray = new (q) CiOutputPin*[no];
+  void* q = mAlloc.get_memory(sizeof(CiPin*) * no);
+  cell->mOutputArray = new (q) CiPin*[no];
 
   cell->mInoutNum = nio;
-  void* r = mAlloc.get_memory(sizeof(CiInoutPin*) * nio);
-  cell->mInoutArray = new (r) CiInoutPin*[nio];
+  void* r = mAlloc.get_memory(sizeof(CiPin*) * nio);
+  cell->mInoutArray = new (r) CiPin*[nio];
 
   ymuint n = (ni + nio) * (no + nio) * 2;
   void* s = mAlloc.get_memory(sizeof(const CiTiming*) * n);
@@ -500,13 +500,6 @@ CiLibrary::new_cell_internal(CiCell* cell,
 }
 #endif
 
-// @brief タイミング情報を格納する配列を確保する．
-void
-CiLibrary::set_timing_array(CiPin* pin,
-			    ymuint np)
-{
-}
-
 // @brief タイミング情報を作る．
 // @param[in] id ID番号
 // @param[in] type タイミングの型
@@ -548,21 +541,21 @@ CiLibrary::set_cell_timing(CiCell* cell,
 			   ymuint opin_id,
 			   ymuint ipin_id,
 			   tCellTimingSense sense,
-			   const CellTiming* timing)
+			   CiTiming* timing)
 {
   ymuint base = opin_id * (cell->input_num() + cell->inout_num());
   switch ( sense ) {
-  case kSensePosiUnate:
-    mTimingArray[base + 0] = timing;
+  case kCellPosiUnate:
+    cell->mTimingArray[base + 0] = timing;
     break;
 
-  case kSenseNegaUnate:
-    mTimingArray[base + 1] = timing;
+  case kCellNegaUnate:
+    cell->mTimingArray[base + 1] = timing;
     break;
 
-  case kSenseNonUnate:
-    mTimingArray[base + 0] = timing;
-    mTimingArray[base + 1] = timing;
+  case kCellNonUnate:
+    cell->mTimingArray[base + 0] = timing;
+    cell->mTimingArray[base + 1] = timing;
     break;
 
   default:
@@ -580,7 +573,7 @@ CiLibrary::set_opin_function(CiCell* cell,
 			     ymuint opin_id,
 			     const LogExpr& function)
 {
-  CiPin* pin = cell->mPinArray[opin_id];
+  CiPin* pin = cell->mOutputArray[opin_id];
   pin->set_function(function);
 }
 
@@ -593,7 +586,7 @@ CiLibrary::set_opin_three_state(CiCell* cell,
 				ymuint opin_id,
 				const LogExpr& expr)
 {
-  CiPin* pin = cell->mPinArray[opin_id];
+  CiPin* pin = cell->mOutputArray[opin_id];
   pin->set_three_state(expr);
 }
 

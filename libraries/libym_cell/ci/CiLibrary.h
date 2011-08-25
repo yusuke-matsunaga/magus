@@ -25,6 +25,7 @@ BEGIN_NAMESPACE_YM_CELL
 
 class CiCell;
 class CiPin;
+class CiTiming;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CiLibrary CiLibrary.h "CiLibrary.h"
@@ -374,7 +375,7 @@ public:
 		  ymuint opin_id,
 		  ymuint ipin_id,
 		  tCellTimingSense sense,
-		  const CellTiming* timing);
+		  CiTiming* timing);
 
   /// @brief 出力ピンの機能を設定する．
   /// @param[in] cell セル
@@ -418,14 +419,6 @@ private:
 	     ymuint nio,
 	     ymuint nb,
 	     ymuint nc);
-
-  /// @brief タイミング情報を格納する配列を確保する．
-  /// @param[in] pin ピン
-  /// @param[in] np 総ピン数
-  /// @note 配列のサイズは np x 2
-  void
-  set_timing_array(CiPin* pin,
-		   ymuint np);
 
 
 private:
