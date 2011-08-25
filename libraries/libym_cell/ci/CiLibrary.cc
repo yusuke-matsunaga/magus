@@ -509,7 +509,7 @@ CiLibrary::new_cell_internal(CiCell* cell,
 // @param[in] slope_fall 立ち下がりスロープ遅延
 // @param[in] rise_resistance 立ち上がり負荷依存係数
 // @param[in] fall_resistance 立ち下がり負荷依存係数
-CellTiming*
+CiTiming*
 CiLibrary::new_timing(ymuint id,
 		      CellTiming::tType type,
 		      CellTime intrinsic_rise,
@@ -520,13 +520,13 @@ CiLibrary::new_timing(ymuint id,
 		      CellResistance fall_resistance)
 {
   void* p = mAlloc.get_memory(sizeof(CiTimingGeneric));
-  CellTiming* timing = new (p) CiTimingGeneric(id, type,
-					       intrinsic_rise,
-					       intrinsic_fall,
-					       slope_rise,
-					       slope_fall,
-					       rise_resistance,
-					       fall_resistance);
+  CiTiming* timing = new (p) CiTimingGeneric(id, type,
+					     intrinsic_rise,
+					     intrinsic_fall,
+					     slope_rise,
+					     slope_fall,
+					     rise_resistance,
+					     fall_resistance);
   return timing;
 }
 

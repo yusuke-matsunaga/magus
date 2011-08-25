@@ -144,32 +144,15 @@ LibDump::gen_pat(const CellLibrary& library)
   ymuint nc = library.cell_num();
   for (ymuint i = 0; i < nc; ++ i) {
     const Cell* cell = library.cell(i);
-    ymuint np = cell->pin_num();
+    ymuint ni = cell->input_num();
+    ymuint no = cell->output_num();
 
     if ( cell->is_logic() ) {
-      const CellPin* opin = NULL;
-      ymuint ni = 0;
-      for (ymuint j = 0; j < np; ++ j) {
-	const CellPin* pin = cell->pin(j);
-	if ( pin->is_output() ) {
-	  if ( opin != NULL ) {
-	    // 出力ピンが複数あるセルは対象外
-	    opin = NULL;
-	    break;
-	  }
-	  opin = pin;
-	}
-	else if ( pin->is_input() ) {
-	  ++ ni;
-	}
-	else if ( pin->is_inout() ) {
-	  // 入出力ピンを持つセルも対象外
-	  opin = NULL;
-	  break;
-	}
+      if ( no > 1 ) {
+	// 出力ピンが複数あるセルは対象外
+	continue;
       }
-      if ( opin == NULL ) continue;
-
+      const CellPin* opin = cell->output(0);
       if ( !opin->has_function() ) {
 	// 論理式を持たないセルも対象外
 	continue;

@@ -32,7 +32,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // セル情報の取得
+  // 基本情報の取得
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号の取得
@@ -56,8 +56,15 @@ public:
   ymuint
   input_num() const = 0;
 
+  /// @brief 入力ピン+入出力ピン数の取得
+  /// @note input_num() + inout_num() に等しい．
+  virtual
+  ymuint
+  input_num2() const = 0;
+
   /// @brief 入力ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num2() )
+  /// @note pos >= input_num() の場合には入出力ピンが返される．
   virtual
   const CellPin*
   input(ymuint pos) const = 0;
@@ -67,8 +74,15 @@ public:
   ymuint
   output_num() const = 0;
 
+  /// @brief 出力ピン+入出力ピン数の取得
+  /// @note output_num() + inout_num() に等しい．
+  virtual
+  ymuint
+  output_num2() const = 0;
+
   /// @brief 出力ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < output_num2() )
+  /// @note pos >= output_num() の場合には入出力ピンが返される．
   virtual
   const CellPin*
   output(ymuint pos) const = 0;
@@ -79,7 +93,7 @@ public:
   inout_num() const = 0;
 
   /// @brief 入出力ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < inout_num() )
   virtual
   const CellPin*
   inout(ymuint pos) const = 0;
@@ -150,7 +164,12 @@ public:
 	 ymuint opos,
 	 tCellTimingSense sense) const = 0;
 
-#if 0
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 機能情報の取得
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 組み合わせ論理セルの時に true を返す．
   bool
   is_logic() const;
@@ -173,17 +192,18 @@ public:
   bool
   is_seq() const;
 
-  /// @brief 論理セルの場合に関数を返す．
-  /// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
-  /// @note 非論理セルの場合の返り値は不定
-  const TvFunc&
-  logic_function(ymuint pos) const;
+  /// @brief 論理セルの場合に出力の論理式を返す．
+  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+  /// @note 論理式中の変数番号は入力ピン番号に対応する．
+  LogExpr
+  logic_function(ymuint pin_id) const;
 
-  /// @brief トライステートセルの場合にトライステート条件関数を返す．
-  /// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
-  /// @note 通常の論理セルの場合には定数0関数を返す．
-  const TvFunc&
-  tristate_function(ymuint pos) const;
+  /// @brief トライステートセルの場合にトライステート条件式を返す．
+  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+  /// @note 論理式中の変数番号は入力ピン番号に対応する．
+  /// @note 通常の論理セルの場合には定数0を返す．
+  LogExpr
+  tristate_function(ymuint pin_id) const;
 
   /// @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
   bool

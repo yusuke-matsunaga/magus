@@ -350,7 +350,7 @@ public:
   /// @param[in] slope_fall 立ち下がりスロープ遅延
   /// @param[in] rise_resistance 立ち上がり負荷依存係数
   /// @param[in] fall_resistance 立ち下がり負荷依存係数
-  CellTiming*
+  CiTiming*
   new_timing(ymuint id,
 	     CellTiming::tType type,
 	     CellTime intrinsic_rise,
