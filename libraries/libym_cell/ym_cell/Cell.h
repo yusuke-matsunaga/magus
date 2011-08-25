@@ -51,6 +51,12 @@ public:
   CellArea
   area() const = 0;
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ピン情報の取得
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 入力ピン数の取得
   virtual
   ymuint
@@ -153,8 +159,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief タイミング情報の取得
-  /// @param[in] ipos 開始ピン番号
-  /// @param[in] opos 終了ピン番号
+  /// @param[in] ipos 開始ピン番号 ( 0 <= ipos < input_num2() )
+  /// @param[in] opos 終了ピン番号 ( 0 <= opos < output_num2() )
   /// @param[in] timing_sense タイミング情報の摘要条件
   /// @return 条件に合致するタイミング情報を返す．
   /// @note なければ NULL を返す．
@@ -198,13 +204,20 @@ public:
   LogExpr
   logic_function(ymuint pin_id) const;
 
+  /// @brief 出力がトライステートの時に true を返す．
+  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+  bool
+  is_tristate(ymuint pin_id) const;
+
   /// @brief トライステートセルの場合にトライステート条件式を返す．
   /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
   /// @note 論理式中の変数番号は入力ピン番号に対応する．
+  /// @note is_tristate() が true の時のみ意味を持つ．
   /// @note 通常の論理セルの場合には定数0を返す．
   LogExpr
   tristate_function(ymuint pin_id) const;
 
+#if 0
   /// @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
   bool
   has_clear() const;

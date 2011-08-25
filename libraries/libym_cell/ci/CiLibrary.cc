@@ -532,14 +532,18 @@ CiLibrary::new_timing(ymuint id,
 
 // @brief セルのタイミング情報を設定する．
 // @param[in] cell セル
-// @param[in] opin_id 出力(入出力)ピン番号
-// @param[in] ipin_id 関連する入力(入出力)ピン番号
+// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
 // @param[in] sense タイミング条件
 // @param[in] timing 設定するタイミング情報
+// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+//  + cell->output_num() を使う．
+// @note ( *2 ) ipin_id で入出力ピンを表す時には入出力ピン番号
+//  + cell->input_num() を使う．
 void
 CiLibrary::set_cell_timing(CiCell* cell,
-			   ymuint opin_id,
 			   ymuint ipin_id,
+			   ymuint opin_id,
 			   tCellTimingSense sense,
 			   CiTiming* timing)
 {
@@ -561,33 +565,6 @@ CiLibrary::set_cell_timing(CiCell* cell,
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
-}
-
-// @brief 出力ピンの機能を設定する．
-// @param[in] cell セル
-// @param[in] opin_id 出力(入出力)ピン番号
-// @param[in] pin 出力(入出力)ピン
-// @param[in] function 機能を表す論理式
-void
-CiLibrary::set_opin_function(CiCell* cell,
-			     ymuint opin_id,
-			     const LogExpr& function)
-{
-  CiPin* pin = cell->mOutputArray[opin_id];
-  pin->set_function(function);
-}
-
-// @brief 出力ピンの three_state 条件を設定する．
-// @param[in] cell セル
-// @param[in] opin_id 出力(入出力)ピン番号 ( 0 <= pin_id < cell->pin_num() )
-// @param[in] expr three_state 条件を表す論理式
-void
-CiLibrary::set_opin_three_state(CiCell* cell,
-				ymuint opin_id,
-				const LogExpr& expr)
-{
-  CiPin* pin = cell->mOutputArray[opin_id];
-  pin->set_three_state(expr);
 }
 
 END_NAMESPACE_YM_CELL

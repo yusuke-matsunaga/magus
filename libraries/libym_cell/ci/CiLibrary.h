@@ -377,28 +377,6 @@ public:
 		  tCellTimingSense sense,
 		  CiTiming* timing);
 
-  /// @brief 出力ピンの機能を設定する．
-  /// @param[in] cell セル
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-  /// @param[in] function 機能を表す論理式
-  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->output_num() を使う．
-  void
-  set_opin_function(CiCell* cell,
-		    ymuint opin_id,
-		    const LogExpr& function);
-
-  /// @brief 出力ピンの three_state 条件を設定する．
-  /// @param[in] cell セル
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-  /// @param[in] expr three_state 条件を表す論理式
-  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->output_num() を使う．
-  void
-  set_opin_three_state(CiCell* cell,
-		       ymuint opin_id,
-		       const LogExpr& expr);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
