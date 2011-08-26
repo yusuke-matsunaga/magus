@@ -37,7 +37,7 @@ libym_cell_la_SOURCES = \
 	CellMislibReader.cc \
 	dump.cc	\
 	CellClassBase.h \
-	CellClassbase.cc \
+	CellClassBase.cc \
 	CellLogicClass.h \
 	CellLogicClass.cc \
 	CellTristateClass.h \

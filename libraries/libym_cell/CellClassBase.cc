@@ -112,19 +112,4 @@ CellClassBase::has_preset() const
   return false;
 }
 
-// @brief セルグループの数を返す．
-ymuint
-CellClassBase::group_num() const
-{
-  return mGroupNum;
-}
-
-// @brief セルグループを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < func_num() )
-const CellGroup*
-CellClassBase::cell_group(ymuint pos) const
-{
-  return mGroupList[pos];
-}
-
 END_NAMESPACE_YM_CELL

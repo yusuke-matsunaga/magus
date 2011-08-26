@@ -130,25 +130,10 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-inline
-CellClass::CellClass() :
-  mGroupNum(0),
-  mGroupList(NULL)
-{
-}
-
-// @brief デストラクタ
-inline
-CellClass::~CellClass()
-{
-  // mGroupList は CellMgr が管理している．
-}
-
 // @brief NPN同値類の数を返す．
 inline
 ymuint
-CellClass::group_num() const
+CellClassBase::group_num() const
 {
   return mGroupNum;
 }
@@ -157,7 +142,7 @@ CellClass::group_num() const
 // @param[in] pos 位置番号 ( 0 <= pos < func_num() )
 inline
 const CellGroup*
-CellClass::cell_group(ymuint pos) const
+CellClassBase::cell_group(ymuint pos) const
 {
   return mGroupList[pos];
 }
