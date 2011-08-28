@@ -220,7 +220,7 @@ ww0_refine(vector<NpnConf>& pollist)
 
   // 重み別 w0 係数を用いて極性の決定を行う．
   ymuint w = 0;
-  int max_d0array[kNpnMaxNi + 1];
+  int max_d0array[kTvFuncMaxNi + 1];
   for (w = 0; w <= ni && pollist.size() > 1; ++ w) {
     bool first = true;
     int max_d0 = 0;
@@ -360,7 +360,7 @@ NpnMgr::cannonical(const TvFunc& func,
 #else
   // 最初に全ての極性を展開してしまう．
   vector<NpnConf> pollist;
-  ymuint ulist[kNpnMaxNi];
+  ymuint ulist[kTvFuncMaxNi];
   ymuint unum = 0;
   for (ymuint c = 0; c < conf0.nc(); ++ c) {
     if ( conf0.ic_pol(c) == 0 ) {
@@ -467,7 +467,7 @@ w2refine(NpnConf& conf,
   // Walsh の 2次の係数を用いた細分化
 
   // 確定した入力をキューに積む．
-  ymuint queue[kNpnMaxNi];
+  ymuint queue[kTvFuncMaxNi];
   ymuint rp = 0;
   ymuint wp = 0;
   for (ymuint g = g0; g < conf.ng(); ++ g) {

@@ -9,11 +9,12 @@
 /// All rights reserved.
 
 
+#include "ym_logic/tvfunc_nsdef.h"
+#include "ym_logic/lexp_nsdef.h"
 #include "ym_logic/npn_nsdef.h"
-#include "ym_logic/NpnMap.h"
 
 
-BEGIN_NAMESPACE_YM_NPN
+BEGIN_NAMESPACE_YM_TVFUNC
 
 //////////////////////////////////////////////////////////////////////
 /// @class TvFunc TvFunc.h "ym_logic/TvFunc.h"
@@ -545,15 +546,15 @@ operator<<(ostream& s,
   return s;
 }
 
-END_NAMESPACE_YM_NPN
+END_NAMESPACE_YM_TVFUNC
 
 BEGIN_NAMESPACE_HASH
 // TvFunc をキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsNpn::TvFunc>
+struct hash<nsYm::nsTvFunc::TvFunc>
 {
   ymuint
-  operator()(const nsYm::nsNpn::TvFunc& f) const
+  operator()(const nsYm::nsTvFunc::TvFunc& f) const
   {
     return f.hash();
   }

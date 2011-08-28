@@ -5,6 +5,7 @@
 SUBDIRS = \
 	ym_logic \
 	expr \
+	tvfunc \
 	npn \
 	bdd \
 	sat \
@@ -29,6 +30,7 @@ libym_logic_la_SOURCES =
 
 libym_logic_la_LIBADD = \
 	expr/libym_logic_expr.la \
+	tvfunc/libym_logic_tvfunc.la \
 	npn/libym_logic_npn.la \
 	bdd/libym_logic_bdd.la \
 	sat/libym_logic_sat.la

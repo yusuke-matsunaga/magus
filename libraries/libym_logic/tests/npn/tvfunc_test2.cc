@@ -87,7 +87,7 @@ walsh_01(const TvFunc& func,
 {
   StopWatch sw;
 
-  int vec1[kNpnMaxNi];
+  int vec1[kTvFuncMaxNi];
 
   sw.start();
   for (int i = 0; i < mag; ++ i) {
@@ -108,8 +108,8 @@ walsh_012(const TvFunc& func,
 {
   StopWatch sw;
 
-  int vec1[kNpnMaxNi];
-  int vec2[kNpnMaxNi * kNpnMaxNi];
+  int vec1[kTvFuncMaxNi];
+  int vec2[kTvFuncMaxNi * kTvFuncMaxNi];
 
   sw.start();
   for (int i = 0; i < mag; ++ i) {

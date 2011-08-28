@@ -10,7 +10,8 @@
 
 
 #include "ym_logic/npn_nsdef.h"
-#include "ym_logic/Literal.h"
+#include "ym_logic/lexp_nsdef.h"
+#include "ym_logic/tvfunc_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_NPN
@@ -169,7 +170,7 @@ private:
   ymuint32 mNiPol;
 
   // 入力のマッピング情報
-  tNpnImap mImap[kNpnMaxNi];
+  tNpnImap mImap[kTvFuncMaxNi];
 
 };
 
