@@ -11,6 +11,8 @@
 
 
 #include "ym_logic/bdd_nsdef.h"
+#include "ym_logic/VarId.h"
+#include "ym_logic/Pol.h"
 #include "ym_logic/lexp_nsdef.h"
 
 

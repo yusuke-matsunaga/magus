@@ -153,7 +153,7 @@ ymuint s_pidx[] = {
 
 END_NONAMESPACE
 
-BEGIN_NAMESPACE_YM_TVFUNC
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // 論理関数を表すクラス
@@ -2669,7 +2669,7 @@ walsh_012_6b(ymulong* src_vec,
 	     ymint vec1[],
 	     ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_5b(src_vec,                     ni, vec1,   vec2);
   ymint ans1 = walsh_012_5b(src_vec + (1 << (5 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 5; ++ i) {
@@ -2692,7 +2692,7 @@ walsh_012_7b(ymulong* src_vec,
 	     ymint vec1[],
 	     ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_6b(src_vec,                     ni, vec1  , vec2);
   ymint ans1 = walsh_012_6b(src_vec + (1 << (6 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 6; ++ i) {
@@ -2713,7 +2713,7 @@ walsh_012_8b(ymulong* src_vec,
 	     ymint vec1[],
 	     ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_7b(src_vec,                     ni, vec1  , vec2);
   ymint ans1 = walsh_012_7b(src_vec + (1 << (7 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 7; ++ i) {
@@ -2734,7 +2734,7 @@ walsh_012_9b(ymulong* src_vec,
 	     ymint vec1[],
 	     ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_8b(src_vec,                     ni, vec1,   vec2);
   ymint ans1 = walsh_012_8b(src_vec + (1 << (8 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 8; ++ i) {
@@ -2755,7 +2755,7 @@ walsh_012_10b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_9b(src_vec,                     ni, vec1  , vec2);
   ymint ans1 = walsh_012_9b(src_vec + (1 << (9 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 9; ++ i) {
@@ -2776,7 +2776,7 @@ walsh_012_11b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_10b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_10b(src_vec + (1 << (10 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 10; ++ i) {
@@ -2797,7 +2797,7 @@ walsh_012_12b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_11b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_11b(src_vec + (1 << (11 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 11; ++ i) {
@@ -2817,7 +2817,7 @@ walsh_012_13b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_12b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_12b(src_vec + (1 << (12 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 12; ++ i) {
@@ -2837,7 +2837,7 @@ walsh_012_14b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_13b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_13b(src_vec + (1 << (13 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 13; ++ i) {
@@ -2857,7 +2857,7 @@ walsh_012_15b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_14b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_14b(src_vec + (1 << (14 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 14; ++ i) {
@@ -2877,7 +2877,7 @@ walsh_012_16b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_15b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_15b(src_vec + (1 << (15 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 15; ++ i) {
@@ -2897,7 +2897,7 @@ walsh_012_17b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_16b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_16b(src_vec + (1 << (16 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 16; ++ i) {
@@ -2917,7 +2917,7 @@ walsh_012_18b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_17b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_17b(src_vec + (1 << (17 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 17; ++ i) {
@@ -2937,7 +2937,7 @@ walsh_012_19b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_18b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_18b(src_vec + (1 << (18 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 18; ++ i) {
@@ -2957,7 +2957,7 @@ walsh_012_20b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[kTvFuncMaxNi];
+  ymint vec1_1[TvFunc::kMaxNi];
   ymint ans0 = walsh_012_19b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_19b(src_vec + (1 << (19 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 19; ++ i) {
@@ -5388,7 +5388,7 @@ TvFunc::xform(const NpnMap& npnmap) const
 #endif
 
   ymuint imask = 0UL;
-  ymuint ipat[kTvFuncMaxNi];
+  ymuint ipat[kMaxNi];
   for (ymuint i = 0; i < mNi; ++ i) {
     tNpnImap imap = npnmap.imap(i);
     if ( npnimap_pol(imap) == kPolNega ) {
@@ -5549,4 +5549,4 @@ TvFunc::dump(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_TVFUNC
+END_NAMESPACE_YM

@@ -21,6 +21,7 @@ noinst_HEADERS = \
 	LogExprWriter.h \
 	NpnMap.h \
 	NpnMgr.h \
+	Pol.h
 	SatMsgHandler.h \
 	SatSolver.h \
 	SatStats.h \

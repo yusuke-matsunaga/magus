@@ -161,7 +161,7 @@ int
 NpnConf::walsh_w0(ymuint w) const
 {
   tPol op = (opol() == -1) ? kPolNega : kPolPosi;
-  tPol ip[kTvFuncMaxNi];
+  tPol ip[TvFunc::kMaxNi];
   for (ymuint i = 0; i < ni(); ++ i) {
     if ( ipol(i) == -1 ) {
       ip[i] = kPolNega;
@@ -198,7 +198,7 @@ NpnConf::set_ic_pol(ymuint pos,
 void
 NpnConf::set_map(NpnMap& map) const
 {
-  ymuint order[kTvFuncMaxNi];
+  ymuint order[TvFunc::kMaxNi];
   ymuint k = 0;
   for (ymuint i = 0; i < nc(); ++ i) {
     ymuint rep = ic_rep(i);

@@ -186,27 +186,27 @@ private:
   ymint32 mW0;
 
   // Walsh の 1次係数
-  ymint32 mW1[kTvFuncMaxNi];
+  ymint32 mW1[TvFunc::kMaxNi];
 
   // Walsh の 2次係数
   mutable
-  ymint32 mW2[kTvFuncMaxNi * kTvFuncMaxNi];
+  ymint32 mW2[TvFunc::kMaxNi * TvFunc::kMaxNi];
 
   // mW2 が計算済みかどうかを記録するビットマップ
   mutable
-  ymint32 mW2flag[kTvFuncMaxNi * kTvFuncMaxNi];
+  ymint32 mW2flag[TvFunc::kMaxNi * TvFunc::kMaxNi];
 
   // 出力極性
   ymint32 mOpol;
 
   // 入力極性を表す配列
-  ymint32 mIpols[kTvFuncMaxNi];
+  ymint32 mIpols[TvFunc::kMaxNi];
 
   // 等価入力クラスの数
   ymuint32 mNc;
 
   // 等価入力クラスの先頭番号のリスト
-  ymuint32 mIcRep[kTvFuncMaxNi];
+  ymuint32 mIcRep[TvFunc::kMaxNi];
 
   // 独立な入力クラスの先頭番号
   ymuint32 mIndepRep;
@@ -216,10 +216,10 @@ private:
 
   // 等価入力クラスの要素数の配列
   // キーは先頭番号
-  ymuint32 mIcNum[kTvFuncMaxNi];
+  ymuint32 mIcNum[TvFunc::kMaxNi];
 
   // 等価入力クラスの次の要素を指す配列
-  ymuint32 mIcLink[kTvFuncMaxNi];
+  ymuint32 mIcLink[TvFunc::kMaxNi];
 
 };
 

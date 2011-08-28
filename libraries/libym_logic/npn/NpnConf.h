@@ -308,11 +308,11 @@ private:
   // 入力極性
   //  1: 肯定
   // -1: 否定
-  ymint32 mIpols[kTvFuncMaxNi];
+  ymint32 mIpols[TvFunc::kMaxNi];
 
   // 入力の順序
   mutable
-  ymuint32 mIorder[kTvFuncMaxNi];
+  ymuint32 mIorder[TvFunc::kMaxNi];
 
   // mIorder が正しいとき true となるフラグ
   mutable
@@ -324,13 +324,13 @@ private:
   // 入力クラスの順列
   // 各要素は下位2ビットで極性(0, 1, 2)，
   // 残りが入力配列へのインデックスを表す．
-  ymint32 mIcList[kTvFuncMaxNi];
+  ymint32 mIcList[TvFunc::kMaxNi];
 
   // グループ数
   ymuint32 mNg;
 
   // グループの先頭のインデックス
-  ymuint32 mIndex[kTvFuncMaxNi + 1];
+  ymuint32 mIndex[TvFunc::kMaxNi + 1];
 
 };
 
@@ -349,7 +349,7 @@ NpnConf::NpnConf() :
   mNg(0)
 {
   mIndex[0] = 0;
-  for (ymuint i = 0; i < kTvFuncMaxNi; ++ i) {
+  for (ymuint i = 0; i < TvFunc::kMaxNi; ++ i) {
     mIpols[i] = 1;
   }
 }

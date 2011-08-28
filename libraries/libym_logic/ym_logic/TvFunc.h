@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "ym_logic/tvfunc_nsdef.h"
-#include "ym_logic/lexp_nsdef.h"
+#include "ym_logic/VarId.h"
+#include "ym_logic/Pol.h"
 #include "ym_logic/npn_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_TVFUNC
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 /// @class TvFunc TvFunc.h "ym_logic/TvFunc.h"
@@ -249,6 +249,18 @@ public:
   /// @brief 生のデータを得る．
   ymulong
   raw_data(ymuint blk) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 定数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 最大の入力数
+  // 特に根拠はないが，これなら Walsh 係数が 32 ビット整数で収まる．
+  // あと真理値表ベースの手法ではこれくらいが限度
+  static
+  const ymuint kMaxNi = 20;
 
 
 public:
@@ -546,15 +558,15 @@ operator<<(ostream& s,
   return s;
 }
 
-END_NAMESPACE_YM_TVFUNC
+END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_HASH
 // TvFunc をキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsTvFunc::TvFunc>
+struct hash<nsYm::TvFunc>
 {
   ymuint
-  operator()(const nsYm::nsTvFunc::TvFunc& f) const
+  operator()(const nsYm::TvFunc& f) const
   {
     return f.hash();
   }

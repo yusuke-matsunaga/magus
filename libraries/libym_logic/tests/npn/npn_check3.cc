@@ -231,8 +231,8 @@ rgen_walsh(size_t ni,
     }
 
     TvFunc func(ni, buff);
-    int w1[kTvFuncMaxNi];
-    int w2[kTvFuncMaxNi * kTvFuncMaxNi];
+    int w1[TvFunc::kMaxNi];
+    int w2[TvFunc::kMaxNi * TvFunc::kMaxNi];
 
     sw.start();
     for (size_t i = 0; i < mag; ++ i) {
