@@ -75,7 +75,7 @@ public:
   /// - 子供が定数ノードの場合には値に応じた簡単化を行う．
   /// - 同一の子供ノードがあった場合には重複を取り除く
   LexpNodePtr
-  make_and(size_t begin);
+  make_and(ymuint begin);
 
   /// @brief OR ノードの生成
   /// @param[in] begin ノードスタック中の開始位置
@@ -84,7 +84,7 @@ public:
   /// - 子供が定数ノードの場合には値に応じた簡単化を行う．
   /// - 同一の子供ノードがあった場合には重複を取り除く
   LexpNodePtr
-  make_or(size_t begin);
+  make_or(ymuint begin);
 
   /// @brief XOR ノードの生成
   /// @param[in] begin ノードスタック中の開始位置
@@ -93,21 +93,21 @@ public:
   /// - 子供が定数ノードの場合には値に応じた簡単化を行う．
   /// - 同一の子供ノードがあった場合には個数の偶奇に応じた処理を行う．
   LexpNodePtr
-  make_xor(size_t begin);
+  make_xor(ymuint begin);
 
   /// @brief ノードスタックにノードを入れる．
   void
   nodestack_push(const LexpNode* node);
 
   /// @brief ノードスタックの先頭位置を返す．
-  size_t
+  ymuint
   nodestack_top();
 
   /// @brief ノードスタックの先頭位置を戻す．
   /// @note この関数を明示的に使う必要があるののはノードを
   /// プッシュしておきながら make_XXX を呼ばないとき
   void
-  nodestack_pop(size_t oldtop);
+  nodestack_pop(ymuint oldtop);
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -158,27 +158,27 @@ public:
 public:
 
   /// @brief 使用されているメモリ量を返す．
-  size_t
+  ymuint
   used_size();
 
   /// @brief 使用されているノード数を返す．
-  size_t
+  ymuint
   node_num();
 
   /// @brief used_size() の最大値を返す．
-  size_t
+  ymuint
   max_used_size();
 
   /// @brief nodenum() の最大値を返す．
-  size_t
+  ymuint
   max_node_num();
 
   /// @brief 実際に確保したメモリ量を返す．
-  size_t
+  ymuint
   allocated_size();
 
   /// @brief 実際に確保した回数を返す．
-  size_t
+  ymuint
   allocated_count();
 
   /// @brief 内部状態を出力する．
@@ -225,8 +225,8 @@ private:
 
   // LexpNode の入力数から必要なサイズを計算する．
   static
-  size_t
-  calc_size(size_t nc);
+  ymuint
+  calc_size(ymuint nc);
 
 
 private:
@@ -253,13 +253,13 @@ private:
   LexpNodeList mNodeStack;
 
   // 使用中のノード数
-  size_t mNodeNum;
+  ymuint32 mNodeNum;
 
   // 使用した最大のノード数
-  size_t mMaxNodeNum;
+  ymuint32 mMaxNodeNum;
 
   // 絶対に開放されないノード数
-  size_t mStuckNodeNum;
+  ymuint32 mStuckNodeNum;
 
 };
 

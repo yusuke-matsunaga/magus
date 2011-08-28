@@ -13,6 +13,13 @@
 #include "ym_logic/Literal.h"
 
 
+BEGIN_NAMESPACE_YM
+
+// クラス名の先行宣言
+class TvFunc;
+
+END_NAMESPACE_YM
+
 BEGIN_NAMESPACE_YM_LEXP
 
 // クラス名の先行宣言
@@ -253,9 +260,10 @@ public:
        ymulong mask = ~0UL) const;
 
   /// @brief 真理値表の作成
-  /// @param[out] tv 真理値ベクタ
-  void
-  make_tv(vector<ymulong>& tv) const;
+  /// @param[in] ni 入力数
+  /// @note ni が省略された場合には input_size() が用いられる．
+  TvFunc
+  make_tv(ymuint ni = 0) const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -329,7 +337,7 @@ public:
   /// @brief オペランドの個数の取得
   /// @retval オペランドの個数 AND/OR/XOR の場合
   /// @retval 0 上記以外の場合
-  size_t
+  ymuint
   child_num() const;
 
   /// @brief オペランドの取得
@@ -338,7 +346,7 @@ public:
   /// ただし pos が範囲外の場合と演算子ノードでなかった場合には
   /// 0を表す式を返す．
   LogExpr
-  child(size_t pos) const;
+  child(ymuint pos) const;
 
   /// @brief "シンプル"な論理式のチェック
   /// @return シンプルな論理式のときに true を返す．
@@ -382,47 +390,47 @@ public:
 
   /// @brief リテラル数の取得
   /// @return リテラル数
-  size_t
+  ymuint
   litnum() const;
 
   /// @brief 変数の出現回数の取得
   /// @param[in] varid 変数番号
   /// @return varid 番めの変数のリテラルの出現回数を得る．
-  size_t
+  ymuint
   litnum(tVarId varid) const;
 
   /// @brief リテラルの出現回数の取得
   /// @param[in] varid 変数番号
   /// @param[in] pol 極性
   /// @return varid 番めの変数の極性が pol のリテラルの出現回数を得る．
-  size_t
+  ymuint
   litnum(tVarId varid,
 	 tPol pol) const;
 
   /// @brief リテラルの出現回数の取得
   /// @param[in] lit リテラル
   /// @return lit のリテラルの出現回数を得る．
-  size_t
+  ymuint
   litnum(const Literal& lit) const;
 
   /// @brief 使われている変数の最大の番号 + 1を得る．
-  size_t
+  ymuint
   input_size() const;
 
   /// @brief SOP形式に展開したときのキューブ数の見積もり
   /// @return SOP形式のキューブ (積項) 数
-  size_t
+  ymuint
   sop_cubenum() const;
 
   /// @brief SOP形式に展開した時のリテラル数の見積もり
   /// @return SOP形式のリテラル数
-  size_t
+  ymuint
   sop_litnum() const;
 
   /// @brief SOP形式に展開した時の変数の出現回数の見積もり
   /// @param[in] varid 変数番号
   /// @return SOP形式の varid 番めの変数のリテラルの出現回数
-  size_t
+  ymuint
   sop_litnum(tVarId varid) const;
 
   /// @brief SOP形式に展開した時のテラルの出現回数の見積もり
@@ -430,14 +438,14 @@ public:
   /// @param[in] pol 極性
   /// @return SOP形式に展開した時の varid 番めの変数の極性が
   /// pol のリテラルの出現回数
-  size_t
+  ymuint
   sop_litnum(tVarId varid,
 	     tPol pol) const;
 
   /// @brief SOP形式に展開したときのリテラルの出現回数の見積もり
   /// @param[in] lit リテラル
   /// @return SOP形式に展開したときの lit のリテラルの出現回数
-  size_t
+  ymuint
   sop_litnum(const Literal& lit) const;
 
   /// @}
@@ -452,32 +460,32 @@ public:
 
   /// @brief 使用されているメモリ量を返す．
   static
-  size_t
+  ymuint
   used_size();
 
   /// @brief 現在使用中のノード数を返す．
   static
-  size_t
+  ymuint
   node_num();
 
   /// @brief used_size() の最大値を返す．
   static
-  size_t
+  ymuint
   max_used_size();
 
   /// @brief nodenum() の最大値を返す．
   static
-  size_t
+  ymuint
   max_node_num();
 
   /// @brief 実際に確保したメモリ量を返す．
   static
-  size_t
+  ymuint
   allocated_size();
 
   /// @brief 実際に確保した回数を返す．
   static
-  size_t
+  ymuint
   allocated_count();
 
   /// @brief 内部状態を出力する．
@@ -610,14 +618,14 @@ LogExpr::make_literal(const Literal& lit)
 }
 
 inline
-size_t
+ymuint
 LogExpr::litnum(const Literal& lit) const
 {
   return litnum(lit.varid(), lit.pol());
 }
 
 inline
-size_t
+ymuint
 LogExpr::sop_litnum(const Literal& lit) const
 {
   return sop_litnum(lit.varid(), lit.pol());

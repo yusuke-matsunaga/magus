@@ -12,6 +12,7 @@
 #include "LexpNode.h"
 #include "LexpMgr.h"
 #include "SopLit.h"
+#include "ym_logic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM_LEXP
@@ -30,8 +31,8 @@ posi_equiv(const LexpNode* node0,
     return false;
   }
 
-  size_t n = node0->child_num();
-  for (size_t i = 0; i < n; i ++) {
+  ymuint n = node0->child_num();
+  for (ymuint i = 0; i < n; i ++) {
     const LexpNode* chd0 = node0->child(i);
     const LexpNode* chd1 = node1->child(i);
     if ( !posi_equiv(chd0, chd1) ) {
@@ -69,8 +70,8 @@ nega_equiv(const LexpNode* node0,
     if ( !node1->is_or() ) {
       return false;
     }
-    size_t n = node0->child_num();
-    for (size_t i = 0; i < n; i ++) {
+    ymuint n = node0->child_num();
+    for (ymuint i = 0; i < n; i ++) {
       const LexpNode* chd0 = node0->child(i);
       const LexpNode* chd1 = node1->child(i);
       if ( !nega_equiv(chd0, chd1) ) {
@@ -83,8 +84,8 @@ nega_equiv(const LexpNode* node0,
     if ( !node1->is_and() ) {
       return false;
     }
-    size_t n = node0->child_num();
-    for (size_t i = 0; i < n; i ++) {
+    ymuint n = node0->child_num();
+    for (ymuint i = 0; i < n; i ++) {
       const LexpNode* chd0 = node0->child(i);
       const LexpNode* chd1 = node1->child(i);
       if ( !nega_equiv(chd0, chd1) ) {
@@ -97,9 +98,9 @@ nega_equiv(const LexpNode* node0,
     if ( !node1->is_xor() ) {
       return false;
     }
-    size_t n = node0->child_num();
+    ymuint n = node0->child_num();
     tPol pol = kPolPosi;
-    for (size_t i = 0; i < n; i ++) {
+    for (ymuint i = 0; i < n; i ++) {
       const LexpNode* chd0 = node0->child(i);
       const LexpNode* chd1 = node1->child(i);
       if ( !nega_equiv(chd0, chd1) ) {
@@ -135,30 +136,75 @@ LexpNode::eval(const vector<ymulong>& vals,
     return ~vals[varid()] & mask;
   }
 
-  size_t ni = child_num();
+  ymuint ni = child_num();
   if ( is_and() ) {
     ymulong ans = child(0)->eval(vals, mask);
-    for (size_t i = 1; i < ni; ++ i) {
+    for (ymuint i = 1; i < ni; ++ i) {
       ans &= child(i)->eval(vals, mask);
     }
     return ans;
   }
   if ( is_or() ) {
     ymulong ans = child(0)->eval(vals, mask);
-    for (size_t i = 1; i < ni; ++ i) {
+    for (ymuint i = 1; i < ni; ++ i) {
       ans |= child(i)->eval(vals, mask);
     }
     return ans;
   }
   if ( is_xor() ) {
     ymulong ans = child(0)->eval(vals, mask);
-    for (size_t i = 1; i < ni; ++ i) {
+    for (ymuint i = 1; i < ni; ++ i) {
       ans ^= child(i)->eval(vals, mask);
     }
     return ans;
   }
   assert_not_reached(__FILE__, __LINE__);
   return 0UL;
+}
+
+// @brief 真理値表を作成する．
+// @param[in] ni 入力数
+TvFunc
+LexpNode::make_tv(ymuint ni) const
+{
+  if ( is_zero() ) {
+    return TvFunc::const_zero(ni);
+  }
+  if ( is_one() ) {
+    return TvFunc::const_one(ni);
+  }
+  if ( is_posiliteral() ) {
+    return TvFunc::posi_literal(ni, varid());
+  }
+  if ( is_negaliteral() ) {
+    return TvFunc::nega_literal(ni, varid());
+  }
+
+  // あとは AND/OR/XOR のみ
+  ymuint nc = child_num();
+  if ( is_and() ) {
+    TvFunc ans = child(0)->make_tv(ni);
+    for (ymuint i = 1; i < nc; ++ i) {
+      ans &= child(i)->make_tv(ni);
+    }
+    return ans;
+  }
+  if ( is_or() ) {
+    TvFunc ans = child(0)->make_tv(ni);
+    for (ymuint i = 1; i < nc; ++ i) {
+      ans |= child(i)->make_tv(ni);
+    }
+    return ans;
+  }
+  if ( is_xor() ) {
+    TvFunc ans = child(0)->make_tv(ni);
+    for (ymuint i = 1; i < nc; ++ i) {
+      ans ^= child(i)->make_tv(ni);
+    }
+    return ans;
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return TvFunc();
 }
 
 // 定数,リテラルもしくは子供がリテラルのノードの時に true を返す．
@@ -169,8 +215,8 @@ LexpNode::is_simple() const
     return true;
   }
 
-  size_t n = child_num();
-  for (size_t i = 0; i < n; ++ i) {
+  ymuint n = child_num();
+  for (ymuint i = 0; i < n; ++ i) {
     if ( !child(i)->is_literal() ) {
       return false;
     }
@@ -186,8 +232,8 @@ LexpNode::is_simple_and() const
     return false;
   }
 
-  size_t n = child_num();
-  for (size_t i = 0; i < n; ++ i) {
+  ymuint n = child_num();
+  for (ymuint i = 0; i < n; ++ i) {
     if ( !child(i)->is_literal() ) {
       return false;
     }
@@ -203,8 +249,8 @@ LexpNode::is_simple_or() const
     return false;
   }
 
-  size_t n = child_num();
-  for (size_t i = 0; i < n; ++ i) {
+  ymuint n = child_num();
+  for (ymuint i = 0; i < n; ++ i) {
     if ( !child(i)->is_literal() ) {
       return false;
     }
@@ -220,8 +266,8 @@ LexpNode::is_simple_xor() const
     return false;
   }
 
-  size_t n = child_num();
-  for (size_t i = 0; i < n; ++ i) {
+  ymuint n = child_num();
+  for (ymuint i = 0; i < n; ++ i) {
     if ( !child(i)->is_literal() ) {
       return false;
     }
@@ -243,8 +289,8 @@ LexpNode::is_sop() const
     return false;
   }
 
-  size_t n = child_num();
-  for (size_t i = 0; i < n; ++ i) {
+  ymuint n = child_num();
+  for (ymuint i = 0; i < n; ++ i) {
     const LexpNode* chd = child(i);
     if ( !chd->is_literal() && !chd->is_simple_and() ) {
       return false;
@@ -254,7 +300,7 @@ LexpNode::is_sop() const
 }
 
 // リテラル数を返す．
-size_t
+ymuint
 LexpNode::litnum() const
 {
   if ( is_literal() ) {
@@ -264,9 +310,9 @@ LexpNode::litnum() const
 
   if ( is_op() ) {
     // AND/OR/XOR ノードなら子供のリテラル数の和を返す．
-    size_t num = 0;
-    size_t n = child_num();
-    for (size_t i = 0; i < n; ++ i) {
+    ymuint num = 0;
+    ymuint n = child_num();
+    for (ymuint i = 0; i < n; ++ i) {
       num += child(i)->litnum();
     }
     return num;
@@ -277,7 +323,7 @@ LexpNode::litnum() const
 }
 
 // 特定の変数のリテラル数を返す．
-size_t
+ymuint
 LexpNode::litnum(tVarId id) const
 {
   if ( is_literal() && varid() == id ) {
@@ -287,9 +333,9 @@ LexpNode::litnum(tVarId id) const
 
   if ( is_op() ) {
     // AND/OR/XOR ノードなら子供のリテラル数の和を返す．
-    size_t num = 0;
-    size_t n = child_num();
-    for (size_t i = 0; i < n; ++ i) {
+    ymuint num = 0;
+    ymuint n = child_num();
+    for (ymuint i = 0; i < n; ++ i) {
       num += child(i)->litnum(id);
     }
     return num;
@@ -300,7 +346,7 @@ LexpNode::litnum(tVarId id) const
 }
 
 // 特定の変数の特定の極性のリテラル数を返す．
-size_t
+ymuint
 LexpNode::litnum(tVarId id,
 		 tPol pol) const
 {
@@ -311,9 +357,9 @@ LexpNode::litnum(tVarId id,
 
   if ( is_op() ) {
     // AND/OR/XOR ノードなら子供のリテラル数の和を返す．
-    size_t num = 0;
-    size_t n = child_num();
-    for (size_t i = 0; i < n; ++ i) {
+    ymuint num = 0;
+    ymuint n = child_num();
+    for (ymuint i = 0; i < n; ++ i) {
       num += child(i)->litnum(id, pol);
     }
     return num;
@@ -324,7 +370,7 @@ LexpNode::litnum(tVarId id,
 }
 
 // @brief 使われている変数の最大の番号 + 1を得る．
-size_t
+ymuint
 LexpNode::input_size() const
 {
   if ( is_literal() ) {
@@ -332,10 +378,10 @@ LexpNode::input_size() const
   }
 
   if ( is_op() ) {
-    size_t ans = 0;
-    size_t n = child_num();
-    for (size_t i = 0; i < n; ++ i) {
-      size_t ans1 = child(i)->input_size();
+    ymuint ans = 0;
+    ymuint n = child_num();
+    for (ymuint i = 0; i < n; ++ i) {
+      ymuint ans1 = child(i)->input_size();
       if ( ans < ans1 ) {
 	ans = ans1;
       }
@@ -358,8 +404,8 @@ LexpNode::soplit(bool inverted) const
   if ( type() == kAnd && ! inverted ||
        type() == kOr && inverted ) {
     SopLit l(1, 0);
-    size_t n = child_num();
-    for (size_t i = 0; i < n; ++ i) {
+    ymuint n = child_num();
+    for (ymuint i = 0; i < n; ++ i) {
       SopLit l1 = child(i)->soplit(inverted);
       l *= l1;
     }
@@ -369,8 +415,8 @@ LexpNode::soplit(bool inverted) const
   if ( type() == kOr && ! inverted ||
        type() == kAnd && inverted ) {
     SopLit l(0, 0);
-    size_t n = child_num();
-    for (size_t i = 0; i < n; ++ i) {
+    ymuint n = child_num();
+    for (ymuint i = 0; i < n; ++ i) {
       SopLit l1 = child(i)->soplit(inverted);
       l += l1;
     }
@@ -378,11 +424,11 @@ LexpNode::soplit(bool inverted) const
   }
 
   if ( type() == kXor ) {
-    size_t n = child_num();
+    ymuint n = child_num();
     const LexpNode* chd = child(0);
     SopLit lp = chd->soplit(inverted);
     SopLit ln = chd->soplit(inverted);
-    for (size_t i = 1; i < n; ++ i) {
+    for (ymuint i = 1; i < n; ++ i) {
       const LexpNode* chd = child(i);
       SopLit l1p = lp;
       SopLit l1n = ln;
@@ -414,8 +460,8 @@ LexpNode::soplit(bool inverted,
   if ( type() == kAnd && ! inverted ||
        type() == kOr  && inverted ) {
     SopLit l(1, 0);
-    size_t n = child_num();
-    for (size_t i = 0; i < n; ++ i) {
+    ymuint n = child_num();
+    for (ymuint i = 0; i < n; ++ i) {
       SopLit l1 = child(i)->soplit(inverted, id);
       l *= l1;
     }
@@ -425,8 +471,8 @@ LexpNode::soplit(bool inverted,
   if ( type() == kOr && ! inverted ||
        type() == kAnd && inverted ) {
     SopLit l(0, 0);
-    size_t n = child_num();
-    for (size_t i = 0; i < n; ++ i) {
+    ymuint n = child_num();
+    for (ymuint i = 0; i < n; ++ i) {
       SopLit l1 = child(i)->soplit(inverted, id);
       l += l1;
     }
@@ -434,11 +480,11 @@ LexpNode::soplit(bool inverted,
   }
 
   if ( type() == kXor ) {
-    size_t n = child_num();
+    ymuint n = child_num();
     const LexpNode* chd = child(0);
     SopLit lp = chd->soplit(inverted);
     SopLit ln = chd->soplit(inverted);
-    for (size_t i = 1; i < n; ++ i) {
+    for (ymuint i = 1; i < n; ++ i) {
       const LexpNode* chd = child(i);
       SopLit l1p = lp;
       SopLit l1n = ln;
@@ -471,8 +517,8 @@ LexpNode::soplit(bool inverted,
   if ( type() == kAnd && ! inverted ||
        type() == kOr && inverted ) {
     SopLit l(1, 0);
-    size_t n = child_num();
-    for (size_t i = 0; i < n; ++ i) {
+    ymuint n = child_num();
+    for (ymuint i = 0; i < n; ++ i) {
       SopLit l1 = child(i)->soplit(inverted, id, pol);
       l *= l1;
     }
@@ -482,8 +528,8 @@ LexpNode::soplit(bool inverted,
   if ( type() == kOr && ! inverted ||
        type() == kAnd && inverted ) {
     SopLit l(0, 0);
-    size_t n = child_num();
-    for (size_t i = 0; i < n; ++ i) {
+    ymuint n = child_num();
+    for (ymuint i = 0; i < n; ++ i) {
       SopLit l1 = child(i)->soplit(inverted, id, pol);
       l += l1;
     }
@@ -491,11 +537,11 @@ LexpNode::soplit(bool inverted,
   }
 
   if ( type() == kXor ) {
-    size_t n = child_num();
+    ymuint n = child_num();
     const LexpNode* chd = child(0);
     SopLit lp = chd->soplit(inverted);
     SopLit ln = chd->soplit(inverted);
-    for (size_t i = 1; i < n; ++ i) {
+    for (ymuint i = 1; i < n; ++ i) {
       const LexpNode* chd = child(i);
       SopLit l1p = lp;
       SopLit l1n = ln;

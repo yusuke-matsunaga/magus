@@ -15,6 +15,7 @@
 #include "LexpNode.h"
 #include "LexpParser.h"
 #include "SopLit.h"
+#include "ym_logic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM_LEXP
@@ -108,7 +109,7 @@ LogExpr::make_and(const LogExprVector& chd_list)
 {
   assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
   LexpMgr& mgr = LexpMgr::the_obj();
-  size_t begin = mgr.nodestack_top();
+  ymuint begin = mgr.nodestack_top();
   for (LogExprVector::const_iterator p = chd_list.begin();
        p != chd_list.end(); ++ p) {
     mgr.nodestack_push((*p).root());
@@ -121,7 +122,7 @@ LogExpr::make_and(const LogExprList& chd_list)
 {
   assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
   LexpMgr& mgr = LexpMgr::the_obj();
-  size_t begin = mgr.nodestack_top();
+  ymuint begin = mgr.nodestack_top();
   for (LogExprList::const_iterator p = chd_list.begin();
        p != chd_list.end(); ++ p) {
     mgr.nodestack_push((*p).root());
@@ -135,7 +136,7 @@ LogExpr::make_or(const LogExprVector& chd_list)
 {
   assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
   LexpMgr& mgr = LexpMgr::the_obj();
-  size_t begin = mgr.nodestack_top();
+  ymuint begin = mgr.nodestack_top();
   for (LogExprVector::const_iterator p = chd_list.begin();
        p != chd_list.end(); ++ p) {
     mgr.nodestack_push((*p).root());
@@ -148,7 +149,7 @@ LogExpr::make_or(const LogExprList& chd_list)
 {
   assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
   LexpMgr& mgr = LexpMgr::the_obj();
-  size_t begin = mgr.nodestack_top();
+  ymuint begin = mgr.nodestack_top();
   for (LogExprList::const_iterator p = chd_list.begin();
        p != chd_list.end(); ++ p) {
     mgr.nodestack_push((*p).root());
@@ -162,7 +163,7 @@ LogExpr::make_xor(const LogExprVector& chd_list)
 {
   assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
   LexpMgr& mgr = LexpMgr::the_obj();
-  size_t begin = mgr.nodestack_top();
+  ymuint begin = mgr.nodestack_top();
   for (LogExprVector::const_iterator p = chd_list.begin();
        p != chd_list.end(); ++ p) {
     mgr.nodestack_push((*p).root());
@@ -175,7 +176,7 @@ LogExpr::make_xor(const LogExprList& chd_list)
 {
   assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
   LexpMgr& mgr = LexpMgr::the_obj();
-  size_t begin = mgr.nodestack_top();
+  ymuint begin = mgr.nodestack_top();
   for (LogExprList::const_iterator p = chd_list.begin();
        p != chd_list.end(); ++ p) {
     mgr.nodestack_push((*p).root());
@@ -196,7 +197,7 @@ operator&(const LogExpr& src1,
 	  const LogExpr& src2)
 {
   LexpMgr& mgr = LexpMgr::the_obj();
-  size_t begin = mgr.nodestack_top();
+  ymuint begin = mgr.nodestack_top();
   mgr.nodestack_push(src1.root());
   mgr.nodestack_push(src2.root());
   return LogExpr(mgr.make_and(begin));
@@ -207,7 +208,7 @@ const LogExpr&
 LogExpr::operator&=(const LogExpr& src)
 {
   LexpMgr& mgr = LexpMgr::the_obj();
-  size_t begin = mgr.nodestack_top();
+  ymuint begin = mgr.nodestack_top();
   mgr.nodestack_push(root());
   mgr.nodestack_push(src.root());
   set_root(mgr.make_and(begin));
@@ -220,7 +221,7 @@ operator|(const LogExpr& src1,
 	  const LogExpr& src2)
 {
   LexpMgr& mgr = LexpMgr::the_obj();
-  size_t begin = mgr.nodestack_top();
+  ymuint begin = mgr.nodestack_top();
   mgr.nodestack_push(src1.root());
   mgr.nodestack_push(src2.root());
   return LogExpr(mgr.make_or(begin));
@@ -231,7 +232,7 @@ const LogExpr&
 LogExpr::operator|=(const LogExpr& src)
 {
   LexpMgr& mgr = LexpMgr::the_obj();
-  size_t begin = mgr.nodestack_top();
+  ymuint begin = mgr.nodestack_top();
   mgr.nodestack_push(root());
   mgr.nodestack_push(src.root());
   set_root(mgr.make_or(begin));
@@ -244,7 +245,7 @@ operator^(const LogExpr& src1,
 	  const LogExpr& src2)
 {
   LexpMgr& mgr = LexpMgr::the_obj();
-  size_t begin = mgr.nodestack_top();
+  ymuint begin = mgr.nodestack_top();
   mgr.nodestack_push(src1.root());
   mgr.nodestack_push(src2.root());
   return LogExpr(mgr.make_xor(begin));
@@ -256,7 +257,7 @@ const LogExpr&
 LogExpr::operator^=(const LogExpr& src)
 {
   LexpMgr& mgr = LexpMgr::the_obj();
-  size_t begin = mgr.nodestack_top();
+  ymuint begin = mgr.nodestack_top();
   mgr.nodestack_push(root());
   mgr.nodestack_push(src.root());
   set_root(mgr.make_xor(begin));
@@ -308,25 +309,31 @@ LogExpr::eval(const vector<ymulong>& vals,
 }
 
 // @brief 真理値表の作成
-// @param[out] tv 真理値ベクタ
-void
-LogExpr::make_tv(vector<ymulong>& tv) const
+TvFunc
+LogExpr::make_tv(ymuint ni) const
 {
+  ymuint ni2 = input_size();
+  if ( ni < ni2 ) {
+    ni = ni2;
+  }
+  return root()->make_tv(ni);
+}
+#if 0
   // とりあえずベタなやり方．
-  size_t ni = input_size();
-  size_t nv = 1 << ni;
-  const size_t BPW = sizeof(ymulong) * 8;
-  size_t nt = (nv + BPW - 1) / BPW;
+  ymuint ni = input_size();
+  ymuint nv = 1 << ni;
+  const ymuint BPW = sizeof(ymulong) * 8;
+  ymuint nt = (nv + BPW - 1) / BPW;
   tv.clear();
   tv.resize(nt);
 
   const LexpNode* node = root();
-  size_t b = 0;
+  ymuint b = 0;
   ymulong s = 1UL;
   ymulong mask = 0UL;
   vector<ymulong> ivec(ni, 0UL);
-  for (size_t p = 0; p < nv; ++ p) {
-    for (size_t i = 0; i < ni; ++ i) {
+  for (ymuint p = 0; p < nv; ++ p) {
+    for (ymuint i = 0; i < ni; ++ i) {
       if ( p & (1 << i) ) {
 	ivec[i] |= s;
       }
@@ -337,7 +344,7 @@ LogExpr::make_tv(vector<ymulong>& tv) const
       tv[b] = node->eval(ivec, ~0UL);
       ++ b;
       s = 1UL;
-      for (size_t i = 0; i < ni; ++ i) {
+      for (ymuint i = 0; i < ni; ++ i) {
 	ivec[i] = 0UL;
       }
     }
@@ -346,6 +353,7 @@ LogExpr::make_tv(vector<ymulong>& tv) const
     tv[b] = node->eval(ivec, mask);
   }
 }
+#endif
 
 // 恒偽関数を表している時に真となる．
 bool
@@ -435,7 +443,7 @@ compare_type(const LogExpr& src1,
 
 // AND/OR/XOR の時に子供の項の数を返す．
 // それ以外のノードの時には 0 を返す．
-size_t
+ymuint
 LogExpr::child_num() const
 {
   return root()->child_num();
@@ -443,7 +451,7 @@ LogExpr::child_num() const
 
 // pos 番目の子供を返す．
 LogExpr
-LogExpr::child(size_t pos) const
+LogExpr::child(ymuint pos) const
 {
   return LogExpr(root()->child(pos));
 }
@@ -486,21 +494,21 @@ LogExpr::is_sop() const
 }
 
 // リテラル数を得る．
-size_t
+ymuint
 LogExpr::litnum() const
 {
   return root()->litnum();
 }
 
 // 特定の変数のリテラル数を得る．
-size_t
+ymuint
 LogExpr::litnum(tVarId varid) const
 {
   return root()->litnum(varid);
 }
 
 // 特定の変数の特定の極性のリテラル数を得る．
-size_t
+ymuint
 LogExpr::litnum(tVarId varid,
 		tPol pol) const
 {
@@ -508,14 +516,14 @@ LogExpr::litnum(tVarId varid,
 }
 
 // @brief 使われている変数の最大の番号を得る．
-size_t
+ymuint
 LogExpr::input_size() const
 {
   return root()->input_size();
 }
 
 // SOP形式に展開したときのキューブ数を得る．
-size_t
+ymuint
 LogExpr::sop_cubenum() const
 {
   SopLit l = root()->soplit(false);
@@ -523,7 +531,7 @@ LogExpr::sop_cubenum() const
 }
 
 // SOP形式に展開した時のリテラル数を見積もる．
-size_t
+ymuint
 LogExpr::sop_litnum() const
 {
   SopLit l = root()->soplit(false);
@@ -531,7 +539,7 @@ LogExpr::sop_litnum() const
 }
 
 // SOP形式に展開した時の varid 番めの変数のリテラルの出現回数を得る．
-size_t
+ymuint
 LogExpr::sop_litnum(tVarId varid) const
 {
   SopLit l = root()->soplit(false, varid);
@@ -540,7 +548,7 @@ LogExpr::sop_litnum(tVarId varid) const
 
 // SOP形式に展開した時の varid 番めの変数の極性が pol のリテラル
 // の出現回数を得る．
-size_t
+ymuint
 LogExpr::sop_litnum(tVarId varid,
 		    tPol pol) const
 {
@@ -549,42 +557,42 @@ LogExpr::sop_litnum(tVarId varid,
 }
 
 // @brief 使用されているメモリ量を返す．
-size_t
+ymuint
 LogExpr::used_size()
 {
   return LexpMgr::the_obj().used_size();
 }
 
 // 現在使用中のノード数を返す．
-size_t
+ymuint
 LogExpr::node_num()
 {
   return LexpMgr::the_obj().node_num();
 }
 
 // @brief used_size() の最大値を返す．
-size_t
+ymuint
 LogExpr::max_used_size()
 {
   return LexpMgr::the_obj().max_used_size();
 }
 
 // @brief nodenum() の最大値を返す．
-size_t
+ymuint
 LogExpr::max_node_num()
 {
   return LexpMgr::the_obj().max_node_num();
 }
 
 // @brief 実際に確保したメモリ量を返す．
-size_t
+ymuint
 LogExpr::allocated_size()
 {
   return LexpMgr::the_obj().allocated_size();
 }
 
 // @brief 実際に確保した回数を返す．
-size_t
+ymuint
 LogExpr::allocated_count()
 {
   return LexpMgr::the_obj().allocated_count();
