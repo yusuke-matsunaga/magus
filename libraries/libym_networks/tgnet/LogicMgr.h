@@ -12,6 +12,7 @@
 #include "ym_networks/tgnet.h"
 #include "ym_networks/TgGateTemplate.h"
 #include "ym_logic/LogExpr.h"
+#include "ym_logic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_TGNET
@@ -44,7 +45,7 @@ public:
   reg_logic(const LogExpr& lexp);
 
   /// @brief 登録されている論理式の数を返す．
-  size_t
+  ymuint
   num() const;
 
   /// @brief 論理式を取り出す．
@@ -65,18 +66,13 @@ private:
 
   class Cell;
 
-  // cell と現在の真理値ベクタが等価かどうか調べる．
-  bool
-  equiv(Cell* cell,
-	const vector<ymulong>& tv_array);
-
   // ハッシュ表を拡大して再ハッシュする．
   void
   expand();
 
   // ハッシュ表用の領域を確保する．
   void
-  alloc_table(size_t req_size);
+  alloc_table(ymuint req_size);
 
 
 private:
@@ -94,7 +90,7 @@ private:
     LogExpr mLexp;
 
     // 真理値表
-    vector<ymulong> mTvArray;
+    TvFunc mTvFunc;
 
     // 次のセルを指すリンク
     Cell* mLink;
@@ -118,13 +114,13 @@ private:
   vector<Cell*> mCellArray;
 
   // ハッシュ表のサイズ
-  size_t mHashSize;
+  ymuint32 mHashSize;
 
   // ハッシュ表
   Cell** mHashTable;
 
   // ハッシュ表を拡大する目安
-  size_t mNextLimit;
+  ymuint32 mNextLimit;
 
 };
 

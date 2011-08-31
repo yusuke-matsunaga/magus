@@ -163,6 +163,204 @@ public:
   const Cell*
   cell(const char* name) const = 0;
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 論理セルの情報の取得
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 論理セルクラスの個数を返す．
+  virtual
+  ymuint
+  logic_class_num() const = 0;
+
+  /// @brief 論理セルクラスを返す．
+  /// @param[in] id クラス番号 ( 0 <= id < logic_class_num() )
+  virtual
+  const CellClass&
+  logic_class(ymuint id) const = 0;
+
+  /// @brief 論理セルグループの個数を返す．
+  virtual
+  ymuint
+  logic_group_num() const = 0;
+
+  /// @brief 論理セルグループを返す．
+  /// @param[in] id グループ番号　( 0 <= id < logic_group_num() )
+  virtual
+  const CellGroup&
+  logic_group(ymuint id) const = 0;
+
+  /// @brief 定数0セルのグループを返す．
+  virtual
+  const CellGroup&
+  const0_func() const = 0;
+
+  /// @brief 定数1セルのグループを返す．
+  virtual
+  const CellGroup&
+  const1_func() const = 0;
+
+  /// @brief バッファセルのグループを返す．
+  virtual
+  const CellGroup&
+  buf_func() const = 0;
+
+  /// @brief インバータセルのグループを返す．
+  virtual
+  const CellGroup&
+  inv_func() const = 0;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // FFセルの情報の取得
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief FFセルクラスの個数を返す．
+  virtual
+  ymuint
+  ff_class_num() const = 0;
+
+  /// @brief FFセルクラスを返す．
+  /// @param[in] id クラス番号 ( 0 <= id < ff_class_num() )
+  virtual
+  const CellClass&
+  ff_class(ymuint id) const = 0;
+
+  /// @brief FFセルグループの個数を返す．
+  virtual
+  ymuint
+  ff_group_num() const = 0;
+
+  /// @brief FFセルグループを返す．
+  /// @param[in] id グループ番号 ( 0 <= id < ff_group_num() )
+  virtual
+  const CellGroup&
+  ff_group(ymuint id) const = 0;
+
+  /// @brief 単純な型のFFクラスを返す．
+  /// @param[in] has_clear クリア端子を持つとき true にする．
+  /// @param[in] has_preset プリセット端子を持つとき true にする．
+  /// @note 該当するセルがないときでも空のセルクラスが返される．
+  virtual
+  const CellClass&
+  simple_ff_class(bool has_clear,
+		  bool has_preset) const = 0;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ラッチセルの情報の取得
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ラッチセルクラスの個数を返す．
+  virtual
+  ymuint
+  latch_class_num() const = 0;
+
+  /// @brief ラッチセルクラスを返す．
+  /// @param[in] id クラス番号 ( 0 <= id < latch_class_num() )
+  virtual
+  const CellClass&
+  latch_class(ymuint id) const = 0;
+
+  /// @brief ラッチセルグループの個数を返す．
+  virtual
+  ymuint
+  latch_group_num() const = 0;
+
+  /// @brief ラッチセルグループを返す．
+  /// @param[in] id グループ番号 ( 0 <= id < latch_group_num() )
+  virtual
+  const CellGroup&
+  latch_group(ymuint id) const = 0;
+
+  /// @brief 単純な型のラッチクラスを返す．
+  /// @param[in] has_clear クリア端子を持つとき true にする．
+  /// @param[in] has_preset プリセット端子を持つとき true にする．
+  /// @note 該当するセルがないときでも空のセルクラスが返される．
+  virtual
+  const CellClass&
+  simple_latch_class(bool has_clear,
+		     bool has_preset) const = 0;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // パタングラフ関係の情報の取得
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 総パタン数を返す．
+  virtual
+  ymuint
+  pat_num() const = 0;
+
+  /// @brief パタンを返す．
+  /// @param[in] id パタン番号 ( 0 <= id < pat_num() )
+  virtual
+  const CellPatGraph&
+  pat(ymuint id) const = 0;
+
+  /// @brief パタンの最大の入力数を得る．
+  virtual
+  ymuint
+  max_input() const = 0;
+
+  /// @brief 総ノード数を返す．
+  virtual
+  ymuint
+  node_num() const = 0;
+
+  /// @brief ノードの種類を返す．
+  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  virtual
+  tCellPatType
+  node_type(ymuint id) const = 0;
+
+  /// @brief ノードが入力ノードの時に入力番号を返す．
+  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  /// @note 入力ノードでない場合の返り値は不定
+  virtual
+  ymuint
+  input_id(ymuint id) const = 0;
+
+  /// @brief 入力のノード番号を返す．
+  /// @param[in] input_id 入力番号 ( 0 <= input_id < input_num() )
+  /// @return input_id の入力に対応するノードのノード番号
+  virtual
+  ymuint
+  input_node(ymuint input_id) const = 0;
+
+  /// @brief 総枝数を返す．
+  virtual
+  ymuint
+  edge_num() const = 0;
+
+  /// @brief 枝のファンイン元のノード番号を返す．
+  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  virtual
+  ymuint
+  edge_from(ymuint id) const = 0;
+
+  /// @brief 枝のファンアウト先のノード番号を返す．
+  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  virtual
+  ymuint
+  edge_to(ymint id) const = 0;
+
+  /// @brief 枝のファンアウト先の入力位置( 0 or 1 ) を返す．
+  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  virtual
+  ymuint
+  edge_pos(ymuint id) const = 0;
+
+  /// @brief 枝の反転属性を返す．
+  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  virtual
+  bool
+  edge_inv(ymuint id) const = 0;
+
 };
 
 
@@ -182,7 +380,6 @@ display_library(ostream& s,
 /// @brief バイナリダンプされた内容を読み込む．
 const CellLibrary*
 restore_library(istream& s);
-
 
 END_NAMESPACE_YM_CELL
 

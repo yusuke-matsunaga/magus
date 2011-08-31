@@ -15,10 +15,8 @@
 #include "ym_cell/CellMgr.h"
 #include "ym_cell/CellPatMgr.h"
 #include "ym_cell/CellPatGraph.h"
-#include "ym_cell/CellFuncClass.h"
-#include "ym_cell/CellFuncGroup.h"
-#include "ym_cell/CellFFClass.h"
-#include "ym_cell/CellFFGroup.h"
+#include "ym_cell/CellClass.h"
+#include "ym_cell/CellGroup.h"
 #include "PatMatcher.h"
 #include "MapRecord.h"
 
@@ -107,7 +105,7 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
       CellArea min_area = CellArea::infty();
       bool min_inv = false;
       for (ymuint i = 0; i < ffc_num; ++ i) {
-	const CellFFClass& ffc = cell_mgr.ff_class(i);
+	const CellClass& ffc = cell_mgr.ff_class(i);
 	bool pmatch = true;
 	bool nmatch = true;
 	if ( ffc.clear_sense() == 0 ) {

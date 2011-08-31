@@ -10,7 +10,7 @@
 #include "LdPatMgr.h"
 #include "LdPatNode.h"
 #include "LdPatHandle.h"
-#include "ym_cell/CellPatMgr.h"
+
 #include "ym_logic/LogExpr.h"
 #include "ym_utils/Generator.h"
 #include "ym_utils/BinIO.h"
@@ -596,13 +596,13 @@ LdPatMgr::dump(ostream& s) const
     LdPatNode* node = this->node(i);
     ymuint v = 0U;
     if ( node->is_input() ) {
-      v = CellPatMgr::kInput | (node->input_id() << 2);
+      v = kCellPatInput | (node->input_id() << 2);
     }
     else if ( node->is_and() ) {
-      v = CellPatMgr::kAnd;
+      v = kCellPatAnd;
     }
     else if ( node->is_xor() ) {
-      v = CellPatMgr::kXor;
+      v = kCellPatXor;
     }
     BinIO::write_32(s, v);
     dump_edge(s, node, 0);

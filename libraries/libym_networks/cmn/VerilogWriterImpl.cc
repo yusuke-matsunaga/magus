@@ -176,29 +176,29 @@ VerilogWriterImpl::dump(ostream& s,
     const CmnNode* onode1 = dff->output1();
     s << "  " << cell->name() << " U" << onode1->id() << " (";
     // データ入力
-    const CellPin* ipin = cell->pin(dffcell->data_pos());
+    const CellPin* ipin = cell->input(dffcell->data_pos());
     s << "." << ipin->name() << "(" << dff_node_name(dff->input()) << ")";
     // クロック入力
-    const CellPin* cpin = cell->pin(dffcell->clock_pos());
+    const CellPin* cpin = cell->input(dffcell->clock_pos());
     s << ", ." << cpin->name() << "(" << dff_node_name(dff->clock()) << ")";
     // クリア入力
     if ( dffcell->has_clear() ) {
-      const CellPin* rpin = cell->pin(dffcell->clear_pos());
+      const CellPin* rpin = cell->input(dffcell->clear_pos());
       s << ", ." << rpin->name() << "(" << dff_node_name(dff->clear()) << ")";
     }
     // プリセット入力
     if ( dffcell->has_preset() ) {
-      const CellPin* ppin = cell->pin(dffcell->preset_pos());
+      const CellPin* ppin = cell->input(dffcell->preset_pos());
       s << ", ." << ppin->name() << "(" << dff_node_name(dff->preset()) << ")";
     }
     // 肯定出力
     if ( dff->output1()->fanout_num() > 0 ) {
-      const CellPin* opin1 = cell->pin(dffcell->q_pos());
+      const CellPin* opin1 = cell->output(dffcell->q_pos());
       s << ", ." << opin1->name() << "(" << node_name(dff->output1()) << ")";
     }
     // 否定出力
     if ( dff->output2()->fanout_num() > 0 ) {
-      const CellPin* opin2 = cell->pin(dffcell->iq_pos());
+      const CellPin* opin2 = cell->output(dffcell->iq_pos());
       s << ", ." << opin2->name() << "(" << node_name(dff->output2()) << ")";
     }
     s << ");" << endl;
@@ -212,31 +212,31 @@ VerilogWriterImpl::dump(ostream& s,
     const CmnNode* onode1 = latch->output1();
     s << "  " << cell->name() << " U" << onode1->id() << " (";
     // データ入力
-    const CellPin* ipin = cell->pin(latchcell->data_pos());
+    const CellPin* ipin = cell->input(latchcell->data_pos());
     s << "." << ipin->name() << "(" << dff_node_name(latch->input()) << ")";
     // イネーブル入力
     if ( latchcell->has_enable() ) {
-      const CellPin* epin = cell->pin(latchcell->enable_pos());
+      const CellPin* epin = cell->input(latchcell->enable_pos());
       s << ", ." << epin->name() << "(" << dff_node_name(latch->enable()) << ")";
     }
     // クリア入力
     if ( latchcell->has_clear() ) {
-      const CellPin* rpin = cell->pin(latchcell->clear_pos());
+      const CellPin* rpin = cell->input(latchcell->clear_pos());
       s << ", ." << rpin->name() << "(" << dff_node_name(latch->clear()) << ")";
     }
     // プリセット入力
     if ( latchcell->has_preset() ) {
-      const CellPin* ppin = cell->pin(latchcell->preset_pos());
+      const CellPin* ppin = cell->input(latchcell->preset_pos());
       s << ", ." << ppin->name() << "(" << dff_node_name(latch->preset()) << ")";
     }
     // 肯定出力
     if ( latch->output1()->fanout_num() > 0 ) {
-      const CellPin* opin1 = cell->pin(latchcell->q_pos());
+      const CellPin* opin1 = cell->output(latchcell->q_pos());
       s << ", ." << opin1->name() << "(" << node_name(latch->output1()) << ")";
     }
     // 否定出力
     if ( latch->output2()->fanout_num() > 0 ) {
-      const CellPin* opin2 = cell->pin(latchcell->iq_pos());
+      const CellPin* opin2 = cell->output(latchcell->iq_pos());
       s << ", ." << opin2->name() << "(" << node_name(latch->output2()) << ")";
     }
     s << ");" << endl;
@@ -247,23 +247,22 @@ VerilogWriterImpl::dump(ostream& s,
     const CmnNode* node = *p;
     const Cell* cell = node->cell();
     assert_cond( cell != NULL, __FILE__, __LINE__);
-    ymuint np = cell->pin_num();
     s << "  " << cell->name() << " U" << node->id() << " (";
     ymuint ipos = 0;
     const char* comma = "";
-    for (ymuint i = 0; i < np; ++ i) {
-      const CellPin* pin = cell->pin(i);
-      const CmnNode* node1 = NULL;
-      if ( pin->is_input() ) {
-	node1 = node->fanin(ipos);
-	++ ipos;
-      }
-      else if ( pin->is_output() ) {
-	node1 = node;
-      }
+    ymuint ni = cell->input_num();
+    for (ymuint ipos = 0; ipos < ni; ++ ipos) {
+      const CellPin* pin = cell->input(ipos);
+      assert_cond( pin->is_input(), __FILE__, __LINE__);
+      const CmnNode* node1 = node->fanin(ipos);
       s << comma << "." << pin->name() << "(" << node_name(node1) << ")";
       comma = ", ";
     }
+    ymuint no = cell->output_num();
+    assert_cond( no == 1, __FILE__, __LINE__);
+    const CellPin* pin = cell->output(0);
+    assert_cond( pin->is_output(), __FILE__, __LINE__);
+    s << comma << "." << pin->name() << "(" << node_name(node) << ")";
     s << ");" << endl;
   }
 

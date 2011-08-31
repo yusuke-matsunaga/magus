@@ -16,6 +16,10 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
+class CellGroupBase;
+class CellFuncClass;
+class CellFuncGroup;
+
 //////////////////////////////////////////////////////////////////////
 /// @class CellMgr CellMgr.h "ym_cell/CellMgr.h"
 /// @brief セルを管理するクラス
@@ -115,7 +119,7 @@ public:
 
   /// @brief FFクラスを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < ff_class_num() )
-  const CellFFClass&
+  const CellClass&
   ff_class(ymuint pos) const;
 
   /// @brief ラッチクラス数を返す．
@@ -124,7 +128,7 @@ public:
 
   /// @brief ラッチクラスを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < latch_class_num() )
-  const CellLatchClass&
+  const CellClass&
   latch_class(ymuint pos) const;
 
 
@@ -153,14 +157,14 @@ private:
   /// @param[in] cell_group ロード対象の CellGroup
   void
   load_cellgroup(istream& s,
-		 CellGroup& cell_group);
+		 CellGroupBase& cell_group);
 
-  /// @brief RepFunc の内容をロードする．
+  /// @brief CellClass の内容をロードする．
   /// @param[in] s 入力ストリーム
-  /// @param[in] id 代表番号
+  /// @param[in] funcclass 論理セルクラス
   void
-  load_repfunc(istream& s,
-	       ymuint id);
+  load_funcclass(istream& s,
+		 CellFuncClass& funcclass);
 
 
 private:
@@ -179,32 +183,32 @@ private:
 
   // 関数グループの配列
   // サイズは mFuncNum
-  CellFuncGroup* mFuncArray;
+  CellGroup* mFuncArray;
 
   // 代表関数の数
   ymuint32 mRepNum;
 
   // 代表関数の配列
   // サイズは mRepNum
-  CellFuncClass* mRepArray;
+  CellClass* mRepArray;
 
   // FFグループ数
   ymuint32 mFFGroupNum;
 
   // FFグループの(実体の)配列
-  CellFFGroup* mFFGroupArray;
+  CellGroup* mFFGroupArray;
 
   // FFクラスの数
   ymuint32 mFFClassNum;
 
   // FFクラスの配列
-  CellFFClass* mFFClassArray;
+  CellClass* mFFClassArray;
 
   // ラッチクラスの数
   ymuint32 mLatchClassNum;
 
   // ラッチクラスの(実体の)配列
-  CellLatchClass* mLatchArray;
+  CellClass* mLatchArray;
 
   // パタンを管理するオブジェクト
   CellPatMgr mPatMgr;

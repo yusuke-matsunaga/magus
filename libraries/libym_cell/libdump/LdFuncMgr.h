@@ -15,7 +15,7 @@
 
 BEGIN_NAMESPACE_YM_CELL_LIBDUMP
 
-class LdFunc;
+class LdFuncGroup;
 class LdFuncClass;
 
 //////////////////////////////////////////////////////////////////////
@@ -46,10 +46,10 @@ public:
   void
   init();
 
-  /// @brief f に対応する LdFunc を求める．
+  /// @brief f に対応する LdFuncGroup を求める．
   /// @param[in] f 関数
   /// @note なければ新規に作る．
-  LdFunc*
+  LdFuncGroup*
   find_func(const TvFunc& f);
 
   /// @brief 内容をバイナリダンプする．
@@ -74,7 +74,7 @@ public:
 
   /// @brief 論理関数情報のオブジェクトを返す．
   /// @param[in] id 関数番号 ( 0 <= id < func_num() )
-  const LdFunc*
+  const LdFuncGroup*
   func(ymuint id) const;
 
   /// @brief 代表関数の数を返す．
@@ -115,10 +115,10 @@ private:
 
   // 論理関数のリスト
   // この配列上の位置と関数番号は一致している．
-  vector<LdFunc*> mFuncList;
+  vector<LdFuncGroup*> mFuncList;
 
   // 論理関数のハッシュ表
-  hash_map<TvFunc, LdFunc*> mFuncMap;
+  hash_map<TvFunc, LdFuncGroup*> mFuncMap;
 
   // 代表関数のリスト
   // この配列上の位置と代表関数番号は一致している．
@@ -145,7 +145,7 @@ LdFuncMgr::func_num() const
 // @brief 論理関数を返す．
 // @param[in] id 関数番号 ( 0 <= id < func_num() )
 inline
-const LdFunc*
+const LdFuncGroup*
 LdFuncMgr::func(ymuint id) const
 {
   return mFuncList[id];

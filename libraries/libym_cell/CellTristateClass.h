@@ -1,8 +1,8 @@
-#ifndef CELLLOGICCLASS_H
-#define CELLLOGICCLASS_H
+#ifndef CELLTRISTATECLASS_H
+#define CELLTRISTATECLASS_H
 
-/// @file CellLogicClass.h
-/// @brief CellLogicClass のヘッダファイル
+/// @file CellTristateClass.h
+/// @brief CellTristateClass のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellLogicClass CellLogicClass.h "CellLogicClass.h"
+/// @class CellTristateClass CellTristateClass.h "CellTristateClass.h"
 /// @brief 論理セルのクラス
 //////////////////////////////////////////////////////////////////////
-class CellLogicClass :
+class CellTristateClass :
   public CellClassBase
 {
   friend class CellMgr;
@@ -26,10 +26,10 @@ class CellLogicClass :
 private:
 
   /// @brief コンストラクタ
-  CellLogicClass();
+  CellTristateClass();
 
   /// @brief デストラクタ
-  ~CellLogicClass();
+  ~CellTristateClass();
 
 
 public:
@@ -51,7 +51,7 @@ public:
   /// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
   /// @note 非論理セルの場合の返り値は不定
   virtual
-  const TvFunc&
+  TvFunc
   logic_function(ymuint pos) const;
 
 
@@ -70,4 +70,4 @@ private:
 
 END_NAMESPACE_YM_CELL
 
-#endif // CELLLOGICCLASS_H
+#endif // CELLTRISTATECLASS_H

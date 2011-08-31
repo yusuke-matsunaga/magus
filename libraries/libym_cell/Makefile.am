@@ -35,23 +35,7 @@ libym_cell_la_CPPFLAGS = \
 libym_cell_la_SOURCES = \
 	CellDotlibReader.cc \
 	CellMislibReader.cc \
-	dump.cc	\
-	CellClassBase.h \
-	CellClassBase.cc \
-	CellLogicClass.h \
-	CellLogicClass.cc \
-	CellTristateClass.h \
-	CellTristateClass.cc \
-	CellFFClass.h \
-	CellFFClass.cc \
-	CellGroupBase.h \
-	CellGroupBase.cc \
-	CellMgr.cc \
-	CellFFClass.cc \
-	CellFFPosArray.cc \
-	CellLatchClass.cc \
-	CellLatchPosArray.cc \
-	CellPatMgr.cc
+	dump.cc
 
 libym_cell_la_LIBADD = \
 	ci/libym_cell_ci.la \

@@ -21,15 +21,8 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] id ID番号
-// @param[in] name 名前
-// @param[in] area 面積
-CiCell::CiCell(ymuint id,
-	       const ShString& name,
-	       CellArea area) :
-  mId(id),
-  mName(name),
-  mArea(area),
+CiCell::CiCell() :
+  mCellGroup(NULL),
   mInputNum(0),
   mInputArray(NULL),
   mOutputNum(0),
@@ -47,6 +40,13 @@ CiCell::CiCell(ymuint id,
 CiCell::~CiCell()
 {
   // メモリの確保は別のクラスが担当している．
+}
+
+// @brief 属している CellGroup を返す．
+const CellGroup*
+CiCell::cell_group() const
+{
+  return mCellGroup;
 }
 
 // @brief ID番号の取得
@@ -190,13 +190,6 @@ CiCell::bundle(const string& name) const
 {
   // 未完
   return NULL;
-}
-
-// @brief 属している CellGroup を返す．
-const CellGroup*
-CiCell::cell_group() const
-{
-  return mCellGroup;
 }
 
 // @brief タイミング情報の取得
@@ -367,20 +360,31 @@ CiCell::clear_preset_var2() const
 }
 #endif
 
-// @brief ピン数，バス数，バンドル数の設定をする．
+// @brief 初期化する．
+// @param[in] id ID番号
+// @param[in] name 名前
+// @param[in] area 面積
 // @param[in] ni 入力ピン数
 // @param[in] no 出力ピン数
 // @param[in] nio 入出力ピン数
 // @param[in] nb バス数
 // @param[in] nc バンドル数
+// @param[in] alloc メモリアロケータ
 void
-CiCell::set_pinnum(ymuint ni,
-		   ymuint no,
-		   ymuint nio,
-		   ymuint nb,
-		   ymuint nc,
-		   AllocBase& alloc)
+CiCell::init(ymuint id,
+	     const ShString& name,
+	     CellArea area,
+	     ymuint ni,
+	     ymuint no,
+	     ymuint nio,
+	     ymuint nb,
+	     ymuint nc,
+	     AllocBase& alloc)
 {
+  mId = id;
+  mName = name;
+  mArea = area;
+
   mInputNum = ni;
   void* p = alloc.get_memory(sizeof(CiPin*) * ni);
   mInputArray = new (p) CiPin*[ni];
@@ -407,6 +411,7 @@ CiCell::set_pinnum(ymuint ni,
   mBundleNum = nc;
 }
 
+#if 0
 // @brief 出力ピンの機能を設定する．
 // @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
 // @param[in] function 機能を表す論理式
@@ -430,6 +435,7 @@ CiCell::set_tristate_function(ymuint opin_id,
 {
   assert_not_reached(__FILE__, __LINE__);
 }
+#endif
 
 // @brief タイミング情報を設定する．
 // @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
@@ -464,274 +470,6 @@ CiCell::set_timing(ymuint opin_id,
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス CiLogicCell
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] id ID番号
-// @param[in] name 名前
-// @param[in] area 面積
-CiLogicCell::CiLogicCell(ymuint id,
-			 const ShString& name,
-			 CellArea area) :
-  CiCell(id, name, area)
-{
-}
-
-// @brief デストラクタ
-CiLogicCell::~CiLogicCell()
-{
-}
-
-// @brief 組み合わせ論理セルの時に true を返す．
-// @note type() == kLogic と等価
-bool
-CiLogicCell::is_logic() const
-{
-  return true;
-}
-
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス CiFLCell
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] id ID番号
-// @param[in] name 名前
-// @param[in] area 面積
-// @param[in] var1, var2 状態変数名
-// @param[in] clear "clear" 関数の式
-// @param[in] preset "preset" 関数の式
-// @param[in] clear_preset_var1 "clear_preset_var1" の値
-// @param[in] clear_preset_var2 "clear_preset_var2" の値
-CiFLCell::CiFLCell(ymuint id,
-		   const ShString& name,
-		   CellArea area,
-		   const ShString& var1,
-		   const ShString& var2,
-		   const LogExpr& clear,
-		   const LogExpr& preset,
-		   ymuint clear_preset_var1,
-		   ymuint clear_preset_var2) :
-  CiCell(id, name, area),
-  mVar1(var1),
-  mVar2(var2),
-  mClear(clear),
-  mPreset(preset),
-  mClearPresetVal((clear_preset_var1 & 1U) | ((clear_preset_var2 & 1U) << 1))
-{
-}
-
-// @brief デストラクタ
-CiFLCell::~CiFLCell()
-{
-}
-
-// @brief 状態変数1の名前を返す．
-// @note FFセルとラッチセルの時に意味を持つ．
-string
-CiFLCell::var1_name() const
-{
-  return mVar1;
-}
-
-// @brief 状態変数2の名前を返す．
-// @note FFセルとラッチセルの時に意味を持つ．
-string
-CiFLCell::var2_name() const
-{
-  return mVar2;
-}
-
-// @brief clear 関数の取得
-// @note FFセルとラッチセルの時に意味を持つ．
-LogExpr
-CiFLCell::clear() const
-{
-  return mClear;
-}
-
-// @brief preset 関数の取得
-// @note FFセルとラッチセルの時に意味を持つ．
-LogExpr
-CiFLCell::preset() const
-{
-  return mPreset;
-}
-
-// @brief clear_preset_var1 の取得
-// @retval 0 "L"
-// @retval 1 "H"
-// @note FFセルとラッチセルの時に意味を持つ．
-ymuint
-CiFLCell::clear_preset_var1() const
-{
-  return mClearPresetVal & 1U;
-}
-
-// @brief clear_preset_var2 の取得
-// @retval 0 "L"
-// @retval 1 "H"
-// @note FFセルとラッチセルの時に意味を持つ．
-ymuint
-CiFLCell::clear_preset_var2() const
-{
-  return (mClearPresetVal >> 1) & 1U;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス CiFFCell
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] id ID番号
-// @param[in] name 名前
-// @param[in] area 面積
-// @param[in] var1, var2 状態変数名
-// @param[in] next_state "next_state" 関数の式
-// @param[in] clocked_on "clocked_on" 関数の式
-// @param[in] clocked_on_also "clocked_on_also" 関数の式
-// @param[in] clear "clear" 関数の式
-// @param[in] preset "preset" 関数の式
-// @param[in] clear_preset_var1 "clear_preset_var1" の値
-// @param[in] clear_preset_var2 "clear_preset_var2" の値
-CiFFCell::CiFFCell(ymuint id,
-		   const ShString& name,
-		   CellArea area,
-		   const ShString& var1,
-		   const ShString& var2,
-		   const LogExpr& next_state,
-		   const LogExpr& clocked_on,
-		   const LogExpr& clocked_on_also,
-		   const LogExpr& clear,
-		   const LogExpr& preset,
-		   ymuint clear_preset_var1,
-		   ymuint clear_preset_var2) :
-  CiFLCell(id, name, area,
-	   var1, var2, clear, preset,
-	   clear_preset_var1,
-	   clear_preset_var2),
-  mNextState(next_state),
-  mClockedOn(clocked_on),
-  mClockedOnAlso(clocked_on_also)
-{
-}
-
-// @brief デストラクタ
-CiFFCell::~CiFFCell()
-{
-}
-
-// @brief FFセルの時に true を返す．
-// @note type() == kFF と等価
-bool
-CiFFCell::is_ff() const
-{
-  return true;
-}
-
-// @brief next_state 関数の取得
-// @note FFセルの時に意味を持つ．
-LogExpr
-CiFFCell::next_state() const
-{
-  return mNextState;
-}
-
-// @brief clocked_on 関数の取得
-// @note FFセルの時に意味を持つ．
-LogExpr
-CiFFCell::clocked_on() const
-{
-  return mClockedOn;
-}
-
-// @brief clocked_on_also 関数の取得
-// @note FFセルの時に意味を持つ．
-LogExpr
-CiFFCell::clocked_on_also() const
-{
-  return mClockedOnAlso;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス CiLatchCell
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] id ID番号
-// @param[in] name 名前
-// @param[in] area 面積
-// @param[in] var1, var2 状態変数名
-// @param[in] data_in "data_in" 関数の式
-// @param[in] enable "enable" 関数の式
-// @param[in] enable_also "enable_also" 関数の式
-// @param[in] clear "clear" 関数の式
-// @param[in] preset "preset" 関数の式
-// @param[in] clear_preset_var1 "clear_preset_var1" の値
-// @param[in] clear_preset_var2 "clear_preset_var2" の値
-CiLatchCell::CiLatchCell(ymuint id,
-			 const ShString& name,
-			 CellArea area,
-			 const ShString& var1,
-			 const ShString& var2,
-			 const LogExpr& data_in,
-			 const LogExpr& enable,
-			 const LogExpr& enable_also,
-			 const LogExpr& clear,
-			 const LogExpr& preset,
-			 ymuint clear_preset_var1,
-			 ymuint clear_preset_var2) :
-  CiFLCell(id, name, area,
-	   var1, var2, clear, preset,
-	   clear_preset_var1,
-	   clear_preset_var2),
-  mDataIn(data_in),
-  mEnable(enable),
-  mEnableAlso(enable_also)
-{
-}
-
-// @brief デストラクタ
-CiLatchCell::~CiLatchCell()
-{
-}
-
-// @brief ラッチセルの時に true を返す．
-// @note type() == kLatch と等価
-bool
-CiLatchCell::is_latch() const
-{
-  return true;
-}
-
-// @brief data_in 関数の取得
-LogExpr
-CiLatchCell::data_in() const
-{
-  return mDataIn;
-}
-
-// @brief enable 関数の取得
-LogExpr
-CiLatchCell::enable() const
-{
-  return mEnable;
-}
-
-// @brief enable_also 関数の取得
-LogExpr
-CiLatchCell::enable_also() const
-{
-  return mEnableAlso;
 }
 
 END_NAMESPACE_YM_CELL

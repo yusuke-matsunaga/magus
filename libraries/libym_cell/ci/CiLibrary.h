@@ -19,10 +19,16 @@
 #include "ym_utils/Alloc.h"
 #include "ym_utils/ShString.h"
 #include "ym_logic/LogExpr.h"
-
+#include "CiPatMgr.h"
 
 BEGIN_NAMESPACE_YM_CELL
 
+class CiLogicClass;
+class CiLogicGroup;
+class CiFFClass;
+class CiFFGroup;
+class CiLatchClass;
+class CiLatchGroup;
 class CiCell;
 class CiPin;
 class CiTiming;
@@ -160,6 +166,204 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
+  // 論理セルの情報の取得
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 論理セルクラスの個数を返す．
+  virtual
+  ymuint
+  logic_class_num() const;
+
+  /// @brief 論理セルクラスを返す．
+  /// @param[in] id クラス番号 ( 0 <= id < logic_class_num() )
+  virtual
+  const CellClass&
+  logic_class(ymuint id) const;
+
+  /// @brief 論理セルグループの個数を返す．
+  virtual
+  ymuint
+  logic_group_num() const;
+
+  /// @brief 論理セルグループを返す．
+  /// @param[in] id グループ番号　( 0 <= id < logic_group_num() )
+  virtual
+  const CellGroup&
+  logic_group(ymuint id) const;
+
+  /// @brief 定数0セルのグループを返す．
+  virtual
+  const CellGroup&
+  const0_func() const;
+
+  /// @brief 定数1セルのグループを返す．
+  virtual
+  const CellGroup&
+  const1_func() const;
+
+  /// @brief バッファセルのグループを返す．
+  virtual
+  const CellGroup&
+  buf_func() const;
+
+  /// @brief インバータセルのグループを返す．
+  virtual
+  const CellGroup&
+  inv_func() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // FFセルの情報の取得
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief FFセルクラスの個数を返す．
+  virtual
+  ymuint
+  ff_class_num() const;
+
+  /// @brief FFセルクラスを返す．
+  /// @param[in] id クラス番号 ( 0 <= id < ff_class_num() )
+  virtual
+  const CellClass&
+  ff_class(ymuint id) const;
+
+  /// @brief FFセルグループの個数を返す．
+  virtual
+  ymuint
+  ff_group_num() const;
+
+  /// @brief FFセルグループを返す．
+  /// @param[in] id グループ番号 ( 0 <= id < ff_group_num() )
+  virtual
+  const CellGroup&
+  ff_group(ymuint id) const;
+
+  /// @brief 単純な型のFFクラスを返す．
+  /// @param[in] has_clear クリア端子を持つとき true にする．
+  /// @param[in] has_preset プリセット端子を持つとき true にする．
+  /// @note 該当するセルがないときでも空のセルクラスが返される．
+  virtual
+  const CellClass&
+  simple_ff_class(bool has_clear,
+		  bool has_preset) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ラッチセルの情報の取得
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ラッチセルクラスの個数を返す．
+  virtual
+  ymuint
+  latch_class_num() const;
+
+  /// @brief ラッチセルクラスを返す．
+  /// @param[in] id クラス番号 ( 0 <= id < latch_class_num() )
+  virtual
+  const CellClass&
+  latch_class(ymuint id) const;
+
+  /// @brief ラッチセルグループの個数を返す．
+  virtual
+  ymuint
+  latch_group_num() const;
+
+  /// @brief ラッチセルグループを返す．
+  /// @param[in] id グループ番号 ( 0 <= id < latch_group_num() )
+  virtual
+  const CellGroup&
+  latch_group(ymuint id) const;
+
+  /// @brief 単純な型のラッチクラスを返す．
+  /// @param[in] has_clear クリア端子を持つとき true にする．
+  /// @param[in] has_preset プリセット端子を持つとき true にする．
+  /// @note 該当するセルがないときでも空のセルクラスが返される．
+  virtual
+  const CellClass&
+  simple_latch_class(bool has_clear,
+		     bool has_preset) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // パタングラフ関係の情報の取得
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 総パタン数を返す．
+  virtual
+  ymuint
+  pat_num() const;
+
+  /// @brief パタンを返す．
+  /// @param[in] id パタン番号 ( 0 <= id < pat_num() )
+  virtual
+  const CellPatGraph&
+  pat(ymuint id) const;
+
+  /// @brief パタンの最大の入力数を得る．
+  virtual
+  ymuint
+  max_input() const;
+
+  /// @brief 総ノード数を返す．
+  virtual
+  ymuint
+  node_num() const;
+
+  /// @brief ノードの種類を返す．
+  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  virtual
+  tCellPatType
+  node_type(ymuint id) const;
+
+  /// @brief ノードが入力ノードの時に入力番号を返す．
+  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  /// @note 入力ノードでない場合の返り値は不定
+  virtual
+  ymuint
+  input_id(ymuint id) const;
+
+  /// @brief 入力のノード番号を返す．
+  /// @param[in] input_id 入力番号 ( 0 <= input_id < input_num() )
+  /// @return input_id の入力に対応するノードのノード番号
+  virtual
+  ymuint
+  input_node(ymuint input_id) const;
+
+  /// @brief 総枝数を返す．
+  virtual
+  ymuint
+  edge_num() const;
+
+  /// @brief 枝のファンイン元のノード番号を返す．
+  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  virtual
+  ymuint
+  edge_from(ymuint id) const;
+
+  /// @brief 枝のファンアウト先のノード番号を返す．
+  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  virtual
+  ymuint
+  edge_to(ymint id) const;
+
+  /// @brief 枝のファンアウト先の入力位置( 0 or 1 ) を返す．
+  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  virtual
+  ymuint
+  edge_pos(ymuint id) const;
+
+  /// @brief 枝の反転属性を返す．
+  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  virtual
+  bool
+  edge_inv(ymuint id) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
   // 情報設定用の関数
   //////////////////////////////////////////////////////////////////////
 
@@ -175,7 +379,7 @@ public:
   void
   set_cell_num(ymuint num);
 
-  /// @brief 論理セルを生成する．
+  /// @brief セルを生成する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] name 名前
   /// @param[in] area 面積
@@ -186,15 +390,16 @@ public:
   /// @param[in] nc バンドル数
   /// @return セルへのポインタを返す．
   CiCell*
-  new_logic_cell(ymuint cell_id,
-		 ShString name,
-		 CellArea area,
-		 ymuint ni,
-		 ymuint no,
-		 ymuint nio,
-		 ymuint nb,
-		 ymuint nc);
+  new_cell(ymuint cell_id,
+	   ShString name,
+	   CellArea area,
+	   ymuint ni,
+	   ymuint no,
+	   ymuint nio,
+	   ymuint nb,
+	   ymuint nc);
 
+#if 0
   /// @brief FFセルを生成する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] name 名前
@@ -268,6 +473,7 @@ public:
 		 const LogExpr& preset,
 		 ymuint clear_preset_var1,
 		 ymuint clear_preset_var2);
+#endif
 
   /// @brief セルの入力ピンを生成する．
   /// @param[in] cell セル
@@ -332,6 +538,7 @@ public:
 		 CellTime max_transition,
 		 CellTime min_transition);
 
+#if 0
   /// @brief セルの内部ピンを生成する．
   /// @param[in] cell セル
   /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
@@ -340,6 +547,7 @@ public:
   new_cell_internal(CiCell* cell,
 		    ymuint pin_id,
 		    ShString name);
+#endif
 
   /// @brief タイミング情報を作る．
   /// @param[in] id ID番号
@@ -406,7 +614,46 @@ private:
   ymuint32 mCellNum;
 
   // セルの配列
-  CiCell** mCellArray;
+  CiCell* mCellArray;
+
+  // 論理セルクラスの数
+  ymuint32 mLogicClassNum;
+
+  // 論理セルクラスの配列
+  CiLogicClass* mLogicClassArray;
+
+  // 論理セルグループの数
+  ymuint32 mLogicGroupNum;
+
+  // 論理セルグループの配列
+  CiLogicGroup* mLogicGroupArray;
+
+  // FFセルクラスの数
+  ymuint32 mFFClassNum;
+
+  // FFセルクラスの配列
+  CiFFClass* mFFClassArray;
+
+  // FFセルグループの数
+  ymuint32 mFFGroupNum;
+
+  // FFセルグループの配列
+  CiFFGroup* mFFGroupArray;
+
+  // ラッチセルクラスの数
+  ymuint32 mLatchClassNum;
+
+  // ラッチセルクラスの配列
+  CiLatchClass* mLatchClassArray;
+
+  // ラッチセルグループの数
+  ymuint32 mLatchGroupNum;
+
+  // ラッチセルグループの配列
+  CiLatchGroup* mLatchGroupArray;
+
+  // パタングラフを管理するクラス
+  CiPatMgr mPatMgr;
 
 };
 

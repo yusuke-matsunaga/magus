@@ -9,7 +9,7 @@
 
 #include "LibDump.h"
 #include "LdFuncClass.h"
-#include "LdFunc.h"
+#include "LdFuncGroup.h"
 #include "LdPatNode.h"
 #include "LdPatHandle.h"
 #include "LdFFGroup.h"
@@ -269,7 +269,7 @@ LibDump::reg_expr(const LogExpr& expr)
 {
   // expr に対応する LdFunc を求める．
   TvFunc f = expr2tvfunc(expr);
-  LdFunc* pgfunc = mLdFuncMgr.find_func(f);
+  LdFuncGroup* pgfunc = mLdFuncMgr.find_func(f);
 
   // expr から生成されるパタンを pgfunc に登録する．
   reg_pat(pgfunc, expr);
@@ -279,7 +279,7 @@ LibDump::reg_expr(const LogExpr& expr)
 // @param[in] pgfunc この式に対応する関数情報
 // @param[in] expr パタンの元となる論理式
 void
-LibDump::reg_pat(LdFunc* pgfunc,
+LibDump::reg_pat(LdFuncGroup* pgfunc,
 		 const LogExpr& expr)
 {
   const LdFuncClass* pgrep = pgfunc->rep();

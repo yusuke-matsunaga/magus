@@ -1,34 +1,35 @@
-#ifndef YM_CELL_CELLFFCLASS_H
-#define YM_CELL_CELLFFCLASS_H
+#ifndef CIFFCLASS_H
+#define CIFFCLASS_H
 
-/// @file ym_cell/CellFFClass.h
-/// @brief CellFFClass のヘッダファイル
+/// @file CiFFClass.h
+/// @brief CiFFClass のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_cell/cell_nsdef.h"
+#include "CiClass.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellFFClass CellFFClass.h "ym_cell/CellFFClass.h"
+/// @class CiFFClass CiFFClass.h "CiFFClass.h"
 /// @brief CellFFGroup の集合を表すセル
 //////////////////////////////////////////////////////////////////////
-class CellFFClass
+class CiFFClass :
+  public CiClass
 {
   friend class CellMgr;
 
 private:
 
   /// @brief コンストラクタ
-  CellFFClass();
+  CiFFClass();
 
   /// @brief デストラクタ
-  ~CellFFClass();
+  ~CiFFClass();
 
 
 public:
@@ -68,15 +69,6 @@ public:
   bool
   has_preset() const;
 
-  /// @brief このクラスに属する CellFFGroup の数を返す．
-  ymuint
-  group_num() const;
-
-  /// @brief CellFFGroup を得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < group_num() )
-  const CellFFGroup&
-  group(ymuint pos) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -85,12 +77,6 @@ private:
 
   // 入力タイプの情報をパックしたもの
   ymuint32 mBits;
-
-  // グループ数
-  ymuint32 mGroupNum;
-
-  // グループの配列
-  const CellFFGroup** mGroupList;
 
 };
 
@@ -101,14 +87,14 @@ private:
 
 // @brief コンストラクタ
 inline
-CellFFClass::CellFFClass() :
+CiFFClass::CiFFClass() :
   mBits(0U)
 {
 }
 
 // @brief デストラクタ
 inline
-CellFFClass::~CellFFClass()
+CiFFClass::~CiFFClass()
 {
   // mGroupList は CellMgr が管理している．
 }
@@ -116,7 +102,7 @@ CellFFClass::~CellFFClass()
 // @brief シグネチャを返す．
 inline
 ymuint
-CellFFClass::signature() const
+CiFFClass::signature() const
 {
   return mBits;
 }
@@ -124,7 +110,7 @@ CellFFClass::signature() const
 // @brief クリア入力を持つタイプの時に true を返す．
 inline
 bool
-CellFFClass::has_clear() const
+CiFFClass::has_clear() const
 {
   return clear_sense() != 0U;
 }
@@ -132,29 +118,11 @@ CellFFClass::has_clear() const
 // @brief プリセット入力を持つタイプの時に true を返す．
 inline
 bool
-CellFFClass::has_preset() const
+CiFFClass::has_preset() const
 {
   return preset_sense() != 0U;
 }
 
-// @brief このクラスに属する CellFFGroup の数を返す．
-inline
-ymuint
-CellFFClass::group_num() const
-{
-  return mGroupNum;
-}
-
-// @brief CellFFGroup を得る．
-// @param[in] pos 位置番号 ( 0 <= pos < group_num() )
-inline
-const CellFFGroup&
-CellFFClass::group(ymuint pos) const
-{
-  return *mGroupList[pos];
-}
-
-
 END_NAMESPACE_YM_CELL
 
-#endif // YM_CELL_CELLFFCLASS_H
+#endif // CIFFCLASS_H

@@ -8,6 +8,12 @@
 
 
 #include "CiLibrary.h"
+#include "CiLogicClass.h"
+#include "CiFFClass.h"
+#include "CiLatchClass.h"
+#include "CiLogicGroup.h"
+#include "CiFFGroup.h"
+#include "CiLatchGroup.h"
 #include "CiCell.h"
 #include "CiPin.h"
 #include "CiTiming.h"
@@ -161,7 +167,7 @@ CiLibrary::cell_num() const
 const Cell*
 CiLibrary::cell(ymuint pos) const
 {
-  return mCellArray[pos];
+  return &mCellArray[pos];
 }
 
 // @brief 名前からのセルの取得
@@ -170,6 +176,255 @@ CiLibrary::cell(const char* name) const
 {
   // 未完
   return NULL;
+}
+
+// @brief 論理セルクラスの個数を返す．
+ymuint
+CiLibrary::logic_class_num() const
+{
+  return mLogicClassNum;
+}
+
+// @brief 論理セルクラスを返す．
+// @param[in] id クラス番号 ( 0 <= id < logic_class_num() )
+const CellClass&
+CiLibrary::logic_class(ymuint id) const
+{
+  return mLogicClassArray[id];
+}
+
+// @brief 論理セルグループの個数を返す．
+ymuint
+CiLibrary::logic_group_num() const
+{
+  return mLogicGroupNum;
+}
+
+// @brief 論理セルグループを返す．
+// @param[in] id グループ番号　( 0 <= id < logic_group_num() )
+const CellGroup&
+CiLibrary::logic_group(ymuint id) const
+{
+  return mLogicGroupArray[id];
+}
+
+// @brief 定数0セルのグループを返す．
+const CellGroup&
+CiLibrary::const0_func() const
+{
+  // 決め打ち
+  return mLogicGroupArray[0];
+}
+
+// @brief 定数1セルのグループを返す．
+const CellGroup&
+CiLibrary::const1_func() const
+{
+  return mLogicGroupArray[1];
+}
+
+// @brief バッファセルのグループを返す．
+const CellGroup&
+CiLibrary::buf_func() const
+{
+  return mLogicGroupArray[2];
+}
+
+// @brief インバータセルのグループを返す．
+const CellGroup&
+CiLibrary::inv_func() const
+{
+  return mLogicGroupArray[3];
+}
+
+// @brief FFセルクラスの個数を返す．
+ymuint
+CiLibrary::ff_class_num() const
+{
+  return mFFClassNum;
+}
+
+// @brief FFセルクラスを返す．
+// @param[in] id クラス番号 ( 0 <= id < ff_class_num() )
+const CellClass&
+CiLibrary::ff_class(ymuint id) const
+{
+  return mFFClassArray[id];
+}
+
+// @brief FFセルグループの個数を返す．
+ymuint
+CiLibrary::ff_group_num() const
+{
+  return mFFGroupNum;
+}
+
+// @brief FFセルグループを返す．
+// @param[in] id グループ番号 ( 0 <= id < ff_group_num() )
+const CellGroup&
+CiLibrary::ff_group(ymuint id) const
+{
+  return mFFGroupArray[id];
+}
+
+// @brief 単純な型のFFクラスを返す．
+// @param[in] has_clear クリア端子を持つとき true にする．
+// @param[in] has_preset プリセット端子を持つとき true にする．
+// @note 該当するセルがないときでも空のセルクラスが返される．
+const CellClass&
+CiLibrary::simple_ff_class(bool has_clear,
+			   bool has_preset) const
+{
+  ymuint pos = 0;
+  if ( has_clear ) {
+    pos += 1;
+  }
+  if ( has_preset ) {
+    pos += 2;
+  }
+  return mFFClassArray[pos];
+}
+
+// @brief ラッチセルクラスの個数を返す．
+ymuint
+CiLibrary::latch_class_num() const
+{
+  return mLatchClassNum;
+}
+
+// @brief ラッチセルクラスを返す．
+// @param[in] id クラス番号 ( 0 <= id < latch_class_num() )
+const CellClass&
+CiLibrary::latch_class(ymuint id) const
+{
+  return mLatchClassArray[id];
+}
+
+// @brief ラッチセルグループの個数を返す．
+ymuint
+CiLibrary::latch_group_num() const
+{
+  return mLatchGroupNum;
+}
+
+// @brief ラッチセルグループを返す．
+// @param[in] id グループ番号 ( 0 <= id < latch_group_num() )
+const CellGroup&
+CiLibrary::latch_group(ymuint id) const
+{
+  return mLatchGroupArray[id];
+}
+
+// @brief 単純な型のラッチクラスを返す．
+// @param[in] has_clear クリア端子を持つとき true にする．
+// @param[in] has_preset プリセット端子を持つとき true にする．
+// @note 該当するセルがないときでも空のセルクラスが返される．
+const CellClass&
+CiLibrary::simple_latch_class(bool has_clear,
+			      bool has_preset) const
+{
+  ymuint pos = 0;
+  if ( has_clear ) {
+    pos += 1;
+  }
+  if ( has_preset ) {
+    pos += 2;
+  }
+  return mLatchClassArray[pos];
+}
+
+// @brief 総パタン数を返す．
+ymuint
+CiLibrary::pat_num() const
+{
+  return mPatMgr.pat_num();
+}
+
+// @brief パタンを返す．
+// @param[in] id パタン番号 ( 0 <= id < pat_num() )
+const CellPatGraph&
+CiLibrary::pat(ymuint id) const
+{
+  return mPatMgr.pat(id);
+}
+
+// @brief パタンの最大の入力数を得る．
+ymuint
+CiLibrary::max_input() const
+{
+  return mPatMgr.max_input();
+}
+
+// @brief 総ノード数を返す．
+ymuint
+CiLibrary::node_num() const
+{
+  return mPatMgr.node_num();
+}
+
+// @brief ノードの種類を返す．
+// @param[in] id ノード番号 ( 0 <= id < node_num() )
+tCellPatType
+CiLibrary::node_type(ymuint id) const
+{
+  return mPatMgr.node_type(id);
+}
+
+// @brief ノードが入力ノードの時に入力番号を返す．
+// @param[in] id ノード番号 ( 0 <= id < node_num() )
+// @note 入力ノードでない場合の返り値は不定
+ymuint
+CiLibrary::input_id(ymuint id) const
+{
+  return mPatMgr.input_id(id);
+}
+
+// @brief 入力のノード番号を返す．
+// @param[in] input_id 入力番号 ( 0 <= input_id < input_num() )
+// @return input_id の入力に対応するノードのノード番号
+ymuint
+CiLibrary::input_node(ymuint input_id) const
+{
+  return mPatMgr.input_node(input_id);
+}
+
+// @brief 総枝数を返す．
+ymuint
+CiLibrary::edge_num() const
+{
+  return mPatMgr.edge_num();
+}
+
+// @brief 枝のファンイン元のノード番号を返す．
+// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+ymuint
+CiLibrary::edge_from(ymuint id) const
+{
+  return mPatMgr.edge_from(id);
+}
+
+// @brief 枝のファンアウト先のノード番号を返す．
+// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+ymuint
+CiLibrary::edge_to(ymint id) const
+{
+  return mPatMgr.edge_to(id);
+}
+
+// @brief 枝のファンアウト先の入力位置( 0 or 1 ) を返す．
+// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+ymuint
+CiLibrary::edge_pos(ymuint id) const
+{
+  return mPatMgr.edge_pos(id);
+}
+
+// @brief 枝の反転属性を返す．
+// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+bool
+CiLibrary::edge_inv(ymuint id) const
+{
+  return mPatMgr.edge_inv(id);
 }
 
 // @brief 属性を設定する．
@@ -217,8 +472,8 @@ void
 CiLibrary::set_cell_num(ymuint num)
 {
   mCellNum = num;
-  void* p = mAlloc.get_memory(sizeof(CiCell*) * num);
-  mCellArray = new (p) CiCell*[num];
+  void* p = mAlloc.get_memory(sizeof(CiCell) * num);
+  mCellArray = new (p) CiCell[num];
 }
 
 // @brief 論理セルを生成する．
@@ -232,24 +487,22 @@ CiLibrary::set_cell_num(ymuint num)
 // @param[in] nc バンドル数
 // @return セルへのポインタを返す．
 CiCell*
-CiLibrary::new_logic_cell(ymuint cell_id,
-			  ShString name,
-			  CellArea area,
-			  ymuint ni,
-			  ymuint no,
-			  ymuint nio,
-			  ymuint nb,
-			  ymuint nc)
+CiLibrary::new_cell(ymuint cell_id,
+		    ShString name,
+		    CellArea area,
+		    ymuint ni,
+		    ymuint no,
+		    ymuint nio,
+		    ymuint nb,
+		    ymuint nc)
 {
-  void* p = mAlloc.get_memory(sizeof(CiLogicCell));
-  CiCell* cell = new (p) CiLogicCell(cell_id, name, area);
-  mCellArray[cell_id] = cell;
-
-  cell->set_pinnum(ni, no, nio, nb, nc, mAlloc);
+  CiCell* cell = &mCellArray[cell_id];
+  cell->init(cell_id, name, area, ni, no, nio, nb, nc, mAlloc);
 
   return cell;
 }
 
+#if 0
 // @brief FFセルを生成する．
 // @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
 // @param[in] name 名前
@@ -351,6 +604,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 
   return cell;
 }
+#endif
 
 // @brief セルの入力ピンの内容を設定する．
 // @param[in] cell セル

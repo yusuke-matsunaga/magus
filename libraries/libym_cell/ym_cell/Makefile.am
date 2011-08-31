@@ -24,5 +24,4 @@ noinst_HEADERS = \
 	CellMgr.h \
 	CellClass.h \
 	CellGroup.h \
-	CellPatGraph.h \
-	CellPatMgr.h
+	CellPatGraph.h

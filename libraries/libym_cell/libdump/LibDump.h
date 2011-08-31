@@ -69,7 +69,7 @@ private:
   /// @param[in] pgfunc この式に対応する関数情報
   /// @param[in] expr パタンの元となる論理式
   void
-  reg_pat(LdFunc* pgfunc,
+  reg_pat(LdFuncGroup* pgfunc,
 	  const LogExpr& expr);
 
 

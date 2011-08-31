@@ -169,8 +169,8 @@ gen_library(const string& lib_name,
     }
 
     ymuint ni = ipin_name_list.size();
-    CiCell* cell = library->new_logic_cell(cell_id, name, area,
-					   ni, 1, 0, 0, 0);
+    CiCell* cell = library->new_cell(cell_id, name, area,
+				     ni, 1, 0, 0, 0);
     for (ymuint i = 0; i < ni; ++ i) {
       // 入力ピンの設定
       ShString name = ipin_name_list[i];
@@ -187,9 +187,10 @@ gen_library(const string& lib_name,
 			     CellTime::infty(),
 			     CellTime(0.0));
     LogExpr function = opin_expr->to_expr(ipin_name_map);
+#if 0
     cell->set_logic_function(0, function);
-
-    TvFunc tv_function = expr_to_tvfunc(function, ni);
+#endif
+    TvFunc tv_function = function.make_tv(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       // タイミング情報の設定
       const MislibNode* pt_pin = ipin_array[i];

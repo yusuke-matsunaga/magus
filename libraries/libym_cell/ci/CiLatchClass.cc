@@ -1,20 +1,19 @@
 
-/// @file CellLatchClass.cc
-/// @brief CellLatchClass の実装ファイル
+/// @file CiLatchClass.cc
+/// @brief CiLatchClass の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_cell/CellLatchClass.h"
-#include "ym_cell/CellLatchGroup.h"
+#include "CiLatchClass.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-// クラス CellLatchClass
+// クラス CiLatchClass
 //////////////////////////////////////////////////////////////////////
 
 BEGIN_NONAMESPACE
@@ -37,13 +36,13 @@ END_NONAMESPACE
 
 
 // @brief コンストラクタ
-CellLatchClass::CellLatchClass() :
+CiLatchClass::CiLatchClass() :
   mBits(0U)
 {
 }
 
 // @brief デストラクタ
-CellLatchClass::~CellLatchClass()
+CiLatchClass::~CiLatchClass()
 {
 }
 
@@ -52,7 +51,7 @@ CellLatchClass::~CellLatchClass()
 // @retval 1 positive edge
 // @retval 2 negative edge
 ymuint
-CellLatchClass::enable_sense() const
+CiLatchClass::enable_sense() const
 {
   return get_pol(mBits, ENABLE);
 }
@@ -61,7 +60,7 @@ CellLatchClass::enable_sense() const
 // @retval 0 Low sensitive
 // @retval 1 High sensitive
 ymuint
-CellLatchClass::clear_sense() const
+CiLatchClass::clear_sense() const
 {
   return get_pol(mBits, CLEAR);
 }
@@ -70,38 +69,23 @@ CellLatchClass::clear_sense() const
 // @retval 0 Low sensitive
 // @retval 1 High sensitive
 ymuint
-CellLatchClass::preset_sense() const
+CiLatchClass::preset_sense() const
 {
   return get_pol(mBits, PRESET);
 }
 
 // @brief クリア入力を持つタイプの時に true を返す．
 bool
-CellLatchClass::has_clear() const
+CiLatchClass::has_clear() const
 {
   return clear_sense() != 0U;
 }
 
 // @brief プリセット入力を持つタイプの時に true を返す．
 bool
-CellLatchClass::has_preset() const
+CiLatchClass::has_preset() const
 {
   return preset_sense() != 0U;
-}
-
-// @brief このクラスに属する CellLatchGroup の数を返す．
-ymuint
-CellLatchClass::group_num() const
-{
-  return mGroupNum;
-}
-
-// @brief CellLatchGroup を得る．
-// @param[in] pos 位置番号 ( 0 <= pos < group_num() )
-const CellLatchGroup&
-CellLatchClass::group(ymuint pos) const
-{
-  return mGroupList[pos];
 }
 
 END_NAMESPACE_YM_CELL

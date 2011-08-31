@@ -18,8 +18,8 @@ libym_cell_libdump_la_SOURCES = \
 	LdFFGroup.h \
 	LdFFMgr.h \
 	LdFFMgr.cc \
-	LdFunc.h \
 	LdFuncClass.h \
+	LdFuncGroup.h \
 	LdFuncMgr.h \
 	LdFuncMgr.cc \
 	LdPatHandler.h \

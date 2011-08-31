@@ -1,8 +1,8 @@
-#ifndef YM_CELL_CELLPATMGR_H
-#define YM_CELL_CELLPATMGR_H
+#ifndef CIPATMGR_H
+#define CIPATMGR_H
 
-/// @file ym_cell/CellPatMgr.h
-/// @brief CellPatMgr のヘッダファイル
+/// @file CiPatMgr.h
+/// @brief CiPatMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellPatMgr CellPatMgr.h "ym_cell/CellPatMgr.h"
+/// @class CiPatMgr CiPatMgr.h "CiPatMgr.h"
 /// @brief パタングラフを管理するクラス
 ///
 /// このクラスが持っている情報は
@@ -28,25 +28,15 @@ BEGIN_NAMESPACE_YM_CELL
 /// 情報の設定は専用形式のバイナリファイルを読み込むことでのみ行える．
 /// バイナリファイルの生成は patgen/PatGen, pg_dump を参照のこと．
 //////////////////////////////////////////////////////////////////////
-class CellPatMgr
+class CiPatMgr
 {
 public:
 
-  /// @brief ノードの種類
-  enum tType {
-    kInput = 0,
-    kAnd   = 2,
-    kXor   = 3
-  };
-
-public:
-
   /// @brief コンストラクタ
-  /// @param[in] alloc メモリアロケータ
-  CellPatMgr(AllocBase& alloc);
+  CiPatMgr();
 
   /// @brief デストラクタ
-  ~CellPatMgr();
+  ~CiPatMgr();
 
 
 public:
@@ -56,10 +46,12 @@ public:
 
   /// @brief データを読み込んでセットする．
   /// @param[in] s 入力元のストリーム
+  /// @param[in] alloc メモリアロケータ
   /// @retval true 読み込みが成功した．
   /// @retval false 読み込みが失敗した．
   bool
-  load(istream& s);
+  load(istream& s,
+       AllocBase& alloc);
 
 
 public:
@@ -77,7 +69,7 @@ public:
 
   /// @brief ノードの種類を返す．
   /// @param[in] id ノード番号 ( 0 <= id < node_num() )
-  tType
+  tCellPatType
   node_type(ymuint id) const;
 
   /// @brief ノードが入力ノードの時に入力番号を返す．
@@ -136,21 +128,11 @@ private:
   void
   init();
 
-  /// @brief CellPatGraph の内容を読み込む．
-  /// @param[in] s 入力元のストリーム
-  /// @param[in] id 番号
-  void
-  load_patgraph(istream& s,
-		ymuint id);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // メモリアロケータ
-  AllocBase& mAlloc;
 
   // ノード数
   ymuint32 mNodeNum;
@@ -173,13 +155,13 @@ private:
 };
 
 
-/// @relates CellPatMgr
-/// @brief CellPatMgr の内容を出力する．
+/// @relates CiPatMgr
+/// @brief CiPatMgr の内容を出力する．
 /// @param[in] s 出力先のストリーム
 /// @param[in] patgraph パタングラフ
 void
 dump(ostream& s,
-     const CellPatMgr& patgraph);
+     const CiPatMgr& patgraph);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -189,7 +171,7 @@ dump(ostream& s,
 // @brief ノード数を返す．
 inline
 ymuint
-CellPatMgr::node_num() const
+CiPatMgr::node_num() const
 {
   return mNodeNum;
 }
@@ -197,10 +179,10 @@ CellPatMgr::node_num() const
 // @brief ノードの種類を返す．
 // @param[in] id ノード番号 ( 0 <= id < node_num() )
 inline
-CellPatMgr::tType
-CellPatMgr::node_type(ymuint id) const
+tCellPatType
+CiPatMgr::node_type(ymuint id) const
 {
-  return static_cast<tType>(mNodeTypeArray[id] & 3U);
+  return static_cast<tCellPatType>(mNodeTypeArray[id] & 3U);
 }
 
 // @brief ノードが入力ノードの時に入力番号を返す．
@@ -208,7 +190,7 @@ CellPatMgr::node_type(ymuint id) const
 // @note 入力ノードでない場合の返り値は不定
 inline
 ymuint
-CellPatMgr::input_id(ymuint id) const
+CiPatMgr::input_id(ymuint id) const
 {
   return (mNodeTypeArray[id] >> 2);
 }
@@ -218,7 +200,7 @@ CellPatMgr::input_id(ymuint id) const
 // @return input_id の入力に対応するノードのノード番号
 inline
 ymuint
-CellPatMgr::input_node(ymuint input_id) const
+CiPatMgr::input_node(ymuint input_id) const
 {
   return input_id;
 }
@@ -226,7 +208,7 @@ CellPatMgr::input_node(ymuint input_id) const
 // @brief 総枝数を返す．
 inline
 ymuint
-CellPatMgr::edge_num() const
+CiPatMgr::edge_num() const
 {
   return node_num() * 2;
 }
@@ -235,7 +217,7 @@ CellPatMgr::edge_num() const
 // @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
 inline
 ymuint
-CellPatMgr::edge_from(ymuint id) const
+CiPatMgr::edge_from(ymuint id) const
 {
   return (mEdgeArray[id] >> 1);
 }
@@ -244,7 +226,7 @@ CellPatMgr::edge_from(ymuint id) const
 // @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
 inline
 ymuint
-CellPatMgr::edge_to(ymint id) const
+CiPatMgr::edge_to(ymint id) const
 {
   return (id / 2);
 }
@@ -253,7 +235,7 @@ CellPatMgr::edge_to(ymint id) const
 // @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
 inline
 ymuint
-CellPatMgr::edge_pos(ymuint id) const
+CiPatMgr::edge_pos(ymuint id) const
 {
   return (id & 1U);
 }
@@ -262,7 +244,7 @@ CellPatMgr::edge_pos(ymuint id) const
 // @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
 inline
 bool
-CellPatMgr::edge_inv(ymuint id) const
+CiPatMgr::edge_inv(ymuint id) const
 {
   return static_cast<bool>(mEdgeArray[id] & 1U);
 }
@@ -270,11 +252,11 @@ CellPatMgr::edge_inv(ymuint id) const
 // @brief 総パタン数を返す．
 inline
 ymuint
-CellPatMgr::pat_num() const
+CiPatMgr::pat_num() const
 {
   return mPatNum;
 }
 
 END_NAMESPACE_YM_CELL
 
-#endif // YM_CELL_CELLPATMGR_H
+#endif // CIPATMGR_H

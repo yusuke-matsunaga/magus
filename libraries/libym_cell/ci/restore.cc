@@ -34,10 +34,9 @@ restore_library(istream& s)
     ymuint nio = BinIO::read_32(s);
     ymuint nb = BinIO::read_32(s);
     ymuint nc = BinIO::read_32(s);
-    CiCell* cell = NULL;
+    CiCell* cell = library->new_cell(i, name, area, ni, no, nio, nb, nc);
     switch ( type ) {
     case 0: // kLogic
-      cell = library->new_logic_cell(i, name, area, ni, no, nio, nb, nc);
       break;
 
     case 1: // kFF
@@ -52,12 +51,6 @@ restore_library(istream& s)
 	ymuint clear_preset_var1;
 	ymuint clear_preset_var2;
 #warning "TODO:未完"
-	cell = library->new_ff_cell(i, name, area, ni, no, nio, nb, nc,
-				    var1, var2,
-				    next_state, clocked_on, clocked_on_also,
-				    clear, preset,
-				    clear_preset_var1,
-				    clear_preset_var2);
       }
       break;
 
@@ -73,12 +66,6 @@ restore_library(istream& s)
 	ymuint clear_preset_var1;
 	ymuint clear_preset_var2;
 #warning "TODO:未完"
-	cell = library->new_latch_cell(i, name, area, ni, no, nio, nb, nb,
-				       var1, var2,
-				       data_in, enable, enable_also,
-				       clear, preset,
-				       clear_preset_var1,
-				       clear_preset_var2);
       }
       break;
 

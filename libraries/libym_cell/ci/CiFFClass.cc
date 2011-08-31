@@ -1,20 +1,19 @@
 
-/// @file CellFFClass.cc
-/// @brief CellFFClass の実装ファイル
+/// @file CiFFClass.cc
+/// @brief CiFFClass の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_cell/CellFFClass.h"
-#include "ym_cell/CellFFGroup.h"
+#include "CiFFClass.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-// クラス CellFFClass
+// クラス CiFFClass
 //////////////////////////////////////////////////////////////////////
 
 BEGIN_NONAMESPACE
@@ -40,7 +39,7 @@ END_NONAMESPACE
 // @retval 1 positive edge
 // @retval 2 negative edge
 ymuint
-CellFFClass::clock_sense() const
+CiFFClass::clock_sense() const
 {
   return get_pol(mBits, CLOCK);
 }
@@ -49,7 +48,7 @@ CellFFClass::clock_sense() const
 // @retval 0 Low sensitive
 // @retval 1 High sensitive
 ymuint
-CellFFClass::clear_sense() const
+CiFFClass::clear_sense() const
 {
   return get_pol(mBits, CLEAR);
 }
@@ -58,7 +57,7 @@ CellFFClass::clear_sense() const
 // @retval 0 Low sensitive
 // @retval 1 High sensitive
 ymuint
-CellFFClass::preset_sense() const
+CiFFClass::preset_sense() const
 {
   return get_pol(mBits, PRESET);
 }

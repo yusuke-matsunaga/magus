@@ -9,7 +9,7 @@
 
 #include "LdFuncMgr.h"
 #include "LdFuncClass.h"
-#include "LdFunc.h"
+#include "LdFuncGroup.h"
 #include "ym_logic/NpnMgr.h"
 #include "ym_utils/BinIO.h"
 
@@ -38,7 +38,7 @@ LdFuncMgr::~LdFuncMgr()
 void
 LdFuncMgr::init()
 {
-  for (vector<LdFunc*>::iterator p = mFuncList.begin();
+  for (vector<LdFuncGroup*>::iterator p = mFuncList.begin();
        p != mFuncList.end(); ++ p) {
     delete *p;
   }
@@ -54,19 +54,19 @@ LdFuncMgr::init()
   // 既定関数の登録
   {
     TvFunc const0 = TvFunc::const_zero(0);
-    LdFunc* func0 = find_func(const0);
+    LdFuncGroup* func0 = find_func(const0);
     assert_cond( func0->id() == 0, __FILE__, __LINE__);
 
     TvFunc const1 = TvFunc::const_one(0);
-    LdFunc* func1 = find_func(const1);
+    LdFuncGroup* func1 = find_func(const1);
     assert_cond( func1->id() == 1, __FILE__, __LINE__);
 
     TvFunc plit = TvFunc::posi_literal(1, 0);
-    LdFunc* func2 = find_func(plit);
+    LdFuncGroup* func2 = find_func(plit);
     assert_cond( func2->id() == 2, __FILE__, __LINE__);
 
     TvFunc nlit = TvFunc::nega_literal(1, 0);
-    LdFunc* func3 = find_func(nlit);
+    LdFuncGroup* func3 = find_func(nlit);
     assert_cond( func3->id() == 3, __FILE__, __LINE__);
   }
 }
@@ -74,14 +74,14 @@ LdFuncMgr::init()
 // @brief f に対応する LdFunc を求める．
 // @param[in] f 関数
 // @note なければ新規に作る．
-LdFunc*
+LdFuncGroup*
 LdFuncMgr::find_func(const TvFunc& f)
 {
-  LdFunc* pgfunc = NULL;
-  hash_map<TvFunc, LdFunc*>::iterator p = mFuncMap.find(f);
+  LdFuncGroup* pgfunc = NULL;
+  hash_map<TvFunc, LdFuncGroup*>::iterator p = mFuncMap.find(f);
   if ( p == mFuncMap.end() ) {
     // なかったので新たに作る．
-    pgfunc = new LdFunc;
+    pgfunc = new LdFuncGroup;
     pgfunc->mId = mFuncList.size();
     mFuncList.push_back(pgfunc);
     mFuncMap.insert(make_pair(f, pgfunc));
@@ -137,7 +137,7 @@ LdFuncMgr::dump(ostream& s) const
   ymuint nf = func_num();
   BinIO::write_32(s, nf);
   for (ymuint i = 0; i < nf; ++ i) {
-    const LdFunc* func = this->func(i);
+    const LdFuncGroup* func = this->func(i);
     assert_cond( func->id() == i, __FILE__, __LINE__);
     // 代表関数に対する変換マップをダンプする．
     dump_map(s, func->map());
@@ -172,7 +172,7 @@ LdFuncMgr::display(ostream& s) const
   s << "*** LdFuncMgr BEGIN ***" << endl;
   s << "*** FUNCTION SECTION ***" << endl;
   for (ymuint i = 0; i < func_num(); ++ i) {
-    const LdFunc* func = this->func(i);
+    const LdFuncGroup* func = this->func(i);
     assert_cond( func->id() == i, __FILE__, __LINE__);
     s << "FUNC#" << i
       << ": REP#" << func->rep()->id()

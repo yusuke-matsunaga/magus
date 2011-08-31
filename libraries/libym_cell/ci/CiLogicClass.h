@@ -1,36 +1,36 @@
-#ifndef CELLLOGICCLASS_H
-#define CELLLOGICCLASS_H
+#ifndef CILOGICCLASS_H
+#define CILOGICCLASS_H
 
-/// @file CellLogicClass.h
-/// @brief CellLogicClass のヘッダファイル
+/// @file CiLogicClass.h
+/// @brief CiLogicClass のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CellClassBase.h"
+#include "CiClass.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellLogicClass CellLogicClass.h "CellLogicClass.h"
+/// @class CiLogicClass CiLogicClass.h "CiLogicClass.h"
 /// @brief 論理セルのクラス
 //////////////////////////////////////////////////////////////////////
-class CellLogicClass :
-  public CellClassBase
+class CiLogicClass :
+  public CiClass
 {
   friend class CellMgr;
 
 private:
 
   /// @brief コンストラクタ
-  CellLogicClass();
+  CiLogicClass();
 
   /// @brief デストラクタ
   virtual
-  ~CellLogicClass();
+  ~CiLogicClass();
 
 
 public:
@@ -52,7 +52,7 @@ public:
   /// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
   /// @note 非論理セルの場合の返り値は不定
   virtual
-  const TvFunc&
+  TvFunc
   logic_function(ymuint pos) const;
 
 
@@ -71,4 +71,4 @@ private:
 
 END_NAMESPACE_YM_CELL
 
-#endif // CELLLOGICCLASS_H
+#endif // CILOGICCLASS_H

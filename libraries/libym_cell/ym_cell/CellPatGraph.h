@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class CellPatGraph
 {
-  friend class CellPatMgr;
+  friend class CiPatMgr;
 
 public:
 

@@ -1,34 +1,36 @@
-#ifndef YM_CELL_CELLLATCHCLASS_H
-#define YM_CELL_CELLLATCHCLASS_H
+#ifndef CILATCHCLASS_H
+#define CILATCHCLASS_H
 
-/// @file ym_cell/CellLatchClass.h
-/// @brief CellLatchClass のヘッダファイル
+/// @file CiLatchClass.h
+/// @brief CiLatchClass のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_cell/cell_nsdef.h"
+#include "CiClass.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellLatchClass CellLatchClass.h "ym_cell/CellLatchClass.h"
-/// @brief LatchGroup の集合を表すセル
+/// @class CiLatchClass CiLatchClass.h "CiLatchClass.h"
+/// @brief LatchGroup の集合を表すクラス
 //////////////////////////////////////////////////////////////////////
-class CellLatchClass
+class CiLatchClass :
+  public CiClass
 {
   friend class CellMgr;
 
 private:
 
   /// @brief コンストラクタ
-  CellLatchClass();
+  CiLatchClass();
 
   /// @brief デストラクタ
-  ~CellLatchClass();
+  virtual
+  ~CiLatchClass();
 
 
 public:
@@ -65,15 +67,6 @@ public:
   bool
   has_preset() const;
 
-  /// @brief このクラスに属する LatchGroup の数を返す．
-  ymuint
-  group_num() const;
-
-  /// @brief LatchGroup を得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < group_num() )
-  const CellLatchGroup&
-  group(ymuint pos) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -83,14 +76,8 @@ private:
   // 入力タイプの情報をパックしたもの
   ymuint32 mBits;
 
-  // グループ数
-  ymuint32 mGroupNum;
-
-  // グループの(実体の)配列
-  CellLatchGroup* mGroupList;
-
 };
 
 END_NAMESPACE_YM_CELL
 
-#endif // YM_CELL_CELLLATCHCLASS_H
+#endif // CILATCHCLASS_H

@@ -1,8 +1,8 @@
-#ifndef LDFUNC_H
-#define LDFUNC_H
+#ifndef LDFUNCGROUP_H
+#define LDFUNCGROUP_H
 
-/// @file LdFunc.h
-/// @brief LdFunc のヘッダファイル
+/// @file LdFuncGroup.h
+/// @brief LdFuncGroup のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -18,10 +18,10 @@ BEGIN_NAMESPACE_YM_CELL_LIBDUMP
 class LdFuncClass;
 
 //////////////////////////////////////////////////////////////////////
-/// @class LdFunc LdFunc.h "LdFunc.h"
+/// @class LdFuncGroup LdFuncGroup.h "LdFuncGroup.h"
 /// @brief 論理関数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class LdFunc :
+class LdFuncGroup :
   public LdCellGroup
 {
   friend class LdFuncMgr;
@@ -29,10 +29,10 @@ class LdFunc :
 private:
 
   /// @brief コンストラクタ
-  LdFunc();
+  LdFuncGroup();
 
   /// @brief デストラクタ
-  ~LdFunc();
+  ~LdFuncGroup();
 
 
 public:
@@ -73,20 +73,20 @@ private:
 
 // @brief コンストラクタ
 inline
-LdFunc::LdFunc()
+LdFuncGroup::LdFuncGroup()
 {
 }
 
 // @brief デストラクタ
 inline
-LdFunc::~LdFunc()
+LdFuncGroup::~LdFuncGroup()
 {
 }
 
 // @brief ID番号を返す．
 inline
 ymuint
-LdFunc::id() const
+LdFuncGroup::id() const
 {
   return mId;
 }
@@ -94,7 +94,7 @@ LdFunc::id() const
 // @brief 親の代表関数を返す．
 inline
 const LdFuncClass*
-LdFunc::rep() const
+LdFuncGroup::rep() const
 {
   return mRep;
 }
@@ -102,7 +102,7 @@ LdFunc::rep() const
 // @brief 親に対する変換マップを返す．
 inline
 const NpnMap&
-LdFunc::map() const
+LdFuncGroup::map() const
 {
   return mMap;
 }

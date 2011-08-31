@@ -10,7 +10,6 @@
 
 
 #include "ym_cell/Cell.h"
-#include "ym_logic/LogExpr.h"
 #include "ym_utils/ShString.h"
 #include "ym_utils/Alloc.h"
 
@@ -37,12 +36,7 @@ class CiCell :
 protected:
 
   /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  /// @param[in] name 名前
-  /// @param[in] area 面積
-  CiCell(ymuint id,
-	 const ShString& name,
-	 CellArea area);
+  CiCell();
 
   /// @brief デストラクタ
   virtual
@@ -53,6 +47,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 基本情報の取得
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 属している CellGroup を返す．
+  virtual
+  const CellGroup*
+  cell_group() const;
 
   /// @brief ID番号の取得
   /// @note ここで返される番号は CellLibrary::cell() の引数に対応する．
@@ -159,11 +158,6 @@ public:
   virtual
   const CellBundle*
   bundle(const string& name) const;
-
-  /// @brief 属している CellGroup を返す．
-  virtual
-  const CellGroup*
-  cell_group() const;
 
 
 public:
@@ -294,7 +288,10 @@ public:
   // 設定用の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ピン数，バス数，バンドル数の設定をする．
+  /// @brief 初期化する．
+  /// @param[in] id ID番号
+  /// @param[in] name 名前
+  /// @param[in] area 面積
   /// @param[in] ni 入力ピン数
   /// @param[in] no 出力ピン数
   /// @param[in] nio 入出力ピン数
@@ -302,13 +299,17 @@ public:
   /// @param[in] nc バンドル数
   /// @param[in] alloc メモリアロケータ
   void
-  set_pinnum(ymuint ni,
-	     ymuint no,
-	     ymuint nio,
-	     ymuint nb,
-	     ymuint nc,
-	     AllocBase& alloc);
+  init(ymuint id,
+       const ShString& name,
+       CellArea area,
+       ymuint ni,
+       ymuint no,
+       ymuint nio,
+       ymuint nb,
+       ymuint nc,
+       AllocBase& alloc);
 
+#if 0
   /// @brief 出力ピンの機能を設定する．
   /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
   /// @param[in] function 機能を表す論理式
@@ -328,6 +329,7 @@ public:
   void
   set_tristate_function(ymuint opin_id,
 			const LogExpr& expr);
+#endif
 
   /// @brief タイミング情報を設定する．
   /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
@@ -349,6 +351,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // セルグループ
+  CellGroup* mCellGroup;
 
   // ID番号
   ymuint32 mId;
@@ -389,344 +394,11 @@ private:
   // バンドルピンの配列
   CiBundle* mBundleArray;
 
-  // セルグループ
-  CellGroup* mCellGroup;
-
   // タイミング情報を格納する配列
   // サイズは(入力数＋入出力数) x (出力数+入出力ピン数)  x 2
   CiTiming** mTimingArray;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class CiLogicCell CiCell.h "CiCell.h"
-/// @brief 組合せ論理セルを表すクラス
-//////////////////////////////////////////////////////////////////////
-class CiLogicCell :
-  public CiCell
-{
-  friend class CiLibrary;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  /// @param[in] name 名前
-  /// @param[in] area 面積
-  CiLogicCell(ymuint id,
-	      const ShString& name,
-	      CellArea area);
-
-  /// @brief デストラクタ
-  virtual
-  ~CiLogicCell();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // セル情報の取得
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 組み合わせ論理セルの時に true を返す．
-  /// @note type() == kLogic と等価
-  virtual
-  bool
-  is_logic() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 設定用の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 出力ピンの機能を設定する．
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-  /// @param[in] function 機能を表す論理式
-  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->output_num() を使う．
-  virtual
-  void
-  set_logic_function(ymuint opin_id,
-		     const LogExpr& function);
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class CiFLCell CiCell.h "CiCell.h"
-/// @brief FFセルとラッチセルの基底クラス
-//////////////////////////////////////////////////////////////////////
-class CiFLCell :
-  public CiCell
-{
-protected:
-
-  /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  /// @param[in] name 名前
-  /// @param[in] area 面積
-  /// @param[in] var1, var2 状態変数名
-  /// @param[in] clear "clear" 関数の式
-  /// @param[in] preset "preset" 関数の式
-  /// @param[in] clear_preset_var1 "clear_preset_var1" の値
-  /// @param[in] clear_preset_var2 "clear_preset_var2" の値
-  CiFLCell(ymuint id,
-	   const ShString& name,
-	   CellArea area,
-	   const ShString& var1,
-	   const ShString& var2,
-	   const LogExpr& clear,
-	   const LogExpr& preset,
-	   ymuint clear_preset_var1,
-	   ymuint clear_preset_var2);
-
-  /// @brief デストラクタ
-  virtual
-  ~CiFLCell();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // セル情報の取得
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 状態変数1の名前を返す．
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  string
-  var1_name() const;
-
-  /// @brief 状態変数2の名前を返す．
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  string
-  var2_name() const;
-
-  /// @brief clear 関数の取得
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  LogExpr
-  clear() const;
-
-  /// @brief preset 関数の取得
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  LogExpr
-  preset() const;
-
-  /// @brief clear_preset_var1 の取得
-  /// @retval 0 "L"
-  /// @retval 1 "H"
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  ymuint
-  clear_preset_var1() const;
-
-  /// @brief clear_preset_var2 の取得
-  /// @retval 0 "L"
-  /// @retval 1 "H"
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  ymuint
-  clear_preset_var2() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 状態変数1
-  ShString mVar1;
-
-  // 状態変数2
-  ShString mVar2;
-
-  // clear 関数を表す式
-  LogExpr mClear;
-
-  // preset 関数を表す式
-  LogExpr mPreset;
-
-  // clear_preset_var1/celar_preset_var2 の値
-  ymuint32 mClearPresetVal;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class CiFFCell CiCell.h "CiCell.h"
-/// @brief FFセルを表すクラス
-//////////////////////////////////////////////////////////////////////
-class CiFFCell :
-  public CiFLCell
-{
-  friend class CiLibrary;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  /// @param[in] name 名前
-  /// @param[in] area 面積
-  /// @param[in] var1, var2 状態変数名
-  /// @param[in] next_state "next_state" 関数の式
-  /// @param[in] clocked_on "clocked_on" 関数の式
-  /// @param[in] clocked_on_also "clocked_on_also" 関数の式
-  /// @param[in] clear "clear" 関数の式
-  /// @param[in] preset "preset" 関数の式
-  /// @param[in] clear_preset_var1 "clear_preset_var1" の値
-  /// @param[in] clear_preset_var2 "clear_preset_var2" の値
-  CiFFCell(ymuint id,
-	   const ShString& name,
-	   CellArea area,
-	   const ShString& var1,
-	   const ShString& var2,
-	   const LogExpr& next_state,
-	   const LogExpr& clocked_on,
-	   const LogExpr& clocked_on_also,
-	   const LogExpr& clear,
-	   const LogExpr& preset,
-	   ymuint clear_preset_var1,
-	   ymuint clear_preset_var2);
-
-  /// @brief デストラクタ
-  virtual
-  ~CiFFCell();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // セル情報の取得
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief FFセルの時に true を返す．
-  /// @note type() == kFF と等価
-  virtual
-  bool
-  is_ff() const;
-
-  /// @brief next_state 関数の取得
-  /// @note FFセルの時に意味を持つ．
-  virtual
-  LogExpr
-  next_state() const;
-
-  /// @brief clocked_on 関数の取得
-  /// @note FFセルの時に意味を持つ．
-  virtual
-  LogExpr
-  clocked_on() const;
-
-  /// @brief clocked_on_also 関数の取得
-  /// @note FFセルの時に意味を持つ．
-  virtual
-  LogExpr
-  clocked_on_also() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // next_state 関数を表す式
-  LogExpr mNextState;
-
-  // clocked_on 関数を表す式
-  LogExpr mClockedOn;
-
-  // clocked_on_also 関数を表す式
-  LogExpr mClockedOnAlso;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class CiLatchCell CiCell.h "CiCell.h"
-/// @brief ラッチセルを表すクラス
-//////////////////////////////////////////////////////////////////////
-class CiLatchCell :
-  public CiFLCell
-{
-  friend class CiLibrary;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  /// @param[in] name 名前
-  /// @param[in] area 面積
-  /// @param[in] var1, var2 状態変数名
-  /// @param[in] data_in "data_in" 関数の式
-  /// @param[in] enable "enable" 関数の式
-  /// @param[in] enable_also "enable_also" 関数の式
-  /// @param[in] clear "clear" 関数の式
-  /// @param[in] preset "preset" 関数の式
-  /// @param[in] clear_preset_var1 "clear_preset_var1" の値
-  /// @param[in] clear_preset_var2 "clear_preset_var2" の値
-  CiLatchCell(ymuint id,
-	      const ShString& name,
-	      CellArea area,
-	      const ShString& var1,
-	      const ShString& var2,
-	      const LogExpr& data_in,
-	      const LogExpr& enable,
-	      const LogExpr& enable_also,
-	      const LogExpr& clear,
-	      const LogExpr& preset,
-	      ymuint clear_preset_var1,
-	      ymuint clear_preset_var2);
-
-  /// @brief デストラクタ
-  virtual
-  ~CiLatchCell();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // セル情報の取得
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ラッチセルの時に true を返す．
-  /// @note type() == kLatch と等価
-  virtual
-  bool
-  is_latch() const;
-
-  /// @brief data_in 関数の取得
-  virtual
-  LogExpr
-  data_in() const;
-
-  /// @brief enable 関数の取得
-  virtual
-  LogExpr
-  enable() const;
-
-  /// @brief enable_also 関数の取得
-  virtual
-  LogExpr
-  enable_also() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // data_in 関数の取得
-  LogExpr mDataIn;
-
-  // enable 関数の取得
-  LogExpr mEnable;
-
-  // enable_also 関数の取得
-  LogExpr mEnableAlso;
-
-};
-
 
 END_NAMESPACE_YM_CELL
 

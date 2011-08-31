@@ -38,21 +38,80 @@ public:
   ymuint
   id() const;
 
-  /// @brief シグネチャを返す．
+  /// @brief 入力ピン数の取得
+  virtual
   ymuint
-  signature() const;
+  input_num() const;
 
-  /// @brief クロック入力のタイプを返す．
+  /// @brief 出力ピン数の取得
+  virtual
   ymuint
-  clock_sense() const;
+  output_num() const;
 
-  /// @brief クリア入力のタイプを返す．
+  /// @brief 入出力ピン数の取得
+  virtual
   ymuint
-  clear_sense() const;
+  inout_num() const;
 
-  /// @brief プリセット入力のタイプを返す．
-  ymuint
-  preset_sense() const;
+  /// @brief 出力の論理関数を返す．
+  /// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
+  /// @note FF/ラッチの場合は状態変数の変数(Q, XQ)が2つ入力に加わる．
+  virtual
+  TvFunc
+  logic_function(ymuint pos) const;
+
+  /// @brief 出力のトライステート条件関数を返す．
+  /// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
+  /// @note トライステートでない場合には定数0関数を返す．
+  virtual
+  TvFunc
+  tristate_function(ymuint pos) const;
+
+  /// @brief FFセルの場合に次状態関数を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  TvFunc
+  next_state_function() const;
+
+  /// @brief FFセルの場合にクロックのアクティブエッジを表す関数を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  TvFunc
+  clock_function() const;
+
+  /// @brief ラッチセルの場合にデータ入力関数を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  TvFunc
+  data_in_function() const;
+
+  /// @brief ラッチセルの場合にイネーブル条件を表す関数を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  TvFunc
+  enable_function() const;
+
+  /// @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
+  virtual
+  bool
+  has_clear() const;
+
+  /// @brief FFセル/ラッチセルの場合にクリア条件を表す関数を返す．
+  /// @note クリア端子がない場合の返り値は不定
+  virtual
+  TvFunc
+  clear_function() const;
+
+  /// @brief FFセル/ラッチセルの場合にプリセット端子を持っていたら true を返す．
+  virtual
+  bool
+  has_preset() const;
+
+  /// @brief FFセル/ラッチセルの場合にプリセット条件を表す関数を返す．
+  /// @note プリセット端子がない場合の返り値は不定
+  virtual
+  TvFunc
+  preset_function() const;
 
   /// @brief このクラスに属しているFFグループのリストを返す．
   const vector<LdFFGroup*>&
@@ -67,9 +126,6 @@ private:
   // ID番号
   ymuint32 mId;
 
-  // ピン情報をパックしたもの
-  ymuint32 mBits;
-
   // FFグループのリスト
   vector<LdFFGroup*> mGroupList;
 
@@ -83,8 +139,7 @@ private:
 // @brief コンストラクタ
 inline
 LdFFClass::LdFFClass() :
-  mId(0),
-  mBits(0)
+  mId(0)
 {
 }
 
@@ -100,38 +155,6 @@ ymuint
 LdFFClass::id() const
 {
   return mId;
-}
-
-// @brief シグネチャを返す．
-inline
-ymuint
-LdFFClass::signature() const
-{
-  return mBits;
-}
-
-// @brief クロック入力のタイプを返す．
-inline
-ymuint
-LdFFClass::clock_sense() const
-{
-  return (mBits >> 0) & 3U;
-}
-
-// @brief クリア入力のタイプを返す．
-inline
-ymuint
-LdFFClass::clear_sense() const
-{
-  return (mBits >> 2) & 3U;
-}
-
-// @brief プリセット入力のタイプを返す．
-inline
-ymuint
-LdFFClass::preset_sense() const
-{
-  return (mBits >> 4) & 3U;
 }
 
 // @brief このクラスに属しているFFグループのリストを返す．

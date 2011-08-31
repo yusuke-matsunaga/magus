@@ -1,13 +1,13 @@
 
-/// @file CellPatMgr.cc
-/// @brief CellPatMgr の実装ファイル
+/// @file CiPatMgr.cc
+/// @brief CiPatMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_cell/CellPatMgr.h"
+#include "CiPatMgr.h"
 #include "ym_cell/CellPatGraph.h"
 #include "ym_utils/BinIO.h"
 
@@ -34,13 +34,11 @@ CellPatGraph::~CellPatGraph()
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス CellPatMgr
+// クラス CiPatMgr
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] alloc メモリアロケータ
-CellPatMgr::CellPatMgr(AllocBase& alloc) :
-  mAlloc(alloc),
+CiPatMgr::CiPatMgr() :
   mNodeNum(0U),
   mNodeTypeArray(NULL),
   mEdgeArray(NULL),
@@ -50,7 +48,7 @@ CellPatMgr::CellPatMgr(AllocBase& alloc) :
 }
 
 // @brief デストラクタ
-CellPatMgr::~CellPatMgr()
+CiPatMgr::~CiPatMgr()
 {
   init();
 }
@@ -58,7 +56,7 @@ CellPatMgr::~CellPatMgr()
 // @brief 内容を初期化する．
 // @note 以前確保されたメモリは開放される．
 void
-CellPatMgr::init()
+CiPatMgr::init()
 {
   // mAlloc の初期化は CellMgr で行われる．
   mNodeNum = 0U;
@@ -67,67 +65,59 @@ CellPatMgr::init()
 
 // @brief データを読み込んでセットする．
 // @param[in] s 入力元のストリーム
+// @param[in] alloc メモリアロケータ
 // @retval true 読み込みが成功した．
 // @retval false 読み込みが失敗した．
 bool
-CellPatMgr::load(istream& s)
+CiPatMgr::load(istream& s,
+		 AllocBase& alloc)
 {
   // 以前の内容を捨てる．
   init();
 
   // ノードと枝の情報を読み込む．
   mNodeNum = BinIO::read_32(s);
-  void* p = mAlloc.get_memory(sizeof(ymuint32) * mNodeNum);
+  void* p = alloc.get_memory(sizeof(ymuint32) * mNodeNum);
   mNodeTypeArray = new (p) ymuint32[mNodeNum];
-  void* q = mAlloc.get_memory(sizeof(ymuint32) * mNodeNum * 2);
+  void* q = alloc.get_memory(sizeof(ymuint32) * mNodeNum * 2);
   mEdgeArray = new (q) ymuint32[mNodeNum * 2];
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     mNodeTypeArray[i] = BinIO::read_32(s);
     mEdgeArray[i * 2] = BinIO::read_32(s);
     mEdgeArray[i * 2 + 1] = BinIO::read_32(s);
-    if ( node_type(i) == kInput ) {
+    if ( node_type(i) == kCellPatInput ) {
       assert_cond( input_id(i) == i, __FILE__, __LINE__);
     }
   }
 
   // パタングラフの情報を読み込む．
   mPatNum = BinIO::read_32(s);
-  void* r = mAlloc.get_memory(sizeof(CellPatGraph) * mPatNum);
+  void* r = alloc.get_memory(sizeof(CellPatGraph) * mPatNum);
   mPatArray = new (r) CellPatGraph[mPatNum];
-  for (ymuint i = 0; i < mPatNum; ++ i) {
-    load_patgraph(s, i);
+  for (ymuint id = 0; id < mPatNum; ++ id) {
+    CellPatGraph& pg = mPatArray[id];
+    pg.mInputNum = BinIO::read_32(s);
+    ymuint n = BinIO::read_32(s);
+    pg.mEdgeNum = n;
+    if ( n > 0 ) {
+      void* p = alloc.get_memory(sizeof(ymuint32) * n);
+      pg.mEdgeList = new (p) ymuint32[n];
+      for (ymuint i = 0; i < n; ++ i) {
+	pg.mEdgeList[i] = BinIO::read_32(s);
+      }
+    }
+    else {
+      pg.mEdgeList = NULL;
+    }
+    pg.mRepId = BinIO::read_32(s);
   }
 
   return true;
 }
 
-// @brief データを読み込んでセットする．
-// @param[in] s 入力元のストリーム
-// @param[in] id 番号
-void
-CellPatMgr::load_patgraph(istream& s,
-			  ymuint id)
-{
-  CellPatGraph& pg = mPatArray[id];
-  pg.mInputNum = BinIO::read_32(s);
-  ymuint n = BinIO::read_32(s);
-  pg.mEdgeNum = n;
-  if ( n > 0 ) {
-    void* p = mAlloc.get_memory(sizeof(ymuint32) * n);
-    pg.mEdgeList = new (p) ymuint32[n];
-    for (ymuint i = 0; i < n; ++ i) {
-      pg.mEdgeList[i] = BinIO::read_32(s);
-    }
-  }
-  else {
-    pg.mEdgeList = NULL;
-  }
-  pg.mRepId = BinIO::read_32(s);
-}
-
 // @brief このセルライブラリに含まれるセルの最大の入力数を得る．
 ymuint
-CellPatMgr::max_input() const
+CiPatMgr::max_input() const
 {
   ymuint ans = 0;
   for (ymuint i = 0; i < mPatNum; ++ i) {
@@ -143,29 +133,29 @@ CellPatMgr::max_input() const
 // @brief パタンを返す．
 // @param[in] id パタン番号 ( 0 <= id < pat_num() )
 const CellPatGraph&
-CellPatMgr::pat(ymuint id) const
+CiPatMgr::pat(ymuint id) const
 {
   return mPatArray[id];
 }
 
-// @relates CellPatMgr
-// @brief CellPatMgr の内容を出力する．
+// @relates CiPatMgr
+// @brief CiPatMgr の内容を出力する．
 // @param[in] s 出力先のストリーム
 // @param[in] pat_mgr パタングラフ
 void
 dump(ostream& s,
-     const CellPatMgr& pat_mgr)
+     const CiPatMgr& pat_mgr)
 {
-  s << "==== CellPatMgr dump start ====" << endl;
+  s << "==== CiPatMgr dump start ====" << endl;
 
   // ノードの種類の出力
   ymuint nn = pat_mgr.node_num();
   for (ymuint i = 0; i < nn; ++ i) {
     s << "Node#" << i << ": ";
     switch ( pat_mgr.node_type(i) ) {
-    case CellPatMgr::kInput: s << "INPUT#" << pat_mgr.input_id(i) ; break;
-    case CellPatMgr::kAnd:   s << "AND"; break;
-    case CellPatMgr::kXor:   s << "XOR"; break;
+    case kCellPatInput: s << "INPUT#" << pat_mgr.input_id(i) ; break;
+    case kCellPatAnd:   s << "AND"; break;
+    case kCellPatXor:   s << "XOR"; break;
     default: assert_not_reached(__FILE__, __LINE__);
     }
     s << endl;
@@ -201,7 +191,7 @@ dump(ostream& s,
     s << endl;
   }
 
-  s << "==== CellPatMgr dump end ====" << endl;
+  s << "==== CiPatMgr dump end ====" << endl;
 }
 
 END_NAMESPACE_YM_CELL

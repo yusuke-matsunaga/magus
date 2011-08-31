@@ -226,7 +226,9 @@ gen_library(const DotlibNode* dt_library)
     const DotlibNode* dt_latch = cell_info.latch();
 
     // セルの生成
-    CiCell* cell = NULL;
+    CiCell* cell = library->new_cell(cell_id, cell_name, area,
+				     ni, no, nio, nbus, nbundle);
+
     if ( dt_ff ) {
       DotlibFF ff_info;
       if ( !dt_ff->get_ff_info(ff_info) ) {
@@ -242,12 +244,13 @@ gen_library(const DotlibNode* dt_library)
       ymuint v1 = ff_info.clear_preset_var1();
       ymuint v2 = ff_info.clear_preset_var2();
 
+#if 0
       cell = library->new_ff_cell(cell_id, cell_name, area,
 				  ni, no, nio, nbus, nbundle,
 				  var1, var2,
 				  next_state, clocked_on, clocked_on_also,
 				  clear, preset, v1, v2);
-
+#endif
       // pin_map に登録しておく
       pin_map.insert(make_pair(var1, npin));
       pin_map.insert(make_pair(var2, npin + 1));
@@ -266,20 +269,22 @@ gen_library(const DotlibNode* dt_library)
       LogExpr preset = dot2expr(latch_info.preset(), pin_map);
       ymuint v1 = latch_info.clear_preset_var1();
       ymuint v2 = latch_info.clear_preset_var2();
-
+#if 0
       cell = library->new_latch_cell(cell_id, cell_name, area,
 				     ni, no, nio, nbus, nbundle,
 				     var1, var2,
 				     data_in, enable, enable_also,
 				     clear, preset, v1, v2);
-
+#endif
       // pin_map に登録しておく
       pin_map.insert(make_pair(var1, npin));
       pin_map.insert(make_pair(var2, npin + 1));
     }
     else {
+#if 0
       cell = library->new_logic_cell(cell_id, cell_name, area,
 				     ni, no, nio, nbus, nbundle);
+#endif
     }
 
     // ピンの生成
@@ -314,8 +319,10 @@ gen_library(const DotlibNode* dt_library)
 				   max_transition, min_transition);
 	  const DotlibNode* func_node = pin_info.function();
 	  if ( func_node ) {
+#if 0
 	    LogExpr expr = dot2expr(func_node, pin_map);
 	    cell->set_logic_function(o_pos, expr);
+#endif
 
 #if 0
 	    TvFunc tv_function = expr_to_tvfunc(expr, ni);
@@ -399,8 +406,10 @@ gen_library(const DotlibNode* dt_library)
 	  }
 	  const DotlibNode* three_state = pin_info.three_state();
 	  if ( three_state ) {
+#if 0
 	    LogExpr expr = dot2expr(three_state, pin_map);
 	    cell->set_tristate_function(o_pos, expr);
+#endif
 	  }
 	}
 	++ o_pos;
@@ -427,7 +436,9 @@ gen_library(const DotlibNode* dt_library)
 	break;
 
       case DotlibPin::kInternal:
+#if 0
 	library->new_cell_internal(cell, i, pin_info.name());
+#endif
 	break;
 
       default:

@@ -1,44 +1,44 @@
 
-/// @file CellLogicClass.cc
-/// @brief CellLogicClass の実装ファイル
+/// @file CiLogicClass.cc
+/// @brief CiLogicClass の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CellLogicClass.h"
+#include "CiLogicClass.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-// クラス CellLogicClass
+// クラス CiLogicClass
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CellLogicClass::CellLogicClass() :
+CiLogicClass::CiLogicClass() :
   mNo(0),
   mLogicArray(NULL)
 {
 }
 
 // @brief デストラクタ
-CellLogicClass::~CellLogicClass()
+CiLogicClass::~CiLogicClass()
 {
   // mLogicArray は CellMgr が管理する．
 }
 
 // @brief 論理セルの場合に true を返す．
 bool
-CellLogicClass::is_logic() const
+CiLogicClass::is_logic() const
 {
   return true;
 }
 
 // @brief 論理セルの場合に出力ピン数を返す．
 ymuint
-CellLogicClass::output_num() const
+CiLogicClass::output_num() const
 {
   return mNo;
 }
@@ -46,8 +46,8 @@ CellLogicClass::output_num() const
 // @brief 論理セルの場合に関数を返す．
 // @param[in] pos 出力番号
 // @note 非論理セルの場合の返り値は不定
-const TvFunc&
-CellLogicClass::logic_function(ymuint pos) const
+TvFunc
+CiLogicClass::logic_function(ymuint pos) const
 {
   return mLogicArray[pos];
 }

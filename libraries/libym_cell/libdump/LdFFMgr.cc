@@ -46,19 +46,12 @@ LdFFMgr::init()
 }
 
 // @brief 対応する LdFFGroup を求める．
-// @param[in] f 関数
+// @param[in] f_array 関数の配列
 // @note なければ新規に作る．
 LdFFGroup*
-LdFFMgr::find_group(ymuint clock_sense,
-		    ymuint clear_sense,
-		    ymuint preset_sense,
-		    ymuint data_pos,
-		    ymuint clock_pos,
-		    ymuint clear_pos,
-		    ymuint preset_pos,
-		    ymuint q_pos,
-		    ymuint iq_pos)
+LdFFMgr::find_group(const vector<TvFunc>& f_array)
 {
+
   ymuint sig = (clock_sense << 0) | (clear_sense << 2) | (preset_sense << 4);
   ymuint n = mFFClassList.size();
   LdFFClass* ff_class = NULL;

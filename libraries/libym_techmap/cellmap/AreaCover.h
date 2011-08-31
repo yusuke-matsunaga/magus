@@ -77,7 +77,7 @@ private:
   void
   add_inv(const BdnNode* node,
 	  bool inv,
-	  const CellFuncGroup& inv_func,
+	  const CellGroup& inv_func,
 	  MapRecord& maprec);
 
   /// @brief node から各入力にいたる経路の重みを計算する．

@@ -15,7 +15,7 @@
 
 BEGIN_NAMESPACE_YM_CELL_LIBDUMP
 
-class LdFunc;
+class LdFuncGroup;
 
 //////////////////////////////////////////////////////////////////////
 /// @class LdFuncClass LdFuncClass.h "LdFuncClass.h"
@@ -50,7 +50,7 @@ public:
 
   /// @brief 関数を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < func_num() )
-  const LdFunc*
+  const LdFuncGroup*
   func(ymuint pos) const;
 
 
@@ -66,7 +66,7 @@ private:
   TvFunc mFunc;
 
   // 関数のリスト
-  vector<LdFunc*> mFuncList;
+  vector<LdFuncGroup*> mFuncList;
 
 };
 
@@ -114,7 +114,7 @@ LdFuncClass::func_num() const
 // @brief 関数を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < func_num() )
 inline
-const LdFunc*
+const LdFuncGroup*
 LdFuncClass::func(ymuint pos) const
 {
   return mFuncList[pos];

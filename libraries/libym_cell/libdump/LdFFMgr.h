@@ -42,18 +42,10 @@ public:
   init();
 
   /// @brief 対応する LdFFGroup を求める．
-  /// @param[in] f 関数
+  /// @param[in] f_array 関数の配列
   /// @note なければ新規に作る．
   LdFFGroup*
-  find_group(ymuint clock_sense,
-	     ymuint clear_sense,
-	     ymuint preset_sense,
-	     ymuint data_pos,
-	     ymuint clock_pos,
-	     ymuint clear_pos,
-	     ymuint preset_pos,
-	     ymuint q_pos,
-	     ymuint iq_pos);
+  find_group(const vector<TvFunc>& f_array);
 
   /// @brief 内容をバイナリダンプする．
   /// @param[in] s 出力先のストリーム

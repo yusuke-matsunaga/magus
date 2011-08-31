@@ -48,6 +48,17 @@ enum tCellTimingSense {
   kCellNonUnate  = 3
 };
 
+
+//////////////////////////////////////////////////////////////////////
+/// @brief パタングラフのノードの型
+//////////////////////////////////////////////////////////////////////
+enum tCellPatType {
+  kCellPatInput = 0,
+  kCellPatAnd   = 2,
+  kCellPatXor   = 3
+};
+
+
 //////////////////////////////////////////////////////////////////////
 // クラスの前方参照
 //////////////////////////////////////////////////////////////////////
@@ -115,6 +126,11 @@ using nsCell::CellLatchPosArray;
 using nsCell::CellMgr;
 using nsCell::CellPatMgr;
 using nsCell::CellPatGraph;
+
+using nsCell::tCellPatType;
+using nsCell::kCellPatInput;
+using nsCell::kCellPatAnd;
+using nsCell::kCellPatXor;
 
 END_NAMESPACE_YM
 
