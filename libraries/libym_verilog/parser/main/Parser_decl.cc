@@ -155,12 +155,8 @@ void
 Parser::add_io_head(PtiIOHead* head,
 		    PtrList<const PtAttrInst>* attr_list)
 {
-  reg_attrinst(head, attr_list);
-  mCurIOHeadList->push_back(head);
-  if ( !mIOItemList.empty() ) {
-    head->set_elem(mIOItemList.to_array(mAlloc));
-  }
-  mIOItemList.clear();
+  add_ioport_head(head, attr_list);
+  flush_io();
 }
 
 

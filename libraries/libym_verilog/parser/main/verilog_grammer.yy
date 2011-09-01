@@ -394,9 +394,9 @@ fr_merge(const FileRegion fr_array[],
 %type <iohead> input_declaration input_declhead
 %type <iohead> output_declaration output_declhead1 output_declhead2
 %type <iohead> io_declaration
-%type <iohead> tf_inout_declaration tf_inout_declhead
-%type <iohead> tf_input_declaration tf_input_declhead
-%type <iohead> tf_output_declaration tf_output_declhead
+%type <iohead> tf_inout_declhead
+%type <iohead> tf_input_declhead
+%type <iohead> tf_output_declhead
 %type <iohead> udp_input_declaration udp_input_declhead
 %type <iohead> udp_output_declaration udp_output_declhead1 udp_output_declhead2
 
@@ -2592,16 +2592,37 @@ tf_io_declaration
 //            |{ attribute_instance } tf_inout_declaration
 task_port_list
 : tf_input_declhead port_identifier_item
+{
+  parser.add_ioport_head($1, NULL);
+}
 | tf_output_declhead port_identifier_item
+{
+  parser.add_ioport_head($1, NULL);
+}
 | tf_inout_declhead port_identifier_item
+{
+  parser.add_ioport_head($1, NULL);
+}
 | task_port_list tf_ioitem_end tf_input_declhead port_identifier_item
+{
+  parser.add_ioport_head($3, NULL);
+}
 | task_port_list tf_ioitem_end tf_output_declhead port_identifier_item
+{
+  parser.add_ioport_head($3, NULL);
+}
 | task_port_list tf_ioitem_end tf_inout_declhead port_identifier_item
+{
+  parser.add_ioport_head($3, NULL);
+}
 | task_port_list ',' port_identifier_item
 ;
 
 tf_ioitem_end
 : ','
+{
+  parser.flush_io();
+}
 ;
 
 // [SPEC] tf_input_declaration ::=
@@ -2611,11 +2632,10 @@ tf_ioitem_end
 tf_input_declaration
 : tf_input_declhead list_of_port_identifiers ';'
 {
-  $$ = $1;
+  parser.add_io_head($1, NULL);
 }
 | tf_input_declhead error ';'
 {
-  $$ = NULL;
   yyerrok;
 }
 ;
@@ -2655,11 +2675,10 @@ tf_input_declhead
 tf_output_declaration
 : tf_output_declhead list_of_port_identifiers ';'
 {
-  $$ = $1;
+  parser.add_io_head($1, NULL);
 }
 | tf_output_declhead error ';'
 {
-  $$ = NULL;
   yyerrok;
 }
 ;
@@ -2699,11 +2718,10 @@ tf_output_declhead
 tf_inout_declaration
 : tf_inout_declhead list_of_port_identifiers ';'
 {
-  $$ = $1;
+  parser.add_io_head($1, NULL);
 }
 | tf_inout_declhead error ';'
 {
-  $$ = NULL;
   yyerrok;
 }
 ;
