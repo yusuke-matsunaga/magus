@@ -115,6 +115,10 @@ ModuleGen::phase1_module_item(ElbModule* module,
     phase1_decl(module, paramport_array, false);
   }
 
+  // parameter と genvar を実体化する．
+  PtDeclHeadArray declhead_array = pt_module->declhead_array();
+  phase1_decl(module, declhead_array, has_paramportdecl);
+
   // パラメータの割り当てを作る．
   if ( param_con ) {
     ymuint n = param_con->elem_num();
@@ -150,11 +154,24 @@ ModuleGen::phase1_module_item(ElbModule* module,
 
       // パラメータポートリストの名前を現れた順番に paramport_list に入れる．
       vector<const char*> paramport_list;
-      for (ymuint i = 0; i < paramport_array.size(); ++ i) {
-	const PtDeclHead* pt_param = paramport_array[i];
-	for (ymuint j = 0; j < pt_param->item_num(); ++ j) {
-	  const PtDeclItem* pt_item = pt_param->item(j);
-	  paramport_list.push_back(pt_item->name());
+      if ( has_paramportdecl ) {
+	for (ymuint i = 0; i < paramport_array.size(); ++ i) {
+	  const PtDeclHead* pt_param = paramport_array[i];
+	  for (ymuint j = 0; j < pt_param->item_num(); ++ j) {
+	    const PtDeclItem* pt_item = pt_param->item(j);
+	    paramport_list.push_back(pt_item->name());
+	  }
+	}
+      }
+      else {
+	for (ymuint i = 0; i < declhead_array.size(); ++ i) {
+	  const PtDeclHead* pt_decl = declhead_array[i];
+	  if ( pt_decl->type() == kPtDecl_Param ) {
+	    for (ymuint j = 0; j < pt_decl->item_num(); ++ j) {
+	      const PtDeclItem* pt_item = pt_decl->item(j);
+	      paramport_list.push_back(pt_item->name());
+	    }
+	  }
 	}
       }
       if ( paramport_list.size() < n ) {
@@ -184,9 +201,6 @@ ModuleGen::phase1_module_item(ElbModule* module,
       }
     }
   }
-
-  // parameter と genvar を実体化する．
-  phase1_decl(module, pt_module->declhead_array(), has_paramportdecl);
 
   // それ以外の要素を実体化する．
   phase1_item(module, pt_module->item_array());
