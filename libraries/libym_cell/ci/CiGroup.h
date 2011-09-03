@@ -89,24 +89,29 @@ public:
   output_inv(ymuint ipos) const;
 
   /// @brief 論理セルの場合に true を返す．
+  virtual
   bool
   is_logic() const;
 
   /// @brief トライステートセルの場合に true を返す．
   /// @note もちろん論理セルでもある．
   /// @note 複数出力のうち1つでもトライステートなら true を返す．
+  virtual
   bool
   is_tristate() const;
 
   /// @brief FFセルの場合に true を返す．
+  virtual
   bool
   is_ff() const;
 
   /// @brief ラッチセルの場合に true を返す．
+  virtual
   bool
   is_latch() const;
 
   /// @brief 順序セル(非FF/非ラッチ)の場合に true を返す．
+  virtual
   bool
   is_seq() const;
 
@@ -201,6 +206,12 @@ private:
 
   // セルのポインタの配列
   const Cell** mCellList;
+
+  // 出力の論理関数の配列
+  TvFunc* mLogicFunction;
+
+  // 出力のトライステート関数の配列
+  TvFunc* mTristateFunction;
 
 };
 

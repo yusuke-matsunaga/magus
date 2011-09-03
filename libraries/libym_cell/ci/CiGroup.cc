@@ -41,18 +41,21 @@ CiGroup::cell_class() const
 ymuint
 CiGroup::input_num() const
 {
+  return cell_class()->input_num();
 }
 
 // @brief 出力ピン数の取得
 ymuint
 CiGroup::output_num() const
 {
+  return cell_class()->output_num();
 }
 
 // @brief 入出力ピン数の取得
 ymuint
 CiGroup::inout_num() const
 {
+  return cell_class()->inout_num();
 }
 
 // @brief 入力ピンの割り当てを得る．
@@ -93,6 +96,7 @@ CiGroup::output_inv(ymuint ipos) const
 bool
 CiGroup::is_logic() const
 {
+  return cell_class()->is_logic();
 }
 
 // @brief トライステートセルの場合に true を返す．
@@ -101,24 +105,28 @@ CiGroup::is_logic() const
 bool
 CiGroup::is_tristate() const
 {
+  return cell_class()->is_tristate();
 }
 
 // @brief FFセルの場合に true を返す．
 bool
 CiGroup::is_ff() const
 {
+  return cell_class()->is_ff();
 }
 
 // @brief ラッチセルの場合に true を返す．
 bool
 CiGroup::is_latch() const
 {
+  return cell_class()->is_latch();
 }
 
 // @brief 順序セル(非FF/非ラッチ)の場合に true を返す．
 bool
 CiGroup::is_seq() const
 {
+  return cell_class()->is_seq();
 }
 
 // @brief 出力の論理関数を返す．
@@ -127,6 +135,7 @@ CiGroup::is_seq() const
 TvFunc
 CiGroup::logic_function(ymuint pos) const
 {
+  return mLogicFunction[pos];
 }
 
 // @brief 出力のトライステート条件関数を返す．
@@ -135,6 +144,7 @@ CiGroup::logic_function(ymuint pos) const
 TvFunc
 CiGroup::tristate_function(ymuint pos) const
 {
+  return mTristateFunction[pos];
 }
 
 // @brief FFセルの場合に次状態関数を返す．
@@ -142,6 +152,7 @@ CiGroup::tristate_function(ymuint pos) const
 TvFunc
 CiGroup::next_state_function() const
 {
+#warning "TODO: not implemented"
 }
 
 // @brief FFセルの場合にクロックのアクティブエッジを表す関数を返す．
@@ -149,6 +160,7 @@ CiGroup::next_state_function() const
 TvFunc
 CiGroup::clock_function() const
 {
+#warning "TODO: not implemented"
 }
 
 // @brief ラッチセルの場合にデータ入力関数を返す．
@@ -156,6 +168,7 @@ CiGroup::clock_function() const
 TvFunc
 CiGroup::data_in_function() const
 {
+#warning "TODO: not implemented"
 }
 
 // @brief ラッチセルの場合にイネーブル条件を表す関数を返す．
@@ -163,12 +176,14 @@ CiGroup::data_in_function() const
 TvFunc
 CiGroup::enable_function() const
 {
+#warning "TODO: not implemented"
 }
 
 // @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
 bool
 CiGroup::has_clear() const
 {
+  return cell_class()->has_clear();
 }
 
 // @brief FFセル/ラッチセルの場合にクリア条件を表す関数を返す．
@@ -176,12 +191,14 @@ CiGroup::has_clear() const
 TvFunc
 CiGroup::clear_function() const
 {
+#warning "TODO: not implemented"
 }
 
 // @brief FFセル/ラッチセルの場合にプリセット端子を持っていたら true を返す．
 bool
 CiGroup::has_preset() const
 {
+  return cell_class()->has_preset();
 }
 
 // @brief FFセル/ラッチセルの場合にプリセット条件を表す関数を返す．
@@ -189,6 +206,7 @@ CiGroup::has_preset() const
 TvFunc
 CiGroup::preset_function() const
 {
+#warning "TODO: not implemented"
 }
 
 // @brief セル数を返す．
