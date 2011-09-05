@@ -26,6 +26,7 @@ noinst_HEADERS = \
 	SatSolver.h \
 	SatStats.h \
 	TvFunc.h \
+	TvFuncM.h \
 	bdd_nsdef.h \
 	lexp_nsdef.h \
 	npn_nsdef.h \

@@ -49,6 +49,12 @@ public:
   LdLogicGroup*
   find_group(const TvFunc& f);
 
+  /// @brief f_list に対応する LdLogicGroup を求める．
+  /// @param[in] f_list 関数のリスト
+  /// @note なければ新規に作る．
+  LdLogicGroup*
+  find_group(const TvFunc& f);
+
   /// @brief 内容をバイナリダンプする．
   /// @param[in] s 出力先のストリーム
   void

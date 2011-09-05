@@ -16,7 +16,8 @@ libym_logic_tvfunc_la_CPPFLAGS = \
 
 libym_logic_tvfunc_la_SOURCES = \
 	w_table.h \
-	TvFunc.cc
+	TvFunc.cc \
+	TvFuncM.cc
 
 libym_logic_tvfunc_la_LIBADD =
 

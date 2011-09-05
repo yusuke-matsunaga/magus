@@ -200,12 +200,13 @@ public:
   cofactor(ymuint varid,
 	   tPol pol) const;
 
+#if 0
   /// @brief npnmap に従った変換を行う．
   /// @param[in] npnmap 変換マップ
   /// @return 変換した関数を返す．
   TvFuncM
   xform(const NpnMapM& npnmap) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -239,6 +240,21 @@ public:
 
   friend
   bool
+  operator>(const TvFuncM& func1,
+	    const TvFuncM& func2);
+
+  friend
+  bool
+  operator<=(const TvFuncM& func1,
+	    const TvFuncM& func2);
+
+  friend
+  bool
+  operator>=(const TvFuncM& func1,
+	    const TvFuncM& func2);
+
+  friend
+  bool
   operator&&(const TvFuncM& func1,
 	     const TvFuncM& func2);
 
@@ -248,18 +264,27 @@ private:
   // 内部で使われる関数
   //////////////////////////////////////////////////////////////////////
 
-  // 入力数 ni のベクタを納めるのに必要なブロック数を計算する．
+  /// @brief 大小比較を実際に行う関数
+  bool
+  lt(const TvFuncM& right) const;
+
+  /// @brief 2つの関数の入出力が等しいかチェックする．
+  static
+  bool
+  check_nio(const TvFuncM& f1,
+	    const TvFuncM& f2);
+
+  /// @brief 入力数 ni のベクタを納めるのに必要なブロック数を計算する．
   static
   ymuint
   nblock(ymuint ni);
 
-  // (opos, ipos) 番目の要素のブロック位置を計算する．
+  /// @brief ipos 番目の要素のブロック位置を計算する．
   static
   ymuint
-  block(ymuint opos,
-	ymuint pos);
+  block(ymuint pos);
 
-  // ipos 番目の要素のシフト量を計算する．
+  /// @brief ipos 番目の要素のシフト量を計算する．
   static
   ymuint
   shift(ymuint pos);
@@ -391,7 +416,7 @@ int
 TvFuncM::value(ymuint opos,
 	       ymuint pos) const
 {
-  return (mVector[block(opos, pos)] >> shift(pos)) & 1;
+  return (mVector[block(pos) + opos * mNblk1] >> shift(pos)) & 1;
 }
 
 // ブロック数を得る．
@@ -410,6 +435,15 @@ TvFuncM::raw_data(ymuint blk) const
   return mVector[blk];
 }
 
+// @brief 2つの関数の入出力が等しいかチェックする．
+inline
+bool
+TvFuncM::check_nio(const TvFuncM& f1,
+		   const TvFuncM& f2)
+{
+  return  (f1.mNi == f2.mNi) && (f1.mNo == f2.mNo);
+}
+
 // 入力数 ni, 出力数 no のベクタを納めるのに必要なブロック数を計算する．
 inline
 ymuint
@@ -419,14 +453,13 @@ TvFuncM::nblock(ymuint ni)
   return ((1 << ni) + wsize - 1) / wsize;
 }
 
-// (opos, pos) 番目の要素のブロック位置を計算する．
+// pos 番目の要素のブロック位置を計算する．
 inline
 ymuint
-TvFuncM::block(ymuint opos,
-	       ymuint pos)
+TvFuncM::block(ymuint pos)
 {
   const ymuint wsize = sizeof(size_t) * 8;
-  return (pos / wsize) + mNblk1 * opos;
+  return pos / wsize;
 }
 
 // pos 番目の要素のシフト量を計算する．
@@ -496,10 +529,24 @@ operator!=(const TvFuncM& src1,
 // 大小比較のバリエーション
 inline
 bool
+operator<(const TvFuncM& src1,
+	  const TvFuncM& src2)
+{
+  if ( !TvFuncM::check_nio(src1, src2) ) {
+    return false;
+  }
+  return src1.lt(src2);
+}
+
+inline
+bool
 operator>(const TvFuncM& src1,
 	  const TvFuncM& src2)
 {
-  return operator<(src2, src1);
+  if ( !TvFuncM::check_nio(src1, src2) ) {
+    return false;
+  }
+  return src2.lt(src1);
 }
 
 inline
@@ -507,7 +554,10 @@ bool
 operator<=(const TvFuncM& src1,
 	   const TvFuncM& src2)
 {
-  return !operator<(src2, src1);
+  if ( !TvFuncM::check_nio(src1, src2) ) {
+    return false;
+  }
+  return !src2.lt(src1);
 }
 
 inline
@@ -515,7 +565,10 @@ bool
 operator>=(const TvFuncM& src1,
 	   const TvFuncM& src2)
 {
-  return !operator<(src1, src2);
+  if ( !TvFuncM::check_nio(src1, src2) ) {
+    return false;
+  }
+  return !src1.lt(src2);
 }
 
 // ストリームに対する出力
