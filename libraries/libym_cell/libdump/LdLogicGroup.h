@@ -1,8 +1,8 @@
-#ifndef LDFUNCGROUP_H
-#define LDFUNCGROUP_H
+#ifndef LDLOGICGROUP_H
+#define LDLOGICGROUP_H
 
-/// @file LdFuncGroup.h
-/// @brief LdFuncGroup のヘッダファイル
+/// @file LdLogicGroup.h
+/// @brief LdLogicGroup のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -15,24 +15,24 @@
 
 BEGIN_NAMESPACE_YM_CELL_LIBDUMP
 
-class LdFuncClass;
+class LdLogicClass;
 
 //////////////////////////////////////////////////////////////////////
-/// @class LdFuncGroup LdFuncGroup.h "LdFuncGroup.h"
+/// @class LdLogicGroup LdLogicGroup.h "LdLogicGroup.h"
 /// @brief 論理関数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class LdFuncGroup :
+class LdLogicGroup :
   public LdCellGroup
 {
-  friend class LdFuncMgr;
+  friend class LdLogicMgr;
 
 private:
 
   /// @brief コンストラクタ
-  LdFuncGroup();
+  LdLogicGroup();
 
   /// @brief デストラクタ
-  ~LdFuncGroup();
+  ~LdLogicGroup();
 
 
 public:
@@ -41,9 +41,9 @@ public:
   ymuint
   id() const;
 
-  /// @brief 親の代表関数を返す．
-  const LdFuncClass*
-  rep() const;
+  /// @brief 親の代表クラスを返す．
+  const LdLogicClass*
+  rep_class() const;
 
   /// @brief 親に対する変換マップを返す．
   const NpnMap&
@@ -58,8 +58,8 @@ private:
   // ID番号
   ymuint32 mId;
 
-  // 親の代表関数
-  LdFuncClass* mRep;
+  // 親の代表クラス
+  LdLogicClass* mRepClass;
 
   // 代表関数から自分自身へ変換するマップ
   NpnMap mMap;
@@ -73,40 +73,40 @@ private:
 
 // @brief コンストラクタ
 inline
-LdFuncGroup::LdFuncGroup()
+LdLogicGroup::LdLogicGroup()
 {
 }
 
 // @brief デストラクタ
 inline
-LdFuncGroup::~LdFuncGroup()
+LdLogicGroup::~LdLogicGroup()
 {
 }
 
 // @brief ID番号を返す．
 inline
 ymuint
-LdFuncGroup::id() const
+LdLogicGroup::id() const
 {
   return mId;
 }
 
-// @brief 親の代表関数を返す．
+// @brief 親の代表クラスを返す．
 inline
-const LdFuncClass*
-LdFuncGroup::rep() const
+const LdLogicClass*
+LdLogicGroup::rep_class() const
 {
-  return mRep;
+  return mRepClass;
 }
 
 // @brief 親に対する変換マップを返す．
 inline
 const NpnMap&
-LdFuncGroup::map() const
+LdLogicGroup::map() const
 {
   return mMap;
 }
 
 END_NAMESPACE_YM_CELL_LIBDUMP
 
-#endif // LDFUNC_H
+#endif // LDLOGIC_H

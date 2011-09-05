@@ -1,13 +1,13 @@
 
-/// @file TvFunc.cc
-/// @brief TvFunc の実装ファイル
+/// @file TvFuncM.cc
+/// @brief TvFuncM の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_logic/TvFunc.h"
+#include "ym_logic/TvFuncM.h"
 #include "ym_logic/NpnMap.h"
 
 
@@ -159,11 +159,14 @@ BEGIN_NAMESPACE_YM
 // 論理関数を表すクラス
 //////////////////////////////////////////////////////////////////////
 
-// 入力数のみ指定したコンストラクタ
+// 入力数と出力数のみ指定したコンストラクタ
 // 中身は恒偽関数
-TvFunc::TvFunc(ymuint ni) :
+TvFuncM::TvFuncM(ymuint ni,
+		 ymuint no) :
   mNi(ni),
-  mNblk(nblock(ni)),
+  mNo(no),
+  mNblk1(nblock(ni)),
+  mNblk(mNblk1 * no),
   mVector(new ymulong[mNblk])
 {
   for (ymuint i = 0; i < mNblk; ++ i) {
@@ -172,41 +175,58 @@ TvFunc::TvFunc(ymuint ni) :
 }
 
 // 恒真関数を作るコンストラクタ
-// 2番目の引数はダミー
-TvFunc::TvFunc(ymuint ni,
-	       int dummy) :
+// 3番目の引数はダミー
+TvFuncM::TvFuncM(ymuint ni,
+		 ymuint no,
+		 int dummy) :
   mNi(ni),
-  mNblk(nblock(ni)),
+  mNo(no),
+  mNblk1(nblock(ni)),
+  mNblk(mNblk1 * no)),
   mVector(new ymulong[mNblk])
 {
   switch ( mNi ) {
   case 0:
-    mVector[0] = 0x1;
+    for (ymuint i = 0; i < no; ++ i) {
+      mVector[i] = 0x1;
+    }
     break;
 
   case 1:
-    mVector[0] = 0x3;
+    for (ymuint i = 0; i < no; ++ i) {
+      mVector[i] = 0x3;
+    }
     break;
 
   case 2:
-    mVector[0] = 0xF;
+    for (ymuint i = 0; i < no; ++ i) {
+      mVector[i] = 0xF;
+    }
     break;
 
   case 3:
-    mVector[0] = 0xFF;
+    for (ymuint i = 0; i < no; ++ i) {
+      mVector[i] = 0xFF;
+    }
     break;
 
   case 4:
-    mVector[0] = 0xFFFF;
+    for (ymuint i = 0; i < no; ++ i) {
+      mVector[i] = 0xFFFF;
+    }
     break;
 
   case 5:
-    mVector[0] = 0xFFFFFFFF;
+    for (ymuint i = 0; i < no; ++ i) {
+      mVector[i] = 0xFFFFFFFF;
+    }
     break;
 
 #if WORD64
   case 6:
-    mVector[0] = 0xFFFFFFFFFFFFFFFF;
+    for (ymuint i = 0; i < no; ++ i) {
+      mVector[i] = 0xFFFFFFFFFFFFFFFF;
+    }
     break;
 #endif
 
@@ -218,9 +238,9 @@ TvFunc::TvFunc(ymuint ni,
 }
 
 // リテラル関数を作るコンストラクタ
-TvFunc::TvFunc(ymuint ni,
-	       ymuint pos,
-	       tPol pol) :
+TvFuncM::TvFuncM(ymuint ni,
+		 ymuint pos,
+		 tPol pol) :
   mNi(ni),
   mNblk(nblock(ni)),
   mVector(new ymulong[mNblk])
@@ -497,7 +517,7 @@ TvFunc::TvFunc(ymuint ni,
 }
 
 // 入力数と真理値を指定したコンストラクタ
-TvFunc::TvFunc(ymuint ni,
+TvFuncM::TvFuncM(ymuint ni,
 	       const vector<int>& values) :
   mNi(ni),
   mNblk(nblock(ni)),
@@ -530,7 +550,7 @@ TvFunc::TvFunc(ymuint ni,
 }
 
 // コピーコンストラクタ
-TvFunc::TvFunc(const TvFunc& src) :
+TvFuncM::TvFuncM(const TvFuncM& src) :
   mNi(src.mNi),
   mNblk(src.mNblk),
   mVector(new ymulong[mNblk])
@@ -543,8 +563,8 @@ TvFunc::TvFunc(const TvFunc& src) :
 }
 
 // 代入演算子
-const TvFunc&
-TvFunc::operator=(const TvFunc& src)
+const TvFuncM&
+TvFuncM::operator=(const TvFuncM& src)
 {
   if ( mNblk != src.mNblk ) {
     delete [] mVector;
@@ -563,44 +583,44 @@ TvFunc::operator=(const TvFunc& src)
 }
 
 // デストラクタ
-TvFunc::~TvFunc()
+TvFuncM::~TvFuncM()
 {
   delete [] mVector;
 }
 
 // 恒偽関数を作る．
-TvFunc
-TvFunc::const_zero(ymuint ni)
+TvFuncM
+TvFuncM::const_zero(ymuint ni)
 {
-  return TvFunc(ni);
+  return TvFuncM(ni);
 }
 
 // 恒真関数を作る．
-TvFunc
-TvFunc::const_one(ymuint ni)
+TvFuncM
+TvFuncM::const_one(ymuint ni)
 {
-  return TvFunc(ni, 0);
+  return TvFuncM(ni, 0);
 }
 
 // 肯定のリテラル関数を作る．
-TvFunc
-TvFunc::posi_literal(ymuint ni,
+TvFuncM
+TvFuncM::posi_literal(ymuint ni,
 		     ymuint pos)
 {
-  return TvFunc(ni, pos, kPolPosi);
+  return TvFuncM(ni, pos, kPolPosi);
 }
 
 // 否定のリテラル関数を作る．
-TvFunc
-TvFunc::nega_literal(ymuint ni,
+TvFuncM
+TvFuncM::nega_literal(ymuint ni,
 		     ymuint pos)
 {
-  return TvFunc(ni, pos, kPolNega);
+  return TvFuncM(ni, pos, kPolNega);
 }
 
 // 自分自身を否定する．
-const TvFunc&
-TvFunc::negate()
+const TvFuncM&
+TvFuncM::negate()
 {
   switch ( mNi ) {
   case 0:
@@ -645,8 +665,8 @@ TvFunc::negate()
 }
 
 // src1 との論理積を計算し自分に代入する．
-const TvFunc&
-TvFunc::operator&=(const TvFunc& src1)
+const TvFuncM&
+TvFuncM::operator&=(const TvFuncM& src1)
 {
   ymulong* endp = mVector + mNblk;
   ymulong* src_bp = src1.mVector;
@@ -657,8 +677,8 @@ TvFunc::operator&=(const TvFunc& src1)
 }
 
 // src1 との論理和を計算し自分に代入する．
-const TvFunc&
-TvFunc::operator|=(const TvFunc& src1)
+const TvFuncM&
+TvFuncM::operator|=(const TvFuncM& src1)
 {
   ymulong* endp = mVector + mNblk;
   ymulong* src_bp = src1.mVector;
@@ -669,8 +689,8 @@ TvFunc::operator|=(const TvFunc& src1)
 }
 
 // src1 との排他的論理和を計算し自分に代入する．
-const TvFunc&
-TvFunc::operator^=(const TvFunc& src1)
+const TvFuncM&
+TvFuncM::operator^=(const TvFuncM& src1)
 {
   ymulong* endp = mVector + mNblk;
   ymulong* src_bp = src1.mVector;
@@ -684,8 +704,8 @@ TvFunc::operator^=(const TvFunc& src1)
 // @param[in] pos 変数番号
 // @param[in] pol 極性
 // @return 自身への参照を返す．
-const TvFunc&
-TvFunc::set_cofactor(ymuint pos,
+const TvFuncM&
+TvFuncM::set_cofactor(ymuint pos,
 		     tPol pol)
 {
   if ( pos < NIPW ) {
@@ -864,7 +884,7 @@ END_NONAMESPACE
 
 // 0 の数を数える．
 ymuint
-TvFunc::count_zero() const
+TvFuncM::count_zero() const
 {
   switch ( ni() ) {
   case 0: return (1 << 0) - count_onebits_0(mVector[0]);
@@ -892,7 +912,7 @@ TvFunc::count_zero() const
 
 // 1 の数を数える．
 ymuint
-TvFunc::count_one() const
+TvFuncM::count_one() const
 {
   switch ( ni() ) {
   case 0: return count_onebits_0(mVector[0]);
@@ -920,7 +940,7 @@ TvFunc::count_one() const
 
 // 0次の Walsh 係数を求める．
 ymint
-TvFunc::walsh_0() const
+TvFuncM::walsh_0() const
 {
   switch ( ni() ) {
   case 0: return (1 << 0) - count_onebits_0(mVector[0]) * 2;
@@ -948,7 +968,7 @@ TvFunc::walsh_0() const
 
 // 1次の Walsh 係数を求める．
 ymint
-TvFunc::walsh_1(ymuint pos) const
+TvFuncM::walsh_1(ymuint pos) const
 {
   switch ( ni() ) {
   case 0: assert_not_reached(__FILE__, __LINE__);
@@ -997,7 +1017,7 @@ TvFunc::walsh_1(ymuint pos) const
 
 // 2次の Walsh 係数を求める．
 ymint
-TvFunc::walsh_2(ymuint i,
+TvFuncM::walsh_2(ymuint i,
 		ymuint j) const
 {
   if ( i == j ) {
@@ -1912,7 +1932,7 @@ END_NONAMESPACE
 
 // 0次と 1次の Walsh 係数を求める．
 ymint
-TvFunc::walsh_01(ymint vec[]) const
+TvFuncM::walsh_01(ymint vec[]) const
 {
   switch ( ni() ) {
   case  1: return walsh_01_1(mVector, vec);
@@ -2669,7 +2689,7 @@ walsh_012_6b(ymulong* src_vec,
 	     ymint vec1[],
 	     ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_5b(src_vec,                     ni, vec1,   vec2);
   ymint ans1 = walsh_012_5b(src_vec + (1 << (5 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 5; ++ i) {
@@ -2692,7 +2712,7 @@ walsh_012_7b(ymulong* src_vec,
 	     ymint vec1[],
 	     ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_6b(src_vec,                     ni, vec1  , vec2);
   ymint ans1 = walsh_012_6b(src_vec + (1 << (6 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 6; ++ i) {
@@ -2713,7 +2733,7 @@ walsh_012_8b(ymulong* src_vec,
 	     ymint vec1[],
 	     ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_7b(src_vec,                     ni, vec1  , vec2);
   ymint ans1 = walsh_012_7b(src_vec + (1 << (7 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 7; ++ i) {
@@ -2734,7 +2754,7 @@ walsh_012_9b(ymulong* src_vec,
 	     ymint vec1[],
 	     ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_8b(src_vec,                     ni, vec1,   vec2);
   ymint ans1 = walsh_012_8b(src_vec + (1 << (8 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 8; ++ i) {
@@ -2755,7 +2775,7 @@ walsh_012_10b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_9b(src_vec,                     ni, vec1  , vec2);
   ymint ans1 = walsh_012_9b(src_vec + (1 << (9 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 9; ++ i) {
@@ -2776,7 +2796,7 @@ walsh_012_11b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_10b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_10b(src_vec + (1 << (10 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 10; ++ i) {
@@ -2797,7 +2817,7 @@ walsh_012_12b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_11b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_11b(src_vec + (1 << (11 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 11; ++ i) {
@@ -2817,7 +2837,7 @@ walsh_012_13b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_12b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_12b(src_vec + (1 << (12 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 12; ++ i) {
@@ -2837,7 +2857,7 @@ walsh_012_14b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_13b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_13b(src_vec + (1 << (13 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 13; ++ i) {
@@ -2857,7 +2877,7 @@ walsh_012_15b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_14b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_14b(src_vec + (1 << (14 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 14; ++ i) {
@@ -2877,7 +2897,7 @@ walsh_012_16b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_15b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_15b(src_vec + (1 << (15 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 15; ++ i) {
@@ -2897,7 +2917,7 @@ walsh_012_17b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_16b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_16b(src_vec + (1 << (16 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 16; ++ i) {
@@ -2917,7 +2937,7 @@ walsh_012_18b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_17b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_17b(src_vec + (1 << (17 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 17; ++ i) {
@@ -2937,7 +2957,7 @@ walsh_012_19b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_18b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_18b(src_vec + (1 << (18 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 18; ++ i) {
@@ -2957,7 +2977,7 @@ walsh_012_20b(ymulong* src_vec,
 	      ymint vec1[],
 	      ymint vec2[])
 {
-  ymint vec1_1[TvFunc::kMaxNi];
+  ymint vec1_1[TvFuncM::kMaxNi];
   ymint ans0 = walsh_012_19b(src_vec,                      ni, vec1  , vec2);
   ymint ans1 = walsh_012_19b(src_vec + (1 << (19 - NIPW)), ni, vec1_1, vec2);
   for (ymuint i = 0; i < 19; ++ i) {
@@ -3467,7 +3487,7 @@ END_NONAMESPACE
 
 // 0次と 1次と 2次の Walsh 係数を求める．
 int
-TvFunc::walsh_012(int vec1[],
+TvFuncM::walsh_012(int vec1[],
 		  int vec2[]) const
 {
   switch ( ni() ) {
@@ -4717,7 +4737,7 @@ END_NONAMESPACE
 
 // 重み別の 0 次の Walsh 係数を求める．
 int
-TvFunc::walsh_w0(ymuint w,
+TvFuncM::walsh_w0(ymuint w,
 		 tPol opol,
 		 ymuint ibits) const
 {
@@ -5000,7 +5020,7 @@ TvFunc::walsh_w0(ymuint w,
 
 // 重み別の 1 次の Walsh 係数を求める．
 int
-TvFunc::walsh_w1(ymuint var,
+TvFuncM::walsh_w1(ymuint var,
 		 ymuint w,
 		 tPol opol,
 		 ymuint ibits) const
@@ -5259,7 +5279,7 @@ TvFunc::walsh_w1(ymuint var,
 
 // i 番目の変数がサポートの時 true を返す．
 bool
-TvFunc::check_sup(tVarId i) const
+TvFuncM::check_sup(tVarId i) const
 {
   if ( i < NIPW ) {
     // ブロックごとにチェック
@@ -5288,7 +5308,7 @@ TvFunc::check_sup(tVarId i) const
 
 // i 番目と j 番目の変数が対称のとき true を返す．
 bool
-TvFunc::check_sym(tVarId i,
+TvFuncM::check_sym(tVarId i,
 		  tVarId j,
 		  tPol pol) const
 {
@@ -5376,8 +5396,8 @@ TvFunc::check_sym(tVarId i,
 }
 
 // npnmap に従った変換を行う．
-TvFunc
-TvFunc::xform(const NpnMap& npnmap) const
+TvFuncM
+TvFuncM::xform(const NpnMap& npnmap) const
 {
   ymuint ni_pow = 1UL << mNi;
 
@@ -5399,7 +5419,7 @@ TvFunc::xform(const NpnMap& npnmap) const
   }
   ymuint omask = npnmap.opol() == kPolPosi ? 0UL : 1UL;
 
-  TvFunc ans(mNi);
+  TvFuncM ans(mNi);
   for (ymuint i = 0; i < ni_pow; ++ i) {
     ymuint new_i = 0;
     ymuint tmp = i;
@@ -5421,7 +5441,7 @@ TvFunc::xform(const NpnMap& npnmap) const
 
 // ハッシュ値を返す．
 ymuint
-TvFunc::hash() const
+TvFuncM::hash() const
 {
   ymulong ans = 0;
   for (ymuint i = 0; i < mNblk; ++ i) {
@@ -5432,8 +5452,8 @@ TvFunc::hash() const
 
 // 等価比較
 bool
-operator==(const TvFunc& func1,
-	   const TvFunc& func2)
+operator==(const TvFuncM& func1,
+	   const TvFuncM& func2)
 {
   if ( func1.mNi != func2.mNi ) {
     return false;
@@ -5451,8 +5471,8 @@ operator==(const TvFunc& func1,
 
 // 大小比較
 bool
-operator<(const TvFunc& func1,
-	  const TvFunc& func2)
+operator<(const TvFuncM& func1,
+	  const TvFuncM& func2)
 {
   if ( func1.mNi != func2.mNi ) {
     return false;
@@ -5475,11 +5495,11 @@ operator<(const TvFunc& func1,
   return false;
 }
 
-// @relates TvFunc
+// @relates TvFuncM
 // @brief 交差チェック
 bool
-operator&&(const TvFunc& func1,
-	   const TvFunc& func2)
+operator&&(const TvFuncM& func1,
+	   const TvFuncM& func2)
 {
   if ( func1.mNi != func2.mNi ) {
     return false;
@@ -5502,7 +5522,7 @@ operator&&(const TvFunc& func1,
 // 内容の出力
 // mode は 2 か 16
 void
-TvFunc::dump(ostream& s,
+TvFuncM::dump(ostream& s,
 	     int mode) const
 {
   ymuint ni_pow = 1UL << mNi;

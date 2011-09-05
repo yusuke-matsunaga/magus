@@ -1,15 +1,15 @@
 
-/// @file LdFuncMgr.cc
-/// @brief LdFuncMgr の実装ファイル
+/// @file LdLogicMgr.cc
+/// @brief LdLogicMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LdFuncMgr.h"
-#include "LdFuncClass.h"
-#include "LdFuncGroup.h"
+#include "LdLogicMgr.h"
+#include "LdLogicClass.h"
+#include "LdLogicGroup.h"
 #include "ym_logic/NpnMgr.h"
 #include "ym_utils/BinIO.h"
 
@@ -17,16 +17,16 @@
 BEGIN_NAMESPACE_YM_CELL_LIBDUMP
 
 //////////////////////////////////////////////////////////////////////
-// クラス LdFuncMgr
+// クラス LdLogicMgr
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LdFuncMgr::LdFuncMgr()
+LdLogicMgr::LdLogicMgr()
 {
 }
 
 // @brief デストラクタ
-LdFuncMgr::~LdFuncMgr()
+LdLogicMgr::~LdLogicMgr()
 {
   init();
 }
@@ -36,65 +36,65 @@ LdFuncMgr::~LdFuncMgr()
 // 常に定数0，定数1，肯定リテラル，否定リテラルの関数番号が
 // 0, 1, 2, 3 になるようにする．
 void
-LdFuncMgr::init()
+LdLogicMgr::init()
 {
-  for (vector<LdFuncGroup*>::iterator p = mFuncList.begin();
-       p != mFuncList.end(); ++ p) {
+  for (vector<LdLogicGroup*>::iterator p = mGroupList.begin();
+       p != mGroupList.end(); ++ p) {
     delete *p;
   }
-  for (vector<LdFuncClass*>::iterator p = mRepList.begin();
-       p != mRepList.end(); ++ p) {
+  for (vector<LdLogicClass*>::iterator p = mClassList.begin();
+       p != mClassList.end(); ++ p) {
     delete *p;
   }
-  mFuncList.clear();
-  mFuncMap.clear();
-  mRepList.clear();
-  mRepMap.clear();
+  mGroupList.clear();
+  mLogicMap.clear();
+  mClassList.clear();
+  mClassMap.clear();
 
   // 既定関数の登録
   {
     TvFunc const0 = TvFunc::const_zero(0);
-    LdFuncGroup* func0 = find_func(const0);
+    LdLogicGroup* func0 = find_group(const0);
     assert_cond( func0->id() == 0, __FILE__, __LINE__);
 
     TvFunc const1 = TvFunc::const_one(0);
-    LdFuncGroup* func1 = find_func(const1);
+    LdLogicGroup* func1 = find_group(const1);
     assert_cond( func1->id() == 1, __FILE__, __LINE__);
 
     TvFunc plit = TvFunc::posi_literal(1, 0);
-    LdFuncGroup* func2 = find_func(plit);
+    LdLogicGroup* func2 = find_group(plit);
     assert_cond( func2->id() == 2, __FILE__, __LINE__);
 
     TvFunc nlit = TvFunc::nega_literal(1, 0);
-    LdFuncGroup* func3 = find_func(nlit);
+    LdLogicGroup* func3 = find_group(nlit);
     assert_cond( func3->id() == 3, __FILE__, __LINE__);
   }
 }
 
-// @brief f に対応する LdFunc を求める．
+// @brief f に対応する LdLogic を求める．
 // @param[in] f 関数
 // @note なければ新規に作る．
-LdFuncGroup*
-LdFuncMgr::find_func(const TvFunc& f)
+LdLogicGroup*
+LdLogicMgr::find_group(const TvFunc& f)
 {
-  LdFuncGroup* pgfunc = NULL;
-  hash_map<TvFunc, LdFuncGroup*>::iterator p = mFuncMap.find(f);
-  if ( p == mFuncMap.end() ) {
+  LdLogicGroup* pgfunc = NULL;
+  hash_map<TvFunc, LdLogicGroup*>::iterator p = mLogicMap.find(f);
+  if ( p == mLogicMap.end() ) {
     // なかったので新たに作る．
-    pgfunc = new LdFuncGroup;
-    pgfunc->mId = mFuncList.size();
-    mFuncList.push_back(pgfunc);
-    mFuncMap.insert(make_pair(f, pgfunc));
+    pgfunc = new LdLogicGroup;
+    pgfunc->mId = mGroupList.size();
+    mGroupList.push_back(pgfunc);
+    mLogicMap.insert(make_pair(f, pgfunc));
 
     // 代表関数を求める．
     NpnMgr npnmgr;
     npnmgr.cannonical(f, pgfunc->mMap);
 
     TvFunc repfunc = f.xform(pgfunc->mMap);
-    LdFuncClass* pgrep = find_repfunc(repfunc);
+    LdLogicClass* pgrep = find_class(repfunc);
 
     // 関数を追加する．
-    pgrep->mFuncList.push_back(pgfunc);
+    pgrep->mGroupList.push_back(pgfunc);
     pgfunc->mRep = pgrep;
   }
   else {
@@ -104,22 +104,22 @@ LdFuncMgr::find_func(const TvFunc& f)
   return pgfunc;
 }
 
-// @brief f に対応する LdFuncClass を求める．
+// @brief f に対応する LdLogicClass を求める．
 // @param[in] f 関数
 // @note なければ新規に作る．
 // @note f は NpnMgr によって正規化されている必要がある．
-LdFuncClass*
-LdFuncMgr::find_repfunc(const TvFunc& f)
+LdLogicClass*
+LdLogicMgr::find_class(const TvFunc& f)
 {
-  LdFuncClass* pgrep = NULL;
-  hash_map<TvFunc, LdFuncClass*>::iterator p = mRepMap.find(f);
-  if ( p == mRepMap.end() ) {
+  LdLogicClass* pgrep = NULL;
+  hash_map<TvFunc, LdLogicClass*>::iterator p = mClassMap.find(f);
+  if ( p == mClassMap.end() ) {
     // まだ登録されていない．
-    pgrep = new LdFuncClass;
-    pgrep->mId = mRepList.size();
+    pgrep = new LdLogicClass;
+    pgrep->mId = mClassList.size();
     pgrep->mFunc = f;
-    mRepList.push_back(pgrep);
-    mRepMap.insert(make_pair(f, pgrep));
+    mClassList.push_back(pgrep);
+    mClassMap.insert(make_pair(f, pgrep));
   }
   else {
     // 登録されていた．
@@ -131,18 +131,18 @@ LdFuncMgr::find_repfunc(const TvFunc& f)
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-LdFuncMgr::dump(ostream& s) const
+LdLogicMgr::dump(ostream& s) const
 {
-  // 関数の情報をダンプする．
-  ymuint nf = func_num();
-  BinIO::write_32(s, nf);
-  for (ymuint i = 0; i < nf; ++ i) {
-    const LdFuncGroup* func = this->func(i);
-    assert_cond( func->id() == i, __FILE__, __LINE__);
-    // 代表関数に対する変換マップをダンプする．
-    dump_map(s, func->map());
+  // 論理グループの情報をダンプする．
+  ymuint ng = logic_group_num();
+  BinIO::write_32(s, ng);
+  for (ymuint i = 0; i < ng; ++ i) {
+    const LdLogicGroup* group = logic_group(i);
+    assert_cond( group->id() == i, __FILE__, __LINE__);
+    // 論理クラスに対する変換マップをダンプする．
+    dump_map(s, group->map());
     // 属しているセル番号をダンプする．
-    const vector<ymuint>& cell_list = func->cell_list();
+    const vector<ymuint>& cell_list = group->cell_list();
     ymuint nc = cell_list.size();
     BinIO::write_32(s, nc);
     for (ymuint i = 0; i < nc; ++ i) {
@@ -150,16 +150,16 @@ LdFuncMgr::dump(ostream& s) const
     }
   }
 
-  // 代表関数の情報をダンプする．
-  ymuint nr = rep_num();
-  BinIO::write_32(s, nr);
-  for (ymuint i = 0; i < nr; ++ i) {
-    const LdFuncClass* rep = this->rep(i);
+  // 論理クラスの情報をダンプする．
+  ymuint nc = logic_class_num();
+  BinIO::write_32(s, nc);
+  for (ymuint i = 0; i < nc; ++ i) {
+    const LdLogicClass* rep = logic_class(i);
     assert_cond( rep->id() == i , __FILE__, __LINE__);
-    ymuint ne = rep->func_num();
-    BinIO::write_32(s, ne);
-    for (ymuint j = 0; j < ne; ++ j) {
-      BinIO::write_32(s, rep->func(j)->id());
+    ymuint ng = rep->group_num();
+    BinIO::write_32(s, ng);
+    for (ymuint j = 0; j < ng; ++ j) {
+      BinIO::write_32(s, rep->group(j)->id());
     }
   }
 }
@@ -167,19 +167,19 @@ LdFuncMgr::dump(ostream& s) const
 // @brief 内容を出力する．(デバッグ用)
 // @param[in] s 出力先のストリーム
 void
-LdFuncMgr::display(ostream& s) const
+LdLogicMgr::display(ostream& s) const
 {
-  s << "*** LdFuncMgr BEGIN ***" << endl;
-  s << "*** FUNCTION SECTION ***" << endl;
-  for (ymuint i = 0; i < func_num(); ++ i) {
-    const LdFuncGroup* func = this->func(i);
-    assert_cond( func->id() == i, __FILE__, __LINE__);
-    s << "FUNC#" << i
-      << ": REP#" << func->rep()->id()
-      << ": " << func->map()
+  s << "*** LdLogicMgr BEGIN ***" << endl;
+  s << "*** LOGIC GROUP SECTION ***" << endl;
+  for (ymuint i = 0; i < logic_group_num(); ++ i) {
+    const LdLogicGroup* group = logic_group(i);
+    assert_cond( group->id() == i, __FILE__, __LINE__);
+    s << "GROUP#" << i
+      << ": CLASS#" << group->rep()->id()
+      << ": " << group->map()
       << endl;
     s << "  CELL#ID" << endl;
-    const vector<ymuint>& cell_list = func->cell_list();
+    const vector<ymuint>& cell_list = group->cell_list();
     for (vector<ymuint>::const_iterator p = cell_list.begin();
 	 p != cell_list.end(); ++ p) {
       s << "    " << *p << endl;
@@ -187,21 +187,21 @@ LdFuncMgr::display(ostream& s) const
   }
   s << endl;
 
-  s << "*** REPRESENTATIVE SECTION ***" << endl;
-  for (ymuint i = 0; i < rep_num(); ++ i) {
-    const LdFuncClass* rep = this->rep(i);
+  s << "*** LOGIC CLASS SECTION ***" << endl;
+  for (ymuint i = 0; i < logic_class_num(); ++ i) {
+    const LdLogicClass* rep = logic_class(i);
     assert_cond( rep->id() == i , __FILE__, __LINE__);
-    s << "REP#" << i << ": ";
+    s << "CLASS#" << i << ": ";
     rep->rep_func().dump(s, 2);
     s << endl;
     s << "  equivalence = ";
-    for (ymuint j = 0; j < rep->func_num(); ++ j) {
-      s << " FUNC#" << rep->func(j)->id();
+    for (ymuint j = 0; j < rep->group_num(); ++ j) {
+      s << " GROUP#" << rep->group(j)->id();
     }
     s << endl;
   }
   s << endl;
-  s << "*** LdFuncMgr END ***" << endl;
+  s << "*** LdLogicMgr END ***" << endl;
 }
 
 #if 0
@@ -229,8 +229,8 @@ dump_func(ostream& s,
 #endif
 
 void
-LdFuncMgr::dump_map(ostream& s,
-		    const NpnMap& map)
+LdLogicMgr::dump_map(ostream& s,
+		     const NpnMap& map)
 {
   ymuint ni = map.ni();
   ymuint32 v = (ni << 1);

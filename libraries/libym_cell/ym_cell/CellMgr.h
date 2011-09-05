@@ -73,39 +73,39 @@ public:
   // 論理関数グループに関する情報を取得する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 論理関数の個数を返す．
+  /// @brief 論理グループの個数を返す．
   ymuint
-  func_num() const;
+  logic_group_num() const;
 
-  /// @brief 関数グループを返す．
-  /// @param[in] id 関数番号　( 0 <= id < func_num() )
+  /// @brief 論理グループを返す．
+  /// @param[in] id 論理グループ番号　( 0 <= id < logic_group_num() )
   const CellGroup&
-  func_group(ymuint id) const;
+  logic_group(ymuint id) const;
 
-  /// @brief 定数0の関数グループを返す．
+  /// @brief 定数0の論理グループを返す．
   const CellGroup&
   const0_func() const;
 
-  /// @brief 定数1の関数グループを返す．
+  /// @brief 定数1の論理グループを返す．
   const CellGroup&
   const1_func() const;
 
-  /// @brief バッファセルの関数グループを返す．
+  /// @brief バッファセルの論理グループを返す．
   const CellGroup&
   buf_func() const;
 
-  /// @brief インバータセルの関数グループを返す．
+  /// @brief インバータセルの論理グループを返す．
   const CellGroup&
   inv_func() const;
 
-  /// @brief 代表関数の個数を返す．
+  /// @brief 論理クラスの個数を返す．
   ymuint
-  rep_num() const;
+  logic_class_num() const;
 
-  /// @brief 代表関数を返す．
-  /// @param[in] id 代表関数番号
+  /// @brief 論理クラスを返す．
+  /// @param[in] id 論理クラス番号 ( 0 <= id < logic_class_num() )
   const CellClass&
-  rep(ymuint id) const;
+  logic_class(ymuint id) const;
 
 
 public:
