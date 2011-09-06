@@ -10,9 +10,9 @@
 
 
 #include "libdump_nsdef.h"
-#include "LdFuncMgr.h"
-#include "LdPatMgr.h"
+#include "LdLogicMgr.h"
 #include "LdFFMgr.h"
+#include "LdPatMgr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBDUMP
@@ -69,7 +69,7 @@ private:
   /// @param[in] pgfunc この式に対応する関数情報
   /// @param[in] expr パタンの元となる論理式
   void
-  reg_pat(LdFuncGroup* pgfunc,
+  reg_pat(LdGroup* pgfunc,
 	  const LogExpr& expr);
 
 
@@ -79,13 +79,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数情報を管理するオブジェクト
-  LdFuncMgr mLdFuncMgr;
-
-  // パタングラフを管理するオブジェクト
-  LdPatMgr mLdPatMgr;
+  LdLogicMgr mLdLogicMgr;
 
   // FFの情報を管理するオブジェクト
   LdFFMgr mLdFFMgr;
+
+  // パタングラフを管理するオブジェクト
+  LdPatMgr mLdPatMgr;
 
 };
 

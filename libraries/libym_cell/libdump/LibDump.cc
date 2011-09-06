@@ -8,11 +8,10 @@
 
 
 #include "LibDump.h"
-#include "LdFuncClass.h"
-#include "LdFuncGroup.h"
+#include "LdClass.h"
+#include "LdGroup.h"
 #include "LdPatNode.h"
 #include "LdPatHandle.h"
-#include "LdFFGroup.h"
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
@@ -129,7 +128,8 @@ LibDump::~LibDump()
 void
 LibDump::gen_pat(const CellLibrary& library)
 {
-  mLdFuncMgr.init();
+  mLdLogicMgr.init();
+  mLdFFMgr.init();
   mLdPatMgr.init();
 
   // XOR のパタンを登録しておく．
@@ -269,7 +269,7 @@ LibDump::reg_expr(const LogExpr& expr)
 {
   // expr に対応する LdFunc を求める．
   TvFunc f = expr2tvfunc(expr);
-  LdFuncGroup* pgfunc = mLdFuncMgr.find_func(f);
+  LdGroup* pgfunc = mLdLogicMgr.find_logic_group(f);
 
   // expr から生成されるパタンを pgfunc に登録する．
   reg_pat(pgfunc, expr);
@@ -279,16 +279,20 @@ LibDump::reg_expr(const LogExpr& expr)
 // @param[in] pgfunc この式に対応する関数情報
 // @param[in] expr パタンの元となる論理式
 void
-LibDump::reg_pat(LdFuncGroup* pgfunc,
+LibDump::reg_pat(LdGroup* pgfunc,
 		 const LogExpr& expr)
 {
-  const LdFuncClass* pgrep = pgfunc->rep();
+  const LdClass* pgrep = pgfunc->parent();
 
   // pgrep->rep_func() を用いる理由は論理式に現れる変数が
   // 真のサポートとは限らないから
-  if ( pgrep->rep_func().ni() > 1 ) {
+  if ( pgrep->repfunc().ni() > 1 ) {
     // expr を変換したパタンを登録する．
+#if 0
     LogExpr cexpr = xform_expr(expr, pgfunc->map());
+#else
+    LogExpr cexpr;
+#endif
 
     assert_cond( !cexpr.is_constant(), __FILE__, __LINE__);
 
@@ -309,7 +313,7 @@ LibDump::display(ostream& s,
   display_library(s, library);
 
   // 関数の情報を出力する．
-  mLdFuncMgr.display(s);
+  mLdLogicMgr.display(s);
 
   // パタングラフの情報を出力する．
   mLdPatMgr.display(s);
@@ -332,7 +336,7 @@ LibDump::dump(ostream& s,
   nsYm::nsCell::dump_library(s, library);
 
   // 関数の情報をダンプする．
-  mLdFuncMgr.dump(s);
+  mLdLogicMgr.dump(s);
 
   // パタングラフの情報をダンプする．
   mLdPatMgr.dump(s);

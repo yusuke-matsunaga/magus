@@ -20,12 +20,13 @@ BEGIN_NAMESPACE_YM_CELL_LIBDUMP
 //////////////////////////////////////////////////////////////////////
 class LdGroup
 {
-  friend class LdMgr;
+  friend class LdClass;
 
-private:
+public:
 
   /// @brief コンストラクタ
-  LdGroup();
+  /// @param[in] id ID番号
+  LdGroup(ymuint id);
 
   /// @brief デストラクタ
   ~LdGroup();
@@ -49,6 +50,11 @@ public:
   const vector<ymuint>&
   cell_list() const;
 
+  /// @brief セル番号を追加する．
+  /// @param[in] cell_id セル番号
+  void
+  add_cell(ymuint cell_id);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -68,58 +74,6 @@ private:
   vector<ymuint> mCellList;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-inline
-LdGroup::LdGroup() :
-  mId(0),
-  mParent(NULL),
-  mCellGroup(NULL)
-{
-}
-
-// @brief デストラクタ
-inline
-LdGroup::~LdGroup()
-{
-}
-
-// @brief ID番号を返す．
-inline
-ymuint
-LdGroup::id() const
-{
-  return mId;
-}
-
-// @brief 親の LdClass を返す．
-inline
-LdClass*
-LdGroup::parent() const
-{
-  return mParent;
-}
-
-// @brief 実体を返す．
-inline
-const CellGroup*
-LdGroup::cell_group() const
-{
-  return mCellGroup;
-}
-
-// @brief 属しているセルの番号のリストを返す．
-inline
-const vector<ymuint>&
-LdGroup::cell_list() const
-{
-  return mCellList;
-}
 
 END_NAMESPACE_YM_CELL_LIBDUMP
 

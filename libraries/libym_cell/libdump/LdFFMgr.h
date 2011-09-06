@@ -10,12 +10,11 @@
 
 
 #include "libdump_nsdef.h"
+#include "ym_logic/TvFunc.h"
+#include "ym_logic/TvFuncM.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBDUMP
-
-class LdFFGroup;
-class LdFFClass;
 
 //////////////////////////////////////////////////////////////////////
 /// @class LdFFMgr LdFFMgr.h "LdFFMgr.h"
@@ -41,11 +40,11 @@ public:
   void
   init();
 
-  /// @brief 対応する LdFFGroup を求める．
+  /// @brief 対応する LdGroup を求める．
   /// @param[in] f_array 関数の配列
   /// @note なければ新規に作る．
-  LdFFGroup*
-  find_group(const vector<TvFunc>& f_array);
+  LdGroup*
+  find_ff_group(const vector<TvFunc>& f_array);
 
   /// @brief 内容をバイナリダンプする．
   /// @param[in] s 出力先のストリーム
@@ -65,11 +64,17 @@ private:
 
   // FFグループのリスト
   // この配列上の位置とグループ番号は一致している．
-  vector<LdFFGroup*> mFFGroupList;
+  vector<LdGroup*> mFFGroupList;
+
+  // 論理関数をキーとしてFFグループ番号を格納するハッシュ表
+  hash_map<TvFuncM, ymuint> mFFGroupMap;
 
   // FFクラスのリスト
   // この配列上の位置とクラス番号は一致している．
-  vector<LdFFClass*> mFFClassList;
+  vector<LdClass*> mFFClassList;
+
+  // 論理関数をキーとしてFFクラス番号を格納するハッシュ表
+  hash_map<TvFuncM, ymuint> mFFClassMap;
 
 };
 

@@ -8,11 +8,6 @@
 
 
 #include "ym_cell/CellMgr.h"
-#include "CellFuncClass.h"
-#include "CellFuncGroup.h"
-#include "CellFFClass.h"
-#include "CellFFGroup.h"
-#include "CellLatchClass.h"
 
 #include "ym_logic/NpnMap.h"
 
@@ -111,24 +106,24 @@ CellMgr::load_library(istream& s)
 
   // 関数の情報を読み込む．
   mFuncNum = BinIO::read_32(s);
-  CellFuncGroup* func_array = NULL;
+  CellGroup* func_array = NULL;
   {
-    void* p = mAlloc.get_memory(sizeof(CellFuncGroup) * mFuncNum);
-    func_array = new (p) CellFuncGroup[mFuncNum];
+    void* p = mAlloc.get_memory(sizeof(CellGroup) * mFuncNum);
+    func_array = new (p) CellGroup[mFuncNum];
     mFuncArray = func_array;
   }
   for (ymuint i = 0; i < mFuncNum; ++ i) {
-    CellFuncGroup& func = func_array[i];
+    CellGroup& func = func_array[i];
     //read_map(s, func.mNpnMap);
     load_cellgroup(s, func);
   }
 
   // 代表関数の情報を読み込む．
   mRepNum = BinIO::read_32(s);
-  CellFuncClass* funcclass_array = NULL;
+  CellClass* funcclass_array = NULL;
   {
-    void* p = mAlloc.get_memory(sizeof(CellFuncClass) * mRepNum);
-    funcclass_array = new (p) CellFuncClass[mRepNum];
+    void* p = mAlloc.get_memory(sizeof(CellClass) * mRepNum);
+    funcclass_array = new (p) CellClass[mRepNum];
     mRepArray = funcclass_array;
   }
   for (ymuint i = 0; i < mRepNum; ++ i) {
@@ -142,14 +137,14 @@ CellMgr::load_library(istream& s)
 
   // FFグループの情報を読み込む．
   mFFGroupNum = BinIO::read_32(s);
-  CellFFGroup* ff_array = NULL;
+  CellGroup* ff_array = NULL;
   {
-    void* p = mAlloc.get_memory(sizeof(CellFFGroup) * mFFGroupNum);
-    ff_array = new (p) CellFFGroup[mFFGroupNum];
+    void* p = mAlloc.get_memory(sizeof(CellGroup) * mFFGroupNum);
+    ff_array = new (p) CellGroup[mFFGroupNum];
     mFFGroupArray = ff_array;
   }
   for (ymuint i = 0; i < mFFGroupNum; ++ i) {
-    CellFFGroup& ff_group = ff_array[i];
+    CellGroup& ff_group = ff_array[i];
     ymuint sig = BinIO::read_32(s);
     //ff_group.mPosArray.set_signature(sig);
     load_cellgroup(s, ff_group);
@@ -157,14 +152,14 @@ CellMgr::load_library(istream& s)
 
   // FFクラスの情報を読み込む．
   mFFClassNum = BinIO::read_32(s);
-  CellFFClass* ffclass_array = NULL;
+  CellClass* ffclass_array = NULL;
   {
-    void* p = mAlloc.get_memory(sizeof(CellFFClass) * mFFClassNum);
-    ffclass_array = new (p) CellFFClass[mFFClassNum];
+    void* p = mAlloc.get_memory(sizeof(CellClass) * mFFClassNum);
+    ffclass_array = new (p) CellClass[mFFClassNum];
     mFFClassArray = ffclass_array;
   }
   for (ymuint i = 0; i < mFFClassNum; ++ i) {
-    CellFFClass& ff_class = ffclass_array[i];
+    CellClass& ff_class = ffclass_array[i];
     ff_class.mBits = BinIO::read_8(s);
     ymuint ng = BinIO::read_32(s);
     ff_class.mGroupNum = ng;
@@ -212,7 +207,7 @@ CellMgr::load_cellgroup(istream& s,
 // @param[in] id 代表番号
 void
 CellMgr::load_funcclass(istream& s,
-			CellFuncClass& funcclass)
+			CellClass& funcclass)
 {
   ymuint n = BinIO::read_32(s);
 #if 0
@@ -441,8 +436,8 @@ dump(ostream& s,
 
     ymuint ng = ff_class.group_num();
     for (ymuint j = 0; j < ng; ++ j) {
-      const CellFFGroup& ff_group = ff_class.group(j);
-      const CellFFPosArray pos_array = ff_group.pos_array();
+      const CellGroup& ff_group = ff_class.group(j);
+      const CellPosArray pos_array = ff_group.pos_array();
       s << "    FF-Group:" << endl
 	<< "      DATA   = Pin#" << pos_array.data_pos() << endl;
       s << "      CLOCK  = ";

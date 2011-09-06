@@ -10,7 +10,6 @@
 
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_cell/CellPatMgr.h"
 #include "ym_utils/Alloc.h"
 
 
@@ -209,9 +208,6 @@ private:
 
   // ラッチクラスの(実体の)配列
   CellClass* mLatchArray;
-
-  // パタンを管理するオブジェクト
-  CellPatMgr mPatMgr;
 
 };
 

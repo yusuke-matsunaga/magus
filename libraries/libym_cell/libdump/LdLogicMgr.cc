@@ -8,8 +8,8 @@
 
 
 #include "LdLogicMgr.h"
-#include "LdLogicClass.h"
-#include "LdLogicGroup.h"
+#include "LdClass.h"
+#include "LdGroup.h"
 #include "ym_logic/NpnMgr.h"
 #include "ym_utils/BinIO.h"
 
@@ -38,35 +38,37 @@ LdLogicMgr::~LdLogicMgr()
 void
 LdLogicMgr::init()
 {
-  for (vector<LdLogicGroup*>::iterator p = mGroupList.begin();
-       p != mGroupList.end(); ++ p) {
+  for (vector<LdGroup*>::iterator p = mLogicGroupList.begin();
+       p != mLogicGroupList.end(); ++ p) {
     delete *p;
   }
-  for (vector<LdLogicClass*>::iterator p = mClassList.begin();
-       p != mClassList.end(); ++ p) {
+  for (vector<LdClass*>::iterator p = mLogicClassList.begin();
+       p != mLogicClassList.end(); ++ p) {
     delete *p;
   }
-  mGroupList.clear();
-  mLogicMap.clear();
-  mClassList.clear();
-  mClassMap.clear();
+  mLogicGroupList.clear();
+  mLogicGroupMap1.clear();
+  mLogicGroupMap2.clear();
+  mLogicClassList.clear();
+  mLogicClassMap1.clear();
+  mLogicClassMap2.clear();
 
   // 既定関数の登録
   {
     TvFunc const0 = TvFunc::const_zero(0);
-    LdLogicGroup* func0 = find_group(const0);
+    LdGroup* func0 = find_logic_group(const0);
     assert_cond( func0->id() == 0, __FILE__, __LINE__);
 
     TvFunc const1 = TvFunc::const_one(0);
-    LdLogicGroup* func1 = find_group(const1);
+    LdGroup* func1 = find_logic_group(const1);
     assert_cond( func1->id() == 1, __FILE__, __LINE__);
 
     TvFunc plit = TvFunc::posi_literal(1, 0);
-    LdLogicGroup* func2 = find_group(plit);
+    LdGroup* func2 = find_logic_group(plit);
     assert_cond( func2->id() == 2, __FILE__, __LINE__);
 
     TvFunc nlit = TvFunc::nega_literal(1, 0);
-    LdLogicGroup* func3 = find_group(nlit);
+    LdGroup* func3 = find_logic_group(nlit);
     assert_cond( func3->id() == 3, __FILE__, __LINE__);
   }
 }
@@ -74,49 +76,118 @@ LdLogicMgr::init()
 // @brief f に対応する LdLogic を求める．
 // @param[in] f 関数
 // @note なければ新規に作る．
-LdLogicGroup*
-LdLogicMgr::find_group(const TvFunc& f)
+LdGroup*
+LdLogicMgr::find_logic_group(const TvFunc& f)
 {
-  LdLogicGroup* pgfunc = NULL;
-  hash_map<TvFunc, ymuint>::iterator p = mLogicMap.find(f);
-  if ( p == mLogicMap.end() ) {
+  LdGroup* pgfunc = NULL;
+  hash_map<TvFunc, ymuint>::iterator p = mLogicGroupMap1.find(f);
+  if ( p == mLogicGroupMap1.end() ) {
     // なかったので新たに作る．
-    ymuint new_id = mGroupList.size();
-    pgfunc = new LdLogicGroup;
-    pgfunc->mId = new_id;
-    mGroupList.push_back(pgfunc);
-    mLogicMap.insert(make_pair(f, new_id));
+    ymuint new_id = mLogicGroupList.size();
+    pgfunc = new LdGroup(new_id);
+    mLogicGroupList.push_back(pgfunc);
+    mLogicGroupMap1.insert(make_pair(f, new_id));
 
     // 代表関数を求める．
     NpnMgr npnmgr;
-    npnmgr.cannonical(f, pgfunc->mMap);
+    NpnMap xmap;
+    npnmgr.cannonical(f, xmap);
 
-    TvFunc repfunc = f.xform(pgfunc->mMap);
-    LdLogicClass* pgrep = NULL;
-    hash_map<TvFunc, ymuint>::iterator p = mClassMap.find(repfunc);
-    if ( p == mClassMap.end() ) {
+    TvFunc repfunc = f.xform(xmap);
+    LdClass* pgrep = NULL;
+    hash_map<TvFunc, ymuint>::iterator p = mLogicClassMap1.find(repfunc);
+    if ( p == mLogicClassMap1.end() ) {
       // まだ登録されていない．
-      ymuint new_id = mClassList.size();
-      pgrep = new LdLogicClass;
-      pgrep->mId = new_id;
-      pgrep->mFunc = repfunc;
-      mClassList.push_back(pgrep);
-      mClassMap.insert(make_pair(repfunc, new_id));
+      ymuint new_id = mLogicClassList.size();
+      pgrep = new LdClass(new_id, repfunc);
+      mLogicClassList.push_back(pgrep);
+      mLogicClassMap1.insert(make_pair(repfunc, new_id));
     }
     else {
       // 登録されていた．
-      pgrep = mClassList[p->second];
+      pgrep = mLogicClassList[p->second];
     }
 
-    // 関数を追加する．
-    pgrep->mGroupList.push_back(pgfunc);
-    pgfunc->mRep = pgrep;
+    // グループを追加する．
+    pgrep->add_group(pgfunc);
   }
   else {
     // 既に登録されていた．
-    pgfunc = mGroupList[p->second];
+    pgfunc = mLogicGroupList[p->second];
   }
   return pgfunc;
+}
+
+// @brief f_list に対応する LdGroup を求める．
+// @param[in] f_list 関数のリスト
+// @note なければ新規に作る．
+LdGroup*
+LdLogicMgr::find_logic_group(const vector<TvFunc>& f_list)
+{
+  TvFuncM f(f_list);
+  LdGroup* pgfunc = NULL;
+  hash_map<TvFuncM, ymuint>::iterator p = mLogicGroupMap2.find(f);
+  if ( p == mLogicGroupMap2.end() ) {
+    // なかったので新たに作る．
+    ymuint new_id = mLogicGroupList.size();
+    pgfunc = new LdGroup(new_id);
+    mLogicGroupList.push_back(pgfunc);
+    mLogicGroupMap2.insert(make_pair(f, new_id));
+
+    // 代表関数を求める．
+    // 今は手抜きで多出力はすべてが代表関数となる．
+    LdClass* pgrep = NULL;
+    hash_map<TvFuncM, ymuint>::iterator p = mLogicClassMap2.find(f);
+    if ( p == mLogicClassMap2.end() ) {
+      // まだ登録されていない．
+      ymuint new_id = mLogicClassList.size();
+      pgrep = new LdClass(new_id, f);
+      mLogicClassList.push_back(pgrep);
+      mLogicClassMap2.insert(make_pair(f, new_id));
+    }
+    else {
+      // 登録されていた．
+      pgrep = mLogicClassList[p->second];
+    }
+
+    // 関数を追加する．
+    pgrep->add_group(pgfunc);
+  }
+  else {
+    // 既に登録されていた．
+    pgfunc = mLogicGroupList[p->second];
+  }
+  return pgfunc;
+}
+
+// @brief 論理グループの数を返す．
+ymuint
+LdLogicMgr::logic_group_num() const
+{
+  return mLogicGroupList.size();
+}
+
+// @brief 論理グループを返す．
+// @param[in] id グループ番号 ( 0 <= id < logic_group_num() )
+const LdGroup*
+LdLogicMgr::logic_group(ymuint id) const
+{
+  return mLogicGroupList[id];
+}
+
+// @brief 論理クラスの数を返す．
+ymuint
+LdLogicMgr::logic_class_num() const
+{
+  return mLogicClassList.size();
+}
+
+// @brief 論理クラスを返す．
+// @param[in] id クラス番号 ( 0 <= id < logic_class_num() )
+const LdClass*
+LdLogicMgr::logic_class(ymuint id) const
+{
+  return mLogicClassList[id];
 }
 
 // @brief 内容をバイナリダンプする．
@@ -128,10 +199,11 @@ LdLogicMgr::dump(ostream& s) const
   ymuint ng = logic_group_num();
   BinIO::write_32(s, ng);
   for (ymuint i = 0; i < ng; ++ i) {
-    const LdLogicGroup* group = logic_group(i);
+    const LdGroup* group = logic_group(i);
     assert_cond( group->id() == i, __FILE__, __LINE__);
 
     // 論理クラスに対する変換マップをダンプする．
+#if 0
     const NpnMap& map = group->map();
     ymuint ni = map.ni();
     ymuint32 v = (ni << 1);
@@ -149,7 +221,7 @@ LdLogicMgr::dump(ostream& s) const
       }
       BinIO::write_32(s, v);
     }
-
+#endif
     // 属しているセル番号をダンプする．
     const vector<ymuint>& cell_list = group->cell_list();
     ymuint nc = cell_list.size();
@@ -163,12 +235,13 @@ LdLogicMgr::dump(ostream& s) const
   ymuint nc = logic_class_num();
   BinIO::write_32(s, nc);
   for (ymuint i = 0; i < nc; ++ i) {
-    const LdLogicClass* rep = logic_class(i);
+    const LdClass* rep = logic_class(i);
     assert_cond( rep->id() == i , __FILE__, __LINE__);
-    ymuint ng = rep->group_num();
+    const vector<LdGroup*>& group_list = rep->group_list();
+    ymuint ng = group_list.size();
     BinIO::write_32(s, ng);
     for (ymuint j = 0; j < ng; ++ j) {
-      BinIO::write_32(s, rep->group(j)->id());
+      BinIO::write_32(s, group_list[j]->id());
     }
   }
 }
@@ -181,11 +254,13 @@ LdLogicMgr::display(ostream& s) const
   s << "*** LdLogicMgr BEGIN ***" << endl;
   s << "*** LOGIC GROUP SECTION ***" << endl;
   for (ymuint i = 0; i < logic_group_num(); ++ i) {
-    const LdLogicGroup* group = logic_group(i);
+    const LdGroup* group = logic_group(i);
     assert_cond( group->id() == i, __FILE__, __LINE__);
     s << "GROUP#" << i
-      << ": CLASS#" << group->rep()->id()
+      << ": CLASS#" << group->parent()->id()
+#if 0
       << ": " << group->map()
+#endif
       << endl;
     s << "  CELL#ID" << endl;
     const vector<ymuint>& cell_list = group->cell_list();
@@ -198,14 +273,17 @@ LdLogicMgr::display(ostream& s) const
 
   s << "*** LOGIC CLASS SECTION ***" << endl;
   for (ymuint i = 0; i < logic_class_num(); ++ i) {
-    const LdLogicClass* rep = logic_class(i);
+    const LdClass* rep = logic_class(i);
     assert_cond( rep->id() == i , __FILE__, __LINE__);
     s << "CLASS#" << i << ": ";
+#if 0
     rep->rep_func().dump(s, 2);
+#endif
     s << endl;
     s << "  equivalence = ";
-    for (ymuint j = 0; j < rep->group_num(); ++ j) {
-      s << " GROUP#" << rep->group(j)->id();
+    const vector<LdGroup*>& group_list = rep->group_list();
+    for (ymuint j = 0; j < group_list.size(); ++ j) {
+	s << " GROUP#" << group_list[j]->id();
     }
     s << endl;
   }

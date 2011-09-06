@@ -11,6 +11,7 @@
 
 #include "libdump_nsdef.h"
 #include "ym_logic/TvFunc.h"
+#include "ym_logic/TvFuncM.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBDUMP
@@ -43,17 +44,17 @@ public:
   void
   init();
 
-  /// @brief f に対応する LdLogicGroup を求める．
+  /// @brief f に対応する LdGroup を求める．
   /// @param[in] f 関数
   /// @note なければ新規に作る．
-  LdLogicGroup*
-  find_group(const TvFunc& f);
+  LdGroup*
+  find_logic_group(const TvFunc& f);
 
-  /// @brief f_list に対応する LdLogicGroup を求める．
+  /// @brief f_list に対応する LdGroup を求める．
   /// @param[in] f_list 関数のリスト
   /// @note なければ新規に作る．
-  LdLogicGroup*
-  find_group(const TvFunc& f);
+  LdGroup*
+  find_logic_group(const vector<TvFunc>& f_list);
 
   /// @brief 内容をバイナリダンプする．
   /// @param[in] s 出力先のストリーム
@@ -77,7 +78,7 @@ public:
 
   /// @brief 論理グループを返す．
   /// @param[in] id 論理グループ番号 ( 0 <= id < logic_group_num() )
-  const LdLogicGroup*
+  const LdGroup*
   logic_group(ymuint id) const;
 
   /// @brief 論理クラスの数を返す．
@@ -86,7 +87,7 @@ public:
 
   /// @brief 論理クラスを返す．
   /// @param[in] id 論理クラス番号 ( 0 <= id < logic_class_num() )
-  const LdLogicClass*
+  const LdClass*
   logic_class(ymuint id) const;
 
 
@@ -97,58 +98,25 @@ private:
 
   // グループのリスト
   // この配列上の位置とグループ番号は一致している．
-  vector<LdLogicGroup*> mGroupList;
+  vector<LdGroup*> mLogicGroupList;
 
-  // 論理関数をキーとしてグループ番号を保持するハッシュ表
-  hash_map<TvFunc, ymuint> mGroupMap;
+  // 1出力論理関数をキーとしてグループ番号を保持するハッシュ表
+  hash_map<TvFunc, ymuint> mLogicGroupMap1;
+
+  // 多出力論理関数をキーとしてグループ番号を保持するハッシュ表
+  hash_map<TvFuncM, ymuint> mLogicGroupMap2;
 
   // クラスのリスト
   // この配列上の位置とクラス番号は一致している．
-  vector<LdLogicClass*> mClassList;
+  vector<LdClass*> mLogicClassList;
 
   // 代表関数をキーとしてクラス番号を保持するハッシュ表
-  hash_map<TvFunc, ymuint> mClassMap;
+  hash_map<TvFunc, ymuint> mLogicClassMap1;
+
+  // 代表関数をキーとしてクラス番号を保持するハッシュ表
+  hash_map<TvFuncM, ymuint> mLogicClassMap2;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief 論理グループの数を返す．
-inline
-ymuint
-LdLogicMgr::logic_gorup_num() const
-{
-  return mGroupList.size();
-}
-
-// @brief 論理グループを返す．
-// @param[in] id グループ番号 ( 0 <= id < logic_group_num() )
-inline
-const LdLogicGroup*
-LdLogicMgr::logic_group(ymuint id) const
-{
-  return mGroupList[id];
-}
-
-// @brief 論理クラスの数を返す．
-inline
-ymuint
-LdLogicMgr::logic_class_num() const
-{
-  return mClassList.size();
-}
-
-// @brief 論理クラスを返す．
-// @param[in] id クラス番号 ( 0 <= id < logic_class_num() )
-inline
-const LdLogicClass*
-LdLogicMgr::logic_class(ymuint id) const
-{
-  return mClassList[id];
-}
 
 END_NAMESPACE_YM_CELL_LIBDUMP
 

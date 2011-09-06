@@ -8,8 +8,8 @@
 
 
 #include "LdFFMgr.h"
-#include "LdFFGroup.h"
-#include "LdFFClass.h"
+#include "LdGroup.h"
+#include "LdClass.h"
 #include "ym_utils/BinIO.h"
 
 
@@ -33,68 +33,60 @@ LdFFMgr::~LdFFMgr()
 void
 LdFFMgr::init()
 {
-  for (vector<LdFFGroup*>::iterator p = mFFGroupList.begin();
+  for (vector<LdGroup*>::iterator p = mFFGroupList.begin();
        p != mFFGroupList.end(); ++ p) {
     delete *p;
   }
-  for (vector<LdFFClass*>::iterator p = mFFClassList.begin();
+  for (vector<LdClass*>::iterator p = mFFClassList.begin();
        p != mFFClassList.end(); ++ p) {
     delete *p;
   }
   mFFGroupList.clear();
+  mFFGroupMap.clear();
   mFFClassList.clear();
+  mFFClassMap.clear();
 }
 
-// @brief 対応する LdFFGroup を求める．
+// @brief 対応する LdGroup を求める．
 // @param[in] f_array 関数の配列
 // @note なければ新規に作る．
-LdFFGroup*
-LdFFMgr::find_group(const vector<TvFunc>& f_array)
+LdGroup*
+LdFFMgr::find_ff_group(const vector<TvFunc>& f_array)
 {
+  TvFuncM f(f_array);
+  LdGroup* pgfunc = NULL;
+  hash_map<TvFuncM, ymuint>::iterator p = mFFGroupMap.find(f);
+  if ( p == mFFGroupMap.end() ) {
+    // なかったので新たに作る．
+    ymuint new_id = mFFGroupList.size();
+    pgfunc = new LdGroup(new_id);
+    mFFGroupList.push_back(pgfunc);
+    mFFGroupMap.insert(make_pair(f, new_id));
 
-  ymuint sig = (clock_sense << 0) | (clear_sense << 2) | (preset_sense << 4);
-  ymuint n = mFFClassList.size();
-  LdFFClass* ff_class = NULL;
-  for (ymuint i = 0; i < n; ++ i) {
-    LdFFClass* ff_class1 = mFFClassList[i];
-    if ( ff_class1->signature() == sig ) {
-      ff_class = ff_class1;
-      break;
+    // 代表関数を求める．
+    // 今は手抜きで多出力はすべてが代表関数となる．
+    LdClass* pgrep = NULL;
+    hash_map<TvFuncM, ymuint>::iterator p = mFFClassMap.find(f);
+    if ( p == mFFClassMap.end() ) {
+      // まだ登録されていない．
+      ymuint new_id = mFFClassList.size();
+      pgrep = new LdClass(new_id, f);
+      mFFClassList.push_back(pgrep);
+      mFFClassMap.insert(make_pair(f, new_id));
     }
-  }
-  if ( ff_class == NULL ) {
-    ff_class = new LdFFClass;
-    ff_class->mId = mFFClassList.size();
-    mFFClassList.push_back(ff_class);
-    ff_class->mBits = sig;
-  }
-
-  CellFFPosArray sig2;
-  sig2.set(data_pos,
-	   clock_pos, clock_sense,
-	   clear_pos, clear_sense,
-	   preset_pos, preset_sense,
-	   q_pos, iq_pos);
-
-  LdFFGroup* ff_group = NULL;
-  for (vector<LdFFGroup*>::iterator p = ff_class->mGroupList.begin();
-       p != ff_class->mGroupList.end(); ++ p) {
-    LdFFGroup* ff_group1 = *p;
-    if ( ff_group1->signature() == sig2.signature() ) {
-      ff_group = ff_group1;
-      break;
+    else {
+      // 登録されていた．
+      pgrep = mFFClassList[p->second];
     }
-  }
-  if ( ff_group == NULL ) {
-    ff_group = new LdFFGroup;
-    ff_group->mId = mFFGroupList.size();
-    mFFGroupList.push_back(ff_group);
-    ff_class->mGroupList.push_back(ff_group);
-    ff_group->mParent = ff_class;
-    ff_group->mPosArray = sig2;
-  }
 
-  return ff_group;
+    // 関数を追加する．
+    pgrep->add_group(pgfunc);
+  }
+  else {
+    // 既に登録されていた．
+    pgfunc = mFFGroupList[p->second];
+  }
+  return pgfunc;
 }
 
 // @brief 内容をバイナリダンプする．
@@ -106,10 +98,12 @@ LdFFMgr::dump(ostream& s) const
   ymuint ng = mFFGroupList.size();
   BinIO::write_32(s, ng);
   for (ymuint i = 0; i < ng; ++ i) {
-    const LdFFGroup* ff_group = mFFGroupList[i];
+    const LdGroup* ff_group = mFFGroupList[i];
     assert_cond( ff_group->id() == i, __FILE__, __LINE__);
+#if 0
     // ピン位置の情報をダンプする．
     BinIO::write_32(s, ff_group->signature());
+#endif
     // 属しているセル番号をダンプする．
     const vector<ymuint>& cell_list = ff_group->cell_list();
     ymuint nc = cell_list.size();
@@ -123,16 +117,18 @@ LdFFMgr::dump(ostream& s) const
   ymuint nc = mFFClassList.size();
   BinIO::write_32(s, nc);
   for (ymuint i = 0; i < nc; ++ i) {
-    const LdFFClass* ff_class = mFFClassList[i];
+    const LdClass* ff_class = mFFClassList[i];
     assert_cond( ff_class->id() == i, __FILE__, __LINE__);
+#if 0
     // 入力のタイプ情報をダンプする．
     BinIO::write_8(s, ff_class->signature());
+#endif
     // 属しているFFグループ番号をダンプする．
-    const vector<LdFFGroup*>& group_list = ff_class->group_list();
+    const vector<LdGroup*>& group_list = ff_class->group_list();
     ymuint ng = group_list.size();
     BinIO::write_32(s, ng);
     for (ymuint j = 0; j < ng; ++ j) {
-      const LdFFGroup* ff_group = group_list[j];
+      const LdGroup* ff_group = group_list[j];
       BinIO::write_32(s, ff_group->id());
     }
   }
@@ -145,12 +141,14 @@ LdFFMgr::display(ostream& s) const
 {
   s << "*** LdFFMgr BEGIN ***" << endl;
   s << "*** FF Group SECTION ***" << endl;
-  for (vector<LdFFGroup*>::const_iterator p = mFFGroupList.begin();
+  for (vector<LdGroup*>::const_iterator p = mFFGroupList.begin();
        p != mFFGroupList.end(); ++ p) {
-    const LdFFGroup* ff_group = *p;
-    const LdFFClass* ff_class = ff_group->parent();
+    const LdGroup* ff_group = *p;
+    const LdClass* ff_class = ff_group->parent();
     s << "FF GROUP#" << ff_group->id()
       << ": CLASS#" << ff_class->id()
+      << endl;
+#if 0
       << ": SIGNATURE = " << hex << ff_group->signature() << dec << endl
       << "  DATA = Pin#" << ff_group->data_pos();
     s << ", CLOCK = ";
@@ -174,6 +172,7 @@ LdFFMgr::display(ostream& s) const
       }
       s << "Pin#" << ff_group->preset_pos();
     }
+#endif
     s << endl;
     s << "  CELLS = ";
     const vector<ymuint>& cell_list = ff_group->cell_list();
@@ -187,10 +186,12 @@ LdFFMgr::display(ostream& s) const
   s << endl;
 
   s << "*** FF Class SECTION ***" << endl;
-  for (vector<LdFFClass*>::const_iterator p = mFFClassList.begin();
+  for (vector<LdClass*>::const_iterator p = mFFClassList.begin();
        p != mFFClassList.end(); ++ p) {
-    const LdFFClass* ff_class = *p;
+    const LdClass* ff_class = *p;
     s << "FF CLASS#" << ff_class->id()
+      << endl;
+#if 0
       << ": SIGNATURE = " << hex << ff_class->signature() << dec << endl;
     s << "  CLOCK: ";
     if ( ff_class->clock_sense() == 1 ) {
@@ -224,12 +225,12 @@ LdFFMgr::display(ostream& s) const
       }
       s << endl;
     }
-
+#endif
     s << "  GROUPS = ";
-    const vector<LdFFGroup*>& g_list = ff_class->group_list();
-    for (vector<LdFFGroup*>::const_iterator q = g_list.begin();
+    const vector<LdGroup*>& g_list = ff_class->group_list();
+    for (vector<LdGroup*>::const_iterator q = g_list.begin();
 	 q != g_list.end(); ++ q) {
-      const LdFFGroup* ff_group = *q;
+      const LdGroup* ff_group = *q;
       s << " GROUP#" << ff_group->id();
     }
     s << endl;

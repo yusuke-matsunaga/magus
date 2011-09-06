@@ -14,14 +14,14 @@ libym_cell_libdump_la_CPPFLAGS = \
 
 libym_cell_libdump_la_SOURCES = \
 	libdump_nsdef.h \
-	LdFFClass.h \
-	LdFFGroup.h \
+	LdClass.h \
+	LdClass.cc \
+	LdGroup.h \
+	LdGroup.cc \
+	LdLogicMgr.h \
+	LdLogicMgr.cc \
 	LdFFMgr.h \
 	LdFFMgr.cc \
-	LdFuncClass.h \
-	LdFuncGroup.h \
-	LdFuncMgr.h \
-	LdFuncMgr.cc \
 	LdPatHandler.h \
 	LdPatMgr.h \
 	LdPatMgr.cc \

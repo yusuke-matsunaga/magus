@@ -10,6 +10,8 @@
 
 
 #include "libdump_nsdef.h"
+#include "ym_logic/TvFunc.h"
+#include "ym_logic/TvFuncM.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBDUMP
@@ -20,12 +22,19 @@ BEGIN_NAMESPACE_YM_CELL_LIBDUMP
 //////////////////////////////////////////////////////////////////////
 class LdClass
 {
-  friend class LdMgr;
-
-private:
+public:
 
   /// @brief コンストラクタ
-  LdClass();
+  /// @param[in] id ID番号
+  /// @param[in] repfunc 代表関数
+  LdClass(ymuint id,
+	  const TvFunc& repfunc);
+
+  /// @brief コンストラクタ
+  /// @param[in] id ID番号
+  /// @param[in] repfunc 代表関数
+  LdClass(ymuint id,
+	  const TvFuncM& repfunc);
 
   /// @brief デストラクタ
   ~LdClass();
@@ -37,13 +46,21 @@ public:
   ymuint
   id() const;
 
+  /// @brief 代表関数を返す．
+  TvFuncM
+  repfunc() const;
+
   /// @brief 実体を返す．
   const CellClass*
   cell_class() const;
 
   /// @brief このクラスに属しているグループのリストを返す．
   const vector<LdGroup*>&
-  group_list();
+  group_list() const;
+
+  /// @brief グループを追加する．
+  void
+  add_group(LdGroup* group);
 
 
 private:
@@ -54,6 +71,9 @@ private:
   // ID番号
   ymuint32 mId;
 
+  // 代表関数
+  TvFuncM mRepFunc;
+
   // 実体のオブジェクト
   const CellClass* mCellClass;
 
@@ -61,50 +81,6 @@ private:
   vector<LdGroup*> mGroupList;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-inline
-LdClass::LdClass() :
-  mId(0),
-  mCellClass(NULL)
-{
-}
-
-// @brief デストラクタ
-inline
-LdClass::~LdClass()
-{
-}
-
-
-// @brief ID番号を返す．
-inline
-ymuint
-LdClass::id() const
-{
-  return mId;
-}
-
-// @brief 実体を返す．
-inline
-const CellClass*
-LdClass::cell_class() const
-{
-  return mCellClass;
-}
-
-// @brief このクラスに属しているグループのリストを返す．
-inline
-const vector<LdGroup*>&
-LdClass::group_list()
-{
-  return mGroupList;
-}
 
 END_NAMESPACE_YM_CELL_LIBDUMP
 
