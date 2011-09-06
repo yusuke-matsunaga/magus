@@ -16,16 +16,18 @@ BEGIN_NAMESPACE_YM_CELL
 
 bool
 dump_load_test(const char* in_filename,
-	       const char* data_filename)
+	       bool dotlib)
 {
+  const CellLibrary* library = NULL;
+  if ( dotlib ) {
+    CellDotlibReader reader;
+    library = reader.read(in_filename);
+  }
+  else {
+    CellMislibReader reader;
+    library = reader.read(in_filename);
+  }
 
-
-#if 0
-  CellMislibReader reader;
-#else
-  CellDotlibReader reader;
-#endif
-  const CellLibrary* library = reader.read(in_filename);
   if ( library == NULL ) {
     cerr << in_filename << ": Error in reading library" << endl;
     return false;
@@ -71,12 +73,23 @@ int
 main(int argc,
      char** argv)
 {
+  using namespace std;
   using nsYm::nsCell::dump_load_test;
 
-  const char* filename = argv[1];
-  const char* datafile = "patdata.bin";
+  if ( argc < 2 ) {
+    cerr << "Usage: " << argv[0] << " [--liberty] <liberty-file>" << endl;
+    return 1;
+  }
+  ymuint base = 1;
+  bool dotlib = false;
+  if ( argc == 3 && strcmp(argv[1], "--liberty") == 0 ) {
+    dotlib = true;
+    base = 2;
+  }
 
-  if ( !dump_load_test(filename, datafile) ) {
+  const char* filename = argv[base];
+
+  if ( !dump_load_test(filename, dotlib) ) {
     return -1;
   }
 

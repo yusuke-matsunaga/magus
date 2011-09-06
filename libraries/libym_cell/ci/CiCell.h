@@ -10,6 +10,7 @@
 
 
 #include "ym_cell/Cell.h"
+#include "ym_logic/LogExpr.h"
 #include "ym_utils/ShString.h"
 #include "ym_utils/Alloc.h"
 
@@ -352,28 +353,6 @@ public:
        ymuint nc,
        AllocBase& alloc);
 
-#if 0
-  /// @brief 出力ピンの機能を設定する．
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-  /// @param[in] function 機能を表す論理式
-  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->output_num() を使う．
-  virtual
-  void
-  set_logic_function(ymuint opin_id,
-		     const LogExpr& function);
-
-  /// @brief 出力ピンの three_state 条件を設定する．
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-  /// @param[in] expr three_state 条件を表す論理式
-  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->output_num() を使う．
-  virtual
-  void
-  set_tristate_function(ymuint opin_id,
-			const LogExpr& expr);
-#endif
-
   /// @brief タイミング情報を設定する．
   /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
   /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
@@ -388,6 +367,26 @@ public:
 	     ymuint ipin_id,
 	     tCellTimingSense sense,
 	     CiTiming* timing);
+
+  /// @brief 出力ピンの論理式を設定する．
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+  /// @param[in] function 機能を表す論理式
+  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->output_num() を使う．
+  virtual
+  void
+  set_logic_expr(ymuint opin_id,
+		 const LogExpr& function);
+
+  /// @brief 出力ピンの three_state 条件を設定する．
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+  /// @param[in] expr three_state 条件を表す論理式
+  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->output_num() を使う．
+  virtual
+  void
+  set_tristate_expr(ymuint opin_id,
+		    const LogExpr& expr);
 
 
 private:
@@ -440,6 +439,26 @@ private:
   // タイミング情報を格納する配列
   // サイズは(入力数＋入出力数) x (出力数+入出力ピン数)  x 2
   CiTiming** mTimingArray;
+
+  // 出力の論理式を格納する配列
+  // サイズは output_num2()
+  LogExpr* mLogicArray;
+
+  // 出力のトライステート条件を格納する配列
+  // サイズは output_num2()
+  LogExpr* mTristateArray;
+
+  // next_state 論理式 / data_in 論理式
+  LogExpr mNextState;
+
+  // clock 論理式 / enable 論理式
+  LogExpr mClock;
+
+  // clear 論理式
+  LogExpr mClear;
+
+  // preset 論理式
+  LogExpr mPreset;
 
 };
 

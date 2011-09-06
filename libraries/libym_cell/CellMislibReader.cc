@@ -66,53 +66,6 @@ dfs(const MislibNode* node,
   }
 }
 
-// @brief LogExpr を TvFunc に変換する．
-// @param[in] expr 対象の論理式
-// @param[in] ni 全入力数
-TvFunc
-expr_to_tvfunc(const LogExpr& expr,
-	       ymuint ni)
-{
-  if ( expr.is_zero() ) {
-    return TvFunc::const_zero(ni);
-  }
-  if ( expr.is_one() ) {
-    return TvFunc::const_one(ni);
-  }
-  if ( expr.is_posiliteral() ) {
-    return TvFunc::posi_literal(ni, expr.varid());
-  }
-  if ( expr.is_negaliteral() ) {
-    return TvFunc::nega_literal(ni, expr.varid());
-  }
-  // あとは AND/OR/XOR のみ
-  ymuint n = expr.child_num();
-  vector<TvFunc> child_func(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    child_func[i] = expr_to_tvfunc(expr.child(i), ni);
-  }
-  TvFunc func = child_func[0];
-  if ( expr.is_and() ) {
-    for (ymuint i = 1; i < n; ++ i) {
-      func &= child_func[i];
-    }
-  }
-  else if ( expr.is_or() ) {
-    for (ymuint i = 1; i < n; ++ i) {
-      func |= child_func[i];
-    }
-  }
-  else if ( expr.is_xor() ) {
-    for (ymuint i = 1; i < n; ++ i) {
-      func ^= child_func[i];
-    }
-  }
-  else {
-    assert_not_reached(__FILE__, __LINE__);
-  }
-  return func;
-}
-
 // @brief MislibNode から CellLibrary を生成する．
 // @param[in] lib_name ライブラリ名
 // @param[in] gate_list パース木のルート
@@ -179,7 +132,7 @@ gen_library(const string& lib_name,
       library->new_cell_input(cell, i, name, load, load, load);
     }
     // 出力ピンの設定
-    library->new_cell_output(cell, ni, opin_name,
+    library->new_cell_output(cell, 0, opin_name,
 			     CellCapacitance::infty(),
 			     CellCapacitance(0.0),
 			     CellCapacitance::infty(),
@@ -187,9 +140,7 @@ gen_library(const string& lib_name,
 			     CellTime::infty(),
 			     CellTime(0.0));
     LogExpr function = opin_expr->to_expr(ipin_name_map);
-#if 0
-    cell->set_logic_function(0, function);
-#endif
+    cell->set_logic_expr(0, function);
     TvFunc tv_function = function.make_tv(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       // タイミング情報の設定

@@ -89,53 +89,6 @@ dot2expr(const DotlibNode* node,
   return LogExpr();
 }
 
-// @brief LogExpr を TvFunc に変換する．
-// @param[in] expr 対象の論理式
-// @param[in] ni 全入力数
-TvFunc
-expr_to_tvfunc(const LogExpr& expr,
-	       ymuint ni)
-{
-  if ( expr.is_zero() ) {
-    return TvFunc::const_zero(ni);
-  }
-  if ( expr.is_one() ) {
-    return TvFunc::const_one(ni);
-  }
-  if ( expr.is_posiliteral() ) {
-    return TvFunc::posi_literal(ni, expr.varid());
-  }
-  if ( expr.is_negaliteral() ) {
-    return TvFunc::nega_literal(ni, expr.varid());
-  }
-  // あとは AND/OR/XOR のみ
-  ymuint n = expr.child_num();
-  vector<TvFunc> child_func(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    child_func[i] = expr_to_tvfunc(expr.child(i), ni);
-  }
-  TvFunc func = child_func[0];
-  if ( expr.is_and() ) {
-    for (ymuint i = 1; i < n; ++ i) {
-      func &= child_func[i];
-    }
-  }
-  else if ( expr.is_or() ) {
-    for (ymuint i = 1; i < n; ++ i) {
-      func |= child_func[i];
-    }
-  }
-  else if ( expr.is_xor() ) {
-    for (ymuint i = 1; i < n; ++ i) {
-      func ^= child_func[i];
-    }
-  }
-  else {
-    assert_not_reached(__FILE__, __LINE__);
-  }
-  return func;
-}
-
 // @brief DotlibNode から CellLibrary を生成する．
 // @param[in] dt_library ライブラリを表すパース木のルート
 // @return 生成したライブラリを返す．
@@ -183,6 +136,9 @@ gen_library(const DotlibNode* dt_library)
     vector<DotlibPin> pin_info_array(npin);
 
     // ピン情報の読み出し
+    ymuint ni = 0;
+    ymuint no = 0;
+    ymuint nio = 0;
     {
       ymuint pin_id = 0;
       bool error = false;
@@ -199,26 +155,19 @@ gen_library(const DotlibNode* dt_library)
 
 	ShString pin_name = pin_info.name();
 	pin_map.insert(make_pair(pin_name, pin_id));
+
+	switch ( pin_info.direction() ) {
+	case DotlibPin::kInput:  ++ ni; break;
+	case DotlibPin::kOutput: ++ no; break;
+	case DotlibPin::kInout:  ++ nio; break;
+	case DotlibPin::kInternal: break; // どうする？
+	default:
+	  assert_not_reached(__FILE__, __LINE__);
+	  break;
+	}
       }
       if ( error ) {
 	continue;
-      }
-    }
-
-    // ピン数を数える．
-    ymuint ni = 0;
-    ymuint no = 0;
-    ymuint nio = 0;
-    for (ymuint i = 0; i < npin; ++ i) {
-      const DotlibPin& pin_info = pin_info_array[i];
-      switch ( pin_info.direction() ) {
-      case DotlibPin::kInput:  ++ ni; break;
-      case DotlibPin::kOutput: ++ no; break;
-      case DotlibPin::kInout:  ++ nio; break;
-      case DotlibPin::kInternal: // どうする？
-      default:
-	assert_not_reached(__FILE__, __LINE__);
-	break;
       }
     }
 
@@ -319,13 +268,10 @@ gen_library(const DotlibNode* dt_library)
 				   max_transition, min_transition);
 	  const DotlibNode* func_node = pin_info.function();
 	  if ( func_node ) {
-#if 0
 	    LogExpr expr = dot2expr(func_node, pin_map);
-	    cell->set_logic_function(o_pos, expr);
-#endif
-
+	    cell->set_logic_expr(o_pos, expr);
 #if 0
-	    TvFunc tv_function = expr_to_tvfunc(expr, ni);
+	    TvFunc tv_function = expr.make_tv(ni);
 	    for (ymuint i = 0; i < ni; ++ i) {
 	      // タイミング情報の設定
 	      const DotlibNode* pt_pin = ipin_array[i];
@@ -354,7 +300,7 @@ gen_library(const DotlibNode* dt_library)
 		  MsgMgr::put_msg(__FILE__, __LINE__,
 				  pt_pin->loc(),
 				  kMsgWarning,
-				  "MISLIB_PARSER",
+				  "DOTLIB_PARSER",
 				  buf.str());
 		  redundant = true;
 		}
@@ -385,7 +331,7 @@ gen_library(const DotlibNode* dt_library)
 		MsgMgr::put_msg(__FILE__, __LINE__,
 				pt_pin->phase()->loc(),
 				kMsgWarning,
-				"MISLIB_PARSER",
+				"DOTLIB_PARSER",
 				buf.str());
 		sense = sense_real;
 	      }
@@ -406,10 +352,8 @@ gen_library(const DotlibNode* dt_library)
 	  }
 	  const DotlibNode* three_state = pin_info.three_state();
 	  if ( three_state ) {
-#if 0
 	    LogExpr expr = dot2expr(three_state, pin_map);
-	    cell->set_tristate_function(o_pos, expr);
-#endif
+	    cell->set_tristate_expr(o_pos, expr);
 	  }
 	}
 	++ o_pos;

@@ -13,15 +13,14 @@ noinst_HEADERS = \
 	CellBundle.h \
 	CellBus.h \
 	CellCapacitance.h \
+	CellClass.h \
 	CellDotlibReader.h \
+	CellGroup.h \
 	CellLibrary.h \
 	CellLut.h \
 	CellMislibReader.h \
+	CellPatGraph.h \
 	CellPin.h \
 	CellResistance.h \
 	CellTime.h \
-	CellTiming.h \
-	CellMgr.h \
-	CellClass.h \
-	CellGroup.h \
-	CellPatGraph.h
+	CellTiming.h

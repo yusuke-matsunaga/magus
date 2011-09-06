@@ -261,6 +261,7 @@ CiCell::is_seq() const
 LogExpr
 CiCell::logic_expr(ymuint pin_id) const
 {
+  return mLogicArray[pin_id];
 }
 
 // @brief 出力の論理関数を返す．
@@ -280,6 +281,7 @@ CiCell::logic_function(ymuint pos) const
 LogExpr
 CiCell::tristate_expr(ymuint pin_id) const
 {
+  return mTristateArray[pin_id];
 }
 
 // @brief 出力のトライステート条件関数を返す．
@@ -296,6 +298,7 @@ CiCell::tristate_function(ymuint pos) const
 LogExpr
 CiCell::next_state_expr() const
 {
+  return mNextState;
 }
 
 // @brief FFセルの場合に次状態関数を返す．
@@ -311,6 +314,7 @@ CiCell::next_state_function() const
 LogExpr
 CiCell::clock_expr() const
 {
+  return mClock;
 }
 
 // @brief FFセルの場合にクロックのアクティブエッジを表す関数を返す．
@@ -326,6 +330,7 @@ CiCell::clock_function() const
 LogExpr
 CiCell::data_in_expr() const
 {
+  return mNextState;
 }
 
 // @brief ラッチセルの場合にデータ入力関数を返す．
@@ -341,6 +346,7 @@ CiCell::data_in_function() const
 LogExpr
 CiCell::enable_expr() const
 {
+  return mClock;
 }
 
 // @brief ラッチセルの場合にイネーブル条件を表す関数を返す．
@@ -363,6 +369,7 @@ CiCell::has_clear() const
 LogExpr
 CiCell::clear_expr() const
 {
+  return mClear;
 }
 
 // @brief FFセル/ラッチセルの場合にクリア条件を表す関数を返す．
@@ -385,6 +392,7 @@ CiCell::has_preset() const
 LogExpr
 CiCell::preset_expr() const
 {
+  return mPreset;
 }
 
 // @brief FFセル/ラッチセルの場合にプリセット条件を表す関数を返す．
@@ -432,6 +440,7 @@ CiCell::init(ymuint id,
   void* r = alloc.get_memory(sizeof(CiPin*) * nio);
   mInoutArray = new (r) CiPin*[nio];
 
+
   ymuint n = (ni + nio) * (no + nio) * 2;
   void* s = alloc.get_memory(sizeof(const CiTiming*) * n);
   mTimingArray = new (s) CiTiming*[n];
@@ -444,33 +453,15 @@ CiCell::init(ymuint id,
   mBusNum = nb;
 
   mBundleNum = nc;
-}
 
-#if 0
-// @brief 出力ピンの機能を設定する．
-// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-// @param[in] function 機能を表す論理式
-// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-//  + cell->output_num() を使う．
-void
-CiCell::set_logic_function(ymuint opin_id,
-			   const LogExpr& function)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
+  ymuint no2 = no + nio;
 
-// @brief 出力ピンの three_state 条件を設定する．
-// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-// @param[in] expr three_state 条件を表す論理式
-// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-//  + cell->output_num() を使う．
-void
-CiCell::set_tristate_function(ymuint opin_id,
-			      const LogExpr& expr)
-{
-  assert_not_reached(__FILE__, __LINE__);
+  void* t = alloc.get_memory(sizeof(LogExpr) * no2);
+  mLogicArray = new (t) LogExpr[no2];
+
+  void* u = alloc.get_memory(sizeof(LogExpr) * no2);
+  mTristateArray = new (u) LogExpr[no2];
 }
-#endif
 
 // @brief タイミング情報を設定する．
 // @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
@@ -505,6 +496,32 @@ CiCell::set_timing(ymuint opin_id,
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
+}
+
+// @brief 出力ピンの機能を設定する．
+// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+// @param[in] function 機能を表す論理式
+// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+//  + cell->output_num() を使う．
+void
+CiCell::set_logic_expr(ymuint opin_id,
+		       const LogExpr& function)
+{
+  assert_cond( opin_id < output_num2(), __FILE__, __LINE__);
+  mLogicArray[opin_id] = function;
+}
+
+// @brief 出力ピンの three_state 条件を設定する．
+// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+// @param[in] expr three_state 条件を表す論理式
+// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+//  + cell->output_num() を使う．
+void
+CiCell::set_tristate_expr(ymuint opin_id,
+			  const LogExpr& expr)
+{
+  assert_cond( opin_id < output_num2(), __FILE__, __LINE__);
+  mTristateArray[opin_id] = expr;
 }
 
 END_NAMESPACE_YM_CELL

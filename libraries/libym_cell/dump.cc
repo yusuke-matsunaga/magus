@@ -191,10 +191,10 @@ display_timing(ostream& s,
 {
   const CellTiming* timing = cell->timing(ipos, opos, sense);
   if ( timing ) {
-    s << "    Timing:" << endl
-      << "      Input Pin       = " << cell->input(ipos)->name() << endl
-      << "      Output Pin      = " << cell->output(opos)->name() << endl
-      << "      Sense           = ";
+    s << "  Timing:" << endl
+      << "    Input Pin       = " << cell->input(ipos)->name() << endl
+      << "    Output Pin      = " << cell->output(opos)->name() << endl
+      << "    Sense           = ";
     if ( sense == kCellPosiUnate ) {
       s << "positive unate";
     }
@@ -205,10 +205,10 @@ display_timing(ostream& s,
       assert_not_reached(__FILE__, __LINE__);
     }
     s << endl
-      << "      Rise Intrinsic  = " << timing->intrinsic_rise() << endl
-      << "      Rise Resistance = " << timing->rise_resistance() << endl
-      << "      Fall Intrinsic  = " << timing->intrinsic_fall() << endl
-      << "      Fall Resistance = " << timing->fall_resistance() << endl;
+      << "    Rise Intrinsic  = " << timing->intrinsic_rise() << endl
+      << "    Rise Resistance = " << timing->rise_resistance() << endl
+      << "    Fall Intrinsic  = " << timing->intrinsic_fall() << endl
+      << "    Fall Resistance = " << timing->fall_resistance() << endl;
   }
 }
 
@@ -236,7 +236,8 @@ display_library(ostream& s,
     ymuint no = cell->output_num();
     for (ymuint opos = 0; opos < no; ++ opos) {
       const CellPin* pin = cell->output(opos);
-      s << "  Output#" << opos << ": " << pin->name() << endl
+      s << "  Output#" << opos << ": " << pin->name()
+	<< " = " << cell->logic_expr(opos) << endl
 	<< "    Max Fanout       = " << pin->max_fanout() << endl
 	<< "    Min Fanout       = " << pin->min_fanout() << endl
 	<< "    Max Capacitance  = " << pin->max_capacitance() << endl

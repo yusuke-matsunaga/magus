@@ -173,7 +173,7 @@ public:
   /// @brief 論理セルクラスを返す．
   /// @param[in] id クラス番号 ( 0 <= id < logic_class_num() )
   virtual
-  const CellClass&
+  const CellClass*
   logic_class(ymuint id) const;
 
   /// @brief 論理セルグループの個数を返す．
@@ -184,27 +184,27 @@ public:
   /// @brief 論理セルグループを返す．
   /// @param[in] id グループ番号　( 0 <= id < logic_group_num() )
   virtual
-  const CellGroup&
+  const CellGroup*
   logic_group(ymuint id) const;
 
   /// @brief 定数0セルのグループを返す．
   virtual
-  const CellGroup&
+  const CellGroup*
   const0_func() const;
 
   /// @brief 定数1セルのグループを返す．
   virtual
-  const CellGroup&
+  const CellGroup*
   const1_func() const;
 
   /// @brief バッファセルのグループを返す．
   virtual
-  const CellGroup&
+  const CellGroup*
   buf_func() const;
 
   /// @brief インバータセルのグループを返す．
   virtual
-  const CellGroup&
+  const CellGroup*
   inv_func() const;
 
 
@@ -221,7 +221,7 @@ public:
   /// @brief FFセルクラスを返す．
   /// @param[in] id クラス番号 ( 0 <= id < ff_class_num() )
   virtual
-  const CellClass&
+  const CellClass*
   ff_class(ymuint id) const;
 
   /// @brief FFセルグループの個数を返す．
@@ -232,7 +232,7 @@ public:
   /// @brief FFセルグループを返す．
   /// @param[in] id グループ番号 ( 0 <= id < ff_group_num() )
   virtual
-  const CellGroup&
+  const CellGroup*
   ff_group(ymuint id) const;
 
   /// @brief 単純な型のFFクラスを返す．
@@ -240,7 +240,7 @@ public:
   /// @param[in] has_preset プリセット端子を持つとき true にする．
   /// @note 該当するセルがないときでも空のセルクラスが返される．
   virtual
-  const CellClass&
+  const CellClass*
   simple_ff_class(bool has_clear,
 		  bool has_preset) const;
 
@@ -258,7 +258,7 @@ public:
   /// @brief ラッチセルクラスを返す．
   /// @param[in] id クラス番号 ( 0 <= id < latch_class_num() )
   virtual
-  const CellClass&
+  const CellClass*
   latch_class(ymuint id) const;
 
   /// @brief ラッチセルグループの個数を返す．
@@ -269,7 +269,7 @@ public:
   /// @brief ラッチセルグループを返す．
   /// @param[in] id グループ番号 ( 0 <= id < latch_group_num() )
   virtual
-  const CellGroup&
+  const CellGroup*
   latch_group(ymuint id) const;
 
   /// @brief 単純な型のラッチクラスを返す．
@@ -277,7 +277,7 @@ public:
   /// @param[in] has_preset プリセット端子を持つとき true にする．
   /// @note 該当するセルがないときでも空のセルクラスが返される．
   virtual
-  const CellClass&
+  const CellClass*
   simple_latch_class(bool has_clear,
 		     bool has_preset) const;
 
