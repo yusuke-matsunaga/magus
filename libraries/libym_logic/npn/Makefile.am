@@ -22,7 +22,8 @@ libym_logic_npn_la_SOURCES = \
 	NpnConf.h \
 	NpnConf.cc \
 	NpnMgr.cc \
-	NpnMap.cc
+	NpnMap.cc \
+	NpnMapM.cc
 
 libym_logic_npn_la_LIBADD =
 

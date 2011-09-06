@@ -109,7 +109,7 @@ LdLogicMgr::find_logic_group(const TvFunc& f)
     }
 
     // グループを追加する．
-    pgrep->add_group(pgfunc);
+    pgrep->add_group(pgfunc, NpnMapM(xmap));
   }
   else {
     // 既に登録されていた．
@@ -136,6 +136,8 @@ LdLogicMgr::find_logic_group(const vector<TvFunc>& f_list)
 
     // 代表関数を求める．
     // 今は手抜きで多出力はすべてが代表関数となる．
+    NpnMapM xmap;
+    xmap.set_identity(f.ni(), f.no());
     LdClass* pgrep = NULL;
     hash_map<TvFuncM, ymuint>::iterator p = mLogicClassMap2.find(f);
     if ( p == mLogicClassMap2.end() ) {
@@ -151,7 +153,7 @@ LdLogicMgr::find_logic_group(const vector<TvFunc>& f_list)
     }
 
     // 関数を追加する．
-    pgrep->add_group(pgfunc);
+    pgrep->add_group(pgfunc, xmap);
   }
   else {
     // 既に登録されていた．
@@ -203,25 +205,31 @@ LdLogicMgr::dump(ostream& s) const
     assert_cond( group->id() == i, __FILE__, __LINE__);
 
     // 論理クラスに対する変換マップをダンプする．
-#if 0
-    const NpnMap& map = group->map();
+    const NpnMapM& map = group->map();
     ymuint ni = map.ni();
-    ymuint32 v = (ni << 1);
-    if ( map.opol() == kPolNega ) {
-      v |= 1U;
-    }
-    BinIO::write_32(s, v);
+    BinIO::write_32(s, ni);
     for (ymuint i = 0; i < ni; ++ i) {
-      tNpnImap imap = map.imap(i);
+      NpnVmap imap = map.imap(i);
       // 手抜きでは imap を ymuint32 にキャストすればよい．
-      ymuint j = npnimap_pos(imap);
+      ymuint j = imap.pos();
       ymuint32 v = (j << 1);
-      if ( npnimap_pol(imap) ) {
+      if ( imap.pol() == kPolNega ) {
 	v |= 1U;
       }
       BinIO::write_32(s, v);
     }
-#endif
+    ymuint no = map.no();
+    BinIO::write_32(s, no);
+    for (ymuint i = 0; i < no; ++ i) {
+      NpnVmap omap = map.omap(i);
+      ymuint j = omap.pos();
+      ymuint32 v = (j << 1);
+      if ( omap.pol() == kPolNega ) {
+	v |= 1U;
+      }
+      BinIO::write_32(s, v);
+    }
+
     // 属しているセル番号をダンプする．
     const vector<ymuint>& cell_list = group->cell_list();
     ymuint nc = cell_list.size();
@@ -258,9 +266,7 @@ LdLogicMgr::display(ostream& s) const
     assert_cond( group->id() == i, __FILE__, __LINE__);
     s << "GROUP#" << i
       << ": CLASS#" << group->parent()->id()
-#if 0
       << ": " << group->map()
-#endif
       << endl;
     s << "  CELL#ID" << endl;
     const vector<ymuint>& cell_list = group->cell_list();
@@ -276,9 +282,7 @@ LdLogicMgr::display(ostream& s) const
     const LdClass* rep = logic_class(i);
     assert_cond( rep->id() == i , __FILE__, __LINE__);
     s << "CLASS#" << i << ": ";
-#if 0
-    rep->rep_func().dump(s, 2);
-#endif
+    rep->repfunc().dump(s, 2);
     s << endl;
     s << "  equivalence = ";
     const vector<LdGroup*>& group_list = rep->group_list();

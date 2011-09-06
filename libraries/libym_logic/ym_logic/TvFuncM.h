@@ -10,6 +10,7 @@
 
 
 #include "ym_logic/TvFunc.h"
+#include "ym_logic/npn_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -200,13 +201,12 @@ public:
   cofactor(ymuint varid,
 	   tPol pol) const;
 
-#if 0
   /// @brief npnmap に従った変換を行う．
   /// @param[in] npnmap 変換マップ
   /// @return 変換した関数を返す．
   TvFuncM
   xform(const NpnMapM& npnmap) const;
-#endif
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -220,6 +220,18 @@ public:
   /// @brief 生のデータを得る．
   ymulong
   raw_data(ymuint blk) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 定数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 最大の入力数
+  // 特に根拠はないが，これなら Walsh 係数が 32 ビット整数で収まる．
+  // あと真理値表ベースの手法ではこれくらいが限度
+  static
+  const ymuint kMaxNi = 20;
 
 
 public:

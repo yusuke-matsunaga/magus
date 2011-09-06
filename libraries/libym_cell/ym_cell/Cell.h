@@ -10,6 +10,8 @@
 
 #include "ym_cell/cell_nsdef.h"
 #include "ym_cell/CellArea.h"
+#include "ym_logic/lexp_nsdef.h"
+#include "ym_logic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -147,11 +149,6 @@ public:
   const CellBundle*
   bundle(const string& name) const = 0;
 
-  /// @brief 属している CellGroup を返す．
-  virtual
-  const CellGroup*
-  cell_group() const = 0;
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -176,180 +173,149 @@ public:
   // 機能情報の取得
   //////////////////////////////////////////////////////////////////////
 
-#if 0
+  /// @brief 属している CellGroup を返す．
+  virtual
+  const CellGroup*
+  cell_group() const = 0;
+
   /// @brief 組み合わせ論理セルの時に true を返す．
+  virtual
   bool
-  is_logic() const;
+  is_logic() const = 0;
 
   /// @brief トライステートセルの場合に true を返す．
   /// @note もちろん論理セルでもある．
   /// @note 複数出力のうち1つでもトライステートなら true を返す．
+  virtual
   bool
-  is_tristate() const;
+  is_tristate() const = 0;
 
   /// @brief FFセルの時に true を返す．
+  virtual
   bool
-  is_ff() const;
+  is_ff() const = 0;
 
   /// @brief ラッチセルの時に true を返す．
+  virtual
   bool
-  is_latch() const;
+  is_latch() const = 0;
 
   /// @brief 順序セル(非FF/非ラッチ)の場合に true を返す．
+  virtual
   bool
-  is_seq() const;
+  is_seq() const = 0;
 
   /// @brief 論理セルの場合に出力の論理式を返す．
   /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
   /// @note 論理式中の変数番号は入力ピン番号に対応する．
+  virtual
   LogExpr
-  logic_function(ymuint pin_id) const;
+  logic_expr(ymuint pin_id) const = 0;
 
-  /// @brief 出力がトライステートの時に true を返す．
-  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
-  bool
-  is_tristate(ymuint pin_id) const;
+  /// @brief 出力の論理関数を返す．
+  /// @param[in] pos 出力番号 ( 0 <= pos < output_num2() )
+  /// @note FF/ラッチの場合は状態変数の変数(Q, XQ)が2つ入力に加わる．
+  virtual
+  TvFunc
+  logic_function(ymuint pos) const = 0;
 
   /// @brief トライステートセルの場合にトライステート条件式を返す．
   /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
   /// @note 論理式中の変数番号は入力ピン番号に対応する．
   /// @note is_tristate() が true の時のみ意味を持つ．
   /// @note 通常の論理セルの場合には定数0を返す．
+  virtual
   LogExpr
-  tristate_function(ymuint pin_id) const;
+  tristate_expr(ymuint pin_id) const = 0;
+
+  /// @brief 出力のトライステート条件関数を返す．
+  /// @param[in] pos 出力番号 ( 0 <= pos < output_num2() )
+  /// @note トライステートでない場合には定数0関数を返す．
+  virtual
+  TvFunc
+  tristate_function(ymuint pos) const = 0;
+
+  /// @brief FFセルの場合に次状態関数を表す論理式を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  LogExpr
+  next_state_expr() const = 0;
+
+  /// @brief FFセルの場合に次状態関数を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  TvFunc
+  next_state_function() const = 0;
+
+  /// @brief FFセルの場合にクロックのアクティブエッジを表す論理式を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  LogExpr
+  clock_expr() const = 0;
+
+  /// @brief FFセルの場合にクロックのアクティブエッジを表す関数を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  TvFunc
+  clock_function() const = 0;
+
+  /// @brief ラッチセルの場合にデータ入力関数を表す論理式を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  LogExpr
+  data_in_expr() const = 0;
+
+  /// @brief ラッチセルの場合にデータ入力関数を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  TvFunc
+  data_in_function() const = 0;
+
+  /// @brief ラッチセルの場合にイネーブル条件を表す論理式を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  LogExpr
+  enable_expr() const = 0;
+
+  /// @brief ラッチセルの場合にイネーブル条件を表す関数を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  TvFunc
+  enable_function() const = 0;
 
   /// @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
+  virtual
   bool
-  has_clear() const;
+  has_clear() const = 0;
+
+  /// @brief FFセル/ラッチセルの場合にクリア条件を表す論理式を返す．
+  /// @note クリア端子がない場合の返り値は不定
+  virtual
+  LogExpr
+  clear_expr() const = 0;
+
+  /// @brief FFセル/ラッチセルの場合にクリア条件を表す関数を返す．
+  /// @note クリア端子がない場合の返り値は不定
+  virtual
+  TvFunc
+  clear_function() const = 0;
 
   /// @brief FFセル/ラッチセルの場合にプリセット端子を持っていたら true を返す．
+  virtual
   bool
-  has_preset() const;
+  has_preset() const = 0;
 
-  /// @brief FF/ラッチセルの場合にデータ入力ピン番号を返す．
-  ymuint
-  data_pos() const;
-
-  /// @brief FF/ラッチセルの場合にデータ入力ピンの反転属性を返す．
-  bool
-  data_inv() const;
-
-  /// @brief FFセルの場合にクロック入力ピン番号を返す．
-  ymuint
-  clock_pos() const;
-
-  /// @brief FFセルの場合にクロック入力ピンの反転属性を返す．
-  /// @note ポジティブエッジが正極性だと思う．
-  bool
-  clock_inv() const;
-
-  /// @brief ラッチセルの場合にイネーブル入力ピン番号を返す．
-  ymuint
-  enable_pos() const;
-
-  /// @brief ラッチセルの場合にイネーブル入力ピンの反転属性を返す．
-  bool
-  enable_inv() const;
-
-  /// @brief FF/ラッチセルの場合にクリア入力ピン番号を返す．
-  ymuint
-  clear_pos() const;
-
-  /// @brief FF/ラッチセルの場合にクリア入力ピンの反転属性を返す．
-  bool
-  clear_inv() const;
-
-  /// @brief FF/ラッチセルの場合にプリセット入力ピン番号を返す．
-  ymuint
-  clear_pos() const;
-
-  /// @brief FF/ラッチセルの場合にプリセット入力ピンの反転属性を返す．
-  bool
-  clear_inv() const;
-
-  /// @brief FF/ラッチセルの場合に Q出力ピン番号を返す．
-  ymuint
-  q_pos() const;
-
-  /// @brief FF/ラッチセルの場合に XQ出力ピン番号を返す．
-  ymuint
-  xq_pos() const;
-#endif
-
-#if 0
-  /// @brief 状態変数1の名前を返す．
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  string
-  var1_name() const = 0;
-
-  /// @brief 状態変数2の名前を返す．
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  string
-  var2_name() const = 0;
-
-  /// @brief next_state 関数の取得
-  /// @note FFセルの時に意味を持つ．
+  /// @brief FFセル/ラッチセルの場合にプリセット条件を表す論理式を返す．
+  /// @note プリセット端子がない場合の返り値は不定
   virtual
   LogExpr
-  next_state() const = 0;
+  preset_expr() const = 0;
 
-  /// @brief clocked_on 関数の取得
-  /// @note FFセルの時に意味を持つ．
+  /// @brief FFセル/ラッチセルの場合にプリセット条件を表す関数を返す．
+  /// @note プリセット端子がない場合の返り値は不定
   virtual
-  LogExpr
-  clocked_on() const = 0;
-
-  /// @brief clocked_on_also 関数の取得
-  /// @note FFセルの時に意味を持つ．
-  virtual
-  LogExpr
-  clocked_on_also() const = 0;
-
-  /// @brief data_in 関数の取得
-  virtual
-  LogExpr
-  data_in() const = 0;
-
-  /// @brief enable 関数の取得
-  virtual
-  LogExpr
-  enable() const = 0;
-
-  /// @brief enable_also 関数の取得
-  virtual
-  LogExpr
-  enable_also() const = 0;
-
-  /// @brief clear 関数の取得
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  LogExpr
-  clear() const = 0;
-
-  /// @brief preset 関数の取得
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  LogExpr
-  preset() const = 0;
-
-  /// @brief clear_preset_var1 の取得
-  /// @retval 0 "L"
-  /// @retval 1 "H"
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  ymuint
-  clear_preset_var1() const = 0;
-
-  /// @brief clear_preset_var2 の取得
-  /// @retval 0 "L"
-  /// @retval 1 "H"
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  ymuint
-  clear_preset_var2() const = 0;
-#endif
+  TvFunc
+  preset_function() const = 0;
 
 };
 

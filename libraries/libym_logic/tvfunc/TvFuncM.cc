@@ -8,7 +8,7 @@
 
 
 #include "ym_logic/TvFuncM.h"
-#include "ym_logic/NpnMap.h"
+#include "ym_logic/NpnMapM.h"
 
 
 #if SIZEOF_SIZE_T == 8
@@ -79,20 +79,6 @@ ymulong sym_masks3[] = {
   0x000000000000FFFF  // (5, 4)
 };
 
-ymuint s_plist[] = {
-  0,
-  1,  2,  4,  8, 16, 32,
-  3,  5,  6,  9, 10, 12, 17, 18, 20, 24, 33, 34, 36, 40, 48,
-  7, 11, 13, 14, 19, 21, 22, 25, 26, 28, 35, 37, 38, 41, 42, 44, 49, 50, 52, 56,
-  15, 23, 27, 29, 30, 39, 43, 45, 46, 51, 53, 54, 57, 58, 60,
-  31, 47, 55, 59, 61, 62,
-  63
-};
-
-ymuint s_pidx[] = {
-  0, 1, 7, 22, 42, 57, 63, 64
-};
-
 #else
 
 // コファクターマスク
@@ -132,19 +118,6 @@ ymulong sym_masks3[] = {
   0x00003333, // (4, 1)
   0x00000F0F, // (4, 2)
   0x000000FF  // (4, 3)
-};
-
-ymuint s_plist[] = {
-  0,
-  1,  2,  4,  8, 16,
-  3,  5,  6,  9, 10, 12, 17, 18, 20, 24,
-  7, 11, 13, 14, 19, 21, 22, 25, 26, 28,
-  15, 23, 27, 29, 30,
-  31
-};
-
-ymuint s_pidx[] = {
-  0, 1, 6, 16, 26, 31, 32
 };
 
 #endif
@@ -513,10 +486,9 @@ TvFuncM::check_sym(tVarId i,
   return ans;
 }
 
-#if 0
 // npnmap に従った変換を行う．
 TvFuncM
-TvFuncM::xform(const NpnMap& npnmap) const
+TvFuncM::xform(const NpnMapM& npnmap) const
 {
   ymuint ni_pow = 1UL << mNi;
 
@@ -529,26 +501,32 @@ TvFuncM::xform(const NpnMap& npnmap) const
   ymuint imask = 0UL;
   ymuint ipat[kMaxNi];
   for (ymuint i = 0; i < mNi; ++ i) {
-    tNpnImap imap = npnmap.imap(i);
-    if ( npnimap_pol(imap) == kPolNega ) {
+    NpnVmap imap = npnmap.imap(i);
+    if ( imap.pol() == kPolNega ) {
       imask |= (1UL << i);
     }
-    ymuint j = npnimap_pos(imap);
+    ymuint j = imap.pos();
     ipat[i] = 1UL << j;
   }
-  ymuint omask = npnmap.opol() == kPolPosi ? 0UL : 1UL;
 
-  TvFuncM ans(mNi);
-  for (ymuint i = 0; i < ni_pow; ++ i) {
-    ymuint new_i = 0;
-    ymuint tmp = i;
-    for (ymuint b = 0; b < mNi; ++ b, tmp >>= 1) {
-      if ( tmp & 1 ) {
-	new_i |= ipat[b];
+  TvFuncM ans(mNi, mNo);
+
+  for (ymuint o = 0; o < mNo; ++ o) {
+    NpnVmap omap = npnmap.omap(o);
+    ymuint dst_pos = omap.pos();
+    ymuint omask = omap.pol() == kPolPosi ? 0UL : 1UL;
+
+    for (ymuint i = 0; i < ni_pow; ++ i) {
+      ymuint new_i = 0;
+      ymuint tmp = i;
+      for (ymuint b = 0; b < mNi; ++ b, tmp >>= 1) {
+	if ( tmp & 1 ) {
+	  new_i |= ipat[b];
+	}
       }
+      ymulong pat = (value(i ^ imask, o) ^ omask) << shift(new_i);
+      ans.mVector[block(new_i) + dst_pos * mNblk1] |= pat;
     }
-    ymulong pat = (value(i ^ imask) ^ omask) << shift(new_i);
-    ans.mVector[block(new_i)] |= pat;
   }
 
 #if defined(DEBUG)
@@ -557,7 +535,6 @@ TvFuncM::xform(const NpnMap& npnmap) const
 
   return ans;
 }
-#endif
 
 // ハッシュ値を返す．
 ymuint

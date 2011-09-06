@@ -5259,7 +5259,7 @@ TvFunc::walsh_w1(ymuint var,
 
 // i 番目の変数がサポートの時 true を返す．
 bool
-TvFunc::check_sup(tVarId i) const
+TvFunc::check_sup(ymuint i) const
 {
   if ( i < NIPW ) {
     // ブロックごとにチェック
@@ -5288,13 +5288,13 @@ TvFunc::check_sup(tVarId i) const
 
 // i 番目と j 番目の変数が対称のとき true を返す．
 bool
-TvFunc::check_sym(tVarId i,
-		  tVarId j,
+TvFunc::check_sym(ymuint i,
+		  ymuint j,
 		  tPol pol) const
 {
   // i と j を正規化する．
   if ( i < j ) {
-    tVarId tmp = i;
+    ymuint tmp = i;
     i = j;
     j = tmp;
   }
@@ -5390,11 +5390,11 @@ TvFunc::xform(const NpnMap& npnmap) const
   ymuint imask = 0UL;
   ymuint ipat[kMaxNi];
   for (ymuint i = 0; i < mNi; ++ i) {
-    tNpnImap imap = npnmap.imap(i);
-    if ( npnimap_pol(imap) == kPolNega ) {
+    NpnVmap imap = npnmap.imap(i);
+    if ( imap.pol() == kPolNega ) {
       imask |= (1UL << i);
     }
-    ymuint j = npnimap_pos(imap);
+    ymuint j = imap.pos();
     ipat[i] = 1UL << j;
   }
   ymuint omask = npnmap.opol() == kPolPosi ? 0UL : 1UL;

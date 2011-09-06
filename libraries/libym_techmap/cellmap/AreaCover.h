@@ -38,11 +38,11 @@ public:
 
   /// @brief 面積最小化マッピングを行う．
   /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cell_mgr セルを管理するオブジェクト
+  /// @param[in] cell_library セルを管理するオブジェクト
   /// @param[out] mapnetwork マッピング結果
   void
   operator()(const BdnMgr& sbjgraph,
-	     const CellMgr& cell_mgr,
+	     const CellLibrary& cell_library,
 	     CmnMgr& mapnetwork);
 
 
@@ -53,20 +53,20 @@ private:
 
   /// @brief FF のマッピングを行う．
   /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cell_mgr セルを管理するオブジェクト
+  /// @param[in] cell_library セルを管理するオブジェクト
   /// @param[in] maprec マッピング結果を保持するオブジェクト
   void
   ff_map(const BdnMgr& sbjgraph,
-	 const CellMgr& cell_mgr,
+	 const CellLibrary& cell_library,
 	 MapRecord& maprec);
 
   /// @brief best cut の記録を行う．
   /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cell_mgr セルを管理するオブジェクト
+  /// @param[in] cell_library セルを管理するオブジェクト
   /// @param[in] maprec マッピング結果を保持するオブジェクト
   void
   record_cuts(const BdnMgr& sbjgraph,
-	      const CellMgr& cell_mgr,
+	      const CellLibrary& cell_library,
 	      MapRecord& maprec);
 
   /// @brief 逆極性の解にインバーターを付加した解を追加する．

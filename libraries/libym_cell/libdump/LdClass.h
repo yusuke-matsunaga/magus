@@ -60,7 +60,8 @@ public:
 
   /// @brief グループを追加する．
   void
-  add_group(LdGroup* group);
+  add_group(LdGroup* group,
+	    const NpnMapM& map);
 
 
 private:

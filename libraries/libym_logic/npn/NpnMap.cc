@@ -37,7 +37,7 @@ NpnMap::NpnMap(ymuint ni,
   mNiPol((ni << 1) | static_cast<ymuint>(pol))
 {
   for (ymuint i = 0; i < ni; ++ i) {
-    mImap[i] = kImapBad;
+    mImap[i] = NpnVmap::invalid();
   }
 }
 
@@ -74,7 +74,7 @@ NpnMap::clear()
 {
   mNiPol &= ~(1UL);
   for (ymuint i = 0; i < ni(); ++ i) {
-    mImap[i] = kImapBad;
+    mImap[i] = NpnVmap::invalid();
   }
 }
 
@@ -84,7 +84,7 @@ NpnMap::resize(ymuint new_ni)
 {
   mNiPol = new_ni << 1;
   for (ymuint i = 0; i < new_ni; ++ i) {
-    mImap[i] = kImapBad;
+    mImap[i] = NpnVmap::invalid();
   }
 }
 
@@ -94,23 +94,23 @@ NpnMap::set_identity(ymuint new_ni)
 {
   mNiPol = new_ni << 1;
   for (ymuint i = 0; i < new_ni; ++ i) {
-    mImap[i] = npnimap_pack(i, kPolPosi);
+    mImap[i] = NpnVmap(i, kPolPosi);
   }
 }
 
 // pos 番目の入力の変換内容を設定する．
 void
-NpnMap::set(tVarId pos,
-	    tVarId dst_pos,
+NpnMap::set(ymuint pos,
+	    ymuint dst_pos,
 	    tPol pol)
 {
   if ( pos < ni() ) {
-    mImap[pos] = npnimap_pack(dst_pos, pol);
+    mImap[pos] = NpnVmap(dst_pos, pol);
   }
 }
 void
-NpnMap::set(tVarId pos,
-	    tNpnImap imap)
+NpnMap::set(ymuint pos,
+	    NpnVmap imap)
 {
   if ( pos < ni() ) {
     mImap[pos] = imap;
@@ -157,16 +157,16 @@ inverse(const NpnMap& src)
   ymuint src_ni = src.ni();
   NpnMap dst_map(src_ni, src.opol());
   for (ymuint i = 0; i < src_ni; ++ i) {
-    tNpnImap imap = src.mImap[i];
-    if ( imap != kImapBad ) {
-      ymuint opos = npnimap_pos(imap);
+    NpnVmap imap = src.imap(i);
+    if ( !imap.is_invalid() ) {
+      ymuint opos = imap.pos();
       if ( opos >= src_ni ) {
 	if ( debug_npn_map ) {
 	  cerr << "inverse(src): srcの値域と定義域が一致しません．";
 	}
 	return NpnMap(src_ni);
       }
-      tPol pol = npnimap_pol(imap);
+      tPol pol = imap.pol();
       dst_map.set(opos, i, pol);
     }
   }
@@ -199,22 +199,22 @@ operator*(const NpnMap& src1,
   ymuint ni1 = src1.ni();
   NpnMap dst_map(ni1, src1.opol() * src2.opol());
   for (ymuint i1 = 0; i1 < ni1; ++ i1) {
-    tNpnImap imap1 = src1.mImap[i1];
-    if ( imap1 == kImapBad ) {
-      dst_map.set(i1, kImapBad);
+    NpnVmap imap1 = src1.imap(i1);
+    if ( imap1.is_invalid() ) {
+      dst_map.set(i1, NpnVmap::invalid());
     }
     else {
-      ymuint opos1 = npnimap_pos(imap1);
-      tPol pol1 = npnimap_pol(imap1);
-      tNpnImap imap2 = src2.imap(opos1);
-      if ( imap2 == kImapBad ) {
+      ymuint opos1 = imap1.pos();
+      tPol pol1 = imap1.pol();
+      NpnVmap imap2 = src2.imap(opos1);
+      if ( imap2.is_invalid() ) {
 	if ( debug_npn_map ) {
 	  cerr << "src1 * src2: src1の値域とsrc2の定義域が一致しません．";
 	}
       }
       else {
-	ymuint opos2 = npnimap_pos(imap2);
-	tPol pol2 = npnimap_pol(imap2);
+	ymuint opos2 = imap2.pos();
+	tPol pol2 = imap2.pol();
 	dst_map.set(i1, opos2, pol1 * pol2);
       }
     }
@@ -248,10 +248,10 @@ NpnMap::xform_bdd(const Bdd& f) const
   BddMgrRef mgr = f.mgr();
   ymuint ni = mImap.size();
   for (ymuint i = 0; i < ni; ++ i) {
-    tVarId old_id = i;
-    tNpnImap imap = mImap[i];
-    tVarId new_id = npnimap_pos(imap);
-    tPol pol = npnimap_pol(imap);
+    ymuint old_id = i;
+    NpnVmap imap = mImap[i];
+    ymuint new_id = imap.pos();
+    tPol pol = imap.pol();
     if ( pol == kPolNega || old_id != new_id ) {
       subst_array[old_id] = mgr.make_literal(new_id, pol);
     }
@@ -276,26 +276,22 @@ ostream&
 operator<<(ostream& s,
 	   const NpnMap& map)
 {
-  bool first = true;
   if ( map.opol() == kPolNega ) {
     s << '~';
   }
+  const char* comma = "";
   s << '(';
   for (ymuint i = 0; i < map.ni(); ++ i) {
-    if ( first ) {
-      first = false;
-    }
-    else {
-      s << ", ";
-    }
-    tVarId ipos = i;
-    tNpnImap imap = map.imap(ipos);
-    if ( imap == kImapBad ) {
+    s << comma;
+    comma = ", ";
+    ymuint ipos = i;
+    NpnVmap imap = map.imap(ipos);
+    if ( imap.is_invalid() ) {
       s << "---(" << ipos << ")";
     }
     else {
-      tVarId index = npnimap_pos(imap);
-      tPol pol = npnimap_pol(imap);
+      ymuint index = imap.pos();
+      tPol pol = imap.pol();
       if ( pol == kPolNega ) {
 	s << '~';
       }

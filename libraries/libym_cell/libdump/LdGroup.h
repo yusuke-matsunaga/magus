@@ -10,6 +10,7 @@
 
 
 #include "libdump_nsdef.h"
+#include "ym_logic/NpnMapM.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBDUMP
@@ -42,6 +43,10 @@ public:
   LdClass*
   parent() const;
 
+  /// @brief 親のクラスに対する変換マップを返す．
+  const NpnMapM&
+  map() const;
+
   /// @brief 実体を返す．
   const CellGroup*
   cell_group() const;
@@ -66,6 +71,9 @@ private:
 
   // 親の LdClass
   LdClass* mParent;
+
+  // 親のクラスに対する変換マップ
+  NpnMapM mMap;
 
   // 実体のオブジェクト
   CellGroup* mCellGroup;

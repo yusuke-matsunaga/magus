@@ -23,12 +23,8 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
-class CiLogicClass;
-class CiLogicGroup;
-class CiFFClass;
-class CiFFGroup;
-class CiLatchClass;
-class CiLatchGroup;
+class CiClass;
+class CiGroup;
 class CiCell;
 class CiPin;
 class CiTiming;
@@ -620,37 +616,37 @@ private:
   ymuint32 mLogicClassNum;
 
   // 論理セルクラスの配列
-  CiLogicClass* mLogicClassArray;
+  CiClass** mLogicClassArray;
 
   // 論理セルグループの数
   ymuint32 mLogicGroupNum;
 
   // 論理セルグループの配列
-  CiLogicGroup* mLogicGroupArray;
+  CiGroup** mLogicGroupArray;
 
   // FFセルクラスの数
   ymuint32 mFFClassNum;
 
   // FFセルクラスの配列
-  CiFFClass* mFFClassArray;
+  CiClass** mFFClassArray;
 
   // FFセルグループの数
   ymuint32 mFFGroupNum;
 
   // FFセルグループの配列
-  CiFFGroup* mFFGroupArray;
+  CiGroup** mFFGroupArray;
 
   // ラッチセルクラスの数
   ymuint32 mLatchClassNum;
 
   // ラッチセルクラスの配列
-  CiLatchClass* mLatchClassArray;
+  CiClass** mLatchClassArray;
 
   // ラッチセルグループの数
   ymuint32 mLatchGroupNum;
 
   // ラッチセルグループの配列
-  CiLatchGroup* mLatchGroupArray;
+  CiGroup** mLatchGroupArray;
 
   // パタングラフを管理するクラス
   CiPatMgr mPatMgr;

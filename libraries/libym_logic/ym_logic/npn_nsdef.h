@@ -43,14 +43,18 @@ BEGIN_NAMESPACE_YM_NPN
 // クラスの前方参照
 //////////////////////////////////////////////////////////////////////
 
+class NpnVmap;
 class NpnMap;
+class NpnMapM;
 class NpnMgr;
 
 END_NAMESPACE_YM_NPN
 
 BEGIN_NAMESPACE_YM
 
+using nsNpn::NpnVmap;
 using nsNpn::NpnMap;
+using nsNpn::NpnMapM;
 using nsNpn::NpnMgr;
 
 END_NAMESPACE_YM

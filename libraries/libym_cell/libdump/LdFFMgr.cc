@@ -65,6 +65,8 @@ LdFFMgr::find_ff_group(const vector<TvFunc>& f_array)
 
     // 代表関数を求める．
     // 今は手抜きで多出力はすべてが代表関数となる．
+    NpnMapM xmap;
+    xmap.set_identity(f.ni(), f.no());
     LdClass* pgrep = NULL;
     hash_map<TvFuncM, ymuint>::iterator p = mFFClassMap.find(f);
     if ( p == mFFClassMap.end() ) {
@@ -80,7 +82,7 @@ LdFFMgr::find_ff_group(const vector<TvFunc>& f_array)
     }
 
     // 関数を追加する．
-    pgrep->add_group(pgfunc);
+    pgrep->add_group(pgfunc, xmap);
   }
   else {
     // 既に登録されていた．

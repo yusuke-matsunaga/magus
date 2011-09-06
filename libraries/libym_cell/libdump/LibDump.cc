@@ -23,63 +23,6 @@ BEGIN_NAMESPACE_YM_CELL_LIBDUMP
 
 BEGIN_NONAMESPACE
 
-// expr に現れる最大の変数番号 + 1を返す．
-ymuint
-check_input(const LogExpr& expr)
-{
-  if ( expr.is_literal() ) {
-    ymuint id = expr.varid();
-    return id + 1;
-  }
-  else if ( expr.is_op() ) {
-    ymuint n = expr.child_num();
-    ymuint id = check_input(expr.child(0));
-    for (ymuint i = 1; i < n; ++ i) {
-      ymuint id1 = check_input(expr.child(i));
-      if ( id < id1 ) {
-	id = id1;
-      }
-    }
-    return id;
-  }
-  else if ( expr.is_constant() ) {
-    return 0;
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  return 0;
-}
-
-// 論理式を TvFunc に変換する．
-TvFunc
-expr2tvfunc(const LogExpr& expr)
-{
-  // expr に現れる最大の入力番号を調べる．
-  ymuint ni = check_input(expr);
-
-  // expr に対応する関数を作る．
-  vector<ymulong> ivals(ni);
-  ymuint nip = (1U << ni);
-  vector<int> vals(nip);
-  for (ymuint p = 0U; p < nip; ++ p) {
-    for (ymuint i = 0; i < ni; ++ i) {
-      if ( p & (1U << i) ) {
-	ivals[i] = 1;
-      }
-      else {
-	ivals[i] = 0;
-      }
-    }
-    if ( expr.eval(ivals, 1UL) ) {
-      vals[p] = 1;
-    }
-    else {
-      vals[p] = 0;
-    }
-  }
-
-  return TvFunc(ni, vals);
-}
-
 // 論理式の変数を map にしたがって変換する．
 LogExpr
 xform_expr(const LogExpr& expr,
@@ -88,10 +31,10 @@ xform_expr(const LogExpr& expr,
   ymuint ni = map.ni();
   VarLogExprMap vlm;
   for (ymuint i = 0; i < ni; ++ i) {
-    tNpnImap imap = map.imap(i);
-    ymuint j = npnimap_pos(imap);
+    NpnVmap imap = map.imap(i);
+    ymuint j = imap.pos();
     LogExpr expr;
-    if ( npnimap_pol(imap) == kPolPosi) {
+    if ( imap.pol() == kPolPosi) {
       expr = LogExpr::make_posiliteral(j);
     }
     else {
@@ -163,7 +106,7 @@ LibDump::gen_pat(const CellLibrary& library)
       }
 
       LogExpr expr = opin->function();
-      TvFunc tv = expr2tvfunc(expr);
+      TvFunc tv = expr.make_tv(ni)
       LdFunc* pgfunc = mLdFuncMgr.find_func(tv);
       pgfunc->add_cell(cell->id());
 
@@ -268,7 +211,7 @@ void
 LibDump::reg_expr(const LogExpr& expr)
 {
   // expr に対応する LdFunc を求める．
-  TvFunc f = expr2tvfunc(expr);
+  TvFunc f = expr.make_tv();
   LdGroup* pgfunc = mLdLogicMgr.find_logic_group(f);
 
   // expr から生成されるパタンを pgfunc に登録する．

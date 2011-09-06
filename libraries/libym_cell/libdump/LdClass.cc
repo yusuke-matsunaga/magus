@@ -74,10 +74,12 @@ LdClass::group_list() const
 
 // @brief グループを追加する．
 void
-LdClass::add_group(LdGroup* group)
+LdClass::add_group(LdGroup* group,
+		   const NpnMapM& map)
 {
   mGroupList.push_back(group);
   group->mParent = this;
+  group->mMap = map;
 }
 
 

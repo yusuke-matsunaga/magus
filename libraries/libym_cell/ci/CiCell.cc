@@ -8,6 +8,7 @@
 
 
 #include "CiCell.h"
+#include "ym_cell/CellGroup.h"
 #include "CiPin.h"
 #include "CiTiming.h"
 #include "CiBus.h"
@@ -40,13 +41,6 @@ CiCell::CiCell() :
 CiCell::~CiCell()
 {
   // メモリの確保は別のクラスが担当している．
-}
-
-// @brief 属している CellGroup を返す．
-const CellGroup*
-CiCell::cell_group() const
-{
-  return mCellGroup;
 }
 
 // @brief ID番号の取得
@@ -217,148 +211,189 @@ CiCell::timing(ymuint ipos,
   return NULL;
 }
 
-#if 0
+// @brief 属している CellGroup を返す．
+const CellGroup*
+CiCell::cell_group() const
+{
+  return mCellGroup;
+}
+
 // @brief 組み合わせ論理セルの時に true を返す．
-// @note type() == kLogic と等価
 bool
 CiCell::is_logic() const
 {
-  return false;
+  return cell_group()->is_logic();
+}
+
+// @brief トライステートセルの場合に true を返す．
+// @note もちろん論理セルでもある．
+// @note 複数出力のうち1つでもトライステートなら true を返す．
+bool
+CiCell::is_tristate() const
+{
+  return cell_group()->is_tristate();
 }
 
 // @brief FFセルの時に true を返す．
-// @note type() == kFF と等価
 bool
 CiCell::is_ff() const
 {
-  return false;
+  return cell_group()->is_ff();
 }
 
 // @brief ラッチセルの時に true を返す．
-// @note type() == kLatch と等価
 bool
 CiCell::is_latch() const
 {
-  return false;
+  return cell_group()->is_latch();
 }
 
-// @brief FSMセルの時に true を返す．
-// @note type() == kFSM と等価
+// @brief 順序セル(非FF/非ラッチ)の場合に true を返す．
 bool
-CiCell::is_fsm() const
+CiCell::is_seq() const
 {
-  return false;
+  return cell_group()->is_seq();
 }
 
-// @brief 状態変数1の名前を返す．
-// @note FFセルとラッチセルの時に意味を持つ．
-string
-CiCell::var1_name() const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return string();
-}
-
-// @brief 状態変数2の名前を返す．
-// @note FFセルとラッチセルの時に意味を持つ．
-string
-CiCell::var2_name() const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return string();
-}
-
-// @brief next_state 関数の取得
-// @note FFセルの時に意味を持つ．
+// @brief 論理セルの場合に出力の論理式を返す．
+// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+// @note 論理式中の変数番号は入力ピン番号に対応する．
 LogExpr
-CiCell::next_state() const
+CiCell::logic_expr(ymuint pin_id) const
 {
-  assert_not_reached(__FILE__, __LINE__);
-  return LogExpr();
 }
 
-// @brief clocked_on 関数の取得
-// @note FFセルの時に意味を持つ．
+// @brief 出力の論理関数を返す．
+// @param[in] pos 出力番号 ( 0 <= pos < output_num2() )
+// @note FF/ラッチの場合は状態変数の変数(Q, XQ)が2つ入力に加わる．
+TvFunc
+CiCell::logic_function(ymuint pos) const
+{
+  return cell_group()->logic_function(pos);
+}
+
+// @brief トライステートセルの場合にトライステート条件式を返す．
+// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+// @note 論理式中の変数番号は入力ピン番号に対応する．
+// @note is_tristate() が true の時のみ意味を持つ．
+// @note 通常の論理セルの場合には定数0を返す．
 LogExpr
-CiCell::clocked_on() const
+CiCell::tristate_expr(ymuint pin_id) const
 {
-  assert_not_reached(__FILE__, __LINE__);
-  return LogExpr();
 }
 
-// @brief data_in 関数の取得
+// @brief 出力のトライステート条件関数を返す．
+// @param[in] pos 出力番号 ( 0 <= pos < output_num2() )
+// @note トライステートでない場合には定数0関数を返す．
+TvFunc
+CiCell::tristate_function(ymuint pos) const
+{
+  return cell_group()->tristate_function(pos);
+}
+
+// @brief FFセルの場合に次状態関数を表す論理式を返す．
+// @note それ以外の型の場合の返り値は不定
 LogExpr
-CiCell::data_in() const
+CiCell::next_state_expr() const
 {
-  assert_not_reached(__FILE__, __LINE__);
-  return LogExpr();
 }
 
-// @brief enable 関数の取得
+// @brief FFセルの場合に次状態関数を返す．
+// @note それ以外の型の場合の返り値は不定
+TvFunc
+CiCell::next_state_function() const
+{
+  return cell_group()->next_state_function();
+}
+
+// @brief FFセルの場合にクロックのアクティブエッジを表す論理式を返す．
+// @note それ以外の型の場合の返り値は不定
 LogExpr
-CiCell::enable() const
+CiCell::clock_expr() const
 {
-  assert_not_reached(__FILE__, __LINE__);
-  return LogExpr();
 }
 
-// @brief enable_also 関数の取得
+// @brief FFセルの場合にクロックのアクティブエッジを表す関数を返す．
+// @note それ以外の型の場合の返り値は不定
+TvFunc
+CiCell::clock_function() const
+{
+  return cell_group()->clock_function();
+}
+
+// @brief ラッチセルの場合にデータ入力関数を表す論理式を返す．
+// @note それ以外の型の場合の返り値は不定
 LogExpr
-CiCell::enable_also() const
+CiCell::data_in_expr() const
 {
-  assert_not_reached(__FILE__, __LINE__);
-  return LogExpr();
 }
 
-// @brief clocked_on_also 関数の取得
-// @note FFセルの時に意味を持つ．
+// @brief ラッチセルの場合にデータ入力関数を返す．
+// @note それ以外の型の場合の返り値は不定
+TvFunc
+CiCell::data_in_function() const
+{
+  return cell_group()->data_in_function();
+}
+
+// @brief ラッチセルの場合にイネーブル条件を表す論理式を返す．
+// @note それ以外の型の場合の返り値は不定
 LogExpr
-CiCell::clocked_on_also() const
+CiCell::enable_expr() const
 {
-  assert_not_reached(__FILE__, __LINE__);
-  return LogExpr();
 }
 
-// @brief clear 関数の取得
-// @note FFセルとラッチセルの時に意味を持つ．
+// @brief ラッチセルの場合にイネーブル条件を表す関数を返す．
+// @note それ以外の型の場合の返り値は不定
+TvFunc
+CiCell::enable_function() const
+{
+  return cell_group()->enable_function();
+}
+
+// @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
+bool
+CiCell::has_clear() const
+{
+  return cell_group()->has_clear();
+}
+
+// @brief FFセル/ラッチセルの場合にクリア条件を表す論理式を返す．
+// @note クリア端子がない場合の返り値は不定
 LogExpr
-CiCell::clear() const
+CiCell::clear_expr() const
 {
-  assert_not_reached(__FILE__, __LINE__);
-  return LogExpr();
 }
 
-// @brief preset 関数の取得
-// @note FFセルとラッチセルの時に意味を持つ．
+// @brief FFセル/ラッチセルの場合にクリア条件を表す関数を返す．
+// @note クリア端子がない場合の返り値は不定
+TvFunc
+CiCell::clear_function() const
+{
+  return cell_group()->clear_function();
+}
+
+// @brief FFセル/ラッチセルの場合にプリセット端子を持っていたら true を返す．
+bool
+CiCell::has_preset() const
+{
+  return cell_group()->has_preset();
+}
+
+// @brief FFセル/ラッチセルの場合にプリセット条件を表す論理式を返す．
+// @note プリセット端子がない場合の返り値は不定
 LogExpr
-CiCell::preset() const
+CiCell::preset_expr() const
 {
-  assert_not_reached(__FILE__, __LINE__);
-  return LogExpr();
 }
 
-// @brief clear_preset_var1 の取得
-// @retval 0 "L"
-// @retval 1 "H"
-// @note FFセルとラッチセルの時に意味を持つ．
-ymuint
-CiCell::clear_preset_var1() const
+// @brief FFセル/ラッチセルの場合にプリセット条件を表す関数を返す．
+// @note プリセット端子がない場合の返り値は不定
+TvFunc
+CiCell::preset_function() const
 {
-  assert_not_reached(__FILE__, __LINE__);
-  return 0;
+  return cell_group()->preset_function();
 }
-
-// @brief clear_preset_var2 の取得
-// @retval 0 "L"
-// @retval 1 "H"
-// @note FFセルとラッチセルの時に意味を持つ．
-ymuint
-CiCell::clear_preset_var2() const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return 0;
-}
-#endif
 
 // @brief 初期化する．
 // @param[in] id ID番号
@@ -473,4 +508,3 @@ CiCell::set_timing(ymuint opin_id,
 }
 
 END_NAMESPACE_YM_CELL
-

@@ -12,8 +12,7 @@
 #include "ym_networks/BdnDff.h"
 #include "ym_networks/CmnMgr.h"
 #include "ym_cell/Cell.h"
-#include "ym_cell/CellMgr.h"
-#include "ym_cell/CellPatMgr.h"
+#include "ym_cell/CellLibrary.h"
 #include "ym_cell/CellPatGraph.h"
 #include "ym_cell/CellClass.h"
 #include "ym_cell/CellGroup.h"
@@ -51,7 +50,7 @@ AreaCover::~AreaCover()
 // @param[out] mapnetwork マッピング結果
 void
 AreaCover::operator()(const BdnMgr& sbjgraph,
-		      const CellMgr& cell_mgr,
+		      const CellLibrary& cell_library,
 		      CmnMgr& mapnetwork)
 {
   if ( debug ) {
@@ -64,14 +63,14 @@ AreaCover::operator()(const BdnMgr& sbjgraph,
   maprec.init(sbjgraph);
 
   // FF のマッピングを行う．
-  ff_map(sbjgraph, cell_mgr, maprec);
+  ff_map(sbjgraph, cell_library, maprec);
 
   // マッピング結果を maprec に記録する．
-  record_cuts(sbjgraph, cell_mgr, maprec);
+  record_cuts(sbjgraph, cell_library, maprec);
 
   // maprec の情報から mapnetwork を生成する．
-  const Cell* c0_cell = cell_mgr.const0_func().cell(0);
-  const Cell* c1_cell = cell_mgr.const1_func().cell(0);
+  const Cell* c0_cell = cell_library.const0_func().cell(0);
+  const Cell* c1_cell = cell_library.const1_func().cell(0);
   maprec.gen_mapgraph(sbjgraph, c0_cell, c1_cell, mapnetwork);
 }
 
@@ -81,10 +80,10 @@ AreaCover::operator()(const BdnMgr& sbjgraph,
 // @param[in] maprec マッピング結果を保持するオブジェクト
 void
 AreaCover::ff_map(const BdnMgr& sbjgraph,
-		  const CellMgr& cell_mgr,
+		  const CellLibrary& cell_library,
 		  MapRecord& maprec)
 {
-  ymuint ffc_num = cell_mgr.ff_class_num();
+  ymuint ffc_num = cell_library.ff_class_num();
   const BdnDffList& dff_list = sbjgraph.dff_list();
   for (BdnDffList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
@@ -105,7 +104,7 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
       CellArea min_area = CellArea::infty();
       bool min_inv = false;
       for (ymuint i = 0; i < ffc_num; ++ i) {
-	const CellClass& ffc = cell_mgr.ff_class(i);
+	const CellClass& ffc = cell_library.ff_class(i);
 	bool pmatch = true;
 	bool nmatch = true;
 	if ( ffc.clear_sense() == 0 ) {
@@ -184,14 +183,14 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
 
 // @brief best cut の記録を行う．
 // @param[in] sbjgraph サブジェクトグラフ
-// @param[in] cell_mgr セルを管理するオブジェクト
+// @param[in] cell_library セルを管理するオブジェクト
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
 AreaCover::record_cuts(const BdnMgr& sbjgraph,
-		       const CellMgr& cell_mgr,
+		       const CellLibrary& cell_library,
 		       MapRecord& maprec)
 {
-  const CellPatMgr& pat_mgr = cell_mgr.pat_mgr();
+  const CellPatMgr& pat_mgr = cell_library.pat_mgr();
   ymuint n = sbjgraph.max_node_id();
   mCostArray.resize(n * 2);
   ymuint max_input = pat_mgr.max_input();
@@ -199,7 +198,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
   mLeafNum.clear();
   mLeafNum.resize(n, -1);
 
-  const CellFuncGroup& inv_func = cell_mgr.inv_func();
+  const CellFuncGroup& inv_func = cell_library.inv_func();
 
   // 入力のコストを設定
   const BdnNodeList& input_list = sbjgraph.input_list();
@@ -251,11 +250,11 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	  cout << "Match with Pat#" << pat_id
 	       << ", Rep#" << rep_id << endl;
 	}
-	const CellFuncClass& rep = cell_mgr.rep(rep_id);
+	const CellFuncClass& rep = cell_library.rep(rep_id);
 	ymuint nf = rep.func_num();
 	for (ymuint f_pos = 0; f_pos < nf; ++ f_pos) {
 	  ymuint func_id = rep.func_id(f_pos);
-	  const CellFuncGroup& func = cell_mgr.func_group(func_id);
+	  const CellFuncGroup& func = cell_library.func_group(func_id);
 	  const NpnMap& npn_map = func.npn_map();
 	  Match c_match(ni);
 	  for (ymuint i = 0; i < ni; ++ i) {

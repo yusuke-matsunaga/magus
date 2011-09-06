@@ -44,6 +44,13 @@ LdGroup::parent() const
   return mParent;
 }
 
+// @brief 親のクラスに対する変換マップを返す．
+const NpnMapM&
+LdGroup::map() const
+{
+  return mMap;
+}
+
 // @brief 実体を返す．
 const CellGroup*
 LdGroup::cell_group() const

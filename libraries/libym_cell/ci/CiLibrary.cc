@@ -190,7 +190,7 @@ CiLibrary::logic_class_num() const
 const CellClass&
 CiLibrary::logic_class(ymuint id) const
 {
-  return mLogicClassArray[id];
+  return *mLogicClassArray[id];
 }
 
 // @brief 論理セルグループの個数を返す．
@@ -205,7 +205,7 @@ CiLibrary::logic_group_num() const
 const CellGroup&
 CiLibrary::logic_group(ymuint id) const
 {
-  return mLogicGroupArray[id];
+  return *mLogicGroupArray[id];
 }
 
 // @brief 定数0セルのグループを返す．
@@ -213,28 +213,28 @@ const CellGroup&
 CiLibrary::const0_func() const
 {
   // 決め打ち
-  return mLogicGroupArray[0];
+  return *mLogicGroupArray[0];
 }
 
 // @brief 定数1セルのグループを返す．
 const CellGroup&
 CiLibrary::const1_func() const
 {
-  return mLogicGroupArray[1];
+  return *mLogicGroupArray[1];
 }
 
 // @brief バッファセルのグループを返す．
 const CellGroup&
 CiLibrary::buf_func() const
 {
-  return mLogicGroupArray[2];
+  return *mLogicGroupArray[2];
 }
 
 // @brief インバータセルのグループを返す．
 const CellGroup&
 CiLibrary::inv_func() const
 {
-  return mLogicGroupArray[3];
+  return *mLogicGroupArray[3];
 }
 
 // @brief FFセルクラスの個数を返す．
@@ -249,7 +249,7 @@ CiLibrary::ff_class_num() const
 const CellClass&
 CiLibrary::ff_class(ymuint id) const
 {
-  return mFFClassArray[id];
+  return *mFFClassArray[id];
 }
 
 // @brief FFセルグループの個数を返す．
@@ -264,7 +264,7 @@ CiLibrary::ff_group_num() const
 const CellGroup&
 CiLibrary::ff_group(ymuint id) const
 {
-  return mFFGroupArray[id];
+  return *mFFGroupArray[id];
 }
 
 // @brief 単純な型のFFクラスを返す．
@@ -282,7 +282,7 @@ CiLibrary::simple_ff_class(bool has_clear,
   if ( has_preset ) {
     pos += 2;
   }
-  return mFFClassArray[pos];
+  return *mFFClassArray[pos];
 }
 
 // @brief ラッチセルクラスの個数を返す．
@@ -297,7 +297,7 @@ CiLibrary::latch_class_num() const
 const CellClass&
 CiLibrary::latch_class(ymuint id) const
 {
-  return mLatchClassArray[id];
+  return *mLatchClassArray[id];
 }
 
 // @brief ラッチセルグループの個数を返す．
@@ -312,7 +312,7 @@ CiLibrary::latch_group_num() const
 const CellGroup&
 CiLibrary::latch_group(ymuint id) const
 {
-  return mLatchGroupArray[id];
+  return *mLatchGroupArray[id];
 }
 
 // @brief 単純な型のラッチクラスを返す．
@@ -330,7 +330,7 @@ CiLibrary::simple_latch_class(bool has_clear,
   if ( has_preset ) {
     pos += 2;
   }
-  return mLatchClassArray[pos];
+  return *mLatchClassArray[pos];
 }
 
 // @brief 総パタン数を返す．

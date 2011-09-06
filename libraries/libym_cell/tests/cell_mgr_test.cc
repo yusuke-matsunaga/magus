@@ -7,7 +7,6 @@
 /// All rights reserved.
 
 
-#include "ym_cell/CellMgr.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
 #include "ym_cell/CellLibrary.h"
@@ -32,6 +31,9 @@ dump_load_test(const char* in_filename,
     return false;
   }
 
+  display_library(cout, *library);
+
+#if 0
   {
     ofstream os;
     os.open(data_filename, ios::binary);
@@ -58,7 +60,7 @@ dump_load_test(const char* in_filename,
     cell_mgr.load_library(ifs);
   }
   dump(cout, cell_mgr);
-
+#endif
   return true;
 }
 
