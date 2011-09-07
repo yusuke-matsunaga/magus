@@ -34,7 +34,26 @@ class CiCell :
 protected:
 
   /// @brief コンストラクタ
-  CiCell();
+  /// @param[in] id ID番号
+  /// @param[in] name 名前
+  /// @param[in] area 面積
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] nio 入出力ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
+  /// @param[in] alloc メモリアロケータ
+  /// @param[in] logic_array 出力の論理式の配列
+  CiCell(ymuint id,
+	 const ShString& name,
+	 CellArea area,
+	 ymuint ni,
+	 ymuint no,
+	 ymuint nio,
+	 ymuint nb,
+	 ymuint nc,
+	 AllocBase& alloc,
+	 const vector<LogExpr>& logic_array);
 
   /// @brief デストラクタ
   virtual
@@ -332,27 +351,6 @@ public:
   // 設定用の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 初期化する．
-  /// @param[in] id ID番号
-  /// @param[in] name 名前
-  /// @param[in] area 面積
-  /// @param[in] ni 入力ピン数
-  /// @param[in] no 出力ピン数
-  /// @param[in] nio 入出力ピン数
-  /// @param[in] nb バス数
-  /// @param[in] nc バンドル数
-  /// @param[in] alloc メモリアロケータ
-  void
-  init(ymuint id,
-       const ShString& name,
-       CellArea area,
-       ymuint ni,
-       ymuint no,
-       ymuint nio,
-       ymuint nb,
-       ymuint nc,
-       AllocBase& alloc);
-
   /// @brief タイミング情報を設定する．
   /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
   /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
@@ -393,9 +391,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // セルグループ
-  CellGroup* mCellGroup;
 
   // ID番号
   ymuint32 mId;
@@ -440,25 +435,12 @@ private:
   // サイズは(入力数＋入出力数) x (出力数+入出力ピン数)  x 2
   CiTiming** mTimingArray;
 
+  // セルグループ
+  CellGroup* mCellGroup;
+
   // 出力の論理式を格納する配列
   // サイズは output_num2()
   LogExpr* mLogicArray;
-
-  // 出力のトライステート条件を格納する配列
-  // サイズは output_num2()
-  LogExpr* mTristateArray;
-
-  // next_state 論理式 / data_in 論理式
-  LogExpr mNextState;
-
-  // clock 論理式 / enable 論理式
-  LogExpr mClock;
-
-  // clear 論理式
-  LogExpr mClear;
-
-  // preset 論理式
-  LogExpr mPreset;
 
 };
 

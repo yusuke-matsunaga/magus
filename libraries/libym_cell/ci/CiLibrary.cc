@@ -11,6 +11,10 @@
 #include "CiClass.h"
 #include "CiGroup.h"
 #include "CiCell.h"
+#include "CiLogicCell.h"
+#include "CiTriCell.h"
+#include "CiFFCell.h"
+#include "CiLatchCell.h"
 #include "CiPin.h"
 #include "CiTiming.h"
 
@@ -163,7 +167,7 @@ CiLibrary::cell_num() const
 const Cell*
 CiLibrary::cell(ymuint pos) const
 {
-  return &mCellArray[pos];
+  return mCellArray[pos];
 }
 
 // @brief 名前からのセルの取得
@@ -468,8 +472,8 @@ void
 CiLibrary::set_cell_num(ymuint num)
 {
   mCellNum = num;
-  void* p = mAlloc.get_memory(sizeof(CiCell) * num);
-  mCellArray = new (p) CiCell[num];
+  void* p = mAlloc.get_memory(sizeof(CiCell*) * num);
+  mCellArray = new (p) CiCell*[num];
 }
 
 // @brief 論理セルを生成する．
@@ -481,19 +485,227 @@ CiLibrary::set_cell_num(ymuint num)
 // @param[in] nio 入出力ピン数
 // @param[in] nb バス数
 // @param[in] nc バンドル数
+// @param[in] logic_array 出力の論理式の配列
 // @return セルへのポインタを返す．
 CiCell*
-CiLibrary::new_cell(ymuint cell_id,
-		    ShString name,
-		    CellArea area,
-		    ymuint ni,
-		    ymuint no,
-		    ymuint nio,
-		    ymuint nb,
-		    ymuint nc)
+CiLibrary::new_logic_cell(ymuint cell_id,
+			  ShString name,
+			  CellArea area,
+			  ymuint ni,
+			  ymuint no,
+			  ymuint nio,
+			  ymuint nb,
+			  ymuint nc,
+			  const vector<LogExpr>& logic_array)
 {
-  CiCell* cell = &mCellArray[cell_id];
-  cell->init(cell_id, name, area, ni, no, nio, nb, nc, mAlloc);
+  void* p = mAlloc.get_memory(sizeof(CiLogicCell));
+  CiCell* cell = new (p) CiLogicCell(cell_id, name, area,
+				     ni, no, nio, nb, nc,
+				     mAlloc,
+				     logic_array);
+  mCellArray[cell_id] = cell;
+
+  return cell;
+}
+
+// @brief トライステートセルを生成する．
+// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+// @param[in] name 名前
+// @param[in] area 面積
+// @param[in] ni 入力ピン数
+// @param[in] no 出力ピン数
+// @param[in] nio 入出力ピン数
+// @param[in] nb バス数
+// @param[in] nc バンドル数
+// @param[in] logic_array 出力の論理式の配列
+// @param[in] tristate_array トライステート条件の論理式の配列
+// @return セルへのポインタを返す．
+CiCell*
+CiLibrary::new_tristate_cell(ymuint cell_id,
+			     ShString name,
+			     CellArea area,
+			     ymuint ni,
+			     ymuint no,
+			     ymuint nio,
+			     ymuint nb,
+			     ymuint nc,
+			     const vector<LogExpr>& logic_array,
+			     const vector<LogExpr>& tristate_array)
+{
+  void* p = mAlloc.get_memory(sizeof(CiTriCell));
+  CiCell* cell = new (p) CiTriCell(cell_id, name, area,
+				   ni, no, nio, nb, nc,
+				   mAlloc,
+				   logic_array, tristate_array);
+  mCellArray[cell_id] = cell;
+
+  return cell;
+}
+
+// @brief FFセルを生成する．
+// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+// @param[in] name 名前
+// @param[in] area 面積
+// @param[in] ni 入力ピン数
+// @param[in] no 出力ピン数
+// @param[in] nio 入出力ピン数
+// @param[in] nb バス数
+// @param[in] nc バンドル数
+// @param[in] logic_array 出力の論理式の配列
+// @param[in] next_state "next_state" 関数の式
+// @param[in] clocked_on "clocked_on" 関数の式
+// @param[in] clear "clear" 関数の式
+// @param[in] preset "preset" 関数の式
+// @return セルへのポインタを返す．
+CiCell*
+CiLibrary::new_ff_cell(ymuint cell_id,
+		       ShString name,
+		       CellArea area,
+		       ymuint ni,
+		       ymuint no,
+		       ymuint nio,
+		       ymuint nb,
+		       ymuint nc,
+		       const vector<LogExpr>& logic_array,
+		       const LogExpr& next_state,
+		       const LogExpr& clocked_on,
+		       const LogExpr& clear,
+		       const LogExpr& preset)
+{
+  bool has_clear = !clear.is_zero();
+  bool has_preset = !preset.is_zero();
+
+  CiCell* cell = NULL;
+  if ( has_clear ) {
+    if ( has_preset ) {
+      void* p = mAlloc.get_memory(sizeof(CiFFSRCell));
+      cell = new (p) CiFFSRCell(cell_id, name, area,
+				ni, no, nio, nb, nc,
+				mAlloc,
+				logic_array,
+				next_state,
+				clocked_on,
+				clear,
+				preset);
+    }
+    else {
+      void* p = mAlloc.get_memory(sizeof(CiFFRCell));
+      cell = new (p) CiFFRCell(cell_id, name, area,
+			       ni, no, nio, nb, nc,
+			       mAlloc,
+			       logic_array,
+			       next_state,
+			       clocked_on,
+			       clear);
+    }
+  }
+  else {
+    if ( has_preset ) {
+      void* p = mAlloc.get_memory(sizeof(CiFFSCell));
+      cell = new (p) CiFFSCell(cell_id, name, area,
+			       ni, no, nio, nb, nc,
+			       mAlloc,
+			       logic_array,
+			       next_state,
+			       clocked_on,
+			       preset);
+    }
+    else {
+      void* p = mAlloc.get_memory(sizeof(CiFFCell));
+      cell = new (p) CiFFCell(cell_id, name, area,
+			      ni, no, nio, nb, nc,
+			      mAlloc,
+			      logic_array,
+			      next_state,
+			      clocked_on);
+    }
+
+  }
+  mCellArray[cell_id] = cell;
+
+  return cell;
+}
+
+// @brief ラッチセルを生成する．
+// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+// @param[in] name 名前
+// @param[in] area 面積
+// @param[in] ni 入力ピン数
+// @param[in] no 出力ピン数
+// @param[in] nio 入出力ピン数
+// @param[in] nb バス数
+// @param[in] nc バンドル数
+/// @param[in] logic_array 出力の論理式の配列
+// @param[in] data_in "data_in" 関数の式
+// @param[in] enable "enable" 関数の式
+// @param[in] clear "clear" 関数の式
+// @param[in] preset "preset" 関数の式
+// @return セルへのポインタを返す．
+CiCell*
+CiLibrary::new_latch_cell(ymuint cell_id,
+			  ShString name,
+			  CellArea area,
+			  ymuint ni,
+			  ymuint no,
+			  ymuint nio,
+			  ymuint nb,
+			  ymuint nc,
+			  const vector<LogExpr>& logic_array,
+			  const LogExpr& data_in,
+			  const LogExpr& enable,
+			  const LogExpr& clear,
+			  const LogExpr& preset)
+{
+  bool has_clear = !clear.is_zero();
+  bool has_preset = !preset.is_zero();
+
+  CiCell* cell = NULL;
+  if ( has_clear ) {
+    if ( has_preset ) {
+      void* p = mAlloc.get_memory(sizeof(CiLatchSRCell));
+      cell = new (p) CiLatchSRCell(cell_id, name, area,
+				   ni, no, nio, nb, nc,
+				   mAlloc,
+				   logic_array,
+				   data_in,
+				   enable,
+				   clear,
+				   preset);
+    }
+    else {
+      void* p = mAlloc.get_memory(sizeof(CiLatchRCell));
+      cell = new (p) CiLatchRCell(cell_id, name, area,
+				  ni, no, nio, nb, nc,
+				  mAlloc,
+				  logic_array,
+				  data_in,
+				  enable,
+				  clear);
+    }
+  }
+  else {
+    if ( has_preset ) {
+      void* p = mAlloc.get_memory(sizeof(CiLatchSCell));
+      cell = new (p) CiLatchSCell(cell_id, name, area,
+				  ni, no, nio, nb, nc,
+				  mAlloc,
+				  logic_array,
+				  data_in,
+				  enable,
+				  preset);
+    }
+    else {
+      void* p = mAlloc.get_memory(sizeof(CiLatchCell));
+      cell = new (p) CiLatchCell(cell_id, name, area,
+				 ni, no, nio, nb, nc,
+				 mAlloc,
+				 logic_array,
+				 data_in,
+				 enable);
+    }
+
+  }
+  mCellArray[cell_id] = cell;
 
   return cell;
 }

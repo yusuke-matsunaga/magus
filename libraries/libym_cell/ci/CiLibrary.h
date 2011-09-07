@@ -375,7 +375,7 @@ public:
   void
   set_cell_num(ymuint num);
 
-  /// @brief セルを生成する．
+  /// @brief 論理セルを生成する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] name 名前
   /// @param[in] area 面積
@@ -384,16 +384,102 @@ public:
   /// @param[in] nio 入出力ピン数
   /// @param[in] nb バス数
   /// @param[in] nc バンドル数
+  /// @param[in] logic_array 出力の論理式の配列
   /// @return セルへのポインタを返す．
   CiCell*
-  new_cell(ymuint cell_id,
-	   ShString name,
-	   CellArea area,
-	   ymuint ni,
-	   ymuint no,
-	   ymuint nio,
-	   ymuint nb,
-	   ymuint nc);
+  new_logic_cell(ymuint cell_id,
+		 ShString name,
+		 CellArea area,
+		 ymuint ni,
+		 ymuint no,
+		 ymuint nio,
+		 ymuint nb,
+		 ymuint nc,
+		 const vector<LogExpr>& logic_array);
+
+  /// @brief トライステートセルを生成する．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] name 名前
+  /// @param[in] area 面積
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] nio 入出力ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
+  /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristate_array トライステート条件の論理式の配列
+  /// @return セルへのポインタを返す．
+  CiCell*
+  new_tristate_cell(ymuint cell_id,
+		    ShString name,
+		    CellArea area,
+		    ymuint ni,
+		    ymuint no,
+		    ymuint nio,
+		    ymuint nb,
+		    ymuint nc,
+		    const vector<LogExpr>& logic_array,
+		    const vector<LogExpr>& tristate_array);
+
+  /// @brief FFセルを生成する．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] name 名前
+  /// @param[in] area 面積
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] nio 入出力ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
+  /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] next_state "next_state" 関数の式
+  /// @param[in] clocked_on "clocked_on" 関数の式
+  /// @param[in] clear "clear" 関数の式
+  /// @param[in] preset "preset" 関数の式
+  /// @return セルへのポインタを返す．
+  CiCell*
+  new_ff_cell(ymuint cell_id,
+	      ShString name,
+	      CellArea area,
+	      ymuint ni,
+	      ymuint no,
+	      ymuint nio,
+	      ymuint nb,
+	      ymuint nc,
+	      const vector<LogExpr>& logic_array,
+	      const LogExpr& next_state,
+	      const LogExpr& clocked_on,
+	      const LogExpr& clear,
+	      const LogExpr& preset);
+
+  /// @brief ラッチセルを生成する．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] name 名前
+  /// @param[in] area 面積
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] nio 入出力ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
+  /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] data_in "data_in" 関数の式
+  /// @param[in] enable "enable" 関数の式
+  /// @param[in] clear "clear" 関数の式
+  /// @param[in] preset "preset" 関数の式
+  /// @return セルへのポインタを返す．
+  CiCell*
+  new_latch_cell(ymuint cell_id,
+		 ShString name,
+		 CellArea area,
+		 ymuint ni,
+		 ymuint no,
+		 ymuint nio,
+		 ymuint nb,
+		 ymuint nc,
+		 const vector<LogExpr>& logic_array,
+		 const LogExpr& data_in,
+		 const LogExpr& enable,
+		 const LogExpr& clear,
+		 const LogExpr& preset);
 
 #if 0
   /// @brief FFセルを生成する．
@@ -609,8 +695,8 @@ private:
   // セル数
   ymuint32 mCellNum;
 
-  // セルの配列
-  CiCell* mCellArray;
+  // セルのポインタの配列
+  CiCell** mCellArray;
 
   // 論理セルクラスの数
   ymuint32 mLogicClassNum;

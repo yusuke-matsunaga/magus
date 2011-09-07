@@ -129,11 +129,11 @@ gen_library(const DotlibNode* dt_library)
     ymuint nbus = dt_bus_list.size();
     ymuint nbundle = dt_bundle_list.size();
 
-    // ピン名とピン番号の連想配列
-    hash_map<ShString, ymuint> pin_map;
-
     // ピン情報の配列
     vector<DotlibPin> pin_info_array(npin);
+
+    // ピン名とピン番号の連想配列
+    hash_map<ShString, ymuint> pin_map;
 
     // ピン情報の読み出し
     ymuint ni = 0;
@@ -153,87 +153,164 @@ gen_library(const DotlibNode* dt_library)
 	  continue;
 	}
 
-	ShString pin_name = pin_info.name();
-	pin_map.insert(make_pair(pin_name, pin_id));
-
+	// 各タイプの個数のカウント
 	switch ( pin_info.direction() ) {
-	case DotlibPin::kInput:  ++ ni; break;
-	case DotlibPin::kOutput: ++ no; break;
-	case DotlibPin::kInout:  ++ nio; break;
-	case DotlibPin::kInternal: break; // どうする？
+	case DotlibPin::kInput:
+	  ++ ni;
+	  break;
+
+	case DotlibPin::kOutput:
+	  ++ no;
+	  break;
+
+	case DotlibPin::kInout:
+	  ++ nio;
+	  break;
+
 	default:
-	  assert_not_reached(__FILE__, __LINE__);
 	  break;
 	}
+
+	// ピン名とピン番号の対応づけを行う．
+	ShString pin_name = pin_info.name();
+	pin_map.insert(make_pair(pin_name, pin_id));
       }
       if ( error ) {
 	continue;
       }
     }
 
+    // FF情報の読み出し
     const DotlibNode* dt_ff = cell_info.ff();
-    const DotlibNode* dt_latch = cell_info.latch();
-
-    // セルの生成
-    CiCell* cell = library->new_cell(cell_id, cell_name, area,
-				     ni, no, nio, nbus, nbundle);
-
-    if ( dt_ff ) {
-      DotlibFF ff_info;
+    DotlibFF ff_info;
+    if ( dt_ff != NULL ) {
       if ( !dt_ff->get_ff_info(ff_info) ) {
 	continue;
       }
       ShString var1 = ff_info.var1_name();
       ShString var2 = ff_info.var2_name();
-      LogExpr next_state = dot2expr(ff_info.next_state(), pin_map);
-      LogExpr clocked_on = dot2expr(ff_info.clocked_on(), pin_map);
-      LogExpr clocked_on_also = dot2expr(ff_info.clocked_on_also(), pin_map);
-      LogExpr clear = dot2expr(ff_info.clear(), pin_map);
-      LogExpr preset = dot2expr(ff_info.preset(), pin_map);
-      ymuint v1 = ff_info.clear_preset_var1();
-      ymuint v2 = ff_info.clear_preset_var2();
-
-#if 0
-      cell = library->new_ff_cell(cell_id, cell_name, area,
-				  ni, no, nio, nbus, nbundle,
-				  var1, var2,
-				  next_state, clocked_on, clocked_on_also,
-				  clear, preset, v1, v2);
-#endif
       // pin_map に登録しておく
       pin_map.insert(make_pair(var1, npin));
       pin_map.insert(make_pair(var2, npin + 1));
     }
-    else if ( dt_latch ) {
-      DotlibLatch latch_info;
+
+    // ラッチ情報の読み出し
+    const DotlibNode* dt_latch = cell_info.latch();
+    DotlibLatch latch_info;
+    if ( dt_latch != NULL) {
       if ( !dt_latch->get_latch_info(latch_info) ) {
 	continue;
       }
       ShString var1 = latch_info.var1_name();
       ShString var2 = latch_info.var2_name();
+      // pin_map に登録しておく
+      pin_map.insert(make_pair(var1, npin));
+      pin_map.insert(make_pair(var2, npin + 1));
+    }
+
+    // 出力ピン(入出力ピン)の論理式を作る．
+    vector<LogExpr> logic_array;
+    vector<LogExpr> tristate_array;
+    logic_array.reserve(npin);
+    tristate_array.reserve(npin);
+    bool has_tristate = false;
+    for (ymuint i = 0; i < npin; ++ i) {
+      DotlibPin& pin_info = pin_info_array[i];
+      switch ( pin_info.direction() ) {
+      case DotlibPin::kOutput:
+	{
+	  const DotlibNode* func_node = pin_info.function();
+	  if ( func_node ) {
+	    LogExpr expr = dot2expr(func_node, pin_map);
+	    logic_array.push_back(expr);
+	  }
+	  else {
+	    logic_array.push_back(LogExpr::make_zero());
+	  }
+	  const DotlibNode* three_state = pin_info.three_state();
+	  if ( three_state ) {
+	    has_tristate = true;
+	    LogExpr expr = dot2expr(three_state, pin_map);
+	    tristate_array.push_back(expr);
+	  }
+	  else {
+	    tristate_array.push_back(LogExpr::make_zero());
+	  }
+	}
+	break;
+
+      case DotlibPin::kInout:
+	{
+	  const DotlibNode* func_node = pin_info.function();
+	  if ( func_node ) {
+	    LogExpr expr = dot2expr(func_node, pin_map);
+	    logic_array.push_back(expr);
+	  }
+	  else {
+	    logic_array.push_back(LogExpr::make_zero());
+	  }
+	  const DotlibNode* three_state = pin_info.three_state();
+	  if ( three_state ) {
+	    has_tristate = true;
+	    LogExpr expr = dot2expr(three_state, pin_map);
+	    tristate_array.push_back(expr);
+	  }
+	  else {
+	    tristate_array.push_back(LogExpr::make_zero());
+	  }
+	}
+	break;
+
+      default:
+	break;
+      }
+    }
+
+    // セルの生成
+    CiCell* cell = NULL;
+
+    if ( dt_ff ) {
+      LogExpr next_state = dot2expr(ff_info.next_state(), pin_map);
+      LogExpr clocked_on = dot2expr(ff_info.clocked_on(), pin_map);
+      LogExpr clocked_on_also = dot2expr(ff_info.clocked_on_also(), pin_map);
+      LogExpr clear = dot2expr(ff_info.clear(), pin_map);
+      LogExpr preset = dot2expr(ff_info.preset(), pin_map);
+#if 0
+      ymuint v1 = ff_info.clear_preset_var1();
+      ymuint v2 = ff_info.clear_preset_var2();
+#endif
+      cell = library->new_ff_cell(cell_id, cell_name, area,
+				  ni, no, nio, nbus, nbundle,
+				  logic_array,
+				  next_state, clocked_on,
+				  clear, preset);
+
+    }
+    else if ( dt_latch ) {
       LogExpr data_in = dot2expr(latch_info.data_in(), pin_map);
       LogExpr enable = dot2expr(latch_info.enable(), pin_map);
       LogExpr enable_also = dot2expr(latch_info.enable_also(), pin_map);
       LogExpr clear = dot2expr(latch_info.clear(), pin_map);
       LogExpr preset = dot2expr(latch_info.preset(), pin_map);
+#if 0
       ymuint v1 = latch_info.clear_preset_var1();
       ymuint v2 = latch_info.clear_preset_var2();
-#if 0
+#endif
       cell = library->new_latch_cell(cell_id, cell_name, area,
 				     ni, no, nio, nbus, nbundle,
-				     var1, var2,
-				     data_in, enable, enable_also,
-				     clear, preset, v1, v2);
-#endif
-      // pin_map に登録しておく
-      pin_map.insert(make_pair(var1, npin));
-      pin_map.insert(make_pair(var2, npin + 1));
+				     logic_array,
+				     data_in, enable,
+				     clear, preset);
+    }
+    else if ( has_tristate ) {
+      cell = library->new_tristate_cell(cell_id, cell_name, area,
+					ni, no, nio, nbus, nbundle,
+					logic_array, tristate_array);
     }
     else {
-#if 0
       cell = library->new_logic_cell(cell_id, cell_name, area,
-				     ni, no, nio, nbus, nbundle);
-#endif
+				     ni, no, nio, nbus, nbundle,
+				     logic_array);
     }
 
     // ピンの生成
@@ -266,6 +343,7 @@ gen_library(const DotlibNode* dt_library)
 				   max_fanout, min_fanout,
 				   max_capacitance, min_capacitance,
 				   max_transition, min_transition);
+#if 0
 	  const DotlibNode* func_node = pin_info.function();
 	  if ( func_node ) {
 	    LogExpr expr = dot2expr(func_node, pin_map);
@@ -355,6 +433,7 @@ gen_library(const DotlibNode* dt_library)
 	    LogExpr expr = dot2expr(three_state, pin_map);
 	    cell->set_tristate_expr(o_pos, expr);
 	  }
+#endif
 	}
 	++ o_pos;
 	break;

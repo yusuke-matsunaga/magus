@@ -22,19 +22,64 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CiCell::CiCell() :
-  mCellGroup(NULL),
-  mInputNum(0),
-  mInputArray(NULL),
-  mOutputNum(0),
-  mOutputArray(NULL),
-  mInoutNum(0),
-  mInoutArray(NULL),
-  mBusNum(0),
-  mBusArray(NULL),
-  mBundleNum(0),
-  mBundleArray(NULL)
+// @param[in] id ID番号
+// @param[in] name 名前
+// @param[in] area 面積
+// @param[in] ni 入力ピン数
+// @param[in] no 出力ピン数
+// @param[in] nio 入出力ピン数
+// @param[in] nb バス数
+// @param[in] nc バンドル数
+// @param[in] alloc メモリアロケータ
+// @param[in] logic_array 出力の論理式の配列
+CiCell::CiCell(ymuint id,
+	       const ShString& name,
+	       CellArea area,
+	       ymuint ni,
+	       ymuint no,
+	       ymuint nio,
+	       ymuint nb,
+	       ymuint nc,
+	       AllocBase& alloc,
+	       const vector<LogExpr>& logic_array)
 {
+  mId = id;
+  mName = name;
+  mArea = area;
+
+  mInputNum = ni;
+  void* p = alloc.get_memory(sizeof(CiPin*) * ni);
+  mInputArray = new (p) CiPin*[ni];
+
+  mOutputNum = no;
+  void* q = alloc.get_memory(sizeof(CiPin*) * no);
+  mOutputArray = new (q) CiPin*[no];
+
+  mInoutNum = nio;
+  void* r = alloc.get_memory(sizeof(CiPin*) * nio);
+  mInoutArray = new (r) CiPin*[nio];
+
+  ymuint n = (ni + nio) * (no + nio) * 2;
+  void* s = alloc.get_memory(sizeof(const CiTiming*) * n);
+  mTimingArray = new (s) CiTiming*[n];
+  for (ymuint i = 0; i < n; ++ i) {
+    mTimingArray[i] = NULL;
+  }
+
+  // バス，バンドル関係は未完
+
+  mBusNum = nb;
+
+  mBundleNum = nc;
+
+  ymuint no2 = no + nio;
+
+  void* t = alloc.get_memory(sizeof(LogExpr) * no2);
+  mLogicArray = new (t) LogExpr[no2];
+
+  for (ymuint i = 0; i < no2; ++ i) {
+    mLogicArray[i] = logic_array[i];
+  }
 }
 
 // @brief デストラクタ
@@ -222,7 +267,7 @@ CiCell::cell_group() const
 bool
 CiCell::is_logic() const
 {
-  return cell_group()->is_logic();
+  return false;
 }
 
 // @brief トライステートセルの場合に true を返す．
@@ -231,28 +276,28 @@ CiCell::is_logic() const
 bool
 CiCell::is_tristate() const
 {
-  return cell_group()->is_tristate();
+  return false;
 }
 
 // @brief FFセルの時に true を返す．
 bool
 CiCell::is_ff() const
 {
-  return cell_group()->is_ff();
+  return false;
 }
 
 // @brief ラッチセルの時に true を返す．
 bool
 CiCell::is_latch() const
 {
-  return cell_group()->is_latch();
+  return false;
 }
 
 // @brief 順序セル(非FF/非ラッチ)の場合に true を返す．
 bool
 CiCell::is_seq() const
 {
-  return cell_group()->is_seq();
+  return false;
 }
 
 // @brief 論理セルの場合に出力の論理式を返す．
@@ -281,7 +326,7 @@ CiCell::logic_function(ymuint pos) const
 LogExpr
 CiCell::tristate_expr(ymuint pin_id) const
 {
-  return mTristateArray[pin_id];
+  return LogExpr::make_zero();
 }
 
 // @brief 出力のトライステート条件関数を返す．
@@ -298,7 +343,7 @@ CiCell::tristate_function(ymuint pos) const
 LogExpr
 CiCell::next_state_expr() const
 {
-  return mNextState;
+  return LogExpr::make_zero();
 }
 
 // @brief FFセルの場合に次状態関数を返す．
@@ -314,7 +359,7 @@ CiCell::next_state_function() const
 LogExpr
 CiCell::clock_expr() const
 {
-  return mClock;
+  return LogExpr::make_zero();
 }
 
 // @brief FFセルの場合にクロックのアクティブエッジを表す関数を返す．
@@ -330,7 +375,7 @@ CiCell::clock_function() const
 LogExpr
 CiCell::data_in_expr() const
 {
-  return mNextState;
+  return LogExpr::make_zero();
 }
 
 // @brief ラッチセルの場合にデータ入力関数を返す．
@@ -346,7 +391,7 @@ CiCell::data_in_function() const
 LogExpr
 CiCell::enable_expr() const
 {
-  return mClock;
+  return LogExpr::make_zero();
 }
 
 // @brief ラッチセルの場合にイネーブル条件を表す関数を返す．
@@ -361,7 +406,7 @@ CiCell::enable_function() const
 bool
 CiCell::has_clear() const
 {
-  return cell_group()->has_clear();
+  return false;
 }
 
 // @brief FFセル/ラッチセルの場合にクリア条件を表す論理式を返す．
@@ -369,7 +414,7 @@ CiCell::has_clear() const
 LogExpr
 CiCell::clear_expr() const
 {
-  return mClear;
+  return LogExpr::make_zero();
 }
 
 // @brief FFセル/ラッチセルの場合にクリア条件を表す関数を返す．
@@ -384,7 +429,7 @@ CiCell::clear_function() const
 bool
 CiCell::has_preset() const
 {
-  return cell_group()->has_preset();
+  return false;
 }
 
 // @brief FFセル/ラッチセルの場合にプリセット条件を表す論理式を返す．
@@ -392,7 +437,7 @@ CiCell::has_preset() const
 LogExpr
 CiCell::preset_expr() const
 {
-  return mPreset;
+  return LogExpr::make_zero();
 }
 
 // @brief FFセル/ラッチセルの場合にプリセット条件を表す関数を返す．
@@ -401,66 +446,6 @@ TvFunc
 CiCell::preset_function() const
 {
   return cell_group()->preset_function();
-}
-
-// @brief 初期化する．
-// @param[in] id ID番号
-// @param[in] name 名前
-// @param[in] area 面積
-// @param[in] ni 入力ピン数
-// @param[in] no 出力ピン数
-// @param[in] nio 入出力ピン数
-// @param[in] nb バス数
-// @param[in] nc バンドル数
-// @param[in] alloc メモリアロケータ
-void
-CiCell::init(ymuint id,
-	     const ShString& name,
-	     CellArea area,
-	     ymuint ni,
-	     ymuint no,
-	     ymuint nio,
-	     ymuint nb,
-	     ymuint nc,
-	     AllocBase& alloc)
-{
-  mId = id;
-  mName = name;
-  mArea = area;
-
-  mInputNum = ni;
-  void* p = alloc.get_memory(sizeof(CiPin*) * ni);
-  mInputArray = new (p) CiPin*[ni];
-
-  mOutputNum = no;
-  void* q = alloc.get_memory(sizeof(CiPin*) * no);
-  mOutputArray = new (q) CiPin*[no];
-
-  mInoutNum = nio;
-  void* r = alloc.get_memory(sizeof(CiPin*) * nio);
-  mInoutArray = new (r) CiPin*[nio];
-
-
-  ymuint n = (ni + nio) * (no + nio) * 2;
-  void* s = alloc.get_memory(sizeof(const CiTiming*) * n);
-  mTimingArray = new (s) CiTiming*[n];
-  for (ymuint i = 0; i < n; ++ i) {
-    mTimingArray[i] = NULL;
-  }
-
-  // バス，バンドル関係は未完
-
-  mBusNum = nb;
-
-  mBundleNum = nc;
-
-  ymuint no2 = no + nio;
-
-  void* t = alloc.get_memory(sizeof(LogExpr) * no2);
-  mLogicArray = new (t) LogExpr[no2];
-
-  void* u = alloc.get_memory(sizeof(LogExpr) * no2);
-  mTristateArray = new (u) LogExpr[no2];
 }
 
 // @brief タイミング情報を設定する．
@@ -520,8 +505,7 @@ void
 CiCell::set_tristate_expr(ymuint opin_id,
 			  const LogExpr& expr)
 {
-  assert_cond( opin_id < output_num2(), __FILE__, __LINE__);
-  mTristateArray[opin_id] = expr;
+  assert_not_reached(__FILE__, __LINE__);
 }
 
 END_NAMESPACE_YM_CELL

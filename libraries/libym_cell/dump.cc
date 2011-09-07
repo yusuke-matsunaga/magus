@@ -221,8 +221,42 @@ display_library(ostream& s,
   ymuint n = library.cell_num();
   for (ymuint i = 0; i < n; ++ i) {
     const Cell* cell = library.cell(i);
-    s << "Cell#" << cell->id() << " (" << cell->name() << ")" << endl;
+    s << "Cell#" << cell->id() << " (" << cell->name() << ") : ";
+    if ( cell->is_logic() ) {
+      s << "Combinational Logic";
+    }
+    else if ( cell->is_tristate() ) {
+      s << "Tristate Logic";
+    }
+    else if ( cell->is_ff() ) {
+      s << "Flip-Flop";
+    }
+    else if ( cell->is_latch() ) {
+      s << "Latch";
+    }
+    s << endl;
     s << "  area = " << cell->area() << endl;
+
+    if ( cell->is_ff() ) {
+      s << "  Next State         = " << cell->next_state_expr() << endl
+	<< "  Clock              = " << cell->clock_expr() << endl;
+      if ( cell->has_clear() ) {
+	s << "  Clear              = " << cell->clear_expr() << endl;
+      }
+      if ( cell->has_preset() ) {
+	s << "  Preset             = " << cell->preset_expr() << endl;
+      }
+    }
+    if ( cell->is_latch() ) {
+      s << "  Data In            = " << cell->data_in_expr() << endl
+	<< "  Enable             = " << cell->enable_expr() << endl;
+      if ( cell->has_clear() ) {
+	s << "  Clear              = " << cell->clear_expr() << endl;
+      }
+      if ( cell->has_preset() ) {
+	s << "  Preset             = " << cell->preset_expr() << endl;
+      }
+    }
 
     ymuint ni = cell->input_num();
     for (ymuint ipos = 0; ipos < ni; ++ ipos) {
@@ -237,8 +271,11 @@ display_library(ostream& s,
     for (ymuint opos = 0; opos < no; ++ opos) {
       const CellPin* pin = cell->output(opos);
       s << "  Output#" << opos << ": " << pin->name()
-	<< " = " << cell->logic_expr(opos) << endl
-	<< "    Max Fanout       = " << pin->max_fanout() << endl
+	<< " = " << cell->logic_expr(opos) << endl;
+      if ( !cell->tristate_expr(opos).is_zero() ) {
+	s << "    Tristate         = " << cell->tristate_expr(opos) << endl;
+      }
+      s << "    Max Fanout       = " << pin->max_fanout() << endl
 	<< "    Min Fanout       = " << pin->min_fanout() << endl
 	<< "    Max Capacitance  = " << pin->max_capacitance() << endl
 	<< "    Min Capacitance  = " << pin->min_capacitance() << endl
