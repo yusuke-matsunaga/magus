@@ -36,6 +36,7 @@ private:
   /// @param[in] nc バンドル数
   /// @param[in] alloc メモリアロケータ
   /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristated_array トライステート条件の論理式の配列
   CiLogicCell(ymuint id,
 	      const ShString& name,
 	      CellArea area,
@@ -45,7 +46,8 @@ private:
 	      ymuint nb,
 	      ymuint nc,
 	      AllocBase& alloc,
-	      const vector<LogExpr>& logic_array);
+	      const vector<LogExpr>& logic_array,
+	      const vector<LogExpr>& tristate_array);
 
   /// @brief デストラクタ
   virtual

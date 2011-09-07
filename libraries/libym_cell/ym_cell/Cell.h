@@ -183,13 +183,6 @@ public:
   bool
   is_logic() const = 0;
 
-  /// @brief トライステートセルの場合に true を返す．
-  /// @note もちろん論理セルでもある．
-  /// @note 複数出力のうち1つでもトライステートなら true を返す．
-  virtual
-  bool
-  is_tristate() const = 0;
-
   /// @brief FFセルの時に true を返す．
   virtual
   bool
@@ -222,7 +215,6 @@ public:
   /// @brief トライステートセルの場合にトライステート条件式を返す．
   /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
   /// @note 論理式中の変数番号は入力ピン番号に対応する．
-  /// @note is_tristate() が true の時のみ意味を持つ．
   /// @note 通常の論理セルの場合には定数0を返す．
   virtual
   LogExpr

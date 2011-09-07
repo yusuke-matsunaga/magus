@@ -32,6 +32,7 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] nc バンドル数
 // @param[in] alloc メモリアロケータ
 // @param[in] logic_array 出力の論理式の配列
+// @param[in] tristated_array トライステート条件の論理式の配列
 CiCell::CiCell(ymuint id,
 	       const ShString& name,
 	       CellArea area,
@@ -41,7 +42,8 @@ CiCell::CiCell(ymuint id,
 	       ymuint nb,
 	       ymuint nc,
 	       AllocBase& alloc,
-	       const vector<LogExpr>& logic_array)
+	       const vector<LogExpr>& logic_array,
+	       const vector<LogExpr>& tristate_array)
 {
   mId = id;
   mName = name;
@@ -77,8 +79,12 @@ CiCell::CiCell(ymuint id,
   void* t = alloc.get_memory(sizeof(LogExpr) * no2);
   mLogicArray = new (t) LogExpr[no2];
 
+  void* u = alloc.get_memory(sizeof(LogExpr) * no2);
+  mTristateArray = new (u) LogExpr[no2];
+
   for (ymuint i = 0; i < no2; ++ i) {
     mLogicArray[i] = logic_array[i];
+    mTristateArray[i] = tristate_array[i];
   }
 }
 
@@ -270,15 +276,6 @@ CiCell::is_logic() const
   return false;
 }
 
-// @brief トライステートセルの場合に true を返す．
-// @note もちろん論理セルでもある．
-// @note 複数出力のうち1つでもトライステートなら true を返す．
-bool
-CiCell::is_tristate() const
-{
-  return false;
-}
-
 // @brief FFセルの時に true を返す．
 bool
 CiCell::is_ff() const
@@ -321,12 +318,11 @@ CiCell::logic_function(ymuint pos) const
 // @brief トライステートセルの場合にトライステート条件式を返す．
 // @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
 // @note 論理式中の変数番号は入力ピン番号に対応する．
-// @note is_tristate() が true の時のみ意味を持つ．
 // @note 通常の論理セルの場合には定数0を返す．
 LogExpr
 CiCell::tristate_expr(ymuint pin_id) const
 {
-  return LogExpr::make_zero();
+  return mTristateArray[pin_id];
 }
 
 // @brief 出力のトライステート条件関数を返す．

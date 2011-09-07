@@ -27,6 +27,7 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] nc バンドル数
 // @param[in] alloc メモリアロケータ
 // @param[in] logic_array 出力の論理式の配列
+// @param[in] tristate_array トライステート条件の論理式の配列
 // @param[in] next_state "next_state" 関数の式
 // @param[in] clocked_on "clocked_on" 関数の式
 CiFFCell::CiFFCell(ymuint id,
@@ -39,9 +40,11 @@ CiFFCell::CiFFCell(ymuint id,
 		   ymuint nc,
 		   AllocBase& alloc,
 		   const vector<LogExpr>& logic_array,
+		   const vector<LogExpr>& tristate_array,
 		   const LogExpr& next_state,
 		   const LogExpr& clocked_on) :
-  CiCell(id, name, area, ni, no, nio, nb, nc, alloc, logic_array),
+  CiCell(id, name, area, ni, no, nio, nb, nc, alloc,
+	 logic_array, tristate_array),
   mNextState(next_state),
   mClock(clocked_on)
 {
@@ -91,6 +94,7 @@ CiFFCell::clock_expr() const
 // @param[in] nc バンドル数
 // @param[in] alloc メモリアロケータ
 // @param[in] logic_array 出力の論理式の配列
+// @param[in] tristate_array トライステート条件の論理式の配列
 // @param[in] next_state "next_state" 関数の式
 // @param[in] clocked_on "clocked_on" 関数の式
 // @param[in] clear "clear" 関数の式
@@ -104,10 +108,12 @@ CiFFRCell::CiFFRCell(ymuint id,
 		     ymuint nc,
 		     AllocBase& alloc,
 		     const vector<LogExpr>& logic_array,
+		     const vector<LogExpr>& tristate_array,
 		     const LogExpr& next_state,
 		     const LogExpr& clocked_on,
 		     const LogExpr& clear) :
-  CiFFCell(id, name, area, ni, no, nio, nb, nc, alloc, logic_array,
+  CiFFCell(id, name, area, ni, no, nio, nb, nc, alloc,
+	   logic_array, tristate_array,
 	   next_state, clocked_on),
   mClear(clear)
 {
@@ -149,6 +155,7 @@ CiFFRCell::clear_expr() const
 // @param[in] nc バンドル数
 // @param[in] alloc メモリアロケータ
 // @param[in] logic_array 出力の論理式の配列
+// @param[in] tristate_array トライステート条件の論理式の配列
 // @param[in] next_state "next_state" 関数の式
 // @param[in] clocked_on "clocked_on" 関数の式
 // @param[in] preset "preset" 関数の式
@@ -162,10 +169,12 @@ CiFFSCell::CiFFSCell(ymuint id,
 		     ymuint nc,
 		     AllocBase& alloc,
 		     const vector<LogExpr>& logic_array,
+		     const vector<LogExpr>& tristate_array,
 		     const LogExpr& next_state,
 		     const LogExpr& clocked_on,
 		     const LogExpr& preset) :
-  CiFFCell(id, name, area, ni, no, nio, nb, nc, alloc, logic_array,
+  CiFFCell(id, name, area, ni, no, nio, nb, nc, alloc,
+	   logic_array, tristate_array,
 	   next_state, clocked_on),
   mPreset(preset)
 {
@@ -207,6 +216,7 @@ CiFFSCell::preset_expr() const
 // @param[in] nc バンドル数
 // @param[in] alloc メモリアロケータ
 // @param[in] logic_array 出力の論理式の配列
+// @param[in] tristate_array トライステート条件の論理式の配列
 // @param[in] next_state "next_state" 関数の式
 // @param[in] clocked_on "clocked_on" 関数の式
 // @param[in] clear "clear" 関数の式
@@ -221,11 +231,13 @@ CiFFSRCell::CiFFSRCell(ymuint id,
 		       ymuint nc,
 		       AllocBase& alloc,
 		       const vector<LogExpr>& logic_array,
+		       const vector<LogExpr>& tristate_array,
 		       const LogExpr& next_state,
 		       const LogExpr& clocked_on,
 		       const LogExpr& clear,
 		       const LogExpr& preset) :
-  CiFFRCell(id, name, area, ni, no, nio, nb, nc, alloc, logic_array,
+  CiFFRCell(id, name, area, ni, no, nio, nb, nc, alloc,
+	    logic_array, tristate_array,
 	    next_state, clocked_on, clear),
   mPreset(preset)
 {

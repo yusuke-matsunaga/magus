@@ -36,6 +36,7 @@ protected:
   /// @param[in] nc バンドル数
   /// @param[in] alloc メモリアロケータ
   /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristated_array トライステート条件の論理式の配列
   /// @param[in] data_in "data_in" 関数の式
   /// @param[in] enable "enable" 関数の式
   CiLatchCell(ymuint id,
@@ -48,6 +49,7 @@ protected:
 	      ymuint nc,
 	      AllocBase& alloc,
 	      const vector<LogExpr>& logic_array,
+	      const vector<LogExpr>& tristate_array,
 	      const LogExpr& data_in,
 	      const LogExpr& enable);
 
@@ -115,6 +117,7 @@ protected:
   /// @param[in] nc バンドル数
   /// @param[in] alloc メモリアロケータ
   /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristated_array トライステート条件の論理式の配列
   /// @param[in] data_in "data_in" 関数の式
   /// @param[in] enable "enable" 関数の式
   /// @param[in] clear "clear" 関数の式
@@ -128,6 +131,7 @@ protected:
 	       ymuint nc,
 	       AllocBase& alloc,
 	       const vector<LogExpr>& logic_array,
+	       const vector<LogExpr>& tristate_array,
 	       const LogExpr& data_in,
 	       const LogExpr& enable,
 	       const LogExpr& clear);
@@ -187,6 +191,7 @@ protected:
   /// @param[in] nc バンドル数
   /// @param[in] alloc メモリアロケータ
   /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristated_array トライステート条件の論理式の配列
   /// @param[in] data_in "data_in" 関数の式
   /// @param[in] enable "enable" 関数の式
   /// @param[in] preset "preset" 関数の式
@@ -200,6 +205,7 @@ protected:
 	       ymuint nc,
 	       AllocBase& alloc,
 	       const vector<LogExpr>& logic_array,
+	       const vector<LogExpr>& tristate_array,
 	       const LogExpr& data_in,
 	       const LogExpr& enable,
 	       const LogExpr& preset);
@@ -259,6 +265,7 @@ protected:
   /// @param[in] nc バンドル数
   /// @param[in] alloc メモリアロケータ
   /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristated_array トライステート条件の論理式の配列
   /// @param[in] data_in "data_in" 関数の式
   /// @param[in] enable "enable" 関数の式
   /// @param[in] clear "clear" 関数の式
@@ -273,6 +280,7 @@ protected:
 		ymuint nc,
 		AllocBase& alloc,
 		const vector<LogExpr>& logic_array,
+		const vector<LogExpr>& tristate_array,
 		const LogExpr& data_in,
 		const LogExpr& enable,
 		const LogExpr& clear,

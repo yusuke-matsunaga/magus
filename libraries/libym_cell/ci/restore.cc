@@ -35,11 +35,12 @@ restore_library(istream& s)
     ymuint nb = BinIO::read_32(s);
     ymuint nc = BinIO::read_32(s);
     vector<LogExpr> logic_array(no + nio);
+    vector<LogExpr> tristate_array(no + nio);
     CiCell* cell = NULL;
     switch ( type ) {
     case 0: // kLogic
       cell = library->new_logic_cell(i, name, area, ni, no, nio, nb, nc,
-				     logic_array);
+				     logic_array, tristate_array);
       break;
 
     case 1: // kFF

@@ -225,9 +225,6 @@ display_library(ostream& s,
     if ( cell->is_logic() ) {
       s << "Combinational Logic";
     }
-    else if ( cell->is_tristate() ) {
-      s << "Tristate Logic";
-    }
     else if ( cell->is_ff() ) {
       s << "Flip-Flop";
     }
@@ -251,7 +248,7 @@ display_library(ostream& s,
       s << "  Data In            = " << cell->data_in_expr() << endl
 	<< "  Enable             = " << cell->enable_expr() << endl;
       if ( cell->has_clear() ) {
-	s << "  Clear              = " << cell->clear_expr() << endl;
+	s << "p  Clear              = " << cell->clear_expr() << endl;
       }
       if ( cell->has_preset() ) {
 	s << "  Preset             = " << cell->preset_expr() << endl;

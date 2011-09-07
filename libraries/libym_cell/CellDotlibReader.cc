@@ -213,7 +213,6 @@ gen_library(const DotlibNode* dt_library)
     vector<LogExpr> tristate_array;
     logic_array.reserve(npin);
     tristate_array.reserve(npin);
-    bool has_tristate = false;
     for (ymuint i = 0; i < npin; ++ i) {
       DotlibPin& pin_info = pin_info_array[i];
       switch ( pin_info.direction() ) {
@@ -229,7 +228,6 @@ gen_library(const DotlibNode* dt_library)
 	  }
 	  const DotlibNode* three_state = pin_info.three_state();
 	  if ( three_state ) {
-	    has_tristate = true;
 	    LogExpr expr = dot2expr(three_state, pin_map);
 	    tristate_array.push_back(expr);
 	  }
@@ -251,7 +249,6 @@ gen_library(const DotlibNode* dt_library)
 	  }
 	  const DotlibNode* three_state = pin_info.three_state();
 	  if ( three_state ) {
-	    has_tristate = true;
 	    LogExpr expr = dot2expr(three_state, pin_map);
 	    tristate_array.push_back(expr);
 	  }
@@ -281,7 +278,7 @@ gen_library(const DotlibNode* dt_library)
 #endif
       cell = library->new_ff_cell(cell_id, cell_name, area,
 				  ni, no, nio, nbus, nbundle,
-				  logic_array,
+				  logic_array, tristate_array,
 				  next_state, clocked_on,
 				  clear, preset);
 
@@ -298,19 +295,14 @@ gen_library(const DotlibNode* dt_library)
 #endif
       cell = library->new_latch_cell(cell_id, cell_name, area,
 				     ni, no, nio, nbus, nbundle,
-				     logic_array,
+				     logic_array, tristate_array,
 				     data_in, enable,
 				     clear, preset);
-    }
-    else if ( has_tristate ) {
-      cell = library->new_tristate_cell(cell_id, cell_name, area,
-					ni, no, nio, nbus, nbundle,
-					logic_array, tristate_array);
     }
     else {
       cell = library->new_logic_cell(cell_id, cell_name, area,
 				     ni, no, nio, nbus, nbundle,
-				     logic_array);
+				     logic_array, tristate_array);
     }
 
     // ピンの生成

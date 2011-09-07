@@ -27,6 +27,7 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] nc バンドル数
 // @param[in] alloc メモリアロケータ
 // @param[in] logic_array 出力の論理式の配列
+// @param[in] tristated_array トライステート条件の論理式の配列
 CiLogicCell::CiLogicCell(ymuint id,
 			 const ShString& name,
 			 CellArea area,
@@ -36,8 +37,10 @@ CiLogicCell::CiLogicCell(ymuint id,
 			 ymuint nb,
 			 ymuint nc,
 			 AllocBase& alloc,
-			 const vector<LogExpr>& logic_array) :
-  CiCell(id, name, area, ni, no, nio, nb, nc, alloc, logic_array)
+			 const vector<LogExpr>& logic_array,
+			 const vector<LogExpr>& tristate_array) :
+  CiCell(id, name, area, ni, no, nio, nb, nc, alloc,
+	 logic_array, tristate_array)
 {
 }
 

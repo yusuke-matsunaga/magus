@@ -486,6 +486,7 @@ CiLibrary::set_cell_num(ymuint num)
 // @param[in] nb バス数
 // @param[in] nc バンドル数
 // @param[in] logic_array 出力の論理式の配列
+// @param[in] tristate_array トライステート条件の論理式の配列
 // @return セルへのポインタを返す．
 CiCell*
 CiLibrary::new_logic_cell(ymuint cell_id,
@@ -496,47 +497,15 @@ CiLibrary::new_logic_cell(ymuint cell_id,
 			  ymuint nio,
 			  ymuint nb,
 			  ymuint nc,
-			  const vector<LogExpr>& logic_array)
+			  const vector<LogExpr>& logic_array,
+			  const vector<LogExpr>& tristate_array)
 {
   void* p = mAlloc.get_memory(sizeof(CiLogicCell));
   CiCell* cell = new (p) CiLogicCell(cell_id, name, area,
 				     ni, no, nio, nb, nc,
 				     mAlloc,
-				     logic_array);
-  mCellArray[cell_id] = cell;
-
-  return cell;
-}
-
-// @brief トライステートセルを生成する．
-// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
-// @param[in] name 名前
-// @param[in] area 面積
-// @param[in] ni 入力ピン数
-// @param[in] no 出力ピン数
-// @param[in] nio 入出力ピン数
-// @param[in] nb バス数
-// @param[in] nc バンドル数
-// @param[in] logic_array 出力の論理式の配列
-// @param[in] tristate_array トライステート条件の論理式の配列
-// @return セルへのポインタを返す．
-CiCell*
-CiLibrary::new_tristate_cell(ymuint cell_id,
-			     ShString name,
-			     CellArea area,
-			     ymuint ni,
-			     ymuint no,
-			     ymuint nio,
-			     ymuint nb,
-			     ymuint nc,
-			     const vector<LogExpr>& logic_array,
-			     const vector<LogExpr>& tristate_array)
-{
-  void* p = mAlloc.get_memory(sizeof(CiTriCell));
-  CiCell* cell = new (p) CiTriCell(cell_id, name, area,
-				   ni, no, nio, nb, nc,
-				   mAlloc,
-				   logic_array, tristate_array);
+				     logic_array,
+				     tristate_array);
   mCellArray[cell_id] = cell;
 
   return cell;
@@ -552,6 +521,7 @@ CiLibrary::new_tristate_cell(ymuint cell_id,
 // @param[in] nb バス数
 // @param[in] nc バンドル数
 // @param[in] logic_array 出力の論理式の配列
+// @param[in] tristate_array トライステート条件の論理式の配列
 // @param[in] next_state "next_state" 関数の式
 // @param[in] clocked_on "clocked_on" 関数の式
 // @param[in] clear "clear" 関数の式
@@ -567,6 +537,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 		       ymuint nb,
 		       ymuint nc,
 		       const vector<LogExpr>& logic_array,
+		       const vector<LogExpr>& tristate_array,
 		       const LogExpr& next_state,
 		       const LogExpr& clocked_on,
 		       const LogExpr& clear,
@@ -583,6 +554,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 				ni, no, nio, nb, nc,
 				mAlloc,
 				logic_array,
+				tristate_array,
 				next_state,
 				clocked_on,
 				clear,
@@ -594,6 +566,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 			       ni, no, nio, nb, nc,
 			       mAlloc,
 			       logic_array,
+			       tristate_array,
 			       next_state,
 			       clocked_on,
 			       clear);
@@ -606,6 +579,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 			       ni, no, nio, nb, nc,
 			       mAlloc,
 			       logic_array,
+			       tristate_array,
 			       next_state,
 			       clocked_on,
 			       preset);
@@ -616,6 +590,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 			      ni, no, nio, nb, nc,
 			      mAlloc,
 			      logic_array,
+			      tristate_array,
 			      next_state,
 			      clocked_on);
     }
@@ -635,7 +610,8 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 // @param[in] nio 入出力ピン数
 // @param[in] nb バス数
 // @param[in] nc バンドル数
-/// @param[in] logic_array 出力の論理式の配列
+// @param[in] logic_array 出力の論理式の配列
+// @param[in] tristate_array トライステート条件の論理式の配列
 // @param[in] data_in "data_in" 関数の式
 // @param[in] enable "enable" 関数の式
 // @param[in] clear "clear" 関数の式
@@ -651,6 +627,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 			  ymuint nb,
 			  ymuint nc,
 			  const vector<LogExpr>& logic_array,
+			  const vector<LogExpr>& tristate_array,
 			  const LogExpr& data_in,
 			  const LogExpr& enable,
 			  const LogExpr& clear,
@@ -667,6 +644,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 				   ni, no, nio, nb, nc,
 				   mAlloc,
 				   logic_array,
+				   tristate_array,
 				   data_in,
 				   enable,
 				   clear,
@@ -678,6 +656,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 				  ni, no, nio, nb, nc,
 				  mAlloc,
 				  logic_array,
+				  tristate_array,
 				  data_in,
 				  enable,
 				  clear);
@@ -690,6 +669,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 				  ni, no, nio, nb, nc,
 				  mAlloc,
 				  logic_array,
+				  tristate_array,
 				  data_in,
 				  enable,
 				  preset);
@@ -700,10 +680,10 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 				 ni, no, nio, nb, nc,
 				 mAlloc,
 				 logic_array,
+				 tristate_array,
 				 data_in,
 				 enable);
     }
-
   }
   mCellArray[cell_id] = cell;
 

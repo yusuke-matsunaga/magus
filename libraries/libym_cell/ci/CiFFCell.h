@@ -36,6 +36,7 @@ protected:
   /// @param[in] nc バンドル数
   /// @param[in] alloc メモリアロケータ
   /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristate_array トライステート条件の論理式の配列
   /// @param[in] next_state "next_state" 関数の式
   /// @param[in] clocked_on "clocked_on" 関数の式
   CiFFCell(ymuint id,
@@ -48,6 +49,7 @@ protected:
 	   ymuint nc,
 	   AllocBase& alloc,
 	   const vector<LogExpr>& logic_array,
+	   const vector<LogExpr>& tristate_array,
 	   const LogExpr& next_state,
 	   const LogExpr& clocked_on);
 
@@ -115,6 +117,7 @@ protected:
   /// @param[in] nc バンドル数
   /// @param[in] alloc メモリアロケータ
   /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristate_array トライステート条件の論理式の配列
   /// @param[in] next_state "next_state" 関数の式
   /// @param[in] clocked_on "clocked_on" 関数の式
   /// @param[in] clear "clear" 関数の式
@@ -128,6 +131,7 @@ protected:
 	    ymuint nc,
 	    AllocBase& alloc,
 	    const vector<LogExpr>& logic_array,
+	    const vector<LogExpr>& tristate_array,
 	    const LogExpr& next_state,
 	    const LogExpr& clocked_on,
 	    const LogExpr& clear);
@@ -187,6 +191,7 @@ protected:
   /// @param[in] nc バンドル数
   /// @param[in] alloc メモリアロケータ
   /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristate_array トライステート条件の論理式の配列
   /// @param[in] next_state "next_state" 関数の式
   /// @param[in] clocked_on "clocked_on" 関数の式
   /// @param[in] preset "preset" 関数の式
@@ -200,6 +205,7 @@ protected:
 	    ymuint nc,
 	    AllocBase& alloc,
 	    const vector<LogExpr>& logic_array,
+	    const vector<LogExpr>& tristate_array,
 	    const LogExpr& next_state,
 	    const LogExpr& clocked_on,
 	    const LogExpr& preset);
@@ -259,6 +265,7 @@ protected:
   /// @param[in] nc バンドル数
   /// @param[in] alloc メモリアロケータ
   /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristate_array トライステート条件の論理式の配列
   /// @param[in] next_state "next_state" 関数の式
   /// @param[in] clocked_on "clocked_on" 関数の式
   /// @param[in] clear "clear" 関数の式
@@ -273,6 +280,7 @@ protected:
 	     ymuint nc,
 	     AllocBase& alloc,
 	     const vector<LogExpr>& logic_array,
+	     const vector<LogExpr>& tristate_array,
 	     const LogExpr& next_state,
 	     const LogExpr& clocked_on,
 	     const LogExpr& clear,
