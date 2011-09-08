@@ -12,7 +12,6 @@
 #include "CiGroup.h"
 #include "CiCell.h"
 #include "CiLogicCell.h"
-#include "CiTriCell.h"
 #include "CiFFCell.h"
 #include "CiLatchCell.h"
 #include "CiPin.h"
