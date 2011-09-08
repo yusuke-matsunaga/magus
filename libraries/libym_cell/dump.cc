@@ -18,25 +18,6 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
-BEGIN_NONAMESPACE
-
-/// @brief タイミング情報を書き出す．
-/// @param[in] s 出力先のストリーム
-/// @param[in] timing タイミング情報
-void
-dump_timing(ostream& s,
-	    const CellTiming* timing)
-{
-  BinIO::write_double(s, timing->intrinsic_rise().value());
-  BinIO::write_double(s, timing->intrinsic_fall().value());
-  BinIO::write_double(s, timing->slope_rise().value());
-  BinIO::write_double(s, timing->slope_fall().value());
-  BinIO::write_double(s, timing->rise_resistance().value());
-  BinIO::write_double(s, timing->fall_resistance().value());
-}
-
-END_NONAMESPACE
-
 /// @brief 内容をバイナリダンプする．
 /// @param[in] s 出力先のストリーム
 /// @param[in] library セルライブラリ
@@ -44,49 +25,73 @@ void
 dump_library(ostream& s,
 	     const CellLibrary& library)
 {
+  BinO bos(s);
+
   // 名前
-  BinIO::write_str(s, library.name());
+  bos << library.name();
 
   // セル数
-  ymuint nc = library.cell_num();
-  BinIO::write_32(s, nc);
+  ymuint32 nc = library.cell_num();
+  bos << nc;
   for (ymuint i = 0; i < nc; ++ i) {
     const Cell* cell = library.cell(i);
-#if 0
-    ymuint tid = 0;
-    switch ( cell->type() ) {
-    case Cell::kLogic: tid = 0; break;
-    case Cell::kFF:    tid = 1; break;
-    case Cell::kLatch: tid = 2; break;
-    case Cell::kFSM:   tid = 3; break;
-    default: assert_not_reached(__FILE__, __LINE__); break;
+    ymuint8 tid = 0;
+    if ( cell->is_logic() ) {
+      tid = 0;
     }
-    BinIO::write_8(s, tid);
-#endif
-    BinIO::write_str(s, cell->name());
-    BinIO::write_double(s, cell->area().value());
+    else if ( cell->is_ff() ) {
+      tid = 1;
+    }
+    else if ( cell->is_latch() ) {
+      tid = 2;
+    }
+    else if ( cell->is_seq() ) {
+      tid = 3;
+    }
+    else {
+      // 無視？
+      assert_not_reached(__FILE__, __LINE__);
+    }
+    ymuint32 ni = cell->input_num();
+    ymuint32 no = cell->output_num();
+    ymuint32 nio = cell->inout_num();
+    ymuint32 nbus = cell->bus_num();
+    ymuint32 nbundle = cell->bundle_num();
 
-    ymuint ni = cell->input_num();
-    BinIO::write_32(s, ni);
+    bos << tid
+	<< cell->name()
+	<< cell->area().value()
+	<< ni
+	<< no
+	<< nio
+	<< nbus
+	<< nbundle;
 
-    ymuint no = cell->output_num();
-    BinIO::write_32(s, no);
+    ymuint no2 = no + nio;
+    for (ymuint opos = 0; opos < no2; ++ opos) {
+      bos << cell->logic_expr(opos)
+	  << cell->tristate_expr(opos);
+    }
 
-    ymuint nio = cell->output_num();
-    BinIO::write_32(s, nio);
-
-    ymuint nb = cell->bus_num();
-    BinIO::write_32(s, nb);
-
-    ymuint nc = cell->bundle_num();
-    BinIO::write_32(s, nc);
+    if ( cell->is_ff() ) {
+      bos << cell->next_state_expr()
+	  << cell->clock_expr()
+	  << cell->clear_expr()
+	  << cell->preset_expr();
+    }
+    else if ( cell->is_latch() ) {
+      bos << cell->data_in_expr()
+	  << cell->enable_expr()
+	  << cell->clear_expr()
+	  << cell->preset_expr();
+    }
 
     // タイミング情報のID -> 通し番号のマップ
-    hash_map<ymuint, ymuint> timing_map;
+    hash_map<ymuint32, ymuint32> timing_map;
     // タイミング情報のリスト
     vector<const CellTiming*> timing_list;
-    for (ymuint ipos = 0; ipos < ni + nio; ++ ipos) {
-      for (ymuint opos = 0; opos < no + nio; ++ opos) {
+    for (ymuint32 ipos = 0; ipos < ni + nio; ++ ipos) {
+      for (ymuint32 opos = 0; opos < no + nio; ++ opos) {
 	const CellTiming* timing_p = cell->timing(ipos, opos, kCellPosiUnate);
 	if ( timing_p ) {
 	  if ( timing_map.count(timing_p->id()) == 0 ) {
@@ -105,79 +110,80 @@ dump_library(ostream& s,
 	}
       }
     }
-    ymuint nt = timing_list.size();
-    BinIO::write_32(s, nt);
-    for (ymuint j = 0; j < nt; ++ j) {
+    ymuint32 nt = timing_list.size();
+    bos << nt;
+    for (ymuint32 j = 0; j < nt; ++ j) {
       const CellTiming* timing = timing_list[j];
-      dump_timing(s, timing);
+      s << timing->intrinsic_rise().value()
+	<< timing->intrinsic_fall().value()
+	<< timing->slope_rise().value()
+	<< timing->slope_fall().value()
+	<< timing->rise_resistance().value()
+	<< timing->fall_resistance().value();
     }
 
     // 入力ピンのダンプ
-    for (ymuint ipin = 0; ipin < ni; ++ ipin) {
+    for (ymuint32 ipin = 0; ipin < ni; ++ ipin) {
       const CellPin* pin = cell->input(ipin);
-      BinIO::write_str(s, pin->name());
-      // Input のつもり
-      BinIO::write_8(s, 1);
-      BinIO::write_double(s, pin->capacitance().value());
-      BinIO::write_double(s, pin->rise_capacitance().value());
-      BinIO::write_double(s, pin->fall_capacitance().value());
+      bos << pin->name()
+	  << pin->capacitance().value()
+	  << pin->rise_capacitance().value()
+	  << pin->fall_capacitance().value();
     }
+
     // 出力ピンのダンプ
-    for (ymuint opin = 0; opin < no; ++ opin) {
+    for (ymuint32 opin = 0; opin < no; ++ opin) {
       const CellPin* pin = cell->output(opin);
-      BinIO::write_str(s, pin->name());
-      // Output のつもり
-      BinIO::write_8(s, 2);
-      BinIO::write_double(s, pin->max_fanout().value());
-      BinIO::write_double(s, pin->min_fanout().value());
-      BinIO::write_double(s, pin->max_capacitance().value());
-      BinIO::write_double(s, pin->min_capacitance().value());
-      BinIO::write_double(s, pin->max_transition().value());
-      BinIO::write_double(s, pin->min_transition().value());
+      bos << pin->name()
+	  << pin->max_fanout().value()
+	  << pin->min_fanout().value()
+	  << pin->max_capacitance().value()
+	  << pin->min_capacitance().value()
+	  << pin->max_transition().value()
+	  << pin->min_transition().value();
     }
+
     // 入出力ピンのダンプ
-    for (ymuint iopin = 0; iopin < nio; ++ iopin) {
+    for (ymuint32 iopin = 0; iopin < nio; ++ iopin) {
       const CellPin* pin = cell->output(iopin);
-      BinIO::write_str(s, pin->name());
-      // Inout のつもり
-      BinIO::write_8(s, 3);
-      BinIO::write_double(s, pin->capacitance().value());
-      BinIO::write_double(s, pin->rise_capacitance().value());
-      BinIO::write_double(s, pin->fall_capacitance().value());
-      BinIO::write_double(s, pin->max_fanout().value());
-      BinIO::write_double(s, pin->min_fanout().value());
-      BinIO::write_double(s, pin->max_capacitance().value());
-      BinIO::write_double(s, pin->min_capacitance().value());
-      BinIO::write_double(s, pin->max_transition().value());
-      BinIO::write_double(s, pin->min_transition().value());
+      bos << pin->name()
+	  << pin->capacitance().value()
+	  << pin->rise_capacitance().value()
+	  << pin->fall_capacitance().value()
+	  << pin->max_fanout().value()
+	  << pin->min_fanout().value()
+	  << pin->max_capacitance().value()
+	  << pin->min_capacitance().value()
+	  << pin->max_transition().value()
+	  << pin->min_transition().value();
     }
+
     // タイミング情報のダンプ
-    for (ymuint ipin = 0; ipin < ni + nio; ++ ipin) {
-      for (ymuint opin = 0; opin < no + nio; ++ opin) {
+    for (ymuint32 ipin = 0; ipin < ni + nio; ++ ipin) {
+      for (ymuint32 opin = 0; opin < no + nio; ++ opin) {
 	const CellTiming* timing_p = cell->timing(ipin, opin, kCellPosiUnate);
 	if ( timing_p ) {
-	  hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_p->id());
+	  hash_map<ymuint, ymuint32>::iterator p = timing_map.find(timing_p->id());
 	  assert_cond( p != timing_map.end(), __FILE__, __LINE__);
-	  BinIO::write_8(s, 1);
-	  BinIO::write_32(s, ipin);
-	  BinIO::write_32(s, opin);
-	  BinIO::write_32(s, p->second);
+	  bos << static_cast<ymuint8>(1)
+	      << ipin
+	      << opin
+	      << p->second;
 	}
 	const CellTiming* timing_n = cell->timing(ipin, opin, kCellNegaUnate);
 	if ( timing_n ) {
 	  hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_n->id());
 	  assert_cond( p != timing_map.end(), __FILE__, __LINE__);
-	  BinIO::write_8(s, 1);
-	  BinIO::write_32(s, ipin);
-	  BinIO::write_32(s, opin);
-	  BinIO::write_32(s, p->second);
+	  bos << static_cast<ymuint8>(0)
+	      << ipin
+	      << opin
+	      << p->second;
 	}
       }
     }
-    BinIO::write_32(s, 0); // timing 情報が終わった印
+    bos << static_cast<ymuint8>(0);
   }
 }
-
 
 BEGIN_NONAMESPACE
 

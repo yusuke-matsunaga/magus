@@ -638,4 +638,124 @@ LogExpr::stream_to_expr(istream& in,
   }
 }
 
+
+BEGIN_NONAMESPACE
+
+// 論理式をバイナリダンプする．
+void
+write_expr(ostream& s,
+	   const LogExpr& expr)
+{
+  if ( expr.is_zero() ) {
+    BinIO::write_8(s, 0);
+    return;
+  }
+  if ( expr.is_one() ) {
+    BinIO::write_8(s, 1);
+    return;
+  }
+  if ( expr.is_posiliteral() ) {
+    BinIO::write_8(s, 2);
+    BinIO::write_32(s, expr.varid());
+    return;
+  }
+  if ( expr.is_negaliteral() ) {
+    BinIO::write_8(s, 3);
+    BinIO::write_32(s, expr.varid());
+    return;
+  }
+
+  // 残りは論理演算ノード
+  if ( expr.is_and() ) {
+    BinIO::write_8(s, 4);
+  }
+  else if ( expr.is_or() ) {
+    BinIO::write_8(s, 5);
+  }
+  else if ( expr.is_xor() ) {
+    BinIO::write_8(s, 6);
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
+  }
+
+  ymuint nc = expr.child_num();
+  BinIO::write_32(s, nc);
+  for (ymuint i = 0; i < nc; ++ i) {
+    write_expr(s, expr.child(i));
+  }
+}
+
+// バイナリストリームから論理式を作る．
+LogExpr
+read_expr(istream& s)
+{
+  ymuint type = BinIO::read_8(s);
+  switch ( type ) {
+  case 0:
+    return LogExpr::make_zero();
+
+  case 1:
+    return LogExpr::make_one();
+
+  case 2:
+    return LogExpr::make_posiliteral(BinIO::read_32(s));
+
+  case 3:
+    return LogExpr::make_negaliteral(BinIO::read_32(s));
+  }
+
+  // 残りは論理演算
+  ymuint nc = BinIO::read_32(s);
+  vector<LogExpr> child_list(nc);
+  for (ymuint i = 0; i < nc; ++ i) {
+    child_list[i] = read_expr(s);
+  }
+
+  switch ( type ) {
+  case 4:
+    return LogExpr::make_and(child_list);
+
+  case 5:
+    return LogExpr::make_or(child_list);
+
+  case 6:
+    return LogExpr::make_xor(child_list);
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+  }
+
+  // ダミー
+  return LogExpr::make_zero();
+}
+
+END_NONAMESPACE
+
+// @relates LogExpr
+// @brief 論理式の内容のバイナリ出力
+// @param[in] s 出力ストリーム
+// @param[in] expr 論理式
+// @return s
+BinO&
+operator<<(BinO& s,
+	   const LogExpr& expr)
+{
+  write_expr(s.s(), expr);
+  return s;
+}
+
+// @relates LogExpr
+// @brief 論理式の内容のバイナリ入力
+// @param[in] s 入力ストリーム
+// @param[out] expr 論理式
+// @return s
+BinI&
+operator>>(BinI& s,
+	   LogExpr& expr)
+{
+  expr = read_expr(s.s());
+  return s;
+}
+
 END_NAMESPACE_YM_LEXP

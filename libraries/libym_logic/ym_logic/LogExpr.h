@@ -11,6 +11,7 @@
 
 #include "ym_logic/lexp_nsdef.h"
 #include "ym_logic/Literal.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -596,6 +597,24 @@ compare_type(const LogExpr& src1,
 ostream&
 operator<<(ostream& s,
 	   const LogExpr& expr);
+
+/// @relates LogExpr
+/// @brief 論理式の内容のバイナリ出力
+/// @param[in] s 出力ストリーム
+/// @param[in] expr 論理式
+/// @return s
+BinO&
+operator<<(BinO& s,
+	   const LogExpr& expr);
+
+/// @relates LogExpr
+/// @brief 論理式の内容のバイナリ入力
+/// @param[in] s 入力ストリーム
+/// @param[out] expr 論理式
+/// @return s
+BinI&
+operator>>(BinI& s,
+	   LogExpr& expr);
 
 
 //////////////////////////////////////////////////////////////////////
