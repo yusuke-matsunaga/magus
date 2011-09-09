@@ -272,16 +272,15 @@ gen_library(const DotlibNode* dt_library)
       LogExpr clocked_on_also = dot2expr(ff_info.clocked_on_also(), pin_map);
       LogExpr clear = dot2expr(ff_info.clear(), pin_map);
       LogExpr preset = dot2expr(ff_info.preset(), pin_map);
-#if 0
       ymuint v1 = ff_info.clear_preset_var1();
       ymuint v2 = ff_info.clear_preset_var2();
-#endif
       cell = library->new_ff_cell(cell_id, cell_name, area,
 				  ni, no, nio, nbus, nbundle,
 				  logic_array, tristate_array,
 				  next_state,
 				  clocked_on, clocked_on_also,
-				  clear, preset);
+				  clear, preset,
+				  v1, v2);
 
     }
     else if ( dt_latch ) {
@@ -290,16 +289,15 @@ gen_library(const DotlibNode* dt_library)
       LogExpr enable_also = dot2expr(latch_info.enable_also(), pin_map);
       LogExpr clear = dot2expr(latch_info.clear(), pin_map);
       LogExpr preset = dot2expr(latch_info.preset(), pin_map);
-#if 0
       ymuint v1 = latch_info.clear_preset_var1();
       ymuint v2 = latch_info.clear_preset_var2();
-#endif
       cell = library->new_latch_cell(cell_id, cell_name, area,
 				     ni, no, nio, nbus, nbundle,
 				     logic_array, tristate_array,
 				     data_in,
 				     enable, enable_also,
-				     clear, preset);
+				     clear, preset,
+				     v1, v2);
     }
     else {
       cell = library->new_logic_cell(cell_id, cell_name, area,

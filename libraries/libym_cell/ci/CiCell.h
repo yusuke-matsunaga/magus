@@ -363,6 +363,22 @@ public:
   TvFunc
   preset_function() const;
 
+  /// @brief clear_preset_var1 の取得
+  /// @retval 0 "L"
+  /// @retval 1 "H"
+  /// @note FFセルとラッチセルの時に意味を持つ．
+  virtual
+  ymuint
+  clear_preset_var1() const;
+
+  /// @brief clear_preset_var2 の取得
+  /// @retval 0 "L"
+  /// @retval 1 "H"
+  /// @note FFセルとラッチセルの時に意味を持つ．
+  virtual
+  ymuint
+  clear_preset_var2() const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////

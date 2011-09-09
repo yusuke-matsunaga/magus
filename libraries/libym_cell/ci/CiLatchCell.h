@@ -286,6 +286,8 @@ protected:
   /// @param[in] enable_also "enable_also" 関数の式
   /// @param[in] clear "clear" 関数の式
   /// @param[in] preset "preset" 関数の式
+  /// @param[in] clear_preset_var1 clear と preset が同時にオンになったときの値1
+  /// @param[in] clear_preset_var2 clear と preset が同時にオンになったときの値2
   CiLatchSRCell(ymuint id,
 		const ShString& name,
 		CellArea area,
@@ -301,7 +303,9 @@ protected:
 		const LogExpr& enable,
 		const LogExpr& enable_also,
 		const LogExpr& clear,
-		const LogExpr& preset);
+		const LogExpr& preset,
+		ymuint clear_preset_var1,
+		ymuint clear_preset_var2);
 
   /// @brief デストラクタ
   virtual
@@ -324,6 +328,22 @@ public:
   LogExpr
   preset_expr() const;
 
+  /// @brief clear_preset_var1 の取得
+  /// @retval 0 "L"
+  /// @retval 1 "H"
+  /// @note FFセルとラッチセルの時に意味を持つ．
+  virtual
+  ymuint
+  clear_preset_var1() const;
+
+  /// @brief clear_preset_var2 の取得
+  /// @retval 0 "L"
+  /// @retval 1 "H"
+  /// @note FFセルとラッチセルの時に意味を持つ．
+  virtual
+  ymuint
+  clear_preset_var2() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -332,6 +352,9 @@ private:
 
   // preset 論理式
   LogExpr mPreset;
+
+  // clear_preser_var1/var2
+  ymuint8 mClearPresetVal[2];
 
 };
 

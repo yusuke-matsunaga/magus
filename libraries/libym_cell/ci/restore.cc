@@ -70,18 +70,22 @@ restore_library(istream& s)
 	LogExpr clocked_on_also;
 	LogExpr clear;
 	LogExpr preset;
-	ymuint clear_preset_var1;
-	ymuint clear_preset_var2;
+	ymuint8 clear_preset_var1;
+	ymuint8 clear_preset_var2;
 	bis >> next_state
 	    >> clocked_on
 	    >> clocked_on_also
 	    >> clear
-	    >> preset;
+	    >> preset
+	    >> clear_preset_var1
+	    >> clear_preset_var2;
 	cell = library->new_ff_cell(i, name, area, ni, no, nio, nbus, nbundle,
 				    logic_array, tristate_array,
 				    next_state,
 				    clocked_on, clocked_on_also,
-				    clear, preset);
+				    clear, preset,
+				    clear_preset_var1,
+				    clear_preset_var2);
       }
       break;
 
@@ -92,18 +96,22 @@ restore_library(istream& s)
 	LogExpr enable_also;
 	LogExpr clear;
 	LogExpr preset;
-	ymuint clear_preset_var1;
-	ymuint clear_preset_var2;
+	ymuint8 clear_preset_var1;
+	ymuint8 clear_preset_var2;
 	bis >> data_in
 	    >> enable
 	    >> enable_also
 	    >> clear
-	    >> preset;
+	    >> preset
+	    >> clear_preset_var1
+	    >> clear_preset_var2;
 	cell = library->new_latch_cell(i, name, area, ni, no, nio, nbus, nbundle,
 				       logic_array, tristate_array,
 				       data_in,
 				       enable, enable_also,
-				       clear, preset);
+				       clear, preset,
+				       clear_preset_var1,
+				       clear_preset_var2);
       }
       break;
 

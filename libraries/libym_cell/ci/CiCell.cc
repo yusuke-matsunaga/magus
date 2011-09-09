@@ -476,6 +476,26 @@ CiCell::preset_function() const
   return cell_group()->preset_function();
 }
 
+// @brief clear_preset_var1 の取得
+// @retval 0 "L"
+// @retval 1 "H"
+// @note FFセルとラッチセルの時に意味を持つ．
+ymuint
+CiCell::clear_preset_var1() const
+{
+  return 0;
+}
+
+// @brief clear_preset_var2 の取得
+// @retval 0 "L"
+// @retval 1 "H"
+// @note FFセルとラッチセルの時に意味を持つ．
+ymuint
+CiCell::clear_preset_var2() const
+{
+  return 0;
+}
+
 // @brief タイミング情報を設定する．
 // @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
 // @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )

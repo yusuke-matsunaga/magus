@@ -78,14 +78,18 @@ dump_library(ostream& s,
 	  << cell->clock_expr()
 	  << cell->clock2_expr()
 	  << cell->clear_expr()
-	  << cell->preset_expr();
+	  << cell->preset_expr()
+	  << static_cast<ymuint8>(cell->clear_preset_var1())
+	  << static_cast<ymuint8>(cell->clear_preset_var2());
     }
     else if ( cell->is_latch() ) {
       bos << cell->data_in_expr()
 	  << cell->enable_expr()
 	  << cell->enable2_expr()
 	  << cell->clear_expr()
-	  << cell->preset_expr();
+	  << cell->preset_expr()
+	  << static_cast<ymuint8>(cell->clear_preset_var1())
+	  << static_cast<ymuint8>(cell->clear_preset_var2());
     }
 
     // タイミング情報のID -> 通し番号のマップ
@@ -254,6 +258,10 @@ display_library(ostream& s,
       if ( cell->has_preset() ) {
 	s << "  Preset             = " << cell->preset_expr() << endl;
       }
+      if ( cell->has_clear() && cell->has_preset() ) {
+	s << "  Clear Preset Var1  = " << cell->clear_preset_var1() << endl
+	  << "  Clear Preset Var2  = " << cell->clear_preset_var2() << endl;
+      }
     }
     if ( cell->is_latch() ) {
       s << "  Data In            = " << cell->data_in_expr() << endl
@@ -266,6 +274,10 @@ display_library(ostream& s,
       }
       if ( cell->has_preset() ) {
 	s << "  Preset             = " << cell->preset_expr() << endl;
+      }
+      if ( cell->has_clear() && cell->has_preset() ) {
+	s << "  Clear Preset Var1  = " << cell->clear_preset_var1() << endl
+	  << "  Clear Preset Var2  = " << cell->clear_preset_var2() << endl;
       }
     }
 

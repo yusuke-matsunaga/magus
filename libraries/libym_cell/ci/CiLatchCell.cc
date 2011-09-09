@@ -237,6 +237,8 @@ CiLatchSCell::preset_expr() const
 // @param[in] enable_also "enable_also" 関数の式
 // @param[in] clear "clear" 関数の式
 // @param[in] preset "preset" 関数の式
+// @param[in] clear_preset_var1 clear と preset が同時にオンになったときの値1
+// @param[in] clear_preset_var2 clear と preset が同時にオンになったときの値2
 CiLatchSRCell::CiLatchSRCell(ymuint id,
 			     const ShString& name,
 			     CellArea area,
@@ -252,12 +254,16 @@ CiLatchSRCell::CiLatchSRCell(ymuint id,
 			     const LogExpr& enable,
 			     const LogExpr& enable_also,
 			     const LogExpr& clear,
-			     const LogExpr& preset) :
+			     const LogExpr& preset,
+			     ymuint clear_preset_var1,
+			     ymuint clear_preset_var2) :
   CiLatchRCell(id, name, area, ni, no, nio, nb, nc, alloc,
 	       logic_array, tristate_array,
 	       data_in, enable, enable_also, clear),
   mPreset(preset)
 {
+  mClearPresetVal[0] = clear_preset_var1;
+  mClearPresetVal[1] = clear_preset_var2;
 }
 
 // @brief デストラクタ
@@ -278,6 +284,26 @@ LogExpr
 CiLatchSRCell::preset_expr() const
 {
   return mPreset;
+}
+
+// @brief clear_preset_var1 の取得
+// @retval 0 "L"
+// @retval 1 "H"
+// @note FFセルとラッチセルの時に意味を持つ．
+ymuint
+CiLatchSRCell::clear_preset_var1() const
+{
+  return mClearPresetVal[0];
+}
+
+// @brief clear_preset_var2 の取得
+// @retval 0 "L"
+// @retval 1 "H"
+// @note FFセルとラッチセルの時に意味を持つ．
+ymuint
+CiLatchSRCell::clear_preset_var2() const
+{
+  return mClearPresetVal[1];
 }
 
 END_NAMESPACE_YM_CELL
