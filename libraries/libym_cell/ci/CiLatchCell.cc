@@ -30,6 +30,7 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] tristated_array トライステート条件の論理式の配列
 // @param[in] data_in "data_in" 関数の式
 // @param[in] enable "enable" 関数の式
+// @param[in] enable_also "enable_also" 関数の式
 CiLatchCell::CiLatchCell(ymuint id,
 			 const ShString& name,
 			 CellArea area,
@@ -42,11 +43,13 @@ CiLatchCell::CiLatchCell(ymuint id,
 			 const vector<LogExpr>& logic_array,
 			 const vector<LogExpr>& tristate_array,
 			 const LogExpr& data_in,
-			 const LogExpr& enable) :
+			 const LogExpr& enable,
+			 const LogExpr& enable_also) :
   CiCell(id, name, area, ni, no, nio, nb, nc, alloc,
 	 logic_array, tristate_array),
   mDataIn(data_in),
-  mEnable(enable)
+  mEnable(enable),
+  mEnable2(enable_also)
 {
 }
 
@@ -78,6 +81,14 @@ CiLatchCell::enable_expr() const
   return mEnable;
 }
 
+// @brief ラッチセルの場合に2つめのイネーブル条件を表す論理式を返す．
+// @note それ以外の型の場合の返り値は不定
+LogExpr
+CiLatchCell::enable2_expr() const
+{
+  return mEnable2;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス CiLatchRCell
@@ -97,6 +108,7 @@ CiLatchCell::enable_expr() const
 // @param[in] tristated_array トライステート条件の論理式の配列
 // @param[in] data_in "data_in" 関数の式
 // @param[in] enable "enable" 関数の式
+// @param[in] enable_also "enable_also" 関数の式
 // @param[in] clear "clear" 関数の式
 CiLatchRCell::CiLatchRCell(ymuint id,
 			   const ShString& name,
@@ -111,10 +123,11 @@ CiLatchRCell::CiLatchRCell(ymuint id,
 			   const vector<LogExpr>& tristate_array,
 			   const LogExpr& data_in,
 			   const LogExpr& enable,
+			   const LogExpr& enable_also,
 			   const LogExpr& clear) :
   CiLatchCell(id, name, area, ni, no, nio, nb, nc, alloc,
 	      logic_array, tristate_array,
-	      data_in, enable),
+	      data_in, enable, enable_also),
   mClear(clear)
 {
 }
@@ -158,6 +171,7 @@ CiLatchRCell::clear_expr() const
 // @param[in] tristated_array トライステート条件の論理式の配列
 // @param[in] data_in "data_in" 関数の式
 // @param[in] enable "enable" 関数の式
+// @param[in] enable_also "enable_also" 関数の式
 // @param[in] preset "preset" 関数の式
 CiLatchSCell::CiLatchSCell(ymuint id,
 			   const ShString& name,
@@ -172,10 +186,11 @@ CiLatchSCell::CiLatchSCell(ymuint id,
 			   const vector<LogExpr>& tristate_array,
 			   const LogExpr& data_in,
 			   const LogExpr& enable,
+			   const LogExpr& enable_also,
 			   const LogExpr& preset) :
   CiLatchCell(id, name, area, ni, no, nio, nb, nc, alloc,
 	      logic_array, tristate_array,
-	      data_in, enable),
+	      data_in, enable, enable_also),
   mPreset(preset)
 {
 }
@@ -219,6 +234,7 @@ CiLatchSCell::preset_expr() const
 // @param[in] tristated_array トライステート条件の論理式の配列
 // @param[in] data_in "data_in" 関数の式
 // @param[in] enable "enable" 関数の式
+// @param[in] enable_also "enable_also" 関数の式
 // @param[in] clear "clear" 関数の式
 // @param[in] preset "preset" 関数の式
 CiLatchSRCell::CiLatchSRCell(ymuint id,
@@ -234,11 +250,12 @@ CiLatchSRCell::CiLatchSRCell(ymuint id,
 			     const vector<LogExpr>& tristate_array,
 			     const LogExpr& data_in,
 			     const LogExpr& enable,
+			     const LogExpr& enable_also,
 			     const LogExpr& clear,
 			     const LogExpr& preset) :
   CiLatchRCell(id, name, area, ni, no, nio, nb, nc, alloc,
 	       logic_array, tristate_array,
-	       data_in, enable, clear),
+	       data_in, enable, enable_also, clear),
   mPreset(preset)
 {
 }

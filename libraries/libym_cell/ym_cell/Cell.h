@@ -251,6 +251,18 @@ public:
   TvFunc
   clock_function() const = 0;
 
+  /// @brief FFセルの場合にスレーブクロックのアクティブエッジを表す論理式を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  LogExpr
+  clock2_expr() const = 0;
+
+  /// @brief FFセルの場合にスレーブクロックのアクティブエッジを表す関数を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  TvFunc
+  clock2_function() const = 0;
+
   /// @brief ラッチセルの場合にデータ入力関数を表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
@@ -274,6 +286,18 @@ public:
   virtual
   TvFunc
   enable_function() const = 0;
+
+  /// @brief ラッチセルの場合に2つめのイネーブル条件を表す論理式を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  LogExpr
+  enable2_expr() const = 0;
+
+  /// @brief ラッチセルの場合に2つめのイネーブル条件を表す関数を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  TvFunc
+  enable2_function() const = 0;
 
   /// @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
   virtual

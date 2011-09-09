@@ -414,6 +414,7 @@ public:
   /// @param[in] clocked_on "clocked_on" 関数の式
   /// @param[in] clear "clear" 関数の式
   /// @param[in] preset "preset" 関数の式
+  /// @param[in] clocked_on_also "clocked_on_also" 関数の式
   /// @return セルへのポインタを返す．
   CiCell*
   new_ff_cell(ymuint cell_id,
@@ -428,6 +429,7 @@ public:
 	      const vector<LogExpr>& tristate_array,
 	      const LogExpr& next_state,
 	      const LogExpr& clocked_on,
+	      const LogExpr& clocked_on_also,
 	      const LogExpr& clear,
 	      const LogExpr& preset);
 
@@ -446,6 +448,7 @@ public:
   /// @param[in] enable "enable" 関数の式
   /// @param[in] clear "clear" 関数の式
   /// @param[in] preset "preset" 関数の式
+  /// @param[in] enable_also "enable_also" 関数の式
   /// @return セルへのポインタを返す．
   CiCell*
   new_latch_cell(ymuint cell_id,
@@ -460,6 +463,7 @@ public:
 		 const vector<LogExpr>& tristate_array,
 		 const LogExpr& data_in,
 		 const LogExpr& enable,
+		 const LogExpr& enable_also,
 		 const LogExpr& clear,
 		 const LogExpr& preset);
 

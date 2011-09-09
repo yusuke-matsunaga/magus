@@ -39,6 +39,7 @@ protected:
   /// @param[in] tristate_array トライステート条件の論理式の配列
   /// @param[in] next_state "next_state" 関数の式
   /// @param[in] clocked_on "clocked_on" 関数の式
+  /// @param[in] clocked_on_also "clocked_on_also" 関数の式
   CiFFCell(ymuint id,
 	   const ShString& name,
 	   CellArea area,
@@ -51,7 +52,8 @@ protected:
 	   const vector<LogExpr>& logic_array,
 	   const vector<LogExpr>& tristate_array,
 	   const LogExpr& next_state,
-	   const LogExpr& clocked_on);
+	   const LogExpr& clocked_on,
+	   const LogExpr& clocked_on_also);
 
   /// @brief デストラクタ
   virtual
@@ -80,6 +82,12 @@ public:
   LogExpr
   clock_expr() const;
 
+  /// @brief FFセルの場合にスレーブクロックのアクティブエッジを表す論理式を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  LogExpr
+  clock2_expr() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -91,6 +99,9 @@ private:
 
   // clock 論理式
   LogExpr mClock;
+
+  // clock2 論理式
+  LogExpr mClock2;
 
 };
 
@@ -121,6 +132,7 @@ protected:
   /// @param[in] next_state "next_state" 関数の式
   /// @param[in] clocked_on "clocked_on" 関数の式
   /// @param[in] clear "clear" 関数の式
+  /// @param[in] clocked_on_also "clocked_on_also" 関数の式
   CiFFRCell(ymuint id,
 	    const ShString& name,
 	    CellArea area,
@@ -134,6 +146,7 @@ protected:
 	    const vector<LogExpr>& tristate_array,
 	    const LogExpr& next_state,
 	    const LogExpr& clocked_on,
+	    const LogExpr& clocked_on_also,
 	    const LogExpr& clear);
 
   /// @brief デストラクタ
@@ -194,6 +207,7 @@ protected:
   /// @param[in] tristate_array トライステート条件の論理式の配列
   /// @param[in] next_state "next_state" 関数の式
   /// @param[in] clocked_on "clocked_on" 関数の式
+  /// @param[in] clocked_on_also "clocked_on_also" 関数の式
   /// @param[in] preset "preset" 関数の式
   CiFFSCell(ymuint id,
 	    const ShString& name,
@@ -208,6 +222,7 @@ protected:
 	    const vector<LogExpr>& tristate_array,
 	    const LogExpr& next_state,
 	    const LogExpr& clocked_on,
+	    const LogExpr& clocked_on_also,
 	    const LogExpr& preset);
 
   /// @brief デストラクタ
@@ -268,6 +283,7 @@ protected:
   /// @param[in] tristate_array トライステート条件の論理式の配列
   /// @param[in] next_state "next_state" 関数の式
   /// @param[in] clocked_on "clocked_on" 関数の式
+  /// @param[in] clocked_on_also "clocked_on_also" 関数の式
   /// @param[in] clear "clear" 関数の式
   /// @param[in] preset "preset" 関数の式
   CiFFSRCell(ymuint id,
@@ -283,6 +299,7 @@ protected:
 	     const vector<LogExpr>& tristate_array,
 	     const LogExpr& next_state,
 	     const LogExpr& clocked_on,
+	     const LogExpr& clocked_on_also,
 	     const LogExpr& clear,
 	     const LogExpr& preset);
 

@@ -76,12 +76,14 @@ dump_library(ostream& s,
     if ( cell->is_ff() ) {
       bos << cell->next_state_expr()
 	  << cell->clock_expr()
+	  << cell->clock2_expr()
 	  << cell->clear_expr()
 	  << cell->preset_expr();
     }
     else if ( cell->is_latch() ) {
       bos << cell->data_in_expr()
 	  << cell->enable_expr()
+	  << cell->enable2_expr()
 	  << cell->clear_expr()
 	  << cell->preset_expr();
     }
@@ -243,6 +245,9 @@ display_library(ostream& s,
     if ( cell->is_ff() ) {
       s << "  Next State         = " << cell->next_state_expr() << endl
 	<< "  Clock              = " << cell->clock_expr() << endl;
+      if ( !cell->clock2_expr().is_zero() ) {
+	s << "  Clock2             = " << cell->clock2_expr() << endl;
+      }
       if ( cell->has_clear() ) {
 	s << "  Clear              = " << cell->clear_expr() << endl;
       }
@@ -253,8 +258,11 @@ display_library(ostream& s,
     if ( cell->is_latch() ) {
       s << "  Data In            = " << cell->data_in_expr() << endl
 	<< "  Enable             = " << cell->enable_expr() << endl;
+      if ( !cell->enable2_expr().is_zero() ) {
+	s << "  Enable2            = " << cell->enable2_expr() << endl;
+      }
       if ( cell->has_clear() ) {
-	s << "p  Clear              = " << cell->clear_expr() << endl;
+	s << "  Clear              = " << cell->clear_expr() << endl;
       }
       if ( cell->has_preset() ) {
 	s << "  Preset             = " << cell->preset_expr() << endl;

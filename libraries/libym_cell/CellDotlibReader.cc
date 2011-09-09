@@ -279,7 +279,8 @@ gen_library(const DotlibNode* dt_library)
       cell = library->new_ff_cell(cell_id, cell_name, area,
 				  ni, no, nio, nbus, nbundle,
 				  logic_array, tristate_array,
-				  next_state, clocked_on,
+				  next_state,
+				  clocked_on, clocked_on_also,
 				  clear, preset);
 
     }
@@ -296,7 +297,8 @@ gen_library(const DotlibNode* dt_library)
       cell = library->new_latch_cell(cell_id, cell_name, area,
 				     ni, no, nio, nbus, nbundle,
 				     logic_array, tristate_array,
-				     data_in, enable,
+				     data_in,
+				     enable, enable_also,
 				     clear, preset);
     }
     else {

@@ -74,11 +74,13 @@ restore_library(istream& s)
 	ymuint clear_preset_var2;
 	bis >> next_state
 	    >> clocked_on
+	    >> clocked_on_also
 	    >> clear
 	    >> preset;
 	cell = library->new_ff_cell(i, name, area, ni, no, nio, nbus, nbundle,
 				    logic_array, tristate_array,
-				    next_state, clocked_on,
+				    next_state,
+				    clocked_on, clocked_on_also,
 				    clear, preset);
       }
       break;
@@ -94,11 +96,13 @@ restore_library(istream& s)
 	ymuint clear_preset_var2;
 	bis >> data_in
 	    >> enable
+	    >> enable_also
 	    >> clear
 	    >> preset;
 	cell = library->new_latch_cell(i, name, area, ni, no, nio, nbus, nbundle,
 				       logic_array, tristate_array,
-				       data_in, enable,
+				       data_in,
+				       enable, enable_also,
 				       clear, preset);
       }
       break;

@@ -525,6 +525,7 @@ CiLibrary::new_logic_cell(ymuint cell_id,
 // @param[in] clocked_on "clocked_on" 関数の式
 // @param[in] clear "clear" 関数の式
 // @param[in] preset "preset" 関数の式
+// @param[in] clocked_on_also "clocked_on_also" 関数の式
 // @return セルへのポインタを返す．
 CiCell*
 CiLibrary::new_ff_cell(ymuint cell_id,
@@ -540,7 +541,8 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 		       const LogExpr& next_state,
 		       const LogExpr& clocked_on,
 		       const LogExpr& clear,
-		       const LogExpr& preset)
+		       const LogExpr& preset,
+		       const LogExpr& clocked_on_also)
 {
   bool has_clear = !clear.is_zero();
   bool has_preset = !preset.is_zero();
@@ -556,6 +558,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 				tristate_array,
 				next_state,
 				clocked_on,
+				clocked_on_also,
 				clear,
 				preset);
     }
@@ -568,6 +571,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 			       tristate_array,
 			       next_state,
 			       clocked_on,
+			       clocked_on_also,
 			       clear);
     }
   }
@@ -581,6 +585,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 			       tristate_array,
 			       next_state,
 			       clocked_on,
+			       clocked_on_also,
 			       preset);
     }
     else {
@@ -591,7 +596,8 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 			      logic_array,
 			      tristate_array,
 			      next_state,
-			      clocked_on);
+			      clocked_on,
+			      clocked_on_also);
     }
 
   }
@@ -615,6 +621,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 // @param[in] enable "enable" 関数の式
 // @param[in] clear "clear" 関数の式
 // @param[in] preset "preset" 関数の式
+// @param[in] enable_also "enable_also" 関数の式
 // @return セルへのポインタを返す．
 CiCell*
 CiLibrary::new_latch_cell(ymuint cell_id,
@@ -630,7 +637,8 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 			  const LogExpr& data_in,
 			  const LogExpr& enable,
 			  const LogExpr& clear,
-			  const LogExpr& preset)
+			  const LogExpr& preset,
+			  const LogExpr& enable_also)
 {
   bool has_clear = !clear.is_zero();
   bool has_preset = !preset.is_zero();
@@ -646,6 +654,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 				   tristate_array,
 				   data_in,
 				   enable,
+				   enable_also,
 				   clear,
 				   preset);
     }
@@ -658,6 +667,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 				  tristate_array,
 				  data_in,
 				  enable,
+				  enable_also,
 				  clear);
     }
   }
@@ -671,6 +681,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 				  tristate_array,
 				  data_in,
 				  enable,
+				  enable_also,
 				  preset);
     }
     else {
@@ -681,7 +692,8 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 				 logic_array,
 				 tristate_array,
 				 data_in,
-				 enable);
+				 enable,
+				 enable_also);
     }
   }
   mCellArray[cell_id] = cell;

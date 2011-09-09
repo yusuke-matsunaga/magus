@@ -30,6 +30,7 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] tristate_array トライステート条件の論理式の配列
 // @param[in] next_state "next_state" 関数の式
 // @param[in] clocked_on "clocked_on" 関数の式
+// @param[in] clocked_on_also "clocked_on_also" 関数の式
 CiFFCell::CiFFCell(ymuint id,
 		   const ShString& name,
 		   CellArea area,
@@ -42,11 +43,13 @@ CiFFCell::CiFFCell(ymuint id,
 		   const vector<LogExpr>& logic_array,
 		   const vector<LogExpr>& tristate_array,
 		   const LogExpr& next_state,
-		   const LogExpr& clocked_on) :
+		   const LogExpr& clocked_on,
+		   const LogExpr& clocked_on_also) :
   CiCell(id, name, area, ni, no, nio, nb, nc, alloc,
 	 logic_array, tristate_array),
   mNextState(next_state),
-  mClock(clocked_on)
+  mClock(clocked_on),
+  mClock2(clocked_on_also)
 {
 }
 
@@ -78,6 +81,14 @@ CiFFCell::clock_expr() const
   return mClock;
 }
 
+// @brief FFセルの場合にスレーブクロックのアクティブエッジを表す論理式を返す．
+// @note それ以外の型の場合の返り値は不定
+LogExpr
+CiFFCell::clock2_expr() const
+{
+  return mClock2;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス CiFFRCell
@@ -97,6 +108,7 @@ CiFFCell::clock_expr() const
 // @param[in] tristate_array トライステート条件の論理式の配列
 // @param[in] next_state "next_state" 関数の式
 // @param[in] clocked_on "clocked_on" 関数の式
+// @param[in] clocked_on_also "clocked_on_also" 関数の式
 // @param[in] clear "clear" 関数の式
 CiFFRCell::CiFFRCell(ymuint id,
 		     const ShString& name,
@@ -111,10 +123,11 @@ CiFFRCell::CiFFRCell(ymuint id,
 		     const vector<LogExpr>& tristate_array,
 		     const LogExpr& next_state,
 		     const LogExpr& clocked_on,
+		     const LogExpr& clocked_on_also,
 		     const LogExpr& clear) :
   CiFFCell(id, name, area, ni, no, nio, nb, nc, alloc,
 	   logic_array, tristate_array,
-	   next_state, clocked_on),
+	   next_state, clocked_on, clocked_on_also),
   mClear(clear)
 {
 }
@@ -158,6 +171,7 @@ CiFFRCell::clear_expr() const
 // @param[in] tristate_array トライステート条件の論理式の配列
 // @param[in] next_state "next_state" 関数の式
 // @param[in] clocked_on "clocked_on" 関数の式
+// @param[in] clocked_on_also "clocked_on_also" 関数の式
 // @param[in] preset "preset" 関数の式
 CiFFSCell::CiFFSCell(ymuint id,
 		     const ShString& name,
@@ -172,10 +186,11 @@ CiFFSCell::CiFFSCell(ymuint id,
 		     const vector<LogExpr>& tristate_array,
 		     const LogExpr& next_state,
 		     const LogExpr& clocked_on,
+		     const LogExpr& clocked_on_also,
 		     const LogExpr& preset) :
   CiFFCell(id, name, area, ni, no, nio, nb, nc, alloc,
 	   logic_array, tristate_array,
-	   next_state, clocked_on),
+	   next_state, clocked_on, clocked_on_also),
   mPreset(preset)
 {
 }
@@ -219,6 +234,7 @@ CiFFSCell::preset_expr() const
 // @param[in] tristate_array トライステート条件の論理式の配列
 // @param[in] next_state "next_state" 関数の式
 // @param[in] clocked_on "clocked_on" 関数の式
+// @param[in] clocked_on_also "clocked_on_also" 関数の式
 // @param[in] clear "clear" 関数の式
 // @param[in] preset "preset" 関数の式
 CiFFSRCell::CiFFSRCell(ymuint id,
@@ -234,11 +250,12 @@ CiFFSRCell::CiFFSRCell(ymuint id,
 		       const vector<LogExpr>& tristate_array,
 		       const LogExpr& next_state,
 		       const LogExpr& clocked_on,
+		       const LogExpr& clocked_on_also,
 		       const LogExpr& clear,
 		       const LogExpr& preset) :
   CiFFRCell(id, name, area, ni, no, nio, nb, nc, alloc,
 	    logic_array, tristate_array,
-	    next_state, clocked_on, clear),
+	    next_state, clocked_on, clocked_on_also, clear),
   mPreset(preset)
 {
 }

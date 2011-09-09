@@ -366,6 +366,22 @@ CiCell::clock_function() const
   return cell_group()->clock_function();
 }
 
+// @brief FFセルの場合にスレーブクロックのアクティブエッジを表す論理式を返す．
+// @note それ以外の型の場合の返り値は不定
+LogExpr
+CiCell::clock2_expr() const
+{
+  return LogExpr::make_zero();
+}
+
+// @brief FFセルの場合にスレーブクロックのアクティブエッジを表す関数を返す．
+// @note それ以外の型の場合の返り値は不定
+TvFunc
+CiCell::clock2_function() const
+{
+  return cell_group()->clock2_function();
+}
+
 // @brief ラッチセルの場合にデータ入力関数を表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
 LogExpr
@@ -396,6 +412,22 @@ TvFunc
 CiCell::enable_function() const
 {
   return cell_group()->enable_function();
+}
+
+// @brief ラッチセルの場合に2つめのイネーブル条件を表す論理式を返す．
+// @note それ以外の型の場合の返り値は不定
+LogExpr
+CiCell::enable2_expr() const
+{
+  return LogExpr::make_zero();
+}
+
+// @brief ラッチセルの場合に2つめのイネーブル条件を表す関数を返す．
+// @note それ以外の型の場合の返り値は不定
+TvFunc
+CiCell::enable2_function() const
+{
+  return cell_group()->enable2_function();
 }
 
 // @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．

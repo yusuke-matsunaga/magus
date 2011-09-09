@@ -39,6 +39,7 @@ protected:
   /// @param[in] tristated_array トライステート条件の論理式の配列
   /// @param[in] data_in "data_in" 関数の式
   /// @param[in] enable "enable" 関数の式
+  /// @param[in] enable_also "enable_also" 関数の式
   CiLatchCell(ymuint id,
 	      const ShString& name,
 	      CellArea area,
@@ -51,7 +52,8 @@ protected:
 	      const vector<LogExpr>& logic_array,
 	      const vector<LogExpr>& tristate_array,
 	      const LogExpr& data_in,
-	      const LogExpr& enable);
+	      const LogExpr& enable,
+	      const LogExpr& enable_also);
 
   /// @brief デストラクタ
   virtual
@@ -80,6 +82,12 @@ public:
   LogExpr
   enable_expr() const;
 
+  /// @brief ラッチセルの場合に2つめのイネーブル条件を表す論理式を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  LogExpr
+  enable2_expr() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -91,6 +99,9 @@ private:
 
   // enable 論理式
   LogExpr mEnable;
+
+  // enable2 論理式
+  LogExpr mEnable2;
 
 };
 
@@ -120,6 +131,7 @@ protected:
   /// @param[in] tristated_array トライステート条件の論理式の配列
   /// @param[in] data_in "data_in" 関数の式
   /// @param[in] enable "enable" 関数の式
+  /// @param[in] enable_also "enable_also" 関数の式
   /// @param[in] clear "clear" 関数の式
   CiLatchRCell(ymuint id,
 	       const ShString& name,
@@ -134,6 +146,7 @@ protected:
 	       const vector<LogExpr>& tristate_array,
 	       const LogExpr& data_in,
 	       const LogExpr& enable,
+	       const LogExpr& enable_also,
 	       const LogExpr& clear);
 
   /// @brief デストラクタ
@@ -194,6 +207,7 @@ protected:
   /// @param[in] tristated_array トライステート条件の論理式の配列
   /// @param[in] data_in "data_in" 関数の式
   /// @param[in] enable "enable" 関数の式
+  /// @param[in] enable_also "enable_also" 関数の式
   /// @param[in] preset "preset" 関数の式
   CiLatchSCell(ymuint id,
 	       const ShString& name,
@@ -208,6 +222,7 @@ protected:
 	       const vector<LogExpr>& tristate_array,
 	       const LogExpr& data_in,
 	       const LogExpr& enable,
+	       const LogExpr& enable_also,
 	       const LogExpr& preset);
 
   /// @brief デストラクタ
@@ -268,6 +283,7 @@ protected:
   /// @param[in] tristated_array トライステート条件の論理式の配列
   /// @param[in] data_in "data_in" 関数の式
   /// @param[in] enable "enable" 関数の式
+  /// @param[in] enable_also "enable_also" 関数の式
   /// @param[in] clear "clear" 関数の式
   /// @param[in] preset "preset" 関数の式
   CiLatchSRCell(ymuint id,
@@ -283,6 +299,7 @@ protected:
 		const vector<LogExpr>& tristate_array,
 		const LogExpr& data_in,
 		const LogExpr& enable,
+		const LogExpr& enable_also,
 		const LogExpr& clear,
 		const LogExpr& preset);
 

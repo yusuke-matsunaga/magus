@@ -163,6 +163,14 @@ CiGroup::clock_function() const
 #warning "TODO: not implemented"
 }
 
+// @brief FFセルの場合にスレーブクロックのアクティブエッジを表す関数を返す．
+// @note それ以外の型の場合の返り値は不定
+TvFunc
+CiGroup::clock2_function() const
+{
+#warning "TODO: not implemented"
+}
+
 // @brief ラッチセルの場合にデータ入力関数を返す．
 // @note それ以外の型の場合の返り値は不定
 TvFunc
@@ -175,6 +183,14 @@ CiGroup::data_in_function() const
 // @note それ以外の型の場合の返り値は不定
 TvFunc
 CiGroup::enable_function() const
+{
+#warning "TODO: not implemented"
+}
+
+// @brief ラッチセルの場合に2つめのイネーブル条件を表す関数を返す．
+// @note それ以外の型の場合の返り値は不定
+TvFunc
+CiGroup::enable2_function() const
 {
 #warning "TODO: not implemented"
 }
