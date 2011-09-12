@@ -9,8 +9,10 @@
 
 #include "ym_cell/CellDotlibReader.h"
 
-#include "ci/CiLibrary.h"
-#include "ci/CiCell.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_cell/CellArea.h"
+#include "ym_cell/CellCapacitance.h"
+#include "ym_cell/CellTime.h"
 
 #include "dotlib/DotlibParser.h"
 #include "dotlib/DotlibMgr.h"
@@ -103,7 +105,8 @@ gen_library(const DotlibNode* dt_library)
   }
 
   // ライブラリの生成
-  CiLibrary* library = new CiLibrary(library_info.name());
+  CellLibrary* library = CellLibrary::new_obj();
+  library->set_name(library_info.name());
 
   // セル数の設定
   const list<const DotlibNode*>& dt_cell_list = library_info.cell_list();
@@ -264,8 +267,6 @@ gen_library(const DotlibNode* dt_library)
     }
 
     // セルの生成
-    CiCell* cell = NULL;
-
     if ( dt_ff ) {
       LogExpr next_state = dot2expr(ff_info.next_state(), pin_map);
       LogExpr clocked_on = dot2expr(ff_info.clocked_on(), pin_map);
@@ -274,13 +275,13 @@ gen_library(const DotlibNode* dt_library)
       LogExpr preset = dot2expr(ff_info.preset(), pin_map);
       ymuint v1 = ff_info.clear_preset_var1();
       ymuint v2 = ff_info.clear_preset_var2();
-      cell = library->new_ff_cell(cell_id, cell_name, area,
-				  ni, no, nio, nbus, nbundle,
-				  logic_array, tristate_array,
-				  next_state,
-				  clocked_on, clocked_on_also,
-				  clear, preset,
-				  v1, v2);
+      library->new_ff_cell(cell_id, cell_name, area,
+			   ni, no, nio, nbus, nbundle,
+			   logic_array, tristate_array,
+			   next_state,
+			   clocked_on, clocked_on_also,
+			   clear, preset,
+			   v1, v2);
 
     }
     else if ( dt_latch ) {
@@ -291,18 +292,18 @@ gen_library(const DotlibNode* dt_library)
       LogExpr preset = dot2expr(latch_info.preset(), pin_map);
       ymuint v1 = latch_info.clear_preset_var1();
       ymuint v2 = latch_info.clear_preset_var2();
-      cell = library->new_latch_cell(cell_id, cell_name, area,
-				     ni, no, nio, nbus, nbundle,
-				     logic_array, tristate_array,
-				     data_in,
-				     enable, enable_also,
-				     clear, preset,
-				     v1, v2);
+      library->new_latch_cell(cell_id, cell_name, area,
+			      ni, no, nio, nbus, nbundle,
+			      logic_array, tristate_array,
+			      data_in,
+			      enable, enable_also,
+			      clear, preset,
+			      v1, v2);
     }
     else {
-      cell = library->new_logic_cell(cell_id, cell_name, area,
-				     ni, no, nio, nbus, nbundle,
-				     logic_array, tristate_array);
+      library->new_logic_cell(cell_id, cell_name, area,
+			      ni, no, nio, nbus, nbundle,
+			      logic_array, tristate_array);
     }
 
     // ピンの生成
@@ -317,7 +318,7 @@ gen_library(const DotlibNode* dt_library)
 	  CellCapacitance cap(pin_info.capacitance());
 	  CellCapacitance rise_cap(pin_info.rise_capacitance());
 	  CellCapacitance fall_cap(pin_info.fall_capacitance());
-	  library->new_cell_input(cell, i_pos, pin_info.name(),
+	  library->new_cell_input(cell_id, i_pos, pin_info.name(),
 				  cap, rise_cap, fall_cap);
 	}
 	++ i_pos;
@@ -331,7 +332,7 @@ gen_library(const DotlibNode* dt_library)
 	  CellCapacitance min_capacitance(pin_info.min_capacitance());
 	  CellTime max_transition(pin_info.max_transition());
 	  CellTime min_transition(pin_info.min_transition());
-	  library->new_cell_output(cell, o_pos, pin_info.name(),
+	  library->new_cell_output(cell_id, o_pos, pin_info.name(),
 				   max_fanout, min_fanout,
 				   max_capacitance, min_capacitance,
 				   max_transition, min_transition);
@@ -441,7 +442,7 @@ gen_library(const DotlibNode* dt_library)
 	  CellCapacitance min_capacitance(pin_info.min_capacitance());
 	  CellTime max_transition(pin_info.max_transition());
 	  CellTime min_transition(pin_info.min_transition());
-	  library->new_cell_inout(cell, io_pos, pin_info.name(),
+	  library->new_cell_inout(cell_id, io_pos, pin_info.name(),
 				  cap, rise_cap, fall_cap,
 				  max_fanout, min_fanout,
 				  max_capacitance, min_capacitance,

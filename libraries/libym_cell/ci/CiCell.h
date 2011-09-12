@@ -385,6 +385,7 @@ public:
   // 設定用の仮想関数
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief タイミング情報を設定する．
   /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
   /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
@@ -419,6 +420,7 @@ public:
   void
   set_tristate_expr(ymuint opin_id,
 		    const LogExpr& expr);
+#endif
 
 
 private:
@@ -467,7 +469,7 @@ private:
 
   // タイミング情報を格納する配列
   // サイズは(入力数＋入出力数) x (出力数+入出力ピン数)  x 2
-  CiTiming** mTimingArray;
+  CellTiming** mTimingArray;
 
   // セルグループ
   CellGroup* mCellGroup;

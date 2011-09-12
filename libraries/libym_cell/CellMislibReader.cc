@@ -9,8 +9,12 @@
 
 #include "ym_cell/CellMislibReader.h"
 
-#include "ci/CiLibrary.h"
-#include "ci/CiCell.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_cell/CellArea.h"
+#include "ym_cell/CellCapacitance.h"
+#include "ym_cell/CellResistance.h"
+#include "ym_cell/CellTime.h"
+#include "ym_cell/CellTiming.h"
 
 #include "mislib/MislibParser.h"
 #include "mislib/MislibMgr.h"
@@ -76,7 +80,8 @@ gen_library(const string& lib_name,
 	    const MislibNode* gate_list)
 {
   // ライブラリの生成
-  CiLibrary* library = new CiLibrary(lib_name);
+  CellLibrary* library = CellLibrary::new_obj();
+  library->set_name(lib_name);
 
   // セル数の設定
   ymuint cell_num = 0;
@@ -125,18 +130,18 @@ gen_library(const string& lib_name,
     LogExpr function = opin_expr->to_expr(ipin_name_map);
     vector<LogExpr> logic_array(1, function);
     vector<LogExpr> tristate_array(1, LogExpr::make_zero());
-    CiCell* cell = library->new_logic_cell(cell_id, name, area,
-					   ni, 1, 0, 0, 0,
-					   logic_array, tristate_array);
+    library->new_logic_cell(cell_id, name, area,
+			    ni, 1, 0, 0, 0,
+			    logic_array, tristate_array);
     for (ymuint i = 0; i < ni; ++ i) {
       // 入力ピンの設定
       ShString name = ipin_name_list[i];
       const MislibNode* pin = ipin_array[i];
       CellCapacitance load(pin->input_load()->num());
-      library->new_cell_input(cell, i, name, load, load, load);
+      library->new_cell_input(cell_id, i, name, load, load, load);
     }
     // 出力ピンの設定
-    library->new_cell_output(cell, 0, opin_name,
+    library->new_cell_output(cell_id, 0, opin_name,
 			     CellCapacitance::infty(),
 			     CellCapacitance(0.0),
 			     CellCapacitance::infty(),
@@ -212,13 +217,13 @@ gen_library(const string& lib_name,
       CellResistance r_r(pt_pin->rise_fanout_delay()->num());
       CellTime f_i(pt_pin->fall_block_delay()->num());
       CellResistance f_r(pt_pin->fall_fanout_delay()->num());
-      CiTiming* timing = library->new_timing(i,
-					     CellTiming::kTimingCombinational,
-					     r_i, f_i,
-					     CellTime(0.0), CellTime(0.0),
-					     r_r, f_r);
+      CellTiming* timing = library->new_timing(i,
+					       kCellTimingCombinational,
+					       r_i, f_i,
+					       CellTime(0.0), CellTime(0.0),
+					       r_r, f_r);
       if ( !redundant ) {
-	cell->set_timing(i, 0, sense, timing);
+	library->set_timing(cell_id, i, 0, sense, timing);
       }
     }
   }

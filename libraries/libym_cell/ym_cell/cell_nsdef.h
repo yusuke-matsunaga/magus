@@ -49,6 +49,54 @@ enum tCellTimingSense {
 };
 
 
+/////////////////////////////////////////////////////////////////////
+/// @brief タイミング情報の型を表す列挙型
+//////////////////////////////////////////////////////////////////////
+enum tCellTimingType {
+  kCellTimingCombinational          = 0,
+  kCellTimingCombinationalRise      = 1,
+  kCellTimingCombinationalFall      = 2,
+
+  kCellTimingThreeStateEnable       = 3,
+  kCellTimingThreeStateDisable      = 4,
+  kCellTimingThreeStateEnableRise   = 5,
+  kCellTimingThreeStateEnableFall   = 6,
+  kCellTimingThreeStateDisableRise  = 7,
+  kCellTimingThreeStateDisableFall  = 8,
+
+  kCellTimingRisingEdge             = 9,
+  ktimingFallingEdge            = 10,
+
+  kCellTimingPreset                 = 11,
+  kCellTimingClear                  = 12,
+
+  kCellTimingHoldRising             = 13,
+  kCellTimingHaldFalling            = 14,
+
+  kCellTimingSetupRising            = 15,
+  kCellTimingSetupFalling           = 16,
+
+  kCellTimingRecoveryRising         = 17,
+  kCellTimingRecoveryFalling        = 18,
+
+  kCellTimingSkewRising             = 19,
+  kCellTimingSkewFalling            = 20,
+
+  kCellTimingRemovalRising          = 21,
+  kCellTimingRemovalFalling         = 22,
+
+  kCellTimingNonSeqSetupRising      = 23,
+  kCellTimingNonSeqSetupFalling     = 24,
+  kCellTimingNonSeqHoldRising       = 25,
+  kCellTimingNonSeqHoldFalling      = 26,
+
+  kCellTimingNochangeHighHigh       = 27,
+  kCellTimingNochangeHighLow        = 28,
+  kCellTimingNochangeLowHigh        = 29,
+  kCellTimingNochangeLowLow         = 30
+};
+
+
 //////////////////////////////////////////////////////////////////////
 /// @brief パタングラフのノードの型
 //////////////////////////////////////////////////////////////////////
@@ -65,7 +113,7 @@ enum tCellPatType {
 
 class CellArea;
 class CellTime;
-class CellCapaciance;
+class CellCapacitance;
 class CellResistance;
 
 class CellLibrary;
@@ -99,7 +147,7 @@ BEGIN_NAMESPACE_YM
 
 using nsCell::CellArea;
 using nsCell::CellTime;
-using nsCell::CellCapaciance;
+using nsCell::CellCapacitance;
 using nsCell::CellResistance;
 
 using nsCell::CellLibrary;
@@ -127,6 +175,8 @@ using nsCell::CellMgr;
 using nsCell::CellPatMgr;
 using nsCell::CellPatGraph;
 
+using nsCell::tCellTimingSense;
+using nsCell::tCellTimingType;
 using nsCell::tCellPatType;
 using nsCell::kCellPatInput;
 using nsCell::kCellPatAnd;

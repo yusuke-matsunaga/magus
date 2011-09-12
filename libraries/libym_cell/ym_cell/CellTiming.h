@@ -22,54 +22,6 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class CellTiming
 {
-public:
-  //////////////////////////////////////////////////////////////////////
-  /// @brief タイミング情報の型を表す列挙型
-  //////////////////////////////////////////////////////////////////////
-  enum tType {
-    kTimingCombinational          = 0,
-    kTimingCombinationalRise      = 1,
-    kTimingCombinationalFall      = 2,
-
-    kTimingThreeStateEnable       = 3,
-    kTimingThreeStateDisable      = 4,
-    kTimingThreeStateEnableRise   = 5,
-    kTimingThreeStateEnableFall   = 6,
-    kTimingThreeStateDisableRise  = 7,
-    kTimingThreeStateDisableFall  = 8,
-
-    kTimingRisingEdge             = 9,
-    ktimingFallingEdge            = 10,
-
-    kTimingPreset                 = 11,
-    kTimingClear                  = 12,
-
-    kTimingHoldRising             = 13,
-    kTimingHaldFalling            = 14,
-
-    kTimingSetupRising            = 15,
-    kTimingSetupFalling           = 16,
-
-    kTimingRecoveryRising         = 17,
-    kTimingRecoveryFalling        = 18,
-
-    kTimingSkewRising             = 19,
-    kTimingSkewFalling            = 20,
-
-    kTimingRemovalRising          = 21,
-    kTimingRemovalFalling         = 22,
-
-    kTimingNonSeqSetupRising      = 23,
-    kTimingNonSeqSetupFalling     = 24,
-    kTimingNonSeqHoldRising       = 25,
-    kTimingNonSeqHoldFalling      = 26,
-
-    kTimingNochangeHighHigh       = 27,
-    kTimingNochangeHighLow        = 28,
-    kTimingNochangeLowHigh        = 29,
-    kTimingNochangeLowLow         = 30
-  };
-
 protected:
 
   /// @brief コンストラクタ
@@ -92,7 +44,7 @@ public:
 
   /// @brief 型の取得
   virtual
-  tType
+  tCellTimingType
   type() const = 0;
 
 

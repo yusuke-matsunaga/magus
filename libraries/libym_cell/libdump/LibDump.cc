@@ -276,7 +276,7 @@ LibDump::dump(ostream& s,
   gen_pat(library);
 
   // ライブラリの情報をダンプする．
-  nsYm::nsCell::dump_library(s, library);
+  library.dump(s);
 
   // 関数の情報をダンプする．
   mLdLogicMgr.dump(s);

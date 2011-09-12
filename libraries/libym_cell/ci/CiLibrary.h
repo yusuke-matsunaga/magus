@@ -39,8 +39,7 @@ class CiLibrary :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] name 名前
-  CiLibrary(const string& name);
+  CiLibrary();
 
   /// @brief デストラクタ
   virtual
@@ -363,15 +362,23 @@ public:
   // 情報設定用の関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 名前を設定する．
+  /// @param[in] name 名前
+  virtual
+  void
+  set_name(const string& name);
+
   /// @brief 属性を設定する．
   /// @param[in] attr_name 属性名
   /// @param[in] value 値
+  virtual
   void
   set_attr(const string& attr_name,
 	   const string& value);
 
   /// @brief セル数を設定する．
   /// @param[in] num 設定する値
+  virtual
   void
   set_cell_num(ymuint num);
 
@@ -386,10 +393,10 @@ public:
   /// @param[in] nc バンドル数
   /// @param[in] logic_array 出力の論理式の配列
   /// @param[in] tristated_array トライステート条件の論理式の配列
-  /// @return セルへのポインタを返す．
-  CiCell*
+  virtual
+  void
   new_logic_cell(ymuint cell_id,
-		 ShString name,
+		 const string& name,
 		 CellArea area,
 		 ymuint ni,
 		 ymuint no,
@@ -417,10 +424,10 @@ public:
   /// @param[in] preset "preset" 関数の式
   /// @param[in] clear_preset_var1 clear と preset が同時にオンになったときの値1
   /// @param[in] clear_preset_var2 clear と preset が同時にオンになったときの値2
-  /// @return セルへのポインタを返す．
-  CiCell*
+  virtual
+  void
   new_ff_cell(ymuint cell_id,
-	      ShString name,
+	      const string& name,
 	      CellArea area,
 	      ymuint ni,
 	      ymuint no,
@@ -455,10 +462,10 @@ public:
   /// @param[in] enable_also "enable_also" 関数の式
   /// @param[in] clear_preset_var1 clear と preset が同時にオンになったときの値1
   /// @param[in] clear_preset_var2 clear と preset が同時にオンになったときの値2
-  /// @return セルへのポインタを返す．
-  CiCell*
+  virtual
+  void
   new_latch_cell(ymuint cell_id,
-		 ShString name,
+		 const string& name,
 		 CellArea area,
 		 ymuint ni,
 		 ymuint no,
@@ -476,22 +483,23 @@ public:
 		 ymuint clear_preset_var2);
 
   /// @brief セルの入力ピンを生成する．
-  /// @param[in] cell セル
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] pin_id 入力ピン番号 ( 0 <= pin_id < cell->input_num() )
   /// @param[in] name 入力ピン名
   /// @param[in] capacitance 入力ピンの負荷容量
   /// @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
   /// @param[in] fall_capacitance 入力ピンの立ち下がり負荷容量
+  virtual
   void
-  new_cell_input(CiCell* cell,
+  new_cell_input(ymuint cell_id,
 		 ymuint pin_id,
-		 ShString name,
+		 const string& name,
 		 CellCapacitance capacitance,
 		 CellCapacitance rise_capacitance,
 		 CellCapacitance fall_capacitance);
 
   /// @brief セルの出力ピンの内容を設定する．
-  /// @param[in] cell セル
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < cell->output_num() )
   /// @param[in] name 出力ピン名
   /// @param[in] max_fanout 最大ファンアウト容量
@@ -500,10 +508,11 @@ public:
   /// @param[in] min_capacitance 最小負荷容量
   /// @param[in] max_transition 最大遷移時間
   /// @param[in] min_transition 最小遷移時間
+  virtual
   void
-  new_cell_output(CiCell* cell,
+  new_cell_output(ymuint cell_id,
 		  ymuint pin_id,
-		  ShString name,
+		  const string& name,
 		  CellCapacitance max_fanout,
 		  CellCapacitance min_fanout,
 		  CellCapacitance max_capacitance,
@@ -512,7 +521,7 @@ public:
 		  CellTime min_transition);
 
   /// @brief セルの入出力ピンの内容を設定する．
-  /// @param[in] cell セル
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] pin_id 入出力ピン番号 ( 0 <= pin_id < cell->inout_num() )
   /// @param[in] name 入出力ピン名
   /// @param[in] capacitance 入力ピンの負荷容量
@@ -524,10 +533,11 @@ public:
   /// @param[in] min_capacitance 最小負荷容量
   /// @param[in] max_transition 最大遷移時間
   /// @param[in] min_transition 最小遷移時間
+  virtual
   void
-  new_cell_inout(CiCell* cell,
+  new_cell_inout(ymuint cell_id,
 		 ymuint pin_id,
-		 ShString name,
+		 const string& name,
 		 CellCapacitance capacitance,
 		 CellCapacitance rise_capacitance,
 		 CellCapacitance fall_capacitance,
@@ -558,15 +568,34 @@ public:
   /// @param[in] slope_fall 立ち下がりスロープ遅延
   /// @param[in] rise_resistance 立ち上がり負荷依存係数
   /// @param[in] fall_resistance 立ち下がり負荷依存係数
-  CiTiming*
+  virtual
+  CellTiming*
   new_timing(ymuint id,
-	     CellTiming::tType type,
+	     tCellTimingType type,
 	     CellTime intrinsic_rise,
 	     CellTime intrinsic_fall,
 	     CellTime slope_rise,
 	     CellTime slope_fall,
 	     CellResistance rise_resistance,
 	     CellResistance fall_resistance);
+
+  /// @brief タイミング情報をセットする．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+  /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
+  /// @param[in] sense タイミング条件
+  /// @param[in] timing 設定するタイミング情報
+  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->output_num() を使う．
+  /// @note ( *2 ) ipin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->input_num() を使う．
+  virtual
+  void
+  set_timing(ymuint cell_id,
+	     ymuint ipin_id,
+	     ymuint opin_id,
+	     tCellTimingSense sense,
+	     CellTiming* timing);
 
 
 private:

@@ -33,7 +33,7 @@ dump_restore_test(const char* filename)
 	cerr << "Could not create " << datafile << endl;
 	return 2;
       }
-      dump_library(os, *library);
+      library->dump(os);
       os.close();
     }
   }
@@ -46,10 +46,9 @@ dump_restore_test(const char* filename)
       cerr << "Could not open " << datafile << endl;
       return 3;
     }
-    const CellLibrary* library2 = restore_library(ifs);
-    if ( library2 ) {
-      display_library(cout, *library2);
-    }
+    CellLibrary* library2 = CellLibrary::new_obj();
+    library2->restore(ifs);
+    display_library(cout, *library2);
   }
 
   return 0;

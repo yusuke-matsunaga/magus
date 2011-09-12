@@ -10,6 +10,7 @@
 
 
 #include "ym_cell/cell_nsdef.h"
+#include "ym_logic/lexp_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -46,6 +47,11 @@ public:
   /// @brief デストラクタ
   virtual
   ~CellLibrary() { }
+
+  /// @brief 実際のオブジェクトを作るクラスメソッド
+  static
+  CellLibrary*
+  new_obj();
 
 
 public:
@@ -361,25 +367,270 @@ public:
   bool
   edge_inv(ymuint id) const = 0;
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ダンプ/リストア関係の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  void
+  dump(ostream& s) const;
+
+  /// @brief バイナリダンプされた内容を読み込む．
+  /// @param[in] s 入力元のストリーム
+  void
+  restore(istream& s);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 情報設定用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 名前を設定する．
+  /// @param[in] name 名前
+  virtual
+  void
+  set_name(const string& name) = 0;
+
+  /// @brief 属性を設定する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] value 値
+  virtual
+  void
+  set_attr(const string& attr_name,
+	   const string& value) = 0;
+
+  /// @brief セル数を設定する．
+  /// @param[in] num 設定する値
+  virtual
+  void
+  set_cell_num(ymuint num) = 0;
+
+  /// @brief 論理セルを生成する．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] name 名前
+  /// @param[in] area 面積
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] nio 入出力ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
+  /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristated_array トライステート条件の論理式の配列
+  virtual
+  void
+  new_logic_cell(ymuint cell_id,
+		 const string& name,
+		 CellArea area,
+		 ymuint ni,
+		 ymuint no,
+		 ymuint nio,
+		 ymuint nb,
+		 ymuint nc,
+		 const vector<LogExpr>& logic_array,
+		 const vector<LogExpr>& tristate_array) = 0;
+
+  /// @brief FFセルを生成する．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] name 名前
+  /// @param[in] area 面積
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] nio 入出力ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
+  /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristated_array トライステート条件の論理式の配列
+  /// @param[in] next_state "next_state" 関数の式
+  /// @param[in] clocked_on "clocked_on" 関数の式
+  /// @param[in] clocked_on_also "clocked_on_also" 関数の式
+  /// @param[in] clear "clear" 関数の式
+  /// @param[in] preset "preset" 関数の式
+  /// @param[in] clear_preset_var1 clear と preset が同時にオンになったときの値1
+  /// @param[in] clear_preset_var2 clear と preset が同時にオンになったときの値2
+  virtual
+  void
+  new_ff_cell(ymuint cell_id,
+	      const string& name,
+	      CellArea area,
+	      ymuint ni,
+	      ymuint no,
+	      ymuint nio,
+	      ymuint nb,
+	      ymuint nc,
+	      const vector<LogExpr>& logic_array,
+	      const vector<LogExpr>& tristate_array,
+	      const LogExpr& next_state,
+	      const LogExpr& clocked_on,
+	      const LogExpr& clocked_on_also,
+	      const LogExpr& clear,
+	      const LogExpr& preset,
+	      ymuint clear_preset_var1,
+	      ymuint clear_preset_var2) = 0;
+
+  /// @brief ラッチセルを生成する．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] name 名前
+  /// @param[in] area 面積
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] nio 入出力ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
+  /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristated_array トライステート条件の論理式の配列
+  /// @param[in] data_in "data_in" 関数の式
+  /// @param[in] enable "enable" 関数の式
+  /// @param[in] clear "clear" 関数の式
+  /// @param[in] preset "preset" 関数の式
+  /// @param[in] enable_also "enable_also" 関数の式
+  /// @param[in] clear_preset_var1 clear と preset が同時にオンになったときの値1
+  /// @param[in] clear_preset_var2 clear と preset が同時にオンになったときの値2
+  virtual
+  void
+  new_latch_cell(ymuint cell_id,
+		 const string& name,
+		 CellArea area,
+		 ymuint ni,
+		 ymuint no,
+		 ymuint nio,
+		 ymuint nb,
+		 ymuint nc,
+		 const vector<LogExpr>& logic_array,
+		 const vector<LogExpr>& tristate_array,
+		 const LogExpr& data_in,
+		 const LogExpr& enable,
+		 const LogExpr& enable_also,
+		 const LogExpr& clear,
+		 const LogExpr& preset,
+		 ymuint clear_preset_var1,
+		 ymuint clear_preset_var2) = 0;
+
+  /// @brief セルの入力ピンを生成する．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] pin_id 入力ピン番号 ( 0 <= pin_id < cell->input_num() )
+  /// @param[in] name 入力ピン名
+  /// @param[in] capacitance 入力ピンの負荷容量
+  /// @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
+  /// @param[in] fall_capacitance 入力ピンの立ち下がり負荷容量
+  virtual
+  void
+  new_cell_input(ymuint cell_id,
+		 ymuint pin_id,
+		 const string& name,
+		 CellCapacitance capacitance,
+		 CellCapacitance rise_capacitance,
+		 CellCapacitance fall_capacitance) = 0;
+
+  /// @brief セルの出力ピンの内容を設定する．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < cell->output_num() )
+  /// @param[in] name 出力ピン名
+  /// @param[in] max_fanout 最大ファンアウト容量
+  /// @param[in] min_fanout 最小ファンアウト容量
+  /// @param[in] max_capacitance 最大負荷容量
+  /// @param[in] min_capacitance 最小負荷容量
+  /// @param[in] max_transition 最大遷移時間
+  /// @param[in] min_transition 最小遷移時間
+  virtual
+  void
+  new_cell_output(ymuint cell_id,
+		  ymuint pin_id,
+		  const string& name,
+		  CellCapacitance max_fanout,
+		  CellCapacitance min_fanout,
+		  CellCapacitance max_capacitance,
+		  CellCapacitance min_capacitance,
+		  CellTime max_transition,
+		  CellTime min_transition) = 0;
+
+  /// @brief セルの入出力ピンの内容を設定する．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] pin_id 入出力ピン番号 ( 0 <= pin_id < cell->inout_num() )
+  /// @param[in] name 入出力ピン名
+  /// @param[in] capacitance 入力ピンの負荷容量
+  /// @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
+  /// @param[in] fall_capacitance 入力ピンの立ち下がり負荷容量
+  /// @param[in] max_fanout 最大ファンアウト容量
+  /// @param[in] min_fanout 最小ファンアウト容量
+  /// @param[in] max_capacitance 最大負荷容量
+  /// @param[in] min_capacitance 最小負荷容量
+  /// @param[in] max_transition 最大遷移時間
+  /// @param[in] min_transition 最小遷移時間
+  virtual
+  void
+  new_cell_inout(ymuint cell_id,
+		 ymuint pin_id,
+		 const string& name,
+		 CellCapacitance capacitance,
+		 CellCapacitance rise_capacitance,
+		 CellCapacitance fall_capacitance,
+		 CellCapacitance max_fanout,
+		 CellCapacitance min_fanout,
+		 CellCapacitance max_capacitance,
+		 CellCapacitance min_capacitance,
+		 CellTime max_transition,
+		 CellTime min_transition) = 0;
+
+#if 0
+  /// @brief セルの内部ピンを生成する．
+  /// @param[in] cell セル
+  /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
+  /// @param[in] name 内部ピン名
+  void
+  new_cell_internal(CiCell* cell,
+		    ymuint pin_id,
+		    const string& name);
+#endif
+
+  /// @brief タイミング情報を作る．
+  /// @param[in] id ID番号
+  /// @param[in] type タイミングの型
+  /// @param[in] intrinsic_rise 立ち上がり固有遅延
+  /// @param[in] intrinsic_fall 立ち下がり固有遅延
+  /// @param[in] slope_rise 立ち上がりスロープ遅延
+  /// @param[in] slope_fall 立ち下がりスロープ遅延
+  /// @param[in] rise_resistance 立ち上がり負荷依存係数
+  /// @param[in] fall_resistance 立ち下がり負荷依存係数
+  virtual
+  CellTiming*
+  new_timing(ymuint id,
+	     tCellTimingType type,
+	     CellTime intrinsic_rise,
+	     CellTime intrinsic_fall,
+	     CellTime slope_rise,
+	     CellTime slope_fall,
+	     CellResistance rise_resistance,
+	     CellResistance fall_resistance) = 0;
+
+  /// @brief タイミング情報をセットする．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+  /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
+  /// @param[in] sense タイミング条件
+  /// @param[in] timing 設定するタイミング情報
+  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->output_num() を使う．
+  /// @note ( *2 ) ipin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->input_num() を使う．
+  virtual
+  void
+  set_timing(ymuint cell_id,
+	     ymuint ipin_id,
+	     ymuint opin_id,
+	     tCellTimingSense sense,
+	     CellTiming* timing) = 0;
+
 };
-
-
-/// @relates CellLibrary
-/// @brief 内容をバイナリダンプする．
-void
-dump_library(ostream& s,
-	     const CellLibrary& library);
 
 /// @relates CellLibrary
 /// @brief 内容を出力する．
 void
 display_library(ostream& s,
 		const CellLibrary& library);
-
-/// @relates CellLibrary
-/// @brief バイナリダンプされた内容を読み込む．
-const CellLibrary*
-restore_library(istream& s);
 
 END_NAMESPACE_YM_CELL
 

@@ -21,14 +21,24 @@
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
+// クラス CellLibrary
+//////////////////////////////////////////////////////////////////////
+
+// @brief 実際のオブジェクトを作るクラスメソッド
+CellLibrary*
+CellLibrary::new_obj()
+{
+  return new CiLibrary();
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス CiLibrary
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] name 名前
-CiLibrary::CiLibrary(const string& name) :
-  mAlloc(4096),
-  mName(name)
+CiLibrary::CiLibrary() :
+  mAlloc(4096)
 {
 }
 
@@ -426,6 +436,14 @@ CiLibrary::edge_inv(ymuint id) const
   return mPatMgr.edge_inv(id);
 }
 
+// @brief 名前を設定する．
+// @param[in] name 名前
+void
+CiLibrary::set_name(const string& name)
+{
+  mName = name;
+}
+
 // @brief 属性を設定する．
 // @param[in] attr_name 属性名
 // @param[in] value 値
@@ -486,10 +504,9 @@ CiLibrary::set_cell_num(ymuint num)
 // @param[in] nc バンドル数
 // @param[in] logic_array 出力の論理式の配列
 // @param[in] tristate_array トライステート条件の論理式の配列
-// @return セルへのポインタを返す．
-CiCell*
+void
 CiLibrary::new_logic_cell(ymuint cell_id,
-			  ShString name,
+			  const string& name,
 			  CellArea area,
 			  ymuint ni,
 			  ymuint no,
@@ -500,14 +517,12 @@ CiLibrary::new_logic_cell(ymuint cell_id,
 			  const vector<LogExpr>& tristate_array)
 {
   void* p = mAlloc.get_memory(sizeof(CiLogicCell));
-  CiCell* cell = new (p) CiLogicCell(cell_id, name, area,
+  CiCell* cell = new (p) CiLogicCell(cell_id, ShString(name), area,
 				     ni, no, nio, nb, nc,
 				     mAlloc,
 				     logic_array,
 				     tristate_array);
   mCellArray[cell_id] = cell;
-
-  return cell;
 }
 
 // @brief FFセルを生成する．
@@ -526,10 +541,9 @@ CiLibrary::new_logic_cell(ymuint cell_id,
 // @param[in] clocked_on_also "clocked_on_also" 関数の式
 // @param[in] clear "clear" 関数の式
 // @param[in] preset "preset" 関数の式
-// @return セルへのポインタを返す．
-CiCell*
+void
 CiLibrary::new_ff_cell(ymuint cell_id,
-		       ShString name,
+		       const string& name,
 		       CellArea area,
 		       ymuint ni,
 		       ymuint no,
@@ -549,11 +563,13 @@ CiLibrary::new_ff_cell(ymuint cell_id,
   bool has_clear = !clear.is_zero();
   bool has_preset = !preset.is_zero();
 
+  ShString shname(name);
+
   CiCell* cell = NULL;
   if ( has_clear ) {
     if ( has_preset ) {
       void* p = mAlloc.get_memory(sizeof(CiFFSRCell));
-      cell = new (p) CiFFSRCell(cell_id, name, area,
+      cell = new (p) CiFFSRCell(cell_id, shname, area,
 				ni, no, nio, nb, nc,
 				mAlloc,
 				logic_array,
@@ -568,7 +584,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
     }
     else {
       void* p = mAlloc.get_memory(sizeof(CiFFRCell));
-      cell = new (p) CiFFRCell(cell_id, name, area,
+      cell = new (p) CiFFRCell(cell_id, shname, area,
 			       ni, no, nio, nb, nc,
 			       mAlloc,
 			       logic_array,
@@ -582,7 +598,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
   else {
     if ( has_preset ) {
       void* p = mAlloc.get_memory(sizeof(CiFFSCell));
-      cell = new (p) CiFFSCell(cell_id, name, area,
+      cell = new (p) CiFFSCell(cell_id, shname, area,
 			       ni, no, nio, nb, nc,
 			       mAlloc,
 			       logic_array,
@@ -594,7 +610,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
     }
     else {
       void* p = mAlloc.get_memory(sizeof(CiFFCell));
-      cell = new (p) CiFFCell(cell_id, name, area,
+      cell = new (p) CiFFCell(cell_id, shname, area,
 			      ni, no, nio, nb, nc,
 			      mAlloc,
 			      logic_array,
@@ -606,8 +622,6 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 
   }
   mCellArray[cell_id] = cell;
-
-  return cell;
 }
 
 // @brief ラッチセルを生成する．
@@ -628,10 +642,9 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 // @param[in] preset "preset" 関数の式
 // @param[in] clear_preset_var1 clear と preset が同時にオンになったときの値1
 // @param[in] clear_preset_var2 clear と preset が同時にオンになったときの値2
-// @return セルへのポインタを返す．
-CiCell*
+void
 CiLibrary::new_latch_cell(ymuint cell_id,
-			  ShString name,
+			  const string& name,
 			  CellArea area,
 			  ymuint ni,
 			  ymuint no,
@@ -651,11 +664,13 @@ CiLibrary::new_latch_cell(ymuint cell_id,
   bool has_clear = !clear.is_zero();
   bool has_preset = !preset.is_zero();
 
+  ShString shname(name);
+
   CiCell* cell = NULL;
   if ( has_clear ) {
     if ( has_preset ) {
       void* p = mAlloc.get_memory(sizeof(CiLatchSRCell));
-      cell = new (p) CiLatchSRCell(cell_id, name, area,
+      cell = new (p) CiLatchSRCell(cell_id, shname, area,
 				   ni, no, nio, nb, nc,
 				   mAlloc,
 				   logic_array,
@@ -670,7 +685,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
     }
     else {
       void* p = mAlloc.get_memory(sizeof(CiLatchRCell));
-      cell = new (p) CiLatchRCell(cell_id, name, area,
+      cell = new (p) CiLatchRCell(cell_id, shname, area,
 				  ni, no, nio, nb, nc,
 				  mAlloc,
 				  logic_array,
@@ -684,7 +699,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
   else {
     if ( has_preset ) {
       void* p = mAlloc.get_memory(sizeof(CiLatchSCell));
-      cell = new (p) CiLatchSCell(cell_id, name, area,
+      cell = new (p) CiLatchSCell(cell_id, shname, area,
 				  ni, no, nio, nb, nc,
 				  mAlloc,
 				  logic_array,
@@ -696,7 +711,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
     }
     else {
       void* p = mAlloc.get_memory(sizeof(CiLatchCell));
-      cell = new (p) CiLatchCell(cell_id, name, area,
+      cell = new (p) CiLatchCell(cell_id, shname, area,
 				 ni, no, nio, nb, nc,
 				 mAlloc,
 				 logic_array,
@@ -707,34 +722,33 @@ CiLibrary::new_latch_cell(ymuint cell_id,
     }
   }
   mCellArray[cell_id] = cell;
-
-  return cell;
 }
 
 // @brief セルの入力ピンの内容を設定する．
-// @param[in] cell セル
+// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
 // @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
 // @param[in] name 入力ピン名
 // @param[in] capacitance 入力ピンの負荷容量
 // @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
 // @param[in] fall_capacitance 入力ピンの立ち下がり負荷容量
 void
-CiLibrary::new_cell_input(CiCell* cell,
+CiLibrary::new_cell_input(ymuint cell_id,
 			  ymuint pin_id,
-			  ShString name,
+			  const string& name,
 			  CellCapacitance capacitance,
 			  CellCapacitance rise_capacitance,
 			  CellCapacitance fall_capacitance)
 {
   void* p = mAlloc.get_memory(sizeof(CiInputPin));
-  CiInputPin* pin = new (p) CiInputPin(name, capacitance,
+  CiInputPin* pin = new (p) CiInputPin(ShString(name), capacitance,
 				       rise_capacitance, fall_capacitance);
+  CiCell* cell = mCellArray[cell_id];
   cell->mInputArray[pin_id] = pin;
   pin->mId = pin_id;
 }
 
 // @brief セルの出力ピンの内容を設定する．
-// @param[in] cell セル
+// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
 // @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
 // @param[in] name 出力ピン名
 // @param[in] max_fanout 最大ファンアウト容量
@@ -744,9 +758,9 @@ CiLibrary::new_cell_input(CiCell* cell,
 // @param[in] max_transition 最大遷移時間
 // @param[in] min_transition 最小遷移時間
 void
-CiLibrary::new_cell_output(CiCell* cell,
+CiLibrary::new_cell_output(ymuint cell_id,
 			   ymuint pin_id,
-			   ShString name,
+			   const string& name,
 			   CellCapacitance max_fanout,
 			   CellCapacitance min_fanout,
 			   CellCapacitance max_capacitance,
@@ -755,15 +769,16 @@ CiLibrary::new_cell_output(CiCell* cell,
 			   CellTime min_transition)
 {
   void* p = mAlloc.get_memory(sizeof(CiOutputPin));
-  CiOutputPin* pin = new (p) CiOutputPin(name, max_fanout, min_fanout,
+  CiOutputPin* pin = new (p) CiOutputPin(ShString(name), max_fanout, min_fanout,
 					 max_capacitance, min_capacitance,
 					 max_transition, min_transition);
+  CiCell* cell = mCellArray[cell_id];
   cell->mOutputArray[pin_id] = pin;
   pin->mId = pin_id;
 }
 
 // @brief セルの入出力ピンの内容を設定する．
-// @param[in] cell セル
+// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
 // @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
 // @param[in] name 入出力ピン名
 // @param[in] capacitance 入力ピンの負荷容量
@@ -776,9 +791,9 @@ CiLibrary::new_cell_output(CiCell* cell,
 // @param[in] max_transition 最大遷移時間
 // @param[in] min_transition 最小遷移時間
 void
-CiLibrary::new_cell_inout(CiCell* cell,
+CiLibrary::new_cell_inout(ymuint cell_id,
 			  ymuint pin_id,
-			  ShString name,
+			  const string& name,
 			  CellCapacitance capacitance,
 			  CellCapacitance rise_capacitance,
 			  CellCapacitance fall_capacitance,
@@ -790,11 +805,12 @@ CiLibrary::new_cell_inout(CiCell* cell,
 			  CellTime min_transition)
 {
   void* p = mAlloc.get_memory(sizeof(CiInoutPin));
-  CiInoutPin* pin =  new (p) CiInoutPin(name, capacitance,
+  CiInoutPin* pin =  new (p) CiInoutPin(ShString(name), capacitance,
 					rise_capacitance, fall_capacitance,
 					max_fanout, min_fanout,
 					max_capacitance, min_capacitance,
 					max_transition, min_transition);
+  CiCell* cell = mCellArray[cell_id];
   cell->mInputArray[pin_id + cell->input_num()] = pin;
   cell->mOutputArray[pin_id + cell->output_num()] = pin;
   cell->mInoutArray[pin_id] = pin;
@@ -827,9 +843,9 @@ CiLibrary::new_cell_internal(CiCell* cell,
 // @param[in] slope_fall 立ち下がりスロープ遅延
 // @param[in] rise_resistance 立ち上がり負荷依存係数
 // @param[in] fall_resistance 立ち下がり負荷依存係数
-CiTiming*
+CellTiming*
 CiLibrary::new_timing(ymuint id,
-		      CellTiming::tType type,
+		      tCellTimingType type,
 		      CellTime intrinsic_rise,
 		      CellTime intrinsic_fall,
 		      CellTime slope_rise,
@@ -846,6 +862,45 @@ CiLibrary::new_timing(ymuint id,
 					     rise_resistance,
 					     fall_resistance);
   return timing;
+}
+
+// @brief タイミング情報をセットする．
+// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
+// @param[in] sense タイミング条件
+// @param[in] timing_id 設定するタイミング情報の番号
+// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+//  + cell->output_num() を使う．
+// @note ( *2 ) ipin_id で入出力ピンを表す時には入出力ピン番号
+//  + cell->input_num() を使う．
+void
+CiLibrary::set_timing(ymuint cell_id,
+		      ymuint ipin_id,
+		      ymuint opin_id,
+		      tCellTimingSense sense,
+		      CellTiming* timing)
+{
+  CiCell* cell = mCellArray[cell_id];
+
+  ymuint base = opin_id * cell->input_num2() + ipin_id;
+  switch ( sense ) {
+  case kCellPosiUnate:
+    cell->mTimingArray[base + 0] = timing;
+    break;
+
+  case kCellNegaUnate:
+    cell->mTimingArray[base + 1] = timing;
+    break;
+
+  case kCellNonUnate:
+    cell->mTimingArray[base + 0] = timing;
+    cell->mTimingArray[base + 1] = timing;
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+  }
 }
 
 END_NAMESPACE_YM_CELL

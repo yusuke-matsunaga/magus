@@ -43,12 +43,12 @@ dump_load_test(const char* in_filename,
       return false;
     }
 
-    dump_library(os, *library);
+    library->dump(os);
 
     os.close();
   }
 
-  const CellLibrary* library2 = NULL;
+  CellLibrary* library2 = CellLibrary::new_obj();
   {
     ifstream ifs;
     ifs.open(data_filename, ios::binary);
@@ -57,7 +57,7 @@ dump_load_test(const char* in_filename,
       cerr << "Could not open " << data_filename << endl;
       return false;
     }
-    library2 = restore_library(ifs);
+    library2->restore(ifs);
   }
 
   display_library(cout, *library2);
