@@ -10,6 +10,7 @@
 
 
 #include "ym_cell/cell_nsdef.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -148,6 +149,22 @@ operator>=(const CellCapacitance& left,
 ostream&
 operator<<(ostream& s,
 	   const CellCapacitance& val);
+
+/// @brief バイナリダンプ
+/// @param[in] s 出力先のストリーム
+/// @param[in] val 値
+/// @relates CellCapacitance
+BinO&
+operator<<(BinO& s,
+	   const CellCapacitance& val);
+
+/// @brief バイナリリストア
+/// @param[in] s 入力元のストリーム
+/// @param[out] val 値を格納する変数
+/// @relates CellCapacitance
+BinI&
+operator>>(BinI& s,
+	   CellCapacitance& val);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -309,6 +326,33 @@ operator<<(ostream& s,
 	   const CellCapacitance& val)
 {
   return s << val.value();
+}
+
+// @brief バイナリダンプ
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+// @relates CellCapacitance
+inline
+BinO&
+operator<<(BinO& s,
+	   const CellCapacitance& val)
+{
+  return s << val.value();
+}
+
+// @brief バイナリリストア
+// @param[in] s 入力元のストリーム
+// @param[out] val 値を格納する変数
+// @relates CellCapacitance
+inline
+BinI&
+operator>>(BinI& s,
+	   CellCapacitance& val)
+{
+  double tmp_val;
+  s >> tmp_val;
+  val = CellCapacitance(tmp_val);
+  return s;
 }
 
 END_NAMESPACE_YM_CELL

@@ -58,7 +58,7 @@ CellLibrary::dump(ostream& s) const
 
     bos << tid
 	<< cell->name()
-	<< cell->area().value()
+	<< cell->area()
 	<< ni
 	<< no
 	<< nio
@@ -94,36 +94,36 @@ CellLibrary::dump(ostream& s) const
     for (ymuint32 ipin = 0; ipin < ni; ++ ipin) {
       const CellPin* pin = cell->input(ipin);
       bos << pin->name()
-	  << pin->capacitance().value()
-	  << pin->rise_capacitance().value()
-	  << pin->fall_capacitance().value();
+	  << pin->capacitance()
+	  << pin->rise_capacitance()
+	  << pin->fall_capacitance();
     }
 
     // 出力ピンのダンプ
     for (ymuint32 opin = 0; opin < no; ++ opin) {
       const CellPin* pin = cell->output(opin);
       bos << pin->name()
-	  << pin->max_fanout().value()
-	  << pin->min_fanout().value()
-	  << pin->max_capacitance().value()
-	  << pin->min_capacitance().value()
-	  << pin->max_transition().value()
-	  << pin->min_transition().value();
+	  << pin->max_fanout()
+	  << pin->min_fanout()
+	  << pin->max_capacitance()
+	  << pin->min_capacitance()
+	  << pin->max_transition()
+	  << pin->min_transition();
     }
 
     // 入出力ピンのダンプ
     for (ymuint32 iopin = 0; iopin < nio; ++ iopin) {
       const CellPin* pin = cell->output(iopin);
       bos << pin->name()
-	  << pin->capacitance().value()
-	  << pin->rise_capacitance().value()
-	  << pin->fall_capacitance().value()
-	  << pin->max_fanout().value()
-	  << pin->min_fanout().value()
-	  << pin->max_capacitance().value()
-	  << pin->min_capacitance().value()
-	  << pin->max_transition().value()
-	  << pin->min_transition().value();
+	  << pin->capacitance()
+	  << pin->rise_capacitance()
+	  << pin->fall_capacitance()
+	  << pin->max_fanout()
+	  << pin->min_fanout()
+	  << pin->max_capacitance()
+	  << pin->min_capacitance()
+	  << pin->max_transition()
+	  << pin->min_transition();
     }
 
     // タイミング情報のID -> 通し番号のマップ
@@ -156,12 +156,12 @@ CellLibrary::dump(ostream& s) const
     bos << nt;
     for (ymuint32 j = 0; j < nt; ++ j) {
       const CellTiming* timing = timing_list[j];
-      s << timing->intrinsic_rise().value()
-	<< timing->intrinsic_fall().value()
-	<< timing->slope_rise().value()
-	<< timing->slope_fall().value()
-	<< timing->rise_resistance().value()
-	<< timing->fall_resistance().value();
+      bos << timing->intrinsic_rise()
+	  << timing->intrinsic_fall()
+	  << timing->slope_rise()
+	  << timing->slope_fall()
+	  << timing->rise_resistance()
+	  << timing->fall_resistance();
     }
     for (ymuint32 ipin = 0; ipin < ni + nio; ++ ipin) {
       for (ymuint32 opin = 0; opin < no + nio; ++ opin) {
@@ -178,7 +178,7 @@ CellLibrary::dump(ostream& s) const
 	if ( timing_n ) {
 	  hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_n->id());
 	  assert_cond( p != timing_map.end(), __FILE__, __LINE__);
-	  bos << static_cast<ymuint8>(0)
+	  bos << static_cast<ymuint8>(2)
 	      << ipin
 	      << opin
 	      << p->second;

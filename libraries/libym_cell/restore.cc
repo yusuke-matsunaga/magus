@@ -35,7 +35,7 @@ CellLibrary::restore(istream& s)
   for (ymuint cell_id = 0; cell_id < nc; ++ cell_id) {
     ymuint8 type;
     string name;
-    double aval;
+    CellArea area;
     ymuint32 ni;
     ymuint32 no;
     ymuint32 nio;
@@ -43,13 +43,12 @@ CellLibrary::restore(istream& s)
     ymuint32 nbundle;
     bis >> type
 	>> name
-	>> aval
+	>> area
 	>> ni
 	>> no
 	>> nio
 	>> nbus
 	>> nbundle;
-    CellArea area( aval );
     ymuint no2 = no + nio;
     vector<LogExpr> logic_array(no2);
     vector<LogExpr> tristate_array(no2);
@@ -124,34 +123,32 @@ CellLibrary::restore(istream& s)
     // 入力ピンの設定
     for (ymuint j = 0; j < ni; ++ j) {
       string name;
-      double v1, v2, v3;
+      CellCapacitance cap;
+      CellCapacitance r_cap;
+      CellCapacitance f_cap;
       bis >> name
-	  >> v1
-	  >> v2
-	  >> v3;
-      CellCapacitance cap( v1 );
-      CellCapacitance r_cap( v2 );
-      CellCapacitance f_cap( v3 );
+	  >> cap
+	  >> r_cap
+	  >> f_cap;
       new_cell_input(cell_id, j, name, cap, r_cap, f_cap);
     }
 
     // 出力ピンの設定
     for (ymuint j = 0; j < no; ++ j) {
       string name;
-      double v1, v2, v3, v4, v5, v6;
+      CellCapacitance max_f;
+      CellCapacitance min_f;
+      CellCapacitance max_c;
+      CellCapacitance min_c;
+      CellTime max_t;
+      CellTime min_t;
       bis >> name
-	  >> v1
-	  >> v2
-	  >> v3
-	  >> v4
-	  >> v5
-	  >> v6;
-      CellCapacitance max_f( v1 );
-      CellCapacitance min_f( v2 );
-      CellCapacitance max_c( v3 );
-      CellCapacitance min_c( v4 );
-      CellTime max_t( v5 );
-      CellTime min_t( v6 );
+	  >> max_f
+	  >> min_f
+	  >> max_c
+	  >> min_c
+	  >> max_t
+	  >> min_t;
       new_cell_output(cell_id, j, name,
 		      max_f, min_f,
 		      max_c, min_c,
@@ -161,26 +158,25 @@ CellLibrary::restore(istream& s)
     // 入出力ピンの設定
     for (ymuint j = 0; j < nio; ++ j) {
       string name;
-      double v1, v2, v3, v4, v5, v6, v7, v8, v9;
+      CellCapacitance cap;
+      CellCapacitance r_cap;
+      CellCapacitance f_cap;
+      CellCapacitance max_f;
+      CellCapacitance min_f;
+      CellCapacitance max_c;
+      CellCapacitance min_c;
+      CellTime max_t;
+      CellTime min_t;
       bis >> name
-	  >> v1
-	  >> v2
-	  >> v3
-	  >> v4
-	  >> v5
-	  >> v6
-	  >> v7
-	  >> v8
-	  >> v9;
-      CellCapacitance cap( v1 );
-      CellCapacitance r_cap( v2 );
-      CellCapacitance f_cap( v3 );
-      CellCapacitance max_f( v4 );
-      CellCapacitance min_f( v5 );
-      CellCapacitance max_c( v6 );
-      CellCapacitance min_c( v7 );
-      CellTime max_t( v8 );
-      CellTime min_t( v9 );
+	  >> cap
+	  >> r_cap
+	  >> f_cap
+	  >> max_f
+	  >> min_f
+	  >> max_c
+	  >> min_c
+	  >> max_t
+	  >> min_t;
       new_cell_inout(cell_id, j, name,
 		     cap, r_cap, f_cap,
 		     max_f, min_f,
@@ -189,22 +185,22 @@ CellLibrary::restore(istream& s)
     }
 
     // タイミング情報の生成
-    ymuint nt = BinIO::read_32(s);
+    ymuint32 nt;
+    bis >> nt;
     vector<CellTiming*> tmp_list(nt);
     for (ymuint j = 0; j < nt; ++ j) {
-      double v1, v2, v3, v4, v5, v6;
-      bis >> v1
-	  >> v2
-	  >> v3
-	  >> v4
-	  >> v5
-	  >> v6;
-      CellTime i_r( v1 );
-      CellTime i_f( v2 );
-      CellTime s_r( v3 );
-      CellTime s_f( v4 );
-      CellResistance r_r( v5 );
-      CellResistance f_r( v6 );
+      CellTime i_r;
+      CellTime i_f;
+      CellTime s_r;
+      CellTime s_f;
+      CellResistance r_r;
+      CellResistance f_r;
+      bis >> i_r
+	  >> i_f
+	  >> s_r
+	  >> s_f
+	  >> r_r
+	  >> f_r;
       CellTiming* timing = new_timing(j, kCellTimingCombinational,
 				      i_r, i_f, s_r, s_f, r_r, f_r);
       tmp_list[j] = timing;
