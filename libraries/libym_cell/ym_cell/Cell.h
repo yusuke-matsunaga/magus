@@ -198,6 +198,17 @@ public:
   bool
   is_seq() const = 0;
 
+  /// @brief 出力の論理式を持っている時に true を返す．
+  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+  virtual
+  bool
+  has_logic(ymuint pin_id) const = 0;
+
+  /// @brief 全ての出力が論理式を持っているときに true を返す．
+  virtual
+  bool
+  has_logic() const = 0;
+
   /// @brief 論理セルの場合に出力の論理式を返す．
   /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
   /// @note 論理式中の変数番号は入力ピン番号に対応する．
@@ -211,6 +222,12 @@ public:
   virtual
   TvFunc
   logic_function(ymuint pos) const = 0;
+
+  /// @brief 出力がトライステート条件を持っている時に true を返す．
+  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+  virtual
+  bool
+  has_tristate(ymuint pin_id) const = 0;
 
   /// @brief トライステートセルの場合にトライステート条件式を返す．
   /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )

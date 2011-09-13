@@ -1,8 +1,8 @@
-#ifndef LDGROUP_H
-#define LDGROUP_H
+#ifndef LCGROUP_H
+#define LCGROUP_H
 
-/// @file LdGroup.h
-/// @brief LdGroup.h
+/// @file LcGroup.h
+/// @brief LcGroup.h
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -13,13 +13,13 @@
 #include "ym_logic/NpnMapM.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBDUMP
+BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 //////////////////////////////////////////////////////////////////////
-/// @class LdGroup LdGroup.h "LdGroup.h"
+/// @class LcGroup LcGroup.h "LcGroup.h"
 /// @brief テンポラリに使用するセルグループ用のクラス
 //////////////////////////////////////////////////////////////////////
-class LdGroup
+class LcGroup
 {
   friend class LdClass;
 
@@ -27,10 +27,10 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
-  LdGroup(ymuint id);
+  LcGroup(ymuint id);
 
   /// @brief デストラクタ
-  ~LdGroup();
+  ~LcGroup();
 
 
 public:
@@ -48,7 +48,7 @@ public:
   map() const;
 
   /// @brief 実体を返す．
-  const CellGroup*
+  CellGroup*
   cell_group() const;
 
   /// @brief 属しているセルの番号のリストを返す．
@@ -83,6 +83,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_CELL_LIBDUMP
+END_NAMESPACE_YM_CELL_LIBCOMP
 
-#endif // LDGROUP_H
+#endif // LCGROUP_H

@@ -42,7 +42,6 @@ bin_PROGRAMS = \
 	dotlib_parser_test \
 	dotlib_reader_test \
 	dump_restore_test \
-	libdump_test \
 	cell_mgr_test \
 	cell_dump_test
 
@@ -105,8 +104,8 @@ cell_dump_test_LDADD = \
 	$(YM_CELL)
 
 
-libdump_test_SOURCES = \
-	libdump_test.cc
+#libdump_test_SOURCES = \
+#	libdump_test.cc
 
-libdump_test_LDADD = \
-	$(YM_CELL)
+#libdump_test_LDADD = \
+#	$(YM_CELL)

@@ -502,8 +502,11 @@ CiLibrary::set_cell_num(ymuint num)
 // @param[in] nio 入出力ピン数
 // @param[in] nb バス数
 // @param[in] nc バンドル数
+// @param[in] output_array 出力の情報の配列(*1)
 // @param[in] logic_array 出力の論理式の配列
 // @param[in] tristate_array トライステート条件の論理式の配列
+// *1: - false 論理式なし
+//     - true 論理式あり
 void
 CiLibrary::new_logic_cell(ymuint cell_id,
 			  const string& name,
@@ -513,15 +516,17 @@ CiLibrary::new_logic_cell(ymuint cell_id,
 			  ymuint nio,
 			  ymuint nb,
 			  ymuint nc,
+			  const vector<bool>& output_array,
 			  const vector<LogExpr>& logic_array,
 			  const vector<LogExpr>& tristate_array)
 {
   void* p = mAlloc.get_memory(sizeof(CiLogicCell));
   CiCell* cell = new (p) CiLogicCell(cell_id, ShString(name), area,
 				     ni, no, nio, nb, nc,
-				     mAlloc,
+				     output_array,
 				     logic_array,
-				     tristate_array);
+				     tristate_array,
+				     mAlloc);
   mCellArray[cell_id] = cell;
 }
 
@@ -534,6 +539,7 @@ CiLibrary::new_logic_cell(ymuint cell_id,
 // @param[in] nio 入出力ピン数
 // @param[in] nb バス数
 // @param[in] nc バンドル数
+// @param[in] output_array 出力の情報の配列(*1)
 // @param[in] logic_array 出力の論理式の配列
 // @param[in] tristate_array トライステート条件の論理式の配列
 // @param[in] next_state "next_state" 関数の式
@@ -541,6 +547,8 @@ CiLibrary::new_logic_cell(ymuint cell_id,
 // @param[in] clocked_on_also "clocked_on_also" 関数の式
 // @param[in] clear "clear" 関数の式
 // @param[in] preset "preset" 関数の式
+// *1: - false 論理式なし
+//     - true 論理式あり
 void
 CiLibrary::new_ff_cell(ymuint cell_id,
 		       const string& name,
@@ -550,6 +558,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 		       ymuint nio,
 		       ymuint nb,
 		       ymuint nc,
+		       const vector<bool>& output_array,
 		       const vector<LogExpr>& logic_array,
 		       const vector<LogExpr>& tristate_array,
 		       const LogExpr& next_state,
@@ -571,7 +580,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
       void* p = mAlloc.get_memory(sizeof(CiFFSRCell));
       cell = new (p) CiFFSRCell(cell_id, shname, area,
 				ni, no, nio, nb, nc,
-				mAlloc,
+				output_array,
 				logic_array,
 				tristate_array,
 				next_state,
@@ -580,19 +589,21 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 				clear,
 				preset,
 				clear_preset_var1,
-				clear_preset_var2);
+				clear_preset_var2,
+				mAlloc);
     }
     else {
       void* p = mAlloc.get_memory(sizeof(CiFFRCell));
       cell = new (p) CiFFRCell(cell_id, shname, area,
 			       ni, no, nio, nb, nc,
-			       mAlloc,
+			       output_array,
 			       logic_array,
 			       tristate_array,
 			       next_state,
 			       clocked_on,
 			       clocked_on_also,
-			       clear);
+			       clear,
+			       mAlloc);
     }
   }
   else {
@@ -600,26 +611,27 @@ CiLibrary::new_ff_cell(ymuint cell_id,
       void* p = mAlloc.get_memory(sizeof(CiFFSCell));
       cell = new (p) CiFFSCell(cell_id, shname, area,
 			       ni, no, nio, nb, nc,
-			       mAlloc,
+			       output_array,
 			       logic_array,
 			       tristate_array,
 			       next_state,
 			       clocked_on,
 			       clocked_on_also,
-			       preset);
+			       preset,
+			       mAlloc);
     }
     else {
       void* p = mAlloc.get_memory(sizeof(CiFFCell));
       cell = new (p) CiFFCell(cell_id, shname, area,
 			      ni, no, nio, nb, nc,
-			      mAlloc,
+			      output_array,
 			      logic_array,
 			      tristate_array,
 			      next_state,
 			      clocked_on,
-			      clocked_on_also);
+			      clocked_on_also,
+			      mAlloc);
     }
-
   }
   mCellArray[cell_id] = cell;
 }
@@ -633,6 +645,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 // @param[in] nio 入出力ピン数
 // @param[in] nb バス数
 // @param[in] nc バンドル数
+// @param[in] output_array 出力の情報の配列(*1)
 // @param[in] logic_array 出力の論理式の配列
 // @param[in] tristate_array トライステート条件の論理式の配列
 // @param[in] data_in "data_in" 関数の式
@@ -642,6 +655,8 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 // @param[in] preset "preset" 関数の式
 // @param[in] clear_preset_var1 clear と preset が同時にオンになったときの値1
 // @param[in] clear_preset_var2 clear と preset が同時にオンになったときの値2
+// *1: - false 論理式なし
+//     - true 論理式あり
 void
 CiLibrary::new_latch_cell(ymuint cell_id,
 			  const string& name,
@@ -651,6 +666,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 			  ymuint nio,
 			  ymuint nb,
 			  ymuint nc,
+			  const vector<bool>& output_array,
 			  const vector<LogExpr>& logic_array,
 			  const vector<LogExpr>& tristate_array,
 			  const LogExpr& data_in,
@@ -672,7 +688,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
       void* p = mAlloc.get_memory(sizeof(CiLatchSRCell));
       cell = new (p) CiLatchSRCell(cell_id, shname, area,
 				   ni, no, nio, nb, nc,
-				   mAlloc,
+				   output_array,
 				   logic_array,
 				   tristate_array,
 				   data_in,
@@ -681,19 +697,21 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 				   clear,
 				   preset,
 				   clear_preset_var1,
-				   clear_preset_var2);
+				   clear_preset_var2,
+				   mAlloc);
     }
     else {
       void* p = mAlloc.get_memory(sizeof(CiLatchRCell));
       cell = new (p) CiLatchRCell(cell_id, shname, area,
 				  ni, no, nio, nb, nc,
-				  mAlloc,
+				  output_array,
 				  logic_array,
 				  tristate_array,
 				  data_in,
 				  enable,
 				  enable_also,
-				  clear);
+				  clear,
+				  mAlloc);
     }
   }
   else {
@@ -701,24 +719,26 @@ CiLibrary::new_latch_cell(ymuint cell_id,
       void* p = mAlloc.get_memory(sizeof(CiLatchSCell));
       cell = new (p) CiLatchSCell(cell_id, shname, area,
 				  ni, no, nio, nb, nc,
-				  mAlloc,
+				  output_array,
 				  logic_array,
 				  tristate_array,
 				  data_in,
 				  enable,
 				  enable_also,
-				  preset);
+				  preset,
+				  mAlloc);
     }
     else {
       void* p = mAlloc.get_memory(sizeof(CiLatchCell));
       cell = new (p) CiLatchCell(cell_id, shname, area,
 				 ni, no, nio, nb, nc,
-				 mAlloc,
+				 output_array,
 				 logic_array,
 				 tristate_array,
 				 data_in,
 				 enable,
-				 enable_also);
+				 enable_also,
+				 mAlloc);
     }
   }
   mCellArray[cell_id] = cell;

@@ -10,7 +10,7 @@ SUBDIRS = \
 	ci \
 	mislib \
 	dotlib \
-	libdump \
+	libcomp \
 	. \
 	tests
 
@@ -43,6 +43,6 @@ libym_cell_la_LIBADD = \
 	ci/libym_cell_ci.la \
 	dotlib/libym_cell_dotlib.la \
 	mislib/libym_cell_mislib.la \
-	libdump/libym_cell_libdump.la
+	libcomp/libym_cell_libcomp.la
 
 libym_cell_la_LDFLAGS =

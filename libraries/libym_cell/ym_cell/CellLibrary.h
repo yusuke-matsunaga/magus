@@ -418,8 +418,11 @@ public:
   /// @param[in] nio 入出力ピン数
   /// @param[in] nb バス数
   /// @param[in] nc バンドル数
+  /// @param[in] output_array 出力の情報の配列(*1)
   /// @param[in] logic_array 出力の論理式の配列
   /// @param[in] tristated_array トライステート条件の論理式の配列
+  /// *1: - false 論理式なし
+  ///     - true 論理式あり
   virtual
   void
   new_logic_cell(ymuint cell_id,
@@ -430,6 +433,7 @@ public:
 		 ymuint nio,
 		 ymuint nb,
 		 ymuint nc,
+		 const vector<bool>& output_array,
 		 const vector<LogExpr>& logic_array,
 		 const vector<LogExpr>& tristate_array) = 0;
 
@@ -442,6 +446,7 @@ public:
   /// @param[in] nio 入出力ピン数
   /// @param[in] nb バス数
   /// @param[in] nc バンドル数
+  /// @param[in] output_array 出力の情報の配列(*1)
   /// @param[in] logic_array 出力の論理式の配列
   /// @param[in] tristated_array トライステート条件の論理式の配列
   /// @param[in] next_state "next_state" 関数の式
@@ -451,6 +456,8 @@ public:
   /// @param[in] preset "preset" 関数の式
   /// @param[in] clear_preset_var1 clear と preset が同時にオンになったときの値1
   /// @param[in] clear_preset_var2 clear と preset が同時にオンになったときの値2
+  /// *1: - false 論理式なし
+  ///     - true 論理式あり
   virtual
   void
   new_ff_cell(ymuint cell_id,
@@ -461,6 +468,7 @@ public:
 	      ymuint nio,
 	      ymuint nb,
 	      ymuint nc,
+	      const vector<bool>& output_array,
 	      const vector<LogExpr>& logic_array,
 	      const vector<LogExpr>& tristate_array,
 	      const LogExpr& next_state,
@@ -480,6 +488,7 @@ public:
   /// @param[in] nio 入出力ピン数
   /// @param[in] nb バス数
   /// @param[in] nc バンドル数
+  /// @param[in] output_array 出力の情報の配列(*1)
   /// @param[in] logic_array 出力の論理式の配列
   /// @param[in] tristated_array トライステート条件の論理式の配列
   /// @param[in] data_in "data_in" 関数の式
@@ -489,6 +498,8 @@ public:
   /// @param[in] enable_also "enable_also" 関数の式
   /// @param[in] clear_preset_var1 clear と preset が同時にオンになったときの値1
   /// @param[in] clear_preset_var2 clear と preset が同時にオンになったときの値2
+  /// *1: - false 論理式なし
+  ///     - true 論理式あり
   virtual
   void
   new_latch_cell(ymuint cell_id,
@@ -499,6 +510,7 @@ public:
 		 ymuint nio,
 		 ymuint nb,
 		 ymuint nc,
+		 const vector<bool>& output_array,
 		 const vector<LogExpr>& logic_array,
 		 const vector<LogExpr>& tristate_array,
 		 const LogExpr& data_in,

@@ -208,6 +208,14 @@ private:
 // BinIO に対するストリーム出力演算子
 //////////////////////////////////////////////////////////////////////
 
+/// @brief ブール値の書き込み
+/// @param[in] s 出力先のストリーム
+/// @param[in] val 値
+/// @return BinO を返す．
+BinO&
+operator<<(BinO& s,
+	   bool val);
+
 /// @brief 1バイトの書き込み
 /// @param[in] s 出力先のストリーム
 /// @param[in] val 値
@@ -271,6 +279,14 @@ operator<<(BinO& s,
 BinO&
 operator<<(BinO& s,
 	   const string& val);
+
+/// @brief ブール値の読み出し
+/// @param[in] s 入力元のストリーム
+/// @param[out] val 値を格納する変数
+/// @return BinI を返す．
+BinI&
+operator>>(BinI& s,
+	   bool& val);
 
 /// @brief 1バイトの読み出し
 /// @param[in] s 入力元のストリーム
@@ -339,6 +355,19 @@ ostream&
 BinO::s()
 {
   return mS;
+}
+
+// @brief ブール値の書き込み
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+// @return BinO を返す．
+inline
+BinO&
+operator<<(BinO& s,
+	   bool val)
+{
+  BinIO::write_8(s.s(), val);
+  return s;
 }
 
 // @brief 1バイトの書き込み
@@ -451,6 +480,19 @@ istream&
 BinI::s()
 {
   return mS;
+}
+
+// @brief ブール値の読み出し
+// @param[in] s 入力元のストリーム
+// @param[out] val 値を格納する変数
+// @return BinI を返す．
+inline
+BinI&
+operator>>(BinI& s,
+	   bool& val)
+{
+  val = BinIO::read_8(s.s());
+  return s;
 }
 
 // @brief 1バイトの読み出し

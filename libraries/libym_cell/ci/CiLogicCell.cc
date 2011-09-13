@@ -25,9 +25,12 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] nio 入出力ピン数
 // @param[in] nb バス数
 // @param[in] nc バンドル数
-// @param[in] alloc メモリアロケータ
+// @param[in] output_array 出力の情報の配列(*1)
 // @param[in] logic_array 出力の論理式の配列
 // @param[in] tristated_array トライステート条件の論理式の配列
+// @param[in] alloc メモリアロケータ
+// *1: - false 論理式なし
+//     - true 論理式あり
 CiLogicCell::CiLogicCell(ymuint id,
 			 const ShString& name,
 			 CellArea area,
@@ -36,11 +39,16 @@ CiLogicCell::CiLogicCell(ymuint id,
 			 ymuint nio,
 			 ymuint nb,
 			 ymuint nc,
-			 AllocBase& alloc,
+			 const vector<bool>& output_array,
 			 const vector<LogExpr>& logic_array,
-			 const vector<LogExpr>& tristate_array) :
-  CiCell(id, name, area, ni, no, nio, nb, nc, alloc,
-	 logic_array, tristate_array)
+			 const vector<LogExpr>& tristate_array,
+			 AllocBase& alloc) :
+  CiCell(id, name, area,
+	 ni, no, nio, nb, nc,
+	 output_array,
+	 logic_array,
+	 tristate_array,
+	 alloc)
 {
 }
 

@@ -30,9 +30,12 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] nio 入出力ピン数
 // @param[in] nb バス数
 // @param[in] nc バンドル数
-// @param[in] alloc メモリアロケータ
+// @param[in] output_array 出力の情報の配列(*1)
 // @param[in] logic_array 出力の論理式の配列
 // @param[in] tristated_array トライステート条件の論理式の配列
+// @param[in] alloc メモリアロケータ
+// *1: - false 論理式なし
+//     - true 論理式あり
 CiCell::CiCell(ymuint id,
 	       const ShString& name,
 	       CellArea area,
@@ -41,9 +44,10 @@ CiCell::CiCell(ymuint id,
 	       ymuint nio,
 	       ymuint nb,
 	       ymuint nc,
-	       AllocBase& alloc,
+	       const vector<bool>& output_array,
 	       const vector<LogExpr>& logic_array,
-	       const vector<LogExpr>& tristate_array)
+	       const vector<LogExpr>& tristate_array,
+	       AllocBase& alloc)
 {
   mId = id;
   mName = name;
@@ -76,6 +80,9 @@ CiCell::CiCell(ymuint id,
 
   ymuint no2 = no + nio;
 
+  void* x = alloc.get_memory(sizeof(ymuint8) * no2);
+  mLTArray = new (x) ymuint8[no2];
+
   void* t = alloc.get_memory(sizeof(LogExpr) * no2);
   mLogicArray = new (t) LogExpr[no2];
 
@@ -83,6 +90,16 @@ CiCell::CiCell(ymuint id,
   mTristateArray = new (u) LogExpr[no2];
 
   for (ymuint i = 0; i < no2; ++ i) {
+    ymuint8 val = 0U;
+    if ( output_array[i] ) {
+      if ( tristate_array[i].is_zero() ) {
+	val = 1U;
+      }
+      else {
+	val = 2U;
+      }
+    }
+    mLTArray[i] = val;
     mLogicArray[i] = logic_array[i];
     mTristateArray[i] = tristate_array[i];
   }
@@ -297,6 +314,26 @@ CiCell::is_seq() const
   return false;
 }
 
+// @brief 出力の論理式を持っている時に true を返す．
+// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+bool
+CiCell::has_logic(ymuint pin_id) const
+{
+  return mLTArray[pin_id] != 0U;
+}
+
+// @brief 全ての出力が論理式を持っているときに true を返す．
+bool
+CiCell::has_logic() const
+{
+  for (ymuint i = 0; i < output_num2(); ++ i) {
+    if ( !has_logic(i) ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 // @brief 論理セルの場合に出力の論理式を返す．
 // @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
 // @note 論理式中の変数番号は入力ピン番号に対応する．
@@ -313,6 +350,14 @@ TvFunc
 CiCell::logic_function(ymuint pos) const
 {
   return cell_group()->logic_function(pos);
+}
+
+// @brief 出力がトライステート条件を持っている時に true を返す．
+// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+bool
+CiCell::has_tristate(ymuint pin_id) const
+{
+  return mLTArray[pin_id] == 2U;
 }
 
 // @brief トライステートセルの場合にトライステート条件式を返す．

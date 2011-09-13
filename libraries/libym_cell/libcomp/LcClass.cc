@@ -11,7 +11,7 @@
 #include "LdGroup.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBDUMP
+BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 //////////////////////////////////////////////////////////////////////
 // クラス LdClass
@@ -83,5 +83,5 @@ LdClass::add_group(LdGroup* group,
 }
 
 
-END_NAMESPACE_YM_CELL_LIBDUMP
+END_NAMESPACE_YM_CELL_LIBCOMP
 

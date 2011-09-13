@@ -1,8 +1,8 @@
-#ifndef LDCLASS_H
-#define LDCLASS_H
+#ifndef LCCLASS_H
+#define LCCLASS_H
 
-/// @file LdClass.h
-/// @brief LdClass のヘッダファイル
+/// @file LcClass.h
+/// @brief LcClass のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -14,30 +14,30 @@
 #include "ym_logic/TvFuncM.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBDUMP
+BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 //////////////////////////////////////////////////////////////////////
-/// @class LdClass LdClass.h "LdClass.h"
+/// @class LcClass LcClass.h "LcClass.h"
 /// @brief テンポラリに使用するセルクラス用のクラス
 //////////////////////////////////////////////////////////////////////
-class LdClass
+class LcClass
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
   /// @param[in] repfunc 代表関数
-  LdClass(ymuint id,
+  LcClass(ymuint id,
 	  const TvFunc& repfunc);
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
   /// @param[in] repfunc 代表関数
-  LdClass(ymuint id,
+  LcClass(ymuint id,
 	  const TvFuncM& repfunc);
 
   /// @brief デストラクタ
-  ~LdClass();
+  ~LcClass();
 
 
 public:
@@ -76,13 +76,13 @@ private:
   TvFuncM mRepFunc;
 
   // 実体のオブジェクト
-  const CellClass* mCellClass;
+  CellClass* mCellClass;
 
   // グループのリスト
   vector<LdGroup*> mGroupList;
 
 };
 
-END_NAMESPACE_YM_CELL_LIBDUMP
+END_NAMESPACE_YM_CELL_LIBCOMP
 
-#endif // LDCLASS_H
+#endif // LCCLASS_H

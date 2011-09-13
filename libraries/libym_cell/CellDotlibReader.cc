@@ -212,10 +212,13 @@ gen_library(const DotlibNode* dt_library)
     }
 
     // 出力ピン(入出力ピン)の論理式を作る．
+    vector<bool> output_array;
     vector<LogExpr> logic_array;
     vector<LogExpr> tristate_array;
-    logic_array.reserve(npin);
-    tristate_array.reserve(npin);
+    ymuint no2 = no + nio;
+    output_array.reserve(no2);
+    logic_array.reserve(no2);
+    tristate_array.reserve(no2);
     for (ymuint i = 0; i < npin; ++ i) {
       DotlibPin& pin_info = pin_info_array[i];
       switch ( pin_info.direction() ) {
@@ -225,9 +228,11 @@ gen_library(const DotlibNode* dt_library)
 	  if ( func_node ) {
 	    LogExpr expr = dot2expr(func_node, pin_map);
 	    logic_array.push_back(expr);
+	    output_array.push_back(true);
 	  }
 	  else {
 	    logic_array.push_back(LogExpr::make_zero());
+	    output_array.push_back(false);
 	  }
 	  const DotlibNode* three_state = pin_info.three_state();
 	  if ( three_state ) {
@@ -246,9 +251,11 @@ gen_library(const DotlibNode* dt_library)
 	  if ( func_node ) {
 	    LogExpr expr = dot2expr(func_node, pin_map);
 	    logic_array.push_back(expr);
+	    output_array.push_back(true);
 	  }
 	  else {
 	    logic_array.push_back(LogExpr::make_zero());
+	    output_array.push_back(false);
 	  }
 	  const DotlibNode* three_state = pin_info.three_state();
 	  if ( three_state ) {
@@ -277,7 +284,9 @@ gen_library(const DotlibNode* dt_library)
       ymuint v2 = ff_info.clear_preset_var2();
       library->new_ff_cell(cell_id, cell_name, area,
 			   ni, no, nio, nbus, nbundle,
-			   logic_array, tristate_array,
+			   output_array,
+			   logic_array,
+			   tristate_array,
 			   next_state,
 			   clocked_on, clocked_on_also,
 			   clear, preset,
@@ -294,7 +303,9 @@ gen_library(const DotlibNode* dt_library)
       ymuint v2 = latch_info.clear_preset_var2();
       library->new_latch_cell(cell_id, cell_name, area,
 			      ni, no, nio, nbus, nbundle,
-			      logic_array, tristate_array,
+			      output_array,
+			      logic_array,
+			      tristate_array,
 			      data_in,
 			      enable, enable_also,
 			      clear, preset,
@@ -303,7 +314,9 @@ gen_library(const DotlibNode* dt_library)
     else {
       library->new_logic_cell(cell_id, cell_name, area,
 			      ni, no, nio, nbus, nbundle,
-			      logic_array, tristate_array);
+			      output_array,
+			      logic_array,
+			      tristate_array);
     }
 
     // ピンの生成

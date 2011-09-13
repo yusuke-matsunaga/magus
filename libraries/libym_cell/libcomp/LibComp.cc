@@ -1,17 +1,17 @@
 
-/// @file LibDump.cc
-/// @brief LibDump の実装ファイル
+/// @file LibComp.cc
+/// @brief LibComp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LibDump.h"
-#include "LdClass.h"
-#include "LdGroup.h"
-#include "LdPatNode.h"
-#include "LdPatHandle.h"
+#include "LibComp.h"
+#include "LcClass.h"
+#include "LcGroup.h"
+#include "LcPatNode.h"
+#include "LcPatHandle.h"
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
@@ -19,7 +19,7 @@
 #include "ym_logic/NpnMap.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBDUMP
+BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 BEGIN_NONAMESPACE
 
@@ -53,27 +53,27 @@ END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス LibDump
+// クラス LibComp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LibDump::LibDump()
+LibComp::LibComp()
 {
 }
 
 // @brief デストラクタ
-LibDump::~LibDump()
+LibComp::~LibComp()
 {
 }
 
 // @brief ライブラリの情報からパタンを生成する．
 // @param[in] library 対象のセルライブラリ
 void
-LibDump::gen_pat(const CellLibrary& library)
+LibComp::gen_pat(const CellLibrary& library)
 {
-  mLdLogicMgr.init();
-  mLdFFMgr.init();
-  mLdPatMgr.init();
+  mLcLogicMgr.init();
+  mLcFFMgr.init();
+  mLcPatMgr.init();
 
   // XOR のパタンを登録しておく．
   // これはちょっとしたハック
@@ -107,7 +107,7 @@ LibDump::gen_pat(const CellLibrary& library)
 
       LogExpr expr = opin->function();
       TvFunc tv = expr.make_tv(ni)
-      LdFunc* pgfunc = mLdFuncMgr.find_func(tv);
+      LcFunc* pgfunc = mLcFuncMgr.find_func(tv);
       pgfunc->add_cell(cell->id());
 
       reg_pat(pgfunc, expr);
@@ -191,7 +191,7 @@ LibDump::gen_pat(const CellLibrary& library)
       ymuint q_pos = q_pin->id();
       ymuint iq_pos = iq_pin->id();
 
-      LdFFGroup* ff_group = mLdFFMgr.find_group(clock_sense,
+      LcFFGroup* ff_group = mLcFFMgr.find_group(clock_sense,
 						clear_sense,
 						preset_sense,
 						data_pos,
@@ -208,11 +208,11 @@ LibDump::gen_pat(const CellLibrary& library)
 
 // @brief expr から生成されるパタンを登録する．
 void
-LibDump::reg_expr(const LogExpr& expr)
+LibComp::reg_expr(const LogExpr& expr)
 {
-  // expr に対応する LdFunc を求める．
+  // expr に対応する LcFunc を求める．
   TvFunc f = expr.make_tv();
-  LdGroup* pgfunc = mLdLogicMgr.find_logic_group(f);
+  LcGroup* pgfunc = mLcLogicMgr.find_logic_group(f);
 
   // expr から生成されるパタンを pgfunc に登録する．
   reg_pat(pgfunc, expr);
@@ -222,10 +222,10 @@ LibDump::reg_expr(const LogExpr& expr)
 // @param[in] pgfunc この式に対応する関数情報
 // @param[in] expr パタンの元となる論理式
 void
-LibDump::reg_pat(LdGroup* pgfunc,
+LibComp::reg_pat(LcGroup* pgfunc,
 		 const LogExpr& expr)
 {
-  const LdClass* pgrep = pgfunc->parent();
+  const LcClass* pgrep = pgfunc->parent();
 
   // pgrep->rep_func() を用いる理由は論理式に現れる変数が
   // 真のサポートとは限らないから
@@ -239,7 +239,7 @@ LibDump::reg_pat(LdGroup* pgfunc,
 
     assert_cond( !cexpr.is_constant(), __FILE__, __LINE__);
 
-    mLdPatMgr.reg_pat(cexpr, pgrep->id());
+    mLcPatMgr.reg_pat(cexpr, pgrep->id());
   }
 }
 
@@ -247,7 +247,7 @@ LibDump::reg_pat(LdGroup* pgfunc,
 // @param[in] s 出力先のストリーム
 // @param[in] library 対象のセルライブラリ
 void
-LibDump::display(ostream& s,
+LibComp::display(ostream& s,
 		 const CellLibrary& library)
 {
   gen_pat(library);
@@ -256,13 +256,13 @@ LibDump::display(ostream& s,
   display_library(s, library);
 
   // 関数の情報を出力する．
-  mLdLogicMgr.display(s);
+  mLcLogicMgr.display(s);
 
   // パタングラフの情報を出力する．
-  mLdPatMgr.display(s);
+  mLcPatMgr.display(s);
 
   // FF の情報を出力する．
-  mLdFFMgr.display(s);
+  mLcFFMgr.display(s);
 }
 
 // @brief グラフ構造全体をダンプする．
@@ -270,7 +270,7 @@ LibDump::display(ostream& s,
 // @param[in] library 対象のセルライブラリ
 // @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
 void
-LibDump::dump(ostream& s,
+LibComp::dump(ostream& s,
 	      const CellLibrary& library)
 {
   gen_pat(library);
@@ -279,13 +279,13 @@ LibDump::dump(ostream& s,
   library.dump(s);
 
   // 関数の情報をダンプする．
-  mLdLogicMgr.dump(s);
+  mLcLogicMgr.dump(s);
 
   // パタングラフの情報をダンプする．
-  mLdPatMgr.dump(s);
+  mLcPatMgr.dump(s);
 
   // FF の情報を出力する．
-  mLdFFMgr.dump(s);
+  mLcFFMgr.dump(s);
 }
 
-END_NAMESPACE_YM_CELL_LIBDUMP
+END_NAMESPACE_YM_CELL_LIBCOMP

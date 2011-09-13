@@ -128,11 +128,14 @@ gen_library(const string& lib_name,
 
     ymuint ni = ipin_name_list.size();
     LogExpr function = opin_expr->to_expr(ipin_name_map);
+    vector<bool> output_array(1, true);
     vector<LogExpr> logic_array(1, function);
     vector<LogExpr> tristate_array(1, LogExpr::make_zero());
     library->new_logic_cell(cell_id, name, area,
 			    ni, 1, 0, 0, 0,
-			    logic_array, tristate_array);
+			    output_array,
+			    logic_array,
+			    tristate_array);
     for (ymuint i = 0; i < ni; ++ i) {
       // 入力ピンの設定
       ShString name = ipin_name_list[i];

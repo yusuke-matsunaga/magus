@@ -34,12 +34,15 @@ protected:
   /// @param[in] nio 入出力ピン数
   /// @param[in] nb バス数
   /// @param[in] nc バンドル数
-  /// @param[in] alloc メモリアロケータ
+  /// @param[in] output_array 出力の情報の配列(*1)
   /// @param[in] logic_array 出力の論理式の配列
   /// @param[in] tristated_array トライステート条件の論理式の配列
   /// @param[in] data_in "data_in" 関数の式
   /// @param[in] enable "enable" 関数の式
   /// @param[in] enable_also "enable_also" 関数の式
+  /// @param[in] alloc メモリアロケータ
+  /// *1: - false 論理式なし
+  ///     - true 論理式あり
   CiLatchCell(ymuint id,
 	      const ShString& name,
 	      CellArea area,
@@ -48,12 +51,13 @@ protected:
 	      ymuint nio,
 	      ymuint nb,
 	      ymuint nc,
-	      AllocBase& alloc,
+	      const vector<bool>& output_array,
 	      const vector<LogExpr>& logic_array,
 	      const vector<LogExpr>& tristate_array,
 	      const LogExpr& data_in,
 	      const LogExpr& enable,
-	      const LogExpr& enable_also);
+	      const LogExpr& enable_also,
+	      AllocBase& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -126,13 +130,16 @@ protected:
   /// @param[in] nio 入出力ピン数
   /// @param[in] nb バス数
   /// @param[in] nc バンドル数
-  /// @param[in] alloc メモリアロケータ
+  /// @param[in] output_array 出力の情報の配列(*1)
   /// @param[in] logic_array 出力の論理式の配列
   /// @param[in] tristated_array トライステート条件の論理式の配列
   /// @param[in] data_in "data_in" 関数の式
   /// @param[in] enable "enable" 関数の式
   /// @param[in] enable_also "enable_also" 関数の式
   /// @param[in] clear "clear" 関数の式
+  /// @param[in] alloc メモリアロケータ
+  /// *1: - false 論理式なし
+  ///     - true 論理式あり
   CiLatchRCell(ymuint id,
 	       const ShString& name,
 	       CellArea area,
@@ -141,13 +148,14 @@ protected:
 	       ymuint nio,
 	       ymuint nb,
 	       ymuint nc,
-	       AllocBase& alloc,
+	       const vector<bool>& output_array,
 	       const vector<LogExpr>& logic_array,
 	       const vector<LogExpr>& tristate_array,
 	       const LogExpr& data_in,
 	       const LogExpr& enable,
 	       const LogExpr& enable_also,
-	       const LogExpr& clear);
+	       const LogExpr& clear,
+	       AllocBase& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -202,13 +210,16 @@ protected:
   /// @param[in] nio 入出力ピン数
   /// @param[in] nb バス数
   /// @param[in] nc バンドル数
-  /// @param[in] alloc メモリアロケータ
+  /// @param[in] output_array 出力の情報の配列(*1)
   /// @param[in] logic_array 出力の論理式の配列
   /// @param[in] tristated_array トライステート条件の論理式の配列
   /// @param[in] data_in "data_in" 関数の式
   /// @param[in] enable "enable" 関数の式
   /// @param[in] enable_also "enable_also" 関数の式
   /// @param[in] preset "preset" 関数の式
+  /// @param[in] alloc メモリアロケータ
+  /// *1: - false 論理式なし
+  ///     - true 論理式あり
   CiLatchSCell(ymuint id,
 	       const ShString& name,
 	       CellArea area,
@@ -217,13 +228,14 @@ protected:
 	       ymuint nio,
 	       ymuint nb,
 	       ymuint nc,
-	       AllocBase& alloc,
+	       const vector<bool>& output_array,
 	       const vector<LogExpr>& logic_array,
 	       const vector<LogExpr>& tristate_array,
 	       const LogExpr& data_in,
 	       const LogExpr& enable,
 	       const LogExpr& enable_also,
-	       const LogExpr& preset);
+	       const LogExpr& preset,
+	       AllocBase& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -278,7 +290,7 @@ protected:
   /// @param[in] nio 入出力ピン数
   /// @param[in] nb バス数
   /// @param[in] nc バンドル数
-  /// @param[in] alloc メモリアロケータ
+  /// @param[in] output_array 出力の情報の配列(*1)
   /// @param[in] logic_array 出力の論理式の配列
   /// @param[in] tristated_array トライステート条件の論理式の配列
   /// @param[in] data_in "data_in" 関数の式
@@ -288,6 +300,9 @@ protected:
   /// @param[in] preset "preset" 関数の式
   /// @param[in] clear_preset_var1 clear と preset が同時にオンになったときの値1
   /// @param[in] clear_preset_var2 clear と preset が同時にオンになったときの値2
+  /// @param[in] alloc メモリアロケータ
+  /// *1: - false 論理式なし
+  ///     - true 論理式あり
   CiLatchSRCell(ymuint id,
 		const ShString& name,
 		CellArea area,
@@ -296,7 +311,7 @@ protected:
 		ymuint nio,
 		ymuint nb,
 		ymuint nc,
-		AllocBase& alloc,
+		const vector<bool>& output_array,
 		const vector<LogExpr>& logic_array,
 		const vector<LogExpr>& tristate_array,
 		const LogExpr& data_in,
@@ -305,7 +320,8 @@ protected:
 		const LogExpr& clear,
 		const LogExpr& preset,
 		ymuint clear_preset_var1,
-		ymuint clear_preset_var2);
+		ymuint clear_preset_var2,
+		AllocBase& alloc);
 
   /// @brief デストラクタ
   virtual

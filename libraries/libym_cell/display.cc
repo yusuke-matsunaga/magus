@@ -120,10 +120,12 @@ display_library(ostream& s,
     ymuint no = cell->output_num();
     for (ymuint opos = 0; opos < no; ++ opos) {
       const CellPin* pin = cell->output(opos);
-      s << "  Output#" << opos << ": " << pin->name()
-	<< " = " << cell->logic_expr(opos) << endl;
-      if ( !cell->tristate_expr(opos).is_zero() ) {
-	s << "    Tristate         = " << cell->tristate_expr(opos) << endl;
+      s << "  Output#" << opos << ": " << pin->name() << endl;
+      if ( cell->has_logic(opos) ) {
+	s << "    Logic            = " << cell->logic_expr(opos) << endl;
+	if ( cell->has_tristate(opos) ) {
+	  s << "    Tristate         = " << cell->tristate_expr(opos) << endl;
+	}
       }
       s << "    Max Fanout       = " << pin->max_fanout() << endl
 	<< "    Min Fanout       = " << pin->min_fanout() << endl
@@ -136,8 +138,14 @@ display_library(ostream& s,
     ymuint nio = cell->inout_num();
     for (ymuint iopos = 0; iopos < nio; ++ iopos) {
       const CellPin* pin = cell->inout(iopos);
-      s << "  Inout#" << iopos << ": " << pin->name() << endl
-	<< "    Capacitance      = " << pin->capacitance() << endl
+      s << "  Inout#" << iopos << ": " << pin->name() << endl;
+      if ( cell->has_logic(iopos) ) {
+	s << "    Logic            = " << cell->logic_expr(iopos) << endl;
+	if ( cell->has_tristate(iopos) ) {
+	  s << "    Tristate         = " << cell->tristate_expr(iopos) << endl;
+	}
+      }
+      s << "    Capacitance      = " << pin->capacitance() << endl
 	<< "    Rise Capacitance = " << pin->rise_capacitance() << endl
 	<< "    Fall Capacitance = " << pin->fall_capacitance() << endl
 	<< "    Max Fanout       = " << pin->max_fanout() << endl

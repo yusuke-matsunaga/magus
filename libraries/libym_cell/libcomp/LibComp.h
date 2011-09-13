@@ -1,35 +1,35 @@
-#ifndef LIBDUMP_H
-#define LIBDUMP_H
+#ifndef LIBCOMP_H
+#define LIBCOMP_H
 
-/// @file LibDump.h
-/// @brief LibDump のヘッダファイル
+/// @file LibComp.h
+/// @brief LibComp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "libdump_nsdef.h"
+#include "libcomp_nsdef.h"
 #include "LdLogicMgr.h"
 #include "LdFFMgr.h"
 #include "LdPatMgr.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBDUMP
+BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 //////////////////////////////////////////////////////////////////////
-/// @class LibDump LibDump.h "LibDump.h"
+/// @class LibComp LibComp.h "LibComp.h"
 /// @brief パタングラフの情報をダンプするためのクラス
 //////////////////////////////////////////////////////////////////////
-class LibDump
+class LibComp
 {
 public:
 
   /// @brief コンストラクタ
-  LibDump();
+  LibComp();
 
   /// @brief デストラクタ
-  ~LibDump();
+  ~LibComp();
 
 
 public:
@@ -89,6 +89,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_CELL_LIBDUMP
+END_NAMESPACE_YM_CELL_LIBCOMP
 
-#endif // LIBDUMP_H
+#endif // LIBCOMP_H

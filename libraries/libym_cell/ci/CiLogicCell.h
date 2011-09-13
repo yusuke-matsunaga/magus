@@ -34,9 +34,12 @@ private:
   /// @param[in] nio 入出力ピン数
   /// @param[in] nb バス数
   /// @param[in] nc バンドル数
-  /// @param[in] alloc メモリアロケータ
+  /// @param[in] output_array 出力の情報の配列(*1)
   /// @param[in] logic_array 出力の論理式の配列
   /// @param[in] tristated_array トライステート条件の論理式の配列
+  /// @param[in] alloc メモリアロケータ
+  /// *1: - false 論理式なし
+  ///     - true 論理式あり
   CiLogicCell(ymuint id,
 	      const ShString& name,
 	      CellArea area,
@@ -45,9 +48,10 @@ private:
 	      ymuint nio,
 	      ymuint nb,
 	      ymuint nc,
-	      AllocBase& alloc,
+	      const vector<bool>& output_array,
 	      const vector<LogExpr>& logic_array,
-	      const vector<LogExpr>& tristate_array);
+	      const vector<LogExpr>& tristate_array,
+	      AllocBase& alloc);
 
   /// @brief デストラクタ
   virtual

@@ -10,7 +10,7 @@
 #include "LdGroup.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBDUMP
+BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 //////////////////////////////////////////////////////////////////////
 // クラス LdGroup
@@ -73,4 +73,4 @@ LdGroup::add_cell(ymuint cell_id)
   mCellList.push_back(cell_id);
 }
 
-END_NAMESPACE_YM_CELL_LIBDUMP
+END_NAMESPACE_YM_CELL_LIBCOMP

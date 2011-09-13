@@ -42,9 +42,12 @@ protected:
   /// @param[in] nio 入出力ピン数
   /// @param[in] nb バス数
   /// @param[in] nc バンドル数
-  /// @param[in] alloc メモリアロケータ
+  /// @param[in] output_array 出力の情報の配列(*1)
   /// @param[in] logic_array 出力の論理式の配列
   /// @param[in] tristated_array トライステート条件の論理式の配列
+  /// @param[in] alloc メモリアロケータ
+  /// *1: - false 論理式なし
+  ///     - true 論理式あり
   CiCell(ymuint id,
 	 const ShString& name,
 	 CellArea area,
@@ -53,9 +56,10 @@ protected:
 	 ymuint nio,
 	 ymuint nb,
 	 ymuint nc,
-	 AllocBase& alloc,
+	 const vector<bool>& output_array,
 	 const vector<LogExpr>& logic_array,
-	 const vector<LogExpr>& tristate_array);
+	 const vector<LogExpr>& tristate_array,
+	 AllocBase& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -228,6 +232,17 @@ public:
   bool
   is_seq() const;
 
+  /// @brief 出力の論理式を持っている時に true を返す．
+  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+  virtual
+  bool
+  has_logic(ymuint pin_id) const;
+
+  /// @brief 全ての出力が論理式を持っているときに true を返す．
+  virtual
+  bool
+  has_logic() const;
+
   /// @brief 論理セルの場合に出力の論理式を返す．
   /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
   /// @note 論理式中の変数番号は入力ピン番号に対応する．
@@ -241,6 +256,12 @@ public:
   virtual
   TvFunc
   logic_function(ymuint pos) const;
+
+  /// @brief 出力がトライステート条件を持っている時に true を返す．
+  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+  virtual
+  bool
+  has_tristate(ymuint pin_id) const;
 
   /// @brief トライステートセルの場合にトライステート条件式を返す．
   /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
@@ -380,49 +401,6 @@ public:
   clear_preset_var2() const;
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 設定用の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-#if 0
-  /// @brief タイミング情報を設定する．
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-  /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
-  /// @param[in] sense タイミング条件
-  /// @param[in] timing 設定するタイミング情報
-  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->output_num() を使う．
-  /// @note ( *2 ) ipin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->input_num() を使う．
-  void
-  set_timing(ymuint opin_id,
-	     ymuint ipin_id,
-	     tCellTimingSense sense,
-	     CiTiming* timing);
-
-  /// @brief 出力ピンの論理式を設定する．
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-  /// @param[in] function 機能を表す論理式
-  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->output_num() を使う．
-  virtual
-  void
-  set_logic_expr(ymuint opin_id,
-		 const LogExpr& function);
-
-  /// @brief 出力ピンの three_state 条件を設定する．
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-  /// @param[in] expr three_state 条件を表す論理式
-  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->output_num() を使う．
-  virtual
-  void
-  set_tristate_expr(ymuint opin_id,
-		    const LogExpr& expr);
-#endif
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -473,6 +451,10 @@ private:
 
   // セルグループ
   CellGroup* mCellGroup;
+
+  // 出力の情報を格納する配列
+  // サイズは output_num2()
+  ymuint8* mLTArray;
 
   // 出力の論理式を格納する配列
   // サイズは output_num2()

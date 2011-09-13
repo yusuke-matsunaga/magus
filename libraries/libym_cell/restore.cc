@@ -50,17 +50,24 @@ CellLibrary::restore(istream& s)
 	>> nbus
 	>> nbundle;
     ymuint no2 = no + nio;
+    vector<bool> has_logic(no2);
     vector<LogExpr> logic_array(no2);
     vector<LogExpr> tristate_array(no2);
     for (ymuint opos = 0; opos < no2; ++ opos) {
-      bis >> logic_array[opos]
+      bool tmp;
+      bis >> tmp
+	  >> logic_array[opos]
 	  >> tristate_array[opos];
+      has_logic[opos] = tmp;
     }
 
     switch ( type ) {
     case 0: // kLogic
-      new_logic_cell(cell_id, name, area, ni, no, nio, nbus, nbundle,
-		     logic_array, tristate_array);
+      new_logic_cell(cell_id, name, area,
+		     ni, no, nio, nbus, nbundle,
+		     has_logic,
+		     logic_array,
+		     tristate_array);
       break;
 
     case 1: // kFF
@@ -79,8 +86,11 @@ CellLibrary::restore(istream& s)
 	    >> preset
 	    >> clear_preset_var1
 	    >> clear_preset_var2;
-	new_ff_cell(cell_id, name, area, ni, no, nio, nbus, nbundle,
-		    logic_array, tristate_array,
+	new_ff_cell(cell_id, name, area,
+		    ni, no, nio, nbus, nbundle,
+		    has_logic,
+		    logic_array,
+		    tristate_array,
 		    next_state,
 		    clocked_on, clocked_on_also,
 		    clear, preset,
@@ -105,8 +115,11 @@ CellLibrary::restore(istream& s)
 	    >> preset
 	    >> clear_preset_var1
 	    >> clear_preset_var2;
-	new_latch_cell(cell_id, name, area, ni, no, nio, nbus, nbundle,
-		       logic_array, tristate_array,
+	new_latch_cell(cell_id, name, area,
+		       ni, no, nio, nbus, nbundle,
+		       has_logic,
+		       logic_array,
+		       tristate_array,
 		       data_in,
 		       enable, enable_also,
 		       clear, preset,
