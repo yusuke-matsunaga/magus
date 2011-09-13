@@ -51,14 +51,14 @@ public:
   CellGroup*
   cell_group() const;
 
-  /// @brief 属しているセルの番号のリストを返す．
-  const vector<ymuint>&
+  /// @brief 属しているセルのリストを返す．
+  const vector<const Cell*>&
   cell_list() const;
 
-  /// @brief セル番号を追加する．
-  /// @param[in] cell_id セル番号
+  /// @brief セルを追加する．
+  /// @param[in] cell セル
   void
-  add_cell(ymuint cell_id);
+  add_cell(const Cell* cell);
 
 
 private:
@@ -78,8 +78,8 @@ private:
   // 実体のオブジェクト
   CellGroup* mCellGroup;
 
-  // セル番号のリスト
-  vector<ymuint> mCellList;
+  // セルのリスト
+  vector<const Cell*> mCellList;
 
 };
 

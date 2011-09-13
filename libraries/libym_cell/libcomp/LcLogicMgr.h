@@ -9,19 +9,17 @@
 /// All rights reserved.
 
 
-#include "libdump_nsdef.h"
-#include "ym_logic/TvFunc.h"
-#include "ym_logic/TvFuncM.h"
-#include "ym_utils/BioIO.h"
+#include "LcGroupMgr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 //////////////////////////////////////////////////////////////////////
 /// @class LcLogicMgr LcLogicMgr.h "LcLogicMgr.h"
-/// @brief セルライブラリを表すクラス
+/// @brief 論理セルのグループ分けを行うクラス
 //////////////////////////////////////////////////////////////////////
-class LcLogicMgr
+class LcLogicMgr :
+  public LcGroupMgr
 {
 public:
 
@@ -45,75 +43,29 @@ public:
   void
   init();
 
-  /// @brief セルを追加する．
-  void
-  add_cell(const Cell* cell);
-
-  /// @brief f に対応する LcGroup を求める．
-  /// @param[in] f 関数
-  /// @note なければ新規に作る．
-  LcGroup*
-  find_logic_group(const TvFunc& f);
-
-  /// @brief f_list に対応する LcGroup を求める．
-  /// @param[in] f_list 関数のリスト
-  /// @note なければ新規に作る．
-  LcGroup*
-  find_logic_group(const vector<TvFunc>& f_list);
-
-  /// @brief 内容をバイナリダンプする．
-  /// @param[in] bos 出力先のストリーム
-  void
-  dump(BinO& bos) const;
-
-  /// @brief 内容を出力する．(デバッグ用)
-  /// @param[in] s 出力先のストリーム
-  void
-  display(ostream& s) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容情報を取得する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理グループの数を返す．
-  ymuint
-  logic_group_num() const;
-
-  /// @brief 論理グループを返す．
-  /// @param[in] id 論理グループ番号 ( 0 <= id < logic_group_num() )
-  const LcGroup*
-  logic_group(ymuint id) const;
-
-  /// @brief 論理クラスの数を返す．
-  ymuint
-  logic_class_num() const;
-
-  /// @brief 論理クラスを返す．
-  /// @param[in] id 論理クラス番号 ( 0 <= id < logic_class_num() )
-  const LcClass*
-  logic_class(ymuint id) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // データメンバ
+  // 内部で用いられる仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  // グループのリスト
-  // この配列上の位置とグループ番号は一致している．
-  vector<LcGroup*> mLogicGroupList;
+  /// @brief セルのシグネチャ関数を作る．
+  /// @param[in] cell セル
+  /// @param[out] f シグネチャ関数
+  virtual
+  void
+  gen_signature(const Cell* cell,
+		TvFuncM& f);
 
-  // 多出力論理関数をキーとしてグループ番号を保持するハッシュ表
-  hash_map<TvFuncM, ymuint> mLogicGroupMap2;
-
-  // クラスのリスト
-  // この配列上の位置とクラス番号は一致している．
-  vector<LcClass*> mLogicClassList;
-
-  // 代表関数をキーとしてクラス番号を保持するハッシュ表
-  hash_map<TvFuncM, ymuint> mLogicClassMap2;
+  /// @brief 代表関数を求める．
+  /// @param[in] f 関数
+  /// @param[out] repfunc 代表関数
+  /// @param[out] xmap 変換
+  virtual
+  void
+  find_repfunc(const TvFuncM& f,
+	       TvFuncM& repfunc,
+	       NpnMapM& xmap);
 
 };
 

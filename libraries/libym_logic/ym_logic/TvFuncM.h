@@ -39,6 +39,10 @@ public:
   /// @brief コピーコンストラクタ
   TvFuncM(const TvFuncM& src);
 
+  /// @brief TvFunc からの変換用コンストラクタ
+  explicit
+  TvFuncM(const TvFunc& src);
+
   /// @brief 代入演算子
   const TvFuncM&
   operator=(const TvFuncM& src);

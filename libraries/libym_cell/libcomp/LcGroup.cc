@@ -58,19 +58,19 @@ LcGroup::cell_group() const
   return mCellGroup;
 }
 
-// @brief 属しているセルの番号のリストを返す．
-const vector<ymuint>&
+// @brief 属しているセルのリストを返す．
+const vector<const Cell*>&
 LcGroup::cell_list() const
 {
   return mCellList;
 }
 
-// @brief セル番号を追加する．
-// @param[in] cell_id セル番号
+// @brief セルを追加する．
+// @param[in] cell セル
 void
-LcGroup::add_cell(ymuint cell_id)
+LcGroup::add_cell(const Cell* cell)
 {
-  mCellList.push_back(cell_id);
+  mCellList.push_back(cell);
 }
 
 END_NAMESPACE_YM_CELL_LIBCOMP

@@ -10,9 +10,10 @@
 
 
 #include "libcomp_nsdef.h"
-#include "LdLogicMgr.h"
-#include "LdFFMgr.h"
-#include "LdPatMgr.h"
+#include "LcLogicMgr.h"
+#include "LcFFMgr.h"
+#include "LcLatchMgr.h"
+#include "LcPatMgr.h"
 
 #include "ym_utils/BinIO.h"
 

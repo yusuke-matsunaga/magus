@@ -33,7 +33,8 @@ NpnMapM::NpnMapM() :
 NpnMapM::NpnMapM(ymuint ni,
 		 ymuint no) :
   mNi(0),
-  mNo(0)
+  mNo(0),
+  mMapArray(NULL)
 {
   resize(ni, no);
 }
@@ -42,7 +43,8 @@ NpnMapM::NpnMapM(ymuint ni,
 // @param[in] src コピー元のオブジェクト
 NpnMapM::NpnMapM(const NpnMapM& src) :
   mNi(0),
-  mNo(0)
+  mNo(0),
+  mMapArray(NULL)
 {
   copy(src);
 }
@@ -76,7 +78,8 @@ NpnMapM::copy(const NpnMapM& src)
 // @note 出力数が1となる．
 NpnMapM::NpnMapM(const NpnMap& src) :
   mNi(0),
-  mNo(0)
+  mNo(0),
+  mMapArray(NULL)
 {
   resize(src.ni(), 1);
   for (ymuint i = 0; i < mNi; ++ i) {

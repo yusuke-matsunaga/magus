@@ -26,9 +26,11 @@ BEGIN_NONAMESPACE
 // 論理式の変数を map にしたがって変換する．
 LogExpr
 xform_expr(const LogExpr& expr,
-	   const NpnMap& map)
+	   const NpnMapM& map)
 {
   ymuint ni = map.ni();
+  ymuint no = map.no();
+  assert_cond( no == 1, __FILE__, __LINE__);
   VarLogExprMap vlm;
   for (ymuint i = 0; i < ni; ++ i) {
     NpnVmap imap = map.imap(i);
@@ -43,7 +45,7 @@ xform_expr(const LogExpr& expr,
     vlm.insert(make_pair(i, expr));
   }
   LogExpr cexpr = expr.compose(vlm);
-  if ( map.opol() == kPolNega ) {
+  if ( map.omap(0).pol() == kPolNega ) {
     cexpr = ~cexpr;
   }
   return cexpr;
@@ -70,9 +72,10 @@ LibComp::~LibComp()
 void
 LibComp::compile(const CellLibrary& library)
 {
-  mLcLogicMgr.init();
-  mLcFFMgr.init();
-  mLcPatMgr.init();
+  mLogicMgr.init();
+  mFFMgr.init();
+  mLatchMgr.init();
+  mPatMgr.init();
 
   // XOR のパタンを登録しておく．
   // これはちょっとしたハック
@@ -88,6 +91,9 @@ LibComp::compile(const CellLibrary& library)
     const Cell* cell = library.cell(i);
 
     if ( cell->is_logic() ) {
+      if ( !cell->has_logic() || cell->output_num() == 0 ) {
+	continue;
+      }
       mLogicMgr.add_cell(cell);
 
       ymuint no = cell->output_num();
@@ -106,7 +112,7 @@ LibComp::compile(const CellLibrary& library)
       }
 
       LogExpr expr = cell->logic_expr(0);
-      reg_expr(pgfunc, expr);
+      reg_expr(expr);
     }
     else if ( cell->is_ff() ) {
       mFFMgr.add_cell(cell);
@@ -121,21 +127,19 @@ LibComp::compile(const CellLibrary& library)
 void
 LibComp::reg_expr(const LogExpr& expr)
 {
-  // expr に対応する LcFunc を求める．
+  // expr に対応する LcGroup を求める．
   TvFunc f = expr.make_tv();
-  LcGroup* pgfunc = mLcLogicMgr.find_logic_group(f);
+  LcGroup* fgroup = mLogicMgr.find_group(TvFuncM(f));
+  const LcClass* fclass = fgroup->parent();
 
-  // expr から生成されるパタンを pgfunc に登録する．
-  const LcClass* pgrep = pgfunc->parent();
-
-  // pgrep->rep_func() を用いる理由は論理式に現れる変数が
+  // fclass->rep_func() を用いる理由は論理式に現れる変数が
   // 真のサポートとは限らないから
-  if ( pgrep->repfunc().ni() > 1 ) {
+  if ( fclass->repfunc().ni() > 1 ) {
     // expr を変換したパタンを登録する．
-    LogExpr cexpr = xform_expr(expr, pgfunc->map());
+    LogExpr cexpr = xform_expr(expr, fgroup->map());
     assert_cond( !cexpr.is_constant(), __FILE__, __LINE__);
 
-    mLcPatMgr.reg_pat(cexpr, pgrep->id());
+    mPatMgr.reg_pat(cexpr, fclass->id());
   }
 }
 
@@ -144,19 +148,17 @@ LibComp::reg_expr(const LogExpr& expr)
 void
 LibComp::display(ostream& s)
 {
-  gen_pat(library);
-
-  // ライブラリの情報を出力する．
-  display_library(s, library);
-
-  // 関数の情報を出力する．
+  // 論理セルグループの情報を出力する．
   mLogicMgr.display(s);
+
+  // FFグループの情報を出力する．
+  mFFMgr.display(s);
+
+  // ラッチグループの情報を出力する．
+  mLatchMgr.display(s);
 
   // パタングラフの情報を出力する．
   mPatMgr.display(s);
-
-  // FF の情報を出力する．
-  mFFMgr.display(s);
 }
 
 // @brief グラフ構造全体をダンプする．
@@ -165,18 +167,13 @@ LibComp::display(ostream& s)
 void
 LibComp::dump(BinO& bos)
 {
-  gen_pat(library);
-
-  // ライブラリの情報をダンプする．
-  library.dump(bos);
-
-  // 関数の情報をダンプする．
+  // 論理セルグループの情報をダンプする．
   mLogicMgr.dump(bos);
 
-  // FF の情報を出力する．
+  // FFグループの情報を出力する．
   mFFMgr.dump(bos);
 
-  // ラッチの情報を出力する．
+  // ラッチグループの情報を出力する．
   mLatchMgr.dump(bos);
 
   // パタングラフの情報をダンプする．

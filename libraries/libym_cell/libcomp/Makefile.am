@@ -18,17 +18,21 @@ libym_cell_libcomp_la_SOURCES = \
 	LcClass.cc \
 	LcGroup.h \
 	LcGroup.cc \
+	LcGroupMgr.h \
+	LcGroupMgr.cc \
+	LcLogicMgr.h \
+	LcLogicMgr.cc \
+	LcFFMgr.h \
+	LcFFMgr.cc \
+	LcLatchMgr.h \
+	LcLatchMgr.cc \
 	LcPatHandler.h \
 	LcPatMgr.h \
 	LcPatMgr.cc \
 	LcPatNode.h \
-	LcPatNode.cc
-#	LcLogicMgr.h \
-#	LcLogicMgr.cc \
-#	LcFFMgr.h \
-#	LcFFMgr.cc \
-#	LibComp.h \
-#	LibComp.cc
+	LcPatNode.cc \
+	LibComp.h \
+	LibComp.cc
 
 libym_cell_libcomp_la_LIBADD =
 

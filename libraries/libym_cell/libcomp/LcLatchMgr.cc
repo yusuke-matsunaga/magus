@@ -1,245 +1,95 @@
 
-/// @file LdFFMgr.cc
-/// @brief LdFFMgr の実装ファイル
+/// @file LcLatchMgr.cc
+/// @brief LcLatchMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LdFFMgr.h"
-#include "LdGroup.h"
-#include "LdClass.h"
-#include "ym_utils/BinIO.h"
+#include "LcLatchMgr.h"
+#include "ym_cell/Cell.h"
+#include "ym_logic/LogExpr.h"
+#include "ym_logic/NpnMapM.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBDUMP
+BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 //////////////////////////////////////////////////////////////////////
-// クラスLdFFMgr
+// クラスLcLatchMgr
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LdFFMgr::LdFFMgr()
+LcLatchMgr::LcLatchMgr()
 {
 }
 
 // @brief デストラクタ
-LdFFMgr::~LdFFMgr()
+LcLatchMgr::~LcLatchMgr()
 {
 }
 
 // @brief 初期化する．
 void
-LdFFMgr::init()
+LcLatchMgr::init()
 {
-  for (vector<LdGroup*>::iterator p = mFFGroupList.begin();
-       p != mFFGroupList.end(); ++ p) {
-    delete *p;
-  }
-  for (vector<LdClass*>::iterator p = mFFClassList.begin();
-       p != mFFClassList.end(); ++ p) {
-    delete *p;
-  }
-  mFFGroupList.clear();
-  mFFGroupMap.clear();
-  mFFClassList.clear();
-  mFFClassMap.clear();
+  clear();
 }
 
-// @brief 対応する LdGroup を求める．
-// @param[in] f_array 関数の配列
-// @note なければ新規に作る．
-LdGroup*
-LdFFMgr::find_ff_group(const vector<TvFunc>& f_array)
-{
-  TvFuncM f(f_array);
-  LdGroup* pgfunc = NULL;
-  hash_map<TvFuncM, ymuint>::iterator p = mFFGroupMap.find(f);
-  if ( p == mFFGroupMap.end() ) {
-    // なかったので新たに作る．
-    ymuint new_id = mFFGroupList.size();
-    pgfunc = new LdGroup(new_id);
-    mFFGroupList.push_back(pgfunc);
-    mFFGroupMap.insert(make_pair(f, new_id));
-
-    // 代表関数を求める．
-    // 今は手抜きで多出力はすべてが代表関数となる．
-    NpnMapM xmap;
-    xmap.set_identity(f.ni(), f.no());
-    LdClass* pgrep = NULL;
-    hash_map<TvFuncM, ymuint>::iterator p = mFFClassMap.find(f);
-    if ( p == mFFClassMap.end() ) {
-      // まだ登録されていない．
-      ymuint new_id = mFFClassList.size();
-      pgrep = new LdClass(new_id, f);
-      mFFClassList.push_back(pgrep);
-      mFFClassMap.insert(make_pair(f, new_id));
-    }
-    else {
-      // 登録されていた．
-      pgrep = mFFClassList[p->second];
-    }
-
-    // 関数を追加する．
-    pgrep->add_group(pgfunc, xmap);
-  }
-  else {
-    // 既に登録されていた．
-    pgfunc = mFFGroupList[p->second];
-  }
-  return pgfunc;
-}
-
-// @brief 内容をバイナリダンプする．
-// @param[in] s 出力先のストリーム
+// @brief セルのシグネチャ関数を作る．
+// @param[in] cell セル
+// @param[out] f シグネチャ関数
 void
-LdFFMgr::dump(ostream& s) const
+LcLatchMgr::gen_signature(const Cell* cell,
+		       TvFuncM& f)
 {
-  // FFグループの情報をダンプする．
-  ymuint ng = mFFGroupList.size();
-  BinIO::write_32(s, ng);
-  for (ymuint i = 0; i < ng; ++ i) {
-    const LdGroup* ff_group = mFFGroupList[i];
-    assert_cond( ff_group->id() == i, __FILE__, __LINE__);
-#if 0
-    // ピン位置の情報をダンプする．
-    BinIO::write_32(s, ff_group->signature());
-#endif
-    // 属しているセル番号をダンプする．
-    const vector<ymuint>& cell_list = ff_group->cell_list();
-    ymuint nc = cell_list.size();
-    BinIO::write_32(s, nc);
-    for (ymuint j = 0; j < nc; ++ j) {
-      BinIO::write_32(s, cell_list[j]);
-    }
-  }
+  ymuint ni = cell->input_num();
+  ymuint no = cell->output_num();
+  ymuint nio = cell->inout_num();
 
-  // FFクラスの情報をダンプする．
-  ymuint nc = mFFClassList.size();
-  BinIO::write_32(s, nc);
-  for (ymuint i = 0; i < nc; ++ i) {
-    const LdClass* ff_class = mFFClassList[i];
-    assert_cond( ff_class->id() == i, __FILE__, __LINE__);
-#if 0
-    // 入力のタイプ情報をダンプする．
-    BinIO::write_8(s, ff_class->signature());
-#endif
-    // 属しているFFグループ番号をダンプする．
-    const vector<LdGroup*>& group_list = ff_class->group_list();
-    ymuint ng = group_list.size();
-    BinIO::write_32(s, ng);
-    for (ymuint j = 0; j < ng; ++ j) {
-      const LdGroup* ff_group = group_list[j];
-      BinIO::write_32(s, ff_group->id());
-    }
+  // + 2 は状態変数
+  ymuint ni2 = ni + nio + 2;
+  ymuint no2 = no + nio;
+
+  vector<TvFunc> f_list(no2 * 2 + 4);
+  for (ymuint i = 0; i < no2; ++ i) {
+    LogExpr lexpr = cell->logic_expr(i);
+    f_list[i * 2 + 0] = lexpr.make_tv(ni2);
+    LogExpr texpr = cell->tristate_expr(i);
+    f_list[i * 2 + 1] = texpr.make_tv(ni2);
+  }
+  {
+    LogExpr expr = cell->data_in_expr();
+    f_list[no2 * 2 + 0] = expr.make_tv(ni2);
+  }
+  {
+    LogExpr expr = cell->enable_expr();
+    f_list[no2 * 2 + 1] = expr.make_tv(ni2);
+  }
+  {
+    LogExpr expr = cell->clear_expr();
+    f_list[no2 * 2 + 2] = expr.make_tv(ni2);
+  }
+  {
+    LogExpr expr = cell->preset_expr();
+    f_list[no2 * 2 + 3] = expr.make_tv(ni2);
   }
 }
 
-// @brief 内容を出力する．(デバッグ用)
-// @param[in] s 出力先のストリーム
+// @brief 代表関数を求める．
+// @param[in] f 関数
+// @param[out] repfunc 代表関数
+// @param[out] xmap 変換
 void
-LdFFMgr::display(ostream& s) const
+LcLatchMgr::find_repfunc(const TvFuncM& f,
+		      TvFuncM& repfunc,
+		      NpnMapM& xmap)
 {
-  s << "*** LdFFMgr BEGIN ***" << endl;
-  s << "*** FF Group SECTION ***" << endl;
-  for (vector<LdGroup*>::const_iterator p = mFFGroupList.begin();
-       p != mFFGroupList.end(); ++ p) {
-    const LdGroup* ff_group = *p;
-    const LdClass* ff_class = ff_group->parent();
-    s << "FF GROUP#" << ff_group->id()
-      << ": CLASS#" << ff_class->id()
-      << endl;
-#if 0
-      << ": SIGNATURE = " << hex << ff_group->signature() << dec << endl
-      << "  DATA = Pin#" << ff_group->data_pos();
-    s << ", CLOCK = ";
-    if ( ff_class->clock_sense() == 2 ) {
-      s << "!";
-    }
-    s << "Pin#" << ff_group->clock_pos();
-    s << ", Q = " << ff_group->q_pos()
-      << ", IQ = " << ff_group->iq_pos();
-    if ( ff_class->clear_sense() != 0 ) {
-      s << ", CLEAR = ";
-      if ( ff_class->clear_sense() == 2 ) {
-	s << "!";
-      }
-      s << "Pin#" << ff_group->clear_pos();
-    }
-    if ( ff_class->preset_sense() != 0 ) {
-      s << ", PRESET = ";
-      if ( ff_class->preset_sense() == 2 ) {
-	s << "!";
-      }
-      s << "Pin#" << ff_group->preset_pos();
-    }
-#endif
-    s << endl;
-    s << "  CELLS = ";
-    const vector<ymuint>& cell_list = ff_group->cell_list();
-    for (vector<ymuint>::const_iterator p = cell_list.begin();
-	 p != cell_list.end(); ++ p) {
-      s << " CELL#" << *p;
-    }
-    s << endl;
-    s << endl;
-  }
-  s << endl;
-
-  s << "*** FF Class SECTION ***" << endl;
-  for (vector<LdClass*>::const_iterator p = mFFClassList.begin();
-       p != mFFClassList.end(); ++ p) {
-    const LdClass* ff_class = *p;
-    s << "FF CLASS#" << ff_class->id()
-      << endl;
-#if 0
-      << ": SIGNATURE = " << hex << ff_class->signature() << dec << endl;
-    s << "  CLOCK: ";
-    if ( ff_class->clock_sense() == 1 ) {
-      s << "POSITIVE";
-    }
-    else {
-      s << "NEGATIVE";
-    }
-    s << endl;
-
-    ymuint r0 = ff_class->clear_sense();
-    if ( r0 != 0 ) {
-      s << "  CLEAR: ";
-      if ( r0 == 1 ) {
-	s << "HIGH";
-      }
-      else {
-	s << "LOW";
-      }
-      s << endl;
-    }
-
-    ymuint r1 = ff_class->preset_sense();
-    if ( r1 != 0 ) {
-      s << "  PRESET: ";
-      if ( r1 == 1 ) {
-	s << "HIGH";
-      }
-      else {
-	s << "LOW";
-      }
-      s << endl;
-    }
-#endif
-    s << "  GROUPS = ";
-    const vector<LdGroup*>& g_list = ff_class->group_list();
-    for (vector<LdGroup*>::const_iterator q = g_list.begin();
-	 q != g_list.end(); ++ q) {
-      const LdGroup* ff_group = *q;
-      s << " GROUP#" << ff_group->id();
-    }
-    s << endl;
-    s << endl;
-  }
-  s << endl;
-  s << "*** LdFFMgr END ***" << endl;
+  ymuint ni = f.ni();
+  ymuint no = f.no();
+  // 今は手抜きで自分自身を代表関数とする．
+  xmap.set_identity(ni, no);
+  repfunc = f;
 }
 
-END_NAMESPACE_YM_CELL_LIBDUMP
+END_NAMESPACE_YM_CELL_LIBCOMP

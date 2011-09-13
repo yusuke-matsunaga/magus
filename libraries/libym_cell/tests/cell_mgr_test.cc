@@ -10,6 +10,7 @@
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
 #include "ym_cell/CellLibrary.h"
+#include "libcomp/LibComp.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -34,6 +35,16 @@ dump_load_test(const char* in_filename,
   }
 
   display_library(cout, *library);
+
+  nsLibcomp::LibComp libcomp;
+
+  try {
+    libcomp.compile(*library);
+  }
+  catch ( AssertError x ) {
+    cout << x << endl;
+  }
+  libcomp.display(cout);
 
 #if 0
   {

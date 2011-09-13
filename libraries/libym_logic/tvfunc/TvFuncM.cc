@@ -187,6 +187,20 @@ TvFuncM::TvFuncM(const TvFuncM& src) :
   }
 }
 
+// @brief TvFunc からの変換用コンストラクタ
+TvFuncM::TvFuncM(const TvFunc& src)
+{
+  ymuint ni = src.ni();
+  mNi = ni;
+  mNo = 1;
+  mNblk1 = nblock(ni);
+  mNblk = mNblk1;
+  mVector = new ymulong[mNblk];
+  for (ymuint i = 0; i < mNblk; ++ i) {
+    mVector[i] = src.raw_data(i);
+  }
+}
+
 // 代入演算子
 const TvFuncM&
 TvFuncM::operator=(const TvFuncM& src)
@@ -357,6 +371,21 @@ TvFuncM::set_cofactor(ymuint pos,
     }
   }
   return *this;
+}
+
+// @brief 1出力の論理関数を切り出す．
+// @param[in] opos 出力番号
+TvFunc
+TvFuncM::output(ymuint opos) const
+{
+  #warning "効率が悪い仮のコード"
+
+  ymuint np = 1U << ni();
+  vector<int> tmp(np);
+  for (ymuint i = 0; i < np; ++ i) {
+    tmp[i] = value(opos, i);
+  }
+  return TvFunc(ni(), tmp);
 }
 
 // i 番目の変数がサポートの時 true を返す．
