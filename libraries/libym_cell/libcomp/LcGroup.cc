@@ -1,24 +1,24 @@
 
-/// @file LdGroup.cc
-/// @brief LdGroup の実装ファイル
+/// @file LcGroup.cc
+/// @brief LcGroup の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LdGroup.h"
+#include "LcGroup.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 //////////////////////////////////////////////////////////////////////
-// クラス LdGroup
+// クラス LcGroup
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] id ID番号
-LdGroup::LdGroup(ymuint id) :
+LcGroup::LcGroup(ymuint id) :
   mId(id),
   mParent(NULL),
   mCellGroup(NULL)
@@ -26,41 +26,41 @@ LdGroup::LdGroup(ymuint id) :
 }
 
 // @brief デストラクタ
-LdGroup::~LdGroup()
+LcGroup::~LcGroup()
 {
 }
 
 // @brief ID番号を返す．
 ymuint
-LdGroup::id() const
+LcGroup::id() const
 {
   return mId;
 }
 
-// @brief 親の LdClass を返す．
-LdClass*
-LdGroup::parent() const
+// @brief 親の LcClass を返す．
+LcClass*
+LcGroup::parent() const
 {
   return mParent;
 }
 
 // @brief 親のクラスに対する変換マップを返す．
 const NpnMapM&
-LdGroup::map() const
+LcGroup::map() const
 {
   return mMap;
 }
 
 // @brief 実体を返す．
-const CellGroup*
-LdGroup::cell_group() const
+CellGroup*
+LcGroup::cell_group() const
 {
   return mCellGroup;
 }
 
 // @brief 属しているセルの番号のリストを返す．
 const vector<ymuint>&
-LdGroup::cell_list() const
+LcGroup::cell_list() const
 {
   return mCellList;
 }
@@ -68,7 +68,7 @@ LdGroup::cell_list() const
 // @brief セル番号を追加する．
 // @param[in] cell_id セル番号
 void
-LdGroup::add_cell(ymuint cell_id)
+LcGroup::add_cell(ymuint cell_id)
 {
   mCellList.push_back(cell_id);
 }

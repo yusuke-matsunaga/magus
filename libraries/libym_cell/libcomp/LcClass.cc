@@ -1,26 +1,26 @@
 
-/// @file LdClass.cc
-/// @brief LdClass の実装ファイル
+/// @file LcClass.cc
+/// @brief LcClass の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LdClass.h"
-#include "LdGroup.h"
+#include "LcClass.h"
+#include "LcGroup.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 //////////////////////////////////////////////////////////////////////
-// クラス LdClass
+// クラス LcClass
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] id ID番号
 // @param[in] repfunc 代表関数
-LdClass::LdClass(ymuint id,
+LcClass::LcClass(ymuint id,
 		 const TvFunc& repfunc) :
   mId(id),
   mRepFunc(TvFuncM(vector<TvFunc>(1, repfunc))),
@@ -31,7 +31,7 @@ LdClass::LdClass(ymuint id,
 // @brief コンストラクタ
 // @param[in] id ID番号
 // @param[in] repfunc 代表関数
-LdClass::LdClass(ymuint id,
+LcClass::LcClass(ymuint id,
 		 const TvFuncM& repfunc) :
   mId(id),
   mRepFunc(repfunc),
@@ -40,41 +40,41 @@ LdClass::LdClass(ymuint id,
 }
 
 // @brief デストラクタ
-LdClass::~LdClass()
+LcClass::~LcClass()
 {
 }
 
 // @brief ID番号を返す．
 ymuint
-LdClass::id() const
+LcClass::id() const
 {
   return mId;
 }
 
 // @brief 代表関数を返す．
 TvFuncM
-LdClass::repfunc() const
+LcClass::repfunc() const
 {
   return mRepFunc;
 }
 
 // @brief 実体を返す．
 const CellClass*
-LdClass::cell_class() const
+LcClass::cell_class() const
 {
   return mCellClass;
 }
 
 // @brief このクラスに属しているグループのリストを返す．
-const vector<LdGroup*>&
-LdClass::group_list() const
+const vector<LcGroup*>&
+LcClass::group_list() const
 {
   return mGroupList;
 }
 
 // @brief グループを追加する．
 void
-LdClass::add_group(LdGroup* group,
+LcClass::add_group(LcGroup* group,
 		   const NpnMapM& map)
 {
   mGroupList.push_back(group);

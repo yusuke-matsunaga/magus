@@ -14,6 +14,8 @@
 #include "LdFFMgr.h"
 #include "LdPatMgr.h"
 
+#include "ym_utils/BinIO.h"
+
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
@@ -34,21 +36,20 @@ public:
 
 public:
 
+  /// @brief セルのグループ化，クラス化を行う．
+  void
+  compile(const CellLibrary& library);
+
   /// @brief グラフ構造全体の内容を表示する．
   /// @param[in] s 出力先のストリーム
-  /// @param[in] library 対象のセルライブラリ
   void
-  display(ostream& s,
-	  const CellLibrary& library);
+  display(ostream& s);
 
-  /// @relates LdFuncMgr
   /// @brief グラフ構造全体をダンプする．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] library 対象のセルライブラリ
+  /// @param[in] bos 出力先のストリーム
   /// @note ダンプされた情報はそのまま PatMgr で読み込むことができる．
   void
-  dump(ostream& s,
-       const CellLibrary& library);
+  dump(BinO& bos);
 
 
 private:
@@ -56,21 +57,9 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ライブラリの情報からパタンを生成する．
-  /// @param[in] library 対象のセルライブラリ
-  void
-  gen_pat(const CellLibrary& library);
-
   /// @brief expr から生成されるパタンを登録する．
   void
   reg_expr(const LogExpr& expr);
-
-  /// @brief 論理式から生成されるパタンを登録する．
-  /// @param[in] pgfunc この式に対応する関数情報
-  /// @param[in] expr パタンの元となる論理式
-  void
-  reg_pat(LdGroup* pgfunc,
-	  const LogExpr& expr);
 
 
 private:
@@ -79,13 +68,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数情報を管理するオブジェクト
-  LdLogicMgr mLdLogicMgr;
+  LcLogicMgr mLogicMgr;
 
   // FFの情報を管理するオブジェクト
-  LdFFMgr mLdFFMgr;
+  LcFFMgr mFFMgr;
+
+  // ラッチの情報を管理するオブジェクト
+  LcLatchMgr mLatchMgr;
 
   // パタングラフを管理するオブジェクト
-  LdPatMgr mLdPatMgr;
+  LcPatMgr mPatMgr;
 
 };
 

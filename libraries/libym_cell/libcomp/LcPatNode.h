@@ -1,36 +1,36 @@
-#ifndef LDPATNODE_H
-#define LDPATNODE_H
+#ifndef LCPATNODE_H
+#define LCPATNODE_H
 
-/// @file LdPatNode.h
-/// @brief LdPatNode のヘッダファイル
+/// @file LcPatNode.h
+/// @brief LcPatNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "libdump_nsdef.h"
+#include "libcomp_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBDUMP
+BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
-class LdPatMgr;
+class LcPatMgr;
 
 //////////////////////////////////////////////////////////////////////
-/// @class LdPatNode LdPatNode.h "LdPatNode.h"
+/// @class LcPatNode LcPatNode.h "LcPatNode.h"
 /// @brief パタン生成用のノードを表すクラス
 //////////////////////////////////////////////////////////////////////
-class LdPatNode
+class LcPatNode
 {
-  friend class LdPatMgr;
+  friend class LcPatMgr;
 
 private:
 
   /// @brief コンストラクタ
-  LdPatNode();
+  LcPatNode();
 
   /// @brief デストラクタ
-  ~LdPatNode();
+  ~LcPatNode();
 
 
 public:
@@ -61,7 +61,7 @@ public:
 
   /// @brief AND/XOR の時にファンインのノードを返す．
   /// @param[in] pos 位置 ( 0 or 1 )
-  LdPatNode*
+  LcPatNode*
   fanin(ymuint pos) const;
 
   /// @brief AND/XOR の時にファンインの極性を返す．
@@ -129,13 +129,13 @@ private:
   bool mLocked;
 
   // ファンインのノード
-  LdPatNode* mFanin[2];
+  LcPatNode* mFanin[2];
 
   // ハッシュ表中のリンク
-  LdPatNode* mLink;
+  LcPatNode* mLink;
 
 };
 
-END_NAMESPACE_YM_CELL_LIBDUMP
+END_NAMESPACE_YM_CELL_LIBCOMP
 
-#endif // LDPATNODE_H
+#endif // LCPATNODE_H

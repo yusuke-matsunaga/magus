@@ -1,39 +1,39 @@
-#ifndef LDPATMGR_H
-#define LDPATMGR_H
+#ifndef LCPATMGR_H
+#define LCPATMGR_H
 
-/// @file LdPatMgr.h
-/// @brief LdPatMgr のヘッダファイル
+/// @file LcPatMgr.h
+/// @brief LcPatMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "libdump_nsdef.h"
+#include "libcomp_nsdef.h"
 #include "ym_logic/lexp_nsdef.h"
+#include "ym_utils/BinIO.h"
 #include "ym_utils/Alloc.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBDUMP
+BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
-class LdFunc;
-class LdPatNode;
-class LdPatHandle;
+class LcPatNode;
+class LcPatHandle;
 
 //////////////////////////////////////////////////////////////////////
-/// @class LdPatMgr LdPatMgr.h "LdPatMgr.h"
+/// @class LcPatMgr LcPatMgr.h "LcPatMgr.h"
 /// @brief パタングラフを生成するクラス
-/// @note 前処理で使われるのであまり効率を考えなく良い．
+/// @note 前処理で使われるのであまり効率を考えていない．
 //////////////////////////////////////////////////////////////////////
-class LdPatMgr
+class LcPatMgr
 {
 public:
 
   /// @brief コンストラクタ
-  LdPatMgr();
+  LcPatMgr();
 
   /// @brief デストラクタ
-  ~LdPatMgr();
+  ~LcPatMgr();
 
 
 public:
@@ -53,9 +53,9 @@ public:
 	  ymuint rep_id);
 
   /// @brief 内容をバイナリダンプする．
-  /// @param[in] s 出力先のストリーム
+  /// @param[in] bos 出力先のストリーム
   void
-  dump(ostream& s) const;
+  dump(BinO& bos) const;
 
   /// @brief 内容を出力する．(デバッグ用)
   /// @param[in] s 出力先のストリーム
@@ -74,7 +74,7 @@ private:
 
   /// @brief ノードを返す．
   /// @param[in] pos ノード番号 ( 0 <= pos < node_num() )
-  LdPatNode*
+  LcPatNode*
   node(ymuint pos) const;
 
   /// @brief パタン数を返す．
@@ -83,7 +83,7 @@ private:
 
   /// @brief パタンの根のハンドルを返す．
   /// @param[in] id パタン番号 ( 0 <= id < pat_num() )
-  LdPatHandle
+  LcPatHandle
   pat_root(ymuint id) const;
 
   /// @brief パタンの属している代表関数番号を返す．
@@ -107,48 +107,48 @@ private:
   /// @param[out] pg_list パタングラフ番号のリスト
   void
   pg_sub(const LogExpr& expr,
-	 vector<LdPatHandle>& pg_list);
+	 vector<LcPatHandle>& pg_list);
 
   /// pg_list に new_handle を追加する．
   /// ただし，同形のパタンがすでにある場合には追加しない．
   static
   void
-  add_pg_list(vector<LdPatHandle>& pg_list,
-	      LdPatHandle new_handle);
+  add_pg_list(vector<LcPatHandle>& pg_list,
+	      LcPatHandle new_handle);
 
   /// @brief 同形か調べる．
   /// @param[in] node1, node2 根のノード
   static
   bool
-  check_isomorphic(const LdPatNode* node1,
-		   const LdPatNode* node2);
+  check_isomorphic(const LcPatNode* node1,
+		   const LcPatNode* node2);
 
   /// @brief 入力ノードを作る．
   /// @param[in] id 入力番号
   /// @note 既にあるときはそれを返す．
-  LdPatNode*
+  LcPatNode*
   make_input(ymuint id);
 
   /// @brief テンプレートにしたがって2分木を作る．
-  LdPatHandle
+  LcPatHandle
   make_bintree(const LogExpr& expr,
-	       const vector<LdPatHandle>& input,
+	       const vector<LcPatHandle>& input,
 	       int pat[],
 	       ymuint& pos);
 
   /// @brief 論理式の種類に応じてノードを作る．
-  LdPatHandle
+  LcPatHandle
   make_node(const LogExpr& expr,
-	    LdPatHandle l_handle,
-	    LdPatHandle r_handle);
+	    LcPatHandle l_handle,
+	    LcPatHandle r_handle);
 
   /// @brief ノードを作る．
-  LdPatNode*
+  LcPatNode*
   new_node();
 
   /// @brief ノードを削除する．
   void
-  delete_node(LdPatNode* node);
+  delete_node(LcPatNode* node);
 
 
 private:
@@ -160,12 +160,12 @@ private:
   void
   alloc_table(ymuint req_size);
 
-  /// @brief LdPatNode のハッシュ関数
+  /// @brief LcPatNode のハッシュ関数
   static
   ymuint
   hash_func(ymuint type,
-	    LdPatNode* l_node,
-	    LdPatNode* r_node);
+	    LcPatNode* l_node,
+	    LcPatNode* r_node);
 
 
 private:
@@ -173,15 +173,13 @@ private:
   // dump() 用の関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 枝の情報をダンプする．
-  /// @param[in] s 出力先のストリーム
+  /// @brief 枝の情報をエンコードする．
   /// @param[in] node 親のノード
   /// @param[in] fanin_pos ファンイン番号
   static
-  void
-  dump_edge(ostream& s,
-		    LdPatNode* node,
-	    ymuint fanin_pos);
+  ymuint32
+  encode_edge(LcPatNode* node,
+	      ymuint fanin_pos);
 
 
   /// @brief パタングラフを DFS でたどって内容を val_list に入れる．
@@ -191,7 +189,7 @@ private:
   /// @return 最大入力番号+1を返す．
   static
   ymuint
-  dump_dfs(LdPatNode* node,
+  dump_dfs(LcPatNode* node,
 	   vector<bool>& vmark,
 	   vector<ymuint>& val_list);
 
@@ -208,7 +206,7 @@ private:
   static
   void
   display_edge(ostream& s,
-	       LdPatNode* node,
+	       LcPatNode* node,
 	       ymuint fanin_pos);
 
 
@@ -217,17 +215,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // LdPatNode のメモリ確保用アロケータ
+  // LcPatNode のメモリ確保用アロケータ
   UnitAlloc mAlloc;
 
   // 入力ノードを収める配列
-  vector<LdPatNode*> mInputList;
+  vector<LcPatNode*> mInputList;
 
   // 全ノードを収める配列
-  vector<LdPatNode*> mNodeList;
+  vector<LcPatNode*> mNodeList;
 
   // AND/XOR ノードのハッシュ表
-  LdPatNode** mHashTable;
+  LcPatNode** mHashTable;
 
   // mHashTable のサイズ
   ymuint32 mHashSize;
@@ -237,7 +235,7 @@ private:
 
   // パタンの根のハンドルのリスト
   // 配列のインデックスはパタン番号
-  vector<LdPatHandle> mPatList;
+  vector<LcPatHandle> mPatList;
 
   // 代表関数番号のリスト
   // 配列のインデックスはパタン番号
@@ -245,6 +243,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_CELL_LIBDUMP
+END_NAMESPACE_YM_CELL_LIBCOMP
 
-#endif // LDPATMGR_H
+#endif // LCPATMGR_H

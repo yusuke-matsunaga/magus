@@ -1,8 +1,8 @@
-#ifndef LDFFMGR_H
-#define LDFFMGR_H
+#ifndef LCFFMGR_H
+#define LCFFMGR_H
 
-/// @file LdFFMgr.h
-/// @brief LdFFMgr.h
+/// @file LcFFMgr.h
+/// @brief LcFFMgr.h
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -10,25 +10,25 @@
 
 
 #include "libdump_nsdef.h"
-#include "ym_logic/TvFunc.h"
 #include "ym_logic/TvFuncM.h"
+#include "ym_utils/BioIO.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBDUMP
+BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 //////////////////////////////////////////////////////////////////////
-/// @class LdFFMgr LdFFMgr.h "LdFFMgr.h"
+/// @class LcFFMgr LcFFMgr.h "LcFFMgr.h"
 /// @brief FFセルを表すクラス
 //////////////////////////////////////////////////////////////////////
-class LdFFMgr
+class LcFFMgr
 {
 public:
 
   /// @brief コンストラクタ
-  LdFFMgr();
+  LcFFMgr();
 
   /// @brief デストラクタ
-  ~LdFFMgr();
+  ~LcFFMgr();
 
 
 public:
@@ -40,21 +40,49 @@ public:
   void
   init();
 
-  /// @brief 対応する LdGroup を求める．
+  /// @brief セルを追加する．
+  void
+  add_cell(const Cell* cell);
+
+  /// @brief 対応する LcGroup を求める．
   /// @param[in] f_array 関数の配列
   /// @note なければ新規に作る．
-  LdGroup*
+  LcGroup*
   find_ff_group(const vector<TvFunc>& f_array);
 
   /// @brief 内容をバイナリダンプする．
-  /// @param[in] s 出力先のストリーム
+  /// @param[in] bos 出力先のストリーム
   void
-  dump(ostream& s) const;
+  dump(BinIO& bos) const;
 
   /// @brief 内容を出力する．(デバッグ用)
   /// @param[in] s 出力先のストリーム
   void
   display(ostream& s) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容情報を取得する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief FFグループの数を返す．
+  ymuint
+  ff_group_num() const;
+
+  /// @brief FFグループを返す．
+  /// @param[in] id FFグループ番号 ( 0 <= id < ff_group_num() )
+  const LcGroup*
+  ff_group(ymuint id) const;
+
+  /// @brief FFクラスの数を返す．
+  ymuint
+  ff_class_num() const;
+
+  /// @brief FFクラスを返す．
+  /// @param[in] id FFクラス番号 ( 0 <= id < ff_class_num() )
+  const LcClass*
+  ff_class(ymuint id) const;
 
 
 private:
@@ -64,20 +92,20 @@ private:
 
   // FFグループのリスト
   // この配列上の位置とグループ番号は一致している．
-  vector<LdGroup*> mFFGroupList;
+  vector<LcGroup*> mFFGroupList;
 
   // 論理関数をキーとしてFFグループ番号を格納するハッシュ表
   hash_map<TvFuncM, ymuint> mFFGroupMap;
 
   // FFクラスのリスト
   // この配列上の位置とクラス番号は一致している．
-  vector<LdClass*> mFFClassList;
+  vector<LcClass*> mFFClassList;
 
   // 論理関数をキーとしてFFクラス番号を格納するハッシュ表
   hash_map<TvFuncM, ymuint> mFFClassMap;
 
 };
 
-END_NAMESPACE_YM_CELL_LIBDUMP
+END_NAMESPACE_YM_CELL_LIBCOMP
 
-#endif // LDFFMGR_H
+#endif // LCFFMGR_H

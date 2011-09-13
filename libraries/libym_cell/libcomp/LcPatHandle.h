@@ -1,26 +1,26 @@
-#ifndef LDPATHANDLE_H
-#define LDPATHANDLE_H
+#ifndef LCPATHANDLE_H
+#define LCPATHANDLE_H
 
-/// @file LdPatHandle.h
-/// @brief LdPatHandle のヘッダファイル
+/// @file LcPatHandle.h
+/// @brief LcPatHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "libdump_nsdef.h"
+#include "libcomp_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBDUMP
+BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
-class LdPatNode;
+class LcPatNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class LdPatHandle LdPatHandle.h "LdPatHandle.h"
-/// @brief LdPatNode と極性を表すクラス
+/// @class LcPatHandle LcPatHandle.h "LcPatHandle.h"
+/// @brief LcPatNode と極性を表すクラス
 //////////////////////////////////////////////////////////////////////
-class LdPatHandle
+class LcPatHandle
 {
 public:
 
@@ -28,17 +28,17 @@ public:
   /// @param[in] node ノード
   /// @param[in] inv 反転属性
   explicit
-  LdPatHandle(LdPatNode* node = NULL,
+  LcPatHandle(LcPatNode* node = NULL,
 	      bool inv = false);
 
   /// @brief デストラクタ
-  ~LdPatHandle();
+  ~LcPatHandle();
 
 
 public:
 
   /// @brief ノードを取り出す．
-  LdPatNode*
+  LcPatNode*
   node() const;
 
   /// @brief 反転属性を取り出す．
@@ -49,7 +49,7 @@ public:
   /// @param[in] node ノード
   /// @param[in] inv 反転属性
   void
-  set(LdPatNode* node,
+  set(LcPatNode* node,
       bool inv);
 
 
@@ -72,7 +72,7 @@ private:
 // @param[in] node ノード
 // @param[in] inv 反転属性
 inline
-LdPatHandle::LdPatHandle(LdPatNode* node,
+LcPatHandle::LcPatHandle(LcPatNode* node,
 			 bool inv)
 {
   set(node, inv);
@@ -80,22 +80,22 @@ LdPatHandle::LdPatHandle(LdPatNode* node,
 
 // @brief デストラクタ
 inline
-LdPatHandle::~LdPatHandle()
+LcPatHandle::~LcPatHandle()
 {
 }
 
 // @brief ノードを取り出す．
 inline
-LdPatNode*
-LdPatHandle::node() const
+LcPatNode*
+LcPatHandle::node() const
 {
-  return reinterpret_cast<LdPatNode*>(mData & ~1UL);
+  return reinterpret_cast<LcPatNode*>(mData & ~1UL);
 }
 
 // @brief 反転属性を取り出す．
 inline
 bool
-LdPatHandle::inv() const
+LcPatHandle::inv() const
 {
   return static_cast<bool>(mData & 1UL);
 }
@@ -105,13 +105,13 @@ LdPatHandle::inv() const
 // @param[in] inv 反転属性
 inline
 void
-LdPatHandle::set(LdPatNode* node,
+LcPatHandle::set(LcPatNode* node,
 		 bool inv)
 {
   // bool に対する & 1UL は不必要だが念のため．
   mData = reinterpret_cast<ympuint>(node) | (static_cast<ympuint>(inv) & 1UL);
 }
 
-END_NAMESPACE_YM_CELL_LIBDUMP
+END_NAMESPACE_YM_CELL_LIBCOMP
 
-#endif // LDPATHANDLE_H
+#endif // LCPATHANDLE_H

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "libdump_nsdef.h"
+#include "libcomp_nsdef.h"
 #include "ym_logic/NpnMapM.h"
 
 
@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 //////////////////////////////////////////////////////////////////////
 class LcGroup
 {
-  friend class LdClass;
+  friend class LcClass;
 
 public:
 
@@ -39,8 +39,8 @@ public:
   ymuint
   id() const;
 
-  /// @brief 親の LdClass を返す．
-  LdClass*
+  /// @brief 親の LcClass を返す．
+  LcClass*
   parent() const;
 
   /// @brief 親のクラスに対する変換マップを返す．
@@ -69,8 +69,8 @@ private:
   // ID番号
   ymuint32 mId;
 
-  // 親の LdClass
-  LdClass* mParent;
+  // 親の LcClass
+  LcClass* mParent;
 
   // 親のクラスに対する変換マップ
   NpnMapM mMap;

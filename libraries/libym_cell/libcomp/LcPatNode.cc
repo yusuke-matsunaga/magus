@@ -1,23 +1,23 @@
 
-/// @file LdPatNode.cc
-/// @brief LdPatMgr の実装ファイル
+/// @file LcPatNode.cc
+/// @brief LcPatMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LdPatNode.h"
+#include "LcPatNode.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBDUMP
+BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 //////////////////////////////////////////////////////////////////////
-// クラス LdPatNode
+// クラス LcPatNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LdPatNode::LdPatNode() :
+LcPatNode::LcPatNode() :
   mType(0U),
   mLocked(false)
 {
@@ -26,56 +26,56 @@ LdPatNode::LdPatNode() :
 }
 
 // @brief デストラクタ
-LdPatNode::~LdPatNode()
+LcPatNode::~LcPatNode()
 {
 }
 
 // @brief ノード番号を返す．
 ymuint
-LdPatNode::id() const
+LcPatNode::id() const
 {
   return mId;
 }
 
 // @brief 'lock' 状態を得る．
 bool
-LdPatNode::is_locked() const
+LcPatNode::is_locked() const
 {
   return mLocked;
 }
 
 // @brief 入力の時 true を返す．
 bool
-LdPatNode::is_input() const
+LcPatNode::is_input() const
 {
   return ((mType & 3U) == kInput);
 }
 
 // @brief AND の時 true を返す．
 bool
-LdPatNode::is_and() const
+LcPatNode::is_and() const
 {
   return ((mType & 3U) == kAnd);
 }
 
 // @brief XOR の時 true を返す．
 bool
-LdPatNode::is_xor() const
+LcPatNode::is_xor() const
 {
   return ((mType & 3U) == kXor);
 }
 
 // @brief 入力の時に入力番号を返す．
 ymuint
-LdPatNode::input_id() const
+LcPatNode::input_id() const
 {
   return mType >> 2;
 }
 
 // @brief AND/XOR の時にファンインのノードを返す．
 // @param[in] pos 位置 ( 0 or 1 )
-LdPatNode*
-LdPatNode::fanin(ymuint pos) const
+LcPatNode*
+LcPatNode::fanin(ymuint pos) const
 {
   return mFanin[pos];
 }
@@ -85,7 +85,7 @@ LdPatNode::fanin(ymuint pos) const
 // @retval true 反転あり
 // @retval false 反転なし
 bool
-LdPatNode::fanin_inv(ymuint pos) const
+LcPatNode::fanin_inv(ymuint pos) const
 {
   return static_cast<bool>((mType >> (pos + 2)) & 1U);
 }
@@ -93,7 +93,7 @@ LdPatNode::fanin_inv(ymuint pos) const
 // @brief 入力に設定する．
 // @param[in] input_id 入力番号
 void
-LdPatNode::set_input(ymuint input_id)
+LcPatNode::set_input(ymuint input_id)
 {
   mType = (input_id << 2) | kInput;
 }
@@ -101,7 +101,7 @@ LdPatNode::set_input(ymuint input_id)
 // @brief ANDに設定する．
 // @param[in] inv0, inv1 ファンインの反転属性
 void
-LdPatNode::set_and(bool inv0,
+LcPatNode::set_and(bool inv0,
 		bool inv1)
 {
   mType = kAnd;
@@ -115,7 +115,7 @@ LdPatNode::set_and(bool inv0,
 
 // @brief XORに設定する．
 void
-LdPatNode::set_xor()
+LcPatNode::set_xor()
 {
   mType = kXor;
 }
@@ -123,7 +123,7 @@ LdPatNode::set_xor()
 // @brief 'lock' する．
 // @note ファンインに再帰する．
 void
-LdPatNode::set_locked()
+LcPatNode::set_locked()
 {
   if ( !mLocked ) {
     mLocked = true;
@@ -134,4 +134,4 @@ LdPatNode::set_locked()
   }
 }
 
-END_NAMESPACE_YM_CELL_LIBDUMP
+END_NAMESPACE_YM_CELL_LIBCOMP

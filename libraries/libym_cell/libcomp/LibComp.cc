@@ -66,10 +66,9 @@ LibComp::~LibComp()
 {
 }
 
-// @brief ライブラリの情報からパタンを生成する．
-// @param[in] library 対象のセルライブラリ
+// @brief セルのグループ化，クラス化を行う．
 void
-LibComp::gen_pat(const CellLibrary& library)
+LibComp::compile(const CellLibrary& library)
 {
   mLcLogicMgr.init();
   mLcFFMgr.init();
@@ -87,122 +86,34 @@ LibComp::gen_pat(const CellLibrary& library)
   ymuint nc = library.cell_num();
   for (ymuint i = 0; i < nc; ++ i) {
     const Cell* cell = library.cell(i);
-    ymuint ni = cell->input_num();
-    ymuint no = cell->output_num();
-#if 0
+
     if ( cell->is_logic() ) {
-      if ( no > 1 ) {
+      mLogicMgr.add_cell(cell);
+
+      ymuint no = cell->output_num();
+      ymuint nio = cell->inout_num();
+      if ( no + nio > 1 ) {
 	// 出力ピンが複数あるセルは対象外
 	continue;
       }
-      const CellPin* opin = cell->output(0);
-      if ( !opin->has_function() ) {
+      if ( !cell->has_logic(0) ) {
 	// 論理式を持たないセルも対象外
 	continue;
       }
-      if ( opin->has_three_state() ) {
+      if ( cell->has_tristate(0) ) {
 	// three_state 属性を持つセルも対象外
 	continue;
       }
 
-      LogExpr expr = opin->function();
-      TvFunc tv = expr.make_tv(ni)
-      LcFunc* pgfunc = mLcFuncMgr.find_func(tv);
-      pgfunc->add_cell(cell->id());
-
-      reg_pat(pgfunc, expr);
+      LogExpr expr = cell->logic_expr(0);
+      reg_expr(pgfunc, expr);
     }
-    if ( cell->is_ff() ) {
-      LogExpr d_expr = cell->next_state();
-      if ( !d_expr.is_posiliteral() ) {
-	// next_state が肯定リテラルでなかった．
-	continue;
-      }
-      ymuint data_pos = d_expr.varid();
-
-      LogExpr c_expr = cell->clocked_on();
-      if ( !c_expr.is_literal() ) {
-	// clocked_on がリテラルでなかった．
-	continue;
-      }
-      ymuint clock_pos = c_expr.varid();
-      ymuint clock_sense = c_expr.is_posiliteral() ? 1 : 2;
-
-      LogExpr r0_expr = cell->clear();
-      ymuint clear_pos = 0;
-      ymuint clear_sense = 0;
-      if ( !r0_expr.is_zero() ) {
-	if ( r0_expr.is_literal() ) {
-	  clear_pos = r0_expr.varid();
-	  clear_sense = r0_expr.is_posiliteral() ? 1 : 2;
-	}
-	else {
-	  continue;
-	}
-      }
-
-      LogExpr r1_expr = cell->preset();
-      ymuint preset_pos = 0;
-      ymuint preset_sense = 0;
-      if ( !r1_expr.is_zero() ) {
-	if ( r1_expr.is_literal() ) {
-	  preset_pos = r1_expr.varid();
-	  preset_sense = r1_expr.is_posiliteral() ? 1 : 2;
-	}
-	else {
-	  continue;
-	}
-      }
-
-      const CellPin* q_pin = NULL;
-      const CellPin* iq_pin = NULL;
-      for (ymuint j = 0; j < np; ++ j) {
-	const CellPin* pin = cell->pin(j);
-	if ( pin->is_output() ) {
-	  if ( !pin->has_function() ) {
-	    continue;
-	  }
-	  LogExpr expr = pin->function();
-	  if ( !expr.is_posiliteral() ) {
-	    continue;
-	  }
-	  ymuint pos = expr.varid();
-	  if ( pos == np ) {
-	    if ( q_pin != NULL ) {
-	      // Q ピンが2つ以上ある．
-	      q_pin = NULL;
-	      break;
-	    }
-	    q_pin = pin;
-	  }
-	  else if ( pos == (np + 1) ) {
-	    if ( iq_pin != NULL ) {
-	      // IQ ピンが2つ以上ある．
-	      iq_pin = NULL;
-	      break;
-	    }
-	    iq_pin = pin;
-	  }
-	}
-      }
-      if ( q_pin == NULL || iq_pin == NULL ) {
-	continue;
-      }
-      ymuint q_pos = q_pin->id();
-      ymuint iq_pos = iq_pin->id();
-
-      LcFFGroup* ff_group = mLcFFMgr.find_group(clock_sense,
-						clear_sense,
-						preset_sense,
-						data_pos,
-						clock_pos,
-						clear_pos,
-						preset_pos,
-						q_pos,
-						iq_pos);
-      ff_group->add_cell(cell->id());
+    else if ( cell->is_ff() ) {
+      mFFMgr.add_cell(cell);
     }
-#endif
+    else if ( cell->is_latch() ) {
+      mLatchMgr.add_cell(cell);
+    }
   }
 }
 
@@ -215,28 +126,13 @@ LibComp::reg_expr(const LogExpr& expr)
   LcGroup* pgfunc = mLcLogicMgr.find_logic_group(f);
 
   // expr から生成されるパタンを pgfunc に登録する．
-  reg_pat(pgfunc, expr);
-}
-
-// @brief 論理式から生成されるパタンを登録する．
-// @param[in] pgfunc この式に対応する関数情報
-// @param[in] expr パタンの元となる論理式
-void
-LibComp::reg_pat(LcGroup* pgfunc,
-		 const LogExpr& expr)
-{
   const LcClass* pgrep = pgfunc->parent();
 
   // pgrep->rep_func() を用いる理由は論理式に現れる変数が
   // 真のサポートとは限らないから
   if ( pgrep->repfunc().ni() > 1 ) {
     // expr を変換したパタンを登録する．
-#if 0
     LogExpr cexpr = xform_expr(expr, pgfunc->map());
-#else
-    LogExpr cexpr;
-#endif
-
     assert_cond( !cexpr.is_constant(), __FILE__, __LINE__);
 
     mLcPatMgr.reg_pat(cexpr, pgrep->id());
@@ -245,10 +141,8 @@ LibComp::reg_pat(LcGroup* pgfunc,
 
 // @brief グラフ構造全体をダンプする．
 // @param[in] s 出力先のストリーム
-// @param[in] library 対象のセルライブラリ
 void
-LibComp::display(ostream& s,
-		 const CellLibrary& library)
+LibComp::display(ostream& s)
 {
   gen_pat(library);
 
@@ -256,36 +150,37 @@ LibComp::display(ostream& s,
   display_library(s, library);
 
   // 関数の情報を出力する．
-  mLcLogicMgr.display(s);
+  mLogicMgr.display(s);
 
   // パタングラフの情報を出力する．
-  mLcPatMgr.display(s);
+  mPatMgr.display(s);
 
   // FF の情報を出力する．
-  mLcFFMgr.display(s);
+  mFFMgr.display(s);
 }
 
 // @brief グラフ構造全体をダンプする．
-// @param[in] s 出力先のストリーム
-// @param[in] library 対象のセルライブラリ
+// @param[in] bos 出力先のストリーム
 // @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
 void
-LibComp::dump(ostream& s,
-	      const CellLibrary& library)
+LibComp::dump(BinO& bos)
 {
   gen_pat(library);
 
   // ライブラリの情報をダンプする．
-  library.dump(s);
+  library.dump(bos);
 
   // 関数の情報をダンプする．
-  mLcLogicMgr.dump(s);
-
-  // パタングラフの情報をダンプする．
-  mLcPatMgr.dump(s);
+  mLogicMgr.dump(bos);
 
   // FF の情報を出力する．
-  mLcFFMgr.dump(s);
+  mFFMgr.dump(bos);
+
+  // ラッチの情報を出力する．
+  mLatchMgr.dump(bos);
+
+  // パタングラフの情報をダンプする．
+  mPatMgr.dump(bos);
 }
 
 END_NAMESPACE_YM_CELL_LIBCOMP

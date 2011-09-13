@@ -1,8 +1,8 @@
-#ifndef LDLOGICMGR_H
-#define LDLOGICMGR_H
+#ifndef LCLOGICMGR_H
+#define LCLOGICMGR_H
 
-/// @file LdLogicMgr.h
-/// @brief LdLogicMgr.h
+/// @file LcLogicMgr.h
+/// @brief LcLogicMgr.h
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -12,23 +12,24 @@
 #include "libdump_nsdef.h"
 #include "ym_logic/TvFunc.h"
 #include "ym_logic/TvFuncM.h"
+#include "ym_utils/BioIO.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBDUMP
+BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 //////////////////////////////////////////////////////////////////////
-/// @class LdLogicMgr LdLogicMgr.h "LdLogicMgr.h"
+/// @class LcLogicMgr LcLogicMgr.h "LcLogicMgr.h"
 /// @brief セルライブラリを表すクラス
 //////////////////////////////////////////////////////////////////////
-class LdLogicMgr
+class LcLogicMgr
 {
 public:
 
   /// @brief コンストラクタ
-  LdLogicMgr();
+  LcLogicMgr();
 
   /// @brief デストラクタ
-  ~LdLogicMgr();
+  ~LcLogicMgr();
 
 
 public:
@@ -44,22 +45,26 @@ public:
   void
   init();
 
-  /// @brief f に対応する LdGroup を求める．
+  /// @brief セルを追加する．
+  void
+  add_cell(const Cell* cell);
+
+  /// @brief f に対応する LcGroup を求める．
   /// @param[in] f 関数
   /// @note なければ新規に作る．
-  LdGroup*
+  LcGroup*
   find_logic_group(const TvFunc& f);
 
-  /// @brief f_list に対応する LdGroup を求める．
+  /// @brief f_list に対応する LcGroup を求める．
   /// @param[in] f_list 関数のリスト
   /// @note なければ新規に作る．
-  LdGroup*
+  LcGroup*
   find_logic_group(const vector<TvFunc>& f_list);
 
   /// @brief 内容をバイナリダンプする．
-  /// @param[in] s 出力先のストリーム
+  /// @param[in] bos 出力先のストリーム
   void
-  dump(ostream& s) const;
+  dump(BinO& bos) const;
 
   /// @brief 内容を出力する．(デバッグ用)
   /// @param[in] s 出力先のストリーム
@@ -78,7 +83,7 @@ public:
 
   /// @brief 論理グループを返す．
   /// @param[in] id 論理グループ番号 ( 0 <= id < logic_group_num() )
-  const LdGroup*
+  const LcGroup*
   logic_group(ymuint id) const;
 
   /// @brief 論理クラスの数を返す．
@@ -87,7 +92,7 @@ public:
 
   /// @brief 論理クラスを返す．
   /// @param[in] id 論理クラス番号 ( 0 <= id < logic_class_num() )
-  const LdClass*
+  const LcClass*
   logic_class(ymuint id) const;
 
 
@@ -98,26 +103,20 @@ private:
 
   // グループのリスト
   // この配列上の位置とグループ番号は一致している．
-  vector<LdGroup*> mLogicGroupList;
-
-  // 1出力論理関数をキーとしてグループ番号を保持するハッシュ表
-  hash_map<TvFunc, ymuint> mLogicGroupMap1;
+  vector<LcGroup*> mLogicGroupList;
 
   // 多出力論理関数をキーとしてグループ番号を保持するハッシュ表
   hash_map<TvFuncM, ymuint> mLogicGroupMap2;
 
   // クラスのリスト
   // この配列上の位置とクラス番号は一致している．
-  vector<LdClass*> mLogicClassList;
-
-  // 代表関数をキーとしてクラス番号を保持するハッシュ表
-  hash_map<TvFunc, ymuint> mLogicClassMap1;
+  vector<LcClass*> mLogicClassList;
 
   // 代表関数をキーとしてクラス番号を保持するハッシュ表
   hash_map<TvFuncM, ymuint> mLogicClassMap2;
 
 };
 
-END_NAMESPACE_YM_CELL_LIBDUMP
+END_NAMESPACE_YM_CELL_LIBCOMP
 
-#endif // LDLOGICMGR_H
+#endif // LCLOGICMGR_H

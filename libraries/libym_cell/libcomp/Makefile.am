@@ -12,22 +12,21 @@ libym_cell_libcomp_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 
-libym_cell_libcomp_la_SOURCES =
-
-#	libcomp_nsdef.h \
-#	LcClass.h \
-#	LcClass.cc \
-#	LcGroup.h \
-#	LcGroup.cc \
+libym_cell_libcomp_la_SOURCES = \
+	libcomp_nsdef.h \
+	LcClass.h \
+	LcClass.cc \
+	LcGroup.h \
+	LcGroup.cc \
+	LcPatHandler.h \
+	LcPatMgr.h \
+	LcPatMgr.cc \
+	LcPatNode.h \
+	LcPatNode.cc
 #	LcLogicMgr.h \
 #	LcLogicMgr.cc \
 #	LcFFMgr.h \
 #	LcFFMgr.cc \
-#	LcPatHandler.h \
-#	LcPatMgr.h \
-#	LcPatMgr.cc \
-#	LcPatNode.h \
-#	LcPatNode.cc \
 #	LibComp.h \
 #	LibComp.cc
 

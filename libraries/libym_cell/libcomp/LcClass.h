@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "libdump_nsdef.h"
+#include "libcomp_nsdef.h"
 #include "ym_logic/TvFunc.h"
 #include "ym_logic/TvFuncM.h"
 
@@ -55,12 +55,12 @@ public:
   cell_class() const;
 
   /// @brief このクラスに属しているグループのリストを返す．
-  const vector<LdGroup*>&
+  const vector<LcGroup*>&
   group_list() const;
 
   /// @brief グループを追加する．
   void
-  add_group(LdGroup* group,
+  add_group(LcGroup* group,
 	    const NpnMapM& map);
 
 
@@ -79,7 +79,7 @@ private:
   CellClass* mCellClass;
 
   // グループのリスト
-  vector<LdGroup*> mGroupList;
+  vector<LcGroup*> mGroupList;
 
 };
 
