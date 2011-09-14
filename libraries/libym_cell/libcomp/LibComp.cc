@@ -91,14 +91,11 @@ LibComp::compile(const CellLibrary& library)
     const Cell* cell = library.cell(i);
 
     if ( cell->is_logic() ) {
-      if ( !cell->has_logic() || cell->output_num() == 0 ) {
-	continue;
-      }
       mLogicMgr.add_cell(cell);
 
-      ymuint no = cell->output_num();
-      ymuint nio = cell->inout_num();
-      if ( no + nio > 1 ) {
+      // パタンを作る．
+      ymuint no2 = cell->output_num2();
+      if ( no2 != 1 ) {
 	// 出力ピンが複数あるセルは対象外
 	continue;
       }

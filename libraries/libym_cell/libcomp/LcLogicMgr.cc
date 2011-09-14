@@ -70,12 +70,8 @@ void
 LcLogicMgr::gen_signature(const Cell* cell,
 			  TvFuncM& f)
 {
-  ymuint ni = cell->input_num();
-  ymuint no = cell->output_num();
-  ymuint nio = cell->inout_num();
-
-  ymuint ni2 = ni + nio;
-  ymuint no2 = no + nio;
+  ymuint ni2 = cell->input_num2();
+  ymuint no2 = cell->output_num2();
   bool has_tristate = false;
   for (ymuint i = 0; i < no2; ++ i) {
     if ( cell->has_tristate(i) ) {

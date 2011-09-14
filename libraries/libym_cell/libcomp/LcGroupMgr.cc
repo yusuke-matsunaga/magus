@@ -53,15 +53,30 @@ LcGroupMgr::clear()
 void
 LcGroupMgr::add_cell(const Cell* cell)
 {
-  // セルのシグネチャ関数を作る．
-  TvFuncM f;
-  gen_signature(cell, f);
+  if ( !cell->has_logic() || cell->output_num2() == 0 ) {
+    // ひとつでも論理式を持たない出力があるセルは独立したグループとなる．
+    LcGroup* fgroup = new_group();
+    fgroup->add_cell(cell);
 
-  // f に対するセルグループを求める．
-  LcGroup* fgroup = find_group(f);
+    ymuint ni = cell->input_num2();
+    ymuint no = cell->output_num2();
+    TvFuncM repfunc(ni, no);
+    LcClass* fclass = new_class(repfunc);
+    NpnMapM xmap;
+    xmap.set_identity(ni, no);
+    fclass->add_group(fgroup, xmap);
+  }
+  else {
+    // セルのシグネチャ関数を作る．
+    TvFuncM f;
+    gen_signature(cell, f);
 
-  // セル(番号)を追加する．
-  fgroup->add_cell(cell);
+    // f に対するセルグループを求める．
+    LcGroup* fgroup = find_group(f);
+
+    // セル(番号)を追加する．
+    fgroup->add_cell(cell);
+  }
 }
 
 // @brief f に対応する LcGroup を求める．
@@ -74,10 +89,8 @@ LcGroupMgr::find_group(const TvFuncM& f)
   hash_map<TvFuncM, ymuint>::iterator p = mGroupMap.find(f);
   if ( p == mGroupMap.end() ) {
     // なかったので新たに作る．
-    ymuint new_id = mGroupList.size();
-    fgroup = new LcGroup(new_id);
-    mGroupList.push_back(fgroup);
-    mGroupMap.insert(make_pair(f, new_id));
+    fgroup = new_group();
+    mGroupMap.insert(make_pair(f, fgroup->id()));
 
     // 代表関数を求める．
     TvFuncM repfunc;
@@ -88,10 +101,8 @@ LcGroupMgr::find_group(const TvFuncM& f)
     hash_map<TvFuncM, ymuint>::iterator p = mClassMap.find(repfunc);
     if ( p == mClassMap.end() ) {
       // まだ登録されていない．
-      ymuint new_id = mClassList.size();
-      fclass = new LcClass(new_id, repfunc);
-      mClassList.push_back(fclass);
-      mClassMap.insert(make_pair(repfunc, new_id));
+      fclass = new_class(repfunc);
+      mClassMap.insert(make_pair(repfunc, fclass->id()));
     }
     else {
       // 登録されていた．
@@ -242,6 +253,28 @@ LcGroupMgr::display(ostream& s) const
   }
   s << endl;
   s << "*** LcGroupMgr END ***" << endl;
+}
+
+// @brief 新しいグループを作る．
+LcGroup*
+LcGroupMgr::new_group()
+{
+  ymuint new_id = mGroupList.size();
+  LcGroup* fgroup = new LcGroup(new_id);
+  mGroupList.push_back(fgroup);
+
+  return fgroup;
+}
+
+// @brief 新しいクラスを作る．
+LcClass*
+LcGroupMgr::new_class(const TvFuncM& repfunc)
+{
+  ymuint new_id = mClassList.size();
+  LcClass* fclass = new LcClass(new_id, repfunc);
+  mClassList.push_back(fclass);
+
+  return fclass;
 }
 
 END_NAMESPACE_YM_CELL_LIBCOMP
