@@ -652,12 +652,12 @@ TvFuncM::dump(ostream& s,
   const ymuint wordsize = SIZEOF_SIZE_T * 8;
   if ( mode == 2 ) {
     ymulong* bp = mVector;
-    ymuint offset = 0;
     ymulong tmp = *bp;
     const char* del = "";
     for (ymuint j = 0; j < mNo; ++ j) {
       s << del;
       del = "|";
+      ymuint offset = 0;
       for (ymuint i = 0; i < ni_pow; ++ i) {
 	s << (tmp & 1L);
 	tmp >>= 1;
@@ -668,15 +668,19 @@ TvFuncM::dump(ostream& s,
 	  tmp = *bp;
 	}
       }
+      if ( offset != 0 ) {
+	++ bp;
+	tmp = *bp;
+      }
     }
   }
   else if ( mode == 16 ) {
     ymuint ni_pow4 = ni_pow / 4;
     ymulong* bp = mVector;
-    ymuint offset = 0;
     ymulong tmp = *bp;
     for (ymuint j = 0; j < mNo; ++ j) {
       const char* del = "";
+      ymuint offset = 0;
       for (ymuint i = 0; i < ni_pow4; ++ i) {
 	s << del;
 	del = "|";
@@ -694,6 +698,10 @@ TvFuncM::dump(ostream& s,
 	  ++ bp;
 	  tmp = *bp;
 	}
+      }
+      if ( offset != 0 ) {
+	++ bp;
+	tmp = *bp;
       }
     }
   }
