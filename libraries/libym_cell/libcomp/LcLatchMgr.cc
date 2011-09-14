@@ -43,13 +43,9 @@ void
 LcLatchMgr::gen_signature(const Cell* cell,
 		       TvFuncM& f)
 {
-  ymuint ni = cell->input_num();
-  ymuint no = cell->output_num();
-  ymuint nio = cell->inout_num();
-
   // + 2 は状態変数
-  ymuint ni2 = ni + nio + 2;
-  ymuint no2 = no + nio;
+  ymuint ni2 = cell->input_num2() + 2;
+  ymuint no2 = cell->output_num2();
 
   vector<TvFunc> f_list(no2 * 2 + 4);
   for (ymuint i = 0; i < no2; ++ i) {
@@ -74,6 +70,7 @@ LcLatchMgr::gen_signature(const Cell* cell,
     LogExpr expr = cell->preset_expr();
     f_list[no2 * 2 + 3] = expr.make_tv(ni2);
   }
+  f = TvFuncM(f_list);
 }
 
 // @brief 代表関数を求める．

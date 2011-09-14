@@ -173,14 +173,30 @@ gen_library(const DotlibNode* dt_library)
 	default:
 	  break;
 	}
-
-	// ピン名とピン番号の対応づけを行う．
-	ShString pin_name = pin_info.name();
-	pin_map.insert(make_pair(pin_name, pin_id));
       }
       if ( error ) {
 	continue;
       }
+    }
+    ymuint ni2 = ni + nio;
+
+    // ピン名とピン番号の対応づけを行う．
+    {
+      ymuint ipos = 0;
+      for (ymuint pin_id = 0; pin_id < npin; ++ pin_id) {
+	DotlibPin& pin_info = pin_info_array[pin_id];
+	switch ( pin_info.direction() ) {
+	case DotlibPin::kInput:
+	case DotlibPin::kInout:
+	  pin_map.insert(make_pair(pin_info.name(), ipos));
+	  ++ ipos;
+	  break;
+
+	default:
+	  break;
+	}
+      }
+      assert_cond( ipos == ni2, __FILE__, __LINE__);
     }
 
     // FF情報の読み出し
@@ -193,8 +209,8 @@ gen_library(const DotlibNode* dt_library)
       ShString var1 = ff_info.var1_name();
       ShString var2 = ff_info.var2_name();
       // pin_map に登録しておく
-      pin_map.insert(make_pair(var1, npin));
-      pin_map.insert(make_pair(var2, npin + 1));
+      pin_map.insert(make_pair(var1, ni2 + 0));
+      pin_map.insert(make_pair(var2, ni2 + 1));
     }
 
     // ラッチ情報の読み出し
@@ -207,8 +223,8 @@ gen_library(const DotlibNode* dt_library)
       ShString var1 = latch_info.var1_name();
       ShString var2 = latch_info.var2_name();
       // pin_map に登録しておく
-      pin_map.insert(make_pair(var1, npin));
-      pin_map.insert(make_pair(var2, npin + 1));
+      pin_map.insert(make_pair(var1, ni2 + 0));
+      pin_map.insert(make_pair(var2, ni2 + 1));
     }
 
     // 出力ピン(入出力ピン)の論理式を作る．

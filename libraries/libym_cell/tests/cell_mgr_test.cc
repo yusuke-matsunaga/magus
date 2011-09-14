@@ -38,12 +38,7 @@ dump_load_test(const char* in_filename,
 
   nsLibcomp::LibComp libcomp;
 
-  try {
-    libcomp.compile(*library);
-  }
-  catch ( AssertError x ) {
-    cout << x << endl;
-  }
+  libcomp.compile(*library);
   libcomp.display(cout);
 
 #if 0
