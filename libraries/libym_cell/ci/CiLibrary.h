@@ -19,6 +19,7 @@
 #include "ym_utils/Alloc.h"
 #include "ym_utils/ShString.h"
 #include "ym_logic/LogExpr.h"
+#include "CiGroupMgr.h"
 #include "CiPatMgr.h"
 
 BEGIN_NAMESPACE_YM_CELL
@@ -609,6 +610,12 @@ public:
 	     tCellTimingSense sense,
 	     CellTiming* timing);
 
+  /// @brief セルのグループ分けを行う．
+  /// @note 論理セルのパタングラフも作成する．
+  virtual
+  void
+  compile();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -657,41 +664,14 @@ private:
   // セルのポインタの配列
   CiCell** mCellArray;
 
-  // 論理セルクラスの数
-  ymuint32 mLogicClassNum;
+  // 論理セルグループの情報
+  CiGroupMgr mLogicGroupMgr;
 
-  // 論理セルクラスの配列
-  CiClass** mLogicClassArray;
+  // FFセルグループの情報
+  CiGroupMgr mFFGroupMgr;
 
-  // 論理セルグループの数
-  ymuint32 mLogicGroupNum;
-
-  // 論理セルグループの配列
-  CiGroup** mLogicGroupArray;
-
-  // FFセルクラスの数
-  ymuint32 mFFClassNum;
-
-  // FFセルクラスの配列
-  CiClass** mFFClassArray;
-
-  // FFセルグループの数
-  ymuint32 mFFGroupNum;
-
-  // FFセルグループの配列
-  CiGroup** mFFGroupArray;
-
-  // ラッチセルクラスの数
-  ymuint32 mLatchClassNum;
-
-  // ラッチセルクラスの配列
-  CiClass** mLatchClassArray;
-
-  // ラッチセルグループの数
-  ymuint32 mLatchGroupNum;
-
-  // ラッチセルグループの配列
-  CiGroup** mLatchGroupArray;
+  // ラッチセルグループの情報
+  CiGroupMgr mLatchGroupMgr;
 
   // パタングラフを管理するクラス
   CiPatMgr mPatMgr;

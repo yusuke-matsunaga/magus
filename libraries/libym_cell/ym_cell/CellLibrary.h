@@ -636,6 +636,12 @@ public:
 	     tCellTimingSense sense,
 	     CellTiming* timing) = 0;
 
+  /// @brief セルのグループ分けを行う．
+  /// @note 論理セルのパタングラフも作成する．
+  virtual
+  void
+  compile() = 0;
+
 };
 
 /// @relates CellLibrary

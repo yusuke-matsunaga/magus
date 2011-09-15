@@ -11,7 +11,6 @@
 #include "ym_cell/cell_nsdef.h"
 #include "ym_cell/CellArea.h"
 #include "ym_logic/lexp_nsdef.h"
-#include "ym_logic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -216,13 +215,6 @@ public:
   LogExpr
   logic_expr(ymuint pin_id) const = 0;
 
-  /// @brief 出力の論理関数を返す．
-  /// @param[in] pos 出力番号 ( 0 <= pos < output_num2() )
-  /// @note FF/ラッチの場合は状態変数の変数(Q, XQ)が2つ入力に加わる．
-  virtual
-  TvFunc
-  logic_function(ymuint pos) const = 0;
-
   /// @brief 出力がトライステート条件を持っている時に true を返す．
   /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
   virtual
@@ -237,24 +229,11 @@ public:
   LogExpr
   tristate_expr(ymuint pin_id) const = 0;
 
-  /// @brief 出力のトライステート条件関数を返す．
-  /// @param[in] pos 出力番号 ( 0 <= pos < output_num2() )
-  /// @note トライステートでない場合には定数0関数を返す．
-  virtual
-  TvFunc
-  tristate_function(ymuint pos) const = 0;
-
   /// @brief FFセルの場合に次状態関数を表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
   LogExpr
   next_state_expr() const = 0;
-
-  /// @brief FFセルの場合に次状態関数を返す．
-  /// @note それ以外の型の場合の返り値は不定
-  virtual
-  TvFunc
-  next_state_function() const = 0;
 
   /// @brief FFセルの場合にクロックのアクティブエッジを表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
@@ -262,23 +241,11 @@ public:
   LogExpr
   clock_expr() const = 0;
 
-  /// @brief FFセルの場合にクロックのアクティブエッジを表す関数を返す．
-  /// @note それ以外の型の場合の返り値は不定
-  virtual
-  TvFunc
-  clock_function() const = 0;
-
   /// @brief FFセルの場合にスレーブクロックのアクティブエッジを表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
   LogExpr
   clock2_expr() const = 0;
-
-  /// @brief FFセルの場合にスレーブクロックのアクティブエッジを表す関数を返す．
-  /// @note それ以外の型の場合の返り値は不定
-  virtual
-  TvFunc
-  clock2_function() const = 0;
 
   /// @brief ラッチセルの場合にデータ入力関数を表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
@@ -286,35 +253,17 @@ public:
   LogExpr
   data_in_expr() const = 0;
 
-  /// @brief ラッチセルの場合にデータ入力関数を返す．
-  /// @note それ以外の型の場合の返り値は不定
-  virtual
-  TvFunc
-  data_in_function() const = 0;
-
   /// @brief ラッチセルの場合にイネーブル条件を表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
   LogExpr
   enable_expr() const = 0;
 
-  /// @brief ラッチセルの場合にイネーブル条件を表す関数を返す．
-  /// @note それ以外の型の場合の返り値は不定
-  virtual
-  TvFunc
-  enable_function() const = 0;
-
   /// @brief ラッチセルの場合に2つめのイネーブル条件を表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
   LogExpr
   enable2_expr() const = 0;
-
-  /// @brief ラッチセルの場合に2つめのイネーブル条件を表す関数を返す．
-  /// @note それ以外の型の場合の返り値は不定
-  virtual
-  TvFunc
-  enable2_function() const = 0;
 
   /// @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
   virtual
@@ -327,12 +276,6 @@ public:
   LogExpr
   clear_expr() const = 0;
 
-  /// @brief FFセル/ラッチセルの場合にクリア条件を表す関数を返す．
-  /// @note クリア端子がない場合の返り値は不定
-  virtual
-  TvFunc
-  clear_function() const = 0;
-
   /// @brief FFセル/ラッチセルの場合にプリセット端子を持っていたら true を返す．
   virtual
   bool
@@ -343,12 +286,6 @@ public:
   virtual
   LogExpr
   preset_expr() const = 0;
-
-  /// @brief FFセル/ラッチセルの場合にプリセット条件を表す関数を返す．
-  /// @note プリセット端子がない場合の返り値は不定
-  virtual
-  TvFunc
-  preset_function() const = 0;
 
   /// @brief clear_preset_var1 の取得
   /// @retval 0 "L"

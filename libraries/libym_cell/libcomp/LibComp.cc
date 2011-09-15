@@ -140,10 +140,38 @@ LibComp::reg_expr(const LogExpr& expr)
   }
 }
 
+// @brief 論理セルグループの情報を取り出す．
+const LcGroupMgr&
+LibComp::logic_group_mgr() const
+{
+  return mLogicMgr;
+}
+
+// @brief FFセルグループの情報を取り出す．
+const LcGroupMgr&
+LibComp::ff_group_mgr() const
+{
+  return mFFMgr;
+}
+
+// @brief ラッチセルグループの情報を取り出す．
+const LcGroupMgr&
+LibComp::latch_group_mgr() const
+{
+  return mLatchMgr;
+}
+
+// @brief パタングラフの情報を取り出す．
+const LcPatMgr&
+LibComp::pat_mgr() const
+{
+  return mPatMgr;
+}
+
 // @brief グラフ構造全体をダンプする．
 // @param[in] s 出力先のストリーム
 void
-LibComp::display(ostream& s)
+LibComp::display(ostream& s) const
 {
   // 論理セルグループの情報を出力する．
   mLogicMgr.display(s);
@@ -156,25 +184,6 @@ LibComp::display(ostream& s)
 
   // パタングラフの情報を出力する．
   mPatMgr.display(s);
-}
-
-// @brief グラフ構造全体をダンプする．
-// @param[in] bos 出力先のストリーム
-// @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
-void
-LibComp::dump(BinO& bos)
-{
-  // 論理セルグループの情報をダンプする．
-  mLogicMgr.dump(bos);
-
-  // FFグループの情報を出力する．
-  mFFMgr.dump(bos);
-
-  // ラッチグループの情報を出力する．
-  mLatchMgr.dump(bos);
-
-  // パタングラフの情報をダンプする．
-  mPatMgr.dump(bos);
 }
 
 END_NAMESPACE_YM_CELL_LIBCOMP

@@ -343,15 +343,6 @@ CiCell::logic_expr(ymuint pin_id) const
   return mLogicArray[pin_id];
 }
 
-// @brief 出力の論理関数を返す．
-// @param[in] pos 出力番号 ( 0 <= pos < output_num2() )
-// @note FF/ラッチの場合は状態変数の変数(Q, XQ)が2つ入力に加わる．
-TvFunc
-CiCell::logic_function(ymuint pos) const
-{
-  return cell_group()->logic_function(pos);
-}
-
 // @brief 出力がトライステート条件を持っている時に true を返す．
 // @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
 bool
@@ -370,29 +361,12 @@ CiCell::tristate_expr(ymuint pin_id) const
   return mTristateArray[pin_id];
 }
 
-// @brief 出力のトライステート条件関数を返す．
-// @param[in] pos 出力番号 ( 0 <= pos < output_num2() )
-// @note トライステートでない場合には定数0関数を返す．
-TvFunc
-CiCell::tristate_function(ymuint pos) const
-{
-  return cell_group()->tristate_function(pos);
-}
-
 // @brief FFセルの場合に次状態関数を表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
 LogExpr
 CiCell::next_state_expr() const
 {
   return LogExpr::make_zero();
-}
-
-// @brief FFセルの場合に次状態関数を返す．
-// @note それ以外の型の場合の返り値は不定
-TvFunc
-CiCell::next_state_function() const
-{
-  return cell_group()->next_state_function();
 }
 
 // @brief FFセルの場合にクロックのアクティブエッジを表す論理式を返す．
@@ -403,28 +377,12 @@ CiCell::clock_expr() const
   return LogExpr::make_zero();
 }
 
-// @brief FFセルの場合にクロックのアクティブエッジを表す関数を返す．
-// @note それ以外の型の場合の返り値は不定
-TvFunc
-CiCell::clock_function() const
-{
-  return cell_group()->clock_function();
-}
-
 // @brief FFセルの場合にスレーブクロックのアクティブエッジを表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
 LogExpr
 CiCell::clock2_expr() const
 {
   return LogExpr::make_zero();
-}
-
-// @brief FFセルの場合にスレーブクロックのアクティブエッジを表す関数を返す．
-// @note それ以外の型の場合の返り値は不定
-TvFunc
-CiCell::clock2_function() const
-{
-  return cell_group()->clock2_function();
 }
 
 // @brief ラッチセルの場合にデータ入力関数を表す論理式を返す．
@@ -435,14 +393,6 @@ CiCell::data_in_expr() const
   return LogExpr::make_zero();
 }
 
-// @brief ラッチセルの場合にデータ入力関数を返す．
-// @note それ以外の型の場合の返り値は不定
-TvFunc
-CiCell::data_in_function() const
-{
-  return cell_group()->data_in_function();
-}
-
 // @brief ラッチセルの場合にイネーブル条件を表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
 LogExpr
@@ -451,28 +401,12 @@ CiCell::enable_expr() const
   return LogExpr::make_zero();
 }
 
-// @brief ラッチセルの場合にイネーブル条件を表す関数を返す．
-// @note それ以外の型の場合の返り値は不定
-TvFunc
-CiCell::enable_function() const
-{
-  return cell_group()->enable_function();
-}
-
 // @brief ラッチセルの場合に2つめのイネーブル条件を表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
 LogExpr
 CiCell::enable2_expr() const
 {
   return LogExpr::make_zero();
-}
-
-// @brief ラッチセルの場合に2つめのイネーブル条件を表す関数を返す．
-// @note それ以外の型の場合の返り値は不定
-TvFunc
-CiCell::enable2_function() const
-{
-  return cell_group()->enable2_function();
 }
 
 // @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
@@ -490,14 +424,6 @@ CiCell::clear_expr() const
   return LogExpr::make_zero();
 }
 
-// @brief FFセル/ラッチセルの場合にクリア条件を表す関数を返す．
-// @note クリア端子がない場合の返り値は不定
-TvFunc
-CiCell::clear_function() const
-{
-  return cell_group()->clear_function();
-}
-
 // @brief FFセル/ラッチセルの場合にプリセット端子を持っていたら true を返す．
 bool
 CiCell::has_preset() const
@@ -511,14 +437,6 @@ LogExpr
 CiCell::preset_expr() const
 {
   return LogExpr::make_zero();
-}
-
-// @brief FFセル/ラッチセルの場合にプリセット条件を表す関数を返す．
-// @note プリセット端子がない場合の返り値は不定
-TvFunc
-CiCell::preset_function() const
-{
-  return cell_group()->preset_function();
 }
 
 // @brief clear_preset_var1 の取得
@@ -540,42 +458,5 @@ CiCell::clear_preset_var2() const
 {
   return 0;
 }
-
-#if 0
-// @brief タイミング情報を設定する．
-// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
-// @param[in] sense タイミング条件
-// @param[in] timing 設定するタイミング情報
-// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-//  + cell->output_num() を使う．
-// @note ( *2 ) ipin_id で入出力ピンを表す時には入出力ピン番号
-//  + cell->input_num() を使う．
-void
-CiCell::set_timing(ymuint opin_id,
-		   ymuint ipin_id,
-		   tCellTimingSense sense,
-		   CiTiming* timing)
-{
-  ymuint base = opin_id * input_num2() + ipin_id;
-  switch ( sense ) {
-  case kCellPosiUnate:
-    mTimingArray[base + 0] = timing;
-    break;
-
-  case kCellNegaUnate:
-    mTimingArray[base + 1] = timing;
-    break;
-
-  case kCellNonUnate:
-    mTimingArray[base + 0] = timing;
-    mTimingArray[base + 1] = timing;
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-  }
-}
-#endif
 
 END_NAMESPACE_YM_CELL

@@ -41,16 +41,26 @@ public:
   void
   compile(const CellLibrary& library);
 
+  /// @brief 論理セルグループの情報を取り出す．
+  const LcGroupMgr&
+  logic_group_mgr() const;
+
+  /// @brief FFセルグループの情報を取り出す．
+  const LcGroupMgr&
+  ff_group_mgr() const;
+
+  /// @brief ラッチセルグループの情報を取り出す．
+  const LcGroupMgr&
+  latch_group_mgr() const;
+
+  /// @brief パタングラフの情報を取り出す．
+  const LcPatMgr&
+  pat_mgr() const;
+
   /// @brief グラフ構造全体の内容を表示する．
   /// @param[in] s 出力先のストリーム
   void
-  display(ostream& s);
-
-  /// @brief グラフ構造全体をダンプする．
-  /// @param[in] bos 出力先のストリーム
-  /// @note ダンプされた情報はそのまま PatMgr で読み込むことができる．
-  void
-  dump(BinO& bos);
+  display(ostream& s) const;
 
 
 private:
