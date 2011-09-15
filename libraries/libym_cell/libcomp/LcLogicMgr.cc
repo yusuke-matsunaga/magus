@@ -42,27 +42,39 @@ LcLogicMgr::init()
 {
   clear();
 
-  // 既定関数の登録
-  {
+  { // 定数0グループの登録
     TvFuncM const0(TvFunc::const_zero(0));
     LcGroup* func0 = find_group(const0);
-    assert_cond( func0->id() == 0, __FILE__, __LINE__);
+    mLogicGroup[0] = func0->id();
   }
-  {
+  { // 定数1グループの登録
     TvFuncM const1(TvFunc::const_one(0));
     LcGroup* func1 = find_group(const1);
-    assert_cond( func1->id() == 1, __FILE__, __LINE__);
+    mLogicGroup[1] = func1->id();
   }
-  {
+  { // バッファグループの登録
     TvFuncM plit(TvFunc::posi_literal(1, 0));
     LcGroup* func2 = find_group(plit);
-    assert_cond( func2->id() == 2, __FILE__, __LINE__);
+    mLogicGroup[2] = func2->id();
   }
-  {
+  { // インバーターグループの登録
     TvFuncM nlit(TvFunc::nega_literal(1, 0));
     LcGroup* func3 = find_group(nlit);
-    assert_cond( func3->id() == 3, __FILE__, __LINE__);
+    mLogicGroup[3] = func3->id();
   }
+}
+
+// @brief 定義済みの論理グループ番号を返す．
+// @param[in] id 番号
+// - 0: 定数0
+// - 1: 定数1
+// - 2: バッファ
+// - 3: インバーター
+ymuint
+LcLogicMgr::logic_group(ymuint id) const
+{
+  assert_cond( id < 4, __FILE__, __LINE__);
+  return mLogicGroup[id];
 }
 
 // @brief セルのシグネチャ関数を作る．

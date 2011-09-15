@@ -194,6 +194,42 @@ LibComp::npn_class(ymuint id) const
   return mClassList[id];
 }
 
+// @brief 定義済みの論理グループ番号を返す．
+// @param[in] id 番号
+// - 0: 定数0
+// - 1: 定数1
+// - 2: バッファ
+// - 3: インバーター
+ymuint
+LibComp::logic_group(ymuint id) const
+{
+  return mLogicMgr.logic_group(id);
+}
+
+// @brief 定義済みのFFクラス番号を返す．
+// @param[in] id 番号
+// - 0: クリアなし，プリセットなし
+// - 1: クリアあり，プリセットなし
+// - 2: クリアなし，プリセットあり
+// - 3: クリアあり，プリセットあり
+ymuint
+LibComp::ff_class(ymuint id) const
+{
+  return mFFMgr.ff_class(id);
+}
+
+// @brief 定義済みのラッチクラス番号を返す．
+// @param[in] id 番号
+// - 0: クリアなし，プリセットなし
+// - 1: クリアあり，プリセットなし
+// - 2: クリアなし，プリセットあり
+// - 3: クリアあり，プリセットあり
+ymuint
+LibComp::latch_class(ymuint id) const
+{
+  return mLatchMgr.latch_class(id);
+}
+
 // @brief expr から生成されるパタンを登録する．
 void
 LibComp::reg_expr(const LogExpr& expr)

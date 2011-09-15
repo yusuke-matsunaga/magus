@@ -38,6 +38,18 @@ LcLatchMgr::init()
   clear();
 }
 
+// @brief 定義済みのラッチクラス番号を返す．
+// @param[in] id 番号
+// - 0: クリアなし，プリセットなし
+// - 1: クリアあり，プリセットなし
+// - 2: クリアなし，プリセットあり
+// - 3: クリアあり，プリセットあり
+ymuint
+LcLatchMgr::latch_class(ymuint id) const
+{
+  return mLatchClass[id];
+}
+
 // @brief セルのシグネチャ関数を作る．
 // @param[in] cell セル
 // @param[out] f シグネチャ関数

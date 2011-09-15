@@ -915,6 +915,16 @@ CiLibrary::compile()
     }
   }
 
+  for (ymuint i = 0; i < 4; ++ i) {
+    mLogicGroup[i] = &mGroupArray[libcomp.logic_group(i)];
+  }
+  for (ymuint i = 0; i < 4; ++ i) {
+    mFFClass[i] = &mClassArray[libcomp.ff_class(i)];
+  }
+  for (ymuint i = 0; i < 4; ++ i) {
+    mLatchClass[i] = &mClassArray[libcomp.latch_class(i)];
+  }
+
   mPatMgr.copy(libcomp.pat_mgr(), mAlloc);
 }
 

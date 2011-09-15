@@ -58,10 +58,10 @@ display_timing(ostream& s,
 // セルクラスの情報を出力する．
 void
 display_class(ostream& s,
-	      ymuint id,
+	      const char* title,
 	      const CellClass* cclass)
 {
-  s << "Class#" << id << endl;
+  s << title << endl;
   for (ymuint i = 0; i < cclass->group_num(); ++ i) {
     const CellGroup* group = cclass->cell_group(i);
     s << "  Group: Map = " << group->map() << endl
@@ -71,6 +71,21 @@ display_class(ostream& s,
       s << " " << cell->name();
     }
     s << endl;
+  }
+  s << endl;
+}
+
+// セルグループの情報を出力する．
+void
+display_group(ostream& s,
+	      const char* title,
+	      const CellGroup* group)
+{
+  s << title << endl
+    << "  Cell =";
+  for (ymuint i = 0; i < group->cell_num(); ++ i) {
+    const Cell* cell = group->cell(i);
+    s << " " << cell->name();
   }
   s << endl;
 }
@@ -368,8 +383,20 @@ display_library(ostream& s,
   ymuint nc = library.npn_class_num();
   for (ymuint i = 0; i < nc; ++ i) {
     const CellClass* cclass = library.npn_class(i);
-    display_class(s, i, cclass);
+    ostringstream buf;
+    buf << "Class#" << i;
+    display_class(s, buf.str().c_str(), cclass);
   }
+
+  display_group(s, "Const0 Group", library.const0_func());
+  display_group(s, "Const1 Group", library.const1_func());
+  display_group(s, "Buffer Group", library.buf_func());
+  display_group(s, "Inverter Group", library.inv_func());
+
+  display_class(s, "DFF Class", library.simple_ff_class(false, false));
+  display_class(s, "DFF_R Class", library.simple_ff_class(true, false));
+  display_class(s, "DFF_S Class", library.simple_ff_class(false, true));
+  display_class(s, "DFF_RS Class", library.simple_ff_class(true, true));
 
   s << "==== PatMgr dump start ====" << endl;
 
