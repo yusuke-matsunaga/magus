@@ -25,7 +25,8 @@ class LcGroupMgr
 public:
 
   /// @brief コンストラクタ
-  LcGroupMgr();
+  /// @param[in] libcomp 親の LibComp
+  LcGroupMgr(LibComp& libcomp);
 
   /// @brief デストラクタ
   ~LcGroupMgr();
@@ -50,46 +51,6 @@ public:
   /// @note なければ新規に作る．
   LcGroup*
   find_group(const TvFuncM& f);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容情報を取得する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief セルグループの数を返す．
-  ymuint
-  group_num() const;
-
-  /// @brief セルグループを返す．
-  /// @param[in] id セルグループ番号 ( 0 <= id < group_num() )
-  const LcGroup*
-  group(ymuint id) const;
-
-  /// @brief NPN同値クラスの数を返す．
-  ymuint
-  npn_class_num() const;
-
-  /// @brief NPN同値クラスを返す．
-  /// @param[in] id NPN同値クラス番号 ( 0 <= id < npn_class_num() )
-  const LcClass*
-  npn_class(ymuint id) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ダンプ用の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 内容をバイナリダンプする．
-  /// @param[in] bos 出力先のストリーム
-  void
-  dump(BinO& bos) const;
-
-  /// @brief 内容を出力する．(デバッグ用)
-  /// @param[in] s 出力先のストリーム
-  void
-  display(ostream& s) const;
 
 
 private:
@@ -118,34 +79,14 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 下請け関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 新しいグループを作る．
-  LcGroup*
-  new_group();
-
-  /// @brief 新しいクラスを作る．
-  /// @param[in] repfunc 代表関数
-  LcClass*
-  new_class(const TvFuncM& repfunc);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // セルグループのリスト
-  // この配列上の位置とグループ番号は一致している．
-  vector<LcGroup*> mGroupList;
+  // 親の LibComp
+  LibComp& mLibComp;
 
   // 多出力論理関数をキーとしてグループ番号を保持するハッシュ表
   hash_map<TvFuncM, ymuint> mGroupMap;
-
-  // NPN同値クラスのリスト
-  // この配列上の位置とクラス番号は一致している．
-  vector<LcClass*> mClassList;
 
   // 代表関数をキーとしてクラス番号を保持するハッシュ表
   hash_map<TvFuncM, ymuint> mClassMap;

@@ -24,7 +24,8 @@ class LcLatchMgr :
 public:
 
   /// @brief コンストラクタ
-  LcLatchMgr();
+  /// @param[in] libcomp 親の LibComp
+  LcLatchMgr(LibComp& libcomp);
 
   /// @brief デストラクタ
   ~LcLatchMgr();

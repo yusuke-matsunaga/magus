@@ -22,7 +22,9 @@ BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LcLogicMgr::LcLogicMgr()
+// @param[in] libcomp 親の LibComp
+LcLogicMgr::LcLogicMgr(LibComp& libcomp) :
+  LcGroupMgr(libcomp)
 {
 }
 

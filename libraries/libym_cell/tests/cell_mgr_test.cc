@@ -7,64 +7,33 @@
 /// All rights reserved.
 
 
+#include "ym_cell/CellLibrary.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
-#include "ym_cell/CellLibrary.h"
-#include "libcomp/LibComp.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
-bool
-dump_load_test(const char* in_filename,
-	       bool dotlib)
+/// @brief genlib 形式のファイルを読み込む．
+/// @param[in] filename ファイル名
+/// @return 生成されたライブラリを返す．
+/// @note エラーが起きたら NULL を返す．
+const CellLibrary*
+read_mislib(const char* filename)
 {
-  const CellLibrary* library = NULL;
-  if ( dotlib ) {
-    CellDotlibReader reader;
-    library = reader.read(in_filename);
-  }
-  else {
-    CellMislibReader reader;
-    library = reader.read(in_filename);
-  }
+  CellMislibReader reader;
+  return reader.read(filename);
+}
 
-  if ( library == NULL ) {
-    cerr << in_filename << ": Error in reading library" << endl;
-    return false;
-  }
-
-  display_library(cout, *library);
-
-#if 0
-  {
-    ofstream os;
-    os.open(data_filename, ios::binary);
-    if ( !os ) {
-      // エラー
-      cerr << "Could not create " << data_filename << endl;
-      return false;
-    }
-
-    CellMgr::dump_library(os, *library);
-
-    os.close();
-  }
-
-  CellMgr cell_mgr;
-  {
-    ifstream ifs;
-    ifs.open(data_filename, ios::binary);
-    if ( !ifs ) {
-      // エラー
-      cerr << "Could not open " << data_filename << endl;
-      return false;
-    }
-    cell_mgr.load_library(ifs);
-  }
-  dump(cout, cell_mgr);
-#endif
-  return true;
+/// @brief liberty 形式のファイルを読み込む．
+/// @param[in] filename ファイル名
+/// @return 生成されたライブラリを返す．
+/// @note エラーが起きたら NULL を返す．
+const CellLibrary*
+read_dotlib(const char* filename)
+{
+  CellDotlibReader reader;
+  return reader.read(filename);
 }
 
 END_NAMESPACE_YM_CELL
@@ -75,7 +44,7 @@ main(int argc,
      char** argv)
 {
   using namespace std;
-  using nsYm::nsCell::dump_load_test;
+  using namespace nsYm::nsCell;
 
   if ( argc < 2 ) {
     cerr << "Usage: " << argv[0] << " [--liberty] <liberty-file>" << endl;
@@ -90,9 +59,19 @@ main(int argc,
 
   const char* filename = argv[base];
 
-  if ( !dump_load_test(filename, dotlib) ) {
-    return -1;
+  const CellLibrary* library = NULL;
+  if ( dotlib ) {
+    library = read_dotlib(filename);
   }
+  else {
+    library = read_mislib(filename);
+  }
+  if ( library == NULL ) {
+    cerr << filename << ": Error in reading library" << endl;
+    return 1;
+  }
+
+  display_library(cout, *library);
 
   return 0;
 }

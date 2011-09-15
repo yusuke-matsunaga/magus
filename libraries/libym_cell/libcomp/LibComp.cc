@@ -59,19 +59,61 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LibComp::LibComp()
+LibComp::LibComp() :
+  mLogicMgr(*this),
+  mFFMgr(*this),
+  mLatchMgr(*this)
 {
 }
 
 // @brief デストラクタ
 LibComp::~LibComp()
 {
+  for (vector<LcGroup*>::iterator p = mGroupList.begin();
+       p != mGroupList.end(); ++ p) {
+    delete *p;
+  }
+  for (vector<LcClass*>::iterator p = mClassList.begin();
+       p != mClassList.end(); ++ p) {
+    delete *p;
+  }
+}
+
+// @brief 論理セルグループの情報を取り出す．
+const LcGroupMgr&
+LibComp::logic_group_mgr() const
+{
+  return mLogicMgr;
+}
+
+// @brief FFセルグループの情報を取り出す．
+const LcGroupMgr&
+LibComp::ff_group_mgr() const
+{
+  return mFFMgr;
+}
+
+// @brief ラッチセルグループの情報を取り出す．
+const LcGroupMgr&
+LibComp::latch_group_mgr() const
+{
+  return mLatchMgr;
+}
+
+// @brief パタングラフの情報を取り出す．
+const LcPatMgr&
+LibComp::pat_mgr() const
+{
+  return mPatMgr;
 }
 
 // @brief セルのグループ化，クラス化を行う．
 void
 LibComp::compile(const CellLibrary& library)
 {
+  mGroupList.clear();
+  mClassList.clear();
+
   mLogicMgr.init();
   mFFMgr.init();
   mLatchMgr.init();
@@ -120,6 +162,38 @@ LibComp::compile(const CellLibrary& library)
   }
 }
 
+// @brief セルグループの数を返す．
+ymuint
+LibComp::group_num() const
+{
+  return mGroupList.size();
+}
+
+// @brief セルグループを返す．
+// @param[in] id グループ番号 ( 0 <= id < group_num() )
+LcGroup*
+LibComp::group(ymuint id) const
+{
+  assert_cond( id < group_num(), __FILE__, __LINE__);
+  return mGroupList[id];
+}
+
+// @brief NPN同値クラスの数を返す．
+ymuint
+LibComp::npn_class_num() const
+{
+  return mClassList.size();
+}
+
+// @brief NPN同値クラスを返す．
+// @param[in] id クラス番号 ( 0 <= id < npn_class_num() )
+LcClass*
+LibComp::npn_class(ymuint id) const
+{
+  assert_cond( id < npn_class_num(), __FILE__, __LINE__);
+  return mClassList[id];
+}
+
 // @brief expr から生成されるパタンを登録する．
 void
 LibComp::reg_expr(const LogExpr& expr)
@@ -140,32 +214,26 @@ LibComp::reg_expr(const LogExpr& expr)
   }
 }
 
-// @brief 論理セルグループの情報を取り出す．
-const LcGroupMgr&
-LibComp::logic_group_mgr() const
+// @brief 新しいグループを作る．
+LcGroup*
+LibComp::new_group()
 {
-  return mLogicMgr;
+  ymuint new_id = mGroupList.size();
+  LcGroup* fgroup = new LcGroup(new_id);
+  mGroupList.push_back(fgroup);
+
+  return fgroup;
 }
 
-// @brief FFセルグループの情報を取り出す．
-const LcGroupMgr&
-LibComp::ff_group_mgr() const
+// @brief 新しいクラスを作る．
+LcClass*
+LibComp::new_class(const TvFuncM& repfunc)
 {
-  return mFFMgr;
-}
+  ymuint new_id = mClassList.size();
+  LcClass* fclass = new LcClass(new_id, repfunc);
+  mClassList.push_back(fclass);
 
-// @brief ラッチセルグループの情報を取り出す．
-const LcGroupMgr&
-LibComp::latch_group_mgr() const
-{
-  return mLatchMgr;
-}
-
-// @brief パタングラフの情報を取り出す．
-const LcPatMgr&
-LibComp::pat_mgr() const
-{
-  return mPatMgr;
+  return fclass;
 }
 
 // @brief グラフ構造全体をダンプする．
@@ -173,6 +241,46 @@ LibComp::pat_mgr() const
 void
 LibComp::display(ostream& s) const
 {
+  // セルグループの情報を出力する．
+  s << "*** Cell Group BEGIN ***" << endl;
+  for (ymuint i = 0; i < group_num(); ++ i) {
+    const LcGroup* group = this->group(i);
+    assert_cond( group->id() == i, __FILE__, __LINE__);
+    s << "GROUP#" << i
+      << ": CLASS#" << group->parent()->id()
+      << ": " << group->map()
+      << endl;
+    s << "  CELL:";
+    const vector<const Cell*>& cell_list = group->cell_list();
+    for (vector<const Cell*>::const_iterator p = cell_list.begin();
+	 p != cell_list.end(); ++ p) {
+      const Cell* cell = *p;
+      s << " " << cell->name();
+    }
+    s << endl;
+  }
+  s << "*** Cell Group END ***" << endl
+    << endl;
+
+  // NPN同値クラスの情報を出力する．
+  s << "*** NPN Class BEGIN ***" << endl;
+  for (ymuint i = 0; i < npn_class_num(); ++ i) {
+    const LcClass* cclass = npn_class(i);
+    assert_cond( cclass->id() == i, __FILE__, __LINE__);
+    s << "CLASS#" << i << ": ";
+    cclass->repfunc().dump(s, 2);
+    s << endl;
+    s << "  equivalence = ";
+    const vector<LcGroup*>& group_list = cclass->group_list();
+    for (ymuint j = 0; j < group_list.size(); ++ j) {
+	s << " GROUP#" << group_list[j]->id();
+    }
+    s << endl;
+  }
+  s << "*** NPN Class END ***" << endl
+    << endl;
+
+#if 0
   // 論理セルグループの情報を出力する．
   s << "*** LogicGroupMgr BEGIN ***" << endl;
   mLogicMgr.display(s);
@@ -190,6 +298,7 @@ LibComp::display(ostream& s) const
   mLatchMgr.display(s);
   s << "*** LatchGroupMgr END ***" << endl
     << endl;
+#endif
 
   // パタングラフの情報を出力する．
   mPatMgr.display(s);

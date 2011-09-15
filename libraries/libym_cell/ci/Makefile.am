@@ -43,8 +43,6 @@ libym_cell_ci_la_SOURCES = \
 	CiLatchCell.cc \
 	CiGroup.h \
 	CiGroup.cc \
-	CiGroupMgr.h \
-	CiGroupMgr.cc \
 	CiLibrary.h \
 	CiLibrary.cc \
 	CiPatGraph.h \

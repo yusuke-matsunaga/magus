@@ -67,7 +67,8 @@ CellLibrary::dump(ostream& s) const
 
     ymuint no2 = no + nio;
     for (ymuint opos = 0; opos < no2; ++ opos) {
-      bos << cell->logic_expr(opos)
+      bos << cell->has_logic()
+	  << cell->logic_expr(opos)
 	  << cell->tristate_expr(opos);
     }
 

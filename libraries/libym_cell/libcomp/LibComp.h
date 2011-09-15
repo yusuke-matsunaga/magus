@@ -26,6 +26,8 @@ BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 //////////////////////////////////////////////////////////////////////
 class LibComp
 {
+  friend class LcGroupMgr;
+
 public:
 
   /// @brief コンストラクタ
@@ -63,6 +65,30 @@ public:
   display(ostream& s) const;
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内部の情報を取得する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief セルグループの数を返す．
+  ymuint
+  group_num() const;
+
+  /// @brief セルグループを返す．
+  /// @param[in] id セルグループ番号 ( 0 <= id < group_num() )
+  LcGroup*
+  group(ymuint id) const;
+
+  /// @brief NPN同値クラスの数を返す．
+  ymuint
+  npn_class_num() const;
+
+  /// @brief NPN同値クラスを返す．
+  /// @param[in] id NPN同値クラス番号 ( 0 <= id < npn_class_num() )
+  LcClass*
+  npn_class(ymuint id) const;
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
@@ -72,11 +98,28 @@ private:
   void
   reg_expr(const LogExpr& expr);
 
+  /// @brief 新しいグループを作る．
+  LcGroup*
+  new_group();
+
+  /// @brief 新しいクラスを作る．
+  /// @param[in] repfunc 代表関数
+  LcClass*
+  new_class(const TvFuncM& repfunc);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // セルグループのリスト
+  // この配列上の位置とグループ番号は一致している．
+  vector<LcGroup*> mGroupList;
+
+  // NPN同値クラスのリスト
+  // この配列上の位置とクラス番号は一致している．
+  vector<LcClass*> mClassList;
 
   // 関数情報を管理するオブジェクト
   LcLogicMgr mLogicMgr;

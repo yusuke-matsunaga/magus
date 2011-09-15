@@ -33,6 +33,7 @@ CellLibrary::restore(istream& s)
   set_cell_num(nc);
 
   for (ymuint cell_id = 0; cell_id < nc; ++ cell_id) {
+    cout << "cell_id = " << cell_id << endl;
     ymuint8 type;
     string name;
     CellArea area;
@@ -49,6 +50,7 @@ CellLibrary::restore(istream& s)
 	>> nio
 	>> nbus
 	>> nbundle;
+
     ymuint no2 = no + nio;
     vector<bool> has_logic(no2);
     vector<LogExpr> logic_array(no2);
@@ -238,6 +240,8 @@ CellLibrary::restore(istream& s)
       set_timing(cell_id, ipin_id, opin_id, sense, timing);
     }
   }
+
+
 }
 
 END_NAMESPACE_YM_CELL

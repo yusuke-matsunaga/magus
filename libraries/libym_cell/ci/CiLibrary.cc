@@ -184,6 +184,7 @@ CiLibrary::cell_num() const
 const Cell*
 CiLibrary::cell(ymuint pos) const
 {
+  assert_cond( pos < cell_num(), __FILE__, __LINE__);
   return mCellArray[pos];
 }
 
@@ -195,34 +196,36 @@ CiLibrary::cell(const char* name) const
   return NULL;
 }
 
-// @brief 論理セルクラスの個数を返す．
+// @brief セルグループの個数を返す．
 ymuint
-CiLibrary::logic_class_num() const
+CiLibrary::group_num() const
 {
-  return mLogicGroupMgr.npn_class_num();
+  return mGroupNum;
 }
 
-// @brief 論理セルクラスを返す．
-// @param[in] id クラス番号 ( 0 <= id < logic_class_num() )
-const CellClass*
-CiLibrary::logic_class(ymuint id) const
-{
-  return mLogicGroupMgr.npn_class(id);
-}
-
-// @brief 論理セルグループの個数を返す．
-ymuint
-CiLibrary::logic_group_num() const
-{
-  return mLogicGroupMgr.group_num();
-}
-
-// @brief 論理セルグループを返す．
-// @param[in] id グループ番号　( 0 <= id < logic_group_num() )
+// @brief セルグループを返す．
+// @param[in] id グループ番号　( 0 <= id < group_num() )
 const CellGroup*
-CiLibrary::logic_group(ymuint id) const
+CiLibrary::group(ymuint id) const
 {
-  return mLogicGroupMgr.group(id);
+  assert_cond( id < group_num(), __FILE__, __LINE__);
+  return &mGroupArray[id];
+}
+
+// @brief NPN同値クラスの個数を返す．
+ymuint
+CiLibrary::npn_class_num() const
+{
+  return mClassNum;
+}
+
+// @brief NPN同値クラスを返す．
+// @param[in] id クラス番号 ( 0 <= id < npn_class_num() )
+const CellClass*
+CiLibrary::npn_class(ymuint id) const
+{
+  assert_cond( id < npn_class_num(), __FILE__, __LINE__);
+  return &mClassArray[id];
 }
 
 // @brief 定数0セルのグループを返す．
@@ -230,7 +233,7 @@ const CellGroup*
 CiLibrary::const0_func() const
 {
   // 決め打ち
-  return logic_group(0);
+  return mLogicGroup[0];
 }
 
 // @brief 定数1セルのグループを返す．
@@ -238,7 +241,7 @@ const CellGroup*
 CiLibrary::const1_func() const
 {
   // 決め打ち
-  return logic_group(1);
+  return mLogicGroup[1];
 }
 
 // @brief バッファセルのグループを返す．
@@ -246,7 +249,7 @@ const CellGroup*
 CiLibrary::buf_func() const
 {
   // 決め打ち
-  return logic_group(2);
+  return mLogicGroup[2];
 }
 
 // @brief インバータセルのグループを返す．
@@ -254,37 +257,7 @@ const CellGroup*
 CiLibrary::inv_func() const
 {
   // 決め打ち
-  return logic_group(3);
-}
-
-// @brief FFセルクラスの個数を返す．
-ymuint
-CiLibrary::ff_class_num() const
-{
-  return mFFGroupMgr.npn_class_num();
-}
-
-// @brief FFセルクラスを返す．
-// @param[in] id クラス番号 ( 0 <= id < ff_class_num() )
-const CellClass*
-CiLibrary::ff_class(ymuint id) const
-{
-  return mFFGroupMgr.npn_class(id);
-}
-
-// @brief FFセルグループの個数を返す．
-ymuint
-CiLibrary::ff_group_num() const
-{
-  return mFFGroupMgr.group_num();
-}
-
-// @brief FFセルグループを返す．
-// @param[in] id グループ番号 ( 0 <= id < ff_group_num() )
-const CellGroup*
-CiLibrary::ff_group(ymuint id) const
-{
-  return mFFGroupMgr.group(id);
+  return mLogicGroup[3];
 }
 
 // @brief 単純な型のFFクラスを返す．
@@ -302,37 +275,7 @@ CiLibrary::simple_ff_class(bool has_clear,
   if ( has_preset ) {
     pos += 2;
   }
-  return ff_class(pos);
-}
-
-// @brief ラッチセルクラスの個数を返す．
-ymuint
-CiLibrary::latch_class_num() const
-{
-  return mLatchGroupMgr.npn_class_num();
-}
-
-// @brief ラッチセルクラスを返す．
-// @param[in] id クラス番号 ( 0 <= id < latch_class_num() )
-const CellClass*
-CiLibrary::latch_class(ymuint id) const
-{
-  return mLatchGroupMgr.npn_class(id);
-}
-
-// @brief ラッチセルグループの個数を返す．
-ymuint
-CiLibrary::latch_group_num() const
-{
-  return mLatchGroupMgr.group_num();
-}
-
-// @brief ラッチセルグループを返す．
-// @param[in] id グループ番号 ( 0 <= id < latch_group_num() )
-const CellGroup*
-CiLibrary::latch_group(ymuint id) const
-{
-  return mLatchGroupMgr.group(id);
+  return mFFClass[pos];
 }
 
 // @brief 単純な型のラッチクラスを返す．
@@ -350,7 +293,7 @@ CiLibrary::simple_latch_class(bool has_clear,
   if ( has_preset ) {
     pos += 2;
   }
-  return latch_class(pos);
+  return mLatchClass[pos];
 }
 
 // @brief 総パタン数を返す．
@@ -934,47 +877,6 @@ CiLibrary::set_timing(ymuint cell_id,
   }
 }
 
-
-BEGIN_NONAMESPACE
-
-// LcGroupMgr の情報を CiGroupMgr へコピーする．
-void
-copy(const LcGroupMgr& src,
-     CiGroupMgr& dst,
-     AllocBase& alloc)
-{
-  ymuint nc = src.npn_class_num();
-  dst.set_class_num(nc, alloc);
-
-  ymuint ng = src.group_num();
-  dst.set_group_num(ng, alloc);
-  for (ymuint g = 0; g < ng; ++ g) {
-    const LcGroup* src_group = src.group(g);
-    CiGroup* dst_group = dst._group(g);
-    const CellClass* parent = dst.npn_class(src_group->parent()->id());
-    const vector<const Cell*>& cell_list = src_group->cell_list();
-    ymuint n = cell_list.size();
-    dst_group->init(parent, src_group->map(), n, alloc);
-    for (ymuint i = 0; i < n; ++ i) {
-      dst_group->set_cell(i, cell_list[i]);
-    }
-  }
-
-  for (ymuint c = 0; c < nc; ++ c) {
-    const LcClass* src_class = src.npn_class(c);
-    const vector<LcGroup*>& src_group_list = src_class->group_list();
-    ymuint n = src_group_list.size();
-    CiClass* dst_class = dst._npn_class(c);
-    dst_class->init(n, alloc);
-    for (ymuint i = 0; i < n; ++ i) {
-      const CellGroup* dst_group = dst.group(src_group_list[i]->id());
-      dst_class->set_group(i, dst_group);
-    }
-  }
-}
-
-END_NONAMESPACE
-
 // @brief セルのグループ分けを行う．
 // @note 論理セルのパタングラフも作成する．
 void
@@ -984,11 +886,58 @@ CiLibrary::compile()
 
   libcomp.compile(*this);
 
-  copy(libcomp.logic_group_mgr(), mLogicGroupMgr, mAlloc);
-  copy(libcomp.ff_group_mgr(), mFFGroupMgr, mAlloc);
-  copy(libcomp.latch_group_mgr(), mLatchGroupMgr, mAlloc);
+  ymuint nc = libcomp.npn_class_num();
+  set_class_num(nc);
+
+  ymuint ng = libcomp.group_num();
+  set_group_num(ng);
+  for (ymuint g = 0; g < ng; ++ g) {
+    const LcGroup* src_group = libcomp.group(g);
+    CiGroup& dst_group = mGroupArray[g];
+    const CellClass* parent = npn_class(src_group->parent()->id());
+    const vector<const Cell*>& cell_list = src_group->cell_list();
+    ymuint n = cell_list.size();
+    dst_group.init(parent, src_group->map(), n, mAlloc);
+    for (ymuint i = 0; i < n; ++ i) {
+      dst_group.set_cell(i, cell_list[i]);
+    }
+  }
+
+  for (ymuint c = 0; c < nc; ++ c) {
+    const LcClass* src_class = libcomp.npn_class(c);
+    const vector<LcGroup*>& src_group_list = src_class->group_list();
+    ymuint n = src_group_list.size();
+    CiClass& dst_class = mClassArray[c];
+    dst_class.init(n, mAlloc);
+    for (ymuint i = 0; i < n; ++ i) {
+      const CellGroup* dst_group = group(src_group_list[i]->id());
+      dst_class.set_group(i, dst_group);
+    }
+  }
 
   mPatMgr.copy(libcomp.pat_mgr(), mAlloc);
+}
+
+// @brief クラス数を設定する．
+// @param[in] nc クラス数
+// @note 同時にクラスの配列の確保を行う．
+void
+CiLibrary::set_class_num(ymuint nc)
+{
+  mClassNum = nc;
+  void* p = mAlloc.get_memory(sizeof(CiClass) * nc);
+  mClassArray = new (p) CiClass[nc];
+}
+
+// @brief グループ数を設定する．
+// @param[in] ng グループ数
+// @note 同時にグループの配列の確保を行う．
+void
+CiLibrary::set_group_num(ymuint ng)
+{
+  mGroupNum = ng;
+  void* p = mAlloc.get_memory(sizeof(CiGroup) * ng);
+  mGroupArray = new (p) CiGroup[ng];
 }
 
 END_NAMESPACE_YM_CELL

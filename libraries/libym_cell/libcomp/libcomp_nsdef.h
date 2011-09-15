@@ -24,6 +24,7 @@ END_NAMESPACE_YM_CELL
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
+class LibComp;
 class LcClass;
 class LcGroup;
 class LcPatMgr;

@@ -20,7 +20,9 @@ BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LcFFMgr::LcFFMgr()
+// @param[in] libcomp 親の LibComp
+LcFFMgr::LcFFMgr(LibComp& libcomp) :
+  LcGroupMgr(libcomp)
 {
 }
 

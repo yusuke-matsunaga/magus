@@ -24,7 +24,8 @@ class LcFFMgr :
 public:
 
   /// @brief コンストラクタ
-  LcFFMgr();
+  /// @param[in] libcomp 親の LibComp
+  LcFFMgr(LibComp& libcomp);
 
   /// @brief デストラクタ
   ~LcFFMgr();

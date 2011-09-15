@@ -10,8 +10,8 @@
 #include "LcGroupMgr.h"
 #include "LcClass.h"
 #include "LcGroup.h"
+#include "LibComp.h"
 #include "ym_cell/Cell.h"
-#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
@@ -21,7 +21,9 @@ BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LcGroupMgr::LcGroupMgr()
+// @param[in] libcomp 親の LibComp
+LcGroupMgr::LcGroupMgr(LibComp& libcomp) :
+  mLibComp(libcomp)
 {
 }
 
@@ -35,17 +37,7 @@ LcGroupMgr::~LcGroupMgr()
 void
 LcGroupMgr::clear()
 {
-  for (vector<LcGroup*>::iterator p = mGroupList.begin();
-       p != mGroupList.end(); ++ p) {
-    delete *p;
-  }
-  for (vector<LcClass*>::iterator p = mClassList.begin();
-       p != mClassList.end(); ++ p) {
-    delete *p;
-  }
-  mGroupList.clear();
   mGroupMap.clear();
-  mClassList.clear();
   mClassMap.clear();
 }
 
@@ -55,13 +47,13 @@ LcGroupMgr::add_cell(const Cell* cell)
 {
   if ( !cell->has_logic() || cell->output_num2() == 0 ) {
     // ひとつでも論理式を持たない出力があるセルは独立したグループとなる．
-    LcGroup* fgroup = new_group();
+    LcGroup* fgroup = mLibComp.new_group();
     fgroup->add_cell(cell);
 
     ymuint ni = cell->input_num2();
     ymuint no = cell->output_num2();
     TvFuncM repfunc(ni, no);
-    LcClass* fclass = new_class(repfunc);
+    LcClass* fclass = mLibComp.new_class(repfunc);
     NpnMapM xmap;
     xmap.set_identity(ni, no);
     fclass->add_group(fgroup, xmap);
@@ -89,7 +81,7 @@ LcGroupMgr::find_group(const TvFuncM& f)
   hash_map<TvFuncM, ymuint>::iterator p = mGroupMap.find(f);
   if ( p == mGroupMap.end() ) {
     // なかったので新たに作る．
-    fgroup = new_group();
+    fgroup = mLibComp.new_group();
     mGroupMap.insert(make_pair(f, fgroup->id()));
 
     // 代表関数を求める．
@@ -98,15 +90,15 @@ LcGroupMgr::find_group(const TvFuncM& f)
     find_repfunc(f, repfunc, xmap);
 
     LcClass* fclass = NULL;
-    hash_map<TvFuncM, ymuint>::iterator p = mClassMap.find(repfunc);
-    if ( p == mClassMap.end() ) {
+    hash_map<TvFuncM, ymuint>::iterator q = mClassMap.find(repfunc);
+    if ( q == mClassMap.end() ) {
       // まだ登録されていない．
-      fclass = new_class(repfunc);
+      fclass = mLibComp.new_class(repfunc);
       mClassMap.insert(make_pair(repfunc, fclass->id()));
     }
     else {
       // 登録されていた．
-      fclass = mClassList[p->second];
+      fclass = mLibComp.npn_class(q->second);
     }
 
     // グループを追加する．
@@ -114,42 +106,13 @@ LcGroupMgr::find_group(const TvFuncM& f)
   }
   else {
     // 既に登録されていた．
-    fgroup = mGroupList[p->second];
+    fgroup = mLibComp.group(p->second);
   }
 
   return fgroup;
 }
 
-// @brief セルグループの数を返す．
-ymuint
-LcGroupMgr::group_num() const
-{
-  return mGroupList.size();
-}
-
-// @brief セルグループを返す．
-// @param[in] id グループ番号 ( 0 <= id < group_num() )
-const LcGroup*
-LcGroupMgr::group(ymuint id) const
-{
-  return mGroupList[id];
-}
-
-// @brief NPN同値クラスの数を返す．
-ymuint
-LcGroupMgr::npn_class_num() const
-{
-  return mClassList.size();
-}
-
-// @brief NPN同値クラスを返す．
-// @param[in] id クラス番号 ( 0 <= id < npn_class_num() )
-const LcClass*
-LcGroupMgr::npn_class(ymuint id) const
-{
-  return mClassList[id];
-}
-
+#if 0
 // @brief 内容をバイナリダンプする．
 // @param[in] bos 出力先のストリーム
 void
@@ -212,67 +175,6 @@ LcGroupMgr::dump(BinO& bos) const
     }
   }
 }
-
-// @brief 内容を出力する．(デバッグ用)
-// @param[in] s 出力先のストリーム
-void
-LcGroupMgr::display(ostream& s) const
-{
-  s << "*** CELL GROUP SECTION ***" << endl;
-  for (ymuint i = 0; i < group_num(); ++ i) {
-    const LcGroup* group = this->group(i);
-    assert_cond( group->id() == i, __FILE__, __LINE__);
-    s << "GROUP#" << i
-      << ": CLASS#" << group->parent()->id()
-      << ": " << group->map()
-      << endl;
-    s << "  CELL#ID" << endl;
-    const vector<const Cell*>& cell_list = group->cell_list();
-    for (vector<const Cell*>::const_iterator p = cell_list.begin();
-	 p != cell_list.end(); ++ p) {
-      const Cell* cell = *p;
-      s << "    " << cell->name() << endl;
-    }
-  }
-  s << endl;
-
-  s << "*** NPN CLASS SECTION ***" << endl;
-  for (ymuint i = 0; i < npn_class_num(); ++ i) {
-    const LcClass* rep = npn_class(i);
-    assert_cond( rep->id() == i , __FILE__, __LINE__);
-    s << "CLASS#" << i << ": ";
-    rep->repfunc().dump(s, 2);
-    s << endl;
-    s << "  equivalence = ";
-    const vector<LcGroup*>& group_list = rep->group_list();
-    for (ymuint j = 0; j < group_list.size(); ++ j) {
-	s << " GROUP#" << group_list[j]->id();
-    }
-    s << endl;
-  }
-  s << endl;
-}
-
-// @brief 新しいグループを作る．
-LcGroup*
-LcGroupMgr::new_group()
-{
-  ymuint new_id = mGroupList.size();
-  LcGroup* fgroup = new LcGroup(new_id);
-  mGroupList.push_back(fgroup);
-
-  return fgroup;
-}
-
-// @brief 新しいクラスを作る．
-LcClass*
-LcGroupMgr::new_class(const TvFuncM& repfunc)
-{
-  ymuint new_id = mClassList.size();
-  LcClass* fclass = new LcClass(new_id, repfunc);
-  mClassList.push_back(fclass);
-
-  return fclass;
-}
+#endif
 
 END_NAMESPACE_YM_CELL_LIBCOMP

@@ -24,7 +24,8 @@ class LcLogicMgr :
 public:
 
   /// @brief コンストラクタ
-  LcLogicMgr();
+  /// @param[in] libcomp 親の LibComp
+  LcLogicMgr(LibComp& libcomp);
 
   /// @brief デストラクタ
   ~LcLogicMgr();

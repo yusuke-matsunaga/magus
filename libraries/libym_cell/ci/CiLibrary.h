@@ -19,7 +19,6 @@
 #include "ym_utils/Alloc.h"
 #include "ym_utils/ShString.h"
 #include "ym_logic/LogExpr.h"
-#include "CiGroupMgr.h"
 #include "CiPatMgr.h"
 
 BEGIN_NAMESPACE_YM_CELL
@@ -159,33 +158,33 @@ public:
   const Cell*
   cell(const char* name) const;
 
+  /// @brief セルグループの個数を返す．
+  virtual
+  ymuint
+  group_num() const;
+
+  /// @brief セルグループを返す．
+  /// @param[in] id グループ番号　( 0 <= id < group_num() )
+  virtual
+  const CellGroup*
+  group(ymuint id) const;
+
+  /// @brief NPN同値クラスの個数を返す．
+  virtual
+  ymuint
+  npn_class_num() const;
+
+  /// @brief NPN同値クラスを返す．
+  /// @param[in] id クラス番号 ( 0 <= id < npn_class_num() )
+  virtual
+  const CellClass*
+  npn_class(ymuint id) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 論理セルの情報の取得
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理セルクラスの個数を返す．
-  virtual
-  ymuint
-  logic_class_num() const;
-
-  /// @brief 論理セルクラスを返す．
-  /// @param[in] id クラス番号 ( 0 <= id < logic_class_num() )
-  virtual
-  const CellClass*
-  logic_class(ymuint id) const;
-
-  /// @brief 論理セルグループの個数を返す．
-  virtual
-  ymuint
-  logic_group_num() const;
-
-  /// @brief 論理セルグループを返す．
-  /// @param[in] id グループ番号　( 0 <= id < logic_group_num() )
-  virtual
-  const CellGroup*
-  logic_group(ymuint id) const;
 
   /// @brief 定数0セルのグループを返す．
   virtual
@@ -213,28 +212,6 @@ public:
   // FFセルの情報の取得
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief FFセルクラスの個数を返す．
-  virtual
-  ymuint
-  ff_class_num() const;
-
-  /// @brief FFセルクラスを返す．
-  /// @param[in] id クラス番号 ( 0 <= id < ff_class_num() )
-  virtual
-  const CellClass*
-  ff_class(ymuint id) const;
-
-  /// @brief FFセルグループの個数を返す．
-  virtual
-  ymuint
-  ff_group_num() const;
-
-  /// @brief FFセルグループを返す．
-  /// @param[in] id グループ番号 ( 0 <= id < ff_group_num() )
-  virtual
-  const CellGroup*
-  ff_group(ymuint id) const;
-
   /// @brief 単純な型のFFクラスを返す．
   /// @param[in] has_clear クリア端子を持つとき true にする．
   /// @param[in] has_preset プリセット端子を持つとき true にする．
@@ -249,28 +226,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ラッチセルの情報の取得
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief ラッチセルクラスの個数を返す．
-  virtual
-  ymuint
-  latch_class_num() const;
-
-  /// @brief ラッチセルクラスを返す．
-  /// @param[in] id クラス番号 ( 0 <= id < latch_class_num() )
-  virtual
-  const CellClass*
-  latch_class(ymuint id) const;
-
-  /// @brief ラッチセルグループの個数を返す．
-  virtual
-  ymuint
-  latch_group_num() const;
-
-  /// @brief ラッチセルグループを返す．
-  /// @param[in] id グループ番号 ( 0 <= id < latch_group_num() )
-  virtual
-  const CellGroup*
-  latch_group(ymuint id) const;
 
   /// @brief 単純な型のラッチクラスを返す．
   /// @param[in] has_clear クリア端子を持つとき true にする．
@@ -619,6 +574,24 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief クラス数を設定する．
+  /// @param[in] nc クラス数
+  /// @note 同時にクラスの配列の確保を行う．
+  void
+  set_class_num(ymuint nc);
+
+  /// @brief グループ数を設定する．
+  /// @param[in] ng グループ数
+  /// @note 同時にグループの配列の確保を行う．
+  void
+  set_group_num(ymuint ng);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -664,14 +637,26 @@ private:
   // セルのポインタの配列
   CiCell** mCellArray;
 
+  // セルグループ数
+  ymuint32 mGroupNum;
+
+  // セルグループの配列
+  CiGroup* mGroupArray;
+
+  // NPN同値クラスの数
+  ymuint32 mClassNum;
+
+  // NPN同値クラスの配列
+  CiClass* mClassArray;
+
   // 論理セルグループの情報
-  CiGroupMgr mLogicGroupMgr;
+  const CellGroup* mLogicGroup[4];
 
-  // FFセルグループの情報
-  CiGroupMgr mFFGroupMgr;
+  // FFクラスの情報
+  const CellClass* mFFClass[4];
 
-  // ラッチセルグループの情報
-  CiGroupMgr mLatchGroupMgr;
+  // ラッチクラスの情報
+  const CellClass* mLatchClass[4];
 
   // パタングラフを管理するクラス
   CiPatMgr mPatMgr;

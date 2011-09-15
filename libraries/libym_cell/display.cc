@@ -364,24 +364,10 @@ display_library(ostream& s,
     s << endl;
   }
 
-  s << "Logic Cell Group" << endl;
-  ymuint nlc = library.logic_class_num();
-  for (ymuint i = 0; i < nlc; ++ i) {
-    const CellClass* cclass = library.logic_class(i);
-    display_class(s, i, cclass);
-  }
-
-  s << "FF Cell Group" << endl;
-  ymuint nfc = library.ff_class_num();
-  for (ymuint i = 0; i < nfc; ++ i) {
-    const CellClass* cclass = library.ff_class(i);
-    display_class(s, i, cclass);
-  }
-
-  s << "Latch Cell Group" << endl;
-  ymuint ngc = library.latch_class_num();
-  for (ymuint i = 0; i < ngc; ++ i) {
-    const CellClass* cclass = library.latch_class(i);
+  s << "Cell Group" << endl;
+  ymuint nc = library.npn_class_num();
+  for (ymuint i = 0; i < nc; ++ i) {
+    const CellClass* cclass = library.npn_class(i);
     display_class(s, i, cclass);
   }
 
