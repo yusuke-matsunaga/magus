@@ -583,7 +583,7 @@ LcPatMgr::hash_func(ymuint type,
 //////////////////////////////////////////////////////////////////////
 // dump() 関係の関数
 //////////////////////////////////////////////////////////////////////
-
+#if 0
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
@@ -609,30 +609,19 @@ LcPatMgr::dump(BinO& bos) const
 	<< encode_edge(node, 1);
   }
 
-  vector<bool> vmark(nn);
-  vector<ymuint> val_list;
-  val_list.reserve(nn * 2);
-
   // パタンの情報をダンプする．
   ymuint32 np = pat_num();
   bos << np;
   for (ymuint i = 0; i < np; ++ i) {
-    LcPatHandle root = pat_root(i);
-    vmark.clear();
-    vmark.resize(nn, false);
-    val_list.clear();
-    ymuint max_input = dump_dfs(root.node(), vmark, val_list);
-    ymuint32 v = max_input << 1;
-    if ( root.inv() ) {
-      v |= 1U;
-    }
+    vector<ymuint> val_list;
+    ymuint32 v = pat_node_list(i, val_list);
     ymuint32 ne = val_list.size();
-    bos << v
+    bos << static_cast<ymuint32>(rep_id(i))
+	<< v
 	<< ne;
     for (ymuint j = 0; j < ne; ++ j) {
       bos << static_cast<ymuint32>(val_list[j]);
     }
-    bos << static_cast<ymuint32>(rep_id(i));
   }
 }
 
@@ -652,6 +641,9 @@ LcPatMgr::encode_edge(LcPatNode* node,
   }
   return v;
 }
+#endif
+
+BEGIN_NONAMESPACE
 
 // @brief パタングラフを DFS でたどって内容を val_list に入れる．
 // @param[in] node ノード
@@ -659,9 +651,9 @@ LcPatMgr::encode_edge(LcPatNode* node,
 // @param[out] val_list ノードの情報を格納するリスト
 // @return 最大入力番号+1を返す．
 ymuint
-LcPatMgr::dump_dfs(LcPatNode* node,
-		   vector<bool>& vmark,
-		   vector<ymuint>& val_list)
+dfs(LcPatNode* node,
+    vector<bool>& vmark,
+    vector<ymuint>& val_list)
 {
   if ( node->is_input() ) {
     return node->input_id() + 1;
@@ -671,13 +663,35 @@ LcPatMgr::dump_dfs(LcPatNode* node,
   }
   vmark[node->id()] = true;
   val_list.push_back(node->id() * 2);
-  ymuint id = dump_dfs(node->fanin(0), vmark, val_list);
+  ymuint id = dfs(node->fanin(0), vmark, val_list);
   val_list.push_back(node->id() * 2 + 1);
-  ymuint id1 = dump_dfs(node->fanin(1), vmark, val_list);
+  ymuint id1 = dfs(node->fanin(1), vmark, val_list);
   if ( id < id1 ) {
     id = id1;
   }
   return id;
+}
+
+END_NONAMESPACE
+
+// @brief パタンのノードリストを返す．
+// @param[in] id パタン番号 ( 0 <= id < pat_num() )
+// @param[out] node_list パタンを DFS 順でたどった時のノード番号のリスト
+// @return このパタンの入力数を返す．
+ymuint
+LcPatMgr::pat_node_list(ymuint id,
+			vector<ymuint>& node_list) const
+{
+  LcPatHandle root = pat_root(id);
+  node_list.clear();
+  node_list.reserve(node_num());
+  vector<bool> vmark(node_num(), false);
+  ymuint max_input =dfs(root.node(), vmark, node_list);
+  ymuint32 v = max_input << 1;
+  if ( root.inv() ) {
+    v |= 1U;
+  }
+  return v;
 }
 
 

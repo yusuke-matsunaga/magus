@@ -17,9 +17,6 @@
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
-class LcPatNode;
-class LcPatHandle;
-
 //////////////////////////////////////////////////////////////////////
 /// @class LcPatMgr LcPatMgr.h "LcPatMgr.h"
 /// @brief パタングラフを生成するクラス
@@ -52,18 +49,13 @@ public:
   reg_pat(const LogExpr& expr,
 	  ymuint rep_id);
 
-  /// @brief 内容をバイナリダンプする．
-  /// @param[in] bos 出力先のストリーム
-  void
-  dump(BinO& bos) const;
-
   /// @brief 内容を出力する．(デバッグ用)
   /// @param[in] s 出力先のストリーム
   void
   display(ostream& s) const;
 
 
-private:
+public:
   //////////////////////////////////////////////////////////////////////
   // 内容情報を取得する関数
   //////////////////////////////////////////////////////////////////////
@@ -85,6 +77,14 @@ private:
   /// @param[in] id パタン番号 ( 0 <= id < pat_num() )
   LcPatHandle
   pat_root(ymuint id) const;
+
+  /// @brief パタンのノードリストを返す．
+  /// @param[in] id パタン番号 ( 0 <= id < pat_num() )
+  /// @param[out] node_list パタンを DFS 順でたどった時のノード番号のリスト
+  /// @return このパタンの入力数を返す．
+  ymuint
+  pat_node_list(ymuint id,
+		vector<ymuint>& node_list) const;
 
   /// @brief パタンの属している代表関数番号を返す．
   /// @param[in] id パタン番号 ( 0 <= id < pat_num() )

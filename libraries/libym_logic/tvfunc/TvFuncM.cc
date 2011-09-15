@@ -544,7 +544,6 @@ TvFuncM::xform(const NpnMapM& npnmap) const
     NpnVmap omap = npnmap.omap(o);
     ymuint dst_pos = omap.pos();
     ymuint omask = omap.pol() == kPolPosi ? 0UL : 1UL;
-
     for (ymuint i = 0; i < ni_pow; ++ i) {
       ymuint new_i = 0;
       ymuint tmp = i;
@@ -553,7 +552,7 @@ TvFuncM::xform(const NpnMapM& npnmap) const
 	  new_i |= ipat[b];
 	}
       }
-      ymulong pat = (value(i ^ imask, o) ^ omask) << shift(new_i);
+      ymulong pat = (value(o, i ^ imask) ^ omask) << shift(new_i);
       ans.mVector[block(new_i) + dst_pos * mNblk1] |= pat;
     }
   }

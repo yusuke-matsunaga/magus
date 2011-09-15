@@ -36,11 +36,6 @@ dump_load_test(const char* in_filename,
 
   display_library(cout, *library);
 
-  nsLibcomp::LibComp libcomp;
-
-  libcomp.compile(*library);
-  libcomp.display(cout);
-
 #if 0
   {
     ofstream os;

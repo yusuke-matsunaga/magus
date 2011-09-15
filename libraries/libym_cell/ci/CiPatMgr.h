@@ -10,10 +10,14 @@
 
 
 #include "ym_cell/cell_nsdef.h"
+#include "ym_utils/BinIO.h"
 #include "ym_utils/Alloc.h"
+#include "libcomp/libcomp_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
+
+class CiPatGraph;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CiPatMgr CiPatMgr.h "CiPatMgr.h"
@@ -37,21 +41,6 @@ public:
 
   /// @brief デストラクタ
   ~CiPatMgr();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 情報設定用の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief データを読み込んでセットする．
-  /// @param[in] s 入力元のストリーム
-  /// @param[in] alloc メモリアロケータ
-  /// @retval true 読み込みが成功した．
-  /// @retval false 読み込みが失敗した．
-  bool
-  load(istream& s,
-       AllocBase& alloc);
 
 
 public:
@@ -118,15 +107,44 @@ public:
   pat(ymuint id) const;
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 情報設定用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief LcPatMgr の情報をコピーする．
+  /// @param[in] src コピー元
+  /// @param[in] alloc メモリアロケータ
+  void
+  copy(const nsLibcomp::LcPatMgr& src,
+       AllocBase& alloc);
+
+  /// @brief データを読み込んでセットする．
+  /// @param[in] bis 入力元のストリーム
+  /// @param[in] alloc メモリアロケータ
+  /// @retval true 読み込みが成功した．
+  /// @retval false 読み込みが失敗した．
+  bool
+  load(BinI& bis,
+       AllocBase& alloc);
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 内容を初期化する．
-  /// @note 以前確保されたメモリは開放される．
+  /// @brief ノード数を設定する．
+  /// @param[in] nn ノード数
+  /// @param[in] alloc メモリアロケータ
   void
-  init();
+  set_node_num(ymuint nn,
+	       AllocBase& alloc);
+
+  /// @brief パタン数を設定する．
+  void
+  set_pat_num(ymuint np,
+	      AllocBase& alloc);
 
 
 private:
@@ -150,18 +168,9 @@ private:
 
   // パタンの配列
   // サイズは mPatNum
-  CellPatGraph* mPatArray;
+  CiPatGraph* mPatArray;
 
 };
-
-
-/// @relates CiPatMgr
-/// @brief CiPatMgr の内容を出力する．
-/// @param[in] s 出力先のストリーム
-/// @param[in] patgraph パタングラフ
-void
-dump(ostream& s,
-     const CiPatMgr& patgraph);
 
 
 //////////////////////////////////////////////////////////////////////

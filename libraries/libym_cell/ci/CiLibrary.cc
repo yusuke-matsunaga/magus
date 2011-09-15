@@ -987,6 +987,8 @@ CiLibrary::compile()
   copy(libcomp.logic_group_mgr(), mLogicGroupMgr, mAlloc);
   copy(libcomp.ff_group_mgr(), mFFGroupMgr, mAlloc);
   copy(libcomp.latch_group_mgr(), mLatchGroupMgr, mAlloc);
+
+  mPatMgr.copy(libcomp.pat_mgr(), mAlloc);
 }
 
 END_NAMESPACE_YM_CELL

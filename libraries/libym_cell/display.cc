@@ -11,8 +11,12 @@
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/CellPin.h"
 #include "ym_cell/CellTiming.h"
+#include "ym_cell/CellClass.h"
+#include "ym_cell/CellGroup.h"
+#include "ym_cell/CellPatGraph.h"
 
 #include "ym_logic/LogExpr.h"
+#include "ym_logic/NpnMapM.h"
 #include "ym_utils/BinIO.h"
 
 
@@ -49,6 +53,26 @@ display_timing(ostream& s,
       << "    Fall Intrinsic  = " << timing->intrinsic_fall() << endl
       << "    Fall Resistance = " << timing->fall_resistance() << endl;
   }
+}
+
+// セルクラスの情報を出力する．
+void
+display_class(ostream& s,
+	      ymuint id,
+	      const CellClass* cclass)
+{
+  s << "Class#" << id << endl;
+  for (ymuint i = 0; i < cclass->group_num(); ++ i) {
+    const CellGroup* group = cclass->cell_group(i);
+    s << "  Group: Map = " << group->map() << endl
+      << "Cell = ";
+    for (ymuint j = 0; j < group->cell_num(); ++ j) {
+      const Cell* cell = group->cell(j);
+      s << " " << cell->name();
+    }
+    s << endl;
+  }
+  s << endl;
 }
 
 END_NONAMESPACE
@@ -340,6 +364,73 @@ display_library(ostream& s,
     s << endl;
   }
 
+  s << "Logic Cell Group" << endl;
+  ymuint nlc = library.logic_class_num();
+  for (ymuint i = 0; i < nlc; ++ i) {
+    const CellClass* cclass = library.logic_class(i);
+    display_class(s, i, cclass);
+  }
+
+  s << "FF Cell Group" << endl;
+  ymuint nfc = library.ff_class_num();
+  for (ymuint i = 0; i < nfc; ++ i) {
+    const CellClass* cclass = library.ff_class(i);
+    display_class(s, i, cclass);
+  }
+
+  s << "Latch Cell Group" << endl;
+  ymuint ngc = library.latch_class_num();
+  for (ymuint i = 0; i < ngc; ++ i) {
+    const CellClass* cclass = library.latch_class(i);
+    display_class(s, i, cclass);
+  }
+
+  s << "==== PatMgr dump start ====" << endl;
+
+  // ノードの種類の出力
+  ymuint nn = library.node_num();
+  for (ymuint i = 0; i < nn; ++ i) {
+    s << "Node#" << i << ": ";
+    switch ( library.node_type(i) ) {
+    case kCellPatInput: s << "INPUT#" << library.input_id(i) ; break;
+    case kCellPatAnd:   s << "AND"; break;
+    case kCellPatXor:   s << "XOR"; break;
+    default: assert_not_reached(__FILE__, __LINE__);
+    }
+    s << endl;
+  }
+  s << endl;
+
+  // 枝の情報の出力
+  ymuint ne = library.edge_num();
+  for (ymuint i = 0; i < ne; ++ i) {
+    s << "Edge#" << i << ": " << library.edge_from(i)
+      << " -> " << library.edge_to(i) << "(" << library.edge_pos(i) << ")";
+    if ( library.edge_inv(i) ) {
+      s << " ***";
+    }
+    s << endl;
+  }
+  s << endl;
+
+  // パタングラフの情報の出力
+  ymuint np = library.pat_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const CellPatGraph& pat = library.pat(i);
+    s << "Pat#" << i << ": "
+      << "Rep#" << pat.rep_id() << ": ";
+    if ( pat.root_inv() ) {
+      s << "[inv]";
+    }
+    s << "(" << pat.input_num() << "), ";
+    ymuint n = pat.edge_num();
+    for (ymuint i = 0; i < n; ++ i) {
+      s << " " << pat.edge(i);
+    }
+    s << endl;
+  }
+
+  s << "==== PatMgr dump end ====" << endl;
 }
 
 END_NAMESPACE_YM_CELL

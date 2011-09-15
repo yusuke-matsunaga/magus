@@ -493,6 +493,8 @@ gen_library(const DotlibNode* dt_library)
 
   }
 
+  library->compile();
+
   return library;
 }
 

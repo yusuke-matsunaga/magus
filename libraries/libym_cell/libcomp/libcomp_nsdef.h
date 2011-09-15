@@ -26,6 +26,10 @@ BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 class LcClass;
 class LcGroup;
+class LcPatMgr;
+class LcPatGraph;
+class LcPatNode;
+class LcPatHandle;
 
 END_NAMESPACE_YM_CELL_LIBCOMP
 

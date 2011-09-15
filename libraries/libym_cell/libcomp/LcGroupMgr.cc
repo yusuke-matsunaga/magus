@@ -218,7 +218,6 @@ LcGroupMgr::dump(BinO& bos) const
 void
 LcGroupMgr::display(ostream& s) const
 {
-  s << "*** LcGroupMgr BEGIN ***" << endl;
   s << "*** CELL GROUP SECTION ***" << endl;
   for (ymuint i = 0; i < group_num(); ++ i) {
     const LcGroup* group = this->group(i);
@@ -252,7 +251,6 @@ LcGroupMgr::display(ostream& s) const
     s << endl;
   }
   s << endl;
-  s << "*** LcGroupMgr END ***" << endl;
 }
 
 // @brief 新しいグループを作る．

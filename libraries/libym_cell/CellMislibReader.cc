@@ -231,6 +231,8 @@ gen_library(const string& lib_name,
     }
   }
 
+  library->compile();
+
   return library;
 }
 
