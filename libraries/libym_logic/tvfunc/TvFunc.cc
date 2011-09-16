@@ -5427,7 +5427,7 @@ TvFunc::hash() const
   for (ymuint i = 0; i < mNblk; ++ i) {
     ans ^= mVector[i];
   }
-  return ans;
+  return ans + mNi;
 }
 
 // 等価比較
