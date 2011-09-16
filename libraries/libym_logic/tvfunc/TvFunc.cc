@@ -5438,11 +5438,9 @@ operator==(const TvFunc& func1,
   if ( func1.mNi != func2.mNi ) {
     return false;
   }
-  ymulong* endp = func1.mVector + func1.mNblk;
-  ymulong* bp1 = func1.mVector;
-  ymulong* bp2 = func2.mVector;
-  for ( ; bp1 != endp; ++ bp1, ++ bp2) {
-    if ( *bp1 != *bp2 ) {
+  ymuint n = func1.mNblk;
+  for (ymuint i = 0; i < n; ++ i) {
+    if ( func1.mVector[i] != func2.mVector[i] ) {
       return false;
     }
   }
@@ -5457,14 +5455,10 @@ operator<(const TvFunc& func1,
   if ( func1.mNi != func2.mNi ) {
     return false;
   }
-  ymulong* endp = func1.mVector;
-  ymulong* bp1 = func1.mVector + func1.mNblk;
-  ymulong* bp2 = func2.mVector + func1.mNblk;
-  while ( bp1 != endp ) {
-    -- bp1;
-    -- bp2;
-    ymulong w1 = *bp1;
-    ymulong w2 = *bp2;
+  ymuint n = func1.mNblk;
+  for (ymuint i = 0; i < n; ++ i) {
+    ymulong w1 = func1.mVector[n - i - 1];
+    ymulong w2 = func2.mVector[n - i - 1];
     if ( w1 > w2 ) {
       return false;
     }
@@ -5484,14 +5478,10 @@ operator&&(const TvFunc& func1,
   if ( func1.mNi != func2.mNi ) {
     return false;
   }
-  ymulong* endp = func1.mVector;
-  ymulong* bp1 = func1.mVector + func1.mNblk;
-  ymulong* bp2 = func2.mVector + func1.mNblk;
-  while ( bp1 != endp ) {
-    -- bp1;
-    -- bp2;
-    ymulong w1 = *bp1;
-    ymulong w2 = *bp2;
+  ymuint n = func1.mNblk;
+  for (ymuint i = 0; i < n; ++ i) {
+    ymulong w1 = func1.mVector[n - i - 1];
+    ymulong w2 = func2.mVector[n - i - 1];
     if ( (w1 & w2) != 0U ) {
       return true;
     }
