@@ -42,13 +42,13 @@ LcFFMgr::init()
 
   { // クリアなし，プリセットなしのFFクラスの登録
     vector<TvFunc> f_list;
-    f_list.push_back(TvFunc::posi_literal(4, 2));
-    f_list.push_back(TvFunc::const_zero(4));
-    f_list.push_back(TvFunc::posi_literal(4, 3));
-    f_list.push_back(TvFunc::const_zero(4));
     f_list.push_back(TvFunc::posi_literal(4, 0));
     f_list.push_back(TvFunc::posi_literal(4, 1));
     f_list.push_back(TvFunc::const_zero(4));
+    f_list.push_back(TvFunc::const_zero(4));
+    f_list.push_back(TvFunc::posi_literal(4, 2));
+    f_list.push_back(TvFunc::const_zero(4));
+    f_list.push_back(TvFunc::posi_literal(4, 3));
     f_list.push_back(TvFunc::const_zero(4));
     TvFuncM f(f_list);
     LcGroup* group = find_group(f);
@@ -57,13 +57,13 @@ LcFFMgr::init()
   }
   { // クリアあり，プリセットなしのFFクラスの登録
     vector<TvFunc> f_list;
-    f_list.push_back(TvFunc::posi_literal(5, 3));
-    f_list.push_back(TvFunc::const_zero(5));
-    f_list.push_back(TvFunc::posi_literal(5, 4));
-    f_list.push_back(TvFunc::const_zero(5));
     f_list.push_back(TvFunc::posi_literal(5, 0));
     f_list.push_back(TvFunc::posi_literal(5, 1));
     f_list.push_back(TvFunc::posi_literal(5, 2));
+    f_list.push_back(TvFunc::const_zero(5));
+    f_list.push_back(TvFunc::posi_literal(5, 3));
+    f_list.push_back(TvFunc::const_zero(5));
+    f_list.push_back(TvFunc::posi_literal(5, 4));
     f_list.push_back(TvFunc::const_zero(5));
     TvFuncM f(f_list);
     LcGroup* group = find_group(f);
@@ -72,14 +72,14 @@ LcFFMgr::init()
   }
   { // クリアなし，プリセットありのFFクラスの登録
     vector<TvFunc> f_list;
-    f_list.push_back(TvFunc::posi_literal(5, 3));
-    f_list.push_back(TvFunc::const_zero(5));
-    f_list.push_back(TvFunc::posi_literal(5, 4));
-    f_list.push_back(TvFunc::const_zero(5));
     f_list.push_back(TvFunc::posi_literal(5, 0));
     f_list.push_back(TvFunc::posi_literal(5, 1));
     f_list.push_back(TvFunc::const_zero(5));
     f_list.push_back(TvFunc::posi_literal(5, 2));
+    f_list.push_back(TvFunc::posi_literal(5, 3));
+    f_list.push_back(TvFunc::const_zero(5));
+    f_list.push_back(TvFunc::posi_literal(5, 4));
+    f_list.push_back(TvFunc::const_zero(5));
     TvFuncM f(f_list);
     LcGroup* group = find_group(f);
     LcClass* cclass = group->parent();
@@ -87,14 +87,14 @@ LcFFMgr::init()
   }
   { // クリアあり，プリセットありのFFクラスの登録
     vector<TvFunc> f_list;
-    f_list.push_back(TvFunc::posi_literal(6, 4));
-    f_list.push_back(TvFunc::const_zero(6));
-    f_list.push_back(TvFunc::posi_literal(6, 5));
-    f_list.push_back(TvFunc::const_zero(6));
     f_list.push_back(TvFunc::posi_literal(6, 0));
     f_list.push_back(TvFunc::posi_literal(6, 1));
     f_list.push_back(TvFunc::posi_literal(6, 2));
     f_list.push_back(TvFunc::posi_literal(6, 3));
+    f_list.push_back(TvFunc::posi_literal(6, 4));
+    f_list.push_back(TvFunc::const_zero(6));
+    f_list.push_back(TvFunc::posi_literal(6, 5));
+    f_list.push_back(TvFunc::const_zero(6));
     TvFuncM f(f_list);
     LcGroup* group = find_group(f);
     LcClass* cclass = group->parent();
@@ -127,61 +127,30 @@ LcFFMgr::gen_signature(const Cell* cell,
   ymuint no2 = cell->output_num2();
 
   vector<TvFunc> f_list(no2 * 2 + 4);
-  for (ymuint i = 0; i < no2; ++ i) {
-    LogExpr lexpr = cell->logic_expr(i);
-    f_list[i * 2 + 0] = lexpr.make_tv(ni2);
-    LogExpr texpr = cell->tristate_expr(i);
-    f_list[i * 2 + 1] = texpr.make_tv(ni2);
-  }
   {
     LogExpr expr = cell->next_state_expr();
-    f_list[no2 * 2 + 0] = expr.make_tv(ni2);
+    f_list[0] = expr.make_tv(ni2);
   }
   {
     LogExpr expr = cell->clock_expr();
-    f_list[no2 * 2 + 1] = expr.make_tv(ni2);
+    f_list[1] = expr.make_tv(ni2);
   }
   {
     LogExpr expr = cell->clear_expr();
-    f_list[no2 * 2 + 2] = expr.make_tv(ni2);
+    f_list[2] = expr.make_tv(ni2);
   }
   {
     LogExpr expr = cell->preset_expr();
-    f_list[no2 * 2 + 3] = expr.make_tv(ni2);
+    f_list[3] = expr.make_tv(ni2);
+  }
+  for (ymuint i = 0; i < no2; ++ i) {
+    LogExpr lexpr = cell->logic_expr(i);
+    f_list[i * 2 + 4] = lexpr.make_tv(ni2);
+    LogExpr texpr = cell->tristate_expr(i);
+    f_list[i * 2 + 5] = texpr.make_tv(ni2);
   }
   f = TvFuncM(f_list);
 }
-
-BEGIN_NONAMESPACE
-
-int
-compare(const TvFuncM& f1,
-	const TvFuncM& f2)
-{
-  ymuint ni = f1.ni();
-  ymuint no = f1.no();
-  assert_cond( f2.ni() == ni, __FILE__, __LINE__);
-  assert_cond( f2.no() == no, __FILE__, __LINE__);
-  ymuint nip = 1U << ni;
-  for (ymuint o = 0; o < no; ++ o) {
-    for (ymuint p = 0; p < nip; ++ p) {
-      int v1 = f1.value(o, p);
-      int v2 = f2.value(o, p);
-      if ( v1 < v2 ) {
-	return -1;
-      }
-      else if ( v1 == v2 ) {
-	continue;
-      }
-      else {
-	return 1;
-      }
-    }
-  }
-  return 0;
-}
-
-END_NONAMESPACE
 
 // @brief 代表関数を求める．
 // @param[in] f 関数
@@ -211,7 +180,7 @@ LcFFMgr::find_repfunc(const TvFuncM& f,
 	map1.set_imap(i, p(i), pol);
       }
       TvFuncM f1 = f.xform(map1);
-      if ( compare(f1, repfunc) < 0 ) {
+      if ( repfunc < f1 ) {
 	repfunc = f1;
 	xmap = map1;
       }
