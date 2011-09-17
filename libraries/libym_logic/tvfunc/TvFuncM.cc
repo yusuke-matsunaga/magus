@@ -180,10 +180,8 @@ TvFuncM::TvFuncM(const TvFuncM& src) :
   mNblk(src.mNblk),
   mVector(new ymulong[mNblk])
 {
-  ymulong* endp = mVector + mNblk;
-  ymulong* src_bp = src.mVector;
-  for (ymulong* bp = mVector; bp != endp; ++ bp, ++ src_bp) {
-    *bp = *src_bp;
+  for (ymuint i = 0; i < mNblk; ++ i) {
+    mVector[i] = src.mVector[i];
   }
 }
 
@@ -214,10 +212,8 @@ TvFuncM::operator=(const TvFuncM& src)
   mNi = src.mNi;
   mNo = src.mNo;
 
-  ymulong* endp = mVector + mNblk;
-  ymulong* src_bp = src.mVector;
-  for (ymulong* bp = mVector; bp != endp; ++ bp, ++ src_bp) {
-    *bp = *src_bp;
+  for (ymuint i = 0; i < mNblk; ++ i) {
+    mVector[i] = src.mVector[i];
   }
 
   return *this;
@@ -293,10 +289,8 @@ TvFuncM::negate()
 const TvFuncM&
 TvFuncM::operator&=(const TvFuncM& src1)
 {
-  ymulong* endp = mVector + mNblk;
-  ymulong* src_bp = src1.mVector;
-  for (ymulong* bp = mVector; bp != endp; ++ bp) {
-    *bp &= *src_bp;
+  for (ymuint i = 0; i < mNblk; ++ i) {
+    mVector[i] &= src1.mVector[i];
   }
   return *this;
 }
@@ -305,10 +299,8 @@ TvFuncM::operator&=(const TvFuncM& src1)
 const TvFuncM&
 TvFuncM::operator|=(const TvFuncM& src1)
 {
-  ymulong* endp = mVector + mNblk;
-  ymulong* src_bp = src1.mVector;
-  for (ymulong* bp = mVector; bp != endp; ++ bp) {
-    *bp |= *src_bp;
+  for (ymuint i = 0; i < mNblk; ++ i) {
+    mVector[i] |= src1.mVector[i];
   }
   return *this;
 }
@@ -317,10 +309,8 @@ TvFuncM::operator|=(const TvFuncM& src1)
 const TvFuncM&
 TvFuncM::operator^=(const TvFuncM& src1)
 {
-  ymulong* endp = mVector + mNblk;
-  ymulong* src_bp = src1.mVector;
-  for (ymulong* bp = mVector; bp != endp; ++ bp) {
-    *bp ^= *src_bp;
+  for (ymuint i = 0; i < mNblk; ++ i) {
+    mVector[i] ^= src1.mVector[i];
   }
   return *this;
 }
@@ -338,17 +328,16 @@ TvFuncM::set_cofactor(ymuint pos,
     if ( pol == kPolNega ) {
       mask = ~mask;
     }
-    ymulong* endp = mVector + mNblk;
     int shift = 1 << pos;
-    for (ymulong* bp = mVector; bp != endp; ++ bp) {
-      ymulong pat = *bp & mask;
+    for (ymuint i = 0; i < mNblk; ++ i) {
+      ymulong pat = mVector[i] & mask;
       if ( pol == kPolPosi ) {
 	pat |= (pat >> shift);
       }
       else {
 	pat |= (pat << shift);
       }
-      *bp = pat;
+      mVector[i] = pat;
     }
   }
   else {
@@ -396,9 +385,8 @@ TvFuncM::check_sup(tVarId i) const
     // ブロックごとにチェック
     ymuint dist = 1U << i;
     ymulong mask = c_masks[i];
-    ymulong* endp = mVector + mNblk;
-    for (ymulong* bp = mVector; bp != endp; ++ bp) {
-      ymulong word = *bp;
+    for (ymuint i = 0; i < mNblk; ++ i) {
+      ymulong word = mVector[i];
       if ( (word ^ (word << dist)) & mask ) {
 	return true;
       }
@@ -490,9 +478,8 @@ TvFuncM::check_sym(tVarId i,
     if ( pol == kPolPosi ) {
       ymulong mask = sym_masks2[(i * (i - 1)) / 2 + j];
       ymuint s = (1U << i) - (1U << j);
-      ymulong* endp = mVector + mNblk;
-      for (ymulong* bp = mVector; bp != endp; ++ bp) {
-	ymulong word = *bp;
+      for (ymuint i = 0; i < mNblk; ++ i) {
+	ymulong word = mVector[i];
 	if ( ((word >> s) ^ word) & mask ) {
 	  ans = false;
 	  break;
@@ -502,9 +489,8 @@ TvFuncM::check_sym(tVarId i,
     else {
       ymulong mask = sym_masks3[(i * (i - 1)) / 2 + j];
       ymuint s = (1U << i) + (1U << j);
-      ymulong* endp = mVector + mNblk;
-      for (ymulong* bp = mVector; bp != endp; ++ bp) {
-	ymuint word = *bp;
+      for (ymuint i = 0; i < mNblk; ++ i) {
+	ymuint word = mVector[i];
 	if ( ((word >> s) ^ word) & mask ) {
 	  ans = false;
 	  break;
