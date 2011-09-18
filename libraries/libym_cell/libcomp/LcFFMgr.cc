@@ -13,7 +13,6 @@
 #include "ym_cell/Cell.h"
 #include "ym_logic/LogExpr.h"
 #include "ym_logic/NpnMapM.h"
-#include "ym_utils/Generator.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
@@ -161,31 +160,7 @@ LcFFMgr::find_repfunc(const TvFuncM& f,
 		      TvFuncM& repfunc,
 		      NpnMapM& xmap)
 {
-  ymuint ni = f.ni();
-  ymuint no = f.no();
-  ymuint nip = 1U << ni;
-
-  xmap.set_identity(ni, no);
-  repfunc = f;
-
-  PermGen pg(ni, ni);
-  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
-    NpnMapM map1(ni, no);
-    for (ymuint i = 0; i < no; ++ i) {
-      map1.set_omap(i, i, kPolPosi);
-    }
-    for (ymuint x = 0U; x < nip; ++ x) {
-      for (ymuint i = 0; i < ni; ++ i) {
-	tPol pol = (x & (1U << i)) ? kPolPosi : kPolNega;
-	map1.set_imap(i, p(i), pol);
-      }
-      TvFuncM f1 = f.xform(map1);
-      if ( repfunc < f1 ) {
-	repfunc = f1;
-	xmap = map1;
-      }
-    }
-  }
+  default_repfunc(f, repfunc, xmap);
 }
 
 END_NAMESPACE_YM_CELL_LIBCOMP

@@ -129,9 +129,7 @@ LcLogicMgr::find_repfunc(const TvFuncM& f,
     repfunc = f.xform(xmap);
   }
   else {
-    // 今は手抜きで多出力はすべてが代表関数となる．
-    xmap.set_identity(ni, no);
-    repfunc = f;
+    default_repfunc(f, repfunc, xmap);
   }
 }
 

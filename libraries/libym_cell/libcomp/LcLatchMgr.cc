@@ -8,6 +8,8 @@
 
 
 #include "LcLatchMgr.h"
+#include "LcClass.h"
+#include "LcGroup.h"
 #include "ym_cell/Cell.h"
 #include "ym_logic/LogExpr.h"
 #include "ym_logic/NpnMapM.h"
@@ -36,6 +38,67 @@ void
 LcLatchMgr::init()
 {
   clear();
+
+  { // クリアなし，プリセットなしのラッチクラスの登録
+    vector<TvFunc> f_list;
+    f_list.push_back(TvFunc::posi_literal(4, 0));
+    f_list.push_back(TvFunc::posi_literal(4, 1));
+    f_list.push_back(TvFunc::const_zero(4));
+    f_list.push_back(TvFunc::const_zero(4));
+    f_list.push_back(TvFunc::posi_literal(4, 2));
+    f_list.push_back(TvFunc::const_zero(4));
+    f_list.push_back(TvFunc::posi_literal(4, 3));
+    f_list.push_back(TvFunc::const_zero(4));
+    TvFuncM f(f_list);
+    LcGroup* group = find_group(f);
+    LcClass* cclass = group->parent();
+    mLatchClass[0] = cclass->id();
+  }
+  { // クリアあり，プリセットなしのラッチクラスの登録
+    vector<TvFunc> f_list;
+    f_list.push_back(TvFunc::posi_literal(5, 0));
+    f_list.push_back(TvFunc::posi_literal(5, 1));
+    f_list.push_back(TvFunc::posi_literal(5, 2));
+    f_list.push_back(TvFunc::const_zero(5));
+    f_list.push_back(TvFunc::posi_literal(5, 3));
+    f_list.push_back(TvFunc::const_zero(5));
+    f_list.push_back(TvFunc::posi_literal(5, 4));
+    f_list.push_back(TvFunc::const_zero(5));
+    TvFuncM f(f_list);
+    LcGroup* group = find_group(f);
+    LcClass* cclass = group->parent();
+    mLatchClass[1] = cclass->id();
+  }
+  { // クリアなし，プリセットありのラッチクラスの登録
+    vector<TvFunc> f_list;
+    f_list.push_back(TvFunc::posi_literal(5, 0));
+    f_list.push_back(TvFunc::posi_literal(5, 1));
+    f_list.push_back(TvFunc::const_zero(5));
+    f_list.push_back(TvFunc::posi_literal(5, 2));
+    f_list.push_back(TvFunc::posi_literal(5, 3));
+    f_list.push_back(TvFunc::const_zero(5));
+    f_list.push_back(TvFunc::posi_literal(5, 4));
+    f_list.push_back(TvFunc::const_zero(5));
+    TvFuncM f(f_list);
+    LcGroup* group = find_group(f);
+    LcClass* cclass = group->parent();
+    mLatchClass[2] = cclass->id();
+  }
+  { // クリアあり，プリセットありのラッチクラスの登録
+    vector<TvFunc> f_list;
+    f_list.push_back(TvFunc::posi_literal(6, 0));
+    f_list.push_back(TvFunc::posi_literal(6, 1));
+    f_list.push_back(TvFunc::posi_literal(6, 2));
+    f_list.push_back(TvFunc::posi_literal(6, 3));
+    f_list.push_back(TvFunc::posi_literal(6, 4));
+    f_list.push_back(TvFunc::const_zero(6));
+    f_list.push_back(TvFunc::posi_literal(6, 5));
+    f_list.push_back(TvFunc::const_zero(6));
+    TvFuncM f(f_list);
+    LcGroup* group = find_group(f);
+    LcClass* cclass = group->parent();
+    mLatchClass[3] = cclass->id();
+  }
 }
 
 // @brief 定義済みのラッチクラス番号を返す．
@@ -62,27 +125,27 @@ LcLatchMgr::gen_signature(const Cell* cell,
   ymuint no2 = cell->output_num2();
 
   vector<TvFunc> f_list(no2 * 2 + 4);
-  for (ymuint i = 0; i < no2; ++ i) {
-    LogExpr lexpr = cell->logic_expr(i);
-    f_list[i * 2 + 0] = lexpr.make_tv(ni2);
-    LogExpr texpr = cell->tristate_expr(i);
-    f_list[i * 2 + 1] = texpr.make_tv(ni2);
-  }
   {
     LogExpr expr = cell->data_in_expr();
-    f_list[no2 * 2 + 0] = expr.make_tv(ni2);
+    f_list[0] = expr.make_tv(ni2);
   }
   {
     LogExpr expr = cell->enable_expr();
-    f_list[no2 * 2 + 1] = expr.make_tv(ni2);
+    f_list[1] = expr.make_tv(ni2);
   }
   {
     LogExpr expr = cell->clear_expr();
-    f_list[no2 * 2 + 2] = expr.make_tv(ni2);
+    f_list[2] = expr.make_tv(ni2);
   }
   {
     LogExpr expr = cell->preset_expr();
-    f_list[no2 * 2 + 3] = expr.make_tv(ni2);
+    f_list[3] = expr.make_tv(ni2);
+  }
+  for (ymuint i = 0; i < no2; ++ i) {
+    LogExpr lexpr = cell->logic_expr(i);
+    f_list[i * 2 + 4] = lexpr.make_tv(ni2);
+    LogExpr texpr = cell->tristate_expr(i);
+    f_list[i * 2 + 5] = texpr.make_tv(ni2);
   }
   f = TvFuncM(f_list);
 }
@@ -93,14 +156,10 @@ LcLatchMgr::gen_signature(const Cell* cell,
 // @param[out] xmap 変換
 void
 LcLatchMgr::find_repfunc(const TvFuncM& f,
-		      TvFuncM& repfunc,
-		      NpnMapM& xmap)
+			 TvFuncM& repfunc,
+			 NpnMapM& xmap)
 {
-  ymuint ni = f.ni();
-  ymuint no = f.no();
-  // 今は手抜きで自分自身を代表関数とする．
-  xmap.set_identity(ni, no);
-  repfunc = f;
+  default_repfunc(f, repfunc, xmap);
 }
 
 END_NAMESPACE_YM_CELL_LIBCOMP

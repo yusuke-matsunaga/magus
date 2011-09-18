@@ -12,6 +12,8 @@
 #include "LcGroup.h"
 #include "LibComp.h"
 #include "ym_cell/Cell.h"
+#include "ym_utils/MFSet.h"
+#include "ym_utils/Generator.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
@@ -110,6 +112,133 @@ LcGroupMgr::find_group(const TvFuncM& f)
   }
 
   return fgroup;
+}
+
+
+BEGIN_NONAMESPACE
+
+// サポートを表すビットベクタを作る．
+ymuint32
+gen_support(const TvFunc& f)
+{
+  ymuint ni = f.ni();
+  ymuint32 ans = 0U;
+  for (ymuint i = 0; i < ni; ++ i) {
+    if ( f.check_sup(i) ) {
+      ans |= (1U << i);
+    }
+  }
+  return ans;
+}
+
+// f を最大化する変換を求める．
+ymuint
+gen_maxmap(const TvFuncM& f,
+	   ymuint offset,
+	   NpnMapM& xmap)
+{
+  ymuint ni = f.ni();
+  ymuint no = f.no();
+
+  vector<ymuint> i_list;
+  i_list.reserve(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    if ( f.check_sup(i) ) {
+      i_list.push_back(i);
+    }
+  }
+  ymuint ni1 = i_list.size();
+  if ( ni1 == 0 ) {
+    return 0;
+  }
+
+  NpnMapM map;
+  bool first = true;
+  TvFuncM repfunc;
+  PermGen pg(ni1, ni1);
+  ymuint nip = 1U << ni1;
+  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+    NpnMapM map1(ni, no);
+    for (ymuint i = 0; i < no; ++ i) {
+      map1.set_omap(i, i, kPolPosi);
+    }
+    for (ymuint x = 0U; x < nip; ++ x) {
+      for (ymuint i = 0; i < ni1; ++ i) {
+	tPol pol = (x & (1U << i)) ? kPolPosi : kPolNega;
+	map1.set_imap(i_list[i], p(i) + offset, pol);
+      }
+      TvFuncM f1 = f.xform(map1);
+      if ( first || repfunc < f1 ) {
+	first = false;
+	repfunc = f1;
+	map = map1;
+      }
+    }
+  }
+
+  for (vector<ymuint>::iterator p = i_list.begin();
+       p != i_list.end(); ++ p) {
+    ymuint i = *p;
+    NpnVmap vmap = map.imap(i);
+    xmap.set_imap(i, vmap);
+  }
+
+  return ni1;
+}
+
+END_NONAMESPACE
+
+// @brief 代表関数を求める．
+void
+LcGroupMgr::default_repfunc(const TvFuncM& f,
+			    TvFuncM& repfunc,
+			    NpnMapM& xmap)
+{
+  ymuint ni = f.ni();
+  ymuint no = f.no();
+
+  // 各出力のサポートをビットベクタの形で求める．
+  vector<ymuint32> sup_array(no);
+  for (ymuint o = 0; o < no; ++ o) {
+    TvFunc func1 = f.output(o);
+    ymuint32 supbits = gen_support(func1);
+    sup_array[o] = supbits;
+  }
+
+  // サポートが共通な出力を同じグループにマージする．
+  MFSet mfset(no);
+  for (ymuint o = 0; o < no; ++ o) {
+    ymuint supbits0 = sup_array[o];
+    for (ymuint o1 = o + 1; o1 < no; ++o1) {
+      ymuint supbits1 = sup_array[o1];
+      if ( supbits0 & supbits1 ) {
+	mfset.merge(o, o1);
+      }
+    }
+  }
+
+  // 一つ一つのグループを独立に処理する．
+  xmap.set_identity(ni, no);
+  ymuint offset = 0;
+  for (ymuint first = 0; first < no; ++ first) {
+    if ( mfset.find(first) != first ) continue;
+    vector<ymuint> o_list;
+    o_list.reserve(no);
+    vector<TvFunc> f_list;
+    f_list.reserve(no);
+    for (ymuint o = 0; o < no; ++ o) {
+      if ( mfset.find(o) == first ) {
+	o_list.push_back(o);
+	f_list.push_back(f.output(o));
+      }
+    }
+    TvFuncM f1(f_list);
+    NpnMapM map1;
+    ymuint ni1 = gen_maxmap(f1, offset, xmap);
+    offset += ni1;
+  }
+
+  repfunc = f.xform(xmap);
 }
 
 #if 0

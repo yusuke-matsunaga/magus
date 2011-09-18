@@ -87,7 +87,8 @@ display_group(ostream& s,
     const Cell* cell = group->cell(i);
     s << " " << cell->name();
   }
-  s << endl;
+  s << endl
+    << endl;
 }
 
 END_NONAMESPACE
@@ -397,6 +398,11 @@ display_library(ostream& s,
   display_class(s, "DFF_R Class", library.simple_ff_class(true, false));
   display_class(s, "DFF_S Class", library.simple_ff_class(false, true));
   display_class(s, "DFF_RS Class", library.simple_ff_class(true, true));
+
+  display_class(s, "Latch Class", library.simple_latch_class(false, false));
+  display_class(s, "Latch_R Class", library.simple_latch_class(true, false));
+  display_class(s, "Latch_S Class", library.simple_latch_class(false, true));
+  display_class(s, "Latch_RS Class", library.simple_latch_class(true, true));
 
   s << "==== PatMgr dump start ====" << endl;
 
