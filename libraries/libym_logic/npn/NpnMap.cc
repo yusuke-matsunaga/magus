@@ -276,18 +276,16 @@ ostream&
 operator<<(ostream& s,
 	   const NpnMap& map)
 {
-  if ( map.opol() == kPolNega ) {
-    s << '~';
-  }
   const char* comma = "";
-  s << '(';
+  s << "INPUT(";
   for (ymuint i = 0; i < map.ni(); ++ i) {
     s << comma;
     comma = ", ";
+    s << i << " ==> ";
     ymuint ipos = i;
     NpnVmap imap = map.imap(ipos);
     if ( imap.is_invalid() ) {
-      s << "---(" << ipos << ")";
+      s << "---";
     }
     else {
       ymuint index = imap.pos();
@@ -295,10 +293,15 @@ operator<<(ostream& s,
       if ( pol == kPolNega ) {
 	s << '~';
       }
-      s << index << "(" << ipos << ")";
+      s << index;
     }
   }
-  s << ')';
+  s << ")";
+  s << " OUTPUT(0 ==> ";
+  if ( map.opol() == kPolNega ) {
+    s << '~';
+  }
+  s << "0)";
 
   return s;
 }

@@ -302,13 +302,14 @@ operator<<(ostream& s,
 {
   const char* comma = "";
 
-  s << '(';
+  s << "INPUT(";
   for (ymuint i = 0; i < map.ni(); ++ i) {
     s << comma;
     comma = ", ";
+    s << i << " ==> ";
     NpnVmap imap = map.imap(i);
     if ( imap.is_invalid() ) {
-      s << "--(" << i << ")";
+      s << "--";
     }
     else {
       ymuint dst_pos = imap.pos();
@@ -316,19 +317,20 @@ operator<<(ostream& s,
       if ( pol == kPolNega ) {
 	s << "~";
       }
-      s << dst_pos << "(" << i << ")";
+      s << dst_pos;
     }
   }
   s << ")";
 
   comma = "";
-  s << '(';
+  s << " OUTPUT(";
   for (ymuint i = 0; i < map.no(); ++ i) {
     s << comma;
     comma = ", ";
+    s << i << " ==> ";
     NpnVmap omap = map.omap(i);
     if ( omap.is_invalid() ) {
-      s << "--(" << i << ")";
+      s << "--";
     }
     else {
       ymuint dst_pos = omap.pos();
@@ -336,7 +338,7 @@ operator<<(ostream& s,
       if ( pol == kPolNega ) {
 	s << "~";
       }
-      s << dst_pos << "(" << i << ")";
+      s << dst_pos;
     }
   }
   s << ")";
