@@ -10,7 +10,6 @@
 
 
 #include "ym_techmap/cellmap_nsdef.h"
-#include "ym_cell/CellFFPosArray.h"
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/cmn.h"
 
