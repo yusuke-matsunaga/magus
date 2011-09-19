@@ -26,7 +26,8 @@ class NpnRawSig
 public:
 
   /// @brief コンストラクタ
-  NpnRawSig();
+  /// @param[in] func 対象の関数
+  NpnRawSig(const TvFunc& func);
 
   /// @brief デストラクタ
   ~NpnRawSig();
@@ -35,11 +36,9 @@ public:
 public:
 
   /// @brief W0/W1 を用いて正規化する．
-  /// @param[in] func 対象の関数
   /// @param[out] conf 結果を格納するオブジェクト
   void
-  normalize(const TvFunc& func,
-	    NpnConf& conf);
+  normalize(NpnConf& conf);
 
 
 public:
@@ -177,7 +176,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 対象の関数
-  TvFunc mFunc;
+  const TvFunc& mFunc;
 
   // 関数の入力数
   ymuint32 mNi;

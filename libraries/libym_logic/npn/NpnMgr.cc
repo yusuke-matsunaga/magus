@@ -312,14 +312,14 @@ NpnMgr::cannonical(const TvFunc& func,
     }
   }
 
-  NpnRawSig sig;
-  NpnConf conf0;
+  NpnRawSig sig(func);
 
   // W0 と W1 が非負になるように極性の調節を行う．
   // W0 と W1 および対称変数の情報を用いて正規化を行う．
   // 以降は対称入力グループ単位で考えればよい．
   // また W0 と W1 シグネチャは最大化されているので考える必要はない．
-  sig.normalize(func, conf0);
+  NpnConf conf0;
+  sig.normalize(conf0);
 
   if ( !conf0.is_resolved() ) {
     if ( debug & debug_step1) {

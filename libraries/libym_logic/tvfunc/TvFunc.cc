@@ -883,9 +883,8 @@ TvFunc::count_zero() const
   }
 
   ymuint ans = 0U;
-  ymulong* endp = mVector + mNblk;
-  for (ymulong* bp = mVector; bp != endp; ++ bp) {
-    ans += count_onebits(*bp);
+  for (ymuint i = 0; i < mNblk; ++ i) {
+    ans += count_onebits(mVector[i]);
   }
   return (1U << ni()) - ans;
 }
@@ -911,9 +910,8 @@ TvFunc::count_one() const
   }
 
   ymuint ans = 0UL;
-  ymulong* endp = mVector + mNblk;
-  for (ymulong* bp = mVector; bp != endp; ++ bp) {
-    ans += count_onebits(*bp);
+  for (ymuint i = 0; i < mNblk; ++ i) {
+    ans += count_onebits(mVector[i]);
   }
   return ans;
 }
@@ -939,9 +937,8 @@ TvFunc::walsh_0() const
   }
 
   ymint ans = 0;
-  ymulong* endp = mVector + mNblk;
-  for (ymulong* bp = mVector; bp != endp; ++ bp) {
-    ans += count_onebits(*bp);
+  for (ymuint i = 0; i < mNblk; ++ i) {
+    ans += count_onebits(mVector[i]);
   }
   return (1 << ni()) - ans * 2;
 }
@@ -971,9 +968,8 @@ TvFunc::walsh_1(ymuint pos) const
   int n = 1 << ni();
   if ( pos < NIPW ) {
     ymulong mask = c_masks[pos];
-    ymulong* endp = mVector + mNblk;
-    for (ymulong* p = mVector; p != endp; ++ p) {
-      c += count_onebits(*p ^ mask);
+    for (ymuint i = 0; i < mNblk; ++ i) {
+      c += count_onebits(mVector[i] ^ mask);
     }
   }
   else {
@@ -986,10 +982,9 @@ TvFunc::walsh_1(ymuint pos) const
     //     c += count_onebits(mVector[b]);
     //   }
     // }
-    ymulong* bp = mVector;
-    for (ymulong b = 0; b < mNblk; ++ b, ++ bp) {
+    for (ymuint b = 0; b < mNblk; ++ b) {
       ymulong mask = 0UL - ((b >> i5) & 1UL);
-      c += count_onebits(*bp ^ mask);
+      c += count_onebits(mVector[b] ^ mask);
     }
   }
   return n - c * 2;
@@ -1041,9 +1036,8 @@ TvFunc::walsh_2(ymuint i,
   ymint c = 0;
   if ( i < NIPW ) {
     ymulong mask = c_masks[i] ^ c_masks[j];
-    ymulong* endp = mVector + mNblk;
-    for (ymulong* bp = mVector; bp != endp; ++ bp) {
-      c += count_onebits(*bp ^ mask);
+    for (ymuint i = 0; i < mNblk; ++ i) {
+      c += count_onebits(mVector[i] ^ mask);
     }
   }
   else if ( j < NIPW ) {
@@ -1059,10 +1053,9 @@ TvFunc::walsh_2(ymuint i,
     // }
     ymuint i5 = i - NIPW;
     ymulong mask = c_masks[j];
-    ymulong* bp = mVector;
-    for (ymuint b = 0; b < mNblk; ++ b, ++ bp) {
-      ymulong mask1 = 0UL - ((b >> i5) & 1UL);
-      c += count_onebits(*bp ^ mask ^ mask1);
+    for (ymuint i = 0; i < mNblk; ++ i) {
+      ymulong mask1 = 0UL - ((i >> i5) & 1UL);
+      c += count_onebits(mVector[i] ^ mask ^ mask1);
     }
   }
   else {
@@ -1079,10 +1072,9 @@ TvFunc::walsh_2(ymuint i,
     // }
     ymuint i5 = i - NIPW;
     ymuint j5 = j - NIPW;
-    ymulong* bp = mVector;
-    for (ymuint b = 0; b < mNblk; ++ b, ++ bp) {
-      ymulong mask = 0UL - (((b >> i5) ^ (b >> j5)) & 1UL);
-      c += count_onebits(*bp ^ mask);
+    for (ymuint i = 0; i < mNblk; ++ i) {
+      ymulong mask = 0UL - (((i >> i5) ^ (i >> j5)) & 1UL);
+      c += count_onebits(mVector[i] ^ mask);
     }
   }
   return (1 << ni()) - c * 2;
