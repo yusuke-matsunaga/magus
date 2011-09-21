@@ -473,7 +473,7 @@ inline
 bool
 BddEdge::is_const() const
 {
-  return (mBody & ~1UL) == kEdge0;
+  return (mBody & ~1UL) == kEdge1;
 }
 
 // @brief エラー枝のチェック
@@ -505,7 +505,7 @@ inline
 bool
 BddEdge::is_leaf() const
 {
-  return (mBody & ~3UL) == kEdge0;
+  return (mBody & ~3UL) == kEdge1;
 }
 
 // @brief ハッシュ値を返す．
