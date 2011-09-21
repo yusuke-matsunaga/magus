@@ -42,6 +42,16 @@ BEGIN_NAMESPACE_YM_NPN
 NpnRawSig::NpnRawSig(const TvFunc& func) :
   mFunc(func)
 {
+  mNi = mFunc.ni();
+
+  // Walsh の0次と1次の係数を計算する．
+  // 2次の係数はオンデマンドで計算する．
+  mW0 = mFunc.walsh_01(mW1);
+  for (ymuint i = 0; i < mNi; ++ i) {
+    for (ymuint j = 0; j < mNi; ++ j) {
+      mW2flag[i * mNi + j] = 0;
+    }
+  }
 }
 
 // デストラクタ
@@ -53,17 +63,6 @@ NpnRawSig::~NpnRawSig()
 void
 NpnRawSig::normalize(NpnConf& conf)
 {
-  mNi = mFunc.ni();
-
-  // Walsh の0次と1次の係数を計算する．
-  // 2次の係数はオンデマンドで計算する．
-  mW0 = mFunc.walsh_01(mW1);
-  for (ymuint i = 0; i < mNi; ++ i) {
-    for (ymuint j = 0; j < mNi; ++ j) {
-      mW2flag[i * mNi + j] = 0;
-    }
-  }
-
   if ( debug & debug_normalize ) {
     cout << "Before normalize" << endl;
     cout << mFunc << endl;
@@ -336,10 +335,10 @@ void
 NpnRawSig::dump_pols(ostream& s) const
 {
   s << "opol: ";
-  if ( opol() == -1 ) {
+  if ( mOpol == -1 ) {
     s << "N";
   }
-  else if ( opol() == 1 ) {
+  else if ( mOpol == 1 ) {
     s << "P";
   }
   else {
@@ -349,10 +348,10 @@ NpnRawSig::dump_pols(ostream& s) const
     << "ipol:";
   for (ymuint i = 0; i < ni(); ++ i) {
     s << " ";
-    if ( ipol(i) == -1 ) {
+    if ( mIpols[i] == -1 ) {
       s << "N";
     }
-    else if ( ipol(i) == 1 ) {
+    else if ( mIpols[i] == 1 ) {
       s << "P";
     }
     else {

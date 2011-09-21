@@ -297,18 +297,16 @@ private:
   // オリジナルのシグネチャ
   const NpnRawSig* mSig;
 
-  // 出力極性が確定していたら true
-  bool mOpolFixed;
-
   // 出力極性
   //  1 : 肯定
   // -1 : 否定
-  ymint32 mOpol;
+  //  0 : 未定
+  ymint8 mOpol;
 
   // 入力極性
   //  1: 肯定
   // -1: 否定
-  ymint32 mIpols[TvFunc::kMaxNi];
+  ymint8 mIpols[TvFunc::kMaxNi];
 
   // 入力の順序
   mutable
@@ -342,8 +340,7 @@ private:
 // コンストラクタ
 inline
 NpnConf::NpnConf() :
-  mOpolFixed(false),
-  mOpol(1),
+  mOpol(0),
   mIorderValid(false),
   mNc(0),
   mNg(0)
@@ -365,7 +362,7 @@ inline
 bool
 NpnConf::is_opol_fixed() const
 {
-  return mOpolFixed;
+  return mOpol != 0;
 }
 
 // 出力極性の割り当ての取得
@@ -614,6 +611,7 @@ void
 NpnConf::set_sig(const NpnRawSig* sig)
 {
   mSig = sig;
+  validate_iorder();
 }
 
 // 出力極性の割り当ての設定
@@ -622,7 +620,6 @@ void
 NpnConf::set_opol(int val)
 {
   mOpol = val;
-  mOpolFixed = true;
 }
 
 // @brief 入力クラスを追加する．

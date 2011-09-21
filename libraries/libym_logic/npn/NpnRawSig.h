@@ -80,9 +80,11 @@ public:
 
 public:
 
+#if 1
   /// @brief 出力極性を得る．
   int
   opol() const;
+#endif
 
   /// @brief 入力極性を得る．
   int
@@ -282,6 +284,7 @@ NpnRawSig::walsh_2(ymuint pos1,
   return mW2[base];
 }
 
+#if 1
 // 出力極性を得る．
 inline
 int
@@ -297,6 +300,7 @@ NpnRawSig::ipol(ymuint pos) const
 {
   return mIpols[pos];
 }
+#endif
 
 // @brief 等価入力クラス数を返す．
 inline

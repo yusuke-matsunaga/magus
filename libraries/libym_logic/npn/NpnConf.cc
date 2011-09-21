@@ -36,7 +36,6 @@ void
 NpnConf::copy(const NpnConf& src)
 {
   mSig = src.mSig;
-  mOpolFixed = src.mOpolFixed;
   mOpol = src.mOpol;
   for (ymuint i = 0; i < ni(); ++ i) {
     mIpols[i] = src.mIpols[i];
@@ -57,7 +56,6 @@ NpnConf::NpnConf(const NpnConf& src,
 		 int pol)
 {
   copy(src);
-  mOpolFixed = true;
   mOpol = pol;
   assert_cond(pol == 1 || pol == -1, __FILE__, __LINE__);
   if ( pol == -1 ) {
@@ -77,7 +75,6 @@ NpnConf::NpnConf(const NpnConf& src,
 		 ymuint c)
 {
   mSig = src.mSig;
-  mOpolFixed = src.mOpolFixed;
   mOpol = src.mOpol;
   for (ymuint i = 0; i < ni(); ++ i) {
     mIpols[i] = src.mIpols[i];
@@ -141,7 +138,7 @@ NpnConf::validate_iorder() const
 bool
 NpnConf::is_resolved(ymuint g0) const
 {
-  if ( !mOpolFixed ) {
+  if ( !is_opol_fixed() ) {
     return false;
   }
   for (ymuint g1 = g0; g1 < mNg; ++ g1) {
@@ -244,16 +241,12 @@ void
 NpnConf::dump(ostream& s) const
 {
   s << "opol: ";
-  if ( mOpolFixed ) {
-    if ( mOpol == 1 ) {
-      s << "P";
-    }
-    else {
-      s << "N";
-    }
-  }
-  else {
-    s << "-";
+  switch ( mOpol ) {
+  case 1:  s << "P"; break;
+  case -1: s << "N"; break;
+  case 0:  s << "-"; break;
+  default:
+    assert_not_reached(__FILE__, __LINE__);
   }
   s << endl;
   s << "ipol:";
