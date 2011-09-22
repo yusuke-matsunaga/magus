@@ -334,6 +334,9 @@ verify(size_t ni,
     ++ c;
 
     TvFunc rep_func = orig_func.xform(map0);
+    cout << "Original Function = " << orig_func << endl
+	 << "map = " << map0 << endl
+	 << "Representative Function = " << rep_func << endl;
 
     // すべての極性・順列組合わせのバリエーションをためして
     // おなじ代表関数になるかチェックする．

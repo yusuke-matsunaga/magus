@@ -424,7 +424,8 @@ NpnMgr::cannonical(const TvFunc& func,
 	NpnMap map;
 	conf.set_map(map);
 	TvFunc func1 = func.xform(map);
-	cout << "rep func: " << func1 << endl
+	cout << "map     : " << map << endl
+	     << "rep func: " << func1 << endl
 	     << endl;
       }
     }

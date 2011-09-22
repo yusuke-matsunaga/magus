@@ -41,8 +41,10 @@ NpnConf::NpnConf(const NpnBaseConf& base_conf)
     for (ymuint c = 0; c < nc(); ++ c) {
       ymuint pos = base_conf.ic_rep(c);
       ymuint pol = base_conf.ipol(pos);
-      ymuint tmp = (pos << 2) | pol;
-      mIcList[c] = tmp;
+      if ( pol == 2 ) {
+	pol = 1;
+      }
+      mIcList[c] = (pos << 2) | pol;
     }
     add_ig(0);
   }
@@ -79,6 +81,8 @@ NpnConf::NpnConf(const NpnConf& src,
 {
   mBaseConf = src.mBaseConf;
   mOpol = src.mOpol;
+  mIpolsValid = false;
+  mIorderValid = false;
 
   ymuint b = src.group_begin(g);
   ymuint e = src.group_end(g);
@@ -120,6 +124,8 @@ NpnConf::copy(const NpnConf& src)
 {
   mBaseConf = src.mBaseConf;
   mOpol = src.mOpol;
+  mIpolsValid = false;
+  mIorderValid = false;
   for (ymuint i = 0; i < nc(); ++ i) {
     mIcList[i] = src.mIcList[i];
   }
@@ -127,8 +133,6 @@ NpnConf::copy(const NpnConf& src)
   for (ymuint i = 0; i <= mGroupNum; ++ i) {
     mGroupTop[i] = src.mGroupTop[i];
   }
-  mIpolsValid = false;
-  mIorderValid = false;
 }
 
 // @brief 入力の極性を正しくする．
@@ -150,7 +154,12 @@ NpnConf::validate_ipols() const
 	n = mBaseConf->ic_num(pos);
       }
       for (ymuint j = 0; j < n; ++ j) {
-	mIpols[pos] = 2;
+	if ( mIpols[pos] == 1 ) {
+	  mIpols[pos] = 2;
+	}
+	else if ( mIpols[pos] == 2 ) {
+	  mIpols[pos] = 1;
+	}
 	pos = mBaseConf->ic_link(pos);
       }
     }
@@ -223,6 +232,7 @@ void
 NpnConf::set_ic_pol(ymuint pos,
 		    int val)
 {
+  assert_cond( ic_pol(pos) == 0, __FILE__, __LINE__);
   mIcList[pos] &= ~3;
   mIcList[pos] |= val;
   mIpolsValid = false;
@@ -264,8 +274,8 @@ NpnConf::set_map(NpnMap& map) const
   tPol opol = (mOpol == 2) ? kPolNega : kPolPosi;
   map.set_opol(opol);
   for (ymuint i = 0; i < mBaseConf->ni(); ++ i) {
-    tPol ipol1 = (ipol(i) == 2) ? kPolNega : kPolPosi;
-    map.set(mIorder[i], i, ipol1 * opol);
+    tPol ipol1 = (ipol(mIorder[i]) == 2) ? kPolNega : kPolPosi;
+    map.set(mIorder[i], i, ipol1);
   }
 }
 
@@ -314,18 +324,12 @@ NpnConf::dump(ostream& s) const
     cmb *= fact(group_size(g));
     for (ymuint j = b; j < e; ++ j) {
       ymuint pos1 = ic_rep(j);
-      ymint w1 = func().walsh_1(pos1);
-      if ( ipol(pos1) == 2 ) {
-	w1 = -w1;
-      }
-      if ( opol() == 2 ) {
-	w1 = -w1;
-      }
+      ymint w1 = mBaseConf->walsh_1(pos1);
       s << " { " << w1;
       if ( mBaseConf->bisym(pos1) ) {
 	s << "*";
       }
-      if ( ic_pol(j) == 0 ) {
+      if ( ic_pol(j) == 0 && ipol(pos1) == 0 ) {
 	s << "?";
       }
       s << ": " << pos1;

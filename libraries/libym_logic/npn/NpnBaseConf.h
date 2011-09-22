@@ -5,7 +5,7 @@
 /// @brief NpnBaseConf のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -55,6 +55,11 @@ public:
 	   tPol opol,
 	   tPol ipol[]) const;
 #endif
+
+  /// @brief Walsh の 1次係数を得る．
+  /// @param[in] pos 入力番号
+  int
+  walsh_1(ymuint pos) const;
 
 #if 0
   /// @brief Walsh の 2次係数を得る．
@@ -252,6 +257,15 @@ ymuint
 NpnBaseConf::ni() const
 {
   return mNi;
+}
+
+// @brief Walsh の 1次係数を得る．
+// @param[in] pos 入力番号
+inline
+int
+NpnBaseConf::walsh_1(ymuint pos) const
+{
+  return mW1[pos];
 }
 
 #if 0

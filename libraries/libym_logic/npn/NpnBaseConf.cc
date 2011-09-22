@@ -88,6 +88,10 @@ NpnBaseConf::normalize()
   // mW0 が非負になるように出力極性の調整を行う．
   if ( mW0 < 0 ) {
     mOpol = 2;
+    mW0 = -mW0;
+    for (ymuint i = 0; i < mNi; ++ i) {
+      mW1[i] = -mW1[i];
+    }
   }
   else if ( mW0 == 0 ) {
     mOpol = 0;
@@ -167,6 +171,7 @@ NpnBaseConf::normalize()
     }
   }
 
+#if 0
   if ( mOpol == 0 ) {
     // もしも入力の極性がすべて決まっていれば
     // w2 の最大値と最小値の絶対値の大きい方の出力極性を選ぶ．
@@ -214,6 +219,7 @@ NpnBaseConf::normalize()
       }
     }
   }
+#endif
 
   if ( debug & debug_normalize ) {
     cout << "After normalize" << endl;

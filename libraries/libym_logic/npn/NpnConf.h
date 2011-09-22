@@ -85,16 +85,18 @@ public:
 
   /// @brief 出力極性の割り当ての取得
   /// @return 出力極性の割り当て状態
-  ///  -   1 : 肯定
-  ///  -   2 : 否定
+  ///  - 0 : 未定
+  ///  - 1 : 肯定
+  ///  - 2 : 否定
   int
   opol() const;
 
   /// @brief 入力極性の取得
   /// @param[in] pos 入力番号
   /// @return 指定された入力の極性
-  ///  -  1 : 肯定
-  ///  -  2 : 否定
+  ///  - 0 : 未定
+  ///  - 1 : 肯定
+  ///  - 2 : 否定
   int
   ipol(ymuint pos) const;
 
@@ -244,15 +246,6 @@ public:
   void
   set_ic_pol(ymuint pos,
 	     int val);
-
-#if 0
-  /// @brief 入力クラスを追加する．
-  /// @param[in] pos 先頭の入力番号
-  /// @param[in] pol 極性
-  void
-  add_ic_rep(ymuint pos,
-	     int pol);
-#endif
 
   /// @brief 入力グループの開始番号を追加する．
   /// @param[in] index 先頭の入力クラス番号
@@ -622,20 +615,6 @@ NpnConf::set_opol(int val)
 {
   mOpol = val;
 }
-
-#if 0
-// @brief 入力クラスを追加する．
-// @param[in] pos 先頭の入力番号
-inline
-void
-NpnConf::add_ic_rep(ymuint pos,
-		    int pol)
-{
-  int v = (static_cast<int>(pos) << 2) | pol;
-  mIcList[mNc] = v;
-  ++ mNc;
-}
-#endif
 
 // @brief 入力グループの開始番号を追加する．
 // @param[in] index 先頭の入力クラス番号
