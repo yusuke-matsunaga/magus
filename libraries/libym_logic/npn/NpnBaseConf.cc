@@ -11,7 +11,6 @@
 #include "ym_logic/TvFunc.h"
 
 #include "NpnBaseConf.h"
-#include "NpnConf.h"
 
 
 const int debug_normalize = 0x0001;
@@ -44,10 +43,15 @@ NpnBaseConf::NpnBaseConf(const TvFunc& func) :
   mW1 = new ymint32[mNi];
   mW2 = new ymint32[mNi * mNi];
   mW2flag = new ymuint8[mNi * mNi];
-  mIpols = new ymint8[mNi];
+  mIpols = new ymuint8[mNi];
   mIcRep = new ymuint32[mNi];
   mIcNum = new ymuint32[mNi];
   mIcLink = new ymuint32[mNi];
+
+  for (ymuint i = 0; i < mNi; ++ i) {
+    mIcNum[i] = 0;
+    mIcLink[i] = static_cast<ymuint>(-1);
+  }
 }
 
 // デストラクタ
@@ -64,7 +68,7 @@ NpnBaseConf::~NpnBaseConf()
 
 // @brief W0/W1 を用いて正規化する．
 void
-NpnBaseConf::normalize(NpnConf& conf)
+NpnBaseConf::normalize()
 {
   // Walsh の0次と1次の係数を計算する．
   // 2次の係数はオンデマンドで計算する．
@@ -83,7 +87,7 @@ NpnBaseConf::normalize(NpnConf& conf)
 
   // mW0 が非負になるように出力極性の調整を行う．
   if ( mW0 < 0 ) {
-    mOpol = -1;
+    mOpol = 2;
   }
   else if ( mW0 == 0 ) {
     mOpol = 0;
@@ -97,16 +101,13 @@ NpnBaseConf::normalize(NpnConf& conf)
   mNc = 0;
   mIndepNum = 0;
   for (ymuint i = 0; i < mNi; ++ i) {
-    init_ic(i);
-
     // w1 が非負になるように調整する．
     // w1 が 0 の時には実際のサポートかどうかも調べる．
-    int w1 = mW1[i];
-    if ( w1 < 0 ) {
-      w1 = -w1;
-      mIpols[i] = -1;
+    if ( mW1[i] < 0 ) {
+      mW1[i] = -mW1[i];
+      mIpols[i] = 2;
     }
-    else if ( w1 == 0 ) {
+    else if ( mW1[i] == 0 ) {
       bool stat = mFunc.check_sup(i);
       if ( !stat ) {
 	// この入力はサポートではなかった
@@ -125,19 +126,19 @@ NpnBaseConf::normalize(NpnConf& conf)
 
     // 等価な入力があるかどうか調べる．
     bool found = false;
-    for (ymuint p = 0; p < mNc; ++ p) {
-      ymuint pos1 = mIcRep[p];
+    for (ymuint cid = 0; cid < mNc; ++ cid) {
+      ymuint pos1 = mIcRep[cid];
       if ( mW1[i] != mW1[pos1] ) {
 	continue;
       }
       // 1次係数が等しい場合
       // 対称性のチェックを行う．
-      tPol poldiff = (mIpols[pos1] * mIpols[i] == -1) ? kPolNega : kPolPosi;
+      tPol poldiff = (mIpols[pos1] * mIpols[i] == 2) ? kPolNega : kPolPosi;
       bool stat = mFunc.check_sym(i, pos1, poldiff);
       if ( stat ) {
 	// 対称だった
 	found = true;
-	if ( mW1[pos1] == 0 && ic_num(pos1) == 1 ) {
+	if ( mW1[pos1] == 0 && ic_num(cid) == 1 ) {
 	  // bi-symmetry かどうかチェックする
 	  bool stat = mFunc.check_sym(i, pos1, ~poldiff);
 	  if ( stat ) {
@@ -147,7 +148,7 @@ NpnBaseConf::normalize(NpnConf& conf)
 	add_elem(pos1, i);
 	break;
       }
-      if ( w1 == 0 ) {
+      if ( mW1[i] == 0 ) {
 	// w1 == 0 の時には逆相での対称性もチェックする．
 	// この場合，最初の要素の極性は常に kPolPosi のはず
 	bool stat = mFunc.check_sym(i, pos1, kPolNega);
@@ -155,15 +156,14 @@ NpnBaseConf::normalize(NpnConf& conf)
 	  // 逆相で対称だった．
 	  found = true;
 	  add_elem(pos1, i);
-	  mIpols[i] = -1;
+	  mIpols[i] = 2;
 	  break;
 	}
       }
     }
     if ( !found ) {
       // 対称な入力が見つからなかった時には新たな入力クラスをつくる．
-      mIcRep[mNc] = i;
-      ++ mNc;
+      new_ic(i);
     }
   }
 
@@ -171,17 +171,23 @@ NpnBaseConf::normalize(NpnConf& conf)
     // もしも入力の極性がすべて決まっていれば
     // w2 の最大値と最小値の絶対値の大きい方の出力極性を選ぶ．
     // 等しいときには総和を正にする．
-    int min = walsh_2(0, 0);
+    int min = func().walsh_2(0, 0);
     int max = min;
     int sum = 0;
     bool valid = true;
     for (ymuint i = 0; i < mNi; ++ i) {
-      if ( mW1[i] == 0 ) {
+      if ( mIpols[i] == 0 ) {
 	valid = false;
 	break;
       }
-      for (ymuint j = 0; j < mNi; ++ j) {
-	int w2 = walsh_2(i, j);
+      for (ymuint j = 0; j <= i; ++ j) {
+	int w2 = func().walsh_2(i, j);
+	if ( mIpols[i] == 2 ) {
+	  w2 = -w2;
+	}
+	if ( mIpols[j] == 2 ) {
+	  w2 = -w2;
+	}
 	if ( min > w2 ) {
 	  min = w2;
 	}
@@ -193,14 +199,14 @@ NpnBaseConf::normalize(NpnConf& conf)
     }
     if ( valid ) {
       if ( -min > max ) {
-	mOpol = -1;
+	mOpol = 2;
       }
       else if ( -min < max ) {
 	mOpol = 1;
       }
       else { // -min == max
 	if ( sum < 0 ) {
-	  mOpol = -1;
+	  mOpol = 2;
 	}
 	else if ( sum > 0 ) {
 	  mOpol = 1;
@@ -213,8 +219,11 @@ NpnBaseConf::normalize(NpnConf& conf)
     cout << "After normalize" << endl;
     dump_walsh(cout);
     dump_pols(cout);
+    cout << "NpnBaseConf::normalize() end" << endl
+	 << endl;
   }
 
+#if 0
   if ( mNc > 0 ) {
     for (ymuint i = 0; i < mNc; ++ i) {
       ymuint pos = mIcRep[i];
@@ -228,9 +237,10 @@ NpnBaseConf::normalize(NpnConf& conf)
     conf.set_opol(1);
   }
   //conf.set_sig(this);
-
+#endif
 }
 
+#if 0
 // @brief 重み別 Walsh の 0次係数を得る．
 int
 NpnBaseConf::walsh_w0(ymuint w,
@@ -252,6 +262,7 @@ NpnBaseConf::walsh_w0(ymuint w,
   }
   return mFunc.walsh_w0(w, opol, ibits);
 }
+#endif
 
 // @brief Walsh 係数を出力する．
 void
@@ -263,15 +274,27 @@ NpnBaseConf::dump_walsh(ostream& s) const
     s << " " << mW1[i];
   }
   s << endl;
+#if 1
   s << "W2:" << endl;
   for (ymuint i = 0; i < ni(); ++ i) {
     s << "   ";
     for (ymuint j = 0; j < ni(); ++ j) {
-      s << " " << setw(4) << walsh_2(i, j);
+      int w2 = func().walsh_2(i, j);
+      if ( ipol(i) == 2 ) {
+	w2 = -w2;
+      }
+      if ( ipol(j) == 2 ) {
+	w2 = -w2;
+      }
+      if ( opol() == 2 ) {
+	w2 = -w2;
+      }
+      s << " " << setw(4) << w2;
     }
     s << endl;
   }
   s << endl;
+#endif
 }
 
 // @brief 極性情報を出力する．
@@ -279,27 +302,21 @@ void
 NpnBaseConf::dump_pols(ostream& s) const
 {
   s << "opol: ";
-  if ( mOpol == -1 ) {
-    s << "N";
-  }
-  else if ( mOpol == 1 ) {
-    s << "P";
-  }
-  else {
-    s << "-";
+  switch ( opol() ) {
+  case 0: s << "-"; break;
+  case 1: s << "P"; break;
+  case 2: s << "N"; break;
+  default: assert_not_reached(__FILE__, __LINE__);
   }
   s << endl
     << "ipol:";
   for (ymuint i = 0; i < ni(); ++ i) {
     s << " ";
-    if ( mIpols[i] == -1 ) {
-      s << "N";
-    }
-    else if ( mIpols[i] == 1 ) {
-      s << "P";
-    }
-    else {
-      s << "-";
+    switch ( ipol(i) ) {
+    case 0: s << "-"; break;
+    case 1: s << "P"; break;
+    case 2: s << "N"; break;
+    default: assert_not_reached(__FILE__, __LINE__);
     }
   }
   s << endl;

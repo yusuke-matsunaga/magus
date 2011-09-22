@@ -15,8 +15,6 @@
 
 BEGIN_NAMESPACE_YM_NPN
 
-class NpnConf;
-
 //////////////////////////////////////////////////////////////////////
 /// @class NpnBaseConf NpnBaseConf.h "NpnBaseConf.h"
 /// @brief NPN同値類を区別するためのシグネチャを表すクラス
@@ -36,9 +34,8 @@ public:
 public:
 
   /// @brief W0/W1 を用いて正規化する．
-  /// @param[out] conf 結果を格納するオブジェクト
   void
-  normalize(NpnConf& conf);
+  normalize();
 
 
 public:
@@ -51,12 +48,15 @@ public:
   ymuint
   ni() const;
 
+#if 0
   /// @brief 重み別 Walsh の 0次係数を得る．
   int
   walsh_w0(ymuint w,
 	   tPol opol,
 	   tPol ipol[]) const;
+#endif
 
+#if 0
   /// @brief Walsh の 2次係数を得る．
   /// @param[in] pos1, pos2 入力番号
   /// @return pos1 番めと pos2 番めの入力に対応する Walsh の 2次係数を返す．
@@ -64,44 +64,52 @@ public:
   int
   walsh_2(ymuint pos1,
 	  ymuint pos2) const;
-
+#endif
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 極性情報の取得
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 出力極性を得る．
-  /// @retval  1 正極性
   /// @retval  0 未定
-  /// @retval -1 負極性
+  /// @retval  1 正極性
+  /// @retval  2 負極性
   int
   opol() const;
 
   /// @brief 入力極性を得る．
-  /// @retval  1 正極性
+  /// @param[in] pos 入力番号 ( 0 <= pos < ni() )
   /// @retval  0 未定
-  /// @retval -1 負極性
+  /// @retval  1 正極性
+  /// @retval  2 負極性
   int
   ipol(ymuint pos) const;
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 入力順情報の取得
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 等価入力クラス数を返す．
   ymuint
   nc() const;
 
-  /// @brief 等価入力クラスの要素数を返す．
-  /// @param[in] rep 入力クラス番号 ( 0 <= rep < nc() )
+  /// @brief 等価入力クラスの先頭番頭を返す．
+  /// @param[in] cid クラス番号 ( 0 <= cid < nc() )
   ymuint
-  ic_num(ymuint rep) const;
+  ic_rep(ymuint cid) const;
 
-  /// @brief 等価入力クラスの pos の次の要素を返す．
+  /// @brief 等価入力クラスの要素数を返す．
+  /// @param[in] pos 先頭の入力番号 ( 0 <= pos < ni() )
   ymuint
-  ic_link(ymuint pos) const;
+  ic_num(ymuint pos) const;
 
   /// @brief 等価入力クラスの bisym マークを返す．
-  /// @param[in] rep 入力クラス番号 ( 0 <= rep < nc() )
+  /// @param[in] pos 先頭の入力番号 ( 0 <= pos < ni() )
   bool
-  bisym(ymuint rep) const;
+  bisym(ymuint pos) const;
 
   /// @brief 独立な入力クラスの要素数を返す．
   ymuint
@@ -112,38 +120,26 @@ public:
   ymuint
   indep_rep() const;
 
-  /// @brief rep1 が rep2 より大きければ true を返す．
+  /// @brief 等価入力クラスの pos の次の要素を返す．
+  /// @param[in] pos 入力番号 ( 0 <= pos < ni() )
+  ymuint
+  ic_link(ymuint pos) const;
+
+  /// @brief pos1 が pos2 より大きければ true を返す．
   bool
-  w1gt(ymuint rep1,
-       ymuint rep2) const;
+  w1gt(ymuint pos1,
+       ymuint pos2) const;
 
-  /// @brief rep1 と rep2 が等しければ true を返す．
+  /// @brief pos1 と pos2 が等しければ true を返す．
   bool
-  w1eq(ymuint rep1,
-       ymuint rep2) const;
-
-
-private:
-
-  /// @brief 等価入力クラスの情報を初期化する．
-  void
-  init_ic(ymuint pos);
-
-  /// @brief 等価入力クラスに要素を足す．
-  void
-  add_elem(ymuint rep,
-	   ymuint pos);
-
-  /// @brief 等価入力クラスに bisym マークをつける．
-  void
-  set_bisym(ymuint rep);
-
-  /// @brief 独立な入力クラスに要素を足す．
-  void
-  add_indep(ymuint rep);
+  w1eq(ymuint pos1,
+       ymuint pos2) const;
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // デバッグ用の関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief Walsh 係数を出力する．
   void
@@ -152,6 +148,34 @@ public:
   /// @brief 極性情報を出力する．
   void
   dump_pols(ostream& s) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 情報設定用の下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 新しい等価入力クラスを作る．
+  /// @param[in] pos 入力番号
+  void
+  new_ic(ymuint pos);
+
+  /// @brief 等価入力クラスに要素を足す．
+  /// @param[in] rep 入力クラスの先頭の入力番号 ( 0 <= rep < ni() )
+  /// @param[in] pos 入力番号 ( 0 <= pos < ni() )
+  void
+  add_elem(ymuint rep,
+	   ymuint pos);
+
+  /// @brief 等価入力クラスに bisym マークをつける．
+  /// @param[in] rep 入力クラスの先頭の入力番号 ( 0 <= rep < ni() )
+  void
+  set_bisym(ymuint rep);
+
+  /// @brief 独立な入力クラスに要素を足す．
+  /// @param[in] pos 入力番号
+  void
+  add_indep(ymuint pos);
 
 
 private:
@@ -180,16 +204,22 @@ private:
   ymuint8* mW2flag;
 
   // 出力極性
-  ymint8 mOpol;
+  ymuint8 mOpol;
 
   // 入力極性を表す配列
-  ymint8* mIpols;
+  // インデックスは入力番号
+  ymuint8* mIpols;
 
   // 等価入力クラスの数
   ymuint32 mNc;
 
   // 等価入力クラスの先頭番号のリスト
+  // インデックスはクラス番号
   ymuint32* mIcRep;
+
+  // 等価入力クラスの要素数の配列
+  // インデックスは入力番号
+  ymuint32* mIcNum;
 
   // 独立な入力クラスの先頭番号
   ymuint32 mIndepRep;
@@ -197,11 +227,8 @@ private:
   // 独立な入力クラスの要素数
   ymuint32 mIndepNum;
 
-  // 等価入力クラスの要素数の配列
-  // キーは先頭番号
-  ymuint32* mIcNum;
-
   // 等価入力クラスの次の要素を指す配列
+  // インデックスは入力番号
   ymuint32* mIcLink;
 
 };
@@ -227,21 +254,29 @@ NpnBaseConf::ni() const
   return mNi;
 }
 
+#if 0
 // Walsh の 2次係数を得る．
 inline
 int
 NpnBaseConf::walsh_2(ymuint pos1,
 		     ymuint pos2) const
 {
+  // 正規化する．
   if ( pos2 > pos1 ) {
     int tmp = pos1;
     pos1 = pos2;
     pos2 = tmp;
   }
   ymuint base = pos1 * ni() + pos2;
-  if ( (mW2flag[base] & 1) == 0 ) {
+  if ( mW2flag[base] == 0 ) {
     int w2 = mFunc.walsh_2(pos1, pos2);
-    if ( mW2flag[base] & 2 ) {
+    if ( ipol(pos1) == 2 ) {
+      w2 = -w2;
+    }
+    if ( ipol(pos2) == 2 ) {
+      w2 = -w2;
+    }
+    if ( opol() == 2 ) {
       w2 = -w2;
     }
     mW2[base] = w2;
@@ -249,8 +284,8 @@ NpnBaseConf::walsh_2(ymuint pos1,
   }
   return mW2[base];
 }
+#endif
 
-#if 1
 // 出力極性を得る．
 inline
 int
@@ -266,7 +301,6 @@ NpnBaseConf::ipol(ymuint pos) const
 {
   return mIpols[pos];
 }
-#endif
 
 // @brief 等価入力クラス数を返す．
 inline
@@ -276,12 +310,31 @@ NpnBaseConf::nc() const
   return mNc;
 }
 
-// 等価入力クラスの要素数を返す．
+// @brief 等価入力クラスの先頭番頭を返す．
+// @param[in] cid クラス番号 ( 0 <= cid < nc() )
 inline
 ymuint
-NpnBaseConf::ic_num(ymuint rep) const
+NpnBaseConf::ic_rep(ymuint cid) const
 {
-  return (mIcNum[rep] >> 1);
+  return mIcRep[cid];
+}
+
+// @brief 等価入力クラスの要素数を返す．
+// @param[in] pos 先頭の入力番号 ( 0 <= pos < ni() )
+inline
+ymuint
+NpnBaseConf::ic_num(ymuint pos) const
+{
+  return (mIcNum[pos] >> 1);
+}
+
+// @brief 等価入力クラスの bisym マークを返す．
+// @param[in] pos 先頭の入力番号 ( 0 <= pos < ni() )
+inline
+bool
+NpnBaseConf::bisym(ymuint pos) const
+{
+  return static_cast<bool>(mIcNum[pos] & 1);
 }
 
 // @brief 独立(無関係)な入力クラスの先頭番号を返す．
@@ -308,60 +361,58 @@ NpnBaseConf::ic_link(ymuint pos) const
   return mIcLink[pos];
 }
 
-// 等価入力クラスの bisym マークを返す．
+// pos1 が pos2 より大きければ true を返す．
 inline
 bool
-NpnBaseConf::bisym(ymuint rep) const
+NpnBaseConf::w1gt(ymuint pos1,
+		  ymuint pos2) const
 {
-  return static_cast<bool>(mIcNum[rep] & 1);
-}
-
-// rep1 が rep2 より大きければ true を返す．
-inline
-bool
-NpnBaseConf::w1gt(ymuint rep1,
-		ymuint rep2) const
-{
-  int diff = mW1[rep1] - mW1[rep2];
+  int diff = mW1[pos1] - mW1[pos2];
   if ( diff > 0 ) {
     return true;
   }
   if ( diff == 0 ) {
-    return mIcNum[rep1] >= mIcNum[rep2];
+    return mIcNum[pos1] >= mIcNum[pos2];
   }
   return false;
 }
 
-// rep1 と rep2 が等しければ true を返す．
+// pos1 と pos2 が等しければ true を返す．
 inline
 bool
-NpnBaseConf::w1eq(ymuint rep1,
-		ymuint rep2) const
+NpnBaseConf::w1eq(ymuint pos1,
+		  ymuint pos2) const
 {
-  return mW1[rep1] == mW1[rep2] && mIcNum[rep1] == mIcNum[rep2];
+  return mW1[pos1] == mW1[pos2] && mIcNum[pos1] == mIcNum[pos2];
 }
 
-// @brief 等価入力クラスの情報を初期化する．
+// @brief 新しい等価入力クラスを作る．
+// @param[in] pos 入力番号
 inline
 void
-NpnBaseConf::init_ic(ymuint pos)
+NpnBaseConf::new_ic(ymuint pos)
 {
-  mIcNum[pos] = 2;
-  mIcLink[pos] = static_cast<ymuint>(-1);
+  mIcRep[mNc] = pos;
+  mIcNum[pos] = 2; // 要素数:1, bisym: false
+  ++ mNc;
 }
 
 // 等価入力クラスに要素を足す．
 inline
 void
 NpnBaseConf::add_elem(ymuint rep,
-		    ymuint pos)
+		      ymuint pos)
 {
+  // 末尾の要素を求める．
+  // O(n) のバカな実装
   ymuint n = (mIcNum[rep] >> 1);
   ymuint pos0 = rep;
   for (ymuint i = 1; i < n; ++ i) {
     pos0 = mIcLink[pos0];
   }
+  // pos0 の次を pos にする．
   mIcLink[pos0] = pos;
+  // 最下位ビットは bi-sym フラグなので2を足す．
   mIcNum[rep] += 2;
 }
 
@@ -376,17 +427,18 @@ NpnBaseConf::set_bisym(ymuint rep)
 // @brief 独立な入力クラスに要素を足す．
 inline
 void
-NpnBaseConf::add_indep(ymuint rep)
+NpnBaseConf::add_indep(ymuint pos)
 {
   if ( mIndepNum == 0 ) {
-    mIndepRep = rep;
+    mIndepRep = pos;
   }
   else {
-    ymuint pos = mIndepRep;
+    // 末尾の要素を求める．
+    ymuint pos0 = mIndepRep;
     for (ymuint i = 1; i < mIndepNum; ++ i) {
-      pos = mIcLink[pos];
+      pos0 = mIcLink[pos0];
     }
-    mIcLink[pos] = rep;
+    mIcLink[pos0] = pos;
   }
   ++ mIndepNum;
 }

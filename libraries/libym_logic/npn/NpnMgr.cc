@@ -12,7 +12,7 @@
 #include "ymtools.h"
 #include "ym_logic/TvFunc.h"
 #include "ym_logic/NpnMgr.h"
-#include "NpnRawSig.h"
+#include "NpnBaseConf.h"
 #include "NpnConf.h"
 
 
@@ -312,16 +312,17 @@ NpnMgr::cannonical(const TvFunc& func,
     }
   }
 
-  NpnRawSig sig(func);
+  NpnBaseConf base_conf(func);
 
   // W0 と W1 が非負になるように極性の調節を行う．
   // W0 と W1 および対称変数の情報を用いて正規化を行う．
   // 以降は対称入力グループ単位で考えればよい．
   // また W0 と W1 シグネチャは最大化されているので考える必要はない．
-  NpnConf conf0;
-  sig.normalize(conf0);
+  base_conf.normalize();
 
-  if ( !conf0.is_resolved() ) {
+  NpnConf conf0(base_conf);
+
+  if ( !conf0.is_resolved() && conf0.nc() > 1 ) {
     if ( debug & debug_step1) {
       cout << "Before step1" << endl;
       conf0.dump(cout);
@@ -350,7 +351,7 @@ NpnMgr::cannonical(const TvFunc& func,
       NpnConf conf_p(conf0, 1);
       w2max_recur(conf_p, 0);
 
-      NpnConf conf_n(conf0, -1);
+      NpnConf conf_n(conf0, 2);
       w2max_recur(conf_n, 0);
     }
     else {
@@ -387,7 +388,7 @@ NpnMgr::cannonical(const TvFunc& func,
     }
   }
   else {
-    for (int opol = -1; opol <= 1; opol += 2) {
+    for (int opol = 1; opol <= 2; ++ opol) {
       for (ymuint p = 0; p < unum_pow; ++ p) {
 	NpnConf conf(conf0, opol);
 	for (ymuint i = 0; i < unum; ++ i) {
@@ -584,6 +585,7 @@ NpnMgr::w2max_recur(NpnConf& conf,
 	const NpnConf& max_conf = mMaxList.front();
 	ymuint ni = max_conf.ni();
 	int diff = 0;
+#if 0
 	for (ymuint i = 0; i < ni - 1; ++ i) {
 	  for (ymuint j = i + 1; j < ni; ++ j) {
 	    int w2_1 = max_conf.walsh_2i(i, j);
@@ -595,6 +597,7 @@ NpnMgr::w2max_recur(NpnConf& conf,
 	  }
 	}
       loop_exit:
+#endif
 	if ( diff == 0 ) {
 	  // ここまでで決着が付かなければ真理値表ベクタの辞書式順序で比較する．
 	  NpnMap map1;

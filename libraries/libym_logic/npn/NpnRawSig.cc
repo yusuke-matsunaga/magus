@@ -220,6 +220,7 @@ NpnRawSig::normalize(NpnConf& conf)
     dump_pols(cout);
   }
 
+#if 0
   if ( mNc > 0 ) {
     for (ymuint i = 0; i < mNc; ++ i) {
       ymuint pos = mIcRep[i];
@@ -233,6 +234,7 @@ NpnRawSig::normalize(NpnConf& conf)
     conf.set_opol(1);
   }
   conf.set_sig(this);
+#endif
 
 }
 
