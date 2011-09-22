@@ -82,13 +82,14 @@ NpnBaseConf::normalize(NpnConf& conf)
   }
 
   // mW0 が非負になるように出力極性の調整を行う．
-  mOpol = 1;
   if ( mW0 < 0 ) {
     mOpol = -1;
-    invert_all();
   }
   else if ( mW0 == 0 ) {
     mOpol = 0;
+  }
+  else { // mW0 > 0
+    mOpol = 1;
   }
 
   // Walsh の1次係数を計算し，極性の調整を行う．
@@ -96,22 +97,16 @@ NpnBaseConf::normalize(NpnConf& conf)
   mNc = 0;
   mIndepNum = 0;
   for (ymuint i = 0; i < mNi; ++ i) {
-    mIcNum[i] = 2;
-    mIcLink[i] = static_cast<ymuint>(-1);
-
-    // i の1次係数を求める．
-    int w1 = mW1[i];
+    init_ic(i);
 
     // w1 が非負になるように調整する．
     // w1 が 0 の時には実際のサポートかどうかも調べる．
-    int ipol = 1;
+    int w1 = mW1[i];
     if ( w1 < 0 ) {
       w1 = -w1;
-      ipol = -1;
-      invert_input(i);
+      mIpols[i] = -1;
     }
     else if ( w1 == 0 ) {
-      ipol = 0;
       bool stat = mFunc.check_sup(i);
       if ( !stat ) {
 	// この入力はサポートではなかった
@@ -120,24 +115,29 @@ NpnBaseConf::normalize(NpnConf& conf)
 	mIpols[i] = 1;
 	continue;
       }
+      else {
+	mIpols[i] = 0;
+      }
     }
-    mIpols[i] = ipol;
+    else {
+      mIpols[i] = 1;
+    }
 
     // 等価な入力があるかどうか調べる．
     bool found = false;
     for (ymuint p = 0; p < mNc; ++ p) {
       ymuint pos1 = mIcRep[p];
-      if ( w1 != mW1[pos1] ) {
+      if ( mW1[i] != mW1[pos1] ) {
 	continue;
       }
       // 1次係数が等しい場合
       // 対称性のチェックを行う．
-      tPol poldiff = (mIpols[pos1] * ipol == -1) ? kPolNega : kPolPosi;
+      tPol poldiff = (mIpols[pos1] * mIpols[i] == -1) ? kPolNega : kPolPosi;
       bool stat = mFunc.check_sym(i, pos1, poldiff);
       if ( stat ) {
 	// 対称だった
 	found = true;
-	if ( w1 == 0 && ic_num(pos1) == 1 ) {
+	if ( mW1[pos1] == 0 && ic_num(pos1) == 1 ) {
 	  // bi-symmetry かどうかチェックする
 	  bool stat = mFunc.check_sym(i, pos1, ~poldiff);
 	  if ( stat ) {
@@ -156,7 +156,6 @@ NpnBaseConf::normalize(NpnConf& conf)
 	  found = true;
 	  add_elem(pos1, i);
 	  mIpols[i] = -1;
-	  invert_input(i);
 	  break;
 	}
       }
@@ -195,14 +194,6 @@ NpnBaseConf::normalize(NpnConf& conf)
     if ( valid ) {
       if ( -min > max ) {
 	mOpol = -1;
-	// w1 を正にするには入力をすべて反転する必要がある．
-	for (ymuint i = 0; i < mNi; ++ i) {
-	  if ( mW1[i] != 0 ) {
-	    mIpols[i] *= -1;
-	  }
-	}
-	// と同時に w2 も反転させる．
-	invert_all_w2();
       }
       else if ( -min < max ) {
 	mOpol = 1;
@@ -210,14 +201,6 @@ NpnBaseConf::normalize(NpnConf& conf)
       else { // -min == max
 	if ( sum < 0 ) {
 	  mOpol = -1;
-	  // w1 を正にするには入力をすべて反転する必要がある．
-	  for (ymuint i = 0; i < mNi; ++ i) {
-	    if ( mW1[i] != 0 ) {
-	      mIpols[i] *= -1;
-	    }
-	  }
-	  // と同時に w2 も反転させる．
-	  invert_all_w2();
 	}
 	else if ( sum > 0 ) {
 	  mOpol = 1;
@@ -246,57 +229,6 @@ NpnBaseConf::normalize(NpnConf& conf)
   }
   //conf.set_sig(this);
 
-}
-
-// @brief すべてのシグネチャを反転させる．
-void
-NpnBaseConf::invert_all()
-{
-  mW0 *= -1;
-  for (ymuint i = 0; i < mNi; ++ i) {
-    mW1[i] *= -1;
-  }
-  invert_all_w2();
-}
-
-// @brief 一つの入力に関するシグネチャを反転する．
-void
-NpnBaseConf::invert_input(ymuint pos)
-{
-  mW1[pos] *= -1;
-  for (ymuint i = 0; i < mNi; ++ i) {
-    invert_w2(pos, i);
-  }
-}
-
-// @brief 2次の係数のみを反転する．
-void
-NpnBaseConf::invert_all_w2()
-{
-  for (ymuint i = 0; i < mNi; ++ i) {
-    for (ymuint j = i + 1; j < mNi; ++ j) {
-      invert_w2(i, j);
-    }
-  }
-}
-
-// @brief w2 の要素を反転する．
-void
-NpnBaseConf::invert_w2(ymuint pos1,
-		     ymuint pos2)
-{
-  if ( pos2 > pos1 ) {
-    int tmp = pos1;
-    pos1 = pos2;
-    pos2 = tmp;
-  }
-  ymuint base = pos1 * ni() + pos2;
-  if ( mW2flag[base] & 1 ) {
-    mW2[base] *= -1;
-  }
-  else {
-    mW2flag[base] ^= 2;
-  }
 }
 
 // @brief 重み別 Walsh の 0次係数を得る．

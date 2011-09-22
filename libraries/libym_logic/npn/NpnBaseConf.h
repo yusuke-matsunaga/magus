@@ -98,18 +98,19 @@ public:
   ymuint
   ic_link(ymuint pos) const;
 
-  /// @brief 独立(無関係)な入力クラスの先頭番号を返す．
-  ymuint
-  indep_rep() const;
+  /// @brief 等価入力クラスの bisym マークを返す．
+  /// @param[in] rep 入力クラス番号 ( 0 <= rep < nc() )
+  bool
+  bisym(ymuint rep) const;
 
   /// @brief 独立な入力クラスの要素数を返す．
   ymuint
   indep_num() const;
 
-  /// @brief 等価入力クラスの bisym マークを返す．
-  /// @param[in] rep 入力クラス番号 ( 0 <= rep < nc() )
-  bool
-  bisym(ymuint rep) const;
+  /// @brief 独立(無関係)な入力クラスの先頭番号を返す．
+  /// @note 2番め以降の要素は ic_link() でたどる．
+  ymuint
+  indep_rep() const;
 
   /// @brief rep1 が rep2 より大きければ true を返す．
   bool
@@ -124,22 +125,9 @@ public:
 
 private:
 
-  /// @brief すべてのシグネチャを反転させる．
+  /// @brief 等価入力クラスの情報を初期化する．
   void
-  invert_all();
-
-  /// @brief 一つの入力に関するシグネチャを反転する．
-  void
-  invert_input(ymuint pos);
-
-  /// @brief 2次の係数のみを反転する．
-  void
-  invert_all_w2();
-
-  /// @brief w2 の要素を反転する．
-  void
-  invert_w2(ymuint pos1,
-	    ymuint pos2);
+  init_ic(ymuint pos);
 
   /// @brief 等価入力クラスに要素を足す．
   void
@@ -351,6 +339,15 @@ NpnBaseConf::w1eq(ymuint rep1,
 		ymuint rep2) const
 {
   return mW1[rep1] == mW1[rep2] && mIcNum[rep1] == mIcNum[rep2];
+}
+
+// @brief 等価入力クラスの情報を初期化する．
+inline
+void
+NpnBaseConf::init_ic(ymuint pos)
+{
+  mIcNum[pos] = 2;
+  mIcLink[pos] = static_cast<ymuint>(-1);
 }
 
 // 等価入力クラスに要素を足す．

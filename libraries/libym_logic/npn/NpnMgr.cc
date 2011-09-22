@@ -470,9 +470,9 @@ w2refine(NpnConf& conf,
   ymuint queue[TvFunc::kMaxNi];
   ymuint rp = 0;
   ymuint wp = 0;
-  for (ymuint g = g0; g < conf.ng(); ++ g) {
-    ymuint s = conf.begin(g);
-    ymuint e = conf.end(g);
+  for (ymuint g = g0; g < conf.group_num(); ++ g) {
+    ymuint s = conf.group_begin(g);
+    ymuint e = conf.group_end(g);
     if ( e - s == 1 && conf.ic_pol(s) != 0 ) {
       ymuint pos0 = conf.ic_rep(s);
       queue[wp] = pos0;
@@ -485,9 +485,9 @@ w2refine(NpnConf& conf,
     ++ rp;
 
     ymuint c = 0;
-    for (ymuint g1 = g0; g1 < conf.ng(); ++ g1) {
-      ymuint b = conf.begin(g1);
-      ymuint e = conf.end(g1);
+    for (ymuint g1 = g0; g1 < conf.group_num(); ++ g1) {
+      ymuint b = conf.group_begin(g1);
+      ymuint e = conf.group_end(g1);
       if ( e - b == 1 ) {
 	// 順序が確定している場合
 
@@ -533,8 +533,8 @@ w2refine(NpnConf& conf,
 
 	// 新しく増えたグループで確定したものがあるか調べる．
 	for (ymuint j = g1; j < g1 + d; ++ j) {
-	  ymuint s = conf.begin(j);
-	  if ( conf.gnum(j) == 1 && conf.ic_pol(s) != 0 ) {
+	  ymuint s = conf.group_begin(j);
+	  if ( conf.group_size(j) == 1 && conf.ic_pol(s) != 0 ) {
 	    ymuint pos1 = conf.ic_rep(s);
 	    queue[wp] = pos1;
 	    ++ wp;
@@ -623,20 +623,20 @@ NpnMgr::w2max_recur(NpnConf& conf,
     }
 
     // 確定している入力グループをスキップする．
-    for ( ; g0 < conf.ng(); ++ g0) {
-      if ( conf.gnum(g0) > 1 ) {
+    for ( ; g0 < conf.group_num(); ++ g0) {
+      if ( conf.group_size(g0) > 1 ) {
 	break;
       }
-      ymuint b = conf.begin(g0);
+      ymuint b = conf.group_begin(g0);
       if ( conf.ic_pol(b) == 0 ) {
 	break;
       }
     }
 
-    if ( conf.gnum(g0) > 1 ) {
+    if ( conf.group_size(g0) > 1 ) {
       // g0 内に複数のクラスがあって順序は未確定
-      ymuint b = conf.begin(g0);
-      ymuint e = conf.end(g0);
+      ymuint b = conf.group_begin(g0);
+      ymuint e = conf.group_end(g0);
       for (ymuint i = b; i < e; ++ i) {
 	NpnConf conf_i(conf, g0, i);
 	w2max_recur(conf_i, g0);

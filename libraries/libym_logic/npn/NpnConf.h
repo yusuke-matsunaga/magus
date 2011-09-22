@@ -49,11 +49,10 @@ public:
   NpnConf(const NpnConf& src,
 	  int pol);
 
-  /// @brief グループ g 内の c というクラスを切り出す．
+  /// @brief グループ g 内の c というクラスを切り出して独立したグループにする．
   /// @param[in] src コピー元のオブジェクト
   /// @param[in] g 切り出す対象のグループ番号
   /// @param[in] c 切り出す対象の等価入力クラス
-  /// @note c のみを独立したグループとする．
   NpnConf(const NpnConf& src,
 	  ymuint g,
 	  ymuint c);
@@ -126,26 +125,26 @@ public:
   /// @brief グループ数の取得
   /// @return グループ数
   ymuint
-  ng() const;
+  group_num() const;
 
   /// @brief グループの先頭の取得
   /// @param[in] pos グループ番号( < ng() )
   /// @return pos 番目のグループの先頭のクラス番号
   ymuint
-  begin(ymuint pos) const;
+  group_begin(ymuint pos) const;
 
   /// @brief グループの末尾の取得
   /// @param[in] pos グループ番号( < ng() )
   /// @return pos 番目のグループの末尾のクラス番号
   /// @note 末尾とは実際の最後の要素の次を指す．
   ymuint
-  end(ymuint pos) const;
+  group_end(ymuint pos) const;
 
   /// @brief グループの要素数の取得
   /// @param[in] pos グループ番号( < ng() )
   /// @return pos 番めのグループの要素数
   ymuint
-  gnum(ymuint pos) const;
+  group_size(ymuint pos) const;
 
   /// @brief 重み別 Walsh の 0次係数を返す．
   int
@@ -156,10 +155,12 @@ public:
   walsh_2(ymuint pos1,
 	  ymuint pos2) const;
 
+#if 0
   /// @brief Walsh の 2次係数を返す (入力順序付き)．
   int
   walsh_2i(ymuint pos1,
 	   ymuint pos2) const;
+#endif
 
   /// @brief W2 を用いた大小比較関数
   bool
@@ -183,6 +184,7 @@ public:
   // NpnRawSig の関数に対するラッパ
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief 対象の関数を得る．
   const TvFunc&
   func() const;
@@ -211,6 +213,11 @@ public:
   bool
   bisym(ymuint rep) const;
 
+  /// @brief Walsh 係数を出力する．
+  void
+  dump_walsh(ostream& s) const;
+#endif
+
   /// @brief rep1 が rep2 より大きければ true を返す．
   bool
   w1gt(ymuint rep1,
@@ -220,11 +227,6 @@ public:
   bool
   w1eq(ymuint rep1,
        ymuint rep2) const;
-
-  /// @brief Walsh 係数を出力する．
-  void
-  dump_walsh(ostream& s) const;
-
 
 public:
 
@@ -284,10 +286,11 @@ private:
   void
   copy(const NpnConf& src);
 
+#if 0
   // 入力順序を正しくする．
   void
   validate_iorder() const;
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -325,10 +328,10 @@ private:
   ymint32 mIcList[TvFunc::kMaxNi];
 
   // グループ数
-  ymuint32 mNg;
+  ymuint32 mGroupNum;
 
   // グループの先頭のインデックス
-  ymuint32 mIndex[TvFunc::kMaxNi + 1];
+  ymuint32 mGroupTop[TvFunc::kMaxNi + 1];
 
 };
 
@@ -343,9 +346,9 @@ NpnConf::NpnConf() :
   mOpol(0),
   mIorderValid(false),
   mNc(0),
-  mNg(0)
+  mGroupNum(0)
 {
-  mIndex[0] = 0;
+  mGroupTop[0] = 0;
   for (ymuint i = 0; i < TvFunc::kMaxNi; ++ i) {
     mIpols[i] = 1;
   }
@@ -381,6 +384,7 @@ NpnConf::ipol(ymuint pos) const
   return mIpols[pos];
 }
 
+#if 0
 // @brief 入力順序の取得
 // @param[in] pos 入力位置
 // @return pos 番めの入力番号
@@ -393,6 +397,7 @@ NpnConf::iorder(ymuint pos) const
   }
   return mIorder[pos];
 }
+#endif
 
 // クラス数の取得
 inline
@@ -446,25 +451,25 @@ NpnConf::ic_pol(ymuint pos) const
 // グループ数の取得
 inline
 ymuint
-NpnConf::ng() const
+NpnConf::group_num() const
 {
-  return mNg;
+  return mGroupNum;
 }
 
 // グループの先頭の取得
 inline
 ymuint
-NpnConf::begin(ymuint pos) const
+NpnConf::group_begin(ymuint pos) const
 {
-  return mIndex[pos];
+  return mGroupTop[pos];
 }
 
 // グループの末尾の取得
 inline
 ymuint
-NpnConf::end(ymuint pos) const
+NpnConf::group_end(ymuint pos) const
 {
-  return mIndex[pos + 1];
+  return mGroupTop[pos + 1];
 }
 
 // @brief グループの要素数の取得
@@ -472,11 +477,12 @@ NpnConf::end(ymuint pos) const
 // @return pos 番めのグループの要素数
 inline
 ymuint
-NpnConf::gnum(ymuint pos) const
+NpnConf::group_size(ymuint pos) const
 {
-  return mIndex[pos + 1] - mIndex[pos];
+  return mGroupTop[pos + 1] - mGroupTop[pos];
 }
 
+#if 0
 // @brief 対象の関数を得る．
 inline
 const TvFunc&
@@ -551,6 +557,16 @@ NpnConf::w1eq(ymuint rep1,
   return mSig->w1eq(rep1, rep2);
 }
 
+// @brief Walsh 係数を出力する．
+inline
+void
+NpnConf::dump_walsh(ostream& s) const
+{
+  mSig->dump_walsh(s);
+}
+
+#endif
+
 // @brief Walsh の 2次係数を返す．
 inline
 int
@@ -561,6 +577,7 @@ NpnConf::walsh_2(ymuint pos1,
   return w2 * ipol(pos1) * ipol(pos2) * opol();
 }
 
+#if 0
 // @brief Walsh の 2次係数を返す (入力順序付き)．
 inline
 int
@@ -572,6 +589,7 @@ NpnConf::walsh_2i(ymuint pos1,
   }
   return walsh_2(mIorder[pos1], mIorder[pos2]);
 }
+#endif
 
 // @brief W2 を用いた大小比較関数
 inline
@@ -597,21 +615,15 @@ NpnConf::w2eq(ymuint rep0,
   return v1 == v2;
 }
 
-// @brief Walsh 係数を出力する．
-inline
-void
-NpnConf::dump_walsh(ostream& s) const
-{
-  mSig->dump_walsh(s);
-}
-
 // @brief シグネチャを設定する．
 inline
 void
 NpnConf::set_sig(const NpnRawSig* sig)
 {
   mSig = sig;
+#if 0
   validate_iorder();
+#endif
 }
 
 // 出力極性の割り当ての設定
@@ -640,9 +652,9 @@ inline
 void
 NpnConf::add_ig(ymuint index)
 {
-  mIndex[mNg] = index;
-  ++ mNg;
-  mIndex[mNg] = mNc;
+  mGroupTop[mGroupNum] = index;
+  ++ mGroupNum;
+  mGroupTop[mGroupNum] = mNc;
 }
 
 // @brief グループの細分化を行う．
@@ -658,9 +670,9 @@ NpnConf::refine(ymuint g0,
 		T1 gt,
 		T2 eq)
 {
-  ymuint ng0 = mNg;
-  ymuint s = begin(g0);
-  ymuint e = end(g0);
+  ymuint ng0 = group_num();
+  ymuint s = group_begin(g0);
+  ymuint e = group_end(g0);
   // gt 関数にしたがって整列させる．
   for (ymuint i = s + 1; i < e; ++ i) {
     int tmp1 = mIcList[i];
@@ -685,16 +697,16 @@ NpnConf::refine(ymuint g0,
     ymuint pos1 = ic_rep(i);
     if ( !eq(prev, pos1) ) {
       // 新しいグループを作る．
-      for (ymuint g1 = mNg; g1 > g0; -- g1) {
-	mIndex[g1 + 1] = mIndex[g1];
+      for (ymuint g1 = mGroupNum; g1 > g0; -- g1) {
+	mGroupTop[g1 + 1] = mGroupTop[g1];
       }
-      ++ mNg;
+      ++ mGroupNum;
       ++ g0;
-      mIndex[g0] = i;
+      mGroupTop[g0] = i;
       prev = pos1;
     }
   }
-  return mNg - ng0;
+  return mGroupNum - ng0;
 }
 
 END_NAMESPACE_YM_NPN

@@ -37,16 +37,16 @@ NpnConf::copy(const NpnConf& src)
 {
   mSig = src.mSig;
   mOpol = src.mOpol;
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < mSig->ni(); ++ i) {
     mIpols[i] = src.mIpols[i];
   }
   mNc = src.mNc;
   for (ymuint i = 0; i < mNc; ++ i) {
     mIcList[i] = src.mIcList[i];
   }
-  mNg = src.mNg;
-  for (ymuint i = 0; i <= mNg; ++ i) {
-    mIndex[i] = src.mIndex[i];
+  mGroupNum = src.mGroupNum;
+  for (ymuint i = 0; i <= mGroupNum; ++ i) {
+    mGroupTop[i] = src.mGroupTop[i];
   }
   mIorderValid = false;
 }
@@ -59,7 +59,7 @@ NpnConf::NpnConf(const NpnConf& src,
   mOpol = pol;
   assert_cond(pol == 1 || pol == -1, __FILE__, __LINE__);
   if ( pol == -1 ) {
-    for (ymuint i = 0; i < ni(); ++ i) {
+    for (ymuint i = 0; i < mSig->ni(); ++ i) {
       if ( mSig->walsh_1(i) != 0 ) {
 	mIpols[i] *= -1;
       }
@@ -76,13 +76,13 @@ NpnConf::NpnConf(const NpnConf& src,
 {
   mSig = src.mSig;
   mOpol = src.mOpol;
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < mSig->ni(); ++ i) {
     mIpols[i] = src.mIpols[i];
   }
   mIorderValid = false;
   mNc = src.mNc;
-  ymuint b = src.begin(g);
-  ymuint e = src.end(g);
+  ymuint b = src.group_begin(g);
+  ymuint e = src.group_end(g);
   assert_cond(b <= c && c < e, __FILE__, __LINE__);
   for (ymuint i = 0; i < b; ++ i) {
     mIcList[i] = src.mIcList[i];
@@ -100,16 +100,17 @@ NpnConf::NpnConf(const NpnConf& src,
     mIcList[i] = src.mIcList[i];
   }
 
-  mNg = src.mNg + 1;
+  mGroupNum = src.mGroupNum + 1;
   for (ymuint i = 0; i <= g; ++ i) {
-    mIndex[i] = src.mIndex[i];
+    mGroupTop[i] = src.mGroupTop[i];
   }
-  mIndex[g + 1] = b + 1;
-  for (ymuint i = g + 1; i < mNg; ++ i) {
-    mIndex[i + 1] = src.mIndex[i];
+  mGroupTop[g + 1] = b + 1;
+  for (ymuint i = g + 1; i < mGroupNum; ++ i) {
+    mGroupTop[i + 1] = src.mGroupTop[i];
   }
 }
 
+#if 0
 // @brief 入力順序を正しくする．
 void
 NpnConf::validate_iorder() const
@@ -133,6 +134,7 @@ NpnConf::validate_iorder() const
   }
   mIorderValid = true;
 }
+#endif
 
 // 完全な正規形になっているとき true を返す．
 bool
@@ -141,11 +143,11 @@ NpnConf::is_resolved(ymuint g0) const
   if ( !is_opol_fixed() ) {
     return false;
   }
-  for (ymuint g1 = g0; g1 < mNg; ++ g1) {
-    if ( gnum(g1) > 1 ) {
+  for (ymuint g1 = g0; g1 < mGroupNum; ++ g1) {
+    if ( group_size(g1) > 1 ) {
       return false;
     }
-    ymuint pos = begin(g1);
+    ymuint pos = group_begin(g1);
     if ( ic_pol(pos) == 0 ) {
       return false;
     }
@@ -159,7 +161,7 @@ NpnConf::walsh_w0(ymuint w) const
 {
   tPol op = (opol() == -1) ? kPolNega : kPolPosi;
   tPol ip[TvFunc::kMaxNi];
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < mSig->ni(); ++ i) {
     if ( ipol(i) == -1 ) {
       ip[i] = kPolNega;
     }
@@ -199,25 +201,25 @@ NpnConf::set_map(NpnMap& map) const
   ymuint k = 0;
   for (ymuint i = 0; i < nc(); ++ i) {
     ymuint rep = ic_rep(i);
-    ymuint n = ic_num(rep);
+    ymuint n = mSig->ic_num(rep);
     for (ymuint j = 0; j < n; ++ j) {
       order[rep] = k;
       ++ k;
-      rep = ic_link(rep);
+      rep = mSig->ic_link(rep);
     }
   }
-  ymuint rep = indep_rep();
-  ymuint n = indep_num();
+  ymuint rep = mSig->indep_rep();
+  ymuint n = mSig->indep_num();
   for (ymuint j = 0; j < n; ++ j) {
     order[rep] = k;
     ++ k;
-    rep = ic_link(rep);
+    rep = mSig->ic_link(rep);
   }
-  map.resize(ni());
+  map.resize(mSig->ni());
   tPol opol0 = (mSig->opol() == -1) ? kPolNega : kPolPosi;
   tPol opol1 = (mOpol == -1) ? kPolNega : kPolPosi;
   map.set_opol(opol0 * opol1);
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < mSig->ni(); ++ i) {
     tPol ipol0 = (mSig->ipol(i) == -1) ? kPolNega : kPolPosi;
     tPol ipol1 = (ipol(i) == -1) ? kPolNega : kPolPosi;
     map.set(i, order[i], ipol0 * ipol1);
@@ -262,23 +264,23 @@ NpnConf::dump(ostream& s) const
   s << endl;
   s << "Input groups" << endl;
   ymuint cmb = 1;
-  for (ymuint g = 0; g < ng(); ++ g) {
-    ymuint b = begin(g);
-    ymuint e = end(g);
-    cmb *= fact(gnum(g));
+  for (ymuint g = 0; g < group_num(); ++ g) {
+    ymuint b = group_begin(g);
+    ymuint e = group_end(g);
+    cmb *= fact(group_size(g));
     for (ymuint j = b; j < e; ++ j) {
       ymuint pos1 = ic_rep(j);
       s << " { " << mSig->walsh_1(pos1);
-      if ( bisym(pos1) ) {
+      if ( mSig->bisym(pos1) ) {
 	s << "*";
       }
       if ( ic_pol(j) == 0 ) {
 	s << "?";
       }
       s << ": " << pos1;
-      ymuint n = ic_num(pos1);
+      ymuint n = mSig->ic_num(pos1);
       for (ymuint k = 1; k < n; ++ k) {
-	pos1 = ic_link(pos1);
+	pos1 = mSig->ic_link(pos1);
 	s << " " << pos1;
       }
       s << "}";
