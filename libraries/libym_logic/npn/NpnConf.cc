@@ -140,28 +140,43 @@ void
 NpnConf::validate_ipols() const
 {
   for (ymuint i = 0; i < ni(); ++ i) {
-    mIpols[i] = mBaseConf->ipol(i);
+    ymuint pol = mBaseConf->ipol(i);
+    mIpols[i] = pol;
   }
   for (ymuint c = 0; c < nc(); ++ c) {
     ymuint ip = ic_pol(c);
-    if ( ip == 2 ) {
-      ymuint pos = ic_rep(c);
-      ymuint n;
-      if ( mBaseConf->bisym(pos) ) {
-	n = 1;
-      }
-      else {
-	n = mBaseConf->ic_num(pos);
-      }
-      for (ymuint j = 0; j < n; ++ j) {
-	if ( mIpols[pos] == 1 ) {
-	  mIpols[pos] = 2;
-	}
-	else if ( mIpols[pos] == 2 ) {
+    ymuint pos = ic_rep(c);
+    ymuint n;
+    if ( mBaseConf->bisym(pos) ) {
+      n = 1;
+    }
+    else {
+      n = mBaseConf->ic_num(pos);
+    }
+    for (ymuint j = 0; j < n; ++ j) {
+      switch ( mIpols[pos] ) {
+      case 0:
+	if ( ip == 1 ) {
 	  mIpols[pos] = 1;
 	}
-	pos = mBaseConf->ic_link(pos);
+	else if ( ip == 2 ) {
+	  mIpols[pos] = 2;
+	}
+	break;
+
+      case 1:
+	if ( ip == 2 ) {
+	  mIpols[pos] = 2;
+	}
+	break;
+
+      case 2:
+	if ( ip == 2 ) {
+	  mIpols[pos] = 1;
+	}
+	break;
       }
+      pos = mBaseConf->ic_link(pos);
     }
   }
   mIpolsValid = true;
@@ -329,7 +344,7 @@ NpnConf::dump(ostream& s) const
       if ( mBaseConf->bisym(pos1) ) {
 	s << "*";
       }
-      if ( ic_pol(j) == 0 && ipol(pos1) == 0 ) {
+      if ( ic_pol(j) == 0 ) {
 	s << "?";
       }
       s << ": " << pos1;
@@ -342,7 +357,14 @@ NpnConf::dump(ostream& s) const
     }
     s << endl;
   }
-  s << endl;
+  if ( is_resolved() ) {
+    s << "resolved";
+  }
+  else {
+    s << "unresolved";
+  }
+  s << endl
+    << endl;
 }
 
 END_NAMESPACE_YM_NPN

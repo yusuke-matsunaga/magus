@@ -77,6 +77,9 @@ private:
   // 1回の cannonical あたりの w2max_recur の起動回数
   ymulong mW2max_count;
 
+  // w2max_recur で用いる現在の最大値
+  TvFunc mMaxFunc;
+
 };
 
 END_NAMESPACE_YM_NPN

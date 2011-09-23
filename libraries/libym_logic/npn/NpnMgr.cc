@@ -345,6 +345,8 @@ NpnMgr::cannonical(const TvFunc& func,
     mMaxList.push_back(conf0);
   }
   else {
+    mMaxFunc = TvFunc::const_zero(func.ni());
+
     // 以降の処理は単純化するために出力極性を固定で考える．
     if ( !conf0.is_opol_fixed() ) {
       // 出力極性が決まっていなければ両方の極性で考える．
@@ -574,13 +576,17 @@ NpnMgr::w2max_recur(NpnConf& conf,
 
     ++ mW2max_count;
 
+#if 0
     if ( !conf.is_resolved() ) {
       w2refine(conf, g0);
     }
-
+#endif
     if ( conf.is_resolved() ) {
       if ( mMaxList.empty() ) {
 	mMaxList.push_back(conf);
+	NpnMap map1;
+	conf.set_map(map1);
+	mMaxFunc = conf.func().xform(map1);
       }
       else {
 	const NpnConf& max_conf = mMaxList.front();
@@ -602,15 +608,13 @@ NpnMgr::w2max_recur(NpnConf& conf,
 	if ( diff == 0 ) {
 	  // ここまでで決着が付かなければ真理値表ベクタの辞書式順序で比較する．
 	  NpnMap map1;
-	  max_conf.set_map(map1);
-	  NpnMap map2;
-	  conf.set_map(map2);
-	  TvFunc func1 = max_conf.func().xform(map1);
-	  TvFunc func2 = conf.func().xform(map2);
-	  if ( func1 < func2 ) {
+	  conf.set_map(map1);
+	  TvFunc func1 = conf.func().xform(map1);
+	  if ( mMaxFunc < func1 ) {
 	    diff = -1;
+	    mMaxFunc = func1;
 	  }
-	  else if ( func1 > func2 ) {
+	  else if ( mMaxFunc > func1 ) {
 	    diff = 1;
 	  }
 	}
@@ -649,10 +653,11 @@ NpnMgr::w2max_recur(NpnConf& conf,
     }
     // g0 の唯一のクラスの極性が未定
     NpnConf conf_p(conf);
-    conf_p.set_ic_pol(g0, 1);
+    ymuint c = conf.group_begin(g0);
+    conf_p.set_ic_pol(c, 1);
     w2max_recur(conf_p, g0);
 
-    conf.set_ic_pol(g0, 2);
+    conf.set_ic_pol(c, 2);
     // わざとループする．
   }
 }
