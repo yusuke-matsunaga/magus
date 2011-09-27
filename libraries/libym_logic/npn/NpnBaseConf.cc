@@ -142,7 +142,7 @@ NpnBaseConf::normalize()
       if ( stat ) {
 	// 対称だった
 	found = true;
-	if ( mW1[pos1] == 0 && ic_num(cid) == 1 ) {
+	if ( mW1[pos1] == 0 && ic_num(pos1) == 1 ) {
 	  // bi-symmetry かどうかチェックする
 	  bool stat = mFunc.check_sym(i, pos1, ~poldiff);
 	  if ( stat ) {
@@ -150,6 +150,10 @@ NpnBaseConf::normalize()
 	  }
 	}
 	add_elem(pos1, i);
+	// bi-symmetry なら2番め以降の入力の極性は固定できる．
+	if ( bisym(pos1) ) {
+	  mIpols[i] = 1;
+	}
 	break;
       }
       if ( mW1[i] == 0 ) {

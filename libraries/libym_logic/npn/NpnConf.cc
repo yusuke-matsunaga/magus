@@ -9,8 +9,6 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
-
 #include "NpnConf.h"
 #include "ym_logic/NpnMgr.h"
 
@@ -32,7 +30,12 @@ NpnConf::NpnConf() :
 NpnConf::NpnConf(const NpnBaseConf& base_conf)
 {
   mBaseConf = &base_conf;
-  mOpol = base_conf.opol();
+  if ( base_conf.opol() == 0 ) {
+    mOpol = 0;
+  }
+  else {
+    mOpol = 1;
+  }
   mGroupNum = 0;
   mIpolsValid = false;
   mIorderValid = false;
@@ -68,9 +71,11 @@ NpnConf::operator=(const NpnConf& src)
 NpnConf::NpnConf(const NpnConf& src,
 		 int pol)
 {
+  assert_cond(pol == 1 || pol == 2, __FILE__, __LINE__);
+  assert_cond( src.opol() == 0, __FILE__, __LINE__);
+
   copy(src);
   mOpol = pol;
-  assert_cond(pol == 1 || pol == 2, __FILE__, __LINE__);
 }
 
 // src からグループ g 内の c というクラスを切り出した
@@ -139,8 +144,20 @@ NpnConf::copy(const NpnConf& src)
 void
 NpnConf::validate_ipols() const
 {
+  bool iinv = ( mBaseConf->opol() == 0 && mOpol == 2 );
   for (ymuint i = 0; i < ni(); ++ i) {
     ymuint pol = mBaseConf->ipol(i);
+    if ( iinv && mBaseConf->walsh_1(i) != 0 ) {
+      switch ( pol ) {
+      case 1:
+	pol = 2;
+	break;
+
+      case 2:
+	pol = 1;
+	break;
+      }
+    }
     mIpols[i] = pol;
   }
   for (ymuint c = 0; c < nc(); ++ c) {
@@ -286,8 +303,8 @@ NpnConf::set_map(NpnMap& map) const
   }
 
   map.resize(mBaseConf->ni());
-  tPol opol = (mOpol == 2) ? kPolNega : kPolPosi;
-  map.set_opol(opol);
+  tPol op = (opol() == 2) ? kPolNega : kPolPosi;
+  map.set_opol(op);
   for (ymuint i = 0; i < mBaseConf->ni(); ++ i) {
     tPol ipol1 = (ipol(mIorder[i]) == 2) ? kPolNega : kPolPosi;
     map.set(mIorder[i], i, ipol1);
@@ -311,7 +328,7 @@ void
 NpnConf::dump(ostream& s) const
 {
   s << "opol: ";
-  switch ( mOpol ) {
+  switch ( opol() ) {
   case 0: s << "-"; break;
   case 1: s << "P"; break;
   case 2: s << "N"; break;

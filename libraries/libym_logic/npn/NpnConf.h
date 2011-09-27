@@ -49,6 +49,7 @@ public:
   /// @brief 出力極性を固定するコピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
   /// @param[in] pol 出力極性(-1/1)
+  /// @note src.opol() == 0 でなければならない．
   NpnConf(const NpnConf& src,
 	  int pol);
 
@@ -233,12 +234,6 @@ public:
 
 public:
 
-  /// @brief 出力極性の割り当ての設定
-  /// @param[in] val 割り当て状態
-  /// @sa opol
-  void
-  set_opol(int val);
-
   /// @brief 入力クラスの極性の割り当ての設定
   /// @param[in] pos 入力クラス番号
   /// @param[in] val 割り当て状態
@@ -370,7 +365,17 @@ inline
 int
 NpnConf::opol() const
 {
-  return mOpol;
+  //   0 1 2
+  // 0 0 - -
+  // 1 1 1 2
+  // 2 2 2 1
+  static int val[] = {
+    0, 0, 0,
+    1, 1, 2,
+    2, 2, 1
+  };
+
+  return val[mOpol * 3 + mBaseConf->opol()];
 }
 
 // @brief 入力極性の取得
@@ -606,14 +611,6 @@ NpnConf::w2eq(ymuint rep0,
   int v1 = walsh_2(rep0, rep1);
   int v2 = walsh_2(rep0, rep2);
   return v1 == v2;
-}
-
-// 出力極性の割り当ての設定
-inline
-void
-NpnConf::set_opol(int val)
-{
-  mOpol = val;
 }
 
 // @brief 入力グループの開始番号を追加する．
