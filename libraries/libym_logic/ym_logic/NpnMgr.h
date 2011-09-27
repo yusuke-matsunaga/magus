@@ -65,6 +65,13 @@ private:
   w2max_recur(NpnConf& conf,
 	      ymuint g0);
 
+  /// @brief シグネチャが最大になるように極性と順序を決める．
+  /// @param[out] conf
+  /// @param[in] g0 調べ始める最初のグループ番号
+  void
+  tvmax_recur(NpnConf& conf,
+	      ymuint g0);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -72,10 +79,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // w2max_recur で用いる現在の最適解のリスト
-  list<NpnConf> mMaxList;
+  vector<NpnConf> mMaxList;
 
   // 1回の cannonical あたりの w2max_recur の起動回数
   ymulong mW2max_count;
+
+  // 1回の cannonical あたりの tvmax_recur の起動回数
+  ymulong mTvmax_count;
 
   // w2max_recur で用いる現在の最大値
   TvFunc mMaxFunc;
