@@ -498,13 +498,16 @@ w2refine(NpnConf& conf,
     ymuint e = conf.group_end(g);
     if ( e - s == 1 && conf.ic_pol(s) != 0 ) {
       ymuint pos0 = conf.ic_rep(s);
-      queue[wp] = pos0;
+      queue[wp] = s;
       ++ wp;
     }
   }
 
   while ( wp > rp ) {
-    ymuint pos0 = queue[rp];
+    ymuint s = queue[rp];
+    ymuint pos0 = conf.is_rep(s);
+    ymint pol0 = conf.ic_pol(s);
+    bool inv0 = (pol0 == 2);
     ++ rp;
 
     ymuint c = 0;
@@ -517,15 +520,15 @@ w2refine(NpnConf& conf,
 	if ( conf.ic_pol(b) == 0 ) {
 	  // ても極性は確定していない場合
 	  ymuint pos1 = conf.ic_rep(b);
-	  int w2_1 = conf.walsh_2(pos0, pos1);
+	  int w2_1 = conf.walsh_2(pos0, inv0, pos1, false);
 	  if ( w2_1 < 0 ) {
 	    conf.set_ic_pol(b, 2);
-	    queue[wp] = pos1;
+	    queue[wp] = b;
 	    ++ wp;
 	  }
 	  else if ( w2_1 > 0 ) {
 	    conf.set_ic_pol(b, 1);
-	    queue[wp] = pos1;
+	    queue[wp] = b;
 	    ++ wp;
 	  }
 	  else {
@@ -541,7 +544,7 @@ w2refine(NpnConf& conf,
 	for (ymuint i = b; i < e; ++ i) {
 	  if ( conf.ic_pol(i) == 0 ) {
 	    ymuint pos1 = conf.ic_rep(i);
-	    int w2 = conf.walsh_2(pos0, pos1);
+	    int w2 = conf.walsh_2(pos0, inv0, pos1, false);
 	    if ( w2 > 0 ) {
 	      conf.set_ic_pol(i, 1);
 	    }
@@ -558,8 +561,7 @@ w2refine(NpnConf& conf,
 	for (ymuint j = g1; j < g1 + d; ++ j) {
 	  ymuint s = conf.group_begin(j);
 	  if ( conf.group_size(j) == 1 && conf.ic_pol(s) != 0 ) {
-	    ymuint pos1 = conf.ic_rep(s);
-	    queue[wp] = pos1;
+	    queue[wp] = s;
 	    ++ wp;
 	  }
 	  else {

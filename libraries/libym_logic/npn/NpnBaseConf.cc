@@ -49,6 +49,12 @@ NpnBaseConf::NpnBaseConf(const TvFunc& func) :
   mIcLink = new ymuint32[mNi];
 
   for (ymuint i = 0; i < mNi; ++ i) {
+    ymuint base = i * mNi;
+    for (ymuint j = 0; j <= i; ++ j) {
+      mW2flag[base + j] = 0;
+    }
+  }
+  for (ymuint i = 0; i < mNi; ++ i) {
     mIcNum[i] = 0;
     mIcLink[i] = static_cast<ymuint>(-1);
   }
@@ -73,11 +79,6 @@ NpnBaseConf::normalize()
   // Walsh の0次と1次の係数を計算する．
   // 2次の係数はオンデマンドで計算する．
   mW0 = mFunc.walsh_01(mW1);
-  for (ymuint i = 0; i < mNi; ++ i) {
-    for (ymuint j = 0; j < mNi; ++ j) {
-      mW2flag[i * mNi + j] = 0;
-    }
-  }
 
   if ( debug & debug_normalize ) {
     cout << "Before normalize" << endl;
@@ -172,6 +173,21 @@ NpnBaseConf::normalize()
     if ( !found ) {
       // 対称な入力が見つからなかった時には新たな入力クラスをつくる．
       new_ic(i);
+    }
+  }
+
+  // walsh_2 用の極性を計算しておく．
+  bool oinv = (mOpol == 2);
+  for (ymuint i = 0; i < mNi; ++ i) {
+    bool iinv1 = (mIpols[i] == 2) ^ oinv;
+    ymuint base = i * mNi;
+    for (ymuint j = 0; j <= i; ++ j) {
+      bool iinv2 = (mIpols[j] == 2);
+      int val = 0;
+      if ( iinv1 ^ iinv2 ) {
+	val = 2;
+      }
+      mW2flag[base + j] = val;
     }
   }
 

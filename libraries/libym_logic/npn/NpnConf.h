@@ -168,7 +168,9 @@ public:
   /// @brief Walsh の 2次係数を返す．
   int
   walsh_2(ymuint pos1,
-	  ymuint pos2) const;
+	  bool inv1,
+	  ymuint pos2,
+	  bool inv2) const;
 
   /// @brief Walsh の 2次係数を返す (入力順序付き)．
   int
@@ -566,16 +568,13 @@ NpnConf::dump_walsh(ostream& s) const
 inline
 int
 NpnConf::walsh_2(ymuint pos1,
-		 ymuint pos2) const
+		 bool inv1,
+		 ymuint pos2,
+		 bool inv2) const
 {
-  int w2 = func().walsh_2(pos1, pos2);
-  if ( ipol(pos1) == 2 ) {
-    w2 = -w2;
-  }
-  if ( ipol(pos2) == 2 ) {
-    w2 = -w2;
-  }
-  if ( opol() == 2 ) {
+  int w2 = mBaseConf->walsh_2(pos1, pos2);
+  bool inv = (mOpol == 2);
+  if ( inv ^ inv1 ^ inv2 ) {
     w2 = -w2;
   }
   return w2;

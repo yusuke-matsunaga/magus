@@ -286,19 +286,13 @@ NpnBaseConf::walsh_2(ymuint pos1,
     pos2 = tmp;
   }
   ymuint base = pos1 * ni() + pos2;
-  if ( mW2flag[base] == 0 ) {
+  if ( (mW2flag[base] & 1) == 0 ) {
     int w2 = mFunc.walsh_2(pos1, pos2);
-    if ( ipol(pos1) == 2 ) {
-      w2 = -w2;
-    }
-    if ( ipol(pos2) == 2 ) {
-      w2 = -w2;
-    }
-    if ( opol() == 2 ) {
+    if ( mW2flag[base] & 2 ) {
       w2 = -w2;
     }
     mW2[base] = w2;
-    mW2flag[base] = 1;
+    mW2flag[base] |= 1;
   }
   return mW2[base];
 }
