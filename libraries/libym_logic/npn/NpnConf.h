@@ -300,6 +300,7 @@ private:
   ymuint8 mOpol;
 
   // 入力クラスの順列
+  // インデックスはクラス番号で，
   // 各要素は下位2ビットで極性(0, 1, 2)，
   // 残りが入力配列へのインデックスを表す．
   ymuint32 mIcList[TvFunc::kMaxNi];
@@ -307,7 +308,10 @@ private:
   // グループ数
   ymuint32 mGroupNum;
 
-  // グループの先頭のインデックス
+  // グループの先頭のクラス番号を納める配列．
+  // i 番めのグループのクラス番号は
+  // mGroupTop[i] 〜 mGroupTop[i + 1] - 1
+  // に入っている．
   ymuint32 mGroupTop[TvFunc::kMaxNi + 1];
 
   // 入力の極性

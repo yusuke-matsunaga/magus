@@ -57,19 +57,18 @@ public:
 #endif
 
   /// @brief Walsh の 1次係数を得る．
-  /// @param[in] pos 入力番号
+  /// @param[in] pos 入力番号 ( 0 <= pos < ni() )
   int
   walsh_1(ymuint pos) const;
 
-#if 0
   /// @brief Walsh の 2次係数を得る．
-  /// @param[in] pos1, pos2 入力番号
+  /// @param[in] pos1, pos2 入力番号 ( 0 <= pos1, pos2 < ni() )
   /// @return pos1 番めと pos2 番めの入力に対応する Walsh の 2次係数を返す．
-  /// @note \f$0 \leq pos1, pos2 < ni()\f$
+  /// @note normalize() の結果の極性反転を考慮する．
   int
   walsh_2(ymuint pos1,
 	  ymuint pos2) const;
-#endif
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -198,13 +197,18 @@ private:
   ymint32 mW0;
 
   // Walsh の 1次係数
+  // 大きさ mNi の配列へのポインタ
   ymint32* mW1;
 
   // Walsh の 2次係数
+  // 大きさ mNi * mNi の配列へのポインタ
   mutable
   ymint32* mW2;
 
-  // mW2 が計算済みかどうかを記録するビットマップ
+  // mW2 が計算済みかどうかを記録するフラグ
+  // 大きさ mNi * mNi の配列へのポインタ
+  // 最下位ビットが計算済みかどうかのフラグ
+  // 1ビット目が極性反転を表すフラグ
   mutable
   ymuint8* mW2flag;
 
@@ -212,6 +216,7 @@ private:
   ymuint8 mOpol;
 
   // 入力極性を表す配列
+  // 大きさ mNi の配列へのポインタ
   // インデックスは入力番号
   ymuint8* mIpols;
 
@@ -268,7 +273,6 @@ NpnBaseConf::walsh_1(ymuint pos) const
   return mW1[pos];
 }
 
-#if 0
 // Walsh の 2次係数を得る．
 inline
 int
@@ -298,7 +302,6 @@ NpnBaseConf::walsh_2(ymuint pos1,
   }
   return mW2[base];
 }
-#endif
 
 // 出力極性を得る．
 inline
