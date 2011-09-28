@@ -176,6 +176,7 @@ NpnBaseConf::normalize()
     }
   }
 
+#if 0
   // walsh_2 用の極性を計算しておく．
   bool oinv = (mOpol == 2);
   for (ymuint i = 0; i < mNi; ++ i) {
@@ -190,6 +191,7 @@ NpnBaseConf::normalize()
       mW2flag[base + j] = val;
     }
   }
+#endif
 
 #if 0
   if ( mOpol == 0 ) {

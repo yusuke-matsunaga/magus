@@ -168,9 +168,7 @@ public:
   /// @brief Walsh の 2次係数を返す．
   int
   walsh_2(ymuint pos1,
-	  bool inv1,
-	  ymuint pos2,
-	  bool inv2) const;
+	  ymuint pos2) const;
 
   /// @brief Walsh の 2次係数を返す (入力順序付き)．
   int
@@ -278,10 +276,6 @@ private:
   void
   copy(const NpnConf& src);
 
-  /// @brief 入力の極性を正しくする．
-  void
-  validate_ipols() const;
-
   /// @brief 入力順序を正しくする．
   void
   validate_iorder() const;
@@ -301,6 +295,12 @@ private:
   // 2 : 否定
   ymuint8 mOpol;
 
+  // 入力の極性
+  // 0 : 未定
+  // 1 : 肯定
+  // 2 : 否定
+  ymuint8 mIpols[TvFunc::kMaxNi];
+
   // 入力クラスの順列
   // インデックスはクラス番号で，
   // 各要素は下位2ビットで極性(0, 1, 2)，
@@ -315,17 +315,6 @@ private:
   // mGroupTop[i] 〜 mGroupTop[i + 1] - 1
   // に入っている．
   ymuint32 mGroupTop[TvFunc::kMaxNi + 1];
-
-  // 入力の極性
-  // 0 : 未定
-  // 1 : 肯定
-  // 2 : 否定
-  mutable
-  ymuint8 mIpols[TvFunc::kMaxNi];
-
-  // mIpols が正しいとき true となるフラグ
-  mutable
-  bool mIpolsValid;
 
   // 入力の順序
   mutable
@@ -371,17 +360,7 @@ inline
 int
 NpnConf::opol() const
 {
-  //   0 1 2
-  // 0 0 - -
-  // 1 1 1 2
-  // 2 2 2 1
-  static int val[] = {
-    0, 0, 0,
-    1, 1, 2,
-    2, 2, 1
-  };
-
-  return val[mOpol * 3 + mBaseConf->opol()];
+  return mOpol;
 }
 
 // @brief 入力極性の取得
@@ -389,9 +368,6 @@ inline
 int
 NpnConf::ipol(ymuint pos) const
 {
-  if ( !mIpolsValid ) {
-    validate_ipols();
-  }
   return mIpols[pos];
 }
 
@@ -568,13 +544,13 @@ NpnConf::dump_walsh(ostream& s) const
 inline
 int
 NpnConf::walsh_2(ymuint pos1,
-		 bool inv1,
-		 ymuint pos2,
-		 bool inv2) const
+		 ymuint pos2) const
 {
   int w2 = mBaseConf->walsh_2(pos1, pos2);
-  bool inv = (mOpol == 2);
-  if ( inv ^ inv1 ^ inv2 ) {
+  bool oinv = (mOpol == 2);
+  bool iinv1 = (mIpols[pos1] == 2);
+  bool iinv2 = (mIpols[pos2] == 2);
+  if ( oinv ^ iinv1 ^ iinv2 ) {
     w2 = -w2;
   }
   return w2;
@@ -589,7 +565,9 @@ NpnConf::walsh_2i(ymuint pos1,
   if ( !mIorderValid ) {
     validate_iorder();
   }
-  return walsh_2(mIorder[pos1], mIorder[pos2]);
+  ymuint ipos1 = mIorder[pos1];
+  ymuint ipos2 = mIorder[pos2];
+  return walsh_2(ipos1, ipos2);
 }
 
 // @brief W2 を用いた大小比較関数

@@ -64,7 +64,6 @@ public:
   /// @brief Walsh の 2次係数を得る．
   /// @param[in] pos1, pos2 入力番号 ( 0 <= pos1, pos2 < ni() )
   /// @return pos1 番めと pos2 番めの入力に対応する Walsh の 2次係数を返す．
-  /// @note normalize() の結果の極性反転を考慮する．
   int
   walsh_2(ymuint pos1,
 	  ymuint pos2) const;
@@ -288,9 +287,11 @@ NpnBaseConf::walsh_2(ymuint pos1,
   ymuint base = pos1 * ni() + pos2;
   if ( (mW2flag[base] & 1) == 0 ) {
     int w2 = mFunc.walsh_2(pos1, pos2);
+#if 0
     if ( mW2flag[base] & 2 ) {
       w2 = -w2;
     }
+#endif
     mW2[base] = w2;
     mW2flag[base] |= 1;
   }

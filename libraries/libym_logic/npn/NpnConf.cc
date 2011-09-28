@@ -20,7 +20,6 @@ NpnConf::NpnConf() :
   mBaseConf(NULL),
   mOpol(0),
   mGroupNum(0),
-  mIpolsValid(false),
   mIorderValid(false)
 {
   mGroupTop[0] = 0;
@@ -30,14 +29,11 @@ NpnConf::NpnConf() :
 NpnConf::NpnConf(const NpnBaseConf& base_conf)
 {
   mBaseConf = &base_conf;
-  if ( base_conf.opol() == 0 ) {
-    mOpol = 0;
-  }
-  else {
-    mOpol = 1;
+  mOpol = base_conf.opol();
+  for (ymuint i = 0; i < ni(); ++ i) {
+    mIpols[i] = base_conf.ipol(i);
   }
   mGroupNum = 0;
-  mIpolsValid = false;
   mIorderValid = false;
 
   if ( nc() > 0 ) {
@@ -76,6 +72,19 @@ NpnConf::NpnConf(const NpnConf& src,
 
   copy(src);
   mOpol = pol;
+  if ( pol == 2 ) {
+    for (ymuint i = 0; i < ni(); ++ i) {
+      switch ( mIpols[i] ) {
+      case 1:
+	mIpols[i] = 2;
+	break;
+
+      case 2:
+	mIpols[i] = 1;
+	break;
+      }
+    }
+  }
 }
 
 // src からグループ g 内の c というクラスを切り出した
@@ -86,7 +95,9 @@ NpnConf::NpnConf(const NpnConf& src,
 {
   mBaseConf = src.mBaseConf;
   mOpol = src.mOpol;
-  mIpolsValid = false;
+  for (ymuint i = 0; i < ni(); ++ i) {
+    mIpols[i] = src.mIpols[i];
+  }
   mIorderValid = false;
 
   ymuint b = src.group_begin(g);
@@ -129,7 +140,9 @@ NpnConf::copy(const NpnConf& src)
 {
   mBaseConf = src.mBaseConf;
   mOpol = src.mOpol;
-  mIpolsValid = false;
+  for (ymuint i = 0; i < ni(); ++ i) {
+    mIpols[i] = src.mIpols[i];
+  }
   mIorderValid = false;
   for (ymuint i = 0; i < nc(); ++ i) {
     mIcList[i] = src.mIcList[i];
@@ -140,6 +153,7 @@ NpnConf::copy(const NpnConf& src)
   }
 }
 
+#if 0
 // @brief 入力の極性を正しくする．
 void
 NpnConf::validate_ipols() const
@@ -198,6 +212,7 @@ NpnConf::validate_ipols() const
   }
   mIpolsValid = true;
 }
+#endif
 
 // @brief 入力順序を正しくする．
 void
@@ -267,7 +282,29 @@ NpnConf::set_ic_pol(ymuint pos,
   assert_cond( ic_pol(pos) == 0, __FILE__, __LINE__);
   mIcList[pos] &= ~3;
   mIcList[pos] |= val;
-  mIpolsValid = false;
+  ymuint p = ic_rep(pos);
+  ymuint n;
+  if ( mBaseConf->bisym(p) ) {
+    n = 1;
+  }
+  else {
+    n = mBaseConf->ic_num(p);
+  }
+  for (ymuint i = 0; i < n; ++ i) {
+    switch ( mIpols[p] ) {
+    case 0:
+    case 1:
+      mIpols[p] = val;
+      break;
+
+    case 2:
+      if ( val == 2 ) {
+	mIpols[p] = 1;
+      }
+      break;
+    }
+    p = mBaseConf->ic_link(p);
+  }
 }
 
 // @brief 内容を NpnMap にセットする．
@@ -298,9 +335,6 @@ NpnConf::set_map(NpnMap& map) const
     validate_iorder();
   }
 #endif
-  if ( !mIpolsValid ) {
-    validate_ipols();
-  }
 
   map.resize(mBaseConf->ni());
   tPol op = (opol() == 2) ? kPolNega : kPolPosi;

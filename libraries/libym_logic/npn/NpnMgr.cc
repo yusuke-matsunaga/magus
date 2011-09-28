@@ -347,7 +347,7 @@ NpnMgr::cannonical(const TvFunc& func,
 #if 1
     mMaxFunc = TvFunc::const_zero(func.ni());
 
-#if 1
+#if 0
     // 以降の処理は単純化するために出力極性を固定で考える．
     if ( !conf0.is_opol_fixed() ) {
       // 出力極性が決まっていなければ両方の極性で考える．
@@ -497,7 +497,6 @@ w2refine(NpnConf& conf,
     ymuint s = conf.group_begin(g);
     ymuint e = conf.group_end(g);
     if ( e - s == 1 && conf.ic_pol(s) != 0 ) {
-      ymuint pos0 = conf.ic_rep(s);
       queue[wp] = s;
       ++ wp;
     }
@@ -505,9 +504,7 @@ w2refine(NpnConf& conf,
 
   while ( wp > rp ) {
     ymuint s = queue[rp];
-    ymuint pos0 = conf.is_rep(s);
-    ymint pol0 = conf.ic_pol(s);
-    bool inv0 = (pol0 == 2);
+    ymuint pos0 = conf.ic_rep(s);
     ++ rp;
 
     ymuint c = 0;
@@ -520,7 +517,7 @@ w2refine(NpnConf& conf,
 	if ( conf.ic_pol(b) == 0 ) {
 	  // ても極性は確定していない場合
 	  ymuint pos1 = conf.ic_rep(b);
-	  int w2_1 = conf.walsh_2(pos0, inv0, pos1, false);
+	  int w2_1 = conf.walsh_2(pos0, pos1);
 	  if ( w2_1 < 0 ) {
 	    conf.set_ic_pol(b, 2);
 	    queue[wp] = b;
@@ -544,7 +541,7 @@ w2refine(NpnConf& conf,
 	for (ymuint i = b; i < e; ++ i) {
 	  if ( conf.ic_pol(i) == 0 ) {
 	    ymuint pos1 = conf.ic_rep(i);
-	    int w2 = conf.walsh_2(pos0, inv0, pos1, false);
+	    int w2 = conf.walsh_2(pos0, pos1);
 	    if ( w2 > 0 ) {
 	      conf.set_ic_pol(i, 1);
 	    }
