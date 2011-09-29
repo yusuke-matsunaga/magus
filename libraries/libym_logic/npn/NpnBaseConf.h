@@ -284,18 +284,12 @@ NpnBaseConf::walsh_2(ymuint pos1,
     pos1 = pos2;
     pos2 = tmp;
   }
-  ymuint base = pos1 * ni() + pos2;
-  if ( (mW2flag[base] & 1) == 0 ) {
-    int w2 = mFunc.walsh_2(pos1, pos2);
-#if 0
-    if ( mW2flag[base] & 2 ) {
-      w2 = -w2;
-    }
-#endif
-    mW2[base] = w2;
-    mW2flag[base] |= 1;
+  ymuint index = pos1 * ni() + pos2;
+  if ( mW2flag[index] == 0 ) {
+    mW2[index] = mFunc.walsh_2(pos1, pos2);
+    mW2flag[index] = 1;
   }
-  return mW2[base];
+  return mW2[index];
 }
 
 // 出力極性を得る．

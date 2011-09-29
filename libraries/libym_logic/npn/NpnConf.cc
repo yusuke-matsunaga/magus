@@ -74,14 +74,16 @@ NpnConf::NpnConf(const NpnConf& src,
   mOpol = pol;
   if ( pol == 2 ) {
     for (ymuint i = 0; i < ni(); ++ i) {
-      switch ( mIpols[i] ) {
-      case 1:
-	mIpols[i] = 2;
-	break;
+      if ( mBaseConf->walsh_1(i) != 0 ) {
+	switch ( mIpols[i] ) {
+	case 1:
+	  mIpols[i] = 2;
+	  break;
 
-      case 2:
-	mIpols[i] = 1;
-	break;
+	case 2:
+	  mIpols[i] = 1;
+	  break;
+	}
       }
     }
   }
@@ -345,18 +347,6 @@ NpnConf::set_map(NpnMap& map) const
   }
 }
 
-
-BEGIN_NONAMESPACE
-ymuint
-fact(ymuint x)
-{
-  if ( x <= 2 ) {
-    return x;
-  }
-  return x * fact(x - 1);
-}
-END_NONAMESPACE
-
 // @brief 内容を出力する．
 void
 NpnConf::dump(ostream& s) const
@@ -383,14 +373,15 @@ NpnConf::dump(ostream& s) const
   }
   s << endl;
   s << "Input groups" << endl;
-  ymuint cmb = 1;
   for (ymuint g = 0; g < group_num(); ++ g) {
     ymuint b = group_begin(g);
     ymuint e = group_end(g);
-    cmb *= fact(group_size(g));
     for (ymuint j = b; j < e; ++ j) {
       ymuint pos1 = ic_rep(j);
-      ymint w1 = mBaseConf->walsh_1(pos1);
+      ymint w1 = func().walsh_1(pos1);
+      if ( (opol() == 2) ^ (ipol(pos1) == 2) ) {
+	w1 = -w1;
+      }
       s << " { " << w1;
       if ( mBaseConf->bisym(pos1) ) {
 	s << "*";

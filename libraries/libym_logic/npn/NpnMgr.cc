@@ -53,7 +53,7 @@ class W1CnumGt
 public:
 
   // コンストラクタ
-  W1CnumGt(const NpnConf& conf) :
+  W1CnumGt(const NpnBaseConf& conf) :
     mConf(conf)
   {
   }
@@ -73,7 +73,7 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  const NpnConf& mConf;
+  const NpnBaseConf& mConf;
 
 };
 
@@ -86,7 +86,7 @@ class W1CnumEq
 public:
 
   // コンストラクタ
-  W1CnumEq(const NpnConf& conf) :
+  W1CnumEq(const NpnBaseConf& conf) :
     mConf(conf)
   {
   }
@@ -106,7 +106,7 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  const NpnConf& mConf;
+  const NpnBaseConf& mConf;
 
 };
 
@@ -329,7 +329,7 @@ NpnMgr::cannonical(const TvFunc& func,
     }
 
     // W1:cnum:bisym を用いてグループわけを行う．
-    conf0.refine(0, W1CnumGt(conf0), W1CnumEq(conf0));
+    conf0.refine(0, W1CnumGt(base_conf), W1CnumEq(base_conf));
 
     if ( debug & debug_step1) {
       cout << "After step1" << endl;
@@ -347,7 +347,7 @@ NpnMgr::cannonical(const TvFunc& func,
 #if 1
     mMaxFunc = TvFunc::const_zero(func.ni());
 
-#if 0
+#if 1
     // 以降の処理は単純化するために出力極性を固定で考える．
     if ( !conf0.is_opol_fixed() ) {
       // 出力極性が決まっていなければ両方の極性で考える．
@@ -606,7 +606,7 @@ NpnMgr::w2max_recur(NpnConf& conf,
       }
       else {
 	int diff = 0;
-#if 0
+#if 1
 	const NpnConf& max_conf = mMaxList.front();
 	ymuint ni = max_conf.ni();
 	for (ymuint i = 0; i < ni - 1; ++ i) {

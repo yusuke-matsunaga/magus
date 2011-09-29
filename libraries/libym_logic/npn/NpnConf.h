@@ -221,16 +221,6 @@ public:
   void
   dump_walsh(ostream& s) const;
 
-  /// @brief rep1 が rep2 より大きければ true を返す．
-  bool
-  w1gt(ymuint rep1,
-       ymuint rep2) const;
-
-  /// @brief rep1 と rep2 が等しければ true を返す．
-  bool
-  w1eq(ymuint rep1,
-       ymuint rep2) const;
-
 
 public:
 
@@ -511,24 +501,6 @@ NpnConf::bisym(ymuint rep) const
   return mBaseConf->bisym(rep);
 }
 #endif
-
-// @brief rep1 が rep2 より大きければ true を返す．
-inline
-bool
-NpnConf::w1gt(ymuint rep1,
-	      ymuint rep2) const
-{
-  return mBaseConf->w1gt(rep1, rep2);
-}
-
-// @brief rep1 と rep2 が等しければ true を返す．
-inline
-bool
-NpnConf::w1eq(ymuint rep1,
-	      ymuint rep2) const
-{
-  return mBaseConf->w1eq(rep1, rep2);
-}
 
 #if 0
 // @brief Walsh 係数を出力する．
