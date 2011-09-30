@@ -24,6 +24,8 @@ libym_logic_npn_la_SOURCES = \
 	NpnConf.h \
 	NpnConf.cc \
 	NpnMgr.cc \
+	NpnMgrImpl.h \
+	NpnMgrImpl.cc \
 	NpnMap.cc \
 	NpnMapM.cc
 

@@ -1,8 +1,8 @@
-#ifndef YM_LOGIC_NPNMGR_H
-#define YM_LOGIC_NPNMGR_H
+#ifndef NPNMGRIMPL_H
+#define NPNMGRIMPL_H
 
-/// @file ym_logic/NpnMgr.h
-/// @brief NpnMgr のヘッダファイル
+/// @file NpnMgrImpl.h
+/// @brief NpnMgrImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -14,21 +14,21 @@
 
 BEGIN_NAMESPACE_YM_NPN
 
-class NpnMgrImpl;
+class NpnConf;
 
 //////////////////////////////////////////////////////////////////////
-/// @class NpnMgr NpnMgr.h "ym_logic/NpnMgr.h"
-/// @brief NPN同値類の正規形を求めるためのクラス
+/// @class NpnMgrImpl NpnMgrImpl.h "NpnMgrImpl.h"
+/// @brief NpnMgr の処理を実際に行う実装クラス
 //////////////////////////////////////////////////////////////////////
-class NpnMgr
+class NpnMgrImpl
 {
 public:
 
   /// @brief コンストラクタ
-  NpnMgr();
+  NpnMgrImpl();
 
   /// @brief デストラクタ
-  ~NpnMgr();
+  ~NpnMgrImpl();
 
 
 public:
@@ -65,14 +65,46 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief シグネチャが最大になるように極性と順序を決める．
+  /// @param[out] conf
+  /// @param[in] g0 調べ始める最初のグループ番号
+  void
+  w2max_recur(NpnConf& conf,
+	      ymuint g0);
+
+  /// @brief シグネチャが最大になるように極性と順序を決める．
+  /// @param[out] conf
+  /// @param[in] g0 調べ始める最初のグループ番号
+  void
+  tvmax_recur(NpnConf& conf,
+	      ymuint g0);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 実際の処理を行う実装クラス
-  NpnMgrImpl* mImpl;
+  // w2max_recur で用いる現在の最適解のリスト
+  vector<NpnConf> mMaxList;
+
+  // 1回の cannonical あたりの w2max_recur の起動回数
+  ymuint64 mW2max_count;
+
+  // 1回の cannonical あたりの tvmax_recur の起動回数
+  ymuint64 mTvmax_count;
+
+  // w2max_recur で用いる現在の最大値
+  TvFunc mMaxFunc;
+
+  // w2max_recur で用いる現在の w2 ベクタ
+  int mMaxW2[TvFunc::kMaxNi * TvFunc::kMaxNi];
 
 };
 
 END_NAMESPACE_YM_NPN
 
-#endif // YM_LOGIC_NPNMGR_H
+#endif // NPNMGRIMPL_H
