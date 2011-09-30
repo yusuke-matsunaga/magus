@@ -52,6 +52,12 @@ public:
   ymulong
   w2max_count() const;
 
+  /// @brief w2max_recur の起動回数を返す．
+  /// 直前の cannonical の呼び出しにおける
+  /// w2max_recur の起動回数を返す．
+  ymulong
+  tvmax_count() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

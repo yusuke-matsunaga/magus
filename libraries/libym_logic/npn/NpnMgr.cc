@@ -339,6 +339,7 @@ NpnMgr::cannonical(const TvFunc& func,
 
   mMaxList.clear();
   mW2max_count = 0;
+  mTvmax_count = 0;
 
   if ( conf0.is_resolved() ) {
     mMaxList.push_back(conf0);
@@ -433,6 +434,7 @@ NpnMgr::cannonical(const TvFunc& func,
   if ( debug & debug_final ) {
     cout << "Final Result" << endl;
     cout << " w2max_count: " << mW2max_count << endl;
+    cout << " w2max_count: " << mTvmax_count << endl;
     for (vector<NpnConf>::iterator p = mMaxList.begin();
 	 p != mMaxList.end(); ++ p) {
       const NpnConf& conf = *p;
@@ -472,11 +474,14 @@ NpnMgr::all_map(list<NpnMap>& map_list) const
 ymulong
 NpnMgr::w2max_count() const
 {
-#if 1
   return mW2max_count;
-#else
+}
+
+// @brief 直前の cannonical の呼び出しにおける w2max_recur の起動回数を返す．
+ymulong
+NpnMgr::tvmax_count() const
+{
   return mTvmax_count;
-#endif
 }
 
 
@@ -598,23 +603,68 @@ NpnMgr::w2max_recur(NpnConf& conf,
       w2refine(conf, g0);
     }
     if ( conf.is_resolved() ) {
-      if ( mMaxList.empty() ) {
-	mMaxList.push_back(conf);
+#if 0
+      TvFunc func1;
+      {
 	NpnMap map1;
 	conf.set_map(map1);
-	mMaxFunc = conf.func().xform(map1);
+	func1 = conf.func().xform(map1);
+      }
+      cout << "func1 = " << func1 << endl
+	     << "w2 = {";
+      ymuint ni = conf.ni();
+      for (ymuint i = 1; i < ni; ++ i) {
+	for (ymuint j = 0; j < i; ++ j) {
+	  int w2 = func1.walsh_2(i, j);
+	  cout << " " << w2;
+	}
+      }
+      cout << "}" << endl;
+#endif
+      if ( mMaxList.empty() ) {
+	mMaxList.push_back(conf);
+#if 0
+	mMaxFunc = func1;
+#else
+	{
+	  NpnMap map1;
+	  conf.set_map(map1);
+	  mMaxFunc = conf.func().xform(map1);
+	}
+#endif
+#if 0
+	cout << "mMaxFunc = " << mMaxFunc << endl
+	     << "w2 = {";
+	ymuint ni = conf.ni();
+	for (ymuint i = 1; i < ni; ++ i) {
+	  for (ymuint j = 0; j < i; ++ j) {
+	    int w2 = mMaxFunc.walsh_2(i, j);
+	    cout << " " << w2;
+	  }
+	}
+	cout << "}" << endl;
+#endif
       }
       else {
 	int diff = 0;
+	TvFunc func1;
 #if 1
-	const NpnConf& max_conf = mMaxList.front();
-	ymuint ni = max_conf.ni();
-	for (ymuint i = 0; i < ni - 1; ++ i) {
-	  for (ymuint j = i + 1; j < ni; ++ j) {
-	    int w2_1 = max_conf.walsh_2i(i, j);
+	ymuint ni = conf.ni();
+	for (ymuint i = 1; i < ni; ++ i) {
+	  for (ymuint j = 0; j < i; ++ j) {
+	    int w2_1 = mMaxFunc.walsh_2(i, j);
+#if 0
+	    int w2_2 = func1.walsh_2(i, j);
+#else
 	    int w2_2 = conf.walsh_2i(i, j);
+#endif
 	    diff = w2_1 - w2_2;
 	    if ( diff != 0 ) {
+	      if ( diff < 0 ) {
+		NpnMap map1;
+		conf.set_map(map1);
+		func1 = conf.func().xform(map1);
+	      }
 	      goto loop_exit;
 	    }
 	  }
@@ -623,9 +673,12 @@ NpnMgr::w2max_recur(NpnConf& conf,
 #endif
 	if ( diff == 0 ) {
 	  // ここまでで決着が付かなければ真理値表ベクタの辞書式順序で比較する．
-	  NpnMap map1;
-	  conf.set_map(map1);
-	  TvFunc func1 = conf.func().xform(map1);
+	  ++ mTvmax_count;
+	  {
+	    NpnMap map1;
+	    conf.set_map(map1);
+	    func1 = conf.func().xform(map1);
+	  }
 	  if ( mMaxFunc < func1 ) {
 	    diff = -1;
 	    mMaxFunc = func1;
@@ -638,6 +691,19 @@ NpnMgr::w2max_recur(NpnConf& conf,
 	  // 最大値の更新
 	  mMaxList.clear();
 	  mMaxList.push_back(conf);
+	  mMaxFunc = func1;
+#if 0
+	  cout << "mMaxFunc = " << mMaxFunc << endl
+	       << "w2 = {";
+	  ymuint ni = conf.ni();
+	  for (ymuint i = 1; i < ni; ++ i) {
+	    for (ymuint j = 0; j < i; ++ j) {
+	      int w2 = mMaxFunc.walsh_2(i, j);
+	      cout << " " << w2;
+	    }
+	  }
+	  cout << "}" << endl;
+#endif
 	}
 	else if ( diff == 0 ) {
 	  mMaxList.push_back(conf);

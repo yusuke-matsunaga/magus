@@ -76,6 +76,7 @@ gen(size_t ni,
   size_t frontier = 0;
   size_t num = 0;
   ymulong w2count_total = 0;
+  ymulong tvcount_total = 0;
   for ( ; ; ) {
     if ( verbose ) {
       if ( buff[frontier] ) {
@@ -98,6 +99,7 @@ gen(size_t ni,
       mgr.cannonical(func, map);
       if ( i == 0 ) {
 	w2count_total += mgr.w2max_count();
+	tvcount_total += mgr.tvmax_count();
       }
     }
     sw.stop();
@@ -136,6 +138,9 @@ gen(size_t ni,
        << "w2max_recur:             "
        << static_cast<double>(w2count_total) / static_cast<double>(num)
        << endl
+       << "tvmax_recur:             "
+       << static_cast<double>(tvcount_total) / static_cast<double>(num)
+       << endl
        << "NPN rep:                 " << repfunc_set.size() << endl
        << "AVE. CPU time(usec):     " << usec << endl;
 
@@ -158,7 +163,8 @@ rgen(size_t ni,
 
   init_random_seed(rseed);
 
-  size_t w2count_total = 0;
+  ymulong w2count_total = 0;
+  ymulong tvcount_total = 0;
   sw.reset();
   for (size_t k = 0; k < num; ++ k) {
     for (size_t i = 0; i < ni_exp; ++ i) {
@@ -180,6 +186,7 @@ rgen(size_t ni,
       mgr.cannonical(func, map);
       if ( i == 0 ) {
 	w2count_total += mgr.w2max_count();
+	tvcount_total += mgr.tvmax_count();
       }
     }
     sw.stop();
@@ -200,6 +207,9 @@ rgen(size_t ni,
        << endl
        << "w2max_recur:             "
        << static_cast<double>(w2count_total) / static_cast<double>(num)
+       << endl
+       << "tvmax_recur:             "
+       << static_cast<double>(tvcount_total) / static_cast<double>(num)
        << endl
        << "NPN rep:                 " << repfunc_set.size() << endl
        << "AVE. CPU time(usec):     " << usec << endl;
