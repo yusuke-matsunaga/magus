@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "NpnMgrImpl.h"
+
 #include "ym_logic/TvFunc.h"
 #include "ym_logic/NpnMgr.h"
-#include "NpnMgrImpl.h"
 #include "NpnBaseConf.h"
 #include "NpnConf.h"
 
@@ -602,6 +602,168 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
       w2refine(conf, g0);
     }
     if ( conf.is_resolved() ) {
+#if 0
+      TvFunc func1;
+      {
+	NpnMap map1;
+	conf.set_map(map1);
+	func1 = conf.func().xform(map1);
+      }
+      cout << "func1 = " << func1 << endl
+	     << "w2 = {";
+      ymuint ni = conf.ni();
+      for (ymuint i = 1; i < ni; ++ i) {
+	for (ymuint j = 0; j < i; ++ j) {
+	  int w2 = func1.walsh_2(i, j);
+	  cout << " " << w2;
+	}
+      }
+      cout << "}" << endl;
+#endif
+      if ( mMaxList.empty() ) {
+	mMaxList.push_back(conf);
+#if 0
+	mMaxFunc = func1;
+#else
+	{
+	  NpnMap map1;
+	  conf.set_map(map1);
+	  mMaxFunc = conf.func().xform(map1);
+	}
+#endif
+#if 0
+	cout << "mMaxFunc = " << mMaxFunc << endl
+	     << "w2 = {";
+	ymuint ni = conf.ni();
+	for (ymuint i = 1; i < ni; ++ i) {
+	  for (ymuint j = 0; j < i; ++ j) {
+	    int w2 = mMaxFunc.walsh_2(i, j);
+	    cout << " " << w2;
+	  }
+	}
+	cout << "}" << endl;
+#endif
+      }
+      else {
+	int diff = 0;
+	TvFunc func1;
+#if 1
+	ymuint ni = conf.ni();
+	for (ymuint i = 1; i < ni; ++ i) {
+	  for (ymuint j = 0; j < i; ++ j) {
+	    int w2_1 = mMaxFunc.walsh_2(i, j);
+#if 0
+	    int w2_2 = func1.walsh_2(i, j);
+#else
+	    int w2_2 = conf.walsh_2i(i, j);
+#endif
+	    diff = w2_1 - w2_2;
+	    if ( diff != 0 ) {
+	      if ( diff < 0 ) {
+		NpnMap map1;
+		conf.set_map(map1);
+		func1 = conf.func().xform(map1);
+	      }
+	      goto loop_exit;
+	    }
+	  }
+	}
+      loop_exit:
+#endif
+	if ( diff == 0 ) {
+	  // ここまでで決着が付かなければ真理値表ベクタの辞書式順序で比較する．
+	  ++ mTvmax_count;
+	  {
+	    NpnMap map1;
+	    conf.set_map(map1);
+	    func1 = conf.func().xform(map1);
+	  }
+	  if ( mMaxFunc < func1 ) {
+	    diff = -1;
+	    mMaxFunc = func1;
+	  }
+	  else if ( mMaxFunc > func1 ) {
+	    diff = 1;
+	  }
+	}
+	if ( diff < 0 ) {
+	  // 最大値の更新
+	  mMaxList.clear();
+	  mMaxList.push_back(conf);
+	  mMaxFunc = func1;
+#if 0
+	  cout << "mMaxFunc = " << mMaxFunc << endl
+	       << "w2 = {";
+	  ymuint ni = conf.ni();
+	  for (ymuint i = 1; i < ni; ++ i) {
+	    for (ymuint j = 0; j < i; ++ j) {
+	      int w2 = mMaxFunc.walsh_2(i, j);
+	      cout << " " << w2;
+	    }
+	  }
+	  cout << "}" << endl;
+#endif
+	}
+	else if ( diff == 0 ) {
+	  mMaxList.push_back(conf);
+	}
+      }
+      return;
+    }
+
+    // 確定している入力グループをスキップする．
+    for ( ; g0 < conf.group_num(); ++ g0) {
+      if ( conf.group_size(g0) > 1 ) {
+	break;
+      }
+      ymuint b = conf.group_begin(g0);
+      if ( conf.ic_pol(b) == 0 ) {
+	break;
+      }
+    }
+
+    if ( conf.group_size(g0) > 1 ) {
+      // g0 内に複数のクラスがあって順序は未確定
+      ymuint b = conf.group_begin(g0);
+      ymuint e = conf.group_end(g0);
+      for (ymuint i = b; i < e; ++ i) {
+	NpnConf conf_i(conf, g0, i);
+	w2max_recur(conf_i, g0);
+      }
+      return;
+    }
+    // g0 の唯一のクラスの極性が未定
+    NpnConf conf_p(conf);
+    ymuint c = conf.group_begin(g0);
+    conf_p.set_ic_pol(c, 1);
+    w2max_recur(conf_p, g0);
+
+    conf.set_ic_pol(c, 2);
+    // わざとループする．
+  }
+}
+
+
+// @brief シグネチャが最大になるように極性と順序を決める．
+void
+NpnMgrImpl::w2max_recur(NpnConf& conf,
+			ymuint g0,
+			ymuint g1)
+{
+  assert_cond( g0 > g1, __FILE__, __LINE__);
+
+  if ( debug & debug_w2max ) {
+    cout << "w2max_recur(" << g0 << ", " << g1 << ")" << endl;
+    conf.dump(cout);
+  }
+
+  ++ mW2max_count;
+
+  if ( !conf.is_resolved() ) {
+    w2refine(conf, g0);
+  }
+
+  if ( conf.is_resolved() ) {
 #if 0
       TvFunc func1;
       {

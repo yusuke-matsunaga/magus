@@ -33,7 +33,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 外部に公開している関数
+  // NpnMgr のための関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 論理関数の正規化を行う．
@@ -74,6 +74,14 @@ private:
   void
   w2max_recur(NpnConf& conf,
 	      ymuint g0);
+
+  /// @brief w2シグネチャが最大になるように極性と順序を決める．
+  /// @param[out] conf
+  /// @param[in] g0 調べ始める最初のグループ番号
+  void
+  w2max_recur(NpnConf& conf,
+	      ymuint g0,
+	      ymuint g1);
 
   /// @brief シグネチャが最大になるように極性と順序を決める．
   /// @param[out] conf
