@@ -744,18 +744,12 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
 			ymuint g0,
 			ymuint g1)
 {
-  assert_cond( g0 > g1, __FILE__, __LINE__);
-
   if ( debug & debug_w2max ) {
     cout << "w2max_recur(" << g0 << ", " << g1 << ")" << endl;
     conf.dump(cout);
   }
 
   ++ mW2max_count;
-
-  if ( !conf.is_resolved() ) {
-    w2refine(conf, g0);
-  }
 
   if ( conf.is_resolved() ) {
 #if 0
@@ -801,48 +795,14 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
 #endif
     }
     else {
-      int diff = 0;
-      TvFunc func1;
-#if 1
-      ymuint ni = conf.ni();
-      for (ymuint i = 1; i < ni; ++ i) {
-	for (ymuint j = 0; j < i; ++ j) {
-	  int w2_1 = mMaxFunc.walsh_2(i, j);
-#if 0
-	  int w2_2 = func1.walsh_2(i, j);
-#else
-	  int w2_2 = conf.walsh_2i(i, j);
-#endif
-	  diff = w2_1 - w2_2;
-	  if ( diff != 0 ) {
-	    if ( diff < 0 ) {
-	      NpnMap map1;
-	      conf.set_map(map1);
-	      func1 = conf.func().xform(map1);
-	    }
-	    goto loop_exit;
-	  }
-	}
+      // ここまでで決着が付かなければ真理値表ベクタの辞書式順序で比較する．
+      ++ mTvmax_count;
+      {
+	NpnMap map1;
+	conf.set_map(map1);
+	func1 = conf.func().xform(map1);
       }
-    loop_exit:
-#endif
-      if ( diff == 0 ) {
-	// ここまでで決着が付かなければ真理値表ベクタの辞書式順序で比較する．
-	++ mTvmax_count;
-	{
-	  NpnMap map1;
-	  conf.set_map(map1);
-	  func1 = conf.func().xform(map1);
-	}
-	if ( mMaxFunc < func1 ) {
-	  diff = -1;
-	  mMaxFunc = func1;
-	}
-	else if ( mMaxFunc > func1 ) {
-	  diff = 1;
-	}
-      }
-      if ( diff < 0 ) {
+      if ( mMaxFunc < func1 ) {
 	// 最大値の更新
 	mMaxList.clear();
 	mMaxList.push_back(conf);
@@ -859,12 +819,33 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
 	}
 	cout << "}" << endl;
 #endif
+	mMaxFunc = func1;
       }
-      else if ( diff == 0 ) {
+      else if ( mMaxFunc == func1 ) {
 	mMaxList.push_back(conf);
       }
     }
     return;
+  }
+
+  if ( conf.group_size(g0) > 1 ) {
+    ymuint b = conf.group_begin(g0);
+    ymuint e = conf.group_end(g0);
+    for (ymuint c0 = b; c0 < e; ++ c0) {
+      ymuint pos0 = conf.ic_rep(c0);
+      ymuint pol0 = conf.ic_pol(c0);
+    }
+  }
+  else {
+    ymuint c0 = conf.group_begin(g0);
+    ymuint pos0 = conf.ic_rep(c0);
+    ymuint pol0 = conf.ic_pol(c0);
+    if ( pol0 == 0 ) {
+    }
+    else {
+      bool inv0 = (pol0 == 2);
+
+    }
   }
 
   // 確定している入力グループをスキップする．
