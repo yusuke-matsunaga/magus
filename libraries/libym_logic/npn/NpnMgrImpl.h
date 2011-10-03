@@ -76,19 +76,16 @@ private:
 	      ymuint g0);
 
   /// @brief w2シグネチャが最大になるように極性と順序を決める．
-  /// @param[out] conf
+  /// @param[in] conf_list
   /// @param[in] g0 調べ始める最初のグループ番号
   void
-  w2max_recur(NpnConf& conf,
-	      ymuint g0,
-	      ymuint g1);
+  w2max_recur(const list<NpnConf>& conf_list,
+	      ymuint g0);
 
   /// @brief シグネチャが最大になるように極性と順序を決める．
-  /// @param[out] conf
-  /// @param[in] g0 調べ始める最初のグループ番号
+  /// @param[in] conf_list
   void
-  tvmax_recur(NpnConf& conf,
-	      ymuint g0);
+  tvmax_recur(const list<NpnConf>& conf_list);
 
 
 private:
