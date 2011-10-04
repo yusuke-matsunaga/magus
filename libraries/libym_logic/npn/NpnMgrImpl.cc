@@ -47,54 +47,29 @@ BEGIN_NAMESPACE_YM_NPN
 //////////////////////////////////////////////////////////////////////
 // W1:cnum:bisym を用いた比較関数
 //////////////////////////////////////////////////////////////////////
-class W1CnumGt
+class W1CnumCmp
 {
 public:
 
   // コンストラクタ
-  W1CnumGt(const NpnBaseConf& conf) :
+  W1CnumCmp(const NpnBaseConf& conf) :
     mConf(conf)
   {
   }
 
 
-  // 比較関数
+  // 大小比較関数
   bool
-  operator()(ymuint pos1,
-	     ymuint pos2)
+  gt(ymuint pos1,
+     ymuint pos2)
   {
     return mConf.w1gt(pos1, pos2);
   }
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  const NpnBaseConf& mConf;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-// W1:cnum:bisym を用いた等価比較関数
-//////////////////////////////////////////////////////////////////////
-class W1CnumEq
-{
-public:
-
-  // コンストラクタ
-  W1CnumEq(const NpnBaseConf& conf) :
-    mConf(conf)
-  {
-  }
-
-
-  // 比較関数
+  // 等価比較関数
   bool
-  operator()(ymuint pos1,
-	     ymuint pos2)
+  eq(ymuint pos1,
+     ymuint pos2)
   {
     return mConf.w1eq(pos1, pos2);
   }
@@ -113,62 +88,37 @@ private:
 //////////////////////////////////////////////////////////////////////
 // W2 を用いた大小比較関数
 //////////////////////////////////////////////////////////////////////
-class W2Gt
+class W2Cmp
 {
 public:
 
   // コンストラクタ
-  W2Gt(const NpnConf& conf,
-       ymuint pos0) :
+  W2Cmp(const NpnConf& conf,
+	ymuint pos0) :
     mConf(conf),
     mPos0(pos0)
   {
   }
 
 
-  // 比較関数
+  // 大小比較関数
   bool
-  operator()(ymuint pos1,
-	     ymuint pos2)
+  gt(ymuint pos1,
+     ymuint pos2)
   {
-    return mConf.w2gt(mPos0, pos1, pos2);
+    int v1 = mConf.walsh_2(mPos0, pos1);
+    int v2 = mConf.walsh_2(mPos0, pos2);
+    return v1 >= v2;
   }
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  const NpnConf& mConf;
-
-  ymuint32 mPos0;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-// W2 を用いた等価比較関数
-//////////////////////////////////////////////////////////////////////
-class W2Eq
-{
-public:
-
-  // コンストラクタ
-  W2Eq(const NpnConf& conf,
-       ymuint pos0) :
-    mConf(conf),
-    mPos0(pos0)
-  {
-  }
-
-
-  // 比較関数
+  // 等価比較関数
   bool
-  operator()(ymuint pos1,
-	     ymuint pos2)
+  eq(ymuint pos1,
+     ymuint pos2)
   {
-    return mConf.w2eq(mPos0, pos1, pos2);
+    int v1 = mConf.walsh_2(mPos0, pos1);
+    int v2 = mConf.walsh_2(mPos0, pos2);
+    return v1 == v2;
   }
 
 
@@ -328,7 +278,7 @@ NpnMgrImpl::cannonical(const TvFunc& func,
     }
 
     // W1:cnum:bisym を用いてグループわけを行う．
-    conf0.refine(0, W1CnumGt(base_conf), W1CnumEq(base_conf));
+    conf0.refine(0, W1CnumCmp(base_conf));
 
     if ( debug & debug_step1) {
       cout << "After step1" << endl;
@@ -541,7 +491,7 @@ w2refine(NpnConf& conf,
 	}
 
 	// 2次係数の降べきの順に並べ替える．
-	ymuint d = conf.refine(g1, W2Gt(conf, pos0), W2Eq(conf, pos0));
+	ymuint d = conf.refine(g1, W2Cmp(conf, pos0));
 
 	// 新しく増えたグループで確定したものがあるか調べる．
 	for (ymuint j = g1; j < g1 + d; ++ j) {
@@ -761,7 +711,7 @@ w2refine2(NpnConf& conf,
 
   if ( pol_fixed ) {
     // 2次係数の降べきの順に並べ替える．
-    conf.refine(g0, W2Gt(conf, pos0), W2Eq(conf, pos0));
+    conf.refine(g0, W2Cmp(conf, pos0));
   }
 }
 

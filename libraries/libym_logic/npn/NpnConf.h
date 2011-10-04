@@ -175,18 +175,6 @@ public:
   walsh_2i(ymuint pos1,
 	   ymuint pos2) const;
 
-  /// @brief W2 を用いた大小比較関数
-  bool
-  w2gt(ymuint rep0,
-       ymuint rep1,
-       ymuint rep2) const;
-
-  /// @brief W2 を用いた等価比較関数
-  bool
-  w2eq(ymuint rep0,
-       ymuint rep1,
-       ymuint rep2) const;
-
   /// @brief 内容を NpnMap にセットする．
   void
   set_map(NpnMap& map) const;
@@ -239,15 +227,12 @@ public:
 
   /// @brief グループの細分化を行う．
   /// @param[in] g0 対象のグループ番号
-  /// @param[in] gt 2つの入力クラスの大小比較関数オブジェクト
-  /// @param[in] eq 2つの入力クラスの等価比較関数オブジェクト
+  /// @param[in] cmp 2つの入力クラスの大小比較関数オブジェクト
   /// @return 増えたグループ数を返す．
-  template <typename T1,
-	    typename T2>
+  template <typename T>
   ymuint
   refine(ymuint g0,
-	 T1 gt,
-	 T2 eq);
+	 T cmp);
 
 
 public:
@@ -542,30 +527,6 @@ NpnConf::walsh_2i(ymuint pos1,
   return walsh_2(ipos1, ipos2);
 }
 
-// @brief W2 を用いた大小比較関数
-inline
-bool
-NpnConf::w2gt(ymuint rep0,
-	      ymuint rep1,
-	      ymuint rep2) const
-{
-  int v1 = walsh_2(rep0, rep1);
-  int v2 = walsh_2(rep0, rep2);
-  return v1 >= v2;
-}
-
-// @brief W2 を用いた等価比較関数
-inline
-bool
-NpnConf::w2eq(ymuint rep0,
-	      ymuint rep1,
-	      ymuint rep2) const
-{
-  int v1 = walsh_2(rep0, rep1);
-  int v2 = walsh_2(rep0, rep2);
-  return v1 == v2;
-}
-
 // @brief 入力グループの開始番号を追加する．
 // @param[in] index 先頭の入力クラス番号
 inline
@@ -579,21 +540,18 @@ NpnConf::add_ig(ymuint index)
 
 // @brief グループの細分化を行う．
 // @param[in] g0 対象のグループ番号
-// @param[in] gt 2つの入力クラスの大小比較関数オブジェクト
-// @param[in] eq 2つの入力クラスの等価比較関数オブジェクト
+// @param[in] cmp 2つの入力クラスの大小比較関数オブジェクト
 // @return 増えたグループ数を返す．
-template <typename T1,
-	  typename T2>
+template <typename T>
 inline
 ymuint
 NpnConf::refine(ymuint g0,
-		T1 gt,
-		T2 eq)
+		T cmp)
 {
   ymuint ng0 = group_num();
   ymuint s = group_begin(g0);
   ymuint e = group_end(g0);
-  // gt 関数にしたがって整列させる．
+  // 大小関数にしたがって整列させる．
   for (ymuint i = s + 1; i < e; ++ i) {
     int tmp1 = mIcList[i];
     ymuint pos1 = static_cast<ymuint>(tmp1 >> 2);
@@ -601,7 +559,7 @@ NpnConf::refine(ymuint g0,
     for ( ; j > s; -- j) {
       int tmp2 = mIcList[j - 1];
       ymuint pos2 = static_cast<ymuint>(tmp2 >> 2);
-      if ( gt(pos2, pos1) ) {
+      if ( cmp.gt(pos2, pos1) ) {
 	break;
       }
       mIcList[j] = tmp2;
@@ -611,11 +569,11 @@ NpnConf::refine(ymuint g0,
       mIorderValid = false;
     }
   }
-  // eq 関数にしたがってグループ化する．
+  // 等価なクラスをグループ化する．
   ymuint prev = ic_rep(s);
   for (ymuint i = s + 1; i < e; ++ i) {
     ymuint pos1 = ic_rep(i);
-    if ( !eq(prev, pos1) ) {
+    if ( !cmp.eq(prev, pos1) ) {
       // 新しいグループを作る．
       for (ymuint g1 = mGroupNum; g1 > g0; -- g1) {
 	mGroupTop[g1 + 1] = mGroupTop[g1];
