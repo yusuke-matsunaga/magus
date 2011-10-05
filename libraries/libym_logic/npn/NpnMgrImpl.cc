@@ -17,16 +17,11 @@
 
 BEGIN_NONAMESPACE
 
-const int debug_step1      = 0x0002;
-const int debug_ww0_refine = 0x0001;
-const int debug_step2      = 0x0004;
-const int debug_step3      = 0x0008;
-const int debug_step4      = 0x0010;
-const int debug_w2max      = 0x0020;
-const int debug_final      = 0x1000;
-const int debug_final_func = 0x0100;
-const int debug_none       = 0x0000;
-const int debug_all        = 0xffff;
+const int debug_ww0_refine  = 0x0001;
+const int debug_w2max_recur = 0x0010;
+const int debug_w2refine    = 0x0040;
+const int debug_none        = 0x0000;
+const int debug_all         = 0xffff;
 
 #ifdef YM_DEBUG
 #define DEBUG_FLAG debug_all
@@ -139,7 +134,8 @@ private:
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-NpnMgrImpl::NpnMgrImpl()
+NpnMgrImpl::NpnMgrImpl() :
+  mAlloc(sizeof(NpnConf), 1024)
 {
 }
 
@@ -161,7 +157,7 @@ ww0_refine(vector<NpnConf>& pollist)
   if ( debug & debug_ww0_refine ) {
     cout << "before ww0_refine()" << endl;
     for (ymuint i = 0; i < pollist.size(); ++ i) {
-      NpnConf& conf = pollist[i];
+      const NpnConf& conf = pollist[i];
       conf.dump(cout);
     }
     cout << endl;
@@ -169,7 +165,6 @@ ww0_refine(vector<NpnConf>& pollist)
 
   // 重み別 w0 係数を用いて極性の決定を行う．
   ymuint w = 0;
-  int max_d0array[TvFunc::kMaxNi + 1];
   for (w = 0; w <= ni && pollist.size() > 1; ++ w) {
     bool first = true;
     int max_d0 = 0;
@@ -197,13 +192,12 @@ ww0_refine(vector<NpnConf>& pollist)
     if ( wpos < pollist.size() ) {
       pollist.erase(pollist.begin() + wpos, pollist.end());
     }
-    max_d0array[w] = max_d0;
   }
 
   if ( debug & debug_ww0_refine ) {
     cout << "after ww0_refine()" << endl;
     for (ymuint i = 0; i < pollist.size(); ++ i) {
-      NpnConf& conf = pollist[i];
+      const NpnConf& conf = pollist[i];
       conf.dump(cout);
     }
     cout << endl;
@@ -216,7 +210,8 @@ END_NONAMESPACE
 // @brief func の正規化を行う．
 void
 NpnMgrImpl::cannonical(const TvFunc& func,
-		       NpnMap& cmap)
+		       NpnMap& cmap,
+		       int algorithm)
 {
   // 特例
   if ( func.ni() == 0 ) {
@@ -272,7 +267,7 @@ NpnMgrImpl::cannonical(const TvFunc& func,
   NpnConf conf0(base_conf);
 
   if ( !conf0.is_resolved() && conf0.nc() > 1 ) {
-    if ( debug & debug_step1) {
+    if ( debug ) {
       cout << "Before step1" << endl;
       conf0.dump(cout);
     }
@@ -280,7 +275,7 @@ NpnMgrImpl::cannonical(const TvFunc& func,
     // W1:cnum:bisym を用いてグループわけを行う．
     conf0.refine(0, W1CnumCmp(base_conf));
 
-    if ( debug & debug_step1) {
+    if ( debug ) {
       cout << "After step1" << endl;
       conf0.dump(cout);
     }
@@ -294,93 +289,169 @@ NpnMgrImpl::cannonical(const TvFunc& func,
     mMaxList.push_back(conf0);
   }
   else {
-#if 1
     mMaxFunc = TvFunc::const_zero(func.ni());
 
-    // 以降の処理は単純化するために出力極性を固定で考える．
-    if ( !conf0.is_opol_fixed() ) {
-      // 出力極性が決まっていなければ両方の極性で考える．
-      NpnConf conf_p(conf0, 1);
-      w2max_recur(conf_p, 0);
+    switch ( algorithm ) {
+    case 0:
+      // 以降の処理は単純化するために出力極性を固定で考える．
+      if ( !conf0.is_opol_fixed() ) {
+	// 出力極性が決まっていなければ両方の極性で考える．
+	NpnConf conf_p(conf0, 1);
+	w2max_recur(conf_p, 0);
 
-      NpnConf conf_n(conf0, 2);
-      w2max_recur(conf_n, 0);
-    }
-    else {
-      w2max_recur(conf0, 0);
-    }
-#else
-    // 最初に全ての極性を展開してしまう．
-    vector<NpnConf> pollist;
-    ymuint ulist[TvFunc::kMaxNi];
-    ymuint unum = 0;
-    for (ymuint c = 0; c < conf0.nc(); ++ c) {
-      if ( conf0.ic_pol(c) == 0 ) {
-	ulist[unum] = c;
-	++ unum;
+	NpnConf conf_n(conf0, 2);
+	w2max_recur(conf_n, 0);
       }
-    }
-    ymuint unum_pow = 1UL << unum;
-    pollist.reserve(unum_pow);
-    if ( conf0.is_opol_fixed() ) {
-      for (ymuint p = 0; p < unum_pow; ++ p) {
-	NpnConf conf(conf0);
-	for (ymuint i = 0; i < unum; ++ i) {
-	  ymuint c = ulist[i];
-	  if ( p & (1 << i) ) {
-	    // c のクラスを反転させる．
-	    conf.set_ic_pol(c, 2);
-	  }
-	  else {
-	    conf.set_ic_pol(c, 1);
+      else {
+	w2max_recur(conf0, 0);
+      }
+      break;
+
+    case 1:
+      {
+	vector<NpnConf> conf_list;
+	if ( conf0.is_opol_fixed() ) {
+	  conf_list.push_back(conf0);
+	}
+	else {
+	  NpnConf conf_p(conf0, 1);
+	  conf_list.push_back(conf_p);
+
+	  NpnConf conf_n(conf0, 2);
+	  conf_list.push_back(conf_n);
+	}
+	w2max_recur(conf_list, 0);
+      }
+      break;
+
+    case 2:
+      {
+	// 最初に全ての極性を展開してしまう．
+	vector<NpnConf> pollist;
+	ymuint ulist[TvFunc::kMaxNi];
+	ymuint unum = 0;
+	for (ymuint c = 0; c < conf0.nc(); ++ c) {
+	  if ( conf0.ic_pol(c) == 0 ) {
+	    ulist[unum] = c;
+	    ++ unum;
 	  }
 	}
-	pollist.push_back(conf);
-      }
-    }
-    else {
-      for (int opol = 1; opol <= 2; ++ opol) {
-	for (ymuint p = 0; p < unum_pow; ++ p) {
-	  NpnConf conf(conf0, opol);
-	  for (ymuint i = 0; i < unum; ++ i) {
-	    ymuint c = ulist[i];
-	    if ( p & (1 << i) ) {
-	      // c のクラスを反転させる．
-	      conf.set_ic_pol(c, 2);
+	ymuint unum_pow = 1UL << unum;
+	pollist.reserve(unum_pow);
+	if ( conf0.is_opol_fixed() ) {
+	  for (ymuint p = 0; p < unum_pow; ++ p) {
+	    NpnConf conf(conf0);
+	    for (ymuint i = 0; i < unum; ++ i) {
+	      ymuint c = ulist[i];
+	      if ( p & (1 << i) ) {
+		// c のクラスを反転させる．
+		conf.set_ic_pol(c, 2);
+	      }
+	      else {
+		conf.set_ic_pol(c, 1);
+	      }
 	    }
-	    else {
-	      conf.set_ic_pol(c, 1);
+	    pollist.push_back(conf);
+	  }
+	}
+	else {
+	  for (int opol = 1; opol <= 2; ++ opol) {
+	    for (ymuint p = 0; p < unum_pow; ++ p) {
+	      NpnConf conf(conf0, opol);
+	      for (ymuint i = 0; i < unum; ++ i) {
+		ymuint c = ulist[i];
+		if ( p & (1 << i) ) {
+		  // c のクラスを反転させる．
+		  conf.set_ic_pol(c, 2);
+		}
+		else {
+		  conf.set_ic_pol(c, 1);
+		}
+	      }
+	      pollist.push_back(conf);
 	    }
 	  }
-	  pollist.push_back(conf);
+	}
+	// それを WW0 を用いて制限する．
+	ww0_refine(pollist);
+	for (ymuint i = 0; i < pollist.size(); ++ i) {
+	  NpnConf& conf = pollist[i];
+	  w2max_recur(conf, 0);
 	}
       }
+      break;
+
+    case 3:
+      {
+	// 最初に全ての極性を展開してしまう．
+	vector<NpnConf> pollist;
+	ymuint ulist[TvFunc::kMaxNi];
+	ymuint unum = 0;
+	for (ymuint c = 0; c < conf0.nc(); ++ c) {
+	  if ( conf0.ic_pol(c) == 0 ) {
+	    ulist[unum] = c;
+	    ++ unum;
+	  }
+	}
+	ymuint unum_pow = 1UL << unum;
+	pollist.reserve(unum_pow);
+	if ( conf0.is_opol_fixed() ) {
+	  for (ymuint p = 0; p < unum_pow; ++ p) {
+	    NpnConf conf(conf0);
+	    for (ymuint i = 0; i < unum; ++ i) {
+	      ymuint c = ulist[i];
+	      if ( p & (1 << i) ) {
+		// c のクラスを反転させる．
+		conf.set_ic_pol(c, 2);
+	      }
+	      else {
+		conf.set_ic_pol(c, 1);
+	      }
+	    }
+	    pollist.push_back(conf);
+	  }
+	}
+	else {
+	  for (int opol = 1; opol <= 2; ++ opol) {
+	    for (ymuint p = 0; p < unum_pow; ++ p) {
+	      NpnConf conf(conf0, opol);
+	      for (ymuint i = 0; i < unum; ++ i) {
+		ymuint c = ulist[i];
+		if ( p & (1 << i) ) {
+		  // c のクラスを反転させる．
+		  conf.set_ic_pol(c, 2);
+		}
+		else {
+		  conf.set_ic_pol(c, 1);
+		}
+	      }
+	      pollist.push_back(conf);
+	    }
+	  }
+	}
+	// それを WW0 を用いて制限する．
+	ww0_refine(pollist);
+	w2max_recur(pollist, 0);
+      }
+      break;
     }
-    // それを WW0 を用いて制限する．
-    ww0_refine(pollist);
-    for (ymuint i = 0; i < pollist.size(); ++ i) {
-      NpnConf& conf = pollist[i];
-      w2max_recur(conf, 0);
-    }
-#endif
   }
 
-  if ( debug & debug_final ) {
+  if ( debug ) {
     cout << "Final Result" << endl;
+    cout << " algorithm:   " << algorithm << endl;
     cout << " w2max_count: " << mW2max_count << endl;
-    cout << " w2max_count: " << mTvmax_count << endl;
+    cout << " tvmax_count: " << mTvmax_count << endl;
     for (vector<NpnConf>::iterator p = mMaxList.begin();
 	 p != mMaxList.end(); ++ p) {
       const NpnConf& conf = *p;
       conf.dump(cout);
-      if ( debug & debug_final_func ) {
-	NpnMap map;
-	conf.set_map(map);
-	TvFunc func1 = func.xform(map);
-	cout << "map     : " << map << endl
-	     << "rep func: " << func1 << endl
-	     << endl;
-      }
+      NpnMap map;
+      conf.set_map(map);
+      TvFunc func1 = func.xform(map);
+      cout << "map     : " << map << endl
+	   << "rep func: " << func1 << endl
+	   << endl;
     }
     cout << endl;
   }
@@ -507,10 +578,6 @@ w2refine(NpnConf& conf,
 	g1 += d;
       }
     }
-    if ( debug & debug_step3 ) {
-      cout << "  pivot = " << pos0 << endl;
-      conf.dump(cout);
-    }
     if ( c == 0 ) {
       break;
     }
@@ -525,7 +592,7 @@ void
 NpnMgrImpl::w2max_recur(NpnConf& conf,
 			ymuint g0)
 {
-  if ( debug & debug_w2max ) {
+  if ( debug & debug_w2max_recur ) {
     cout << "w2max_recur(" << g0 << ")" << endl;
     conf.dump(cout);
   }
@@ -675,43 +742,73 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
 
 BEGIN_NONAMESPACE
 
-// @brief 確定した入力との w2 を用いて細分化する．
 void
-w2refine2(NpnConf& conf,
-	  ymuint g0)
+w2refine2_sub(NpnConf& conf,
+	      ymuint g0)
 {
-  // Walsh の 2次の係数を用いた細分化
+  if ( debug & debug_w2refine) {
+    cout << "conf" << endl;
+    conf.dump(cout);
+  }
 
-  assert_cond( conf.group_size(g0) == 1, __FILE__, __LINE__);
+  // 極性の確定を行う．
   ymuint c0 = conf.group_begin(g0);
   ymuint pos0 = conf.ic_rep(c0);
-  bool pol_fixed = ( conf.ic_pol(c0) != 0 );
-  if ( !pol_fixed ) {
-    // 極性が確定していない．
-    for (ymuint g1 = g0 + 1; g1 < conf.group_num(); ++ g1) {
-      ymuint b1 = conf.group_begin(g1);
-      ymuint e1 = conf.group_end(g1);
-      for (ymuint c = b1; c < e1; ++ c) {
-	ymuint pos1 = conf.ic_rep(c);
-	ymuint pol1 = conf.ic_pol(c);
-	if ( pol1 == 0 ) continue;
-	int w2 = conf.walsh_2(pos0, pos1);
-	if ( w2 == 0 ) continue;
-	if ( w2 > 0 ) {
-	  conf.set_ic_pol(c0, 1);
-	}
-	else if ( w2 < 0 ) {
-	  conf.set_ic_pol(c0, 2);
-	}
-	pol_fixed = true;
-	break;
+  ymuint cend = conf.group_end(conf.group_num() - 1);
+  for (ymuint c = c0 + 1; c < cend; ++ c) {
+    if ( conf.ic_pol(c) == 0 ) {
+      int w2 = conf.walsh_2(pos0, conf.ic_rep(c));
+      if ( w2 < 0 ) {
+	conf.set_ic_pol(c, 2);
+      }
+      else if ( w2 > 0 ) {
+	conf.set_ic_pol(c, 1);
       }
     }
   }
+  // 並べ替え＆グループ化を行う．
+  for (ymuint g = g0 + 1; g < conf.group_num(); ++ g) {
+    ymuint delta = conf.refine(g, W2Cmp(conf, pos0));
+    g += delta;
+  }
+  if ( debug & debug_w2refine) {
+    cout << " =>" << endl;
+    conf.dump(cout);
+    cout << endl;
+  }
+}
 
-  if ( pol_fixed ) {
+// @brief 確定した入力との w2 を用いて細分化する．
+void
+w2refine2(const NpnConf& conf,
+	  ymuint g0,
+	  list<NpnConf>& conf_list)
+{
+  // Walsh の 2次の係数を用いた細分化
+  if ( debug & debug_w2refine ) {
+    cout << endl
+	 << "w2refine2(g0 = " << g0 << ")" << endl;
+  }
+
+  assert_cond( conf.group_size(g0) == 1, __FILE__, __LINE__);
+  ymuint c0 = conf.group_begin(g0);
+  if ( conf.ic_pol(c0) == 0 ) {
+    // 極性が確定していない．
+    NpnConf conf_p(conf);
+    conf_p.set_ic_pol(c0, 1);
+    w2refine2_sub(conf_p, g0);
+    conf_list.push_back(conf_p);
+
+    NpnConf conf_n(conf);
+    conf_n.set_ic_pol(c0, 2);
+    w2refine2_sub(conf_n, g0);
+    conf_list.push_back(conf_n);
+  }
+  else {
     // 2次係数の降べきの順に並べ替える．
-    conf.refine(g0, W2Cmp(conf, pos0));
+    NpnConf conf1(conf);
+    w2refine2_sub(conf1, g0);
+    conf_list.push_back(conf1);
   }
 }
 
@@ -720,168 +817,156 @@ END_NONAMESPACE
 
 // @brief シグネチャが最大になるように極性と順序を決める．
 void
-NpnMgrImpl::w2max_recur(const list<NpnConf>& conf_list,
+NpnMgrImpl::w2max_recur(vector<NpnConf>& conf_list,
 			ymuint g0)
 {
-  assert_cond( !conf_list.empty(), __FILE__, __LINE__);
+  ymuint cend;
+  {
+    assert_cond( !conf_list.empty(), __FILE__, __LINE__);
+    const NpnConf& conf = conf_list.front();
+    cend = conf.group_end(conf.group_num() - 1);
+  }
 
-  if ( debug & debug_w2max ) {
-    cout << "w2max_recur()" << endl;
-    for (list<NpnConf>::const_iterator p = conf_list.begin();
-	 p != conf_list.end(); ++ p) {
-      const NpnConf& conf = *p;
-      conf.dump(cout);
+  while ( !conf_list.empty() ) {
+    if ( debug & debug_w2max_recur ) {
+      cout << endl
+	   << "w2max_recur(g0 = " << g0 << ")" << endl;
+      for (vector<NpnConf>::const_iterator p = conf_list.begin();
+	   p != conf_list.end(); ++ p) {
+	const NpnConf& conf = *p;
+	conf.dump(cout);
+      }
+      cout << endl;
     }
-    cout << "  g0 = " << g0 << endl;
-  }
 
-  ++ mW2max_count;
+    ++ mW2max_count;
 
-  const NpnConf& conf0 = conf_list.front();
-  if ( conf0.is_resolved() ) {
-    tvmax_recur(conf_list);
-  }
-  else {
-    int w2_max = -INT_MAX;
-    vector<ymuint> top_list;
+#if 0
+    for (ymuint c1 = 0; c1 < cend; ++ c1) {
+      mMaxW2[c1] = -INT_MAX;
+    }
+#endif
+    bool first = true;
     list<NpnConf> conf_list1;
-    for (list<NpnConf>::const_iterator p = conf_list.begin();
+    for (vector<NpnConf>::const_iterator p = conf_list.begin();
 	 p != conf_list.end(); ++ p) {
       const NpnConf& conf = *p;
+      if ( conf.is_resolved() ) {
+	++ mTvmax_count;
+
+	NpnMap map1;
+	conf.set_map(map1);
+	TvFunc func1 = conf.func().xform(map1);
+	if ( mMaxList.empty() ) {
+	  mMaxList.push_back(conf);
+	  mMaxFunc = func1;
+	}
+	else {
+	  // 真理値表ベクタの辞書式順序で比較する．
+	  if ( mMaxFunc < func1 ) {
+	    // 最大値の更新
+	    mMaxList.clear();
+	    mMaxList.push_back(conf);
+	    mMaxFunc = func1;
+	  }
+	  else if ( mMaxFunc == func1 ) {
+	    mMaxList.push_back(conf);
+	  }
+	}
+	continue;
+      }
+
+      list<NpnConf> tmp_list;
       if ( conf.group_size(g0) > 1 ) {
 	ymuint b = conf.group_begin(g0);
 	ymuint e = conf.group_end(g0);
-	top_list.reserve(top_list.size()  + conf.group_size(g0));
 	for (ymuint c0 = b; c0 < e; ++ c0) {
-	  ymuint pos0 = conf.ic_rep(c0);
-	  ymuint pol0 = conf.ic_pol(c0);
-	  for (ymuint c1 = b; c1 < e; ++ c1) {
-	    if ( c1 == c0 ) continue;
-	    ymuint pos1 = conf.ic_rep(c1);
-	    ymuint pol1 = conf.ic_pol(c1);
-	    int w2 = conf.walsh_2(pos0, pos1);
-	    if ( (pol0 == 0 || pol1  == 0) && w2 < 0 ) {
-	      w2 = -w2;
-	    }
-	    if ( w2_max <= w2 ) {
-	      if ( w2_max < w2 ) {
-		w2_max = w2;
-		top_list.clear();
-	      }
-	      NpnConf conf1(conf, g0, c0);
-	      w2refine2(conf1, g0);
-	      conf_list1.push_back(conf1);
-	    }
-	  }
+	  NpnConf conf1(conf, g0, c0);
+	  w2refine2(conf1, g0, tmp_list);
 	}
       }
       else {
+	w2refine2(conf, g0, tmp_list);
+      }
+
+      for (list<NpnConf>::iterator p = tmp_list.begin();
+	   p != tmp_list.end(); ++ p) {
+	const NpnConf& conf = *p;
 	ymuint c0 = conf.group_begin(g0);
 	ymuint pos0 = conf.ic_rep(c0);
 	ymuint pol0 = conf.ic_pol(c0);
-	ymuint b = conf.group_begin(g0 + 1);
-	ymuint e = conf.group_end(g0 + 1);
-	for (ymuint c1 = b; c1 < e; ++ c1) {
+	assert_cond( pol0 != 0, __FILE__, __LINE__);
+	int tmp_w2[TvFunc::kMaxNi];
+	for (ymuint c1 = c0 + 1; c1 < cend; ++ c1) {
 	  ymuint pos1 = conf.ic_rep(c1);
-	  ymuint pol1 = conf.ic_pol(c1);
-	  int w2 = conf.walsh_2(pos0, pos1);
-	  if ( (pol0 == 0 || pol1 == 0) && w2 < 0 ) {
-	    w2 = -w2;
+	  tmp_w2[c1] = conf.walsh_2(pos0, pos1);
+	}
+	if ( debug & debug_w2max_recur ) {
+	  cout << "tmp_w2 = ";
+	  for (ymuint c1 = c0 + 1; c1 < cend; ++ c1) {
+	    cout << " " << tmp_w2[c1];
 	  }
-	  if ( w2_max <= w2 ) {
-	    if ( w2_max < w2 ) {
-	      w2_max = w2;
-	      top_list.clear();
+	  cout << endl;
+	}
+	int diff = 0;
+	if ( first ) {
+	  first = false;
+	  diff = -1;
+	}
+	else {
+	  for (ymuint c1 = c0 + 1; c1 < cend; ++ c1) {
+	    int diff1 = mMaxW2[c1] - tmp_w2[c1];
+	    if ( diff1 != 0 ) {
+	      diff = diff1;
+	      break;
 	    }
-	    NpnConf conf1(conf, g0, c0);
-	    w2refine2(conf1, g0);
-	    conf_list1.push_back(conf1);
 	  }
+	}
+	if ( diff <= 0 ) {
+	  if ( diff < 0 ) {
+	    conf_list1.clear();
+	    for (ymuint c1 = c0 + 1; c1 < cend; ++ c1) {
+	      mMaxW2[c1] = tmp_w2[c1];
+	    }
+	  }
+	  conf_list1.push_back(conf);
 	}
       }
     }
-    bool first = true;
-    list<NpnConf> conf_list2;
+
+    if ( debug & debug_w2max_recur ) {
+      cout << "conf_list1 = " << endl;
+      for (list<NpnConf>::iterator p = conf_list1.begin();
+	   p != conf_list1.end(); ++ p) {
+	const NpnConf& conf = *p;
+	conf.dump(cout);
+      }
+      cout << endl;
+    }
+
+    conf_list.clear();
     for (list<NpnConf>::iterator p = conf_list1.begin();
 	 p != conf_list1.end(); ++ p) {
       const NpnConf& conf = *p;
-      ymuint c0 = conf.group_begin(g0);
-      ymuint pos0 = conf.ic_rep(c0);
-      ymuint pol0 = conf.ic_pol(c0);
-      ymuint idx = 0;
-      int tmp_w2[TvFunc::kMaxNi];
-      for (ymuint g1 = g0 + 1; g1 < conf.group_num(); ++ g1) {
-	ymuint b1 = conf.group_begin(g1);
-	ymuint e1 = conf.group_end(g1);
-	for (ymuint c1 = b1; c1 < e1; ++ c1) {
-	  ymuint pos1 = conf.ic_rep(c1);
-	  ymuint pol1 = conf.ic_pol(c1);
-	  int w2 = conf.walsh_2(pos0, pos1);
-	  tmp_w2[idx] = w2;
-	  ++ idx;
-	}
-      }
-      ymuint n = idx;
-      int diff = 0;
-      if ( first ) {
-	first = false;
-	diff = -1;
-      }
-      else {
-	for (ymuint i = 0; i < n; ++ i) {
-	  int diff1 = mMaxW2[i] - tmp_w2[i];
-	  if ( diff1 != 0 ) {
-	    diff = diff1;
-	    break;
-	  }
-	}
-      }
-      if ( diff <= 0 ) {
-	if ( diff < 0 ) {
-	  conf_list2.clear();
-	  for (ymuint i = 0; i < n; ++ i) {
-	    mMaxW2[i] = tmp_w2[i];
-	  }
-	}
-	conf_list2.push_back(conf);
-      }
+      conf_list.push_back(conf);
     }
-    w2max_recur(conf_list2, g0 + 1);
+    ++ g0;
   }
 }
 
-
-// @brief シグネチャが最大になるように極性と順序を決める．
-void
-NpnMgrImpl::tvmax_recur(const list<NpnConf>& conf_list)
+// @brief NpnConf を取り出す．
+NpnConf*
+NpnMgrImpl::new_npnconf()
 {
-  for (list<NpnConf>::const_iterator p = conf_list.begin();
-       p != conf_list.end(); ++ p) {
-    const NpnConf& conf = *p;
-    assert_cond( conf.is_resolved(), __FILE__, __LINE__);
+  void* p = mAlloc.get_memory(sizeof(NpnConf));
+  return new (p) NpnConf;
+}
 
-    ++ mTvmax_count;
-
-    NpnMap map1;
-    conf.set_map(map1);
-    TvFunc func1 = conf.func().xform(map1);
-    if ( mMaxList.empty() ) {
-      mMaxList.push_back(conf);
-      mMaxFunc = func1;
-    }
-    else {
-      // 真理値表ベクタの辞書式順序で比較する．
-      if ( mMaxFunc < func1 ) {
-	// 最大値の更新
-	mMaxList.clear();
-	mMaxList.push_back(conf);
-	mMaxFunc = func1;
-      }
-      else if ( mMaxFunc == func1 ) {
-	mMaxList.push_back(conf);
-      }
-    }
-  }
+// @brief NpnConf を使用可能リストに戻す．
+void
+NpnMgrImpl::free_npnconf(NpnConf* conf)
+{
+  mAlloc.put_memory(sizeof(NpnConf), conf);
 }
 
 END_NAMESPACE_YM_NPN

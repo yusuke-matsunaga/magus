@@ -10,6 +10,7 @@
 
 
 #include "ym_logic/NpnMap.h"
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_NPN
@@ -43,7 +44,8 @@ public:
   /// @note 同位体変換がある時は次の all_map() で取得する．
   void
   cannonical(const TvFunc& func,
-	     NpnMap& cmap);
+	     NpnMap& cmap,
+	     int algorithm);
 
   /// @brief 直前の cannonical の呼び出しにおける NpnMap の全候補を返す．
   /// @param[out] map_list 変換マップを格納するリスト
@@ -79,13 +81,16 @@ private:
   /// @param[in] conf_list
   /// @param[in] g0 調べ始める最初のグループ番号
   void
-  w2max_recur(const list<NpnConf>& conf_list,
+  w2max_recur(vector<NpnConf>& conf_list,
 	      ymuint g0);
 
-  /// @brief シグネチャが最大になるように極性と順序を決める．
-  /// @param[in] conf_list
+  /// @brief NpnConf を取り出す．
+  NpnConf*
+  new_npnconf();
+
+  /// @brief NpnConf を使用可能リストに戻す．
   void
-  tvmax_recur(const list<NpnConf>& conf_list);
+  free_npnconf(NpnConf* conf);
 
 
 private:
@@ -107,6 +112,9 @@ private:
 
   // w2max_recur で用いる現在の w2 ベクタ
   int mMaxW2[TvFunc::kMaxNi * TvFunc::kMaxNi];
+
+  // NpnConf 用のアロケータ
+  UnitAlloc mAlloc;
 
 };
 

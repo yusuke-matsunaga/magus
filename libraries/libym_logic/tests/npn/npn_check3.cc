@@ -62,7 +62,8 @@ str2vect(size_t ni,
 void
 gen(size_t ni,
     size_t limit,
-    size_t flow)
+    size_t flow,
+    int algorithm)
 {
   hash_set<TvFunc> repfunc_set;
 
@@ -96,7 +97,7 @@ gen(size_t ni,
 
     sw.start();
     for (size_t i = 0; i < mag; ++ i) {
-      mgr.cannonical(func, map);
+      mgr.cannonical(func, map, algorithm);
       if ( i == 0 ) {
 	w2count_total += mgr.w2max_count();
 	tvcount_total += mgr.tvmax_count();
@@ -154,7 +155,8 @@ void
 rgen(size_t ni,
      int rseed,
      size_t num,
-     size_t flow)
+     size_t flow,
+     int algorithm)
 {
   hash_set<TvFunc> repfunc_set;
 
@@ -183,7 +185,7 @@ rgen(size_t ni,
 
     sw.start();
     for (size_t i = 0; i < mag; ++ i) {
-      mgr.cannonical(func, map);
+      mgr.cannonical(func, map, algorithm);
       if ( i == 0 ) {
 	w2count_total += mgr.w2max_count();
 	tvcount_total += mgr.tvmax_count();
@@ -218,8 +220,7 @@ rgen(size_t ni,
 void
 rgen_walsh(size_t ni,
 	   int rseed,
-	   size_t num,
-	   size_t flow)
+	   size_t num)
 {
   hash_set<TvFunc> repfunc_set;
 
@@ -242,7 +243,7 @@ rgen_walsh(size_t ni,
 
     TvFunc func(ni, buff);
     int w1[TvFunc::kMaxNi];
-    int w2[TvFunc::kMaxNi * TvFunc::kMaxNi];
+    //int w2[TvFunc::kMaxNi * TvFunc::kMaxNi];
 
     sw.start();
     for (size_t i = 0; i < mag; ++ i) {
@@ -263,7 +264,8 @@ rgen_walsh(size_t ni,
 
 void
 read_func(const char* filename,
-	  size_t flow)
+	  size_t flow,
+	  int algorithm)
 {
   ifstream fs;
   fs.open(filename);
@@ -297,7 +299,7 @@ read_func(const char* filename,
     ++ num;
     sw.start();
     for (size_t i = 0; i < mag; ++ i) {
-      mgr.cannonical(func, map);
+      mgr.cannonical(func, map, algorithm);
       if ( i == 0 ) {
 	w2count_total += mgr.w2max_count();
       }
@@ -317,7 +319,8 @@ void
 verify(size_t ni,
        size_t rseed,
        size_t num,
-       size_t flow)
+       size_t flow,
+       int algorithm)
 {
   init_random_seed(rseed);
 
@@ -339,7 +342,7 @@ verify(size_t ni,
     NpnMgr mgr;
     NpnMap map0;
     sw.start();
-    mgr.cannonical(orig_func, map0);
+    mgr.cannonical(orig_func, map0, algorithm);
     sw.stop();
     ++ c;
 
@@ -375,7 +378,7 @@ verify(size_t ni,
 	NpnMgr mgr;
 	NpnMap repmap;
 	sw.start();
-	mgr.cannonical(tmp_func, repmap);
+	mgr.cannonical(tmp_func, repmap, algorithm);
 	sw.stop();
 	++ c;
 
@@ -431,6 +434,7 @@ main(int argc,
      const char** argv)
 {
 #if HAVE_POPT
+  int algorithm = 0;
   int mode = 0;
   int step1mode = 1;
   int step2mode = 1;
@@ -453,6 +457,9 @@ main(int argc,
     // argstr
     { "verbose", 'v', POPT_ARG_NONE, &verbose, 0,
       "enable verbose mode", NULL },
+
+    { "algorithm", 'a', POPT_ARG_INT, &algorithm, 0,
+      "specify algorithm", "[0-3]"},
 
     { "gen", 'g', POPT_ARG_NONE, NULL, 1,
       "generate all NPN equivalent functions mode", NULL },
@@ -550,40 +557,43 @@ main(int argc,
   if ( finish ) {
     flow |= 1024;
   }
+#if !defined(YM_DEBUG)
   try {
+#endif
     switch ( mode ) {
     case 1: // gen
-      gen(ni, 0, flow);
+      gen(ni, 0, flow, algorithm);
       break;
 
     case 2: // rgen
       init_random_seed(rseed);
-      rgen(ni, rseed, rnum, flow);
+      rgen(ni, rseed, rnum, flow, algorithm);
       break;
 
     case 3: // verify
-      verify(ni, rseed, rnum, flow);
+      verify(ni, rseed, rnum, flow, algorithm);
       break;
 
     case 4: // function
-      read_func(argname, flow);
+      read_func(argname, flow, algorithm);
       break;
 
     case 5: // rgen_walsh
       init_random_seed(rseed);
-      rgen_walsh(ni, rseed, rnum, flow);
+      rgen_walsh(ni, rseed, rnum);
       break;
 
     default:
       usage(argv[0]);
       exit(1);
     }
+#if !defined(YM_DEBUG)
   }
 
   catch ( nsYm::AssertError x ) {
     cerr << x << endl;
   }
-
+#endif
 #else
 
   int base = 1;

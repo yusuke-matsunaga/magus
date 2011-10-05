@@ -43,7 +43,8 @@ public:
   /// @note 同位体変換がある時は次の all_map() で取得する．
   void
   cannonical(const TvFunc& func,
-	     NpnMap& cmap);
+	     NpnMap& cmap,
+	     int algorithm);
 
   /// @brief 直前の cannonical の呼び出しにおける NpnMap の全候補を返す．
   /// @param[out] map_list 変換マップを格納するリスト

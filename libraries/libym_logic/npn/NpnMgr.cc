@@ -32,9 +32,10 @@ NpnMgr::~NpnMgr()
 // @brief func の正規化を行う．
 void
 NpnMgr::cannonical(const TvFunc& func,
-		   NpnMap& cmap)
+		   NpnMap& cmap,
+		   int algorithm)
 {
-  mImpl->cannonical(func, cmap);
+  mImpl->cannonical(func, cmap, algorithm);
 }
 
 // @brief 直前の cannonical の呼び出しにおける NpnMap の全候補を返す．
