@@ -70,6 +70,22 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief DFS
+  void
+  algorithm0(const NpnConf& conf);
+
+  /// @brief BFS
+  void
+  algorithm1(const NpnConf& conf);
+
+  /// @brief 極性を展開した後で DFS
+  void
+  algorithm2(const NpnConf& conf);
+
+  /// @brief 極性を展開した後で BFS
+  void
+  algorithm3(const NpnConf& conf);
+
   /// @brief シグネチャが最大になるように極性と順序を決める．
   /// @param[out] conf
   /// @param[in] g0 調べ始める最初のグループ番号

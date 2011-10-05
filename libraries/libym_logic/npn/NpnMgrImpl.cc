@@ -293,146 +293,23 @@ NpnMgrImpl::cannonical(const TvFunc& func,
 
     switch ( algorithm ) {
     case 0:
-      // 以降の処理は単純化するために出力極性を固定で考える．
-      if ( !conf0.is_opol_fixed() ) {
-	// 出力極性が決まっていなければ両方の極性で考える．
-	NpnConf conf_p(conf0, 1);
-	w2max_recur(conf_p, 0);
-
-	NpnConf conf_n(conf0, 2);
-	w2max_recur(conf_n, 0);
-      }
-      else {
-	w2max_recur(conf0, 0);
-      }
+      algorithm0(conf0);
       break;
 
     case 1:
-      {
-	vector<NpnConf> conf_list;
-	if ( conf0.is_opol_fixed() ) {
-	  conf_list.push_back(conf0);
-	}
-	else {
-	  NpnConf conf_p(conf0, 1);
-	  conf_list.push_back(conf_p);
-
-	  NpnConf conf_n(conf0, 2);
-	  conf_list.push_back(conf_n);
-	}
-	w2max_recur(conf_list, 0);
-      }
+      algorithm1(conf0);
       break;
 
     case 2:
-      {
-	// 最初に全ての極性を展開してしまう．
-	vector<NpnConf> pollist;
-	ymuint ulist[TvFunc::kMaxNi];
-	ymuint unum = 0;
-	for (ymuint c = 0; c < conf0.nc(); ++ c) {
-	  if ( conf0.ic_pol(c) == 0 ) {
-	    ulist[unum] = c;
-	    ++ unum;
-	  }
-	}
-	ymuint unum_pow = 1UL << unum;
-	pollist.reserve(unum_pow);
-	if ( conf0.is_opol_fixed() ) {
-	  for (ymuint p = 0; p < unum_pow; ++ p) {
-	    NpnConf conf(conf0);
-	    for (ymuint i = 0; i < unum; ++ i) {
-	      ymuint c = ulist[i];
-	      if ( p & (1 << i) ) {
-		// c のクラスを反転させる．
-		conf.set_ic_pol(c, 2);
-	      }
-	      else {
-		conf.set_ic_pol(c, 1);
-	      }
-	    }
-	    pollist.push_back(conf);
-	  }
-	}
-	else {
-	  for (int opol = 1; opol <= 2; ++ opol) {
-	    for (ymuint p = 0; p < unum_pow; ++ p) {
-	      NpnConf conf(conf0, opol);
-	      for (ymuint i = 0; i < unum; ++ i) {
-		ymuint c = ulist[i];
-		if ( p & (1 << i) ) {
-		  // c のクラスを反転させる．
-		  conf.set_ic_pol(c, 2);
-		}
-		else {
-		  conf.set_ic_pol(c, 1);
-		}
-	      }
-	      pollist.push_back(conf);
-	    }
-	  }
-	}
-	// それを WW0 を用いて制限する．
-	ww0_refine(pollist);
-	for (ymuint i = 0; i < pollist.size(); ++ i) {
-	  NpnConf& conf = pollist[i];
-	  w2max_recur(conf, 0);
-	}
-      }
+      algorithm2(conf0);
       break;
 
     case 3:
-      {
-	// 最初に全ての極性を展開してしまう．
-	vector<NpnConf> pollist;
-	ymuint ulist[TvFunc::kMaxNi];
-	ymuint unum = 0;
-	for (ymuint c = 0; c < conf0.nc(); ++ c) {
-	  if ( conf0.ic_pol(c) == 0 ) {
-	    ulist[unum] = c;
-	    ++ unum;
-	  }
-	}
-	ymuint unum_pow = 1UL << unum;
-	pollist.reserve(unum_pow);
-	if ( conf0.is_opol_fixed() ) {
-	  for (ymuint p = 0; p < unum_pow; ++ p) {
-	    NpnConf conf(conf0);
-	    for (ymuint i = 0; i < unum; ++ i) {
-	      ymuint c = ulist[i];
-	      if ( p & (1 << i) ) {
-		// c のクラスを反転させる．
-		conf.set_ic_pol(c, 2);
-	      }
-	      else {
-		conf.set_ic_pol(c, 1);
-	      }
-	    }
-	    pollist.push_back(conf);
-	  }
-	}
-	else {
-	  for (int opol = 1; opol <= 2; ++ opol) {
-	    for (ymuint p = 0; p < unum_pow; ++ p) {
-	      NpnConf conf(conf0, opol);
-	      for (ymuint i = 0; i < unum; ++ i) {
-		ymuint c = ulist[i];
-		if ( p & (1 << i) ) {
-		  // c のクラスを反転させる．
-		  conf.set_ic_pol(c, 2);
-		}
-		else {
-		  conf.set_ic_pol(c, 1);
-		}
-	      }
-	      pollist.push_back(conf);
-	    }
-	  }
-	}
-	// それを WW0 を用いて制限する．
-	ww0_refine(pollist);
-	w2max_recur(pollist, 0);
-      }
+      algorithm3(conf0);
+      break;
+
+    default:
+      algorithm0(conf0);
       break;
     }
   }
@@ -487,6 +364,158 @@ ymulong
 NpnMgrImpl::tvmax_count() const
 {
   return mTvmax_count;
+}
+
+// @brief DFS
+void
+NpnMgrImpl::algorithm0(const NpnConf& conf)
+{
+  // 以降の処理は単純化するために出力極性を固定で考える．
+  if ( conf.is_opol_fixed() ) {
+    NpnConf conf1(conf);
+    w2max_recur(conf1, 0);
+  }
+  else {
+    // 出力極性が決まっていなければ両方の極性で考える．
+    NpnConf conf_p(conf, 1);
+    w2max_recur(conf_p, 0);
+
+    NpnConf conf_n(conf, 2);
+    w2max_recur(conf_n, 0);
+  }
+}
+
+// @brief BFS
+void
+NpnMgrImpl::algorithm1(const NpnConf& conf)
+{
+  vector<NpnConf> conf_list;
+  if ( conf.is_opol_fixed() ) {
+    conf_list.push_back(conf);
+  }
+  else {
+    NpnConf conf_p(conf, 1);
+    conf_list.push_back(conf_p);
+
+    NpnConf conf_n(conf, 2);
+    conf_list.push_back(conf_n);
+  }
+  w2max_recur(conf_list, 0);
+}
+
+// @brief 極性を展開した後で DFS
+void
+NpnMgrImpl::algorithm2(const NpnConf& conf)
+{
+  // 最初に全ての極性を展開してしまう．
+  vector<NpnConf> pollist;
+  ymuint ulist[TvFunc::kMaxNi];
+  ymuint unum = 0;
+  for (ymuint c = 0; c < conf.nc(); ++ c) {
+    if ( conf.ic_pol(c) == 0 ) {
+      ulist[unum] = c;
+      ++ unum;
+    }
+  }
+  ymuint unum_pow = 1UL << unum;
+  if ( conf.is_opol_fixed() ) {
+    pollist.reserve(unum_pow);
+    for (ymuint p = 0; p < unum_pow; ++ p) {
+      NpnConf conf1(conf);
+      for (ymuint i = 0; i < unum; ++ i) {
+	ymuint c = ulist[i];
+	if ( p & (1 << i) ) {
+	  // c のクラスを反転させる．
+	  conf1.set_ic_pol(c, 2);
+	}
+	else {
+	  conf1.set_ic_pol(c, 1);
+	}
+      }
+      pollist.push_back(conf1);
+    }
+  }
+  else {
+    pollist.reserve(unum_pow * 2);
+    for (int opol = 1; opol <= 2; ++ opol) {
+      for (ymuint p = 0; p < unum_pow; ++ p) {
+	NpnConf conf1(conf, opol);
+	for (ymuint i = 0; i < unum; ++ i) {
+	  ymuint c = ulist[i];
+	  if ( p & (1 << i) ) {
+	    // c のクラスを反転させる．
+	    conf1.set_ic_pol(c, 2);
+	  }
+	  else {
+	    conf1.set_ic_pol(c, 1);
+	  }
+	}
+	pollist.push_back(conf1);
+      }
+    }
+  }
+  // それを WW0 を用いて制限する．
+  ww0_refine(pollist);
+  for (ymuint i = 0; i < pollist.size(); ++ i) {
+    NpnConf& conf = pollist[i];
+    w2max_recur(conf, 0);
+  }
+}
+
+// @brief 極性を展開した後で BFS
+void
+NpnMgrImpl::algorithm3(const NpnConf& conf)
+{
+  // 最初に全ての極性を展開してしまう．
+  vector<NpnConf> pollist;
+  ymuint ulist[TvFunc::kMaxNi];
+  ymuint unum = 0;
+  for (ymuint c = 0; c < conf.nc(); ++ c) {
+    if ( conf.ic_pol(c) == 0 ) {
+      ulist[unum] = c;
+      ++ unum;
+    }
+  }
+  ymuint unum_pow = 1UL << unum;
+  if ( conf.is_opol_fixed() ) {
+    pollist.reserve(unum_pow);
+    for (ymuint p = 0; p < unum_pow; ++ p) {
+      NpnConf conf1(conf);
+      for (ymuint i = 0; i < unum; ++ i) {
+	ymuint c = ulist[i];
+	if ( p & (1 << i) ) {
+	  // c のクラスを反転させる．
+	  conf1.set_ic_pol(c, 2);
+	}
+	else {
+	  conf1.set_ic_pol(c, 1);
+	}
+      }
+      pollist.push_back(conf1);
+    }
+  }
+  else {
+    pollist.reserve(unum_pow * 2);
+    for (int opol = 1; opol <= 2; ++ opol) {
+      for (ymuint p = 0; p < unum_pow; ++ p) {
+	NpnConf conf1(conf, opol);
+	for (ymuint i = 0; i < unum; ++ i) {
+	  ymuint c = ulist[i];
+	  if ( p & (1 << i) ) {
+	    // c のクラスを反転させる．
+	    conf1.set_ic_pol(c, 2);
+	  }
+	  else {
+	    conf1.set_ic_pol(c, 1);
+	  }
+	}
+	pollist.push_back(conf1);
+      }
+    }
+  }
+  // それを WW0 を用いて制限する．
+  ww0_refine(pollist);
+  w2max_recur(pollist, 0);
 }
 
 
