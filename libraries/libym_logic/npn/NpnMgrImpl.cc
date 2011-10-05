@@ -677,16 +677,12 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
     else {
       int diff = 0;
       TvFunc func1;
-#if 1
+
       ymuint ni = conf.ni();
       for (ymuint i = 1; i < ni; ++ i) {
 	for (ymuint j = 0; j < i; ++ j) {
 	  int w2_1 = mMaxFunc.walsh_2(i, j);
-#if 0
-	  int w2_2 = func1.walsh_2(i, j);
-#else
 	  int w2_2 = conf.walsh_2i(i, j);
-#endif
 	  diff = w2_1 - w2_2;
 	  if ( diff != 0 ) {
 	    if ( diff < 0 ) {
@@ -699,7 +695,6 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
 	}
       }
     loop_exit:
-#endif
       if ( diff == 0 ) {
 	// ここまでで決着が付かなければ真理値表ベクタの辞書式順序で比較する．
 	++ mTvmax_count;
@@ -710,31 +705,29 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
 	}
 	if ( mMaxFunc < func1 ) {
 	  diff = -1;
-	  mMaxFunc = func1;
 	}
 	else if ( mMaxFunc > func1 ) {
 	  diff = 1;
 	}
       }
-      if ( diff < 0 ) {
-	// 最大値の更新
-	mMaxList.clear();
-	mMaxList.push_back(conf);
-	mMaxFunc = func1;
+      if ( diff <= 0 ) {
+	if ( diff < 0 ) {
+	  // 最大値の更新
+	  mMaxList.clear();
+	  mMaxFunc = func1;
 #if 0
-	cout << "mMaxFunc = " << mMaxFunc << endl
-	     << "w2 = {";
-	ymuint ni = conf.ni();
-	for (ymuint i = 1; i < ni; ++ i) {
-	  for (ymuint j = 0; j < i; ++ j) {
-	    int w2 = mMaxFunc.walsh_2(i, j);
-	    cout << " " << w2;
+	  cout << "mMaxFunc = " << mMaxFunc << endl
+	       << "w2 = {";
+	  ymuint ni = conf.ni();
+	  for (ymuint i = 1; i < ni; ++ i) {
+	    for (ymuint j = 0; j < i; ++ j) {
+	      int w2 = mMaxFunc.walsh_2(i, j);
+	      cout << " " << w2;
+	    }
 	  }
-	}
-	cout << "}" << endl;
+	  cout << "}" << endl;
 #endif
-      }
-      else if ( diff == 0 ) {
+	}
 	mMaxList.push_back(conf);
       }
     }
