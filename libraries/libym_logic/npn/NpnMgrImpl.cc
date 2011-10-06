@@ -655,28 +655,26 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
       {
 	NpnMap map1;
 	conf.set_map(map1);
-	mMaxFunc = conf.func().xform(map1);
+	set_maxfunc(conf.func().xform(map1));
       }
-#if 0
-      cout << "mMaxFunc = " << mMaxFunc << endl
-	   << "w2 = {";
-      ymuint ni = conf.ni();
-      for (ymuint i = 1; i < ni; ++ i) {
-	for (ymuint j = 0; j < i; ++ j) {
-	  int w2 = mMaxFunc.walsh_2(i, j);
-	  cout << " " << w2;
-	}
-      }
-      cout << "}" << endl;
-#endif
     }
     else {
       int diff = 0;
 
       ymuint ni = conf.ni();
+      if ( !mMaxW2Valid ) {
+	for (ymuint i = 1; i < ni; ++ i) {
+	  ymuint base = i * ni;
+	  for (ymuint j = 0; j < i; ++ j) {
+	    mMaxW2[base + j] = mMaxFunc.walsh_2(i, j);
+	  }
+	}
+	mMaxW2Valid = true;
+      }
       for (ymuint i = 1; i < ni; ++ i) {
+	ymuint base = i * ni;
 	for (ymuint j = 0; j < i; ++ j) {
-	  int w2_1 = mMaxFunc.walsh_2(i, j);
+	  int w2_1 = mMaxW2[base + j];
 	  int w2_2 = conf.walsh_2i(i, j);
 	  diff = w2_1 - w2_2;
 	  if ( diff != 0 ) {
@@ -709,19 +707,7 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
 	if ( diff < 0 ) {
 	  // 最大値の更新
 	  mMaxList.clear();
-	  mMaxFunc = mTmpFunc;
-#if 0
-	  cout << "mMaxFunc = " << mMaxFunc << endl
-	       << "w2 = {";
-	  ymuint ni = conf.ni();
-	  for (ymuint i = 1; i < ni; ++ i) {
-	    for (ymuint j = 0; j < i; ++ j) {
-	      int w2 = mMaxFunc.walsh_2(i, j);
-	      cout << " " << w2;
-	    }
-	  }
-	  cout << "}" << endl;
-#endif
+	  set_maxfunc(mTmpFunc);
 	}
 	mMaxList.push_back(conf);
       }
@@ -754,6 +740,36 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
       break;
     }
   }
+}
+
+// @brief mMaxFunc を設定する．
+void
+NpnMgrImpl::set_maxfunc(const TvFunc& func)
+{
+  mMaxFunc = func;
+  mMaxW2Valid = false;
+#if 0
+  ymuint ni = func.ni();
+  for (ymuint i = 1; i < ni; ++ i) {
+    ymuint base = i * ni;
+    for (ymuint j = 0; j < i; ++ j) {
+      mMaxW2[base + j] = func.walsh_2(i, j);
+    }
+  }
+#endif
+#if 0
+  cout << "mMaxFunc = " << mMaxFunc << endl
+       << "w2 = {";
+  ymuint ni = conf.ni();
+  for (ymuint i = 1; i < ni; ++ i) {
+    ymuint base = i * ni;
+    for (ymuint j = 0; j < i; ++ j) {
+      int w2 = mMaxW2[base + j];
+      cout << " " << w2;
+    }
+  }
+  cout << "}" << endl;
+#endif
 }
 
 

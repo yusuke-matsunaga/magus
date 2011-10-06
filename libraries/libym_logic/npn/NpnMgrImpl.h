@@ -100,6 +100,10 @@ private:
   w2max_recur(vector<NpnConf>& conf_list,
 	      ymuint g0);
 
+  /// @brief mMaxFunc を設定する．
+  void
+  set_maxfunc(const TvFunc& func);
+
   /// @brief NpnConf を取り出す．
   NpnConf*
   new_npnconf();
@@ -130,6 +134,8 @@ private:
 
   // w2max_recur で用いる現在の w2 ベクタ
   int mMaxW2[TvFunc::kMaxNi * TvFunc::kMaxNi];
+
+  bool mMaxW2Valid;
 
   // NpnConf 用のアロケータ
   UnitAlloc mAlloc;
