@@ -248,16 +248,19 @@ NpnConf::is_resolved(ymuint g0) const
   if ( !is_opol_fixed() ) {
     return false;
   }
-  for (ymuint g1 = g0; g1 < group_num(); ++ g1) {
-    if ( group_size(g1) > 1 ) {
-      // 複数のクラスが分離されていない．
-      return false;
-    }
-    ymuint pos = group_begin(g1);
-    if ( ic_pol(pos) == 0 ) {
+  ymuint pos0 = mGroupTop[g0];
+  for (ymuint g1 = g0; g1 < group_num(); ) {
+    if ( ic_pol(pos0) == 0 ) {
       // 極性が確定していない．
       return false;
     }
+    ++ g1;
+    ymuint pos = mGroupTop[g1];
+    if ( pos - pos0 > 1 ) {
+      // 複数のクラスが分離されていない．
+      return false;
+    }
+    pos0 = pos;
   }
   return true;
 }
@@ -313,14 +316,17 @@ NpnConf::set_ic_pol(ymuint pos,
 void
 NpnConf::set_map(NpnMap& map) const
 {
-#if 0
-  ymuint order[TvFunc::kMaxNi];
+  map.resize(mBaseConf->ni());
+  tPol op = (opol() == 2) ? kPolNega : kPolPosi;
+  map.set_opol(op);
+
   ymuint k = 0;
   for (ymuint i = 0; i < nc(); ++ i) {
     ymuint rep = ic_rep(i);
     ymuint n = mBaseConf->ic_num(rep);
     for (ymuint j = 0; j < n; ++ j) {
-      order[rep] = k;
+      tPol pol = (ipol(rep) == 2) ? kPolNega : kPolPosi;
+      map.set(rep, k, pol);
       ++ k;
       rep = mBaseConf->ic_link(rep);
     }
@@ -328,23 +334,11 @@ NpnConf::set_map(NpnMap& map) const
   ymuint rep = mBaseConf->indep_rep();
   ymuint n = mBaseConf->indep_num();
   for (ymuint j = 0; j < n; ++ j) {
-    order[rep] = k;
+    map.set(rep, k, kPolPosi);
     ++ k;
     rep = mBaseConf->ic_link(rep);
   }
-#else
-  if ( !mIorderValid ) {
-    validate_iorder();
-  }
-#endif
-
-  map.resize(mBaseConf->ni());
-  tPol op = (opol() == 2) ? kPolNega : kPolPosi;
-  map.set_opol(op);
-  for (ymuint i = 0; i < mBaseConf->ni(); ++ i) {
-    tPol ipol1 = (ipol(mIorder[i]) == 2) ? kPolNega : kPolPosi;
-    map.set(mIorder[i], i, ipol1);
-  }
+  assert_cond( k == ni(), __FILE__, __LINE__);
 }
 
 // @brief 内容を出力する．
