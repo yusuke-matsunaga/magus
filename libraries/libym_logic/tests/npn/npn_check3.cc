@@ -63,7 +63,8 @@ void
 gen(size_t ni,
     size_t limit,
     size_t flow,
-    int algorithm)
+    int algorithm,
+    int dump)
 {
   hash_set<TvFunc> repfunc_set;
 
@@ -146,7 +147,7 @@ gen(size_t ni,
        << "NPN rep:                 " << repfunc_set.size() << endl
        << "AVE. CPU time(usec):     " << usec << endl;
 
-  if ( verbose ) {
+  if ( dump ) {
     for (hash_set<TvFunc>::iterator p = repfunc_set.begin();
 	 p != repfunc_set.end(); ++ p) {
       cout << ni << " " << *p << endl;
@@ -448,6 +449,7 @@ main(int argc,
   int ni = 4;
   int rnum = 10000;
   int rseed = 0;
+  int dump = 0;
 
   // オプション解析用のデータ
   const struct poptOption options[] = {
@@ -466,6 +468,9 @@ main(int argc,
 
     { "gen", 'g', POPT_ARG_NONE, NULL, 1,
       "generate all NPN equivalent functions mode", NULL },
+
+    { "dump", 'd', POPT_ARG_NONE, &dump, 0,
+      "dump rep. functions", NULL },
 
     { "rgen", 'r', POPT_ARG_NONE, NULL, 2,
       "randomly generate NPN equivalent functions mode", NULL },
@@ -565,7 +570,7 @@ main(int argc,
 #endif
     switch ( mode ) {
     case 1: // gen
-      gen(ni, 0, flow, algorithm);
+      gen(ni, 0, flow, algorithm, dump);
       break;
 
     case 2: // rgen
