@@ -78,6 +78,10 @@ gen(size_t ni,
   size_t num = 0;
   ymulong w2count_total = 0;
   ymulong tvcount_total = 0;
+
+  NpnMgr mgr;
+  NpnMap map;
+  TvFunc repfunc;
   for ( ; ; ) {
     if ( verbose ) {
       if ( buff[frontier] ) {
@@ -92,8 +96,6 @@ gen(size_t ni,
     }
 
     TvFunc func(ni, buff);
-    NpnMgr mgr;
-    NpnMap map;
 
     sw.start();
     for (size_t i = 0; i < mag; ++ i) {
@@ -106,11 +108,10 @@ gen(size_t ni,
     sw.stop();
 
     TvFunc orgfunc(ni, buff);
-    TvFunc repfunc = orgfunc.xform(map);
+    repfunc = orgfunc.xform(map);
     if ( repfunc_set.count(repfunc) == 0 ) {
       repfunc_set.insert(repfunc);
     }
-
     ++ num;
 
     bool carry = false;
@@ -145,9 +146,11 @@ gen(size_t ni,
        << "NPN rep:                 " << repfunc_set.size() << endl
        << "AVE. CPU time(usec):     " << usec << endl;
 
-  for (hash_set<TvFunc>::iterator p = repfunc_set.begin();
-       p != repfunc_set.end(); ++ p) {
-    cout << ni << " " << *p << endl;
+  if ( verbose ) {
+    for (hash_set<TvFunc>::iterator p = repfunc_set.begin();
+	 p != repfunc_set.end(); ++ p) {
+      cout << ni << " " << *p << endl;
+    }
   }
 }
 

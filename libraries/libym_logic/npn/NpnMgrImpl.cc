@@ -652,15 +652,11 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
 #endif
     if ( mMaxList.empty() ) {
       mMaxList.push_back(conf);
-#if 0
-      mMaxFunc = func1;
-#else
       {
 	NpnMap map1;
 	conf.set_map(map1);
 	mMaxFunc = conf.func().xform(map1);
       }
-#endif
 #if 0
       cout << "mMaxFunc = " << mMaxFunc << endl
 	   << "w2 = {";
@@ -676,7 +672,6 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
     }
     else {
       int diff = 0;
-      TvFunc func1;
 
       ymuint ni = conf.ni();
       for (ymuint i = 1; i < ni; ++ i) {
@@ -688,7 +683,7 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
 	    if ( diff < 0 ) {
 	      NpnMap map1;
 	      conf.set_map(map1);
-	      func1 = conf.func().xform(map1);
+	      mTmpFunc = conf.func().xform(map1);
 	    }
 	    goto loop_exit;
 	  }
@@ -701,12 +696,12 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
 	{
 	  NpnMap map1;
 	  conf.set_map(map1);
-	  func1 = conf.func().xform(map1);
+	  mTmpFunc = conf.func().xform(map1);
 	}
-	if ( mMaxFunc < func1 ) {
+	if ( mMaxFunc < mTmpFunc ) {
 	  diff = -1;
 	}
-	else if ( mMaxFunc > func1 ) {
+	else if ( mMaxFunc > mTmpFunc ) {
 	  diff = 1;
 	}
       }
@@ -714,7 +709,7 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
 	if ( diff < 0 ) {
 	  // 最大値の更新
 	  mMaxList.clear();
-	  mMaxFunc = func1;
+	  mMaxFunc = mTmpFunc;
 #if 0
 	  cout << "mMaxFunc = " << mMaxFunc << endl
 	       << "w2 = {";
@@ -876,24 +871,29 @@ NpnMgrImpl::w2max_recur(vector<NpnConf>& conf_list,
       if ( conf.is_resolved() ) {
 	++ mTvmax_count;
 
+	// 真理値表ベクタの辞書式順序で比較する．
 	NpnMap map1;
 	conf.set_map(map1);
-	TvFunc func1 = conf.func().xform(map1);
+	mTmpFunc = conf.func().xform(map1);
+	int diff = 1;
 	if ( mMaxList.empty() ) {
-	  mMaxList.push_back(conf);
-	  mMaxFunc = func1;
+	  diff = -1;
 	}
 	else {
-	  // 真理値表ベクタの辞書式順序で比較する．
-	  if ( mMaxFunc < func1 ) {
+	  if ( mMaxFunc < mTmpFunc ) {
+	    diff = -1;
+	  }
+	  else if ( mMaxFunc == mTmpFunc ) {
+	    diff = 0;
+	  }
+	}
+	if ( diff <= 0 ) {
+	  if ( diff < 0 ) {
 	    // 最大値の更新
 	    mMaxList.clear();
-	    mMaxList.push_back(conf);
-	    mMaxFunc = func1;
+	    mMaxFunc = mTmpFunc;
 	  }
-	  else if ( mMaxFunc == func1 ) {
-	    mMaxList.push_back(conf);
-	  }
+	  mMaxList.push_back(conf);
 	}
 	continue;
       }

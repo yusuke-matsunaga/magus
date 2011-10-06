@@ -13,6 +13,8 @@
 #include "ym_logic/TvFunc.h"
 
 
+#define USE_MALLOC 0
+
 BEGIN_NAMESPACE_YM_NPN
 
 //////////////////////////////////////////////////////////////////////
@@ -197,19 +199,31 @@ private:
 
   // Walsh の 1次係数
   // 大きさ mNi の配列へのポインタ
+#if USE_MALLOC
   ymint32* mW1;
+#else
+  ymint32 mW1[TvFunc::kMaxNi];
+#endif
 
   // Walsh の 2次係数
   // 大きさ mNi * mNi の配列へのポインタ
   mutable
+#if USE_MALLOC
   ymint32* mW2;
+#else
+  ymint32 mW2[TvFunc::kMaxNi * TvFunc::kMaxNi];
+#endif
 
   // mW2 が計算済みかどうかを記録するフラグ
   // 大きさ mNi * mNi の配列へのポインタ
   // 最下位ビットが計算済みかどうかのフラグ
   // 1ビット目が極性反転を表すフラグ
   mutable
+#if USE_MALLOC
   ymuint8* mW2flag;
+#else
+  ymuint8 mW2flag[TvFunc::kMaxNi * TvFunc::kMaxNi];
+#endif
 
   // 出力極性
   ymuint8 mOpol;
@@ -217,18 +231,30 @@ private:
   // 入力極性を表す配列
   // 大きさ mNi の配列へのポインタ
   // インデックスは入力番号
+#if USE_MALLOC
   ymuint8* mIpols;
+#else
+  ymuint8 mIpols[TvFunc::kMaxNi];
+#endif
 
   // 等価入力クラスの数
   ymuint32 mNc;
 
   // 等価入力クラスの先頭番号のリスト
   // インデックスはクラス番号
+#if USE_MALLOC
   ymuint32* mIcRep;
+#else
+  ymuint32 mIcRep[TvFunc::kMaxNi];
+#endif
 
   // 等価入力クラスの要素数の配列
   // インデックスは入力番号
+#if USE_MALLOC
   ymuint32* mIcNum;
+#else
+  ymuint32 mIcNum[TvFunc::kMaxNi];
+#endif
 
   // 独立な入力クラスの先頭番号
   ymuint32 mIndepRep;
@@ -238,7 +264,11 @@ private:
 
   // 等価入力クラスの次の要素を指す配列
   // インデックスは入力番号
+#if USE_MALLOC
   ymuint32* mIcLink;
+#else
+  ymuint32 mIcLink[TvFunc::kMaxNi];
+#endif
 
 };
 

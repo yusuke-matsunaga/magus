@@ -40,6 +40,7 @@ NpnBaseConf::NpnBaseConf(const TvFunc& func) :
   mFunc(func)
 {
   mNi = mFunc.ni();
+#if USE_MALLOC
   mW1 = new ymint32[mNi];
   mW2 = new ymint32[mNi * mNi];
   mW2flag = new ymuint8[mNi * mNi];
@@ -47,10 +48,10 @@ NpnBaseConf::NpnBaseConf(const TvFunc& func) :
   mIcRep = new ymuint32[mNi];
   mIcNum = new ymuint32[mNi];
   mIcLink = new ymuint32[mNi];
-
+#endif
   for (ymuint i = 0; i < mNi; ++ i) {
     ymuint base = i * mNi;
-    for (ymuint j = 0; j <= i; ++ j) {
+    for (ymuint j = 0; j < mNi; ++ j) {
       mW2flag[base + j] = 0;
     }
   }
@@ -63,6 +64,7 @@ NpnBaseConf::NpnBaseConf(const TvFunc& func) :
 // デストラクタ
 NpnBaseConf::~NpnBaseConf()
 {
+#if USE_MALLOC
   delete [] mW1;
   delete [] mW2;
   delete [] mW2flag;
@@ -70,6 +72,7 @@ NpnBaseConf::~NpnBaseConf()
   delete [] mIcRep;
   delete [] mIcNum;
   delete [] mIcLink;
+#endif
 }
 
 // @brief W0/W1 を用いて正規化する．

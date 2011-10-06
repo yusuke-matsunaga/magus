@@ -126,6 +126,8 @@ private:
   // w2max_recur で用いる現在の最大値
   TvFunc mMaxFunc;
 
+  TvFunc mTmpFunc;
+
   // w2max_recur で用いる現在の w2 ベクタ
   int mMaxW2[TvFunc::kMaxNi * TvFunc::kMaxNi];
 
