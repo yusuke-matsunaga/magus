@@ -26,8 +26,7 @@ class NpnBaseConf
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] func 対象の関数
-  NpnBaseConf(const TvFunc& func);
+  NpnBaseConf();
 
   /// @brief デストラクタ
   ~NpnBaseConf();
@@ -36,8 +35,9 @@ public:
 public:
 
   /// @brief W0/W1 を用いて正規化する．
+  /// @param[in] func 対象の関数
   void
-  normalize();
+  normalize(const TvFunc& func);
 
 
 public:
@@ -189,7 +189,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 対象の関数
-  const TvFunc& mFunc;
+  TvFunc mFunc;
 
   // 関数の入力数
   ymuint32 mNi;

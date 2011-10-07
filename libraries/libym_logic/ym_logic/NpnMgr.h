@@ -49,7 +49,7 @@ public:
   /// @brief 直前の cannonical の呼び出しにおける NpnMap の全候補を返す．
   /// @param[out] map_list 変換マップを格納するリスト
   void
-  all_map(list<NpnMap>& map_list) const;
+  all_map(vector<NpnMap>& map_list) const;
 
   /// @brief w2max_recur の起動回数を返す．
   /// 直前の cannonical の呼び出しにおける

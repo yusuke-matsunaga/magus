@@ -115,6 +115,13 @@ gen(size_t ni,
     }
     ++ num;
 
+    { // repfunc が本当に代表関数かどうかを検証する．
+      NpnMap map1;
+      mgr.cannonical(repfunc, map1);
+      TvFunc func2 = repfunc.xform(map1);
+      assert_cond( repfunc == func2, __FILE__, __LINE__);
+    }
+
     bool carry = false;
     for (size_t i = 0; i < ni_exp; ++ i) {
       if ( buff[i] == 0 ) {
@@ -172,6 +179,8 @@ rgen(size_t ni,
   ymulong w2count_total = 0;
   ymulong tvcount_total = 0;
   sw.reset();
+  NpnMgr mgr;
+
   for (size_t k = 0; k < num; ++ k) {
     for (size_t i = 0; i < ni_exp; ++ i) {
       buff[i] = random_num() & 1;
@@ -184,7 +193,6 @@ rgen(size_t ni,
     }
 
     TvFunc func(ni, buff);
-    NpnMgr mgr;
     NpnMap map;
 
     sw.start();
@@ -197,8 +205,16 @@ rgen(size_t ni,
     }
     sw.stop();
 
+    { // repfunc が本当に代表関数かどうかを検証する．
+      TvFunc repfunc = func.xform(map);
+      NpnMap map1;
+      mgr.cannonical(repfunc, map1);
+      TvFunc func2 = repfunc.xform(map1);
+      assert_cond( repfunc == func2, __FILE__, __LINE__);
+    }
+
     if ( flow & 1024 ) {
-      TvFunc repfunc = TvFunc(ni, buff).xform(map);
+      TvFunc repfunc = func.xform(map);
       if ( repfunc_set.count(repfunc) == 0 ) {
 	repfunc_set.insert(repfunc);
       }

@@ -256,15 +256,13 @@ NpnMgrImpl::cannonical(const TvFunc& func,
     }
   }
 
-  NpnBaseConf base_conf(func);
-
   // W0 と W1 が非負になるように極性の調節を行う．
   // W0 と W1 および対称変数の情報を用いて正規化を行う．
   // 以降は対称入力グループ単位で考えればよい．
   // また W0 と W1 シグネチャは最大化されているので考える必要はない．
-  base_conf.normalize();
+  mBaseConf.normalize(func);
 
-  NpnConf conf0(base_conf);
+  NpnConf conf0(mBaseConf);
 
   if ( !conf0.is_resolved() && conf0.nc() > 1 ) {
     if ( debug ) {
@@ -273,7 +271,7 @@ NpnMgrImpl::cannonical(const TvFunc& func,
     }
 
     // W1:cnum:bisym を用いてグループわけを行う．
-    conf0.refine(0, W1CnumCmp(base_conf));
+    conf0.refine(0, W1CnumCmp(mBaseConf));
 
     if ( debug ) {
       cout << "After step1" << endl;
@@ -284,6 +282,7 @@ NpnMgrImpl::cannonical(const TvFunc& func,
   mMaxList.clear();
   mW2max_count = 0;
   mTvmax_count = 0;
+  mMaxW2Valid = false;
 
   if ( conf0.is_resolved() ) {
     mMaxList.push_back(conf0);
@@ -340,9 +339,10 @@ NpnMgrImpl::cannonical(const TvFunc& func,
 
 // @brief 直前の cannonical の呼び出しにおける NpnMap の全候補を返す．
 void
-NpnMgrImpl::all_map(list<NpnMap>& map_list) const
+NpnMgrImpl::all_map(vector<NpnMap>& map_list) const
 {
   map_list.clear();
+  map_list.reserve(mMaxList.size());
   for (vector<NpnConf>::const_iterator p = mMaxList.begin();
        p != mMaxList.end(); ++ p) {
     const NpnConf& conf = *p;

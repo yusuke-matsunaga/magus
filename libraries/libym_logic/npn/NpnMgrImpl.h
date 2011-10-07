@@ -11,6 +11,7 @@
 
 #include "ym_logic/NpnMap.h"
 #include "ym_utils/Alloc.h"
+#include "NpnBaseConf.h"
 
 
 BEGIN_NAMESPACE_YM_NPN
@@ -50,7 +51,7 @@ public:
   /// @brief 直前の cannonical の呼び出しにおける NpnMap の全候補を返す．
   /// @param[out] map_list 変換マップを格納するリスト
   void
-  all_map(list<NpnMap>& map_list) const;
+  all_map(vector<NpnMap>& map_list) const;
 
   /// @brief w2max_recur の起動回数を返す．
   /// 直前の cannonical の呼び出しにおける
@@ -117,6 +118,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // w0とw1 を用いた解析情報
+  NpnBaseConf mBaseConf;
 
   // w2max_recur で用いる現在の最適解のリスト
   vector<NpnConf> mMaxList;

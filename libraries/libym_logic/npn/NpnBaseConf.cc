@@ -35,11 +35,32 @@ BEGIN_NAMESPACE_YM_NPN
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-// @param[in] func 対象の関数
-NpnBaseConf::NpnBaseConf(const TvFunc& func) :
-  mFunc(func)
+NpnBaseConf::NpnBaseConf()
 {
+}
+
+// デストラクタ
+NpnBaseConf::~NpnBaseConf()
+{
+#if USE_MALLOC
+  delete [] mW1;
+  delete [] mW2;
+  delete [] mW2flag;
+  delete [] mIpols;
+  delete [] mIcRep;
+  delete [] mIcNum;
+  delete [] mIcLink;
+#endif
+}
+
+// @brief W0/W1 を用いて正規化する．
+// @param[in] func 対象の関数
+void
+NpnBaseConf::normalize(const TvFunc& func)
+{
+  mFunc = func;
   mNi = mFunc.ni();
+
 #if USE_MALLOC
   mW1 = new ymint32[mNi];
   mW2 = new ymint32[mNi * mNi];
@@ -59,26 +80,6 @@ NpnBaseConf::NpnBaseConf(const TvFunc& func) :
     mIcNum[i] = 0;
     mIcLink[i] = static_cast<ymuint>(-1);
   }
-}
-
-// デストラクタ
-NpnBaseConf::~NpnBaseConf()
-{
-#if USE_MALLOC
-  delete [] mW1;
-  delete [] mW2;
-  delete [] mW2flag;
-  delete [] mIpols;
-  delete [] mIcRep;
-  delete [] mIcNum;
-  delete [] mIcLink;
-#endif
-}
-
-// @brief W0/W1 を用いて正規化する．
-void
-NpnBaseConf::normalize()
-{
   // Walsh の0次と1次の係数を計算する．
   // 2次の係数はオンデマンドで計算する．
   mW0 = mFunc.walsh_01(mW1);

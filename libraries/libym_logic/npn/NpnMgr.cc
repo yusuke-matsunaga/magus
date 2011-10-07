@@ -35,12 +35,16 @@ NpnMgr::cannonical(const TvFunc& func,
 		   NpnMap& cmap,
 		   int algorithm)
 {
+#if 0
+  delete mImpl;
+  mImpl = new NpnMgrImpl;
+#endif
   mImpl->cannonical(func, cmap, algorithm);
 }
 
 // @brief 直前の cannonical の呼び出しにおける NpnMap の全候補を返す．
 void
-NpnMgr::all_map(list<NpnMap>& map_list) const
+NpnMgr::all_map(vector<NpnMap>& map_list) const
 {
   mImpl->all_map(map_list);
 }
