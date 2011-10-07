@@ -241,7 +241,7 @@ public:
   xmask(vector<ymuint32>& val) const;
 
   /// @brief セルを得る．
-  /// @note type() が kCell の時のみ意味をモツ．
+  /// @note type() が kCell の時のみ意味を持つ．
   /// @note デフォルトの実装では NULL を返す．
   virtual
   const Cell*

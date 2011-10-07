@@ -49,7 +49,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief セルを得る．
-  /// @note type() が kCell の時のみ意味をモツ．
+  /// @note type() が kCell の時のみ意味を持つ．
   virtual
   const Cell*
   cell() const;
