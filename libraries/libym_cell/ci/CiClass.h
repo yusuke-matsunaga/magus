@@ -37,6 +37,11 @@ public:
   // このクラスに属しているセルグループの情報を取得する関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 同位体変換リストを得る．
+  virtual
+  const vector<NpnMapM>&
+  idmap_list() const;
+
   /// @brief セルグループの数を返す．
   virtual
   ymuint
@@ -55,10 +60,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化する．
+  /// @param[in] idmap_list 同位体変換リスト
   /// @param[in] group_num グループ数
   /// @param[in] alloc メモリアロケータ
   void
-  init(ymuint group_num,
+  init(const vector<NpnMapM>& idmap_list,
+       ymuint group_num,
        AllocBase& alloc);
 
   /// @brief グループを設定する．
@@ -74,6 +81,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 同位体変換リスト
+  vector<NpnMapM> mIdmapList;
 
   // グループの数
   ymuint32 mGroupNum;

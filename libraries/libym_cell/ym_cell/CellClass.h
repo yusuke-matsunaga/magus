@@ -10,6 +10,7 @@
 
 
 #include "ym_cell/cell_nsdef.h"
+#include "ym_logic/npn_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -34,6 +35,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   // このクラスに属しているセルグループの情報を取得する関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 同位体変換リストを得る．
+  virtual
+  const vector<NpnMapM>&
+  idmap_list() const = 0;
 
   /// @brief CellGroup の数を返す．
   virtual

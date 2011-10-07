@@ -76,6 +76,14 @@ private:
 	       TvFuncM& repfunc,
 	       NpnMapM& xmap) = 0;
 
+  /// @brief 同位体変換リストを求める．
+  /// @param[in] func 対象の関数
+  /// @param[out] idmap_list 同位体変換のリスト
+  virtual
+  void
+  find_idmap_list(const TvFuncM& func,
+		  vector<NpnMapM>& idmap_list) = 0;
+
 
 protected:
   //////////////////////////////////////////////////////////////////////

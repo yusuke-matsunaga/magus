@@ -118,18 +118,62 @@ LcLogicMgr::find_repfunc(const TvFuncM& f,
 			 TvFuncM& repfunc,
 			 NpnMapM& xmap)
 {
-  ymuint ni = f.ni();
   ymuint no = f.no();
 
   if ( no == 1 ) {
-    NpnMgr npnmgr;
+    TvFunc f1 = f.output(0);
     NpnMap xmap1;
-    npnmgr.cannonical(f.output(0), xmap1);
+    mNpnMgr.cannonical(f1, xmap1);
     xmap = NpnMapM(xmap1);
     repfunc = f.xform(xmap);
+    TvFunc repfunc1 = f1.xform(xmap1);
   }
   else {
     default_repfunc(f, repfunc, xmap);
+  }
+}
+
+// @brief 同位体変換リストを求める．
+// @param[in] func 対象の関数
+// @param[out] idmap_list 同位体変換のリスト
+void
+LcLogicMgr::find_idmap_list(const TvFuncM& func,
+			    vector<NpnMapM>& idmap_list)
+{
+  idmap_list.clear();
+
+  ymuint ni = func.ni();
+  ymuint no = func.no();
+  if ( no == 1 ) {
+    NpnMap xmap1;
+    TvFunc f1 = func.output(0);
+    mNpnMgr.cannonical(f1, xmap1);
+    { // 検証
+      TvFunc f2 = f1.xform(xmap1);
+      assert_cond( f1 == f2, __FILE__, __LINE__);
+    }
+    vector<NpnMap> tmp_list;
+    mNpnMgr.all_map(tmp_list);
+    idmap_list.reserve(tmp_list.size());
+    for (vector<NpnMap>::iterator p = tmp_list.begin();
+	 p != tmp_list.end(); ++ p) {
+      const NpnMap& map = *p;
+      // 恒等変換は追加しない．
+      bool ident = true;
+      for (ymuint i = 0; i < ni; ++ i) {
+	NpnVmap vmap = map.imap(i);
+	if ( vmap.pos() != i || vmap.pol() != kPolPosi ) {
+	  ident = false;
+	  break;
+	}
+      }
+      if ( !ident ) {
+	idmap_list.push_back(NpnMapM(map));
+      }
+    }
+  }
+  else {
+    // 今のところなし．
   }
 }
 

@@ -62,6 +62,13 @@ display_class(ostream& s,
 	      const CellClass* cclass)
 {
   s << title << endl;
+  const vector<NpnMapM>& idmap_list = cclass->idmap_list();
+  s << "  Idmap List = " << endl;
+  for (vector<NpnMapM>::const_iterator p = idmap_list.begin();
+       p != idmap_list.end(); ++ p) {
+    s << *p << endl;
+  }
+  s << endl;
   for (ymuint i = 0; i < cclass->group_num(); ++ i) {
     const CellGroup* group = cclass->cell_group(i);
     s << "  Group: Map = " << group->map() << endl

@@ -162,4 +162,15 @@ LcLatchMgr::find_repfunc(const TvFuncM& f,
   default_repfunc(f, repfunc, xmap);
 }
 
+// @brief 同位体変換リストを求める．
+// @param[in] func 対象の関数
+// @param[out] idmap_list 同位体変換のリスト
+void
+LcLatchMgr::find_idmap_list(const TvFuncM& func,
+			    vector<NpnMapM>& idmap_list)
+{
+  idmap_list.clear();
+  // 今のところなし．
+}
+
 END_NAMESPACE_YM_CELL_LIBCOMP

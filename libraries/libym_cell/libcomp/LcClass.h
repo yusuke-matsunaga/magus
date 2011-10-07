@@ -22,6 +22,8 @@ BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 //////////////////////////////////////////////////////////////////////
 class LcClass
 {
+  friend class LcGroupMgr;
+
 public:
 
   /// @brief コンストラクタ
@@ -50,6 +52,10 @@ public:
   TvFuncM
   repfunc() const;
 
+  /// @brief 同位体変換のリストを返す．
+  const vector<NpnMapM>&
+  idmap_list() const;
+
   /// @brief 実体を返す．
   const CellClass*
   cell_class() const;
@@ -74,6 +80,9 @@ private:
 
   // 代表関数
   TvFuncM mRepFunc;
+
+  // 同位体変換のリスト
+  vector<NpnMapM> mIdmapList;
 
   // 実体のオブジェクト
   CellClass* mCellClass;

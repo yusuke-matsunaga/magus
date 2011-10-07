@@ -58,6 +58,13 @@ LcClass::repfunc() const
   return mRepFunc;
 }
 
+// @brief 同位体変換のリストを返す．
+const vector<NpnMapM>&
+LcClass::idmap_list() const
+{
+  return mIdmapList;
+}
+
 // @brief 実体を返す．
 const CellClass*
 LcClass::cell_class() const

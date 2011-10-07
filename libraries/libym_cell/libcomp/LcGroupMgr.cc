@@ -97,6 +97,7 @@ LcGroupMgr::find_group(const TvFuncM& f)
       // まだ登録されていない．
       fclass = mLibComp.new_class(repfunc);
       mClassMap.insert(make_pair(repfunc, fclass->id()));
+      find_idmap_list(repfunc, fclass->mIdmapList);
     }
     else {
       // 登録されていた．

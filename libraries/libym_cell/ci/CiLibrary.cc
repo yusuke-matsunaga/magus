@@ -908,7 +908,7 @@ CiLibrary::compile()
     const vector<LcGroup*>& src_group_list = src_class->group_list();
     ymuint n = src_group_list.size();
     CiClass& dst_class = mClassArray[c];
-    dst_class.init(n, mAlloc);
+    dst_class.init(src_class->idmap_list(), n, mAlloc);
     for (ymuint i = 0; i < n; ++ i) {
       const CellGroup* dst_group = group(src_group_list[i]->id());
       dst_class.set_group(i, dst_group);

@@ -8,6 +8,7 @@
 
 
 #include "CiClass.h"
+#include "ym_logic/NpnMapM.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -29,6 +30,13 @@ CiClass::~CiClass()
   // mGroupList は CellMgr が管理している．
 }
 
+// @brief 同位体変換リストを得る．
+const vector<NpnMapM>&
+CiClass::idmap_list() const
+{
+  return mIdmapList;
+}
+
 // @brief NPN同値類の数を返す．
 ymuint
 CiClass::group_num() const
@@ -46,12 +54,21 @@ CiClass::cell_group(ymuint pos) const
 }
 
 // @brief 初期化する．
+// @param[in] idmap_list 同位体変換リスト
 // @param[in] group_num グループ数
 // @param[in] alloc メモリアロケータ
 void
-CiClass::init(ymuint group_num,
+CiClass::init(const vector<NpnMapM>& idmap_list,
+	      ymuint group_num,
 	      AllocBase& alloc)
 {
+  mIdmapList.clear();
+  mIdmapList.reserve(idmap_list.size());
+  for (vector<NpnMapM>::const_iterator p = idmap_list.begin();
+       p != idmap_list.end(); ++ p) {
+    mIdmapList.push_back(*p);
+  }
+
   mGroupNum = group_num;
   void* p = alloc.get_memory(sizeof(const CellGroup*) * group_num);
   mGroupList = new (p) const CellGroup*[group_num];
