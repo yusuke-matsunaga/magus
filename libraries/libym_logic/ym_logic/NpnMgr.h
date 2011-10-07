@@ -44,7 +44,7 @@ public:
   void
   cannonical(const TvFunc& func,
 	     NpnMap& cmap,
-	     int algorithm);
+	     int algorithm = 0);
 
   /// @brief 直前の cannonical の呼び出しにおける NpnMap の全候補を返す．
   /// @param[out] map_list 変換マップを格納するリスト
