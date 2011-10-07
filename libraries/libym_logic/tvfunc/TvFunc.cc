@@ -467,9 +467,8 @@ TvFunc::TvFunc(ymuint ni,
       else {
 	pat = ~c_masks[pos];
       }
-      ymulong* endp = mVector + mNblk;
-      for (ymulong* bp = mVector; bp != endp; ++ bp) {
-	*bp = pat;
+      for (ymuint b = 0; b < mNblk; ++ b) {
+	mVector[b] = pat;
       }
     }
     else {
@@ -535,10 +534,8 @@ TvFunc::TvFunc(const TvFunc& src) :
   mNblk(src.mNblk),
   mVector(new ymulong[mNblk])
 {
-  ymulong* endp = mVector + mNblk;
-  ymulong* src_bp = src.mVector;
-  for (ymulong* bp = mVector; bp != endp; ++ bp, ++ src_bp) {
-    *bp = *src_bp;
+  for (ymuint b = 0; b < mNblk; ++ b) {
+    mVector[b] = src.mVector[b];
   }
 }
 
@@ -553,10 +550,8 @@ TvFunc::operator=(const TvFunc& src)
   }
   mNi = src.mNi;
 
-  ymulong* endp = mVector + mNblk;
-  ymulong* src_bp = src.mVector;
-  for (ymulong* bp = mVector; bp != endp; ++ bp, ++ src_bp) {
-    *bp = *src_bp;
+  for (ymuint b = 0; b < mNblk; ++ b) {
+    mVector[b] = src.mVector[b];
   }
 
   return *this;
@@ -634,12 +629,10 @@ TvFunc::negate()
 #endif
 
   default:
-    {
-      ymulong* endp = mVector + mNblk;
-      for (ymulong* bp = mVector; bp != endp; ++ bp) {
-	*bp ^= ~(0UL);
-      }
+    for (ymuint b = 0; b < mNblk; ++ b) {
+      mVector[b] ^= ~(0UL);
     }
+    break;
   }
   return *this;
 }
@@ -648,10 +641,8 @@ TvFunc::negate()
 const TvFunc&
 TvFunc::operator&=(const TvFunc& src1)
 {
-  ymulong* endp = mVector + mNblk;
-  ymulong* src_bp = src1.mVector;
-  for (ymulong* bp = mVector; bp != endp; ++ bp) {
-    *bp &= *src_bp;
+  for (ymuint b = 0; b < mNblk; ++ b) {
+    mVector[b] &= src1.mVector[b];
   }
   return *this;
 }
@@ -660,10 +651,8 @@ TvFunc::operator&=(const TvFunc& src1)
 const TvFunc&
 TvFunc::operator|=(const TvFunc& src1)
 {
-  ymulong* endp = mVector + mNblk;
-  ymulong* src_bp = src1.mVector;
-  for (ymulong* bp = mVector; bp != endp; ++ bp) {
-    *bp |= *src_bp;
+  for (ymuint b = 0; b < mNblk; ++ b) {
+    mVector[b] |= src1.mVector[b];
   }
   return *this;
 }
@@ -672,10 +661,8 @@ TvFunc::operator|=(const TvFunc& src1)
 const TvFunc&
 TvFunc::operator^=(const TvFunc& src1)
 {
-  ymulong* endp = mVector + mNblk;
-  ymulong* src_bp = src1.mVector;
-  for (ymulong* bp = mVector; bp != endp; ++ bp) {
-    *bp ^= *src_bp;
+  for (ymuint b = 0; b < mNblk; ++ b) {
+    mVector[b] ^= src1.mVector[b];
   }
   return *this;
 }
@@ -693,17 +680,16 @@ TvFunc::set_cofactor(ymuint pos,
     if ( pol == kPolNega ) {
       mask = ~mask;
     }
-    ymulong* endp = mVector + mNblk;
     int shift = 1 << pos;
-    for (ymulong* bp = mVector; bp != endp; ++ bp) {
-      ymulong pat = *bp & mask;
+    for (ymuint b = 0; b < mNblk; ++ b) {
+      ymulong pat = mVector[b] & mask;
       if ( pol == kPolPosi ) {
 	pat |= (pat >> shift);
       }
       else {
 	pat |= (pat << shift);
       }
-      *bp = pat;
+      mVector[b] = pat;
     }
   }
   else {
@@ -5257,9 +5243,8 @@ TvFunc::check_sup(ymuint i) const
     // ブロックごとにチェック
     ymuint dist = 1 << i;
     ymulong mask = c_masks[i];
-    ymulong* endp = mVector + mNblk;
-    for (ymulong* bp = mVector; bp != endp; ++ bp) {
-      ymulong word = *bp;
+    for (ymuint b = 0; b < mNblk; ++ b) {
+      ymulong word = mVector[b];
       if ( (word ^ (word << dist)) & mask ) {
 	return true;
       }
@@ -5326,7 +5311,7 @@ TvFunc::check_sym(ymuint i,
     else {
       cond = 0UL;
     }
-    ymuint mask2 = ~c_masks[j];
+    ymulong mask2 = ~c_masks[j];
     ymuint s = 1 << j;
     for (ymuint v = 0; v < mNblk; ++ v) {
       if ( (v & mask_i) == cond &&
@@ -5342,9 +5327,8 @@ TvFunc::check_sym(ymuint i,
     if ( pol == kPolPosi ) {
       ymulong mask = sym_masks2[(i * (i - 1)) / 2 + j];
       ymuint s = (1 << i) - (1 << j);
-      ymulong* endp = mVector + mNblk;
-      for (ymulong* bp = mVector; bp != endp; ++ bp) {
-	ymulong word = *bp;
+      for (ymuint b = 0; b < mNblk; ++ b) {
+	ymulong word = mVector[b];
 	if ( ((word >> s) ^ word) & mask ) {
 	  ans = false;
 	  break;
@@ -5354,9 +5338,8 @@ TvFunc::check_sym(ymuint i,
     else {
       ymulong mask = sym_masks3[(i * (i - 1)) / 2 + j];
       ymuint s = (1 << i) + (1 << j);
-      ymulong* endp = mVector + mNblk;
-      for (ymulong* bp = mVector; bp != endp; ++ bp) {
-	ymuint word = *bp;
+      for (ymuint b = 0; b < mNblk; ++ b) {
+	ymulong word = mVector[b];
 	if ( ((word >> s) ^ word) & mask ) {
 	  ans = false;
 	  break;
@@ -5389,7 +5372,7 @@ TvFunc::xform(const NpnMap& npnmap) const
     ymuint j = imap.pos();
     ipat[i] = 1UL << j;
   }
-  ymuint omask = npnmap.opol() == kPolPosi ? 0UL : 1UL;
+  ymuint omask = npnmap.opol() == kPolPosi ? 0U : 1U;
 
   TvFunc ans(mNi);
   for (ymuint i = 0; i < ni_pow; ++ i) {
@@ -5400,8 +5383,8 @@ TvFunc::xform(const NpnMap& npnmap) const
 	new_i |= ipat[b];
       }
     }
-    ymulong pat = (value(i ^ imask) ^ omask) << shift(new_i);
-    ans.mVector[block(new_i)] |= pat;
+    ymulong pat = (value(i ^ imask) ^ omask);
+    ans.mVector[block(new_i)] |= pat << shift(new_i);
   }
 
 #if defined(DEBUG)

@@ -459,7 +459,7 @@ TvFuncM::check_sym(tVarId i,
     else {
       cond = 0UL;
     }
-    ymuint mask2 = ~c_masks[j];
+    ymulong mask2 = ~c_masks[j];
     ymuint s = 1U << j;
     for (ymuint i = 0; i < mNo; ++ i) {
       ymuint offset = i * mNblk1;
@@ -490,7 +490,7 @@ TvFuncM::check_sym(tVarId i,
       ymulong mask = sym_masks3[(i * (i - 1)) / 2 + j];
       ymuint s = (1U << i) + (1U << j);
       for (ymuint i = 0; i < mNblk; ++ i) {
-	ymuint word = mVector[i];
+	ymulong word = mVector[i];
 	if ( ((word >> s) ^ word) & mask ) {
 	  ans = false;
 	  break;
@@ -529,7 +529,7 @@ TvFuncM::xform(const NpnMapM& npnmap) const
   for (ymuint o = 0; o < mNo; ++ o) {
     NpnVmap omap = npnmap.omap(o);
     ymuint dst_pos = omap.pos();
-    ymuint omask = omap.pol() == kPolPosi ? 0UL : 1UL;
+    ymulong omask = omap.pol() == kPolPosi ? 0UL : 1UL;
     for (ymuint i = 0; i < ni_pow; ++ i) {
       ymuint new_i = 0;
       ymuint tmp = i;
@@ -538,8 +538,8 @@ TvFuncM::xform(const NpnMapM& npnmap) const
 	  new_i |= ipat[b];
 	}
       }
-      ymulong pat = (value(o, i ^ imask) ^ omask) << shift(new_i);
-      ans.mVector[block(new_i) + dst_pos * mNblk1] |= pat;
+      ymulong pat = (value(o, i ^ imask) ^ omask);
+      ans.mVector[block(new_i) + dst_pos * mNblk1] |= pat << shift(new_i);
     }
   }
 
