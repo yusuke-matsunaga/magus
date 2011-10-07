@@ -12,6 +12,7 @@
 #include "ym_techmap/cellmap_nsdef.h"
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/cmn.h"
+#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -92,6 +93,7 @@ private:
        bool inv);
 
 
+#if 0
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられるデータ構造
@@ -109,15 +111,12 @@ private:
     CellFFPosArray mPosArray;
     bool mInv;
   };
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // シグネチャをキーにして FFInfo を保持する配列
-  FFInfo mFFInfo[4];
 
   // 各ノードのコストを保持する配列
   vector<double> mCostArray;

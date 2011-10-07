@@ -13,8 +13,6 @@
 
 #include "ym_techmap/cellmap_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
-#include "ym_cell/CellFFPosArray.h"
-#include "ym_cell/CellLatchPosArray.h"
 #include "ym_networks/cmn.h"
 #include "Match.h"
 
