@@ -306,4 +306,41 @@ operator<<(ostream& s,
   return s;
 }
 
+// バイナリ出力
+BinO&
+operator<<(BinO& bos,
+	   const NpnMap& map)
+{
+  ymuint32 ni = map.ni();
+  bos << ni;
+  for (ymuint i = 0; i < ni; ++ i) {
+    NpnVmap vmap = map.imap(i);
+    bos << vmap;
+  }
+  bos << (map.opol() == kPolNega);
+
+  return bos;
+}
+
+// バイナリ入力
+BinI&
+operator>>(BinI& bis,
+	   NpnMap& map)
+{
+  ymuint32 ni;
+  bis >> ni;
+  map.resize(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    NpnVmap vmap;
+    bis >> vmap;
+    map.set(i, vmap);
+  }
+  bool inv;
+  bis >> inv;
+  tPol opol = inv ? kPolNega : kPolPosi;
+  map.set_opol(opol);
+
+  return bis;
+}
+
 END_NAMESPACE_YM_NPN

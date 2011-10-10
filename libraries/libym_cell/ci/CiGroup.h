@@ -35,6 +35,18 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
+  // 一般的な情報を取得する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ID番号を返す．
+  /// @note CellLibrary::group(id) で返されるオブジェクトの id() は id となる．
+  virtual
+  ymuint
+  id() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
   // 機能情報を取得する関数
   //////////////////////////////////////////////////////////////////////
 
@@ -72,29 +84,26 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化する．
+  /// @param[in] id ID番号
   /// @param[in] cell_class 代表クラス
   /// @param[in] map 変換マップ
-  /// @param[in] cell_num セル数
+  /// @param[in] cell_list セルのリスト
   /// @param[in] alloc メモリアロケータ
   void
-  init(const CellClass* cell_class,
+  init(ymuint id,
+       const CellClass* cell_class,
        const NpnMapM& map,
-       ymuint cell_num,
+       const vector<const Cell*>& cell_list,
        AllocBase& alloc);
-
-  /// @brief セルを設定する．
-  /// @param[in] pos 位置番号 ( 0 <= pos < cell_num() )
-  /// @param[in] cell セル
-  /// @note 必ず init() の後に呼び出すこと
-  void
-  set_cell(ymuint pos,
-	   const Cell* cell);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // ID 番号
+  ymuint32 mId;
 
   // 属している CellClass
   const CellClass* mCellClass;

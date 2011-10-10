@@ -34,13 +34,25 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // このクラスに属しているセルグループの情報を取得する関数
+  // 一般的な情報を取得する関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief ID番号を返す．
+  /// @note CellLibrary::npn_class(id) で返されるオブジェクトの id() は id となる．
+  virtual
+  ymuint
+  id() const;
 
   /// @brief 同位体変換リストを得る．
   virtual
   const vector<NpnMapM>&
   idmap_list() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // このクラスに属しているセルグループの情報を取得する関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief セルグループの数を返す．
   virtual
@@ -60,27 +72,24 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化する．
+  /// @param[in] id ID番号
   /// @param[in] idmap_list 同位体変換リスト
-  /// @param[in] group_num グループ数
+  /// @param[in] group_list グループのリスト
   /// @param[in] alloc メモリアロケータ
   void
-  init(const vector<NpnMapM>& idmap_list,
-       ymuint group_num,
+  init(ymuint id,
+       const vector<NpnMapM>& idmap_list,
+       const vector<const CellGroup*>& group_list,
        AllocBase& alloc);
-
-  /// @brief グループを設定する．
-  /// @param[in] pos 位置番号 ( 0 <= pos < group_num() )
-  /// @param[in] group グループ
-  /// @note 必ず init() の後に呼び出すこと
-  void
-  set_group(ymuint pos,
-	    const CellGroup* group);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // ID番号
+  ymuint32 mId;
 
   // 同位体変換リスト
   vector<NpnMapM> mIdmapList;

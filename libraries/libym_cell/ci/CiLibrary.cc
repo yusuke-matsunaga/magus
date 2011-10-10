@@ -897,22 +897,20 @@ CiLibrary::compile()
     const CellClass* parent = npn_class(src_group->parent()->id());
     const vector<const Cell*>& cell_list = src_group->cell_list();
     ymuint n = cell_list.size();
-    dst_group.init(parent, src_group->map(), n, mAlloc);
-    for (ymuint i = 0; i < n; ++ i) {
-      dst_group.set_cell(i, cell_list[i]);
-    }
+    dst_group.init(g, parent, src_group->map(), cell_list, mAlloc);
   }
 
   for (ymuint c = 0; c < nc; ++ c) {
     const LcClass* src_class = libcomp.npn_class(c);
     const vector<LcGroup*>& src_group_list = src_class->group_list();
     ymuint n = src_group_list.size();
-    CiClass& dst_class = mClassArray[c];
-    dst_class.init(src_class->idmap_list(), n, mAlloc);
+    vector<const CellGroup*> dst_group_list(n);
     for (ymuint i = 0; i < n; ++ i) {
       const CellGroup* dst_group = group(src_group_list[i]->id());
-      dst_class.set_group(i, dst_group);
+      dst_group_list[i] = dst_group;
     }
+    CiClass& dst_class = mClassArray[c];
+    dst_class.init(c, src_class->idmap_list(), dst_group_list, mAlloc);
   }
 
   for (ymuint i = 0; i < 4; ++ i) {

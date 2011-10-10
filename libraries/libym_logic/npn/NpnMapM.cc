@@ -346,5 +346,53 @@ operator<<(ostream& s,
   return s;
 }
 
+// バイナリ出力
+BinO&
+operator<<(BinO& bos,
+	   const NpnMapM& map)
+{
+  ymuint32 ni = map.ni();
+  bos << ni;
+
+  ymuint32 no = map.no();
+  bos << no;
+
+  for (ymuint i = 0; i < ni; ++ i) {
+    NpnVmap vmap = map.imap(i);
+    bos << vmap;
+  }
+
+  for (ymuint i = 0; i < no; ++ i) {
+    NpnVmap vmap = map.omap(i);
+    bos << vmap;
+  }
+
+  return bos;
+}
+
+// バイナリ入力
+BinI&
+operator<<(BinI& bis,
+	   NpnMapM& map)
+{
+  ymuint32 ni;
+  ymuint32 no;
+  bis >> ni >> no;
+  map.resize(ni, no);
+
+  for (ymuint i = 0; i < ni; ++ i) {
+    NpnVmap vmap;
+    bis >> vmap;
+    map.set_imap(i, vmap);
+  }
+
+  for (ymuint i = 0; i < no; ++ i) {
+    NpnVmap vmap;
+    bis >> vmap;
+    map.set_omap(i, vmap);
+  }
+
+  return bis;
+}
 END_NAMESPACE_YM_NPN
 

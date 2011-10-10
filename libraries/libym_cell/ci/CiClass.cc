@@ -30,6 +30,14 @@ CiClass::~CiClass()
   // mGroupList は CellMgr が管理している．
 }
 
+// @brief ID番号を返す．
+// @note CellLibrary::npn_class(id) で返されるオブジェクトの id() は id となる．
+ymuint
+CiClass::id() const
+{
+  return mId;
+}
+
 // @brief 同位体変換リストを得る．
 const vector<NpnMapM>&
 CiClass::idmap_list() const
@@ -54,14 +62,17 @@ CiClass::cell_group(ymuint pos) const
 }
 
 // @brief 初期化する．
+// @param[in] id ID番号
 // @param[in] idmap_list 同位体変換リスト
-// @param[in] group_num グループ数
+// @param[in] group_list グループのリスト
 // @param[in] alloc メモリアロケータ
 void
-CiClass::init(const vector<NpnMapM>& idmap_list,
-	      ymuint group_num,
+CiClass::init(ymuint id,
+	      const vector<NpnMapM>& idmap_list,
+	      const vector<const CellGroup*>& group_list,
 	      AllocBase& alloc)
 {
+  mId = id;
   mIdmapList.clear();
   mIdmapList.reserve(idmap_list.size());
   for (vector<NpnMapM>::const_iterator p = idmap_list.begin();
@@ -69,21 +80,12 @@ CiClass::init(const vector<NpnMapM>& idmap_list,
     mIdmapList.push_back(*p);
   }
 
-  mGroupNum = group_num;
-  void* p = alloc.get_memory(sizeof(const CellGroup*) * group_num);
-  mGroupList = new (p) const CellGroup*[group_num];
-}
-
-// @brief グループを設定する．
-// @param[in] pos 位置番号 ( 0 <= pos < group_num() )
-// @param[in] group グループ
-// @note 必ず init() の後に呼び出すこと
-void
-CiClass::set_group(ymuint pos,
-		   const CellGroup* group)
-{
-  assert_cond( pos < mGroupNum, __FILE__, __LINE__);
-  mGroupList[pos] = group;
+  mGroupNum = group_list.size();
+  void* p = alloc.get_memory(sizeof(const CellGroup*) * mGroupNum);
+  mGroupList = new (p) const CellGroup*[mGroupNum];
+  for (ymuint i = 0; i < mGroupNum; ++ i) {
+    mGroupList[i] = group_list[i];
+  }
 }
 
 END_NAMESPACE_YM_CELL

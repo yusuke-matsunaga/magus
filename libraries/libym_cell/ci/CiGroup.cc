@@ -30,6 +30,14 @@ CiGroup::~CiGroup()
   // mCellList は CellMgr が管理する．
 }
 
+// @brief ID番号を返す．
+// @note CellLibrary::group(id) で返されるオブジェクトの id() は id となる．
+ymuint
+CiGroup::id() const
+{
+  return mId;
+}
+
 // @brief 属している CellClass を返す．
 const CellClass*
 CiGroup::cell_class() const
@@ -61,33 +69,27 @@ CiGroup::cell(ymuint pos) const
 }
 
 // @brief 初期化する．
+// @param[in] id ID番号
 // @param[in] cell_class 代表クラス
 // @param[in] map 変換マップ
 // @param[in] cell_list セルのリスト
 // @param[in] alloc メモリアロケータ
 void
-CiGroup::init(const CellClass* cell_class,
+CiGroup::init(ymuint id,
+	      const CellClass* cell_class,
 	      const NpnMapM& map,
-	      ymuint cell_num,
+	      const vector<const Cell*>& cell_list,
 	      AllocBase& alloc)
 {
+  mId = id;
   mCellClass = cell_class;
   mMap = map;
-  mCellNum = cell_num;
-  void* p = alloc.get_memory(sizeof(const Cell*) * cell_num);
-  mCellList = new (p) const Cell*[cell_num];
-}
-
-// @brief セルを設定する．
-// @param[in] pos 位置番号 ( 0 <= pos < cell_num() )
-// @param[in] cell セル
-// @note 必ず init() の後に呼び出すこと
-void
-CiGroup::set_cell(ymuint pos,
-		  const Cell* cell)
-{
-  assert_cond( pos < cell_num(), __FILE__, __LINE__);
-  mCellList[pos] = cell;
+  mCellNum = cell_list.size();
+  void* p = alloc.get_memory(sizeof(const Cell*) * mCellNum);
+  mCellList = new (p) const Cell*[mCellNum];
+  for (ymuint i = 0; i < mCellNum; ++ i) {
+    mCellList[i] = cell_list[i];
+  }
 }
 
 END_NAMESPACE_YM_CELL

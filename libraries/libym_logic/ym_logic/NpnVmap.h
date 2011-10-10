@@ -11,6 +11,7 @@
 
 #include "ym_logic/npn_nsdef.h"
 #include "ym_logic/Pol.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_NPN
@@ -69,6 +70,30 @@ public:
   operator!=(const NpnVmap& right) const;
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // フレンド関数 (public に意味はない)
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力ストリーム
+  /// @param[in] vmap 対象のオブジェクト
+  /// @return s
+  friend
+  BinO&
+  operator<<(BinO& s,
+	     const NpnVmap& vmap);
+
+  /// @brief バイナリ入力
+  /// @param[in] s 入力ストリーム
+  /// @param[out] vmap 結果を格納する変数
+  /// @return s
+  friend
+  BinI&
+  operator>>(BinI& s,
+	     NpnVmap& vmap);
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -78,6 +103,7 @@ private:
   ymuint8 mPosPol;
 
 };
+
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
@@ -149,6 +175,30 @@ bool
 NpnVmap::operator!=(const NpnVmap& right) const
 {
   return !operator==(right);
+}
+
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力ストリーム
+// @param[in] vmap 対象のオブジェクト
+// @return s
+inline
+BinO&
+operator<<(BinO& s,
+	   const NpnVmap& vmap)
+{
+  return s << vmap.mPosPol;
+}
+
+// @brief バイナリ入力
+// @param[in] s 入力ストリーム
+// @param[out] vmap 結果を格納する変数
+// @return s
+inline
+BinI&
+operator>>(BinI& s,
+	   NpnVmap& vmap)
+{
+  return s >> vmap.mPosPol;
 }
 
 END_NAMESPACE_YM_NPN

@@ -11,8 +11,12 @@
 #include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
 #include "ym_cell/CellTiming.h"
+#include "ym_cell/CellClass.h"
+#include "ym_cell/CellGroup.h"
+#include "ym_cell/CellPatGraph.h"
 
 #include "ym_logic/LogExpr.h"
+#include "ym_logic/NpnMapM.h"
 #include "ym_utils/BinIO.h"
 
 
@@ -187,6 +191,98 @@ CellLibrary::dump(ostream& s) const
       }
     }
     bos << static_cast<ymuint8>(0);
+  }
+
+  // セルクラスの個数だけダンプする．
+  ymuint32 ncc = npn_class_num();
+  bos << ncc;
+
+  // セルグループ情報のダンプ
+  ymuint32 ng = group_num();
+  for (ymuint g = 0; g < ng; ++ g) {
+    const CellGroup* group = this->group(g);
+    ymuint32 parent_id = group->cell_class()->id();
+    bos << parent_id
+	<< group->map();
+    ymuint32 nc = group->cell_num();
+    bos << nc;
+    for (ymuint k = 0; k < nc; ++ k) {
+      const Cell* cell = group->cell(k);
+      ymuint32 cell_id = cell->id();
+      bos << cell_id;
+    }
+  }
+
+  // セルクラス情報のダンプ
+  for (ymuint i = 0; i < ncc; ++ i) {
+    const CellClass* cclass = npn_class(i);
+
+    // 同位体変換情報のダンプ
+    const vector<NpnMapM>& idmap_list = cclass->idmap_list();
+    ymuint32 nm = idmap_list.size();
+    bos << nm;
+    for (vector<NpnMapM>::const_iterator p = idmap_list.begin();
+	 p != idmap_list.end(); ++ p) {
+      bos << *p;
+    }
+
+    // グループ情報のダンプ
+    ymuint32 ng = cclass->group_num();
+    bos << ng;
+    for (ymuint j = 0; j < ng; ++ j) {
+      const CellGroup* group = cclass->cell_group(j);
+      ymuint32 group_id = group->id();
+      bos << group_id;
+    }
+  }
+
+  // パタングラフのノード情報のダンプ
+  ymuint32 nn = node_num();
+  bos << nn;
+  for (ymuint i = 0; i < nn; ++ i) {
+    switch ( node_type(i) ) {
+    case kCellPatInput:
+      bos << static_cast<ymuint8>(0U) << static_cast<ymuint32>(input_id(i));
+      break;
+
+    case kCellPatAnd:
+      bos << static_cast<ymuint8>(1U);
+      break;
+
+    case kCellPatXor:
+      bos << static_cast<ymuint8>(2U);
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+    }
+  }
+
+  // パタングラフの枝の情報のダンプ
+  ymuint32 ne = edge_num();
+  for (ymuint i = 0; i < ne; ++ i) {
+    ymuint32 from = edge_from(i);
+    ymuint32 to = edge_to(i);
+    ymuint8 pos = edge_pos(i) << 1;
+    if ( edge_inv(i) ) {
+      pos |= 1U;
+    }
+    bos << from << to << pos;
+  }
+
+  // パタングラフの情報のダンプ
+  ymuint32 np = pat_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const CellPatGraph& pat = this->pat(i);
+    ymuint32 rep = pat.rep_id();
+    bool inv = pat.root_inv();
+    ymuint32 input_num = pat.input_num();
+    bos << rep << inv << input_num;
+    ymuint32 ne = pat.edge_num();
+    bos << ne;
+    for (ymuint j = 0; j < ne; ++ j) {
+      bos << pat.edge(j);
+    }
   }
 }
 

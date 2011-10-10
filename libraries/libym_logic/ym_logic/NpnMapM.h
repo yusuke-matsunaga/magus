@@ -12,6 +12,7 @@
 #include "ym_logic/npn_nsdef.h"
 #include "ym_logic/Pol.h"
 #include "ym_logic/NpnVmap.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_NPN
@@ -203,6 +204,22 @@ operator*(const NpnMapM& src1,
 ostream&
 operator<<(ostream& s,
 	   const NpnMapM& map);
+
+/// @brief バイナリ出力
+/// @param[in] s 出力ストリーム
+/// @param[in] map 変換マップ
+/// @return s
+BinO&
+operator<<(BinO& s,
+	   const NpnMapM& map);
+
+/// @brief バイナリ入力
+/// @param[in] s 入力ストリーム
+/// @param[out] map 結果を格納する変数
+/// @return s
+BinI&
+operator>>(BinI& s,
+	   NpnMapM& map);
 
 
 //////////////////////////////////////////////////////////////////////
