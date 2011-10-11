@@ -9,6 +9,10 @@
 
 #include "CiGroup.h"
 
+#include "ym_cell/CellLibrary.h"
+#include "ym_cell/CellClass.h"
+#include "ym_cell/Cell.h"
+
 
 BEGIN_NAMESPACE_YM_CELL
 
@@ -69,26 +73,75 @@ CiGroup::cell(ymuint pos) const
 }
 
 // @brief 初期化する．
-// @param[in] id ID番号
 // @param[in] cell_class 代表クラス
 // @param[in] map 変換マップ
 // @param[in] cell_list セルのリスト
 // @param[in] alloc メモリアロケータ
 void
-CiGroup::init(ymuint id,
-	      const CellClass* cell_class,
+CiGroup::init(const CellClass* cell_class,
 	      const NpnMapM& map,
 	      const vector<const Cell*>& cell_list,
 	      AllocBase& alloc)
 {
-  mId = id;
   mCellClass = cell_class;
   mMap = map;
   mCellNum = cell_list.size();
-  void* p = alloc.get_memory(sizeof(const Cell*) * mCellNum);
-  mCellList = new (p) const Cell*[mCellNum];
+
+  alloc_array(alloc);
   for (ymuint i = 0; i < mCellNum; ++ i) {
     mCellList[i] = cell_list[i];
+  }
+}
+
+// @brief バイナリダンプを行う．
+// @param[in] bos 出力先のストリーム
+void
+CiGroup::dump(BinO& bos) const
+{
+  ymuint32 parent_id = mCellClass->id();
+  bos << parent_id
+      << mMap
+      << mCellNum;
+  for (ymuint i = 0; i < mCellNum; ++ i) {
+    ymuint32 cell_id = mCellList[i]->id();
+    bos << cell_id;
+  }
+}
+
+// @brief バイナリファイルを読み込む．
+// @param[in] bis 入力元のストリーム
+// @param[in] library セルライブラリ
+// @param[in] alloc メモリアロケータ
+void
+CiGroup::restore(BinI& bis,
+		 const CellLibrary& library,
+		 AllocBase& alloc)
+{
+  ymuint32 parent_id;
+  bis >> parent_id
+      >> mMap
+      >> mCellNum;
+  mCellClass = library.npn_class(parent_id);
+
+  alloc_array(alloc);
+  for (ymuint i = 0; i < mCellNum; ++ i) {
+    ymuint32 cell_id;
+    bis >> cell_id;
+    mCellList[i] = library.cell(cell_id);
+  }
+}
+
+// @brief メモリ領域の確保を行う．
+// @param[in] alloc メモリアロケータ
+void
+CiGroup::alloc_array(AllocBase& alloc)
+{
+  if ( mCellNum > 0 ) {
+    void* p = alloc.get_memory(sizeof(const Cell*) * mCellNum);
+    mCellList = new (p) const Cell*[mCellNum];
+  }
+  else {
+    mCellList = NULL;
   }
 }
 

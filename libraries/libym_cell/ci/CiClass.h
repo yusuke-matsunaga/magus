@@ -11,6 +11,7 @@
 
 #include "ym_cell/CellClass.h"
 #include "ym_utils/Alloc.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -22,6 +23,8 @@ BEGIN_NAMESPACE_YM_CELL
 class CiClass :
   public CellClass
 {
+  friend class CiLibrary;
+
 public:
 
   /// @brief コンストラクタ
@@ -43,10 +46,17 @@ public:
   ymuint
   id() const;
 
-  /// @brief 同位体変換リストを得る．
+  /// @brief 同位体変換の個数を得る．
+  /// @note 恒等変換は含まない．
   virtual
-  const vector<NpnMapM>&
-  idmap_list() const;
+  ymuint
+  idmap_num() const;
+
+  /// @brief 同位体変換を得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < idmap_num() )
+  virtual
+  const NpnMapM&
+  idmap(ymuint pos) const;
 
 
 public:
@@ -72,15 +82,45 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化する．
-  /// @param[in] id ID番号
   /// @param[in] idmap_list 同位体変換リスト
   /// @param[in] group_list グループのリスト
   /// @param[in] alloc メモリアロケータ
   void
-  init(ymuint id,
-       const vector<NpnMapM>& idmap_list,
+  init(const vector<NpnMapM>& idmap_list,
        const vector<const CellGroup*>& group_list,
        AllocBase& alloc);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // バイナリダンプ用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief バイナリダンプを行う．
+  /// @param[in] bos 出力先のストリーム
+  void
+  dump(BinO& bos) const;
+
+  /// @brief バイナリファイルを読み込む．
+  /// @param[in] bis 入力元のストリーム
+  /// @param[in] library セルライブラリ
+  /// @param[in] alloc メモリアロケータ
+  void
+  restore(BinI& bis,
+	  const CellLibrary& library,
+	  AllocBase& alloc);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // メモリ確保用の下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 配列領域の確保を行う．
+  /// @param[in] alloc メモリアロケータ
+  /// @note mIdmapNum, mGroupNum が適切に設定されている必要がある．
+  void
+  alloc_array(AllocBase& alloc);
 
 
 private:
@@ -91,8 +131,11 @@ private:
   // ID番号
   ymuint32 mId;
 
-  // 同位体変換リスト
-  vector<NpnMapM> mIdmapList;
+  // 同位体変換の数
+  ymuint32 mIdmapNum;
+
+  // 同位体変換の配列
+  NpnMapM* mIdmapList;
 
   // グループの数
   ymuint32 mGroupNum;

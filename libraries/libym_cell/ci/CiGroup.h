@@ -12,6 +12,7 @@
 #include "ym_cell/CellGroup.h"
 #include "ym_logic/NpnMapM.h"
 #include "ym_utils/Alloc.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -23,6 +24,8 @@ BEGIN_NAMESPACE_YM_CELL
 class CiGroup :
   public CellGroup
 {
+  friend class CiLibrary;
+
 public:
 
   /// @brief コンストラクタ
@@ -84,17 +87,46 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化する．
-  /// @param[in] id ID番号
   /// @param[in] cell_class 代表クラス
   /// @param[in] map 変換マップ
   /// @param[in] cell_list セルのリスト
   /// @param[in] alloc メモリアロケータ
   void
-  init(ymuint id,
-       const CellClass* cell_class,
+  init(const CellClass* cell_class,
        const NpnMapM& map,
        const vector<const Cell*>& cell_list,
        AllocBase& alloc);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // バイナリダンプ用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief バイナリダンプを行う．
+  /// @param[in] bos 出力先のストリーム
+  void
+  dump(BinO& bos) const;
+
+  /// @brief バイナリファイルを読み込む．
+  /// @param[in] bis 入力元のストリーム
+  /// @param[in] library セルライブラリ
+  /// @param[in] alloc メモリアロケータ
+  void
+  restore(BinI& bis,
+	  const CellLibrary& library,
+	  AllocBase& alloc);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief メモリ領域の確保を行う．
+  /// @param[in] alloc メモリアロケータ
+  void
+  alloc_array(AllocBase& alloc);
 
 
 private:

@@ -8,6 +8,8 @@
 
 
 #include "CiClass.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_cell/CellGroup.h"
 #include "ym_logic/NpnMapM.h"
 
 
@@ -19,6 +21,8 @@ BEGIN_NAMESPACE_YM_CELL
 
 // @brief コンストラクタ
 CiClass::CiClass() :
+  mIdmapNum(0),
+  mIdmapList(NULL),
   mGroupNum(0),
   mGroupList(NULL)
 {
@@ -27,7 +31,7 @@ CiClass::CiClass() :
 // @brief デストラクタ
 CiClass::~CiClass()
 {
-  // mGroupList は CellMgr が管理している．
+  // mIdmapList, mGroupList は CellMgr が管理している．
 }
 
 // @brief ID番号を返す．
@@ -38,11 +42,21 @@ CiClass::id() const
   return mId;
 }
 
-// @brief 同位体変換リストを得る．
-const vector<NpnMapM>&
-CiClass::idmap_list() const
+// @brief 同位体変換の個数を得る．
+// @note 恒等変換は含まない．
+ymuint
+CiClass::idmap_num() const
 {
-  return mIdmapList;
+  return mIdmapNum;
+}
+
+// @brief 同位体変換を得る．
+// @param[in] pos 位置番号 ( 0 <= pos < idmap_num() )
+const NpnMapM&
+CiClass::idmap(ymuint pos) const
+{
+  assert_cond( pos < mIdmapNum, __FILE__, __LINE__);
+  return mIdmapList[pos];
 }
 
 // @brief NPN同値類の数を返す．
@@ -62,29 +76,95 @@ CiClass::cell_group(ymuint pos) const
 }
 
 // @brief 初期化する．
-// @param[in] id ID番号
 // @param[in] idmap_list 同位体変換リスト
 // @param[in] group_list グループのリスト
 // @param[in] alloc メモリアロケータ
 void
-CiClass::init(ymuint id,
-	      const vector<NpnMapM>& idmap_list,
+CiClass::init(const vector<NpnMapM>& idmap_list,
 	      const vector<const CellGroup*>& group_list,
 	      AllocBase& alloc)
 {
-  mId = id;
-  mIdmapList.clear();
-  mIdmapList.reserve(idmap_list.size());
-  for (vector<NpnMapM>::const_iterator p = idmap_list.begin();
-       p != idmap_list.end(); ++ p) {
-    mIdmapList.push_back(*p);
+  mIdmapNum = idmap_list.size();
+  mGroupNum = group_list.size();
+  alloc_array(alloc);
+
+  for (ymuint i = 0; i < mIdmapNum; ++ i) {
+    mIdmapList[i] = idmap_list[i];
   }
 
-  mGroupNum = group_list.size();
-  void* p = alloc.get_memory(sizeof(const CellGroup*) * mGroupNum);
-  mGroupList = new (p) const CellGroup*[mGroupNum];
   for (ymuint i = 0; i < mGroupNum; ++ i) {
     mGroupList[i] = group_list[i];
+  }
+}
+
+// @brief バイナリダンプを行う．
+// @param[in] bos 出力先のストリーム
+void
+CiClass::dump(BinO& bos) const
+{
+  bos << mIdmapNum
+      << mGroupNum;
+
+  // 同位体変換情報のダンプ
+  for (ymuint i = 0; i < mIdmapNum; ++ i) {
+    bos << mIdmapList[i];
+  }
+
+  // グループ情報のダンプ
+  for (ymuint j = 0; j < mGroupNum; ++ j) {
+    const CellGroup* group = mGroupList[j];
+    ymuint32 group_id = group->id();
+    bos << group_id;
+  }
+}
+
+// @brief バイナリファイルを読み込む．
+// @param[in] bis 入力元のストリーム
+// @param[in] library セルライブラリ
+// @param[in] alloc メモリアロケータ
+void
+CiClass::restore(BinI& bis,
+		 const CellLibrary& library,
+		 AllocBase& alloc)
+{
+  bis >> mIdmapNum
+      >> mGroupNum;
+  alloc_array(alloc);
+
+  // 同位体変換情報の設定
+  for (ymuint i = 0; i < mIdmapNum; ++ i) {
+    bis >> mIdmapList[i];
+  }
+
+  // グループ情報の設定
+  for (ymuint i = 0; i < mGroupNum; ++ i) {
+    ymuint32 group_id;
+    bis >> group_id;
+    const CellGroup* group = library.group(group_id);
+    mGroupList[i] = group;
+  }
+}
+
+// @brief 配列領域の確保を行う．
+// @param[in] alloc メモリアロケータ
+// @note mIdmapNum, mGroupNum が適切に設定されている必要がある．
+void
+CiClass::alloc_array(AllocBase& alloc)
+{
+  if ( mIdmapNum > 0 ) {
+    void* p = alloc.get_memory(sizeof(NpnMapM) * mIdmapNum);
+    mIdmapList = new (p) NpnMapM[mIdmapNum];
+  }
+  else {
+    mIdmapList = NULL;
+  }
+
+  if ( mGroupNum > 0 ) {
+    void* p = alloc.get_memory(sizeof(const CellGroup*) * mGroupNum);
+    mGroupList = new (p) const CellGroup*[mGroupNum];
+  }
+  else {
+    mGroupList = NULL;
   }
 }
 

@@ -254,42 +254,12 @@ CiLibrary::restore(istream& s)
 
   // セルグループ情報の設定
   for (ymuint g = 0; g < ng; ++ g) {
-    ymuint32 parent_id;
-    NpnMapM map;
-    ymuint32 nc;
-    bis >> parent_id
-	>> map
-	>> nc;
-    const CellClass* parent = npn_class(parent_id);
-    vector<const Cell*> cell_list(nc);
-    for (ymuint i = 0; i < nc; ++ i) {
-      ymuint32 cell_id;
-      bis >> cell_id;
-      cell_list[i] = cell(cell_id);
-    }
-    CiGroup& dst_group = mGroupArray[g];
-    dst_group.init(g, parent, map, cell_list, mAlloc);
+    mGroupArray[g].restore(bis, *this, mAlloc);
   }
 
   // セルクラス情報の設定
   for (ymuint c = 0; c < ncc; ++ c) {
-    ymuint32 nm;
-    bis >> nm;
-    vector<NpnMapM> map_list(nm);
-    for (ymuint i = 0; i < nm; ++ i) {
-      bis >> map_list[i];
-    }
-
-    ymuint32 ng;
-    bis >> ng;
-    vector<const CellGroup*> group_list(ng);
-    for (ymuint i = 0; i < ng; ++ i) {
-      ymuint32 group_id;
-      bis >> group_id;
-      group_list[i] = group(group_id);
-    }
-    CiClass& dst_class = mClassArray[c];
-    dst_class.init(c, map_list, group_list, mAlloc);
+    mClassArray[c].restore(bis, *this, mAlloc);
   }
 
   // 組み込み型の設定

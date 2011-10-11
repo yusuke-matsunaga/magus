@@ -896,7 +896,7 @@ CiLibrary::compile()
     CiGroup& dst_group = mGroupArray[g];
     const CellClass* parent = npn_class(src_group->parent()->id());
     const vector<const Cell*>& cell_list = src_group->cell_list();
-    dst_group.init(g, parent, src_group->map(), cell_list, mAlloc);
+    dst_group.init(parent, src_group->map(), cell_list, mAlloc);
   }
 
   for (ymuint c = 0; c < nc; ++ c) {
@@ -909,7 +909,7 @@ CiLibrary::compile()
       dst_group_list[i] = dst_group;
     }
     CiClass& dst_class = mClassArray[c];
-    dst_class.init(c, src_class->idmap_list(), dst_group_list, mAlloc);
+    dst_class.init(src_class->idmap_list(), dst_group_list, mAlloc);
   }
 
   for (ymuint i = 0; i < 4; ++ i) {
@@ -932,8 +932,11 @@ void
 CiLibrary::set_class_num(ymuint nc)
 {
   mClassNum = nc;
-  void* p = mAlloc.get_memory(sizeof(CiClass) * nc);
-  mClassArray = new (p) CiClass[nc];
+  void* p = mAlloc.get_memory(sizeof(CiClass) * mClassNum);
+  mClassArray = new (p) CiClass[mClassNum];
+  for (ymuint i = 0; i < mClassNum; ++ i) {
+    mClassArray[i].mId = i;
+  }
 }
 
 // @brief グループ数を設定する．
@@ -943,8 +946,11 @@ void
 CiLibrary::set_group_num(ymuint ng)
 {
   mGroupNum = ng;
-  void* p = mAlloc.get_memory(sizeof(CiGroup) * ng);
-  mGroupArray = new (p) CiGroup[ng];
+  void* p = mAlloc.get_memory(sizeof(CiGroup) * mGroupNum);
+  mGroupArray = new (p) CiGroup[mGroupNum];
+  for (ymuint i = 0; i < mGroupNum; ++ i) {
+    mGroupArray[i].mId = i;
+  }
 }
 
 END_NAMESPACE_YM_CELL

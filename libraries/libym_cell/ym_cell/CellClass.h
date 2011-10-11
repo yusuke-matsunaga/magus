@@ -42,11 +42,17 @@ public:
   ymuint
   id() const = 0;
 
-  /// @brief 同位体変換リストを得る．
+  /// @brief 同位体変換の個数を得る．
+  /// @note 恒等変換は含まない．
   virtual
-  const vector<NpnMapM>&
-  idmap_list() const = 0;
+  ymuint
+  idmap_num() const = 0;
 
+  /// @brief 同位体変換を得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < idmap_num() )
+  virtual
+  const NpnMapM&
+  idmap(ymuint pos) const = 0;
 
 
 public:
