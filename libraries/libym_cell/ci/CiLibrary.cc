@@ -896,7 +896,6 @@ CiLibrary::compile()
     CiGroup& dst_group = mGroupArray[g];
     const CellClass* parent = npn_class(src_group->parent()->id());
     const vector<const Cell*>& cell_list = src_group->cell_list();
-    ymuint n = cell_list.size();
     dst_group.init(g, parent, src_group->map(), cell_list, mAlloc);
   }
 

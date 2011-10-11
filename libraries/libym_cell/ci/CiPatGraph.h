@@ -11,6 +11,7 @@
 
 #include "ym_cell/CellPatGraph.h"
 #include "ym_utils/Alloc.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -71,6 +72,24 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
+  // バイナリダンプ用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief バイナリダンプを行う．
+  /// @param[in] bos 出力先のストリーム
+  void
+  dump(BinO& bos) const;
+
+  /// @brief バイナリファイルを読み込む．
+  /// @param[in] bis 入力元のストリーム
+  /// @param[in] alloc メモリアロケータ
+  void
+  restore(BinI& bis,
+	  AllocBase& alloc);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
   // 設定用の関数
   //////////////////////////////////////////////////////////////////////
 
@@ -92,6 +111,18 @@ public:
   void
   set_edge(ymuint pos,
 	   ymuint edge);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief mEdgeList を確保する．
+  /// @param[in] alloc メモリアロケータ
+  /// @note mEdgeNum に値が設定されているものとする．
+  void
+  alloc_array(AllocBase& alloc);
 
 
 private:

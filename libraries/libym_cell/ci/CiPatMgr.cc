@@ -110,7 +110,26 @@ CiPatMgr::copy(const LcPatMgr& src,
       pg.set_edge(j, node_list[j]);
     }
   }
+}
 
+// @brief バイナリダンプを行う．
+// @param[in] bos 出力先のストリーム
+void
+CiPatMgr::dump(BinO& bos) const
+{
+  // パタングラフのノード情報のダンプ
+  bos << mNodeNum;
+  for (ymuint i = 0; i < mNodeNum; ++ i) {
+    bos << mNodeTypeArray[i]
+	<< mEdgeArray[i * 2 + 0]
+	<< mEdgeArray[i * 2 + 1];
+  }
+
+  // パタングラフの情報のダンプ
+  bos << mPatNum;
+  for (ymuint i = 0; i < mPatNum; ++ i) {
+    mPatArray[i].dump(bos);
+  }
 }
 
 // @brief データを読み込んでセットする．
@@ -119,8 +138,8 @@ CiPatMgr::copy(const LcPatMgr& src,
 // @retval true 読み込みが成功した．
 // @retval false 読み込みが失敗した．
 bool
-CiPatMgr::load(BinI& bis,
-	       AllocBase& alloc)
+CiPatMgr::restore(BinI& bis,
+		  AllocBase& alloc)
 {
   // ノードと枝の情報を読み込む．
   ymuint32 nn;
@@ -140,19 +159,7 @@ CiPatMgr::load(BinI& bis,
   bis >> np;
   set_pat_num(np, alloc);
   for (ymuint id = 0; id < mPatNum; ++ id) {
-    CiPatGraph& pg = mPatArray[id];
-    ymuint32 rep_id;
-    ymuint32 input_num;
-    ymuint32 edge_num;
-    bis >> rep_id
-	>> input_num
-	>> edge_num;
-    pg.init(rep_id, input_num, edge_num, alloc);
-    for (ymuint i = 0; i < edge_num; ++ i) {
-      ymuint32 val;
-      bis >> val;
-      pg.set_edge(i, val);
-    }
+    mPatArray[id].restore(bis, alloc);
   }
 
   return true;

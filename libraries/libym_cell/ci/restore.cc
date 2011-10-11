@@ -7,19 +7,23 @@
 /// All rights reserved.
 
 
-#include "ym_cell/CellLibrary.h"
+#include "CiLibrary.h"
+#include "CiClass.h"
+#include "CiGroup.h"
+
 #include "ym_cell/CellArea.h"
 #include "ym_cell/CellCapacitance.h"
 #include "ym_cell/CellResistance.h"
 #include "ym_cell/CellTime.h"
 #include "ym_logic/LogExpr.h"
+#include "ym_logic/NpnMapM.h"
 #include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
 void
-CellLibrary::restore(istream& s)
+CiLibrary::restore(istream& s)
 {
   BinI bis(s);
 
@@ -33,7 +37,6 @@ CellLibrary::restore(istream& s)
   set_cell_num(nc);
 
   for (ymuint cell_id = 0; cell_id < nc; ++ cell_id) {
-    cout << "cell_id = " << cell_id << endl;
     ymuint8 type;
     string name;
     CellArea area;
@@ -241,7 +244,73 @@ CellLibrary::restore(istream& s)
     }
   }
 
+  // セルクラス数とグループ数の取得
+  ymuint32 ncc;
+  ymuint32 ng;
+  bis >> ncc
+      >> ng;
+  set_class_num(ncc);
+  set_group_num(ng);
 
+  // セルグループ情報の設定
+  for (ymuint g = 0; g < ng; ++ g) {
+    ymuint32 parent_id;
+    NpnMapM map;
+    ymuint32 nc;
+    bis >> parent_id
+	>> map
+	>> nc;
+    const CellClass* parent = npn_class(parent_id);
+    vector<const Cell*> cell_list(nc);
+    for (ymuint i = 0; i < nc; ++ i) {
+      ymuint32 cell_id;
+      bis >> cell_id;
+      cell_list[i] = cell(cell_id);
+    }
+    CiGroup& dst_group = mGroupArray[g];
+    dst_group.init(g, parent, map, cell_list, mAlloc);
+  }
+
+  // セルクラス情報の設定
+  for (ymuint c = 0; c < ncc; ++ c) {
+    ymuint32 nm;
+    bis >> nm;
+    vector<NpnMapM> map_list(nm);
+    for (ymuint i = 0; i < nm; ++ i) {
+      bis >> map_list[i];
+    }
+
+    ymuint32 ng;
+    bis >> ng;
+    vector<const CellGroup*> group_list(ng);
+    for (ymuint i = 0; i < ng; ++ i) {
+      ymuint32 group_id;
+      bis >> group_id;
+      group_list[i] = group(group_id);
+    }
+    CiClass& dst_class = mClassArray[c];
+    dst_class.init(c, map_list, group_list, mAlloc);
+  }
+
+  // 組み込み型の設定
+  for (ymuint i = 0; i < 4; ++ i) {
+    ymuint32 group_id;
+    bis >> group_id;
+    mLogicGroup[i] = &mGroupArray[group_id];
+  }
+  for (ymuint i = 0; i < 4; ++ i) {
+    ymuint32 class_id;
+    bis >> class_id;
+    mFFClass[i] = &mClassArray[class_id];
+  }
+  for (ymuint i = 0; i < 4; ++ i) {
+    ymuint32 class_id;
+    bis >> class_id;
+    mLatchClass[i] = &mClassArray[class_id];
+  }
+
+  // パタングラフの情報の設定
+  mPatMgr.restore(bis, mAlloc);
 }
 
 END_NAMESPACE_YM_CELL

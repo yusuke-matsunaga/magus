@@ -106,6 +106,11 @@ public:
   const CellPatGraph&
   pat(ymuint id) const;
 
+  /// @brief バイナリダンプを行う．
+  /// @param[in] bos 出力先のストリーム
+  void
+  dump(BinO& bos) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -125,8 +130,8 @@ public:
   /// @retval true 読み込みが成功した．
   /// @retval false 読み込みが失敗した．
   bool
-  load(BinI& bis,
-       AllocBase& alloc);
+  restore(BinI& bis,
+	  AllocBase& alloc);
 
 
 private:

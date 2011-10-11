@@ -70,6 +70,7 @@ main(int argc,
     cerr << filename << ": Error in reading library" << endl;
     return 1;
   }
+  display_library(cout, *library);
 
   const char* datafile = "patdata.bin";
   {

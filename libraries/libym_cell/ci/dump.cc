@@ -7,7 +7,8 @@
 /// All rights reserved.
 
 
-#include "ym_cell/CellLibrary.h"
+#include "CiLibrary.h"
+
 #include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
 #include "ym_cell/CellTiming.h"
@@ -25,7 +26,7 @@ BEGIN_NAMESPACE_YM_CELL
 /// @brief 内容をバイナリダンプする．
 /// @param[in] s 出力先のストリーム
 void
-CellLibrary::dump(ostream& s) const
+CiLibrary::dump(ostream& s) const
 {
   BinO bos(s);
 
@@ -199,13 +200,14 @@ CellLibrary::dump(ostream& s) const
 
   // セルグループ情報のダンプ
   ymuint32 ng = group_num();
+  bos << ng;
   for (ymuint g = 0; g < ng; ++ g) {
     const CellGroup* group = this->group(g);
     ymuint32 parent_id = group->cell_class()->id();
-    bos << parent_id
-	<< group->map();
     ymuint32 nc = group->cell_num();
-    bos << nc;
+    bos << parent_id
+	<< group->map()
+	<< nc;
     for (ymuint k = 0; k < nc; ++ k) {
       const Cell* cell = group->cell(k);
       ymuint32 cell_id = cell->id();
@@ -236,54 +238,22 @@ CellLibrary::dump(ostream& s) const
     }
   }
 
-  // パタングラフのノード情報のダンプ
-  ymuint32 nn = node_num();
-  bos << nn;
-  for (ymuint i = 0; i < nn; ++ i) {
-    switch ( node_type(i) ) {
-    case kCellPatInput:
-      bos << static_cast<ymuint8>(0U) << static_cast<ymuint32>(input_id(i));
-      break;
-
-    case kCellPatAnd:
-      bos << static_cast<ymuint8>(1U);
-      break;
-
-    case kCellPatXor:
-      bos << static_cast<ymuint8>(2U);
-      break;
-
-    default:
-      assert_not_reached(__FILE__, __LINE__);
-    }
+  // 組み込み型の情報のダンプ
+  for (ymuint i = 0; i < 4; ++ i) {
+    ymuint32 group_id = mLogicGroup[i]->id();
+    bos << group_id;
   }
-
-  // パタングラフの枝の情報のダンプ
-  ymuint32 ne = edge_num();
-  for (ymuint i = 0; i < ne; ++ i) {
-    ymuint32 from = edge_from(i);
-    ymuint32 to = edge_to(i);
-    ymuint8 pos = edge_pos(i) << 1;
-    if ( edge_inv(i) ) {
-      pos |= 1U;
-    }
-    bos << from << to << pos;
+  for (ymuint i = 0; i < 4; ++ i) {
+    ymuint32 class_id = mFFClass[i]->id();
+    bos << class_id;
+  }
+  for (ymuint i = 0; i < 4; ++ i) {
+    ymuint32 class_id = mLatchClass[i]->id();
+    bos << class_id;
   }
 
   // パタングラフの情報のダンプ
-  ymuint32 np = pat_num();
-  for (ymuint i = 0; i < np; ++ i) {
-    const CellPatGraph& pat = this->pat(i);
-    ymuint32 rep = pat.rep_id();
-    bool inv = pat.root_inv();
-    ymuint32 input_num = pat.input_num();
-    bos << rep << inv << input_num;
-    ymuint32 ne = pat.edge_num();
-    bos << ne;
-    for (ymuint j = 0; j < ne; ++ j) {
-      bos << pat.edge(j);
-    }
-  }
+  mPatMgr.dump(bos);
 }
 
 END_NAMESPACE_YM_CELL

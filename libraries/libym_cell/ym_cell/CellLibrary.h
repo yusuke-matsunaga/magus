@@ -331,13 +331,15 @@ public:
 
   /// @brief 内容をバイナリダンプする．
   /// @param[in] s 出力先のストリーム
+  virtual
   void
-  dump(ostream& s) const;
+  dump(ostream& s) const = 0;
 
   /// @brief バイナリダンプされた内容を読み込む．
   /// @param[in] s 入力元のストリーム
+  virtual
   void
-  restore(istream& s);
+  restore(istream& s) = 0;
 
 
 public:

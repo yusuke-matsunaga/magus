@@ -75,6 +75,34 @@ CiPatGraph::edge(ymuint pos) const
   return mEdgeList[pos];
 }
 
+// @brief バイナリダンプを行う．
+// @param[in] bos 出力先のストリーム
+void
+CiPatGraph::dump(BinO& bos) const
+{
+  bos << mRepId
+      << mInputNum
+      << mEdgeNum;
+  for (ymuint i = 0; i < mEdgeNum; ++ i) {
+    bos << mEdgeList[i];
+  }
+}
+
+// @brief バイナリファイルを読み込む．
+// @param[in] bis 入力元のストリーム
+void
+CiPatGraph::restore(BinI& bis,
+		    AllocBase& alloc)
+{
+  bis >> mRepId
+      >> mInputNum
+      >> mEdgeNum;
+  alloc_array(alloc);
+  for (ymuint i = 0; i < mEdgeNum; ++ i) {
+    bis >> mEdgeList[i];
+  }
+}
+
 // @brief 初期化する．
 // @param[in] rep_id 代表番号
 // @param[in] input_num 入力数
@@ -89,13 +117,7 @@ CiPatGraph::init(ymuint rep_id,
   mRepId = rep_id;
   mInputNum = input_num;
   mEdgeNum = edge_num;
-  if ( edge_num > 0 ) {
-    void* p = alloc.get_memory(sizeof(ymuint32) * edge_num);
-    mEdgeList = new (p) ymuint32[edge_num];
-  }
-  else {
-    mEdgeList = NULL;
-  }
+  alloc_array(alloc);
 }
 
 // @brief 枝のデータを設定する．
@@ -108,6 +130,21 @@ CiPatGraph::set_edge(ymuint pos,
 {
   assert_cond( pos < edge_num(), __FILE__, __LINE__);
   mEdgeList[pos] = edge;
+}
+
+// @brief mEdgeList を確保する．
+// @param[in] alloc メモリアロケータ
+// @note mEdgeNum に値が設定されているものとする．
+void
+CiPatGraph::alloc_array(AllocBase& alloc)
+{
+  if ( mEdgeNum > 0 ) {
+    void* p = alloc.get_memory(sizeof(ymuint32) * mEdgeNum);
+    mEdgeList = new (p) ymuint32[mEdgeNum];
+  }
+  else {
+    mEdgeList = NULL;
+  }
 }
 
 END_NAMESPACE_YM_CELL

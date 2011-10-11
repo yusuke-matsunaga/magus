@@ -372,7 +372,7 @@ operator<<(BinO& bos,
 
 // バイナリ入力
 BinI&
-operator<<(BinI& bis,
+operator>>(BinI& bis,
 	   NpnMapM& map)
 {
   ymuint32 ni;
