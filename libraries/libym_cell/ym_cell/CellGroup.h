@@ -58,17 +58,100 @@ public:
   const NpnMapM&
   map() const = 0;
 
-  /// @brief FFセルのグループの場合にFFのピン情報を返す．
-  /// @note それ以外の場合には NULL を返す．
-  virtual
-  const CellFFInfo*
-  ff_info() const = 0;
 
-  /// @brief ラッチセルのグループの場合にラッチのピン情報を返す．
-  /// @note それ以外の場合には NULL を返す．
+public:
+  //////////////////////////////////////////////////////////////////////
+  // FF/ラッチセルの場合にピンの情報を返す関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief データ入力を持つとき true を返す．
   virtual
-  const CellLatchInfo*
-  latch_info() const = 0;
+  bool
+  has_data() const = 0;
+
+  /// @brief データ入力のピン番号を返す．
+  virtual
+  ymuint
+  data_pos() const = 0;
+
+  /// @brief クロック入力のタイプを返す．
+  /// @retval 0 該当しない
+  /// @retval 1 positive edge
+  /// @retval 2 negative edge
+  virtual
+  ymuint
+  clock_sense() const = 0;
+
+  /// @brief クロック入力のピン番号を返す．
+  virtual
+  ymuint
+  clock_pos() const = 0;
+
+  /// @brief イネーブル入力を持つとき true を返す．
+  virtual
+  bool
+  has_enable() const = 0;
+
+  /// @brief イネーブル入力のタイプを返す．
+  /// @retval 0 なし
+  /// @retval 1 positive edge
+  /// @retval 2 negative edge
+  virtual
+  ymuint
+  enable_sense() const = 0;
+
+  /// @brief イネーブル入力のピン番号を返す．
+  virtual
+  ymuint
+  enable_pos() const = 0;
+
+  /// @brief クリア入力を持つタイプの時に true を返す．
+  virtual
+  bool
+  has_clear() const = 0;
+
+  /// @brief クリア入力のタイプを返す．
+  /// @retval 0 なし
+  /// @retval 1 High sensitive
+  /// @retval 2 Low sensitive
+  virtual
+  ymuint
+  clear_sense() const = 0;
+
+  /// @brief クリア入力のピン番号を返す．
+  /// @note クリア入力がない場合の値は不定
+  virtual
+  ymuint
+  clear_pos() const = 0;
+
+  /// @brief プリセット入力を持つタイプの時に true を返す．
+  virtual
+  bool
+  has_preset() const = 0;
+
+  /// @brief プリセット入力のタイプを返す．
+  /// @retval 0 なし
+  /// @retval 1 High sensitive
+  /// @retval 2 Low sensitive
+  virtual
+  ymuint
+  preset_sense() const = 0;
+
+  /// @brief プリセット入力のピン番号を返す．
+  /// @note プリセット入力がない場合の値は不定
+  virtual
+  ymuint
+  preset_pos() const = 0;
+
+  /// @brief 肯定出力のピン番号を返す．
+  virtual
+  ymuint
+  q_pos() const = 0;
+
+  /// @brief 否定出力のピン番号を返す．
+  virtual
+  ymuint
+  iq_pos() const = 0;
 
 
 public:

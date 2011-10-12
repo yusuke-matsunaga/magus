@@ -10,7 +10,7 @@
 
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_utils/binIO.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -119,7 +119,7 @@ public:
   friend
   BinI&
   operator>>(BinI& bis,
-	     DellFFInfo& ffinfo);
+	     CellFFInfo& ffinfo);
 
 
 private:

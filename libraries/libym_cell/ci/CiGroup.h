@@ -66,6 +66,101 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
+  // FF/ラッチセルの場合にピンの情報を返す関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief データ入力を持つとき true を返す．
+  virtual
+  bool
+  has_data() const;
+
+  /// @brief データ入力のピン番号を返す．
+  virtual
+  ymuint
+  data_pos() const;
+
+  /// @brief クロック入力のタイプを返す．
+  /// @retval 0 該当しない
+  /// @retval 1 positive edge
+  /// @retval 2 negative edge
+  virtual
+  ymuint
+  clock_sense() const;
+
+  /// @brief クロック入力のピン番号を返す．
+  virtual
+  ymuint
+  clock_pos() const;
+
+  /// @brief イネーブル入力を持つとき true を返す．
+  virtual
+  bool
+  has_enable() const;
+
+  /// @brief イネーブル入力のタイプを返す．
+  /// @retval 0 なし
+  /// @retval 1 positive edge
+  /// @retval 2 negative edge
+  virtual
+  ymuint
+  enable_sense() const;
+
+  /// @brief イネーブル入力のピン番号を返す．
+  virtual
+  ymuint
+  enable_pos() const;
+
+  /// @brief クリア入力を持つタイプの時に true を返す．
+  virtual
+  bool
+  has_clear() const;
+
+  /// @brief クリア入力のタイプを返す．
+  /// @retval 0 なし
+  /// @retval 1 High sensitive
+  /// @retval 2 Low sensitive
+  virtual
+  ymuint
+  clear_sense() const;
+
+  /// @brief クリア入力のピン番号を返す．
+  /// @note クリア入力がない場合の値は不定
+  virtual
+  ymuint
+  clear_pos() const;
+
+  /// @brief プリセット入力を持つタイプの時に true を返す．
+  virtual
+  bool
+  has_preset() const;
+
+  /// @brief プリセット入力のタイプを返す．
+  /// @retval 0 なし
+  /// @retval 1 High sensitive
+  /// @retval 2 Low sensitive
+  virtual
+  ymuint
+  preset_sense() const;
+
+  /// @brief プリセット入力のピン番号を返す．
+  /// @note プリセット入力がない場合の値は不定
+  virtual
+  ymuint
+  preset_pos() const;
+
+  /// @brief 肯定出力のピン番号を返す．
+  virtual
+  ymuint
+  q_pos() const;
+
+  /// @brief 否定出力のピン番号を返す．
+  virtual
+  ymuint
+  iq_pos() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
   // このグループに属しているセルの情報を取得する関数
   //////////////////////////////////////////////////////////////////////
 
@@ -142,6 +237,9 @@ private:
 
   // CellClass に対する入出力の変換関数
   NpnMapM mMap;
+
+  // FF/ラッチのピン情報
+  ymuint32 mPinInfo;
 
   // セル数
   ymuint32 mCellNum;

@@ -180,9 +180,9 @@ operator<<(BinO& bos,
 // @return ストリームを返す．
 BinI&
 operator>>(BinI& bis,
-	   DellFFInfo& ffinfo)
+	   CellFFInfo& ffinfo)
 {
-  return bis >> ffinfo.mBits
+  return bis >> ffinfo.mBits;
 }
 
 END_NAMESPACE_YM_CELL

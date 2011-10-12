@@ -119,7 +119,7 @@ public:
   friend
   BinO&
   operator<<(BinO& bos,
-	     const CellFFInfo& latchinfo);
+	     const CellLatchInfo& latchinfo);
 
   /// @brief バイナリファイルを読み込む．
   /// @param[in] bis 入力元のストリーム
@@ -128,7 +128,7 @@ public:
   friend
   BinI&
   operator>>(BinI& bis,
-	     DellFFInfo& latchinfo);
+	     CellLatchInfo& latchinfo);
 
 
 private:

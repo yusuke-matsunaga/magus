@@ -184,7 +184,7 @@ CellLatchInfo::iq_pos() const
 // @return ストリームを返す．
 BinO&
 operator<<(BinO& bos,
-	   const CellFFInfo& latchinfo)
+	   const CellLatchInfo& latchinfo)
 {
   return bos << latchinfo.mBits;
 }
@@ -195,7 +195,7 @@ operator<<(BinO& bos,
 // @return ストリームを返す．
 BinI&
 operator>>(BinI& bis,
-	   DellFFInfo& latchinfo)
+	   CellLatchInfo& latchinfo)
 {
   return bis >> latchinfo.mBits;
 }
