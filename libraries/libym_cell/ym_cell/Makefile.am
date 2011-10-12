@@ -15,7 +15,9 @@ noinst_HEADERS = \
 	CellCapacitance.h \
 	CellClass.h \
 	CellDotlibReader.h \
+	CellFFInfo.h \
 	CellGroup.h \
+	CellLatchInfo.h \
 	CellLibrary.h \
 	CellLut.h \
 	CellMislibReader.h \

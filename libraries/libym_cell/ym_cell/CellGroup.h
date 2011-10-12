@@ -58,6 +58,18 @@ public:
   const NpnMapM&
   map() const = 0;
 
+  /// @brief FFセルのグループの場合にFFのピン情報を返す．
+  /// @note それ以外の場合には NULL を返す．
+  virtual
+  const CellFFInfo*
+  ff_info() const = 0;
+
+  /// @brief ラッチセルのグループの場合にラッチのピン情報を返す．
+  /// @note それ以外の場合には NULL を返す．
+  virtual
+  const CellLatchInfo*
+  latch_info() const = 0;
+
 
 public:
   //////////////////////////////////////////////////////////////////////

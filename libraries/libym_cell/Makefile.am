@@ -35,6 +35,8 @@ libym_cell_la_CPPFLAGS = \
 libym_cell_la_SOURCES = \
 	CellDotlibReader.cc \
 	CellMislibReader.cc \
+	CellFFInfo.cc \
+	CellLatchInfo.cc \
 	display.cc
 
 libym_cell_la_LIBADD = \

@@ -131,14 +131,8 @@ class CellDotlibReader;
 
 class CellGroup;
 class CellClass;
-class CellFFClass;
-class CellFFGroup;
-class CellFFPosArray;
-class CellLatchClass;
-class CellLatchGroup;
-class CellLatchPosArray;
-class CellMgr;
-class CellPatMgr;
+class CellFFInfo;
+class CellLatchInfo;
 class CellPatGraph;
 
 END_NAMESPACE_YM_CELL
@@ -165,14 +159,8 @@ using nsCell::CellDotlibReader;
 
 using nsCell::CellGroup;
 using nsCell::CellClass;
-using nsCell::CellFFClass;
-using nsCell::CellFFGroup;
-using nsCell::CellFFPosArray;
-using nsCell::CellLatchClass;
-using nsCell::CellLatchGroup;
-using nsCell::CellLatchPosArray;
-using nsCell::CellMgr;
-using nsCell::CellPatMgr;
+using nsCell::CellFFInfo;
+using nsCell::CellLatchInfo;
 using nsCell::CellPatGraph;
 
 using nsCell::tCellTimingSense;

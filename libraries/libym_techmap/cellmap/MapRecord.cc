@@ -1,9 +1,7 @@
 
-/// @file libym_techmap/cellmap/MapRecord.cc
+/// @file MapRecord.cc
 /// @brief MapRecord の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: MapRecord.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -64,34 +62,34 @@ MapRecord::copy(const MapRecord& src)
 
 // @brief D-FF のマッチを記録する．
 // @param[in] dff D-FF
-// @param[in] cell セル
-// @param[in] pos_array ピン情報の配列
-// @param[in] phase 入力ピンの極性情報
 // @param[in] inv 極性
+// @param[in] match 対応するマッチ
+// @param[in] cell セル
 void
 MapRecord::set_dff_match(const BdnDff* dff,
-			 const Cell* cell,
-			 CellFFPosArray pos_array,
-			 bool inv)
+			 bool inv,
+			 const Match& match,
+			 const Cell* cell)
 {
-  DffInfo& dffinfo = mDffInfo[dff->id()];
+  NodeInfo& dffinfo = mDffInfo[dff->id()];
+  dffinfo.mMatch = match;
   dffinfo.mCell = cell;
-  dffinfo.mPosArray = pos_array;
-  dffinfo.mInv = inv;
 }
 
 // @brief ラッチのマッチを記録する．
 // @param[in] latch ラッチ
+// @param[in] inv 極性
+// @param[in] match 対応するマッチ
 // @param[in] cell セル
-// @param[in] pos_array ピン情報の配列
 void
 MapRecord::set_latch_match(const BdnLatch* latch,
-			   const Cell* cell,
-			   CellLatchPosArray pos_array)
+			   bool inv,
+			   const Match& match,
+			   const Cell* cell)
 {
-  LatchInfo& latchinfo = mLatchInfo[latch->id()];
+  NodeInfo& latchinfo = mLatchInfo[latch->id()];
+  latchinfo.mMatch = match;
   latchinfo.mCell = cell;
-  latchinfo.mPosArray = pos_array;
 }
 
 // @brief 論理ゲートのマッチを記録する．
@@ -245,7 +243,7 @@ MapRecord::gen_port(const BdnPort* sbj_port)
 void
 MapRecord::gen_dff(const BdnDff* sbj_dff)
 {
-  DffInfo& dff_info = get_dff_info(sbj_dff);
+  NodeInfo& dff_info = get_dff_info(sbj_dff);
   bool inv = dff_info.mInv;
   const Cell* cell = dff_info.mCell;
   const CmnDffCell* dff_cell = mMapGraph->dff_cell(cell);

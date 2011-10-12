@@ -1,11 +1,9 @@
-#ifndef LIBYM_TECHMAP_CELLMAP_MAPRECORD_H
-#define LIBYM_TECHMAP_CELLMAP_MAPRECORD_H
+#ifndef MAPRECORD_H
+#define MAPRECORD_H
 
-/// @file libym_techmap/cellmap/MapRecord.h
+/// @file MapRecord.h
 /// @brief MapRecord のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: MapRecord.h 1293 2008-02-21 02:25:52Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -48,23 +46,25 @@ public:
 
   /// @brief D-FF のマッチを記録する．
   /// @param[in] dff D-FF
-  /// @param[in] cell セル
-  /// @param[in] pos_array ピン情報の配列
   /// @param[in] inv 極性
+  /// @param[in] match 対応するマッチ
+  /// @param[in] cell セル
   void
   set_dff_match(const BdnDff* dff,
-		const Cell* cell,
-		CellFFPosArray pos_array,
-		bool inv);
+		bool inv,
+		const Match& match,
+		const Cell* cell);
 
   /// @brief ラッチのマッチを記録する．
   /// @param[in] latch ラッチ
+  /// @param[in] inv 極性
+  /// @param[in] match 対応するマッチ
   /// @param[in] cell セル
-  /// @param[in] pos_array ピン情報の配列
   void
   set_latch_match(const BdnLatch* latch,
-		  const Cell* cell,
-		  CellLatchPosArray pos_array);
+		  bool inv,
+		  const Match& match,
+		  const Cell* cell);
 
   /// @brief 論理ゲートのマッチを記録する．
   /// @param[in] node 該当のノード
@@ -110,6 +110,7 @@ private:
   // 内部で用いられるデータ構造
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   // D-FF の割り当て情報
   struct DffInfo
   {
@@ -144,6 +145,7 @@ private:
     // ピンの割り当て情報
     CellLatchPosArray mPosArray;
   };
+#endif
 
   // ノードの割り当て情報
   struct NodeInfo
@@ -215,11 +217,11 @@ private:
 	     bool inv);
 
   /// @brief D-FF の割り当て情報を取り出す．
-  DffInfo&
+  NodeInfo&
   get_dff_info(const BdnDff* dff);
 
   /// @brief ラッチの割り当て情報を取り出す．
-  LatchInfo&
+  NodeInfo&
   get_latch_info(const BdnLatch* latch);
 
   /// @brief NodeInfo を取り出す．
@@ -238,11 +240,11 @@ private:
 
   // D-FF の割り当て情報を格納した配列
   // キーは BdnDff の ID 番号
-  vector<DffInfo> mDffInfo;
+  vector<NodeInfo> mDffInfo;
 
   // ラッチの割り当て情報を格納した配列
   // キーは BdnLatch の ID 番号
-  vector<LatchInfo> mLatchInfo;
+  vector<NodeInfo> mLatchInfo;
 
   // 各ノードの極性ごと作業領域を格納した配列
   // キーは BdnNode の ID 番号
@@ -258,4 +260,4 @@ private:
 
 END_NAMESPACE_YM_CELLMAP
 
-#endif // LIBYM_TECHMAP_CELLMAP_MAPRECORD_H
+#endif // MAPRECORD_H
