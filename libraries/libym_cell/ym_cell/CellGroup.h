@@ -151,7 +151,7 @@ public:
   /// @brief 否定出力のピン番号を返す．
   virtual
   ymuint
-  iq_pos() const = 0;
+  xq_pos() const = 0;
 
 
 public:

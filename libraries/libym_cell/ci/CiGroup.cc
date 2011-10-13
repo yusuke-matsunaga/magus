@@ -207,7 +207,7 @@ CiGroup::q_pos() const
 
 // @brief 否定出力のピン番号を返す．
 ymuint
-CiGroup::iq_pos() const
+CiGroup::xq_pos() const
 {
   return get_pos(mPinInfo, OUTPUT2);
 }
@@ -247,6 +247,47 @@ CiGroup::init(const CellClass* cell_class,
   for (ymuint i = 0; i < mCellNum; ++ i) {
     mCellList[i] = cell_list[i];
   }
+}
+
+// @brief FFのピン情報を設定する．
+// @param[in] pos_array ピン位置と極性情報の配列
+// @note pos_array の意味は以下の通り
+//  - pos_array[0] : データ入力のピン番号     (3bit)
+//  - pos_array[1] : クロック入力のピン番号   (3bit) | 極性情報 (1bit)
+//  - pos_array[2] : クリア入力のピン番号     (3bit) | 極性情報 (2bit)
+//  - pos_array[3] : プリセット入力のピン番号 (3bit) | 極性情報 (2bit)
+//  - pos_array[4] : 肯定出力のピン番号       (3bit)
+//  - pos_array[5] : 否定出力のピン番号       (3bit)
+void
+CiGroup::set_ff_info(ymuint pos_array[])
+{
+  mPinInfo = 0U;
+  mPinInfo |= encode(pos_array[0], INPUT);
+  mPinInfo |= encode(pos_array[1], CLOCK);
+  mPinInfo |= encode(pos_array[2], CLEAR);
+  mPinInfo |= encode(pos_array[3], PRESET);
+  mPinInfo |= encode(pos_array[4], OUTPUT1);
+  mPinInfo |= encode(pos_array[5], OUTPUT2);
+}
+
+// @brief ラッチのピン情報を設定する．
+// @param[in] pos_array ピン位置と極性情報の配列
+// @note pos_array の意味は以下の通り
+//  - pos_array[0] : データ入力のピン番号     (3bit)
+//  - pos_array[1] : イネーブル入力のピン番号 (3bit) | 極性情報 (2bit)
+//  - pos_array[2] : クリア入力のピン番号     (3bit) | 極性情報 (2bit)
+//  - pos_array[3] : プリセット入力のピン番号 (3bit) | 極性情報 (2bit)
+//  - pos_array[4] : 肯定出力のピン番号       (3bit)
+//  - pos_array[5] : 否定出力のピン番号       (3bit)
+void
+CiGroup::set_latch_info(ymuint pos_array[])
+{
+  mPinInfo = 0U;
+  mPinInfo |= encode(pos_array[0], INPUT);
+  mPinInfo |= encode(pos_array[1], ENABLE);
+  mPinInfo |= encode(pos_array[2], CLEAR);
+  mPinInfo |= encode(pos_array[3], PRESET);
+  mPinInfo |= encode(pos_array[4], OUTPUT1);
 }
 
 // @brief バイナリダンプを行う．

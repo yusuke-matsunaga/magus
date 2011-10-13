@@ -62,16 +62,102 @@ display_class(ostream& s,
 	      const CellClass* cclass)
 {
   s << title << endl;
-  s << "  Idmap List = " << endl;
   ymuint n = cclass->idmap_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    s << cclass->idmap(i) << endl;
+  if ( n > 0 ) {
+    s << "  Idmap List = " << endl;
+    for (ymuint i = 0; i < n; ++ i) {
+      s << cclass->idmap(i) << endl;
+    }
+    s << endl;
   }
-  s << endl;
   for (ymuint i = 0; i < cclass->group_num(); ++ i) {
     const CellGroup* group = cclass->cell_group(i);
     s << "  Group: Map = " << group->map() << endl
-      << "Cell = ";
+      << "         Cell = ";
+    for (ymuint j = 0; j < group->cell_num(); ++ j) {
+      const Cell* cell = group->cell(j);
+      s << " " << cell->name();
+    }
+    s << endl;
+  }
+  s << endl;
+}
+
+void
+display_pos(ostream& s,
+	    const char* title,
+	    ymuint pos,
+	    ymuint sense)
+{
+  if ( sense > 0 ) {
+    s << " " << title << " = ";
+    if ( sense == 2 ) {
+      s << "~";
+    }
+    s << pos;
+  }
+}
+
+// FFセルクラスの情報を出力する．
+void
+display_ff_class(ostream& s,
+		 const char* title,
+		 const CellClass* cclass)
+{
+  s << title << endl;
+  ymuint n = cclass->idmap_num();
+  if ( n > 0 ) {
+    s << "  Idmap List = " << endl;
+    for (ymuint i = 0; i < n; ++ i) {
+      s << cclass->idmap(i) << endl;
+    }
+    s << endl;
+  }
+  for (ymuint i = 0; i < cclass->group_num(); ++ i) {
+    const CellGroup* group = cclass->cell_group(i);
+    s << "  Group:";
+    s << " data-pin = " << group->data_pos();
+    display_pos(s, "clock-pin", group->clock_pos(), group->clock_sense());
+    display_pos(s, "clear-pin", group->clear_pos(), group->clear_sense());
+    display_pos(s, "preset-pin", group->preset_pos(), group->preset_sense());
+    s << " q-pin = " << group->q_pos()
+      << " xq-pin = " << group->xq_pos()
+      << endl;
+    s << "         Cell = ";
+    for (ymuint j = 0; j < group->cell_num(); ++ j) {
+      const Cell* cell = group->cell(j);
+      s << " " << cell->name();
+    }
+    s << endl;
+  }
+  s << endl;
+}
+
+// ラッチセルクラスの情報を出力する．
+void
+display_latch_class(ostream& s,
+		    const char* title,
+		    const CellClass* cclass)
+{
+  s << title << endl;
+  ymuint n = cclass->idmap_num();
+  if ( n > 0 ) {
+    s << "  Idmap List = " << endl;
+    for (ymuint i = 0; i < n; ++ i) {
+      s << cclass->idmap(i) << endl;
+    }
+    s << endl;
+  }
+  for (ymuint i = 0; i < cclass->group_num(); ++ i) {
+    const CellGroup* group = cclass->cell_group(i);
+    s << "  Group:";
+    display_pos(s, "data-pin",  group->data_pos(), group->has_data() ? 1 : 0);
+    display_pos(s, "enable-pin", group->enable_pos(), group->enable_sense());
+    display_pos(s, "clear-pin", group->clear_pos(), group->clear_sense());
+    display_pos(s, "preset-pin", group->preset_pos(), group->preset_sense());
+    s << " q-pin = " << group->q_pos()
+      << endl;
+    s << "         Cell = ";
     for (ymuint j = 0; j < group->cell_num(); ++ j) {
       const Cell* cell = group->cell(j);
       s << " " << cell->name();
@@ -400,15 +486,15 @@ display_library(ostream& s,
   display_group(s, "Buffer Group", library.buf_func());
   display_group(s, "Inverter Group", library.inv_func());
 
-  display_class(s, "DFF Class", library.simple_ff_class(false, false));
-  display_class(s, "DFF_R Class", library.simple_ff_class(true, false));
-  display_class(s, "DFF_S Class", library.simple_ff_class(false, true));
-  display_class(s, "DFF_RS Class", library.simple_ff_class(true, true));
+  display_ff_class(s, "DFF Class", library.simple_ff_class(false, false));
+  display_ff_class(s, "DFF_R Class", library.simple_ff_class(true, false));
+  display_ff_class(s, "DFF_S Class", library.simple_ff_class(false, true));
+  display_ff_class(s, "DFF_RS Class", library.simple_ff_class(true, true));
 
-  display_class(s, "Latch Class", library.simple_latch_class(false, false));
-  display_class(s, "Latch_R Class", library.simple_latch_class(true, false));
-  display_class(s, "Latch_S Class", library.simple_latch_class(false, true));
-  display_class(s, "Latch_RS Class", library.simple_latch_class(true, true));
+  display_latch_class(s, "Latch Class", library.simple_latch_class(false, false));
+  display_latch_class(s, "Latch_R Class", library.simple_latch_class(true, false));
+  display_latch_class(s, "Latch_S Class", library.simple_latch_class(false, true));
+  display_latch_class(s, "Latch_RS Class", library.simple_latch_class(true, true));
 
   s << "==== PatMgr dump start ====" << endl;
 

@@ -47,8 +47,6 @@ LcLatchMgr::init()
     f_list.push_back(TvFunc::const_zero(4));
     f_list.push_back(TvFunc::posi_literal(4, 2));
     f_list.push_back(TvFunc::const_zero(4));
-    f_list.push_back(TvFunc::posi_literal(4, 3));
-    f_list.push_back(TvFunc::const_zero(4));
     TvFuncM f(f_list);
     LcGroup* group = find_group(f);
     LcClass* cclass = group->parent();
@@ -61,8 +59,6 @@ LcLatchMgr::init()
     f_list.push_back(TvFunc::posi_literal(5, 2));
     f_list.push_back(TvFunc::const_zero(5));
     f_list.push_back(TvFunc::posi_literal(5, 3));
-    f_list.push_back(TvFunc::const_zero(5));
-    f_list.push_back(TvFunc::posi_literal(5, 4));
     f_list.push_back(TvFunc::const_zero(5));
     TvFuncM f(f_list);
     LcGroup* group = find_group(f);
@@ -77,8 +73,6 @@ LcLatchMgr::init()
     f_list.push_back(TvFunc::posi_literal(5, 2));
     f_list.push_back(TvFunc::posi_literal(5, 3));
     f_list.push_back(TvFunc::const_zero(5));
-    f_list.push_back(TvFunc::posi_literal(5, 4));
-    f_list.push_back(TvFunc::const_zero(5));
     TvFuncM f(f_list);
     LcGroup* group = find_group(f);
     LcClass* cclass = group->parent();
@@ -91,8 +85,6 @@ LcLatchMgr::init()
     f_list.push_back(TvFunc::posi_literal(6, 2));
     f_list.push_back(TvFunc::posi_literal(6, 3));
     f_list.push_back(TvFunc::posi_literal(6, 4));
-    f_list.push_back(TvFunc::const_zero(6));
-    f_list.push_back(TvFunc::posi_literal(6, 5));
     f_list.push_back(TvFunc::const_zero(6));
     TvFuncM f(f_list);
     LcGroup* group = find_group(f);
@@ -110,6 +102,7 @@ LcLatchMgr::init()
 ymuint
 LcLatchMgr::latch_class(ymuint id) const
 {
+  assert_cond( id < 4, __FILE__, __LINE__);
   return mLatchClass[id];
 }
 
@@ -118,7 +111,7 @@ LcLatchMgr::latch_class(ymuint id) const
 // @param[out] f シグネチャ関数
 void
 LcLatchMgr::gen_signature(const Cell* cell,
-		       TvFuncM& f)
+			  TvFuncM& f)
 {
   // + 2 は状態変数
   ymuint ni2 = cell->input_num2() + 2;

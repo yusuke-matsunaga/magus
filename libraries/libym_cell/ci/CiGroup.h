@@ -156,7 +156,7 @@ public:
   /// @brief 否定出力のピン番号を返す．
   virtual
   ymuint
-  iq_pos() const;
+  xq_pos() const;
 
 
 public:
@@ -191,6 +191,29 @@ public:
        const NpnMapM& map,
        const vector<const Cell*>& cell_list,
        AllocBase& alloc);
+
+  /// @brief FFのピン情報を設定する．
+  /// @param[in] pos_array ピン位置と極性情報の配列
+  /// @note pos_array の意味は以下の通り
+  ///  - pos_array[0] : データ入力のピン番号     (3bit)
+  ///  - pos_array[1] : クロック入力のピン番号   (3bit) | 極性情報 (1bit)
+  ///  - pos_array[2] : クリア入力のピン番号     (3bit) | 極性情報 (2bit)
+  ///  - pos_array[3] : プリセット入力のピン番号 (3bit) | 極性情報 (2bit)
+  ///  - pos_array[4] : 肯定出力のピン番号       (3bit)
+  ///  - pos_array[5] : 否定出力のピン番号       (3bit)
+  void
+  set_ff_info(ymuint pos_array[]);
+
+  /// @brief ラッチのピン情報を設定する．
+  /// @param[in] pos_array ピン位置と極性情報の配列
+  /// @note pos_array の意味は以下の通り
+  ///  - pos_array[0] : データ入力のピン番号     (3bit)
+  ///  - pos_array[1] : イネーブル入力のピン番号 (3bit) | 極性情報 (2bit)
+  ///  - pos_array[2] : クリア入力のピン番号     (3bit) | 極性情報 (2bit)
+  ///  - pos_array[3] : プリセット入力のピン番号 (3bit) | 極性情報 (2bit)
+  ///  - pos_array[4] : 肯定出力のピン番号       (3bit)
+   void
+  set_latch_info(ymuint pos_array[]);
 
 
 public:
