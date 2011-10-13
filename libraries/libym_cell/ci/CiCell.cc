@@ -54,18 +54,20 @@ CiCell::CiCell(ymuint id,
   mArea = area;
 
   mInputNum = ni;
-  void* p = alloc.get_memory(sizeof(CiPin*) * ni);
-  mInputArray = new (p) CiPin*[ni];
+  ymuint ni2 = ni + nio;
+  void* p = alloc.get_memory(sizeof(CiPin*) * ni2);
+  mInputArray = new (p) CiPin*[ni2];
 
   mOutputNum = no;
-  void* q = alloc.get_memory(sizeof(CiPin*) * no);
-  mOutputArray = new (q) CiPin*[no];
+  ymuint no2 = no + nio;
+  void* q = alloc.get_memory(sizeof(CiPin*) * no2);
+  mOutputArray = new (q) CiPin*[no2];
 
   mInoutNum = nio;
   void* r = alloc.get_memory(sizeof(CiPin*) * nio);
   mInoutArray = new (r) CiPin*[nio];
 
-  ymuint n = (ni + nio) * (no + nio) * 2;
+  ymuint n = ni2 * no2 * 2;
   void* s = alloc.get_memory(sizeof(const CiTiming*) * n);
   mTimingArray = new (s) CellTiming*[n];
   for (ymuint i = 0; i < n; ++ i) {
@@ -77,8 +79,6 @@ CiCell::CiCell(ymuint id,
   mBusNum = nb;
 
   mBundleNum = nc;
-
-  ymuint no2 = no + nio;
 
   void* x = alloc.get_memory(sizeof(ymuint8) * no2);
   mLTArray = new (x) ymuint8[no2];
