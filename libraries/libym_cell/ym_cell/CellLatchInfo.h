@@ -23,6 +23,10 @@ class CellLatchInfo
 {
 public:
 
+  /// @brief 空のコンストラクタ
+  /// @note 内容は不定
+  CellLatchInfo();
+
   /// @brief コンストラクタ
   /// @param[in] pos_array ピン位置と極性情報の配列
   /// @note pos_array の意味は以下の通り
@@ -31,7 +35,6 @@ public:
   ///  - pos_array[2] : クリア入力のピン番号     (3bit) | 極性情報 (2bit)
   ///  - pos_array[3] : プリセット入力のピン番号 (3bit) | 極性情報 (2bit)
   ///  - pos_array[4] : 肯定出力のピン番号       (3bit)
-  ///  - pos_array[5] : 否定出力のピン番号       (3bit)
   CellLatchInfo(ymuint pos_array[]);
 
   /// @brief デストラクタ
@@ -101,10 +104,6 @@ public:
   /// @brief 肯定出力のピン番号を返す．
   ymuint
   q_pos() const;
-
-  /// @brief 否定出力のピン番号を返す．
-  ymuint
-  iq_pos() const;
 
 
 public:

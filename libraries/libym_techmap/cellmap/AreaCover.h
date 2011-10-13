@@ -13,6 +13,7 @@
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/cmn.h"
 #include "ym_cell/cell_nsdef.h"
+#include "ym_cell/CellFFInfo.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -77,7 +78,7 @@ private:
   void
   add_inv(const BdnNode* node,
 	  bool inv,
-	  const CellGroup& inv_func,
+	  const CellGroup* inv_func,
 	  MapRecord& maprec);
 
   /// @brief node から各入力にいたる経路の重みを計算する．
@@ -93,7 +94,6 @@ private:
        bool inv);
 
 
-#if 0
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられるデータ構造
@@ -102,16 +102,14 @@ private:
   struct FFInfo
   {
     FFInfo() :
-      mCell(NULL),
-      mInv(false)
+      mCell(NULL)
     {
     }
 
     const Cell* mCell;
-    CellFFPosArray mPosArray;
-    bool mInv;
+    CellFFInfo mPinInfo;
   };
-#endif
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -126,6 +124,9 @@ private:
 
   // calc_weight で用いる作業領域
   vector<int> mLeafNum;
+
+  // FFの割り当て情報
+  FFInfo mFFInfo[4];
 
 };
 

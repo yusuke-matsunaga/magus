@@ -19,6 +19,8 @@
 #include "PatMatcher.h"
 #include "MapRecord.h"
 
+#include "ym_logic/NpnMapM.h"
+
 #include "ym_networks/BdnVerilogWriter.h"
 #include "ym_networks/BdnDumper.h"
 
@@ -69,8 +71,8 @@ AreaCover::operator()(const BdnMgr& sbjgraph,
   record_cuts(sbjgraph, cell_library, maprec);
 
   // maprec の情報から mapnetwork を生成する．
-  const Cell* c0_cell = cell_library.const0_func().cell(0);
-  const Cell* c1_cell = cell_library.const1_func().cell(0);
+  const Cell* c0_cell = cell_library.const0_func()->cell(0);
+  const Cell* c1_cell = cell_library.const1_func()->cell(0);
   maprec.gen_mapgraph(sbjgraph, c0_cell, c1_cell, mapnetwork);
 }
 
@@ -83,101 +85,75 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
 		  const CellLibrary& cell_library,
 		  MapRecord& maprec)
 {
-  ymuint ffc_num = cell_library.ff_class_num();
+  // FFの割り当て情報を作る．
+  for (ymuint i = 0; i < 4; ++ i) {
+    FFInfo& ff_info = mFFInfo[i];
+    bool has_clear = false;
+    bool has_preset = false;
+    if ( i & 1U ) {
+      has_clear = true;
+    }
+    if ( i & 2U ) {
+      has_preset = true;
+    }
+
+    const Cell* min_cell = NULL;
+    CellFFInfo min_pin_info;
+    CellArea min_area = CellArea::infty();
+    const CellClass* ff_class = cell_library.simple_ff_class(has_clear, has_preset);
+    if ( ff_class ) {
+      ymuint ng = ff_class->group_num();
+      for (ymuint g = 0; g < ng; ++ g) {
+	const CellGroup* ff_group = ff_class->cell_group(g);
+	ymuint nc = ff_group->cell_num();
+	for (ymuint i = 0; i < nc; ++ i) {
+	  const Cell* cell = ff_group->cell(i);
+	  CellArea area = cell->area();
+	  if ( min_area > area ) {
+	    min_area = area;
+	    min_cell = cell;
+	    min_pin_info = ff_group->ff_info();
+	  }
+	}
+      }
+    }
+    if ( min_cell != NULL ) {
+      ff_info.mCell = min_cell;
+      ff_info.mPinInfo = min_pin_info;
+    }
+    else {
+      ff_info.mCell = NULL;
+    }
+  }
+
   const BdnDffList& dff_list = sbjgraph.dff_list();
   for (BdnDffList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
     const BdnDff* dff = *p;
     const BdnNode* clear = dff->clear();
     const BdnNode* preset = dff->preset();
+    bool has_clear = false;
+    bool has_preset = false;
     ymuint sig = 0U;
+    ymuint xsig = 0U;
     if ( clear->output_fanin() ) {
+      has_clear = true;
       sig |= 1U;
+      xsig |= 2U;
     }
     if ( preset->output_fanin() ) {
+      has_preset = true;
       sig |= 2U;
+      xsig |= 1U;
     }
-    FFInfo& ff_info = mFFInfo[sig];
-    if ( ff_info.mCell == NULL ) {
-      const Cell* min_cell = NULL;
-      CellFFPosArray min_pos_array;
-      CellArea min_area = CellArea::infty();
-      bool min_inv = false;
-      for (ymuint i = 0; i < ffc_num; ++ i) {
-	const CellClass& ffc = cell_library.ff_class(i);
-	bool pmatch = true;
-	bool nmatch = true;
-	if ( ffc.clear_sense() == 0 ) {
-	  // このセルはクリア端子を持たない．
-	  if ( sig & 1U ) {
-	    // 正極性ではマッチしない．
-	    pmatch = false;
-	  }
-	  if ( sig & 2U ) {
-	    // 不極性ではマッチしない．
-	    nmatch = false;
-	  }
-	}
-	if ( ffc.preset_sense() == 0 ) {
-	  // このセルはプリセット端子を持たない．
-	  if ( sig & 1U ) {
-	    // 不極性ではマッチしない．
-	    nmatch = false;
-	  }
-	  if ( sig & 2U ) {
-	    // 正極性ではマッチしない．
-	    pmatch = false;
-	  }
-	}
-	if ( !pmatch && !nmatch ) {
-	  continue;
-	}
-
-	ymuint ng = ffc.group_num();
-	for (ymuint j = 0; j < ng; ++ j) {
-	  const CellFFGroup& ffg = ffc.group(j);
-	  ymuint nc = ffg.cell_num();
-	  for (ymuint k = 0; k < nc; ++ k) {
-	    const Cell* cell = ffg.cell(j);
-	    CellArea area = cell->area();
-	    if ( min_area > area ) {
-	      min_area = area;
-	      min_cell = cell;
-	      min_pos_array = ffg.pos_array();
-	      // ちょっとトリッキーなコード
-	      // pmatch == false ということは nmatch == true だが
-	      // pmatch == true && nmatch == true もありうるので下のようになる．
-	      min_inv = !pmatch;
-	    }
-	  }
-	}
-      }
-      assert_cond( min_cell != NULL, __FILE__, __LINE__);
-      ff_info.mCell = min_cell;
-      ff_info.mPosArray = min_pos_array;
-      ff_info.mInv = min_inv;
+    FFInfo& ff_info1 = mFFInfo[sig];
+    if ( ff_info1.mCell != NULL ) {
+      maprec.set_dff_match(dff, false, ff_info1.mCell, ff_info1.mPinInfo);
     }
-
-    if ( debug ) {
-      cout << endl
-	   << "Processing Dff#" << dff->id() << endl;
-      if ( clear->output_fanin() ) {
-	cout << "  Has clear" << endl;
-      }
-      if ( preset->output_fanin() ) {
-	cout << "  Has preset" << endl;
-      }
-      cout << "  Cell = ";
-      if ( ff_info.mInv ) {
-	cout << "~(";
-      }
-      cout << ff_info.mCell->name();
-      if ( ff_info.mInv ) {
-	cout << ")";
-      }
-      cout << endl;
+    FFInfo& ff_info2 = mFFInfo[xsig];
+    if ( ff_info2.mCell != NULL ) {
+      maprec.set_dff_match(dff, true, ff_info2.mCell, ff_info2.mPinInfo);
     }
-    maprec.set_dff_match(dff, ff_info.mCell, ff_info.mPosArray, ff_info.mInv);
   }
 }
 
@@ -190,15 +166,14 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 		       const CellLibrary& cell_library,
 		       MapRecord& maprec)
 {
-  const CellPatMgr& pat_mgr = cell_library.pat_mgr();
   ymuint n = sbjgraph.max_node_id();
   mCostArray.resize(n * 2);
-  ymuint max_input = pat_mgr.max_input();
+  ymuint max_input = cell_library.max_input();
   mWeight.resize(max_input);
   mLeafNum.clear();
   mLeafNum.resize(n, -1);
 
-  const CellFuncGroup& inv_func = cell_library.inv_func();
+  const CellGroup* inv_func = cell_library.inv_func();
 
   // 入力のコストを設定
   const BdnNodeList& input_list = sbjgraph.input_list();
@@ -226,8 +201,8 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
   }
 
   // 論理ノードのコストを入力側から計算
-  PatMatcher pat_match(pat_mgr);
-  ymuint np = pat_mgr.pat_num();
+  PatMatcher pat_match(cell_library);
+  ymuint np = cell_library.pat_num();
   vector<BdnNode*> snode_list;
   sbjgraph.sort(snode_list);
   for (vector<BdnNode*>::const_iterator p = snode_list.begin();
@@ -242,7 +217,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
     p_cost = DBL_MAX;
     n_cost = DBL_MAX;
     for (ymuint pat_id = 0; pat_id < np; ++ pat_id) {
-      const CellPatGraph& pat = pat_mgr.pat(pat_id);
+      const CellPatGraph& pat = cell_library.pat(pat_id);
       ymuint ni = pat.input_num();
       if ( pat_match(node, pat) ) {
 	ymuint rep_id = pat.rep_id();
@@ -250,30 +225,29 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	  cout << "Match with Pat#" << pat_id
 	       << ", Rep#" << rep_id << endl;
 	}
-	const CellFuncClass& rep = cell_library.rep(rep_id);
-	ymuint nf = rep.func_num();
-	for (ymuint f_pos = 0; f_pos < nf; ++ f_pos) {
-	  ymuint func_id = rep.func_id(f_pos);
-	  const CellFuncGroup& func = cell_library.func_group(func_id);
-	  const NpnMap& npn_map = func.npn_map();
+	const CellClass* rep = cell_library.npn_class(rep_id);
+	ymuint ng = rep->group_num();
+	for (ymuint g_pos = 0; g_pos < ng; ++ g_pos) {
+	  const CellGroup* group = rep->cell_group(g_pos);
+	  const NpnMapM& npn_map = group->map();
 	  Match c_match(ni);
 	  for (ymuint i = 0; i < ni; ++ i) {
-	    tNpnImap imap = npn_map.imap(i);
-	    ymuint pos = npnimap_pos(imap);
+	    NpnVmap imap = npn_map.imap(i);
+	    ymuint pos = imap.pos();
 	    const BdnNode* inode = pat_match.leaf_node(pos);
 	    bool iinv = pat_match.leaf_inv(pos);
-	    if ( npnimap_pol(imap) == kPolNega ) {
+	    if ( imap.pol() == kPolNega ) {
 	      iinv = !iinv;
 	    }
 	    c_match.set_leaf(i, inode, iinv);
 	    mLeafNum[inode->id()] = i;
 	  }
 	  bool root_inv = pat.root_inv();
-	  if ( npn_map.opol() == kPolNega ) {
+	  if ( npn_map.omap(0).pol() == kPolNega ) {
 	    root_inv = !root_inv;
 	  }
 	  if ( debug ) {
-	    cout << "  FuncId#" << func_id << endl
+	    cout << "  Group#" << group->id() << endl
 		 << "    Root_inv = " << root_inv << endl;
 	    for (ymuint i = 0; i < ni; ++ i) {
 	      cout << "    Leaf#" << i << ": ";
@@ -301,9 +275,9 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	    leaf_cost += cost(leaf_node, leaf_inv) * mWeight[i];
 	  }
 
-	  ymuint nc = func.cell_num();
+	  ymuint nc = group->cell_num();
 	  for (ymuint c_pos = 0; c_pos < nc; ++ c_pos) {
-	    const Cell* cell = func.cell(c_pos);
+	    const Cell* cell = group->cell(c_pos);
 	    double cur_cost = cell->area().value() + leaf_cost;
 	    if ( debug ) {
 	      cout << "      Cell = " << cell->name()
@@ -340,7 +314,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 void
 AreaCover::add_inv(const BdnNode* node,
 		   bool inv,
-		   const CellFuncGroup& inv_func,
+		   const CellGroup* inv_func,
 		   MapRecord& maprec)
 {
   if ( maprec.get_match(node, !inv).leaf_num() == 1 ) {
@@ -350,11 +324,11 @@ AreaCover::add_inv(const BdnNode* node,
 
   double& cur_cost = cost(node, inv);
   double alt_cost = cost(node, !inv);
-  ymuint nc = inv_func.cell_num();
+  ymuint nc = inv_func->cell_num();
   const Cell* inv_cell = NULL;
   double min_cost = DBL_MAX;
   for (ymuint c_pos = 0; c_pos < nc; ++ c_pos) {
-    const Cell* cell = inv_func.cell(c_pos);
+    const Cell* cell = inv_func->cell(c_pos);
     double cost = cell->area().value();
     if ( min_cost > cost ) {
       min_cost = cost;

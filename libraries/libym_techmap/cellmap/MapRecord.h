@@ -11,6 +11,8 @@
 
 #include "ym_techmap/cellmap_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
+#include "ym_cell/CellFFInfo.h"
+#include "ym_cell/CellLatchInfo.h"
 #include "ym_networks/cmn.h"
 #include "Match.h"
 
@@ -47,24 +49,24 @@ public:
   /// @brief D-FF のマッチを記録する．
   /// @param[in] dff D-FF
   /// @param[in] inv 極性
-  /// @param[in] match 対応するマッチ
+  /// @param[in] ff_info ピンの割り当て情報
   /// @param[in] cell セル
   void
   set_dff_match(const BdnDff* dff,
 		bool inv,
-		const Match& match,
-		const Cell* cell);
+		const Cell* cell,
+		const CellFFInfo& ff_info);
 
   /// @brief ラッチのマッチを記録する．
   /// @param[in] latch ラッチ
   /// @param[in] inv 極性
-  /// @param[in] match 対応するマッチ
+  /// @param[in] latch_info ピンの割り当て情報
   /// @param[in] cell セル
   void
   set_latch_match(const BdnLatch* latch,
 		  bool inv,
-		  const Match& match,
-		  const Cell* cell);
+		  const Cell* cell,
+		  const CellLatchInfo& latch_info);
 
   /// @brief 論理ゲートのマッチを記録する．
   /// @param[in] node 該当のノード
@@ -110,13 +112,11 @@ private:
   // 内部で用いられるデータ構造
   //////////////////////////////////////////////////////////////////////
 
-#if 0
   // D-FF の割り当て情報
   struct DffInfo
   {
     DffInfo() :
-      mCell(NULL),
-      mInv(false)
+      mCell(NULL)
     {
     }
 
@@ -124,10 +124,7 @@ private:
     const Cell* mCell;
 
     // ピンの割り当て情報
-    CellFFPosArray mPosArray;
-
-    // 極性情報
-    bool mInv;
+    CellFFInfo mPinInfo;
 
   };
 
@@ -143,9 +140,9 @@ private:
     const Cell* mCell;
 
     // ピンの割り当て情報
-    CellLatchPosArray mPosArray;
+    CellLatchInfo mPinInfo;
+
   };
-#endif
 
   // ノードの割り当て情報
   struct NodeInfo
@@ -217,12 +214,14 @@ private:
 	     bool inv);
 
   /// @brief D-FF の割り当て情報を取り出す．
-  NodeInfo&
-  get_dff_info(const BdnDff* dff);
+  DffInfo&
+  get_dff_info(const BdnDff* dff,
+	       bool inv);
 
   /// @brief ラッチの割り当て情報を取り出す．
-  NodeInfo&
-  get_latch_info(const BdnLatch* latch);
+  LatchInfo&
+  get_latch_info(const BdnLatch* latch,
+		 bool inv);
 
   /// @brief NodeInfo を取り出す．
   NodeInfo&
@@ -240,11 +239,11 @@ private:
 
   // D-FF の割り当て情報を格納した配列
   // キーは BdnDff の ID 番号
-  vector<NodeInfo> mDffInfo;
+  vector<DffInfo> mDffInfo;
 
   // ラッチの割り当て情報を格納した配列
   // キーは BdnLatch の ID 番号
-  vector<NodeInfo> mLatchInfo;
+  vector<LatchInfo> mLatchInfo;
 
   // 各ノードの極性ごと作業領域を格納した配列
   // キーは BdnNode の ID 番号

@@ -12,6 +12,8 @@
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/CellClass.h"
 #include "ym_cell/Cell.h"
+#include "ym_cell/CellFFInfo.h"
+#include "ym_cell/CellLatchInfo.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -91,6 +93,44 @@ const NpnMapM&
 CiGroup::map() const
 {
   return mMap;
+}
+
+// @brief FFセルの場合のピン情報を返す．
+// @note FFセル以外の場合には返り値は不定
+CellFFInfo
+CiGroup::ff_info() const
+{
+  // 本当はバイナリレベルでコピーすればOKだけど
+  // キレイにコピーする．
+  ymuint pos_array[6];
+  pos_array[0] = data_pos();
+  pos_array[1] = clock_pos() | (clock_sense() << 3);
+  pos_array[2] = clear_pos() | (clear_sense() << 3);
+  pos_array[3] = preset_pos() | (preset_sense() << 3);
+  pos_array[4] = q_pos();
+  pos_array[5] = xq_pos();
+  return CellFFInfo(pos_array);
+}
+
+// @brief ラッチセルの場合のピン情報を返す．
+// @note ラッチセル以外の場合には返り値は不定
+CellLatchInfo
+CiGroup::latch_info() const
+{
+  // 本当はバイナリレベルでコピーすればOKだけど
+  // キレイにコピーする．
+  ymuint pos_array[6];
+  if ( has_data() ) {
+    pos_array[0] = data_pos() | 8U;
+  }
+  else {
+    pos_array[0] = 0;
+  }
+  pos_array[1] = enable_pos() | (enable_sense() << 3);
+  pos_array[2] = clear_pos() | (clear_sense() << 3);
+  pos_array[3] = preset_pos() | (preset_sense() << 3);
+  pos_array[4] = q_pos();
+  return CellLatchInfo(pos_array);
 }
 
 // @brief データ入力を持つとき true を返す．

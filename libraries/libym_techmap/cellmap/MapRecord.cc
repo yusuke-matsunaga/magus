@@ -9,6 +9,9 @@
 
 #include "MapRecord.h"
 
+#include "ym_cell/CellFFInfo.h"
+#include "ym_cell/CellLatchInfo.h"
+
 #include "ym_networks/BdnMgr.h"
 #include "ym_networks/BdnPort.h"
 #include "ym_networks/BdnDff.h"
@@ -41,9 +44,9 @@ void
 MapRecord::init(const BdnMgr& sbjgraph)
 {
   mDffInfo.clear();
-  mDffInfo.resize(sbjgraph.max_dff_id());
+  mDffInfo.resize(sbjgraph.max_dff_id() * 2);
   mLatchInfo.clear();
-  mLatchInfo.resize(sbjgraph.max_latch_id());
+  mLatchInfo.resize(sbjgraph.max_latch_id() * 2);
   mNodeInfo.clear();
   mNodeInfo.resize(sbjgraph.max_node_id() * 2);
 }
@@ -63,33 +66,34 @@ MapRecord::copy(const MapRecord& src)
 // @brief D-FF のマッチを記録する．
 // @param[in] dff D-FF
 // @param[in] inv 極性
-// @param[in] match 対応するマッチ
 // @param[in] cell セル
+// @param[in] ff_info ピンの割り当て情報
 void
 MapRecord::set_dff_match(const BdnDff* dff,
 			 bool inv,
-			 const Match& match,
-			 const Cell* cell)
+			 const Cell* cell,
+			 const CellFFInfo& ff_info)
 {
-  NodeInfo& dffinfo = mDffInfo[dff->id()];
-  dffinfo.mMatch = match;
+  ymuint offset = inv ? 1 : 0;
+  DffInfo& dffinfo = mDffInfo[dff->id() * 2 + offset];
   dffinfo.mCell = cell;
+  dffinfo.mPinInfo = ff_info;
 }
 
 // @brief ラッチのマッチを記録する．
 // @param[in] latch ラッチ
-// @param[in] inv 極性
-// @param[in] match 対応するマッチ
+// @param[in] latch_info ピンの割り当て情報
 // @param[in] cell セル
 void
 MapRecord::set_latch_match(const BdnLatch* latch,
 			   bool inv,
-			   const Match& match,
-			   const Cell* cell)
+			   const Cell* cell,
+			   const CellLatchInfo& latch_info)
 {
-  NodeInfo& latchinfo = mLatchInfo[latch->id()];
-  latchinfo.mMatch = match;
+  ymuint offset = inv ? 1 : 0;
+  LatchInfo& latchinfo = mLatchInfo[latch->id() * 2 + offset];
   latchinfo.mCell = cell;
+  latchinfo.mPinInfo = latch_info;
 }
 
 // @brief 論理ゲートのマッチを記録する．
@@ -243,23 +247,26 @@ MapRecord::gen_port(const BdnPort* sbj_port)
 void
 MapRecord::gen_dff(const BdnDff* sbj_dff)
 {
-  NodeInfo& dff_info = get_dff_info(sbj_dff);
-  bool inv = dff_info.mInv;
-  const Cell* cell = dff_info.mCell;
+  const DffInfo& dff_info0 = get_dff_info(sbj_dff, false);
+  const DffInfo& dff_info1 = get_dff_info(sbj_dff, true);
+  const Cell* cell = NULL;
+  CellFFInfo pin_info;
+  bool inv = false;
+  if ( dff_info0.mCell == NULL ) {
+    if ( dff_info1.mCell == NULL ) {
+      assert_not_reached(__FILE__, __LINE__);
+    }
+    cell = dff_info1.mCell;
+    pin_info = dff_info1.mPinInfo;
+    inv = true;
+  }
+  else {
+    cell = dff_info0.mCell;
+    pin_info = dff_info0.mPinInfo;
+  }
   const CmnDffCell* dff_cell = mMapGraph->dff_cell(cell);
   if ( dff_cell == NULL ) {
-    ymuint pos_array[6];
-    const CellFFPosArray& pos_array_src = dff_info.mPosArray;
-    pos_array[0] = pos_array_src.data_pos();
-    pos_array[1] = encode(pos_array_src.clock_pos(),
-			  pos_array_src.clock_sense());
-    pos_array[2] = encode(pos_array_src.clear_pos(),
-			  pos_array_src.clear_sense());
-    pos_array[3] = encode(pos_array_src.preset_pos(),
-			  pos_array_src.preset_sense());
-    pos_array[4] = pos_array_src.q_pos();
-    pos_array[5] = pos_array_src.iq_pos();
-    dff_cell = mMapGraph->reg_dff_cell(cell, pos_array);
+    dff_cell = mMapGraph->reg_dff_cell(cell, pin_info);
 
   }
   CmnDff* dff = mMapGraph->new_dff(dff_cell, sbj_dff->name());
@@ -365,16 +372,20 @@ MapRecord::back_trace(const BdnNode* node,
 
 // @brief D-FF の割り当て情報を取り出す．
 MapRecord::DffInfo&
-MapRecord::get_dff_info(const BdnDff* dff)
+MapRecord::get_dff_info(const BdnDff* dff,
+			bool inv)
 {
-  return mDffInfo[dff->id()];
+  bool offset = inv ? 1 : 0;
+  return mDffInfo[dff->id() * 2 + offset];
 }
 
 // @brief ラッチの割り当て情報を取り出す．
 MapRecord::LatchInfo&
-MapRecord::get_latch_info(const BdnLatch* latch)
+MapRecord::get_latch_info(const BdnLatch* latch,
+			  bool inv)
 {
-  return mLatchInfo[latch->id()];
+  bool offset = inv ? 1 : 0;
+  return mLatchInfo[latch->id() * 2 + offset];
 }
 
 // @brief NodeInfo を取り出す．

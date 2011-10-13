@@ -51,6 +51,13 @@ END_NONAMESPACE
 // クラス CellFFInfo
 //////////////////////////////////////////////////////////////////////
 
+// @brief 空のコンストラクタ
+// @note 内容は不定
+CellFFInfo::CellFFInfo() :
+  mBits(0U)
+{
+}
+
 // @brief コンストラクタ
 // @param[in] pos_array ピン位置と極性情報の配列
 // @note pos_array の意味は以下の通り
@@ -158,7 +165,7 @@ CellFFInfo::q_pos() const
 
 // @brief 否定出力のピン番号を返す．
 ymuint
-CellFFInfo::iq_pos() const
+CellFFInfo::xq_pos() const
 {
   return get_pos(mBits, OUTPUT2);
 }

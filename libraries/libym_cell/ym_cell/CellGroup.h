@@ -64,6 +64,18 @@ public:
   // FF/ラッチセルの場合にピンの情報を返す関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief FFセルの場合のピン情報を返す．
+  /// @note FFセル以外の場合には返り値は不定
+  virtual
+  CellFFInfo
+  ff_info() const = 0;
+
+  /// @brief ラッチセルの場合のピン情報を返す．
+  /// @note ラッチセル以外の場合には返り値は不定
+  virtual
+  CellLatchInfo
+  latch_info() const = 0;
+
   /// @brief データ入力を持つとき true を返す．
   virtual
   bool

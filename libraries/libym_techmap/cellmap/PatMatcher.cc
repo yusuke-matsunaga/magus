@@ -9,7 +9,7 @@
 
 #include "PatMatcher.h"
 #include "ym_networks/BdnNode.h"
-#include "ym_cell/CellPatMgr.h"
+#include "ym_cell/CellLibrary.h"
 #include "ym_cell/CellPatGraph.h"
 #include "Match.h"
 
@@ -22,12 +22,12 @@ BEGIN_NAMESPACE_YM_CELLMAP
 
 // @brief コンストラクタ
 // @param[in] pat_mgr パタンを管理するクラス
-PatMatcher::PatMatcher(const CellPatMgr& pat_mgr) :
-  mPatMgr(pat_mgr),
-  mSbjMap(pat_mgr.node_num(), NULL),
-  mInvMap(pat_mgr.node_num(), false),
-  mLeafNodeArray(pat_mgr.max_input()),
-  mLeafInvArray(pat_mgr.max_input())
+PatMatcher::PatMatcher(const CellLibrary& cell_library) :
+  mLibrary(cell_library),
+  mSbjMap(mLibrary.node_num(), NULL),
+  mInvMap(mLibrary.node_num(), false),
+  mLeafNodeArray(mLibrary.max_input()),
+  mLeafInvArray(mLibrary.max_input())
 {
 }
 
@@ -49,19 +49,19 @@ PatMatcher::operator()(const BdnNode* sbj_root,
 {
   // 根のノードを調べる．
   ymuint root_id = pat_graph.root_id();
-  switch ( mPatMgr.node_type(root_id) ) {
-  case CellPatMgr::kInput:
+  switch ( mLibrary.node_type(root_id) ) {
+  case kCellPatInput:
     // これはなんでも OK
     break;
 
-  case CellPatMgr::kAnd:
+  case kCellPatAnd:
     if ( !sbj_root->is_and() ) {
       // 型が違う．
       return false;
     }
     break;
 
-  case CellPatMgr::kXor:
+  case kCellPatXor:
     if ( !sbj_root->is_xor() ) {
       // 型が違う．
       return false;
@@ -79,38 +79,38 @@ PatMatcher::operator()(const BdnNode* sbj_root,
   ymuint ne = pat_graph.edge_num();
   for (ymuint i = 0; i < ne; ++ i) {
     ymuint edge_id = pat_graph.edge(i);
-    ymuint to_id = mPatMgr.edge_to(edge_id);
-    ymuint from_id = mPatMgr.edge_from(edge_id);
-    ymuint f_pos = mPatMgr.edge_pos(edge_id);
+    ymuint to_id = mLibrary.edge_to(edge_id);
+    ymuint from_id = mLibrary.edge_from(edge_id);
+    ymuint f_pos = mLibrary.edge_pos(edge_id);
     const BdnNode* to_node = mSbjMap[to_id];
     assert_cond( to_node->is_logic(), __FILE__, __LINE__);
     const BdnNode* from_node = to_node->fanin(f_pos);
     bool iinv = to_node->fanin_inv(f_pos);
     bool inv = false;
-    switch ( mPatMgr.node_type(from_id) ) {
-    case CellPatMgr::kInput:
+    switch ( mLibrary.node_type(from_id) ) {
+    case kCellPatInput:
       // どんな型でも OK
       // 極性が違っても OK
-      inv =  mPatMgr.edge_inv(edge_id) ^ iinv;
+      inv =  mLibrary.edge_inv(edge_id) ^ iinv;
       break;
 
-    case CellPatMgr::kAnd:
+    case kCellPatAnd:
       if ( !from_node->is_and() ) {
 	// 型が違う
 	goto end;
       }
-      if ( mPatMgr.edge_inv(edge_id) != iinv ) {
+      if ( mLibrary.edge_inv(edge_id) != iinv ) {
 	// 極性が違う
 	goto end;
       }
       break;
 
-    case CellPatMgr::kXor:
+    case kCellPatXor:
       if ( !from_node->is_xor() ) {
 	// 型が違う
 	goto end;
       }
-      if ( mPatMgr.edge_inv(edge_id) != iinv ) {
+      if ( mLibrary.edge_inv(edge_id) != iinv ) {
 	// 極性が違う
 	goto end;
       }
@@ -129,7 +129,7 @@ PatMatcher::operator()(const BdnNode* sbj_root,
     success= true;
     ymuint ni = pat_graph.input_num();
     for (ymuint i = 0; i < ni; ++ i) {
-      ymuint node_id = mPatMgr.input_node(i);
+      ymuint node_id = mLibrary.input_node(i);
       mLeafNodeArray[i] = mSbjMap[node_id];
       mLeafInvArray[i] = mInvMap[node_id];
     }

@@ -45,7 +45,7 @@ VerilogWriterImpl::dump(ostream& s,
 
   const CmnDffList& dff_list = network.dff_list();
   const CmnLatchList& latch_list = network.latch_list();
-  const CmnNodeList& input_list = network.input_list();
+  //const CmnNodeList& input_list = network.input_list();
   const CmnNodeList& output_list = network.output_list();
   const CmnNodeList& logic_list = network.logic_list();
 
@@ -198,7 +198,7 @@ VerilogWriterImpl::dump(ostream& s,
     }
     // 否定出力
     if ( dff->output2()->fanout_num() > 0 ) {
-      const CellPin* opin2 = cell->output(dffcell->iq_pos());
+      const CellPin* opin2 = cell->output(dffcell->xq_pos());
       s << ", ." << opin2->name() << "(" << node_name(dff->output2()) << ")";
     }
     s << ");" << endl;
@@ -234,11 +234,6 @@ VerilogWriterImpl::dump(ostream& s,
       const CellPin* opin1 = cell->output(latchcell->q_pos());
       s << ", ." << opin1->name() << "(" << node_name(latch->output1()) << ")";
     }
-    // 否定出力
-    if ( latch->output2()->fanout_num() > 0 ) {
-      const CellPin* opin2 = cell->output(latchcell->iq_pos());
-      s << ", ." << opin2->name() << "(" << node_name(latch->output2()) << ")";
-    }
     s << ");" << endl;
   }
 
@@ -248,7 +243,6 @@ VerilogWriterImpl::dump(ostream& s,
     const Cell* cell = node->cell();
     assert_cond( cell != NULL, __FILE__, __LINE__);
     s << "  " << cell->name() << " U" << node->id() << " (";
-    ymuint ipos = 0;
     const char* comma = "";
     ymuint ni = cell->input_num();
     for (ymuint ipos = 0; ipos < ni; ++ ipos) {

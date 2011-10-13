@@ -23,6 +23,10 @@ class CellFFInfo
 {
 public:
 
+  /// @brief 空のコンストラクタ
+  /// @note 内容は不定
+  CellFFInfo();
+
   /// @brief コンストラクタ
   /// @param[in] pos_array ピン位置と極性情報の配列
   /// @note pos_array の意味は以下の通り
@@ -95,7 +99,7 @@ public:
 
   /// @brief 否定出力のピン番号を返す．
   ymuint
-  iq_pos() const;
+  xq_pos() const;
 
 
 public:

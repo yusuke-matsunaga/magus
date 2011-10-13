@@ -12,66 +12,18 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
-BEGIN_NONAMESPACE
-
-const int OUTPUT1 = 0;
-const int OUTPUT2 = 1;
-const int INPUT   = 2;
-const int ENABLE  = 3;
-const int CLEAR   = 4;
-const int PRESET  = 5;
-
-inline
-ymuint32
-encode(ymuint val,
-       int idx)
-{
-  return val << (5 * idx);
-}
-
-inline
-ymuint
-get_sense(ymuint32 bits,
-	  int idx)
-{
-  return (bits >> 5 * idx) & 3U;
-}
-
-inline
-ymuint
-get_pos(ymuint32 bits,
-	int idx)
-{
-  return (bits >> (5 * idx + 2)) & 7U;
-}
-
-END_NONAMESPACE
-
 //////////////////////////////////////////////////////////////////////
 // クラス CmnLatchCell
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] cell セル
-// @param[in] pos_array ピン情報の配列
-// @note pos_array の意味は以下の通り
-//  - pos_array[0] : データ入力のピン番号     (3bit)
-//  - pos_array[1] : イネーブル入力のピン番号 (3bit) | ピン情報 (2bit)
-//  - pos_array[2] : クリア入力のピン番号     (3bit) | ピン情報 (2bit)
-//  - pos_array[3] : プリセット入力のピン番号 (3bit) | ピン情報 (2bit)
-//  - pos_array[4] : 肯定出力のピン番号       (3bit)
-//  - pos_array[5] : 否定出力のピン番号       (3bit)
+// @param[in] pin_info ピン情報
 CmnLatchCell::CmnLatchCell(const Cell* cell,
-			   ymuint pos_array[]) :
+			   const CellLatchInfo& pin_info) :
   mCell(cell),
-  mBits(0U)
+  mPinInfo(pin_info)
 {
-  mBits |= encode(pos_array[0], INPUT);
-  mBits |= encode(pos_array[1], ENABLE);
-  mBits |= encode(pos_array[2], CLEAR);
-  mBits |= encode(pos_array[3], PRESET);
-  mBits |= encode(pos_array[4], OUTPUT1);
-  mBits |= encode(pos_array[5], OUTPUT2);
 }
 
 // @brief デストラクタ
@@ -93,7 +45,7 @@ CmnLatchCell::cell() const
 ymuint
 CmnLatchCell::enable_sense() const
 {
-  return get_sense(mBits, ENABLE);
+  return mPinInfo.enable_sense();
 }
 
 // @brief クリア入力のタイプを返す．
@@ -103,7 +55,7 @@ CmnLatchCell::enable_sense() const
 ymuint
 CmnLatchCell::clear_sense() const
 {
-  return get_sense(mBits, CLEAR);
+  return mPinInfo.clear_sense();
 }
 
 // @brief プリセット入力のタイプを返す．
@@ -113,42 +65,42 @@ CmnLatchCell::clear_sense() const
 ymuint
 CmnLatchCell::preset_sense() const
 {
-  return get_sense(mBits, PRESET);
+  return mPinInfo.preset_sense();
 }
 
 // @brief イネーブル入力を持つタイプの時に true を返す．
 bool
 CmnLatchCell::has_enable() const
 {
-  return enable_sense() != 0;
+  return mPinInfo.has_enable();
 }
 
 // @brief クリア入力を持つタイプの時に true を返す．
 bool
 CmnLatchCell::has_clear() const
 {
-  return clear_sense() != 0;
+  return mPinInfo.has_clear();
 }
 
 // @brief プリセット入力を持つタイプの時に true を返す．
 bool
 CmnLatchCell::has_preset() const
 {
-  return preset_sense() != 0;
+  return mPinInfo.has_preset();
 }
 
 // @brief データ入力のピン番号を返す．
 ymuint
 CmnLatchCell::data_pos() const
 {
-  return get_pos(mBits, INPUT);
+  return mPinInfo.data_pos();
 }
 
 // @brief イネーブル入力のピン番号を返す．
 ymuint
 CmnLatchCell::enable_pos() const
 {
-  return get_pos(mBits, ENABLE);
+  return mPinInfo.enable_pos();
 }
 
 // @brief クリア入力のピン番号を返す．
@@ -156,7 +108,7 @@ CmnLatchCell::enable_pos() const
 ymuint
 CmnLatchCell::clear_pos() const
 {
-  return get_pos(mBits, CLEAR);
+  return mPinInfo.clear_pos();
 }
 
 // @brief プリセット入力のピン番号を返す．
@@ -164,21 +116,14 @@ CmnLatchCell::clear_pos() const
 ymuint
 CmnLatchCell::preset_pos() const
 {
-  return get_pos(mBits, PRESET);
+  return mPinInfo.preset_pos();
 }
 
 // @brief 肯定出力のピン番号を返す．
 ymuint
 CmnLatchCell::q_pos() const
 {
-  return get_pos(mBits, OUTPUT1);
-}
-
-// @brief 否定出力のピン番号を返す．
-ymuint
-CmnLatchCell::iq_pos() const
-{
-  return get_pos(mBits, OUTPUT2);
+  return mPinInfo.q_pos();
 }
 
 END_NAMESPACE_YM_NETWORKS_CMN
