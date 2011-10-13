@@ -56,6 +56,10 @@ libmagus_core_tcl_la_SOURCES = \
 	WriteBlif.cc \
 	WriteVerilog.h \
 	WriteVerilog.cc \
+	ReadMislib.h \
+	ReadMislib.cc \
+	ReadLiberty.h \
+	ReadLiberty.cc \
 	core_init.cc
 
 libmagus_core_tcl_la_LIBADD =

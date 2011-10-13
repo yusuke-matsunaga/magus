@@ -58,6 +58,17 @@ MagMgr::~MagMgr()
   }
 }
 
+// @brief カレントセルライブラリの設定
+// @param[in] library 設定するセルライブラリ
+// @note 以前のライブラリは破棄される．
+void
+MagMgr::set_cur_cell_library(const CellLibrary* library)
+{
+  delete mCellLibrary;
+
+  mCellLibrary = library;
+}
+
 // @brief カレントセルライブラリの取得
 const CellLibrary*
 MagMgr::cur_cell_library()

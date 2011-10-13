@@ -27,6 +27,8 @@
 #include "ReadIscas89.h"
 #include "WriteBlif.h"
 #include "WriteVerilog.h"
+#include "ReadMislib.h"
+#include "ReadLiberty.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -81,6 +83,12 @@ core_init(Tcl_Interp* interp,
 					 "magus::write_blif");
   TclCmdBinder1<WriteVerilog, MagMgr*>::reg(interp, mgr,
 					    "magus::write_verilog");
+
+  // セルライブラリの読み込みを行うコマンド
+  TclCmdBinder1<ReadMislib, MagMgr*>::reg(interp, mgr,
+					  "magus::read_mislib");
+  TclCmdBinder1<ReadLiberty, MagMgr*>::reg(interp, mgr,
+					   "magus::read_liberty");
 
 
   //////////////////////////////////////////////////////////////////////
@@ -137,6 +145,8 @@ core_init(Tcl_Interp* interp,
     "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
     "proc complete(write_blif) { t s e l p m } { return \"\" }\n"
     "proc complete(write_verilog) { t s e l p m } { return \"\" }\n"
+    "proc complete(read_mislib) { t s e l p m } { return \"\" }\n"
+    "proc complete(read_liberty) { t s e l p m } { return \"\" }\n"
     "}\n"
     "}\n";
   if ( Tcl_Eval(interp, completer) == TCL_ERROR ) {

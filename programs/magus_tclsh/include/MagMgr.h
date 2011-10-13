@@ -38,6 +38,12 @@ public:
 
 public:
 
+  /// @brief カレントセルライブラリの設定
+  /// @param[in] library 設定するセルライブラリ
+  /// @note 以前のライブラリは破棄される．
+  void
+  set_cur_cell_library(const CellLibrary* library);
+
   /// @brief カレントセルライブラリの取得
   const CellLibrary*
   cur_cell_library();

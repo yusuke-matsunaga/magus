@@ -75,6 +75,13 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
+  if ( cur_cell_library() == NULL ) {
+    TclObj emsg;
+    emsg << "Cell Library is not set.";
+    set_result(emsg);
+    return TCL_ERROR;
+  }
+
   NetHandle* neth = cur_nethandle();
   CellMap mapper;
   switch ( neth->type() ) {

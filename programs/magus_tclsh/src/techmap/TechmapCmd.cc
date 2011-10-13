@@ -8,10 +8,8 @@
 
 
 #include "TechmapCmd.h"
-#include "LoadPatCmd.h"
 #include "AreaMapCmd.h"
 #include "DumpCnCmd.h"
-#include "DumpPatCmd.h"
 #include "ym_networks/CmnMgr.h"
 
 
@@ -53,8 +51,6 @@ techmap_init(Tcl_Interp* interp,
 
   CmnMgr* cmnmgr = new CmnMgr;
 
-  TclCmdBinder1<LoadPatCmd, MagMgr*>::reg(interp, mgr, "magus::techmap::load_pat");
-  TclCmdBinder1<DumpPatCmd, MagMgr*>::reg(interp, mgr, "magus::techmap::dump_pat");
   TclCmdBinder2<AreaMapCmd, MagMgr*, CmnMgr&>::reg(interp, mgr, *cmnmgr,
 						       "magus::techmap::area_map");
   TclCmdBinder2<DumpCnCmd, MagMgr*, CmnMgr&>::reg(interp, mgr, *cmnmgr,
