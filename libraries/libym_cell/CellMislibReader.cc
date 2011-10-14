@@ -262,7 +262,7 @@ CellMislibReader::~CellMislibReader()
 // @return 読み込んで作成したセルライブラリを返す．
 // @note エラーが起きたら NULL を返す．
 const CellLibrary*
-CellMislibReader::read(const string& filename)
+CellMislibReader::operator()(const string& filename)
 {
   using namespace nsMislib;
 

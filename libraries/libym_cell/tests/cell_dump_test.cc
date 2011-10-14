@@ -7,9 +7,11 @@
 /// All rights reserved.
 
 
+#include "ym_cell/CellLibrary.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
-#include "ym_cell/CellLibrary.h"
+#include "ym_cell/CellDumper.h"
+#include "ym_cell/CellRestorer.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -20,12 +22,12 @@ dump_load_test(const char* in_filename,
 {
   const CellLibrary* library = NULL;
   if ( dotlib ) {
-    CellDotlibReader reader;
-    library = reader.read(in_filename);
+    CellDotlibReader read;
+    library = read(in_filename);
   }
   else {
-    CellMislibReader reader;
-    library = reader.read(in_filename);
+    CellMislibReader read;
+    library = read(in_filename);
   }
 
   if ( library == NULL ) {
@@ -43,12 +45,13 @@ dump_load_test(const char* in_filename,
       return false;
     }
 
-    library->dump(os);
+    CellDumper dump;
+    dump(os, *library);
 
     os.close();
   }
 
-  CellLibrary* library2 = CellLibrary::new_obj();
+  const CellLibrary* library2 = NULL;
   {
     ifstream ifs;
     ifs.open(data_filename, ios::binary);
@@ -57,7 +60,10 @@ dump_load_test(const char* in_filename,
       cerr << "Could not open " << data_filename << endl;
       return false;
     }
-    library2->restore(ifs);
+
+    CellRestorer restore;
+
+    library2 = restore(ifs);
   }
 
   display_library(cout, *library2);

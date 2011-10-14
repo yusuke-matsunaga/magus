@@ -37,7 +37,7 @@ public:
   /// @return 読み込んで作成したセルライブラリを返す．
   /// @note エラーが起きたら NULL を返す．
   const CellLibrary*
-  read(const string& filename);
+  operator()(const string& filename);
 
 };
 

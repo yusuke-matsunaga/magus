@@ -10,6 +10,8 @@
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
+#include "ym_cell/CellDumper.h"
+#include "ym_cell/CellRestorer.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -21,8 +23,8 @@ BEGIN_NAMESPACE_YM_CELL
 const CellLibrary*
 read_mislib(const char* filename)
 {
-  CellMislibReader reader;
-  return reader.read(filename);
+  CellMislibReader read;
+  return read(filename);
 }
 
 /// @brief liberty 形式のファイルを読み込む．
@@ -32,8 +34,8 @@ read_mislib(const char* filename)
 const CellLibrary*
 read_dotlib(const char* filename)
 {
-  CellDotlibReader reader;
-  return reader.read(filename);
+  CellDotlibReader read;
+  return read(filename);
 }
 
 END_NAMESPACE_YM_CELL
@@ -81,7 +83,9 @@ main(int argc,
       cerr << "Could not create " << datafile << endl;
       return 2;
     }
-    library->dump(os);
+
+    CellDumper dump;
+    dump(os, *library);
   }
 
   {
@@ -92,8 +96,11 @@ main(int argc,
       cerr << "Could not open " << datafile << endl;
       return 3;
     }
-    CellLibrary* library2 = CellLibrary::new_obj();
-    library2->restore(ifs);
+
+    CellRestorer restore;
+
+    const CellLibrary* library2 = restore(ifs);
+
     display_library(cout, *library2);
   }
 

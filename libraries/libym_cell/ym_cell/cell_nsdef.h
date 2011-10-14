@@ -129,6 +129,9 @@ class CellLut;
 class CellMislibReader;
 class CellDotlibReader;
 
+class CellDumper;
+class CellRestorer;
+
 class CellGroup;
 class CellClass;
 class CellFFInfo;
@@ -156,6 +159,9 @@ using nsCell::CellLut;
 
 using nsCell::CellMislibReader;
 using nsCell::CellDotlibReader;
+
+using nsCell::CellDumper;
+using nsCell::CellRestorer;
 
 using nsCell::CellGroup;
 using nsCell::CellClass;

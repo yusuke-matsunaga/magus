@@ -524,7 +524,7 @@ CellDotlibReader::~CellDotlibReader()
 // @return 読み込んで作成したセルライブラリを返す．
 // @note エラーが起きたら NULL を返す．
 const CellLibrary*
-CellDotlibReader::read(const string& filename)
+CellDotlibReader::operator()(const string& filename)
 {
   using namespace nsDotlib;
 

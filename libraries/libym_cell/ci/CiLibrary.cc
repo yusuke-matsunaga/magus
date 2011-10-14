@@ -993,4 +993,468 @@ CiLibrary::set_group_num(ymuint ng)
   }
 }
 
+/// @brief 内容をバイナリダンプする．
+/// @param[in] s 出力先のストリーム
+void
+CiLibrary::dump(ostream& s) const
+{
+  BinO bos(s);
+
+  // 名前
+  bos << name();
+
+  // セル数
+  ymuint32 nc = cell_num();
+  bos << nc;
+  for (ymuint i = 0; i < nc; ++ i) {
+    const Cell* cell = this->cell(i);
+    ymuint8 tid = 0;
+    if ( cell->is_logic() ) {
+      tid = 0;
+    }
+    else if ( cell->is_ff() ) {
+      tid = 1;
+    }
+    else if ( cell->is_latch() ) {
+      tid = 2;
+    }
+    else if ( cell->is_seq() ) {
+      tid = 3;
+    }
+    else {
+      // 無視？
+      assert_not_reached(__FILE__, __LINE__);
+    }
+    ymuint32 ni = cell->input_num();
+    ymuint32 no = cell->output_num();
+    ymuint32 nio = cell->inout_num();
+    ymuint32 nbus = cell->bus_num();
+    ymuint32 nbundle = cell->bundle_num();
+
+    bos << tid
+	<< cell->name()
+	<< cell->area()
+	<< ni
+	<< no
+	<< nio
+	<< nbus
+	<< nbundle;
+
+    ymuint no2 = no + nio;
+    for (ymuint opos = 0; opos < no2; ++ opos) {
+      bos << cell->has_logic()
+	  << cell->logic_expr(opos)
+	  << cell->tristate_expr(opos);
+    }
+
+    if ( cell->is_ff() ) {
+      bos << cell->next_state_expr()
+	  << cell->clock_expr()
+	  << cell->clock2_expr()
+	  << cell->clear_expr()
+	  << cell->preset_expr()
+	  << static_cast<ymuint8>(cell->clear_preset_var1())
+	  << static_cast<ymuint8>(cell->clear_preset_var2());
+    }
+    else if ( cell->is_latch() ) {
+      bos << cell->data_in_expr()
+	  << cell->enable_expr()
+	  << cell->enable2_expr()
+	  << cell->clear_expr()
+	  << cell->preset_expr()
+	  << static_cast<ymuint8>(cell->clear_preset_var1())
+	  << static_cast<ymuint8>(cell->clear_preset_var2());
+    }
+
+    // 入力ピンのダンプ
+    for (ymuint32 ipin = 0; ipin < ni; ++ ipin) {
+      const CellPin* pin = cell->input(ipin);
+      bos << pin->name()
+	  << pin->capacitance()
+	  << pin->rise_capacitance()
+	  << pin->fall_capacitance();
+    }
+
+    // 出力ピンのダンプ
+    for (ymuint32 opin = 0; opin < no; ++ opin) {
+      const CellPin* pin = cell->output(opin);
+      bos << pin->name()
+	  << pin->max_fanout()
+	  << pin->min_fanout()
+	  << pin->max_capacitance()
+	  << pin->min_capacitance()
+	  << pin->max_transition()
+	  << pin->min_transition();
+    }
+
+    // 入出力ピンのダンプ
+    for (ymuint32 iopin = 0; iopin < nio; ++ iopin) {
+      const CellPin* pin = cell->output(iopin);
+      bos << pin->name()
+	  << pin->capacitance()
+	  << pin->rise_capacitance()
+	  << pin->fall_capacitance()
+	  << pin->max_fanout()
+	  << pin->min_fanout()
+	  << pin->max_capacitance()
+	  << pin->min_capacitance()
+	  << pin->max_transition()
+	  << pin->min_transition();
+    }
+
+    // タイミング情報のID -> 通し番号のマップ
+    hash_map<ymuint32, ymuint32> timing_map;
+    // タイミング情報のリスト
+    vector<const CellTiming*> timing_list;
+    for (ymuint32 ipos = 0; ipos < ni + nio; ++ ipos) {
+      for (ymuint32 opos = 0; opos < no + nio; ++ opos) {
+	const CellTiming* timing_p = cell->timing(ipos, opos, kCellPosiUnate);
+	if ( timing_p ) {
+	  if ( timing_map.count(timing_p->id()) == 0 ) {
+	    ymuint pos = timing_list.size();
+	    timing_map.insert(make_pair(timing_p->id(), pos));
+	    timing_list.push_back(timing_p);
+	  }
+	}
+	const CellTiming* timing_n = cell->timing(ipos, opos, kCellNegaUnate);
+	if ( timing_n ) {
+	  if ( timing_map.count(timing_n->id()) == 0 ) {
+	    ymuint pos = timing_list.size();
+	    timing_map.insert(make_pair(timing_n->id(), pos));
+	    timing_list.push_back(timing_n);
+	  }
+	}
+      }
+    }
+
+    // タイミング情報のダンプ
+    ymuint32 nt = timing_list.size();
+    bos << nt;
+    for (ymuint32 j = 0; j < nt; ++ j) {
+      const CellTiming* timing = timing_list[j];
+      bos << timing->intrinsic_rise()
+	  << timing->intrinsic_fall()
+	  << timing->slope_rise()
+	  << timing->slope_fall()
+	  << timing->rise_resistance()
+	  << timing->fall_resistance();
+    }
+    for (ymuint32 ipin = 0; ipin < ni + nio; ++ ipin) {
+      for (ymuint32 opin = 0; opin < no + nio; ++ opin) {
+	const CellTiming* timing_p = cell->timing(ipin, opin, kCellPosiUnate);
+	if ( timing_p ) {
+	  hash_map<ymuint, ymuint32>::iterator p = timing_map.find(timing_p->id());
+	  assert_cond( p != timing_map.end(), __FILE__, __LINE__);
+	  bos << static_cast<ymuint8>(1)
+	      << ipin
+	      << opin
+	      << p->second;
+	}
+	const CellTiming* timing_n = cell->timing(ipin, opin, kCellNegaUnate);
+	if ( timing_n ) {
+	  hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_n->id());
+	  assert_cond( p != timing_map.end(), __FILE__, __LINE__);
+	  bos << static_cast<ymuint8>(2)
+	      << ipin
+	      << opin
+	      << p->second;
+	}
+      }
+    }
+    bos << static_cast<ymuint8>(0);
+  }
+
+  // セルクラスの個数だけダンプする．
+  bos << mClassNum
+      << mGroupNum;
+
+  // セルグループ情報のダンプ
+  for (ymuint g = 0; g < mGroupNum; ++ g) {
+    mGroupArray[g].dump(bos);
+  }
+
+  // セルクラス情報のダンプ
+  for (ymuint i = 0; i < mClassNum; ++ i) {
+    mClassArray[i].dump(bos);
+  }
+
+  // 組み込み型の情報のダンプ
+  for (ymuint i = 0; i < 4; ++ i) {
+    ymuint32 group_id = mLogicGroup[i]->id();
+    bos << group_id;
+  }
+  for (ymuint i = 0; i < 4; ++ i) {
+    ymuint32 class_id = mFFClass[i]->id();
+    bos << class_id;
+  }
+  for (ymuint i = 0; i < 4; ++ i) {
+    ymuint32 class_id = mLatchClass[i]->id();
+    bos << class_id;
+  }
+
+  // パタングラフの情報のダンプ
+  mPatMgr.dump(bos);
+}
+
+void
+CiLibrary::restore(istream& s)
+{
+  BinI bis(s);
+
+  string name;
+  bis >> name;
+
+  set_name(name);
+
+  ymuint32 nc;
+  bis >> nc;
+  set_cell_num(nc);
+
+  for (ymuint cell_id = 0; cell_id < nc; ++ cell_id) {
+    ymuint8 type;
+    string name;
+    CellArea area;
+    ymuint32 ni;
+    ymuint32 no;
+    ymuint32 nio;
+    ymuint32 nbus;
+    ymuint32 nbundle;
+    bis >> type
+	>> name
+	>> area
+	>> ni
+	>> no
+	>> nio
+	>> nbus
+	>> nbundle;
+
+    ymuint no2 = no + nio;
+    vector<bool> has_logic(no2);
+    vector<LogExpr> logic_array(no2);
+    vector<LogExpr> tristate_array(no2);
+    for (ymuint opos = 0; opos < no2; ++ opos) {
+      bool tmp;
+      bis >> tmp
+	  >> logic_array[opos]
+	  >> tristate_array[opos];
+      has_logic[opos] = tmp;
+    }
+
+    switch ( type ) {
+    case 0: // kLogic
+      new_logic_cell(cell_id, name, area,
+		     ni, no, nio, nbus, nbundle,
+		     has_logic,
+		     logic_array,
+		     tristate_array);
+      break;
+
+    case 1: // kFF
+      {
+	LogExpr next_state;
+	LogExpr clocked_on;
+	LogExpr clocked_on_also;
+	LogExpr clear;
+	LogExpr preset;
+	ymuint8 clear_preset_var1;
+	ymuint8 clear_preset_var2;
+	bis >> next_state
+	    >> clocked_on
+	    >> clocked_on_also
+	    >> clear
+	    >> preset
+	    >> clear_preset_var1
+	    >> clear_preset_var2;
+	new_ff_cell(cell_id, name, area,
+		    ni, no, nio, nbus, nbundle,
+		    has_logic,
+		    logic_array,
+		    tristate_array,
+		    next_state,
+		    clocked_on, clocked_on_also,
+		    clear, preset,
+		    clear_preset_var1,
+		    clear_preset_var2);
+      }
+      break;
+
+    case 2: // kLatch
+      {
+	LogExpr data_in;
+	LogExpr enable;
+	LogExpr enable_also;
+	LogExpr clear;
+	LogExpr preset;
+	ymuint8 clear_preset_var1;
+	ymuint8 clear_preset_var2;
+	bis >> data_in
+	    >> enable
+	    >> enable_also
+	    >> clear
+	    >> preset
+	    >> clear_preset_var1
+	    >> clear_preset_var2;
+	new_latch_cell(cell_id, name, area,
+		       ni, no, nio, nbus, nbundle,
+		       has_logic,
+		       logic_array,
+		       tristate_array,
+		       data_in,
+		       enable, enable_also,
+		       clear, preset,
+		       clear_preset_var1,
+		       clear_preset_var2);
+      }
+      break;
+
+    case 3: // kFSM
+#warning "TODO: 未完"
+      break;
+    }
+
+    // 入力ピンの設定
+    for (ymuint j = 0; j < ni; ++ j) {
+      string name;
+      CellCapacitance cap;
+      CellCapacitance r_cap;
+      CellCapacitance f_cap;
+      bis >> name
+	  >> cap
+	  >> r_cap
+	  >> f_cap;
+      new_cell_input(cell_id, j, name, cap, r_cap, f_cap);
+    }
+
+    // 出力ピンの設定
+    for (ymuint j = 0; j < no; ++ j) {
+      string name;
+      CellCapacitance max_f;
+      CellCapacitance min_f;
+      CellCapacitance max_c;
+      CellCapacitance min_c;
+      CellTime max_t;
+      CellTime min_t;
+      bis >> name
+	  >> max_f
+	  >> min_f
+	  >> max_c
+	  >> min_c
+	  >> max_t
+	  >> min_t;
+      new_cell_output(cell_id, j, name,
+		      max_f, min_f,
+		      max_c, min_c,
+		      max_t, min_t);
+    }
+
+    // 入出力ピンの設定
+    for (ymuint j = 0; j < nio; ++ j) {
+      string name;
+      CellCapacitance cap;
+      CellCapacitance r_cap;
+      CellCapacitance f_cap;
+      CellCapacitance max_f;
+      CellCapacitance min_f;
+      CellCapacitance max_c;
+      CellCapacitance min_c;
+      CellTime max_t;
+      CellTime min_t;
+      bis >> name
+	  >> cap
+	  >> r_cap
+	  >> f_cap
+	  >> max_f
+	  >> min_f
+	  >> max_c
+	  >> min_c
+	  >> max_t
+	  >> min_t;
+      new_cell_inout(cell_id, j, name,
+		     cap, r_cap, f_cap,
+		     max_f, min_f,
+		     max_c, min_c,
+		     max_t, min_t);
+    }
+
+    // タイミング情報の生成
+    ymuint32 nt;
+    bis >> nt;
+    vector<CellTiming*> tmp_list(nt);
+    for (ymuint j = 0; j < nt; ++ j) {
+      CellTime i_r;
+      CellTime i_f;
+      CellTime s_r;
+      CellTime s_f;
+      CellResistance r_r;
+      CellResistance f_r;
+      bis >> i_r
+	  >> i_f
+	  >> s_r
+	  >> s_f
+	  >> r_r
+	  >> f_r;
+      CellTiming* timing = new_timing(j, kCellTimingCombinational,
+				      i_r, i_f, s_r, s_f, r_r, f_r);
+      tmp_list[j] = timing;
+    }
+
+    // タイミング情報の設定
+    for ( ; ; ) {
+      ymuint8 unate;
+      bis >> unate;
+      if ( unate == 0 ) {
+	// エンドマーカー
+	break;
+      }
+      ymuint32 ipin_id;
+      ymuint32 opin_id;
+      ymuint32 timing_id;
+      bis >> ipin_id
+	  >> opin_id
+	  >> timing_id;
+      tCellTimingSense sense = ( unate == 1 ) ? kCellPosiUnate : kCellNegaUnate;
+      CellTiming* timing = tmp_list[timing_id];
+      set_timing(cell_id, ipin_id, opin_id, sense, timing);
+    }
+  }
+
+  // セルクラス数とグループ数の取得
+  ymuint32 ncc;
+  ymuint32 ng;
+  bis >> ncc
+      >> ng;
+  set_class_num(ncc);
+  set_group_num(ng);
+
+  // セルグループ情報の設定
+  for (ymuint g = 0; g < ng; ++ g) {
+    mGroupArray[g].restore(bis, *this, mAlloc);
+  }
+
+  // セルクラス情報の設定
+  for (ymuint c = 0; c < ncc; ++ c) {
+    mClassArray[c].restore(bis, *this, mAlloc);
+  }
+
+  // 組み込み型の設定
+  for (ymuint i = 0; i < 4; ++ i) {
+    ymuint32 group_id;
+    bis >> group_id;
+    mLogicGroup[i] = &mGroupArray[group_id];
+  }
+  for (ymuint i = 0; i < 4; ++ i) {
+    ymuint32 class_id;
+    bis >> class_id;
+    mFFClass[i] = &mClassArray[class_id];
+  }
+  for (ymuint i = 0; i < 4; ++ i) {
+    ymuint32 class_id;
+    bis >> class_id;
+    mLatchClass[i] = &mClassArray[class_id];
+  }
+
+  // パタングラフの情報の設定
+  mPatMgr.restore(bis, mAlloc);
+}
+
 END_NAMESPACE_YM_CELL

@@ -52,9 +52,7 @@ libym_cell_ci_la_SOURCES = \
 	CiPin.h \
 	CiPin.cc \
 	CiTiming.h \
-	CiTiming.cc \
-	dump.cc \
-	restore.cc
+	CiTiming.cc
 
 libym_cell_ci_la_LIBADD =
 

@@ -59,8 +59,8 @@ ReadMislib::cmd_proc(TclObjVector& objv)
   MsgMgr::reg_handler(&mh);
 
   // 実際の読み込みを行う．
-  CellMislibReader reader;
-  const CellLibrary* lib = reader.read(ex_file_name);
+  CellMislibReader read;
+  const CellLibrary* lib = read(ex_file_name);
   if ( lib == NULL ) {
     TclObj emsg = mh.msg_obj();
     emsg << "Error occurred in reading " << objv[1];

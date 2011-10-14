@@ -21,8 +21,8 @@ BEGIN_NAMESPACE_YM_CELL
 const CellLibrary*
 read_mislib(const char* filename)
 {
-  CellMislibReader reader;
-  return reader.read(filename);
+  CellMislibReader read;
+  return read(filename);
 }
 
 /// @brief liberty 形式のファイルを読み込む．
@@ -32,8 +32,8 @@ read_mislib(const char* filename)
 const CellLibrary*
 read_dotlib(const char* filename)
 {
-  CellDotlibReader reader;
-  return reader.read(filename);
+  CellDotlibReader read;
+  return read(filename);
 }
 
 END_NAMESPACE_YM_CELL
