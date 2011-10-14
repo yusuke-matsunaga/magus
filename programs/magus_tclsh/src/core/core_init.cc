@@ -29,6 +29,8 @@
 #include "WriteVerilog.h"
 #include "ReadMislib.h"
 #include "ReadLiberty.h"
+#include "RestoreLibrary.h"
+#include "DumpLibrary.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -89,6 +91,10 @@ core_init(Tcl_Interp* interp,
 					  "magus::read_mislib");
   TclCmdBinder1<ReadLiberty, MagMgr*>::reg(interp, mgr,
 					   "magus::read_liberty");
+  TclCmdBinder1<RestoreLibrary, MagMgr*>::reg(interp, mgr,
+					      "magus::restore_library");
+  TclCmdBinder1<DumpLibrary, MagMgr*>::reg(interp, mgr,
+					   "magus::dump_library");
 
 
   //////////////////////////////////////////////////////////////////////
@@ -147,6 +153,8 @@ core_init(Tcl_Interp* interp,
     "proc complete(write_verilog) { t s e l p m } { return \"\" }\n"
     "proc complete(read_mislib) { t s e l p m } { return \"\" }\n"
     "proc complete(read_liberty) { t s e l p m } { return \"\" }\n"
+    "proc complete(restore_library) { t s e l p m } { return \"\" }\n"
+    "proc complete(dump_library) { t s e l p m } { return \"\" }\n"
     "}\n"
     "}\n";
   if ( Tcl_Eval(interp, completer) == TCL_ERROR ) {

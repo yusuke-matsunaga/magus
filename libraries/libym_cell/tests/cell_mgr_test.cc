@@ -12,33 +12,6 @@
 #include "ym_cell/CellDotlibReader.h"
 
 
-BEGIN_NAMESPACE_YM_CELL
-
-/// @brief genlib 形式のファイルを読み込む．
-/// @param[in] filename ファイル名
-/// @return 生成されたライブラリを返す．
-/// @note エラーが起きたら NULL を返す．
-const CellLibrary*
-read_mislib(const char* filename)
-{
-  CellMislibReader read;
-  return read(filename);
-}
-
-/// @brief liberty 形式のファイルを読み込む．
-/// @param[in] filename ファイル名
-/// @return 生成されたライブラリを返す．
-/// @note エラーが起きたら NULL を返す．
-const CellLibrary*
-read_dotlib(const char* filename)
-{
-  CellDotlibReader read;
-  return read(filename);
-}
-
-END_NAMESPACE_YM_CELL
-
-
 int
 main(int argc,
      char** argv)
@@ -61,10 +34,12 @@ main(int argc,
 
   const CellLibrary* library = NULL;
   if ( dotlib ) {
-    library = read_dotlib(filename);
+    CellDotlibReader dotlib_reader;
+    library = dotlib_reader(filename);
   }
   else {
-    library = read_mislib(filename);
+    CellMislibReader mislib_reader;
+    library = mislib_reader(filename);
   }
   if ( library == NULL ) {
     cerr << filename << ": Error in reading library" << endl;

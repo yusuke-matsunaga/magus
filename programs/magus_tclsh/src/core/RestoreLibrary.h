@@ -1,8 +1,8 @@
-#ifndef READMISLIB_H
-#define READMISLIB_H
+#ifndef RESTORELIBRARY_H
+#define RESTORELIBRARY_H
 
-/// @file ReadMislib.h
-/// @brief ReadMislib のヘッダファイル
+/// @file RestoreLibrary.h
+/// @brief RestoreLibrary のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -16,22 +16,22 @@
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-/// @class ReadMislib ReadMislib.h "ReadMislib.h"
+/// @class RestoreLibrary RestoreLibrary.h "RestoreLibrary.h"
 /// @ingroup MagusGroup
-/// @brief mislib 形式のセルライブラリの読み込みを行うコマンド
+/// @brief バイナリ形式のファイルを読み込んでセルライブラリを設定するコマンド
 //////////////////////////////////////////////////////////////////////
-class ReadMislib :
+class RestoreLibrary :
   public ReadLibrary
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr Magus の管理オブジェクト
-  ReadMislib(MagMgr* mgr);
+  RestoreLibrary(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~ReadMislib();
+  ~RestoreLibrary();
 
 
 private:
@@ -49,4 +49,4 @@ private:
 
 END_NAMESPACE_MAGUS
 
-#endif // READMISLIB_H
+#endif // RESTORELIBRARY_H

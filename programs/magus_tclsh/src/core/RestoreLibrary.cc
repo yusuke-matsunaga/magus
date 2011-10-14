@@ -1,41 +1,49 @@
 
-/// @file ReadLiberty.cc
-/// @brief ReadLiberty の実装ファイル
+/// @file RestoreLibrary.cc
+/// @brief RestoreLibrary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ReadLiberty.h"
-#include "ym_cell/CellDotlibReader.h"
+#include "RestoreLibrary.h"
+#include "ym_cell/CellRestorer.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-// クラス ReadLiberty
+// クラス RestoreLibrary
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ReadLiberty::ReadLiberty(MagMgr* mgr) :
+RestoreLibrary::RestoreLibrary(MagMgr* mgr) :
   ReadLibrary(mgr)
 {
   set_usage_string("<filename>");
 }
 
 // @brief デストラクタ
-ReadLiberty::~ReadLiberty()
+RestoreLibrary::~RestoreLibrary()
 {
 }
 
 // @brief セルライブラリを読み込む．
 // @param[in] filename ファイル名
 const CellLibrary*
-ReadLiberty::read_library(const string& filename)
+RestoreLibrary::read_library(const string& filename)
 {
-  CellDotlibReader read;
-  return read(filename);
+  ifstream ifs;
+  ifs.open(filename.c_str(), ios::binary);
+  if ( !ifs ) {
+    TclObj emsg;
+    emsg << "Could not open " << filename;
+    set_result(emsg);
+    return NULL;
+  }
+  CellRestorer read;
+  return read(ifs);
 }
 
 END_NAMESPACE_MAGUS

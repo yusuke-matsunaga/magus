@@ -126,6 +126,7 @@ class CellTiming;
 class CellLutTemplate;
 class CellLut;
 
+class CellReader;
 class CellMislibReader;
 class CellDotlibReader;
 
@@ -157,6 +158,7 @@ using nsCell::CellTiming;
 using nsCell::CellLutTemplate;
 using nsCell::CellLut;
 
+using nsCell::CellReader;
 using nsCell::CellMislibReader;
 using nsCell::CellDotlibReader;
 

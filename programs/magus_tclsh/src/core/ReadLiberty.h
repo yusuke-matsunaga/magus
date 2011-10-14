@@ -10,7 +10,7 @@
 /// All rights reserved.
 
 
-#include "MagCmd.h"
+#include "ReadLibrary.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_MAGUS
 /// @brief liberty 形式のセルライブラリの読み込みを行うコマンド
 //////////////////////////////////////////////////////////////////////
 class ReadLiberty :
-  public MagCmd
+  public ReadLibrary
 {
 public:
 
@@ -34,12 +34,16 @@ public:
   ~ReadLiberty();
 
 
-protected:
+private:
+  //////////////////////////////////////////////////////////////////////
+  // ReadLibrary の仮想関数
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief コマンドを実行する仮想関数
+  /// @brief セルライブラリを読み込む．
+  /// @param[in] filename ファイル名
   virtual
-  int
-  cmd_proc(TclObjVector& objv);
+  const CellLibrary*
+  read_library(const string& filename);
 
 };
 

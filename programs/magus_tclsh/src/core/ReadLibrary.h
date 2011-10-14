@@ -1,8 +1,8 @@
-#ifndef READMISLIB_H
-#define READMISLIB_H
+#ifndef READLIBRARY_H
+#define READLIBRARY_H
 
-/// @file ReadMislib.h
-/// @brief ReadMislib のヘッダファイル
+/// @file ReadLibrary.h
+/// @brief ReadLibrary のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,43 +10,51 @@
 /// All rights reserved.
 
 
-#include "ReadLibrary.h"
+#include "MagCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-/// @class ReadMislib ReadMislib.h "ReadMislib.h"
+/// @class ReadLibrary ReadLibrary.h "ReadLibrary.h"
 /// @ingroup MagusGroup
-/// @brief mislib 形式のセルライブラリの読み込みを行うコマンド
+/// @brief liberty 形式のセルライブラリの読み込みを行うコマンド
 //////////////////////////////////////////////////////////////////////
-class ReadMislib :
-  public ReadLibrary
+class ReadLibrary :
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr Magus の管理オブジェクト
-  ReadMislib(MagMgr* mgr);
+  ReadLibrary(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~ReadMislib();
+  ~ReadLibrary();
+
+
+protected:
+
+  /// @brief コマンドを実行する仮想関数
+  virtual
+  int
+  cmd_proc(TclObjVector& objv);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // ReadLibrary の仮想関数
+  // 継承クラスが実装する関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief セルライブラリを読み込む．
   /// @param[in] filename ファイル名
   virtual
   const CellLibrary*
-  read_library(const string& filename);
+  read_library(const string& filemae) = 0;
 
 };
 
 END_NAMESPACE_MAGUS
 
-#endif // READMISLIB_H
+#endif // READLIBRARY_H
