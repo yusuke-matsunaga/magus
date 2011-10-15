@@ -8,11 +8,12 @@
 
 
 #include "CiCell.h"
-#include "ym_cell/CellGroup.h"
+#include "CiLibrary.h"
 #include "CiPin.h"
 #include "CiTiming.h"
 #include "CiBus.h"
 #include "CiBundle.h"
+#include "ym_cell/CellGroup.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -22,6 +23,7 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] library 親のセルライブラリ
 // @param[in] id ID番号
 // @param[in] name 名前
 // @param[in] area 面積
@@ -36,7 +38,8 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] alloc メモリアロケータ
 // *1: - false 論理式なし
 //     - true 論理式あり
-CiCell::CiCell(ymuint id,
+CiCell::CiCell(CiLibrary* library,
+	       ymuint id,
 	       const ShString& name,
 	       CellArea area,
 	       ymuint ni,
@@ -49,6 +52,8 @@ CiCell::CiCell(ymuint id,
 	       const vector<LogExpr>& tristate_array,
 	       AllocBase& alloc)
 {
+  mLibrary = library;
+
   mId = id;
   mName = name;
   mArea = area;
@@ -201,8 +206,17 @@ CiCell::inout(ymuint pos) const
 const CellPin*
 CiCell::pin(const string& name) const
 {
-  // 未完
-  return NULL;
+  return mLibrary->get_pin(this, ShString(name));
+}
+
+// @brief 名前からピンの取得
+// @param[in] name ピン名
+// @return name という名前をピンを返す．
+// @note なければ NULL を返す．
+const CellPin*
+CiCell::pin(const char* name) const
+{
+  return mLibrary->get_pin(this, ShString(name));
 }
 
 // @brief バス数の取得

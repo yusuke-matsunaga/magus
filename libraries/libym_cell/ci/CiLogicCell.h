@@ -26,6 +26,7 @@ class CiLogicCell :
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] library 親のセルライブラリ
   /// @param[in] id ID番号
   /// @param[in] name 名前
   /// @param[in] area 面積
@@ -40,7 +41,8 @@ private:
   /// @param[in] alloc メモリアロケータ
   /// *1: - false 論理式なし
   ///     - true 論理式あり
-  CiLogicCell(ymuint id,
+  CiLogicCell(CiLibrary* library,
+	      ymuint id,
 	      const ShString& name,
 	      CellArea area,
 	      ymuint ni,

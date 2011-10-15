@@ -17,6 +17,7 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] library 親のセルライブラリ
 // @param[in] id ID番号
 // @param[in] name 名前
 // @param[in] area 面積
@@ -31,7 +32,8 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] alloc メモリアロケータ
 // *1: - false 論理式なし
 //     - true 論理式あり
-CiLogicCell::CiLogicCell(ymuint id,
+CiLogicCell::CiLogicCell(CiLibrary* library,
+			 ymuint id,
 			 const ShString& name,
 			 CellArea area,
 			 ymuint ni,
@@ -43,7 +45,7 @@ CiLogicCell::CiLogicCell(ymuint id,
 			 const vector<LogExpr>& logic_array,
 			 const vector<LogExpr>& tristate_array,
 			 AllocBase& alloc) :
-  CiCell(id, name, area,
+  CiCell(library, id, name, area,
 	 ni, no, nio, nb, nc,
 	 output_array,
 	 logic_array,

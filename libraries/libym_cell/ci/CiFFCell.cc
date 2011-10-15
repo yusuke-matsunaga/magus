@@ -17,6 +17,7 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] library 親のセルライブラリ
 // @param[in] id ID番号
 // @param[in] name 名前
 // @param[in] area 面積
@@ -34,7 +35,8 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] alloc メモリアロケータ
 // *1: - false 論理式なし
 //     - true 論理式あり
-CiFFCell::CiFFCell(ymuint id,
+CiFFCell::CiFFCell(CiLibrary* library,
+		   ymuint id,
 		   const ShString& name,
 		   CellArea area,
 		   ymuint ni,
@@ -49,7 +51,7 @@ CiFFCell::CiFFCell(ymuint id,
 		   const LogExpr& clocked_on,
 		   const LogExpr& clocked_on_also,
 		   AllocBase& alloc) :
-  CiCell(id, name, area,
+  CiCell(library, id, name, area,
 	 ni, no, nio, nb, nc,
 	 output_array,
 	 logic_array,
@@ -103,6 +105,7 @@ CiFFCell::clock2_expr() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] library 親のセルライブラリ
 // @param[in] id ID番号
 // @param[in] name 名前
 // @param[in] area 面積
@@ -121,7 +124,8 @@ CiFFCell::clock2_expr() const
 // @param[in] alloc メモリアロケータ
 // *1: - false 論理式なし
 //     - true 論理式あり
-CiFFRCell::CiFFRCell(ymuint id,
+CiFFRCell::CiFFRCell(CiLibrary* library,
+		     ymuint id,
 		     const ShString& name,
 		     CellArea area,
 		     ymuint ni,
@@ -137,7 +141,7 @@ CiFFRCell::CiFFRCell(ymuint id,
 		     const LogExpr& clocked_on_also,
 		     const LogExpr& clear,
 		     AllocBase& alloc) :
-  CiFFCell(id, name, area,
+  CiFFCell(library, id, name, area,
 	   ni, no, nio, nb, nc,
 	   output_array,
 	   logic_array,
@@ -176,6 +180,7 @@ CiFFRCell::clear_expr() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] library 親のセルライブラリ
 // @param[in] id ID番号
 // @param[in] name 名前
 // @param[in] area 面積
@@ -194,7 +199,8 @@ CiFFRCell::clear_expr() const
 // @param[in] alloc メモリアロケータ
 // *1: - false 論理式なし
 //     - true 論理式あり
-CiFFSCell::CiFFSCell(ymuint id,
+CiFFSCell::CiFFSCell(CiLibrary* library,
+		     ymuint id,
 		     const ShString& name,
 		     CellArea area,
 		     ymuint ni,
@@ -210,7 +216,7 @@ CiFFSCell::CiFFSCell(ymuint id,
 		     const LogExpr& clocked_on_also,
 		     const LogExpr& preset,
 		     AllocBase& alloc) :
-  CiFFCell(id, name, area,
+  CiFFCell(library, id, name, area,
 	   ni, no, nio, nb, nc,
 	   output_array,
 	   logic_array,
@@ -249,6 +255,7 @@ CiFFSCell::preset_expr() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] library 親のセルライブラリ
 // @param[in] id ID番号
 // @param[in] name 名前
 // @param[in] area 面積
@@ -270,7 +277,8 @@ CiFFSCell::preset_expr() const
 // @param[in] alloc メモリアロケータ
 // *1: - false 論理式なし
 //     - true 論理式あり
-CiFFSRCell::CiFFSRCell(ymuint id,
+CiFFSRCell::CiFFSRCell(CiLibrary* library,
+		       ymuint id,
 		       const ShString& name,
 		       CellArea area,
 		       ymuint ni,
@@ -289,7 +297,7 @@ CiFFSRCell::CiFFSRCell(ymuint id,
 		       ymuint clear_preset_var1,
 		       ymuint clear_preset_var2,
 		       AllocBase& alloc) :
-  CiFFRCell(id, name, area,
+  CiFFRCell(library, id, name, area,
 	    ni, no, nio, nb, nc,
 	    output_array,
 	    logic_array,

@@ -17,6 +17,7 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] library 親のセルライブラリ
 // @param[in] id ID番号
 // @param[in] name 名前
 // @param[in] area 面積
@@ -34,7 +35,8 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] alloc メモリアロケータ
 // *1: - false 論理式なし
 //     - true 論理式あり
-CiLatchCell::CiLatchCell(ymuint id,
+CiLatchCell::CiLatchCell(CiLibrary* library,
+			 ymuint id,
 			 const ShString& name,
 			 CellArea area,
 			 ymuint ni,
@@ -49,7 +51,7 @@ CiLatchCell::CiLatchCell(ymuint id,
 			 const LogExpr& enable,
 			 const LogExpr& enable_also,
 			 AllocBase& alloc) :
-  CiCell(id, name, area,
+  CiCell(library, id, name, area,
 	 ni, no, nio, nb, nc,
 	 output_array,
 	 logic_array,
@@ -103,6 +105,7 @@ CiLatchCell::enable2_expr() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] library 親のセルライブラリ
 // @param[in] id ID番号
 // @param[in] name 名前
 // @param[in] area 面積
@@ -121,7 +124,8 @@ CiLatchCell::enable2_expr() const
 // @param[in] alloc メモリアロケータ
 // *1: - false 論理式なし
 //     - true 論理式あり
-CiLatchRCell::CiLatchRCell(ymuint id,
+CiLatchRCell::CiLatchRCell(CiLibrary* library,
+			   ymuint id,
 			   const ShString& name,
 			   CellArea area,
 			   ymuint ni,
@@ -137,7 +141,7 @@ CiLatchRCell::CiLatchRCell(ymuint id,
 			   const LogExpr& enable_also,
 			   const LogExpr& clear,
 			   AllocBase& alloc) :
-  CiLatchCell(id, name, area,
+  CiLatchCell(library, id, name, area,
 	      ni, no, nio, nb, nc,
 	      output_array,
 	      logic_array,
@@ -176,6 +180,7 @@ CiLatchRCell::clear_expr() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] library 親のセルライブラリ
 // @param[in] id ID番号
 // @param[in] name 名前
 // @param[in] area 面積
@@ -194,7 +199,8 @@ CiLatchRCell::clear_expr() const
 // @param[in] alloc メモリアロケータ
 // *1: - false 論理式なし
 //     - true 論理式あり
-CiLatchSCell::CiLatchSCell(ymuint id,
+CiLatchSCell::CiLatchSCell(CiLibrary* library,
+			   ymuint id,
 			   const ShString& name,
 			   CellArea area,
 			   ymuint ni,
@@ -210,7 +216,7 @@ CiLatchSCell::CiLatchSCell(ymuint id,
 			   const LogExpr& enable_also,
 			   const LogExpr& preset,
 			   AllocBase& alloc) :
-  CiLatchCell(id, name, area,
+  CiLatchCell(library, id, name, area,
 	      ni, no, nio, nb, nc,
 	      output_array,
 	      logic_array,
@@ -249,6 +255,7 @@ CiLatchSCell::preset_expr() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] library 親のセルライブラリ
 // @param[in] id ID番号
 // @param[in] name 名前
 // @param[in] area 面積
@@ -270,7 +277,8 @@ CiLatchSCell::preset_expr() const
 // @param[in] alloc メモリアロケータ
 // *1: - false 論理式なし
 //     - true 論理式あり
-CiLatchSRCell::CiLatchSRCell(ymuint id,
+CiLatchSRCell::CiLatchSRCell(CiLibrary* library,
+			     ymuint id,
 			     const ShString& name,
 			     CellArea area,
 			     ymuint ni,
@@ -289,7 +297,7 @@ CiLatchSRCell::CiLatchSRCell(ymuint id,
 			     ymuint clear_preset_var1,
 			     ymuint clear_preset_var2,
 			     AllocBase& alloc) :
-  CiLatchRCell(id, name, area,
+  CiLatchRCell(library, id, name, area,
 	       ni, no, nio, nb, nc,
 	       output_array,
 	       logic_array,

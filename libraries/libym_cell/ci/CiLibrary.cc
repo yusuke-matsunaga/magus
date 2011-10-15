@@ -192,8 +192,14 @@ CiLibrary::cell(ymuint pos) const
 const Cell*
 CiLibrary::cell(const char* name) const
 {
-  // 未完
-  return NULL;
+  return mCellHash.get(ShString(name));
+}
+
+// @brief 名前からのセルの取得
+const Cell*
+CiLibrary::cell(const string& name) const
+{
+  return mCellHash.get(ShString(name));
 }
 
 // @brief セルグループの個数を返す．
@@ -475,13 +481,13 @@ CiLibrary::new_logic_cell(ymuint cell_id,
 			  const vector<LogExpr>& tristate_array)
 {
   void* p = mAlloc.get_memory(sizeof(CiLogicCell));
-  CiCell* cell = new (p) CiLogicCell(cell_id, ShString(name), area,
+  CiCell* cell = new (p) CiLogicCell(this, cell_id, ShString(name), area,
 				     ni, no, nio, nb, nc,
 				     output_array,
 				     logic_array,
 				     tristate_array,
 				     mAlloc);
-  mCellArray[cell_id] = cell;
+  add_cell(cell_id, cell);
 }
 
 // @brief FFセルを生成する．
@@ -532,7 +538,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
   if ( has_clear ) {
     if ( has_preset ) {
       void* p = mAlloc.get_memory(sizeof(CiFFSRCell));
-      cell = new (p) CiFFSRCell(cell_id, shname, area,
+      cell = new (p) CiFFSRCell(this, cell_id, shname, area,
 				ni, no, nio, nb, nc,
 				output_array,
 				logic_array,
@@ -548,7 +554,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
     }
     else {
       void* p = mAlloc.get_memory(sizeof(CiFFRCell));
-      cell = new (p) CiFFRCell(cell_id, shname, area,
+      cell = new (p) CiFFRCell(this, cell_id, shname, area,
 			       ni, no, nio, nb, nc,
 			       output_array,
 			       logic_array,
@@ -563,7 +569,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
   else {
     if ( has_preset ) {
       void* p = mAlloc.get_memory(sizeof(CiFFSCell));
-      cell = new (p) CiFFSCell(cell_id, shname, area,
+      cell = new (p) CiFFSCell(this, cell_id, shname, area,
 			       ni, no, nio, nb, nc,
 			       output_array,
 			       logic_array,
@@ -576,7 +582,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
     }
     else {
       void* p = mAlloc.get_memory(sizeof(CiFFCell));
-      cell = new (p) CiFFCell(cell_id, shname, area,
+      cell = new (p) CiFFCell(this, cell_id, shname, area,
 			      ni, no, nio, nb, nc,
 			      output_array,
 			      logic_array,
@@ -587,7 +593,7 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 			      mAlloc);
     }
   }
-  mCellArray[cell_id] = cell;
+  add_cell(cell_id, cell);
 }
 
 // @brief ラッチセルを生成する．
@@ -640,7 +646,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
   if ( has_clear ) {
     if ( has_preset ) {
       void* p = mAlloc.get_memory(sizeof(CiLatchSRCell));
-      cell = new (p) CiLatchSRCell(cell_id, shname, area,
+      cell = new (p) CiLatchSRCell(this, cell_id, shname, area,
 				   ni, no, nio, nb, nc,
 				   output_array,
 				   logic_array,
@@ -656,7 +662,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
     }
     else {
       void* p = mAlloc.get_memory(sizeof(CiLatchRCell));
-      cell = new (p) CiLatchRCell(cell_id, shname, area,
+      cell = new (p) CiLatchRCell(this, cell_id, shname, area,
 				  ni, no, nio, nb, nc,
 				  output_array,
 				  logic_array,
@@ -671,7 +677,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
   else {
     if ( has_preset ) {
       void* p = mAlloc.get_memory(sizeof(CiLatchSCell));
-      cell = new (p) CiLatchSCell(cell_id, shname, area,
+      cell = new (p) CiLatchSCell(this, cell_id, shname, area,
 				  ni, no, nio, nb, nc,
 				  output_array,
 				  logic_array,
@@ -684,7 +690,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
     }
     else {
       void* p = mAlloc.get_memory(sizeof(CiLatchCell));
-      cell = new (p) CiLatchCell(cell_id, shname, area,
+      cell = new (p) CiLatchCell(this, cell_id, shname, area,
 				 ni, no, nio, nb, nc,
 				 output_array,
 				 logic_array,
@@ -695,7 +701,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 				 mAlloc);
     }
   }
-  mCellArray[cell_id] = cell;
+  add_cell(cell_id, cell);
 }
 
 // @brief セルの入力ピンの内容を設定する．
@@ -713,12 +719,14 @@ CiLibrary::new_cell_input(ymuint cell_id,
 			  CellCapacitance rise_capacitance,
 			  CellCapacitance fall_capacitance)
 {
-  void* p = mAlloc.get_memory(sizeof(CiInputPin));
-  CiInputPin* pin = new (p) CiInputPin(ShString(name), capacitance,
-				       rise_capacitance, fall_capacitance);
   CiCell* cell = mCellArray[cell_id];
+  void* p = mAlloc.get_memory(sizeof(CiInputPin));
+  CiInputPin* pin = new (p) CiInputPin(cell, ShString(name),
+				       capacitance,
+				       rise_capacitance, fall_capacitance);
   cell->mInputArray[pin_id] = pin;
   pin->mId = pin_id;
+  mPinHash.add(pin);
 }
 
 // @brief セルの出力ピンの内容を設定する．
@@ -742,13 +750,15 @@ CiLibrary::new_cell_output(ymuint cell_id,
 			   CellTime max_transition,
 			   CellTime min_transition)
 {
+  CiCell* cell = mCellArray[cell_id];
   void* p = mAlloc.get_memory(sizeof(CiOutputPin));
-  CiOutputPin* pin = new (p) CiOutputPin(ShString(name), max_fanout, min_fanout,
+  CiOutputPin* pin = new (p) CiOutputPin(cell, ShString(name),
+					 max_fanout, min_fanout,
 					 max_capacitance, min_capacitance,
 					 max_transition, min_transition);
-  CiCell* cell = mCellArray[cell_id];
   cell->mOutputArray[pin_id] = pin;
   pin->mId = pin_id;
+  mPinHash.add(pin);
 }
 
 // @brief セルの入出力ピンの内容を設定する．
@@ -778,17 +788,19 @@ CiLibrary::new_cell_inout(ymuint cell_id,
 			  CellTime max_transition,
 			  CellTime min_transition)
 {
+  CiCell* cell = mCellArray[cell_id];
   void* p = mAlloc.get_memory(sizeof(CiInoutPin));
-  CiInoutPin* pin =  new (p) CiInoutPin(ShString(name), capacitance,
+  CiInoutPin* pin =  new (p) CiInoutPin(cell, ShString(name),
+					capacitance,
 					rise_capacitance, fall_capacitance,
 					max_fanout, min_fanout,
 					max_capacitance, min_capacitance,
 					max_transition, min_transition);
-  CiCell* cell = mCellArray[cell_id];
   cell->mInputArray[pin_id + cell->input_num()] = pin;
   cell->mOutputArray[pin_id + cell->output_num()] = pin;
   cell->mInoutArray[pin_id] = pin;
   pin->mId = pin_id;
+  mPinHash.add(pin);
 }
 
 #if 0
@@ -991,6 +1003,17 @@ CiLibrary::set_group_num(ymuint ng)
   for (ymuint i = 0; i < mGroupNum; ++ i) {
     mGroupArray[i].mId = i;
   }
+}
+
+// @brief セルを追加する．
+// @param[in] id セル番号
+// @param[in] cell セル
+void
+CiLibrary::add_cell(ymuint id,
+		    CiCell* cell)
+{
+  mCellArray[id] = cell;
+  mCellHash.add(cell);
 }
 
 /// @brief 内容をバイナリダンプする．
@@ -1455,6 +1478,24 @@ CiLibrary::restore(istream& s)
 
   // パタングラフの情報の設定
   mPatMgr.restore(bis, mAlloc);
+}
+
+// @brief ピンの登録
+// @param[in] pin 登録するピン
+void
+CiLibrary::add_pin(CiPin* pin)
+{
+  mPinHash.add(pin);
+}
+
+// @brief ピン名からピンを取り出す．
+// @param[in] cell セル
+// @param[in] name ピン名
+CiPin*
+CiLibrary::get_pin(const CiCell* cell,
+		   ShString name)
+{
+  return mPinHash.get(cell, name);
 }
 
 END_NAMESPACE_YM_CELL

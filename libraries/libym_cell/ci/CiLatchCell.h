@@ -26,6 +26,7 @@ class CiLatchCell :
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] library 親のセルライブラリ
   /// @param[in] id ID番号
   /// @param[in] name 名前
   /// @param[in] area 面積
@@ -43,7 +44,8 @@ protected:
   /// @param[in] alloc メモリアロケータ
   /// *1: - false 論理式なし
   ///     - true 論理式あり
-  CiLatchCell(ymuint id,
+  CiLatchCell(CiLibrary* library,
+	      ymuint id,
 	      const ShString& name,
 	      CellArea area,
 	      ymuint ni,
@@ -122,6 +124,7 @@ class CiLatchRCell :
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] library 親のセルライブラリ
   /// @param[in] id ID番号
   /// @param[in] name 名前
   /// @param[in] area 面積
@@ -140,7 +143,8 @@ protected:
   /// @param[in] alloc メモリアロケータ
   /// *1: - false 論理式なし
   ///     - true 論理式あり
-  CiLatchRCell(ymuint id,
+  CiLatchRCell(CiLibrary* library,
+	       ymuint id,
 	       const ShString& name,
 	       CellArea area,
 	       ymuint ni,
@@ -202,6 +206,7 @@ class CiLatchSCell :
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] library 親のセルライブラリ
   /// @param[in] id ID番号
   /// @param[in] name 名前
   /// @param[in] area 面積
@@ -220,7 +225,8 @@ protected:
   /// @param[in] alloc メモリアロケータ
   /// *1: - false 論理式なし
   ///     - true 論理式あり
-  CiLatchSCell(ymuint id,
+  CiLatchSCell(CiLibrary* library,
+	       ymuint id,
 	       const ShString& name,
 	       CellArea area,
 	       ymuint ni,
@@ -282,6 +288,7 @@ class CiLatchSRCell :
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] library 親のセルライブラリ
   /// @param[in] id ID番号
   /// @param[in] name 名前
   /// @param[in] area 面積
@@ -303,7 +310,8 @@ protected:
   /// @param[in] alloc メモリアロケータ
   /// *1: - false 論理式なし
   ///     - true 論理式あり
-  CiLatchSRCell(ymuint id,
+  CiLatchSRCell(CiLibrary* library,
+		ymuint id,
 		const ShString& name,
 		CellArea area,
 		ymuint ni,

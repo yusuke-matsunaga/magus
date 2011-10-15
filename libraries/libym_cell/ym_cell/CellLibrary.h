@@ -169,6 +169,11 @@ public:
   const Cell*
   cell(const char* name) const = 0;
 
+  /// @brief 名前からのセルの取得
+  virtual
+  const Cell*
+  cell(const string& name) const = 0;
+
   /// @brief セルグループの個数を返す．
   virtual
   ymuint

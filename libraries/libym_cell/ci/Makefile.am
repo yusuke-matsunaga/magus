@@ -35,6 +35,8 @@ libym_cell_ci_la_SOURCES = \
 	CiClass.cc \
 	CiCell.h \
 	CiCell.cc \
+	CiCellHash.h \
+	CiCellHash.cc \
 	CiLogicCell.h \
 	CiLogicCell.cc \
 	CiFFCell.h \
@@ -51,6 +53,8 @@ libym_cell_ci_la_SOURCES = \
 	CiPatMgr.cc \
 	CiPin.h \
 	CiPin.cc \
+	CiPinHash.h \
+	CiPinHash.cc \
 	CiTiming.h \
 	CiTiming.cc
 

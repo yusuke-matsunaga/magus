@@ -19,7 +19,10 @@
 #include "ym_utils/Alloc.h"
 #include "ym_utils/ShString.h"
 #include "ym_logic/LogExpr.h"
+#include "CiCellHash.h"
+#include "CiPinHash.h"
 #include "CiPatMgr.h"
+
 
 BEGIN_NAMESPACE_YM_CELL
 
@@ -157,6 +160,11 @@ public:
   virtual
   const Cell*
   cell(const char* name) const;
+
+  /// @brief 名前からのセルの取得
+  virtual
+  const Cell*
+  cell(const string& name) const;
 
   /// @brief セルグループの個数を返す．
   virtual
@@ -607,6 +615,31 @@ private:
   void
   set_group_num(ymuint ng);
 
+  /// @brief セルを追加する．
+  /// @param[in] id セル番号
+  /// @param[in] cell セル
+  void
+  add_cell(ymuint id,
+	   CiCell* cell);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ピンハッシュ用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ピンの登録
+  /// @param[in] pin 登録するピン
+  void
+  add_pin(CiPin* pin);
+
+  /// @brief ピン名からピンを取り出す．
+  /// @param[in] cell セル
+  /// @param[in] name ピン名
+  CiPin*
+  get_pin(const CiCell* cell,
+	  ShString name);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -654,6 +687,12 @@ private:
 
   // セルのポインタの配列
   CiCell** mCellArray;
+
+  // 名前をキーにしたセルのハッシュ表
+  CiCellHash mCellHash;
+
+  // ピン名をキーにしたピンのハッシュ表
+  CiPinHash mPinHash;
 
   // セルグループ数
   ymuint32 mGroupNum;

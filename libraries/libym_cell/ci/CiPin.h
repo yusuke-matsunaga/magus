@@ -18,6 +18,8 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
+class CiCell;
+
 //////////////////////////////////////////////////////////////////////
 /// @class CellPinBase CiPin.h "CiPin.h"
 /// @brief ピンの基底クラス
@@ -26,12 +28,15 @@ class CiPin :
   public CellPin
 {
   friend class CiLibrary;
+  friend class CiPinHash;
 
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] cell 親のセル
   /// @param[in] name ピン名
-  CiPin(const ShString& name);
+  CiPin(CiCell* cell,
+	const ShString& name);
 
   /// @brief デストラクタ
   virtual
@@ -190,6 +195,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ハッシュ表のためのリンク
+  CiPin* mLink;
+
+  // 親のセル
+  CiCell* mCell;
+
   // ピン番号
   ymuint32 mId;
 
@@ -211,11 +222,13 @@ class CiInputPin :
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] cell 親のセル
   /// @param[in] name ピン名
   /// @param[in] capacitance 負荷容量
   /// @param[in] rise_capacitance 立ち上がり時の負荷容量
   /// @param[in] fall_capacitance 立ち下がり時の負荷容量
-  CiInputPin(const ShString& name,
+  CiInputPin(CiCell* cell,
+	     const ShString& name,
 	     CellCapacitance capacitance,
 	     CellCapacitance rise_capacitance,
 	     CellCapacitance fall_capacitance);
@@ -291,6 +304,7 @@ class CiOutputPinBase :
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] cell 親のセル
   /// @param[in] name ピン名
   /// @param[in] max_fanout 最大ファンアウト容量
   /// @param[in] min_fanout 最小ファンアウト容量
@@ -298,7 +312,8 @@ protected:
   /// @param[in] min_capacitance 最小負荷容量
   /// @param[in] max_transition 最大遷移時間
   /// @param[in] min_transition 最小遷移時間
-  CiOutputPinBase(const ShString& name,
+  CiOutputPinBase(CiCell* cell,
+		  const ShString& name,
 		  CellCapacitance max_fanout,
 		  CellCapacitance min_fanout,
 		  CellCapacitance max_capacitance,
@@ -451,6 +466,7 @@ class CiOutputPin :
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] cell 親のセル
   /// @param[in] name ピン名
   /// @param[in] max_fanout 最大ファンアウト容量
   /// @param[in] min_fanout 最小ファンアウト容量
@@ -458,7 +474,8 @@ private:
   /// @param[in] min_capacitance 最小負荷容量
   /// @param[in] max_transition 最大遷移時間
   /// @param[in] min_transition 最小遷移時間
-  CiOutputPin(const ShString& name,
+  CiOutputPin(CiCell* cell,
+	      const ShString& name,
 	      CellCapacitance max_fanout,
 	      CellCapacitance min_fanout,
 	      CellCapacitance max_capacitance,
@@ -502,6 +519,7 @@ class CiInoutPin :
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] cell 親のセル
   /// @param[in] name ピン名
   /// @param[in] capacitance 負荷容量
   /// @param[in] rise_capacitance 立ち上がり時の負荷容量
@@ -512,7 +530,8 @@ private:
   /// @param[in] min_capacitance 最小負荷容量
   /// @param[in] max_transition 最大遷移時間
   /// @param[in] min_transition 最小遷移時間
-  CiInoutPin(const ShString& name,
+  CiInoutPin(CiCell* cell,
+	     const ShString& name,
 	     CellCapacitance capacitance,
 	     CellCapacitance rise_capacitance,
 	     CellCapacitance fall_capacitance,
@@ -594,8 +613,10 @@ class CiInternalPin :
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] cell 親のセル
   /// @param[in] name ピン名
-  CiInternalPin(const ShString& name);
+  CiInternalPin(CiCell* cell,
+		const ShString& name);
 
   /// @brief デストラクタ
   virtual

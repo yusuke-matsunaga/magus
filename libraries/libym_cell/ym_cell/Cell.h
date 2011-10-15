@@ -113,6 +113,14 @@ public:
   const CellPin*
   pin(const string& name) const = 0;
 
+  /// @brief 名前からピンの取得
+  /// @param[in] name ピン名
+  /// @return name という名前をピンを返す．
+  /// @note なければ NULL を返す．
+  virtual
+  const CellPin*
+  pin(const char* name) const = 0;
+
   /// @brief バス数の取得
   virtual
   ymuint

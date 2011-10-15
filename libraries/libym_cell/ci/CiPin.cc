@@ -17,8 +17,11 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] cell 親のセル
 // @param[in] name ピン名
-CiPin::CiPin(const ShString& name) :
+CiPin::CiPin(CiCell* cell,
+	     const ShString& name) :
+  mCell(cell),
   mName(name)
 {
 }
@@ -183,15 +186,17 @@ CiPin::set_three_state(const LogExpr& expr)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] cell 親のセル
 // @param[in] name ピン名
 // @param[in] capacitance 負荷容量
 // @param[in] rise_capacitance 立ち上がり時の負荷容量
 // @param[in] fall_capacitance 立ち下がり時の負荷容量
-CiInputPin::CiInputPin(const ShString& name,
+CiInputPin::CiInputPin(CiCell* cell,
+		       const ShString& name,
 		       CellCapacitance capacitance,
 		       CellCapacitance rise_capacitance,
 		       CellCapacitance fall_capacitance) :
-  CiPin(name),
+  CiPin(cell, name),
   mCapacitance(capacitance),
   mRiseCapacitance(rise_capacitance),
   mFallCapacitance(fall_capacitance)
@@ -244,6 +249,7 @@ CiInputPin::fall_capacitance() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] cell 親のセル
 // @param[in] name ピン名
 // @param[in] max_fanout 最大ファンアウト容量
 // @param[in] min_fanout 最小ファンアウト容量
@@ -251,14 +257,15 @@ CiInputPin::fall_capacitance() const
 // @param[in] min_capacitance 最小負荷容量
 // @param[in] max_transition 最大遷移時間
 // @param[in] min_transition 最小遷移時間
-CiOutputPinBase::CiOutputPinBase(const ShString& name,
+CiOutputPinBase::CiOutputPinBase(CiCell* cell,
+				 const ShString& name,
 				 CellCapacitance max_fanout,
 				 CellCapacitance min_fanout,
 				 CellCapacitance max_capacitance,
 				 CellCapacitance min_capacitance,
 				 CellTime max_transition,
 				 CellTime min_transition) :
-  CiPin(name),
+  CiPin(cell, name),
   mHasFunction(0U),
   mMaxFanout(max_fanout),
   mMinFanout(min_fanout),
@@ -394,6 +401,7 @@ CiOutputPinBase::set_timing_array(const CellTiming** timing_array)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+ /// @param[in] cell 親のセル
 // @param[in] name ピン名
 // @param[in] max_fanout 最大ファンアウト容量
 // @param[in] min_fanout 最小ファンアウト容量
@@ -401,14 +409,15 @@ CiOutputPinBase::set_timing_array(const CellTiming** timing_array)
 // @param[in] min_capacitance 最小負荷容量
 // @param[in] max_transition 最大遷移時間
 // @param[in] min_transition 最小遷移時間
-CiOutputPin::CiOutputPin(const ShString& name,
+CiOutputPin::CiOutputPin(CiCell* cell,
+			 const ShString& name,
 			 CellCapacitance max_fanout,
 			 CellCapacitance min_fanout,
 			 CellCapacitance max_capacitance,
 			 CellCapacitance min_capacitance,
 			 CellTime max_transition,
 			 CellTime min_transition) :
-  CiOutputPinBase(name,
+  CiOutputPinBase(cell, name,
 		  max_fanout, min_fanout,
 		  max_capacitance, min_capacitance,
 		  max_transition, min_transition)
@@ -440,6 +449,7 @@ CiOutputPin::is_output() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] cell 親のセル
 // @param[in] name ピン名
 // @param[in] capacitance 負荷容量
 // @param[in] rise_capacitance 立ち上がり時の負荷容量
@@ -450,7 +460,8 @@ CiOutputPin::is_output() const
 // @param[in] min_capacitance 最小負荷容量
 // @param[in] max_transition 最大遷移時間
 // @param[in] min_transition 最小遷移時間
-CiInoutPin::CiInoutPin(const ShString& name,
+CiInoutPin::CiInoutPin(CiCell* cell,
+		       const ShString& name,
 		       CellCapacitance capacitance,
 		       CellCapacitance rise_capacitance,
 		       CellCapacitance fall_capacitance,
@@ -460,7 +471,7 @@ CiInoutPin::CiInoutPin(const ShString& name,
 		       CellCapacitance min_capacitance,
 		       CellTime max_transition,
 		       CellTime min_transition) :
-  CiOutputPinBase(name,
+  CiOutputPinBase(cell, name,
 		  max_fanout, min_fanout,
 		  max_capacitance, min_capacitance,
 		  max_transition, min_transition),
@@ -516,9 +527,11 @@ CiInoutPin::fall_capacitance() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] cell 親のセル
 // @param[in] name ピン名
-CiInternalPin::CiInternalPin(const ShString& name) :
-  CiPin(name)
+CiInternalPin::CiInternalPin(CiCell* cell,
+			     const ShString& name) :
+  CiPin(cell, name)
 {
 }
 

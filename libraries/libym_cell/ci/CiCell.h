@@ -17,6 +17,7 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
+class CiLibrary;
 class CiPin;
 class CiBus;
 class CiBundle;
@@ -30,10 +31,12 @@ class CiCell :
   public Cell
 {
   friend class CiLibrary;
+  friend class CiCellHash;
 
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] library 親のセルライブラリ
   /// @param[in] id ID番号
   /// @param[in] name 名前
   /// @param[in] area 面積
@@ -48,7 +51,8 @@ protected:
   /// @param[in] alloc メモリアロケータ
   /// *1: - false 論理式なし
   ///     - true 論理式あり
-  CiCell(ymuint id,
+  CiCell(CiLibrary* library,
+	 ymuint id,
 	 const ShString& name,
 	 CellArea area,
 	 ymuint ni,
@@ -147,6 +151,14 @@ public:
   virtual
   const CellPin*
   pin(const string& name) const;
+
+  /// @brief 名前からピンの取得
+  /// @param[in] name ピン名
+  /// @return name という名前をピンを返す．
+  /// @note なければ NULL を返す．
+  virtual
+  const CellPin*
+  pin(const char* name) const;
 
   /// @brief バス数の取得
   virtual
@@ -343,6 +355,12 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // セルライブラリ
+  CiLibrary* mLibrary;
+
+  // ハッシュ表のためのリンク
+  CiCell* mLink;
 
   // ID番号
   ymuint32 mId;

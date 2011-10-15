@@ -26,6 +26,7 @@ class CiFFCell :
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] library 親のセルライブラリ
   /// @param[in] id ID番号
   /// @param[in] name 名前
   /// @param[in] area 面積
@@ -43,7 +44,8 @@ protected:
   /// @param[in] alloc メモリアロケータ
   /// *1: - false 論理式なし
   ///     - true 論理式あり
-  CiFFCell(ymuint id,
+  CiFFCell(CiLibrary* library,
+	   ymuint id,
 	   const ShString& name,
 	   CellArea area,
 	   ymuint ni,
@@ -122,6 +124,7 @@ class CiFFRCell :
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] library 親のセルライブラリ
   /// @param[in] id ID番号
   /// @param[in] name 名前
   /// @param[in] area 面積
@@ -140,7 +143,8 @@ protected:
   /// @param[in] alloc メモリアロケータ
   /// *1: - false 論理式なし
   ///     - true 論理式あり
-  CiFFRCell(ymuint id,
+  CiFFRCell(CiLibrary* library,
+	    ymuint id,
 	    const ShString& name,
 	    CellArea area,
 	    ymuint ni,
@@ -202,6 +206,7 @@ class CiFFSCell :
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] library 親のセルライブラリ
   /// @param[in] id ID番号
   /// @param[in] name 名前
   /// @param[in] area 面積
@@ -220,7 +225,8 @@ protected:
   /// @param[in] alloc メモリアロケータ
   /// *1: - false 論理式なし
   ///     - true 論理式あり
-  CiFFSCell(ymuint id,
+  CiFFSCell(CiLibrary* library,
+	    ymuint id,
 	    const ShString& name,
 	    CellArea area,
 	    ymuint ni,
@@ -282,6 +288,7 @@ class CiFFSRCell :
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] library 親のセルライブラリ
   /// @param[in] id ID番号
   /// @param[in] name 名前
   /// @param[in] area 面積
@@ -303,7 +310,8 @@ protected:
   /// @param[in] alloc メモリアロケータ
   /// *1: - false 論理式なし
   ///     - true 論理式あり
-  CiFFSRCell(ymuint id,
+  CiFFSRCell(CiLibrary* library,
+	     ymuint id,
 	     const ShString& name,
 	     CellArea area,
 	     ymuint ni,
