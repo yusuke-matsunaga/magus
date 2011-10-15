@@ -74,9 +74,9 @@ test(const CellLibrary* library,
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
     MsgMgr::reg_handler(msg_handler);
 
-    BdnBlifReader reader;
+    BdnBlifReader read;
 
-    if ( !reader.read(sbj_filename, sbjgraph) ) {
+    if ( !read(sbj_filename, sbjgraph) ) {
       cerr << "Error in reading " << sbj_filename << endl;
       return;
     }

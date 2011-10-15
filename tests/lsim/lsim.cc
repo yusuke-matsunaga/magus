@@ -34,15 +34,15 @@ lsim(const string& filename,
   BdnMgr network;
 
   if ( blif ) {
-    BdnBlifReader reader;
-    if ( !reader.read(filename, network) ) {
+    BdnBlifReader read;
+    if ( !read(filename, network) ) {
       cerr << "Error in reading " << filename << endl;
       return;
     }
   }
   else {
-    BdnIscas89Reader reader;
-    if ( !reader.read(filename, network) ) {
+    BdnIscas89Reader read;
+    if ( !read(filename, network) ) {
       cerr << "Error in reading " << filename << endl;
       return;
     }

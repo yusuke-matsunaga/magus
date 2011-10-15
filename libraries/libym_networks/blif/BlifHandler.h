@@ -111,7 +111,7 @@ public:
   /// @param[in] loc1 ピン名の位置情報
   /// @param[in] f_name ピン名
   /// @param[in] loc2 ノード名の位置情報
-  /// @param[in] a_name ノード名
+  /// @param[in] a_name ノード名を表す ID 番号
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
@@ -119,7 +119,7 @@ public:
   gate_assign(const FileRegion& loc1,
 	      const char* f_name,
 	      const FileRegion& loc2,
-	      const char* a_name) = 0;
+	      ymuint a_name) = 0;
 
   /// @brief .gate 文の終了
   virtual

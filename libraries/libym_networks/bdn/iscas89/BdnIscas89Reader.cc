@@ -36,8 +36,8 @@ BdnIscas89Reader::~BdnIscas89Reader()
 // @retval true 正常に読み込めた
 // @retval false 読み込み中にエラーが起こった．
 bool
-BdnIscas89Reader::read(const string& filename,
-		       BdnMgr& network)
+BdnIscas89Reader::operator()(const string& filename,
+			     BdnMgr& network)
 {
   using namespace nsIscas89;
 

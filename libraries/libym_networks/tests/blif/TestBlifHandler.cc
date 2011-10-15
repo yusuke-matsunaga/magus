@@ -105,10 +105,10 @@ bool
 TestBlifHandler::gate_assign(const FileRegion& loc1,
 			     const char* f_name,
 			     const FileRegion& loc2,
-			     const char* a_name)
+			     ymuint a_name)
 {
   (*mStreamPtr) << "  .gate assign: "
-		<< f_name << " = " << a_name << endl
+		<< f_name << " = " << id2str(a_name) << endl
 		<< "\t[" << loc1 << "]" << endl
 		<< "\t[" << loc2 << "]" << endl;
   return true;

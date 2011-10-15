@@ -599,7 +599,7 @@ BlifParserImpl::read(const string& filename)
       for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	   p != mHandlerList.end(); ++ p) {
 	BlifHandler* handler = *p;
-	if ( !handler->gate_assign(loc1, name1, loc2, name2) ) {
+	if ( !handler->gate_assign(loc1, name1, loc2, cell->id()) ) {
 	  stat = false;
 	}
       }

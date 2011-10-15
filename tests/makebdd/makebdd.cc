@@ -27,10 +27,10 @@ makebdd(const string& filename)
   MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
   MsgMgr::reg_handler(msg_handler);
 
-  BdnBlifReader reader;
+  BdnBlifReader read;
   BdnMgr network;
 
-  if ( !reader.read(filename, network) ) {
+  if ( !read(filename, network) ) {
     cerr << "Error in reading " << filename << endl;
     return false;
   }

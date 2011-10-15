@@ -24,11 +24,13 @@ BlifNetworkHandler::~BlifNetworkHandler()
 {
 }
 
-// @brief 読み込む対象のネットワークを設定する．
+// @brief 読み込む対象のネットワークとセルライブラリを設定する．
 void
-BlifNetworkHandler::set_network(BlifNetwork* network)
+BlifNetworkHandler::set(BlifNetwork* network,
+			const CellLibrary* cell_library)
 {
   mNetwork = network;
+  mCellLibrary = cell_library;
 }
 
 // @brief 初期化
@@ -123,7 +125,7 @@ bool
 BlifNetworkHandler::gate_assign(const FileRegion& loc1,
 				const char* f_name,
 				const FileRegion& loc2,
-				const char* a_name)
+				ymuint a_name)
 {
   return true;
 }

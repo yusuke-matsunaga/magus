@@ -10,6 +10,8 @@
 
 
 #include "ym_networks/bnet.h"
+#include "ym_cell/cell_nsdef.h"
+
 #include "BlifHandler.h"
 
 
@@ -34,9 +36,18 @@ public:
 
 public:
 
-  /// @brief 読み込む対象のネットワークを設定する．
+  /// @brief 対象のネットワークとセルライブラリを設定する．
+  /// @param[in] network 読み込む対象のネットワークを設定する．
+  /// @param[in] cell_library セルライブラリ
   void
-  set_network(BNetwork* network);
+  set(BNetwork* network,
+      const CellLibrary* cell_library);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // BlifHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化
   /// @retval true 処理が成功した．
@@ -106,7 +117,7 @@ public:
   /// @param[in] loc1 ピン名の位置情報
   /// @param[in] f_name ピン名
   /// @param[in] loc2 ノード名の位置情報
-  /// @param[in] a_name ノード名
+  /// @param[in] a_name ノード名の ID番号
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
@@ -114,7 +125,7 @@ public:
   gate_assign(const FileRegion& loc1,
 	      const char* f_name,
 	      const FileRegion& loc2,
-	      const char* a_name);
+	      ymuint a_name);
 
   /// @brief .gate 文の終了
   virtual
@@ -177,11 +188,23 @@ private:
   // 対象の BNetwork
   BNetwork* mNetwork;
 
+  // セルライブラリ
+  const CellLibrary* mCellLibrary;
+
   // ネットワークを操作するクラス
   BNetManip* mManip;
 
   // ID番号をキーにした BNode を納めた配列
   vector<BNode*> mNodeArray;
+
+  // .gate 用 : 現在のセル
+  const Cell* mCurCell;
+
+  // .gate 用 : 現在の入力ノードの配列
+  vector<BNode*> mCurInputs;
+
+  // .gate 用 : 現在の出力ノード
+  BNode* mCurOutput;
 
 };
 

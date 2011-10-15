@@ -36,10 +36,10 @@ main(int argc,
     StreamMsgHandler msg_handler(&cerr);
     MsgMgr::reg_handler(&msg_handler);
 
-    BNetBlifReader reader;
+    BNetBlifReader read;
     BNetwork bnetwork;
 
-    if ( !reader.read(filename, bnetwork) ) {
+    if ( !read(filename, bnetwork) ) {
       cerr << "Error in reading " << filename << endl;
       return 4;
     }

@@ -10,6 +10,7 @@
 
 
 #include "BlifHandler.h"
+#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF
@@ -35,9 +36,16 @@ public:
 
 public:
 
-  /// @brief 読み込む対象のネットワークを設定する．
+  /// @brief 読み込む対象のネットワークとセルライブラリを設定する．
   void
-  set_network(BlifNetwork* network);
+  set(BlifNetwork* network,
+      const CellLibrary* cell_library);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // BlifHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化
   virtual
@@ -102,7 +110,7 @@ public:
   /// @param[in] loc1 ピン名の位置情報
   /// @param[in] f_name ピン名
   /// @param[in] loc2 ノード名の位置情報
-  /// @param[in] a_name ノード名
+  /// @param[in] a_name ノード名の ID番号
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
@@ -110,7 +118,7 @@ public:
   gate_assign(const FileRegion& loc1,
 	      const char* f_name,
 	      const FileRegion& loc2,
-	      const char* a_name);
+	      ymuint a_name);
 
   /// @brief .gate 文の終了
   virtual
@@ -157,6 +165,9 @@ private:
 
   // 対象のネットワーク
   BlifNetwork* mNetwork;
+
+  // セルライブラリ
+  const CellLibrary* mCellLibrary;
 
 };
 

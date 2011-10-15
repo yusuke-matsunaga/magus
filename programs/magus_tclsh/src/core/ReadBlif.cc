@@ -63,7 +63,8 @@ ReadBlif::cmd_proc(TclObjVector& objv)
   switch ( neth->type() ) {
   case NetHandle::kMagBNet:
     {
-      bool result = mBnetReader.read(ex_file_name, *neth->_bnetwork());
+      bool result = mBnetReader(ex_file_name, *neth->_bnetwork(),
+				cur_cell_library());
 
       // エラーが起きていないか調べる．
       if ( !result ) {
@@ -77,7 +78,8 @@ ReadBlif::cmd_proc(TclObjVector& objv)
 
   case NetHandle::kMagBdn:
     {
-      bool result = mBdnReader.read(ex_file_name, *neth->_bdn());
+      bool result = mBdnReader(ex_file_name, *neth->_bdn(),
+			       cur_cell_library());
       if ( !result ) {
 	TclObj emsg = mh.msg_obj();
 	emsg << ": Error in reading " << objv[1];
