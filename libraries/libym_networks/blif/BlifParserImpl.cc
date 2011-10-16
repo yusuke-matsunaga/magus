@@ -9,6 +9,9 @@
 
 #include "BlifParserImpl.h"
 #include "BlifHandler.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_cell/Cell.h"
+#include "ym_cell/CellPin.h"
 #include "ym_utils/MsgMgr.h"
 
 
@@ -58,7 +61,8 @@ BlifParserImpl::~BlifParserImpl()
 
 // 読み込みを行なう．
 bool
-BlifParserImpl::read(const string& filename)
+BlifParserImpl::read(const string& filename,
+		     const CellLibrary* cell_library)
 {
   // ファイルをオープンする．
   if ( !mScanner.open_file(filename) ) {
@@ -69,6 +73,8 @@ BlifParserImpl::read(const string& filename)
 		    kMsgFailure, "BLIF_PARSER", buf.str());
     return false;
   }
+
+  mCellLibrary = cell_library;
 
   // 初期化を行う．
   mIdHash.clear();
@@ -185,6 +191,14 @@ BlifParserImpl::read(const string& filename)
       goto ST_NAMES;
 
     case kTokenGATE:
+      if ( mCellLibrary == NULL ) {
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			mLoc1,
+			kMsgError,
+			"NOCELL01",
+			"No cell-library is specified.");
+	goto ST_ERROR_EXIT;
+      }
       goto ST_GATE;
 
     case kTokenLATCH:
@@ -515,7 +529,7 @@ BlifParserImpl::read(const string& filename)
 	  << "Previsous Definition is " << cell->def_loc() << ".";
       MsgMgr::put_msg(__FILE__, __LINE__, cell->loc(),
 		      kMsgError,
-		      "MLTDEF01", buf.str().c_str());
+		      "MLTDEF01", buf.str());
       goto ST_ERROR_EXIT;
     }
     cell->set_defined();
@@ -544,6 +558,15 @@ BlifParserImpl::read(const string& filename)
       goto ST_GATE_SYNERROR;
     }
     const char* name = mScanner.cur_string();
+    mCell = mCellLibrary->cell(name);
+    if ( mCell == NULL ) {
+      ostringstream buf;
+      buf << name << ": No such cell.";
+      MsgMgr::put_msg(__FILE__, __LINE__, loc,
+		      kMsgError,
+		      "NOCELL02", buf.str());
+      goto ST_ERROR_EXIT;
+    }
     for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	 p != mHandlerList.end(); ++ p) {
       BlifHandler* handler = *p;
@@ -565,6 +588,15 @@ BlifParserImpl::read(const string& filename)
     if ( tk == kTokenSTRING ) {
       mName1 = mScanner.cur_string();
       const char* name1 = mName1.c_str();
+      const CellPin* pin = mCell->pin(name1);
+      if ( pin == NULL ) {
+	ostringstream buf;
+	buf << name1 << ": No such pin.";
+	MsgMgr::put_msg(__FILE__, __LINE__, loc1,
+			kMsgError,
+			"NOPIN01", buf.str());
+	goto ST_ERROR_EXIT;
+      }
       FileRegion loc2;
       tk = get_token(loc2);
       if ( tk != kTokenEQ ) {
@@ -580,9 +612,7 @@ BlifParserImpl::read(const string& filename)
       IdCell* cell = mIdHash.find(name2, true);
       cell->set_loc(loc2);
 
-      // 注意! 出力ピン名を 'o' もしくは 'O' と仮定している．
-      if ( strcmp(name1, "o") == 0 ||
-	   strcmp(name1, "O") == 0 ) {
+      if ( pin->is_output() ) {
 	if ( cell->is_defined() ) {
 	  // 二重定義
 	  ostringstream buf;

@@ -10,6 +10,7 @@
 
 
 #include "blif_nsdef.h"
+#include "ym_cell/cell_nsdef.h"
 #include "BlifScanner.h"
 #include "IdHash.h"
 
@@ -35,10 +36,12 @@ public:
 
   /// @brief 読み込みを行う．
   /// @param[in] filename ファイル名
+  /// @param[in] cell_library セルライブラリ
   /// @retval true 読み込みが成功した．
   /// @retval false 読み込みが失敗した．
   bool
-  read(const string& filename);
+  read(const string& filename,
+       const CellLibrary* cell_library);
 
   /// @brief イベントハンドラの登録
   void
@@ -81,6 +84,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // セルライブラリ
+  const CellLibrary* mCellLibrary;
+
   // 字句解析器
   BlifScanner mScanner;
 
@@ -113,6 +119,9 @@ private:
 
   // 出力の極性
   char mOpat;
+
+  // 現在のセル
+  const Cell* mCell;
 
   // 位置情報バッファ
   FileRegion mLoc1;

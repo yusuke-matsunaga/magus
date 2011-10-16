@@ -27,9 +27,10 @@ BlifParser::~BlifParser()
 
 // @brief 読み込みを行う．
 bool
-BlifParser::read(const string& filename)
+BlifParser::read(const string& filename,
+		 const CellLibrary* cell_library)
 {
-  return mRep->read(filename);
+  return mRep->read(filename, cell_library);
 }
 
 // @brief イベントハンドラの登録

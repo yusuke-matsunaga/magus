@@ -39,6 +39,7 @@ noinst_HEADERS = \
 	CmnMgr.h \
 	CmnNode.h \
 	CmnPort.h \
+	CmnBlifWriter.h \
 	CmnVerilogWriter.h \
 	MvnDumper.h \
 	MvnInputPin.h \

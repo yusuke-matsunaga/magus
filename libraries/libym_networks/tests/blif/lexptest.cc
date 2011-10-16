@@ -404,7 +404,7 @@ main(int argc,
 	StreamMsgHandler* msg_handler = new StreamMsgHandler(&cerr);
 	MsgMgr::reg_handler(msg_handler);
 
-	if ( !parser.read(filename) ) {
+	if ( !parser.read(filename, NULL) ) {
 	  cerr << "Error in reading " << argv[1] << endl;
 	  return 4;
 	}

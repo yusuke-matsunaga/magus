@@ -36,10 +36,11 @@ TgBlifReader::~TgBlifReader()
 // @brief blif ファイルを読み込む．
 bool
 TgBlifReader::operator()(const string& filename,
-			 TgNetwork& network)
+			 TgNetwork& network,
+			 const CellLibrary* cell_library)
 {
   mHandler->set_network(network);
-  bool stat = mParser->read(filename);
+  bool stat = mParser->read(filename, cell_library);
   return stat;
 }
 
