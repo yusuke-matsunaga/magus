@@ -707,6 +707,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 // @brief セルの入力ピンの内容を設定する．
 // @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
 // @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
+// @param[in] input_id 入力ピン番号 ( 0 <= input_id < cell->input_num2() )
 // @param[in] name 入力ピン名
 // @param[in] capacitance 入力ピンの負荷容量
 // @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
@@ -714,6 +715,7 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 void
 CiLibrary::new_cell_input(ymuint cell_id,
 			  ymuint pin_id,
+			  ymuint input_id,
 			  const string& name,
 			  CellCapacitance capacitance,
 			  CellCapacitance rise_capacitance,
@@ -724,14 +726,17 @@ CiLibrary::new_cell_input(ymuint cell_id,
   CiInputPin* pin = new (p) CiInputPin(cell, ShString(name),
 				       capacitance,
 				       rise_capacitance, fall_capacitance);
-  cell->mInputArray[pin_id] = pin;
+  cell->mPinArray[pin_id] = pin;
   pin->mId = pin_id;
+  cell->mInputArray[input_id] = pin;
+  pin->mInputId = input_id;
   mPinHash.add(pin);
 }
 
 // @brief セルの出力ピンの内容を設定する．
 // @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
 // @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
+// @param[in] output_id 出力ピン番号 ( 0 <= output_id < cell->output_num2() )
 // @param[in] name 出力ピン名
 // @param[in] max_fanout 最大ファンアウト容量
 // @param[in] min_fanout 最小ファンアウト容量
@@ -742,6 +747,7 @@ CiLibrary::new_cell_input(ymuint cell_id,
 void
 CiLibrary::new_cell_output(ymuint cell_id,
 			   ymuint pin_id,
+			   ymuint output_id,
 			   const string& name,
 			   CellCapacitance max_fanout,
 			   CellCapacitance min_fanout,
@@ -756,14 +762,18 @@ CiLibrary::new_cell_output(ymuint cell_id,
 					 max_fanout, min_fanout,
 					 max_capacitance, min_capacitance,
 					 max_transition, min_transition);
-  cell->mOutputArray[pin_id] = pin;
+  cell->mPinArray[pin_id] = pin;
   pin->mId = pin_id;
+  cell->mOutputArray[output_id] = pin;
+  pin->mOutputId = output_id;
   mPinHash.add(pin);
 }
 
 // @brief セルの入出力ピンの内容を設定する．
 // @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
-// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
+// @param[in] pin_id 入出力ピン番号 ( 0 <= pin_id < cell->pin_num() )
+// @param[in] input_id 入力ピン番号 ( 0 <= input_id < cell->input_num2() )
+// @param[in] output_id 出力ピン番号 ( 0 <= output_id < cell->output_num2() )
 // @param[in] name 入出力ピン名
 // @param[in] capacitance 入力ピンの負荷容量
 // @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
@@ -777,6 +787,8 @@ CiLibrary::new_cell_output(ymuint cell_id,
 void
 CiLibrary::new_cell_inout(ymuint cell_id,
 			  ymuint pin_id,
+			  ymuint input_id,
+			  ymuint output_id,
 			  const string& name,
 			  CellCapacitance capacitance,
 			  CellCapacitance rise_capacitance,
@@ -796,10 +808,12 @@ CiLibrary::new_cell_inout(ymuint cell_id,
 					max_fanout, min_fanout,
 					max_capacitance, min_capacitance,
 					max_transition, min_transition);
-  cell->mInputArray[pin_id + cell->input_num()] = pin;
-  cell->mOutputArray[pin_id + cell->output_num()] = pin;
-  cell->mInoutArray[pin_id] = pin;
+  cell->mPinArray[pin_id] = pin;
   pin->mId = pin_id;
+  cell->mInputArray[input_id] = pin;
+  pin->mInputId = input_id;
+  cell->mOutputArray[output_id] = pin;
+  pin->mOutputId = output_id;
   mPinHash.add(pin);
 }
 
@@ -1093,6 +1107,7 @@ CiLibrary::dump(ostream& s) const
     for (ymuint32 ipin = 0; ipin < ni; ++ ipin) {
       const CellPin* pin = cell->input(ipin);
       bos << pin->name()
+	  << pin->pin_id()
 	  << pin->capacitance()
 	  << pin->rise_capacitance()
 	  << pin->fall_capacitance();
@@ -1102,6 +1117,7 @@ CiLibrary::dump(ostream& s) const
     for (ymuint32 opin = 0; opin < no; ++ opin) {
       const CellPin* pin = cell->output(opin);
       bos << pin->name()
+	  << pin->pin_id()
 	  << pin->max_fanout()
 	  << pin->min_fanout()
 	  << pin->max_capacitance()
@@ -1114,6 +1130,7 @@ CiLibrary::dump(ostream& s) const
     for (ymuint32 iopin = 0; iopin < nio; ++ iopin) {
       const CellPin* pin = cell->output(iopin);
       bos << pin->name()
+	  << pin->pin_id()
 	  << pin->capacitance()
 	  << pin->rise_capacitance()
 	  << pin->fall_capacitance()
@@ -1338,19 +1355,22 @@ CiLibrary::restore(istream& s)
     // 入力ピンの設定
     for (ymuint j = 0; j < ni; ++ j) {
       string name;
+      ymuint32 pin_id;
       CellCapacitance cap;
       CellCapacitance r_cap;
       CellCapacitance f_cap;
       bis >> name
+	  >> pin_id
 	  >> cap
 	  >> r_cap
 	  >> f_cap;
-      new_cell_input(cell_id, j, name, cap, r_cap, f_cap);
+      new_cell_input(cell_id, pin_id, j, name, cap, r_cap, f_cap);
     }
 
     // 出力ピンの設定
     for (ymuint j = 0; j < no; ++ j) {
       string name;
+      ymuint32 pin_id;
       CellCapacitance max_f;
       CellCapacitance min_f;
       CellCapacitance max_c;
@@ -1358,13 +1378,14 @@ CiLibrary::restore(istream& s)
       CellTime max_t;
       CellTime min_t;
       bis >> name
+	  >> pin_id
 	  >> max_f
 	  >> min_f
 	  >> max_c
 	  >> min_c
 	  >> max_t
 	  >> min_t;
-      new_cell_output(cell_id, j, name,
+      new_cell_output(cell_id, pin_id, j, name,
 		      max_f, min_f,
 		      max_c, min_c,
 		      max_t, min_t);
@@ -1373,6 +1394,7 @@ CiLibrary::restore(istream& s)
     // 入出力ピンの設定
     for (ymuint j = 0; j < nio; ++ j) {
       string name;
+      ymuint32 pin_id;
       CellCapacitance cap;
       CellCapacitance r_cap;
       CellCapacitance f_cap;
@@ -1383,6 +1405,7 @@ CiLibrary::restore(istream& s)
       CellTime max_t;
       CellTime min_t;
       bis >> name
+	  >> pin_id
 	  >> cap
 	  >> r_cap
 	  >> f_cap
@@ -1392,7 +1415,7 @@ CiLibrary::restore(istream& s)
 	  >> min_c
 	  >> max_t
 	  >> min_t;
-      new_cell_inout(cell_id, j, name,
+      new_cell_inout(cell_id, pin_id, j + ni, j + no, name,
 		     cap, r_cap, f_cap,
 		     max_f, min_f,
 		     max_c, min_c,

@@ -240,52 +240,51 @@ display_library(ostream& s,
       }
     }
 
-    ymuint ni = cell->input_num();
-    for (ymuint ipos = 0; ipos < ni; ++ ipos) {
-      const CellPin* pin = cell->input(ipos);
-      s << "  Input#" << ipos << ": " << pin->name() << endl
-	<< "    Capacitance      = " << pin->capacitance() << endl
-	<< "    Rise Capacitance = " << pin->rise_capacitance() << endl
-	<< "    Fall Capacitance = " << pin->fall_capacitance() << endl;
-    }
-
-    ymuint no = cell->output_num();
-    for (ymuint opos = 0; opos < no; ++ opos) {
-      const CellPin* pin = cell->output(opos);
-      s << "  Output#" << opos << ": " << pin->name() << endl;
-      if ( cell->has_logic(opos) ) {
-	s << "    Logic            = " << cell->logic_expr(opos) << endl;
-	if ( cell->has_tristate(opos) ) {
-	  s << "    Tristate         = " << cell->tristate_expr(opos) << endl;
-	}
+    ymuint npin = cell->pin_num();
+    for (ymuint pin_id = 0; pin_id < npin; ++ pin_id) {
+      const CellPin* pin = cell->pin(pin_id);
+      s << "  Pin#" << pin_id << "[ " << pin->name() << " ]: ";
+      if ( pin->is_input() ) {
+	s << "Input#" << pin->input_id() << endl
+	  << "    Capacitance      = " << pin->capacitance() << endl
+	  << "    Rise Capacitance = " << pin->rise_capacitance() << endl
+	  << "    Fall Capacitance = " << pin->fall_capacitance() << endl;
       }
-      s << "    Max Fanout       = " << pin->max_fanout() << endl
-	<< "    Min Fanout       = " << pin->min_fanout() << endl
-	<< "    Max Capacitance  = " << pin->max_capacitance() << endl
-	<< "    Min Capacitance  = " << pin->min_capacitance() << endl
-	<< "    Max Transition   = " << pin->max_transition() << endl
-	<< "    Min Transition   = " << pin->min_transition() << endl;
-    }
-
-    ymuint nio = cell->inout_num();
-    for (ymuint iopos = 0; iopos < nio; ++ iopos) {
-      const CellPin* pin = cell->inout(iopos);
-      s << "  Inout#" << iopos << ": " << pin->name() << endl;
-      if ( cell->has_logic(iopos) ) {
-	s << "    Logic            = " << cell->logic_expr(iopos) << endl;
-	if ( cell->has_tristate(iopos) ) {
-	  s << "    Tristate         = " << cell->tristate_expr(iopos) << endl;
+      else if ( pin->is_output() ) {
+	ymuint opos = pin->output_id();
+	s << "Output# " << opos << endl;
+	if ( cell->has_logic(opos) ) {
+	  s << "    Logic            = " << cell->logic_expr(opos) << endl;
+	  if ( cell->has_tristate(opos) ) {
+	    s << "    Tristate         = " << cell->tristate_expr(opos) << endl;
+	  }
 	}
+	s << "    Max Fanout       = " << pin->max_fanout() << endl
+	  << "    Min Fanout       = " << pin->min_fanout() << endl
+	  << "    Max Capacitance  = " << pin->max_capacitance() << endl
+	  << "    Min Capacitance  = " << pin->min_capacitance() << endl
+	  << "    Max Transition   = " << pin->max_transition() << endl
+	  << "    Min Transition   = " << pin->min_transition() << endl;
       }
-      s << "    Capacitance      = " << pin->capacitance() << endl
-	<< "    Rise Capacitance = " << pin->rise_capacitance() << endl
-	<< "    Fall Capacitance = " << pin->fall_capacitance() << endl
-	<< "    Max Fanout       = " << pin->max_fanout() << endl
-	<< "    Min Fanout       = " << pin->min_fanout() << endl
-	<< "    Max Capacitance  = " << pin->max_capacitance() << endl
-	<< "    Min Capacitance  = " << pin->min_capacitance() << endl
-	<< "    Max Transition   = " << pin->max_transition() << endl
-	<< "    Min Transition   = " << pin->min_transition() << endl;
+      else if ( pin->is_inout() ) {
+	ymuint opos = pin->output_id();
+	s << "Inout#(" << pin->input_id() << ", " << opos << ")" << endl;
+	if ( cell->has_logic(opos) ) {
+	  s << "    Logic            = " << cell->logic_expr(opos) << endl;
+	  if ( cell->has_tristate(opos) ) {
+	    s << "    Tristate         = " << cell->tristate_expr(opos) << endl;
+	  }
+	}
+	s << "    Capacitance      = " << pin->capacitance() << endl
+	  << "    Rise Capacitance = " << pin->rise_capacitance() << endl
+	  << "    Fall Capacitance = " << pin->fall_capacitance() << endl
+	  << "    Max Fanout       = " << pin->max_fanout() << endl
+	  << "    Min Fanout       = " << pin->min_fanout() << endl
+	  << "    Max Capacitance  = " << pin->max_capacitance() << endl
+	  << "    Min Capacitance  = " << pin->min_capacitance() << endl
+	  << "    Max Transition   = " << pin->max_transition() << endl
+	  << "    Min Transition   = " << pin->min_transition() << endl;
+      }
     }
 
     ymuint ni2 = cell->input_num2();

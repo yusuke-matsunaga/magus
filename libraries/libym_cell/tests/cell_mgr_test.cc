@@ -59,30 +59,10 @@ main(int argc,
       cout << "Error" << endl;
     }
 
-    ymuint ni = cell->input_num();
-    for (ymuint j = 0; j < ni; ++ j) {
-      const CellPin* pin = cell->input(j);
-      cout << "  Input: " << pin->name() << endl;
-      const CellPin* pin2 = cell->pin(pin->name());
-      if ( pin != pin2 ) {
-	cout << "  Error" << endl;
-      }
-    }
-
-    ymuint no = cell->output_num();
-    for (ymuint j = 0; j < no; ++ j) {
-      const CellPin* pin = cell->output(j);
-      cout << "  Output: " << pin->name() << endl;
-      const CellPin* pin2 = cell->pin(pin->name());
-      if ( pin != pin2 ) {
-	cout << "  Error" << endl;
-      }
-    }
-
-    ymuint nio = cell->inout_num();
-    for (ymuint j = 0; j < nio; ++ j) {
-      const CellPin* pin = cell->inout(j);
-      cout << "  Inout: " << pin->name() << endl;
+    ymuint np = cell->pin_num();
+    for (ymuint j = 0; j < np; ++ j) {
+      const CellPin* pin = cell->pin(j);
+      cout << "  Pin: " << pin->name() << endl;
       const CellPin* pin2 = cell->pin(pin->name());
       if ( pin != pin2 ) {
 	cout << "  Error" << endl;

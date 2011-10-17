@@ -141,10 +141,10 @@ gen_library(const string& lib_name,
       ShString name = ipin_name_list[i];
       const MislibNode* pin = ipin_array[i];
       CellCapacitance load(pin->input_load()->num());
-      library->new_cell_input(cell_id, i, name, load, load, load);
+      library->new_cell_input(cell_id, i, i, name, load, load, load);
     }
     // 出力ピンの設定
-    library->new_cell_output(cell_id, 0, opin_name,
+    library->new_cell_output(cell_id, ni, 0, opin_name,
 			     CellCapacitance::infty(),
 			     CellCapacitance(0.0),
 			     CellCapacitance::infty(),

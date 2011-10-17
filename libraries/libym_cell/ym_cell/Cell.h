@@ -58,10 +58,31 @@ public:
   // ピン情報の取得
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ピン数の取得
+  virtual
+  ymuint
+  pin_num() const = 0;
+
+  /// @brief ピンの取得
+  /// @param[in] id ピン番号 ( 0 <= id < pin_num() )
+  virtual
+  const CellPin*
+  pin(ymuint id) const = 0;
+
   /// @brief 入力ピン数の取得
   virtual
   ymuint
   input_num() const = 0;
+
+  /// @brief 出力ピン数の取得
+  virtual
+  ymuint
+  output_num() const = 0;
+
+  /// @brief 入出力ピン数の取得
+  virtual
+  ymuint
+  inout_num() const = 0;
 
   /// @brief 入力ピン+入出力ピン数の取得
   /// @note input_num() + inout_num() に等しい．
@@ -70,16 +91,11 @@ public:
   input_num2() const = 0;
 
   /// @brief 入力ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < input_num2() )
+  /// @param[in] input_id 入力番号 ( 0 <= pos < input_num2() )
   /// @note pos >= input_num() の場合には入出力ピンが返される．
   virtual
   const CellPin*
-  input(ymuint pos) const = 0;
-
-  /// @brief 出力ピン数の取得
-  virtual
-  ymuint
-  output_num() const = 0;
+  input(ymuint input_id) const = 0;
 
   /// @brief 出力ピン+入出力ピン数の取得
   /// @note output_num() + inout_num() に等しい．
@@ -88,22 +104,11 @@ public:
   output_num2() const = 0;
 
   /// @brief 出力ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < output_num2() )
+  /// @param[in] output_id 出力番号 ( 0 <= pos < output_num2() )
   /// @note pos >= output_num() の場合には入出力ピンが返される．
   virtual
   const CellPin*
-  output(ymuint pos) const = 0;
-
-  /// @brief 入出力ピン数の取得
-  virtual
-  ymuint
-  inout_num() const = 0;
-
-  /// @brief 入出力ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < inout_num() )
-  virtual
-  const CellPin*
-  inout(ymuint pos) const = 0;
+  output(ymuint output_id) const = 0;
 
   /// @brief 名前からピンの取得
   /// @param[in] name ピン名

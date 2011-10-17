@@ -58,25 +58,34 @@ CiCell::CiCell(CiLibrary* library,
   mName = name;
   mArea = area;
 
-  mInputNum = ni;
   ymuint ni2 = ni + nio;
-  void* p = alloc.get_memory(sizeof(CiPin*) * ni2);
-  mInputArray = new (p) CiPin*[ni2];
-
-  mOutputNum = no;
   ymuint no2 = no + nio;
-  void* q = alloc.get_memory(sizeof(CiPin*) * no2);
-  mOutputArray = new (q) CiPin*[no2];
 
-  mInoutNum = nio;
-  void* r = alloc.get_memory(sizeof(CiPin*) * nio);
-  mInoutArray = new (r) CiPin*[nio];
+  {
+    mPinNum = ni + no + nio;
+    void* p = alloc.get_memory(sizeof(CiPin*) * mPinNum);
+    mPinArray = new (p) CiPin*[mPinNum];
+  }
 
-  ymuint n = ni2 * no2 * 2;
-  void* s = alloc.get_memory(sizeof(const CiTiming*) * n);
-  mTimingArray = new (s) CellTiming*[n];
-  for (ymuint i = 0; i < n; ++ i) {
-    mTimingArray[i] = NULL;
+  {
+    mInputNum = ni;
+    void* p = alloc.get_memory(sizeof(CiPin*) * ni2);
+    mInputArray = new (p) CiPin*[ni2];
+  }
+
+  {
+    mOutputNum = no;
+    void* q = alloc.get_memory(sizeof(CiPin*) * no2);
+    mOutputArray = new (q) CiPin*[no2];
+  }
+
+  {
+    ymuint n = ni2 * no2 * 2;
+    void* s = alloc.get_memory(sizeof(const CiTiming*) * n);
+    mTimingArray = new (s) CellTiming*[n];
+    for (ymuint i = 0; i < n; ++ i) {
+      mTimingArray[i] = NULL;
+    }
   }
 
   // バス，バンドル関係は未完
@@ -138,65 +147,19 @@ CiCell::area() const
   return mArea;
 }
 
-// @brief 入力ピン数の取得
+// @brief ピン数の取得
 ymuint
-CiCell::input_num() const
+CiCell::pin_num() const
 {
-  return mInputNum;
+  return mPinNum;
 }
 
-// @brief 入力ピン+入出力ピン数の取得
-// @note input_num() + inout_num() に等しい．
-ymuint
-CiCell::input_num2() const
-{
-  return mInputNum + mInoutNum;
-}
-
-// @brief 入力ピンの取得
-// @param[in] pos 位置番号 ( 0 <= pos < input_num2() )
+// @brief ピンの取得
+// @param[in] id ピン番号 ( 0 <= id < pin_num() )
 const CellPin*
-CiCell::input(ymuint pos) const
+CiCell::pin(ymuint id) const
 {
-  return mInputArray[pos];
-}
-
-// @brief 出力ピン数の取得
-ymuint
-CiCell::output_num() const
-{
-  return mOutputNum;
-}
-
-// @brief 出力ピン+入出力ピン数の取得
-// @note output_num() + inout_num() に等しい．
-ymuint
-CiCell::output_num2() const
-{
-  return mOutputNum + mInoutNum;
-}
-
-// @brief 出力ピンの取得
-// @param[in] pos 位置番号 ( 0 <= pos < output_num2() )
-const CellPin*
-CiCell::output(ymuint pos) const
-{
-  return mOutputArray[pos];
-}
-
-// @brief 入出力ピン数の取得
-ymuint
-CiCell::inout_num() const
-{
-  return mInoutNum;
-}
-
-// @brief 入出力ピンの取得
-// @param[in] pos 位置番号 ( 0 <= pos < inout_num() )
-const CellPin*
-CiCell::inout(ymuint pos) const
-{
-  return mInoutArray[pos];
+  return mPinArray[id];
 }
 
 // @brief 名前からピンの取得
@@ -217,6 +180,59 @@ const CellPin*
 CiCell::pin(const char* name) const
 {
   return mLibrary->get_pin(this, ShString(name));
+}
+
+// @brief 入力ピン数の取得
+ymuint
+CiCell::input_num() const
+{
+  return mInputNum;
+}
+
+// @brief 出力ピン数の取得
+ymuint
+CiCell::output_num() const
+{
+  return mOutputNum;
+}
+
+// @brief 入出力ピン数の取得
+ymuint
+CiCell::inout_num() const
+{
+  return mPinNum - mInputNum - mOutputNum;
+}
+
+// @brief 入力ピン+入出力ピン数の取得
+// @note input_num() + inout_num() に等しい．
+ymuint
+CiCell::input_num2() const
+{
+  return mInputNum + inout_num();
+}
+
+// @brief 入力ピンの取得
+// @param[in] pos 位置番号 ( 0 <= pos < input_num2() )
+const CellPin*
+CiCell::input(ymuint pos) const
+{
+  return mInputArray[pos];
+}
+
+// @brief 出力ピン+入出力ピン数の取得
+// @note output_num() + inout_num() に等しい．
+ymuint
+CiCell::output_num2() const
+{
+  return mOutputNum + inout_num();
+}
+
+// @brief 出力ピンの取得
+// @param[in] pos 位置番号 ( 0 <= pos < output_num2() )
+const CellPin*
+CiCell::output(ymuint pos) const
+{
+  return mOutputArray[pos];
 }
 
 // @brief バス数の取得

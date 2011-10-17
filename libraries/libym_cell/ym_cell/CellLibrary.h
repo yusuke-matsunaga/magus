@@ -486,7 +486,8 @@ public:
 
   /// @brief セルの入力ピンを生成する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
-  /// @param[in] pin_id 入力ピン番号 ( 0 <= pin_id < cell->input_num() )
+  /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
+  /// @param[in] input_id 入力ピン番号 ( 0 <= input_id < cell->input_num2() )
   /// @param[in] name 入力ピン名
   /// @param[in] capacitance 入力ピンの負荷容量
   /// @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
@@ -495,6 +496,7 @@ public:
   void
   new_cell_input(ymuint cell_id,
 		 ymuint pin_id,
+		 ymuint input_id,
 		 const string& name,
 		 CellCapacitance capacitance,
 		 CellCapacitance rise_capacitance,
@@ -502,7 +504,8 @@ public:
 
   /// @brief セルの出力ピンの内容を設定する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
-  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < cell->output_num() )
+  /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
+  /// @param[in] output_id 出力ピン番号 ( 0 <= output_id < cell->output_num2() )
   /// @param[in] name 出力ピン名
   /// @param[in] max_fanout 最大ファンアウト容量
   /// @param[in] min_fanout 最小ファンアウト容量
@@ -514,6 +517,7 @@ public:
   void
   new_cell_output(ymuint cell_id,
 		  ymuint pin_id,
+		  ymuint output_id,
 		  const string& name,
 		  CellCapacitance max_fanout,
 		  CellCapacitance min_fanout,
@@ -524,7 +528,9 @@ public:
 
   /// @brief セルの入出力ピンの内容を設定する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
-  /// @param[in] pin_id 入出力ピン番号 ( 0 <= pin_id < cell->inout_num() )
+  /// @param[in] pin_id 入出力ピン番号 ( 0 <= pin_id < cell->pin_num() )
+  /// @param[in] input_id 入力ピン番号 ( 0 <= input_id < cell->input_num2() )
+  /// @param[in] output_id 出力ピン番号 ( 0 <= output_id < cell->output_num2() )
   /// @param[in] name 入出力ピン名
   /// @param[in] capacitance 入力ピンの負荷容量
   /// @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
@@ -539,6 +545,8 @@ public:
   void
   new_cell_inout(ymuint cell_id,
 		 ymuint pin_id,
+		 ymuint input_id,
+		 ymuint output_id,
 		 const string& name,
 		 CellCapacitance capacitance,
 		 CellCapacitance rise_capacitance,

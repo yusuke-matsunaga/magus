@@ -347,7 +347,7 @@ gen_library(const DotlibNode* dt_library)
 	  CellCapacitance cap(pin_info.capacitance());
 	  CellCapacitance rise_cap(pin_info.rise_capacitance());
 	  CellCapacitance fall_cap(pin_info.fall_capacitance());
-	  library->new_cell_input(cell_id, i_pos, pin_info.name(),
+	  library->new_cell_input(cell_id, i, i_pos, pin_info.name(),
 				  cap, rise_cap, fall_cap);
 	}
 	++ i_pos;
@@ -361,7 +361,7 @@ gen_library(const DotlibNode* dt_library)
 	  CellCapacitance min_capacitance(pin_info.min_capacitance());
 	  CellTime max_transition(pin_info.max_transition());
 	  CellTime min_transition(pin_info.min_transition());
-	  library->new_cell_output(cell_id, o_pos, pin_info.name(),
+	  library->new_cell_output(cell_id, i, o_pos, pin_info.name(),
 				   max_fanout, min_fanout,
 				   max_capacitance, min_capacitance,
 				   max_transition, min_transition);
@@ -471,7 +471,7 @@ gen_library(const DotlibNode* dt_library)
 	  CellCapacitance min_capacitance(pin_info.min_capacitance());
 	  CellTime max_transition(pin_info.max_transition());
 	  CellTime min_transition(pin_info.min_transition());
-	  library->new_cell_inout(cell_id, io_pos, pin_info.name(),
+	  library->new_cell_inout(cell_id, i, io_pos + ni, io_pos + no, pin_info.name(),
 				  cap, rise_cap, fall_cap,
 				  max_fanout, min_fanout,
 				  max_capacitance, min_capacitance,

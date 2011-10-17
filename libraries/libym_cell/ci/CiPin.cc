@@ -33,7 +33,7 @@ CiPin::~CiPin()
 
 // @brief ピン番号を返す．
 ymuint
-CiPin::id() const
+CiPin::pin_id() const
 {
   return mId;
 }
@@ -73,6 +73,14 @@ CiPin::is_internal() const
   return false;
 }
 
+// @brief 入力ピン番号を返す．
+// @note 入力ピンもしくは入出力ピンの時のみ意味を持つ．
+ymuint
+CiPin::input_id() const
+{
+  return 0;
+}
+
 // @brief 負荷容量を返す．
 CellCapacitance
 CiPin::capacitance() const
@@ -92,6 +100,14 @@ CellCapacitance
 CiPin::fall_capacitance() const
 {
   return CellCapacitance(0.0);
+}
+
+// @brief 出力ピン番号を返す．
+// @note 出力ピンもしくは入出力ピンの時のみ意味を持つ．
+ymuint
+CiPin::output_id() const
+{
+  return 0;
 }
 
 // @brief 論理式を持っているときに true を返す．
@@ -222,6 +238,14 @@ CiInputPin::is_input() const
   return true;
 }
 
+// @brief 入力ピン番号を返す．
+// @note 入力ピンもしくは入出力ピンの時のみ意味を持つ．
+ymuint
+CiInputPin::input_id() const
+{
+  return mInputId;
+}
+
 // @brief 負荷容量を返す．
 CellCapacitance
 CiInputPin::capacitance() const
@@ -279,6 +303,14 @@ CiOutputPinBase::CiOutputPinBase(CiCell* cell,
 // @brief デストラクタ
 CiOutputPinBase::~CiOutputPinBase()
 {
+}
+
+// @brief 出力ピン番号を返す．
+// @note 出力ピンもしくは入出力ピンの時のみ意味を持つ．
+ymuint
+CiOutputPinBase::output_id() const
+{
+  return mOutputId;
 }
 
 // @brief 論理式を持っているときに true を返す．
@@ -498,6 +530,14 @@ bool
 CiInoutPin::is_inout() const
 {
   return true;
+}
+
+// @brief 入力ピン番号を返す．
+// @note 入力ピンもしくは入出力ピンの時のみ意味を持つ．
+ymuint
+CiInoutPin::input_id() const
+{
+  return mInputId;
 }
 
 // @brief 負荷容量を返す．
