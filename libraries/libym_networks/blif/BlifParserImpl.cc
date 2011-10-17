@@ -595,20 +595,8 @@ BlifParserImpl::read(const string& filename,
 		      kMsgError, "BNetBlifReader", buf.str());
       return false;
     }
-#if 0
-    for (list<BlifHandler*>::iterator p = mHandlerList.begin();
-	 p != mHandlerList.end(); ++ p) {
-      BlifHandler* handler = *p;
-      if ( !handler->gate_begin(mLoc1, loc, mCell) ) {
-	stat = false;
-      }
-    }
-    if ( !stat ) {
-      goto ST_ERROR_EXIT;
-    }
-#endif
     mNameArray.clear();
-    mNameArray.resize(mCell->input_num(), NULL);
+    mNameArray.resize(mCell->pin_num(), NULL);
     n_token = 0;
     goto ST_GATE1;
   }
@@ -666,19 +654,6 @@ BlifParserImpl::read(const string& filename,
 	goto ST_ERROR_EXIT;
       }
       mNameArray[pin->pin_id()] = cell;
-
-#if 0
-      for (list<BlifHandler*>::iterator p = mHandlerList.begin();
-	   p != mHandlerList.end(); ++ p) {
-	BlifHandler* handler = *p;
-	if ( !handler->gate_assign(loc1, pin, cell->id()) ) {
-	  stat = false;
-	}
-      }
-      if ( !stat ) {
-	goto ST_ERROR_EXIT;
-      }
-#endif
       ++ n_token;
       goto ST_GATE1;
     }
@@ -687,15 +662,6 @@ BlifParserImpl::read(const string& filename,
 	error_loc = loc1;
 	goto ST_GATE_SYNERROR;
       }
-#if 0
-      for (list<BlifHandler*>::iterator p = mHandlerList.begin();
-	   p != mHandlerList.end(); ++ p) {
-	BlifHandler* handler = *p;
-	if ( !handler->gate_end() ) {
-	  stat = false;
-	}
-      }
-#else
       const CellPin* opin = mCell->output(0);
       ymuint onode_id = mNameArray[opin->pin_id()]->id();
       ymuint ni = mCell->input_num();
@@ -712,7 +678,6 @@ BlifParserImpl::read(const string& filename,
 	  stat = false;
 	}
       }
-#endif
       if ( !stat ) {
 	goto ST_ERROR_EXIT;
       }

@@ -98,43 +98,6 @@ NullBlifHandler::gate(const Cell* cell,
   return true;
 }
 
-#if 0
-// @brief .gate 文の開始
-// @param[in] loc1 .gate の位置情報
-// @param[in] loc2 セル名の位置情報
-// @param[in] cell セル
-// @retval true 処理が成功した．
-// @retval false エラーが起こった．
-bool
-NullBlifHandler::gate_begin(const FileRegion& loc1,
-			    const FileRegion& loc2,
-			    const Cell* cell)
-{
-  return true;
-}
-
-// @brief .gate 文中のピン割り当ての処理
-// @param[in] loc1 ピン名の位置情報
-// @param[in] pin ピン
-// @param[in] name_id ノード名のID番号
-// @retval true 処理が成功した．
-// @retval false エラーが起こった．
-bool
-NullBlifHandler::gate_assign(const FileRegion& loc1,
-			     const CellPin* pin,
-			     ymuint name_id)
-{
-  return true;
-}
-
-// @brief .gate 文の終了
-bool
-NullBlifHandler::gate_end()
-{
-  return true;
-}
-#endif
-
 // @brief .latch 文の処理
 // @param[in] name1_id 最初の識別子のID番号
 // @param[in] name2_id 次の識別子のID番号

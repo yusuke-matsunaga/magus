@@ -112,41 +112,6 @@ TestBlifHandler::gate(const Cell* cell,
   return true;
 }
 
-#if 0
-// @brief .gate 文の開始
-bool
-TestBlifHandler::gate_begin(const FileRegion& loc1,
-			    const FileRegion& loc2,
-			    const Cell* cell)
-{
-  (*mStreamPtr) << ".gate " << cell->name() << " begin" << endl
-		<< "\t[" << loc1 << "]" << endl
-		<< "\t[" << loc2 << "]" << endl;
-  return true;
-}
-
-// @brief .gate 文中のピン割り当ての処理
-bool
-TestBlifHandler::gate_assign(const FileRegion& loc1,
-			     const CellPin* pin,
-			     ymuint name_id)
-{
-  (*mStreamPtr) << "  .gate assign: "
-		<< pin->name() << " = " << id2str(name_id) << endl
-		<< "\t[" << loc1 << "]" << endl
-		<< "\t[" << id2loc(name_id) << "]" << endl;
-  return true;
-}
-
-// @brief .gate 文の終了
-bool
-TestBlifHandler::gate_end()
-{
-  (*mStreamPtr) << ".gate end" << endl << endl;
-  return true;
-}
-#endif
-
 // @brief .latch 文の処理
 bool
 TestBlifHandler::latch(ymuint32 name1_id,
