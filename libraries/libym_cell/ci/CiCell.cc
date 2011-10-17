@@ -30,6 +30,7 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] ni 入力ピン数
 // @param[in] no 出力ピン数
 // @param[in] nio 入出力ピン数
+// @param[in] nit 内部ピン数
 // @param[in] nb バス数
 // @param[in] nc バンドル数
 // @param[in] output_array 出力の情報の配列(*1)
@@ -45,6 +46,7 @@ CiCell::CiCell(CiLibrary* library,
 	       ymuint ni,
 	       ymuint no,
 	       ymuint nio,
+	       ymuint nit,
 	       ymuint nb,
 	       ymuint nc,
 	       const vector<bool>& output_array,
@@ -61,22 +63,31 @@ CiCell::CiCell(CiLibrary* library,
   ymuint ni2 = ni + nio;
   ymuint no2 = no + nio;
 
+  mPinNum = ni + no + nio + nit;
   {
-    mPinNum = ni + no + nio;
     void* p = alloc.get_memory(sizeof(CiPin*) * mPinNum);
     mPinArray = new (p) CiPin*[mPinNum];
   }
 
+  mInputNum = ni;
   {
-    mInputNum = ni;
     void* p = alloc.get_memory(sizeof(CiPin*) * ni2);
     mInputArray = new (p) CiPin*[ni2];
   }
 
+  mOutputNum = no;
   {
-    mOutputNum = no;
     void* q = alloc.get_memory(sizeof(CiPin*) * no2);
     mOutputArray = new (q) CiPin*[no2];
+  }
+
+  mInternalNum = nit;
+  if ( nit > 0 ) {
+    void* p = alloc.get_memory(sizeof(CiPin*) * nit);
+    mInternalArray = new (p) CiPin*[nit];
+  }
+  else {
+    mInternalArray = NULL;
   }
 
   {
@@ -200,7 +211,14 @@ CiCell::output_num() const
 ymuint
 CiCell::inout_num() const
 {
-  return mPinNum - mInputNum - mOutputNum;
+  return mPinNum - mInputNum - mOutputNum - mInternalNum;
+}
+
+// @brief 内部ピン数の取得
+ymuint
+CiCell::internal_num() const
+{
+  return mInternalNum;
 }
 
 // @brief 入力ピン+入出力ピン数の取得
@@ -233,6 +251,14 @@ const CellPin*
 CiCell::output(ymuint pos) const
 {
   return mOutputArray[pos];
+}
+
+// @brief 内部ピンの取得
+// @param[in] internal_id 内部ピン番号 ( 0 <= internal_id < internal_num() )
+const CellPin*
+CiCell::internal(ymuint internal_id) const
+{
+  return mInternalArray[internal_id];
 }
 
 // @brief バス数の取得
@@ -339,7 +365,7 @@ CiCell::is_latch() const
 
 // @brief 順序セル(非FF/非ラッチ)の場合に true を返す．
 bool
-CiCell::is_seq() const
+CiCell::is_fsm() const
 {
   return false;
 }

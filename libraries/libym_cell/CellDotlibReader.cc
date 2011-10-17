@@ -124,11 +124,6 @@ gen_library(const DotlibNode* dt_library)
       continue;
     }
 
-    // 今は statetable 形式のセルはスキップ
-    if ( cell_info.statetable() != NULL ) {
-      continue;
-    }
-
     ShString cell_name = cell_info.name();
     CellArea area(cell_info.area());
     const list<const DotlibNode*>& dt_pin_list = cell_info.pin_list();
@@ -148,6 +143,7 @@ gen_library(const DotlibNode* dt_library)
     ymuint ni = 0;
     ymuint no = 0;
     ymuint nio = 0;
+    ymuint nit = 0;
     {
       ymuint pin_id = 0;
       bool error = false;
@@ -176,19 +172,26 @@ gen_library(const DotlibNode* dt_library)
 	  ++ nio;
 	  break;
 
+	case DotlibPin::kInternal:
+	  ++ nit;
+	  break;
+
 	default:
+	  assert_not_reached(__FILE__, __LINE__);
 	  break;
 	}
       }
       if ( error ) {
 	continue;
       }
+      assert_cond( pin_id == npin, __FILE__, __LINE__);
     }
     ymuint ni2 = ni + nio;
 
     // ピン名とピン番号の対応づけを行う．
     {
       ymuint ipos = 0;
+      ymuint itpos = 0;
       for (ymuint pin_id = 0; pin_id < npin; ++ pin_id) {
 	DotlibPin& pin_info = pin_info_array[pin_id];
 	switch ( pin_info.direction() ) {
@@ -198,11 +201,17 @@ gen_library(const DotlibNode* dt_library)
 	  ++ ipos;
 	  break;
 
+	case DotlibPin::kInternal:
+	  pin_map.insert(make_pair(pin_info.name(), itpos + ni2));
+	  ++ itpos;
+	  break;
+
 	default:
 	  break;
 	}
       }
       assert_cond( ipos == ni2, __FILE__, __LINE__);
+      assert_cond( itpos == nit, __FILE__, __LINE__);
     }
 
     // FF情報の読み出し
@@ -232,6 +241,9 @@ gen_library(const DotlibNode* dt_library)
       pin_map.insert(make_pair(var1, ni2 + 0));
       pin_map.insert(make_pair(var2, ni2 + 1));
     }
+
+    // 遷移表情報の読み出し
+    const DotlibNode* dt_fsm = cell_info.statetable();
 
     // 出力ピン(入出力ピン)の論理式を作る．
     vector<bool> output_array;
@@ -333,6 +345,15 @@ gen_library(const DotlibNode* dt_library)
 			      clear, preset,
 			      v1, v2);
     }
+    else if ( dt_fsm ) {
+      cout << cell_name << "(" << ni << ", " << no << ", " << nio
+	   << ", " << nit << "), npin = " << npin << endl;
+      library->new_fsm_cell(cell_id, cell_name, area,
+			    ni, no, nio, nit, nbus, nbundle,
+			    output_array,
+			    logic_array,
+			    tristate_array);
+    }
     else {
       library->new_logic_cell(cell_id, cell_name, area,
 			      ni, no, nio, nbus, nbundle,
@@ -345,6 +366,7 @@ gen_library(const DotlibNode* dt_library)
     ymuint i_pos = 0;
     ymuint o_pos = 0;
     ymuint io_pos = 0;
+    ymuint it_pos = 0;
     for (ymuint i = 0; i < npin; ++ i) {
       const DotlibPin& pin_info = pin_info_array[i];
       switch ( pin_info.direction() ) {
@@ -367,6 +389,8 @@ gen_library(const DotlibNode* dt_library)
 	  CellCapacitance min_capacitance(pin_info.min_capacitance());
 	  CellTime max_transition(pin_info.max_transition());
 	  CellTime min_transition(pin_info.min_transition());
+	  cout << "new_cell_output(" << i << ", " << o_pos << ", "
+	       << pin_info.name() << ")" << endl;
 	  library->new_cell_output(cell_id, i, o_pos, pin_info.name(),
 				   max_fanout, min_fanout,
 				   max_capacitance, min_capacitance,
@@ -487,9 +511,8 @@ gen_library(const DotlibNode* dt_library)
 	break;
 
       case DotlibPin::kInternal:
-#if 0
-	library->new_cell_internal(cell, i, pin_info.name());
-#endif
+	library->new_cell_internal(cell_id, i, it_pos, pin_info.name());
+	++ it_pos;
 	break;
 
       default:

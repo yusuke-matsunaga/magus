@@ -1,19 +1,19 @@
 
-/// @file CiLogicCell.cc
-/// @brief CiLogicCell の実装ファイル
+/// @file CiFsmCell.cc
+/// @brief CiFsmCell の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CiLogicCell.h"
+#include "CiFsmCell.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-// クラス CiLogicCell
+// クラス CiFsmCell
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
@@ -24,6 +24,7 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] ni 入力ピン数
 // @param[in] no 出力ピン数
 // @param[in] nio 入出力ピン数
+// @param[in] nit 内部ピン数
 // @param[in] nb バス数
 // @param[in] nc バンドル数
 // @param[in] output_array 出力の情報の配列(*1)
@@ -32,21 +33,22 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] alloc メモリアロケータ
 // *1: - false 論理式なし
 //     - true 論理式あり
-CiLogicCell::CiLogicCell(CiLibrary* library,
-			 ymuint id,
-			 const ShString& name,
-			 CellArea area,
-			 ymuint ni,
-			 ymuint no,
-			 ymuint nio,
-			 ymuint nb,
-			 ymuint nc,
-			 const vector<bool>& output_array,
-			 const vector<LogExpr>& logic_array,
-			 const vector<LogExpr>& tristate_array,
-			 AllocBase& alloc) :
+CiFsmCell::CiFsmCell(CiLibrary* library,
+		     ymuint id,
+		     const ShString& name,
+		     CellArea area,
+		     ymuint ni,
+		     ymuint no,
+		     ymuint nio,
+		     ymuint nit,
+		     ymuint nb,
+		     ymuint nc,
+		     const vector<bool>& output_array,
+		     const vector<LogExpr>& logic_array,
+		     const vector<LogExpr>& tristate_array,
+		     AllocBase& alloc) :
   CiCell(library, id, name, area,
-	 ni, no, nio, 0, nb, nc,
+	 ni, no, nio, nit, nb, nc,
 	 output_array,
 	 logic_array,
 	 tristate_array,
@@ -55,13 +57,13 @@ CiLogicCell::CiLogicCell(CiLibrary* library,
 }
 
 // @brief デストラクタ
-CiLogicCell::~CiLogicCell()
+CiFsmCell::~CiFsmCell()
 {
 }
 
-// @brief 組み合わせ論理セルの時に true を返す．
+// @brief 順序セル(非FF/非ラッチ)の場合に true を返す．
 bool
-CiLogicCell::is_logic() const
+CiFsmCell::is_fsm() const
 {
   return true;
 }

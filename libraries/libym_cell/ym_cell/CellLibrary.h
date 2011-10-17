@@ -484,6 +484,36 @@ public:
 		 ymuint clear_preset_var1,
 		 ymuint clear_preset_var2) = 0;
 
+  /// @brief FSMセルを生成する．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] name 名前
+  /// @param[in] area 面積
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] nio 入出力ピン数
+  /// @param[in] nit 内部ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
+  /// @param[in] output_array 出力の情報の配列(*1)
+  /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristated_array トライステート条件の論理式の配列
+  /// *1: - false 論理式なし
+  ///     - true 論理式あり
+  virtual
+  void
+  new_fsm_cell(ymuint cell_id,
+	       const string& name,
+	       CellArea area,
+	       ymuint ni,
+	       ymuint no,
+	       ymuint nio,
+	       ymuint nit,
+	       ymuint nb,
+	       ymuint nc,
+	       const vector<bool>& output_array,
+	       const vector<LogExpr>& logic_array,
+	       const vector<LogExpr>& tristate_array) = 0;
+
   /// @brief セルの入力ピンを生成する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
@@ -558,16 +588,17 @@ public:
 		 CellTime max_transition,
 		 CellTime min_transition) = 0;
 
-#if 0
   /// @brief セルの内部ピンを生成する．
   /// @param[in] cell セル
   /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
+  /// @param[in] internal_id 入力ピン番号 ( 0 <= internal_id < cell->internal_num() )
   /// @param[in] name 内部ピン名
+  virtual
   void
-  new_cell_internal(CiCell* cell,
+  new_cell_internal(ymuint cell_id,
 		    ymuint pin_id,
-		    const string& name);
-#endif
+		    ymuint internal_id,
+		    const string& name) = 0;
 
   /// @brief タイミング情報を作る．
   /// @param[in] id ID番号

@@ -41,6 +41,8 @@ libym_cell_ci_la_SOURCES = \
 	CiLogicCell.cc \
 	CiFFCell.h \
 	CiFFCell.cc \
+	CiFsmCell.h \
+	CiFsmCell.cc \
 	CiLatchCell.h \
 	CiLatchCell.cc \
 	CiGroup.h \

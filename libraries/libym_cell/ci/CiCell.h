@@ -43,6 +43,7 @@ protected:
   /// @param[in] ni 入力ピン数
   /// @param[in] no 出力ピン数
   /// @param[in] nio 入出力ピン数
+  /// @param[in] nit 内部ピン数
   /// @param[in] nb バス数
   /// @param[in] nc バンドル数
   /// @param[in] output_array 出力の情報の配列(*1)
@@ -58,6 +59,7 @@ protected:
 	 ymuint ni,
 	 ymuint no,
 	 ymuint nio,
+	 ymuint nit,
 	 ymuint nb,
 	 ymuint nc,
 	 const vector<bool>& output_array,
@@ -139,6 +141,11 @@ public:
   ymuint
   inout_num() const;
 
+  /// @brief 内部ピン数の取得
+  virtual
+  ymuint
+  internal_num() const;
+
   /// @brief 入力ピン+入出力ピン数の取得
   /// @note input_num() + inout_num() に等しい．
   virtual
@@ -164,6 +171,12 @@ public:
   virtual
   const CellPin*
   output(ymuint output_id) const;
+
+  /// @brief 内部ピンの取得
+  /// @param[in] internal_id 内部ピン番号 ( 0 <= internal_id < internal_num() )
+  virtual
+  const CellPin*
+  internal(ymuint internal_id) const;
 
   /// @brief バス数の取得
   virtual
@@ -247,7 +260,7 @@ public:
   /// @brief 順序セル(非FF/非ラッチ)の場合に true を返す．
   virtual
   bool
-  is_seq() const;
+  is_fsm() const;
 
   /// @brief 出力の論理式を持っている時に true を返す．
   /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
@@ -388,11 +401,17 @@ private:
   // 出力ピン数
   ymuint32 mOutputNum;
 
+  // 内部ピン数
+  ymuint32 mInternalNum;
+
   // 入力ピンの配列
   CiPin** mInputArray;
 
   // 出力ピンの配列
   CiPin** mOutputArray;
+
+  // 内部ピンの配列
+  CiPin** mInternalArray;
 
   // バス数
   ymuint32 mBusNum;

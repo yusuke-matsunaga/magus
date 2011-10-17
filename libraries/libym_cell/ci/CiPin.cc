@@ -180,6 +180,15 @@ CiPin::min_transition() const
   return CellTime(0.0);
 }
 
+// @brief 内部ピン番号を返す．
+// @note 内部ピンの時のみ意味を持つ．
+ymuint
+CiPin::internal_id() const
+{
+  return 0;
+}
+
+#if 0
 // @brief 出力ピン(入出力ピン)の関数を設定する．
 // @param[in] function 関数を表す論理式
 void
@@ -187,6 +196,7 @@ CiPin::set_function(const LogExpr& function)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
+#endif
 
 // @brief 出力ピン(入出力ピン)の three_state 条件を設定する．
 // @param[in] expr three_state 条件を表す論理式
@@ -592,6 +602,14 @@ bool
 CiInternalPin::is_internal() const
 {
   return true;
+}
+
+// @brief 内部ピン番号を返す．
+// @note 内部ピンの時のみ意味を持つ．
+ymuint
+CiInternalPin::internal_id() const
+{
+  return mInternalId;
 }
 
 END_NAMESPACE_YM_CELL

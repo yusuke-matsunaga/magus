@@ -202,7 +202,14 @@ display_library(ostream& s,
     else if ( cell->is_latch() ) {
       s << "Latch";
     }
+    else if ( cell->is_fsm() ) {
+      s << "FSM";
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
+    }
     s << endl;
+    s << "npin = " << cell->pin_num() << endl;
     s << "  area = " << cell->area() << endl;
 
     if ( cell->is_ff() ) {
@@ -284,6 +291,10 @@ display_library(ostream& s,
 	  << "    Min Capacitance  = " << pin->min_capacitance() << endl
 	  << "    Max Transition   = " << pin->max_transition() << endl
 	  << "    Min Transition   = " << pin->min_transition() << endl;
+      }
+      else if ( pin->is_internal() ) {
+	ymuint itpos = pin->internal_id();
+	s << "Internal#(" << itpos << ")" << endl;
       }
     }
 

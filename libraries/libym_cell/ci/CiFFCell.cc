@@ -52,7 +52,7 @@ CiFFCell::CiFFCell(CiLibrary* library,
 		   const LogExpr& clocked_on_also,
 		   AllocBase& alloc) :
   CiCell(library, id, name, area,
-	 ni, no, nio, nb, nc,
+	 ni, no, nio, 0, nb, nc,
 	 output_array,
 	 logic_array,
 	 tristate_array,

@@ -14,6 +14,7 @@
 #include "CiLogicCell.h"
 #include "CiFFCell.h"
 #include "CiLatchCell.h"
+#include "CiFsmCell.h"
 #include "CiPin.h"
 #include "CiTiming.h"
 
@@ -704,6 +705,45 @@ CiLibrary::new_latch_cell(ymuint cell_id,
   add_cell(cell_id, cell);
 }
 
+// @brief FSMセルを生成する．
+// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+// @param[in] name 名前
+// @param[in] area 面積
+// @param[in] ni 入力ピン数
+// @param[in] no 出力ピン数
+// @param[in] nio 入出力ピン数
+// @param[in] nit 内部ピン数
+// @param[in] nb バス数
+// @param[in] nc バンドル数
+// @param[in] output_array 出力の情報の配列(*1)
+// @param[in] logic_array 出力の論理式の配列
+// @param[in] tristate_array トライステート条件の論理式の配列
+// *1: - false 論理式なし
+//     - true 論理式あり
+void
+CiLibrary::new_fsm_cell(ymuint cell_id,
+			const string& name,
+			CellArea area,
+			ymuint ni,
+			ymuint no,
+			ymuint nio,
+			ymuint nit,
+			ymuint nb,
+			ymuint nc,
+			const vector<bool>& output_array,
+			const vector<LogExpr>& logic_array,
+			const vector<LogExpr>& tristate_array)
+{
+  void* p = mAlloc.get_memory(sizeof(CiFsmCell));
+  CiCell* cell = new (p) CiFsmCell(this, cell_id, ShString(name), area,
+				   ni, no, nio, nit, nb, nc,
+				   output_array,
+				   logic_array,
+				   tristate_array,
+				   mAlloc);
+  add_cell(cell_id, cell);
+}
+
 // @brief セルの入力ピンの内容を設定する．
 // @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
 // @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
@@ -817,22 +857,25 @@ CiLibrary::new_cell_inout(ymuint cell_id,
   mPinHash.add(pin);
 }
 
-#if 0
 // @brief セルの内部ピンを生成する．
-// @param[in] cell セル
+// @param[in] cell_id セル番号
 // @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
+// @param[in] internal_id 入力ピン番号 ( 0 <= internal_id < cell->internal_num() )
 // @param[in] name 内部ピン名
 void
-CiLibrary::new_cell_internal(CiCell* cell,
+CiLibrary::new_cell_internal(ymuint cell_id,
 			     ymuint pin_id,
-			     ShString name)
+			     ymuint internal_id,
+			     const string& name)
 {
+  CiCell* cell = mCellArray[cell_id];
   void* p = mAlloc.get_memory(sizeof(CiInternalPin));
-  CiPin* pin = new (p) CiInternalPin(name);
+  CiInternalPin* pin = new (p) CiInternalPin(cell, ShString(name));
   cell->mPinArray[pin_id] = pin;
   pin->mId = pin_id;
+  cell->mInternalArray[internal_id] = pin;
+  pin->mInternalId = internal_id;
 }
-#endif
 
 // @brief タイミング情報を作る．
 // @param[in] id ID番号
@@ -1055,7 +1098,7 @@ CiLibrary::dump(ostream& s) const
     else if ( cell->is_latch() ) {
       tid = 2;
     }
-    else if ( cell->is_seq() ) {
+    else if ( cell->is_fsm() ) {
       tid = 3;
     }
     else {
@@ -1065,6 +1108,7 @@ CiLibrary::dump(ostream& s) const
     ymuint32 ni = cell->input_num();
     ymuint32 no = cell->output_num();
     ymuint32 nio = cell->inout_num();
+    ymuint32 nit = cell->internal_num();
     ymuint32 nbus = cell->bus_num();
     ymuint32 nbundle = cell->bundle_num();
 
@@ -1074,6 +1118,7 @@ CiLibrary::dump(ostream& s) const
 	<< ni
 	<< no
 	<< nio
+	<< nit
 	<< nbus
 	<< nbundle;
 
@@ -1140,6 +1185,13 @@ CiLibrary::dump(ostream& s) const
 	  << pin->min_capacitance()
 	  << pin->max_transition()
 	  << pin->min_transition();
+    }
+
+    // 内部ピンのダンプ
+    for (ymuint32 itpin = 0; itpin < nit; ++ itpin) {
+      const CellPin* pin = cell->internal(itpin);
+      bos << pin->name()
+	  << pin->pin_id();
     }
 
     // タイミング情報のID -> 通し番号のマップ
@@ -1257,6 +1309,7 @@ CiLibrary::restore(istream& s)
     ymuint32 ni;
     ymuint32 no;
     ymuint32 nio;
+    ymuint32 nit;
     ymuint32 nbus;
     ymuint32 nbundle;
     bis >> type
@@ -1265,6 +1318,7 @@ CiLibrary::restore(istream& s)
 	>> ni
 	>> no
 	>> nio
+	>> nit
 	>> nbus
 	>> nbundle;
 
@@ -1348,7 +1402,15 @@ CiLibrary::restore(istream& s)
       break;
 
     case 3: // kFSM
-#warning "TODO: 未完"
+      new_fsm_cell(cell_id, name, area,
+		   ni, no, nio, nit, nbus, nbundle,
+		   has_logic,
+		   logic_array,
+		   tristate_array);
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
       break;
     }
 
@@ -1420,6 +1482,15 @@ CiLibrary::restore(istream& s)
 		     max_f, min_f,
 		     max_c, min_c,
 		     max_t, min_t);
+    }
+
+    // 内部ピンの設定
+    for (ymuint j = 0; j < nit; ++ j) {
+      string name;
+      ymuint32 pin_id;
+      bis >> name
+	  >> pin_id;
+      new_cell_internal(cell_id, pin_id, j, name);
     }
 
     // タイミング情報の生成

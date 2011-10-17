@@ -69,6 +69,22 @@ public:
   const CellPin*
   pin(ymuint id) const = 0;
 
+  /// @brief 名前からピンの取得
+  /// @param[in] name ピン名
+  /// @return name という名前をピンを返す．
+  /// @note なければ NULL を返す．
+  virtual
+  const CellPin*
+  pin(const string& name) const = 0;
+
+  /// @brief 名前からピンの取得
+  /// @param[in] name ピン名
+  /// @return name という名前をピンを返す．
+  /// @note なければ NULL を返す．
+  virtual
+  const CellPin*
+  pin(const char* name) const = 0;
+
   /// @brief 入力ピン数の取得
   virtual
   ymuint
@@ -83,6 +99,11 @@ public:
   virtual
   ymuint
   inout_num() const = 0;
+
+  /// @brief 内部ピン数の取得
+  virtual
+  ymuint
+  internal_num() const = 0;
 
   /// @brief 入力ピン+入出力ピン数の取得
   /// @note input_num() + inout_num() に等しい．
@@ -110,21 +131,11 @@ public:
   const CellPin*
   output(ymuint output_id) const = 0;
 
-  /// @brief 名前からピンの取得
-  /// @param[in] name ピン名
-  /// @return name という名前をピンを返す．
-  /// @note なければ NULL を返す．
+  /// @brief 内部ピンの取得
+  /// @param[in] internal_id 内部ピン番号 ( 0 <= internal_id < internal_num() )
   virtual
   const CellPin*
-  pin(const string& name) const = 0;
-
-  /// @brief 名前からピンの取得
-  /// @param[in] name ピン名
-  /// @return name という名前をピンを返す．
-  /// @note なければ NULL を返す．
-  virtual
-  const CellPin*
-  pin(const char* name) const = 0;
+  internal(ymuint internal_id) const = 0;
 
   /// @brief バス数の取得
   virtual
@@ -208,7 +219,7 @@ public:
   /// @brief 順序セル(非FF/非ラッチ)の場合に true を返す．
   virtual
   bool
-  is_seq() const = 0;
+  is_fsm() const = 0;
 
   /// @brief 出力の論理式を持っている時に true を返す．
   /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
