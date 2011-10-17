@@ -209,7 +209,7 @@ display_library(ostream& s,
       assert_not_reached(__FILE__, __LINE__);
     }
     s << endl;
-    s << "npin = " << cell->pin_num() << endl;
+
     s << "  area = " << cell->area() << endl;
 
     if ( cell->is_ff() ) {

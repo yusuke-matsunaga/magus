@@ -346,8 +346,6 @@ gen_library(const DotlibNode* dt_library)
 			      v1, v2);
     }
     else if ( dt_fsm ) {
-      cout << cell_name << "(" << ni << ", " << no << ", " << nio
-	   << ", " << nit << "), npin = " << npin << endl;
       library->new_fsm_cell(cell_id, cell_name, area,
 			    ni, no, nio, nit, nbus, nbundle,
 			    output_array,
@@ -389,8 +387,6 @@ gen_library(const DotlibNode* dt_library)
 	  CellCapacitance min_capacitance(pin_info.min_capacitance());
 	  CellTime max_transition(pin_info.max_transition());
 	  CellTime min_transition(pin_info.min_transition());
-	  cout << "new_cell_output(" << i << ", " << o_pos << ", "
-	       << pin_info.name() << ")" << endl;
 	  library->new_cell_output(cell_id, i, o_pos, pin_info.name(),
 				   max_fanout, min_fanout,
 				   max_capacitance, min_capacitance,
