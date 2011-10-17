@@ -8,6 +8,8 @@
 
 
 #include "TestBlifHandler.h"
+#include "ym_cell/Cell.h"
+#include "ym_cell/CellPin.h"
 #include "ym_utils/FileRegion.h"
 
 
@@ -88,13 +90,36 @@ TestBlifHandler::names(const vector<ymuint32>& name_id_array,
   return true;
 }
 
+// @brief .gate 文の処理
+// @param[in] cell セル
+// @param[in] onode_id 出力ノードのID番号
+// @param[in] inode_id_array 入力ノードのID番号の配列
+// @retval true 処理が成功した．
+// @retval false エラーが起こった．
+bool
+TestBlifHandler::gate(const Cell* cell,
+		      ymuint32 onode_id,
+		      const vector<ymuint32>& inode_id_array)
+{
+  (*mStreamPtr) << ".gate " << cell->name() << " " << id2str(onode_id)
+		<< "\t[" << id2loc(onode_id) << "]" << endl;
+  ymuint ni = inode_id_array.size();
+  for (ymuint i = 0; i < ni; ++ i) {
+    ymuint id = inode_id_array[i];
+    (*mStreamPtr) << "  " << cell->input(i)->name() << " " << id2str(id)
+		  << "\t[" << id2loc(id) << "]" << endl;
+  }
+  return true;
+}
+
+#if 0
 // @brief .gate 文の開始
 bool
 TestBlifHandler::gate_begin(const FileRegion& loc1,
 			    const FileRegion& loc2,
-			    const char* name)
+			    const Cell* cell)
 {
-  (*mStreamPtr) << ".gate " << name << " begin" << endl
+  (*mStreamPtr) << ".gate " << cell->name() << " begin" << endl
 		<< "\t[" << loc1 << "]" << endl
 		<< "\t[" << loc2 << "]" << endl;
   return true;
@@ -103,14 +128,13 @@ TestBlifHandler::gate_begin(const FileRegion& loc1,
 // @brief .gate 文中のピン割り当ての処理
 bool
 TestBlifHandler::gate_assign(const FileRegion& loc1,
-			     const char* f_name,
-			     const FileRegion& loc2,
-			     ymuint a_name)
+			     const CellPin* pin,
+			     ymuint name_id)
 {
   (*mStreamPtr) << "  .gate assign: "
-		<< f_name << " = " << id2str(a_name) << endl
+		<< pin->name() << " = " << id2str(name_id) << endl
 		<< "\t[" << loc1 << "]" << endl
-		<< "\t[" << loc2 << "]" << endl;
+		<< "\t[" << id2loc(name_id) << "]" << endl;
   return true;
 }
 
@@ -121,6 +145,7 @@ TestBlifHandler::gate_end()
   (*mStreamPtr) << ".gate end" << endl << endl;
   return true;
 }
+#endif
 
 // @brief .latch 文の処理
 bool

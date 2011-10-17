@@ -44,7 +44,7 @@ BNetBlifReader::operator()(const string& filename,
 			   BNetwork& network,
 			   const CellLibrary* cell_library)
 {
-  mHandler->set(&network, cell_library);
+  mHandler->set_network(&network);
 
   bool stat = mParser->read(filename, cell_library);
   if ( !stat ) {

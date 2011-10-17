@@ -36,12 +36,10 @@ public:
 
 public:
 
-  /// @brief 対象のネットワークとセルライブラリを設定する．
+  /// @brief 対象のネットワークを設定する．
   /// @param[in] network 読み込む対象のネットワークを設定する．
-  /// @param[in] cell_library セルライブラリ
   void
-  set(BNetwork* network,
-      const CellLibrary* cell_library);
+  set_network(BNetwork* network);
 
 
 public:
@@ -101,36 +99,48 @@ public:
 	const char* cover_pat,
 	char opat);
 
+  /// @brief .gate 文の処理
+  /// @param[in] cell セル
+  /// @param[in] onode_id 出力ノードのID番号
+  /// @param[in] inode_id_array 入力ノードのID番号の配列
+  /// @retval true 処理が成功した．
+  /// @retval false エラーが起こった．
+  virtual
+  bool
+  gate(const Cell* cell,
+       ymuint32 onode_id,
+       const vector<ymuint32>& inode_id_array);
+
+#if 0
   /// @brief .gate 文の開始
   /// @param[in] loc1 .gate の位置情報
   /// @param[in] loc2 セル名の位置情報
-  /// @param[in] name セル名
+  /// @param[in] cell セル
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
   gate_begin(const FileRegion& loc1,
 	     const FileRegion& loc2,
-	     const char* name);
+	     const Cell* cell);
 
   /// @brief .gate 文中のピン割り当ての処理
   /// @param[in] loc1 ピン名の位置情報
-  /// @param[in] f_name ピン名
-  /// @param[in] loc2 ノード名の位置情報
-  /// @param[in] a_name ノード名の ID番号
+  /// @param[in] pin ピン
+  /// @param[in] name_id ノード名の ID番号
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
   gate_assign(const FileRegion& loc1,
-	      const char* f_name,
-	      const FileRegion& loc2,
-	      ymuint a_name);
+	      const CellPin* pin,
+	      ymuint name_id);
 
   /// @brief .gate 文の終了
   virtual
   bool
   gate_end();
+#endif
 
   /// @brief .latch 文の処理
   /// @param[in] name1_id 最初の識別子のID番号
@@ -188,23 +198,11 @@ private:
   // 対象の BNetwork
   BNetwork* mNetwork;
 
-  // セルライブラリ
-  const CellLibrary* mCellLibrary;
-
   // ネットワークを操作するクラス
   BNetManip* mManip;
 
   // ID番号をキーにした BNode を納めた配列
   vector<BNode*> mNodeArray;
-
-  // .gate 用 : 現在のセル
-  const Cell* mCurCell;
-
-  // .gate 用 : 現在の入力ノードの配列
-  vector<BNode*> mCurInputs;
-
-  // .gate 用 : 現在の出力ノード
-  BNode* mCurOutput;
 
 };
 

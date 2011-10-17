@@ -184,7 +184,6 @@ BlifParserImpl::read(const string& filename,
 
     case kTokenNAMES:
       mNameArray.clear();
-      mIdArray.clear();
       mNc = 0;
       mCoverPat.clear();
       mOpat = ' ';
@@ -533,6 +532,7 @@ BlifParserImpl::read(const string& filename,
       goto ST_ERROR_EXIT;
     }
     cell->set_defined();
+    mIdArray.clear();
     for (size_t i = 0; i < n; ++ i) {
       mIdArray.push_back(mNameArray[i]->id());
     }
@@ -567,16 +567,48 @@ BlifParserImpl::read(const string& filename,
 		      "NOCELL02", buf.str());
       goto ST_ERROR_EXIT;
     }
+    if ( !mCell->is_logic() ) {
+      ostringstream buf;
+      buf << name << " : Not a logic cell.";
+      MsgMgr::put_msg(__FILE__, __LINE__, loc,
+		      kMsgError, "BNetBlifReader", buf.str());
+      return false;
+    }
+    if ( mCell->output_num() != 1 ) {
+      ostringstream buf;
+      buf << name << " : Not a single output cell.";
+      MsgMgr::put_msg(__FILE__, __LINE__, loc,
+		      kMsgError, "BNetBlifReader", buf.str());
+      return false;
+    }
+    if ( mCell->has_tristate(0) ) {
+      ostringstream buf;
+      buf << name << " : Is a tri-state cell.";
+      MsgMgr::put_msg(__FILE__, __LINE__, loc,
+		      kMsgError, "BNetBlifReader", buf.str());
+      return false;
+    }
+    if ( mCell->inout_num() > 0 ) {
+      ostringstream buf;
+      buf << name << " : Has inout pins.";
+      MsgMgr::put_msg(__FILE__, __LINE__, loc,
+		      kMsgError, "BNetBlifReader", buf.str());
+      return false;
+    }
+#if 0
     for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	 p != mHandlerList.end(); ++ p) {
       BlifHandler* handler = *p;
-      if ( !handler->gate_begin(mLoc1, loc, name) ) {
+      if ( !handler->gate_begin(mLoc1, loc, mCell) ) {
 	stat = false;
       }
     }
     if ( !stat ) {
       goto ST_ERROR_EXIT;
     }
+#endif
+    mNameArray.clear();
+    mNameArray.resize(mCell->input_num(), NULL);
     n_token = 0;
     goto ST_GATE1;
   }
@@ -617,25 +649,36 @@ BlifParserImpl::read(const string& filename,
 	  // 二重定義
 	  ostringstream buf;
 	  buf << cell->str() << ": Defined more than once. "
-	      << "Previsous Definition is " << cell->def_loc() << ".";
+	      << "Previous definition is " << cell->def_loc() << ".";
 	  MsgMgr::put_msg(__FILE__, __LINE__, cell->loc(),
 			  kMsgError,
-			  "MLTDEF01", buf.str().c_str());
+			  "MLTDEF01", buf.str());
 	  goto ST_ERROR_EXIT;
 	}
 	cell->set_defined();
       }
+      if ( mNameArray[pin->pin_id()] != NULL ) {
+	ostringstream buf;
+	buf << name2 << ": Appears more than once.";
+	MsgMgr::put_msg(__FILE__, __LINE__, loc2,
+			kMsgError,
+			"MLTDEF02", buf.str());
+	goto ST_ERROR_EXIT;
+      }
+      mNameArray[pin->pin_id()] = cell;
 
+#if 0
       for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	   p != mHandlerList.end(); ++ p) {
 	BlifHandler* handler = *p;
-	if ( !handler->gate_assign(loc1, name1, loc2, cell->id()) ) {
+	if ( !handler->gate_assign(loc1, pin, cell->id()) ) {
 	  stat = false;
 	}
       }
       if ( !stat ) {
 	goto ST_ERROR_EXIT;
       }
+#endif
       ++ n_token;
       goto ST_GATE1;
     }
@@ -644,6 +687,7 @@ BlifParserImpl::read(const string& filename,
 	error_loc = loc1;
 	goto ST_GATE_SYNERROR;
       }
+#if 0
       for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	   p != mHandlerList.end(); ++ p) {
 	BlifHandler* handler = *p;
@@ -651,6 +695,24 @@ BlifParserImpl::read(const string& filename,
 	  stat = false;
 	}
       }
+#else
+      const CellPin* opin = mCell->output(0);
+      ymuint onode_id = mNameArray[opin->pin_id()]->id();
+      ymuint ni = mCell->input_num();
+      mIdArray.clear();
+      for (ymuint i = 0; i < ni; ++ i) {
+	const CellPin* ipin = mCell->input(i);
+	ymuint inode_id = mNameArray[ipin->pin_id()]->id();
+	mIdArray.push_back(inode_id);
+      }
+      for (list<BlifHandler*>::iterator p = mHandlerList.begin();
+	   p != mHandlerList.end(); ++ p) {
+	BlifHandler* handler = *p;
+	if ( !handler->gate(mCell, onode_id, mIdArray) ) {
+	  stat = false;
+	}
+      }
+#endif
       if ( !stat ) {
 	goto ST_ERROR_EXIT;
       }

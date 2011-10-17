@@ -123,6 +123,12 @@ gen_library(const DotlibNode* dt_library)
     if ( !dt_cell->get_cell_info(cell_info) ) {
       continue;
     }
+
+    // 今は statetable 形式のセルはスキップ
+    if ( cell_info.statetable() != NULL ) {
+      continue;
+    }
+
     ShString cell_name = cell_info.name();
     CellArea area(cell_info.area());
     const list<const DotlibNode*>& dt_pin_list = cell_info.pin_list();

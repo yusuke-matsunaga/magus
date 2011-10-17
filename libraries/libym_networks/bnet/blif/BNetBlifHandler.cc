@@ -31,13 +31,11 @@ BNetBlifHandler::~BNetBlifHandler()
   delete mManip;
 }
 
-// @brief 読み込む対象のネットワークとセルライブラリを設定する．
+// @brief 読み込む対象のネットワークを設定する．
 void
-BNetBlifHandler::set(BNetwork* network,
-		     const CellLibrary* cell_library)
+BNetBlifHandler::set_network(BNetwork* network)
 {
   mNetwork = network;
-  mCellLibrary = cell_library;
 }
 
 // @brief 初期化
@@ -157,62 +155,50 @@ BNetBlifHandler::names(const vector<ymuint32>& name_id_array,
       expr = LogExpr::make_and(or_expr);
     }
   }
-  BNodeVector fanins;
+  BNodeVector fanins(ni);
   for (ymuint i = 0; i < ni; ++ i) {
     BNode* inode = get_node(name_id_array[i]);
-    fanins.push_back(inode);
+    fanins[i] = inode;
   }
   bool stat = mManip->change_logic(node, expr, fanins);
   return stat;
 }
 
+// @brief .gate 文の処理
+// @param[in] cell セル
+// @param[in] onode_id 出力ノードのID番号
+// @param[in] inode_id_array 入力ノードのID番号の配列
+// @retval true 処理が成功した．
+// @retval false エラーが起こった．
+bool
+BNetBlifHandler::gate(const Cell* cell,
+		      ymuint32 onode_id,
+		      const vector<ymuint32>& inode_id_array)
+{
+  LogExpr expr = cell->logic_expr(0);
+  BNode* onode = get_node(onode_id);
+  ymuint ni = inode_id_array.size();
+  BNodeVector fanins(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    fanins[i] = get_node(inode_id_array[i]);
+  }
+  bool stat = mManip->change_logic(onode, expr, fanins);
+  return stat;
+}
+
+#if 0
 // @brief .gate 文の開始
 // @param[in] loc1 .gate の位置情報
 // @param[in] loc2 セル名の位置情報
-// @param[in] name セル名
+// @param[in] cell セル
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
 BNetBlifHandler::gate_begin(const FileRegion& loc1,
 			    const FileRegion& loc2,
-			    const char* name)
+			    const Cell* cell)
 {
-  mCurCell = mCellLibrary->cell(name);
-  if ( mCurCell == NULL ) {
-    ostringstream buf;
-    buf << name << " : No such cell.";
-    MsgMgr::put_msg(__FILE__, __LINE__, loc2,
-		    kMsgError, "BNetBlifReader", buf.str());
-    return false;
-  }
-  if ( !mCurCell->is_logic() ) {
-    ostringstream buf;
-    buf << name << " : Not a logic cell.";
-    MsgMgr::put_msg(__FILE__, __LINE__, loc2,
-		    kMsgError, "BNetBlifReader", buf.str());
-    return false;
-  }
-  if ( mCurCell->output_num() != 1 ) {
-    ostringstream buf;
-    buf << name << " : Not a single output cell.";
-    MsgMgr::put_msg(__FILE__, __LINE__, loc2,
-		    kMsgError, "BNetBlifReader", buf.str());
-    return false;
-  }
-  if ( mCurCell->has_tristate(0) ) {
-    ostringstream buf;
-    buf << name << " : Is a tri-state cell.";
-    MsgMgr::put_msg(__FILE__, __LINE__, loc2,
-		    kMsgError, "BNetBlifReader", buf.str());
-    return false;
-  }
-  if ( mCurCell->inout_num() > 0 ) {
-    ostringstream buf;
-    buf << name << " : Has inout pins.";
-    MsgMgr::put_msg(__FILE__, __LINE__, loc2,
-		    kMsgError, "BNetBlifReader", buf.str());
-    return false;
-  }
+  mCurCell = cell;
   ymuint ni = mCurCell->input_num();
   mCurInputs.clear();
   mCurInputs.resize(ni, NULL);
@@ -222,33 +208,22 @@ BNetBlifHandler::gate_begin(const FileRegion& loc1,
 
 // @brief .gate 文中のピン割り当ての処理
 // @param[in] loc1 ピン名の位置情報
-// @param[in] f_name ピン名
-// @param[in] loc2 ノード名の位置情報
-// @param[in] a_name ノード名の ID番号
+// @param[in] pin ピン
+// @param[in] name_id ノード名の ID番号
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
 BNetBlifHandler::gate_assign(const FileRegion& loc1,
-			     const char* f_name,
-			     const FileRegion& loc2,
-			     ymuint a_name)
+			     const CellPin* pin,
+			     ymuint name_id)
 {
-  const CellPin* pin = mCurCell->pin(f_name);
-  if ( pin == NULL ) {
-    ostringstream buf;
-    buf << f_name << " : No such pin.";
-    MsgMgr::put_msg(__FILE__, __LINE__, loc2,
-		    kMsgError, "BNetBlifReader", buf.str());
-    return false;
-  }
-
-  BNode* node = get_node(a_name);
+  BNode* node = get_node(name_id);
 
   if ( pin->is_input() ) {
-    ymuint pos = pin->id();
+    ymuint pos = pin->pin_id();
     if ( mCurInputs[pos] != NULL ) {
       ostringstream buf;
-      buf << f_name << " : Multiple definition.";
+      buf << pin->name() << " : Multiple definition.";
       MsgMgr::put_msg(__FILE__, __LINE__, loc1,
 		      kMsgError, "BNetBlifReader", buf.str());
       return false;
@@ -258,7 +233,7 @@ BNetBlifHandler::gate_assign(const FileRegion& loc1,
   else if ( pin->is_output() ) {
     if ( mCurOutput != NULL ) {
       ostringstream buf;
-      buf << f_name << " : Multiple definition.";
+      buf << pin->name() << " : Multiple definition.";
       MsgMgr::put_msg(__FILE__, __LINE__, loc1,
 		      kMsgError, "BNetBlifReader", buf.str());
       return false;
@@ -276,6 +251,7 @@ BNetBlifHandler::gate_end()
   bool stat = mManip->change_logic(mCurOutput, expr, mCurInputs);
   return stat;
 }
+#endif
 
 // @brief .latch 文中の本体の処理
 // @param[in] name1_id 最初の文字列

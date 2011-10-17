@@ -85,36 +85,48 @@ public:
 	const char* cover_pat,
 	char opat);
 
+  /// @brief .gate 文の処理
+  /// @param[in] cell セル
+  /// @param[in] onode_id 出力ノードのID番号
+  /// @param[in] inode_id_array 入力ノードのID番号の配列
+  /// @retval true 処理が成功した．
+  /// @retval false エラーが起こった．
+  virtual
+  bool
+  gate(const Cell* cell,
+       ymuint32 onode_id,
+       const vector<ymuint32>& inode_id_array);
+
+#if 0
   /// @brief .gate 文の開始
   /// @param[in] loc1 .gate の位置情報
   /// @param[in] loc2 セル名の位置情報
-  /// @param[in] name セル名
+  /// @param[in] cell セル
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
   gate_begin(const FileRegion& loc1,
 	     const FileRegion& loc2,
-	     const char* name);
+	     const Cell* cell);
 
   /// @brief .gate 文中のピン割り当ての処理
   /// @param[in] loc1 ピン名の位置情報
-  /// @param[in] f_name ピン名
-  /// @param[in] loc2 ノード名の位置情報
-  /// @param[in] a_name ノード名のID番号
+  /// @param[in] pin ピン
+  /// @param[in] name_id ノード名のID番号
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
   gate_assign(const FileRegion& loc1,
-	      const char* f_name,
-	      const FileRegion& loc2,
-	      ymuint a_name);
+	      const CellPin* pin,
+	      ymuint name_id);
 
   /// @brief .gate 文の終了
   virtual
   bool
   gate_end();
+#endif
 
   /// @brief .latch 文の処理
   /// @param[in] name1_id 最初の識別子のID番号
