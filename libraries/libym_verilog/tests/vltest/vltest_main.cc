@@ -9,16 +9,13 @@
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
 #if HAVE_POPT
 #include <popt.h>
 #endif
 
-#include <ym_verilog/verilog.h>
-
+#include "ym_verilog/verilog.h"
+#include "ym_cell/CellDotlibReader.h"
+#include "ym_cell/CellMislibReader.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -50,6 +47,7 @@ void
 elaborate_mode(const list<string>& filename_list,
 	       bool all_msg,
 	       const char* spath,
+	       const CellLibrary* cell_library,
 	       int watch_line,
 	       bool verbose,
 	       bool profile,
@@ -76,6 +74,8 @@ main(int argc,
   int loop = 0;
   int use_cpt = false;
   int profile = 0;
+  char* liberty_name = NULL;
+  char* mislib_name = NULL;
 
 #if HAVE_POPT
   // オプション解析用のデータ
@@ -92,7 +92,7 @@ main(int argc,
 
     { "rawlex", '1', POPT_ARG_NONE, NULL, 1,
       "enable rawlex mode", NULL },
-    
+
     { "lex", '2', POPT_ARG_NONE, NULL, 2,
       "enable lex mode", NULL },
 
@@ -101,25 +101,31 @@ main(int argc,
 
     { "elaborate", '4', POPT_ARG_NONE, NULL, 4,
       "enable elaborate mode", NULL },
-    
+
     { "dump", 'd', POPT_ARG_NONE, &dump, 0,
       "set dump-flag", NULL },
-    
+
     { "all-msg", 'a', POPT_ARG_NONE, &all_msg, 0,
       "display all kind of messages", NULL },
 
     { "search-path", 'p', POPT_ARG_STRING, &spath, 0,
       "set search path", "\"path list\"" },
-    
+
     { "loop", 'l', POPT_ARG_INT, &loop, 0,
       "loop test", NULL },
-    
+
     { "watch-line", 'w', POPT_ARG_INT, &watch_line, 0,
       "enable line watcher", "line number" },
 
     { "profile", 'q', POPT_ARG_NONE, &profile, 0,
       "show memory profile", NULL },
-    
+
+    { "liberty", 0, POPT_ARG_STRING, &liberty_name, 0,
+      "specify liberty library", "\"file name\"" },
+
+    { "mislib", 0, POPT_ARG_STRING, &mislib_name, 0,
+      "specify mislib library", "\"file name\"" },
+
     POPT_AUTOHELP
 
     { NULL, '\0', 0, NULL, 0, NULL, NULL }
@@ -128,7 +134,7 @@ main(int argc,
   // オプション解析用のコンテキストを生成する．
   poptContext popt_context = poptGetContext(NULL, argc, argv, options, 0);
   poptSetOtherOptionHelp(popt_context, "[OPTIONS]* <file-name> ...");
-  
+
   // オプション解析を行う．
   for ( ; ; ) {
     int rc = poptGetNextOpt(popt_context);
@@ -195,6 +201,16 @@ main(int argc,
   }
 #endif
 
+  const CellLibrary* cell_library = NULL;
+  if ( liberty_name != NULL ) {
+    CellDotlibReader read;
+    cell_library = read(liberty_name);
+  }
+  else if ( mislib_name != NULL ) {
+    CellMislibReader read;
+    cell_library = read(mislib_name);
+  }
+
   switch ( mode ) {
   case 1:
     rawlex_mode(filename_list,
@@ -203,7 +219,7 @@ main(int argc,
 		verbose,
 		dump);
     break;
-    
+
   case 2:
     lex_mode(filename_list,
 	     spath,
@@ -212,7 +228,7 @@ main(int argc,
 	     loop,
 	     dump);
     break;
-    
+
   case 3:
     parse_mode(filename_list,
 	       spath,
@@ -227,6 +243,7 @@ main(int argc,
     elaborate_mode(filename_list,
 		   all_msg,
 		   spath,
+		   cell_library,
 		   watch_line,
 		   verbose,
 		   profile,

@@ -15,6 +15,7 @@
 
 #include "ym_verilog/pt/PtItem.h"
 #include "ym_verilog/pt/PtMisc.h"
+#include "ym_cell/Cell.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -64,6 +65,21 @@ EiFactory::new_UdpHead(const VlNamedObj* parent,
     void* p = mAlloc.get_memory(sizeof(EiPrimHeadU));
     head = new (p) EiPrimHeadU(parent, pt_header, udp);
   }
+  return head;
+}
+
+// @brief セルプリミティブのヘッダを生成する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_header パース木の定義
+// @param[in] cell セル
+ElbPrimHead*
+EiFactory::new_CellHead(const VlNamedObj* parent,
+			const PtItem* pt_header,
+			const Cell* cell)
+{
+  EiPrimHead* head = NULL;
+  void* p = mAlloc.get_memory(sizeof(EiPrimHeadC));
+  head = new (p) EiPrimHeadC(parent, pt_header, cell);
   return head;
 }
 
@@ -182,9 +198,11 @@ EiPrimHead::def_name() const
   case kVpiTranif1Prim:  nm = "tranif1"; break;
   case kVpiPullupPrim:   nm = "pullup"; break;
   case kVpiPulldownPrim: nm = "pulldown"; break;
+  case kVpiCellPrim:     nm = "cell"; break;
   case kVpiSeqPrim:
   case kVpiCombPrim:
     assert_not_reached(__FILE__, __LINE__);
+    break;
   }
   return nm;
 }
@@ -193,6 +211,13 @@ EiPrimHead::def_name() const
 // @note このクラスでは NULL を返す．
 const ElbUdpDefn*
 EiPrimHead::udp_defn() const
+{
+  return NULL;
+}
+
+// @brief セルを返す．
+const Cell*
+EiPrimHead::cell() const
 {
   return NULL;
 }
@@ -344,6 +369,49 @@ EiPrimHeadUD::set_delay(ElbDelay* expr)
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス EiPrimHeadC
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] parent 親のスコープ
+// @param[in] pt_header パース木の定義
+// @param[in] cell セル
+EiPrimHeadC::EiPrimHeadC(const VlNamedObj* parent,
+			 const PtItem* pt_header,
+			 const Cell* cell) :
+  EiPrimHead(parent, pt_header),
+  mCell(cell)
+{
+}
+
+// @brief デストラクタ
+EiPrimHeadC::~EiPrimHeadC()
+{
+}
+
+// @brief primitive type を返す．
+tVpiPrimType
+EiPrimHeadC::prim_type() const
+{
+  return kVpiCellPrim;
+}
+
+// @brief プリミティブの定義名を返す．
+const char*
+EiPrimHeadC::def_name() const
+{
+  return mCell->name().c_str();
+}
+
+// @brief セルを返す．
+const Cell*
+EiPrimHeadC::cell() const
+{
+  return mCell;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス EiPrimArray
 //////////////////////////////////////////////////////////////////////
 
@@ -414,42 +482,49 @@ EiPrimArray::name() const
 tVpiPrimType
 EiPrimArray::prim_type() const
 {
-  return mHead->prim_type();
+  return head()->prim_type();
 }
 
 // @brief プリミティブの定義名を返す．
 const char*
 EiPrimArray::def_name() const
 {
-  return mHead->def_name();
+  return head()->def_name();
 }
 
 // @brief UDP 定義を返す．
 const VlUdpDefn*
 EiPrimArray::udp_defn() const
 {
-  return mHead->udp_defn();
+  return head()->udp_defn();
+}
+
+// @brief セルを返す．
+const Cell*
+EiPrimArray::cell() const
+{
+  return head()->cell();
 }
 
 // @brief 0 の強さを得る．
 tVpiStrength
 EiPrimArray::drive0() const
 {
-  return mHead->drive0();
+  return head()->drive0();
 }
 
 // @brief 1 の強さを得る．
 tVpiStrength
 EiPrimArray::drive1() const
 {
-  return mHead->drive1();
+  return head()->drive1();
 }
 
 // @brief 遅延式を得る．
 const VlDelay*
 EiPrimArray::delay() const
 {
-  return mHead->delay();
+  return head()->delay();
 }
 
 // @brief 範囲の MSB の値を返す．
@@ -609,6 +684,13 @@ const VlUdpDefn*
 EiPrimitive::udp_defn() const
 {
   return head()->udp_defn();
+}
+
+// @brief セルを返す．
+const Cell*
+EiPrimitive::cell() const
+{
+  return head()->cell();
 }
 
 // @brief 0 の強さを得る．

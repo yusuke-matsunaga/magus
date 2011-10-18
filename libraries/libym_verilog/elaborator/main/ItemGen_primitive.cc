@@ -18,6 +18,8 @@
 #include "ym_verilog/pt/PtExpr.h"
 #include "ym_verilog/pt/PtMisc.h"
 
+#include "ym_cell/Cell.h"
+
 #include "ElbUdp.h"
 #include "ElbPrimitive.h"
 #include "ElbExpr.h"
@@ -255,36 +257,41 @@ ItemGen::instantiate_cell(const VlNamedObj* parent,
 			  const PtItem* pt_head,
 			  const Cell* cell)
 {
-#if 0 // instantiate_udphead の内容をコピーしただけのでたらめ
-  PtConnectionArray pa_array = pt_head->paramassign_array();
-  ymuint param_size = pa_array.size();
-  const PtDelay* pt_delay = pt_head->delay();
-  bool has_delay = ( pt_delay || param_size == 1 );
-
   ElbPrimHead* prim_head = factory().new_CellHead(parent,
 						  pt_head,
 						  cell);
 
   for (ymuint i = 0; i < pt_head->size(); ++ i) {
     const PtInst* pt_inst = pt_head->inst(i);
-    if ( pt_inst->port_num() > 0 &&
-	 pt_inst->port(0)->name() != NULL ) {
-      MsgMgr::put_msg(__FILE__, __LINE__,
-		      pt_inst->file_region(),
-		      kMsgError,
-		      "ELAB",
-		      "UDP instance cannot have named port list.");
-      continue;
-    }
-
     ymuint port_num = pt_inst->port_num();
-    if ( udpdefn->port_num() != port_num ) {
-      MsgMgr::put_msg(__FILE__, __LINE__,
-		      pt_inst->file_region(),
-		      kMsgError,
-		      "ELAB",
-		      "Number of ports mismatch.");
-      continue;
+    if ( port_num > 0 &&
+	 pt_inst->port(0)->name() != NULL ) {
+      // 名前による結合
+      for (ymuint j = 0; j < port_num; ++ j) {
+	const PtConnection* pt_con = pt_inst->port(j);
+	const char* pin_name = pt_con->name();
+	const CellPin* pin = cell->pin(pin_name);
+	if ( pin == NULL ) {
+	  ostringstream buf;
+	  buf << pin_name << ": No such pin.";
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_con->file_region(),
+			  kMsgError,
+			  "ELAB",
+			  buf.str());
+	  continue;
+	}
+      }
+    }
+    else {
+      if ( cell->pin_num() != port_num ) {
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			pt_inst->file_region(),
+			kMsgError,
+			"ELAB",
+			"Number of ports mismatch.");
+	continue;
+      }
     }
 
     const PtExpr* pt_left = pt_inst->left_range();
@@ -333,7 +340,6 @@ ItemGen::instantiate_cell(const VlNamedObj* parent,
 			       primitive, pt_inst));
     }
   }
-#endif
 }
 
 // @brief gate delay の生成を行う

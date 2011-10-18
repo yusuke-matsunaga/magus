@@ -68,6 +68,11 @@ public:
   const ElbUdpDefn*
   udp_defn() const;
 
+  /// @brief セルを返す．
+  virtual
+  const Cell*
+  cell() const;
+
   /// @brief 0 の強さを得る．
   virtual
   tVpiStrength
@@ -261,6 +266,62 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class EiPrimHeadC EiPrimitive.h "EiPrimitive.h"
+/// @brief セル型の EiPrimHead
+//////////////////////////////////////////////////////////////////////
+class EiPrimHeadC :
+  public EiPrimHead
+{
+  friend class EiFactory;
+
+protected:
+
+  /// @brief コンストラクタ
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_header パース木の定義
+  /// @param[in] cell セル
+  EiPrimHeadC(const VlNamedObj* parent,
+	      const PtItem* pt_header,
+	      const Cell* cell);
+
+  /// @brief デストラクタ
+  virtual
+  ~EiPrimHeadC();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // EiPrimHead の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief primitive type を返す．
+  virtual
+  tVpiPrimType
+  prim_type() const;
+
+  /// @brief プリミティブの定義名を返す．
+  virtual
+  const char*
+  def_name() const;
+
+  /// @brief セルを返す．
+  virtual
+  const Cell*
+  cell() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // セル
+  const Cell* mCell;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class EiPrimitive EiPrimitive.h "EiPrimitive.h"
 /// @brief ElbPrimitive の実装クラス
 //////////////////////////////////////////////////////////////////////
@@ -325,6 +386,11 @@ public:
   virtual
   const VlUdpDefn*
   udp_defn() const;
+
+  /// @brief セルを返す．
+  virtual
+  const Cell*
+  cell() const;
 
   /// @brief 0 の強さを得る．
   virtual
@@ -629,6 +695,11 @@ public:
   virtual
   const VlUdpDefn*
   udp_defn() const;
+
+  /// @brief セルを返す．
+  virtual
+  const Cell*
+  cell() const;
 
   /// @brief 0 の強さを得る．
   virtual
