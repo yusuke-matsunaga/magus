@@ -13,6 +13,7 @@
 
 #include "ym_verilog/verilog.h"
 #include "ym_verilog/pt/PtP.h"
+#include "ym_cell/cell_nsdef.h"
 #include "ElbProxy.h"
 
 
@@ -65,27 +66,27 @@ public:
   ElbTaskFunc*
   instantiate_constant_function(const VlNamedObj* parent,
 				const PtItem* pt_function);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief continous assignment に関連した式の名前解決を行う．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_head ヘッダ
   void
   instantiate_cont_assign(const VlNamedObj* parent,
 			  const PtItem* pt_head);
-  
+
   /// @brief process 文の生成を行う．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_item パース木の定義
   void
   instantiate_process(const VlNamedObj* parent,
 		      const PtItem* pt_item);
-  
+
   /// @brief task/function の生成を行う．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_tf タスク/関数定義
@@ -159,6 +160,15 @@ private:
 			const PtItem* pt_head,
 			const ElbUdpDefn* udpdefn);
 
+  /// @brief セル instance の生成を行う
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_head ヘッダ
+  /// @param[in] cell セル
+  void
+  instantiate_cell(const VlNamedObj* parent,
+		   const PtItem* pt_head,
+		   const Cell* cell);
+
   /// @brief gate delay の生成を行う
   /// @param[in] prim_head ゲートプリミティブのヘッダ
   /// @param[in] pt_delay パース木の遅延式
@@ -222,7 +232,7 @@ private:
   void
   phase1_genfor(const VlNamedObj* parent,
 		const PtItem* pt_genfor);
-  
+
   /// @brief generate block の要素でスコープに関連するものの生成を行う．
   /// @note と同時の残りの処理をキューに積む．
   /// @param[in] parent 親のスコープ
@@ -232,7 +242,7 @@ private:
   phase1_genitem(const VlNamedObj* parent,
 		 PtDeclHeadArray pt_decl_array,
 		 PtItemArray pt_item_array);
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

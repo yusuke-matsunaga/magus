@@ -246,6 +246,96 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
   }
 }
 
+// @brief セル instance の生成を行う
+// @param[in] parent 親のスコープ
+// @param[in] pt_head ヘッダ
+// @param[in] cell セル
+void
+ItemGen::instantiate_cell(const VlNamedObj* parent,
+			  const PtItem* pt_head,
+			  const Cell* cell)
+{
+#if 0 // instantiate_udphead の内容をコピーしただけのでたらめ
+  PtConnectionArray pa_array = pt_head->paramassign_array();
+  ymuint param_size = pa_array.size();
+  const PtDelay* pt_delay = pt_head->delay();
+  bool has_delay = ( pt_delay || param_size == 1 );
+
+  ElbPrimHead* prim_head = factory().new_CellHead(parent,
+						  pt_head,
+						  cell);
+
+  for (ymuint i = 0; i < pt_head->size(); ++ i) {
+    const PtInst* pt_inst = pt_head->inst(i);
+    if ( pt_inst->port_num() > 0 &&
+	 pt_inst->port(0)->name() != NULL ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_inst->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      "UDP instance cannot have named port list.");
+      continue;
+    }
+
+    ymuint port_num = pt_inst->port_num();
+    if ( udpdefn->port_num() != port_num ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_inst->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      "Number of ports mismatch.");
+      continue;
+    }
+
+    const PtExpr* pt_left = pt_inst->left_range();
+    const PtExpr* pt_right = pt_inst->right_range();
+    if ( pt_left && pt_right ) {
+      // 配列
+      int left_val = 0;
+      int right_val = 0;
+      if ( !evaluate_range(parent, pt_left, pt_right,
+			   left_val, right_val) ) {
+	return;
+      }
+
+      ElbPrimArray* prim_array
+	= factory().new_PrimitiveArray(prim_head,
+				       pt_inst,
+				       pt_left, pt_right,
+				       left_val, right_val);
+      reg_primarray(prim_array);
+
+#if 0
+      // attribute instance の生成
+      instantiate_attribute(pt_head->attr_top(), false, prim_array);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
+
+      add_phase3stub(make_stub(this, &ItemGen::link_prim_array,
+			       prim_array, pt_inst));
+    }
+    else {
+      // 単一の要素
+      ElbPrimitive* primitive
+	= factory().new_Primitive(prim_head,
+				  pt_inst);
+      reg_primitive(primitive);
+
+#if 0
+      // attribute instance の生成
+      instantiate_attribute(pt_head->attr_top(), false, primitive);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
+
+      add_phase3stub(make_stub(this, &ItemGen::link_primitive,
+			       primitive, pt_inst));
+    }
+  }
+#endif
+}
+
 // @brief gate delay の生成を行う
 // @param[in] prim_head ゲートプリミティブのヘッダ
 // @param[in] pt_delay パース木の遅延式

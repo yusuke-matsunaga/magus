@@ -140,6 +140,13 @@ protected:
   ElbAttrList*
   find_attr_list(const PtAttrInst* pt_attr) const;
 
+  /// @brief セルの探索
+  /// @param[in] name セル名
+  /// @return name という名のセルを返す．
+  /// @note なければ NULL を返す．
+  const Cell*
+  find_cell(const char* name) const;
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -720,6 +727,17 @@ ElbProxy::find_obj_up(const VlNamedObj* base_scope,
 		      const VlNamedObj* ulimit)
 {
   return mMgr.find_obj_up(base_scope, nb_array, name, ulimit);
+}
+
+// @brief セルの探索
+// @param[in] name セル名
+// @return name という名のセルを返す．
+// @note なければ NULL を返す．
+inline
+const Cell*
+ElbProxy::find_cell(const char* name) const
+{
+  return mElaborator.find_cell(name);
 }
 
 // @brief UDP を登録する．

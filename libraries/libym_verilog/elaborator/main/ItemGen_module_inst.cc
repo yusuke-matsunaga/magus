@@ -176,6 +176,27 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
     return;
   }
 
+  // 正式な仕様にはないが，セルライブラリを探す．
+  const Cell* cell = find_cell(defname);
+  if ( cell ) {
+    // ただしこの場合, mParamList は空でなければならない．
+    PtConnectionArray pa_array = pt_head->paramassign_array();
+    ymuint param_size = pa_array.size();
+    if ( param_size > 0 ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      fr,
+		      kMsgError,
+		      "ELAB",
+		      "Cell instance cannot have parameter list.");
+      return;
+    }
+
+    // 今すぐには処理できないのでキューに積む．
+    add_phase2stub(make_stub(this, &ItemGen::instantiate_cell,
+			     parent, pt_head, cell));
+    return;
+  }
+
   // どちらもなければエラー
   ostringstream buf;
   buf << defname << " : No such module or UDP.";

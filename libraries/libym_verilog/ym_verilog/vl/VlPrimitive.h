@@ -13,6 +13,7 @@
 
 #include "ym_verilog/vl/VlNamedObj.h"
 #include "ym_verilog/vl/VlFwd.h"
+#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -44,6 +45,11 @@ public:
   virtual
   const VlUdpDefn*
   udp_defn() const = 0;
+
+  /// @brief セルを返す．
+  virtual
+  const Cell*
+  cell() const = 0;
 
   /// @brief 0 の強さを得る．
   virtual
