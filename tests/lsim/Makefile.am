@@ -22,7 +22,8 @@ noinst_PROGRAMS = \
 
 lsim_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(YMTOOLS_BUILDDIR)/include \
+	@POPT_INCLUDES@
 
 lsim_SOURCES = \
 	lsim.cc \
@@ -33,6 +34,7 @@ lsim_SOURCES = \
 lsim_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	@POPT_LIBS@
 
 lsim_LDFLAGS =
