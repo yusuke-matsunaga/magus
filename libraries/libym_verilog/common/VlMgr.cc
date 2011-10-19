@@ -88,12 +88,12 @@ VlMgr::pt_udp_list() const
 }
 
 // @brief エラボレーションを行う．
-// @param[in] msg_mgr メッセージマネージャ
+// @param[in] cell_library セルライブラリ
 // @param[in] エラー数を返す．
 ymuint
-VlMgr::elaborate()
+VlMgr::elaborate(const CellLibrary* cell_library)
 {
-  Elaborator elab(*mElbMgr, *mElbFactory);
+  Elaborator elab(*mElbMgr, *mElbFactory, cell_library);
 
   return elab(*mPtMgr);
 }
