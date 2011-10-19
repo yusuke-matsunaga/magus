@@ -88,7 +88,7 @@ elaborate_mode(const list<string>& filename_list,
 	StopWatch timer;
 	timer.start();
 
-	vlmgr.elaborate();
+	vlmgr.elaborate(cell_library);
 
 	timer.stop();
 	USTime time = timer.time();
