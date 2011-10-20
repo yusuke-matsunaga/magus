@@ -25,6 +25,7 @@
 #include "ym_utils/StopWatch.h"
 
 #include "LsimNaive.h"
+#include "LsimBdd.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -98,6 +99,8 @@ lsim(const string& filename,
     do_lsim(lsim, loop_count, network);
   }
   else if ( method_str == "bdd" ) {
+    LsimBdd lsim;
+    do_lsim(lsim, loop_count, network);
   }
   else if ( method_str == "tv" ) {
   }
