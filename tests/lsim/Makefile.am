@@ -30,6 +30,8 @@ lsim_SOURCES = \
 	Lsim.h \
 	LsimNaive.h \
 	LsimNaive.cc \
+	LsimNaive2.h \
+	LsimNaive2.cc \
 	LsimBdd.h \
 	LsimBdd.cc
 

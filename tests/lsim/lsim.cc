@@ -25,6 +25,7 @@
 #include "ym_utils/StopWatch.h"
 
 #include "LsimNaive.h"
+#include "LsimNaive2.h"
 #include "LsimBdd.h"
 
 
@@ -96,6 +97,10 @@ lsim(const string& filename,
 
   if ( method_str == "naive" ) {
     LsimNaive lsim;
+    do_lsim(lsim, loop_count, network);
+  }
+  else if ( method_str == "naive2" ) {
+    LsimNaive2 lsim;
     do_lsim(lsim, loop_count, network);
   }
   else if ( method_str == "bdd" ) {
