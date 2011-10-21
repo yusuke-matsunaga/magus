@@ -878,7 +878,7 @@ private:
   // 親のプリミティブ
   ElbPrimitive* mPrimitive;
 
-  // インデックス + 方向
+  // インデックス + 方向(3bit)
   ymuint32 mIndexDir;
 
   // 接続している式

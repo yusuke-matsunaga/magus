@@ -19,6 +19,7 @@
 #include "ym_verilog/pt/PtMisc.h"
 
 #include "ym_cell/Cell.h"
+#include "ym_cell/CellPin.h"
 
 #include "ElbUdp.h"
 #include "ElbPrimitive.h"
@@ -319,7 +320,7 @@ ItemGen::instantiate_cell(const VlNamedObj* parent,
 #warning "TODO:2011-02-09-01"
 #endif
 
-      add_phase3stub(make_stub(this, &ItemGen::link_prim_array,
+      add_phase3stub(make_stub(this, &ItemGen::link_cell_array,
 			       prim_array, pt_inst));
     }
     else {
@@ -336,7 +337,7 @@ ItemGen::instantiate_cell(const VlNamedObj* parent,
 #warning "TODO:2011-02-09-01"
 #endif
 
-      add_phase3stub(make_stub(this, &ItemGen::link_primitive,
+      add_phase3stub(make_stub(this, &ItemGen::link_cell,
 			       primitive, pt_inst));
     }
   }
@@ -480,6 +481,205 @@ ItemGen::link_primitive(ElbPrimitive* primitive,
   for (ymuint index = 0; index < pt_inst->port_num(); ++ index) {
     const PtConnection* pt_con = pt_inst->port(index);
     // UDP instance の場合には ai_list は無視する．
+    const PtExpr* pt_expr = pt_con->expr();
+    if ( !pt_expr ) {
+      continue;
+    }
+
+    const VlPrimTerm* term = primitive->prim_term(index);
+    ElbExpr* tmp = NULL;
+    if ( term->direction() == kVlInput ) {
+      // 入力に接続するのは通常の右辺式
+      tmp = instantiate_expr(parent, env1, pt_expr);
+    }
+    else {
+      // それ以外は左辺式
+      tmp = instantiate_lhs(parent, env2, pt_expr);
+    }
+    if ( !tmp ) {
+      continue;
+    }
+
+    VlValueType type = tmp->value_type();
+    if ( type.is_real_type() ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tmp->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      "Real expression cannot connect to UDP port.");
+      continue;
+    }
+    ymuint expr_size = type.size();
+    if ( expr_size == 1 ) {
+      // サイズが等しければそのまま接続する．
+      primitive->connect(index, tmp);
+    }
+    else if ( expr_size == 0 ) {
+      // サイズがなければ1ビットに直してから接続する．
+      tmp->set_reqsize(VlValueType(false, true, 1));
+      primitive->connect(index, tmp);
+    }
+    else {
+      ostringstream buf;
+      buf << (index + 1) << num_suffix(index + 1)
+	  << " port expression has illegal size.";
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_con->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      buf.str());
+    }
+  }
+}
+
+// @brief cell array instance で使われている式の名前解決を行う．
+// @param[in] pt_inst インスタンス定義
+// @param[in] prim_array primitive 配列
+void
+ItemGen::link_cell_array(ElbPrimArray* prim_array,
+			 const PtInst* pt_inst)
+{
+  const VlNamedObj* parent = prim_array->parent();
+  ymuint arraysize = prim_array->elem_num();
+
+  // ポートの情報を得るために先頭の要素を取り出す．
+  const VlPrimitive* prim = prim_array->elem_by_offset(0);
+
+  // YACC の文法から一つでも named_con なら全部そう
+  bool conn_by_name = (pt_inst->port(0)->name() != NULL);
+
+  const Cell* cell = prim->cell();
+
+  ElbEnv env1;
+  ElbNetLhsEnv env2(env1);
+  for (ymuint i = 0; i < pt_inst->port_num(); ++ i) {
+    const PtConnection* pt_con = pt_inst->port(i);
+    ymuint index;
+    if ( conn_by_name ) {
+      const CellPin* pin = cell->pin(pt_con->name());
+      if ( pin == NULL ) {
+	ostringstream buf;
+	buf << pt_con->name() << ": No such pin.";
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			pt_con->file_region(),
+			kMsgError,
+			"ELAB",
+			buf.str());
+	continue;
+      }
+      index = pin->pin_id();
+    }
+    else {
+      index = i;
+    }
+    const PtExpr* pt_expr = pt_con->expr();
+    if ( !pt_expr ) {
+      // 空の接続式は許されない．
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_con->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      "Empty expression in UDP/primitive instance port.");
+      continue;
+    }
+
+    const VlPrimTerm* term = prim->prim_term(index);
+    ElbExpr* tmp = NULL;
+    if ( term->direction() == kVlInput ) {
+      // 入力に接続するのは通常の右辺式
+      tmp = instantiate_expr(parent, env1, pt_expr);
+    }
+    else {
+      // それ以外は左辺式
+      tmp = instantiate_lhs(parent, env2, pt_expr);
+    }
+    if ( !tmp ) {
+      continue;
+    }
+
+    VlValueType type = tmp->value_type();
+    if ( type.is_real_type() ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tmp->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      "Real expression cannot connect to UDP port.");
+      continue;
+    }
+    ymuint expr_size = type.size();
+    if ( expr_size == 1 ) {
+      // サイズが等しければそのまま接続する．
+      for (ymuint i = 0; i < arraysize; ++ i) {
+	ElbPrimitive* prim = prim_array->_primitive_by_offset(i);
+	prim->connect(index, tmp);
+      }
+    }
+    else if ( expr_size == 0 ) {
+      // サイズがなければ1ビットに直してから接続する．
+      tmp->set_reqsize(VlValueType(false, true, 1));
+      for (ymuint i = 0; i < arraysize; ++ i) {
+	ElbPrimitive* prim = prim_array->_primitive_by_offset(i);
+	prim->connect(index, tmp);
+      }
+    }
+    else if ( expr_size == arraysize ) {
+      // tmp を 1 ビットずつに分割して接続する．
+      for (ymuint i = 0; i < arraysize; ++ i) {
+	ElbPrimitive* prim = prim_array->_primitive_by_offset(i);
+	ElbExpr* bit = factory().new_BitSelect(pt_expr, tmp, i);
+	prim->connect(index, bit);
+      }
+    }
+    else {
+      ostringstream buf;
+      buf << (index + 1) << num_suffix(index + 1)
+	  << " port expression has illegal size.";
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_con->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      buf.str());
+    }
+  }
+}
+
+// @brief cell instance で使われている式の名前解決を行う．
+// @param[in] pt_inst インスタンス定義
+// @param[in] primitive primitive
+void
+ItemGen::link_cell(ElbPrimitive* primitive,
+		   const PtInst* pt_inst)
+{
+  const VlNamedObj* parent = primitive->parent();
+
+  // YACC の文法から一つでも named_con なら全部そう
+  bool conn_by_name = (pt_inst->port(0)->name() != NULL);
+
+  const Cell* cell = primitive->cell();
+
+  ElbEnv env1;
+  ElbNetLhsEnv env2(env1);
+  for (ymuint i = 0; i < pt_inst->port_num(); ++ i) {
+    const PtConnection* pt_con = pt_inst->port(i);
+    ymuint index;
+    if ( conn_by_name ) {
+      const CellPin* pin = cell->pin(pt_con->name());
+      if ( pin == NULL ) {
+	ostringstream buf;
+	buf << pt_con->name() << ": No such pin.";
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			pt_con->file_region(),
+			kMsgError,
+			"ELAB",
+			buf.str());
+	continue;
+      }
+      index = pin->pin_id();
+    }
+    else {
+      index = i;
+    }
+    // ai_list は無視する．
     const PtExpr* pt_expr = pt_con->expr();
     if ( !pt_expr ) {
       continue;

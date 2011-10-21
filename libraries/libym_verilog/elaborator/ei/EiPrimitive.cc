@@ -16,6 +16,7 @@
 #include "ym_verilog/pt/PtItem.h"
 #include "ym_verilog/pt/PtMisc.h"
 #include "ym_cell/Cell.h"
+#include "ym_cell/CellPin.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -736,22 +737,45 @@ EiPrimitive::init_port(EiPrimTerm* term_array)
 {
   mPortArray = term_array;
 
-  ymuint output_num;
-  ymuint inout_num;
-  ymuint input_num;
-  int stat = get_port_size(prim_type(), port_num(),
-			   output_num, inout_num, input_num);
-  assert_cond(stat == 0, __FILE__, __LINE__);
+  const Cell* cell = this->cell();
+  if ( cell == NULL ) {
+    ymuint output_num;
+    ymuint inout_num;
+    ymuint input_num;
+    int stat = get_port_size(prim_type(), port_num(),
+			     output_num, inout_num, input_num);
+    assert_cond(stat == 0, __FILE__, __LINE__);
 
-  ymuint index = 0;
-  for (ymuint i = 0; i < output_num; ++ i, ++ index) {
-    mPortArray[index].set(this, index, kVlOutput);
+    ymuint index = 0;
+    for (ymuint i = 0; i < output_num; ++ i, ++ index) {
+      mPortArray[index].set(this, index, kVlOutput);
+    }
+    for (ymuint i = 0; i < inout_num; ++ i, ++ index) {
+      mPortArray[index].set(this, index, kVlInout);
+    }
+    for (ymuint i = 0; i < input_num; ++ i, ++ index) {
+      mPortArray[index].set(this, index, kVlInput);
+    }
   }
-  for (ymuint i = 0; i < inout_num; ++ i, ++ index) {
-    mPortArray[index].set(this, index, kVlInout);
-  }
-  for (ymuint i = 0; i < input_num; ++ i, ++ index) {
-    mPortArray[index].set(this, index, kVlInput);
+  else {
+    ymuint n = cell->pin_num();
+    for (ymuint i = 0; i < n; ++ i) {
+      const CellPin* pin = cell->pin(i);
+      tVlDirection dir;
+      if ( pin->is_input() ) {
+	dir = kVlInput;
+      }
+      else if ( pin->is_output() ) {
+	dir = kVlOutput;
+      }
+      else if ( pin->is_inout() ) {
+	dir = kVlInout;
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      mPortArray[i].set(this, i, dir);
+    }
   }
 }
 
@@ -905,19 +929,14 @@ EiPrimTerm::primitive() const
 tVlDirection
 EiPrimTerm::direction() const
 {
-  if ( mIndexDir & 1U ) {
-    return kVlOutput;
-  }
-  else {
-    return kVlInput;
-  }
+  return static_cast<tVlDirection>( (mIndexDir & 7U) );
 }
 
 // @brief 端子番号を返す．
 ymuint
 EiPrimTerm::term_index() const
 {
-  return (mIndexDir >> 1);
+  return (mIndexDir >> 3);
 }
 
 // @brief 接続しているネットを表す式を返す．
@@ -934,10 +953,7 @@ EiPrimTerm::set(ElbPrimitive* primitive,
 		tVlDirection dir)
 {
   mPrimitive = primitive;
-  mIndexDir = (index << 1);
-  if ( dir == kVlOutput ) {
-    mIndexDir |= 1U;
-  }
+  mIndexDir = (index << 3) | static_cast<ymuint32>(dir);
 }
 
 END_NAMESPACE_YM_VERILOG

@@ -198,6 +198,20 @@ private:
   link_primitive(ElbPrimitive* primitive,
 		 const PtInst* pt_inst);
 
+  /// @brief cell array instance で使われている式の名前解決を行う．
+  /// @param[in] prim_array プリミティブ配列
+  /// @param[in] pt_inst インスタンス定義
+  void
+  link_cell_array(ElbPrimArray* prim_array,
+		  const PtInst* pt_inst);
+
+  /// @brief cell instance で使われている式の名前解決を行う．
+  /// @param[in] primitive プリミティブ配列
+  /// @param[in] pt_inst インスタンス定義
+  void
+  link_cell(ElbPrimitive* primitive,
+	    const PtInst* pt_inst);
+
   /// @brief generate block を実際にインスタンス化を行う．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_genblock generate block 定義
