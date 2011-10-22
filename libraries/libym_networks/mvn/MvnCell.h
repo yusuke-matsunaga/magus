@@ -31,12 +31,8 @@ private:
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
   /// @param[in] cell セル
-  /// @param[in] ni 入力ピン数
-  /// @param[in] no 出力ピン数
   MvnCell(MvnModule* module,
-	  const Cell* cell,
-	  ymuint ni,
-	  ymuint no);
+	  const Cell* cell);
 
   /// @brief デストラクタ
   virtual

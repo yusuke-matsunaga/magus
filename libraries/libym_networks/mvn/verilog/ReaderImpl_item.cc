@@ -26,7 +26,8 @@
 #include "ym_verilog/vl/VlStmt.h"
 #include "ym_verilog/vl/VlControl.h"
 #include "ym_verilog/vl/VlExpr.h"
-
+#include "ym_cell/Cell.h"
+#include "ym_cell/CellPin.h"
 #include "ym_utils/MsgMgr.h"
 
 
@@ -80,7 +81,12 @@ ReaderImpl::gen_item(MvnModule* module,
       for (vector<const VlPrimitive*>::iterator p = primitive_list.begin();
 	   p != primitive_list.end(); ++ p) {
 	const VlPrimitive* prim = *p;
-	gen_priminst(module, prim);
+	if ( prim->prim_type() == kVpiCellPrim ) {
+	  gen_cellinst(module, prim);
+	}
+	else {
+	  gen_priminst(module, prim);
+	}
       }
     }
   }
@@ -95,7 +101,12 @@ ReaderImpl::gen_item(MvnModule* module,
 	ymuint n = vl_primarray->elem_num();
 	for (ymuint i = 0; i < n; ++ i) {
 	  const VlPrimitive* prim = vl_primarray->elem_by_offset(i);
-	  gen_priminst(module, prim);
+	  if ( prim->type() == kVpiCellPrim ) {
+	    gen_cellinst(module, prim);
+	  }
+	  else {
+	    gen_priminst(module, prim);
+	  }
 	}
       }
     }
@@ -546,6 +557,37 @@ ReaderImpl::gen_moduleinst(MvnModule* parent_module,
   }
 }
 
+// @brief セルインスタンスの生成を行う．
+// @param[in] parent_module 親のモジュール
+// @param[in] prim プリミティブ
+void
+ReaderImpl::gen_cellinst(MvnModule* parent_module,
+			 const VlPrimitive* prim)
+{
+  const Cell* cell = prim->cell();
+  ymuint np = cell->pin_num();
+  ymuint ni = cell->input_num();
+  ymuint no = cell->output_num();
+  ymuint nio = cell->inout_num();
+
+  MvnNode* onode = mMvnMgr->new_cell(parent_module, cell);
+  for (ymuint pos = 0; pos < np; ++ pos) {
+    const VlPrimTerm* term = prim->prim_term(pos);
+    const VlExpr* expr = term->expr();
+    const CellPin* pin = cell->pin(pos);
+    if ( pin->is_input() ) {
+      ymuint input_id = pin->input_id();
+      MvnNode* node = gen_expr(parent_module, expr, mGlobalEnv);
+      mMvnMgr->connect(node, 0, onode, input_id);
+    }
+    else if ( pin->is_output() ) {
+      assert_cond( pin->output_id() == 0, __FILE__, __LINE__);
+      MvnNode* dst_node = gen_primary(expr, mGlobalEnv);
+      connect_lhs(dst_node, expr, onode, prim->file_region());
+    }
+  }
+}
+
 // @brief プリミティブインスタンスの生成を行う．
 // @param[in] parent_module 親のモジュール
 // @param[in] prim プリミティブ
@@ -554,6 +596,7 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
 			 const VlPrimitive* prim)
 {
   ymuint nt = prim->port_num();
+
   ymuint ni = 0;
   ymuint no = 0;
   if ( prim->prim_type() == kVpiBufPrim ) {

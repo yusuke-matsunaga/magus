@@ -25,10 +25,8 @@ BEGIN_NAMESPACE_YM_NETWORKS_MVN
 // @param[in] ni 入力ピン数
 // @param[in] no 出力ピン数
 MvnCell::MvnCell(MvnModule* module,
-		 const Cell* cell,
-		 ymuint ni,
-		 ymuint no) :
-  MvnNodeBase(module, MvnNode::kCell, ni),
+		 const Cell* cell) :
+  MvnNodeBase(module, MvnNode::kCell, cell->input_num()),
   mCell(cell)
 {
 }
@@ -61,8 +59,9 @@ MvnMgr::new_cell(MvnModule* module,
     assert_not_reached(__FILE__, __LINE__);
     return NULL;
   }
+  assert_cond( no == 1, __FILE__, __LINE__);
 
-  MvnCell* node = new MvnCell(module, cell, ni, no);
+  MvnCell* node = new MvnCell(module, cell);
   reg_node(node);
 
   for (ymuint i = 0; i < ni; ++ i) {

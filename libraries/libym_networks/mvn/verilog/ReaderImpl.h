@@ -137,6 +137,13 @@ private:
   gen_priminst(MvnModule* parent_module,
 	       const VlPrimitive* prim);
 
+  /// @brief セルインスタンスの生成を行う．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] prim プリミティブ
+  void
+  gen_cellinst(MvnModule* parent_module,
+	       const VlPrimitive* prim);
+
   /// @brief 継続的代入文の生成を行う．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] lhs 左辺式
