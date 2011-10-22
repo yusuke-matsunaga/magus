@@ -647,6 +647,8 @@ VerilogWriterImpl::dump_node(ostream& s,
 	s << ", ." << pin->name()
 	  << "(" << node_name(src_node) << ")";
       }
+
+      s << ");" << endl;
     }
     break;
 

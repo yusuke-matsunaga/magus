@@ -37,8 +37,14 @@ makenode_test_SOURCES = \
 makenode_test_LDADD = \
 	$(LIBYM_NET)
 
+read_test_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	@POPT_INCLUDES@
+
 read_test_SOURCES = \
 	read_test.cc
 
 read_test_LDADD = \
-	$(LIBYM_NET)
+	$(LIBYM_NET) \
+	@POPT_LIBS@

@@ -22,6 +22,36 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
+BEGIN_NONAMESPACE
+
+// Verilog 用のエスケープ文字列を作る．
+string
+vescape(const string& str)
+{
+  string::const_iterator p = str.begin();
+  char c = *p ++;
+  if ( c == '\\' ) {
+    return str;
+  }
+  if ( !isalpha(c) && c != '_' ) {
+    goto need_escape;
+  }
+  for ( ; p != str.end(); ++ p) {
+    char c = *p;
+    if ( !isalnum(c) && c != '_' ) {
+      goto need_escape;
+    }
+  }
+  return str;
+
+ need_escape:
+  // 先頭が '\' ならば次の空白までを識別子と見なす(らしい)
+  string ans = "\\" + str + " ";
+  return ans;
+}
+
+END_NONAMESPACE
+
 // @brief コンストラクタ
 VerilogWriterImpl::VerilogWriterImpl()
 {
@@ -49,12 +79,12 @@ VerilogWriterImpl::dump(ostream& s,
   const CmnNodeList& output_list = network.output_list();
   const CmnNodeList& logic_list = network.logic_list();
 
-  s << "module " << network.name() << "(";
+  s << "module " << vescape(network.name()) << "(";
   ymuint np = network.port_num();
   const char* sep = "";
   for (ymuint i = 0; i < np; ++ i) {
     const CmnPort* port = network.port(i);
-    s << sep << port->name();
+    s << sep << vescape(port->name());
     sep = ", ";
 
     ymuint nb = port->bit_width();
@@ -91,11 +121,11 @@ VerilogWriterImpl::dump(ostream& s,
 	else {
 	  s << "  input  ";
 	}
-	s << port_name << ";" << endl;
+	s << vescape(port_name) << ";" << endl;
       }
       else if ( output ) {
 	set_node_name(output, port_name);
-	s << "  output  " << port_name << ";" << endl;
+	s << "  output  " << vescape(port_name) << ";" << endl;
       }
       else {
 	assert_not_reached(__FILE__, __LINE__);
@@ -108,7 +138,7 @@ VerilogWriterImpl::dump(ostream& s,
 	const CmnNode* input = port->input(j);
 	const CmnNode* output = port->output(j);
 	ostringstream buf;
-	buf << port_name << "[" << j << "]";
+	buf << vescape(port_name) << "[" << j << "]";
 	if ( input != NULL ) {
 	  has_input = true;
 	  set_node_name(input, buf.str());
@@ -127,7 +157,8 @@ VerilogWriterImpl::dump(ostream& s,
       else {
 	s << "  inout";
       }
-      s << " [" << nb - 1 << ":" << 0 << "]  " << port_name << ";" << endl;
+      s << " [" << nb - 1 << ":" << 0 << "]  "
+	<< vescape(port_name) << ";" << endl;
     }
   }
 
@@ -280,7 +311,7 @@ VerilogWriterImpl::node_name(const CmnNode* node) const
 #warning "TODO: 名前の衝突回避のための NameMgr の導入"
     name = "n" + node->id_str();
   }
-  return name;
+  return vescape(name);
 }
 
 // DFF の入力のノード名を返す．
