@@ -11,6 +11,11 @@
 #include "ym_networks/BNetwork.h"
 #include "ym_logic/LogExprWriter.h"
 
+#include "../verilog/VlwModule.h"
+#include "../verilog/VlwModuleHeader.h"
+#include "../verilog/VlwIO.h"
+#include "../verilog/VlwAssign.h"
+
 
 BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
@@ -57,105 +62,87 @@ void
 BNetVerilogWriter::dump(ostream& s,
 			const BNetwork& network) const
 {
+  VlWriter writer(s);
+
   // module 文の処理
-  s << "module\t" << verilog_name(network.model_name());
-  string comma = "";
-  s <<"( ";
-  for (BNodeList::const_iterator p = network.inputs_begin();
-       p != network.inputs_end(); ++p) {
-    BNode* node = *p;
-    s << comma;
-    comma = ", ";
-    s << verilog_name(node->name());
-  }
-  for (BNodeList::const_iterator p = network.outputs_begin();
-       p != network.outputs_end(); ++p) {
-    BNode* node = *p;
-    BNode* inode = node->fanin(0);
-    s << comma;
-    comma = ", ";
-    if ( inode->name() == node->name() ) {
+  VlwModule vlw_module(writer, network.model_name());
+
+  {
+    VlwModuleHeader vlw_module_header(writer);
+
+    const char* comma = "";
+    for (BNodeList::const_iterator p = network.inputs_begin();
+	 p != network.inputs_end(); ++p) {
+      BNode* node = *p;
+      s << comma;
+      comma = ", ";
       s << verilog_name(node->name());
     }
-    else {
-      // 複数のファンアウトを持ち，その中に外部出力が含まれる場合には
-      // ポート結合が複雑になる．
-      // inode が外部入力でも同様
-      s << "." << verilog_name(node->name()) << "("
-	<< verilog_name(inode->name()) << ")";
+    for (BNodeList::const_iterator p = network.outputs_begin();
+	 p != network.outputs_end(); ++p) {
+      BNode* node = *p;
+      BNode* inode = node->fanin(0);
+      s << comma;
+      comma = ", ";
+      if ( strcmp(inode->name(), node->name()) == 0 ) {
+	s << verilog_name(node->name());
+      }
+      else {
+	// 複数のファンアウトを持ち，その中に外部出力が含まれる場合には
+	// ポート結合が複雑になる．
+	// inode が外部入力でも同様
+	s << "." << verilog_name(node->name()) << "("
+	  << verilog_name(inode->name()) << ")";
+      }
     }
   }
-  s << " );" << endl;
 
   // input文の処理
-  comma = "input\t";
   for (BNodeList::const_iterator p = network.inputs_begin();
        p != network.inputs_end(); ++p) {
+    VlwInput vlw_input(writer);
+
     BNode* node = *p;
-    s << comma;
-    comma = ", ";
-    s << verilog_name(node->name());
-  }
-  if ( comma != "input\t" ) {
-    s << ";" << endl;
+    writer.put_elem(node->name());
   }
 
   // output文の処理
-  comma = "output\t";
   for (BNodeList::const_iterator p = network.outputs_begin();
        p != network.outputs_end(); ++p) {
+    VlwOutput vlw_output(writer);
+
     BNode* node = *p;
-    s << comma;
-    comma = ", ";
-    s << verilog_name(node->name());
-  }
-  if ( comma != "output\t" ) {
-    s << ";" << endl;
+    writer.put_elem(node->name());
   }
 
   // wire文の処理
-  size_t num = 0;
   for (BNodeList::const_iterator p = network.logic_nodes_begin();
        p != network.logic_nodes_end(); ++p) {
+    VlwWire vlw_wire(writer);
+
     BNode* node = *p;
-    if ( num == 0 ) {
-      s << "\twire\t";
-    }
-    else if ( (num % 8) == 0 ) {
-      s << ",\n\t\t";
-    }
-    else {
-      s << ", ";
-    }
-    ++ num;
-    s << verilog_name(node->name());
-  }
-  if ( num > 0 ) {
-    s << ";" << endl;
+    writer.put_elem(node->name());
   }
 
   // 各内部節点の処理
-  LogExprWriter writer;
   VarStrMap fanin_name;
   for (BNodeList::const_iterator p = network.logic_nodes_begin();
        p != network.logic_nodes_end(); ++p) {
     BNode* node = *p;
-    string name = verilog_name(node->name());
-    s << "\tassign\t" << name << " = ";
-    size_t n = node->ni();
+    VlwAssign vlw_assign(writer);
+
+    vlw_assign.put_lhs(node->name());
+
     fanin_name.clear();
-    for (size_t i = 0; i < n; i ++) {
+    ymuint n = node->ni();
+    for (ymuint i = 0; i < n; i ++) {
       BNode* inode = node->fanin(i);
       assert_cond( inode != 0, __FILE__, __LINE__);
-      fanin_name.insert(make_pair(i, verilog_name(inode->name())));
+      fanin_name.insert(make_pair(i, inode->name()));
     }
     const LogExpr& f = node->func();
-    writer.dump(s, f, fanin_name);
-    s << ";" << endl;
+    vlw_assign.put_rhs(f, fanin_name);
   }
-
-  // endmodule 文の処理
-  s << "endmodule" << endl;
 }
 
 END_NAMESPACE_YM_NETWORKS_BNET

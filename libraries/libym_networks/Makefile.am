@@ -11,6 +11,7 @@ SUBDIRS = \
 	tgnet \
 	conv_bnet_bdn \
 	conv_mvn_bdn \
+	verilog \
 	. \
 	tests
 
@@ -29,7 +30,8 @@ libym_networks_la_LIBADD = \
 	mvn/libym_mvn.la \
 	tgnet/libym_tgnet.la \
 	conv_bnet_bdn/libym_conv_bnet_bdn.la \
-	conv_mvn_bdn/libym_conv_mvn_bdn.la
+	conv_mvn_bdn/libym_conv_mvn_bdn.la \
+	verilog/libym_vlw.la
 
 libym_networks_la_LDFLAGS =
 
