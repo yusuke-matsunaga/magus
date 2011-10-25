@@ -244,18 +244,25 @@ VlWriter::put_idstr(const char* name)
     // かなり特殊なケース
     return;
   }
+
+  bool need_escape = false;
   if ( !isalpha(c) && c != '_' ) {
-    goto need_escape;
+    need_escape = true;
   }
-  for (++s; (c = *s); ++ s) {
-    if ( !isalnum(c) && c != '_' ) {
-      goto need_escape;
+  else {
+    for (++s; (c = *s); ++ s) {
+      if ( !isalnum(c) && c != '_' ) {
+	need_escape = true;
+	break;
+      }
     }
   }
-  mS << name;
-
- need_escape:
-  mS << '\\' << name << ' ';
+  if ( need_escape ) {
+    mS << '\\' << name << ' ';
+  }
+  else {
+    mS << name;
+  }
 }
 
 // @brief 識別子を出力する．

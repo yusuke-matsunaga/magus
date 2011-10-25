@@ -22,6 +22,7 @@ VlwAssign::VlwAssign(VlWriter& writer) :
   VlwBase(writer)
 {
   writer.begin_assign();
+  writer.put_sp();
 }
 
 // @brief デストラクタ
