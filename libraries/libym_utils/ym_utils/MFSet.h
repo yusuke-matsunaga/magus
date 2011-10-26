@@ -30,13 +30,10 @@ class MFSetCell;
 class MFSet
 {
 public:
-  typedef unsigned int id_type;
-
-public:
 
   /// @brief コンストラクタ
   /// @param[in] n 確保したい要素の数．
-  MFSet(size_t n);
+  MFSet(ymuint n);
 
   /// @brief デストラクタ
   ~MFSet();
@@ -45,8 +42,8 @@ public:
   /// @param[in] x 要素番号
   /// @retval 要素 x の属する集合の代表元
   /// @retval 0 要素 x が存在していない場合
-  id_type
-  find(id_type x);
+  ymuint
+  find(ymuint x);
 
   /// @brief 2つの集合の併合 (Merge)
   /// @param[in] x, y 代表元
@@ -56,9 +53,9 @@ public:
   /// @note 実は x, y が代表元でない場合，
   /// 内部で find(x), find(y)を呼ぶので処理は行えるが，
   /// 代表元が分かっている場合にはそれを使ったほうが処理は速い．
-  id_type
-  merge(id_type x,
-	id_type y);
+  ymuint
+  merge(ymuint x,
+	ymuint y);
 
 
 private:
@@ -66,13 +63,13 @@ private:
   /// @brief 番号 x の要素セルを取ってくる．
   /// そのような要素がない場合にはNULLを返す．
   MFSetCell*
-  get(id_type x);
+  get(ymuint x);
 
 
 private:
 
   // 配列の要素数
-  size_t mNum;
+  ymuint32 mNum;
 
   // 要素の配列
   MFSetCell* mCellArray;

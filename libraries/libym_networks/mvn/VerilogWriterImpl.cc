@@ -27,6 +27,7 @@
 #include "ym_networks/MvnVlMap.h"
 
 #include "ym_cell/Cell.h"
+#include "ym_cell/CellPin.h"
 
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlDeclArray.h"
@@ -623,22 +624,31 @@ VerilogWriterImpl::dump_node(ostream& s,
 
   case MvnNode::kCell:
     {
-#if 0
       const Cell* cell = node->cell();
-      ymuint np = cell->pin_num();
-      for (ymuint i = 0; i < np; ++ i) {
-	const CellPin* pin = cell->pin(i);
-	ymuint pp = node->cell_pin_pos(i);
-	ymuint pos = po >> 1;
-	if ( pp & 1U ) {
-	  const MvnOutputPin* opin = node->output(pos);
-	}
-	else {
-	  const MvnInputPin* ipin = node->input(pos);
-	  const MvnNode* src_node = ipin->src_node();
-	}
+      ymuint ni = cell->input_num();
+      ymuint no = cell->output_num();
+      ymuint nio = cell->inout_num();
+      assert_cond( no == 1, __FILE__, __LINE__);
+      assert_cond( nio == 0, __FILE__, __LINE__);
+
+      s << cell->name() << " " << node_name(node)
+	<< " (";
+
+      // 出力
+      s << "." << cell->output(0)->name()
+	<< "(" << node_name(node) << ")";
+
+      // 入力
+      for (ymuint i = 0; i < ni; ++ i) {
+	const CellPin* pin = cell->input(i);
+	const MvnInputPin* ipin = node->input(i);
+	const MvnNode* src_node = ipin->src_node();
+
+	s << ", ." << pin->name()
+	  << "(" << node_name(src_node) << ")";
       }
-#endif
+
+      s << ");" << endl;
     }
     break;
 

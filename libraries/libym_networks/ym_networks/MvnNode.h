@@ -233,22 +233,10 @@ public:
 
   /// @brief セルを得る．
   /// @note type() が kCell の時のみ意味を持つ．
+  /// @note デフォルトの実装では NULL を返す．
   virtual
   const Cell*
   cell() const = 0;
-
-  /// @brief セルの出力ピン番号を返す．
-  /// @note type() が kCell の時のみ意味を持つ．
-  virtual
-  ymuint
-  cell_opin_pos() const = 0;
-
-  /// @brief 多出力セルノードの場合の代表ノードを返す．
-  /// @note type() が kCell の時のみ意味を持つ．
-  /// @note 1出力セルノードの時には自分自身を返す．
-  virtual
-  const MvnNode*
-  cell_node() const = 0;
 
 
 protected:

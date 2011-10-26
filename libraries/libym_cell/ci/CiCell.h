@@ -10,17 +10,18 @@
 
 
 #include "ym_cell/Cell.h"
+#include "ym_logic/LogExpr.h"
 #include "ym_utils/ShString.h"
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
+class CiLibrary;
 class CiPin;
-class CiInputPin;
-class CiOutputPin;
-class CiInoutPin;
 class CiBus;
 class CiBundle;
+class CiTiming;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CiCell CiCell.h "CiCell.h"
@@ -30,16 +31,41 @@ class CiCell :
   public Cell
 {
   friend class CiLibrary;
+  friend class CiCellHash;
 
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] library 親のセルライブラリ
   /// @param[in] id ID番号
   /// @param[in] name 名前
   /// @param[in] area 面積
-  CiCell(ymuint id,
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] nio 入出力ピン数
+  /// @param[in] nit 内部ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
+  /// @param[in] output_array 出力の情報の配列(*1)
+  /// @param[in] logic_array 出力の論理式の配列
+  /// @param[in] tristated_array トライステート条件の論理式の配列
+  /// @param[in] alloc メモリアロケータ
+  /// *1: - false 論理式なし
+  ///     - true 論理式あり
+  CiCell(CiLibrary* library,
+	 ymuint id,
 	 const ShString& name,
-	 CellArea area);
+	 CellArea area,
+	 ymuint ni,
+	 ymuint no,
+	 ymuint nio,
+	 ymuint nit,
+	 ymuint nb,
+	 ymuint nc,
+	 const vector<bool>& output_array,
+	 const vector<LogExpr>& logic_array,
+	 const vector<LogExpr>& tristate_array,
+	 AllocBase& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -48,7 +74,7 @@ protected:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // セル情報の取得
+  // 基本情報の取得
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号の取得
@@ -67,102 +93,11 @@ public:
   CellArea
   area() const;
 
-  /// @brief 組み合わせ論理セルの時に true を返す．
-  /// @note type() == kLogic と等価
-  virtual
-  bool
-  is_logic() const;
 
-  /// @brief FFセルの時に true を返す．
-  /// @note type() == kFF と等価
-  virtual
-  bool
-  is_ff() const;
-
-  /// @brief ラッチセルの時に true を返す．
-  /// @note type() == kLatch と等価
-  virtual
-  bool
-  is_latch() const;
-
-  /// @brief FSMセルの時に true を返す．
-  /// @note type() == kFSM と等価
-  virtual
-  bool
-  is_fsm() const;
-
-  /// @brief 状態変数1の名前を返す．
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  string
-  var1_name() const;
-
-  /// @brief 状態変数2の名前を返す．
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  string
-  var2_name() const;
-
-  /// @brief next_state 関数の取得
-  /// @note FFセルの時に意味を持つ．
-  virtual
-  LogExpr
-  next_state() const;
-
-  /// @brief clocked_on 関数の取得
-  /// @note FFセルの時に意味を持つ．
-  virtual
-  LogExpr
-  clocked_on() const;
-
-  /// @brief data_in 関数の取得
-  virtual
-  LogExpr
-  data_in() const;
-
-  /// @brief enable 関数の取得
-  virtual
-  LogExpr
-  enable() const;
-
-  /// @brief enable_also 関数の取得
-  virtual
-  LogExpr
-  enable_also() const;
-
-  /// @brief clocked_on_also 関数の取得
-  /// @note FFセルの時に意味を持つ．
-  virtual
-  LogExpr
-  clocked_on_also() const;
-
-  /// @brief clear 関数の取得
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  LogExpr
-  clear() const;
-
-  /// @brief preset 関数の取得
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  LogExpr
-  preset() const;
-
-  /// @brief clear_preset_var1 の取得
-  /// @retval 0 "L"
-  /// @retval 1 "H"
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  ymuint
-  clear_preset_var1() const;
-
-  /// @brief clear_preset_var2 の取得
-  /// @retval 0 "L"
-  /// @retval 1 "H"
-  /// @note FFセルとラッチセルの時に意味を持つ．
-  virtual
-  ymuint
-  clear_preset_var2() const;
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ピン情報の取得
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief ピン数の取得
   virtual
@@ -170,10 +105,18 @@ public:
   pin_num() const;
 
   /// @brief ピンの取得
-  /// @param[in] pin_id ピン番号 ( 0 <= pin_id < pin_num()
+  /// @param[in] id ピン番号 ( 0 <= id < pin_num() )
   virtual
   const CellPin*
-  pin(ymuint pin_id) const;
+  pin(ymuint id) const;
+
+  /// @brief 名前からピンの取得
+  /// @param[in] name ピン名
+  /// @return name という名前をピンを返す．
+  /// @note なければ NULL を返す．
+  virtual
+  const CellPin*
+  pin(const char* name) const;
 
   /// @brief 名前からピンの取得
   /// @param[in] name ピン名
@@ -182,6 +125,58 @@ public:
   virtual
   const CellPin*
   pin(const string& name) const;
+
+  /// @brief 入力ピン数の取得
+  virtual
+  ymuint
+  input_num() const;
+
+  /// @brief 出力ピン数の取得
+  virtual
+  ymuint
+  output_num() const;
+
+  /// @brief 入出力ピン数の取得
+  virtual
+  ymuint
+  inout_num() const;
+
+  /// @brief 内部ピン数の取得
+  virtual
+  ymuint
+  internal_num() const;
+
+  /// @brief 入力ピン+入出力ピン数の取得
+  /// @note input_num() + inout_num() に等しい．
+  virtual
+  ymuint
+  input_num2() const;
+
+  /// @brief 入力ピンの取得
+  /// @param[in] input_id 入力番号 ( 0 <= pos < input_num2() )
+  /// @note pos >= input_num() の場合には入出力ピンが返される．
+  virtual
+  const CellPin*
+  input(ymuint input_id) const;
+
+  /// @brief 出力ピン+入出力ピン数の取得
+  /// @note output_num() + inout_num() に等しい．
+  virtual
+  ymuint
+  output_num2() const;
+
+  /// @brief 出力ピンの取得
+  /// @param[in] output_id 出力番号 ( 0 <= pos < output_num2() )
+  /// @note pos >= output_num() の場合には入出力ピンが返される．
+  virtual
+  const CellPin*
+  output(ymuint output_id) const;
+
+  /// @brief 内部ピンの取得
+  /// @param[in] internal_id 内部ピン番号 ( 0 <= internal_id < internal_num() )
+  virtual
+  const CellPin*
+  internal(ymuint internal_id) const;
 
   /// @brief バス数の取得
   virtual
@@ -219,145 +214,143 @@ public:
   bundle(const string& name) const;
 
 
-private:
+public:
   //////////////////////////////////////////////////////////////////////
-  // データメンバ
+  // タイミング情報の取得
   //////////////////////////////////////////////////////////////////////
 
-  // ID番号
-  ymuint32 mId;
-
-  // 名前
-  ShString mName;
-
-  // 面積
-  CellArea mArea;
-
-  // 総ピン数
-  ymuint32 mPinNum;
-
-  // ピンの配列
-  CiPin** mPinArray;
-
-  // バス数
-  ymuint32 mBusNum;
-
-  // バスピンの配列
-  CiBus* mBusArray;
-
-  // バンドル数
-  ymuint32 mBundleNum;
-
-  // バンドルピンの配列
-  CiBundle* mBundleArray;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class CiLogicCell CiCell.h "CiCell.h"
-/// @brief 組合せ論理セルを表すクラス
-//////////////////////////////////////////////////////////////////////
-class CiLogicCell :
-  public CiCell
-{
-  friend class CiLibrary;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  /// @param[in] name 名前
-  /// @param[in] area 面積
-  CiLogicCell(ymuint id,
-	      const ShString& name,
-	      CellArea area);
-
-  /// @brief デストラクタ
+  /// @brief タイミング情報の取得
+  /// @param[in] ipos 開始ピン番号
+  /// @param[in] opos 終了ピン番号
+  /// @param[in] timing_sense タイミング情報の摘要条件
+  /// @return 条件に合致するタイミング情報を返す．
+  /// @note なければ NULL を返す．
   virtual
-  ~CiLogicCell();
+  const CellTiming*
+  timing(ymuint ipos,
+	 ymuint opos,
+	 tCellTimingSense sense) const;
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // セル情報の取得
+  // 機能情報の取得
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型の取得
+  /// @brief 属している CellGroup を返す．
   virtual
-  tType
-  type() const;
+  const CellGroup*
+  cell_group() const;
 
   /// @brief 組み合わせ論理セルの時に true を返す．
-  /// @note type() == kLogic と等価
   virtual
   bool
   is_logic() const;
 
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class CiFLCell CiCell.h "CiCell.h"
-/// @brief FFセルとラッチセルの基底クラス
-//////////////////////////////////////////////////////////////////////
-class CiFLCell :
-  public CiCell
-{
-protected:
-
-  /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  /// @param[in] name 名前
-  /// @param[in] area 面積
-  /// @param[in] var1, var2 状態変数名
-  /// @param[in] clear "clear" 関数の式
-  /// @param[in] preset "preset" 関数の式
-  /// @param[in] clear_preset_var1 "clear_preset_var1" の値
-  /// @param[in] clear_preset_var2 "clear_preset_var2" の値
-  CiFLCell(ymuint id,
-	   const ShString& name,
-	   CellArea area,
-	   const ShString& var1,
-	   const ShString& var2,
-	   const LogExpr& clear,
-	   const LogExpr& preset,
-	   ymuint clear_preset_var1,
-	   ymuint clear_preset_var2);
-
-  /// @brief デストラクタ
+  /// @brief FFセルの時に true を返す．
   virtual
-  ~CiFLCell();
+  bool
+  is_ff() const;
 
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // セル情報の取得
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 状態変数1の名前を返す．
-  /// @note FFセルとラッチセルの時に意味を持つ．
+  /// @brief ラッチセルの時に true を返す．
   virtual
-  string
-  var1_name() const;
+  bool
+  is_latch() const;
 
-  /// @brief 状態変数2の名前を返す．
-  /// @note FFセルとラッチセルの時に意味を持つ．
+  /// @brief 順序セル(非FF/非ラッチ)の場合に true を返す．
   virtual
-  string
-  var2_name() const;
+  bool
+  is_fsm() const;
 
-  /// @brief clear 関数の取得
-  /// @note FFセルとラッチセルの時に意味を持つ．
+  /// @brief 出力の論理式を持っている時に true を返す．
+  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+  virtual
+  bool
+  has_logic(ymuint pin_id) const;
+
+  /// @brief 全ての出力が論理式を持っているときに true を返す．
+  virtual
+  bool
+  has_logic() const;
+
+  /// @brief 論理セルの場合に出力の論理式を返す．
+  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+  /// @note 論理式中の変数番号は入力ピン番号に対応する．
   virtual
   LogExpr
-  clear() const;
+  logic_expr(ymuint pin_id) const;
 
-  /// @brief preset 関数の取得
-  /// @note FFセルとラッチセルの時に意味を持つ．
+  /// @brief 出力がトライステート条件を持っている時に true を返す．
+  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+  virtual
+  bool
+  has_tristate(ymuint pin_id) const;
+
+  /// @brief トライステートセルの場合にトライステート条件式を返す．
+  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
+  /// @note 論理式中の変数番号は入力ピン番号に対応する．
+  /// @note 通常の論理セルの場合には定数0を返す．
   virtual
   LogExpr
-  preset() const;
+  tristate_expr(ymuint pin_id) const;
+
+  /// @brief FFセルの場合に次状態関数を表す論理式を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  LogExpr
+  next_state_expr() const;
+
+  /// @brief FFセルの場合にクロックのアクティブエッジを表す論理式を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  LogExpr
+  clock_expr() const;
+
+  /// @brief FFセルの場合にスレーブクロックのアクティブエッジを表す論理式を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  LogExpr
+  clock2_expr() const;
+
+  /// @brief ラッチセルの場合にデータ入力関数を表す論理式を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  LogExpr
+  data_in_expr() const;
+
+  /// @brief ラッチセルの場合にイネーブル条件を表す論理式を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  LogExpr
+  enable_expr() const;
+
+  /// @brief ラッチセルの場合に2つめのイネーブル条件を表す論理式を返す．
+  /// @note それ以外の型の場合の返り値は不定
+  virtual
+  LogExpr
+  enable2_expr() const;
+
+  /// @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
+  virtual
+  bool
+  has_clear() const;
+
+  /// @brief FFセル/ラッチセルの場合にクリア条件を表す論理式を返す．
+  /// @note クリア端子がない場合の返り値は不定
+  virtual
+  LogExpr
+  clear_expr() const;
+
+  /// @brief FFセル/ラッチセルの場合にプリセット端子を持っていたら true を返す．
+  virtual
+  bool
+  has_preset() const;
+
+  /// @brief FFセル/ラッチセルの場合にプリセット条件を表す論理式を返す．
+  /// @note プリセット端子がない場合の返り値は不定
+  virtual
+  LogExpr
+  preset_expr() const;
 
   /// @brief clear_preset_var1 の取得
   /// @retval 0 "L"
@@ -381,206 +374,77 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 状態変数1
-  ShString mVar1;
+  // セルライブラリ
+  CiLibrary* mLibrary;
 
-  // 状態変数2
-  ShString mVar2;
+  // ハッシュ表のためのリンク
+  CiCell* mLink;
 
-  // clear 関数を表す式
-  LogExpr mClear;
+  // ID番号
+  ymuint32 mId;
 
-  // preset 関数を表す式
-  LogExpr mPreset;
+  // 名前
+  ShString mName;
 
-  // clear_preset_var1/celar_preset_var2 の値
-  ymuint32 mClearPresetVal;
+  // 面積
+  CellArea mArea;
 
-};
+  // ピン数
+  ymuint32 mPinNum;
 
+  // ピンの配列
+  CiPin** mPinArray;
 
-//////////////////////////////////////////////////////////////////////
-/// @class CiFFCell CiCell.h "CiCell.h"
-/// @brief FFセルを表すクラス
-//////////////////////////////////////////////////////////////////////
-class CiFFCell :
-  public CiFLCell
-{
-  friend class CiLibrary;
+  // 入力ピン数
+  ymuint32 mInputNum;
 
-private:
+  // 出力ピン数
+  ymuint32 mOutputNum;
 
-  /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  /// @param[in] name 名前
-  /// @param[in] area 面積
-  /// @param[in] var1, var2 状態変数名
-  /// @param[in] next_state "next_state" 関数の式
-  /// @param[in] clocked_on "clocked_on" 関数の式
-  /// @param[in] clocked_on_also "clocked_on_also" 関数の式
-  /// @param[in] clear "clear" 関数の式
-  /// @param[in] preset "preset" 関数の式
-  /// @param[in] clear_preset_var1 "clear_preset_var1" の値
-  /// @param[in] clear_preset_var2 "clear_preset_var2" の値
-  CiFFCell(ymuint id,
-	   const ShString& name,
-	   CellArea area,
-	   const ShString& var1,
-	   const ShString& var2,
-	   const LogExpr& next_state,
-	   const LogExpr& clocked_on,
-	   const LogExpr& clocked_on_also,
-	   const LogExpr& clear,
-	   const LogExpr& preset,
-	   ymuint clear_preset_var1,
-	   ymuint clear_preset_var2);
+  // 内部ピン数
+  ymuint32 mInternalNum;
 
-  /// @brief デストラクタ
-  virtual
-  ~CiFFCell();
+  // 入力ピンの配列
+  CiPin** mInputArray;
 
+  // 出力ピンの配列
+  CiPin** mOutputArray;
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // セル情報の取得
-  //////////////////////////////////////////////////////////////////////
+  // 内部ピンの配列
+  CiPin** mInternalArray;
 
-  /// @brief 型の取得
-  virtual
-  tType
-  type() const;
+  // バス数
+  ymuint32 mBusNum;
 
-  /// @brief FFセルの時に true を返す．
-  /// @note type() == kFF と等価
-  virtual
-  bool
-  is_ff() const;
+  // バスピンの配列
+  CiBus* mBusArray;
 
-  /// @brief next_state 関数の取得
-  /// @note FFセルの時に意味を持つ．
-  virtual
-  LogExpr
-  next_state() const;
+  // バンドル数
+  ymuint32 mBundleNum;
 
-  /// @brief clocked_on 関数の取得
-  /// @note FFセルの時に意味を持つ．
-  virtual
-  LogExpr
-  clocked_on() const;
+  // バンドルピンの配列
+  CiBundle* mBundleArray;
 
-  /// @brief clocked_on_also 関数の取得
-  /// @note FFセルの時に意味を持つ．
-  virtual
-  LogExpr
-  clocked_on_also() const;
+  // タイミング情報を格納する配列
+  // サイズは(入力数＋入出力数) x (出力数+入出力ピン数)  x 2
+  CellTiming** mTimingArray;
 
+  // セルグループ
+  CellGroup* mCellGroup;
 
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
+  // 出力の情報を格納する配列
+  // サイズは output_num2()
+  ymuint8* mLTArray;
 
-  // next_state 関数を表す式
-  LogExpr mNextState;
+  // 出力の論理式を格納する配列
+  // サイズは output_num2()
+  LogExpr* mLogicArray;
 
-  // clocked_on 関数を表す式
-  LogExpr mClockedOn;
-
-  // clocked_on_also 関数を表す式
-  LogExpr mClockedOnAlso;
+  // 出力のトライステート条件を格納する配列
+  // サイズは output_num2()
+  LogExpr* mTristateArray;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class CiLatchCell CiCell.h "CiCell.h"
-/// @brief ラッチセルを表すクラス
-//////////////////////////////////////////////////////////////////////
-class CiLatchCell :
-  public CiFLCell
-{
-  friend class CiLibrary;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  /// @param[in] name 名前
-  /// @param[in] area 面積
-  /// @param[in] var1, var2 状態変数名
-  /// @param[in] data_in "data_in" 関数の式
-  /// @param[in] enable "enable" 関数の式
-  /// @param[in] enable_also "enable_also" 関数の式
-  /// @param[in] clear "clear" 関数の式
-  /// @param[in] preset "preset" 関数の式
-  /// @param[in] clear_preset_var1 "clear_preset_var1" の値
-  /// @param[in] clear_preset_var2 "clear_preset_var2" の値
-  CiLatchCell(ymuint id,
-	      const ShString& name,
-	      CellArea area,
-	      const ShString& var1,
-	      const ShString& var2,
-	      const LogExpr& data_in,
-	      const LogExpr& enable,
-	      const LogExpr& enable_also,
-	      const LogExpr& clear,
-	      const LogExpr& preset,
-	      ymuint clear_preset_var1,
-	      ymuint clear_preset_var2);
-
-  /// @brief デストラクタ
-  virtual
-  ~CiLatchCell();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // セル情報の取得
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 型の取得
-  virtual
-  tType
-  type() const;
-
-  /// @brief ラッチセルの時に true を返す．
-  /// @note type() == kLatch と等価
-  virtual
-  bool
-  is_latch() const;
-
-  /// @brief data_in 関数の取得
-  virtual
-  LogExpr
-  data_in() const;
-
-  /// @brief enable 関数の取得
-  virtual
-  LogExpr
-  enable() const;
-
-  /// @brief enable_also 関数の取得
-  virtual
-  LogExpr
-  enable_also() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // data_in 関数の取得
-  LogExpr mDataIn;
-
-  // enable 関数の取得
-  LogExpr mEnable;
-
-  // enable_also 関数の取得
-  LogExpr mEnableAlso;
-
-};
-
 
 END_NAMESPACE_YM_CELL
 

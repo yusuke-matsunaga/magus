@@ -69,6 +69,14 @@ AC_TYPE_SIZE_T
 
 
 # ===================================================================
+# Checks for other packages
+# ===================================================================
+
+# Check for popt
+YM_CHECK_POPT
+
+
+# ===================================================================
 # Check for C++ language
 # ===================================================================
 AC_LANG_CPLUSPLUS
@@ -105,6 +113,7 @@ AC_CONFIG_FILES([mvn/verilog/Makefile])
 AC_CONFIG_FILES([tgnet/Makefile])
 AC_CONFIG_FILES([tgnet/blif/Makefile])
 AC_CONFIG_FILES([tgnet/iscas89/Makefile])
+AC_CONFIG_FILES([verilog/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([tests/blif/Makefile])
 AC_CONFIG_FILES([tests/iscas89/Makefile])

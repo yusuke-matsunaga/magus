@@ -23,118 +23,50 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class CellPatGraph
 {
-  friend class CellPatMgr;
-
 public:
 
   /// @brief コンストラクタ
-  CellPatGraph();
+  CellPatGraph() { }
 
   /// @brief デストラクタ
-  ~CellPatGraph();
+  virtual
+  ~CellPatGraph() { }
 
 
 public:
 
   /// @brief 代表関数番号を返す．
+  virtual
   ymuint
-  rep_id() const;
+  rep_id() const = 0;
 
   /// @brief 根のノード番号を返す．
+  virtual
   ymuint
-  root_id() const;
+  root_id() const = 0;
 
   /// @brief 根の反転属性を返す．
+  virtual
   bool
-  root_inv() const;
+  root_inv() const = 0;
 
   /// @brief 入力数を返す．
+  virtual
   ymuint
-  input_num() const;
+  input_num() const = 0;
 
   /// @brief 枝数を返す．
+  virtual
   ymuint
-  edge_num() const;
+  edge_num() const = 0;
 
   /// @brief 枝(の番号)を返す．
   /// @param[in] pos 位置 ( 0 <= pos < edge_num() )
+  virtual
   ymuint
-  edge(ymuint pos) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 代表関数番号
-  ymuint32 mRepId;
-
-  // 入力数 + 根の反転属性
-  ymuint32 mInputNum;
-
-  // 枝数
-  ymuint32 mEdgeNum;
-
-  // 枝番号の配列
-  ymuint32* mEdgeList;
+  edge(ymuint pos) const = 0;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief 代表関数番号を返す．
-inline
-ymuint
-CellPatGraph::rep_id() const
-{
-  return mRepId;
-}
-
-// @brief 根のノード番号を返す．
-inline
-ymuint
-CellPatGraph::root_id() const
-{
-  // 枝の番号を2で割ればファンアウト先のノード番号
-  return mEdgeList[0] / 2;
-}
-
-// @brief 根の反転属性を返す．
-inline
-bool
-CellPatGraph::root_inv() const
-{
-  return static_cast<bool>(mInputNum & 1U);
-}
-
-// @brief 入力数を返す．
-inline
-ymuint
-CellPatGraph::input_num() const
-{
-  return (mInputNum >> 1);
-}
-
-// @brief 枝数を返す．
-inline
-ymuint
-CellPatGraph::edge_num() const
-{
-  return mEdgeNum;
-}
-
-// @brief 枝(の番号)を返す．
-// @param[in] pos 位置 ( 0 <= pos < edge_num() )
-inline
-ymuint
-CellPatGraph::edge(ymuint pos) const
-{
-  return mEdgeList[pos];
-}
 
 END_NAMESPACE_YM_CELL
 

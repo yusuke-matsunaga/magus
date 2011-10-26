@@ -9,11 +9,12 @@
 /// All rights reserved.
 
 
+#include "ym_logic/VarId.h"
+#include "ym_logic/Pol.h"
 #include "ym_logic/npn_nsdef.h"
-#include "ym_logic/NpnMap.h"
 
 
-BEGIN_NAMESPACE_YM_NPN
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 /// @class TvFunc TvFunc.h "ym_logic/TvFunc.h"
@@ -207,6 +208,12 @@ public:
   ymuint
   hash() const;
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // デバッグ用の関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 内容の出力
   /// @param[in] s 出力先のストリーム
   /// @param[in] mode 出力モード
@@ -248,6 +255,18 @@ public:
   /// @brief 生のデータを得る．
   ymulong
   raw_data(ymuint blk) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 定数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 最大の入力数
+  // 特に根拠はないが，これなら Walsh 係数が 32 ビット整数で収まる．
+  // あと真理値表ベースの手法ではこれくらいが限度
+  static
+  const ymuint kMaxNi = 20;
 
 
 public:
@@ -318,6 +337,11 @@ private:
   ymulong* mVector;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// TvFunc の演算子
+//////////////////////////////////////////////////////////////////////
 
 /// @relates TvFunc
 /// @brief 否定を求める．
@@ -545,15 +569,15 @@ operator<<(ostream& s,
   return s;
 }
 
-END_NAMESPACE_YM_NPN
+END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_HASH
 // TvFunc をキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsNpn::TvFunc>
+struct hash<nsYm::TvFunc>
 {
   ymuint
-  operator()(const nsYm::nsNpn::TvFunc& f) const
+  operator()(const nsYm::TvFunc& f) const
   {
     return f.hash();
   }

@@ -43,29 +43,19 @@ BEGIN_NAMESPACE_YM_NPN
 // クラスの前方参照
 //////////////////////////////////////////////////////////////////////
 
-class TvFunc;
+class NpnVmap;
 class NpnMap;
+class NpnMapM;
 class NpnMgr;
-
-
-//////////////////////////////////////////////////////////////////////
-// 定数
-//////////////////////////////////////////////////////////////////////
-
-/// @brief 扱う最大の入力数
-/// 特に根拠はないが，これなら Walsh 係数が 32 ビット整数で収まる．
-/// あと真理値表ベースの手法ではこれくらいが限度
-static
-const ymuint kNpnMaxNi = 20;
 
 END_NAMESPACE_YM_NPN
 
 BEGIN_NAMESPACE_YM
 
-using nsNpn::TvFunc;
+using nsNpn::NpnVmap;
 using nsNpn::NpnMap;
+using nsNpn::NpnMapM;
 using nsNpn::NpnMgr;
-using nsNpn::kNpnMaxNi;
 
 END_NAMESPACE_YM
 

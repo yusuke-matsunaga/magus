@@ -3,8 +3,6 @@
 /// @brief CellMislibReader のテスト用プログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: mislib_test.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -13,10 +11,6 @@
 #include "ym_utils/MsgHandler.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellLibrary.h"
-#include "ym_cell/Cell.h"
-#include "ym_cell/CellPin.h"
-#include "ym_cell/CellTiming.h"
-#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -24,7 +18,7 @@ BEGIN_NAMESPACE_YM_CELL
 int
 mislib_reader_test(const string& filename)
 {
-  CellMislibReader reader;
+  CellMislibReader read;
 
   MsgHandler* mh = new StreamMsgHandler(&cerr);
   mh->set_mask(kMaskAll);
@@ -32,7 +26,7 @@ mislib_reader_test(const string& filename)
   mh->delete_mask(kMsgDebug);
   MsgMgr::reg_handler(mh);
 
-  const CellLibrary* library = reader.read(filename);
+  const CellLibrary* library = read(filename);
   if ( library == NULL) {
     return 1;
   }

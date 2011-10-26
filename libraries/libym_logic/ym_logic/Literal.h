@@ -9,7 +9,9 @@
 /// All rights reserved.
 
 
-#include "ym_logic/lexp_nsdef.h"
+#include "ymtools.h"
+#include "ym_logic/VarId.h"
+#include "ym_logic/Pol.h"
 
 
 BEGIN_NAMESPACE_YM

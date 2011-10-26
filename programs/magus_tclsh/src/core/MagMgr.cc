@@ -8,7 +8,7 @@
 
 
 #include "MagMgr.h"
-#include "ym_cell/CellMgr.h"
+#include "ym_cell/CellLibrary.h"
 #include "NetHandle.h"
 #include "BNetHandle.h"
 #include "BdnHandle.h"
@@ -23,13 +23,14 @@ string MagMgr::kCurNetwork("_network");
 
 // コンストラクタ
 MagMgr::MagMgr() :
-  mCellMgr(new CellMgr),
   mAlloc(sizeof(Cell), 1024),
   mNetHandleHashSize(0),
   mNetHandleHash(NULL),
   mNetHandleHashNum(0)
 {
   alloc_table(16);
+
+  mCellLibrary = NULL;
 
   // カレントネットワークは NULL
   mCurNet = NULL;
@@ -39,7 +40,7 @@ MagMgr::MagMgr() :
 // 全てのネットワークを破壊する．
 MagMgr::~MagMgr()
 {
-  delete mCellMgr;
+  delete mCellLibrary;
 
   // このオブジェクトの管理しているネットワークを全て破棄する．
   // といってもこのループでは name_list にネットワーク名を入れている
@@ -57,11 +58,22 @@ MagMgr::~MagMgr()
   }
 }
 
-// @brief カレントセルライブラリの取得
-CellMgr*
-MagMgr::cur_cellmgr()
+// @brief カレントセルライブラリの設定
+// @param[in] library 設定するセルライブラリ
+// @note 以前のライブラリは破棄される．
+void
+MagMgr::set_cur_cell_library(const CellLibrary* library)
 {
-  return mCellMgr;
+  delete mCellLibrary;
+
+  mCellLibrary = library;
+}
+
+// @brief カレントセルライブラリの取得
+const CellLibrary*
+MagMgr::cur_cell_library()
+{
+  return mCellLibrary;
 }
 
 // @brief 名前が適切かどうか調べる関数

@@ -11,6 +11,7 @@
 
 #include "ym_verilog/verilog.h"
 #include "ym_verilog/pt/PtP.h"
+#include "ym_cell/cell_nsdef.h"
 #include "ym_utils/Alloc.h"
 
 #include "ElbFwd.h"
@@ -399,6 +400,16 @@ public:
 	      const PtItem* pt_header,
 	      const ElbUdpDefn* udp,
 	      bool has_delay) = 0;
+
+  /// @brief セルプリミティブのヘッダを生成する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_header パース木の定義
+  /// @param[in] cell セル
+  virtual
+  ElbPrimHead*
+  new_CellHead(const VlNamedObj* parent,
+	       const PtItem* pt_header,
+	       const Cell* cell) = 0;
 
   /// @brief プリミティブインスタンスを生成する．
   /// @param[in] head ヘッダ

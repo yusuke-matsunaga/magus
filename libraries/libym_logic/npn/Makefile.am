@@ -17,14 +17,17 @@ libym_logic_npn_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_logic_npn_la_SOURCES = \
-	w_table.h \
-	TvFunc.cc \
+	NpnBaseConf.h \
+	NpnBaseConf.cc \
 	NpnRawSig.h \
 	NpnRawSig.cc \
 	NpnConf.h \
 	NpnConf.cc \
 	NpnMgr.cc \
-	NpnMap.cc
+	NpnMgrImpl.h \
+	NpnMgrImpl.cc \
+	NpnMap.cc \
+	NpnMapM.cc
 
 libym_logic_npn_la_LIBADD =
 

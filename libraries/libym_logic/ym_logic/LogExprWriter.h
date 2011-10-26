@@ -10,6 +10,7 @@
 
 
 #include "ym_logic/lexp_nsdef.h"
+#include "ym_logic/VarId.h"
 
 
 BEGIN_NAMESPACE_YM_LEXP
@@ -114,12 +115,5 @@ private:
 };
 
 END_NAMESPACE_YM_LEXP
-
-
-BEGIN_NAMESPACE_YM
-
-using nsLexp::LogExprWriter;
-
-END_NAMESPACE_YM
 
 #endif // YM_LOGIC_LOGEXPRWRITER_H

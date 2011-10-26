@@ -109,7 +109,7 @@ AC_CONFIG_FILES([ym_cell/Makefile])
 AC_CONFIG_FILES([ci/Makefile])
 AC_CONFIG_FILES([mislib/Makefile])
 AC_CONFIG_FILES([dotlib/Makefile])
-AC_CONFIG_FILES([libdump/Makefile])
+AC_CONFIG_FILES([libcomp/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([tests/dotlib_ptview/Makefile])
 

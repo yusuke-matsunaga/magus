@@ -10,34 +10,20 @@
 
 
 #include "ym_logic/npn_nsdef.h"
-#include "ym_logic/Literal.h"
+#include "ym_logic/Pol.h"
+#include "ym_logic/NpnVmap.h"
+#include "ym_logic/TvFunc.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_NPN
-
-//////////////////////////////////////////////////////////////////////
-// 型と定数の定義
-//////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////
-/// @ingroup NpnGroup
-/// @brief 極性を含んだマッピング情報
-//////////////////////////////////////////////////////////////////////
-typedef ymuint32 tNpnImap;
-
-//////////////////////////////////////////////////////////////////////
-/// @ingroup NpnGroup
-/// @brief 不正な tNpnImap の状態を表すエラーコード
-//////////////////////////////////////////////////////////////////////
-const tNpnImap kImapBad = 0xffffffff;
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class NpnMap NpnMap.h "ym_logic/NpnMap.h"
 /// @ingroup NpnGroup
 /// @brief NPN変換の情報を入れるクラス
 ///
-/// @sa tVarId, tPol, tNpnImap
+/// @sa tPol, NpnVmap
 //////////////////////////////////////////////////////////////////////
 class NpnMap
 {
@@ -50,7 +36,7 @@ public:
   /// @brief 入力数(と出力極性)を指定したコンストラクタ
   /// @param[in] ni 入力数
   /// @param[in] pol 出力極性
-  /// @note 各入力の変換内容は kImapBad になっている．
+  /// @note 各入力の変換内容は不正な値になっている．
   explicit
   NpnMap(ymuint ni,
 	 tPol pol = kPolPosi);
@@ -69,7 +55,7 @@ public:
   ~NpnMap();
 
   /// @brief 内容をクリアする．
-  /// @note 入力の変換内容は kImapBad になる．
+  /// @note 入力の変換内容は不正な値になる．
   /// 出力の極性は kPolPosi
   void
   clear();
@@ -90,17 +76,17 @@ public:
   /// @param[in] dst_pos 変換先の入力番号
   /// @param[in] pol 極性
   void
-  set(tVarId pos,
-      tVarId dst_pos,
+  set(ymuint pos,
+      ymuint dst_pos,
       tPol pol);
 
   /// @brief 入力の変換内容の設定
   /// @param[in] pos 入力番号
   /// @param[in] imap 変換情報(変換先の入力番号と極性)
-  /// @sa tNpnImap
+  /// @sa NpnVmap
   void
-  set(tVarId pos,
-      tNpnImap imap);
+  set(ymuint pos,
+      NpnVmap imap);
 
   /// @brief 出力極性を設定する．
   /// @param[in] pol 出力極性
@@ -115,11 +101,10 @@ public:
   /// @brief 入力の変換情報の取得
   /// @param[in] pos 入力番号
   /// @return pos 番目の入力の変換情報
-  /// @note pos に対応するマッピング情報がないときには
-  /// kImapBad を返す．
-  /// @sa tNpnImap
-  tNpnImap
-  imap(tVarId pos) const;
+  /// @note pos に対応するマッピング情報がないときには不正な値を返す．
+  /// @sa NpnVmap
+  NpnVmap
+  imap(ymuint pos) const;
 
   /// @brief 出力極性を返す．
   /// @return 出力極性
@@ -132,33 +117,6 @@ public:
   bool
   operator==(const NpnMap& src) const;
 
-  /// @brief 逆写像を求める．
-  /// @param[in] src 入力となるマップ
-  /// @return src の逆写像
-  /// @note 1対1写像でなければ答えは不定．
-  friend
-  NpnMap
-  inverse(const NpnMap& src);
-
-  /// @brief 合成を求める．
-  /// @param[in] src1,src2 入力となるマップ
-  /// @return src1 と src2 を合成したもの
-  /// @note src1の値域とsrc2の定義域は一致していな
-  /// ければならない．そうでなければ答えは不定．
-  friend
-  NpnMap
-  operator*(const NpnMap& src1,
-	    const NpnMap& src2);
-
-  /// @brief 内容を表示する(主にデバッグ用)．
-  /// @param[in] s 出力ストリーム
-  /// @param[in] map 出力対象のマップ
-  /// @note 改行はしない．
-  friend
-  ostream&
-  operator<<(ostream& s,
-	     const NpnMap& map);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -169,9 +127,49 @@ private:
   ymuint32 mNiPol;
 
   // 入力のマッピング情報
-  tNpnImap mImap[kNpnMaxNi];
+  NpnVmap mImap[TvFunc::kMaxNi];
 
 };
+
+/// @brief 逆写像を求める．
+/// @param[in] src 入力となるマップ
+/// @return src の逆写像
+/// @note 1対1写像でなければ答えは不定．
+NpnMap
+inverse(const NpnMap& src);
+
+/// @brief 合成を求める．
+/// @param[in] src1,src2 入力となるマップ
+/// @return src1 と src2 を合成したもの
+/// @note src1の値域とsrc2の定義域は一致していな
+/// ければならない．そうでなければ答えは不定．
+NpnMap
+operator*(const NpnMap& src1,
+	  const NpnMap& src2);
+
+/// @brief 内容を表示する(主にデバッグ用)．
+/// @param[in] s 出力ストリーム
+/// @param[in] map 出力対象のマップ
+/// @note 改行はしない．
+ostream&
+operator<<(ostream& s,
+	   const NpnMap& map);
+
+/// @brief バイナリ出力
+/// @param[in] s 出力ストリーム
+/// @param[in] map 変換マップ
+/// @return s
+BinO&
+operator<<(BinO& s,
+	   const NpnMap& map);
+
+/// @brief バイナリ入力
+/// @param[in] s 入力ストリーム
+/// @param[out] map 結果を格納する変数
+/// @return s
+BinI&
+operator>>(BinI& s,
+	   NpnMap& map);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -188,13 +186,13 @@ NpnMap::ni() const
 
 // posに対応するマッピング情報を得る．
 inline
-tNpnImap
-NpnMap::imap(tVarId pos) const
+NpnVmap
+NpnMap::imap(ymuint pos) const
 {
   if ( pos < ni() ) {
     return mImap[pos];
   }
-  return kImapBad;
+  return NpnVmap::invalid();
 }
 
 // 出力極性を返す．
@@ -205,60 +203,6 @@ NpnMap::opol() const
   return (mNiPol & 1) ? kPolNega : kPolPosi;
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// tMapImap 関係のコンビニエンス関数
-//////////////////////////////////////////////////////////////////////
-
-/// @ingroup NpnGroup
-/// @brief マップされた入力番号を取り出す．
-/// @param[in] x パックされた入力マッピング情報
-/// @return 入力のマッピング先の番号
-///
-/// @sa tNpnImap, tVarId
-inline
-tVarId
-npnimap_pos(tNpnImap x)
-{
-  return x >> 1;
-}
-
-/// @ingroup NpnGroup
-/// @brief 入力極性を取り出す．
-/// @param[in] x パックされた入力マッピング情報
-/// @return 入力の極性
-///
-/// @sa tNpnImap, tPol
-inline
-tPol
-npnimap_pol(tNpnImap x)
-{
-  return static_cast<tPol>(x & 1UL);
-}
-
-/// @ingroup NpnGroup
-/// @brief 入力番号と極性をパックして tNpnImap を作る．
-/// @param[in] pos 入力のマッピング先の番号
-/// @param[in] pol 入力の極性
-/// @return パックされた入力マッピング情報
-/// @sa tNpnImap, tVarId, tPol
-inline
-tNpnImap
-npnimap_pack(tVarId pos,
-	     tPol pol)
-{
-  return tNpnImap((pos << 1) | ymuint32(pol));
-}
-
 END_NAMESPACE_YM_NPN
-
-BEGIN_NAMESPACE_YM
-
-using nsNpn::tNpnImap;
-using nsNpn::npnimap_pos;
-using nsNpn::npnimap_pol;
-using nsNpn::npnimap_pack;
-
-END_NAMESPACE_YM
 
 #endif // YM_LOGIC_NPNMAP_H

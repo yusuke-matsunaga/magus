@@ -1,11 +1,9 @@
-#ifndef LIBYM_TECHMAP_CELLMAP_MAPRECORD_H
-#define LIBYM_TECHMAP_CELLMAP_MAPRECORD_H
+#ifndef MAPRECORD_H
+#define MAPRECORD_H
 
-/// @file libym_techmap/cellmap/MapRecord.h
+/// @file MapRecord.h
 /// @brief MapRecord のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: MapRecord.h 1293 2008-02-21 02:25:52Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -13,8 +11,8 @@
 
 #include "ym_techmap/cellmap_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
-#include "ym_cell/CellFFPosArray.h"
-#include "ym_cell/CellLatchPosArray.h"
+#include "ym_cell/CellFFInfo.h"
+#include "ym_cell/CellLatchInfo.h"
 #include "ym_networks/cmn.h"
 #include "Match.h"
 
@@ -50,23 +48,25 @@ public:
 
   /// @brief D-FF のマッチを記録する．
   /// @param[in] dff D-FF
-  /// @param[in] cell セル
-  /// @param[in] pos_array ピン情報の配列
   /// @param[in] inv 極性
+  /// @param[in] ff_info ピンの割り当て情報
+  /// @param[in] cell セル
   void
   set_dff_match(const BdnDff* dff,
+		bool inv,
 		const Cell* cell,
-		CellFFPosArray pos_array,
-		bool inv);
+		const CellFFInfo& ff_info);
 
   /// @brief ラッチのマッチを記録する．
   /// @param[in] latch ラッチ
+  /// @param[in] inv 極性
+  /// @param[in] latch_info ピンの割り当て情報
   /// @param[in] cell セル
-  /// @param[in] pos_array ピン情報の配列
   void
   set_latch_match(const BdnLatch* latch,
+		  bool inv,
 		  const Cell* cell,
-		  CellLatchPosArray pos_array);
+		  const CellLatchInfo& latch_info);
 
   /// @brief 論理ゲートのマッチを記録する．
   /// @param[in] node 該当のノード
@@ -116,8 +116,7 @@ private:
   struct DffInfo
   {
     DffInfo() :
-      mCell(NULL),
-      mInv(false)
+      mCell(NULL)
     {
     }
 
@@ -125,10 +124,7 @@ private:
     const Cell* mCell;
 
     // ピンの割り当て情報
-    CellFFPosArray mPosArray;
-
-    // 極性情報
-    bool mInv;
+    CellFFInfo mPinInfo;
 
   };
 
@@ -144,7 +140,8 @@ private:
     const Cell* mCell;
 
     // ピンの割り当て情報
-    CellLatchPosArray mPosArray;
+    CellLatchInfo mPinInfo;
+
   };
 
   // ノードの割り当て情報
@@ -218,11 +215,13 @@ private:
 
   /// @brief D-FF の割り当て情報を取り出す．
   DffInfo&
-  get_dff_info(const BdnDff* dff);
+  get_dff_info(const BdnDff* dff,
+	       bool inv);
 
   /// @brief ラッチの割り当て情報を取り出す．
   LatchInfo&
-  get_latch_info(const BdnLatch* latch);
+  get_latch_info(const BdnLatch* latch,
+		 bool inv);
 
   /// @brief NodeInfo を取り出す．
   NodeInfo&
@@ -260,4 +259,4 @@ private:
 
 END_NAMESPACE_YM_CELLMAP
 
-#endif // LIBYM_TECHMAP_CELLMAP_MAPRECORD_H
+#endif // MAPRECORD_H

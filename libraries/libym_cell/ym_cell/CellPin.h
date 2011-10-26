@@ -33,16 +33,6 @@ public:
     kDirInternal
   };
 
-
-  //////////////////////////////////////////////////////////////////////
-  /// @brief タイミングの条件を表す列挙型
-  //////////////////////////////////////////////////////////////////////
-  enum tTimingSense {
-    kSensePosiUnate = 1,
-    kSenseNegaUnate = 2,
-    kSenseNonUnate  = 3
-  };
-
 protected:
 
   /// @brief コンストラクタ
@@ -61,7 +51,7 @@ public:
   /// @brief ピン番号を返す．
   virtual
   ymuint
-  id() const = 0;
+  pin_id() const = 0;
 
   /// @brief ピン名を返す．
   virtual
@@ -103,6 +93,12 @@ public:
   // 入力ピンの属性
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 入力ピン番号を返す．
+  /// @note 入力ピンもしくは入出力ピンの時のみ意味を持つ．
+  virtual
+  ymuint
+  input_id() const = 0;
+
   /// @brief 負荷容量を返す．
   virtual
   CellCapacitance
@@ -123,6 +119,12 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 出力ピンの属性
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 出力ピン番号を返す．
+  /// @note 出力ピンもしくは入出力ピンの時のみ意味を持つ．
+  virtual
+  ymuint
+  output_id() const = 0;
 
   /// @brief 論理式を持っているときに true を返す．
   virtual
@@ -174,15 +176,17 @@ public:
   CellTime
   min_transition() const = 0;
 
-  /// @brief タイミング情報の取得
-  /// @param[in] ipos 開始ピン番号
-  /// @param[in] timing_sense タイミング情報の摘要条件
-  /// @return 条件に合致するタイミング情報を返す．
-  /// @note なければ NULL を返す．
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内部ピンの属性
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内部ピン番号を返す．
+  /// @note 内部ピンの時のみ意味を持つ．
   virtual
-  const CellTiming*
-  timing(ymuint ipos,
-	 tTimingSense sense) const = 0;
+  ymuint
+  internal_id() const = 0;
 
 };
 

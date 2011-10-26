@@ -62,7 +62,9 @@ str2vect(size_t ni,
 void
 gen(size_t ni,
     size_t limit,
-    size_t flow)
+    size_t flow,
+    int algorithm,
+    int dump)
 {
   hash_set<TvFunc> repfunc_set;
 
@@ -76,6 +78,11 @@ gen(size_t ni,
   size_t frontier = 0;
   size_t num = 0;
   ymulong w2count_total = 0;
+  ymulong tvcount_total = 0;
+
+  NpnMgr mgr;
+  NpnMap map;
+  TvFunc repfunc;
   for ( ; ; ) {
     if ( verbose ) {
       if ( buff[frontier] ) {
@@ -90,25 +97,30 @@ gen(size_t ni,
     }
 
     TvFunc func(ni, buff);
-    NpnMgr mgr;
-    NpnMap map;
 
     sw.start();
     for (size_t i = 0; i < mag; ++ i) {
-      mgr.cannonical(func, map);
+      mgr.cannonical(func, map, algorithm);
       if ( i == 0 ) {
 	w2count_total += mgr.w2max_count();
+	tvcount_total += mgr.tvmax_count();
       }
     }
     sw.stop();
 
     TvFunc orgfunc(ni, buff);
-    TvFunc repfunc = orgfunc.xform(map);
+    repfunc = orgfunc.xform(map);
     if ( repfunc_set.count(repfunc) == 0 ) {
       repfunc_set.insert(repfunc);
     }
-
     ++ num;
+
+    { // repfunc が本当に代表関数かどうかを検証する．
+      NpnMap map1;
+      mgr.cannonical(repfunc, map1);
+      TvFunc func2 = repfunc.xform(map1);
+      assert_cond( repfunc == func2, __FILE__, __LINE__);
+    }
 
     bool carry = false;
     for (size_t i = 0; i < ni_exp; ++ i) {
@@ -136,12 +148,17 @@ gen(size_t ni,
        << "w2max_recur:             "
        << static_cast<double>(w2count_total) / static_cast<double>(num)
        << endl
+       << "tvmax_recur:             "
+       << static_cast<double>(tvcount_total) / static_cast<double>(num)
+       << endl
        << "NPN rep:                 " << repfunc_set.size() << endl
        << "AVE. CPU time(usec):     " << usec << endl;
 
-  for (hash_set<TvFunc>::iterator p = repfunc_set.begin();
-       p != repfunc_set.end(); ++ p) {
-    cout << ni << " " << *p << endl;
+  if ( dump ) {
+    for (hash_set<TvFunc>::iterator p = repfunc_set.begin();
+	 p != repfunc_set.end(); ++ p) {
+      cout << ni << " " << *p << endl;
+    }
   }
 }
 
@@ -149,7 +166,8 @@ void
 rgen(size_t ni,
      int rseed,
      size_t num,
-     size_t flow)
+     size_t flow,
+     int algorithm)
 {
   hash_set<TvFunc> repfunc_set;
 
@@ -158,8 +176,11 @@ rgen(size_t ni,
 
   init_random_seed(rseed);
 
-  size_t w2count_total = 0;
+  ymulong w2count_total = 0;
+  ymulong tvcount_total = 0;
   sw.reset();
+  NpnMgr mgr;
+
   for (size_t k = 0; k < num; ++ k) {
     for (size_t i = 0; i < ni_exp; ++ i) {
       buff[i] = random_num() & 1;
@@ -172,20 +193,28 @@ rgen(size_t ni,
     }
 
     TvFunc func(ni, buff);
-    NpnMgr mgr;
     NpnMap map;
 
     sw.start();
     for (size_t i = 0; i < mag; ++ i) {
-      mgr.cannonical(func, map);
+      mgr.cannonical(func, map, algorithm);
       if ( i == 0 ) {
 	w2count_total += mgr.w2max_count();
+	tvcount_total += mgr.tvmax_count();
       }
     }
     sw.stop();
 
+    { // repfunc が本当に代表関数かどうかを検証する．
+      TvFunc repfunc = func.xform(map);
+      NpnMap map1;
+      mgr.cannonical(repfunc, map1);
+      TvFunc func2 = repfunc.xform(map1);
+      assert_cond( repfunc == func2, __FILE__, __LINE__);
+    }
+
     if ( flow & 1024 ) {
-      TvFunc repfunc = TvFunc(ni, buff).xform(map);
+      TvFunc repfunc = func.xform(map);
       if ( repfunc_set.count(repfunc) == 0 ) {
 	repfunc_set.insert(repfunc);
       }
@@ -201,6 +230,9 @@ rgen(size_t ni,
        << "w2max_recur:             "
        << static_cast<double>(w2count_total) / static_cast<double>(num)
        << endl
+       << "tvmax_recur:             "
+       << static_cast<double>(tvcount_total) / static_cast<double>(num)
+       << endl
        << "NPN rep:                 " << repfunc_set.size() << endl
        << "AVE. CPU time(usec):     " << usec << endl;
 }
@@ -208,8 +240,7 @@ rgen(size_t ni,
 void
 rgen_walsh(size_t ni,
 	   int rseed,
-	   size_t num,
-	   size_t flow)
+	   size_t num)
 {
   hash_set<TvFunc> repfunc_set;
 
@@ -231,8 +262,8 @@ rgen_walsh(size_t ni,
     }
 
     TvFunc func(ni, buff);
-    int w1[kNpnMaxNi];
-    int w2[kNpnMaxNi * kNpnMaxNi];
+    int w1[TvFunc::kMaxNi];
+    //int w2[TvFunc::kMaxNi * TvFunc::kMaxNi];
 
     sw.start();
     for (size_t i = 0; i < mag; ++ i) {
@@ -253,7 +284,8 @@ rgen_walsh(size_t ni,
 
 void
 read_func(const char* filename,
-	  size_t flow)
+	  size_t flow,
+	  int algorithm)
 {
   ifstream fs;
   fs.open(filename);
@@ -287,7 +319,7 @@ read_func(const char* filename,
     ++ num;
     sw.start();
     for (size_t i = 0; i < mag; ++ i) {
-      mgr.cannonical(func, map);
+      mgr.cannonical(func, map, algorithm);
       if ( i == 0 ) {
 	w2count_total += mgr.w2max_count();
       }
@@ -307,7 +339,8 @@ void
 verify(size_t ni,
        size_t rseed,
        size_t num,
-       size_t flow)
+       size_t flow,
+       int algorithm)
 {
   init_random_seed(rseed);
 
@@ -329,7 +362,7 @@ verify(size_t ni,
     NpnMgr mgr;
     NpnMap map0;
     sw.start();
-    mgr.cannonical(orig_func, map0);
+    mgr.cannonical(orig_func, map0, algorithm);
     sw.stop();
     ++ c;
 
@@ -365,7 +398,7 @@ verify(size_t ni,
 	NpnMgr mgr;
 	NpnMap repmap;
 	sw.start();
-	mgr.cannonical(tmp_func, repmap);
+	mgr.cannonical(tmp_func, repmap, algorithm);
 	sw.stop();
 	++ c;
 
@@ -421,6 +454,7 @@ main(int argc,
      const char** argv)
 {
 #if HAVE_POPT
+  int algorithm = 0;
   int mode = 0;
   int step1mode = 1;
   int step2mode = 1;
@@ -431,6 +465,7 @@ main(int argc,
   int ni = 4;
   int rnum = 10000;
   int rseed = 0;
+  int dump = 0;
 
   // オプション解析用のデータ
   const struct poptOption options[] = {
@@ -444,8 +479,14 @@ main(int argc,
     { "verbose", 'v', POPT_ARG_NONE, &verbose, 0,
       "enable verbose mode", NULL },
 
+    { "algorithm", 'a', POPT_ARG_INT, &algorithm, 0,
+      "specify algorithm", "[0-3]"},
+
     { "gen", 'g', POPT_ARG_NONE, NULL, 1,
       "generate all NPN equivalent functions mode", NULL },
+
+    { "dump", 'd', POPT_ARG_NONE, &dump, 0,
+      "dump rep. functions", NULL },
 
     { "rgen", 'r', POPT_ARG_NONE, NULL, 2,
       "randomly generate NPN equivalent functions mode", NULL },
@@ -540,40 +581,43 @@ main(int argc,
   if ( finish ) {
     flow |= 1024;
   }
+#if !defined(YM_DEBUG)
   try {
+#endif
     switch ( mode ) {
     case 1: // gen
-      gen(ni, 0, flow);
+      gen(ni, 0, flow, algorithm, dump);
       break;
 
     case 2: // rgen
       init_random_seed(rseed);
-      rgen(ni, rseed, rnum, flow);
+      rgen(ni, rseed, rnum, flow, algorithm);
       break;
 
     case 3: // verify
-      verify(ni, rseed, rnum, flow);
+      verify(ni, rseed, rnum, flow, algorithm);
       break;
 
     case 4: // function
-      read_func(argname, flow);
+      read_func(argname, flow, algorithm);
       break;
 
     case 5: // rgen_walsh
       init_random_seed(rseed);
-      rgen_walsh(ni, rseed, rnum, flow);
+      rgen_walsh(ni, rseed, rnum);
       break;
 
     default:
       usage(argv[0]);
       exit(1);
     }
+#if !defined(YM_DEBUG)
   }
 
   catch ( nsYm::AssertError x ) {
     cerr << x << endl;
   }
-
+#endif
 #else
 
   int base = 1;

@@ -10,6 +10,7 @@
 
 
 #include "ym_networks/tgnet.h"
+#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -45,7 +46,8 @@ public:
   /// @param[in] network 設定対象のネットワーク
   bool
   operator()(const string& filename,
-	     TgNetwork& network);
+	     TgNetwork& network,
+	     const CellLibrary* cell_library = NULL);
 
 
 private:

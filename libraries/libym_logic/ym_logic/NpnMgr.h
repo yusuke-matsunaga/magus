@@ -14,7 +14,7 @@
 
 BEGIN_NAMESPACE_YM_NPN
 
-class NpnConf;
+class NpnMgrImpl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class NpnMgr NpnMgr.h "ym_logic/NpnMgr.h"
@@ -32,19 +32,24 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部に公開している関数
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief func の正規化を行う．
+  /// @brief 論理関数の正規化を行う．
   /// @param[in] func 対象の論理関数
-  /// @param[out] cmap 正規化するための変換マップ
+  /// @param[out] cmap 正規化するための変換マップ(の一つ)
   /// @note func.xform(cmap) の結果が正規化された関数となる．
+  /// @note 同位体変換がある時は次の all_map() で取得する．
   void
   cannonical(const TvFunc& func,
-	     NpnMap& cmap);
+	     NpnMap& cmap,
+	     int algorithm = 0);
 
   /// @brief 直前の cannonical の呼び出しにおける NpnMap の全候補を返す．
   /// @param[out] map_list 変換マップを格納するリスト
   void
-  all_map(list<NpnMap>& map_list) const;
+  all_map(vector<NpnMap>& map_list) const;
 
   /// @brief w2max_recur の起動回数を返す．
   /// 直前の cannonical の呼び出しにおける
@@ -52,18 +57,11 @@ public:
   ymulong
   w2max_count() const;
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief シグネチャが最大になるように極性と順序を決める．
-  /// @param[out] conf
-  /// @param[in] g0 調べ始める最初のグループ番号
-  void
-  w2max_recur(NpnConf& conf,
-	      ymuint g0);
+  /// @brief w2max_recur の起動回数を返す．
+  /// 直前の cannonical の呼び出しにおける
+  /// w2max_recur の起動回数を返す．
+  ymulong
+  tvmax_count() const;
 
 
 private:
@@ -71,11 +69,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // w2max_recur で用いる現在の最適解のリスト
-  list<NpnConf> mMaxList;
-
-  // 1回の cannonical あたりの w2max_recur の起動回数
-  ymulong mW2max_count;
+  // 実際の処理を行う実装クラス
+  NpnMgrImpl* mImpl;
 
 };
 

@@ -23,22 +23,42 @@ noinst_LTLIBRARIES = libym_cell_ci.la
 
 libym_cell_ci_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)
 
 libym_cell_ci_la_SOURCES = \
 	CiBundle.h \
 	CiBundle.cc \
 	CiBus.h \
 	CiBus.cc \
+	CiClass.h \
+	CiClass.cc \
 	CiCell.h \
 	CiCell.cc \
+	CiCellHash.h \
+	CiCellHash.cc \
+	CiLogicCell.h \
+	CiLogicCell.cc \
+	CiFFCell.h \
+	CiFFCell.cc \
+	CiFsmCell.h \
+	CiFsmCell.cc \
+	CiLatchCell.h \
+	CiLatchCell.cc \
+	CiGroup.h \
+	CiGroup.cc \
 	CiLibrary.h \
 	CiLibrary.cc \
+	CiPatGraph.h \
+	CiPatGraph.cc \
+	CiPatMgr.h \
+	CiPatMgr.cc \
 	CiPin.h \
 	CiPin.cc \
+	CiPinHash.h \
+	CiPinHash.cc \
 	CiTiming.h \
-	CiTiming.cc \
-	restore.cc
+	CiTiming.cc
 
 libym_cell_ci_la_LIBADD =
 

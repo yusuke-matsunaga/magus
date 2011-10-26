@@ -30,11 +30,11 @@ main(int argc,
   try {
     StreamMsgHandler* msg_handler = new StreamMsgHandler(&cerr);
     MsgMgr::reg_handler(msg_handler);
-    BlifNetworkReader reader;
+    BlifNetworkReader read;
 
     BlifNetwork network;
 
-    if ( !reader.read(filename, network) ) {
+    if ( !read(filename, network) ) {
       cerr << "Error in reading " << filename << endl;
       return 4;
     }

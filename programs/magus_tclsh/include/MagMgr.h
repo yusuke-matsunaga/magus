@@ -38,9 +38,15 @@ public:
 
 public:
 
+  /// @brief カレントセルライブラリの設定
+  /// @param[in] library 設定するセルライブラリ
+  /// @note 以前のライブラリは破棄される．
+  void
+  set_cur_cell_library(const CellLibrary* library);
+
   /// @brief カレントセルライブラリの取得
-  CellMgr*
-  cur_cellmgr();
+  const CellLibrary*
+  cur_cell_library();
 
   /// @brief 新たな BNetwork を作成して登録する．
   /// @param[in] name 名前
@@ -204,7 +210,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // セルライブラリ
-  CellMgr* mCellMgr;
+  const CellLibrary* mCellLibrary;
 
   // NetHandle 用のアロケータ
   UnitAlloc mAlloc;

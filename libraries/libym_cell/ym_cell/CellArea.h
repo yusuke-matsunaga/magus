@@ -10,6 +10,7 @@
 
 
 #include "ym_cell/cell_nsdef.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -148,6 +149,22 @@ operator>=(const CellArea& left,
 ostream&
 operator<<(ostream& s,
 	   const CellArea& val);
+
+/// @brief バイナリダンプ
+/// @param[in] s 出力先のストリーム
+/// @param[in] val 値
+/// @relates CellArea
+BinO&
+operator<<(BinO& s,
+	   const CellArea& val);
+
+/// @brief バイナリリストア
+/// @param[in] s 入力元のストリーム
+/// @param[out] val 値を格納する変数
+/// @relates CellArea
+BinI&
+operator>>(BinI& s,
+	   CellArea& val);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -308,6 +325,33 @@ operator<<(ostream& s,
 	   const CellArea& val)
 {
   return s << val.value();
+}
+
+// @brief バイナリダンプ
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+// @relates CellArea
+inline
+BinO&
+operator<<(BinO& s,
+	   const CellArea& val)
+{
+  return s << val.value();
+}
+
+// @brief バイナリリストア
+// @param[in] s 入力元のストリーム
+// @param[out] val 値を格納する変数
+// @relates CellArea
+inline
+BinI&
+operator>>(BinI& s,
+	   CellArea& val)
+{
+  double tmp_val;
+  s >> tmp_val;
+  val = CellArea(tmp_val);
+  return s;
 }
 
 END_NAMESPACE_YM_CELL

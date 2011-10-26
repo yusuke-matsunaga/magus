@@ -66,7 +66,7 @@ LexpNodePtr
 LexpMgr::make_posiliteral(tVarId id)
 {
   make_literals(id);
-  size_t pos = id << 1;
+  ymuint pos = id << 1;
   assert_cond(pos < mLiteralArray.size(), __FILE__, __LINE__);
   return mLiteralArray[pos];
 }
@@ -76,7 +76,7 @@ LexpNodePtr
 LexpMgr::make_negaliteral(tVarId id)
 {
   make_literals(id);
-  size_t pos = (id << 1) + 1;
+  ymuint pos = (id << 1) + 1;
   assert_cond(pos < mLiteralArray.size(), __FILE__, __LINE__);
   return mLiteralArray[pos];
 }
@@ -85,13 +85,13 @@ LexpMgr::make_negaliteral(tVarId id)
 // 子供も AND ノードの場合にはマージする．
 // 子供が定数ノードの場合には値に応じた簡単化を行う．
 LexpNodePtr
-LexpMgr::make_and(size_t begin)
+LexpMgr::make_and(ymuint begin)
 {
   bool const0 = false;
-  size_t end = nodestack_top();
+  ymuint end = nodestack_top();
   mTmpNodeList.clear();
   mTmpNodeList.reserve(end - begin);
-  for (size_t i = begin; i < end; ++ i) {
+  for (ymuint i = begin; i < end; ++ i) {
     const LexpNode* node = mNodeStack[i];
     tType type = node->type();
     if ( type == kConst0 ) {
@@ -99,8 +99,8 @@ LexpMgr::make_and(size_t begin)
       break;
     }
     if ( type == kAnd ) {
-      size_t ni = node->child_num();
-      for (size_t j = 0; j < ni; ++ j) {
+      ymuint ni = node->child_num();
+      for (ymuint j = 0; j < ni; ++ j) {
 	const LexpNode* node1 = node->child(j);
 	if ( check_node(node1) ) {
 	  // 逆相の入力があったら答は0
@@ -125,7 +125,7 @@ LexpMgr::make_and(size_t begin)
   }
   nodestack_pop(begin);
 
-  size_t n = mTmpNodeList.size();
+  ymuint n = mTmpNodeList.size();
   LexpNodePtr node;
   if ( const0 ) {
     node = make_zero();
@@ -146,13 +146,13 @@ LexpMgr::make_and(size_t begin)
 // 子供も OR ノードの場合にはマージする．
 // 子供が定数ノードの場合には値に応じた簡単化を行う．
 LexpNodePtr
-LexpMgr::make_or(size_t begin)
+LexpMgr::make_or(ymuint begin)
 {
   bool const1 = false;
-  size_t end = nodestack_top();
+  ymuint end = nodestack_top();
   mTmpNodeList.clear();
   mTmpNodeList.reserve(end - begin);
-  for (size_t i = begin; i < end; ++ i) {
+  for (ymuint i = begin; i < end; ++ i) {
     LexpNodePtr node = mNodeStack[i];
     tType type = node->type();
     if ( type == kConst1 ) {
@@ -160,8 +160,8 @@ LexpMgr::make_or(size_t begin)
       break;
     }
     if ( type == kOr ) {
-      size_t ni = node->child_num();
-      for (size_t j = 0; j < ni; ++ j) {
+      ymuint ni = node->child_num();
+      for (ymuint j = 0; j < ni; ++ j) {
 	const LexpNode* node1 = node->child(j);
 	if ( check_node(node1) ) {
 	  // 逆相の入力があったら答は1
@@ -187,7 +187,7 @@ LexpMgr::make_or(size_t begin)
   nodestack_pop(begin);
 
   LexpNodePtr node;
-  size_t n = mTmpNodeList.size();
+  ymuint n = mTmpNodeList.size();
   if ( const1 ) {
     node = make_one();
   }
@@ -207,21 +207,21 @@ LexpMgr::make_or(size_t begin)
 // 子供も XOR ノードの場合にはマージする．
 // 子供が定数ノードの場合には値に応じた簡単化を行う．
 LexpNodePtr
-LexpMgr::make_xor(size_t begin)
+LexpMgr::make_xor(ymuint begin)
 {
   tPol pol = kPolPosi;
-  size_t end = nodestack_top();
+  ymuint end = nodestack_top();
   mTmpNodeList.clear();
   mTmpNodeList.reserve(end - begin);
-  for (size_t i = begin; i < end; ++ i) {
+  for (ymuint i = begin; i < end; ++ i) {
     LexpNodePtr node = mNodeStack[i];
     tType type = node->type();
     if ( type == kConst1 ) {
       pol = ~pol;
     }
     else if ( type == kXor ) {
-      size_t ni = node->child_num();
-      for (size_t j = 0; j < ni; ++ j) {
+      ymuint ni = node->child_num();
+      for (ymuint j = 0; j < ni; ++ j) {
 	const LexpNode* node1 = node->child(j);
 	if ( check_node2(node1) ) {
 	  pol = ~pol;
@@ -239,7 +239,7 @@ LexpMgr::make_xor(size_t begin)
   nodestack_pop(begin);
 
   LexpNodePtr node;
-  size_t n = mTmpNodeList.size();
+  ymuint n = mTmpNodeList.size();
   if ( n == 0 ) {
     node = make_zero();
   }
@@ -299,7 +299,7 @@ LexpMgr::check_node2(const LexpNode* node)
     // ループ中で削除する場合があるので反復子をコピーしてから進めておく
     LexpNodeList::iterator q = p;
     ++ p;
-    
+
     if ( posi_equiv(node, node1) ) {
       // 同相で重なっていたら両方取り除く
       mTmpNodeList.erase(q);
@@ -323,7 +323,7 @@ LexpMgr::nodestack_push(const LexpNode* node)
 }
 
 // @brief ノードスタックの先頭位置を返す．
-size_t
+ymuint
 LexpMgr::nodestack_top()
 {
   return mNodeStack.size();
@@ -331,7 +331,7 @@ LexpMgr::nodestack_top()
 
 // @brief ノードスタックの先頭位置を戻す．
 void
-LexpMgr::nodestack_pop(size_t oldtop)
+LexpMgr::nodestack_pop(ymuint oldtop)
 {
   assert_cond(oldtop < mNodeStack.size(), __FILE__, __LINE__);
   mNodeStack.erase(mNodeStack.begin() + oldtop, mNodeStack.end());
@@ -352,28 +352,28 @@ LexpMgr::complement(const LexpNode* node)
     return make_posiliteral(node->varid());
   case kAnd:
     {
-      size_t n = node->child_num();
-      size_t begin = nodestack_top();
-      for (size_t i = 0; i < n; ++ i) {
+      ymuint n = node->child_num();
+      ymuint begin = nodestack_top();
+      for (ymuint i = 0; i < n; ++ i) {
 	nodestack_push(complement(node->child(i)));
       }
       return make_or(begin);
     }
   case kOr:
     {
-      size_t n = node->child_num();
-      size_t begin = nodestack_top();
-      for (size_t i = 0; i < n; ++ i) {
+      ymuint n = node->child_num();
+      ymuint begin = nodestack_top();
+      for (ymuint i = 0; i < n; ++ i) {
 	nodestack_push(complement(node->child(i)));
       }
       return make_and(begin);
     }
   case kXor:
     {
-      size_t n = node->child_num();
-      size_t begin = nodestack_top();
+      ymuint n = node->child_num();
+      ymuint begin = nodestack_top();
       nodestack_push(complement(node->child(0)));
-      for (size_t i = 1; i < n; ++ i) {
+      for (ymuint i = 1; i < n; ++ i) {
 	nodestack_push(node->child(i));
       }
       return make_xor(begin);
@@ -412,10 +412,10 @@ LexpMgr::compose(const LexpNode* node,
     break;
   }
 
-  size_t n = node->child_num();
-  size_t begin = nodestack_top();
+  ymuint n = node->child_num();
+  ymuint begin = nodestack_top();
   bool ident = true;
-  for (size_t i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     LexpNodePtr chd = compose(node->child(i), id, sub);
     if ( chd != node->child(i) ) {
       ident = false;
@@ -448,7 +448,7 @@ LexpMgr::compose(const LexpNode* node,
   case kConst0:
   case kConst1:
     return node;
-    
+
   case kPosiLiteral:
     {
       VarLogExprMap::const_iterator p = comp_map.find(node->varid());
@@ -471,10 +471,10 @@ LexpMgr::compose(const LexpNode* node,
     break;
   }
 
-  size_t n = node->child_num();
-  size_t begin = nodestack_top();
+  ymuint n = node->child_num();
+  ymuint begin = nodestack_top();
   bool ident = true;
-  for (size_t i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     LexpNodePtr chd = compose(node->child(i), comp_map);
     if ( chd != node->child(i) ) {
       ident = false;
@@ -527,11 +527,11 @@ LexpMgr::remap_var(const LexpNode* node,
 
   default: break;
   }
-    
-  size_t n = node->child_num();
-  size_t begin = nodestack_top();
+
+  ymuint n = node->child_num();
+  ymuint begin = nodestack_top();
   bool ident = true;
-  for (size_t i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     LexpNodePtr chd = remap_var(node->child(i), varmap);
     if ( chd != node->child(i) ) {
       ident = false;
@@ -542,7 +542,7 @@ LexpMgr::remap_var(const LexpNode* node,
     nodestack_pop(begin);
     return node;
   }
-  
+
   switch ( node->type() ) {
   case kAnd: return make_and(begin);
   case kOr:  return make_or(begin);
@@ -568,11 +568,11 @@ LexpMgr::simplify(const LexpNode* node)
   default:
     break;
   }
-  
-  size_t n = node->child_num();
-  size_t begin = nodestack_top();
+
+  ymuint n = node->child_num();
+  ymuint begin = nodestack_top();
   bool ident = true;
-  for (size_t i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     LexpNodePtr chd = simplify(node->child(i));
     if ( chd != node->child(i) ) {
       ident = false;
@@ -598,42 +598,42 @@ LexpMgr::simplify(const LexpNode* node)
 }
 
 // @brief 使用されているメモリ量を返す．
-size_t
+ymuint
 LexpMgr::used_size()
 {
   return mNodeAlloc.used_size();
 }
 
 // @brief 使用されているノード数を返す．
-size_t
+ymuint
 LexpMgr::node_num()
 {
   return mNodeNum;
 }
 
 // @brief used_size() の最大値を返す．
-size_t
+ymuint
 LexpMgr::max_used_size()
 {
   return mNodeAlloc.max_used_size();
 }
 
 // @brief nodenum() の最大値を返す．
-size_t
+ymuint
 LexpMgr::max_node_num()
 {
   return mMaxNodeNum;
 }
 
 // @brief 実際に確保したメモリ量を返す．
-size_t
+ymuint
 LexpMgr::allocated_size()
 {
   return mNodeAlloc.allocated_size();
 }
 
 // @brief 実際に確保した回数を返す．
-size_t
+ymuint
 LexpMgr::allocated_count()
 {
   return mNodeAlloc.allocated_count();
@@ -657,7 +657,7 @@ LexpMgr::print_stats(ostream& s)
 void
 LexpMgr::make_literals(tVarId id)
 {
-  size_t last = mLiteralArray.size() / 2;
+  ymuint last = mLiteralArray.size() / 2;
   while ( last <= id ) {
     LexpNode* posi = alloc_node(kPosiLiteral);
     posi->mNc = last;
@@ -681,17 +681,17 @@ LexpMgr::alloc_node(tType type)
     mMaxNodeNum = mNodeNum;
   }
 
-  size_t nc = 0;
+  ymuint nc = 0;
   if ( type == kAnd || type == kOr || type == kXor ) {
     nc = mTmpNodeList.size();
   }
-    
-  size_t req_size = calc_size(nc);
+
+  ymuint req_size = calc_size(nc);
   void* p = mNodeAlloc.get_memory(req_size);
   LexpNode* node = reinterpret_cast<LexpNode*>(p);
   node->mRefType = static_cast<ymuint32>(type);
   node->mNc = nc;
-  for (size_t i = 0; i < nc; ++ i) {
+  for (ymuint i = 0; i < nc; ++ i) {
     node->mChildArray[i] = mTmpNodeList[i];
     node->child(i)->inc_ref();
   }
@@ -702,20 +702,20 @@ LexpMgr::alloc_node(tType type)
 void
 LexpMgr::free_node(LexpNode* node)
 {
-  size_t n = node->child_num();
-  for (size_t i = 0; i < n; ++ i) {
+  ymuint n = node->child_num();
+  for (ymuint i = 0; i < n; ++ i) {
     node->child(i)->dec_ref();
   }
 
   -- mNodeNum;
 
-  size_t req_size = calc_size(n);
+  ymuint req_size = calc_size(n);
   mNodeAlloc.put_memory(req_size, node);
 }
 
 // LexpNode の入力数から必要なサイズを計算する．
-size_t
-LexpMgr::calc_size(size_t nc)
+ymuint
+LexpMgr::calc_size(ymuint nc)
 {
   return sizeof(LexpNode) + sizeof(LexpNode*) * (nc - 1);
 }

@@ -58,11 +58,13 @@ public:
 
   /// @brief 今まで読み込んだ情報からネットワークを生成する．
   /// @param[in] mgr ネットワーク生成用のマネージャ
+  /// @param[in] cell_library セルライブラリ
   /// @param[out] node_map MvnNode と宣言要素の対応付けを保持する配列
   /// @retval true 正常に処理を行った．
   /// @retval false 生成中にエラーが起こった．
   bool
   gen_network(MvnMgr& mgr,
+	      const CellLibrary* cell_library,
 	      MvnVlMap& node_map);
 
 
@@ -135,6 +137,13 @@ private:
   /// @param[in] prim プリミティブ
   void
   gen_priminst(MvnModule* parent_module,
+	       const VlPrimitive* prim);
+
+  /// @brief セルインスタンスの生成を行う．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] prim プリミティブ
+  void
+  gen_cellinst(MvnModule* parent_module,
 	       const VlPrimitive* prim);
 
   /// @brief 継続的代入文の生成を行う．

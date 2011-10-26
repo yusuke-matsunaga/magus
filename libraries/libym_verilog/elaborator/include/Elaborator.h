@@ -12,6 +12,7 @@
 #include "ym_verilog/verilog.h"
 #include "ym_verilog/pt/PtP.h"
 #include "ym_verilog/vl/VlFwd.h"
+#include "ym_cell/cell_nsdef.h"
 
 #include "ym_utils/Alloc.h"
 
@@ -53,8 +54,10 @@ public:
   /// @brief コンストラクタ
   /// @param[in] elb_mgr Elbオブジェクトを管理するクラス
   /// @param[in] elb_factory Elbオブジェクトを生成するファクトリクラス
+  /// @param[in] cell_library セルライブラリ
   Elaborator(ElbMgr& elb_mgr,
-	     ElbFactory& elb_factory);
+	     ElbFactory& elb_factory,
+	     const CellLibrary* cell_library = NULL);
 
   /// @brief デストラクタ
   ~Elaborator();
@@ -118,6 +121,13 @@ private:
   find_constant_function(const VlNamedObj* parent,
 			 const char* name) const;
 
+  /// @brief セルの探索
+  /// @param[in] name セル名
+  /// @return name という名のセルを返す．
+  /// @note なければ NULL を返す．
+  const Cell*
+  find_cell(const char* name) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -172,6 +182,9 @@ private:
 
   // オブジェクト生成用のファクトリクラス
   ElbFactory& mFactory;
+
+  // セルライブラリ
+  const CellLibrary* mCellLibrary;
 
   // ElbStub 用のメモリアロケータ
   SimpleAlloc mAlloc;

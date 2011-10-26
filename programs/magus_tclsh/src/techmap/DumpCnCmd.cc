@@ -10,6 +10,7 @@
 #include "DumpCnCmd.h"
 #include "ym_tclpp/TclPopt.h"
 #include "ym_networks/CmnDumper.h"
+#include "ym_networks/CmnBlifWriter.h"
 #include "ym_networks/CmnVerilogWriter.h"
 
 
@@ -26,9 +27,9 @@ DumpCnCmd::DumpCnCmd(MagMgr* mgr,
 {
   mPoptVerilog = new TclPopt(this, "verilog",
 			     "verilog mode");
-  mPoptSpice = new TclPopt(this, "spice",
-			   "spice mode");
-  new_popt_group(mPoptVerilog, mPoptSpice);
+  mPoptBlif = new TclPopt(this, "blif",
+			  "blif mode");
+  new_popt_group(mPoptVerilog, mPoptBlif);
   set_usage_string("?<filename>");
 }
 
@@ -47,9 +48,9 @@ DumpCnCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
   bool verilog = mPoptVerilog->is_specified();
-  bool spice = mPoptSpice->is_specified();
+  bool blif = mPoptBlif->is_specified();
 
-#if 0
+#if !defined(YM_DEBUG)
   try {
 #endif
     ostream* outp = &cout;
@@ -66,12 +67,16 @@ DumpCnCmd::cmd_proc(TclObjVector& objv)
       CmnVerilogWriter dump;
       dump(*outp, cmnmgr());
     }
+    else if ( blif ) {
+      CmnBlifWriter dump;
+      dump(*outp, cmnmgr());
+    }
     else {
       CmnDumper dump;
       dump(*outp, cmnmgr());
     }
     return TCL_OK;
-#if 0
+#if !defined(YM_DEBUG)
   }
   catch ( AssertError x ) {
     cerr << x << endl;

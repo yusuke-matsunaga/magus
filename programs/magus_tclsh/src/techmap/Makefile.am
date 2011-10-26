@@ -19,10 +19,6 @@ libmagus_techmap_tcl_la_SOURCES = \
 	AreaMapCmd.cc \
 	DumpCnCmd.h \
 	DumpCnCmd.cc \
-	DumpPatCmd.h \
-	DumpPatCmd.cc \
-	LoadPatCmd.h \
-	LoadPatCmd.cc \
 	TechmapCmd.h \
 	TechmapCmd.cc
 

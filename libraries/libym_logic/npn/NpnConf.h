@@ -10,7 +10,7 @@
 
 
 #include "ym_logic/NpnMap.h"
-#include "NpnRawSig.h"
+#include "NpnBaseConf.h"
 
 
 BEGIN_NAMESPACE_YM_NPN
@@ -33,6 +33,9 @@ public:
   /// @note 内容は不定
   NpnConf();
 
+  /// @brief NpnBaseConf を指定したコンストラクタ
+  NpnConf(const NpnBaseConf& base_conf);
+
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
   NpnConf(const NpnConf& src);
@@ -46,14 +49,14 @@ public:
   /// @brief 出力極性を固定するコピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
   /// @param[in] pol 出力極性(-1/1)
+  /// @note src.opol() == 0 でなければならない．
   NpnConf(const NpnConf& src,
 	  int pol);
 
-  /// @brief グループ g 内の c というクラスを切り出す．
+  /// @brief グループ g 内の c というクラスを切り出して独立したグループにする．
   /// @param[in] src コピー元のオブジェクト
   /// @param[in] g 切り出す対象のグループ番号
   /// @param[in] c 切り出す対象の等価入力クラス
-  /// @note c のみを独立したグループとする．
   NpnConf(const NpnConf& src,
 	  ymuint g,
 	  ymuint c);
@@ -63,6 +66,14 @@ public:
 
 
 public:
+
+  /// @brief 対象の関数を得る．
+  const TvFunc&
+  func() const;
+
+  /// @brief 入力数を得る．
+  ymuint
+  ni() const;
 
   /// @brief 完全な正規形になっているとき true を返す．
   /// @param[in] g0 調べ始める最初のグループ番号
@@ -75,16 +86,18 @@ public:
 
   /// @brief 出力極性の割り当ての取得
   /// @return 出力極性の割り当て状態
-  ///  -   1 : 肯定
-  ///  -  -1 : 否定
+  ///  - 0 : 未定
+  ///  - 1 : 肯定
+  ///  - 2 : 否定
   int
   opol() const;
 
   /// @brief 入力極性の取得
   /// @param[in] pos 入力番号
   /// @return 指定された入力の極性
-  ///  -  1 : 肯定
-  ///  - -1 : 否定
+  ///  - 0 : 未定
+  ///  - 1 : 肯定
+  ///  - 2 : 否定
   int
   ipol(ymuint pos) const;
 
@@ -103,49 +116,50 @@ public:
   nc() const;
 
   /// @brief 等価入力クラスの取得
-  /// @param[in] pos 入力クラス番号
+  /// @param[in] cid 入力クラス番号 ( 0 <= cid < nc() )
   /// @return 指定された入力クラスの先頭番号＋極性
   pair<ymuint, int>
-  input(ymuint pos) const;
+  input(ymuint cid) const;
 
   /// @brief 等価入力クラスの先頭番号の取得
-  /// @param[in] pos 入力クラス番号
+  /// @param[in] cid 入力クラス番号 ( 0 <= cid < nc() )
   /// @return 指定された入力クラスの先頭の入力番号インデックス
   ymuint
-  ic_rep(ymuint pos) const;
+  ic_rep(ymuint cid) const;
 
   /// @brief 入力クラスの極性の割り当ての取得
-  /// @param[in] pos 入力クラス番号
+  /// @param[in] cid 入力クラス番号 ( 0 <= cid < nc() )
   /// @return pos に対応する入力の極性の割り当て状態
   ///  -  0 : 未定(肯定も否定もありうる)
   ///  -  1 : 肯定
   ///  -  2 : 否定
   int
-  ic_pol(ymuint pos) const;
+  ic_pol(ymuint cid) const;
 
   /// @brief グループ数の取得
   /// @return グループ数
   ymuint
-  ng() const;
+  group_num() const;
 
-  /// @brief グループの先頭の取得
-  /// @param[in] pos グループ番号( < ng() )
-  /// @return pos 番目のグループの先頭のクラス番号
+  /// @brief グループの先頭のクラス番号の取得
+  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   ymuint
-  begin(ymuint pos) const;
+  group_begin(ymuint gid) const;
 
-  /// @brief グループの末尾の取得
-  /// @param[in] pos グループ番号( < ng() )
-  /// @return pos 番目のグループの末尾のクラス番号
-  /// @note 末尾とは実際の最後の要素の次を指す．
+  /// @brief グループの末尾のクラス番号取得
+  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  /// @note 末尾とは最後の要素の次のクラス番号を指す．
   ymuint
-  end(ymuint pos) const;
+  group_end(ymuint gid) const;
 
   /// @brief グループの要素数の取得
-  /// @param[in] pos グループ番号( < ng() )
-  /// @return pos 番めのグループの要素数
+  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  /// @note group_end(gid) - group_begin(gid) に等しい．
   ymuint
-  gnum(ymuint pos) const;
+  group_size(ymuint gid) const;
+
+
+public:
 
   /// @brief 重み別 Walsh の 0次係数を返す．
   int
@@ -161,18 +175,6 @@ public:
   walsh_2i(ymuint pos1,
 	   ymuint pos2) const;
 
-  /// @brief W2 を用いた大小比較関数
-  bool
-  w2gt(ymuint rep0,
-       ymuint rep1,
-       ymuint rep2) const;
-
-  /// @brief W2 を用いた等価比較関数
-  bool
-  w2eq(ymuint rep0,
-       ymuint rep1,
-       ymuint rep2) const;
-
   /// @brief 内容を NpnMap にセットする．
   void
   set_map(NpnMap& map) const;
@@ -180,16 +182,8 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // NpnRawSig の関数に対するラッパ
+  // NpnBaseConf の関数に対するラッパ
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 対象の関数を得る．
-  const TvFunc&
-  func() const;
-
-  /// @brief 入力数を得る．
-  ymuint
-  ni() const;
 
   // 等価入力クラスの要素数を返す．
   ymuint
@@ -211,32 +205,12 @@ public:
   bool
   bisym(ymuint rep) const;
 
-  /// @brief rep1 が rep2 より大きければ true を返す．
-  bool
-  w1gt(ymuint rep1,
-       ymuint rep2) const;
-
-  /// @brief rep1 と rep2 が等しければ true を返す．
-  bool
-  w1eq(ymuint rep1,
-       ymuint rep2) const;
-
   /// @brief Walsh 係数を出力する．
   void
   dump_walsh(ostream& s) const;
 
 
 public:
-
-  /// @brief シグネチャを設定する．
-  void
-  set_sig(const NpnRawSig* sig);
-
-  /// @brief 出力極性の割り当ての設定
-  /// @param[in] val 割り当て状態
-  /// @sa opol
-  void
-  set_opol(int val);
 
   /// @brief 入力クラスの極性の割り当ての設定
   /// @param[in] pos 入力クラス番号
@@ -246,13 +220,6 @@ public:
   set_ic_pol(ymuint pos,
 	     int val);
 
-  /// @brief 入力クラスを追加する．
-  /// @param[in] pos 先頭の入力番号
-  /// @param[in] pol 極性
-  void
-  add_ic_rep(ymuint pos,
-	     int pol);
-
   /// @brief 入力グループの開始番号を追加する．
   /// @param[in] index 先頭の入力クラス番号
   void
@@ -260,15 +227,12 @@ public:
 
   /// @brief グループの細分化を行う．
   /// @param[in] g0 対象のグループ番号
-  /// @param[in] gt 2つの入力クラスの大小比較関数オブジェクト
-  /// @param[in] eq 2つの入力クラスの等価比較関数オブジェクト
+  /// @param[in] cmp 2つの入力クラスの大小比較関数オブジェクト
   /// @return 増えたグループ数を返す．
-  template <typename T1,
-	    typename T2>
+  template <typename T>
   ymuint
   refine(ymuint g0,
-	 T1 gt,
-	 T2 eq);
+	 T cmp);
 
 
 public:
@@ -279,12 +243,15 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる下請け関数
+  //////////////////////////////////////////////////////////////////////
 
-  // コピーを行う．
+  /// @brief コピーを行う．
   void
   copy(const NpnConf& src);
 
-  // 入力順序を正しくする．
+  /// @brief 入力順序を正しくする．
   void
   validate_iorder() const;
 
@@ -294,43 +261,43 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // オリジナルのシグネチャ
-  const NpnRawSig* mSig;
-
-  // 出力極性が確定していたら true
-  bool mOpolFixed;
+  // 共通な情報
+  const NpnBaseConf* mBaseConf;
 
   // 出力極性
-  //  1 : 肯定
-  // -1 : 否定
-  ymint32 mOpol;
+  // 0 : 未定
+  // 1 : 肯定
+  // 2 : 否定
+  ymuint8 mOpol;
 
-  // 入力極性
-  //  1: 肯定
-  // -1: 否定
-  ymint32 mIpols[kNpnMaxNi];
+  // 入力の極性
+  // 0 : 未定
+  // 1 : 肯定
+  // 2 : 否定
+  ymuint8 mIpols[TvFunc::kMaxNi];
+
+  // 入力クラスの順列
+  // インデックスはクラス番号で，
+  // 各要素は下位2ビットで極性(0, 1, 2)，
+  // 残りが入力配列へのインデックスを表す．
+  ymuint32 mIcList[TvFunc::kMaxNi];
+
+  // グループ数
+  ymuint32 mGroupNum;
+
+  // グループの先頭のクラス番号を納める配列．
+  // i 番めのグループのクラス番号は
+  // mGroupTop[i] 〜 mGroupTop[i + 1] - 1
+  // に入っている．
+  ymuint32 mGroupTop[TvFunc::kMaxNi + 1];
 
   // 入力の順序
   mutable
-  ymuint32 mIorder[kNpnMaxNi];
+  ymuint32 mIorder[TvFunc::kMaxNi];
 
   // mIorder が正しいとき true となるフラグ
   mutable
   bool mIorderValid;
-
-  // クラス数
-  ymuint32 mNc;
-
-  // 入力クラスの順列
-  // 各要素は下位2ビットで極性(0, 1, 2)，
-  // 残りが入力配列へのインデックスを表す．
-  ymint32 mIcList[kNpnMaxNi];
-
-  // グループ数
-  ymuint32 mNg;
-
-  // グループの先頭のインデックス
-  ymuint32 mIndex[kNpnMaxNi + 1];
 
 };
 
@@ -339,25 +306,20 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// コンストラクタ
+// @brief 対象の関数を得る．
 inline
-NpnConf::NpnConf() :
-  mOpolFixed(false),
-  mOpol(1),
-  mIorderValid(false),
-  mNc(0),
-  mNg(0)
+const TvFunc&
+NpnConf::func() const
 {
-  mIndex[0] = 0;
-  for (ymuint i = 0; i < kNpnMaxNi; ++ i) {
-    mIpols[i] = 1;
-  }
+  return mBaseConf->func();
 }
 
-// デストラクタ
+// @brief 入力数を得る．
 inline
-NpnConf::~NpnConf()
+ymuint
+NpnConf::ni() const
 {
+  return mBaseConf->ni();
 }
 
 // @brief 出力極性が確定のときに true を返す．
@@ -365,7 +327,7 @@ inline
 bool
 NpnConf::is_opol_fixed() const
 {
-  return mOpolFixed;
+  return mOpol != 0;
 }
 
 // 出力極性の割り当ての取得
@@ -402,46 +364,45 @@ inline
 ymuint
 NpnConf::nc() const
 {
-  return mNc;
+  return mBaseConf->nc();;
 }
 
-// @brief 入力クラスの取得
-// @param[in] pos インデックス番号
-// @param[out] pol 指定された入力クラスの極性
-// @return 指定された入力クラスの入力番号インデックス
+// @brief 等価入力クラスの取得
+// @param[in] cid 入力クラス番号 ( 0 <= cid < nc() )
+// @return 指定された入力クラスの先頭番号＋極性
 inline
 pair<ymuint, int>
-NpnConf::input(ymuint pos) const
+NpnConf::input(ymuint cid) const
 {
-  int v = mIcList[pos];
+  int v = mIcList[cid];
   ymuint index = static_cast<ymuint>(v >> 2);
   int pol = v & 3;
   return make_pair(index, pol);
 }
 
-// @brief 入力クラスの入力番号インデックスの取得
-// @param[in] pos 入力クラス番号
+// @brief 等価入力クラスの先頭番号の取得
+// @param[in] cid 入力クラス番号 ( 0 <= cid < nc() )
 // @return 指定された入力クラスの先頭の入力番号インデックス
 inline
 ymuint
-NpnConf::ic_rep(ymuint pos) const
+NpnConf::ic_rep(ymuint cid) const
 {
-  int v = mIcList[pos];
+  int v = mIcList[cid];
   ymuint index = static_cast<ymuint>(v >> 2);
   return index;
 }
 
 // @brief 入力クラスの極性の割り当ての取得
-// @param[in] pos 入力クラス番号
+// @param[in] cid 入力クラス番号 ( 0 <= cid < nc() )
 // @return pos に対応する入力の極性の割り当て状態
 //  -  0 : 未定(肯定も否定もありうる)
 //  -  1 : 肯定
 //  -  2 : 否定
 inline
 int
-NpnConf::ic_pol(ymuint pos) const
+NpnConf::ic_pol(ymuint cid) const
 {
-  int v = mIcList[pos];
+  int v = mIcList[cid];
   int pol = v & 3;
   return pol;
 }
@@ -449,59 +410,48 @@ NpnConf::ic_pol(ymuint pos) const
 // グループ数の取得
 inline
 ymuint
-NpnConf::ng() const
+NpnConf::group_num() const
 {
-  return mNg;
+  return mGroupNum;
 }
 
-// グループの先頭の取得
+// @brief グループの先頭のクラス番号の取得
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
 inline
 ymuint
-NpnConf::begin(ymuint pos) const
+NpnConf::group_begin(ymuint gid) const
 {
-  return mIndex[pos];
+  return mGroupTop[gid];
 }
 
-// グループの末尾の取得
+// @brief グループの末尾のクラス番号取得
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+// @note 末尾とは最後の要素の次のクラス番号を指す．
 inline
 ymuint
-NpnConf::end(ymuint pos) const
+NpnConf::group_end(ymuint gid) const
 {
-  return mIndex[pos + 1];
+  return mGroupTop[gid + 1];
 }
 
 // @brief グループの要素数の取得
-// @param[in] pos グループ番号( < ng() )
-// @return pos 番めのグループの要素数
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+// @note group_end(gid) - group_begin(gid) に等しい．
 inline
 ymuint
-NpnConf::gnum(ymuint pos) const
+NpnConf::group_size(ymuint gid) const
 {
-  return mIndex[pos + 1] - mIndex[pos];
+  return group_end(gid) - group_begin(gid);
 }
 
-// @brief 対象の関数を得る．
-inline
-const TvFunc&
-NpnConf::func() const
-{
-  return mSig->func();
-}
-
-// @brief 入力数を得る．
-inline
-ymuint
-NpnConf::ni() const
-{
-  return mSig->ni();
-}
+#if 0
 
 // 等価入力クラスの要素数を返す．
 inline
 ymuint
 NpnConf::ic_num(ymuint rep) const
 {
-  return mSig->ic_num(rep);
+  return mBaseConf->ic_num(rep);
 }
 
 // @brief 独立(無関係)な入力クラスの先頭番号を返す．
@@ -509,7 +459,7 @@ inline
 ymuint
 NpnConf::indep_rep() const
 {
-  return mSig->indep_rep();
+  return mBaseConf->indep_rep();
 }
 
 // @brief 独立な入力クラスの要素数を返す．
@@ -517,7 +467,7 @@ inline
 ymuint
 NpnConf::indep_num() const
 {
-  return mSig->indep_num();
+  return mBaseConf->indep_num();
 }
 
 // 等価入力クラスの pos の次の要素を返す．
@@ -525,7 +475,7 @@ inline
 ymuint
 NpnConf::ic_link(ymuint pos) const
 {
-  return mSig->ic_link(pos);
+  return mBaseConf->ic_link(pos);
 }
 
 // 等価入力クラスの bisym マークを返す．
@@ -533,26 +483,19 @@ inline
 bool
 NpnConf::bisym(ymuint rep) const
 {
-  return mSig->bisym(rep);
+  return mBaseConf->bisym(rep);
 }
+#endif
 
-// @brief rep1 が rep2 より大きければ true を返す．
+#if 0
+// @brief Walsh 係数を出力する．
 inline
-bool
-NpnConf::w1gt(ymuint rep1,
-	      ymuint rep2) const
+void
+NpnConf::dump_walsh(ostream& s) const
 {
-  return mSig->w1gt(rep1, rep2);
+  mBaseConf->dump_walsh(s);
 }
-
-// @brief rep1 と rep2 が等しければ true を返す．
-inline
-bool
-NpnConf::w1eq(ymuint rep1,
-	      ymuint rep2) const
-{
-  return mSig->w1eq(rep1, rep2);
-}
+#endif
 
 // @brief Walsh の 2次係数を返す．
 inline
@@ -560,8 +503,14 @@ int
 NpnConf::walsh_2(ymuint pos1,
 		 ymuint pos2) const
 {
-  int w2 = mSig->walsh_2(pos1, pos2);
-  return w2 * ipol(pos1) * ipol(pos2) * opol();
+  int w2 = mBaseConf->walsh_2(pos1, pos2);
+  bool oinv = (mOpol == 2);
+  bool iinv1 = (mIpols[pos1] == 2);
+  bool iinv2 = (mIpols[pos2] == 2);
+  if ( oinv ^ iinv1 ^ iinv2 ) {
+    w2 = -w2;
+  }
+  return w2;
 }
 
 // @brief Walsh の 2次係数を返す (入力順序付き)．
@@ -573,68 +522,9 @@ NpnConf::walsh_2i(ymuint pos1,
   if ( !mIorderValid ) {
     validate_iorder();
   }
-  return walsh_2(mIorder[pos1], mIorder[pos2]);
-}
-
-// @brief W2 を用いた大小比較関数
-inline
-bool
-NpnConf::w2gt(ymuint rep0,
-	      ymuint rep1,
-	      ymuint rep2) const
-{
-  int v1 = mSig->walsh_2(rep0, rep1) * ipol(rep0) * ipol(rep1) * opol();
-  int v2 = mSig->walsh_2(rep0, rep2) * ipol(rep0) * ipol(rep2) * opol();
-  return v1 >= v2;
-}
-
-// @brief W2 を用いた等価比較関数
-inline
-bool
-NpnConf::w2eq(ymuint rep0,
-	      ymuint rep1,
-	      ymuint rep2) const
-{
-  int v1 = mSig->walsh_2(rep0, rep1) * ipol(rep1);
-  int v2 = mSig->walsh_2(rep0, rep2) * ipol(rep2);
-  return v1 == v2;
-}
-
-// @brief Walsh 係数を出力する．
-inline
-void
-NpnConf::dump_walsh(ostream& s) const
-{
-  mSig->dump_walsh(s);
-}
-
-// @brief シグネチャを設定する．
-inline
-void
-NpnConf::set_sig(const NpnRawSig* sig)
-{
-  mSig = sig;
-}
-
-// 出力極性の割り当ての設定
-inline
-void
-NpnConf::set_opol(int val)
-{
-  mOpol = val;
-  mOpolFixed = true;
-}
-
-// @brief 入力クラスを追加する．
-// @param[in] pos 先頭の入力番号
-inline
-void
-NpnConf::add_ic_rep(ymuint pos,
-		    int pol)
-{
-  int v = (static_cast<int>(pos) << 2) | pol;
-  mIcList[mNc] = v;
-  ++ mNc;
+  ymuint ipos1 = mIorder[pos1];
+  ymuint ipos2 = mIorder[pos2];
+  return walsh_2(ipos1, ipos2);
 }
 
 // @brief 入力グループの開始番号を追加する．
@@ -643,28 +533,25 @@ inline
 void
 NpnConf::add_ig(ymuint index)
 {
-  mIndex[mNg] = index;
-  ++ mNg;
-  mIndex[mNg] = mNc;
+  mGroupTop[mGroupNum] = index;
+  ++ mGroupNum;
+  mGroupTop[mGroupNum] = nc();
 }
 
 // @brief グループの細分化を行う．
 // @param[in] g0 対象のグループ番号
-// @param[in] gt 2つの入力クラスの大小比較関数オブジェクト
-// @param[in] eq 2つの入力クラスの等価比較関数オブジェクト
+// @param[in] cmp 2つの入力クラスの大小比較関数オブジェクト
 // @return 増えたグループ数を返す．
-template <typename T1,
-	  typename T2>
+template <typename T>
 inline
 ymuint
 NpnConf::refine(ymuint g0,
-		T1 gt,
-		T2 eq)
+		T cmp)
 {
-  ymuint ng0 = mNg;
-  ymuint s = begin(g0);
-  ymuint e = end(g0);
-  // gt 関数にしたがって整列させる．
+  ymuint ng0 = group_num();
+  ymuint s = group_begin(g0);
+  ymuint e = group_end(g0);
+  // 大小関数にしたがって整列させる．
   for (ymuint i = s + 1; i < e; ++ i) {
     int tmp1 = mIcList[i];
     ymuint pos1 = static_cast<ymuint>(tmp1 >> 2);
@@ -672,7 +559,7 @@ NpnConf::refine(ymuint g0,
     for ( ; j > s; -- j) {
       int tmp2 = mIcList[j - 1];
       ymuint pos2 = static_cast<ymuint>(tmp2 >> 2);
-      if ( gt(pos2, pos1) ) {
+      if ( cmp.gt(pos2, pos1) ) {
 	break;
       }
       mIcList[j] = tmp2;
@@ -682,22 +569,22 @@ NpnConf::refine(ymuint g0,
       mIorderValid = false;
     }
   }
-  // eq 関数にしたがってグループ化する．
+  // 等価なクラスをグループ化する．
   ymuint prev = ic_rep(s);
   for (ymuint i = s + 1; i < e; ++ i) {
     ymuint pos1 = ic_rep(i);
-    if ( !eq(prev, pos1) ) {
+    if ( !cmp.eq(prev, pos1) ) {
       // 新しいグループを作る．
-      for (ymuint g1 = mNg; g1 > g0; -- g1) {
-	mIndex[g1 + 1] = mIndex[g1];
+      for (ymuint g1 = mGroupNum; g1 > g0; -- g1) {
+	mGroupTop[g1 + 1] = mGroupTop[g1];
       }
-      ++ mNg;
+      ++ mGroupNum;
       ++ g0;
-      mIndex[g0] = i;
+      mGroupTop[g0] = i;
       prev = pos1;
     }
   }
-  return mNg - ng0;
+  return mGroupNum - ng0;
 }
 
 END_NAMESPACE_YM_NPN

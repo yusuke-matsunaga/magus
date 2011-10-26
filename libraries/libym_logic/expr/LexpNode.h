@@ -91,7 +91,7 @@ public:
   is_op() const;
 
   /// @brief 演算子ノードの場合に項の数を返す．
-  size_t
+  ymuint
   child_num() const;
 
   /// @brief 演算子ノードの場合に子供のノードを返す．
@@ -99,12 +99,17 @@ public:
   /// @note 演算子ノード以外の場合と pos が範囲外の場合には定数0を返す．
   /// 通常は定数ノードが子供に含まれることはないのでエラーとわかる．
   const LexpNode*
-  child(size_t pos) const;
+  child(ymuint pos) const;
 
   /// @brief vals の値にしたがった評価を行う．
   ymulong
   eval(const vector<ymulong>& vals,
        ymulong mask) const;
+
+  /// @brief 真理値表を作成する．
+  /// @param[in] ni 入力数
+  TvFunc
+  make_tv(ymuint ni) const;
 
   /// @brief 定数,リテラルもしくは子供がリテラルのノードの時に true を返す．
   bool
@@ -127,23 +132,23 @@ public:
   is_sop() const;
 
   /// @brief リテラル数を返す．
-  size_t
+  ymuint
   litnum() const;
 
   /// @brief 特定の変数のリテラルの出現回数を返す．
   /// @param[in] varid 計測対象の変数番号
-  size_t
+  ymuint
   litnum(tVarId varid) const;
 
   /// @brief 特定の変数の特定の極性のリテラルの出現回数を返す．
   /// @param[in] varid 計測対象の変数番号
   /// @param[in] pol 計測対象の極性
-  size_t
+  ymuint
   litnum(tVarId varid,
 	 tPol pol) const;
 
   /// @brief 使われている変数の最大の番号 + 1を得る．
-  size_t
+  ymuint
   input_size() const;
 
   /// @brief SOP 形式に展開したときの積項数とリテラル数を見積もる．
@@ -208,12 +213,12 @@ public:
 private:
 
   // 参照回数を得る．
-  size_t
+  ymuint
   ref() const;
 
   // 参照回数をセットする．
   void
-  ref(size_t ref) const;
+  ref(ymuint ref) const;
 
   // 自殺する．
   void
@@ -362,7 +367,7 @@ LexpNode::is_op() const
 }
 
 inline
-size_t
+ymuint
 LexpNode::child_num() const
 {
   return is_op() ? mNc : 0;
@@ -370,22 +375,22 @@ LexpNode::child_num() const
 
 inline
 const LexpNode*
-LexpNode::child(size_t pos) const
+LexpNode::child(ymuint pos) const
 {
   assert_cond(pos < child_num(), __FILE__, __LINE__);
   return mChildArray[pos];
 }
 
 inline
-size_t
+ymuint
 LexpNode::ref() const
 {
-  return static_cast<size_t>(mRefType >> 3);
+  return static_cast<ymuint>(mRefType >> 3);
 }
 
 inline
 void
-LexpNode::ref(size_t ref) const
+LexpNode::ref(ymuint ref) const
 {
   LexpNode* node = const_cast<LexpNode*>(this);
   // 昔の参照回数を落とす．
@@ -409,7 +414,7 @@ inline
 void
 LexpNode::dec_ref() const
 {
-  size_t r = ref();
+  ymuint r = ref();
   // MAX の時は減らさない．
   if ( r < kRefMax ) {
     LexpNode* node = const_cast<LexpNode*>(this);

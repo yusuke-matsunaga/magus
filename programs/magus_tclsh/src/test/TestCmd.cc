@@ -49,9 +49,9 @@ TestCmd::cmd_proc(TclObjVector& objv)
   StreamMsgHandler msg_handler(&cerr);
   MsgMgr::reg_handler(&msg_handler);
 
-  BNetBlifReader reader;
+  BNetBlifReader read;
   BNetwork network;
-  if ( !reader.read(ex_file_name, network) ) {
+  if ( !read(ex_file_name, network) ) {
     return TCL_ERROR;
   }
 

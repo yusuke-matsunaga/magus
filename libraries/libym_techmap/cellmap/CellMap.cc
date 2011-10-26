@@ -24,7 +24,7 @@ CellMap::~CellMap()
 }
 
 // @brief 面積最小化 DAG covering のヒューリスティック関数
-// @param[in] cell_mgr セルライブラリ
+// @param[in] cell_library セルライブラリ
 // @param[in] sbjgraph サブジェクトグラフ
 // @param[in] mode モード
 //  - 0: fanout フロー, resub なし
@@ -33,14 +33,14 @@ CellMap::~CellMap()
 //  - 3: weighted フロー, resub あり
 // @param[out] mapnetwork マッピング結果
 void
-CellMap::area_map(const CellMgr& cell_mgr,
+CellMap::area_map(const CellLibrary& cell_library,
 		  const BdnMgr& sbjgraph,
 		  ymuint mode,
 		  CmnMgr& mapnetwork)
 {
   AreaCover area_cover;
 
-  area_cover(sbjgraph, cell_mgr, mapnetwork);
+  area_cover(sbjgraph, cell_library, mapnetwork);
 }
 
 END_NAMESPACE_YM_CELLMAP

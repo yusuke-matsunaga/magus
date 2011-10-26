@@ -9,7 +9,10 @@
 
 #include "ym_cell/CellDotlibReader.h"
 
-#include "ci/CiLibrary.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_cell/CellArea.h"
+#include "ym_cell/CellCapacitance.h"
+#include "ym_cell/CellTime.h"
 
 #include "dotlib/DotlibParser.h"
 #include "dotlib/DotlibMgr.h"
@@ -88,53 +91,6 @@ dot2expr(const DotlibNode* node,
   return LogExpr();
 }
 
-// @brief LogExpr を TvFunc に変換する．
-// @param[in] expr 対象の論理式
-// @param[in] ni 全入力数
-TvFunc
-expr_to_tvfunc(const LogExpr& expr,
-	       ymuint ni)
-{
-  if ( expr.is_zero() ) {
-    return TvFunc::const_zero(ni);
-  }
-  if ( expr.is_one() ) {
-    return TvFunc::const_one(ni);
-  }
-  if ( expr.is_posiliteral() ) {
-    return TvFunc::posi_literal(ni, expr.varid());
-  }
-  if ( expr.is_negaliteral() ) {
-    return TvFunc::nega_literal(ni, expr.varid());
-  }
-  // あとは AND/OR/XOR のみ
-  ymuint n = expr.child_num();
-  vector<TvFunc> child_func(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    child_func[i] = expr_to_tvfunc(expr.child(i), ni);
-  }
-  TvFunc func = child_func[0];
-  if ( expr.is_and() ) {
-    for (ymuint i = 1; i < n; ++ i) {
-      func &= child_func[i];
-    }
-  }
-  else if ( expr.is_or() ) {
-    for (ymuint i = 1; i < n; ++ i) {
-      func |= child_func[i];
-    }
-  }
-  else if ( expr.is_xor() ) {
-    for (ymuint i = 1; i < n; ++ i) {
-      func ^= child_func[i];
-    }
-  }
-  else {
-    assert_not_reached(__FILE__, __LINE__);
-  }
-  return func;
-}
-
 // @brief DotlibNode から CellLibrary を生成する．
 // @param[in] dt_library ライブラリを表すパース木のルート
 // @return 生成したライブラリを返す．
@@ -149,7 +105,8 @@ gen_library(const DotlibNode* dt_library)
   }
 
   // ライブラリの生成
-  CiLibrary* library = new CiLibrary(library_info.name());
+  CellLibrary* library = CellLibrary::new_obj();
+  library->set_name(library_info.name());
 
   // セル数の設定
   const list<const DotlibNode*>& dt_cell_list = library_info.cell_list();
@@ -166,6 +123,7 @@ gen_library(const DotlibNode* dt_library)
     if ( !dt_cell->get_cell_info(cell_info) ) {
       continue;
     }
+
     ShString cell_name = cell_info.name();
     CellArea area(cell_info.area());
     const list<const DotlibNode*>& dt_pin_list = cell_info.pin_list();
@@ -175,13 +133,17 @@ gen_library(const DotlibNode* dt_library)
     ymuint nbus = dt_bus_list.size();
     ymuint nbundle = dt_bundle_list.size();
 
-    // ピン名とピン番号の連想配列
-    hash_map<ShString, ymuint> pin_map;
-
     // ピン情報の配列
     vector<DotlibPin> pin_info_array(npin);
 
+    // ピン名とピン番号の連想配列
+    hash_map<ShString, ymuint> pin_map;
+
     // ピン情報の読み出し
+    ymuint ni = 0;
+    ymuint no = 0;
+    ymuint nio = 0;
+    ymuint nit = 0;
     {
       ymuint pin_id = 0;
       bool error = false;
@@ -196,26 +158,157 @@ gen_library(const DotlibNode* dt_library)
 	  continue;
 	}
 
-	ShString pin_name = pin_info.name();
-	pin_map.insert(make_pair(pin_name, pin_id));
+	// 各タイプの個数のカウント
+	switch ( pin_info.direction() ) {
+	case DotlibPin::kInput:
+	  ++ ni;
+	  break;
+
+	case DotlibPin::kOutput:
+	  ++ no;
+	  break;
+
+	case DotlibPin::kInout:
+	  ++ nio;
+	  break;
+
+	case DotlibPin::kInternal:
+	  ++ nit;
+	  break;
+
+	default:
+	  assert_not_reached(__FILE__, __LINE__);
+	  break;
+	}
       }
       if ( error ) {
 	continue;
       }
+      assert_cond( pin_id == npin, __FILE__, __LINE__);
+    }
+    ymuint ni2 = ni + nio;
+
+    // ピン名とピン番号の対応づけを行う．
+    {
+      ymuint ipos = 0;
+      ymuint itpos = 0;
+      for (ymuint pin_id = 0; pin_id < npin; ++ pin_id) {
+	DotlibPin& pin_info = pin_info_array[pin_id];
+	switch ( pin_info.direction() ) {
+	case DotlibPin::kInput:
+	case DotlibPin::kInout:
+	  pin_map.insert(make_pair(pin_info.name(), ipos));
+	  ++ ipos;
+	  break;
+
+	case DotlibPin::kInternal:
+	  pin_map.insert(make_pair(pin_info.name(), itpos + ni2));
+	  ++ itpos;
+	  break;
+
+	default:
+	  break;
+	}
+      }
+      assert_cond( ipos == ni2, __FILE__, __LINE__);
+      assert_cond( itpos == nit, __FILE__, __LINE__);
     }
 
+    // FF情報の読み出し
     const DotlibNode* dt_ff = cell_info.ff();
-    const DotlibNode* dt_latch = cell_info.latch();
-
-    // セルの生成
-    CiCell* cell = NULL;
-    if ( dt_ff ) {
-      DotlibFF ff_info;
+    DotlibFF ff_info;
+    if ( dt_ff != NULL ) {
       if ( !dt_ff->get_ff_info(ff_info) ) {
 	continue;
       }
       ShString var1 = ff_info.var1_name();
       ShString var2 = ff_info.var2_name();
+      // pin_map に登録しておく
+      pin_map.insert(make_pair(var1, ni2 + 0));
+      pin_map.insert(make_pair(var2, ni2 + 1));
+    }
+
+    // ラッチ情報の読み出し
+    const DotlibNode* dt_latch = cell_info.latch();
+    DotlibLatch latch_info;
+    if ( dt_latch != NULL) {
+      if ( !dt_latch->get_latch_info(latch_info) ) {
+	continue;
+      }
+      ShString var1 = latch_info.var1_name();
+      ShString var2 = latch_info.var2_name();
+      // pin_map に登録しておく
+      pin_map.insert(make_pair(var1, ni2 + 0));
+      pin_map.insert(make_pair(var2, ni2 + 1));
+    }
+
+    // 遷移表情報の読み出し
+    const DotlibNode* dt_fsm = cell_info.statetable();
+
+    // 出力ピン(入出力ピン)の論理式を作る．
+    vector<bool> output_array;
+    vector<LogExpr> logic_array;
+    vector<LogExpr> tristate_array;
+    ymuint no2 = no + nio;
+    output_array.reserve(no2);
+    logic_array.reserve(no2);
+    tristate_array.reserve(no2);
+    for (ymuint i = 0; i < npin; ++ i) {
+      DotlibPin& pin_info = pin_info_array[i];
+      switch ( pin_info.direction() ) {
+      case DotlibPin::kOutput:
+	{
+	  const DotlibNode* func_node = pin_info.function();
+	  if ( func_node ) {
+	    LogExpr expr = dot2expr(func_node, pin_map);
+	    logic_array.push_back(expr);
+	    output_array.push_back(true);
+	  }
+	  else {
+	    logic_array.push_back(LogExpr::make_zero());
+	    output_array.push_back(false);
+	  }
+	  const DotlibNode* three_state = pin_info.three_state();
+	  if ( three_state ) {
+	    LogExpr expr = dot2expr(three_state, pin_map);
+	    tristate_array.push_back(expr);
+	  }
+	  else {
+	    tristate_array.push_back(LogExpr::make_zero());
+	  }
+	}
+	break;
+
+      case DotlibPin::kInout:
+	{
+	  const DotlibNode* func_node = pin_info.function();
+	  if ( func_node ) {
+	    LogExpr expr = dot2expr(func_node, pin_map);
+	    logic_array.push_back(expr);
+	    output_array.push_back(true);
+	  }
+	  else {
+	    logic_array.push_back(LogExpr::make_zero());
+	    output_array.push_back(false);
+	  }
+	  const DotlibNode* three_state = pin_info.three_state();
+	  if ( three_state ) {
+	    LogExpr expr = dot2expr(three_state, pin_map);
+	    tristate_array.push_back(expr);
+	  }
+	  else {
+	    tristate_array.push_back(LogExpr::make_zero());
+	  }
+	}
+	break;
+
+      default:
+	break;
+      }
+    }
+
+    // セルの生成
+    if ( dt_ff ) {
       LogExpr next_state = dot2expr(ff_info.next_state(), pin_map);
       LogExpr clocked_on = dot2expr(ff_info.clocked_on(), pin_map);
       LogExpr clocked_on_also = dot2expr(ff_info.clocked_on_also(), pin_map);
@@ -223,24 +316,18 @@ gen_library(const DotlibNode* dt_library)
       LogExpr preset = dot2expr(ff_info.preset(), pin_map);
       ymuint v1 = ff_info.clear_preset_var1();
       ymuint v2 = ff_info.clear_preset_var2();
+      library->new_ff_cell(cell_id, cell_name, area,
+			   ni, no, nio, nbus, nbundle,
+			   output_array,
+			   logic_array,
+			   tristate_array,
+			   next_state,
+			   clocked_on, clocked_on_also,
+			   clear, preset,
+			   v1, v2);
 
-      cell = library->new_ff_cell(cell_id, cell_name, area,
-				  var1, var2,
-				  next_state, clocked_on, clocked_on_also,
-				  clear, preset, v1, v2,
-				  npin, nbus, nbundle);
-
-      // pin_map に登録しておく
-      pin_map.insert(make_pair(var1, npin));
-      pin_map.insert(make_pair(var2, npin + 1));
     }
     else if ( dt_latch ) {
-      DotlibLatch latch_info;
-      if ( !dt_latch->get_latch_info(latch_info) ) {
-	continue;
-      }
-      ShString var1 = latch_info.var1_name();
-      ShString var2 = latch_info.var2_name();
       LogExpr data_in = dot2expr(latch_info.data_in(), pin_map);
       LogExpr enable = dot2expr(latch_info.enable(), pin_map);
       LogExpr enable_also = dot2expr(latch_info.enable_also(), pin_map);
@@ -248,55 +335,69 @@ gen_library(const DotlibNode* dt_library)
       LogExpr preset = dot2expr(latch_info.preset(), pin_map);
       ymuint v1 = latch_info.clear_preset_var1();
       ymuint v2 = latch_info.clear_preset_var2();
-
-      cell = library->new_latch_cell(cell_id, cell_name, area,
-				     var1, var2,
-				     data_in, enable, enable_also,
-				     clear, preset, v1, v2,
-				     npin, nbus, nbundle);
-
-      // pin_map に登録しておく
-      pin_map.insert(make_pair(var1, npin));
-      pin_map.insert(make_pair(var2, npin + 1));
+      library->new_latch_cell(cell_id, cell_name, area,
+			      ni, no, nio, nbus, nbundle,
+			      output_array,
+			      logic_array,
+			      tristate_array,
+			      data_in,
+			      enable, enable_also,
+			      clear, preset,
+			      v1, v2);
+    }
+    else if ( dt_fsm ) {
+      library->new_fsm_cell(cell_id, cell_name, area,
+			    ni, no, nio, nit, nbus, nbundle,
+			    output_array,
+			    logic_array,
+			    tristate_array);
     }
     else {
-      cell = library->new_logic_cell(cell_id, cell_name, area,
-				     npin, nbus, nbundle);
+      library->new_logic_cell(cell_id, cell_name, area,
+			      ni, no, nio, nbus, nbundle,
+			      output_array,
+			      logic_array,
+			      tristate_array);
     }
 
     // ピンの生成
+    ymuint i_pos = 0;
+    ymuint o_pos = 0;
+    ymuint io_pos = 0;
+    ymuint it_pos = 0;
     for (ymuint i = 0; i < npin; ++ i) {
       const DotlibPin& pin_info = pin_info_array[i];
       switch ( pin_info.direction() ) {
       case DotlibPin::kInput:
-	{
+	{ // 入力ピンの生成
 	  CellCapacitance cap(pin_info.capacitance());
 	  CellCapacitance rise_cap(pin_info.rise_capacitance());
 	  CellCapacitance fall_cap(pin_info.fall_capacitance());
-	  library->new_cell_input(cell, i, pin_info.name(),
+	  library->new_cell_input(cell_id, i, i_pos, pin_info.name(),
 				  cap, rise_cap, fall_cap);
 	}
+	++ i_pos;
 	break;
 
       case DotlibPin::kOutput:
-	{
+	{ // 出力の生成
 	  CellCapacitance max_fanout(pin_info.max_fanout());
 	  CellCapacitance min_fanout (pin_info.min_fanout());
 	  CellCapacitance max_capacitance(pin_info.max_capacitance());
 	  CellCapacitance min_capacitance(pin_info.min_capacitance());
 	  CellTime max_transition(pin_info.max_transition());
 	  CellTime min_transition(pin_info.min_transition());
-	  library->new_cell_output(cell, i, pin_info.name(),
+	  library->new_cell_output(cell_id, i, o_pos, pin_info.name(),
 				   max_fanout, min_fanout,
 				   max_capacitance, min_capacitance,
 				   max_transition, min_transition);
+#if 0
 	  const DotlibNode* func_node = pin_info.function();
 	  if ( func_node ) {
 	    LogExpr expr = dot2expr(func_node, pin_map);
-	    library->set_opin_function(cell, i, expr);
-
+	    cell->set_logic_expr(o_pos, expr);
 #if 0
-	    TvFunc tv_function = expr_to_tvfunc(expr, ni);
+	    TvFunc tv_function = expr.make_tv(ni);
 	    for (ymuint i = 0; i < ni; ++ i) {
 	      // タイミング情報の設定
 	      const DotlibNode* pt_pin = ipin_array[i];
@@ -306,15 +407,15 @@ gen_library(const DotlibNode* dt_library)
 	      bool redundant = false;
 	      if ( ~p_func && n_func ) {
 		if ( ~n_func && p_func ) {
-		  sense_real = kSenseNonUnate;
+		  sense_real = kCellNonUnate;
 		}
 		else {
-		  sense_real = kSenseNegaUnate;
+		  sense_real = kCellNegaUnate;
 		}
 	      }
 	      else {
 		if ( ~n_func && p_func ) {
-		  sense_real = kSensePosiUnate;
+		  sense_real = kCellPosiUnate;
 		}
 		else {
 		  // つまり p_func == n_func ということ．
@@ -325,24 +426,24 @@ gen_library(const DotlibNode* dt_library)
 		  MsgMgr::put_msg(__FILE__, __LINE__,
 				  pt_pin->loc(),
 				  kMsgWarning,
-				  "MISLIB_PARSER",
+				  "DOTLIB_PARSER",
 				  buf.str());
 		  redundant = true;
 		}
 	      }
 
-	      tCellTimingSense sense = kSenseNonUnate;
+	      tCellTimingSense sense = kCellNonUnate;
 	      switch ( pt_pin->phase()->type() ) {
 	      case DotlibNode::kNoninv:
-		sense = kSensePosiUnate;
+		sense = kCellPosiUnate;
 		break;
 
 	      case DotlibNode::kInv:
-		sense = kSenseNegaUnate;
+		sense = kCellNegaUnate;
 		break;
 
 	      case DotlibNode::kUnknown:
-		sense = kSenseNonUnate;
+		sense = kCellNonUnate;
 		break;
 
 	      default:
@@ -356,7 +457,7 @@ gen_library(const DotlibNode* dt_library)
 		MsgMgr::put_msg(__FILE__, __LINE__,
 				pt_pin->phase()->loc(),
 				kMsgWarning,
-				"MISLIB_PARSER",
+				"DOTLIB_PARSER",
 				buf.str());
 		sense = sense_real;
 	      }
@@ -370,7 +471,7 @@ gen_library(const DotlibNode* dt_library)
 						       CellTime(0.0),
 						       r_r, f_r);
 	      if ( !redundant ) {
-		library->set_opin_timing(opin, i, sense, timing);
+		library->set_cell_timing(cell, i, o_pos, sense, timing);
 	      }
 	    }
 #endif
@@ -378,13 +479,15 @@ gen_library(const DotlibNode* dt_library)
 	  const DotlibNode* three_state = pin_info.three_state();
 	  if ( three_state ) {
 	    LogExpr expr = dot2expr(three_state, pin_map);
-	    library->set_opin_three_state(cell, i, expr);
+	    cell->set_tristate_expr(o_pos, expr);
 	  }
+#endif
 	}
+	++ o_pos;
 	break;
 
       case DotlibPin::kInout:
-	{
+	{ // 入出力ピンの生成
 	  CellCapacitance cap(pin_info.capacitance());
 	  CellCapacitance rise_cap(pin_info.rise_capacitance());
 	  CellCapacitance fall_cap(pin_info.fall_capacitance());
@@ -394,16 +497,18 @@ gen_library(const DotlibNode* dt_library)
 	  CellCapacitance min_capacitance(pin_info.min_capacitance());
 	  CellTime max_transition(pin_info.max_transition());
 	  CellTime min_transition(pin_info.min_transition());
-	  library->new_cell_inout(cell, i, pin_info.name(),
+	  library->new_cell_inout(cell_id, i, io_pos + ni, io_pos + no, pin_info.name(),
 				  cap, rise_cap, fall_cap,
 				  max_fanout, min_fanout,
 				  max_capacitance, min_capacitance,
 				  max_transition, min_transition);
 	}
+	++ io_pos;
 	break;
 
       case DotlibPin::kInternal:
-	library->new_cell_internal(cell, i, pin_info.name());
+	library->new_cell_internal(cell_id, i, it_pos, pin_info.name());
+	++ it_pos;
 	break;
 
       default:
@@ -412,6 +517,8 @@ gen_library(const DotlibNode* dt_library)
     }
 
   }
+
+  library->compile();
 
   return library;
 }
@@ -442,7 +549,7 @@ CellDotlibReader::~CellDotlibReader()
 // @return 読み込んで作成したセルライブラリを返す．
 // @note エラーが起きたら NULL を返す．
 const CellLibrary*
-CellDotlibReader::read(const string& filename)
+CellDotlibReader::operator()(const string& filename)
 {
   using namespace nsDotlib;
 

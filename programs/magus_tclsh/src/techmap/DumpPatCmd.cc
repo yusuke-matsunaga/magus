@@ -11,7 +11,7 @@
 
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
-#include "ym_cell/CellMgr.h"
+#include "ym_cell/CellLibrary.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -91,7 +91,7 @@ DumpPatCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  CellMgr::dump_library(os, *library);
+  library->dump(os);
 
   return TCL_OK;
 }

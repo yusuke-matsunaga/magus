@@ -44,10 +44,10 @@ MagCmd::mgr() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief カレントセルライブラリの取得
-CellMgr*
-MagCmd::cur_cellmgr()
+const CellLibrary*
+MagCmd::cur_cell_library()
 {
-  return mMagMgr->cur_cellmgr();
+  return mMagMgr->cur_cell_library();
 }
 
 

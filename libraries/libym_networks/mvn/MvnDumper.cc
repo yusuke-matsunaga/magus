@@ -22,6 +22,8 @@
 #include "ym_verilog/vl/VlDeclArray.h"
 #include "ym_verilog/vl/VlRange.h"
 
+#include "ym_cell/Cell.h"
+
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
@@ -140,6 +142,11 @@ dump_node(ostream& s,
 	s << " " << val[n - i - 1];
       }
       s << dec << ")";
+    }
+    break;
+  case MvnNode::kCell:
+    {
+      s << "Cell(" << node->cell()->name() << ")";
     }
     break;
   default:

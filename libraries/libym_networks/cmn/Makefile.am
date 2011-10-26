@@ -28,7 +28,10 @@ libym_cmn_la_SOURCES = \
 	CmnNodePI.h \
 	CmnNodePO.h \
 	CmnPort.cc \
+	CmnBlifWriter.cc \
 	CmnVerilogWriter.cc \
+	BlifWriterImpl.h \
+	BlifWriterImpl.cc \
 	VerilogWriterImpl.h \
 	VerilogWriterImpl.cc
 

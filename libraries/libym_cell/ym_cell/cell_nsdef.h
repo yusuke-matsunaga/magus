@@ -40,12 +40,80 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
+/// @brief タイミングの条件を表す列挙型
+//////////////////////////////////////////////////////////////////////
+enum tCellTimingSense {
+  kCellPosiUnate = 1,
+  kCellNegaUnate = 2,
+  kCellNonUnate  = 3
+};
+
+
+/////////////////////////////////////////////////////////////////////
+/// @brief タイミング情報の型を表す列挙型
+//////////////////////////////////////////////////////////////////////
+enum tCellTimingType {
+  kCellTimingCombinational          = 0,
+  kCellTimingCombinationalRise      = 1,
+  kCellTimingCombinationalFall      = 2,
+
+  kCellTimingThreeStateEnable       = 3,
+  kCellTimingThreeStateDisable      = 4,
+  kCellTimingThreeStateEnableRise   = 5,
+  kCellTimingThreeStateEnableFall   = 6,
+  kCellTimingThreeStateDisableRise  = 7,
+  kCellTimingThreeStateDisableFall  = 8,
+
+  kCellTimingRisingEdge             = 9,
+  ktimingFallingEdge            = 10,
+
+  kCellTimingPreset                 = 11,
+  kCellTimingClear                  = 12,
+
+  kCellTimingHoldRising             = 13,
+  kCellTimingHaldFalling            = 14,
+
+  kCellTimingSetupRising            = 15,
+  kCellTimingSetupFalling           = 16,
+
+  kCellTimingRecoveryRising         = 17,
+  kCellTimingRecoveryFalling        = 18,
+
+  kCellTimingSkewRising             = 19,
+  kCellTimingSkewFalling            = 20,
+
+  kCellTimingRemovalRising          = 21,
+  kCellTimingRemovalFalling         = 22,
+
+  kCellTimingNonSeqSetupRising      = 23,
+  kCellTimingNonSeqSetupFalling     = 24,
+  kCellTimingNonSeqHoldRising       = 25,
+  kCellTimingNonSeqHoldFalling      = 26,
+
+  kCellTimingNochangeHighHigh       = 27,
+  kCellTimingNochangeHighLow        = 28,
+  kCellTimingNochangeLowHigh        = 29,
+  kCellTimingNochangeLowLow         = 30
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @brief パタングラフのノードの型
+//////////////////////////////////////////////////////////////////////
+enum tCellPatType {
+  kCellPatInput = 0,
+  kCellPatAnd   = 2,
+  kCellPatXor   = 3
+};
+
+
+//////////////////////////////////////////////////////////////////////
 // クラスの前方参照
 //////////////////////////////////////////////////////////////////////
 
 class CellArea;
 class CellTime;
-class CellCapaciance;
+class CellCapacitance;
 class CellResistance;
 
 class CellLibrary;
@@ -58,20 +126,17 @@ class CellTiming;
 class CellLutTemplate;
 class CellLut;
 
+class CellReader;
 class CellMislibReader;
 class CellDotlibReader;
 
+class CellDumper;
+class CellRestorer;
+
 class CellGroup;
-class CellFuncClass;
-class CellFuncGroup;
-class CellFFClass;
-class CellFFGroup;
-class CellFFPosArray;
-class CellLatchClass;
-class CellLatchGroup;
-class CellLatchPosArray;
-class CellMgr;
-class CellPatMgr;
+class CellClass;
+class CellFFInfo;
+class CellLatchInfo;
 class CellPatGraph;
 
 END_NAMESPACE_YM_CELL
@@ -80,7 +145,7 @@ BEGIN_NAMESPACE_YM
 
 using nsCell::CellArea;
 using nsCell::CellTime;
-using nsCell::CellCapaciance;
+using nsCell::CellCapacitance;
 using nsCell::CellResistance;
 
 using nsCell::CellLibrary;
@@ -93,20 +158,25 @@ using nsCell::CellTiming;
 using nsCell::CellLutTemplate;
 using nsCell::CellLut;
 
+using nsCell::CellReader;
 using nsCell::CellMislibReader;
 using nsCell::CellDotlibReader;
 
-using nsCell::CellFuncClass;
-using nsCell::CellFuncGroup;
-using nsCell::CellFFClass;
-using nsCell::CellFFGroup;
-using nsCell::CellFFPosArray;
-using nsCell::CellLatchClass;
-using nsCell::CellLatchGroup;
-using nsCell::CellLatchPosArray;
-using nsCell::CellMgr;
-using nsCell::CellPatMgr;
+using nsCell::CellDumper;
+using nsCell::CellRestorer;
+
+using nsCell::CellGroup;
+using nsCell::CellClass;
+using nsCell::CellFFInfo;
+using nsCell::CellLatchInfo;
 using nsCell::CellPatGraph;
+
+using nsCell::tCellTimingSense;
+using nsCell::tCellTimingType;
+using nsCell::tCellPatType;
+using nsCell::kCellPatInput;
+using nsCell::kCellPatAnd;
+using nsCell::kCellPatXor;
 
 END_NAMESPACE_YM
 

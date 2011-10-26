@@ -48,8 +48,8 @@ private:
   // verilog オプションの解析用オブジェクト
   TclPopt* mPoptVerilog;
 
-  // spice オプションの解析用オブジェクト
-  TclPopt* mPoptSpice;
+  // blif オプションの解析用オブジェクト
+  TclPopt* mPoptBlif;
 
 };
 

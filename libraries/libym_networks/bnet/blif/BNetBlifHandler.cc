@@ -10,6 +10,10 @@
 #include "BNetBlifHandler.h"
 #include "ym_networks/BNetwork.h"
 #include "ym_networks/BNetManip.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_cell/Cell.h"
+#include "ym_cell/CellPin.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF
@@ -151,53 +155,35 @@ BNetBlifHandler::names(const vector<ymuint32>& name_id_array,
       expr = LogExpr::make_and(or_expr);
     }
   }
-  BNodeVector fanins;
+  BNodeVector fanins(ni);
   for (ymuint i = 0; i < ni; ++ i) {
     BNode* inode = get_node(name_id_array[i]);
-    fanins.push_back(inode);
+    fanins[i] = inode;
   }
   bool stat = mManip->change_logic(node, expr, fanins);
   return stat;
 }
 
-// @brief .gate 文の開始
-// @param[in] loc1 .gate の位置情報
-// @param[in] loc2 セル名の位置情報
-// @param[in] name セル名
+// @brief .gate 文の処理
+// @param[in] cell セル
+// @param[in] onode_id 出力ノードのID番号
+// @param[in] inode_id_array 入力ノードのID番号の配列
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-BNetBlifHandler::gate_begin(const FileRegion& loc1,
-			    const FileRegion& loc2,
-			    const char* name)
+BNetBlifHandler::gate(const Cell* cell,
+		      ymuint32 onode_id,
+		      const vector<ymuint32>& inode_id_array)
 {
-  // 無視
-  return true;
-}
-
-// @brief .gate 文中のピン割り当ての処理
-// @param[in] loc1 ピン名の位置情報
-// @param[in] f_name ピン名
-// @param[in] loc2 ノード名の位置情報
-// @param[in] a_name ノード名
-// @retval true 処理が成功した．
-// @retval false エラーが起こった．
-bool
-BNetBlifHandler::gate_assign(const FileRegion& loc1,
-			     const char* f_name,
-			     const FileRegion& loc2,
-			     const char* a_name)
-{
-  // 無視
-  return true;
-}
-
-// @brief .gate 文の終了
-bool
-BNetBlifHandler::gate_end()
-{
-  // 無視
-  return true;
+  LogExpr expr = cell->logic_expr(0);
+  BNode* onode = get_node(onode_id);
+  ymuint ni = inode_id_array.size();
+  BNodeVector fanins(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    fanins[i] = get_node(inode_id_array[i]);
+  }
+  bool stat = mManip->change_logic(onode, expr, fanins);
+  return stat;
 }
 
 // @brief .latch 文中の本体の処理

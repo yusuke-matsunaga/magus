@@ -87,36 +87,17 @@ public:
 	const char* cover_pat,
 	char opat);
 
-  /// @brief .gate 文の開始
-  /// @param[in] loc1 .gate の位置情報
-  /// @param[in] loc2 セル名の位置情報
-  /// @param[in] name セル名
+  /// @brief .gate 文の処理
+  /// @param[in] cell セル
+  /// @param[in] onode_id 出力ノードのID番号
+  /// @param[in] inode_id_array 入力ノードのID番号の配列
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
-  gate_begin(const FileRegion& loc1,
-	     const FileRegion& loc2,
-	     const char* name);
-
-  /// @brief .gate 文中のピン割り当ての処理
-  /// @param[in] loc1 ピン名の位置情報
-  /// @param[in] f_name ピン名
-  /// @param[in] loc2 ノード名の位置情報
-  /// @param[in] a_name ノード名
-  /// @retval true 処理が成功した．
-  /// @retval false エラーが起こった．
-  virtual
-  bool
-  gate_assign(const FileRegion& loc1,
-	      const char* f_name,
-	      const FileRegion& loc2,
-	      const char* a_name);
-
-  /// @brief .gate 文の終了
-  virtual
-  bool
-  gate_end();
+  gate(const Cell* cell,
+       ymuint32 onode_id,
+       const vector<ymuint32>& inode_id_array);
 
   /// @brief .latch 文の処理
   /// @param[in] name1_id 最初の識別子のID番号
@@ -301,39 +282,16 @@ TestBlifHandler::names(const vector<ymuint32>& name_id_array,
   return true;
 }
 
-// @brief .gate 文の開始
-// @param[in] loc1 .gate の位置情報
-// @param[in] loc2 セル名の位置情報
-// @param[in] name セル名
+// @brief .gate 文の処理
+// @param[in] cell セル
+// @param[in] onode_id 出力ノードのID番号
+// @param[in] inode_id_array 入力ノードのID番号の配列
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-TestBlifHandler::gate_begin(const FileRegion& loc1,
-			    const FileRegion& loc2,
-			    const char* name)
-{
-  return true;
-}
-
-// @brief .gate 文中のピン割り当ての処理
-// @param[in] loc1 ピン名の位置情報
-// @param[in] f_name ピン名
-// @param[in] loc2 ノード名の位置情報
-// @param[in] a_name ノード名
-// @retval true 処理が成功した．
-// @retval false エラーが起こった．
-bool
-TestBlifHandler::gate_assign(const FileRegion& loc1,
-			     const char* f_name,
-			     const FileRegion& loc2,
-			     const char* a_name)
-{
-  return true;
-}
-
-// @brief .gate 文の終了
-bool
-TestBlifHandler::gate_end()
+TestBlifHandler::gate(const Cell* cell,
+		      ymuint32 onode_id,
+		      const vector<ymuint32>& inode_id_array)
 {
   return true;
 }
@@ -404,7 +362,7 @@ main(int argc,
 	StreamMsgHandler* msg_handler = new StreamMsgHandler(&cerr);
 	MsgMgr::reg_handler(msg_handler);
 
-	if ( !parser.read(filename) ) {
+	if ( !parser.read(filename, NULL) ) {
 	  cerr << "Error in reading " << argv[1] << endl;
 	  return 4;
 	}

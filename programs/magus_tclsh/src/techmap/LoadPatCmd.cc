@@ -9,7 +9,7 @@
 
 #include "LoadPatCmd.h"
 #include "ym_tclpp/TclPopt.h"
-#include "ym_cell/CellMgr.h"
+#include "ym_cell/CellLibrary.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -59,7 +59,7 @@ LoadPatCmd::cmd_proc(TclObjVector& objv)
     set_result(emsg);
     return TCL_ERROR;
   }
-  if ( !cur_cellmgr()->load_library(is) ) {
+  if ( !cur_cell_library()->load_library(is) ) {
     TclObj emsg;
     emsg << "Error occured in reading " << filename;
     set_result(emsg);

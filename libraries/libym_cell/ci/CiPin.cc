@@ -17,8 +17,11 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] cell 親のセル
 // @param[in] name ピン名
-CiPin::CiPin(const ShString& name) :
+CiPin::CiPin(CiCell* cell,
+	     const ShString& name) :
+  mCell(cell),
   mName(name)
 {
 }
@@ -30,7 +33,7 @@ CiPin::~CiPin()
 
 // @brief ピン番号を返す．
 ymuint
-CiPin::id() const
+CiPin::pin_id() const
 {
   return mId;
 }
@@ -70,6 +73,14 @@ CiPin::is_internal() const
   return false;
 }
 
+// @brief 入力ピン番号を返す．
+// @note 入力ピンもしくは入出力ピンの時のみ意味を持つ．
+ymuint
+CiPin::input_id() const
+{
+  return 0;
+}
+
 // @brief 負荷容量を返す．
 CellCapacitance
 CiPin::capacitance() const
@@ -89,6 +100,14 @@ CellCapacitance
 CiPin::fall_capacitance() const
 {
   return CellCapacitance(0.0);
+}
+
+// @brief 出力ピン番号を返す．
+// @note 出力ピンもしくは入出力ピンの時のみ意味を持つ．
+ymuint
+CiPin::output_id() const
+{
+  return 0;
 }
 
 // @brief 論理式を持っているときに true を返す．
@@ -161,18 +180,15 @@ CiPin::min_transition() const
   return CellTime(0.0);
 }
 
-// @brief タイミング情報の取得
-// @param[in] ipos 開始ピン番号
-// @param[in] timing_sense タイミング情報の摘要条件
-// @return 条件に合致するタイミング情報を返す．
-// @note なければ NULL を返す．
-const CellTiming*
-CiPin::timing(ymuint ipos,
-	      tTimingSense sense) const
+// @brief 内部ピン番号を返す．
+// @note 内部ピンの時のみ意味を持つ．
+ymuint
+CiPin::internal_id() const
 {
-  return NULL;
+  return 0;
 }
 
+#if 0
 // @brief 出力ピン(入出力ピン)の関数を設定する．
 // @param[in] function 関数を表す論理式
 void
@@ -180,30 +196,12 @@ CiPin::set_function(const LogExpr& function)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
+#endif
 
 // @brief 出力ピン(入出力ピン)の three_state 条件を設定する．
 // @param[in] expr three_state 条件を表す論理式
 void
 CiPin::set_three_state(const LogExpr& expr)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-
-// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
-void
-CiPin::set_timing_array(const CellTiming** timing_array)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-
-// @brief 出力ピン(入出力ピン)のタイミング情報を設定する．
-// @param[in] pin_id 入力ピンのピン番号
-// @param[in] sense タイミング情報の適用条件
-// @param[in] timing 設定するタイミング情報
-void
-CiPin::set_timing(ymuint pin_id,
-		  tTimingSense sense,
-		  const CellTiming* timing)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
@@ -214,15 +212,17 @@ CiPin::set_timing(ymuint pin_id,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] cell 親のセル
 // @param[in] name ピン名
 // @param[in] capacitance 負荷容量
 // @param[in] rise_capacitance 立ち上がり時の負荷容量
 // @param[in] fall_capacitance 立ち下がり時の負荷容量
-CiInputPin::CiInputPin(const ShString& name,
+CiInputPin::CiInputPin(CiCell* cell,
+		       const ShString& name,
 		       CellCapacitance capacitance,
 		       CellCapacitance rise_capacitance,
 		       CellCapacitance fall_capacitance) :
-  CiPin(name),
+  CiPin(cell, name),
   mCapacitance(capacitance),
   mRiseCapacitance(rise_capacitance),
   mFallCapacitance(fall_capacitance)
@@ -246,6 +246,14 @@ bool
 CiInputPin::is_input() const
 {
   return true;
+}
+
+// @brief 入力ピン番号を返す．
+// @note 入力ピンもしくは入出力ピンの時のみ意味を持つ．
+ymuint
+CiInputPin::input_id() const
+{
+  return mInputId;
 }
 
 // @brief 負荷容量を返す．
@@ -275,6 +283,7 @@ CiInputPin::fall_capacitance() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] cell 親のセル
 // @param[in] name ピン名
 // @param[in] max_fanout 最大ファンアウト容量
 // @param[in] min_fanout 最小ファンアウト容量
@@ -282,14 +291,15 @@ CiInputPin::fall_capacitance() const
 // @param[in] min_capacitance 最小負荷容量
 // @param[in] max_transition 最大遷移時間
 // @param[in] min_transition 最小遷移時間
-CiOutputPinBase::CiOutputPinBase(const ShString& name,
+CiOutputPinBase::CiOutputPinBase(CiCell* cell,
+				 const ShString& name,
 				 CellCapacitance max_fanout,
 				 CellCapacitance min_fanout,
 				 CellCapacitance max_capacitance,
 				 CellCapacitance min_capacitance,
 				 CellTime max_transition,
 				 CellTime min_transition) :
-  CiPin(name),
+  CiPin(cell, name),
   mHasFunction(0U),
   mMaxFanout(max_fanout),
   mMinFanout(min_fanout),
@@ -303,6 +313,14 @@ CiOutputPinBase::CiOutputPinBase(const ShString& name,
 // @brief デストラクタ
 CiOutputPinBase::~CiOutputPinBase()
 {
+}
+
+// @brief 出力ピン番号を返す．
+// @note 出力ピンもしくは入出力ピンの時のみ意味を持つ．
+ymuint
+CiOutputPinBase::output_id() const
+{
+  return mOutputId;
 }
 
 // @brief 論理式を持っているときに true を返す．
@@ -375,6 +393,7 @@ CiOutputPinBase::min_transition() const
   return mMinTransition;
 }
 
+#if 0
 // @brief タイミング情報の取得
 // @param[in] ipos 開始ピン番号
 // @param[in] timing_sense タイミング情報の摘要条件
@@ -390,6 +409,7 @@ CiOutputPinBase::timing(ymuint ipos,
   }
   return mTimingArray[ipos * 2 + offset];
 }
+#endif
 
 // @brief 出力ピン(入出力ピン)の関数を設定する．
 // @param[in] function 関数を表す論理式
@@ -408,40 +428,14 @@ CiOutputPinBase::set_three_state(const LogExpr& three_state)
   mThreeState = three_state;
 }
 
+#if 0
 // @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
 void
 CiOutputPinBase::set_timing_array(const CellTiming** timing_array)
 {
   mTimingArray = timing_array;
 }
-
-// @brief 出力ピン(入出力ピン)のタイミング情報を設定する．
-// @param[in] pin_id 入力ピンのピン番号
-// @param[in] sense タイミング情報の適用条件
-// @param[in] timing 設定するタイミング情報
-void
-CiOutputPinBase::set_timing(ymuint pin_id,
-			    tTimingSense sense,
-			    const CellTiming* timing)
-{
-  switch ( sense ) {
-  case kSensePosiUnate:
-    mTimingArray[pin_id * 2 + 0] = timing;
-    break;
-
-  case kSenseNegaUnate:
-    mTimingArray[pin_id * 2 + 1] = timing;
-    break;
-
-  case kSenseNonUnate:
-    mTimingArray[pin_id * 2 + 0] = timing;
-    mTimingArray[pin_id * 2 + 1] = timing;
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-  }
-}
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -449,6 +443,7 @@ CiOutputPinBase::set_timing(ymuint pin_id,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+ /// @param[in] cell 親のセル
 // @param[in] name ピン名
 // @param[in] max_fanout 最大ファンアウト容量
 // @param[in] min_fanout 最小ファンアウト容量
@@ -456,14 +451,15 @@ CiOutputPinBase::set_timing(ymuint pin_id,
 // @param[in] min_capacitance 最小負荷容量
 // @param[in] max_transition 最大遷移時間
 // @param[in] min_transition 最小遷移時間
-CiOutputPin::CiOutputPin(const ShString& name,
+CiOutputPin::CiOutputPin(CiCell* cell,
+			 const ShString& name,
 			 CellCapacitance max_fanout,
 			 CellCapacitance min_fanout,
 			 CellCapacitance max_capacitance,
 			 CellCapacitance min_capacitance,
 			 CellTime max_transition,
 			 CellTime min_transition) :
-  CiOutputPinBase(name,
+  CiOutputPinBase(cell, name,
 		  max_fanout, min_fanout,
 		  max_capacitance, min_capacitance,
 		  max_transition, min_transition)
@@ -495,6 +491,7 @@ CiOutputPin::is_output() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] cell 親のセル
 // @param[in] name ピン名
 // @param[in] capacitance 負荷容量
 // @param[in] rise_capacitance 立ち上がり時の負荷容量
@@ -505,7 +502,8 @@ CiOutputPin::is_output() const
 // @param[in] min_capacitance 最小負荷容量
 // @param[in] max_transition 最大遷移時間
 // @param[in] min_transition 最小遷移時間
-CiInoutPin::CiInoutPin(const ShString& name,
+CiInoutPin::CiInoutPin(CiCell* cell,
+		       const ShString& name,
 		       CellCapacitance capacitance,
 		       CellCapacitance rise_capacitance,
 		       CellCapacitance fall_capacitance,
@@ -515,7 +513,7 @@ CiInoutPin::CiInoutPin(const ShString& name,
 		       CellCapacitance min_capacitance,
 		       CellTime max_transition,
 		       CellTime min_transition) :
-  CiOutputPinBase(name,
+  CiOutputPinBase(cell, name,
 		  max_fanout, min_fanout,
 		  max_capacitance, min_capacitance,
 		  max_transition, min_transition),
@@ -542,6 +540,14 @@ bool
 CiInoutPin::is_inout() const
 {
   return true;
+}
+
+// @brief 入力ピン番号を返す．
+// @note 入力ピンもしくは入出力ピンの時のみ意味を持つ．
+ymuint
+CiInoutPin::input_id() const
+{
+  return mInputId;
 }
 
 // @brief 負荷容量を返す．
@@ -571,9 +577,11 @@ CiInoutPin::fall_capacitance() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] cell 親のセル
 // @param[in] name ピン名
-CiInternalPin::CiInternalPin(const ShString& name) :
-  CiPin(name)
+CiInternalPin::CiInternalPin(CiCell* cell,
+			     const ShString& name) :
+  CiPin(cell, name)
 {
 }
 
@@ -594,6 +602,14 @@ bool
 CiInternalPin::is_internal() const
 {
   return true;
+}
+
+// @brief 内部ピン番号を返す．
+// @note 内部ピンの時のみ意味を持つ．
+ymuint
+CiInternalPin::internal_id() const
+{
+  return mInternalId;
 }
 
 END_NAMESPACE_YM_CELL

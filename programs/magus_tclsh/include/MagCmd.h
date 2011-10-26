@@ -50,8 +50,8 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief カレントセルライブラリの取得
-  CellMgr*
-  cur_cellmgr();
+  const CellLibrary*
+  cur_cell_library();
 
 
 protected:

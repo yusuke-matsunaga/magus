@@ -10,6 +10,7 @@
 
 
 #include "blif_nsdef.h"
+#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF
@@ -36,10 +37,12 @@ public:
 
   /// @brief 読み込みを行う．
   /// @param[in] filename ファイル名
+  /// @param[in] cell_library セルライブラリ
   /// @retval true 読み込みが成功した．
   /// @retval false 読み込みが失敗した．
   bool
-  read(const string& filename);
+  read(const string& filename,
+       const CellLibrary* cell_library);
 
   /// @brief イベントハンドラの登録
   /// @param[in] handler 登録するハンドラ

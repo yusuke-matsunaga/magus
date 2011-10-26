@@ -38,8 +38,20 @@ BEGIN_NAMESPACE_YM_NPN
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-NpnRawSig::NpnRawSig()
+// @param[in] func 対象の関数
+NpnRawSig::NpnRawSig(const TvFunc& func) :
+  mFunc(func)
 {
+  mNi = mFunc.ni();
+
+  // Walsh の0次と1次の係数を計算する．
+  // 2次の係数はオンデマンドで計算する．
+  mW0 = mFunc.walsh_01(mW1);
+  for (ymuint i = 0; i < mNi; ++ i) {
+    for (ymuint j = 0; j < mNi; ++ j) {
+      mW2flag[i * mNi + j] = 0;
+    }
+  }
 }
 
 // デストラクタ
@@ -49,25 +61,11 @@ NpnRawSig::~NpnRawSig()
 
 // @brief W0/W1 を用いて正規化する．
 void
-NpnRawSig::normalize(const TvFunc& func,
-		     NpnConf& conf)
+NpnRawSig::normalize(NpnConf& conf)
 {
-  mFunc = func;
-
-  mNi = func.ni();
-
-  // Walsh の0次と1次の係数を計算する．
-  // 2次の係数はオンデマンドで計算する．
-  mW0 = func.walsh_01(mW1);
-  for (ymuint i = 0; i < mNi; ++ i) {
-    for (ymuint j = 0; j < mNi; ++ j) {
-      mW2flag[i * mNi + j] = 0;
-    }
-  }
-
   if ( debug & debug_normalize ) {
     cout << "Before normalize" << endl;
-    cout << func << endl;
+    cout << mFunc << endl;
     dump_walsh(cout);
   }
 
@@ -102,7 +100,7 @@ NpnRawSig::normalize(const TvFunc& func,
     }
     else if ( w1 == 0 ) {
       ipol = 0;
-      bool stat = func.check_sup(i);
+      bool stat = mFunc.check_sup(i);
       if ( !stat ) {
 	// この入力はサポートではなかった
 	add_indep(i);
@@ -123,13 +121,13 @@ NpnRawSig::normalize(const TvFunc& func,
       // 1次係数が等しい場合
       // 対称性のチェックを行う．
       tPol poldiff = (mIpols[pos1] * ipol == -1) ? kPolNega : kPolPosi;
-      bool stat = func.check_sym(i, pos1, poldiff);
+      bool stat = mFunc.check_sym(i, pos1, poldiff);
       if ( stat ) {
 	// 対称だった
 	found = true;
 	if ( w1 == 0 && ic_num(pos1) == 1 ) {
 	  // bi-symmetry かどうかチェックする
-	  bool stat = func.check_sym(i, pos1, ~poldiff);
+	  bool stat = mFunc.check_sym(i, pos1, ~poldiff);
 	  if ( stat ) {
 	    set_bisym(pos1);
 	  }
@@ -140,7 +138,7 @@ NpnRawSig::normalize(const TvFunc& func,
       if ( w1 == 0 ) {
 	// w1 == 0 の時には逆相での対称性もチェックする．
 	// この場合，最初の要素の極性は常に kPolPosi のはず
-	bool stat = func.check_sym(i, pos1, kPolNega);
+	bool stat = mFunc.check_sym(i, pos1, kPolNega);
 	if ( stat ) {
 	  // 逆相で対称だった．
 	  found = true;
@@ -222,6 +220,7 @@ NpnRawSig::normalize(const TvFunc& func,
     dump_pols(cout);
   }
 
+#if 0
   if ( mNc > 0 ) {
     for (ymuint i = 0; i < mNc; ++ i) {
       ymuint pos = mIcRep[i];
@@ -235,6 +234,7 @@ NpnRawSig::normalize(const TvFunc& func,
     conf.set_opol(1);
   }
   conf.set_sig(this);
+#endif
 
 }
 
@@ -337,10 +337,10 @@ void
 NpnRawSig::dump_pols(ostream& s) const
 {
   s << "opol: ";
-  if ( opol() == -1 ) {
+  if ( mOpol == -1 ) {
     s << "N";
   }
-  else if ( opol() == 1 ) {
+  else if ( mOpol == 1 ) {
     s << "P";
   }
   else {
@@ -350,10 +350,10 @@ NpnRawSig::dump_pols(ostream& s) const
     << "ipol:";
   for (ymuint i = 0; i < ni(); ++ i) {
     s << " ";
-    if ( ipol(i) == -1 ) {
+    if ( mIpols[i] == -1 ) {
       s << "N";
     }
-    else if ( ipol(i) == 1 ) {
+    else if ( mIpols[i] == 1 ) {
       s << "P";
     }
     else {

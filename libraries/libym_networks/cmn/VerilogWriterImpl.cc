@@ -19,8 +19,45 @@
 #include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
 
+#include "../verilog/VlWriter.h"
+#include "../verilog/VlwModule.h"
+#include "../verilog/VlwModuleHeader.h"
+#include "../verilog/VlwIO.h"
+#include "../verilog/VlwAssign.h"
+#include "../verilog/VlwInst.h"
+
 
 BEGIN_NAMESPACE_YM_NETWORKS_CMN
+
+BEGIN_NONAMESPACE
+
+// Verilog 用のエスケープ文字列を作る．
+string
+vescape(const string& str)
+{
+  string::const_iterator p = str.begin();
+  char c = *p ++;
+  if ( c == '\\' ) {
+    return str;
+  }
+  if ( !isalpha(c) && c != '_' ) {
+    goto need_escape;
+  }
+  for ( ; p != str.end(); ++ p) {
+    char c = *p;
+    if ( !isalnum(c) && c != '_' ) {
+      goto need_escape;
+    }
+  }
+  return str;
+
+ need_escape:
+  // 先頭が '\' ならば次の空白までを識別子と見なす(らしい)
+  string ans = "\\" + str + " ";
+  return ans;
+}
+
+END_NONAMESPACE
 
 // @brief コンストラクタ
 VerilogWriterImpl::VerilogWriterImpl()
@@ -39,41 +76,48 @@ void
 VerilogWriterImpl::dump(ostream& s,
 			const CmnMgr& network)
 {
+  VlWriter writer(s);
+
   ymuint n = network.max_node_id();
   mNameArray.clear();
   mNameArray.resize(n, string());
 
   const CmnDffList& dff_list = network.dff_list();
   const CmnLatchList& latch_list = network.latch_list();
-  const CmnNodeList& input_list = network.input_list();
+  //const CmnNodeList& input_list = network.input_list();
   const CmnNodeList& output_list = network.output_list();
   const CmnNodeList& logic_list = network.logic_list();
-
-  s << "module " << network.name() << "(";
   ymuint np = network.port_num();
-  const char* sep = "";
-  for (ymuint i = 0; i < np; ++ i) {
-    const CmnPort* port = network.port(i);
-    s << sep << port->name();
-    sep = ", ";
 
-    ymuint nb = port->bit_width();
-    assert_cond( nb > 0, __FILE__, __LINE__);
-    if ( nb == 1 ) {
-      const CmnNode* input = port->input(0);
-      const CmnNode* output = port->output(0);
-      if ( input ) {
-	set_node_name(input, port->name());
-      }
-      else if ( output ) {
-	set_node_name(output, port->name());
-      }
-      else {
-	assert_not_reached(__FILE__, __LINE__);
+  VlwModule vlw_module(writer, network.name());
+
+  {
+    VlwModuleHeader vlw_module_hader(writer);
+
+    const char* sep = "";
+    for (ymuint i = 0; i < np; ++ i) {
+      const CmnPort* port = network.port(i);
+      writer.put_str(sep);
+      writer.put_idstr(port->name());
+      sep = ", ";
+
+      ymuint nb = port->bit_width();
+      assert_cond( nb > 0, __FILE__, __LINE__);
+      if ( nb == 1 ) {
+	const CmnNode* input = port->input(0);
+	const CmnNode* output = port->output(0);
+	if ( input ) {
+	  set_node_name(input, port->name());
+	}
+	else if ( output ) {
+	  set_node_name(output, port->name());
+	}
+	else {
+	  assert_not_reached(__FILE__, __LINE__);
+	}
       }
     }
   }
-  s << ");" << endl;
 
   for (ymuint i = 0; i < np; ++ i) {
     const CmnPort* port = network.port(i);
@@ -86,16 +130,18 @@ VerilogWriterImpl::dump(ostream& s,
       if ( input ) {
 	set_node_name(input, port_name);
 	if ( input->alt_node() ) {
-	  s << "  inout  ";
+	  VlwInout vlw_decl(writer);
+	  writer.put_elem(port_name);
 	}
 	else {
-	  s << "  input  ";
+	  VlwInput vlw_decl(writer);
+	  writer.put_elem(port_name);
 	}
-	s << port_name << ";" << endl;
       }
       else if ( output ) {
 	set_node_name(output, port_name);
-	s << "  output  " << port_name << ";" << endl;
+	VlwOutput vlw_decl(writer);
+	writer.put_elem(port_name);
       }
       else {
 	assert_not_reached(__FILE__, __LINE__);
@@ -108,7 +154,7 @@ VerilogWriterImpl::dump(ostream& s,
 	const CmnNode* input = port->input(j);
 	const CmnNode* output = port->output(j);
 	ostringstream buf;
-	buf << port_name << "[" << j << "]";
+	buf << vescape(port_name) << "[" << j << "]";
 	if ( input != NULL ) {
 	  has_input = true;
 	  set_node_name(input, buf.str());
@@ -119,34 +165,39 @@ VerilogWriterImpl::dump(ostream& s,
 	}
       }
       if ( !has_output ) {
-	s << "  input";
+	VlwInput vlw_decl(writer);
+	writer.put_elem(port_name, nb - 1, 0);
       }
       else if ( !has_input ) {
-	s << "  output";
+	VlwOutput vlw_decl(writer);
+	writer.put_elem(port_name, nb - 1, 0);
       }
       else {
-	s << "  inout";
+	VlwInout vlw_decl(writer);
+	writer.put_elem(port_name, nb - 1, 0);
       }
-      s << " [" << nb - 1 << ":" << 0 << "]  " << port_name << ";" << endl;
     }
   }
 
   for (CmnNodeList::const_iterator p = logic_list.begin();
        p != logic_list.end(); ++ p) {
     const CmnNode* node = *p;
-    s << "  wire   " << node_name(node) << ";" << endl;
+    VlwWire vlw_decl(writer);
+    writer.put_elem(node_name(node));
   }
 
   for (CmnDffList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
     const CmnDff* dff = *p;
     const CmnNode* q = dff->output1();
-    const CmnNode* iq = dff->output2();
+    const CmnNode* xq = dff->output2();
     if ( q->fanout_num() > 0 ) {
-      s << "  wire    " << node_name(q) << ";" << endl;
+      VlwWire vlw_decl(writer);
+      writer.put_elem(node_name(q));
     }
-    if ( iq->fanout_num() > 0 ) {
-      s << "  wire    " << node_name(iq) << ";" << endl;
+    if ( xq->fanout_num() > 0 ) {
+      VlwWire vlw_decl(writer);
+      writer.put_elem(node_name(xq));
     }
   }
 
@@ -158,14 +209,15 @@ VerilogWriterImpl::dump(ostream& s,
     }
     const CmnNode* inode = node->fanin(0);
     assert_cond( inode != NULL, __FILE__, __LINE__);
-    s << "  assign ";
+
+    VlwAssign vlw_assign(writer);
     if ( node->alt_node() ) {
-      s << node_name(node->alt_node());
+      vlw_assign.put_lhs(node_name(node->alt_node()));
     }
     else {
-      s << node_name(node);
+      vlw_assign.put_lhs(node_name(node));
     }
-    s << " = " << node_name(inode) << ";" << endl;
+    writer.put_idstr(node_name(inode));
   }
 
   for (CmnDffList::const_iterator p = dff_list.begin();
@@ -176,29 +228,29 @@ VerilogWriterImpl::dump(ostream& s,
     const CmnNode* onode1 = dff->output1();
     s << "  " << cell->name() << " U" << onode1->id() << " (";
     // データ入力
-    const CellPin* ipin = cell->pin(dffcell->data_pos());
+    const CellPin* ipin = cell->input(dffcell->data_pos());
     s << "." << ipin->name() << "(" << dff_node_name(dff->input()) << ")";
     // クロック入力
-    const CellPin* cpin = cell->pin(dffcell->clock_pos());
+    const CellPin* cpin = cell->input(dffcell->clock_pos());
     s << ", ." << cpin->name() << "(" << dff_node_name(dff->clock()) << ")";
     // クリア入力
     if ( dffcell->has_clear() ) {
-      const CellPin* rpin = cell->pin(dffcell->clear_pos());
+      const CellPin* rpin = cell->input(dffcell->clear_pos());
       s << ", ." << rpin->name() << "(" << dff_node_name(dff->clear()) << ")";
     }
     // プリセット入力
     if ( dffcell->has_preset() ) {
-      const CellPin* ppin = cell->pin(dffcell->preset_pos());
+      const CellPin* ppin = cell->input(dffcell->preset_pos());
       s << ", ." << ppin->name() << "(" << dff_node_name(dff->preset()) << ")";
     }
     // 肯定出力
     if ( dff->output1()->fanout_num() > 0 ) {
-      const CellPin* opin1 = cell->pin(dffcell->q_pos());
+      const CellPin* opin1 = cell->output(dffcell->q_pos());
       s << ", ." << opin1->name() << "(" << node_name(dff->output1()) << ")";
     }
     // 否定出力
     if ( dff->output2()->fanout_num() > 0 ) {
-      const CellPin* opin2 = cell->pin(dffcell->iq_pos());
+      const CellPin* opin2 = cell->output(dffcell->xq_pos());
       s << ", ." << opin2->name() << "(" << node_name(dff->output2()) << ")";
     }
     s << ");" << endl;
@@ -212,32 +264,27 @@ VerilogWriterImpl::dump(ostream& s,
     const CmnNode* onode1 = latch->output1();
     s << "  " << cell->name() << " U" << onode1->id() << " (";
     // データ入力
-    const CellPin* ipin = cell->pin(latchcell->data_pos());
+    const CellPin* ipin = cell->input(latchcell->data_pos());
     s << "." << ipin->name() << "(" << dff_node_name(latch->input()) << ")";
     // イネーブル入力
     if ( latchcell->has_enable() ) {
-      const CellPin* epin = cell->pin(latchcell->enable_pos());
+      const CellPin* epin = cell->input(latchcell->enable_pos());
       s << ", ." << epin->name() << "(" << dff_node_name(latch->enable()) << ")";
     }
     // クリア入力
     if ( latchcell->has_clear() ) {
-      const CellPin* rpin = cell->pin(latchcell->clear_pos());
+      const CellPin* rpin = cell->input(latchcell->clear_pos());
       s << ", ." << rpin->name() << "(" << dff_node_name(latch->clear()) << ")";
     }
     // プリセット入力
     if ( latchcell->has_preset() ) {
-      const CellPin* ppin = cell->pin(latchcell->preset_pos());
+      const CellPin* ppin = cell->input(latchcell->preset_pos());
       s << ", ." << ppin->name() << "(" << dff_node_name(latch->preset()) << ")";
     }
     // 肯定出力
     if ( latch->output1()->fanout_num() > 0 ) {
-      const CellPin* opin1 = cell->pin(latchcell->q_pos());
+      const CellPin* opin1 = cell->output(latchcell->q_pos());
       s << ", ." << opin1->name() << "(" << node_name(latch->output1()) << ")";
-    }
-    // 否定出力
-    if ( latch->output2()->fanout_num() > 0 ) {
-      const CellPin* opin2 = cell->pin(latchcell->iq_pos());
-      s << ", ." << opin2->name() << "(" << node_name(latch->output2()) << ")";
     }
     s << ");" << endl;
   }
@@ -247,27 +294,27 @@ VerilogWriterImpl::dump(ostream& s,
     const CmnNode* node = *p;
     const Cell* cell = node->cell();
     assert_cond( cell != NULL, __FILE__, __LINE__);
-    ymuint np = cell->pin_num();
-    s << "  " << cell->name() << " U" << node->id() << " (";
-    ymuint ipos = 0;
-    const char* comma = "";
-    for (ymuint i = 0; i < np; ++ i) {
-      const CellPin* pin = cell->pin(i);
-      const CmnNode* node1 = NULL;
-      if ( pin->is_input() ) {
-	node1 = node->fanin(ipos);
-	++ ipos;
-      }
-      else if ( pin->is_output() ) {
-	node1 = node;
-      }
-      s << comma << "." << pin->name() << "(" << node_name(node1) << ")";
-      comma = ", ";
-    }
-    s << ");" << endl;
-  }
 
-  s << "endmodule" << endl;
+    VlwInst vlw_inst(writer, cell->name());
+
+    ostringstream buf;
+    buf << "U" << node->id();
+    string inst_name = buf.str();
+    VlwInstElem vlw_elem(vlw_inst, inst_name);
+
+    ymuint ni = cell->input_num();
+    for (ymuint ipos = 0; ipos < ni; ++ ipos) {
+      const CellPin* pin = cell->input(ipos);
+      assert_cond( pin->is_input(), __FILE__, __LINE__);
+      const CmnNode* node1 = node->fanin(ipos);
+      vlw_elem.put_pinassign(pin->name(), node_name(node1));
+    }
+    ymuint no = cell->output_num();
+    assert_cond( no == 1, __FILE__, __LINE__);
+    const CellPin* pin = cell->output(0);
+    assert_cond( pin->is_output(), __FILE__, __LINE__);
+    vlw_elem.put_pinassign(pin->name(), node_name(node));
+  }
 }
 
 // @brief ノード名を設定する．

@@ -57,6 +57,11 @@ public:
   const ElbUdpDefn*
   udp_defn() const = 0;
 
+  /// @brief セルを返す．
+  virtual
+  const Cell*
+  cell() const = 0;
+
   /// @brief 0 の強さを得る．
   virtual
   tVpiStrength

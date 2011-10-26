@@ -20,11 +20,14 @@ noinst_HEADERS = \
 	LogExpr.h \
 	LogExprWriter.h \
 	NpnMap.h \
+	NpnMapM.h \
 	NpnMgr.h \
+	Pol.h
 	SatMsgHandler.h \
 	SatSolver.h \
 	SatStats.h \
 	TvFunc.h \
+	TvFuncM.h \
 	bdd_nsdef.h \
 	lexp_nsdef.h \
 	npn_nsdef.h \

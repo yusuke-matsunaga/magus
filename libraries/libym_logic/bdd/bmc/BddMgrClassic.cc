@@ -125,6 +125,7 @@ BddMgrClassic::BddMgrClassic(const string& name,
   mTopBlk = NULL;
   mCurBlk = NULL;
   mCurIdx = 1;
+  mOverflow = false;
 
   // 内部情報の初期化
   mUsedMem = 0;

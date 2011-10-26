@@ -7,7 +7,9 @@
 /// All rights reserved.
 
 
-#include "ym_cell/CellMgr.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_cell/CellMislibReader.h"
+#include "ym_cell/CellDotlibReader.h"
 #include "ym_networks/BdnMgr.h"
 #include "ym_networks/BdnBlifReader.h"
 #include "ym_networks/BdnDumper.h"
@@ -34,37 +36,47 @@ usage()
 END_NONAMESPACE
 
 
+BEGIN_NAMESPACE_YM
+
+/// @brief genlib 形式のファイルを読み込む．
+/// @param[in] filename ファイル名
+/// @return 生成されたライブラリを返す．
+/// @note エラーが起きたら NULL を返す．
+const CellLibrary*
+read_mislib(const char* filename)
+{
+  CellMislibReader read;
+  return read(filename);
+}
+
+/// @brief liberty 形式のファイルを読み込む．
+/// @param[in] filename ファイル名
+/// @return 生成されたライブラリを返す．
+/// @note エラーが起きたら NULL を返す．
+const CellLibrary*
+read_dotlib(const char* filename)
+{
+  CellDotlibReader read;
+  return read(filename);
+}
+
+END_NAMESPACE_YM
+
+
 BEGIN_NAMESPACE_YM_CELLMAP
 
 void
-test(string pat_filename,
+test(const CellLibrary* library,
      string sbj_filename)
 {
-  CellMgr cell_mgr;
-  {
-    ifstream ifs;
-    ifs.open(pat_filename.c_str(), ios::binary);
-    if ( !ifs ) {
-      // エラー
-      cerr << "Could not open " << pat_filename << endl;
-      return;
-    }
-
-    if ( !cell_mgr.load_library(ifs) ) {
-      // エラー
-      cerr << "Error occured during load_library()" << endl;
-      return;
-    }
-  }
-
   BdnMgr sbjgraph;
   {
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
     MsgMgr::reg_handler(msg_handler);
 
-    BdnBlifReader reader;
+    BdnBlifReader read;
 
-    if ( !reader.read(sbj_filename, sbjgraph) ) {
+    if ( !read(sbj_filename, sbjgraph) ) {
       cerr << "Error in reading " << sbj_filename << endl;
       return;
     }
@@ -76,7 +88,7 @@ test(string pat_filename,
   CmnMgr mapnetwork;
 
   CellMap mapper;
-  mapper.area_map(cell_mgr, sbjgraph, 0, mapnetwork);
+  mapper.area_map(*library, sbjgraph, 0, mapnetwork);
 
   CmnDumper dump;
   dump(cout, mapnetwork);
@@ -89,16 +101,39 @@ int
 main(int argc,
      char** argv)
 {
+  using namespace std;
+  using namespace nsYm;
   using nsYm::nsCellmap::test;
 
   argv0 = argv[0];
 
-  if ( argc != 3 ) {
+  ymuint base = 1;
+  bool dotlib = false;
+  if ( argc == 4 && strcmp(argv[1], "--liberty") == 0 ) {
+    dotlib = true;
+    base = 2;
+  }
+
+  if ( argc - base != 2 ) {
     usage();
     return 1;
   }
 
-  test(argv[1], argv[2]);
+  const char* libname = argv[base];
+
+  const CellLibrary* library = NULL;
+  if ( dotlib ) {
+    library = read_dotlib(libname);
+  }
+  else {
+    library = read_mislib(libname);
+  }
+  if ( library == NULL ) {
+    cerr << libname << ": Error in reading library" << endl;
+    return 1;
+  }
+
+  test(library, argv[base + 1]);
 
   return 0;
 }

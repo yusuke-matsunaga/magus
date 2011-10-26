@@ -25,8 +25,8 @@ class PatMatcher
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] pat_mgr パタンを管理するクラス
-  PatMatcher(const CellPatMgr& pat_mgr);
+  /// @param[in] library セルライブラリ
+  PatMatcher(const CellLibrary& library);
 
   /// @brief デストラクタ
   ~PatMatcher();
@@ -84,8 +84,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // パタングラフを管理するクラス
-  const CellPatMgr& mPatMgr;
+  // セルライブラリ
+  const CellLibrary& mLibrary;
 
   // パタンノードの ID をキーとしてサブジェクトノードを入れる配列
   vector<const BdnNode*> mSbjMap;

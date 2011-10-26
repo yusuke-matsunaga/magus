@@ -18,6 +18,8 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
+class CiCell;
+
 //////////////////////////////////////////////////////////////////////
 /// @class CellPinBase CiPin.h "CiPin.h"
 /// @brief ピンの基底クラス
@@ -26,12 +28,15 @@ class CiPin :
   public CellPin
 {
   friend class CiLibrary;
+  friend class CiPinHash;
 
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] cell 親のセル
   /// @param[in] name ピン名
-  CiPin(const ShString& name);
+  CiPin(CiCell* cell,
+	const ShString& name);
 
   /// @brief デストラクタ
   virtual
@@ -46,7 +51,7 @@ public:
   /// @brief ピン番号を返す．
   virtual
   ymuint
-  id() const;
+  pin_id() const;
 
   /// @brief ピン名を返す．
   virtual
@@ -79,6 +84,12 @@ public:
   // 入力ピンの属性
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 入力ピン番号を返す．
+  /// @note 入力ピンもしくは入出力ピンの時のみ意味を持つ．
+  virtual
+  ymuint
+  input_id() const;
+
   /// @brief 負荷容量を返す．
   virtual
   CellCapacitance
@@ -99,6 +110,12 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 出力ピンの属性
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 出力ピン番号を返す．
+  /// @note 出力ピンもしくは入出力ピンの時のみ意味を持つ．
+  virtual
+  ymuint
+  output_id() const;
 
   /// @brief 論理式を持っているときに true を返す．
   virtual
@@ -150,15 +167,17 @@ public:
   CellTime
   min_transition() const;
 
-  /// @brief タイミング情報の取得
-  /// @param[in] ipos 開始ピン番号
-  /// @param[in] timing_sense タイミング情報の摘要条件
-  /// @return 条件に合致するタイミング情報を返す．
-  /// @note なければ NULL を返す．
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内部ピンの属性
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内部ピン番号を返す．
+  /// @note 内部ピンの時のみ意味を持つ．
   virtual
-  const CellTiming*
-  timing(ymuint ipos,
-	 tTimingSense sense) const;
+  ymuint
+  internal_id() const;
 
 
 private:
@@ -166,11 +185,13 @@ private:
   // 設定用の仮想関数
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief 出力ピン(入出力ピン)の関数を設定する．
   /// @param[in] function 関数を表す論理式
   virtual
   void
   set_function(const LogExpr& function);
+#endif
 
   /// @brief 出力ピン(入出力ピン)の three_state 条件を設定する．
   /// @param[in] expr three_state 条件を表す論理式
@@ -178,6 +199,7 @@ private:
   void
   set_three_state(const LogExpr& expr);
 
+#if 0
   /// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
   virtual
   void
@@ -192,12 +214,18 @@ private:
   set_timing(ymuint pin_id,
 	     tTimingSense sense,
 	     const CellTiming* timing);
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // ハッシュ表のためのリンク
+  CiPin* mLink;
+
+  // 親のセル
+  CiCell* mCell;
 
   // ピン番号
   ymuint32 mId;
@@ -220,11 +248,13 @@ class CiInputPin :
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] cell 親のセル
   /// @param[in] name ピン名
   /// @param[in] capacitance 負荷容量
   /// @param[in] rise_capacitance 立ち上がり時の負荷容量
   /// @param[in] fall_capacitance 立ち下がり時の負荷容量
-  CiInputPin(const ShString& name,
+  CiInputPin(CiCell* cell,
+	     const ShString& name,
 	     CellCapacitance capacitance,
 	     CellCapacitance rise_capacitance,
 	     CellCapacitance fall_capacitance);
@@ -255,6 +285,12 @@ public:
   // 入力ピンの属性
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 入力ピン番号を返す．
+  /// @note 入力ピンもしくは入出力ピンの時のみ意味を持つ．
+  virtual
+  ymuint
+  input_id() const;
+
   /// @brief 負荷容量を返す．
   virtual
   CellCapacitance
@@ -275,6 +311,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 入力ピン番号
+  ymuint32 mInputId;
 
   // 負荷
   CellCapacitance mCapacitance;
@@ -300,6 +339,7 @@ class CiOutputPinBase :
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] cell 親のセル
   /// @param[in] name ピン名
   /// @param[in] max_fanout 最大ファンアウト容量
   /// @param[in] min_fanout 最小ファンアウト容量
@@ -307,7 +347,8 @@ protected:
   /// @param[in] min_capacitance 最小負荷容量
   /// @param[in] max_transition 最大遷移時間
   /// @param[in] min_transition 最小遷移時間
-  CiOutputPinBase(const ShString& name,
+  CiOutputPinBase(CiCell* cell,
+		  const ShString& name,
 		  CellCapacitance max_fanout,
 		  CellCapacitance min_fanout,
 		  CellCapacitance max_capacitance,
@@ -324,6 +365,12 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 出力ピンの属性
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 出力ピン番号を返す．
+  /// @note 出力ピンもしくは入出力ピンの時のみ意味を持つ．
+  virtual
+  ymuint
+  output_id() const;
 
   /// @brief 論理式を持っているときに true を返す．
   virtual
@@ -375,16 +422,6 @@ public:
   CellTime
   min_transition() const;
 
-  /// @brief タイミング情報の取得
-  /// @param[in] ipos 開始ピン番号
-  /// @param[in] timing_sense タイミング情報の摘要条件
-  /// @return 条件に合致するタイミング情報を返す．
-  /// @note なければ NULL を返す．
-  virtual
-  const CellTiming*
-  timing(ymuint ipos,
-	 tTimingSense sense) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -402,6 +439,7 @@ private:
   void
   set_three_state(const LogExpr& three_state);
 
+#if 0
   /// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
   virtual
   void
@@ -416,12 +454,16 @@ private:
   set_timing(ymuint pin_id,
 	     tTimingSense sense,
 	     const CellTiming* timing);
+#endif
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 出力ピン番号
+  ymuint32 mOutputId;
 
   // 論理式を持っているかどうかを表すフラグ
   ymuint32 mHasFunction;
@@ -453,10 +495,6 @@ private:
   // 最小遷移時間
   CellTime mMinTransition;
 
-  // タイミング情報を格納する配列
-  // サイズは総ピン数 x 2
-  const CellTiming** mTimingArray;
-
 };
 
 
@@ -472,6 +510,7 @@ class CiOutputPin :
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] cell 親のセル
   /// @param[in] name ピン名
   /// @param[in] max_fanout 最大ファンアウト容量
   /// @param[in] min_fanout 最小ファンアウト容量
@@ -479,7 +518,8 @@ private:
   /// @param[in] min_capacitance 最小負荷容量
   /// @param[in] max_transition 最大遷移時間
   /// @param[in] min_transition 最小遷移時間
-  CiOutputPin(const ShString& name,
+  CiOutputPin(CiCell* cell,
+	      const ShString& name,
 	      CellCapacitance max_fanout,
 	      CellCapacitance min_fanout,
 	      CellCapacitance max_capacitance,
@@ -523,6 +563,7 @@ class CiInoutPin :
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] cell 親のセル
   /// @param[in] name ピン名
   /// @param[in] capacitance 負荷容量
   /// @param[in] rise_capacitance 立ち上がり時の負荷容量
@@ -533,7 +574,8 @@ private:
   /// @param[in] min_capacitance 最小負荷容量
   /// @param[in] max_transition 最大遷移時間
   /// @param[in] min_transition 最小遷移時間
-  CiInoutPin(const ShString& name,
+  CiInoutPin(CiCell* cell,
+	     const ShString& name,
 	     CellCapacitance capacitance,
 	     CellCapacitance rise_capacitance,
 	     CellCapacitance fall_capacitance,
@@ -570,6 +612,12 @@ public:
   // 入力ピンの属性
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 入力ピン番号を返す．
+  /// @note 入力ピンもしくは入出力ピンの時のみ意味を持つ．
+  virtual
+  ymuint
+  input_id() const;
+
   /// @brief 負荷容量を返す．
   virtual
   CellCapacitance
@@ -590,6 +638,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 入力ピン番号
+  ymuint32 mInputId;
 
   // 負荷
   CellCapacitance mCapacitance;
@@ -615,8 +666,10 @@ class CiInternalPin :
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] cell 親のセル
   /// @param[in] name ピン名
-  CiInternalPin(const ShString& name);
+  CiInternalPin(CiCell* cell,
+		const ShString& name);
 
   /// @brief デストラクタ
   virtual
@@ -637,6 +690,27 @@ public:
   virtual
   bool
   is_internal() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内部ピンの属性
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内部ピン番号を返す．
+  /// @note 内部ピンの時のみ意味を持つ．
+  virtual
+  ymuint
+  internal_id() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 内部ピン番号
+  ymuint32 mInternalId;
 
 };
 

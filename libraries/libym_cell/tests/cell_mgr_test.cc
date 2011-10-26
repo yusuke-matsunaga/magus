@@ -7,75 +7,67 @@
 /// All rights reserved.
 
 
-#include "ym_cell/CellMgr.h"
+#include "ym_cell/CellLibrary.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
-#include "ym_cell/CellLibrary.h"
-
-
-BEGIN_NAMESPACE_YM_CELL
-
-bool
-dump_load_test(const char* in_filename,
-	       const char* data_filename)
-{
-
-
-#if 0
-  CellMislibReader reader;
-#else
-  CellDotlibReader reader;
-#endif
-  const CellLibrary* library = reader.read(in_filename);
-  if ( library == NULL ) {
-    cerr << in_filename << ": Error in reading library" << endl;
-    return false;
-  }
-
-  {
-    ofstream os;
-    os.open(data_filename, ios::binary);
-    if ( !os ) {
-      // エラー
-      cerr << "Could not create " << data_filename << endl;
-      return false;
-    }
-
-    CellMgr::dump_library(os, *library);
-
-    os.close();
-  }
-
-  CellMgr cell_mgr;
-  {
-    ifstream ifs;
-    ifs.open(data_filename, ios::binary);
-    if ( !ifs ) {
-      // エラー
-      cerr << "Could not open " << data_filename << endl;
-      return false;
-    }
-    cell_mgr.load_library(ifs);
-  }
-  dump(cout, cell_mgr);
-
-  return true;
-}
-
-END_NAMESPACE_YM_CELL
+#include "ym_cell/Cell.h"
+#include "ym_cell/CellPin.h"
 
 
 int
 main(int argc,
      char** argv)
 {
-  using nsYm::nsCell::dump_load_test;
+  using namespace std;
+  using namespace nsYm::nsCell;
 
-  const char* filename = argv[1];
-  const char* datafile = "patdata.bin";
+  if ( argc < 2 ) {
+    cerr << "Usage: " << argv[0] << " [--liberty] <liberty-file>" << endl;
+    return 1;
+  }
+  ymuint base = 1;
+  bool dotlib = false;
+  if ( argc == 3 && strcmp(argv[1], "--liberty") == 0 ) {
+    dotlib = true;
+    base = 2;
+  }
 
-  if ( !dump_load_test(filename, datafile) ) {
-    return -1;
+  const char* filename = argv[base];
+
+  const CellLibrary* library = NULL;
+  if ( dotlib ) {
+    CellDotlibReader dotlib_reader;
+    library = dotlib_reader(filename);
+  }
+  else {
+    CellMislibReader mislib_reader;
+    library = mislib_reader(filename);
+  }
+  if ( library == NULL ) {
+    cerr << filename << ": Error in reading library" << endl;
+    return 1;
+  }
+
+  display_library(cout, *library);
+
+  ymuint n = library->cell_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    const Cell* cell = library->cell(i);
+    cout << "Cell: " << cell->name() << endl;
+    const Cell* cell2 = library->cell(cell->name());
+    if ( cell != cell2 ) {
+      cout << "Error" << endl;
+    }
+
+    ymuint np = cell->pin_num();
+    for (ymuint j = 0; j < np; ++ j) {
+      const CellPin* pin = cell->pin(j);
+      cout << "  Pin: " << pin->name() << endl;
+      const CellPin* pin2 = cell->pin(pin->name());
+      if ( pin != pin2 ) {
+	cout << "  Error" << endl;
+      }
+    }
   }
 
   return 0;

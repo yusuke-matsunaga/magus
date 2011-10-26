@@ -9,7 +9,12 @@
 
 #include "ym_cell/CellMislibReader.h"
 
-#include "ci/CiLibrary.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_cell/CellArea.h"
+#include "ym_cell/CellCapacitance.h"
+#include "ym_cell/CellResistance.h"
+#include "ym_cell/CellTime.h"
+#include "ym_cell/CellTiming.h"
 
 #include "mislib/MislibParser.h"
 #include "mislib/MislibMgr.h"
@@ -65,53 +70,6 @@ dfs(const MislibNode* node,
   }
 }
 
-// @brief LogExpr を TvFunc に変換する．
-// @param[in] expr 対象の論理式
-// @param[in] ni 全入力数
-TvFunc
-expr_to_tvfunc(const LogExpr& expr,
-	       ymuint ni)
-{
-  if ( expr.is_zero() ) {
-    return TvFunc::const_zero(ni);
-  }
-  if ( expr.is_one() ) {
-    return TvFunc::const_one(ni);
-  }
-  if ( expr.is_posiliteral() ) {
-    return TvFunc::posi_literal(ni, expr.varid());
-  }
-  if ( expr.is_negaliteral() ) {
-    return TvFunc::nega_literal(ni, expr.varid());
-  }
-  // あとは AND/OR/XOR のみ
-  ymuint n = expr.child_num();
-  vector<TvFunc> child_func(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    child_func[i] = expr_to_tvfunc(expr.child(i), ni);
-  }
-  TvFunc func = child_func[0];
-  if ( expr.is_and() ) {
-    for (ymuint i = 1; i < n; ++ i) {
-      func &= child_func[i];
-    }
-  }
-  else if ( expr.is_or() ) {
-    for (ymuint i = 1; i < n; ++ i) {
-      func |= child_func[i];
-    }
-  }
-  else if ( expr.is_xor() ) {
-    for (ymuint i = 1; i < n; ++ i) {
-      func ^= child_func[i];
-    }
-  }
-  else {
-    assert_not_reached(__FILE__, __LINE__);
-  }
-  return func;
-}
-
 // @brief MislibNode から CellLibrary を生成する．
 // @param[in] lib_name ライブラリ名
 // @param[in] gate_list パース木のルート
@@ -122,7 +80,8 @@ gen_library(const string& lib_name,
 	    const MislibNode* gate_list)
 {
   // ライブラリの生成
-  CiLibrary* library = new CiLibrary(lib_name);
+  CellLibrary* library = CellLibrary::new_obj();
+  library->set_name(lib_name);
 
   // セル数の設定
   ymuint cell_num = 0;
@@ -168,44 +127,50 @@ gen_library(const string& lib_name,
     }
 
     ymuint ni = ipin_name_list.size();
-    CiCell* cell = library->new_logic_cell(cell_id, name, area, ni +  1, 0, 0);
+    LogExpr function = opin_expr->to_expr(ipin_name_map);
+    vector<bool> output_array(1, true);
+    vector<LogExpr> logic_array(1, function);
+    vector<LogExpr> tristate_array(1, LogExpr::make_zero());
+    library->new_logic_cell(cell_id, name, area,
+			    ni, 1, 0, 0, 0,
+			    output_array,
+			    logic_array,
+			    tristate_array);
     for (ymuint i = 0; i < ni; ++ i) {
       // 入力ピンの設定
       ShString name = ipin_name_list[i];
       const MislibNode* pin = ipin_array[i];
       CellCapacitance load(pin->input_load()->num());
-      library->new_cell_input(cell, i, name, load, load, load);
+      library->new_cell_input(cell_id, i, i, name, load, load, load);
     }
     // 出力ピンの設定
-    library->new_cell_output(cell, ni, opin_name,
+    library->new_cell_output(cell_id, ni, 0, opin_name,
 			     CellCapacitance::infty(),
 			     CellCapacitance(0.0),
 			     CellCapacitance::infty(),
 			     CellCapacitance(0.0),
 			     CellTime::infty(),
 			     CellTime(0.0));
-    LogExpr function = opin_expr->to_expr(ipin_name_map);
-    library->set_opin_function(cell, ni, function);
 
-    TvFunc tv_function = expr_to_tvfunc(function, ni);
+    TvFunc tv_function = function.make_tv(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       // タイミング情報の設定
       const MislibNode* pt_pin = ipin_array[i];
       TvFunc p_func = tv_function.cofactor(i, kPolPosi);
       TvFunc n_func = tv_function.cofactor(i, kPolNega);
-      CellPin::tTimingSense sense_real = CellPin::kSenseNonUnate;
+      tCellTimingSense sense_real = kCellNonUnate;
       bool redundant = false;
       if ( ~p_func && n_func ) {
 	if ( ~n_func && p_func ) {
-	  sense_real = CellPin::kSenseNonUnate;
+	  sense_real = kCellNonUnate;
 	}
 	else {
-	  sense_real = CellPin::kSenseNegaUnate;
+	  sense_real = kCellNegaUnate;
 	}
       }
       else {
 	if ( ~n_func && p_func ) {
-	  sense_real = CellPin::kSensePosiUnate;
+	  sense_real = kCellPosiUnate;
 	}
 	else {
 	  // つまり p_func == n_func ということ．
@@ -222,18 +187,18 @@ gen_library(const string& lib_name,
 	}
       }
 
-      CellPin::tTimingSense sense = CellPin::kSenseNonUnate;
+      tCellTimingSense sense = kCellNonUnate;
       switch ( pt_pin->phase()->type() ) {
       case MislibNode::kNoninv:
-	sense = CellPin::kSensePosiUnate;
+	sense = kCellPosiUnate;
 	break;
 
       case MislibNode::kInv:
-	sense = CellPin::kSenseNegaUnate;
+	sense = kCellNegaUnate;
 	break;
 
       case MislibNode::kUnknown:
-	sense = CellPin::kSenseNonUnate;
+	sense = kCellNonUnate;
 	break;
 
       default:
@@ -256,15 +221,17 @@ gen_library(const string& lib_name,
       CellTime f_i(pt_pin->fall_block_delay()->num());
       CellResistance f_r(pt_pin->fall_fanout_delay()->num());
       CellTiming* timing = library->new_timing(i,
-					       CellTiming::kTimingCombinational,
+					       kCellTimingCombinational,
 					       r_i, f_i,
 					       CellTime(0.0), CellTime(0.0),
 					       r_r, f_r);
       if ( !redundant ) {
-	library->set_opin_timing(cell, ni, i, sense, timing);
+	library->set_timing(cell_id, i, 0, sense, timing);
       }
     }
   }
+
+  library->compile();
 
   return library;
 }
@@ -295,7 +262,7 @@ CellMislibReader::~CellMislibReader()
 // @return 読み込んで作成したセルライブラリを返す．
 // @note エラーが起きたら NULL を返す．
 const CellLibrary*
-CellMislibReader::read(const string& filename)
+CellMislibReader::operator()(const string& filename)
 {
   using namespace nsMislib;
 

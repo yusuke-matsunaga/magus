@@ -14,6 +14,7 @@
 #include "ym_verilog/verilog.h"
 #include "ym_verilog/pt/PtP.h"
 #include "ym_verilog/vl/VlFwd.h"
+#include "ym_cell/cell_nsdef.h"
 #include "ym_utils/File.h"
 #include "ym_utils/Alloc.h"
 
@@ -80,9 +81,10 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief エラボレーションを行う．
+  /// @param[in] cell_library セルライブラリ
   /// @param[in] エラー数を返す．
   ymuint
-  elaborate();
+  elaborate(const CellLibrary* cell_library = NULL);
 
   /// @brief UDP 定義のリストを返す．
   const list<const VlUdpDefn*>&

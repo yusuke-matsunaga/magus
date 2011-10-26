@@ -21,8 +21,8 @@ LogicMgr::LogicMgr()
 // @brief デストラクタ
 LogicMgr::~LogicMgr()
 {
-  size_t n = mCellArray.size();
-  for (size_t i = 0; i < n; ++ i) {
+  ymuint n = mCellArray.size();
+  for (ymuint i = 0; i < n; ++ i) {
     delete mCellArray[i];
   }
   delete [] mHashTable;
@@ -32,19 +32,19 @@ LogicMgr::~LogicMgr()
 void
 LogicMgr::clear()
 {
-  size_t n = mCellArray.size();
-  for (size_t i = 0; i < n; ++ i) {
+  ymuint n = mCellArray.size();
+  for (ymuint i = 0; i < n; ++ i) {
     delete mCellArray[i];
   }
   mCellArray.clear();
 
-  for (size_t i = 0; i < mHashSize; ++ i) {
+  for (ymuint i = 0; i < mHashSize; ++ i) {
     mHashTable[i] = NULL;
   }
 }
 
 // @brief 登録されている論理式の数を返す．
-size_t
+ymuint
 LogicMgr::num() const
 {
   return mCellArray.size();
@@ -56,10 +56,10 @@ LogExpr
 LogicMgr::get(TgGateTemplate gt_id) const
 {
   tTgGateType type = gt_id.type();
-  size_t ni = gt_id.ni();
+  ymuint ni = gt_id.ni();
   if ( static_cast<ymuint32>(type) < kBase ) {
     vector<LogExpr> literals(ni);
-    for (size_t i = 0; i < ni; ++ i) {
+    for (ymuint i = 0; i < ni; ++ i) {
       literals[i] = LogExpr::make_posiliteral(i);
     }
     switch ( type ) {
@@ -70,37 +70,37 @@ LogicMgr::get(TgGateTemplate gt_id) const
       return ~literals[0];
 
     case kTgAnd:
-      for (size_t i = 1; i < ni; ++ i) {
+      for (ymuint i = 1; i < ni; ++ i) {
 	literals[0] &= literals[i];
       }
       return literals[0];
 
     case kTgNand:
-      for (size_t i = 1; i < ni; ++ i) {
+      for (ymuint i = 1; i < ni; ++ i) {
 	literals[0] &= literals[i];
       }
       return ~literals[0];
 
     case kTgOr:
-      for (size_t i = 1; i < ni; ++ i) {
+      for (ymuint i = 1; i < ni; ++ i) {
 	literals[0] |= literals[i];
       }
       return literals[0];
 
     case kTgNor:
-      for (size_t i = 1; i < ni; ++ i) {
+      for (ymuint i = 1; i < ni; ++ i) {
 	literals[0] |= literals[i];
       }
       return ~literals[0];
 
     case kTgXor:
-      for (size_t i = 1; i < ni; ++ i) {
+      for (ymuint i = 1; i < ni; ++ i) {
 	literals[0] ^= literals[i];
       }
       return literals[0];
 
     case kTgXnor:
-      for (size_t i = 1; i < ni; ++ i) {
+      for (ymuint i = 1; i < ni; ++ i) {
 	literals[0] ^= literals[i];
       }
       return ~literals[0];
@@ -121,8 +121,8 @@ BEGIN_NONAMESPACE
 // 組み込み型のチェック
 tTgGateType
 check_builtin(const LogExpr& lexp,
-	      size_t ni,
-	      const vector<ymulong>& tmp_vec)
+	      ymuint ni,
+	      const TvFunc& tmp_func)
 {
   if ( lexp.is_posiliteral() ) {
     assert_cond(lexp.varid() == 0, __FILE__, __LINE__);
@@ -132,8 +132,8 @@ check_builtin(const LogExpr& lexp,
     assert_cond(lexp.varid() == 0, __FILE__, __LINE__);
     return kTgNot;
   }
-  size_t np = 1 << ni;
-  const size_t NBPW = sizeof(ymulong) * 8;
+  ymuint np = 1 << ni;
+  const ymuint NBPW = sizeof(ymulong) * 8;
 
   bool and_flag = true;
   bool nand_flag = true;
@@ -142,9 +142,7 @@ check_builtin(const LogExpr& lexp,
   bool xor_flag = true;
   bool xnor_flag = true;
   for (ymuint p = 0; p < np; ++ p) {
-    size_t blk = p / NBPW;
-    size_t pos = p % NBPW;
-    bool bit = static_cast<bool>((tmp_vec[blk] >> pos) & 1UL);
+    bool bit = static_cast<bool>(tmp_func.value(p));
     if ( and_flag || nand_flag ) {
       if ( p < (np - 1) ) {
 	and_flag &= !bit;
@@ -166,8 +164,8 @@ check_builtin(const LogExpr& lexp,
       }
     }
     if ( xor_flag || xnor_flag ) {
-      size_t n1 = 0;
-      for (size_t i = 0; i < ni; ++ i) {
+      ymuint n1 = 0;
+      for (ymuint i = 0; i < ni; ++ i) {
 	if ( p & (1UL << i) ) {
 	  ++ n1;
 	}
@@ -204,26 +202,6 @@ check_builtin(const LogExpr& lexp,
   return kTgUndef;
 }
 
-// ハッシュ値を計算する．
-ymuint32
-hash_func(const vector<ymulong>& tv_array)
-{
-  size_t n = tv_array.size();
-  ymuint32 ans = 0;
-  for (size_t i = 0; i < n; ++ i) {
-#if SIZEOF_UNSIGNED_LONG == 4
-    ymuint32 ans1 = tv_array[i];
-    ans ^= ((ans1 << i) | (ans1 >> (31 - i)));
-#elif SIZEOF_UNSIGNED_LONG == 8
-    ymuint32 ans1 = tv_array[i] & 0xffffffff;
-    ans ^= ((ans1 << i) | (ans1 >> (31 - i)));
-    ymuint32 ans2 = tv_array[i] >> 32;
-    ans ^= ((ans2 << (i + 3)) | (ans2 >> (31 - i - 3)));
-#endif
-  }
-  return ans;
-}
-
 END_NONAMESPACE
 
 
@@ -232,22 +210,21 @@ TgGateTemplate
 LogicMgr::reg_logic(const LogExpr& lexp)
 {
   // 真理値ベクタに変換する．
-  vector<ymulong> tmp_vec;
-  lexp.make_tv(tmp_vec);
-  size_t ni = lexp.input_size();
+  TvFunc tmp_func = lexp.make_tv();
+  ymuint ni = lexp.input_size();
 
   // 組み込み型のチェック
-  tTgGateType type = check_builtin(lexp, ni, tmp_vec);
+  tTgGateType type = check_builtin(lexp, ni, tmp_func);
 
   if ( type != kTgUndef ) {
     return TgGateTemplate(type, ni);
   }
 
   // ハッシュ表から同一の関数がないか調べる．
-  size_t pos0 = hash_func(tmp_vec);
-  size_t pos = pos0 % mHashSize;
+  ymuint pos0 = tmp_func.hash();
+  ymuint pos = pos0 % mHashSize;
   for (Cell* cell = mHashTable[pos]; cell; cell = cell->mLink) {
-    if ( cell->mId.ni() == ni && equiv(cell, tmp_vec) ) {
+    if ( cell->mId.ni() == ni && cell->mTvFunc == tmp_func ) {
       // 同じ関数が登録されていた．
       // もしもリテラル数が少なかったら論理式を変更する．
       if ( cell->mLexp.litnum() > lexp.litnum() ) {
@@ -267,39 +244,25 @@ LogicMgr::reg_logic(const LogExpr& lexp)
   type = static_cast<tTgGateType>(mCellArray.size() + kBase);
   new_cell->mId = TgGateTemplate(type, ni);
   new_cell->mLexp = lexp;
-  new_cell->mTvArray = tmp_vec;
+  new_cell->mTvFunc = tmp_func;
   new_cell->mLink = mHashTable[pos];
   mCellArray.push_back(new_cell);
   mHashTable[pos] = new_cell;
   return new_cell->mId;
 }
 
-// 2つの論理式の配列が等価かどうか調べる．
-bool
-LogicMgr::equiv(Cell* cell,
-		const vector<ymulong>& tv_array)
-{
-  size_t n = cell->mTvArray.size();
-  for (size_t i = 0; i < n; ++ i) {
-    if ( cell->mTvArray[i] != tv_array[i] ) {
-      return false;
-    }
-  }
-  return true;
-}
-
 // ハッシュ表を拡大して再ハッシュする．
 void
 LogicMgr::expand()
 {
-  size_t old_size = mHashSize;
+  ymuint old_size = mHashSize;
   Cell** old_table = mHashTable;
   alloc_table(mHashSize << 1);
-  for (size_t i = 0; i < old_size; ++ i) {
+  for (ymuint i = 0; i < old_size; ++ i) {
     Cell* next = NULL;
     for (Cell* cell = old_table[i]; cell; cell = next) {
       next = cell->mLink;
-      size_t pos1 = hash_func(cell->mTvArray) % mHashSize;
+      ymuint pos1 = cell->mTvFunc.hash() % mHashSize;
       cell->mLink = mHashTable[pos1];
       mHashTable[pos1] = cell;
     }
@@ -309,14 +272,14 @@ LogicMgr::expand()
 
 // ハッシュ表用の領域を確保する．
 void
-LogicMgr::alloc_table(size_t req_size)
+LogicMgr::alloc_table(ymuint req_size)
 {
   mHashSize = req_size;
   mHashTable = new Cell*[mHashSize];
-  for (size_t i = 0; i < mHashSize; ++ i) {
+  for (ymuint i = 0; i < mHashSize; ++ i) {
     mHashTable[i] = NULL;
   }
-  mNextLimit = static_cast<size_t>(mHashSize * kHashCapacity);
+  mNextLimit = static_cast<ymuint>(mHashSize * kHashCapacity);
 }
 
 // @brief デバッグ用の関数
@@ -325,8 +288,8 @@ void
 LogicMgr::dump(ostream& s) const
 {
   s << "=====<LogicMgr Dump Start>=====" << endl;
-  size_t n = mCellArray.size();
-  for (size_t i = 0; i < n; ++ i) {
+  ymuint n = mCellArray.size();
+  for (ymuint i = 0; i < n; ++ i) {
     Cell* tmp = mCellArray[i];
     s << tmp->mId << "\t: " << tmp->mLexp << endl;
   }

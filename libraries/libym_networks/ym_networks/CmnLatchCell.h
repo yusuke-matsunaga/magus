@@ -10,7 +10,7 @@
 
 
 #include "ym_networks/cmn.h"
-#include "ym_cell/cell_nsdef.h"
+#include "ym_cell/CellLatchInfo.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_CMN
@@ -27,16 +27,9 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] cell セル
-  /// @param[in] pos_array ピン情報の配列
-  /// @note pos_array の意味は以下の通り
-  ///  - pos_array[0] : データ入力のピン番号     (3bit)
-  ///  - pos_array[1] : イネーブル入力のピン番号 (3bit) | ピン情報 (2bit)
-  ///  - pos_array[2] : クリア入力のピン番号     (3bit) | ピン情報 (2bit)
-  ///  - pos_array[3] : プリセット入力のピン番号 (3bit) | ピン情報 (2bit)
-  ///  - pos_array[4] : 肯定出力のピン番号       (3bit)
-  ///  - pos_array[5] : 否定出力のピン番号       (3bit)
+  /// @param[in] pin_info ピン情報
   CmnLatchCell(const Cell* cell,
-	       ymuint pos_array[]);
+	       const CellLatchInfo& pin_info);
 
   /// @brief デストラクタ
   ~CmnLatchCell();
@@ -103,10 +96,6 @@ public:
   ymuint
   q_pos() const;
 
-  /// @brief 否定出力のピン番号を返す．
-  ymuint
-  iq_pos() const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -116,8 +105,8 @@ private:
   // セル
   const Cell* mCell;
 
-  // ピン情報，ピン番号パックしたもの
-  ymuint32 mBits;
+  // ピン情報
+  CellLatchInfo mPinInfo;
 
 };
 

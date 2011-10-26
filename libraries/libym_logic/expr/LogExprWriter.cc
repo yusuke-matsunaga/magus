@@ -57,7 +57,7 @@ LogExprWriter::dump_string(const LogExpr& expr,
 void
 LogExprWriter::set_opstr(const vector<string>& op)
 {
-  for (size_t i = 0; i < 4; i ++) {
+  for (ymuint i = 0; i < 4; i ++) {
     mOpStrArray[i] = op[i];
   }
 }
@@ -67,7 +67,7 @@ void
 LogExprWriter::opstr(vector<string>& op) const
 {
   op.resize(4);
-  for (size_t i = 0; i < 4; i ++) {
+  for (ymuint i = 0; i < 4; i ++) {
     op[i] = mOpStrArray[i];
   }
 }
@@ -147,8 +147,8 @@ LogExprWriter::dump_sub(ostream& s,
     }
     s << "( ";
     string delim1 = "";
-    size_t n = node->child_num();
-    for (size_t i = 0; i < n; ++ i) {
+    ymuint n = node->child_num();
+    for (ymuint i = 0; i < n; ++ i) {
       s << delim1;
       dump_sub(s, node->child(i), var_names);
       delim1 = " " + delim + " ";

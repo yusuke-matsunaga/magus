@@ -402,6 +402,16 @@ public:
 	      const ElbUdpDefn* udp,
 	      bool has_delay);
 
+  /// @brief セルプリミティブのヘッダを生成する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_header パース木の定義
+  /// @param[in] cell セル
+  virtual
+  ElbPrimHead*
+  new_CellHead(const VlNamedObj* parent,
+	       const PtItem* pt_header,
+	       const Cell* cell);
+
   /// @brief プリミティブインスタンスを生成する．
   /// @param[in] head ヘッダ
   /// @param[in] pt_inst インスタンス定義

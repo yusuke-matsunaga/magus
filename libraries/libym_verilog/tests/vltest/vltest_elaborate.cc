@@ -9,14 +9,12 @@
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "ymconfig.h"
-#endif
-
 #include "ym_utils/StopWatch.h"
 #include "VlTestLineWatcher.h"
 #include "ym_verilog/VlMgr.h"
 #include "VlDumper.h"
+
+#include "ym_cell/cell_nsdef.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -28,6 +26,7 @@ void
 elaborate_mode(const list<string>& filename_list,
 	       bool all_msg,
 	       const char* spath,
+	       const CellLibrary* cell_library,
 	       int watch_line,
 	       bool verbose,
 	       bool profile,
@@ -59,7 +58,7 @@ elaborate_mode(const list<string>& filename_list,
   ymuint c = loop + 1;
   for (ymuint i = 0; i < c; ++ i) {
 
-#if 0
+#if !defined(YM_DEBUG)
     try {
 #endif
 
@@ -89,7 +88,7 @@ elaborate_mode(const list<string>& filename_list,
 	StopWatch timer;
 	timer.start();
 
-	vlmgr.elaborate();
+	vlmgr.elaborate(cell_library);
 
 	timer.stop();
 	USTime time = timer.time();
@@ -120,7 +119,7 @@ elaborate_mode(const list<string>& filename_list,
 	break;
       }
 
-#if 0
+#if !defined(YM_DEBUG)
     }
     catch ( AssertError x ) {
       cerr << x << endl;

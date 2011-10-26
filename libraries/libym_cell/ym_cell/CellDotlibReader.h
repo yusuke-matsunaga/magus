@@ -14,11 +14,6 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
-namespace nsDotlib {
-  class PtMgr;
-  class DotlibParser;
-}
-
 //////////////////////////////////////////////////////////////////////
 /// @class CellDotlibReader CellDotlibReader.h "ym_cell/CellDotlibReader.h"
 /// @brief dotlib(liberty) を読み込んで CellLibrary に設定するクラス
@@ -42,19 +37,7 @@ public:
   /// @return 読み込んで作成したセルライブラリを返す．
   /// @note エラーが起きたら NULL を返す．
   const CellLibrary*
-  read(const string& filename);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // dotlib のパース木を管理するオブジェクト
-  nsDotlib::PtMgr* mPtMgr;
-
-  // dotlib のパーサー
-  nsDotlib::DotlibParser* mParser;
+  operator()(const string& filename);
 
 };
 

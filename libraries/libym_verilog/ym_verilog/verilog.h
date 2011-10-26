@@ -255,7 +255,10 @@ enum tVpiPrimType {
   kVpiPullupPrim    = vpiPullupPrim,
   kVpiPulldownPrim  = vpiPulldownPrim,
   kVpiSeqPrim       = vpiSeqPrim,
-  kVpiCombPrim      = vpiCombPrim
+  kVpiCombPrim      = vpiCombPrim,
+  // この値だけ vpi_user.h にはない
+  // 値の重複に注意すること．
+  kVpiCellPrim      = 29
 };
 
 

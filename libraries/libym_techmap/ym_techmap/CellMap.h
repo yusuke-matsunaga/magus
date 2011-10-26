@@ -38,7 +38,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 面積最小化 DAG covering のヒューリスティック関数
-  /// @param[in] cell_mgr セルライブラリ
+  /// @param[in] cell_library セルライブラリ
   /// @param[in] sbjgraph サブジェクトグラフを表す Bdn
   /// @param[in] mode モード
   ///  - 0: fanout フロー, resub なし
@@ -47,7 +47,7 @@ public:
   ///  - 3: weighted フロー, resub あり
   /// @param[out] mapnetwork マッピング結果
   void
-  area_map(const CellMgr& cell_mgr,
+  area_map(const CellLibrary& cell_library,
 	   const BdnMgr& sbjgraph,
 	   ymuint mode,
 	   CmnMgr& mapnetwork);

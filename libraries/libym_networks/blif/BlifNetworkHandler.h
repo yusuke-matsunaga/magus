@@ -10,6 +10,7 @@
 
 
 #include "BlifHandler.h"
+#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF
@@ -35,9 +36,16 @@ public:
 
 public:
 
-  /// @brief 読み込む対象のネットワークを設定する．
+  /// @brief 読み込む対象のネットワークとセルライブラリを設定する．
   void
-  set_network(BlifNetwork* network);
+  set(BlifNetwork* network,
+      const CellLibrary* cell_library);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // BlifHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化
   virtual
@@ -86,36 +94,17 @@ public:
 	const char* cover_pat,
 	char opat);
 
-  /// @brief .gate 文の開始
-  /// @param[in] loc1 .gate の位置情報
-  /// @param[in] loc2 セル名の位置情報
-  /// @param[in] name セル名
+  /// @brief .gate 文の処理
+  /// @param[in] cell セル
+  /// @param[in] onode_id 出力ノードのID番号
+  /// @param[in] inode_id_array 入力ノードのID番号の配列
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
-  gate_begin(const FileRegion& loc1,
-	     const FileRegion& loc2,
-	     const char* name);
-
-  /// @brief .gate 文中のピン割り当ての処理
-  /// @param[in] loc1 ピン名の位置情報
-  /// @param[in] f_name ピン名
-  /// @param[in] loc2 ノード名の位置情報
-  /// @param[in] a_name ノード名
-  /// @retval true 処理が成功した．
-  /// @retval false エラーが起こった．
-  virtual
-  bool
-  gate_assign(const FileRegion& loc1,
-	      const char* f_name,
-	      const FileRegion& loc2,
-	      const char* a_name);
-
-  /// @brief .gate 文の終了
-  virtual
-  bool
-  gate_end();
+  gate(const Cell* cell,
+       ymuint32 onode_id,
+       const vector<ymuint32>& inode_id_array);
 
   /// @brief .latch 文中の本体の処理
   /// @param[in] name1_id 最初の文字列
@@ -157,6 +146,9 @@ private:
 
   // 対象のネットワーク
   BlifNetwork* mNetwork;
+
+  // セルライブラリ
+  const CellLibrary* mCellLibrary;
 
 };
 
