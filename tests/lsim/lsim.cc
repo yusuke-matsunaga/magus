@@ -27,6 +27,7 @@
 #include "LsimNaive.h"
 #include "LsimNaive2.h"
 #include "LsimBdd.h"
+#include "LsimBdd2.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -110,7 +111,14 @@ lsim(const string& filename,
     LsimBdd lsim;
     do_lsim(lsim, loop_count, network);
   }
+  else if ( method_str == "bdd2" ) {
+    LsimBdd2 lsim;
+    do_lsim(lsim, loop_count, network);
+  }
   else if ( method_str == "tv" ) {
+  }
+  else {
+    cerr << "Unknown method: " << method_str << endl;
   }
 }
 

@@ -33,7 +33,9 @@ lsim_SOURCES = \
 	LsimNaive2.h \
 	LsimNaive2.cc \
 	LsimBdd.h \
-	LsimBdd.cc
+	LsimBdd.cc \
+	LsimBdd2.h \
+	LsimBdd2.cc
 
 lsim_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
