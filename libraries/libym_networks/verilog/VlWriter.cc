@@ -232,6 +232,57 @@ VlWriter::end_assign()
   put_eol();
 }
 
+// @brief インスタンス記述の開始
+// @param[in] def_name インスタンスの定義名
+void
+VlWriter::begin_inst(const char* def_name)
+{
+  put_idstr(def_name);
+}
+
+// @brief インスタンス記述の開始
+// @param[in] def_name インスタンスの定義名
+void
+VlWriter::begin_inst(const string& def_name)
+{
+  put_idstr(def_name);
+}
+
+// @brief インスタンス記述の終了
+// @note ';' nl を出力する．
+void
+VlWriter::end_inst()
+{
+  put_eol();
+}
+
+// @brief インスタンスの要素の開始
+// @param[in] inst_name インスタンス名
+// @note インスタンス名 '(' までを出力する．
+void
+VlWriter::begin_inst_elem(const char* inst_name)
+{
+  put_idstr(inst_name);
+  put_str("(");
+}
+
+// @brief インスタンスの要素の開始
+// @param[in] inst_name インスタンス名
+// @note インスタンス名 '(' までを出力する．
+void
+VlWriter::begin_inst_elem(const string& inst_name)
+{
+  begin_inst_elem(inst_name.c_str());
+}
+
+// @brief インスタンスの要素の終了
+// @note ')' を出力する．
+void
+VlWriter::end_inst_elem()
+{
+  put_str(")");
+}
+
 // @brief 識別子を出力する．
 // @param[in] name 識別子名
 // @note 場合によってはエスケープ文字列にする．

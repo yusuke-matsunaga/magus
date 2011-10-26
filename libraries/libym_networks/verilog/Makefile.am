@@ -22,7 +22,9 @@ libym_vlw_la_SOURCES = \
 	VlwIO.h \
 	VlwIO.cc \
 	VlwAssign.h \
-	VlwAssign.cc
+	VlwAssign.cc \
+	VlwInst.h \
+	VlwInst.cc
 
 libym_vlw_la_LIBADD =
 

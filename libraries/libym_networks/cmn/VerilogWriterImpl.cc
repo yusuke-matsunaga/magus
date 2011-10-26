@@ -24,6 +24,7 @@
 #include "../verilog/VlwModuleHeader.h"
 #include "../verilog/VlwIO.h"
 #include "../verilog/VlwAssign.h"
+#include "../verilog/VlwInst.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_CMN
@@ -293,22 +294,26 @@ VerilogWriterImpl::dump(ostream& s,
     const CmnNode* node = *p;
     const Cell* cell = node->cell();
     assert_cond( cell != NULL, __FILE__, __LINE__);
-    s << "  " << cell->name() << " U" << node->id() << " (";
-    const char* comma = "";
+
+    VlwInst vlw_inst(writer, cell->name());
+
+    ostringstream buf;
+    buf << "U" << node->id();
+    string inst_name = buf.str();
+    VlwInstElem vlw_elem(vlw_inst, inst_name);
+
     ymuint ni = cell->input_num();
     for (ymuint ipos = 0; ipos < ni; ++ ipos) {
       const CellPin* pin = cell->input(ipos);
       assert_cond( pin->is_input(), __FILE__, __LINE__);
       const CmnNode* node1 = node->fanin(ipos);
-      s << comma << "." << pin->name() << "(" << node_name(node1) << ")";
-      comma = ", ";
+      vlw_elem.put_pinassign(pin->name(), node_name(node1));
     }
     ymuint no = cell->output_num();
     assert_cond( no == 1, __FILE__, __LINE__);
     const CellPin* pin = cell->output(0);
     assert_cond( pin->is_output(), __FILE__, __LINE__);
-    s << comma << "." << pin->name() << "(" << node_name(node) << ")";
-    s << ");" << endl;
+    vlw_elem.put_pinassign(pin->name(), node_name(node));
   }
 }
 

@@ -149,6 +149,38 @@ public:
   void
   end_assign();
 
+  /// @brief インスタンス記述の開始
+  /// @param[in] def_name インスタンスの定義名
+  void
+  begin_inst(const char* def_name);
+
+  /// @brief インスタンス記述の開始
+  /// @param[in] def_name インスタンスの定義名
+  void
+  begin_inst(const string& def_name);
+
+  /// @brief インスタンス記述の終了
+  /// @note ';' nl を出力する．
+  void
+  end_inst();
+
+  /// @brief インスタンスの要素の開始
+  /// @param[in] inst_name インスタンス名
+  /// @note インスタンス名 '(' までを出力する．
+  void
+  begin_inst_elem(const char* inst_name);
+
+  /// @brief インスタンスの要素の開始
+  /// @param[in] inst_name インスタンス名
+  /// @note インスタンス名 '(' までを出力する．
+  void
+  begin_inst_elem(const string& inst_name);
+
+  /// @brief インスタンスの要素の終了
+  /// @note ')' を出力する．
+  void
+  end_inst_elem();
+
 
 public:
   //////////////////////////////////////////////////////////////////////
