@@ -100,12 +100,12 @@ LsimBdd::set_network(const BdnMgr& bdn)
 
 BEGIN_NONAMESPACE
 
-ymuint32
+ymuint64
 eval_bdd(Bdd bdd,
-	 const vector<ymuint32>& iv)
+	 const vector<ymuint64>& iv)
 {
   ymuint val = 0U;
-  for (ymuint b = 0; b < 32; ++ b) {
+  for (ymuint b = 0; b < 64; ++ b) {
     for ( ; ; ) {
       if ( bdd.is_one() ) {
 	val |= (1U << b);
@@ -136,8 +136,8 @@ END_NONAMESPACE
 // @param[in] iv 入力ベクタ
 // @param[out] ov 出力ベクタ
 void
-LsimBdd::eval(const vector<ymuint32>& iv,
-	      vector<ymuint32>& ov)
+LsimBdd::eval(const vector<ymuint64>& iv,
+	      vector<ymuint64>& ov)
 {
   ymuint no = ov.size();
   for (ymuint i = 0; i < no; ++ i) {

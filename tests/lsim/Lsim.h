@@ -43,8 +43,8 @@ public:
   /// @param[out] ov 出力ベクタ
   virtual
   void
-  eval(const vector<ymuint32>& iv,
-       vector<ymuint32>& ov) = 0;
+  eval(const vector<ymuint64>& iv,
+       vector<ymuint64>& ov) = 0;
 
 };
 

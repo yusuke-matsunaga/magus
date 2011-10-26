@@ -53,11 +53,14 @@ do_lsim(Lsim& lsim,
 
   ymuint ni = network.input_num();
   ymuint no = network.output_num();
-  vector<ymuint32> iv(ni);
-  vector<ymuint32> ov(no);
+  vector<ymuint64> iv(ni);
+  vector<ymuint64> ov(no);
   for (ymuint i = 0; i < nloop; ++ i) {
     for (ymuint j = 0; j < ni; ++ j) {
-      iv[j] = rg.int32();
+      ymuint64 tmp = rg.int32();
+      tmp <<= 32;
+      tmp += rg.int32();
+      iv[j] = tmp;
     }
     lsim.eval(iv, ov);
   }

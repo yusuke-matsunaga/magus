@@ -93,8 +93,8 @@ LsimNaive2::set_network(const BdnMgr& bdn)
 // @param[in] iv 入力ベクタ
 // @param[out] ov 出力ベクタ
 void
-LsimNaive2::eval(const vector<ymuint32>& iv,
-		 vector<ymuint32>& ov)
+LsimNaive2::eval(const vector<ymuint64>& iv,
+		 vector<ymuint64>& ov)
 {
   ymuint ni = mInputList.size();
   assert_cond( ni == iv.size(), __FILE__, __LINE__);
@@ -106,16 +106,16 @@ LsimNaive2::eval(const vector<ymuint32>& iv,
   for (ymuint i = 0; i < nn; ++ i) {
     SimNode& snode = mNodeList[i];
     SimNode* snode0 = snode.mFanins[0];
-    ymuint32 val0 = snode0->mVal;
+    ymuint64 val0 = snode0->mVal;
     if ( snode.mType & 1U ) {
       val0 = ~val0;
     }
     SimNode* snode1 = snode.mFanins[1];
-    ymuint32 val1 = snode1->mVal;
+    ymuint64 val1 = snode1->mVal;
     if ( snode.mType & 2U ) {
       val1 = ~val1;
     }
-    ymuint32 val;
+    ymuint64 val;
     if ( snode.mType & 4U ) {
       val = val0 ^ val1;
     }

@@ -47,8 +47,8 @@ public:
   /// @param[out] ov 出力ベクタ
   virtual
   void
-  eval(const vector<ymuint32>& iv,
-       vector<ymuint32>& ov);
+  eval(const vector<ymuint64>& iv,
+       vector<ymuint64>& ov);
 
 
 private:
@@ -70,7 +70,7 @@ private:
 
   // 値を入れておく配列
   // node->id() をキーにする．
-  vector<ymuint32> mValArray;
+  vector<ymuint64> mValArray;
 
 };
 

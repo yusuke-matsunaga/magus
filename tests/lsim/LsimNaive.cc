@@ -65,8 +65,8 @@ LsimNaive::set_network(const BdnMgr& bdn)
 // @param[in] iv 入力ベクタ
 // @param[out] ov 出力ベクタ
 void
-LsimNaive::eval(const vector<ymuint32>& iv,
-		vector<ymuint32>& ov)
+LsimNaive::eval(const vector<ymuint64>& iv,
+		vector<ymuint64>& ov)
 {
   if ( mBdnMgr == NULL ) {
     return;
@@ -83,16 +83,16 @@ LsimNaive::eval(const vector<ymuint32>& iv,
   for (ymuint i = 0; i < nn; ++ i) {
     const BdnNode* node = mNodeList[i];
     const BdnNode* node0 = node->fanin0();
-    ymuint32 val0 = mValArray[node0->id()];
+    ymuint64 val0 = mValArray[node0->id()];
     if ( node->fanin0_inv() ) {
       val0 = ~val0;
     }
     const BdnNode* node1 = node->fanin1();
-    ymuint32 val1 = mValArray[node1->id()];
+    ymuint64 val1 = mValArray[node1->id()];
     if ( node->fanin1_inv() ) {
       val1 = ~val1;
     }
-    ymuint32 val;
+    ymuint64 val;
     if ( node->is_and() ) {
       val = val0 & val1;
     }
@@ -106,7 +106,7 @@ LsimNaive::eval(const vector<ymuint32>& iv,
   for (ymuint i = 0; i < no; ++ i) {
     const BdnNode* node = mOutputList[i];
     const BdnNode* inode = node->output_fanin();
-    ymuint32 val = 0U;
+    ymuint64 val = 0U;
     if ( inode ) {
       val = mValArray[inode->id()];
     }
