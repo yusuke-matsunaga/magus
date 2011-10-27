@@ -56,29 +56,36 @@ put_bdd(Bdd bdd,
 
 ymuint
 make_lut(Bdd bdd,
+	 const vector<ymuint>& cut_points,
 	 hash_map<Bdd, ymuint32>& lutmap,
 	 ymuint& nlut);
 
 void
 make_lut_sub(Bdd bdd,
+	     const vector<ymuint>& cut_points,
 	     ymuint limit,
 	     hash_map<Bdd, ymuint32>& lutmap,
-	     ymuint& nulut)
+	     ymuint& nlut)
 {
+  if ( bdd.is_leaf() ) {
+    return;
+  }
+
   Bdd bdd0;
   Bdd bdd1;
   ymuint var = bdd.root_decomp(bdd0, bdd1);
   if ( var >= limit ) {
-    make_lut(bdd, lutmap, nlut);
+    make_lut(bdd, cut_points, lutmap, nlut);
   }
   else {
-    make_lut_sub(bdd0, limit, lutmap, nlut);
-    make_lut_sub(bdd1, limit, lutmap, nlut);
+    make_lut_sub(bdd0, cut_points, limit, lutmap, nlut);
+    make_lut_sub(bdd1, cut_points, limit, lutmap, nlut);
   }
 }
 
 ymuint
 make_lut(Bdd bdd,
+	 const vector<ymuint>& cut_points,
 	 hash_map<Bdd, ymuint32>& lutmap,
 	 ymuint& nlut)
 {
@@ -88,28 +95,54 @@ make_lut(Bdd bdd,
   }
 
   ymuint addr = nlut * 1024;
+  ++ nlut,
   lutmap.insert(make_pair(bdd, addr));
 
   Bdd bdd0;
   Bdd bdd1;
   ymuint var = bdd.root_decomp(bdd0, bdd1);
 
-  make_lut_sub(bdd0, var + 10, lutmap, nlut);
-  make_lut_sub(bdd1, var + 10, lutmap, nlut);
+  ymuint limit = 0;
+  for (vector<ymuint>::const_iterator p = cut_ponts.begin();
+       p != cut_points.end(); ++ p) {
+    limit = *p;
+    if ( limit > var ) {
+      break;
+    }
+  }
+
+  make_lut_sub(bdd0, cut_points, limit, lutmap, nlut);
+  make_lut_sub(bdd1, cut_points, limit, lutmap, nlut);
 
   return addr;
 }
 
 void
 make_lut2(Bdd bdd,
-	  ymuint32* lut);
-
-void
-make_lut2(Bdd bdd,
+	  const vector<ymuint>& cut_points,
 	  ymuint32* lut,
 	  const hash_map<Bdd, ymuint32>& lutmap)
 {
-  ymuint32
+  Bdd bdd0;
+  Bdd bdd1;
+  ymuint var = bdd.root_decomp(bdd0, bdd1);
+  ymuint pos;
+  for (pos = 1; pos < cut_points.size(); ++ pos) {
+    if ( var < cut_points[pos] ) {
+      break;
+    }
+  }
+  ymuint base = cut_points[pos - 1];
+  ymuint limit = cut_points[pos];
+  if ( limit - base == 10 ) {
+    for (ymuint b = 0U; b < 1024U; ++ b) {
+      Bdd leaf = eval_bdd(bdd, base, p);
+      hash_map<Bdd, ymuint32>::const_iterator p = lutmap.find(leaf);
+      assert_cond( p != lutmap.end(), __FILE__, __LINE__);
+    }
+  }
+  else {
+  }
 }
 
 END_NONAMESPACE
@@ -123,6 +156,7 @@ LsimBdd3::set_network(const BdnMgr& bdn)
   vector<Bdd> bddmap(n);
 
   const BdnNodeList& input_list = bdn.input_list();
+  ymuint ni = input_list.size();
   ymuint id = 0;
   for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
@@ -182,6 +216,16 @@ LsimBdd3::set_network(const BdnMgr& bdn)
 
   hash_map<Bdd, ymuint32> lutmap;
 
+  vector<ymuint> cut_points;
+  for (ymuint i = 0; i < ni; ) {
+    i += 10;
+    if ( i + 5 >= ni ) {
+      break;
+    }
+    cut_points.push_back(i);
+  }
+  cut_points.push_back(ni);
+
   mOutputList.clear();
   mOutputList.reserve(no);
   ymuint nlut = 0;
@@ -200,7 +244,7 @@ LsimBdd3::set_network(const BdnMgr& bdn)
 
     output_id.push_back(q->second);
 
-    ymuint addr = make_lut(bdd, lutmap, nlut);
+    ymuint addr = make_lut(bdd, cut_points, lutmap, nlut);
     mOutputList.push_back(addr);
   }
 
@@ -210,7 +254,7 @@ LsimBdd3::set_network(const BdnMgr& bdn)
        p != lutmap.end(); ++ ) {
     Bdd bdd = p->first;
     ymuint32 addr = p->second;
-    make_lut2(bdd, &mLut[addr], lutmap);
+    make_lut2(bdd, cut_points, &mLut[addr], lutmap);
   }
 }
 

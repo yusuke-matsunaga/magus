@@ -28,6 +28,7 @@
 #include "LsimNaive2.h"
 #include "LsimBdd.h"
 #include "LsimBdd2.h"
+#include "LsimBdd3.h"
 #include "LsimLcc.h"
 
 
@@ -114,6 +115,10 @@ lsim(const string& filename,
   }
   else if ( method_str == "bdd2" ) {
     LsimBdd2 lsim;
+    do_lsim(lsim, loop_count, network);
+  }
+  else if ( method_str == "bdd3" ) {
+    LsimBdd3 lsim;
     do_lsim(lsim, loop_count, network);
   }
   else if ( method_str == "lcc" ) {
