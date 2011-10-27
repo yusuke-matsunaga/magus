@@ -28,6 +28,7 @@
 #include "LsimNaive2.h"
 #include "LsimBdd.h"
 #include "LsimBdd2.h"
+#include "LsimLcc.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -45,7 +46,7 @@ do_lsim(Lsim& lsim,
   sw.stop();
 
   USTime time1 = sw.time();
-  cout << "Initialize:       \t" << time1 << endl;
+  cerr << "Initialize:       \t" << time1 << endl;
 
   RandGen rg;
 
@@ -69,7 +70,7 @@ do_lsim(Lsim& lsim,
   sw.stop();
 
   USTime time2 = sw.time();
-  cout << "Evaluation[" << nloop << "]:\t" << time2 << endl;
+  cerr << "Evaluation[" << nloop << "]:\t" << time2 << endl;
 }
 
 void
@@ -113,6 +114,10 @@ lsim(const string& filename,
   }
   else if ( method_str == "bdd2" ) {
     LsimBdd2 lsim;
+    do_lsim(lsim, loop_count, network);
+  }
+  else if ( method_str == "lcc" ) {
+    LsimLcc lsim;
     do_lsim(lsim, loop_count, network);
   }
   else if ( method_str == "tv" ) {

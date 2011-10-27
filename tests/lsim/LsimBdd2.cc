@@ -59,12 +59,10 @@ write_bdd(Bdd bdd,
 	  const hash_map<Bdd, ymuint32>& idmap)
 {
   if ( bdd.is_zero() ) {
-    cout << "    rval = 0;" << endl
-	 << "    goto END;" << endl;
+    cout << "    return 0;" << endl;
   }
   else if ( bdd.is_one() ) {
-    cout << "    rval = 0;" << endl
-	 << "    goto END;" << endl;
+    cout << "    return 1;" << endl;
   }
   else {
     hash_map<Bdd, ymuint32>::const_iterator p = idmap.find(bdd);
@@ -84,6 +82,7 @@ LsimBdd2::set_network(const BdnMgr& bdn)
   vector<Bdd> bddmap(n);
 
   const BdnNodeList& input_list = bdn.input_list();
+  ymuint ni = input_list.size();
   ymuint id = 0;
   for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
@@ -153,23 +152,26 @@ LsimBdd2::set_network(const BdnMgr& bdn)
     output_id.push_back(q->second);
   }
 
+  cout << "/// @file lcc_main.cc" << endl
+       << "/// @brief コンパイル法シミュレータのメイン関数" << endl
+       << "/// @author Yusuke Matsunaga (松永 裕介)" << endl
+       << "///" << endl
+       << "/// Copyright (C) 2005-2011 Yusuke Matsunaga" << endl
+       << "/// All rights reserved." << endl
+       << endl
+       << "#include <iostream>" << endl
+       << endl;
+
   cout << "int" << endl
        << "eval_logic(int ivals[]," << endl
-       << "           int ovals[])" << endl
+       << "           int opos)" << endl
        << "{" << endl;
   for (ymuint i = 0; i < no; ++ i) {
-    cout << "  goto BDD" << output_id[i] << ";" << endl
-	 << endl
-	 << "END" << i << ":" << endl
-	 << endl;
+    cout << "  if ( opos == " << i << " ) {" << endl
+	 << "    goto BDD" << output_id[i] << ";" << endl
+	 << "  }" << endl;
   }
-       << "  for (int i = 0; i < " << no << "; ++ i) {" << endl
-       << "    goto BDD" << output_id[i] << ";" << endl
-       << endl
-       << "END:" << endl
-       << "    ovals[i] = rval;" << endl
-       << "  }" << endl
-       << endl;
+  cout << "  return 0;" << endl; // ダミー
 
   for (vector<Bdd>::iterator p = bdd_array.begin();
        p != bdd_array.end(); ++ p) {
@@ -189,7 +191,52 @@ LsimBdd2::set_network(const BdnMgr& bdn)
     cout << "  }" << endl
 	 << endl;
   }
-  cout << "}" << endl;
+  cout << "}" << endl
+       << endl;
+
+  cout << "void" << endl
+       << "eval_logic(unsigned long ivals[]," << endl
+       << "           unsigned long ovals[])" << endl
+       << "{" << endl
+       << "  for (int i = 0; i < " << no << "; ++ i) {" << endl
+       << "    ovals[i] = 0UL;" << endl
+       << "  }" << endl
+       << "  int tmp_ivals[" << ni << "];" << endl
+       << "  for (int b = 0; b < 64; ++ b) {" << endl
+       << "    for (int i = 0; i < " << ni << "; ++ i) {" << endl
+       << "      tmp_ivals[i] = (ivals[i] >> b) & 1;" << endl
+       << "    }" << endl
+       << "    for (int i = 0; i < " << no << "; ++ i) {" << endl
+       << "      int o = eval_logic(tmp_ivals, i);" << endl
+       << "      ovals[i] |= (o << b);" << endl
+       << "    }" << endl
+       << "  }" << endl
+       << "}" << endl
+       << endl;
+
+  cout << "int" << endl
+       << "main(int argc," << endl
+       << "const char** argv)"<< endl
+       << "{" << endl
+       << "  using namespace std;" << endl
+       << endl
+       << "  if ( argc != 2 ) {" << endl
+       << "    cerr << \"Usage: lcc <loop-num>\" << endl;" << endl
+       << "    return 1;" << endl
+       << "  }" << endl
+       << endl
+       << "  int n = atoi(argv[1]);" << endl
+       << "  unsigned long ivals[" << ni << "];" << endl
+       << "  unsigned long ovals[" << no << "];" << endl
+       << "  for (int i = 0; i < n; ++ i) {" << endl
+       << "    for (int j = 0; j < " << ni << "; ++ j) {" << endl
+       << "      ivals[j] = random();" << endl
+       << "    }" << endl
+       << "    eval_logic(ivals, ovals);" << endl
+       << "  }" << endl
+       << endl
+       << "  return 0;" << endl
+       << "}" << endl;
 }
 
 
