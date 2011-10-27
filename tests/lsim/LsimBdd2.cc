@@ -142,8 +142,11 @@ LsimBdd2::set_network(const BdnMgr& bdn)
   for (BdnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     BdnNode* node = *p;
-    BdnNode* node0 = node->fanin0();
+    BdnNode* node0 = node->output_fanin();
     Bdd bdd = bddmap[node0->id()];
+    if ( node->output_fanin_inv() ) {
+      bdd = ~bdd;
+    }
     put_bdd(bdd, idmap, bdd_array);
 
     hash_map<Bdd, ymuint32>::iterator q = idmap.find(bdd);

@@ -79,7 +79,7 @@ LsimNaive2::set_network(const BdnMgr& bdn)
   for (BdnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     const BdnNode* node = *p;
-    const BdnNode* inode = node->fanin(0);
+    const BdnNode* inode = node->output_fanin();
     if ( inode != NULL ) {
       mOutputList.push_back(map[inode->id()]);
     }
