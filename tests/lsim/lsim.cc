@@ -30,6 +30,7 @@
 #include "LsimBdd1.h"
 #include "LsimBdd2.h"
 #include "LsimBdd3.h"
+#include "LsimBdd10.h"
 #include "LsimLcc.h"
 #include "LsimMpx.h"
 #include "LsimMpx2.h"
@@ -181,6 +182,10 @@ lsim(const string& filename,
   }
   else if ( method_str == "bdd3" ) {
     LsimBdd3 lsim;
+    do_lsim(lsim, loop_count, network, order_map);
+  }
+  else if ( method_str == "bdd10" ) {
+    LsimBdd10 lsim;
     do_lsim(lsim, loop_count, network, order_map);
   }
   else if ( method_str == "lcc" ) {

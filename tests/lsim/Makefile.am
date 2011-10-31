@@ -40,6 +40,8 @@ lsim_SOURCES = \
 	LsimBdd1.cc \
 	LsimBdd3.h \
 	LsimBdd3.cc \
+	LsimBdd10.h \
+	LsimBdd10.cc \
 	LsimLcc.h \
 	LsimLcc.cc \
 	LsimMpx.h \
