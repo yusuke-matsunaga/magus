@@ -38,9 +38,11 @@ public:
 
   /// @brief ネットワークをセットする．
   /// @param[in] bdn 対象のネットワーク
+  /// @param[in] order_map 順序マップ
   virtual
   void
-  set_network(const BdnMgr& bdn);
+  set_network(const BdnMgr& bdn,
+	      const hash_map<string, ymuint>& order_map);
 
   /// @brief 論理シミュレーションを行う．
   /// @param[in] iv 入力ベクタ
@@ -87,6 +89,8 @@ private:
   // 出力ノードの配列
   vector<SimNode*> mOutputList;
 
+  // 出力ノードの極性
+  vector<bool> mOutputInv;
 };
 
 END_NAMESPACE_YM

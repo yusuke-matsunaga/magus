@@ -9,6 +9,7 @@
 
 #include "LsimBdd3.h"
 #include "ym_networks/BdnNode.h"
+#include "ym_networks/BdnPort.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -89,9 +90,11 @@ make_lut(Bdd bdd,
 	 hash_map<Bdd, ymuint32>& lutmap,
 	 ymuint& nlut)
 {
-  hash_map::iterator p = lutmap.find(bdd);
-  if ( p != lutmap.end() ) {
+  {
+    hash_map<Bdd, ymuint32>::iterator p = lutmap.find(bdd);
+    if ( p != lutmap.end() ) {
     return p->second;
+    }
   }
 
   ymuint addr = nlut * 1024;
@@ -103,7 +106,7 @@ make_lut(Bdd bdd,
   ymuint var = bdd.root_decomp(bdd0, bdd1);
 
   ymuint limit = 0;
-  for (vector<ymuint>::const_iterator p = cut_ponts.begin();
+  for (vector<ymuint>::const_iterator p = cut_points.begin();
        p != cut_points.end(); ++ p) {
     limit = *p;
     if ( limit > var ) {
@@ -123,6 +126,7 @@ make_lut2(Bdd bdd,
 	  ymuint32* lut,
 	  const hash_map<Bdd, ymuint32>& lutmap)
 {
+#if 0
   Bdd bdd0;
   Bdd bdd1;
   ymuint var = bdd.root_decomp(bdd0, bdd1);
@@ -143,37 +147,55 @@ make_lut2(Bdd bdd,
   }
   else {
   }
+#endif
 }
 
 END_NONAMESPACE
 
 // @brief ネットワークをセットする．
 // @param[in] bdn 対象のネットワーク
+// @param[in] order_map 順序マップ
 void
-LsimBdd3::set_network(const BdnMgr& bdn)
+LsimBdd3::set_network(const BdnMgr& bdn,
+		      const hash_map<string, ymuint>& order_map)
 {
   ymuint n = bdn.max_node_id();
   vector<Bdd> bddmap(n);
 
   const BdnNodeList& input_list = bdn.input_list();
   ymuint ni = input_list.size();
-  ymuint id = 0;
-  for (BdnNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    const BdnNode* node = *p;
-    Bdd bdd = mBddMgr.make_posiliteral(id);
-    ++ id;
-    bddmap[node->id()] = bdd;
+
+  if ( order_map.empty() ) {
+    ymuint id = 0;
+    for (BdnNodeList::const_iterator p = input_list.begin();
+	 p != input_list.end(); ++ p) {
+      const BdnNode* node = *p;
+      Bdd bdd = mBddMgr.make_posiliteral(id);
+      ++ id;
+      bddmap[node->id()] = bdd;
+    }
+  }
+  else {
+    for (BdnNodeList::const_iterator p = input_list.begin();
+	 p != input_list.end(); ++ p) {
+      const BdnNode* node = *p;
+      string name = node->port()->name();
+      hash_map<string, ymuint>::const_iterator q = order_map.find(name);
+      if ( q == order_map.end() ) {
+	cerr << "No map for " << name << endl;
+	abort();
+      }
+      ymuint id = q->second;
+      Bdd bdd = mBddMgr.make_posiliteral(id);
+      bddmap[node->id()] = bdd;
+    }
   }
 
   vector<BdnNode*> node_list;
   bdn.sort(node_list);
-  ymuint node_num = node_list.size();
-  id = 0;
   for (vector<BdnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const BdnNode* node = *p;
-    ++ id;
     const BdnNode* fanin0 = node->fanin0();
     Bdd bdd0 = bddmap[fanin0->id()];
     if ( node->fanin0_inv() ) {
@@ -248,13 +270,13 @@ LsimBdd3::set_network(const BdnMgr& bdn)
     mOutputList.push_back(addr);
   }
 
-  mLut = new ymuint32[nlut * 1024];
+  mLUT = new ymuint32[nlut * 1024];
 
   for (hash_map<Bdd, ymuint32>::iterator p = lutmap.begin();
-       p != lutmap.end(); ++ ) {
+       p != lutmap.end(); ++ p) {
     Bdd bdd = p->first;
     ymuint32 addr = p->second;
-    make_lut2(bdd, cut_points, &mLut[addr], lutmap);
+    make_lut2(bdd, cut_points, &mLUT[addr], lutmap);
   }
 }
 

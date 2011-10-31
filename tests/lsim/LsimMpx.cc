@@ -1,13 +1,13 @@
 
-/// @file LsimBdd.cc
-/// @brief LsimBdd の実装ファイル
+/// @file LsimMpx.cc
+/// @brief LsimMpx の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LsimBdd.h"
+#include "LsimMpx.h"
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/BdnPort.h"
 
@@ -15,31 +15,78 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス LsimBdd
+// クラス LsimMpx
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LsimBdd::LsimBdd() :
+LsimMpx::LsimMpx() :
   mBddMgr("bmc", "Bdd Manager")
 {
 }
 
 // @brief デストラクタ
-LsimBdd::~LsimBdd()
+LsimMpx::~LsimMpx()
 {
 }
+
+BEGIN_NONAMESPACE
+
+inline
+ympuint
+encode(LsimMpx::MpxNode* node,
+       bool inv)
+{
+  return reinterpret_cast<ympuint>(node) | inv;
+}
+
+inline
+LsimMpx::MpxNode*
+decode_node(ympuint val)
+{
+  return reinterpret_cast<LsimMpx::MpxNode*>(val & ~1UL);
+}
+
+inline
+bool
+decode_inv(ympuint val)
+{
+  return static_cast<bool>(val & 1UL);
+}
+
+inline
+ymuint64
+ptr_eval(ympuint ptr)
+{
+  LsimMpx::MpxNode* node = decode_node(ptr);
+  ymuint64 val = 0UL;
+  if ( node ) {
+    val = node->mVal;
+  }
+  bool inv = decode_inv(ptr);
+  if ( inv ) {
+    val = ~val;
+  }
+  return val;
+}
+
+END_NONAMESPACE
 
 // @brief ネットワークをセットする．
 // @param[in] bdn 対象のネットワーク
 // @param[in] order_map 順序マップ
 void
-LsimBdd::set_network(const BdnMgr& bdn,
+LsimMpx::set_network(const BdnMgr& bdn,
 		     const hash_map<string, ymuint>& order_map)
 {
   ymuint n = bdn.max_node_id();
   vector<Bdd> bddmap(n);
 
+  hash_map<Bdd, ympuint> mpx_map;
+
   const BdnNodeList& input_list = bdn.input_list();
+  ymuint ni = input_list.size();
+  mInputList.clear();
+  mInputList.reserve(ni);
   if ( order_map.empty() ) {
     ymuint id = 0;
     for (BdnNodeList::const_iterator p = input_list.begin();
@@ -48,6 +95,9 @@ LsimBdd::set_network(const BdnMgr& bdn,
       Bdd bdd = mBddMgr.make_posiliteral(id);
       ++ id;
       bddmap[node->id()] = bdd;
+      mInputList.push_back(MpxNode(id, 0UL, 0UL));
+      ympuint ptr = encode(&mInputList.back(), false);
+      mpx_map.insert(make_pair(bdd, ptr));
     }
   }
   else {
@@ -63,6 +113,9 @@ LsimBdd::set_network(const BdnMgr& bdn,
       ymuint id = q->second;
       Bdd bdd = mBddMgr.make_posiliteral(id);
       bddmap[node->id()] = bdd;
+      mInputList.push_back(MpxNode(id, 0UL, 0UL));
+      ympuint ptr = encode(&mInputList.back(), false);
+      mpx_map.insert(make_pair(bdd, ptr));
     }
   }
 
@@ -104,8 +157,8 @@ LsimBdd::set_network(const BdnMgr& bdn,
   mBddMgr.disable_gc();
 
   const BdnNodeList& output_list = bdn.output_list();
-  mOutputList.clear();
-  mOutputList.reserve(output_list.size());
+  vector<Bdd> output_bdd_list;
+  output_bdd_list.reserve(output_list.size());
   for (BdnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     BdnNode* node = *p;
@@ -120,58 +173,84 @@ LsimBdd::set_network(const BdnMgr& bdn,
     if ( node->output_fanin_inv() ) {
       bdd = ~bdd;
     }
-    mOutputList.push_back(bdd);
+    output_bdd_list.push_back(bdd);
   }
 
-  cout << "BDD size: " << size(mOutputList) << endl;
+  cout << "BDD size: " << size(output_bdd_list) << endl;
+
+  ymuint nbdd = size(output_bdd_list);
+  mNodeList.clear();
+  mNodeList.reserve(nbdd);
+  mOutputList.clear();
+  mOutputList.reserve(output_list.size());
+  for (vector<Bdd>::iterator p = output_bdd_list.begin();
+       p != output_bdd_list.end(); ++ p) {
+    ympuint node = make_mpx(*p, mpx_map);
+    mOutputList.push_back(node);
+  }
+
+  cout << "MPX size: " << mNodeList.size() << endl;
 }
 
-
-BEGIN_NONAMESPACE
-
-ymuint64
-eval_bdd(Bdd bdd,
-	 const vector<ymuint64>& iv)
+ympuint
+LsimMpx::make_mpx(Bdd bdd,
+		  hash_map<Bdd, ympuint>& mpx_map)
 {
-  ymuint val = 0U;
-  for (ymuint b = 0; b < 64; ++ b) {
-    for ( ; ; ) {
-      if ( bdd.is_one() ) {
-	val |= (1U << b);
-	break;
-      }
-      else if ( bdd.is_zero() ) {
-	break;
-      }
-      Bdd bdd0;
-      Bdd bdd1;
-      ymuint id = bdd.root_decomp(bdd0, bdd1);
-      ymuint ival = iv[id];
-      if ( (ival & (1 << b)) ) {
-	bdd = bdd1;
-      }
-      else {
-	bdd = bdd0;
-      }
-    }
+  if ( bdd.is_zero() ) {
+    return 0UL;
   }
-  return val;
+  if ( bdd.is_one() ) {
+    return 1UL;
+  }
+  hash_map<Bdd, ympuint>::iterator p = mpx_map.find(bdd);
+  if ( p != mpx_map.end() ) {
+    return p->second;
+  }
+
+  p = mpx_map.find(~bdd);
+  if ( p != mpx_map.end() ) {
+    return p->second ^ 1UL;
+  }
+
+  Bdd bdd0;
+  Bdd bdd1;
+  ymuint varid = bdd.root_decomp(bdd0, bdd1);
+  ympuint node0 = make_mpx(bdd0, mpx_map);
+  ympuint node1 = make_mpx(bdd1, mpx_map);
+
+  mNodeList.push_back(MpxNode(varid, node0, node1));
+  ympuint ptr = encode(&mNodeList.back(), false);
+  mpx_map.insert(make_pair(bdd, ptr));
+
+  return ptr;
 }
-
-END_NONAMESPACE
-
 
 // @brief 論理シミュレーションを行う．
 // @param[in] iv 入力ベクタ
 // @param[out] ov 出力ベクタ
 void
-LsimBdd::eval(const vector<ymuint64>& iv,
+LsimMpx::eval(const vector<ymuint64>& iv,
 	      vector<ymuint64>& ov)
 {
+  ymuint ni = mInputList.size();
+  assert_cond( ni == iv.size(), __FILE__, __LINE__);
+
+  ymuint nn = mNodeList.size();
+  for (ymuint i = 0; i < nn; ++ i) {
+    MpxNode& node = mNodeList[i];
+    ympuint ptr0 = node.mFanins[0];
+    ymuint64 val0 = ptr_eval(ptr0);
+    ympuint ptr1 = node.mFanins[1];
+    ymuint64 val1 = ptr_eval(ptr1);
+    ymuint64 c_val = iv[node.mId];
+
+    node.mVal = (c_val & val1) | (~c_val & val0);
+  }
+
   ymuint no = ov.size();
   for (ymuint i = 0; i < no; ++ i) {
-    Bdd bdd = mOutputList[i];
-    ov[i] = eval_bdd(bdd, iv);
+    ympuint ptr = mOutputList[i];
+    ov[i] = ptr_eval(ptr);
   }
 }
 

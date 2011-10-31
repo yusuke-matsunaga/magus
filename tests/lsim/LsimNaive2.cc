@@ -30,8 +30,10 @@ LsimNaive2::~LsimNaive2()
 
 // @brief ネットワークをセットする．
 // @param[in] bdn 対象のネットワーク
+// @param[in] order_map 順序マップ
 void
-LsimNaive2::set_network(const BdnMgr& bdn)
+LsimNaive2::set_network(const BdnMgr& bdn,
+			const hash_map<string, ymuint>& order_map)
 {
   mBdnMgr = &bdn;
 
@@ -76,6 +78,8 @@ LsimNaive2::set_network(const BdnMgr& bdn)
   const BdnNodeList& output_list = mBdnMgr->output_list();
   mOutputList.clear();
   mOutputList.reserve(output_list.size());
+  mOutputInv.clear();
+  mOutputInv.reserve(output_list.size());
   for (BdnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     const BdnNode* node = *p;
@@ -84,9 +88,12 @@ LsimNaive2::set_network(const BdnMgr& bdn)
       mOutputList.push_back(map[inode->id()]);
     }
     else {
-      mOutputList.push_back(map[0]);
+      mOutputList.push_back(NULL);
     }
+    mOutputInv.push_back(node->output_fanin_inv());
   }
+
+  cout << "Node num: " << id << endl;
 }
 
 // @brief 論理シミュレーションを行う．
@@ -128,7 +135,14 @@ LsimNaive2::eval(const vector<ymuint64>& iv,
   ymuint no = mOutputList.size();
   for (ymuint i = 0; i < no; ++ i) {
     SimNode* snode = mOutputList[i];
-    ov[i] = snode->mVal;
+    ymuint64 val = 0UL;
+    if ( snode != NULL ) {
+      val = snode->mVal;
+    }
+    if ( mOutputInv[i] ) {
+      val = ~val;
+    }
+    ov[i] = val;
   }
 }
 

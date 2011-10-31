@@ -30,8 +30,10 @@ LsimNaive::~LsimNaive()
 
 // @brief ネットワークをセットする．
 // @param[in] bdn 対象のネットワーク
+// @param[in] order_map 順序マップ
 void
-LsimNaive::set_network(const BdnMgr& bdn)
+LsimNaive::set_network(const BdnMgr& bdn,
+		       const hash_map<string, ymuint>& order_map)
 {
   mBdnMgr = &bdn;
 

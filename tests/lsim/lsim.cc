@@ -30,24 +30,71 @@
 #include "LsimBdd2.h"
 #include "LsimBdd3.h"
 #include "LsimLcc.h"
+#include "LsimMpx.h"
 
 
 BEGIN_NAMESPACE_YM
 
+string
+read_name(istream& s)
+{
+  string buf;
+  while ( !s.eof() ) {
+    char c = s.get();
+    if ( !isspace(c) ) {
+      buf += c;
+      break;
+    }
+  }
+  while ( !s.eof() ) {
+    char c = s.get();
+    if ( isspace(c) || c == EOF ) {
+      break;
+    }
+    buf += c;
+  }
+  return buf;
+}
+
+bool
+read_order(const char* filename,
+	   hash_map<string, ymuint>& order_map)
+{
+  ifstream fs;
+
+  fs.open(filename);
+  if ( !fs ) {
+    cerr << "Could not open " << filename << endl;
+    return false;
+  }
+
+  ymuint pos = 0;
+  while ( !fs.eof() ) {
+    string name = read_name(fs);
+#if 0
+    cout << name << ": " << pos << endl;
+#endif
+    order_map.insert(make_pair(name, pos));
+    ++ pos;
+  }
+  return true;
+}
+
 void
 do_lsim(Lsim& lsim,
 	ymuint nloop,
-	BdnMgr& network)
+	BdnMgr& network,
+	hash_map<string, ymuint>& order_map)
 {
   StopWatch sw;
   sw.start();
 
-  lsim.set_network(network);
+  lsim.set_network(network, order_map);
 
   sw.stop();
 
   USTime time1 = sw.time();
-  cerr << "Initialize:       \t" << time1 << endl;
+  cout << "Initialize:       \t" << time1 << endl;
 
   RandGen rg;
 
@@ -71,7 +118,7 @@ do_lsim(Lsim& lsim,
   sw.stop();
 
   USTime time2 = sw.time();
-  cerr << "Evaluation[" << nloop << "]:\t" << time2 << endl;
+  cout << "Evaluation[" << nloop << "]:\t" << time2 << endl;
 }
 
 void
@@ -79,7 +126,8 @@ lsim(const string& filename,
      bool blif,
      bool iscas89,
      int loop_count,
-     const string& method_str)
+     const string& method_str,
+     const char* order_file)
 {
   MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
   MsgMgr::reg_handler(msg_handler);
@@ -101,31 +149,43 @@ lsim(const string& filename,
     }
   }
 
+  hash_map<string, ymuint> order_map;
+  if ( order_file ) {
+    if ( !read_order(order_file, order_map) ) {
+      cerr << "Error in reading " << order_file << endl;
+      return;
+    }
+  }
+
   if ( method_str == "naive" ) {
     LsimNaive lsim;
-    do_lsim(lsim, loop_count, network);
+    do_lsim(lsim, loop_count, network, order_map);
   }
   else if ( method_str == "naive2" ) {
     LsimNaive2 lsim;
-    do_lsim(lsim, loop_count, network);
+    do_lsim(lsim, loop_count, network, order_map);
   }
   else if ( method_str == "bdd" ) {
     LsimBdd lsim;
-    do_lsim(lsim, loop_count, network);
+    do_lsim(lsim, loop_count, network, order_map);
   }
   else if ( method_str == "bdd2" ) {
     LsimBdd2 lsim;
-    do_lsim(lsim, loop_count, network);
+    do_lsim(lsim, loop_count, network, order_map);
   }
   else if ( method_str == "bdd3" ) {
     LsimBdd3 lsim;
-    do_lsim(lsim, loop_count, network);
+    do_lsim(lsim, loop_count, network, order_map);
   }
   else if ( method_str == "lcc" ) {
     LsimLcc lsim;
-    do_lsim(lsim, loop_count, network);
+    do_lsim(lsim, loop_count, network, order_map);
   }
   else if ( method_str == "tv" ) {
+  }
+  else if ( method_str == "mpx" ) {
+    LsimMpx lsim;
+    do_lsim(lsim, loop_count, network, order_map);
   }
   else {
     cerr << "Unknown method: " << method_str << endl;
@@ -143,6 +203,7 @@ main(int argc,
   using namespace nsYm;
 
   const char* method_str = "naive";
+  const char* order_file = NULL;
   int loop_count = 2000;
   bool blif = false;
   bool iscas = false;
@@ -167,6 +228,9 @@ main(int argc,
 
     { "iscas89", '\0', POPT_ARG_NONE, NULL, 0x101,
       "iscas89 mode", NULL },
+
+    { "order", 'o', POPT_ARG_STRING, &order_file, 0,
+      "specify variable order file", NULL },
 
     POPT_AUTOHELP
 
@@ -210,7 +274,7 @@ main(int argc,
   }
 
   string filename(str);
-  lsim(filename, blif, iscas, loop_count, method_str);
+  lsim(filename, blif, iscas, loop_count, method_str, order_file);
 
   return 0;
 }

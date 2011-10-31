@@ -29,8 +29,10 @@ LsimLcc::~LsimLcc()
 
 // @brief ネットワークをセットする．
 // @param[in] bdn 対象のネットワーク
+// @param[in] order_map 順序マップ
 void
-LsimLcc::set_network(const BdnMgr& bdn)
+LsimLcc::set_network(const BdnMgr& bdn,
+		     const hash_map<string, ymuint>& order_map)
 {
   vector<BdnNode*> node_list;
   bdn.sort(node_list);

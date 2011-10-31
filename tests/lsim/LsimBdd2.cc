@@ -9,6 +9,7 @@
 
 #include "LsimBdd2.h"
 #include "ym_networks/BdnNode.h"
+#include "ym_networks/BdnPort.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -75,31 +76,48 @@ END_NONAMESPACE
 
 // @brief ネットワークをセットする．
 // @param[in] bdn 対象のネットワーク
+// @param[in] order_map 順序マップ
 void
-LsimBdd2::set_network(const BdnMgr& bdn)
+LsimBdd2::set_network(const BdnMgr& bdn,
+		      const hash_map<string, ymuint>& order_map)
 {
   ymuint n = bdn.max_node_id();
   vector<Bdd> bddmap(n);
 
   const BdnNodeList& input_list = bdn.input_list();
   ymuint ni = input_list.size();
-  ymuint id = 0;
-  for (BdnNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    const BdnNode* node = *p;
-    Bdd bdd = mBddMgr.make_posiliteral(id);
-    ++ id;
-    bddmap[node->id()] = bdd;
+
+  if ( order_map.empty() ) {
+    ymuint id = 0;
+    for (BdnNodeList::const_iterator p = input_list.begin();
+	 p != input_list.end(); ++ p) {
+      const BdnNode* node = *p;
+      Bdd bdd = mBddMgr.make_posiliteral(id);
+      ++ id;
+      bddmap[node->id()] = bdd;
+    }
+  }
+  else {
+    for (BdnNodeList::const_iterator p = input_list.begin();
+	 p != input_list.end(); ++ p) {
+      const BdnNode* node = *p;
+      string name = node->port()->name();
+      hash_map<string, ymuint>::const_iterator q = order_map.find(name);
+      if ( q == order_map.end() ) {
+	cerr << "No order for " << name << endl;
+	abort();
+      }
+      ymuint id = q->second;
+      Bdd bdd = mBddMgr.make_posiliteral(id);
+      bddmap[node->id()] = bdd;
+    }
   }
 
   vector<BdnNode*> node_list;
   bdn.sort(node_list);
-  ymuint node_num = node_list.size();
-  id = 0;
   for (vector<BdnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const BdnNode* node = *p;
-    ++ id;
     const BdnNode* fanin0 = node->fanin0();
     Bdd bdd0 = bddmap[fanin0->id()];
     if ( node->fanin0_inv() ) {
@@ -143,7 +161,13 @@ LsimBdd2::set_network(const BdnMgr& bdn)
        p != output_list.end(); ++ p) {
     BdnNode* node = *p;
     BdnNode* node0 = node->output_fanin();
-    Bdd bdd = bddmap[node0->id()];
+    Bdd bdd;
+    if ( node0 != NULL ) {
+      bdd = bddmap[node0->id()];
+    }
+    else {
+      bdd = mBddMgr.make_zero();
+    }
     if ( node->output_fanin_inv() ) {
       bdd = ~bdd;
     }

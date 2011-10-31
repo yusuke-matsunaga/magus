@@ -34,9 +34,11 @@ public:
 
   /// @brief ネットワークをセットする．
   /// @param[in] bdn 対象のネットワーク
+  /// @param[in] order_map 順序マップ
   virtual
   void
-  set_network(const BdnMgr& bdn) = 0;
+  set_network(const BdnMgr& bdn,
+	      const hash_map<string, ymuint>& order_map) = 0;
 
   /// @brief 論理シミュレーションを行う．
   /// @param[in] iv 入力ベクタ
