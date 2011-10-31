@@ -36,12 +36,16 @@ lsim_SOURCES = \
 	LsimBdd.cc \
 	LsimBdd2.h \
 	LsimBdd2.cc \
+	LsimBdd1.h \
+	LsimBdd1.cc \
 	LsimBdd3.h \
 	LsimBdd3.cc \
 	LsimLcc.h \
 	LsimLcc.cc \
 	LsimMpx.h \
-	LsimMpx.cc
+	LsimMpx.cc \
+	LsimMpx2.h \
+	LsimMpx2.cc
 
 lsim_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \

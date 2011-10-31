@@ -1,8 +1,8 @@
-#ifndef LSIMBDD2_H
-#define LSIMBDD2_H
+#ifndef LSIMBDD1_H
+#define LSIMBDD1_H
 
-/// @file LsimBdd2.h
-/// @brief LsimBdd2 のヘッダファイル
+/// @file LsimBdd1.h
+/// @brief LsimBdd1 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -17,20 +17,20 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class LsimBdd2 LsimBdd2.h "LsimBdd2.h"
+/// @class LsimBdd1 LsimBdd1.h "LsimBdd1.h"
 /// @brief BDD を用いた Lsim の実装
 //////////////////////////////////////////////////////////////////////
-class LsimBdd2 :
+class LsimBdd1 :
   public Lsim
 {
 public:
 
   /// @brief コンストラクタ
-  LsimBdd2();
+  LsimBdd1();
 
   /// @brief デストラクタ
   virtual
-  ~LsimBdd2();
+  ~LsimBdd1();
 
 
 public:
@@ -70,24 +70,18 @@ public:
   // 内部で用いられるデータ構造
   //////////////////////////////////////////////////////////////////////
 
-  struct Bdd2Node {
-    Bdd2Node(ymuint id0,
-	     ymuint id1,
-	     ympuint node00,
-	     ympuint node01,
-	     ympuint node10,
-	     ympuint node11)
+  struct Bdd1Node {
+    Bdd1Node(ymuint id,
+	     ympuint node0,
+	     ympuint node1)
     {
-      mId[0] = id0;
-      mId[1] = id1;
-      mFanins[0] = node00;
-      mFanins[1] = node01;
-      mFanins[2] = node10;
-      mFanins[3] = node11;
+      mId = id;
+      mFanins[0] = node0;
+      mFanins[1] = node1;
     }
 
-    ymuint mId[2];
-    ympuint mFanins[4];
+    ymuint mId;
+    ympuint mFanins[2];
   };
 
 
@@ -100,7 +94,7 @@ private:
   BddMgr mBddMgr;
 
   // ノードの配列
-  vector<Bdd2Node*> mNodeList;
+  vector<Bdd1Node*> mNodeList;
 
   // 出力のノードの配列
   vector<ympuint> mOutputList;
@@ -109,4 +103,4 @@ private:
 
 END_NAMESPACE_YM
 
-#endif // LSIMBDD2_H
+#endif // LSIMBDD1_H

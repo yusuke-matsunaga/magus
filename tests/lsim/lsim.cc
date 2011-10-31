@@ -27,10 +27,12 @@
 #include "LsimNaive.h"
 #include "LsimNaive2.h"
 #include "LsimBdd.h"
+#include "LsimBdd1.h"
 #include "LsimBdd2.h"
 #include "LsimBdd3.h"
 #include "LsimLcc.h"
 #include "LsimMpx.h"
+#include "LsimMpx2.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -169,6 +171,10 @@ lsim(const string& filename,
     LsimBdd lsim;
     do_lsim(lsim, loop_count, network, order_map);
   }
+  else if ( method_str == "bdd1" ) {
+    LsimBdd1 lsim;
+    do_lsim(lsim, loop_count, network, order_map);
+  }
   else if ( method_str == "bdd2" ) {
     LsimBdd2 lsim;
     do_lsim(lsim, loop_count, network, order_map);
@@ -185,6 +191,10 @@ lsim(const string& filename,
   }
   else if ( method_str == "mpx" ) {
     LsimMpx lsim;
+    do_lsim(lsim, loop_count, network, order_map);
+  }
+  else if ( method_str == "mpx2" ) {
+    LsimMpx2 lsim;
     do_lsim(lsim, loop_count, network, order_map);
   }
   else {

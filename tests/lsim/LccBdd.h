@@ -57,53 +57,14 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  ympuint
-  make_node(Bdd bdd,
-	    hash_map<Bdd, ympuint>& node_map);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  struct Bdd2Node {
-    Bdd2Node(ymuint id0,
-	     ymuint id1,
-	     ympuint node00,
-	     ympuint node01,
-	     ympuint node10,
-	     ympuint node11)
-    {
-      mId[0] = id0;
-      mId[1] = id1;
-      mFanins[0] = node00;
-      mFanins[1] = node01;
-      mFanins[2] = node10;
-      mFanins[3] = node11;
-    }
-
-    ymuint mId[2];
-    ympuint mFanins[4];
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // BDD の管理用オブジェクト
   BddMgr mBddMgr;
 
-  // ノードの配列
-  vector<Bdd2Node*> mNodeList;
-
-  // 出力のノードの配列
-  vector<ympuint> mOutputList;
+  // 出力のBDDの配列
+  vector<Bdd> mOutputList;
 
 };
 
