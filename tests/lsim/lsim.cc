@@ -26,6 +26,7 @@
 
 #include "LsimNaive.h"
 #include "LsimNaive2.h"
+#include "LsimNaive3.h"
 #include "LsimBdd.h"
 #include "LsimBdd1.h"
 #include "LsimBdd2.h"
@@ -166,6 +167,10 @@ lsim(const string& filename,
   }
   else if ( method_str == "naive2" ) {
     LsimNaive2 lsim;
+    do_lsim(lsim, loop_count, network, order_map);
+  }
+  else if ( method_str == "naive3" ) {
+    LsimNaive3 lsim;
     do_lsim(lsim, loop_count, network, order_map);
   }
   else if ( method_str == "bdd" ) {

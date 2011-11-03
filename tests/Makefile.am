@@ -4,7 +4,8 @@
 
 SUBDIRS = \
 	makebdd \
-	lsim
+	lsim \
+	enumcut
 
 MAINTAINERCLEANFILES = Makefile.in
 

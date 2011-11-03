@@ -18,43 +18,26 @@ TESTS =
 
 
 noinst_PROGRAMS = \
-	lsim
+	enumcut
 
-lsim_CPPFLAGS = \
+enumcut_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	@POPT_INCLUDES@
 
-lsim_SOURCES = \
-	lsim.cc \
-	Lsim.h \
-	LsimNaive.h \
-	LsimNaive.cc \
-	LsimNaive2.h \
-	LsimNaive2.cc \
-	LsimNaive3.h \
-	LsimNaive3.cc \
-	LsimBdd.h \
-	LsimBdd.cc \
-	LsimBdd2.h \
-	LsimBdd2.cc \
-	LsimBdd1.h \
-	LsimBdd1.cc \
-	LsimBdd3.h \
-	LsimBdd3.cc \
-	LsimBdd10.h \
-	LsimBdd10.cc \
-	LsimLcc.h \
-	LsimLcc.cc \
-	LsimMpx.h \
-	LsimMpx.cc \
-	LsimMpx2.h \
-	LsimMpx2.cc
+enumcut_SOURCES = \
+	enumcut.cc \
+	EnumCut.h \
+	EnumCut.cc \
+	BottomUp.h \
+	BottomUp.cc \
+	TopDown.h \
+	TopDown.cc
 
-lsim_LDADD = \
+enumcut_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	@POPT_LIBS@
 
-lsim_LDFLAGS =
+enumcut_LDFLAGS =

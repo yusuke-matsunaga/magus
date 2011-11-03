@@ -13,13 +13,41 @@
 
 BEGIN_NAMESPACE_YM
 
+BEGIN_NONAMESPACE
+
+void
+xoring(BdnMgr& bdnmgr)
+{
+  vector<BdnNode*> node_list;
+  bdnmgr.sort(node_list);
+  for (vector<BdnNode*>::iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    BdnNode* node = *p;
+    BdnNode* node0 = node->fanin(0);
+    BdnNode* node1 = node->fanin(1);
+    BdnNode* node00 = node0->fanin(0);
+    BdnNode* node01 = node0->fanin(1);
+    BdnNode* node10 = node1->fanin(0);
+    BdnNode* node11 = node1->fanin(1);
+    if ( node00 == node10 && node01 == node11 ) {
+      if ( (node0->fanin_inv(0) ^ node0->fanin_inv(1)) &&
+	   (node1->fanin_inv(0) ^ node1->fanin_inv(1)) ) {
+      }
+    }
+    else if ( node00 == node11 && node01 == node10 ) {
+      ;
+    }
+  }
+}
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス LsimNaive2
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LsimNaive2::LsimNaive2() :
-  mBdnMgr(NULL)
+LsimNaive2::LsimNaive2()
 {
 }
 
@@ -35,11 +63,12 @@ void
 LsimNaive2::set_network(const BdnMgr& bdn,
 			const hash_map<string, ymuint>& order_map)
 {
-  mBdnMgr = &bdn;
+  // コピー
+  mBdnMgr = bdn;
 
-  vector<SimNode*> map(mBdnMgr->max_node_id());
+  vector<SimNode*> map(mBdnMgr.max_node_id());
 
-  const BdnNodeList& input_list = mBdnMgr->input_list();
+  const BdnNodeList& input_list = mBdnMgr.input_list();
   mInputList.clear();
   mInputList.resize(input_list.size());
   ymuint input_id = 0;
@@ -50,11 +79,14 @@ LsimNaive2::set_network(const BdnMgr& bdn,
     //cout << "map[" << node->id() << "]" << endl;
   }
 
-  ymuint lnum = mBdnMgr->lnode_num();
+  // XORize する．
+  xoring(mBdnMgr);
+
+  ymuint lnum = mBdnMgr.lnode_num();
   mNodeList.clear();
   mNodeList.resize(lnum);
   vector<BdnNode*> node_list;
-  mBdnMgr->sort(node_list);
+  mBdnMgr.sort(node_list);
   ymuint id = 0;
   for (vector<BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p, ++ id) {
@@ -75,7 +107,7 @@ LsimNaive2::set_network(const BdnMgr& bdn,
     map[node->id()] = &snode;
   }
 
-  const BdnNodeList& output_list = mBdnMgr->output_list();
+  const BdnNodeList& output_list = mBdnMgr.output_list();
   mOutputList.clear();
   mOutputList.reserve(output_list.size());
   mOutputInv.clear();
