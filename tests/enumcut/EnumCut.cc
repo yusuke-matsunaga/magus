@@ -56,7 +56,11 @@ EnumCut::found_cut(const BdnNode* root)
 {
   ++ mNcCur;
 
+  mCutList.push_back(vector<ymuint32>(1, root->id()));
+
+#if 0
   cout << "found_cut()" << endl;
+#endif
 }
 
 // @brief cut が一つ見つかったときに呼ばれる関数(non-trivial cut)
@@ -70,11 +74,19 @@ EnumCut::found_cut(const BdnNode* root,
 {
   ++ mNcCur;
 
+  mCutList.push_back(vector<ymuint32>(ni));
+  vector<ymuint32>& cut = mCutList.back();
+  for (ymuint i = 0; i < ni; ++ i) {
+    cut[i] = inputs[i];
+  }
+
+#if 0
   cout << "found_cut(";
   for (ymuint i = 0; i < ni; ++ i) {
     cout << " " << inputs[i];
   }
   cout << ")" << endl;
+#endif
 }
 
 // @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
@@ -86,7 +98,19 @@ EnumCut::node_end(const BdnNode* node)
   ++ mCurPos;
   mNcAll += mNcCur;
 
-  cout << "Node#" << node->id() << ": " << mNcCur << endl
+  for (list<vector<ymuint32> >::iterator p = mCutList.begin();
+       p != mCutList.end(); ++ p) {
+    const vector<ymuint32>& cut = *p;
+    ymuint n = cut.size();
+    cout << "{";
+    for (ymuint i = 0; i < n; ++ i) {
+      cout << " " << cut[i];
+    }
+    cout << "}" << endl;
+  }
+  mCutList.clear();
+
+  cout << "    " << mNcCur << " cuts" << endl
        << endl;
 }
 

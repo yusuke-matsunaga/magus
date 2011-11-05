@@ -92,6 +92,9 @@ private:
   // 現在処理中のノード番号
   ymuint32 mCurPos;
 
+  // 現在のカットリスト
+  list<vector<ymuint32> > mCutList;
+
   // 現在のカット数
   ymuint32 mNcCur;
 

@@ -182,6 +182,10 @@ private:
   bool
   frontier_is_empty() const;
 
+  /// @brief ノードを入力に確定する．
+  void
+  set_input(const BdnNode* node);
+
   /// @brief ノードの作業領域を得る．
   NodeTemp&
   node_temp(const BdnNode* node);
@@ -676,6 +680,17 @@ bool
 TopDown::frontier_is_empty() const
 {
   return mFsPos == mFrontierStack;
+}
+
+// @brief ノードを入力に確定する．
+inline
+void
+TopDown::set_input(const BdnNode* node)
+{
+  set_input_state(node);
+  mInputs[mInputPos] = node;
+  mInputIds[mInputPos] = node->id();
+  ++ mInputPos;
 }
 
 END_NAMESPACE_YM_NETWORKS

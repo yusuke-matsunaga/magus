@@ -11,7 +11,7 @@
 #include "ym_networks/BdnMgr.h"
 
 
-#define DEBUG_ENUM_RECUR 1
+//#define DEBUG_ENUM_RECUR 1
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -178,16 +178,15 @@ TopDown::enum_recur()
 
   if ( mInputPos < mLimit ) {
     // node を入力に固定して再帰を続ける
-    set_input_state(node);
-    mInputs[mInputPos] = node;
-    mInputIds[mInputPos] = node->id();
-    ++ mInputPos;
+    set_input(node);
 
 #if defined(DEBUG_ENUM_RECUR)
     cout << "MARK[1] " << node->id() << endl;
 #endif
 
     has_cuts = enum_recur();
+
+    // node を内部ノードにする．
     set_inside_state(node);
     -- mInputPos;
 
@@ -212,10 +211,7 @@ TopDown::enum_recur()
 #endif
     }
     else if ( mInputPos < mLimit ) {
-      set_input_state(inode0);
-      mInputs[mInputPos] = inode0;
-      mInputIds[mInputPos] = inode0->id();
-      ++ mInputPos;
+      set_input(inode0);
       inode0_stat = true;
       set_edge_mark(node, 0);
 
@@ -241,28 +237,33 @@ TopDown::enum_recur()
 #endif
       }
       else if ( mInputPos < mLimit ) {
-	set_input_state(inode1);
-	mInputs[mInputPos] = inode1;
-	mInputIds[mInputPos] = inode1->id();
-	++ mInputPos;
+	set_input(inode1);
 	inode1_stat = true;
 	set_edge_mark(node, 1);
-      }
 
 #if defined(DEBUG_ENUM_RECUR)
-      cout << "MARK[3] " << inode0->id() << endl;
+	cout << "MARK[3] " << inode0->id() << endl;
 #endif
+      }
+      else {
+	go = false;
+      }
     }
-    else {
-      go = false;
+    if ( go ) {
+      // node を内部ノードにして再帰を続ける．
+      bool has_cuts1 = enum_recur();
+      if ( has_cuts1 ) {
+	set_fpmark(node);
+	has_cuts = true;
+      }
     }
-  }
-  if ( go ) {
-    // node を内部ノードにして再帰を続ける．
-    bool has_cuts1 = enum_recur();
-    if ( has_cuts1 ) {
-      set_fpmark(node);
-      has_cuts = true;
+    if ( inode1_stat ) {
+      clear_state(inode1);
+      clear_edge_mark(node, 0);
+
+#if defined(DEBUG_ENUM_RECUR)
+      cout << "UNMARK[3] " << inode1->id() << endl;
+#endif
     }
   }
   if ( inode0_stat ) {

@@ -53,20 +53,6 @@ BottomUp::operator()(const BdnMgr& network,
     found_cut(node);
 
     node_end(node);
-
-#if 0
-    cout << "Node#" << node->id() << ": " << cut_list.size() << endl;
-    for (list<vector<ymuint32> >::const_iterator p = cut_list.begin();
-	 p != cut_list.end(); ++ p) {
-      const vector<ymuint32>& cut = *p;
-      cout << "  {";
-      for (vector<ymuint32>::const_iterator q = cut.begin();
-	   q != cut.end(); ++ q) {
-	cout << " " << *q;
-      }
-      cout << "}" << endl;
-    }
-#endif
   }
 
   vector<BdnNode*> node_list;
@@ -88,20 +74,6 @@ BottomUp::operator()(const BdnMgr& network,
       for (list<vector<ymuint32> >::const_iterator q = cut_list1.begin();
 	   q != cut_list1.end(); ++ q) {
 	const vector<ymuint32>& cut1 = *q;
-#if 0
-	cout << "cut0 = {";
-	for (vector<ymuint32>::const_iterator p = cut0.begin();
-	     p != cut0.end(); ++ p) {
-	  cout << " " << *p;
-	}
-	cout << "}" << endl;
-	cout << "cut1 = {";
-	for (vector<ymuint32>::const_iterator p = cut1.begin();
-	     p != cut1.end(); ++ p) {
-	  cout << " " << *p;
-	}
-	cout << "}" << endl;
-#endif
 
 	mInputNum = 0;
 	vector<ymuint32>::const_iterator r1 = cut0.begin();
@@ -166,22 +138,6 @@ BottomUp::operator()(const BdnMgr& network,
     found_cut(node);
 
     node_end(node);
-#if 0
-    cout << "Node#" << node->id() << ": " << cut_list.size() << endl
-	 << " = Node#" << node0->id()
-	 << " x Node#" << node1->id()
-	 << endl;
-    for (list<vector<ymuint32> >::const_iterator p = cut_list.begin();
-	 p != cut_list.end(); ++ p) {
-      const vector<ymuint32>& cut = *p;
-      cout << "  {";
-      for (vector<ymuint32>::const_iterator q = cut.begin();
-	   q != cut.end(); ++ q) {
-	cout << " " << *q;
-      }
-      cout << "}" << endl;
-    }
-#endif
   }
 
   delete [] mTmpInputs;
