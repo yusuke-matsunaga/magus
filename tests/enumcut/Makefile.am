@@ -18,7 +18,8 @@ TESTS =
 
 
 noinst_PROGRAMS = \
-	enumcut
+	enumcut \
+	lr
 
 enumcut_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
@@ -41,3 +42,16 @@ enumcut_LDADD = \
 	@POPT_LIBS@
 
 enumcut_LDFLAGS =
+
+lr_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	@POPT_INCLUDES@
+
+lr_SOURCES = \
+	LrTable.cc
+
+lr_LDADD = \
+	@POPT_LIBS@
+
+lr_LDFLAGS =
