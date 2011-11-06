@@ -10,8 +10,14 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	Bdd.h \
+	BddEdge.h \
+	BddMgr.h \
 	BddLitSet.h \
 	BddVarSet.h \
+	BddDecomp.h \
+	Zdd.h \
+	ZddEdge.h \
+	ZddMgr.h \
 	Bool3.h \
 	CvFunc.h \
 	Dg.h \
@@ -31,4 +37,5 @@ noinst_HEADERS = \
 	bdd_nsdef.h \
 	lexp_nsdef.h \
 	npn_nsdef.h \
-	sat_nsdef.h
+	sat_nsdef.h \
+	zdd_nsdef.h
