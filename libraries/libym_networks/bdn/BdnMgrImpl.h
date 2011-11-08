@@ -120,6 +120,18 @@ public:
   const BdnNodeList&
   lnode_list() const;
 
+  /// @brief 論理ノードを探す．
+  /// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  /// @param[out] onode_handle 該当のノード+極性
+  /// @return 見つかったら true を返す．
+  bool
+  find_logic(bool is_xor,
+	     BdnNodeHandle inode1_handle,
+	     BdnNodeHandle inode2_handle,
+	     BdnNodeHandle& onode_handle);
+
   /// @brief ソートされた論理ノードのリストを得る．
   /// @param[out] node_list ノードのリストの格納先
   /// @note 入力ノードと出力ノード，ラッチノードは含まない．
@@ -180,6 +192,32 @@ public:
 
 public:
 
+  /// @brief ANDノードの内容を設定する．
+  /// @param[in] node 設定するノード
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  /// @return ノード＋極性を返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  /// @note なければ node に設定する．
+  /// @note node が NULL の場合，新しいノードを確保する．
+  BdnNodeHandle
+  set_and(BdnNode* node,
+	  BdnNodeHandle inode1_handle,
+	  BdnNodeHandle inode2_handle);
+
+  /// @brief XORノードの内容を設定する．
+  /// @param[in] node 設定するノード
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  /// @return ノード＋極性を返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  /// @note なければ node に設定する．
+  /// @note node が NULL の場合，新しいノードを確保する．
+  BdnNodeHandle
+  set_xor(BdnNode* node,
+	  BdnNodeHandle inode1_handle,
+	  BdnNodeHandle inode2_handle);
+
   /// @brief AND のバランス木を作る．
   /// @param[in] node 根のノード
   /// @param[in] node_list 入力のノードのリスト
@@ -203,44 +241,6 @@ public:
   BdnNodeHandle
   make_xor_tree(BdnNode* node,
 		const vector<BdnNodeHandle>& node_list);
-
-  /// @brief バランス木を作る．
-  /// @param[in] node 根のノード
-  /// @param[in] fcode 機能コード
-  /// @param[in] iinv 入力の反転属性
-  /// @param[in] start 開始位置
-  /// @param[in] num 要素数
-  /// @param[in] node_list 入力のノードのリスト
-  /// @note node が NULL の場合，新しいノードを確保する．
-  /// @note fcode の各ビットの意味は以下のとおり，
-  ///  - 2bit: XOR/AND フラグ( 0: AND, 1: XOR)
-  BdnNodeHandle
-  make_tree(BdnNode* node,
-	    ymuint fcode,
-	    bool iinv,
-	    ymuint start,
-	    ymuint num,
-	    const vector<BdnNodeHandle>& node_list);
-
-  /// @brief 論理ノードの内容を設定する．
-  /// @param[in] node 設定するノード
-  /// @param[in] fcode 機能コード
-  /// @param[in] inode1_handle 1番めの入力ノード+極性
-  /// @param[in] inode2_handle 2番めの入力ノード+極性
-  /// @return ノード＋極性を返す．
-  /// @note fcode の各ビットの意味は以下のとおり，
-  ///  - 0bit: ファンイン0の反転属性
-  ///  - 1bit: ファンイン1の反転属性
-  ///  - 2bit: XOR/AND フラグ( 0: AND, 1: XOR)
-  ///  - 3bit: 出力の反転属性
-  /// @note すでに構造的に同じノードがあればそれを返す．
-  /// @note なければ node に設定する．
-  /// @note node が NULL の場合，新しいノードを確保する．
-  BdnNodeHandle
-  set_logic(BdnNode* node,
-	    ymuint fcode,
-	    BdnNodeHandle inode1_handle,
-	    BdnNodeHandle inode2_handle);
 
   /// @brief 論理ノードの内容を変更する．
   /// @param[in] node 変更対象の論理ノード
@@ -271,6 +271,86 @@ public:
   /// @param[in] src コピー元のオブジェクト
   void
   copy(const BdnMgr& src);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief バランス木を作る．
+  /// @param[in] node 根のノード
+  /// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
+  /// @param[in] iinv 入力の反転属性
+  /// @param[in] start 開始位置
+  /// @param[in] num 要素数
+  /// @param[in] node_list 入力のノードのリスト
+  /// @note node が NULL の場合，新しいノードを確保する．
+  BdnNodeHandle
+  make_tree(BdnNode* node,
+	    bool is_xor,
+	    bool iinv,
+	    ymuint start,
+	    ymuint num,
+	    const vector<BdnNodeHandle>& node_list);
+
+  /// @brief 論理ノードの内容を設定する．
+  /// @param[in] node 設定するノード
+  /// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  /// @return ノード＋極性を返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  /// @note なければ node に設定する．
+  /// @note node が NULL の場合，新しいノードを確保する．
+  BdnNodeHandle
+  set_logic(BdnNode* node,
+	    bool is_xor,
+	    BdnNodeHandle inode1_handle,
+	    BdnNodeHandle inode2_handle);
+
+  /// @brief 論理ノードの自明な簡単化を行う．
+  /// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  /// @param[out] onode_handle 該当のノード+極性
+  /// @return 見つかったら true を返す．
+  bool
+  is_trivial(bool is_xor,
+	     BdnNodeHandle inode1_handle,
+	     BdnNodeHandle inode2_handle,
+	     BdnNodeHandle& onode_handle);
+
+  /// @brief 論理ノードに設定する情報の正規化を行う．
+  /// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  /// @param[out] inode1 正規化された1番めの入力ノード
+  /// @param[out] inode2 正規化された2番目の入力ノード
+  /// @param[out] oinv 出力極性
+  /// @return 機能コードを返す．
+  /// @note 機能コードの各ビットの意味は以下のとおり，
+  ///  - 0bit: ファンイン0の反転属性
+  ///  - 1bit: ファンイン1の反転属性
+  ///  - 2bit: XOR/AND フラグ( 0: AND, 1: XOR)
+  ymuint
+  cannonicalize(bool is_xor,
+		BdnNodeHandle inode1_handle,
+		BdnNodeHandle inode2_handle,
+		BdnNode*& inode1,
+		BdnNode*& inode2,
+		bool& oinv);
+
+  /// @brief ノードを探索する．
+  /// @param[in] fcode 機能コード
+  /// @param[in] node1 1番めのノード
+  /// @param[in] node2 2番めのノード
+  /// @return 該当のノードを返す．
+  /// @note 見つからなければ NULL を返す．
+  BdnNode*
+  find_node(ymuint fcode,
+	    BdnNode* node1,
+	    BdnNode* node2);
 
   /// @brief D-FF を削除する．
   /// @param[in] dff 削除対象の D-FF
@@ -359,9 +439,9 @@ private:
   mutable
   ymuint32 mLevel;
 
-public:
+private:
   //////////////////////////////////////////////////////////////////////
-  // new_logic 用の定数
+  // 機能コード用の定数
   //////////////////////////////////////////////////////////////////////
 
   static
@@ -369,15 +449,7 @@ public:
   static
   const ymuint I1_BIT  = 2U;
   static
-  const ymuint AND_BIT = 0U;
-  static
   const ymuint XOR_BIT = 4U;
-
-  static
-  const ymuint AND     = AND_BIT;
-
-  static
-  const ymuint XOR     = XOR_BIT;
 
 };
 
@@ -540,6 +612,40 @@ BdnMgrImpl::lnode_list() const
   return mLnodeList;
 }
 
+// @brief ANDノードの内容を設定する．
+// @param[in] node 設定するノード
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @return ノード＋極性を返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+// @note なければ node に設定する．
+// @note node が NULL の場合，新しいノードを確保する．
+inline
+BdnNodeHandle
+BdnMgrImpl::set_and(BdnNode* node,
+		    BdnNodeHandle inode1_handle,
+		    BdnNodeHandle inode2_handle)
+{
+  return set_logic(node, false, inode1_handle, inode2_handle);
+}
+
+// @brief XORノードの内容を設定する．
+// @param[in] node 設定するノード
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @return ノード＋極性を返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+// @note なければ node に設定する．
+// @note node が NULL の場合，新しいノードを確保する．
+inline
+BdnNodeHandle
+BdnMgrImpl::set_xor(BdnNode* node,
+		    BdnNodeHandle inode1_handle,
+		    BdnNodeHandle inode2_handle)
+{
+  return set_logic(node, true, inode1_handle, inode2_handle);
+}
+
 // @brief AND のバランス木を作る．
 // @param[in] node 根のノード
 // @param[in] node_list 入力のノードのリスト
@@ -549,7 +655,7 @@ BdnNodeHandle
 BdnMgrImpl::make_and_tree(BdnNode* node,
 			  const vector<BdnNodeHandle>& node_list)
 {
-  return make_tree(node, AND, false, 0, node_list.size(), node_list);
+  return make_tree(node, false, false, 0, node_list.size(), node_list);
 }
 
 // @brief OR のバランス木を作る．
@@ -561,7 +667,7 @@ BdnNodeHandle
 BdnMgrImpl::make_or_tree(BdnNode* node,
 			 const vector<BdnNodeHandle>& node_list)
 {
-  return ~make_tree(node, AND, true, 0, node_list.size(), node_list);
+  return ~make_tree(node, false, true, 0, node_list.size(), node_list);
 }
 
 // @brief XOR のバランス木を作る．
@@ -573,7 +679,7 @@ BdnNodeHandle
 BdnMgrImpl::make_xor_tree(BdnNode* node,
 			  const vector<BdnNodeHandle>& node_list)
 {
-  return make_tree(node, XOR, false, 0, node_list.size(), node_list);
+  return make_tree(node, true, false, 0, node_list.size(), node_list);
 }
 
 END_NAMESPACE_YM_NETWORKS_BDN
