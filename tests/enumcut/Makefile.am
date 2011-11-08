@@ -49,9 +49,15 @@ lr_CPPFLAGS = \
 	@POPT_INCLUDES@
 
 lr_SOURCES = \
+	RwtNode.h \
+	RwtMgr.h \
+	RwtMgr.cc \
 	LrTable.cc
 
 lr_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	@POPT_LIBS@
 
 lr_LDFLAGS =

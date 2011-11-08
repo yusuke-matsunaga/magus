@@ -8,12 +8,16 @@
 
 
 #include "ym_networks/bdn.h"
+#include "RwtMgr.h"
+#include "RwtNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-static
-ymuint16 s_RwtAigSubgraphs[] =
+BEGIN_NONAMESPACE
+
+ymuint16
+s_RwtAigSubgraphs[] =
 {
     0x0008,0x0002, 0x000a,0x0002, 0x0008,0x0003, 0x000a,0x0003, 0x0009,0x0002,
     0x000c,0x0002, 0x000e,0x0002, 0x000c,0x0003, 0x000e,0x0003, 0x000d,0x0002,
@@ -374,18 +378,33 @@ ymuint16 s_RwtAigSubgraphs[] =
     0x0000,0x0000
 };
 
+END_NONAMESPACE
 
 void
 read_data()
 {
+  // データ数を数える．
+  ymuint n = 0;
   for (ymuint i = 0; ; ++ i) {
     ymuint16 v0 = s_RwtAigSubgraphs[i * 2 + 0];
     ymuint16 v1 = s_RwtAigSubgraphs[i * 2 + 1];
     if ( v0 == 0U && v1 == 0U ) {
+      n = i;
       break;
     }
+  }
+
+  RwtMgr mgr;
+
+  ymuint input_num = 4;
+  mgr.init(input_num, n);
+
+  for (ymuint i = 0; i < n; ++ i) {
+    ymuint16 v0 = s_RwtAigSubgraphs[i * 2 + 0];
+    ymuint16 v1 = s_RwtAigSubgraphs[i * 2 + 1];
 
     bool is_xor = static_cast<bool>(v0 & 1U);
+
     v0 >>= 1;
 
     ymuint id0 = v0 >> 1;
@@ -393,23 +412,11 @@ read_data()
     bool inv0 = static_cast<bool>(v0 & 1U);
     bool inv1 = static_cast<bool>(v1 & 1U);
 
-    cout << "Node#" << (i + 5) << ": ";
-    if ( is_xor ) {
-      cout << "XOR";
-    }
-    else {
-      cout << "AND";
-    }
-    cout << "(";
-    if ( inv0 ) {
-      cout << "~";
-    }
-    cout << id0 << ", ";
-    if ( inv1 ) {
-      cout << "~";
-    }
-    cout << id1 << ")" << endl;
+    ymuint id = i + input_num + 1;
+    mgr.set_node(id, is_xor, id0, id1, inv0, inv1);
   }
+
+  mgr.print(cout);
 }
 
 END_NAMESPACE_YM_NETWORKS
