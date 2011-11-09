@@ -113,12 +113,6 @@ private:
   // このノードの表している関数
   TvFunc mFunc;
 
-  // 代表関数に対する変換マップ
-  NpnMap mNpnMap;
-
-  // 同じNPN同値類に属するノードのリンク
-  RwtNode* mLink;
-
 };
 
 

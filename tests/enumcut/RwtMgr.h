@@ -16,6 +16,7 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
+class RwtPat;
 class RwtNode;
 
 //////////////////////////////////////////////////////////////////////
@@ -66,16 +67,6 @@ public:
 	   bool inv1);
 
 
-private:
-
-  /// @brief ノードと論理関数を結びつける．
-  /// @param[in] node ノード
-  /// @param[in] f 論理関数
-  void
-  set_func(RwtNode* node,
-	   const TvFunc& f);
-
-
 public:
   //////////////////////////////////////////////////////////////////////
   // 内容を取り出す関数
@@ -89,22 +80,30 @@ public:
   ymuint
   node_num() const;
 
-  /// @brief ノードを取り出す．
-  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
-  const RwtNode*
-  node(ymuint id) const;
-
-  /// @brief 論理関数に対するノードを返す．
+  /// @brief 論理関数に対するパタンを返す．
   /// @param[in] f 論理関数
   /// @param[out] cmap 変換マップ
-  const RwtNode*
-  node(const TvFunc& f,
-       NpnMap& cmap);
+  const RwtPat*
+  pat(const TvFunc& f,
+      NpnMap& cmap);
 
   /// @brief 内容を出力する．
   /// @param[in] s 出力先のストリーム
   void
   print(ostream& s) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードと論理関数を結びつける．
+  /// @param[in] node ノード
+  /// @param[in] f 論理関数
+  void
+  set_func(RwtNode* node,
+	   const TvFunc& f);
 
 
 private:
@@ -122,8 +121,8 @@ private:
   // 0 〜 input_num() までは予約済み
   RwtNode* mNodeArray;
 
-  // 代表関数をキーにしたノードのハッシュ表
-  hash_map<TvFunc, RwtNode*> mPatMap;
+  // 代表関数をキーにしたパタンのハッシュ表
+  hash_map<TvFunc, RwtPat*> mPatMap;
 
   // NPN マネージャ
   NpnMgr mNpnMgr;

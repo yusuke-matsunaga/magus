@@ -8,6 +8,7 @@
 
 
 #include "RwtMgr.h"
+#include "RwtPat.h"
 #include "RwtNode.h"
 #include "ym_logic/NpnMgr.h"
 #include "ym_logic/NpnMap.h"
@@ -59,7 +60,6 @@ RwtMgr::init(ymuint input_num,
 
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     mNodeArray[i].mId = i;
-    mNodeArray[i].mLink = NULL;
   }
 
   // 定数0ノードの設定
@@ -136,6 +136,52 @@ RwtMgr::set_node(ymuint id,
   set_func(node, f);
 }
 
+BEGIN_NONAMESPACE
+
+ymuint
+traverse(const RwtNode* node,
+	 vector<bool>& mark,
+	 vector<const RwtNode*>& inputs)
+{
+  if ( mark[node->id()] ) {
+    return 0;
+  }
+  mark[node->id()] = true;
+
+  ymuint n = 1;
+  if ( node->is_input() ) {
+    inputs.push_back(node);
+  }
+  else if ( !node->is_const0() ) {
+    n += traverse(node->fanin0_node(), mark, inputs);
+    n += traverse(node->fanin1_node(), mark, inputs);
+  }
+  return n;
+}
+
+void
+traverse2(const RwtNode* node,
+	  vector<bool>& mark,
+	  const RwtNode** node_list,
+	  ymuint& last)
+{
+  if ( !mark[node->id()] ) {
+    return;
+  }
+
+  if ( !node->is_const0() ) {
+    assert_cond( !node->is_input(), __FILE__, __LINE__);
+
+    traverse2(node->fanin0_node(), mark, node_list, last);
+    traverse2(node->fanin1_node(), mark, node_list, last);
+  }
+  node_list[last] = node;
+  ++ last;
+  mark[node->id()] = false;
+}
+
+END_NONAMESPACE
+
 // @brief ノードと論理関数を結びつける．
 // @param[in] node ノード
 // @param[in] f 論理関数
@@ -145,37 +191,48 @@ RwtMgr::set_func(RwtNode* node,
 {
   node->mFunc = f;
 
-  mNpnMgr.cannonical(f, node->mNpnMap);
-  TvFunc f1 = f.xform(node->mNpnMap);
-  hash_map<TvFunc, RwtNode*>::iterator p = mPatMap.find(f1);
+  RwtPat* pat = new RwtPat;
+
+  vector<bool> mark(mNodeNum, false);
+  vector<const RwtNode*> inputs;
+  inputs.reserve(mInputNum);
+  ymuint n = traverse(node, mark, inputs);
+  pat->mNodeNum = n;
+  pat->mInputNum = inputs.size();
+  pat->mNodeList = new const RwtNode*[n];
+  for (ymuint i = 0; i < pat->mInputNum; ++ i) {
+    const RwtNode* node = inputs[i];
+    pat->mNodeList[i] = node;
+    mark[node->id()] = false;
+  }
+  ymuint last = pat->mInputNum;
+  traverse2(node, mark, pat->mNodeList, last);
+  assert_cond( last == n, __FILE__, __LINE__);
+  assert_cond( pat->mNodeList[n - 1] == node, __FILE__, __LINE__);
+
+  mNpnMgr.cannonical(f, pat->mCmap);
+  TvFunc f1 = f.xform(pat->mCmap);
+  hash_map<TvFunc, RwtPat*>::iterator p = mPatMap.find(f1);
   if ( p == mPatMap.end() ) {
-    mPatMap.insert(make_pair(f1, node));
+    mPatMap.insert(make_pair(f1, pat));
   }
   else {
-    RwtNode* node1 = p->second;
-    for ( ; node1->mLink; node1 = node1->mLink) ;
-    node1->mLink = node;
+    RwtPat* pat1 = p->second;
+    for ( ; pat1->mLink; pat1 = pat1->mLink) ;
+    pat1->mLink = pat;
   }
 }
 
-// @brief ノードを取り出す．
-// @param[in] id ノード番号 ( 0 <= id < node_num() )
-const RwtNode*
-RwtMgr::node(ymuint id) const
-{
-  return &mNodeArray[id];
-}
-
-// @brief 論理関数に対するノードを返す．
+// @brief 論理関数に対するパタンを返す．
 // @param[in] f 論理関数
 // @param[out] cmap 変換マップ
-const RwtNode*
-RwtMgr::node(const TvFunc& f,
-	     NpnMap& cmap)
+const RwtPat*
+RwtMgr::pat(const TvFunc& f,
+	    NpnMap& cmap)
 {
   mNpnMgr.cannonical(f, cmap);
   TvFunc f1 = f.xform(cmap);
-  hash_map<TvFunc, RwtNode*>::iterator p = mPatMap.find(f1);
+  hash_map<TvFunc, RwtPat*>::iterator p = mPatMap.find(f1);
   if ( p == mPatMap.end() ) {
     return NULL;
   }
@@ -192,7 +249,7 @@ RwtMgr::print(ostream& s) const
   s << "InputNum: " << input_num() << endl
     << "NodeNum : " << node_num() << endl;
   for (ymuint i = 0; i < node_num(); ++ i) {
-    const RwtNode* node = this->node(i);
+    const RwtNode* node = &mNodeArray[i];
 
     s << "Node#" << node->id() << ": ";
     if ( node->is_const0() ) {
@@ -224,13 +281,20 @@ RwtMgr::print(ostream& s) const
   }
 
   ymuint nf = 0;
-  for (hash_map<TvFunc, RwtNode*>::const_iterator p = mPatMap.begin();
+  ymuint np = 0;
+  for (hash_map<TvFunc, RwtPat*>::const_iterator p = mPatMap.begin();
        p != mPatMap.end(); ++ p) {
     const TvFunc& f = p->first;
-    s << "Function: " << f << endl
-      << "  Node# :";
-    for (RwtNode* node = p->second; node; node = node->mLink) {
-      s << " " << node->id();
+    s << "Function: " << f << endl;
+    for (RwtPat* pat = p->second; pat; pat = pat->mLink) {
+      s << "  Pat#" << np << ": "
+	<< "#inputs = " << pat->input_num()
+	<< ", node_list = {";
+      for (ymuint i = 0; i < pat->node_num(); ++ i) {
+	s << " " << pat->node(i)->id();
+      }
+      s << "}" << endl;
+      ++ np;
     }
     s << endl;
     ++ nf;

@@ -50,6 +50,7 @@ lr_CPPFLAGS = \
 
 lr_SOURCES = \
 	RwtNode.h \
+	RwtPat.h \
 	RwtMgr.h \
 	RwtMgr.cc \
 	LrTable.cc
