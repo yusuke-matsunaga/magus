@@ -16,7 +16,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 //////////////////////////////////////////////////////////////////////
 // クラス EnumCut
 //////////////////////////////////////////////////////////////////////
-
+#if 0
 // @brief コンストラクタ
 EnumCut::EnumCut()
 {
@@ -35,8 +35,6 @@ void
 EnumCut::all_init(const BdnMgr& sbjgraph,
 		  ymuint limit)
 {
-  mCurPos = 0;
-  mNcAll = 0;
 }
 
 // @brief node を根とするカットを列挙する直前に呼ばれる関数
@@ -44,9 +42,6 @@ EnumCut::all_init(const BdnMgr& sbjgraph,
 void
 EnumCut::node_init(const BdnNode* node)
 {
-  mNcCur = 0;
-  mCurNode = node;
-  cout << "#" << mCurPos << ": Node#" << node->id() << endl;
 }
 
 // @brief cut が一つ見つかったときに呼ばれる関数(singlton cut)
@@ -54,13 +49,6 @@ EnumCut::node_init(const BdnNode* node)
 void
 EnumCut::found_cut(const BdnNode* root)
 {
-  ++ mNcCur;
-
-  mCutList.push_back(vector<ymuint32>(1, root->id()));
-
-#if 0
-  cout << "found_cut()" << endl;
-#endif
 }
 
 // @brief cut が一つ見つかったときに呼ばれる関数(non-trivial cut)
@@ -74,11 +62,13 @@ EnumCut::found_cut(const BdnNode* root,
 {
   ++ mNcCur;
 
+#if 0
   mCutList.push_back(vector<ymuint32>(ni));
   vector<ymuint32>& cut = mCutList.back();
   for (ymuint i = 0; i < ni; ++ i) {
     cut[i] = inputs[i];
   }
+#endif
 
 #if 0
   cout << "found_cut(";
@@ -98,6 +88,7 @@ EnumCut::node_end(const BdnNode* node)
   ++ mCurPos;
   mNcAll += mNcCur;
 
+#if 0
   for (list<vector<ymuint32> >::iterator p = mCutList.begin();
        p != mCutList.end(); ++ p) {
     const vector<ymuint32>& cut = *p;
@@ -109,9 +100,12 @@ EnumCut::node_end(const BdnNode* node)
     cout << "}" << endl;
   }
   mCutList.clear();
+#endif
 
+#if 0
   cout << "    " << mNcCur << " cuts" << endl
        << endl;
+#endif
 }
 
 // @brief 処理の最後に呼ばれる関数
@@ -119,7 +113,9 @@ void
 EnumCut::all_end(const BdnMgr& sbjgraph,
 		 ymuint limit)
 {
+#if 0
   cout << "Total " << mNcAll << " cuts" << endl;
+#endif
 }
-
+#endif
 END_NAMESPACE_YM_NETWORKS

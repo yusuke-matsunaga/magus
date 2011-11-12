@@ -10,12 +10,9 @@
 
 
 #include "ym_networks/bdn.h"
-#include "ym_logic/NpnMap.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
-
-class RwtNode;
 
 //////////////////////////////////////////////////////////////////////
 /// @class RwtNode RwtNode.h "RwtNode.h"
@@ -109,9 +106,6 @@ private:
 
   // ファンイン1のポインタ＋極性
   ympuint mFanin1;
-
-  // このノードの表している関数
-  TvFunc mFunc;
 
 };
 

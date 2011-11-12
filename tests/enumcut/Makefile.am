@@ -51,9 +51,21 @@ lr_CPPFLAGS = \
 lr_SOURCES = \
 	RwtNode.h \
 	RwtPat.h \
+	RwtPatGen.h \
+	RwtPatGen.cc \
+	RwtPatList.h \
 	RwtMgr.h \
 	RwtMgr.cc \
-	LrTable.cc
+	LrTable.cc \
+	EnumCut.h \
+	EnumCut.cc \
+	BottomUp.h \
+	BottomUp.cc \
+	TopDown.h \
+	TopDown.cc \
+	RwtOp.h \
+	RwtOp.cc \
+	lr.cc
 
 lr_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \

@@ -38,8 +38,9 @@ public:
   /// @param[in] limit カットサイズの制限
   virtual
   void
-  operator()(const BdnMgr& network,
-	     ymuint limit);
+  operator()(BdnMgr& network,
+	     ymuint limit,
+	     EnumCutOp* op);
 
 
 private:
@@ -48,16 +49,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   void
-  mark_cut1(const BdnNode* node);
+  mark_cut1(BdnNode* node);
 
   void
-  clear_cut1(const BdnNode* node);
+  clear_cut1(BdnNode* node);
 
   void
-  mark_cut2(const BdnNode* node);
+  mark_cut2(BdnNode* node);
 
   void
-  clear_cut2(const BdnNode* node);
+  clear_cut2(BdnNode* node);
 
 
 private:
@@ -68,7 +69,7 @@ private:
   struct NodeInfo
   {
     // カットのリスト
-    list<vector<ymuint32> > mCutList;
+    list<vector<BdnNode*> > mCutList;
 
     // マーク1
     ymuint8 mMark1;
@@ -88,7 +89,7 @@ private:
   vector<NodeInfo> mNodeInfo;
 
   // カットの入力を保持する作業領域
-  ymuint32* mTmpInputs;
+  BdnNode** mTmpInputs;
 
   // mTmpInputs の要素数
   ymuint32 mInputNum;

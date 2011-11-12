@@ -39,26 +39,33 @@ public:
   // 内容を取り出す関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ノード数を得る．
-  ymuint
-  node_num() const;
+  /// @brief 根のノードを得る．
+  const RwtNode*
+  root_node() const;
+
+  /// @brief 根の極性を得る．
+  bool
+  root_inv() const;
 
   /// @brief 入力数を得る．
   ymuint
   input_num() const;
 
+  /// @brief 入力のノードを得る．
+  /// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
+  const RwtNode*
+  input_node(ymuint pos) const;
+
+  /// @brief ノード数を得る．
+  ymuint
+  node_num() const;
+
   /// @brief ノードを得る．
   /// @param[in] pos ノード番号 ( 0 <= pos < node_num() )
+  /// @note 0 〜 (input_num() - 1) は入力ノード
+  /// @note 最後のノードは根のノード
   const RwtNode*
   node(ymuint pos) const;
-
-  /// @brief 代表関数に対する変換を得る．
-  const NpnMap&
-  cmap() const;
-
-  /// @brief 同じ代表関数を表す次のノードを得る．
-  const RwtPat*
-  link() const;
 
 
 private:
@@ -69,19 +76,13 @@ private:
   // ノード数
   ymuint32 mNodeNum;
 
-  // 入力数
+  // 入力数 + 根のノードの極性
   ymuint32 mInputNum;
 
   // ノードの配列
   // 0 〜 mInputNum - 1 個は入力ノード
   // 最後は根のノード
-  const RwtNode** mNodeList;
-
-  // 変換マップ
-  NpnMap mCmap;
-
-  // 次のパタンを指すリンク
-  RwtPat* mLink;
+  RwtNode** mNodeList;
 
 };
 
@@ -97,14 +98,46 @@ RwtPat::RwtPat()
   mNodeNum = 0;
   mInputNum = 0;
   mNodeList = NULL;
-  mLink = NULL;
 }
 
 // @brief デストラクタ
 inline
 RwtPat::~RwtPat()
 {
-  delete [] mNodeList;
+  // mNodeList は RwtMgr が管理する．
+}
+
+// @brief 根のノードを得る．
+inline
+const RwtNode*
+RwtPat::root_node() const
+{
+  return mNodeList[mNodeNum - 1];
+}
+
+// @brief 根の極性を得る．
+inline
+bool
+RwtPat::root_inv() const
+{
+  return static_cast<bool>(mInputNum & 1U);
+}
+
+// @brief 入力数を得る．
+inline
+ymuint
+RwtPat::input_num() const
+{
+  return mInputNum >> 1;
+}
+
+// @brief 入力のノードを得る．
+// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
+inline
+const RwtNode*
+RwtPat::input_node(ymuint pos) const
+{
+  return node(pos);
 }
 
 // @brief ノード数を得る．
@@ -115,38 +148,15 @@ RwtPat::node_num() const
   return mNodeNum;
 }
 
-// @brief 入力数を得る．
-inline
-ymuint
-RwtPat::input_num() const
-{
-  return mInputNum;
-}
-
 // @brief ノードを得る．
 // @param[in] pos ノード番号 ( 0 <= pos < node_num() )
+// @note 0 〜 (input_num() - 1) は入力ノード
+// @note 最後のノードは根のノード
 inline
 const RwtNode*
 RwtPat::node(ymuint pos) const
 {
-  assert_cond( pos < mNodeNum, __FILE__, __LINE__);
   return mNodeList[pos];
-}
-
-// @brief 代表関数に対する変換を得る．
-inline
-const NpnMap&
-RwtPat::cmap() const
-{
-  return mCmap;
-}
-
-// @brief 同じ代表関数を表す次のノードを得る．
-inline
-const RwtPat*
-RwtPat::link() const
-{
-  return mLink;
 }
 
 END_NAMESPACE_YM_NETWORKS

@@ -381,8 +381,9 @@ s_RwtAigSubgraphs[] =
 END_NONAMESPACE
 
 void
-read_data()
+read_data(RwtMgr& mgr)
 {
+#if 0
   // データ数を数える．
   ymuint n = 0;
   for (ymuint i = 0; ; ++ i) {
@@ -393,8 +394,6 @@ read_data()
       break;
     }
   }
-
-  RwtMgr mgr;
 
   ymuint input_num = 4;
   mgr.init(input_num, n);
@@ -415,12 +414,12 @@ read_data()
     ymuint id = i + input_num + 1;
     mgr.set_node(id, is_xor, id0, id1, inv0, inv1);
   }
-
-  mgr.print(cout);
+#endif
 }
 
 END_NAMESPACE_YM_NETWORKS
 
+#if 0
 
 int
 main(int argc,
@@ -430,3 +429,4 @@ main(int argc,
 
   return 0;
 }
+#endif

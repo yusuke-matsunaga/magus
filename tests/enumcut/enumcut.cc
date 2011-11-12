@@ -29,10 +29,121 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-struct Cut
+class SimpleOp :
+  public EnumCutOp
 {
-  vector<ymuint32> mList;
+public:
+
+  /// @brief 処理の最初に呼ばれる関数
+  /// @param[in] sbjgraph 対象のサブジェクトグラフ
+  /// @param[in] limit カットサイズ
+  /// @param[in] mode カット列挙モード
+  virtual
+  void
+  all_init(BdnMgr& sbjgraph,
+	   ymuint limit);
+
+  /// @brief node を根とするカットを列挙する直前に呼ばれる関数
+  /// @param[in] node 根のノード
+  virtual
+  void
+  node_init(BdnNode* node);
+
+  virtual
+  void
+  found_cut(BdnNode* root,
+	    ymuint ni,
+	    BdnNode** inputs);
+
+  /// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
+  /// @param[in] node 根のノード
+  virtual
+  void
+  node_end(BdnNode* node);
+
+  /// @brief 処理の最後に呼ばれる関数
+  virtual
+  void
+  all_end(const BdnMgr& sbjgraph,
+	  ymuint limit);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 現在処理中のノード
+  BdnNode* mCurNode;
+
+  // 現在処理中のノード番号
+  ymuint32 mCurPos;
+
+  // 現在のカット数
+  ymuint32 mNcCur;
+
+  // 全カット数
+  ymuint32 mNcAll;
+
 };
+
+// @brief 処理の最初に呼ばれる関数
+// @param[in] sbjgraph 対象のサブジェクトグラフ
+// @param[in] limit カットサイズ
+// @param[in] mode カット列挙モード
+void
+SimpleOp::all_init(BdnMgr& sbjgraph,
+		   ymuint limit)
+{
+  mCurPos = 0;
+  mNcAll = 0;
+}
+
+// @brief node を根とするカットを列挙する直前に呼ばれる関数
+// @param[in] node 根のノード
+void
+SimpleOp::node_init(BdnNode* node)
+{
+  mNcCur = 0;
+  mCurNode = node;
+  cout << "#" << mCurPos << ": Node#" << node->id() << endl;
+}
+
+void
+SimpleOp::found_cut(BdnNode* root,
+		    ymuint ni,
+		    BdnNode** inputs)
+{
+  ++ mNcCur;
+
+  cout << "found_cut(" << root->id() << ", {";
+  for (ymuint i = 0; i < ni; ++ i) {
+    cout << " " << inputs[i]->id();
+  }
+  cout << "}" << endl;
+}
+
+// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
+// @param[in] node 根のノード
+void
+SimpleOp::node_end(BdnNode* node)
+{
+  assert_cond( node == mCurNode, __FILE__, __LINE__);
+  ++ mCurPos;
+  mNcAll += mNcCur;
+
+  cout << "    " << mNcCur << " cuts" << endl
+       << endl;
+}
+
+// @brief 処理の最後に呼ばれる関数
+void
+SimpleOp::all_end(const BdnMgr& sbjgraph,
+		  ymuint limit)
+{
+  cout << "Total " << mNcAll << " cuts" << endl;
+}
+
 
 void
 enumcut(const string& filename,
@@ -61,15 +172,21 @@ enumcut(const string& filename,
     }
   }
 
+  SimpleOp op;
+
   if ( method_str == "bottom_up" ) {
     BottomUp enumcut;
 
-    enumcut(network, cut_size);
+    enumcut(network, cut_size, &op);
   }
   else if ( method_str == "top_down" ) {
     TopDown enumcut;
 
-    enumcut(network, cut_size);
+    enumcut(network, cut_size, &op);
+  }
+  else {
+    cerr << "Unknown method: " << method_str << endl;
+    return;
   }
 }
 
