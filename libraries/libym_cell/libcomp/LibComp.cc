@@ -304,7 +304,7 @@ LibComp::display(ostream& s) const
     const LcClass* cclass = npn_class(i);
     assert_cond( cclass->id() == i, __FILE__, __LINE__);
     s << "CLASS#" << i << ": ";
-    cclass->repfunc().dump(s, 2);
+    cclass->repfunc().print(s, 2);
     s << endl;
     s << "  equivalence = ";
     const vector<LcGroup*>& group_list = cclass->group_list();

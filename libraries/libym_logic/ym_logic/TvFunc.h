@@ -12,6 +12,7 @@
 #include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
 #include "ym_logic/npn_nsdef.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -219,8 +220,24 @@ public:
   /// @param[in] mode 出力モード
   /// @note mode は 2 か 16
   void
-  dump(ostream& s,
-       int mode = 2) const;
+  print(ostream& s,
+	int mode = 2) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // BinIO 用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief バイナリファイルの書き出し
+  /// @param[in] s 出力先のストリーム
+  void
+  dump(BinO& s) const;
+
+  /// @brief バイナリファイルの読み込み
+  /// @param[in] s 入力元のストリーム
+  void
+  restore(BinI& s);
 
 
 public:
@@ -414,6 +431,22 @@ ostream&
 operator<<(ostream& s,
 	   const TvFunc& func);
 
+/// @brief バイナリ出力
+/// @param[in] s 出力ストリーム
+/// @param[in] func 関数
+/// @return s
+BinO&
+operator<<(BinO& s,
+	   const TvFunc& func);
+
+/// @brief バイナリ入力
+/// @param[in] s 入力ストリーム
+/// @param[out] func 関数
+/// @return s
+BinI&
+operator>>(BinI& s,
+	   TvFunc& func);
+
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
@@ -565,7 +598,33 @@ ostream&
 operator<<(ostream& s,
 	   const TvFunc& func)
 {
-  func.dump(s, 2);
+  func.print(s, 2);
+  return s;
+}
+
+// @brief バイナリ出力
+// @param[in] s 出力ストリーム
+// @param[in] func 関数
+// @return s
+inline
+BinO&
+operator<<(BinO& s,
+	   const TvFunc& func)
+{
+  func.dump(s);
+  return s;
+}
+
+// @brief バイナリ入力
+// @param[in] s 入力ストリーム
+// @param[out] func 関数
+// @return s
+inline
+BinI&
+operator>>(BinI& s,
+	   TvFunc& func)
+{
+  func.restore(s);
   return s;
 }
 

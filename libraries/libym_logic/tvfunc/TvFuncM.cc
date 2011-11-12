@@ -619,8 +619,8 @@ operator&&(const TvFuncM& func1,
 // 内容の出力
 // mode は 2 か 16
 void
-TvFuncM::dump(ostream& s,
-	      int mode) const
+TvFuncM::print(ostream& s,
+	       int mode) const
 {
   ymuint ni_pow = 1UL << mNi;
   const ymuint wordsize = SIZEOF_SIZE_T * 8;
@@ -681,6 +681,43 @@ TvFuncM::dump(ostream& s,
   }
   else {
     assert_not_reached(__FILE__, __LINE__);
+  }
+}
+
+// @brief バイナリファイルの書き出し
+// @param[in] s 出力先のストリーム
+void
+TvFuncM::dump(BinO& s) const
+{
+  s << mNi
+    << mNo
+    << mNblk1
+    << mNblk;
+
+  for (ymuint i = 0; i < mNblk; ++ i) {
+    s << mVector[i];
+  }
+}
+
+// @brief バイナリファイルの読み込み
+// @param[in] s 入力元のストリーム
+void
+TvFuncM::restore(BinI& s)
+{
+  ymuint32 nblk;
+
+  s >> mNi
+    >> mNo
+    >> mNblk1
+    >> nblk;
+
+  if ( mNblk != nblk ) {
+    delete [] mVector;
+    mNblk = nblk;
+    mVector = new ymulong[mNblk];
+  }
+  for (ymuint i = 0; i < mNblk; ++ i) {
+    s >> mVector[i];
   }
 }
 
