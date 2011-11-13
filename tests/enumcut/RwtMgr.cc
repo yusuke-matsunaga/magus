@@ -11,6 +11,8 @@
 #include "RwtPat.h"
 #include "RwtNode.h"
 #include "RwtPatGen.h"
+#include "PgNode.h"
+#include "PgPat.h"
 #include "RwtPatList.h"
 
 
@@ -330,27 +332,27 @@ RwtMgr::copy(const RwtPatGen& pg)
 
   // ノードの情報をコピーする．
   for (ymuint i = 0; i < mNodeNum; ++ i) {
-    const RwtNode* src_node = pg.node(i);
-    ymuint32 id = src_node->mId;
-    ymuint32 type = src_node->mType;
-    ymuint32 i0 = (src_node->fanin0_node()->id() << 1) | src_node->fanin0_inv();
-    ymuint32 i1 = (src_node->fanin1_node()->id() << 1) | src_node->fanin1_inv();
+    const PgNode* src_node = pg.node(i);
+    ymuint32 id = src_node->id();
+    ymuint32 type = src_node->type();
+    ymuint32 i0 = src_node->fanin0();
+    ymuint32 i1 = src_node->fanin1();
     set_node(id, type, i0, i1);
   }
 
   // 関数ごとのパタンリストの情報をコピーする．
   for (ymuint i = 0; i < mTableSize; ++ i) {
     TvFunc f = pg.func(i);
-    const vector<RwtPat*>& src_patlist = pg.pat_list(i);
+    const vector<PgPat*>& src_patlist = pg.pat_list(i);
     ymuint np = src_patlist.size();
     RwtPatList* dst_patlist = new_patlist(f, np);
     for (ymuint i = 0; i < np; ++ i) {
-      const RwtPat* src_pat = src_patlist[i];
+      const PgPat* src_pat = src_patlist[i];
       RwtPat* dst_pat = &dst_patlist->mPatList[i];
-      ymuint nn = src_pat->mNodeNum;
-      set_pat(dst_pat, nn, src_pat->mInputNum);
+      ymuint nn = src_pat->node_num();
+      set_pat(dst_pat, nn, src_pat->input_num());
       for (ymuint k = 0; k < nn; ++ k) {
-	set_pat_node(dst_pat, k, src_pat->node(k)->id());
+	set_pat_node(dst_pat, k, src_pat->node(k));
       }
     }
   }
