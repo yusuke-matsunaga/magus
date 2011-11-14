@@ -7,14 +7,33 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bdn.h"
 #include "RwtMgr.h"
-#include "RwtNode.h"
+#include "RwtPatGen.h"
+#include "PgNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
+
+ymuint16
+s_RwtPracticalClasses[] =
+{
+    0x0000, 0x0001, 0x0003, 0x0006, 0x0007, 0x000f, 0x0016, 0x0017, 0x0018, 0x0019, 0x001b,
+    0x001e, 0x001f, 0x003c, 0x003d, 0x003f, 0x0069, 0x006b, 0x006f, 0x007e, 0x007f, 0x00ff,
+    0x0116, 0x0118, 0x0119, 0x011a, 0x011b, 0x011e, 0x011f, 0x012c, 0x012d, 0x012f, 0x013c,
+    0x013d, 0x013e, 0x013f, 0x0168, 0x0169, 0x016f, 0x017f, 0x0180, 0x0181, 0x0182, 0x0183,
+    0x0186, 0x0189, 0x018b, 0x018f, 0x0198, 0x0199, 0x019b, 0x01a8, 0x01a9, 0x01aa, 0x01ab,
+    0x01ac, 0x01ad, 0x01ae, 0x01af, 0x01bf, 0x01e9, 0x01ea, 0x01eb, 0x01ee, 0x01ef, 0x01fe,
+    0x033c, 0x033d, 0x033f, 0x0356, 0x0357, 0x0358, 0x0359, 0x035a, 0x035b, 0x035f, 0x0368,
+    0x0369, 0x036c, 0x036e, 0x037d, 0x03c0, 0x03c1, 0x03c3, 0x03c7, 0x03cf, 0x03d4, 0x03d5,
+    0x03d7, 0x03d8, 0x03d9, 0x03dc, 0x03dd, 0x03de, 0x03fc, 0x0660, 0x0661, 0x0666, 0x0669,
+    0x066f, 0x0676, 0x067e, 0x0690, 0x0696, 0x0697, 0x069f, 0x06b1, 0x06b6, 0x06f0, 0x06f2,
+    0x06f6, 0x06f9, 0x0776, 0x0778, 0x07b0, 0x07b1, 0x07b4, 0x07bc, 0x07f0, 0x07f2, 0x07f8,
+    0x0ff0, 0x1683, 0x1696, 0x1698, 0x169e, 0x16e9, 0x178e, 0x17e8, 0x18e7, 0x19e6, 0x1be4,
+    0x1ee1, 0x3cc3, 0x6996, 0x0000
+};
+
 
 ymuint16
 s_RwtAigSubgraphs[] =
@@ -383,7 +402,29 @@ END_NONAMESPACE
 void
 read_data(RwtMgr& mgr)
 {
-#if 0
+  RwtPatGen pg;
+
+  // 代表関数を読み込む．
+  hash_set<TvFunc> rep_func;
+  rep_func.insert(TvFunc::const_zero(4));
+  for (ymuint i = 1; ; ++ i) {
+    ymuint16 v = s_RwtPracticalClasses[i];
+    if ( v == 0U ) {
+      break;
+    }
+    vector<int> vt(16);
+    for (ymuint j = 0; j < 16; ++j) {
+      if ( v & (1 << j) ) {
+	vt[j] = 1;
+      }
+      else {
+	vt[j] = 0;
+      }
+    }
+    TvFunc f(4, vt);
+    rep_func.insert(f);
+  }
+
   // データ数を数える．
   ymuint n = 0;
   for (ymuint i = 0; ; ++ i) {
@@ -395,8 +436,20 @@ read_data(RwtMgr& mgr)
     }
   }
 
-  ymuint input_num = 4;
-  mgr.init(input_num, n);
+  vector<const PgNode*> node_array(n);
+  vector<bool> inv_array(n);
+  vector<TvFunc> func_array(n);
+
+  pg.init(4);
+
+  for (ymuint i = 0; i <= 4; ++ i) {
+    node_array[i] = pg.node(i);
+    inv_array[i] = false;
+  }
+  func_array[0] = TvFunc::const_zero(4);
+  for (ymuint i = 0; i < 4; ++ i) {
+    func_array[i + 1] = TvFunc::posi_literal(4, i);
+  }
 
   for (ymuint i = 0; i < n; ++ i) {
     ymuint16 v0 = s_RwtAigSubgraphs[i * 2 + 0];
@@ -411,22 +464,42 @@ read_data(RwtMgr& mgr)
     bool inv0 = static_cast<bool>(v0 & 1U);
     bool inv1 = static_cast<bool>(v1 & 1U);
 
-    ymuint id = i + input_num + 1;
-    mgr.set_node(id, is_xor, id0, id1, inv0, inv1);
+    const PgNode* node0 = node_array[id0];
+    TvFunc f0 = func_array[id0];
+    if ( inv_array[id0] ) {
+      inv0 = !inv0;
+      f0.negate();
+    }
+
+    const PgNode* node1 = node_array[id1];
+    TvFunc f1 = func_array[id1];
+    if ( inv_array[id1] ) {
+      inv1 = !inv1;
+      f1.negate();
+    }
+
+    const PgNode* node = NULL;
+    bool oinv = false;
+    TvFunc f;
+    if ( is_xor ) {
+      node = pg.new_xor(node0, inv0, node1, inv1, oinv);
+      f = f0 ^ f1;
+    }
+    else {
+      node = pg.new_and(node0, inv0, node1, inv1);
+      f = f0 & f1;
+    }
+
+    node_array[i + 5] = node;
+    inv_array[i + 5] = oinv;
+    func_array[i + 5] = f;
+
+    pg.new_pat(node, oinv);
   }
-#endif
+
+  mgr.copy(pg);
+
+  mgr.print(cout);
 }
 
 END_NAMESPACE_YM_NETWORKS
-
-#if 0
-
-int
-main(int argc,
-     const char** argv)
-{
-  nsYm::nsNetworks::read_data();
-
-  return 0;
-}
-#endif

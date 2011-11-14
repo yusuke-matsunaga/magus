@@ -190,7 +190,9 @@ RwtOp::calc_func(BdnNode* node)
   if ( node_info.mMark == 1U ) {
     return;
   }
+#if 0
   cout << "calc_func(" << node->id() << ")" << endl;
+#endif
   node_info.mMark = 1U;
 
   assert_cond( node->is_logic(), __FILE__, __LINE__);
@@ -223,7 +225,9 @@ RwtOp::clear_mark(BdnNode* node)
   if ( node_info.mMark == 0U ) {
     return;
   }
+#if 0
   cout << "clear_mark(" << node->id() << ")" << endl;
+#endif
   node_info.mMark = 0U;
 
   if ( node->is_logic() ) {
@@ -252,7 +256,9 @@ RwtOp::count_node(BdnNode* node)
   if ( node->is_input() ) {
     return 1;
   }
+#if 0
   cout << "count_node: mark 1U (" << node->id() << ")" << endl;
+#endif
   node_info.mMark = 1U;
   ymuint n = 1;
   n += count_node(node->fanin0());

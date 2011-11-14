@@ -77,10 +77,6 @@ lr(BdnMgr& network,
 
   cout << endl;
 
-  rwt_mgr.print(cout);
-
-  cout << endl;
-
   enumcut(network, rwt_mgr.input_num(), &op);
 
 }

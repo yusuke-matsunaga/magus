@@ -84,10 +84,10 @@ public:
   /// @param[in] inv0 ファンイン0の極性
   /// @param[in] fanin1 ファンイン1
   /// @param[in] inv1 ファンイン1の極性
-  PgNode*
-  new_and(PgNode* fanin0,
+  const PgNode*
+  new_and(const PgNode* fanin0,
 	  bool inv0,
-	  PgNode* fanin1,
+	  const PgNode* fanin1,
 	  bool inv1);
 
   /// @brief XOR ノードを作る．
@@ -96,16 +96,16 @@ public:
   /// @param[in] fanin1 ファンイン1
   /// @param[in] inv1 ファンイン1の極性
   /// @param[out] oinv 出力の極性
-  PgNode*
-  new_xor(PgNode* fanin0,
+  const PgNode*
+  new_xor(const PgNode* fanin0,
 	  bool inv0,
-	  PgNode* fanin1,
+	  const PgNode* fanin1,
 	  bool inv1,
 	  bool& oinv);
 
   /// @brief パタンを登録する．
   void
-  new_pat(PgNode* root,
+  new_pat(const PgNode* root,
 	  bool inv);
 
 
@@ -116,10 +116,10 @@ private:
 
   /// @brief パタンのノードをDFSで訪れる．
   void
-  dfs(PgNode* node,
+  dfs(const PgNode* node,
       vector<bool>& mark,
-      vector<PgNode*>& inputs,
-      vector<PgNode*>& node_list);
+      vector<const PgNode*>& inputs,
+      vector<const PgNode*>& node_list);
 
   /// @brief ノードを返す．
   /// @param[in] type タイプ

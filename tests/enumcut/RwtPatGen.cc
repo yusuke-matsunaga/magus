@@ -51,18 +51,20 @@ RwtPatGen::init(ymuint input_num)
   // 定数0ノードを作る．
   PgNode* node = alloc_node();
   node->mType = 0U;
+  node->mFunc = TvFunc::const_zero(mInputNum);
 
   // 入力ノードを作る．
   for (ymuint i = 0; i < mInputNum; ++ i) {
     PgNode* node = alloc_node();
     node->mType = 1U | (i << 2);
+    node->mFunc = TvFunc::posi_literal(mInputNum, i);
   }
 }
 
 BEGIN_NONAMESPACE
 
 ymuint32
-encode(PgNode* node,
+encode(const PgNode* node,
        bool inv)
 {
   return (node->id() << 1) | static_cast<ymuint32>(inv);
@@ -75,10 +77,10 @@ END_NONAMESPACE
 // @param[in] inv0 ファンイン0の極性
 // @param[in] fanin1 ファンイン1
 // @param[in] inv1 ファンイン1の極性
-PgNode*
-RwtPatGen::new_and(PgNode* fanin0,
+const PgNode*
+RwtPatGen::new_and(const PgNode* fanin0,
 		   bool inv0,
-		   PgNode* fanin1,
+		   const PgNode* fanin1,
 		   bool inv1)
 {
   if ( fanin0->is_const0() ) {
@@ -113,7 +115,21 @@ RwtPatGen::new_and(PgNode* fanin0,
     id0 = id1;
     id1 = tmp;
   }
-  return new_node(2U, id0, id1);
+  PgNode* node = new_node(2U, id0, id1);
+
+  TvFunc f0 = fanin0->mFunc;
+  if ( inv0 ) {
+    f0.negate();
+  }
+
+  TvFunc f1 = fanin1->mFunc;
+  if ( inv1 ) {
+    f1.negate();
+  }
+
+  node->mFunc = f0 & f1;
+
+  return node;
 }
 
 // @brief XOR ノードを作る．
@@ -122,10 +138,10 @@ RwtPatGen::new_and(PgNode* fanin0,
 // @param[in] fanin1 ファンイン1
 // @param[in] inv1 ファンイン1の極性
 // @param[out] oinv 出力の極性
-PgNode*
-RwtPatGen::new_xor(PgNode* fanin0,
+const PgNode*
+RwtPatGen::new_xor(const PgNode* fanin0,
 		   bool inv0,
-		   PgNode* fanin1,
+		   const PgNode* fanin1,
 		   bool inv1,
 		   bool& oinv)
 {
@@ -146,18 +162,28 @@ RwtPatGen::new_xor(PgNode* fanin0,
     id0 = id1;
     id1 = tmp;
   }
-  return new_node(3U, id0, id1);
+  PgNode* node = new_node(3U, id0, id1);
+
+  TvFunc f0 = fanin0->mFunc;
+  TvFunc f1 = fanin1->mFunc;
+
+  node->mFunc = f0 ^ f1;
+  if ( oinv ) {
+    node->mFunc.negate();
+  }
+
+  return node;
 }
 
 // @brief パタンを登録する．
 void
-RwtPatGen::new_pat(PgNode* root,
+RwtPatGen::new_pat(const PgNode* root,
 		   bool inv)
 {
   vector<bool> mark(mNodeArray.size());
-  vector<PgNode*> inputs;
+  vector<const PgNode*> inputs;
   inputs.reserve(mInputNum);
-  vector<PgNode*> node_list;
+  vector<const PgNode*> node_list;
   node_list.reserve(mNodeArray.size());
   dfs(root, mark, inputs, node_list);
 
@@ -174,30 +200,14 @@ RwtPatGen::new_pat(PgNode* root,
   void* q = mAlloc.get_memory(sizeof(ymuint32) * pat->mNodeNum);
   pat->mNodeList = new (q) ymuint32[pat->mNodeNum];
   for (ymuint i = 0; i < ni; ++ i) {
-    PgNode* node = inputs[i];
+    const PgNode* node = inputs[i];
     pat->mNodeList[i] = node->id();
-    node->mFunc = TvFunc::posi_literal(ni, i);
   }
   for (ymuint i = 0; i < nn; ++ i) {
-    PgNode* node = node_list[i];
+    const PgNode* node = node_list[i];
     pat->mNodeList[i + ni] = node->id();
-    TvFunc f0 = mNodeArray[node->fanin0_id()]->mFunc;
-    if ( node->fanin0_inv() ) {
-      f0.negate();
-    }
-    TvFunc f1 = mNodeArray[node->fanin1_id()]->mFunc;
-    if ( node->fanin1_inv() ) {
-      f1.negate();
-    }
-    TvFunc f;
-    if ( node->is_and() ) {
-      f = f0 & f1;
-    }
-    else {
-      f = f0 ^ f1;
-    }
-    node->mFunc = f;
   }
+
   TvFunc f = root->mFunc;
   if ( inv ) {
     f.negate();
@@ -218,10 +228,10 @@ RwtPatGen::new_pat(PgNode* root,
 
 // @brief パタンのノードをDFSで訪れる．
 void
-RwtPatGen::dfs(PgNode* node,
+RwtPatGen::dfs(const PgNode* node,
 	       vector<bool>& mark,
-	       vector<PgNode*>& inputs,
-	       vector<PgNode*>& node_list)
+	       vector<const PgNode*>& inputs,
+	       vector<const PgNode*>& node_list)
 {
   if ( mark[node->id()] ) {
     return;
@@ -232,9 +242,9 @@ RwtPatGen::dfs(PgNode* node,
     inputs.push_back(node);
   }
   else {
-    PgNode* node0 = mNodeArray[node->fanin0_id()];
+    const PgNode* node0 = mNodeArray[node->fanin0_id()];
     dfs(node0, mark, inputs, node_list);
-    PgNode* node1 = mNodeArray[node->fanin1_id()];
+    const PgNode* node1 = mNodeArray[node->fanin1_id()];
     dfs(node1, mark, inputs, node_list);
     node_list.push_back(node);
   }
