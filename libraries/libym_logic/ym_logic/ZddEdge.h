@@ -12,7 +12,6 @@
 
 #include "ym_logic/zdd_nsdef.h"
 #include "ym_logic/VarId.h"
-#include "ym_logic/Pol.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
@@ -72,6 +71,9 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で使われる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
   /// @param[in] val 内容
@@ -181,11 +183,11 @@ private:
 
   /// @brief 終端の0を指す枝
   static
-  const ympuint kEdge0 = 1UL;
+  const ympuint kEdge0 = 0UL;
 
   /// @brief 終端の1を指す枝
   static
-  const ympuint kEdge1 = 0UL;
+  const ympuint kEdge1 = 1UL;
 
   /// @brief 不正な値を表す枝
   static
@@ -304,6 +306,7 @@ operator!=(const ZddEdge& left,
   return left.mBody != right.mBody;
 }
 
+#if 0
 // @brief 大小比較
 // @note 対象演算の時の順序の正規化に使う．
 inline
@@ -323,6 +326,7 @@ operator>(const ZddEdge& left,
 {
   return left.mBody > right.mBody;
 }
+#endif
 
 // @brief 定数0ノードのチェック
 inline
@@ -345,7 +349,7 @@ inline
 bool
 ZddEdge::is_const() const
 {
-  return (mBody & ~1UL) == kEdge1;
+  return (mBody & ~1UL) == 0UL;
 }
 
 // @brief エラー枝のチェック
@@ -364,12 +368,12 @@ ZddEdge::is_overflow() const
   return mBody == kEdgeOverflow;
 }
 
-// @brief エラーがオーバーフローのチェック
+// @brief エラーかオーバーフローのチェック
 inline
 bool
 ZddEdge::is_invalid() const
 {
-  return (mBody & ~1UL) == kEdgeInvalid;
+  return (mBody & ~1UL) == 2UL;
 }
 
 // @brief 終端枝のチェック
@@ -377,7 +381,7 @@ inline
 bool
 ZddEdge::is_leaf() const
 {
-  return (mBody & ~3UL) == kEdge1;
+  return (mBody & ~3UL) == 0UL;
 }
 
 // @brief ハッシュ値を返す．

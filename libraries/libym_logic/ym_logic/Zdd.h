@@ -12,6 +12,7 @@
 
 #include "ym_logic/zdd_nsdef.h"
 #include "ym_logic/ZddEdge.h"
+#include "ym_utils/BinIO.h"
 #include "gmpxx.h"
 
 
@@ -204,17 +205,15 @@ public:
 
   /// @brief コファクター演算
   /// @param[in] var 変数番号
-  /// @param[in] pol 極性
-  /// @return 変数 var の極性 pol 側のコファクターを返す．
+  /// @return 変数 var を含まないコファクターを返す．
   Zdd
-  cofactor(tVarId var,
-	   tPol pol) const;
+  cofactor0(tVarId var) const;
 
   /// @brief コファクター演算
-  /// @param[in] literal リテラル
-  /// @return literal によるコファクターを返す．
+  /// @param[in] var 変数番号
+  /// @return 変数 var を含むコファクターを返す．
   Zdd
-  cofactor(const Literal& literal) const;
+  cofactor1(tVarId var) const;
 
   /// @brief 変数インデックスの置き換えを行う．
   /// @param[in] var_map 置き換え元の変数から置き換え先の変数への写像
@@ -249,12 +248,12 @@ public:
   /// @param[in] s 出力ストリーム
   /// @return ノード数を返す．
   ymuint64
-  display(ostream& s) const;
+  print(ostream& s) const;
 
   /// @brief 内容のダンプ
   /// @param[in] s 出力ストリーム
   void
-  dump(ostream& s) const;
+  dump(BinO& s) const;
 
   /// @brief ZDD が使っているノード数を数える．
   /// @return ZDD が使っているノード数
@@ -325,23 +324,23 @@ public:
 
   friend
   ymuint64
-  display(const ZddVector& array,
-	  ostream& s);
+  print(const ZddVector& array,
+	ostream& s);
 
   friend
   ymuint64
-  display(const ZddList& array,
-	  ostream& s);
+  print(const ZddList& array,
+	ostream& s);
 
   friend
   void
   dump(const ZddVector& array,
-       ostream& s);
+       BinO& s);
 
   friend
   void
   dump(const ZddList& array,
-       ostream& s);
+       BinO& s);
 
   friend
   ymuint64
@@ -497,21 +496,21 @@ operator<(const Zdd& src1,
 // ZDDの配列の内容を書き出す
 // と同時にノード数を返す．
 ymuint64
-display(const ZddVector& array,
-	ostream& s);
+print(const ZddVector& array,
+      ostream& s);
 ymuint64
-display(const ZddList& array,
-	ostream& s);
+print(const ZddList& array,
+      ostream& s);
 
 // ZDDの配列の内容を保存用に書き出す
 void
 dump(const ZddVector& array,
-     ostream& s);
+     BinO& s);
 
 // ZDDの配列の内容を保存用に書き出す
 void
 dump(const ZddList& array,
-     ostream& s);
+     BinO& s);
 
 // ZDDの配列のノード数を数える
 ymuint64

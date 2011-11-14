@@ -57,12 +57,6 @@ class ZddEdge;
 /// @name 型名の定義
 /// @{
 
-#if 0
-/// @brief ZDD の節点を指す枝のタイプ
-/// @ingroup Zdd
-typedef ympuint tZddEdge;
-#endif
-
 /// @brief ZDD の変数番号
 /// @ingroup Zdd
 typedef ymuint32 tVarId;

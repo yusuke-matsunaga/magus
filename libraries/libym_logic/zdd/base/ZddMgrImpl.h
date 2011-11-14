@@ -1,7 +1,7 @@
-#ifndef LIBYM_LOGIC_ZDD_BASE_ZDDMGRIMPL_H
-#define LIBYM_LOGIC_ZDD_BASE_ZDDMGRIMPL_H
+#ifndef ZDDMGRIMPL_H
+#define ZDDMGRIMPL_H
 
-/// @file libym_logic/bdd/base/ZddMgrImpl.h
+/// @file ZddMgrImpl.h
 /// @brief ZddMgrImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -131,8 +131,8 @@ public:
   // e1 $\cup$ e2 $\cup$ e3 を計算する．
   ZddEdge
   cup_op(ZddEdge e1,
-	ZddEdge e2,
-	ZddEdge e3);
+	 ZddEdge e2,
+	 ZddEdge e3);
 
   // src1 $\setdiff$ src2 を計算する．
   virtual
@@ -224,12 +224,12 @@ public:
 
   // e を根とするZDDのノード数を数える．
   virtual
-  size_t
+  ymuint64
   size(ZddEdge e) = 0;
 
   // edge_list に登録されたZDDのノード数を数える．
   virtual
-  size_t
+  ymuint64
   size(const list<ZddEdge>& edge_list) = 0;
 
   // ZDD の表す集合の要素数を返す．
@@ -268,30 +268,6 @@ public:
   virtual
   ZddEdge
   mark_to_zdd() = 0;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VarSet の内部で用いられる演算
-  //////////////////////////////////////////////////////////////////////
-
-  // src1 と src2 が変数集合の時に共通部分を求める．
-  virtual
-  ZddEdge
-  vscap(ZddEdge e1,
-	ZddEdge e2) = 0;
-
-  // src1 と src2 が変数集合の時に集合差を求める．
-  virtual
-  ZddEdge
-  vsdiff(ZddEdge e1,
-	 ZddEdge e2) = 0;
-
-  // src1 と src2 が変数集合の時のインターセクションチェック
-  virtual
-  bool
-  vsintersect(ZddEdge e1,
-	      ZddEdge e2) = 0;
 
 
 public:
@@ -338,27 +314,27 @@ public:
 
   // 使用メモリ量(in bytes)を得る．
   virtual
-  size_t
+  ymuint64
   used_mem() const = 0;
 
   // 節点テーブルに登録されているノードの数を得る．
   virtual
-  size_t
+  ymuint64
   node_num() const = 0;
 
   // GC で回収される(フリーになる)ノード数を得る．
   virtual
-  size_t
+  ymuint64
   garbage_num() const = 0;
 
   // 利用可能なフリーノード数を得る．
   virtual
-  size_t
+  ymuint64
   avail_num() const = 0;
 
   // GC の起動された回数を得る．
   virtual
-  size_t
+  ymuin64
   gc_count() const = 0;
 
 
@@ -403,7 +379,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 参照回数
-  int mRefCount;
+  ymuint32 mRefCount;
 
 
   //////////////////////////////////////////////////////////////////////
@@ -469,4 +445,4 @@ ZddMgrImpl::make_zdd(tVarId varid,
 
 END_NAMESPACE_YM_ZDD
 
-#endif // LIBYM_LOGIC_ZDD_BASE_ZDDMGRIMPL_H
+#endif // ZDDMGRIMPL_H

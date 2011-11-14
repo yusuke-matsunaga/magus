@@ -34,7 +34,8 @@ CompTbl::CompTbl(ZddMgrClassic* mgr,
     // 適当な名前を付ける．
     static int num = 1;
     ostringstream s;
-    s << "table#" << num ++;
+    s << "table#" << num;
+    ++ num;
     mName = s.str();
   }
   else {
@@ -161,7 +162,7 @@ CompTbl1::resize(ymuint64 new_size)
   Cell* end = top + mTableSize;
   do {
     top->mKey1 = ZddEdge::make_error();
-    top ++;
+    ++ top;
   } while ( top != end );
 
   // ハッシュし直して新しいテーブルに登録する．
@@ -173,11 +174,11 @@ CompTbl1::resize(ymuint64 new_size)
       if ( !top->mKey1.is_error() ) {
 	ymuint pos = hash_func(top->mKey1);
 	Cell* temp = mTable + pos;
-	if ( temp->mKey1.is_error() ) mUsedNum ++;
+	if ( temp->mKey1.is_error() ) ++ mUsedNum;
 	temp->mKey1 = top->mKey1;
 	temp->mAns = top->mAns;
       }
-      top ++;
+      ++ top;
     } while ( top != end );
     deallocate((void*)old_table, old_size * sizeof(Cell));
   }
@@ -201,7 +202,7 @@ CompTbl1::sweep()
 	 (check_noref(cell->mKey1) ||
 	  check_noref(cell->mAns)) ) {
       cell->mKey1 = ZddEdge::make_error();
-      mUsedNum --;
+      -- mUsedNum;
     }
   }
 }
@@ -214,7 +215,7 @@ CompTbl1::clear()
   Cell* end = cell + mTableSize;
   for ( ; cell != end; ++ cell) {
     cell->mKey1 = ZddEdge::make_error();
-    mUsedNum --;
+    -- mUsedNum;
   }
 }
 
@@ -265,7 +266,7 @@ CompTbl2::resize(ymuint64 new_size)
   Cell* end = top + mTableSize;
   do {
     top->mKey1 = ZddEdge::make_error();
-    top ++;
+    ++ top;
   } while ( top != end );
 
   // ハッシュし直して新しいテーブルに登録する．
@@ -277,12 +278,12 @@ CompTbl2::resize(ymuint64 new_size)
       if ( !top->mKey1.is_error() ) {
 	ymuint64 pos = hash_func(top->mKey1, top->mKey2);
 	Cell* temp = mTable + pos;
-	if ( temp->mKey1.is_error() ) mUsedNum ++;
+	if ( temp->mKey1.is_error() ) ++ mUsedNum;
 	temp->mKey1 = top->mKey1;
 	temp->mKey2 = top->mKey2;
 	temp->mAns = top->mAns;
       }
-      top ++;
+      ++ top;
     } while ( top != end );
     deallocate((void*)old_table, old_size * sizeof(Cell));
   }
@@ -307,7 +308,7 @@ CompTbl2::sweep()
 	  check_noref(cell->mKey2) ||
 	  check_noref(cell->mAns)) ) {
       cell->mKey1 = ZddEdge::make_error();
-      mUsedNum --;
+      -- mUsedNum;
     }
   }
 }
@@ -320,7 +321,7 @@ CompTbl2::clear()
   Cell* end = cell + mTableSize;
   for ( ; cell != end; ++ cell) {
     cell->mKey1 = ZddEdge::make_error();
-    mUsedNum --;
+    -- mUsedNum;
   }
 }
 
@@ -331,7 +332,7 @@ CompTbl2::clear()
 
 // コンストラクタ
 CompTbl3::CompTbl3(ZddMgrClassic* mgr,
-			 const char* name) :
+		   const char* name) :
   CompTbl(mgr, name)
 {
   resize(kInitSize);
@@ -372,7 +373,7 @@ CompTbl3::resize(ymuint64 new_size)
   Cell* end = top + mTableSize;
   do {
     top->mKey1 = ZddEdge::make_error();
-    top ++;
+    ++ top;
   } while ( top != end );
 
   // ハッシュし直して新しいテーブルに登録する．
@@ -384,13 +385,13 @@ CompTbl3::resize(ymuint64 new_size)
       if ( !top->mKey1.is_error() ) {
 	ymuint64 pos = hash_func(top->mKey1, top->mKey2, top->mKey3);
 	Cell* temp = mTable + pos;
-	if ( temp->mKey1.is_error() ) mUsedNum ++;
+	if ( temp->mKey1.is_error() ) ++ mUsedNum;
 	temp->mKey1 = top->mKey1;
 	temp->mKey2 = top->mKey2;
 	temp->mKey3 = top->mKey3;
 	temp->mAns = top->mAns;
       }
-      top ++;
+      ++ top;
     } while ( top != end );
     deallocate((void*)old_table, old_size * sizeof(Cell));
   }
@@ -416,7 +417,7 @@ CompTbl3::sweep()
 	  check_noref(cell->mKey3) ||
 	  check_noref(cell->mAns)) ) {
       cell->mKey1 = ZddEdge::make_error();
-      mUsedNum --;
+      -- mUsedNum;
     }
   }
 }
@@ -429,7 +430,7 @@ CompTbl3::clear()
   Cell* end = cell + mTableSize;
   for ( ; cell != end; ++ cell) {
     cell->mKey1 = ZddEdge::make_error();
-    mUsedNum --;
+    -- mUsedNum;
   }
 }
 

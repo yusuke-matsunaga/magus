@@ -1,5 +1,5 @@
 
-/// @file libym_logic/zdd/base/ZddMgr.cc
+/// @file ZddMgr.cc
 /// @brief ZddMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -457,7 +457,7 @@ ZddMgr::gc_count() const
 // @param[in] s 入力ストリーム
 // @return 読み込まれた ZDD
 Zdd
-ZddMgr::restore(istream& s)
+ZddMgr::restore(BinI& s)
 {
   Restorer restorer(mImpl, s);
   ymuint n = restorer.read();
@@ -474,7 +474,7 @@ ZddMgr::restore(istream& s)
 // @param[in] s 入力ストリーム
 // @param[in] array 読み込み先の ZDD ベクタ
 void
-ZddMgr::restore(istream& s,
+ZddMgr::restore(BinI& s,
 		ZddVector& array)
 {
   Restorer restorer(mImpl, s);
@@ -489,7 +489,7 @@ ZddMgr::restore(istream& s,
 // @param[in] s 入力ストリーム
 // @param[in] array 読み込み先の ZDD リスト
 void
-ZddMgr::restore(istream& s,
+ZddMgr::restore(BinI& s,
 		ZddList& array)
 {
   Restorer restorer(mImpl, s);

@@ -1,5 +1,5 @@
 
-/// @file libym_logic/zdd/base/Dumper.cc
+/// @file Dumper.cc
 /// @brief Dumper の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -75,25 +75,25 @@ IdMgr::clear()
 
 
 //////////////////////////////////////////////////////////////////////
-// Displayer
+// Printer
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-Displayer::Displayer(ZddMgrImpl* mgr,
-		     ostream& s) :
+Printer::Printer(ZddMgrImpl* mgr,
+		 ostream& s) :
   mMgr(mgr),
   mStream(s)
 {
 }
 
 // デストラクタ
-Displayer::~Displayer()
+Printer::~Printer()
 {
 }
 
 // e の ID 番号を出力する．
 void
-Displayer::display_id(ZddEdge e)
+Printer::print_id(ZddEdge e)
 {
   ymuint id = mIdMgr.id(e);
   ios::fmtflags save = mStream.flags();
@@ -103,7 +103,7 @@ Displayer::display_id(ZddEdge e)
 
 // e の内容を出力する．
 void
-Displayer::display_name(ZddEdge e)
+Printer::print_name(ZddEdge e)
 {
   if ( e.is_zero() ) {
     mStream << "     val_0 ";
@@ -119,15 +119,15 @@ Displayer::display_name(ZddEdge e)
   }
   else {
     mStream << " ";
-    display_id(e);
+    print_id(e);
     tPol p = e.pol();
     mStream << ((p == kPolPosi) ? ' ' : '~');
   }
 }
 
-// display_root の下請関数
+// print_root の下請関数
 void
-Displayer::display_step(ZddEdge e)
+Printer::print_step(ZddEdge e)
 {
   if ( e.is_leaf() ) {
     return;
@@ -138,7 +138,7 @@ Displayer::display_step(ZddEdge e)
     return;
   }
   mMark.insert(e_p);
-  display_id(e_p);
+  print_id(e_p);
   ZddEdge e0;
   ZddEdge e1;
   tVarId id = mMgr->root_decomp(e_p, e0, e1);
@@ -148,26 +148,26 @@ Displayer::display_step(ZddEdge e)
 	  << ":LVL=" << setw(3) << level
 	  << ": EDGE0=";
   mStream.flags(save);
-  display_name(e0);
+  print_name(e0);
   mStream << ": EDGE1=";
-  display_name(e1);
+  print_name(e1);
   mStream << endl;
-  display_step(e0);
-  display_step(e1);
+  print_step(e0);
+  print_step(e1);
 }
 
 // e を根とするZDDの内容を出力する．
 void
-Displayer::display_root(ZddEdge e)
+Printer::print_root(ZddEdge e)
 {
-  display_name(e);
+  print_name(e);
   mStream << "\tmgr: " << mMgr->name() << endl;
-  display_step(e);
+  print_step(e);
 }
 
 // 登録された節点数を返す．
 ymuint
-Displayer::num() const
+Printer::num() const
 {
   return mIdMgr.num();
 }
@@ -179,7 +179,7 @@ Displayer::num() const
 
 // コンストラクタ
 Dumper::Dumper(ZddMgrImpl* mgr,
-	       ostream& s) :
+	       BinO& s) :
   mMgr(mgr),
   mStream(s)
 {
@@ -244,7 +244,7 @@ Dumper::dump_edge(ZddEdge e)
 
 // コンストラクタ
 Restorer::Restorer(ZddMgrImpl* mgr,
-		   istream& s) :
+		   BinI& s) :
   mMgr(mgr),
   mStream(s)
 {

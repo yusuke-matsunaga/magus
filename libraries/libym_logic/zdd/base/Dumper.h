@@ -1,7 +1,7 @@
-#ifndef LIBYM_LOGIC_ZDD_DUMPER_H
-#define LIBYM_LOGIC_ZDD_DUMPER_H
+#ifndef DUMPER_H
+#define DUMPER_H
 
-/// @file libym_logic/zdd/base/Dumper.h
+/// @file Dumper.h
 /// @brief Dumper のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,6 +10,7 @@
 
 
 #include "ZddMgrImpl.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
@@ -57,7 +58,7 @@ private:
   hash_map<ZddEdge, ymuint> mMap;
 
   // 次に割り当てるID番号
-  ymuint mNext;
+  ymuint32 mNext;
 
 };
 
@@ -65,28 +66,28 @@ private:
 //////////////////////////////////////////////////////////////////////
 // ZDD の内容を出力するためのクラス
 //////////////////////////////////////////////////////////////////////
-class Displayer
+class Printer
 {
 
 public:
 
   /// @brief コンストラクタ
-  Displayer(ZddMgrImpl* mgr,
-	    ostream& s);
+  Printer(ZddMgrImpl* mgr,
+	  ostream& s);
 
   /// @brief デストラクタ
-  ~Displayer();
+  ~Printer();
 
 
 public:
 
   /// @brief 登録された節点数を返す．
-  ymuint
+  ymuint64
   num() const;
 
   /// @brief e を根とするZDDの内容を出力する．
   void
-  display_root(ZddEdge e);
+  print_root(ZddEdge e);
 
 
 private:
@@ -96,15 +97,15 @@ private:
 
   /// @brief e の ID 番号を出力する．
   void
-  display_id(ZddEdge e);
+  print_id(ZddEdge e);
 
   /// @brief e の内容を出力する．
   void
-  display_name(ZddEdge e);
+  print_name(ZddEdge e);
 
   /// @brief display_root の下請関数
   void
-  display_step(ZddEdge e);
+  print_step(ZddEdge e);
 
 
 private:
@@ -138,7 +139,7 @@ public:
   /// @param[in] mgr ZddMgr
   /// @param[in] s 出力先のストリーム
   Dumper(ZddMgrImpl* mgr,
-	 ostream& s);
+	 BinO& s);
 
   /// @brief デストラクタ
   ~Dumper();
@@ -164,7 +165,7 @@ private:
   ZddMgrImpl* mMgr;
 
   // 出力用のストリーム
-  ostream& mStream;
+  BinO& mStream;
 
   // ID 番号を管理するマネージャ
   IdMgr mIdMgr;
@@ -183,7 +184,7 @@ public:
   /// @param[in] mgr ZddMgr
   /// @param[in] s 入力元のストリーム
   Restorer(ZddMgrImpl* mgr,
-	   istream& s);
+	   BinI& s);
 
   /// @brief デストラクタ
   ~Restorer();
@@ -223,7 +224,7 @@ private:
   ZddMgrImpl* mMgr;
 
   // 入力用のストリーム
-  istream& mStream;
+  BinI& mStream;
 
   // 根の枝を格納しておくベクタ
   vector<ZddEdge> mRootVector;
@@ -235,4 +236,4 @@ private:
 
 END_NAMESPACE_YM_ZDD
 
-#endif
+#endif // DUMPER_h

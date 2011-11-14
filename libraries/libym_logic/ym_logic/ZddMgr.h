@@ -12,6 +12,7 @@
 
 #include "ym_logic/zdd_nsdef.h"
 #include "ym_utils/Binder.h"
+#include "ym_utils/BinIO.h"
 #include "gmpxx.h"
 
 
@@ -152,20 +153,20 @@ public:
   /// @param[in] s 入力ストリーム
   /// @return 生成された ZDD
   Zdd
-  restore(istream& s);
+  restore(BinI& s);
 
   /// @brief 保存されたZDDをベクタに読み込む．
   /// @param[in] s 入力ストリーム
   /// @param[out] array 生成された ZDD を格納するベクタ
   void
-  restore(istream& s,
+  restore(BinI& s,
 	  ZddVector& array);
 
   /// @brief 保存されたZDDをリストに読み込む．
   /// @param[in] s 入力ストリーム
   /// @param[out] array 生成された ZDD を格納するリスト
   void
-  restore(istream& s,
+  restore(BinI& s,
 	  ZddList& array);
 
   /// @}
