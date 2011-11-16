@@ -10,6 +10,7 @@
 
 
 #include "ym_logic/npn_nsdef.h"
+#include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
 #include "ym_logic/NpnVmap.h"
 #include "ym_logic/TvFunc.h"
@@ -72,20 +73,20 @@ public:
   set_identity(ymuint ni);
 
   /// @brief 入力の変換内容の設定
-  /// @param[in] pos 入力番号
-  /// @param[in] dst_pos 変換先の入力番号
+  /// @param[in] src_var 入力変数
+  /// @param[in] dst_var 変換先の入力変数
   /// @param[in] pol 極性
   void
-  set(ymuint pos,
-      ymuint dst_pos,
+  set(VarId src_var,
+      VarId dst_var,
       tPol pol);
 
   /// @brief 入力の変換内容の設定
-  /// @param[in] pos 入力番号
+  /// @param[in] src_var 入力変数
   /// @param[in] imap 変換情報(変換先の入力番号と極性)
   /// @sa NpnVmap
   void
-  set(ymuint pos,
+  set(VarId src_var,
       NpnVmap imap);
 
   /// @brief 出力極性を設定する．
@@ -99,12 +100,12 @@ public:
   ni() const;
 
   /// @brief 入力の変換情報の取得
-  /// @param[in] pos 入力番号
+  /// @param[in] var 入力変数
   /// @return pos 番目の入力の変換情報
-  /// @note pos に対応するマッピング情報がないときには不正な値を返す．
+  /// @note var に対応するマッピング情報がないときには不正な値を返す．
   /// @sa NpnVmap
   NpnVmap
-  imap(ymuint pos) const;
+  imap(VarId var) const;
 
   /// @brief 出力極性を返す．
   /// @return 出力極性
@@ -184,13 +185,14 @@ NpnMap::ni() const
   return mNiPol >> 1;
 }
 
-// posに対応するマッピング情報を得る．
+// var に対応するマッピング情報を得る．
 inline
 NpnVmap
-NpnMap::imap(ymuint pos) const
+NpnMap::imap(VarId var) const
 {
-  if ( pos < ni() ) {
-    return mImap[pos];
+  ymuint idx = var.val();
+  if ( idx < ni() ) {
+    return mImap[idx];
   }
   return NpnVmap::invalid();
 }

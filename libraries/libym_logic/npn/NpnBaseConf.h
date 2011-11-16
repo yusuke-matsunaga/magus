@@ -316,7 +316,7 @@ NpnBaseConf::walsh_2(ymuint pos1,
   }
   ymuint index = pos1 * ni() + pos2;
   if ( mW2flag[index] == 0 ) {
-    mW2[index] = mFunc.walsh_2(pos1, pos2);
+    mW2[index] = mFunc.walsh_2(VarId(pos1), VarId(pos2));
     mW2flag[index] = 1;
   }
   return mW2[index];

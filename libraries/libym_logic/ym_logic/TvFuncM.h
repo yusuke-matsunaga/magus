@@ -84,7 +84,7 @@ public:
   /// @param[in] pol 極性
   /// @return 自身への参照を返す．
   const TvFuncM&
-  set_cofactor(ymuint varid,
+  set_cofactor(VarId varid,
 	       tPol pol);
 
 
@@ -94,43 +94,43 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 自分自身を否定する．
-  /// @param[in] opos 出力番号
+  /// @param[in] ovar 出力番号
   /// @return 自身への参照を返す．
   const TvFuncM&
-  negate(ymuint opos);
+  negate(VarId ovar);
 
   /// @brief src1 との論理積を計算し自分に代入する．
-  /// @param[in] opos 出力番号
+  /// @param[in] ovar 出力番号
   /// @param[in] src1 論理対象のオブジェクト
   /// @return 自身への参照を返す．
   const TvFuncM&
-  and_assign(ymuint opos,
+  and_assign(VarId ovar,
 	     const TvFunc& src1);
 
   /// @brief src1 との論理和を計算し自分に代入する．
-  /// @param[in] opos 出力番号
+  /// @param[in] ovar 出力番号
   /// @param[in] src1 論理対象のオブジェクト
   /// @return 自身への参照を返す．
   const TvFuncM&
-  or_assign(ymuint opos,
+  or_assign(VarId ovar,
 	    const TvFunc& src1);
 
   /// @brief src1 との排他的論理和を計算し自分に代入する．
-  /// @param[in] opos 出力番号
+  /// @param[in] ovar 出力番号
   /// @param[in] src1 論理対象のオブジェクト
   /// @return 自身への参照を返す．
   const TvFuncM&
-  xor_assign(ymuint opos,
+  xor_assign(VarId ovar,
 	     const TvFunc& src1);
 
   /// @brief コファクターを計算し自分に代入する．
-  /// @param[in] opos 出力番号
+  /// @param[in] ovar 出力番号
   /// @param[in] varid 変数番号
   /// @param[in] pol 極性
   /// @return 自身への参照を返す．
   const TvFuncM&
-  set_cofactor(ymuint opos,
-	       ymuint varid,
+  set_cofactor(VarId ovar,
+	       VarId varid,
 	       tPol pol);
 
 
@@ -148,29 +148,29 @@ public:
   no() const;
 
   /// @brief 1出力の論理関数を切り出す．
-  /// @param[in] opos 出力番号
+  /// @param[in] ovar 出力番号
   TvFunc
-  output(ymuint opos) const;
+  output(VarId ovar) const;
 
   /// @brief 入力値を2進数と見なしたときの pos 番目の値を得る．
-  /// @param[in] opos 出力番号
-  /// @param[in] pos 変数番号
+  /// @param[in] ovar 出力番号
+  /// @param[in] pos 位置番号 ( 0 <= pos < 2^(ni()) )
   /// 答は 0 か 1 だが int 型
   int
-  value(ymuint opos,
+  value(VarId ovar,
 	ymuint pos) const;
 
-  /// @brief pos 番目の変数がサポートの時 true を返す．
-  /// @param[in] pos 変数番号
+  /// @brief varid 番目の変数がサポートの時 true を返す．
+  /// @param[in] varid 変数番号
   bool
-  check_sup(tVarId pos) const;
+  check_sup(VarId varid) const;
 
   /// @brief pos1 番目と pos2 番目の変数が対称のとき true を返す．
   /// @param[in] pos1, pos2 変数番号
   /// @param[in] pol 極性
   bool
-  check_sym(tVarId pos1,
-	    tVarId pos2,
+  check_sym(VarId pos1,
+	    VarId pos2,
 	    tPol pol = kPolPosi) const;
 
   /// @brief ハッシュ値を返す．
@@ -218,7 +218,7 @@ public:
   /// @param[in] varid 変数番号
   /// @param[in] pol 極性
   TvFuncM
-  cofactor(ymuint varid,
+  cofactor(VarId varid,
 	   tPol pol) const;
 
   /// @brief npnmap に従った変換を行う．
@@ -457,13 +457,14 @@ TvFuncM::no() const
   return mNo;
 }
 
-// 入力値を2進数と見なしたときの (opos, pos) 番目の値を得る．
+// 入力値を2進数と見なしたときの (ovar, pos) 番目の値を得る．
 // 答は 0 か 1 だが int 型
 inline
 int
-TvFuncM::value(ymuint opos,
+TvFuncM::value(VarId ovar,
 	       ymuint pos) const
 {
+  ymuint opos = ovar.val();
   return (mVector[block(pos) + opos * mNblk1] >> shift(pos)) & 1;
 }
 
@@ -559,8 +560,8 @@ operator^(const TvFuncM& src1,
 // @param[in] pol 極性
 inline
 TvFuncM
-TvFuncM::cofactor(ymuint varid,
-		 tPol pol) const
+TvFuncM::cofactor(VarId varid,
+		  tPol pol) const
 {
   return TvFuncM(*this).set_cofactor(varid, pol);
 }

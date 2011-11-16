@@ -107,7 +107,7 @@ BddMgr::make_overflow()
 
 // リテラル関数を表すBDDを作る．
 Bdd
-BddMgr::make_literal(tVarId index,
+BddMgr::make_literal(VarId index,
 		     tPol pol)
 {
   BddEdge ans = mImpl->make_posiliteral(index);
@@ -124,14 +124,14 @@ BddMgr::make_literal(const Literal& lit)
 
 // 肯定のリテラル関数を作る
 Bdd
-BddMgr::make_posiliteral(tVarId varid)
+BddMgr::make_posiliteral(VarId varid)
 {
   return Bdd(mImpl, mImpl->make_posiliteral(varid));
 }
 
 // 否定のリテラル関数を作る．
 Bdd
-BddMgr::make_negaliteral(tVarId varid)
+BddMgr::make_negaliteral(VarId varid)
 {
   return Bdd(mImpl, mImpl->make_negaliteral(varid));
 }
@@ -140,7 +140,7 @@ BddMgr::make_negaliteral(tVarId varid)
 // その左右の子のデフォルトはそれぞれ0と1
 // メモリ不足によってエラーが起きる可能性がある．
 Bdd
-BddMgr::make_bdd(tVarId index,
+BddMgr::make_bdd(VarId index,
 		 const Bdd& chd0,
 		 const Bdd& chd1)
 {
@@ -157,7 +157,7 @@ BddMgr::tvec_to_bdd(const vector<int>& v,
 {
   VarVector vv(ni);
   for (ymuint i = 0; i < ni; ++ i) {
-    vv[i] = i;
+    vv[i] = VarId(i);
   }
   return tvec_to_bdd(v, vv);
 }
@@ -177,7 +177,7 @@ BddMgr::tvec_to_bdd(const vector<int>& v,
   Bdd ans0(ans, mImpl);
   BddVector varbdds(ni);
   for (ymuint i = 0; i < ni; ++ i) {
-    tVarId vid = vars[i];
+    VarId vid = vars[i];
     varbdds[i] = make_posiliteral(vid);
   }
 
@@ -220,7 +220,7 @@ BddMgr::expr_to_bdd(const LogExpr& expr,
 
   // リテラルの場合
   if ( expr.is_literal() ) {
-    tVarId pos = expr.varid();
+    VarId pos = expr.varid();
     VarBddMap::const_iterator p = varmap.find(pos);
     Bdd ans;
     if ( p == varmap.end() ) {
@@ -265,8 +265,8 @@ BddMgr::expr_to_bdd(const LogExpr& expr,
   VarBddMap vbmap;
   for (VarVarMap::const_iterator p = varmap.begin();
        p != varmap.end(); ++ p) {
-    tVarId id = p->first;
-    tVarId id2 = p->second;
+    VarId id = p->first;
+    VarId id2 = p->second;
     Bdd bdd = make_posiliteral(id2);
     vbmap.insert(make_pair(id, bdd));
   }
@@ -337,7 +337,7 @@ BddMgr::make_thfunc(tVarSize n,
       else {
 	BddEdge l = table[elem(i + 1, j, th)];
 	BddEdge h = table[elem(i + 1, j - 1, th)];
-	BddEdge tmp = mImpl->make_bdd(i, l, h);
+	BddEdge tmp = mImpl->make_bdd(VarId(i), l, h);
 	if ( tmp.is_overflow() ) {
 	  return make_overflow();
 	}
@@ -638,14 +638,14 @@ BddMgr::xor_op(const BddList& bdds)
 // 確保に失敗したら false を返す．
 // 最後の変数の後ろに挿入される．
 bool
-BddMgr::new_var(tVarId varid)
+BddMgr::new_var(VarId varid)
 {
   return mImpl->new_var(varid);
 }
 
 // 現在登録されている変数をそのレベルの昇順で返す．
 tVarSize
-BddMgr::var_list(list<tVarId>& vlist) const
+BddMgr::var_list(list<VarId>& vlist) const
 {
   return mImpl->var_list(vlist);
 }
@@ -653,13 +653,13 @@ BddMgr::var_list(list<tVarId>& vlist) const
 // 変数番号からレベルを得る．
 // もしもレベルが割り当てられていない場合にはエラーとなる．
 tLevel
-BddMgr::level(tVarId varid) const
+BddMgr::level(VarId varid) const
 {
   return mImpl->level(varid);
 }
 
 // レベルから変数番号を得る．
-tVarId
+VarId
 BddMgr::varid(tLevel level) const
 {
   return mImpl->varid(level);
@@ -793,7 +793,7 @@ BddMgr::gc_count() const
 // @param[in] s 入力ストリーム
 // @return 読み込まれた BDD
 Bdd
-BddMgr::restore(istream& s)
+BddMgr::restore(BinI& s)
 {
   Restorer restorer(mImpl, s);
   ymuint n = restorer.read();
@@ -810,7 +810,7 @@ BddMgr::restore(istream& s)
 // @param[in] s 入力ストリーム
 // @param[in] array 読み込み先の BDD ベクタ
 void
-BddMgr::restore(istream& s,
+BddMgr::restore(BinI& s,
 		BddVector& array)
 {
   Restorer restorer(mImpl, s);
@@ -825,7 +825,7 @@ BddMgr::restore(istream& s,
 // @param[in] s 入力ストリーム
 // @param[in] array 読み込み先の BDD リスト
 void
-BddMgr::restore(istream& s,
+BddMgr::restore(BinI& s,
 		BddList& array)
 {
   Restorer restorer(mImpl, s);

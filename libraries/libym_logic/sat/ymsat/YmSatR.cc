@@ -34,10 +34,10 @@ YmSatR::~YmSatR()
 // @brief 変数を追加する．
 // @return 新しい変数番号を返す．
 // @note 変数番号は 0 から始まる．
-tVarId
+VarId
 YmSatR::new_var()
 {
-  tVarId id = YmSat::new_var();
+  VarId id = YmSat::new_var();
 
   mOut << "N" << endl
        << "# varid = " << id << endl;

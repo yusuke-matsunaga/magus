@@ -119,20 +119,20 @@ YmSat::sane() const
 // @brief 変数を追加する．
 // @return 新しい変数番号を返す．
 // @note 変数番号は 0 から始まる．
-tVarId
+VarId
 YmSat::new_var()
 {
   if ( decision_level() != 0 ) {
     // エラー
     cout << "Error!: decision_level() != 0" << endl;
-    return 0;
+    return kVarIdIllegal;
   }
 
   // ここではカウンタを増やすだけ
   // 実際の処理は alloc_var() でまとめて行う．
-  tVarId n = mVarNum;
+  ymuint n = mVarNum;
   ++ mVarNum;
-  return n;
+  return VarId(n);
 }
 
 // 変数に関する配列を拡張する．
@@ -229,7 +229,7 @@ YmSat::add_clause(const vector<Literal>& lits)
       // true literal があったら既に充足している
       return;
     }
-    if ( l.varid() >= mVarNum ) {
+    if ( l.varid().val() >= mVarNum ) {
       // 範囲外
       cout << "Error![YmSat]: literal(" << l << "): out of range"
 	   << endl;
@@ -471,7 +471,7 @@ YmSat::solve(const vector<Literal>& assumptions,
     // SAT ならモデル(充足させる変数割り当てのリスト)を作る．
     model.resize(mVarNum);
     for (ymuint i = 0; i < mVarNum; ++ i) {
-      Bool3 val = eval(i);
+      Bool3 val = mVal[i];
       assert_cond(val != kB3X, __FILE__, __LINE__);
       model[i] = val;
     }
@@ -765,9 +765,10 @@ YmSat::backtrack(int level)
     mAssignList.backtrack(level);
     while ( mAssignList.has_elem() ) {
       Literal p = mAssignList.get_prev();
-      tVarId varid = p.varid();
-      mVal[varid] = kB3X;
-      heap_push(varid);
+      VarId varid = p.varid();
+      ymuint vindex = varid.val();
+      mVal[vindex] = kB3X;
+      heap_push(vindex);
       if ( debug & debug_assign ) {
 	cout << "\tdeassign " << p << endl;
       }
@@ -793,11 +794,11 @@ YmSat::next_decision()
   }
 #endif
   while ( !heap_empty() ) {
-    tVarId var = heap_pop_top();
-    if ( eval(var) == kB3X ) {
+    ymuint vindex = heap_pop_top();
+    if ( mVal[vindex] == kB3X ) {
       //tPol pol = (mRandGen.int32() & 1) ? kPolPosi : kPolNega;
       tPol pol = kPolNega;
-      return Literal(var, pol);
+      return Literal(VarId(vindex), pol);
     }
   }
   return kLiteralX;
@@ -916,9 +917,10 @@ YmSat::delete_clause(SatClause* clause)
 
 // 変数のアクティビティを増加させる．
 void
-YmSat::bump_var_activity(tVarId varid)
+YmSat::bump_var_activity(VarId varid)
 {
-  double& act = mActivity[varid];
+  ymuint vindex = varid.val();
+  double& act = mActivity[vindex];
   act += mVarBump;
   if ( act > 1e+100 ) {
     for (ymuint i = 0; i < mVarNum; ++ i) {
@@ -926,7 +928,7 @@ YmSat::bump_var_activity(tVarId varid)
     }
     mVarBump *= 1e-100;
   }
-  ymint pos = mHeapPos[varid];
+  ymint pos = mHeapPos[vindex];
   if ( pos >= 0 ) {
     heap_move_up(pos);
   }
@@ -977,8 +979,8 @@ YmSat::decay_clause_activity()
 void
 YmSat::heap_move_down(ymuint pos)
 {
-  tVarId var_p = mHeap[pos];
-  double val_p = mActivity[var_p];
+  ymuint vindex_p = mHeap[pos];
+  double val_p = mActivity[vindex_p];
   for ( ; ; ) {
     // ヒープ木の性質から親から子の位置がわかる
     ymuint pos_l = heap_left(pos);
@@ -988,23 +990,23 @@ YmSat::heap_move_down(ymuint pos)
       break;
     }
     ymuint pos_c = pos_l;
-    tVarId var_c = mHeap[pos_c];
-    double val_c = mActivity[var_c];
+    ymuint vindex_c = mHeap[pos_c];
+    double val_c = mActivity[vindex_c];
     if ( pos_r < mHeapNum ) {
-      tVarId var_r = mHeap[pos_r];
-      double val_r = mActivity[var_r];
-      if ( val_c < val_r ) {
+      ymuint vindex_r = mHeap[pos_r];
+      double val_r = mActivity[vindex_r];
+      if ( vindex_c < vindex_r ) {
 	pos_c = pos_r;
-	var_c = var_r;
-	val_c = val_c;
+	vindex_c = vindex_r;
+	val_c = val_r;
       }
     }
     if ( val_c <= val_p ) {
       break;
     }
     // 逆転
-    heap_set(var_p, pos_c);
-    heap_set(var_c, pos);
+    heap_set(vindex_p, pos_c);
+    heap_set(vindex_c, pos);
     pos = pos_c;
   }
 }
@@ -1018,15 +1020,15 @@ YmSat::heap_dump(ostream& s) const
   ymuint nc = 1;
   const char* spc = "";
   for (ymuint i = 0; i < mHeapNum; ++ i) {
-    tVarId var = mHeap[i];
-    assert_cond(mHeapPos[var] == static_cast<ymint>(i),
+    ymuint vindex = mHeap[i];
+    assert_cond(mHeapPos[vindex] == static_cast<ymint>(i),
 		__FILE__, __LINE__);
     if ( i > 0 ) {
       ymint p = (i - 1) >> 1;
-      assert_cond(mVal[mHeap[p]] >= mVal[var], __FILE__, __LINE__);
+      assert_cond(mVal[mHeap[p]] >= mVal[vindex], __FILE__, __LINE__);
     }
-    s << spc << var << "("
-      << mActivity[var]
+    s << spc << vindex << "("
+      << mActivity[vindex]
       << ")";
     ++ j;
     if ( j == nc ) {

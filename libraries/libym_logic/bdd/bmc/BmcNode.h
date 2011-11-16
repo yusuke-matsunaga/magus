@@ -23,7 +23,7 @@ class BmcVar
 public:
 
   // 変数番号を得る．
-  tVarId
+  VarId
   varid() const
   {
     return mId;
@@ -33,13 +33,13 @@ public:
   tLevel
   level() const
   {
-    return tLevel(mId);
+    return static_cast<tLevel>(mId.val());
   }
 
 private:
 
   // コンストラクタ
-  BmcVar(tVarId id) :
+  BmcVar(VarId id) :
     mId(id),
     mMark(0),
     mLink(NULL)
@@ -59,7 +59,7 @@ private:
 
   // 変数番号
   // レベルも同一
-  tVarId mId;
+  VarId mId;
 
   // 作業用のマーク
   int mMark;
@@ -129,7 +129,7 @@ public:
   var() const;
 
   // 変数インデックス値を得る
-  tVarId
+  VarId
   varid() const;
 
   // レベルを得る．
@@ -249,7 +249,7 @@ BmcNode::var() const
 
 // 変数インデックス値を得る
 inline
-tVarId
+VarId
 BmcNode::varid() const
 {
   return mVar->varid();

@@ -176,7 +176,8 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
     BNode* node1;
     tPol pol1;
     if ( opr1.is_literal() ) {
-      tVarId pos = opr1.varid();
+      VarId var = opr1.varid();
+      ymuint pos = var.val();
       node1 = orig_node->fanin(pos);
       pol1 = opr1.is_posiliteral() ? kPolPosi : kPolNega;
     }
@@ -211,7 +212,7 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
       Node tmp1 = work.getmin();
       work.popmin();
       fanins.push_back(tmp1.mNode);
-      literals.push_back(LogExpr::make_literal(new_ni, tmp1.mPol));
+      literals.push_back(LogExpr::make_literal(VarId(new_ni), tmp1.mPol));
     }
 
     LogExpr tmp_expr;
@@ -286,7 +287,8 @@ BNetDecomp::decomp_type2_sub(BNode* orig_node,
     BNode* node1;
     tPol pol1;
     if ( opr1.is_literal() ) {
-      tVarId pos = opr1.varid();
+      VarId var = opr1.varid();
+      ymuint pos = var.val();
       node1 = orig_node->fanin(pos);
       pol1 = opr1.is_posiliteral() ? kPolPosi : kPolNega;
     }
@@ -365,7 +367,7 @@ BNetDecomp::build_tree(ymuint b,
 			     type_expr, NULL, no_xor);
       pol = kPolPosi;
     }
-    literals[i] = LogExpr::make_literal(i, pol);
+    literals[i] = LogExpr::make_literal(VarId(i), pol);
   }
 
   LogExpr expr;

@@ -67,7 +67,7 @@ SaUIP1::capture(SatReason creason,
       size_t n = cclause.size();
       for (size_t i = first_pos; i < n; ++ i) {
 	Literal q = cclause.lit(i);
-	tVarId var = q.varid();
+	VarId var = q.varid();
 	int var_level = decision_level(var);
 	if ( !get_mark(var) && var_level > 0 ) {
 	  set_mark_and_putq(var);
@@ -84,7 +84,7 @@ SaUIP1::capture(SatReason creason,
     else {
       assert_cond(first_pos == 1, __FILE__, __LINE__);
       Literal q = creason.literal();
-      tVarId var = q.varid();
+      VarId var = q.varid();
       int var_level = decision_level(var);
       if ( !get_mark(var) && var_level > 0 ) {
 	set_mark_and_putq(var);
@@ -102,7 +102,7 @@ SaUIP1::capture(SatReason creason,
     // mAssignList に入っている最近の変数で mark の付いたものを探す．
     for ( ; ; -- last) {
       Literal q = get_assign(last);
-      tVarId var = q.varid();
+      VarId var = q.varid();
       if ( get_mark(var) ) {
 	set_mark(var, false);
 	learnt[0] = ~q;

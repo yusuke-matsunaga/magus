@@ -147,7 +147,7 @@ BddMgrClassic::compose_start()
 
 // multiple compose 演算を行う変数と置き換え関数を登録する関数
 void
-BddMgrClassic::compose_reg(tVarId id,
+BddMgrClassic::compose_reg(VarId id,
 			   BddEdge e)
 {
   Var* var = var_of(id);
@@ -311,7 +311,7 @@ BddMgrClassic::pd_step2(BddEdge e,
     if ( !r0.is_invalid() ) {
       BddEdge r1 = pd_step2(e1, y_level);
       if ( !r1.is_invalid() ) {
-	tVarId vid = varid(vp->level() - 1);
+	VarId vid = varid(vp->level() - 1);
 	Var* var = var_of(vid);
 	if ( !var ) {
 	  var = alloc_var(vid);
@@ -345,7 +345,7 @@ BddMgrClassic::pd_step3(BddEdge e0,
   BddEdge result = mPushDownTable3->get(e0, e1, xy_edge);
   if ( result.is_error() ) {
     if ( top_level > y_level ) {
-      tVarId vid = varid(y_level);
+      VarId vid = varid(y_level);
       Var* var = var_of(vid);
       if ( !var ) {
 	var = alloc_var(vid);
@@ -378,7 +378,7 @@ BddMgrClassic::pd_step3(BddEdge e0,
       if ( !r0.is_invalid() ) {
 	BddEdge r1 = pd_step3(e01, e11, y_level, pol);
 	if ( !r1.is_invalid() ) {
-	  tVarId vid = varid(top_level - 1);
+	  VarId vid = varid(top_level - 1);
 	  Var* var = var_of(vid);
 	  if ( !var ) {
 	    var = alloc_var(vid);
@@ -498,7 +498,7 @@ BddMgrClassic::gcofactor_step(BddEdge f,
 // 一つの変数に対する cofactor を計算する．
 BddEdge
 BddMgrClassic::scofactor(BddEdge e1,
-			 tVarId id,
+			 VarId id,
 			 tPol pol)
 {
   clear_varmark();
@@ -612,7 +612,7 @@ BddMgrClassic::cubediv_step(BddEdge f)
 // メモリ不足のためにエラーとなる可能性がある．
 BddEdge
 BddMgrClassic::xor_moment(BddEdge e,
-			  tVarId idx)
+			  VarId idx)
 {
   if ( e.is_error() ) {
     return BddEdge::make_error();

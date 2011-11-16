@@ -155,9 +155,10 @@ gen_library(const string& lib_name,
     TvFunc tv_function = function.make_tv(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       // タイミング情報の設定
+      VarId var(i);
       const MislibNode* pt_pin = ipin_array[i];
-      TvFunc p_func = tv_function.cofactor(i, kPolPosi);
-      TvFunc n_func = tv_function.cofactor(i, kPolNega);
+      TvFunc p_func = tv_function.cofactor(var, kPolPosi);
+      TvFunc n_func = tv_function.cofactor(var, kPolNega);
       tCellTimingSense sense_real = kCellNonUnate;
       bool redundant = false;
       if ( ~p_func && n_func ) {

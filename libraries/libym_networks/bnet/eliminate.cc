@@ -105,7 +105,7 @@ sort_nodes(const BNetwork* network,
 	break;
       }
       // ファンアウト先のファクタードフォームでの出現頻度を求める．
-      int a = onode->func().litnum(edge->pos());
+      int a = onode->func().litnum(VarId(edge->pos()));
       ovalue += a;
     }
     work.push_back(ElimElem(node, level, ovalue));
@@ -212,9 +212,9 @@ BNetwork::eliminate(int threshold,
 	}
 	const LogExpr& ofunc = onode->func();
 	// SOP形式で肯定のリテラルの現れる回数
-	ymuint pa = ofunc.sop_litnum(edge->pos(), kPolPosi);
+	ymuint pa = ofunc.sop_litnum(VarId(edge->pos()), kPolPosi);
 	// SOP形式で否定のリテラルの現れる回数
-	ymuint na = ofunc.sop_litnum(edge->pos(), kPolNega);
+	ymuint na = ofunc.sop_litnum(VarId(edge->pos()), kPolNega);
 	// それらに肯定および否定のSOPのキューブ数をかける．
 	ymuint c = pa * pc + na * nc;
 	if ( ofunc.sop_cubenum() + c > sop_limit ) {

@@ -135,7 +135,7 @@ BddMgrModern::compose_start()
 
 // multiple compose 演算を行う変数と置き換え関数を登録する関数
 void
-BddMgrModern::compose_reg(tVarId id,
+BddMgrModern::compose_reg(VarId id,
 			  BddEdge e)
 {
   Var* var = var_of(id);
@@ -322,7 +322,7 @@ BddMgrModern::gcofactor_step(BddEdge f,
 // 一つの変数に対する cofactor を計算する．
 BddEdge
 BddMgrModern::scofactor(BddEdge e1,
-			tVarId id,
+			VarId id,
 			tPol pol)
 {
   clear_varmark();
@@ -432,7 +432,7 @@ BddMgrModern::cubediv_step(BddEdge f)
 // メモリ不足のためにエラーとなる可能性がある．
 BddEdge
 BddMgrModern::xor_moment(BddEdge e,
-			 tVarId idx)
+			 VarId idx)
 {
   if ( e.is_error() ) {
     return BddEdge::make_error();

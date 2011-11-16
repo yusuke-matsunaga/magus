@@ -71,18 +71,20 @@ inline
 ymuint
 hash_func3(BddEdge id1,
 	   BddEdge id2,
-	   ymuint id3)
+	   VarId var)
 {
   ymuint v1 = id1.hash();
   ymuint v2 = id2.hash();
+  ymuint id3 = var.val();
   return v1 + (v2 >> 2) + (id3 << 3) - id3;
 }
 
 // VarId 用のハッシュ関数
 inline
 ymuint
-var_hash(tVarId key)
+var_hash(VarId var)
 {
+  ymuint key = var.val();
   return ((key * key) >> 8) + key;
 }
 
@@ -228,7 +230,7 @@ BddMgrModern::~BddMgrModern()
 
 // 肯定のリテラル関数を作る
 BddEdge
-BddMgrModern::make_posiliteral(tVarId varid)
+BddMgrModern::make_posiliteral(VarId varid)
 {
   Var* var = var_of(varid);
   if ( !var ) {
@@ -315,7 +317,7 @@ BddMgrModern::check_cube(BddEdge e)
 
 // Shannon 展開を行なう．
 // エラーは起きないはず．
-tVarId
+VarId
 BddMgrModern::root_decomp(BddEdge e,
 			  BddEdge& e0,
 			  BddEdge& e1)
@@ -325,19 +327,19 @@ BddMgrModern::root_decomp(BddEdge e,
   if ( vp ) {
     e0 = vp->edge0(pol);
     e1 = vp->edge1(pol);
-    tVarId varid = vp->varid();
+    VarId varid = vp->varid();
     return varid;
   }
   else {
     // 終端節点の時にはコファクターも自分自身
     // これはエラー節点の場合も含む
     e0 = e1 = e;
-    return kVarIdMax;
+    return kVarIdIllegal;
   }
 }
 
 // 根の変数番号を取り出す．
-tVarId
+VarId
 BddMgrModern::root_var(BddEdge e)
 {
   Node* vp = get_node(e);
@@ -346,7 +348,7 @@ BddMgrModern::root_var(BddEdge e)
   }
   else {
     // 終端
-    return kVarIdMax;
+    return kVarIdIllegal;
   }
 }
 
@@ -395,7 +397,7 @@ BddMgrModern::check_noref(BddEdge e)
 // 確保に失敗したら false を返す．
 // 最後の変数の後ろに挿入される．
 bool
-BddMgrModern::new_var(tVarId varid)
+BddMgrModern::new_var(VarId varid)
 {
   return alloc_var(varid) != NULL;
 }
@@ -403,7 +405,7 @@ BddMgrModern::new_var(tVarId varid)
 // 変数を確保する．
 // 最後の変数の後ろに挿入される．
 BmmVar*
-BddMgrModern::alloc_var(tVarId varid)
+BddMgrModern::alloc_var(VarId varid)
 {
   if ( mVarTableSize == mVarNum ) {
     size_t new_size = mVarTableSize << 1;
@@ -440,7 +442,7 @@ BddMgrModern::alloc_var(tVarId varid)
 
 // 現在登録されている変数をそのレベルの昇順で返す．
 tVarSize
-BddMgrModern::var_list(list<tVarId>& vlist) const
+BddMgrModern::var_list(list<VarId>& vlist) const
 {
   vlist.clear();
   for (ymuint i = 0; i < mVarNum; ++ i) {
@@ -452,14 +454,14 @@ BddMgrModern::var_list(list<tVarId>& vlist) const
 // 変数番号からレベルを得る．
 // もしもレベルが割り当てられていない場合にはエラーとなる．
 tLevel
-BddMgrModern::level(tVarId varid) const
+BddMgrModern::level(VarId varid) const
 {
   Var* v = var_of(varid);
   return v->level();
 }
 
 // レベルから変数番号を得る．
-tVarId
+VarId
 BddMgrModern::varid(tLevel level) const
 {
   Var* v = var_at(level);
@@ -792,7 +794,7 @@ BddMgrModern::new_node(Var* var,
     }
   }
   else {
-    tVarId index = var->varid();
+    VarId index = var->varid();
     pos = hash_func3(e0, e1, index);
     for (temp = mNodeTable[pos & mTableSize_1]; temp; temp = temp->mLink) {
       if ( temp->edge0() == e0 && temp->edge1() == e1 &&
@@ -878,7 +880,7 @@ BddMgrModern::var_at(tLevel level) const
 
 // varid の変数を取出す．
 BmmVar*
-BddMgrModern::var_of(tVarId varid) const
+BddMgrModern::var_of(VarId varid) const
 {
   size_t pos = var_hash(varid) & (mVarTableSize - 1);
   for (Var* var = mVarHashTable[pos]; var; var = var->mLink) {

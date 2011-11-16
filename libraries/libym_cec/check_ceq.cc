@@ -56,10 +56,10 @@ make_logic(const LogExpr& func,
     return BdnNodeHandle::make_one();
   }
   if ( func.is_posiliteral() ) {
-    return inputs[func.varid()];
+    return inputs[func.varid().val()];
   }
   if ( func.is_negaliteral() ) {
-    return ~inputs[func.varid()];
+    return ~inputs[func.varid().val()];
   }
   ymuint nc = func.child_num();
   vector<BdnNodeHandle> fanins(nc);

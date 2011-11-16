@@ -204,7 +204,7 @@ Bdd::operator>=(const Bdd& src2) const
 
 // @brief compose 演算
 Bdd
-Bdd::compose(tVarId var,
+Bdd::compose(VarId var,
 	     const Bdd& g) const
 {
   BddEdge ans;
@@ -241,7 +241,7 @@ Bdd::compose(const VarBddMap& comp_map) const
   mMgr->compose_start();
   for (VarBddMap::const_iterator p = comp_map.begin();
        p != comp_map.end(); ++ p) {
-    tVarId id = p->first;
+    VarId id = p->first;
     Bdd bdd = p->second;
     mMgr->compose_reg(id, bdd.mRoot);
   }
@@ -256,8 +256,8 @@ Bdd::remap_var(const VarVarMap& var_map) const
   mMgr->compose_start();
   for (VarVarMap::const_iterator p = var_map.begin();
        p != var_map.end(); ++ p) {
-    tVarId id = p->first;
-    tVarId mid = p->second;
+    VarId id = p->first;
+    VarId mid = p->second;
     Bdd bdd(mMgr, mMgr->make_posiliteral(mid));
     mMgr->compose_reg(id, bdd.mRoot);
   }
@@ -267,7 +267,7 @@ Bdd::remap_var(const VarVarMap& var_map) const
 
 // @brief コファクター演算
 Bdd
-Bdd::cofactor(tVarId var,
+Bdd::cofactor(VarId var,
 	      tPol pol) const
 {
   BddEdge ans = mMgr->scofactor(mRoot, var, pol);
@@ -299,7 +299,7 @@ Bdd::operator/=(const Bdd& c)
 
 // @brief Davio 展開のモーメント項を求める処理
 Bdd
-Bdd::xor_moment(tVarId idx) const
+Bdd::xor_moment(VarId idx) const
 {
   BddEdge ans = mMgr->xor_moment(mRoot, idx);
   return Bdd(mMgr, ans);
@@ -369,8 +369,8 @@ Bdd::is_cube() const
 
 // @brief 対称性のチェック
 bool
-Bdd::check_symmetry(tVarId x,
-		    tVarId y,
+Bdd::check_symmetry(VarId x,
+		    VarId y,
 		    tPol pol) const
 {
   if ( x == y ) {
@@ -466,19 +466,19 @@ Bdd::push_down(tLevel x_level,
 }
 
 // @brief Shannon 展開 (Boole 展開) を行なう．
-tVarId
+VarId
 Bdd::root_decomp(Bdd& f0,
 		 Bdd& f1) const
 {
   BddEdge e0, e1;
-  tVarId ans = mMgr->root_decomp(mRoot, e0, e1);
+  VarId ans = mMgr->root_decomp(mRoot, e0, e1);
   f0 = Bdd(mMgr, e0);
   f1 = Bdd(mMgr, e1);
   return ans;
 }
 
 // @brief 根の変数番号を取り出す．
-tVarId
+VarId
 Bdd::root_var() const
 {
   return mMgr->root_var(mRoot);
@@ -585,20 +585,18 @@ display(const BddList& array,
 
 // @brief 内容のダンプ
 void
-Bdd::dump(ostream& s) const
+Bdd::dump(BinO& s) const
 {
   Dumper dumper(mMgr, s);
-  dumper.dump(mRoot);
-  dumper.dump_edge(mRoot);
-  s << endl;
+  dumper.write(mRoot);
 }
 
 // @brief BDD ベクタの内容をダンプする．
-// @param[in] array BDD の配列
 // @param[in] s 出力ストリーム
+// @param[in] array BDD の配列
 void
-dump(const BddVector& array,
-     ostream& s)
+dump(BinO& s,
+     const BddVector& array)
 {
   if ( array.empty() ) {
     return;
@@ -606,25 +604,22 @@ dump(const BddVector& array,
   // 今は array の中のBDDのマネージャがすべて同じと仮定している．
   BddMgrImpl* mgr = array.front().mMgr;
   Dumper dumper(mgr, s);
+  vector<BddEdge> edge_list;
+  edge_list.reserve(array.size());
   for (BddVector::const_iterator p = array.begin();
        p != array.end(); ++ p) {
     Bdd bdd = *p;
-    dumper.dump(bdd.root());
+    edge_list.push_back(bdd.root());
   }
-  for (BddVector::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Bdd bdd = *p;
-    dumper.dump_edge(bdd.root());
-    s << endl;
-  }
+  dumper.write(edge_list);
 }
 
 // @brief BDD リストの内容をダンプする．
-// @param[in] array BDD のリスト
 // @param[in] s 出力ストリーム
+// @param[in] array BDD のリスト
 void
-dump(const BddList& array,
-     ostream& s)
+dump(BinO& s,
+     const BddList& array)
 {
   if ( array.empty() ) {
     return;
@@ -632,17 +627,14 @@ dump(const BddList& array,
   // 今は array の中のBDDのマネージャがすべて同じと仮定している．
   BddMgrImpl* mgr = array.front().mMgr;
   Dumper dumper(mgr, s);
+  vector<BddEdge> edge_list;
+  edge_list.reserve(array.size());
   for (BddList::const_iterator p = array.begin();
        p != array.end(); ++ p) {
     Bdd bdd = *p;
-    dumper.dump(bdd.root());
+    edge_list.push_back(bdd.root());
   }
-  for (BddList::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Bdd bdd = *p;
-    dumper.dump_edge(bdd.root());
-    s << endl;
-  }
+  dumper.write(edge_list);
 }
 
 // @brief BDD が使っているノード数を数える．
@@ -720,7 +712,7 @@ Bdd::walsh0(tVarSize n) const
 
 // @brief Walsh変換の 1次係数の計算
 mpz_class
-Bdd::walsh1(tVarId var,
+Bdd::walsh1(VarId var,
 	    tVarSize n) const
 {
   return mMgr->walsh1(mRoot, var, n);
@@ -1160,32 +1152,6 @@ Bdd::to_literallist(LiteralList& dst) const
   return mMgr->to_literallist(mRoot, dst);
 }
 
-// @brief 節点に n-mark を付け，各変数ごとにノード数を数える．
-// @param[out] node_counts 変数番号をキーとして，
-// その変数のノード数を格納する連想配列
-void
-Bdd::scan(hash_map<tVarId, size_t>& node_counts) const
-{
-  return mMgr->scan(mRoot, node_counts);
-}
-
-// @brief レベル level のノード数を数える．
-// @param[in] level 変数のレベル
-// @return level のノード数
-// ただし n-mark が付いていないノードがあったら UINT_MAX を返す．
-ymuint64
-Bdd::count_at(tLevel level) const
-{
-  return mMgr->count_at(mRoot, level);
-}
-
-// @brief scan で付けた n-mark を消す．
-void
-Bdd::clear_scanmark() const
-{
-  mMgr->clear_scanmark(mRoot);
-}
-
 // @brief カルノー図を描く
 // @param[in] s 出力ストリーム
 // 4入力以下した受け付けない
@@ -1197,11 +1163,13 @@ Bdd::display_map(ostream& s) const
   for (ymuint i = 0; i < 16; i ++) {
     BddEdge e = mRoot;
     for (ymuint j = 0; j < 4; j ++) {
+      if ( e.is_const() ) {
+	break;
+      }
       BddEdge e0;
       BddEdge e1;
-      tVarId vid = mMgr->root_decomp(e, e0, e1);
-      if ( vid == kVarIdMax ) break;
-      if ( vid > j ) continue;
+      VarId vid = mMgr->root_decomp(e, e0, e1);
+      if ( vid.val() > j ) continue;
       if ( i & (1 << j) ) {
 	e = e1;
       }

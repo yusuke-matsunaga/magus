@@ -41,14 +41,13 @@ LsimBdd::set_network(const BdnMgr& bdn)
   for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     const BdnNode* node = *p;
-    Bdd bdd = mBddMgr.make_posiliteral(id);
+    Bdd bdd = mBddMgr.make_posiliteral(VarId(id));
     ++ id;
     bddmap[node->id()] = bdd;
   }
 
   vector<BdnNode*> node_list;
   bdn.sort(node_list);
-  ymuint node_num = node_list.size();
   id = 0;
   for (vector<BdnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
@@ -116,8 +115,8 @@ eval_bdd(Bdd bdd,
       }
       Bdd bdd0;
       Bdd bdd1;
-      ymuint id = bdd.root_decomp(bdd0, bdd1);
-      ymuint ival = iv[id];
+      VarId id = bdd.root_decomp(bdd0, bdd1);
+      ymuint ival = iv[id.val()];
       if ( (ival & (1 << b)) ) {
 	bdd = bdd1;
       }

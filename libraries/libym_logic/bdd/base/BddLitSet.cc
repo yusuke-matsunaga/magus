@@ -36,7 +36,7 @@ Literal
 BddLitSet::iterator::operator*() const
 {
   Bdd f0, f1;
-  tVarId varid = mCur.root_decomp(f0, f1);
+  VarId varid = mCur.root_decomp(f0, f1);
   tPol pol1 = f0.is_zero() ? kPolPosi : kPolNega;
   return Literal(varid, pol1);
 }
@@ -125,7 +125,7 @@ BddLitSet::operator=(const BddLitSet& src)
 
 // リテラル1つだけを要素とする集合を作るコンストラクタ
 BddLitSet::BddLitSet(BddMgr& mgr,
-		     tVarId varid,
+		     VarId varid,
 		     tPol pol) :
   mBody(mgr.make_literal(varid, pol)),
   mSize(0U)

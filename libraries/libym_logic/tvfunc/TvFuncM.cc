@@ -316,13 +316,14 @@ TvFuncM::operator^=(const TvFuncM& src1)
 }
 
 // @brief コファクターを計算し自分に代入する．
-// @param[in] pos 変数番号
+// @param[in] varid 変数番号
 // @param[in] pol 極性
 // @return 自身への参照を返す．
 const TvFuncM&
-TvFuncM::set_cofactor(ymuint pos,
+TvFuncM::set_cofactor(VarId varid,
 		      tPol pol)
 {
+  ymuint pos = varid.val();
   if ( pos < NIPW ) {
     ymulong mask = c_masks[pos];
     if ( pol == kPolNega ) {
@@ -363,24 +364,25 @@ TvFuncM::set_cofactor(ymuint pos,
 }
 
 // @brief 1出力の論理関数を切り出す．
-// @param[in] opos 出力番号
+// @param[in] ovar 出力番号
 TvFunc
-TvFuncM::output(ymuint opos) const
+TvFuncM::output(VarId ovar) const
 {
   #warning "効率が悪い仮のコード"
 
   ymuint np = 1U << ni();
   vector<int> tmp(np);
   for (ymuint i = 0; i < np; ++ i) {
-    tmp[i] = value(opos, i);
+    tmp[i] = value(ovar, i);
   }
   return TvFunc(ni(), tmp);
 }
 
-// i 番目の変数がサポートの時 true を返す．
+// var がサポートの時 true を返す．
 bool
-TvFuncM::check_sup(tVarId i) const
+TvFuncM::check_sup(VarId var) const
 {
+  ymuint i = var.val();
   if ( i < NIPW ) {
     // ブロックごとにチェック
     ymuint dist = 1U << i;
@@ -399,7 +401,8 @@ TvFuncM::check_sup(tVarId i) const
     for (ymuint i = 0; i < mNo; ++ i) {
       ymuint offset = i * mNblk1;
       for (ymuint b = 0; b < mNblk1; ++ b) {
-	if ( (b & check) && (mVector[b + offset] != mVector[(b ^ check) + offset]) ) {
+	if ( (b & check) &&
+	     (mVector[b + offset] != mVector[(b ^ check) + offset]) ) {
 	  return true;
 	}
       }
@@ -408,15 +411,18 @@ TvFuncM::check_sup(tVarId i) const
   return false;
 }
 
-// i 番目と j 番目の変数が対称のとき true を返す．
+// var1 と var2 の変数が対称のとき true を返す．
 bool
-TvFuncM::check_sym(tVarId i,
-		   tVarId j,
+TvFuncM::check_sym(VarId var1,
+		   VarId var2,
 		   tPol pol) const
 {
+  ymuint i = var1.val();
+  ymuint j = var2.val();
+
   // i と j を正規化する．
   if ( i < j ) {
-    tVarId tmp = i;
+    ymuint tmp = i;
     i = j;
     j = tmp;
   }
@@ -516,19 +522,23 @@ TvFuncM::xform(const NpnMapM& npnmap) const
   ymuint imask = 0UL;
   ymuint ipat[kMaxNi];
   for (ymuint i = 0; i < mNi; ++ i) {
-    NpnVmap imap = npnmap.imap(i);
+    VarId src_var(i);
+    NpnVmap imap = npnmap.imap(src_var);
     if ( imap.pol() == kPolNega ) {
       imask |= (1UL << i);
     }
-    ymuint j = imap.pos();
+    VarId dst_var = imap.var();
+    ymuint j = dst_var.val();
     ipat[i] = 1UL << j;
   }
 
   TvFuncM ans(mNi, mNo);
 
   for (ymuint o = 0; o < mNo; ++ o) {
-    NpnVmap omap = npnmap.omap(o);
-    ymuint dst_pos = omap.pos();
+    VarId src_var(o);
+    NpnVmap omap = npnmap.omap(src_var);
+    VarId dst_var = omap.var();
+    ymuint dst_pos = dst_var.val();
     ymulong omask = omap.pol() == kPolPosi ? 0UL : 1UL;
     for (ymuint i = 0; i < ni_pow; ++ i) {
       ymuint new_i = 0;
@@ -538,7 +548,7 @@ TvFuncM::xform(const NpnMapM& npnmap) const
 	  new_i |= ipat[b];
 	}
       }
-      ymulong pat = (value(o, i ^ imask) ^ omask);
+      ymulong pat = (value(VarId(o), i ^ imask) ^ omask);
       ans.mVector[block(new_i) + dst_pos * mNblk1] |= pat << shift(new_i);
     }
   }

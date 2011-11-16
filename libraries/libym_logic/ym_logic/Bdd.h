@@ -12,7 +12,9 @@
 
 #include "ym_logic/bdd_nsdef.h"
 #include "ym_logic/BddEdge.h"
+#include "ym_logic/VarId.h"
 #include "ym_logic/LogExpr.h"
+#include "ym_utils/BinIO.h"
 #include "gmpxx.h"
 
 
@@ -123,8 +125,8 @@ public:
   /// ただし pol = kPolNega の時には x(または y) を反転して
   /// 交換したときに等しくなるかどうかチェックする．
   bool
-  check_symmetry(tVarId x,
-		 tVarId y,
+  check_symmetry(VarId x,
+		 VarId y,
 		 tPol pol = kPolPosi) const;
 
   /// @}
@@ -217,14 +219,14 @@ public:
   /// @return 根の節点の変数番号を返す．
   /// @note もともと定数値(葉)のBDDの場合，kVarIdMax を返し，
   /// f0, f1 には自分自身を代入する．
-  tVarId
+  VarId
   root_decomp(Bdd& f0,
 	      Bdd& f1) const;
 
   /// @brief 根の変数番号の取得
   /// @retval 根の変数番号 内部節点の場合
   /// @retval kVarIdMax 終端節点の場合
-  tVarId
+  VarId
   root_var() const;
 
   /// @brief 0枝の指しているコファクターの取得
@@ -253,7 +255,7 @@ public:
   /// @param[in] pol 極性
   /// @return 変数 var の極性 pol 側のコファクターを返す．
   Bdd
-  cofactor(tVarId var,
+  cofactor(VarId var,
 	   tPol pol) const;
 
   /// @brief コファクター演算
@@ -267,7 +269,7 @@ public:
   /// @return Davio 展開のモーメント項 (\f$f_{\overline{x}} \oplus f_x\f$)
   /// を返す．
   Bdd
-  xor_moment(tVarId idx) const;
+  xor_moment(VarId idx) const;
 
   /// @brief Smallest Cube Containg F を求める．
   /// @return SCC を返す．
@@ -279,7 +281,7 @@ public:
   /// @param[in] g 置き換え先の BDD
   /// @return 演算結果
   Bdd
-  compose(tVarId var,
+  compose(VarId var,
 	  const Bdd& g) const;
 
   /// @brief 複数変数の compose 演算
@@ -367,7 +369,7 @@ public:
   /// @brief 内容のダンプ
   /// @param[in] s 出力ストリーム
   void
-  dump(ostream& s) const;
+  dump(BinO& s) const;
 
   /// @brief BDD が使っているノード数を数える．
   /// @return BDD が使っているノード数
@@ -396,7 +398,7 @@ public:
   /// @param[in] n 入力数
   /// @return 変数 var の 1次係数
   mpz_class
-  walsh1(tVarId var,
+  walsh1(VarId var,
 	 tVarSize n) const;
 
   /// @brief サポート変数集合の計算 (VarVector)
@@ -495,27 +497,6 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  /// @name NPN Matcher 関係の関数
-  /// @{
-
-  /// @brief 節点に n-mark を付け，各変数ごとにノード数を数える．
-  void
-  scan(hash_map<tVarId, size_t>& node_counts) const;
-
-  /// @brief レベル level のノード数を数える．
-  /// @note ただし n-mark が付いていないノードがあったら UINT_MAX を返す．
-  ymuint64
-  count_at(tLevel level) const;
-
-  /// @brief scan で付けた n-mark を消す．
-  void
-  clear_scanmark() const;
-
-  /// @}
-  //////////////////////////////////////////////////////////////////////
-
-
-  //////////////////////////////////////////////////////////////////////
   //  friend 関数の宣言
   //////////////////////////////////////////////////////////////////////
   friend
@@ -558,13 +539,13 @@ public:
 
   friend
   void
-  dump(const BddVector& array,
-       ostream& s);
+  dump(BinO& s,
+       const BddVector& array);
 
   friend
   void
-  dump(const BddList& array,
-       ostream& s);
+  dump(BinO& s,
+       const BddList& array);
 
   friend
   ymuint64
@@ -811,13 +792,13 @@ display(const BddList& array,
 
 // BDDの配列の内容を保存用に書き出す
 void
-dump(const BddVector& array,
-     ostream& s);
+dump(BinO& s,
+     const BddVector& array);
 
 // BDDの配列の内容を保存用に書き出す
 void
-dump(const BddList& array,
-     ostream& s);
+dump(BinO& s,
+     const BddList& array);
 
 // BDDの配列のノード数を数える
 ymuint64

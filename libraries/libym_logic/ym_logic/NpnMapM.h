@@ -10,6 +10,7 @@
 
 
 #include "ym_logic/npn_nsdef.h"
+#include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
 #include "ym_logic/NpnVmap.h"
 #include "ym_utils/BinIO.h"
@@ -84,37 +85,37 @@ public:
 	       ymuint no);
 
   /// @brief 入力の変換内容の設定
-  /// @param[in] pos 入力番号
-  /// @param[in] dst_pos 変換先の入力番号
+  /// @param[in] src_var 入力番号
+  /// @param[in] dst_var 変換先の入力番号
   /// @param[in] pol 極性
   void
-  set_imap(ymuint pos,
-	   ymuint dst_pos,
+  set_imap(VarId src_var,
+	   VarId dst_var,
 	   tPol pol);
 
   /// @brief 入力の変換内容の設定
-  /// @param[in] pos 入力番号
+  /// @param[in] var 入力番号
   /// @param[in] imap 変換情報(変換先の入力番号と極性)
   /// @sa NpnVmap
   void
-  set_imap(ymuint pos,
+  set_imap(VarId var,
 	   NpnVmap imap);
 
   /// @brief 出力の変換内容の設定
-  /// @param[in] pos 出力番号
-  /// @param[in] dst_pos 変換先の出力番号
+  /// @param[in] src_var 出力番号
+  /// @param[in] dst_var 変換先の出力番号
   /// @param[in] pol 極性
   void
-  set_omap(ymuint pos,
-	   ymuint dst_pos,
+  set_omap(VarId src_var,
+	   VarId dst_var,
 	   tPol pol);
 
   /// @brief 出力の変換内容の設定
-  /// @param[in] pos 出力番号
+  /// @param[in] var 出力番号
   /// @param[in] omap 変換情報(変換先の出力番号と極性)
   /// @sa NpnVmap
   void
-  set_omap(ymuint pos,
+  set_omap(VarId var,
 	   NpnVmap omap);
 
 
@@ -133,20 +134,20 @@ public:
   no() const;
 
   /// @brief 入力の変換情報の取得
-  /// @param[in] pos 入力番号 ( 0 <= pos < ni() )
-  /// @return pos 番目の入力の変換情報
-  /// @note pos に対応するマッピング情報がないときには不正な値を返す．
+  /// @param[in] var 入力番号
+  /// @return var の変換情報
+  /// @note var に対応するマッピング情報がないときには不正な値を返す．
   /// @sa NpnVmap
   NpnVmap
-  imap(ymuint pos) const;
+  imap(VarId var) const;
 
   /// @brief 出力の変換情報の取得
-  /// @param[in] pos 出力番号 ( 0 <= pos < no() )
-  /// @return pos 番目の出力の変換情報
-  /// @note pos に対応するマッピング情報がないときには不正な値を返す．
+  /// @param[in] var 出力番号
+  /// @return var の変換情報
+  /// @note var に対応するマッピング情報がないときには不正な値を返す．
   /// @sa NpnVmap
   NpnVmap
-  omap(ymuint pos) const;
+  omap(VarId var) const;
 
   /// @brief 内容が等しいか調べる．
   /// @param[in] src 比較対象のマップ
@@ -242,29 +243,31 @@ NpnMapM::no() const
   return mNo;
 }
 
-// posに対応するマッピング情報を得る．
+// var に対応するマッピング情報を得る．
 inline
 NpnVmap
-NpnMapM::imap(ymuint pos) const
+NpnMapM::imap(VarId var) const
 {
-  if ( pos < ni() ) {
-    return mMapArray[pos];
+  ymuint idx = var.val();
+  if ( idx < ni() ) {
+    return mMapArray[idx];
   }
   return NpnVmap::invalid();
 }
 
 // @brief 出力の変換情報の取得
-// @param[in] pos 出力番号 ( 0 <= pos < no() )
-// @return pos 番目の出力の変換情報
-// @note pos に対応するマッピング情報がないときには
+// @param[in] var 出力番号
+// @return var の出力の変換情報
+// @note var に対応するマッピング情報がないときには
 // kImapBad を返す．
 // @sa NpnVmap
 inline
 NpnVmap
-NpnMapM::omap(ymuint pos) const
+NpnMapM::omap(VarId var) const
 {
-  if ( pos < no() ) {
-    return mMapArray[pos + ni()];
+  ymuint idx = var.val();
+  if ( idx < no() ) {
+    return mMapArray[idx + ni()];
   }
   return NpnVmap::invalid();
 }

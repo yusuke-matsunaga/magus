@@ -69,7 +69,7 @@ public:
   is_literal(tPol pol) const;
 
   /// @brief リテラルノードの場合に変数番号を取り出す．
-  tVarId
+  VarId
   varid() const;
 
   /// @brief AND ノードの時に真となる．
@@ -138,13 +138,13 @@ public:
   /// @brief 特定の変数のリテラルの出現回数を返す．
   /// @param[in] varid 計測対象の変数番号
   ymuint
-  litnum(tVarId varid) const;
+  litnum(VarId varid) const;
 
   /// @brief 特定の変数の特定の極性のリテラルの出現回数を返す．
   /// @param[in] varid 計測対象の変数番号
   /// @param[in] pol 計測対象の極性
   ymuint
-  litnum(tVarId varid,
+  litnum(VarId varid,
 	 tPol pol) const;
 
   /// @brief 使われている変数の最大の番号 + 1を得る．
@@ -161,7 +161,7 @@ public:
   /// @param[in] varid 計測対象の変数番号
   SopLit
   soplit(bool inverted,
-	 tVarId varid) const;
+	 VarId varid) const;
 
   /// @brief SOP 形式に展開したときの積項数とリテラル数を見積もる．
   /// @param[in] inverted true の時否定のSOPに対する見積を行う．
@@ -169,7 +169,7 @@ public:
   /// @param[in] pol 計測対象の極性
   SopLit
   soplit(bool inverted,
-	 tVarId varid,
+	 VarId varid,
 	 tPol pol) const;
 
   /// @}
@@ -332,10 +332,10 @@ LexpNode::is_literal(tPol pol) const
 }
 
 inline
-tVarId
+VarId
 LexpNode::varid() const
 {
-  return is_literal() ? static_cast<tVarId>(mNc) : kVarIdMax;
+  return is_literal() ? VarId(mNc) : VarId();
 }
 
 inline

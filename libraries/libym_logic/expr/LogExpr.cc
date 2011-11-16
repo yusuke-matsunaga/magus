@@ -91,14 +91,14 @@ LogExpr::make_one()
 
 // 肯定のリテラルを作る．
 LogExpr
-LogExpr::make_posiliteral(tVarId varid)
+LogExpr::make_posiliteral(VarId varid)
 {
   return LogExpr(LexpMgr::the_obj().make_posiliteral(varid));
 }
 
 // 否定のリテラルを作る．
 LogExpr
-LogExpr::make_negaliteral(tVarId varid)
+LogExpr::make_negaliteral(VarId varid)
 {
   return LogExpr(LexpMgr::the_obj().make_negaliteral(varid));
 }
@@ -266,7 +266,7 @@ LogExpr::operator^=(const LogExpr& src)
 
 // pos 番目のリテラルを src の論理式に置き換える．
 LogExpr
-LogExpr::compose(tVarId varid,
+LogExpr::compose(VarId varid,
 		 const LogExpr& src) const
 {
   return LogExpr(LexpMgr::the_obj().compose(root(), varid, src.root()));
@@ -399,7 +399,7 @@ LogExpr::is_literal() const
 
 // リテラルの時に変数番号を返す．
 // リテラルでなければ kVarMaxId を返す．
-nsYm::tVarId
+VarId
 LogExpr::varid() const
 {
   return root()->varid();
@@ -502,14 +502,14 @@ LogExpr::litnum() const
 
 // 特定の変数のリテラル数を得る．
 ymuint
-LogExpr::litnum(tVarId varid) const
+LogExpr::litnum(VarId varid) const
 {
   return root()->litnum(varid);
 }
 
 // 特定の変数の特定の極性のリテラル数を得る．
 ymuint
-LogExpr::litnum(tVarId varid,
+LogExpr::litnum(VarId varid,
 		tPol pol) const
 {
   return root()->litnum(varid, pol);
@@ -540,7 +540,7 @@ LogExpr::sop_litnum() const
 
 // SOP形式に展開した時の varid 番めの変数のリテラルの出現回数を得る．
 ymuint
-LogExpr::sop_litnum(tVarId varid) const
+LogExpr::sop_litnum(VarId varid) const
 {
   SopLit l = root()->soplit(false, varid);
   return l.nl();
@@ -549,7 +549,7 @@ LogExpr::sop_litnum(tVarId varid) const
 // SOP形式に展開した時の varid 番めの変数の極性が pol のリテラル
 // の出現回数を得る．
 ymuint
-LogExpr::sop_litnum(tVarId varid,
+LogExpr::sop_litnum(VarId varid,
 		    tPol pol) const
 {
   SopLit l = root()->soplit(false, varid, pol);
@@ -643,44 +643,46 @@ BEGIN_NONAMESPACE
 
 // 論理式をバイナリダンプする．
 void
-write_expr(ostream& s,
+write_expr(BinO& s,
 	   const LogExpr& expr)
 {
   if ( expr.is_zero() ) {
-    BinIO::write_8(s, 0);
+    s << static_cast<ymuint8>(0);
     return;
   }
   if ( expr.is_one() ) {
-    BinIO::write_8(s, 1);
+    s << static_cast<ymuint8>(1);
     return;
   }
   if ( expr.is_posiliteral() ) {
-    BinIO::write_8(s, 2);
-    BinIO::write_32(s, expr.varid());
+    s << static_cast<ymuint8>(2)
+      << expr.varid();
     return;
   }
   if ( expr.is_negaliteral() ) {
-    BinIO::write_8(s, 3);
-    BinIO::write_32(s, expr.varid());
+    s << static_cast<ymuint8>(3)
+      << expr.varid();
     return;
   }
 
   // 残りは論理演算ノード
+  ymuint8 type = 0;
   if ( expr.is_and() ) {
-    BinIO::write_8(s, 4);
+    type = 4;
   }
   else if ( expr.is_or() ) {
-    BinIO::write_8(s, 5);
+    type = 5;
   }
   else if ( expr.is_xor() ) {
-    BinIO::write_8(s, 6);
+    type = 6;
   }
   else {
     assert_not_reached(__FILE__, __LINE__);
   }
 
-  ymuint nc = expr.child_num();
-  BinIO::write_32(s, nc);
+  ymuint32 nc = expr.child_num();
+  s << type
+    << nc;
   for (ymuint i = 0; i < nc; ++ i) {
     write_expr(s, expr.child(i));
   }
@@ -688,9 +690,10 @@ write_expr(ostream& s,
 
 // バイナリストリームから論理式を作る．
 LogExpr
-read_expr(istream& s)
+read_expr(BinI& s)
 {
-  ymuint type = BinIO::read_8(s);
+  ymuint8 type;
+  s >> type;
   switch ( type ) {
   case 0:
     return LogExpr::make_zero();
@@ -699,14 +702,23 @@ read_expr(istream& s)
     return LogExpr::make_one();
 
   case 2:
-    return LogExpr::make_posiliteral(BinIO::read_32(s));
+    {
+      VarId var;
+      s >> var;
+      return LogExpr::make_posiliteral(var);
+    }
 
   case 3:
-    return LogExpr::make_negaliteral(BinIO::read_32(s));
+    {
+      VarId var;
+      s >> var;
+      return LogExpr::make_negaliteral(var);
+    }
   }
 
   // 残りは論理演算
-  ymuint nc = BinIO::read_32(s);
+  ymuint32 nc;
+  s >> nc;
   vector<LogExpr> child_list(nc);
   for (ymuint i = 0; i < nc; ++ i) {
     child_list[i] = read_expr(s);
@@ -741,7 +753,7 @@ BinO&
 operator<<(BinO& s,
 	   const LogExpr& expr)
 {
-  write_expr(s.s(), expr);
+  write_expr(s, expr);
   return s;
 }
 
@@ -754,7 +766,7 @@ BinI&
 operator>>(BinI& s,
 	   LogExpr& expr)
 {
-  expr = read_expr(s.s());
+  expr = read_expr(s);
   return s;
 }
 

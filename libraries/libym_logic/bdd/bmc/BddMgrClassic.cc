@@ -73,18 +73,20 @@ inline
 ymuint
 hash_func3(BddEdge id1,
 	   BddEdge id2,
-	   ymuint id3)
+	   VarId var)
 {
   ymuint v1 = id1.hash();
   ymuint v2 = id2.hash();
+  ymuint id3 = var.val();
   return static_cast<ymuint>(v1 + (v2 >> 2) + (id3 << 3) - id3);
 }
 
 // VarId 用のハッシュ関数
 inline
 ymuint
-var_hash(tVarId key)
+var_hash(VarId var)
 {
+  ymuint key = var.val();
   return ((key * key) >> 8) + key;
 }
 
@@ -227,7 +229,7 @@ BddMgrClassic::~BddMgrClassic()
 
 // 肯定のリテラル関数を作る
 BddEdge
-BddMgrClassic::make_posiliteral(tVarId varid)
+BddMgrClassic::make_posiliteral(VarId varid)
 {
   Var* var = var_of(varid);
   if ( !var ) {
@@ -314,7 +316,7 @@ BddMgrClassic::check_cube(BddEdge e)
 
 // Shannon 展開を行なう．
 // エラーは起きないはず．
-tVarId
+VarId
 BddMgrClassic::root_decomp(BddEdge e,
 			   BddEdge& e0,
 			   BddEdge& e1)
@@ -324,19 +326,19 @@ BddMgrClassic::root_decomp(BddEdge e,
   if ( vp ) {
     e0 = vp->edge0(pol);
     e1 = vp->edge1(pol);
-    tVarId varid = vp->varid();
+    VarId varid = vp->varid();
     return varid;
   }
   else {
     // 終端節点の時にはコファクターも自分自身
     // これはエラー節点の場合も含む
     e0 = e1 = e;
-    return kVarIdMax;
+    return kVarIdIllegal;
   }
 }
 
 // 根の変数番号を取り出す．
-tVarId
+VarId
 BddMgrClassic::root_var(BddEdge e)
 {
   Node* vp = get_node(e);
@@ -345,7 +347,7 @@ BddMgrClassic::root_var(BddEdge e)
   }
   else {
     // 終端
-    return kVarIdMax;
+    return kVarIdIllegal;
   }
 }
 
@@ -394,14 +396,14 @@ BddMgrClassic::check_noref(BddEdge e)
 // 確保に失敗したら false を返す．
 // 最後の変数の後ろに挿入される．
 bool
-BddMgrClassic::new_var(tVarId varid)
+BddMgrClassic::new_var(VarId varid)
 {
   return alloc_var(varid) != NULL;
 }
 
 // 変数を確保する．
 BmcVar*
-BddMgrClassic::alloc_var(tVarId varid)
+BddMgrClassic::alloc_var(VarId varid)
 {
   if ( mVarTableSize == mVarNum ) {
     Var** old_table = mVarHashTable;
@@ -437,7 +439,7 @@ BddMgrClassic::alloc_var(tVarId varid)
 
 // 現在登録されている変数をそのレベルの昇順で返す．
 tVarSize
-BddMgrClassic::var_list(list<tVarId>& vlist) const
+BddMgrClassic::var_list(list<VarId>& vlist) const
 {
   vlist.clear();
   for (Var* var = mVarTop; var; var = var->mNext) {
@@ -448,18 +450,18 @@ BddMgrClassic::var_list(list<tVarId>& vlist) const
 
 // 変数番号からレベルを得る．
 tLevel
-BddMgrClassic::level(tVarId varid) const
+BddMgrClassic::level(VarId varid) const
 {
   // 実は同じ
-  return tLevel(varid);
+  return varid.val();
 }
 
 // レベルから変数番号を得る．
-tVarId
+VarId
 BddMgrClassic::varid(tLevel level) const
 {
   // 実は同じ
-  return tVarId(level);
+  return VarId(level);
 }
 
 // 動的変数順変更を許可する．
@@ -747,7 +749,7 @@ BddMgrClassic::new_node(Var* var,
   e0.addpol(ans_pol);
 
   // 節点テーブルを探す．
-  tVarId index = var->varid();
+  VarId index = var->varid();
   ymuint pos = hash_func3(e0, e1, index);
   for (Node* temp = mNodeTable[pos & mTableSize_1]; temp; temp = temp->mLink) {
     if ( temp->edge0() == e0 && temp->edge1() == e1 && temp->var() == var ) {
@@ -821,14 +823,14 @@ BddMgrClassic::clear_varmark()
 BmcVar*
 BddMgrClassic::var_at(tLevel level) const
 {
-  return var_of(tVarId(level));
+  return var_of(VarId(level));
 }
 
 // varid の変数を取出す．
 BmcVar*
-BddMgrClassic::var_of(tVarId varid) const
+BddMgrClassic::var_of(VarId varid) const
 {
-  size_t pos = var_hash(varid) & (mVarTableSize - 1);
+  ymuint pos = var_hash(varid) & (mVarTableSize - 1);
   for (Var* var = mVarHashTable[pos]; var; var = var->mLink) {
     if ( var->varid() == varid ) {
       return var;

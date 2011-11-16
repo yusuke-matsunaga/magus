@@ -116,11 +116,13 @@ read_lits(istream& s,
     while ( s ) {
       int c = s.get();
       if ( c == 'N' ) {
-	lits.push_back(Literal(id, kPolNega));
+	VarId var(id);
+	lits.push_back(Literal(var, kPolNega));
 	break;
       }
       else if ( c == 'P' ) {
-	lits.push_back(Literal(id, kPolPosi));
+	VarId var(id);
+	lits.push_back(Literal(var, kPolPosi));
 	break;
       }
       else if ( c >= '0' && c <= '9' ) {

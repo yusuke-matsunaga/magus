@@ -26,7 +26,7 @@ bool verbose = false;
 int check_count = 0;
 int perm_count = 0;
 int unresolved_count = 0;
-size_t mag = 1;
+ymuint mag = 1;
 
 StopWatch sw;
 
@@ -34,15 +34,15 @@ double acum_time = 0.0;
 double max_time = 0;
 
 bool
-str2vect(size_t ni,
+str2vect(ymuint ni,
 	 const char* buff,
 	 vector<int>& v)
 {
-  size_t ni_pow = 1 << ni;
+  ymuint ni_pow = 1 << ni;
   v.resize(ni_pow);
 
   for ( ; *buff == ' '; ++ buff) { }
-  for (size_t i = 0; i < ni_pow; ++ i) {
+  for (ymuint i = 0; i < ni_pow; ++ i) {
     char c = buff[i];
     if ( c == '1' ) {
       v[i] = 1;
@@ -60,23 +60,23 @@ str2vect(size_t ni,
 }
 
 void
-gen(size_t ni,
-    size_t limit,
-    size_t flow,
+gen(ymuint ni,
+    ymuint limit,
+    ymuint flow,
     int algorithm,
     int dump)
 {
   hash_set<TvFunc> repfunc_set;
 
-  size_t ni_exp = 1 << ni;
+  ymuint ni_exp = 1 << ni;
   vector<int> buff(ni_exp);
-  for (size_t i = 0; i < ni_exp; ++ i) {
+  for (ymuint i = 0; i < ni_exp; ++ i) {
     buff[i] = 0;
   }
 
   sw.reset();
-  size_t frontier = 0;
-  size_t num = 0;
+  ymuint frontier = 0;
+  ymuint num = 0;
   ymulong w2count_total = 0;
   ymulong tvcount_total = 0;
 
@@ -86,7 +86,7 @@ gen(size_t ni,
   for ( ; ; ) {
     if ( verbose ) {
       if ( buff[frontier] ) {
-	for (size_t i = 0; i < ni_exp; ++ i) {
+	for (ymuint i = 0; i < ni_exp; ++ i) {
 	  cout << buff[i];
 	}
 	cout << endl;
@@ -99,7 +99,7 @@ gen(size_t ni,
     TvFunc func(ni, buff);
 
     sw.start();
-    for (size_t i = 0; i < mag; ++ i) {
+    for (ymuint i = 0; i < mag; ++ i) {
       mgr.cannonical(func, map, algorithm);
       if ( i == 0 ) {
 	w2count_total += mgr.w2max_count();
@@ -123,7 +123,7 @@ gen(size_t ni,
     }
 
     bool carry = false;
-    for (size_t i = 0; i < ni_exp; ++ i) {
+    for (ymuint i = 0; i < ni_exp; ++ i) {
       if ( buff[i] == 0 ) {
 	buff[i] = 1;
 	break;
@@ -163,15 +163,15 @@ gen(size_t ni,
 }
 
 void
-rgen(size_t ni,
+rgen(ymuint ni,
      int rseed,
-     size_t num,
-     size_t flow,
+     ymuint num,
+     ymuint flow,
      int algorithm)
 {
   hash_set<TvFunc> repfunc_set;
 
-  size_t ni_exp = 1 << ni;
+  ymuint ni_exp = 1 << ni;
   vector<int> buff(ni_exp);
 
   init_random_seed(rseed);
@@ -181,12 +181,12 @@ rgen(size_t ni,
   sw.reset();
   NpnMgr mgr;
 
-  for (size_t k = 0; k < num; ++ k) {
-    for (size_t i = 0; i < ni_exp; ++ i) {
+  for (ymuint k = 0; k < num; ++ k) {
+    for (ymuint i = 0; i < ni_exp; ++ i) {
       buff[i] = random_num() & 1;
     }
     if ( verbose ) {
-      for (size_t i = 0; i < ni_exp; ++ i) {
+      for (ymuint i = 0; i < ni_exp; ++ i) {
 	cout << buff[i];
       }
       cout << endl;
@@ -196,7 +196,7 @@ rgen(size_t ni,
     NpnMap map;
 
     sw.start();
-    for (size_t i = 0; i < mag; ++ i) {
+    for (ymuint i = 0; i < mag; ++ i) {
       mgr.cannonical(func, map, algorithm);
       if ( i == 0 ) {
 	w2count_total += mgr.w2max_count();
@@ -238,24 +238,24 @@ rgen(size_t ni,
 }
 
 void
-rgen_walsh(size_t ni,
+rgen_walsh(ymuint ni,
 	   int rseed,
-	   size_t num)
+	   ymuint num)
 {
   hash_set<TvFunc> repfunc_set;
 
-  size_t ni_exp = 1 << ni;
+  ymuint ni_exp = 1 << ni;
   vector<int> buff(ni_exp);
 
   init_random_seed(rseed);
 
   sw.reset();
-  for (size_t k = 0; k < num; ++ k) {
-    for (size_t i = 0; i < ni_exp; ++ i) {
+  for (ymuint k = 0; k < num; ++ k) {
+    for (ymuint i = 0; i < ni_exp; ++ i) {
       buff[i] = random_num() & 1;
     }
     if ( verbose ) {
-      for (size_t i = 0; i < ni_exp; ++ i) {
+      for (ymuint i = 0; i < ni_exp; ++ i) {
 	cout << buff[i];
       }
       cout << endl;
@@ -266,7 +266,7 @@ rgen_walsh(size_t ni,
     //int w2[TvFunc::kMaxNi * TvFunc::kMaxNi];
 
     sw.start();
-    for (size_t i = 0; i < mag; ++ i) {
+    for (ymuint i = 0; i < mag; ++ i) {
       //func.walsh_012(w1, w2);
       func.walsh_01(w1);
     }
@@ -284,7 +284,7 @@ rgen_walsh(size_t ni,
 
 void
 read_func(const char* filename,
-	  size_t flow,
+	  ymuint flow,
 	  int algorithm)
 {
   ifstream fs;
@@ -299,11 +299,11 @@ read_func(const char* filename,
   char buff[buff_size];
   vector<int> vect;
 
-  size_t num = 0;
+  ymuint num = 0;
   ymulong w2count_total = 0;
   sw.reset();
   while ( fs.peek() != EOF ) {
-    size_t ni;
+    ymuint ni;
     fs >> ni;
     fs.getline(buff, buff_size);
     bool stat = str2vect(ni, buff, vect);
@@ -318,7 +318,7 @@ read_func(const char* filename,
 
     ++ num;
     sw.start();
-    for (size_t i = 0; i < mag; ++ i) {
+    for (ymuint i = 0; i < mag; ++ i) {
       mgr.cannonical(func, map, algorithm);
       if ( i == 0 ) {
 	w2count_total += mgr.w2max_count();
@@ -336,23 +336,23 @@ read_func(const char* filename,
 }
 
 void
-verify(size_t ni,
-       size_t rseed,
-       size_t num,
-       size_t flow,
+verify(ymuint ni,
+       ymuint rseed,
+       ymuint num,
+       ymuint flow,
        int algorithm)
 {
   init_random_seed(rseed);
 
-  size_t ni_exp = 1 << ni;
+  ymuint ni_exp = 1 << ni;
   vector<int> buff(ni_exp);
-  size_t c = 0;
-  for (size_t k = 0; k < num; ++ k) {
-    for (size_t i = 0; i < ni_exp; ++ i) {
+  ymuint c = 0;
+  for (ymuint k = 0; k < num; ++ k) {
+    for (ymuint i = 0; i < ni_exp; ++ i) {
       buff[i] = random_num() & 1;
     }
     if ( verbose ) {
-      for (size_t i = 0; i < ni_exp; ++ i) {
+      for (ymuint i = 0; i < ni_exp; ++ i) {
 	cout << buff[i];
       }
       cout << endl;
@@ -370,27 +370,27 @@ verify(size_t ni,
 
     // すべての極性・順列組合わせのバリエーションをためして
     // おなじ代表関数になるかチェックする．
-    size_t ni_pow = 2 << ni;
-    for (size_t bits = 0; bits < ni_pow; ++ bits) {
+    ymuint ni_pow = 2 << ni;
+    for (ymuint bits = 0; bits < ni_pow; ++ bits) {
       tPol opol = (bits & 1) ? kPolNega : kPolPosi;
-      size_t ibits = bits >> 1;
+      ymuint ibits = bits >> 1;
 
       NpnMap pol_map(ni, opol);
-      for (size_t i = 0; i < ni; ++ i) {
+      for (ymuint i = 0; i < ni; ++ i) {
 	if ( ibits & (1 << i) ) {
-	  pol_map.set(i, i, kPolNega);
+	  pol_map.set(VarId(i), VarId(i), kPolNega);
 	}
 	else {
-	  pol_map.set(i, i, kPolPosi);
+	  pol_map.set(VarId(i), VarId(i), kPolPosi);
 	}
       }
 
       PermGen pg(ni, ni);
       for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
 	NpnMap perm_map(ni);
-	for (size_t i = 0; i < ni; ++ i) {
-	  size_t j = p(i);
-	  perm_map.set(i, j, kPolPosi);
+	for (ymuint i = 0; i < ni; ++ i) {
+	  ymuint j = p(i);
+	  perm_map.set(VarId(i), VarId(j), kPolPosi);
 	}
 
 	NpnMap tmpmap = pol_map * perm_map;
@@ -621,7 +621,7 @@ main(int argc,
 #else
 
   int base = 1;
-  size_t flow_end = 1024;
+  ymuint flow_end = 1024;
   for ( ; base < argc; ++ base) {
     if ( argv[base][0] != '-' ) {
       break;
@@ -648,9 +648,9 @@ main(int argc,
 	return 2;
       }
 
-      size_t ni = atoi(argv[base + 1]);
+      ymuint ni = atoi(argv[base + 1]);
       NpnSigMgr npnsigmgr;
-      size_t ni_pow = 1 << ni;
+      ymuint ni_pow = 1 << ni;
       char buff[256];
       while ( cin.getline(buff, sizeof(buff)) ) {
 	vector<int> tmp(ni_pow);
@@ -664,7 +664,7 @@ main(int argc,
 	return 2;
       }
 
-      size_t ni = atoi(argv[base + 1]);
+      ymuint ni = atoi(argv[base + 1]);
       NpnSigMgr npnsigmgr;
       vector<int> tmp(1 << ni);
       str2vect(ni, argv[base + 2], tmp);
@@ -678,7 +678,7 @@ main(int argc,
 	return 2;
       }
 
-      size_t ni = atoi(argv[base + 1]);
+      ymuint ni = atoi(argv[base + 1]);
       NpnSigMgr npnsigmgr;
       vector<int> tmp(1 << ni);
       str2vect(ni, argv[base + 2], tmp);
@@ -692,8 +692,8 @@ main(int argc,
 	return 2;
       }
 
-      size_t ni = atoi(argv[base + 1]);
-      size_t flow = atoi(argv[base + 2]) | flow_end;
+      ymuint ni = atoi(argv[base + 1]);
+      ymuint flow = atoi(argv[base + 2]) | flow_end;
       gen(ni, 0, flow, 2);
     }
     else if ( strcmp(argv[base], "ngen") == 0 ) {
@@ -702,8 +702,8 @@ main(int argc,
 	return 2;
       }
 
-      size_t ni = atoi(argv[base + 1]);
-      size_t n = atoi(argv[base + 2]);
+      ymuint ni = atoi(argv[base + 1]);
+      ymuint n = atoi(argv[base + 2]);
       gen(ni, n, 0, 2);
     }
     else if ( strcmp(argv[base], "rgen") == 0 ) {
@@ -712,9 +712,9 @@ main(int argc,
 	return 2;
       }
 
-      size_t ni = atoi(argv[base + 1]);
-      size_t flow = atoi(argv[base + 2]) | flow_end;
-      size_t num = atoi(argv[base + 3]);
+      ymuint ni = atoi(argv[base + 1]);
+      ymuint flow = atoi(argv[base + 2]) | flow_end;
+      ymuint num = atoi(argv[base + 3]);
       int seed = atoi(argv[base + 4]);
       init_random_seed(seed);
       rgen(ni, num, flow, 2);
@@ -725,9 +725,9 @@ main(int argc,
 	return 2;
       }
 
-      size_t ni = atoi(argv[base + 1]);
-      size_t flow = atoi(argv[base + 2]) | flow_end;
-      size_t num = atoi(argv[base + 3]);
+      ymuint ni = atoi(argv[base + 1]);
+      ymuint flow = atoi(argv[base + 2]) | flow_end;
+      ymuint num = atoi(argv[base + 3]);
       int seed = atoi(argv[base + 4]);
       init_random_seed(seed);
       verify(ni, num, flow, 2);

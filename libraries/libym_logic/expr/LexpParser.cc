@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_LEXP
 // "(double-quote) で囲まれた文字列はいかなるコードであろうと
 // string と見なす．
 // また，直前に\(backslash)がついているコードも string と見なされる．
-  
+
 
 // @brief コンストラクタ
 // @param[in] input 入力ファイルストリーム
@@ -33,21 +33,21 @@ LexpParser::~LexpParser()
 }
 
 // str からリテラル番号を得る．
-tVarId
+VarId
 LexpParser::str_to_literal(const string& str)
 {
-  tVarId id = 0;
+  ymuint id = 0;
   for (string::const_iterator p = str.begin(); p != str.end(); ++p) {
     char c = *p;
     id *= 10;
-    id += tVarId(c - '0');
+    id += static_cast<ymuint>(c - '0');
   }
-  return id;
+  return VarId(id);
 }
 
 // トークンを一つ読み出す．
 tToken
-LexpParser::get_token(tVarId& lit_id)
+LexpParser::get_token(VarId& lit_id)
 {
   string str;
   char c;
@@ -168,7 +168,7 @@ LexpParser::get_literal()
 {
   // ここに来る可能性のあるのは NUM, NOT, LP のみ
   // それ以外はエラー
-  tVarId id;
+  VarId id;
   tToken token = get_token(id);
 
   if ( token == kTokenZERO ) {
@@ -178,7 +178,7 @@ LexpParser::get_literal()
   if ( token == kTokenONE ) {
     return LogExpr::make_one();
   }
-  
+
   if ( token == kTokenNUM ) {
     // id 番目の肯定のリテラルを作る．
     return LogExpr::make_posiliteral(id);
@@ -239,7 +239,7 @@ LexpParser::get_expr(tToken end_token)
 
   for ( ; ; ) {
     // 次のトークンを調べる．
-    tVarId dummy;
+    VarId dummy;
     tToken token = get_token(dummy);
     if ( token == end_token ) {
       return expr;

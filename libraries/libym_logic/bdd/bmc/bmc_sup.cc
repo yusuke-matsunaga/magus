@@ -72,7 +72,7 @@ BddMgrClassic::mark_to_vector(VarVector& vars)
   vars.reserve(n);
   for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
     Var* v = *p;
-    tVarId varid = v->varid();
+    VarId varid = v->varid();
     vars.push_back(varid);
   }
   clear_varmark();
@@ -87,7 +87,7 @@ BddMgrClassic::mark_to_list(VarList& vars)
   vars.clear();
   for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
     Var* v = *p;
-    tVarId varid = v->varid();
+    VarId varid = v->varid();
     vars.push_back(varid);
   }
   clear_varmark();

@@ -83,9 +83,9 @@ NpnMapM::NpnMapM(const NpnMap& src) :
 {
   resize(src.ni(), 1);
   for (ymuint i = 0; i < mNi; ++ i) {
-    mMapArray[i] = src.imap(i);
+    mMapArray[i] = src.imap(VarId(i));
   }
-  set_omap(0, 0, src.opol());
+  set_omap(VarId(0), VarId(0), src.opol());
 }
 
 // @brief デストラクタ
@@ -132,57 +132,63 @@ NpnMapM::set_identity(ymuint ni,
 {
   resize(ni, no);
   for (ymuint i = 0; i < ni; ++ i) {
-    set_imap(i, i, kPolPosi);
+    set_imap(VarId(i), VarId(i), kPolPosi);
   }
   for (ymuint i = 0; i < no; ++ i) {
-    set_omap(i, i, kPolPosi);
+    set_omap(VarId(i), VarId(i), kPolPosi);
   }
 }
 
 // @brief 入力の変換内容の設定
-// @param[in] pos 入力番号
-// @param[in] dst_pos 変換先の入力番号
+// @param[in] src_var 入力番号
+// @param[in] dst_var 変換先の入力番号
 // @param[in] pol 極性
 void
-NpnMapM::set_imap(ymuint pos,
-		  ymuint dst_pos,
+NpnMapM::set_imap(VarId src_var,
+		  VarId dst_var,
 		  tPol pol)
 {
-  set_imap(pos, NpnVmap(dst_pos, pol));
+  set_imap(src_var, NpnVmap(dst_var, pol));
 }
 
 // @brief 入力の変換内容の設定
-// @param[in] pos 入力番号
+// @param[in] var 入力番号
 // @param[in] imap 変換情報(変換先の入力番号と極性)
 // @sa NpnVmap
 void
-NpnMapM::set_imap(ymuint pos,
+NpnMapM::set_imap(VarId var,
 		  NpnVmap imap)
 {
-  mMapArray[pos] = imap;
+  ymuint pos = var.val();
+  if ( pos < ni() ) {
+    mMapArray[pos] = imap;
+  }
 }
 
 // @brief 出力の変換内容の設定
-// @param[in] pos 出力番号
-// @param[in] dst_pos 変換先の出力番号
+// @param[in] src_var 出力番号
+// @param[in] dst_var 変換先の出力番号
 // @param[in] pol 極性
 void
-NpnMapM::set_omap(ymuint pos,
-		  ymuint dst_pos,
+NpnMapM::set_omap(VarId src_var,
+		  VarId dst_var,
 		  tPol pol)
 {
-  set_omap(pos, NpnVmap(dst_pos, pol));
+  set_omap(src_var, NpnVmap(dst_var, pol));
 }
 
 // @brief 出力の変換内容の設定
-// @param[in] pos 出力番号
+// @param[in] var 出力番号
 // @param[in] omap 変換情報(変換先の出力番号と極性)
 // @sa NpnVmap
 void
-NpnMapM::set_omap(ymuint pos,
+NpnMapM::set_omap(VarId var,
 		  NpnVmap omap)
 {
-  mMapArray[pos + mNi] = omap;
+  ymuint pos = var.val();
+  if ( pos < no() ) {
+    mMapArray[pos + mNi] = omap;
+  }
 }
 
 // @brief 内容が等しいか調べる．
@@ -216,24 +222,26 @@ inverse(const NpnMapM& src)
   NpnMapM ans(ni, no);
 
   for (ymuint i = 0; i < ni; ++ i) {
-    NpnVmap imap = src.imap(i);
+    VarId src_var(i);
+    NpnVmap imap = src.imap(src_var);
     if ( imap.is_invalid() ) {
       // 不正な値を返す．
       return NpnMapM(ni, no);
     }
-    ymuint dst_pos = imap.pos();
+    VarId dst_var = imap.var();
     tPol pol = imap.pol();
-    ans.set_imap(dst_pos, i, pol);
+    ans.set_imap(dst_var, src_var, pol);
   }
   for (ymuint i = 0; i < no; ++ i) {
-    NpnVmap omap = src.omap(i);
+    VarId src_var(i);
+    NpnVmap omap = src.omap(src_var);
     if ( omap.is_invalid() ) {
       // 不正な値を返す．
       return NpnMapM(ni, no);
     }
-    ymuint dst_pos = omap.pos();
+    VarId dst_var = omap.var();
     tPol pol = omap.pol();
-    ans.set_omap(dst_pos, i, pol);
+    ans.set_omap(dst_var, src_var, pol);
   }
 
   return ans;
@@ -258,35 +266,37 @@ operator*(const NpnMapM& src1,
   NpnMapM ans(ni, no);
 
   for (ymuint i = 0; i < ni; ++ i) {
-    NpnVmap imap1 = src1.imap(i);
+    VarId var1(i);
+    NpnVmap imap1 = src1.imap(var1);
     if ( imap1.is_invalid() ) {
       return NpnMapM(ni, no);
     }
-    ymuint dst_pos1 = imap1.pos();
-    tPol pol1 = imap1.pol();
-    NpnVmap imap2 = src2.imap(dst_pos1);
+    VarId var2 = imap1.var();
+    tPol pol2 = imap1.pol();
+    NpnVmap imap2 = src2.imap(var2);
     if ( imap2.is_invalid() ) {
       return NpnMapM(ni, no);
     }
-    ymuint dst_pos2 = imap2.pos();
-    tPol pol2 = imap2.pol();
-    ans.set_imap(i, dst_pos2, pol1 * pol2);
+    VarId var3 = imap2.var();
+    tPol pol3 = imap2.pol();
+    ans.set_imap(var1, var3, pol2 * pol3);
   }
 
   for (ymuint i = 0; i < no; ++ i) {
-    NpnVmap omap1 = src1.omap(i);
+    VarId var1(i);
+    NpnVmap omap1 = src1.omap(var1);
     if ( omap1.is_invalid() ) {
       return NpnMapM(ni, no);
     }
-    ymuint dst_pos1 = omap1.pos();
-    tPol pol1 = omap1.pol();
-    NpnVmap omap2 = src2.omap(dst_pos1);
+    VarId var2 = omap1.var();
+    tPol pol2 = omap1.pol();
+    NpnVmap omap2 = src2.omap(var2);
     if ( omap2.is_invalid() ) {
       return NpnMapM(ni, no);
     }
-    ymuint dst_pos2 = omap2.pos();
-    tPol pol2 = omap2.pol();
-    ans.set_omap(i, dst_pos2, pol1 * pol2);
+    VarId var3 = omap2.var();
+    tPol pol3 = omap2.pol();
+    ans.set_omap(var1, var3, pol2 * pol3);
   }
 
   return ans;
@@ -307,17 +317,17 @@ operator<<(ostream& s,
     s << comma;
     comma = ", ";
     s << i << " ==> ";
-    NpnVmap imap = map.imap(i);
+    NpnVmap imap = map.imap(VarId(i));
     if ( imap.is_invalid() ) {
       s << "--";
     }
     else {
-      ymuint dst_pos = imap.pos();
+      VarId dst_var = imap.var();
       tPol pol = imap.pol();
       if ( pol == kPolNega ) {
 	s << "~";
       }
-      s << dst_pos;
+      s << dst_var;
     }
   }
   s << ")";
@@ -328,17 +338,17 @@ operator<<(ostream& s,
     s << comma;
     comma = ", ";
     s << i << " ==> ";
-    NpnVmap omap = map.omap(i);
+    NpnVmap omap = map.omap(VarId(i));
     if ( omap.is_invalid() ) {
       s << "--";
     }
     else {
-      ymuint dst_pos = omap.pos();
+      VarId dst_var = omap.var();
       tPol pol = omap.pol();
       if ( pol == kPolNega ) {
 	s << "~";
       }
-      s << dst_pos;
+      s << dst_var;
     }
   }
   s << ")";
@@ -358,12 +368,12 @@ operator<<(BinO& bos,
   bos << no;
 
   for (ymuint i = 0; i < ni; ++ i) {
-    NpnVmap vmap = map.imap(i);
+    NpnVmap vmap = map.imap(VarId(i));
     bos << vmap;
   }
 
   for (ymuint i = 0; i < no; ++ i) {
-    NpnVmap vmap = map.omap(i);
+    NpnVmap vmap = map.omap(VarId(i));
     bos << vmap;
   }
 
@@ -383,13 +393,13 @@ operator>>(BinI& bis,
   for (ymuint i = 0; i < ni; ++ i) {
     NpnVmap vmap;
     bis >> vmap;
-    map.set_imap(i, vmap);
+    map.set_imap(VarId(i), vmap);
   }
 
   for (ymuint i = 0; i < no; ++ i) {
     NpnVmap vmap;
     bis >> vmap;
-    map.set_omap(i, vmap);
+    map.set_omap(VarId(i), vmap);
   }
 
   return bis;

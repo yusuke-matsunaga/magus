@@ -67,7 +67,8 @@ dot2expr(const DotlibNode* node,
 		      buf.str());
       return LogExpr();
     }
-    return LogExpr::make_posiliteral(p->second);
+    ymuint id = p->second;
+    return LogExpr::make_posiliteral(VarId(id));
   }
   if ( node->is_opr() ) {
     if ( node->type() == DotlibNode::kNot ) {

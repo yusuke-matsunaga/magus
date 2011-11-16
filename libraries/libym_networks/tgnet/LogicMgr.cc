@@ -60,7 +60,7 @@ LogicMgr::get(TgGateTemplate gt_id) const
   if ( static_cast<ymuint32>(type) < kBase ) {
     vector<LogExpr> literals(ni);
     for (ymuint i = 0; i < ni; ++ i) {
-      literals[i] = LogExpr::make_posiliteral(i);
+      literals[i] = LogExpr::make_posiliteral(VarId(i));
     }
     switch ( type ) {
     case kTgBuff:
@@ -125,11 +125,11 @@ check_builtin(const LogExpr& lexp,
 	      const TvFunc& tmp_func)
 {
   if ( lexp.is_posiliteral() ) {
-    assert_cond(lexp.varid() == 0, __FILE__, __LINE__);
+    assert_cond(lexp.varid().val() == 0, __FILE__, __LINE__);
     return kTgBuff;
   }
   if ( lexp.is_negaliteral() ) {
-    assert_cond(lexp.varid() == 0, __FILE__, __LINE__);
+    assert_cond(lexp.varid().val() == 0, __FILE__, __LINE__);
     return kTgNot;
   }
   ymuint np = 1 << ni;

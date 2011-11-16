@@ -408,11 +408,12 @@ LcPatMgr::check_isomorphic(const LcPatNode* node1,
 }
 
 // @brief 入力ノードを作る．
-// @param[in] id 入力番号
+// @param[in] var 入力変数
 // @note 既にあるときはそれを返す．
 LcPatNode*
-LcPatMgr::make_input(ymuint id)
+LcPatMgr::make_input(VarId var)
 {
+  ymuint id = var.val();
   while ( mInputList.size() <= id ) {
     LcPatNode* node = new_node();
     ymuint id1 = mInputList.size();

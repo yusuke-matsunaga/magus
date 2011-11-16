@@ -48,14 +48,14 @@ Fsim::~Fsim()
 {
   clear();
 }
-  
+
 // @brief 対象の故障をセットする
 // @param[in] flist 対象の故障リスト
 void
 Fsim::set_faults(const vector<SaFault*>& flist)
 {
   clear_faults();
-  
+
   ymuint n = flist.size();
   mFsimFaults.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
@@ -87,16 +87,16 @@ Fsim::run(TestVector* tv,
 	  list<SaFault*>& det_faults)
 {
   ymuint npi = mNetwork->input_num2();
-  
+
   det_faults.clear();
-  
+
   // tv を全ビットにセットしていく．
   for (ymuint i = 0; i < npi; ++ i) {
     SimNode* simnode = mInputArray[i];
     PackedVal val = (tv->val3(i) == kVal1) ? kPvAll1 : kPvAll0;
     simnode->set_gval(val);
   }
-  
+
   // 正常値の計算を行う．
   for (vector<SimNode*>::iterator q = mLogicArray.begin();
        q != mLogicArray.end(); ++ q) {
@@ -111,7 +111,7 @@ Fsim::run(TestVector* tv,
        p != mFFRArray.end(); ++ p) {
     SimFFR* ffr = &(*p);
     if ( ffr->fault_list().empty() ) continue;
-    
+
     // FFR 内の故障伝搬を行う．
     // 結果は FsimFault.mObsMask に保存される．
     // FFR 内の全ての obs マスクを ffr_req に入れる．
@@ -174,11 +174,11 @@ Fsim::run(const vector<TestVector*>& tv_array,
   ymuint npi = mNetwork->input_num2();
   ymuint nb = tv_array.size();
   assert_cond(det_faults.size() >= nb, __FILE__, __LINE__);
-  
+
   for (ymuint i = 0; i < nb; ++ i) {
     det_faults[i].clear();
   }
-  
+
   // tv_array を入力ごとに固めてセットしていく．
   for (ymuint i = 0; i < npi; ++ i) {
     PackedVal val = kPvAll0;
@@ -197,20 +197,20 @@ Fsim::run(const vector<TestVector*>& tv_array,
     SimNode* simnode = mInputArray[i];
     simnode->set_gval(val);
   }
-  
+
   // 正常値の計算を行う．
   for (vector<SimNode*>::iterator q = mLogicArray.begin();
        q != mLogicArray.end(); ++ q) {
     SimNode* node = *q;
     node->calc_gval2();
   }
-  
+
   // FFR ごとに処理を行う．
   for (vector<SimFFR>::iterator p = mFFRArray.begin();
        p != mFFRArray.end(); ++ p) {
     SimFFR* ffr = &(*p);
     if ( ffr->fault_list().empty() ) continue;
-    
+
     // FFR 内の故障伝搬を行う．
     // 結果は FsimFault.mObsMask に保存される．
     // FFR 内の全ての obs マスクを ffr_req に入れる．
@@ -221,7 +221,7 @@ Fsim::run(const vector<TestVector*>& tv_array,
     if ( ffr_req == kPvAll0 ) {
       continue;
     }
-    
+
     // FFR の出力の故障伝搬を行う．
     SimNode* root = ffr->root();
     PackedVal obs = kPvAll0;
@@ -239,7 +239,7 @@ Fsim::run(const vector<TestVector*>& tv_array,
       }
       obs = eventq_simulate();
     }
-    
+
     // obs と各々の故障の mObsMask との AND が 0 でなければ故障検出
     // できたということ．対応するテストベクタを記録する．
     // また，検出済みとなった故障をリストから取り除く
@@ -270,7 +270,7 @@ Fsim::run(const vector<TestVector*>& tv_array,
     }
   }
 }
-  
+
 // @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
 // @param[in] tv テストベクタ
 // @param[in] f 対象の故障
@@ -279,16 +279,16 @@ Fsim::run(TestVector* tv,
 	  SaFault* f)
 {
   cout << "run(" << f->str() << ")" << endl;
-  
+
   ymuint npi = mNetwork->input_num2();
-  
+
   // tv を全ビットにセットしていく．
   for (ymuint i = 0; i < npi; ++ i) {
     SimNode* simnode = mInputArray[i];
     PackedVal val = (tv->val3(i) == kVal1) ? kPvAll1 : kPvAll0;
     simnode->set_gval(val);
   }
-  
+
   // 正常値の計算を行う．
   for (vector<SimNode*>::iterator q = mLogicArray.begin();
        q != mLogicArray.end(); ++ q) {
@@ -318,12 +318,12 @@ Fsim::run(TestVector* tv,
   lobs &= valdiff;
 
   cout << f->str() << " : lobs = " << hex << lobs << dec << endl;
-  
+
   // lobs が 0 ならその後のシミュレーションを行う必要はない．
   if ( lobs == kPvAll0 ) {
     return false;
   }
-  
+
   SimNode* root = simnode->ffr()->root();
   if ( root->is_output() ) {
     return (lobs != kPvAll0);
@@ -361,7 +361,7 @@ Fsim::after_set_network(const TgNetwork& network,
   mEdgeMap.resize(nn);
   mInputArray.resize(ni);
   mOutputArray.resize(no);
-  
+
   // 外部入力に対応する SimNode の生成
   for (ymuint i = 0; i < ni; ++ i) {
     const TgNode* tgnode = mNetwork->input(i);
@@ -394,8 +394,9 @@ Fsim::after_set_network(const TgNetwork& network,
 	// - B) 肯定リテラルが 2 つ以上
 	// - C) 否定リテラルのみ．数は問わない．
 	// - D) 肯定と否定リテラルが各々 1 つ以上
-	ymuint np = lexp.litnum(i, kPolPosi);
-	ymuint nn = lexp.litnum(i, kPolNega);
+	VarId var(i);
+	ymuint np = lexp.litnum(var, kPolPosi);
+	ymuint nn = lexp.litnum(var, kPolNega);
 	EdgeMap& edge_map = mEdgeMap[tgnode->gid()][i];
 	if ( np == 1 && nn == 0 ) {
 	  inputs2[i * 2] = inputs[i];
@@ -499,7 +500,7 @@ Fsim::after_set_network(const TgNetwork& network,
       node->set_ffr(ffr);
     }
   }
-  
+
   // 消去用の配列の大きさはノード数を越えない．
   mClearArray.reserve(mNodeArray.size());
 
@@ -525,7 +526,7 @@ void
 Fsim::clear()
 {
   clear_faults();
-  
+
   mSimMap.clear();
 
   // mNodeArray が全てのノードを持っている
@@ -541,12 +542,12 @@ Fsim::clear()
   mFFRArray.clear();
 
   mClearArray.clear();
-  
-  
+
+
   // 念のため
   mNetwork = NULL;
 }
-  
+
 // @brief FsimFault を破棄する．
 void
 Fsim::clear_faults()
@@ -555,7 +556,7 @@ Fsim::clear_faults()
        p != mFFRArray.end(); ++ p) {
     (*p).fault_list().clear();
   }
-  
+
   mFsimFaults.clear();
 }
 
@@ -574,12 +575,12 @@ Fsim::ffr_simulate(SimFFR* ffr)
     if ( fs == kFsDetected || fs == kFsUntestable ) {
       continue;
     }
-    
+
     if ( wpos != rpos ) {
       flist[wpos] = ff;
     }
     ++ wpos;
-      
+
     // ff の故障伝搬を行う．
     SimNode* simnode = ff->mNode;
     PackedVal lobs = simnode->calc_lobs();
@@ -593,7 +594,7 @@ Fsim::ffr_simulate(SimFFR* ffr)
       valdiff = ~valdiff;
     }
     lobs &= valdiff;
-    
+
     ff->mObsMask = lobs;
     ffr_req |= lobs;
   }
@@ -603,16 +604,16 @@ Fsim::ffr_simulate(SimFFR* ffr)
     flist.erase(flist.begin() + wpos, flist.end());
     fnum = wpos;
   }
-  
+
   for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
     FsimFault* ff = flist[rpos];
     SimNode* node = ff->mNode;
     clear_lobs(node);
   }
-  
+
   return ffr_req;
 }
-  
+
 // @brief イベントキューを用いてシミュレーションを行う．
 PackedVal
 Fsim::eventq_simulate()
@@ -680,12 +681,14 @@ Fsim::make_logic(const LogExpr& lexp,
 {
   SimNode* node = NULL;
   if ( lexp.is_posiliteral() ) {
-    ymuint pos = lexp.varid();
+    VarId var = lexp.varid();
+    ymuint pos = var.val();
     node = inputs[pos * 2];
     assert_cond(node, __FILE__, __LINE__);
   }
   else if ( lexp.is_negaliteral() ) {
-    ymuint pos = lexp.varid();
+    VarId var = lexp.varid();
+    ymuint pos = var.val();
     node = inputs[pos * 2 + 1];
     assert_cond(node, __FILE__, __LINE__);
   }

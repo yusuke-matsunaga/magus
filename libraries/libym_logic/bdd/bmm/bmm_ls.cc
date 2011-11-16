@@ -187,7 +187,7 @@ BddMgrModern::lsdiff(BddEdge e1,
       node2 = get_node(e2);
       pol2 = e2.pol();
       var2 = node2->var();
-      level2 = var2->varid();
+      level2 = var2->level();
     }
     else {
       int which1;
@@ -301,7 +301,7 @@ BddMgrModern::to_literalvector(BddEdge e,
   Node* vp = get_node(e);
   tPol pol = e.pol();
   while ( vp ) {
-    tVarId varid = vp->varid();
+    VarId varid = vp->varid();
     BddEdge e0 = vp->edge0(pol);
     BddEdge e1 = vp->edge1(pol);
     if ( e0 == BddEdge::make_zero() ) {
@@ -334,7 +334,7 @@ BddMgrModern::to_literallist(BddEdge e,
   Node* vp = get_node(e);
   tPol pol = e.pol();
   while ( vp ) {
-    tVarId varid = vp->varid();
+    VarId varid = vp->varid();
     BddEdge e0 = vp->edge0(pol);
     BddEdge e1 = vp->edge1(pol);
     if ( e0 == BddEdge::make_zero() ) {

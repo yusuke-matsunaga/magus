@@ -165,8 +165,8 @@ BddMgrModern::cs_step(BddEdge e,
 // エラーとなる可能性がある．
 bool
 BddMgrModern::check_symmetry(BddEdge e,
-			     tVarId x,
-			     tVarId y,
+			     VarId x,
+			     VarId y,
 			     tPol pol)
 {
   x_level = level(x);

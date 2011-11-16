@@ -45,7 +45,7 @@ BNode::set_type(tType type)
   case kPI:
     break;
   case kPO:
-    mFunc = LogExpr::make_posiliteral(0);
+    mFunc = LogExpr::make_posiliteral(VarId(0));
     break;
   case kLO:
     break;
@@ -95,7 +95,7 @@ BNode::value() const
       feed_to_outputs = true;
     }
     else {
-      c += onode->mFunc.litnum(edge->pos());
+      c += onode->mFunc.litnum(VarId(edge->pos()));
     }
   }
 

@@ -367,7 +367,7 @@ VlWriter::put_expr(const LogExpr& expr,
     if ( expr.is_negaliteral() ) {
       put_str("~");
     }
-    ymuint id = expr.varid();
+    VarId id = expr.varid();
     VarStrMap::const_iterator p = name_map.find(id);
     if ( p == name_map.end() ) {
 #warning "TODO: 未対応"

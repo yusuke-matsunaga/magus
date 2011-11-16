@@ -29,50 +29,63 @@ public:
 public:
 
   // 変数番号を得る．
-  tVarId varid() const
+  VarId
+  varid() const
   {
     return mId;
   }
 
   // レベルを得る．
-  tLevel level() const
+  tLevel
+  level() const
   {
     return mLevel;
   }
 
 private:
   // コンストラクタ
-  BmmVar(BddMgrModern* mgr, tVarId id);
+  BmmVar(BddMgrModern* mgr,
+	 VarId id);
 
   // デストラクタ
   ~BmmVar();
 
   // gc 用の sweep 処理
-  void sweep();
+  void
+  sweep();
 
   // 節点テーブルが縮小可能なら縮小する．
-  void shrink(double load_limit);
+  void
+  shrink(double load_limit);
 
   // ノードを登録する．
-  void reg_node(size_t pos, BmmNode* node);
+  void
+  reg_node(size_t pos,
+	   BmmNode* node);
 
   // 節点テーブルを拡張する
   // メモリアロケーションに失敗したら false を返す．
-  bool resize(size_t new_size);
+  bool
+  resize(size_t new_size);
 
   // 次のリミット値を計算する
-  void set_next_limit_size(double load_limit);
+  void
+  set_next_limit_size(double load_limit);
 
   // ログ出力用のストリームを得る．
-  ostream& logstream() const;
+  ostream&
+  logstream() const;
 
   // 節点テーブル用のメモリを確保する．
   // size はバイト単位ではなくエントリ数
-  BmmNode** alloc_nodetable(size_t size);
+  BmmNode**
+  alloc_nodetable(size_t size);
 
   // 節点テーブル用のメモリを解放する．
   // size はバイト単位ではなくエントリ数
-  void dealloc_nodetable(BmmNode** table, size_t size);
+  void
+  dealloc_nodetable(BmmNode** table,
+		    size_t size);
 
 
 private:
@@ -85,7 +98,7 @@ private:
 
   // 変数番号
   // これは不変
-  tVarId mId;
+  VarId mId;
 
   // レベル
   // これは可変

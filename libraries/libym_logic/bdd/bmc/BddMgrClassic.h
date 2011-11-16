@@ -84,22 +84,22 @@ public:
   // 最後の変数の後ろに挿入される．
   virtual
   bool
-  new_var(tVarId varid);
+  new_var(VarId varid);
 
   // 現在登録されている変数をそのレベルの昇順で返す．
   virtual
   tVarSize
-  var_list(list<tVarId>& vlist) const;
+  var_list(list<VarId>& vlist) const;
 
   // 変数番号からレベルを得る．
   // もしもレベルが割り当てられていない場合にはエラーとなる．
   virtual
   tLevel
-  level(tVarId varid) const;
+  level(VarId varid) const;
 
   // レベルから変数番号を得る．
   virtual
-  tVarId
+  VarId
   varid(tLevel level) const;
 
   // 動的変数順変更を許可する．
@@ -120,7 +120,7 @@ public:
   // 肯定のリテラル関数を作る
   virtual
   BddEdge
-  make_posiliteral(tVarId varid);
+  make_posiliteral(VarId varid);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -150,7 +150,7 @@ public:
   virtual
   BddEdge
   xor_moment(BddEdge e,
-	     tVarId idx);
+	     VarId idx);
 
   // bdd がキューブの時 true を返す．
   virtual
@@ -166,15 +166,15 @@ public:
   virtual
   bool
   check_symmetry(BddEdge e,
-		 tVarId x,
-		 tVarId y,
+		 VarId x,
+		 VarId y,
 		 tPol pol);
 
   // 一つの変数に対する cofactor を計算する．
   virtual
   BddEdge
   scofactor(BddEdge e1,
-	    tVarId id,
+	    VarId id,
 	    tPol pol);
 
   // generalized cofactor を計算する．
@@ -198,7 +198,7 @@ public:
   // multiple compose 演算を行う変数と置き換え関数を登録する関数
   virtual
   void
-  compose_reg(tVarId id,
+  compose_reg(VarId id,
 	      BddEdge e);
 
   // multiple compose 演算の本体
@@ -266,7 +266,7 @@ public:
   // もともと定数値(葉)のBDDの場合，kVarIdMax を返し，
   // f0, f1 には自分自身を代入する．
   virtual
-  tVarId
+  VarId
   root_decomp(BddEdge e,
 	      BddEdge& e0,
 	      BddEdge& e1);
@@ -274,7 +274,7 @@ public:
   // 根の変数番号インデックスを取り出す．
   // 定数節点の場合には kVarIdMax を返す．
   virtual
-  tVarId
+  VarId
   root_var(BddEdge e);
 
   // 0枝の指している cofactor を返す．
@@ -352,7 +352,7 @@ public:
   virtual
   mpz_class
   walsh1(BddEdge e,
-	 tVarId var,
+	 VarId var,
 	 tVarSize n);
 
 
@@ -445,29 +445,6 @@ public:
 
 
   //////////////////////////////////////////////////////////////////////
-  // NPN Matcher で用いられる演算
-  //////////////////////////////////////////////////////////////////////
-
-  // e を根とするBDDの節点に n-mark を付け，各変数ごとのノード数を数える．
-  virtual
-  void
-  scan(BddEdge e,
-       hash_map<tVarId, size_t>& node_counts);
-
-  // e を根とするBDDのレベル level のノード数を数える．
-  // ただし，n-mark の付いていないノードがあったら UINT_MAX を返す．
-  virtual
-  size_t
-  count_at(BddEdge e,
-	   tLevel level);
-
-  // scan で付けた n-mark を消す．
-  virtual
-  void
-  clear_scanmark(BddEdge e);
-
-
-  //////////////////////////////////////////////////////////////////////
   // 内部動作の設定を行う関数
   //////////////////////////////////////////////////////////////////////
 
@@ -544,7 +521,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   Var*
-  alloc_var(tVarId varid);
+  alloc_var(VarId varid);
 
   // 左右の枝が同じ場合にはその枝自身を返し，それ以外の場合には，
   // 与えられた枝とインデックスを持つノードを返す．
@@ -766,7 +743,7 @@ private:
 
   // varid の変数を取出す．
   Var*
-  var_of(tVarId varid) const;
+  var_of(VarId varid) const;
 
   // Var を登録する．
   void

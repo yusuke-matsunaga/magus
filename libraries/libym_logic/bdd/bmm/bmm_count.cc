@@ -302,7 +302,7 @@ BddMgrModern::wt0_step(BddEdge e,
 // n は全入力数
 mpz_class
 BddMgrModern::walsh1(BddEdge e,
-		     tVarId var,
+		     VarId var,
 		     tVarSize n)
 {
   if ( e.is_overflow() || e.is_error() ) {
@@ -441,100 +441,6 @@ BddMgrModern::wt1_step(BddEdge e,
   }
 
   return result;
-}
-
-// e を根とするBDDの節点に n-mark を付け，各変数ごとのノード数を数える．
-void
-BddMgrModern::scan(BddEdge e,
-		   hash_map<tVarId, size_t>& node_counts)
-{
-  for (ymuint i = 0; i < mVarNum; ++ i) {
-    mVarTable[i]->mMark = 0;
-  }
-  scan_step(e);
-  clear_pmark(e);
-  for (ymuint i = 0; i < mVarNum; ++ i) {
-    Var* var = mVarTable[i];
-    node_counts.insert(make_pair(var->varid(), var->mMark));
-    var->mMark = 0;
-  }
-}
-
-// scan の下請関数
-void
-BddMgrModern::scan_step(BddEdge e)
-{
-  for ( ; ; ) {
-    Node* vp = get_node(e);
-    if ( !vp || vp->pmark() ) {
-      break;
-    }
-    vp->pmark(1);
-    vp->nmark(1);
-    Var* var = vp->var();
-    ++ var->mMark;
-    scan_step(vp->edge0());
-    e = vp->edge1();
-  }
-}
-
-// e を根とするBDDのレベル level のノード数を数える．
-// ただし，n-mark の付いていないノードがあったら UINT_MAX を返す．
-size_t
-BddMgrModern::count_at(BddEdge e,
-		       tLevel level)
-{
-  size_t ans = count_at_step(e, level);
-  clear_pmark(e);
-  return ans;
-}
-
-// bdd のレベル level の *** n_mark のついた *** 節点の数を数える．
-// ただし，n_mark の付いていない節点があった場合には ULONG_MAX を返す．
-size_t
-BddMgrModern::count_at_step(BddEdge e,
-			    tLevel level)
-{
-  // tail recursion elimination を行なっているのでコードが
-  // みづらい．
-  size_t n = 0;
-  for ( ; ; ) {
-    Node* vp = get_node(e);
-    if ( vp == 0 || vp->pmark() ) {
-      break;
-    }
-    int diff = level - vp->level();
-    vp->pmark(1);
-    if ( diff <=  0 ) {
-      if ( diff == 0 ) {
-	if ( vp->nmark() ) {
-	  ++ n;
-	}
-	else {
-	  n = ULONG_MAX;
-	}
-      }
-      break;
-    }
-    else {
-      // if ( diff > 0 ) {
-      size_t n1 = count_at_step(vp->edge0(), level);
-      if ( n1 == ULONG_MAX ) {
-	n = ULONG_MAX;
-	break;
-      }
-      n += n1;
-      e = vp->edge1();
-    }
-  }
-  return n;
-}
-
-// scan で付けた n-mark を消す．
-void
-BddMgrModern::clear_scanmark(BddEdge e)
-{
-  clear_nmark(e);
 }
 
 END_NAMESPACE_YM_BDD

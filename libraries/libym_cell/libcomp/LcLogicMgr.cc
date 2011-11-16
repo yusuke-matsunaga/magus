@@ -53,12 +53,12 @@ LcLogicMgr::init()
     mLogicGroup[1] = func1->id();
   }
   { // バッファグループの登録
-    TvFuncM plit(TvFunc::posi_literal(1, 0));
+    TvFuncM plit(TvFunc::posi_literal(1, VarId(0)));
     LcGroup* func2 = find_group(plit);
     mLogicGroup[2] = func2->id();
   }
   { // インバーターグループの登録
-    TvFuncM nlit(TvFunc::nega_literal(1, 0));
+    TvFuncM nlit(TvFunc::nega_literal(1, VarId(0)));
     LcGroup* func3 = find_group(nlit);
     mLogicGroup[3] = func3->id();
   }
@@ -121,7 +121,7 @@ LcLogicMgr::find_repfunc(const TvFuncM& f,
   ymuint no = f.no();
 
   if ( no == 1 ) {
-    TvFunc f1 = f.output(0);
+    TvFunc f1 = f.output(VarId(0));
     NpnMap xmap1;
     mNpnMgr.cannonical(f1, xmap1);
     xmap = NpnMapM(xmap1);
@@ -146,7 +146,7 @@ LcLogicMgr::find_idmap_list(const TvFuncM& func,
   ymuint no = func.no();
   if ( no == 1 ) {
     NpnMap xmap1;
-    TvFunc f1 = func.output(0);
+    TvFunc f1 = func.output(VarId(0));
     mNpnMgr.cannonical(f1, xmap1);
     { // 検証
       TvFunc f2 = f1.xform(xmap1);
@@ -161,8 +161,9 @@ LcLogicMgr::find_idmap_list(const TvFuncM& func,
       // 恒等変換は追加しない．
       bool ident = true;
       for (ymuint i = 0; i < ni; ++ i) {
-	NpnVmap vmap = map.imap(i);
-	if ( vmap.pos() != i || vmap.pol() != kPolPosi ) {
+	VarId src_var(i);
+	NpnVmap vmap = map.imap(src_var);
+	if ( vmap.var() != src_var || vmap.pol() != kPolPosi ) {
 	  ident = false;
 	  break;
 	}

@@ -67,22 +67,22 @@ public:
   // 最後の変数の後ろに挿入される．
   virtual
   bool
-  new_var(tVarId varid) = 0;
+  new_var(VarId varid) = 0;
 
   // 現在登録されている変数をそのレベルの昇順で返す．
   virtual
   tVarSize
-  var_list(list<tVarId>& vlist) const = 0;
+  var_list(list<VarId>& vlist) const = 0;
 
   // 変数番号からレベルを得る．
   // もしもレベルが割り当てられていない場合にはエラーとなる．
   virtual
   tLevel
-  level(tVarId varid) const = 0;
+  level(VarId varid) const = 0;
 
   // レベルから変数番号を得る．
   virtual
-  tVarId
+  VarId
   varid(tLevel level) const = 0;
 
   // 動的変数順変更を許可する．
@@ -104,19 +104,19 @@ public:
   // 肯定のリテラル関数を作る
   virtual
   BddEdge
-  make_posiliteral(tVarId varid) = 0;
+  make_posiliteral(VarId varid) = 0;
 
   /// @brief 否定のリテラル関数を作る．
   /// @param[in] varid 変数番号
   BddEdge
-  make_negaliteral(tVarId varid);
+  make_negaliteral(VarId varid);
 
   /// @brief インデックスと左右の子供を指定してBDDを作る．
   /// @param[in] varid 変数番号
   /// @param[in] chd_0 0枝の子供
   /// @param[in] chd_1 1枝の子供
   BddEdge
-  make_bdd(tVarId varid,
+  make_bdd(VarId varid,
 	   BddEdge chd_0,
 	   BddEdge chd_1);
 
@@ -180,7 +180,7 @@ public:
   virtual
   BddEdge
   xor_moment(BddEdge e,
-	     tVarId idx) = 0;
+	     VarId idx) = 0;
 
   // bdd がキューブの時 true を返す．
   virtual
@@ -196,15 +196,15 @@ public:
   virtual
   bool
   check_symmetry(BddEdge e,
-		 tVarId x,
-		 tVarId y,
+		 VarId x,
+		 VarId y,
 		 tPol pol) = 0;
 
   // 一つの変数に対する cofactor を計算する．
   virtual
   BddEdge
   scofactor(BddEdge e1,
-	    tVarId id,
+	    VarId id,
 	    tPol pol) = 0;
 
   // generalized cofactor を計算する．
@@ -228,7 +228,7 @@ public:
   // multiple compose 演算を行う変数と置き換え関数を登録する関数
   virtual
   void
-  compose_reg(tVarId id,
+  compose_reg(VarId id,
 	      BddEdge e) = 0;
 
   // multiple compose 演算の本体
@@ -297,7 +297,7 @@ public:
   // もともと定数値(葉)のBDDの場合，kVarIdMax を返し，
   // f0, f1 には自分自身を代入する．
   virtual
-  tVarId
+  VarId
   root_decomp(BddEdge e,
 	      BddEdge& e0,
 	      BddEdge& e1) = 0;
@@ -305,7 +305,7 @@ public:
   // 根の変数番号インデックスを取り出す．
   // 定数節点の場合には kVarIdMax を返す．
   virtual
-  tVarId
+  VarId
   root_var(BddEdge e) = 0;
 
   // 0枝の指している cofactor を返す．
@@ -384,7 +384,7 @@ public:
   virtual
   mpz_class
   walsh1(BddEdge e,
-	 tVarId var,
+	 VarId var,
 	 tVarSize n) = 0;
 
 
@@ -477,30 +477,6 @@ public:
   tVarSize
   to_literallist(BddEdge e,
 		 LiteralList& dst) = 0;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // NPN Matcher で用いられる演算
-  //////////////////////////////////////////////////////////////////////
-
-  // e を根とするBDDの節点に n-mark を付け，各変数ごとのノード数を数える．
-  virtual
-  void
-  scan(BddEdge e,
-       hash_map<tVarId, size_t>& node_counts) = 0;
-
-  // e を根とするBDDのレベル level のノード数を数える．
-  // ただし，n-mark の付いていないノードがあったら UINT_MAX を返す．
-  virtual
-  size_t
-  count_at(BddEdge e,
-	   tLevel level) = 0;
-
-  // scan で付けた n-mark を消す．
-  virtual
-  void
-  clear_scanmark(BddEdge e) = 0;
 
 
 public:
@@ -617,7 +593,7 @@ private:
 	   ymuint32 top,
 	   ymuint32 size,
 	   const vector<BddEdge>& var_vector,
-	   tVarId var_idx);
+	   ymuint var_idx);
 
 
 private:
@@ -668,7 +644,7 @@ private:
 // 否定のリテラル関数を作る．
 inline
 BddEdge
-BddMgrImpl::make_negaliteral(tVarId varid)
+BddMgrImpl::make_negaliteral(VarId varid)
 {
   BddEdge ans = make_posiliteral(varid);
   return ~ans;
@@ -722,7 +698,7 @@ BddMgrImpl::xor_op(BddEdge e1,
 // @param[in] chd_1 1枝の子供
 inline
 BddEdge
-BddMgrImpl::make_bdd(tVarId varid,
+BddMgrImpl::make_bdd(VarId varid,
 		     BddEdge chd_0,
 		     BddEdge chd_1)
 {

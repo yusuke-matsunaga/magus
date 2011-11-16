@@ -666,7 +666,7 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
 	for (ymuint i = 1; i < ni; ++ i) {
 	  ymuint base = i * ni;
 	  for (ymuint j = 0; j < i; ++ j) {
-	    mMaxW2[base + j] = mMaxFunc.walsh_2(i, j);
+	    mMaxW2[base + j] = mMaxFunc.walsh_2(VarId(i), VarId(j));
 	  }
 	}
 	mMaxW2Valid = true;

@@ -73,21 +73,21 @@ public:
 
   /// @brief 肯定のリテラル関数を作る．
   /// @param[in] ni 入力数
-  /// @param[in] pos リテラルの変数番号
+  /// @param[in] varid リテラルの変数番号
   /// @return 生成したオブジェクトを返す．
   static
   TvFunc
   posi_literal(ymuint ni,
-	       ymuint pos);
+	       VarId varid);
 
   /// @brief 否定のリテラル関数を作る．
   /// @param[in] ni 入力数
-  /// @param[in] pos リテラルの変数番号
+  /// @param[in] varid リテラルの変数番号
   /// @return 生成したオブジェクトを返す．
   static
   TvFunc
   nega_literal(ymuint ni,
-	       ymuint pos);
+	       VarId varid);
 
 
 public:
@@ -123,7 +123,7 @@ public:
   /// @param[in] pol 極性
   /// @return 自身への参照を返す．
   const TvFunc&
-  set_cofactor(ymuint varid,
+  set_cofactor(VarId varid,
 	       tPol pol);
 
 
@@ -137,7 +137,7 @@ public:
   ni() const;
 
   /// @brief 入力値を2進数と見なしたときの pos 番目の値を得る．
-  /// @param[in] pos 変数番号
+  /// @param[in] pos 位置番号 ( 0 <= pos < 2^(ni()) )
   /// 答は 0 か 1 だが int 型
   int
   value(ymuint pos) const;
@@ -155,15 +155,15 @@ public:
   walsh_0() const;
 
   /// @brief 1次の Walsh 係数を求める．
-  /// @param[in] pos 変数番号
+  /// @param[in] varid 変数番号
   ymint
-  walsh_1(ymuint pos) const;
+  walsh_1(VarId varid) const;
 
   /// @brief 2次の Walsh 係数を求める．
-  /// @param[in] pos1, pos2 変数番号
+  /// @param[in] var1, var2 変数番号
   int
-  walsh_2(ymuint pos1,
-	  ymuint pos2) const;
+  walsh_2(VarId var1,
+	  VarId var2) const;
 
   /// @brief 0次と 1次の Walsh 係数を求める．
   /// @param[out] vec 値を格納する配列
@@ -187,7 +187,7 @@ public:
 
   /// @brief 重み別の 1 次の Walsh 係数を求める．
   int
-  walsh_w1(ymuint i,
+  walsh_w1(VarId i,
 	   ymuint w,
 	   tPol opol,
 	   ymuint ibits) const;
@@ -195,14 +195,14 @@ public:
   /// @brief pos 番目の変数がサポートの時 true を返す．
   /// @param[in] pos 変数番号
   bool
-  check_sup(tVarId pos) const;
+  check_sup(VarId pos) const;
 
   /// @brief pos1 番目と pos2 番目の変数が対称のとき true を返す．
   /// @param[in] pos1, pos2 変数番号
   /// @param[in] pol 極性
   bool
-  check_sym(tVarId pos1,
-	    tVarId pos2,
+  check_sym(VarId pos1,
+	    VarId pos2,
 	    tPol pol = kPolPosi) const;
 
   /// @brief ハッシュ値を返す．
@@ -250,7 +250,7 @@ public:
   /// @param[in] varid 変数番号
   /// @param[in] pol 極性
   TvFunc
-  cofactor(ymuint varid,
+  cofactor(VarId varid,
 	   tPol pol) const;
 
   /// @brief npnmap に従った変換を行う．
@@ -320,7 +320,7 @@ private:
 
   // リテラル関数を作るコンストラクタ
   TvFunc(ymuint ni,
-	 ymuint pos,
+	 VarId varid,
 	 tPol pol);
 
   // 入力数 ni のベクタを納めるのに必要なブロック数を計算する．
@@ -552,7 +552,7 @@ operator^(const TvFunc& src1,
 // @param[in] pol 極性
 inline
 TvFunc
-TvFunc::cofactor(ymuint varid,
+TvFunc::cofactor(VarId varid,
 		 tPol pol) const
 {
   return TvFunc(*this).set_cofactor(varid, pol);

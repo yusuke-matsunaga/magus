@@ -117,7 +117,7 @@ NpnBaseConf::normalize(const TvFunc& func)
       mIpols[i] = 2;
     }
     else if ( mW1[i] == 0 ) {
-      bool stat = mFunc.check_sup(i);
+      bool stat = mFunc.check_sup(VarId(i));
       if ( !stat ) {
 	// この入力はサポートではなかった
 	add_indep(i);
@@ -142,14 +142,16 @@ NpnBaseConf::normalize(const TvFunc& func)
       }
       // 1次係数が等しい場合
       // 対称性のチェックを行う．
+      VarId var(i);
+      VarId var1(pos1);
       tPol poldiff = (mIpols[pos1] * mIpols[i] == 2) ? kPolNega : kPolPosi;
-      bool stat = mFunc.check_sym(i, pos1, poldiff);
+      bool stat = mFunc.check_sym(var, var1, poldiff);
       if ( stat ) {
 	// 対称だった
 	found = true;
 	if ( mW1[pos1] == 0 && ic_num(pos1) == 1 ) {
 	  // bi-symmetry かどうかチェックする
-	  bool stat = mFunc.check_sym(i, pos1, ~poldiff);
+	  bool stat = mFunc.check_sym(var, var1, ~poldiff);
 	  if ( stat ) {
 	    set_bisym(pos1);
 	  }
@@ -164,7 +166,7 @@ NpnBaseConf::normalize(const TvFunc& func)
       if ( mW1[i] == 0 ) {
 	// w1 == 0 の時には逆相での対称性もチェックする．
 	// この場合，最初の要素の極性は常に kPolPosi のはず
-	bool stat = mFunc.check_sym(i, pos1, kPolNega);
+	bool stat = mFunc.check_sym(var, var1, kPolNega);
 	if ( stat ) {
 	  // 逆相で対称だった．
 	  found = true;
@@ -311,7 +313,7 @@ NpnBaseConf::dump_walsh(ostream& s) const
   for (ymuint i = 0; i < ni(); ++ i) {
     s << "   ";
     for (ymuint j = 0; j < ni(); ++ j) {
-      int w2 = func().walsh_2(i, j);
+      int w2 = func().walsh_2(VarId(i), VarId(j));
       if ( ipol(i) == 2 ) {
 	w2 = -w2;
       }

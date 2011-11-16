@@ -24,8 +24,8 @@ BEGIN_NAMESPACE_YM_SEAL
 // @param[in] state_vars 状態変数番号の配列(現状態と次状態のペア)
 // @param[in] trans_relation 状態遷移関係
 BddFsm::BddFsm(BddMgr& bdd_mgr,
-	       const vector<ymuint>& input_vars,
-	       const vector<pair<ymuint, ymuint> >& state_vars,
+	       const vector<VarId>& input_vars,
+	       const vector<pair<VarId, VarId> >& state_vars,
 	       const Bdd& trans_relation) :
   mBddMgr(bdd_mgr),
   mInputVarIds(input_vars.size()),
@@ -46,8 +46,8 @@ BddFsm::BddFsm(BddMgr& bdd_mgr,
   mTransRel1 = mTransRel.esmooth(mInputVars);
 
   for (ymuint i = 0; i < ff_num(); ++ i) {
-    ymuint cur_id = state_vars[i].first;
-    ymuint next_id = state_vars[i].second;
+    VarId cur_id = state_vars[i].first;
+    VarId next_id = state_vars[i].second;
     mCurVarIds[i] = cur_id;
     mNextVarIds[i] = next_id;
     mNext2CurMap.insert(make_pair(next_id, cur_id));
@@ -171,7 +171,7 @@ BddFsm::rs_sub(Bdd rel,
   }
   Bdd l;
   Bdd r;
-  tVarId root_idx = rel.root_decomp(l, r);
+  VarId root_idx = rel.root_decomp(l, r);
   ymuint pos;
   if ( cur_varid2pos(root_idx, pos) ) {
     st_vec[pos] = 1;
@@ -283,7 +283,7 @@ BddFsm::bdd2cur_states(Bdd bdd_states,
     for (ymuint i = 0; i < litvec.size(); ++ i) {
       Literal l = litvec[i];
       int pat = (l.pol() == kPolNega) ? 1 : 3;
-      tVarId id = l.varid();
+      VarId id = l.varid();
       ymuint pos;
       bool stat = cur_varid2pos(id, pos);
       if ( stat && pos < ff_num() ) {
@@ -342,7 +342,7 @@ BddFsm::bdd2next_states(Bdd bdd_states,
     for (ymuint i = 0; i < litvec.size(); ++ i) {
       Literal l = litvec[i];
       int pat = (l.pol() == kPolNega) ? 1 : 3;
-      tVarId id = l.varid();
+      VarId id = l.varid();
       ymuint pos;
       bool stat = next_varid2pos(id, pos);
       if ( stat && pos < ff_num() ) {

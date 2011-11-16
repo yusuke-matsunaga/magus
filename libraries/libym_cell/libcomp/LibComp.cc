@@ -33,19 +33,14 @@ xform_expr(const LogExpr& expr,
   assert_cond( no == 1, __FILE__, __LINE__);
   VarLogExprMap vlm;
   for (ymuint i = 0; i < ni; ++ i) {
-    NpnVmap imap = map.imap(i);
-    ymuint j = imap.pos();
-    LogExpr expr;
-    if ( imap.pol() == kPolPosi) {
-      expr = LogExpr::make_posiliteral(j);
-    }
-    else {
-      expr = LogExpr::make_negaliteral(j);
-    }
-    vlm.insert(make_pair(i, expr));
+    VarId src_var(i);
+    NpnVmap imap = map.imap(src_var);
+    VarId dst_var = imap.var();
+    LogExpr expr = LogExpr::make_literal(dst_var, imap.pol());
+    vlm.insert(make_pair(src_var, expr));
   }
   LogExpr cexpr = expr.compose(vlm);
-  if ( map.omap(0).pol() == kPolNega ) {
+  if ( map.omap(VarId(0)).pol() == kPolNega ) {
     cexpr = ~cexpr;
   }
   return cexpr;
@@ -122,8 +117,8 @@ LibComp::compile(const CellLibrary& library)
   // XOR のパタンを登録しておく．
   // これはちょっとしたハック
   {
-    LogExpr lit0 = LogExpr::make_posiliteral(0);
-    LogExpr lit1 = LogExpr::make_posiliteral(1);
+    LogExpr lit0 = LogExpr::make_posiliteral(VarId(0));
+    LogExpr lit1 = LogExpr::make_posiliteral(VarId(1));
     LogExpr xor_ex = lit0 ^ lit1;
     reg_expr(xor_ex);
   }

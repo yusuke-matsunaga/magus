@@ -323,10 +323,11 @@ NpnConf::set_map(NpnMap& map) const
   ymuint k = 0;
   for (ymuint i = 0; i < nc(); ++ i) {
     ymuint rep = ic_rep(i);
+    VarId rep_var(rep);
     ymuint n = mBaseConf->ic_num(rep);
     for (ymuint j = 0; j < n; ++ j) {
       tPol pol = (ipol(rep) == 2) ? kPolNega : kPolPosi;
-      map.set(rep, k, pol);
+      map.set(rep_var, VarId(k), pol);
       ++ k;
       rep = mBaseConf->ic_link(rep);
     }
@@ -334,7 +335,7 @@ NpnConf::set_map(NpnMap& map) const
   ymuint rep = mBaseConf->indep_rep();
   ymuint n = mBaseConf->indep_num();
   for (ymuint j = 0; j < n; ++ j) {
-    map.set(rep, k, kPolPosi);
+    map.set(VarId(rep), VarId(k), kPolPosi);
     ++ k;
     rep = mBaseConf->ic_link(rep);
   }
@@ -372,7 +373,7 @@ NpnConf::dump(ostream& s) const
     ymuint e = group_end(g);
     for (ymuint j = b; j < e; ++ j) {
       ymuint pos1 = ic_rep(j);
-      ymint w1 = func().walsh_1(pos1);
+      ymint w1 = func().walsh_1(VarId(pos1));
       if ( (opol() == 2) ^ (ipol(pos1) == 2) ) {
 	w1 = -w1;
       }

@@ -19,14 +19,22 @@
 
 #include "bddtest.h"
 
-using namespace std;
-using namespace nsYm::nsBdd;
 
-using nsYm::VarList;
-using nsYm::LogExpr;
+BEGIN_NAMESPACE_YM
 
 BddMgr mgr1("bmm", "manager 1");
 BddMgr mgr2("bmm", "manager 2");
+
+// 変数を確保しておく．
+void
+init_var(ymuint n)
+{
+  for (ymuint i = 0; i < n; ++ i) {
+    VarId var(i);
+    mgr1.new_var(var);
+    mgr2.new_var(var);
+  }
+}
 
 // error BDD になっているかチェック
 bool
@@ -46,9 +54,9 @@ check_errbdd(const Bdd& bdd,
 bool
 test_binary()
 {
-  Bdd var0 = mgr1.make_posiliteral(0);
-  Bdd var1 = mgr1.make_posiliteral(1);
-  Bdd var2 = mgr2.make_posiliteral(2);
+  Bdd var0 = mgr1.make_posiliteral(VarId(0));
+  Bdd var1 = mgr1.make_posiliteral(VarId(1));
+  Bdd var2 = mgr2.make_posiliteral(VarId(2));
 
   if ( !check_errbdd(var0 & var2, "var0 & var2") )
     return false;
@@ -123,7 +131,7 @@ test_compose()
   Bdd bdd2 = str2bdd(mgr1, "~4 | 5");
   Bdd bdd3 = str2bdd(mgr2, "~4 | 5");
 
-  Bdd bdd5 = bdd1.compose(0, bdd3);
+  Bdd bdd5 = bdd1.compose(VarId(0), bdd3);
   if ( !bdd5.is_error() ) {
     bdd1.display(cout);
     bdd2.display(cout);
@@ -132,7 +140,7 @@ test_compose()
   }
 
   VarBddMap vbmap;
-  vbmap.insert(make_pair(0, bdd3));
+  vbmap.insert(make_pair(VarId(0), bdd3));
   Bdd bdd6 = bdd1.compose(vbmap);
   if ( !bdd6.is_error() ) {
     bdd1.display(cout);
@@ -150,7 +158,7 @@ test_smooth()
 {
   Bdd bdd1 = str2bdd(mgr1, "0 & 1 | ~0 & 2");
   VarList vl;
-  vl.push_back(0);
+  vl.push_back(VarId(0));
 
   BddVarSet vs2(mgr2, vl);
   Bdd bdd4 = bdd1.esmooth(vs2);
@@ -215,7 +223,7 @@ test_and_exist()
 {
   const char* str = "0 | 2";
   VarList vl;
-  vl.push_back(0);
+  vl.push_back(VarId(0));
 
   Bdd bdd1 = str2bdd(mgr1, "0 & 1 | ~0 & 2");
   Bdd bdd2 = str2bdd(mgr1, str);
@@ -281,13 +289,10 @@ test_isop()
 }
 
 int
-main(int argc, char** argv)
+mgr_test()
 {
   try {
-    for (size_t i = 0; i < 10; ++ i) {
-      mgr1.new_var(i);
-      mgr2.new_var(i);
-    }
+    init_var(10);
     if ( !test_binary() ) {
       return 255;
     }
@@ -317,9 +322,9 @@ main(int argc, char** argv)
     Bdd f;
     {
       BddMgr mgr("bmm", "temporary manager", "reorder");
-      mgr.new_var(0);
-      mgr.new_var(1);
-      mgr.new_var(2);
+      mgr.new_var(VarId(0));
+      mgr.new_var(VarId(1));
+      mgr.new_var(VarId(2));
       f = str2bdd(mgr, "0 * 1 + ~0 * 2");
     }
     // この時点で f はエラーBDDになっているはず．
@@ -335,6 +340,14 @@ main(int argc, char** argv)
     cerr << a << endl;
     return 255;
   }
+}
 
-  return 0;
+END_NAMESPACE_YM
+
+
+int
+main(int argc,
+     char** argv)
+{
+  return nsYm::mgr_test();
 }

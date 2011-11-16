@@ -998,8 +998,8 @@ CiLibrary::compile()
       ymuint ni = map.ni() - 2;
       assert_cond( ni <= 4, __FILE__, __LINE__);
       for (ymuint i = 0; i < ni; ++ i) {
-	NpnVmap imap = map.imap(i);
-	ymuint pos = imap.pos();
+	NpnVmap imap = map.imap(VarId(i));
+	ymuint pos = imap.var().val();
 	ymuint pol = (imap.pol() == kPolNega) ? 16U : 8U;
 	pos_array[pos] = i | pol;
       }
@@ -1021,8 +1021,8 @@ CiLibrary::compile()
       ymuint ni = map.ni() - 2;
       assert_cond( ni <= 4, __FILE__, __LINE__);
       for (ymuint i = 0; i < ni; ++ i) {
-	NpnVmap imap = map.imap(i);
-	ymuint pos = imap.pos();
+	NpnVmap imap = map.imap(VarId(i));
+	ymuint pos = imap.var().val();
 	ymuint pol = (imap.pol() == kPolNega) ? 16U : 8U;
 	pos_array[pos] = i | pol;
       }

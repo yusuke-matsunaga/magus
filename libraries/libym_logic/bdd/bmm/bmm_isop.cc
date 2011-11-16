@@ -20,7 +20,7 @@ BEGIN_NONAMESPACE
 // cov を積和形論理式と見なして各キューブにリテラルを追加する
 LogExpr
 sop_litand(const LogExpr& cov,
-	   tVarId varid,
+	   VarId varid,
 	   tPol pol)
 {
   if ( cov.is_zero() ) {
@@ -156,7 +156,7 @@ BddMgrModern::isop_step(BddEdge l,
     BddEdge u_0, u_1;
     Var* var = split(l, u, l_0, l_1, u_0, u_1);
     BddEdge var_edge = new_node(var, BddEdge::make_zero(), BddEdge::make_one());
-    tVarId varid = var->varid();
+    VarId varid = var->varid();
     BddEdge z_0 = and_op(l_0, ~u_1);
     LogExpr p_0;
     BddEdge c_0 = isop_step(z_0, u_0, p_0);
@@ -210,7 +210,7 @@ BddMgrModern::pc_step(BddEdge l,
     BddEdge u_0, u_1;
     Var* var = split(l, u, l_0, l_1, u_0, u_1);
     BddEdge var_edge = new_node(var, BddEdge::make_zero(), BddEdge::make_one());
-    tVarId varid = var->varid();
+    VarId varid = var->varid();
 
     // \bar{x} を含む prime implicants の生成
     BddEdge z_0 = and_op(l_0, ~u_1);

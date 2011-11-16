@@ -83,14 +83,14 @@ public:
 public:
 
   /// @brief リテラル文字列からリテラル番号を得る．
-  tVarId
+  VarId
   str_to_literal(const string& str);
 
   /// @brief トークンを一つ読み出す．
   /// @param[out] lit_id トークンが kTokenNUM の時にはリテラル番号を入れる．
   /// @return 読み出されたトークン値
   tToken
-  get_token(tVarId& lit_id);
+  get_token(VarId& lit_id);
 
   /// @brief 次のトークンが AND ならそれを読み出し true を返す．
   ///

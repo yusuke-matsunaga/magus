@@ -232,8 +232,9 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	  const NpnMapM& npn_map = group->map();
 	  Match c_match(ni);
 	  for (ymuint i = 0; i < ni; ++ i) {
-	    NpnVmap imap = npn_map.imap(i);
-	    ymuint pos = imap.pos();
+	    NpnVmap imap = npn_map.imap(VarId(i));
+	    VarId dst_var = imap.var();
+	    ymuint pos = dst_var.val();
 	    const BdnNode* inode = pat_match.leaf_node(pos);
 	    bool iinv = pat_match.leaf_inv(pos);
 	    if ( imap.pol() == kPolNega ) {
@@ -243,7 +244,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	    mLeafNum[inode->id()] = i;
 	  }
 	  bool root_inv = pat.root_inv();
-	  if ( npn_map.omap(0).pol() == kPolNega ) {
+	  if ( npn_map.omap(VarId(0)).pol() == kPolNega ) {
 	    root_inv = !root_inv;
 	  }
 	  if ( debug ) {

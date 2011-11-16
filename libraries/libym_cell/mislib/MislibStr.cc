@@ -57,7 +57,9 @@ MislibStr::to_expr(const hash_map<ShString, ymuint>& name_map) const
 {
   hash_map<ShString, ymuint>::const_iterator p = name_map.find(str());
   assert_cond( p != name_map.end(), __FILE__, __LINE__);
-  return LogExpr::make_posiliteral(p->second);
+  ymuint id = p->second;
+  VarId var(id);
+  return LogExpr::make_posiliteral(var);
 }
 
 // 内容を出力する．

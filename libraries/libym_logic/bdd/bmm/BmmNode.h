@@ -70,7 +70,7 @@ public:
   var() const;
 
   // 変数インデックス値を得る
-  tVarId
+  VarId
   varid() const;
 
   // レベルを得る．
@@ -190,7 +190,7 @@ BmmNode::var() const
 
 // 変数インデックス値を得る
 inline
-tVarId
+VarId
 BmmNode::varid() const
 {
   return mVar->varid();

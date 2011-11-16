@@ -202,13 +202,13 @@ make_cnf(SatSolver& solver,
   for (ymuint i = 0; i < nc; ++ i) {
     LogExpr lexp1 = lexp.child(i);
     if ( lexp1.is_posiliteral() ) {
-      local_inputs[i] = inputs[lexp1.varid()];
+      local_inputs[i] = inputs[lexp1.varid().val()];
     }
     else if ( lexp1.is_negaliteral() ) {
-      local_inputs[i] = ~inputs[lexp1.varid()];
+      local_inputs[i] = ~inputs[lexp1.varid().val()];
     }
     else {
-      ymuint new_varid = solver.new_var();
+      VarId new_varid = solver.new_var();
       local_inputs[i] = Literal(new_varid, kPolPosi);
       make_cnf(solver, lexp1, local_inputs[i], inputs);
     }
@@ -493,8 +493,8 @@ DtpgSat::run(const TgNetwork& network,
     for (ymuint i = 0; i < npi; ++ i) {
       const TgNode* node = network.input(i);
       if ( mark(node) != kNone ) {
-	ymuint idx = gvar(node);
-	if ( model[idx] == kB3True ) {
+	VarId idx = gvar(node);
+	if ( model[idx.val()] == kB3True ) {
 	  tv->set_val(i, kVal1);
 	}
 	else {

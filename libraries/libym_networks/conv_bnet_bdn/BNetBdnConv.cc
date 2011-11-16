@@ -160,10 +160,10 @@ make_node_sub(BdnMgr& bdn,
     return BdnNodeHandle::make_one();
   }
   if ( func.is_posiliteral() ) {
-    return fanins[func.varid()];
+    return fanins[func.varid().val()];
   }
   if ( func.is_negaliteral() ) {
-    return ~fanins[func.varid()];
+    return ~fanins[func.varid().val()];
   }
   // 以降は AND/OR/XOR
   ymuint n = func.child_num();

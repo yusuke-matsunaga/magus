@@ -118,7 +118,7 @@ BddMgrImpl::tvec_to_bdd(const vector<int>& v,
   // 変数の生成
   vector<BddEdge> var_vector;
   for (VarVector::const_iterator p = vars.begin(); p != vars.end(); ++ p) {
-    tVarId varid = *p;
+    VarId varid = *p;
     var_vector.push_back(make_posiliteral(varid));
   }
   ymuint size = v.size();
@@ -131,7 +131,7 @@ BddMgrImpl::tvec_sub(const vector<int>& v,
 		     ymuint32 top,
 		     ymuint32 size,
 		     const vector<BddEdge>& var_vector,
-		     tVarId var_idx)
+		     ymuint var_idx)
 {
   assert_cond(size > 0, __FILE__, __LINE__);
   if ( size == 1 ) {

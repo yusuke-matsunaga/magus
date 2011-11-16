@@ -93,7 +93,7 @@ public:
   /// @return 新しい変数番号を返す．
   /// @note 変数番号は 0 から始まる．
   virtual
-  tVarId
+  VarId
   new_var();
 
   /// @brief 節を追加する．
@@ -220,7 +220,7 @@ private:
 
   // 変数の評価を行う．
   Bool3
-  eval(tVarId id) const;
+  eval(VarId id) const;
 
   // literal の評価を行う．
   Bool3
@@ -232,11 +232,11 @@ private:
 
   // 変数の decision level を返す．
   int
-  decision_level(tVarId varid) const;
+  decision_level(VarId varid) const;
 
   // 変数の割り当て理由を返す．
   SatReason
-  reason(tVarId varid) const;
+  reason(VarId varid) const;
 
   // 学習節が使われているか調べる．
   bool
@@ -244,7 +244,7 @@ private:
 
   // 変数のアクティビティを増加させる．
   void
-  bump_var_activity(tVarId var);
+  bump_var_activity(VarId var);
 
   // 変数のアクティビティを定率で減少させる．
   void
@@ -285,18 +285,18 @@ private:
   heap_empty() const;
 
   /// @brief 変数を始めてヒープに追加する．
-  /// @param[in] var 追加する変数
+  /// @param[in] vindex 追加する変数番号
   void
-  heap_add_var(tVarId var);
+  heap_add_var(ymuint vindex);
 
   /// @brief 変数を再びヒープに追加する．
-  /// @param[in] var 追加する変数
+  /// @param[in] vindex 追加する変数番号
   void
-  heap_push(tVarId var);
+  heap_push(ymuint vindex);
 
-  /// @brief アクティビティ最大の変数を取り出す．
+  /// @brief アクティビティ最大の変数番号を取り出す．
   /// @note 該当の変数はヒープから取り除かれる．
-  tVarId
+  ymuint
   heap_pop_top();
 
   /// @brief 引数の位置にある要素を適当な位置まで沈めてゆく
@@ -305,12 +305,12 @@ private:
 
   /// @brief 引数の位置にある要素を適当な位置まで上げてゆく
   void
-  heap_move_up(tVarId var);
+  heap_move_up(ymuint vindex);
 
   /// @brief 変数を配列にセットする．
   /// @note mHeap と mHeapPos の一貫性を保つためにはこの関数を使うこと．
   void
-  heap_set(tVarId var,
+  heap_set(ymuint vindex,
 	   ymuint pos);
 
   /// @brief 左の子供の位置を計算する
@@ -502,9 +502,9 @@ YmSat::watcher_list(Literal lit)
 // 変数の評価を行う．
 inline
 Bool3
-YmSat::eval(tVarId id) const
+YmSat::eval(VarId id) const
 {
-  return mVal[id];
+  return mVal[id.val()];
 }
 
 // literal の評価を行う．
@@ -513,8 +513,8 @@ Bool3
 YmSat::eval(Literal l) const
 {
   ymuint index = l.index();
-  Bool3 val = eval(index / 2);
-  int d = 1 - (index & 1) * 2;
+  Bool3 val = mVal[index / 2];
+  int d = 1 - (index & 1U) * 2;
   return static_cast<Bool3>(static_cast<int>(val) * d);
 }
 
@@ -538,10 +538,11 @@ void
 YmSat::assign(Literal lit,
 	      SatReason reason)
 {
-  tVarId varid = lit.varid();
-  mVal[varid] = static_cast<Bool3>(1 - static_cast<int>(lit.pol()) * 2);
-  mDecisionLevel[varid] = decision_level();
-  mReason[varid] = reason;
+  ymuint lindex = lit.index();
+  ymuint vindex = lindex / 2;
+  mVal[vindex] = static_cast<Bool3>(1 - static_cast<int>(lindex & 1U) * 2);
+  mDecisionLevel[vindex] = decision_level();
+  mReason[vindex] = reason;
 
   // mAssignList に格納する．
   mAssignList.put(lit);
@@ -558,17 +559,17 @@ YmSat::decision_level() const
 // 変数の decision level を返す．
 inline
 int
-YmSat::decision_level(tVarId varid) const
+YmSat::decision_level(VarId varid) const
 {
-  return mDecisionLevel[varid];
+  return mDecisionLevel[varid.val()];
 }
 
 // 変数の割り当て理由を返す．
 inline
 SatReason
-YmSat::reason(tVarId varid) const
+YmSat::reason(VarId varid) const
 {
-  return mReason[varid];
+  return mReason[varid.val()];
 }
 
 // @brief clase が含意の理由になっているか調べる．
@@ -627,41 +628,41 @@ YmSat::heap_empty() const
 }
 
 // @brief 変数を始めてヒープに追加する．
-// @param[in] var 追加する変数
+// @param[in] vindex 追加する変数番号
 inline
 void
-YmSat::heap_add_var(tVarId var)
+YmSat::heap_add_var(ymuint vindex)
 {
-  heap_set(var, mHeapNum);
+  heap_set(vindex, mHeapNum);
   ++ mHeapNum;
 }
 
 // @brief 要素を追加する．
 inline
 void
-YmSat::heap_push(tVarId var)
+YmSat::heap_push(ymuint vindex)
 {
-  if ( mHeapPos[var] == -1 ) {
+  if ( mHeapPos[vindex] == -1 ) {
     ymuint pos = mHeapNum;
     ++ mHeapNum;
-    heap_set(var, pos);
+    heap_set(vindex, pos);
     heap_move_up(pos);
   }
 }
 
 // @brief もっともアクティビティの高い変数を返す．
 inline
-tVarId
+ymuint
 YmSat::heap_pop_top()
 {
   // この assert は重いのでコメントアウトしておく
   //assert_cond(mHeapNum > 0, __FILE__, __LINE__);
-  tVarId ans = mHeap[0];
+  ymuint ans = mHeap[0];
   mHeapPos[ans] = -1;
   -- mHeapNum;
   if ( mHeapNum > 0 ) {
-    tVarId var = mHeap[mHeapNum];
-    heap_set(var, 0);
+    ymuint vindex = mHeap[mHeapNum];
+    heap_set(vindex, 0);
     heap_move_down(0);
   }
   return ans;
@@ -672,17 +673,17 @@ inline
 void
 YmSat::heap_move_up(ymuint pos)
 {
-  tVarId var = mHeap[pos];
-  double val = mActivity[var];
+  ymuint vindex = mHeap[pos];
+  double val = mActivity[vindex];
   while ( pos > 0 ) {
     ymuint pos_p = heap_parent(pos);
-    tVarId var_p = mHeap[pos_p];
-    double val_p = mActivity[var_p];
+    ymuint vindex_p = mHeap[pos_p];
+    double val_p = mActivity[vindex_p];
     if ( val_p >= val ) {
       break;
     }
-    heap_set(var, pos_p);
-    heap_set(var_p, pos);
+    heap_set(vindex, pos_p);
+    heap_set(vindex_p, pos);
     pos = pos_p;
   }
 }
@@ -690,11 +691,11 @@ YmSat::heap_move_up(ymuint pos)
 // 変数を配列にセットする．
 inline
 void
-YmSat::heap_set(tVarId var,
-			ymuint pos)
+YmSat::heap_set(ymuint vindex,
+		ymuint pos)
 {
-  mHeap[pos] = var;
-  mHeapPos[var] = pos;
+  mHeap[pos] = vindex;
+  mHeapPos[vindex] = pos;
 }
 
 // @brief 左の子供の位置を計算する

@@ -130,10 +130,10 @@ LexpNode::eval(const vector<ymulong>& vals,
     return ~0UL & mask;
   }
   if ( is_posiliteral() ) {
-    return vals[varid()];
+    return vals[varid().val()];
   }
   if ( is_negaliteral() ) {
-    return ~vals[varid()] & mask;
+    return ~vals[varid().val()] & mask;
   }
 
   ymuint ni = child_num();
@@ -324,7 +324,7 @@ LexpNode::litnum() const
 
 // 特定の変数のリテラル数を返す．
 ymuint
-LexpNode::litnum(tVarId id) const
+LexpNode::litnum(VarId id) const
 {
   if ( is_literal() && varid() == id ) {
     // リテラルならリテラル数は1
@@ -347,7 +347,7 @@ LexpNode::litnum(tVarId id) const
 
 // 特定の変数の特定の極性のリテラル数を返す．
 ymuint
-LexpNode::litnum(tVarId id,
+LexpNode::litnum(VarId id,
 		 tPol pol) const
 {
   if ( is_literal(pol) && varid() == id ) {
@@ -374,7 +374,7 @@ ymuint
 LexpNode::input_size() const
 {
   if ( is_literal() ) {
-    return varid() + 1;
+    return varid().val() + 1;
   }
 
   if ( is_op() ) {
@@ -446,7 +446,7 @@ LexpNode::soplit(bool inverted) const
 // SOP形式の積項数とリテラル数を計算する．
 SopLit
 LexpNode::soplit(bool inverted,
-		 tVarId id) const
+		 VarId id) const
 {
   if ( is_literal() ) {
     if ( varid() == id ) {
@@ -502,7 +502,7 @@ LexpNode::soplit(bool inverted,
 // SOP形式の積項数とリテラル数を計算する．
 SopLit
 LexpNode::soplit(bool inverted,
-		 tVarId id,
+		 VarId id,
 		 tPol pol) const
 {
   if ( is_literal() ) {
