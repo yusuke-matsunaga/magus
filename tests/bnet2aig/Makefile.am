@@ -27,25 +27,11 @@ AM_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 noinst_PROGRAMS = \
-	genpat \
-	genpat2 \
-	enum_pat3
+	bnet2aig
 
-genpat_SOURCES = \
-	GpNode.h \
-	GpNode.cc \
-	genpat.cc
+bnet2aig_SOURCES = \
+	bnet2aig.cc
 
-genpat_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
-
-genpat2_SOURCES = \
-	genpat2.cc
-
-genpat2_LDADD =
-
-enum_pat3_SOURCES = \
-	enum_pat3.cc
-
-enum_pat3_LDADD = \
+bnet2aig_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
