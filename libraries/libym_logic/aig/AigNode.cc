@@ -1,36 +1,34 @@
 
-/// @file libym_aig/AigNode.cc
+/// @file AigNode.cc
 /// @brief AigNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: AigNode.cc 2203 2009-04-16 05:04:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_aig/AigNode.h"
+#include "AigNode.h"
 
 
 BEGIN_NAMESPACE_YM_AIG
 
 //////////////////////////////////////////////////////////////////////
-// クラス AigHandle
+// クラス Aig
 //////////////////////////////////////////////////////////////////////
 
 // @brief ノードの通し番号を得る．
 ymuint
-AigHandle::node_id() const
+Aig::node_id() const
 {
   return node()->node_id();
 }
 
 
-/// @relates AigHandle
+/// @relates Aig
 /// @brief 内容を出力する関数
 ostream&
 operator<<(ostream& s,
-	   AigHandle src)
+	   Aig src)
 {
   bool inv = src.inv();
   AigNode* node = src.node();
@@ -71,17 +69,17 @@ AigNode::~AigNode()
 // @brief 入力タイプに設定する．
 // @param[in] input_id 入力番号
 void
-AigNode::set_input(ymuint input_id)
+AigNode::set_input(VarId input_id)
 {
   mFlags |= (1U << kSftT);
-  mFanins[0].mPackedData = input_id;
+  mFanins[0].mPackedData = input_id.val();
 }
 
 // @brief ANDタイプに設定する．
 // @param[in] fanin0, fanin1 ファンインのハンドル
 void
-AigNode::set_and(AigHandle fanin0,
-		 AigHandle fanin1)
+AigNode::set_and(Aig fanin0,
+		 Aig fanin1)
 {
   mFlags &= ~(1U << kSftT);
   mFanins[0] = fanin0;

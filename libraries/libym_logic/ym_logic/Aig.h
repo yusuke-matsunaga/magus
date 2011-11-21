@@ -1,15 +1,16 @@
-#ifndef YM_AIG_AIGHANDLE_H
-#define YM_AIG_AIGHANDLE_H
+#ifndef YM_LOGIC_AIG_H
+#define YM_LOGIC_AIG_H
 
-/// @file ym_aig/AigHandle.h
-/// @brief AigHandle のヘッダファイル
+/// @file ym_logic/Aig.h
+/// @brief Aig のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_aig/aig_nsdef.h"
+#include "ym_logic/aig_nsdef.h"
+#include "ym_logic/VarId.h"
 
 
 BEGIN_NAMESPACE_YM_AIG
@@ -17,10 +18,10 @@ BEGIN_NAMESPACE_YM_AIG
 class AigNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class AigHandle AigHandle.h "ym_aig/AigHandle.h"
-/// @brief 枝を表すクラス
+/// @class Aig Aig.h "ym_logic/Aig.h"
+/// @brief AIG を表すクラス (実際には根の枝を表すクラス)
 //////////////////////////////////////////////////////////////////////
-class AigHandle
+class Aig
 {
   friend class AigMgrImpl;
   friend class AigNode;
@@ -31,16 +32,16 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 空のコンストラクタ
-  AigHandle();
+  Aig();
 
   /// @brief 内容を設定したコンストラクタ
   /// @param[in] node ノード
   /// @param[in] inv 反転している時に true とするフラグ
-  AigHandle(AigNode* node,
-	    bool inv);
+  Aig(AigNode* node,
+      bool inv);
 
   /// @brief デストラクタ
-  ~AigHandle();
+  ~Aig();
 
   /// @brief 内容を設定する．
   /// @param[in] node ノード
@@ -56,7 +57,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 否定の枝を返す．
-  AigHandle
+  Aig
   operator~() const;
 
   /// @brief ノードを得る．
@@ -67,7 +68,7 @@ public:
   ymuint
   node_id() const;
 
-  /// @brief 極性を得る．
+  /// @brief 根の極性を得る．
   /// @return 反転しているとき true を返す．
   bool
   inv() const;
@@ -90,7 +91,7 @@ public:
 
   /// @brief 外部入力ノードへのハンドルのとき，入力番号を返す．
   /// @note is_input() の時のみ意味を持つ．
-  ymuint
+  VarId
   input_id() const;
 
   /// @brief ANDノードへのハンドルのとき true を返す．
@@ -100,18 +101,18 @@ public:
   /// @brief pos で指示されたファンインのハンドルを得る．
   /// @note pos は 0 か 1 でなければならない．
   /// @note is_and() の時のみ意味を持つ．
-  AigHandle
-  fanin_handle(ymuint pos) const;
+  Aig
+  fanin(ymuint pos) const;
 
   /// @brief fanin0 のハンドルを得る．
   /// @note is_and() の時のみ意味を持つ．
-  AigHandle
-  fanin0_handle() const;
+  Aig
+  fanin0() const;
 
   /// @brief fanin1 のハンドルを得る．
   /// @note is_and() の時のみ意味を持つ．
-  AigHandle
-  fanin1_handle() const;
+  Aig
+  fanin1() const;
 
   /// @brief ハッシュ値を返す．
   ymuint32
@@ -125,15 +126,15 @@ public:
 
   friend
   bool
-  operator==(AigHandle src1,
-	     AigHandle src2);
+  operator==(Aig src1,
+	     Aig src2);
 
 
 private:
 
   /// @brief 内容を直接指定したコンストラクタ
   explicit
-  AigHandle(ympuint data);
+  Aig(ympuint data);
 
 
 private:
@@ -146,78 +147,79 @@ private:
 
 };
 
-/// @relates AigHandle
+
+/// @relates Aig
 /// @brief 等価比較演算
 bool
-operator==(AigHandle src1,
-	   AigHandle src2);
+operator==(Aig src1,
+	   Aig src2);
 
-/// @relates AigHandle
+/// @relates Aig
 /// @brief 非等価比較演算
 bool
-operator!=(AigHandle src1,
-	   AigHandle src2);
+operator!=(Aig src1,
+	   Aig src2);
 
-/// @relates AigHandle
+/// @relates Aig
 /// @brief 内容を出力する関数
 ostream&
 operator<<(ostream& s,
-	   AigHandle src);
+	   Aig src);
 
 
 //////////////////////////////////////////////////////////////////////
-// AigHandle のインライン関数
+// Aig のインライン関数
 //////////////////////////////////////////////////////////////////////
 
 // @brief 空のコンストラクタ
 inline
-AigHandle::AigHandle() :
+Aig::Aig() :
   mPackedData(0UL)
 {
 }
 
 // @brief 内容を直接指定したコンストラクタ
 inline
-AigHandle::AigHandle(ympuint data) :
+Aig::Aig(ympuint data) :
   mPackedData(data)
 {
 }
 
 // @brief 内容を設定したコンストラクタ
 inline
-AigHandle::AigHandle(AigNode* node,
-		     bool inv)
+Aig::Aig(AigNode* node,
+	 bool inv)
 {
   mPackedData = reinterpret_cast<ympuint>(node) | inv;
 }
 
 // @brief デストラクタ
 inline
-AigHandle::~AigHandle()
+Aig::~Aig()
 {
 }
 
 // @brief 内容を設定する．
 inline
 void
-AigHandle::set(AigNode* node,
-	       bool inv)
+Aig::set(AigNode* node,
+	 bool inv)
 {
   mPackedData = reinterpret_cast<ympuint>(node) | inv;
 }
 
 // @brief 否定の枝を返す．
 inline
-AigHandle
-AigHandle::operator~() const
+Aig
+Aig::operator~() const
 {
-  return AigHandle(mPackedData ^ 1UL);
+  return Aig(mPackedData ^ 1UL);
 }
 
 // @brief ノードを得る．
 inline
 AigNode*
-AigHandle::node() const
+Aig::node() const
 {
   return reinterpret_cast<AigNode*>(mPackedData & ~3UL);
 }
@@ -226,7 +228,7 @@ AigHandle::node() const
 // @return 反転しているとき true を返す．
 inline
 bool
-AigHandle::inv() const
+Aig::inv() const
 {
   return static_cast<bool>(mPackedData & 1UL);
 }
@@ -234,7 +236,7 @@ AigHandle::inv() const
 // @brief 定数0を指しているとき true を返す．
 inline
 bool
-AigHandle::is_zero() const
+Aig::is_zero() const
 {
   return mPackedData == 0UL;
 }
@@ -242,7 +244,7 @@ AigHandle::is_zero() const
 // @brief 定数1を指しているとき true を返す．
 inline
 bool
-AigHandle::is_one() const
+Aig::is_one() const
 {
   return mPackedData == 1UL;
 }
@@ -250,7 +252,7 @@ AigHandle::is_one() const
 // @brief 定数を指しているとき true を返す．
 inline
 bool
-AigHandle::is_const() const
+Aig::is_const() const
 {
   return (mPackedData & ~1UL) == 0UL;
 }
@@ -258,27 +260,27 @@ AigHandle::is_const() const
 // @brief ハッシュ値を返す．
 inline
 ymuint32
-AigHandle::hash_func() const
+Aig::hash_func() const
 {
   return static_cast<ymuint32>(mPackedData);
 }
 
-// @relates AigHandle
+// @relates Aig
 // @brief 等価比較演算
 inline
 bool
-operator==(AigHandle src1,
-	   AigHandle src2)
+operator==(Aig src1,
+	   Aig src2)
 {
   return src1.mPackedData == src2.mPackedData;
 }
 
-// @relates AigHandle
+// @relates Aig
 // @brief 非等価比較演算
 inline
 bool
-operator!=(AigHandle src1,
-	   AigHandle src2)
+operator!=(Aig src1,
+	   Aig src2)
 {
   return !operator==(src1, src2);
 }
@@ -286,16 +288,16 @@ operator!=(AigHandle src1,
 END_NAMESPACE_YM_AIG
 
 BEGIN_NAMESPACE_HASH
-// AigHandleをキーにしたハッシュ関数クラスの定義
+// Aigをキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsAig::AigHandle>
+struct hash<nsYm::nsAig::Aig>
 {
   ymuint
-  operator()(nsYm::nsAig::AigHandle aig) const
+  operator()(nsYm::nsAig::Aig aig) const
   {
     return aig.hash_func();
   }
 };
 END_NAMESPACE_HASH
 
-#endif // YM_AIG_AIGHANDLE_H
+#endif // YM_LOGIC_AIG_H

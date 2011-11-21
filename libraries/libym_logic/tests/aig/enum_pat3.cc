@@ -1,19 +1,17 @@
-/// @file libym_aig/tests/enum_pat3.cc
+/// @file enum_pat3.cc
 /// @brief 3入力関数のパタンを列挙するプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: enum_pat3.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_npn/TvFunc.h"
-#include "ym_npn/NpnMgr.h"
-#include "ym_npn/NpnMap.h"
-#include "ym_aig/AigMgr.h"
+#include "ym_logic/TvFunc.h"
+#include "ym_logic/NpnMgr.h"
+#include "ym_logic/NpnMap.h"
+#include "ym_logic/AigMgr.h"
 
-#include "ym_sat/SatSolver.h"
+#include "ym_logic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -52,7 +50,7 @@ public:
 public:
 
   // pat を実現するパタンのリストを列挙する．
-  AigHandle
+  Aig
   enum_pat2(ymuint32 pat,
 	    const vector<ymuint32>& vmap);
 
@@ -61,43 +59,43 @@ public:
   bool
   enum_pat3(ymuint32 pat,
 	    list<ymuint32>& parent_list,
-	    list<AigHandle>& pat_list);
+	    list<Aig>& pat_list);
 
   // 分解などで2入力以下に落とせる関数の処理を行う．
   bool
   decomp3(ymuint32 pat,
-	  list<AigHandle>& pat_list);
+	  list<Aig>& pat_list);
 
   // pat を2つの関数の AND で実現する．
   void
   try_anddecomp(ymuint32 pat,
 		list<ymuint32>& parent_list,
-		list<AigHandle>& pat_list);
+		list<Aig>& pat_list);
 
   // pat を2つの関数の OR で実現する．
   void
   try_ordecomp(ymuint32 pat,
 	       list<ymuint32>& parent_list,
-	       list<AigHandle>& pat_list);
+	       list<Aig>& pat_list);
 
   // pat を2つの関数の OR で実現する．
   void
   try_xordecomp(ymuint32 pat,
 		list<ymuint32>& parent_list,
-		list<AigHandle>& pat_list);
+		list<Aig>& pat_list);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // AIG マネージャ
   AigMgr mAigMgr;
 
   // 入力のノード
-  AigHandle mInput[3];
-  
+  Aig mInput[3];
+
 };
 
 
@@ -154,7 +152,7 @@ search_aigtable(ymuint32 ni,
       }
     }
   }
-  
+
   if ( ni == 3 ) {
     // pat0 のエントリを探す．
     ymuint32 id0;
@@ -177,7 +175,7 @@ search_aigtable(ymuint32 ni,
     }
     return false;
   }
-  
+
   assert_not_reached(__FILE__, __LINE__);
   return false;
 }
@@ -188,7 +186,7 @@ search_aigtable(ymuint32 ni,
 EnumPat::EnumPat()
 {
   for (ymuint32 i = 0; i < 3; ++ i) {
-    mInput[i] = mAigMgr.make_input();
+    mInput[i] = mAigMgr.make_input(VarId(i));
   }
 }
 
@@ -198,13 +196,13 @@ EnumPat::~EnumPat()
 }
 
 // pat を実現するパタンのリストを列挙する．
-AigHandle
+Aig
 EnumPat::enum_pat2(ymuint32 pat,
 		   const vector<ymuint32>& vmap)
 {
-  AigHandle input0 = mInput[vmap[0]];
-  AigHandle input1 = mInput[vmap[1]];
-  
+  Aig input0 = mInput[vmap[0]];
+  Aig input1 = mInput[vmap[1]];
+
   switch ( pat ) {
   case 0x0: return mAigMgr.make_zero();
   case 0x1: return mAigMgr.make_and(~input0, ~input1);
@@ -231,13 +229,13 @@ EnumPat::enum_pat2(ymuint32 pat,
 // 分解などで2入力以下に落とせる関数の処理を行う．
 bool
 EnumPat::decomp3(ymuint32 pat,
-		 list<AigHandle>& pat_list)
+		 list<Aig>& pat_list)
 {
   // 各変数に対するコファクターを計算する．
   // ちょっとトリッキー
   ymuint32 pat0[3];
   ymuint32 pat1[3];
-  
+
   ymuint32 tmp;
 
   tmp = pat & 0x55U;        // 0x2x4x6x
@@ -246,7 +244,7 @@ EnumPat::decomp3(ymuint32 pat,
   tmp |= (tmp >> 2);        // 024646xx
   tmp &= 0x0FU;             // 0246xxxx
   pat0[0] = tmp;
-  
+
   tmp = (pat >> 1) & 0x55U; // 1x3x5x7x
   tmp |= (tmp >> 1);        // 1335577x
   tmp &= 0x33U;             // 13xx57xx
@@ -269,7 +267,7 @@ EnumPat::decomp3(ymuint32 pat,
 
   tmp = (pat >> 4) & 0x0FU; // 4567xxxx
   pat1[2] = tmp;
-  
+
   if ( 0 ) {
     cout << "step1(";
     dump_pat(cout, 3, pat);
@@ -290,7 +288,7 @@ EnumPat::decomp3(ymuint32 pat,
     dump_pat(cout, 2, pat1[2]);
     cout << endl;
   }
-  
+
   for (ymuint32 i = 0; i < 3; ++ i) {
     if ( pat0[i] == pat1[i] ) {
       // i 番めの変数と無関係
@@ -300,11 +298,11 @@ EnumPat::decomp3(ymuint32 pat,
 	  vmap.push_back(j);
 	}
       }
-      AigHandle pat = enum_pat2(pat0[i], vmap);
+      Aig pat = enum_pat2(pat0[i], vmap);
       pat_list.push_back(pat);
       return true;
     }
-    
+
     if ( pat0[i] == 0x0U ) {
       if ( pat1[i] == 0xFU ) {
 	// xi
@@ -318,12 +316,12 @@ EnumPat::decomp3(ymuint32 pat,
 	  vmap.push_back(j);
 	}
       }
-      AigHandle tmp = enum_pat2(pat1[i], vmap);
-      AigHandle pat = mAigMgr.make_and(mInput[i], tmp);
+      Aig tmp = enum_pat2(pat1[i], vmap);
+      Aig pat = mAigMgr.make_and(mInput[i], tmp);
       pat_list.push_back(pat);
       return true;
     }
-    
+
     if ( pat0[i] == 0xFU ) {
       if ( pat1[i] == 0x0U ) {
 	// xi'
@@ -337,12 +335,12 @@ EnumPat::decomp3(ymuint32 pat,
 	  vmap.push_back(j);
 	}
       }
-      AigHandle tmp = enum_pat2(pat1[i], vmap);
-      AigHandle pat = mAigMgr.make_or(~mInput[i], tmp);
+      Aig tmp = enum_pat2(pat1[i], vmap);
+      Aig pat = mAigMgr.make_or(~mInput[i], tmp);
       pat_list.push_back(pat);
       return true;
     }
-    
+
     if ( pat1[i] == 0x0U ) {
       // xi' & f_xi'
       vector<ymuint32> vmap;
@@ -351,12 +349,12 @@ EnumPat::decomp3(ymuint32 pat,
 	  vmap.push_back(j);
 	}
       }
-      AigHandle tmp = enum_pat2(pat0[i], vmap);
-      AigHandle pat = mAigMgr.make_and(~mInput[i], tmp);
+      Aig tmp = enum_pat2(pat0[i], vmap);
+      Aig pat = mAigMgr.make_and(~mInput[i], tmp);
       pat_list.push_back(pat);
       return true;
     }
-    
+
     if ( pat1[i] == 0xFU ) {
       // xi | f_xi'
       vector<ymuint32> vmap;
@@ -365,12 +363,12 @@ EnumPat::decomp3(ymuint32 pat,
 	  vmap.push_back(j);
 	}
       }
-      AigHandle tmp = enum_pat2(pat0[i], vmap);
-      AigHandle pat = mAigMgr.make_or(mInput[i], tmp);
+      Aig tmp = enum_pat2(pat0[i], vmap);
+      Aig pat = mAigMgr.make_or(mInput[i], tmp);
       pat_list.push_back(pat);
       return true;
     }
-    
+
     if ( pat0[i] == (pat1[i] ^ 0xFU) ) {
       // xi xor f_xi'
       vector<ymuint32> vmap;
@@ -379,8 +377,8 @@ EnumPat::decomp3(ymuint32 pat,
 	  vmap.push_back(j);
 	}
       }
-      AigHandle tmp = enum_pat2(pat0[i], vmap);
-      AigHandle pat = mAigMgr.make_xor(mInput[0], tmp);
+      Aig tmp = enum_pat2(pat0[i], vmap);
+      Aig pat = mAigMgr.make_xor(mInput[0], tmp);
       pat_list.push_back(pat);
       return true;
     }
@@ -393,10 +391,10 @@ EnumPat::decomp3(ymuint32 pat,
 void
 EnumPat::try_anddecomp(ymuint32 pat,
 		       list<ymuint32>& parent_list,
-		       list<AigHandle>& pat_list)
+		       list<Aig>& pat_list)
 {
   ymuint32 nip = (1U << 3);
-  
+
   // 0の位置を pos_array に入れる．
   // ただし最初の要素だけ pos0 に入れる．
   ymuint32 pos0 = 0;
@@ -416,7 +414,7 @@ EnumPat::try_anddecomp(ymuint32 pat,
   }
   ymuint32 n = pos_array.size();
   assert_cond(n > 0, __FILE__, __LINE__);
-  
+
   ymuint32 np = 1U << n;
   for (ymuint32 p = 0U; p < np; ++ p) {
     ymuint32 pat_a = (1U << pos0);
@@ -426,7 +424,7 @@ EnumPat::try_anddecomp(ymuint32 pat,
       }
     }
     pat_a ^= 0xFF;
-    
+
     // pat_a が parent_list に含まれていたらスキップする．
     bool found = false;
     for (list<ymuint32>::iterator p = parent_list.begin();
@@ -437,11 +435,11 @@ EnumPat::try_anddecomp(ymuint32 pat,
       }
     }
     if ( found ) continue;
-    
-    list<AigHandle> pat_a_list;
+
+    list<Aig> pat_a_list;
     bool stat1 = enum_pat3(pat_a, parent_list, pat_a_list);
     assert_cond(stat1, __FILE__, __LINE__);
-    
+
     for (ymuint32 q = 1U; q < np; ++ q) {
       ymuint32 pat_b = 0U;
       for (ymuint32 i = 0; i < n; ++ i) {
@@ -450,9 +448,9 @@ EnumPat::try_anddecomp(ymuint32 pat,
 	}
       }
       pat_b ^= 0xFF;
-      
+
       if ( (pat_a & pat_b) != pat ) continue;
-      
+
       // pat_b が parent_list に含まれていたらスキップする．
       bool found = false;
       for (list<ymuint32>::iterator p = parent_list.begin();
@@ -463,18 +461,18 @@ EnumPat::try_anddecomp(ymuint32 pat,
 	}
       }
       if ( found ) continue;
-      
-      list<AigHandle> pat_b_list;
+
+      list<Aig> pat_b_list;
       bool stat2 = enum_pat3(pat_b, parent_list, pat_b_list);
       assert_cond(stat2, __FILE__, __LINE__);
-      
-      for (list<AigHandle>::iterator p = pat_a_list.begin();
+
+      for (list<Aig>::iterator p = pat_a_list.begin();
 	   p != pat_a_list.end(); ++ p) {
-	AigHandle handle1 = *p;
-	for (list<AigHandle>::iterator q = pat_b_list.begin();
+	Aig handle1 = *p;
+	for (list<Aig>::iterator q = pat_b_list.begin();
 	     q != pat_b_list.end(); ++ q) {
-	  AigHandle handle2 = *q;
-	  AigHandle pat = mAigMgr.make_and(handle1, handle2);
+	  Aig handle2 = *q;
+	  Aig pat = mAigMgr.make_and(handle1, handle2);
 	  pat_list.push_back(pat);
 	}
       }
@@ -486,10 +484,10 @@ EnumPat::try_anddecomp(ymuint32 pat,
 void
 EnumPat::try_ordecomp(ymuint32 pat,
 		      list<ymuint32>& parent_list,
-		      list<AigHandle>& pat_list)
+		      list<Aig>& pat_list)
 {
   ymuint32 nip = (1U << 3);
-  
+
   // 1の位置を pos_array に入れる．
   // ただし最初の要素だけ pos0 に入れる．
   ymuint32 pos0 = 0;
@@ -509,7 +507,7 @@ EnumPat::try_ordecomp(ymuint32 pat,
   }
   ymuint32 n = pos_array.size();
   assert_cond(n > 0, __FILE__, __LINE__);
-  
+
   ymuint32 np = 1U << n;
   for (ymuint32 p = 0U; p < np; ++ p) {
     ymuint32 pat_a = (1U << pos0);
@@ -528,11 +526,11 @@ EnumPat::try_ordecomp(ymuint32 pat,
       }
     }
     if ( found ) continue;
-    
-    list<AigHandle> pat_a_list;
+
+    list<Aig> pat_a_list;
     bool stat1 = enum_pat3(pat_a, parent_list, pat_a_list);
     assert_cond(stat1, __FILE__, __LINE__);
-    
+
     for (ymuint32 q = 1U; q < np; ++ q) {
       ymuint32 pat_b = 0U;
       for (ymuint32 i = 0; i < n; ++ i) {
@@ -541,7 +539,7 @@ EnumPat::try_ordecomp(ymuint32 pat,
 	}
       }
       if ( (pat_a | pat_b) != pat ) continue;
-      
+
       // pat_b が parent_list に含まれていたらスキップする．
       bool found = false;
       for (list<ymuint32>::iterator p = parent_list.begin();
@@ -552,18 +550,18 @@ EnumPat::try_ordecomp(ymuint32 pat,
 	}
       }
       if ( found ) continue;
-      
-      list<AigHandle> pat_b_list;
+
+      list<Aig> pat_b_list;
       bool stat2 = enum_pat3(pat_b, parent_list, pat_b_list);
       assert_cond(stat2, __FILE__, __LINE__);
-      
-      for (list<AigHandle>::iterator p = pat_a_list.begin();
+
+      for (list<Aig>::iterator p = pat_a_list.begin();
 	   p != pat_a_list.end(); ++ p) {
-	AigHandle handle1 = *p;
-	for (list<AigHandle>::iterator q = pat_b_list.begin();
+	Aig handle1 = *p;
+	for (list<Aig>::iterator q = pat_b_list.begin();
 	     q != pat_b_list.end(); ++ q) {
-	  AigHandle handle2 = *q;
-	  AigHandle pat = mAigMgr.make_or(handle1, handle2);
+	  Aig handle2 = *q;
+	  Aig pat = mAigMgr.make_or(handle1, handle2);
 	  pat_list.push_back(pat);
 	}
       }
@@ -574,10 +572,10 @@ EnumPat::try_ordecomp(ymuint32 pat,
 void
 EnumPat::try_xordecomp(ymuint32 pat,
 		       list<ymuint32>& parent_list,
-		       list<AigHandle>& pat_list)
+		       list<Aig>& pat_list)
 {
   ymuint32 nip = (1U << 3);
-  
+
   // 1の位置を pos_array に入れる．
   // ただし最初の要素だけ pos0 に入れる．
   ymuint32 pos0 = 0;
@@ -596,10 +594,10 @@ EnumPat::try_xordecomp(ymuint32 pat,
   }
   ymuint32 n = pos_array.size();
   assert_cond(n > 0, __FILE__, __LINE__);
-  
+
   for (ymuint32 p = 0U; p < nip; ++ p) {
     ymuint32 pat_a = (1U << pos0) | p;
-    
+
     // pat_a が parent_list に含まれていたらスキップする．
     bool found = false;
     for (list<ymuint32>::iterator p = parent_list.begin();
@@ -610,13 +608,13 @@ EnumPat::try_xordecomp(ymuint32 pat,
       }
     }
     if ( found ) continue;
-    
-    list<AigHandle> pat_a_list;
+
+    list<Aig> pat_a_list;
     bool stat1 = enum_pat3(pat_a, parent_list, pat_a_list);
     assert_cond(stat1, __FILE__, __LINE__);
-    
+
     ymuint32 pat_b = pat ^ pat_a;
-      
+
     // pat_b が parent_list に含まれていたらスキップする．
     found = false;
     for (list<ymuint32>::iterator p = parent_list.begin();
@@ -627,18 +625,18 @@ EnumPat::try_xordecomp(ymuint32 pat,
       }
     }
     if ( found ) continue;
-      
-    list<AigHandle> pat_b_list;
+
+    list<Aig> pat_b_list;
     bool stat2 = enum_pat3(pat_b, parent_list, pat_b_list);
     assert_cond(stat2, __FILE__, __LINE__);
-      
-    for (list<AigHandle>::iterator p = pat_a_list.begin();
+
+    for (list<Aig>::iterator p = pat_a_list.begin();
 	 p != pat_a_list.end(); ++ p) {
-      AigHandle handle1 = *p;
-      for (list<AigHandle>::iterator q = pat_b_list.begin();
+      Aig handle1 = *p;
+      for (list<Aig>::iterator q = pat_b_list.begin();
 	   q != pat_b_list.end(); ++ q) {
-	AigHandle handle2 = *q;
-	AigHandle pat = mAigMgr.make_or(handle1, handle2);
+	Aig handle2 = *q;
+	Aig pat = mAigMgr.make_or(handle1, handle2);
 	pat_list.push_back(pat);
       }
     }
@@ -648,7 +646,7 @@ EnumPat::try_xordecomp(ymuint32 pat,
 bool
 EnumPat::enum_pat3(ymuint32 pat,
 		   list<ymuint32>& parent_list,
-		   list<AigHandle>& pat_list)
+		   list<Aig>& pat_list)
 {
   bool stat = decomp3(pat, pat_list);
   if ( stat ) {
@@ -656,20 +654,20 @@ EnumPat::enum_pat3(ymuint32 pat,
     //verify(3, pat, aig3table[id]);
     return true;
   }
-  
+
   parent_list.push_back(pat);
-  
+
   // AND 分解を試す．
   try_anddecomp(pat, parent_list, pat_list);
-  
+
   // OR 分解を試す．
   try_ordecomp(pat, parent_list, pat_list);
-  
+
   // XOR 分解を試す．
   try_xordecomp(pat, parent_list, pat_list);
-  
+
   parent_list.pop_back();
-  
+
   return !pat_list.empty();
 }
 
@@ -732,7 +730,7 @@ void
 init_table3()
 {
   EnumPat enum_pat;
-  
+
   ymuint32 n_count = 0;
   for (ymuint32 id = 0; ; ++ id) {
     ymuint32 pat = npn3rep[id];
@@ -740,7 +738,7 @@ init_table3()
       break;
     }
     list<ymuint32> parent_list;
-    list<AigHandle> pat_list;
+    list<Aig> pat_list;
     bool stat = enum_pat.enum_pat3(pat, parent_list, pat_list);
     if ( stat ) {
       // 見つかった．
@@ -755,7 +753,7 @@ init_table3()
       continue;
     }
   }
-  
+
 #if 0
   for (ymuint32 pat = 0U; pat < 256U; ++ pat) {
     AigTemplate templ;
@@ -779,6 +777,6 @@ main(int argc,
   using namespace nsYm;
 
   init_table3();
-  
+
   return 0;
 }

@@ -1,7 +1,7 @@
-#ifndef YM_AIG_AIG_NSDEF_H
-#define YM_AIG_AIG_NSDEF_H
+#ifndef YM_LOGIC_AIG_NSDEF_H
+#define YM_LOGIC_AIG_NSDEF_H
 
-/// @file ym_aig/aig_nsdef.h
+/// @file ym_logic/aig_nsdef.h
 /// @brief AIG パッケージ用の名前空間の定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -26,7 +26,7 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_AIG
 
 class AigMgr;
-class AigHandle;
+class Aig;
 class AigNode;
 
 class AigSatMgr;
@@ -37,11 +37,11 @@ END_NAMESPACE_YM_AIG
 BEGIN_NAMESPACE_YM
 
 using nsAig::AigMgr;
-using nsAig::AigHandle;
+using nsAig::Aig;
 using nsAig::AigNode;
 
 using nsAig::AigSatMgr;
 
 END_NAMESPACE_YM
 
-#endif // YM_AIG_AIG_NSDEF_H
+#endif // YM_LOGIC_AIG_NSDEF_H

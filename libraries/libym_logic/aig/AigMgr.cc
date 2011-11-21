@@ -1,16 +1,14 @@
 
-/// @file libym_aig/AigMgr.cc
+/// @file AigMgr.cc
 /// @brief AigMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: AigMgr.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_aig/AigMgr.h"
-#include "ym_aig/AigNode.h"
+#include "ym_logic/AigMgr.h"
+#include "AigNode.h"
 #include "AigMgrImpl.h"
 
 
@@ -40,11 +38,10 @@ AigMgr::input_num() const
 }
 
 // @brief 入力ノードを取り出す．
-// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
-AigNode*
-AigMgr::input_node(ymuint pos) const
+const AigNode*
+AigMgr::input_node(VarId id) const
 {
-  return mImpl->input_node(pos);
+  return mImpl->input_node(id);
 }
 
 // @brief ノード数を得る．
@@ -57,7 +54,7 @@ AigMgr::node_num() const
 // @brief ノードを取り出す．
 // @param[in] pos ノード番号 ( 0 <= pos < input_num() )
 // @note ANDノードの他に入力ノードも含まれる．
-AigNode*
+const AigNode*
 AigMgr::node(ymuint pos) const
 {
   return mImpl->node(pos);
@@ -84,10 +81,10 @@ dfs(ostream& s,
     s << "Input#" << node->input_id() << endl;
   }
   else {
-    s << "And(" << node->fanin0_handle() << ", "
-      << node->fanin1_handle() << ")" << endl;
-    dfs(s, node->fanin0(), mark);
-    dfs(s, node->fanin1(), mark);
+    s << "And(" << node->fanin0() << ", "
+      << node->fanin1() << ")" << endl;
+    dfs(s, node->fanin0_node(), mark);
+    dfs(s, node->fanin1_node(), mark);
   }
 }
 
@@ -98,13 +95,13 @@ END_NONAMESPACE
 // @param[in] handle_list 対象のハンドルのリスト
 void
 AigMgr::dump_handles(ostream& s,
-		     const list<AigHandle>& handle_list) const
+		     const list<Aig>& handle_list) const
 {
   ymuint i = 0;
   hash_set<ymuint> mark;
-  for (list<AigHandle>::const_iterator p = handle_list.begin();
+  for (list<Aig>::const_iterator p = handle_list.begin();
        p != handle_list.end(); ++ p) {
-    AigHandle handle = *p;
+    Aig handle = *p;
     s << "Root#" << i << ": " << handle << endl;
     ++ i;
     dfs(s, handle.node(), mark);
@@ -112,44 +109,45 @@ AigMgr::dump_handles(ostream& s,
 }
 
 // @brief 定数0関数をつくる．
-AigHandle
+Aig
 AigMgr::make_zero()
 {
   return mImpl->make_zero();
 }
 
 // @brief 定数1関数をつくる．
-AigHandle
+Aig
 AigMgr::make_one()
 {
   return mImpl->make_one();
 }
 
 // @brief 外部入力を作る．
-AigHandle
-AigMgr::make_input()
+// @param[in] id 入力番号
+Aig
+AigMgr::make_input(VarId id)
 {
-  return mImpl->make_input();
+  return mImpl->make_input(id);
 }
 
 // @brief AND ノードを作る．
-AigHandle
-AigMgr::make_and(AigHandle handle1,
-		 AigHandle handle2)
+Aig
+AigMgr::make_and(Aig handle1,
+		 Aig handle2)
 {
   return mImpl->make_and(handle1, handle2);
 }
 
 // @brief 複数のノードの AND を取る．
 // @param[in] edge_list 入力の AIG ハンドルのリスト
-AigHandle
-AigMgr::make_and(const vector<AigHandle>& edge_list)
+Aig
+AigMgr::make_and(const vector<Aig>& edge_list)
 {
   ymuint n = edge_list.size();
   if ( n == 0 ) {
     return make_one();
   }
-  AigHandle ans = edge_list[0];
+  Aig ans = edge_list[0];
   for (ymuint i = 1; i < n; ++ i) {
     ans = make_and(ans, edge_list[i]);
   }
@@ -158,14 +156,14 @@ AigMgr::make_and(const vector<AigHandle>& edge_list)
 
 // @brief 複数のノードの AND を取る．
 // @param[in] edge_list 入力の AIG ハンドルのリスト
-AigHandle
-AigMgr::make_and(const list<AigHandle>& edge_list)
+Aig
+AigMgr::make_and(const list<Aig>& edge_list)
 {
   if ( edge_list.empty() ) {
     return make_one();
   }
-  list<AigHandle>::const_iterator p = edge_list.begin();
-  AigHandle ans = *p;
+  list<Aig>::const_iterator p = edge_list.begin();
+  Aig ans = *p;
   for (++ p ; p != edge_list.end(); ++ p) {
     ans = make_and(ans, *p);
   }
@@ -174,14 +172,14 @@ AigMgr::make_and(const list<AigHandle>& edge_list)
 
 // @brief 複数のノードの OR を取る．
 // @param[in] edge_list 入力の AIG ハンドルのリスト
-AigHandle
-AigMgr::make_or(const vector<AigHandle>& edge_list)
+Aig
+AigMgr::make_or(const vector<Aig>& edge_list)
 {
   ymuint n = edge_list.size();
   if ( n == 0 ) {
     return make_zero();
   }
-  AigHandle ans = edge_list[0];
+  Aig ans = edge_list[0];
   for (ymuint i = 1; i < n; ++ i) {
     ans = make_or(ans, edge_list[i]);
   }
@@ -190,14 +188,14 @@ AigMgr::make_or(const vector<AigHandle>& edge_list)
 
 // @brief 複数のノードの OR を取る．
 // @param[in] edge_list 入力の AIG ハンドルのリスト
-AigHandle
-AigMgr::make_or(const list<AigHandle>& edge_list)
+Aig
+AigMgr::make_or(const list<Aig>& edge_list)
 {
   if ( edge_list.empty() ) {
     return make_zero();
   }
-  list<AigHandle>::const_iterator p = edge_list.begin();
-  AigHandle ans = *p;
+  list<Aig>::const_iterator p = edge_list.begin();
+  Aig ans = *p;
   for (++ p ; p != edge_list.end(); ++ p) {
     ans = make_or(ans, *p);
   }
@@ -206,14 +204,14 @@ AigMgr::make_or(const list<AigHandle>& edge_list)
 
 // @brief 複数のノードの XOR を取る．
 // @param[in] edge_list 入力の AIG ハンドルのリスト
-AigHandle
-AigMgr::make_xor(const vector<AigHandle>& edge_list)
+Aig
+AigMgr::make_xor(const vector<Aig>& edge_list)
 {
   ymuint n = edge_list.size();
   if ( n == 0 ) {
     return make_zero();
   }
-  AigHandle ans = edge_list[0];
+  Aig ans = edge_list[0];
   for (ymuint i = 1; i < n; ++ i) {
     ans = make_xor(ans, edge_list[i]);
   }
@@ -222,14 +220,14 @@ AigMgr::make_xor(const vector<AigHandle>& edge_list)
 
 // @brief 複数のノードの XOR を取る．
 // @param[in] edge_list 入力の AIG ハンドルのリスト
-AigHandle
-AigMgr::make_xor(const list<AigHandle>& edge_list)
+Aig
+AigMgr::make_xor(const list<Aig>& edge_list)
 {
   if ( edge_list.empty() ) {
     return make_zero();
   }
-  list<AigHandle>::const_iterator p = edge_list.begin();
-  AigHandle ans = *p;
+  list<Aig>::const_iterator p = edge_list.begin();
+  Aig ans = *p;
   for (++ p ; p != edge_list.end(); ++ p) {
     ans = make_xor(ans, *p);
   }
@@ -237,9 +235,11 @@ AigMgr::make_xor(const list<AigHandle>& edge_list)
 }
 
 // @brief 論理式に対応するノード(木)をつくる．
-AigHandle
+// @param[in] expr 対象の論理式
+// @param[in] input_map 入力とAIGの対応表
+Aig
 AigMgr::make_logic(const LogExpr& expr,
-		   const vector<AigHandle>& inputs)
+		   const hash_map<VarId, Aig>& input_map)
 {
   if ( expr.is_zero() ) {
     return make_zero();
@@ -248,36 +248,44 @@ AigMgr::make_logic(const LogExpr& expr,
     return make_one();
   }
   if ( expr.is_posiliteral() ) {
-    tVarId id = expr.varid();
-    assert_cond(id < inputs.size(), __FILE__, __LINE__);
-    return inputs[id];
+    VarId id = expr.varid();
+    hash_map<VarId, Aig>::const_iterator p = input_map.find(id);
+    if ( p != input_map.end() ) {
+      return p->second;
+    }
+    // なかったらそのままの入力ノードに変換する．
+    return make_input(id);
   }
   if ( expr.is_negaliteral() ) {
-    tVarId id = expr.varid();
-    assert_cond(id < inputs.size(), __FILE__, __LINE__);
-    return ~inputs[id];
+    VarId id = expr.varid();
+    hash_map<VarId, Aig>::const_iterator p = input_map.find(id);
+    if ( p != input_map.end() ) {
+      return ~p->second;
+    }
+    // なかったらそのままの入力ノードに変換する．
+    return ~make_input(id);
   }
   if ( expr.is_and() ) {
     ymuint n = expr.child_num();
-    vector<AigHandle> tmp_list(n);
+    vector<Aig> tmp_list(n);
     for (ymuint i = 0; i < n; ++ i) {
-      tmp_list[i] = make_logic(expr.child(i), inputs);
+      tmp_list[i] = make_logic(expr.child(i), input_map);
     }
     return make_and(tmp_list);
   }
   if ( expr.is_or() ) {
     ymuint n = expr.child_num();
-    vector<AigHandle> tmp_list(n);
+    vector<Aig> tmp_list(n);
     for (ymuint i = 0; i < n; ++ i) {
-      tmp_list[i] = make_logic(expr.child(i), inputs);
+      tmp_list[i] = make_logic(expr.child(i), input_map);
     }
     return make_or(tmp_list);
   }
   if ( expr.is_xor() ) {
     ymuint n = expr.child_num();
-    vector<AigHandle> tmp_list(n);
+    vector<Aig> tmp_list(n);
     for (ymuint i = 0; i < n; ++ i) {
-      tmp_list[i] = make_logic(expr.child(i), inputs);
+      tmp_list[i] = make_logic(expr.child(i), input_map);
     }
     return make_xor(tmp_list);
   }
@@ -289,9 +297,9 @@ AigMgr::make_logic(const LogExpr& expr,
 // @param[in] edge 対象の AIG ハンドル
 // @param[in] id コファクターをとる変数番号
 // @param[in] pol 極性
-AigHandle
-AigMgr::make_cofactor(AigHandle edge,
-		      ymuint id,
+Aig
+AigMgr::make_cofactor(Aig edge,
+		      VarId id,
 		      tPol pol)
 {
   if ( edge.is_const() ) {
@@ -300,7 +308,7 @@ AigMgr::make_cofactor(AigHandle edge,
   }
 
   AigNode* node = edge.node();
-  AigHandle ans;
+  Aig ans;
   if ( node->is_input() ) {
     // 入力ノード時は番号が id どうかで処理が変わる．
     if ( node->input_id() == id ) {
@@ -312,15 +320,15 @@ AigMgr::make_cofactor(AigHandle edge,
       }
     }
     else {
-      ans = AigHandle(node, false);
+      ans = Aig(node, false);
     }
   }
   else {
     // AND ノードの場合
     // 2つの子供に再帰的な処理を行って結果の AND を計算する．
-    AigHandle new_handle0 = make_cofactor(node->fanin0_handle(), id, pol);
-    AigHandle new_handle1 = make_cofactor(node->fanin1_handle(), id, pol);
-    AigHandle ans = make_and(new_handle0, new_handle1);
+    Aig new_handle0 = make_cofactor(node->fanin0(), id, pol);
+    Aig new_handle1 = make_cofactor(node->fanin1(), id, pol);
+    Aig ans = make_and(new_handle0, new_handle1);
   }
   if ( edge.inv() ) {
     ans = ~ans;

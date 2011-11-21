@@ -26,13 +26,6 @@ AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 
-LIBYM_AIG = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_aig/libym_aig.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_sat/libym_sat.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-
 noinst_PROGRAMS = \
 	bnet2aig \
 	genpat \
@@ -44,7 +37,7 @@ bnet2aig_SOURCES = \
 
 bnet2aig_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(LIBYM_AIG)
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
 
 genpat_SOURCES = \
 	GpNode.h \
@@ -52,7 +45,7 @@ genpat_SOURCES = \
 	genpat.cc
 
 genpat_LDADD = \
-	$(LIBYM_AIG)
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
 
 genpat2_SOURCES = \
 	genpat2.cc
@@ -63,4 +56,4 @@ enum_pat3_SOURCES = \
 	enum_pat3.cc
 
 enum_pat3_LDADD = \
-	$(LIBYM_AIG)
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la

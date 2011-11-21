@@ -1,7 +1,7 @@
-#ifndef YM_AIG_AIGSATMGR_H
-#define YM_AIG_AIGSATMGR_H
+#ifndef YM_LOGIC_AIGSATMGR_H
+#define YM_LOGIC_AIGSATMGR_H
 
-/// @file ym_aig/AigSatMgr.h
+/// @file ym_logic/AigSatMgr.h
 /// @brief AigSatMgrのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_aig/AigHandle.h"
-#include "ym_sat/SatSolver.h"
+#include "ym_logic/Aig.h"
+#include "ym_logic/SatSolver.h"
 
 
 #error "Who need this?"
@@ -18,7 +18,7 @@
 BEGIN_NAMESPACE_YM_AIG
 
 //////////////////////////////////////////////////////////////////////
-/// @class AigSatMgr AigSatMgr.h "ym_aig/AigSatMgr.h"
+/// @class AigSatMgr AigSatMgr.h "ym_logic/AigSatMgr.h"
 /// @brief AIG 上の充足可能性判定器
 //////////////////////////////////////////////////////////////////////
 class AigSatMgr
@@ -26,7 +26,7 @@ class AigSatMgr
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] aitmgr AigMgr
+  /// @param[in] aigmgr AigMgr
   /// @param[in] solver SAT-solver
   AigSatMgr(AigMgr& aigmgr,
 	    SatSolver& solver);
@@ -47,7 +47,7 @@ public:
   /// @retval kB3True 充足可能
   /// @retval kB3X 不明
   Bool3
-  sat(AigHandle edge,
+  sat(Aig edge,
       vector<Bool3>& model);
 
   /// @brief SAT 問題を解く．
@@ -57,7 +57,7 @@ public:
   /// @retval kB3True 充足可能
   /// @retval kB3X 不明
   Bool3
-  sat(const vector<AigHandle>& edge_list,
+  sat(const vector<Aig>& edge_list,
       vector<Bool3>& model);
 
 
@@ -76,4 +76,4 @@ private:
 
 END_NAMESPACE_YM_AIG
 
-#endif // YM_AIG_AIGMGR_H
+#endif // YM_LOGIC_AIGMGR_H

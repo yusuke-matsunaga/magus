@@ -6,6 +6,7 @@ SUBDIRS = \
 	bdd \
 	expr \
 	npn \
-	sat
+	sat \
+	aig
 
 MAINTAINERCLEANFILES = Makefile.in

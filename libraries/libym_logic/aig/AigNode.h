@@ -1,7 +1,7 @@
-#ifndef LIBYM_AIG_AIGNODE_H
-#define LIBYM_AIG_AIGNODE_H
+#ifndef AIGNODE_H
+#define AIGNODE_H
 
-/// @file libym_aig/AigNode.h
+/// @file AigNode.h
 /// @brief AigNodeのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,13 +9,13 @@
 /// All rights reserved.
 
 
-#include "ym_aig/AigHandle.h"
+#include "ym_logic/Aig.h"
 
 
 BEGIN_NAMESPACE_YM_AIG
 
 //////////////////////////////////////////////////////////////////////
-/// @class AigNode AigNode.h "ym_aig/AigNode.h"
+/// @class AigNode AigNode.h "AigNode.h"
 /// @brief ノードを表すクラス
 //////////////////////////////////////////////////////////////////////
 class AigNode
@@ -52,7 +52,7 @@ public:
 
   /// @brief 外部入力ノードのときの入力番号を返す．
   /// @note is_input() の時のみ意味を持つ．
-  ymuint
+  VarId
   input_id() const;
 
 
@@ -64,15 +64,15 @@ public:
   /// @brief pos で指示されたファンインのノードを得る．
   /// @note pos は 0 か 1 でなければならない．
   AigNode*
-  fanin(ymuint pos) const;
+  fanin_node(ymuint pos) const;
 
   /// @brief fanin0 のノードを得る．
   AigNode*
-  fanin0() const;
+  fanin0_node() const;
 
   /// @brief fanin1 のノードを得る．
   AigNode*
-  fanin1() const;
+  fanin1_node() const;
 
   /// @brief pos で指示されたファンインの極性を得る．
   /// @note pos は 0 か 1 でなければならない．
@@ -89,16 +89,16 @@ public:
 
   /// @brief pos で指示されたファンインのハンドルを得る．
   /// @note pos は 0 か 1 でなければならない．
-  AigHandle
-  fanin_handle(ymuint pos) const;
+  Aig
+  fanin(ymuint pos) const;
 
   /// @brief fanin0 のハンドルを得る．
-  AigHandle
-  fanin0_handle() const;
+  Aig
+  fanin0() const;
 
   /// @brief fanin1 のハンドルを得る．
-  AigHandle
-  fanin1_handle() const;
+  Aig
+  fanin1() const;
 
 
 private:
@@ -109,13 +109,13 @@ private:
   /// @brief 入力タイプに設定する．
   /// @param[in] input_id 入力番号
   void
-  set_input(ymuint input_id);
+  set_input(VarId input_id);
 
   /// @brief ANDタイプに設定する．
   /// @param[in] fanin0, fanin1 ファンインのハンドル
   void
-  set_and(AigHandle fanin0,
-	  AigHandle fanin1);
+  set_and(Aig fanin0,
+	  Aig fanin1);
 
 
 private:
@@ -127,7 +127,7 @@ private:
   ymuint32 mFlags;
 
   // ファンインの枝の配列
-  AigHandle mFanins[2];
+  Aig mFanins[2];
 
   // ハッシュ用のリンクポインタ
   AigNode* mLink;
@@ -180,25 +180,25 @@ AigNode::node_id() const
 // @brief 外部入力ノードのときの入力番号を返す．
 // @note is_input() の時のみ意味を持つ．
 inline
-ymuint
+VarId
 AigNode::input_id() const
 {
-  return mFanins[0].mPackedData;
+  return VarId(mFanins[0].mPackedData);
 }
 
 // pos で指示されたファンインのノードを得る．
 // pos は 0 か 1 でなければならない．
 inline
 AigNode*
-AigNode::fanin(ymuint pos) const
+AigNode::fanin_node(ymuint pos) const
 {
-  return mFanins[pos].node();
+  return mFanins[pos & 1U].node();
 }
 
 // fanin0 のノードを得る．
 inline
 AigNode*
-AigNode::fanin0() const
+AigNode::fanin0_node() const
 {
   return mFanins[0].node();
 }
@@ -206,7 +206,7 @@ AigNode::fanin0() const
 // fanin1 のノードを得る．
 inline
 AigNode*
-AigNode::fanin1() const
+AigNode::fanin1_node() const
 {
   return mFanins[1].node();
 }
@@ -217,7 +217,7 @@ inline
 bool
 AigNode::fanin_inv(ymuint pos) const
 {
-  return mFanins[pos].inv();
+  return mFanins[pos & 1U].inv();
 }
 
 // fanin0 の極性を得る．
@@ -239,28 +239,28 @@ AigNode::fanin1_inv() const
 // @brief pos で指示されたファンインのハンドルを得る．
 // @note pos は 0 か 1 でなければならない．
 inline
-AigHandle
-AigNode::fanin_handle(ymuint pos) const
+Aig
+AigNode::fanin(ymuint pos) const
 {
-  return mFanins[pos];
+  return mFanins[pos & 1U];
 }
 
 // @brief fanin0 のハンドルを得る．
 inline
-AigHandle
-AigNode::fanin0_handle() const
+Aig
+AigNode::fanin0() const
 {
   return mFanins[0];
 }
 
 // @brief fanin1 のハンドルを得る．
 inline
-AigHandle
-AigNode::fanin1_handle() const
+Aig
+AigNode::fanin1() const
 {
   return mFanins[1];
 }
 
 END_NAMESPACE_YM_AIG
 
-#endif // LIBYM_AIG_AIGNODE_H
+#endif // AIGNODE_H

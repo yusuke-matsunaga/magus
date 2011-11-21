@@ -5,10 +5,7 @@
 ## $Revision: 1.2 $
 ## $Date: 2006/02/21 18:04:13 $
 
-SUBDIRS = \
-	ym_aig \
-	. \
-	tests
+SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -17,31 +14,31 @@ MAINTAINERCLEANFILES = Makefile.in
 ## Variables for building targets
 ############################################################
 
-noinst_LTLIBRARIES = libym_aig.la
+noinst_LTLIBRARIES = libym_logic_aig.la
 
 
 ############################################################
 ## Variables for building libym_aig.la
 ############################################################
 
-libym_aig_la_CPPFLAGS = \
+libym_logic_aig_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 
-libym_aig_la_SOURCES = \
+libym_logic_aig_la_SOURCES = \
+	AigNode.h \
 	AigNode.cc \
 	AigMgr.cc \
 	AigMgrImpl.h \
-	AigMgrImpl.cc
+	AigMgrImpl.cc \
+	AigSatMgr.cc
 
 #	AigSatData.h \
 #	AigSatMgr.cc \
 #	AigTemplate.h \
 #	AigTemplate.cc
 
-libym_aig_la_LIBADD =
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_sat/libym_sat.la \
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_logic_aig_la_LIBADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_aig_la_LDFLAGS =
+libym_logic_aig_la_LDFLAGS =

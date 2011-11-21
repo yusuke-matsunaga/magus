@@ -1,18 +1,16 @@
 
-/// @file libym_aig/tests/bnet2aig.cc
+/// @file bnet2aig.cc
 /// @brief bnet から aig を作るテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: bnet2aig.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_networks/BNetwork.h"
 #include "ym_networks/BNetBlifReader.h"
-#include "ym_aig/AigMgr.h"
-#include "ym_aig/AigHandle.h"
+#include "ym_logic/AigMgr.h"
+#include "ym_logic/Aig.h"
 
 //#include "ym_aig/AigSatMgr.h"
 //#include "ym_sat/SatSolver.h"
@@ -23,13 +21,13 @@
 
 BEGIN_NAMESPACE_YM
 
-typedef hash_map<BNode*, AigHandle> BNodeMap;
+typedef hash_map<BNode*, Aig> BNodeMap;
 
 BEGIN_NONAMESPACE
 
-// bnode に対応する AigHandle を連想配列 assoc から探す．
+// bnode に対応する Aig を連想配列 assoc から探す．
 // 見つからなかったらアボートする．
-AigHandle
+Aig
 find_node(BNode* bnode,
 	  const BNodeMap& assoc)
 {
@@ -49,10 +47,11 @@ bnet2aig(const BNetwork& network,
   BNodeMap assoc;
 
   // 外部入力を作る．
+  ymuint ipos = 0;
   for (BNodeList::const_iterator p = network.inputs_begin();
-       p != network.inputs_end(); ++p) {
+       p != network.inputs_end(); ++p, ++ ipos) {
     BNode* bnode = *p;
-    AigHandle anode = aig_mgr.make_input();
+    Aig anode = aig_mgr.make_input(VarId(ipos));
     assoc.insert(make_pair(bnode, anode));
   }
 
@@ -60,29 +59,30 @@ bnet2aig(const BNetwork& network,
   // まず入力からのトポロジカル順にソートし buff に入れる．
   BNodeVector node_list;
   network.tsort(node_list);
-  size_t nv = network.logic_node_num();
+  ymuint nv = network.logic_node_num();
   for (size_t i = 0; i < nv; ++ i) {
     BNode* bnode = node_list[i];
-    size_t ni = bnode->ni();
-    vector<AigHandle> ianodes(ni);
-    for (size_t pos = 0; pos < ni; ++ pos) {
-      ianodes[pos] = find_node(bnode->fanin(pos), assoc);
-      cout << "ianodes[" << pos << "] = " << ianodes[pos] << endl;
+    ymuint ni = bnode->ni();
+    hash_map<VarId, Aig> input_map;
+    for (ymuint pos = 0; pos < ni; ++ pos) {
+      Aig iaig = find_node(bnode->fanin(pos), assoc);
+      input_map.insert(make_pair(VarId(pos), iaig));
+      cout << "input_map[" << pos << "] = " << iaig << endl;
     }
     cout << "bnode->func() = " << bnode->func() << endl;
-    AigHandle anode = aig_mgr.make_logic(bnode->func(), ianodes);
+    Aig anode = aig_mgr.make_logic(bnode->func(), input_map);
     cout << "anode = " << anode << endl;
     assoc.insert(make_pair(bnode, anode));
   }
 
   // 外部出力を作る．
-  list<AigHandle> output_handle_list;
+  list<Aig> output_handle_list;
   const BNodeList& output_list = network.outputs();
   for (BNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     BNode* obnode = *p;
     BNode* ibnode = obnode->fanin(0);
-    AigHandle ianode = find_node(ibnode, assoc);
+    Aig ianode = find_node(ibnode, assoc);
     output_handle_list.push_back(ianode);
   }
 
@@ -91,7 +91,7 @@ bnet2aig(const BNetwork& network,
 #if 0
   SatSolver* solver = SatSolverFactory::gen_solver();
   AigSatMgr aigsat(aig_mgr, *solver);
-  AigHandle root = output_handle_list.front();
+  Aig root = output_handle_list.front();
   vector<Bool3> model;
   Bool3 stat = aigsat.sat(root, model);
 #endif
@@ -119,8 +119,8 @@ main(int argc,
     MsgMgr::reg_handler(msg_handler);
 
     BNetwork network;
-    BNetBlifReader reader;
-    if ( !reader.read(filename, network) ) {
+    BNetBlifReader read;
+    if ( !read(filename, network) ) {
       cerr << "Error in reading " << filename << endl;
       return 4;
     }
