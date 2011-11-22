@@ -143,6 +143,7 @@ AC_CONFIG_FILES([
 	bnet2aig/Makefile
 	makebdd/Makefile
 	lsim/Makefile
+	svm/Makefile
 	])
 
 
