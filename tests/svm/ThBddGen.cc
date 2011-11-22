@@ -12,6 +12,9 @@
 
 BEGIN_NAMESPACE_YM
 
+static
+bool debug = false;
+
 //////////////////////////////////////////////////////////////////////
 // クラス ThBddGen
 //////////////////////////////////////////////////////////////////////
@@ -75,20 +78,23 @@ ThBddGen::gen_bdd(ymuint pos,
 		  double& lb,
 		  double& ub)
 {
-  cout << "gen_bdd(" << pos << ", " << slack << ")" << endl;
   if ( slack < 0.0 ) {
-    cout << " ==> zero" << endl;
+    if ( debug ) {
+      cout << " ==> one" << endl;
+    }
     lb = DBL_MIN;
-    ub = -1.0;
-    return mBddMgr.make_zero();
+    ub = 0.0;
+    return mBddMgr.make_one();
   }
 
   Weight& w = mWeightArray[pos];
   if ( slack >= w.mAcc ) {
-    cout << " ==> one" << endl;
-    lb = 0;
+    if ( debug ) {
+      cout << " ==> zero" << endl;
+    }
+    lb = 0.0;
     ub = DBL_MAX;
-    return mBddMgr.make_one();
+    return mBddMgr.make_zero();
   }
 
   // 区間検索
@@ -99,33 +105,74 @@ ThBddGen::gen_bdd(ymuint pos,
     if ( cell.mLb <= slack && cell.mUb >= slack ) {
       lb = cell.mLb;
       ub = cell.mUb;
-      cout << " ==> found(" << lb << ", " << ub << ")" << endl;
+      if ( debug ) {
+	cout << " ==> found(" << lb << ", " << ub << ")" << endl;
+      }
       return cell.mBdd;
     }
   }
 
   double weight = w.mWeight;
 
+  if ( debug ) {
+    cout << "gen_bdd0("
+	 << pos + 1
+	 << ", "
+	 << slack << ")"
+	 << endl;
+  }
   double lb0;
   double ub0;
   Bdd f0 = gen_bdd(pos + 1, slack, lb0, ub0);
+  if ( debug ) {
+    cout << "lb0 = " << lb0
+	 << ", ub0 = " << ub0
+	 << endl
+	 << endl;
+  }
 
+  if ( debug ) {
+    cout << "gen_bdd1("
+	 << pos + 1
+	 << ", "
+	 << slack - weight
+	 << ")" << endl;
+  }
   double lb1;
   double ub1;
   Bdd f1 = gen_bdd(pos + 1, slack - weight, lb1, ub1);
-  lb1 += weight;
-  ub1 += weight;
+  if ( lb1 != DBL_MIN ) {
+    lb1 += weight;
+  }
+  if ( ub1 != DBL_MAX ) {
+    ub1 += weight;
+  }
+  if ( debug ) {
+    cout << "lb1 = " << lb1
+	 << ", ub1 = " << ub1
+	 << endl
+	 << endl;
+  }
 
-  lb = ( lb0 >= lb1 ) ? lb0 : lb1;
-  ub = ( ub0 <= ub1 ) ? ub0 : ub1;
-  cout << "pos = " << pos << ", slack = " << slack << endl;
-  cout << "lb = " << lb << endl
-       << " lb0 = " << lb0 << ", lb1 = " << lb1 << endl;
-  cout << "ub = " << ub << endl
-       << " ub0 = " << ub0 << ", ub1 = " << ub1 << endl;
+  lb = lb0;
+  if ( lb1 != DBL_MIN && lb < lb1 ) {
+    lb = lb1;
+  }
+  ub = ub0;
+  if ( ub1 != DBL_MAX && ub > ub1 ) {
+    ub = ub1;
+  }
+
+  if ( debug ) {
+    cout << "pos = " << pos << ", slack = " << slack << endl;
+    cout << "lb = " << lb << endl
+	 << "ub = " << ub << endl
+	 << endl;
+  }
   Bdd f = mBddMgr.make_bdd(VarId(w.mIdx), f0, f1);
 
   itvl_list.push_back(Cell(lb, ub, f));
+  cout << "Level#" << pos << ": " << itvl_list.size() << endl;
 
   return f;
 }
