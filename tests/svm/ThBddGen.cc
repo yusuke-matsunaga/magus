@@ -13,7 +13,7 @@
 BEGIN_NAMESPACE_YM
 
 static
-bool debug = false;
+bool debug = true;
 
 //////////////////////////////////////////////////////////////////////
 // クラス ThBddGen
@@ -58,7 +58,8 @@ ThBddGen::operator()(const vector<double>& weight_array,
 
   for (ymuint i = 0; i < n; ++ i) {
     Weight& w = mWeightArray[i];
-    cout << "IDX: " << w.mIdx
+    cout << "POS: " << i
+	 << "\tIDX: " << w.mIdx
 	 << "\tWEIGHT: " << setw(10) << w.mWeight
 	 << "\tACC: " << setw(10) << w.mAcc
 	 << endl;
@@ -78,6 +79,8 @@ ThBddGen::gen_bdd(ymuint pos,
 		  double& lb,
 		  double& ub)
 {
+  Weight& w = mWeightArray[pos];
+
   if ( slack < 0.0 ) {
     if ( debug ) {
       cout << " ==> one" << endl;
@@ -87,29 +90,26 @@ ThBddGen::gen_bdd(ymuint pos,
     return mBddMgr.make_one();
   }
 
-  Weight& w = mWeightArray[pos];
   if ( slack >= w.mAcc ) {
     if ( debug ) {
       cout << " ==> zero" << endl;
     }
-    lb = 0.0;
+    lb = w.mAcc;
     ub = DBL_MAX;
     return mBddMgr.make_zero();
   }
 
   // 区間検索
-  vector<Cell>& itvl_list = mItvlList[pos];
-  for (vector<Cell>::iterator p = itvl_list.begin();
-       p != itvl_list.end(); ++ p) {
-    Cell& cell = *p;
-    if ( cell.mLb <= slack && cell.mUb >= slack ) {
-      lb = cell.mLb;
-      ub = cell.mUb;
-      if ( debug ) {
-	cout << " ==> found(" << lb << ", " << ub << ")" << endl;
-      }
-      return cell.mBdd;
+  ItvlList& itvl_list = mItvlList[pos];
+  Bdd f;
+  bool found = itvl_list.find(slack, lb, ub, f);
+  if ( found ) {
+    if ( debug ) {
+      cout << " ==> found ("
+	   << lb << ", " << ub << ")"
+	   << endl;
     }
+    return f;
   }
 
   double weight = w.mWeight;
@@ -162,17 +162,21 @@ ThBddGen::gen_bdd(ymuint pos,
   if ( ub1 != DBL_MAX && ub > ub1 ) {
     ub = ub1;
   }
+  assert_cond( lb < ub, __FILE__, __LINE__);
+  cout << "Level#" << pos << ": " << itvl_list.size() << endl
+       << "  [" << lb << ", " << ub << ")" << endl
+       << endl;
 
   if ( debug ) {
     cout << "pos = " << pos << ", slack = " << slack << endl;
     cout << "lb = " << lb << endl
 	 << "ub = " << ub << endl
+	 << "delta = " << ub - lb << endl
 	 << endl;
   }
-  Bdd f = mBddMgr.make_bdd(VarId(w.mIdx), f0, f1);
+  f = mBddMgr.make_bdd(VarId(w.mIdx), f0, f1);
 
-  itvl_list.push_back(Cell(lb, ub, f));
-  cout << "Level#" << pos << ": " << itvl_list.size() << endl;
+  itvl_list.add(lb, ub, f);
 
   return f;
 }

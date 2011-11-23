@@ -58,7 +58,7 @@ struct WeightLT
   operator()(const Weight& left,
 	     const Weight& right)
   {
-    return left.mWeight <= right.mWeight;
+    return left.mWeight < right.mWeight;
   }
 
 };
@@ -76,7 +76,7 @@ struct WeightGT
   operator()(const Weight& left,
 	     const Weight& right)
   {
-    return left.mWeight >= right.mWeight;
+    return left.mWeight > right.mWeight;
   }
 
 };

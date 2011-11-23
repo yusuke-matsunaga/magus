@@ -28,6 +28,8 @@ svm_CPPFLAGS = \
 svm_SOURCES = \
 	svm.cc \
 	Weight.h \
+	ItvlList.h \
+	ItvlList.cc \
 	ThBddGen.h \
 	ThBddGen.cc
 

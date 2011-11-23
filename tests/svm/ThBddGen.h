@@ -13,6 +13,7 @@
 #include "ym_logic/Bdd.h"
 
 #include "Weight.h"
+#include "ItvlList.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -95,9 +96,13 @@ private:
   // 係数の配列
   vector<Weight> mWeightArray;
 
+  // 区間のリストの配列
+  vector<ItvlList> mItvlList;
+
+#if 0
   // 区間のリスト
   vector<vector<Cell> > mItvlList;
-
+#endif
 };
 
 END_NAMESPACE_YM
