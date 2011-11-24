@@ -13,7 +13,7 @@
 BEGIN_NAMESPACE_YM
 
 static
-bool debug = true;
+bool debug = false;
 
 //////////////////////////////////////////////////////////////////////
 // クラス ThBddGen
@@ -162,21 +162,32 @@ ThBddGen::gen_bdd(ymuint pos,
   if ( ub1 != DBL_MAX && ub > ub1 ) {
     ub = ub1;
   }
-  assert_cond( lb < ub, __FILE__, __LINE__);
-  cout << "Level#" << pos << ": " << itvl_list.size() << endl
-       << "  [" << lb << ", " << ub << ")" << endl
-       << endl;
 
   if ( debug ) {
+    double delta = ub - lb;
     cout << "pos = " << pos << ", slack = " << slack << endl;
     cout << "lb = " << lb << endl
 	 << "ub = " << ub << endl
-	 << "delta = " << ub - lb << endl
+	 << "delta = " << delta << endl
 	 << endl;
+    if ( delta < 1e-4 ) {
+      abort();
+    }
   }
+#if 0
   f = mBddMgr.make_bdd(VarId(w.mIdx), f0, f1);
+#else
+  f = mBddMgr.make_bdd(VarId(pos), f0, f1);
+#endif
 
   itvl_list.add(lb, ub, f);
+
+#if 0
+  cout << "Level#" << pos << ": " << itvl_list.size() << endl
+       << "  [" << lb << ", " << ub << ")" << endl;
+  //f.display(cout);
+  cout << endl;
+#endif
 
   return f;
 }

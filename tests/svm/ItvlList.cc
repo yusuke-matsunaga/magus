@@ -110,8 +110,10 @@ ItvlList::add_node(Node* node,
     ptr->mBalance = 0;
     return true;
   }
+#if 0
   cout << "add_node([" << node->mLb << ", " << node->mUb << ") )" << endl
        << "  ptr = [" << ptr->mLb << ", " << ptr->mUb << ")" << endl;
+#endif
   if ( node->mUb <= ptr->mLb ) {
     // 左の部分木に対して挿入を試みる．
     bool chg = add_node(node, ptr->mLchd);
