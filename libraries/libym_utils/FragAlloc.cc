@@ -1,11 +1,9 @@
 
-/// @file libym_utils/FragAlloc.cc
+/// @file FragAlloc.cc
 /// @brief FragAlloc の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: FragAlloc.cc 1052 2007-10-24 11:08:51Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,7 +17,7 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-FragAlloc::FragAlloc(size_t max_size) :
+FragAlloc::FragAlloc(ymuint max_size) :
   mMaxSize(max_size),
   mUsedSize(0),
   mMaxUsedSize(0),
@@ -30,14 +28,14 @@ FragAlloc::FragAlloc(size_t max_size) :
   mMinLogSize = 0;
   for ( ; mMinSize < ALIGNOF_DOUBLE; mMinSize <<= 1, ++ mMinLogSize) ;
   assert_cond(mMinSize == ALIGNOF_DOUBLE, __FILE__, __LINE__);
-  
+
   assert_cond(max_size > 0, __FILE__, __LINE__);
   mMaxPowerSize = 1;
   mMaxLogSize = 0;
   for ( ; mMaxPowerSize < max_size; mMaxPowerSize <<= 1, ++ mMaxLogSize) ;
 
   mBlockListArray = new Block*[mMaxLogSize - mMinLogSize + 1];
-  for (size_t i = mMinLogSize; i <= mMaxLogSize; ++ i ) {
+  for (ymuint i = mMinLogSize; i <= mMaxLogSize; ++ i ) {
     mBlockListArray[i - mMinLogSize] = NULL;
   }
 }
@@ -51,12 +49,12 @@ FragAlloc::~FragAlloc()
 
 // @brief n バイトの領域を確保する．
 void*
-FragAlloc::get_memory(size_t n)
+FragAlloc::get_memory(ymuint n)
 {
   if ( n == 0 ) {
     return NULL;
   }
-  
+
   mUsedSize += n;
   if ( mMaxUsedSize < mUsedSize ) {
     mMaxUsedSize = mUsedSize;
@@ -67,10 +65,10 @@ FragAlloc::get_memory(size_t n)
     ++ mAllocCount;
     return static_cast<void*>(new char[n]);
   }
-  
+
   // 2の巾乗のサイズに整える．
-  size_t alloc_size = mMinSize;
-  size_t pos0 = mMinLogSize;
+  ymuint alloc_size = mMinSize;
+  ymuint pos0 = mMinLogSize;
   while ( alloc_size < n ) {
     alloc_size <<= 1;
     ++ pos0;
@@ -81,7 +79,7 @@ FragAlloc::get_memory(size_t n)
 
 // @brief n バイトの領域を開放する．
 void
-FragAlloc::put_memory(size_t n,
+FragAlloc::put_memory(ymuint n,
 		      void* block)
 {
   if ( n == 0 ) {
@@ -91,14 +89,14 @@ FragAlloc::put_memory(size_t n,
   mUsedSize -= n;
 
   char* cblock = static_cast<char*>(block);
-  
+
   if ( n > mMaxSize ) {
     delete [] cblock;
   }
-  
+
   // 2の巾乗のサイズに整える．
-  size_t alloc_size = mMinSize;
-  size_t pos0 = mMinLogSize;
+  ymuint alloc_size = mMinSize;
+  ymuint pos0 = mMinLogSize;
   while ( alloc_size < n ) {
     alloc_size <<= 1;
     ++ pos0;
@@ -110,7 +108,7 @@ FragAlloc::put_memory(size_t n,
 void
 FragAlloc::destroy()
 {
-  for (size_t i = mMinLogSize; i <= mMaxLogSize; ++ i ) {
+  for (ymuint i = mMinLogSize; i <= mMaxLogSize; ++ i ) {
     mBlockListArray[i - mMinLogSize] = NULL;
   }
   for (list<char*>::iterator p = mAllocList.begin();
@@ -122,7 +120,7 @@ FragAlloc::destroy()
 
 // サイズ 2^p のブロックを確保する．
 char*
-FragAlloc::alloc_block(size_t p)
+FragAlloc::alloc_block(ymuint p)
 {
   char* block = get_block(p);
   if ( block ) {
@@ -146,7 +144,7 @@ FragAlloc::alloc_block(size_t p)
 // サイズ 2^p のブロックがあれば返す．
 // なければ NULL を返す．
 char*
-FragAlloc::get_block(size_t p)
+FragAlloc::get_block(ymuint p)
 {
   Block* b = mBlockListArray[p - mMinLogSize];
   if ( b ) {
@@ -158,7 +156,7 @@ FragAlloc::get_block(size_t p)
 
 // サイズ 2^p のブロックをリストに戻す．
 void
-FragAlloc::put_block(size_t p,
+FragAlloc::put_block(ymuint p,
 		     char* block)
 {
   Block* b = reinterpret_cast<Block*>(block);
@@ -167,28 +165,28 @@ FragAlloc::put_block(size_t p,
 }
 
 // @brief 使用されているメモリ量を返す．
-size_t
+ymuint
 FragAlloc::used_size() const
 {
   return mUsedSize;
 }
 
 // @brief used_size() の最大値を返す．
-size_t
+ymuint
 FragAlloc::max_used_size() const
 {
   return mMaxUsedSize;
 }
 
 // @brief 実際に確保したメモリ量を返す．
-size_t
+ymuint
 FragAlloc::allocated_size() const
 {
   return mAllocSize;
 }
 
 // @brief 実際に確保した回数を返す．
-size_t
+ymuint
 FragAlloc::allocated_count() const
 {
   return mAllocCount;

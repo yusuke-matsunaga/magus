@@ -1,11 +1,9 @@
 
-/// @file libym_utils/SimpleAlloc.cc
+/// @file SimpleAlloc.cc
 /// @brief SimpleAlloc の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SimpleAlloc.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,7 +17,7 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SimpleAlloc::SimpleAlloc(size_t max_size) :
+SimpleAlloc::SimpleAlloc(ymuint max_size) :
   mUsedSize(0),
   mMaxUsedSize(0),
   mAllocSize(0),
@@ -39,12 +37,12 @@ SimpleAlloc::~SimpleAlloc()
 
 // @brief n バイトの領域を確保する．
 void*
-SimpleAlloc::get_memory(size_t n)
+SimpleAlloc::get_memory(ymuint n)
 {
   if ( n == 0 ) {
     return NULL;
   }
-  
+
   mUsedSize += n;
   if ( mMaxUsedSize < mUsedSize ) {
     mMaxUsedSize = mUsedSize;
@@ -56,9 +54,9 @@ SimpleAlloc::get_memory(size_t n)
     ++ mAllocCount;
     return ::operator new(n);
   }
-  
+
   // ワード境界に乗るようにサイズに整える．
-  size_t alloc_size = align(n);
+  ymuint alloc_size = align(n);
   if ( mNextPos + alloc_size > mMaxSize ) {
     mCurBlock = new char[mMaxSize];
     mNextPos = 0;
@@ -74,16 +72,16 @@ SimpleAlloc::get_memory(size_t n)
 
 // @brief n バイトの領域を開放する．
 void
-SimpleAlloc::put_memory(size_t n,
+SimpleAlloc::put_memory(ymuint n,
 			void* block)
 {
   mUsedSize -= n;
-  
+
   if ( n > mMaxSize ) {
     // mMaxSize を越えるものは普通に開放する．
     ::operator delete(block);
   }
-  
+
   // このクラスでは領域の再利用はしない．
   return;
 }
@@ -102,28 +100,28 @@ SimpleAlloc::destroy()
 }
 
 // @brief 使用されているメモリ量を返す．
-size_t
+ymuint
 SimpleAlloc::used_size() const
 {
   return mUsedSize;
 }
 
 // @brief used_size() の最大値を返す．
-size_t
+ymuint
 SimpleAlloc::max_used_size() const
 {
   return mMaxUsedSize;
 }
 
 // @brief 実際に確保したメモリ量を返す．
-size_t
+ymuint
 SimpleAlloc::allocated_size() const
 {
   return mAllocSize;
 }
 
 // @brief 実際に確保した回数を返す．
-size_t
+ymuint
 SimpleAlloc::allocated_count() const
 {
   return mAllocCount;
@@ -141,8 +139,8 @@ SimpleAlloc::print_stats(ostream& s) const
 }
 
 // @brief アラインメントを考慮してサイズを調節する．
-size_t
-SimpleAlloc::align(size_t req_size)
+ymuint
+SimpleAlloc::align(ymuint req_size)
 {
   return ((req_size + ALIGNOF_DOUBLE - 1) / ALIGNOF_DOUBLE) * ALIGNOF_DOUBLE;
 }

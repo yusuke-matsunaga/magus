@@ -1,11 +1,9 @@
 
-/// @file libym_utils/UnitAlloc.cc
+/// @file UnitAlloc.cc
 /// @brief UnitAlloc の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: UnitAlloc.cc 958 2007-08-28 05:38:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,8 +17,8 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-UnitAlloc::UnitAlloc(size_t unit_size,
-		     size_t block_size) :
+UnitAlloc::UnitAlloc(ymuint unit_size,
+		     ymuint block_size) :
   mUnitSize(unit_size),
   mBlockSize(block_size),
   mAvailTop(NULL),
@@ -43,7 +41,7 @@ UnitAlloc::~UnitAlloc()
 
 // @brief n バイトの領域を確保する．
 void*
-UnitAlloc::get_memory(size_t n)
+UnitAlloc::get_memory(ymuint n)
 {
   mUsedSize += n;
   if ( mMaxUsedSize < mUsedSize ) {
@@ -54,14 +52,14 @@ UnitAlloc::get_memory(size_t n)
     mAllocSize += n;
     return ::operator new(n);
   }
-  
+
   if ( mAvailTop == NULL ) {
     char* chunk = new char[mUnitSize * mBlockSize];
     mAllocSize += mUnitSize * mBlockSize;
     ++ mAllocCount;
     mAllocList.push_back(chunk);
 
-    for (size_t i = 0; i < mBlockSize; ++ i, chunk += mUnitSize) {
+    for (ymuint i = 0; i < mBlockSize; ++ i, chunk += mUnitSize) {
       Block* b = reinterpret_cast<Block*>(chunk);
       b->mLink = mAvailTop;
       mAvailTop = b;
@@ -75,7 +73,7 @@ UnitAlloc::get_memory(size_t n)
 
 // @brief n バイトの領域を開放する．
 void
-UnitAlloc::put_memory(size_t n,
+UnitAlloc::put_memory(ymuint n,
 		      void* block)
 {
   mUsedSize -= n;
@@ -104,28 +102,28 @@ UnitAlloc::destroy()
 }
 
 // @brief 使用されているメモリ量を返す．
-size_t
+ymuint
 UnitAlloc::used_size() const
 {
   return mUsedSize;
 }
 
 // @brief used_size() の最大値を返す．
-size_t
+ymuint
 UnitAlloc::max_used_size() const
 {
   return mMaxUsedSize;
 }
 
 // @brief 実際に確保したメモリ量を返す．
-size_t
+ymuint
 UnitAlloc::allocated_size() const
 {
   return mAllocSize;
 }
 
 // @brief 実際に確保した回数を返す．
-size_t
+ymuint
 UnitAlloc::allocated_count() const
 {
   return mAllocCount;
