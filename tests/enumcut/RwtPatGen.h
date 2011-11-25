@@ -92,16 +92,10 @@ public:
 
   /// @brief XOR ノードを作る．
   /// @param[in] fanin0 ファンイン0
-  /// @param[in] inv0 ファンイン0の極性
   /// @param[in] fanin1 ファンイン1
-  /// @param[in] inv1 ファンイン1の極性
-  /// @param[out] oinv 出力の極性
   const PgNode*
   new_xor(const PgNode* fanin0,
-	  bool inv0,
-	  const PgNode* fanin1,
-	  bool inv1,
-	  bool& oinv);
+	  const PgNode* fanin1);
 
   /// @brief パタンを登録する．
   void

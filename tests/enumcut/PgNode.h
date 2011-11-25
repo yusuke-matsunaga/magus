@@ -64,6 +64,10 @@ public:
   ymuint
   input_id() const;
 
+  /// @brief 論理関数を返す．
+  TvFunc
+  function() const;
+
   /// @brief ファンイン0の情報をエンコードした値を返す．
   /// @note AND/XORノードの時のみ意味を持つ．
   ymuint32
@@ -199,6 +203,14 @@ ymuint
 PgNode::input_id() const
 {
   return mType >> 2;
+}
+
+// @brief 論理関数を返す．
+inline
+TvFunc
+PgNode::function() const
+{
+  return mFunc;
 }
 
 // @brief ファンイン0の情報をエンコードした値を返す．

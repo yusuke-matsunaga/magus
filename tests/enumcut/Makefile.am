@@ -18,6 +18,7 @@ TESTS =
 
 
 noinst_PROGRAMS = \
+	init_table \
 	enumcut \
 	lr
 
@@ -56,7 +57,7 @@ lr_SOURCES = \
 	RwtPatList.h \
 	RwtMgr.h \
 	RwtMgr.cc \
-	LrTable.cc \
+	set_abc_table.cc \
 	EnumCut.h \
 	EnumCut.cc \
 	BottomUp.h \
@@ -74,3 +75,26 @@ lr_LDADD = \
 	@POPT_LIBS@
 
 lr_LDFLAGS =
+
+
+init_table_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	@POPT_INCLUDES@
+
+init_table_SOURCES = \
+	init_table.cc \
+	RwtNode.h \
+	RwtPat.h \
+	RwtPatGen.h \
+	RwtPatGen.cc \
+	RwtPatList.h \
+	RwtMgr.h \
+	RwtMgr.cc \
+	set_abc_table.cc
+
+init_table_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+init_table_LDFLAGS =

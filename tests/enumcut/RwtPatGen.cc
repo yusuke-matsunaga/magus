@@ -53,6 +53,9 @@ RwtPatGen::init(ymuint input_num)
   node->mType = 0U;
   node->mFunc = TvFunc::const_zero(mInputNum);
 
+  // 定数0のパタンを登録しておく．
+  new_pat(node, false);
+
   // 入力ノードを作る．
   for (ymuint i = 0; i < mInputNum; ++ i) {
     PgNode* node = alloc_node();
@@ -134,18 +137,11 @@ RwtPatGen::new_and(const PgNode* fanin0,
 
 // @brief XOR ノードを作る．
 // @param[in] fanin0 ファンイン0
-// @param[in] inv0 ファンイン0の極性
 // @param[in] fanin1 ファンイン1
-// @param[in] inv1 ファンイン1の極性
-// @param[out] oinv 出力の極性
 const PgNode*
 RwtPatGen::new_xor(const PgNode* fanin0,
-		   bool inv0,
-		   const PgNode* fanin1,
-		   bool inv1,
-		   bool& oinv)
+		   const PgNode* fanin1)
 {
-  oinv = inv0 ^ inv1;
   if ( fanin0->is_const0() ) {
     return fanin1;
   }
@@ -155,8 +151,8 @@ RwtPatGen::new_xor(const PgNode* fanin0,
   if ( fanin0 == fanin1 ) {
     return mNodeArray[0];
   }
-  ymuint32 id0 = encode(fanin0, inv0);
-  ymuint32 id1 = encode(fanin1, inv1);
+  ymuint32 id0 = encode(fanin0, false);
+  ymuint32 id1 = encode(fanin1, false);
   if ( id0 > id1 ) {
     ymuint32 tmp = id0;
     id0 = id1;
@@ -168,9 +164,6 @@ RwtPatGen::new_xor(const PgNode* fanin0,
   TvFunc f1 = fanin1->mFunc;
 
   node->mFunc = f0 ^ f1;
-  if ( oinv ) {
-    node->mFunc.negate();
-  }
 
   return node;
 }

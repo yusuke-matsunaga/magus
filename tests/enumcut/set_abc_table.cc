@@ -1,21 +1,25 @@
 
-/// @file LrTable.cc
-/// @brief
+/// @file set_abc_table.cc
+/// @brief abc のパタンテーブルを読み込む．
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "RwtMgr.h"
 #include "RwtPatGen.h"
 #include "PgNode.h"
+#include "ym_utils/Generator.h"
+#include "ym_logic/TvFunc.h"
+#include "ym_logic/NpnMap.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
 
+// 実は要らない．
+#if 0
 ymuint16
 s_RwtPracticalClasses[] =
 {
@@ -33,7 +37,7 @@ s_RwtPracticalClasses[] =
     0x0ff0, 0x1683, 0x1696, 0x1698, 0x169e, 0x16e9, 0x178e, 0x17e8, 0x18e7, 0x19e6, 0x1be4,
     0x1ee1, 0x3cc3, 0x6996, 0x0000
 };
-
+#endif
 
 ymuint16
 s_RwtAigSubgraphs[] =
@@ -397,48 +401,73 @@ s_RwtAigSubgraphs[] =
     0x0000,0x0000
 };
 
+// 同値類のなかで，真理値表ベクタを辞書順で比較したときに最小となる関数を
+// 代表関数と定めた場合の代表関数集合を求める．
+void
+init_repfunc(hash_set<TvFunc>& rep_func)
+{
+  hash_set<TvFunc> nonrep;
+  PermGen pg(4, 4);
+  NpnMap map(4, kPolPosi);
+  for (ymuint32 p = 0U; p < 0x10000; ++ p) {
+    vector<int> vals(16);
+    for (ymuint i = 0; i < 16; ++ i) {
+      if ( p & (1U << i) ) {
+	vals[i] = 1;
+      }
+      else {
+	vals[i] = 0;
+      }
+    }
+    TvFunc f(4, vals);
+    if ( nonrep.count(f) > 0 ) {
+      continue;
+    }
+
+    rep_func.insert(f);
+    for (ymuint pols = 0U; pols < 16; ++ pols) {
+      for (PermGen::iterator q = pg.begin(); !q.is_end(); ++ q) {
+	for (ymuint i = 0; i < 4; ++ i) {
+	  tPol pol = (pols & (1U << i)) ? kPolNega : kPolPosi;
+	  map.set(i, q(i), pol);
+	}
+	map.set_opol(kPolPosi);
+	TvFunc f1 = f.xform(map);
+	if ( f != f1 ) {
+	  nonrep.insert(f1);
+	}
+	map.set_opol(kPolNega);
+	f1 = f.xform(map);
+	nonrep.insert(f1);
+      }
+    }
+  }
+  cout << "init_repfunc end: " << rep_func.size() << " functions" << endl;
+}
+
 END_NONAMESPACE
 
 void
-read_data(RwtMgr& mgr)
+read_data(RwtPatGen& pg)
 {
-  RwtPatGen pg;
-
   // 代表関数を読み込む．
   hash_set<TvFunc> rep_func;
-  rep_func.insert(TvFunc::const_zero(4));
-  for (ymuint i = 1; ; ++ i) {
-    ymuint16 v = s_RwtPracticalClasses[i];
-    if ( v == 0U ) {
-      break;
-    }
-    vector<int> vt(16);
-    for (ymuint j = 0; j < 16; ++j) {
-      if ( v & (1 << j) ) {
-	vt[j] = 1;
-      }
-      else {
-	vt[j] = 0;
-      }
-    }
-    TvFunc f(4, vt);
-    rep_func.insert(f);
-  }
+  init_repfunc(rep_func);
 
   // データ数を数える．
-  ymuint n = 0;
+  ymuint n_nodes = 0;
   for (ymuint i = 0; ; ++ i) {
     ymuint16 v0 = s_RwtAigSubgraphs[i * 2 + 0];
     ymuint16 v1 = s_RwtAigSubgraphs[i * 2 + 1];
     if ( v0 == 0U && v1 == 0U ) {
-      n = i;
+      n_nodes = i;
       break;
     }
   }
 
-  vector<const PgNode*> node_array(n);
-  vector<bool> inv_array(n);
-  vector<TvFunc> func_array(n);
+  vector<const PgNode*> node_array(n_nodes + 5);
+  vector<bool> inv_array(n_nodes + 5);
+  vector<TvFunc> func_array(n_nodes + 5);
 
   pg.init(4);
 
@@ -451,7 +480,8 @@ read_data(RwtMgr& mgr)
     func_array[i + 1] = TvFunc::posi_literal(4, i);
   }
 
-  for (ymuint i = 0; i < n; ++ i) {
+  hash_set<TvFunc> rep_func2;
+  for (ymuint i = 0; i < n_nodes; ++ i) {
     ymuint16 v0 = s_RwtAigSubgraphs[i * 2 + 0];
     ymuint16 v1 = s_RwtAigSubgraphs[i * 2 + 1];
 
@@ -465,41 +495,33 @@ read_data(RwtMgr& mgr)
     bool inv1 = static_cast<bool>(v1 & 1U);
 
     const PgNode* node0 = node_array[id0];
-    TvFunc f0 = func_array[id0];
     if ( inv_array[id0] ) {
       inv0 = !inv0;
-      f0.negate();
     }
 
     const PgNode* node1 = node_array[id1];
-    TvFunc f1 = func_array[id1];
     if ( inv_array[id1] ) {
       inv1 = !inv1;
-      f1.negate();
     }
 
     const PgNode* node = NULL;
     bool oinv = false;
-    TvFunc f;
     if ( is_xor ) {
-      node = pg.new_xor(node0, inv0, node1, inv1, oinv);
-      f = f0 ^ f1;
+      oinv = inv0 ^ inv1;
+      node = pg.new_xor(node0, node1);
     }
     else {
       node = pg.new_and(node0, inv0, node1, inv1);
-      f = f0 & f1;
     }
 
     node_array[i + 5] = node;
     inv_array[i + 5] = oinv;
-    func_array[i + 5] = f;
 
-    pg.new_pat(node, oinv);
+    TvFunc f = node->function();
+    if ( rep_func.count(f) > 0 ) {
+      pg.new_pat(node, oinv);
+    }
   }
-
-  mgr.copy(pg);
-
-  mgr.print(cout);
 }
 
 END_NAMESPACE_YM_NETWORKS
