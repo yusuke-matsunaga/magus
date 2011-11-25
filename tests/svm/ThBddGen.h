@@ -53,36 +53,11 @@ private:
   Bdd
   gen_bdd(ymuint pos,
 	  double slack,
+	  const vector<bool>& curvals,
 	  double& lb,
-	  double& ub);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  struct Cell
-  {
-    Cell()
-    {
-    }
-
-    Cell(double lb,
-	 double ub,
-	 const Bdd& bdd) :
-      mLb(lb),
-      mUb(ub),
-      mBdd(bdd)
-    {
-    };
-
-    double mLb;
-
-    double mUb;
-
-    Bdd mBdd;
-  };
+	  double& ub,
+	  vector<bool>& lbvals,
+	  vector<bool>& ubvals);
 
 
 private:
@@ -93,16 +68,18 @@ private:
   // BDDマネージャ
   BddMgr& mBddMgr;
 
+  // 変数の数
+  ymuint32 mNv;
+
   // 係数の配列
   vector<Weight> mWeightArray;
+
+  // しきい値
+  double mThreshold;
 
   // 区間のリストの配列
   vector<ItvlList> mItvlList;
 
-#if 0
-  // 区間のリスト
-  vector<vector<Cell> > mItvlList;
-#endif
 };
 
 END_NAMESPACE_YM

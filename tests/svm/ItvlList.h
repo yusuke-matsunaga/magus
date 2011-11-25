@@ -44,6 +44,8 @@ public:
   find(double val,
        double& lb,
        double& ub,
+       vector<bool>& lbvals,
+       vector<bool>& ubvals,
        Bdd& f);
 
   /// @brief 区間を追加する．
@@ -53,6 +55,8 @@ public:
   void
   add(double lb,
       double ub,
+      const vector<bool>& lbvals,
+      const vector<bool>& ubvals,
       const Bdd& f);
 
   /// @brief 要素数を返す．
@@ -72,6 +76,12 @@ private:
 
     // 上限
     double mUb;
+
+    // 下限を与える値の組み合わせ
+    vector<bool> mLbVals;
+
+    // 上限を与える値の組み合わせ
+    vector<bool> mUbVals;
 
     // 対応する関数
     Bdd mF;

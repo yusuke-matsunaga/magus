@@ -13,7 +13,7 @@
 BEGIN_NAMESPACE_YM
 
 static
-bool debug = false;
+bool debug = true;
 
 //////////////////////////////////////////////////////////////////////
 // クラス ThBddGen
@@ -39,24 +39,26 @@ ThBddGen::operator()(const vector<double>& weight_array,
 		     double threshold)
 {
   mWeightArray.clear();
-  ymuint n = weight_array.size();
-  mWeightArray.resize(n);
+  mNv = weight_array.size();
+  mWeightArray.resize(mNv);
   mItvlList.clear();
-  mItvlList.resize(n);
-  for (ymuint i = 0; i < n; ++ i) {
+  mItvlList.resize(mNv);
+  for (ymuint i = 0; i < mNv; ++ i) {
     Weight& w = mWeightArray[i];
     w.mIdx = i;
     w.mWeight = weight_array[i];
   }
   sort(mWeightArray.begin(), mWeightArray.end(), WeightGT());
   double acc = 0.0;
-  for (ymuint i = 0; i < n; ++ i) {
-    Weight& w = mWeightArray[n - i - 1];
+  for (ymuint i = 0; i < mNv; ++ i) {
+    Weight& w = mWeightArray[mNv - i - 1];
     acc += w.mWeight;
     w.mAcc = acc;
   }
 
-  for (ymuint i = 0; i < n; ++ i) {
+  mThreshold = threshold;
+
+  for (ymuint i = 0; i < mNv; ++ i) {
     Weight& w = mWeightArray[i];
     cout << "POS: " << i
 	 << "\tIDX: " << w.mIdx
@@ -67,7 +69,10 @@ ThBddGen::operator()(const vector<double>& weight_array,
 
   double lb;
   double ub;
-  Bdd f = gen_bdd(0, threshold, lb, ub);
+  vector<bool> curvals(mNv, false);
+  vector<bool> lbvals(mNv, false);
+  vector<bool> ubvals(mNv, false);
+  Bdd f = gen_bdd(0, threshold, curvals, lb, ub, lbvals, ubvals);
 
   return f;
 }
@@ -76,8 +81,11 @@ ThBddGen::operator()(const vector<double>& weight_array,
 Bdd
 ThBddGen::gen_bdd(ymuint pos,
 		  double slack,
+		  const vector<bool>& curvals,
 		  double& lb,
-		  double& ub)
+		  double& ub,
+		  vector<bool>& lbvals,
+		  vector<bool>& ubvals)
 {
   Weight& w = mWeightArray[pos];
 
@@ -96,13 +104,16 @@ ThBddGen::gen_bdd(ymuint pos,
     }
     lb = w.mAcc;
     ub = DBL_MAX;
+    for (ymuint i = pos; i < mNv; ++ i) {
+      lbvals[i] = true;
+    }
     return mBddMgr.make_zero();
   }
 
   // 区間検索
   ItvlList& itvl_list = mItvlList[pos];
   Bdd f;
-  bool found = itvl_list.find(slack, lb, ub, f);
+  bool found = itvl_list.find(slack, lb, ub, lbvals, ubvals, f);
   if ( found ) {
     if ( debug ) {
       cout << " ==> found ("
@@ -123,7 +134,10 @@ ThBddGen::gen_bdd(ymuint pos,
   }
   double lb0;
   double ub0;
-  Bdd f0 = gen_bdd(pos + 1, slack, lb0, ub0);
+  vector<bool> cur0vals = curvals;
+  vector<bool> lb0vals(mNv);
+  vector<bool> ub0vals(mNv);
+  Bdd f0 = gen_bdd(pos + 1, slack, cur0vals, lb0, ub0, lb0vals, ub0vals);
   if ( debug ) {
     cout << "lb0 = " << lb0
 	 << ", ub0 = " << ub0
@@ -140,11 +154,16 @@ ThBddGen::gen_bdd(ymuint pos,
   }
   double lb1;
   double ub1;
-  Bdd f1 = gen_bdd(pos + 1, slack - weight, lb1, ub1);
+  cur0vals[pos] = true;
+  vector<bool> lb1vals(mNv);
+  vector<bool> ub1vals(mNv);
+  Bdd f1 = gen_bdd(pos + 1, slack - weight, cur0vals, lb1, ub1, lb1vals, ub1vals);
   if ( lb1 != DBL_MIN ) {
+    lb1vals[pos] = true;
     lb1 += weight;
   }
   if ( ub1 != DBL_MAX ) {
+    ub1vals[pos] = true;
     ub1 += weight;
   }
   if ( debug ) {
@@ -155,12 +174,16 @@ ThBddGen::gen_bdd(ymuint pos,
   }
 
   lb = lb0;
+  lbvals = lb0vals;
   if ( lb1 != DBL_MIN && lb < lb1 ) {
     lb = lb1;
+    lbvals = lb1vals;
   }
   ub = ub0;
+  ubvals = ub0vals;
   if ( ub1 != DBL_MAX && ub > ub1 ) {
     ub = ub1;
+    ubvals = ub1vals;
   }
 
   if ( debug ) {
@@ -170,7 +193,29 @@ ThBddGen::gen_bdd(ymuint pos,
 	 << "ub = " << ub << endl
 	 << "delta = " << delta << endl
 	 << endl;
-    if ( delta < 1e-4 ) {
+    if ( delta < 1e-5 ) {
+      double v = 0.0;
+      cout << "lbvals = ";
+      for (ymuint i = 0; i < mNv; ++ i) {
+	if ( curvals[i] || lbvals[i] ) {
+	  cout << " " << i
+	       << "(" << mWeightArray[i].mWeight << ")";
+	  v += mWeightArray[i].mWeight;
+	}
+      }
+      cout << endl;
+      cout << "lbtotal = " << v - mThreshold << endl;
+      cout << "ubvals = ";
+      v = 0.0;
+      for (ymuint i = 0; i < mNv; ++ i) {
+	if ( curvals[i] || ubvals[i] ) {
+	  cout << " " << i
+	       << "(" << mWeightArray[i].mWeight << ")";
+	  v += mWeightArray[i].mWeight;
+	}
+      }
+      cout << endl;
+      cout << "ubtotal = " << v - mThreshold << endl;
       abort();
     }
   }
@@ -180,7 +225,7 @@ ThBddGen::gen_bdd(ymuint pos,
   f = mBddMgr.make_bdd(VarId(pos), f0, f1);
 #endif
 
-  itvl_list.add(lb, ub, f);
+  itvl_list.add(lb, ub, lbvals, ubvals, f);
 
 #if 0
   cout << "Level#" << pos << ": " << itvl_list.size() << endl

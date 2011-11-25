@@ -40,12 +40,16 @@ bool
 ItvlList::find(double val,
 	       double& lb,
 	       double& ub,
+	       vector<bool>& lbvals,
+	       vector<bool>& ubvals,
 	       Bdd& f)
 {
   Node* node = find_node(val, mRoot);
   if ( node ) {
     lb = node->mLb;
     ub = node->mUb;
+    lbvals = node->mLbVals;
+    ubvals = node->mUbVals;
     f = node->mF;
     return true;
   }
@@ -59,12 +63,16 @@ ItvlList::find(double val,
 void
 ItvlList::add(double lb,
 	      double ub,
+	      const vector<bool>& lbvals,
+	      const vector<bool>& ubvals,
 	      const Bdd& f)
 {
   void* p = mAlloc.get_memory(sizeof(Node));
   Node* node = new (p) Node;
   node->mLb = lb;
   node->mUb = ub;
+  node->mLbVals = lbvals;
+  node->mUbVals = ubvals;
   node->mF = f;
   node->mLchd = NULL;
   node->mRchd = NULL;
