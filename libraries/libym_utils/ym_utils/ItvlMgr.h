@@ -10,12 +10,13 @@
 
 
 #include "ymtools.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM
 
 // ポインタを使うだけなのでこのクラス定義は見せる必要がない．
-class ItvlCell;
+class ItvlMgrImpl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ItvlMgr ItvlMgr.h "ym_utils/ItvlMgr.h"
@@ -105,12 +106,20 @@ public:
   /// @brief 内容を表示する
   /// @param[in] s 出力ストリーム
   void
-  dump(ostream& s) const;
+  print(ostream& s) const;
 
   /// @brief 木構造を表示する
   /// @param[in] s 出力ストリーム
   void
-  disp_tree(ostream& s) const;
+  print_tree(ostream& s) const;
+
+  /// @brief バイナリファイルに書き出す．
+  void
+  dump(BinO& s) const;
+
+  /// @brief バイナリファイルを読み込む．
+  void
+  restore(BinI& s);
 
 
 private:
@@ -118,10 +127,39 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 根のセルを指すポインタ
-  ItvlCell* mRoot;
+  // 実装クラス
+  ItvlMgrImpl* mImpl;
 
 };
+
+
+/// @relates ItvlMgr
+/// @brief バイナリファイルに書き出す．
+/// @param[in] s 出力先のストリーム
+/// @param[in] itvlmgr 対象のオブジェクト
+/// @return s を返す．
+inline
+BinO&
+operator<<(BinO& s,
+	   const ItvlMgr& itvlmgr)
+{
+  itvlmgr.dump(s);
+  return s;
+}
+
+/// @relates ItvlMgr
+/// @brief バイナリファイルを読み込む．
+/// @param[in] s 入力元のストリーム
+/// @param[in] itvlmgr 読み込む先のオブジェクト
+/// @return s を返す．
+inline
+BinI&
+operator>>(BinI& s,
+	   ItvlMgr& itvlmgr)
+{
+  itvlmgr.restore(s);
+  return s;
+}
 
 END_NAMESPACE_YM
 

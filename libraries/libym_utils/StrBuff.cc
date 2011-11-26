@@ -1,11 +1,9 @@
 
-/// @file libym_utils/StrBuff.h
+/// @file StrBuff.h
 /// @brief StrBuff の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: StrBuff.cc 958 2007-08-28 05:38:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "ym_utils/StrBuff.h"

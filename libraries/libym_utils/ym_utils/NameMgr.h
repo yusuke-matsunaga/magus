@@ -76,7 +76,7 @@ public:
   /// @param[in] s 出力先のストリーム
   /// @note 主にデバッグ用
   void
-  dump(ostream& s) const;
+  print(ostream& s) const;
 
 
 private:

@@ -1,11 +1,9 @@
 
-/// @file libym_utils/StopWatch.cc
+/// @file StopWatch.cc
 /// @brief 時間計測用のクラスの実装ファイル
 /// @author Yusuke Matsunaga
 ///
-/// $Id: StopWatch.cc 700 2007-05-31 00:41:30Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -111,8 +109,8 @@ StopWatch::time() const
 }
 
 // コンストラクタ，時計の数と最初にアクティブな時計番号
-MStopWatch::MStopWatch(size_t n,
-		       size_t id) :
+MStopWatch::MStopWatch(ymuint n,
+		       ymuint id) :
   mNum(n),
   mCur(id),
   mWarray(n)
@@ -123,12 +121,12 @@ MStopWatch::MStopWatch(size_t n,
   }
   mWarray[mCur].start();
 }
-    
+
 // アクティブな時計を切替える．昔の時計番号を返す
-size_t
-MStopWatch::change(size_t new_id)
+ymuint
+MStopWatch::change(ymuint new_id)
 {
-  size_t old_id = mCur;
+  ymuint old_id = mCur;
 
   // 範囲外の場合は何もしない．
   if ( new_id < mNum ) {
@@ -139,7 +137,7 @@ MStopWatch::change(size_t new_id)
       StopWatch& old_sw = mWarray[old_id];
       old_sw.mState = StopWatch::OFF;
       old_sw.mTotalTime += tmp_time - old_sw.mStartTime;
-  
+
       StopWatch& new_sw = mWarray[new_id];
       new_sw.mState = StopWatch::ON;
       new_sw.mStartTime = tmp_time;

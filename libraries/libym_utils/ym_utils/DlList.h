@@ -105,7 +105,7 @@ public:
   clear();
 
   /// @brief 要素数の取得
-  size_t
+  ymuint
   size() const;
 
   /// @brief 空のとき true を返す．
@@ -192,7 +192,7 @@ private:
   DlElem mDummyTop;
 
   // 要素数
-  size_t mNum;
+  ymuint32 mNum;
 
 };
 
@@ -497,7 +497,7 @@ DlElem::next() const
 
 // @brief 要素数の取得
 inline
-size_t
+ymuint
 DlListBase::size() const
 {
   return mNum;

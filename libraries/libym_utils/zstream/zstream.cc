@@ -1,9 +1,7 @@
 
-/// @file libym_utils/zstream/zstream.cc
+/// @file zstream.cc
 /// @brief zstream の実装ファイル
 /// @author Yusuke Matsunaga
-///
-/// $Id: zstream.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -17,7 +15,7 @@ BEGIN_NAMESPACE_YM
 // @brief 入力用のコンストラクタ
 // @param[in] s 入力ストリーム
 zstream_buff::zstream_buff(istream* s,
-			   size_t size) :
+			   ymuint size) :
   mInStream(s),
   mOutStream(NULL),
   mBuff(new Bytef[size]),
@@ -32,7 +30,7 @@ zstream_buff::zstream_buff(istream* s,
 // @brief 出力用のコンストラクタ
 // @param[in] s 出力ストリーム
 zstream_buff::zstream_buff(ostream* s,
-			   size_t size) :
+			   ymuint size) :
   mInStream(NULL),
   mOutStream(s),
   mBuff(new Bytef[size]),
@@ -57,7 +55,7 @@ zstream_buff::~zstream_buff()
 // @note 結果は出力ストリームに書き込まれる．
 void
 zstream_buff::compress(Bytef* buff,
-		       int size,
+		       ymuint size,
 		       int flush)
 {
   set_inbuf(buff, size);
@@ -85,9 +83,9 @@ zstream_buff::compress(Bytef* buff,
 // @param[in] バッファ中の空きサイズ(in byte)
 // @return バッファに書き出されたサイズ(in bytes)を返す．
 // @note データは入力ストリームから読み込まれる．
-int
+ymuint
 zstream_buff::decompress(Bytef* buff,
-			 int size)
+			 ymuint size)
 {
   set_outbuf(buff, size);
   int orig_size = avail_out();

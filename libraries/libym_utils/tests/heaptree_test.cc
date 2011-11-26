@@ -11,8 +11,9 @@ using namespace nsYm;
 
 struct CompFunc1
 {
-  int operator()(int a,
-		 int b)
+  int
+  operator()(int a,
+	     int b)
   {
     return a - b;
   }
@@ -20,8 +21,9 @@ struct CompFunc1
 
 struct CompFunc2
 {
-  int operator()(const char* a,
-		 const char* b)
+  int
+  operator()(const char* a,
+	     const char* b)
   {
     return strcmp(a, b);
   }
@@ -30,7 +32,7 @@ struct CompFunc2
 void
 test1()
 {
-  
+
   HeapTree<int, CompFunc1> ht;
 
   ht.put(1);

@@ -1,5 +1,5 @@
 
-/// @file libym_utils/StrPool.cc
+/// @file StrPool.cc
 /// @brief StrPool と ShString の実装ファイル
 /// @author Yusuke Matsunaga
 ///
@@ -90,7 +90,7 @@ StrPool::reg(const char* str)
 }
 
 // 確保した文字列領域の総量を得る．
-size_t
+ymuint
 StrPool::accum_alloc_size() const
 {
   return mCellAlloc.allocated_size();
