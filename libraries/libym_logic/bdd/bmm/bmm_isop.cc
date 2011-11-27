@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmm/bmm_isop.cc
+/// @file bmm_isop.cc
 /// @brief ISOP を求める関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmm_isop.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -40,9 +38,9 @@ sop_litand(const LogExpr& cov,
   }
 
   // あとはカバーの場合のみ
-  size_t n = cov.child_num();
+  ymuint n = cov.child_num();
   LogExpr ans = LogExpr::make_zero();
-  for (size_t i = 0; i < n; i ++) {
+  for (ymuint i = 0; i < n; i ++) {
     LogExpr child = cov.child(i);
     ans |= child & lit;
   }

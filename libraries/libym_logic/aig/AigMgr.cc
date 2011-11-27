@@ -94,8 +94,8 @@ END_NONAMESPACE
 // @param[in] s 出力先のストリーム
 // @param[in] handle_list 対象のハンドルのリスト
 void
-AigMgr::dump_handles(ostream& s,
-		     const list<Aig>& handle_list) const
+AigMgr::print_handles(ostream& s,
+		      const list<Aig>& handle_list) const
 {
   ymuint i = 0;
   hash_set<ymuint> mark;

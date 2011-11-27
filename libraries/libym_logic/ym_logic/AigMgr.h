@@ -61,8 +61,8 @@ public:
   /// @param[in] s 出力先のストリーム
   /// @param[in] handle_list 対象のハンドルのリスト
   void
-  dump_handles(ostream& s,
-	       const list<Aig>& handle_list) const;
+  print_handles(ostream& s,
+		const list<Aig>& handle_list) const;
 
 
 public:

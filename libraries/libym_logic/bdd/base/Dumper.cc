@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/base/Dumper.cc
+/// @file Dumper.cc
 /// @brief Dumper の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: Dumper.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -142,7 +140,7 @@ Displayer::display_step(BddEdge e)
   BddEdge e0;
   BddEdge e1;
   VarId id = mMgr->root_decomp(e_p, e0, e1);
-  tLevel level = mMgr->level(id);
+  ymuint level = mMgr->level(id);
   ios::fmtflags save = mStream.flags();
   mStream << ":IDX=" << setw(3) << id
 	  << ":LVL=" << setw(3) << level

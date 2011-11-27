@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmm/bmm_ls.cc
+/// @file bmm_ls.cc
 /// @brief リテラル集合を扱う関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmm_ls.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -84,8 +82,8 @@ BddMgrModern::lscap(BddEdge e1,
   tPol pol2 = e2.pol();
   Var* var1 = node1->var();
   Var* var2 = node2->var();
-  tLevel level1 = var1->level();
-  tLevel level2 = var2->level();
+  ymuint level1 = var1->level();
+  ymuint level2 = var2->level();
   for ( ; ; ) {
     if ( level1 == level2 ) {
       int which1;
@@ -164,8 +162,8 @@ BddMgrModern::lsdiff(BddEdge e1,
   tPol pol2 = e2.pol();
   Var* var1 = node1->var();
   Var* var2 = node2->var();
-  tLevel level1 = var1->level();
-  tLevel level2 = var2->level();
+  ymuint level1 = var1->level();
+  ymuint level2 = var2->level();
   for ( ; ; ) {
     if ( level1 < level2 ) {
       int which1;
@@ -240,8 +238,8 @@ BddMgrModern::lsintersect(BddEdge e1,
   Node* node2 = get_node(e2);
   tPol pol1 = e1.pol();
   tPol pol2 = e2.pol();
-  tLevel level1 = node1->level();
-  tLevel level2 = node2->level();
+  ymuint level1 = node1->level();
+  ymuint level2 = node2->level();
   for ( ; ; ) {
     if ( level1 == level2 ) {
       int which1;
@@ -285,7 +283,7 @@ BddMgrModern::lsintersect(BddEdge e1,
 }
 
 // リテラルの vector に変換する．
-tVarSize
+ymuint
 BddMgrModern::to_literalvector(BddEdge e,
 			       LiteralVector& dst)
 {
@@ -295,7 +293,7 @@ BddMgrModern::to_literalvector(BddEdge e,
     return 0;
   }
 
-  size_t n = size(e);
+  ymuint n = size(e);
   dst.reserve(n);
 
   Node* vp = get_node(e);
@@ -321,7 +319,7 @@ BddMgrModern::to_literalvector(BddEdge e,
 }
 
 // リテラルの list に変換する．
-tVarSize
+ymuint
 BddMgrModern::to_literallist(BddEdge e,
 			     LiteralList& dst)
 {

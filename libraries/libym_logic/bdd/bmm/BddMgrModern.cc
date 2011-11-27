@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmm/BddMgrModern.cc
+/// @file BddMgrModern.cc
 /// @brief BddMgrModern の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BddMgrModern.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -34,57 +32,57 @@ typedef xalloc alloc_xcpt;
 BEGIN_NONAMESPACE
 
 // 1K = 1,024
-const size_t K_unit = (1 << 10);
+const ymuint64 K_unit = (1 << 10);
 // 1M = 1,024 x 1,024
-const size_t M_unit = (1 << 20);
+const ymuint64 M_unit = (1 << 20);
 
 // パラメータのデフォルト値
 const double DEFAULT_GC_THRESHOLD  = 0.10;
-const size_t DEFAULT_GC_NODE_LIMIT =  64 * K_unit;
+const ymuint64 DEFAULT_GC_NODE_LIMIT =  64 * K_unit;
 const double DEFAULT_NT_LOAD_LIMIT = 2.0;
 const double DEFAULT_RT_LOAD_LIMIT = 0.8;
-const size_t DEFAULT_MEM_LIMIT     = 400 * M_unit;
-const size_t DEFAULT_DZONE         =  10 * M_unit;
+const ymuint64 DEFAULT_MEM_LIMIT     = 400 * M_unit;
+const ymuint64 DEFAULT_DZONE         =  10 * M_unit;
 
 // 節点テーブルの初期サイズ
-const size_t INIT_SIZE = 1 * K_unit;
+const ymuint64 INIT_SIZE = 1 * K_unit;
 
 // 一度にアロケートするノード数
-const size_t NODE_UNIT = 1 * K_unit;
+const ymuint64 NODE_UNIT = 1 * K_unit;
 
 // 変数テーブルの初期サイズ
-const size_t VARTABLE_INIT_SIZE = 1 * K_unit;
+const ymuint64 VARTABLE_INIT_SIZE = 1 * K_unit;
 
 // 節点テーブルのハッシュ関数
 inline
-ymuint
+ymuint64
 hash_func2(BddEdge id1,
 	   BddEdge id2)
 {
-  ymuint v1 = id1.hash();
-  ymuint v2 = id2.hash();
+  ymuint64 v1 = id1.hash();
+  ymuint64 v2 = id2.hash();
   return v1 + (v2 >> 2);
 }
 
 // 節点テーブルのハッシュ関数
 inline
-ymuint
+ymuint64
 hash_func3(BddEdge id1,
 	   BddEdge id2,
 	   VarId var)
 {
-  ymuint v1 = id1.hash();
-  ymuint v2 = id2.hash();
-  ymuint id3 = var.val();
+  ymuint64 v1 = id1.hash();
+  ymuint64 v2 = id2.hash();
+  ymuint64 id3 = var.val();
   return v1 + (v2 >> 2) + (id3 << 3) - id3;
 }
 
 // VarId 用のハッシュ関数
 inline
-ymuint
+ymuint64
 var_hash(VarId var)
 {
-  ymuint key = var.val();
+  ymuint64 key = var.val();
   return ((key * key) >> 8) + key;
 }
 
@@ -216,7 +214,7 @@ BddMgrModern::~BddMgrModern()
   }
 
   // 変数の解放
-  for (size_t i = 0; i < mVarNum; ++ i) {
+  for (ymuint i = 0; i < mVarNum; ++ i) {
     delete mVarTable[i];
   }
 
@@ -408,7 +406,7 @@ BmmVar*
 BddMgrModern::alloc_var(VarId varid)
 {
   if ( mVarTableSize == mVarNum ) {
-    size_t new_size = mVarTableSize << 1;
+    ymuint64 new_size = mVarTableSize << 1;
     Var** new_table = alloc_vartable(new_size);
     if ( !new_table ) {
       return NULL;
@@ -418,7 +416,7 @@ BddMgrModern::alloc_var(VarId varid)
       dealloc_vartable(new_table, new_size);
       return NULL;
     }
-    for (size_t i = 0; i < mVarNum; ++ i) {
+    for (ymuint i = 0; i < mVarNum; ++ i) {
       Var* var = mVarTable[i];
       new_table[i] = var;
       reg_var(var);
@@ -441,7 +439,7 @@ BddMgrModern::alloc_var(VarId varid)
 }
 
 // 現在登録されている変数をそのレベルの昇順で返す．
-tVarSize
+ymuint
 BddMgrModern::var_list(list<VarId>& vlist) const
 {
   vlist.clear();
@@ -453,7 +451,7 @@ BddMgrModern::var_list(list<VarId>& vlist) const
 
 // 変数番号からレベルを得る．
 // もしもレベルが割り当てられていない場合にはエラーとなる．
-tLevel
+ymuint
 BddMgrModern::level(VarId varid) const
 {
   Var* v = var_of(varid);
@@ -462,7 +460,7 @@ BddMgrModern::level(VarId varid) const
 
 // レベルから変数番号を得る．
 VarId
-BddMgrModern::varid(tLevel level) const
+BddMgrModern::varid(ymuint level) const
 {
   Var* v = var_at(level);
   return v->varid();
@@ -498,7 +496,7 @@ BddMgrModern::set_next_limit_size()
     }
   }
   else {
-    mNextLimit = size_t(double(mTableSize) * mNtLoadLimit);
+    mNextLimit = static_cast<ymuint64>(double(mTableSize) * mNtLoadLimit);
   }
 }
 
@@ -595,7 +593,7 @@ BddMgrModern::gc(bool shrink_nodetable)
   *prev = NULL;
 
   // 内部 statistics の更新
-  size_t free_num = mGarbageNum;
+  ymuint64 free_num = mGarbageNum;
   mFreeNum += free_num - delete_num;
   mNodeNum -= free_num;
   mGarbageNum = 0;
@@ -604,13 +602,13 @@ BddMgrModern::gc(bool shrink_nodetable)
   if ( shrink_nodetable ) {
     // ノードテーブルが縮小可能ならば縮小する
     if ( is_reorderable() ) {
-      for (size_t i = 0; i < mVarNum; ++ i) {
+      for (ymuint i = 0; i < mVarNum; ++ i) {
 	mVarTable[i]->shrink(mNtLoadLimit);
       }
     }
     else {
-      size_t nn = static_cast<size_t>(mNodeNum * 2.0 / mNtLoadLimit);
-      size_t new_size = mTableSize;
+      ymuint64 nn = static_cast<ymuint64>(mNodeNum * 2.0 / mNtLoadLimit);
+      ymuint64 new_size = mTableSize;
       while ( new_size > INIT_SIZE ) {
 	if ( nn < new_size ) {
 	  new_size >>= 1;
@@ -635,7 +633,7 @@ BddMgrModern::gc(bool shrink_nodetable)
 // 節点テーブルを拡張する
 // メモリアロケーションに失敗したら false を返す．
 bool
-BddMgrModern::resize(size_t new_size)
+BddMgrModern::resize(ymuint64 new_size)
 {
   logstream() << "BddMgrModern::resize(" << new_size << ")" << endl;
 
@@ -645,7 +643,7 @@ BddMgrModern::resize(size_t new_size)
     return false;
   }
 
-  size_t old_size = mTableSize;
+  ymuint64 old_size = mTableSize;
   Node** old_table = mNodeTable;
   mNodeTable = new_table;
   mTableSize = new_size;
@@ -659,7 +657,7 @@ BddMgrModern::resize(size_t new_size)
       Node* temp;
       for (temp = *tbl; temp; temp = next) {
 	next = temp->mLink;
-	size_t pos = hash_func3(temp->edge0(), temp->edge1(), temp->varid());
+	ymuint64 pos = hash_func3(temp->edge0(), temp->edge1(), temp->varid());
 	Node*& entry = mNodeTable[pos & mTableSize_1];
 	temp->mLink = entry;
 	entry = temp;
@@ -683,7 +681,7 @@ BddMgrModern::reg_sweep_binder(EventBinder* binder)
 // 設定したいパラメータに対応するビットのみをmaskにセットする．
 void
 BddMgrModern::param(const BddMgrParam& param,
-		    unsigned int mask)
+		    ymuint32 mask)
 {
   if ( mask & BddMgrParam::GC_THRESHOLD ) {
     mGcThreshold = param.mGcThreshold;
@@ -727,31 +725,31 @@ BddMgrModern::name() const
 // さまざまな内部情報を得る
 // これらの変数はread-onlyなので，変数自体を外部で宣言せずに，
 // それを読み出す関数を定義している．
-size_t
+ymuint64
 BddMgrModern::used_mem() const
 {
   return mUsedMem;
 }
 
-size_t
+ymuint64
 BddMgrModern::node_num() const
 {
   return mNodeNum;
 }
 
-size_t
+ymuint64
 BddMgrModern::garbage_num() const
 {
   return mGarbageNum;
 }
 
-size_t
+ymuint64
 BddMgrModern::avail_num() const
 {
   return mFreeNum;
 }
 
-size_t
+ymuint64
 BddMgrModern::gc_count() const
 {
   return mGcCount;
@@ -781,7 +779,7 @@ BddMgrModern::new_node(Var* var,
   e0.addpol(ans_pol);
 
   Node* temp;
-  size_t pos;
+  ymuint64 pos;
   // 節点テーブルを探す．
   if ( is_reorderable() ) {
     pos = hash_func2(e0, e1);
@@ -855,7 +853,7 @@ BddMgrModern::dec_rootref(BddEdge e)
   // ただし頻繁に gc() を呼びたくないので条件をもうけている．
   if ( mGcEnable == 0 &&
        mNodeNum > mGcNodeLimit	&&
-       mGarbageNum > size_t(double(mNodeNum) * mGcThreshold)) {
+       mGarbageNum > static_cast<ymuint64>(double(mNodeNum) * mGcThreshold) ) {
     gc(false);
   }
 }
@@ -864,7 +862,7 @@ BddMgrModern::dec_rootref(BddEdge e)
 void
 BddMgrModern::clear_varmark()
 {
-  for (size_t i = 0; i < mVarNum; ++ i) {
+  for (ymuint i = 0; i < mVarNum; ++ i) {
     mVarTable[i]->mMark = 0;
   }
   mVarSet.clear();
@@ -872,7 +870,7 @@ BddMgrModern::clear_varmark()
 
 // level の変数を取り出す．
 BmmVar*
-BddMgrModern::var_at(tLevel level) const
+BddMgrModern::var_at(ymuint level) const
 {
   assert_cond(level < mVarNum, __FILE__, __LINE__);
   return mVarTable[level];
@@ -882,7 +880,7 @@ BddMgrModern::var_at(tLevel level) const
 BmmVar*
 BddMgrModern::var_of(VarId varid) const
 {
-  size_t pos = var_hash(varid) & (mVarTableSize - 1);
+  ymuint64 pos = var_hash(varid) & (mVarTableSize - 1);
   for (Var* var = mVarHashTable[pos]; var; var = var->mLink) {
     if ( var->varid() == varid ) {
       return var;
@@ -896,7 +894,7 @@ BddMgrModern::var_of(VarId varid) const
 void
 BddMgrModern::reg_var(Var* var)
 {
-  size_t pos = var_hash(var->varid()) & (mVarTableSize - 1);
+  ymuint64 pos = var_hash(var->varid()) & (mVarTableSize - 1);
   Var*& entry = mVarHashTable[pos];
   var->mLink = entry;
   entry = var;
@@ -979,7 +977,7 @@ BddMgrModern::alloc_node()
 // つながない．その場合には true を返す．
 bool
 BddMgrModern::scan_nodechunk(Node* blk,
-			     size_t blk_size,
+			     ymuint64 blk_size,
 			     Node**& prev)
 {
   Node** prev_orig = prev;
@@ -987,7 +985,7 @@ BddMgrModern::scan_nodechunk(Node* blk,
   // メモリブロックの先頭のノードは次のブロックを指すポインタとして
   // 使っているのでスキャンから除外する．
   Node* temp = &blk[1];
-  for (size_t i = 1; i < blk_size; ++ i, ++ temp) {
+  for (ymuint64 i = 1; i < blk_size; ++ i, ++ temp) {
     if ( temp->noref() ) {
       *prev = temp;
       prev = &(temp->mLink);
@@ -1005,9 +1003,9 @@ BddMgrModern::scan_nodechunk(Node* blk,
 // 変数テーブル用のメモリを確保する．
 // size はバイト単位ではなくエントリ数．
 BmmVar**
-BddMgrModern::alloc_vartable(size_t size)
+BddMgrModern::alloc_vartable(ymuint64 size)
 {
-  size_t byte_size = sizeof(Var*) * size;
+  ymuint64 byte_size = sizeof(Var*) * size;
   void* ptr = allocate(byte_size);
   if ( ptr ) {
     memset(ptr, 0, byte_size);
@@ -1019,18 +1017,18 @@ BddMgrModern::alloc_vartable(size_t size)
 // size はバイト単位ではなくエントリ数
 void
 BddMgrModern::dealloc_vartable(Var** table,
-			       size_t size)
+			       ymuint64 size)
 {
-  size_t byte_size = sizeof(Var*) * size;
+  ymuint64 byte_size = sizeof(Var*) * size;
   deallocate(table, byte_size);
 }
 
 // 節点テーブル用のメモリを確保する．
 // size はバイト単位ではなくエントリ数
 BmmNode**
-BddMgrModern::alloc_nodetable(size_t size)
+BddMgrModern::alloc_nodetable(ymuint64 size)
 {
-  size_t byte_size = sizeof(Node*) * size;
+  ymuint64 byte_size = sizeof(Node*) * size;
   void* ptr = allocate(byte_size);
   if ( ptr ) {
     memset(ptr, 0, byte_size);
@@ -1042,9 +1040,9 @@ BddMgrModern::alloc_nodetable(size_t size)
 // size はバイト単位ではなくエントリ数
 void
 BddMgrModern::dealloc_nodetable(Node** table,
-				size_t size)
+				ymuint64 size)
 {
-  size_t byte_size = sizeof(Node*) * size;
+  ymuint64 byte_size = sizeof(Node*) * size;
   deallocate(table, byte_size);
 }
 
@@ -1052,7 +1050,7 @@ BddMgrModern::dealloc_nodetable(Node** table,
 BmmNode*
 BddMgrModern::alloc_nodechunk()
 {
-  const size_t byte_size = sizeof(Node) * NODE_UNIT;
+  const ymuint64 byte_size = sizeof(Node) * NODE_UNIT;
   void* ptr = allocate(byte_size);
   return static_cast<Node*>(ptr);
 }
@@ -1061,13 +1059,13 @@ BddMgrModern::alloc_nodechunk()
 void
 BddMgrModern::dealloc_nodechunk(Node* chunk)
 {
-  const size_t byte_size = sizeof(Node) * NODE_UNIT;
+  const ymuint64 byte_size = sizeof(Node) * NODE_UNIT;
   deallocate(chunk, byte_size);
 }
 
 // BDD パッケージ用のメモリ確保ルーティン
 void*
-BddMgrModern::allocate(size_t size)
+BddMgrModern::allocate(ymuint64 size)
 {
   if ( mUsedMem + size > mMemLimit ) {
     // メモリ制限をオーバーしたので 0 を返す．
@@ -1105,7 +1103,7 @@ BddMgrModern::allocate(size_t size)
 // BDD パッケージ用のメモリ解放ルーティン
 void
 BddMgrModern::deallocate(void* ptr,
-			 size_t size)
+			 ymuint64 size)
 {
 #if defined(BDD_DEBUG_MEMALLOC)
   {

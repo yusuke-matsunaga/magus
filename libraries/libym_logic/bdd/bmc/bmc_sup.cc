@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmc/bmc_sup.cc
+/// @file bmc_sup.cc
 /// @brief サポート変数を求める関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmc_sup.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -16,7 +14,7 @@
 BEGIN_NAMESPACE_YM_BDD
 
 // eを根とするBDDのサポートに印をつける．
-tVarSize
+ymuint
 BddMgrClassic::mark_support(BddEdge e)
 {
   clear_varmark();
@@ -26,7 +24,7 @@ BddMgrClassic::mark_support(BddEdge e)
 }
 
 // edge_list に含まれる枝を根とするBDDのサポートに印をつける．
-tVarSize
+ymuint
 BddMgrClassic::mark_support(const list<BddEdge>& edge_list)
 {
   clear_varmark();
@@ -64,10 +62,10 @@ BddMgrClassic::sup_step(BddEdge e)
 }
 
 // var_mark を列挙してマークのついた変数を vars に入れる．
-tVarSize
+ymuint
 BddMgrClassic::mark_to_vector(VarVector& vars)
 {
-  tVarSize n = mVarSet.size();
+  ymuint n = mVarSet.size();
   vars.clear();
   vars.reserve(n);
   for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
@@ -81,7 +79,7 @@ BddMgrClassic::mark_to_vector(VarVector& vars)
 }
 
 // var_mark を列挙してマークのついた変数を vars に入れる．
-tVarSize
+ymuint
 BddMgrClassic::mark_to_list(VarList& vars)
 {
   vars.clear();
@@ -237,7 +235,7 @@ BddMgrClassic::esmooth_step(BddEdge e)
 
   Node* vp = get_node(e);
   Var* var = vp->var();
-  tLevel level = var->level();
+  ymuint level = var->level();
   if ( level > mLastLevel ) {
     return e;
   }
@@ -323,9 +321,9 @@ BddMgrClassic::andexist_step(BddEdge f,
   tPol g_pol = g.pol();
   Var* f_var = f_vp->var();
   Var* g_var = g_vp->var();
-  tLevel f_level = f_var->level();
-  tLevel g_level = g_var->level();
-  tLevel level = f_level;
+  ymuint f_level = f_var->level();
+  ymuint g_level = g_var->level();
+  ymuint level = f_level;
   Var* var = f_var;
   if ( level > g_level ) {
     level = g_level;

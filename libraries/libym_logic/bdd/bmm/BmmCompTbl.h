@@ -1,7 +1,7 @@
-#ifndef LIBYM_LOGIC_BDD_BMM_BMMCOMPTBL_H
-#define LIBYM_LOGIC_BDD_BMM_BMMCOMPTBL_H
+#ifndef BMMCOMPTBL_H
+#define BMMCOMPTBL_H
 
-/// @file libym_logic/bdd/bmm/BmmCompTbl.h
+/// @file BmmCompTbl.h
 /// @brief BmmCompTbl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -24,11 +24,11 @@ class BmmCompTbl
 public:
 
   // 使用されているセル数を返す．
-  size_t
+  ymuint64
   used_num() const;
 
   // テーブルサイズを返す．
-  size_t
+  ymuint64
   table_size() const;
 
   // load_limit を設定する．
@@ -37,7 +37,7 @@ public:
 
   // 最大のテーブルサイズを設定する．
   void
-  max_size(size_t max_size);
+  max_size(ymuint64 max_size);
 
 
 protected:
@@ -70,12 +70,12 @@ protected:
 
   // BddMgr からメモリを確保する．
   void*
-  allocate(size_t size);
+  allocate(ymuint64 size);
 
   // BddMgr にメモリを返す．
   void
   deallocate(void* ptr,
-	     size_t size);
+	     ymuint64 size);
 
   // ログ出力用のストリームを得る．
   ostream&
@@ -90,14 +90,14 @@ protected:
 protected:
 
   // 使用されているセルの数
-  size_t mUsedNum;
+  ymuint64 mUsedNum;
 
   // テーブルサイズ
   // セルの個数．バイト数ではないので注意
-  size_t mTableSize;
+  ymuint64 mTableSize;
 
   // テーブルサイズ - 1 の値，ハッシュのマスクに用いる．
-  size_t mTableSize_1;
+  ymuint64 mTableSize_1;
 
   // ほとんどデバッグ用の名前
   string mName;
@@ -106,10 +106,10 @@ protected:
   double mLoadLimit;
 
   // ただし，テーブルのサイズはこれ以上大きくしない．
-  size_t mMaxSize;
+  ymuint64 mMaxSize;
 
   // mUsedがこの値を越えたらテーブルを拡張する
-  size_t mNextLimit;
+  ymuint64 mNextLimit;
 
   // 親の BddMgr
   BddMgrModern* mMgr;
@@ -134,6 +134,7 @@ class BmmCompTbl1 :
     BddEdge mKey1;
     BddEdge mAns;
   };
+
 public:
 
   // id1をキーとして検索を行なう
@@ -157,12 +158,12 @@ private:
   ~BmmCompTbl1();
 
   // ハッシュ関数
-  size_t
+  ymuint64
   hash_func(BddEdge id1);
 
   // テーブルサイズを変更する．
   void
-  resize(size_t new_size);
+  resize(ymuint64 new_size);
 
   // ガーベージコレクションが起きた時の処理を行なう．
   virtual
@@ -200,6 +201,7 @@ class BmmCompTbl2 :
     BddEdge mKey2;
     BddEdge mAns;
   };
+
 public:
 
   // id1, id2をキーとして検索を行なう
@@ -225,13 +227,13 @@ private:
   ~BmmCompTbl2();
 
   // ハッシュ関数
-  size_t
+  ymuint64
   hash_func(BddEdge id1,
 	    BddEdge id2);
 
   // テーブルサイズを変更する．
   void
-  resize(size_t new_size);
+  resize(ymuint64 new_size);
 
   // ガーベージコレクションが起きた時の処理を行なう．
   virtual
@@ -271,6 +273,7 @@ class BmmIsopTbl :
     BddEdge mAnsBdd;
     LogExpr* mAnsCov;
   };
+
 public:
 
   // id1, id2をキーとして検索を行なう
@@ -298,13 +301,13 @@ private:
   ~BmmIsopTbl();
 
   // ハッシュ関数
-  size_t
+  ymuint64
   hash_func(BddEdge id1,
 	    BddEdge id2);
 
   // テーブルサイズを変更する．
   void
-  resize(size_t new_size);
+  resize(ymuint64 new_size);
 
   // ガーベージコレクションが起きた時の処理を行なう．
   virtual
@@ -345,6 +348,7 @@ class BmmCompTbl3 :
     BddEdge mKey3;
     BddEdge mAns;
   };
+
 public:
 
   // 検索を行なう．
@@ -372,14 +376,14 @@ private:
   ~BmmCompTbl3();
 
   // ハッシュ関数
-  size_t
+  ymuint64
   hash_func(BddEdge id1,
 	    BddEdge id2,
 	    BddEdge id3);
 
   // テーブルサイズを変更する．
   void
-  resize(size_t new_size);
+  resize(ymuint64 new_size);
 
   // ガーベージコレクションが起きた時の処理を行なう．
   virtual
@@ -426,11 +430,11 @@ BmmCompTbl::check_noref(BddEdge e)
 
 // ハッシュ関数
 inline
-size_t
+ymuint64
 BmmCompTbl1::hash_func(BddEdge id1)
 {
-  ymuint v1 = id1.hash();
-  return size_t((v1 * v1) >> 8) & mTableSize_1;
+  ymuint64 v1 = id1.hash();
+  return ((v1 * v1) >> 8) & mTableSize_1;
 }
 
 // id1をキーとして検索を行なう
@@ -460,20 +464,20 @@ BmmCompTbl1::put(BddEdge id1,
     resize(mTableSize << 1);
   }
   Cell* tmp = mTable + hash_func(id1);
-  if ( tmp->mKey1.is_error() ) mUsedNum ++;
+  if ( tmp->mKey1.is_error() ) ++ mUsedNum;
   tmp->mKey1 = id1;
   tmp->mAns = ans;
 }
 
 // ハッシュ関数
 inline
-size_t
+ymuint64
 BmmCompTbl2::hash_func(BddEdge id1,
 		       BddEdge id2)
 {
-  ymuint v1 = id1.hash();
-  ymuint v2 = id2.hash();
-  return size_t(v1 + v2 + v2 + (v1 >> 2) + (v2 >> 4)) & mTableSize_1;
+  ymuint64 v1 = id1.hash();
+  ymuint64 v2 = id2.hash();
+  return (v1 + v2 + v2 + (v1 >> 2) + (v2 >> 4)) & mTableSize_1;
   //    return size_t((id1 * (id2 + 2)) >> 2) & mTableSize_1;
 }
 
@@ -506,7 +510,7 @@ BmmCompTbl2::put(BddEdge id1,
     resize(mTableSize << 1);
   }
   Cell* tmp = mTable + hash_func(id1, id2);
-  if ( tmp->mKey1.is_error() ) mUsedNum ++;
+  if ( tmp->mKey1.is_error() ) ++ mUsedNum;
   tmp->mKey1 = id1;
   tmp->mKey2 = id2;
   tmp->mAns = ans;
@@ -514,13 +518,13 @@ BmmCompTbl2::put(BddEdge id1,
 
 // ハッシュ関数
 inline
-size_t
+ymuint64
 BmmIsopTbl::hash_func(BddEdge id1,
 		      BddEdge id2)
 {
-  ymuint v1 = id1.hash();
-  ymuint v2 = id2.hash();
-  return size_t(v1 + v2 + v2 + (v1 >> 2) + (v2 >> 4)) & mTableSize_1;
+  ymuint64 v1 = id1.hash();
+  ymuint64 v2 = id2.hash();
+  return (v1 + v2 + v2 + (v1 >> 2) + (v2 >> 4)) & mTableSize_1;
   //    return size_t((id1 * (id2 + 2)) >> 2) & mTableSize_1;
 }
 
@@ -556,7 +560,7 @@ BmmIsopTbl::put(BddEdge id1,
     resize(mTableSize << 1);
   }
   Cell* tmp = mTable + hash_func(id1, id2);
-  if ( tmp->mKey1.is_error() ) mUsedNum ++;
+  if ( tmp->mKey1.is_error() ) ++ mUsedNum;
   tmp->mKey1 = id1;
   tmp->mKey2 = id2;
   tmp->mAnsBdd = ans_bdd;
@@ -566,16 +570,15 @@ BmmIsopTbl::put(BddEdge id1,
 
 // ハッシュ関数
 inline
-size_t
+ymuint64
 BmmCompTbl3::hash_func(BddEdge id1,
 		       BddEdge id2,
 		       BddEdge id3)
 {
-  ymuint v1 = id1.hash();
-  ymuint v2 = id2.hash();
-  ymuint v3 = id3.hash();
-  return size_t(v1 + v2 + v3 + (v1 >> 2) + (v2 >> 4) + (v3 >> 6))
-    & mTableSize_1;
+  ymuint64 v1 = id1.hash();
+  ymuint64 v2 = id2.hash();
+  ymuint64 v3 = id3.hash();
+  return (v1 + v2 + v3 + (v1 >> 2) + (v2 >> 4) + (v3 >> 6)) & mTableSize_1;
 }
 
 // 検索を行なう．
@@ -612,7 +615,7 @@ BmmCompTbl3::put(BddEdge id1,
     resize(mTableSize << 1);
   }
   Cell* tmp = mTable + hash_func(id1, id2, id3);
-  if ( tmp->mKey1.is_error() ) mUsedNum ++;
+  if ( tmp->mKey1.is_error() ) ++ mUsedNum;
   tmp->mKey1 = id1;
   tmp->mKey2 = id2;
   tmp->mKey3 = id3;

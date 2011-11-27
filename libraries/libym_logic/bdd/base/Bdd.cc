@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/base/Bdd.cc
+/// @file Bdd.cc
 /// @brief Bdd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: Bdd.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -454,8 +452,8 @@ Bdd::asmooth(const BddVarSet& svars) const
 
 // @brief x_level の変数を y_level まで「押し込む」
 Bdd
-Bdd::push_down(tLevel x_level,
-	       tLevel y_level,
+Bdd::push_down(ymuint x_level,
+	       ymuint y_level,
 	       tPol pol) const
 {
   if ( x_level >= y_level ) {
@@ -526,7 +524,7 @@ Bdd::shortest_onepath() const
 }
 
 // @brief 最短の 1パスの長さの取得
-tVarSize
+ymuint
 Bdd::shortest_onepath_len() const
 {
   return mMgr->shortest_onepath_len(mRoot);
@@ -687,39 +685,39 @@ size(const BddList& array)
 // @brief 真理値表密度の計算
 // @param[in] n 入力数
 double
-Bdd::density(tVarSize n) const
+Bdd::density(ymuint nvar) const
 {
-  mpz_class mc = mMgr->minterm_count(mRoot, n);
+  mpz_class mc = mMgr->minterm_count(mRoot, nvar);
   mpf_class mc_f(mc);
-  mpz_class w = mpz_class(1) << n;
+  mpz_class w = mpz_class(1) << nvar;
   mpf_class d = mc_f / w;
   return d.get_d();
 }
 
 // @brief 最小項の数の計算
 mpz_class
-Bdd::minterm_count(tVarSize n) const
+Bdd::minterm_count(ymuint nvar) const
 {
-  return mMgr->minterm_count(mRoot, n);
+  return mMgr->minterm_count(mRoot, nvar);
 }
 
 // @brief Walsh変換の 0次係数の計算
 mpz_class
-Bdd::walsh0(tVarSize n) const
+Bdd::walsh0(ymuint nvar) const
 {
-  return mMgr->walsh0(mRoot, n);
+  return mMgr->walsh0(mRoot, nvar);
 }
 
 // @brief Walsh変換の 1次係数の計算
 mpz_class
 Bdd::walsh1(VarId var,
-	    tVarSize n) const
+	    ymuint nvar) const
 {
-  return mMgr->walsh1(mRoot, var, n);
+  return mMgr->walsh1(mRoot, var, nvar);
 }
 
 // @brief サポート変数集合の計算 (VarVector)
-tVarSize
+ymuint
 Bdd::support(VarVector& vars) const
 {
   mMgr->mark_support(mRoot);
@@ -727,7 +725,7 @@ Bdd::support(VarVector& vars) const
 }
 
 // @brief サポート変数集合の計算 (VarList)
-tVarSize
+ymuint
 Bdd::support(VarList& vars) const
 {
   mMgr->mark_support(mRoot);
@@ -744,7 +742,7 @@ Bdd::support() const
 }
 
 // @brief サポート変数集合の要素数の計算
-tVarSize
+ymuint
 Bdd::support_size() const
 {
   return mMgr->mark_support(mRoot);
@@ -754,7 +752,7 @@ Bdd::support_size() const
 // @param[in] bdd_array BDD のベクタ
 // @param[in] sup サポート変数集合を格納するベクタ
 // @return サポート変数集合の要素数
-tVarSize
+ymuint
 support(const BddVector& bdd_array,
 	VarVector& sup)
 {
@@ -778,7 +776,7 @@ support(const BddVector& bdd_array,
 // @param[in] bdd_array BDD のベクタ
 // @param[in] sup サポート変数集合を格納するリスト
 // @return サポート変数集合の要素数
-tVarSize
+ymuint
 support(const BddVector& bdd_array,
 	VarList& sup)
 {
@@ -823,7 +821,7 @@ support(const BddVector& bdd_array)
 // @brief BDD ベクタのサポート変数集合の要素数の計算
 // @param[in] bdd_array BDD のベクタ
 // @return サポート変数集合の要素数
-tVarSize
+ymuint
 support_size(const BddVector& bdd_array)
 {
   if ( bdd_array.empty() ) {
@@ -844,7 +842,7 @@ support_size(const BddVector& bdd_array)
 // @param[in] bdd_array BDD のリスト
 // @param[in] sup サポート変数集合を格納するベクタ
 // @return サポート変数集合の要素数
-tVarSize
+ymuint
 support(const BddList& bdd_array,
 	VarVector& sup)
 {
@@ -868,7 +866,7 @@ support(const BddList& bdd_array,
 // @param[in] bdd_array BDD のリスト
 // @param[in] sup サポート変数集合を格納するリスト
 // @return サポート変数集合の要素数
-tVarSize
+ymuint
 support(const BddList& bdd_array,
 	VarList& sup)
 {
@@ -913,7 +911,7 @@ support(const BddList& bdd_array)
 // @brief BDD リストのサポート変数集合の要素数の計算
 // @param[in] bdd_array BDD のリスト
 // @return サポート変数集合の要素数
-tVarSize
+ymuint
 support_size(const BddList& bdd_array)
 {
   if ( bdd_array.empty() ) {
@@ -1137,7 +1135,7 @@ lsintersect(const Bdd& src1,
 // @brief BddLitSet を表しているときに内容をベクタに変換する．
 // @param[in] dst 結果を格納するベクタ
 // @return 要素数
-tVarSize
+ymuint
 Bdd::to_literalvector(LiteralVector& dst) const
 {
   return mMgr->to_literalvector(mRoot, dst);
@@ -1146,7 +1144,7 @@ Bdd::to_literalvector(LiteralVector& dst) const
 // @brief BddLitSet を表しているときに内容をリストに変換する．
 // @param[in] dst 結果を格納するリスト
 // @return 要素数
-tVarSize
+ymuint
 Bdd::to_literallist(LiteralList& dst) const
 {
   return mMgr->to_literallist(mRoot, dst);

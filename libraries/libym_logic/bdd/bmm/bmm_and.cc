@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmm/bmm_and.cc
+/// @file bmm_and.cc
 /// @brief AND 演算を行う関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmm_and.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -207,8 +205,8 @@ BddMgrModern::check_intersect(BddEdge f,
     Node* g_vp = get_node(g);
     Var* f_var = f_vp->var();
     Var* g_var = g_vp->var();
-    tLevel f_level = f_var->level();
-    tLevel g_level = g_var->level();
+    ymuint f_level = f_var->level();
+    ymuint g_level = g_var->level();
     BddEdge f_0, f_1;
     BddEdge g_0, g_1;
     if ( f_level < g_level ) {

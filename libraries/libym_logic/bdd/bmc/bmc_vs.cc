@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmc/bmc_vs.cc
+/// @file bmc_vs.cc
 /// @brief 変数集合を扱う関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmc_vs.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -37,8 +35,8 @@ BddMgrClassic::vscap(BddEdge e1,
   Node* node2 = get_node(e2);
   Var* var1 = node1->var();
   Var* var2 = node2->var();
-  tLevel level1 = var1->level();
-  tLevel level2 = var2->level();
+  ymuint level1 = var1->level();
+  ymuint level2 = var2->level();
   for ( ; ; ) {
     if ( level1 == level2 ) {
       BddEdge tmp = vscap(node1->edge1(), node2->edge1());
@@ -90,8 +88,8 @@ BddMgrClassic::vsdiff(BddEdge e1,
   Node* node2 = get_node(e2);
   Var* var1 = node1->var();
   Var* var2 = node2->var();
-  tLevel level1 = var1->level();
-  tLevel level2 = var2->level();
+  ymuint level1 = var1->level();
+  ymuint level2 = var2->level();
   for ( ; ; ) {
     if ( level1 < level2 ) {
       BddEdge tmp = vsdiff(node1->edge1(), e2);
@@ -145,8 +143,8 @@ BddMgrClassic::vsintersect(BddEdge e1,
 
   Node* node1 = get_node(e1);
   Node* node2 = get_node(e2);
-  tLevel level1 = node1->level();
-  tLevel level2 = node2->level();
+  ymuint level1 = node1->level();
+  ymuint level2 = node2->level();
   for ( ; ; ) {
     if ( level1 == level2 ) {
       return true;

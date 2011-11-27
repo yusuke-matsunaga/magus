@@ -28,15 +28,15 @@ public:
   // コンストラクタとデストラクタ
   //////////////////////////////////////////////////////////////////////
 
-  // デフォルトマネージャを返す．
+  /// @brief デフォルトマネージャを返す．
   static
   BddMgrImpl*
   default_mgr();
 
-  // コンストラクタ
+  /// @brief コンストラクタ
   BddMgrImpl();
 
-  // デストラクタ
+  /// @brief デストラクタ
   virtual
   ~BddMgrImpl();
 
@@ -46,12 +46,14 @@ public:
   // BDDの根の枝の参照回数関数
   //////////////////////////////////////////////////////////////////////
 
-  // e の参照回数を増やす．
+  /// @brief 根の枝の参照回数を増やす．
+  /// @param[in] e 根の枝
   virtual
   void
   inc_rootref(BddEdge e) = 0;
 
-  // e の参照回数を減らす．
+  /// @brief 根の枝の参照回数を減らす．
+  /// @param[in] e 根の枝
   virtual
   void
   dec_rootref(BddEdge e) = 0;
@@ -62,35 +64,42 @@ public:
   // 変数番号とレベルの対応づけ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数を確保する．
-  // 確保に失敗したら false を返す．
-  // 最後の変数の後ろに挿入される．
+  /// @brief 変数を確保する．
+  /// @param[in] varid 変数番号
+  /// @return 確保に失敗したら false を返す．
+  /// @note 最後の変数の後ろに挿入される．
   virtual
   bool
   new_var(VarId varid) = 0;
 
-  // 現在登録されている変数をそのレベルの昇順で返す．
+  /// @brief 現在登録されている変数をそのレベルの昇順で返す．
+  /// @param[out] vlist 変数を格納するリスト
+  /// @return 変数の数 ( = vlist.size() ) を返す．
   virtual
-  tVarSize
+  ymuint
   var_list(list<VarId>& vlist) const = 0;
 
-  // 変数番号からレベルを得る．
-  // もしもレベルが割り当てられていない場合にはエラーとなる．
+  /// @brief 変数番号からレベルを得る．
+  /// @param[in] varid 変数番号
+  /// @return varid に対応するレベルを返す．
+  /// @note もしもレベルが割り当てられていない場合にはエラーとなる．
   virtual
-  tLevel
+  ymuint
   level(VarId varid) const = 0;
 
-  // レベルから変数番号を得る．
+  /// @brief レベルから変数番号を得る．
+  /// @param[in] level レベル
+  /// @return level に対応する変数番号を返す．
   virtual
   VarId
-  varid(tLevel level) const = 0;
+  varid(ymuint level) const = 0;
 
-  // 動的変数順変更を許可する．
+  /// @brief 動的変数順変更を許可する．
   virtual
   void
   enable_DVO() = 0;
 
-  // 動的変数順変更を禁止する．
+  /// @brief 動的変数順変更を禁止する．
   virtual
   void
   disable_DVO() = 0;
@@ -101,7 +110,8 @@ public:
   // BDD 生成用関数
   //////////////////////////////////////////////////////////////////////
 
-  // 肯定のリテラル関数を作る
+  /// @brief 肯定のリテラル関数を作る
+  /// @param[in] varid 変数番号
   virtual
   BddEdge
   make_posiliteral(VarId varid) = 0;
@@ -121,7 +131,8 @@ public:
 	   BddEdge chd_1);
 
   /// @brief ベクタを真理値表と見なしてBDDを作る．
-  /// @note 個々の変数を vars で指定する．
+  /// @param[in] v 真理値表のベクタ
+  /// @param[in] vars 変数番号の配列
   /// @note ベクタの値は非ゼロを true とみなす．
   /// @note v の大きさは 2^(vars.size()) に等しくなければならない．
   BddEdge
@@ -134,65 +145,87 @@ public:
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
 
-  // e1 & e2 を計算する．
+  /// @brief e1 & e2 を計算する．
+  /// @param[in] e1, e2 演算対象の枝
+  /// @return 演算結果を返す．
   virtual
   BddEdge
   and_op(BddEdge e1,
 	 BddEdge e2) = 0;
 
-  // e1 & e2 & e3 を計算する．
+  /// @brief e1 & e2 & e3 を計算する．
+  /// @param[in] e1, e2, e3 演算対象の枝
+  /// @return 演算結果を返す．
   BddEdge
   and_op(BddEdge e1,
 	 BddEdge e2,
 	 BddEdge e3);
 
-  // e1 | e2 を計算する．
+  /// @brief e1 | e2 を計算する．
+  /// @param[in] e1, e2 演算対象の枝
+  /// @return 演算結果を返す．
   BddEdge
   or_op(BddEdge e1,
 	BddEdge e2);
 
-  // e1 | e2 | e3 を計算する．
+  /// @brief e1 | e2 | e3 を計算する．
+  /// @param[in] e1, e2, e3 演算対象の枝
+  /// @return 演算結果を返す．
   BddEdge
   or_op(BddEdge e1,
 	BddEdge e2,
 	BddEdge e3);
 
-  // src1 ^ src2 を計算する．
+  /// @brief src1 ^ src2 を計算する．
+  /// @param[in] e1, e2 演算対象の枝
+  /// @return 演算結果を返す．
   virtual
   BddEdge
   xor_op(BddEdge e1,
 	 BddEdge e2) = 0;
 
-  // e1 ^ e2 ^ e3 を計算する．
+  /// @brief e1 ^ e2 ^ e3 を計算する．
+  /// @param[in] e1, e2, e3 演算対象の枝
+  /// @return 演算結果を返す．
   BddEdge
   xor_op(BddEdge e1,
 	 BddEdge e2,
 	 BddEdge e3);
 
-  // src1 と src2 の共通部分があれば kEdge1 を返す．
+  /// @brief e1 と e2 の共通部分があれば kEdge1 を返す．
+  /// @param[in] e1, e2 演算対象の枝
+  /// @return 演算結果を返す．
   virtual
   BddEdge
   check_intersect(BddEdge e1,
 		  BddEdge e2) = 0;
 
-  // Davio展開のモーメント項($f_{\overline{x}} \oplus f_x$)を
-  // 求める処理
+  /// @brief Davio展開のモーメント項を求める処理
+  /// @param[in] e 演算対象の枝
+  /// @param[in] idx 展開を行う変数番号
+  /// @return 演算結果を返す．
+  /// @note モーメント項とは $f_{\overline{x}} \oplus f_x$ のこと．
   virtual
   BddEdge
   xor_moment(BddEdge e,
 	     VarId idx) = 0;
 
-  // bdd がキューブの時 true を返す．
+  /// @brief bdd がキューブの時 true を返す．
+  /// @param[in] e 演算対象の枝
   virtual
   bool
   check_cube(BddEdge e) = 0;
 
-  // bdd が肯定リテラルのみからなるキューブの時 true を返す．
+  /// @brief bdd が肯定リテラルのみからなるキューブの時 true を返す．
+  /// @param[in] e 演算対象の枝
   virtual
   bool
   check_posi_cube(BddEdge e) = 0;
 
-  // 変数xとyが対称(交換可能)な時にtrueを返す．
+  /// @brief 変数 xと y が対称(交換可能)な時にtrueを返す．
+  /// @param[in] e 演算対象の枝
+  /// @param[in] x, y 変数番号
+  /// @param[in] pol 極性
   virtual
   bool
   check_symmetry(BddEdge e,
@@ -200,87 +233,111 @@ public:
 		 VarId y,
 		 tPol pol) = 0;
 
-  // 一つの変数に対する cofactor を計算する．
+  /// @brief 一つの変数に対する cofactor を計算する．
+  /// @param[in] e 演算対象の枝
+  /// @param[in] id 展開対象の変数番号
+  /// @param[in] pol 極性
+  /// @return 演算結果を返す．
   virtual
   BddEdge
-  scofactor(BddEdge e1,
+  scofactor(BddEdge e,
 	    VarId id,
 	    tPol pol) = 0;
 
-  // generalized cofactor を計算する．
+  /// @brief generalized cofactor を計算する．
+  /// @param[in] e1, e2 演算対象の枝
+  /// @return 演算結果を返す．
   virtual
   BddEdge
   gcofactor(BddEdge e1,
 	    BddEdge e2) = 0;
 
-  // if-then-else 演算を計算する．
+  /// @brief if-then-else 演算を計算する．
+  /// @param[in] e1, e2, e3 演算対象の枝
+  /// @return 演算結果を返す．
   virtual
   BddEdge
   ite_op(BddEdge e1,
 	 BddEdge e2,
 	 BddEdge e3) = 0;
 
-  // multiple compose 演算を行うために最初に呼ばれる関数．
+  /// @brief multiple compose 演算を行うために最初に呼ばれる関数．
   virtual
   void
   compose_start() = 0;
 
-  // multiple compose 演算を行う変数と置き換え関数を登録する関数
+  /// @brief multiple compose 演算を行う変数と置き換え関数を登録する関数
+  /// @param[in] id 変数番号
+  /// @param[in] e id に対応するBDDの根の枝
   virtual
   void
   compose_reg(VarId id,
 	      BddEdge e) = 0;
 
-  // multiple compose 演算の本体
+  /// @brief multiple compose 演算の本体
+  /// @param[in] e 演算対象の枝
+  /// @return 演算結果を返す．
   virtual
   BddEdge
   compose(BddEdge e) = 0;
 
-  // x_level の変数を y_level まで「押し込む」．
-  // pol が kPolNega の時は 0-枝と 1-枝を取り替える．
+  /// @brief x_level の変数を y_level まで「押し込む」．
+  /// @note pol が kPolNega の時は 0-枝と 1-枝を取り替える．
   virtual
   BddEdge
   push_down(BddEdge e,
-	    tLevel x_level,
-	    tLevel y_level,
+	    ymuint x_level,
+	    ymuint y_level,
 	    tPol pol = kPolPosi) = 0;
 
-  // smoothing(elimination)
-  // svars に含まれる変数を消去する．
+  /// @brief smoothing(elimination)
+  /// @param[in] e1, e2 演算対象の枝
+  /// @return 演算結果を返す．
+  /// @note svars に含まれる変数を消去する．
   virtual
   BddEdge
   esmooth(BddEdge e1,
 	  BddEdge e2) = 0;
 
-  // src1 と src2 の論理積を計算して src3 の変数を消去する．
+  /// @brief src1 と src2 の論理積を計算して src3 の変数を消去する．
+  /// @param[in] e1, e2, e3 演算対象の枝
+  /// @return 演算結果を返す．
   virtual
   BddEdge
   and_exist(BddEdge e1,
 	    BddEdge e2,
 	    BddEdge e3) = 0;
 
-  // lower と upper で指定された不完全指定論理関数の非冗長積和形を求める．
+  /// @brief 不完全指定論理関数の非冗長積和形を求める．
+  /// @param[in] l オンセットを表す関数
+  /// @param[in] u オンセット＋ドントケアセットを表す関数
+  /// @param[out] cover 結果の論理式を格納する変数
+  /// @return 演算結果を返す．
   virtual
   BddEdge
   isop(BddEdge l,
        BddEdge u,
        LogExpr& cover) = 0;
 
-  // lower と upper で指定された不完全指定論理関数の主項カバーを求める．
+  /// @brief 不完全指定論理関数の主項カバーを求める．
+  /// @param[in] l オンセットを表す関数
+  /// @param[in] u オンセット＋ドントケアセットを表す関数
+  /// @return 結果の論理式を返す．
   virtual
   LogExpr
   prime_cover(BddEdge l,
 	      BddEdge u) = 0;
 
-  // lower と upper で指定された不完全指定論理関数の極小サポート集合をすべて
-  // 列挙する．解は論理関数の形で返される．そのなかの主項がサポート集合に
-  // 対応している．
+  /// @brief 不完全指定論理関数の極小サポート集合をすべて列挙する．
+  /// @param[in] l オンセットを表す関数
+  /// @param[in] u オンセット＋ドントケアセットを表す関数
+  /// 解は論理関数の形で返される．そのなかの主項がサポート集合に対応している．
   virtual
   BddEdge
   minimal_support(BddEdge l,
 		  BddEdge u) = 0;
 
-  // smallest cube containing F 演算
+  /// @brief smallest cube containing F 演算
   virtual
   BddEdge
   SCC(BddEdge e) = 0;
@@ -291,36 +348,36 @@ public:
   // BDD の構造に関係したメソッド
   //////////////////////////////////////////////////////////////////////
 
-  // 根の節点の変数に基づいてShannon展開を行なう．
-  // 戻り値として根の節点の変数番号を返し，その変数を0/1に固定した
-  // 時の cofactor をそれぞれ f0, f1 に入れる．
-  // もともと定数値(葉)のBDDの場合，kVarIdMax を返し，
-  // f0, f1 には自分自身を代入する．
+  /// @brief 根の節点の変数に基づいてShannon展開を行なう．
+  /// 戻り値として根の節点の変数番号を返し，その変数を0/1に固定した
+  /// 時の cofactor をそれぞれ f0, f1 に入れる．
+  /// もともと定数値(葉)のBDDの場合，kVarIdMax を返し，
+  /// f0, f1 には自分自身を代入する．
   virtual
   VarId
   root_decomp(BddEdge e,
 	      BddEdge& e0,
 	      BddEdge& e1) = 0;
 
-  // 根の変数番号インデックスを取り出す．
-  // 定数節点の場合には kVarIdMax を返す．
+  /// @brief 根の変数番号インデックスを取り出す．
+  /// @note 定数節点の場合には kVarIdMax を返す．
   virtual
   VarId
   root_var(BddEdge e) = 0;
 
-  // 0枝の指している cofactor を返す．
-  // 定数節点の場合には自分自身を返す．
+  /// @brief 0枝の指している cofactor を返す．
+  /// @note 定数節点の場合には自分自身を返す．
   virtual
   BddEdge
   edge0(BddEdge e) = 0;
 
-  // 1枝の指している cofactor を返す．
-  // 定数節点の場合には自分自身を返す．
+  /// @brief 1枝の指している cofactor を返す．
+  /// @note 定数節点の場合には自分自身を返す．
   virtual
   BddEdge
   edge1(BddEdge e) = 0;
 
-  // e の参照回数が0なら true を返す．
+  /// @brief e の参照回数が0なら true を返す．
   virtual
   bool
   check_noref(BddEdge e) = 0;
@@ -331,21 +388,21 @@ public:
   // 1へ至るパスを求める関数
   //////////////////////////////////////////////////////////////////////
 
-  // 1パスを求める．
-  // 結果はその経路のみのBDDとなる．
+  /// @brief 1パスを求める．
+  /// @note 結果はその経路のみのBDDとなる．
   virtual
   BddEdge
   onepath(BddEdge e) = 0;
 
-  // 最短の1パスを求める．
-  // 結果はその経路のみのBDDとなる．
+  /// @brief 最短の1パスを求める．
+  /// @note 結果はその経路のみのBDDとなる．
   virtual
   BddEdge
   shortest_onepath(BddEdge e) = 0;
 
-  // 最短の1パスの長さを求める．
+  /// @brief 最短の1パスの長さを求める．
   virtual
-  tVarSize
+  ymuint
   shortest_onepath_len(BddEdge e) = 0;
 
 
@@ -354,38 +411,43 @@ public:
   // ノード数の計数や真理値表密度の計算など
   //////////////////////////////////////////////////////////////////////
 
-  // e を根とするBDDのノード数を数える．
+  /// @brief e を根とするBDDのノード数を数える．
+  /// @param[in] e 根の枝
   virtual
-  size_t
+  ymuint64
   size(BddEdge e) = 0;
 
-  // edge_list に登録されたBDDのノード数を数える．
+  /// @brief edge_list に登録されたBDDのノード数を数える．
   virtual
-  size_t
+  ymuint64
   size(const list<BddEdge>& edge_list) = 0;
 
-  // BDD の表す論理関数の minterm の数を返す．
-  // 無限長精度の整数(mpz_class)を用いて計算する．
-  // n は論理関数の変数の数
+  /// @brief BDD の表す論理関数の minterm の数を返す．
+  /// @param[in] e 根の枝
+  /// @param[in] nvar 論理関数の変数の数
+  /// 無限長精度の整数(mpz_class)を用いて計算する．
   virtual
   mpz_class
   minterm_count(BddEdge e,
-		tVarSize n) = 0;
+		ymuint nvar) = 0;
 
-  // Walsh 変換の0次の係数を計算する．
-  // n は論理関数の変数の数
+  /// @brief Walsh 変換の0次の係数を計算する．
+  /// @param[in] e 根の枝
+  /// @param[in] nvar 論理関数の変数の数
   virtual
   mpz_class
   walsh0(BddEdge e,
-	 tVarSize n) = 0;
+	 ymuint nvar) = 0;
 
-  // Walsh 変換の1次の係数を計算する．
-  // n は論理関数の変数の数
+  /// @brief Walsh 変換の1次の係数を計算する．
+  /// @param[in] e 根の枝
+  /// @param[in] var 変数番号
+  /// @param[in] nvar 論理関数の変数の数
   virtual
   mpz_class
   walsh1(BddEdge e,
 	 VarId var,
-	 tVarSize n) = 0;
+	 ymuint nvar) = 0;
 
 
 public:
@@ -393,27 +455,35 @@ public:
   // サポート関係の関数
   //////////////////////////////////////////////////////////////////////
 
-  // e を根とするBDDのサポートに印をつける．
+  /// @brief e を根とするBDDのサポートに印をつける．
+  /// @param[in] e 根の枝
+  /// @return サポート数を返す．
   virtual
-  tVarSize
+  ymuint
   mark_support(BddEdge e) = 0;
 
-  // edge_list に登録されたBDDのサポートに印をつける．
+  /// @brief edge_list に登録されたBDDのサポートに印をつける．
+  /// @param[in] edge_list 根の枝のリスト
+  /// @return サポート数を返す．
   virtual
-  tVarSize
+  ymuint
   mark_support(const list<BddEdge>& edge_list) = 0;
 
-  // 印のついた変数をベクタに変換する．
+  /// @brief 印のついた変数をベクタに変換する．
+  /// @param[out] support 結果を格納する変数
+  /// @return サポート数を返す．
   virtual
-  tVarSize
+  ymuint
   mark_to_vector(VarVector& support) = 0;
 
-  // 印のついた変数をリストに変換する．
+  /// @brief 印のついた変数をリストに変換する．
+  /// @param[out] support 結果を格納する変数
+  /// @return サポート数を返す．
   virtual
-  tVarSize
+  ymuint
   mark_to_list(VarList& support) = 0;
 
-  // 印のついた変数をBDD(キューブ)に変換する．
+  /// @brief 印のついた変数をBDD(キューブ)に変換する．
   virtual
   BddEdge
   mark_to_bdd() = 0;
@@ -424,19 +494,25 @@ public:
   // VarSet の内部で用いられる演算
   //////////////////////////////////////////////////////////////////////
 
-  // src1 と src2 が変数集合の時に共通部分を求める．
+  /// @brief 変数集合の共通部分を求める．
+  /// @param[in] e1, e2 演算対象の枝
+  /// @return 演算結果を返す．
   virtual
   BddEdge
   vscap(BddEdge e1,
 	BddEdge e2) = 0;
 
-  // src1 と src2 が変数集合の時に集合差を求める．
+  /// @brief 変数集合の集合差を求める．
+  /// @param[in] e1, e2 演算対象の枝
+  /// @return 演算結果を返す．
   virtual
   BddEdge
   vsdiff(BddEdge e1,
 	 BddEdge e2) = 0;
 
-  // src1 と src2 が変数集合の時のインターセクションチェック
+  /// @brief 変数集合のインターセクションチェック
+  /// @param[in] e1, e2 演算対象の枝
+  /// @return 演算結果を返す．
   virtual
   bool
   vsintersect(BddEdge e1,
@@ -448,33 +524,45 @@ public:
   // LitSet の内部で用いられる演算
   //////////////////////////////////////////////////////////////////////
 
-  // src1 と src2 がリテラル集合の時に共通部分を求める．
+  /// @brief リテラル集合の共通部分を求める．
+  /// @param[in] e1, e2 演算対象の枝
+  /// @return 演算結果を返す．
   virtual
   BddEdge
   lscap(BddEdge e1,
 	BddEdge e2) = 0;
 
-  // src1 と src2 がリテラル集合の時に集合差を求める．
+  /// @brief リテラル集合の集合差を求める．
+  /// @param[in] e1, e2 演算対象の枝
+  /// @return 演算結果を返す．
   virtual
   BddEdge
   lsdiff(BddEdge e1,
 	 BddEdge e2) = 0;
 
-  // src1 と src2 がリテラル集合の時のインターセクションチェック
+  /// @brief リテラル集合のインターセクションチェック
+  /// @param[in] e1, e2 演算対象の枝
+  /// @return 演算結果を返す．
   virtual
   bool
   lsintersect(BddEdge e1,
 	      BddEdge e2) = 0;
 
-  // LitSet 用のBDDからリテラルのベクタを作る．
+  /// @brief LitSet 用のBDDからリテラルのベクタを作る．
+  /// @param[in] e 根の枝
+  /// @param[out] dst 結果を格納する変数
+  /// @return リテラル数を返す．
   virtual
-  tVarSize
+  ymuint
   to_literalvector(BddEdge e,
 		   LiteralVector& dst) = 0;
 
-  // LitSet 用のBDDからリテラルのリストを作る．
+  /// @brief LitSet 用のBDDからリテラルのリストを作る．
+  /// @param[in] e 根の枝
+  /// @param[out] dst 結果を格納する変数
+  /// @return リテラル数を返す．
   virtual
-  tVarSize
+  ymuint
   to_literallist(BddEdge e,
 		 LiteralList& dst) = 0;
 
@@ -494,56 +582,59 @@ public:
   void
   disable_gc() = 0;
 
-  // ガーベージコレクションを行なう．
-  // shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
+  /// @brief ガーベージコレクションを行なう．
+  /// shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
   virtual
   void
   gc(bool shrink_nodetable) = 0;
 
-  // GC 前の sweep 処理を行うためのバインダーを登録する．
+  /// @brief GC 前の sweep 処理を行うためのバインダーを登録する．
   virtual
   void
   reg_sweep_binder(EventBinder* binder) = 0;
 
-  // パラメータを設定する．設定したい項目のマスクビットを1とする．
+  /// @brief パラメータを設定する．
+  /// @param[in] param パラメータ
+  /// @param[in] mask 設定する項目を指定するマスク
   virtual
   void
   param(const BddMgrParam& param,
 	ymuint32 mask) = 0;
 
-  // パラメータを取得する．
+  /// @brief パラメータを取得する．
+  /// @param[out] param 結果を格納する変数
   virtual
   void
   param(BddMgrParam& param) const = 0;
 
-  // 名前を得る．
+  /// @brief 名前を得る．
   virtual
   const string&
   name() const = 0;
 
-  // 使用メモリ量(in bytes)を得る．
+  /// @brief 使用メモリ量(in bytes)を得る．
   virtual
-  size_t
+  ymuint64
   used_mem() const = 0;
 
-  // 節点テーブルに登録されているノードの数を得る．
+  /// @brief 節点テーブルに登録されているノードの数を得る．
   virtual
-  size_t
+  ymuint64
   node_num() const = 0;
 
-  // GC で回収される(フリーになる)ノード数を得る．
+  /// @brief GC で回収される(フリーになる)ノード数を得る．
   virtual
-  size_t
+  ymuint64
   garbage_num() const = 0;
 
-  // 利用可能なフリーノード数を得る．
+  /// @brief 利用可能なフリーノード数を得る．
   virtual
-  size_t
+  ymuint64
   avail_num() const = 0;
 
-  // GC の起動された回数を得る．
+  /// @brief GC の起動された回数を得る．
   virtual
-  size_t
+  ymuint64
   gc_count() const = 0;
 
 
@@ -552,13 +643,17 @@ public:
   // BDDの管理用関数
   //////////////////////////////////////////////////////////////////////
 
-  // Bdd の根の枝をセットする時の関数
+  /// @brief BDD の根の枝をセットする時の関数
+  /// @param[in] bdd_p BDDのポインタ
+  /// @param[in] e 根の枝
   void
   set_bdd(Bdd* bdd_p,
 	  BddEdge e);
 
-  // bdd の根の枝を new_e に変更する．
-  // new_e も同一の BddMgr に属していると仮定する．
+  /// @brief BDD の根の枝を new_e に変更する．
+  /// @param[in] bdd_p BDDのポインタ
+  /// @param[in] new_e 根の枝
+  /// @note new_e も同一の BddMgr に属していると仮定する．
   void
   assign(Bdd* bdd_p,
 	 BddEdge new_e);
@@ -569,15 +664,15 @@ public:
   // ログ出力用の関数
   //////////////////////////////////////////////////////////////////////
 
-  // ログ出力用のストリームを設定する．
+  /// @brief ログ出力用のストリームを設定する．
   void
   set_logstream(ostream& s);
 
-  // ログ出力用のストリームを解除する．
+  /// @brief ログ出力用のストリームを解除する．
   void
   unset_logstream();
 
-  // ログ出力用のストリームを得る．
+  /// @brief ログ出力用のストリームを得る．
   ostream&
   logstream() const;
 
@@ -602,7 +697,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 参照回数
-  int mRefCount;
+  ymuint32 mRefCount;
 
 
   //////////////////////////////////////////////////////////////////////

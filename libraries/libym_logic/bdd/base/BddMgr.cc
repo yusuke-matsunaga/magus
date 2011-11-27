@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/base/BddMgrRef.cc
+/// @file BddMgrRef.cc
 /// @brief BddMgrRef の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BddMgrRef.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -153,7 +151,7 @@ BddMgr::make_bdd(VarId index,
 // v の大きさは 2^ni に等しくなければならない．
 Bdd
 BddMgr::tvec_to_bdd(const vector<int>& v,
-		    tVarSize ni)
+		    ymuint ni)
 {
   VarVector vv(ni);
   for (ymuint i = 0; i < ni; ++ i) {
@@ -320,8 +318,8 @@ END_NONAMESPACE
 
 // 閾値関数を作る．
 Bdd
-BddMgr::make_thfunc(tVarSize n,
-		    tVarSize th)
+BddMgr::make_thfunc(ymuint n,
+		    ymuint th)
 {
   vector<BddEdge> table((n + 1) * (th + 1));
   table[elem(n, 0, th)] = BddEdge::make_one();
@@ -644,7 +642,7 @@ BddMgr::new_var(VarId varid)
 }
 
 // 現在登録されている変数をそのレベルの昇順で返す．
-tVarSize
+ymuint
 BddMgr::var_list(list<VarId>& vlist) const
 {
   return mImpl->var_list(vlist);
@@ -652,7 +650,7 @@ BddMgr::var_list(list<VarId>& vlist) const
 
 // 変数番号からレベルを得る．
 // もしもレベルが割り当てられていない場合にはエラーとなる．
-tLevel
+ymuint
 BddMgr::level(VarId varid) const
 {
   return mImpl->level(varid);
@@ -660,7 +658,7 @@ BddMgr::level(VarId varid) const
 
 // レベルから変数番号を得る．
 VarId
-BddMgr::varid(tLevel level) const
+BddMgr::varid(ymuint level) const
 {
   return mImpl->varid(level);
 }

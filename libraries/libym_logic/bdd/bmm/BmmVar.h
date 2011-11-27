@@ -1,7 +1,7 @@
-#ifndef LIBYM_LOGIC_BDD_BMM_BMMVAR_H
-#define LIBYM_LOGIC_BDD_BMM_BMMVAR_H
+#ifndef BMMVAR_H
+#define BMMVAR_H
 
-/// @file libym_logic/bdd/bmm/BmmVar.h
+/// @file BmmVar.h
 /// @brief BmmVar のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -23,6 +23,7 @@ class BmmNode;
 class BmmVar
 {
   friend class BddMgrModern;
+
 public:
   typedef BmmNode Node;
 
@@ -36,13 +37,14 @@ public:
   }
 
   // レベルを得る．
-  tLevel
+  ymuint
   level() const
   {
     return mLevel;
   }
 
 private:
+
   // コンストラクタ
   BmmVar(BddMgrModern* mgr,
 	 VarId id);
@@ -60,13 +62,13 @@ private:
 
   // ノードを登録する．
   void
-  reg_node(size_t pos,
+  reg_node(ymuint64 pos,
 	   BmmNode* node);
 
   // 節点テーブルを拡張する
   // メモリアロケーションに失敗したら false を返す．
   bool
-  resize(size_t new_size);
+  resize(ymuint64 new_size);
 
   // 次のリミット値を計算する
   void
@@ -79,13 +81,13 @@ private:
   // 節点テーブル用のメモリを確保する．
   // size はバイト単位ではなくエントリ数
   BmmNode**
-  alloc_nodetable(size_t size);
+  alloc_nodetable(ymuint64 size);
 
   // 節点テーブル用のメモリを解放する．
   // size はバイト単位ではなくエントリ数
   void
   dealloc_nodetable(BmmNode** table,
-		    size_t size);
+		    ymuint64 size);
 
 
 private:
@@ -102,7 +104,7 @@ private:
 
   // レベル
   // これは可変
-  tLevel mLevel;
+  ymuint32 mLevel;
 
   // 作業用のマーク
   int mMark;
@@ -118,22 +120,22 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // テーブルサイズ
-  size_t mTableSize;
+  ymuint64 mTableSize;
 
   // テーブルサイズ - 1
-  size_t mTableSize_1;
+  ymuint64 mTableSize_1;
 
   // ノード数がこの数を越えたらテーブルサイズを拡張する．
-  size_t mNextLimit;
+  ymuint64 mNextLimit;
 
   // テーブル本体
   BmmNode** mNodeTable;
 
   // ノード数
-  size_t mNodeNum;
+  ymuint64 mNodeNum;
 
 };
 
 END_NAMESPACE_YM_BDD
 
-#endif // LIBYM_LOGIC_BDD_BMM_BMMVAR_H
+#endif // BMMVAR_H

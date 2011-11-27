@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/base/BddLitSet.cc
+/// @file BddLitSet.cc
 /// @brief BddLitSet の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BddLitSet.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.

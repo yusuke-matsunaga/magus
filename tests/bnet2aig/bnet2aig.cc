@@ -86,7 +86,7 @@ bnet2aig(const BNetwork& network,
     output_handle_list.push_back(ianode);
   }
 
-  aig_mgr.dump_handles(cout, output_handle_list);
+  aig_mgr.print_handles(cout, output_handle_list);
 
 #if 0
   SatSolver* solver = SatSolverFactory::gen_solver();

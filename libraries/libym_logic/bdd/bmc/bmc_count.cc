@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmc/bmc_count.cc
+/// @file bmc_count.cc
 /// @brief 節点数を数える関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmc_count.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -17,14 +15,14 @@ BEGIN_NAMESPACE_YM_BDD
 BEGIN_NONAMESPACE
 
 mpz_class n_invect;
-ymuint n_invect_int;
+ymuint32 n_invect_int;
 
-tLevel w_level;
+ymuint32 w_level;
 
 END_NONAMESPACE
 
 // e を根とするBDDの節点数を数える．
-size_t
+ymuint64
 BddMgrClassic::size(BddEdge e)
 {
   mNum = 0;
@@ -34,7 +32,7 @@ BddMgrClassic::size(BddEdge e)
 }
 
 // edge list に登録されたBDDの節点数を数える．
-size_t
+ymuint64
 BddMgrClassic::size(const list<BddEdge>& edge_list)
 {
   mNum = 0;
@@ -70,7 +68,7 @@ BddMgrClassic::count1(BddEdge e)
 // 論理関数の変数の数を指定するバージョン
 mpz_class
 BddMgrClassic::minterm_count(BddEdge e,
-			     tVarSize n)
+			     ymuint n)
 {
   if ( e.is_overflow() ) {
     return 0;
@@ -180,7 +178,7 @@ BddMgrClassic::mterm_step(BddEdge e,
 // n は全入力数
 mpz_class
 BddMgrClassic::walsh0(BddEdge e,
-		      tVarSize n)
+		      ymuint n)
 {
   if ( e.is_overflow() ) {
     return 0;
@@ -305,7 +303,7 @@ BddMgrClassic::wt0_step(BddEdge e,
 mpz_class
 BddMgrClassic::walsh1(BddEdge e,
 		      VarId var,
-		      tVarSize n)
+		      ymuint n)
 {
   if ( e.is_invalid() ) {
     return 0;
@@ -344,7 +342,7 @@ BddMgrClassic::wt1_step(BddEdge e,
   }
 
   Node* vp = get_node(e);
-  tLevel level = vp->level();
+  ymuint level = vp->level();
   if ( level > w_level ) {
     return 0;
   }
@@ -400,7 +398,7 @@ BddMgrClassic::wt1_step(BddEdge e,
   }
 
   Node* vp = get_node(e);
-  tLevel level = vp->level();
+  ymuint level = vp->level();
   if ( level > w_level ) {
     return 0;
   }
