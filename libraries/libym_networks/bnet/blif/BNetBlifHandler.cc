@@ -120,12 +120,13 @@ BNetBlifHandler::names(const vector<ymuint32>& name_id_array,
       for (ymuint32 c = 0; c < nc; ++ c) {
 	vector<LogExpr> and_expr;
 	for (ymuint32 i = 0; i < ni; ++ i) {
+	  VarId var(i);
 	  char v = cover_pat[c * ni + i];
 	  if ( v == '0' ) {
-	    and_expr.push_back(LogExpr::make_negaliteral(i));
+	    and_expr.push_back(LogExpr::make_negaliteral(var));
 	  }
 	  else if ( v == '1' ) {
-	    and_expr.push_back(LogExpr::make_posiliteral(i));
+	    and_expr.push_back(LogExpr::make_posiliteral(var));
 	  }
 	}
 	or_expr.push_back(LogExpr::make_and(and_expr));
@@ -142,12 +143,13 @@ BNetBlifHandler::names(const vector<ymuint32>& name_id_array,
       for (ymuint32 c = 0; c < nc; ++ c) {
 	vector<LogExpr> and_expr;
 	for (ymuint32 i = 0; i < ni; ++ i) {
+	  VarId var(i);
 	  char v = cover_pat[c * ni + i];
 	  if ( v == '0' ) {
-	    and_expr.push_back(LogExpr::make_posiliteral(i));
+	    and_expr.push_back(LogExpr::make_posiliteral(var));
 	  }
 	  else if ( v == '1' ) {
-	    and_expr.push_back(LogExpr::make_negaliteral(i));
+	    and_expr.push_back(LogExpr::make_negaliteral(var));
 	  }
 	}
 	or_expr.push_back(LogExpr::make_or(and_expr));

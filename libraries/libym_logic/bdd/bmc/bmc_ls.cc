@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmc/bmc_ls.cc
+/// @file bmc_ls.cc
 /// @brief リテラル集合を扱う関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmc_ls.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -84,8 +82,8 @@ BddMgrClassic::lscap(BddEdge e1,
   tPol pol2 = e2.pol();
   Var* var1 = node1->var();
   Var* var2 = node2->var();
-  tLevel level1 = var1->level();
-  tLevel level2 = var2->level();
+  ymuint level1 = var1->level();
+  ymuint level2 = var2->level();
   for ( ; ; ) {
     if ( level1 == level2 ) {
       int which1;
@@ -164,8 +162,8 @@ BddMgrClassic::lsdiff(BddEdge e1,
   tPol pol2 = e2.pol();
   Var* var1 = node1->var();
   Var* var2 = node2->var();
-  tLevel level1 = var1->level();
-  tLevel level2 = var2->level();
+  ymuint level1 = var1->level();
+  ymuint level2 = var2->level();
   for ( ; ; ) {
     if ( level1 < level2 ) {
       int which1;
@@ -187,7 +185,7 @@ BddMgrClassic::lsdiff(BddEdge e1,
       node2 = get_node(e2);
       pol2 = e2.pol();
       var2 = node2->var();
-      level2 = var2->varid();
+      level2 = var2->level();
     }
     else {
       int which1;
@@ -237,8 +235,8 @@ BddMgrClassic::lsintersect(BddEdge e1,
   Node* node2 = get_node(e2);
   tPol pol1 = e1.pol();
   tPol pol2 = e2.pol();
-  tLevel level1 = node1->level();
-  tLevel level2 = node2->level();
+  ymuint level1 = node1->level();
+  ymuint level2 = node2->level();
   for ( ; ; ) {
     if ( level1 == level2 ) {
       int which1;
@@ -282,7 +280,7 @@ BddMgrClassic::lsintersect(BddEdge e1,
 }
 
 // リテラルの vector に変換する．
-tVarSize
+ymuint
 BddMgrClassic::to_literalvector(BddEdge e,
 				LiteralVector& dst)
 {
@@ -298,7 +296,7 @@ BddMgrClassic::to_literalvector(BddEdge e,
   Node* vp = get_node(e);
   tPol pol = e.pol();
   while ( vp ) {
-    tVarId varid = vp->varid();
+    VarId varid = vp->varid();
     BddEdge e0 = vp->edge0(pol);
     BddEdge e1 = vp->edge1(pol);
     if ( e0 == BddEdge::make_zero() ) {
@@ -318,7 +316,7 @@ BddMgrClassic::to_literalvector(BddEdge e,
 }
 
 // リテラルの list に変換する．
-tVarSize
+ymuint
 BddMgrClassic::to_literallist(BddEdge e,
 			      LiteralList& dst)
 {
@@ -331,7 +329,7 @@ BddMgrClassic::to_literallist(BddEdge e,
   Node* vp = get_node(e);
   tPol pol = e.pol();
   while ( vp ) {
-    tVarId varid = vp->varid();
+    VarId varid = vp->varid();
     BddEdge e0 = vp->edge0(pol);
     BddEdge e1 = vp->edge1(pol);
     if ( e0 == BddEdge::make_zero() ) {

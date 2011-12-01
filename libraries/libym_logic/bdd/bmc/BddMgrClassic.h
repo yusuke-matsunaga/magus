@@ -1,7 +1,7 @@
-#ifndef LIBYM_LOGIC_BDD_BMC_BDDMGRCLASSIC_H
-#define LIBYM_LOGIC_BDD_BMC_BDDMGRCLASSIC_H
+#ifndef BDDMGRCLASSIC_H
+#define BDDMGRCLASSIC_H
 
-/// @file libym_logic/bdd/bmc/BddMgrClassic.h
+/// @file BddMgrClassic.h
 /// @brief BddMgrClassic のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -84,23 +84,23 @@ public:
   // 最後の変数の後ろに挿入される．
   virtual
   bool
-  new_var(tVarId varid);
+  new_var(VarId varid);
 
   // 現在登録されている変数をそのレベルの昇順で返す．
   virtual
-  tVarSize
-  var_list(list<tVarId>& vlist) const;
+  ymuint
+  var_list(list<VarId>& vlist) const;
 
   // 変数番号からレベルを得る．
   // もしもレベルが割り当てられていない場合にはエラーとなる．
   virtual
-  tLevel
-  level(tVarId varid) const;
+  ymuint
+  level(VarId varid) const;
 
   // レベルから変数番号を得る．
   virtual
-  tVarId
-  varid(tLevel level) const;
+  VarId
+  varid(ymuint level) const;
 
   // 動的変数順変更を許可する．
   virtual
@@ -120,7 +120,7 @@ public:
   // 肯定のリテラル関数を作る
   virtual
   BddEdge
-  make_posiliteral(tVarId varid);
+  make_posiliteral(VarId varid);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -150,7 +150,7 @@ public:
   virtual
   BddEdge
   xor_moment(BddEdge e,
-	     tVarId idx);
+	     VarId idx);
 
   // bdd がキューブの時 true を返す．
   virtual
@@ -166,15 +166,15 @@ public:
   virtual
   bool
   check_symmetry(BddEdge e,
-		 tVarId x,
-		 tVarId y,
+		 VarId x,
+		 VarId y,
 		 tPol pol);
 
   // 一つの変数に対する cofactor を計算する．
   virtual
   BddEdge
   scofactor(BddEdge e1,
-	    tVarId id,
+	    VarId id,
 	    tPol pol);
 
   // generalized cofactor を計算する．
@@ -198,7 +198,7 @@ public:
   // multiple compose 演算を行う変数と置き換え関数を登録する関数
   virtual
   void
-  compose_reg(tVarId id,
+  compose_reg(VarId id,
 	      BddEdge e);
 
   // multiple compose 演算の本体
@@ -211,8 +211,8 @@ public:
   virtual
   BddEdge
   push_down(BddEdge e,
-	    tLevel x_level,
-	    tLevel y_level,
+	    ymuint x_level,
+	    ymuint y_level,
 	    tPol pol);
 
   // smoothing(elimination)
@@ -266,7 +266,7 @@ public:
   // もともと定数値(葉)のBDDの場合，kVarIdMax を返し，
   // f0, f1 には自分自身を代入する．
   virtual
-  tVarId
+  VarId
   root_decomp(BddEdge e,
 	      BddEdge& e0,
 	      BddEdge& e1);
@@ -274,7 +274,7 @@ public:
   // 根の変数番号インデックスを取り出す．
   // 定数節点の場合には kVarIdMax を返す．
   virtual
-  tVarId
+  VarId
   root_var(BddEdge e);
 
   // 0枝の指している cofactor を返す．
@@ -314,7 +314,7 @@ public:
 
   // 最短の1パスの長さを求める．
   virtual
-  tVarSize
+  ymuint
   shortest_onepath_len(BddEdge e);
 
 
@@ -324,36 +324,36 @@ public:
 
   // e を根とするBDDのノード数を数える．
   virtual
-  size_t
+  ymuint64
   size(BddEdge e);
 
   // edge_list に登録されたBDDのノード数を数える．
   virtual
-  size_t
+  ymuint64
   size(const list<BddEdge>& edge_list);
 
   // BDD の表す論理関数の minterm の数を返す．
   // 無限長精度の整数(mpz_class)を用いて計算する．
-  // n は論理関数の変数の数
+  // nvar は論理関数の変数の数
   virtual
   mpz_class
   minterm_count(BddEdge e,
-		tVarSize n);
+		ymuint nvar);
 
   // Walsh 変換の0次の係数を計算する．
-  // n は論理関数の変数の数
+  // nvar は論理関数の変数の数
   virtual
   mpz_class
   walsh0(BddEdge e,
-	 tVarSize n);
+	 ymuint nvar);
 
   // Walsh 変換の1次の係数を計算する．
-  // n は論理関数の変数の数
+  // nvar は論理関数の変数の数
   virtual
   mpz_class
   walsh1(BddEdge e,
-	 tVarId var,
-	 tVarSize n);
+	 VarId var,
+	 ymuint nvar);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -362,22 +362,22 @@ public:
 
   // e を根とするBDDのサポートに印をつける．
   virtual
-  tVarSize
+  ymuint
   mark_support(BddEdge e);
 
   // edge_list に登録されたBDDのサポートに印をつける．
   virtual
-  tVarSize
+  ymuint
   mark_support(const list<BddEdge>& edge_list);
 
   // 印のついた変数をベクタに変換する．
   virtual
-  tVarSize
+  ymuint
   mark_to_vector(VarVector& support);
 
   // 印のついた変数をリストに変換する．
   virtual
-  tVarSize
+  ymuint
   mark_to_list(VarList& support);
 
   // 印のついた変数をBDD(キューブ)に変換する．
@@ -433,38 +433,15 @@ public:
 
   // LitSet 用のBDDからリテラルのベクタを作る．
   virtual
-  tVarSize
+  ymuint
   to_literalvector(BddEdge e,
 		   LiteralVector& dst);
 
   // LitSet 用のBDDからリテラルのリストを作る．
   virtual
-  tVarSize
+  ymuint
   to_literallist(BddEdge e,
 		 LiteralList& dst);
-
-
-  //////////////////////////////////////////////////////////////////////
-  // NPN Matcher で用いられる演算
-  //////////////////////////////////////////////////////////////////////
-
-  // e を根とするBDDの節点に n-mark を付け，各変数ごとのノード数を数える．
-  virtual
-  void
-  scan(BddEdge e,
-       hash_map<tVarId, size_t>& node_counts);
-
-  // e を根とするBDDのレベル level のノード数を数える．
-  // ただし，n-mark の付いていないノードがあったら UINT_MAX を返す．
-  virtual
-  size_t
-  count_at(BddEdge e,
-	   tLevel level);
-
-  // scan で付けた n-mark を消す．
-  virtual
-  void
-  clear_scanmark(BddEdge e);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -509,32 +486,32 @@ public:
 
   // 名前を得る．
   virtual
-  const
-  string& name() const;
+  const string&
+  name() const;
 
   // 使用メモリ量(in bytes)を得る．
   virtual
-  size_t
+  ymuint64
   used_mem() const;
 
   // 節点テーブルに登録されているノードの数を得る．
   virtual
-  size_t
+  ymuint64
   node_num() const;
 
   // GC で回収される(フリーになる)ノード数を得る．
   virtual
-  size_t
+  ymuint64
   garbage_num() const;
 
   // 利用可能なフリーノード数を得る．
   virtual
-  size_t
+  ymuint64
   avail_num() const;
 
   // GC の起動された回数を得る．
   virtual
-  size_t
+  ymuint64
   gc_count() const;
 
 
@@ -543,8 +520,9 @@ private:
   //
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 変数を確保する．
   Var*
-  alloc_var(tVarId varid);
+  alloc_var(VarId varid);
 
   // 左右の枝が同じ場合にはその枝自身を返し，それ以外の場合には，
   // 与えられた枝とインデックスを持つノードを返す．
@@ -570,16 +548,16 @@ private:
   // push_down のサブルーティン
   BddEdge
   pd_step(BddEdge e,
-	  tLevel x_level,
-	  tLevel y_level,
+	  ymuint x_level,
+	  ymuint y_level,
 	  tPol pol);
   BddEdge
   pd_step2(BddEdge e,
-	   tLevel y_level);
+	   ymuint y_level);
   BddEdge
   pd_step3(BddEdge e0,
 	   BddEdge e1,
-	   tLevel y_level,
+	   ymuint y_level,
 	   tPol pol);
 
   // generalized cofactorの内部版．
@@ -709,7 +687,7 @@ private:
   static
   size_t
   count_at_step(BddEdge e,
-		tLevel level);
+		ymuint level);
 
   // sp_step 中で用いられる関数
   static
@@ -730,7 +708,7 @@ private:
   // 節点テーブルのサイズを返す．
   // メモリ確保に失敗したら false を返す．
   bool
-  resize(size_t new_size);
+  resize(ymuint64 new_size);
 
   // 次のリミット値を計算する
   void
@@ -762,11 +740,11 @@ private:
 
   // level の変数を取り出す．
   Var*
-  var_at(tLevel level) const;
+  var_at(ymuint level) const;
 
   // varid の変数を取出す．
   Var*
-  var_of(tVarId varid) const;
+  var_of(VarId varid) const;
 
   // Var を登録する．
   void
@@ -786,30 +764,30 @@ private:
   // つながない．その場合には true を返す．
   bool
   scan_nodechunk(Node* blk,
-		 size_t blk_size,
+		 ymuint blk_size,
 		 Node**& prev);
 
   // 変数テーブル用のメモリを確保する．
   // size はバイト単位ではなくエントリ数．
   Var**
-  alloc_vartable(size_t size);
+  alloc_vartable(ymuint size);
 
   // 変数テーブル用のメモリを解放する．
   // size はバイト単位ではなくエントリ数
   void
   dealloc_vartable(Var** table,
-		   size_t size);
+		   ymuint size);
 
   // 節点テーブル用のメモリを確保する．
   // size はバイト単位ではなくエントリ数
   Node**
-  alloc_nodetable(size_t size);
+  alloc_nodetable(ymuint64 size);
 
   // 節点テーブル用のメモリを解放する．
   // size はバイト単位ではなくエントリ数
   void
   dealloc_nodetable(Node** table,
-		    size_t size);
+		    ymuint64 size);
 
   // 節点チャンク用のメモリを確保する．
   Node*
@@ -821,12 +799,12 @@ private:
 
   // このマネージャで使用するメモリ領域を確保する．
   void*
-  allocate(size_t size);
+  allocate(ymuint64 size);
 
   // このマネージャで確保したメモリを解放する．
   void
   deallocate(void* ptr,
-	     size_t size);
+	     ymuint64 size);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -876,8 +854,8 @@ private:
   // 等しくなければ e をセットする．
   static
   void
-  split1(tLevel top,
-	 tLevel level,
+  split1(ymuint top,
+	 ymuint level,
 	 BddEdge e,
 	 const Node* vp,
 	 tPol pol,
@@ -912,7 +890,7 @@ private:
   double mGcThreshold;
 
   // ただし，全体のノード数がこの数以下の時はGCは起こさない．
-  size_t mGcNodeLimit;
+  ymuint64 mGcNodeLimit;
 
   // 節点テーブル拡張時の制限値を決めるパラメータ
   double mNtLoadLimit;
@@ -921,7 +899,7 @@ private:
   double mRtLoadLimit;
 
   // 使用メモリ量の上限
-  size_t mMemLimit;
+  ymuint64 mMemLimit;
 
 
   //////////////////////////////////////////////////////////////////////
@@ -947,10 +925,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // mVarTable 用に確保されたサイズ(単位はエントリ数)
-  tVarSize mVarTableSize;
+  ymuint32 mVarTableSize;
 
   // 確保された変数の数(<= mVarTableSize)
-  tVarSize mVarNum;
+  ymuint32 mVarNum;
 
   // 変数リストの先頭
   Var* mVarTop;
@@ -1056,7 +1034,7 @@ private:
   ymuint64 mNum;
 
   // smooth 用変数の最大レベル
-  tLevel mLastLevel;
+  ymuint32 mLastLevel;
 
 };
 
@@ -1136,8 +1114,8 @@ BddMgrClassic::setmark(BddEdge vd)
 // 等しくなければ e をセットする．
 inline
 void
-BddMgrClassic::split1(tLevel top,
-		      tLevel level,
+BddMgrClassic::split1(ymuint top,
+		      ymuint level,
 		      BddEdge e,
 		      const Node* vp,
 		      tPol pol,
@@ -1169,9 +1147,9 @@ BddMgrClassic::split(BddEdge f,
   tPol g_pol = g.pol();
   Var* f_var = f_vp->var();
   Var* g_var = g_vp->var();
-  tLevel f_level = f_var->level();
-  tLevel g_level = g_var->level();
-  tLevel level = f_level;
+  ymuint f_level = f_var->level();
+  ymuint g_level = g_var->level();
+  ymuint level = f_level;
   Var* var = f_var;
   if ( g_level < level ) {
     level = g_level;
@@ -1192,4 +1170,4 @@ BddMgrClassic::nt_load_limit() const
 
 END_NAMESPACE_YM_BDD
 
-#endif // LIBYM_LOGIC_BDD_BMC_BDDMGRCLASSIC_H
+#endif // BDDMGRCLASSIC_H

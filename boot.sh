@@ -117,12 +117,9 @@ SUBMODULE=\
  libraries/libym_logic \
  libraries/libym_smtlibv2 \
  libraries/libym_mincov \
- libraries/libym_blif \
- libraries/libym_iscas89 \
  libraries/libym_cell \
  libraries/libym_verilog \
  libraries/libym_networks \
- libraries/libym_aig \
  libraries/libym_gds \
  libraries/libym_cec \
  libraries/libym_techmap \

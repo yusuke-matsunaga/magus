@@ -37,6 +37,9 @@ public:
 
   // コピーコンストラクタと代入はデフォルトで大丈夫
 
+
+public:
+
   /// @brief 設定用関数
   /// @param[in] u ユーザー時間(usec)
   /// @param[in] s システム時間(usec)
@@ -175,6 +178,9 @@ public:
   /// の状態で初期化される．
   StopWatch();
 
+
+public:
+
   /// @brief "リセット" する.
   /// @note
   /// - 停止中
@@ -204,6 +210,9 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   // 現在の時間をとってくる関数
   static
@@ -251,25 +260,25 @@ public:
   /// @brief コンストラクタ.
   /// @param[in] n 時計の数
   /// @param[in] id 最初にアクティブな時計番号
-  MStopWatch(size_t n,
-	     size_t id = 0);
+  MStopWatch(ymuint n,
+	     ymuint id = 0);
 
   /// @brief アクティブな時計を切替える.
   /// @param[in] new_id アクティブにする時計番号
   /// @return 昔の時計番号を返す
-  size_t
-  change(size_t new_id);
+  ymuint
+  change(ymuint new_id);
 
   /// @brief 現在アクティブな時計番号を返す.
   /// @return 現在アクティブな時計番号を返す.
-  size_t
+  ymuint
   cur_id() const;
 
   /// @brief 経過時間の取得
   /// @param[in] id 対象の時計番号
   /// @return id で指定された時計の経過時間
   USTime
-  time(size_t id) const;
+  time(ymuint id) const;
 
 
 private:
@@ -278,10 +287,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 時計の数
-  size_t mNum;
+  ymuint32 mNum;
 
   // 現在アクティブな時計の番号
-  size_t mCur;
+  ymuint32 mCur;
 
   // StopWatchの配列
   vector<StopWatch> mWarray;
@@ -412,7 +421,7 @@ USTime::operator-=(const USTime& a)
 
 // 現在アクティブな時計番号を返す．
 inline
-size_t
+ymuint
 MStopWatch::cur_id() const
 {
   return mCur;
@@ -421,7 +430,7 @@ MStopWatch::cur_id() const
 // idで指定された時計の経過時間を返す
 inline
 USTime
-MStopWatch::time(size_t id) const
+MStopWatch::time(ymuint id) const
 {
   // 範囲外の場合は補正する．
   if ( id >= mNum ) {

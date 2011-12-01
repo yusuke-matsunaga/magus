@@ -1,7 +1,7 @@
-#ifndef LIBYM_LOGIC_BDD_BMC_BMCCOMPTBL_H
-#define LIBYM_LOGIC_BDD_BMC_BMCCOMPTBL_H
+#ifndef BMCCOMPTBL_H
+#define BMCCOMPTBL_H
 
-/// @file libym_logic/bdd/bmc/BmcCompTbl.h
+/// @file BmcCompTbl.h
 /// @brief BmcCompTbl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -24,11 +24,11 @@ class BmcCompTbl
 public:
 
   // 使用されているセル数を返す．
-  size_t
+  ymuint64
   used_num() const;
 
   // テーブルサイズを返す．
-  size_t
+  ymuint64
   table_size() const;
 
   // load_limit を設定する．
@@ -37,7 +37,7 @@ public:
 
   // 最大のテーブルサイズを設定する．
   void
-  max_size(size_t max_size);
+  max_size(ymuint64 max_size);
 
 
 protected:
@@ -70,12 +70,12 @@ protected:
 
   // BddMgr からメモリを確保する．
   void*
-  allocate(size_t size);
+  allocate(ymuint64 size);
 
   // BddMgr にメモリを返す．
   void
   deallocate(void* ptr,
-	     size_t size);
+	     ymuint64 size);
 
   // ログ出力用のストリームを得る．
   ostream&
@@ -90,14 +90,14 @@ protected:
 protected:
 
   // 使用されているセルの数
-  size_t mUsedNum;
+  ymuint64 mUsedNum;
 
   // テーブルサイズ
   // セルの個数．バイト数ではないので注意
-  size_t mTableSize;
+  ymuint64 mTableSize;
 
   // テーブルサイズ - 1 の値，ハッシュのマスクに用いる．
-  size_t mTableSize_1;
+  ymuint64 mTableSize_1;
 
   // ほとんどデバッグ用の名前
   string mName;
@@ -106,16 +106,17 @@ protected:
   double mLoadLimit;
 
   // ただし，テーブルのサイズはこれ以上大きくしない．
-  size_t mMaxSize;
+  ymuint64 mMaxSize;
 
   // mUsedがこの値を越えたらテーブルを拡張する
-  size_t mNextLimit;
+  ymuint64 mNextLimit;
 
   // 親の BddMgr
   BddMgrClassic* mMgr;
 
   // 同じ BddMgr に属している次のテーブル
   BmcCompTbl* mNext;
+
 };
 
 
@@ -159,13 +160,13 @@ private:
   ~BmcCompTbl2();
 
   // ハッシュ関数
-  size_t
+  ymuint64
   hash_func(BddEdge id1,
 	    BddEdge id2);
 
   // テーブルサイズを変更する．
   bool
-  resize(size_t new_size);
+  resize(ymuint64 new_size);
 
   // ガーベージコレクションが起きた時の処理を行なう．
   virtual
@@ -227,12 +228,12 @@ private:
   ~BmcCompTbl1();
 
   // ハッシュ関数
-  size_t
+  ymuint64
   hash_func(BddEdge id1);
 
   // テーブルサイズを変更する．
   bool
-  resize(size_t new_size);
+  resize(ymuint64 new_size);
 
   // ガーベージコレクションが起きた時の処理を行なう．
   virtual
@@ -305,7 +306,7 @@ private:
 
   // テーブルサイズを変更する．
   bool
-  resize(size_t new_size);
+  resize(ymuint64 new_size);
 
   // ガーベージコレクションが起きた時の処理を行なう．
   virtual
@@ -380,7 +381,7 @@ private:
 
   // テーブルサイズを変更する．
   bool
-  resize(size_t new_size);
+  resize(ymuint64 new_size);
 
   // ガーベージコレクションが起きた時の処理を行なう．
   virtual
@@ -426,10 +427,10 @@ BmcCompTbl::check_noref(BddEdge e)
 
 // ハッシュ関数
 inline
-size_t
+ymuint64
 BmcCompTbl1::hash_func(BddEdge id1)
 {
-  return size_t((id1.hash() * id1.hash()) >> 8) & mTableSize_1;
+  return static_cast<ymuint64>(((id1.hash() * id1.hash()) >> 8) & mTableSize_1);
 }
 
 // id1をキーとして検索を行なう
@@ -468,13 +469,13 @@ BmcCompTbl1::put(BddEdge id1,
 
 // ハッシュ関数
 inline
-size_t
+ymuint64
 BmcCompTbl2::hash_func(BddEdge id1,
 		       BddEdge id2)
 {
-  ymuint v1 = id1.hash();
-  ymuint v2 = id2.hash();
-  return size_t(v1 + v2 + v2 + (v1 >> 2) + (v2 >> 4)) & mTableSize_1;
+  ymuint64 v1 = id1.hash();
+  ymuint64 v2 = id2.hash();
+  return (v1 + v2 + v2 + (v1 >> 2) + (v2 >> 4)) & mTableSize_1;
   //    return size_t((id1 * (id2 + 2)) >> 2) & mTableSize_1;
 }
 
@@ -517,13 +518,13 @@ BmcCompTbl2::put(BddEdge id1,
 
 // ハッシュ関数
 inline
-size_t
+ymuint64
 BmcIsopTbl::hash_func(BddEdge id1,
 		      BddEdge id2)
 {
-  ymuint v1 = id1.hash();
-  ymuint v2 = id2.hash();
-  return size_t(v1 + v2 + v2 + (v1 >> 2) + (v2 >> 4)) & mTableSize_1;
+  ymuint64 v1 = id1.hash();
+  ymuint64 v2 = id2.hash();
+  return (v1 + v2 + v2 + (v1 >> 2) + (v2 >> 4)) & mTableSize_1;
   //    return size_t((id1 * (id2 + 2)) >> 2) & mTableSize_1;
 }
 
@@ -571,16 +572,15 @@ BmcIsopTbl::put(BddEdge id1,
 
 // ハッシュ関数
 inline
-size_t
+ymuint64
 BmcCompTbl3::hash_func(BddEdge id1,
 		       BddEdge id2,
 		       BddEdge id3)
 {
-  ymuint v1 = id1.hash();
-  ymuint v2 = id2.hash();
-  ymuint v3 = id3.hash();
-  return size_t(v1 + v2 + v3 + (v1 >> 2) + (v2 >> 4) + (v3 >> 6))
-    & mTableSize_1;
+  ymuint64 v1 = id1.hash();
+  ymuint64 v2 = id2.hash();
+  ymuint64 v3 = id3.hash();
+  return (v1 + v2 + v3 + (v1 >> 2) + (v2 >> 4) + (v3 >> 6)) & mTableSize_1;
 }
 
 // 検索を行なう．

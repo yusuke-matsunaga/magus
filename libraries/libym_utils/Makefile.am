@@ -40,7 +40,8 @@ libym_utils_la_SOURCES = \
 	FragAlloc.cc \
 	Generator.cc \
 	ItvlCell.h \
-	ItvlCell.cc \
+	ItvlMgrImpl.h \
+	ItvlMgrImpl.cc \
 	ItvlMgr.cc \
 	MFSet.cc \
 	MsgHandler.cc \

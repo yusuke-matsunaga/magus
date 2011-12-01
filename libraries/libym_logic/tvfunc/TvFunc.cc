@@ -219,13 +219,13 @@ TvFunc::TvFunc(ymuint ni,
 
 // リテラル関数を作るコンストラクタ
 TvFunc::TvFunc(ymuint ni,
-	       ymuint pos,
+	       VarId varid,
 	       tPol pol) :
   mNi(ni),
   mNblk(nblock(ni)),
   mVector(new ymulong[mNblk])
 {
-  assert_cond( pos < ni, __FILE__, __LINE__);
+  assert_cond( varid.val() < ni, __FILE__, __LINE__);
   switch ( ni ) {
   case 1:
     if ( pol == kPolPosi ) {
@@ -237,7 +237,7 @@ TvFunc::TvFunc(ymuint ni,
     break;
 
   case 2:
-    switch ( pos ) {
+    switch ( varid.val() ) {
     case 0:
       if ( pol == kPolPosi ) {
 	mVector[0] = 0xA;
@@ -263,7 +263,7 @@ TvFunc::TvFunc(ymuint ni,
     break;
 
   case 3:
-    switch ( pos ) {
+    switch ( varid.val() ) {
     case 0:
       if ( pol == kPolPosi ) {
 	mVector[0] = 0xAA;
@@ -298,7 +298,7 @@ TvFunc::TvFunc(ymuint ni,
     break;
 
   case 4:
-    switch ( pos ) {
+    switch ( varid.val() ) {
     case 0:
       if ( pol == kPolPosi ) {
 	mVector[0] = 0xAAAA;
@@ -342,7 +342,7 @@ TvFunc::TvFunc(ymuint ni,
     break;
 
   case 5:
-    switch ( pos ) {
+    switch ( varid.val() ) {
     case 0:
       if ( pol == kPolPosi ) {
 	mVector[0] = 0xAAAAAAAA;
@@ -396,7 +396,7 @@ TvFunc::TvFunc(ymuint ni,
 
 #if WORD64
   case 6:
-    switch ( pos ) {
+    switch ( varid.val() ) {
     case 0:
       if ( pol == kPolPosi ) {
 	mVector[0] = 0xAAAAAAAAAAAAAAAA;
@@ -459,20 +459,20 @@ TvFunc::TvFunc(ymuint ni,
 #endif
 
   default:
-    if ( pos < NIPW ) {
+    if ( varid.val() < NIPW ) {
       ymulong pat;
       if ( pol == kPolPosi ) {
-	pat = c_masks[pos];
+	pat = c_masks[varid.val()];
       }
       else {
-	pat = ~c_masks[pos];
+	pat = ~c_masks[varid.val()];
       }
       for (ymuint b = 0; b < mNblk; ++ b) {
 	mVector[b] = pat;
       }
     }
     else {
-      ymuint i5 = pos - NIPW;
+      ymuint i5 = varid.val() - NIPW;
       ymuint check = 1U << i5;
       ymulong pat0;
       if ( pol == kPolPosi ) {
@@ -580,17 +580,17 @@ TvFunc::const_one(ymuint ni)
 // 肯定のリテラル関数を作る．
 TvFunc
 TvFunc::posi_literal(ymuint ni,
-		     ymuint pos)
+		     VarId varid)
 {
-  return TvFunc(ni, pos, kPolPosi);
+  return TvFunc(ni, varid, kPolPosi);
 }
 
 // 否定のリテラル関数を作る．
 TvFunc
 TvFunc::nega_literal(ymuint ni,
-		     ymuint pos)
+		     VarId varid)
 {
-  return TvFunc(ni, pos, kPolNega);
+  return TvFunc(ni, varid, kPolNega);
 }
 
 // 自分自身を否定する．
@@ -668,13 +668,14 @@ TvFunc::operator^=(const TvFunc& src1)
 }
 
 // @brief コファクターを計算し自分に代入する．
-// @param[in] pos 変数番号
+// @param[in] varid 変数番号
 // @param[in] pol 極性
 // @return 自身への参照を返す．
 const TvFunc&
-TvFunc::set_cofactor(ymuint pos,
+TvFunc::set_cofactor(VarId varid,
 		     tPol pol)
 {
+  ymuint pos = varid.val();
   if ( pos < NIPW ) {
     ymulong mask = c_masks[pos];
     if ( pol == kPolNega ) {
@@ -931,8 +932,9 @@ TvFunc::walsh_0() const
 
 // 1次の Walsh 係数を求める．
 ymint
-TvFunc::walsh_1(ymuint pos) const
+TvFunc::walsh_1(VarId varid) const
 {
+  ymuint pos = varid.val();
   switch ( ni() ) {
   case 0: assert_not_reached(__FILE__, __LINE__);
   case 1: return (1 << 1) - count_onebits_1(mVector[0] ^ c_masks[pos]) * 2;
@@ -978,9 +980,12 @@ TvFunc::walsh_1(ymuint pos) const
 
 // 2次の Walsh 係数を求める．
 ymint
-TvFunc::walsh_2(ymuint i,
-		ymuint j) const
+TvFunc::walsh_2(VarId var1,
+		VarId var2) const
 {
+  ymuint i = var1.val();
+  ymuint j = var2.val();
+
   if ( i == j ) {
     return 0;
   }
@@ -4978,11 +4983,12 @@ TvFunc::walsh_w0(ymuint w,
 
 // 重み別の 1 次の Walsh 係数を求める．
 int
-TvFunc::walsh_w1(ymuint var,
+TvFunc::walsh_w1(VarId var,
 		 ymuint w,
 		 tPol opol,
 		 ymuint ibits) const
 {
+  ymuint idx = var.val();
   switch ( ni() ) {
   case 2:
     {
@@ -4990,11 +4996,11 @@ TvFunc::walsh_w1(ymuint var,
       if ( opol == kPolNega ) {
 	tmp ^= 0x0000000F;
       }
-      if ( ibits & (1 << var) ) {
-	tmp ^= ~c_masks[var];
+      if ( ibits & (1 << idx) ) {
+	tmp ^= ~c_masks[idx];
       }
       else {
-	tmp ^= c_masks[var];
+	tmp ^= c_masks[idx];
       }
       ymuint mask;
       switch ( w ) {
@@ -5016,11 +5022,11 @@ TvFunc::walsh_w1(ymuint var,
       if ( opol == kPolNega ) {
 	tmp ^= 0x000000FF;
       }
-      if ( ibits & (1 << var) ) {
-	tmp ^= ~c_masks[var];
+      if ( ibits & (1 << idx) ) {
+	tmp ^= ~c_masks[idx];
       }
       else {
-	tmp ^= c_masks[var];
+	tmp ^= c_masks[idx];
       }
       ymuint mask;
       switch ( w ) {
@@ -5045,11 +5051,11 @@ TvFunc::walsh_w1(ymuint var,
       if ( opol == kPolNega ) {
 	tmp ^= 0x0000FFFF;
       }
-      if ( ibits & (1 << var) ) {
-	tmp ^= ~c_masks[var];
+      if ( ibits & (1 << idx) ) {
+	tmp ^= ~c_masks[idx];
       }
       else {
-	tmp ^= c_masks[var];
+	tmp ^= c_masks[idx];
       }
       ymuint mask;
       switch ( w ) {
@@ -5086,11 +5092,11 @@ TvFunc::walsh_w1(ymuint var,
       else {
 	tmp = mVector[0];
       }
-      if ( ibits & (1 << var) ) {
-	tmp ^= ~c_masks[var];
+      if ( ibits & (1 << idx) ) {
+	tmp ^= ~c_masks[idx];
       }
       else {
-	tmp ^= c_masks[var];
+	tmp ^= c_masks[idx];
       }
       int nall;
       int c;
@@ -5161,13 +5167,13 @@ TvFunc::walsh_w1(ymuint var,
   int c = 0;
   ymuint ibits1 = ibits >> NIPW;
   ymuint ibits2 = ibits & ((1UL << NIPW) - 1UL);
-  if ( var < NIPW ) {
+  if ( idx < NIPW ) {
     ymuint mask2;
-    if ( ibits2 & (1 << var) ) {
-      mask2 = ~c_masks[var];
+    if ( ibits2 & (1 << idx) ) {
+      mask2 = ~c_masks[idx];
     }
     else {
-      mask2 = c_masks[var];
+      mask2 = c_masks[idx];
     }
     for (ymuint u = 0; u <= w; ++ u ) {
       ymuint v = w - u;
@@ -5196,7 +5202,7 @@ TvFunc::walsh_w1(ymuint var,
     }
   }
   else {
-    ymuint var5 = var - NIPW;
+    ymuint var5 = idx - NIPW;
     for (ymuint u = 0; u <= w; ++ u ) {
       ymuint v = w - u;
       if ( v > NIPW ) continue;
@@ -5235,10 +5241,11 @@ TvFunc::walsh_w1(ymuint var,
   }
 }
 
-// i 番目の変数がサポートの時 true を返す．
+// 変数がサポートの時 true を返す．
 bool
-TvFunc::check_sup(ymuint i) const
+TvFunc::check_sup(VarId var) const
 {
+  ymuint i = var.val();
   if ( i < NIPW ) {
     // ブロックごとにチェック
     ymuint dist = 1 << i;
@@ -5265,10 +5272,13 @@ TvFunc::check_sup(ymuint i) const
 
 // i 番目と j 番目の変数が対称のとき true を返す．
 bool
-TvFunc::check_sym(ymuint i,
-		  ymuint j,
+TvFunc::check_sym(VarId var1,
+		  VarId var2,
 		  tPol pol) const
 {
+  ymuint i = var1.val();
+  ymuint j = var2.val();
+
   // i と j を正規化する．
   if ( i < j ) {
     ymuint tmp = i;
@@ -5365,11 +5375,13 @@ TvFunc::xform(const NpnMap& npnmap) const
   ymuint imask = 0UL;
   ymuint ipat[kMaxNi];
   for (ymuint i = 0; i < mNi; ++ i) {
-    NpnVmap imap = npnmap.imap(i);
+    VarId src_var(i);
+    NpnVmap imap = npnmap.imap(src_var);
     if ( imap.pol() == kPolNega ) {
       imask |= (1UL << i);
     }
-    ymuint j = imap.pos();
+    VarId dst_var = imap.var();
+    ymuint j = dst_var.val();
     ipat[i] = 1UL << j;
   }
   ymuint omask = npnmap.opol() == kPolPosi ? 0U : 1U;
@@ -5467,8 +5479,8 @@ operator&&(const TvFunc& func1,
 // 内容の出力
 // mode は 2 か 16
 void
-TvFunc::dump(ostream& s,
-	     int mode) const
+TvFunc::print(ostream& s,
+	      int mode) const
 {
   ymuint ni_pow = 1UL << mNi;
   const ymuint wordsize = SIZEOF_SIZE_T * 8;
@@ -5511,6 +5523,36 @@ TvFunc::dump(ostream& s,
   }
   else {
     assert_not_reached(__FILE__, __LINE__);
+  }
+}
+
+// @brief バイナリファイルの書き出し
+// @param[in] s 出力先のストリーム
+void
+TvFunc::dump(BinO& s) const
+{
+  s << mNi
+    << mNblk;
+  for (ymuint i = 0; i < mNblk; ++ i) {
+    s << mVector[i];
+  }
+}
+
+// @brief バイナリファイルの読み込み
+// @param[in] s 入力元のストリーム
+void
+TvFunc::restore(BinI& s)
+{
+  ymuint32 nblk;
+  s >> mNi
+    >> nblk;
+  if ( mNblk != nblk ) {
+    delete [] mVector;
+    mNblk = nblk;
+    mVector = new ymulong[mNblk];
+  }
+  for (ymuint i = 0; i < mNblk; ++ i) {
+    s >> mVector[i];
   }
 }
 

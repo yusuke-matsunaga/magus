@@ -30,9 +30,9 @@ main(int argc,
 	cout << "Clearing" << endl;
 	nm.clear();
 	break;
-      case 'd':
-      case 'D':
-	nm.dump(cout);
+      case 'p':
+      case 'P':
+	nm.print(cout);
 	break;
       case 'e':
       case 'E':

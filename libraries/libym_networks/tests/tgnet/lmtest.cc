@@ -37,14 +37,14 @@ main(int argc,
   using namespace nsYm::nsNetworks::nsTgnet;
 
   try {
-    LogExpr v0 = LogExpr::make_posiliteral(0);
-    LogExpr v1 = LogExpr::make_posiliteral(1);
-    LogExpr v2 = LogExpr::make_posiliteral(2);
-    LogExpr v3 = LogExpr::make_posiliteral(3);
-    LogExpr v4 = LogExpr::make_posiliteral(4);
-    LogExpr v5 = LogExpr::make_posiliteral(5);
-    LogExpr v6 = LogExpr::make_posiliteral(6);
-    LogExpr v7 = LogExpr::make_posiliteral(7);
+    LogExpr v0 = LogExpr::make_posiliteral(VarId(0));
+    LogExpr v1 = LogExpr::make_posiliteral(VarId(1));
+    LogExpr v2 = LogExpr::make_posiliteral(VarId(2));
+    LogExpr v3 = LogExpr::make_posiliteral(VarId(3));
+    LogExpr v4 = LogExpr::make_posiliteral(VarId(4));
+    LogExpr v5 = LogExpr::make_posiliteral(VarId(5));
+    LogExpr v6 = LogExpr::make_posiliteral(VarId(6));
+    LogExpr v7 = LogExpr::make_posiliteral(VarId(7));
 
     LogicMgr lm;
 

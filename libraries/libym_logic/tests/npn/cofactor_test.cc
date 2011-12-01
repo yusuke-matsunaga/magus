@@ -75,7 +75,9 @@ cofactor_test(int argc,
     pol = kPolNega;
   }
 
-  test.check_cofactor(func, pos, pol);
+  VarId var(pos);
+
+  test.check_cofactor(func, var, pol);
 
   cout << test.nerr() << " error(s)." << endl;
 }

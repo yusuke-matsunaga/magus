@@ -51,7 +51,8 @@ str2varset(BddMgr& bddmgr,
     char c = *s;
     if ( c == ',' || c == '\0' ) {
       int d = atoi(buf.c_str());
-      vs += BddVarSet(bddmgr, d);
+      VarId var(d);
+      vs += BddVarSet(bddmgr, var);
       if ( c == '\0' ) {
 	return vs;
       }
@@ -93,7 +94,8 @@ str2litset(BddMgr& bddmgr,
     }
     else if ( c == ',' || c == '\0' ) {
       int d = atoi(buf.c_str());
-      ls += BddLitSet(bddmgr, d, pol);
+      VarId var(d);
+      ls += BddLitSet(bddmgr, var, pol);
       if ( c == '\0' ) {
 	return ls;
       }
@@ -132,7 +134,8 @@ check_bddv(BddMgr& bddmgr,
   for (s = spec; (c = *s) && c != '|'; ++ s) {
     if ( c == ',' ) {
       int d = atoi(buf.c_str());
-      vars.push_back(d);
+      VarId var(d);
+      vars.push_back(var);
       buf = "";
     }
     else {
@@ -140,7 +143,8 @@ check_bddv(BddMgr& bddmgr,
     }
   }
   int d = atoi(buf.c_str());
-  vars.push_back(d);
+  VarId var(d);
+  vars.push_back(var);
 
   if ( c != '|' ) {
     cout << "ERROR[check_bddv(a)]: illegal spec \"" << spec << "\"" << endl;
@@ -235,11 +239,12 @@ check_support(BddMgr& bddmgr,
 {
   Bdd bdd = str2bdd(bddmgr, str);
   BddVarSet ref_vs(bddmgr);
-  for (size_t i = 0; i < 10; ++ i) {
-    Bdd bdd0 = bdd.cofactor(i, kPolNega);
-    Bdd bdd1 = bdd.cofactor(i, kPolPosi);
+  for (ymuint i = 0; i < 10; ++ i) {
+    VarId var(i);
+    Bdd bdd0 = bdd.cofactor(var, kPolNega);
+    Bdd bdd1 = bdd.cofactor(var, kPolPosi);
     if ( bdd0 != bdd1 ) {
-      ref_vs += BddVarSet(bddmgr, i);
+      ref_vs += BddVarSet(bddmgr, var);
     }
   }
   BddVarSet vs = bdd.support();

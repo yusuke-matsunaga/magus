@@ -54,10 +54,10 @@ BNetManip::eliminate_node(BNode* node)
       size_t oni = fo_node->ni();
       VarVarMap vvmap;
       for (size_t i = 0; i < old_ni; i ++) {
-	vvmap[i] = i + oni;
+	vvmap.insert(make_pair(VarId(i), VarId(i + oni)));
       }
       LogExpr tmp = orig_f.remap_var(vvmap);
-      LogExpr new_expr = fo_node->func().compose(edge->pos(), tmp);
+      LogExpr new_expr = fo_node->func().compose(VarId(edge->pos()), tmp);
 
       // 新しいファンインの配列を作る．
       size_t new_ni = oni + old_ni;
@@ -338,8 +338,8 @@ BNetManip::change_logic(BNode* node,
 
   // Phase-2: new_expr に現れないリテラルに対応したファンインは削除する．
   bool redundant = false;
-  for (size_t i = 0; i < new_ni; i ++) {
-    size_t lit = new_expr.litnum(i);
+  for (ymuint i = 0; i < new_ni; i ++) {
+    ymuint lit = new_expr.litnum(VarId(i));
     if ( lit == 0 ) {
       redundant = true;
       break;
@@ -348,13 +348,13 @@ BNetManip::change_logic(BNode* node,
   if ( redundant ) {
     mTmpMap.clear();
     size_t wpos = 0;
-    for (size_t i = 0; i < new_ni; i ++) {
-      size_t lit = new_expr.litnum(i);
+    for (ymuint i = 0; i < new_ni; i ++) {
+      ymuint lit = new_expr.litnum(VarId(i));
       if ( lit > 0 ) {
 	if ( wpos < i ) {
 	  BNode* node = mTmpNodes[i];
 	  mTmpNodes[wpos] = node;
-	  mTmpMap.insert(make_pair(i, wpos));
+	  mTmpMap.insert(make_pair(VarId(i), wpos));
 	}
 	++ wpos;
       }
@@ -550,7 +550,7 @@ BNetManip::change_to_buffer(BNode* node,
 			    BNode* src_node)
 {
   // BUF を表すファクタードフォームを作る．
-  LogExpr expr = LogExpr::make_posiliteral(0);
+  LogExpr expr = LogExpr::make_posiliteral(VarId(0));
 
   // ノードの内容を設定する．
   bool stat = change_logic(node, expr, vector<BNode*>(1, src_node));
@@ -564,7 +564,7 @@ BNetManip::change_to_inverter(BNode* node,
 			      BNode* src_node)
 {
   // NOT を表すファクタードフォームを作る．
-  LogExpr expr = LogExpr::make_negaliteral(0);
+  LogExpr expr = LogExpr::make_negaliteral(VarId(0));
 
   // ノードの内容を設定する．
   bool stat = change_logic(node, expr, vector<BNode*>(1, src_node));
@@ -581,7 +581,7 @@ BNetManip::change_to_and(BNode* node,
   size_t n = fanins.size();
   LogExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(i);
+    leaves[i] = LogExpr::make_posiliteral(VarId(i));
   }
   LogExpr expr = LogExpr::make_and(leaves);
 
@@ -600,7 +600,7 @@ BNetManip::change_to_nand(BNode* node,
   size_t n = fanins.size();
   LogExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(i);
+    leaves[i] = LogExpr::make_posiliteral(VarId(i));
   }
   LogExpr expr = ~LogExpr::make_and(leaves);
 
@@ -619,7 +619,7 @@ BNetManip::change_to_or(BNode* node,
   size_t n = fanins.size();
   LogExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(i);
+    leaves[i] = LogExpr::make_posiliteral(VarId(i));
   }
   LogExpr expr = LogExpr::make_or(leaves);
 
@@ -638,7 +638,7 @@ BNetManip::change_to_nor(BNode* node,
   size_t n = fanins.size();
   LogExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(i);
+    leaves[i] = LogExpr::make_posiliteral(VarId(i));
   }
   LogExpr expr = ~LogExpr::make_or(leaves);
 
@@ -657,7 +657,7 @@ BNetManip::change_to_xor(BNode* node,
   size_t n = fanins.size();
   LogExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(i);
+    leaves[i] = LogExpr::make_posiliteral(VarId(i));
   }
   LogExpr expr = LogExpr::make_xor(leaves);
 
@@ -676,7 +676,7 @@ BNetManip::change_to_xnor(BNode* node,
   size_t n = fanins.size();
   LogExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(i);
+    leaves[i] = LogExpr::make_posiliteral(VarId(i));
   }
   LogExpr expr = ~LogExpr::make_xor(leaves);
 

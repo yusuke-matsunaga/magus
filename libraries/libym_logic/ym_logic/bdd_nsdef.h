@@ -14,6 +14,7 @@
 ///
 
 #include "ymtools.h"
+#include "ym_logic/VarId.h"
 
 
 //////////////////////////////////////////////////////////////////////
@@ -60,15 +61,6 @@ class BddLitSet;
 /// @{
 
 #if 0
-/// @brief BDD の節点を指す枝のタイプ
-/// @ingroup Bdd
-typedef ympuint tBddEdge;
-#endif
-
-/// @brief BDD の変数番号
-/// @ingroup Bdd
-typedef ymuint32 tVarId;
-
 /// @brief BDD の変数の数
 /// @ingroup Bdd
 typedef ymuint32 tVarSize;
@@ -80,6 +72,7 @@ typedef ymuint32 tLevel;
 /// @brief BDD の節点のレベルの数
 /// @ingroup Bdd
 typedef ymuint32 tLevelSize;
+#endif
 
 /// @brief BDD のベクタ
 /// @ingroup Bdd
@@ -91,7 +84,7 @@ typedef list<Bdd> BddList;
 
 /// @brief 変数番号をキートして BDD を値とする連想配列
 /// @ingroup Bdd
-typedef hash_map<tVarId, Bdd> VarBddMap;
+typedef hash_map<VarId, Bdd> VarBddMap;
 
 /// @}
 //////////////////////////////////////////////////////////////////////

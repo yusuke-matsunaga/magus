@@ -274,7 +274,7 @@ NpnRawSig::walsh_2(ymuint pos1,
   }
   ymuint base = pos1 * ni() + pos2;
   if ( (mW2flag[base] & 1) == 0 ) {
-    int w2 = mFunc.walsh_2(pos1, pos2);
+    int w2 = mFunc.walsh_2(VarId(pos1), VarId(pos2));
     if ( mW2flag[base] & 2 ) {
       w2 = -w2;
     }

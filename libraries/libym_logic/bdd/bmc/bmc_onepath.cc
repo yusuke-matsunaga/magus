@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmc/bmc_onepath.cc
+/// @file bmc_onepath.cc
 /// @brief パスを求める関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmc_onepath.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -122,7 +120,7 @@ BddMgrClassic::sp_len(BddEdge e)
 }
 
 // 最短1パスの長さを求める．
-tVarSize
+ymuint
 BddMgrClassic::shortest_onepath_len(BddEdge e)
 {
   if ( e.is_invalid() ) {
@@ -131,7 +129,7 @@ BddMgrClassic::shortest_onepath_len(BddEdge e)
   hash_map<BddEdge, ymint> assoc;
   ymint tmp = spl_step(e, assoc);
   assert_cond(tmp >= 0, __FILE__, __LINE__);
-  return static_cast<tVarSize>(tmp);
+  return static_cast<ymuint>(tmp);
 }
 
 // shortest_onepath_len() 中で用いられる下請関数

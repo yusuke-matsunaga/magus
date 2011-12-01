@@ -1,26 +1,24 @@
 
-/// @file libym_utils/RandGen.cc
+/// @file RandGen.cc
 /// @brief RandGen の実装ファイル
 /// @author Yusuke Matsunaga
 ///
-/// $Id: Binder.cc 33 2006-07-16 14:58:17Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 // もとは MT19937 のコードを流用している．
 // 以下はオリジナルの copyright notice
-/* 
+/*
    A C-program for MT19937, with initialization improved 2002/1/26.
    Coded by Takuji Nishimura and Makoto Matsumoto.
 
-   Before using, initialize the state by using init_genrand(seed)  
+   Before using, initialize the state by using init_genrand(seed)
    or init_by_array(init_key, key_length).
 
    Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
-   All rights reserved.                          
+   All rights reserved.
    Copyright (C) 2005, Mutsuo Saito,
-   All rights reserved.                          
+   All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
@@ -33,8 +31,8 @@
         notice, this list of conditions and the following disclaimer in the
         documentation and/or other materials provided with the distribution.
 
-     3. The names of its contributors may not be used to endorse or promote 
-        products derived from this software without specific prior written 
+     3. The names of its contributors may not be used to endorse or promote
+        products derived from this software without specific prior written
         permission.
 
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -79,8 +77,8 @@ RandGen::init(ymuint32 s)
 {
   mV[0]= s & 0xffffffffUL;
   for (mIdx = 1; mIdx < N; ++ mIdx) {
-    mV[mIdx] = 
-      (1812433253UL * (mV[mIdx - 1] ^ (mV[mIdx - 1] >> 30)) + mIdx); 
+    mV[mIdx] =
+      (1812433253UL * (mV[mIdx - 1] ^ (mV[mIdx - 1] >> 30)) + mIdx);
     /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
     /* In the previous versions, MSBs of the seed affect   */
     /* only MSBs of the array mt[].                        */
@@ -96,13 +94,13 @@ RandGen::init(ymuint32 s)
 /* slight change for C++, 2004/2/26 */
 void
 RandGen::init_by_array(ymuint32 init_key[],
-		       size_t key_length)
+		       ymuint key_length)
 {
   init(19650218UL);
 
-  size_t i = 1;
-  size_t j = 0;
-  size_t k = (N > key_length ? N : key_length);
+  ymuint i = 1;
+  ymuint j = 0;
+  ymuint k = (N > key_length ? N : key_length);
   for ( ; k; -- k) {
     mV[i] = (mV[i] ^ ((mV[i - 1] ^ (mV[i - 1] >> 30)) * 1664525UL))
       + init_key[j] + j; /* non linear */
@@ -127,8 +125,8 @@ RandGen::init_by_array(ymuint32 init_key[],
       i = 1;
     }
   }
-  
-  mV[0] = 0x80000000UL; /* MSB is 1; assuring non-zero initial array */ 
+
+  mV[0] = 0x80000000UL; /* MSB is 1; assuring non-zero initial array */
 }
 
 /* generates a random number on [0,0xffffffff]-interval */
@@ -139,11 +137,11 @@ RandGen::int32()
   /* mag01[x] = x * MATRIX_A  for x=0,1 */
 
   if ( mIdx >= N ) { /* generate N words at one time */
-    
+
     if ( mIdx == N + 1 )   /* if init_genrand() has not been called, */
       init(5489UL); /* a default initial seed is used */
 
-    size_t kk;
+    ymuint kk;
     for ( kk = 0; kk < N - M; ++ kk) {
       unsigned long y = (mV[kk] & UPPER_MASK) | (mV[kk + 1] & LOWER_MASK);
       mV[kk] = mV[kk + M] ^ (y >> 1) ^ mag01[y & 0x1UL];
@@ -154,18 +152,18 @@ RandGen::int32()
     }
     unsigned long y = (mV[N-1] & UPPER_MASK) | (mV[0] & LOWER_MASK);
     mV[N - 1] = mV[M - 1] ^ (y >> 1) ^ mag01[y & 0x1UL];
-    
+
     mIdx = 0;
   }
-  
+
   ymuint32 y = mV[mIdx ++];
-  
+
   /* Tempering */
   y ^= (y >> 11);
   y ^= (y << 7) & 0x9d2c5680UL;
   y ^= (y << 15) & 0xefc60000UL;
   y ^= (y >> 18);
-  
+
   return y;
 }
 
@@ -181,7 +179,7 @@ RandGen::ulong()
   return (tmp1 << 32) | tmp2;
 #else
   ymulong ans = 0UL;
-  size_t n = SIZEOF_LONG / 4;
+  ymuint n = SIZEOF_LONG / 4;
   for (size_t i = 0; i < n; ++ i) {
     ans <<= 32;
     ans |= int32();
@@ -197,7 +195,7 @@ RandGen::ulong()
 
 // @brief コンストラクタ
 // @param[in] n 要素数
-RandPermGen::RandPermGen(size_t n) :
+RandPermGen::RandPermGen(ymuint n) :
   mNum(n),
   mArray(new ymuint32[n])
 {
@@ -208,26 +206,26 @@ RandPermGen::~RandPermGen()
 {
   delete [] mArray;
 }
-  
+
 // @brief 要素数を返す．
-size_t
+ymuint
 RandPermGen::num() const
 {
   return mNum;
 }
-  
+
 // @brief ランダムな順列を生成する．
 void
 RandPermGen::generate(RandGen& randgen)
 {
-  for (size_t i = 0; i < mNum; ++ i) {
+  for (ymuint i = 0; i < mNum; ++ i) {
     mArray[i] = i;
   }
-  for (size_t i = 0; i < mNum; ++ i) {
-    size_t n = mNum - i;
-    size_t p = (randgen.int32() % n) + i;
+  for (ymuint i = 0; i < mNum; ++ i) {
+    ymuint n = mNum - i;
+    ymuint p = (randgen.int32() % n) + i;
     if ( p != i ) {
-      size_t v = mArray[p];
+      ymuint v = mArray[p];
       mArray[p] = mArray[i];
       mArray[i] = v;
     }
@@ -237,7 +235,7 @@ RandPermGen::generate(RandGen& randgen)
 // @brief 順列の要素を取り出す．
 // @param[in] pos 要素の位置番号 ( 0 <= pos < num() )
 ymuint32
-RandPermGen::elem(size_t pos) const
+RandPermGen::elem(ymuint pos) const
 {
   return mArray[pos];
 }
@@ -250,8 +248,8 @@ RandPermGen::elem(size_t pos) const
 // @brief コンストラクタ
 // @param[in] n 全要素数
 // @param[in] k 組み合わせの要素数
-RandCombiGen::RandCombiGen(size_t n,
-			   size_t k) :
+RandCombiGen::RandCombiGen(ymuint n,
+			   ymuint k) :
   mNum(n),
   mCombiNum(k),
   mArray(new ymuint32[n])
@@ -263,32 +261,32 @@ RandCombiGen::~RandCombiGen()
 {
   delete [] mArray;
 }
-  
+
 // @brief 全要素数を返す．
-size_t
+ymuint
 RandCombiGen::num() const
 {
   return mNum;
 }
-  
+
 // @brief 組み合わせの要素数を返す．
-size_t
+ymuint
 RandCombiGen::combi_num() const
 {
   return mCombiNum;
 }
-  
+
 // @brief ランダムな組み合わせを生成する．
 // @param[in] randgen 乱数発生器
 void
 RandCombiGen::generate(RandGen& randgen)
 {
-  for (size_t i = 0; i < mNum; ++ i) {
+  for (ymuint i = 0; i < mNum; ++ i) {
     mArray[i] = i;
   }
-  for (size_t i = 0; i < mCombiNum; ++ i) {
-    size_t n = mNum - i;
-    size_t p = (randgen.int32() % n) + i;
+  for (ymuint i = 0; i < mCombiNum; ++ i) {
+    ymuint n = mNum - i;
+    ymuint p = (randgen.int32() % n) + i;
     if ( p != i ) {
       size_t v = mArray[p];
       mArray[p] = mArray[i];
@@ -300,7 +298,7 @@ RandCombiGen::generate(RandGen& randgen)
 // @brief 組み合わせの要素を取り出す．
 // @param[in] pos 要素の位置番号 ( 0 <= pos < combi_num() )
 ymuint32
-RandCombiGen::elem(size_t pos) const
+RandCombiGen::elem(ymuint pos) const
 {
   return mArray[pos];
 }

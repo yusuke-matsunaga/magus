@@ -61,7 +61,7 @@ SaSimple::capture(SatReason creason,
 	if ( q == p ) {
 	  continue;
 	}
-	tVarId var = q.varid();
+	VarId var = q.varid();
 	if ( !get_mark(var) && decision_level(var) > 0 ) {
 	  set_mark_and_putq(var);
 	  bump_var_activity(var);
@@ -75,7 +75,7 @@ SaSimple::capture(SatReason creason,
     else {
       Literal q = creason.literal();
       if ( q != p ) {
-	tVarId var = q.varid();
+	VarId var = q.varid();
 	if ( !get_mark(var) && decision_level(var) > 0 ) {
 	  set_mark_and_putq(var);
 	  bump_var_activity(var);
@@ -88,7 +88,7 @@ SaSimple::capture(SatReason creason,
     for ( ; ; ) {
       Literal q = get_assign(last);
       -- last;
-      tVarId var = q.varid();
+      VarId var = q.varid();
       if ( get_mark(var) ) {
 	set_mark(var, false);
 	-- c;

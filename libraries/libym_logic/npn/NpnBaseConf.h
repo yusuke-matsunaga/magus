@@ -1,7 +1,7 @@
-#ifndef LIBYM_NPN_NPNBASECONF_H
-#define LIBYM_NPN_NPNBASECONF_H
+#ifndef NPNBASECONF_H
+#define NPNBASECONF_H
 
-/// @file libym_npn/NpnBaseConf.h
+/// @file NpnBaseConf.h
 /// @brief NpnBaseConf のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -148,11 +148,11 @@ public:
 
   /// @brief Walsh 係数を出力する．
   void
-  dump_walsh(ostream& s) const;
+  print_walsh(ostream& s) const;
 
   /// @brief 極性情報を出力する．
   void
-  dump_pols(ostream& s) const;
+  print_pols(ostream& s) const;
 
 
 private:
@@ -316,7 +316,7 @@ NpnBaseConf::walsh_2(ymuint pos1,
   }
   ymuint index = pos1 * ni() + pos2;
   if ( mW2flag[index] == 0 ) {
-    mW2[index] = mFunc.walsh_2(pos1, pos2);
+    mW2[index] = mFunc.walsh_2(VarId(pos1), VarId(pos2));
     mW2flag[index] = 1;
   }
   return mW2[index];
@@ -481,4 +481,4 @@ NpnBaseConf::add_indep(ymuint pos)
 
 END_NAMESPACE_YM_NPN
 
-#endif // LIBYM_NPN_NPNBASECONF_H
+#endif // NPNBASECONF_H

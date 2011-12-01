@@ -39,8 +39,8 @@ dump_trans(ostream& s,
 	   BddMgr& bddmgr,
 	   const Bdd& trans,
 	   const vector<State>& reachable_states,
-	   const vector<ymuint>& input_vars,
-	   const vector<pair<ymuint, ymuint> >& state_vars)
+	   const vector<VarId>& input_vars,
+	   const vector<pair<VarId, VarId> >& state_vars)
 {
   ymuint ni = input_vars.size();
   ymuint nip = 1U << ni;
@@ -50,7 +50,7 @@ dump_trans(ostream& s,
     Bdd tmp = trans;
     string cspat = reachable_states[s1];
     for (ymuint i = 0; i < nff; ++ i) {
-      ymuint csidx = state_vars[i].first;
+      VarId csidx = state_vars[i].first;
       if ( cspat[i] == '1' ) {
 	tmp &= bddmgr.make_posiliteral(csidx);
       }
@@ -62,7 +62,7 @@ dump_trans(ostream& s,
       Bdd tmp2 = tmp;
       string ipat = "";
       for (ymuint i = 0; i < ni; ++ i) {
-	ymuint iidx = input_vars[i];
+	VarId iidx = input_vars[i];
 	if ( iv & (1U << i) ) {
 	  tmp2 &= bddmgr.make_posiliteral(iidx);
 	  ipat += '1';
@@ -78,7 +78,7 @@ dump_trans(ostream& s,
 	Bdd tmp3 = tmp2;
 	string nspat = reachable_states[s2];
 	for (ymuint i = 0; i < nff; ++ i) {
-	  ymuint nsidx = state_vars[i].second;
+	  VarId nsidx = state_vars[i].second;
 	  if ( nspat[i] == '1' ) {
 	    tmp3 &= bddmgr.make_posiliteral(nsidx);
 	  }
@@ -134,13 +134,13 @@ fsm_analysis(const BNetwork& bnetwork,
   ymuint ff_num = bnetwork.latch_node_num();
 
   // 外部入力変数番号を納める配列
-  vector<ymuint> input_vars(input_num);
+  vector<VarId> input_vars(input_num);
   // 外部出力変数番号を納める配列
-  vector<ymuint> output_vars(output_num);
+  vector<VarId> output_vars(output_num);
   // もとの回路の状態変数(現状態変数と次状態変数のペア)番号を納める配列
-  vector<pair<ymuint, ymuint> > state_vars(ff_num);
+  vector<pair<VarId, VarId> > state_vars(ff_num);
   // 正常回路と故障回路の積の状態変数番号を納める配列
-  vector<pair<ymuint, ymuint> > state_vars2(ff_num * 2 + 2);
+  vector<pair<VarId, VarId> > state_vars2(ff_num * 2 + 2);
 
   // 変数番号のマップを作るオブジェクト
   IdxMapper idxmap(input_num, output_num, ff_num);
@@ -154,7 +154,7 @@ fsm_analysis(const BNetwork& bnetwork,
     for (BNodeList::const_iterator p = bnetwork.inputs_begin();
 	 p != bnetwork.inputs_end(); ++ p, ++ var_num) {
       BNode* node = *p;
-      ymuint id = idxmap.input_idx(var_num);
+      VarId id = idxmap.input_idx(var_num);
       input_vars[var_num] = id;
       bdd_array[node->id()] = bddmgr.make_posiliteral(id);
     }
@@ -166,8 +166,8 @@ fsm_analysis(const BNetwork& bnetwork,
     for (BNodeList::const_iterator p = bnetwork.latch_nodes_begin();
 	 p != bnetwork.latch_nodes_end(); ++ p, ++ var_num) {
       BNode* node = *p;
-      ymuint cur_id  = idxmap.cur_normal_idx(var_num);
-      ymuint next_id = idxmap.next_normal_idx(var_num);
+      VarId cur_id  = idxmap.cur_normal_idx(var_num);
+      VarId next_id = idxmap.next_normal_idx(var_num);
       state_vars[var_num] = make_pair(cur_id, next_id);
       bdd_array[node->id()] = bddmgr.make_posiliteral(cur_id);
     }
@@ -198,7 +198,7 @@ fsm_analysis(const BNetwork& bnetwork,
       BNode* node = *p;
       BNode* inode = node->fanin(0);
       Bdd ofunc = bdd_array[inode->id()];
-      ymuint id = idxmap.output_idx(var_num);
+      VarId id = idxmap.output_idx(var_num);
       output_vars[var_num] = id;
       Bdd ovar = bddmgr.make_posiliteral(id);
       output_rel &= ~(ovar ^ ofunc);
@@ -214,7 +214,7 @@ fsm_analysis(const BNetwork& bnetwork,
       BNode* node = *p;
       BNode* inode = node->fanin(0);
       Bdd ofunc = bdd_array[inode->id()];
-      ymuint id = idxmap.next_normal_idx(var_num);
+      VarId id = idxmap.next_normal_idx(var_num);
       Bdd ovar = bddmgr.make_posiliteral(id);
       trans_rel &= ~(ovar ^ ofunc);
     }
@@ -235,22 +235,22 @@ fsm_analysis(const BNetwork& bnetwork,
   // 正常回路の変数をエラー回路にシフトさせるためのマップ
   VarVarMap c2e_map;
   for (ymuint i = 0; i < ff_num; ++ i) {
-    ymuint cur_id1 = idxmap.cur_normal_idx(i);
-    ymuint cur_id2 = idxmap.cur_error_idx(i);
+    VarId cur_id1 = idxmap.cur_normal_idx(i);
+    VarId cur_id2 = idxmap.cur_error_idx(i);
     c2e_map.insert(make_pair(cur_id1, cur_id2));
-    ymuint next_id1 = idxmap.next_normal_idx(i);
-    ymuint next_id2 = idxmap.next_error_idx(i);
+    VarId next_id1 = idxmap.next_normal_idx(i);
+    VarId next_id2 = idxmap.next_error_idx(i);
     c2e_map.insert(make_pair(next_id1, next_id2));
   }
 
   for (ymuint i = 0; i < ff_num; ++ i) {
-    ymuint cur_id = idxmap.cur_normal_idx(i);
-    ymuint next_id = idxmap.next_normal_idx(i);
+    VarId cur_id = idxmap.cur_normal_idx(i);
+    VarId next_id = idxmap.next_normal_idx(i);
     state_vars2[i] = make_pair(cur_id, next_id);
   }
   for (ymuint i = 0; i < ff_num; ++ i) {
-    ymuint cur_id = idxmap.cur_error_idx(i);
-    ymuint next_id = idxmap.next_error_idx(i);
+    VarId cur_id = idxmap.cur_error_idx(i);
+    VarId next_id = idxmap.next_error_idx(i);
     state_vars2[i + ff_num] = make_pair(cur_id, next_id);
   }
   state_vars2[ff_num * 2 + 0] = make_pair(idxmap.cur_error_bit(),
@@ -308,8 +308,8 @@ fsm_analysis(const BNetwork& bnetwork,
     State state = reachable_states1[i];
     Bdd tmp = bddmgr.make_one();
     for (ymuint j = 0; j < ff_num; ++ j) {
-      ymuint id1 = idxmap.next_normal_idx(j);
-      ymuint id2 = idxmap.next_error_idx(j);
+      VarId id1 = idxmap.next_normal_idx(j);
+      VarId id2 = idxmap.next_error_idx(j);
       if ( state[j] == '1' ) {
 	tmp &= bddmgr.make_posiliteral(id1);
 	tmp &= bddmgr.make_posiliteral(id2);

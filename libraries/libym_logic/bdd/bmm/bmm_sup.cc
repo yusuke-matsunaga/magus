@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmm/bmm_sup.cc
+/// @file bmm_sup.cc
 /// @brief サポート変数を求める関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmm_sup.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -16,7 +14,7 @@
 BEGIN_NAMESPACE_YM_BDD
 
 // eを根とするBDDのサポートに印をつける．
-tVarSize
+ymuint
 BddMgrModern::mark_support(BddEdge e)
 {
   clear_varmark();
@@ -26,7 +24,7 @@ BddMgrModern::mark_support(BddEdge e)
 }
 
 // edge_list に含まれる枝を根とするBDDのサポートに印をつける．
-tVarSize
+ymuint
 BddMgrModern::mark_support(const list<BddEdge>& edge_list)
 {
   clear_varmark();
@@ -64,15 +62,15 @@ BddMgrModern::sup_step(BddEdge e)
 }
 
 // var_mark を列挙してマークのついた変数を vars に入れる．
-tVarSize
+ymuint
 BddMgrModern::mark_to_vector(VarVector& vars)
 {
-  tVarSize n = mVarSet.size();
+  ymuint n = mVarSet.size();
   vars.clear();
   vars.reserve(n);
   for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
     Var* v = *p;
-    tVarId varid = v->varid();
+    VarId varid = v->varid();
     vars.push_back(varid);
   }
   clear_varmark();
@@ -81,13 +79,13 @@ BddMgrModern::mark_to_vector(VarVector& vars)
 }
 
 // var_mark を列挙してマークのついた変数を vars に入れる．
-tVarSize
+ymuint
 BddMgrModern::mark_to_list(VarList& vars)
 {
   vars.clear();
   for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
     Var* v = *p;
-    tVarId varid = v->varid();
+    VarId varid = v->varid();
     vars.push_back(varid);
   }
   clear_varmark();
@@ -239,7 +237,7 @@ BddMgrModern::esmooth_step(BddEdge e)
 
   Node* vp = get_node(e);
   Var* var = vp->var();
-  tLevel level = var->level();
+  ymuint level = var->level();
   if ( level > mLastLevel ) {
     return e;
   }
@@ -325,9 +323,9 @@ BddMgrModern::andexist_step(BddEdge f,
   tPol g_pol = g.pol();
   Var* f_var = f_vp->var();
   Var* g_var = g_vp->var();
-  tLevel f_level = f_var->level();
-  tLevel g_level = g_var->level();
-  tLevel level = f_level;
+  ymuint f_level = f_var->level();
+  ymuint g_level = g_var->level();
+  ymuint level = f_level;
   Var* var = f_var;
   if ( level > g_level ) {
     level = g_level;

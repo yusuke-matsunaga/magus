@@ -314,7 +314,7 @@ independent(const PrimDec& dec1,
 Bdd
 root_func(const Bdd& f,
 	  const Bdd& bound_func,
-	  tVarId hvar);
+	  VarId hvar);
 
 /// @brief dec_list をダンプする．
 /// @param[in] dec_list 基本分解のリスト

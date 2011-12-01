@@ -51,7 +51,7 @@ makebdd(const string& filename)
     for (BdnNodeList::const_iterator p = input_list.begin();
 	 p != input_list.end(); ++ p) {
       const BdnNode* node = *p;
-      Bdd bdd = bddmgr.make_posiliteral(id);
+      Bdd bdd = bddmgr.make_posiliteral(VarId(id));
       ++ id;
       bddmap[node->id()] = bdd;
     }

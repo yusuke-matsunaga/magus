@@ -87,6 +87,8 @@ NpnRawSig::normalize(NpnConf& conf)
     mIcNum[i] = 2;
     mIcLink[i] = static_cast<ymuint>(-1);
 
+    VarId var(i);
+
     // i の1次係数を求める．
     int w1 = walsh_1(i);
 
@@ -100,7 +102,7 @@ NpnRawSig::normalize(NpnConf& conf)
     }
     else if ( w1 == 0 ) {
       ipol = 0;
-      bool stat = mFunc.check_sup(i);
+      bool stat = mFunc.check_sup(var);
       if ( !stat ) {
 	// この入力はサポートではなかった
 	add_indep(i);
@@ -118,16 +120,17 @@ NpnRawSig::normalize(NpnConf& conf)
       if ( w1 != walsh_1(pos1) ) {
 	continue;
       }
+      VarId var1(pos1);
       // 1次係数が等しい場合
       // 対称性のチェックを行う．
       tPol poldiff = (mIpols[pos1] * ipol == -1) ? kPolNega : kPolPosi;
-      bool stat = mFunc.check_sym(i, pos1, poldiff);
+      bool stat = mFunc.check_sym(var, var1, poldiff);
       if ( stat ) {
 	// 対称だった
 	found = true;
 	if ( w1 == 0 && ic_num(pos1) == 1 ) {
 	  // bi-symmetry かどうかチェックする
-	  bool stat = mFunc.check_sym(i, pos1, ~poldiff);
+	  bool stat = mFunc.check_sym(var, var1, ~poldiff);
 	  if ( stat ) {
 	    set_bisym(pos1);
 	  }
@@ -138,7 +141,7 @@ NpnRawSig::normalize(NpnConf& conf)
       if ( w1 == 0 ) {
 	// w1 == 0 の時には逆相での対称性もチェックする．
 	// この場合，最初の要素の極性は常に kPolPosi のはず
-	bool stat = mFunc.check_sym(i, pos1, kPolNega);
+	bool stat = mFunc.check_sym(var, var1, kPolNega);
 	if ( stat ) {
 	  // 逆相で対称だった．
 	  found = true;

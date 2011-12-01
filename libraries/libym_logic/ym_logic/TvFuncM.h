@@ -61,30 +61,30 @@ public:
   const TvFuncM&
   negate();
 
-  /// @brief src1 との論理積を計算し自分に代入する．
-  /// @param[in] src1 論理対象のオブジェクト
+  /// @brief left との論理積を計算し自分に代入する．
+  /// @param[in] left 論理対象のオブジェクト
   /// @return 自身への参照を返す．
   const TvFuncM&
-  operator&=(const TvFuncM& src1);
+  operator&=(const TvFuncM& left);
 
-  /// @brief src1 との論理和を計算し自分に代入する．
-  /// @param[in] src1 論理対象のオブジェクト
+  /// @brief left との論理和を計算し自分に代入する．
+  /// @param[in] left 論理対象のオブジェクト
   /// @return 自身への参照を返す．
   const TvFuncM&
-  operator|=(const TvFuncM& src1);
+  operator|=(const TvFuncM& left);
 
-  /// @brief src1 との排他的論理和を計算し自分に代入する．
-  /// @param[in] src1 論理対象のオブジェクト
+  /// @brief left との排他的論理和を計算し自分に代入する．
+  /// @param[in] left 論理対象のオブジェクト
   /// @return 自身への参照を返す．
   const TvFuncM&
-  operator^=(const TvFuncM& src1);
+  operator^=(const TvFuncM& left);
 
   /// @brief コファクターを計算し自分に代入する．
   /// @param[in] varid 変数番号
   /// @param[in] pol 極性
   /// @return 自身への参照を返す．
   const TvFuncM&
-  set_cofactor(ymuint varid,
+  set_cofactor(VarId varid,
 	       tPol pol);
 
 
@@ -94,43 +94,43 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 自分自身を否定する．
-  /// @param[in] opos 出力番号
+  /// @param[in] ovar 出力番号
   /// @return 自身への参照を返す．
   const TvFuncM&
-  negate(ymuint opos);
+  negate(VarId ovar);
 
-  /// @brief src1 との論理積を計算し自分に代入する．
-  /// @param[in] opos 出力番号
-  /// @param[in] src1 論理対象のオブジェクト
+  /// @brief left との論理積を計算し自分に代入する．
+  /// @param[in] ovar 出力番号
+  /// @param[in] left 論理対象のオブジェクト
   /// @return 自身への参照を返す．
   const TvFuncM&
-  and_assign(ymuint opos,
-	     const TvFunc& src1);
+  and_assign(VarId ovar,
+	     const TvFunc& left);
 
-  /// @brief src1 との論理和を計算し自分に代入する．
-  /// @param[in] opos 出力番号
-  /// @param[in] src1 論理対象のオブジェクト
+  /// @brief left との論理和を計算し自分に代入する．
+  /// @param[in] ovar 出力番号
+  /// @param[in] left 論理対象のオブジェクト
   /// @return 自身への参照を返す．
   const TvFuncM&
-  or_assign(ymuint opos,
-	    const TvFunc& src1);
+  or_assign(VarId ovar,
+	    const TvFunc& left);
 
-  /// @brief src1 との排他的論理和を計算し自分に代入する．
-  /// @param[in] opos 出力番号
-  /// @param[in] src1 論理対象のオブジェクト
+  /// @brief left との排他的論理和を計算し自分に代入する．
+  /// @param[in] ovar 出力番号
+  /// @param[in] left 論理対象のオブジェクト
   /// @return 自身への参照を返す．
   const TvFuncM&
-  xor_assign(ymuint opos,
-	     const TvFunc& src1);
+  xor_assign(VarId ovar,
+	     const TvFunc& left);
 
   /// @brief コファクターを計算し自分に代入する．
-  /// @param[in] opos 出力番号
+  /// @param[in] ovar 出力番号
   /// @param[in] varid 変数番号
   /// @param[in] pol 極性
   /// @return 自身への参照を返す．
   const TvFuncM&
-  set_cofactor(ymuint opos,
-	       ymuint varid,
+  set_cofactor(VarId ovar,
+	       VarId varid,
 	       tPol pol);
 
 
@@ -148,29 +148,29 @@ public:
   no() const;
 
   /// @brief 1出力の論理関数を切り出す．
-  /// @param[in] opos 出力番号
+  /// @param[in] ovar 出力番号
   TvFunc
-  output(ymuint opos) const;
+  output(VarId ovar) const;
 
   /// @brief 入力値を2進数と見なしたときの pos 番目の値を得る．
-  /// @param[in] opos 出力番号
-  /// @param[in] pos 変数番号
+  /// @param[in] ovar 出力番号
+  /// @param[in] pos 位置番号 ( 0 <= pos < 2^(ni()) )
   /// 答は 0 か 1 だが int 型
   int
-  value(ymuint opos,
+  value(VarId ovar,
 	ymuint pos) const;
 
-  /// @brief pos 番目の変数がサポートの時 true を返す．
-  /// @param[in] pos 変数番号
+  /// @brief varid 番目の変数がサポートの時 true を返す．
+  /// @param[in] varid 変数番号
   bool
-  check_sup(tVarId pos) const;
+  check_sup(VarId varid) const;
 
   /// @brief pos1 番目と pos2 番目の変数が対称のとき true を返す．
   /// @param[in] pos1, pos2 変数番号
   /// @param[in] pol 極性
   bool
-  check_sym(tVarId pos1,
-	    tVarId pos2,
+  check_sym(VarId pos1,
+	    VarId pos2,
 	    tPol pol = kPolPosi) const;
 
   /// @brief ハッシュ値を返す．
@@ -188,8 +188,24 @@ public:
   /// @param[in] mode 出力モード
   /// @note mode は 2 か 16
   void
-  dump(ostream& s,
-       int mode = 2) const;
+  print(ostream& s,
+	int mode = 2) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // BinIO 用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief バイナリファイルの書き出し
+  /// @param[in] s 出力先のストリーム
+  void
+  dump(BinO& s) const;
+
+  /// @brief バイナリファイルの読み込み
+  /// @param[in] s 入力元のストリーム
+  void
+  restore(BinI& s);
 
 
 public:
@@ -202,7 +218,7 @@ public:
   /// @param[in] varid 変数番号
   /// @param[in] pol 極性
   TvFuncM
-  cofactor(ymuint varid,
+  cofactor(VarId varid,
 	   tPol pol) const;
 
   /// @brief npnmap に従った変換を行う．
@@ -232,8 +248,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 最大の入力数
-  // 特に根拠はないが，これなら Walsh 係数が 32 ビット整数で収まる．
-  // あと真理値表ベースの手法ではこれくらいが限度
+  /// 特に根拠はないが，これなら Walsh 係数が 32 ビット整数で収まる．
+  /// あと真理値表ベースの手法ではこれくらいが限度
   static
   const ymuint kMaxNi = 20;
 
@@ -246,33 +262,33 @@ public:
 
   friend
   bool
-  operator==(const TvFuncM& func1,
-	     const TvFuncM& func2);
+  operator==(const TvFuncM& left,
+	     const TvFuncM& right);
 
   friend
   bool
-  operator<(const TvFuncM& func1,
-	    const TvFuncM& func2);
+  operator<(const TvFuncM& left,
+	    const TvFuncM& right);
 
   friend
   bool
-  operator>(const TvFuncM& func1,
-	    const TvFuncM& func2);
+  operator>(const TvFuncM& left,
+	    const TvFuncM& right);
 
   friend
   bool
-  operator<=(const TvFuncM& func1,
-	    const TvFuncM& func2);
+  operator<=(const TvFuncM& left,
+	    const TvFuncM& right);
 
   friend
   bool
-  operator>=(const TvFuncM& func1,
-	    const TvFuncM& func2);
+  operator>=(const TvFuncM& left,
+	    const TvFuncM& right);
 
   friend
   bool
-  operator&&(const TvFuncM& func1,
-	     const TvFuncM& func2);
+  operator&&(const TvFuncM& left,
+	     const TvFuncM& right);
 
 
 private:
@@ -335,74 +351,103 @@ private:
 
 /// @relates TvFuncM
 /// @brief 否定を求める．
+/// @param[in] src ソースの関数
 TvFuncM
 operator~(const TvFuncM& src);
 
 /// @relates TvFuncM
 /// @brief 論理積を求める．
+/// @param[in] left, right オペランド
 TvFuncM
-operator&(const TvFuncM& src1,
-	  const TvFuncM& src2);
+operator&(const TvFuncM& left,
+	  const TvFuncM& right);
 
 /// @relates TvFuncM
 /// @brief 論理和を求める．
+/// @param[in] left, right オペランド
 TvFuncM
-operator|(const TvFuncM& src1,
-	  const TvFuncM& src2);
+operator|(const TvFuncM& left,
+	  const TvFuncM& right);
 
 /// @relates TvFuncM
 /// @brief 排他的論理和を求める．
+/// @param[in] left, right オペランド
 TvFuncM
-operator^(const TvFuncM& src1,
-	  const TvFuncM& src2);
+operator^(const TvFuncM& left,
+	  const TvFuncM& right);
 
 /// @relates TvFuncM
 /// @brief 等価比較
+/// @param[in] left, right オペランド
 bool
-operator==(const TvFuncM& func1,
-	   const TvFuncM& func2);
+operator==(const TvFuncM& left,
+	   const TvFuncM& right);
 
 /// @relates TvFuncM
 /// @brief 非等価比較
+/// @param[in] left, right オペランド
 bool
-operator!=(const TvFuncM& src1,
-	   const TvFuncM& src2);
+operator!=(const TvFuncM& left,
+	   const TvFuncM& right);
 
 /// @relates TvFuncM
 /// @brief 大小比較(小なり)
+/// @param[in] left, right オペランド
 bool
-operator<(const TvFuncM& func1,
-	  const TvFuncM& func2);
+operator<(const TvFuncM& left,
+	  const TvFuncM& right);
 
 /// @relates TvFuncM
 /// @brief 大小比較(大なり)
+/// @param[in] left, right オペランド
 bool
-operator>(const TvFuncM& src1,
-	  const TvFuncM& src2);
+operator>(const TvFuncM& left,
+	  const TvFuncM& right);
 
 /// @relates TvFuncM
 /// @brief 大小比較(小なりイコール)
+/// @param[in] left, right オペランド
 bool
-operator<=(const TvFuncM& src1,
-	   const TvFuncM& src2);
+operator<=(const TvFuncM& left,
+	   const TvFuncM& right);
 
 /// @relates TvFuncM
 /// @brief 大小比較(大なりイコール)
+/// @param[in] left, right オペランド
 bool
-operator>=(const TvFuncM& src1,
-	   const TvFuncM& src2);
+operator>=(const TvFuncM& left,
+	   const TvFuncM& right);
 
 /// @relates TvFuncM
 /// @brief 交差チェック
+/// @param[in] left, right オペランド
 bool
-operator&&(const TvFuncM& src1,
-	   const TvFuncM& src2);
+operator&&(const TvFuncM& left,
+	   const TvFuncM& right);
 
 /// @relates TvFuncM
 /// @brief ストリームに対する出力
+/// @param[in] s 出力先のストリーム
+/// @param[in] func 対象の関数
 ostream&
 operator<<(ostream& s,
 	   const TvFuncM& func);
+
+/// @brief バイナリ出力
+/// @param[in] s 出力ストリーム
+/// @param[in] func 関数
+/// @return s
+BinO&
+operator<<(BinO& s,
+	   const TvFuncM& func);
+
+/// @brief バイナリ入力
+/// @param[in] s 入力ストリーム
+/// @param[out] func 関数
+/// @return s
+BinI&
+operator>>(BinI& s,
+	   TvFuncM& func);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -425,13 +470,14 @@ TvFuncM::no() const
   return mNo;
 }
 
-// 入力値を2進数と見なしたときの (opos, pos) 番目の値を得る．
+// 入力値を2進数と見なしたときの (ovar, pos) 番目の値を得る．
 // 答は 0 か 1 だが int 型
 inline
 int
-TvFuncM::value(ymuint opos,
+TvFuncM::value(VarId ovar,
 	       ymuint pos) const
 {
+  ymuint opos = ovar.val();
   return (mVector[block(pos) + opos * mNblk1] >> shift(pos)) & 1;
 }
 
@@ -498,28 +544,28 @@ operator~(const TvFuncM& src)
 // 論理積を求める．
 inline
 TvFuncM
-operator&(const TvFuncM& src1,
-	  const TvFuncM& src2)
+operator&(const TvFuncM& left,
+	  const TvFuncM& right)
 {
-  return TvFuncM(src1).operator&=(src2);
+  return TvFuncM(left).operator&=(right);
 }
 
 // 論理和を求める．
 inline
 TvFuncM
-operator|(const TvFuncM& src1,
-	  const TvFuncM& src2)
+operator|(const TvFuncM& left,
+	  const TvFuncM& right)
 {
-  return TvFuncM(src1).operator|=(src2);
+  return TvFuncM(left).operator|=(right);
 }
 
 // 排他的論理和を求める．
 inline
 TvFuncM
-operator^(const TvFuncM& src1,
-	  const TvFuncM& src2)
+operator^(const TvFuncM& left,
+	  const TvFuncM& right)
 {
-  return TvFuncM(src1).operator^=(src2);
+  return TvFuncM(left).operator^=(right);
 }
 
 // @brief コファクターを返す．
@@ -527,8 +573,8 @@ operator^(const TvFuncM& src1,
 // @param[in] pol 極性
 inline
 TvFuncM
-TvFuncM::cofactor(ymuint varid,
-		 tPol pol) const
+TvFuncM::cofactor(VarId varid,
+		  tPol pol) const
 {
   return TvFuncM(*this).set_cofactor(varid, pol);
 }
@@ -536,55 +582,55 @@ TvFuncM::cofactor(ymuint varid,
 // 等価比較
 inline
 bool
-operator!=(const TvFuncM& src1,
-	   const TvFuncM& src2)
+operator!=(const TvFuncM& left,
+	   const TvFuncM& right)
 {
-  return !operator==(src1, src2);
+  return !operator==(left, right);
 }
 
 // 大小比較のバリエーション
 inline
 bool
-operator<(const TvFuncM& src1,
-	  const TvFuncM& src2)
+operator<(const TvFuncM& left,
+	  const TvFuncM& right)
 {
-  if ( !TvFuncM::check_nio(src1, src2) ) {
+  if ( !TvFuncM::check_nio(left, right) ) {
     return false;
   }
-  return src1.lt(src2);
+  return left.lt(right);
 }
 
 inline
 bool
-operator>(const TvFuncM& src1,
-	  const TvFuncM& src2)
+operator>(const TvFuncM& left,
+	  const TvFuncM& right)
 {
-  if ( !TvFuncM::check_nio(src1, src2) ) {
+  if ( !TvFuncM::check_nio(left, right) ) {
     return false;
   }
-  return src2.lt(src1);
+  return right.lt(left);
 }
 
 inline
 bool
-operator<=(const TvFuncM& src1,
-	   const TvFuncM& src2)
+operator<=(const TvFuncM& left,
+	   const TvFuncM& right)
 {
-  if ( !TvFuncM::check_nio(src1, src2) ) {
+  if ( !TvFuncM::check_nio(left, right) ) {
     return false;
   }
-  return !src2.lt(src1);
+  return !right.lt(left);
 }
 
 inline
 bool
-operator>=(const TvFuncM& src1,
-	   const TvFuncM& src2)
+operator>=(const TvFuncM& left,
+	   const TvFuncM& right)
 {
-  if ( !TvFuncM::check_nio(src1, src2) ) {
+  if ( !TvFuncM::check_nio(left, right) ) {
     return false;
   }
-  return !src1.lt(src2);
+  return !left.lt(right);
 }
 
 // ストリームに対する出力
@@ -593,7 +639,33 @@ ostream&
 operator<<(ostream& s,
 	   const TvFuncM& func)
 {
-  func.dump(s, 2);
+  func.print(s, 2);
+  return s;
+}
+
+// @brief バイナリ出力
+// @param[in] s 出力ストリーム
+// @param[in] func 関数
+// @return s
+inline
+BinO&
+operator<<(BinO& s,
+	   const TvFuncM& func)
+{
+  func.dump(s);
+  return s;
+}
+
+// @brief バイナリ入力
+// @param[in] s 入力ストリーム
+// @param[out] func 関数
+// @return s
+inline
+BinI&
+operator>>(BinI& s,
+	   TvFuncM& func)
+{
+  func.restore(s);
   return s;
 }
 

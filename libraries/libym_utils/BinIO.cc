@@ -1,9 +1,7 @@
 
-/// @file libym_utils/BinIO.cc
+/// @file BinIO.cc
 /// @brief BinIO の実装ファイル
 /// @author Yusuke Matsunaga
-///
-/// $Id: File.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -14,15 +12,133 @@
 
 BEGIN_NAMESPACE_YM
 
+BEGIN_NONAMESPACE
+
+// 作業用のバッファ
+ymuint8 buff[8];
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス BinO
 //////////////////////////////////////////////////////////////////////
 
+// @brief 1バイトの書き込み
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+void
+BinO::write_8(ymuint8 val)
+{
+  buff[0] = val & 255U;
+  write(1, buff);
+}
+
+// @brief 2バイトの書き込み
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+void
+BinO::write_16(ymuint16 val)
+{
+  buff[0] = val & 255U; val >>= 8;
+  buff[1] = val & 255U;
+  write(2, buff);
+}
+
+// @brief 4バイトの書き込み
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+void
+BinO::write_32(ymuint32 val)
+{
+  buff[0] = val & 255U; val >>= 8;
+  buff[1] = val & 255U; val >>= 8;
+  buff[2] = val & 255U; val >>= 8;
+  buff[3] = val & 255U;
+  write(4, buff);
+}
+
+// @brief 8バイトの書き込み
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+void
+BinO::write_64(ymuint64 val)
+{
+  buff[0] = val & 255U; val >>= 8;
+  buff[1] = val & 255U; val >>= 8;
+  buff[2] = val & 255U; val >>= 8;
+  buff[3] = val & 255U; val >>= 8;
+  buff[4] = val & 255U; val >>= 8;
+  buff[5] = val & 255U; val >>= 8;
+  buff[6] = val & 255U; val >>= 8;
+  buff[7] = val & 255U;
+  write(8, buff);
+}
+
+// @brief 単精度浮動小数点数の書き込み
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+void
+BinO::write_float(float val)
+{
+  // かなり強引
+  *(reinterpret_cast<float*>(buff)) = val;
+  write(sizeof(float), buff);
+}
+
+// @brief 倍精度浮動小数点数の書き込み
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+void
+BinO::write_double(double val)
+{
+  // かなり強引
+  *(reinterpret_cast<double*>(buff)) = val;
+  write(sizeof(double), buff);
+}
+
+// @brief 文字列の書き込み
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+void
+BinO::write_str(const char* val)
+{
+  if ( val ) {
+    ymuint64 l = strlen(val);
+    write_64(l);
+    write(l, reinterpret_cast<const ymuint8*>(val));
+  }
+  else {
+    write_64(0);
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス BinOStream
+//////////////////////////////////////////////////////////////////////
+
 // @brief コンストラクタ
 // @param[in] s 出力先のストリーム
-BinO::BinO(ostream& s) :
+BinOStream::BinOStream(ostream& s) :
   mS(s)
 {
+}
+
+// @brief デストラクタ
+BinOStream::~BinOStream()
+{
+}
+
+// @brief データを書き出す．
+// @param[in] n データサイズ
+// @param[in] buff データを収めた領域のアドレス
+// @return 実際に書き出した量を返す．
+ymuint
+BinOStream::write(ymuint64 n,
+		  const ymuint8* buff)
+{
+  mS.write(reinterpret_cast<const char*>(buff), n);
+  return n;
 }
 
 
@@ -30,206 +146,125 @@ BinO::BinO(ostream& s) :
 // クラス BinI
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-// @param[in] s 入力ストリーム
-BinI::BinI(istream& s) :
-  mS(s)
-{
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス BinIO
-//////////////////////////////////////////////////////////////////////
-
-ymuint8 BinIO::mBuf[8];
-
-// @brief 1バイトの書き込み
-// @param[in] s 出力先のストリーム
-// @param[in] val 値
-void
-BinIO::write_8(ostream& s,
-	       ymuint8 val)
-{
-  mBuf[0] = val & 255U;
-  s.write(reinterpret_cast<char*>(mBuf), 1);
-}
-
-// @brief 2バイトの書き込み
-// @param[in] s 出力先のストリーム
-// @param[in] val 値
-void
-BinIO::write_16(ostream& s,
-		ymuint16 val)
-{
-  mBuf[0] = val & 255U; val >>= 8;
-  mBuf[1] = val & 255U;
-  s.write(reinterpret_cast<char*>(mBuf), 2);
-}
-
-// @brief 4バイトの書き込み
-// @param[in] s 出力先のストリーム
-// @param[in] val 値
-void
-BinIO::write_32(ostream& s,
-		ymuint32 val)
-{
-  mBuf[0] = val & 255U; val >>= 8;
-  mBuf[1] = val & 255U; val >>= 8;
-  mBuf[2] = val & 255U; val >>= 8;
-  mBuf[3] = val & 255U;
-  s.write(reinterpret_cast<char*>(mBuf), 4);
-}
-
-// @brief 8バイトの書き込み
-// @param[in] s 出力先のストリーム
-// @param[in] val 値
-void
-BinIO::write_64(ostream& s,
-		ymuint64 val)
-{
-  mBuf[0] = val & 255U; val >>= 8;
-  mBuf[1] = val & 255U; val >>= 8;
-  mBuf[2] = val & 255U; val >>= 8;
-  mBuf[3] = val & 255U; val >>= 8;
-  mBuf[4] = val & 255U; val >>= 8;
-  mBuf[5] = val & 255U; val >>= 8;
-  mBuf[6] = val & 255U; val >>= 8;
-  mBuf[7] = val & 255U;
-  s.write(reinterpret_cast<char*>(mBuf), 8);
-}
-
-// @brief 単精度浮動小数点数の書き込み
-// @param[in] s 出力先のストリーム
-// @param[in] val 値
-void
-BinIO::write_float(ostream& s,
-		   float val)
-{
-  // かなり強引
-  *(reinterpret_cast<float*>(mBuf)) = val;
-  s.write(reinterpret_cast<char*>(mBuf), sizeof(float));
-}
-
-// @brief 倍精度浮動小数点数の書き込み
-// @param[in] s 出力先のストリーム
-// @param[in] val 値
-void
-BinIO::write_double(ostream& s,
-		    double val)
-{
-  // かなり強引
-  *(reinterpret_cast<double*>(mBuf)) = val;
-  s.write(reinterpret_cast<char*>(mBuf), sizeof(double));
-}
-
-// @brief 文字列の書き込み
-// @param[in] s 出力先のストリーム
-// @param[in] val 値
-void
-BinIO::write_str(ostream& s,
-		 const char* val)
-{
-  if ( val ) {
-    ymuint l = strlen(val);
-    write_32(s, l);
-    s.write(val, l);
-  }
-  else {
-    write_32(s, 0);
-  }
-}
-
 // @brief 1バイトの読み出し
 // @param[in] s 入力元のストリーム
 ymuint8
-BinIO::read_8(istream& s)
+BinI::read_8()
 {
-  s.read(reinterpret_cast<char*>(mBuf), 1);
-  return mBuf[0];
+  read(1, buff);
+  return buff[0];
 }
 
 // @brief 2バイトの読み出し
 // @param[in] s 入力元のストリーム
 ymuint16
-BinIO::read_16(istream& s)
+BinI::read_16()
 {
-  s.read(reinterpret_cast<char*>(mBuf), 2);
+  read(2, buff);
   ymuint16 val =
-    (static_cast<ymuint16>(mBuf[0]) <<  0) |
-    (static_cast<ymuint16>(mBuf[1]) <<  8);
+    (static_cast<ymuint16>(buff[0]) <<  0) |
+    (static_cast<ymuint16>(buff[1]) <<  8);
   return val;
 }
 
 // @brief 4バイトの読み出し
 // @param[in] s 入力元のストリーム
 ymuint32
-BinIO::read_32(istream& s)
+BinI::read_32()
 {
-  s.read(reinterpret_cast<char*>(mBuf), 4);
+  read(4, buff);
   ymuint32 val =
-    (static_cast<ymuint32>(mBuf[0]) <<  0) |
-    (static_cast<ymuint32>(mBuf[1]) <<  8) |
-    (static_cast<ymuint32>(mBuf[2]) << 16) |
-    (static_cast<ymuint32>(mBuf[3]) << 24);
+    (static_cast<ymuint32>(buff[0]) <<  0) |
+    (static_cast<ymuint32>(buff[1]) <<  8) |
+    (static_cast<ymuint32>(buff[2]) << 16) |
+    (static_cast<ymuint32>(buff[3]) << 24);
   return val;
 }
 
 // @brief 8バイトの読み出し
 // @param[in] s 入力元のストリーム
 ymuint64
-BinIO::read_64(istream& s)
+BinI::read_64()
 {
-  s.read(reinterpret_cast<char*>(mBuf), 8);
+  read(8, buff);
   ymuint64 val =
-    (static_cast<ymuint64>(mBuf[0]) <<  0) |
-    (static_cast<ymuint64>(mBuf[1]) <<  8) |
-    (static_cast<ymuint64>(mBuf[2]) << 16) |
-    (static_cast<ymuint64>(mBuf[3]) << 24) |
-    (static_cast<ymuint64>(mBuf[4]) << 32) |
-    (static_cast<ymuint64>(mBuf[5]) << 40) |
-    (static_cast<ymuint64>(mBuf[6]) << 48) |
-    (static_cast<ymuint64>(mBuf[7]) << 56);
+    (static_cast<ymuint64>(buff[0]) <<  0) |
+    (static_cast<ymuint64>(buff[1]) <<  8) |
+    (static_cast<ymuint64>(buff[2]) << 16) |
+    (static_cast<ymuint64>(buff[3]) << 24) |
+    (static_cast<ymuint64>(buff[4]) << 32) |
+    (static_cast<ymuint64>(buff[5]) << 40) |
+    (static_cast<ymuint64>(buff[6]) << 48) |
+    (static_cast<ymuint64>(buff[7]) << 56);
   return val;
 }
 
 // @brief 単精度不動週数点数の読み出し
 // @param[in] s 入力元のストリーム
 float
-BinIO::read_float(istream& s)
+BinI::read_float()
 {
   // かなり強引
-  s.read(reinterpret_cast<char*>(mBuf), sizeof(float));
-  return *(reinterpret_cast<float*>(mBuf));
+  read(sizeof(float), buff);
+  return *(reinterpret_cast<float*>(buff));
 }
 
 // @brief 倍精度不動週数点数の読み出し
 // @param[in] s 入力元のストリーム
 double
-BinIO::read_double(istream& s)
+BinI::read_double()
 {
   // かなり強引
-  s.read(reinterpret_cast<char*>(mBuf), sizeof(double));
-  return *(reinterpret_cast<double*>(mBuf));
+  read(sizeof(double), buff);
+  return *(reinterpret_cast<double*>(buff));
 }
 
 // @brief 文字列の読み出し
 // @param[in] s 入力元のストリーム
 string
-BinIO::read_str(istream& s)
+BinI::read_str()
 {
-  ymuint32 l = read_32(s);
+  ymuint64 l = read_64();
   if ( l > 0 ) {
-    char* buf = new char[l + 1];
-    s.read(buf, l);
-    buf[l] = '\0';
-    string ans(buf);
-    delete [] buf;
+    ymuint8* strbuf = new ymuint8[l + 1];
+    read(l, strbuf);
+    strbuf[l] = '\0';
+    string ans(reinterpret_cast<char*>(strbuf));
+    delete [] strbuf;
     return ans;
   }
   else {
     return string();
   }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス BinIStream
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] s 入力ストリーム
+BinIStream::BinIStream(istream& s) :
+  mS(s)
+{
+}
+
+// @brief デストラクタ
+BinIStream::~BinIStream()
+{
+}
+
+// @brief データを読み込む．
+// @param[in] n 読み込むデータサイズ
+// @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
+// @return 実際に読み込んだ量を返す．
+ymuint
+BinIStream::read(ymuint64 n,
+		 ymuint8* buff)
+{
+  mS.read(reinterpret_cast<char*>(buff), n);
+  return n;
 }
 
 END_NAMESPACE_YM

@@ -1,11 +1,9 @@
 
-/// @file libym_npn/NpnConf.cc
+/// @file NpnConf.cc
 /// @brief NpnConf の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NpnConf.cc 1508 2008-06-30 04:55:42Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -155,67 +153,6 @@ NpnConf::copy(const NpnConf& src)
   }
 }
 
-#if 0
-// @brief 入力の極性を正しくする．
-void
-NpnConf::validate_ipols() const
-{
-  bool iinv = ( mBaseConf->opol() == 0 && mOpol == 2 );
-  for (ymuint i = 0; i < ni(); ++ i) {
-    ymuint pol = mBaseConf->ipol(i);
-    if ( iinv && mBaseConf->walsh_1(i) != 0 ) {
-      switch ( pol ) {
-      case 1:
-	pol = 2;
-	break;
-
-      case 2:
-	pol = 1;
-	break;
-      }
-    }
-    mIpols[i] = pol;
-  }
-  for (ymuint c = 0; c < nc(); ++ c) {
-    ymuint ip = ic_pol(c);
-    ymuint pos = ic_rep(c);
-    ymuint n;
-    if ( mBaseConf->bisym(pos) ) {
-      n = 1;
-    }
-    else {
-      n = mBaseConf->ic_num(pos);
-    }
-    for (ymuint j = 0; j < n; ++ j) {
-      switch ( mIpols[pos] ) {
-      case 0:
-	if ( ip == 1 ) {
-	  mIpols[pos] = 1;
-	}
-	else if ( ip == 2 ) {
-	  mIpols[pos] = 2;
-	}
-	break;
-
-      case 1:
-	if ( ip == 2 ) {
-	  mIpols[pos] = 2;
-	}
-	break;
-
-      case 2:
-	if ( ip == 2 ) {
-	  mIpols[pos] = 1;
-	}
-	break;
-      }
-      pos = mBaseConf->ic_link(pos);
-    }
-  }
-  mIpolsValid = true;
-}
-#endif
-
 // @brief 入力順序を正しくする．
 void
 NpnConf::validate_iorder() const
@@ -326,7 +263,7 @@ NpnConf::set_map(NpnMap& map) const
     ymuint n = mBaseConf->ic_num(rep);
     for (ymuint j = 0; j < n; ++ j) {
       tPol pol = (ipol(rep) == 2) ? kPolNega : kPolPosi;
-      map.set(rep, k, pol);
+      map.set(VarId(rep), VarId(k), pol);
       ++ k;
       rep = mBaseConf->ic_link(rep);
     }
@@ -334,7 +271,7 @@ NpnConf::set_map(NpnMap& map) const
   ymuint rep = mBaseConf->indep_rep();
   ymuint n = mBaseConf->indep_num();
   for (ymuint j = 0; j < n; ++ j) {
-    map.set(rep, k, kPolPosi);
+    map.set(VarId(rep), VarId(k), kPolPosi);
     ++ k;
     rep = mBaseConf->ic_link(rep);
   }
@@ -343,7 +280,7 @@ NpnConf::set_map(NpnMap& map) const
 
 // @brief 内容を出力する．
 void
-NpnConf::dump(ostream& s) const
+NpnConf::print(ostream& s) const
 {
   s << "opol: ";
   switch ( opol() ) {
@@ -372,7 +309,7 @@ NpnConf::dump(ostream& s) const
     ymuint e = group_end(g);
     for (ymuint j = b; j < e; ++ j) {
       ymuint pos1 = ic_rep(j);
-      ymint w1 = func().walsh_1(pos1);
+      ymint w1 = func().walsh_1(VarId(pos1));
       if ( (opol() == 2) ^ (ipol(pos1) == 2) ) {
 	w1 = -w1;
       }

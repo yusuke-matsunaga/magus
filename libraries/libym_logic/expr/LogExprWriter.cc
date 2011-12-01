@@ -127,7 +127,7 @@ LogExprWriter::dump_sub(ostream& s,
     if ( node->is_negaliteral() ) {
       s << not_str();
     }
-    tVarId id = node->varid();
+    VarId id = node->varid();
     VarStrMap::const_iterator p = var_names.find(id);
     if ( p == var_names.end() ) {
       s << "V" << id;

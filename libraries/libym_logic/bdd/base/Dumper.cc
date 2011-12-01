@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/base/Dumper.cc
+/// @file Dumper.cc
 /// @brief Dumper の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: Dumper.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -141,8 +139,8 @@ Displayer::display_step(BddEdge e)
   display_id(e_p);
   BddEdge e0;
   BddEdge e1;
-  tVarId id = mMgr->root_decomp(e_p, e0, e1);
-  tLevel level = mMgr->level(id);
+  VarId id = mMgr->root_decomp(e_p, e0, e1);
+  ymuint level = mMgr->level(id);
   ios::fmtflags save = mStream.flags();
   mStream << ":IDX=" << setw(3) << id
 	  << ":LVL=" << setw(3) << level
@@ -179,7 +177,7 @@ Displayer::num() const
 
 // コンストラクタ
 Dumper::Dumper(BddMgrImpl* mgr,
-	       ostream& s) :
+	       BinO& s) :
   mMgr(mgr),
   mStream(s)
 {
@@ -188,12 +186,43 @@ Dumper::Dumper(BddMgrImpl* mgr,
 // デストラクタ
 Dumper::~Dumper()
 {
-  mStream.flush();
 }
 
-// e を根とするBDDの内容を出力する．
+// @brief 一つのBDDをダンプする．
 void
-Dumper::dump(BddEdge e)
+Dumper::write(BddEdge e)
+{
+  dump_node(e);
+  // エンドマーク
+  mStream << kVarIdIllegal;
+  // 出力数
+  mStream << static_cast<ymuint32>(1);
+  dump_edge(e);
+}
+
+// @brief 複数のBDDをダンプする．
+void
+Dumper::write(const vector<BddEdge>& edge_list)
+{
+  for (vector<BddEdge>::const_iterator p = edge_list.begin();
+       p != edge_list.end(); ++ p) {
+    BddEdge e = *p;
+    dump_node(e);
+  }
+  // エンドマーク
+  mStream << kVarIdIllegal;
+  // 出力数
+  mStream << static_cast<ymuint32>(edge_list.size());
+  for (vector<BddEdge>::const_iterator p = edge_list.begin();
+       p != edge_list.end(); ++ p) {
+    BddEdge e = *p;
+    dump_edge(e);
+  }
+}
+
+// @brief e で指されたBDDノードの内容を出力する．
+void
+Dumper::dump_node(BddEdge e)
 {
   if ( e.is_leaf() || mIdMgr.has_id(e) ) {
     return;
@@ -202,37 +231,42 @@ Dumper::dump(BddEdge e)
   e_p.normalize();
   BddEdge e0;
   BddEdge e1;
-  tVarId varid = mMgr->root_decomp(e_p, e0, e1);
-  dump(e0);
-  dump(e1);
+  VarId varid = mMgr->root_decomp(e_p, e0, e1);
+  dump_node(e0);
+  dump_node(e1);
   mIdMgr.id(e_p);
-  mStream << varid << ":";
+  mStream << varid;
   dump_edge(e0);
-  mStream << ":";
   dump_edge(e1);
-  mStream << endl;
 }
 
 // 枝の内容を書き出す．
 void
 Dumper::dump_edge(BddEdge e)
 {
+  ymuint8 type;
   if ( e.is_zero() ) {
-    mStream << "F";
+    type = 0;
   }
   else if ( e.is_one() ) {
-    mStream << "T";
+    type = 1;
   }
   else if ( e.is_error() ) {
-    mStream << "E";
+    type = 2;
   }
   else if ( e.is_overflow() ) {
-    mStream << "O";
+    type = 3;
   }
   else {
+    type = 4;
     tPol p = e.pol();
-    mStream << ((p == kPolPosi) ? "P" : "N");
-    ymuint id = mIdMgr.id(e);
+    if ( p == kPolNega ) {
+      type = 5;
+    }
+  }
+  mStream << type;
+  if ( type >= 4 ) {
+    ymuint32 id = mIdMgr.id(e);
     mStream << id;
   }
 }
@@ -244,7 +278,7 @@ Dumper::dump_edge(BddEdge e)
 
 // コンストラクタ
 Restorer::Restorer(BddMgrImpl* mgr,
-		   istream& s) :
+		   BinI& s) :
   mMgr(mgr),
   mStream(s)
 {
@@ -263,23 +297,24 @@ Restorer::read()
 {
   mRootVector.clear();
   mEdgeVector.clear();
-  char buff[1024];
-  while ( mStream.getline(buff, sizeof(buff), '\n') ) {
-    if ( '0' <= buff[0] && buff[0] <= '9' ) {
-      // 内部のノードの記述
-      char* p = strtok(buff, ": \t");
-      ymuint vid = atoi(p);
-      p = strtok(NULL, ": \t");
-      BddEdge e0 = find_edge(p);
-      p = strtok(NULL, ": \t");
-      BddEdge e1 = find_edge(p);
-      BddEdge ans = mMgr->make_bdd(vid, e0, e1);
-      mEdgeVector.push_back(ans);
+  for ( ; ; ) {
+    VarId varid;
+    mStream >> varid;
+    if ( varid == kVarIdIllegal ) {
+      // エンドマーク
+      break;
     }
-    else {
-      // 根のノードの記述
-      mRootVector.push_back(find_edge(buff));
-    }
+    BddEdge e0 = read_edge();
+    BddEdge e1 = read_edge();
+    BddEdge ans = mMgr->make_bdd(varid, e0, e1);
+    mEdgeVector.push_back(ans);
+  }
+  ymuint32 n;
+  mStream >> n;
+  for (ymuint i = 0; i < n; ++ i) {
+    // 根のノードの記述
+    BddEdge root = read_edge();
+    mRootVector.push_back(root);
   }
   return mRootVector.size();
 }
@@ -297,21 +332,24 @@ Restorer::root(ymuint pos)
 // 内部の枝を指す文字列から枝を得る．
 // 見つからなければ kEdgeError を返す．
 BddEdge
-Restorer::find_edge(const char* str) const
+Restorer::read_edge()
 {
+  ymuint8 type;
+  mStream >> type;
   bool negated = false;
-  switch ( str[0] ) {
-  case 'T': return BddEdge::make_one();
-  case 'F': return BddEdge::make_zero();
-  case 'E': return BddEdge::make_error();
-  case 'O': return BddEdge::make_overflow();
-  case 'P': break;
-  case 'N': negated = true; break;
+  switch ( type ) {
+  case 0: return BddEdge::make_zero();
+  case 1: return BddEdge::make_one();
+  case 2: return BddEdge::make_error();
+  case 3: return BddEdge::make_overflow();
+  case 4: break;
+  case 5: negated = true; break;
   default: return BddEdge::make_error();
   }
-  ymuint pos = atoi(str + 1);
-  if ( pos < mEdgeVector.size() ) {
-    BddEdge ans = mEdgeVector[pos];
+  ymuint32 id;
+  mStream >> id;
+  if ( id < mEdgeVector.size() ) {
+    BddEdge ans = mEdgeVector[id];
     if ( negated ) {
       ans.negate();
     }

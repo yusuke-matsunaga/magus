@@ -40,10 +40,10 @@ SatSolverMiniSat::sane() const
 // @brief 変数を追加する．
 // @return 新しい変数番号を返す．
 // @note 変数番号は 0 から始まる．
-tVarId
+VarId
 SatSolverMiniSat::new_var()
 {
-  return mSolver.newVar();
+  return VarId(mSolver.newVar());
 }
 
 // @brief 節を追加する．
@@ -55,7 +55,7 @@ SatSolverMiniSat::add_clause(const vector<Literal>& lits)
   for (vector<Literal>::const_iterator p = lits.begin();
        p != lits.end(); ++ p) {
     Literal l = *p;
-    Lit lit(l.varid(), l.pol() == kPolNega);
+    Lit lit(l.varid().val(), l.pol() == kPolNega);
     tmp.push(lit);
   }
   mSolver.addClause(tmp);
@@ -76,7 +76,7 @@ SatSolverMiniSat::solve(const vector<Literal>& assumptions,
   for (vector<Literal>::const_iterator p = assumptions.begin();
        p != assumptions.end(); ++ p) {
     Literal l = *p;
-    Lit lit(l.varid(), l.pol() == kPolNega);
+    Lit lit(l.varid().val(), l.pol() == kPolNega);
     tmp.push(lit);
   }
   bool ans = mSolver.solve(tmp);

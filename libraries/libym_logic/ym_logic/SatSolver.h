@@ -48,7 +48,7 @@ public:
   /// @brief 変数を追加する．
   /// @return 新しい変数番号を返す．
   /// @note 変数番号は 0 から始まる．
-  tVarId
+  VarId
   new_var();
 
   /// @brief 節を追加する．

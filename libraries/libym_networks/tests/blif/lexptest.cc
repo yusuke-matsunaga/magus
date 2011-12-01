@@ -233,10 +233,10 @@ TestBlifHandler::names(const vector<ymuint32>& name_id_array,
       for (ymuint32 i = 0; i < ni; ++ i) {
 	char v = cover_pat[c * ni + i];
 	if ( v == '0' ) {
-	  and_expr.push_back(LogExpr::make_negaliteral(i));
+	  and_expr.push_back(LogExpr::make_negaliteral(VarId(i)));
 	}
 	else if ( v == '1' ) {
-	  and_expr.push_back(LogExpr::make_posiliteral(i));
+	  and_expr.push_back(LogExpr::make_posiliteral(VarId(i)));
 	}
       }
       or_expr.push_back(LogExpr::make_and(and_expr));
@@ -255,10 +255,10 @@ TestBlifHandler::names(const vector<ymuint32>& name_id_array,
       for (ymuint32 i = 0; i < ni; ++ i) {
 	char v = cover_pat[c * ni + i];
 	if ( v == '0' ) {
-	  or_expr.push_back(LogExpr::make_posiliteral(i));
+	  or_expr.push_back(LogExpr::make_posiliteral(VarId(i)));
 	}
 	else if ( v == '1' ) {
-	  or_expr.push_back(LogExpr::make_negaliteral(i));
+	  or_expr.push_back(LogExpr::make_negaliteral(VarId(i)));
 	}
       }
       and_expr.push_back(LogExpr::make_or(or_expr));

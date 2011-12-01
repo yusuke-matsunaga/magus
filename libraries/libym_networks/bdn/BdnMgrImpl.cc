@@ -132,14 +132,16 @@ BdnMgrImpl::copy(const BdnMgr& src)
     BdnNode* src_inode0 = src_node->fanin0();
     BdnNode* input0 = nodemap[src_inode0->id()];
     assert_cond(input0, __FILE__, __LINE__);
+    bool inv0 = src_node->fanin0_inv();
 
     BdnNode* src_inode1 = src_node->fanin1();
     BdnNode* input1 = nodemap[src_inode1->id()];
     assert_cond(input1, __FILE__, __LINE__);
+    bool inv1 = src_node->fanin1_inv();
 
-    BdnNodeHandle tmp_h = set_logic(NULL, src_node->_fcode(),
-				    BdnNodeHandle(input0, false),
-				    BdnNodeHandle(input1, false));
+    BdnNodeHandle tmp_h = set_logic(NULL, src_node->is_xor(),
+				    BdnNodeHandle(input0, inv0),
+				    BdnNodeHandle(input1, inv1));
     assert_cond(tmp_h.inv() == false, __FILE__, __LINE__);
     BdnNode* dst_node = tmp_h.node();
     nodemap[src_node->id()] = dst_node;
@@ -529,7 +531,7 @@ BdnMgrImpl::delete_latch(BdnLatch* latch)
 
 // @brief バランス木を作る．
 // @param[in] node 根のノード
-// @param[in] fcode 機能コード
+// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
 // @param[in] iinv 入力の反転属性
 // @param[in] start 開始位置
 // @param[in] num 要素数
@@ -537,7 +539,7 @@ BdnMgrImpl::delete_latch(BdnLatch* latch)
 // @note node が NULL の場合，新しいノードを確保する．
 BdnNodeHandle
 BdnMgrImpl::make_tree(BdnNode* node,
-		      ymuint fcode,
+		      bool is_xor,
 		      bool iinv,
 		      ymuint start,
 		      ymuint num,
@@ -557,10 +559,10 @@ BdnMgrImpl::make_tree(BdnNode* node,
 
   case 2:
     if ( iinv ) {
-      return set_logic(node, fcode, ~node_list[start], ~node_list[start + 1]);
+      return set_logic(node, is_xor, ~node_list[start], ~node_list[start + 1]);
     }
     else {
-      return set_logic(node, fcode, node_list[start], node_list[start + 1]);
+      return set_logic(node, is_xor, node_list[start], node_list[start + 1]);
     }
 
   default:
@@ -568,9 +570,9 @@ BdnMgrImpl::make_tree(BdnNode* node,
   }
 
   ymuint nh = num / 2;
-  BdnNodeHandle l = make_tree(NULL, fcode, iinv, start, nh, node_list);
-  BdnNodeHandle r = make_tree(NULL, fcode, iinv, start + nh, num - nh, node_list);
-  return set_logic(node, fcode, l, r);
+  BdnNodeHandle l = make_tree(NULL, is_xor, iinv, start, nh, node_list);
+  BdnNodeHandle r = make_tree(NULL, is_xor, iinv, start + nh, num - nh, node_list);
+  return set_logic(node, is_xor, l, r);
 }
 
 // @brief 論理ノードの内容を変更する．
@@ -610,7 +612,7 @@ BdnMgrImpl::change_logic(BdnNode* node ,
       else {
 	inode2_handle = new_handle;
       }
-      BdnNodeHandle new_oh = set_logic(onode, onode->_fcode(),
+      BdnNodeHandle new_oh = set_logic(onode, onode->is_xor(),
 				       inode1_handle, inode2_handle);
       change_logic(onode, new_oh);
     }
@@ -653,113 +655,84 @@ hash_func(ymuint fcode,
 	  const BdnNode* node1,
 	  const BdnNode* node2)
 {
-  return (node1->id() * 3 + node2->id() << 3) | fcode;
+  return (node1->id() * 3 + node2->id() << 3) ^ fcode;
 }
 
 END_NONAMESPACE
 
 
-// 論理ノードの内容を設定する．
-BdnNodeHandle
-BdnMgrImpl::set_logic(BdnNode* node,
-		      ymuint fcode,
-		      BdnNodeHandle inode0_handle,
-		      BdnNodeHandle inode1_handle)
+// @brief 論理ノードを探す．
+// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @param[out] onode_handle 該当のノード+極性
+// @return 見つかったら true を返す．
+// @note fcode の各ビットの意味は以下のとおり，
+//  - 0bit: ファンイン0の反転属性
+//  - 1bit: ファンイン1の反転属性
+//  - 2bit: XOR/AND フラグ( 0: AND, 1: XOR)
+bool
+BdnMgrImpl::find_logic(bool is_xor,
+		       BdnNodeHandle inode1_handle,
+		       BdnNodeHandle inode2_handle,
+		       BdnNodeHandle& onode_handle)
 {
-  // 境界条件の検査
-  if ( fcode & 4U ) {
-    // XOR の場合
-    if ( inode0_handle.is_zero() ) {
-      // 入力0が定数0だった．
-      return inode1_handle;
-    }
-    else if ( inode0_handle.is_one() ) {
-      // 入力0が定数1だった．
-      return ~inode1_handle;
-    }
-    else if ( inode1_handle.is_zero() ) {
-      // 入力1が定数0だった．
-      return inode0_handle;
-    }
-    else if ( inode1_handle.is_one() ) {
-      // 入力1が定数1だった．
-      return ~inode0_handle;
-    }
-    else if ( inode0_handle == inode1_handle ) {
-      // 2つの入力が同一だった．
-      return inode0_handle;
-    }
-    else if ( inode0_handle == ~inode1_handle ) {
-      // 2つの入力が極性違いだった．
-      return BdnNodeHandle::make_zero();
-    }
-  }
-  else {
-    // AND の場合
-    if ( inode0_handle.is_one() ) {
-      // 入力0が定数1だった．
-      return inode1_handle;
-    }
-    else if ( inode0_handle.is_zero() ) {
-      // 入力0が定数0だった．
-      return BdnNodeHandle::make_zero();
-    }
-    else if ( inode1_handle.is_one() ) {
-      // 入力1が定数1だった．
-      return inode0_handle;
-    }
-    else if ( inode1_handle.is_zero() ) {
-      // 入力1が定数0だった．
-      return BdnNodeHandle::make_zero();
-    }
-    else if ( inode0_handle == inode1_handle ) {
-      // 2つの入力が同じだった．
-      return inode0_handle;
-    }
-    else if ( inode0_handle == ~inode1_handle ) {
-      // 2つの入力が極性違いだった．
-      return BdnNodeHandle::make_zero();
-    }
+  bool stat = is_trivial(is_xor, inode1_handle, inode2_handle, onode_handle);
+  if ( stat ) {
+    return true;
   }
 
-  // 入力の反転属性
-  bool inv0 = inode0_handle.inv();
-  bool inv1 = inode1_handle.inv();
-
-  // 入力のノード
-  BdnNode* inode0 = inode0_handle.node();
-  BdnNode* inode1 = inode1_handle.node();
-
-  // ファンインの順番の正規化
-  if ( inode0->id() > inode1->id() ) {
-    BdnNode* tmp = inode0;
-    inode0 = inode1;
-    inode1 = tmp;
-    bool tmp_inv = inv0;
-    inv0 = inv1;
-    inv1 = tmp_inv;
-  }
-
-  // 出力の反転属性
-  bool oinv = false;
-
-  // fcode の正規化
-  if ( fcode & XOR_BIT ) {
-    // XOR の場合には入力に反転属性はつかない．
-    oinv = inv0 ^ inv1;
-    fcode = XOR;
-  }
-  else {
-    fcode = static_cast<ymuint>(inv0) | (static_cast<ymuint>(inv1) << 1);
-  }
+  BdnNode* inode1;
+  BdnNode* inode2;
+  bool oinv;
+  ymuint fcode = cannonicalize(is_xor, inode1_handle, inode2_handle,
+			       inode1, inode2, oinv);
 
   // 同じ構造を持つノードが既にないか調べる．
-  ymuint pos = hash_func(fcode, inode0, inode1);
+  BdnNode* node = find_node(fcode, inode1, inode2);
+  if ( node ) {
+    // 同じノードがあった．
+    onode_handle = BdnNodeHandle(node, oinv);
+    return true;
+  }
+
+  return false;
+}
+
+// @brief 論理ノードの内容を設定する．
+// @param[in] node 設定するノード
+// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @return ノード＋極性を返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+// @note なければ node に設定する．
+// @note node が NULL の場合，新しいノードを確保する．
+BdnNodeHandle
+BdnMgrImpl::set_logic(BdnNode* node,
+		      bool is_xor,
+		      BdnNodeHandle inode1_handle,
+		      BdnNodeHandle inode2_handle)
+{
+  BdnNodeHandle onode_handle;
+  bool found = is_trivial(is_xor, inode1_handle, inode2_handle, onode_handle);
+  if ( found ) {
+    return onode_handle;
+  }
+
+  BdnNode* inode1;
+  BdnNode* inode2;
+  bool oinv;
+  ymuint fcode = cannonicalize(is_xor, inode1_handle, inode2_handle,
+			       inode1, inode2, oinv);
+
+  // 同じ構造を持つノードが既にないか調べる．
+  ymuint pos = hash_func(fcode, inode1, inode2);
   ymuint idx = pos % mHashSize;
   for (BdnNode* node1 = mHashTable[idx]; node1; node1 = node1->mLink) {
     if ( node1->_fcode() == fcode &&
-	 node1->fanin0() == inode0 &&
-	 node1->fanin1() == inode1 ) {
+	 node1->fanin0() == inode1 &&
+	 node1->fanin1() == inode2 ) {
       // 同じノードがあった．
       return BdnNodeHandle(node1, oinv);
     }
@@ -796,8 +769,8 @@ BdnMgrImpl::set_logic(BdnNode* node,
   }
 
   node->set_logic_type(fcode);
-  connect(inode0, node, 0);
-  connect(inode1, node, 1);
+  connect(inode1, node, 0);
+  connect(inode2, node, 1);
 
   // ハッシュ表に登録する．
   node->mLink = mHashTable[idx];
@@ -829,6 +802,164 @@ BdnMgrImpl::connect(BdnNode* from,
 
   // 構造が変わったのでレベルの情報は無効化される．
   mLevel = 0U;
+}
+
+// @brief 論理ノードの自明な簡単化を行う．
+// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @param[out] onode_handle 該当のノード+極性
+// @return 見つかったら true を返す．
+bool
+BdnMgrImpl::is_trivial(bool is_xor,
+		       BdnNodeHandle inode1_handle,
+		       BdnNodeHandle inode2_handle,
+		       BdnNodeHandle& onode_handle)
+{
+  // 境界条件の検査
+  if ( is_xor ) {
+    // XOR の場合
+    if ( inode1_handle.is_zero() ) {
+      // 入力0が定数0だった．
+      onode_handle = inode2_handle;
+      return true;
+    }
+    else if ( inode1_handle.is_one() ) {
+      // 入力0が定数1だった．
+      onode_handle = ~inode2_handle;
+      return true;
+    }
+    else if ( inode2_handle.is_zero() ) {
+      // 入力1が定数0だった．
+      onode_handle = inode1_handle;
+      return true;
+    }
+    else if ( inode2_handle.is_one() ) {
+      // 入力1が定数1だった．
+      onode_handle = ~inode1_handle;
+      return true;
+    }
+    else if ( inode1_handle == inode2_handle ) {
+      // 2つの入力が同一だった．
+      onode_handle = inode1_handle;
+      return true;
+    }
+    else if ( inode1_handle == ~inode2_handle ) {
+      // 2つの入力が極性違いだった．
+      onode_handle = BdnNodeHandle::make_zero();
+      return true;
+    }
+  }
+  else {
+    // AND の場合
+    if ( inode1_handle.is_one() ) {
+      // 入力0が定数1だった．
+      onode_handle = inode2_handle;
+      return true;
+    }
+    else if ( inode1_handle.is_zero() ) {
+      // 入力0が定数0だった．
+      onode_handle = BdnNodeHandle::make_zero();
+      return true;
+    }
+    else if ( inode2_handle.is_one() ) {
+      // 入力1が定数1だった．
+      onode_handle = inode1_handle;
+      return true;
+    }
+    else if ( inode2_handle.is_zero() ) {
+      // 入力1が定数0だった．
+      onode_handle = BdnNodeHandle::make_zero();
+      return true;
+    }
+    else if ( inode1_handle == inode2_handle ) {
+      // 2つの入力が同じだった．
+      onode_handle = inode1_handle;
+      return true;
+    }
+    else if ( inode1_handle == ~inode2_handle ) {
+      // 2つの入力が極性違いだった．
+      onode_handle = BdnNodeHandle::make_zero();
+      return true;
+    }
+  }
+
+  // ここまで来たら自明な簡単化は行えなかったということ．
+  return false;
+}
+
+// @brief 論理ノードに設定する情報の正規化を行う．
+// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @param[out] inode1 正規化された1番めの入力ノード
+// @param[out] inode2 正規化された2番目の入力ノード
+// @param[out] oinv 出力極性
+// @return 機能コードを返す．
+// @note 機能コードの各ビットの意味は以下のとおり，
+//  - 0bit: ファンイン0の反転属性
+//  - 1bit: ファンイン1の反転属性
+//  - 2bit: XOR/AND フラグ( 0: AND, 1: XOR)
+ymuint
+BdnMgrImpl::cannonicalize(bool is_xor,
+			  BdnNodeHandle inode1_handle,
+			  BdnNodeHandle inode2_handle,
+			  BdnNode*& inode1,
+			  BdnNode*& inode2,
+			  bool& oinv)
+{
+  // 入力の反転属性
+  bool inv1 = inode1_handle.inv();
+  bool inv2 = inode2_handle.inv();
+
+  // 入力のノード
+  inode1 = inode1_handle.node();
+  inode2 = inode2_handle.node();
+
+  // ファンインの順番の正規化
+  if ( inode1->id() > inode2->id() ) {
+    BdnNode* tmp = inode1;
+    inode1 = inode2;
+    inode2 = tmp;
+    bool tmp_inv = inv1;
+    inv1 = inv2;
+    inv2 = tmp_inv;
+  }
+
+  // 出力の反転属性
+  oinv = false;
+
+  // fcode の正規化
+  if ( is_xor ) {
+    // XOR の場合には入力に反転属性はつかない．
+    oinv = inv1 ^ inv2;
+    return XOR_BIT;
+  }
+  else {
+    return static_cast<ymuint>(inv1) | (static_cast<ymuint>(inv2) << 1);
+  }
+}
+
+// @brief ノードを探索する．
+// @param[in] fcode 機能コード
+// @param[in] inode1 1番めのノード
+// @param[in] inode2 2番めのノード
+BdnNode*
+BdnMgrImpl::find_node(ymuint fcode,
+		      BdnNode* inode1,
+		      BdnNode* inode2)
+{
+  ymuint idx = hash_func(fcode, inode1, inode2) % mHashSize;
+  for (BdnNode* node1 = mHashTable[idx]; node1; node1 = node1->mLink) {
+    if ( node1->_fcode() == fcode &&
+	 node1->fanin0() == inode1 &&
+	 node1->fanin1() == inode2 ) {
+      // 同じノードがあった．
+      return node1;
+    }
+  }
+  // 見つからなかった．
+  return NULL;
 }
 
 // @brief ノードを作成する．

@@ -12,7 +12,9 @@
 
 #include "ym_logic/bdd_nsdef.h"
 #include "ym_logic/BddEdge.h"
+#include "ym_logic/VarId.h"
 #include "ym_logic/LogExpr.h"
+#include "ym_utils/BinIO.h"
 #include "gmpxx.h"
 
 
@@ -24,7 +26,7 @@ BEGIN_NAMESPACE_YM_BDD
 
 /// @brief 葉のノードの仮想的なレベル
 /// @ingroup Bdd
-const tLevel kLevelMax = 0xFFFFFFFF;
+const ymuint kLevelMax = 0xFFFFFFFF;
 
 /// @}
 //////////////////////////////////////////////////////////////////////
@@ -123,8 +125,8 @@ public:
   /// ただし pol = kPolNega の時には x(または y) を反転して
   /// 交換したときに等しくなるかどうかチェックする．
   bool
-  check_symmetry(tVarId x,
-		 tVarId y,
+  check_symmetry(VarId x,
+		 VarId y,
 		 tPol pol = kPolPosi) const;
 
   /// @}
@@ -217,14 +219,14 @@ public:
   /// @return 根の節点の変数番号を返す．
   /// @note もともと定数値(葉)のBDDの場合，kVarIdMax を返し，
   /// f0, f1 には自分自身を代入する．
-  tVarId
+  VarId
   root_decomp(Bdd& f0,
 	      Bdd& f1) const;
 
   /// @brief 根の変数番号の取得
   /// @retval 根の変数番号 内部節点の場合
   /// @retval kVarIdMax 終端節点の場合
-  tVarId
+  VarId
   root_var() const;
 
   /// @brief 0枝の指しているコファクターの取得
@@ -253,7 +255,7 @@ public:
   /// @param[in] pol 極性
   /// @return 変数 var の極性 pol 側のコファクターを返す．
   Bdd
-  cofactor(tVarId var,
+  cofactor(VarId var,
 	   tPol pol) const;
 
   /// @brief コファクター演算
@@ -267,7 +269,7 @@ public:
   /// @return Davio 展開のモーメント項 (\f$f_{\overline{x}} \oplus f_x\f$)
   /// を返す．
   Bdd
-  xor_moment(tVarId idx) const;
+  xor_moment(VarId idx) const;
 
   /// @brief Smallest Cube Containg F を求める．
   /// @return SCC を返す．
@@ -279,7 +281,7 @@ public:
   /// @param[in] g 置き換え先の BDD
   /// @return 演算結果
   Bdd
-  compose(tVarId var,
+  compose(VarId var,
 	  const Bdd& g) const;
 
   /// @brief 複数変数の compose 演算
@@ -315,8 +317,8 @@ public:
   /// @note 他の関数と異なり変数番号ではなくレベルで指定する．
   /// @warning x_level < y_level でないときはエラーとなる．
   Bdd
-  push_down(tLevel x_level,
-	    tLevel y_level,
+  push_down(ymuint x_level,
+	    ymuint y_level,
 	    tPol pol = kPolPosi) const;
 
   /// @brief BDD の内容を積和形論理式に変換する．
@@ -367,7 +369,7 @@ public:
   /// @brief 内容のダンプ
   /// @param[in] s 出力ストリーム
   void
-  dump(ostream& s) const;
+  dump(BinO& s) const;
 
   /// @brief BDD が使っているノード数を数える．
   /// @return BDD が使っているノード数
@@ -375,40 +377,40 @@ public:
   size() const;
 
   /// @brief 真理値表密度の計算
-  /// @param[in] n 入力数
+  /// @param[in] nvar 入力数
   double
-  density(tVarSize n) const;
+  density(ymuint nvar) const;
 
   /// @brief 最小項の数の計算
-  /// @param[in] n 入力数
+  /// @param[in] nvar 入力数
   /// @return 最小項の数
   mpz_class
-  minterm_count(tVarSize n) const;
+  minterm_count(ymuint nvar) const;
 
   /// @brief Walsh変換の 0次係数の計算
-  /// @param[in] n 入力数
+  /// @param[in] nvar 入力数
   /// @return Walsh変換の 0次係数
   mpz_class
-  walsh0(tVarSize n) const;
+  walsh0(ymuint nvar) const;
 
   /// @brief Walsh変換の 1次係数の計算
   /// @param[in] var 変数番号
-  /// @param[in] n 入力数
+  /// @param[in] nvar 入力数
   /// @return 変数 var の 1次係数
   mpz_class
-  walsh1(tVarId var,
-	 tVarSize n) const;
+  walsh1(VarId var,
+	 ymuint nvar) const;
 
   /// @brief サポート変数集合の計算 (VarVector)
   /// @param[out] support サポート変数集合を格納するベクタ
   /// @return サポートの要素数
-  tVarSize
+  ymuint
   support(VarVector& support) const;
 
   /// @brief サポート変数集合の計算 (VarList)
   /// @param[out] support サポート変数集合を格納するリスト
   /// @return サポートの要素数
-  tVarSize
+  ymuint
   support(VarList& support) const;
 
   /// @brief サポート変数集合の計算 (BddVarSet)
@@ -418,7 +420,7 @@ public:
 
   /// @brief サポート変数集合の要素数の計算
   /// @return サポート変数集合の要素数
-  tVarSize
+  ymuint
   support_size() const;
 
   /// @brief 1パスの探索
@@ -433,7 +435,7 @@ public:
 
   /// @brief 最短の 1パスの長さの取得
   /// @return 最短の 1パスの長さ
-  tVarSize
+  ymuint
   shortest_onepath_len() const;
 
   /// @}
@@ -479,14 +481,14 @@ public:
   /// @param[out] dst リテラルを格納するベクタ
   /// @return 要素数
   /// @note 自分自身がリテラル集合を表している場合に内容をベクタに変換する．
-  tVarSize
+  ymuint
   to_literalvector(LiteralVector& dst) const;
 
   /// @brief BddLitSet からリテラルリストへの変換
   /// @param[out] dst リテラルを格納するリスト
   /// @return 要素数
   /// @note 自分自身がリテラル集合を表している場合に内容をリストに変換する．
-  tVarSize
+  ymuint
   to_literallist(LiteralList& dst) const;
 
   /// @}
@@ -494,27 +496,6 @@ public:
 
 
 public:
-  //////////////////////////////////////////////////////////////////////
-  /// @name NPN Matcher 関係の関数
-  /// @{
-
-  /// @brief 節点に n-mark を付け，各変数ごとにノード数を数える．
-  void
-  scan(hash_map<tVarId, size_t>& node_counts) const;
-
-  /// @brief レベル level のノード数を数える．
-  /// @note ただし n-mark が付いていないノードがあったら UINT_MAX を返す．
-  ymuint64
-  count_at(tLevel level) const;
-
-  /// @brief scan で付けた n-mark を消す．
-  void
-  clear_scanmark() const;
-
-  /// @}
-  //////////////////////////////////////////////////////////////////////
-
-
   //////////////////////////////////////////////////////////////////////
   //  friend 関数の宣言
   //////////////////////////////////////////////////////////////////////
@@ -558,13 +539,13 @@ public:
 
   friend
   void
-  dump(const BddVector& array,
-       ostream& s);
+  dump(BinO& s,
+       const BddVector& array);
 
   friend
   void
-  dump(const BddList& array,
-       ostream& s);
+  dump(BinO& s,
+       const BddList& array);
 
   friend
   ymuint64
@@ -575,12 +556,12 @@ public:
   size(const BddList& array);
 
   friend
-  tVarSize
+  ymuint
   support(const BddVector& bdd_array,
 	  VarVector& sup);
 
   friend
-  tVarSize
+  ymuint
   support(const BddVector& bdd_array,
 	  VarList& sup);
 
@@ -589,16 +570,16 @@ public:
   support(const BddVector& bdd_array);
 
   friend
-  tVarSize
+  ymuint
   support_size(const BddVector& bdd_array);
 
   friend
-  tVarSize
+  ymuint
   support(const BddList& bdd_array,
 	  VarVector& sup);
 
   friend
-  tVarSize
+  ymuint
   support(const BddList& bdd_array,
 	  VarList& sup);
 
@@ -607,7 +588,7 @@ public:
   support(const BddList& bdd_array);
 
   friend
-  tVarSize
+  ymuint
   support_size(const BddList& bdd_array);
 
   friend
@@ -811,13 +792,13 @@ display(const BddList& array,
 
 // BDDの配列の内容を保存用に書き出す
 void
-dump(const BddVector& array,
-     ostream& s);
+dump(BinO& s,
+     const BddVector& array);
 
 // BDDの配列の内容を保存用に書き出す
 void
-dump(const BddList& array,
-     ostream& s);
+dump(BinO& s,
+     const BddList& array);
 
 // BDDの配列のノード数を数える
 ymuint64
@@ -828,12 +809,12 @@ ymuint64
 size(const BddList& array);
 
 // BDD のベクタのサポートを求める．
-tVarSize
+ymuint
 support(const BddVector& bdd_array,
 	VarVector& sup);
 
 // BDD のベクタのサポートを求める．
-tVarSize
+ymuint
 support(const BddVector& bdd_array,
 	VarList& sup);
 
@@ -842,16 +823,16 @@ BddVarSet
 support(const BddVector& bdd_array);
 
 // BDD のベクタのサポートを求める．
-tVarSize
+ymuint
 support_size(const BddVector& bdd_array);
 
 // BDD のリストのサポートを求める．
-tVarSize
+ymuint
 support(const BddList& bdd_array,
 	VarVector& sup);
 
 // BDD のリストのサポートを求める．
-tVarSize
+ymuint
 support(const BddList& bdd_array,
 	VarList& sup);
 
@@ -860,7 +841,7 @@ BddVarSet
 support(const BddList& bdd_array);
 
 // BDD のリストのサポートを求める．
-tVarSize
+ymuint
 support_size(const BddList& bdd_array);
 
 // src1 と src2 が変数集合の時に共通部分を求める．

@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmm/bmm_ite.cc
+/// @file bmm_ite.cc
 /// @brief ITE 演算を行う関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmm_ite.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -77,9 +75,9 @@ BddMgrModern::ite_op(BddEdge f,
   Var* f_var = f_vp->var();
   Var* g_var = g_vp->var();
   Var* h_var = h_vp->var();
-  tLevel f_level = f_var->level();
-  tLevel g_level = g_var->level();
-  tLevel h_level = h_var->level();
+  ymuint f_level = f_var->level();
+  ymuint g_level = g_var->level();
+  ymuint h_level = h_var->level();
 
   BddEdge result;
 
@@ -99,7 +97,7 @@ BddMgrModern::ite_op(BddEdge f,
     if ( result.is_error() ) {
       tPol g_pol = g.pol();
       tPol h_pol = h.pol();
-      tLevel top = f_level;
+      ymuint top = f_level;
       Var* var = f_var;
       if ( top > g_level) {
 	top = g_level;
@@ -135,14 +133,14 @@ BddMgrModern::compose_start()
 
 // multiple compose 演算を行う変数と置き換え関数を登録する関数
 void
-BddMgrModern::compose_reg(tVarId id,
+BddMgrModern::compose_reg(VarId id,
 			  BddEdge e)
 {
   Var* var = var_of(id);
   if ( var ) {
     var->mMark = 1;
     var->mCompEdge = e;
-    tLevel level = var->level();
+    ymuint level = var->level();
     if ( mLastLevel < level ) {
       mLastLevel = level;
     }
@@ -206,8 +204,8 @@ BddMgrModern::compose_step(BddEdge f)
 // pol が kPolNega の時は 0-枝と 1-枝を取り替える．
 BddEdge
 BddMgrModern::push_down(BddEdge e,
-			tLevel x_level,
-			tLevel y_level,
+			ymuint x_level,
+			ymuint y_level,
 			tPol pol)
 {
   if ( e.is_error() ) {
@@ -278,8 +276,8 @@ BddMgrModern::gcofactor_step(BddEdge f,
     tPol c_p = c.pol();
     Var* f_var = f_v->var();
     Var* c_var = c_v->var();
-    tLevel f_level = f_var->level();
-    tLevel c_level = c_var->level();
+    ymuint f_level = f_var->level();
+    ymuint c_level = c_var->level();
 
     BddEdge f_0, f_1;
     if ( f_level <= c_level ) {
@@ -322,7 +320,7 @@ BddMgrModern::gcofactor_step(BddEdge f,
 // 一つの変数に対する cofactor を計算する．
 BddEdge
 BddMgrModern::scofactor(BddEdge e1,
-			tVarId id,
+			VarId id,
 			tPol pol)
 {
   clear_varmark();
@@ -432,7 +430,7 @@ BddMgrModern::cubediv_step(BddEdge f)
 // メモリ不足のためにエラーとなる可能性がある．
 BddEdge
 BddMgrModern::xor_moment(BddEdge e,
-			 tVarId idx)
+			 VarId idx)
 {
   if ( e.is_error() ) {
     return BddEdge::make_error();
@@ -464,7 +462,7 @@ BddMgrModern::xcofactor_step(BddEdge f)
   // この時点で e は終端ではない．
   Node* node = get_node(f);
   Var* var = node->var();
-  tLevel level = var->level();
+  ymuint level = var->level();
   if ( level > mLastLevel ) {
     return BddEdge::make_zero();
   }

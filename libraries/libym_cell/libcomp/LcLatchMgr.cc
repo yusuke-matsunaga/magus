@@ -41,11 +41,11 @@ LcLatchMgr::init()
 
   { // クリアなし，プリセットなしのラッチクラスの登録
     vector<TvFunc> f_list;
-    f_list.push_back(TvFunc::posi_literal(4, 0));
-    f_list.push_back(TvFunc::posi_literal(4, 1));
+    f_list.push_back(TvFunc::posi_literal(4, VarId(0)));
+    f_list.push_back(TvFunc::posi_literal(4, VarId(1)));
     f_list.push_back(TvFunc::const_zero(4));
     f_list.push_back(TvFunc::const_zero(4));
-    f_list.push_back(TvFunc::posi_literal(4, 2));
+    f_list.push_back(TvFunc::posi_literal(4, VarId(2)));
     f_list.push_back(TvFunc::const_zero(4));
     TvFuncM f(f_list);
     LcGroup* group = find_group(f);
@@ -54,11 +54,11 @@ LcLatchMgr::init()
   }
   { // クリアあり，プリセットなしのラッチクラスの登録
     vector<TvFunc> f_list;
-    f_list.push_back(TvFunc::posi_literal(5, 0));
-    f_list.push_back(TvFunc::posi_literal(5, 1));
-    f_list.push_back(TvFunc::posi_literal(5, 2));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(0)));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(1)));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(2)));
     f_list.push_back(TvFunc::const_zero(5));
-    f_list.push_back(TvFunc::posi_literal(5, 3));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(3)));
     f_list.push_back(TvFunc::const_zero(5));
     TvFuncM f(f_list);
     LcGroup* group = find_group(f);
@@ -67,11 +67,11 @@ LcLatchMgr::init()
   }
   { // クリアなし，プリセットありのラッチクラスの登録
     vector<TvFunc> f_list;
-    f_list.push_back(TvFunc::posi_literal(5, 0));
-    f_list.push_back(TvFunc::posi_literal(5, 1));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(0)));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(1)));
     f_list.push_back(TvFunc::const_zero(5));
-    f_list.push_back(TvFunc::posi_literal(5, 2));
-    f_list.push_back(TvFunc::posi_literal(5, 3));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(2)));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(3)));
     f_list.push_back(TvFunc::const_zero(5));
     TvFuncM f(f_list);
     LcGroup* group = find_group(f);
@@ -80,11 +80,11 @@ LcLatchMgr::init()
   }
   { // クリアあり，プリセットありのラッチクラスの登録
     vector<TvFunc> f_list;
-    f_list.push_back(TvFunc::posi_literal(6, 0));
-    f_list.push_back(TvFunc::posi_literal(6, 1));
-    f_list.push_back(TvFunc::posi_literal(6, 2));
-    f_list.push_back(TvFunc::posi_literal(6, 3));
-    f_list.push_back(TvFunc::posi_literal(6, 4));
+    f_list.push_back(TvFunc::posi_literal(6, VarId(0)));
+    f_list.push_back(TvFunc::posi_literal(6, VarId(1)));
+    f_list.push_back(TvFunc::posi_literal(6, VarId(2)));
+    f_list.push_back(TvFunc::posi_literal(6, VarId(3)));
+    f_list.push_back(TvFunc::posi_literal(6, VarId(4)));
     f_list.push_back(TvFunc::const_zero(6));
     TvFuncM f(f_list);
     LcGroup* group = find_group(f);

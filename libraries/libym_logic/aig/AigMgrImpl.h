@@ -1,7 +1,7 @@
-#ifndef LIBYM_AIG_AIGMGRIMPL_H
-#define LIBYM_AIG_AIGMGRIMPL_H
+#ifndef AIGMGRIMPL_H
+#define AIGMGRIMPL_H
 
-/// @file libym_aig/AigMgrImpl.h
+/// @file AigMgrImpl.h
 /// @brief AigMgrImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_aig/AigMgr.h"
-#include "ym_aig/AigNode.h"
+#include "ym_logic/AigMgr.h"
+#include "AigNode.h"
 #include "ym_utils/Alloc.h"
 #include "ym_utils/ItvlMgr.h"
 
@@ -39,16 +39,16 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 入力ノード数を得る．
-  size_t
+  ymuint
   input_num() const;
 
   /// @brief 入力ノードを取り出す．
-  /// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
+  /// @param[in] id 入力番号
   AigNode*
-  input_node(size_t pos) const;
+  input_node(VarId id) const;
 
   /// @brief ノード数を得る．
-  size_t
+  ymuint
   node_num() const;
 
   /// @brief ノードを取り出す．
@@ -58,22 +58,23 @@ public:
   node(size_t pos) const;
 
   /// @brief 定数0関数をつくる．
-  AigHandle
+  Aig
   make_zero();
 
   /// @brief 定数1関数をつくる．
-  AigHandle
+  Aig
   make_one();
 
   /// @brief 外部入力を作る．
-  AigHandle
-  make_input();
+  /// @param[in] id 入力番号
+  Aig
+  make_input(VarId id);
 
   /// @brief 2つのノードの AND を取る．
   /// @param[in] edge1, edge2 入力の AIG ハンドル
-  AigHandle
-  make_and(AigHandle edge1,
-	   AigHandle edge2);
+  Aig
+  make_and(Aig edge1,
+	   Aig edge2);
 
 
 private:
@@ -85,15 +86,21 @@ private:
   AigNode*
   new_node();
 
-  /// @brief ハッシュ表を確保する．
+  /// @brief ハッシュ表を拡大する．
+  /// @note 現在のサイズが0のときは適当な大きさに初期化される．
+  static
   void
-  alloc_table(ymuint req_size);
+  alloc_table(AigNode**& table,
+	      ymuint req_size,
+	      ymuint& size,
+	      ymuint& limit);
+
 
   /// @brief AigNode のハッシュ関数
   static
   ymuint
-  hash_func(AigHandle handle1,
-	    AigHandle handle2);
+  hash_func(Aig handle1,
+	    Aig handle2);
 
 
 private:
@@ -108,17 +115,29 @@ private:
   // 全てのノードのリスト(mInputNodes + mAndNodes)
   vector<AigNode*> mAllNodes;
 
-  // 入力ノードの配列
-  vector<AigNode*> mInputNodes;
+  // 入力ノード数
+  ymuint32 mInputNum;
+
+  // 入力ノードのハッシュ表
+  AigNode** mInputHashTable;
+
+  // 入力ノードのハッシュ表のサイズ
+  ymuint32 mInputHashSize;
+
+  // 入力ノードのハッシュ表を拡大する目安
+  ymuint32 mInputNextLimit;
+
+  // AND ノード数
+  ymuint32 mAndNum;
 
   // AND ノードのハッシュ表
-  AigNode** mHashTable;
+  AigNode** mAndHashTable;
 
-  // mHashTable のサイズ
-  ymuint32 mHashSize;
+  // AND ノードのハッシュ表のサイズ
+  ymuint32 mAndHashSize;
 
-  // ハッシュ表を拡大する目安
-  ymuint32 mNextLimit;
+  // AND ノードのハッシュ表を拡大する目安
+  ymuint32 mAndNextLimit;
 
 };
 
@@ -129,24 +148,15 @@ private:
 
 // @brief 入力ノード数を得る．
 inline
-size_t
+ymuint
 AigMgrImpl::input_num() const
 {
-  return mInputNodes.size();
-}
-
-// @brief 入力ノードを取り出す．
-// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
-inline
-AigNode*
-AigMgrImpl::input_node(size_t pos) const
-{
-  return mInputNodes[pos];
+  return mInputNum;
 }
 
 // @brief ノード数を得る．
 inline
-size_t
+ymuint
 AigMgrImpl::node_num() const
 {
   return mAllNodes.size();
@@ -164,25 +174,25 @@ AigMgrImpl::node(size_t pos) const
 
 // @brief 定数0関数をつくる．
 inline
-AigHandle
+Aig
 AigMgrImpl::make_zero()
 {
-  return AigHandle(NULL, false);
+  return Aig(NULL, false);
 }
 
 // @brief 定数1関数をつくる．
 inline
-AigHandle
+Aig
 AigMgrImpl::make_one()
 {
-  return AigHandle(NULL, true);
+  return Aig(NULL, true);
 }
 
 // AigNode のハッシュ関数
 inline
 ymuint
-AigMgrImpl::hash_func(AigHandle handle1,
-		      AigHandle handle2)
+AigMgrImpl::hash_func(Aig handle1,
+		      Aig handle2)
 {
   return handle1.mPackedData + handle2.mPackedData;
 }

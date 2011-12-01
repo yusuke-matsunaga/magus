@@ -108,10 +108,10 @@ TgBlifHandler::names(const vector<ymuint32>& name_id_array,
       for (ymuint32 i = 0; i < ni; ++ i) {
 	char v = cover_pat[c * ni + i];
 	if ( v == '0' ) {
-	  mChd2.push_back(LogExpr::make_negaliteral(i));
+	  mChd2.push_back(LogExpr::make_negaliteral(VarId(i)));
 	}
 	else if ( v == '1' ) {
-	  mChd2.push_back(LogExpr::make_posiliteral(i));
+	  mChd2.push_back(LogExpr::make_posiliteral(VarId(i)));
 	}
       }
       mChd1.push_back(LogExpr::make_and(mChd2));
@@ -129,10 +129,10 @@ TgBlifHandler::names(const vector<ymuint32>& name_id_array,
       for (ymuint32 i = 0; i < ni; ++ i) {
 	char v = cover_pat[c * ni + i];
 	if ( v == '0' ) {
-	  mChd2.push_back(LogExpr::make_posiliteral(i));
+	  mChd2.push_back(LogExpr::make_posiliteral(VarId(i)));
 	}
 	else if ( v == '1' ) {
-	  mChd2.push_back(LogExpr::make_negaliteral(i));
+	  mChd2.push_back(LogExpr::make_negaliteral(VarId(i)));
 	}
       }
       mChd1.push_back(LogExpr::make_or(mChd2));
@@ -209,8 +209,8 @@ TgBlifHandler::end(const FileRegion& loc)
   }
   mConList.clear();
 
-  size_t n = mNetwork->node_num();
-  for (size_t i = 0; i < n; ++ i) {
+  ymuint n = mNetwork->node_num();
+  for (ymuint i = 0; i < n; ++ i) {
     const TgNode* node = mNetwork->node(i);
     if ( node->is_undef() ) {
       // node は定義されていない
@@ -247,7 +247,7 @@ TgBlifHandler::error_exit()
 void
 TgBlifHandler::connect(TgNode* from,
 		       TgNode* to,
-		       size_t pos)
+		       ymuint pos)
 {
   if ( from->is_undef() ) {
     mConList.push_back(Connection(from, to, pos));

@@ -1,7 +1,7 @@
-#ifndef LIBYM_LOGIC_BDD_BMM_BMMNODE_H
-#define LIBYM_LOGIC_BDD_BMM_BMMNODE_H
+#ifndef BMMNODE_H
+#define BMMNODE_H
 
-/// @file libym_logic/bdd/bmm/BmmNode.h
+/// @file BmmNode.h
 /// @brief BmmNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -52,6 +52,7 @@ public:
 
 
 public:
+
   // 中間ノードの場合に0枝/1枝を得る．
   BddEdge
   edge0() const;
@@ -70,11 +71,11 @@ public:
   var() const;
 
   // 変数インデックス値を得る
-  tVarId
+  VarId
   varid() const;
 
   // レベルを得る．
-  tLevel
+  ymuint
   level() const;
 
   // p-mark が付いていたらtrueを返す
@@ -100,7 +101,7 @@ public:
   rst_mark();
 
   // リンク数を得る．
-  size_t
+  ymuint
   refcount() const;
 
   // 参照されていない時にtrueを返す
@@ -115,11 +116,11 @@ private:
   linkdelta() const;
 
   // リンク数を増やす(オーバーフロー時は何もしない)
-  size_t
+  ymuint
   linkinc();
 
   // リンク数を減らす(オーバーフロー時は何もしない)
-  size_t
+  ymuint
   linkdec();
 
   // コンストラクタ
@@ -190,7 +191,7 @@ BmmNode::var() const
 
 // 変数インデックス値を得る
 inline
-tVarId
+VarId
 BmmNode::varid() const
 {
   return mVar->varid();
@@ -198,7 +199,7 @@ BmmNode::varid() const
 
 // レベルを得る
 inline
-tLevel
+ymuint
 BmmNode::level() const
 {
   return mVar->level();
@@ -256,10 +257,10 @@ BmmNode::rst_mark()
 
 // リンク数を得る．
 inline
-size_t
+ymuint
 BmmNode::refcount() const
 {
-  return static_cast<size_t>(mRefMark & kLMask);
+  return static_cast<ymuint>(mRefMark & kLMask);
 }
 
 // 参照されていない時にtrueを返す
@@ -280,20 +281,20 @@ BmmNode::linkdelta() const
 
 // リンク数を増やす(オーバーフロー時は何もしない)
 inline
-size_t
+ymuint
 BmmNode::linkinc()
 {
   int d = linkdelta();
-  return (mRefMark += d) & kLMask;
+  return static_cast<ymuint>((mRefMark += d) & kLMask);
 }
 
 // リンク数を減らす(オーバーフロー時は何もしない)
 inline
-size_t
+ymuint
 BmmNode::linkdec()
 {
   int d = linkdelta();
-  return (mRefMark -= d) & kLMask;
+  return static_cast<ymuint>((mRefMark -= d) & kLMask);
 }
 
 // コンストラクタ
@@ -310,11 +311,12 @@ BEGIN_NAMESPACE_HASH
 template <>
 struct hash<nsYm::nsBdd::BmmNode*>
 {
-  size_t operator()(nsYm::nsBdd::BmmNode* node) const
+  ymuint
+  operator()(nsYm::nsBdd::BmmNode* node) const
   {
-    return reinterpret_cast<size_t>(node)/sizeof(void*);
+    return reinterpret_cast<ympuint>(node)/sizeof(void*);
   }
 };
 END_NAMESPACE_HASH
 
-#endif // LIBYM_LOGIC_BDD_BMM_BMMNODE_H
+#endif // BMMNODE_H

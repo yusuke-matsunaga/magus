@@ -1,11 +1,11 @@
-#ifndef LIBYM_NPN_NPNCONF_H
-#define LIBYM_NPN_NPNCONF_H
+#ifndef NPNCONF_H
+#define NPNCONF_H
 
-/// @file libym_npn/NpnConf.h
+/// @file NpnConf.h
 /// @brief NpnConf のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -238,8 +238,9 @@ public:
 public:
 
   /// @brief 内容を出力する．
+  /// @param[in] s 出力先のストリーム
   void
-  dump(ostream& s) const;
+  print(ostream& s) const;
 
 
 private:
@@ -589,4 +590,4 @@ NpnConf::refine(ymuint g0,
 
 END_NAMESPACE_YM_NPN
 
-#endif // YM_NPN_NPNCONF
+#endif // NPNCONF

@@ -41,11 +41,12 @@ walsh_1(const TvFunc& func,
 {
   StopWatch sw;
 
-  size_t ni = func.ni();
+  ymuint ni = func.ni();
   sw.start();
-  for (size_t j = 0; j < ni; ++ j) {
+  for (ymuint j = 0; j < ni; ++ j) {
+    VarId var(j);
     for (int i = 0; i < mag; ++ i) {
-      func.walsh_1(j);
+      func.walsh_1(var);
     }
   }
   sw.stop();
@@ -63,12 +64,14 @@ walsh_2(const TvFunc& func,
 {
   StopWatch sw;
 
-  size_t ni = func.ni();
+  ymuint ni = func.ni();
   sw.start();
-  for (size_t j = 0; j < ni; ++ j) {
-    for (size_t k = 0; k < ni; ++ k) {
+  for (ymuint j = 0; j < ni; ++ j) {
+    VarId var1(j);
+    for (ymuint k = 0; k < ni; ++ k) {
+      VarId var2(k);
       for (int i = 0; i < mag; ++ i) {
-	func.walsh_2(j, k);
+	func.walsh_2(var1, var2);
       }
     }
   }

@@ -64,7 +64,7 @@ private:
 typedef vector<LexpNodePtr> LexpNodeList;
 typedef vector<LexpNodePtr>::iterator LexpNode_itr;
 typedef vector<LexpNodePtr>::const_iterator LexpNode_citr;
-typedef hash_map<tVarId, LexpNodePtr> VarLexpNodeMap;
+typedef hash_map<VarId, LexpNodePtr> VarLexpNodeMap;
 
 
 

@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmm/bmm_symmetry.cc
+/// @file bmm_symmetry.cc
 /// @brief 対称性をチェックする関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmm_symmetry.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -17,8 +15,8 @@ BEGIN_NAMESPACE_YM_BDD
 
 BEGIN_NONAMESPACE
 
-tLevel x_level;
-tLevel y_level;
+ymuint x_level;
+ymuint y_level;
 
 BddEdge xy_edge;
 BddEdge y_edge;
@@ -35,7 +33,7 @@ BddMgrModern::cs_step2(BddEdge e)
   if ( vp == 0 ) {
     return BddEdge::make_one();
   }
-  tLevel level = vp->level();
+  ymuint level = vp->level();
   if ( level > y_level ) {
     return BddEdge::make_one();
   }
@@ -64,9 +62,9 @@ BddMgrModern::cs_step1(BddEdge e1,
 {
   Node* vp1 = get_node(e1);
   Node* vp2 = get_node(e2);
-  tLevel level1 = vp1 ? vp1->level() : kLevelMax;
-  tLevel level2 = vp2 ? vp2->level() : kLevelMax;
-  tLevel top_level = level1;
+  ymuint level1 = vp1 ? vp1->level() : kLevelMax;
+  ymuint level2 = vp2 ? vp2->level() : kLevelMax;
+  ymuint top_level = level1;
   if ( top_level > level2 ) {
     top_level = level2;
   }
@@ -126,7 +124,7 @@ BddMgrModern::cs_step(BddEdge e,
   if ( vp == 0 ) {
     return BddEdge::make_one();
   }
-  tLevel level = vp->level();
+  ymuint level = vp->level();
   if ( level > y_level ) {
     return BddEdge::make_one();
   }
@@ -165,14 +163,14 @@ BddMgrModern::cs_step(BddEdge e,
 // エラーとなる可能性がある．
 bool
 BddMgrModern::check_symmetry(BddEdge e,
-			     tVarId x,
-			     tVarId y,
+			     VarId x,
+			     VarId y,
 			     tPol pol)
 {
   x_level = level(x);
   y_level = level(y);
   if ( y_level < x_level ) {
-    tLevel tmp = x_level;
+    ymuint tmp = x_level;
     x_level = y_level;
     y_level = tmp;
   }

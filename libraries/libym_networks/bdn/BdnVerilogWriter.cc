@@ -269,8 +269,8 @@ BdnVerilogWriter::operator()(ostream& s,
     if ( node->alt_node() ) {
       node = node->alt_node();
     }
-    const BdnNode* input = node->fanin0();
-    bool i_inv = node->fanin0_inv();
+    const BdnNode* input = node->output_fanin();
+    bool i_inv = node->output_fanin_inv();
     s << "  assign " << node_name(node, false) << " = "
       << node_name(input, i_inv) << ";" << endl;
   }

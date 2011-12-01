@@ -24,7 +24,7 @@ bool
 test_var_list(BddMgr& bddmgr,
 	      ymuint n)
 {
-  list<tVarId> vlist;
+  list<VarId> vlist;
   ymuint nn = bddmgr.var_list(vlist);
   bool result = true;
   if ( nn != n ) {
@@ -32,9 +32,9 @@ test_var_list(BddMgr& bddmgr,
   }
   else {
     ymuint i = 0;
-    for (list<tVarId>::const_iterator p = vlist.begin();
+    for (list<VarId>::const_iterator p = vlist.begin();
 	 p != vlist.end(); ++ p) {
-      if ( *p != i ) {
+      if ( *p != VarId(i) ) {
 	result = false;
 	break;
       }
@@ -43,7 +43,7 @@ test_var_list(BddMgr& bddmgr,
   }
   if ( !result ) {
     cout << "ERROR in var_list" << endl;
-    for (list<tVarId>::const_iterator p = vlist.begin();
+    for (list<VarId>::const_iterator p = vlist.begin();
 	 p != vlist.end(); ++ p) {
       cout << " " << *p;
     }
@@ -91,25 +91,25 @@ test_const(BddMgr& bddmgr)
 bool
 test_literal(BddMgr& bddmgr)
 {
-  Bdd var0 = bddmgr.make_posiliteral(0);
+  Bdd var0 = bddmgr.make_posiliteral(VarId(0));
   if ( !check_bddv(bddmgr, var0, "make_posiliteral(0)", "0|01") )
     return false;
 
-  Bdd var0bar = bddmgr.make_negaliteral(0);
+  Bdd var0bar = bddmgr.make_negaliteral(VarId(0));
   if ( !check_bddv(bddmgr, var0bar, "make_negaliteral(0)", "0|10") )
     return false;
 
-  Bdd var2 = bddmgr.make_literal(2, kPolPosi);
+  Bdd var2 = bddmgr.make_literal(VarId(2), kPolPosi);
   if ( !check_bddv(bddmgr, var2, "make_literal(2, kPolPosi)", "2|01") )
     return false;
 
-  Bdd var3bar = bddmgr.make_literal(3, kPolNega);
+  Bdd var3bar = bddmgr.make_literal(VarId(3), kPolNega);
   if ( !check_bddv(bddmgr, var3bar, "make_literal(3, kPolNega)", "3|10") )
     return false;
 
   Bdd zero = bddmgr.make_zero();
   Bdd one = bddmgr.make_one();
-  Bdd var4 = bddmgr.make_bdd(4, zero, one);
+  Bdd var4 = bddmgr.make_bdd(VarId(4), zero, one);
   if ( !check_bddv(bddmgr, var4, "make_bdd(4, zero, one)", "4|01") )
     return false;
 
@@ -120,7 +120,7 @@ test_literal(BddMgr& bddmgr)
 bool
 test_unary(BddMgr& bddmgr)
 {
-  Bdd var0 = bddmgr.make_posiliteral(0);
+  Bdd var0 = bddmgr.make_posiliteral(VarId(0));
 
   // って否定しかない
   if ( !check_bddv(bddmgr, ~var0, "~var0", "0|10") )
@@ -139,8 +139,8 @@ test_unary(BddMgr& bddmgr)
 bool
 test_binary(BddMgr& bddmgr)
 {
-  Bdd var0 = bddmgr.make_posiliteral(0);
-  Bdd var1 = bddmgr.make_posiliteral(1);
+  Bdd var0 = bddmgr.make_posiliteral(VarId(0));
+  Bdd var1 = bddmgr.make_posiliteral(VarId(1));
 
   if ( !check_bddv(bddmgr, var0 & var1, "var0 & var1", "0,1|0001") )
     return false;
@@ -176,17 +176,19 @@ test_binary(BddMgr& bddmgr)
 bool
 test_make_bdd(BddMgr& bddmgr)
 {
-  LogExpr expr1 = LogExpr::make_posiliteral(0) & LogExpr::make_negaliteral(1) |
-    LogExpr::make_posiliteral(2) & LogExpr::make_posiliteral(1);
+  LogExpr expr1 = LogExpr::make_posiliteral(VarId(0)) &
+    LogExpr::make_negaliteral(VarId(1)) |
+    LogExpr::make_posiliteral(VarId(2)) &
+    LogExpr::make_posiliteral(VarId(1));
   Bdd bdd1 = bddmgr.expr_to_bdd(expr1);
   if ( !check_bddv(bddmgr, bdd1, "0 & ~1 | 2 & 1", "0, 1, 2|00011101" ) ) {
     return false;
   }
 
   VarVarMap vvmap;
-  vvmap.insert(make_pair(0, 1));
-  vvmap.insert(make_pair(1, 2));
-  vvmap.insert(make_pair(2, 0));
+  vvmap.insert(make_pair(VarId(0), 1));
+  vvmap.insert(make_pair(VarId(1), 2));
+  vvmap.insert(make_pair(VarId(2), 0));
   Bdd bdd3 = bddmgr.expr_to_bdd(expr1, vvmap);
   if ( !check_bddv(bddmgr, bdd3, "(0 & ~1 | 2 & 1)(0->1, 1->2, 2->0)",
 		  "0, 1, 2|00100111") ) {
@@ -194,8 +196,8 @@ test_make_bdd(BddMgr& bddmgr)
   }
 
   VarVarMap vvmap2;
-  vvmap2.insert(make_pair(0, 1));
-  vvmap2.insert(make_pair(1, 0));
+  vvmap2.insert(make_pair(VarId(0), 1));
+  vvmap2.insert(make_pair(VarId(1), 0));
   Bdd bdd5 = bddmgr.expr_to_bdd(expr1, vvmap2);
   if ( !check_bddv(bddmgr, bdd5, "(0 & ~1 | 2 & 1)(0->1, 1->0)",
 		  "0, 1, 2|00110101") ) {
@@ -225,7 +227,7 @@ test_compose(BddMgr& bddmgr)
   Bdd bdd1 = str2bdd(bddmgr, "0 & 1 & 2 & 3");
   Bdd bdd2 = str2bdd(bddmgr, "~4 | 5");
 
-  Bdd bdd4 = bdd1.compose(0, bdd2);
+  Bdd bdd4 = bdd1.compose(VarId(0), bdd2);
   if ( !check_bdde(bddmgr, bdd4, "0 & 1 & 2 & 3 compose(0, ~4 | 5)",
 		   "1 & 2 & 3 & (~4 | 5)") ) {
     return false;
@@ -240,7 +242,7 @@ test_smooth(BddMgr& bddmgr)
 {
   Bdd bdd1 = str2bdd(bddmgr, "0 & 1 | ~0 & 2");
   VarList vl;
-  vl.push_back(0);
+  vl.push_back(VarId(0));
   BddVarSet vs1(bddmgr, vl);
   Bdd bdd2 = bdd1.esmooth(vs1);
   if ( !check_bdde(bddmgr, bdd2, "0 & 1 | ~0 & 2 esmooth(0)", "1 | 2") ) {
@@ -300,7 +302,7 @@ test_and_exist(BddMgr& bddmgr)
 {
   const char* str = "0 | 2";
   VarList vl;
-  vl.push_back(0);
+  vl.push_back(VarId(0));
 
   Bdd bdd1 = str2bdd(bddmgr, "0 & 1 | ~0 & 2");
   Bdd bdd2 = str2bdd(bddmgr, str);
@@ -406,11 +408,11 @@ check_sym(BddMgr& bddmgr,
     return true;
   }
   for (ymuint i = 0; i < ni - 1; ++ i) {
-    tVarId pos1 = sup[i];
+    VarId pos1 = sup[i];
     Bdd bdd_0 = bdd.cofactor(pos1, kPolNega);
     Bdd bdd_1 = bdd.cofactor(pos1, kPolPosi);
     for (ymuint j = i + 1; j < ni; ++ j) {
-      tVarId pos2 = sup[j];
+      VarId pos2 = sup[j];
       Bdd bdd_01 = bdd_0.cofactor(pos2, kPolPosi);
       Bdd bdd_10 = bdd_1.cofactor(pos2, kPolNega);
       bool expected_result1 = (bdd_01 == bdd_10);
@@ -489,7 +491,7 @@ test_minterm_count(BddMgr& bddmgr)
 
   bdd = bddmgr.make_one();
   for (ymuint i = 0; i < 100; ++ i) {
-    Bdd bdd1 = bddmgr.make_posiliteral(i);
+    Bdd bdd1 = bddmgr.make_posiliteral(VarId(i));
     bdd &= bdd1;
   }
   mc = bdd.minterm_count(100);
@@ -519,7 +521,8 @@ test_dump(BddMgr& bddmgr)
       cout << "cannot open output file: " << fn << endl;
       return false;
     }
-    bdd.dump(ofs);
+    BinOStream bos(ofs);
+    bdd.dump(bos);
   }
   Bdd bdd2;
   {
@@ -528,7 +531,8 @@ test_dump(BddMgr& bddmgr)
       cout << "cannont open input file: " << fn << endl;
       return false;
     }
-    bdd2 = bddmgr.restore(ifs);
+    BinIStream bis(ifs);
+    bdd2 = bddmgr.restore(bis);
   }
   if ( bdd != bdd2 ) {
     cout << "ERROR[test_dump]" << endl;
@@ -543,7 +547,7 @@ bool
 test(BddMgr& bddmgr)
 {
   for (ymuint i = 0; i < 10; ++ i) {
-    bddmgr.new_var(i);
+    bddmgr.new_var(VarId(i));
   }
   return test_var_list(bddmgr, 10) &&
     test_const(bddmgr) &&

@@ -56,15 +56,15 @@ protected:
 
   // 変数のマークにアクセスする．
   bool
-  get_mark(tVarId var);
+  get_mark(VarId var);
 
   // var->mMark を設定してキューに積む
   void
-  set_mark_and_putq(tVarId var);
+  set_mark_and_putq(VarId var);
 
   // 変数のマークをセットする．
   void
-  set_mark(tVarId var,
+  set_mark(VarId var,
 	   bool mark);
 
 
@@ -72,7 +72,7 @@ private:
 
   // simplify のサブルーティン
   bool
-  check_recur(tVarId var,
+  check_recur(VarId var,
 	      ymuint64 lmask);
 
 
@@ -82,10 +82,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // var->mMark を消すためのキュー
-  vector<tVarId> mClearQueue;
+  vector<VarId> mClearQueue;
 
   // var->mMark を消すためのキュー(simplify_recur用)
-  vector<tVarId> mClearQueue2;
+  vector<VarId> mClearQueue2;
 
   // 変数のマーク
   vector<bool> mMark;
@@ -100,18 +100,18 @@ private:
 // 変数のマークにアクセスする．
 inline
 bool
-SaBase::get_mark(tVarId var)
+SaBase::get_mark(VarId var)
 {
-  return mMark[var];
+  return mMark[var.val()];
 }
 
 // 変数のマークをセットする．
 inline
 void
-SaBase::set_mark(tVarId var,
+SaBase::set_mark(VarId var,
 		 bool mark)
 {
-  mMark[var] = mark;
+  mMark[var.val()] = mark;
 }
 
 END_NAMESPACE_YM_SAT

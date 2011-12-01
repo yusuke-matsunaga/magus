@@ -1,11 +1,9 @@
 
-/// @file libym_utils/Generator.cc
+/// @file Generator.cc
 /// @brief 組み合わせ生成器と順列生成器の実装ファイル
 /// @author Yusuke Matsunaga
 ///
-/// $Id: Generator.cc 700 2007-05-31 00:41:30Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -31,7 +29,7 @@ GenBase::iterator::iterator(const GenBase* parent) :
   mElem(parent->k()),
   mParent(parent)
 {
-  for (size_t i = 0; i < mParent->k(); ++ i) {
+  for (ymuint i = 0; i < mParent->k(); ++ i) {
     mElem[i] = i;
   }
 }
@@ -46,13 +44,13 @@ GenBase::iterator::copy(const iterator& src)
 
 // コンストラクタ
 // 全要素数 n と選択する要素数 k を必ず指定する．
-GenBase::GenBase(size_t n,
-		 size_t k) :
+GenBase::GenBase(ymuint n,
+		 ymuint k) :
   mN(n),
   mK(k)
 {
 }
-  
+
 // デストラクタ
 GenBase::~GenBase()
 {
@@ -109,7 +107,7 @@ CombiGen::iterator::is_end() const
 
 // operator++() のサブルーティン
 void
-CombiGen::iterator::next(size_t pos)
+CombiGen::iterator::next(ymuint pos)
 {
   ++ elem(pos);
   if ( elem(pos) == n() - k() + pos + 1) {
@@ -122,12 +120,12 @@ CombiGen::iterator::next(size_t pos)
 
 // コンストラクタ
 // 全要素数 n と選択する要素数 k を必ず指定する．
-CombiGen::CombiGen(size_t n,
-		   size_t k) :
+CombiGen::CombiGen(ymuint n,
+		   ymuint k) :
   GenBase(n, k)
 {
 }
-  
+
 // デストラクタ
 CombiGen::~CombiGen()
 {
@@ -176,15 +174,15 @@ PermGen::iterator
 PermGen::iterator::operator++()
 {
   vector<int> bitmap(n());
-  for (size_t i = 0; i < n(); ++ i) {
+  for (ymuint i = 0; i < n(); ++ i) {
     bitmap[i] = 0;
   }
-  for (size_t i = 0; i < k(); ++ i) {
+  for (ymuint i = 0; i < k(); ++ i) {
     bitmap[elem(i)] = 1;
   }
-  for (size_t i = k(); i -- > 0; ) {
+  for (ymuint i = k(); i -- > 0; ) {
     bool found = false;
-    for (size_t j = elem(i); ++ j < n(); ) {
+    for (ymuint j = elem(i); ++ j < n(); ) {
       if ( bitmap[j] == 0 ) {
 	bitmap[elem(i)] = 0;
 	elem(i) = j;
@@ -194,8 +192,8 @@ PermGen::iterator::operator++()
       }
     }
     if ( found ) {
-      size_t pos = 0;
-      for (size_t j = i + 1; j < k(); ++ j) {
+      ymuint pos = 0;
+      for (ymuint j = i + 1; j < k(); ++ j) {
 	for ( ; bitmap[pos] == 1; ++ pos) ;
 	bitmap[pos] = 1;
 	elem(j) = pos;
@@ -222,12 +220,12 @@ PermGen::iterator::is_end() const
 
 // コンストラクタ
 // 全要素数 n と選択する要素数 k を必ず指定する．
-PermGen::PermGen(size_t n,
-		 size_t k) :
+PermGen::PermGen(ymuint n,
+		 ymuint k) :
   GenBase(n, k)
 {
 }
-  
+
 // デストラクタ
 PermGen::~PermGen()
 {
@@ -258,9 +256,9 @@ MultiGenBase::iterator::iterator(const MultiGenBase* parent) :
   mElemArray(parent->ngrp()),
   mParent(parent)
 {
-  size_t ngrp = parent->ngrp();
-  for (size_t g = 0; g < ngrp; ++ g) {
-    mElemArray[g] = new vector<size_t>(k(g));
+  ymuint ngrp = parent->ngrp();
+  for (ymuint g = 0; g < ngrp; ++ g) {
+    mElemArray[g] = new vector<ymuint>(k(g));
     init(g);
   }
 }
@@ -273,10 +271,10 @@ MultiGenBase::iterator::copy(const iterator& src)
     free();
     mParent = src.mParent;
     if ( mParent ) {
-      size_t ngrp = mParent->ngrp();
+      ymuint ngrp = mParent->ngrp();
       mElemArray.resize(ngrp);
-      for (size_t g = 0; g < ngrp; ++ g) {
-	mElemArray[g] = new vector<size_t>(k(g));
+      for (ymuint g = 0; g < ngrp; ++ g) {
+	mElemArray[g] = new vector<ymuint>(k(g));
 	elem(g) = src.elem(g);
       }
     }
@@ -294,16 +292,16 @@ MultiGenBase::iterator::~iterator()
 
 // grp 番目のグループの要素配列を初期化する．
 void
-MultiGenBase::iterator::init(size_t grp)
+MultiGenBase::iterator::init(ymuint grp)
 {
-  for (size_t i = 0; i < k(grp); ++ i) {
+  for (ymuint i = 0; i < k(grp); ++ i) {
     elem(grp)[i] = i;
   }
 }
 
 // grp 番目のグループの要素配列を得る．
-vector<size_t>&
-MultiGenBase::iterator::elem(size_t g)
+vector<ymuint>&
+MultiGenBase::iterator::elem(ymuint g)
 {
   assert_cond(mElemArray[g], __FILE__, __LINE__);
   return *mElemArray[g];
@@ -311,8 +309,8 @@ MultiGenBase::iterator::elem(size_t g)
 
 // grp 番目のグループの要素配列を得る．
 // こちらは const 版
-const vector<size_t>&
-MultiGenBase::iterator::elem(size_t g) const
+const vector<ymuint>&
+MultiGenBase::iterator::elem(ymuint g) const
 {
   return *mElemArray[g];
 }
@@ -321,8 +319,8 @@ MultiGenBase::iterator::elem(size_t g) const
 void
 MultiGenBase::iterator::free()
 {
-  size_t n = mElemArray.size();
-  for (size_t g = 0; g < n; ++ g) {
+  ymuint n = mElemArray.size();
+  for (ymuint g = 0; g < n; ++ g) {
     delete mElemArray[g];
     mElemArray[g] = NULL;
   }
@@ -330,11 +328,11 @@ MultiGenBase::iterator::free()
 
 // コンストラクタ
 // 全要素数 n と選択する要素数 k のベクタを指定する．
-MultiGenBase::MultiGenBase(const vector<pair<size_t, size_t> >& nk_array) :
+MultiGenBase::MultiGenBase(const vector<pair<ymuint, ymuint> >& nk_array) :
   mNkArray(nk_array)
 {
 }
-  
+
 // デストラクタ
 MultiGenBase::~MultiGenBase()
 {
@@ -375,7 +373,7 @@ MultiCombiGen::iterator::operator=(const iterator& src)
 MultiCombiGen::iterator
 MultiCombiGen::iterator::operator++()
 {
-  for (size_t g = ngrp(); g -- > 0; ) {
+  for (ymuint g = ngrp(); g -- > 0; ) {
     if ( !is_end_sub(g) ) {
       next(g, k(g) - 1);
     }
@@ -399,7 +397,8 @@ MultiCombiGen::iterator::is_end() const
 
 // operator++() のサブルーティン
 void
-MultiCombiGen::iterator::next(size_t g, size_t pos)
+MultiCombiGen::iterator::next(ymuint g,
+			      ymuint pos)
 {
   ++ elem(g)[pos];
   if ( elem(g)[pos] == n(g) - k(g) + pos + 1) {
@@ -412,18 +411,18 @@ MultiCombiGen::iterator::next(size_t g, size_t pos)
 
 // grp 番目のグループが終了状態の時 true を返す．
 bool
-MultiCombiGen::iterator::is_end_sub(size_t grp) const
+MultiCombiGen::iterator::is_end_sub(ymuint grp) const
 {
   return elem(grp)[k(grp) - 1] == n(grp);
 }
 
 // コンストラクタ
 // 全要素数 n と選択する要素数 k のベクタを指定する．
-MultiCombiGen::MultiCombiGen(const vector<pair<size_t, size_t> >& nk_array) :
+MultiCombiGen::MultiCombiGen(const vector<pair<ymuint, ymuint> >& nk_array) :
   MultiGenBase(nk_array)
 {
 }
-  
+
 // デストラクタ
 MultiCombiGen::~MultiCombiGen()
 {
@@ -471,17 +470,17 @@ MultiPermGen::iterator::operator=(const iterator& src)
 MultiPermGen::iterator
 MultiPermGen::iterator::operator++()
 {
-  for (size_t g = ngrp(); g -- > 0; ) {
+  for (ymuint g = ngrp(); g -- > 0; ) {
     vector<int> bitmap(n(g));
-    for (size_t i = 0; i < n(g); ++ i) {
+    for (ymuint i = 0; i < n(g); ++ i) {
       bitmap[i] = 0;
     }
-    for (size_t i = 0; i < k(g); ++ i) {
+    for (ymuint i = 0; i < k(g); ++ i) {
       bitmap[elem(g)[i]] = 1;
     }
-    for (size_t i = k(g); i -- > 0; ) {
+    for (ymuint i = k(g); i -- > 0; ) {
       bool found = false;
-      for (size_t j = elem(g)[i]; ++ j < n(g); ) {
+      for (ymuint j = elem(g)[i]; ++ j < n(g); ) {
 	if ( bitmap[j] == 0 ) {
 	  bitmap[elem(g)[i]] = 0;
 	  elem(g)[i] = j;
@@ -491,8 +490,8 @@ MultiPermGen::iterator::operator++()
 	}
       }
       if ( found ) {
-	size_t pos = 0;
-	for (size_t j = i + 1; j < k(g); ++ j) {
+	ymuint pos = 0;
+	for (ymuint j = i + 1; j < k(g); ++ j) {
 	  for ( ; bitmap[pos] == 1; ++ pos) ;
 	  bitmap[pos] = 1;
 	  elem(g)[j] = pos;
@@ -526,18 +525,18 @@ MultiPermGen::iterator::is_end() const
 
 // grp 番目のグループが終了状態の時 true を返す．
 bool
-MultiPermGen::iterator::is_end_sub(size_t grp) const
+MultiPermGen::iterator::is_end_sub(ymuint grp) const
 {
   return elem(grp)[0] == n(grp);
 }
 
 // コンストラクタ
 // 全要素数 n と選択する要素数 k のベクタを指定する．
-MultiPermGen::MultiPermGen(const vector<pair<size_t, size_t> >& nk_array) :
+MultiPermGen::MultiPermGen(const vector<pair<ymuint, ymuint> >& nk_array) :
   MultiGenBase(nk_array)
 {
 }
-  
+
 // デストラクタ
 MultiPermGen::~MultiPermGen()
 {

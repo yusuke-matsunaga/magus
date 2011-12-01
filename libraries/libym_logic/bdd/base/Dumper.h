@@ -10,6 +10,7 @@
 
 
 #include "BddMgrImpl.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -54,10 +55,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // BddEdge と ID 番号の対応表
-  hash_map<BddEdge, ymuint> mMap;
+  hash_map<BddEdge, ymuint32> mMap;
 
   // 次に割り当てるID番号
-  ymuint mNext;
+  ymuint32 mNext;
 
 };
 
@@ -138,7 +139,7 @@ public:
   /// @param[in] mgr BddMgr
   /// @param[in] s 出力先のストリーム
   Dumper(BddMgrImpl* mgr,
-	 ostream& s);
+	 BinO& s);
 
   /// @brief デストラクタ
   ~Dumper();
@@ -146,9 +147,22 @@ public:
 
 public:
 
-  /// @brief e を根とするBDDの内容を出力する．
+  /// @brief 一つのBDDをダンプする．
   void
-  dump(BddEdge e);
+  write(BddEdge e);
+
+  /// @brief 複数のBDDをダンプする．
+  void
+  write(const vector<BddEdge>& edge_list);
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief e で指されたBDDノードの内容を出力する．
+  void
+  dump_node(BddEdge e);
 
   /// @brief e の内容を出力する．
   void
@@ -164,7 +178,7 @@ private:
   BddMgrImpl* mMgr;
 
   // 出力用のストリーム
-  ostream& mStream;
+  BinO& mStream;
 
   // ID 番号を管理するマネージャ
   IdMgr mIdMgr;
@@ -183,7 +197,7 @@ public:
   /// @param[in] mgr BddMgr
   /// @param[in] s 入力元のストリーム
   Restorer(BddMgrImpl* mgr,
-	   istream& s);
+	   BinI& s);
 
   /// @brief デストラクタ
   ~Restorer();
@@ -208,10 +222,10 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 内部の枝を指す文字列から枝を得る．
+  /// @brief データを読んで次の枝を得る．
   /// @return 見つからなければ kEdgeError を返す．
   BddEdge
-  find_edge(const char* str) const;
+  read_edge();
 
 
 private:
@@ -223,7 +237,7 @@ private:
   BddMgrImpl* mMgr;
 
   // 入力用のストリーム
-  istream& mStream;
+  BinI& mStream;
 
   // 根の枝を格納しておくベクタ
   vector<BddEdge> mRootVector;

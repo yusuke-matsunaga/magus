@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmm/BmmVar.cc
+/// @file BmmVar.cc
 /// @brief BmmVar の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BmmVar.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -17,48 +15,36 @@ BEGIN_NAMESPACE_YM_BDD
 BEGIN_NONAMESPACE
 
 // 1K = 1,024
-const size_t K_unit = (1 << 10);
+const ymuint64 K_unit = (1 << 10);
 // 1M = 1,024 x 1,024
-const size_t M_unit = (1 << 20);
+const ymuint64 M_unit = (1 << 20);
 
 // パラメータのデフォルト値
 const double DEFAULT_GC_THRESHOLD  = 0.10;
-const size_t DEFAULT_GC_NODE_LIMIT =  64 * K_unit;
+const ymuint64 DEFAULT_GC_NODE_LIMIT =  64 * K_unit;
 const double DEFAULT_NT_LOAD_LIMIT = 2.0;
 const double DEFAULT_RT_LOAD_LIMIT = 0.8;
-const size_t DEFAULT_MEM_LIMIT     = 400 * M_unit;
-const size_t DEFAULT_DZONE         =  10 * M_unit;
+const ymuint64 DEFAULT_MEM_LIMIT     = 400 * M_unit;
+const ymuint64 DEFAULT_DZONE         =  10 * M_unit;
 
 // 節点テーブルの初期サイズ
-const size_t INIT_SIZE = 1 * K_unit;
+const ymuint64 INIT_SIZE = 1 * K_unit;
 
 // 一度にアロケートするノード数
-const size_t NODE_UNIT = 1 * K_unit;
+const ymuint64 NODE_UNIT = 1 * K_unit;
 
 // 変数テーブルの初期サイズ
-const size_t VARTABLE_INIT_SIZE = 1 * K_unit;
+const ymuint64 VARTABLE_INIT_SIZE = 1 * K_unit;
 
 // 節点テーブルのハッシュ関数
 inline
-ymuint
+ymuint64
 hash_func2(BddEdge id1,
 	   BddEdge id2)
 {
-  ymuint v1 = id1.hash();
-  ymuint v2 = id2.hash();
+  ymuint64 v1 = id1.hash();
+  ymuint64 v2 = id2.hash();
   return v1 + (v2 >> 2);
-}
-
-// 節点テーブルのハッシュ関数
-inline
-ymuint
-hash_func3(BddEdge id1,
-	   BddEdge id2,
-	   ymuint id3)
-{
-  ymuint v1 = id1.hash();
-  ymuint v2 = id2.hash();
-  return v1 + (v2 >> 2) + (id3 << 3) - id3;
 }
 
 END_NONAMESPACE
@@ -69,7 +55,7 @@ END_NONAMESPACE
 
 // コンストラクタ
 BmmVar::BmmVar(BddMgrModern* mgr,
-	       tVarId id) :
+	       VarId id) :
   mMgr(mgr),
   mId(id)
 {
@@ -115,7 +101,7 @@ BmmVar::sweep()
 {
   Node** ptr = mNodeTable;
   Node** end = mNodeTable + mTableSize;
-  size_t nf = 0;
+  ymuint64 nf = 0;
   do {
     Node* temp;
     Node** prev = ptr;
@@ -139,8 +125,8 @@ BmmVar::sweep()
 void
 BmmVar::shrink(double load_limit)
 {
-  size_t nn = static_cast<size_t>(mNodeNum * 2.0 / load_limit);
-  size_t new_size = mTableSize;
+  ymuint64 nn = static_cast<ymuint64>(mNodeNum * 2.0 / load_limit);
+  ymuint64 new_size = mTableSize;
   while ( new_size > INIT_SIZE ) {
     if ( nn < new_size ) {
       new_size >>= 1;
@@ -157,7 +143,7 @@ BmmVar::shrink(double load_limit)
 // 節点テーブルを拡張する
 // メモリアロケーションに失敗したら false を返す．
 bool
-BmmVar::resize(size_t new_size)
+BmmVar::resize(ymuint64 new_size)
 {
   logstream() << "BmmVar(" << varid() << ")::resize("
 	      << new_size << ")" << endl;
@@ -168,7 +154,7 @@ BmmVar::resize(size_t new_size)
     return false;
   }
 
-  size_t old_size = mTableSize;
+  ymuint64 old_size = mTableSize;
   Node** old_table = mNodeTable;
   mNodeTable = new_table;
   mTableSize = new_size;
@@ -182,7 +168,7 @@ BmmVar::resize(size_t new_size)
       Node* temp;
       for (temp = *tbl; temp; temp = next) {
 	next = temp->mLink;
-	size_t pos = hash_func2(temp->edge0(), temp->edge1());
+	ymuint64 pos = hash_func2(temp->edge0(), temp->edge1());
 	Node*& entry = mNodeTable[pos & mTableSize_1];
 	temp->mLink = entry;
 	entry = temp;
@@ -197,7 +183,7 @@ BmmVar::resize(size_t new_size)
 void
 BmmVar::set_next_limit_size(double load_limit)
 {
-  mNextLimit = size_t(double(mTableSize) * load_limit);
+  mNextLimit = static_cast<ymuint64>(double(mTableSize) * load_limit);
 }
 
 // ログ出力用のストリームを得る．
@@ -210,7 +196,7 @@ BmmVar::logstream() const
 // 節点テーブル用のメモリを確保する．
 // size はバイト単位ではなくエントリ数
 BmmNode**
-BmmVar::alloc_nodetable(size_t size)
+BmmVar::alloc_nodetable(ymuint64 size)
 {
   return mMgr->alloc_nodetable(size);
 }
@@ -218,7 +204,8 @@ BmmVar::alloc_nodetable(size_t size)
 // 節点テーブル用のメモリを解放する．
 // size はバイト単位ではなくエントリ数
 void
-BmmVar::dealloc_nodetable(Node** table, size_t size)
+BmmVar::dealloc_nodetable(Node** table,
+			  ymuint64 size)
 {
   mMgr->dealloc_nodetable(table, size);
 }

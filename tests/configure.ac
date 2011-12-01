@@ -140,6 +140,7 @@ AC_SUBST([YMTOOLS_BUILDDIR])
 # ===================================================================
 AC_CONFIG_FILES([
 	Makefile
+	bnet2aig/Makefile
 	makebdd/Makefile
 	lsim/Makefile
 	])

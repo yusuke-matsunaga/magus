@@ -287,7 +287,7 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
 
     LogExprVector lit_array(ni);
     for (ymuint i = 0; i < ni;  ++ i) {
-      lit_array[i] = LogExpr::make_posiliteral(i);
+      lit_array[i] = LogExpr::make_posiliteral(VarId(i));
     }
     LogExpr new_expr;
     if ( best_type == kAnd ) {
@@ -342,7 +342,8 @@ BNetGateDecomp::count_inv(const LogExpr& expr,
   ymuint c = 0;
   for (ymuint i = 0; i < nc; ++ i) {
     LogExpr expr1 = expr.child(i);
-    tVarId pos = expr1.varid();
+    VarId var = expr1.varid();
+    ymuint pos = var.val();
     BNode* node1 = node->fanin(pos);
     bool inv = false;
     if ( phase & expr1.is_posiliteral() ||

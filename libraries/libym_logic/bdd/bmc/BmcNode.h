@@ -1,7 +1,7 @@
-#ifndef LIBYM_LOGIC_BDD_BMC_BMCNODE_H
-#define LIBYM_LOGIC_BDD_BMC_BMCNODE_H
+#ifndef BMCNODE_H
+#define BMCNODE_H
 
-/// @file libym_logic/bdd/bmc/BmcNode.h
+/// @file BmcNode.h
 /// @brief BmcNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -23,23 +23,24 @@ class BmcVar
 public:
 
   // 変数番号を得る．
-  tVarId
+  VarId
   varid() const
   {
     return mId;
   }
 
   // レベルを得る．
-  tLevel
+  ymuint
   level() const
   {
-    return tLevel(mId);
+    return static_cast<ymuint>(mId.val());
   }
+
 
 private:
 
   // コンストラクタ
-  BmcVar(tVarId id) :
+  BmcVar(VarId id) :
     mId(id),
     mMark(0),
     mLink(NULL)
@@ -59,7 +60,7 @@ private:
 
   // 変数番号
   // レベルも同一
-  tVarId mId;
+  VarId mId;
 
   // 作業用のマーク
   int mMark;
@@ -129,11 +130,11 @@ public:
   var() const;
 
   // 変数インデックス値を得る
-  tVarId
+  VarId
   varid() const;
 
   // レベルを得る．
-  tLevel
+  ymuint
   level() const;
 
   // p-mark が付いていたらtrueを返す
@@ -159,7 +160,7 @@ public:
   rst_mark();
 
   // リンク数を得る．
-  size_t
+  ymuint
   refcount() const;
 
   // 参照されていない時にtrueを返す
@@ -174,11 +175,13 @@ private:
   linkdelta() const;
 
   // リンク数を増やす(オーバーフロー時は何もしない)
-  size_t
+  // 結果のリンク数を返す．
+  ymuint
   linkinc();
 
   // リンク数を減らす(オーバーフロー時は何もしない)
-  size_t
+  // 結果のリンク数を返す．
+  ymuint
   linkdec();
 
   // コンストラクタ
@@ -249,7 +252,7 @@ BmcNode::var() const
 
 // 変数インデックス値を得る
 inline
-tVarId
+VarId
 BmcNode::varid() const
 {
   return mVar->varid();
@@ -257,7 +260,7 @@ BmcNode::varid() const
 
 // レベルを得る
 inline
-tLevel
+ymuint
 BmcNode::level() const
 {
   return mVar->level();
@@ -315,10 +318,10 @@ BmcNode::rst_mark()
 
 // リンク数を得る．
 inline
-size_t
+ymuint
 BmcNode::refcount() const
 {
-  return static_cast<size_t>(mRefMark & kLMask);
+  return static_cast<ymuint>(mRefMark & kLMask);
 }
 
 // 参照されていない時にtrueを返す
@@ -339,7 +342,7 @@ BmcNode::linkdelta() const
 
 // リンク数を増やす(オーバーフロー時は何もしない)
 inline
-size_t
+ymuint
 BmcNode::linkinc()
 {
   int d = linkdelta();
@@ -348,7 +351,7 @@ BmcNode::linkinc()
 
 // リンク数を減らす(オーバーフロー時は何もしない)
 inline
-size_t
+ymuint
 BmcNode::linkdec()
 {
   int d = linkdelta();
@@ -369,12 +372,12 @@ BEGIN_NAMESPACE_HASH
 template <>
 struct hash<nsYm::nsBdd::BmcNode*>
 {
-  size_t
+  ymuint
   operator()(nsYm::nsBdd::BmcNode* node) const
   {
-    return reinterpret_cast<size_t>(node)/sizeof(void*);
+    return reinterpret_cast<ympuint>(node)/sizeof(void*);
   }
 };
 END_NAMESPACE_HASH
 
-#endif // LIBYM_LOGIC_BDD_BMC_BMCNODE_H
+#endif // BMCNODE_H

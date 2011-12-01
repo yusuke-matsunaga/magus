@@ -1,5 +1,5 @@
 
-/// @file libym_npn/NpnBaseConf.cc
+/// @file NpnBaseConf.cc
 /// @brief NpnBaseConf の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -87,7 +87,7 @@ NpnBaseConf::normalize(const TvFunc& func)
   if ( debug & debug_normalize ) {
     cout << "Before normalize" << endl;
     cout << mFunc << endl;
-    dump_walsh(cout);
+    print_walsh(cout);
   }
 
   // mW0 が非負になるように出力極性の調整を行う．
@@ -117,7 +117,7 @@ NpnBaseConf::normalize(const TvFunc& func)
       mIpols[i] = 2;
     }
     else if ( mW1[i] == 0 ) {
-      bool stat = mFunc.check_sup(i);
+      bool stat = mFunc.check_sup(VarId(i));
       if ( !stat ) {
 	// この入力はサポートではなかった
 	add_indep(i);
@@ -142,14 +142,16 @@ NpnBaseConf::normalize(const TvFunc& func)
       }
       // 1次係数が等しい場合
       // 対称性のチェックを行う．
+      VarId var(i);
+      VarId var1(pos1);
       tPol poldiff = (mIpols[pos1] * mIpols[i] == 2) ? kPolNega : kPolPosi;
-      bool stat = mFunc.check_sym(i, pos1, poldiff);
+      bool stat = mFunc.check_sym(var, var1, poldiff);
       if ( stat ) {
 	// 対称だった
 	found = true;
 	if ( mW1[pos1] == 0 && ic_num(pos1) == 1 ) {
 	  // bi-symmetry かどうかチェックする
-	  bool stat = mFunc.check_sym(i, pos1, ~poldiff);
+	  bool stat = mFunc.check_sym(var, var1, ~poldiff);
 	  if ( stat ) {
 	    set_bisym(pos1);
 	  }
@@ -164,7 +166,7 @@ NpnBaseConf::normalize(const TvFunc& func)
       if ( mW1[i] == 0 ) {
 	// w1 == 0 の時には逆相での対称性もチェックする．
 	// この場合，最初の要素の極性は常に kPolPosi のはず
-	bool stat = mFunc.check_sym(i, pos1, kPolNega);
+	bool stat = mFunc.check_sym(var, var1, kPolNega);
 	if ( stat ) {
 	  // 逆相で対称だった．
 	  found = true;
@@ -180,96 +182,13 @@ NpnBaseConf::normalize(const TvFunc& func)
     }
   }
 
-#if 0
-  // walsh_2 用の極性を計算しておく．
-  bool oinv = (mOpol == 2);
-  for (ymuint i = 0; i < mNi; ++ i) {
-    bool iinv1 = (mIpols[i] == 2) ^ oinv;
-    ymuint base = i * mNi;
-    for (ymuint j = 0; j <= i; ++ j) {
-      bool iinv2 = (mIpols[j] == 2);
-      int val = 0;
-      if ( iinv1 ^ iinv2 ) {
-	val = 2;
-      }
-      mW2flag[base + j] = val;
-    }
-  }
-#endif
-
-#if 0
-  if ( mOpol == 0 ) {
-    // もしも入力の極性がすべて決まっていれば
-    // w2 の最大値と最小値の絶対値の大きい方の出力極性を選ぶ．
-    // 等しいときには総和を正にする．
-    int min = func().walsh_2(0, 0);
-    int max = min;
-    int sum = 0;
-    bool valid = true;
-    for (ymuint i = 0; i < mNi; ++ i) {
-      if ( mIpols[i] == 0 ) {
-	valid = false;
-	break;
-      }
-      for (ymuint j = 0; j <= i; ++ j) {
-	int w2 = func().walsh_2(i, j);
-	if ( mIpols[i] == 2 ) {
-	  w2 = -w2;
-	}
-	if ( mIpols[j] == 2 ) {
-	  w2 = -w2;
-	}
-	if ( min > w2 ) {
-	  min = w2;
-	}
-	if ( max < w2 ) {
-	  max = w2;
-	}
-	sum += w2;
-      }
-    }
-    if ( valid ) {
-      if ( -min > max ) {
-	mOpol = 2;
-      }
-      else if ( -min < max ) {
-	mOpol = 1;
-      }
-      else { // -min == max
-	if ( sum < 0 ) {
-	  mOpol = 2;
-	}
-	else if ( sum > 0 ) {
-	  mOpol = 1;
-	}
-      }
-    }
-  }
-#endif
-
   if ( debug & debug_normalize ) {
     cout << "After normalize" << endl;
-    dump_walsh(cout);
-    dump_pols(cout);
+    print_walsh(cout);
+    print_pols(cout);
     cout << "NpnBaseConf::normalize() end" << endl
 	 << endl;
   }
-
-#if 0
-  if ( mNc > 0 ) {
-    for (ymuint i = 0; i < mNc; ++ i) {
-      ymuint pos = mIcRep[i];
-      int ipol1 = (mW1[pos] == 0) ? 0 : 1;
-      conf.add_ic_rep(pos, ipol1);
-    }
-    // 最初はひとかたまりのグループにしておく．
-    conf.add_ig(0);
-  }
-  if ( mOpol != 0 ) {
-    conf.set_opol(1);
-  }
-  //conf.set_sig(this);
-#endif
 }
 
 #if 0
@@ -298,7 +217,7 @@ NpnBaseConf::walsh_w0(ymuint w,
 
 // @brief Walsh 係数を出力する．
 void
-NpnBaseConf::dump_walsh(ostream& s) const
+NpnBaseConf::print_walsh(ostream& s) const
 {
   s << "W0: " << mW0 << endl
     << "w1:";
@@ -306,12 +225,12 @@ NpnBaseConf::dump_walsh(ostream& s) const
     s << " " << mW1[i];
   }
   s << endl;
-#if 1
+
   s << "W2:" << endl;
   for (ymuint i = 0; i < ni(); ++ i) {
     s << "   ";
     for (ymuint j = 0; j < ni(); ++ j) {
-      int w2 = func().walsh_2(i, j);
+      int w2 = func().walsh_2(VarId(i), VarId(j));
       if ( ipol(i) == 2 ) {
 	w2 = -w2;
       }
@@ -326,12 +245,11 @@ NpnBaseConf::dump_walsh(ostream& s) const
     s << endl;
   }
   s << endl;
-#endif
 }
 
 // @brief 極性情報を出力する．
 void
-NpnBaseConf::dump_pols(ostream& s) const
+NpnBaseConf::print_pols(ostream& s) const
 {
   s << "opol: ";
   switch ( opol() ) {

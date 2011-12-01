@@ -76,11 +76,12 @@ Ln2BNet::operator()(const LnGraph& src_network,
 	if ( tv[p] ) {
 	  LogExpr prd = LogExpr::make_one();
 	  for (ymuint i = 0; i < ni; ++ i) {
+	    VarId var(i);
 	    if ( p & (1U << i) ) {
-	      prd &= LogExpr::make_posiliteral(i);
+	      prd &= LogExpr::make_posiliteral(var);
 	    }
 	    else {
-	      prd &= LogExpr::make_negaliteral(i);
+	      prd &= LogExpr::make_negaliteral(var);
 	    }
 	  }
 	  expr |= prd;

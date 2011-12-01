@@ -116,7 +116,7 @@ expr
 }
 | NUMBER
 {
-  tVarId id = cur_num;
+  VarId id(cur_num);
   $$ = mgr.make_posiliteral(id);
 }
 | expr BAND expr

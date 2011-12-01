@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmc/bmc_ite.cc
+/// @file bmc_ite.cc
 /// @brief ITE 演算を行う関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmc_ite.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -85,9 +83,9 @@ BddMgrClassic::ite_op(BddEdge f,
   Var* f_var = f_vp->var();
   Var* g_var = g_vp->var();
   Var* h_var = h_vp->var();
-  tLevel f_level = f_var->level();
-  tLevel g_level = g_var->level();
-  tLevel h_level = h_var->level();
+  ymuint f_level = f_var->level();
+  ymuint g_level = g_var->level();
+  ymuint h_level = h_var->level();
 
   BddEdge result;
 
@@ -107,7 +105,7 @@ BddMgrClassic::ite_op(BddEdge f,
     if ( result.is_error() ) {
       tPol g_pol = g.pol();
       tPol h_pol = h.pol();
-      tLevel top = f_level;
+      ymuint top = f_level;
       Var* var = f_var;
       if ( top > g_level) {
 	top = g_level;
@@ -147,14 +145,14 @@ BddMgrClassic::compose_start()
 
 // multiple compose 演算を行う変数と置き換え関数を登録する関数
 void
-BddMgrClassic::compose_reg(tVarId id,
+BddMgrClassic::compose_reg(VarId id,
 			   BddEdge e)
 {
   Var* var = var_of(id);
   if ( var ) {
     var->mMark = 1;
     var->mCompEdge = e;
-    tLevel level = var->level();
+    ymuint level = var->level();
     if ( mLastLevel < level ) {
       mLastLevel = level;
     }
@@ -222,8 +220,8 @@ BddMgrClassic::compose_step(BddEdge f)
 // pol が kPolNega の時は 0-枝と 1-枝を取り替える．
 BddEdge
 BddMgrClassic::push_down(BddEdge e,
-			 tLevel x_level,
-			 tLevel y_level,
+			 ymuint x_level,
+			 ymuint y_level,
 			 tPol pol)
 {
   if ( e.is_error() ) {
@@ -243,8 +241,8 @@ BddMgrClassic::push_down(BddEdge e,
 
 BddEdge
 BddMgrClassic::pd_step(BddEdge e,
-		       tLevel x_level,
-		       tLevel y_level,
+		       ymuint x_level,
+		       ymuint y_level,
 		       tPol pol)
 {
   if ( e.is_leaf() ) {
@@ -289,7 +287,7 @@ BddMgrClassic::pd_step(BddEdge e,
 
 BddEdge
 BddMgrClassic::pd_step2(BddEdge e,
-			tLevel y_level)
+			ymuint y_level)
 {
   if ( e.is_leaf() ) {
     return e;
@@ -311,7 +309,7 @@ BddMgrClassic::pd_step2(BddEdge e,
     if ( !r0.is_invalid() ) {
       BddEdge r1 = pd_step2(e1, y_level);
       if ( !r1.is_invalid() ) {
-	tVarId vid = varid(vp->level() - 1);
+	VarId vid = varid(vp->level() - 1);
 	Var* var = var_of(vid);
 	if ( !var ) {
 	  var = alloc_var(vid);
@@ -327,14 +325,14 @@ BddMgrClassic::pd_step2(BddEdge e,
 BddEdge
 BddMgrClassic::pd_step3(BddEdge e0,
 			BddEdge e1,
-			tLevel y_level,
+			ymuint y_level,
 			tPol pol)
 {
   Node* vp0 = get_node(e0);
   Node* vp1 = get_node(e1);
   tPol pol0 = e0.pol();
   tPol pol1 = e1.pol();
-  tLevel top_level = kLevelMax;
+  ymuint top_level = kLevelMax;
   if ( vp0 && top_level > vp0->level() ) {
     top_level = vp0->level();
   }
@@ -345,7 +343,7 @@ BddMgrClassic::pd_step3(BddEdge e0,
   BddEdge result = mPushDownTable3->get(e0, e1, xy_edge);
   if ( result.is_error() ) {
     if ( top_level > y_level ) {
-      tVarId vid = varid(y_level);
+      VarId vid = varid(y_level);
       Var* var = var_of(vid);
       if ( !var ) {
 	var = alloc_var(vid);
@@ -378,7 +376,7 @@ BddMgrClassic::pd_step3(BddEdge e0,
       if ( !r0.is_invalid() ) {
 	BddEdge r1 = pd_step3(e01, e11, y_level, pol);
 	if ( !r1.is_invalid() ) {
-	  tVarId vid = varid(top_level - 1);
+	  VarId vid = varid(top_level - 1);
 	  Var* var = var_of(vid);
 	  if ( !var ) {
 	    var = alloc_var(vid);
@@ -443,8 +441,8 @@ BddMgrClassic::gcofactor_step(BddEdge f,
     tPol c_p = c.pol();
     Var* f_var = f_v->var();
     Var* c_var = c_v->var();
-    tLevel f_level = f_var->level();
-    tLevel c_level = c_var->level();
+    ymuint f_level = f_var->level();
+    ymuint c_level = c_var->level();
 
     BddEdge f_0, f_1;
     if ( f_level <= c_level ) {
@@ -498,7 +496,7 @@ BddMgrClassic::gcofactor_step(BddEdge f,
 // 一つの変数に対する cofactor を計算する．
 BddEdge
 BddMgrClassic::scofactor(BddEdge e1,
-			 tVarId id,
+			 VarId id,
 			 tPol pol)
 {
   clear_varmark();
@@ -564,7 +562,7 @@ BddMgrClassic::cubediv_step(BddEdge f)
 
   Node* f_vp = get_node(f);
   Var* f_var = f_vp->var();
-  tLevel f_level = f_var->level();
+  ymuint f_level = f_var->level();
   if ( f_level > mLastLevel ) {
     return f;
   }
@@ -612,7 +610,7 @@ BddMgrClassic::cubediv_step(BddEdge f)
 // メモリ不足のためにエラーとなる可能性がある．
 BddEdge
 BddMgrClassic::xor_moment(BddEdge e,
-			  tVarId idx)
+			  VarId idx)
 {
   if ( e.is_error() ) {
     return BddEdge::make_error();
@@ -644,7 +642,7 @@ BddMgrClassic::xcofactor_step(BddEdge f)
   // この時点で e は終端ではない．
   Node* vp = get_node(f);
   Var* var = vp->var();
-  tLevel level = var->level();
+  ymuint level = var->level();
   if ( level > mLastLevel ) {
     // 今のレベルはコファクタリングすべきレベルよりも下なので
     // 答は 0 となる．

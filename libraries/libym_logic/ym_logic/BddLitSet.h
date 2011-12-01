@@ -99,7 +99,7 @@ public:
   /// @param[in] varid 変数番号
   /// @param[in] pol 極性
   BddLitSet(BddMgr& mgr,
-	    tVarId varid,
+	    VarId varid,
 	    tPol pol);
 
   /// @brief リテラル1つだけを要素とする集合を作るコンストラクタ

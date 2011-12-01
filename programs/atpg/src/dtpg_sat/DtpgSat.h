@@ -15,6 +15,7 @@
 #include "dtpgsat_nsdef.h"
 #include "ym_networks/tgnet.h"
 #include "ym_networks/TgNode.h"
+#include "ym_logic/VarId.h"
 #include "ym_logic/SatStats.h"
 
 
@@ -86,15 +87,15 @@ private:
   mark(const TgNode* node);
 
   /// @brief 正常回路の変数番号を得る．
-  ymuint
+  VarId
   gvar(const TgNode* node);
 
   /// @brief 故障回路の変数番号を得る．
-  ymuint
+  VarId
   fvar(const TgNode* node);
 
   /// @brief 故障差の変数番号を得る．
-  ymuint
+  VarId
   dvar(const TgNode* node);
 
 
@@ -109,13 +110,13 @@ private:
     Mark mMark;
 
     // 正常回路の変数番号
-    ymuint mGid;
+    VarId mGid;
 
     // 故障回路の変数番号
-    ymuint mFid;
+    VarId mFid;
 
     // 故障差の変数番号
-    ymuint mDid;
+    VarId mDid;
   };
 
 
@@ -145,7 +146,7 @@ DtpgSat::mark(const TgNode* node)
 
 // @brief 正常回路の変数番号を得る．
 inline
-ymuint
+VarId
 DtpgSat::gvar(const TgNode* node)
 {
   Var& var = mVarMap[node->gid()];
@@ -155,7 +156,7 @@ DtpgSat::gvar(const TgNode* node)
 
 // @brief 故障回路の変数番号を得る．
 inline
-ymuint
+VarId
 DtpgSat::fvar(const TgNode* node)
 {
   Var& var = mVarMap[node->gid()];
@@ -165,7 +166,7 @@ DtpgSat::fvar(const TgNode* node)
 
 // @brief 故障差の変数番号を得る．
 inline
-ymuint
+VarId
 DtpgSat::dvar(const TgNode* node)
 {
   Var& var = mVarMap[node->gid()];

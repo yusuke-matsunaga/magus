@@ -17,19 +17,115 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 /// @class BinO BinIO.h "ym_utils/BinIO.h"
 /// @ingroup YmUtils
-/// @brief バイナリ出力ストリーム
+/// @brief バイナリ出力ストリームの基底クラス
 //////////////////////////////////////////////////////////////////////
 class BinO
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] s 出力先のストリーム
-  BinO(ostream& s);
+  BinO() { }
 
-  /// @brief ストリームを得る．
-  ostream&
-  s();
+  /// @brief デストラクタ
+  virtual
+  ~BinO() { }
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // BinO の公開関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 1バイトの書き込み
+  /// @param[in] val 値
+  void
+  write_8(ymuint8 val);
+
+  /// @brief 2バイトの書き込み
+  /// @param[in] val 値
+  void
+  write_16(ymuint16 val);
+
+  /// @brief 4バイトの書き込み
+  /// @param[in] val 値
+  void
+  write_32(ymuint32 val);
+
+  /// @brief 8バイトの書き込み
+  /// @param[in] val 値
+  void
+  write_64(ymuint64 val);
+
+  /// @brief 単精度浮動小数点数の書き込み
+  /// @param[in] val 値
+  void
+  write_float(float val);
+
+  /// @brief 倍精度浮動小数点数の書き込み
+  /// @param[in] val 値
+  void
+  write_double(double val);
+
+  /// @brief 文字列の書き込み
+  /// @param[in] val 値
+  void
+  write_str(const char* val);
+
+  /// @brief 文字列の書き込み
+  /// @param[in] val 値
+  void
+  write_str(const string& val);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // BinO の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief nバイトのデータを書き出す．
+  /// @param[in] n データサイズ
+  /// @param[in] buff データを収めた領域のアドレス
+  /// @return 実際に書き出した量を返す．
+  virtual
+  ymuint
+  write(ymuint64 n,
+	const ymuint8* buff) = 0;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class BinOStream BinIO.h "ym_utils/BinIO.h"
+/// @ingroup YmUtils
+/// @brief ostream を用いた BinO の継承クラス
+//////////////////////////////////////////////////////////////////////
+class BinOStream :
+  public BinO
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] s 出力先のストリーム
+  BinOStream(ostream& s);
+
+  /// @brief デストラクタ
+  virtual
+  ~BinOStream();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // BinO の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief データを書き出す．
+  /// @param[in] n データサイズ
+  /// @param[in] buff データを収めた領域のアドレス
+  /// @return 実際に書き出した量を返す．
+  virtual
+  ymuint
+  write(ymuint64 n,
+	const ymuint8* buff);
 
 
 private:
@@ -46,19 +142,110 @@ private:
 //////////////////////////////////////////////////////////////////////
 /// @class BinI BinIO.h "ym_utils/BinIO.h"
 /// @ingroup YmUtils
-/// @brief バイナリ入力ストリーム
+/// @brief バイナリ入力ストリームの基底クラス
 //////////////////////////////////////////////////////////////////////
 class BinI
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] s 入力ストリーム
-  BinI(istream& s);
+  BinI() { }
 
-  /// @brief ストリームを得る．
-  istream&
-  s();
+  /// @brief デストラクタ
+  virtual
+  ~BinI() { }
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 公開関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 1バイトの読み出し
+  /// @return 読み込んだ値を返す．
+  ymuint8
+  read_8();
+
+  /// @brief 2バイトの読み出し
+  /// @return 読み込んだ値を返す．
+  ymuint16
+  read_16();
+
+  /// @brief 4バイトの読み出し
+  /// @return 読み込んだ値を返す．
+  ymuint32
+  read_32();
+
+  /// @brief 8バイトの読み出し
+  /// @return 読み込んだ値を返す．
+  ymuint64
+  read_64();
+
+  /// @brief 単精度不動週数点数の読み出し
+  /// @return 読み込んだ値を返す．
+  float
+  read_float();
+
+  /// @brief 倍精度不動週数点数の読み出し
+  /// @return 読み込んだ値を返す．
+  double
+  read_double();
+
+  /// @brief 文字列の読み出し
+  /// @return 読み込んだ値を返す．
+  string
+  read_str();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // BinI の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief データを読み込む．
+  /// @param[in] n 読み込むデータサイズ
+  /// @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
+  /// @return 実際に読み込んだ量を返す．
+  virtual
+  ymuint
+  read(ymuint64 n,
+       ymuint8* buff) = 0;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class BinIStream BinIO.h "ym_utils/BinIO.h"
+/// @ingroup YmUtils
+/// @brief istream を用いた BinI の継承クラス
+//////////////////////////////////////////////////////////////////////
+class BinIStream :
+  public BinI
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] s 入力ストリーム
+  BinIStream(istream& s);
+
+  /// @brief デストラクタ
+  virtual
+  ~BinIStream();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // BinI の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief データを読み込む．
+  /// @param[in] n 読み込むデータサイズ
+  /// @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
+  /// @return 実際に読み込んだ量を返す．
+  virtual
+  ymuint
+  read(ymuint64 n,
+       ymuint8* buff);
 
 
 private:
@@ -73,139 +260,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class BinIO BinIO.h "ym_utils/BinIO.h"
-/// @ingroup YmUtils
-/// @brief バイナリ形式でダンプ/リストアするためのクラス
-/// @note 実際にはクラスメソッドしか持たない．
-//////////////////////////////////////////////////////////////////////
-class BinIO
-{
-public:
-  //////////////////////////////////////////////////////////////////////
-  // クラスメソッド
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 1バイトの書き込み
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] val 値
-  static
-  void
-  write_8(ostream& s,
-	  ymuint8 val);
-
-  /// @brief 2バイトの書き込み
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] val 値
-  static
-  void
-  write_16(ostream& s,
-	   ymuint16 val);
-
-  /// @brief 4バイトの書き込み
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] val 値
-  static
-  void
-  write_32(ostream& s,
-	   ymuint32 val);
-
-  /// @brief 8バイトの書き込み
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] val 値
-  static
-  void
-  write_64(ostream& s,
-	   ymuint64 val);
-
-  /// @brief 単精度浮動小数点数の書き込み
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] val 値
-  static
-  void
-  write_float(ostream& s,
-	      float val);
-
-  /// @brief 倍精度浮動小数点数の書き込み
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] val 値
-  static
-  void
-  write_double(ostream& s,
-	       double val);
-
-  /// @brief 文字列の書き込み
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] val 値
-  static
-  void
-  write_str(ostream& s,
-	    const char* val);
-
-  /// @brief 文字列の書き込み
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] val 値
-  static
-  void
-  write_str(ostream& s,
-	    const string& val);
-
-  /// @brief 1バイトの読み出し
-  /// @param[in] s 入力元のストリーム
-  static
-  ymuint8
-  read_8(istream& s);
-
-  /// @brief 2バイトの読み出し
-  /// @param[in] s 入力元のストリーム
-  static
-  ymuint16
-  read_16(istream& s);
-
-  /// @brief 4バイトの読み出し
-  /// @param[in] s 入力元のストリーム
-  static
-  ymuint32
-  read_32(istream& s);
-
-  /// @brief 8バイトの読み出し
-  /// @param[in] s 入力元のストリーム
-  static
-  ymuint64
-  read_64(istream& s);
-
-  /// @brief 単精度不動週数点数の読み出し
-  /// @param[in] s 入力元のストリーム
-  static
-  float
-  read_float(istream& s);
-
-  /// @brief 倍精度不動週数点数の読み出し
-  /// @param[in] s 入力元のストリーム
-  static
-  double
-  read_double(istream& s);
-
-  /// @brief 文字列の読み出し
-  /// @param[in] s 入力元のストリーム
-  static
-  string
-  read_str(istream& s);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // バッファ
-  static
-  ymuint8 mBuf[8];
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-// BinIO に対するストリーム出力演算子
+// BinO に対するストリーム出力演算子
 //////////////////////////////////////////////////////////////////////
 
 /// @brief ブール値の書き込み
@@ -280,6 +335,11 @@ BinO&
 operator<<(BinO& s,
 	   const string& val);
 
+
+//////////////////////////////////////////////////////////////////////
+// BinI に対するストリーム入力演算子
+//////////////////////////////////////////////////////////////////////
+
 /// @brief ブール値の読み出し
 /// @param[in] s 入力元のストリーム
 /// @param[out] val 値を格納する変数
@@ -349,12 +409,14 @@ operator>>(BinI& s,
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief ストリームを得る．
+// @brief 文字列の書き込み
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
 inline
-ostream&
-BinO::s()
+void
+BinO::write_str(const string& val)
 {
-  return mS;
+  write_str(val.c_str());
 }
 
 // @brief ブール値の書き込み
@@ -366,7 +428,7 @@ BinO&
 operator<<(BinO& s,
 	   bool val)
 {
-  BinIO::write_8(s.s(), val);
+  s.write_8(val);
   return s;
 }
 
@@ -379,7 +441,7 @@ BinO&
 operator<<(BinO& s,
 	   ymuint8 val)
 {
-  BinIO::write_8(s.s(), val);
+  s.write_8(val);
   return s;
 }
 
@@ -392,7 +454,7 @@ BinO&
 operator<<(BinO& s,
 	   ymuint16 val)
 {
-  BinIO::write_16(s.s(), val);
+  s.write_16(val);
   return s;
 }
 
@@ -405,7 +467,7 @@ BinO&
 operator<<(BinO& s,
 	   ymuint32 val)
 {
-  BinIO::write_32(s.s(), val);
+  s.write_32(val);
   return s;
 }
 
@@ -418,7 +480,7 @@ BinO&
 operator<<(BinO& s,
 	   ymuint64 val)
 {
-  BinIO::write_64(s.s(), val);
+  s.write_64(val);
   return s;
 }
 
@@ -431,7 +493,7 @@ BinO&
 operator<<(BinO& s,
 	   float val)
 {
-  BinIO::write_float(s.s(), val);
+  s.write_float(val);
   return s;
 }
 
@@ -444,7 +506,7 @@ BinO&
 operator<<(BinO& s,
 	   double val)
 {
-  BinIO::write_double(s.s(), val);
+  s.write_double(val);
   return s;
 }
 
@@ -457,7 +519,7 @@ BinO&
 operator<<(BinO& s,
 	   const char* val)
 {
-  BinIO::write_str(s.s(), val);
+  s.write_str(val);
   return s;
 }
 
@@ -470,16 +532,8 @@ BinO&
 operator<<(BinO& s,
 	   const string& val)
 {
-  BinIO::write_str(s.s(), val.c_str());
+  s.write_str(val.c_str());
   return s;
-}
-
-// @brief ストリームを得る．
-inline
-istream&
-BinI::s()
-{
-  return mS;
 }
 
 // @brief ブール値の読み出し
@@ -491,7 +545,7 @@ BinI&
 operator>>(BinI& s,
 	   bool& val)
 {
-  val = BinIO::read_8(s.s());
+  val = s.read_8();
   return s;
 }
 
@@ -504,7 +558,7 @@ BinI&
 operator>>(BinI& s,
 	   ymuint8& val)
 {
-  val = BinIO::read_8(s.s());
+  val = s.read_8();
   return s;
 }
 
@@ -517,7 +571,7 @@ BinI&
 operator>>(BinI& s,
 	   ymuint16& val)
 {
-  val = BinIO::read_16(s.s());
+  val = s.read_16();
   return s;
 }
 
@@ -530,7 +584,7 @@ BinI&
 operator>>(BinI& s,
 	   ymuint32& val)
 {
-  val = BinIO::read_32(s.s());
+  val = s.read_32();
   return s;
 }
 
@@ -543,7 +597,7 @@ BinI&
 operator>>(BinI& s,
 	   ymuint64& val)
 {
-  val = BinIO::read_64(s.s());
+  val = s.read_64();
   return s;
 }
 
@@ -556,7 +610,7 @@ BinI&
 operator>>(BinI& s,
 	   float& val)
 {
-  val = BinIO::read_float(s.s());
+  val = s.read_float();
   return s;
 }
 
@@ -569,7 +623,7 @@ BinI&
 operator>>(BinI& s,
 	   double& val)
 {
-  val = BinIO::read_double(s.s());
+  val = s.read_double();
   return s;
 }
 
@@ -582,19 +636,8 @@ BinI&
 operator>>(BinI& s,
 	   string& val)
 {
-  val = BinIO::read_str(s.s());
+  val = s.read_str();
   return s;
-}
-
-// @brief 文字列の書き込み
-// @param[in] s 出力先のストリーム
-// @param[in] val 値
-inline
-void
-BinIO::write_str(ostream& s,
-		 const string& val)
-{
-  write_str(s, val.c_str());
 }
 
 END_NAMESPACE_YM

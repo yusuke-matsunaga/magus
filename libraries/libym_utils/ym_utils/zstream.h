@@ -240,14 +240,14 @@ public:
   /// @param[in] size バッファサイズ
   explicit
   zstream_buff(istream* s,
-	       size_t size = kBufSize);
+	       ymuint size = kBufSize);
 
   /// @brief 出力用のコンストラクタ
   /// @param[in] s 出力ストリーム
   /// @param[in] size バッファサイズ
   explicit
   zstream_buff(ostream* s,
-	       size_t size = kBufSize);
+	       ymuint size = kBufSize);
 
   /// @brief デストラクタ
   ~zstream_buff();
@@ -262,7 +262,7 @@ public:
   /// @note 結果は出力ストリームに書き込まれる．
   void
   compress(Bytef* buff,
-	   int size,
+	   ymuint size,
 	   int flush);
 
   /// @brief データの伸長を行う．
@@ -270,9 +270,9 @@ public:
   /// @param[in] size バッファ中の空きサイズ(in bytes)
   /// @return バッファに書き出されたサイズ(in bytes)を返す．
   /// @note データは入力ストリームから読み込まれる．
-  int
+  ymuint
   decompress(Bytef* buff,
-	     int size);
+	     ymuint size);
 
   /// @brief 入力ストリームを取り出す．
   istream*
@@ -296,7 +296,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   static
-  const size_t kBufSize = 4096;
+  const ymuint kBufSize = 4096;
 
 
 private:
@@ -314,7 +314,7 @@ private:
   Bytef* mBuff;
 
   // mBuff のサイズ
-  int mSize;
+  ymuint32 mSize;
 
   // 伸長モードの時のフラッシュフラグ
   int mInFlush;
@@ -347,7 +347,7 @@ public:
   /// @param[in] size バッファサイズ
   explicit
   basic_zlib_streambuf(istream& s,
-		       size_t size = kBufSize) :
+		       ymuint size = kBufSize) :
     mZbuf(&s, size),
     mBuff(NULL),
     mSize(size),
@@ -363,7 +363,7 @@ public:
   /// @param[in] size バッファサイズ
   explicit
   basic_zlib_streambuf(ostream& s,
-		       size_t size = kBufSize) :
+		       ymuint size = kBufSize) :
     mZbuf(&s, size),
     mBuff(NULL),
     mSize(size),
@@ -395,7 +395,7 @@ protected:
   virtual
   streambuf_type*
   setbuf(char_type* buf,
-	 int size)
+	 ymuint size)
   {
     if ( mZbuf.in() ) {
       setg(buf, buf, buf + size);
@@ -466,15 +466,15 @@ protected:
   }
 
   // char_type 単位のサイズを Bytef 単位のサイズに変換する
-  int
-  byte_size(int size)
+  ymuint
+  byte_size(ymuint size)
   {
     return size * sizeof(char_type) / sizeof(Bytef);
   }
 
   // Bytef 単位のサイズを char_type 単位のサイズに変換する
-  int
-  char_size(int size)
+  ymuint
+  char_size(ymuint size)
   {
     return size * sizeof(Bytef) / sizeof(char_type);
   }
@@ -501,7 +501,7 @@ private:
   char_type* mBuff;
 
   // mBuff のサイズ
-  int mSize;
+  ymuint32 mSize;
 
   // デフォルトのバッファ
   char_type* mBuff0;
@@ -862,7 +862,7 @@ zstream::deflate_bound(uLong sourceLen)
 inline
 int
 zstream::deflate_prime(int bits,
-		      int value)
+		       int value)
 {
   int status = deflatePrime(&mZ, bits, value);
   if ( status < 0 ) {

@@ -49,8 +49,8 @@ public:
     /// @brief 要素の取得
     /// @param[in] pos 取り出す要素の位置 (最初の位置は 0)
     /// @return pos 番目の要素
-    size_t
-    operator()(size_t pos) const;
+    ymuint
+    operator()(ymuint pos) const;
 
 
   protected:
@@ -66,26 +66,26 @@ public:
 
     /// @brief 全要素数を得る．
     /// @return 全要素数
-    size_t
+    ymuint
     n() const;
 
     /// @brief 順列/組合わせ数を得る．
     /// @return 順列/組み合わせ数
-    size_t
+    ymuint
     k() const;
 
     /// @brief 要素の取得
     /// @param[in] pos 取り出す要素の位置 (最初の位置は 0)
     /// @return pos 番目の要素
     /// @note operator() の別名
-    size_t
-    elem(size_t pos) const;
+    ymuint
+    elem(ymuint pos) const;
 
     /// @brief 要素の参照の取得
     /// @param[in] pos 取り出す要素の位置 (最初の位置は 0)
     /// @return pos 番目の要素への参照
-    size_t&
-    elem(size_t pos);
+    ymuint&
+    elem(ymuint pos);
 
 
   private:
@@ -94,7 +94,7 @@ public:
     //////////////////////////////////////////////////////////////////////
 
     // 現在の要素
-    vector<size_t> mElem;
+    vector<ymuint32> mElem;
 
     // 親の GenBase
     const GenBase* mParent;
@@ -106,20 +106,23 @@ public:
   /// @brief コンストラクタ
   /// @param[in] n 全要素数
   /// @param[in] k 選び出す要素数
-  GenBase(size_t n,
-	  size_t k);
+  GenBase(ymuint n,
+	  ymuint k);
 
   /// @brief デストラクタ
   ~GenBase();
 
+
+public:
+
   /// @brief 全要素数を得る．
   /// @return 全要素数
-  size_t
+  ymuint
   n() const;
 
   /// @brief 選択する要素数を得る．
   /// @return 選択する要素数
-  size_t
+  ymuint
   k() const;
 
 
@@ -129,10 +132,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 全要素数
-  size_t mN;
+  ymuint32 mN;
 
   // 選択する要素数
-  size_t mK;
+  ymuint32 mK;
 
 };
 
@@ -186,7 +189,7 @@ public:
 
     /// @brief operator++() のサブルーティン
     void
-    next(size_t pos);
+    next(ymuint pos);
 
   };
 
@@ -196,11 +199,14 @@ public:
   /// @brief コンストラクタ
   /// @param[in] n 全要素数
   /// @param[in] k 選び出す要素数
-  CombiGen(size_t n,
-	   size_t k);
+  CombiGen(ymuint n,
+	   ymuint k);
 
   /// @brief デストラクタ
   ~CombiGen();
+
+
+public:
 
   /// @brief 最初の組み合わせを取り出す．
   iterator
@@ -225,12 +231,16 @@ public:
   {
     friend class PermGen;
   public:
+
     /// @brief 空のコンストラクタ
     iterator();
 
     /// @brief コピーコンストラクタ
     /// @param[in] src コピー元のオブジェクト
     iterator(const iterator& src);
+
+
+  public:
 
     /// @brief 代入演算子
     /// @param[in] src コピー元のオブジェクト
@@ -264,11 +274,14 @@ public:
   /// @brief コンストラクタ
   /// @param[in] n 全要素数
   /// @param[in] k 選択する要素数
-  PermGen(size_t n,
-	  size_t k);
+  PermGen(ymuint n,
+	  ymuint k);
 
   /// @brief デストラクタ
   ~PermGen();
+
+
+public:
 
   /// @brief 最初の順列を取り出す．
   iterator
@@ -296,13 +309,16 @@ public:
     /// @brief デストラクタ
     ~iterator();
 
+
+  public:
+
     /// @brief 要素の取得
     /// @param[in] grp グループ番号
     /// @param[in] pos 要素の位置
     /// @return grp 番目のグループの pos 番目の要素を取り出す．
-    size_t
-    operator()(size_t grp,
-	       size_t pos) const;
+    ymuint
+    operator()(ymuint grp,
+	       ymuint pos) const;
 
 
   protected:
@@ -319,42 +335,45 @@ public:
 
     /// @brief グループ数を得る．
     /// @return グループ数
-    size_t
+    ymuint
     ngrp() const;
 
     /// @brief 要素配列の初期化
     /// @param[in] grp グループ番号
     /// @note grp 番目のグループの要素配列を初期化する．
     void
-    init(size_t grp);
+    init(ymuint grp);
 
     /// @brief 要素数の取得
     /// @param[in] grp グループ番号
     /// @return grp 番目のグループの全要素数
-    size_t
-    n(size_t grp) const;
+    ymuint
+    n(ymuint grp) const;
 
     /// @brief 選択する要素数の取得
     /// @param[in] grp グループ番号
     /// @return grp 番目のグループの選択する要素数
-    size_t
-    k(size_t grp) const;
+    ymuint
+    k(ymuint grp) const;
 
     /// @brief 要素配列の取得
     /// @param[in] grp グループ番号
     /// @return grp 番目のグループの要素配列
-    vector<size_t>&
-    elem(size_t grp);
+    vector<ymuint>&
+    elem(ymuint grp);
 
     /// @brief 要素配列の取得
     /// @param[in] grp グループ番号
     /// @return grp 番目のグループの要素配列
     /// @note こちらは const 版
-    const vector<size_t>&
-    elem(size_t grp) const;
+    const vector<ymuint>&
+    elem(ymuint grp) const;
 
 
   private:
+    //////////////////////////////////////////////////////////////////////
+    // 内部で用いられる関数
+    //////////////////////////////////////////////////////////////////////
 
     /// @brief 確保したメモリを解放する
     void
@@ -367,7 +386,7 @@ public:
     //////////////////////////////////////////////////////////////////////
 
     // 現在の要素(二重の配列なので少しめんどくさい)
-    vector<vector<size_t>*> mElemArray;
+    vector<vector<ymuint>*> mElemArray;
 
     // 親の MultiGenBase
     const MultiGenBase* mParent;
@@ -379,27 +398,30 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] nk_array 全要素数 n と選択する要素数 k のベクタ
-  MultiGenBase(const vector<pair<size_t, size_t> >& nk_array);
+  MultiGenBase(const vector<pair<ymuint, ymuint> >& nk_array);
 
   /// @brief デストラクタ
   ~MultiGenBase();
 
+
+public:
+
   /// @brief グループ数の取得
   /// @return グループ数
-  size_t
+  ymuint
   ngrp() const;
 
   /// @brief 全要素数の取得
   /// @param[in] grp グループ番号
   /// @return grp 番目のグループの全要素数
-  size_t
-  n(size_t grp) const;
+  ymuint
+  n(ymuint grp) const;
 
   /// @brief 選択する要素数の取得
   /// @param[in] grp グループ番号
   /// @return grp 番目のグループの選択する要素数
-  size_t
-  k(size_t grp) const;
+  ymuint
+  k(ymuint grp) const;
 
 
 private:
@@ -408,7 +430,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 各グループごとの全要素数を選択する要素数を入れる配列
-  vector<pair<size_t, size_t> > mNkArray;
+  vector<pair<ymuint, ymuint> > mNkArray;
 
 };
 
@@ -437,6 +459,9 @@ public:
     /// @param[in] src コピー元のオブジェクト
     iterator(const iterator& src);
 
+
+  public:
+
     /// @brief 代入演算子
     /// @param[in] src コピー元のオブジェクト
     /// @return 自分自身
@@ -455,6 +480,7 @@ public:
 
 
   private:
+
     /// @brief コンストラクタ
     /// @param[in] parent 親のオブジェクト
     /// @brief MultiCombiGen が用いる．
@@ -462,12 +488,12 @@ public:
 
     /// @brief operator++() のサブルーティン
     void
-    next(size_t g,
-	 size_t pos);
+    next(ymuint g,
+	 ymuint pos);
 
     /// @brief grp 番目のグループが終了状態の時 true を返す．
     bool
-    is_end_sub(size_t grp) const;
+    is_end_sub(ymuint grp) const;
 
   };
 
@@ -476,10 +502,13 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] nk_array 全要素数 n と選択する要素数 k のベクタ
-  MultiCombiGen(const vector<pair<size_t, size_t> >& nk_array);
+  MultiCombiGen(const vector<pair<ymuint, ymuint> >& nk_array);
 
   /// @brief デストラクタ
   ~MultiCombiGen();
+
+
+public:
 
   /// @brief 最初の組み合わせを取り出す．
   iterator
@@ -504,6 +533,7 @@ public:
   {
     friend class MultiPermGen;
   public:
+
     /// @brief 空のコンストラクタ
     iterator();
 
@@ -529,6 +559,7 @@ public:
 
 
   private:
+
     /// @brief コンストラクタ
     /// @param[in] parent 親のオブジェクト
     /// @brief MultiPermGen が用いる．
@@ -536,11 +567,11 @@ public:
 
     /// @brief operator++() のサブルーティン
     void
-    next(size_t pos);
+    next(ymuint pos);
 
     /// @brief grp 番目のグループが終了状態の時 true を返す．
     bool
-    is_end_sub(size_t grp) const;
+    is_end_sub(ymuint grp) const;
 
   };
 
@@ -549,10 +580,13 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] nk_array 全要素数 n と選択する要素数 k のベクタ
-  MultiPermGen(const vector<pair<size_t, size_t> >& nk_array);
+  MultiPermGen(const vector<pair<ymuint, ymuint> >& nk_array);
 
   /// @brief デストラクタ
   ~MultiPermGen();
+
+
+public:
 
   /// @brief 最初の順列を取り出す．
   iterator
@@ -567,7 +601,7 @@ public:
 
 // 全要素数を得る．
 inline
-size_t
+ymuint
 GenBase::iterator::n() const
 {
   return mParent->n();
@@ -575,7 +609,7 @@ GenBase::iterator::n() const
 
 // 順列/組合わせ数を得る．
 inline
-size_t
+ymuint
 GenBase::iterator::k() const
 {
   return mParent->k();
@@ -583,31 +617,31 @@ GenBase::iterator::k() const
 
 // pos 番目の要素を取り出す．
 inline
-size_t
-GenBase::iterator::operator()(size_t pos) const
+ymuint
+GenBase::iterator::operator()(ymuint pos) const
 {
   return elem(pos);
 }
 
 // pos 番目の要素を取り出す．
 inline
-size_t
-GenBase::iterator::elem(size_t pos) const
+ymuint
+GenBase::iterator::elem(ymuint pos) const
 {
   return mElem[pos];
 }
 
 // pos 番目の要素への参照を取り出す．
 inline
-size_t&
-GenBase::iterator::elem(size_t pos)
+ymuint&
+GenBase::iterator::elem(ymuint pos)
 {
   return mElem[pos];
 }
 
 // 全要素数を得る．
 inline
-size_t
+ymuint
 GenBase::n() const
 {
   return mN;
@@ -615,7 +649,7 @@ GenBase::n() const
 
 // 選択する要素数を得る．
 inline
-size_t
+ymuint
 GenBase::k() const
 {
   return mK;
@@ -623,16 +657,16 @@ GenBase::k() const
 
 // grp 番目のグループの pos 番目の要素を取り出す．
 inline
-size_t
-MultiGenBase::iterator::operator()(size_t grp,
-				   size_t pos) const
+ymuint
+MultiGenBase::iterator::operator()(ymuint grp,
+				   ymuint pos) const
 {
   return (*mElemArray[grp])[pos];
 }
 
 // グループ数を得る．
 inline
-size_t
+ymuint
 MultiGenBase::iterator::ngrp() const
 {
   return mParent->ngrp();
@@ -640,23 +674,23 @@ MultiGenBase::iterator::ngrp() const
 
 // grp 番目のグループの全要素数を得る．
 inline
-size_t
-MultiGenBase::iterator::n(size_t grp) const
+ymuint
+MultiGenBase::iterator::n(ymuint grp) const
 {
   return mParent->n(grp);
 }
 
 // grp 番目のグループの選択する要素数を得る．
 inline
-size_t
-MultiGenBase::iterator::k(size_t grp) const
+ymuint
+MultiGenBase::iterator::k(ymuint grp) const
 {
   return mParent->k(grp);
 }
 
 // グループ数を得る．
 inline
-size_t
+ymuint
 MultiGenBase::ngrp() const
 {
   return mNkArray.size();
@@ -664,16 +698,16 @@ MultiGenBase::ngrp() const
 
 // grp 番目のグループの全要素数を得る．
 inline
-size_t
-MultiGenBase::n(size_t grp) const
+ymuint
+MultiGenBase::n(ymuint grp) const
 {
   return mNkArray[grp].first;
 }
 
 // grp 番目のグループの選択する要素数を得る．
 inline
-size_t
-MultiGenBase::k(size_t grp) const
+ymuint
+MultiGenBase::k(ymuint grp) const
 {
   return mNkArray[grp].second;
 }

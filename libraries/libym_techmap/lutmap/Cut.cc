@@ -81,7 +81,7 @@ Cut::expr() const
   for (ymuint i = 0; i < ni(); i ++) {
     const BdnNode* node = mInputs[i];
     ymuint id = node->id();
-    logmap.insert(make_pair(id, LogExpr::make_posiliteral(i)));
+    logmap.insert(make_pair(id, LogExpr::make_posiliteral(VarId(i))));
   }
   return calc_expr_for_node(root(), logmap);
 }

@@ -14,7 +14,8 @@ TESTS_ENVIRONMENT = \
 	top_builddir=$(top_builddir) \
 	top_srcdir=$(top_srcdir)
 
-TESTS =
+TESTS = \
+	npn.test
 
 testsubdir = testSubDir
 
@@ -34,11 +35,6 @@ YM_LOGIC = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-#if BUILD_LIBYM_TCLPP
-#NPN_CHECK = npn_check
-#else
-#NPN_CHECK =
-#endif
 
 noinst_PROGRAMS = \
 	tvfunc_test \

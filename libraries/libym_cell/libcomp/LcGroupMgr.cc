@@ -125,7 +125,8 @@ gen_support(const TvFunc& f)
   ymuint ni = f.ni();
   ymuint32 ans = 0U;
   for (ymuint i = 0; i < ni; ++ i) {
-    if ( f.check_sup(i) ) {
+    VarId var(i);
+    if ( f.check_sup(var) ) {
       ans |= (1U << i);
     }
   }
@@ -141,11 +142,12 @@ gen_maxmap(const TvFuncM& f,
   ymuint ni = f.ni();
   ymuint no = f.no();
 
-  vector<ymuint> i_list;
+  vector<VarId> i_list;
   i_list.reserve(ni);
   for (ymuint i = 0; i < ni; ++ i) {
-    if ( f.check_sup(i) ) {
-      i_list.push_back(i);
+    VarId var(i);
+    if ( f.check_sup(var) ) {
+      i_list.push_back(var);
     }
   }
   ymuint ni1 = i_list.size();
@@ -161,12 +163,14 @@ gen_maxmap(const TvFuncM& f,
   for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
     NpnMapM map1(ni, no);
     for (ymuint i = 0; i < no; ++ i) {
-      map1.set_omap(i, i, kPolPosi);
+      map1.set_omap(VarId(i), VarId(i), kPolPosi);
     }
     for (ymuint x = 0U; x < nip; ++ x) {
       for (ymuint i = 0; i < ni1; ++ i) {
 	tPol pol = (x & (1U << i)) ? kPolPosi : kPolNega;
-	map1.set_imap(i_list[i], p(i) + offset, pol);
+	VarId src_var = i_list[i];
+	VarId dst_var(p(i) + offset);
+	map1.set_imap(src_var, dst_var, pol);
       }
       TvFuncM f1 = f.xform(map1);
       if ( first || repfunc < f1 ) {
@@ -177,11 +181,11 @@ gen_maxmap(const TvFuncM& f,
     }
   }
 
-  for (vector<ymuint>::iterator p = i_list.begin();
+  for (vector<VarId>::iterator p = i_list.begin();
        p != i_list.end(); ++ p) {
-    ymuint i = *p;
-    NpnVmap vmap = map.imap(i);
-    xmap.set_imap(i, vmap);
+    VarId src_var = *p;
+    NpnVmap vmap = map.imap(src_var);
+    xmap.set_imap(src_var, vmap);
   }
 
   return ni1;
@@ -201,7 +205,8 @@ LcGroupMgr::default_repfunc(const TvFuncM& f,
   // 各出力のサポートをビットベクタの形で求める．
   vector<ymuint32> sup_array(no);
   for (ymuint o = 0; o < no; ++ o) {
-    TvFunc func1 = f.output(o);
+    VarId ovar(o);
+    TvFunc func1 = f.output(ovar);
     ymuint32 supbits = gen_support(func1);
     sup_array[o] = supbits;
   }
@@ -228,9 +233,10 @@ LcGroupMgr::default_repfunc(const TvFuncM& f,
     vector<TvFunc> f_list;
     f_list.reserve(no);
     for (ymuint o = 0; o < no; ++ o) {
+      VarId ovar(o);
       if ( mfset.find(o) == first ) {
 	o_list.push_back(o);
-	f_list.push_back(f.output(o));
+	f_list.push_back(f.output(ovar));
       }
     }
     TvFuncM f1(f_list);

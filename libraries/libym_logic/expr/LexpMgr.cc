@@ -63,20 +63,20 @@ LexpMgr::make_one()
 
 // 肯定のリテラルを作る．
 LexpNodePtr
-LexpMgr::make_posiliteral(tVarId id)
+LexpMgr::make_posiliteral(VarId id)
 {
   make_literals(id);
-  ymuint pos = id << 1;
+  ymuint pos = id.val() << 1;
   assert_cond(pos < mLiteralArray.size(), __FILE__, __LINE__);
   return mLiteralArray[pos];
 }
 
 // 否定のリテラルを作る．
 LexpNodePtr
-LexpMgr::make_negaliteral(tVarId id)
+LexpMgr::make_negaliteral(VarId id)
 {
   make_literals(id);
-  ymuint pos = (id << 1) + 1;
+  ymuint pos = (id.val() << 1) + 1;
   assert_cond(pos < mLiteralArray.size(), __FILE__, __LINE__);
   return mLiteralArray[pos];
 }
@@ -389,7 +389,7 @@ LexpMgr::complement(const LexpNode* node)
 // id 番目の変数を sub に置き換える．
 LexpNodePtr
 LexpMgr::compose(const LexpNode* node,
-		 tVarId id,
+		 VarId id,
 		 const LexpNodePtr& sub)
 {
   switch ( node->type() ) {
@@ -655,10 +655,10 @@ LexpMgr::print_stats(ostream& s)
 
 // id 番めまでのリテラルノードを作る．
 void
-LexpMgr::make_literals(tVarId id)
+LexpMgr::make_literals(VarId id)
 {
   ymuint last = mLiteralArray.size() / 2;
-  while ( last <= id ) {
+  while ( last <= id.val() ) {
     LexpNode* posi = alloc_node(kPosiLiteral);
     posi->mNc = last;
     mLiteralArray.push_back(posi);

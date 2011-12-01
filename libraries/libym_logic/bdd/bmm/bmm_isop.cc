@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmm/bmm_isop.cc
+/// @file bmm_isop.cc
 /// @brief ISOP を求める関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmm_isop.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -20,7 +18,7 @@ BEGIN_NONAMESPACE
 // cov を積和形論理式と見なして各キューブにリテラルを追加する
 LogExpr
 sop_litand(const LogExpr& cov,
-	   tVarId varid,
+	   VarId varid,
 	   tPol pol)
 {
   if ( cov.is_zero() ) {
@@ -40,9 +38,9 @@ sop_litand(const LogExpr& cov,
   }
 
   // あとはカバーの場合のみ
-  size_t n = cov.child_num();
+  ymuint n = cov.child_num();
   LogExpr ans = LogExpr::make_zero();
-  for (size_t i = 0; i < n; i ++) {
+  for (ymuint i = 0; i < n; i ++) {
     LogExpr child = cov.child(i);
     ans |= child & lit;
   }
@@ -156,7 +154,7 @@ BddMgrModern::isop_step(BddEdge l,
     BddEdge u_0, u_1;
     Var* var = split(l, u, l_0, l_1, u_0, u_1);
     BddEdge var_edge = new_node(var, BddEdge::make_zero(), BddEdge::make_one());
-    tVarId varid = var->varid();
+    VarId varid = var->varid();
     BddEdge z_0 = and_op(l_0, ~u_1);
     LogExpr p_0;
     BddEdge c_0 = isop_step(z_0, u_0, p_0);
@@ -210,7 +208,7 @@ BddMgrModern::pc_step(BddEdge l,
     BddEdge u_0, u_1;
     Var* var = split(l, u, l_0, l_1, u_0, u_1);
     BddEdge var_edge = new_node(var, BddEdge::make_zero(), BddEdge::make_one());
-    tVarId varid = var->varid();
+    VarId varid = var->varid();
 
     // \bar{x} を含む prime implicants の生成
     BddEdge z_0 = and_op(l_0, ~u_1);

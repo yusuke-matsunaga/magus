@@ -63,6 +63,9 @@ public:
   /// @brief デストラクタ
   ~ShString();
 
+
+public:
+
   /// @brief const char* に変換する．
   operator const char*() const;
 
@@ -75,7 +78,7 @@ public:
   id() const;
 
   /// @brief ハッシュ用のキーを返す．
-  size_t
+  ymuint
   hash() const;
 
   /// @brief ShString 関連でアロケートされたメモリサイズ
@@ -274,11 +277,11 @@ ShString::id() const
 
 // @brief ハッシュ用のキーを返す．
 inline
-size_t
+ymuint
 ShString::hash() const
 {
   // 共有されているのでポインタ比較でOK
-  return reinterpret_cast<size_t>(mPtr)/sizeof(void*);
+  return reinterpret_cast<ympuint>(mPtr)/sizeof(void*);
 }
 
 // 等価比較演算子
@@ -359,7 +362,7 @@ BEGIN_NAMESPACE_HASH
 template <>
 struct hash<nsYm::ShString>
 {
-  size_t
+  ymuint
   operator()(nsYm::ShString str) const
   {
     return str.hash();

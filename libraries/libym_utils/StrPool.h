@@ -1,7 +1,7 @@
-#ifndef YM_UTILS_STRPOOL_H
-#define YM_UTILS_STRPOOL_H
+#ifndef STRPOOL_H
+#define STRPOOL_H
 
-/// @file ym_utils/StrPool.h
+/// @file StrPool.h
 /// @brief StrPool のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -35,6 +35,9 @@ public:
   /// @note このオブジェクトが管理しているすべてのページが解放される．
   ~StrPool();
 
+
+public:
+
   /// @brief 文字列を登録する．
   /// @param[in] str 入力となる文字列
   /// @return カノニカライズされた文字列を返す．
@@ -44,11 +47,14 @@ public:
   /// @brief 確保した文字列領域の総量を得る．
   /// @return 確保した文字列領域の総量を得る．
   /// @note デバッグ/解析用 -- 通常は使わない．
-  size_t
+  ymuint
   accum_alloc_size() const;
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief ハッシュ関数
   /// @param[in] str ハッシュ対象の文字列
@@ -64,6 +70,9 @@ private:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief ハッシュ表の中で使われる要素
   struct
@@ -108,4 +117,4 @@ private:
 
 END_NAMESPACE_YM
 
-#endif // YM_UTILS_STRPOOL_H
+#endif // STRPOOL_H

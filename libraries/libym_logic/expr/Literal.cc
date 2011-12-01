@@ -1,5 +1,5 @@
 
-/// @file libym_logic/expr/Literal.cc
+/// @file Literal.cc
 /// @brief Literal の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,13 +10,16 @@
 
 
 #include "ym_logic/Literal.h"
+#include "ym_logic/VarId.h"
 
 
 BEGIN_NAMESPACE_YM
 
 // 実はデフォルトコンストラクタが未定義リテラルを作っている．
-const
-Literal kLiteralX;
+const Literal kLiteralX;
+
+// 場所がないのでここに書いておく．
+const VarId kVarIdIllegal;
 
 // ostream に対する書出し
 ostream&

@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmc/BmcCompTbl.cc
+/// @file BmcCompTbl.cc
 /// @brief BmcCompTbl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BmcCompTbl.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -14,9 +12,9 @@
 
 BEGIN_NONAMESPACE
 
-const size_t kInitSize = (1UL << 10);
+const ymuint64 kInitSize = (1UL << 10);
 const double kLoadLimit = 0.8;
-const size_t kMaxSize = (1UL << 20);
+const ymuint64 kMaxSize = (1UL << 20);
 
 END_NONAMESPACE
 
@@ -57,7 +55,7 @@ BmcCompTbl::~BmcCompTbl()
 }
 
 // テーブルサイズを取り出す．
-size_t
+ymuint64
 BmcCompTbl::table_size() const
 {
   return mTableSize;
@@ -67,11 +65,11 @@ BmcCompTbl::table_size() const
 void
 BmcCompTbl::update_next_limit()
 {
-  mNextLimit = size_t(double(mTableSize) * mLoadLimit);
+  mNextLimit = static_cast<ymuint64>(double(mTableSize) * mLoadLimit);
 }
 
 // 使用されているセル数を取り出す．
-size_t
+ymuint64
 BmcCompTbl::used_num() const
 {
   return mUsedNum;
@@ -88,14 +86,14 @@ BmcCompTbl::load_limit(double load_limit)
 // 現在，このサイズを越えているテーブルがあっても縮小するような
 // ことはしない．
 void
-BmcCompTbl::max_size(size_t max_size)
+BmcCompTbl::max_size(ymuint64 max_size)
 {
   mMaxSize = max_size;
 }
 
 // BddMgr からメモリを獲得する．
 void*
-BmcCompTbl::allocate(size_t size)
+BmcCompTbl::allocate(ymuint64 size)
 {
   return mMgr->allocate(size);
 }
@@ -103,7 +101,7 @@ BmcCompTbl::allocate(size_t size)
 // BddMgr にメモリを返す．
 void
 BmcCompTbl::deallocate(void* ptr,
-		       size_t size)
+		       ymuint64 size)
 {
   mMgr->deallocate(ptr, size);
 }
@@ -136,7 +134,7 @@ BmcCompTbl1::~BmcCompTbl1()
 
 // テーブルサイズを変更する．
 bool
-BmcCompTbl1::resize(size_t new_size)
+BmcCompTbl1::resize(ymuint64 new_size)
 {
   // ログの出力
   logstream() << "BmcCompTbl1[" << mName << "]::resize(" << new_size << ")"
@@ -149,7 +147,7 @@ BmcCompTbl1::resize(size_t new_size)
   }
 
   // 昔の値を保存する．
-  size_t old_size = mTableSize;
+  ymuint64 old_size = mTableSize;
   Cell* old_table = mTable;
 
   // 新たなサイズを設定し，テーブルを確保する．
@@ -163,7 +161,7 @@ BmcCompTbl1::resize(size_t new_size)
   Cell* end = top + mTableSize;
   do {
     top->mKey1 = BddEdge::make_error();
-    top ++;
+    ++ top;
   } while ( top != end );
 
   // ハッシュし直して新しいテーブルに登録する．
@@ -173,13 +171,13 @@ BmcCompTbl1::resize(size_t new_size)
     Cell* end = top + old_size;
     do {
       if ( !top->mKey1.is_error() ) {
-	ymuint pos = hash_func(top->mKey1);
+	ymuint64 pos = hash_func(top->mKey1);
 	Cell* temp = mTable + pos;
-	if ( temp->mKey1.is_error() ) mUsedNum ++;
+	if ( temp->mKey1.is_error() ) ++ mUsedNum;
 	temp->mKey1 = top->mKey1;
 	temp->mAns = top->mAns;
       }
-      top ++;
+      ++ top;
     } while ( top != end );
     deallocate((void*)old_table, old_size * sizeof(Cell));
   }
@@ -198,12 +196,12 @@ BmcCompTbl1::sweep()
   // 削除されるノードに関連したセルをクリアする．
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
-  for ( ; cell != end; cell ++) {
+  for ( ; cell != end; ++ cell) {
     if ( !cell->mKey1.is_error() &&
 	 (check_noref(cell->mKey1) ||
 	  check_noref(cell->mAns)) ) {
       cell->mKey1 = BddEdge::make_error();
-      mUsedNum --;
+      -- mUsedNum;
     }
   }
 }
@@ -214,9 +212,9 @@ BmcCompTbl1::clear()
 {
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
-  for ( ; cell != end; cell ++) {
+  for ( ; cell != end; ++ cell) {
     cell->mKey1 = BddEdge::make_error();
-    mUsedNum --;
+    -- mUsedNum;
   }
 }
 
@@ -241,7 +239,7 @@ BmcCompTbl2::~BmcCompTbl2()
 
 // テーブルサイズを変更する．
 bool
-BmcCompTbl2::resize(size_t new_size)
+BmcCompTbl2::resize(ymuint64 new_size)
 {
   // ログの出力
   logstream() << "BmcCompTbl2[" << mName << "]::resize(" << new_size << ")"
@@ -254,7 +252,7 @@ BmcCompTbl2::resize(size_t new_size)
   }
 
   // 昔の値を保存する．
-  size_t old_size = mTableSize;
+  ymuint64 old_size = mTableSize;
   Cell* old_table = mTable;
 
   mTable = new_table;
@@ -267,7 +265,7 @@ BmcCompTbl2::resize(size_t new_size)
   Cell* end = top + mTableSize;
   do {
     top->mKey1 = BddEdge::make_error();
-    top ++;
+    ++ top;
   } while ( top != end );
 
   // ハッシュし直して新しいテーブルに登録する．
@@ -277,14 +275,14 @@ BmcCompTbl2::resize(size_t new_size)
     Cell* end = top + old_size;
     do {
       if ( !top->mKey1.is_error() ) {
-	size_t pos = hash_func(top->mKey1, top->mKey2);
+	ymuint64 pos = hash_func(top->mKey1, top->mKey2);
 	Cell* temp = mTable + pos;
-	if ( temp->mKey1.is_error() ) mUsedNum ++;
+	if ( temp->mKey1.is_error() ) ++ mUsedNum;
 	temp->mKey1 = top->mKey1;
 	temp->mKey2 = top->mKey2;
 	temp->mAns = top->mAns;
       }
-      top ++;
+      ++ top;
     } while ( top != end );
     deallocate((void*)old_table, old_size * sizeof(Cell));
   }
@@ -303,13 +301,13 @@ BmcCompTbl2::sweep()
   // 削除されるノードに関連したセルをクリアする．
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
-  for ( ; cell != end; cell ++) {
+  for ( ; cell != end; ++ cell) {
     if ( !cell->mKey1.is_error() &&
 	 (check_noref(cell->mKey1) ||
 	  check_noref(cell->mKey2) ||
 	  check_noref(cell->mAns)) ) {
       cell->mKey1 = BddEdge::make_error();
-      mUsedNum --;
+      -- mUsedNum;
     }
   }
 }
@@ -320,9 +318,9 @@ BmcCompTbl2::clear()
 {
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
-  for ( ; cell != end; cell ++) {
+  for ( ; cell != end; ++ cell) {
     cell->mKey1 = BddEdge::make_error();
-    mUsedNum --;
+    -- mUsedNum;
   }
 }
 
@@ -347,7 +345,7 @@ BmcCompTbl3::~BmcCompTbl3()
 
 // テーブルサイズを変更する．
 bool
-BmcCompTbl3::resize(size_t new_size)
+BmcCompTbl3::resize(ymuint64 new_size)
 {
   // ログの出力
   logstream() << "BmcCompTbl3[" << mName << "]::resize(" << new_size << ")"
@@ -360,7 +358,7 @@ BmcCompTbl3::resize(size_t new_size)
   }
 
   // 昔の値を保存する．
-  size_t old_size = mTableSize;
+  ymuint64 old_size = mTableSize;
   Cell* old_table = mTable;
 
   // 新たなサイズを設定し，テーブルを確保する．
@@ -374,7 +372,7 @@ BmcCompTbl3::resize(size_t new_size)
   Cell* end = top + mTableSize;
   do {
     top->mKey1 = BddEdge::make_error();
-    top ++;
+    ++ top;
   } while ( top != end );
 
   // ハッシュし直して新しいテーブルに登録する．
@@ -384,15 +382,15 @@ BmcCompTbl3::resize(size_t new_size)
     Cell* end = top + old_size;
     do {
       if ( !top->mKey1.is_error() ) {
-	size_t pos = hash_func(top->mKey1, top->mKey2, top->mKey3);
+	ymuint64 pos = hash_func(top->mKey1, top->mKey2, top->mKey3);
 	Cell* temp = mTable + pos;
-	if ( temp->mKey1.is_error() ) mUsedNum ++;
+	if ( temp->mKey1.is_error() ) ++ mUsedNum;
 	temp->mKey1 = top->mKey1;
 	temp->mKey2 = top->mKey2;
 	temp->mKey3 = top->mKey3;
 	temp->mAns = top->mAns;
       }
-      top ++;
+      ++ top;
     } while ( top != end );
     deallocate((void*)old_table, old_size * sizeof(Cell));
   }
@@ -411,14 +409,14 @@ BmcCompTbl3::sweep()
   // 削除されるノードに関連したセルをクリアする．
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
-  for ( ; cell != end; cell ++) {
+  for ( ; cell != end; ++ cell) {
     if ( !cell->mKey1.is_error() &&
 	 (check_noref(cell->mKey1) ||
 	  check_noref(cell->mKey2) ||
 	  check_noref(cell->mKey3) ||
 	  check_noref(cell->mAns)) ) {
       cell->mKey1 = BddEdge::make_error();
-      mUsedNum --;
+      -- mUsedNum;
     }
   }
 }
@@ -431,7 +429,7 @@ BmcCompTbl3::clear()
   Cell* end = cell + mTableSize;
   for ( ; cell != end; cell ++) {
     cell->mKey1 = BddEdge::make_error();
-    mUsedNum --;
+    -- mUsedNum;
   }
 }
 
@@ -457,7 +455,7 @@ BmcIsopTbl::~BmcIsopTbl()
 
 // テーブルサイズを変更する．
 bool
-BmcIsopTbl::resize(size_t new_size)
+BmcIsopTbl::resize(ymuint64 new_size)
 {
   // ログの出力
   logstream() << "BmcIsopTbl[" << mName << "]::resize(" << new_size << ")"
@@ -470,7 +468,7 @@ BmcIsopTbl::resize(size_t new_size)
   }
 
   // 昔の値を保存する．
-  size_t old_size = mTableSize;
+  ymuint64 old_size = mTableSize;
   Cell* old_table = mTable;
 
   // 新たなサイズを設定し，テーブルを確保する．
@@ -485,7 +483,7 @@ BmcIsopTbl::resize(size_t new_size)
   do {
     top->mKey1 = BddEdge::make_error();
     top->mAnsCov = 0;
-    top ++;
+    ++ top;
   } while ( top != end );
 
   // ハッシュし直して新しいテーブルに登録する．
@@ -495,16 +493,16 @@ BmcIsopTbl::resize(size_t new_size)
     Cell* end = top + old_size;
     do {
       if ( !top->mKey1.is_error() ) {
-	size_t pos = hash_func(top->mKey1, top->mKey2);
+	ymuint64 pos = hash_func(top->mKey1, top->mKey2);
 	Cell* temp = mTable + pos;
-	if ( temp->mKey1.is_error() ) mUsedNum ++;
+	if ( temp->mKey1.is_error() ) ++ mUsedNum;
 	temp->mKey1 = top->mKey1;
 	temp->mKey2 = top->mKey2;
 	temp->mAnsBdd = top->mAnsBdd;
 	delete temp->mAnsCov;
 	temp->mAnsCov = top->mAnsCov;
       }
-      top ++;
+      ++ top;
     } while ( top != end );
     deallocate((void*)old_table, old_size * sizeof(Cell));
   }
@@ -523,7 +521,7 @@ BmcIsopTbl::sweep()
   // 削除されるノードに関連したセルをクリアする．
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
-  for ( ; cell != end; cell ++) {
+  for ( ; cell != end; ++ cell) {
     if ( !cell->mKey1.is_error() &&
 	 (check_noref(cell->mKey1) ||
 	  check_noref(cell->mKey2) ||
@@ -531,7 +529,7 @@ BmcIsopTbl::sweep()
       cell->mKey1 = BddEdge::make_error();
       delete cell->mAnsCov;
       cell->mAnsCov = 0;
-      mUsedNum --;
+      -- mUsedNum;
     }
   }
 }
@@ -542,11 +540,11 @@ BmcIsopTbl::clear()
 {
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
-  for ( ; cell != end; cell ++) {
+  for ( ; cell != end; ++ cell) {
     cell->mKey1 = BddEdge::make_error();
     delete cell->mAnsCov;
     cell->mAnsCov = 0;
-    mUsedNum --;
+    -- mUsedNum;
   }
 }
 

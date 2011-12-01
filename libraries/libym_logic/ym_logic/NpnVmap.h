@@ -10,6 +10,7 @@
 
 
 #include "ym_logic/npn_nsdef.h"
+#include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
 #include "ym_utils/BinIO.h"
 
@@ -32,10 +33,10 @@ public:
   NpnVmap();
 
   /// @brief 変数番号と極性を指定したコンストラクタ
-  /// @param[in] pos 変数番号
+  /// @param[in] var 変数番号
   /// @param[in] pol 極性
   explicit
-  NpnVmap(ymuint pos,
+  NpnVmap(VarId var,
 	  tPol pol = kPolPosi);
 
   /// @brief 不正な値を返すクラス関数
@@ -50,8 +51,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 変換先の変数番号を得る．
-  ymuint
-  pos() const;
+  VarId
+  var() const;
 
   /// @brief 極性を得る．
   tPol
@@ -118,12 +119,12 @@ NpnVmap::NpnVmap() :
 }
 
 // @brief 変数番号と極性を指定したコンストラクタ
-// @param[in] pos 変数番号
+// @param[in] var 変数番号
 // @param[in] pol 極性
 inline
-NpnVmap::NpnVmap(ymuint pos,
+NpnVmap::NpnVmap(VarId var,
 		 tPol pol) :
-  mPosPol((pos << 1) | static_cast<ymuint8>(pol))
+  mPosPol((var.val() << 1) | static_cast<ymuint8>(pol))
 {
 }
 
@@ -139,10 +140,10 @@ NpnVmap::invalid()
 
 // @brief 変換先の変数番号を得る．
 inline
-ymuint
-NpnVmap::pos() const
+VarId
+NpnVmap::var() const
 {
-  return mPosPol >> 1;
+  return VarId(mPosPol >> 1);
 }
 
 // @brief 極性を得る．

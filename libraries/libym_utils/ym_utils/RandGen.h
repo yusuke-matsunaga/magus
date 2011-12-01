@@ -76,6 +76,9 @@ public:
   /// @brief デストラクタ
   ~RandGen();
 
+
+public:
+
   /// @brief シードで初期化する．
   /// @param[in] s シード
   /// @note 以下，原文\n
@@ -93,7 +96,7 @@ public:
   /// slight change for C++, 2004/2/26
   void
   init_by_array(ymuint32 init_key[],
-		size_t key_length);
+		ymuint key_length);
 
   /// @brief 32ビット符号無し整数の乱数を発生させる．
   /// @note 以下，原文\n
@@ -143,9 +146,9 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   static
-  const size_t N = 624;
+  const ymuint32 N = 624;
   static
-  const size_t M = 397;
+  const ymuint32 M = 397;
   static
   const ymuint32 MATRIX_A = 0x9908b0dfUL;   // constant vector a
   static
@@ -163,7 +166,7 @@ private:
   ymuint32 mV[N];
 
   // 状態ベクタのインデックス
-  size_t mIdx;
+  ymuint32 mIdx;
 
 };
 
@@ -178,7 +181,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] n 要素数
-  RandPermGen(size_t n);
+  RandPermGen(ymuint n);
 
   /// @brief デストラクタ
   ~RandPermGen();
@@ -187,7 +190,7 @@ public:
 public:
 
   /// @brief 要素数を返す．
-  size_t
+  ymuint
   num() const;
 
   /// @brief ランダムな順列を生成する．
@@ -198,7 +201,7 @@ public:
   /// @brief 順列の要素を取り出す．
   /// @param[in] pos 要素の位置番号 ( 0 <= pos < num() )
   ymuint32
-  elem(size_t pos) const;
+  elem(ymuint pos) const;
 
 
 private:
@@ -207,7 +210,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 要素数
-  size_t mNum;
+  ymuint32 mNum;
 
   // 現在の順列
   ymuint32* mArray;
@@ -226,8 +229,8 @@ public:
   /// @brief コンストラクタ
   /// @param[in] n 全要素数
   /// @param[in] k 組み合わせの要素数
-  RandCombiGen(size_t n,
-	       size_t k);
+  RandCombiGen(ymuint n,
+	       ymuint k);
 
   /// @brief デストラクタ
   ~RandCombiGen();
@@ -236,11 +239,11 @@ public:
 public:
 
   /// @brief 全要素数を返す．
-  size_t
+  ymuint
   num() const;
 
   /// @brief 組み合わせの要素数を返す．
-  size_t
+  ymuint
   combi_num() const;
 
   /// @brief ランダムな組み合わせを生成する．
@@ -251,7 +254,7 @@ public:
   /// @brief 組み合わせの要素を取り出す．
   /// @param[in] pos 要素の位置番号 ( 0 <= pos < combi_num() )
   ymuint32
-  elem(size_t pos) const;
+  elem(ymuint pos) const;
 
 
 private:
@@ -260,10 +263,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 要素数
-  size_t mNum;
+  ymuint32 mNum;
 
   // 組み合わせの要素数
-  size_t mCombiNum;
+  ymuint32 mCombiNum;
 
   // 現在の順列
   ymuint32* mArray;

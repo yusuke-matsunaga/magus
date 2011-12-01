@@ -35,7 +35,7 @@ public:
 
     // 現在指している要素を返す．
     // 末尾かどうかのチェックは行わない．
-    tVarId
+    VarId
     operator*() const;
 
     // ひとつ先に進める．
@@ -91,7 +91,7 @@ public:
   /// @param[in] mgr BddMgr
   /// @param[in] varid 変数番号
   BddVarSet(BddMgr& mgr,
-	    tVarId varid);
+	    VarId varid);
 
   /// @brief vector からの変換用コンストラクタ
   /// @param[in] mgr BddMgr

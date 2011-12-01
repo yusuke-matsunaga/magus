@@ -124,10 +124,10 @@ private:
 		   const LcPatNode* node2);
 
   /// @brief 入力ノードを作る．
-  /// @param[in] id 入力番号
+  /// @param[in] var 入力変数
   /// @note 既にあるときはそれを返す．
   LcPatNode*
-  make_input(ymuint id);
+  make_input(VarId var);
 
   /// @brief テンプレートにしたがって2分木を作る．
   LcPatHandle

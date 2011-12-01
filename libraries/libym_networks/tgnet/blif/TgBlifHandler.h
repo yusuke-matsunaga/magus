@@ -141,7 +141,7 @@ private:
   void
   connect(TgNode* from,
 	  TgNode* to,
-	  size_t pos);
+	  ymuint pos);
 
 
 private:
@@ -153,11 +153,11 @@ private:
   {
     TgNode* mFrom;
     TgNode* mTo;
-    size_t mPos;
+    ymuint32 mPos;
 
     Connection(TgNode* from,
 	       TgNode* to,
-	       size_t pos) :
+	       ymuint pos) :
       mFrom(from),
       mTo(to),
       mPos(pos) { }
