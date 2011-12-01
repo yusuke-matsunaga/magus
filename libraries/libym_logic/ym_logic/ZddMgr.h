@@ -11,6 +11,7 @@
 
 
 #include "ym_logic/zdd_nsdef.h"
+#include "ym_logic/VarId.h"
 #include "ym_utils/Binder.h"
 #include "ym_utils/BinIO.h"
 #include "gmpxx.h"
@@ -109,6 +110,7 @@ public:
   Zdd
   make_error();
 
+#if 0
   /// @brief singletonを表すZDDを作る
   /// @param[in] varid 変数番号
   /// @return 生成された ZDD
@@ -121,9 +123,10 @@ public:
   /// @param[in] chd_1 1枝の指す ZDD
   /// @return 生成された ZDD
   Zdd
-  make_zdd(tVarId varid,
+  make_zdd(VarId varid,
 	   const Zdd& chd_0,
 	   const Zdd& chd_1);
+#endif
 
   /// @brief 複数のZDDのintersectionを求める．
   /// @param[in] zdds ZDD のベクタ
@@ -141,7 +144,7 @@ public:
   /// @param[in] zdds ZDD のベクタ
   /// @return 生成された ZDD
   Zdd
-  uion_op(const ZddVector& zdds);
+  union_op(const ZddVector& zdds);
 
   /// @brief 複数のZDDのunionを求める．
   /// @param[in] zdds ZDD のリスト
@@ -183,26 +186,26 @@ public:
   /// @retval false 確保に失敗した
   /// @note 新しい変数は最後の変数の後ろに挿入される．
   bool
-  new_var(tVarId varid);
+  new_var(VarId varid);
 
   /// @brief 現在登録されている変数をそのレベルの昇順で返す．
   /// @param[out] vlist 変数を格納するリスト
   /// @return 変数の要素数
-  tVarSize
-  var_list(list<tVarId>& vlist) const;
+  ymuint
+  var_list(list<VarId>& vlist) const;
 
   /// @brief 変数番号からレベルを得る．
   /// @param[in] varid 変数番号
   /// @return varid に対応するレベル
   /// @note もしもレベルが割り当てられていない場合にはエラーとなる．
-  tLevel
-  level(tVarId varid) const;
+  ymuint
+  level(VarId varid) const;
 
   /// @brief レベルから変数番号を得る．
   /// @param[in] level レベル
   /// @return level に対応する変数番号
-  tVarId
-  varid(tLevel level) const;
+  VarId
+  varid(ymuint level) const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////

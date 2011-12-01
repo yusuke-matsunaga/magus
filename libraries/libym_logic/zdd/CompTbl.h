@@ -9,10 +9,11 @@
 /// All rights reserved.
 
 
-#include "ZddMgrImp.h"
+#include "ym_logic/zdd_nsdef.h"
+#include "ZddNode.h"
 
 
-BEGIN_NAMESPACE_YM_BDD
+BEGIN_NAMESPACE_YM_ZDD
 
 //////////////////////////////////////////////////////////////////////
 /// @class CompTbl CompTbl.h "CompTbl.h"
@@ -370,7 +371,7 @@ inline
 bool
 CompTbl::check_noref(ZddEdge e)
 {
-  Node* vp = ZddMgrImpl::get_node(e);
+  ZddNode* vp = e.get_node();
   return vp && vp->noref();
 }
 
@@ -522,6 +523,6 @@ CompTbl3::put(ZddEdge id1,
   tmp->mAns = ans;
 }
 
-END_NAMESPACE_YM_BDD
+END_NAMESPACE_YM_ZDD
 
-#endif // LIBYM_LOGIC_BDD_BMC_BMCCOMPTBL_H
+#endif // COMPTBL_H

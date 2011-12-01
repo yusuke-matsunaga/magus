@@ -26,14 +26,18 @@ ZddMgrImpl*
 ZddMgrImpl::default_mgr()
 {
   if ( !mDefaultMgr ) {
-    mDefaultMgr = new ZddMgrClassic("default manager");
+    mDefaultMgr = new ZddMgrImpl("default manager");
     assert_cond(mDefaultMgr, __FILE__, __LINE__);
   }
   return mDefaultMgr;
 }
 
-// コンストラクタ
-ZddMgrImpl::ZddMgrImpl()
+// @brief コンストラクタ
+// @param[in] name 名前
+// @param[in] option オプション
+ZddMgrImpl::ZddMgrImpl(const string& name,
+		       const string& option) :
+  mName(name)
 {
   mRefCount = 0;
 

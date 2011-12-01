@@ -57,14 +57,6 @@ class ZddEdge;
 /// @name 型名の定義
 /// @{
 
-/// @brief ZDD の変数番号
-/// @ingroup Zdd
-typedef ymuint32 tVarId;
-
-/// @brief ZDD の節点のレベル
-/// @ingroup Zdd
-typedef ymuint32 tLevel;
-
 /// @brief ZDD のベクタ
 /// @ingroup Zdd
 typedef vector<Zdd> ZddVector;

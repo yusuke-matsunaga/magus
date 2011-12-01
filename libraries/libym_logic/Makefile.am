@@ -8,6 +8,7 @@ SUBDIRS = \
 	tvfunc \
 	npn \
 	bdd \
+	zdd \
 	sat \
 	aig \
 	. \

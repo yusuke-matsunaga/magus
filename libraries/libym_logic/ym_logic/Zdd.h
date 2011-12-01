@@ -12,11 +12,12 @@
 
 #include "ym_logic/zdd_nsdef.h"
 #include "ym_logic/ZddEdge.h"
+#include "ym_logic/VarId.h"
 #include "ym_utils/BinIO.h"
 #include "gmpxx.h"
 
 
-BEGIN_NAMESPACE_YM_BDD
+BEGIN_NAMESPACE_YM_ZDD
 
 //////////////////////////////////////////////////////////////////////
 /// @name 定数の定義
@@ -24,7 +25,7 @@ BEGIN_NAMESPACE_YM_BDD
 
 /// @brief 葉のノードの仮想的なレベル
 /// @ingroup Zdd
-const tLevel kLevelMax = 0xFFFFFFFF;
+const ymuint kZddLevelMax = 0xFFFFFFFF;
 
 /// @}
 //////////////////////////////////////////////////////////////////////
@@ -33,7 +34,7 @@ const tLevel kLevelMax = 0xFFFFFFFF;
 //////////////////////////////////////////////////////////////////////
 /// @class Zdd Zdd.h "ym_logic/Zdd.h"
 /// @ingroup Zdd
-/// @brief BDDを表すクラス
+/// @brief ZDDを表すクラス
 /// @sa ZddMgr
 //////////////////////////////////////////////////////////////////////
 class Zdd
@@ -172,14 +173,14 @@ public:
   /// @return 根の節点の変数番号を返す．
   /// @note もともと定数値(葉)のZDDの場合，kVarIdMax を返し，
   /// f0, f1 には自分自身を代入する．
-  tVarId
+  VarId
   root_decomp(Zdd& f0,
 	      Zdd& f1) const;
 
   /// @brief 根の変数番号の取得
   /// @retval 根の変数番号 内部節点の場合
   /// @retval kVarIdMax 終端節点の場合
-  tVarId
+  VarId
   root_var() const;
 
   /// @brief 0枝の指しているコファクターの取得
@@ -207,13 +208,13 @@ public:
   /// @param[in] var 変数番号
   /// @return 変数 var を含まないコファクターを返す．
   Zdd
-  cofactor0(tVarId var) const;
+  cofactor0(VarId var) const;
 
   /// @brief コファクター演算
   /// @param[in] var 変数番号
   /// @return 変数 var を含むコファクターを返す．
   Zdd
-  cofactor1(tVarId var) const;
+  cofactor1(VarId var) const;
 
   /// @brief 変数インデックスの置き換えを行う．
   /// @param[in] var_map 置き換え元の変数から置き換え先の変数への写像
@@ -267,18 +268,18 @@ public:
   /// @brief サポート変数集合の計算 (VarVector)
   /// @param[out] support サポート変数集合を格納するベクタ
   /// @return サポートの要素数
-  tVarSize
+  ymuint
   support(VarVector& support) const;
 
   /// @brief サポート変数集合の計算 (VarList)
   /// @param[out] support サポート変数集合を格納するリスト
   /// @return サポートの要素数
-  tVarSize
+  ymuint
   support(VarList& support) const;
 
   /// @brief サポート変数集合の要素数の計算
   /// @return サポート変数集合の要素数
-  tVarSize
+  ymuint
   support_size() const;
 
   /// @}
@@ -351,31 +352,31 @@ public:
   size(const ZddList& array);
 
   friend
-  tVarSize
+  ymuint
   support(const ZddVector& bdd_array,
 	  VarVector& sup);
 
   friend
-  tVarSize
+  ymuint
   support(const ZddVector& bdd_array,
 	  VarList& sup);
 
   friend
-  tVarSize
+  ymuint
   support_size(const ZddVector& bdd_array);
 
   friend
-  tVarSize
+  ymuint
   support(const ZddList& bdd_array,
 	  VarVector& sup);
 
   friend
-  tVarSize
+  ymuint
   support(const ZddList& bdd_array,
 	  VarList& sup);
 
   friend
-  tVarSize
+  ymuint
   support_size(const ZddList& bdd_array);
 
 
@@ -386,11 +387,11 @@ private:
 
   /// @brief ZDD マネージャと根の枝を引数とするコンストラクタ
   /// @param[in] mgr ZDD マネージャ
-  /// @param[in] e 根の枝
+  /// @param[in] root 根の枝
   Zdd(ZddMgrImpl* mgr,
       ZddEdge root);
 
-  // 根の枝をとり出す
+  /// @brief 根の枝をとり出す
   ZddEdge
   root() const;
 
@@ -461,16 +462,6 @@ Zdd
 operator-(const Zdd& src1,
 	  const Zdd& src2);
 
-/// @relates Zdd
-/// @ingroup Zdd
-/// @brief 変数への値の代入
-/// @param[in] src もとの ZDD
-/// @param[in] r 固定する変数を表したリテラルの集合
-/// @return r に従って変数を固定した ZDD
-Zdd
-operator/(const Zdd& src,
-	  const ZddLitSet& r);
-
 /// src1 と src2 が等価でない場合 true を返す．
 bool
 operator!=(const Zdd& src1,
@@ -493,59 +484,90 @@ operator<(const Zdd& src1,
 	  const Zdd& src2);
 #endif
 
-// ZDDの配列の内容を書き出す
-// と同時にノード数を返す．
+/// @brief ZDDの配列の内容を書き出す
+/// @param[in] array ZDD を収めた配列
+/// @param[in] s 出力先のストリーム
+/// @return ノード数を返す．
 ymuint64
 print(const ZddVector& array,
       ostream& s);
+
+/// @brief ZDDの配列の内容を書き出す
+/// @param[in] array ZDD を収めた配列
+/// @param[in] s 出力先のストリーム
+/// @return ノード数を返す．
 ymuint64
 print(const ZddList& array,
       ostream& s);
 
-// ZDDの配列の内容を保存用に書き出す
+/// @brief ZDDの配列の内容をバイナリファイルに書き出す
+/// @param[in] array ZDD を収めた配列
+/// @param[in] s 出力先のストリーム
 void
 dump(const ZddVector& array,
      BinO& s);
 
-// ZDDの配列の内容を保存用に書き出す
+/// @brief ZDDの配列の内容をバイナリファイルに書き出す
+/// @param[in] array ZDD を収めた配列
+/// @param[in] s 出力先のストリーム
 void
 dump(const ZddList& array,
      BinO& s);
 
-// ZDDの配列のノード数を数える
+/// @brief ZDDの配列のノード数を数える
+/// @param[in] array ZDD を収めた配列
+/// @return 配列全体で使っているノード数
 ymuint64
 size(const ZddVector& array);
 
-// ZDDの配列のノード数を数える
+/// @brief ZDDの配列のノード数を数える
+/// @param[in] array ZDD を収めた配列
+/// @return 配列全体で使っているノード数
 ymuint64
 size(const ZddList& array);
 
-// ZDD のベクタのサポートを求める．
-tVarSize
-support(const ZddVector& bdd_array,
+/// @brief ZDD の配列のサポートを求める．
+/// @param[in] array ZDD を収めた配列
+/// @param[out] sup サポート変数を収める配列
+/// @return サポート数を返す．
+ymuint
+support(const ZddVector& array,
 	VarVector& sup);
 
-// ZDD のベクタのサポートを求める．
-tVarSize
-support(const ZddVector& bdd_array,
+/// @brief ZDD の配列のサポートを求める．
+/// @param[in] array ZDD を収めた配列
+/// @param[out] sup サポート変数を収めるリスト
+/// @return サポート数を返す．
+ymuint
+support(const ZddVector& array,
 	VarList& sup);
 
-// ZDD のベクタのサポートを求める．
-tVarSize
+/// @brief ZDD の配列のサポート数を求める．
+/// @param[in] array ZDD を収めた配列
+/// @return サポート数を返す．
+ymuint
 support_size(const ZddVector& bdd_array);
 
-// ZDD のリストのサポートを求める．
-tVarSize
+/// @brief ZDD のリストのサポートを求める．
+/// @param[in] array ZDD を収めた配列
+/// @param[out] sup サポート変数を収める配列
+/// @return サポート数を返す．
+ymuint
 support(const ZddList& bdd_array,
 	VarVector& sup);
 
-// ZDD のリストのサポートを求める．
-tVarSize
+/// @brief ZDD のリストのサポートを求める．
+/// @param[in] array ZDD を収めた配列
+/// @param[out] sup サポート変数を収める配列
+/// @return サポート数を返す．
+ymuint
 support(const ZddList& bdd_array,
 	VarList& sup);
 
-// ZDD のリストのサポートを求める．
-tVarSize
+/// @brief ZDD のリストのサポート数を求める．
+/// @param[in] array ZDD を収めた配列
+/// @return サポート数を返す．
+ymuint
 support_size(const ZddList& bdd_array);
 
 /// @}
@@ -716,16 +738,6 @@ operator<(const Zdd& src1,
   return src2 > src1;
 }
 #endif
-
-// @brief リテラルによるコファクター演算
-// @param literal コファクタリングの変数番号と極性を組にしたもの
-// @return コファクター
-inline
-Zdd
-Zdd::cofactor(const Literal& literal) const
-{
-  return cofactor(literal.varid(), literal.pol());
-}
 
 // @brief ハッシュ関数
 // @return ハッシュ値

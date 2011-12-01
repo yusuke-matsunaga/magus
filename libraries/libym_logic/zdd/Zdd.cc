@@ -1,5 +1,5 @@
 
-/// @file libym_logic/zdd/base/Zdd.cc
+/// @file Zdd.cc
 /// @brief Zdd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -8,7 +8,7 @@
 
 
 #include "ym_logic/Zdd.h"
-
+#include "ym_logic/ZddMgr.h"
 #include "ZddMgrImpl.h"
 #include "Dumper.h"
 
@@ -135,7 +135,7 @@ Zdd::operator|=(const Zdd& src2)
   else {
     ZddEdge e1 = mRoot;
     ZddEdge e2 = src2.mRoot;
-    ans = ~mMgr->cup_op(e1, e2);
+    ans = mMgr->cup_op(e1, e2);
   }
   assign(ans);
   return *this;
@@ -143,7 +143,7 @@ Zdd::operator|=(const Zdd& src2)
 
 // @brief diff 付き代入
 const Zdd&
-Zdd::operator^=(const Zdd& src2)
+Zdd::operator-=(const Zdd& src2)
 {
   ZddEdge ans;
   if ( mMgr != src2.mMgr ) {
@@ -189,32 +189,23 @@ Zdd::operator>=(const Zdd& src2) const
 }
 #endif
 
-// @brief 変数インデックスの置き換え
+// @brief 変数を含まないコファクターを返す．
 Zdd
-Zdd::remap_var(const VarVarMap& var_map) const
+Zdd::cofactor0(VarId var) const
 {
-  mMgr->compose_start();
-  for (VarVarMap::const_iterator p = var_map.begin();
-       p != var_map.end(); ++ p) {
-    tVarId id = p->first;
-    tVarId mid = p->second;
-    Zdd zdd(mMgr, mMgr->make_singleton(mid));
-    mMgr->compose_reg(id, zdd.mRoot);
-  }
-  ZddEdge ans = mMgr->compose(mRoot);
+  ZddEdge ans = mMgr->cofactor0(mRoot, var);
   return Zdd(mMgr, ans);
 }
 
-// @brief コファクター演算
+// @brief 変数を含むコファクターを返す．
 Zdd
-Zdd::cofactor(tVarId var,
-	      tPol pol) const
+Zdd::cofactor1(VarId var) const
 {
-  ZddEdge ans = mMgr->scofactor(mRoot, var, pol);
+  ZddEdge ans = mMgr->cofactor1(mRoot, var);
   return Zdd(mMgr, ans);
 }
 
-// @brief intersectionD 演算
+// @brief intersection 演算
 Zdd
 operator&(const Zdd& src1,
 	  const Zdd& src2)
@@ -232,34 +223,26 @@ operator|(const Zdd& src1,
 
 // @brief diff 演算
 Zdd
-operator^(const Zdd& src1,
+operator-(const Zdd& src1,
 	  const Zdd& src2)
 {
-  return Zdd(src1).operator^=(src2);
-}
-
-// @brief 複数変数のコファクター演算
-Zdd
-operator/(const Zdd& src,
-	  const ZddLitSet& lit_set)
-{
-  return Zdd(src).operator/=(lit_set.function());
+  return Zdd(src1).operator-=(src2);
 }
 
 // @brief Shannon 展開 (Boole 展開) を行なう．
-tVarId
+VarId
 Zdd::root_decomp(Zdd& f0,
 		 Zdd& f1) const
 {
   ZddEdge e0, e1;
-  tVarId ans = mMgr->root_decomp(mRoot, e0, e1);
+  VarId ans = mMgr->root_decomp(mRoot, e0, e1);
   f0 = Zdd(mMgr, e0);
   f1 = Zdd(mMgr, e1);
   return ans;
 }
 
 // @brief 根の変数番号を取り出す．
-tVarId
+VarId
 Zdd::root_var() const
 {
   return mMgr->root_var(mRoot);
@@ -281,42 +264,43 @@ Zdd::edge1() const
   return Zdd(mMgr, ans);
 }
 
+#if 0
 // @brief ZDD の内容を書き出す．
 ymuint64
-Zdd::display(ostream& s) const
+Zdd::print(ostream& s) const
 {
-  Displayer displayer(mMgr, s);
-  displayer.display_root(mRoot);
-  return displayer.num();
+  Printer printer(mMgr, s);
+  printer.print_root(mRoot);
+  return printer.num();
 }
 
 // @brief ZDD ベクタの内容を書き出す
 // @param[in] array ZDD ベクタ
 // @param[in] s 出力ストリーム
 ymuint64
-display(const ZddVector& array,
-	ostream& s)
+print(const ZddVector& array,
+      ostream& s)
 {
   if ( array.empty() ) {
     return 0;
   }
   // 今は array の中のZDDのマネージャがすべて同じと仮定している．
   ZddMgrImpl* mgr = array.front().mMgr;
-  Displayer displayer(mgr, s);
+  Printer printer(mgr, s);
   for (ZddVector::const_iterator p = array.begin();
        p != array.end(); ++ p) {
     Zdd zdd = *p;
-    displayer.display_root(zdd.root());
+    print.print_root(zdd.root());
   }
-  return displayer.num();
+  return printer.num();
 }
 
 // @brief ZDD リストの内容を書き出す
 // @param[in] array ZDD リスト
 // @param[in] s 出力ストリーム
 ymuint64
-display(const ZddList& array,
-	ostream& s)
+print(const ZddList& array,
+      ostream& s)
 {
   if ( array.empty() ) {
     return 0;
@@ -331,7 +315,9 @@ display(const ZddList& array,
   }
   return displayer.num();
 }
+#endif
 
+#if 0
 // @brief 内容のダンプ
 void
 Zdd::dump(ostream& s) const
@@ -393,6 +379,7 @@ dump(const ZddList& array,
     s << endl;
   }
 }
+#endif
 
 // @brief ZDD が使っているノード数を数える．
 ymuint64
@@ -449,7 +436,7 @@ Zdd::count() const
 }
 
 // @brief サポート変数集合の計算 (VarVector)
-tVarSize
+ymuint
 Zdd::support(VarVector& vars) const
 {
   mMgr->mark_support(mRoot);
@@ -457,7 +444,7 @@ Zdd::support(VarVector& vars) const
 }
 
 // @brief サポート変数集合の計算 (VarList)
-tVarSize
+ymuint
 Zdd::support(VarList& vars) const
 {
   mMgr->mark_support(mRoot);
@@ -465,7 +452,7 @@ Zdd::support(VarList& vars) const
 }
 
 // @brief サポート変数集合の要素数の計算
-tVarSize
+ymuint
 Zdd::support_size() const
 {
   return mMgr->mark_support(mRoot);
@@ -475,7 +462,7 @@ Zdd::support_size() const
 // @param[in] zdd_array ZDD のベクタ
 // @param[in] sup サポート変数集合を格納するベクタ
 // @return サポート変数集合の要素数
-tVarSize
+ymuint
 support(const ZddVector& zdd_array,
 	VarVector& sup)
 {
@@ -499,7 +486,7 @@ support(const ZddVector& zdd_array,
 // @param[in] zdd_array ZDD のベクタ
 // @param[in] sup サポート変数集合を格納するリスト
 // @return サポート変数集合の要素数
-tVarSize
+ymuint
 support(const ZddVector& zdd_array,
 	VarList& sup)
 {
@@ -519,32 +506,10 @@ support(const ZddVector& zdd_array,
   return mgr->mark_to_list(sup);
 }
 
-// @brief ZDD ベクタのサポート変数集合の計算 (ZddVarSet)
-// @param[in] zdd_array ZDD のベクタ
-// @return サポート変数集合
-ZddVarSet
-support(const ZddVector& zdd_array)
-{
-  if ( zdd_array.empty() ) {
-    return ZddVarSet(ZddMgr::default_mgr());
-  }
-  list<ZddEdge> edge_list;
-  for (ZddVector::const_iterator p = zdd_array.begin();
-       p != zdd_array.end(); ++ p) {
-    Zdd zdd = *p;
-    edge_list.push_back(zdd.root());
-  }
-  // 今は手抜きで zdd_array 中の ZDD のマネージャは全部同じと仮定している．
-  ZddMgrImpl* mgr = zdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  ZddEdge ans = mgr->mark_to_zdd();
-  return ZddVarSet(Zdd(mgr, ans));
-}
-
 // @brief ZDD ベクタのサポート変数集合の要素数の計算
 // @param[in] zdd_array ZDD のベクタ
 // @return サポート変数集合の要素数
-tVarSize
+ymuint
 support_size(const ZddVector& zdd_array)
 {
   if ( zdd_array.empty() ) {
@@ -565,7 +530,7 @@ support_size(const ZddVector& zdd_array)
 // @param[in] zdd_array ZDD のリスト
 // @param[in] sup サポート変数集合を格納するベクタ
 // @return サポート変数集合の要素数
-tVarSize
+ymuint
 support(const ZddList& zdd_array,
 	VarVector& sup)
 {
@@ -589,7 +554,7 @@ support(const ZddList& zdd_array,
 // @param[in] zdd_array ZDD のリスト
 // @param[in] sup サポート変数集合を格納するリスト
 // @return サポート変数集合の要素数
-tVarSize
+ymuint
 support(const ZddList& zdd_array,
 	VarList& sup)
 {
@@ -609,32 +574,10 @@ support(const ZddList& zdd_array,
   return mgr->mark_to_list(sup);
 }
 
-// @brief ZDD リストのサポート変数集合の計算 (ZddVarSet)
-// @param[in] zdd_array ZDD のリスト
-// @return[in] サポート変数集合
-ZddVarSet
-support(const ZddList& zdd_array)
-{
-  if ( zdd_array.empty() ) {
-    return ZddVarSet(ZddMgr::default_mgr());
-  }
-  list<ZddEdge> edge_list;
-  for (ZddList::const_iterator p = zdd_array.begin();
-       p != zdd_array.end(); ++ p) {
-    Zdd zdd = *p;
-    edge_list.push_back(zdd.root());
-  }
-  // 今は手抜きで zdd_array 中の ZDD のマネージャは全部同じと仮定している．
-  ZddMgrImpl* mgr = zdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  ZddEdge ans = mgr->mark_to_zdd();
-  return ZddVarSet(Zdd(mgr, ans));
-}
-
 // @brief ZDD リストのサポート変数集合の要素数の計算
 // @param[in] zdd_array ZDD のリスト
 // @return サポート変数集合の要素数
-tVarSize
+ymuint
 support_size(const ZddList& zdd_array)
 {
   if ( zdd_array.empty() ) {

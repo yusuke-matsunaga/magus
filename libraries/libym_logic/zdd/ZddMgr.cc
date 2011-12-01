@@ -12,9 +12,6 @@
 #include "ZddMgrImpl.h"
 #include "Dumper.h"
 
-#include "bmc/ZddMgrClassic.h"
-#include "bmm/ZddMgrModern.h"
-
 #include "ym_utils/HeapTree.h"
 
 
@@ -54,15 +51,7 @@ ZddMgr::ZddMgr(const string& type,
 	       const string& name,
 	       const string& option)
 {
-  if ( type == "bmc" ) {
-    mImpl = new ZddMgrClassic(name, option);
-  }
-  else if ( type == "bmm" ) {
-    mImpl = new ZddMgrModern(name, option);
-  }
-  else {
-    mImpl = new ZddMgrClassic(name, option);
-  }
+  mImpl = new ZddMgrImpl(name, option);
   assert_cond(mImpl, __FILE__, __LINE__);
 }
 
@@ -103,6 +92,7 @@ ZddMgr::make_overflow()
   return Zdd(mImpl, ZddEdge::make_overflow());
 }
 
+#if 0
 // singletonを表すZDDを作る．
 Zdd
 ZddMgr::make_singleton(ymuint32 varid)
@@ -121,6 +111,7 @@ ZddMgr::make_zdd(ymuint32 index,
 {
   return Zdd(mImpl, mImpl->make_zdd(index, chd0.root(), chd1.root()));
 }
+#endif
 
 // 複数のZDDのintersectionを求める．
 Zdd
@@ -219,7 +210,7 @@ ZddMgr::cap_op(const ZddList& zdds)
 
 // 複数のZDDのunionを求める．
 Zdd
-ZddMgr::cup_op(const ZddVector& zdds)
+ZddMgr::union_op(const ZddVector& zdds)
 {
   ymuint n = zdds.size();
   if ( n == 0 ) {
@@ -261,7 +252,7 @@ ZddMgr::cup_op(const ZddVector& zdds)
 }
 
 Zdd
-ZddMgr::cup_op(const ZddList& zdds)
+ZddMgr::union_op(const ZddList& zdds)
 {
   ymuint n = zdds.size();
   if ( n == 0 ) {
@@ -316,29 +307,29 @@ ZddMgr::cup_op(const ZddList& zdds)
 // 確保に失敗したら false を返す．
 // 最後の変数の後ろに挿入される．
 bool
-ZddMgr::new_var(tVarId varid)
+ZddMgr::new_var(VarId varid)
 {
   return mImpl->new_var(varid);
 }
 
 // 現在登録されている変数をそのレベルの昇順で返す．
-tVarSize
-ZddMgr::var_list(list<tVarId>& vlist) const
+ymuint
+ZddMgr::var_list(list<VarId>& vlist) const
 {
   return mImpl->var_list(vlist);
 }
 
 // 変数番号からレベルを得る．
 // もしもレベルが割り当てられていない場合にはエラーとなる．
-tLevel
-ZddMgr::level(tVarId varid) const
+ymuint
+ZddMgr::level(VarId varid) const
 {
   return mImpl->level(varid);
 }
 
 // レベルから変数番号を得る．
-tVarId
-ZddMgr::varid(tLevel level) const
+VarId
+ZddMgr::varid(ymuint level) const
 {
   return mImpl->varid(level);
 }

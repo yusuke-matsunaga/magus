@@ -24,24 +24,24 @@ class ZddVar
 public:
 
   // 変数番号を得る．
-  tVarId
+  VarId
   varid() const
   {
     return mId;
   }
 
   // レベルを得る．
-  tLevel
+  ymuint
   level() const
   {
-    return tLevel(mId);
+    return mId.val();
   }
 
 
 private:
 
   // コンストラクタ
-  ZddVar(tVarId id) :
+  ZddVar(VarId id) :
     mId(id),
     mMark(0),
     mLink(NULL)
@@ -61,7 +61,7 @@ private:
 
   // 変数番号
   // レベルも同一
-  tVarId mId;
+  VarId mId;
 
   // 作業用のマーク
   int mMark;
@@ -121,11 +121,11 @@ public:
   var() const;
 
   /// @brief 変数インデックス値を得る
-  tVarId
+  VarId
   varid() const;
 
   /// @brief レベルを得る．
-  tLevel
+  ymuint
   level() const;
 
   /// @brief mark が付いていたらtrueを返す
@@ -223,7 +223,7 @@ ZddNode::var() const
 
 // 変数インデックス値を得る
 inline
-tVarId
+VarId
 ZddNode::varid() const
 {
   return mVar->varid();
@@ -231,7 +231,7 @@ ZddNode::varid() const
 
 // レベルを得る
 inline
-tLevel
+ymuint
 ZddNode::level() const
 {
   return mVar->level();
@@ -248,13 +248,13 @@ ZddNode::mark() const
 // mark を付ける
 inline
 void
-ZddNode::pmark(int val)
+ZddNode::mark(int val)
 {
   if ( val ) {
-    mRefMark |= kPMask;
+    mRefMark |= kMMask;
   }
   else {
-    mRefMark &= ~kPMask;
+    mRefMark &= ~kMMask;
   }
 }
 
@@ -325,7 +325,7 @@ struct hash<nsYm::nsZdd::ZddNode*>
   ymuint
   operator()(nsYm::nsZdd::ZddNode* node) const
   {
-    return reinterpret_cast<ymuint>(node)/sizeof(void*);
+    return reinterpret_cast<ympuint>(node) / sizeof(void*);
   }
 };
 END_NAMESPACE_HASH

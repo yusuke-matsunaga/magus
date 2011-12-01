@@ -16,6 +16,8 @@
 
 BEGIN_NAMESPACE_YM_ZDD
 
+class ZddNode;
+
 //////////////////////////////////////////////////////////////////////
 /// @class ZddEdge ZddEdge.h "ym_logic/ZddEdge.h"
 /// @brief ZDD の枝を表すクラス
@@ -35,15 +37,13 @@ public:
   /// @brief コンストラクタ
   /// @param[in] node ノード
   explicit
-  ZddEdge(void* node);
+  ZddEdge(ZddNode* node);
 
   /// @brief コンストラクタ
   /// @param[in] node ノード
-  ZddEdge(void* node);
-
-  /// @brief コンストラクタ
-  /// @param[in] src コピー元の枝
-  ZddEdge(const ZddEdge& src);
+  /// @param[in] zattr 0-element 属性
+  ZddEdge(ZddNode* node,
+	  bool zattr);
 
   /// @brief コンストラクタ
   /// @param[in] src コピー元の枝
@@ -115,12 +115,30 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ノードのポインタ型への変換
+  // ノードと属性に関する関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ノードのポインタを取り出す．
-  void*
-  get_ptr() const;
+  ZddNode*
+  get_node() const;
+
+  /// @brief 0-element 属性を取り出す．
+  bool
+  zattr() const;
+
+  /// @brief 属性を取り去る．
+  /// @return 自分自身への参照を返す．
+  const ZddEdge&
+  normalize();
+
+  /// @brief 属性を取り去った枝を返す．
+  ZddEdge
+  get_normal() const;
+
+  /// @brief 属性を付加する．
+  /// @return 自分自身への参照を返す．
+  const ZddEdge&
+  add_zattr();
 
 
 public:
@@ -137,6 +155,7 @@ public:
   is_one() const;
 
   /// @brief 定数ノードのチェック
+  /// @note 要するに定数0か定数1
   bool
   is_const() const;
 
@@ -153,6 +172,7 @@ public:
   is_invalid() const;
 
   /// @brief 終端枝のチェック
+  /// @note 定数0，定数1，エラー，オーバーフローのいずれかの時に真となる．
   bool
   is_leaf() const;
 
@@ -219,7 +239,7 @@ ZddEdge::ZddEdge() :
 // @brief コンストラクタ
 // @param[in] node ノード
 inline
-ZddEdge::ZddEdge(void* node) :
+ZddEdge::ZddEdge(ZddNode* node) :
   mBody(reinterpret_cast<ympuint>(node))
 {
 }
@@ -274,18 +294,46 @@ ZddEdge::make_error()
 
 // @brief ノードのポインタを取り出す．
 inline
-void*
-ZddEdge::get_ptr() const
+ZddNode*
+ZddEdge::get_node() const
 {
-  return reinterpret_cast<void*>(mBody & ~3UL);
+  return reinterpret_cast<ZddNode*>(mBody & ~3UL);
 }
 
-// @brief 極性を取り出す．
+// @brief 0-element 属性を取り出す．
 inline
-tPol
-ZddEdge::pol() const
+bool
+ZddEdge::zattr() const
 {
-  return static_cast<tPol>(mBody & 1UL);
+  return static_cast<bool>(mBody & 1UL);
+}
+
+// @brief 属性を取り去る．
+// @return 自分自身への参照を返す．
+inline
+const ZddEdge&
+ZddEdge::normalize()
+{
+  mBody &= ~1UL;
+  return *this;
+}
+
+// @brief 属性を取り去った枝を返す．
+inline
+ZddEdge
+ZddEdge::get_normal() const
+{
+  return ZddEdge(mBody & ~1UL);
+}
+
+// @brief 属性を付加する．
+// @return 自分自身への参照を返す．
+inline
+const ZddEdge&
+ZddEdge::add_zattr()
+{
+  mBody |= 1UL;
+  return *this;
 }
 
 // @brief 等価比較
@@ -306,7 +354,6 @@ operator!=(const ZddEdge& left,
   return left.mBody != right.mBody;
 }
 
-#if 0
 // @brief 大小比較
 // @note 対象演算の時の順序の正規化に使う．
 inline
@@ -326,7 +373,6 @@ operator>(const ZddEdge& left,
 {
   return left.mBody > right.mBody;
 }
-#endif
 
 // @brief 定数0ノードのチェック
 inline
