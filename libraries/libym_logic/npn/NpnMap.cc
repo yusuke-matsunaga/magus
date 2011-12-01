@@ -1,9 +1,7 @@
 
-/// @file libym_npn/NpnMap.cc
+/// @file NpnMap.cc
 /// @brief NpnMap の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: NpnMap.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
@@ -34,7 +32,7 @@ NpnMap::NpnMap() :
 // 各入力の変換内容は kImapBad になっている．
 NpnMap::NpnMap(ymuint ni,
 	       tPol pol) :
-  mNiPol((ni << 1) | static_cast<ymuint>(pol))
+  mNiPol((ni << 1) | static_cast<ymuint32>(pol))
 {
   for (ymuint i = 0; i < ni; ++ i) {
     mImap[i] = NpnVmap::invalid();
@@ -98,24 +96,17 @@ NpnMap::set_identity(ymuint new_ni)
   }
 }
 
-// pos 番目の入力の変換内容を設定する．
-void
-NpnMap::set(VarId src_var,
-	    VarId dst_var,
-	    tPol pol)
-{
-  ymuint src_pos = src_var.val();
-  if ( src_pos < ni() ) {
-    mImap[src_pos] = NpnVmap(dst_var, pol);
-  }
-}
+// @brief 入力の変換内容の設定
+// @param[in] src_var 入力変数
+// @param[in] dst_var 変換先の入力変数
+// @param[in] pol 極性
 void
 NpnMap::set(VarId var,
 	    NpnVmap imap)
 {
-  ymuint pos = var.val();
-  if ( pos < ni() ) {
-    mImap[pos] = imap;
+  ymuint src_pos = var.val();
+  if ( src_pos < ni() ) {
+    mImap[src_pos] = imap;
   }
 }
 

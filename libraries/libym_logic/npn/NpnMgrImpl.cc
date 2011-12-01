@@ -158,7 +158,7 @@ ww0_refine(vector<NpnConf>& pollist)
     cout << "before ww0_refine()" << endl;
     for (ymuint i = 0; i < pollist.size(); ++ i) {
       const NpnConf& conf = pollist[i];
-      conf.dump(cout);
+      conf.print(cout);
     }
     cout << endl;
   }
@@ -198,7 +198,7 @@ ww0_refine(vector<NpnConf>& pollist)
     cout << "after ww0_refine()" << endl;
     for (ymuint i = 0; i < pollist.size(); ++ i) {
       const NpnConf& conf = pollist[i];
-      conf.dump(cout);
+      conf.print(cout);
     }
     cout << endl;
   }
@@ -267,7 +267,7 @@ NpnMgrImpl::cannonical(const TvFunc& func,
   if ( !conf0.is_resolved() && conf0.nc() > 1 ) {
     if ( debug ) {
       cout << "Before step1" << endl;
-      conf0.dump(cout);
+      conf0.print(cout);
     }
 
     // W1:cnum:bisym を用いてグループわけを行う．
@@ -275,7 +275,7 @@ NpnMgrImpl::cannonical(const TvFunc& func,
 
     if ( debug ) {
       cout << "After step1" << endl;
-      conf0.dump(cout);
+      conf0.print(cout);
     }
   }
 
@@ -321,7 +321,7 @@ NpnMgrImpl::cannonical(const TvFunc& func,
     for (vector<NpnConf>::iterator p = mMaxList.begin();
 	 p != mMaxList.end(); ++ p) {
       const NpnConf& conf = *p;
-      conf.dump(cout);
+      conf.print(cout);
       NpnMap map;
       conf.set_map(map);
       TvFunc func1 = func.xform(map);
@@ -623,7 +623,7 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
 {
   if ( debug & debug_w2max_recur ) {
     cout << "w2max_recur(" << g0 << ")" << endl;
-    conf.dump(cout);
+    conf.print(cout);
   }
 
   ++ mW2max_count;
@@ -781,7 +781,7 @@ w2refine2_sub(NpnConf& conf,
 {
   if ( debug & debug_w2refine) {
     cout << "conf" << endl;
-    conf.dump(cout);
+    conf.print(cout);
   }
 
   // 極性の確定を行う．
@@ -806,7 +806,7 @@ w2refine2_sub(NpnConf& conf,
   }
   if ( debug & debug_w2refine) {
     cout << " =>" << endl;
-    conf.dump(cout);
+    conf.print(cout);
     cout << endl;
   }
 }
@@ -867,7 +867,7 @@ NpnMgrImpl::w2max_recur(vector<NpnConf>& conf_list,
       for (vector<NpnConf>::const_iterator p = conf_list.begin();
 	   p != conf_list.end(); ++ p) {
 	const NpnConf& conf = *p;
-	conf.dump(cout);
+	conf.print(cout);
       }
       cout << endl;
     }
@@ -977,7 +977,7 @@ NpnMgrImpl::w2max_recur(vector<NpnConf>& conf_list,
       for (list<NpnConf>::iterator p = conf_list1.begin();
 	   p != conf_list1.end(); ++ p) {
 	const NpnConf& conf = *p;
-	conf.dump(cout);
+	conf.print(cout);
       }
       cout << endl;
     }

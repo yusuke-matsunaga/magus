@@ -182,30 +182,39 @@ private:
 
 };
 
-// @brief 逆写像を求める．
-// @param[in] src 入力となるマップ
-// @return src の逆写像
-// @note 1対1写像でなければ答えは不定．
+
+//////////////////////////////////////////////////////////////////////
+// NpnMapM に関連した関数
+//////////////////////////////////////////////////////////////////////
+
+/// @relates NpnMapM
+/// @brief 逆写像を求める．
+/// @param[in] src 入力となるマップ
+/// @return src の逆写像
+/// @note 1対1写像でなければ答えは不定．
 NpnMapM
 inverse(const NpnMapM& src);
 
-// @brief 合成を求める．
-// @param[in] src1,src2 入力となるマップ
-// @return src1 と src2 を合成したもの
-// @note src1の値域とsrc2の定義域は一致していな
-// ければならない．そうでなければ答えは不定．
+/// @relates NpnMapM
+/// @brief 合成を求める．
+/// @param[in] src1,src2 入力となるマップ
+/// @return src1 と src2 を合成したもの
+/// src1の値域とsrc2の定義域は一致していなければならない．
+/// そうでなければ答えは不定．
 NpnMapM
 operator*(const NpnMapM& src1,
 	  const NpnMapM& src2);
 
-// @brief 内容を表示する(主にデバッグ用)．
-// @param[in] s 出力ストリーム
-// @param[in] map 出力対象のマップ
-// @note 改行はしない．
+/// @relates NpnMapM
+/// @brief 内容を表示する(主にデバッグ用)．
+/// @param[in] s 出力ストリーム
+/// @param[in] map 出力対象のマップ
+/// @note 改行はしない．
 ostream&
 operator<<(ostream& s,
 	   const NpnMapM& map);
 
+/// @relates NpnMapM
 /// @brief バイナリ出力
 /// @param[in] s 出力ストリーム
 /// @param[in] map 変換マップ
@@ -214,6 +223,7 @@ BinO&
 operator<<(BinO& s,
 	   const NpnMapM& map);
 
+/// @relates NpnMapM
 /// @brief バイナリ入力
 /// @param[in] s 入力ストリーム
 /// @param[out] map 結果を格納する変数
@@ -270,6 +280,32 @@ NpnMapM::omap(VarId var) const
     return mMapArray[idx + ni()];
   }
   return NpnVmap::invalid();
+}
+
+// @brief 入力の変換内容の設定
+// @param[in] src_var 入力番号
+// @param[in] dst_var 変換先の入力番号
+// @param[in] pol 極性
+inline
+void
+NpnMapM::set_imap(VarId src_var,
+		  VarId dst_var,
+		  tPol pol)
+{
+  set_imap(src_var, NpnVmap(dst_var, pol));
+}
+
+// @brief 出力の変換内容の設定
+// @param[in] src_var 出力番号
+// @param[in] dst_var 変換先の出力番号
+// @param[in] pol 極性
+inline
+void
+NpnMapM::set_omap(VarId src_var,
+		  VarId dst_var,
+		  tPol pol)
+{
+  set_omap(src_var, NpnVmap(dst_var, pol));
 }
 
 END_NAMESPACE_YM_NPN

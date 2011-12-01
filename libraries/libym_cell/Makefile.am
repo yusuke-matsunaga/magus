@@ -37,8 +37,6 @@ libym_cell_la_SOURCES = \
 	CellMislibReader.cc \
 	CellFFInfo.cc \
 	CellLatchInfo.cc \
-	CellDumper.cc \
-	CellRestorer.cc \
 	display.cc
 
 libym_cell_la_LIBADD = \

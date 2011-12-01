@@ -280,8 +280,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 最大の入力数
-  // 特に根拠はないが，これなら Walsh 係数が 32 ビット整数で収まる．
-  // あと真理値表ベースの手法ではこれくらいが限度
+  /// 特に根拠はないが，これなら Walsh 係数が 32 ビット整数で収まる．
+  /// あと真理値表ベースの手法ではこれくらいが限度
   static
   const ymuint kMaxNi = 20;
 
@@ -294,18 +294,18 @@ public:
 
   friend
   bool
-  operator==(const TvFunc& func1,
-	     const TvFunc& func2);
+  operator==(const TvFunc& left,
+	     const TvFunc& right);
 
   friend
   bool
-  operator<(const TvFunc& func1,
-	    const TvFunc& func2);
+  operator<(const TvFunc& left,
+	    const TvFunc& right);
 
   friend
   bool
-  operator&&(const TvFunc& func1,
-	     const TvFunc& func2);
+  operator&&(const TvFunc& left,
+	     const TvFunc& right);
 
 
 private:
@@ -313,27 +313,35 @@ private:
   // 内部で使われる関数
   //////////////////////////////////////////////////////////////////////
 
-  // 恒真関数を作るコンストラクタ
-  // 2番目の引数はダミー
+  /// @brief 恒真関数を作るコンストラクタ
+  /// @param[in] ni 入力数
+  /// @param[in] dummy ダミー
+  /// 2番目の引数はダミー
   TvFunc(ymuint ni,
 	 int dummy);
 
-  // リテラル関数を作るコンストラクタ
+  /// @brief リテラル関数を作るコンストラクタ
+  /// @param[in] ni 入力数
+  /// @param[in] varid 変数番号
+  /// @param[in] pol 極性
   TvFunc(ymuint ni,
 	 VarId varid,
 	 tPol pol);
 
-  // 入力数 ni のベクタを納めるのに必要なブロック数を計算する．
+  /// @brief 入力数 ni のベクタを納めるのに必要なブロック数を計算する．
+  /// @param[in] ni 入力数
   static
   ymuint
   nblock(ymuint ni);
 
-  // pos 番目の要素のブロック位置を計算する．
+  /// @brief pos 番目の要素のブロック位置を計算する．
+  /// @param[in] pos 位置番号
   static
   ymuint
   block(ymuint pos);
 
-  // pos 番目の要素のシフト量を計算する．
+  /// @brief pos 番目の要素のシフト量を計算する．
+  /// @param[in] pos 位置番号
   static
   ymuint
   shift(ymuint pos);
@@ -362,71 +370,84 @@ private:
 
 /// @relates TvFunc
 /// @brief 否定を求める．
+/// @param[in] src オペランド
 TvFunc
 operator~(const TvFunc& src);
 
 /// @relates TvFunc
 /// @brief 論理積を求める．
+/// @param[in] left, right オペランド
 TvFunc
-operator&(const TvFunc& src1,
-	  const TvFunc& src2);
+operator&(const TvFunc& left,
+	  const TvFunc& right);
 
 /// @relates TvFunc
 /// @brief 論理和を求める．
+/// @param[in] left, right オペランド
 TvFunc
-operator|(const TvFunc& src1,
-	  const TvFunc& src2);
+operator|(const TvFunc& left,
+	  const TvFunc& right);
 
 /// @relates TvFunc
 /// @brief 排他的論理和を求める．
+/// @param[in] left, right オペランド
 TvFunc
-operator^(const TvFunc& src1,
-	  const TvFunc& src2);
+operator^(const TvFunc& left,
+	  const TvFunc& right);
 
 /// @relates TvFunc
 /// @brief 等価比較
+/// @param[in] left, right オペランド
 bool
-operator==(const TvFunc& func1,
-	   const TvFunc& func2);
+operator==(const TvFunc& left,
+	   const TvFunc& right);
 
 /// @relates TvFunc
 /// @brief 非等価比較
+/// @param[in] left, right オペランド
 bool
-operator!=(const TvFunc& src1,
-	   const TvFunc& src2);
+operator!=(const TvFunc& left,
+	   const TvFunc& right);
 
 /// @relates TvFunc
 /// @brief 大小比較(小なり)
+/// @param[in] left, right オペランド
 bool
-operator<(const TvFunc& func1,
-	  const TvFunc& func2);
+operator<(const TvFunc& left,
+	  const TvFunc& right);
 
 /// @relates TvFunc
 /// @brief 大小比較(大なり)
+/// @param[in] left, right オペランド
 bool
-operator>(const TvFunc& src1,
-	  const TvFunc& src2);
+operator>(const TvFunc& left,
+	  const TvFunc& right);
 
 /// @relates TvFunc
 /// @brief 大小比較(小なりイコール)
+/// @param[in] left, right オペランド
 bool
-operator<=(const TvFunc& src1,
-	   const TvFunc& src2);
+operator<=(const TvFunc& left,
+	   const TvFunc& right);
 
 /// @relates TvFunc
 /// @brief 大小比較(大なりイコール)
+/// @param[in] left, right オペランド
 bool
-operator>=(const TvFunc& src1,
-	   const TvFunc& src2);
+operator>=(const TvFunc& left,
+	   const TvFunc& right);
 
 /// @relates TvFunc
 /// @brief 交差チェック
+/// @param[in] left, right オペランド
 bool
-operator&&(const TvFunc& src1,
-	   const TvFunc& src2);
+operator&&(const TvFunc& left,
+	   const TvFunc& right);
 
 /// @relates TvFunc
 /// @brief ストリームに対する出力
+/// @param[in] s 出力先のストリーム
+/// @param[in] func 対象の関数
 ostream&
 operator<<(ostream& s,
 	   const TvFunc& func);
@@ -523,28 +544,28 @@ operator~(const TvFunc& src)
 // 論理積を求める．
 inline
 TvFunc
-operator&(const TvFunc& src1,
-	  const TvFunc& src2)
+operator&(const TvFunc& left,
+	  const TvFunc& right)
 {
-  return TvFunc(src1).operator&=(src2);
+  return TvFunc(left).operator&=(right);
 }
 
 // 論理和を求める．
 inline
 TvFunc
-operator|(const TvFunc& src1,
-	  const TvFunc& src2)
+operator|(const TvFunc& left,
+	  const TvFunc& right)
 {
-  return TvFunc(src1).operator|=(src2);
+  return TvFunc(left).operator|=(right);
 }
 
 // 排他的論理和を求める．
 inline
 TvFunc
-operator^(const TvFunc& src1,
-	  const TvFunc& src2)
+operator^(const TvFunc& left,
+	  const TvFunc& right)
 {
-  return TvFunc(src1).operator^=(src2);
+  return TvFunc(left).operator^=(right);
 }
 
 // @brief コファクターを返す．
@@ -561,35 +582,35 @@ TvFunc::cofactor(VarId varid,
 // 等価比較
 inline
 bool
-operator!=(const TvFunc& src1,
-	   const TvFunc& src2)
+operator!=(const TvFunc& left,
+	   const TvFunc& right)
 {
-  return !operator==(src1, src2);
+  return !operator==(left, right);
 }
 
 // 大小比較のバリエーション
 inline
 bool
-operator>(const TvFunc& src1,
-	  const TvFunc& src2)
+operator>(const TvFunc& left,
+	  const TvFunc& right)
 {
-  return operator<(src2, src1);
+  return operator<(right, left);
 }
 
 inline
 bool
-operator<=(const TvFunc& src1,
-	   const TvFunc& src2)
+operator<=(const TvFunc& left,
+	   const TvFunc& right)
 {
-  return !operator<(src2, src1);
+  return !operator<(right, left);
 }
 
 inline
 bool
-operator>=(const TvFunc& src1,
-	   const TvFunc& src2)
+operator>=(const TvFunc& left,
+	   const TvFunc& right)
 {
-  return !operator<(src1, src2);
+  return !operator<(left, right);
 }
 
 // ストリームに対する出力

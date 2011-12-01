@@ -10,11 +10,9 @@
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
-#include "ym_cell/CellDumper.h"
-#include "ym_cell/CellRestorer.h"
 
 
-BEGIN_NAMESPACE_YM_CELL
+BEGIN_NAMESPACE_YM
 
 /// @brief genlib 形式のファイルを読み込む．
 /// @param[in] filename ファイル名
@@ -38,7 +36,7 @@ read_dotlib(const char* filename)
   return read(filename);
 }
 
-END_NAMESPACE_YM_CELL
+END_NAMESPACE_YM
 
 
 int
@@ -46,7 +44,7 @@ main(int argc,
      char** argv)
 {
   using namespace std;
-  using namespace nsYm::nsCell;
+  using namespace nsYm;
 
   if ( argc < 2 ) {
     cerr << "Usage: " << argv[0] << " [--liberty] <liberty-file>" << endl;
@@ -83,23 +81,23 @@ main(int argc,
       cerr << "Could not create " << datafile << endl;
       return 2;
     }
+    BinOStream bos(os);
 
-    CellDumper dump;
-    dump(os, *library);
+    library->dump(bos);
   }
 
   {
-    ifstream ifs;
-    ifs.open(datafile, ios::binary);
-    if ( !ifs ) {
+    ifstream is;
+    is.open(datafile, ios::binary);
+    if ( !is ) {
       // エラー
       cerr << "Could not open " << datafile << endl;
       return 3;
     }
+    BinIStream bis(is);
 
-    CellRestorer restore;
-
-    const CellLibrary* library2 = restore(ifs);
+    CellLibrary* library2 = CellLibrary::new_obj();
+    library2->restore(bis);
 
     display_library(cout, *library2);
   }

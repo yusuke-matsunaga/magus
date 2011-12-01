@@ -8,7 +8,8 @@
 
 
 #include "RestoreLibrary.h"
-#include "ym_cell/CellRestorer.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -42,8 +43,11 @@ RestoreLibrary::read_library(const string& filename)
     set_result(emsg);
     return NULL;
   }
-  CellRestorer read;
-  return read(ifs);
+  BinIStream bis(ifs);
+
+  CellLibrary* library = CellLibrary::new_obj();
+  library->restore(bis);
+  return library;
 }
 
 END_NAMESPACE_MAGUS

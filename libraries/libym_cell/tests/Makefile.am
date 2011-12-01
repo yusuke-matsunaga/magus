@@ -5,7 +5,7 @@
 ## $Revision: 1.1.1.1 $
 ## $Date: 2005/12/11 17:07:26 $
 
-SUBDIRS = .
+SUBDIRS =
 
 if WITH_QT
 SUBDIRS += dotlib_ptview

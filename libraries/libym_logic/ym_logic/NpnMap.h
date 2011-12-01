@@ -55,6 +55,12 @@ public:
   /// @brief デストラクタ
   ~NpnMap();
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を設定する関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 内容をクリアする．
   /// @note 入力の変換内容は不正な値になる．
   /// 出力の極性は kPolPosi
@@ -94,6 +100,12 @@ public:
   void
   set_opol(tPol pol);
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を取得する関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 入力数を得る．
   /// @return 入力数
   ymuint
@@ -132,6 +144,12 @@ private:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+// NpnMap に関連する関数
+//////////////////////////////////////////////////////////////////////
+
+/// @relates NpnMap
 /// @brief 逆写像を求める．
 /// @param[in] src 入力となるマップ
 /// @return src の逆写像
@@ -139,6 +157,7 @@ private:
 NpnMap
 inverse(const NpnMap& src);
 
+/// @relates NpnMap
 /// @brief 合成を求める．
 /// @param[in] src1,src2 入力となるマップ
 /// @return src1 と src2 を合成したもの
@@ -148,6 +167,7 @@ NpnMap
 operator*(const NpnMap& src1,
 	  const NpnMap& src2);
 
+/// @relates NpnMap
 /// @brief 内容を表示する(主にデバッグ用)．
 /// @param[in] s 出力ストリーム
 /// @param[in] map 出力対象のマップ
@@ -156,6 +176,7 @@ ostream&
 operator<<(ostream& s,
 	   const NpnMap& map);
 
+/// @relates NpnMap
 /// @brief バイナリ出力
 /// @param[in] s 出力ストリーム
 /// @param[in] map 変換マップ
@@ -164,6 +185,7 @@ BinO&
 operator<<(BinO& s,
 	   const NpnMap& map);
 
+/// @relates NpnMap
 /// @brief バイナリ入力
 /// @param[in] s 入力ストリーム
 /// @param[out] map 結果を格納する変数
@@ -194,7 +216,9 @@ NpnMap::imap(VarId var) const
   if ( idx < ni() ) {
     return mImap[idx];
   }
-  return NpnVmap::invalid();
+  else {
+    return NpnVmap::invalid();
+  }
 }
 
 // 出力極性を返す．
@@ -203,6 +227,19 @@ tPol
 NpnMap::opol() const
 {
   return (mNiPol & 1) ? kPolNega : kPolPosi;
+}
+
+// @brief 入力の変換内容の設定
+// @param[in] src_var 入力変数
+// @param[in] dst_var 変換先の入力変数
+// @param[in] pol 極性
+inline
+void
+NpnMap::set(VarId src_var,
+	    VarId dst_var,
+	    tPol pol)
+{
+  set(src_var, NpnVmap(dst_var, pol));
 }
 
 END_NAMESPACE_YM_NPN

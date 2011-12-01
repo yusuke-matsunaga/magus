@@ -126,7 +126,10 @@ LcLogicMgr::find_repfunc(const TvFuncM& f,
     mNpnMgr.cannonical(f1, xmap1);
     xmap = NpnMapM(xmap1);
     repfunc = f.xform(xmap);
-    TvFunc repfunc1 = f1.xform(xmap1);
+    {
+      TvFunc repfunc1 = f1.xform(xmap1);
+      assert_cond( repfunc.output(VarId(0)) == repfunc1, __FILE__, __LINE__);
+    }
   }
   else {
     default_repfunc(f, repfunc, xmap);
@@ -150,6 +153,12 @@ LcLogicMgr::find_idmap_list(const TvFuncM& func,
     mNpnMgr.cannonical(f1, xmap1);
     { // 検証
       TvFunc f2 = f1.xform(xmap1);
+      if ( f1 != f2 ) {
+	cerr << "f1   = " << f1 << endl
+	     << "f2   = " << f2 << endl
+	     << "func = " << func << endl
+	     << "xmap1 = " << xmap1 << endl;
+      }
       assert_cond( f1 == f2, __FILE__, __LINE__);
     }
     vector<NpnMap> tmp_list;

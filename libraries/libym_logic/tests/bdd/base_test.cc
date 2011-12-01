@@ -521,7 +521,7 @@ test_dump(BddMgr& bddmgr)
       cout << "cannot open output file: " << fn << endl;
       return false;
     }
-    BinO bos(ofs);
+    BinOStream bos(ofs);
     bdd.dump(bos);
   }
   Bdd bdd2;
@@ -531,7 +531,7 @@ test_dump(BddMgr& bddmgr)
       cout << "cannont open input file: " << fn << endl;
       return false;
     }
-    BinI bis(ifs);
+    BinIStream bis(ifs);
     bdd2 = bddmgr.restore(bis);
   }
   if ( bdd != bdd2 ) {

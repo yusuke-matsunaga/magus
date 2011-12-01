@@ -68,18 +68,19 @@ binio_test()
     cerr << "Could not create " << datafile << endl;
     return false;
   }
+  BinOStream bos(os);
 
   for (ymuint i = 0; i < n_8; ++ i) {
-    BinIO::write_8(os, data_8[i]);
+    bos.write_8(data_8[i]);
   }
   for (ymuint i = 0; i < n_16; ++ i) {
-    BinIO::write_16(os, data_16[i]);
+    bos.write_16(data_16[i]);
   }
   for (ymuint i = 0; i < n_32; ++ i) {
-    BinIO::write_32(os, data_32[i]);
+    bos.write_32(data_32[i]);
   }
   for (ymuint i = 0; i < n_64; ++ i) {
-    BinIO::write_64(os, data_64[i]);
+    bos.write_64(data_64[i]);
   }
   os.close();
 
@@ -90,10 +91,11 @@ binio_test()
     cerr << "Could not open " << datafile << endl;
     return false;
   }
+  BinIStream bis(is);
 
   ymuint nerr = 0;
   for (ymuint i = 0; i < n_8; ++ i) {
-    ymuint8 val = BinIO::read_8(is);
+    ymuint8 val = bis.read_8();
     if ( val != data_8[i] ) {
       cerr << "data mismatch at data_8[" << i << "]" << endl
 	   << "write data = " << static_cast<ymuint>(data_8[i]) << endl
@@ -102,7 +104,7 @@ binio_test()
     }
   }
   for (ymuint i = 0; i < n_16; ++ i) {
-    ymuint16 val = BinIO::read_16(is);
+    ymuint16 val = bis.read_16();
     if ( val != data_16[i] ) {
       cerr << "data mismatch at data_16[" << i << "]" << endl
 	   << "write data = " << static_cast<ymuint>(data_16[i]) << endl
@@ -111,7 +113,7 @@ binio_test()
     }
   }
   for (ymuint i = 0; i < n_32; ++ i) {
-    ymuint32 val = BinIO::read_32(is);
+    ymuint32 val = bis.read_32();
     if ( val != data_32[i] ) {
       cerr << "data mismatch at data_32[" << i << "]" << endl
 	   << "write data = " << static_cast<ymuint>(data_32[i]) << endl
@@ -120,7 +122,7 @@ binio_test()
     }
   }
   for (ymuint i = 0; i < n_64; ++ i) {
-    ymuint64 val = BinIO::read_64(is);
+    ymuint64 val = bis.read_64();
     if ( val != data_64[i] ) {
       cerr << "data mismatch at data_64[" << i << "]" << endl
 	   << "write data = " << static_cast<ymuint>(data_64[i]) << endl
@@ -152,19 +154,19 @@ binio_test2()
       cerr << "Could not create " << datafile << endl;
       return false;
     }
-    BinO bo(os);
+    BinOStream bos(os);
 
     for (ymuint i = 0; i < n_8; ++ i) {
-      bo << data_8[i];
+      bos << data_8[i];
     }
     for (ymuint i = 0; i < n_16; ++ i) {
-      bo << data_16[i];
+      bos << data_16[i];
     }
     for (ymuint i = 0; i < n_32; ++ i) {
-      bo << data_32[i];
+      bos << data_32[i];
     }
     for (ymuint i = 0; i < n_64; ++ i) {
-      bo << data_64[i];
+      bos << data_64[i];
     }
   }
 
@@ -177,11 +179,11 @@ binio_test2()
       cerr << "Could not open " << datafile << endl;
       return false;
     }
-    BinI bi(is);
+    BinIStream bis(is);
 
     for (ymuint i = 0; i < n_8; ++ i) {
       ymuint8 val;
-      bi >> val;
+      bis >> val;
       if ( val != data_8[i] ) {
 	cerr << "data mismatch at data_8[" << i << "]" << endl
 	     << "write data = " << static_cast<ymuint>(data_8[i]) << endl
@@ -191,7 +193,7 @@ binio_test2()
     }
     for (ymuint i = 0; i < n_16; ++ i) {
       ymuint16 val;
-      bi >> val;
+      bis >> val;
       if ( val != data_16[i] ) {
 	cerr << "data mismatch at data_16[" << i << "]" << endl
 	     << "write data = " << static_cast<ymuint>(data_16[i]) << endl
@@ -201,7 +203,7 @@ binio_test2()
     }
     for (ymuint i = 0; i < n_32; ++ i) {
       ymuint32 val;
-      bi >> val;
+      bis >> val;
       if ( val != data_32[i] ) {
 	cerr << "data mismatch at data_32[" << i << "]" << endl
 	     << "write data = " << static_cast<ymuint>(data_32[i]) << endl
@@ -211,7 +213,7 @@ binio_test2()
     }
     for (ymuint i = 0; i < n_64; ++ i) {
       ymuint64 val;
-      bi >> val;
+      bis >> val;
       if ( val != data_64[i] ) {
 	cerr << "data mismatch at data_64[" << i << "]" << endl
 	     << "write data = " << static_cast<ymuint>(data_64[i]) << endl

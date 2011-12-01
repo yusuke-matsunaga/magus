@@ -140,18 +140,6 @@ NpnMapM::set_identity(ymuint ni,
 }
 
 // @brief 入力の変換内容の設定
-// @param[in] src_var 入力番号
-// @param[in] dst_var 変換先の入力番号
-// @param[in] pol 極性
-void
-NpnMapM::set_imap(VarId src_var,
-		  VarId dst_var,
-		  tPol pol)
-{
-  set_imap(src_var, NpnVmap(dst_var, pol));
-}
-
-// @brief 入力の変換内容の設定
 // @param[in] var 入力番号
 // @param[in] imap 変換情報(変換先の入力番号と極性)
 // @sa NpnVmap
@@ -163,18 +151,6 @@ NpnMapM::set_imap(VarId var,
   if ( pos < ni() ) {
     mMapArray[pos] = imap;
   }
-}
-
-// @brief 出力の変換内容の設定
-// @param[in] src_var 出力番号
-// @param[in] dst_var 変換先の出力番号
-// @param[in] pol 極性
-void
-NpnMapM::set_omap(VarId src_var,
-		  VarId dst_var,
-		  tPol pol)
-{
-  set_omap(src_var, NpnVmap(dst_var, pol));
 }
 
 // @brief 出力の変換内容の設定

@@ -10,8 +10,6 @@
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
-#include "ym_cell/CellDumper.h"
-#include "ym_cell/CellRestorer.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -44,14 +42,14 @@ dump_load_test(const char* in_filename,
       cerr << "Could not create " << data_filename << endl;
       return false;
     }
+    BinOStream bos(os);
 
-    CellDumper dump;
-    dump(os, *library);
+    library->dump(bos);
 
     os.close();
   }
 
-  const CellLibrary* library2 = NULL;
+  CellLibrary* library2 = NULL;
   {
     ifstream ifs;
     ifs.open(data_filename, ios::binary);
@@ -60,10 +58,10 @@ dump_load_test(const char* in_filename,
       cerr << "Could not open " << data_filename << endl;
       return false;
     }
+    BinIStream bis(ifs);
 
-    CellRestorer restore;
-
-    library2 = restore(ifs);
+    library2 = CellLibrary::new_obj();
+    library2->restore(bis);
   }
 
   display_library(cout, *library2);

@@ -330,13 +330,13 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(ostream& s) const;
+  dump(BinO& s) const;
 
   /// @brief バイナリダンプされた内容を読み込む．
   /// @param[in] s 入力元のストリーム
   virtual
   void
-  restore(istream& s);
+  restore(BinI& s);
 
 
 public:

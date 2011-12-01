@@ -11,6 +11,7 @@
 
 #include "ym_cell/cell_nsdef.h"
 #include "ym_logic/lexp_nsdef.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -338,13 +339,13 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(ostream& s) const = 0;
+  dump(BinO& s) const = 0;
 
   /// @brief バイナリダンプされた内容を読み込む．
   /// @param[in] s 入力元のストリーム
   virtual
   void
-  restore(istream& s) = 0;
+  restore(BinI& s) = 0;
 
 
 public:

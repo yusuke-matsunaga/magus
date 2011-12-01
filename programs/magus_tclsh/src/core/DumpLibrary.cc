@@ -8,7 +8,8 @@
 
 
 #include "DumpLibrary.h"
-#include "ym_cell/CellDumper.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -41,10 +42,9 @@ DumpLibrary::cmd_proc(TclObjVector& objv)
     // エラーメッセージは open_ofile() がセットしている．
     return TCL_ERROR;
   }
+  BinOStream bos(os);
 
-  CellDumper dump;
-
-  dump(os, *cur_cell_library());
+  cur_cell_library()->dump(bos);
 
   return TCL_OK;
 }
