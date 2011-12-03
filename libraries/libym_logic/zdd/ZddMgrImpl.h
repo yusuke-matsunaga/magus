@@ -24,13 +24,14 @@ BEGIN_NAMESPACE_YM_ZDD
 class ZddMgrImpl
 {
   friend class Zdd;
+  friend class CompTbl;
 
 public:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタとデストラクタ
   //////////////////////////////////////////////////////////////////////
 
-  // デフォルトマネージャを返す．
+  /// @brief デフォルトマネージャを返す．
   static
   ZddMgrImpl*
   default_mgr();
@@ -41,7 +42,7 @@ public:
   ZddMgrImpl(const string& name = string(),
 	     const string& option = string());
 
-  // デストラクタ
+  /// @brief デストラクタ
   virtual
   ~ZddMgrImpl();
 
@@ -51,11 +52,11 @@ public:
   // ZDDの根の枝の参照回数関数
   //////////////////////////////////////////////////////////////////////
 
-  // e の参照回数を増やす．
+  /// @brief e の参照回数を増やす．
   void
   inc_rootref(ZddEdge e);
 
-  // e の参照回数を減らす．
+  /// @brief e の参照回数を減らす．
   void
   dec_rootref(ZddEdge e);
 
@@ -65,22 +66,24 @@ public:
   // 変数番号とレベルの対応づけ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数を確保する．
-  // 確保に失敗したら false を返す．
-  // 最後の変数の後ろに挿入される．
+  /// @brief 変数を確保する．
+  /// @brief 確保に失敗したら false を返す．
+  /// @brief 最後の変数の後ろに挿入される．
   bool
   new_var(VarId varid);
 
-  // 現在登録されている変数をそのレベルの昇順で返す．
+  /// @brief 現在登録されている変数をそのレベルの昇順で返す．
+  /// @param[out] vlist 変数を格納するリスト
+  /// @return 変数の数を返す．
   ymuint
   var_list(list<VarId>& vlist) const;
 
-  // 変数番号からレベルを得る．
-  // もしもレベルが割り当てられていない場合にはエラーとなる．
+  /// @brief 変数番号からレベルを得る．
+  /// @note もしもレベルが割り当てられていない場合にはエラーとなる．
   ymuint
   level(VarId varid) const;
 
-  // レベルから変数番号を得る．
+  /// @brief レベルから変数番号を得る．
   VarId
   varid(ymuint level) const;
 
@@ -90,7 +93,7 @@ public:
   // ZDD 生成用関数
   //////////////////////////////////////////////////////////////////////
 
-  // singletonを作る
+  /// @brief singletonを作る
   ZddEdge
   make_singleton(VarId varid);
 
@@ -100,39 +103,39 @@ public:
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
 
-  // e1 $\cap$ e2 を計算する．
+  /// @brief e1 $\cap$ e2 を計算する．
   ZddEdge
   cap_op(ZddEdge e1,
 	 ZddEdge e2);
 
-  // e1 $\cap$ e2 $\cap$ e3 を計算する．
+  /// @brief e1 $\cap$ e2 $\cap$ e3 を計算する．
   ZddEdge
   cap_op(ZddEdge e1,
 	 ZddEdge e2,
 	 ZddEdge e3);
 
-  // e1 $\cup$ e2 を計算する．
+  /// @brief e1 $\cup$ e2 を計算する．
   ZddEdge
   cup_op(ZddEdge e1,
 	 ZddEdge e2);
 
-  // e1 $\cup$ e2 $\cup$ e3 を計算する．
+  /// @brief e1 $\cup$ e2 $\cup$ e3 を計算する．
   ZddEdge
   cup_op(ZddEdge e1,
 	 ZddEdge e2,
 	 ZddEdge e3);
 
-  // src1 $\setdiff$ src2 を計算する．
+  /// @brief src1 $\setdiff$ src2 を計算する．
   ZddEdge
   diff_op(ZddEdge e1,
 	  ZddEdge e2);
 
-  // 指定された変数を含まないコファクターを返す．
+  /// @brief 指定された変数を含まないコファクターを返す．
   ZddEdge
   cofactor0(ZddEdge e1,
 	    VarId id);
 
-  // 指定された変数を含むコファクターを返す．
+  /// @brief 指定された変数を含むコファクターを返す．
   ZddEdge
   cofactor1(ZddEdge e1,
 	    VarId id);
@@ -143,32 +146,32 @@ public:
   // ZDD の構造に関係したメソッド
   //////////////////////////////////////////////////////////////////////
 
-  // 根の節点の変数に基づいてShannon展開を行なう．
-  // 戻り値として根の節点の変数番号を返し，その変数を0/1に固定した
-  // 時の cofactor をそれぞれ f0, f1 に入れる．
-  // もともと定数値(葉)のZDDの場合，kVarIdMax を返し，
-  // f0, f1 には自分自身を代入する．
+  /// @brief 根の節点の変数に基づいてShannon展開を行なう．
+  /// 戻り値として根の節点の変数番号を返し，その変数を0/1に固定した
+  /// 時の cofactor をそれぞれ f0, f1 に入れる．
+  /// もともと定数値(葉)のZDDの場合，kVarIdMax を返し，
+  /// f0, f1 には自分自身を代入する．
   VarId
   root_decomp(ZddEdge e,
 	      ZddEdge& e0,
 	      ZddEdge& e1);
 
-  // 根の変数番号インデックスを取り出す．
-  // 定数節点の場合には kVarIdMax を返す．
+  /// @brief 根の変数番号インデックスを取り出す．
+  /// @brief 定数節点の場合には kVarIdMax を返す．
   VarId
   root_var(ZddEdge e);
 
-  // 0枝の指している cofactor を返す．
-  // 定数節点の場合には自分自身を返す．
+  /// @brief 0枝の指している cofactor を返す．
+  /// 定数節点の場合には自分自身を返す．
   ZddEdge
   edge0(ZddEdge e);
 
-  // 1枝の指している cofactor を返す．
-  // 定数節点の場合には自分自身を返す．
+  /// @brief 1枝の指している cofactor を返す．
+  /// 定数節点の場合には自分自身を返す．
   ZddEdge
   edge1(ZddEdge e);
 
-  // e の参照回数が0なら true を返す．
+  /// @brief e の参照回数が0なら true を返す．
   bool
   check_noref(ZddEdge e);
 
@@ -178,16 +181,16 @@ public:
   // ノード数の計数や真理値表密度の計算など
   //////////////////////////////////////////////////////////////////////
 
-  // e を根とするZDDのノード数を数える．
+  /// @brief e を根とするZDDのノード数を数える．
   ymuint64
   size(ZddEdge e);
 
-  // edge_list に登録されたZDDのノード数を数える．
+  /// @brief edge_list に登録されたZDDのノード数を数える．
   ymuint64
   size(const list<ZddEdge>& edge_list);
 
-  // ZDD の表す集合の要素数を返す．
-  // 無限長精度の整数(mpz_class)を用いて計算する．
+  /// @brief ZDD の表す集合の要素数を返す．
+  /// 無限長精度の整数(mpz_class)を用いて計算する．
   mpz_class
   count(ZddEdge e);
 
@@ -197,23 +200,23 @@ public:
   // サポート関係の関数
   //////////////////////////////////////////////////////////////////////
 
-  // e を根とするZDDのサポートに印をつける．
+  /// @brief e を根とするZDDのサポートに印をつける．
   ymuint
   mark_support(ZddEdge e);
 
-  // edge_list に登録されたZDDのサポートに印をつける．
+  /// @brief edge_list に登録されたZDDのサポートに印をつける．
   ymuint
   mark_support(const list<ZddEdge>& edge_list);
 
-  // 印のついた変数をベクタに変換する．
+  /// @brief 印のついた変数をベクタに変換する．
   ymuint
   mark_to_vector(VarVector& support);
 
-  // 印のついた変数をリストに変換する．
+  /// @brief 印のついた変数をリストに変換する．
   ymuint
   mark_to_list(VarList& support);
 
-  // 印のついた変数をZDD(キューブ)に変換する．
+  /// @brief 印のついた変数をZDD(キューブ)に変換する．
   ZddEdge
   mark_to_zdd();
 
@@ -231,45 +234,45 @@ public:
   void
   disable_gc();
 
-  // ガーベージコレクションを行なう．
-  // shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
+  /// @brief ガーベージコレクションを行なう．
+  /// shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
   void
   gc(bool shrink_nodetable);
 
-  // GC 前の sweep 処理を行うためのバインダーを登録する．
+  /// @brief GC 前の sweep 処理を行うためのバインダーを登録する．
   void
   reg_sweep_binder(EventBinder* binder);
 
-  // パラメータを設定する．設定したい項目のマスクビットを1とする．
+  /// @brief パラメータを設定する．設定したい項目のマスクビットを1とする．
   void
   param(const ZddMgrParam& param,
 	ymuint32 mask);
 
-  // パラメータを取得する．
+  /// @brief パラメータを取得する．
   void
   param(ZddMgrParam& param) const;
 
-  // 名前を得る．
+  /// @brief 名前を得る．
   const string&
   name() const;
 
-  // 使用メモリ量(in bytes)を得る．
+  /// @brief 使用メモリ量(in bytes)を得る．
   ymuint64
   used_mem() const;
 
-  // 節点テーブルに登録されているノードの数を得る．
+  /// @brief 節点テーブルに登録されているノードの数を得る．
   ymuint64
   node_num() const;
 
-  // GC で回収される(フリーになる)ノード数を得る．
+  /// @brief GC で回収される(フリーになる)ノード数を得る．
   ymuint64
   garbage_num() const;
 
-  // 利用可能なフリーノード数を得る．
+  /// @brief 利用可能なフリーノード数を得る．
   ymuint64
   avail_num() const;
 
-  // GC の起動された回数を得る．
+  /// @brief GC の起動された回数を得る．
   ymuint64
   gc_count() const;
 
@@ -279,13 +282,13 @@ public:
   // ZDDの管理用関数
   //////////////////////////////////////////////////////////////////////
 
-  // Zdd の根の枝をセットする時の関数
+  /// @brief Zdd の根の枝をセットする時の関数
   void
   set_zdd(Zdd* zdd_p,
 	  ZddEdge e);
 
-  // zdd の根の枝を new_e に変更する．
-  // new_e も同一の ZddMgr に属していると仮定する．
+  /// @brief zdd の根の枝を new_e に変更する．
+  /// new_e も同一の ZddMgr に属していると仮定する．
   void
   assign(Zdd* zdd_p,
 	 ZddEdge new_e);
@@ -296,17 +299,64 @@ public:
   // ログ出力用の関数
   //////////////////////////////////////////////////////////////////////
 
-  // ログ出力用のストリームを設定する．
+  /// @brief ログ出力用のストリームを設定する．
   void
   set_logstream(ostream& s);
 
-  // ログ出力用のストリームを解除する．
+  /// @brief ログ出力用のストリームを解除する．
   void
   unset_logstream();
 
-  // ログ出力用のストリームを得る．
+  /// @brief ログ出力用のストリームを得る．
   ostream&
   logstream() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // ノードを返す基本関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 左右の枝が同じ場合にはその枝自身を返し，それ以外の場合には，
+  /// @return 与えられた枝とインデックスを持つノードを返す．
+  ZddEdge
+  new_node(ZddVar* var,
+	   ZddEdge l,
+	   ZddEdge h);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 上記の XXX_op() の内部で用いられる再帰関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief cap_op の下請け関数
+  ZddEdge
+  cap_step(ZddEdge e1,
+	   ZddEdge e2);
+
+  /// @brief cup_op の下請け関数
+  ZddEdge
+  cup_step(ZddEdge e1,
+	   ZddEdge e2);
+
+  /// @brief diff_op の下請け関数
+  ZddEdge
+  diff_step(ZddEdge e1,
+	    ZddEdge e2);
+
+  /// @brief size() の下請関数
+  void
+  count1(ZddEdge e);
+
+  /// @brief count の下請関数
+  mpz_class
+  count_step(ZddEdge e,
+	     hash_map<ZddEdge, mpz_class>& mc_map);
+
+  /// @brief サポート変数に印をつける．
+  void
+  sup_step(ZddEdge e);
 
 
 private:
@@ -314,48 +364,48 @@ private:
   // 内部メンバの管理用関数
   //////////////////////////////////////////////////////////////////////
 
-  // 節点テーブルのサイズを返す．
-  // メモリ確保に失敗したら false を返す．
+  /// @brief 節点テーブルのサイズを返す．
+  /// @return メモリ確保に失敗したら false を返す．
   bool
   resize(ymuint64 new_size);
 
-  // 次のリミット値を計算する
+  /// @brief 次のリミット値を計算する
   void
   set_next_limit_size();
 
-  // ノードのリンク数を増やし，もしロックされていなければロックする
+  /// @brief ノードのリンク数を増やし，もしロックされていなければロックする
   void
   activate(ZddEdge vd);
 
-  // ノードのリンク数を減らし，他のリンクがなければロックを外す
+  /// @brief ノードのリンク数を減らし，他のリンクがなければロックを外す
   void
   deactivate(ZddEdge vd);
 
-  // vp と vp の子孫のノードをロックする
+  /// @brief vp と vp の子孫のノードをロックする
   void
   lockall(ZddNode* vp);
 
-  // vp と vp の子孫ノードを(他に参照されていないもののみ)ロックを外す
+  /// @brief vp と vp の子孫ノードを(他に参照されていないもののみ)ロックを外す
   void
   unlockall(ZddNode* vp);
 
-  // 演算結果テーブルを登録する．
+  /// @brief 演算結果テーブルを登録する．
   void
   add_table(CompTbl* tbl);
 
-  // mVarTable 中のマークを消す．
+  /// @brief mVarTable 中のマークを消す．
   void
   clear_varmark();
 
-  // level の変数を取り出す．
+  /// @brief level の変数を取り出す．
   ZddVar*
   var_at(ymuint level) const;
 
-  // varid の変数を取出す．
+  /// @brief varid の変数を取出す．
   ZddVar*
   var_of(VarId varid) const;
 
-  // Var を登録する．
+  /// @brief Var を登録する．
   void
   reg_var(ZddVar* var);
 
@@ -364,53 +414,53 @@ private:
   // メモリ管理用の関数
   //////////////////////////////////////////////////////////////////////
 
-  // 節点を確保する．
+  /// @brief 節点を確保する．
   ZddNode*
   alloc_node();
 
-  // 節点チャンクをスキャンして参照されていない節点をフリーリストにつなぐ
-  // ただし，チャンク全体が参照されていなかった場合にはフリーリストには
-  // つながない．その場合には true を返す．
+  /// @brief 節点チャンクをスキャンして参照されていない節点をフリーリストにつなぐ
+  /// ただし，チャンク全体が参照されていなかった場合にはフリーリストには
+  /// つながない．その場合には true を返す．
   bool
   scan_nodechunk(ZddNode* blk,
 		 ymuint blk_size,
 		 ZddNode**& prev);
 
-  // 変数テーブル用のメモリを確保する．
-  // size はバイト単位ではなくエントリ数．
+  /// @brief 変数テーブル用のメモリを確保する．
+  /// size はバイト単位ではなくエントリ数．
   ZddVar**
   alloc_vartable(ymuint size);
 
-  // 変数テーブル用のメモリを解放する．
-  // size はバイト単位ではなくエントリ数
+  /// @brief 変数テーブル用のメモリを解放する．
+  /// size はバイト単位ではなくエントリ数
   void
   dealloc_vartable(ZddVar** table,
 		   ymuint size);
 
-  // 節点テーブル用のメモリを確保する．
-  // size はバイト単位ではなくエントリ数
+  /// @brief 節点テーブル用のメモリを確保する．
+  /// size はバイト単位ではなくエントリ数
   ZddNode**
   alloc_nodetable(ymuint64 size);
 
-  // 節点テーブル用のメモリを解放する．
-  // size はバイト単位ではなくエントリ数
+  /// @brief 節点テーブル用のメモリを解放する．
+  /// size はバイト単位ではなくエントリ数
   void
   dealloc_nodetable(ZddNode** table,
 		    ymuint64 size);
 
-  // 節点チャンク用のメモリを確保する．
+  /// @brief 節点チャンク用のメモリを確保する．
   ZddNode*
   alloc_nodechunk();
 
-  // 節点チャンク用のメモリを解放する．
+  /// @brief 節点チャンク用のメモリを解放する．
   void
   dealloc_nodechunk(ZddNode* chunk);
 
-  // このマネージャで使用するメモリ領域を確保する．
+  /// @brief このマネージャで使用するメモリ領域を確保する．
   void*
   allocate(ymuint64 size);
 
-  // このマネージャで確保したメモリを解放する．
+  /// @brief このマネージャで確保したメモリを解放する．
   void
   deallocate(void* ptr,
 	     ymuint64 size);
@@ -420,36 +470,23 @@ private:
   // ZddEdge を操作するクラスメソッド
   //////////////////////////////////////////////////////////////////////
 
-  // p-mark が付いた節点のマークを消す．
+  /// @brief mark が付いた節点のマークを消す．
   static
   void
-  clear_pmark(ZddEdge e);
+  clear_mark(ZddEdge e);
 
-  // n-mark が付いた節点のマークを消す．
-  static
-  void
-  clear_nmark(ZddEdge e);
-
-  // vdで示された枝の子孫の全てのマークを消す
-  static
-  void
-  clear_pnmark(ZddEdge e);
-
-  // vdの指すノードのマークを調べ，マークされていればtrueを返す．
-  // 枝に極性がなければマークは1種類でいいが，極性があるので，
-  // 肯定の枝から指された場合の p-mark と否定の枝から指された場
-  // 合の n-mark の2種類があるので，枝に応じて切替える．
+  /// @brief vdの指すノードのマークを調べ，マークされていればtrueを返す．
   static
   bool
   mark(ZddEdge vd);
 
-  // vdの指すノードにマークをつける
+  /// @brief vdの指すノードにマークをつける
   static
   void
   setmark(ZddEdge vd);
 
-  // idx が top に等しいときには e の子供を e_0, e_1 にセットする．
-  // 等しくなければ e をセットする．
+  /// @brief idx が top に等しいときには e の子供を e_0, e_1 にセットする．
+  /// 等しくなければ e をセットする．
   static
   void
   split1(ymuint top,
@@ -460,7 +497,7 @@ private:
 	 ZddEdge& e_0,
 	 ZddEdge& e_1);
 
-  // f と g のノードの子供のノードとレベルを求める．
+  /// @brief f と g のノードの子供のノードとレベルを求める．
   static
   ZddVar*
   split(ZddEdge f,
@@ -595,9 +632,9 @@ private:
   // この ZddMgr に登録されているテーブルの先頭
   CompTbl* mTblTop;
 
-  CompTbl2* mAndTable;
-  CompTbl2* mXorTable;
-  CompTbl2* mIntTable;
+  CompTbl2* mCapTable;
+  CompTbl2* mCupTable;
+  CompTbl2* mDiffTable;
 
 
   //////////////////////////////////////////////////////////////////////

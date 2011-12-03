@@ -11,7 +11,6 @@
 
 
 #include "ym_logic/zdd_nsdef.h"
-#include "ym_logic/ZddEdge.h"
 #include "ym_logic/VarId.h"
 #include "ym_utils/BinIO.h"
 #include "gmpxx.h"
@@ -389,18 +388,14 @@ private:
   /// @param[in] mgr ZDD マネージャ
   /// @param[in] root 根の枝
   Zdd(ZddMgrImpl* mgr,
-      ZddEdge root);
-
-  /// @brief 根の枝をとり出す
-  ZddEdge
-  root() const;
+      ympuint root);
 
   /// @brief mgr, root をセットする時に呼ばれる関数
   /// @param[in] mgr ZDD マネージャ
   /// @param[in] root 根の枝
   void
   set(ZddMgrImpl* mgr,
-      ZddEdge root);
+      ympuint root);
 
   /// @brief (mMgr, mRoot) への参照をなくす時に呼ばれる関数
   void
@@ -410,7 +405,7 @@ private:
   /// @param[in] new_e 新しい枝
   /// @warning new_e も同一の ZddMgr に属していると仮定する．
   void
-  assign(ZddEdge new_e);
+  assign(ympuint new_e);
 
 
 private:
@@ -422,7 +417,7 @@ private:
   ZddMgrImpl* mMgr;
 
   // 根のノードを指す枝
-  ZddEdge mRoot;
+  ympuint mRoot;
 
   // おなじ ZddMgr の ZDD をつなぐためのリンクポインタ
   Zdd* mPrev;
@@ -578,120 +573,6 @@ support_size(const ZddList& bdd_array);
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 根の枝をとり出す
-// @return 根の枝
-inline
-ZddEdge
-Zdd::root() const
-{
-  return mRoot;
-}
-
-// @brief 定数0 のチェック
-// @return 定数0の時 true を返す．
-inline
-bool
-Zdd::is_zero() const
-{
-  return mRoot.is_zero();
-}
-
-// @brief 定数1 のチェック
-// @return 定数1 の時 true を返す．
-inline
-bool
-Zdd::is_one() const
-{
-  return mRoot.is_one();
-}
-
-// @brief 定数のチェック
-// @return 定数の時 true を返す．
-inline
-bool
-Zdd::is_const() const
-{
-  return mRoot.is_const();
-}
-
-// @brief オーバーフローのチェック
-// @return 演算結果がオーバーフローしたとき true を返す．
-inline
-bool
-Zdd::is_overflow() const
-{
-  return mRoot.is_overflow();
-}
-
-// @brief エラーのチェック
-// @return 演算結果がエラーになったとき true を返す．
-inline
-bool
-Zdd::is_error() const
-{
-  return mRoot.is_error();
-}
-
-// @brief オーバーフローとエラーのチェック
-// @return 演算結果がオーバーフローかエラーのとき true を返す．
-inline
-bool
-Zdd::is_invalid() const
-{
-  return mRoot.is_invalid();
-}
-
-// @brief 終端ノードのチェック
-// @return 終端ノードのとき true を返す．
-inline
-bool
-Zdd::is_leaf() const
-{
-  return mRoot.is_leaf();
-}
-
-// @brief 定数0に設定する．
-inline
-void
-Zdd::set_zero()
-{
-  set(mMgr, ZddEdge::make_zero());
-}
-
-// @brief 定数1に設定する．
-inline
-void
-Zdd::set_one()
-{
-  set(mMgr, ZddEdge::make_one());
-}
-
-// @brief エラー値に設定する．
-inline
-void
-Zdd::set_error()
-{
-  set(mMgr, ZddEdge::make_error());
-}
-
-// @brief オーバーフロー値に設定する．
-inline
-void
-Zdd::set_overflow()
-{
-  set(mMgr, ZddEdge::make_overflow());
-}
-
-// @brief 等価比較
-// @return 2つのZDDが等しいとき true を返す．
-inline
-bool
-Zdd::operator==(const Zdd& src2) const
-{
-  // 実はただのポインタ（スカラ値）比較でわかる．
-  return root() == src2.root();
-}
-
 // @brief 不等価比較
 // @return 2つのZDDが等しくないとき true を返す．
 inline
@@ -700,6 +581,33 @@ operator!=(const Zdd& src1,
 	   const Zdd& src2)
 {
   return ! src1.operator==(src2);
+}
+
+// @brief intersection 演算
+inline
+Zdd
+operator&(const Zdd& src1,
+	  const Zdd& src2)
+{
+  return Zdd(src1).operator&=(src2);
+}
+
+// @brief union 演算
+inline
+Zdd
+operator|(const Zdd& src1,
+	  const Zdd& src2)
+{
+  return Zdd(src1).operator|=(src2);
+}
+
+// @brief diff 演算
+inline
+Zdd
+operator-(const Zdd& src1,
+	  const Zdd& src2)
+{
+  return Zdd(src1).operator-=(src2);
 }
 
 #if 0
@@ -745,7 +653,7 @@ inline
 ymuint
 Zdd::hash() const
 {
-  ympuint r = mRoot.mBody;
+  ympuint r = mRoot;
   return (r * r) >> 8;
 }
 

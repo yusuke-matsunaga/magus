@@ -10,6 +10,7 @@
 
 
 #include "ym_logic/Zdd.h"
+#include "ZddEdge.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
@@ -21,6 +22,7 @@ BEGIN_NAMESPACE_YM_ZDD
 class ZddVar
 {
   friend class ZddMgrImpl;
+
 public:
 
   // 変数番号を得る．

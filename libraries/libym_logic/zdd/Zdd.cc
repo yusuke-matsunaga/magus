@@ -18,12 +18,12 @@ BEGIN_NAMESPACE_YM_ZDD
 // @brief mgr, root をセットする時に呼ばれる関数
 void
 Zdd::set(ZddMgrImpl* mgr,
-	 ZddEdge root)
+	 ympuint root)
 {
   mMgr = mgr;
   mRoot = root;
 
-  mMgr->inc_rootref(mRoot);
+  mMgr->inc_rootref(ZddEdge(mRoot));
 
   // ZDD のリストに追加
   Zdd* top = mMgr->mTopZdd;
@@ -39,7 +39,7 @@ Zdd::set(ZddMgrImpl* mgr,
 void
 Zdd::reset()
 {
-  mMgr->dec_rootref(mRoot);
+  mMgr->dec_rootref(ZddEdge(mRoot));
 
   // ZDD のリストから削除
   Zdd* p = mPrev;
@@ -57,10 +57,10 @@ Zdd::reset()
 
 // @brief 根の枝を new_e に置き換える．
 void
-Zdd::assign(ZddEdge new_e)
+Zdd::assign(ympuint new_e)
 {
-  mMgr->inc_rootref(new_e);
-  mMgr->dec_rootref(mRoot);
+  mMgr->inc_rootref(ZddEdge(new_e));
+  mMgr->dec_rootref(ZddEdge(mRoot));
   mRoot = new_e;
 }
 
@@ -78,7 +78,7 @@ Zdd::Zdd(const Zdd& src)
 
 // @brief ZDD マネージャと根の枝を引数とするコンストラクタ
 Zdd::Zdd(ZddMgrImpl* mgr,
-	 ZddEdge e)
+	 ympuint e)
 {
   set(mgr, e);
 }
@@ -105,6 +105,99 @@ Zdd::operator=(const Zdd& src)
   return *this;
 }
 
+// @brief 定数0 のチェック
+// @return 定数0の時 true を返す．
+bool
+Zdd::is_zero() const
+{
+  return ZddEdge(mRoot).is_zero();
+}
+
+// @brief 定数1 のチェック
+// @return 定数1 の時 true を返す．
+bool
+Zdd::is_one() const
+{
+  return ZddEdge(mRoot).is_one();
+}
+
+// @brief 定数のチェック
+// @return 定数の時 true を返す．
+bool
+Zdd::is_const() const
+{
+  return ZddEdge(mRoot).is_const();
+}
+
+// @brief オーバーフローのチェック
+// @return 演算結果がオーバーフローしたとき true を返す．
+bool
+Zdd::is_overflow() const
+{
+  return ZddEdge(mRoot).is_overflow();
+}
+
+// @brief エラーのチェック
+// @return 演算結果がエラーになったとき true を返す．
+bool
+Zdd::is_error() const
+{
+  return ZddEdge(mRoot).is_error();
+}
+
+// @brief オーバーフローとエラーのチェック
+// @return 演算結果がオーバーフローかエラーのとき true を返す．
+bool
+Zdd::is_invalid() const
+{
+  return ZddEdge(mRoot).is_invalid();
+}
+
+// @brief 終端ノードのチェック
+// @return 終端ノードのとき true を返す．
+bool
+Zdd::is_leaf() const
+{
+  return ZddEdge(mRoot).is_leaf();
+}
+
+// @brief 定数0に設定する．
+void
+Zdd::set_zero()
+{
+  set(mMgr, ZddEdge::make_zero());
+}
+
+// @brief 定数1に設定する．
+void
+Zdd::set_one()
+{
+  set(mMgr, ZddEdge::make_one());
+}
+
+// @brief エラー値に設定する．
+void
+Zdd::set_error()
+{
+  set(mMgr, ZddEdge::make_error());
+}
+
+// @brief オーバーフロー値に設定する．
+void
+Zdd::set_overflow()
+{
+  set(mMgr, ZddEdge::make_overflow());
+}
+
+// @brief 等価比較
+// @return 2つのZDDが等しいとき true を返す．
+bool
+Zdd::operator==(const Zdd& src2) const
+{
+  // 実はただのポインタ（スカラ値）比較でわかる．
+  return mRoot == src2.mRoot;
+}
+
 // @brief intersection 付き代入
 const Zdd&
 Zdd::operator&=(const Zdd& src2)
@@ -115,8 +208,8 @@ Zdd::operator&=(const Zdd& src2)
     ans = ZddEdge::make_error();
   }
   else {
-    ZddEdge e1 = mRoot;
-    ZddEdge e2 = src2.mRoot;
+    ZddEdge e1 = ZddEdge(mRoot);
+    ZddEdge e2 = ZddEdge(src2.mRoot);
     ans = mMgr->cap_op(e1, e2);
   }
   assign(ans);
@@ -133,8 +226,8 @@ Zdd::operator|=(const Zdd& src2)
     ans = ZddEdge::make_error();
   }
   else {
-    ZddEdge e1 = mRoot;
-    ZddEdge e2 = src2.mRoot;
+    ZddEdge e1 = ZddEdge(mRoot);
+    ZddEdge e2 = ZddEdge(src2.mRoot);
     ans = mMgr->cup_op(e1, e2);
   }
   assign(ans);
@@ -151,8 +244,8 @@ Zdd::operator-=(const Zdd& src2)
     ans = ZddEdge::make_error();
   }
   else {
-    ZddEdge e1 = mRoot;
-    ZddEdge e2 = src2.mRoot;
+    ZddEdge e1 = ZddEdge(mRoot);
+    ZddEdge e2 = ZddEdge(src2.mRoot);
     ans = mMgr->diff_op(e1, e2);
   }
   assign(ans);
@@ -170,7 +263,7 @@ Zdd::operator&&(const Zdd& src2) const
     // マネージャが異なる．
     return false;
   }
-  return mMgr->check_intersect(mRoot, src2.mRoot).is_one();
+  return mMgr->check_intersect(ZddEdge(mRoot), src2.ZddEdge(mRoot)).is_one();
 }
 
 // @brief 包含関係のチェック
@@ -183,8 +276,8 @@ Zdd::operator>=(const Zdd& src2) const
     // マネージャが異なる．
     return false;
   }
-  ZddEdge e1 = ~mRoot;
-  ZddEdge e2 = src2.mRoot;
+  ZddEdge e1 = ~ZddEdge(mRoot);
+  ZddEdge e2 = src2.ZddEdge(mRoot);
   return mMgr->check_intersect(e1, e2).is_zero();
 }
 #endif
@@ -193,7 +286,7 @@ Zdd::operator>=(const Zdd& src2) const
 Zdd
 Zdd::cofactor0(VarId var) const
 {
-  ZddEdge ans = mMgr->cofactor0(mRoot, var);
+  ZddEdge ans = mMgr->cofactor0(ZddEdge(mRoot), var);
   return Zdd(mMgr, ans);
 }
 
@@ -201,32 +294,8 @@ Zdd::cofactor0(VarId var) const
 Zdd
 Zdd::cofactor1(VarId var) const
 {
-  ZddEdge ans = mMgr->cofactor1(mRoot, var);
+  ZddEdge ans = mMgr->cofactor1(ZddEdge(mRoot), var);
   return Zdd(mMgr, ans);
-}
-
-// @brief intersection 演算
-Zdd
-operator&(const Zdd& src1,
-	  const Zdd& src2)
-{
-  return Zdd(src1).operator&=(src2);
-}
-
-// @brief union 演算
-Zdd
-operator|(const Zdd& src1,
-	  const Zdd& src2)
-{
-  return Zdd(src1).operator|=(src2);
-}
-
-// @brief diff 演算
-Zdd
-operator-(const Zdd& src1,
-	  const Zdd& src2)
-{
-  return Zdd(src1).operator-=(src2);
 }
 
 // @brief Shannon 展開 (Boole 展開) を行なう．
@@ -235,7 +304,7 @@ Zdd::root_decomp(Zdd& f0,
 		 Zdd& f1) const
 {
   ZddEdge e0, e1;
-  VarId ans = mMgr->root_decomp(mRoot, e0, e1);
+  VarId ans = mMgr->root_decomp(ZddEdge(mRoot), e0, e1);
   f0 = Zdd(mMgr, e0);
   f1 = Zdd(mMgr, e1);
   return ans;
@@ -245,14 +314,14 @@ Zdd::root_decomp(Zdd& f0,
 VarId
 Zdd::root_var() const
 {
-  return mMgr->root_var(mRoot);
+  return mMgr->root_var(ZddEdge(mRoot));
 }
 
 // @brief 0枝の取得
 Zdd
 Zdd::edge0() const
 {
-  ZddEdge ans = mMgr->edge0(mRoot);
+  ZddEdge ans = mMgr->edge0(ZddEdge(mRoot));
   return Zdd(mMgr, ans);
 }
 
@@ -260,7 +329,7 @@ Zdd::edge0() const
 Zdd
 Zdd::edge1() const
 {
-  ZddEdge ans = mMgr->edge1(mRoot);
+  ZddEdge ans = mMgr->edge1(ZddEdge(mRoot));
   return Zdd(mMgr, ans);
 }
 
@@ -270,7 +339,7 @@ ymuint64
 Zdd::print(ostream& s) const
 {
   Printer printer(mMgr, s);
-  printer.print_root(mRoot);
+  printer.print_root(ZddEdge(mRoot));
   return printer.num();
 }
 
@@ -323,8 +392,8 @@ void
 Zdd::dump(ostream& s) const
 {
   Dumper dumper(mMgr, s);
-  dumper.dump(mRoot);
-  dumper.dump_edge(mRoot);
+  dumper.dump(ZddEdge(mRoot));
+  dumper.dump_edge(ZddEdge(mRoot));
   s << endl;
 }
 
@@ -385,7 +454,7 @@ dump(const ZddList& array,
 ymuint64
 Zdd::size() const
 {
-  return mMgr->size(mRoot);
+  return mMgr->size(ZddEdge(mRoot));
 }
 
 // @brief ZDD ベクタが使っているノード数を数える．
@@ -401,7 +470,7 @@ size(const ZddVector& array)
   for (ZddVector::const_iterator p = array.begin();
        p != array.end(); ++ p) {
     Zdd zdd = *p;
-    edge_list.push_back(zdd.root());
+    edge_list.push_back(ZddEdge(zdd.mRoot));
   }
   // 今は array の中のZDDのマネージャがすべて同じと仮定している．
   ZddMgrImpl* mgr = array.front().mMgr;
@@ -421,7 +490,7 @@ size(const ZddList& array)
   for (ZddList::const_iterator p = array.begin();
        p != array.end(); ++ p) {
     Zdd zdd = *p;
-    edge_list.push_back(zdd.root());
+    edge_list.push_back(ZddEdge(zdd.mRoot));
   }
   // 今は array の中のZDDのマネージャがすべて同じと仮定している．
   ZddMgrImpl* mgr = array.front().mMgr;
@@ -432,14 +501,14 @@ size(const ZddList& array)
 mpz_class
 Zdd::count() const
 {
-  return mMgr->count(mRoot);
+  return mMgr->count(ZddEdge(mRoot));
 }
 
 // @brief サポート変数集合の計算 (VarVector)
 ymuint
 Zdd::support(VarVector& vars) const
 {
-  mMgr->mark_support(mRoot);
+  mMgr->mark_support(ZddEdge(mRoot));
   return mMgr->mark_to_vector(vars);
 }
 
@@ -447,7 +516,7 @@ Zdd::support(VarVector& vars) const
 ymuint
 Zdd::support(VarList& vars) const
 {
-  mMgr->mark_support(mRoot);
+  mMgr->mark_support(ZddEdge(mRoot));
   return mMgr->mark_to_list(vars);
 }
 
@@ -455,7 +524,7 @@ Zdd::support(VarList& vars) const
 ymuint
 Zdd::support_size() const
 {
-  return mMgr->mark_support(mRoot);
+  return mMgr->mark_support(ZddEdge(mRoot));
 }
 
 // @brief ZDD ベクタのサポート変数集合の計算 (VarVector)
@@ -474,7 +543,7 @@ support(const ZddVector& zdd_array,
   for (ZddVector::const_iterator p = zdd_array.begin();
        p != zdd_array.end(); ++ p) {
     Zdd zdd = *p;
-    edge_list.push_back(zdd.root());
+    edge_list.push_back(ZddEdge(zdd.mRoot));
   }
   // 今は手抜きで zdd_array 中の ZDD のマネージャは全部同じと仮定している．
   ZddMgrImpl* mgr = zdd_array.front().mMgr;
@@ -498,7 +567,7 @@ support(const ZddVector& zdd_array,
   for (ZddVector::const_iterator p = zdd_array.begin();
        p != zdd_array.end(); ++ p) {
     Zdd zdd = *p;
-    edge_list.push_back(zdd.root());
+    edge_list.push_back(ZddEdge(zdd.mRoot));
   }
   // 今は手抜きで zdd_array 中の ZDD のマネージャは全部同じと仮定している．
   ZddMgrImpl* mgr = zdd_array.front().mMgr;
@@ -519,7 +588,7 @@ support_size(const ZddVector& zdd_array)
   for (ZddVector::const_iterator p = zdd_array.begin();
        p != zdd_array.end(); ++ p) {
     Zdd zdd = *p;
-    edge_list.push_back(zdd.root());
+    edge_list.push_back(ZddEdge(zdd.mRoot));
   }
   // 今は手抜きで zdd_array 中の ZDD のマネージャは全部同じと仮定している．
   ZddMgrImpl* mgr = zdd_array.front().mMgr;
@@ -542,7 +611,7 @@ support(const ZddList& zdd_array,
   for (ZddList::const_iterator p = zdd_array.begin();
        p != zdd_array.end(); ++ p) {
     Zdd zdd = *p;
-    edge_list.push_back(zdd.root());
+    edge_list.push_back(ZddEdge(zdd.mRoot));
   }
   // 今は手抜きで zdd_array 中の ZDD のマネージャは全部同じと仮定している．
   ZddMgrImpl* mgr = zdd_array.front().mMgr;
@@ -566,7 +635,7 @@ support(const ZddList& zdd_array,
   for (ZddList::const_iterator p = zdd_array.begin();
        p != zdd_array.end(); ++ p) {
     Zdd zdd = *p;
-    edge_list.push_back(zdd.root());
+    edge_list.push_back(ZddEdge(zdd.mRoot));
   }
   // 今は手抜きで zdd_array 中の ZDD のマネージャは全部同じと仮定している．
   ZddMgrImpl* mgr = zdd_array.front().mMgr;
@@ -587,7 +656,7 @@ support_size(const ZddList& zdd_array)
   for (ZddList::const_iterator p = zdd_array.begin();
        p != zdd_array.end(); ++ p) {
     Zdd zdd = *p;
-    edge_list.push_back(zdd.root());
+    edge_list.push_back(ZddEdge(zdd.mRoot));
   }
   // 今は手抜きで zdd_array 中の ZDD のマネージャは全部同じと仮定している．
   ZddMgrImpl* mgr = zdd_array.front().mMgr;

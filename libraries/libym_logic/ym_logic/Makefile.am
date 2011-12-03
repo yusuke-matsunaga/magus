@@ -16,7 +16,6 @@ noinst_HEADERS = \
 	BddVarSet.h \
 	BddDecomp.h \
 	Zdd.h \
-	ZddEdge.h \
 	ZddMgr.h \
 	Bool3.h \
 	CvFunc.h \

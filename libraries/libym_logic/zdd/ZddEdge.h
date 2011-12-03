@@ -1,7 +1,7 @@
-#ifndef YM_LOGIC_ZDDEDGE_H
-#define YM_LOGIC_ZDDEDGE_H
+#ifndef ZDDEDGE_H
+#define ZDDEDGE_H
 
-/// @file ym_logic/ZddEdge.h
+/// @file ZddEdge.h
 /// @brief ZddEdge のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
@@ -34,6 +34,11 @@ public:
   /// @note 中身は不定
   ZddEdge();
 
+  /// @brief ストレートなコンストラクタ
+  /// @param[in] val 内容
+  explicit
+  ZddEdge(ympuint val);
+
   /// @brief コンストラクタ
   /// @param[in] node ノード
   explicit
@@ -48,6 +53,9 @@ public:
   /// @brief コンストラクタ
   /// @param[in] src コピー元の枝
   ZddEdge(const ZddEdge& src);
+
+  /// @brief ympuint へのキャスト演算子
+  operator ympuint() const;
 
   /// @brief 定数0の枝を返す．
   static
@@ -68,17 +76,6 @@ public:
   static
   ZddEdge
   make_error();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で使われる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief コンストラクタ
-  /// @param[in] val 内容
-  explicit
-  ZddEdge(ympuint val);
 
 
 public:
@@ -138,7 +135,7 @@ public:
   /// @brief 属性を付加する．
   /// @return 自分自身への参照を返す．
   const ZddEdge&
-  add_zattr();
+  add_zattr(bool zattr);
 
 
 public:
@@ -237,6 +234,14 @@ ZddEdge::ZddEdge() :
 }
 
 // @brief コンストラクタ
+// @param[in] val 内容
+inline
+ZddEdge::ZddEdge(ympuint val) :
+  mBody(val)
+{
+}
+
+// @brief コンストラクタ
 // @param[in] node ノード
 inline
 ZddEdge::ZddEdge(ZddNode* node) :
@@ -252,12 +257,11 @@ ZddEdge::ZddEdge(const ZddEdge& src) :
 {
 }
 
-// @brief コンストラクタ
-// @param[in] val 内容
+// @brief ympuint へのキャスト演算子
 inline
-ZddEdge::ZddEdge(ympuint val) :
-  mBody(val)
+ZddEdge::operator ympuint() const
 {
+  return mBody;
 }
 
 // @brief 定数0の枝を返す．
@@ -330,9 +334,10 @@ ZddEdge::get_normal() const
 // @return 自分自身への参照を返す．
 inline
 const ZddEdge&
-ZddEdge::add_zattr()
+ZddEdge::add_zattr(bool zattr)
 {
-  mBody |= 1UL;
+  // true = 1 だと仮定している．
+  mBody |= static_cast<ympuint>(zattr);
   return *this;
 }
 
@@ -455,4 +460,4 @@ struct hash<nsYm::nsZdd::ZddEdge>
 
 END_NAMESPACE_HASH
 
-#endif // YM_LOGIC_ZDDEDGE_H
+#endif // ZDDEDGE_H

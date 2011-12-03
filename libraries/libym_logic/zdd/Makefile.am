@@ -25,8 +25,9 @@ libym_logic_zdd_la_CPPFLAGS = \
 
 libym_logic_zdd_la_SOURCES = \
 	CompTbl.h \
-	CompTbl.h \
+	CompTbl.cc \
 	Zdd.cc \
+	ZddEdge.h \
 	ZddMgr.cc \
 	ZddMgrImpl.h \
 	ZddMgrImpl.cc \

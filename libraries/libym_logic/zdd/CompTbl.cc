@@ -8,6 +8,7 @@
 
 
 #include "CompTbl.h"
+#include "ZddMgrImpl.h"
 
 
 BEGIN_NONAMESPACE
@@ -26,7 +27,7 @@ BEGIN_NAMESPACE_YM_ZDD
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CompTbl::CompTbl(ZddMgrClassic* mgr,
+CompTbl::CompTbl(ZddMgrImpl* mgr,
 		 const char* name) :
   mMgr(mgr)
 {
@@ -120,7 +121,7 @@ CompTbl::logstream() const
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CompTbl1::CompTbl1(ZddMgrClassic* mgr,
+CompTbl1::CompTbl1(ZddMgrImpl* mgr,
 		   const char* name) :
   CompTbl(mgr, name)
 {
@@ -225,7 +226,7 @@ CompTbl1::clear()
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CompTbl2::CompTbl2(ZddMgrClassic* mgr,
+CompTbl2::CompTbl2(ZddMgrImpl* mgr,
 		   const char* name) :
   CompTbl(mgr, name)
 {
@@ -331,7 +332,7 @@ CompTbl2::clear()
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CompTbl3::CompTbl3(ZddMgrClassic* mgr,
+CompTbl3::CompTbl3(ZddMgrImpl* mgr,
 		   const char* name) :
   CompTbl(mgr, name)
 {

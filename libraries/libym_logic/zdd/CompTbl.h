@@ -22,6 +22,7 @@ BEGIN_NAMESPACE_YM_ZDD
 class CompTbl
 {
   friend class ZddMgrImpl;
+
 public:
 
   /// @brief 使用されているセル数を返す．

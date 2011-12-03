@@ -130,20 +130,23 @@ ZddMgr::cap_op(const ZddVector& zdds)
 
   ZddEdge ans_e;
   if ( n == 3 ) {
-    ans_e = mImpl->cap_op(zdds[0].root(), zdds[1].root(), zdds[2].root());
+    ZddEdge e0(zdds[0].mRoot);
+    ZddEdge e1(zdds[1].mRoot);
+    ZddEdge e2(zdds[2].mRoot);
+    ans_e = mImpl->cap_op(e0, e1, e2);
   }
   else if ( n < kNiLimit ) {
     ZddVector::const_iterator p = zdds.begin();
-    ans_e = p->root();
+    ans_e = ZddEdge(p->mRoot);
     for (++ p; p != zdds.end(); ++ p) {
-      ans_e = mImpl->cap_op(ans_e, p->root());
+      ans_e = mImpl->cap_op(ans_e, ZddEdge(p->mRoot));
     }
   }
   else {
     SimpleHeapTree<ZddEdge> work;
     for (ZddVector::const_iterator p = zdds.begin();
 	 p != zdds.end(); ++p) {
-      ZddEdge e = p->root();
+      ZddEdge e(p->mRoot);
       work.put(e, mImpl->size(e));
     }
     ans_e = work.getmin();
@@ -177,25 +180,25 @@ ZddMgr::cap_op(const ZddList& zdds)
   ZddEdge ans_e;
   if ( n == 3 ) {
     ZddList::const_iterator p = zdds.begin();
-    ZddEdge e0 = p->root();
+    ZddEdge e0(p->mRoot);
     ++ p;
-    ZddEdge e1 = p->root();
+    ZddEdge e1(p->mRoot);
     ++ p;
-    ZddEdge e2 = p->root();
+    ZddEdge e2(p->mRoot);
     ans_e = mImpl->cap_op(e0, e1, e2);
   }
   else if ( n < kNiLimit ) {
     ZddList::const_iterator p = zdds.begin();
-    ans_e = p->root();
+    ans_e = ZddEdge(p->mRoot);
     for (++ p; p != zdds.end(); ++ p) {
-      ans_e = mImpl->cap_op(ans_e, p->root());
+      ans_e = mImpl->cap_op(ans_e, ZddEdge(p->mRoot));
     }
   }
   else {
     SimpleHeapTree<ZddEdge> work;
     for (ZddList::const_iterator p = zdds.begin();
 	 p != zdds.end(); ++p) {
-      ZddEdge e = p->root();
+      ZddEdge e(p->mRoot);
       work.put(e, mImpl->size(e));
     }
     ans_e = work.getmin();
@@ -225,20 +228,23 @@ ZddMgr::union_op(const ZddVector& zdds)
 
   ZddEdge ans_e;
   if ( n == 3 ) {
-    ans_e = mImpl->cup_op(zdds[0].root(), zdds[1].root(), zdds[2].root());
+    ZddEdge e0(zdds[0].mRoot);
+    ZddEdge e1(zdds[1].mRoot);
+    ZddEdge e2(zdds[2].mRoot);
+    ans_e = mImpl->cup_op(e0, e1, e2);
   }
   else if ( n < kNiLimit ) {
     ZddVector::const_iterator p = zdds.begin();
-    ans_e = p->root();
+    ans_e = ZddEdge(p->mRoot);
     for (++ p; p != zdds.end(); ++ p) {
-      ans_e = mImpl->cup_op(ans_e, p->root());
+      ans_e = mImpl->cup_op(ans_e, ZddEdge(p->mRoot));
     }
   }
   else {
     SimpleHeapTree<ZddEdge> work;
     for (ZddVector::const_iterator p = zdds.begin();
 	 p != zdds.end(); ++p) {
-      ZddEdge e = p->root();
+      ZddEdge e(p->mRoot);
       work.put(e, mImpl->size(e));
     }
     ans_e = work.getmin();
@@ -272,25 +278,25 @@ ZddMgr::union_op(const ZddList& zdds)
   ZddEdge ans_e;
   if ( n == 3 ) {
     ZddList::const_iterator p = zdds.begin();
-    ZddEdge e0 = p->root();
+    ZddEdge e0(p->mRoot);
     ++ p;
-    ZddEdge e1 = p->root();
+    ZddEdge e1(p->mRoot);
     ++ p;
-    ZddEdge e2 = p->root();
+    ZddEdge e2(p->mRoot);
     ans_e = mImpl->cup_op(e0, e1, e2);
   }
   else if ( n < kNiLimit ) {
     ZddList::const_iterator p = zdds.begin();
-    ans_e = p->root();
+    ans_e = ZddEdge(p->mRoot);
     for (++ p; p != zdds.end(); ++ p) {
-      ans_e = mImpl->cup_op(ans_e, p->root());
+      ans_e = mImpl->cup_op(ans_e, ZddEdge(p->mRoot));
     }
   }
   else {
     SimpleHeapTree<ZddEdge> work;
     for (ZddList::const_iterator p = zdds.begin();
 	 p != zdds.end(); ++p) {
-      ZddEdge e = p->root();
+      ZddEdge e(p->mRoot);
       work.put(e, mImpl->size(e));
     }
     ans_e = work.getmin();
