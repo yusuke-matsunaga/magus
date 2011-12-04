@@ -90,15 +90,15 @@ public:
   /// @name ZDD 生成用関数
   /// @{
 
-  /// @brief 定数0関数を作る．
+  /// @brief 定数0(A.K.A. empty set)を作る．
   /// @return 生成された ZDD
   Zdd
-  make_zero();
+  make_empty();
 
-  /// @brief 定数1関数を作る．
+  /// @brief 定数1(A.K.A. base set)を作る．
   /// @return 生成された ZDD
   Zdd
-  make_one();
+  make_base();
 
   /// @brief オバーフローZDDを明示的に生成する．
   /// @return 生成された ZDD
@@ -115,7 +115,7 @@ public:
   /// @param[in] varid 変数番号
   /// @return 生成された ZDD
   Zdd
-  make_singleton(ymuint32 varid);
+  make_singleton(VarId varid);
 
   /// @brief インデックスと左右の子供を指定してZDDを作る．
   /// @param[in] varid 変数番号
@@ -128,29 +128,32 @@ public:
 	   const Zdd& chd_1);
 #endif
 
-  /// @brief 複数のZDDのintersectionを求める．
-  /// @param[in] zdds ZDD のベクタ
-  /// @return 生成された ZDD
-  Zdd
-  cap_op(const ZddVector& zdds);
 
-  /// @brief 複数のZDDのintersectionを求める．
-  /// @param[in] zdds ZDD のリスト
-  /// @return 生成された ZDD
-  Zdd
-  cap_op(const ZddList& zdds);
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name バイナリ入出力関係の関数
+  /// @{
 
-  /// @brief 複数のZDDのunionを求める．
-  /// @param[in] zdds ZDD のベクタ
-  /// @return 生成された ZDD
-  Zdd
-  union_op(const ZddVector& zdds);
+  /// @brief ZDDの内容をバイナリダンプする．
+  /// @param[in] s 出力ストリーム
+  /// @param[in] zdd 対象のZDD
+  void
+  dump(BinO& s,
+       const Zdd& zdd);
 
-  /// @brief 複数のZDDのunionを求める．
-  /// @param[in] zdds ZDD のリスト
-  /// @return 生成された ZDD
-  Zdd
-  union_op(const ZddList& zdds);
+  /// @brief ZDDの配列の内容をバイナリファイルに書き出す
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] array ZDD を収めた配列
+  void
+  dump(BinO& s,
+       const ZddVector& array);
+
+  /// @brief ZDDの配列の内容をバイナリファイルに書き出す
+  /// @param[in] array ZDD を収めた配列
+  /// @param[in] s 出力先のストリーム
+  void
+  dump(BinO& s,
+       const ZddList& array);
 
   /// @brief 保存されたZDDを読み込む．
   /// @param[in] s 入力ストリーム
@@ -176,6 +179,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
 
+public:
   //////////////////////////////////////////////////////////////////////
   /// @name 変数番号とレベルの対応づけ
   /// @{
@@ -211,6 +215,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
 
+public:
   //////////////////////////////////////////////////////////////////////
   /// @name 内部動作の設定を行う関数
   /// @{

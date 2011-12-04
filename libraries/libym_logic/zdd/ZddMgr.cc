@@ -12,19 +12,11 @@
 #include "ZddMgrImpl.h"
 #include "Dumper.h"
 
-#include "ym_utils/HeapTree.h"
-
 
 BEGIN_NAMESPACE_YM_ZDD
 
 ZddMgr ZddMgr::theDefaultMgr;
 
-BEGIN_NONAMESPACE
-
-// 入力数がこの値よりも小さかったらヒープ木は使わない．
-const ymuint kNiLimit = 8;
-
-END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
 // クラス ZddMgr
@@ -66,14 +58,14 @@ ZddMgr::~ZddMgr()
 
 // 定数0を表すZDDを作る．
 Zdd
-ZddMgr::make_zero()
+ZddMgr::make_empty()
 {
   return Zdd(mImpl, ZddEdge::make_zero());
 }
 
 // 定数1を表すZDDを作る．
 Zdd
-ZddMgr::make_one()
+ZddMgr::make_base()
 {
   return Zdd(mImpl, ZddEdge::make_one());
 }
@@ -112,202 +104,6 @@ ZddMgr::make_zdd(ymuint32 index,
   return Zdd(mImpl, mImpl->make_zdd(index, chd0.root(), chd1.root()));
 }
 #endif
-
-// 複数のZDDのintersectionを求める．
-Zdd
-ZddMgr::cap_op(const ZddVector& zdds)
-{
-  ymuint n = zdds.size();
-  if ( n == 0 ) {
-    return make_one();
-  }
-  if ( n == 1 ) {
-    return zdds[0];
-  }
-  if ( n == 2 ) {
-    return zdds[0] & zdds[1];
-  }
-
-  ZddEdge ans_e;
-  if ( n == 3 ) {
-    ZddEdge e0(zdds[0].mRoot);
-    ZddEdge e1(zdds[1].mRoot);
-    ZddEdge e2(zdds[2].mRoot);
-    ans_e = mImpl->cap_op(e0, e1, e2);
-  }
-  else if ( n < kNiLimit ) {
-    ZddVector::const_iterator p = zdds.begin();
-    ans_e = ZddEdge(p->mRoot);
-    for (++ p; p != zdds.end(); ++ p) {
-      ans_e = mImpl->cap_op(ans_e, ZddEdge(p->mRoot));
-    }
-  }
-  else {
-    SimpleHeapTree<ZddEdge> work;
-    for (ZddVector::const_iterator p = zdds.begin();
-	 p != zdds.end(); ++p) {
-      ZddEdge e(p->mRoot);
-      work.put(e, mImpl->size(e));
-    }
-    ans_e = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans_e = mImpl->cap_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
-    }
-  }
-  return Zdd(mImpl, ans_e);
-}
-
-Zdd
-ZddMgr::cap_op(const ZddList& zdds)
-{
-  ymuint n = zdds.size();
-  if ( n == 0 ) {
-    return make_one();
-  }
-  if ( n == 1 ) {
-    return zdds.front();
-  }
-  if ( n == 2 ) {
-    ZddList::const_iterator p = zdds.begin();
-    Zdd zdd0 = *p;
-    ++ p;
-    Zdd zdd1 = *p;
-    return zdd0 & zdd1;
-  }
-
-  ZddEdge ans_e;
-  if ( n == 3 ) {
-    ZddList::const_iterator p = zdds.begin();
-    ZddEdge e0(p->mRoot);
-    ++ p;
-    ZddEdge e1(p->mRoot);
-    ++ p;
-    ZddEdge e2(p->mRoot);
-    ans_e = mImpl->cap_op(e0, e1, e2);
-  }
-  else if ( n < kNiLimit ) {
-    ZddList::const_iterator p = zdds.begin();
-    ans_e = ZddEdge(p->mRoot);
-    for (++ p; p != zdds.end(); ++ p) {
-      ans_e = mImpl->cap_op(ans_e, ZddEdge(p->mRoot));
-    }
-  }
-  else {
-    SimpleHeapTree<ZddEdge> work;
-    for (ZddList::const_iterator p = zdds.begin();
-	 p != zdds.end(); ++p) {
-      ZddEdge e(p->mRoot);
-      work.put(e, mImpl->size(e));
-    }
-    ans_e = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans_e = mImpl->cap_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
-    }
-  }
-  return Zdd(mImpl, ans_e);
-}
-
-// 複数のZDDのunionを求める．
-Zdd
-ZddMgr::union_op(const ZddVector& zdds)
-{
-  ymuint n = zdds.size();
-  if ( n == 0 ) {
-    return make_zero();
-  }
-  if ( n == 1 ) {
-    return zdds[0];
-  }
-  if ( n == 2 ) {
-    return zdds[0] | zdds[1];
-  }
-
-  ZddEdge ans_e;
-  if ( n == 3 ) {
-    ZddEdge e0(zdds[0].mRoot);
-    ZddEdge e1(zdds[1].mRoot);
-    ZddEdge e2(zdds[2].mRoot);
-    ans_e = mImpl->cup_op(e0, e1, e2);
-  }
-  else if ( n < kNiLimit ) {
-    ZddVector::const_iterator p = zdds.begin();
-    ans_e = ZddEdge(p->mRoot);
-    for (++ p; p != zdds.end(); ++ p) {
-      ans_e = mImpl->cup_op(ans_e, ZddEdge(p->mRoot));
-    }
-  }
-  else {
-    SimpleHeapTree<ZddEdge> work;
-    for (ZddVector::const_iterator p = zdds.begin();
-	 p != zdds.end(); ++p) {
-      ZddEdge e(p->mRoot);
-      work.put(e, mImpl->size(e));
-    }
-    ans_e = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans_e = mImpl->cup_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
-    }
-  }
-  return Zdd(mImpl, ans_e);
-}
-
-Zdd
-ZddMgr::union_op(const ZddList& zdds)
-{
-  ymuint n = zdds.size();
-  if ( n == 0 ) {
-    return make_zero();
-  }
-  if ( n == 1 ) {
-    return zdds.front();
-  }
-  if ( n == 2 ) {
-    ZddList::const_iterator p = zdds.begin();
-    Zdd zdd0 = *p;
-    ++ p;
-    Zdd zdd1 = *p;
-    return zdd0 | zdd1;
-  }
-
-  ZddEdge ans_e;
-  if ( n == 3 ) {
-    ZddList::const_iterator p = zdds.begin();
-    ZddEdge e0(p->mRoot);
-    ++ p;
-    ZddEdge e1(p->mRoot);
-    ++ p;
-    ZddEdge e2(p->mRoot);
-    ans_e = mImpl->cup_op(e0, e1, e2);
-  }
-  else if ( n < kNiLimit ) {
-    ZddList::const_iterator p = zdds.begin();
-    ans_e = ZddEdge(p->mRoot);
-    for (++ p; p != zdds.end(); ++ p) {
-      ans_e = mImpl->cup_op(ans_e, ZddEdge(p->mRoot));
-    }
-  }
-  else {
-    SimpleHeapTree<ZddEdge> work;
-    for (ZddList::const_iterator p = zdds.begin();
-	 p != zdds.end(); ++p) {
-      ZddEdge e(p->mRoot);
-      work.put(e, mImpl->size(e));
-    }
-    ans_e = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans_e = mImpl->cup_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
-    }
-  }
-  return Zdd(mImpl, ans_e);
-}
 
 // 変数を確保する．
 // 確保に失敗したら false を返す．
@@ -448,6 +244,64 @@ ymuint64
 ZddMgr::gc_count() const
 {
   return mImpl->gc_count();
+}
+
+// @brief 内容のダンプ
+void
+ZddMgr::dump(BinO& s,
+	     const Zdd& zdd)
+{
+  Dumper dumper(mImpl, s);
+  dumper.dump(ZddEdge(zdd.mRoot));
+  dumper.dump_edge(ZddEdge(zdd.mRoot));
+}
+
+// @brief ZDD ベクタの内容をダンプする．
+// @param[in] s 出力ストリーム
+// @param[in] array ZDD の配列
+void
+ZddMgr::dump(BinO& s,
+	     const ZddVector& array)
+{
+  if ( array.empty() ) {
+    return;
+  }
+  // 今は array の中のZDDのマネージャがすべて同じと仮定している．
+  Dumper dumper(mImpl, s);
+  for (ZddVector::const_iterator p = array.begin();
+       p != array.end(); ++ p) {
+    Zdd zdd = *p;
+    dumper.dump(ZddEdge(zdd.mRoot));
+  }
+  for (ZddVector::const_iterator p = array.begin();
+       p != array.end(); ++ p) {
+    Zdd zdd = *p;
+    dumper.dump_edge(ZddEdge(zdd.mRoot));
+  }
+}
+
+// @brief ZDD リストの内容をダンプする．
+// @param[in] array ZDD のリスト
+// @param[in] s 出力ストリーム
+void
+ZddMgr::dump(BinO& s,
+	     const ZddList& array)
+{
+  if ( array.empty() ) {
+    return;
+  }
+  // 今は array の中のZDDのマネージャがすべて同じと仮定している．
+  Dumper dumper(mImpl, s);
+  for (ZddList::const_iterator p = array.begin();
+       p != array.end(); ++ p) {
+    Zdd zdd = *p;
+    dumper.dump(ZddEdge(zdd.mRoot));
+  }
+  for (ZddList::const_iterator p = array.begin();
+       p != array.end(); ++ p) {
+    Zdd zdd = *p;
+    dumper.dump_edge(ZddEdge(zdd.mRoot));
+  }
 }
 
 // @brief ダンプされた情報を ZDD を読み込む．

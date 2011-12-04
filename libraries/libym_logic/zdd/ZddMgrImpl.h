@@ -108,22 +108,10 @@ public:
   cap_op(ZddEdge e1,
 	 ZddEdge e2);
 
-  /// @brief e1 $\cap$ e2 $\cap$ e3 を計算する．
-  ZddEdge
-  cap_op(ZddEdge e1,
-	 ZddEdge e2,
-	 ZddEdge e3);
-
   /// @brief e1 $\cup$ e2 を計算する．
   ZddEdge
   cup_op(ZddEdge e1,
 	 ZddEdge e2);
-
-  /// @brief e1 $\cup$ e2 $\cup$ e3 を計算する．
-  ZddEdge
-  cup_op(ZddEdge e1,
-	 ZddEdge e2,
-	 ZddEdge e3);
 
   /// @brief src1 $\setdiff$ src2 を計算する．
   ZddEdge
@@ -688,22 +676,6 @@ private:
   ymuint32 mLastLevel;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の実装
-//////////////////////////////////////////////////////////////////////
-
-// e1 $\cap$ e2 $\cap$ e3 を計算する．
-inline
-ZddEdge
-ZddMgrImpl::cap_op(ZddEdge e1,
-		   ZddEdge e2,
-		   ZddEdge e3)
-{
-  ZddEdge tmp = cap_op(e1, e2);
-  return cap_op(tmp, e3);
-}
 
 END_NAMESPACE_YM_ZDD
 
