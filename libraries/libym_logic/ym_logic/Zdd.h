@@ -151,7 +151,7 @@ public:
   const Zdd&
   operator|=(const Zdd& src);
 
-  /// @brief diff (\f$\setminus\f$)付き代入
+  /// @brief diff (\f$\setdiff\f$)付き代入
   /// @param[in] src オペランド
   /// @return 自分自身
   const Zdd&
@@ -494,7 +494,7 @@ operator|(const Zdd& left,
 
 /// @relates Zdd
 /// @ingroup Zdd
-/// @brief diff (\f$\setminus\f$)演算
+/// @brief diff (\f$\setdiff\f$)演算
 /// @param[in] left, right オペランド
 /// @return left と right の diff
 Zdd

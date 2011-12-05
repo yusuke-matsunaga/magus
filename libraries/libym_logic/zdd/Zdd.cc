@@ -271,6 +271,7 @@ intersection(const ZddVector& zdds)
   return ans;
 }
 
+// 複数のZDDのintersectionを求める．
 Zdd
 intersection(const ZddList& zdds)
 {
@@ -398,6 +399,7 @@ set_union(const ZddVector& zdds)
   return ans;
 }
 
+// 複数のZDDのunionを求める．
 Zdd
 set_union(const ZddList& zdds)
 {
