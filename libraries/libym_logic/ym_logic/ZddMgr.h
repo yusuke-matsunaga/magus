@@ -110,24 +110,6 @@ public:
   Zdd
   make_error();
 
-#if 0
-  /// @brief singletonを表すZDDを作る
-  /// @param[in] varid 変数番号
-  /// @return 生成された ZDD
-  Zdd
-  make_singleton(VarId varid);
-
-  /// @brief インデックスと左右の子供を指定してZDDを作る．
-  /// @param[in] varid 変数番号
-  /// @param[in] chd_0 0枝の指す ZDD
-  /// @param[in] chd_1 1枝の指す ZDD
-  /// @return 生成された ZDD
-  Zdd
-  make_zdd(VarId varid,
-	   const Zdd& chd_0,
-	   const Zdd& chd_1);
-#endif
-
 
 public:
   //////////////////////////////////////////////////////////////////////

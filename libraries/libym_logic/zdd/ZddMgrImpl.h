@@ -118,6 +118,12 @@ public:
   diff_op(ZddEdge e1,
 	  ZddEdge e2);
 
+  /// @brief 指定した変数の0枝と1枝を交換する．
+  /// @param[in] var 交換を行う変数番号
+  /// @return 自分自身を返す．
+  ZddEdge
+  swap(VarId var);
+
   /// @brief 指定された変数を含まないコファクターを返す．
   ZddEdge
   cofactor0(ZddEdge e1,

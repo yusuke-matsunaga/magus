@@ -562,6 +562,17 @@ Zdd::edge1() const
   return Zdd(mMgr, ans);
 }
 
+// @brief 指定した変数の0枝と1枝を交換する．
+// @param[in] var 交換を行う変数番号
+// @return 自分自身を返す．
+const Zdd&
+Zdd::swap(VarId var)
+{
+  ZddEdge ans = mMgr->swap(var);
+  assign(ans);
+  return *this;
+}
+
 #if 0
 // @brief ZDD の内容を書き出す．
 ymuint64
