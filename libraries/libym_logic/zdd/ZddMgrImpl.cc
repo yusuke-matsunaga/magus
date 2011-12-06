@@ -99,6 +99,14 @@ ZddMgrImpl::ZddMgrImpl(const string& name,
 		       const string& option) :
   mName(name)
 {
+  if ( name == string() ) {
+    // 適当な名前を付ける．
+    static int num = 1;
+    ostringstream s;
+    s << "zdd_mgr#" << num ++;
+    mName = s.str();
+  }
+
   mRefCount = 0;
 
   // ログ出力用ストリームの初期化
@@ -111,6 +119,49 @@ ZddMgrImpl::ZddMgrImpl(const string& name,
 
   // ZDD リストの初期化
   mTopZdd = NULL;
+
+  // ユーザー設定可能パラメータのデフォルト値を設定
+  mGcThreshold = DEFAULT_GC_THRESHOLD;
+  mGcNodeLimit = DEFAULT_GC_NODE_LIMIT;
+  mNtLoadLimit = DEFAULT_NT_LOAD_LIMIT;
+  mRtLoadLimit = DEFAULT_RT_LOAD_LIMIT;
+  mMemLimit = DEFAULT_MEM_LIMIT;
+  mDangerousZone = DEFAULT_DZONE;
+  mGcEnable = 0;
+
+  // メモリ管理用のメンバを初期化
+  mFreeTop = NULL;
+  mFreeNum = 0;
+  mTopBlk = NULL;
+  mCurBlk = NULL;
+  mCurIdx = 1;
+  mOverflow = false;
+
+  // 内部情報の初期化
+  mUsedMem = 0;
+  mNodeNum = 0;
+  mGarbageNum = 0;
+  mGcCount = 0;
+
+  // 節点テーブルの初期化
+  mTableSize = 0;
+  mTableSize_1 = 0;
+  mNextLimit = 0;
+  mNodeTable = NULL;
+  resize(INIT_SIZE);
+
+  // 変数テーブルの初期化
+  mVarTableSize = VARTABLE_INIT_SIZE;
+  mVarHashTable = alloc_vartable(mVarTableSize);
+  assert_cond(mVarHashTable, __FILE__, __LINE__);
+  mVarNum = 0;
+  mVarTop = NULL;
+
+  // 演算結果テーブルの初期化
+  mTblTop = NULL;
+
+  // 演算クラスの生成
+  mCapOp = new CapOp(this);
 }
 
 // デストラクタ
@@ -139,6 +190,40 @@ ZddMgrImpl::~ZddMgrImpl()
 
   // /dev/null ストリームの破壊
   delete mNullStream;
+
+  // 節点テーブルの解放
+  dealloc_nodetable(mNodeTable, mTableSize);
+
+  // 節点用のメモリブロックの解放
+  for (Node* blk = mTopBlk; blk; ) {
+    Node* temp = blk;
+    blk = temp->mLink;
+    dealloc_nodechunk(temp);
+  }
+  if ( mCurBlk ) {
+    dealloc_nodechunk(mCurBlk);
+  }
+
+  // 演算結果テーブルの解放
+  for (CompTbl* tbl = mTblTop; tbl; ) {
+    CompTbl* tmp = tbl;
+    tbl = tbl->mNext;
+    delete tmp;
+  }
+
+  // 変数の解放
+  for (ZddVar* var = mVarTop; var; ) {
+    ZddVar* next = var->mNext;
+    delete var;
+    var = next;
+  }
+
+  // 変数テーブルの解放
+  dealloc_vartable(mVarHashTable, mVarTableSize);
+
+  // このマネージャに関わるメモリはすべて解放したはず．
+  assert_cond( mUsedMem == 0, __FILE__, __LINE__);
+
 }
 
 // log用ストリームを設定する．
