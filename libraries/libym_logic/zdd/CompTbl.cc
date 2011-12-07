@@ -27,7 +27,7 @@ BEGIN_NAMESPACE_YM_ZDD
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CompTbl::CompTbl(ZddMgrImpl* mgr,
+CompTbl::CompTbl(ZddMgrImpl& mgr,
 		 const char* name) :
   mMgr(mgr)
 {
@@ -48,7 +48,7 @@ CompTbl::CompTbl(ZddMgrImpl* mgr,
   mTableSize = 0;
 
   // リストに追加する．
-  mMgr->add_table(this);
+  mMgr.add_table(this);
 }
 
 // デストラクタ
@@ -97,7 +97,7 @@ CompTbl::max_size(ymuint64 max_size)
 void*
 CompTbl::allocate(ymuint64 size)
 {
-  return mMgr->allocate(size);
+  return mMgr.allocate(size);
 }
 
 // ZddMgr にメモリを返す．
@@ -105,14 +105,14 @@ void
 CompTbl::deallocate(void* ptr,
 		    ymuint64 size)
 {
-  mMgr->deallocate(ptr, size);
+  mMgr.deallocate(ptr, size);
 }
 
 // ログ出力用のストリームを得る．
 ostream&
 CompTbl::logstream() const
 {
-  return mMgr->logstream();
+  return mMgr.logstream();
 }
 
 
@@ -121,7 +121,7 @@ CompTbl::logstream() const
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CompTbl1::CompTbl1(ZddMgrImpl* mgr,
+CompTbl1::CompTbl1(ZddMgrImpl& mgr,
 		   const char* name) :
   CompTbl(mgr, name)
 {
@@ -226,7 +226,7 @@ CompTbl1::clear()
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CompTbl2::CompTbl2(ZddMgrImpl* mgr,
+CompTbl2::CompTbl2(ZddMgrImpl& mgr,
 		   const char* name) :
   CompTbl(mgr, name)
 {
@@ -317,115 +317,6 @@ CompTbl2::sweep()
 // クリアする．
 void
 CompTbl2::clear()
-{
-  Cell* cell = mTable;
-  Cell* end = cell + mTableSize;
-  for ( ; cell != end; ++ cell) {
-    cell->mKey1 = ZddEdge::make_error();
-    -- mUsedNum;
-  }
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// CompTbl3
-//////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-CompTbl3::CompTbl3(ZddMgrImpl* mgr,
-		   const char* name) :
-  CompTbl(mgr, name)
-{
-  resize(kInitSize);
-}
-
-// デストラクタ
-CompTbl3::~CompTbl3()
-{
-  deallocate((void*)mTable, mTableSize * sizeof(Cell));
-}
-
-// テーブルサイズを変更する．
-bool
-CompTbl3::resize(ymuint64 new_size)
-{
-  // ログの出力
-  logstream() << "CompTbl3[" << mName << "]::resize(" << new_size << ")"
-	      << endl;
-
-  // 新たなサイズを設定し，テーブルを確保する．
-  Cell* new_table = (Cell*)allocate(new_size * sizeof(Cell));
-  if ( new_table == NULL ) {
-    return false;
-  }
-
-  // 昔の値を保存する．
-  ymuint64 old_size = mTableSize;
-  Cell* old_table = mTable;
-
-  // 新たなサイズを設定し，テーブルを確保する．
-  mTable = new_table;
-  mTableSize = new_size;
-  mTableSize_1 = mTableSize - 1;
-  update_next_limit();
-
-  // 中身をクリアしておく．
-  Cell* top = mTable;
-  Cell* end = top + mTableSize;
-  do {
-    top->mKey1 = ZddEdge::make_error();
-    ++ top;
-  } while ( top != end );
-
-  // ハッシュし直して新しいテーブルに登録する．
-  mUsedNum = 0;
-  if ( old_size > 0 ) {
-    Cell* top = old_table;
-    Cell* end = top + old_size;
-    do {
-      if ( !top->mKey1.is_error() ) {
-	ymuint64 pos = hash_func(top->mKey1, top->mKey2, top->mKey3);
-	Cell* temp = mTable + pos;
-	if ( temp->mKey1.is_error() ) ++ mUsedNum;
-	temp->mKey1 = top->mKey1;
-	temp->mKey2 = top->mKey2;
-	temp->mKey3 = top->mKey3;
-	temp->mAns = top->mAns;
-      }
-      ++ top;
-    } while ( top != end );
-    deallocate((void*)old_table, old_size * sizeof(Cell));
-  }
-
-  return true;
-}
-
-// ZddMgr::GC()に対応する．
-// 具体的には GC で削除されるノードに関連したセルをクリアする．
-void
-CompTbl3::sweep()
-{
-  // ログを出力
-  logstream() << "CompTbl3[" << mName << "]::sweep()" << endl;
-
-  // 削除されるノードに関連したセルをクリアする．
-  Cell* cell = mTable;
-  Cell* end = cell + mTableSize;
-  for ( ; cell != end; ++ cell) {
-    if ( !cell->mKey1.is_error() &&
-	 (check_noref(cell->mKey1) ||
-	  check_noref(cell->mKey2) ||
-	  check_noref(cell->mKey3) ||
-	  check_noref(cell->mAns)) ) {
-      cell->mKey1 = ZddEdge::make_error();
-      -- mUsedNum;
-    }
-  }
-}
-
-// クリアする．
-void
-CompTbl3::clear()
 {
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;

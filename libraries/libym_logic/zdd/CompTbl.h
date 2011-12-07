@@ -21,9 +21,30 @@ BEGIN_NAMESPACE_YM_ZDD
 //////////////////////////////////////////////////////////////////////
 class CompTbl
 {
-  friend class ZddMgrImpl;
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] mgr 親の ZddMgrImpl
+  /// @param[in] name 名前(デバッグ用)
+  CompTbl(ZddMgrImpl& mgr,
+	  const char* name);
+
+  /// @brief デストラクタ
+  virtual
+  ~CompTbl();
+
 
 public:
+
+  /// @brief ロックされていないノードに関係したセルをきれいにする．
+  virtual
+  void
+  sweep() = 0;
+
+  /// @brief 内容をクリアする．
+  virtual
+  void
+  clear() = 0;
 
   /// @brief 使用されているセル数を返す．
   ymuint64
@@ -43,28 +64,12 @@ public:
   void
   max_size(ymuint64 max_size);
 
+  /// @brief 次の要素を返す．
+  CompTbl*
+  next() const;
+
 
 protected:
-
-  /// @brief コンストラクタ
-  /// @param[in] mgr 親の ZddMgrImpl
-  /// @param[in] name 名前(デバッグ用)
-  CompTbl(ZddMgrImpl* mgr,
-	  const char* name);
-
-  /// @brief デストラクタ
-  virtual
-  ~CompTbl();
-
-  /// @brief ロックされていないノードに関係したセルをきれいにする．
-  virtual
-  void
-  sweep() = 0;
-
-  /// @brief 内容をクリアする．
-  virtual
-  void
-  clear() = 0;
 
   /// @brief next_limitを更新する
   void
@@ -98,6 +103,9 @@ protected:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 親の ZddMgr
+  ZddMgrImpl& mMgr;
+
   // 使用されているセルの数
   ymuint64 mUsedNum;
 
@@ -120,9 +128,6 @@ protected:
   // mUsedがこの値を越えたらテーブルを拡張する
   ymuint64 mNextLimit;
 
-  // 親の ZddMgr
-  ZddMgrImpl* mMgr;
-
   // 同じ ZddMgr に属している次のテーブル
   CompTbl* mNext;
 
@@ -136,7 +141,6 @@ protected:
 class CompTbl1 :
   public CompTbl
 {
-  friend class ZddMgrImpl;
 
   // キーが1つのセル
   struct Cell
@@ -144,6 +148,18 @@ class CompTbl1 :
     ZddEdge mKey1;
     ZddEdge mAns;
   };
+
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] mgr 親の ZddMgrImpl
+  /// @param[in] name 名前
+  CompTbl1(ZddMgrImpl& mgr,
+	   const char* name = 0);
+
+  /// @brief デストラクタ
+  virtual
+  ~CompTbl1();
 
 
 public:
@@ -159,16 +175,6 @@ public:
 
 
 private:
-
-  /// @brief コンストラクタ
-  /// @param[in] mgr 親の ZddMgrImpl
-  /// @param[in] name 名前
-  CompTbl1(ZddMgrImpl* mgr,
-	   const char* name = 0);
-
-  /// @brief デストラクタ
-  virtual
-  ~CompTbl1();
 
   /// @brief ハッシュ関数
   ymuint64
@@ -208,7 +214,6 @@ private:
 class CompTbl2 :
   public CompTbl
 {
-  friend class ZddMgrImpl;
 
   // キーが2つのセル
   struct Cell {
@@ -216,6 +221,19 @@ class CompTbl2 :
     ZddEdge mKey2;
     ZddEdge mAns;
   };
+
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] mgr 親の ZddMgrImpl
+  /// @param[in] name 名前
+  CompTbl2(ZddMgrImpl& mgr,
+	   const char* name = 0);
+
+  /// @brief デストラクタ
+  virtual
+  ~CompTbl2();
+
 
 public:
 
@@ -232,16 +250,6 @@ public:
 
 
 private:
-
-  /// @brief コンストラクタ
-  /// @param[in] mgr 親の ZddMgrImpl
-  /// @param[in] name 名前
-  CompTbl2(ZddMgrImpl* mgr,
-	   const char* name = 0);
-
-  /// @brief デストラクタ
-  virtual
-  ~CompTbl2();
 
   /// @brief ハッシュ関数
   ymuint64
@@ -276,88 +284,16 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CompTbl3 CompTbl.h "CompTbl.h"
-/// @brief 3つの枝をキーとする演算結果テーブル．
-/// compose演算で用いられる
-//////////////////////////////////////////////////////////////////////
-class CompTbl3 :
-  public CompTbl
-{
-  friend class ZddMgrImpl;
-
-  // キーが3つのセル
-  struct Cell
-  {
-    ZddEdge mKey1;
-    ZddEdge mKey2;
-    ZddEdge mKey3;
-    ZddEdge mAns;
-  };
-
-public:
-
-  /// @brief 検索を行なう．
-  ZddEdge
-  get(ZddEdge id1,
-      ZddEdge id2,
-      ZddEdge id3);
-
-  /// @brief 登録を行なう．
-  void
-  put(ZddEdge id1,
-      ZddEdge id2,
-      ZddEdge id3,
-      ZddEdge ans);
-
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] mgr 親の ZddMgrImpl
-  /// @param[in] name
-  CompTbl3(ZddMgrImpl* mgr,
-	   const char* name = 0);
-
-  /// @brief デストラクタ
-  virtual
-  ~CompTbl3();
-
-  /// @brief ハッシュ関数
-  ymuint64
-  hash_func(ZddEdge id1,
-	    ZddEdge id2,
-	    ZddEdge id3);
-
-  /// @brief テーブルサイズを変更する．
-  /// @param[in] new_size 設定する値
-  bool
-  resize(ymuint64 new_size);
-
-  /// @brief ガーベージコレクションが起きた時の処理を行なう．
-  virtual
-  void
-  sweep();
-
-  /// @brief クリアする．
-  virtual
-  void
-  clear();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 実際のテーブル
-  Cell* mTable;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief 次の要素を返す．
+inline
+CompTbl*
+CompTbl::next() const
+{
+  return mNext;
+}
 
 // テーブルを拡張すべき時には true を返す．
 inline
@@ -464,63 +400,6 @@ CompTbl2::put(ZddEdge id1,
   if ( tmp->mKey1.is_error() ) mUsedNum ++;
   tmp->mKey1 = id1;
   tmp->mKey2 = id2;
-  tmp->mAns = ans;
-}
-
-// ハッシュ関数
-inline
-ymuint64
-CompTbl3::hash_func(ZddEdge id1,
-		    ZddEdge id2,
-		    ZddEdge id3)
-{
-  ymuint64 v1 = id1.hash();
-  ymuint64 v2 = id2.hash();
-  ymuint64 v3 = id3.hash();
-  return ymuint64(v1 + v2 + v3 + (v1 >> 2) + (v2 >> 4) + (v3 >> 6))
-    & mTableSize_1;
-}
-
-// 検索を行なう．
-inline
-ZddEdge
-CompTbl3::get(ZddEdge id1,
-	      ZddEdge id2,
-	      ZddEdge id3)
-{
-  Cell* tmp = mTable + hash_func(id1, id2, id3);
-  if ( tmp->mKey1 != id1 || tmp->mKey2 != id2 || tmp->mKey3 != id3 ) {
-    return ZddEdge::make_error();
-  }
-  else {
-    return tmp->mAns;
-  }
-}
-
-// 登録を行なう．
-inline
-void
-CompTbl3::put(ZddEdge id1,
-	      ZddEdge id2,
-	      ZddEdge id3,
-	      ZddEdge ans)
-{
-  if ( id1.is_invalid() ||
-       id2.is_invalid() ||
-       id3.is_invalid() ||
-       ans.is_invalid() ) {
-    return;
-  }
-  if ( check_tablesize() ) {
-    if ( !resize(mTableSize << 1) ) {
-      return;
-    }
-  }
-  Cell* tmp = mTable + hash_func(id1, id2, id3);
-  if ( tmp->mKey1.is_error() ) mUsedNum ++;
-  tmp->mKey1 = id1;
-  tmp->mKey2 = id2;
-  tmp->mKey3 = id3;
   tmp->mAns = ans;
 }
 

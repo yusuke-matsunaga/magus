@@ -23,11 +23,11 @@ class ZddBinOp
 public:
 
   /// @brief コンストラクタ
-  ZddOp() { }
+  ZddBinOp() { }
 
   /// @brief デストラクタ
   virtual
-  ~ZddOp() { }
+  ~ZddBinOp() { }
 
 
 public:

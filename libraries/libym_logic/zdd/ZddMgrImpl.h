@@ -17,6 +17,8 @@
 
 BEGIN_NAMESPACE_YM_ZDD
 
+class ZddBinOp;
+
 //////////////////////////////////////////////////////////////////////
 /// @class ZddMgrImpl ZddMgrImpl.h "ZddMgrImpl.h"
 /// @param[in] ZDD を管理するクラス
@@ -610,7 +612,7 @@ private:
   CompTbl* mTblTop;
 
   // cap_op 用の演算クラス
-  ZddOp* mCapOp;
+  ZddBinOp* mCapOp;
 
 
   //////////////////////////////////////////////////////////////////////

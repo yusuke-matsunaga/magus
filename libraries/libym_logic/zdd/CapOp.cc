@@ -20,7 +20,8 @@ BEGIN_NAMESPACE_YM_ZDD
 
 // @brief コンストラクタ
 // @param[in] mgr ZddMgrImpl
-CapOp::CapOp(ZddMgrImpl* mgr) :
+CapOp::CapOp(ZddMgrImpl& mgr) :
+  mMgr(mgr),
   mCapTable(mgr, "cap_table")
 {
 }
@@ -81,7 +82,7 @@ CapOp::cap_step(ZddEdge f,
       g = tmp;
     }
 
-    ZddEdge result = mCapTable->get(f, g);
+    ZddEdge result = mCapTable.get(f, g);
     if ( result.is_error() ) {
       // 演算結果テーブルには登録されていない
       ZddEdge f_0, f_1;
@@ -95,8 +96,8 @@ CapOp::cap_step(ZddEdge f,
       if ( r_1.is_overflow() ) {
 	return ZddEdge::make_overflow();
       }
-      result = new_node(var, r_0, r_1);
-      mCapTable->put(f, g, result);
+      result = mMgr.new_node(var, r_0, r_1);
+      mCapTable.put(f, g, result);
     }
   }
   return ans_e.add_zattr(zattr);

@@ -10,6 +10,7 @@
 
 
 #include "ZddOp.h"
+#include "ZddMgrImpl.h"
 #include "CompTbl.h"
 
 
@@ -26,7 +27,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr ZddMgrImpl
-  CapOp(ZddMgrImpl* mgr);
+  CapOp(ZddMgrImpl& mgr);
 
   /// @brief デストラクタ
   virtual
@@ -58,6 +59,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 親のマネージャ
+  ZddMgrImpl& mMgr;
 
   // 演算テーブル
   CompTbl2 mCapTable;

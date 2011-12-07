@@ -11,6 +11,7 @@
 
 #include "ym_logic/Zdd.h"
 #include "ym_logic/ZddMgr.h"
+#include "CapOp.h"
 
 
 #if !defined(__SUNPRO_CC) || __SUNPRO_CC >= 0x500
@@ -40,6 +41,14 @@ BEGIN_NONAMESPACE
 const ymuint64 K_unit = (1 << 10);
 // 1M = 1,024 x 1,024
 const ymuint64 M_unit = (1 << 20);
+
+// パラメータのデフォルト値
+const double DEFAULT_GC_THRESHOLD  = 0.10;
+const ymuint64 DEFAULT_GC_NODE_LIMIT =  64 * K_unit;
+const double DEFAULT_NT_LOAD_LIMIT = 2.0;
+const double DEFAULT_RT_LOAD_LIMIT = 0.8;
+const ymuint64 DEFAULT_MEM_LIMIT     = 400 * M_unit;
+const ymuint64 DEFAULT_DZONE         =  10 * M_unit;
 
 // 節点テーブルの初期サイズ
 const ymuint64 INIT_SIZE = 1 * K_unit;
@@ -161,7 +170,7 @@ ZddMgrImpl::ZddMgrImpl(const string& name,
   mTblTop = NULL;
 
   // 演算クラスの生成
-  mCapOp = new CapOp(this);
+  mCapOp = new CapOp(*this);
 }
 
 // デストラクタ
@@ -195,8 +204,8 @@ ZddMgrImpl::~ZddMgrImpl()
   dealloc_nodetable(mNodeTable, mTableSize);
 
   // 節点用のメモリブロックの解放
-  for (Node* blk = mTopBlk; blk; ) {
-    Node* temp = blk;
+  for (ZddNode* blk = mTopBlk; blk; ) {
+    ZddNode* temp = blk;
     blk = temp->mLink;
     dealloc_nodechunk(temp);
   }
@@ -207,7 +216,7 @@ ZddMgrImpl::~ZddMgrImpl()
   // 演算結果テーブルの解放
   for (CompTbl* tbl = mTblTop; tbl; ) {
     CompTbl* tmp = tbl;
-    tbl = tbl->mNext;
+    tbl = tbl->next();
     delete tmp;
   }
 
@@ -354,7 +363,7 @@ ZddMgrImpl::gc(bool shrink_nodetable)
   logstream() << "ZddMgrImpl::GC() begin...." << endl;
 
   // 演算結果テーブルをスキャンしておかなければならない．
-  for (CompTbl* tbl = mTblTop; tbl; tbl = tbl->mNext) {
+  for (CompTbl* tbl = mTblTop; tbl; tbl = tbl->next()) {
     if ( tbl->used_num() > 0 ) tbl->sweep();
   }
 
@@ -508,7 +517,7 @@ ZddMgrImpl::param(const ZddMgrParam& param,
   }
   if ( mask & ZddMgrParam::RT_LOAD_LIMIT ) {
     mRtLoadLimit = param.mRtLoadLimit;
-    for (CompTbl* tbl = mTblTop; tbl; tbl = tbl->mNext) {
+    for (CompTbl* tbl = mTblTop; tbl; tbl = tbl->next()) {
       tbl->load_limit(mRtLoadLimit);
     }
   }

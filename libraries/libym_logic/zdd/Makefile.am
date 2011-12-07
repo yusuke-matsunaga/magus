@@ -32,7 +32,9 @@ libym_logic_zdd_la_SOURCES = \
 	ZddMgrImpl.h \
 	ZddMgrImpl.cc \
 	ZddNode.h \
-	cap_op.cc \
+	ZddOp.h \
+	CapOp.h \
+	CapOp.cc \
 	count.cc \
 	support.cc
 
