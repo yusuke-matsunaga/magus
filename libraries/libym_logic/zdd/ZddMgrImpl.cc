@@ -12,6 +12,8 @@
 #include "ym_logic/Zdd.h"
 #include "ym_logic/ZddMgr.h"
 #include "CapOp.h"
+#include "CupOp.h"
+#include "DiffOp.h"
 
 
 #if !defined(__SUNPRO_CC) || __SUNPRO_CC >= 0x500
@@ -43,10 +45,10 @@ const ymuint64 K_unit = (1 << 10);
 const ymuint64 M_unit = (1 << 20);
 
 // パラメータのデフォルト値
-const double DEFAULT_GC_THRESHOLD  = 0.10;
+const double DEFAULT_GC_THRESHOLD    = 0.10;
 const ymuint64 DEFAULT_GC_NODE_LIMIT =  64 * K_unit;
-const double DEFAULT_NT_LOAD_LIMIT = 2.0;
-const double DEFAULT_RT_LOAD_LIMIT = 0.8;
+const double DEFAULT_NT_LOAD_LIMIT   = 2.0;
+const double DEFAULT_RT_LOAD_LIMIT   = 0.8;
 const ymuint64 DEFAULT_MEM_LIMIT     = 400 * M_unit;
 const ymuint64 DEFAULT_DZONE         =  10 * M_unit;
 
@@ -167,10 +169,12 @@ ZddMgrImpl::ZddMgrImpl(const string& name,
   mVarTop = NULL;
 
   // 演算結果テーブルの初期化
-  mTblTop = NULL;
+  mTblList.clear();
 
   // 演算クラスの生成
   mCapOp = new CapOp(*this);
+  mCupOp = new CupOp(*this);
+  mDiffOp = new DiffOp(*this);
 }
 
 // デストラクタ
@@ -211,13 +215,6 @@ ZddMgrImpl::~ZddMgrImpl()
   }
   if ( mCurBlk ) {
     dealloc_nodechunk(mCurBlk);
-  }
-
-  // 演算結果テーブルの解放
-  for (CompTbl* tbl = mTblTop; tbl; ) {
-    CompTbl* tmp = tbl;
-    tbl = tbl->next();
-    delete tmp;
   }
 
   // 変数の解放
@@ -328,6 +325,56 @@ ZddMgrImpl::varid(ymuint level) const
   return VarId(level);
 }
 
+// @brief e1 $\cap$ e2 を計算する．
+ZddEdge
+ZddMgrImpl::cap(ZddEdge e1,
+		ZddEdge e2)
+{
+  return mCapOp->apply(e1, e2);
+}
+
+// @brief e1 $\cup$ e2 を計算する．
+ZddEdge
+ZddMgrImpl::cup(ZddEdge e1,
+		ZddEdge e2)
+{
+  return mCupOp->apply(e1, e2);
+}
+
+// @brief src1 $\setdiff$ src2 を計算する．
+ZddEdge
+ZddMgrImpl::diff(ZddEdge e1,
+		 ZddEdge e2)
+{
+  return mDiffOp->apply(e1, e2);
+}
+
+// @brief 指定した変数の0枝と1枝を交換する．
+// @param[in] e 枝
+// @param[in] var 交換を行う変数番号
+ZddEdge
+ZddMgrImpl::swap(ZddEdge e,
+		 VarId var)
+{
+  return mSwapOp->apply(e, var);
+}
+
+// @brief 指定された変数を含まないコファクターを返す．
+ZddEdge
+ZddMgrImpl::cofactor0(ZddEdge e,
+		      VarId var)
+{
+  return mCof0Op->apply(e, var);
+}
+
+// @brief 指定された変数を含むコファクターを返す．
+ZddEdge
+ZddMgrImpl::cofactor1(ZddEdge e,
+		      VarId var)
+{
+  return mCof1Op->apply(e, var);
+}
+
 // 節点テーブルを次に拡大する時の基準値を計算する．
 void
 ZddMgrImpl::set_next_limit_size()
@@ -363,7 +410,9 @@ ZddMgrImpl::gc(bool shrink_nodetable)
   logstream() << "ZddMgrImpl::GC() begin...." << endl;
 
   // 演算結果テーブルをスキャンしておかなければならない．
-  for (CompTbl* tbl = mTblTop; tbl; tbl = tbl->next()) {
+  for (list<CompTbl*>::iterator p = mTblList.begin();
+       p != mTblList.end(); ++ p) {
+    CompTbl* tbl = *p;
     if ( tbl->used_num() > 0 ) tbl->sweep();
   }
 
@@ -517,9 +566,6 @@ ZddMgrImpl::param(const ZddMgrParam& param,
   }
   if ( mask & ZddMgrParam::RT_LOAD_LIMIT ) {
     mRtLoadLimit = param.mRtLoadLimit;
-    for (CompTbl* tbl = mTblTop; tbl; tbl = tbl->next()) {
-      tbl->load_limit(mRtLoadLimit);
-    }
   }
   if ( mask & ZddMgrParam::MEM_LIMIT ) {
     mMemLimit = param.mMemLimit;
@@ -738,8 +784,7 @@ ZddMgrImpl::unlockall(ZddNode* vp)
 void
 ZddMgrImpl::add_table(CompTbl* tbl)
 {
-  tbl->mNext = mTblTop;
-  mTblTop = tbl;
+  mTblList.push_back(tbl);
 }
 
 // 節点を確保する．

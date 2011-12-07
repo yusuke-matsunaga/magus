@@ -219,7 +219,7 @@ Zdd::operator&=(const Zdd& src2)
   else {
     ZddEdge e1 = ZddEdge(mRoot);
     ZddEdge e2 = ZddEdge(src2.mRoot);
-    ans = mMgr->cap_op(e1, e2);
+    ans = mMgr->cap(e1, e2);
   }
   assign(ans);
   return *this;
@@ -347,7 +347,7 @@ Zdd::operator|=(const Zdd& src2)
   else {
     ZddEdge e1 = ZddEdge(mRoot);
     ZddEdge e2 = ZddEdge(src2.mRoot);
-    ans = mMgr->cup_op(e1, e2);
+    ans = mMgr->cup(e1, e2);
   }
   assign(ans);
   return *this;
@@ -475,7 +475,7 @@ Zdd::operator-=(const Zdd& src2)
   else {
     ZddEdge e1 = ZddEdge(mRoot);
     ZddEdge e2 = ZddEdge(src2.mRoot);
-    ans = mMgr->diff_op(e1, e2);
+    ans = mMgr->diff(e1, e2);
   }
   assign(ans);
   return *this;

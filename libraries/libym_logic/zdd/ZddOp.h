@@ -10,9 +10,79 @@
 
 
 #include "ym_logic/zdd_nsdef.h"
+#include "ZddEdge.h"
+#include "ZddNode.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
+
+//////////////////////////////////////////////////////////////////////
+/// @class ZddUnOp ZddOp.h "ZddOp.h"
+/// @brief ZDD の単項演算を行うクラス
+//////////////////////////////////////////////////////////////////////
+class ZddUnOp
+{
+public:
+
+  /// @brief コンストラクタ
+  ZddUnOp() { }
+
+  /// @brief デストラクタ
+  virtual
+  ~ZddUnOp() { }
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // メインの関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 演算を行う関数
+  /// @param[in] left オペランド
+  /// @param[in] varid 変数番号
+  virtual
+  ZddEdge
+  apply(ZddEdge left,
+	VarId varid) = 0;
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 根のインデックスにしたがって子供のノードを求める．
+  /// @param[in] f, g オペランド
+  /// @param[out] f_0, f_1 f の子供
+  /// @param[out] g_0, g_1 g の子供
+  /// @return 根の変数を返す．
+  static
+  ZddVar*
+  split(ZddEdge f,
+	ZddEdge g,
+	ZddEdge& f_0,
+	ZddEdge& f_1,
+	ZddEdge& g_0,
+	ZddEdge& g_1);
+
+  /// @brief split() の下請け関数
+  /// @param[in] top_level 根のレベル
+  /// @param[in] level レベル
+  /// @param[in] e 枝
+  /// @param[in] node ノード
+  /// @param[out] e_0 0枝
+  /// @param[out] e_1 1枝
+  static
+  void
+  split1(ymuint top_level,
+	 ymuint level,
+	 ZddEdge e,
+	 ZddNode* node,
+	 ZddEdge& e_0,
+	 ZddEdge& e_1);
+
+};
+
 
 //////////////////////////////////////////////////////////////////////
 /// @class ZddOp ZddOp.h "ZddOp.h"
@@ -31,15 +101,118 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // メインの関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 演算を行う関数
   /// @param[in] left, right オペランド
   virtual
   ZddEdge
-  operator()(ZddEdge left,
-	     ZddEdge right) = 0;
+  apply(ZddEdge left,
+	ZddEdge right) = 0;
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 根のインデックスにしたがって子供のノードを求める．
+  /// @param[in] f, g オペランド
+  /// @param[out] f_0, f_1 f の子供
+  /// @param[out] g_0, g_1 g の子供
+  /// @return 根の変数を返す．
+  static
+  ZddVar*
+  split(ZddEdge f,
+	ZddEdge g,
+	ZddEdge& f_0,
+	ZddEdge& f_1,
+	ZddEdge& g_0,
+	ZddEdge& g_1);
+
+  /// @brief split() の下請け関数
+  /// @param[in] top_level 根のレベル
+  /// @param[in] level レベル
+  /// @param[in] e 枝
+  /// @param[in] node ノード
+  /// @param[out] e_0 0枝
+  /// @param[out] e_1 1枝
+  static
+  void
+  split1(ymuint top_level,
+	 ymuint level,
+	 ZddEdge e,
+	 ZddNode* node,
+	 ZddEdge& e_0,
+	 ZddEdge& e_1);
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 根のインデックスにしたがって子供のノードを求める．
+// @param[in] f, g オペランド
+// @param[out] f_0, f_1 f の子供
+// @param[out] g_0, g_1 g の子供
+// @return 根の変数を返す．
+inline
+ZddVar*
+ZddBinOp::split(ZddEdge f,
+		ZddEdge g,
+		ZddEdge& f_0,
+		ZddEdge& f_1,
+		ZddEdge& g_0,
+		ZddEdge& g_1)
+{
+  ZddNode* f_vp = f.get_node();
+  ZddNode* g_vp = g.get_node();
+  ZddVar* f_var = f_vp->var();
+  ZddVar* g_var = g_vp->var();
+  ymuint f_level = f_var->level();
+  ymuint g_level = g_var->level();
+  ymuint level = f_level;
+  ZddVar* var = f_var;
+  if ( level > g_level ) {
+    level = g_level;
+    var = g_var;
+  }
+  split1(level, f_level, f, f_vp, f_0, f_1);
+  split1(level, g_level, g, g_vp, g_0, g_1);
+
+  return var;
+}
+
+// @brief split() の下請け関数
+// @param[in] top_level 根のレベル
+// @param[in] level レベル
+// @param[in] e 枝
+// @param[in] node ノード
+// @param[out] e_0 0枝
+// @param[out] e_1 1枝
+inline
+void
+ZddBinOp::split1(ymuint top_level,
+		 ymuint level,
+		 ZddEdge e,
+		 ZddNode* node,
+		 ZddEdge& e_0,
+		 ZddEdge& e_1)
+{
+  if ( top_level == level ) {
+    e_0 = node->edge0();
+    e_1 = node->edge1();
+    e_0.add_zattr(e.zattr());
+  }
+  else {
+    e_0 = e;
+    e_1 = ZddEdge::make_zero();
+  }
+}
 
 END_NAMESPACE_YM_ZDD
 

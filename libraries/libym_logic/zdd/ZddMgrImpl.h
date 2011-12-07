@@ -92,49 +92,44 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ZDD 生成用関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief singletonを作る
-  ZddEdge
-  make_singleton(VarId varid);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
 
   /// @brief e1 $\cap$ e2 を計算する．
   ZddEdge
-  cap_op(ZddEdge e1,
-	 ZddEdge e2);
+  cap(ZddEdge e1,
+      ZddEdge e2);
 
   /// @brief e1 $\cup$ e2 を計算する．
   ZddEdge
-  cup_op(ZddEdge e1,
-	 ZddEdge e2);
+  cup(ZddEdge e1,
+      ZddEdge e2);
 
   /// @brief src1 $\setdiff$ src2 を計算する．
   ZddEdge
-  diff_op(ZddEdge e1,
-	  ZddEdge e2);
+  diff(ZddEdge e1,
+       ZddEdge e2);
 
   /// @brief 指定した変数の0枝と1枝を交換する．
+  /// @param[in] e 枝
   /// @param[in] var 交換を行う変数番号
-  /// @return 自分自身を返す．
   ZddEdge
-  swap(VarId var);
+  swap(ZddEdge e,
+       VarId var);
 
   /// @brief 指定された変数を含まないコファクターを返す．
+  /// @param[in] e 枝
+  /// @param[in] var 交換を行う変数番号
   ZddEdge
-  cofactor0(ZddEdge e1,
-	    VarId id);
+  cofactor0(ZddEdge e,
+	    VarId var);
 
   /// @brief 指定された変数を含むコファクターを返す．
+  /// @param[in] e 枝
+  /// @param[in] var 交換を行う変数番号
   ZddEdge
-  cofactor1(ZddEdge e1,
-	    VarId id);
+  cofactor1(ZddEdge e,
+	    VarId var);
 
 
 public:
@@ -275,6 +270,10 @@ public:
   ymuint64
   gc_count() const;
 
+  /// @brief 演算テーブル用の load_limit を得る．
+  double
+  rt_load_limit() const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -315,21 +314,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 上記の XXX_op() の内部で用いられる再帰関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief cap_op の下請け関数
-  ZddEdge
-  cap_step(ZddEdge e1,
-	   ZddEdge e2);
-
-  /// @brief cup_op の下請け関数
-  ZddEdge
-  cup_step(ZddEdge e1,
-	   ZddEdge e2);
-
-  /// @brief diff_op の下請け関数
-  ZddEdge
-  diff_step(ZddEdge e1,
-	    ZddEdge e2);
 
   /// @brief size() の下請関数
   void
@@ -476,28 +460,6 @@ private:
   void
   setmark(ZddEdge vd);
 
-  /// @brief idx が top に等しいときには e の子供を e_0, e_1 にセットする．
-  /// 等しくなければ e をセットする．
-  static
-  void
-  split1(ymuint top,
-	 ymuint level,
-	 ZddEdge e,
-	 const ZddNode* vp,
-	 bool zattr,
-	 ZddEdge& e_0,
-	 ZddEdge& e_1);
-
-  /// @brief f と g のノードの子供のノードとレベルを求める．
-  static
-  ZddVar*
-  split(ZddEdge f,
-	ZddEdge g,
-	ZddEdge& f_0,
-	ZddEdge& f_1,
-	ZddEdge& g_0,
-	ZddEdge& g_1);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -608,11 +570,26 @@ private:
   // 演算結果テーブル
   //////////////////////////////////////////////////////////////////////
 
-  // この ZddMgr に登録されているテーブルの先頭
-  CompTbl* mTblTop;
+  // この ZddMgr に登録されているテーブルのリスト
+  list<CompTbl*> mTblList;
 
-  // cap_op 用の演算クラス
+  // cap 用の演算クラス
   ZddBinOp* mCapOp;
+
+  // cup 用の演算クラス
+  ZddBinOp* mCupOp;
+
+  // diff 用の演算クラス
+  ZddBinOp* mDiffOp;
+
+  // swap 用の演算クラス
+  ZddUnOp* mSwapOp;
+
+  // cofactor0 用の演算クラス
+  ZddUnOp* mCof0Op;
+
+  // cofactor1 用の演算クラス
+  ZddUnOp* mCof1Op;
 
 
   //////////////////////////////////////////////////////////////////////
@@ -673,6 +650,19 @@ private:
   ZddMgrImpl* mDefaultMgr;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 演算テーブル用の load_limit を得る．
+inline
+double
+ZddMgrImpl::rt_load_limit() const
+{
+  return mRtLoadLimit;
+}
 
 END_NAMESPACE_YM_ZDD
 

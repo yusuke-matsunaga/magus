@@ -14,7 +14,6 @@
 BEGIN_NONAMESPACE
 
 const ymuint64 kInitSize = (1UL << 10);
-const double kLoadLimit = 0.8;
 const ymuint64 kMaxSize = (1UL << 20);
 
 END_NONAMESPACE
@@ -43,7 +42,6 @@ CompTbl::CompTbl(ZddMgrImpl& mgr,
     mName = name;
   }
 
-  mLoadLimit = kLoadLimit;
   mMaxSize = kMaxSize;
   mTableSize = 0;
 
@@ -67,7 +65,7 @@ CompTbl::table_size() const
 void
 CompTbl::update_next_limit()
 {
-  mNextLimit = size_t(double(mTableSize) * mLoadLimit);
+  mNextLimit = static_cast<ymuint64>(double(mTableSize) * mMgr.rt_load_limit());
 }
 
 // 使用されているセル数を取り出す．
@@ -75,13 +73,6 @@ ymuint64
 CompTbl::used_num() const
 {
   return mUsedNum;
-}
-
-// load_limitの(再)設定を行なう．
-void
-CompTbl::load_limit(double load_limit)
-{
-  mLoadLimit = load_limit;
 }
 
 // 最大のテーブルサイズの設定を行なう．

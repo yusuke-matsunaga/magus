@@ -54,19 +54,10 @@ public:
   ymuint64
   table_size() const;
 
-  /// @brief load_limit を設定する．
-  /// @param[in] load_limit 設定する値
-  void
-  load_limit(double load_limit);
-
   /// @brief 最大のテーブルサイズを設定する．
   /// @param[in] max_size 設定する値
   void
   max_size(ymuint64 max_size);
-
-  /// @brief 次の要素を返す．
-  CompTbl*
-  next() const;
 
 
 protected:
@@ -118,9 +109,6 @@ protected:
 
   // ほとんどデバッグ用の名前
   string mName;
-
-  // テーブルの使用率がこの値を越えたらサイズの拡張を行なう．
-  double mLoadLimit;
 
   // ただし，テーブルのサイズはこれ以上大きくしない．
   ymuint64 mMaxSize;
@@ -286,14 +274,6 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief 次の要素を返す．
-inline
-CompTbl*
-CompTbl::next() const
-{
-  return mNext;
-}
 
 // テーブルを拡張すべき時には true を返す．
 inline

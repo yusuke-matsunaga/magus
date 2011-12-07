@@ -1,8 +1,8 @@
-#ifndef CAPOP_H
-#define CAPOP_H
+#ifndef CUPOP_H
+#define CUPOP_H
 
-/// @file CapOp.h
-/// @brief CapOp のヘッダファイル
+/// @file CupOp.h
+/// @brief CupOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -17,21 +17,21 @@
 BEGIN_NAMESPACE_YM_ZDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class CapOp CapOp.h "CapOp.h"
-/// @brief インターセクションを求めるクラス
+/// @class CupOp CupOp.h "CupOp.h"
+/// @brief ユニオンを求めるクラス
 //////////////////////////////////////////////////////////////////////
-class CapOp :
+class CupOp :
   public ZddBinOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr ZddMgrImpl
-  CapOp(ZddMgrImpl& mgr);
+  CupOp(ZddMgrImpl& mgr);
 
   /// @brief デストラクタ
   virtual
-  ~CapOp();
+  ~CupOp();
 
 
 public:
@@ -39,7 +39,7 @@ public:
   // メインの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief \f$\cap\f$演算を行う関数
+  /// @brief \f$\cup\f$演算を行う関数
   /// @param[in] left, right オペランド
   virtual
   ZddEdge
@@ -54,7 +54,7 @@ private:
 
   /// @brief 実際に演算を行う関数
   ZddEdge
-  cap_step(ZddEdge f,
+  cup_step(ZddEdge f,
 	   ZddEdge g);
 
 
@@ -67,10 +67,10 @@ private:
   ZddMgrImpl& mMgr;
 
   // 演算テーブル
-  CompTbl2 mCapTable;
+  CompTbl2 mCupTable;
 
 };
 
 END_NAMESPACE_YM_ZDD
 
-#endif // CAPOP_H
+#endif // CUPOP_H

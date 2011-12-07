@@ -1,13 +1,13 @@
 
-/// @file CapOp.cc
-/// @brief CapOp の実装ファイル
+/// @file SwapOp.cc
+/// @brief SwapOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CapOp.h"
+#include "SwapOp.h"
 #include "ZddMgrImpl.h"
 #include "CompTbl.h"
 
@@ -15,57 +15,56 @@
 BEGIN_NAMESPACE_YM_ZDD
 
 //////////////////////////////////////////////////////////////////////
-// クラス CapOp
+// クラス SwapOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] mgr ZddMgrImpl
-CapOp::CapOp(ZddMgrImpl& mgr) :
+SwapOp::SwapOp(ZddMgrImpl& mgr) :
   mMgr(mgr),
-  mCapTable(mgr, "cap_table")
+  mSwapTable(mgr, "swap_table")
 {
 }
 
 // @brief デストラクタ
-CapOp::~CapOp()
+SwapOp::~SwapOp()
 {
 }
 
-// @brief \f$\cap\f$演算を行う関数
-// @param[in] left, right オペランド
+// @brief swap 演算を行う関数
+// @param[in] left オペランド
+// @param[in] var 変数番号
 ZddEdge
-CapOp::apply(ZddEdge left,
-	     ZddEdge right)
+SwapOp::apply(ZddEdge left,
+	      VarId var)
 {
   // エラー状態のチェック
-  if ( left.is_error() || right.is_error() ) {
+  if ( left.is_error() ) {
     // どちらかがエラー
     return ZddEdge::make_error();
   }
-  if ( left.is_overflow() || right.is_overflow() ) {
+  if ( left.is_overflow() ) {
     // どちらかがオーバーフロー
     return ZddEdge::make_overflow();
   }
 
-  return cap_step(left, right);
+  mVar = var;
+  mVarEdge = mMgr.new_node(ZddEdge::make_zero(), ZddEdge::make_one());
+  return swap_step(left)
 }
 
-// cap_op の下請け関数
+// swap_op の下請け関数
 ZddEdge
-CapOp::cap_step(ZddEdge f,
-		ZddEdge g)
+SwapOp::swap_step(ZddEdge f)
 {
-  // 0-element 属性に対するルール
-  // f, g ともに 0-element 属性をもっていたら答にも 0-element 属性を持たせる．
-  bool zattr = f.zattr() && g.zattr();
+  bool zattr = f.zattr();
   f.normalize();
-  g.normalize();
 
   ZddEdge ans_e;
 
   // 特別な場合の処理
-  // 1: 片方のZDDが0なら答は0，
-  // 2: 同じZDDどうしなら答は自分自身
+  // 1：片方のZDDが0なら答は0，
+  // 2：同じZDDどうしなら答は自分自身
   if ( f.is_zero() || g.is_zero() ) {
     ans_e = ZddEdge::make_zero();
   }
@@ -82,7 +81,7 @@ CapOp::cap_step(ZddEdge f,
       g = tmp;
     }
 
-    ZddEdge result = mCapTable.get(f, g);
+    ZddEdge result = mSwapTable.get(f, g);
     if ( result.is_error() ) {
       // 演算結果テーブルには登録されていない
       ZddEdge f_0, f_1;
@@ -97,7 +96,7 @@ CapOp::cap_step(ZddEdge f,
 	return ZddEdge::make_overflow();
       }
       result = mMgr.new_node(var, r_0, r_1);
-      mCapTable.put(f, g, result);
+      mSwapTable.put(f, g, result);
     }
   }
   return ans_e.add_zattr(zattr);

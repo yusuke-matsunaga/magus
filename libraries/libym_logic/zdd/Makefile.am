@@ -35,6 +35,10 @@ libym_logic_zdd_la_SOURCES = \
 	ZddOp.h \
 	CapOp.h \
 	CapOp.cc \
+	CupOp.h \
+	CupOp.cc \
+	DiffOp.h \
+	DiffOp.cc \
 	count.cc \
 	support.cc
 

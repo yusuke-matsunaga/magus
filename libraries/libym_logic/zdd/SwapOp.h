@@ -1,8 +1,8 @@
-#ifndef CAPOP_H
-#define CAPOP_H
+#ifndef SWAPOP_H
+#define SWAPOP_H
 
-/// @file CapOp.h
-/// @brief CapOp のヘッダファイル
+/// @file SwapOp.h
+/// @brief SwapOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -17,21 +17,21 @@
 BEGIN_NAMESPACE_YM_ZDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class CapOp CapOp.h "CapOp.h"
-/// @brief インターセクションを求めるクラス
+/// @class SwapOp SwapOp.h "SwapOp.h"
+/// @brief swap 演算を求めるクラス
 //////////////////////////////////////////////////////////////////////
-class CapOp :
-  public ZddBinOp
+class SwapOp :
+  public ZddUnOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr ZddMgrImpl
-  CapOp(ZddMgrImpl& mgr);
+  SwapOp(ZddMgrImpl& mgr);
 
   /// @brief デストラクタ
   virtual
-  ~CapOp();
+  ~SwapOp();
 
 
 public:
@@ -39,12 +39,13 @@ public:
   // メインの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief \f$\cap\f$演算を行う関数
-  /// @param[in] left, right オペランド
+  /// @brief swap 演算を行う関数
+  /// @param[in] left オペランド
+  /// @param[in] var 変数番号
   virtual
   ZddEdge
   apply(ZddEdge left,
-	ZddEdge right);
+	VarId var);
 
 
 private:
@@ -54,8 +55,7 @@ private:
 
   /// @brief 実際に演算を行う関数
   ZddEdge
-  cap_step(ZddEdge f,
-	   ZddEdge g);
+  swap_step(ZddEdge f);
 
 
 private:
@@ -67,10 +67,16 @@ private:
   ZddMgrImpl& mMgr;
 
   // 演算テーブル
-  CompTbl2 mCapTable;
+  CompTbl2 mSwapTable;
+
+  // 変数番号
+  VarId mVar;
+
+  // 変数番号を表す枝
+  ZddEdge mVarEdge;
 
 };
 
 END_NAMESPACE_YM_ZDD
 
-#endif // CAPOP_H
+#endif // SWAPOP_H

@@ -1,8 +1,8 @@
-#ifndef CAPOP_H
-#define CAPOP_H
+#ifndef DIFFOP_H
+#define DIFFOP_H
 
-/// @file CapOp.h
-/// @brief CapOp のヘッダファイル
+/// @file DiffOp.h
+/// @brief DiffOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -17,21 +17,21 @@
 BEGIN_NAMESPACE_YM_ZDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class CapOp CapOp.h "CapOp.h"
-/// @brief インターセクションを求めるクラス
+/// @class DiffOp DiffOp.h "DiffOp.h"
+/// @brief 集合差を求めるクラス
 //////////////////////////////////////////////////////////////////////
-class CapOp :
+class DiffOp :
   public ZddBinOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr ZddMgrImpl
-  CapOp(ZddMgrImpl& mgr);
+  DiffOp(ZddMgrImpl& mgr);
 
   /// @brief デストラクタ
   virtual
-  ~CapOp();
+  ~DiffOp();
 
 
 public:
@@ -39,7 +39,7 @@ public:
   // メインの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief \f$\cap\f$演算を行う関数
+  /// @brief \f$\setdiff\f$演算を行う関数
   /// @param[in] left, right オペランド
   virtual
   ZddEdge
@@ -54,8 +54,8 @@ private:
 
   /// @brief 実際に演算を行う関数
   ZddEdge
-  cap_step(ZddEdge f,
-	   ZddEdge g);
+  diff_step(ZddEdge f,
+	    ZddEdge g);
 
 
 private:
@@ -67,10 +67,10 @@ private:
   ZddMgrImpl& mMgr;
 
   // 演算テーブル
-  CompTbl2 mCapTable;
+  CompTbl2 mDiffTable;
 
 };
 
 END_NAMESPACE_YM_ZDD
 
-#endif // CAPOP_H
+#endif // DIFFOP_H
