@@ -1,8 +1,8 @@
-#ifndef SWAPOP_H
-#define SWAPOP_H
+#ifndef COF1OP_H
+#define COF1OP_H
 
-/// @file SwapOp.h
-/// @brief SwapOp のヘッダファイル
+/// @file Cof1Op.h
+/// @brief Cof1Op のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -16,21 +16,21 @@
 BEGIN_NAMESPACE_YM_ZDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class SwapOp SwapOp.h "SwapOp.h"
-/// @brief swap 演算を求めるクラス
+/// @class Cof1Op Cof1Op.h "Cof1Op.h"
+/// @brief cofactor1 演算を求めるクラス
 //////////////////////////////////////////////////////////////////////
-class SwapOp :
+class Cof1Op :
   public ZddUnOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr ZddMgrImpl
-  SwapOp(ZddMgrImpl& mgr);
+  Cof1Op(ZddMgrImpl& mgr);
 
   /// @brief デストラクタ
   virtual
-  ~SwapOp();
+  ~Cof1Op();
 
 
 public:
@@ -38,7 +38,7 @@ public:
   // メインの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief swap 演算を行う関数
+  /// @brief cofactor1 演算を行う関数
   /// @param[in] left オペランド
   /// @param[in] var 変数番号
   virtual
@@ -54,7 +54,7 @@ private:
 
   /// @brief 実際に演算を行う関数
   ZddEdge
-  swap_step(ZddEdge f);
+  cof1_step(ZddEdge f);
 
 
 private:
@@ -78,4 +78,4 @@ private:
 
 END_NAMESPACE_YM_ZDD
 
-#endif // SWAPOP_H
+#endif // COF0OP_H

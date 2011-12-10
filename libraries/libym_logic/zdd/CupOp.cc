@@ -82,8 +82,8 @@ CupOp::cup_step(ZddEdge f,
       g = tmp;
     }
 
-    ZddEdge result = mCupTable.get(f, g);
-    if ( result.is_error() ) {
+    ans_e = mCupTable.get(f, g);
+    if ( ans_e.is_error() ) {
       // 演算結果テーブルには登録されていない
       ZddEdge f_0, f_1;
       ZddEdge g_0, g_1;
@@ -96,8 +96,8 @@ CupOp::cup_step(ZddEdge f,
       if ( r_1.is_overflow() ) {
 	return ZddEdge::make_overflow();
       }
-      result = mMgr.new_node(var, r_0, r_1);
-      mCupTable.put(f, g, result);
+      ans_e = mMgr.new_node(var, r_0, r_1);
+      mCupTable.put(f, g, ans_e);
     }
   }
   return ans_e.add_zattr(zattr);

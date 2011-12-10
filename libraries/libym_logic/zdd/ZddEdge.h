@@ -176,6 +176,39 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
+  // ZDD の構造に関係した関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 根の節点の変数に基づいて展開を行なう．
+  /// @param[out] e0 0枝
+  /// @param[out] e1 1枝
+  /// @return 根の節点の変数番号を返す．
+  /// @note もともと定数値(葉)のZDDの場合動作は不定
+  VarId
+  root_decomp(ZddEdge& e0,
+	      ZddEdge& e1) const;
+
+  /// @brief 根の変数番号の取得
+  /// @retval 根の変数番号 内部節点の場合
+  /// @retval kVarIdMax 終端節点の場合
+  VarId
+  root_var() const;
+
+  /// @brief 0枝の取得
+  /// @retval 0枝
+  /// @retval 自分自身 終端節点の場合
+  ZddEdge
+  edge0() const;
+
+  /// @brief 1枝の取得
+  /// @retval 1枝
+  /// @retval 0 終端節点の場合
+  ZddEdge
+  edge1() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
   // ハッシュ関数用の関数
   //////////////////////////////////////////////////////////////////////
 
@@ -246,6 +279,16 @@ ZddEdge::ZddEdge(ympuint val) :
 inline
 ZddEdge::ZddEdge(ZddNode* node) :
   mBody(reinterpret_cast<ympuint>(node))
+{
+}
+
+// @brief コンストラクタ
+// @param[in] node ノード
+// @param[in] zattr 0-element 属性
+inline
+ZddEdge::ZddEdge(ZddNode* node,
+		 bool zattr) :
+  mBody(reinterpret_cast<ympuint>(node) | zattr)
 {
 }
 

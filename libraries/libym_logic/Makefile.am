@@ -35,6 +35,7 @@ libym_logic_la_LIBADD = \
 	tvfunc/libym_logic_tvfunc.la \
 	npn/libym_logic_npn.la \
 	bdd/libym_logic_bdd.la \
+	zdd/libym_logic_zdd.la \
 	sat/libym_logic_sat.la \
 	aig/libym_logic_aig.la
 

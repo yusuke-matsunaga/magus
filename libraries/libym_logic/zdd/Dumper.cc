@@ -30,7 +30,7 @@ IdMgr::~IdMgr()
 }
 
 // 登録された節点数を返す．
-ymuint
+ymuint64
 IdMgr::num() const
 {
   return mNext;
@@ -47,13 +47,13 @@ IdMgr::has_id(ZddEdge e) const
 
 // e の ID 番号を返す．
 // 未登録ならば新しい番号を割り振る．
-ymuint
+ymuint64
 IdMgr::id(ZddEdge e)
 {
   ZddEdge e_p(e);
   e_p.normalize();
-  ymuint id;
-  hash_map<ZddEdge, ymuint>::iterator p = mMap.find(e_p);
+  ymuint64 id;
+  hash_map<ZddEdge, ymuint64>::iterator p = mMap.find(e_p);
   if ( p == mMap.end() ) {
     id = mNext;
     ++ mNext;
@@ -95,7 +95,7 @@ Printer::~Printer()
 void
 Printer::print_id(ZddEdge e)
 {
-  ymuint id = mIdMgr.id(e);
+  ymuint64 id = mIdMgr.id(e);
   ios::fmtflags save = mStream.flags();
   mStream << setw(9) << id;
   mStream.flags(save);
@@ -120,8 +120,8 @@ Printer::print_name(ZddEdge e)
   else {
     mStream << " ";
     print_id(e);
-    tPol p = e.pol();
-    mStream << ((p == kPolPosi) ? ' ' : '~');
+    bool z = e.zattr();
+    mStream << ((z) ? '*' : ' ');
   }
 }
 
@@ -141,8 +141,8 @@ Printer::print_step(ZddEdge e)
   print_id(e_p);
   ZddEdge e0;
   ZddEdge e1;
-  tVarId id = mMgr->root_decomp(e_p, e0, e1);
-  tLevel level = mMgr->level(id);
+  VarId id = e_p.root_decomp(e0, e1);
+  ymuint level = mMgr->level(id);
   ios::fmtflags save = mStream.flags();
   mStream << ":IDX=" << setw(3) << id
 	  << ":LVL=" << setw(3) << level
@@ -166,7 +166,7 @@ Printer::print_root(ZddEdge e)
 }
 
 // 登録された節点数を返す．
-ymuint
+ymuint64
 Printer::num() const
 {
   return mIdMgr.num();
@@ -188,7 +188,6 @@ Dumper::Dumper(ZddMgrImpl* mgr,
 // デストラクタ
 Dumper::~Dumper()
 {
-  mStream.flush();
 }
 
 // e を根とするZDDの内容を出力する．
@@ -202,7 +201,7 @@ Dumper::dump(ZddEdge e)
   e_p.normalize();
   ZddEdge e0;
   ZddEdge e1;
-  tVarId varid = mMgr->root_decomp(e_p, e0, e1);
+  VarId varid = e_p.root_decomp(e0, e1);
   dump(e0);
   dump(e1);
   mIdMgr.id(e_p);
@@ -210,13 +209,13 @@ Dumper::dump(ZddEdge e)
   dump_edge(e0);
   mStream << ":";
   dump_edge(e1);
-  mStream << endl;
 }
 
 // 枝の内容を書き出す．
 void
 Dumper::dump_edge(ZddEdge e)
 {
+#if 0
   if ( e.is_zero() ) {
     mStream << "F";
   }
@@ -235,6 +234,7 @@ Dumper::dump_edge(ZddEdge e)
     ymuint id = mIdMgr.id(e);
     mStream << id;
   }
+#endif
 }
 
 
@@ -261,6 +261,7 @@ Restorer::~Restorer()
 ymuint
 Restorer::read()
 {
+#if 0
   mRootVector.clear();
   mEdgeVector.clear();
   char buff[1024];
@@ -281,6 +282,7 @@ Restorer::read()
       mRootVector.push_back(find_edge(buff));
     }
   }
+#endif
   return mRootVector.size();
 }
 
@@ -299,6 +301,7 @@ Restorer::root(ymuint pos)
 ZddEdge
 Restorer::find_edge(const char* str) const
 {
+#if 0
   bool negated = false;
   switch ( str[0] ) {
   case 'T': return ZddEdge::make_one();
@@ -317,6 +320,7 @@ Restorer::find_edge(const char* str) const
     }
     return ans;
   }
+#endif
   return ZddEdge::make_error();
 }
 

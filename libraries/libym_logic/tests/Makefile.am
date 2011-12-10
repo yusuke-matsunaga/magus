@@ -4,6 +4,7 @@
 
 SUBDIRS = \
 	bdd \
+	zdd \
 	expr \
 	npn \
 	sat \

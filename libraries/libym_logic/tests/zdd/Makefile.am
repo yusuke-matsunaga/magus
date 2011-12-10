@@ -33,10 +33,12 @@ YM_BDD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-noinst_LTLIBRARIES = libymbddtest.la
+noinst_LTLIBRARIES = libymzddtest.la
 
 libymzddtest_la_SOURCES = \
 	zddtest.h \
+	CombSet.h \
+	CombSet.cc \
 	test_utils.cc
 
 libymzddtest_la_LIBADD =

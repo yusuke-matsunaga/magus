@@ -8,13 +8,52 @@
 
 
 
-#include "bddtest.h"
+#include "zddtest.h"
 
 #include "ym_logic/Zdd.h"
 #include "ym_logic/ZddMgr.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
+
+// zdd が spec の文字列で指定された関数と等しいか調べる．
+// spec の仕様は以下の通り
+// "v1 v2 ..."
+// vi : 1つの要素を表す数字．1の立っているビットの要素を含む．
+bool
+check_zdd(ZddMgr& zddmgr,
+	  const Zdd& zdd,
+	  const char* zdd_str,
+	  const char* spec)
+{
+  vector<ymuint32> v_list;
+  string buf;
+  for (const char* s = spec; ; ++ s) {
+    char c = *s;
+    if ( c == ' ' || c == '\0' ) {
+      ymuint d = atoi(buf.c_str());
+      v_list.push_back(d);
+      if ( c == '\0' ) {
+	break;
+      }
+      buf = "";
+    }
+    else {
+      buf += c;
+    }
+  }
+
+  cout << "spec = ";
+  for (vector<ymuint32>::iterator p = v_list.begin();
+       p != v_list.end(); ++ p) {
+    cout << " " << *p;
+  }
+  cout << endl;
+
+  print(cout, zdd);
+
+  return true;
+}
 
 #if 0
 // 論理式を表す文字列からBDDを作る．
@@ -110,81 +149,6 @@ str2litset(BddMgr& bddmgr,
       exit(exit_code);
     }
   }
-}
-
-// bdd が spec の文字列で指定された関数と等しいか調べる．
-// spec の仕様は以下の通り
-// "d,d,d,d|vvvvvvvvvv"
-// d : 変数番号 [0-9]+
-// v : 真理値   [01]
-// d の個数を n とすると v は 2^n 個なければならない．
-bool
-check_bddv(BddMgr& bddmgr,
-	   const Bdd& bdd,
-	   const char* bdd_str,
-	   const char* spec)
-{
-  VarVector vars;
-  string buf;
-  const char* s;
-  char c;
-  for (s = spec; (c = *s) && c != '|'; ++ s) {
-    if ( c == ',' ) {
-      int d = atoi(buf.c_str());
-      VarId var(d);
-      vars.push_back(var);
-      buf = "";
-    }
-    else {
-      buf += c;
-    }
-  }
-  int d = atoi(buf.c_str());
-  VarId var(d);
-  vars.push_back(var);
-
-  if ( c != '|' ) {
-    cout << "ERROR[check_bddv(a)]: illegal spec \"" << spec << "\"" << endl;
-    return false;
-  }
-  size_t ni = vars.size();
-  size_t nv = 1 << ni;
-  vector<int> v(nv);
-  ++ s;
-  for (size_t i = 0; i < nv; ++ i, ++ s) {
-    c = *s;
-    if ( c == '0' ) {
-      v[i] = 0;
-    }
-    else if ( c == '1' ) {
-      v[i] = 1;
-    }
-    else {
-      cout << "ERROR[check_bddv(b)]: illegal spec \"" << spec << "\"" << endl;
-      return false;
-    }
-  }
-  if ( *s != '\0' ) {
-    cout << "ni = " << ni << ", nv = " << nv << endl;
-    cout << "ERROR[check_bddv(c)]: illegal spec \"" << spec << "\"" << endl;
-    return false;
-  }
-
-  Bdd spec_bdd = bddmgr.tvec_to_bdd(v, vars);
-  if ( spec_bdd.is_error() ) {
-    cout << "ERROR[check_bddv(d)]: error in tvec_to_bdd(v, vars) with spec \""
-	 << spec << "\"" << endl;
-    return false;
-  }
-
-  if ( bdd != spec_bdd ) {
-    cout << "Error[check_bddv(e)]: " << bdd_str << " != \"" << spec << "\""
-	 << endl;
-    bdd.display(cout);
-    spec_bdd.display(cout);
-    return false;
-  }
-  return true;
 }
 
 // bdd が str の論理式と等しいかどうか確かめる．

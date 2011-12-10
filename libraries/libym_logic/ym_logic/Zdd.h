@@ -163,6 +163,39 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
+  /// @name その他の演算
+  /// @{
+
+  /// @brief 指定した変数の0枝と1枝を交換する．
+  /// @param[in] var 交換を行う変数番号
+  /// @return 自分自身を返す．
+  const Zdd&
+  swap(VarId var);
+
+  /// @brief コファクター演算
+  /// @param[in] var 変数番号
+  /// @return 変数 var を含まないコファクターを返す．
+  Zdd
+  cofactor0(VarId var) const;
+
+  /// @brief コファクター演算
+  /// @param[in] var 変数番号
+  /// @return 変数 var を含むコファクターを返す．
+  Zdd
+  cofactor1(VarId var) const;
+
+  /// @brief 変数インデックスの置き換えを行う．
+  /// @param[in] var_map 置き換え元の変数から置き換え先の変数への写像
+  /// @return 演算結果
+  Zdd
+  remap_var(const VarVarMap& var_map) const;
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
   /// @name ZDD の構造に関係したメソッド
   /// @{
 
@@ -192,39 +225,6 @@ public:
   /// @retval 自分自身 終端節点の場合
   Zdd
   edge1() const;
-
-  /// @brief 指定した変数の0枝と1枝を交換する．
-  /// @param[in] var 交換を行う変数番号
-  /// @return 自分自身を返す．
-  const Zdd&
-  swap(VarId var);
-
-  /// @}
-  //////////////////////////////////////////////////////////////////////
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  /// @name その他の演算
-  /// @{
-
-  /// @brief コファクター演算
-  /// @param[in] var 変数番号
-  /// @return 変数 var を含まないコファクターを返す．
-  Zdd
-  cofactor0(VarId var) const;
-
-  /// @brief コファクター演算
-  /// @param[in] var 変数番号
-  /// @return 変数 var を含むコファクターを返す．
-  Zdd
-  cofactor1(VarId var) const;
-
-  /// @brief 変数インデックスの置き換えを行う．
-  /// @param[in] var_map 置き換え元の変数から置き換え先の変数への写像
-  /// @return 演算結果
-  Zdd
-  remap_var(const VarVarMap& var_map) const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -303,6 +303,7 @@ public:
   /// @param[in] s 出力ストリーム
   /// @param[in] zdd 対象のZDD
   /// @return ノード数を返す．
+  friend
   ymuint64
   print(ostream& s,
 	const Zdd& zdd);

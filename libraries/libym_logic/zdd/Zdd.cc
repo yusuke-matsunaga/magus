@@ -10,6 +10,7 @@
 #include "ym_logic/Zdd.h"
 #include "ym_logic/ZddMgr.h"
 #include "ZddMgrImpl.h"
+#include "Dumper.h"
 
 #include "ym_utils/HeapTree.h"
 
@@ -511,7 +512,20 @@ Zdd::operator>=(const Zdd& src2) const
 }
 #endif
 
-// @brief 変数を含まないコファクターを返す．
+// @brief 指定した変数の0枝と1枝を交換する．
+// @param[in] var 交換を行う変数番号
+// @return 自分自身を返す．
+const Zdd&
+Zdd::swap(VarId var)
+{
+  ZddEdge ans = mMgr->swap(ZddEdge(mRoot), var);
+  assign(ans);
+  return *this;
+}
+
+// @brief コファクター演算
+// @param[in] var 変数番号
+// @return 変数 var を含まないコファクターを返す．
 Zdd
 Zdd::cofactor0(VarId var) const
 {
@@ -519,7 +533,9 @@ Zdd::cofactor0(VarId var) const
   return Zdd(mMgr, ans);
 }
 
-// @brief 変数を含むコファクターを返す．
+// @brief コファクター演算
+// @param[in] var 変数番号
+// @return 変数 var を含むコファクターを返す．
 Zdd
 Zdd::cofactor1(VarId var) const
 {
@@ -532,54 +548,114 @@ VarId
 Zdd::root_decomp(Zdd& f0,
 		 Zdd& f1) const
 {
-  ZddEdge e0, e1;
-  VarId ans = mMgr->root_decomp(ZddEdge(mRoot), e0, e1);
+  ZddEdge e0;
+  ZddEdge e1;
+  VarId varid = ZddEdge(mRoot).root_decomp(e0, e1);
   f0 = Zdd(mMgr, e0);
   f1 = Zdd(mMgr, e1);
-  return ans;
+  return varid;
+}
+
+// @brief 根の節点の変数に基づいて展開を行なう．
+// @param[out] e0 0枝
+// @param[out] e1 1枝
+// @return 根の節点の変数番号を返す．
+// @note もともと定数値(葉)のZDDの場合動作は不定
+VarId
+ZddEdge::root_decomp(ZddEdge& e0,
+		     ZddEdge& e1) const
+{
+  ZddNode* node = get_node();
+  VarId varid;
+  if ( node ) {
+    e0 = node->edge0();
+    e0.add_zattr(zattr());
+    e1 = node->edge1();
+    varid = node->varid();
+  }
+  else {
+    e0 = *this;
+    e1 = ZddEdge::make_zero();
+  }
+  return varid;
 }
 
 // @brief 根の変数番号を取り出す．
 VarId
 Zdd::root_var() const
 {
-  return mMgr->root_var(ZddEdge(mRoot));
+  return ZddEdge(mRoot).root_var();
+}
+
+// @brief 根の変数番号の取得
+// @retval 根の変数番号 内部節点の場合
+// @retval kVarIdMax 終端節点の場合
+VarId
+ZddEdge::root_var() const
+{
+  VarId varid;
+  ZddNode* node = get_node();
+  if ( node ) {
+    varid = node->varid();
+  }
+  return varid;
 }
 
 // @brief 0枝の取得
 Zdd
 Zdd::edge0() const
 {
-  ZddEdge ans = mMgr->edge0(ZddEdge(mRoot));
+  ZddEdge ans = ZddEdge(mRoot).edge0();
   return Zdd(mMgr, ans);
+}
+
+// @brief 0枝の取得
+// @retval 0枝
+// @retval 自分自身 終端節点の場合
+ZddEdge
+ZddEdge::edge0() const
+{
+  ZddNode* node = get_node();
+  if ( node ) {
+    ZddEdge ans = node->edge0();
+    ans.add_zattr(zattr());
+    return ans;
+  }
+  else {
+    return *this;
+  }
 }
 
 // @brief 1枝の取得
 Zdd
 Zdd::edge1() const
 {
-  ZddEdge ans = mMgr->edge1(ZddEdge(mRoot));
+  ZddEdge ans = ZddEdge(mRoot).edge1();
   return Zdd(mMgr, ans);
 }
 
-// @brief 指定した変数の0枝と1枝を交換する．
-// @param[in] var 交換を行う変数番号
-// @return 自分自身を返す．
-const Zdd&
-Zdd::swap(VarId var)
+// @brief 1枝の取得
+// @retval 1枝
+// @retval 0 終端節点の場合
+ZddEdge
+ZddEdge::edge1() const
 {
-  ZddEdge ans = mMgr->swap(var);
-  assign(ans);
-  return *this;
+  ZddNode* node = get_node();
+  if ( node ) {
+    return node->edge1();
+  }
+  else {
+    return ZddEdge::make_zero();
+  }
 }
 
-#if 0
 // @brief ZDD の内容を書き出す．
 ymuint64
-Zdd::print(ostream& s) const
+print(ostream& s,
+      const Zdd& zdd)
 {
-  Printer printer(mMgr, s);
-  printer.print_root(ZddEdge(mRoot));
+  Printer printer(zdd.mMgr, s);
+  printer.print_root(ZddEdge(zdd.mRoot));
   return printer.num();
 }
 
@@ -587,8 +663,8 @@ Zdd::print(ostream& s) const
 // @param[in] array ZDD ベクタ
 // @param[in] s 出力ストリーム
 ymuint64
-print(const ZddVector& array,
-      ostream& s)
+print(ostream& s,
+      const ZddVector& array)
 {
   if ( array.empty() ) {
     return 0;
@@ -599,7 +675,7 @@ print(const ZddVector& array,
   for (ZddVector::const_iterator p = array.begin();
        p != array.end(); ++ p) {
     Zdd zdd = *p;
-    print.print_root(zdd.root());
+    printer.print_root(ZddEdge(zdd.mRoot));
   }
   return printer.num();
 }
@@ -608,23 +684,22 @@ print(const ZddVector& array,
 // @param[in] array ZDD リスト
 // @param[in] s 出力ストリーム
 ymuint64
-print(const ZddList& array,
-      ostream& s)
+print(ostream& s,
+      const ZddList& array)
 {
   if ( array.empty() ) {
     return 0;
   }
   // 今は array の中のZDDのマネージャがすべて同じと仮定している．
   ZddMgrImpl* mgr = array.front().mMgr;
-  Displayer displayer(mgr, s);
+  Printer printer(mgr, s);
   for (ZddList::const_iterator p = array.begin();
        p != array.end(); ++ p) {
     Zdd zdd = *p;
-    displayer.display_root(zdd.root());
+    printer.print_root(ZddEdge(zdd.mRoot));
   }
-  return displayer.num();
+  return printer.num();
 }
-#endif
 
 // @brief ZDD が使っているノード数を数える．
 ymuint64

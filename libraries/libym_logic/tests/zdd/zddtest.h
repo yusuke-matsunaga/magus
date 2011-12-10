@@ -14,6 +14,16 @@
 
 BEGIN_NAMESPACE_YM_ZDD
 
+// zdd が spec の文字列で指定された関数と等しいか調べる．
+// spec の仕様は以下の通り
+// "v1 v2 ..."
+// vi : 1つの要素を表す数字．1の立っているビットの要素を含む．
+bool
+check_zdd(ZddMgr& zddmgr,
+	  const Zdd& zdd,
+	  const char* zdd_str,
+	  const char* spec);
+
 #if 0
 // 論理式を表す文字列からBDDを作る．
 // 基本的には BddMgr::make_bdd() を呼ぶだけだが
@@ -39,32 +49,6 @@ BddLitSet
 str2litset(BddMgr& bddmgr,
 	   const char* ls_str,
 	   int exit_code = 1);
-
-// bdd が spec の文字列で指定された関数と等しいか調べる．
-// spec の仕様は以下の通り
-// "d,d,d,d|vvvvvvvvvv"
-// d : 変数番号 [0-9]+
-// v : 真理値   [01]
-// d の個数を n とすると v は 2^n 個なければならない．
-bool
-check_bddv(BddMgr& bddmgr,
-	   const Bdd& bdd,
-	   const char* bdd_str,
-	   const char* spec);
-
-// bdd が str の論理式と等しいかどうか確かめる．
-bool
-check_bdde(BddMgr& bddmgr,
-	   const Bdd& bdd,
-	   const char* bdd_str,
-	   const char* str);
-
-// ite_op のテスト
-bool
-check_ite(BddMgr& bddmgr,
-	  const char* if_str,
-	  const char* then_str,
-	  const char* else_str);
 
 // support のテスト
 // 0 〜 10 までの変数でコファクタリングして2つのコファクターが異なる

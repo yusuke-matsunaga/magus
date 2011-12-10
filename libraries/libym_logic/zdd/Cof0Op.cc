@@ -1,39 +1,39 @@
 
-/// @file SwapOp.cc
-/// @brief SwapOp の実装ファイル
+/// @file Cof0Op.cc
+/// @brief Cof0Op の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SwapOp.h"
+#include "Cof0Op.h"
 #include "ZddMgrImpl.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
 
 //////////////////////////////////////////////////////////////////////
-// クラス SwapOp
+// クラス Cof0Op
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] mgr ZddMgrImpl
-SwapOp::SwapOp(ZddMgrImpl& mgr) :
+Cof0Op::Cof0Op(ZddMgrImpl& mgr) :
   mMgr(mgr)
 {
 }
 
 // @brief デストラクタ
-SwapOp::~SwapOp()
+Cof0Op::~Cof0Op()
 {
 }
 
-// @brief swap 演算を行う関数
+// @brief cofactor0 演算を行う関数
 // @param[in] left オペランド
 // @param[in] var 変数番号
 ZddEdge
-SwapOp::apply(ZddEdge left,
+Cof0Op::apply(ZddEdge left,
 	      VarId var)
 {
   // エラー状態のチェック
@@ -50,21 +50,21 @@ SwapOp::apply(ZddEdge left,
   mLevel = mVar->level();
   mCompTbl.clear();
 
-  return swap_step(left);
+  return cof0_step(left);
 }
 
-// swap_op の下請け関数
+// 下請け関数
 ZddEdge
-SwapOp::swap_step(ZddEdge f)
+Cof0Op::cof0_step(ZddEdge f)
 {
   // 特別な場合の処理
   // 1：fが0なら答は0，
-  // 2: fが1なら答は mVar の1枝に base を持つノード
+  // 2: fが1なら答は1
   if ( f.is_zero() ) {
     return ZddEdge::make_zero();
   }
   else if ( f.is_one() ) {
-    return  mMgr.new_node(mVar, ZddEdge::make_zero(), ZddEdge::make_one());
+    return  ZddEdge::make_one();
   }
   else {
     // この時点で f は終端ではない．
@@ -83,25 +83,23 @@ SwapOp::swap_step(ZddEdge f)
       if ( f_level < mLevel ) {
 	ZddEdge f_0 = f_vp->edge0();
 	f_0.add_zattr(f.zattr());
-	ZddEdge r_0 = swap_step(f_0);
+	ZddEdge r_0 = cof0_step(f_0);
 	if ( r_0.is_overflow() ) {
 	  return ZddEdge::make_overflow();
 	}
 	ZddEdge f_1 = f_vp->edge1();
-	ZddEdge r_1 = swap_step(f_1);
+	ZddEdge r_1 = cof0_step(f_1);
 	if ( r_1.is_overflow() ) {
 	  return ZddEdge::make_overflow();
 	}
 	result = mMgr.new_node(f_var, r_0, r_1);
       }
       else if ( f_level == mLevel ) {
-	ZddEdge f_0 = f_vp->edge0();
-	f_0.add_zattr(f.zattr());
-	ZddEdge f_1 = f_vp->edge1();
-	result = mMgr.new_node(mVar, f_1, f_0);
+	result = f_vp->edge0();
+	result.add_zattr(f.zattr());
       }
       else {
-	result = mMgr.new_node(mVar, ZddEdge::make_zero(), f);
+	result = f;
       }
       mCompTbl.insert(make_pair(f, result));
       return result;

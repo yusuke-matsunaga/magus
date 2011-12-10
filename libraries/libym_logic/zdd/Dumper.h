@@ -37,11 +37,11 @@ public:
 
   /// @brief e の ID 番号を返す．
   /// @note未登録ならば新しい番号を割り振る．
-  ymuint
+  ymuint64
   id(ZddEdge e);
 
   /// @brief 登録されている節点数を返す．
-  ymuint
+  ymuint64
   num() const;
 
   /// @brief クリアする．
@@ -55,10 +55,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ZddEdge と ID 番号の対応表
-  hash_map<ZddEdge, ymuint> mMap;
+  hash_map<ZddEdge, ymuint64> mMap;
 
   // 次に割り当てるID番号
-  ymuint32 mNext;
+  ymuint64 mNext;
 
 };
 

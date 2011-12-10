@@ -17,6 +17,7 @@
 
 BEGIN_NAMESPACE_YM_ZDD
 
+class ZddUnOp;
 class ZddBinOp;
 
 //////////////////////////////////////////////////////////////////////
@@ -51,20 +52,6 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ZDDの根の枝の参照回数関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief e の参照回数を増やす．
-  void
-  inc_rootref(ZddEdge e);
-
-  /// @brief e の参照回数を減らす．
-  void
-  dec_rootref(ZddEdge e);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
   // 変数番号とレベルの対応づけ
   //////////////////////////////////////////////////////////////////////
 
@@ -88,6 +75,14 @@ public:
   /// @brief レベルから変数番号を得る．
   VarId
   varid(ymuint level) const;
+
+  /// @brief level の変数を取り出す．
+  ZddVar*
+  var_at(ymuint level) const;
+
+  /// @brief varid の変数を取出す．
+  ZddVar*
+  var_of(VarId varid) const;
 
 
 public:
@@ -134,37 +129,26 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ZDD の構造に関係したメソッド
+  // ZDDの根の枝の参照回数関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 根の節点の変数に基づいてShannon展開を行なう．
-  /// 戻り値として根の節点の変数番号を返し，その変数を0/1に固定した
-  /// 時の cofactor をそれぞれ f0, f1 に入れる．
-  /// もともと定数値(葉)のZDDの場合，kVarIdMax を返し，
-  /// f0, f1 には自分自身を代入する．
-  VarId
-  root_decomp(ZddEdge e,
-	      ZddEdge& e0,
-	      ZddEdge& e1);
+  /// @brief e の参照回数を増やす．
+  void
+  inc_rootref(ZddEdge e);
 
-  /// @brief 根の変数番号インデックスを取り出す．
-  /// @brief 定数節点の場合には kVarIdMax を返す．
-  VarId
-  root_var(ZddEdge e);
-
-  /// @brief 0枝の指している cofactor を返す．
-  /// 定数節点の場合には自分自身を返す．
-  ZddEdge
-  edge0(ZddEdge e);
-
-  /// @brief 1枝の指している cofactor を返す．
-  /// 定数節点の場合には自分自身を返す．
-  ZddEdge
-  edge1(ZddEdge e);
+  /// @brief e の参照回数を減らす．
+  void
+  dec_rootref(ZddEdge e);
 
   /// @brief e の参照回数が0なら true を返す．
   bool
   check_noref(ZddEdge e);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ノードの生成
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 左右の枝が同じ場合にはその枝自身を返し，それ以外の場合には，
   /// @return 与えられた枝とインデックスを持つノードを返す．
@@ -366,14 +350,6 @@ private:
   /// @brief mVarTable 中のマークを消す．
   void
   clear_varmark();
-
-  /// @brief level の変数を取り出す．
-  ZddVar*
-  var_at(ymuint level) const;
-
-  /// @brief varid の変数を取出す．
-  ZddVar*
-  var_of(VarId varid) const;
 
   /// @brief Var を登録する．
   void
@@ -655,6 +631,28 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief ノードのリンク数を増やし，もしロックされていなければロックする
+inline
+void
+ZddMgrImpl::activate(ZddEdge vd)
+{
+  ZddNode* node = vd.get_node();
+  if ( node && node->linkinc() == 1 ) {
+    lockall(node);
+  }
+}
+
+// @brief ノードのリンク数を減らし，他のリンクがなければロックを外す
+inline
+void
+ZddMgrImpl::deactivate(ZddEdge vd)
+{
+  ZddNode* node = vd.get_node();
+  if ( node && node->linkdec() == 0 ) {
+    unlockall(node);
+  }
+}
 
 // @brief 演算テーブル用の load_limit を得る．
 inline

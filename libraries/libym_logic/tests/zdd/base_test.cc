@@ -12,6 +12,7 @@
 
 #include "zddtest.h"
 
+#include "CombSet.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
@@ -53,30 +54,30 @@ test_var_list(ZddMgr& zddmgr,
 bool
 test_const(ZddMgr& zddmgr)
 {
-  Zdd one = zddmgr.make_one();
+  Zdd one = zddmgr.make_base();
   if ( !one.is_one() ) {
-    one.display(cout);
+    print(cout, one);
     cout << "ERROR[const-1]: !one.is_one()" << endl;
     return false;
   }
 
-  Zdd zero = zddmgr.make_zero();
+  Zdd zero = zddmgr.make_empty();
   if ( !zero.is_zero() ) {
-    zero.display(cout);
+    print(cout, zero);
     cout << "ERROR[const-2]: !zero.is_zero()" << endl;
     return false;
   }
 
   Zdd err = zddmgr.make_error();
   if ( !err.is_error() ) {
-    err.display(cout);
+    print(cout, err);
     cout << "ERROR[const-3]: !err.is_error()" << endl;
     return false;
   }
 
   Zdd ovf = zddmgr.make_overflow();
   if ( !ovf.is_overflow() ) {
-    ovf.display(cout);
+    print(cout, ovf);
     cout << "ERROR[const-4]: !ovf.is_overflow()" << endl;
     return false;
   }
@@ -84,30 +85,24 @@ test_const(ZddMgr& zddmgr)
   return true;
 }
 
-// リテラル関数の生成
+// シングルトンの生成
 bool
 test_literal(ZddMgr& zddmgr)
 {
-  Zdd var0 = zddmgr.make_posiliteral(VarId(0));
-  if ( !check_zddv(zddmgr, var0, "make_posiliteral(0)", "0|01") )
+  Zdd base = zddmgr.make_base();
+  Zdd var0 = base;
+  var0.swap(VarId(0));
+  if ( !check_zdd(zddmgr, var0, "var0", "1") )
     return false;
 
-  Zdd var0bar = zddmgr.make_negaliteral(VarId(0));
-  if ( !check_zddv(zddmgr, var0bar, "make_negaliteral(0)", "0|10") )
+  Zdd var2 = base;
+  var2.swap(VarId(2));
+  if ( !check_zdd(zddmgr, var2, "var2", "4") )
     return false;
 
-  Zdd var2 = zddmgr.make_literal(VarId(2), kPolPosi);
-  if ( !check_zddv(zddmgr, var2, "make_literal(2, kPolPosi)", "2|01") )
-    return false;
-
-  Zdd var3bar = zddmgr.make_literal(VarId(3), kPolNega);
-  if ( !check_zddv(zddmgr, var3bar, "make_literal(3, kPolNega)", "3|10") )
-    return false;
-
-  Zdd zero = zddmgr.make_zero();
-  Zdd one = zddmgr.make_one();
-  Zdd var4 = zddmgr.make_zdd(VarId(4), zero, one);
-  if ( !check_zddv(zddmgr, var4, "make_zdd(4, zero, one)", "4|01") )
+  Zdd var4 = base;
+  var4.swap(VarId(4));
+  if ( !check_zdd(zddmgr, var4, "var4", "16") )
     return false;
 
   return true;
@@ -117,74 +112,42 @@ test_literal(ZddMgr& zddmgr)
 bool
 test_binary(ZddMgr& zddmgr)
 {
-  Zdd var0 = zddmgr.make_posiliteral(VarId(0));
-  Zdd var1 = zddmgr.make_posiliteral(VarId(1));
+  Zdd base = zddmgr.make_base();
+  Zdd var0 = base; var0.swap(VarId(0));
+  Zdd var1 = base; var1.swap(VarId(1));
+  Zdd var2 = base; var2.swap(VarId(2));
+  Zdd var3 = base; var3.swap(VarId(3));
 
-  if ( !check_zddv(zddmgr, var0 & var1, "var0 & var1", "0,1|0001") )
+  Zdd set1 = var0 | var1 | var2 | var3;
+
+  Zdd set2 = base;
+  set2.swap(VarId(0));
+  set2.swap(VarId(1));
+  set2.swap(VarId(2));
+  set2.swap(VarId(3));
+
+  if ( !check_zdd(zddmgr, var0 | var1, "var0 | var1", "1, 2") )
     return false;
 
-  if ( !check_zddv(zddmgr, var0 & ~var1, "var0 & ~var1", "0,1|0010") )
+  if ( !check_zdd(zddmgr, set1, "set1", "1 2 4 8") )
     return false;
 
-  if ( !check_zddv(zddmgr, var0 & ~var1, "var0 & ~var1", "1,0|0100") )
+  if ( !check_zdd(zddmgr, set2, "set2", "15") )
     return false;
 
-  if ( !check_zddv(zddmgr, var0 | var1, "var0 | var1", "0,1|0111") )
+  if ( !check_zdd(zddmgr, var0 & set1, "var0 & set1", "1") )
     return false;
 
-  if ( !check_zddv(zddmgr, var0 ^ var1, "var0 ^ var1", "0,1|0110") )
+  if ( !check_zdd(zddmgr, set1 & set2, "set1 & set2", "") )
     return false;
 
-  Zdd zdd1 = var0;
-  if ( !check_zddv(zddmgr, zdd1 &= var1, "var0 &= var1", "0,1|0001") )
-    return false;
-
-  Zdd zdd2 = var0;
-  if ( !check_zddv(zddmgr, zdd2 |= var1, "var0 |= var1", "0,1|0111") )
-    return false;
-
-  Zdd zdd3 = var0;
-  if ( !check_zddv(zddmgr, zdd3 ^= var1, "var0 ^= var1", "0,1|0110") )
+  if ( !check_zdd(zddmgr, set1 - var2, "set1 - var2", "1 2 8") )
     return false;
 
   return true;
 }
 
-// LogExpr や文字列からBDDを作る関数の検査
-bool
-test_make_zdd(ZddMgr& zddmgr)
-{
-  LogExpr expr1 = LogExpr::make_posiliteral(VarId(0)) &
-    LogExpr::make_negaliteral(VarId(1)) |
-    LogExpr::make_posiliteral(VarId(2)) &
-    LogExpr::make_posiliteral(VarId(1));
-  Zdd zdd1 = zddmgr.expr_to_zdd(expr1);
-  if ( !check_zddv(zddmgr, zdd1, "0 & ~1 | 2 & 1", "0, 1, 2|00011101" ) ) {
-    return false;
-  }
-
-  VarVarMap vvmap;
-  vvmap.insert(make_pair(VarId(0), 1));
-  vvmap.insert(make_pair(VarId(1), 2));
-  vvmap.insert(make_pair(VarId(2), 0));
-  Zdd zdd3 = zddmgr.expr_to_zdd(expr1, vvmap);
-  if ( !check_zddv(zddmgr, zdd3, "(0 & ~1 | 2 & 1)(0->1, 1->2, 2->0)",
-		  "0, 1, 2|00100111") ) {
-    return false;
-  }
-
-  VarVarMap vvmap2;
-  vvmap2.insert(make_pair(VarId(0), 1));
-  vvmap2.insert(make_pair(VarId(1), 0));
-  Zdd zdd5 = zddmgr.expr_to_zdd(expr1, vvmap2);
-  if ( !check_zddv(zddmgr, zdd5, "(0 & ~1 | 2 & 1)(0->1, 1->0)",
-		  "0, 1, 2|00110101") ) {
-    return false;
-  }
-
-  return true;
-}
-
+#if 0
 // support のテスト
 bool
 test_support(ZddMgr& zddmgr)
@@ -212,7 +175,7 @@ test_minterm_count(ZddMgr& zddmgr)
     return false;
   }
 
-  zdd = zddmgr.make_one();
+  zdd = zddmgr.make_base();
   for (ymuint i = 0; i < 100; ++ i) {
     Zdd zdd1 = zddmgr.make_posiliteral(VarId(i));
     zdd &= zdd1;
@@ -265,6 +228,7 @@ test_dump(ZddMgr& zddmgr)
   }
   return true;
 }
+#endif
 
 bool
 test(ZddMgr& zddmgr)
@@ -274,17 +238,11 @@ test(ZddMgr& zddmgr)
   }
   return test_var_list(zddmgr, 10) &&
     test_const(zddmgr) &&
-    test_unary(zddmgr) &&
-    test_binary(zddmgr) &&
-    test_make_zdd(zddmgr) &&
-    test_cofactor(zddmgr) &&
-    test_support(zddmgr) &&
-    test_minterm_count(zddmgr) &&
-    test_dump(zddmgr)
+    test_binary(zddmgr)
     ;
 }
 
-END_NAMESPACE_YM_BDD
+END_NAMESPACE_YM_ZDD
 
 
 int
@@ -295,16 +253,20 @@ main(int argc,
   using nsYm::AssertError;
   using nsYm::ZddMgr;
 
+#if !defined(YM_DEBUG)
   try {
-    ZddMgr zddmgr1("bmc", "classic zddmgr");
+#endif
+    ZddMgr zddmgr1("zddmgr", "classic zddmgr");
     if ( !test(zddmgr1) ) {
       return 1;
     }
+#if !defined(YM_DEBUG)
   }
   catch ( AssertError a ) {
     cerr << a << endl;
     return 255;
   }
+#endif
 
   return 0;
 }

@@ -39,8 +39,16 @@ libym_logic_zdd_la_SOURCES = \
 	CupOp.cc \
 	DiffOp.h \
 	DiffOp.cc \
+	SwapOp.h \
+	SwapOp.cc \
+	Cof0Op.h \
+	Cof0Op.cc \
+	Cof1Op.h \
+	Cof1Op.cc \
 	count.cc \
-	support.cc
+	support.cc \
+	Dumper.h \
+	Dumper.cc
 
 libym_logic_zdd_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
