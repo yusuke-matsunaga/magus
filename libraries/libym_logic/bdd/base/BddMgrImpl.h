@@ -11,6 +11,7 @@
 
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddMgr.h"
+#include "BddEdge.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

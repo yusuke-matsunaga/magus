@@ -60,20 +60,6 @@ class BddLitSet;
 /// @name 型名の定義
 /// @{
 
-#if 0
-/// @brief BDD の変数の数
-/// @ingroup Bdd
-typedef ymuint32 tVarSize;
-
-/// @brief BDD の節点のレベル
-/// @ingroup Bdd
-typedef ymuint32 tLevel;
-
-/// @brief BDD の節点のレベルの数
-/// @ingroup Bdd
-typedef ymuint32 tLevelSize;
-#endif
-
 /// @brief BDD のベクタ
 /// @ingroup Bdd
 typedef vector<Bdd> BddVector;

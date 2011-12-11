@@ -35,6 +35,11 @@ public:
   BddEdge();
 
   /// @brief コンストラクタ
+  /// @param[in] val 内容
+  explicit
+  BddEdge(ympuint val);
+
+  /// @brief コンストラクタ
   /// @param[in] node ノード
   explicit
   BddEdge(void* node);
@@ -76,20 +81,6 @@ public:
   make_error();
 
 
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] val 内容
-  explicit
-  BddEdge(ympuint val);
-
-  /// @brief コンストラクタ
-  /// @param[in] val 内容
-  /// @param[in] pol 極性
-  BddEdge(ympuint val,
-	  tPol pol);
-
-
 public:
   //////////////////////////////////////////////////////////////////////
   // 極性情報に関する関数
@@ -125,6 +116,9 @@ public:
   /// @brief 極性を取り出す．
   tPol
   pol() const;
+
+  /// @brief 生の情報を取り出す．
+  operator ympuint() const;
 
 
 public:
@@ -225,11 +219,11 @@ private:
 
   /// @brief 終端の0を指す枝
   static
-  const ympuint kEdge0 = 1UL;
+  const ympuint kEdge0 = 0UL;
 
   /// @brief 終端の1を指す枝
   static
-  const ympuint kEdge1 = 0UL;
+  const ympuint kEdge1 = 1UL;
 
   /// @brief 不正な値を表す枝
   static
@@ -242,6 +236,14 @@ private:
   /// @brief エラーを表す枝
   static
   const ympuint kEdgeError = 3UL;
+
+  /// @brief 終端の定数を表すマスク値
+  static
+  const ympuint kEdgeConst = 0UL;
+
+  /// @brief エラーも含めた終端を表すマスク値
+  static
+  const ympuint kEdgeLeaf = 0UL;
 
 };
 
@@ -301,17 +303,6 @@ inline
 BddEdge::BddEdge(ympuint val) :
   mBody(val)
 {
-}
-
-// @brief コンストラクタ
-// @param[in] val 内容
-// @param[in] pol 極性
-inline
-BddEdge::BddEdge(ympuint val,
-		 tPol pol) :
-  mBody(val)
-{
-  mBody ^= (static_cast<ympuint>(pol) ^ ((mBody & kEdgeInvalid) >> 1));
 }
 
 // @brief 定数0の枝を返す．
@@ -475,7 +466,7 @@ inline
 bool
 BddEdge::is_const() const
 {
-  return (mBody & ~1UL) == kEdge1;
+  return (mBody & ~1UL) == kEdgeConst;
 }
 
 // @brief エラー枝のチェック
@@ -494,7 +485,7 @@ BddEdge::is_overflow() const
   return mBody == kEdgeOverflow;
 }
 
-// @brief エラーがオーバーフローのチェック
+// @brief エラーかオーバーフローのチェック
 inline
 bool
 BddEdge::is_invalid() const
@@ -507,7 +498,14 @@ inline
 bool
 BddEdge::is_leaf() const
 {
-  return (mBody & ~3UL) == kEdge1;
+  return (mBody & ~3UL) == kEdgeLeaf;
+}
+
+// @brief 生の情報を取り出す．
+inline
+BddEdge::operator ympuint() const
+{
+  return mBody;
 }
 
 // @brief ハッシュ値を返す．

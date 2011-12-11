@@ -80,6 +80,10 @@ public:
   explicit
   BddVarSet(BddMgr& mgr);
 
+  /// @brief BDD を指定するコンストラクタ
+  explicit
+  BddVarSet(const Bdd& bdd);
+
   /// @brief コピーコンストラクタ
   BddVarSet(const BddVarSet& src);
 
@@ -195,10 +199,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief BDD を指定するコンストラクタ
-  explicit
-  BddVarSet(const Bdd& bdd);
 
   /// @brief サイズを設定する．
   void

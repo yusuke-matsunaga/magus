@@ -184,7 +184,7 @@ ymuint
 BddLitSet::size() const
 {
   if ( !static_cast<bool>(mSize & 1U) ) {
-    set_size(mBody.size());
+    set_size(nsYm::nsBdd::size(mBody));
   }
   return (mSize >> 1);
 }

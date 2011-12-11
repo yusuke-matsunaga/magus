@@ -85,6 +85,11 @@ public:
   explicit
   BddLitSet(BddMgr& mgr);
 
+  /// @brief BDD を指定するコンストラクタ
+  /// @param[in] bdd 対象のBDD
+  explicit
+  BddLitSet(const Bdd& bdd);
+
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
   BddLitSet(const BddLitSet& src);
@@ -198,11 +203,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief BDD を指定するコンストラクタ
-  /// @param[in] bdd 対象のBDD
-  explicit
-  BddLitSet(const Bdd& bdd);
 
   /// @brief サイズを設定する．
   void

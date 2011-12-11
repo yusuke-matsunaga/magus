@@ -10,7 +10,7 @@
 #include "ym_logic/BddMgr.h"
 
 #include "BddMgrImpl.h"
-#include "Dumper.h"
+#include "Restorer.h"
 
 #include "bmc/BddMgrClassic.h"
 #include "bmm/BddMgrModern.h"
@@ -142,7 +142,10 @@ BddMgr::make_bdd(VarId index,
 		 const Bdd& chd0,
 		 const Bdd& chd1)
 {
-  return Bdd(mImpl, mImpl->make_bdd(index, chd0.root(), chd1.root()));
+  BddEdge e0(chd0.mRoot);
+  BddEdge e1(chd1.mRoot);
+  BddEdge ans = mImpl->make_bdd(index, e0, e1);
+  return Bdd(mImpl, ans);
 }
 
 // ベクタを真理値表と見なしてBDDを作る．
@@ -361,33 +364,36 @@ BddMgr::and_op(const BddVector& bdds)
   if ( n == 2 ) {
     return bdds[0] & bdds[1];
   }
-
-  BddEdge ans_e;
   if ( n == 3 ) {
-    ans_e = mImpl->and_op(bdds[0].root(), bdds[1].root(), bdds[2].root());
+    return bdds[0] & bdds[1] & bdds[2];
   }
-  else if ( n < kNiLimit ) {
+  if ( n == 4 ) {
+    return bdds[0] & bdds[1] & bdds[2] & bdds[3];
+  }
+
+  Bdd ans;
+  if ( n < kNiLimit ) {
     BddVector::const_iterator p = bdds.begin();
-    ans_e = p->root();
+    ans = *p;
     for (++ p; p != bdds.end(); ++ p) {
-      ans_e = mImpl->and_op(ans_e, p->root());
+      ans &= *p;
     }
   }
   else {
-    SimpleHeapTree<BddEdge> work;
+    SimpleHeapTree<Bdd> work;
     for (BddVector::const_iterator p = bdds.begin();
 	 p != bdds.end(); ++p) {
-      BddEdge e = p->root();
-      work.put(e, mImpl->size(e));
+      Bdd bdd = *p;
+      work.put(bdd, size(bdd));
     }
-    ans_e = work.getmin();
+    ans = work.getmin();
     work.popmin();
     while ( !work.empty() ) {
-      ans_e = mImpl->and_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
+      ans &= work.getmin();
+      ans = work.xchgmin(ans, size(ans));
     }
   }
-  return Bdd(mImpl, ans_e);
+  return ans;
 }
 
 Bdd
@@ -407,39 +413,50 @@ BddMgr::and_op(const BddList& bdds)
     Bdd bdd1 = *p;
     return bdd0 & bdd1;
   }
-
-  BddEdge ans_e;
   if ( n == 3 ) {
     BddList::const_iterator p = bdds.begin();
-    BddEdge e0 = p->root();
+    Bdd bdd0 = *p;
     ++ p;
-    BddEdge e1 = p->root();
+    Bdd bdd1 = *p;
     ++ p;
-    BddEdge e2 = p->root();
-    ans_e = mImpl->and_op(e0, e1, e2);
+    Bdd bdd2 = *p;
+    return bdd0 & bdd1 & bdd2;
   }
-  else if ( n < kNiLimit ) {
+  if ( n == 4 ) {
     BddList::const_iterator p = bdds.begin();
-    ans_e = p->root();
+    Bdd bdd0 = *p;
+    ++ p;
+    Bdd bdd1 = *p;
+    ++ p;
+    Bdd bdd2 = *p;
+    ++ p;
+    Bdd bdd3 = *p;
+    return bdd0 & bdd1 & bdd2 & bdd3;
+  }
+
+  Bdd ans;
+  if ( n < kNiLimit ) {
+    BddList::const_iterator p = bdds.begin();
+    ans = *p;
     for (++ p; p != bdds.end(); ++ p) {
-      ans_e = mImpl->and_op(ans_e, p->root());
+      ans &= *p;
     }
   }
   else {
-    SimpleHeapTree<BddEdge> work;
+    SimpleHeapTree<Bdd> work;
     for (BddList::const_iterator p = bdds.begin();
 	 p != bdds.end(); ++p) {
-      BddEdge e = p->root();
-      work.put(e, mImpl->size(e));
+      Bdd bdd = *p;
+      work.put(bdd, size(bdd));
     }
-    ans_e = work.getmin();
+    ans = work.getmin();
     work.popmin();
     while ( !work.empty() ) {
-      ans_e = mImpl->and_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
+      ans &= work.getmin();
+      ans = work.xchgmin(ans, size(ans));
     }
   }
-  return Bdd(mImpl, ans_e);
+  return ans;
 }
 
 // 複数のBDDの論理和を求める．
@@ -456,33 +473,36 @@ BddMgr::or_op(const BddVector& bdds)
   if ( n == 2 ) {
     return bdds[0] | bdds[1];
   }
-
-  BddEdge ans_e;
   if ( n == 3 ) {
-    ans_e = mImpl->or_op(bdds[0].root(), bdds[1].root(), bdds[2].root());
+    return bdds[0] | bdds[1] | bdds[2];
   }
-  else if ( n < kNiLimit ) {
+  if ( n == 4 ) {
+    return bdds[0] | bdds[1] | bdds[2] | bdds[3];
+  }
+
+  Bdd ans;
+  if ( n < kNiLimit ) {
     BddVector::const_iterator p = bdds.begin();
-    ans_e = p->root();
+    ans = *p;
     for (++ p; p != bdds.end(); ++ p) {
-      ans_e = mImpl->or_op(ans_e, p->root());
+      ans |= *p;
     }
   }
   else {
-    SimpleHeapTree<BddEdge> work;
+    SimpleHeapTree<Bdd> work;
     for (BddVector::const_iterator p = bdds.begin();
 	 p != bdds.end(); ++p) {
-      BddEdge e = p->root();
-      work.put(e, mImpl->size(e));
+      Bdd bdd = *p;
+      work.put(bdd, size(bdd));
     }
-    ans_e = work.getmin();
+    ans = work.getmin();
     work.popmin();
     while ( !work.empty() ) {
-      ans_e = mImpl->or_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
+      ans |= work.getmin();
+      ans = work.xchgmin(ans, size(ans));
     }
   }
-  return Bdd(mImpl, ans_e);
+  return ans;
 }
 
 Bdd
@@ -502,39 +522,50 @@ BddMgr::or_op(const BddList& bdds)
     Bdd bdd1 = *p;
     return bdd0 | bdd1;
   }
-
-  BddEdge ans_e;
+  if ( n == 2 ) {
+    BddList::const_iterator p = bdds.begin();
+    Bdd bdd0 = *p;
+    ++ p;
+    Bdd bdd1 = *p;
+    ++ p;
+    Bdd bdd2 = *p;
+    return bdd0 | bdd1 | bdd2;
+  }
   if ( n == 3 ) {
     BddList::const_iterator p = bdds.begin();
-    BddEdge e0 = p->root();
+    Bdd bdd0 = *p;
     ++ p;
-    BddEdge e1 = p->root();
+    Bdd bdd1 = *p;
     ++ p;
-    BddEdge e2 = p->root();
-    ans_e = mImpl->or_op(e0, e1, e2);
+    Bdd bdd2 = *p;
+    ++ p;
+    Bdd bdd3 = *p;
+    return bdd0 | bdd1 | bdd2 | bdd3;
   }
-  else if ( n < kNiLimit ) {
+
+  Bdd ans;
+  if ( n < kNiLimit ) {
     BddList::const_iterator p = bdds.begin();
-    ans_e = p->root();
+    ans = *p;
     for (++ p; p != bdds.end(); ++ p) {
-      ans_e = mImpl->or_op(ans_e, p->root());
+      ans |= *p;
     }
   }
   else {
-    SimpleHeapTree<BddEdge> work;
+    SimpleHeapTree<Bdd> work;
     for (BddList::const_iterator p = bdds.begin();
 	 p != bdds.end(); ++p) {
-      BddEdge e = p->root();
-      work.put(e, mImpl->size(e));
+      Bdd bdd = *p;
+      work.put(bdd, size(bdd));
     }
-    ans_e = work.getmin();
+    ans = work.getmin();
     work.popmin();
     while ( !work.empty() ) {
-      ans_e = mImpl->or_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
+      ans |= work.getmin();
+      ans = work.xchgmin(ans, size(ans));
     }
   }
-  return Bdd(mImpl, ans_e);
+  return ans;
 }
 
 // 複数のBDDの排他的論理和を求める．
@@ -551,33 +582,36 @@ BddMgr::xor_op(const BddVector& bdds)
   if ( n == 2 ) {
     return bdds[0] ^ bdds[1];
   }
-
-  BddEdge ans_e;
   if ( n == 3 ) {
-    ans_e = mImpl->xor_op(bdds[0].root(), bdds[1].root(), bdds[2].root());
+    return bdds[0] ^ bdds[1] ^ bdds[2];
   }
-  else if ( n < kNiLimit ) {
+  if ( n == 4 ) {
+    return bdds[0] ^ bdds[1] ^ bdds[3] ^ bdds[4];
+  }
+
+  Bdd ans;
+  if ( n < kNiLimit ) {
     BddVector::const_iterator p = bdds.begin();
-    ans_e = p->root();
+    ans = *p;
     for (++ p; p != bdds.end(); ++ p) {
-      ans_e = mImpl->xor_op(ans_e, p->root());
+      ans ^= *p;
     }
   }
   else {
-    SimpleHeapTree<BddEdge> work;
+    SimpleHeapTree<Bdd> work;
     for (BddVector::const_iterator p = bdds.begin();
 	 p != bdds.end(); ++p) {
-      BddEdge e = p->root();
-      work.put(e, mImpl->size(e));
+      Bdd bdd = *p;
+      work.put(bdd, size(bdd));
     }
-    ans_e = work.getmin();
+    ans = work.getmin();
     work.popmin();
     while ( !work.empty() ) {
-      ans_e = mImpl->xor_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
+      ans ^= work.getmin();
+      ans = work.xchgmin(ans, size(ans));
     }
   }
-  return Bdd(mImpl, ans_e);
+  return ans;
 }
 
 Bdd
@@ -597,39 +631,50 @@ BddMgr::xor_op(const BddList& bdds)
     Bdd bdd1 = *p;
     return bdd0 ^ bdd1;
   }
-
-  BddEdge ans_e;
   if ( n == 3 ) {
     BddList::const_iterator p = bdds.begin();
-    BddEdge e0 = p->root();
+    Bdd bdd0 = *p;
     ++ p;
-    BddEdge e1 = p->root();
+    Bdd bdd1 = *p;
     ++ p;
-    BddEdge e2 = p->root();
-    ans_e = mImpl->xor_op(e0, e1, e2);
+    Bdd bdd2 = *p;
+    return bdd0 ^ bdd1 ^ bdd2;
   }
-  else if ( n < kNiLimit ) {
+  if ( n == 4 ) {
     BddList::const_iterator p = bdds.begin();
-    ans_e = p->root();
+    Bdd bdd0 = *p;
+    ++ p;
+    Bdd bdd1 = *p;
+    ++ p;
+    Bdd bdd2 = *p;
+    ++ p;
+    Bdd bdd3 = *p;
+    return bdd0 ^ bdd1 ^ bdd2 ^ bdd3;
+  }
+
+  Bdd ans;
+  if ( n < kNiLimit ) {
+    BddList::const_iterator p = bdds.begin();
+    ans = *p;
     for (++ p; p != bdds.end(); ++ p) {
-      ans_e = mImpl->xor_op(ans_e, p->root());
+      ans ^= *p;
     }
   }
   else {
-    SimpleHeapTree<BddEdge> work;
+    SimpleHeapTree<Bdd> work;
     for (BddList::const_iterator p = bdds.begin();
 	 p != bdds.end(); ++p) {
-      BddEdge e = p->root();
-      work.put(e, mImpl->size(e));
+      Bdd bdd = *p;
+      work.put(bdd, size(bdd));
     }
-    ans_e = work.getmin();
+    ans = work.getmin();
     work.popmin();
     while ( !work.empty() ) {
-      ans_e = mImpl->xor_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
+      ans ^= work.getmin();
+      ans = work.xchgmin(ans, size(ans));
     }
   }
-  return Bdd(mImpl, ans_e);
+  return ans;
 }
 
 // 変数を確保する．

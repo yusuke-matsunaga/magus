@@ -83,13 +83,13 @@ list
 line
 : expr SEMI
 {
-  $1.display(cout);
+  print(cout, $1);
   prompt();
 }
 | ID { lname = cur_text; } EQ expr SEMI
 {
   id_table[lname] = $4;
-  $4.display(cout);
+  print(cout, $4);
   cout << " is stored in " << lname << endl;
   prompt();
 }

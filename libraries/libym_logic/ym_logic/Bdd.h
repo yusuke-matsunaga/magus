@@ -11,7 +11,6 @@
 
 
 #include "ym_logic/bdd_nsdef.h"
-#include "ym_logic/BddEdge.h"
 #include "ym_logic/VarId.h"
 #include "ym_logic/LogExpr.h"
 #include "ym_utils/BinIO.h"
@@ -349,33 +348,6 @@ public:
   /// @name 表示/ノード数の計数など
   /// @{
 
-  /// @brief 内容を書き出す
-  /// @param[in] s 出力ストリーム
-  /// @return ノード数を返す．
-  ymuint64
-  display(ostream& s) const;
-
-  /// @brief BDD が表す関数のカルノー図を表示する
-  /// @param[in] s 主力ストリーム
-  /// @warning ただし4変数以内
-  void
-  display_map(ostream& s) const;
-
-  /// @brief BDD の内容を積和形論理式の形で出力する．
-  /// @param[in] s 出力ストリーム
-  void
-  display_sop(ostream& s) const;
-
-  /// @brief 内容のダンプ
-  /// @param[in] s 出力ストリーム
-  void
-  dump(BinO& s) const;
-
-  /// @brief BDD が使っているノード数を数える．
-  /// @return BDD が使っているノード数
-  ymuint64
-  size() const;
-
   /// @brief 真理値表密度の計算
   /// @param[in] nvar 入力数
   double
@@ -400,28 +372,6 @@ public:
   mpz_class
   walsh1(VarId var,
 	 ymuint nvar) const;
-
-  /// @brief サポート変数集合の計算 (VarVector)
-  /// @param[out] support サポート変数集合を格納するベクタ
-  /// @return サポートの要素数
-  ymuint
-  support(VarVector& support) const;
-
-  /// @brief サポート変数集合の計算 (VarList)
-  /// @param[out] support サポート変数集合を格納するリスト
-  /// @return サポートの要素数
-  ymuint
-  support(VarList& support) const;
-
-  /// @brief サポート変数集合の計算 (BddVarSet)
-  /// @return サポート変数集合
-  BddVarSet
-  support() const;
-
-  /// @brief サポート変数集合の要素数の計算
-  /// @return サポート変数集合の要素数
-  ymuint
-  support_size() const;
 
   /// @brief 1パスの探索
   /// @return 1パス ('1' の終端へ至る経路) を表すリテラル集合
@@ -499,94 +449,231 @@ public:
   //////////////////////////////////////////////////////////////////////
   //  friend 関数の宣言
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief if-then-else 演算
+  /// @param[in] cond 条件
+  /// @param[in] s 条件が成り立ったときの関数
+  /// @param[in] t 条件が成り立たなかったの関数
   friend
   Bdd
   ite_op(const Bdd& cond,
 	 const Bdd& s,
 	 const Bdd& t);
 
+  /// @brief and-exist 演算
+  /// @param[in] src1, src2 オペランド
+  /// @param[in] svars 消去する変数のリスト
   friend
   Bdd
   and_exist(const Bdd& src1,
 	    const Bdd& src2,
 	    const BddVarSet& svars);
 
+  /// @brief 非冗長積和形を求める．
+  /// @param[in] lower 下限(on set)
+  /// @param[in] upper 上限(on set + don't care set)
+  /// @param[out] cover 結果の式を納める変数
   friend
   Bdd
   isop(const Bdd& lower,
        const Bdd& upper,
        LogExpr& cover);
 
+  /// @brief 主項を求める．
+  /// @param[in] lower 下限(on set)
+  /// @param[in] upper 上限(on set + don't care set)
+  /// @return すべての主項からなる論理式を返す．
   friend
   LogExpr
   prime_cover(const Bdd& lower,
 	      const Bdd& upper);
 
+  /// @brief 最小サポートを求める．
+  /// @param[in] lower 下限(on set)
+  /// @param[in] upper 上限(on set + don't care set)
+  /// @return 最小サポート集合を表す BDD を返す．
   friend
   Bdd
   minimal_support(const Bdd& lower,
 		  const Bdd& upper);
 
+  /// @brief 内容を書き出す
+  /// @param[in] s 出力ストリーム
+  /// @param[in] bdd 対象のBDD
+  /// @return ノード数を返す．
   friend
   ymuint64
-  display(const BddVector& array,
-	  ostream& s);
+  print(ostream& s,
+	const Bdd& bdd);
 
+  /// @brief BDD のリストの内容を出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] array BDD のリスト
   friend
   ymuint64
-  display(const BddList& array,
-	  ostream& s);
+  print(ostream& s,
+	const BddVector& array);
 
+  /// @brief BDD のリストの内容を出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] array BDD のリスト
+  friend
+  ymuint64
+  print(ostream& s,
+	const BddList& array);
+
+  /// @brief BDD が表す関数のカルノー図を表示する
+  /// @param[in] s 主力ストリーム
+  /// @param[in] bdd 対象のBDD
+  /// @warning ただし4変数以内
+  friend
+  void
+  print_map(ostream& s,
+	    const Bdd& bdd);
+
+  /// @brief BDD の内容を積和形論理式の形で出力する．
+  /// @param[in] s 出力ストリーム
+  /// @param[in] bdd 対象のBDD
+  friend
+  void
+  print_sop(ostream& s,
+	    const Bdd& bdd);
+
+  /// @brief BDD の内容をダンプする．
+  /// @param[in] s 出力ストリーム
+  /// @param[in] bdd 対象の BDD
+  friend
+  void
+  dump(BinO& s,
+       const Bdd& bdd);
+
+  /// @brief BDD のリストの内容をダンプする．
+  /// @param[in] s 出力ストリーム
+  /// @param[in] array BDD のリスト
   friend
   void
   dump(BinO& s,
        const BddVector& array);
 
+  /// @brief BDD のリストの内容をダンプする．
+  /// @param[in] s 出力ストリーム
+  /// @param[in] array BDD のリスト
   friend
   void
   dump(BinO& s,
        const BddList& array);
 
+  /// @brief BDD が使っているノード数を数える．
+  /// @param[in] bdd 対象の BDD
+  /// @return BDD が使っているノード数
+  friend
+  ymuint64
+  size(const Bdd& bdd);
+
+  /// @brief BDD のリストが使っているノード数を数える．
+  /// @param[in] array BDDのリスト
   friend
   ymuint64
   size(const BddVector& array);
 
+  /// @brief BDD のリストが使っているノード数を数える．
+  /// @param[in] array BDDのリスト
   friend
   ymuint64
   size(const BddList& array);
 
+  /// @brief サポート変数集合の計算 (VarVector)
+  /// @param[in] bdd 対象の BDD
+  /// @param[out] support サポート変数集合を格納するベクタ
+  /// @return サポートの要素数
+  friend
+  ymuint
+  support(const Bdd& bdd,
+	  VarVector& support);
+
+  /// @brief サポート変数集合の計算 (VarVector)
+  /// @param[in] bdd_array 対象の BDD のリスト
+  /// @param[out] support サポート変数集合を格納するベクタ
+  /// @return サポートの要素数
   friend
   ymuint
   support(const BddVector& bdd_array,
 	  VarVector& sup);
 
+  /// @brief サポート変数集合の計算 (VarVector)
+  /// @param[in] bdd_array 対象の BDD のリスト
+  /// @param[out] support サポート変数集合を格納するベクタ
+  /// @return サポートの要素数
+  friend
+  ymuint
+  support(const BddList& bdd_array,
+	  VarVector& sup);
+
+  /// @brief サポート変数集合の計算 (VarList)
+  /// @param[in] bdd 対象の BDD
+  /// @param[out] support サポート変数集合を格納するリスト
+  /// @return サポートの要素数
+  friend
+  ymuint
+  support(const Bdd& bdd,
+	  VarList& support);
+
+  /// @brief サポート変数集合の計算 (VarList)
+  /// @param[in] bdd_array 対象の BDD のリスト
+  /// @param[out] support サポート変数集合を格納するベクタ
+  /// @return サポートの要素数
   friend
   ymuint
   support(const BddVector& bdd_array,
 	  VarList& sup);
 
+  /// @brief サポート変数集合の計算 (VarList)
+  /// @param[in] bdd_array 対象の BDD のリスト
+  /// @param[out] support サポート変数集合を格納するベクタ
+  /// @return サポートの要素数
+  friend
+  ymuint
+  support(const BddList& bdd_array,
+	  VarList& sup);
+
+  /// @brief サポート変数集合の計算 (BddVarSet)
+  /// @param[in] bdd 対象の BDD
+  /// @return サポート変数集合
+  friend
+  BddVarSet
+  support(const Bdd& bdd);
+
+  /// @brief サポート変数集合の計算 (BddVarSet)
+  /// @param[in] bdd_array 対象の BDD のリスト
+  /// @return サポート変数集合
   friend
   BddVarSet
   support(const BddVector& bdd_array);
 
-  friend
-  ymuint
-  support_size(const BddVector& bdd_array);
-
-  friend
-  ymuint
-  support(const BddList& bdd_array,
-	  VarVector& sup);
-
-  friend
-  ymuint
-  support(const BddList& bdd_array,
-	  VarList& sup);
-
+  /// @brief サポート変数集合の計算 (BddVarSet)
+  /// @param[in] bdd_array 対象の BDD のリスト
+  /// @return サポート変数集合
   friend
   BddVarSet
   support(const BddList& bdd_array);
 
+  /// @brief サポート変数集合の要素数の計算
+  /// @param[in] bdd 対象の BDD
+  /// @return サポート変数集合の要素数
+  friend
+  ymuint
+  support_size(const Bdd& bdd);
+
+  /// @brief サポート変数集合の要素数の計算
+  /// @param[in] bdd 対象の BDD
+  /// @return サポート変数集合の要素数
+  friend
+  ymuint
+  support_size(const BddVector& bdd_array);
+
+  /// @brief サポート変数集合の要素数の計算
+  /// @param[in] bdd 対象の BDD
+  /// @return サポート変数集合の要素数
   friend
   ymuint
   support_size(const BddList& bdd_array);
@@ -631,18 +718,14 @@ private:
   /// @param[in] mgr BDD マネージャ
   /// @param[in] e 根の枝
   Bdd(BddMgrImpl* mgr,
-      BddEdge root);
-
-  // 根の枝をとり出す
-  BddEdge
-  root() const;
+      ympuint root);
 
   /// @brief mgr, root をセットする時に呼ばれる関数
   /// @param[in] mgr BDD マネージャ
   /// @param[in] root 根の枝
   void
   set(BddMgrImpl* mgr,
-      BddEdge root);
+      ympuint root);
 
   /// @brief (mMgr, mRoot) への参照をなくす時に呼ばれる関数
   void
@@ -652,7 +735,7 @@ private:
   /// @param[in] new_e 新しい枝
   /// @warning new_e も同一の BddMgr に属していると仮定する．
   void
-  assign(BddEdge new_e);
+  assign(ympuint new_e);
 
 
 private:
@@ -664,7 +747,7 @@ private:
   BddMgrImpl* mMgr;
 
   // 根のノードを指す枝
-  BddEdge mRoot;
+  ympuint mRoot;
 
   // おなじ BddMgr の BDD をつなぐためのリンクポインタ
   Bdd* mPrev;
@@ -745,105 +828,6 @@ bool
 operator<(const Bdd& src1,
 	  const Bdd& src2);
 
-// if-then-else 演算．
-// condが真の時はsを，偽の時はtを選ぶ
-Bdd
-ite_op(const Bdd& cond,
-       const Bdd& s,
-       const Bdd& t);
-
-// src1 と src2 の論理積を計算しつつスムージングを行なう．
-Bdd
-and_exist(const Bdd& src1,
-	  const Bdd& src2,
-	  const BddVarSet& svars);
-
-// ISOP の生成
-// lower と upper で指定された不完全指定論理関数に含まれる関数の
-// 非冗長積和形表現を一つ求め, cover にセットする．
-// その論理関数を返す．
-Bdd
-isop(const Bdd& lower,
-     const Bdd& upper,
-     LogExpr& cover);
-
-// prime-cover の生成
-// lower と upper で指定された不完全指定論理関数に含まれる関数の
-// すべての prime implicant からなる prime cover を求める．
-LogExpr
-prime_cover(const Bdd& lower,
-	    const Bdd& upper);
-
-// minimum support の生成
-// lower と upper で指定された不完全指定論理関数に含まれる関数の
-// 極小サポート集合をもとめる．
-Bdd
-minimal_support(const Bdd& lower,
-		const Bdd& upper);
-
-// BDDの配列の内容を書き出す
-// と同時にノード数を返す．
-ymuint64
-display(const BddVector& array,
-	ostream& s);
-ymuint64
-display(const BddList& array,
-	ostream& s);
-
-// BDDの配列の内容を保存用に書き出す
-void
-dump(BinO& s,
-     const BddVector& array);
-
-// BDDの配列の内容を保存用に書き出す
-void
-dump(BinO& s,
-     const BddList& array);
-
-// BDDの配列のノード数を数える
-ymuint64
-size(const BddVector& array);
-
-// BDDの配列のノード数を数える
-ymuint64
-size(const BddList& array);
-
-// BDD のベクタのサポートを求める．
-ymuint
-support(const BddVector& bdd_array,
-	VarVector& sup);
-
-// BDD のベクタのサポートを求める．
-ymuint
-support(const BddVector& bdd_array,
-	VarList& sup);
-
-// BDD のベクタのサポートを求める．
-BddVarSet
-support(const BddVector& bdd_array);
-
-// BDD のベクタのサポートを求める．
-ymuint
-support_size(const BddVector& bdd_array);
-
-// BDD のリストのサポートを求める．
-ymuint
-support(const BddList& bdd_array,
-	VarVector& sup);
-
-// BDD のリストのサポートを求める．
-ymuint
-support(const BddList& bdd_array,
-	VarList& sup);
-
-// BDD のリストのサポートを求める．
-BddVarSet
-support(const BddList& bdd_array);
-
-// BDD のリストのサポートを求める．
-ymuint
-support_size(const BddList& bdd_array);
-
 // src1 と src2 が変数集合の時に共通部分を求める．
 Bdd
 vscap(const Bdd& src1,
@@ -874,6 +858,206 @@ bool
 lsintersect(const Bdd& src1,
 	    const Bdd& src2);
 
+/// @brief if-then-else 演算
+/// @param[in] cond 条件
+/// @param[in] s 条件が成り立ったときの関数
+/// @param[in] t 条件が成り立たなかったの関数
+Bdd
+ite_op(const Bdd& cond,
+       const Bdd& s,
+       const Bdd& t);
+
+/// @brief and-exist 演算
+/// @param[in] src1, src2 オペランド
+/// @param[in] svars 消去する変数のリスト
+Bdd
+and_exist(const Bdd& src1,
+	  const Bdd& src2,
+	  const BddVarSet& svars);
+
+/// @brief 非冗長積和形を求める．
+/// @param[in] lower 下限(on set)
+/// @param[in] upper 上限(on set + don't care set)
+/// @param[out] cover 結果の式を納める変数
+Bdd
+isop(const Bdd& lower,
+     const Bdd& upper,
+     LogExpr& cover);
+
+/// @brief 主項を求める．
+/// @param[in] lower 下限(on set)
+/// @param[in] upper 上限(on set + don't care set)
+/// @return すべての主項からなる論理式を返す．
+LogExpr
+prime_cover(const Bdd& lower,
+	    const Bdd& upper);
+
+/// @brief 最小サポートを求める．
+/// @param[in] lower 下限(on set)
+/// @param[in] upper 上限(on set + don't care set)
+/// @return 最小サポート集合を表す BDD を返す．
+Bdd
+minimal_support(const Bdd& lower,
+		const Bdd& upper);
+
+/// @brief 内容を書き出す
+/// @param[in] s 出力ストリーム
+/// @param[in] bdd 対象のBDD
+/// @return ノード数を返す．
+ymuint64
+print(ostream& s,
+      const Bdd& bdd);
+
+/// @brief BDD が表す関数のカルノー図を表示する
+/// @param[in] s 主力ストリーム
+/// @param[in] bdd 対象のBDD
+/// @warning ただし4変数以内
+void
+print_map(ostream& s,
+	  const Bdd& bdd);
+
+/// @brief BDD の内容を積和形論理式の形で出力する．
+/// @param[in] s 出力ストリーム
+/// @param[in] bdd 対象のBDD
+void
+print_sop(ostream& s,
+	  const Bdd& bdd);
+
+/// @brief BDD のリストの内容を出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] array BDD のリスト
+ymuint64
+print(ostream& s,
+      const BddVector& array);
+
+/// @brief BDD のリストの内容を出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] array BDD のリスト
+ymuint64
+print(ostream& s,
+      const BddList& array);
+
+/// @brief BDD の内容をダンプする．
+/// @param[in] s 出力ストリーム
+/// @param[in] bdd 対象の BDD
+void
+dump(BinO& s,
+     const Bdd& bdd);
+
+/// @brief BDD のリストの内容をダンプする．
+/// @param[in] s 出力ストリーム
+/// @param[in] array BDD のリスト
+void
+dump(BinO& s,
+     const BddVector& array);
+
+/// @brief BDD のリストの内容をダンプする．
+/// @param[in] s 出力ストリーム
+/// @param[in] array BDD のリスト
+void
+dump(BinO& s,
+     const BddList& array);
+
+/// @brief BDD が使っているノード数を数える．
+/// @param[in] bdd 対象の BDD
+/// @return BDD が使っているノード数
+ymuint64
+size(const Bdd& bdd);
+
+/// @brief BDD のリストが使っているノード数を数える．
+/// @param[in] array BDDのリスト
+ymuint64
+size(const BddVector& array);
+
+/// @brief BDD のリストが使っているノード数を数える．
+/// @param[in] array BDDのリスト
+ymuint64
+size(const BddList& array);
+
+/// @brief サポート変数集合の計算 (VarVector)
+/// @param[in] bdd 対象の BDD
+/// @param[out] support サポート変数集合を格納するベクタ
+/// @return サポートの要素数
+ymuint
+support(const Bdd& bdd,
+	VarVector& support);
+
+/// @brief サポート変数集合の計算 (VarVector)
+/// @param[in] bdd_array 対象の BDD のリスト
+/// @param[out] support サポート変数集合を格納するベクタ
+/// @return サポートの要素数
+ymuint
+support(const BddVector& bdd_array,
+	VarVector& sup);
+
+/// @brief サポート変数集合の計算 (VarVector)
+/// @param[in] bdd_array 対象の BDD のリスト
+/// @param[out] support サポート変数集合を格納するベクタ
+/// @return サポートの要素数
+ymuint
+support(const BddList& bdd_array,
+	VarVector& sup);
+
+/// @brief サポート変数集合の計算 (VarList)
+/// @param[in] bdd 対象の BDD
+/// @param[out] support サポート変数集合を格納するリスト
+/// @return サポートの要素数
+ymuint
+support(const Bdd& bdd,
+	VarList& support);
+
+/// @brief サポート変数集合の計算 (VarList)
+/// @param[in] bdd_array 対象の BDD のリスト
+/// @param[out] support サポート変数集合を格納するベクタ
+/// @return サポートの要素数
+ymuint
+support(const BddVector& bdd_array,
+	VarList& sup);
+
+/// @brief サポート変数集合の計算 (VarList)
+/// @param[in] bdd_array 対象の BDD のリスト
+/// @param[out] support サポート変数集合を格納するベクタ
+/// @return サポートの要素数
+ymuint
+support(const BddList& bdd_array,
+	VarList& sup);
+
+/// @brief サポート変数集合の計算 (BddVarSet)
+/// @param[in] bdd 対象の BDD
+/// @return サポート変数集合
+BddVarSet
+support(const Bdd& bdd);
+
+/// @brief サポート変数集合の計算 (BddVarSet)
+/// @param[in] bdd_array 対象の BDD のリスト
+/// @return サポート変数集合
+BddVarSet
+support(const BddVector& bdd_array);
+
+/// @brief サポート変数集合の計算 (BddVarSet)
+/// @param[in] bdd_array 対象の BDD のリスト
+/// @return サポート変数集合
+BddVarSet
+support(const BddList& bdd_array);
+
+/// @brief サポート変数集合の要素数の計算
+/// @param[in] bdd 対象の BDD
+/// @return サポート変数集合の要素数
+ymuint
+support_size(const Bdd& bdd);
+
+/// @brief サポート変数集合の要素数の計算
+/// @param[in] bdd 対象の BDD
+/// @return サポート変数集合の要素数
+ymuint
+support_size(const BddVector& bdd_array);
+
+/// @brief サポート変数集合の要素数の計算
+/// @param[in] bdd 対象の BDD
+/// @return サポート変数集合の要素数
+ymuint
+support_size(const BddList& bdd_array);
+
 /// @}
 //////////////////////////////////////////////////////////////////////
 
@@ -881,120 +1065,6 @@ lsintersect(const Bdd& src1,
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief 根の枝をとり出す
-// @return 根の枝
-inline
-BddEdge
-Bdd::root() const
-{
-  return mRoot;
-}
-
-// @brief 定数0 のチェック
-// @return 定数0の時 true を返す．
-inline
-bool
-Bdd::is_zero() const
-{
-  return mRoot.is_zero();
-}
-
-// @brief 定数1 のチェック
-// @return 定数1 の時 true を返す．
-inline
-bool
-Bdd::is_one() const
-{
-  return mRoot.is_one();
-}
-
-// @brief 定数のチェック
-// @return 定数の時 true を返す．
-inline
-bool
-Bdd::is_const() const
-{
-  return mRoot.is_const();
-}
-
-// @brief オーバーフローのチェック
-// @return 演算結果がオーバーフローしたとき true を返す．
-inline
-bool
-Bdd::is_overflow() const
-{
-  return mRoot.is_overflow();
-}
-
-// @brief エラーのチェック
-// @return 演算結果がエラーになったとき true を返す．
-inline
-bool
-Bdd::is_error() const
-{
-  return mRoot.is_error();
-}
-
-// @brief オーバーフローとエラーのチェック
-// @return 演算結果がオーバーフローかエラーのとき true を返す．
-inline
-bool
-Bdd::is_invalid() const
-{
-  return mRoot.is_invalid();
-}
-
-// @brief 終端ノードのチェック
-// @return 終端ノードのとき true を返す．
-inline
-bool
-Bdd::is_leaf() const
-{
-  return mRoot.is_leaf();
-}
-
-// @brief 定数0に設定する．
-inline
-void
-Bdd::set_zero()
-{
-  set(mMgr, BddEdge::make_zero());
-}
-
-// @brief 定数1に設定する．
-inline
-void
-Bdd::set_one()
-{
-  set(mMgr, BddEdge::make_one());
-}
-
-// @brief エラー値に設定する．
-inline
-void
-Bdd::set_error()
-{
-  set(mMgr, BddEdge::make_error());
-}
-
-// @brief オーバーフロー値に設定する．
-inline
-void
-Bdd::set_overflow()
-{
-  set(mMgr, BddEdge::make_overflow());
-}
-
-// @brief 等価比較
-// @return 2つのBDDが等しいとき true を返す．
-inline
-bool
-Bdd::operator==(const Bdd& src2) const
-{
-  // 実はただのポインタ（スカラ値）比較でわかる．
-  return root() == src2.root();
-}
 
 // @brief 不等価比較
 // @return 2つのBDDが等しくないとき true を返す．
@@ -1057,18 +1127,19 @@ inline
 ymuint
 Bdd::hash() const
 {
-  ympuint r = mRoot.mBody;
+  ympuint r = mRoot;
   return (r * r) >> 8;
 }
 
-// @brief 積和系論理式の出力
-// @param s 出力ストリーム
-// BDD の内容を積和形論理式の形で s に出力する．
+// @brief BDD の内容を積和形論理式の形で出力する．
+// @param[in] s 出力ストリーム
+// @param[in] bdd 対象のBDD
 inline
 void
-Bdd::display_sop(ostream& s) const
+print_sop(ostream& s,
+	  const Bdd& bdd)
 {
-  s << sop() << endl;
+  s << bdd.sop() << endl;
 }
 
 END_NAMESPACE_YM_BDD

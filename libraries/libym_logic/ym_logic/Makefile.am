@@ -10,7 +10,6 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	Bdd.h \
-	BddEdge.h \
 	BddMgr.h \
 	BddLitSet.h \
 	BddVarSet.h \

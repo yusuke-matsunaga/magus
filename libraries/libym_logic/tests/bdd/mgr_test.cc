@@ -1,11 +1,9 @@
 
-/// @file libym_bdd/tests/mgr_test.cc
+/// @file mgr_test.cc
 /// @brief BddMgr 用のテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: mgr_test.cc 700 2007-05-31 00:41:30Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 // BDD パッケージのテスト
@@ -43,7 +41,7 @@ check_errbdd(const Bdd& bdd,
 {
   if ( !bdd.is_error() ) {
     cout << "ERROR[errbdd]: " << bdd_str << endl;
-    bdd.display(cout);
+    print(cout, bdd);
     return false;
   }
 
@@ -113,9 +111,9 @@ test_ite()
       }
     }
     else if ( !bdd.is_error() ) {
-      f.display(cout);
-      g.display(cout);
-      h.display(cout);
+      print(cout, f);
+      print(cout, g);
+      print(cout, h);
       cout << "ERROR[test_ite]: bdd should be an Error-BDD" << endl;
       return false;
     }
@@ -133,8 +131,8 @@ test_compose()
 
   Bdd bdd5 = bdd1.compose(VarId(0), bdd3);
   if ( !bdd5.is_error() ) {
-    bdd1.display(cout);
-    bdd2.display(cout);
+    print(cout, bdd1);
+    print(cout, bdd2);
     cout << "ERROR[test_compose(a)]: bdd5 should be an Error-BDD" << endl;
     return false;
   }
@@ -143,8 +141,8 @@ test_compose()
   vbmap.insert(make_pair(VarId(0), bdd3));
   Bdd bdd6 = bdd1.compose(vbmap);
   if ( !bdd6.is_error() ) {
-    bdd1.display(cout);
-    bdd2.display(cout);
+    print(cout, bdd1);
+    print(cout, bdd2);
     cout << "ERROR[test_compose(b)]: bdd6 should be an Error-BDD" << endl;
     return false;
   }
@@ -163,15 +161,15 @@ test_smooth()
   BddVarSet vs2(mgr2, vl);
   Bdd bdd4 = bdd1.esmooth(vs2);
   if ( !bdd4.is_error() ) {
-    bdd1.display(cout);
-    vs2.function().display(cout);
+    print(cout, bdd1);
+    print(cout, vs2.function());
     cout << "ERROR[test_esmooth]: bdd4 should be an Error-BDD" << endl;
     return false;
   }
   Bdd bdd5 = bdd1.asmooth(vs2);
   if ( !bdd5.is_error() ) {
-    bdd1.display(cout);
-    vs2.function().display(cout);
+    print(cout, bdd1);
+    print(cout, vs2.function());
     cout << "ERROR[test_asmooth]: bdd5 should be and Error-BDD" << endl;
     return false;
   }
@@ -186,15 +184,15 @@ test_intersect()
   Bdd bdd1 = str2bdd(mgr1, "0 & 1 | 2 & 3");
   Bdd bdd4 = str2bdd(mgr2, "0 | 1");
   if ( bdd1 && bdd4 ) {
-    bdd1.display(cout);
-    bdd4.display(cout);
+    print(cout, bdd1);
+    print(cout, bdd4);
     cout << "ERROR[test_intersect(a)]: bdd1 && bdd4 failed" << endl;
     return false;
   }
   Bdd bdd5 = str2bdd(mgr2, "0 & 1");
   if ( bdd1 >= bdd5 ) {
-    bdd1.display(cout);
-    bdd5.display(cout);
+    print(cout, bdd1);
+    print(cout, bdd5);
     cout << "ERROR[test_intersect(b)]: bdd1 >= bdd5 failed" << endl;
     return false;
   }
@@ -209,8 +207,8 @@ test_cofactor()
   Bdd bdd4 = str2bdd(mgr2, "0 & 2");
   Bdd bdd5 = bdd1 / bdd4;
   if ( !bdd5.is_error() ) {
-    bdd1.display(cout);
-    bdd4.display(cout);
+    print(cout, bdd1);
+    print(cout, bdd4);
     cout << "ERROR[48]: bdd1 / bdd4 failed" << endl;
     return false;
   }
@@ -232,9 +230,9 @@ test_and_exist()
   BddVarSet svars2(mgr2, vl);
   Bdd bdd5 = and_exist(bdd1, bdd4, svars1);
   if ( !bdd5.is_error() ) {
-    bdd1.display(cout);
-    bdd4.display(cout);
-    svars1.function().display(cout);
+    print(cout, bdd1);
+    print(cout, bdd4);
+    print(cout, svars1.function());
     cout << "ERROR[test_and_exist(a)]: and_exist(bdd1, bdd4, svars1) failed"
 	 << endl;
     return false;
@@ -242,9 +240,9 @@ test_and_exist()
 
   Bdd bdd6 = and_exist(bdd1, bdd2, svars2);
   if ( !bdd6.is_error() ) {
-    bdd1.display(cout);
-    bdd2.display(cout);
-    svars2.function().display(cout);
+    print(cout, bdd1);
+    print(cout, bdd2);
+    print(cout, svars2.function());
     cout << "ERROR[test_and_exist(b)]: and_exist(bdd1, bdd2, svars2) failed"
 	 << endl;
     return false;
@@ -262,16 +260,16 @@ test_isop()
   LogExpr cover2;
   Bdd bdd5 = isop(bdd1, bdd4, cover2);
   if ( !bdd5.is_error() ) {
-    bdd1.display(cout);
-    bdd4.display(cout);
+    print(cout, bdd1);
+    print(cout, bdd4);
     cout << "ERROR[test_isop(a)]: isop(bdd1, bdd4, cover2) failed" << endl;
     return false;
   }
 
   LogExpr ans_cover2 = prime_cover(bdd1, bdd4);
   if ( !ans_cover2.is_zero() ) {
-    bdd1.display(cout);
-    bdd4.display(cout);
+    print(cout, bdd1);
+    print(cout, bdd4);
     cout << ans_cover2 << endl;
     cout << "ERROR[test_isop(b)]: prime_cover(bdd1, bdd4) failed" << endl;
     return false;
@@ -279,8 +277,8 @@ test_isop()
 
   Bdd bdd9 = minimal_support(bdd1, bdd4);
   if ( !bdd9.is_error() ) {
-    bdd1.display(cout);
-    bdd4.display(cout);
+    print(cout, bdd1);
+    print(cout, bdd4);
     cout << "ERROR[test_isop(c)]: minimal_support(bdd1, bdd4) failed" << endl;
     return false;
   }

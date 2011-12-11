@@ -1,9 +1,7 @@
 
-/// @file libym_logic/tests/bdd/base_test.cc
+/// @file base_test.cc
 /// @brief BDD パッケージのテストその1 --- 基本関数 ---
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: base_test.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -58,28 +56,28 @@ test_const(BddMgr& bddmgr)
 {
   Bdd one = bddmgr.make_one();
   if ( !one.is_one() ) {
-    one.display(cout);
+    print(cout, one);
     cout << "ERROR[const-1]: !one.is_one()" << endl;
     return false;
   }
 
   Bdd zero = bddmgr.make_zero();
   if ( !zero.is_zero() ) {
-    zero.display(cout);
+    print(cout, zero);
     cout << "ERROR[const-2]: !zero.is_zero()" << endl;
     return false;
   }
 
   Bdd err = bddmgr.make_error();
   if ( !err.is_error() ) {
-    err.display(cout);
+    print(cout, err);
     cout << "ERROR[const-3]: !err.is_error()" << endl;
     return false;
   }
 
   Bdd ovf = bddmgr.make_overflow();
   if ( !ovf.is_overflow() ) {
-    ovf.display(cout);
+    print(cout, ovf);
     cout << "ERROR[const-4]: !ovf.is_overflow()" << endl;
     return false;
   }
@@ -265,16 +263,16 @@ test_intersect(BddMgr& bddmgr)
   Bdd bdd1 = str2bdd(bddmgr, "0 & 1 | 2 & 3");
   Bdd bdd2 = str2bdd(bddmgr, str1);
   if ( !(bdd1 && bdd2) ) {
-    bdd1.display(cout);
-    bdd2.display(cout);
+    print(cout, bdd1);
+    print(cout, bdd2);
     cout << "ERROR[44]: bdd1 && bdd2 failed" << endl;
     return false;
   }
 
   Bdd bdd3 = str2bdd(bddmgr, str2);
   if ( !(bdd1 >= bdd3) ) {
-    bdd1.display(cout);
-    bdd3.display(cout);
+    print(cout, bdd1);
+    print(cout, bdd3);
     cout << "ERROR[45]: bdd1 >= bdd3 failed" << endl;
     return false;
   }
@@ -402,7 +400,7 @@ check_sym(BddMgr& bddmgr,
 {
   Bdd bdd = str2bdd(bddmgr, expr_str.c_str());
   VarVector sup;
-  ymuint ni = bdd.support(sup);
+  ymuint ni = support(bdd, sup);
   if ( ni < 2 ) {
     // 無意味
     return true;
@@ -418,7 +416,7 @@ check_sym(BddMgr& bddmgr,
       bool expected_result1 = (bdd_01 == bdd_10);
       if ( bdd.check_symmetry(pos1, pos2, kPolPosi) != expected_result1 ) {
 	cout << "ERROR[test_symmetry(positive)]" << endl;
-	bdd.display(cout);
+	print(cout, bdd);
 	cout << "pos1 : " << pos1 << ", pos2 : " << pos2 << endl;
 	cout << "expected result = ";
 	if ( expected_result1 ) {
@@ -434,7 +432,7 @@ check_sym(BddMgr& bddmgr,
       bool expected_result2 = (bdd_00 == bdd_11);
       if ( bdd.check_symmetry(pos1, pos2, kPolNega) != expected_result2 ) {
 	cout << "ERROR[test_invsymmetry(negative)]" << endl;
-	bdd.display(cout);
+	print(cout, bdd);
 	cout << "pos1 : " << pos1 << ", pos2 : " << pos2 << endl;
 	cout << "expected result = ";
 	if ( expected_result2 ) {
@@ -522,7 +520,7 @@ test_dump(BddMgr& bddmgr)
       return false;
     }
     BinOStream bos(ofs);
-    bdd.dump(bos);
+    dump(bos, bdd);
   }
   Bdd bdd2;
   {
@@ -536,8 +534,8 @@ test_dump(BddMgr& bddmgr)
   }
   if ( bdd != bdd2 ) {
     cout << "ERROR[test_dump]" << endl;
-    bdd.display(cout);
-    bdd2.display(cout);
+    print(cout, bdd);
+    print(cout, bdd2);
     return false;
   }
   return true;
@@ -580,7 +578,9 @@ main(int argc,
   using nsYm::AssertError;
   using nsYm::BddMgr;
 
+#if !defined(YM_DEBUG)
   try {
+#endif
     BddMgr bddmgr1("bmc", "classic bddmgr");
     if ( !test(bddmgr1) ) {
       return 1;
@@ -593,11 +593,13 @@ main(int argc,
     if ( !test(bddmgr3) ) {
       return 3;
     }
+#if !defined(YM_DEBUG)
   }
   catch ( AssertError a ) {
     cerr << a << endl;
     return 255;
   }
+#endif
 
   return 0;
 }

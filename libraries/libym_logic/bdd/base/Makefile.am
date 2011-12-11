@@ -25,14 +25,21 @@ libym_bdd_base_la_CPPFLAGS = \
 	$(GMP_INCLUDES)
 
 libym_bdd_base_la_SOURCES = \
-	Dumper.h \
 	Bdd.cc \
+	BddEdge.h \
 	BddMgr.cc \
 	BddMgrImpl.h \
 	BddMgrImpl.cc \
 	BddLitSet.cc \
 	BddVarSet.cc \
-	Dumper.cc
+	IdMgr.h \
+	IdMgr.cc \
+	Printer.h \
+	Printer.cc \
+	Dumper.h \
+	Dumper.cc \
+	Restorer.h \
+	Restorer.cc
 
 libym_bdd_base_la_LIBADD =
 

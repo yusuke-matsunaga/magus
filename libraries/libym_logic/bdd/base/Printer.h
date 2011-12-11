@@ -1,8 +1,8 @@
-#ifndef DUMPER_H
-#define DUMPER_H
+#ifndef PRINTER_H
+#define PRINTER_H
 
-/// @file Dumper.h
-/// @brief Dumper のヘッダファイル
+/// @file Printer.h
+/// @brief Printer のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -11,37 +11,35 @@
 
 #include "BddMgrImpl.h"
 #include "IdMgr.h"
-#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
 
 //////////////////////////////////////////////////////////////////////
-// BDD の内容を保存するためのクラス
+/// @class Printer Printer.h "Printer.h"
+/// @brief BDD の内容を出力するためのクラス
 //////////////////////////////////////////////////////////////////////
-class Dumper
+class Printer
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] mgr BddMgr
-  /// @param[in] s 出力先のストリーム
-  Dumper(BddMgrImpl* mgr,
-	 BinO& s);
+  Printer(BddMgrImpl* mgr,
+	  ostream& s);
 
   /// @brief デストラクタ
-  ~Dumper();
+  ~Printer();
 
 
 public:
 
-  /// @brief 一つのBDDをダンプする．
-  void
-  write(BddEdge e);
+  /// @brief 登録された節点数を返す．
+  ymuint64
+  num() const;
 
-  /// @brief 複数のBDDをダンプする．
+  /// @brief e を根とするBDDの内容を出力する．
   void
-  write(const vector<BddEdge>& edge_list);
+  print_root(BddEdge e);
 
 
 private:
@@ -49,13 +47,17 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief e で指されたBDDノードの内容を出力する．
+  /// @brief e の ID 番号を出力する．
   void
-  dump_node(BddEdge e);
+  print_id(BddEdge e);
 
   /// @brief e の内容を出力する．
   void
-  dump_edge(BddEdge e);
+  print_name(BddEdge e);
+
+  /// @brief display_root の下請関数
+  void
+  print_step(BddEdge e);
 
 
 private:
@@ -67,7 +69,10 @@ private:
   BddMgrImpl* mMgr;
 
   // 出力用のストリーム
-  BinO& mStream;
+  ostream& mStream;
+
+  // 処理済の BddEdge に印を付けておくためのハッシュ表
+  hash_set<BddEdge> mMark;
 
   // ID 番号を管理するマネージャ
   IdMgr mIdMgr;
