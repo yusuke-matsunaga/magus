@@ -19,7 +19,7 @@ dump(BinO& s,
 {
   Dumper dumper(bdd.mMgr, s);
   BddEdge e(bdd.mRoot);
-  dumper.write(e);
+  dumper.write(vector<BddEdge>(1, e));
 }
 
 // @brief BDD ベクタの内容をダンプする．
@@ -86,18 +86,6 @@ Dumper::Dumper(BddMgrImpl* mgr,
 // デストラクタ
 Dumper::~Dumper()
 {
-}
-
-// @brief 一つのBDDをダンプする．
-void
-Dumper::write(BddEdge e)
-{
-  dump_node(e);
-  // エンドマーク
-  mStream << kVarIdIllegal;
-  // 出力数
-  mStream << static_cast<ymuint32>(1);
-  dump_edge(e);
 }
 
 // @brief 複数のBDDをダンプする．

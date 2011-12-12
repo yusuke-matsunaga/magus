@@ -50,9 +50,9 @@ Restorer::read()
     BddEdge ans = mMgr->ite_op(idx, e1, e0);
     mEdgeVector.push_back(ans);
   }
-  ymuint64 n;
+  ymuint32 n;
   mStream >> n;
-  for (ymuint64 i = 0; i < n; ++ i) {
+  for (ymuint32 i = 0; i < n; ++ i) {
     // 根のノードの記述
     BddEdge root = read_edge();
     mRootVector.push_back(root);

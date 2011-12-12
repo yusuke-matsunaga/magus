@@ -35,10 +35,6 @@ public:
 
 public:
 
-  /// @brief 一つのBDDをダンプする．
-  void
-  write(BddEdge e);
-
   /// @brief 複数のBDDをダンプする．
   void
   write(const vector<BddEdge>& edge_list);
