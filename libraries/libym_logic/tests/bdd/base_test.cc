@@ -54,64 +54,66 @@ test_var_list(BddMgr& bddmgr,
 bool
 test_const(BddMgr& bddmgr)
 {
+  bool stat = true;
   Bdd one = bddmgr.make_one();
   if ( !one.is_one() ) {
     print(cout, one);
     cout << "ERROR[const-1]: !one.is_one()" << endl;
-    return false;
+    stat = false;
   }
 
   Bdd zero = bddmgr.make_zero();
   if ( !zero.is_zero() ) {
     print(cout, zero);
     cout << "ERROR[const-2]: !zero.is_zero()" << endl;
-    return false;
+    stat = false;
   }
 
   Bdd err = bddmgr.make_error();
   if ( !err.is_error() ) {
     print(cout, err);
     cout << "ERROR[const-3]: !err.is_error()" << endl;
-    return false;
+    stat = false;
   }
 
   Bdd ovf = bddmgr.make_overflow();
   if ( !ovf.is_overflow() ) {
     print(cout, ovf);
     cout << "ERROR[const-4]: !ovf.is_overflow()" << endl;
-    return false;
+    stat = false;
   }
 
-  return true;
+  return stat;
 }
 
 // リテラル関数の生成
 bool
 test_literal(BddMgr& bddmgr)
 {
+  bool stat = true;
   Bdd var0 = bddmgr.make_posiliteral(VarId(0));
   if ( !check_bddv(bddmgr, var0, "make_posiliteral(0)", "0|01") )
-    return false;
+    stat = false;
 
   Bdd var0bar = bddmgr.make_negaliteral(VarId(0));
   if ( !check_bddv(bddmgr, var0bar, "make_negaliteral(0)", "0|10") )
-    return false;
+    stat = false;
 
   Bdd var2 = bddmgr.make_literal(VarId(2), kPolPosi);
   if ( !check_bddv(bddmgr, var2, "make_literal(2, kPolPosi)", "2|01") )
-    return false;
+    stat = false;
 
   Bdd var3bar = bddmgr.make_literal(VarId(3), kPolNega);
   if ( !check_bddv(bddmgr, var3bar, "make_literal(3, kPolNega)", "3|10") )
-    return false;
+    stat = false;
 
   Bdd zero = bddmgr.make_zero();
   Bdd one = bddmgr.make_one();
   Bdd var4 = bddmgr.make_bdd(VarId(4), zero, one);
   if ( !check_bddv(bddmgr, var4, "make_bdd(4, zero, one)", "4|01") )
-    return false;
+    stat = false;
 
-  return true;
+  return stat;
 }
 
 // 単項演算
@@ -120,17 +122,19 @@ test_unary(BddMgr& bddmgr)
 {
   Bdd var0 = bddmgr.make_posiliteral(VarId(0));
 
+  bool stat = true;
+
   // って否定しかない
   if ( !check_bddv(bddmgr, ~var0, "~var0", "0|10") )
-    return false;
+    stat = false;
 
   // 否定つき代入
   Bdd bdd1 = var0;
   bdd1.negate();
   if ( !check_bddv(bddmgr, bdd1, "var0.negate()", "0|10") )
-    return false;
+    stat = false;
 
-  return true;
+  return stat;
 }
 
 // 簡単な二項演算の検査
@@ -140,47 +144,51 @@ test_binary(BddMgr& bddmgr)
   Bdd var0 = bddmgr.make_posiliteral(VarId(0));
   Bdd var1 = bddmgr.make_posiliteral(VarId(1));
 
+  bool stat = true;
+
   if ( !check_bddv(bddmgr, var0 & var1, "var0 & var1", "0,1|0001") )
-    return false;
+    stat = false;
 
   if ( !check_bddv(bddmgr, var0 & ~var1, "var0 & ~var1", "0,1|0010") )
-    return false;
+    stat = false;
 
   if ( !check_bddv(bddmgr, var0 & ~var1, "var0 & ~var1", "1,0|0100") )
-    return false;
+    stat = false;
 
   if ( !check_bddv(bddmgr, var0 | var1, "var0 | var1", "0,1|0111") )
-    return false;
+    stat = false;
 
   if ( !check_bddv(bddmgr, var0 ^ var1, "var0 ^ var1", "0,1|0110") )
-    return false;
+    stat = false;
 
   Bdd bdd1 = var0;
   if ( !check_bddv(bddmgr, bdd1 &= var1, "var0 &= var1", "0,1|0001") )
-    return false;
+    stat = false;
 
   Bdd bdd2 = var0;
   if ( !check_bddv(bddmgr, bdd2 |= var1, "var0 |= var1", "0,1|0111") )
-    return false;
+    stat = false;
 
   Bdd bdd3 = var0;
   if ( !check_bddv(bddmgr, bdd3 ^= var1, "var0 ^= var1", "0,1|0110") )
-    return false;
+    stat = false;
 
-  return true;
+  return stat;
 }
 
 // LogExpr や文字列からBDDを作る関数の検査
 bool
 test_make_bdd(BddMgr& bddmgr)
 {
+  bool stat = true;
+
   LogExpr expr1 = LogExpr::make_posiliteral(VarId(0)) &
     LogExpr::make_negaliteral(VarId(1)) |
     LogExpr::make_posiliteral(VarId(2)) &
     LogExpr::make_posiliteral(VarId(1));
   Bdd bdd1 = bddmgr.expr_to_bdd(expr1);
   if ( !check_bddv(bddmgr, bdd1, "0 & ~1 | 2 & 1", "0, 1, 2|00011101" ) ) {
-    return false;
+    stat = false;
   }
 
   VarVarMap vvmap;
@@ -190,7 +198,7 @@ test_make_bdd(BddMgr& bddmgr)
   Bdd bdd3 = bddmgr.expr_to_bdd(expr1, vvmap);
   if ( !check_bddv(bddmgr, bdd3, "(0 & ~1 | 2 & 1)(0->1, 1->2, 2->0)",
 		  "0, 1, 2|00100111") ) {
-    return false;
+    stat = false;
   }
 
   VarVarMap vvmap2;
@@ -199,64 +207,73 @@ test_make_bdd(BddMgr& bddmgr)
   Bdd bdd5 = bddmgr.expr_to_bdd(expr1, vvmap2);
   if ( !check_bddv(bddmgr, bdd5, "(0 & ~1 | 2 & 1)(0->1, 1->0)",
 		  "0, 1, 2|00110101") ) {
-    return false;
+    stat = false;
   }
 
-  return true;
+  return stat;
 }
 
 // ite_op のテスト
 bool
 test_ite(BddMgr& bddmgr)
 {
+  bool stat = true;
+
   if ( !check_ite(bddmgr, "0", "1", "2") ) {
-    return false;
+    stat = false;
   }
   if ( !check_ite(bddmgr, "1 & ~3", "1 | 2 & 3", "2 & 3") ) {
-    return false;
+    stat = false;
   }
-  return true;
+  return stat;;
 }
 
 // compose のテスト
 bool
 test_compose(BddMgr& bddmgr)
 {
+  bool stat = true;
+
   Bdd bdd1 = str2bdd(bddmgr, "0 & 1 & 2 & 3");
   Bdd bdd2 = str2bdd(bddmgr, "~4 | 5");
 
   Bdd bdd4 = bdd1.compose(VarId(0), bdd2);
   if ( !check_bdde(bddmgr, bdd4, "0 & 1 & 2 & 3 compose(0, ~4 | 5)",
 		   "1 & 2 & 3 & (~4 | 5)") ) {
-    return false;
+    stat = false;
   }
 
-  return true;
+  return true;;
 }
 
 // (a|e)smooth のテスト
 bool
 test_smooth(BddMgr& bddmgr)
 {
+  bool stat = true;
+
   Bdd bdd1 = str2bdd(bddmgr, "0 & 1 | ~0 & 2");
   VarList vl;
   vl.push_back(VarId(0));
   BddVarSet vs1(bddmgr, vl);
   Bdd bdd2 = bdd1.esmooth(vs1);
   if ( !check_bdde(bddmgr, bdd2, "0 & 1 | ~0 & 2 esmooth(0)", "1 | 2") ) {
-    return false;
+    stat = false;
   }
   Bdd bdd3 = bdd1.asmooth(vs1);
   if ( !check_bdde(bddmgr, bdd3, "0 & 1 | ~0 & 2 asmooth(0)", "1 & 2") ) {
-    return false;
+    stat = false;
   }
-  return true;
+
+  return true;;
 }
 
 // && 演算子のテスト
 bool
 test_intersect(BddMgr& bddmgr)
 {
+  bool stat = true;
+
   const char* str1 = "0 | 1";
   const char* str2 = "0 & 1";
 
@@ -266,7 +283,7 @@ test_intersect(BddMgr& bddmgr)
     print(cout, bdd1);
     print(cout, bdd2);
     cout << "ERROR[44]: bdd1 && bdd2 failed" << endl;
-    return false;
+    stat = false;
   }
 
   Bdd bdd3 = str2bdd(bddmgr, str2);
@@ -274,30 +291,35 @@ test_intersect(BddMgr& bddmgr)
     print(cout, bdd1);
     print(cout, bdd3);
     cout << "ERROR[45]: bdd1 >= bdd3 failed" << endl;
-    return false;
+    stat = false;
   }
-  return true;
+
+  return stat;;
 }
 
 //  / 演算子のテスト
 bool
 test_cofactor(BddMgr& bddmgr)
 {
+  bool stat = true;
+
   const char* str = "0 & 2";
 
   Bdd bdd1 = str2bdd(bddmgr, "0 & 1 | 2 & 3");
   Bdd bdd2 = str2bdd(bddmgr, str);
   Bdd bdd3 = bdd1 / bdd2;
   if ( !check_bdde(bddmgr, bdd3, "0 & 1 | 1 & 2 / 0 & 2", "1 | 3") ) {
-    return false;
+    stat = false;
   }
-  return true;
+  return stat;
 }
 
 // and_exist演算
 bool
 test_and_exist(BddMgr& bddmgr)
 {
+  bool stat = true;
+
   const char* str = "0 | 2";
   VarList vl;
   vl.push_back(VarId(0));
@@ -307,16 +329,18 @@ test_and_exist(BddMgr& bddmgr)
   BddVarSet svars1(bddmgr, vl);
   Bdd bdd3 = and_exist(bdd1, bdd2, svars1);
   if ( !check_bdde(bddmgr, bdd3, "and_exist(bdd1, bdd2, svars1)", "1 | 2") ) {
-    return false;
+    stat = false;
   }
 
-  return true;
+  return stat;;
 }
 
 // isop, prime_cover, minimal_support のテスト
 bool
 test_isop(BddMgr& bddmgr)
 {
+  bool stat = true;
+
   const char* str = "0 & 2 | 1 & 3 | ~1 & ~3 | ~0 & ~2 & ~3";
   Bdd bdd1 = str2bdd(bddmgr, "0 & 1 & 2 | ~0 & 1 & 3 | ~1 & ~2 & ~3");
 
@@ -325,38 +349,41 @@ test_isop(BddMgr& bddmgr)
   Bdd bdd3 = isop(bdd1, bdd2, cover1);
   if ( !check_bdde(bddmgr, bdd3, "isop(bdd1, bdd2, cover1)",
 		   "0 & 2 | 1 & 3 | ~1 & ~3") ) {
-    return false;
+    stat = false;
   }
 
   LogExpr ans_cover1 = prime_cover(bdd1, bdd2);
   Bdd bdd6 = bddmgr.expr_to_bdd(ans_cover1);
   if ( !check_bdde(bddmgr, bdd6, "prime_cover(bdd1, bdd2)",
 		   "0 & 2 | 1 & 3 | ~1 & ~3") ) {
-    return false;
+    stat = false;
   }
 
   Bdd bdd8 = minimal_support(bdd1, bdd2);
   if ( !check_bdde(bddmgr, bdd8, "minimal_support(bdd1, bdd2)", "0 & 1 & 2 & 3") ) {
-    return false;
+    stat = false;
   }
 
-  return true;
+  return stat;
 }
 
 // support のテスト
 bool
 test_support(BddMgr& bddmgr)
 {
+  bool stat = true;
+
   if ( !check_support(bddmgr, "0") ) {
-    return false;
+    stat = false;
   }
   if ( !check_support(bddmgr, "0 | 1") ) {
-    return false;
+    stat = false;
   }
   if ( !check_support(bddmgr, "0 & 1 | ~0 & 3") ) {
-    return false;
+    stat = false;
   }
-  return true;
+
+  return stat;
 }
 
 // test_scc のサブルーティン
@@ -368,6 +395,7 @@ check_scc(BddMgr& bddmgr,
   Bdd bdd = str2bdd(bddmgr, expr_str.c_str());
   Bdd scc = bdd.SCC();
   string tmp = "SCC(" + expr_str + ")";
+
   return check_bdde(bddmgr, scc, tmp.c_str(), scc_str);
 }
 
@@ -375,22 +403,25 @@ check_scc(BddMgr& bddmgr,
 bool
 test_scc(BddMgr& bddmgr)
 {
+  bool stat = true;
+
   if ( !check_scc(bddmgr, "0 & 1 & ~2", "0 & 1 & ~2") ) {
-    return false;
+    stat = false;
   }
   if ( !check_scc(bddmgr, "0 & 1 | ~0 & ~2", "one") ) {
-    return false;
+    stat = false;
   }
   if ( !check_scc(bddmgr, "(0 ^ 1) & 2", "2") ) {
-    return false;
+    stat = false;
   }
   if ( !check_scc(bddmgr, "0 & 1 & ~2 | ~0 & 1 & 2", "1") ) {
-    return false;
+    stat = false;
   }
   if ( !check_scc(bddmgr, "0 | 1 | 2", "one") ) {
-    return false;
+    stat = false;
   }
-  return true;
+
+  return stat;
 }
 
 // test_symmetry のサブルーティン
@@ -398,13 +429,16 @@ bool
 check_sym(BddMgr& bddmgr,
 	  string expr_str)
 {
+  bool stat = true;
+
   Bdd bdd = str2bdd(bddmgr, expr_str.c_str());
   VarVector sup;
   ymuint ni = support(bdd, sup);
   if ( ni < 2 ) {
     // 無意味
-    return true;
+    return stat;
   }
+
   for (ymuint i = 0; i < ni - 1; ++ i) {
     VarId pos1 = sup[i];
     Bdd bdd_0 = bdd.cofactor(pos1, kPolNega);
@@ -425,7 +459,7 @@ check_sym(BddMgr& bddmgr,
 	else {
 	  cout << "false" << endl;
 	}
-	return false;
+	stat = false;
       }
       Bdd bdd_00 = bdd_0.cofactor(pos2, kPolNega);
       Bdd bdd_11 = bdd_1.cofactor(pos2, kPolPosi);
@@ -441,50 +475,55 @@ check_sym(BddMgr& bddmgr,
 	else {
 	  cout << "false" << endl;
 	}
-	return false;
+	stat = false;
       }
     }
   }
-  return true;
+  return stat;
 }
 
 // check_symmetry のテスト
 bool
 test_symmetry(BddMgr& bddmgr)
 {
+  bool stat = true;
+
   if ( !check_sym(bddmgr, "0 & 2 | ~0 & 1 & ~2") ) {
-    return false;
+    stat = false;
   }
   if ( !check_sym(bddmgr, "0 & 1 | ~0 & ~1 & 2") ) {
-    return false;
+    stat = false;
   }
   if ( !check_sym(bddmgr, "0 & 2 | 0 & ~1 | ~0 & 1 | ~0 & ~1 & ~2") ) {
-    return false;
+    stat = false;
   }
   if ( !check_sym(bddmgr, "~0 & 1 & ~2 | 0 & ~1 | 0 & 2") ) {
-    return false;
+    stat = false;
   }
   if ( !check_sym(bddmgr, "~0 & ~1 & 2 | 0 & 1 & ~2") ) {
-    return false;
+    stat = false;
   }
   if ( !check_sym(bddmgr, "~0 & 1 & 2 | 0 & ~1 & ~2") ) {
-    return false;
+    stat = false;
   }
   if ( !check_sym(bddmgr, "0 & 2 | ~0 & 1 & ~2") ) {
-    return false;
+    stat = false;
   }
-  return true;
+
+  return stat;
 }
 
 // minterm_count のテスト
 bool
 test_minterm_count(BddMgr& bddmgr)
 {
+  bool stat = true;
+
   Bdd bdd = str2bdd(bddmgr, "0 & 2 | 1 & 3 | ~1 & ~3");
   mpz_class mc = bdd.minterm_count(4);
   if ( mc != 10 ) {
     cout << "minterm_count(0 & 2 | 1 & 3 | ~1 & ~3) != 10" << endl;
-    return false;
+    stat = false;
   }
 
   bdd = bddmgr.make_one();
@@ -496,28 +535,31 @@ test_minterm_count(BddMgr& bddmgr)
   if ( mc != 1 ) {
     cout << "mc != 1" << endl;
     cout << "mc = " << mc.get_str() << endl;
-    return false;
+    stat = false;
   }
   Bdd bdd2 = ~bdd;
   mpz_class mc2 = bdd2.minterm_count(100);
   if ( mc2 != (mpz_class(1) << 100) - mpz_class(1) ) {
     cout << "mc != 2^100 - 1" << endl;
-    return false;
+    stat = false;
   }
-  return true;
+
+  return stat;
 }
 
 // dump/restore のテスト
 bool
 test_dump(BddMgr& bddmgr)
 {
+  bool stat = true;
+
   Bdd bdd = str2bdd(bddmgr, "0 & 2 | 1 & 3 | ~1 & ~3");
   const char* fn = "/tmp/magus_bdd_base_test";
   {
     ofstream ofs(fn);
     if ( !ofs ) {
       cout << "cannot open output file: " << fn << endl;
-      return false;
+      stat = false;
     }
     BinOStream bos(ofs);
     dump(bos, bdd);
@@ -527,7 +569,7 @@ test_dump(BddMgr& bddmgr)
     ifstream ifs(fn);
     if ( !ifs ) {
       cout << "cannont open input file: " << fn << endl;
-      return false;
+      stat = false;
     }
     BinIStream bis(ifs);
     bdd2 = bddmgr.restore(bis);
@@ -536,35 +578,73 @@ test_dump(BddMgr& bddmgr)
     cout << "ERROR[test_dump]" << endl;
     print(cout, bdd);
     print(cout, bdd2);
-    return false;
+    stat = false;
   }
-  return true;
+
+  return stat;
 }
 
 bool
 test(BddMgr& bddmgr)
 {
+  bool stat = true;
+
   for (ymuint i = 0; i < 10; ++ i) {
     bddmgr.new_var(VarId(i));
   }
-  return test_var_list(bddmgr, 10) &&
-    test_const(bddmgr) &&
-    test_unary(bddmgr) &&
-    test_binary(bddmgr) &&
-    test_make_bdd(bddmgr) &&
-    test_ite(bddmgr) &&
-    test_compose(bddmgr) &&
-    test_smooth(bddmgr) &&
-    test_intersect(bddmgr) &&
-    test_cofactor(bddmgr) &&
-    test_and_exist(bddmgr) &&
-    test_isop(bddmgr) &&
-    test_support(bddmgr) &&
-    test_scc(bddmgr) &&
-    test_minterm_count(bddmgr) &&
-    test_symmetry(bddmgr) &&
-    test_dump(bddmgr)
-    ;
+
+  if ( !test_var_list(bddmgr, 10) )
+    stat = false;
+
+  if ( !test_const(bddmgr) )
+    stat = false;
+
+  if ( !test_unary(bddmgr) )
+    stat = false;
+
+  if ( !test_binary(bddmgr) )
+    stat = false;
+
+  if ( !test_make_bdd(bddmgr) )
+    stat = false;
+
+  if ( !test_ite(bddmgr) )
+    stat = false;
+
+  if ( !test_compose(bddmgr) )
+    stat = false;
+
+  if ( !test_smooth(bddmgr) )
+    stat = false;
+
+  if ( !test_intersect(bddmgr) )
+    stat = false;
+
+  if ( !test_cofactor(bddmgr) )
+    stat = false;
+
+  if ( !test_and_exist(bddmgr) )
+    stat = false;
+
+  if ( !test_isop(bddmgr) )
+    stat = false;
+
+  if ( !test_support(bddmgr) )
+    stat = false;
+
+  if ( !test_scc(bddmgr) )
+    stat = false;
+
+  if ( !test_minterm_count(bddmgr) )
+    stat = false;
+
+  if ( !test_symmetry(bddmgr) )
+    stat = false;
+
+  if ( !test_dump(bddmgr) )
+    stat = false;
+
+  return stat;
 }
 
 END_NAMESPACE_YM_BDD

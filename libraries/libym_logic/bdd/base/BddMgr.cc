@@ -142,10 +142,8 @@ BddMgr::make_bdd(VarId index,
 		 const Bdd& chd0,
 		 const Bdd& chd1)
 {
-  BddEdge e0(chd0.mRoot);
-  BddEdge e1(chd1.mRoot);
-  BddEdge ans = mImpl->make_bdd(index, e0, e1);
-  return Bdd(mImpl, ans);
+  Bdd idx_bdd = make_posiliteral(index);
+  return ite_op(idx_bdd, chd1, chd0);
 }
 
 // ベクタを真理値表と見なしてBDDを作る．
@@ -330,6 +328,7 @@ BddMgr::make_thfunc(ymuint n,
     table[elem(n, i, th)] = BddEdge::make_zero();
   }
   for (ymuint i = n; i -- > 0; ) {
+    BddEdge idx = mImpl->make_posiliteral(VarId(i));
     table[elem(i, 0, th)] = BddEdge::make_one();
     for (ymuint j = 1; j <= th; j ++) {
       if ( j > n - i ) {
@@ -338,7 +337,7 @@ BddMgr::make_thfunc(ymuint n,
       else {
 	BddEdge l = table[elem(i + 1, j, th)];
 	BddEdge h = table[elem(i + 1, j - 1, th)];
-	BddEdge tmp = mImpl->make_bdd(VarId(i), l, h);
+	BddEdge tmp = mImpl->ite_op(idx, h, l);
 	if ( tmp.is_overflow() ) {
 	  return make_overflow();
 	}

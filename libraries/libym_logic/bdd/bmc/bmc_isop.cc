@@ -193,7 +193,8 @@ BddMgrClassic::isop_step(BddEdge l,
 	  if ( !h_1.is_invalid() ) {
 	    BddEdge r_0 = isop_step(h_0, h_1, p_2);
 	    if ( !r_0.is_invalid() ) {
-	      result = or_op(cc_0, cc_1, r_0);
+	      BddEdge tmp = or_op(cc_0, cc_1);
+	      result = or_op(tmp, r_0);
 	      cov = p_0 | p_1 | p_2;
 	      mIsopTable->put(l, u, result, cov);
 	    }
@@ -274,7 +275,8 @@ BddMgrClassic::pc_step(BddEdge l,
 	  if ( !h_1.is_invalid() ) {
 	    BddEdge r_0 = pc_step(h_0, h_1, p_2);
 	    if ( !r_0.is_invalid() ) {
-	      result = or_op(cc_0, cc_1, r_0);
+	      BddEdge tmp = or_op(cc_0, cc_1);
+	      result = or_op(tmp, r_0);
 	      cov = p_0 | p_1 | p_2;
 	      mPcTable->put(l, u, result, cov);
 	    }

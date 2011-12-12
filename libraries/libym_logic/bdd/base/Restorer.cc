@@ -44,9 +44,10 @@ Restorer::read()
       // エンドマーク
       break;
     }
+    BddEdge idx = mMgr->make_posiliteral(varid);
     BddEdge e0 = read_edge();
     BddEdge e1 = read_edge();
-    BddEdge ans = mMgr->make_bdd(varid, e0, e1);
+    BddEdge ans = mMgr->ite_op(idx, e1, e0);
     mEdgeVector.push_back(ans);
   }
   ymuint64 n;

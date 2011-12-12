@@ -756,7 +756,7 @@ support(const Bdd& bdd,
 {
   BddMgrImpl* mgr = bdd.mMgr;
   BddEdge e(bdd.mRoot);
-  mgr->mark_support(e);
+  mgr->mark_support(vector<BddEdge>(1, e));
   return mgr->mark_to_vector(vars);
 }
 
@@ -772,7 +772,8 @@ support(const BddVector& bdd_array,
     sup.clear();
     return 0;
   }
-  list<BddEdge> edge_list;
+  vector<BddEdge> edge_list;
+  edge_list.reserve(bdd_array.size());
   for (BddVector::const_iterator p = bdd_array.begin();
        p != bdd_array.end(); ++ p) {
     Bdd bdd = *p;
@@ -797,7 +798,8 @@ support(const BddList& bdd_array,
     sup.clear();
     return 0;
   }
-  list<BddEdge> edge_list;
+  vector<BddEdge> edge_list;
+  edge_list.reserve(bdd_array.size());
   for (BddList::const_iterator p = bdd_array.begin();
        p != bdd_array.end(); ++ p) {
     Bdd bdd = *p;
@@ -817,7 +819,7 @@ support(const Bdd& bdd,
 {
   BddMgrImpl* mgr = bdd.mMgr;
   BddEdge e(bdd.mRoot);
-  mgr->mark_support(e);
+  mgr->mark_support(vector<BddEdge>(1, e));
   return mgr->mark_to_list(vars);
 }
 
@@ -833,7 +835,8 @@ support(const BddVector& bdd_array,
     sup.clear();
     return 0;
   }
-  list<BddEdge> edge_list;
+  vector<BddEdge> edge_list;
+  edge_list.reserve(bdd_array.size());
   for (BddVector::const_iterator p = bdd_array.begin();
        p != bdd_array.end(); ++ p) {
     Bdd bdd = *p;
@@ -858,7 +861,8 @@ support(const BddList& bdd_array,
     sup.clear();
     return 0;
   }
-  list<BddEdge> edge_list;
+  vector<BddEdge> edge_list;
+  edge_list.reserve(bdd_array.size());
   for (BddList::const_iterator p = bdd_array.begin();
        p != bdd_array.end(); ++ p) {
     Bdd bdd = *p;
@@ -877,7 +881,7 @@ support(const Bdd& bdd)
 {
   BddMgrImpl* mgr = bdd.mMgr;
   BddEdge e(bdd.mRoot);
-  mgr->mark_support(e);
+  mgr->mark_support(vector<BddEdge>(1, e));
   BddEdge ans = mgr->mark_to_bdd();
   return BddVarSet(Bdd(mgr, ans));
 }
@@ -891,7 +895,8 @@ support(const BddVector& bdd_array)
   if ( bdd_array.empty() ) {
     return BddVarSet(BddMgr::default_mgr());
   }
-  list<BddEdge> edge_list;
+  vector<BddEdge> edge_list;
+  edge_list.reserve(bdd_array.size());
   for (BddVector::const_iterator p = bdd_array.begin();
        p != bdd_array.end(); ++ p) {
     Bdd bdd = *p;
@@ -914,7 +919,8 @@ support(const BddList& bdd_array)
   if ( bdd_array.empty() ) {
     return BddVarSet(BddMgr::default_mgr());
   }
-  list<BddEdge> edge_list;
+  vector<BddEdge> edge_list;
+  edge_list.reserve(bdd_array.size());
   for (BddList::const_iterator p = bdd_array.begin();
        p != bdd_array.end(); ++ p) {
     Bdd bdd = *p;
@@ -934,7 +940,7 @@ support_size(const Bdd& bdd)
 {
   BddMgrImpl* mgr = bdd.mMgr;
   BddEdge e(bdd.mRoot);
-  return mgr->mark_support(e);
+  return mgr->mark_support(vector<BddEdge>(1, e));
 }
 
 // @brief BDD ベクタのサポート変数集合の要素数の計算
@@ -946,7 +952,8 @@ support_size(const BddVector& bdd_array)
   if ( bdd_array.empty() ) {
     return 0;
   }
-  list<BddEdge> edge_list;
+  vector<BddEdge> edge_list;
+  edge_list.reserve(bdd_array.size());
   for (BddVector::const_iterator p = bdd_array.begin();
        p != bdd_array.end(); ++ p) {
     Bdd bdd = *p;
@@ -967,7 +974,8 @@ support_size(const BddList& bdd_array)
   if ( bdd_array.empty() ) {
     return 0;
   }
-  list<BddEdge> edge_list;
+  vector<BddEdge> edge_list;
+  edge_list.reserve(bdd_array.size());
   for (BddList::const_iterator p = bdd_array.begin();
        p != bdd_array.end(); ++ p) {
     Bdd bdd = *p;

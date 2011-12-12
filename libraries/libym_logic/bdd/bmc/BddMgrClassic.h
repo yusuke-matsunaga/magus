@@ -360,15 +360,10 @@ public:
   // サポート関係の関数
   //////////////////////////////////////////////////////////////////////
 
-  // e を根とするBDDのサポートに印をつける．
-  virtual
-  ymuint
-  mark_support(BddEdge e);
-
   // edge_list に登録されたBDDのサポートに印をつける．
   virtual
   ymuint
-  mark_support(const list<BddEdge>& edge_list);
+  mark_support(const vector<BddEdge>& edge_list);
 
   // 印のついた変数をベクタに変換する．
   virtual

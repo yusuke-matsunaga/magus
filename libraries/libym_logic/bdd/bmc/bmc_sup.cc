@@ -13,27 +13,17 @@
 
 BEGIN_NAMESPACE_YM_BDD
 
-// eを根とするBDDのサポートに印をつける．
-ymuint
-BddMgrClassic::mark_support(BddEdge e)
-{
-  clear_varmark();
-  sup_step(e);
-  clear_pnmark(e);
-  return mVarSet.size();
-}
-
 // edge_list に含まれる枝を根とするBDDのサポートに印をつける．
 ymuint
-BddMgrClassic::mark_support(const list<BddEdge>& edge_list)
+BddMgrClassic::mark_support(const vector<BddEdge>& edge_list)
 {
   clear_varmark();
   // サポート変数にマークをつける．
-  for (list<BddEdge>::const_iterator p = edge_list.begin();
+  for (vector<BddEdge>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
     sup_step(*p);
   }
-  for (list<BddEdge>::const_iterator p = edge_list.begin();
+  for (vector<BddEdge>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
     clear_pnmark(*p);
   }
@@ -128,11 +118,10 @@ BddMgrClassic::SCC(BddEdge e)
   }
 
   // まずサポートを求める．
-  mark_support(e);
+  mark_support(vector<BddEdge>(1, e));
   BddEdge sup = mark_to_bdd();
 
   // サポートを用いて SCC を計算する．
-  clear_varmark();
   scc_step(e, sup);
   clear_pnmark(e);
 

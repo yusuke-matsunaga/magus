@@ -122,15 +122,6 @@ public:
   BddEdge
   make_negaliteral(VarId varid);
 
-  /// @brief インデックスと左右の子供を指定してBDDを作る．
-  /// @param[in] varid 変数番号
-  /// @param[in] chd_0 0枝の子供
-  /// @param[in] chd_1 1枝の子供
-  BddEdge
-  make_bdd(VarId varid,
-	   BddEdge chd_0,
-	   BddEdge chd_1);
-
   /// @brief ベクタを真理値表と見なしてBDDを作る．
   /// @param[in] v 真理値表のベクタ
   /// @param[in] vars 変数番号の配列
@@ -154,28 +145,12 @@ public:
   and_op(BddEdge e1,
 	 BddEdge e2) = 0;
 
-  /// @brief e1 & e2 & e3 を計算する．
-  /// @param[in] e1, e2, e3 演算対象の枝
-  /// @return 演算結果を返す．
-  BddEdge
-  and_op(BddEdge e1,
-	 BddEdge e2,
-	 BddEdge e3);
-
   /// @brief e1 | e2 を計算する．
   /// @param[in] e1, e2 演算対象の枝
   /// @return 演算結果を返す．
   BddEdge
   or_op(BddEdge e1,
 	BddEdge e2);
-
-  /// @brief e1 | e2 | e3 を計算する．
-  /// @param[in] e1, e2, e3 演算対象の枝
-  /// @return 演算結果を返す．
-  BddEdge
-  or_op(BddEdge e1,
-	BddEdge e2,
-	BddEdge e3);
 
   /// @brief src1 ^ src2 を計算する．
   /// @param[in] e1, e2 演算対象の枝
@@ -184,14 +159,6 @@ public:
   BddEdge
   xor_op(BddEdge e1,
 	 BddEdge e2) = 0;
-
-  /// @brief e1 ^ e2 ^ e3 を計算する．
-  /// @param[in] e1, e2, e3 演算対象の枝
-  /// @return 演算結果を返す．
-  BddEdge
-  xor_op(BddEdge e1,
-	 BddEdge e2,
-	 BddEdge e3);
 
   /// @brief e1 と e2 の共通部分があれば kEdge1 を返す．
   /// @param[in] e1, e2 演算対象の枝
@@ -456,19 +423,12 @@ public:
   // サポート関係の関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief e を根とするBDDのサポートに印をつける．
-  /// @param[in] e 根の枝
-  /// @return サポート数を返す．
-  virtual
-  ymuint
-  mark_support(BddEdge e) = 0;
-
   /// @brief edge_list に登録されたBDDのサポートに印をつける．
   /// @param[in] edge_list 根の枝のリスト
   /// @return サポート数を返す．
   virtual
   ymuint
-  mark_support(const list<BddEdge>& edge_list) = 0;
+  mark_support(const vector<BddEdge>& edge_list) = 0;
 
   /// @brief 印のついた変数をベクタに変換する．
   /// @param[out] support 結果を格納する変数
@@ -746,17 +706,6 @@ BddMgrImpl::make_negaliteral(VarId varid)
   return ~ans;
 }
 
-// e1 & e2 & e3 を計算する．
-inline
-BddEdge
-BddMgrImpl::and_op(BddEdge e1,
-		   BddEdge e2,
-		   BddEdge e3)
-{
-  BddEdge tmp = and_op(e1, e2);
-  return and_op(tmp, e3);
-}
-
 // src1 | src2 を計算する．
 inline
 BddEdge
@@ -764,42 +713,6 @@ BddMgrImpl::or_op(BddEdge e1,
 		  BddEdge e2)
 {
   return ~and_op(~e1, ~e2);
-}
-
-// e1 | e2 | e3 を計算する．
-inline
-BddEdge
-BddMgrImpl::or_op(BddEdge e1,
-		  BddEdge e2,
-		  BddEdge e3)
-{
-  BddEdge tmp = and_op(~e1, ~e2);
-  return ~and_op(tmp, ~e3);
-}
-
-// e1 ^ e2 ^ e3 を計算する．
-inline
-BddEdge
-BddMgrImpl::xor_op(BddEdge e1,
-		   BddEdge e2,
-		   BddEdge e3)
-{
-  BddEdge tmp = xor_op(e1, e2);
-  return xor_op(tmp, e3);
-}
-
-// @brief インデックスと左右の子供を指定してBDDの枝を作る．
-// @param[in] varid 変数番号
-// @param[in] chd_0 0枝の子供
-// @param[in] chd_1 1枝の子供
-inline
-BddEdge
-BddMgrImpl::make_bdd(VarId varid,
-		     BddEdge chd_0,
-		     BddEdge chd_1)
-{
-  BddEdge tmp = make_posiliteral(varid);
-  return ite_op(tmp, chd_1, chd_0);
 }
 
 END_NAMESPACE_YM_BDD

@@ -231,8 +231,9 @@ BddMgrClassic::push_down(BddEdge e,
     return BddEdge::make_overflow();
   }
 
-  y_edge = make_bdd(varid(y_level), BddEdge::make_zero(), BddEdge::make_one());
-  xy_edge = make_bdd(varid(x_level), BddEdge::make_zero(), BddEdge(y_edge, pol));
+  y_edge = make_posiliteral(varid(y_level));
+  BddEdge x_edge = make_posiliteral(varid(x_level));
+  xy_edge = and_op(x_edge, y_edge);
   activate(xy_edge);
   BddEdge ans = pd_step(e, x_level, y_level, pol);
   deactivate(xy_edge);

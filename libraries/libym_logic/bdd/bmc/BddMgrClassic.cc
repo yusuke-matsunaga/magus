@@ -742,9 +742,9 @@ BddMgrClassic::new_node(Var* var,
   }
 
   // 否定枝に関する正規化ルール
-  tPol ans_pol = e1.pol();
-  e1.addpol(ans_pol);
+  tPol ans_pol = e0.pol();
   e0.addpol(ans_pol);
+  e1.addpol(ans_pol);
 
   // 節点テーブルを探す．
   VarId index = var->varid();
