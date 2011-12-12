@@ -180,7 +180,12 @@ BddMgrClassic::check_symmetry(BddEdge e,
 
   y_edge = make_posiliteral(y);
   BddEdge x_edge = make_posiliteral(x);
-  xy_edge = and_op(x_edge, y_edge);
+  if ( pol == kPolPosi ) {
+    xy_edge = and_op(x_edge, y_edge);
+  }
+  else {
+    xy_edge = and_op(x_edge, ~y_edge);
+  }
 
   activate(xy_edge);
   BddEdge ans = cs_step(e, pol);
