@@ -32,6 +32,8 @@ libym_bdd_base_la_SOURCES = \
 	BddMgrImpl.cc \
 	BddLitSet.cc \
 	BddVarSet.cc \
+	BddVector.cc \
+	BddList.cc \
 	IdMgr.h \
 	IdMgr.cc \
 	Printer.h \

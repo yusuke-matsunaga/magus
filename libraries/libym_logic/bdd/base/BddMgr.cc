@@ -8,6 +8,8 @@
 
 
 #include "ym_logic/BddMgr.h"
+#include "ym_logic/BddVector.h"
+#include "ym_logic/BddList.h"
 
 #include "BddMgrImpl.h"
 #include "Restorer.h"
@@ -236,19 +238,31 @@ BddMgr::expr_to_bdd(const LogExpr& expr,
 
   // ここまで来たら根はAND/OR/XOR演算子
   ymuint n = expr.child_num();
-  vector<Bdd> bdd_list(n);
+  BddVector bdd_list(*this, n);
   for (ymuint i = 0; i < n; ++ i) {
     Bdd bdd = expr_to_bdd(expr.child(i), varmap);
     bdd_list[i] = bdd;
   }
   if ( expr.is_and() ) {
+#if 0
     return and_op(bdd_list);
+#else
+    return bdd_list.and_op();
+#endif
   }
   if ( expr.is_or() ) {
+#if 0
     return or_op(bdd_list);
+#else
+    return bdd_list.or_op();
+#endif
   }
   if ( expr.is_xor() ) {
+#if 0
     return xor_op(bdd_list);
+#else
+    return bdd_list.xor_op();
+#endif
   }
   assert_not_reached(__FILE__, __LINE__);
   return make_error();
@@ -349,6 +363,7 @@ BddMgr::make_thfunc(ymuint n,
   return Bdd(mImpl, ans);
 }
 
+#if 1
 // 複数のBDDの論理積を求める．
 Bdd
 BddMgr::and_op(const BddVector& bdds)
@@ -521,7 +536,7 @@ BddMgr::or_op(const BddList& bdds)
     Bdd bdd1 = *p;
     return bdd0 | bdd1;
   }
-  if ( n == 2 ) {
+  if ( n == 3 ) {
     BddList::const_iterator p = bdds.begin();
     Bdd bdd0 = *p;
     ++ p;
@@ -530,7 +545,7 @@ BddMgr::or_op(const BddList& bdds)
     Bdd bdd2 = *p;
     return bdd0 | bdd1 | bdd2;
   }
-  if ( n == 3 ) {
+  if ( n == 4 ) {
     BddList::const_iterator p = bdds.begin();
     Bdd bdd0 = *p;
     ++ p;
@@ -675,6 +690,7 @@ BddMgr::xor_op(const BddList& bdds)
   }
   return ans;
 }
+#endif
 
 // 変数を確保する．
 // 確保に失敗したら false を返す．

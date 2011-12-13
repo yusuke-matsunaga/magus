@@ -234,6 +234,7 @@ public:
   make_thfunc(ymuint n,
 	      ymuint th);
 
+#if 1
   /// @brief 複数のBDDの論理積を求める．
   /// @param[in] bdds BDD のベクタ
   /// @return 生成された BDD
@@ -269,6 +270,7 @@ public:
   /// @return 生成された BDD
   Bdd
   xor_op(const BddList& bdds);
+#endif
 
   /// @brief 保存されたBDDを読み込む．
   /// @param[in] s 入力ストリーム

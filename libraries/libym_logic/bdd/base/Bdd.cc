@@ -10,6 +10,8 @@
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddVarSet.h"
 #include "ym_logic/BddLitSet.h"
+#include "ym_logic/BddVector.h"
+#include "ym_logic/BddList.h"
 
 #include "BddMgrImpl.h"
 

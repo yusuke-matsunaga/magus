@@ -14,6 +14,7 @@
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddLitSet.h"
 #include "ym_logic/BddVarSet.h"
+#include "ym_logic/BddVector.h"
 
 
 BEGIN_NAMESPACE_YM_DEC
