@@ -26,5 +26,4 @@ libym_verilog_la_LIBADD = \
 	parser/libym_vl_parser.la \
 	elaborator/libym_vl_elab.la
 
-libym_verilog_la_LDFLAGS = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la
+libym_verilog_la_LDFLAGS =

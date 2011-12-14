@@ -45,5 +45,4 @@ libym_cell_la_LIBADD = \
 	mislib/libym_cell_mislib.la \
 	libcomp/libym_cell_libcomp.la
 
-libym_cell_la_LDFLAGS = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
+libym_cell_la_LDFLAGS =
