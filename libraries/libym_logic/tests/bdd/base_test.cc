@@ -10,6 +10,8 @@
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddMgr.h"
 #include "ym_logic/BddVarSet.h"
+#include "ym_logic/BddVector.h"
+#include "ym_logic/BddList.h"
 
 #include "bddtest.h"
 
@@ -57,28 +59,28 @@ test_const(BddMgr& bddmgr)
   bool stat = true;
   Bdd one = bddmgr.make_one();
   if ( !one.is_one() ) {
-    print(cout, one);
+    one.print(cout);
     cout << "ERROR[const-1]: !one.is_one()" << endl;
     stat = false;
   }
 
   Bdd zero = bddmgr.make_zero();
   if ( !zero.is_zero() ) {
-    print(cout, zero);
+    zero.print(cout);
     cout << "ERROR[const-2]: !zero.is_zero()" << endl;
     stat = false;
   }
 
   Bdd err = bddmgr.make_error();
   if ( !err.is_error() ) {
-    print(cout, err);
+    err.print(cout);
     cout << "ERROR[const-3]: !err.is_error()" << endl;
     stat = false;
   }
 
   Bdd ovf = bddmgr.make_overflow();
   if ( !ovf.is_overflow() ) {
-    print(cout, ovf);
+    ovf.print(cout);
     cout << "ERROR[const-4]: !ovf.is_overflow()" << endl;
     stat = false;
   }
@@ -176,16 +178,133 @@ test_binary(BddMgr& bddmgr)
   return stat;
 }
 
+// BddVector の多項演算の検査
+bool
+test_bddvector(BddMgr& bddmgr)
+{
+  bool stat = true;
+
+  Bdd var[20];
+  for (ymuint i = 0; i < 20; ++ i) {
+    var[i] = bddmgr.make_posiliteral(VarId(i));
+  }
+
+  // Bdd
+  for (ymuint i = 2; i < 20; ++ i) {
+    BddVector bddvec(bddmgr, i);
+    for (ymuint j = 0; j < i; ++ j) {
+      bddvec[j] = var[j];
+    }
+
+    // 多項 AND
+    Bdd ans_bdd = bddvec.and_op();
+    Bdd ref_bdd = var[0];
+    for (ymuint j = 1; j < i; ++ j) {
+      ref_bdd &= var[j];
+    }
+    if ( ans_bdd != ref_bdd ) {
+      cout << "Error in BddVector(" << i << ").and_op()" << endl;
+      stat = false;
+    }
+
+    // 多項 OR
+    ans_bdd = bddvec.or_op();
+    ref_bdd = var[0];
+    for (ymuint j = 1; j < i; ++ j) {
+      ref_bdd |= var[j];
+    }
+    if ( ans_bdd != ref_bdd ) {
+      cout << "Error in BddVector(" << i << ").or_op()" << endl;
+      stat = false;
+    }
+
+    // 多項 XOR
+    ans_bdd = bddvec.xor_op();
+    ref_bdd = var[0];
+    for (ymuint j = 1; j < i; ++ j) {
+      ref_bdd ^= var[j];
+    }
+    if ( ans_bdd != ref_bdd ) {
+      cout << "Error in BddVector(" << i << ").ans_op()" << endl;
+      stat = false;
+    }
+  }
+
+  return stat;
+}
+
+// BddList の多項演算の検査
+bool
+test_bddlist(BddMgr& bddmgr)
+{
+  bool stat = true;
+
+  Bdd var[20];
+  for (ymuint i = 0; i < 20; ++ i) {
+    var[i] = bddmgr.make_posiliteral(VarId(i));
+  }
+
+  // Bdd
+  for (ymuint i = 2; i < 20; ++ i) {
+    BddList bddlist(bddmgr);
+    for (ymuint j = 0; j < i; ++ j) {
+      bddlist.push_back(var[j]);
+    }
+
+    // 多項 AND
+    Bdd ans_bdd = bddlist.and_op();
+    Bdd ref_bdd = var[0];
+    for (ymuint j = 1; j < i; ++ j) {
+      ref_bdd &= var[j];
+    }
+    if ( ans_bdd != ref_bdd ) {
+      cout << "Error in BddList(" << i << ").and_op()" << endl;
+      stat = false;
+    }
+
+    // 多項 OR
+    ans_bdd = bddlist.or_op();
+    ref_bdd = var[0];
+    for (ymuint j = 1; j < i; ++ j) {
+      ref_bdd |= var[j];
+    }
+    if ( ans_bdd != ref_bdd ) {
+      cout << "Error in BddList(" << i << ").or_op()" << endl;
+      stat = false;
+    }
+
+    // 多項 XOR
+    ans_bdd = bddlist.xor_op();
+    ref_bdd = var[0];
+    for (ymuint j = 1; j < i; ++ j) {
+      ref_bdd ^= var[j];
+    }
+    if ( ans_bdd != ref_bdd ) {
+      cout << "Error in BddList(" << i << ").ans_op()" << endl;
+      stat = false;
+    }
+  }
+
+  return stat;
+}
+
 // LogExpr や文字列からBDDを作る関数の検査
 bool
 test_make_bdd(BddMgr& bddmgr)
 {
   bool stat = true;
 
-  LogExpr expr1 = LogExpr::make_posiliteral(VarId(0)) &
-    LogExpr::make_negaliteral(VarId(1)) |
-    LogExpr::make_posiliteral(VarId(2)) &
-    LogExpr::make_posiliteral(VarId(1));
+  {
+    LogExpr expr1 = LogExpr::make_posiliteral(VarId(0)) & LogExpr::make_negaliteral(VarId(1));
+    Bdd bdd1 = bddmgr.expr_to_bdd(expr1);
+    if ( !check_bddv(bddmgr, bdd1, "0 & ~1", "0, 1|0010" ) ) {
+      stat = false;
+    }
+  }
+
+  LogExpr expr1 =
+    (LogExpr::make_posiliteral(VarId(0)) & LogExpr::make_negaliteral(VarId(1))) |
+    (LogExpr::make_posiliteral(VarId(2)) & LogExpr::make_posiliteral(VarId(1)));
   Bdd bdd1 = bddmgr.expr_to_bdd(expr1);
   if ( !check_bddv(bddmgr, bdd1, "0 & ~1 | 2 & 1", "0, 1, 2|00011101" ) ) {
     stat = false;
@@ -280,16 +399,16 @@ test_intersect(BddMgr& bddmgr)
   Bdd bdd1 = str2bdd(bddmgr, "0 & 1 | 2 & 3");
   Bdd bdd2 = str2bdd(bddmgr, str1);
   if ( !(bdd1 && bdd2) ) {
-    print(cout, bdd1);
-    print(cout, bdd2);
+    bdd1.print(cout);
+    bdd2.print(cout);
     cout << "ERROR[44]: bdd1 && bdd2 failed" << endl;
     stat = false;
   }
 
   Bdd bdd3 = str2bdd(bddmgr, str2);
   if ( !(bdd1 >= bdd3) ) {
-    print(cout, bdd1);
-    print(cout, bdd3);
+    bdd1.print(cout);
+    bdd3.print(cout);
     cout << "ERROR[45]: bdd1 >= bdd3 failed" << endl;
     stat = false;
   }
@@ -433,7 +552,7 @@ check_sym(BddMgr& bddmgr,
 
   Bdd bdd = str2bdd(bddmgr, expr_str.c_str());
   VarVector sup;
-  ymuint ni = support(bdd, sup);
+  ymuint ni = bdd.support(sup);
   if ( ni < 2 ) {
     // 無意味
     return stat;
@@ -450,7 +569,7 @@ check_sym(BddMgr& bddmgr,
       bool expected_result1 = (bdd_01 == bdd_10);
       if ( bdd.check_symmetry(pos1, pos2, kPolPosi) != expected_result1 ) {
 	cout << "ERROR[test_symmetry(positive)]" << endl;
-	print(cout, bdd);
+	bdd.print(cout);
 	cout << "pos1 : " << pos1 << ", pos2 : " << pos2 << endl;
 	cout << "expected result = ";
 	if ( expected_result1 ) {
@@ -466,7 +585,7 @@ check_sym(BddMgr& bddmgr,
       bool expected_result2 = (bdd_00 == bdd_11);
       if ( bdd.check_symmetry(pos1, pos2, kPolNega) != expected_result2 ) {
 	cout << "ERROR[test_invsymmetry(negative)]" << endl;
-	print(cout, bdd);
+	bdd.print(cout);
 	cout << "pos1 : " << pos1 << ", pos2 : " << pos2 << endl;
 	cout << "expected result = ";
 	if ( expected_result2 ) {
@@ -562,9 +681,9 @@ test_dump(BddMgr& bddmgr)
       stat = false;
     }
     BinOStream bos(ofs);
-    dump(bos, bdd);
+    bdd.dump(bos);
   }
-  Bdd bdd2;
+  Bdd bdd2(bddmgr);
   {
     ifstream ifs(fn);
     if ( !ifs ) {
@@ -572,12 +691,12 @@ test_dump(BddMgr& bddmgr)
       stat = false;
     }
     BinIStream bis(ifs);
-    bdd2 = bddmgr.restore(bis);
+    bdd2.restore(bis);
   }
   if ( bdd != bdd2 ) {
     cout << "ERROR[test_dump]" << endl;
-    print(cout, bdd);
-    print(cout, bdd2);
+    bdd.print(cout);
+    bdd2.print(cout);
     stat = false;
   }
 
@@ -603,6 +722,12 @@ test(BddMgr& bddmgr)
     stat = false;
 
   if ( !test_binary(bddmgr) )
+    stat = false;
+
+  if ( !test_bddvector(bddmgr) )
+    stat = false;
+
+  if ( !test_bddlist(bddmgr) )
     stat = false;
 
   if ( !test_make_bdd(bddmgr) )

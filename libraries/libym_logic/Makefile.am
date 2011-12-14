@@ -39,7 +39,8 @@ libym_logic_la_LIBADD = \
 	sat/libym_logic_sat.la \
 	aig/libym_logic_aig.la
 
-libym_logic_la_LDFLAGS =
+libym_logic_la_LDFLAGS = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 # Dummy C++ source to cause C++ linking.
 nodist_EXTRA_libym_logic_la_SOURCES = dummy.cc

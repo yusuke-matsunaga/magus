@@ -41,12 +41,17 @@ class Bdd
 {
   friend class BddMgr;
   friend class BddMgrImpl;
+  friend class BddVector;
+  friend class BddList;
 
 public:
 
   /// @brief デフォルトのコンストラクタ
   /// @note デフォルトの BDD マネージャの定数0となる
   Bdd();
+
+  /// @brief マネージャを指定したコンストラクタ
+  Bdd(BddMgr& mgr);
 
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
@@ -345,8 +350,13 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  /// @name 表示/ノード数の計数など
+  /// @name ノード数の計数などの関数
   /// @{
+
+  /// @brief BDD が使っているノード数を数える．
+  /// @return BDD が使っているノード数
+  ymuint64
+  node_count() const;
 
   /// @brief 真理値表密度の計算
   /// @param[in] nvar 入力数
@@ -447,6 +457,83 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
+  /// @name サポート関係の関数
+  /// @{
+
+  /// @brief サポート変数集合の計算 (VarVector)
+  /// @param[out] support サポート変数集合を格納するベクタ
+  /// @return サポートの要素数
+  ymuint
+  support(VarVector& support) const;
+
+  /// @brief サポート変数集合の計算 (VarList)
+  /// @param[out] support サポート変数集合を格納するリスト
+  /// @return サポートの要素数
+  ymuint
+  support(VarList& support) const;
+
+  /// @brief サポート変数集合の計算 (BddVarSet)
+  /// @return サポート変数集合
+  BddVarSet
+  support() const;
+
+  /// @brief サポート変数集合の要素数の計算
+  /// @param[in] bdd 対象の BDD
+  /// @return サポート変数集合の要素数
+  ymuint
+  support_size() const;
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name 出力関係の関数
+  /// @{
+
+  /// @brief 内容を書き出す
+  /// @param[in] s 出力ストリーム
+  /// @return ノード数を返す．
+  ymuint64
+  print(ostream& s) const;
+
+  /// @brief BDD が表す関数のカルノー図を表示する
+  /// @param[in] s 主力ストリーム
+  /// @warning ただし4変数以内
+  void
+  print_map(ostream& s) const;
+
+  /// @brief BDD の内容を積和形論理式の形で出力する．
+  /// @param[in] s 出力ストリーム
+  void
+  print_sop(ostream& s) const;
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name バイナリダンプ関係の関数
+  /// @{
+
+  /// @brief BDD の内容をダンプする．
+  /// @param[in] s 出力ストリーム
+  void
+  dump(BinO& s) const;
+
+  /// @brief バイナリファイルに保存されたBDDを読み込む．
+  /// @param[in] s 入力ストリーム
+  void
+  restore(BinI& s);
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
   //  friend 関数の宣言
   //////////////////////////////////////////////////////////////////////
 
@@ -496,187 +583,6 @@ public:
   Bdd
   minimal_support(const Bdd& lower,
 		  const Bdd& upper);
-
-  /// @brief 内容を書き出す
-  /// @param[in] s 出力ストリーム
-  /// @param[in] bdd 対象のBDD
-  /// @return ノード数を返す．
-  friend
-  ymuint64
-  print(ostream& s,
-	const Bdd& bdd);
-
-  /// @brief BDD のリストの内容を出力する．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] array BDD のリスト
-  friend
-  ymuint64
-  print(ostream& s,
-	const BddVector& array);
-
-  /// @brief BDD のリストの内容を出力する．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] array BDD のリスト
-  friend
-  ymuint64
-  print(ostream& s,
-	const BddList& array);
-
-  /// @brief BDD が表す関数のカルノー図を表示する
-  /// @param[in] s 主力ストリーム
-  /// @param[in] bdd 対象のBDD
-  /// @warning ただし4変数以内
-  friend
-  void
-  print_map(ostream& s,
-	    const Bdd& bdd);
-
-  /// @brief BDD の内容を積和形論理式の形で出力する．
-  /// @param[in] s 出力ストリーム
-  /// @param[in] bdd 対象のBDD
-  friend
-  void
-  print_sop(ostream& s,
-	    const Bdd& bdd);
-
-  /// @brief BDD の内容をダンプする．
-  /// @param[in] s 出力ストリーム
-  /// @param[in] bdd 対象の BDD
-  friend
-  void
-  dump(BinO& s,
-       const Bdd& bdd);
-
-  /// @brief BDD のリストの内容をダンプする．
-  /// @param[in] s 出力ストリーム
-  /// @param[in] array BDD のリスト
-  friend
-  void
-  dump(BinO& s,
-       const BddVector& array);
-
-  /// @brief BDD のリストの内容をダンプする．
-  /// @param[in] s 出力ストリーム
-  /// @param[in] array BDD のリスト
-  friend
-  void
-  dump(BinO& s,
-       const BddList& array);
-
-  /// @brief BDD が使っているノード数を数える．
-  /// @param[in] bdd 対象の BDD
-  /// @return BDD が使っているノード数
-  friend
-  ymuint64
-  size(const Bdd& bdd);
-
-  /// @brief BDD のリストが使っているノード数を数える．
-  /// @param[in] array BDDのリスト
-  friend
-  ymuint64
-  size(const BddVector& array);
-
-  /// @brief BDD のリストが使っているノード数を数える．
-  /// @param[in] array BDDのリスト
-  friend
-  ymuint64
-  size(const BddList& array);
-
-  /// @brief サポート変数集合の計算 (VarVector)
-  /// @param[in] bdd 対象の BDD
-  /// @param[out] support サポート変数集合を格納するベクタ
-  /// @return サポートの要素数
-  friend
-  ymuint
-  support(const Bdd& bdd,
-	  VarVector& support);
-
-  /// @brief サポート変数集合の計算 (VarVector)
-  /// @param[in] bdd_array 対象の BDD のリスト
-  /// @param[out] support サポート変数集合を格納するベクタ
-  /// @return サポートの要素数
-  friend
-  ymuint
-  support(const BddVector& bdd_array,
-	  VarVector& sup);
-
-  /// @brief サポート変数集合の計算 (VarVector)
-  /// @param[in] bdd_array 対象の BDD のリスト
-  /// @param[out] support サポート変数集合を格納するベクタ
-  /// @return サポートの要素数
-  friend
-  ymuint
-  support(const BddList& bdd_array,
-	  VarVector& sup);
-
-  /// @brief サポート変数集合の計算 (VarList)
-  /// @param[in] bdd 対象の BDD
-  /// @param[out] support サポート変数集合を格納するリスト
-  /// @return サポートの要素数
-  friend
-  ymuint
-  support(const Bdd& bdd,
-	  VarList& support);
-
-  /// @brief サポート変数集合の計算 (VarList)
-  /// @param[in] bdd_array 対象の BDD のリスト
-  /// @param[out] support サポート変数集合を格納するベクタ
-  /// @return サポートの要素数
-  friend
-  ymuint
-  support(const BddVector& bdd_array,
-	  VarList& sup);
-
-  /// @brief サポート変数集合の計算 (VarList)
-  /// @param[in] bdd_array 対象の BDD のリスト
-  /// @param[out] support サポート変数集合を格納するベクタ
-  /// @return サポートの要素数
-  friend
-  ymuint
-  support(const BddList& bdd_array,
-	  VarList& sup);
-
-  /// @brief サポート変数集合の計算 (BddVarSet)
-  /// @param[in] bdd 対象の BDD
-  /// @return サポート変数集合
-  friend
-  BddVarSet
-  support(const Bdd& bdd);
-
-  /// @brief サポート変数集合の計算 (BddVarSet)
-  /// @param[in] bdd_array 対象の BDD のリスト
-  /// @return サポート変数集合
-  friend
-  BddVarSet
-  support(const BddVector& bdd_array);
-
-  /// @brief サポート変数集合の計算 (BddVarSet)
-  /// @param[in] bdd_array 対象の BDD のリスト
-  /// @return サポート変数集合
-  friend
-  BddVarSet
-  support(const BddList& bdd_array);
-
-  /// @brief サポート変数集合の要素数の計算
-  /// @param[in] bdd 対象の BDD
-  /// @return サポート変数集合の要素数
-  friend
-  ymuint
-  support_size(const Bdd& bdd);
-
-  /// @brief サポート変数集合の要素数の計算
-  /// @param[in] bdd 対象の BDD
-  /// @return サポート変数集合の要素数
-  friend
-  ymuint
-  support_size(const BddVector& bdd_array);
-
-  /// @brief サポート変数集合の要素数の計算
-  /// @param[in] bdd 対象の BDD
-  /// @return サポート変数集合の要素数
-  friend
-  ymuint
-  support_size(const BddList& bdd_array);
 
   friend
   Bdd
@@ -899,164 +805,6 @@ prime_cover(const Bdd& lower,
 Bdd
 minimal_support(const Bdd& lower,
 		const Bdd& upper);
-
-/// @brief 内容を書き出す
-/// @param[in] s 出力ストリーム
-/// @param[in] bdd 対象のBDD
-/// @return ノード数を返す．
-ymuint64
-print(ostream& s,
-      const Bdd& bdd);
-
-/// @brief BDD が表す関数のカルノー図を表示する
-/// @param[in] s 主力ストリーム
-/// @param[in] bdd 対象のBDD
-/// @warning ただし4変数以内
-void
-print_map(ostream& s,
-	  const Bdd& bdd);
-
-/// @brief BDD の内容を積和形論理式の形で出力する．
-/// @param[in] s 出力ストリーム
-/// @param[in] bdd 対象のBDD
-void
-print_sop(ostream& s,
-	  const Bdd& bdd);
-
-/// @brief BDD のリストの内容を出力する．
-/// @param[in] s 出力先のストリーム
-/// @param[in] array BDD のリスト
-ymuint64
-print(ostream& s,
-      const BddVector& array);
-
-/// @brief BDD のリストの内容を出力する．
-/// @param[in] s 出力先のストリーム
-/// @param[in] array BDD のリスト
-ymuint64
-print(ostream& s,
-      const BddList& array);
-
-/// @brief BDD の内容をダンプする．
-/// @param[in] s 出力ストリーム
-/// @param[in] bdd 対象の BDD
-void
-dump(BinO& s,
-     const Bdd& bdd);
-
-/// @brief BDD のリストの内容をダンプする．
-/// @param[in] s 出力ストリーム
-/// @param[in] array BDD のリスト
-void
-dump(BinO& s,
-     const BddVector& array);
-
-/// @brief BDD のリストの内容をダンプする．
-/// @param[in] s 出力ストリーム
-/// @param[in] array BDD のリスト
-void
-dump(BinO& s,
-     const BddList& array);
-
-/// @brief BDD が使っているノード数を数える．
-/// @param[in] bdd 対象の BDD
-/// @return BDD が使っているノード数
-ymuint64
-size(const Bdd& bdd);
-
-/// @brief BDD のリストが使っているノード数を数える．
-/// @param[in] array BDDのリスト
-ymuint64
-size(const BddVector& array);
-
-/// @brief BDD のリストが使っているノード数を数える．
-/// @param[in] array BDDのリスト
-ymuint64
-size(const BddList& array);
-
-/// @brief サポート変数集合の計算 (VarVector)
-/// @param[in] bdd 対象の BDD
-/// @param[out] support サポート変数集合を格納するベクタ
-/// @return サポートの要素数
-ymuint
-support(const Bdd& bdd,
-	VarVector& support);
-
-/// @brief サポート変数集合の計算 (VarVector)
-/// @param[in] bdd_array 対象の BDD のリスト
-/// @param[out] support サポート変数集合を格納するベクタ
-/// @return サポートの要素数
-ymuint
-support(const BddVector& bdd_array,
-	VarVector& sup);
-
-/// @brief サポート変数集合の計算 (VarVector)
-/// @param[in] bdd_array 対象の BDD のリスト
-/// @param[out] support サポート変数集合を格納するベクタ
-/// @return サポートの要素数
-ymuint
-support(const BddList& bdd_array,
-	VarVector& sup);
-
-/// @brief サポート変数集合の計算 (VarList)
-/// @param[in] bdd 対象の BDD
-/// @param[out] support サポート変数集合を格納するリスト
-/// @return サポートの要素数
-ymuint
-support(const Bdd& bdd,
-	VarList& support);
-
-/// @brief サポート変数集合の計算 (VarList)
-/// @param[in] bdd_array 対象の BDD のリスト
-/// @param[out] support サポート変数集合を格納するベクタ
-/// @return サポートの要素数
-ymuint
-support(const BddVector& bdd_array,
-	VarList& sup);
-
-/// @brief サポート変数集合の計算 (VarList)
-/// @param[in] bdd_array 対象の BDD のリスト
-/// @param[out] support サポート変数集合を格納するベクタ
-/// @return サポートの要素数
-ymuint
-support(const BddList& bdd_array,
-	VarList& sup);
-
-/// @brief サポート変数集合の計算 (BddVarSet)
-/// @param[in] bdd 対象の BDD
-/// @return サポート変数集合
-BddVarSet
-support(const Bdd& bdd);
-
-/// @brief サポート変数集合の計算 (BddVarSet)
-/// @param[in] bdd_array 対象の BDD のリスト
-/// @return サポート変数集合
-BddVarSet
-support(const BddVector& bdd_array);
-
-/// @brief サポート変数集合の計算 (BddVarSet)
-/// @param[in] bdd_array 対象の BDD のリスト
-/// @return サポート変数集合
-BddVarSet
-support(const BddList& bdd_array);
-
-/// @brief サポート変数集合の要素数の計算
-/// @param[in] bdd 対象の BDD
-/// @return サポート変数集合の要素数
-ymuint
-support_size(const Bdd& bdd);
-
-/// @brief サポート変数集合の要素数の計算
-/// @param[in] bdd 対象の BDD
-/// @return サポート変数集合の要素数
-ymuint
-support_size(const BddVector& bdd_array);
-
-/// @brief サポート変数集合の要素数の計算
-/// @param[in] bdd 対象の BDD
-/// @return サポート変数集合の要素数
-ymuint
-support_size(const BddList& bdd_array);
 
 /// @}
 //////////////////////////////////////////////////////////////////////

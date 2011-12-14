@@ -322,15 +322,10 @@ public:
   // ノード数の計数や真理値表密度の計算など
   //////////////////////////////////////////////////////////////////////
 
-  // e を根とするBDDのノード数を数える．
-  virtual
-  ymuint64
-  size(BddEdge e);
-
   // edge_list に登録されたBDDのノード数を数える．
   virtual
   ymuint64
-  size(const list<BddEdge>& edge_list);
+  node_count(const vector<BddEdge>& edge_list);
 
   // BDD の表す論理関数の minterm の数を返す．
   // 無限長精度の整数(mpz_class)を用いて計算する．

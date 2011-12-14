@@ -75,7 +75,13 @@ Bdd::assign(ympuint new_e)
 // @brief デフォルトのコンストラクタ
 Bdd::Bdd()
 {
-  set(BddMgr::default_mgr().mImpl, BddEdge::kEdge0);
+  set(BddMgr::default_mgr().mImpl, BddEdge::kEdgeError);
+}
+
+// @brief マネージャを指定したコンストラクタ
+Bdd::Bdd(BddMgr& mgr)
+{
+  set(mgr.mImpl, BddEdge::kEdgeError);
 }
 
 // @brief コピーコンストラクタ
@@ -665,52 +671,10 @@ Bdd::shortest_onepath_len() const
 
 // @brief BDD が使っているノード数を数える．
 ymuint64
-size(const Bdd& bdd)
+Bdd::node_count() const
 {
-  BddEdge e(bdd.mRoot);
-  return bdd.mMgr->size(e);
-}
-
-// @brief BDD ベクタが使っているノード数を数える．
-// @param[in] array BDD ベクタ
-// @return BDD ベクタが使っているノード数
-ymuint64
-size(const BddVector& array)
-{
-  if ( array.empty() ) {
-    return 0;
-  }
-  list<BddEdge> edge_list;
-  for (BddVector::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Bdd bdd = *p;
-    BddEdge e(bdd.mRoot);
-    edge_list.push_back(e);
-  }
-  // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgrImpl* mgr = array.front().mMgr;
-  return mgr->size(edge_list);
-}
-
-// @brief BDD リストが使っているノード数を数える．
-// @param[in] array BDD リスト
-// @return BDD リストが使っているノード数
-ymuint64
-size(const BddList& array)
-{
-  if ( array.empty() ) {
-    return 0;
-  }
-  list<BddEdge> edge_list;
-  for (BddList::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Bdd bdd = *p;
-    BddEdge e(bdd.mRoot);
-    edge_list.push_back(e);
-  }
-  // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgrImpl* mgr = array.front().mMgr;
-  return mgr->size(edge_list);
+  BddEdge e(mRoot);
+  return mMgr->node_count(vector<BddEdge>(1, e));
 }
 
 // @brief 真理値表密度の計算
@@ -753,240 +717,42 @@ Bdd::walsh1(VarId var,
 
 // @brief サポート変数集合の計算 (VarVector)
 ymuint
-support(const Bdd& bdd,
-	VarVector& vars)
+Bdd::support(VarVector& vars) const
 {
-  BddMgrImpl* mgr = bdd.mMgr;
-  BddEdge e(bdd.mRoot);
+  BddMgrImpl* mgr = mMgr;
+  BddEdge e(mRoot);
   mgr->mark_support(vector<BddEdge>(1, e));
   return mgr->mark_to_vector(vars);
 }
 
-// @brief BDD ベクタのサポート変数集合の計算 (VarVector)
-// @param[in] bdd_array BDD のベクタ
-// @param[in] sup サポート変数集合を格納するベクタ
-// @return サポート変数集合の要素数
-ymuint
-support(const BddVector& bdd_array,
-	VarVector& sup)
-{
-  if ( bdd_array.empty() ) {
-    sup.clear();
-    return 0;
-  }
-  vector<BddEdge> edge_list;
-  edge_list.reserve(bdd_array.size());
-  for (BddVector::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    BddEdge e(bdd.mRoot);
-    edge_list.push_back(e);
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  return mgr->mark_to_vector(sup);
-}
-
-// @brief BDD リストのサポート変数集合の計算 (VarVector)
-// @param[in] bdd_array BDD のリスト
-// @param[in] sup サポート変数集合を格納するベクタ
-// @return サポート変数集合の要素数
-ymuint
-support(const BddList& bdd_array,
-	VarVector& sup)
-{
-  if ( bdd_array.empty() ) {
-    sup.clear();
-    return 0;
-  }
-  vector<BddEdge> edge_list;
-  edge_list.reserve(bdd_array.size());
-  for (BddList::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    BddEdge e(bdd.mRoot);
-    edge_list.push_back(e);
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  return mgr->mark_to_vector(sup);
-}
-
 // @brief サポート変数集合の計算 (VarList)
 ymuint
-support(const Bdd& bdd,
-	VarList& vars)
+Bdd::support(VarList& vars) const
 {
-  BddMgrImpl* mgr = bdd.mMgr;
-  BddEdge e(bdd.mRoot);
+  BddMgrImpl* mgr = mMgr;
+  BddEdge e(mRoot);
   mgr->mark_support(vector<BddEdge>(1, e));
   return mgr->mark_to_list(vars);
 }
 
-// @brief BDD ベクタのサポート変数集合の計算 (VarList)
-// @param[in] bdd_array BDD のベクタ
-// @param[in] sup サポート変数集合を格納するリスト
-// @return サポート変数集合の要素数
-ymuint
-support(const BddVector& bdd_array,
-	VarList& sup)
-{
-  if ( bdd_array.empty() ) {
-    sup.clear();
-    return 0;
-  }
-  vector<BddEdge> edge_list;
-  edge_list.reserve(bdd_array.size());
-  for (BddVector::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    BddEdge e(bdd.mRoot);
-    edge_list.push_back(e);
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  return mgr->mark_to_list(sup);
-}
-
-// @brief BDD リストのサポート変数集合の計算 (VarList)
-// @param[in] bdd_array BDD のリスト
-// @param[in] sup サポート変数集合を格納するリスト
-// @return サポート変数集合の要素数
-ymuint
-support(const BddList& bdd_array,
-	VarList& sup)
-{
-  if ( bdd_array.empty() ) {
-    sup.clear();
-    return 0;
-  }
-  vector<BddEdge> edge_list;
-  edge_list.reserve(bdd_array.size());
-  for (BddList::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    BddEdge e(bdd.mRoot);
-    edge_list.push_back(e);
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  return mgr->mark_to_list(sup);
-}
-
 // @brief サポート変数集合の計算 (BddVarSet)
 BddVarSet
-support(const Bdd& bdd)
+Bdd::support() const
 {
-  BddMgrImpl* mgr = bdd.mMgr;
-  BddEdge e(bdd.mRoot);
+  BddMgrImpl* mgr = mMgr;
+  BddEdge e(mRoot);
   mgr->mark_support(vector<BddEdge>(1, e));
-  BddEdge ans = mgr->mark_to_bdd();
-  return BddVarSet(Bdd(mgr, ans));
-}
-
-// @brief BDD ベクタのサポート変数集合の計算 (BddVarSet)
-// @param[in] bdd_array BDD のベクタ
-// @return サポート変数集合
-BddVarSet
-support(const BddVector& bdd_array)
-{
-  if ( bdd_array.empty() ) {
-    return BddVarSet(BddMgr::default_mgr());
-  }
-  vector<BddEdge> edge_list;
-  edge_list.reserve(bdd_array.size());
-  for (BddVector::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    BddEdge e(bdd.mRoot);
-    edge_list.push_back(e);
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  BddEdge ans = mgr->mark_to_bdd();
-  return BddVarSet(Bdd(mgr, ans));
-}
-
-// @brief BDD リストのサポート変数集合の計算 (BddVarSet)
-// @param[in] bdd_array BDD のリスト
-// @return[in] サポート変数集合
-BddVarSet
-support(const BddList& bdd_array)
-{
-  if ( bdd_array.empty() ) {
-    return BddVarSet(BddMgr::default_mgr());
-  }
-  vector<BddEdge> edge_list;
-  edge_list.reserve(bdd_array.size());
-  for (BddList::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    BddEdge e(bdd.mRoot);
-    edge_list.push_back(e);
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
   BddEdge ans = mgr->mark_to_bdd();
   return BddVarSet(Bdd(mgr, ans));
 }
 
 // @brief サポート変数集合の要素数の計算
 ymuint
-support_size(const Bdd& bdd)
+Bdd::support_size() const
 {
-  BddMgrImpl* mgr = bdd.mMgr;
-  BddEdge e(bdd.mRoot);
+  BddMgrImpl* mgr = mMgr;
+  BddEdge e(mRoot);
   return mgr->mark_support(vector<BddEdge>(1, e));
-}
-
-// @brief BDD ベクタのサポート変数集合の要素数の計算
-// @param[in] bdd_array BDD のベクタ
-// @return サポート変数集合の要素数
-ymuint
-support_size(const BddVector& bdd_array)
-{
-  if ( bdd_array.empty() ) {
-    return 0;
-  }
-  vector<BddEdge> edge_list;
-  edge_list.reserve(bdd_array.size());
-  for (BddVector::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    BddEdge e(bdd.mRoot);
-    edge_list.push_back(e);
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  return mgr->mark_support(edge_list);
-}
-
-// @brief BDD リストのサポート変数集合の要素数の計算
-// @param[in] bdd_array BDD のリスト
-// @return サポート変数集合の要素数
-ymuint
-support_size(const BddList& bdd_array)
-{
-  if ( bdd_array.empty() ) {
-    return 0;
-  }
-  vector<BddEdge> edge_list;
-  edge_list.reserve(bdd_array.size());
-  for (BddList::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    BddEdge e(bdd.mRoot);
-    edge_list.push_back(e);
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  return mgr->mark_support(edge_list);
 }
 
 // @brief if-then-else 演算．
@@ -1241,14 +1007,13 @@ Bdd::to_literallist(LiteralList& dst) const
 // @param[in] s 出力ストリーム
 // 4入力以下した受け付けない
 void
-print_map(ostream& s,
-	  const Bdd& bdd)
+Bdd::print_map(ostream& s) const
 {
-  BddMgrImpl* mgr = bdd.mMgr;
+  BddMgrImpl* mgr = mMgr;
   char val[16];
   bool flag = true;
   for (ymuint i = 0; i < 16; i ++) {
-    BddEdge e(bdd.mRoot);
+    BddEdge e(mRoot);
     for (ymuint j = 0; j < 4; j ++) {
       if ( e.is_const() ) {
 	break;

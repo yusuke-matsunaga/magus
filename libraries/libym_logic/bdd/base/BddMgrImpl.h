@@ -379,16 +379,10 @@ public:
   // ノード数の計数や真理値表密度の計算など
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief e を根とするBDDのノード数を数える．
-  /// @param[in] e 根の枝
-  virtual
-  ymuint64
-  size(BddEdge e) = 0;
-
   /// @brief edge_list に登録されたBDDのノード数を数える．
   virtual
   ymuint64
-  size(const list<BddEdge>& edge_list) = 0;
+  node_count(const vector<BddEdge>& edge_list) = 0;
 
   /// @brief BDD の表す論理関数の minterm の数を返す．
   /// @param[in] e 根の枝

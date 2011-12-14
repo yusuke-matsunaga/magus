@@ -10,8 +10,12 @@
 #include "ym_logic/BddVector.h"
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddMgr.h"
+#include "ym_logic/BddVarSet.h"
 
 #include "ym_utils/HeapTree.h"
+
+#include "BddMgrImpl.h"
+#include "BddEdge.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -26,7 +30,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // クラス BddVector
 //////////////////////////////////////////////////////////////////////
-#if 1
+
 // @brief 空のコンストラクタ
 // @param[in] mgr BddMgr
 BddVector::BddVector(BddMgr& mgr) :
@@ -42,6 +46,7 @@ BddVector::BddVector(BddMgr& mgr,
   vector<Bdd>(n),
   mMgr(mgr)
 {
+  assert_cond( size() == n, __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -101,13 +106,13 @@ BddVector::and_op() const
     for (BddVector::const_iterator p = begin();
 	 p != end(); ++p) {
       Bdd bdd = *p;
-      work.put(bdd, nsYm::nsBdd::size(bdd));
+      work.put(bdd, bdd.node_count());
     }
     ans = work.getmin();
     work.popmin();
     while ( !work.empty() ) {
       ans &= work.getmin();
-      ans = work.xchgmin(ans, nsYm::nsBdd::size(ans));
+      ans = work.xchgmin(ans, ans.node_count());
     }
   }
   return ans;
@@ -165,13 +170,13 @@ BddVector::or_op() const
     for (BddVector::const_iterator p = begin();
 	 p != end(); ++p) {
       Bdd bdd = *p;
-      work.put(bdd, nsYm::nsBdd::size(bdd));
+      work.put(bdd, bdd.node_count());
     }
     ans = work.getmin();
     work.popmin();
     while ( !work.empty() ) {
       ans |= work.getmin();
-      ans = work.xchgmin(ans, nsYm::nsBdd::size(ans));
+      ans = work.xchgmin(ans, ans.node_count());
     }
   }
   return ans;
@@ -229,209 +234,134 @@ BddVector::xor_op() const
     for (BddVector::const_iterator p = begin();
 	 p != end(); ++p) {
       Bdd bdd = *p;
-      work.put(bdd, nsYm::nsBdd::size(bdd));
+      work.put(bdd, bdd.node_count());
     }
     ans = work.getmin();
     work.popmin();
     while ( !work.empty() ) {
       ans ^= work.getmin();
-      ans = work.xchgmin(ans, nsYm::nsBdd::size(ans));
+      ans = work.xchgmin(ans, ans.node_count());
     }
   }
   return ans;
 }
-#else
 
-// 要素のBDDの論理積を求める．
-Bdd
-BddMgr::and_op(const BddVector& bdds)
+// @brief BDD ベクタが使っているノード数を数える．
+// @param[in] array BDD ベクタ
+// @return BDD ベクタが使っているノード数
+ymuint64
+BddVector::node_count() const
 {
-  ymuint n = bdds.size();
-  if ( n == 0 ) {
-    return make_one();
+  if ( empty() ) {
+    return 0;
   }
-  if ( n == 1 ) {
-    return bdds.front();
+  vector<BddEdge> edge_list;
+  edge_list.reserve(size());
+  for (BddVector::const_iterator p = begin();
+       p != end(); ++ p) {
+    Bdd bdd = *p;
+    BddEdge e(bdd.mRoot);
+    edge_list.push_back(e);
   }
-  if ( n == 2 ) {
-    BddVector::const_iterator p = bdds.begin();
-    Bdd bdd0 = *p;
-    ++ p;
-    Bdd bdd1 = *p;
-    return bdd0 & bdd1;
-  }
-  if ( n == 3 ) {
-    BddVector::const_iterator p = bdds.begin();
-    Bdd bdd0 = *p;
-    ++ p;
-    Bdd bdd1 = *p;
-    ++ p;
-    Bdd bdd2 = *p;
-    return bdd0 & bdd1 & bdd2;
-  }
-  if ( n == 4 ) {
-    BddVector::const_iterator p = bdds.begin();
-    Bdd bdd0 = *p;
-    ++ p;
-    Bdd bdd1 = *p;
-    ++ p;
-    Bdd bdd2 = *p;
-    ++ p;
-    Bdd bdd3 = *p;
-    return bdd0 & bdd1 & bdd2 & bdd3;
-  }
-
-  Bdd ans;
-  if ( n < kNiLimit ) {
-    BddVector::const_iterator p = bdds.begin();
-    ans = *p;
-    for (++ p; p != bdds.end(); ++ p) {
-      ans &= *p;
-    }
-  }
-  else {
-    SimpleHeapTree<Bdd> work;
-    for (BddVector::const_iterator p = bdds.begin();
-	 p != bdds.end(); ++p) {
-      Bdd bdd = *p;
-      work.put(bdd, size(bdd));
-    }
-    ans = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans &= work.getmin();
-      ans = work.xchgmin(ans, size(ans));
-    }
-  }
-  return ans;
+  // 今は array の中のBDDのマネージャがすべて同じと仮定している．
+  BddMgrImpl* mgr = mMgr.mImpl;
+  return mgr->node_count(edge_list);
 }
 
-// 複数のBDDの論理和を求める．
-Bdd
-BddMgr::or_op(const BddVector& bdds)
+// @brief BDD ベクタのサポート変数集合の計算 (VarVector)
+// @param[in] bdd_array BDD のベクタ
+// @param[in] sup サポート変数集合を格納するベクタ
+// @return サポート変数集合の要素数
+ymuint
+BddVector::support(VarVector& sup) const
 {
-  ymuint n = bdds.size();
-  if ( n == 0 ) {
-    return make_zero();
+  if ( empty() ) {
+    sup.clear();
+    return 0;
   }
-  if ( n == 1 ) {
-    return bdds.front();
+  vector<BddEdge> edge_list;
+  edge_list.reserve(size());
+  for (BddVector::const_iterator p = begin();
+       p != end(); ++ p) {
+    Bdd bdd = *p;
+    BddEdge e(bdd.mRoot);
+    edge_list.push_back(e);
   }
-  if ( n == 2 ) {
-    BddVector::const_iterator p = bdds.begin();
-    Bdd bdd0 = *p;
-    ++ p;
-    Bdd bdd1 = *p;
-    return bdd0 | bdd1;
-  }
-  if ( n == 2 ) {
-    BddVector::const_iterator p = bdds.begin();
-    Bdd bdd0 = *p;
-    ++ p;
-    Bdd bdd1 = *p;
-    ++ p;
-    Bdd bdd2 = *p;
-    return bdd0 | bdd1 | bdd2;
-  }
-  if ( n == 3 ) {
-    BddVector::const_iterator p = bdds.begin();
-    Bdd bdd0 = *p;
-    ++ p;
-    Bdd bdd1 = *p;
-    ++ p;
-    Bdd bdd2 = *p;
-    ++ p;
-    Bdd bdd3 = *p;
-    return bdd0 | bdd1 | bdd2 | bdd3;
-  }
-
-  Bdd ans;
-  if ( n < kNiLimit ) {
-    BddVector::const_iterator p = bdds.begin();
-    ans = *p;
-    for (++ p; p != bdds.end(); ++ p) {
-      ans |= *p;
-    }
-  }
-  else {
-    SimpleHeapTree<Bdd> work;
-    for (BddVector::const_iterator p = bdds.begin();
-	 p != bdds.end(); ++p) {
-      Bdd bdd = *p;
-      work.put(bdd, size(bdd));
-    }
-    ans = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans |= work.getmin();
-      ans = work.xchgmin(ans, size(ans));
-    }
-  }
-  return ans;
+  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
+  BddMgrImpl* mgr = mMgr.mImpl;
+  mgr->mark_support(edge_list);
+  return mgr->mark_to_vector(sup);
 }
 
-// 複数のBDDの排他的論理和を求める．
-Bdd
-BddMgr::xor_op(const BddVector& bdds)
+// @brief BDD ベクタのサポート変数集合の計算 (VarList)
+// @param[in] bdd_array BDD のベクタ
+// @param[in] sup サポート変数集合を格納するリスト
+// @return サポート変数集合の要素数
+ymuint
+BddVector::support(VarList& sup) const
 {
-  ymuint n = bdds.size();
-  if ( n == 0 ) {
-    return make_zero();
+  if ( empty() ) {
+    sup.clear();
+    return 0;
   }
-  if ( n == 1 ) {
-    return bdds.front();
+  vector<BddEdge> edge_list;
+  edge_list.reserve(size());
+  for (BddVector::const_iterator p = begin();
+       p != end(); ++ p) {
+    Bdd bdd = *p;
+    BddEdge e(bdd.mRoot);
+    edge_list.push_back(e);
   }
-  if ( n == 2 ) {
-    BddVector::const_iterator p = bdds.begin();
-    Bdd bdd0 = *p;
-    ++ p;
-    Bdd bdd1 = *p;
-    return bdd0 ^ bdd1;
-  }
-  if ( n == 3 ) {
-    BddVector::const_iterator p = bdds.begin();
-    Bdd bdd0 = *p;
-    ++ p;
-    Bdd bdd1 = *p;
-    ++ p;
-    Bdd bdd2 = *p;
-    return bdd0 ^ bdd1 ^ bdd2;
-  }
-  if ( n == 4 ) {
-    BddVector::const_iterator p = bdds.begin();
-    Bdd bdd0 = *p;
-    ++ p;
-    Bdd bdd1 = *p;
-    ++ p;
-    Bdd bdd2 = *p;
-    ++ p;
-    Bdd bdd3 = *p;
-    return bdd0 ^ bdd1 ^ bdd2 ^ bdd3;
-  }
-
-  Bdd ans;
-  if ( n < kNiLimit ) {
-    BddVector::const_iterator p = bdds.begin();
-    ans = *p;
-    for (++ p; p != bdds.end(); ++ p) {
-      ans ^= *p;
-    }
-  }
-  else {
-    SimpleHeapTree<Bdd> work;
-    for (BddVector::const_iterator p = bdds.begin();
-	 p != bdds.end(); ++p) {
-      Bdd bdd = *p;
-      work.put(bdd, size(bdd));
-    }
-    ans = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans ^= work.getmin();
-      ans = work.xchgmin(ans, size(ans));
-    }
-  }
-  return ans;
+  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
+  BddMgrImpl* mgr = mMgr.mImpl;
+  mgr->mark_support(edge_list);
+  return mgr->mark_to_list(sup);
 }
-#endif
+
+// @brief BDD ベクタのサポート変数集合の計算 (BddVarSet)
+// @param[in] bdd_array BDD のベクタ
+// @return サポート変数集合
+BddVarSet
+BddVector::support() const
+{
+  if ( empty() ) {
+    return BddVarSet(mMgr);
+  }
+  vector<BddEdge> edge_list;
+  edge_list.reserve(size());
+  for (BddVector::const_iterator p = begin();
+       p != end(); ++ p) {
+    Bdd bdd = *p;
+    BddEdge e(bdd.mRoot);
+    edge_list.push_back(e);
+  }
+  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
+  BddMgrImpl* mgr = mMgr.mImpl;
+  mgr->mark_support(edge_list);
+  BddEdge ans = mgr->mark_to_bdd();
+  return BddVarSet(Bdd(mgr, ans));
+}
+
+// @brief BDD ベクタのサポート変数集合の要素数の計算
+// @param[in] bdd_array BDD のベクタ
+// @return サポート変数集合の要素数
+ymuint
+BddVector::support_size() const
+{
+  if ( empty() ) {
+    return 0;
+  }
+  vector<BddEdge> edge_list;
+  edge_list.reserve(size());
+  for (BddVector::const_iterator p = begin();
+       p != end(); ++ p) {
+    Bdd bdd = *p;
+    BddEdge e(bdd.mRoot);
+    edge_list.push_back(e);
+  }
+  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
+  BddMgrImpl* mgr = mMgr.mImpl;
+  return mgr->mark_support(edge_list);
+}
+
 END_NAMESPACE_YM_BDD

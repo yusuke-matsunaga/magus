@@ -9,8 +9,59 @@
 
 #include "Restorer.h"
 
+#include "ym_logic/Bdd.h"
+#include "ym_logic/BddVector.h"
+#include "ym_logic/BddList.h"
+
 
 BEGIN_NAMESPACE_YM_BDD
+
+// @brief ダンプされた情報を BDD を読み込む．
+// @param[in] s 入力ストリーム
+void
+Bdd::restore(BinI& s)
+{
+  Restorer restorer(mMgr, s);
+  ymuint n = restorer.read();
+  BddEdge ans;
+  if ( n != 1 ) {
+    // エラーもしくは複数の BDD データだった．
+    ans = BddEdge::make_error();
+  }
+  else {
+    ans = restorer.root(0);
+  }
+  assign(ans);
+}
+
+// @brief ダンプされた情報を読み込む．
+// @param[in] s 入力ストリーム
+void
+BddVector::restore(BinI& s)
+{
+  Restorer restorer(mMgr.mImpl, s);
+  ymuint n = restorer.read();
+  clear();
+  reserve(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    BddEdge root = restorer.root(i);
+    push_back(Bdd(mMgr.mImpl, root));
+  }
+}
+
+// @brief ダンプされた情報を読み込む．
+// @param[in] s 入力ストリーム
+void
+BddList::restore(BinI& s)
+{
+  Restorer restorer(mMgr.mImpl, s);
+  ymuint n = restorer.read();
+  clear();
+  for (ymuint i = 0; i < n; ++ i) {
+    BddEdge root = restorer.root(i);
+    push_back(Bdd(mMgr.mImpl, root));
+  }
+}
 
 //////////////////////////////////////////////////////////////////////
 // Restorer

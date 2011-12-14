@@ -62,6 +62,8 @@ class BddMgr
 {
   friend class Bdd;
   friend class BddMgrImpl;
+  friend class BddVector;
+  friend class BddList;
   friend class DgMgr;
 
 public:
@@ -233,50 +235,6 @@ public:
   Bdd
   make_thfunc(ymuint n,
 	      ymuint th);
-
-#if 1
-  /// @brief 複数のBDDの論理積を求める．
-  /// @param[in] bdds BDD のベクタ
-  /// @return 生成された BDD
-  Bdd
-  and_op(const BddVector& bdds);
-
-  /// @brief 複数のBDDの論理積を求める．
-  /// @param[in] bdds BDD のリスト
-  /// @return 生成された BDD
-  Bdd
-  and_op(const BddList& bdds);
-
-  /// @brief 複数のBDDの論理和を求める．
-  /// @param[in] bdds BDD のベクタ
-  /// @return 生成された BDD
-  Bdd
-  or_op(const BddVector& bdds);
-
-  /// @brief 複数のBDDの論理和を求める．
-  /// @param[in] bdds BDD のリスト
-  /// @return 生成された BDD
-  Bdd
-  or_op(const BddList& bdds);
-
-  /// @brief 複数のBDDの排他的論理和を求める．
-  /// @param[in] bdds BDD のベクタ
-  /// @return 生成された BDD
-  Bdd
-  xor_op(const BddVector& bdds);
-
-  /// @brief 複数のBDDの排他的論理和を求める．
-  /// @param[in] bdds BDD のリスト
-  /// @return 生成された BDD
-  Bdd
-  xor_op(const BddList& bdds);
-#endif
-
-  /// @brief 保存されたBDDを読み込む．
-  /// @param[in] s 入力ストリーム
-  /// @return 生成された BDD
-  Bdd
-  restore(BinI& s);
 
   /// @brief 保存されたBDDをベクタに読み込む．
   /// @param[in] s 入力ストリーム

@@ -9,6 +9,7 @@
 
 #include "Dumper.h"
 
+#include "ym_logic/Bdd.h"
 #include "ym_logic/BddVector.h"
 #include "ym_logic/BddList.h"
 
@@ -17,31 +18,25 @@ BEGIN_NAMESPACE_YM_BDD
 
 // @brief 内容のダンプ
 void
-dump(BinO& s,
-     const Bdd& bdd)
+Bdd::dump(BinO& s) const
 {
-  Dumper dumper(bdd.mMgr, s);
-  BddEdge e(bdd.mRoot);
+  Dumper dumper(mMgr, s);
+  BddEdge e(mRoot);
   dumper.write(vector<BddEdge>(1, e));
 }
 
-// @brief BDD ベクタの内容をダンプする．
+// @brief 内容をダンプする．
 // @param[in] s 出力ストリーム
-// @param[in] array BDD の配列
 void
-dump(BinO& s,
-     const BddVector& array)
+BddVector::dump(BinO& s) const
 {
-  if ( array.empty() ) {
-    return;
-  }
   // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgrImpl* mgr = array.front().mMgr;
+  BddMgrImpl* mgr = mMgr.mImpl;
   Dumper dumper(mgr, s);
   vector<BddEdge> edge_list;
-  edge_list.reserve(array.size());
-  for (BddVector::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
+  edge_list.reserve(size());
+  for (BddVector::const_iterator p = begin();
+       p != end(); ++ p) {
     Bdd bdd = *p;
     BddEdge e(bdd.mRoot);
     edge_list.push_back(e);
@@ -49,23 +44,18 @@ dump(BinO& s,
   dumper.write(edge_list);
 }
 
-// @brief BDD リストの内容をダンプする．
+// @brief 内容をダンプする．
 // @param[in] s 出力ストリーム
-// @param[in] array BDD のリスト
 void
-dump(BinO& s,
-     const BddList& array)
+BddList::dump(BinO& s) const
 {
-  if ( array.empty() ) {
-    return;
-  }
   // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgrImpl* mgr = array.front().mMgr;
+  BddMgrImpl* mgr = mMgr.mImpl;
   Dumper dumper(mgr, s);
   vector<BddEdge> edge_list;
-  edge_list.reserve(array.size());
-  for (BddList::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
+  edge_list.reserve(size());
+  for (BddList::const_iterator p = begin();
+       p != end(); ++ p) {
     Bdd bdd = *p;
     BddEdge e(bdd.mRoot);
     edge_list.push_back(e);

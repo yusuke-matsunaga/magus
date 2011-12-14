@@ -160,7 +160,7 @@ ymuint
 BddVarSet::size() const
 {
   if ( !static_cast<bool>(mSize & 1U) ) {
-    set_size(nsYm::nsBdd::size(mBody));
+    set_size(mBody.node_count());
   }
   return (mSize >> 1);
 }
@@ -241,7 +241,7 @@ ymuint
 BddVarSet::to_vector(VarVector& dst) const
 {
   // 手抜き
-  return support(mBody, dst);
+  return mBody.support(dst);
 }
 
 // 変数番号の list に変換する．
@@ -249,7 +249,7 @@ ymuint
 BddVarSet::to_list(VarList& dst) const
 {
   // 手抜き
-  return support(mBody, dst);
+  return mBody.support(dst);
 }
 
 // サイズを設定する．

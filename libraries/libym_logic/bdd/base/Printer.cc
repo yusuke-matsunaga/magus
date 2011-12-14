@@ -18,11 +18,10 @@ BEGIN_NAMESPACE_YM_BDD
 
 // @brief BDD の内容を書き出す．
 ymuint64
-print(ostream& s,
-      const Bdd& bdd)
+Bdd::print(ostream& s) const
 {
-  BddEdge e(bdd.mRoot);
-  Printer printer(bdd.mMgr, s);
+  BddEdge e(mRoot);
+  Printer printer(mMgr, s);
   printer.print_root(e);
   return printer.num();
 }
@@ -31,17 +30,16 @@ print(ostream& s,
 // @param[in] array BDD ベクタ
 // @param[in] s 出力ストリーム
 ymuint64
-print(ostream& s,
-      const BddVector& array)
+BddVector::print(ostream& s) const
 {
-  if ( array.empty() ) {
+  if ( empty() ) {
     return 0;
   }
   // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgrImpl* mgr = array.front().mMgr;
+  BddMgrImpl* mgr = mMgr.mImpl;
   Printer printer(mgr, s);
-  for (BddVector::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
+  for (BddVector::const_iterator p = begin();
+       p != end(); ++ p) {
     Bdd bdd = *p;
     BddEdge e(bdd.mRoot);
     printer.print_root(e);
@@ -53,17 +51,16 @@ print(ostream& s,
 // @param[in] array BDD リスト
 // @param[in] s 出力ストリーム
 ymuint64
-print(ostream& s,
-      const BddList& array)
+BddList::print(ostream& s) const
 {
-  if ( array.empty() ) {
+  if ( empty() ) {
     return 0;
   }
   // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgrImpl* mgr = array.front().mMgr;
+  BddMgrImpl* mgr = mMgr.mImpl;
   Printer printer(mgr, s);
-  for (BddList::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
+  for (BddList::const_iterator p = begin();
+       p != end(); ++ p) {
     Bdd bdd = *p;
     BddEdge e(bdd.mRoot);
     printer.print_root(e);

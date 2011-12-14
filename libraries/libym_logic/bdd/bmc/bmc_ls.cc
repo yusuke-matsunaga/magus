@@ -290,7 +290,7 @@ BddMgrClassic::to_literalvector(BddEdge e,
     return 0;
   }
 
-  size_t n = size(e);
+  ymuint n = node_count(vector<BddEdge>(1, e));
   dst.reserve(n);
 
   Node* vp = get_node(e);

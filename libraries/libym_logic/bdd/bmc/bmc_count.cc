@@ -21,26 +21,16 @@ ymuint32 w_level;
 
 END_NONAMESPACE
 
-// e を根とするBDDの節点数を数える．
-ymuint64
-BddMgrClassic::size(BddEdge e)
-{
-  mNum = 0;
-  count1(e);
-  clear_pnmark(e);
-  return mNum;
-}
-
 // edge list に登録されたBDDの節点数を数える．
 ymuint64
-BddMgrClassic::size(const list<BddEdge>& edge_list)
+BddMgrClassic::node_count(const vector<BddEdge>& edge_list)
 {
   mNum = 0;
-  for (list<BddEdge>::const_iterator p = edge_list.begin();
+  for (vector<BddEdge>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
     count1(*p);
   }
-  for (list<BddEdge>::const_iterator p = edge_list.begin();
+  for (vector<BddEdge>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
     clear_pnmark(*p);
   }
