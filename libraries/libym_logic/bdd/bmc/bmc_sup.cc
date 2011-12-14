@@ -8,6 +8,7 @@
 
 
 #include "BddMgrClassic.h"
+#include "BmcVar.h"
 #include "BmcCompTbl.h"
 
 
@@ -41,10 +42,11 @@ BddMgrClassic::sup_step(BddEdge e)
     }
 
     vp->pmark(1);
-    Var* v = vp->var();
-    if ( !v->mMark ) {
-      v->mMark = 1;
-      mVarSet.push_back(v);
+
+    Var* var = var_at(vp->level());
+    if ( !var->mMark ) {
+      var->mMark = 1;
+      mVarSet.push_back(var);
     }
     sup_step(vp->edge0());
     e = vp->edge1();
@@ -59,8 +61,8 @@ BddMgrClassic::mark_to_vector(VarVector& vars)
   vars.clear();
   vars.reserve(n);
   for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
-    Var* v = *p;
-    VarId varid = v->varid();
+    Var* var = *p;
+    VarId varid(var->level());
     vars.push_back(varid);
   }
   clear_varmark();
@@ -74,8 +76,8 @@ BddMgrClassic::mark_to_list(VarList& vars)
 {
   vars.clear();
   for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
-    Var* v = *p;
-    VarId varid = v->varid();
+    Var* var = *p;
+    VarId varid(var->level());
     vars.push_back(varid);
   }
   clear_varmark();
@@ -91,9 +93,11 @@ BddMgrClassic::mark_to_bdd()
     return BddEdge::make_one();
   }
   list<Var*>::iterator p = mVarSet.begin();
-  BddEdge tmp = make_posiliteral((*p)->varid());
+  VarId varid0((*p)->level());
+  BddEdge tmp = make_posiliteral(varid0);
   for (++ p; p != mVarSet.end(); ++ p) {
-    tmp = and_op(tmp, make_posiliteral((*p)->varid()));
+    VarId varid((*p)->level());
+    tmp = and_op(tmp, make_posiliteral(varid));
   }
   clear_varmark();
   return tmp;
@@ -128,11 +132,12 @@ BddMgrClassic::SCC(BddEdge e)
   BddEdge ans = BddEdge::make_one();
   for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
     Var* v = *p;
+    VarId varid(v->level());
     if ( v->mMark == 1 ) {
-      ans = and_op(ans, make_negaliteral(v->varid()));
+      ans = and_op(ans, make_negaliteral(varid));
     }
     else if ( v->mMark == 2 ) {
-      ans = and_op(ans, make_posiliteral(v->varid()));
+      ans = and_op(ans, make_posiliteral(varid));
     }
   }
   return ans;
@@ -147,7 +152,7 @@ BddMgrClassic::scc_step(BddEdge e,
     while ( !s.is_one() ) {
       assert_cond(!s.is_zero(), __FILE__, __LINE__);
       Node* svp = get_node(s);
-      Var* svar = svp->var();
+      Var* svar = var_at(svp->level());
       svar->mMark |= 3;
       s = svp->edge1();
     }
@@ -157,11 +162,13 @@ BddMgrClassic::scc_step(BddEdge e,
   Node* vp = get_node(e);
   if ( vp && !mark(e) ) {
     setmark(e);
-    Var* var = vp->var();
+    ymuint level = vp->level();
+    Var* var = var_at(level);
     Node* svp = get_node(s);
-    Var* svar = svp->var();
+    ymuint s_level = svp->level();
     BddEdge s2 = svp->edge1();
-    if ( svar->level() < var->level() ) {
+    if ( s_level < level ) {
+      Var* svar = var_at(s_level);
       svar->mMark |= 3;
       scc_step(e, s2);
     }
@@ -203,9 +210,9 @@ BddMgrClassic::esmooth(BddEdge e1,
   {
     Node* vp = get_node(e2);
     while ( vp != 0 ) {
-      Var* v = vp->var();
-      mLastLevel = v->level();
-      v->mMark = 1;
+      mLastLevel = vp->level();
+      Var* var = var_at(mLastLevel);
+      var->mMark = 1;
       vp = get_node(vp->edge1());
     }
   }
@@ -223,8 +230,7 @@ BddMgrClassic::esmooth_step(BddEdge e)
   }
 
   Node* vp = get_node(e);
-  Var* var = vp->var();
-  ymuint level = var->level();
+  ymuint level = vp->level();
   if ( level > mLastLevel ) {
     return e;
   }
@@ -234,6 +240,7 @@ BddMgrClassic::esmooth_step(BddEdge e)
     tPol pol = e.pol();
     BddEdge e0 = vp->edge0(pol);
     BddEdge e1 = vp->edge1(pol);
+    Var* var = var_at(level);
     if ( var->mMark ) {
       // 消去対象の変数だった．
       BddEdge tmp = or_op(e0, e1);
@@ -242,7 +249,7 @@ BddMgrClassic::esmooth_step(BddEdge e)
     else {
       BddEdge r_0 = esmooth_step(e0);
       BddEdge r_1 = esmooth_step(e1);
-      result = new_node(var, r_0, r_1);
+      result = new_node(level, r_0, r_1);
     }
     mSmTable->put(e, result);
   }
@@ -268,9 +275,9 @@ BddMgrClassic::and_exist(BddEdge e1,
   {
     Node* vp = get_node(e3);
     while ( vp != 0 ) {
-      Var* v = vp->var();
-      mLastLevel = v->level();
-      v->mMark = 1;
+      mLastLevel = vp->level();
+      Var* var = var_at(mLastLevel);
+      var->mMark = 1;
       vp = get_node(vp->edge1());
     }
   }
@@ -308,15 +315,11 @@ BddMgrClassic::andexist_step(BddEdge f,
   Node* g_vp = get_node(g);
   tPol f_pol = f.pol();
   tPol g_pol = g.pol();
-  Var* f_var = f_vp->var();
-  Var* g_var = g_vp->var();
-  ymuint f_level = f_var->level();
-  ymuint g_level = g_var->level();
+  ymuint f_level = f_vp->level();
+  ymuint g_level = g_vp->level();
   ymuint level = f_level;
-  Var* var = f_var;
   if ( level > g_level ) {
     level = g_level;
-    var = g_var;
   }
   if ( level > mLastLevel ) {
     return and_op(f, g);
@@ -326,6 +329,7 @@ BddMgrClassic::andexist_step(BddEdge f,
   if ( result.is_error() ) {
     BddEdge f_0, f_1;
     BddEdge g_0, g_1;
+    Var* var = var_at(level);
     if ( var->mMark ) {
       if ( f_level > level ) {
 	g_0 = g_vp->edge0(g_pol);
@@ -356,7 +360,7 @@ BddMgrClassic::andexist_step(BddEdge f,
       g_1 = g_vp->edge1(g_pol);
       BddEdge r_0 = andexist_step(f_0, g_0);
       BddEdge r_1 = andexist_step(f_1, g_1);
-      result = new_node(var, r_0, r_1);
+      result = new_node(level, r_0, r_1);
     }
     mAeTable->put(f, g, result);
   }

@@ -65,7 +65,7 @@ BddMgrClassic::and_step(BddEdge f,
     // 演算結果テーブルには登録されていない
     BddEdge f_0, f_1;
     BddEdge g_0, g_1;
-    Var* var = split(f, g, f_0, f_1, g_0, g_1);
+    ymuint level = split(f, g, f_0, f_1, g_0, g_1);
     BddEdge r_0 = and_step(f_0, g_0);
     if ( r_0.is_overflow() ) {
       return BddEdge::make_overflow();
@@ -74,7 +74,7 @@ BddMgrClassic::and_step(BddEdge f,
     if ( r_1.is_overflow() ) {
       return BddEdge::make_overflow();
     }
-    result = new_node(var, r_0, r_1);
+    result = new_node(level, r_0, r_1);
     mAndTable->put(f, g, result);
   }
 
@@ -139,12 +139,12 @@ BddMgrClassic::xor_op(BddEdge f,
   if ( result.is_error() ) {
     BddEdge f_0, f_1;
     BddEdge g_0, g_1;
-    Var* var = split(f, g, f_0, f_1, g_0, g_1);
+    ymuint level = split(f, g, f_0, f_1, g_0, g_1);
     BddEdge r_0 = xor_op(f_0, g_0);
     if ( !r_0.is_invalid() ) {
       BddEdge r_1 = xor_op(f_1, g_1);
       if ( !r_1.is_invalid() ) {
-	result = new_node(var, r_0, r_1);
+	result = new_node(level, r_0, r_1);
 	mXorTable->put(f, g, result);
       }
     }
@@ -181,9 +181,9 @@ BddMgrClassic::check_intersect(BddEdge f,
   }
   // この時点で f, g は終端ではない．
 
-  // 極性は正規化されている(否定属性は0枝のみ，葉は1のみ)
-  // ので f も g も正極性のときは f(1,1,...,1) = g(1,1,...,1) = 1
-  // つまりすべての入力を 1 にしたときの関数値は 1 であるので
+  // 極性は正規化されている(否定属性は1枝のみ，葉は0のみ)
+  // ので f も g も正極性のときは f(0,0,...,0) = g(0,0,...,0) = 0
+  // つまりすべての入力を 0 にしたときの関数値は 0 であるので
   // 交わっていることがわかる．
   tPol f_pol = f.pol();
   tPol g_pol = g.pol();
@@ -204,10 +204,8 @@ BddMgrClassic::check_intersect(BddEdge f,
   if ( result.is_error() ) {
     Node* f_vp = get_node(f);
     Node* g_vp = get_node(g);
-    Var* f_var = f_vp->var();
-    Var* g_var = g_vp->var();
-    ymuint f_level = f_var->level();
-    ymuint g_level = g_var->level();
+    ymuint f_level = f_vp->level();
+    ymuint g_level = g_vp->level();
     BddEdge f_0, f_1;
     BddEdge g_0, g_1;
     if ( f_level < g_level ) {

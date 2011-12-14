@@ -15,69 +15,6 @@
 BEGIN_NAMESPACE_YM_BDD
 
 //////////////////////////////////////////////////////////////////////
-// 変数の情報を格納しておくクラス
-//////////////////////////////////////////////////////////////////////
-class BmcVar
-{
-  friend class BddMgrClassic;
-public:
-
-  // 変数番号を得る．
-  VarId
-  varid() const
-  {
-    return mId;
-  }
-
-  // レベルを得る．
-  ymuint
-  level() const
-  {
-    return static_cast<ymuint>(mId.val());
-  }
-
-
-private:
-
-  // コンストラクタ
-  BmcVar(VarId id) :
-    mId(id),
-    mMark(0),
-    mLink(NULL)
-  {
-  }
-
-  // デストラクタ
-  ~BmcVar()
-  {
-  }
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 変数番号
-  // レベルも同一
-  VarId mId;
-
-  // 作業用のマーク
-  int mMark;
-
-  // compose用にBDDの枝を入れておくメンバ
-  BddEdge mCompEdge;
-
-  // 変数リスト中の次の要素を指すポインタ
-  BmcVar* mNext;
-
-  // ハッシュ表中の次の要素を指すポインタ
-  BmcVar* mLink;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 // BDDのノードを表す構造体
 //////////////////////////////////////////////////////////////////////
 class BmcNode
@@ -124,14 +61,6 @@ public:
 
   BddEdge
   edge1(tPol p) const;
-
-  // 変数を得る．
-  BmcVar*
-  var() const;
-
-  // 変数インデックス値を得る
-  VarId
-  varid() const;
 
   // レベルを得る．
   ymuint
@@ -200,8 +129,8 @@ private:
   // 1枝
   BddEdge mEdge1;
 
-  // 変数へのポインタ
-  BmcVar* mVar;
+  // レベル
+  ymuint32 mLevel;
 
   // 参照回数＋α(上の定数を参照)
   ymuint32 mRefMark;
@@ -242,28 +171,12 @@ BmcNode::edge1(tPol p) const
   return BddEdge(mEdge1, p);
 }
 
-// 変数を得る．
-inline
-BmcVar*
-BmcNode::var() const
-{
-  return mVar;
-}
-
-// 変数インデックス値を得る
-inline
-VarId
-BmcNode::varid() const
-{
-  return mVar->varid();
-}
-
 // レベルを得る
 inline
 ymuint
 BmcNode::level() const
 {
-  return mVar->level();
+  return mLevel;
 }
 
 // p-mark が付いていたらtrueを返す

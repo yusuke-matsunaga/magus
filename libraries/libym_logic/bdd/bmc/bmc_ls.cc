@@ -80,10 +80,8 @@ BddMgrClassic::lscap(BddEdge e1,
   Node* node2 = get_node(e2);
   tPol pol1 = e1.pol();
   tPol pol2 = e2.pol();
-  Var* var1 = node1->var();
-  Var* var2 = node2->var();
-  ymuint level1 = var1->level();
-  ymuint level2 = var2->level();
+  ymuint level1 = node1->level();
+  ymuint level2 = node2->level();
   for ( ; ; ) {
     if ( level1 == level2 ) {
       int which1;
@@ -93,10 +91,10 @@ BddMgrClassic::lscap(BddEdge e1,
       if ( which1 == which2 ) {
 	BddEdge tmp = lscap(e1, e2);
 	if ( which1 == 0 ) {
-	  return new_node(var1, tmp, BddEdge::make_zero());
+	  return new_node(level1, tmp, BddEdge::make_zero());
 	}
 	else {
-	  return new_node(var1, BddEdge::make_zero(), tmp);
+	  return new_node(level1, BddEdge::make_zero(), tmp);
 	}
       }
       if ( e1.is_one() || e2.is_one() ) {
@@ -106,10 +104,8 @@ BddMgrClassic::lscap(BddEdge e1,
       node2 = get_node(e2);
       pol1 = e1.pol();
       pol2 = e2.pol();
-      var1 = node1->var();
-      var2 = node2->var();
-      level1 = var1->level();
-      level2 = var2->level();
+      level1 = node1->level();
+      level2 = node2->level();
     }
     else if ( level1 < level2 ) {
       int which1;
@@ -119,8 +115,7 @@ BddMgrClassic::lscap(BddEdge e1,
       }
       node1 = get_node(e1);
       pol1 = e1.pol();
-      var1 = node1->var();
-      level1 = var1->level();
+      level1 = node1->level();
     }
     else { // level1 > level2
       int which2;
@@ -130,8 +125,7 @@ BddMgrClassic::lscap(BddEdge e1,
       }
       node2 = get_node(e2);
       pol2 = e2.pol();
-      var2 = node2->var();
-      level2 = var2->level();
+      level2 = node2->level();
     }
   }
 }
@@ -160,20 +154,18 @@ BddMgrClassic::lsdiff(BddEdge e1,
   Node* node2 = get_node(e2);
   tPol pol1 = e1.pol();
   tPol pol2 = e2.pol();
-  Var* var1 = node1->var();
-  Var* var2 = node2->var();
-  ymuint level1 = var1->level();
-  ymuint level2 = var2->level();
+  ymuint level1 = node1->level();
+  ymuint level2 = node2->level();
   for ( ; ; ) {
     if ( level1 < level2 ) {
       int which1;
       e1 = select_edge(node1, pol1, which1);
       BddEdge tmp = lsdiff(e1, e2);
       if ( which1 == 0 ) {
-	return new_node(var1, tmp, BddEdge::make_zero());
+	return new_node(level1, tmp, BddEdge::make_zero());
       }
       else {
-	return new_node(var1, BddEdge::make_zero(), tmp);
+	return new_node(level1, BddEdge::make_zero(), tmp);
       }
     }
     if ( level1 > level2 ) {
@@ -184,8 +176,7 @@ BddMgrClassic::lsdiff(BddEdge e1,
       }
       node2 = get_node(e2);
       pol2 = e2.pol();
-      var2 = node2->var();
-      level2 = var2->level();
+      level2 = node2->level();
     }
     else {
       int which1;
@@ -195,10 +186,10 @@ BddMgrClassic::lsdiff(BddEdge e1,
       if ( which1 != which2 ) {
 	BddEdge tmp = lsdiff(e1, e2);
 	if ( which1 == 0 ) {
-	  return new_node(var1, tmp, BddEdge::make_zero());
+	  return new_node(level1, tmp, BddEdge::make_zero());
 	}
 	else {
-	  return new_node(var1, BddEdge::make_zero(), tmp);
+	  return new_node(level1, BddEdge::make_zero(), tmp);
 	}
       }
       if ( e1.is_one() || e2.is_one() ) {
@@ -208,10 +199,8 @@ BddMgrClassic::lsdiff(BddEdge e1,
       node2 = get_node(e2);
       pol1 = e1.pol();
       pol2 = e2.pol();
-      var1 = node1->var();
-      var2 = node2->var();
-      level1 = var1->level();
-      level2 = var2->level();
+      level1 = node1->level();
+      level2 = node2->level();
     }
   }
 }
@@ -296,7 +285,8 @@ BddMgrClassic::to_literalvector(BddEdge e,
   Node* vp = get_node(e);
   tPol pol = e.pol();
   while ( vp ) {
-    VarId varid = vp->varid();
+    ymuint level = vp->level();
+    VarId varid(level);
     BddEdge e0 = vp->edge0(pol);
     BddEdge e1 = vp->edge1(pol);
     if ( e0 == BddEdge::make_zero() ) {
@@ -329,7 +319,8 @@ BddMgrClassic::to_literallist(BddEdge e,
   Node* vp = get_node(e);
   tPol pol = e.pol();
   while ( vp ) {
-    VarId varid = vp->varid();
+    ymuint level = vp->level();
+    VarId varid(level);
     BddEdge e0 = vp->edge0(pol);
     BddEdge e1 = vp->edge1(pol);
     if ( e0 == BddEdge::make_zero() ) {

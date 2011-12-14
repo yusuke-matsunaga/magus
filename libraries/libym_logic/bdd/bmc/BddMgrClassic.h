@@ -517,7 +517,7 @@ private:
   // 左右の枝が同じ場合にはその枝自身を返し，それ以外の場合には，
   // 与えられた枝とインデックスを持つノードを返す．
   BddEdge
-  new_node(Var* var,
+  new_node(ymuint level,
 	   BddEdge l,
 	   BddEdge h);
 
@@ -854,7 +854,11 @@ private:
 
   // f と g のノードの子供のノードとレベルを求める．
   static
+#if 0
   Var*
+#else
+  ymuint
+#endif
   split(BddEdge f,
 	BddEdge g,
 	BddEdge& f_0,
@@ -1123,7 +1127,11 @@ BddMgrClassic::split1(ymuint top,
 
 // f と g のノードの子供のノードとレベルを求める．
 inline
+#if 0
 BmcVar*
+#else
+ymuint
+#endif
 BddMgrClassic::split(BddEdge f,
 		     BddEdge g,
 		     BddEdge& f_0,
@@ -1135,19 +1143,32 @@ BddMgrClassic::split(BddEdge f,
   Node* g_vp = get_node(g);
   tPol f_pol = f.pol();
   tPol g_pol = g.pol();
+#if 0
   Var* f_var = f_vp->var();
   Var* g_var = g_vp->var();
   ymuint f_level = f_var->level();
   ymuint g_level = g_var->level();
+#else
+  ymuint f_level = f_vp->level();
+  ymuint g_level = g_vp->level();
+#endif
   ymuint level = f_level;
+#if 0
   Var* var = f_var;
+#endif
   if ( g_level < level ) {
     level = g_level;
+#if 0
     var = g_var;
+#endif
   }
   split1(level, f_level, f, f_vp, f_pol, f_0, f_1);
   split1(level, g_level, g, g_vp, g_pol, g_0, g_1);
+#if 0
   return var;
+#else
+  return level;
+#endif
 }
 
 // 節点テーブルの拡張を制御するパラメータを得る．

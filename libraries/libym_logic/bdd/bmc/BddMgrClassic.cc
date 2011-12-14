@@ -9,6 +9,7 @@
 
 #include "BddMgrClassic.h"
 #include "BmcCompTbl.h"
+#include "BmcVar.h"
 
 
 #if !defined(__SUNPRO_CC) || __SUNPRO_CC >= 0x500
@@ -71,20 +72,20 @@ inline
 ymuint64
 hash_func3(BddEdge id1,
 	   BddEdge id2,
-	   VarId var)
+	   ymuint level)
 {
   ymuint64 v1 = id1.hash();
   ymuint64 v2 = id2.hash();
-  ymuint64 id3 = var.val();
+  ymuint64 id3 = level;
   return static_cast<ymuint64>(v1 + (v2 >> 2) + (id3 << 3) - id3);
 }
 
 // VarId 用のハッシュ関数
 inline
 ymuint64
-var_hash(VarId var)
+var_hash(ymuint level)
 {
-  ymuint64 key = var.val();
+  ymuint64 key = level;
   return ((key * key) >> 8) + key;
 }
 
@@ -236,7 +237,7 @@ BddMgrClassic::make_posiliteral(VarId varid)
       return BddEdge::make_overflow();
     }
   }
-  return new_node(var, BddEdge::make_zero(), BddEdge::make_one());
+  return new_node(level(varid), BddEdge::make_zero(), BddEdge::make_one());
 }
 
 // bdd が正リテラルのみのキューブの時，真となる．
@@ -324,8 +325,8 @@ BddMgrClassic::root_decomp(BddEdge e,
   if ( vp ) {
     e0 = vp->edge0(pol);
     e1 = vp->edge1(pol);
-    VarId varid = vp->varid();
-    return varid;
+    ymuint level = vp->level();
+    return varid(level);
   }
   else {
     // 終端節点の時にはコファクターも自分自身
@@ -341,7 +342,7 @@ BddMgrClassic::root_var(BddEdge e)
 {
   Node* vp = get_node(e);
   if ( vp ) {
-    return vp->varid();
+    return varid(vp->level());
   }
   else {
     // 終端
@@ -418,14 +419,15 @@ BddMgrClassic::alloc_var(VarId varid)
       reg_var(var);
     }
   }
-  Var* var = new Var(varid);
+  ymuint level = varid.val();
+  Var* var = new Var(level);
   if ( var ) {
     reg_var(var);
     ++ mVarNum;
     // varid の昇順になるような位置に挿入する．
     Var** pprev = &mVarTop;
     Var* temp;
-    while ( (temp = *pprev) && temp->varid() < varid ) {
+    while ( (temp = *pprev) && temp->level() < level ) {
       pprev = &(temp->mNext);
       temp = *pprev;
     }
@@ -441,7 +443,7 @@ BddMgrClassic::var_list(list<VarId>& vlist) const
 {
   vlist.clear();
   for (Var* var = mVarTop; var; var = var->mNext) {
-    vlist.push_back(var->varid());
+    vlist.push_back(VarId(var->level()));
   }
   return mVarNum;
 }
@@ -625,7 +627,7 @@ BddMgrClassic::resize(ymuint64 new_size)
       Node* temp;
       for (temp = *tbl; temp; temp = next) {
 	next = temp->mLink;
-	ymuint pos = hash_func3(temp->edge0(), temp->edge1(), temp->varid());
+	ymuint pos = hash_func3(temp->edge0(), temp->edge1(), temp->level());
 	Node*& entry = mNodeTable[pos & mTableSize_1];
 	temp->mLink = entry;
 	entry = temp;
@@ -726,7 +728,7 @@ BddMgrClassic::gc_count() const
 // 同一の節点が存在するか調べ，ない時にのみ新たなノードを確保する
 // 使用メモリ量が上限を越えたら kEdgeInvalid を返す．
 BddEdge
-BddMgrClassic::new_node(Var* var,
+BddMgrClassic::new_node(ymuint level,
 			BddEdge e0,
 			BddEdge e1)
 {
@@ -747,10 +749,9 @@ BddMgrClassic::new_node(Var* var,
   e1.addpol(ans_pol);
 
   // 節点テーブルを探す．
-  VarId index = var->varid();
-  ymuint64 pos = hash_func3(e0, e1, index);
+  ymuint64 pos = hash_func3(e0, e1, level);
   for (Node* temp = mNodeTable[pos & mTableSize_1]; temp; temp = temp->mLink) {
-    if ( temp->edge0() == e0 && temp->edge1() == e1 && temp->var() == var ) {
+    if ( temp->edge0() == e0 && temp->edge1() == e1 && temp->level() == level ) {
       // 同一の節点がすでに登録されている
       return BddEdge(temp, ans_pol);
     }
@@ -765,7 +766,7 @@ BddMgrClassic::new_node(Var* var,
   }
   temp->mEdge0 = e0;
   temp->mEdge1 = e1;
-  temp->mVar = var;
+  temp->mLevel = level;
   temp->mRefMark = 0UL;  // mark = none, link = 0
 
   // 新たなノードを登録する．
@@ -821,16 +822,9 @@ BddMgrClassic::clear_varmark()
 BmcVar*
 BddMgrClassic::var_at(ymuint level) const
 {
-  return var_of(VarId(level));
-}
-
-// varid の変数を取出す．
-BmcVar*
-BddMgrClassic::var_of(VarId varid) const
-{
-  ymuint64 pos = var_hash(varid) & (mVarTableSize - 1);
+  ymuint64 pos = var_hash(level) & (mVarTableSize - 1);
   for (Var* var = mVarHashTable[pos]; var; var = var->mLink) {
-    if ( var->varid() == varid ) {
+    if ( var->level() == level ) {
       return var;
     }
   }
@@ -838,11 +832,18 @@ BddMgrClassic::var_of(VarId varid) const
   return NULL;
 }
 
+// varid の変数を取出す．
+BmcVar*
+BddMgrClassic::var_of(VarId varid) const
+{
+  return var_at(level(varid));
+}
+
 // Var を登録する．
 void
 BddMgrClassic::reg_var(Var* var)
 {
-  ymuint64 pos = var_hash(var->varid()) & (mVarTableSize - 1);
+  ymuint64 pos = var_hash(var->level()) & (mVarTableSize - 1);
   Var*& entry = mVarHashTable[pos];
   var->mLink = entry;
   entry = var;

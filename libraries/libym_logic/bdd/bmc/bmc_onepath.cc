@@ -29,17 +29,17 @@ BddMgrClassic::onepath(BddEdge e)
 
   Node* vp = get_node(e);
   tPol pol = e.pol();
-  Var* var = vp->var();
+  ymuint level = vp->level();
   BddEdge l = vp->edge0(pol);
   BddEdge h = vp->edge1(pol);
   BddEdge result;
   if ( h.is_zero() ) {
     BddEdge chd = onepath(l);
-    result = new_node(var, chd, BddEdge::make_zero());
+    result = new_node(level, chd, BddEdge::make_zero());
   }
   else {
     BddEdge chd = onepath(h);
-    result = new_node(var, BddEdge::make_zero(), chd);
+    result = new_node(level, BddEdge::make_zero(), chd);
   }
   return result;
 }
@@ -87,7 +87,7 @@ BddMgrClassic::sp_step(BddEdge e,
     else if ( llen != -1 && llen < hlen + 1 ) {
       h = BddEdge::make_zero();
     }
-    result = new_node(vp->var(), l, h);
+    result = new_node(vp->level(), l, h);
     sp_assoc[e] = result;
   }
   else {

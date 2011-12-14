@@ -110,7 +110,7 @@ BddMgrClassic::minimal_support(BddEdge l,
   if ( result.is_error() ) {
     BddEdge l0, l1;
     BddEdge u0, u1;
-    Var* var = split(l, u, l0, l1, u0, u1);
+    ymuint level = split(l, u, l0, l1, u0, u1);
 
     // level を含む場合の極小サポート
     BddEdge r_dep = minimal_support(l0, u0);
@@ -122,7 +122,7 @@ BddMgrClassic::minimal_support(BddEdge l,
     // level を含まない場合の極小サポート
     BddEdge r_indep = minimal_support(or_op(l0, l1), and_op(u0, u1));
 
-    result = new_node(var, r_indep, r_dep);
+    result = new_node(level, r_indep, r_dep);
     mMinsupTable->put(l, u, result);
   }
   return result;
@@ -152,9 +152,9 @@ BddMgrClassic::isop_step(BddEdge l,
     // 見つからなかった．
     BddEdge l_0, l_1;
     BddEdge u_0, u_1;
-    Var* var = split(l, u, l_0, l_1, u_0, u_1);
-    BddEdge var_edge = new_node(var, BddEdge::make_zero(), BddEdge::make_one());
-    VarId varid = var->varid();
+    ymuint level = split(l, u, l_0, l_1, u_0, u_1);
+    BddEdge var_edge = new_node(level, BddEdge::make_zero(), BddEdge::make_one());
+    VarId var = varid(level);
     LogExpr p_0;
     BddEdge z_0 = and_op(l_0, ~u_1);
     BddEdge c_0;
@@ -164,7 +164,7 @@ BddMgrClassic::isop_step(BddEdge l,
       if ( !c_0.is_invalid() ) {
 	cc_0 = and_op(c_0, ~var_edge);
 	if ( !cc_0.is_invalid() ) {
-	  p_0 = sop_litand(p_0, varid, kPolNega);
+	  p_0 = sop_litand(p_0, var, kPolNega);
 	}
       }
     }
@@ -177,7 +177,7 @@ BddMgrClassic::isop_step(BddEdge l,
       if ( !c_1.is_invalid() ) {
 	cc_1 = and_op(c_1, var_edge);
 	if ( !cc_1.is_invalid() ) {
-	  p_1 = sop_litand(p_1, varid, kPolPosi);
+	  p_1 = sop_litand(p_1, var, kPolPosi);
 	}
       }
     }
@@ -231,9 +231,9 @@ BddMgrClassic::pc_step(BddEdge l,
     // 見つからなかった．
     BddEdge l_0, l_1;
     BddEdge u_0, u_1;
-    Var* var = split(l, u, l_0, l_1, u_0, u_1);
-    BddEdge var_edge = new_node(var, BddEdge::make_zero(), BddEdge::make_one());
-    VarId varid = var->varid();
+    ymuint level = split(l, u, l_0, l_1, u_0, u_1);
+    BddEdge var_edge = new_node(level, BddEdge::make_zero(), BddEdge::make_one());
+    VarId var(level);
 
     // \bar{x} を含む prime implicants の生成
     LogExpr p_0;
@@ -245,7 +245,7 @@ BddMgrClassic::pc_step(BddEdge l,
       if ( !c_0.is_invalid() ) {
 	cc_0 = and_op(c_0, ~var_edge);
 	if ( !cc_0.is_invalid() ) {
-	  p_0 = sop_litand(p_0, varid, kPolNega);
+	  p_0 = sop_litand(p_0, var, kPolNega);
 	}
       }
     }
@@ -261,7 +261,7 @@ BddMgrClassic::pc_step(BddEdge l,
 	cc_1 = and_op(c_1, var_edge);
       }
     }
-    p_1 = sop_litand(p_1, varid, kPolPosi);
+    p_1 = sop_litand(p_1, var, kPolPosi);
 
     // x/\bar{x} を含まない prime implicants の生成
     LogExpr p_2;
