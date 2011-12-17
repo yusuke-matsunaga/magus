@@ -11,6 +11,8 @@
 
 #include "ym_logic/Zdd.h"
 #include "ym_logic/ZddMgr.h"
+#include "ZddVar.h"
+
 #include "CapOp.h"
 #include "CupOp.h"
 #include "DiffOp.h"
@@ -69,11 +71,11 @@ inline
 ymuint64
 hash_func3(ZddEdge id1,
 	   ZddEdge id2,
-	   VarId var)
+	   ymuint level)
 {
   ymuint64 v1 = id1.hash();
   ymuint64 v2 = id2.hash();
-  ymuint64 id3 = var.val();
+  ymuint64 id3 = level;
   return static_cast<ymuint64>(v1 + (v2 >> 2) + (id3 << 3) - id3);
 }
 
@@ -389,34 +391,9 @@ ZddMgrImpl::cofactor1(ZddEdge e,
   return mCof1Op->apply(e, var);
 }
 
-// @brief 根の節点の変数に基づいてShannon展開を行なう．
-// 戻り値として根の節点の変数番号を返し，その変数を0/1に固定した
-// 時の cofactor をそれぞれ f0, f1 に入れる．
-// もともと定数値(葉)のZDDの場合，kVarIdMax を返し，
-// f0, f1 には自分自身を代入する．
-VarId
-root_decomp(ZddEdge e,
-	      ZddEdge& e0,
-	      ZddEdge& e1);
-
-  /// @brief 根の変数番号インデックスを取り出す．
-  /// @brief 定数節点の場合には kVarIdMax を返す．
-  VarId
-  root_var(ZddEdge e);
-
-  /// @brief 0枝の指している cofactor を返す．
-  /// 定数節点の場合には自分自身を返す．
-  ZddEdge
-  edge0(ZddEdge e);
-
-  /// @brief 1枝の指している cofactor を返す．
-  /// 定数節点の場合には自分自身を返す．
-  ZddEdge
-  edge1(ZddEdge e);
-
-  /// @brief e の参照回数が0なら true を返す．
-  bool
-  check_noref(ZddEdge e);
+/// @brief e の参照回数が0なら true を返す．
+bool
+check_noref(ZddEdge e);
 
 // 節点テーブルを次に拡大する時の基準値を計算する．
 void
@@ -571,7 +548,7 @@ ZddMgrImpl::resize(ymuint64 new_size)
       ZddNode* temp;
       for (temp = *tbl; temp; temp = next) {
 	next = temp->mLink;
-	ymuint pos = hash_func3(temp->edge0(), temp->edge1(), temp->varid());
+	ymuint pos = hash_func3(temp->edge0(), temp->edge1(), temp->level());
 	ZddNode*& entry = mNodeTable[pos & mTableSize_1];
 	temp->mLink = entry;
 	entry = temp;
@@ -669,7 +646,7 @@ ZddMgrImpl::gc_count() const
 // 同一の節点が存在するか調べ，ない時にのみ新たなノードを確保する
 // 使用メモリ量が上限を越えたら kEdgeInvalid を返す．
 ZddEdge
-ZddMgrImpl::new_node(ZddVar* var,
+ZddMgrImpl::new_node(ymuint level,
 		     ZddEdge e0,
 		     ZddEdge e1)
 {
@@ -690,11 +667,10 @@ ZddMgrImpl::new_node(ZddVar* var,
   }
   else {
     // 節点テーブルを探す．
-    VarId index = var->varid();
-    ymuint64 pos = hash_func3(e0, e1, index);
+    ymuint64 pos = hash_func3(e0, e1, level);
     bool found = false;
     for (ZddNode* temp = mNodeTable[pos & mTableSize_1]; temp; temp = temp->mLink) {
-      if ( temp->edge0() == e0 && temp->edge1() == e1 && temp->var() == var ) {
+      if ( temp->edge0() == e0 && temp->edge1() == e1 && temp->level() == level ) {
 	// 同一の節点がすでに登録されている
 	ans = ZddEdge(temp, false);
 	found = true;
@@ -711,7 +687,7 @@ ZddMgrImpl::new_node(ZddVar* var,
       }
       temp->mEdge0 = e0;
       temp->mEdge1 = e1;
-      temp->mVar = var;
+      temp->mLevel = level;
       temp->mRefMark = 0UL;  // mark = none, link = 0
 
       // 新たなノードを登録する．

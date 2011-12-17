@@ -46,8 +46,7 @@ SwapOp::apply(ZddEdge left,
     return ZddEdge::make_overflow();
   }
 
-  mVar = mMgr.var_of(var);
-  mLevel = mVar->level();
+  mLevel = mMgr.level(var);
   mCompTbl.clear();
 
   return swap_step(left);
@@ -64,7 +63,7 @@ SwapOp::swap_step(ZddEdge f)
     return ZddEdge::make_zero();
   }
   else if ( f.is_one() ) {
-    return  mMgr.new_node(mVar, ZddEdge::make_zero(), ZddEdge::make_one());
+    return  mMgr.new_node(mLevel, ZddEdge::make_zero(), ZddEdge::make_one());
   }
   else {
     // この時点で f は終端ではない．
@@ -77,8 +76,7 @@ SwapOp::swap_step(ZddEdge f)
     else {
       // 演算結果テーブルには登録されていない
       ZddNode* f_vp = f.get_node();
-      ZddVar* f_var = f_vp->var();
-      ymuint f_level = f_var->level();
+      ymuint f_level = f_vp->level();
       ZddEdge result;
       if ( f_level < mLevel ) {
 	ZddEdge f_0 = f_vp->edge0();
@@ -92,16 +90,16 @@ SwapOp::swap_step(ZddEdge f)
 	if ( r_1.is_overflow() ) {
 	  return ZddEdge::make_overflow();
 	}
-	result = mMgr.new_node(f_var, r_0, r_1);
+	result = mMgr.new_node(f_level, r_0, r_1);
       }
       else if ( f_level == mLevel ) {
 	ZddEdge f_0 = f_vp->edge0();
 	f_0.add_zattr(f.zattr());
 	ZddEdge f_1 = f_vp->edge1();
-	result = mMgr.new_node(mVar, f_1, f_0);
+	result = mMgr.new_node(f_level, f_1, f_0);
       }
       else {
-	result = mMgr.new_node(mVar, ZddEdge::make_zero(), f);
+	result = mMgr.new_node(mLevel, ZddEdge::make_zero(), f);
       }
       mCompTbl.insert(make_pair(f, result));
       return result;

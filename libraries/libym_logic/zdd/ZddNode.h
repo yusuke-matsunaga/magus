@@ -16,97 +16,11 @@
 BEGIN_NAMESPACE_YM_ZDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class ZddVar ZddNode.h "ZddNode.h"
-/// @brief 変数の情報を格納しておくクラス
-//////////////////////////////////////////////////////////////////////
-class ZddVar
-{
-  friend class ZddMgrImpl;
-
-public:
-
-  // 変数番号を得る．
-  VarId
-  varid() const
-  {
-    return mId;
-  }
-
-  // レベルを得る．
-  ymuint
-  level() const
-  {
-    return mId.val();
-  }
-
-
-private:
-
-  // コンストラクタ
-  ZddVar(VarId id) :
-    mId(id),
-    mMark(0),
-    mLink(NULL)
-  {
-  }
-
-  // デストラクタ
-  ~ZddVar()
-  {
-  }
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 変数番号
-  // レベルも同一
-  VarId mId;
-
-  // 作業用のマーク
-  int mMark;
-
-  // compose用にZDDの枝を入れておくメンバ
-  ZddEdge mCompEdge;
-
-  // 変数リスト中の次の要素を指すポインタ
-  ZddVar* mNext;
-
-  // ハッシュ表中の次の要素を指すポインタ
-  ZddVar* mLink;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 // ZDDのノードを表す構造体
 //////////////////////////////////////////////////////////////////////
 class ZddNode
 {
   friend class ZddMgrImpl;
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 定数の定義
-  // mRefMarkにパックされる情報
-  // 最上位ビットから: tmporary-mark
-  //                   リンクオーバーフロービット
-  //                   残りビットは全てリンク数を表す．
-  //////////////////////////////////////////////////////////////////////
-  static
-  const int kMBit = sizeof(ymuint32) * 8 - 1;
-  static
-  const int kLMaxBit = sizeof(ymuint32) * 8 - 2;
-  static
-  const ymuint32 kMMask = 1UL << kMBit;
-  static
-  const ymuint32 kLMax = 1UL << kLMaxBit;
-  static
-  const ymuint32 kLMax_1 = kLMax - 1;
-  static
-  const ymuint32 kLMask = kLMax | kLMax_1;
 
 public:
 
@@ -118,13 +32,8 @@ public:
   ZddEdge
   edge1() const;
 
-  /// @brief 変数を得る．
-  ZddVar*
-  var() const;
 
-  /// @brief 変数インデックス値を得る
-  VarId
-  varid() const;
+public:
 
   /// @brief レベルを得る．
   ymuint
@@ -184,14 +93,36 @@ private:
   // 1枝
   ZddEdge mEdge1;
 
-  // 変数へのポインタ
-  ZddVar* mVar;
+  // レベル
+  ymuint32 mLevel;
 
-  // 参照回数＋α(上の定数を参照)
+  // 参照回数＋α(下の定数を参照)
   ymuint32 mRefMark;
 
   // 節点テーブル用のリンクポインタ
   ZddNode* mLink;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 定数の定義
+  // mRefMarkにパックされる情報
+  // 最上位ビットから: tmporary-mark
+  //                   リンクオーバーフロービット
+  //                   残りビットは全てリンク数を表す．
+  //////////////////////////////////////////////////////////////////////
+  static
+  const int kMBit = sizeof(ymuint32) * 8 - 1;
+  static
+  const int kLMaxBit = sizeof(ymuint32) * 8 - 2;
+  static
+  const ymuint32 kMMask = 1UL << kMBit;
+  static
+  const ymuint32 kLMax = 1UL << kLMaxBit;
+  static
+  const ymuint32 kLMax_1 = kLMax - 1;
+  static
+  const ymuint32 kLMask = kLMax | kLMax_1;
 
 };
 
@@ -215,28 +146,12 @@ ZddNode::edge1() const
   return mEdge1;
 }
 
-// 変数を得る．
-inline
-ZddVar*
-ZddNode::var() const
-{
-  return mVar;
-}
-
-// 変数インデックス値を得る
-inline
-VarId
-ZddNode::varid() const
-{
-  return mVar->varid();
-}
-
 // レベルを得る
 inline
 ymuint
 ZddNode::level() const
 {
-  return mVar->level();
+  return mLevel;
 }
 
 // mark が付いていたらtrueを返す

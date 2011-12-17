@@ -12,33 +12,23 @@
 
 BEGIN_NAMESPACE_YM_ZDD
 
-// e を根とするBDDの節点数を数える．
-ymuint64
-ZddMgrImpl::size(ZddEdge e)
-{
-  mNum = 0;
-  count1(e);
-  clear_mark(e);
-  return mNum;
-}
-
 // edge list に登録されたBDDの節点数を数える．
 ymuint64
-ZddMgrImpl::size(const list<ZddEdge>& edge_list)
+ZddMgrImpl::node_count(const vector<ZddEdge>& edge_list)
 {
   mNum = 0;
-  for (list<ZddEdge>::const_iterator p = edge_list.begin();
+  for (vector<ZddEdge>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
     count1(*p);
   }
-  for (list<ZddEdge>::const_iterator p = edge_list.begin();
+  for (vector<ZddEdge>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
     clear_mark(*p);
   }
   return mNum;
 }
 
-// size() の下請関数
+// node_count() の下請関数
 void
 ZddMgrImpl::count1(ZddEdge e)
 {

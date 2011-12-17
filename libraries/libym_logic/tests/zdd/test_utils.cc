@@ -50,7 +50,7 @@ check_zdd(ZddMgr& zddmgr,
   }
   cout << endl;
 
-  print(cout, zdd);
+  zdd.print(cout);
 
   return true;
 }

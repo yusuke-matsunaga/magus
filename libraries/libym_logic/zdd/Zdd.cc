@@ -10,19 +10,9 @@
 #include "ym_logic/Zdd.h"
 #include "ym_logic/ZddMgr.h"
 #include "ZddMgrImpl.h"
-#include "Dumper.h"
-
-#include "ym_utils/HeapTree.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
-
-BEGIN_NONAMESPACE
-
-// 入力数がこの値よりも小さかったらヒープ木は使わない．
-const ymuint kNiLimit = 8;
-
-END_NONAMESPACE
 
 
 // @brief mgr, root をセットする時に呼ばれる関数
@@ -226,116 +216,6 @@ Zdd::operator&=(const Zdd& src2)
   return *this;
 }
 
-// 複数のZDDのintersectionを求める．
-Zdd
-intersection(const ZddVector& zdds)
-{
-  ymuint n = zdds.size();
-  if ( n == 0 ) {
-    return ZddMgr::default_mgr().make_base();
-  }
-  if ( n == 1 ) {
-    return zdds[0];
-  }
-  if ( n == 2 ) {
-    return zdds[0] & zdds[1];
-  }
-  if ( n == 3 ) {
-    return zdds[0] & zdds[1] & zdds[2];
-  }
-  if ( n == 4 ) {
-    return zdds[0] & zdds[1] & zdds[2] & zdds[3];
-  }
-
-  Zdd ans;
-  if ( n < kNiLimit ) {
-    ZddVector::const_iterator p = zdds.begin();
-    ans = *p;
-    for (++ p; p != zdds.end(); ++ p) {
-      ans &= *p;
-    }
-  }
-  else {
-    SimpleHeapTree<Zdd> work;
-    for (ZddVector::const_iterator p = zdds.begin();
-	 p != zdds.end(); ++p) {
-      Zdd zdd = *p;
-      work.put(zdd, size(zdd));
-    }
-    ans = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans &= work.getmin();
-      ans = work.xchgmin(ans, size(ans));
-    }
-  }
-  return ans;
-}
-
-// 複数のZDDのintersectionを求める．
-Zdd
-intersection(const ZddList& zdds)
-{
-  ymuint n = zdds.size();
-  if ( n == 0 ) {
-    return ZddMgr::default_mgr().make_base();
-  }
-  if ( n == 1 ) {
-    return zdds.front();
-  }
-  if ( n == 2 ) {
-    ZddList::const_iterator p = zdds.begin();
-    Zdd ans = *p;
-    ++ p;
-    ans &= *p;
-    return ans;
-  }
-  if ( n == 3 ) {
-    ZddList::const_iterator p = zdds.begin();
-    Zdd ans = *p;
-    ++ p;
-    ans &= *p;
-    ++ p;
-    ans &= *p;
-    return ans;
-  }
-  if ( n == 4 ) {
-    ZddList::const_iterator p = zdds.begin();
-    Zdd ans = *p;
-    ++ p;
-    ans &= *p;
-    ++ p;
-    ans &= *p;
-    ++ p;
-    ans &= *p;
-    return ans;
-  }
-
-  Zdd ans;
-  if ( n < kNiLimit ) {
-    ZddList::const_iterator p = zdds.begin();
-    ans = *p;
-    for (++ p; p != zdds.end(); ++ p) {
-      ans &= *p;
-    }
-  }
-  else {
-    SimpleHeapTree<Zdd> work;
-    for (ZddList::const_iterator p = zdds.begin();
-	 p != zdds.end(); ++p) {
-      Zdd zdd = *p;
-      work.put(zdd, size(zdd));
-    }
-    ans = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans &= work.getmin();
-      ans = work.xchgmin(ans, size(ans));
-    }
-  }
-  return ans;
-}
-
 // @brief union 付き代入
 const Zdd&
 Zdd::operator|=(const Zdd& src2)
@@ -352,116 +232,6 @@ Zdd::operator|=(const Zdd& src2)
   }
   assign(ans);
   return *this;
-}
-
-// 複数のZDDのunionを求める．
-Zdd
-set_union(const ZddVector& zdds)
-{
-  ymuint n = zdds.size();
-  if ( n == 0 ) {
-    return ZddMgr::default_mgr().make_empty();
-  }
-  if ( n == 1 ) {
-    return zdds[0];
-  }
-  if ( n == 2 ) {
-    return zdds[0] | zdds[1];
-  }
-  if ( n == 3 ) {
-    return zdds[0] | zdds[1] | zdds[2];
-  }
-  if ( n == 4 ) {
-    return zdds[0] | zdds[1] | zdds[2] | zdds[3];
-  }
-
-  Zdd ans;
-  if ( n < kNiLimit ) {
-    ZddVector::const_iterator p = zdds.begin();
-    ans = *p;
-    for (++ p; p != zdds.end(); ++ p) {
-      ans |= *p;
-    }
-  }
-  else {
-    SimpleHeapTree<Zdd> work;
-    for (ZddVector::const_iterator p = zdds.begin();
-	 p != zdds.end(); ++p) {
-      Zdd zdd = *p;
-      work.put(zdd, size(zdd));
-    }
-    ans = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans |= work.getmin();
-      ans = work.xchgmin(ans, size(ans));
-    }
-  }
-  return ans;
-}
-
-// 複数のZDDのunionを求める．
-Zdd
-set_union(const ZddList& zdds)
-{
-  ymuint n = zdds.size();
-  if ( n == 0 ) {
-    return ZddMgr::default_mgr().make_empty();
-  }
-  if ( n == 1 ) {
-    return zdds.front();
-  }
-  if ( n == 2 ) {
-    ZddList::const_iterator p = zdds.begin();
-    Zdd ans = *p;
-    ++ p;
-    ans |= *p;
-    return ans;
-  }
-  if ( n == 3 ) {
-    ZddList::const_iterator p = zdds.begin();
-    Zdd ans = *p;
-    ++ p;
-    ans |= *p;
-    ++ p;
-    ans |= *p;
-    return ans;
-  }
-  if ( n == 4 ) {
-    ZddList::const_iterator p = zdds.begin();
-    Zdd ans = *p;
-    ++ p;
-    ans |= *p;
-    ++ p;
-    ans |= *p;
-    ++ p;
-    ans |= *p;
-    return ans;
-  }
-
-  Zdd ans;
-  if ( n < kNiLimit ) {
-    ZddList::const_iterator p = zdds.begin();
-    ans = *p;
-    for (++ p; p != zdds.end(); ++ p) {
-      ans |= *p;
-    }
-  }
-  else {
-    SimpleHeapTree<Zdd> work;
-    for (ZddList::const_iterator p = zdds.begin();
-	 p != zdds.end(); ++p) {
-      Zdd zdd = *p;
-      work.put(zdd, size(zdd));
-    }
-    ans = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans |= work.getmin();
-      ans = work.xchgmin(ans, size(ans));
-    }
-  }
-  return ans;
 }
 
 // @brief diff 付き代入
@@ -550,33 +320,23 @@ Zdd::root_decomp(Zdd& f0,
 {
   ZddEdge e0;
   ZddEdge e1;
-  VarId varid = ZddEdge(mRoot).root_decomp(e0, e1);
-  f0 = Zdd(mMgr, e0);
-  f1 = Zdd(mMgr, e1);
-  return varid;
-}
-
-// @brief 根の節点の変数に基づいて展開を行なう．
-// @param[out] e0 0枝
-// @param[out] e1 1枝
-// @return 根の節点の変数番号を返す．
-// @note もともと定数値(葉)のZDDの場合動作は不定
-VarId
-ZddEdge::root_decomp(ZddEdge& e0,
-		     ZddEdge& e1) const
-{
-  ZddNode* node = get_node();
+  ZddEdge e(mRoot);
+  ZddNode* node = e.get_node();
   VarId varid;
   if ( node ) {
     e0 = node->edge0();
-    e0.add_zattr(zattr());
+    e0.add_zattr(e.zattr());
     e1 = node->edge1();
-    varid = node->varid();
+    ymuint level = node->level();
+    varid = mMgr->varid(level);
   }
   else {
-    e0 = *this;
+    e0 = e;
     e1 = ZddEdge::make_zero();
+    varid = kVarIdIllegal;
   }
+  f0 = Zdd(mMgr, e0);
+  f1 = Zdd(mMgr, e1);
   return varid;
 }
 
@@ -584,42 +344,25 @@ ZddEdge::root_decomp(ZddEdge& e0,
 VarId
 Zdd::root_var() const
 {
-  return ZddEdge(mRoot).root_var();
-}
-
-// @brief 根の変数番号の取得
-// @retval 根の変数番号 内部節点の場合
-// @retval kVarIdMax 終端節点の場合
-VarId
-ZddEdge::root_var() const
-{
-  VarId varid;
-  ZddNode* node = get_node();
+  ZddEdge e(mRoot);
+  ZddNode* node = e.get_node();
   if ( node ) {
-    varid = node->varid();
+    ymuint level = node->level();
+    return mMgr->varid(level);
   }
-  return varid;
+  return kVarIdIllegal;
 }
 
 // @brief 0枝の取得
 Zdd
 Zdd::edge0() const
 {
-  ZddEdge ans = ZddEdge(mRoot).edge0();
-  return Zdd(mMgr, ans);
-}
-
-// @brief 0枝の取得
-// @retval 0枝
-// @retval 自分自身 終端節点の場合
-ZddEdge
-ZddEdge::edge0() const
-{
-  ZddNode* node = get_node();
+  ZddEdge e(mRoot);
+  ZddNode* node = e.get_node();
   if ( node ) {
     ZddEdge ans = node->edge0();
-    ans.add_zattr(zattr());
-    return ans;
+    ans.add_zattr(e.zattr());
+    return Zdd(mMgr, ans);
   }
   else {
     return *this;
@@ -630,290 +373,51 @@ ZddEdge::edge0() const
 Zdd
 Zdd::edge1() const
 {
-  ZddEdge ans = ZddEdge(mRoot).edge1();
-  return Zdd(mMgr, ans);
-}
-
-// @brief 1枝の取得
-// @retval 1枝
-// @retval 0 終端節点の場合
-ZddEdge
-ZddEdge::edge1() const
-{
-  ZddNode* node = get_node();
+  ZddEdge e(mRoot);
+  ZddNode* node = e.get_node();
   if ( node ) {
-    return node->edge1();
+    return Zdd(mMgr, node->edge1());
   }
   else {
-    return ZddEdge::make_zero();
+    return Zdd(mMgr, ZddEdge::make_zero());
   }
-}
-
-// @brief ZDD の内容を書き出す．
-ymuint64
-print(ostream& s,
-      const Zdd& zdd)
-{
-  Printer printer(zdd.mMgr, s);
-  printer.print_root(ZddEdge(zdd.mRoot));
-  return printer.num();
-}
-
-// @brief ZDD ベクタの内容を書き出す
-// @param[in] array ZDD ベクタ
-// @param[in] s 出力ストリーム
-ymuint64
-print(ostream& s,
-      const ZddVector& array)
-{
-  if ( array.empty() ) {
-    return 0;
-  }
-  // 今は array の中のZDDのマネージャがすべて同じと仮定している．
-  ZddMgrImpl* mgr = array.front().mMgr;
-  Printer printer(mgr, s);
-  for (ZddVector::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Zdd zdd = *p;
-    printer.print_root(ZddEdge(zdd.mRoot));
-  }
-  return printer.num();
-}
-
-// @brief ZDD リストの内容を書き出す
-// @param[in] array ZDD リスト
-// @param[in] s 出力ストリーム
-ymuint64
-print(ostream& s,
-      const ZddList& array)
-{
-  if ( array.empty() ) {
-    return 0;
-  }
-  // 今は array の中のZDDのマネージャがすべて同じと仮定している．
-  ZddMgrImpl* mgr = array.front().mMgr;
-  Printer printer(mgr, s);
-  for (ZddList::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Zdd zdd = *p;
-    printer.print_root(ZddEdge(zdd.mRoot));
-  }
-  return printer.num();
 }
 
 // @brief ZDD が使っているノード数を数える．
 ymuint64
-size(const Zdd& zdd)
+Zdd::node_count() const
 {
-  return zdd.mMgr->size(ZddEdge(zdd.mRoot));
-}
-
-// @brief ZDD ベクタが使っているノード数を数える．
-// @param[in] array ZDD ベクタ
-// @return ZDD ベクタが使っているノード数
-ymuint64
-size(const ZddVector& array)
-{
-  if ( array.empty() ) {
-    return 0;
-  }
-  list<ZddEdge> edge_list;
-  for (ZddVector::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Zdd zdd = *p;
-    edge_list.push_back(ZddEdge(zdd.mRoot));
-  }
-  // 今は array の中のZDDのマネージャがすべて同じと仮定している．
-  ZddMgrImpl* mgr = array.front().mMgr;
-  return mgr->size(edge_list);
-}
-
-// @brief ZDD リストが使っているノード数を数える．
-// @param[in] array ZDD リスト
-// @return ZDD リストが使っているノード数
-ymuint64
-size(const ZddList& array)
-{
-  if ( array.empty() ) {
-    return 0;
-  }
-  list<ZddEdge> edge_list;
-  for (ZddList::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Zdd zdd = *p;
-    edge_list.push_back(ZddEdge(zdd.mRoot));
-  }
-  // 今は array の中のZDDのマネージャがすべて同じと仮定している．
-  ZddMgrImpl* mgr = array.front().mMgr;
-  return mgr->size(edge_list);
+  return mMgr->node_count(ZddEdge(mRoot));
 }
 
 // @brief 要素数の計算
 mpz_class
-count(const Zdd& zdd)
+Zdd::count() const
 {
-  return zdd.mMgr->count(ZddEdge(zdd.mRoot));
+  return mMgr->count(ZddEdge(mRoot));
 }
 
 // @brief サポート変数集合の計算 (VarVector)
 ymuint
-support(const Zdd& zdd,
-	VarVector& vars)
+Zdd::support(VarVector& vars) const
 {
-  zdd.mMgr->mark_support(ZddEdge(zdd.mRoot));
-  return zdd.mMgr->mark_to_vector(vars);
+  mMgr->mark_support(ZddEdge(mRoot));
+  return mMgr->mark_to_vector(vars);
 }
 
 // @brief サポート変数集合の計算 (VarList)
 ymuint
-support(const Zdd& zdd,
-	VarList& vars)
+Zdd::support(VarList& vars) const
 {
-  zdd.mMgr->mark_support(ZddEdge(zdd.mRoot));
-  return zdd.mMgr->mark_to_list(vars);
+  mMgr->mark_support(ZddEdge(mRoot));
+  return mMgr->mark_to_list(vars);
 }
 
 // @brief サポート変数集合の要素数の計算
 ymuint
-support_size(const Zdd& zdd)
+Zdd::support_size() const
 {
-  return zdd.mMgr->mark_support(ZddEdge(zdd.mRoot));
-}
-
-// @brief ZDD ベクタのサポート変数集合の計算 (VarVector)
-// @param[in] zdd_array ZDD のベクタ
-// @param[in] sup サポート変数集合を格納するベクタ
-// @return サポート変数集合の要素数
-ymuint
-support(const ZddVector& zdd_array,
-	VarVector& sup)
-{
-  if ( zdd_array.empty() ) {
-    sup.clear();
-    return 0;
-  }
-  list<ZddEdge> edge_list;
-  for (ZddVector::const_iterator p = zdd_array.begin();
-       p != zdd_array.end(); ++ p) {
-    Zdd zdd = *p;
-    edge_list.push_back(ZddEdge(zdd.mRoot));
-  }
-  // 今は手抜きで zdd_array 中の ZDD のマネージャは全部同じと仮定している．
-  ZddMgrImpl* mgr = zdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  return mgr->mark_to_vector(sup);
-}
-
-// @brief ZDD ベクタのサポート変数集合の計算 (VarList)
-// @param[in] zdd_array ZDD のベクタ
-// @param[in] sup サポート変数集合を格納するリスト
-// @return サポート変数集合の要素数
-ymuint
-support(const ZddVector& zdd_array,
-	VarList& sup)
-{
-  if ( zdd_array.empty() ) {
-    sup.clear();
-    return 0;
-  }
-  list<ZddEdge> edge_list;
-  for (ZddVector::const_iterator p = zdd_array.begin();
-       p != zdd_array.end(); ++ p) {
-    Zdd zdd = *p;
-    edge_list.push_back(ZddEdge(zdd.mRoot));
-  }
-  // 今は手抜きで zdd_array 中の ZDD のマネージャは全部同じと仮定している．
-  ZddMgrImpl* mgr = zdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  return mgr->mark_to_list(sup);
-}
-
-// @brief ZDD ベクタのサポート変数集合の要素数の計算
-// @param[in] zdd_array ZDD のベクタ
-// @return サポート変数集合の要素数
-ymuint
-support_size(const ZddVector& zdd_array)
-{
-  if ( zdd_array.empty() ) {
-    return 0;
-  }
-  list<ZddEdge> edge_list;
-  for (ZddVector::const_iterator p = zdd_array.begin();
-       p != zdd_array.end(); ++ p) {
-    Zdd zdd = *p;
-    edge_list.push_back(ZddEdge(zdd.mRoot));
-  }
-  // 今は手抜きで zdd_array 中の ZDD のマネージャは全部同じと仮定している．
-  ZddMgrImpl* mgr = zdd_array.front().mMgr;
-  return mgr->mark_support(edge_list);
-}
-
-// @brief ZDD リストのサポート変数集合の計算 (VarVector)
-// @param[in] zdd_array ZDD のリスト
-// @param[in] sup サポート変数集合を格納するベクタ
-// @return サポート変数集合の要素数
-ymuint
-support(const ZddList& zdd_array,
-	VarVector& sup)
-{
-  if ( zdd_array.empty() ) {
-    sup.clear();
-    return 0;
-  }
-  list<ZddEdge> edge_list;
-  for (ZddList::const_iterator p = zdd_array.begin();
-       p != zdd_array.end(); ++ p) {
-    Zdd zdd = *p;
-    edge_list.push_back(ZddEdge(zdd.mRoot));
-  }
-  // 今は手抜きで zdd_array 中の ZDD のマネージャは全部同じと仮定している．
-  ZddMgrImpl* mgr = zdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  return mgr->mark_to_vector(sup);
-}
-
-// @brief ZDD リストのサポート変数集合の計算 (VarList)
-// @param[in] zdd_array ZDD のリスト
-// @param[in] sup サポート変数集合を格納するリスト
-// @return サポート変数集合の要素数
-ymuint
-support(const ZddList& zdd_array,
-	VarList& sup)
-{
-  if ( zdd_array.empty() ) {
-    sup.clear();
-    return 0;
-  }
-  list<ZddEdge> edge_list;
-  for (ZddList::const_iterator p = zdd_array.begin();
-       p != zdd_array.end(); ++ p) {
-    Zdd zdd = *p;
-    edge_list.push_back(ZddEdge(zdd.mRoot));
-  }
-  // 今は手抜きで zdd_array 中の ZDD のマネージャは全部同じと仮定している．
-  ZddMgrImpl* mgr = zdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  return mgr->mark_to_list(sup);
-}
-
-// @brief ZDD リストのサポート変数集合の要素数の計算
-// @param[in] zdd_array ZDD のリスト
-// @return サポート変数集合の要素数
-ymuint
-support_size(const ZddList& zdd_array)
-{
-  if ( zdd_array.empty() ) {
-    return 0;
-  }
-  list<ZddEdge> edge_list;
-  for (ZddList::const_iterator p = zdd_array.begin();
-       p != zdd_array.end(); ++ p) {
-    Zdd zdd = *p;
-    edge_list.push_back(ZddEdge(zdd.mRoot));
-  }
-  // 今は手抜きで zdd_array 中の ZDD のマネージャは全部同じと仮定している．
-  ZddMgrImpl* mgr = zdd_array.front().mMgr;
-  return mgr->mark_support(edge_list);
+  return mMgr->mark_support(ZddEdge(mRoot));
 }
 
 END_NAMESPACE_YM_ZDD

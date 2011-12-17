@@ -25,6 +25,7 @@ public:
 
   /// @brief 空のコンストラクタ
   /// @param[in] mgr BddMgr
+  explicit
   BddList(BddMgr& mgr);
 
   /// @brief デストラクタ

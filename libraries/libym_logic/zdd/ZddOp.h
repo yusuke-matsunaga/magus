@@ -51,13 +51,13 @@ protected:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 根のインデックスにしたがって子供のノードを求める．
+  /// @brief 根のレベルにしたがって子供のノードを求める．
   /// @param[in] f, g オペランド
   /// @param[out] f_0, f_1 f の子供
   /// @param[out] g_0, g_1 g の子供
-  /// @return 根の変数を返す．
+  /// @return 根のレベルを返す．
   static
-  ZddVar*
+  ymuint
   split(ZddEdge f,
 	ZddEdge g,
 	ZddEdge& f_0,
@@ -118,13 +118,13 @@ protected:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 根のインデックスにしたがって子供のノードを求める．
+  /// @brief 根のレベルにしたがって子供のノードを求める．
   /// @param[in] f, g オペランド
   /// @param[out] f_0, f_1 f の子供
   /// @param[out] g_0, g_1 g の子供
-  /// @return 根の変数を返す．
+  /// @return 根のレベルを返す．
   static
-  ZddVar*
+  ymuint
   split(ZddEdge f,
 	ZddEdge g,
 	ZddEdge& f_0,
@@ -155,13 +155,13 @@ protected:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 根のインデックスにしたがって子供のノードを求める．
+// @brief 根のレベルにしたがって子供のノードを求める．
 // @param[in] f, g オペランド
 // @param[out] f_0, f_1 f の子供
 // @param[out] g_0, g_1 g の子供
-// @return 根の変数を返す．
+// @return 根のレベルを返す．
 inline
-ZddVar*
+ymuint
 ZddBinOp::split(ZddEdge f,
 		ZddEdge g,
 		ZddEdge& f_0,
@@ -171,20 +171,16 @@ ZddBinOp::split(ZddEdge f,
 {
   ZddNode* f_vp = f.get_node();
   ZddNode* g_vp = g.get_node();
-  ZddVar* f_var = f_vp->var();
-  ZddVar* g_var = g_vp->var();
-  ymuint f_level = f_var->level();
-  ymuint g_level = g_var->level();
+  ymuint f_level = f_vp->level();
+  ymuint g_level = g_vp->level();
   ymuint level = f_level;
-  ZddVar* var = f_var;
   if ( level > g_level ) {
     level = g_level;
-    var = g_var;
   }
   split1(level, f_level, f, f_vp, f_0, f_1);
   split1(level, g_level, g, g_vp, g_0, g_1);
 
-  return var;
+  return level;
 }
 
 // @brief split() の下請け関数

@@ -9,6 +9,7 @@
 
 #include "ZddMgrImpl.h"
 #include "CompTbl.h"
+#include "ZddVar.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
@@ -25,15 +26,15 @@ ZddMgrImpl::mark_support(ZddEdge e)
 
 // edge_list に含まれる枝を根とするZDDのサポートに印をつける．
 ymuint
-ZddMgrImpl::mark_support(const list<ZddEdge>& edge_list)
+ZddMgrImpl::mark_support(const vector<ZddEdge>& edge_list)
 {
   clear_varmark();
   // サポート変数にマークをつける．
-  for (list<ZddEdge>::const_iterator p = edge_list.begin();
+  for (vector<ZddEdge>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
     sup_step(*p);
   }
-  for (list<ZddEdge>::const_iterator p = edge_list.begin();
+  for (vector<ZddEdge>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
     clear_mark(*p);
   }
@@ -51,7 +52,7 @@ ZddMgrImpl::sup_step(ZddEdge e)
     }
 
     vp->mark(1);
-    ZddVar* v = vp->var();
+    ZddVar* v = var_at(vp->level());
     if ( !v->mMark ) {
       v->mMark = 1;
       mVarSet.push_back(v);

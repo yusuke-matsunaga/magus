@@ -3,178 +3,76 @@
 /// @brief Dumper の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Dumper.cc 700 2007-05-31 00:41:30Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "Dumper.h"
+#include "ym_logic/Zdd.h"
+#include "ym_logic/ZddVector.h"
+#include "ym_logic/ZddList.h"
+#include "ym_logic/ZddMgr.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
 
-//////////////////////////////////////////////////////////////////////
-// IdMgr
-//////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-IdMgr::IdMgr()
-{
-  mNext = 0;
-}
-
-// デストラクタ
-IdMgr::~IdMgr()
-{
-}
-
-// 登録された節点数を返す．
-ymuint64
-IdMgr::num() const
-{
-  return mNext;
-}
-
-// e がすでに ID 番号を持っていたら true を返す．
-bool
-IdMgr::has_id(ZddEdge e) const
-{
-  ZddEdge e_p(e);
-  e_p.normalize();
-  return mMap.count(e_p);
-}
-
-// e の ID 番号を返す．
-// 未登録ならば新しい番号を割り振る．
-ymuint64
-IdMgr::id(ZddEdge e)
-{
-  ZddEdge e_p(e);
-  e_p.normalize();
-  ymuint64 id;
-  hash_map<ZddEdge, ymuint64>::iterator p = mMap.find(e_p);
-  if ( p == mMap.end() ) {
-    id = mNext;
-    ++ mNext;
-    mMap.insert(make_pair(e_p, id));
-  }
-  else {
-    id = p->second;
-  }
-  return id;
-}
-
-// クリアする．
+// @brief 内容のダンプ
 void
-IdMgr::clear()
+Zdd::dump(BinO& s) const
 {
-  mMap.clear();
-  mNext = 0;
+  Dumper dumper(mMgr, s);
+  ZddEdge e(mRoot);
+  dumper.dump(e);
+  dumper.dump_edge(e);
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// Printer
-//////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-Printer::Printer(ZddMgrImpl* mgr,
-		 ostream& s) :
-  mMgr(mgr),
-  mStream(s)
-{
-}
-
-// デストラクタ
-Printer::~Printer()
-{
-}
-
-// e の ID 番号を出力する．
+// @brief ZDD ベクタの内容をダンプする．
+// @param[in] s 出力ストリーム
 void
-Printer::print_id(ZddEdge e)
+ZddVector::dump(BinO& s) const
 {
-  ymuint64 id = mIdMgr.id(e);
-  ios::fmtflags save = mStream.flags();
-  mStream << setw(9) << id;
-  mStream.flags(save);
-}
-
-// e の内容を出力する．
-void
-Printer::print_name(ZddEdge e)
-{
-  if ( e.is_zero() ) {
-    mStream << "     val_0 ";
-  }
-  else if ( e.is_one() ) {
-    mStream << "     val_1 ";
-  }
-  else if ( e.is_error() ) {
-    mStream << "     error ";
-  }
-  else if ( e.is_overflow() ) {
-    mStream << "  overflow ";
-  }
-  else {
-    mStream << " ";
-    print_id(e);
-    bool z = e.zattr();
-    mStream << ((z) ? '*' : ' ');
-  }
-}
-
-// print_root の下請関数
-void
-Printer::print_step(ZddEdge e)
-{
-  if ( e.is_leaf() ) {
+  if ( empty() ) {
     return;
   }
-  ZddEdge e_p(e);
-  e_p.normalize();
-  if ( mMark.count(e_p) ) {
+  // 今は array の中のZDDのマネージャがすべて同じと仮定している．
+  Dumper dumper(mMgr.mImpl, s);
+  for (ZddVector::const_iterator p = begin();
+       p != end(); ++ p) {
+    Zdd zdd = *p;
+    dumper.dump(ZddEdge(zdd.mRoot));
+  }
+  for (ZddVector::const_iterator p = begin();
+       p != end(); ++ p) {
+    Zdd zdd = *p;
+    dumper.dump_edge(ZddEdge(zdd.mRoot));
+  }
+}
+
+// @brief ZDD リストの内容をダンプする．
+// @param[in] s 出力ストリーム
+void
+ZddList::dump(BinO& s) const
+{
+  if ( empty() ) {
     return;
   }
-  mMark.insert(e_p);
-  print_id(e_p);
-  ZddEdge e0;
-  ZddEdge e1;
-  VarId id = e_p.root_decomp(e0, e1);
-  ymuint level = mMgr->level(id);
-  ios::fmtflags save = mStream.flags();
-  mStream << ":IDX=" << setw(3) << id
-	  << ":LVL=" << setw(3) << level
-	  << ": EDGE0=";
-  mStream.flags(save);
-  print_name(e0);
-  mStream << ": EDGE1=";
-  print_name(e1);
-  mStream << endl;
-  print_step(e0);
-  print_step(e1);
-}
-
-// e を根とするZDDの内容を出力する．
-void
-Printer::print_root(ZddEdge e)
-{
-  print_name(e);
-  mStream << "\tmgr: " << mMgr->name() << endl;
-  print_step(e);
-}
-
-// 登録された節点数を返す．
-ymuint64
-Printer::num() const
-{
-  return mIdMgr.num();
+  // 今は array の中のZDDのマネージャがすべて同じと仮定している．
+  Dumper dumper(mMgr.mImpl, s);
+  for (ZddList::const_iterator p = begin();
+       p != end(); ++ p) {
+    Zdd zdd = *p;
+    dumper.dump(ZddEdge(zdd.mRoot));
+  }
+  for (ZddList::const_iterator p = begin();
+       p != end(); ++ p) {
+    Zdd zdd = *p;
+    dumper.dump_edge(ZddEdge(zdd.mRoot));
+  }
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// Dumper
+// クラス Dumper
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
@@ -199,13 +97,14 @@ Dumper::dump(ZddEdge e)
   }
   ZddEdge e_p(e);
   e_p.normalize();
-  ZddEdge e0;
-  ZddEdge e1;
-  VarId varid = e_p.root_decomp(e0, e1);
+  ZddNode* node = e_p.get_node();
+  ymuint level = node->level();
+  ZddEdge e0 = node->edge0();
   dump(e0);
+  ZddEdge e1 = node->edge1();
   dump(e1);
   mIdMgr.id(e_p);
-  mStream << varid << ":";
+  mStream << level << ":";
   dump_edge(e0);
   mStream << ":";
   dump_edge(e1);
@@ -235,93 +134,6 @@ Dumper::dump_edge(ZddEdge e)
     mStream << id;
   }
 #endif
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// Restorer
-//////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-Restorer::Restorer(ZddMgrImpl* mgr,
-		   BinI& s) :
-  mMgr(mgr),
-  mStream(s)
-{
-}
-
-// デストラクタ
-Restorer::~Restorer()
-{
-}
-
-// 読み込む．
-// 読み込んだZDDの根の枝の数を返す．
-// エラーが起きたら 0 を返す．
-ymuint
-Restorer::read()
-{
-#if 0
-  mRootVector.clear();
-  mEdgeVector.clear();
-  char buff[1024];
-  while ( mStream.getline(buff, sizeof(buff), '\n') ) {
-    if ( '0' <= buff[0] && buff[0] <= '9' ) {
-      // 内部のノードの記述
-      char* p = strtok(buff, ": \t");
-      ymuint vid = atoi(p);
-      p = strtok(NULL, ": \t");
-      ZddEdge e0 = find_edge(p);
-      p = strtok(NULL, ": \t");
-      ZddEdge e1 = find_edge(p);
-      ZddEdge ans = mMgr->make_zdd(vid, e0, e1);
-      mEdgeVector.push_back(ans);
-    }
-    else {
-      // 根のノードの記述
-      mRootVector.push_back(find_edge(buff));
-    }
-  }
-#endif
-  return mRootVector.size();
-}
-
-// pos 番目の枝を返す．
-ZddEdge
-Restorer::root(ymuint pos)
-{
-  if ( pos < mRootVector.size() ) {
-    return mRootVector[pos];
-  }
-  return ZddEdge::make_error();
-}
-
-// 内部の枝を指す文字列から枝を得る．
-// 見つからなければ kEdgeError を返す．
-ZddEdge
-Restorer::find_edge(const char* str) const
-{
-#if 0
-  bool negated = false;
-  switch ( str[0] ) {
-  case 'T': return ZddEdge::make_one();
-  case 'F': return ZddEdge::make_zero();
-  case 'E': return ZddEdge::make_error();
-  case 'O': return ZddEdge::make_overflow();
-  case 'P': break;
-  case 'N': negated = true; break;
-  default: return ZddEdge::make_error();
-  }
-  ymuint pos = atoi(str + 1);
-  if ( pos < mEdgeVector.size() ) {
-    ZddEdge ans = mEdgeVector[pos];
-    if ( negated ) {
-      ans.negate();
-    }
-    return ans;
-  }
-#endif
-  return ZddEdge::make_error();
 }
 
 END_NAMESPACE_YM_ZDD

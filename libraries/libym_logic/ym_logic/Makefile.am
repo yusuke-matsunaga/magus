@@ -10,11 +10,15 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	Bdd.h \
+	BddVector.h \
+	BddList.h \
 	BddMgr.h \
 	BddLitSet.h \
 	BddVarSet.h \
 	BddDecomp.h \
 	Zdd.h \
+	ZddVector.h \
+	ZddList.h \
 	ZddMgr.h \
 	Bool3.h \
 	CvFunc.h \

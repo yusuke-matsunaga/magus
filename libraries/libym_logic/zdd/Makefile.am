@@ -26,12 +26,15 @@ libym_logic_zdd_la_CPPFLAGS = \
 libym_logic_zdd_la_SOURCES = \
 	CompTbl.h \
 	CompTbl.cc \
-	Zdd.cc \
 	ZddEdge.h \
+	ZddNode.h \
+	ZddVar.h \
+	Zdd.cc \
+	ZddVector.cc \
+	ZddList.cc \
 	ZddMgr.cc \
 	ZddMgrImpl.h \
 	ZddMgrImpl.cc \
-	ZddNode.h \
 	ZddOp.h \
 	CapOp.h \
 	CapOp.cc \
@@ -47,11 +50,16 @@ libym_logic_zdd_la_SOURCES = \
 	Cof1Op.cc \
 	count.cc \
 	support.cc \
+	IdMgr.h \
+	IdMgr.cc \
+	Printer.h \
+	Printer.cc \
 	Dumper.h \
-	Dumper.cc
+	Dumper.cc \
+	Restorer.h \
+	Restorer.cc
 
-libym_logic_zdd_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_logic_zdd_la_LIBADD =
 
 libym_logic_zdd_la_LDFLAGS =
 

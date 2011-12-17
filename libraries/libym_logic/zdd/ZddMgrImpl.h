@@ -10,7 +10,7 @@
 
 
 #include "ym_logic/Zdd.h"
-#include "ZddNode.h"
+//#include "ZddNode.h"
 #include "CompTbl.h"
 #include "ym_utils/Binder.h"
 
@@ -19,6 +19,8 @@ BEGIN_NAMESPACE_YM_ZDD
 
 class ZddUnOp;
 class ZddBinOp;
+class ZddVar;
+class ZddNode;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ZddMgrImpl ZddMgrImpl.h "ZddMgrImpl.h"
@@ -140,10 +142,6 @@ public:
   void
   dec_rootref(ZddEdge e);
 
-  /// @brief e の参照回数が0なら true を返す．
-  bool
-  check_noref(ZddEdge e);
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -153,7 +151,7 @@ public:
   /// @brief 左右の枝が同じ場合にはその枝自身を返し，それ以外の場合には，
   /// @return 与えられた枝とインデックスを持つノードを返す．
   ZddEdge
-  new_node(ZddVar* var,
+  new_node(ymuint level,
 	   ZddEdge l,
 	   ZddEdge h);
 
@@ -165,11 +163,11 @@ public:
 
   /// @brief e を根とするZDDのノード数を数える．
   ymuint64
-  size(ZddEdge e);
+  node_count(ZddEdge e);
 
   /// @brief edge_list に登録されたZDDのノード数を数える．
   ymuint64
-  size(const list<ZddEdge>& edge_list);
+  node_count(const vector<ZddEdge>& edge_list);
 
   /// @brief ZDD の表す集合の要素数を返す．
   /// 無限長精度の整数(mpz_class)を用いて計算する．
@@ -188,7 +186,7 @@ public:
 
   /// @brief edge_list に登録されたZDDのサポートに印をつける．
   ymuint
-  mark_support(const list<ZddEdge>& edge_list);
+  mark_support(const vector<ZddEdge>& edge_list);
 
   /// @brief 印のついた変数をベクタに変換する．
   ymuint
@@ -631,6 +629,14 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief e を根とするZDDのノード数を数える．
+inline
+ymuint64
+ZddMgrImpl::node_count(ZddEdge e)
+{
+  return node_count(vector<ZddEdge>(1, e));
+}
 
 // @brief ノードのリンク数を増やし，もしロックされていなければロックする
 inline

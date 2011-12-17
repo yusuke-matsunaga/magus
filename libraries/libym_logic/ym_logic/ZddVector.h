@@ -1,41 +1,42 @@
-#ifndef YM_LOGIC_BDDVECTOR_H
-#define YM_LOGIC_BDDVECTOR_H
+#ifndef YM_LOGIC_ZDDVECTOR_H
+#define YM_LOGIC_ZDDVECTOR_H
 
-/// @file ym_logic/BddVector.h
-/// @brief BddVector のヘッダファイル
+/// @file ym_logic/ZddVector.h
+/// @brief ZddVector のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_logic/bdd_nsdef.h"
+#include "ym_logic/zdd_nsdef.h"
+#include "ym_logic/VarId.h"
 
 
-BEGIN_NAMESPACE_YM_BDD
+BEGIN_NAMESPACE_YM_ZDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class BddVector BddVector.h "ym_logic/BddVector.h"
-/// @brief Bdd のベクタを表すクラス
+/// @class ZddVector ZddVector.h "ym_logic/ZddVector.h"
+/// @brief Zdd のベクタを表すクラス
 //////////////////////////////////////////////////////////////////////
-class BddVector :
-  public vector<Bdd>
+class ZddVector :
+  public vector<Zdd>
 {
 public:
 
   /// @brief 空のコンストラクタ
-  /// @param[in] mgr BddMgr
+  /// @param[in] mgr ZddMgr
   explicit
-  BddVector(BddMgr& mgr);
+  ZddVector(ZddMgr& mgr);
 
   /// @brief 要素数を指定したコンストラクタ
-  /// @param[in] mgr BddMgr
+  /// @param[in] mgr ZddMgr
   /// @param[in] n 要素数
-  BddVector(BddMgr& mgr,
+  ZddVector(ZddMgr& mgr,
 	    ymuint n);
 
   /// @brief デストラクタ
-  ~BddVector();
+  ~ZddVector();
 
 
 public:
@@ -43,20 +44,13 @@ public:
   /// @name 要素に対する演算
   /// @{
 
-  /// @brief 要素のBDDの論理積を求める．
-  /// @return 生成された BDD
-  Bdd
-  and_op() const;
+  /// @brief intersection を求める．
+  Zdd
+  intersection() const;
 
-  /// @brief 要素のBDDの論理和を求める．
-  /// @return 生成された BDD
-  Bdd
-  or_op() const;
-
-  /// @brief 要素のBDDの排他的論理和を求める．
-  /// @return 生成された BDD
-  Bdd
-  xor_op() const;
+  /// @brief union を求める．
+  Zdd
+  set_union() const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -91,11 +85,6 @@ public:
   /// @return サポートの要素数
   ymuint
   support(VarList& sup) const;
-
-  /// @brief サポート変数集合の計算 (BddVarSet)
-  /// @return サポート変数集合
-  BddVarSet
-  support() const;
 
   /// @brief サポート変数集合の要素数の計算
   /// @return サポート変数集合の要素数
@@ -145,11 +134,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // BddMgr
-  BddMgr& mMgr;
+  // ZddMgr
+  ZddMgr& mMgr;
 
 };
 
-END_NAMESPACE_YM_BDD
+END_NAMESPACE_YM_ZDD
 
-#endif // YM_LOGIC_BDDVECTOR_H
+#endif // YM_LOGIC_ZDDVECTOR_H

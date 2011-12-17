@@ -47,36 +47,20 @@ BEGIN_NAMESPACE_YM_ZDD
 //////////////////////////////////////////////////////////////////////
 
 class Zdd;
+class ZddVector;
+class ZddList;
 class ZddMgr;
 class ZddMgrParam;
-class ZddMgrImpl;
-class ZddEdge;
-
-
-//////////////////////////////////////////////////////////////////////
-/// @name 型名の定義
-/// @{
-
-/// @brief ZDD のベクタ
-/// @ingroup Zdd
-typedef vector<Zdd> ZddVector;
-
-/// @brief ZDD のリスト
-/// @ingroup Zdd
-typedef list<Zdd> ZddList;
-
-/// @}
-//////////////////////////////////////////////////////////////////////
 
 END_NAMESPACE_YM_ZDD
 
 BEGIN_NAMESPACE_YM
 
 using nsZdd::Zdd;
-using nsZdd::ZddMgr;
-using nsZdd::ZddMgrParam;
 using nsZdd::ZddVector;
 using nsZdd::ZddList;
+using nsZdd::ZddMgr;
+using nsZdd::ZddMgrParam;
 
 END_NAMESPACE_YM
 

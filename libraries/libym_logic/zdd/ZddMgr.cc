@@ -8,9 +8,7 @@
 
 
 #include "ym_logic/ZddMgr.h"
-
 #include "ZddMgrImpl.h"
-#include "Dumper.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
@@ -244,110 +242,6 @@ ymuint64
 ZddMgr::gc_count() const
 {
   return mImpl->gc_count();
-}
-
-// @brief 内容のダンプ
-void
-ZddMgr::dump(BinO& s,
-	     const Zdd& zdd)
-{
-  Dumper dumper(mImpl, s);
-  dumper.dump(ZddEdge(zdd.mRoot));
-  dumper.dump_edge(ZddEdge(zdd.mRoot));
-}
-
-// @brief ZDD ベクタの内容をダンプする．
-// @param[in] s 出力ストリーム
-// @param[in] array ZDD の配列
-void
-ZddMgr::dump(BinO& s,
-	     const ZddVector& array)
-{
-  if ( array.empty() ) {
-    return;
-  }
-  // 今は array の中のZDDのマネージャがすべて同じと仮定している．
-  Dumper dumper(mImpl, s);
-  for (ZddVector::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Zdd zdd = *p;
-    dumper.dump(ZddEdge(zdd.mRoot));
-  }
-  for (ZddVector::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Zdd zdd = *p;
-    dumper.dump_edge(ZddEdge(zdd.mRoot));
-  }
-}
-
-// @brief ZDD リストの内容をダンプする．
-// @param[in] array ZDD のリスト
-// @param[in] s 出力ストリーム
-void
-ZddMgr::dump(BinO& s,
-	     const ZddList& array)
-{
-  if ( array.empty() ) {
-    return;
-  }
-  // 今は array の中のZDDのマネージャがすべて同じと仮定している．
-  Dumper dumper(mImpl, s);
-  for (ZddList::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Zdd zdd = *p;
-    dumper.dump(ZddEdge(zdd.mRoot));
-  }
-  for (ZddList::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Zdd zdd = *p;
-    dumper.dump_edge(ZddEdge(zdd.mRoot));
-  }
-}
-
-// @brief ダンプされた情報を ZDD を読み込む．
-// @param[in] s 入力ストリーム
-// @return 読み込まれた ZDD
-Zdd
-ZddMgr::restore(BinI& s)
-{
-  Restorer restorer(mImpl, s);
-  ymuint n = restorer.read();
-  if ( n != 1 ) {
-    // エラーもしくは複数の ZDD データだった．
-    return make_error();
-  }
-  else {
-    return Zdd(mImpl, restorer.root(0));
-  }
-}
-
-// @brief ダンプされた情報を ZDD ベクタに読み込む．
-// @param[in] s 入力ストリーム
-// @param[in] array 読み込み先の ZDD ベクタ
-void
-ZddMgr::restore(BinI& s,
-		ZddVector& array)
-{
-  Restorer restorer(mImpl, s);
-  ymuint n = restorer.read();
-  array.resize(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    array[i] = Zdd(mImpl, restorer.root(i));
-  }
-}
-
-// @brief ダンプされた情報を ZDD リストに読み込む．
-// @param[in] s 入力ストリーム
-// @param[in] array 読み込み先の ZDD リスト
-void
-ZddMgr::restore(BinI& s,
-		ZddList& array)
-{
-  Restorer restorer(mImpl, s);
-  ymuint n = restorer.read();
-  for (ymuint i = 0; i < n; ++ i) {
-    array.push_back(Zdd(mImpl, restorer.root(i)));
-  }
 }
 
 END_NAMESPACE_YM_ZDD

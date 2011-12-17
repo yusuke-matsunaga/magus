@@ -56,28 +56,28 @@ test_const(ZddMgr& zddmgr)
 {
   Zdd one = zddmgr.make_base();
   if ( !one.is_one() ) {
-    print(cout, one);
+    one.print(cout);
     cout << "ERROR[const-1]: !one.is_one()" << endl;
     return false;
   }
 
   Zdd zero = zddmgr.make_empty();
   if ( !zero.is_zero() ) {
-    print(cout, zero);
+    zero.print(cout);
     cout << "ERROR[const-2]: !zero.is_zero()" << endl;
     return false;
   }
 
   Zdd err = zddmgr.make_error();
   if ( !err.is_error() ) {
-    print(cout, err);
+    err.print(cout);
     cout << "ERROR[const-3]: !err.is_error()" << endl;
     return false;
   }
 
   Zdd ovf = zddmgr.make_overflow();
   if ( !ovf.is_overflow() ) {
-    print(cout, ovf);
+    ovf.print(cout);
     cout << "ERROR[const-4]: !ovf.is_overflow()" << endl;
     return false;
   }

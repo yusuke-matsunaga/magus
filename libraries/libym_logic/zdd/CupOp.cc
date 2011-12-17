@@ -87,7 +87,7 @@ CupOp::cup_step(ZddEdge f,
       // 演算結果テーブルには登録されていない
       ZddEdge f_0, f_1;
       ZddEdge g_0, g_1;
-      ZddVar* var = split(f, g, f_0, f_1, g_0, g_1);
+      ymuint level = split(f, g, f_0, f_1, g_0, g_1);
       ZddEdge r_0 = cup_step(f_0, g_0);
       if ( r_0.is_overflow() ) {
 	return ZddEdge::make_overflow();
@@ -96,7 +96,7 @@ CupOp::cup_step(ZddEdge f,
       if ( r_1.is_overflow() ) {
 	return ZddEdge::make_overflow();
       }
-      ans_e = mMgr.new_node(var, r_0, r_1);
+      ans_e = mMgr.new_node(level, r_0, r_1);
       mCupTable.put(f, g, ans_e);
     }
   }

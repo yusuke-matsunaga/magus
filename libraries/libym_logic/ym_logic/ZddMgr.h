@@ -13,11 +13,13 @@
 #include "ym_logic/zdd_nsdef.h"
 #include "ym_logic/VarId.h"
 #include "ym_utils/Binder.h"
-#include "ym_utils/BinIO.h"
+//#include "ym_utils/BinIO.h"
 #include "gmpxx.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
+
+class ZddMgrImpl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ZddMgrParam ZddMgr.h "ym_logic/ZddMgr.h"
@@ -60,6 +62,8 @@ struct ZddMgrParam
 class ZddMgr
 {
   friend class Zdd;
+  friend class ZddVector;
+  friend class ZddList;
   friend class ZddMgrImpl;
 
 public:
@@ -116,6 +120,7 @@ public:
   /// @name バイナリ入出力関係の関数
   /// @{
 
+#if 0
   /// @brief ZDDの内容をバイナリダンプする．
   /// @param[in] s 出力ストリーム
   /// @param[in] zdd 対象のZDD
@@ -156,7 +161,7 @@ public:
   void
   restore(BinI& s,
 	  ZddList& array);
-
+#endif
   /// @}
   //////////////////////////////////////////////////////////////////////
 

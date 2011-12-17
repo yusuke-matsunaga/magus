@@ -18,6 +18,8 @@
 
 BEGIN_NAMESPACE_YM_ZDD
 
+class ZddMgrImpl;
+
 //////////////////////////////////////////////////////////////////////
 /// @name 定数の定義
 /// @{
@@ -38,6 +40,8 @@ const ymuint kZddLevelMax = 0xFFFFFFFF;
 //////////////////////////////////////////////////////////////////////
 class Zdd
 {
+  friend class ZddVector;
+  friend class ZddList;
   friend class ZddMgr;
   friend class ZddMgrImpl;
 
@@ -246,8 +250,16 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  /// @name 表示/ノード数の計数など
+  /// @name ノード数の計数などの関数
   /// @{
+
+  /// @brief ZDD が使っているノード数を数える．
+  ymuint64
+  node_count() const;
+
+  /// @brief 集合の要素数を数える．
+  mpz_class
+  count() const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -287,8 +299,26 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  /// @name バイナリダンプ関係
+  /// @name サポート関係の関数
   /// @{
+
+  /// @brief サポート変数集合の計算 (VarVector)
+  /// @param[out] support サポート変数集合を格納するベクタ
+  /// @return サポートの要素数
+  ymuint
+  support(VarVector& support) const;
+
+  /// @brief サポート変数集合の計算 (VarList)
+  /// @param[out] support サポート変数集合を格納するリスト
+  /// @return サポートの要素数
+  ymuint
+  support(VarList& support) const;
+
+  /// @brief サポート変数集合の要素数の計算
+  /// @param[in] bdd 対象の BDD
+  /// @return サポート変数集合の要素数
+  ymuint
+  support_size() const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -296,138 +326,36 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  //  friend 関数の宣言
+  /// @name 出力用の関数
+  /// @{
+
+  /// @brief 内容を書き出す．
+  /// @param[in] s 出力ストリーム
+  /// @return ノード数を返す．
+  ymuint64
+  print(ostream& s) const;
+
+  /// @}
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 内容を書き出す
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name バイナリダンプ関係
+  /// @{
+
+  /// @brief ZDD の内容をダンプする．
   /// @param[in] s 出力ストリーム
-  /// @param[in] zdd 対象のZDD
-  /// @return ノード数を返す．
-  friend
-  ymuint64
-  print(ostream& s,
-	const Zdd& zdd);
+  void
+  dump(BinO& s) const;
 
-  /// @brief ZDDの配列の内容を書き出す
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] array ZDD を収めた配列
-  /// @return ノード数を返す．
-  friend
-  ymuint64
-  print(ostream& s,
-	const ZddVector& array);
+  /// @brief バイナリファイルに保存されたZDDを読み込む．
+  /// @param[in] s 入力ストリーム
+  void
+  restore(BinI& s);
 
-  /// @brief ZDDの配列の内容を書き出す
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] array ZDD を収めた配列
-  /// @return ノード数を返す．
-  friend
-  ymuint64
-  print(ostream& s,
-	const ZddList& array);
-
-  /// @brief ZDD が使っているノード数を数える．
-  /// @param[in] zdd 対象のZDD
-  /// @return ZDD が使っているノード数
-  friend
-  ymuint64
-  size(const Zdd& zdd);
-
-  /// @brief ZDDの配列のノード数を数える
-  /// @param[in] array ZDD を収めた配列
-  /// @return 配列全体で使っているノード数
-  friend
-  ymuint64
-  size(const ZddVector& array);
-
-  /// @brief ZDDの配列のノード数を数える
-  /// @param[in] array ZDD を収めた配列
-  /// @return 配列全体で使っているノード数
-  friend
-  ymuint64
-  size(const ZddList& array);
-
-  /// @brief 要素数の計算
-  /// @param[in] zdd 対象のZDD
-  /// @return zdd が表している集合の要素数を返す．
-  friend
-  mpz_class
-  count(const Zdd& zdd);
-
-  /// @brief サポート変数集合の計算 (VarVector)
-  /// @param[in] zdd 対象のZDD
-  /// @param[out] support サポート変数集合を格納するベクタ
-  /// @return サポートの要素数
-  friend
-  ymuint
-  support(const Zdd& zdd,
-	  VarVector& support);
-
-  /// @brief サポート変数集合の計算 (VarList)
-  /// @param[in] zdd 対象のZDD
-  /// @param[out] support サポート変数集合を格納するリスト
-  /// @return サポートの要素数
-  friend
-  ymuint
-  support(const Zdd& zdd,
-	  VarList& support);
-
-  /// @brief ZDD の配列のサポートを求める．
-  /// @param[in] array ZDD を収めた配列
-  /// @param[out] sup サポート変数を収める配列
-  /// @return サポート数を返す．
-  friend
-  ymuint
-  support(const ZddVector& bdd_array,
-	  VarVector& sup);
-
-  /// @brief ZDD の配列のサポートを求める．
-  /// @param[in] array ZDD を収めた配列
-  /// @param[out] sup サポート変数を収めるリスト
-  /// @return サポート数を返す．
-  friend
-  ymuint
-  support(const ZddVector& bdd_array,
-	  VarList& sup);
-
-  /// @brief ZDD のリストのサポートを求める．
-  /// @param[in] array ZDD を収めた配列
-  /// @param[out] sup サポート変数を収める配列
-  /// @return サポート数を返す．
-  friend
-  ymuint
-  support(const ZddList& bdd_array,
-	  VarVector& sup);
-
-  /// @brief ZDD のリストのサポートを求める．
-  /// @param[in] array ZDD を収めた配列
-  /// @param[out] sup サポート変数を収める配列
-  /// @return サポート数を返す．
-  friend
-  ymuint
-  support(const ZddList& bdd_array,
-	  VarList& sup);
-
-  /// @brief サポート変数集合の要素数の計算
-  /// @param[in] zdd 対象のZDD
-  /// @return サポート変数集合の要素数
-  friend
-  ymuint
-  support_size(const Zdd& zdd);
-
-  /// @brief ZDD の配列のサポート数を求める．
-  /// @param[in] array ZDD を収めた配列
-  /// @return サポート数を返す．
-  friend
-  ymuint
-  support_size(const ZddVector& bdd_array);
-
-  /// @brief ZDD のリストのサポート数を求める．
-  /// @param[in] array ZDD を収めた配列
-  /// @return サポート数を返す．
-  friend
-  ymuint
-  support_size(const ZddList& bdd_array);
+  /// @}
+  //////////////////////////////////////////////////////////////////////
 
 
 private:
@@ -516,31 +444,6 @@ bool
 operator!=(const Zdd& left,
 	   const Zdd& right);
 
-/// @relates Zdd
-/// @brief 複数のZDDのintersection (\f$\cap\f$)を求める．
-/// @param[in] zdds ZDD のベクタ
-/// @return 生成された ZDD
-Zdd
-intersection(const ZddVector& zdds);
-
-/// @brief 複数のZDDのintersection (\f$\cap\f$)を求める．
-/// @param[in] zdds ZDD のリスト
-/// @return 生成された ZDD
-Zdd
-intersection(const ZddList& zdds);
-
-/// @brief 複数のZDDのunion (\f$\cup\f$)を求める．
-/// @param[in] zdds ZDD のベクタ
-/// @return 生成された ZDD
-Zdd
-set_union(const ZddVector& zdds);
-
-/// @brief 複数のZDDのunion (\f$cup\f$)を求める．
-/// @param[in] zdds ZDD のリスト
-/// @return 生成された ZDD
-Zdd
-set_union(const ZddList& zdds);
-
 #if 0
 // left が minterms の集合として right に含まれるとき true を返す．
 bool
@@ -558,79 +461,6 @@ operator<(const Zdd& left,
 	  const Zdd& right);
 #endif
 
-#if 0
-/// @brief ZDDの配列の内容を書き出す
-/// @param[in] array ZDD を収めた配列
-/// @param[in] s 出力先のストリーム
-/// @return ノード数を返す．
-ymuint64
-print(const ZddVector& array,
-      ostream& s);
-
-/// @brief ZDDの配列の内容を書き出す
-/// @param[in] array ZDD を収めた配列
-/// @param[in] s 出力先のストリーム
-/// @return ノード数を返す．
-ymuint64
-print(const ZddList& array,
-      ostream& s);
-
-/// @brief ZDDの配列のノード数を数える
-/// @param[in] array ZDD を収めた配列
-/// @return 配列全体で使っているノード数
-ymuint64
-size(const ZddVector& array);
-
-/// @brief ZDDの配列のノード数を数える
-/// @param[in] array ZDD を収めた配列
-/// @return 配列全体で使っているノード数
-ymuint64
-size(const ZddList& array);
-
-/// @brief ZDD の配列のサポートを求める．
-/// @param[in] array ZDD を収めた配列
-/// @param[out] sup サポート変数を収める配列
-/// @return サポート数を返す．
-ymuint
-support(const ZddVector& array,
-	VarVector& sup);
-
-/// @brief ZDD の配列のサポートを求める．
-/// @param[in] array ZDD を収めた配列
-/// @param[out] sup サポート変数を収めるリスト
-/// @return サポート数を返す．
-ymuint
-support(const ZddVector& array,
-	VarList& sup);
-
-/// @brief ZDD の配列のサポート数を求める．
-/// @param[in] array ZDD を収めた配列
-/// @return サポート数を返す．
-ymuint
-support_size(const ZddVector& bdd_array);
-
-/// @brief ZDD のリストのサポートを求める．
-/// @param[in] array ZDD を収めた配列
-/// @param[out] sup サポート変数を収める配列
-/// @return サポート数を返す．
-ymuint
-support(const ZddList& bdd_array,
-	VarVector& sup);
-
-/// @brief ZDD のリストのサポートを求める．
-/// @param[in] array ZDD を収めた配列
-/// @param[out] sup サポート変数を収める配列
-/// @return サポート数を返す．
-ymuint
-support(const ZddList& bdd_array,
-	VarList& sup);
-
-/// @brief ZDD のリストのサポート数を求める．
-/// @param[in] array ZDD を収めた配列
-/// @return サポート数を返す．
-ymuint
-support_size(const ZddList& bdd_array);
-#endif
 /// @}
 //////////////////////////////////////////////////////////////////////
 
