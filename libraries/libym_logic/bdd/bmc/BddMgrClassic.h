@@ -753,36 +753,6 @@ private:
   // BddEdge を操作するクラスメソッド
   //////////////////////////////////////////////////////////////////////
 
-  // p-mark が付いた節点のマークを消す．
-  static
-  void
-  clear_pmark(BddEdge e);
-
-  // n-mark が付いた節点のマークを消す．
-  static
-  void
-  clear_nmark(BddEdge e);
-
-  // vdで示された枝の子孫の全てのマークを消す
-  static
-  void
-  clear_pnmark(BddEdge e);
-
-#if 0
-  // vdの指すノードのマークを調べ，マークされていればtrueを返す．
-  // 枝に極性がなければマークは1種類でいいが，極性があるので，
-  // 肯定の枝から指された場合の p-mark と否定の枝から指された場
-  // 合の n-mark の2種類があるので，枝に応じて切替える．
-  static
-  bool
-  mark(BddEdge vd);
-
-  // vdの指すノードにマークをつける
-  static
-  void
-  setmark(BddEdge vd);
-#endif
-
   // idx が top に等しいときには e の子供を e_0, e_1 にセットする．
   // 等しくなければ e をセットする．
   static
@@ -975,34 +945,6 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-#if 0
-// vdの指すノードのマークを調べ，マークされていればtrueを返す．
-// 枝に極性がなければマークは1種類でいいが，極性があるので，
-// 肯定の枝から指された場合の p-mark と否定の枝から指された場
-// 合の n-mark の2種類があるので，枝に応じて切替える．
-inline
-bool
-BddMgrClassic::mark(BddEdge vd)
-{
-  BddNode* vp = get_node(vd);
-  return ( vd.pol() == kPolPosi ) ? vp->pmark() : vp->nmark();
-}
-
-// vdの指すノードにマークをつける
-inline
-void
-BddMgrClassic::setmark(BddEdge vd)
-{
-  BddNode* vp = get_node(vd);
-  if ( vd.pol() == kPolPosi ) {
-    vp->pmark(1);
-  }
-  else {
-    vp->nmark(1);
-  }
-}
-#endif
 
 // idx が top に等しいときには e の子供を e_0, e_1 にセットする．
 // 等しくなければ e をセットする．

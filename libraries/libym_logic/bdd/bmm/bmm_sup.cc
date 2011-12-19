@@ -27,7 +27,7 @@ BddMgrModern::mark_support(const vector<BddEdge>& edge_list)
   for (vector<BddEdge>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
     BddEdge e = *p;
-    e.clear_mark();
+    clear_mark(e);
   }
   return mVarSet.size();
 }
@@ -127,7 +127,7 @@ BddMgrModern::SCC(BddEdge e)
   // サポートを使って SCC を求める．
   clear_varmark();
   scc_step(e, sup);
-  e.clear_mark();
+  clear_mark(e);
 
   BddEdge ans = BddEdge::make_one();
   for (list<BmmVar*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {

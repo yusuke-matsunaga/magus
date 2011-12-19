@@ -988,49 +988,4 @@ BddMgrClassic::deallocate(void* ptr,
 #endif
 }
 
-// p_mark が付いた節点のマークを消す．
-void
-BddMgrClassic::clear_pmark(BddEdge e)
-{
-  for ( ; ; ) {
-    BddNode* vp = e.get_node();
-    if ( !vp || !vp->pmark() ) {
-      break;
-    }
-    vp->pmark(0);
-    clear_pmark(vp->edge0());
-    e = vp->edge1();
-  }
-}
-
-// scan で付けた n-mark を消す．
-void
-BddMgrClassic::clear_nmark(BddEdge e)
-{
-  for ( ; ; ) {
-    BddNode* vp = e.get_node();
-    if ( !vp || !vp->nmark() ) {
-      break;
-    }
-    vp->nmark(0);
-    clear_nmark(vp->edge0());
-    e = vp->edge1();
-  }
-}
-
-// 各ノードについたマークを再帰的にクリアする
-void
-BddMgrClassic::clear_pnmark(BddEdge e)
-{
-  for ( ; ; ) {
-    BddNode* vp = e.get_node();
-    if ( !vp || !(vp->pmark() || vp->nmark()) ) {
-      break;
-    }
-    vp->rst_mark();
-    clear_pnmark(vp->edge0());
-    e = vp->edge1();
-  }
-}
-
 END_NAMESPACE_YM_BDD

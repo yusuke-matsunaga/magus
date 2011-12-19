@@ -1001,9 +1001,14 @@ ZddMgrImpl::deallocate(void* ptr,
 #endif
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// ZddEdge に関連する関数
+//////////////////////////////////////////////////////////////////////
+
 // 節点のマークを消す．
 void
-ZddMgrImpl::clear_mark(ZddEdge e)
+clear_mark(ZddEdge e)
 {
   for ( ; ; ) {
     ZddNode* vp = e.get_node();

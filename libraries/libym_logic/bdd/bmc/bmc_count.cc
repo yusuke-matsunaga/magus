@@ -32,7 +32,7 @@ BddMgrClassic::node_count(const vector<BddEdge>& edge_list)
   }
   for (vector<BddEdge>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
-    clear_pnmark(*p);
+    clear_mark(*p);
   }
   return mNum;
 }

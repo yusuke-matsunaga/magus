@@ -415,26 +415,6 @@ private:
 	     ymuint64 size);
 
 
-  //////////////////////////////////////////////////////////////////////
-  // ZddEdge を操作するクラスメソッド
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief mark が付いた節点のマークを消す．
-  static
-  void
-  clear_mark(ZddEdge e);
-
-  /// @brief vdの指すノードのマークを調べ，マークされていればtrueを返す．
-  static
-  bool
-  mark(ZddEdge vd);
-
-  /// @brief vdの指すノードにマークをつける
-  static
-  void
-  setmark(ZddEdge vd);
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -636,6 +616,14 @@ ymuint64
 ZddMgrImpl::node_count(ZddEdge e)
 {
   return node_count(vector<ZddEdge>(1, e));
+}
+
+// @brief e を根とするZDDのサポートに印をつける．
+inline
+ymuint
+ZddMgrImpl::mark_support(ZddEdge e)
+{
+  return mark_support(vector<ZddEdge>(1, e));
 }
 
 // @brief ノードのリンク数を増やし，もしロックされていなければロックする

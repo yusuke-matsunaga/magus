@@ -14,16 +14,6 @@
 
 BEGIN_NAMESPACE_YM_ZDD
 
-// eを根とするZDDのサポートに印をつける．
-ymuint
-ZddMgrImpl::mark_support(ZddEdge e)
-{
-  clear_varmark();
-  sup_step(e);
-  clear_mark(e);
-  return mVarSet.size();
-}
-
 // edge_list に含まれる枝を根とするZDDのサポートに印をつける．
 ymuint
 ZddMgrImpl::mark_support(const vector<ZddEdge>& edge_list)

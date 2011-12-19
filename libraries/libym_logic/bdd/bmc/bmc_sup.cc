@@ -26,7 +26,7 @@ BddMgrClassic::mark_support(const vector<BddEdge>& edge_list)
   }
   for (vector<BddEdge>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
-    clear_pnmark(*p);
+    clear_mark(*p);
   }
   return mVarSet.size();
 }
@@ -127,7 +127,7 @@ BddMgrClassic::SCC(BddEdge e)
 
   // サポートを用いて SCC を計算する．
   scc_step(e, sup);
-  e.clear_mark();
+  clear_mark(e);
 
   BddEdge ans = BddEdge::make_one();
   for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {

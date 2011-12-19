@@ -45,14 +45,17 @@ BddEdge::set_mark()
 
 // @brief マークを消す．
 void
-BddEdge::clear_mark()
+clear_mark(BddEdge e)
 {
-  BddNode* node = get_node();
-  if ( node &&
-       ( node->pmark() || node->nmark() ) ) {
+  for ( ; ; ) {
+    BddNode* node = e.get_node();
+    if ( !node ||
+	 ( !node->pmark() && !node->nmark() ) ) {
+      break;
+    }
     node->rst_mark();
-    node->edge0().clear_mark();
-    node->edge1().clear_mark();
+    clear_mark(node->edge0());
+    e = node->edge1();
   }
 }
 
