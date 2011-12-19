@@ -22,6 +22,8 @@ class BddNode
 {
   friend class BddMgrImpl;
   friend class BddMgrClassic;
+  friend class BddMgrModern;
+  friend class BmmVar;
 
 private:
 

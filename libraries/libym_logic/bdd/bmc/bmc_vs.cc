@@ -31,8 +31,8 @@ BddMgrClassic::vscap(BddEdge e1,
     return BddEdge::make_error();
   }
 
-  Node* node1 = get_node(e1);
-  Node* node2 = get_node(e2);
+  BddNode* node1 = e1.get_node();
+  BddNode* node2 = e2.get_node();
   ymuint level1 = node1->level();
   ymuint level2 = node2->level();
   for ( ; ; ) {
@@ -45,7 +45,7 @@ BddMgrClassic::vscap(BddEdge e1,
       if ( e1.is_one() ) {
 	return BddEdge::make_one();
       }
-      node1 = get_node(e1);
+      node1 = e1.get_node();
       level1 = node1->level();
     }
     else { // level1 > level2
@@ -53,7 +53,7 @@ BddMgrClassic::vscap(BddEdge e1,
       if ( e2.is_one() ) {
 	return BddEdge::make_one();
       }
-      node2 = get_node(e2);
+      node2 = e2.get_node();
       level2 = node2->level();
     }
   }
@@ -80,8 +80,8 @@ BddMgrClassic::vsdiff(BddEdge e1,
     return e1;
   }
 
-  Node* node1 = get_node(e1);
-  Node* node2 = get_node(e2);
+  BddNode* node1 = e1.get_node();
+  BddNode* node2 = e2.get_node();
   ymuint level1 = node1->level();
   ymuint level2 = node2->level();
   for ( ; ; ) {
@@ -94,7 +94,7 @@ BddMgrClassic::vsdiff(BddEdge e1,
       if ( e2 == BddEdge::make_one() ) {
 	return e1;
       }
-      node2 = get_node(e2);
+      node2 = e2.get_node();
       level2 = node2->level();
     }
     else {
@@ -106,8 +106,8 @@ BddMgrClassic::vsdiff(BddEdge e1,
       if ( e2.is_one() ) {
 	return e1;
       }
-      node1 = get_node(e1);
-      node2 = get_node(e2);
+      node1 = e1.get_node();
+      node2 = e2.get_node();
       level1 = node1->level();
       level2 = node2->level();
     }
@@ -132,8 +132,8 @@ BddMgrClassic::vsintersect(BddEdge e1,
     return false;
   }
 
-  Node* node1 = get_node(e1);
-  Node* node2 = get_node(e2);
+  BddNode* node1 = e1.get_node();
+  BddNode* node2 = e2.get_node();
   ymuint level1 = node1->level();
   ymuint level2 = node2->level();
   for ( ; ; ) {
@@ -145,7 +145,7 @@ BddMgrClassic::vsintersect(BddEdge e1,
       if ( e1.is_one() ) {
 	return false;
       }
-      node1 = get_node(e1);
+      node1 = e1.get_node();
       level1 = node1->level();
     }
     else {
@@ -153,7 +153,7 @@ BddMgrClassic::vsintersect(BddEdge e1,
       if ( e2.is_one() ) {
 	return false;
       }
-      node2 = get_node(e2);
+      node2 = e2.get_node();
       level2 = node2->level();
     }
   }

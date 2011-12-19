@@ -42,7 +42,7 @@ void
 BddMgrClassic::count1(BddEdge e)
 {
   for ( ; ; ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     if ( vp == 0 || vp->pmark() ) {
       return;
     }
@@ -101,7 +101,7 @@ BddMgrClassic::mterm_step(BddEdge e,
     return 0;
   }
 
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   tPol pol = e.pol();
   ymuint ref = vp->refcount();
   if ( ref != 1 ) {
@@ -138,7 +138,7 @@ BddMgrClassic::mterm_step(BddEdge e,
     return 0;
   }
 
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   tPol pol = e.pol();
   ymuint ref = vp->refcount();
   if ( ref != 1 ) {
@@ -182,7 +182,7 @@ BddMgrClassic::walsh0(BddEdge e,
     // 値の範囲が int に収まるのなら int 版の関数を呼ぶ．
     n_invect_int = 1U << n;
 
-    hash_map<Node*, ymint> result_map;
+    hash_map<BddNode*, ymint> result_map;
     ymuint result = wt0_step(e, result_map);
 
     return mpz_class(result);
@@ -190,7 +190,7 @@ BddMgrClassic::walsh0(BddEdge e,
   else {
     n_invect = mpz_class(1U) << n;
 
-    hash_map<Node*, mpz_class> result_map;
+    hash_map<BddNode*, mpz_class> result_map;
     mpz_class result = wt0_step(e, result_map);
 
     return result;
@@ -200,7 +200,7 @@ BddMgrClassic::walsh0(BddEdge e,
 // Walsh spectrumの0次の係数を求める処理
 mpz_class
 BddMgrClassic::wt0_step(BddEdge e,
-			hash_map<Node*, mpz_class>& result_map)
+			hash_map<BddNode*, mpz_class>& result_map)
 {
   if ( e.is_zero() ) {
     return n_invect;
@@ -210,11 +210,11 @@ BddMgrClassic::wt0_step(BddEdge e,
   }
 
   // まずハッシュ表を探す．
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   tPol pol = e.pol();
   ymuint ref = vp->refcount();
   if ( ref != 1 ) {
-    hash_map<Node*, mpz_class>::iterator p = result_map.find(vp);
+    hash_map<BddNode*, mpz_class>::iterator p = result_map.find(vp);
     if ( p != result_map.end() ) {
       if ( pol == kPolPosi ) {
 	return p->second;
@@ -246,7 +246,7 @@ BddMgrClassic::wt0_step(BddEdge e,
 // こちらは int 版
 ymint
 BddMgrClassic::wt0_step(BddEdge e,
-			hash_map<Node*, ymint>& result_map)
+			hash_map<BddNode*, ymint>& result_map)
 {
   if ( e.is_zero() ) {
     return static_cast<ymint>(n_invect_int);
@@ -256,11 +256,11 @@ BddMgrClassic::wt0_step(BddEdge e,
   }
 
   // まずハッシュ表を探す．
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   tPol pol = e.pol();
   ymuint ref = vp->refcount();
   if ( ref != 1 ) {
-    hash_map<Node*, ymint>::iterator p = result_map.find(vp);
+    hash_map<BddNode*, ymint>::iterator p = result_map.find(vp);
     if ( p != result_map.end() ) {
       if ( pol == kPolPosi ) {
 	return p->second;
@@ -307,7 +307,7 @@ BddMgrClassic::walsh1(BddEdge e,
     // 値の範囲が int に収まるのなら int 版の関数を呼ぶ．
     n_invect_int = 1U << n;
 
-    hash_map<Node*, ymint> result_map;
+    hash_map<BddNode*, ymint> result_map;
     ymint result = wt1_step(e, result_map);
 
     return mpz_class(result);
@@ -315,7 +315,7 @@ BddMgrClassic::walsh1(BddEdge e,
   else {
     n_invect = mpz_class(1U) << n;
 
-    hash_map<Node*, mpz_class> result_map;
+    hash_map<BddNode*, mpz_class> result_map;
     mpz_class result = wt1_step(e, result_map);
 
     return result;
@@ -325,13 +325,13 @@ BddMgrClassic::walsh1(BddEdge e,
 // Walsh spectrumの1次の係数を求める処理
 mpz_class
 BddMgrClassic::wt1_step(BddEdge e,
-			hash_map<Node*, mpz_class>& result_map)
+			hash_map<BddNode*, mpz_class>& result_map)
 {
   if ( e.is_const() ) {
     return 0;
   }
 
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   ymuint level = vp->level();
   if ( level > w_level ) {
     return 0;
@@ -341,7 +341,7 @@ BddMgrClassic::wt1_step(BddEdge e,
   tPol pol = e.pol();
   ymuint ref = vp->refcount();
   if ( ref != 1 ) {
-    hash_map<Node*, mpz_class>::iterator p = result_map.find(vp);
+    hash_map<BddNode*, mpz_class>::iterator p = result_map.find(vp);
     if ( p != result_map.end() ) {
       if ( pol == kPolPosi ) {
 	return p->second;
@@ -381,13 +381,13 @@ BddMgrClassic::wt1_step(BddEdge e,
 // int 版
 ymint
 BddMgrClassic::wt1_step(BddEdge e,
-			hash_map<Node*, ymint>& result_map)
+			hash_map<BddNode*, ymint>& result_map)
 {
   if ( e.is_const() ) {
     return 0;
   }
 
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   ymuint level = vp->level();
   if ( level > w_level ) {
     return 0;
@@ -397,7 +397,7 @@ BddMgrClassic::wt1_step(BddEdge e,
   tPol pol = e.pol();
   ymuint ref = vp->refcount();
   if ( ref != 1 ) {
-    hash_map<Node*, int>::iterator p = result_map.find(vp);
+    hash_map<BddNode*, int>::iterator p = result_map.find(vp);
     if ( p != result_map.end() ) {
       if ( pol == kPolPosi ) {
 	return p->second;

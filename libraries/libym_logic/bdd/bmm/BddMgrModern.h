@@ -12,7 +12,7 @@
 #include "ym_logic/Bdd.h"
 
 #include "base/BddMgrImpl.h"
-#include "BddNode.h"
+#include "base/BddNode.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -22,7 +22,6 @@ BEGIN_NAMESPACE_YM_BDD
 //////////////////////////////////////////////////////////////////////
 
 class BmmVar;
-class BmmNode;
 class BmmCompTbl;
 class BmmCompTbl1;
 class BmmCompTbl2;
@@ -37,7 +36,6 @@ class BddMgrModern :
   public BddMgrImpl
 {
 public:
-  typedef BmmVar Var;
   typedef BmmCompTbl CompTbl;
   typedef BmmCompTbl1 CompTbl1;
   typedef BmmCompTbl2 CompTbl2;
@@ -510,13 +508,13 @@ public:
   //
   //////////////////////////////////////////////////////////////////////
 
-  Var*
+  BmmVar*
   alloc_var(VarId varid);
 
   // 左右の枝が同じ場合にはその枝自身を返し，それ以外の場合には，
   // 与えられた枝とインデックスを持つノードを返す．
   BddEdge
-  new_node(Var* var,
+  new_node(ymuint level,
 	   BddEdge l,
 	   BddEdge h);
 
@@ -710,16 +708,16 @@ public:
   clear_varmark();
 
   // level の変数を取り出す．
-  Var*
+  BmmVar*
   var_at(ymuint level) const;
 
   // varid の変数を取出す．
-  Var*
+  BmmVar*
   var_of(VarId varid) const;
 
   // Var を登録する．
   void
-  reg_var(Var* var);
+  reg_var(BmmVar* var);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -740,13 +738,13 @@ public:
 
   // 変数テーブル用のメモリを確保する．
   // size はバイト単位ではなくエントリ数．
-  Var**
+  BmmVar**
   alloc_vartable(ymuint64 size);
 
   // 変数テーブル用のメモリを解放する．
   // size はバイト単位ではなくエントリ数
   void
-  dealloc_vartable(Var** table,
+  dealloc_vartable(BmmVar** table,
 		   ymuint64 size);
 
   // 節点テーブル用のメモリを確保する．
@@ -782,6 +780,7 @@ public:
   // BddEdge を操作するクラスメソッド
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   // p-mark が付いた節点のマークを消す．
   static
   void
@@ -809,6 +808,7 @@ public:
   static
   void
   setmark(BddEdge vd);
+#endif
 
   // idx が top に等しいときには e の子供を e_0, e_1 にセットする．
   // 等しくなければ e をセットする．
@@ -886,7 +886,7 @@ private:
 
   // レベルをキーにして変数のポインタを格納している配列
   // 必要に応じて拡張される．
-  Var** mVarTable;
+  BmmVar** mVarTable;
 
   // mVarTable 用に確保されたサイズ(単位はエントリ数)
   ymuint32 mVarTableSize;
@@ -895,7 +895,7 @@ private:
   ymuint32 mVarNum;
 
   // 変数番号をキーにして変数のポインタを格納しているハッシュ表
-  Var** mVarHashTable;
+  BmmVar** mVarHashTable;
 
 
   //////////////////////////////////////////////////////////////////////
@@ -983,7 +983,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // サポート演算中で用いられる作業領域
-  list<Var*> mVarSet;
+  list<BmmVar*> mVarSet;
 
   // dump/size で節点数を数えるための作業領域
   ymuint64 mNum;

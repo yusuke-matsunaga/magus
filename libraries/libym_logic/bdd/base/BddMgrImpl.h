@@ -633,6 +633,17 @@ public:
   logstream() const;
 
 
+protected:
+
+  /// @brief ノードのリンク数を増やし，もしロックされていなければロックする
+  void
+  activate(BddEdge vd);
+
+  /// @brief ノードのリンク数を減らし，他のリンクがなければロックを外す
+  void
+  deactivate(BddEdge vd);
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
@@ -645,14 +656,6 @@ private:
 	   ymuint32 size,
 	   const vector<BddEdge>& var_vector,
 	   ymuint var_idx);
-
-  /// @brief ノードのリンク数を増やし，もしロックされていなければロックする
-  void
-  activate(BddEdge vd);
-
-  /// @brief ノードのリンク数を減らし，他のリンクがなければロックを外す
-  void
-  deactivate(BddEdge vd);
 
   /// @brief vp と vp の子孫のノードをロックする
   void

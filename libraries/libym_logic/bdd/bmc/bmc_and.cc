@@ -202,8 +202,8 @@ BddMgrClassic::check_intersect(BddEdge f,
 
   BddEdge result = mIntTable->get(f, g);
   if ( result.is_error() ) {
-    Node* f_vp = get_node(f);
-    Node* g_vp = get_node(g);
+    BddNode* f_vp = f.get_node();
+    BddNode* g_vp = g.get_node();
     ymuint f_level = f_vp->level();
     ymuint g_level = g_vp->level();
     BddEdge f_0, f_1;

@@ -8,6 +8,7 @@
 
 
 #include "BddMgrModern.h"
+#include "BmmVar.h"
 #include "BmmCompTbl.h"
 
 #if !defined(__SUNPRO_CC) || __SUNPRO_CC >= 0x500
@@ -69,11 +70,11 @@ inline
 ymuint64
 hash_func3(BddEdge id1,
 	   BddEdge id2,
-	   VarId var)
+	   ymuint level)
 {
   ymuint64 v1 = id1.hash();
   ymuint64 v2 = id2.hash();
-  ymuint64 id3 = var.val();
+  ymuint64 id3 = level;
   return v1 + (v2 >> 2) + (id3 << 3) - id3;
 }
 
@@ -197,8 +198,8 @@ BddMgrModern::~BddMgrModern()
   dealloc_nodetable(mNodeTable, mTableSize);
 
   // 節点用のメモリブロックの解放
-  for (Node* blk = mTopBlk; blk; ) {
-    Node* temp = blk;
+  for (BddNode* blk = mTopBlk; blk; ) {
+    BddNode* temp = blk;
     blk = temp->mLink;
     dealloc_nodechunk(temp);
   }
@@ -230,14 +231,15 @@ BddMgrModern::~BddMgrModern()
 BddEdge
 BddMgrModern::make_posiliteral(VarId varid)
 {
-  Var* var = var_of(varid);
+  BmmVar* var = var_of(varid);
   if ( !var ) {
     var = alloc_var(varid);
     if ( !var ) {
       return BddEdge::make_overflow();
     }
   }
-  return new_node(var, BddEdge::make_zero(), BddEdge::make_one());
+  ymuint level = var->level();
+  return new_node(level, BddEdge::make_zero(), BddEdge::make_one());
 }
 
 // bdd が正リテラルのみのキューブの時，真となる．
@@ -260,7 +262,7 @@ BddMgrModern::check_posi_cube(BddEdge e)
   }
 
   for ( ; ; ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     tPol pol = e.pol();
     BddEdge e0 = vp->edge0(pol);
     BddEdge e1 = vp->edge1(pol);
@@ -294,7 +296,7 @@ BddMgrModern::check_cube(BddEdge e)
   }
 
   for ( ; ; ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     tPol pol = e.pol();
     BddEdge e0 = vp->edge0(pol);
     BddEdge e1 = vp->edge1(pol);
@@ -321,12 +323,12 @@ BddMgrModern::root_decomp(BddEdge e,
 			  BddEdge& e1)
 {
   tPol pol = e.pol();
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   if ( vp ) {
     e0 = vp->edge0(pol);
     e1 = vp->edge1(pol);
-    VarId varid = vp->varid();
-    return varid;
+    ymuint level = vp->level();
+    return varid(level);
   }
   else {
     // 終端節点の時にはコファクターも自分自身
@@ -340,9 +342,10 @@ BddMgrModern::root_decomp(BddEdge e,
 VarId
 BddMgrModern::root_var(BddEdge e)
 {
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   if ( vp ) {
-    return vp->varid();
+    ymuint level = vp->level();
+    return varid(level);
   }
   else {
     // 終端
@@ -355,7 +358,7 @@ BddMgrModern::root_var(BddEdge e)
 BddEdge
 BddMgrModern::edge0(BddEdge e)
 {
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   if ( vp ) {
     tPol pol = e.pol();
     return vp->edge0(pol);
@@ -371,7 +374,7 @@ BddMgrModern::edge0(BddEdge e)
 BddEdge
 BddMgrModern::edge1(BddEdge e)
 {
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   if ( vp ) {
     tPol pol = e.pol();
     return vp->edge1(pol);
@@ -387,7 +390,7 @@ BddMgrModern::edge1(BddEdge e)
 bool
 BddMgrModern::check_noref(BddEdge e)
 {
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   return vp && vp->noref();
 }
 
@@ -407,17 +410,17 @@ BddMgrModern::alloc_var(VarId varid)
 {
   if ( mVarTableSize == mVarNum ) {
     ymuint64 new_size = mVarTableSize << 1;
-    Var** new_table = alloc_vartable(new_size);
+    BmmVar** new_table = alloc_vartable(new_size);
     if ( !new_table ) {
       return NULL;
     }
-    Var** new_hash = alloc_vartable(new_size);
+    BmmVar** new_hash = alloc_vartable(new_size);
     if ( !new_hash ) {
       dealloc_vartable(new_table, new_size);
       return NULL;
     }
     for (ymuint i = 0; i < mVarNum; ++ i) {
-      Var* var = mVarTable[i];
+      BmmVar* var = mVarTable[i];
       new_table[i] = var;
       reg_var(var);
     }
@@ -428,7 +431,7 @@ BddMgrModern::alloc_var(VarId varid)
     mVarTableSize = new_size;
   }
   assert_cond(mVarTableSize > mVarNum, __FILE__, __LINE__);
-  Var* var = new Var(this, varid);
+  BmmVar* var = new BmmVar(this, varid);
   if ( var ) {
     reg_var(var);
     mVarTable[mVarNum] = var;
@@ -454,7 +457,7 @@ BddMgrModern::var_list(list<VarId>& vlist) const
 ymuint
 BddMgrModern::level(VarId varid) const
 {
-  Var* v = var_of(varid);
+  BmmVar* v = var_of(varid);
   return v->level();
 }
 
@@ -462,7 +465,7 @@ BddMgrModern::level(VarId varid) const
 VarId
 BddMgrModern::varid(ymuint level) const
 {
-  Var* v = var_at(level);
+  BmmVar* v = var_at(level);
   return v->varid();
 }
 
@@ -541,11 +544,11 @@ BddMgrModern::gc(bool shrink_nodetable)
     }
   }
   else {
-    Node** ptr = mNodeTable;
-    Node** end = mNodeTable + mTableSize;
+    BddNode** ptr = mNodeTable;
+    BddNode** end = mNodeTable + mTableSize;
     do {
-      Node* temp;
-      Node** prev = ptr;
+      BddNode* temp;
+      BddNode** prev = ptr;
       while ( (temp = *prev) ) {
 	if ( temp->noref() ) {
 	  // どこからも参照されていないノードは節点テーブルから除く
@@ -567,10 +570,10 @@ BddMgrModern::gc(bool shrink_nodetable)
   // その時には，このブロックに含まれるノードはフリーリストから除かなければ
   // ならない．
   mFreeTop = NULL;
-  Node** prev = &mFreeTop;
-  Node** prev_blk = &mTopBlk;
+  BddNode** prev = &mFreeTop;
+  BddNode** prev_blk = &mTopBlk;
   int delete_num = 0;
-  for (Node* blk; (blk = *prev_blk);  ) {
+  for (BddNode* blk; (blk = *prev_blk);  ) {
     if ( scan_nodechunk(blk, NODE_UNIT, prev) ) {
       *prev_blk = blk->mLink;
       dealloc_nodechunk(blk);
@@ -637,28 +640,28 @@ BddMgrModern::resize(ymuint64 new_size)
 {
   logstream() << "BddMgrModern::resize(" << new_size << ")" << endl;
 
-  Node** new_table = alloc_nodetable(new_size);
+  BddNode** new_table = alloc_nodetable(new_size);
   if ( !new_table ) {
     // アロケーションに失敗した．
     return false;
   }
 
   ymuint64 old_size = mTableSize;
-  Node** old_table = mNodeTable;
+  BddNode** old_table = mNodeTable;
   mNodeTable = new_table;
   mTableSize = new_size;
   mTableSize_1 = mTableSize - 1;
   set_next_limit_size();
-  Node** tbl = old_table;
+  BddNode** tbl = old_table;
   if ( tbl ) {
-    Node** end = tbl + old_size;
+    BddNode** end = tbl + old_size;
     do {
-      Node* next;
-      Node* temp;
+      BddNode* next;
+      BddNode* temp;
       for (temp = *tbl; temp; temp = next) {
 	next = temp->mLink;
-	ymuint64 pos = hash_func3(temp->edge0(), temp->edge1(), temp->varid());
-	Node*& entry = mNodeTable[pos & mTableSize_1];
+	ymuint64 pos = hash_func3(temp->edge0(), temp->edge1(), temp->level());
+	BddNode*& entry = mNodeTable[pos & mTableSize_1];
 	temp->mLink = entry;
 	entry = temp;
       }
@@ -758,7 +761,7 @@ BddMgrModern::gc_count() const
 // 同一の節点が存在するか調べ，ない時にのみ新たなノードを確保する
 // 使用メモリ量が上限を越えたら kEdgeInvalid を返す．
 BddEdge
-BddMgrModern::new_node(Var* var,
+BddMgrModern::new_node(ymuint level,
 		       BddEdge e0,
 		       BddEdge e1)
 {
@@ -778,10 +781,12 @@ BddMgrModern::new_node(Var* var,
   e0.addpol(ans_pol);
   e1.addpol(ans_pol);
 
-  Node* temp;
+  BddNode* temp;
   ymuint64 pos;
+  BmmVar* var = NULL;
   // 節点テーブルを探す．
   if ( is_reorderable() ) {
+    var = var_at(level);
     pos = hash_func2(e0, e1);
     for (temp = var->mNodeTable[pos & var->mTableSize_1]; temp;
 	 temp = temp->mLink) {
@@ -792,11 +797,11 @@ BddMgrModern::new_node(Var* var,
     }
   }
   else {
-    VarId index = var->varid();
-    pos = hash_func3(e0, e1, index);
+    pos = hash_func3(e0, e1, level);
     for (temp = mNodeTable[pos & mTableSize_1]; temp; temp = temp->mLink) {
-      if ( temp->edge0() == e0 && temp->edge1() == e1 &&
-	   temp->var() == var ) {
+      if ( temp->edge0() == e0 &&
+	   temp->edge1() == e1 &&
+	   temp->level() == level ) {
 	// 同一の節点がすでに登録されている
 	goto already_exist;
       }
@@ -812,7 +817,7 @@ BddMgrModern::new_node(Var* var,
   }
   temp->mEdge0 = e0;
   temp->mEdge1 = e1;
-  temp->mVar = var;
+  temp->mLevel = level;
   temp->mRefMark = 0UL;  // mark = none, link = 0
 
   // 新たなノードを登録する．
@@ -824,14 +829,14 @@ BddMgrModern::new_node(Var* var,
       // ノード数が制限値を越えたのでテーブルを2倍に拡張する
       resize(mTableSize << 1);
     }
-    Node*& entry = mNodeTable[pos & mTableSize_1];
+    BddNode*& entry = mNodeTable[pos & mTableSize_1];
     temp->mLink = entry;
     entry = temp;
   }
 
  already_exist:
 
-  BddEdge ans = combine(temp, ans_pol);
+  BddEdge ans(temp, ans_pol);
 
   return ans;
 }
@@ -881,7 +886,7 @@ BmmVar*
 BddMgrModern::var_of(VarId varid) const
 {
   ymuint64 pos = var_hash(varid) & (mVarTableSize - 1);
-  for (Var* var = mVarHashTable[pos]; var; var = var->mLink) {
+  for (BmmVar* var = mVarHashTable[pos]; var; var = var->mLink) {
     if ( var->varid() == varid ) {
       return var;
     }
@@ -892,37 +897,26 @@ BddMgrModern::var_of(VarId varid) const
 
 // Var を登録する．
 void
-BddMgrModern::reg_var(Var* var)
+BddMgrModern::reg_var(BmmVar* var)
 {
   ymuint64 pos = var_hash(var->varid()) & (mVarTableSize - 1);
-  Var*& entry = mVarHashTable[pos];
+  BmmVar*& entry = mVarHashTable[pos];
   var->mLink = entry;
   entry = var;
 }
 
-// ノードをロックする．
-// もし，子孫のノードがアンロックの状態ならばロックする
-// 無駄な関数呼び出しを避けるため，この関数を呼び出す前に，
-// このノードがロックされていないことを確認してあるものとする．
+// @brief lockall() 用のフック
 void
-BddMgrModern::lockall(Node* vp)
+BddMgrModern::lock_hook(BddNode* vp)
 {
   -- mGarbageNum;
-  activate(vp->edge0());
-  activate(vp->edge1());
 }
 
-// ノードをアンロックする．
-// もし，子孫のノードがこのノード以外から参照されていない場合には，
-// そのノードもアンロックする
-// 無駄な関数呼び出しを避けるため，この関数を呼び出す前に，
-// このノードがロックされていたことは確認してあるものとする．
+// @brief unlockall() 用のフック
 void
-BddMgrModern::unlockall(Node* vp)
+BddMgrModern::unlock_hook(BddNode* vp)
 {
   ++ mGarbageNum;
-  deactivate(vp->edge0());
-  deactivate(vp->edge1());
 }
 
 // 演算結果テーブルを登録する．
@@ -934,10 +928,10 @@ BddMgrModern::add_table(CompTbl* tbl)
 }
 
 // 節点を確保する．
-BmmNode*
+BddNode*
 BddMgrModern::alloc_node()
 {
-  Node* temp;
+  BddNode* temp;
 
   if ( (temp = mFreeTop) ) {
     // フリーリストに節点があったのでそれを取り出す．
@@ -976,15 +970,15 @@ BddMgrModern::alloc_node()
 // ただし，チャンク全体が参照されていなかった場合にはフリーリストには
 // つながない．その場合には true を返す．
 bool
-BddMgrModern::scan_nodechunk(Node* blk,
+BddMgrModern::scan_nodechunk(BddNode* blk,
 			     ymuint64 blk_size,
-			     Node**& prev)
+			     BddNode**& prev)
 {
-  Node** prev_orig = prev;
+  BddNode** prev_orig = prev;
   bool can_delete = true;
   // メモリブロックの先頭のノードは次のブロックを指すポインタとして
   // 使っているのでスキャンから除外する．
-  Node* temp = &blk[1];
+  BddNode* temp = &blk[1];
   for (ymuint64 i = 1; i < blk_size; ++ i, ++ temp) {
     if ( temp->noref() ) {
       *prev = temp;
@@ -1005,61 +999,61 @@ BddMgrModern::scan_nodechunk(Node* blk,
 BmmVar**
 BddMgrModern::alloc_vartable(ymuint64 size)
 {
-  ymuint64 byte_size = sizeof(Var*) * size;
+  ymuint64 byte_size = sizeof(BmmVar*) * size;
   void* ptr = allocate(byte_size);
   if ( ptr ) {
     memset(ptr, 0, byte_size);
   }
-  return static_cast<Var**>(ptr);
+  return static_cast<BmmVar**>(ptr);
 }
 
 // 変数テーブル用のメモリを解放する．
 // size はバイト単位ではなくエントリ数
 void
-BddMgrModern::dealloc_vartable(Var** table,
+BddMgrModern::dealloc_vartable(BmmVar** table,
 			       ymuint64 size)
 {
-  ymuint64 byte_size = sizeof(Var*) * size;
+  ymuint64 byte_size = sizeof(BmmVar*) * size;
   deallocate(table, byte_size);
 }
 
 // 節点テーブル用のメモリを確保する．
 // size はバイト単位ではなくエントリ数
-BmmNode**
+BddNode**
 BddMgrModern::alloc_nodetable(ymuint64 size)
 {
-  ymuint64 byte_size = sizeof(Node*) * size;
+  ymuint64 byte_size = sizeof(BddNode*) * size;
   void* ptr = allocate(byte_size);
   if ( ptr ) {
     memset(ptr, 0, byte_size);
   }
-  return static_cast<Node**>(ptr);
+  return static_cast<BddNode**>(ptr);
 }
 
 // 節点テーブル用のメモリを解放する．
 // size はバイト単位ではなくエントリ数
 void
-BddMgrModern::dealloc_nodetable(Node** table,
+BddMgrModern::dealloc_nodetable(BddNode** table,
 				ymuint64 size)
 {
-  ymuint64 byte_size = sizeof(Node*) * size;
+  ymuint64 byte_size = sizeof(BddNode*) * size;
   deallocate(table, byte_size);
 }
 
 // 節点チャンク用のメモリを確保する．
-BmmNode*
+BddNode*
 BddMgrModern::alloc_nodechunk()
 {
-  const ymuint64 byte_size = sizeof(Node) * NODE_UNIT;
+  const ymuint64 byte_size = sizeof(BddNode) * NODE_UNIT;
   void* ptr = allocate(byte_size);
-  return static_cast<Node*>(ptr);
+  return static_cast<BddNode*>(ptr);
 }
 
 // 節点チャンク用のメモリを解放する．
 void
-BddMgrModern::dealloc_nodechunk(Node* chunk)
+BddMgrModern::dealloc_nodechunk(BddNode* chunk)
 {
-  const ymuint64 byte_size = sizeof(Node) * NODE_UNIT;
+  const ymuint64 byte_size = sizeof(BddNode) * NODE_UNIT;
   deallocate(chunk, byte_size);
 }
 
@@ -1124,12 +1118,13 @@ BddMgrModern::deallocate(void* ptr,
 #endif
 }
 
+#if 0
 // p_mark が付いた節点のマークを消す．
 void
 BddMgrModern::clear_pmark(BddEdge e)
 {
   for ( ; ; ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     if ( !vp || !vp->pmark() ) {
       break;
     }
@@ -1144,7 +1139,7 @@ void
 BddMgrModern::clear_nmark(BddEdge e)
 {
   for ( ; ; ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     if ( !vp || !vp->nmark() ) {
       break;
     }
@@ -1159,7 +1154,7 @@ void
 BddMgrModern::clear_pnmark(BddEdge e)
 {
   for ( ; ; ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     if ( !vp || !(vp->pmark() || vp->nmark()) ) {
       break;
     }
@@ -1168,5 +1163,6 @@ BddMgrModern::clear_pnmark(BddEdge e)
     e = vp->edge1();
   }
 }
+#endif
 
 END_NAMESPACE_YM_BDD

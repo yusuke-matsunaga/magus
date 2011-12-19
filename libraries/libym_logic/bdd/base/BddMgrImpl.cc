@@ -17,6 +17,45 @@
 
 BEGIN_NAMESPACE_YM_BDD
 
+// @brief マークを返す．
+bool
+BddEdge::mark() const
+{
+  BddNode* node = get_node();
+  if ( pol() == kPolPosi ) {
+    return node->pmark();
+  }
+  else {
+    return node->nmark();
+  }
+}
+
+// @brief マークをつける．
+void
+BddEdge::set_mark()
+{
+  BddNode* node = get_node();
+  if ( pol() == kPolPosi ) {
+    node->pmark(1);
+  }
+  else {
+    node->nmark(1);
+  }
+}
+
+// @brief マークを消す．
+void
+BddEdge::clear_mark()
+{
+  BddNode* node = get_node();
+  if ( node &&
+       ( node->pmark() || node->nmark() ) ) {
+    node->rst_mark();
+    node->edge0().clear_mark();
+    node->edge1().clear_mark();
+  }
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス BddMgrImpl

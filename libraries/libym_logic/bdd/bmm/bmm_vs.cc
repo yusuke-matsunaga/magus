@@ -31,34 +31,30 @@ BddMgrModern::vscap(BddEdge e1,
     return BddEdge::make_error();
   }
 
-  Node* node1 = get_node(e1);
-  Node* node2 = get_node(e2);
-  Var* var1 = node1->var();
-  Var* var2 = node2->var();
-  ymuint level1 = var1->level();
-  ymuint level2 = var2->level();
+  BddNode* node1 = e1.get_node();
+  BddNode* node2 = e2.get_node();
+  ymuint level1 = node1->level();
+  ymuint level2 = node2->level();
   for ( ; ; ) {
     if ( level1 == level2 ) {
       BddEdge tmp = vscap(node1->edge1(), node2->edge1());
-      return new_node(var1, BddEdge::make_zero(), tmp);
+      return new_node(level1, BddEdge::make_zero(), tmp);
     }
     else if ( level1 < level2 ) {
       e1 = node1->edge1();
       if ( e1.is_one() ) {
 	return BddEdge::make_one();
       }
-      node1 = get_node(e1);
-      var1 = node1->var();
-      level1 = var1->level();
+      node1 = e1.get_node();
+      level1 = node1->level();
     }
     else { // level1 > level2
       e2 = node2->edge1();
       if ( e2.is_one() ) {
 	return BddEdge::make_one();
       }
-      node2 = get_node(e2);
-      var2 = node2->var();
-      level2 = var2->level();
+      node2 = e2.get_node();
+      level2 = node2->level();
     }
   }
 }
@@ -84,25 +80,22 @@ BddMgrModern::vsdiff(BddEdge e1,
     return e1;
   }
 
-  Node* node1 = get_node(e1);
-  Node* node2 = get_node(e2);
-  Var* var1 = node1->var();
-  Var* var2 = node2->var();
-  ymuint level1 = var1->level();
-  ymuint level2 = var2->level();
+  BddNode* node1 = e1.get_node();
+  BddNode* node2 = e2.get_node();
+  ymuint level1 = node1->level();
+  ymuint level2 = node2->level();
   for ( ; ; ) {
     if ( level1 < level2 ) {
       BddEdge tmp = vsdiff(node1->edge1(), e2);
-      return new_node(var1, BddEdge::make_zero(), tmp);
+      return new_node(level1, BddEdge::make_zero(), tmp);
     }
     if ( level1 > level2 ) {
       e2 = node2->edge1();
       if ( e2 == BddEdge::make_one() ) {
 	return e1;
       }
-      node2 = get_node(e2);
-      var2 = node2->var();
-      level2 = var2->level();
+      node2 = e2.get_node();
+      level2 = node2->level();
     }
     else {
       e1 = node1->edge1();
@@ -113,12 +106,10 @@ BddMgrModern::vsdiff(BddEdge e1,
       if ( e2.is_one() ) {
 	return e1;
       }
-      node1 = get_node(e1);
-      node2 = get_node(e2);
-      var1 = node1->var();
-      var2 = node2->var();
-      level1 = var1->level();
-      level2 = var2->level();
+      node1 = e1.get_node();
+      node2 = e2.get_node();
+      level1 = node1->level();
+      level2 = node2->level();
     }
   }
 }
@@ -141,8 +132,8 @@ BddMgrModern::vsintersect(BddEdge e1,
     return false;
   }
 
-  Node* node1 = get_node(e1);
-  Node* node2 = get_node(e2);
+  BddNode* node1 = e1.get_node();
+  BddNode* node2 = e2.get_node();
   ymuint level1 = node1->level();
   ymuint level2 = node2->level();
   for ( ; ; ) {
@@ -154,7 +145,7 @@ BddMgrModern::vsintersect(BddEdge e1,
       if ( e1.is_one() ) {
 	return false;
       }
-      node1 = get_node(e1);
+      node1 = e1.get_node();
       level1 = node1->level();
     }
     else {
@@ -162,7 +153,7 @@ BddMgrModern::vsintersect(BddEdge e1,
       if ( e2.is_one() ) {
 	return false;
       }
-      node2 = get_node(e2);
+      node2 = e2.get_node();
       level2 = node2->level();
     }
   }

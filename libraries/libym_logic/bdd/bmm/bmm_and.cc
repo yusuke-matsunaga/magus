@@ -66,10 +66,10 @@ BddMgrModern::and_step(BddEdge f,
     // 演算結果テーブルには登録されていない
     BddEdge f_0, f_1;
     BddEdge g_0, g_1;
-    Var* var = split(f, g, f_0, f_1, g_0, g_1);
+    ymuint level = split(f, g, f_0, f_1, g_0, g_1);
     BddEdge r_0 = and_step(f_0, g_0);
     BddEdge r_1 = and_step(f_1, g_1);
-    result = new_node(var, r_0, r_1);
+    result = new_node(level, r_0, r_1);
     mAndTable->put(f, g, result);
   }
 
@@ -142,10 +142,10 @@ BddMgrModern::xor_step(BddEdge f,
   if ( result.is_error() ) {
     BddEdge f_0, f_1;
     BddEdge g_0, g_1;
-    Var* var = split(f, g, f_0, f_1, g_0, g_1);
+    ymuint level = split(f, g, f_0, f_1, g_0, g_1);
     BddEdge r_0 = xor_step(f_0, g_0);
     BddEdge r_1 = xor_step(f_1, g_1);
-    result = new_node(var, r_0, r_1);
+    result = new_node(level, r_0, r_1);
     mXorTable->put(f, g, result);
   }
 
@@ -201,12 +201,10 @@ BddMgrModern::check_intersect(BddEdge f,
 
   BddEdge result = mIntTable->get(f, g);
   if ( result.is_error() ) {
-    Node* f_vp = get_node(f);
-    Node* g_vp = get_node(g);
-    Var* f_var = f_vp->var();
-    Var* g_var = g_vp->var();
-    ymuint f_level = f_var->level();
-    ymuint g_level = g_var->level();
+    BddNode* f_vp = f.get_node();
+    BddNode* g_vp = g.get_node();
+    ymuint f_level = f_vp->level();
+    ymuint g_level = g_vp->level();
     BddEdge f_0, f_1;
     BddEdge g_0, g_1;
     if ( f_level < g_level ) {

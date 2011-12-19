@@ -988,7 +988,7 @@ BddMgrClassic::dealloc_nodetable(BddNode** table,
 BddNode*
 BddMgrClassic::alloc_nodechunk()
 {
-  const ymuint64 byte_size = sizeof(Node) * NODE_UNIT;
+  const ymuint64 byte_size = sizeof(BddNode) * NODE_UNIT;
   void* ptr = allocate(byte_size);
   return static_cast<BddNode*>(ptr);
 }
@@ -997,7 +997,7 @@ BddMgrClassic::alloc_nodechunk()
 void
 BddMgrClassic::dealloc_nodechunk(BddNode* chunk)
 {
-  const ymuint64 byte_size = sizeof(Node) * NODE_UNIT;
+  const ymuint64 byte_size = sizeof(BddNode) * NODE_UNIT;
   deallocate(chunk, byte_size);
 }
 

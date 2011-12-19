@@ -36,7 +36,7 @@ void
 BddMgrClassic::sup_step(BddEdge e)
 {
   for ( ; ; ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     if ( vp == 0 || vp->pmark() ) {
       return;
     }
@@ -127,7 +127,7 @@ BddMgrClassic::SCC(BddEdge e)
 
   // サポートを用いて SCC を計算する．
   scc_step(e, sup);
-  clear_pnmark(e);
+  e.clear_mark();
 
   BddEdge ans = BddEdge::make_one();
   for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
@@ -151,7 +151,7 @@ BddMgrClassic::scc_step(BddEdge e,
   if ( e.is_one() ) {
     while ( !s.is_one() ) {
       assert_cond(!s.is_zero(), __FILE__, __LINE__);
-      Node* svp = get_node(s);
+      BddNode* svp = s.get_node();
       Var* svar = var_at(svp->level());
       svar->mMark |= 3;
       s = svp->edge1();
@@ -159,12 +159,12 @@ BddMgrClassic::scc_step(BddEdge e,
     return;
   }
 
-  Node* vp = get_node(e);
-  if ( vp && !mark(e) ) {
-    setmark(e);
+  BddNode* vp = e.get_node();
+  if ( vp && !e.mark() ) {
+    e.set_mark();
     ymuint level = vp->level();
     Var* var = var_at(level);
-    Node* svp = get_node(s);
+    BddNode* svp = s.get_node();
     ymuint s_level = svp->level();
     BddEdge s2 = svp->edge1();
     if ( s_level < level ) {
@@ -208,12 +208,12 @@ BddMgrClassic::esmooth(BddEdge e1,
   clear_varmark();
   mLastLevel = 0;
   {
-    Node* vp = get_node(e2);
+    BddNode* vp = e2.get_node();
     while ( vp != 0 ) {
       mLastLevel = vp->level();
       Var* var = var_at(mLastLevel);
       var->mMark = 1;
-      vp = get_node(vp->edge1());
+      vp = vp->edge1().get_node();
     }
   }
   BddEdge ans = esmooth_step(e1);
@@ -229,7 +229,7 @@ BddMgrClassic::esmooth_step(BddEdge e)
     return e;
   }
 
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   ymuint level = vp->level();
   if ( level > mLastLevel ) {
     return e;
@@ -273,12 +273,12 @@ BddMgrClassic::and_exist(BddEdge e1,
   clear_varmark();
   mLastLevel = 0;
   {
-    Node* vp = get_node(e3);
+    BddNode* vp = e3.get_node();
     while ( vp != 0 ) {
       mLastLevel = vp->level();
       Var* var = var_at(mLastLevel);
       var->mMark = 1;
-      vp = get_node(vp->edge1());
+      vp = vp->edge1().get_node();
     }
   }
   BddEdge ans = andexist_step(e1, e2);
@@ -311,8 +311,8 @@ BddMgrClassic::andexist_step(BddEdge f,
     g = tmp;
   }
 
-  Node* f_vp = get_node(f);
-  Node* g_vp = get_node(g);
+  BddNode* f_vp = f.get_node();
+  BddNode* g_vp = g.get_node();
   tPol f_pol = f.pol();
   tPol g_pol = g.pol();
   ymuint f_level = f_vp->level();

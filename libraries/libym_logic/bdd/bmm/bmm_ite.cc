@@ -9,6 +9,7 @@
 
 #include "BddMgrModern.h"
 #include "BmmCompTbl.h"
+#include "BmmVar.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -69,15 +70,12 @@ BddMgrModern::ite_op(BddEdge f,
   g.addpol(ans_pol);
   h.addpol(ans_pol);
 
-  Node* f_vp = get_node(f);
-  Node* g_vp = get_node(g);
-  Node* h_vp = get_node(h);
-  Var* f_var = f_vp->var();
-  Var* g_var = g_vp->var();
-  Var* h_var = h_vp->var();
-  ymuint f_level = f_var->level();
-  ymuint g_level = g_var->level();
-  ymuint h_level = h_var->level();
+  BddNode* f_vp = f.get_node();
+  BddNode* g_vp = g.get_node();
+  BddNode* h_vp = h.get_node();
+  ymuint f_level = f_vp->level();
+  ymuint g_level = g_vp->level();
+  ymuint h_level = h_vp->level();
 
   BddEdge result;
 
@@ -85,12 +83,12 @@ BddMgrModern::ite_op(BddEdge f,
   if ( f_vp->edge0(f_pol).is_zero() &&
        f_vp->edge1(f_pol).is_one() &&
        f_level < g_level && f_level < h_level ) {
-    result = new_node(f_var, h, g);
+    result = new_node(f_level, h, g);
   }
   else if ( f_vp->edge0(f_pol).is_one() &&
 	    f_vp->edge1(f_pol).is_zero() &&
 	    f_level < g_level && f_level < h_level ) {
-    result = new_node(f_var, g, h);
+    result = new_node(f_level, g, h);
   }
   else {
     result = mIteTable->get(f, g, h);
@@ -98,14 +96,11 @@ BddMgrModern::ite_op(BddEdge f,
       tPol g_pol = g.pol();
       tPol h_pol = h.pol();
       ymuint top = f_level;
-      Var* var = f_var;
       if ( top > g_level) {
 	top = g_level;
-	var = g_var;
       }
       if ( top > h_level ) {
 	top = h_level;
-	var = h_var;
       }
       BddEdge f_0, f_1;
       BddEdge g_0, g_1;
@@ -115,7 +110,7 @@ BddMgrModern::ite_op(BddEdge f,
       split1(top, h_level, h, h_vp, h_pol, h_0, h_1);
       BddEdge r_0 = ite_op(f_0, g_0, h_0);
       BddEdge r_1 = ite_op(f_1, g_1, h_1);
-      result = new_node(var, r_0, r_1);
+      result = new_node(top, r_0, r_1);
       mIteTable->put(f, g, h, result);
     }
   }
@@ -136,7 +131,7 @@ void
 BddMgrModern::compose_reg(VarId id,
 			  BddEdge e)
 {
-  Var* var = var_of(id);
+  BmmVar* var = var_of(id);
   if ( var ) {
     var->mMark = 1;
     var->mCompEdge = e;
@@ -170,9 +165,9 @@ BddMgrModern::compose_step(BddEdge f)
     return f;
   }
 
-  Node* f_vp = get_node(f);
-  Var* f_var = f_vp->var();
-  if ( f_var->level() > mLastLevel ) {
+  BddNode* f_vp = f.get_node();
+  ymuint f_level = f_vp->level();
+  if ( f_level > mLastLevel ) {
     return f;
   }
 
@@ -187,11 +182,12 @@ BddMgrModern::compose_step(BddEdge f)
     BddEdge r_0 = compose_step(f_0);
     BddEdge r_1 = compose_step(f_1);
     BddEdge tmp;
+    BmmVar* f_var = var_at(f_level);
     if ( f_var->mMark == 1 ) {
       tmp = f_var->mCompEdge;
     }
     else {
-      tmp = new_node(f_var, BddEdge::make_zero(), BddEdge::make_one());
+      tmp = new_node(f_level, BddEdge::make_zero(), BddEdge::make_one());
     }
     result = ite_op(tmp, r_1, r_0);
     mCmpTable->put(f, result);
@@ -271,13 +267,11 @@ BddMgrModern::gcofactor_step(BddEdge f,
   f.normalize();
   BddEdge result = mCofacTable->get(f, c);
   if ( result.is_error() ) {
-    Node* f_v = get_node(f);
-    Node* c_v = get_node(c);
+    BddNode* f_v = f.get_node();
+    BddNode* c_v = c.get_node();
     tPol c_p = c.pol();
-    Var* f_var = f_v->var();
-    Var* c_var = c_v->var();
-    ymuint f_level = f_var->level();
-    ymuint c_level = c_var->level();
+    ymuint f_level = f_v->level();
+    ymuint c_level = c_v->level();
 
     BddEdge f_0, f_1;
     if ( f_level <= c_level ) {
@@ -291,7 +285,7 @@ BddMgrModern::gcofactor_step(BddEdge f,
     if ( f_level < c_level ) {
       BddEdge r0 = gcofactor_step(f_0, c);
       BddEdge r1 = gcofactor_step(f_1, c);
-      result = new_node(f_var, r0, r1);
+      result = new_node(f_level, r0, r1);
     }
     else {
       BddEdge c_0 = c_v->edge0(c_p);
@@ -305,7 +299,7 @@ BddMgrModern::gcofactor_step(BddEdge f,
       else {
 	BddEdge r0 = gcofactor_step(f_0, c_0);
 	BddEdge r1 = gcofactor_step(f_1, c_1);
-	result = new_node(c_var, r0, r1);
+	result = new_node(c_level, r0, r1);
       }
     }
     mCofacTable->put(f, c, result);
@@ -324,7 +318,7 @@ BddMgrModern::scofactor(BddEdge e1,
 			tPol pol)
 {
   clear_varmark();
-  Var* var = var_of(id);
+  BmmVar* var = var_of(id);
   if ( !var ) {
     // var がないということは e1 中に含まれていない
     return e1;
@@ -349,13 +343,14 @@ BddMgrModern::cube_division(BddEdge f,
 {
   clear_varmark();
   BddEdge e = c;
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   tPol pol = e.pol();
   mLastLevel = 0;
   while ( vp != 0 ) {
     BddEdge e0 = vp->edge0(pol);
     BddEdge e1 = vp->edge1(pol);
-    Var* var = vp->var();
+    ymuint level = vp->level();
+    BmmVar* var = var_at(level);
     if ( e0.is_zero() ) {
       var->mMark = 1;
       e = e1;
@@ -364,8 +359,8 @@ BddMgrModern::cube_division(BddEdge f,
       var->mMark = 2;
       e = e0;
     }
-    mLastLevel = var->level();
-    vp = get_node(e);
+    mLastLevel = level;
+    vp = e.get_node();
     pol = e.pol();
   }
   BddEdge ans = cubediv_step(f);
@@ -384,9 +379,9 @@ BddMgrModern::cubediv_step(BddEdge f)
   }
   // この時点で f, g は終端ではない．
 
-  Node* f_vp = get_node(f);
-  Var* f_var = f_vp->var();
-  if ( f_var->level() > mLastLevel ) {
+  BddNode* f_vp = f.get_node();
+  ymuint f_level = f_vp->level();
+  if ( f_level > mLastLevel ) {
     return f;
   }
 
@@ -396,6 +391,7 @@ BddMgrModern::cubediv_step(BddEdge f)
 
   BddEdge result = mCubedivTable->get(f);
   if ( result.is_error() ) {
+    BmmVar* f_var = var_at(f_level);
     if ( f_var->mMark == 1 ) {
       // 肯定のリテラルが現れているので 1枝の結果を返す．
       BddEdge f_1 = f_vp->edge1();
@@ -414,7 +410,7 @@ BddMgrModern::cubediv_step(BddEdge f)
       BddEdge r_0 = cubediv_step(f_0);
       BddEdge r_1 = cubediv_step(f_1);
 
-      result = new_node(f_var, r_0, r_1);
+      result = new_node(f_level, r_0, r_1);
     }
     mCubedivTable->put(f, result);
   }
@@ -438,7 +434,7 @@ BddMgrModern::xor_moment(BddEdge e,
   if ( e.is_overflow() ) {
     return BddEdge::make_overflow();
   }
-  Var* var = var_of(idx);
+  BmmVar* var = var_of(idx);
   if ( !var ) {
     // この変数がないということは答は0
     return BddEdge::make_zero();
@@ -460,9 +456,8 @@ BddMgrModern::xcofactor_step(BddEdge f)
   }
 
   // この時点で e は終端ではない．
-  Node* node = get_node(f);
-  Var* var = node->var();
-  ymuint level = var->level();
+  BddNode* node = f.get_node();
+  ymuint level = node->level();
   if ( level > mLastLevel ) {
     return BddEdge::make_zero();
   }
@@ -483,7 +478,7 @@ BddMgrModern::xcofactor_step(BddEdge f)
     else { // level < mLastLevel
       BddEdge r_0 = xcofactor_step(e_0);
       BddEdge r_1 = xcofactor_step(e_1);
-      result = new_node(var, r_0, r_1);
+      result = new_node(level, r_0, r_1);
     }
     // ハッシュに登録しておく．
     mXcofactorTable->put(f, result);

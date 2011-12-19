@@ -22,7 +22,6 @@ BEGIN_NAMESPACE_YM_BDD
 //////////////////////////////////////////////////////////////////////
 
 class BmcVar;
-class BmcNode;
 class BmcCompTbl;
 class BmcCompTbl1;
 class BmcCompTbl2;

@@ -7,6 +7,7 @@
 /// All rights reserved.
 
 
+#include "BmmVar.h"
 #include "BddMgrModern.h"
 
 
@@ -83,14 +84,14 @@ BmmVar::~BmmVar()
 // ノードを登録する．
 void
 BmmVar::reg_node(size_t pos,
-		 Node* node)
+		 BddNode* node)
 {
   ++ mNodeNum;
   if ( mNodeNum > mNextLimit ) {
     // ノード数が制限値を越えたのでテーブルを2倍に拡張する
     resize(mTableSize << 1);
   }
-  Node*& entry = mNodeTable[pos & mTableSize_1];
+  BddNode*& entry = mNodeTable[pos & mTableSize_1];
   node->mLink = entry;
   entry = node;
 }
@@ -99,12 +100,12 @@ BmmVar::reg_node(size_t pos,
 void
 BmmVar::sweep()
 {
-  Node** ptr = mNodeTable;
-  Node** end = mNodeTable + mTableSize;
+  BddNode** ptr = mNodeTable;
+  BddNode** end = mNodeTable + mTableSize;
   ymuint64 nf = 0;
   do {
-    Node* temp;
-    Node** prev = ptr;
+    BddNode* temp;
+    BddNode** prev = ptr;
     while ( (temp = *prev) ) {
       if ( temp->noref() ) {
 	// どこからも参照されていないノードは節点テーブルから除く
@@ -148,28 +149,28 @@ BmmVar::resize(ymuint64 new_size)
   logstream() << "BmmVar(" << varid() << ")::resize("
 	      << new_size << ")" << endl;
 
-  Node** new_table = alloc_nodetable(new_size);
+  BddNode** new_table = alloc_nodetable(new_size);
   if ( !new_table ) {
     // アロケーションに失敗した．
     return false;
   }
 
   ymuint64 old_size = mTableSize;
-  Node** old_table = mNodeTable;
+  BddNode** old_table = mNodeTable;
   mNodeTable = new_table;
   mTableSize = new_size;
   mTableSize_1 = mTableSize - 1;
   set_next_limit_size(mMgr->nt_load_limit());
-  Node** tbl = old_table;
+  BddNode** tbl = old_table;
   if ( tbl ) {
-    Node** end = tbl + old_size;
+    BddNode** end = tbl + old_size;
     do {
-      Node* next;
-      Node* temp;
+      BddNode* next;
+      BddNode* temp;
       for (temp = *tbl; temp; temp = next) {
 	next = temp->mLink;
 	ymuint64 pos = hash_func2(temp->edge0(), temp->edge1());
-	Node*& entry = mNodeTable[pos & mTableSize_1];
+	BddNode*& entry = mNodeTable[pos & mTableSize_1];
 	temp->mLink = entry;
 	entry = temp;
       }
@@ -195,7 +196,7 @@ BmmVar::logstream() const
 
 // 節点テーブル用のメモリを確保する．
 // size はバイト単位ではなくエントリ数
-BmmNode**
+BddNode**
 BmmVar::alloc_nodetable(ymuint64 size)
 {
   return mMgr->alloc_nodetable(size);
@@ -204,7 +205,7 @@ BmmVar::alloc_nodetable(ymuint64 size)
 // 節点テーブル用のメモリを解放する．
 // size はバイト単位ではなくエントリ数
 void
-BmmVar::dealloc_nodetable(Node** table,
+BmmVar::dealloc_nodetable(BddNode** table,
 			  ymuint64 size)
 {
   mMgr->dealloc_nodetable(table, size);

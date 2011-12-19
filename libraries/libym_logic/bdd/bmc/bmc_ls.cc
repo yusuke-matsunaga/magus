@@ -39,7 +39,7 @@ struct LitCompLess
 // 1枝が選ばれた場合には which = 1 とする．
 inline
 BddEdge
-select_edge(BmcNode* node,
+select_edge(BddNode* node,
 	    tPol pol,
 	    int& which)
 {
@@ -76,8 +76,8 @@ BddMgrClassic::lscap(BddEdge e1,
     return BddEdge::make_one();
   }
 
-  Node* node1 = get_node(e1);
-  Node* node2 = get_node(e2);
+  BddNode* node1 = e1.get_node();
+  BddNode* node2 = e2.get_node();
   tPol pol1 = e1.pol();
   tPol pol2 = e2.pol();
   ymuint level1 = node1->level();
@@ -100,8 +100,8 @@ BddMgrClassic::lscap(BddEdge e1,
       if ( e1.is_one() || e2.is_one() ) {
 	return BddEdge::make_one();
       }
-      node1 = get_node(e1);
-      node2 = get_node(e2);
+      node1 = e1.get_node();
+      node2 = e2.get_node();
       pol1 = e1.pol();
       pol2 = e2.pol();
       level1 = node1->level();
@@ -113,7 +113,7 @@ BddMgrClassic::lscap(BddEdge e1,
       if ( e1.is_one() ) {
 	return BddEdge::make_one();
       }
-      node1 = get_node(e1);
+      node1 = e1.get_node();
       pol1 = e1.pol();
       level1 = node1->level();
     }
@@ -123,7 +123,7 @@ BddMgrClassic::lscap(BddEdge e1,
       if ( e2.is_one() ) {
 	return BddEdge::make_one();
       }
-      node2 = get_node(e2);
+      node2 = e2.get_node();
       pol2 = e2.pol();
       level2 = node2->level();
     }
@@ -150,8 +150,8 @@ BddMgrClassic::lsdiff(BddEdge e1,
     return e1;
   }
 
-  Node* node1 = get_node(e1);
-  Node* node2 = get_node(e2);
+  BddNode* node1 = e1.get_node();
+  BddNode* node2 = e2.get_node();
   tPol pol1 = e1.pol();
   tPol pol2 = e2.pol();
   ymuint level1 = node1->level();
@@ -174,7 +174,7 @@ BddMgrClassic::lsdiff(BddEdge e1,
       if ( e2.is_one() ) {
 	return e1;
       }
-      node2 = get_node(e2);
+      node2 = e2.get_node();
       pol2 = e2.pol();
       level2 = node2->level();
     }
@@ -195,8 +195,8 @@ BddMgrClassic::lsdiff(BddEdge e1,
       if ( e1.is_one() || e2.is_one() ) {
 	return e1;
       }
-      node1 = get_node(e1);
-      node2 = get_node(e2);
+      node1 = e1.get_node();
+      node2 = e2.get_node();
       pol1 = e1.pol();
       pol2 = e2.pol();
       level1 = node1->level();
@@ -220,8 +220,8 @@ BddMgrClassic::lsintersect(BddEdge e1,
     return false;
   }
 
-  Node* node1 = get_node(e1);
-  Node* node2 = get_node(e2);
+  BddNode* node1 = e1.get_node();
+  BddNode* node2 = e2.get_node();
   tPol pol1 = e1.pol();
   tPol pol2 = e2.pol();
   ymuint level1 = node1->level();
@@ -238,8 +238,8 @@ BddMgrClassic::lsintersect(BddEdge e1,
       if ( e1.is_one() || e2.is_one() ) {
 	return false;
       }
-      node1 = get_node(e1);
-      node2 = get_node(e2);
+      node1 = e1.get_node();
+      node2 = e2.get_node();
       pol1 = e1.pol();
       pol2 = e2.pol();
       level1 = node1->level();
@@ -251,7 +251,7 @@ BddMgrClassic::lsintersect(BddEdge e1,
       if ( e1.is_one() ) {
 	return false;
       }
-      node1 = get_node(e1);
+      node1 = e1.get_node();
       pol1 = e1.pol();
       level1 = node1->level();
     }
@@ -261,7 +261,7 @@ BddMgrClassic::lsintersect(BddEdge e1,
       if ( e2.is_one() ) {
 	return false;
       }
-      node2 = get_node(e2);
+      node2 = e2.get_node();
       pol2 = e2.pol();
       level2 = node2->level();
     }
@@ -282,7 +282,7 @@ BddMgrClassic::to_literalvector(BddEdge e,
   ymuint n = node_count(vector<BddEdge>(1, e));
   dst.reserve(n);
 
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   tPol pol = e.pol();
   while ( vp ) {
     ymuint level = vp->level();
@@ -291,12 +291,12 @@ BddMgrClassic::to_literalvector(BddEdge e,
     BddEdge e1 = vp->edge1(pol);
     if ( e0 == BddEdge::make_zero() ) {
       dst.push_back(Literal(varid, kPolPosi));
-      vp = get_node(e1);
+      vp = e1.get_node();
       pol = e1.pol();
     }
     else {
       dst.push_back(Literal(varid, kPolNega));
-      vp = get_node(e0);
+      vp = e0.get_node();
       pol = e0.pol();
     }
   }
@@ -316,7 +316,7 @@ BddMgrClassic::to_literallist(BddEdge e,
     return 0;
   }
 
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   tPol pol = e.pol();
   while ( vp ) {
     ymuint level = vp->level();
@@ -325,12 +325,12 @@ BddMgrClassic::to_literallist(BddEdge e,
     BddEdge e1 = vp->edge1(pol);
     if ( e0 == BddEdge::make_zero() ) {
       dst.push_back(Literal(varid, kPolPosi));
-      vp = get_node(e1);
+      vp = e1.get_node();
       pol = e1.pol();
     }
     else {
       dst.push_back(Literal(varid, kPolNega));
-      vp = get_node(e0);
+      vp = e0.get_node();
       pol = e0.pol();
     }
   }

@@ -10,12 +10,13 @@
 
 
 #include "ym_logic/Bdd.h"
+#include "base/BddEdge.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
 
 class BddMgrModern;
-class BmmNode;
+class BddNode;
 
 //////////////////////////////////////////////////////////////////////
 // 変数の情報を格納しておくクラス
@@ -23,9 +24,6 @@ class BmmNode;
 class BmmVar
 {
   friend class BddMgrModern;
-
-public:
-  typedef BmmNode Node;
 
 public:
 
@@ -63,7 +61,7 @@ private:
   // ノードを登録する．
   void
   reg_node(ymuint64 pos,
-	   BmmNode* node);
+	   BddNode* node);
 
   // 節点テーブルを拡張する
   // メモリアロケーションに失敗したら false を返す．
@@ -80,13 +78,13 @@ private:
 
   // 節点テーブル用のメモリを確保する．
   // size はバイト単位ではなくエントリ数
-  BmmNode**
+  BddNode**
   alloc_nodetable(ymuint64 size);
 
   // 節点テーブル用のメモリを解放する．
   // size はバイト単位ではなくエントリ数
   void
-  dealloc_nodetable(BmmNode** table,
+  dealloc_nodetable(BddNode** table,
 		    ymuint64 size);
 
 
@@ -129,7 +127,7 @@ private:
   ymuint64 mNextLimit;
 
   // テーブル本体
-  BmmNode** mNodeTable;
+  BddNode** mNodeTable;
 
   // ノード数
   ymuint64 mNodeNum;

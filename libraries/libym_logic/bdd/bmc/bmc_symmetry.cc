@@ -27,7 +27,7 @@ END_NONAMESPACE
 BddEdge
 BddMgrClassic::cs_step2(BddEdge e)
 {
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   if ( vp == 0 ) {
     return BddEdge::make_one();
   }
@@ -39,7 +39,7 @@ BddMgrClassic::cs_step2(BddEdge e)
     return BddEdge::make_zero();
   }
 
-  BddEdge e2 = combine(vp, kPolPosi);
+  BddEdge e2(vp, kPolPosi);
   BddEdge result = mCs2Table->get(e2, y_edge);
   if ( result.is_error() ) {
     result = cs_step2(vp->edge0());
@@ -58,8 +58,8 @@ BddMgrClassic::cs_step1(BddEdge e1,
 			BddEdge e2,
 			tPol sympol)
 {
-  Node* vp1 = get_node(e1);
-  Node* vp2 = get_node(e2);
+  BddNode* vp1 = e1.get_node();
+  BddNode* vp2 = e2.get_node();
   ymuint level1 = vp1 ? vp1->level() : kLevelMax;
   ymuint level2 = vp2 ? vp2->level() : kLevelMax;
   ymuint top_level = level1;
@@ -118,7 +118,7 @@ BddEdge
 BddMgrClassic::cs_step(BddEdge e,
 		       tPol sympol)
 {
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   if ( vp == 0 ) {
     return BddEdge::make_one();
   }
@@ -132,7 +132,7 @@ BddMgrClassic::cs_step(BddEdge e,
   }
 
   // 極性は落としてしまう．
-  e = combine(vp, kPolPosi);
+  e = BddEdge(vp, kPolPosi);
   BddEdge result = mCsTable->get(e, xy_edge);
   if ( result.is_error() ) {
     if ( level < x_level ) {

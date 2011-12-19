@@ -78,9 +78,9 @@ BddMgrClassic::ite_op(BddEdge f,
   g.addpol(ans_pol);
   h.addpol(ans_pol);
 
-  Node* f_vp = get_node(f);
-  Node* g_vp = get_node(g);
-  Node* h_vp = get_node(h);
+  BddNode* f_vp = f.get_node();
+  BddNode* g_vp = g.get_node();
+  BddNode* h_vp = h.get_node();
   ymuint f_level = f_vp->level();
   ymuint g_level = g_vp->level();
   ymuint h_level = h_vp->level();
@@ -177,7 +177,7 @@ BddMgrClassic::compose_step(BddEdge f)
     return f;
   }
 
-  Node* f_vp = get_node(f);
+  BddNode* f_vp = f.get_node();
   ymuint f_level = f_vp->level();
   if ( f_level > mLastLevel ) {
     return f;
@@ -246,7 +246,7 @@ BddMgrClassic::pd_step(BddEdge e,
     return e;
   }
 
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   if ( vp->level() > y_level ) {
     // 変化なし
     return e;
@@ -290,7 +290,7 @@ BddMgrClassic::pd_step2(BddEdge e,
     return e;
   }
 
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   if ( vp->level() > y_level ) {
     return e;
   }
@@ -325,8 +325,8 @@ BddMgrClassic::pd_step3(BddEdge e0,
 			ymuint y_level,
 			tPol pol)
 {
-  Node* vp0 = get_node(e0);
-  Node* vp1 = get_node(e1);
+  BddNode* vp0 = e0.get_node();
+  BddNode* vp1 = e1.get_node();
   tPol pol0 = e0.pol();
   tPol pol1 = e1.pol();
   ymuint top_level = kLevelMax;
@@ -433,8 +433,8 @@ BddMgrClassic::gcofactor_step(BddEdge f,
   f.normalize();
   BddEdge result = mCofacTable->get(f, c);
   if ( result.is_error() ) {
-    Node* f_v = get_node(f);
-    Node* c_v = get_node(c);
+    BddNode* f_v = f.get_node();
+    BddNode* c_v = c.get_node();
     tPol c_p = c.pol();
     ymuint f_level = f_v->level();
     ymuint c_level = c_v->level();
@@ -520,7 +520,7 @@ BddMgrClassic::cube_division(BddEdge f,
 {
   clear_varmark();
   BddEdge e = c;
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   tPol pol = e.pol();
   mLastLevel = 0;
   while ( vp != 0 ) {
@@ -536,7 +536,7 @@ BddMgrClassic::cube_division(BddEdge f,
       var->mMark = 2;
       e = e0;
     }
-    vp = get_node(e);
+    vp = e.get_node();
     pol = e.pol();
   }
   BddEdge ans = cubediv_step(f);
@@ -555,7 +555,7 @@ BddMgrClassic::cubediv_step(BddEdge f)
   }
   // この時点で f, g は終端ではない．
 
-  Node* f_vp = get_node(f);
+  BddNode* f_vp = f.get_node();
   ymuint f_level = f_vp->level();
   if ( f_level > mLastLevel ) {
     return f;
@@ -635,7 +635,7 @@ BddMgrClassic::xcofactor_step(BddEdge f)
   }
 
   // この時点で e は終端ではない．
-  Node* vp = get_node(f);
+  BddNode* vp = f.get_node();
   ymuint level = vp->level();
   if ( level > mLastLevel ) {
     // 今のレベルはコファクタリングすべきレベルよりも下なので

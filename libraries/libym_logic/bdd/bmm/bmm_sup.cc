@@ -9,6 +9,7 @@
 
 #include "BddMgrModern.h"
 #include "BmmCompTbl.h"
+#include "BmmVar.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -25,7 +26,8 @@ BddMgrModern::mark_support(const vector<BddEdge>& edge_list)
   }
   for (vector<BddEdge>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
-    clear_pnmark(*p);
+    BddEdge e = *p;
+    e.clear_mark();
   }
   return mVarSet.size();
 }
@@ -35,13 +37,14 @@ void
 BddMgrModern::sup_step(BddEdge e)
 {
   for ( ; ; ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     if ( vp == 0 || vp->pmark() ) {
       return;
     }
 
     vp->pmark(1);
-    Var* v = vp->var();
+    ymuint level = vp->level();
+    BmmVar* v = var_at(level);
     if ( !v->mMark ) {
       v->mMark = 1;
       mVarSet.push_back(v);
@@ -58,8 +61,8 @@ BddMgrModern::mark_to_vector(VarVector& vars)
   ymuint n = mVarSet.size();
   vars.clear();
   vars.reserve(n);
-  for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
-    Var* v = *p;
+  for (list<BmmVar*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
+    BmmVar* v = *p;
     VarId varid = v->varid();
     vars.push_back(varid);
   }
@@ -73,8 +76,8 @@ ymuint
 BddMgrModern::mark_to_list(VarList& vars)
 {
   vars.clear();
-  for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
-    Var* v = *p;
+  for (list<BmmVar*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
+    BmmVar* v = *p;
     VarId varid = v->varid();
     vars.push_back(varid);
   }
@@ -90,7 +93,7 @@ BddMgrModern::mark_to_bdd()
   if ( mVarSet.empty() ) {
     return BddEdge::make_one();
   }
-  list<Var*>::iterator p = mVarSet.begin();
+  list<BmmVar*>::iterator p = mVarSet.begin();
   BddEdge tmp = make_posiliteral((*p)->varid());
   for (++ p; p != mVarSet.end(); ++ p) {
     tmp = and_op(tmp, make_posiliteral((*p)->varid()));
@@ -124,11 +127,11 @@ BddMgrModern::SCC(BddEdge e)
   // サポートを使って SCC を求める．
   clear_varmark();
   scc_step(e, sup);
-  clear_pnmark(e);
+  e.clear_mark();
 
   BddEdge ans = BddEdge::make_one();
-  for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
-    Var* v = *p;
+  for (list<BmmVar*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
+    BmmVar* v = *p;
     if ( v->mMark == 1 ) {
       ans = and_op(ans, make_negaliteral(v->varid()));
     }
@@ -149,20 +152,23 @@ BddMgrModern::scc_step(BddEdge e,
   if ( e.is_one() ) {
     while ( !s.is_one() ) {
       assert_cond(!s.is_zero(), __FILE__, __LINE__);
-      Node* svp = get_node(s);
-      Var* svar = svp->var();
+      BddNode* svp = s.get_node();
+      ymuint slevel = svp->level();
+      BmmVar* svar = var_at(slevel);
       svar->mMark |= 3;
       s = svp->edge1();
     }
     return;
   }
 
-  Node* vp = get_node(e);
-  if ( vp && !mark(e) ) {
-    setmark(e);
-    Var* var = vp->var();
-    Node* svp = get_node(s);
-    Var* svar = svp->var();
+  BddNode* vp = e.get_node();
+  if ( vp && !e.mark() ) {
+    e.set_mark();
+    ymuint level = vp->level();
+    BmmVar* var = var_at(level);
+    BddNode* svp = s.get_node();
+    ymuint slevel = svp->level();
+    BmmVar* svar = var_at(slevel);
     BddEdge s2 = svp->edge1();
     if ( svar->level() < var->level() ) {
       svar->mMark |= 3;
@@ -204,12 +210,13 @@ BddMgrModern::esmooth(BddEdge e1,
   clear_varmark();
   mLastLevel = 0;
   {
-    Node* vp = get_node(e2);
+    BddNode* vp = e2.get_node();
     while ( vp != 0 ) {
-      Var* v = vp->var();
-      mLastLevel = v->level();
+      ymuint level = vp->level();
+      BmmVar* v = var_at(level);
+      mLastLevel = level;
       v->mMark = 1;
-      vp = get_node(vp->edge1());
+      vp = vp->edge1().get_node();
     }
   }
   BddEdge ans = esmooth_step(e1);
@@ -225,9 +232,8 @@ BddMgrModern::esmooth_step(BddEdge e)
     return e;
   }
 
-  Node* vp = get_node(e);
-  Var* var = vp->var();
-  ymuint level = var->level();
+  BddNode* vp = e.get_node();
+  ymuint level = vp->level();
   if ( level > mLastLevel ) {
     return e;
   }
@@ -237,6 +243,7 @@ BddMgrModern::esmooth_step(BddEdge e)
     tPol pol = e.pol();
     BddEdge e0 = vp->edge0(pol);
     BddEdge e1 = vp->edge1(pol);
+    BmmVar* var = var_at(level);
     if ( var->mMark ) {
       // 消去対象の変数だった．
       BddEdge tmp = or_op(e0, e1);
@@ -245,7 +252,7 @@ BddMgrModern::esmooth_step(BddEdge e)
     else {
       BddEdge r_0 = esmooth_step(e0);
       BddEdge r_1 = esmooth_step(e1);
-      result = new_node(var, r_0, r_1);
+      result = new_node(level, r_0, r_1);
     }
     mSmTable->put(e, result);
   }
@@ -269,12 +276,12 @@ BddMgrModern::and_exist(BddEdge e1,
   clear_varmark();
   mLastLevel = 0;
   {
-    Node* vp = get_node(e3);
+    BddNode* vp = e3.get_node();
     while ( vp != 0 ) {
-      Var* v = vp->var();
-      mLastLevel = v->level();
+      mLastLevel = vp->level();
+      BmmVar* v = var_at(mLastLevel);
       v->mMark = 1;
-      vp = get_node(vp->edge1());
+      vp = vp->edge1().get_node();
     }
   }
   BddEdge ans = andexist_step(e1, e2);
@@ -307,19 +314,15 @@ BddMgrModern::andexist_step(BddEdge f,
     g = tmp;
   }
 
-  Node* f_vp = get_node(f);
-  Node* g_vp = get_node(g);
+  BddNode* f_vp = f.get_node();
+  BddNode* g_vp = g.get_node();
   tPol f_pol = f.pol();
   tPol g_pol = g.pol();
-  Var* f_var = f_vp->var();
-  Var* g_var = g_vp->var();
-  ymuint f_level = f_var->level();
-  ymuint g_level = g_var->level();
+  ymuint f_level = f_vp->level();
+  ymuint g_level = g_vp->level();
   ymuint level = f_level;
-  Var* var = f_var;
   if ( level > g_level ) {
     level = g_level;
-    var = g_var;
   }
   if ( level > mLastLevel ) {
     return and_op(f, g);
@@ -329,6 +332,7 @@ BddMgrModern::andexist_step(BddEdge f,
   if ( result.is_error() ) {
     BddEdge f_0, f_1;
     BddEdge g_0, g_1;
+    BmmVar* var = var_at(level);
     if ( var->mMark ) {
       if ( f_level > level ) {
 	g_0 = g_vp->edge0(g_pol);
@@ -359,7 +363,7 @@ BddMgrModern::andexist_step(BddEdge f,
       g_1 = g_vp->edge1(g_pol);
       BddEdge r_0 = andexist_step(f_0, g_0);
       BddEdge r_1 = andexist_step(f_1, g_1);
-      result = new_node(var, r_0, r_1);
+      result = new_node(level, r_0, r_1);
     }
     mAeTable->put(f, g, result);
   }
