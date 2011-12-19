@@ -421,7 +421,7 @@ inline
 bool
 BmcCompTbl::check_noref(BddEdge e)
 {
-  BmcNode* vp = BddMgrClassic::get_node(e);
+  BddNode* vp = e.get_node();
   return vp && vp->noref();
 }
 

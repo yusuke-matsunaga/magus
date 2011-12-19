@@ -12,7 +12,7 @@
 #include "ym_logic/Bdd.h"
 
 #include "base/BddMgrImpl.h"
-#include "BmmNode.h"
+#include "BddNode.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -38,7 +38,6 @@ class BddMgrModern :
 {
 public:
   typedef BmmVar Var;
-  typedef BmmNode Node;
   typedef BmmCompTbl CompTbl;
   typedef BmmCompTbl1 CompTbl1;
   typedef BmmCompTbl2 CompTbl2;
@@ -635,27 +634,27 @@ public:
   static
   mpz_class
   wt0_step(BddEdge e,
-	   hash_map<Node*, mpz_class>& result_map);
+	   hash_map<BddNode*, mpz_class>& result_map);
 
   // Walsh spectrumの0次の係数を求める処理
   // こちらは int 版
   static
   ymint
   wt0_step(BddEdge e,
-	   hash_map<Node*, ymint>& result_map);
+	   hash_map<BddNode*, ymint>& result_map);
 
   // Walsh spectrumの1次の係数を求める処理
   static
   mpz_class
   wt1_step(BddEdge e,
-	   hash_map<Node*, mpz_class>& result_map);
+	   hash_map<BddNode*, mpz_class>& result_map);
 
   // Walsh spectrumの1次の係数を求める処理
   // int 版
   static
   ymint
   wt1_step(BddEdge e,
-	   hash_map<Node*, ymint>& result_map);
+	   hash_map<BddNode*, ymint>& result_map);
 
   // sp_step 中で用いられる関数
   static
@@ -682,6 +681,7 @@ public:
   void
   set_next_limit_size();
 
+#if 0
   // ノードのリンク数を増やし，もしロックされていなければロックする
   void
   activate(BddEdge vd);
@@ -689,14 +689,17 @@ public:
   // ノードのリンク数を減らし，他のリンクがなければロックを外す
   void
   deactivate(BddEdge vd);
+#endif
 
-  // vp と vp の子孫のノードをロックする
+  /// @brief lockall() 用のフック
+  virtual
   void
-  lockall(Node* vp);
+  lock_hook(BddNode* vp);
 
-  // vp と vp の子孫ノードを(他に参照されていないもののみ)ロックを外す
+  /// @brief unlockall() 用のフック
+  virtual
   void
-  unlockall(Node* vp);
+  unlock_hook(BddNode* vp);
 
   // 演算結果テーブルを登録する．
   void
@@ -724,16 +727,16 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   // 節点を確保する．
-  Node*
+  BddNode*
   alloc_node();
 
   // 節点チャンクをスキャンして参照されていない節点をフリーリストにつなぐ
   // ただし，チャンク全体が参照されていなかった場合にはフリーリストには
   // つながない．その場合には true を返す．
   bool
-  scan_nodechunk(Node* blk,
+  scan_nodechunk(BddNode* blk,
 		 ymuint64 blk_size,
-		 Node**& prev);
+		 BddNode**& prev);
 
   // 変数テーブル用のメモリを確保する．
   // size はバイト単位ではなくエントリ数．
@@ -748,22 +751,22 @@ public:
 
   // 節点テーブル用のメモリを確保する．
   // size はバイト単位ではなくエントリ数
-  Node**
+  BddNode**
   alloc_nodetable(ymuint64 size);
 
   // 節点テーブル用のメモリを解放する．
   // size はバイト単位ではなくエントリ数
   void
-  dealloc_nodetable(Node** table,
+  dealloc_nodetable(BddNode** table,
 		    ymuint64 size);
 
   // 節点チャンク用のメモリを確保する．
-  Node*
+  BddNode*
   alloc_nodechunk();
 
   // 節点チャンク用のメモリを解放する．
   void
-  dealloc_nodechunk(Node* chunk);
+  dealloc_nodechunk(BddNode* chunk);
 
   // このマネージャで使用するメモリ領域を確保する．
   void*
@@ -778,17 +781,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // BddEdge を操作するクラスメソッド
   //////////////////////////////////////////////////////////////////////
-
-  // 枝の値からそれが指しているノードのポインタをとり出す
-  static
-  Node*
-  get_node(BddEdge e);
-
-  // ノードのポインタと極性から枝の情報を作り出す
-  static
-  BddEdge
-  combine(Node* n,
-	  tPol p);
 
   // p-mark が付いた節点のマークを消す．
   static
@@ -825,14 +817,14 @@ public:
   split1(ymuint top,
 	 ymuint level,
 	 BddEdge e,
-	 const Node* vp,
+	 const BddNode* vp,
 	 tPol pol,
 	 BddEdge& e_0,
 	 BddEdge& e_1);
 
   // f と g のノードの子供のノードとレベルを求める．
   static
-  Var*
+  ymuint
   split(BddEdge f,
 	BddEdge g,
 	BddEdge& f_0,
@@ -920,7 +912,7 @@ private:
   ymuint64 mNextLimit;
 
   // テーブル本体
-  Node** mNodeTable;
+  BddNode** mNodeTable;
 
 
   //////////////////////////////////////////////////////////////////////
@@ -957,16 +949,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // フリーな節点リストの先頭
-  Node* mFreeTop;
+  BddNode* mFreeTop;
 
   // フリーな節点数
   ymuint64 mFreeNum;
 
   // 今までに確保したメモリブロックの先頭
-  Node* mTopBlk;
+  BddNode* mTopBlk;
 
   // 現在使用中のブロック
-  Node* mCurBlk;
+  BddNode* mCurBlk;
 
   // mCurBlk の何番目まで使用しているかを示すインデックス
   ymuint64 mCurIdx;
@@ -1006,47 +998,7 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// リンク数を増やし，もしロックされていなければロックする
-// 多くの場合, lockall() が呼ばれることが少ないので inline にしている．
-inline
-void
-BddMgrModern::activate(BddEdge vd)
-{
-  Node* vp = get_node(vd);
-  if ( vp && vp->linkinc() == 1 ) {
-    lockall(vp);
-  }
-}
-
-// リンク数を減らし，他のリンクがなければロックを外す
-// 多くの場合, unlockall() が呼ばれることが少ないので inline にしている．
-inline
-void
-BddMgrModern::deactivate(BddEdge vd)
-{
-  Node* vp = get_node(vd);
-  if ( vp && vp->linkdec() == 0 ) {
-    unlockall(vp);
-  }
-}
-
-// 枝の値からそれが指しているノードのポインタをとり出す
-inline
-BmmNode*
-BddMgrModern::get_node(BddEdge e)
-{
-  return reinterpret_cast<Node*>(e.get_ptr());
-}
-
-// ノードのポインタと極性から枝の情報を作り出す
-inline
-BddEdge
-BddMgrModern::combine(Node* n,
-		      tPol p)
-{
-  return BddEdge(n, p);
-}
-
+#if 0
 // vdの指すノードのマークを調べ，マークされていればtrueを返す．
 // 枝に極性がなければマークは1種類でいいが，極性があるので，
 // 肯定の枝から指された場合の p-mark と否定の枝から指された場
@@ -1072,6 +1024,7 @@ BddMgrModern::setmark(BddEdge vd)
     vp->nmark(1);
   }
 }
+#endif
 
 // idx が top に等しいときには e の子供を e_0, e_1 にセットする．
 // 等しくなければ e をセットする．
@@ -1080,7 +1033,7 @@ void
 BddMgrModern::split1(ymuint top,
 		     ymuint level,
 		     BddEdge e,
-		     const Node* vp,
+		     const BddNode* vp,
 		     tPol pol,
 		     BddEdge& e_0,
 		     BddEdge& e_1)
@@ -1096,7 +1049,7 @@ BddMgrModern::split1(ymuint top,
 
 // f と g のノードの子供のノードとレベルを求める．
 inline
-BmmVar*
+ymuint
 BddMgrModern::split(BddEdge f,
 		    BddEdge g,
 		    BddEdge& f_0,
@@ -1104,23 +1057,19 @@ BddMgrModern::split(BddEdge f,
 		    BddEdge& g_0,
 		    BddEdge& g_1)
 {
-  Node* f_vp = get_node(f);
-  Node * g_vp = get_node(g);
+  BddNode* f_vp = f.get_node();
+  BddNode * g_vp = g.get_node();
   tPol f_pol = f.pol();
   tPol g_pol = g.pol();
-  Var* f_var = f_vp->var();
-  Var* g_var = g_vp->var();
-  ymuint f_level = f_var->level();
-  ymuint g_level = g_var->level();
+  ymuint f_level = f_vp->level();
+  ymuint g_level = g_vp->level();
   ymuint level = f_level;
-  Var* var = f_var;
   if ( g_level < level ) {
     level = g_level;
-    var = g_var;
   }
   split1(level, f_level, f, f_vp, f_pol, f_0, f_1);
   split1(level, g_level, g, g_vp, g_pol, g_0, g_1);
-  return var;
+  return level;
 }
 
 // 節点テーブルの拡張を制御するパラメータを得る．

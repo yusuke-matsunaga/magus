@@ -196,8 +196,8 @@ BddMgrClassic::~BddMgrClassic()
   dealloc_nodetable(mNodeTable, mTableSize);
 
   // 節点用のメモリブロックの解放
-  for (Node* blk = mTopBlk; blk; ) {
-    Node* temp = blk;
+  for (BddNode* blk = mTopBlk; blk; ) {
+    BddNode* temp = blk;
     blk = temp->mLink;
     dealloc_nodechunk(temp);
   }
@@ -260,7 +260,7 @@ BddMgrClassic::check_posi_cube(BddEdge e)
   }
 
   for ( ; ; ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     tPol pol = e.pol();
     BddEdge e0 = vp->edge0(pol);
     BddEdge e1 = vp->edge1(pol);
@@ -294,7 +294,7 @@ BddMgrClassic::check_cube(BddEdge e)
   }
 
   for ( ; ; ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     tPol pol = e.pol();
     BddEdge e0 = vp->edge0(pol);
     BddEdge e1 = vp->edge1(pol);
@@ -321,7 +321,7 @@ BddMgrClassic::root_decomp(BddEdge e,
 			   BddEdge& e1)
 {
   tPol pol = e.pol();
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   if ( vp ) {
     e0 = vp->edge0(pol);
     e1 = vp->edge1(pol);
@@ -340,7 +340,7 @@ BddMgrClassic::root_decomp(BddEdge e,
 VarId
 BddMgrClassic::root_var(BddEdge e)
 {
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   if ( vp ) {
     return varid(vp->level());
   }
@@ -355,7 +355,7 @@ BddMgrClassic::root_var(BddEdge e)
 BddEdge
 BddMgrClassic::edge0(BddEdge e)
 {
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   if ( vp ) {
     tPol pol = e.pol();
     return vp->edge0(pol);
@@ -371,7 +371,7 @@ BddMgrClassic::edge0(BddEdge e)
 BddEdge
 BddMgrClassic::edge1(BddEdge e)
 {
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   if ( vp ) {
     tPol pol = e.pol();
     return vp->edge1(pol);
@@ -387,7 +387,7 @@ BddMgrClassic::edge1(BddEdge e)
 bool
 BddMgrClassic::check_noref(BddEdge e)
 {
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   return vp && vp->noref();
 }
 
@@ -519,11 +519,11 @@ BddMgrClassic::gc(bool shrink_nodetable)
   mSweepMgr.prop_event();
 
   // 節点テーブルをスキャンしてゴミを取り除く
-  Node** ptr = mNodeTable;
-  Node** end = mNodeTable + mTableSize;
+  BddNode** ptr = mNodeTable;
+  BddNode** end = mNodeTable + mTableSize;
   do {
-    Node* temp;
-    Node** prev = ptr;
+    BddNode* temp;
+    BddNode** prev = ptr;
     while ( (temp = *prev) ) {
       if ( temp->noref() ) {
 	// どこからも参照されていないノードは節点テーブルから除く
@@ -544,10 +544,10 @@ BddMgrClassic::gc(bool shrink_nodetable)
   // その時には，このブロックに含まれるノードはフリーリストから除かなければ
   // ならない．
   mFreeTop = NULL;
-  Node** prev = &mFreeTop;
-  Node** prev_blk = &mTopBlk;
+  BddNode** prev = &mFreeTop;
+  BddNode** prev_blk = &mTopBlk;
   ymuint64 delete_num = 0;
-  for (Node* blk; (blk = *prev_blk);  ) {
+  for (BddNode* blk; (blk = *prev_blk);  ) {
     if ( scan_nodechunk(blk, NODE_UNIT, prev) ) {
       *prev_blk = blk->mLink;
       dealloc_nodechunk(blk);
@@ -607,28 +607,28 @@ BddMgrClassic::resize(ymuint64 new_size)
 {
   logstream() << "BddMgrClassic::resize(" << new_size << ")" << endl;
 
-  Node** new_table = alloc_nodetable(new_size);
+  BddNode** new_table = alloc_nodetable(new_size);
   if ( !new_table ) {
     // アロケーションに失敗した．
     return false;
   }
 
   ymuint64 old_size = mTableSize;
-  Node** old_table = mNodeTable;
+  BddNode** old_table = mNodeTable;
   mNodeTable = new_table;
   mTableSize = new_size;
   mTableSize_1 = mTableSize - 1;
   set_next_limit_size();
-  Node** tbl = old_table;
+  BddNode** tbl = old_table;
   if ( tbl ) {
-    Node** end = tbl + old_size;
+    BddNode** end = tbl + old_size;
     do {
-      Node* next;
-      Node* temp;
+      BddNode* next;
+      BddNode* temp;
       for (temp = *tbl; temp; temp = next) {
 	next = temp->mLink;
 	ymuint pos = hash_func3(temp->edge0(), temp->edge1(), temp->level());
-	Node*& entry = mNodeTable[pos & mTableSize_1];
+	BddNode*& entry = mNodeTable[pos & mTableSize_1];
 	temp->mLink = entry;
 	entry = temp;
       }
@@ -750,7 +750,7 @@ BddMgrClassic::new_node(ymuint level,
 
   // 節点テーブルを探す．
   ymuint64 pos = hash_func3(e0, e1, level);
-  for (Node* temp = mNodeTable[pos & mTableSize_1]; temp; temp = temp->mLink) {
+  for (BddNode* temp = mNodeTable[pos & mTableSize_1]; temp; temp = temp->mLink) {
     if ( temp->edge0() == e0 && temp->edge1() == e1 && temp->level() == level ) {
       // 同一の節点がすでに登録されている
       return BddEdge(temp, ans_pol);
@@ -759,7 +759,7 @@ BddMgrClassic::new_node(ymuint level,
 
   // 節点テーブルには登録されていなかったので新しい節点を取ってきて
   // 内容を設定する．
-  Node* temp = alloc_node();
+  BddNode* temp = alloc_node();
   if ( !temp ) {
     // メモリアロケーションに失敗した
     return BddEdge::make_overflow();
@@ -778,7 +778,7 @@ BddMgrClassic::new_node(ymuint level,
     }
   }
   {
-    Node*& entry = mNodeTable[pos & mTableSize_1];
+    BddNode*& entry = mNodeTable[pos & mTableSize_1];
     temp->mLink = entry;
     entry = temp;
   }
@@ -849,29 +849,18 @@ BddMgrClassic::reg_var(Var* var)
   entry = var;
 }
 
-// ノードをロックする．
-// もし，子孫のノードがアンロックの状態ならばロックする
-// 無駄な関数呼び出しを避けるため，この関数を呼び出す前に，
-// このノードがロックされていないことを確認してあるものとする．
+// @brief lockall() 用のフック
 void
-BddMgrClassic::lockall(Node* vp)
+BddMgrClassic::lock_hook(BddNode* vp)
 {
   -- mGarbageNum;
-  activate(vp->edge0());
-  activate(vp->edge1());
 }
 
-// ノードをアンロックする．
-// もし，子孫のノードがこのノード以外から参照されていない場合には，
-// そのノードもアンロックする
-// 無駄な関数呼び出しを避けるため，この関数を呼び出す前に，
-// このノードがロックされていたことは確認してあるものとする．
+// @brief unlockall() 用のフック
 void
-BddMgrClassic::unlockall(Node* vp)
+BddMgrClassic::unlock_hook(BddNode* vp)
 {
   ++ mGarbageNum;
-  deactivate(vp->edge0());
-  deactivate(vp->edge1());
 }
 
 // 演算結果テーブルを登録する．
@@ -883,10 +872,10 @@ BddMgrClassic::add_table(CompTbl* tbl)
 }
 
 // 節点を確保する．
-BmcNode*
+BddNode*
 BddMgrClassic::alloc_node()
 {
-  Node* temp;
+  BddNode* temp;
 
   if ( (temp = mFreeTop) ) {
     // フリーリストに節点があったのでそれを取り出す．
@@ -925,15 +914,15 @@ BddMgrClassic::alloc_node()
 // ただし，チャンク全体が参照されていなかった場合にはフリーリストには
 // つながない．その場合には true を返す．
 bool
-BddMgrClassic::scan_nodechunk(Node* blk,
+BddMgrClassic::scan_nodechunk(BddNode* blk,
 			      ymuint blk_size,
-			      Node**& prev)
+			      BddNode**& prev)
 {
-  Node** prev_orig = prev;
+  BddNode** prev_orig = prev;
   bool can_delete = true;
   // メモリブロックの先頭のノードは次のブロックを指すポインタとして
   // 使っているのでスキャンから除外する．
-  Node* temp = &blk[1];
+  BddNode* temp = &blk[1];
   for (ymuint i = 1; i < blk_size; ++ i, ++ temp) {
     if ( temp->noref() ) {
       *prev = temp;
@@ -974,39 +963,39 @@ BddMgrClassic::dealloc_vartable(Var** table,
 
 // 節点テーブル用のメモリを確保する．
 // size はバイト単位ではなくエントリ数
-BmcNode**
+BddNode**
 BddMgrClassic::alloc_nodetable(ymuint64 size)
 {
-  ymuint64 byte_size = sizeof(Node*) * size;
+  ymuint64 byte_size = sizeof(BddNode*) * size;
   void* ptr = allocate(byte_size);
   if ( ptr ) {
     memset(ptr, 0, byte_size);
   }
-  return static_cast<Node**>(ptr);
+  return static_cast<BddNode**>(ptr);
 }
 
 // 節点テーブル用のメモリを解放する．
 // size はバイト単位ではなくエントリ数
 void
-BddMgrClassic::dealloc_nodetable(Node** table,
+BddMgrClassic::dealloc_nodetable(BddNode** table,
 				 ymuint64 size)
 {
-  ymuint64 byte_size = sizeof(Node*) * size;
+  ymuint64 byte_size = sizeof(BddNode*) * size;
   deallocate(table, byte_size);
 }
 
 // 節点チャンク用のメモリを確保する．
-BmcNode*
+BddNode*
 BddMgrClassic::alloc_nodechunk()
 {
   const ymuint64 byte_size = sizeof(Node) * NODE_UNIT;
   void* ptr = allocate(byte_size);
-  return static_cast<Node*>(ptr);
+  return static_cast<BddNode*>(ptr);
 }
 
 // 節点チャンク用のメモリを解放する．
 void
-BddMgrClassic::dealloc_nodechunk(Node* chunk)
+BddMgrClassic::dealloc_nodechunk(BddNode* chunk)
 {
   const ymuint64 byte_size = sizeof(Node) * NODE_UNIT;
   deallocate(chunk, byte_size);

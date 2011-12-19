@@ -12,6 +12,7 @@
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddMgr.h"
 #include "BddEdge.h"
+#include "BddNode.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -645,6 +646,32 @@ private:
 	   const vector<BddEdge>& var_vector,
 	   ymuint var_idx);
 
+  /// @brief ノードのリンク数を増やし，もしロックされていなければロックする
+  void
+  activate(BddEdge vd);
+
+  /// @brief ノードのリンク数を減らし，他のリンクがなければロックを外す
+  void
+  deactivate(BddEdge vd);
+
+  /// @brief vp と vp の子孫のノードをロックする
+  void
+  lockall(BddNode* vp);
+
+  /// @brief vp と vp の子孫ノードを(他に参照されていないもののみ)ロックを外す
+  void
+  unlockall(BddNode* vp);
+
+  /// @brief lockall() 用のフック
+  virtual
+  void
+  lock_hook(BddNode* vp) = 0;
+
+  /// @brief unlockall() 用のフック
+  virtual
+  void
+  unlock_hook(BddNode* vp) = 0;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -707,6 +734,30 @@ BddMgrImpl::or_op(BddEdge e1,
 		  BddEdge e2)
 {
   return ~and_op(~e1, ~e2);
+}
+
+// リンク数を増やし，もしロックされていなければロックする
+// 多くの場合, lockall() が呼ばれることが少ないので inline にしている．
+inline
+void
+BddMgrImpl::activate(BddEdge e)
+{
+  BddNode* vp = e.get_node();
+  if ( vp && vp->linkinc() == 1 ) {
+    lockall(vp);
+  }
+}
+
+// リンク数を減らし，他のリンクがなければロックを外す
+// 多くの場合, unlockall() が呼ばれることが少ないので inline にしている．
+inline
+void
+BddMgrImpl::deactivate(BddEdge e)
+{
+  BddNode* vp = e.get_node();
+  if ( vp && vp->linkdec() == 0 ) {
+    unlockall(vp);
+  }
 }
 
 END_NAMESPACE_YM_BDD

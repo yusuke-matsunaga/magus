@@ -150,4 +150,29 @@ BddMgrImpl::tvec_sub(const vector<int>& v,
   }
 }
 
+// ノードをロックする．
+// もし，子孫のノードがアンロックの状態ならばロックする
+// 無駄な関数呼び出しを避けるため，この関数を呼び出す前に，
+// このノードがロックされていないことを確認してあるものとする．
+void
+BddMgrImpl::lockall(BddNode* vp)
+{
+  lock_hook(vp);
+  activate(vp->edge0());
+  activate(vp->edge1());
+}
+
+// ノードをアンロックする．
+// もし，子孫のノードがこのノード以外から参照されていない場合には，
+// そのノードもアンロックする
+// 無駄な関数呼び出しを避けるため，この関数を呼び出す前に，
+// このノードがロックされていたことは確認してあるものとする．
+void
+BddMgrImpl::unlockall(BddNode* vp)
+{
+  unlock_hook(vp);
+  deactivate(vp->edge0());
+  deactivate(vp->edge1());
+}
+
 END_NAMESPACE_YM_BDD

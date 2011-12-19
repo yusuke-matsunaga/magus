@@ -12,7 +12,7 @@
 #include "ym_logic/Bdd.h"
 
 #include "base/BddMgrImpl.h"
-#include "BddNode.h"
+#include "base/BddNode.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -703,21 +703,15 @@ private:
   void
   set_next_limit_size();
 
-  // ノードのリンク数を増やし，もしロックされていなければロックする
+  /// @brief lockall() 用のフック
+  virtual
   void
-  activate(BddEdge vd);
+  lock_hook(BddNode* vp);
 
-  // ノードのリンク数を減らし，他のリンクがなければロックを外す
+  /// @brief unlockall() 用のフック
+  virtual
   void
-  deactivate(BddEdge vd);
-
-  // vp と vp の子孫のノードをロックする
-  void
-  lockall(BddNode* vp);
-
-  // vp と vp の子孫ノードを(他に参照されていないもののみ)ロックを外す
-  void
-  unlockall(BddNode* vp);
+  unlock_hook(BddNode* vp);
 
   // 演算結果テーブルを登録する．
   void
@@ -815,6 +809,7 @@ private:
   void
   clear_pnmark(BddEdge e);
 
+#if 0
   // vdの指すノードのマークを調べ，マークされていればtrueを返す．
   // 枝に極性がなければマークは1種類でいいが，極性があるので，
   // 肯定の枝から指された場合の p-mark と否定の枝から指された場
@@ -827,6 +822,7 @@ private:
   static
   void
   setmark(BddEdge vd);
+#endif
 
   // idx が top に等しいときには e の子供を e_0, e_1 にセットする．
   // 等しくなければ e をセットする．
@@ -1021,30 +1017,7 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// リンク数を増やし，もしロックされていなければロックする
-// 多くの場合, lockall() が呼ばれることが少ないので inline にしている．
-inline
-void
-BddMgrClassic::activate(BddEdge e)
-{
-  BddNode* vp = e.get_node();
-  if ( vp && vp->linkinc() == 1 ) {
-    lockall(vp);
-  }
-}
-
-// リンク数を減らし，他のリンクがなければロックを外す
-// 多くの場合, unlockall() が呼ばれることが少ないので inline にしている．
-inline
-void
-BddMgrClassic::deactivate(BddEdge e)
-{
-  BddNode* vp = e.get_node();
-  if ( vp && vp->linkdec() == 0 ) {
-    unlockall(vp);
-  }
-}
-
+#if 0
 // vdの指すノードのマークを調べ，マークされていればtrueを返す．
 // 枝に極性がなければマークは1種類でいいが，極性があるので，
 // 肯定の枝から指された場合の p-mark と否定の枝から指された場
@@ -1070,6 +1043,7 @@ BddMgrClassic::setmark(BddEdge vd)
     vp->nmark(1);
   }
 }
+#endif
 
 // idx が top に等しいときには e の子供を e_0, e_1 にセットする．
 // 等しくなければ e をセットする．
