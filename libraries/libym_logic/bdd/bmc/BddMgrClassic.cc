@@ -1082,7 +1082,7 @@ void
 BddMgrClassic::clear_pmark(BddEdge e)
 {
   for ( ; ; ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     if ( !vp || !vp->pmark() ) {
       break;
     }
@@ -1097,7 +1097,7 @@ void
 BddMgrClassic::clear_nmark(BddEdge e)
 {
   for ( ; ; ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     if ( !vp || !vp->nmark() ) {
       break;
     }
@@ -1112,7 +1112,7 @@ void
 BddMgrClassic::clear_pnmark(BddEdge e)
 {
   for ( ; ; ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     if ( !vp || !(vp->pmark() || vp->nmark()) ) {
       break;
     }

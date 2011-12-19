@@ -1,7 +1,7 @@
-#ifndef YM_LOGIC_BDDEDGE_H
-#define YM_LOGIC_BDDEDGE_H
+#ifndef BDDEDGE_H
+#define BDDEDGE_H
 
-/// @file ym_logic/BddEdge.h
+/// @file BddEdge.h
 /// @brief BddEdge のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
@@ -13,13 +13,14 @@
 #include "ym_logic/bdd_nsdef.h"
 #include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
-#include "ym_logic/lexp_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
 
+class BddNode;
+
 //////////////////////////////////////////////////////////////////////
-/// @class BddEdge BddEdge.h "ym_logic/BddEdge.h"
+/// @class BddEdge BddEdge.h "BddEdge.h"
 /// @brief BDD の枝を表すクラス
 //////////////////////////////////////////////////////////////////////
 class BddEdge
@@ -42,7 +43,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] node ノード
   explicit
-  BddEdge(void* node);
+  BddEdge(BddNode* node);
 
   /// @brief コンストラクタ
   /// @param[in] node ノード
@@ -110,8 +111,8 @@ public:
   get_normal() const;
 
   /// @brief ノードのポインタを取り出す．
-  void*
-  get_ptr() const;
+  BddNode*
+  get_node() const;
 
   /// @brief 極性を取り出す．
   tPol
@@ -263,7 +264,7 @@ BddEdge::BddEdge() :
 // @brief コンストラクタ
 // @param[in] node ノード
 inline
-BddEdge::BddEdge(void* node) :
+BddEdge::BddEdge(BddNode* node) :
   mBody(reinterpret_cast<ympuint>(node))
 {
 }
@@ -384,10 +385,10 @@ BddEdge::get_normal() const
 
 // @brief ノードのポインタを取り出す．
 inline
-void*
-BddEdge::get_ptr() const
+BddNode*
+BddEdge::get_node() const
 {
-  return reinterpret_cast<void*>(mBody & ~3UL);
+  return reinterpret_cast<BddNode*>(mBody & ~3UL);
 }
 
 // @brief 極性を取り出す．
