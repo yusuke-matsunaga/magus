@@ -599,12 +599,21 @@ VarId
 Bdd::root_decomp(Bdd& f0,
 		 Bdd& f1) const
 {
-  BddEdge e0, e1;
   BddEdge e(mRoot);
-  VarId ans = mMgr->root_decomp(e, e0, e1);
-  f0 = Bdd(mMgr, e0);
-  f1 = Bdd(mMgr, e1);
-  return ans;
+  tPol pol = e.pol();
+  BddNode* node = e.get_node();
+  if ( node ) {
+    BddEdge e0 = node->edge0(pol);
+    f0 = Bdd(mMgr, e0);
+    BddEdge e1 = node->edge1(pol);
+    f1 = Bdd(mMgr, e1);
+    ymuint level = node->level();
+    return mMgr->varid(level);
+  }
+  else {
+    f0 = f1 = *this;
+    return kVarIdIllegal;
+  }
 }
 
 // @brief 根の変数番号を取り出す．
@@ -612,7 +621,14 @@ VarId
 Bdd::root_var() const
 {
   BddEdge e(mRoot);
-  return mMgr->root_var(e);
+  BddNode* node = e.get_node();
+  if ( node ) {
+    ymuint level = node->level();
+    return mMgr->varid(level);
+  }
+  else {
+    return kVarIdIllegal;
+  }
 }
 
 // @brief 0枝の取得
@@ -620,8 +636,15 @@ Bdd
 Bdd::edge0() const
 {
   BddEdge e(mRoot);
-  BddEdge ans = mMgr->edge0(e);
-  return Bdd(mMgr, ans);
+  tPol pol = e.pol();
+  BddNode* node = e.get_node();
+  if ( node ) {
+    BddEdge e0 = node->edge0(pol);
+    return Bdd(mMgr, e0);
+  }
+  else {
+    return *this;
+  }
 }
 
 // @brief 1枝の取得
@@ -629,8 +652,15 @@ Bdd
 Bdd::edge1() const
 {
   BddEdge e(mRoot);
-  BddEdge ans = mMgr->edge1(e);
-  return Bdd(mMgr, ans);
+  tPol pol = e.pol();
+  BddNode* node = e.get_node();
+  if ( node ) {
+    BddEdge e1 = node->edge1(pol);
+    return Bdd(mMgr, e1);
+  }
+  else {
+    return *this;
+  }
 }
 
 // @brief BDD の内容を積和形論理式に変換する．
@@ -1009,30 +1039,29 @@ Bdd::to_literallist(LiteralList& dst) const
 void
 Bdd::print_map(ostream& s) const
 {
-  BddMgrImpl* mgr = mMgr;
   char val[16];
   bool flag = true;
+  Bdd f = *this;
   for (ymuint i = 0; i < 16; i ++) {
-    BddEdge e(mRoot);
     for (ymuint j = 0; j < 4; j ++) {
-      if ( e.is_const() ) {
+      if ( f.is_const() ) {
 	break;
       }
-      BddEdge e0;
-      BddEdge e1;
-      VarId vid = mgr->root_decomp(e, e0, e1);
+      Bdd f0;
+      Bdd f1;
+      VarId vid = f.root_decomp(f0, f1);
       if ( vid.val() > j ) continue;
       if ( i & (1 << j) ) {
-	e = e1;
+	f = f1;
       }
       else {
-	e = e0;
+	f = f0;
       }
     }
-    if ( e.is_zero() ) {
+    if ( f.is_zero() ) {
       val[i] = '0';
     }
-    else if ( e.is_one() ) {
+    else if ( f.is_one() ) {
       val[i] = '1';
     }
     else {

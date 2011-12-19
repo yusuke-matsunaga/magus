@@ -134,10 +134,11 @@ Printer::print_step(BddEdge e)
   }
   mMark.insert(e_p);
   print_id(e_p);
-  BddEdge e0;
-  BddEdge e1;
-  VarId id = mMgr->root_decomp(e_p, e0, e1);
-  ymuint64 level = mMgr->level(id);
+  BddNode* node = e_p.get_node();
+  BddEdge e0 = node->edge0();
+  BddEdge e1 = node->edge1();
+  ymuint level = node->level();
+  VarId id = mMgr->varid(level);
   ios::fmtflags save = mStream.flags();
   mStream << ":IDX=" << setw(3) << id
 	  << ":LVL=" << setw(3) << level

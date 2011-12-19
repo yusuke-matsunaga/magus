@@ -110,13 +110,15 @@ Dumper::dump_node(BddEdge e)
   }
   BddEdge e_p(e);
   e_p.normalize();
-  BddEdge e0;
-  BddEdge e1;
-  VarId varid = mMgr->root_decomp(e_p, e0, e1);
+  BddNode* node = e_p.get_node();
+  BddEdge e0 = node->edge0();
+  BddEdge e1 = node->edge1();
+  ymuint level = node->level();
+  VarId id = mMgr->varid(level);
   dump_node(e0);
   dump_node(e1);
   mIdMgr.id(e_p);
-  mStream << varid;
+  mStream << id;
   dump_edge(e0);
   dump_edge(e1);
 }
