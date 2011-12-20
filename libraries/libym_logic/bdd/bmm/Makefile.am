@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
-
 SUBDIR =
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -21,13 +21,12 @@ noinst_LTLIBRARIES = libym_bdd_bmm.la
 libym_bdd_bmm_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/bdd \
+	-I$(top_srcdir)/bdd/include \
 	$(GMP_INCLUDES)
 
 libym_bdd_bmm_la_SOURCES = \
 	BddMgrModern.h \
 	BddMgrModern.cc \
-	BmmNode.h \
 	BmmVar.h \
 	BmmVar.cc \
 	BmmCompTbl.h \

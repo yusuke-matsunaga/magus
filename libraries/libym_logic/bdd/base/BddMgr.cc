@@ -13,9 +13,6 @@
 
 #include "BddMgrImpl.h"
 
-#include "bmc/BddMgrClassic.h"
-#include "bmm/BddMgrModern.h"
-
 #include "ym_utils/HeapTree.h"
 
 
@@ -55,15 +52,7 @@ BddMgr::BddMgr(const string& type,
 	       const string& name,
 	       const string& option)
 {
-  if ( type == "bmc" ) {
-    mImpl = new BddMgrClassic(name, option);
-  }
-  else if ( type == "bmm" ) {
-    mImpl = new BddMgrModern(name, option);
-  }
-  else {
-    mImpl = new BddMgrClassic(name, option);
-  }
+  mImpl = BddMgrImpl::new_mgr(type, name, option);
   assert_cond(mImpl, __FILE__, __LINE__);
 }
 

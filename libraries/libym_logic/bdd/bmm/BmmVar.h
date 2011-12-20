@@ -9,8 +9,9 @@
 /// All rights reserved.
 
 
-#include "ym_logic/Bdd.h"
-#include "base/BddEdge.h"
+#include "ym_logic/bdd_nsdef.h"
+
+#include "BddEdge.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
