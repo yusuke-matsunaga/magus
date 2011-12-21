@@ -32,6 +32,19 @@ libym_bdd_base_la_SOURCES = \
 	BddVarSet.cc \
 	BddVector.cc \
 	BddList.cc \
+	CompTbl.h \
+	CompTbl.cc \
+	CompTbl1.h \
+	CompTbl1.cc \
+	CompTbl2.h \
+	CompTbl2.cc \
+	CompTbl2e.h \
+	CompTbl2e.cc \
+	CompTbl3.h \
+	CompTbl3.cc \
+	BddOp.h \
+	AndOp.h \
+	AndOp.cc \
 	IdMgr.h \
 	IdMgr.cc \
 	Printer.h \

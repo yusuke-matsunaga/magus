@@ -10,6 +10,7 @@
 
 
 #include "CompTbl.h"
+#include "BddEdge.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -100,7 +101,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // テーブルの本体
   Cell* mTable;
+
+  // 使用されているセルの数
+  ymuint64 mUsedNum;
 
 };
 
@@ -117,7 +122,7 @@ CompTbl2::hash_func(BddEdge id1,
 {
   ymuint64 v1 = id1.hash();
   ymuint64 v2 = id2.hash();
-  return (v1 + v2 + v2 + (v1 >> 2) + (v2 >> 4)) & mTableSize_1;
+  return (v1 + v2 + v2 + (v1 >> 2) + (v2 >> 4)) % table_size();
   //    return size_t((id1 * (id2 + 2)) >> 2) & mTableSize_1;
 }
 
@@ -146,13 +151,13 @@ CompTbl2::put(BddEdge id1,
   if ( id1.is_invalid() || id2.is_invalid() || ans.is_invalid() ) {
     return;
   }
-  if ( check_tablesize() ) {
-    if ( !resize(mTableSize << 1) ) {
+  if ( check_tablesize(mUsedNum) ) {
+    if ( !resize(table_size() << 1) ) {
       return;
     }
   }
   Cell* tmp = mTable + hash_func(id1, id2);
-  if ( tmp->mKey1.is_error() ) mUsedNum ++;
+  if ( tmp->mKey1.is_error() ) ++ mUsedNum;
   tmp->mKey1 = id1;
   tmp->mKey2 = id2;
   tmp->mAns = ans;

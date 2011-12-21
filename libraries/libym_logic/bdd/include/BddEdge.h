@@ -118,6 +118,10 @@ public:
   /// @brief 生の情報を取り出す．
   operator ympuint() const;
 
+  /// @brief 参照されていない時にtrueを返す
+  bool
+  noref() const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////

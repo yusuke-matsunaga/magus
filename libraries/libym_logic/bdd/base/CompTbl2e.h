@@ -10,6 +10,8 @@
 
 
 #include "CompTbl.h"
+#include "BddEdge.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -24,8 +26,8 @@ class CompTbl2e :
 public:
 
   // コンストラクタ
-  CompTbl2e(BddMgrClassic* mgr,
-	     const char* name = 0);
+  CompTbl2e(BddMgrImpl* mgr,
+	    const char* name = 0);
 
   // デストラクタ
   virtual
@@ -103,7 +105,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // テーブルの本体
   Cell* mTable;
+
+  // 使用されているセルの数
+  ymuint64 mUsedNum;
 
 };
 
@@ -120,7 +126,7 @@ CompTbl2e::hash_func(BddEdge id1,
 {
   ymuint64 v1 = id1.hash();
   ymuint64 v2 = id2.hash();
-  return (v1 + v2 + v2 + (v1 >> 2) + (v2 >> 4)) & mTableSize_1;
+  return (v1 + v2 + v2 + (v1 >> 2) + (v2 >> 4)) % table_size();
   //    return size_t((id1 * (id2 + 2)) >> 2) & mTableSize_1;
 }
 
@@ -152,8 +158,8 @@ CompTbl2e::put(BddEdge id1,
   if ( id1.is_invalid() || id2.is_invalid() || ans_bdd.is_invalid() ) {
     return;
   }
-  if ( check_tablesize() ) {
-    if ( !resize(mTableSize << 1) ) {
+  if ( check_tablesize(mUsedNum) ) {
+    if ( !resize(table_size() << 1) ) {
       return;
     }
   }

@@ -8,6 +8,7 @@
 
 
 #include "AndOp.h"
+#include "BddMgrImpl.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -19,6 +20,7 @@ BEGIN_NAMESPACE_YM_BDD
 // @brief コンストラクタ
 // @param[in] mgr マネージャ
 AndOp::AndOp(BddMgrImpl* mgr) :
+  BddBinOp(mgr),
   mMgr(mgr)
 {
 }
@@ -77,7 +79,7 @@ AndOp::apply_step(BddEdge f,
     g = tmp;
   }
 
-  BddEdge result = mCompTable.get(f, g);
+  BddEdge result = get(f, g);
   if ( result.is_error() ) {
     // 演算結果テーブルには登録されていない
     BddEdge f_0, f_1;
@@ -91,8 +93,8 @@ AndOp::apply_step(BddEdge f,
     if ( r_1.is_overflow() ) {
       return BddEdge::make_overflow();
     }
-    result = new_node(level, r_0, r_1);
-    mCompTable.put(f, g, result);
+    result = mMgr->new_node(level, r_0, r_1);
+    put(f, g, result);
   }
 
   return result;

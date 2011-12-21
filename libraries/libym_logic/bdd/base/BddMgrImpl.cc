@@ -44,6 +44,14 @@ BddEdge::set_mark()
   }
 }
 
+// @brief 参照されていない時にtrueを返す
+bool
+BddEdge::noref() const
+{
+  BddNode* node = get_node();
+  return node->noref();
+}
+
 // @brief マークを消す．
 void
 clear_mark(BddEdge e)

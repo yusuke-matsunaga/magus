@@ -49,6 +49,10 @@ public:
   void
   clear() = 0;
 
+  /// @brief 名前を返す．
+  string
+  name() const;
+
   /// @brief 使用されているセル数を返す．
   ymuint64
   used_num() const;
@@ -71,13 +75,15 @@ protected:
   // 継承クラスから用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief next_limitを更新する
+  /// @brief テーブルサイズを設定する．
+  /// @param[in] new_size 設定する新しいサイズ
   void
-  update_next_limit();
+  set_table_size(ymuint64 new_size);
 
   /// @brief テーブルを拡張すべき時には true を返す．
+  /// @param[in] num 使用中のセル数
   bool
-  check_tablesize() const;
+  check_tablesize(ymuint64 num) const;
 
   // BddMgr からメモリを確保する．
   void*
@@ -98,8 +104,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 使用されているセルの数
-  ymuint64 mUsedNum;
+  // 親の BddMgr
+  BddMgrImpl* mMgr;
+
+  // ほとんどデバッグ用の名前
+  string mName;
 
   // テーブルサイズ
   // セルの個数．バイト数ではないので注意
@@ -108,20 +117,14 @@ private:
   // テーブルサイズ - 1 の値，ハッシュのマスクに用いる．
   ymuint64 mTableSize_1;
 
-  // ほとんどデバッグ用の名前
-  string mName;
-
   // テーブルの使用率がこの値を越えたらサイズの拡張を行なう．
   double mLoadLimit;
 
   // ただし，テーブルのサイズはこれ以上大きくしない．
   ymuint64 mMaxSize;
 
-  // mUsedがこの値を越えたらテーブルを拡張する
+  // mUsedNumがこの値を越えたらテーブルを拡張する
   ymuint64 mNextLimit;
-
-  // 親の BddMgr
-  BddMgrClassic* mMgr;
 
 };
 
@@ -130,21 +133,20 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief 名前を返す．
+inline
+string
+CompTbl::name() const
+{
+  return mName;
+}
+
 // テーブルを拡張すべき時には true を返す．
 inline
 bool
-CompTbl::check_tablesize() const
+CompTbl::check_tablesize(ymuint64 num) const
 {
-  return mUsedNum > mNextLimit && mTableSize < mMaxSize;
-}
-
-// e の参照回数が0なら true を返す．
-inline
-bool
-CompTbl::check_noref(BddEdge e)
-{
-  BddNode* vp = e.get_node();
-  return vp && vp->noref();
+  return num > mNextLimit && mTableSize < mMaxSize;
 }
 
 END_NAMESPACE_YM_BDD

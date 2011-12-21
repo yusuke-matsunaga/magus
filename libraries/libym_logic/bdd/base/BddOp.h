@@ -10,6 +10,8 @@
 
 
 #include "ym_logic/bdd_nsdef.h"
+#include "CompTbl2.h"
+#include "BddNode.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -23,7 +25,10 @@ class BddBinOp
 public:
 
   /// @brief コンストラクタ
-  BddBinOp() { }
+  /// @param[in] mgr マネージャ
+  /// @param[in] name テーブル名
+  BddBinOp(BddMgrImpl* mgr,
+	   const char* name = 0);
 
   /// @brief デストラクタ
   virtual
@@ -49,7 +54,21 @@ protected:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  // f と g のノードの子供のノードとレベルを求める．
+  /// @brief 演算結果テーブルを検索する．
+  /// @param[in] e1, e2 オペランドの枝
+  BddEdge
+  get(BddEdge e1,
+      BddEdge e2);
+
+  /// @brief 演算結果テーブルに登録する．
+  /// @param[in] e1, e2 オペランドの枝
+  /// @param[in] ans 結果の枝
+  void
+  put(BddEdge e1,
+      BddEdge e2,
+      BddEdge ans);
+
+  /// @brief f と g のノードの子供のノードとレベルを求める．
   static
   ymuint
   split(BddEdge f,
@@ -59,8 +78,8 @@ protected:
 	BddEdge& g_0,
 	BddEdge& g_1);
 
-  // idx が top に等しいときには e の子供を e_0, e_1 にセットする．
-  // 等しくなければ e をセットする．
+  /// @brief idx が top に等しいときには e の子供を e_0, e_1 にセットする．
+  /// 等しくなければ e をセットする．
   static
   void
   split1(ymuint top,
@@ -71,12 +90,53 @@ protected:
 	 BddEdge& e_0,
 	 BddEdge& e_1);
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 演算結果テーブル
+  CompTbl2 mCompTbl;
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] mgr マネージャ
+// @param[in] name テーブル名
+inline
+BddBinOp::BddBinOp(BddMgrImpl* mgr,
+		   const char* name) :
+  mCompTbl(mgr, name)
+{
+}
+
+// @brief 演算結果テーブルを検索する．
+// @param[in] e1, e2 オペランドの枝
+inline
+BddEdge
+BddBinOp::get(BddEdge e1,
+	      BddEdge e2)
+{
+  return mCompTbl.get(e1, e2);
+}
+
+// @brief 演算結果テーブルに登録する．
+// @param[in] e1, e2 オペランドの枝
+// @param[in] ans 結果の枝
+inline
+void
+BddBinOp::put(BddEdge e1,
+	      BddEdge e2,
+	      BddEdge ans)
+{
+  mCompTbl.put(e1, e2, ans);
+}
 
 // f と g のノードの子供のノードとレベルを求める．
 inline

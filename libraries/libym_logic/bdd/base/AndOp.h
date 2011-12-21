@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "BddBinOp.h"
+#include "BddOp.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -64,9 +64,6 @@ private:
 
   // マネージャ
   BddMgrImpl* mMgr;
-
-  // 演算結果テーブル
-  CompTbl2 mCompTbl;
 
 };
 
