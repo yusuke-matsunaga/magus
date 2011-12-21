@@ -11,7 +11,6 @@
 
 
 #include "ym_logic/bdd_nsdef.h"
-#include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
 
 
@@ -25,8 +24,6 @@ class BddNode;
 //////////////////////////////////////////////////////////////////////
 class BddEdge
 {
-  friend class Bdd;
-  friend class BddMgr;
   friend class BddMgrImpl;
 
 public:

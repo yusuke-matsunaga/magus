@@ -75,13 +75,13 @@ Bdd::assign(ympuint new_e)
 // @brief デフォルトのコンストラクタ
 Bdd::Bdd()
 {
-  set(BddMgr::default_mgr().mImpl, BddEdge::kEdgeError);
+  set(BddMgr::default_mgr().mImpl, BddEdge::make_error());
 }
 
 // @brief マネージャを指定したコンストラクタ
 Bdd::Bdd(BddMgr& mgr)
 {
-  set(mgr.mImpl, BddEdge::kEdgeError);
+  set(mgr.mImpl, BddEdge::make_error());
 }
 
 // @brief コピーコンストラクタ
@@ -163,28 +163,28 @@ Bdd::is_leaf() const
 void
 Bdd::set_zero()
 {
-  set(mMgr, BddEdge::kEdge0);
+  set(mMgr, BddEdge::make_zero());
 }
 
 // @brief 定数1に設定する．
 void
 Bdd::set_one()
 {
-  set(mMgr, BddEdge::kEdge1);
+  set(mMgr, BddEdge::make_one());
 }
 
 // @brief エラー値に設定する．
 void
 Bdd::set_error()
 {
-  set(mMgr, BddEdge::kEdgeError);
+  set(mMgr, BddEdge::make_error());
 }
 
 // @brief オーバーフロー値に設定する．
 void
 Bdd::set_overflow()
 {
-  set(mMgr, BddEdge::kEdgeOverflow);
+  set(mMgr, BddEdge::make_overflow());
 }
 
 // @brief 等価比較
@@ -344,10 +344,10 @@ Bdd::compose(const VarBddMap& comp_map) const
        p != comp_map.end(); ++ p) {
     Bdd bdd = p->second;
     if ( mMgr != bdd.mMgr || bdd.is_error() ) {
-      return Bdd(mMgr, BddEdge::kEdgeError);
+      return Bdd(mMgr, BddEdge::make_error());
     }
     if ( bdd.is_overflow() ) {
-      return Bdd(mMgr, BddEdge::kEdgeOverflow);
+      return Bdd(mMgr, BddEdge::make_overflow());
     }
   }
 
@@ -587,7 +587,7 @@ Bdd::push_down(ymuint x_level,
 	       tPol pol) const
 {
   if ( x_level >= y_level ) {
-    return Bdd(mMgr, BddEdge::kEdgeError);
+    return Bdd(mMgr, BddEdge::make_error());
   }
   BddEdge e(mRoot);
   BddEdge ans = mMgr->push_down(e, x_level, y_level, pol);
