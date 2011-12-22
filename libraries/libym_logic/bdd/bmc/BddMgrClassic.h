@@ -112,19 +112,10 @@ public:
 
 
   //////////////////////////////////////////////////////////////////////
-  // BDD 生成用関数
-  //////////////////////////////////////////////////////////////////////
-
-  // 肯定のリテラル関数を作る
-  virtual
-  BddEdge
-  make_posiliteral(VarId varid);
-
-
-  //////////////////////////////////////////////////////////////////////
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   // src1 & src2 を計算する．
   virtual
   BddEdge
@@ -142,6 +133,7 @@ public:
   BddEdge
   check_intersect(BddEdge e1,
 		  BddEdge e2);
+#endif
 
   // Davio展開のモーメント項($f_{\overline{x}} \oplus f_x$)を
   // 求める処理
@@ -396,16 +388,6 @@ public:
   // 内部動作の設定を行う関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ガーベージコレクションを許可する．
-  virtual
-  void
-  enable_gc();
-
-  /// @brief ガーベージコレクションを禁止する．
-  virtual
-  void
-  disable_gc();
-
   // ガーベージコレクションを行なう．
   // shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
   virtual
@@ -416,26 +398,6 @@ public:
   virtual
   void
   reg_sweep_binder(EventBinder* binder);
-
-  // パラメータを設定する．設定したい項目のマスクビットを1とする．
-  virtual
-  void
-  param(const BddMgrParam& param,
-	ymuint32 mask);
-
-  // パラメータを取得する．
-  virtual
-  void
-  param(BddMgrParam& param) const;
-
-  // 節点テーブルの拡張を制御するパラメータを得る．
-  double
-  nt_load_limit() const;
-
-  // 名前を得る．
-  virtual
-  const string&
-  name() const;
 
   // 使用メモリ量(in bytes)を得る．
   virtual
@@ -739,6 +701,7 @@ private:
   void
   dealloc_nodechunk(BddNode* chunk);
 
+#if 1
   // このマネージャで使用するメモリ領域を確保する．
   void*
   allocate(ymuint64 size);
@@ -747,7 +710,7 @@ private:
   void
   deallocate(void* ptr,
 	     ymuint64 size);
-
+#endif
 
   //////////////////////////////////////////////////////////////////////
   // BddEdge を操作するクラスメソッド
@@ -777,34 +740,6 @@ private:
 
 
 private:
-  //////////////////////////////////////////////////////////////////////
-  // デバッグ用の名前
-  //////////////////////////////////////////////////////////////////////
-
-  string mName;
-
-
-  //////////////////////////////////////////////////////////////////////
-  // ユーザーが設定するパラメータ
-  // 設定は専用のメソッドを用いる．
-  //////////////////////////////////////////////////////////////////////
-
-  // ガーベージの割合がこの値を越えるとGCを起こす．
-  double mGcThreshold;
-
-  // ただし，全体のノード数がこの数以下の時はGCは起こさない．
-  ymuint64 mGcNodeLimit;
-
-  // 節点テーブル拡張時の制限値を決めるパラメータ
-  double mNtLoadLimit;
-
-  // 演算結果テーブル拡張時の制限値を決めるパラメータ
-  double mRtLoadLimit;
-
-  // 使用メモリ量の上限
-  ymuint64 mMemLimit;
-
-
   //////////////////////////////////////////////////////////////////////
   // パッケージ内部の情報
   // 読み出しのみ可能
@@ -916,12 +851,6 @@ private:
   // garbage collection 用の制御用変数
   //////////////////////////////////////////////////////////////////////
 
-  // GCの起動を制御する変数
-  int mGcEnable;
-
-  // ノード数がこの数を越えたら mGcEnable は常に true だと思う
-  ymuint64 mDangerousZone;
-
   // GC 前に sweep 処理を行うオブジェクトを管理するマネージャ
   EventBindMgr mSweepMgr;
 
@@ -990,14 +919,6 @@ BddMgrClassic::split(BddEdge f,
   split1(level, f_level, f, f_vp, f_pol, f_0, f_1);
   split1(level, g_level, g, g_vp, g_pol, g_0, g_1);
   return level;
-}
-
-// 節点テーブルの拡張を制御するパラメータを得る．
-inline
-double
-BddMgrClassic::nt_load_limit() const
-{
-  return mNtLoadLimit;
 }
 
 END_NAMESPACE_YM_BDD

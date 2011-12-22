@@ -1,32 +1,32 @@
 
-/// @file AndOp.cc
-/// @brief AndOp の実装ファイル
+/// @file XorOp.cc
+/// @brief XorOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AndOp.h"
+#include "XorOp.h"
 #include "BddMgrImpl.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
 
 //////////////////////////////////////////////////////////////////////
-// クラス AndOp
+// クラス XorOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] mgr マネージャ
-AndOp::AndOp(BddMgrImpl* mgr) :
-  BddBinOp(mgr, "and_op"),
+XorOp::XorOp(BddMgrImpl* mgr) :
+  BddBinOp(mgr, "xor_op"),
   mMgr(mgr)
 {
 }
 
 // @brief デストラクタ
-AndOp::~AndOp()
+XorOp::~XorOp()
 {
 }
 
@@ -34,7 +34,7 @@ AndOp::~AndOp()
 // @param[in] left, right オペランド
 // @return 演算結果を買えす．
 BddEdge
-AndOp::apply(BddEdge left,
+XorOp::apply(BddEdge left,
 	     BddEdge right)
 {
   // エラー状態のチェック
@@ -52,32 +52,41 @@ AndOp::apply(BddEdge left,
 
 // @brief 実際の演算を行う関数
 BddEdge
-AndOp::apply_step(BddEdge f,
+XorOp::apply_step(BddEdge f,
 		  BddEdge g)
 {
+
   // 特別な場合の処理
-  // 1：片方のBDDが0なら答えは0，互いに否定の関係でも答えは0．
-  // 2：両方とも1なら答えは1．
-  // 3：片方が1ならもう片方を返す．
-  // 4：同じBDDどうしのANDは自分自身
-  // 2 は 3 でカバーされている．
-  if ( f.is_zero() || g.is_zero() || check_reverse(f, g) ) {
-    return BddEdge::make_zero();
-  }
-  if ( f.is_one() ) {
+  // 1: 片方が0なら他方を返す．
+  // 2: 片方が1なら他方の否定を返す．
+  // 3: 同じBDD同士のXORは0を返す．
+  // 4: 極性のみが異なる関数同士なら1を返す．
+  if ( f.is_zero() ) {
     return g;
   }
-  if ( g.is_one() || f == g ) {
+  if ( g.is_zero() ) {
     return f;
   }
-  // この時点で f,g は終端ではない．
-
-  // 演算結果テーブルが当たりやすくなるように順序を正規化する
-  if ( f > g ) {
-    BddEdge tmp = f;
-    f = g;
-    g = tmp;
+  if ( f.is_one() ) {
+    return ~g;
   }
+  if ( g.is_one() ) {
+    return ~f;
+  }
+  if ( f == g ) {
+    return BddEdge::make_zero();
+  }
+  if ( check_reverse(f, g) ) {
+    return BddEdge::make_one();
+  }
+  // この時点で f, g は終端ではない．
+
+  // 極性情報は落してしまう．
+  tPol f_pol = f.pol();
+  tPol g_pol = g.pol();
+  tPol ans_pol = f_pol * g_pol;
+  f.normalize();
+  g.normalize();
 
   BddEdge result = get(f, g);
   if ( result.is_error() ) {
@@ -97,7 +106,7 @@ AndOp::apply_step(BddEdge f,
     put(f, g, result);
   }
 
-  return result;
+  return BddEdge(result, ans_pol);
 }
 
 END_NAMESPACE_YM_BDD

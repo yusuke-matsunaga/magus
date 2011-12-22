@@ -45,6 +45,10 @@ libym_bdd_base_la_SOURCES = \
 	BddOp.h \
 	AndOp.h \
 	AndOp.cc \
+	XorOp.h \
+	XorOp.cc \
+	IntsecOp.h \
+	IntsecOp.cc \
 	IdMgr.h \
 	IdMgr.cc \
 	Printer.h \

@@ -97,29 +97,11 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] name 名前
 // @param[in] option オプション
 BddMgrClassic::BddMgrClassic(const string& name,
 			     const string& option) :
-  mName(name)
+  BddMgrImpl(name)
 {
-  if ( name == string() ) {
-    // 適当な名前を付ける．
-    static int num = 1;
-    ostringstream s;
-    s << "bdd_mgr#" << num ++;
-    mName = s.str();
-  }
-
-  // ユーザー設定可能パラメータのデフォルト値を設定
-  mGcThreshold = DEFAULT_GC_THRESHOLD;
-  mGcNodeLimit = DEFAULT_GC_NODE_LIMIT;
-  mNtLoadLimit = DEFAULT_NT_LOAD_LIMIT;
-  mRtLoadLimit = DEFAULT_RT_LOAD_LIMIT;
-  mMemLimit = DEFAULT_MEM_LIMIT;
-  mDangerousZone = DEFAULT_DZONE;
-  mGcEnable = 0;
-
   // メモリ管理用のメンバを初期化
   mFreeTop = NULL;
   mFreeNum = 0;
@@ -226,20 +208,6 @@ BddMgrClassic::~BddMgrClassic()
   assert_cond( mUsedMem == 0, __FILE__, __LINE__);
 }
 
-// 肯定のリテラル関数を作る
-BddEdge
-BddMgrClassic::make_posiliteral(VarId varid)
-{
-  Var* var = var_of(varid);
-  if ( !var ) {
-    var = alloc_var(varid);
-    if ( !var ) {
-      return BddEdge::make_overflow();
-    }
-  }
-  return new_node(level(varid), BddEdge::make_zero(), BddEdge::make_one());
-}
-
 // bdd が正リテラルのみのキューブの時，真となる．
 bool
 BddMgrClassic::check_posi_cube(BddEdge e)
@@ -319,7 +287,13 @@ BddMgrClassic::check_cube(BddEdge e)
 bool
 BddMgrClassic::new_var(VarId varid)
 {
-  return alloc_var(varid) != NULL;
+  Var* var = var_of(varid);
+  if ( var == NULL ) {
+    return alloc_var(varid) != NULL;
+  }
+  else {
+    return true;
+  }
 }
 
 // 変数を確保する．
@@ -403,23 +377,7 @@ void
 BddMgrClassic::set_next_limit_size()
 {
   // 制限値はロード値のリミットと現在のテーブルサイズから計算される
-  mNextLimit = static_cast<ymuint64>(double(mTableSize) * mNtLoadLimit);
-}
-
-// @brief ガーベージコレクションを許可する．
-void
-BddMgrClassic::enable_gc()
-{
-  if ( mGcEnable > 0 ) {
-    -- mGcEnable;
-  }
-}
-
-// @brief ガーベージコレクションを禁止する．
-void
-BddMgrClassic::disable_gc()
-{
-  ++ mGcEnable;
+  mNextLimit = static_cast<ymuint64>(double(mTableSize) * nt_load_limit());
 }
 
 // ガーベージコレクションを行なう．
@@ -500,7 +458,7 @@ BddMgrClassic::gc(bool shrink_nodetable)
 
   if ( shrink_nodetable ) {
     // ノードテーブルが縮小可能ならば縮小する
-    ymuint64 nn = static_cast<ymuint64>(mNodeNum * 2.0 / mNtLoadLimit);
+    ymuint64 nn = static_cast<ymuint64>(mNodeNum * 2.0 / nt_load_limit());
     ymuint64 new_size = mTableSize;
     while ( new_size > INIT_SIZE ) {
       if ( nn < new_size ) {
@@ -565,53 +523,6 @@ void
 BddMgrClassic::reg_sweep_binder(EventBinder* binder)
 {
   mSweepMgr.reg_binder(binder);
-}
-
-// さまざまなパラメータを設定する．
-// 設定方法はX-windowのライブラリ関数に良くあるやり方で，まず，全ての
-// パラメータを格納する構造体bdd_param_tに必要なパラメータを設定し，
-// 設定したいパラメータに対応するビットのみをmaskにセットする．
-void
-BddMgrClassic::param(const BddMgrParam& param,
-		     ymuint32 mask)
-{
-  if ( mask & BddMgrParam::GC_THRESHOLD ) {
-    mGcThreshold = param.mGcThreshold;
-  }
-  if ( mask & BddMgrParam::GC_NODE_LIMIT ) {
-    mGcNodeLimit = param.mGcNodeLimit;
-  }
-  if ( mask & BddMgrParam::NT_LOAD_LIMIT ) {
-    mNtLoadLimit = param.mNtLoadLimit;
-    set_next_limit_size();
-  }
-  if ( mask & BddMgrParam::RT_LOAD_LIMIT ) {
-    mRtLoadLimit = param.mRtLoadLimit;
-    for (CompTbl* tbl = mTblTop; tbl; tbl = tbl->mNext) {
-      tbl->load_limit(mRtLoadLimit);
-    }
-  }
-  if ( mask & BddMgrParam::MEM_LIMIT ) {
-    mMemLimit = param.mMemLimit;
-  }
-}
-
-// パラメータを読み出す
-void
-BddMgrClassic::param(BddMgrParam& param) const
-{
-  param.mGcThreshold = mGcThreshold;
-  param.mGcNodeLimit = mGcNodeLimit;
-  param.mNtLoadLimit = mNtLoadLimit;
-  param.mRtLoadLimit = mRtLoadLimit;
-  param.mMemLimit = mMemLimit;
-}
-
-// 名前を得る．
-const string&
-BddMgrClassic::name() const
-{
-  return mName;
 }
 
 // さまざまな内部情報を得る
@@ -723,9 +634,9 @@ BddMgrClassic::dec_rootref(BddEdge e)
 
   // ゴミがたまっていたら回収する．
   // ただし頻繁に gc() を呼びたくないので条件をもうけている．
-  if ( mGcEnable == 0 &&
-       mNodeNum > mGcNodeLimit	&&
-       mGarbageNum > static_cast<ymuint64>(double(mNodeNum) * mGcThreshold) ) {
+  if ( check_gc() &&
+       mNodeNum > gc_node_limit()	&&
+       mGarbageNum > static_cast<ymuint64>(double(mNodeNum) * gc_threshold()) ) {
     gc(false);
   }
 }
@@ -923,11 +834,12 @@ BddMgrClassic::dealloc_nodechunk(BddNode* chunk)
   deallocate(chunk, byte_size);
 }
 
+#if 1
 // BDD パッケージ用のメモリ確保ルーティン
 void*
 BddMgrClassic::allocate(ymuint64 size)
 {
-  if ( mOverflow || mMemLimit > 0 && mUsedMem + size > mMemLimit ) {
+  if ( mOverflow || mem_limit() > 0 && mUsedMem + size > mem_limit() ) {
     // メモリ制限をオーバーしたので 0 を返す．
     mOverflow = true;
     return 0;
@@ -987,5 +899,6 @@ BddMgrClassic::deallocate(void* ptr,
   delete [] (char*)ptr;
 #endif
 }
+#endif
 
 END_NAMESPACE_YM_BDD

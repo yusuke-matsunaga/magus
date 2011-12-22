@@ -11,11 +11,14 @@
 
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddMgr.h"
+#include "ym_utils/Alloc.h"
 #include "BddEdge.h"
 #include "BddNode.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
+
+class BddBinOp;
 
 //////////////////////////////////////////////////////////////////////
 /// @class BddMgrImpl BddMgrImpl.h "BddMgrImpl.h"
@@ -52,7 +55,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  BddMgrImpl();
+  /// @param[in] name マネージャの名前
+  BddMgrImpl(const string& name = string());
 
   /// @brief デストラクタ
   virtual
@@ -130,9 +134,8 @@ public:
 
   /// @brief 肯定のリテラル関数を作る
   /// @param[in] varid 変数番号
-  virtual
   BddEdge
-  make_posiliteral(VarId varid) = 0;
+  make_posiliteral(VarId varid);
 
   /// @brief 否定のリテラル関数を作る．
   /// @param[in] varid 変数番号
@@ -157,10 +160,9 @@ public:
   /// @brief e1 & e2 を計算する．
   /// @param[in] e1, e2 演算対象の枝
   /// @return 演算結果を返す．
-  virtual
   BddEdge
   and_op(BddEdge e1,
-	 BddEdge e2) = 0;
+	 BddEdge e2);
 
   /// @brief e1 | e2 を計算する．
   /// @param[in] e1, e2 演算対象の枝
@@ -172,18 +174,16 @@ public:
   /// @brief src1 ^ src2 を計算する．
   /// @param[in] e1, e2 演算対象の枝
   /// @return 演算結果を返す．
-  virtual
   BddEdge
   xor_op(BddEdge e1,
-	 BddEdge e2) = 0;
+	 BddEdge e2);
 
   /// @brief e1 と e2 の共通部分があれば kEdge1 を返す．
   /// @param[in] e1, e2 演算対象の枝
   /// @return 演算結果を返す．
-  virtual
   BddEdge
   check_intersect(BddEdge e1,
-		  BddEdge e2) = 0;
+		  BddEdge e2);
 
   /// @brief Davio展開のモーメント項を求める処理
   /// @param[in] e 演算対象の枝
@@ -505,14 +505,20 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ガーベージコレクションを許可する．
-  virtual
+  /// @note 過去の enable_gc()/disable_gc() の回数が多い方できまる．
   void
-  enable_gc() = 0;
+  enable_gc();
 
   /// @brief ガーベージコレクションを禁止する．
-  virtual
+  /// @note 過去の enable_gc()/disable_gc() の回数が多い方できまる．
   void
-  disable_gc() = 0;
+  disable_gc();
+
+  /// @brief ガーベージコレクションの許可状態を調べる．
+  /// @retval true ガーベージコレクションを起動可能
+  /// @retval false ガーベージコレクション禁止
+  bool
+  check_gc() const;
 
   /// @brief ガーベージコレクションを行なう．
   /// shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
@@ -528,21 +534,38 @@ public:
   /// @brief パラメータを設定する．
   /// @param[in] param パラメータ
   /// @param[in] mask 設定する項目を指定するマスク
-  virtual
   void
   param(const BddMgrParam& param,
-	ymuint32 mask) = 0;
+	ymuint32 mask);
 
   /// @brief パラメータを取得する．
   /// @param[out] param 結果を格納する変数
-  virtual
   void
-  param(BddMgrParam& param) const = 0;
+  param(BddMgrParam& param) const;
+
+  /// @brief GC を起動するかどうかのしきい値パラメータを得る．
+  double
+  gc_threshold() const;
+
+  /// @brief GC を起動するかどうかのノード数のしきい値パラメータを得る．
+  ymuint64
+  gc_node_limit() const;
+
+  /// @brief 節点テーブルの拡張を制御するパラメータを得る．
+  double
+  nt_load_limit() const;
+
+  /// @brief 演算結果テーブルの拡張を制御するパラメータを得る．
+  double
+  rt_load_limit() const;
+
+  /// @brief メモリ使用量の制限値パラメータを得る．
+  ymuint64
+  mem_limit() const;
 
   /// @brief 名前を得る．
-  virtual
   const string&
-  name() const = 0;
+  name() const;
 
   /// @brief 使用メモリ量(in bytes)を得る．
   virtual
@@ -694,17 +717,55 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 参照回数
-  ymuint32 mRefCount;
+  // デバッグ用の名前
+  string mName;
 
 
   //////////////////////////////////////////////////////////////////////
+  // ユーザーが設定するパラメータ
+  // 設定は専用のメソッドを用いる．
+  //////////////////////////////////////////////////////////////////////
+
+  // ガーベージの割合がこの値を越えるとGCを起こす．
+  double mGcThreshold;
+
+  // ただし，全体のノード数がこの数以下の時はGCは起こさない．
+  ymuint64 mGcNodeLimit;
+
+  // GCの起動を制御する変数
+  ymint32 mGcEnable;
+
+  // ノード数がこの数を越えたら mGcEnable は常に true だと思う
+  ymuint64 mDangerousZone;
+
+  // 節点テーブル拡張時の制限値を決めるパラメータ
+  double mNtLoadLimit;
+
+  // 演算結果テーブル拡張時の制限値を決めるパラメータ
+  double mRtLoadLimit;
+
+  // 使用メモリ量の上限
+  ymuint64 mMemLimit;
+
+  // メモリアロケータ
+  FragAlloc mAlloc;
+
+  // メモリ確保が失敗した時にオンになるフラグ
+  bool mOverflow;
+
   // このマネージャに管理されている BDD のリスト
-  //////////////////////////////////////////////////////////////////////
-
   // リストのためのダミーヘッダ
   // BDD としては用いない．
   Bdd* mTopBdd;
+
+  // AND 演算用オブジェクト
+  BddBinOp* mAndOp;
+
+  // XOR 演算用オブジェクト
+  BddBinOp* mXorOp;
+
+  // INTERSECT 演算用オブジェクト
+  BddBinOp* mIntsecOp;
 
 
   //////////////////////////////////////////////////////////////////////
@@ -733,6 +794,64 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の実装
 //////////////////////////////////////////////////////////////////////
+
+// @brief 名前を得る．
+inline
+const string&
+BddMgrImpl::name() const
+{
+  return mName;
+}
+
+// @brief ガーベージコレクションの許可状態を調べる．
+// @retval true ガーベージコレクションを起動可能
+// @retval false ガーベージコレクション禁止
+inline
+bool
+BddMgrImpl::check_gc() const
+{
+  return mGcEnable == 0;
+}
+
+// @brief GC を起動するかどうかのしきい値パラメータを得る．
+inline
+double
+BddMgrImpl::gc_threshold() const
+{
+  return mGcThreshold;
+}
+
+// @brief GC を起動するかどうかのノード数のしきい値パラメータを得る．
+inline
+ymuint64
+BddMgrImpl::gc_node_limit() const
+{
+  return mGcNodeLimit;
+}
+
+// @brief 節点テーブルの拡張を制御するパラメータを得る．
+inline
+double
+BddMgrImpl::nt_load_limit() const
+{
+  return mNtLoadLimit;
+}
+
+// @brief 演算結果テーブルの拡張を制御するパラメータを得る．
+inline
+double
+BddMgrImpl::rt_load_limit() const
+{
+  return mRtLoadLimit;
+}
+
+// @brief メモリ使用量の制限値パラメータを得る．
+inline
+ymuint64
+BddMgrImpl::mem_limit() const
+{
+  return mMemLimit;
+}
 
 // 否定のリテラル関数を作る．
 inline

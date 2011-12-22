@@ -28,6 +28,7 @@ END_NONAMESPACE
 CompTbl2e::CompTbl2e(BddMgrImpl* mgr,
 		     const char* name) :
   CompTbl(mgr, name),
+  mTable(NULL),
   mUsedNum(0)
 {
   resize(kInitSize);

@@ -24,22 +24,13 @@ CompTbl::CompTbl(BddMgrImpl* mgr,
 		 const char* name) :
   mMgr(mgr),
   mName(name),
-  mTableSize(0),
-  mTableSize_1(0)
+  mTableSize(0)
 {
 }
 
 // @brief デストラクタ
 CompTbl::~CompTbl()
 {
-}
-
-// @brief load_limit を設定する．
-void
-CompTbl::load_limit(double load_limit)
-{
-  mLoadLimit = load_limit;
-  mNextLimit = static_cast<ymuint64>(double(mTableSize) * mLoadLimit);
 }
 
 // @brief 最大のテーブルサイズを設定する．
@@ -55,8 +46,10 @@ void
 CompTbl::set_table_size(ymuint64 new_size)
 {
   mTableSize = new_size;
-  mTableSize_1 = mTableSize - 1;
-  mNextLimit = static_cast<ymuint64>(double(mTableSize) * mLoadLimit);
+  BddMgrParam param;
+  mMgr->param(param);
+  double load_limit = param.mRtLoadLimit;
+  mNextLimit = static_cast<ymuint64>(double(mTableSize) * load_limit);
 }
 
 // BddMgr からメモリを確保する．

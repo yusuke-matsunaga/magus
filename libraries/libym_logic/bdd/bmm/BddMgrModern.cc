@@ -227,21 +227,6 @@ BddMgrModern::~BddMgrModern()
   assert_cond( mUsedMem == 0, __FILE__, __LINE__);
 }
 
-// 肯定のリテラル関数を作る
-BddEdge
-BddMgrModern::make_posiliteral(VarId varid)
-{
-  BmmVar* var = var_of(varid);
-  if ( !var ) {
-    var = alloc_var(varid);
-    if ( !var ) {
-      return BddEdge::make_overflow();
-    }
-  }
-  ymuint level = var->level();
-  return new_node(level, BddEdge::make_zero(), BddEdge::make_one());
-}
-
 // bdd が正リテラルのみのキューブの時，真となる．
 bool
 BddMgrModern::check_posi_cube(BddEdge e)
@@ -321,7 +306,13 @@ BddMgrModern::check_cube(BddEdge e)
 bool
 BddMgrModern::new_var(VarId varid)
 {
-  return alloc_var(varid) != NULL;
+  BmmVar* var = var_of(varid);
+  if ( var == NULL ) {
+    return alloc_var(varid) != NULL;
+  }
+  else {
+    return true;
+  }
 }
 
 // 変数を確保する．

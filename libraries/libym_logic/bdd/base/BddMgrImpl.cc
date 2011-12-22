@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/base/BddMgrImpl.cc
+/// @file BddMgrImpl.cc
 /// @brief BddMgrImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BddMgr.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -14,9 +12,34 @@
 #include "ym_logic/Bdd.h"
 #include "../bmc/BddMgrClassic.h"
 #include "../bmm/BddMgrModern.h"
+#include "AndOp.h"
+#include "XorOp.h"
+#include "IntsecOp.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
+
+BEGIN_NONAMESPACE
+
+// 1K = 1,024
+const ymuint64 K_unit = (1 << 10);
+// 1M = 1,024 x 1,024
+const ymuint64 M_unit = (1 << 20);
+
+// パラメータのデフォルト値
+const double DEFAULT_GC_THRESHOLD  = 0.10;
+const ymuint64 DEFAULT_GC_NODE_LIMIT =  64 * K_unit;
+const double DEFAULT_NT_LOAD_LIMIT = 2.0;
+const double DEFAULT_RT_LOAD_LIMIT = 0.8;
+const ymuint64 DEFAULT_MEM_LIMIT     = 400 * M_unit;
+const ymuint64 DEFAULT_DZONE         =  10 * M_unit;
+
+END_NONAMESPACE
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス BddEdge
+//////////////////////////////////////////////////////////////////////
 
 // @brief マークを返す．
 bool
@@ -109,10 +132,27 @@ BddMgrImpl::new_mgr(const string& type,
   return impl;
 }
 
-// コンストラクタ
-BddMgrImpl::BddMgrImpl()
+// @brief コンストラクタ
+// @param[in] name マネージャの名前
+BddMgrImpl::BddMgrImpl(const string& name) :
+  mAlloc(4096)
 {
-  mRefCount = 0;
+  if ( name == string() ) {
+    // 適当な名前を付ける．
+    static int num = 1;
+    ostringstream s;
+    s << "bdd_mgr#" << num ++;
+    mName = s.str();
+  }
+
+  // ユーザー設定可能パラメータのデフォルト値を設定
+  mGcThreshold = DEFAULT_GC_THRESHOLD;
+  mGcNodeLimit = DEFAULT_GC_NODE_LIMIT;
+  mNtLoadLimit = DEFAULT_NT_LOAD_LIMIT;
+  mRtLoadLimit = DEFAULT_RT_LOAD_LIMIT;
+  mMemLimit = DEFAULT_MEM_LIMIT;
+  mDangerousZone = DEFAULT_DZONE;
+  mGcEnable = 0;
 
   // ログ出力用ストリームの初期化
   mNullStream = new ofstream("/dev/null", ios::out);
@@ -124,6 +164,12 @@ BddMgrImpl::BddMgrImpl()
 
   // BDD リストの初期化
   mTopBdd = NULL;
+
+  mOverflow = false;
+
+  mAndOp = new AndOp(this);
+  mXorOp = new XorOp(this);
+  mIntsecOp = new IntsecOp(this);
 }
 
 // デストラクタ
@@ -154,25 +200,17 @@ BddMgrImpl::~BddMgrImpl()
   delete mNullStream;
 }
 
-// log用ストリームを設定する．
-void
-BddMgrImpl::set_logstream(ostream& s)
+// 肯定のリテラル関数を作る
+BddEdge
+BddMgrImpl::make_posiliteral(VarId varid)
 {
-  mLogFp = &s;
-}
-
-// log用ストリームを解除する．
-void
-BddMgrImpl::unset_logstream()
-{
-  mLogFp = mNullStream;
-}
-
-// log用ファイルポインタを読み出す．
-ostream&
-BddMgrImpl::logstream() const
-{
-  return *mLogFp;
+  bool stat = new_var(varid);
+  if ( !stat ) {
+    return BddEdge::make_overflow();
+  }
+  else {
+    return new_node(level(varid), BddEdge::make_zero(), BddEdge::make_one());
+  }
 }
 
 // ベクタを真理値表と見なしてBDDを作る．
@@ -224,6 +262,117 @@ BddMgrImpl::tvec_sub(const vector<int>& v,
   }
 }
 
+// @brief e1 & e2 を計算する．
+// @param[in] e1, e2 演算対象の枝
+// @return 演算結果を返す．
+BddEdge
+BddMgrImpl::and_op(BddEdge e1,
+		   BddEdge e2)
+{
+  return mAndOp->apply(e1, e2);
+}
+
+// @brief src1 ^ src2 を計算する．
+// @param[in] e1, e2 演算対象の枝
+// @return 演算結果を返す．
+BddEdge
+BddMgrImpl::xor_op(BddEdge e1,
+		   BddEdge e2)
+{
+  return mXorOp->apply(e1, e2);
+}
+
+// @brief e1 と e2 の共通部分があれば kEdge1 を返す．
+// @param[in] e1, e2 演算対象の枝
+// @return 演算結果を返す．
+BddEdge
+BddMgrImpl::check_intersect(BddEdge e1,
+			    BddEdge e2)
+{
+  return mIntsecOp->apply(e1, e2);
+}
+
+// @brief パラメータを設定する．
+// @param[in] param パラメータ
+// @param[in] mask 設定する項目を指定するマスク
+void
+BddMgrImpl::param(const BddMgrParam& param,
+		  ymuint32 mask)
+{
+  if ( mask & BddMgrParam::GC_THRESHOLD ) {
+    mGcThreshold = param.mGcThreshold;
+  }
+  if ( mask & BddMgrParam::GC_NODE_LIMIT ) {
+    mGcNodeLimit = param.mGcNodeLimit;
+  }
+  if ( mask & BddMgrParam::NT_LOAD_LIMIT ) {
+    mNtLoadLimit = param.mNtLoadLimit;
+#if 0
+    set_next_limit_size();
+#endif
+  }
+  if ( mask & BddMgrParam::RT_LOAD_LIMIT ) {
+    mRtLoadLimit = param.mRtLoadLimit;
+#if 0
+    for (CompTbl* tbl = mTblTop; tbl; tbl = tbl->mNext) {
+      tbl->load_limit(mRtLoadLimit);
+    }
+#endif
+  }
+  if ( mask & BddMgrParam::MEM_LIMIT ) {
+    mMemLimit = param.mMemLimit;
+  }
+}
+
+// @brief パラメータを取得する．
+// @param[out] param 結果を格納する変数
+void
+BddMgrImpl::param(BddMgrParam& param) const
+{
+  param.mGcThreshold = mGcThreshold;
+  param.mGcNodeLimit = mGcNodeLimit;
+  param.mNtLoadLimit = mNtLoadLimit;
+  param.mRtLoadLimit = mRtLoadLimit;
+  param.mMemLimit = mMemLimit;
+}
+
+// @brief ガーベージコレクションを許可する．
+void
+BddMgrImpl::enable_gc()
+{
+  if ( mGcEnable > 0 ) {
+    -- mGcEnable;
+  }
+}
+
+// @brief ガーベージコレクションを禁止する．
+void
+BddMgrImpl::disable_gc()
+{
+  ++ mGcEnable;
+}
+
+// log用ストリームを設定する．
+void
+BddMgrImpl::set_logstream(ostream& s)
+{
+  mLogFp = &s;
+}
+
+// log用ストリームを解除する．
+void
+BddMgrImpl::unset_logstream()
+{
+  mLogFp = mNullStream;
+}
+
+// log用ファイルポインタを読み出す．
+ostream&
+BddMgrImpl::logstream() const
+{
+  return *mLogFp;
+}
+
 // ノードをロックする．
 // もし，子孫のノードがアンロックの状態ならばロックする
 // 無駄な関数呼び出しを避けるため，この関数を呼び出す前に，
@@ -247,6 +396,38 @@ BddMgrImpl::unlockall(BddNode* vp)
   unlock_hook(vp);
   deactivate(vp->edge0());
   deactivate(vp->edge1());
+}
+
+// @brief このマネージャで使用するメモリ領域を確保する．
+// @param[in] size サイズ
+void*
+BddMgrImpl::allocate(ymuint64 size)
+{
+  if ( mOverflow || mMemLimit > 0 && mAlloc.used_size() + size > mMemLimit ) {
+    // メモリ制限をオーバーしたので 0 を返す．
+    mOverflow = true;
+    return 0;
+  }
+
+#if 0
+  return mAlloc.get_memory(size);
+#else
+  return reinterpret_cast<void*>(new char[size]);
+#endif
+}
+
+// @brief このマネージャで確保したメモリを解放する．
+// @param[in] ptr 解放するメモリのアドレス
+// @param[in] size サイズ
+void
+BddMgrImpl::deallocate(void* ptr,
+		       ymuint64 size)
+{
+#if 0
+  mAlloc.put_memory(size, ptr);
+#else
+  delete [] static_cast<char*>(ptr);
+#endif
 }
 
 END_NAMESPACE_YM_BDD

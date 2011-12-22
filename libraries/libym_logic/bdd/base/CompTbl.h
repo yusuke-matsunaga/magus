@@ -114,9 +114,6 @@ private:
   // セルの個数．バイト数ではないので注意
   ymuint64 mTableSize;
 
-  // テーブルサイズ - 1 の値，ハッシュのマスクに用いる．
-  ymuint64 mTableSize_1;
-
   // テーブルの使用率がこの値を越えたらサイズの拡張を行なう．
   double mLoadLimit;
 
@@ -139,6 +136,14 @@ string
 CompTbl::name() const
 {
   return mName;
+}
+
+// @brief テーブルサイズを返す．
+inline
+ymuint64
+CompTbl::table_size() const
+{
+  return mTableSize;
 }
 
 // テーブルを拡張すべき時には true を返す．
