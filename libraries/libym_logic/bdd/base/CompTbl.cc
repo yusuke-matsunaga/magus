@@ -46,9 +46,7 @@ void
 CompTbl::set_table_size(ymuint64 new_size)
 {
   mTableSize = new_size;
-  BddMgrParam param;
-  mMgr->param(param);
-  double load_limit = param.mRtLoadLimit;
+  double load_limit = mMgr->rt_load_limit();
   mNextLimit = static_cast<ymuint64>(double(mTableSize) * load_limit);
 }
 
