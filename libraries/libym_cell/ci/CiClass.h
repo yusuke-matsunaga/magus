@@ -88,7 +88,7 @@ public:
   void
   init(const vector<NpnMapM>& idmap_list,
        const vector<const CellGroup*>& group_list,
-       AllocBase& alloc);
+       Alloc& alloc);
 
 
 public:
@@ -108,7 +108,7 @@ public:
   void
   restore(BinI& bis,
 	  const CellLibrary& library,
-	  AllocBase& alloc);
+	  Alloc& alloc);
 
 
 private:
@@ -120,7 +120,7 @@ private:
   /// @param[in] alloc メモリアロケータ
   /// @note mIdmapNum, mGroupNum が適切に設定されている必要がある．
   void
-  alloc_array(AllocBase& alloc);
+  alloc_array(Alloc& alloc);
 
 
 private:

@@ -28,6 +28,7 @@ libym_utils_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_utils_la_SOURCES = \
+	Alloc.cc \
 	BinIO.cc \
 	Binder.cc \
 	DlList.cc \

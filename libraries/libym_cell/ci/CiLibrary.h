@@ -16,7 +16,7 @@
 #include "ym_cell/CellResistance.h"
 #include "ym_cell/CellTiming.h"
 #include "ym_cell/CellPin.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
 #include "ym_utils/ShString.h"
 #include "ym_logic/LogExpr.h"
 #include "CiCellHash.h"

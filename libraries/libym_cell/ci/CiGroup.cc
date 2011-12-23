@@ -277,7 +277,7 @@ void
 CiGroup::init(const CellClass* cell_class,
 	      const NpnMapM& map,
 	      const vector<const Cell*>& cell_list,
-	      AllocBase& alloc)
+	      Alloc& alloc)
 {
   mCellClass = cell_class;
   mMap = map;
@@ -353,7 +353,7 @@ CiGroup::dump(BinO& bos) const
 void
 CiGroup::restore(BinI& bis,
 		 const CellLibrary& library,
-		 AllocBase& alloc)
+		 Alloc& alloc)
 {
   ymuint32 parent_id;
   bis >> parent_id
@@ -373,7 +373,7 @@ CiGroup::restore(BinI& bis,
 // @brief メモリ領域の確保を行う．
 // @param[in] alloc メモリアロケータ
 void
-CiGroup::alloc_array(AllocBase& alloc)
+CiGroup::alloc_array(Alloc& alloc)
 {
   if ( mCellNum > 0 ) {
     void* p = alloc.get_memory(sizeof(const Cell*) * mCellNum);

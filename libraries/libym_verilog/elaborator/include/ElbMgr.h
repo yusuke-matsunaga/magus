@@ -36,7 +36,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のオブジェクト
-  ElbMgr(AllocBase& alloc);
+  ElbMgr(Alloc& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -361,7 +361,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief アロケータを取り出す．
-  AllocBase&
+  Alloc&
   allocator();
 
   /// @brief このオブジェクトが確保したメモリの総量を返す．
@@ -388,7 +388,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // メモリ確保用のアロケータ
-  AllocBase& mAlloc;
+  Alloc& mAlloc;
 
   // UDP のリスト
   list<const VlUdpDefn*> mUdpList;
@@ -618,7 +618,7 @@ ElbMgr::find_attr(const VlObj* obj,
 
 // @brief アロケータを取り出す．
 inline
-AllocBase&
+Alloc&
 ElbMgr::allocator()
 {
   return mAlloc;

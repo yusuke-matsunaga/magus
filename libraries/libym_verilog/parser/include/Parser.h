@@ -14,6 +14,8 @@
 #include "ym_verilog/pt/PtP.h"
 #include "ym_utils/File.h"
 #include "ym_utils/Alloc.h"
+#include "ym_utils/FragAlloc.h"
+#include "ym_utils/UnitAlloc.h"
 #include "PtiFwd.h"
 #include "PtiFactory.h"
 #include "PtiDecl.h"
@@ -43,7 +45,7 @@ public:
   /// @param[in] alloc メモリアロケータ
   /// @param[in] ptifactory パース木の要素を生成するファクトリクラス
   Parser(PtMgr& ptmgr,
-	 AllocBase& alloc,
+	 Alloc& alloc,
 	 PtiFactory& ptifactory);
 
   /// @brief デストラクタ
@@ -2359,7 +2361,7 @@ private:
   PtMgr& mPtMgr;
 
   // 本体のメモリアロケータ(配列確保用)
-  AllocBase& mAlloc;
+  Alloc& mAlloc;
 
   // パース木の要素の生成を行うクラス
   PtiFactory& mFactory;

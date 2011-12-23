@@ -85,7 +85,7 @@ public:
   /// @param[in] alloc メモリアロケータ
   void
   restore(BinI& bis,
-	  AllocBase& alloc);
+	  Alloc& alloc);
 
 
 public:
@@ -102,7 +102,7 @@ public:
   init(ymuint rep_id,
        ymuint input_num,
        ymuint edge_num,
-       AllocBase& alloc);
+       Alloc& alloc);
 
   /// @brief 枝のデータを設定する．
   /// @param[in] pos 位置番号 ( 0 <= pos < edge_num() )
@@ -122,7 +122,7 @@ private:
   /// @param[in] alloc メモリアロケータ
   /// @note mEdgeNum に値が設定されているものとする．
   void
-  alloc_array(AllocBase& alloc);
+  alloc_array(Alloc& alloc);
 
 
 private:

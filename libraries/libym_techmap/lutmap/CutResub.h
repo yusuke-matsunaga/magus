@@ -14,7 +14,7 @@
 #include "ym_techmap/lutmap_nsdef.h"
 #include "ym_networks/bdn.h"
 
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
 #include "CrNode.h"
 #include "CrHeap.h"
 #include "CrLevelQ.h"

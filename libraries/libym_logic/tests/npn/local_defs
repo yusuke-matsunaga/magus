@@ -2,4 +2,4 @@
 
 . ${top_srcdir}/../../etc/common_defs
 
-TEST_PATH=${top_builddir}/libym_logic/tests/bdd
+TEST_PATH=${top_builddir}/libym_logic/tests/npn

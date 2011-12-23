@@ -52,7 +52,7 @@ CiCell::CiCell(CiLibrary* library,
 	       const vector<bool>& output_array,
 	       const vector<LogExpr>& logic_array,
 	       const vector<LogExpr>& tristate_array,
-	       AllocBase& alloc)
+	       Alloc& alloc)
 {
   mLibrary = library;
 

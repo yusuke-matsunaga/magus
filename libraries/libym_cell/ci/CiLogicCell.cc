@@ -44,7 +44,7 @@ CiLogicCell::CiLogicCell(CiLibrary* library,
 			 const vector<bool>& output_array,
 			 const vector<LogExpr>& logic_array,
 			 const vector<LogExpr>& tristate_array,
-			 AllocBase& alloc) :
+			 Alloc& alloc) :
   CiCell(library, id, name, area,
 	 ni, no, nio, 0, nb, nc,
 	 output_array,

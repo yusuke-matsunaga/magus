@@ -82,7 +82,7 @@ CiClass::cell_group(ymuint pos) const
 void
 CiClass::init(const vector<NpnMapM>& idmap_list,
 	      const vector<const CellGroup*>& group_list,
-	      AllocBase& alloc)
+	      Alloc& alloc)
 {
   mIdmapNum = idmap_list.size();
   mGroupNum = group_list.size();
@@ -125,7 +125,7 @@ CiClass::dump(BinO& bos) const
 void
 CiClass::restore(BinI& bis,
 		 const CellLibrary& library,
-		 AllocBase& alloc)
+		 Alloc& alloc)
 {
   bis >> mIdmapNum
       >> mGroupNum;
@@ -149,7 +149,7 @@ CiClass::restore(BinI& bis,
 // @param[in] alloc メモリアロケータ
 // @note mIdmapNum, mGroupNum が適切に設定されている必要がある．
 void
-CiClass::alloc_array(AllocBase& alloc)
+CiClass::alloc_array(Alloc& alloc)
 {
   if ( mIdmapNum > 0 ) {
     void* p = alloc.get_memory(sizeof(NpnMapM) * mIdmapNum);

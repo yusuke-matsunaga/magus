@@ -10,7 +10,7 @@
 
 
 #include "ym_logic/NpnMap.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
 #include "NpnBaseConf.h"
 
 

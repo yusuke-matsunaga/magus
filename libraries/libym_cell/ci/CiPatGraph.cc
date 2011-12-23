@@ -92,7 +92,7 @@ CiPatGraph::dump(BinO& bos) const
 // @param[in] bis 入力元のストリーム
 void
 CiPatGraph::restore(BinI& bis,
-		    AllocBase& alloc)
+		    Alloc& alloc)
 {
   bis >> mRepId
       >> mInputNum
@@ -112,7 +112,7 @@ void
 CiPatGraph::init(ymuint rep_id,
 		 ymuint input_num,
 		 ymuint edge_num,
-		 AllocBase& alloc)
+		 Alloc& alloc)
 {
   mRepId = rep_id;
   mInputNum = input_num;
@@ -136,7 +136,7 @@ CiPatGraph::set_edge(ymuint pos,
 // @param[in] alloc メモリアロケータ
 // @note mEdgeNum に値が設定されているものとする．
 void
-CiPatGraph::alloc_array(AllocBase& alloc)
+CiPatGraph::alloc_array(Alloc& alloc)
 {
   if ( mEdgeNum > 0 ) {
     void* p = alloc.get_memory(sizeof(ymuint32) * mEdgeNum);

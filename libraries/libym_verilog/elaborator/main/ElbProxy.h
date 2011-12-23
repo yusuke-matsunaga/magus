@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELABORATOR_ELBPROXY_H
-#define LIBYM_VERILOG_ELABORATOR_ELBPROXY_H
+#ifndef ELBPROXY_H
+#define ELBPROXY_H
 
-/// @file libym_verilog/elaborator/ElbProxy.h
+/// @file ElbProxy.h
 /// @brief ElbProxy のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: ElbProxy.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
@@ -1108,4 +1106,4 @@ ElbProxy::make_stub(T* obj,
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELABORATOR_ELBPROXY_H
+#endif // ELBPROXY_H

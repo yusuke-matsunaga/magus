@@ -12,7 +12,7 @@
 #include "dotlib_int.h"
 #include "ym_utils/ShString.h"
 #include "ym_utils/FileRegion.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

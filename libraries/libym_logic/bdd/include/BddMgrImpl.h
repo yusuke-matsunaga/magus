@@ -11,7 +11,7 @@
 
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddMgr.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/FragAlloc.h"
 #include "BddEdge.h"
 #include "BddNode.h"
 

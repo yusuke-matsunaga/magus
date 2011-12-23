@@ -50,7 +50,7 @@ CiLatchCell::CiLatchCell(CiLibrary* library,
 			 const LogExpr& data_in,
 			 const LogExpr& enable,
 			 const LogExpr& enable_also,
-			 AllocBase& alloc) :
+			 Alloc& alloc) :
   CiCell(library, id, name, area,
 	 ni, no, nio, 0, nb, nc,
 	 output_array,
@@ -140,7 +140,7 @@ CiLatchRCell::CiLatchRCell(CiLibrary* library,
 			   const LogExpr& enable,
 			   const LogExpr& enable_also,
 			   const LogExpr& clear,
-			   AllocBase& alloc) :
+			   Alloc& alloc) :
   CiLatchCell(library, id, name, area,
 	      ni, no, nio, nb, nc,
 	      output_array,
@@ -215,7 +215,7 @@ CiLatchSCell::CiLatchSCell(CiLibrary* library,
 			   const LogExpr& enable,
 			   const LogExpr& enable_also,
 			   const LogExpr& preset,
-			   AllocBase& alloc) :
+			   Alloc& alloc) :
   CiLatchCell(library, id, name, area,
 	      ni, no, nio, nb, nc,
 	      output_array,
@@ -296,7 +296,7 @@ CiLatchSRCell::CiLatchSRCell(CiLibrary* library,
 			     const LogExpr& preset,
 			     ymuint clear_preset_var1,
 			     ymuint clear_preset_var2,
-			     AllocBase& alloc) :
+			     Alloc& alloc) :
   CiLatchRCell(library, id, name, area,
 	       ni, no, nio, nb, nc,
 	       output_array,

@@ -24,7 +24,8 @@
 #include "ym_networks/tgnet.h"
 #include "ym_networks/TgGateTemplate.h"
 #include "ym_logic/LogExpr.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
+#include "ym_utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_TGNET

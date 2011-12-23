@@ -47,7 +47,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 // @brief コンストラクタ
 // @param[in] alloc メモリ確保用のオブジェクト
-ElbMgr::ElbMgr(AllocBase& alloc) :
+ElbMgr::ElbMgr(Alloc& alloc) :
   mAlloc(alloc),
   mObjDict(alloc),
   mTagDict(alloc),

@@ -14,7 +14,7 @@
 #include "LexpNode.h"
 #include "LexpNodePtr.h"
 
-#include "ym_utils/Alloc.h"
+#include "ym_utils/FragAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_LEXP

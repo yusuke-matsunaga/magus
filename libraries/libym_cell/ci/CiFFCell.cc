@@ -50,7 +50,7 @@ CiFFCell::CiFFCell(CiLibrary* library,
 		   const LogExpr& next_state,
 		   const LogExpr& clocked_on,
 		   const LogExpr& clocked_on_also,
-		   AllocBase& alloc) :
+		   Alloc& alloc) :
   CiCell(library, id, name, area,
 	 ni, no, nio, 0, nb, nc,
 	 output_array,
@@ -140,7 +140,7 @@ CiFFRCell::CiFFRCell(CiLibrary* library,
 		     const LogExpr& clocked_on,
 		     const LogExpr& clocked_on_also,
 		     const LogExpr& clear,
-		     AllocBase& alloc) :
+		     Alloc& alloc) :
   CiFFCell(library, id, name, area,
 	   ni, no, nio, nb, nc,
 	   output_array,
@@ -215,7 +215,7 @@ CiFFSCell::CiFFSCell(CiLibrary* library,
 		     const LogExpr& clocked_on,
 		     const LogExpr& clocked_on_also,
 		     const LogExpr& preset,
-		     AllocBase& alloc) :
+		     Alloc& alloc) :
   CiFFCell(library, id, name, area,
 	   ni, no, nio, nb, nc,
 	   output_array,
@@ -296,7 +296,7 @@ CiFFSRCell::CiFFSRCell(CiLibrary* library,
 		       const LogExpr& preset,
 		       ymuint clear_preset_var1,
 		       ymuint clear_preset_var2,
-		       AllocBase& alloc) :
+		       Alloc& alloc) :
   CiFFRCell(library, id, name, area,
 	    ni, no, nio, nb, nc,
 	    output_array,

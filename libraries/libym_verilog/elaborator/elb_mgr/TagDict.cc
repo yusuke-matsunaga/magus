@@ -31,7 +31,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 // @brief コンストラクタ
 // @param[in] alloc メモリ確保用のオブジェクト
-TagDict::TagDict(AllocBase& alloc) :
+TagDict::TagDict(Alloc& alloc) :
   mAlloc(alloc),
   mNum(0)
 {

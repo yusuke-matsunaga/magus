@@ -1,18 +1,16 @@
-#ifndef BASE_TVMGR_H
-#define BASE_TVMGR_H
+#ifndef TVMGR_H
+#define TVMGR_H
 
-/// @file src/base/TvMgr.h
+/// @file TvMgr.h
 /// @brief TvMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: TvMgr.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2009 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "atpg_nsdef.h"
 #include "TestVector.h"
-#include <ym_utils/Alloc.h>
+#include "ym_utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG
@@ -43,17 +41,17 @@ public:
   /// @note 副作用で clear() が呼ばれる．
   void
   init(size_t ni);
-  
+
   /// @brief 新しいパタンを生成する．
   /// @return 生成されたパタンを返す．
   /// @note パタンは0で初期化される．
   TestVector*
   new_vector();
-  
+
   /// @brief パタンを削除する．
   void
   delete_vector(TestVector* tv);
-  
+
 
 private:
 
@@ -71,13 +69,13 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // テストベクタのメモリ確保用のアロケータ
   SimpleAlloc mAlloc;
-  
+
   // テストベクタの入力数
   size_t mNi;
-  
+
   // 未使用のテストベクタをつないでおくリスト
   list<TestVector*> mAvail;
 
@@ -164,4 +162,4 @@ TvMgr::cur_vector()
 
 END_NAMESPACE_YM_ATPG
 
-#endif // ATPG_TVMGR_H
+#endif // TVMGR_H

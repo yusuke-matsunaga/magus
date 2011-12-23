@@ -12,7 +12,7 @@
 #include "libcomp_nsdef.h"
 #include "ym_logic/lexp_nsdef.h"
 #include "ym_utils/BinIO.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP

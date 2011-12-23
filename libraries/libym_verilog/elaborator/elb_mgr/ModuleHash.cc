@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ModuleHash::ModuleHash(AllocBase& alloc) :
+ModuleHash::ModuleHash(Alloc& alloc) :
   mAlloc(alloc),
   mNum(0)
 {

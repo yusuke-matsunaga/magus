@@ -122,7 +122,7 @@ public:
   /// @param[in] alloc メモリアロケータ
   void
   copy(const nsLibcomp::LcPatMgr& src,
-       AllocBase& alloc);
+       Alloc& alloc);
 
   /// @brief データを読み込んでセットする．
   /// @param[in] bis 入力元のストリーム
@@ -131,7 +131,7 @@ public:
   /// @retval false 読み込みが失敗した．
   bool
   restore(BinI& bis,
-	  AllocBase& alloc);
+	  Alloc& alloc);
 
 
 private:
@@ -144,12 +144,12 @@ private:
   /// @param[in] alloc メモリアロケータ
   void
   set_node_num(ymuint nn,
-	       AllocBase& alloc);
+	       Alloc& alloc);
 
   /// @brief パタン数を設定する．
   void
   set_pat_num(ymuint np,
-	      AllocBase& alloc);
+	      Alloc& alloc);
 
 
 private:

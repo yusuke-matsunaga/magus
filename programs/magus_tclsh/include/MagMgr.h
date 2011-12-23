@@ -11,7 +11,7 @@
 
 #include "magus_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
 #include "ym_utils/ItvlMgr.h"
 
 

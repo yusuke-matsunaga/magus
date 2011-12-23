@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM

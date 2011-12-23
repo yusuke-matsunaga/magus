@@ -12,6 +12,7 @@
 #include "ym_verilog/verilog.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
 
 #include "ym_verilog/vl/VlFwd.h"
 #include "ElbFwd.h"
@@ -563,7 +564,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のアロケータ
-  ObjDict(AllocBase& alloc);
+  ObjDict(Alloc& alloc);
 
   /// @brief デストラクタ
   ~ObjDict();

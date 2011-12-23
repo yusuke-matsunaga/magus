@@ -10,7 +10,8 @@
 
 
 #include "ym_networks/BNetwork.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
+#include "ym_utils/FragAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BNET

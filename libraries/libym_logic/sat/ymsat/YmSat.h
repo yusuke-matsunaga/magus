@@ -10,7 +10,7 @@
 
 
 #include "../SatSolverImpl.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/FragAlloc.h"
 #include "ym_utils/RandGen.h"
 #include "ym_utils/StopWatch.h"
 #include "SatClause.h"

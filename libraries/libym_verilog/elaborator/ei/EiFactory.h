@@ -25,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のアロケータ
-  EiFactory(AllocBase& alloc);
+  EiFactory(Alloc& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -1104,7 +1104,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // メモリアロケータ
-  AllocBase& mAlloc;
+  Alloc& mAlloc;
 
   ymuint32 mUdpDefnNum;
   ymuint32 mModuleArrayNum;

@@ -200,7 +200,7 @@ public:
   init(const CellClass* cell_class,
        const NpnMapM& map,
        const vector<const Cell*>& cell_list,
-       AllocBase& alloc);
+       Alloc& alloc);
 
   /// @brief FFのピン情報を設定する．
   /// @param[in] pos_array ピン位置と極性情報の配列
@@ -243,7 +243,7 @@ public:
   void
   restore(BinI& bis,
 	  const CellLibrary& library,
-	  AllocBase& alloc);
+	  Alloc& alloc);
 
 
 private:
@@ -254,7 +254,7 @@ private:
   /// @brief メモリ領域の確保を行う．
   /// @param[in] alloc メモリアロケータ
   void
-  alloc_array(AllocBase& alloc);
+  alloc_array(Alloc& alloc);
 
 
 private:

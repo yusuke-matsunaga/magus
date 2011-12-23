@@ -67,7 +67,7 @@ CiPatMgr::pat(ymuint id) const
 // @param[in] alloc メモリアロケータ
 void
 CiPatMgr::copy(const LcPatMgr& src,
-	       AllocBase& alloc)
+	       Alloc& alloc)
 {
   // ノードの情報をコピーする．
   ymuint nn = src.node_num();
@@ -139,7 +139,7 @@ CiPatMgr::dump(BinO& bos) const
 // @retval false 読み込みが失敗した．
 bool
 CiPatMgr::restore(BinI& bis,
-		  AllocBase& alloc)
+		  Alloc& alloc)
 {
   // ノードと枝の情報を読み込む．
   ymuint32 nn;
@@ -170,7 +170,7 @@ CiPatMgr::restore(BinI& bis,
 // @param[in] alloc メモリアロケータ
 void
 CiPatMgr::set_node_num(ymuint nn,
-		       AllocBase& alloc)
+		       Alloc& alloc)
 {
   mNodeNum = nn;
   void* p = alloc.get_memory(sizeof(ymuint32) * mNodeNum);
@@ -182,7 +182,7 @@ CiPatMgr::set_node_num(ymuint nn,
 // @brief パタン数を設定する．
 void
 CiPatMgr::set_pat_num(ymuint np,
-		      AllocBase& alloc)
+		      Alloc& alloc)
 {
   mPatNum = np;
   void* p = alloc.get_memory(sizeof(CiPatGraph) * mPatNum);

@@ -11,7 +11,7 @@
 
 #include "ym_logic/AigMgr.h"
 #include "AigNode.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
 #include "ym_utils/ItvlMgr.h"
 
 
