@@ -115,26 +115,6 @@ public:
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
 
-#if 0
-  // src1 & src2 を計算する．
-  virtual
-  BddEdge
-  and_op(BddEdge e1,
-	 BddEdge e2);
-
-  // src1 ^ src2 を計算する．
-  virtual
-  BddEdge
-  xor_op(BddEdge e1,
-	 BddEdge e2);
-
-  // src1 と src2 の共通部分があれば kEdge1 を返す．
-  virtual
-  BddEdge
-  check_intersect(BddEdge e1,
-		  BddEdge e2);
-#endif
-
   // Davio展開のモーメント項($f_{\overline{x}} \oplus f_x$)を
   // 求める処理
   virtual
@@ -445,11 +425,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 上記の XXX_op() の内部で用いられる再帰関数
   //////////////////////////////////////////////////////////////////////
-
-  // and_op/or_op の下請け関数
-  BddEdge
-  and_step(BddEdge e1,
-	   BddEdge e2);
 
   // compose 演算を行う．
   BddEdge
@@ -798,10 +773,6 @@ private:
 
   // この BddMgr に登録されているテーブルの先頭
   CompTbl* mTblTop;
-
-  CompTbl2* mAndTable;
-  CompTbl2* mXorTable;
-  CompTbl2* mIntTable;
 
   CompTbl3* mIteTable;
   CompTbl1* mCmpTable;

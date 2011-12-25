@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "BddOp.h"
+#include "BddBinOp.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

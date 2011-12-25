@@ -18,6 +18,7 @@
 
 BEGIN_NAMESPACE_YM_BDD
 
+class BddOp;
 class BddBinOp;
 
 //////////////////////////////////////////////////////////////////////
@@ -744,9 +745,6 @@ private:
   // 演算結果テーブル拡張時の制限値を決めるパラメータ
   double mRtLoadLimit;
 
-  // 使用メモリ量の上限
-  ymuint64 mMemLimit;
-
   // メモリアロケータ
   FragAlloc mAlloc;
 
@@ -766,6 +764,9 @@ private:
 
   // INTERSECT 演算用オブジェクト
   BddBinOp* mIntsecOp;
+
+  // 演算オブジェクトのリスト
+  list<BddOp*> mOpList;
 
 
   //////////////////////////////////////////////////////////////////////
@@ -850,7 +851,7 @@ inline
 ymuint64
 BddMgrImpl::mem_limit() const
 {
-  return mMemLimit;
+  return mAlloc.mem_limit();
 }
 
 // 否定のリテラル関数を作る．

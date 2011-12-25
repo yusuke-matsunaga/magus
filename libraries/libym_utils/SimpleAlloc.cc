@@ -17,12 +17,10 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SimpleAlloc::SimpleAlloc(ymuint64 max_size)
+SimpleAlloc::SimpleAlloc(ymuint64 page_size)
 {
-  assert_cond(max_size > 0, __FILE__, __LINE__);
-  mMaxSize = align(max_size);
-  mCurBlock = NULL;
-  mNextPos = mMaxSize;
+  assert_cond(page_size > 0, __FILE__, __LINE__);
+  mPageSize = align(page_size);
 }
 
 // デストラクタ
@@ -35,23 +33,42 @@ SimpleAlloc::~SimpleAlloc()
 void*
 SimpleAlloc::_get_memory(ymuint64 n)
 {
-  if ( n > mMaxSize ) {
-    // mMaxSize を越えるものは普通にアロケートする．
+  if ( n > mPageSize ) {
+    // mPageSize を越えるものは普通にアロケートする．
     return alloc(n);
   }
 
   // ワード境界に乗るようにサイズに整える．
   ymuint64 alloc_size = align(n);
-  if ( mNextPos + alloc_size > mMaxSize ) {
-    void* p = alloc(mMaxSize);
-    mCurBlock = static_cast<char*>(p);
-    mNextPos = 0;
-    mAllocList.push_back(mCurBlock);
-  }
-  char* p = &mCurBlock[mNextPos];
-  mNextPos += alloc_size;
 
-  return static_cast<void*>(p);
+  // alloc_size 以上の余りがあるページを探す．
+  list<Page>::iterator p = mAvailList.begin();
+  for ( ; p != mAvailList.end(); ++ p) {
+    Page& page = *p;
+    if ( page.mNextPos + alloc_size <= mPageSize ) {
+      // 見つけた．
+      break;
+    }
+  }
+  if ( p == mAvailList.end() ) {
+    // 適当なページがなければ新しいページを確保する．
+    void* chunk = alloc(mPageSize);
+    mAvailList.push_back(Page(chunk));
+    p = mAvailList.end();
+    -- p;
+  }
+
+  Page& page = *p;
+  char* s = &page.mChunk[page.mNextPos];
+  page.mNextPos += alloc_size;
+
+  // page の余りがなくなったら mUsedList に移す．
+  if ( page.mNextPos + align(1) > mPageSize ) {
+    mAvailList.erase(p);
+    mUsedList.push_back(page);
+  }
+
+  return static_cast<void*>(s);
 }
 
 // @brief n バイトの領域を開放する．
@@ -59,8 +76,8 @@ void
 SimpleAlloc::_put_memory(ymuint64 n,
 			 void* block)
 {
-  if ( n > mMaxSize ) {
-    // mMaxSize を越えるものは普通に開放する．
+  if ( n > mPageSize ) {
+    // mPageSize を越えるものは普通に開放する．
     free(n, block);
   }
 
@@ -72,14 +89,21 @@ SimpleAlloc::_put_memory(ymuint64 n,
 void
 SimpleAlloc::_destroy()
 {
-  for (list<char*>::iterator p = mAllocList.begin();
-       p != mAllocList.end(); ++ p) {
-    char* s = *p;
-    free(mMaxSize, static_cast<void*>(s));
+  for (list<Page>::iterator p = mAvailList.begin();
+       p != mAvailList.end(); ++ p) {
+    Page& page = *p;
+    void* chunk = static_cast<void*>(page.mChunk);
+    free(mPageSize, chunk);
   }
-  mAllocList.clear();
-  mCurBlock = NULL;
-  mNextPos = mMaxSize;
+  mAvailList.clear();
+
+  for (list<Page>::iterator p = mUsedList.begin();
+       p != mUsedList.end(); ++ p) {
+    Page& page = *p;
+    void* chunk = static_cast<void*>(page.mChunk);
+    free(mPageSize, chunk);
+  }
+  mUsedList.clear();
 }
 
 // @brief アラインメントを考慮してサイズを調節する．

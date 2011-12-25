@@ -45,12 +45,12 @@ UnitAlloc::_get_memory(ymuint64 n)
   }
 
   if ( mAvailTop == NULL ) {
-    void* p = alloc(mUnitSize * mBlockSize);
-    char* chunk = static_cast<char*>(p);
+    void* chunk = alloc(mUnitSize * mBlockSize);
     mAllocList.push_back(chunk);
 
-    for (ymuint64 i = 0; i < mBlockSize; ++ i, chunk += mUnitSize) {
-      Block* b = reinterpret_cast<Block*>(chunk);
+    char* p = static_cast<char*>(chunk);
+    for (ymuint64 i = 0; i < mBlockSize; ++ i, p += mUnitSize) {
+      Block* b = reinterpret_cast<Block*>(p);
       b->mLink = mAvailTop;
       mAvailTop = b;
     }
@@ -80,10 +80,10 @@ UnitAlloc::_put_memory(ymuint64 n,
 void
 UnitAlloc::_destroy()
 {
-  for (list<char*>::iterator p = mAllocList.begin();
+  for (list<void*>::iterator p = mAllocList.begin();
        p != mAllocList.end(); ++ p) {
-    char* chunk = *p;
-    free(mUnitSize * mBlockSize, static_cast<void*>(chunk));
+    void* chunk = *p;
+    free(mUnitSize * mBlockSize, chunk);
   }
   mAllocList.clear();
   mAvailTop = NULL;

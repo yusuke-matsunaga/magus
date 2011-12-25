@@ -39,11 +39,6 @@ public:
   // 外部から用いられるインターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ロックされていないノードに関係したセルをきれいにする．
-  virtual
-  void
-  sweep() = 0;
-
   /// @brief 内容をクリアする．
   virtual
   void
@@ -60,10 +55,6 @@ public:
   /// @brief テーブルサイズを返す．
   ymuint64
   table_size() const;
-
-  /// @brief load_limit を設定する．
-  void
-  load_limit(double load_limit);
 
   /// @brief 最大のテーブルサイズを設定する．
   void
@@ -113,9 +104,6 @@ private:
   // テーブルサイズ
   // セルの個数．バイト数ではないので注意
   ymuint64 mTableSize;
-
-  // テーブルの使用率がこの値を越えたらサイズの拡張を行なう．
-  double mLoadLimit;
 
   // ただし，テーブルのサイズはこれ以上大きくしない．
   ymuint64 mMaxSize;

@@ -105,7 +105,7 @@ private:
   Block* mAvailTop;
 
   // 確保して使用中のメモリ領域のリスト
-  list<char*> mAllocList;
+  list<void*> mAllocList;
 
 };
 

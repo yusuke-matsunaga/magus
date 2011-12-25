@@ -24,10 +24,10 @@ class SimpleAlloc :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] max_size このオブジェクトが管理する最大サイズ
-  /// @note max_size 以上のメモリ領域はデフォルトのアロケーターを
+  /// @param[in] page_size このオブジェクトが管理するメモリ量の単位
+  /// @note page_size 以上のメモリ領域はデフォルトのアロケーターを
   /// 使用する．
-  SimpleAlloc(ymuint64 max_size);
+  SimpleAlloc(ymuint64 page_size);
 
   /// @brief デストラクタ
   virtual
@@ -74,26 +74,40 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  struct Page
+  {
+    // コンストラクタ
+    Page(void* p = NULL) :
+      mNextPos(0),
+      mChunk(static_cast<char*>(p))
+    {
+    }
+
+    // 利用可能な先頭番地
+    ymuint64 mNextPos;
+
+    // メモリチャンク
+    char* mChunk;
+
+  };
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // コンストラクタの引数
-  ymuint64 mMaxSize;
+  // 一度に確保するメモリの単位
+  ymuint64 mPageSize;
 
-  // mMaxSize を越えない2の巾乗の数．
-  ymuint64 mMaxPowerSize;
+  // 使用可能なメモリ領域のリスト
+  list<Page> mAvailList;
 
-  // mMaxPowerSize の log
-  ymuint64 mMaxLogSize;
-
-  // 現在利用可能なメモリ領域
-  char* mCurBlock;
-
-  // mCurBlock の次に利用可能な位置
-  ymuint64 mNextPos;
-
-  // 確保して使用中のメモリ領域のリスト
-  list<char*> mAllocList;
+  // 使用中のメモリ領域のリスト
+  list<Page> mUsedList;
 
 };
 

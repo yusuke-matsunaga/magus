@@ -27,10 +27,10 @@ const ymuint64 K_unit = (1 << 10);
 const ymuint64 M_unit = (1 << 20);
 
 // パラメータのデフォルト値
-const double DEFAULT_GC_THRESHOLD  = 0.10;
+const double DEFAULT_GC_THRESHOLD    = 0.10;
 const ymuint64 DEFAULT_GC_NODE_LIMIT =  64 * K_unit;
-const double DEFAULT_NT_LOAD_LIMIT = 2.0;
-const double DEFAULT_RT_LOAD_LIMIT = 0.8;
+const double DEFAULT_NT_LOAD_LIMIT   = 2.0;
+const double DEFAULT_RT_LOAD_LIMIT   = 0.8;
 const ymuint64 DEFAULT_MEM_LIMIT     = 400 * M_unit;
 const ymuint64 DEFAULT_DZONE         =  10 * M_unit;
 
@@ -150,9 +150,10 @@ BddMgrImpl::BddMgrImpl(const string& name) :
   mGcNodeLimit = DEFAULT_GC_NODE_LIMIT;
   mNtLoadLimit = DEFAULT_NT_LOAD_LIMIT;
   mRtLoadLimit = DEFAULT_RT_LOAD_LIMIT;
-  mMemLimit = DEFAULT_MEM_LIMIT;
   mDangerousZone = DEFAULT_DZONE;
   mGcEnable = 0;
+
+  mAlloc.set_mem_limit(DEFAULT_MEM_LIMIT);
 
   // ログ出力用ストリームの初期化
   mNullStream = new ofstream("/dev/null", ios::out);
@@ -170,6 +171,10 @@ BddMgrImpl::BddMgrImpl(const string& name) :
   mAndOp = new AndOp(this);
   mXorOp = new XorOp(this);
   mIntsecOp = new IntsecOp(this);
+
+  mOpList.push_back(mAndOp);
+  mOpList.push_back(mXorOp);
+  mOpList.push_back(mIntsecOp);
 }
 
 // デストラクタ
@@ -194,6 +199,12 @@ BddMgrImpl::~BddMgrImpl()
     if ( first ) {
       first->mPrev = last;
     }
+  }
+
+  // 演算オブジェクトの解放
+  for (list<BddOp*>::iterator p = mOpList.begin();
+       p != mOpList.end(); ++ p) {
+    delete *p;
   }
 
   // /dev/null ストリームの破壊
@@ -313,14 +324,9 @@ BddMgrImpl::param(const BddMgrParam& param,
   }
   if ( mask & BddMgrParam::RT_LOAD_LIMIT ) {
     mRtLoadLimit = param.mRtLoadLimit;
-#if 0
-    for (CompTbl* tbl = mTblTop; tbl; tbl = tbl->mNext) {
-      tbl->load_limit(mRtLoadLimit);
-    }
-#endif
   }
   if ( mask & BddMgrParam::MEM_LIMIT ) {
-    mMemLimit = param.mMemLimit;
+    mAlloc.set_mem_limit(param.mMemLimit);
   }
 }
 
@@ -329,11 +335,11 @@ BddMgrImpl::param(const BddMgrParam& param,
 void
 BddMgrImpl::param(BddMgrParam& param) const
 {
-  param.mGcThreshold = mGcThreshold;
-  param.mGcNodeLimit = mGcNodeLimit;
-  param.mNtLoadLimit = mNtLoadLimit;
-  param.mRtLoadLimit = mRtLoadLimit;
-  param.mMemLimit = mMemLimit;
+  param.mGcThreshold = gc_threshold();
+  param.mGcNodeLimit = gc_node_limit();
+  param.mNtLoadLimit = nt_load_limit();
+  param.mRtLoadLimit = rt_load_limit();
+  param.mMemLimit = mem_limit();
 }
 
 // @brief ガーベージコレクションを許可する．
@@ -403,17 +409,7 @@ BddMgrImpl::unlockall(BddNode* vp)
 void*
 BddMgrImpl::allocate(ymuint64 size)
 {
-  if ( mOverflow || mMemLimit > 0 && mAlloc.used_size() + size > mMemLimit ) {
-    // メモリ制限をオーバーしたので 0 を返す．
-    mOverflow = true;
-    return 0;
-  }
-
-#if 0
   return mAlloc.get_memory(size);
-#else
-  return reinterpret_cast<void*>(new char[size]);
-#endif
 }
 
 // @brief このマネージャで確保したメモリを解放する．
@@ -423,11 +419,7 @@ void
 BddMgrImpl::deallocate(void* ptr,
 		       ymuint64 size)
 {
-#if 0
   mAlloc.put_memory(size, ptr);
-#else
-  delete [] static_cast<char*>(ptr);
-#endif
 }
 
 END_NAMESPACE_YM_BDD

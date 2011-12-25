@@ -133,15 +133,6 @@ BddMgrClassic::BddMgrClassic(const string& name,
   // 演算結果テーブルの初期化
   mTblTop = NULL;
 
-  mAndTable = new CompTbl2(this, "and_table");
-  assert_cond(mAndTable, __FILE__, __LINE__);
-  mXorTable = new CompTbl2(this, "xor_table");
-  assert_cond(mXorTable, __FILE__, __LINE__);
-  mIntTable = new CompTbl2(this, "int_table");
-  assert_cond(mIntTable, __FILE__, __LINE__);
-
-  mIteTable = new CompTbl3(this, "ite_table");
-  assert_cond(mIntTable, __FILE__, __LINE__);
   mCmpTable = new CompTbl1(this, "compose_table");
   assert_cond(mCmpTable, __FILE__, __LINE__);
   mCofacTable = new CompTbl2(this, "cofac_table");

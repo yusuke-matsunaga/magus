@@ -43,6 +43,8 @@ libym_bdd_base_la_SOURCES = \
 	CompTbl3.h \
 	CompTbl3.cc \
 	BddOp.h \
+	BddBinOp.h \
+	BddBinOp.cc \
 	AndOp.h \
 	AndOp.cc \
 	XorOp.h \
