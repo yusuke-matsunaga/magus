@@ -1,8 +1,8 @@
-#ifndef BDDBINOP_H
-#define BDDBINOP_H
+#ifndef BDDTRIOP_H
+#define BDDTRIOP_H
 
-/// @file BddBinOp.h
-/// @brief BddBinOp のヘッダファイル
+/// @file BddTriOp.h
+/// @brief BddTriOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -10,17 +10,17 @@
 
 
 #include "BddOp.h"
-#include "CompTbl2.h"
+#include "CompTbl3.h"
 #include "BddNode.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class BddBinOp BddBinOp.h "BddBinOp.h"
+/// @class BddTriOp BddTriOp.h "BddTriOp.h"
 /// @brief BDD 間の二項演算を表すクラス
 //////////////////////////////////////////////////////////////////////
-class BddBinOp :
+class BddTriOp :
   public BddOp
 {
 public:
@@ -28,12 +28,12 @@ public:
   /// @brief コンストラクタ
   /// @param[in] mgr マネージャ
   /// @param[in] name テーブル名
-  BddBinOp(BddMgrImpl* mgr,
+  BddTriOp(BddMgrImpl* mgr,
 	   const char* name = 0);
 
   /// @brief デストラクタ
   virtual
-  ~BddBinOp();
+  ~BddTriOp();
 
 
 public:
@@ -42,12 +42,13 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 演算を行う関数
-  /// @param[in] left, right オペランド
+  /// @param[in] e1, e2, e3 オペランド
   /// @return 演算結果を買えす．
   virtual
   BddEdge
-  apply(BddEdge left,
-	BddEdge right) = 0;
+  apply(BddEdge e1,
+	BddEdge e2,
+	BddEdge e3) = 0;
 
   /// @brief 次の GC で回収されるノードに関連した情報を削除する．
   virtual
@@ -61,28 +62,20 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 演算結果テーブルを検索する．
-  /// @param[in] e1, e2 オペランドの枝
+  /// @param[in] e1, e2, e3 オペランドの枝
   BddEdge
   get(BddEdge e1,
-      BddEdge e2);
+      BddEdge e2,
+      BddEdge e3);
 
   /// @brief 演算結果テーブルに登録する．
-  /// @param[in] e1, e2 オペランドの枝
+  /// @param[in] e1, e2, e3 オペランドの枝
   /// @param[in] ans 結果の枝
   void
   put(BddEdge e1,
       BddEdge e2,
+      BddEdge e3,
       BddEdge ans);
-
-  /// @brief f と g のノードの子供のノードとレベルを求める．
-  static
-  ymuint
-  split(BddEdge f,
-	BddEdge g,
-	BddEdge& f_0,
-	BddEdge& f_1,
-	BddEdge& g_0,
-	BddEdge& g_1);
 
 
 private:
@@ -91,7 +84,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 演算結果テーブル
-  CompTbl2 mCompTbl;
+  CompTbl3 mCompTbl;
 
 };
 
@@ -101,50 +94,27 @@ private:
 //////////////////////////////////////////////////////////////////////
 
 // @brief 演算結果テーブルを検索する．
-// @param[in] e1, e2 オペランドの枝
+// @param[in] e1, e2, e3 オペランドの枝
 inline
 BddEdge
-BddBinOp::get(BddEdge e1,
-	      BddEdge e2)
+BddTriOp::get(BddEdge e1,
+	      BddEdge e2,
+	      BddEdge e3)
 {
-  return mCompTbl.get(e1, e2);
+  return mCompTbl.get(e1, e2, e3);
 }
 
 // @brief 演算結果テーブルに登録する．
-// @param[in] e1, e2 オペランドの枝
+// @param[in] e1, e2, e3 オペランドの枝
 // @param[in] ans 結果の枝
 inline
 void
-BddBinOp::put(BddEdge e1,
+BddTriOp::put(BddEdge e1,
 	      BddEdge e2,
+	      BddEdge e3,
 	      BddEdge ans)
 {
-  mCompTbl.put(e1, e2, ans);
-}
-
-// f と g のノードの子供のノードとレベルを求める．
-inline
-ymuint
-BddBinOp::split(BddEdge f,
-		BddEdge g,
-		BddEdge& f_0,
-		BddEdge& f_1,
-		BddEdge& g_0,
-		BddEdge& g_1)
-{
-  BddNode* f_vp = f.get_node();
-  BddNode* g_vp = g.get_node();
-  tPol f_pol = f.pol();
-  tPol g_pol = g.pol();
-  ymuint f_level = f_vp->level();
-  ymuint g_level = g_vp->level();
-  ymuint level = f_level;
-  if ( g_level < level ) {
-    level = g_level;
-  }
-  split1(level, f_level, f, f_vp, f_pol, f_0, f_1);
-  split1(level, g_level, g, g_vp, g_pol, g_0, g_1);
-  return level;
+  mCompTbl.put(e1, e2, e3, ans);
 }
 
 END_NAMESPACE_YM_BDD

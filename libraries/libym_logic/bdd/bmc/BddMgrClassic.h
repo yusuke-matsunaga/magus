@@ -153,13 +153,6 @@ public:
   gcofactor(BddEdge e1,
 	    BddEdge e2);
 
-  // if-then-else 演算を計算する．
-  virtual
-  BddEdge
-  ite_op(BddEdge e1,
-	 BddEdge e2,
-	 BddEdge e3);
-
   // multiple compose 演算を行うために最初に呼ばれる関数．
   virtual
   void

@@ -116,24 +116,6 @@ public:
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
 
-  // src1 & src2 を計算する．
-  virtual
-  BddEdge
-  and_op(BddEdge e1,
-	 BddEdge e2);
-
-  // src1 ^ src2 を計算する．
-  virtual
-  BddEdge
-  xor_op(BddEdge e1,
-	 BddEdge e2);
-
-  // src1 と src2 の共通部分があれば kEdge1 を返す．
-  virtual
-  BddEdge
-  check_intersect(BddEdge e1,
-		  BddEdge e2);
-
   // Davio展開のモーメント項($f_{\overline{x}} \oplus f_x$)を
   // 求める処理
   virtual
@@ -171,13 +153,6 @@ public:
   BddEdge
   gcofactor(BddEdge e1,
 	    BddEdge e2);
-
-  // if-then-else 演算を計算する．
-  virtual
-  BddEdge
-  ite_op(BddEdge e1,
-	 BddEdge e2,
-	 BddEdge e3);
 
   // multiple compose 演算を行うために最初に呼ばれる関数．
   virtual

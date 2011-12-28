@@ -20,8 +20,7 @@ BEGIN_NAMESPACE_YM_BDD
 // @brief コンストラクタ
 // @param[in] mgr マネージャ
 XorOp::XorOp(BddMgrImpl* mgr) :
-  BddBinOp(mgr, "xor_op"),
-  mMgr(mgr)
+  BddBinOp(mgr, "xor_op")
 {
 }
 
@@ -32,7 +31,7 @@ XorOp::~XorOp()
 
 // @brief 演算を行う関数
 // @param[in] left, right オペランド
-// @return 演算結果を買えす．
+// @return 演算結果を返す．
 BddEdge
 XorOp::apply(BddEdge left,
 	     BddEdge right)

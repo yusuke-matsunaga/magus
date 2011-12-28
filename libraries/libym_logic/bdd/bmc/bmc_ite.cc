@@ -21,7 +21,7 @@ BddEdge xy_edge;
 
 END_NONAMESPACE
 
-
+#if 0
 // f が真の時 g を，偽の時 h を選ぶ関数
 BddEdge
 BddMgrClassic::ite_op(BddEdge f,
@@ -128,6 +128,7 @@ BddMgrClassic::ite_op(BddEdge f,
   }
   return BddEdge(result, ans_pol);
 }
+#endif
 
 // multiple compose 演算を行うために最初に呼ばれる関数．
 void

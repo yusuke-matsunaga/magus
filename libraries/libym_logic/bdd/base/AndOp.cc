@@ -8,7 +8,6 @@
 
 
 #include "AndOp.h"
-#include "BddMgrImpl.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -20,8 +19,7 @@ BEGIN_NAMESPACE_YM_BDD
 // @brief コンストラクタ
 // @param[in] mgr マネージャ
 AndOp::AndOp(BddMgrImpl* mgr) :
-  BddBinOp(mgr, "and_op"),
-  mMgr(mgr)
+  BddBinOp(mgr, "and_op")
 {
 }
 
@@ -32,7 +30,7 @@ AndOp::~AndOp()
 
 // @brief 演算を行う関数
 // @param[in] left, right オペランド
-// @return 演算結果を買えす．
+// @return 演算結果を返す．
 BddEdge
 AndOp::apply(BddEdge left,
 	     BddEdge right)
@@ -93,7 +91,7 @@ AndOp::apply_step(BddEdge f,
     if ( r_1.is_overflow() ) {
       return BddEdge::make_overflow();
     }
-    result = mMgr->new_node(level, r_0, r_1);
+    result = new_node(level, r_0, r_1);
     put(f, g, result);
   }
 

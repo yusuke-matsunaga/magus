@@ -12,9 +12,11 @@
 #include "ym_logic/Bdd.h"
 #include "../bmc/BddMgrClassic.h"
 #include "../bmm/BddMgrModern.h"
+
 #include "AndOp.h"
 #include "XorOp.h"
 #include "IntsecOp.h"
+#include "IteOp.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -171,10 +173,12 @@ BddMgrImpl::BddMgrImpl(const string& name) :
   mAndOp = new AndOp(this);
   mXorOp = new XorOp(this);
   mIntsecOp = new IntsecOp(this);
+  mIteOp = new IteOp(this, mAndOp, mXorOp);
 
   mOpList.push_back(mAndOp);
   mOpList.push_back(mXorOp);
   mOpList.push_back(mIntsecOp);
+  mOpList.push_back(mIteOp);
 }
 
 // デストラクタ
@@ -301,6 +305,17 @@ BddMgrImpl::check_intersect(BddEdge e1,
 			    BddEdge e2)
 {
   return mIntsecOp->apply(e1, e2);
+}
+
+// @brief if-then-else 演算を計算する．
+// @param[in] e1, e2, e3 演算対象の枝
+// @return 演算結果を返す．
+BddEdge
+BddMgrImpl::ite_op(BddEdge e1,
+		   BddEdge e2,
+		   BddEdge e3)
+{
+  return mIteOp->apply(e1, e2, e3);
 }
 
 // @brief パラメータを設定する．

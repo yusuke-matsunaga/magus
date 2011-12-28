@@ -1,35 +1,41 @@
-#ifndef ANDOP_H
-#define ANDOP_H
+#ifndef ITEOP_H
+#define ITEOP_H
 
-/// @file AndOp.h
-/// @brief AndOp のヘッダファイル
+/// @file IteOp.h
+/// @brief IteOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BddBinOp.h"
+#include "BddTriOp.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
 
+class BddBinOp;
+
 //////////////////////////////////////////////////////////////////////
-/// @class AndOp AndOp.h "AndOp.h"
-/// @brief AND 演算を行うクラス
+/// @class IteOp IteOp.h "IteOp.h"
+/// @brief if-then-else 演算を行うクラス
 //////////////////////////////////////////////////////////////////////
-class AndOp :
-  public BddBinOp
+class IteOp :
+  public BddTriOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr マネージャ
-  AndOp(BddMgrImpl* mgr);
+  /// @param[in] and_op AND 演算オブジェクト
+  /// @param[in] xor_op XOR 演算オブジェクト
+  IteOp(BddMgrImpl* mgr,
+	BddBinOp* and_op,
+	BddBinOp* xor_op);
 
   /// @brief デストラクタ
   virtual
-  ~AndOp();
+  ~IteOp();
 
 
 public:
@@ -38,12 +44,13 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 演算を行う関数
-  /// @param[in] left, right オペランド
+  /// @param[in] e1, e2, e3 オペランド
   /// @return 演算結果を返す．
   virtual
   BddEdge
-  apply(BddEdge left,
-	BddEdge right);
+  apply(BddEdge e1,
+	BddEdge e2,
+	BddEdge e3);
 
 
 private:
@@ -54,10 +61,23 @@ private:
   /// @brief 実際の演算を行う関数
   BddEdge
   apply_step(BddEdge f,
-	     BddEdge g);
+	     BddEdge g,
+	     BddEdge h);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // AND 演算オブジェクト
+  BddBinOp* mAndOp;
+
+  // XOR 演算オブジェクト
+  BddBinOp* mXorOp;
 
 };
 
 END_NAMESPACE_YM_BDD
 
-#endif // ANDOP_H
+#endif // ITEOP_H

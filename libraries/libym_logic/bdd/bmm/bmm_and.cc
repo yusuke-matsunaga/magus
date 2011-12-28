@@ -12,7 +12,7 @@
 
 
 BEGIN_NAMESPACE_YM_BDD
-
+#if 0
 // 2つのBDDのANDを計算するapply演算
 // これで，AND,NAND,OR,NORをすべて計算する．
 BddEdge
@@ -231,5 +231,6 @@ BddMgrModern::check_intersect(BddEdge f,
   }
   return result;
 }
+#endif
 
 END_NAMESPACE_YM_BDD

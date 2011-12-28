@@ -20,6 +20,9 @@ BEGIN_NAMESPACE_YM_BDD
 
 class BddOp;
 class BddBinOp;
+class BddTriOp;
+class CofOp;
+class XcOp;
 
 //////////////////////////////////////////////////////////////////////
 /// @class BddMgrImpl BddMgrImpl.h "BddMgrImpl.h"
@@ -186,15 +189,22 @@ public:
   check_intersect(BddEdge e1,
 		  BddEdge e2);
 
+  /// @brief if-then-else 演算を計算する．
+  /// @param[in] e1, e2, e3 演算対象の枝
+  /// @return 演算結果を返す．
+  BddEdge
+  ite_op(BddEdge e1,
+	 BddEdge e2,
+	 BddEdge e3);
+
   /// @brief Davio展開のモーメント項を求める処理
   /// @param[in] e 演算対象の枝
   /// @param[in] idx 展開を行う変数番号
   /// @return 演算結果を返す．
   /// @note モーメント項とは $f_{\overline{x}} \oplus f_x$ のこと．
-  virtual
   BddEdge
   xor_moment(BddEdge e,
-	     VarId idx) = 0;
+	     VarId idx);
 
   /// @brief bdd がキューブの時 true を返す．
   /// @param[in] e 演算対象の枝
@@ -237,15 +247,6 @@ public:
   BddEdge
   gcofactor(BddEdge e1,
 	    BddEdge e2) = 0;
-
-  /// @brief if-then-else 演算を計算する．
-  /// @param[in] e1, e2, e3 演算対象の枝
-  /// @return 演算結果を返す．
-  virtual
-  BddEdge
-  ite_op(BddEdge e1,
-	 BddEdge e2,
-	 BddEdge e3) = 0;
 
   /// @brief multiple compose 演算を行うために最初に呼ばれる関数．
   virtual
@@ -764,6 +765,15 @@ private:
 
   // INTERSECT 演算用オブジェクト
   BddBinOp* mIntsecOp;
+
+  // ITE 演算用オブジェクト
+  BddTriOp* mIteOp;
+
+  // COFACTOR 演算用オブジェクト
+  CofOp* mCofOp;
+
+  // XCOFACTOR 演算用オブジェクト
+  XcOp* mXcOp;
 
   // 演算オブジェクトのリスト
   list<BddOp*> mOpList;

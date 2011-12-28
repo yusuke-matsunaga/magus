@@ -1,35 +1,39 @@
-#ifndef ANDOP_H
-#define ANDOP_H
+#ifndef XCOP_H
+#define XCOP_H
 
-/// @file AndOp.h
-/// @brief AndOp のヘッダファイル
+/// @file XcOp.h
+/// @brief XcOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BddBinOp.h"
+#include "BddUniOp.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
 
+class BddBinOp;
+
 //////////////////////////////////////////////////////////////////////
-/// @class AndOp AndOp.h "AndOp.h"
-/// @brief AND 演算を行うクラス
+/// @class XcOp XcOp.h "XcOp.h"
+/// @brief XOR-cofactor 演算を行うクラス
 //////////////////////////////////////////////////////////////////////
-class AndOp :
-  public BddBinOp
+class XcOp :
+  public BddUniOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr マネージャ
-  AndOp(BddMgrImpl* mgr);
+  /// @param[in] xor_op XOR演算オブジェクト
+  XcOp(BddMgrImpl* mgr,
+       XorOp* xor_op);
 
   /// @brief デストラクタ
   virtual
-  ~AndOp();
+  ~XcOp();
 
 
 public:
@@ -38,12 +42,13 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 演算を行う関数
-  /// @param[in] left, right オペランド
+  /// @param[in] left オペランド
+  /// @param[in] id コファクタをとる変数番号
   /// @return 演算結果を返す．
   virtual
   BddEdge
   apply(BddEdge left,
-	BddEdge right);
+	VarId id);
 
 
 private:
@@ -53,11 +58,19 @@ private:
 
   /// @brief 実際の演算を行う関数
   BddEdge
-  apply_step(BddEdge f,
-	     BddEdge g);
+  apply_step(BddEdge f);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // XOR演算オブジェクト
+  BddBinOp* mXorOp;
 
 };
 
 END_NAMESPACE_YM_BDD
 
-#endif // ANDOP_H
+#endif // XCOP_H

@@ -1,41 +1,38 @@
 
-/// @file BddBinOp.cc
-/// @brief BddBinOp
+/// @file BddUniOp.cc
+/// @brief BddUniOp
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BddBinOp.h"
+#include "BddUniOp.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
 
 //////////////////////////////////////////////////////////////////////
-// クラス BddBinOp
+// クラス BddUniOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] mgr マネージャ
-// @param[in] name テーブル名
-BddBinOp::BddBinOp(BddMgrImpl* mgr,
-		   const char* name) :
-  BddOp(mgr),
-  mCompTbl(mgr, name)
+BddUniOp::BddUniOp(BddMgrImpl* mgr) :
+  BddOp(mgr)
 {
 }
 
 // @brief デストラクタ
-BddBinOp::~BddBinOp()
+BddUniOp::~BddUniOp()
 {
 }
 
 // @brief 次の GC で回収されるノードに関連した情報を削除する．
 void
-BddBinOp::sweep()
+BddUniOp::sweep()
 {
-  mCompTbl.sweep();
+  mCompTbl.clear();
 }
 
 END_NAMESPACE_YM_BDD
