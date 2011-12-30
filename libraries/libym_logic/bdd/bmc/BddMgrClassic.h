@@ -100,6 +100,11 @@ public:
   VarId
   varid(ymuint level) const;
 
+  /// @brief 現在の最大レベル + 1を返す．
+  virtual
+  ymuint
+  max_level() const;
+
   // 動的変数順変更を許可する．
   virtual
   void
@@ -114,13 +119,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
-
-  // Davio展開のモーメント項($f_{\overline{x}} \oplus f_x$)を
-  // 求める処理
-  virtual
-  BddEdge
-  xor_moment(BddEdge e,
-	     VarId idx);
 
   // bdd がキューブの時 true を返す．
   virtual
@@ -139,19 +137,6 @@ public:
 		 VarId x,
 		 VarId y,
 		 tPol pol);
-
-  // 一つの変数に対する cofactor を計算する．
-  virtual
-  BddEdge
-  scofactor(BddEdge e1,
-	    VarId id,
-	    tPol pol);
-
-  // generalized cofactor を計算する．
-  virtual
-  BddEdge
-  gcofactor(BddEdge e1,
-	    BddEdge e2);
 
   // multiple compose 演算を行うために最初に呼ばれる関数．
   virtual
@@ -742,6 +727,9 @@ private:
   // 変数番号をキーにして変数のポインタを格納しているハッシュ表
   Var** mVarHashTable;
 
+  // 最大のレベル
+  ymuint32 mMaxLevel;
+
 
   //////////////////////////////////////////////////////////////////////
   // 節点テーブル関係のメンバ
@@ -767,13 +755,10 @@ private:
   // この BddMgr に登録されているテーブルの先頭
   CompTbl* mTblTop;
 
-  CompTbl3* mIteTable;
   CompTbl1* mCmpTable;
   CompTbl2* mPushDownTable;
   CompTbl2* mPushDownTable2;
   CompTbl3* mPushDownTable3;
-  CompTbl2* mCofacTable;
-  CompTbl1* mXcofactorTable;
 
   CompTbl1* mSmTable;
   CompTbl2* mAeTable;

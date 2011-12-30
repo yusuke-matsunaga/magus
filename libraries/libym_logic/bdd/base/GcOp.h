@@ -1,39 +1,37 @@
-#ifndef XCOP_H
-#define XCOP_H
+#ifndef GCOP_H
+#define GCOP_H
 
-/// @file XcOp.h
-/// @brief XcOp のヘッダファイル
+/// @file GcOp.h
+/// @brief GcOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BddUniOp.h"
+#include "BddBinOp.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
 
-class BddBinOp;
+class CdOp;
 
 //////////////////////////////////////////////////////////////////////
-/// @class XcOp XcOp.h "XcOp.h"
-/// @brief XOR-cofactor 演算を行うクラス
+/// @class GcOp GcOp.h "GcOp.h"
+/// @brief AND 演算を行うクラス
 //////////////////////////////////////////////////////////////////////
-class XcOp :
-  public BddUniOp
+class GcOp :
+  public BddBinOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr マネージャ
-  /// @param[in] xor_op XOR演算オブジェクト
-  XcOp(BddMgrImpl* mgr,
-       BddBinOp* xor_op);
+  GcOp(BddMgrImpl* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~XcOp();
+  ~GcOp();
 
 
 public:
@@ -42,13 +40,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 演算を行う関数
-  /// @param[in] left オペランド
-  /// @param[in] id コファクタをとる変数番号
+  /// @param[in] left, right オペランド
   /// @return 演算結果を返す．
   virtual
   BddEdge
   apply(BddEdge left,
-	VarId id);
+	BddEdge right);
 
 
 private:
@@ -58,22 +55,11 @@ private:
 
   /// @brief 実際の演算を行う関数
   BddEdge
-  apply_step(BddEdge f);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // コファクターをとる変数のレベル
-  ymuint32 mLevel;
-
-  // XOR演算オブジェクト
-  BddBinOp* mXorOp;
+  apply_step(BddEdge f,
+	     BddEdge g);
 
 };
 
 END_NAMESPACE_YM_BDD
 
-#endif // XCOP_H
+#endif // ANDOP_H

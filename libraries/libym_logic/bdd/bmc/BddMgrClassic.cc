@@ -129,16 +129,13 @@ BddMgrClassic::BddMgrClassic(const string& name,
   assert_cond(mVarHashTable, __FILE__, __LINE__);
   mVarNum = 0;
   mVarTop = NULL;
+  mMaxLevel = 0;
 
   // 演算結果テーブルの初期化
   mTblTop = NULL;
 
   mCmpTable = new CompTbl1(this, "compose_table");
   assert_cond(mCmpTable, __FILE__, __LINE__);
-  mCofacTable = new CompTbl2(this, "cofac_table");
-  assert_cond(mCofacTable, __FILE__, __LINE__);
-  mXcofactorTable = new CompTbl1(this, "xcofactor_table");
-  assert_cond(mXcofactorTable, __FILE__, __LINE__);
 
   mSmTable = new CompTbl1(this, "sm_table");
   assert_cond(mSmTable, __FILE__, __LINE__);
@@ -321,6 +318,9 @@ BddMgrClassic::alloc_var(VarId varid)
     *pprev = var;
     var->mNext = temp;
   }
+  if ( mMaxLevel < level ) {
+    mMaxLevel = level;
+  }
   return var;
 }
 
@@ -349,6 +349,13 @@ BddMgrClassic::varid(ymuint level) const
 {
   // 実は同じ
   return VarId(level);
+}
+
+// @brief 現在の最大レベル + 1を返す．
+ymuint
+BddMgrClassic::max_level() const
+{
+  return mMaxLevel + 1;
 }
 
 // 動的変数順変更を許可する．

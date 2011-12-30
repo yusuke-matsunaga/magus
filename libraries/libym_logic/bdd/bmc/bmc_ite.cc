@@ -388,6 +388,7 @@ BddMgrClassic::pd_step3(BddEdge e0,
   return result;
 }
 
+#if 0
 // generalized cofactor 演算
 BddEdge
 BddMgrClassic::gcofactor(BddEdge e1,
@@ -600,7 +601,9 @@ BddMgrClassic::cubediv_step(BddEdge f)
 
   return result;
 }
+#endif
 
+#if 0
 // Davio展開のモーメント項($f_{\overline{x}} \oplus f_x$)を
 // 求める処理
 // メモリ不足のためにエラーとなる可能性がある．
@@ -671,5 +674,6 @@ BddMgrClassic::xcofactor_step(BddEdge f)
   }
   return result;
 }
+#endif
 
 END_NAMESPACE_YM_BDD

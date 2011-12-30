@@ -1,8 +1,8 @@
-#ifndef XCOP_H
-#define XCOP_H
+#ifndef COFOP_H
+#define COFOP_H
 
-/// @file XcOp.h
-/// @brief XcOp のヘッダファイル
+/// @file CofOp.h
+/// @brief CofOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -17,23 +17,21 @@ BEGIN_NAMESPACE_YM_BDD
 class BddBinOp;
 
 //////////////////////////////////////////////////////////////////////
-/// @class XcOp XcOp.h "XcOp.h"
-/// @brief XOR-cofactor 演算を行うクラス
+/// @class CofOp CofOp.h "CofOp.h"
+/// @brief cofactor 演算を行うクラス
 //////////////////////////////////////////////////////////////////////
-class XcOp :
+class CofOp :
   public BddUniOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr マネージャ
-  /// @param[in] xor_op XOR演算オブジェクト
-  XcOp(BddMgrImpl* mgr,
-       BddBinOp* xor_op);
+  CofOp(BddMgrImpl* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~XcOp();
+  ~CofOp();
 
 
 public:
@@ -44,11 +42,13 @@ public:
   /// @brief 演算を行う関数
   /// @param[in] left オペランド
   /// @param[in] id コファクタをとる変数番号
+  /// @param[in] pol 極性
   /// @return 演算結果を返す．
   virtual
   BddEdge
   apply(BddEdge left,
-	VarId id);
+	VarId id,
+	tPol pol);
 
 
 private:
@@ -69,11 +69,11 @@ private:
   // コファクターをとる変数のレベル
   ymuint32 mLevel;
 
-  // XOR演算オブジェクト
-  BddBinOp* mXorOp;
+  // コファクターの極性
+  tPol mPol;
 
 };
 
 END_NAMESPACE_YM_BDD
 
-#endif // XCOP_H
+#endif // COFOP_H

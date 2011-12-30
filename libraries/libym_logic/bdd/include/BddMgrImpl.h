@@ -120,6 +120,11 @@ public:
   VarId
   varid(ymuint level) const = 0;
 
+  /// @brief 現在の最大レベル + 1を返す．
+  virtual
+  ymuint
+  max_level() const = 0;
+
   /// @brief 動的変数順変更を許可する．
   virtual
   void
@@ -197,6 +202,16 @@ public:
 	 BddEdge e2,
 	 BddEdge e3);
 
+  /// @brief 一つの変数に対する cofactor を計算する．
+  /// @param[in] e 演算対象の枝
+  /// @param[in] id 展開対象の変数番号
+  /// @param[in] pol 極性
+  /// @return 演算結果を返す．
+  BddEdge
+  scofactor(BddEdge e,
+	    VarId id,
+	    tPol pol);
+
   /// @brief Davio展開のモーメント項を求める処理
   /// @param[in] e 演算対象の枝
   /// @param[in] idx 展開を行う変数番号
@@ -205,6 +220,13 @@ public:
   BddEdge
   xor_moment(BddEdge e,
 	     VarId idx);
+
+  /// @brief generalized cofactor を計算する．
+  /// @param[in] e1, e2 演算対象の枝
+  /// @return 演算結果を返す．
+  BddEdge
+  gcofactor(BddEdge e1,
+	    BddEdge e2);
 
   /// @brief bdd がキューブの時 true を返す．
   /// @param[in] e 演算対象の枝
@@ -228,25 +250,6 @@ public:
 		 VarId x,
 		 VarId y,
 		 tPol pol) = 0;
-
-  /// @brief 一つの変数に対する cofactor を計算する．
-  /// @param[in] e 演算対象の枝
-  /// @param[in] id 展開対象の変数番号
-  /// @param[in] pol 極性
-  /// @return 演算結果を返す．
-  virtual
-  BddEdge
-  scofactor(BddEdge e,
-	    VarId id,
-	    tPol pol) = 0;
-
-  /// @brief generalized cofactor を計算する．
-  /// @param[in] e1, e2 演算対象の枝
-  /// @return 演算結果を返す．
-  virtual
-  BddEdge
-  gcofactor(BddEdge e1,
-	    BddEdge e2) = 0;
 
   /// @brief multiple compose 演算を行うために最初に呼ばれる関数．
   virtual
@@ -763,17 +766,20 @@ private:
   // XOR 演算用オブジェクト
   BddBinOp* mXorOp;
 
-  // INTERSECT 演算用オブジェクト
+  // intersect 演算用オブジェクト
   BddBinOp* mIntsecOp;
 
-  // ITE 演算用オブジェクト
+  // If-then-else 演算用オブジェクト
   BddTriOp* mIteOp;
 
-  // COFACTOR 演算用オブジェクト
+  // cofactor 演算用オブジェクト
   CofOp* mCofOp;
 
-  // XCOFACTOR 演算用オブジェクト
+  // xor-cofactor 演算用オブジェクト
   XcOp* mXcOp;
+
+  // generalized cofactor 演算用オブジェクト
+  BddBinOp* mGcOp;
 
   // 演算オブジェクトのリスト
   list<BddOp*> mOpList;

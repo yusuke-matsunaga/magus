@@ -17,6 +17,9 @@
 #include "XorOp.h"
 #include "IntsecOp.h"
 #include "IteOp.h"
+#include "CofOp.h"
+#include "XcOp.h"
+#include "GcOp.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -146,6 +149,9 @@ BddMgrImpl::BddMgrImpl(const string& name) :
     s << "bdd_mgr#" << num ++;
     mName = s.str();
   }
+  else {
+    mName = name;
+  }
 
   // ユーザー設定可能パラメータのデフォルト値を設定
   mGcThreshold = DEFAULT_GC_THRESHOLD;
@@ -174,11 +180,17 @@ BddMgrImpl::BddMgrImpl(const string& name) :
   mXorOp = new XorOp(this);
   mIntsecOp = new IntsecOp(this);
   mIteOp = new IteOp(this, mAndOp, mXorOp);
+  mCofOp = new CofOp(this);
+  mXcOp = new XcOp(this, mXorOp);
+  mGcOp = new GcOp(this);
 
   mOpList.push_back(mAndOp);
   mOpList.push_back(mXorOp);
   mOpList.push_back(mIntsecOp);
   mOpList.push_back(mIteOp);
+  mOpList.push_back(mCofOp);
+  mOpList.push_back(mXcOp);
+  mOpList.push_back(mGcOp);
 }
 
 // デストラクタ
@@ -316,6 +328,41 @@ BddMgrImpl::ite_op(BddEdge e1,
 		   BddEdge e3)
 {
   return mIteOp->apply(e1, e2, e3);
+}
+
+// @brief 一つの変数に対する cofactor を計算する．
+// @param[in] e 演算対象の枝
+// @param[in] id 展開対象の変数番号
+// @param[in] pol 極性
+// @return 演算結果を返す．
+BddEdge
+BddMgrImpl::scofactor(BddEdge e,
+		      VarId id,
+		      tPol pol)
+{
+  return mCofOp->apply(e, id, pol);
+}
+
+// @brief Davio展開のモーメント項を求める処理
+// @param[in] e 演算対象の枝
+// @param[in] idx 展開を行う変数番号
+// @return 演算結果を返す．
+// @note モーメント項とは $f_{\overline{x}} \oplus f_x$ のこと．
+BddEdge
+BddMgrImpl::xor_moment(BddEdge e,
+		       VarId idx)
+{
+  return mXcOp->apply(e, idx);
+}
+
+// @brief generalized cofactor を計算する．
+// @param[in] e1, e2 演算対象の枝
+// @return 演算結果を返す．
+BddEdge
+BddMgrImpl::gcofactor(BddEdge e1,
+		      BddEdge e2)
+{
+  return mGcOp->apply(e1, e2);
 }
 
 // @brief パラメータを設定する．

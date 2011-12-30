@@ -43,6 +43,12 @@ libym_bdd_base_la_SOURCES = \
 	CompTbl3.h \
 	CompTbl3.cc \
 	BddOp.h \
+	BddUniOp.h \
+	BddUniOp.cc \
+	CofOp.h \
+	CofOp.cc \
+	XcOp.h \
+	XcOp.cc \
 	BddBinOp.h \
 	BddBinOp.cc \
 	AndOp.h \
@@ -51,6 +57,8 @@ libym_bdd_base_la_SOURCES = \
 	XorOp.cc \
 	IntsecOp.h \
 	IntsecOp.cc \
+	GcOp.h \
+	GcOp.cc \
 	BddTriOp.h \
 	BddTriOp.cc \
 	IteOp.h \

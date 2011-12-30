@@ -101,6 +101,11 @@ public:
   VarId
   varid(ymuint level) const;
 
+  /// @brief 現在の最大レベル + 1を返す．
+  virtual
+  ymuint
+  max_level() const;
+
   // 動的変数順変更を許可する．
   virtual
   void
@@ -115,13 +120,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
-
-  // Davio展開のモーメント項($f_{\overline{x}} \oplus f_x$)を
-  // 求める処理
-  virtual
-  BddEdge
-  xor_moment(BddEdge e,
-	     VarId idx);
 
   // bdd がキューブの時 true を返す．
   virtual
@@ -140,19 +138,6 @@ public:
 		 VarId x,
 		 VarId y,
 		 tPol pol);
-
-  // 一つの変数に対する cofactor を計算する．
-  virtual
-  BddEdge
-  scofactor(BddEdge e1,
-	    VarId id,
-	    tPol pol);
-
-  // generalized cofactor を計算する．
-  virtual
-  BddEdge
-  gcofactor(BddEdge e1,
-	    BddEdge e2);
 
   // multiple compose 演算を行うために最初に呼ばれる関数．
   virtual
@@ -448,37 +433,9 @@ public:
   // 上記の XXX_op() の内部で用いられる再帰関数
   //////////////////////////////////////////////////////////////////////
 
-  // and_op() の下請け関数
-  BddEdge
-  and_step(BddEdge e1,
-	   BddEdge e2);
-
-  // xor_op() の下請け関数
-  BddEdge
-  xor_step(BddEdge e1,
-	   BddEdge e2);
-
   // compose 演算を行う．
   BddEdge
   compose_step(BddEdge f);
-
-  // generalized cofactorの内部版．
-  BddEdge
-  gcofactor_step(BddEdge f,
-		 BddEdge c);
-
-  // キューブによる割り算．答は一意に決まる．
-  BddEdge
-  cube_division(BddEdge f,
-		BddEdge c);
-
-  // gcofactor の c がキューブの場合の特別版
-  BddEdge
-  cubediv_step(BddEdge f);
-
-  // xor cofactor 演算
-  BddEdge
-  xcofactor_step(BddEdge f);
 
   // existential qualification を行う．
   BddEdge
@@ -781,6 +738,9 @@ private:
 
   // 変数番号をキーにして変数のポインタを格納しているハッシュ表
   BmmVar** mVarHashTable;
+
+  // 最大のレベル
+  ymuint32 mMaxLevel;
 
 
   //////////////////////////////////////////////////////////////////////

@@ -101,7 +101,7 @@ XorOp::apply_step(BddEdge f,
     if ( r_1.is_overflow() ) {
       return BddEdge::make_overflow();
     }
-    result = mMgr->new_node(level, r_0, r_1);
+    result = new_node(level, r_0, r_1);
     put(f, g, result);
   }
 

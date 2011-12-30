@@ -61,6 +61,10 @@ protected:
   put(BddEdge e1,
       BddEdge ans);
 
+  /// @brief 演算結果テーブルをクリアする．
+  void
+  clear();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -101,6 +105,14 @@ BddUniOp::put(BddEdge e1,
 	      BddEdge ans)
 {
   mCompTbl.insert(make_pair(e1, ans));
+}
+
+// @brief 演算結果テーブルをクリアする．
+inline
+void
+BddUniOp::clear()
+{
+  mCompTbl.clear();
 }
 
 END_NAMESPACE_YM_BDD

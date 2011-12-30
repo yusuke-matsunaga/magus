@@ -149,25 +149,13 @@ BddMgrModern::BddMgrModern(const string& name,
   mVarHashTable = alloc_vartable(mVarTableSize);
   assert_cond(mVarHashTable, __FILE__, __LINE__);
   mVarNum = 0;
+  mMaxLevel = 0;
 
   // 演算結果テーブルの初期化
   mTblTop = NULL;
 
-  mAndTable = new CompTbl2(this, "and_table");
-  assert_cond(mAndTable, __FILE__, __LINE__);
-  mXorTable = new CompTbl2(this, "xor_table");
-  assert_cond(mXorTable, __FILE__, __LINE__);
-  mIntTable = new CompTbl2(this, "int_table");
-  assert_cond(mIntTable, __FILE__, __LINE__);
-
-  mIteTable = new CompTbl3(this, "ite_table");
-  assert_cond(mIntTable, __FILE__, __LINE__);
   mCmpTable = new CompTbl1(this, "compose_table");
   assert_cond(mCmpTable, __FILE__, __LINE__);
-  mCofacTable = new CompTbl2(this, "cofac_table");
-  assert_cond(mCofacTable, __FILE__, __LINE__);
-  mXcofactorTable = new CompTbl1(this, "xcofactor_table");
-  assert_cond(mXcofactorTable, __FILE__, __LINE__);
 
   mSmTable = new CompTbl1(this, "sm_table");
   assert_cond(mSmTable, __FILE__, __LINE__);
@@ -349,6 +337,9 @@ BddMgrModern::alloc_var(VarId varid)
     mVarTable[mVarNum] = var;
     var->mLevel = mVarNum;
     ++ mVarNum;
+    if ( mMaxLevel < var->mLevel ) {
+      mMaxLevel = var->mLevel;
+    }
   }
   return var;
 }
@@ -386,6 +377,13 @@ bool
 BddMgrModern::is_reorderable() const
 {
   return mNodeTable == NULL;
+}
+
+// @brief 現在の最大レベル + 1を返す．
+ymuint
+BddMgrModern::max_level() const
+{
+  return mMaxLevel + 1;
 }
 
 // 動的変数順変更を許可する．
