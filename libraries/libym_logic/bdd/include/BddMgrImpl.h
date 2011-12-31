@@ -24,6 +24,10 @@ class BddTriOp;
 class CofOp;
 class XcOp;
 class SymOp;
+class CountOp;
+class McOp;
+class W0Op;
+class W1Op;
 
 //////////////////////////////////////////////////////////////////////
 /// @class BddMgrImpl BddMgrImpl.h "BddMgrImpl.h"
@@ -368,36 +372,32 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief edge_list に登録されたBDDのノード数を数える．
-  virtual
   ymuint64
-  node_count(const vector<BddEdge>& edge_list) = 0;
+  node_count(const vector<BddEdge>& edge_list);
 
   /// @brief BDD の表す論理関数の minterm の数を返す．
   /// @param[in] e 根の枝
   /// @param[in] nvar 論理関数の変数の数
   /// 無限長精度の整数(mpz_class)を用いて計算する．
-  virtual
   mpz_class
   minterm_count(BddEdge e,
-		ymuint nvar) = 0;
+		ymuint nvar);
 
   /// @brief Walsh 変換の0次の係数を計算する．
   /// @param[in] e 根の枝
   /// @param[in] nvar 論理関数の変数の数
-  virtual
   mpz_class
   walsh0(BddEdge e,
-	 ymuint nvar) = 0;
+	 ymuint nvar);
 
   /// @brief Walsh 変換の1次の係数を計算する．
   /// @param[in] e 根の枝
   /// @param[in] var 変数番号
   /// @param[in] nvar 論理関数の変数の数
-  virtual
   mpz_class
   walsh1(BddEdge e,
 	 VarId var,
-	 ymuint nvar) = 0;
+	 ymuint nvar);
 
 
 public:
@@ -789,6 +789,18 @@ private:
 
   // check_symmetry 用の演算オブジェクト
   SymOp* mSymOp;
+
+  // node_count 用の演算オブジェクト
+  CountOp* mCountOp;
+
+  // minerm_count 用の演算オブジェクト
+  McOp* mMcOp;
+
+  // walsh0 用の演算オブジェクト
+  W0Op* mW0Op;
+
+  // walsh1 用の演算オブジェクト
+  W1Op* mW1Op;
 
   // 演算オブジェクトのリスト
   list<BddOp*> mOpList;

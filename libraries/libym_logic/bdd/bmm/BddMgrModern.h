@@ -213,6 +213,7 @@ public:
   // ノード数の計数や真理値表密度の計算など
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   // edge_list に登録されたBDDのノード数を数える．
   virtual
   ymuint64
@@ -240,7 +241,7 @@ public:
   walsh1(BddEdge e,
 	 VarId var,
 	 ymuint nvar);
-
+#endif
 
   //////////////////////////////////////////////////////////////////////
   // サポート関係の関数
@@ -459,6 +460,7 @@ public:
   scc_step(BddEdge e,
 	   BddEdge s);
 
+#if 0
   // size() の中で用いられる関数
   void
   count1(BddEdge e);
@@ -506,6 +508,7 @@ public:
   ymint
   wt1_step(BddEdge e,
 	   hash_map<BddNode*, ymint>& result_map);
+#endif
 
   // sp_step 中で用いられる関数
   static

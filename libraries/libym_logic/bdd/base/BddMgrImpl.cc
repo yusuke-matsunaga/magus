@@ -21,6 +21,10 @@
 #include "XcOp.h"
 #include "GcOp.h"
 #include "SymOp.h"
+#include "CountOp.h"
+#include "McOp.h"
+#include "W0Op.h"
+#include "W1Op.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -177,6 +181,7 @@ BddMgrImpl::BddMgrImpl(const string& name) :
 
   mOverflow = false;
 
+  // 演算オブジェクトの生成
   mAndOp = new AndOp(this);
   mXorOp = new XorOp(this);
   mIntsecOp = new IntsecOp(this);
@@ -185,7 +190,12 @@ BddMgrImpl::BddMgrImpl(const string& name) :
   mXcOp = new XcOp(this, mXorOp);
   mGcOp = new GcOp(this);
   mSymOp = new SymOp(this);
+  mCountOp = new CountOp(this);
+  mMcOp = new McOp(this);
+  mW0Op = new W0Op(this);
+  mW1Op = new W1Op(this);
 
+  // 演算オブジェクトの登録
   mOpList.push_back(mAndOp);
   mOpList.push_back(mXorOp);
   mOpList.push_back(mIntsecOp);
@@ -194,6 +204,10 @@ BddMgrImpl::BddMgrImpl(const string& name) :
   mOpList.push_back(mXcOp);
   mOpList.push_back(mGcOp);
   mOpList.push_back(mSymOp);
+  mOpList.push_back(mCountOp);
+  mOpList.push_back(mMcOp);
+  mOpList.push_back(mW0Op);
+  mOpList.push_back(mW1Op);
 }
 
 // デストラクタ
@@ -452,6 +466,46 @@ BddMgrImpl::check_symmetry(BddEdge e,
 			   tPol pol)
 {
   return mSymOp->apply(e, x, y, pol);
+}
+
+// @brief edge_list に登録されたBDDのノード数を数える．
+ymuint64
+BddMgrImpl::node_count(const vector<BddEdge>& edge_list)
+{
+  return mCountOp->apply(edge_list);
+}
+
+// @brief BDD の表す論理関数の minterm の数を返す．
+// @param[in] e 根の枝
+// @param[in] nvar 論理関数の変数の数
+// 無限長精度の整数(mpz_class)を用いて計算する．
+mpz_class
+BddMgrImpl::minterm_count(BddEdge e,
+			  ymuint nvar)
+{
+  return mMcOp->apply(e, nvar);
+}
+
+// @brief Walsh 変換の0次の係数を計算する．
+// @param[in] e 根の枝
+// @param[in] nvar 論理関数の変数の数
+mpz_class
+BddMgrImpl::walsh0(BddEdge e,
+		   ymuint nvar)
+{
+  return mW0Op->apply(e, nvar);
+}
+
+// @brief Walsh 変換の1次の係数を計算する．
+// @param[in] e 根の枝
+// @param[in] var 変数番号
+// @param[in] nvar 論理関数の変数の数
+mpz_class
+BddMgrImpl::walsh1(BddEdge e,
+		   VarId var,
+		   ymuint nvar)
+{
+  return mW1Op->apply(e, level(var), nvar);
 }
 
 // @brief パラメータを設定する．

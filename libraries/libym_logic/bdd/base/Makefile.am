@@ -65,6 +65,14 @@ libym_bdd_base_la_SOURCES = \
 	IteOp.cc \
 	SymOp.h \
 	SymOp.cc \
+	CountOp.h \
+	CountOp.cc \
+	McOp.h \
+	McOp.cc \
+	W0Op.h \
+	W0Op.cc \
+	W1Op.h \
+	W1Op.cc \
 	IdMgr.h \
 	IdMgr.cc \
 	Printer.h \

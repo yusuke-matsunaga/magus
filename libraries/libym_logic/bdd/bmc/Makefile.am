@@ -33,7 +33,6 @@ libym_bdd_bmc_la_SOURCES = \
 	BmcCompTbl.cc \
 	bmc_ite.cc \
 	bmc_sup.cc \
-	bmc_count.cc \
 	bmc_isop.cc \
 	bmc_onepath.cc \
 	bmc_vs.cc \
