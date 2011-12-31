@@ -196,6 +196,7 @@ BddMgrClassic::~BddMgrClassic()
   assert_cond( mUsedMem == 0, __FILE__, __LINE__);
 }
 
+#if 0
 // bdd が正リテラルのみのキューブの時，真となる．
 bool
 BddMgrClassic::check_posi_cube(BddEdge e)
@@ -268,6 +269,7 @@ BddMgrClassic::check_cube(BddEdge e)
     }
   }
 }
+#endif
 
 // 変数を確保する．
 // 確保に失敗したら false を返す．

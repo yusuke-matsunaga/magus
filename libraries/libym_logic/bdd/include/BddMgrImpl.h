@@ -23,6 +23,7 @@ class BddBinOp;
 class BddTriOp;
 class CofOp;
 class XcOp;
+class SymOp;
 
 //////////////////////////////////////////////////////////////////////
 /// @class BddMgrImpl BddMgrImpl.h "BddMgrImpl.h"
@@ -238,26 +239,23 @@ public:
 
   /// @brief bdd がキューブの時 true を返す．
   /// @param[in] e 演算対象の枝
-  virtual
   bool
-  check_cube(BddEdge e) = 0;
+  check_cube(BddEdge e);
 
   /// @brief bdd が肯定リテラルのみからなるキューブの時 true を返す．
   /// @param[in] e 演算対象の枝
-  virtual
   bool
-  check_posi_cube(BddEdge e) = 0;
+  check_posi_cube(BddEdge e);
 
   /// @brief 変数 xと y が対称(交換可能)な時にtrueを返す．
   /// @param[in] e 演算対象の枝
   /// @param[in] x, y 変数番号
   /// @param[in] pol 極性
-  virtual
   bool
   check_symmetry(BddEdge e,
 		 VarId x,
 		 VarId y,
-		 tPol pol) = 0;
+		 tPol pol);
 
   /// @brief multiple compose 演算を行うために最初に呼ばれる関数．
   virtual
@@ -788,6 +786,9 @@ private:
 
   // generalized cofactor 演算用オブジェクト
   BddBinOp* mGcOp;
+
+  // check_symmetry 用の演算オブジェクト
+  SymOp* mSymOp;
 
   // 演算オブジェクトのリスト
   list<BddOp*> mOpList;

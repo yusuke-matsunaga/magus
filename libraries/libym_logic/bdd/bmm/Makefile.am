@@ -31,13 +31,11 @@ libym_bdd_bmm_la_SOURCES = \
 	BmmVar.cc \
 	BmmCompTbl.h \
 	BmmCompTbl.cc \
-	bmm_and.cc \
 	bmm_ite.cc \
 	bmm_sup.cc \
 	bmm_count.cc \
 	bmm_isop.cc \
 	bmm_onepath.cc \
-	bmm_symmetry.cc \
 	bmm_vs.cc \
 	bmm_ls.cc
 

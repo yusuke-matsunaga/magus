@@ -31,13 +31,11 @@ libym_bdd_bmc_la_SOURCES = \
 	BddMgrClassic.cc \
 	BmcCompTbl.h \
 	BmcCompTbl.cc \
-	bmc_and.cc \
 	bmc_ite.cc \
 	bmc_sup.cc \
 	bmc_count.cc \
 	bmc_isop.cc \
 	bmc_onepath.cc \
-	bmc_symmetry.cc \
 	bmc_vs.cc \
 	bmc_ls.cc
 

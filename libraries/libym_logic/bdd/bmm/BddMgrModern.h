@@ -121,24 +121,6 @@ public:
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
 
-  // bdd がキューブの時 true を返す．
-  virtual
-  bool
-  check_cube(BddEdge e);
-
-  // bdd が肯定リテラルのみからなるキューブの時 true を返す．
-  virtual
-  bool
-  check_posi_cube(BddEdge e);
-
-  // 変数xとyが対称(交換可能)な時にtrueを返す．
-  virtual
-  bool
-  check_symmetry(BddEdge e,
-		 VarId x,
-		 VarId y,
-		 tPol pol);
-
   // multiple compose 演算を行うために最初に呼ばれる関数．
   virtual
   void
@@ -467,17 +449,6 @@ public:
   BddEdge
   ms_step(BddEdge l,
 	  BddEdge u);
-
-  // check_symmetry の内部で使われる関数
-  BddEdge
-  cs_step2(BddEdge e);
-  BddEdge
-  cs_step1(BddEdge e1,
-	   BddEdge e2,
-	   tPol sympol);
-  BddEdge
-  cs_step(BddEdge e,
-	  tPol sympol);
 
   // support 関係の共通処理
   void

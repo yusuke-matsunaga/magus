@@ -120,16 +120,7 @@ public:
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
 
-  // bdd がキューブの時 true を返す．
-  virtual
-  bool
-  check_cube(BddEdge e);
-
-  // bdd が肯定リテラルのみからなるキューブの時 true を返す．
-  virtual
-  bool
-  check_posi_cube(BddEdge e);
-
+#if 0
   // 変数xとyが対称(交換可能)な時にtrueを返す．
   virtual
   bool
@@ -137,6 +128,7 @@ public:
 		 VarId x,
 		 VarId y,
 		 tPol pol);
+#endif
 
   // multiple compose 演算を行うために最初に呼ばれる関数．
   virtual
@@ -423,24 +415,6 @@ private:
 	   ymuint y_level,
 	   tPol pol);
 
-  // generalized cofactorの内部版．
-  BddEdge
-  gcofactor_step(BddEdge f,
-		 BddEdge c);
-
-  // キューブによる割り算．答は一意に決まる．
-  BddEdge
-  cube_division(BddEdge f,
-		BddEdge c);
-
-  // gcofactor の c がキューブの場合の特別版
-  BddEdge
-  cubediv_step(BddEdge f);
-
-  // xor cofactor 演算
-  BddEdge
-  xcofactor_step(BddEdge f);
-
   // existential qualification を行う．
   BddEdge
   esmooth_step(BddEdge e1);
@@ -471,17 +445,6 @@ private:
   BddEdge
   ms_step(BddEdge l,
 	  BddEdge u);
-
-  // check_symmetry の内部で使われる関数
-  BddEdge
-  cs_step2(BddEdge e);
-  BddEdge
-  cs_step1(BddEdge e1,
-	   BddEdge e2,
-	   tPol sympol);
-  BddEdge
-  cs_step(BddEdge e,
-	  tPol sympol);
 
   // support 関係の共通処理
   void

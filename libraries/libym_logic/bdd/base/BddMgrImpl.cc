@@ -20,6 +20,7 @@
 #include "CofOp.h"
 #include "XcOp.h"
 #include "GcOp.h"
+#include "SymOp.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -183,6 +184,7 @@ BddMgrImpl::BddMgrImpl(const string& name) :
   mCofOp = new CofOp(this);
   mXcOp = new XcOp(this, mXorOp);
   mGcOp = new GcOp(this);
+  mSymOp = new SymOp(this);
 
   mOpList.push_back(mAndOp);
   mOpList.push_back(mXorOp);
@@ -191,6 +193,7 @@ BddMgrImpl::BddMgrImpl(const string& name) :
   mOpList.push_back(mCofOp);
   mOpList.push_back(mXcOp);
   mOpList.push_back(mGcOp);
+  mOpList.push_back(mSymOp);
 }
 
 // デストラクタ
@@ -363,6 +366,92 @@ BddMgrImpl::gcofactor(BddEdge e1,
 		      BddEdge e2)
 {
   return mGcOp->apply(e1, e2);
+}
+
+// bdd が正リテラルのみのキューブの時，真となる．
+bool
+BddMgrImpl::check_posi_cube(BddEdge e)
+{
+  // エラーやオーバーフローの時は false を返す．
+  if ( e.is_invalid() ) {
+    return false;
+  }
+
+  // 定数0の場合も false かな？
+  if ( e.is_zero() ) {
+    return false;
+  }
+
+  // 定数1の場合は true
+  if ( e.is_one() ) {
+    return true;
+  }
+
+  for ( ; ; ) {
+    BddNode* vp = e.get_node();
+    tPol pol = e.pol();
+    BddEdge e0 = vp->edge0(pol);
+    BddEdge e1 = vp->edge1(pol);
+    if ( !e0.is_zero() || e1.is_zero() ) {
+      return false;
+    }
+    if ( e1.is_one() ) {
+      return true;
+    }
+    e = e1;
+  }
+}
+
+// bdd がキューブの時, true となる．
+bool
+BddMgrImpl::check_cube(BddEdge e)
+{
+  // エラーやオーバーフローの時は false を返す．
+  if ( e.is_invalid() ) {
+    return false;
+  }
+
+  // 定数0の場合も false かな？
+  if ( e.is_zero() ) {
+    return false;
+  }
+
+  // 定数1の場合は true
+  if ( e.is_one() ) {
+    return true;
+  }
+
+  for ( ; ; ) {
+    BddNode* vp = e.get_node();
+    tPol pol = e.pol();
+    BddEdge e0 = vp->edge0(pol);
+    BddEdge e1 = vp->edge1(pol);
+    if ( e0.is_zero() ) {
+      e = e1;
+    }
+    else if ( e1.is_zero() ) {
+      e = e0;
+    }
+    else {
+      return false;
+    }
+    if ( e.is_one() ) {
+      return true;
+    }
+  }
+}
+
+// @brief 変数 xと y が対称(交換可能)な時にtrueを返す．
+// @param[in] e 演算対象の枝
+// @param[in] x, y 変数番号
+// @param[in] pol 極性
+bool
+BddMgrImpl::check_symmetry(BddEdge e,
+			   VarId x,
+			   VarId y,
+			   tPol pol)
+{
+  return mSymOp->apply(e, x, y, pol);
 }
 
 // @brief パラメータを設定する．
