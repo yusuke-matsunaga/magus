@@ -98,9 +98,7 @@ Bdd
 BddMgr::make_literal(VarId index,
 		     tPol pol)
 {
-  BddEdge ans = mImpl->make_posiliteral(index);
-  ans.addpol(pol);
-  return Bdd(mImpl, ans);
+  return Bdd(mImpl, mImpl->make_literal(index, pol));
 }
 
 // リテラル関数を表すBDDを作る

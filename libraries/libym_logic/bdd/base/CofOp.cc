@@ -59,8 +59,8 @@ BddEdge
 CofOp::apply_step(BddEdge f)
 {
   if ( f.is_leaf() ) {
-    // 終端なら(0/1)どちらでも答は0
-    return BddEdge::make_zero();
+    // 終端なら(0/1)答は自分自身
+    return f;
   }
 
   // この時点で fは終端ではない．

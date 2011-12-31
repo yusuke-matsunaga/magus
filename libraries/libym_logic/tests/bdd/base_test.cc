@@ -416,6 +416,41 @@ test_intersect(BddMgr& bddmgr)
   return stat;;
 }
 
+//  cofactor 演算子のテスト
+bool
+test_scofactor(BddMgr& bddmgr)
+{
+  bool stat = true;
+
+  Bdd bdd = str2bdd(bddmgr, "0 & 1 | ~2 & 3");
+
+  Bdd bdd0_0 = bdd.cofactor(VarId(0), kPolNega);
+  if ( !check_bdde(bddmgr, bdd0_0, "(0 & 1 | ~2 & 3) / ~0", "~2 & 3") )
+    stat = false;
+
+  Bdd bdd0_1 = bdd.cofactor(VarId(0), kPolPosi);
+  if ( !check_bdde(bddmgr, bdd0_1, "(0 & 1 | ~2 & 3) / 0", "1 | ~2 & 3") )
+    stat = false;
+
+  Bdd bdd1_0 = bdd.cofactor(VarId(1), kPolNega);
+  if ( !check_bdde(bddmgr, bdd1_0, "(0 & 1 | ~2 & 3) / ~1", "~2 & 3") )
+    stat = false;
+
+  Bdd bdd1_1 = bdd.cofactor(VarId(1), kPolPosi);
+  if ( !check_bdde(bddmgr, bdd1_1, "(0 & 1 | ~2 & 3) / 1", "0 | ~2 & 3") )
+    stat = false;
+
+  Bdd bdd2_0 = bdd.cofactor(VarId(2), kPolNega);
+  if ( !check_bdde(bddmgr, bdd2_0, "(0 & 1 | ~2 & 3) / ~2", "0 & 1 | 3") )
+    stat = false;
+
+  Bdd bdd2_1 = bdd.cofactor(VarId(2), kPolPosi);
+  if ( !check_bdde(bddmgr, bdd2_1, "(0 & 1 | ~2 & 3) / 2", "0 & 1") )
+    stat = false;
+
+  return stat;
+}
+
 //  / 演算子のテスト
 bool
 test_cofactor(BddMgr& bddmgr)
@@ -594,6 +629,10 @@ check_sym(BddMgr& bddmgr,
 	else {
 	  cout << "false" << endl;
 	}
+	cout << "bdd_00" << endl;
+	bdd_00.print(cout);
+	cout << "bdd_11" << endl;
+	bdd_11.print(cout);
 	stat = false;
       }
     }
@@ -743,6 +782,9 @@ test(BddMgr& bddmgr)
     stat = false;
 
   if ( !test_intersect(bddmgr) )
+    stat = false;
+
+  if ( !test_scofactor(bddmgr) )
     stat = false;
 
   if ( !test_cofactor(bddmgr) )

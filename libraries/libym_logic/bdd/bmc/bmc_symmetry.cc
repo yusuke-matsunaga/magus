@@ -39,14 +39,14 @@ BddMgrClassic::cs_step2(BddEdge e)
     return BddEdge::make_zero();
   }
 
-  BddEdge e2(vp, kPolPosi);
-  BddEdge result = mCs2Table->get(e2, y_edge);
+  e.normalize();
+  BddEdge result = mCs2Table->get(e, y_edge);
   if ( result.is_error() ) {
     result = cs_step2(vp->edge0());
     if ( result == BddEdge::make_one() ) {
       result = cs_step2(vp->edge1());
     }
-    mCs2Table->put(e2, y_edge, result);
+    mCs2Table->put(e, y_edge, result);
   }
   return result;
 }
@@ -58,6 +58,10 @@ BddMgrClassic::cs_step1(BddEdge e1,
 			BddEdge e2,
 			tPol sympol)
 {
+  if ( e1 == e2 ) {
+    return cs_step2(e1);
+  }
+
   BddNode* vp1 = e1.get_node();
   BddNode* vp2 = e2.get_node();
   ymuint level1 = vp1 ? vp1->level() : kLevelMax;
@@ -66,10 +70,8 @@ BddMgrClassic::cs_step1(BddEdge e1,
   if ( top_level > level2 ) {
     top_level = level2;
   }
-  if ( e1 == e2 ) {
-    return cs_step2(e1);
-  }
   if ( top_level > y_level ) {
+    // x に依存していたが y に依存していないので false
     return BddEdge::make_zero();
   }
 
@@ -120,19 +122,22 @@ BddMgrClassic::cs_step(BddEdge e,
 {
   BddNode* vp = e.get_node();
   if ( vp == 0 ) {
+    // x も y も無関係なら true を返す．
     return BddEdge::make_one();
   }
+
   ymuint level = vp->level();
   if ( level > y_level ) {
+    // x も y も無関係なら true を返す．
     return BddEdge::make_one();
   }
-  else if ( level == y_level ) {
+  if ( level == y_level ) {
     // ここまでのパスにxが含まれず，yが含まれているので false
     return BddEdge::make_zero();
   }
 
   // 極性は落としてしまう．
-  e = BddEdge(vp, kPolPosi);
+  e.normalize();
   BddEdge result = mCsTable->get(e, xy_edge);
   if ( result.is_error() ) {
     if ( level < x_level ) {
@@ -144,7 +149,7 @@ BddMgrClassic::cs_step(BddEdge e,
     else if ( level == x_level ) {
       result = cs_step1(vp->edge0(), vp->edge1(), sympol);
     }
-    else {
+    else { // level > x_level
       result = cs_step2(vp->edge0());
       if ( result == BddEdge::make_one() ) {
 	result = cs_step2(vp->edge1());
@@ -178,8 +183,8 @@ BddMgrClassic::check_symmetry(BddEdge e,
     y_level = tmp;
   }
 
-  y_edge = make_posiliteral(y);
   BddEdge x_edge = make_posiliteral(x);
+  y_edge = make_posiliteral(y);
   if ( pol == kPolPosi ) {
     xy_edge = and_op(x_edge, y_edge);
   }
@@ -187,9 +192,7 @@ BddMgrClassic::check_symmetry(BddEdge e,
     xy_edge = and_op(x_edge, ~y_edge);
   }
 
-  activate(xy_edge);
   BddEdge ans = cs_step(e, pol);
-  deactivate(xy_edge);
 
   return ans == BddEdge::make_one();
 }

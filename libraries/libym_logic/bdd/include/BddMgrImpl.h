@@ -141,6 +141,14 @@ public:
   // BDD 生成用関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief リテラル関数を表すBDDを作る
+  /// @param[in] varid 変数番号
+  /// @param[in] pol 極性
+  /// @return 生成された BDD
+  BddEdge
+  make_literal(VarId varid,
+	       tPol pol);
+
   /// @brief 肯定のリテラル関数を作る
   /// @param[in] varid 変数番号
   BddEdge
@@ -868,6 +876,19 @@ ymuint64
 BddMgrImpl::mem_limit() const
 {
   return mAlloc.mem_limit();
+}
+
+// @brief リテラル関数を表すBDDを作る
+// @param[in] varid 変数番号
+// @param[in] pol 極性
+// @return 生成された BDD
+inline
+BddEdge
+BddMgrImpl::make_literal(VarId varid,
+			 tPol pol)
+{
+  BddEdge ans = make_posiliteral(varid);
+  return ans.addpol(pol);
 }
 
 // 否定のリテラル関数を作る．
