@@ -44,7 +44,7 @@ W1Op::apply(BddEdge e,
 
   mLevel = level;
 
-  ymuint bitsize = nvar + 1;
+  ymuint bitsize = nvar + 2;
   if ( bitsize < sizeof(ymint32) * 8 ) {
     // 値の範囲が ymint32 に収まるのなら int 版の関数を呼ぶ．
 
@@ -52,7 +52,7 @@ W1Op::apply(BddEdge e,
     mAllCount2 = 1L << nvar;
 
     mCompTbl2.clear();
-    ymint32 ans = count_sub2(e);
+    ymint32 ans = w1_sub2(e);
 
     return mpz_class(ans);
   }
@@ -61,7 +61,7 @@ W1Op::apply(BddEdge e,
     mAllCount1 = mpz_class(1) << nvar;
 
     mCompTbl1.clear();
-    mpz_class ans = count_sub1(e);
+    mpz_class ans = w1_sub1(e);
 
     return ans;
   }
@@ -76,7 +76,7 @@ W1Op::sweep()
 
 // @brief apply() の下請け関数(mpz_class 版)
 mpz_class
-W1Op::count_sub1(BddEdge e)
+W1Op::w1_sub1(BddEdge e)
 {
   if ( e.is_const() ) {
     return mpz_class(0);
@@ -109,8 +109,8 @@ W1Op::count_sub1(BddEdge e)
   mpz_class result;
   if ( level < mLevel ) {
     // 子ノードが表す関数の walsh1 を計算する
-    mpz_class n0 = count_sub1(node->edge0());
-    mpz_class n1 = count_sub1(node->edge1());
+    mpz_class n0 = w1_sub1(node->edge0());
+    mpz_class n1 = w1_sub1(node->edge1());
 
     // 子ノードが表す関数の walsh1 を足して半分にしたものが
     // 親ノードが表す関数の walsh1
@@ -118,9 +118,9 @@ W1Op::count_sub1(BddEdge e)
   }
   else { // level == mLevel
     // 正のコファクターの結果から負のコファクターの結果を引く
-    mpz_class n0 = count_sub1(node->edge0());
-    mpz_class n1 = count_sub1(node->edge1());
-    result = n0 - n1;
+    mpz_class n0 = w0_sub1(node->edge0());
+    mpz_class n1 = w0_sub1(node->edge1());
+    result = (n0 - n1) >> 1;
   }
 
   if ( ref != 1) {
@@ -138,7 +138,7 @@ W1Op::count_sub1(BddEdge e)
 
 // @brief apply() の下請け関数(ymint32 版)
 ymint32
-W1Op::count_sub2(BddEdge e)
+W1Op::w1_sub2(BddEdge e)
 {
   if ( e.is_const() ) {
     return 0;
@@ -171,20 +171,18 @@ W1Op::count_sub2(BddEdge e)
   ymint32 result;
   if ( level < mLevel ) {
     // 子ノードが表す関数の walsh1 を計算する
-    ymint32 n0 = count_sub2(node->edge0());
-    ymint32 n1 = count_sub2(node->edge1());
+    ymint32 n0 = w1_sub2(node->edge0());
+    ymint32 n1 = w1_sub2(node->edge1());
 
     // 子ノードが表す関数の walsh1 を足して半分にしたものが
     // 親ノードが表す関数の walsh1
-    // ただし桁あふれを起こさないように最初に半分にする．
-    // もともと 2^nvar らあ始まっているので奇数ではない．
-    result = (n0 >> 1) + (n1 >> 1);
+    result = (n0 + n1) >> 1;
   }
   else { // level == mLevel
     // 正のコファクターの結果から負のコファクターの結果を引く
-    ymint32 n0 = count_sub2(node->edge0());
-    ymint32 n1 = count_sub2(node->edge1());
-    result = n0 - n1;
+    ymint32 n0 = w0_sub2(node->edge0());
+    ymint32 n1 = w0_sub2(node->edge1());
+    result = (n0 - n1) >> 1;
   }
 
   if ( ref != 1) {
@@ -200,5 +198,106 @@ W1Op::count_sub2(BddEdge e)
   return result;
 }
 
-END_NAMESPACE_YM_BDD
+// @brief w1_sub() の下請け関数(mpz_class 版)
+mpz_class
+W1Op::w0_sub1(BddEdge e)
+{
+  if ( e.is_zero() ) {
+    return mAllCount1;
+  }
+  if ( e.is_one() ) {
+    return -mAllCount1;
+  }
 
+  BddNode* node = e.get_node();
+
+  tPol pol = e.pol();
+  // 極性違いは符号反転で表せるので正規化する．
+  e.normalize();
+
+  ymuint ref = node->refcount();
+  if ( ref != 1 ) {
+    // 複数回参照されていたらまず演算結果テーブルを探す．
+    hash_map<BddEdge, mpz_class>::iterator p = mCompTbl1.find(e);
+    if ( p != mCompTbl1.end() ) {
+      mpz_class ans = p->second;
+      if ( pol == kPolNega ) {
+	ans = -ans;
+      }
+      return ans;
+    }
+  }
+
+  // 子ノードが表す関数の walsh1 を計算する
+  mpz_class n0 = w0_sub1(node->edge0());
+  mpz_class n1 = w0_sub1(node->edge1());
+
+  // 子ノードが表す関数の walsh1 を足して半分にしたものが
+  // 親ノードが表す関数の walsh1
+  mpz_class result = (n0 + n1) >> 1;
+
+  if ( ref != 1) {
+    // 演算結果テーブルに答を登録する．
+    mCompTbl1.insert(make_pair(e, result));
+  }
+
+  // 極性を考慮して補正する．
+  if ( pol == kPolNega ) {
+    result = -result;
+  }
+
+  return result;
+}
+
+// @brief w1_sub() の下請け関数(ymint32 版)
+ymint32
+W1Op::w0_sub2(BddEdge e)
+{
+  if ( e.is_zero() ) {
+    return mAllCount2;
+  }
+  if ( e.is_one() ) {
+    return -mAllCount2;
+  }
+
+  BddNode* node = e.get_node();
+
+  tPol pol = e.pol();
+  // 極性違いは符号反転で表せるので正規化する．
+  e.normalize();
+
+  ymuint ref = node->refcount();
+  if ( ref != 1 ) {
+    // 複数回参照されていたらまず演算結果テーブルを探す．
+    hash_map<BddEdge, ymint32>::iterator p = mCompTbl2.find(e);
+    if ( p != mCompTbl2.end() ) {
+      ymint32 ans = p->second;
+      if ( pol == kPolNega ) {
+	ans = -ans;
+      }
+      return ans;
+    }
+  }
+
+  // 子ノードが表す関数の walsh1 を計算する
+  ymint32 n0 = w0_sub2(node->edge0());
+  ymint32 n1 = w0_sub2(node->edge1());
+
+  // 子ノードが表す関数の walsh1 を足して半分にしたものが
+  // 親ノードが表す関数の walsh1
+  ymint32 result = (n0 + n1) >> 1;
+
+  if ( ref != 1) {
+    // 演算結果テーブルに答を登録する．
+    mCompTbl2.insert(make_pair(e, result));
+  }
+
+  // 極性を考慮して補正する．
+  if ( pol == kPolNega ) {
+    result = -result;
+  }
+
+  return result;
+}
+
+END_NAMESPACE_YM_BDD

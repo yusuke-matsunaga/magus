@@ -60,11 +60,19 @@ private:
 
   /// @brief apply() の下請け関数(mpz_class 版)
   mpz_class
-  count_sub1(BddEdge e);
+  w1_sub1(BddEdge e);
 
   /// @brief apply() の下請け関数(ymint32 版)
   ymint32
-  count_sub2(BddEdge e);
+  w1_sub2(BddEdge e);
+
+  /// @brief w1_sub() の下請け関数(mpz_class 版)
+  mpz_class
+  w0_sub1(BddEdge e);
+
+  /// @brief w1_sub() の下請け関数(ymint32 版)
+  ymint32
+  w0_sub2(BddEdge e);
 
 
 private:

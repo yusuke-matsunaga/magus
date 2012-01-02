@@ -671,6 +671,22 @@ test_symmetry(BddMgr& bddmgr)
   return stat;
 }
 
+// node_count のテスト
+bool
+test_node_count(BddMgr& bddmgr)
+{
+  bool stat = true;
+
+  Bdd bdd1 = str2bdd(bddmgr, "0 ^ 1 ^ 2");
+  ymuint64 n = bdd1.node_count();
+  if ( n != 3 ) {
+    cout << "node_count(0 ^ 1 ^ 2) != 3" << endl;
+    stat = false;
+  }
+
+  return stat;
+}
+
 // minterm_count のテスト
 bool
 test_minterm_count(BddMgr& bddmgr)
@@ -684,22 +700,124 @@ test_minterm_count(BddMgr& bddmgr)
     stat = false;
   }
 
-  bdd = bddmgr.make_one();
-  for (ymuint i = 0; i < 100; ++ i) {
-    Bdd bdd1 = bddmgr.make_posiliteral(VarId(i));
-    bdd &= bdd1;
+  for (ymuint n = 2; n <= 100; ++ n) {
+    bdd = bddmgr.make_one();
+    for (ymuint i = 0; i < n; ++ i) {
+      Bdd bdd1 = bddmgr.make_posiliteral(VarId(i));
+      bdd &= bdd1;
+    }
+    mc = bdd.minterm_count(n);
+    if ( mc != 1 ) {
+      cout << "mc != 1" << endl;
+      cout << "mc = " << mc.get_str() << endl;
+      stat = false;
+    }
+    Bdd bdd2 = ~bdd;
+    mpz_class mc2 = bdd2.minterm_count(n);
+    if ( mc2 != (mpz_class(1) << n) - mpz_class(1) ) {
+      cout << "mc != 2^" << n << " - 1" << endl;
+      stat = false;
+    }
   }
-  mc = bdd.minterm_count(100);
-  if ( mc != 1 ) {
-    cout << "mc != 1" << endl;
-    cout << "mc = " << mc.get_str() << endl;
+
+  return stat;
+}
+
+bool
+check_walsh0(const Bdd& bdd,
+	     ymuint nvar)
+{
+  mpz_class w0 = bdd.walsh0(nvar);
+  mpz_class n1 = bdd.minterm_count(nvar);
+  mpz_class n0 = (~bdd).minterm_count(nvar);
+  mpz_class w0_expected = n0 - n1;
+  if ( w0 != w0_expected ) {
+    cout << "walsh0 error" << endl;
+    bdd.print(cout);
+    cout << "bdd.walsh0() = " << w0 << endl
+	 << "expected     = " << w0_expected << endl
+	 << endl;
+    return false;
+  }
+  return true;
+}
+
+// walsh0 のテスト
+bool
+test_walsh0(BddMgr& bddmgr)
+{
+  bool stat = true;
+
+  Bdd bdd = str2bdd(bddmgr, "0 & 2 | 1 & 3 | ~1 & ~3");
+  if ( !check_walsh0(bdd, 4) ) {
     stat = false;
   }
-  Bdd bdd2 = ~bdd;
-  mpz_class mc2 = bdd2.minterm_count(100);
-  if ( mc2 != (mpz_class(1) << 100) - mpz_class(1) ) {
-    cout << "mc != 2^100 - 1" << endl;
+
+  for (ymuint n = 2; n <= 100; ++ n) {
+    bdd = bddmgr.make_one();
+    for (ymuint i = 0; i < n; ++ i) {
+      Bdd bdd1 = bddmgr.make_posiliteral(VarId(i));
+      bdd &= bdd1;
+    }
+    if ( !check_walsh0(bdd, n) ) {
+      stat = false;
+    }
+    Bdd bdd2 = ~bdd;
+    if ( !check_walsh0(bdd2, n) ) {
+      stat = false;
+    }
+  }
+
+  return stat;
+}
+
+bool
+check_walsh1(const Bdd& bdd,
+	     ymuint nvar)
+{
+  for (ymuint i = 0; i < nvar; ++ i) {
+    mpz_class w1 = bdd.walsh1(VarId(i), nvar);
+    Bdd bdd0 = bdd.cofactor(VarId(i), kPolNega);
+    Bdd bdd1 = bdd.cofactor(VarId(i), kPolPosi);
+    mpz_class n0 = bdd0.walsh0(nvar - 1);
+    mpz_class n1 = bdd1.walsh0(nvar - 1);
+    mpz_class w1_expected = n0 - n1;
+    if ( w1 != w1_expected ) {
+      cout << "walsh1(" << i << ") error" << endl;
+      bdd.print(cout);
+      cout << "bdd.walsh1(" << i << ") = " << w1 << endl
+	   << "expected     = " << w1_expected << endl
+	   << endl;
+      return false;
+    }
+  }
+  return true;
+}
+
+// walsh1 のテスト
+bool
+test_walsh1(BddMgr& bddmgr)
+{
+  bool stat = true;
+
+  Bdd bdd = str2bdd(bddmgr, "0 & 2 | 1 & 3 | ~1 & ~3");
+  if ( !check_walsh1(bdd, 4) ) {
     stat = false;
+  }
+
+  for (ymuint n = 2; n <= 100; ++ n) {
+    bdd = bddmgr.make_one();
+    for (ymuint i = 0; i < n; ++ i) {
+      Bdd bdd1 = bddmgr.make_posiliteral(VarId(i));
+      bdd &= bdd1;
+    }
+    if ( !check_walsh1(bdd, n) ) {
+      stat = false;
+    }
+    Bdd bdd2 = ~bdd;
+    if ( !check_walsh1(bdd2, n) ) {
+      stat = false;
+    }
   }
 
   return stat;
@@ -802,7 +920,16 @@ test(BddMgr& bddmgr)
   if ( !test_scc(bddmgr) )
     stat = false;
 
+  if ( !test_node_count(bddmgr) )
+    stat = false;
+
   if ( !test_minterm_count(bddmgr) )
+    stat = false;
+
+  if ( !test_walsh0(bddmgr) )
+    stat = false;
+
+  if ( !test_walsh1(bddmgr) )
     stat = false;
 
   if ( !test_symmetry(bddmgr) )

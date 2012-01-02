@@ -74,10 +74,10 @@ W0Op::sweep()
 mpz_class
 W0Op::count_sub1(BddEdge e)
 {
-  if ( e.is_one() ) {
+  if ( e.is_zero() ) {
     return mAllCount1;
   }
-  if ( e.is_zero() ) {
+  if ( e.is_one() ) {
     return -mAllCount1;
   }
 
@@ -124,10 +124,10 @@ W0Op::count_sub1(BddEdge e)
 ymint32
 W0Op::count_sub2(BddEdge e)
 {
-  if ( e.is_one() ) {
+  if ( e.is_zero() ) {
     return mAllCount2;
   }
-  if ( e.is_zero() ) {
+  if ( e.is_one() ) {
     return -mAllCount2;
   }
 
@@ -151,14 +151,12 @@ W0Op::count_sub2(BddEdge e)
   }
 
   // 子ノードが表す関数の walsh0 を計算する
-  ymuint32 n0 = count_sub2(node->edge0());
-  ymuint32 n1 = count_sub2(node->edge1());
+  ymint32 n0 = count_sub2(node->edge0());
+  ymint32 n1 = count_sub2(node->edge1());
 
   // 子ノードが表す関数の walsh0 を足して半分にしたものが
   // 親ノードが表す関数の walsh0
-  // ただし桁あふれのおそれがあるので先に半分にする．
-  // もともと mAllCount2 から始まっているので奇数ではないはず．
-  ymint32 ans = (n0 >> 1) + (n1 >> 1);
+  ymint32 ans = (n0 + n1) >> 1;
 
   if ( ref != 1) {
     // 演算結果テーブルに答を登録する．
