@@ -153,7 +153,6 @@ public:
   BddEdge
   esmooth(BddEdge e1,
 	  BddEdge e2);
-#endif
 
   // src1 と src2 の論理積を計算して src3 の変数を消去する．
   virtual
@@ -161,6 +160,7 @@ public:
   and_exist(BddEdge e1,
 	    BddEdge e2,
 	    BddEdge e3);
+#endif
 
   // lower と upper で指定された不完全指定論理関数の非冗長積和形を求める．
   virtual
@@ -356,12 +356,12 @@ public:
   // existential qualification を行う．
   BddEdge
   esmooth_step(BddEdge e1);
-#endif
 
   // and exist 演算を行う．
   BddEdge
   andexist_step(BddEdge e1,
 		BddEdge e2);
+#endif
 
   // 最短の1パスを求める．
   BddEdge

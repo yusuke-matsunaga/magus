@@ -8,7 +8,6 @@
 
 
 #include "SmoothOp.h"
-#include "BddBinOp.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -22,7 +21,7 @@ BEGIN_NAMESPACE_YM_BDD
 // @param[in] and_op AND 演算オブジェクト
 SmoothOp::SmoothOp(BddMgrImpl* mgr,
 		   BddBinOp* and_op) :
-  BddUniOp(mgr),
+  BddBinOp(mgr, "smooth_op"),
   mAndOp(and_op)
 {
 }
@@ -34,80 +33,74 @@ SmoothOp::~SmoothOp()
 
 // @brief 演算を行う関数
 // @param[in] e 根の枝
-// @param[in] v_list 消去する変数のレベルのリスト
+// @param[in] s 消去する変数のリストの根
 // @return 演算結果を返す．
 BddEdge
 SmoothOp::apply(BddEdge e,
-		const vector<ymuint32>& v_list)
+		BddEdge s)
 {
   if ( e.is_invalid() ) {
     return e;
   }
-
-  ymuint n = mgr()->max_level();
-  mEmark.clear();
-  mEmark.resize(n, false);
-  mMaxLevel = 0;
-  for (vector<ymuint32>::const_iterator p = v_list.begin();
-       p != v_list.end(); ++ p) {
-    ymuint level = *p;
-    mEmark[level] = true;
-    if ( mMaxLevel < level ) {
-      mMaxLevel = level;
-    }
+  if ( s.is_invalid() ) {
+    return s;
   }
 
-  clear();
-
-  return apply_step(e);
-}
-
-// @brief 次の GC で回収されるノードに関連した情報を削除する．
-void
-SmoothOp::sweep()
-{
-  // 何もしない．
+  return apply_step(e, s);
 }
 
 // @brief apply() の下請け関数
 BddEdge
-SmoothOp::apply_step(BddEdge e)
+SmoothOp::apply_step(BddEdge e,
+		     BddEdge s)
 {
-  if ( e.is_leaf() ) {
+  if ( e.is_leaf() || s.is_one() ) {
     return e;
   }
 
   BddNode* node = e.get_node();
   ymuint level = node->level();
-  if ( level > mMaxLevel ) {
-    return e;
+
+  BddNode* snode = s.get_node();
+  ymuint slevel = snode->level();
+  while ( slevel < level ) {
+    s = snode->edge1();
+    snode = s.get_node();
+    slevel = snode->level();
   }
 
-  BddEdge result = get(e);
+  BddEdge result = get(e, s);
   if ( result.is_error() ) {
     tPol pol = e.pol();
     BddEdge e0 = node->edge0(pol);
     BddEdge e1 = node->edge1(pol);
-    if ( mEmark[level] ) {
+    if ( level == slevel ) {
       // 消去対象の変数だった．
-      BddEdge tmp = ~mAndOp->apply(~e0, ~e1);
-      if ( tmp.is_overflow() ) {
-	return tmp;
-      }
-      result = apply_step(tmp);
-    }
-    else {
-      BddEdge r_0 = apply_step(e0);
+      BddEdge r_0 = apply_step(e0, snode->edge1());
       if ( r_0.is_overflow() ) {
 	return r_0;
       }
-      BddEdge r_1 = apply_step(e1);
+      BddEdge r_1 = apply_step(e1, snode->edge1());
+      if ( r_1.is_overflow() ) {
+	return r_1;
+      }
+      result = ~mAndOp->apply(~r_0, ~r_1);
+      if ( result.is_overflow() ) {
+	return result;
+      }
+    }
+    else {
+      BddEdge r_0 = apply_step(e0, s);
+      if ( r_0.is_overflow() ) {
+	return r_0;
+      }
+      BddEdge r_1 = apply_step(e1, s);
       if ( r_1.is_overflow() ) {
 	return r_1;
       }
       result = new_node(level, r_0, r_1);
     }
-    put(e, result);
+    put(e, s, result);
   }
 
   return result;

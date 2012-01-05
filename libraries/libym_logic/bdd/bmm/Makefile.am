@@ -32,7 +32,6 @@ libym_bdd_bmm_la_SOURCES = \
 	BmmCompTbl.h \
 	BmmCompTbl.cc \
 	bmm_ite.cc \
-	bmm_sup.cc \
 	bmm_isop.cc \
 	bmm_onepath.cc \
 	bmm_vs.cc \

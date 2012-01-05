@@ -245,12 +245,20 @@ public:
 
   /// @brief smoothing(elimination)
   /// @param[in] e 演算対象の枝
-  /// @param[in] v_list 消去対象の変数リスト
+  /// @param[in] s 消去対象の変数リストを表す枝
   /// @return 演算結果を返す．
-  /// @note v_list に含まれる変数を消去する．
+  /// @note s に含まれる変数を消去する．
   BddEdge
   esmooth(BddEdge e,
-	  const vector<ymuint32>& v_list);
+	  BddEdge s);
+
+  /// @brief src1 と src2 の論理積を計算して src3 の変数を消去する．
+  /// @param[in] e1, e2, e3 演算対象の枝
+  /// @return 演算結果を返す．
+  BddEdge
+  and_exist(BddEdge e1,
+	    BddEdge e2,
+	    BddEdge e3);
 
   /// @brief bdd がキューブの時 true を返す．
   /// @param[in] e 演算対象の枝
@@ -300,15 +308,6 @@ public:
 	    ymuint x_level,
 	    ymuint y_level,
 	    tPol pol = kPolPosi) = 0;
-
-  /// @brief src1 と src2 の論理積を計算して src3 の変数を消去する．
-  /// @param[in] e1, e2, e3 演算対象の枝
-  /// @return 演算結果を返す．
-  virtual
-  BddEdge
-  and_exist(BddEdge e1,
-	    BddEdge e2,
-	    BddEdge e3) = 0;
 
   /// @brief 不完全指定論理関数の非冗長積和形を求める．
   /// @param[in] l オンセットを表す関数
@@ -807,7 +806,10 @@ private:
   SupOp* mSupOp;
 
   // smooth 演算オブジェクト
-  SmoothOp* mSmoothOp;
+  BddBinOp* mSmoothOp;
+
+  // and-exist 演算オブジェクト
+  BddTriOp* mAeOp;
 
   // 演算オブジェクトのリスト
   list<BddOp*> mOpList;

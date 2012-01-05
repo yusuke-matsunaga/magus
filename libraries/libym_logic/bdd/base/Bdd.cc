@@ -546,22 +546,9 @@ Bdd::check_symmetry(VarId x,
 Bdd
 Bdd::esmooth(const BddVarSet& svars) const
 {
-  ymuint n = svars.size();
-  vector<ymuint32> v_list;
-  v_list.reserve(n);
-  Bdd sbdd = svars.function();
-  while ( !sbdd.is_one() ) {
-    Bdd dummy;
-    Bdd bdd1;
-    VarId var = sbdd.root_decomp(dummy, bdd1);
-    assert_cond( dummy.is_zero(), __FILE__, __LINE__);
-    ymuint level = mMgr->level(var);
-    v_list.push_back(level);
-    sbdd = bdd1;
-  }
-
   BddEdge e(mRoot);
-  BddEdge ans = mMgr->esmooth(e, v_list);
+  BddEdge s(svars.function().mRoot);
+  BddEdge ans = mMgr->esmooth(e, s);
 
   return Bdd(mMgr, ans);
 }
@@ -570,22 +557,9 @@ Bdd::esmooth(const BddVarSet& svars) const
 Bdd
 Bdd::asmooth(const BddVarSet& svars) const
 {
-  ymuint n = svars.size();
-  vector<ymuint32> v_list;
-  v_list.reserve(n);
-  Bdd sbdd = svars.function();
-  while ( !sbdd.is_one() ) {
-    Bdd dummy;
-    Bdd bdd1;
-    VarId var = sbdd.root_decomp(dummy, bdd1);
-    assert_cond( dummy.is_zero(), __FILE__, __LINE__);
-    ymuint level = mMgr->level(var);
-    v_list.push_back(level);
-    sbdd = bdd1;
-  }
-
   BddEdge e(mRoot);
-  BddEdge ans = ~mMgr->esmooth(~e, v_list);
+  BddEdge s(svars.function().mRoot);
+  BddEdge ans = ~mMgr->esmooth(~e, s);
 
   return Bdd(mMgr, ans);
 }

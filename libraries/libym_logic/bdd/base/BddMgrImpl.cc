@@ -27,6 +27,7 @@
 #include "W1Op.h"
 #include "SupOp.h"
 #include "SmoothOp.h"
+#include "AeOp.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -198,6 +199,7 @@ BddMgrImpl::BddMgrImpl(const string& name) :
   mW1Op = new W1Op(this);
   mSupOp = new SupOp(this);
   mSmoothOp = new SmoothOp(this, mAndOp);
+  mAeOp = new AeOp(this, mAndOp, mSmoothOp);
 
   // 演算オブジェクトの登録
   mOpList.push_back(mAndOp);
@@ -214,6 +216,7 @@ BddMgrImpl::BddMgrImpl(const string& name) :
   mOpList.push_back(mW1Op);
   mOpList.push_back(mSupOp);
   mOpList.push_back(mSmoothOp);
+  mOpList.push_back(mAeOp);
 }
 
 // デストラクタ
@@ -390,14 +393,25 @@ BddMgrImpl::gcofactor(BddEdge e1,
 
 // @brief smoothing(elimination)
 // @param[in] e 演算対象の枝
-// @param[in] v_list 消去対象の変数リスト
+// @param[in] s 消去対象の変数リストを表す枝
 // @return 演算結果を返す．
-// @note v_list に含まれる変数を消去する．
+// @note s に含まれる変数を消去する．
 BddEdge
 BddMgrImpl::esmooth(BddEdge e,
-		    const vector<ymuint32>& v_list)
+		    BddEdge s)
 {
-  return mSmoothOp->apply(e, v_list);
+  return mSmoothOp->apply(e, s);
+}
+
+// @brief src1 と src2 の論理積を計算して src3 の変数を消去する．
+// @param[in] e1, e2, e3 演算対象の枝
+// @return 演算結果を返す．
+BddEdge
+BddMgrImpl::and_exist(BddEdge e1,
+		      BddEdge e2,
+		      BddEdge e3)
+{
+  return mAeOp->apply(e1, e2, e3);
 }
 
 // bdd が正リテラルのみのキューブの時，真となる．

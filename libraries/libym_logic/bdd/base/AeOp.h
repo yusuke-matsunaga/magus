@@ -1,37 +1,41 @@
-#ifndef SMOOTHOP_H
-#define SMOTTHOP_H
+#ifndef AEOP_H
+#define AEOP_H
 
-/// @file SmoothOp.h
-/// @brief SmoothOp のヘッダファイル
+/// @file AeOp.h
+/// @brief AeOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BddBinOp.h"
+#include "BddTriOp.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
 
+class BddBinOp;
+
 //////////////////////////////////////////////////////////////////////
-/// @class SmoothOp SmoothOp.h "SmoothOp.h"
-/// @brief smooth 演算を行うクラス
+/// @class AeOp AeOp.h "AeOp.h"
+/// @brief and-exist 演算を行うクラス
 //////////////////////////////////////////////////////////////////////
-class SmoothOp :
-  public BddBinOp
+class AeOp :
+  public BddTriOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr マネージャ
   /// @param[in] and_op AND 演算オブジェクト
-  SmoothOp(BddMgrImpl* mgr,
-	   BddBinOp* and_op);
+  /// @param[in] smooth_op smoothing 演算オブジェクト
+  AeOp(BddMgrImpl* mgr,
+       BddBinOp* and_op,
+       BddBinOp* smooth_op);
 
   /// @brief デストラクタ
   virtual
-  ~SmoothOp();
+  ~AeOp();
 
 
 public:
@@ -40,13 +44,13 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 演算を行う関数
-  /// @param[in] e 根の枝
-  /// @param[in] s 消去する変数のリストの根
+  /// @param[in] e1, e2, e3 オペランド
   /// @return 演算結果を返す．
   virtual
   BddEdge
-  apply(BddEdge e,
-	BddEdge s);
+  apply(BddEdge e1,
+	BddEdge e2,
+	BddEdge e3);
 
 
 private:
@@ -54,10 +58,11 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief apply() の下請け関数
+  /// @brief 実際の演算を行う関数
   BddEdge
-  apply_step(BddEdge e,
-	     BddEdge s);
+  apply_step(BddEdge f,
+	     BddEdge g,
+	     BddEdge h);
 
 
 private:
@@ -68,8 +73,11 @@ private:
   // AND 演算オブジェクト
   BddBinOp* mAndOp;
 
+  // smoothing 演算オブジェクト
+  BddBinOp* mSmoothOp;
+
 };
 
 END_NAMESPACE_YM_BDD
 
-#endif // SMOTTHOP_H
+#endif // ITEOP_H
