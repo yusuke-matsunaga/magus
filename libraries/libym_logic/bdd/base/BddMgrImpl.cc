@@ -25,6 +25,8 @@
 #include "McOp.h"
 #include "W0Op.h"
 #include "W1Op.h"
+#include "SupOp.h"
+#include "SmoothOp.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -194,6 +196,8 @@ BddMgrImpl::BddMgrImpl(const string& name) :
   mMcOp = new McOp(this);
   mW0Op = new W0Op(this);
   mW1Op = new W1Op(this);
+  mSupOp = new SupOp(this);
+  mSmoothOp = new SmoothOp(this, mAndOp);
 
   // 演算オブジェクトの登録
   mOpList.push_back(mAndOp);
@@ -208,6 +212,8 @@ BddMgrImpl::BddMgrImpl(const string& name) :
   mOpList.push_back(mMcOp);
   mOpList.push_back(mW0Op);
   mOpList.push_back(mW1Op);
+  mOpList.push_back(mSupOp);
+  mOpList.push_back(mSmoothOp);
 }
 
 // デストラクタ
@@ -382,6 +388,18 @@ BddMgrImpl::gcofactor(BddEdge e1,
   return mGcOp->apply(e1, e2);
 }
 
+// @brief smoothing(elimination)
+// @param[in] e 演算対象の枝
+// @param[in] v_list 消去対象の変数リスト
+// @return 演算結果を返す．
+// @note v_list に含まれる変数を消去する．
+BddEdge
+BddMgrImpl::esmooth(BddEdge e,
+		    const vector<ymuint32>& v_list)
+{
+  return mSmoothOp->apply(e, v_list);
+}
+
 // bdd が正リテラルのみのキューブの時，真となる．
 bool
 BddMgrImpl::check_posi_cube(BddEdge e)
@@ -508,6 +526,47 @@ BddMgrImpl::walsh1(BddEdge e,
   return mW1Op->apply(e, level(var), nvar);
 }
 
+// @brief edge_list に登録されたBDDのサポートに印をつける．
+// @param[in] edge_list 根の枝のリスト
+// @return サポート数を返す．
+ymuint
+BddMgrImpl::mark_support(const vector<BddEdge>& edge_list)
+{
+  return mSupOp->apply(edge_list);
+}
+
+// @brief 印のついた変数をベクタに変換する．
+// @param[out] support 結果を格納する変数
+// @return サポート数を返す．
+ymuint
+BddMgrImpl::mark_to_vector(VarVector& support)
+{
+  return mSupOp->to_list(support);
+}
+
+// @brief 印のついた変数をリストに変換する．
+// @param[out] support 結果を格納する変数
+// @return サポート数を返す．
+ymuint
+BddMgrImpl::mark_to_list(VarList& support)
+{
+  return mSupOp->to_list(support);
+}
+
+// @brief 印のついた変数をBDD(キューブ)に変換する．
+BddEdge
+BddMgrImpl::mark_to_bdd()
+{
+  return mSupOp->to_bdd();
+}
+
+// @brief smallest cube containing F 演算
+BddEdge
+BddMgrImpl::SCC(BddEdge e)
+{
+  return mSupOp->scc(e);
+}
+
 // @brief パラメータを設定する．
 // @param[in] param パラメータ
 // @param[in] mask 設定する項目を指定するマスク
@@ -561,6 +620,24 @@ void
 BddMgrImpl::disable_gc()
 {
   ++ mGcEnable;
+}
+
+// ガーベージコレクションを行なう．
+// 具体的には各ノードの参照回数が0のノードをフリーリストに回収し
+// 再利用できるよ うにする．
+// その際，それらのノードに関係した演算結果テーブルの内容はクリアされる．
+// shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
+void
+BddMgrImpl::gc(bool shrink_nodetable)
+{
+  for (list<BddOp*>::iterator p = mOpList.begin();
+       p != mOpList.end(); ++ p) {
+    BddOp* op = *p;
+    op->sweep();
+  }
+
+  _gc(shrink_nodetable);
+
 }
 
 // log用ストリームを設定する．

@@ -215,81 +215,6 @@ BddMgrModern::~BddMgrModern()
   assert_cond( mUsedMem == 0, __FILE__, __LINE__);
 }
 
-#if 0
-// bdd が正リテラルのみのキューブの時，真となる．
-bool
-BddMgrModern::check_posi_cube(BddEdge e)
-{
-  // エラーやオーバーフローの時は false を返す．
-  if ( e.is_invalid() ) {
-    return false;
-  }
-
-  // 定数0の場合も false かな？
-  if ( e.is_zero() ) {
-    return false;
-  }
-
-  // 定数1の場合は true
-  if ( e.is_one() ) {
-    return true;
-  }
-
-  for ( ; ; ) {
-    BddNode* vp = e.get_node();
-    tPol pol = e.pol();
-    BddEdge e0 = vp->edge0(pol);
-    BddEdge e1 = vp->edge1(pol);
-    if ( !e0.is_zero() || e1.is_zero() ) {
-      return false;
-    }
-    if ( e1.is_one() ) {
-      return true;
-    }
-    e = e1;
-  }
-}
-
-// bdd がキューブの時, true となる．
-bool
-BddMgrModern::check_cube(BddEdge e)
-{
-  // エラーやオーバーフローの時は false を返す．
-  if ( e.is_invalid() ) {
-    return false;
-  }
-
-  // 定数0の場合も false かな？
-  if ( e.is_zero() ) {
-    return false;
-  }
-
-  // 定数1の場合は true
-  if ( e.is_one() ) {
-    return true;
-  }
-
-  for ( ; ; ) {
-    BddNode* vp = e.get_node();
-    tPol pol = e.pol();
-    BddEdge e0 = vp->edge0(pol);
-    BddEdge e1 = vp->edge1(pol);
-    if ( e0.is_zero() ) {
-      e = e1;
-    }
-    else if ( e1.is_zero() ) {
-      e = e0;
-    }
-    else {
-      return false;
-    }
-    if ( e.is_one() ) {
-      return true;
-    }
-  }
-}
-#endif
-
 // 変数を確保する．
 // 確保に失敗したら false を返す．
 // 最後の変数の後ろに挿入される．
@@ -437,7 +362,7 @@ BddMgrModern::disable_gc()
 // その際，それらのノードに関係した演算結果テーブルの内容はクリアされる．
 // shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
 void
-BddMgrModern::gc(bool shrink_nodetable)
+BddMgrModern::_gc(bool shrink_nodetable)
 {
   logstream() << "BddMgrModern::GC() begin...." << endl;
 

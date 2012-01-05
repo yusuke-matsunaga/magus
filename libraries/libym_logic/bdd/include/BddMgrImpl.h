@@ -28,6 +28,8 @@ class CountOp;
 class McOp;
 class W0Op;
 class W1Op;
+class SupOp;
+class SmoothOp;
 
 //////////////////////////////////////////////////////////////////////
 /// @class BddMgrImpl BddMgrImpl.h "BddMgrImpl.h"
@@ -241,6 +243,15 @@ public:
   gcofactor(BddEdge e1,
 	    BddEdge e2);
 
+  /// @brief smoothing(elimination)
+  /// @param[in] e 演算対象の枝
+  /// @param[in] v_list 消去対象の変数リスト
+  /// @return 演算結果を返す．
+  /// @note v_list に含まれる変数を消去する．
+  BddEdge
+  esmooth(BddEdge e,
+	  const vector<ymuint32>& v_list);
+
   /// @brief bdd がキューブの時 true を返す．
   /// @param[in] e 演算対象の枝
   bool
@@ -290,15 +301,6 @@ public:
 	    ymuint y_level,
 	    tPol pol = kPolPosi) = 0;
 
-  /// @brief smoothing(elimination)
-  /// @param[in] e1, e2 演算対象の枝
-  /// @return 演算結果を返す．
-  /// @note svars に含まれる変数を消去する．
-  virtual
-  BddEdge
-  esmooth(BddEdge e1,
-	  BddEdge e2) = 0;
-
   /// @brief src1 と src2 の論理積を計算して src3 の変数を消去する．
   /// @param[in] e1, e2, e3 演算対象の枝
   /// @return 演算結果を返す．
@@ -336,11 +338,6 @@ public:
   BddEdge
   minimal_support(BddEdge l,
 		  BddEdge u) = 0;
-
-  /// @brief smallest cube containing F 演算
-  virtual
-  BddEdge
-  SCC(BddEdge e) = 0;
 
 
 public:
@@ -408,28 +405,28 @@ public:
   /// @brief edge_list に登録されたBDDのサポートに印をつける．
   /// @param[in] edge_list 根の枝のリスト
   /// @return サポート数を返す．
-  virtual
   ymuint
-  mark_support(const vector<BddEdge>& edge_list) = 0;
+  mark_support(const vector<BddEdge>& edge_list);
 
   /// @brief 印のついた変数をベクタに変換する．
   /// @param[out] support 結果を格納する変数
   /// @return サポート数を返す．
-  virtual
   ymuint
-  mark_to_vector(VarVector& support) = 0;
+  mark_to_vector(VarVector& support);
 
   /// @brief 印のついた変数をリストに変換する．
   /// @param[out] support 結果を格納する変数
   /// @return サポート数を返す．
-  virtual
   ymuint
-  mark_to_list(VarList& support) = 0;
+  mark_to_list(VarList& support);
 
   /// @brief 印のついた変数をBDD(キューブ)に変換する．
-  virtual
   BddEdge
-  mark_to_bdd() = 0;
+  mark_to_bdd();
+
+  /// @brief smallest cube containing F 演算
+  BddEdge
+  SCC(BddEdge e);
 
 
 public:
@@ -533,9 +530,8 @@ public:
 
   /// @brief ガーベージコレクションを行なう．
   /// shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
-  virtual
   void
-  gc(bool shrink_nodetable) = 0;
+  gc(bool shrink_nodetable);
 
   /// @brief GC 前の sweep 処理を行うためのバインダーを登録する．
   virtual
@@ -722,6 +718,11 @@ private:
   void
   unlock_hook(BddNode* vp) = 0;
 
+  /// @brief gc() の実際の処理を行う関数
+  virtual
+  void
+  _gc(bool shink_nodetable) = 0;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -801,6 +802,12 @@ private:
 
   // walsh1 用の演算オブジェクト
   W1Op* mW1Op;
+
+  // support 関係の演算オブジェクト
+  SupOp* mSupOp;
+
+  // smooth 演算オブジェクト
+  SmoothOp* mSmoothOp;
 
   // 演算オブジェクトのリスト
   list<BddOp*> mOpList;

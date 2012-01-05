@@ -19,11 +19,35 @@
 
 BEGIN_NAMESPACE_YM_BDD
 
+BEGIN_NONAMESPACE
+
+void
+print_header(const char* testname)
+{
+  cout << testname << endl;
+}
+
+void
+print_result(bool result)
+{
+  if ( result ) {
+    cout << "OK" << endl;
+  }
+  else {
+    cout << "Error" << endl;
+  }
+}
+
+END_NONAMESPACE
+
+
 // 変数リストの検査
 bool
 test_var_list(BddMgr& bddmgr,
 	      ymuint n)
 {
+  print_header("test_var_list");
+
   list<VarId> vlist;
   ymuint nn = bddmgr.var_list(vlist);
   bool result = true;
@@ -41,6 +65,7 @@ test_var_list(BddMgr& bddmgr,
       ++ i;
     }
   }
+
   if ( !result ) {
     cout << "ERROR in var_list" << endl;
     for (list<VarId>::const_iterator p = vlist.begin();
@@ -56,6 +81,8 @@ test_var_list(BddMgr& bddmgr,
 bool
 test_const(BddMgr& bddmgr)
 {
+  print_header("test_const");
+
   bool stat = true;
   Bdd one = bddmgr.make_one();
   if ( !one.is_one() ) {
@@ -92,6 +119,8 @@ test_const(BddMgr& bddmgr)
 bool
 test_literal(BddMgr& bddmgr)
 {
+  print_header("test_literal");
+
   bool stat = true;
   Bdd var0 = bddmgr.make_posiliteral(VarId(0));
   if ( !check_bddv(bddmgr, var0, "make_posiliteral(0)", "0|01") )
@@ -122,6 +151,8 @@ test_literal(BddMgr& bddmgr)
 bool
 test_unary(BddMgr& bddmgr)
 {
+  print_header("test_unary");
+
   Bdd var0 = bddmgr.make_posiliteral(VarId(0));
 
   bool stat = true;
@@ -143,6 +174,8 @@ test_unary(BddMgr& bddmgr)
 bool
 test_binary(BddMgr& bddmgr)
 {
+  print_header("test_binary");
+
   Bdd var0 = bddmgr.make_posiliteral(VarId(0));
   Bdd var1 = bddmgr.make_posiliteral(VarId(1));
 
@@ -182,6 +215,8 @@ test_binary(BddMgr& bddmgr)
 bool
 test_bddvector(BddMgr& bddmgr)
 {
+  print_header("test_bddvector");
+
   bool stat = true;
 
   Bdd var[20];
@@ -237,6 +272,8 @@ test_bddvector(BddMgr& bddmgr)
 bool
 test_bddlist(BddMgr& bddmgr)
 {
+  print_header("test_bddlist");
+
   bool stat = true;
 
   Bdd var[20];
@@ -292,6 +329,8 @@ test_bddlist(BddMgr& bddmgr)
 bool
 test_make_bdd(BddMgr& bddmgr)
 {
+  print_header("test_make_bdd");
+
   bool stat = true;
 
   {
@@ -336,6 +375,8 @@ test_make_bdd(BddMgr& bddmgr)
 bool
 test_ite(BddMgr& bddmgr)
 {
+  print_header("test_ite");
+
   bool stat = true;
 
   if ( !check_ite(bddmgr, "0", "1", "2") ) {
@@ -351,6 +392,8 @@ test_ite(BddMgr& bddmgr)
 bool
 test_compose(BddMgr& bddmgr)
 {
+  print_header("test_compose");
+
   bool stat = true;
 
   Bdd bdd1 = str2bdd(bddmgr, "0 & 1 & 2 & 3");
@@ -369,6 +412,8 @@ test_compose(BddMgr& bddmgr)
 bool
 test_smooth(BddMgr& bddmgr)
 {
+  print_header("test_smooth");
+
   bool stat = true;
 
   Bdd bdd1 = str2bdd(bddmgr, "0 & 1 | ~0 & 2");
@@ -391,6 +436,8 @@ test_smooth(BddMgr& bddmgr)
 bool
 test_intersect(BddMgr& bddmgr)
 {
+  print_header("test_intersect");
+
   bool stat = true;
 
   const char* str1 = "0 | 1";
@@ -420,6 +467,8 @@ test_intersect(BddMgr& bddmgr)
 bool
 test_scofactor(BddMgr& bddmgr)
 {
+  print_header("test_scofactor");
+
   bool stat = true;
 
   Bdd bdd = str2bdd(bddmgr, "0 & 1 | ~2 & 3");
@@ -455,6 +504,8 @@ test_scofactor(BddMgr& bddmgr)
 bool
 test_cofactor(BddMgr& bddmgr)
 {
+  print_header("test_cofactor");
+
   bool stat = true;
 
   const char* str = "0 & 2";
@@ -472,6 +523,8 @@ test_cofactor(BddMgr& bddmgr)
 bool
 test_and_exist(BddMgr& bddmgr)
 {
+  print_header("test_and_exist");
+
   bool stat = true;
 
   const char* str = "0 | 2";
@@ -493,6 +546,8 @@ test_and_exist(BddMgr& bddmgr)
 bool
 test_isop(BddMgr& bddmgr)
 {
+  print_header("test_isop");
+
   bool stat = true;
 
   const char* str = "0 & 2 | 1 & 3 | ~1 & ~3 | ~0 & ~2 & ~3";
@@ -525,6 +580,8 @@ test_isop(BddMgr& bddmgr)
 bool
 test_support(BddMgr& bddmgr)
 {
+  print_header("test_support");
+
   bool stat = true;
 
   if ( !check_support(bddmgr, "0") ) {
@@ -557,6 +614,8 @@ check_scc(BddMgr& bddmgr,
 bool
 test_scc(BddMgr& bddmgr)
 {
+  print_header("test_scc");
+
   bool stat = true;
 
   if ( !check_scc(bddmgr, "0 & 1 & ~2", "0 & 1 & ~2") ) {
@@ -644,6 +703,8 @@ check_sym(BddMgr& bddmgr,
 bool
 test_symmetry(BddMgr& bddmgr)
 {
+  print_header("test_symmetry");
+
   bool stat = true;
 
   if ( !check_sym(bddmgr, "0 & 2 | ~0 & 1 & ~2") ) {
@@ -675,6 +736,8 @@ test_symmetry(BddMgr& bddmgr)
 bool
 test_node_count(BddMgr& bddmgr)
 {
+  print_header("test_node_count");
+
   bool stat = true;
 
   Bdd bdd1 = str2bdd(bddmgr, "0 ^ 1 ^ 2");
@@ -691,6 +754,8 @@ test_node_count(BddMgr& bddmgr)
 bool
 test_minterm_count(BddMgr& bddmgr)
 {
+  print_header("test_minterm_count");
+
   bool stat = true;
 
   Bdd bdd = str2bdd(bddmgr, "0 & 2 | 1 & 3 | ~1 & ~3");
@@ -746,6 +811,8 @@ check_walsh0(const Bdd& bdd,
 bool
 test_walsh0(BddMgr& bddmgr)
 {
+  print_header("test_walsh0");
+
   bool stat = true;
 
   Bdd bdd = str2bdd(bddmgr, "0 & 2 | 1 & 3 | ~1 & ~3");
@@ -798,6 +865,8 @@ check_walsh1(const Bdd& bdd,
 bool
 test_walsh1(BddMgr& bddmgr)
 {
+  print_header("test_walsh1");
+
   bool stat = true;
 
   Bdd bdd = str2bdd(bddmgr, "0 & 2 | 1 & 3 | ~1 & ~3");
@@ -827,6 +896,8 @@ test_walsh1(BddMgr& bddmgr)
 bool
 test_dump(BddMgr& bddmgr)
 {
+  print_header("test_dump");
+
   bool stat = true;
 
   Bdd bdd = str2bdd(bddmgr, "0 & 2 | 1 & 3 | ~1 & ~3");
@@ -917,6 +988,7 @@ test(BddMgr& bddmgr)
   if ( !test_support(bddmgr) )
     stat = false;
 
+
   if ( !test_scc(bddmgr) )
     stat = false;
 
@@ -937,6 +1009,8 @@ test(BddMgr& bddmgr)
 
   if ( !test_dump(bddmgr) )
     stat = false;
+
+  cout << "test end" << endl;
 
   return stat;
 }

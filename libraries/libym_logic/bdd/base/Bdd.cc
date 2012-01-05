@@ -546,18 +546,23 @@ Bdd::check_symmetry(VarId x,
 Bdd
 Bdd::esmooth(const BddVarSet& svars) const
 {
+  ymuint n = svars.size();
+  vector<ymuint32> v_list;
+  v_list.reserve(n);
   Bdd sbdd = svars.function();
-  BddEdge ans;
-  if ( mMgr != sbdd.mMgr ) {
-    // マネージャが異なる．
-    // 本当は異なってもいいね
-    ans = BddEdge::make_error();
+  while ( !sbdd.is_one() ) {
+    Bdd dummy;
+    Bdd bdd1;
+    VarId var = sbdd.root_decomp(dummy, bdd1);
+    assert_cond( dummy.is_zero(), __FILE__, __LINE__);
+    ymuint level = mMgr->level(var);
+    v_list.push_back(level);
+    sbdd = bdd1;
   }
-  else {
-    BddEdge e1(mRoot);
-    BddEdge e2(sbdd.mRoot);
-    ans = mMgr->esmooth(e1, e2);
-  }
+
+  BddEdge e(mRoot);
+  BddEdge ans = mMgr->esmooth(e, v_list);
+
   return Bdd(mMgr, ans);
 }
 
@@ -565,18 +570,23 @@ Bdd::esmooth(const BddVarSet& svars) const
 Bdd
 Bdd::asmooth(const BddVarSet& svars) const
 {
+  ymuint n = svars.size();
+  vector<ymuint32> v_list;
+  v_list.reserve(n);
   Bdd sbdd = svars.function();
-  BddEdge ans;
-  if ( mMgr != sbdd.mMgr ) {
-    // マネージャが異なる．
-    // 本当は異なってもいいね
-    ans = BddEdge::make_error();
+  while ( !sbdd.is_one() ) {
+    Bdd dummy;
+    Bdd bdd1;
+    VarId var = sbdd.root_decomp(dummy, bdd1);
+    assert_cond( dummy.is_zero(), __FILE__, __LINE__);
+    ymuint level = mMgr->level(var);
+    v_list.push_back(level);
+    sbdd = bdd1;
   }
-  else {
-    BddEdge e1(mRoot);
-    BddEdge e2(sbdd.mRoot);
-    ans = ~mMgr->esmooth(~e1, e2);
-  }
+
+  BddEdge e(mRoot);
+  BddEdge ans = ~mMgr->esmooth(~e, v_list);
+
   return Bdd(mMgr, ans);
 }
 

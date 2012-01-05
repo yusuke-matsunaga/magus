@@ -146,12 +146,14 @@ public:
 	    ymuint y_level,
 	    tPol pol);
 
+#if 0
   // smoothing(elimination)
   // svars に含まれる変数を消去する．
   virtual
   BddEdge
   esmooth(BddEdge e1,
 	  BddEdge e2);
+#endif
 
   // src1 と src2 の論理積を計算して src3 の変数を消去する．
   virtual
@@ -181,11 +183,6 @@ public:
   minimal_support(BddEdge l,
 		  BddEdge u);
 
-  // smallest cube containing F 演算
-  virtual
-  BddEdge
-  SCC(BddEdge e);
-
 
   //////////////////////////////////////////////////////////////////////
   // 1へ至るパスを求める関数
@@ -207,65 +204,6 @@ public:
   virtual
   ymuint
   shortest_onepath_len(BddEdge e);
-
-
-  //////////////////////////////////////////////////////////////////////
-  // ノード数の計数や真理値表密度の計算など
-  //////////////////////////////////////////////////////////////////////
-
-#if 0
-  // edge_list に登録されたBDDのノード数を数える．
-  virtual
-  ymuint64
-  node_count(const vector<BddEdge>& edge_list);
-
-  // BDD の表す論理関数の minterm の数を返す．
-  // 無限長精度の整数(mpz_class)を用いて計算する．
-  // nvar は論理関数の変数の数
-  virtual
-  mpz_class
-  minterm_count(BddEdge e,
-		ymuint nvar);
-
-  // Walsh 変換の0次の係数を計算する．
-  // nvar は論理関数の変数の数
-  virtual
-  mpz_class
-  walsh0(BddEdge e,
-	 ymuint nvar);
-
-  // Walsh 変換の1次の係数を計算する．
-  // nvar は論理関数の変数の数
-  virtual
-  mpz_class
-  walsh1(BddEdge e,
-	 VarId var,
-	 ymuint nvar);
-#endif
-
-  //////////////////////////////////////////////////////////////////////
-  // サポート関係の関数
-  //////////////////////////////////////////////////////////////////////
-
-  // edge_list に登録されたBDDのサポートに印をつける．
-  virtual
-  ymuint
-  mark_support(const vector<BddEdge>& edge_list);
-
-  // 印のついた変数をベクタに変換する．
-  virtual
-  ymuint
-  mark_to_vector(VarVector& support);
-
-  // 印のついた変数をリストに変換する．
-  virtual
-  ymuint
-  mark_to_list(VarList& support);
-
-  // 印のついた変数をBDD(キューブ)に変換する．
-  virtual
-  BddEdge
-  mark_to_bdd();
 
 
   //////////////////////////////////////////////////////////////////////
@@ -339,12 +277,6 @@ public:
   virtual
   void
   disable_gc();
-
-  // ガーベージコレクションを行なう．
-  // shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
-  virtual
-  void
-  gc(bool shrink_nodetable);
 
   // GC 前の sweep 処理を行うためのバインダーを登録する．
   virtual
@@ -420,9 +352,11 @@ public:
   BddEdge
   compose_step(BddEdge f);
 
+#if 0
   // existential qualification を行う．
   BddEdge
   esmooth_step(BddEdge e1);
+#endif
 
   // and exist 演算を行う．
   BddEdge
@@ -450,65 +384,6 @@ public:
   BddEdge
   ms_step(BddEdge l,
 	  BddEdge u);
-
-  // support 関係の共通処理
-  void
-  sup_step(BddEdge e);
-
-  // SCC で用いられる関数
-  void
-  scc_step(BddEdge e,
-	   BddEdge s);
-
-#if 0
-  // size() の中で用いられる関数
-  void
-  count1(BddEdge e);
-
-  // density の下請関数
-  static
-  double
-  dens_step(BddEdge e,
-	    hash_map<BddEdge, double>& dens_assoc);
-
-  // mpz_class 版の minterm_count の下請関数
-  static
-  mpz_class
-  mterm_step(BddEdge e,
-	     hash_map<BddEdge, mpz_class>& mc_map);
-
-  // int 版の minterm_count の下請関数
-  static
-  ymuint
-  mterm_step(BddEdge e,
-	     hash_map<BddEdge, ymuint>& mc_map);
-
-  // Walsh spectrumの0次の係数を求める処理
-  static
-  mpz_class
-  wt0_step(BddEdge e,
-	   hash_map<BddNode*, mpz_class>& result_map);
-
-  // Walsh spectrumの0次の係数を求める処理
-  // こちらは int 版
-  static
-  ymint
-  wt0_step(BddEdge e,
-	   hash_map<BddNode*, ymint>& result_map);
-
-  // Walsh spectrumの1次の係数を求める処理
-  static
-  mpz_class
-  wt1_step(BddEdge e,
-	   hash_map<BddNode*, mpz_class>& result_map);
-
-  // Walsh spectrumの1次の係数を求める処理
-  // int 版
-  static
-  ymint
-  wt1_step(BddEdge e,
-	   hash_map<BddNode*, ymint>& result_map);
-#endif
 
   // sp_step 中で用いられる関数
   static
@@ -544,6 +419,12 @@ public:
   virtual
   void
   unlock_hook(BddNode* vp);
+
+  // ガーベージコレクションを行なう．
+  // shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
+  virtual
+  void
+  _gc(bool shrink_nodetable);
 
   // 演算結果テーブルを登録する．
   void

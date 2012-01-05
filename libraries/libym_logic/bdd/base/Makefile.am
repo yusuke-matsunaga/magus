@@ -73,6 +73,10 @@ libym_bdd_base_la_SOURCES = \
 	W0Op.cc \
 	W1Op.h \
 	W1Op.cc \
+	SupOp.h \
+	SupOp.cc \
+	SmoothOp.h \
+	SmoothOp.cc \
 	IdMgr.h \
 	IdMgr.cc \
 	Printer.h \
