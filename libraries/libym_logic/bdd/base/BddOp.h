@@ -95,6 +95,7 @@ inline
 BddOp::BddOp(BddMgrImpl* mgr) :
   mMgr(mgr)
 {
+  mMgr->mOpList.push_back(this);
 }
 
 // @brief 与えられた枝とインデックスを持つノードを返す．

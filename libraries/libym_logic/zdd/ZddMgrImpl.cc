@@ -401,10 +401,6 @@ ZddMgrImpl::cofactor1(ZddEdge e,
   return mCof1Op->apply(e, level(var));
 }
 
-/// @brief e の参照回数が0なら true を返す．
-bool
-check_noref(ZddEdge e);
-
 // 節点テーブルを次に拡大する時の基準値を計算する．
 void
 ZddMgrImpl::set_next_limit_size()

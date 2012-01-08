@@ -30,7 +30,6 @@ public:
 	    const char* name = 0);
 
   // デストラクタ
-  virtual
   ~CompTbl2e();
 
 
@@ -63,7 +62,6 @@ public:
   sweep();
 
   /// @brief クリアする．
-  virtual
   void
   clear();
 

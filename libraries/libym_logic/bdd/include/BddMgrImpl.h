@@ -38,6 +38,7 @@ class SmoothOp;
 class BddMgrImpl
 {
   friend class Bdd;
+  friend class BddOp;
 
 public:
   //////////////////////////////////////////////////////////////////////

@@ -58,7 +58,6 @@ public:
   sweep();
 
   /// @brief 内容をクリアする．
-  virtual
   void
   clear();
 

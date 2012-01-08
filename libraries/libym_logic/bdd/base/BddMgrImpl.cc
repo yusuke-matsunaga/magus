@@ -200,23 +200,6 @@ BddMgrImpl::BddMgrImpl(const string& name) :
   mSupOp = new SupOp(this);
   mSmoothOp = new SmoothOp(this, mAndOp);
   mAeOp = new AeOp(this, mAndOp, mSmoothOp);
-
-  // 演算オブジェクトの登録
-  mOpList.push_back(mAndOp);
-  mOpList.push_back(mXorOp);
-  mOpList.push_back(mIntsecOp);
-  mOpList.push_back(mIteOp);
-  mOpList.push_back(mCofOp);
-  mOpList.push_back(mXcOp);
-  mOpList.push_back(mGcOp);
-  mOpList.push_back(mSymOp);
-  mOpList.push_back(mCountOp);
-  mOpList.push_back(mMcOp);
-  mOpList.push_back(mW0Op);
-  mOpList.push_back(mW1Op);
-  mOpList.push_back(mSupOp);
-  mOpList.push_back(mSmoothOp);
-  mOpList.push_back(mAeOp);
 }
 
 // デストラクタ
