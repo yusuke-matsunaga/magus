@@ -1,36 +1,37 @@
-#ifndef COF1OP_H
-#define COF1OP_H
+#ifndef CONOP_H
+#define CONOP_H
 
-/// @file Cof1Op.h
-/// @brief Cof1Op のヘッダファイル
+/// @file ConOp.h
+/// @brief ConOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ZddUniOp.h"
-#include "ZddMgrImpl.h"
+#include "CNFddOp.h"
+#include "CNFddMgrImpl.h"
+#include "CompTbl.h"
 
 
-BEGIN_NAMESPACE_YM_ZDD
+BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class Cof1Op Cof1Op.h "Cof1Op.h"
-/// @brief cofactor1 演算を求めるクラス
+/// @class ConOp ConOp.h "ConOp.h"
+/// @brief conjunction を求めるクラス
 //////////////////////////////////////////////////////////////////////
-class Cof1Op :
-  public ZddUniOp
+class ConOp :
+  public CNFddBinOp
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] mgr ZddMgrImpl
-  Cof1Op(ZddMgrImpl* mgr);
+  /// @param[in] mgr CNFddMgrImpl
+  ConOp(CNFddMgrImpl& mgr);
 
   /// @brief デストラクタ
   virtual
-  ~Cof1Op();
+  ~ConOp();
 
 
 public:
@@ -38,13 +39,12 @@ public:
   // メインの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief cofactor1 演算を行う関数
-  /// @param[in] left オペランド
-  /// @param[in] level 変数のレベル
+  /// @brief \f$\wedge\f$演算を行う関数
+  /// @param[in] left, right オペランド
   virtual
-  ZddEdge
-  apply(ZddEdge left,
-	ymuint level);
+  CNFddEdge
+  apply(CNFddEdge left,
+	CNFddEdge right);
 
 
 private:
@@ -53,8 +53,9 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 実際に演算を行う関数
-  ZddEdge
-  apply_step(ZddEdge f);
+  CNFddEdge
+  cap_step(CNFddEdge f,
+	   CNFddEdge g);
 
 
 private:
@@ -62,11 +63,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数のレベル
-  ymuint32 mLevel;
+  // 親のマネージャ
+  CNFddMgrImpl& mMgr;
+
+  // 演算テーブル
+  CompTbl2 mCapTable;
 
 };
 
-END_NAMESPACE_YM_ZDD
+END_NAMESPACE_YM_CNFDD
 
-#endif // COF0OP_H
+#endif // CAPOP_H

@@ -5,12 +5,11 @@
 /// @brief Cof0Op のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ZddOp.h"
-#include "ZddMgrImpl.h"
+#include "ZddUniOp.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
@@ -20,13 +19,13 @@ BEGIN_NAMESPACE_YM_ZDD
 /// @brief cofactor0 演算を求めるクラス
 //////////////////////////////////////////////////////////////////////
 class Cof0Op :
-  public ZddUnOp
+  public ZddUniOp
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] mgr ZddMgrImpl
-  Cof0Op(ZddMgrImpl& mgr);
+  /// @param[in] mgr マネージャ
+  Cof0Op(ZddMgrImpl* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -40,11 +39,11 @@ public:
 
   /// @brief cofactor0 演算を行う関数
   /// @param[in] left オペランド
-  /// @param[in] var 変数番号
+  /// @param[in] level 変数のレベル
   virtual
   ZddEdge
   apply(ZddEdge left,
-	VarId var);
+	ymuint level);
 
 
 private:
@@ -54,7 +53,7 @@ private:
 
   /// @brief 実際に演算を行う関数
   ZddEdge
-  cof0_step(ZddEdge f);
+  apply_step(ZddEdge f);
 
 
 private:
@@ -62,17 +61,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 親のマネージャ
-  ZddMgrImpl& mMgr;
-
-  // 変数
-  ZddVar* mVar;
-
   // 変数のレベル
   ymuint32 mLevel;
-
-  // 一時的に結果を覚えておくハッシュ表
-  hash_map<ZddEdge, ZddEdge> mCompTbl;
 
 };
 

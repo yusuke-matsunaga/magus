@@ -11,47 +11,41 @@ MAINTAINERCLEANFILES = Makefile.in
 ## Variables for building targets
 ############################################################
 
-noinst_LTLIBRARIES = libym_logic_zdd.la
+noinst_LTLIBRARIES = libym_logic_cnfdd.la
 
 
 ############################################################
-## Variables for building libym_logic_zdd.la
+## Variables for building libym_logic_cnfdd.la
 ############################################################
 
-libym_logic_zdd_la_CPPFLAGS = \
+libym_logic_cnfdd_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	$(GMP_INCLUDES)
 
-libym_logic_zdd_la_SOURCES = \
+libym_logic_cnfdd_la_SOURCES = \
 	CompTbl.h \
 	CompTbl.cc \
-	ZddEdge.h \
-	ZddNode.h \
-	ZddVar.h \
-	Zdd.cc \
-	ZddVector.cc \
-	ZddList.cc \
-	ZddMgr.cc \
-	ZddMgrImpl.h \
-	ZddMgrImpl.cc \
-	ZddOp.h \
-	ZddUniOp.h \
-	ZddUniOp.cc \
-	ZddBinOp.h \
-	ZddBinOp.cc \
-	CapOp.h \
-	CapOp.cc \
-	CupOp.h \
-	CupOp.cc \
+	CNFddEdge.h \
+	CNFddNode.h \
+	CNFddVar.h \
+	CNFdd.cc \
+	CNFddMgr.cc \
+	CNFddMgrImpl.h \
+	CNFddMgrImpl.cc \
+	CNFddOp.h \
+	ConOp.h \
+	ConOp.cc \
 	DiffOp.h \
 	DiffOp.cc \
-	SwapOp.h \
-	SwapOp.cc \
+	AddLiteralOp.h \
+	AddLiteralOp.cc \
 	Cof0Op.h \
 	Cof0Op.cc \
-	Cof1Op.h \
-	Cof1Op.cc \
+	CofPOp.h \
+	CofPOp.cc \
+	CofNOp.h \
+	CofNOp.cc \
 	count.cc \
 	support.cc \
 	IdMgr.h \
@@ -63,7 +57,7 @@ libym_logic_zdd_la_SOURCES = \
 	Restorer.h \
 	Restorer.cc
 
-libym_logic_zdd_la_LIBADD =
+libym_logic_cnfdd_la_LIBADD =
 
-libym_logic_zdd_la_LDFLAGS =
+libym_logic_cnfdd_la_LDFLAGS =
 

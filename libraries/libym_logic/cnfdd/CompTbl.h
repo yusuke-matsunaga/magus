@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "ym_logic/zdd_nsdef.h"
-#include "ZddNode.h"
+#include "ym_logic/cnfdd_nsdef.h"
+#include "CNFddNode.h"
 
 
-BEGIN_NAMESPACE_YM_ZDD
+BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
 /// @class CompTbl CompTbl.h "CompTbl.h"
@@ -24,9 +24,9 @@ class CompTbl
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] mgr 親の ZddMgrImpl
+  /// @param[in] mgr 親の CNFddMgrImpl
   /// @param[in] name 名前(デバッグ用)
-  CompTbl(ZddMgrImpl* mgr,
+  CompTbl(CNFddMgrImpl& mgr,
 	  const char* name);
 
   /// @brief デストラクタ
@@ -35,6 +35,16 @@ public:
 
 
 public:
+
+  /// @brief ロックされていないノードに関係したセルをきれいにする．
+  virtual
+  void
+  sweep() = 0;
+
+  /// @brief 内容をクリアする．
+  virtual
+  void
+  clear() = 0;
 
   /// @brief 使用されているセル数を返す．
   ymuint64
@@ -51,9 +61,6 @@ public:
 
 
 protected:
-  //////////////////////////////////////////////////////////////////////
-  // 継承クラスから使われる関数
-  //////////////////////////////////////////////////////////////////////
 
   /// @brief next_limitを更新する
   void
@@ -63,11 +70,11 @@ protected:
   bool
   check_tablesize() const;
 
-  /// @brief ZddMgr からメモリを確保する．
+  /// @brief CNFddMgr からメモリを確保する．
   void*
   allocate(ymuint64 size);
 
-  /// @brief ZddMgr にメモリを返す．
+  /// @brief CNFddMgr にメモリを返す．
   void
   deallocate(void* ptr,
 	     ymuint64 size);
@@ -82,8 +89,8 @@ protected:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 親の ZddMgr
-  ZddMgrImpl* mMgr;
+  // 親の CNFddMgr
+  CNFddMgrImpl& mMgr;
 
   // 使用されているセルの数
   ymuint64 mUsedNum;
@@ -104,7 +111,7 @@ protected:
   // mUsedがこの値を越えたらテーブルを拡張する
   ymuint64 mNextLimit;
 
-  // 同じ ZddMgr に属している次のテーブル
+  // 同じ CNFddMgr に属している次のテーブル
   CompTbl* mNext;
 
 };
@@ -117,12 +124,20 @@ protected:
 class CompTbl1 :
   public CompTbl
 {
+
+  // キーが1つのセル
+  struct Cell
+  {
+    CNFddEdge mKey1;
+    CNFddEdge mAns;
+  };
+
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] mgr 親の ZddMgrImpl
+  /// @param[in] mgr 親の CNFddMgrImpl
   /// @param[in] name 名前
-  CompTbl1(ZddMgrImpl* mgr,
+  CompTbl1(CNFddMgrImpl& mgr,
 	   const char* name = 0);
 
   /// @brief デストラクタ
@@ -131,54 +146,37 @@ public:
 
 
 public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
 
   /// @brief id1をキーとして検索を行なう
-  ZddEdge
-  get(ZddEdge id1);
+  CNFddEdge
+  get(CNFddEdge id1);
 
   /// @brief 結果を登録する
   void
-  put(ZddEdge id1,
-      ZddEdge ans);
-
-  /// @brief ガーベージコレクションが起きた時の処理を行なう．
-  void
-  sweep();
-
-  /// @brief 内容をクリアする．
-  void
-  clear();
+  put(CNFddEdge id1,
+      CNFddEdge ans);
 
 
 private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
 
   /// @brief ハッシュ関数
   ymuint64
-  hash_func(ZddEdge id1);
+  hash_func(CNFddEdge id1);
 
   /// @brief テーブルサイズを変更する．
   /// @param[in] new_size 設定する値
   bool
   resize(ymuint64 new_size);
 
+  /// @brief ガーベージコレクションが起きた時の処理を行なう．
+  virtual
+  void
+  sweep();
 
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  // キーが1つのセル
-  struct Cell
-  {
-    ZddEdge mKey1;
-    ZddEdge mAns;
-  };
+  /// @brief 内容をクリアする．
+  virtual
+  void
+  clear();
 
 
 private:
@@ -199,12 +197,20 @@ private:
 class CompTbl2 :
   public CompTbl
 {
+
+  // キーが2つのセル
+  struct Cell {
+    CNFddEdge mKey1;
+    CNFddEdge mKey2;
+    CNFddEdge mAns;
+  };
+
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] mgr 親の ZddMgrImpl
+  /// @param[in] mgr 親の CNFddMgrImpl
   /// @param[in] name 名前
-  CompTbl2(ZddMgrImpl* mgr,
+  CompTbl2(CNFddMgrImpl& mgr,
 	   const char* name = 0);
 
   /// @brief デストラクタ
@@ -215,52 +221,38 @@ public:
 public:
 
   /// @brief id1, id2をキーとして検索を行なう
-  ZddEdge
-  get(ZddEdge id1,
-      ZddEdge id2);
+  CNFddEdge
+  get(CNFddEdge id1,
+      CNFddEdge id2);
 
   /// @brief 結果を登録する
   void
-  put(ZddEdge id1,
-      ZddEdge id2,
-      ZddEdge ans);
-
-  /// @brief ガーベージコレクションが起きた時の処理を行なう．
-  void
-  sweep();
-
-  /// @brief 内容をクリアする．
-  void
-  clear();
+  put(CNFddEdge id1,
+      CNFddEdge id2,
+      CNFddEdge ans);
 
 
 private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
 
   /// @brief ハッシュ関数
   ymuint64
-  hash_func(ZddEdge id1,
-	    ZddEdge id2);
+  hash_func(CNFddEdge id1,
+	    CNFddEdge id2);
 
   /// @brief テーブルサイズを変更する．
   /// @param[in] new_size 新しい値
   bool
   resize(ymuint64 new_size);
 
+  /// @brief ガーベージコレクションが起きた時の処理を行なう．
+  virtual
+  void
+  sweep();
 
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  // キーが2つのセル
-  struct Cell {
-    ZddEdge mKey1;
-    ZddEdge mKey2;
-    ZddEdge mAns;
-  };
+  /// @brief 内容をクリアする．
+  virtual
+  void
+  clear();
 
 
 private:
@@ -289,19 +281,19 @@ CompTbl::check_tablesize() const
 // ハッシュ関数
 inline
 ymuint64
-CompTbl1::hash_func(ZddEdge id1)
+CompTbl1::hash_func(CNFddEdge id1)
 {
   return ymuint64((id1.hash() * id1.hash()) >> 8) & mTableSize_1;
 }
 
 // id1をキーとして検索を行なう
 inline
-ZddEdge
-CompTbl1::get(ZddEdge id1)
+CNFddEdge
+CompTbl1::get(CNFddEdge id1)
 {
   Cell* tmp = mTable + hash_func(id1);
   if ( tmp->mKey1 != id1 ) {
-    return ZddEdge::make_error();
+    return CNFddEdge::make_error();
   }
   else {
     return tmp->mAns;
@@ -311,8 +303,8 @@ CompTbl1::get(ZddEdge id1)
 // 結果を登録する
 inline
 void
-CompTbl1::put(ZddEdge id1,
-	      ZddEdge ans)
+CompTbl1::put(CNFddEdge id1,
+	      CNFddEdge ans)
 {
   if ( id1.is_invalid() || ans.is_invalid() ) {
     return;
@@ -331,8 +323,8 @@ CompTbl1::put(ZddEdge id1,
 // ハッシュ関数
 inline
 ymuint64
-CompTbl2::hash_func(ZddEdge id1,
-		    ZddEdge id2)
+CompTbl2::hash_func(CNFddEdge id1,
+		    CNFddEdge id2)
 {
   ymuint64 v1 = id1.hash();
   ymuint64 v2 = id2.hash();
@@ -342,13 +334,13 @@ CompTbl2::hash_func(ZddEdge id1,
 
 // id1, id2をキーとして検索を行なう
 inline
-ZddEdge
-CompTbl2::get(ZddEdge id1,
-	      ZddEdge id2)
+CNFddEdge
+CompTbl2::get(CNFddEdge id1,
+	      CNFddEdge id2)
 {
   Cell* tmp = mTable + hash_func(id1, id2);
   if ( tmp->mKey1 != id1 || tmp->mKey2 != id2 ) {
-    return ZddEdge::make_error();
+    return CNFddEdge::make_error();
   }
   else {
     return tmp->mAns;
@@ -358,9 +350,9 @@ CompTbl2::get(ZddEdge id1,
 // 結果を登録する
 inline
 void
-CompTbl2::put(ZddEdge id1,
-	      ZddEdge id2,
-	      ZddEdge ans)
+CompTbl2::put(CNFddEdge id1,
+	      CNFddEdge id2,
+	      CNFddEdge ans)
 {
   if ( id1.is_invalid() || id2.is_invalid() || ans.is_invalid() ) {
     return;
@@ -377,6 +369,6 @@ CompTbl2::put(ZddEdge id1,
   tmp->mAns = ans;
 }
 
-END_NAMESPACE_YM_ZDD
+END_NAMESPACE_YM_CNFDD
 
 #endif // COMPTBL_H

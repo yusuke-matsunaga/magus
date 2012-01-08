@@ -1,80 +1,80 @@
-#ifndef ZDDEDGE_H
-#define ZDDEDGE_H
+#ifndef CNFDDEDGE_H
+#define CNFDDEDGE_H
 
-/// @file ZddEdge.h
-/// @brief ZddEdge のヘッダファイル
+/// @file CNFddEdge.h
+/// @brief CNFddEdge のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_logic/zdd_nsdef.h"
+#include "ym_logic/cnfdd_nsdef.h"
 #include "ym_logic/VarId.h"
 
 
-BEGIN_NAMESPACE_YM_ZDD
+BEGIN_NAMESPACE_YM_CNFDD
 
-class ZddNode;
+class CNFddNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class ZddEdge ZddEdge.h "ym_logic/ZddEdge.h"
-/// @brief ZDD の枝を表すクラス
+/// @class CNFddEdge CNFddEdge.h "ym_logic/CNFddEdge.h"
+/// @brief CNFDD の枝を表すクラス
 //////////////////////////////////////////////////////////////////////
-class ZddEdge
+class CNFddEdge
 {
-  friend class Zdd;
-  friend class ZddMgr;
-  friend class ZddMgrImpl;
+  friend class CNFdd;
+  friend class CNFddMgr;
+  friend class CNFddMgrImpl;
 
 public:
 
   /// @brief 空のコンストラクタ
   /// @note 中身は不定
-  ZddEdge();
+  CNFddEdge();
 
   /// @brief ストレートなコンストラクタ
   /// @param[in] val 内容
   explicit
-  ZddEdge(ympuint val);
+  CNFddEdge(ympuint val);
 
   /// @brief コンストラクタ
   /// @param[in] node ノード
   explicit
-  ZddEdge(ZddNode* node);
+  CNFddEdge(CNFddNode* node);
 
   /// @brief コンストラクタ
   /// @param[in] node ノード
   /// @param[in] zattr 0-element 属性
-  ZddEdge(ZddNode* node,
-	  bool zattr);
+  CNFddEdge(CNFddNode* node,
+	    bool zattr);
 
   /// @brief コンストラクタ
   /// @param[in] src コピー元の枝
-  ZddEdge(const ZddEdge& src);
+  CNFddEdge(const CNFddEdge& src);
 
   /// @brief ympuint へのキャスト演算子
   operator ympuint() const;
 
   /// @brief 定数0の枝を返す．
   static
-  ZddEdge
+  CNFddEdge
   make_zero();
 
   /// @brief 定数1の枝を返す．
   static
-  ZddEdge
+  CNFddEdge
   make_one();
 
   /// @brief オーバーフロー枝を返す．
   static
-  ZddEdge
+  CNFddEdge
   make_overflow();
 
   /// @brief エラー枝を返す．
   static
-  ZddEdge
+  CNFddEdge
   make_error();
 
 
@@ -86,28 +86,28 @@ public:
   /// @brief 等価比較
   friend
   bool
-  operator==(const ZddEdge& left,
-	     const ZddEdge& right);
+  operator==(const CNFddEdge& left,
+	     const CNFddEdge& right);
 
   /// @brief 非等価比較
   friend
   bool
-  operator!=(const ZddEdge& left,
-	     const ZddEdge& right);
+  operator!=(const CNFddEdge& left,
+	     const CNFddEdge& right);
 
   /// @brief 大小比較
   /// @note 対象演算の時の順序の正規化に使う．
   friend
   bool
-  operator<(const ZddEdge& left,
-	    const ZddEdge& right);
+  operator<(const CNFddEdge& left,
+	    const CNFddEdge& right);
 
   /// @brief 大小比較
   /// @note 対象演算の時の順序の正規化に使う．
   friend
   bool
-  operator>(const ZddEdge& left,
-	    const ZddEdge& right);
+  operator>(const CNFddEdge& left,
+	    const CNFddEdge& right);
 
 
 public:
@@ -116,7 +116,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ノードのポインタを取り出す．
-  ZddNode*
+  CNFddNode*
   get_node() const;
 
   /// @brief 0-element 属性を取り出す．
@@ -125,16 +125,16 @@ public:
 
   /// @brief 属性を取り去る．
   /// @return 自分自身への参照を返す．
-  const ZddEdge&
+  const CNFddEdge&
   normalize();
 
   /// @brief 属性を取り去った枝を返す．
-  ZddEdge
+  CNFddEdge
   get_normal() const;
 
   /// @brief 属性を付加する．
   /// @return 自分自身への参照を返す．
-  const ZddEdge&
+  const CNFddEdge&
   add_zattr(bool zattr);
 
   /// @brief 参照されていない時にtrueを返す
@@ -226,14 +226,14 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-// ZddEdge に関連する関数
+// CNFddEdge に関連する関数
 //////////////////////////////////////////////////////////////////////
 
-/// @relates ZddEdge
+/// @relates CNFddEdge
 /// @brief 再帰的に節点のマークを消す．
 /// @param[in] e 根の枝
 void
-clear_mark(ZddEdge e);
+clear_mark(CNFddEdge e);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -243,7 +243,7 @@ clear_mark(ZddEdge e);
 // @brief 空のコンストラクタ
 // @note 中身は不定
 inline
-ZddEdge::ZddEdge() :
+CNFddEdge::CNFddEdge() :
   mBody(kEdgeError)
 {
 }
@@ -251,7 +251,7 @@ ZddEdge::ZddEdge() :
 // @brief コンストラクタ
 // @param[in] val 内容
 inline
-ZddEdge::ZddEdge(ympuint val) :
+CNFddEdge::CNFddEdge(ympuint val) :
   mBody(val)
 {
 }
@@ -259,7 +259,7 @@ ZddEdge::ZddEdge(ympuint val) :
 // @brief コンストラクタ
 // @param[in] node ノード
 inline
-ZddEdge::ZddEdge(ZddNode* node) :
+CNFddEdge::CNFddEdge(CNFddNode* node) :
   mBody(reinterpret_cast<ympuint>(node))
 {
 }
@@ -268,7 +268,7 @@ ZddEdge::ZddEdge(ZddNode* node) :
 // @param[in] node ノード
 // @param[in] zattr 0-element 属性
 inline
-ZddEdge::ZddEdge(ZddNode* node,
+CNFddEdge::CNFddEdge(CNFddNode* node,
 		 bool zattr) :
   mBody(reinterpret_cast<ympuint>(node) | zattr)
 {
@@ -277,62 +277,62 @@ ZddEdge::ZddEdge(ZddNode* node,
 // @brief コンストラクタ
 // @param[in] src コピー元の枝
 inline
-ZddEdge::ZddEdge(const ZddEdge& src) :
+CNFddEdge::CNFddEdge(const CNFddEdge& src) :
   mBody(src.mBody)
 {
 }
 
 // @brief ympuint へのキャスト演算子
 inline
-ZddEdge::operator ympuint() const
+CNFddEdge::operator ympuint() const
 {
   return mBody;
 }
 
 // @brief 定数0の枝を返す．
 inline
-ZddEdge
-ZddEdge::make_zero()
+CNFddEdge
+CNFddEdge::make_zero()
 {
-  return ZddEdge(kEdge0);
+  return CNFddEdge(kEdge0);
 }
 
 // @brief 定数1の枝を返す．
 inline
-ZddEdge
-ZddEdge::make_one()
+CNFddEdge
+CNFddEdge::make_one()
 {
-  return ZddEdge(kEdge1);
+  return CNFddEdge(kEdge1);
 }
 
 // @brief オーバーフロー枝を返す．
 inline
-ZddEdge
-ZddEdge::make_overflow()
+CNFddEdge
+CNFddEdge::make_overflow()
 {
-  return ZddEdge(kEdgeOverflow);
+  return CNFddEdge(kEdgeOverflow);
 }
 
 // @brief エラー枝を返す．
 inline
-ZddEdge
-ZddEdge::make_error()
+CNFddEdge
+CNFddEdge::make_error()
 {
-  return ZddEdge(kEdgeError);
+  return CNFddEdge(kEdgeError);
 }
 
 // @brief ノードのポインタを取り出す．
 inline
-ZddNode*
-ZddEdge::get_node() const
+CNFddNode*
+CNFddEdge::get_node() const
 {
-  return reinterpret_cast<ZddNode*>(mBody & ~3UL);
+  return reinterpret_cast<CNFddNode*>(mBody & ~3UL);
 }
 
 // @brief 0-element 属性を取り出す．
 inline
 bool
-ZddEdge::zattr() const
+CNFddEdge::zattr() const
 {
   return static_cast<bool>(mBody & 1UL);
 }
@@ -340,8 +340,8 @@ ZddEdge::zattr() const
 // @brief 属性を取り去る．
 // @return 自分自身への参照を返す．
 inline
-const ZddEdge&
-ZddEdge::normalize()
+const CNFddEdge&
+CNFddEdge::normalize()
 {
   mBody &= ~1UL;
   return *this;
@@ -349,17 +349,17 @@ ZddEdge::normalize()
 
 // @brief 属性を取り去った枝を返す．
 inline
-ZddEdge
-ZddEdge::get_normal() const
+CNFddEdge
+CNFddEdge::get_normal() const
 {
-  return ZddEdge(mBody & ~1UL);
+  return CNFddEdge(mBody & ~1UL);
 }
 
 // @brief 属性を付加する．
 // @return 自分自身への参照を返す．
 inline
-const ZddEdge&
-ZddEdge::add_zattr(bool zattr)
+const CNFddEdge&
+CNFddEdge::add_zattr(bool zattr)
 {
   // true = 1 だと仮定している．
   mBody |= static_cast<ympuint>(zattr);
@@ -369,8 +369,8 @@ ZddEdge::add_zattr(bool zattr)
 // @brief 等価比較
 inline
 bool
-operator==(const ZddEdge& left,
-	   const ZddEdge& right)
+operator==(const CNFddEdge& left,
+	   const CNFddEdge& right)
 {
   return left.mBody == right.mBody;
 }
@@ -378,8 +378,8 @@ operator==(const ZddEdge& left,
 // @brief 非等価比較
 inline
 bool
-operator!=(const ZddEdge& left,
-	   const ZddEdge& right)
+operator!=(const CNFddEdge& left,
+	   const CNFddEdge& right)
 {
   return left.mBody != right.mBody;
 }
@@ -388,8 +388,8 @@ operator!=(const ZddEdge& left,
 // @note 対象演算の時の順序の正規化に使う．
 inline
 bool
-operator<(const ZddEdge& left,
-	  const ZddEdge& right)
+operator<(const CNFddEdge& left,
+	  const CNFddEdge& right)
 {
   return left.mBody < right.mBody;
 }
@@ -398,8 +398,8 @@ operator<(const ZddEdge& left,
 // @note 対象演算の時の順序の正規化に使う．
 inline
 bool
-operator>(const ZddEdge& left,
-	  const ZddEdge& right)
+operator>(const CNFddEdge& left,
+	  const CNFddEdge& right)
 {
   return left.mBody > right.mBody;
 }
@@ -407,7 +407,7 @@ operator>(const ZddEdge& left,
 // @brief 定数0ノードのチェック
 inline
 bool
-ZddEdge::is_zero() const
+CNFddEdge::is_zero() const
 {
   return mBody == kEdge0;
 }
@@ -415,7 +415,7 @@ ZddEdge::is_zero() const
 // @brief 定数1ノードのチェック
 inline
 bool
-ZddEdge::is_one() const
+CNFddEdge::is_one() const
 {
   return mBody == kEdge1;
 }
@@ -423,7 +423,7 @@ ZddEdge::is_one() const
 // @brief 定数ノードのチェック
 inline
 bool
-ZddEdge::is_const() const
+CNFddEdge::is_const() const
 {
   return (mBody & ~1UL) == 0UL;
 }
@@ -431,7 +431,7 @@ ZddEdge::is_const() const
 // @brief エラー枝のチェック
 inline
 bool
-ZddEdge::is_error() const
+CNFddEdge::is_error() const
 {
   return mBody == kEdgeError;
 }
@@ -439,7 +439,7 @@ ZddEdge::is_error() const
 // @brief オーバーフロー枝のチェック
 inline
 bool
-ZddEdge::is_overflow() const
+CNFddEdge::is_overflow() const
 {
   return mBody == kEdgeOverflow;
 }
@@ -447,7 +447,7 @@ ZddEdge::is_overflow() const
 // @brief エラーかオーバーフローのチェック
 inline
 bool
-ZddEdge::is_invalid() const
+CNFddEdge::is_invalid() const
 {
   return (mBody & ~1UL) == 2UL;
 }
@@ -455,7 +455,7 @@ ZddEdge::is_invalid() const
 // @brief 終端枝のチェック
 inline
 bool
-ZddEdge::is_leaf() const
+CNFddEdge::is_leaf() const
 {
   return (mBody & ~3UL) == 0UL;
 }
@@ -463,21 +463,21 @@ ZddEdge::is_leaf() const
 // @brief ハッシュ値を返す．
 inline
 ymuint
-ZddEdge::hash() const
+CNFddEdge::hash() const
 {
   return mBody;
 }
 
-END_NAMESPACE_YM_ZDD
+END_NAMESPACE_YM_CNFDD
 
 BEGIN_NAMESPACE_HASH
 
-// ZddEdge をキーにしたハッシュ関数クラスの定義
+// CNFddEdge をキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsZdd::ZddEdge>
+struct hash<nsYm::nsCNFdd::CNFddEdge>
 {
   ymuint
-  operator()(const nsYm::nsZdd::ZddEdge& e) const
+  operator()(const nsYm::nsCNFdd::CNFddEdge& e) const
   {
     return e.hash();
   }
@@ -485,4 +485,4 @@ struct hash<nsYm::nsZdd::ZddEdge>
 
 END_NAMESPACE_HASH
 
-#endif // ZDDEDGE_H
+#endif // CNFDDEDGE_H

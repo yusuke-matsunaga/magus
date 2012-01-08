@@ -1,36 +1,36 @@
-#ifndef COF1OP_H
-#define COF1OP_H
+#ifndef COF0OP_H
+#define COF0OP_H
 
-/// @file Cof1Op.h
-/// @brief Cof1Op のヘッダファイル
+/// @file Cof0Op.h
+/// @brief Cof0Op のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ZddUniOp.h"
+#include "ZddOp.h"
 #include "ZddMgrImpl.h"
 
 
-BEGIN_NAMESPACE_YM_ZDD
+BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class Cof1Op Cof1Op.h "Cof1Op.h"
-/// @brief cofactor1 演算を求めるクラス
+/// @class Cof0Op Cof0Op.h "Cof0Op.h"
+/// @brief cofactor0 演算を求めるクラス
 //////////////////////////////////////////////////////////////////////
-class Cof1Op :
-  public ZddUniOp
+class Cof0Op :
+  public ZddUnOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr ZddMgrImpl
-  Cof1Op(ZddMgrImpl* mgr);
+  Cof0Op(ZddMgrImpl& mgr);
 
   /// @brief デストラクタ
   virtual
-  ~Cof1Op();
+  ~Cof0Op();
 
 
 public:
@@ -38,13 +38,13 @@ public:
   // メインの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief cofactor1 演算を行う関数
+  /// @brief cofactor0 演算を行う関数
   /// @param[in] left オペランド
-  /// @param[in] level 変数のレベル
+  /// @param[in] var 変数番号
   virtual
   ZddEdge
   apply(ZddEdge left,
-	ymuint level);
+	VarId var);
 
 
 private:
@@ -54,7 +54,7 @@ private:
 
   /// @brief 実際に演算を行う関数
   ZddEdge
-  apply_step(ZddEdge f);
+  cof0_step(ZddEdge f);
 
 
 private:
@@ -62,11 +62,20 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 親のマネージャ
+  ZddMgrImpl& mMgr;
+
+  // 変数
+  ZddVar* mVar;
+
   // 変数のレベル
   ymuint32 mLevel;
 
+  // 一時的に結果を覚えておくハッシュ表
+  hash_map<ZddEdge, ZddEdge> mCompTbl;
+
 };
 
-END_NAMESPACE_YM_ZDD
+END_NAMESPACE_YM_CNFDD
 
 #endif // COF0OP_H

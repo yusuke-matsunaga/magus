@@ -9,9 +9,7 @@
 /// All rights reserved.
 
 
-#include "ZddOp.h"
-#include "ZddMgrImpl.h"
-#include "CompTbl.h"
+#include "ZddBinOp.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
@@ -26,8 +24,8 @@ class DiffOp :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] mgr ZddMgrImpl
-  DiffOp(ZddMgrImpl& mgr);
+  /// @param[in] mgr マネージャ
+  DiffOp(ZddMgrImpl* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -54,20 +52,8 @@ private:
 
   /// @brief 実際に演算を行う関数
   ZddEdge
-  diff_step(ZddEdge f,
-	    ZddEdge g);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 親のマネージャ
-  ZddMgrImpl& mMgr;
-
-  // 演算テーブル
-  CompTbl2 mDiffTable;
+  apply_step(ZddEdge f,
+	     ZddEdge g);
 
 };
 

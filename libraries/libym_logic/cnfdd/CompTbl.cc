@@ -3,12 +3,12 @@
 /// @brief CompTbl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "CompTbl.h"
-#include "ZddMgrImpl.h"
+#include "CNFddMgrImpl.h"
 
 
 BEGIN_NONAMESPACE
@@ -19,14 +19,14 @@ const ymuint64 kMaxSize = (1UL << 20);
 END_NONAMESPACE
 
 
-BEGIN_NAMESPACE_YM_ZDD
+BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
 // クラス CompTbl
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CompTbl::CompTbl(ZddMgrImpl* mgr,
+CompTbl::CompTbl(CNFddMgrImpl& mgr,
 		 const char* name) :
   mMgr(mgr)
 {
@@ -44,6 +44,9 @@ CompTbl::CompTbl(ZddMgrImpl* mgr,
 
   mMaxSize = kMaxSize;
   mTableSize = 0;
+
+  // リストに追加する．
+  mMgr.add_table(this);
 }
 
 // デストラクタ
@@ -62,7 +65,7 @@ CompTbl::table_size() const
 void
 CompTbl::update_next_limit()
 {
-  mNextLimit = static_cast<ymuint64>(double(mTableSize) * mMgr->rt_load_limit());
+  mNextLimit = static_cast<ymuint64>(double(mTableSize) * mMgr.rt_load_limit());
 }
 
 // 使用されているセル数を取り出す．
@@ -81,26 +84,26 @@ CompTbl::max_size(ymuint64 max_size)
   mMaxSize = max_size;
 }
 
-// ZddMgr からメモリを獲得する．
+// CNFddMgr からメモリを獲得する．
 void*
 CompTbl::allocate(ymuint64 size)
 {
-  return mMgr->allocate(size);
+  return mMgr.allocate(size);
 }
 
-// ZddMgr にメモリを返す．
+// CNFddMgr にメモリを返す．
 void
 CompTbl::deallocate(void* ptr,
 		    ymuint64 size)
 {
-  mMgr->deallocate(ptr, size);
+  mMgr.deallocate(ptr, size);
 }
 
 // ログ出力用のストリームを得る．
 ostream&
 CompTbl::logstream() const
 {
-  return mMgr->logstream();
+  return mMgr.logstream();
 }
 
 
@@ -109,7 +112,7 @@ CompTbl::logstream() const
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CompTbl1::CompTbl1(ZddMgrImpl* mgr,
+CompTbl1::CompTbl1(CNFddMgrImpl& mgr,
 		   const char* name) :
   CompTbl(mgr, name)
 {
@@ -150,7 +153,7 @@ CompTbl1::resize(ymuint64 new_size)
   Cell* top = mTable;
   Cell* end = top + mTableSize;
   do {
-    top->mKey1 = ZddEdge::make_error();
+    top->mKey1 = CNFddEdge::make_error();
     ++ top;
   } while ( top != end );
 
@@ -175,7 +178,7 @@ CompTbl1::resize(ymuint64 new_size)
   return true;
 }
 
-// ZddMgr::GC()に対応する．
+// CNFddMgr::GC()に対応する．
 // 具体的には GC で削除されるノードに関連したセルをクリアする．
 void
 CompTbl1::sweep()
@@ -190,7 +193,7 @@ CompTbl1::sweep()
     if ( !cell->mKey1.is_error() &&
 	 (cell->mKey1.noref() ||
 	  cell->mAns.noref()) ) {
-      cell->mKey1 = ZddEdge::make_error();
+      cell->mKey1 = CNFddEdge::make_error();
       -- mUsedNum;
     }
   }
@@ -203,7 +206,7 @@ CompTbl1::clear()
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
   for ( ; cell != end; ++ cell) {
-    cell->mKey1 = ZddEdge::make_error();
+    cell->mKey1 = CNFddEdge::make_error();
     -- mUsedNum;
   }
 }
@@ -214,7 +217,7 @@ CompTbl1::clear()
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CompTbl2::CompTbl2(ZddMgrImpl* mgr,
+CompTbl2::CompTbl2(CNFddMgrImpl& mgr,
 		   const char* name) :
   CompTbl(mgr, name)
 {
@@ -254,7 +257,7 @@ CompTbl2::resize(ymuint64 new_size)
   Cell* top = mTable;
   Cell* end = top + mTableSize;
   do {
-    top->mKey1 = ZddEdge::make_error();
+    top->mKey1 = CNFddEdge::make_error();
     ++ top;
   } while ( top != end );
 
@@ -280,7 +283,7 @@ CompTbl2::resize(ymuint64 new_size)
   return true;
 }
 
-// ZddMgr::GC()に対応する．
+// CNFddMgr::GC()に対応する．
 // 具体的には GC で削除されるノードに関連したセルをクリアする．
 void
 CompTbl2::sweep()
@@ -296,7 +299,7 @@ CompTbl2::sweep()
 	 (cell->mKey1.noref() ||
 	  cell->mKey2.noref() ||
 	  cell->mAns.noref()) ) {
-      cell->mKey1 = ZddEdge::make_error();
+      cell->mKey1 = CNFddEdge::make_error();
       -- mUsedNum;
     }
   }
@@ -309,9 +312,9 @@ CompTbl2::clear()
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
   for ( ; cell != end; ++ cell) {
-    cell->mKey1 = ZddEdge::make_error();
+    cell->mKey1 = CNFddEdge::make_error();
     -- mUsedNum;
   }
 }
 
-END_NAMESPACE_YM_ZDD
+END_NAMESPACE_YM_CNFDD

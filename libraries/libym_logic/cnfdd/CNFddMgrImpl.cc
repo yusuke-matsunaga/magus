@@ -1,17 +1,17 @@
 
-/// @file ZddMgrImpl.cc
-/// @brief ZddMgrImpl の実装ファイル
+/// @file CNFddMgrImpl.cc
+/// @brief CNFddMgrImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ZddMgrImpl.h"
+#include "CNFddMgrImpl.h"
 
-#include "ym_logic/Zdd.h"
-#include "ym_logic/ZddMgr.h"
-#include "ZddVar.h"
+#include "ym_logic/CNFdd.h"
+#include "ym_logic/CNFddMgr.h"
+#include "CNFddVar.h"
 
 #include "CapOp.h"
 #include "CupOp.h"
@@ -29,7 +29,7 @@
 #endif
 
 
-BEGIN_NAMESPACE_YM_ZDD
+BEGIN_NAMESPACE_YM_CNFDD
 
 #if !defined(__SUNPRO_CC) || __SUNPRO_CC >= 0x500
 
@@ -69,14 +69,16 @@ const ymuint64 VARTABLE_INIT_SIZE = 1 * K_unit;
 // 節点テーブルのハッシュ関数
 inline
 ymuint64
-hash_func3(ZddEdge id1,
-	   ZddEdge id2,
+hash_func3(CNFddEdge id1,
+	   CNFddEdge id2,
+	   CNFddEdge id3,
 	   ymuint level)
 {
   ymuint64 v1 = id1.hash();
   ymuint64 v2 = id2.hash();
-  ymuint64 id3 = level;
-  return static_cast<ymuint64>(v1 + (v2 >> 2) + (id3 << 3) - id3);
+  ymuint64 v3 = id3.hash();
+  ymuint64 v4 = level;
+  return static_cast<ymuint64>((v1 >> 2) + (v2 >> 1) + v3 + v4 * 7);
 }
 
 // VarId 用のハッシュ関数
@@ -92,30 +94,17 @@ END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス ZddEdge
+// クラス CNFddMgrImpl
 //////////////////////////////////////////////////////////////////////
 
-// @brief 参照されていない時にtrueを返す
-bool
-ZddEdge::noref() const
-{
-  ZddNode* node = get_node();
-  return node->noref();
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス ZddMgrImpl
-//////////////////////////////////////////////////////////////////////
-
-ZddMgrImpl* ZddMgrImpl::mDefaultMgr = NULL;
+CNFddMgrImpl* CNFddMgrImpl::mDefaultMgr = NULL;
 
 // デフォルトマネージャを返すクラスメソッド
-ZddMgrImpl*
-ZddMgrImpl::default_mgr()
+CNFddMgrImpl*
+CNFddMgrImpl::default_mgr()
 {
   if ( !mDefaultMgr ) {
-    mDefaultMgr = new ZddMgrImpl("default manager");
+    mDefaultMgr = new CNFddMgrImpl("default manager");
     assert_cond(mDefaultMgr, __FILE__, __LINE__);
   }
   return mDefaultMgr;
@@ -124,15 +113,15 @@ ZddMgrImpl::default_mgr()
 // @brief コンストラクタ
 // @param[in] name 名前
 // @param[in] option オプション
-ZddMgrImpl::ZddMgrImpl(const string& name,
-		       const string& option) :
+CNFddMgrImpl::CNFddMgrImpl(const string& name,
+			   const string& option) :
   mName(name)
 {
   if ( name == string() ) {
     // 適当な名前を付ける．
     static int num = 1;
     ostringstream s;
-    s << "zdd_mgr#" << num ++;
+    s << "cnfdd_mgr#" << num ++;
     mName = s.str();
   }
 
@@ -146,8 +135,8 @@ ZddMgrImpl::ZddMgrImpl(const string& name,
   }
   mLogFp = mNullStream;
 
-  // ZDD リストの初期化
-  mTopZdd = NULL;
+  // CNFDD リストの初期化
+  mTopCNFdd = NULL;
 
   // ユーザー設定可能パラメータのデフォルト値を設定
   mGcThreshold = DEFAULT_GC_THRESHOLD;
@@ -186,33 +175,36 @@ ZddMgrImpl::ZddMgrImpl(const string& name,
   mVarNum = 0;
   mVarTop = NULL;
 
+  // 演算結果テーブルの初期化
+  mTblList.clear();
+
   // 演算クラスの生成
-  mCapOp = new CapOp(this);
-  mCupOp = new CupOp(this);
-  mDiffOp = new DiffOp(this);
-  mSwapOp = new SwapOp(this);
-  mCof0Op = new Cof0Op(this);
-  mCof1Op = new Cof1Op(this);
+  mCapOp = new CapOp(*this);
+  mCupOp = new CupOp(*this);
+  mDiffOp = new DiffOp(*this);
+  mSwapOp = new SwapOp(*this);
+  mCof0Op = new Cof0Op(*this);
+  mCof1Op = new Cof1Op(*this);
 }
 
 // デストラクタ
-ZddMgrImpl::~ZddMgrImpl()
+CNFddMgrImpl::~CNFddMgrImpl()
 {
   assert_cond(this != mDefaultMgr, __FILE__, __LINE__);
 
-  // ZDD の解放
-  // と言っても Zdd のオブジェクトを削除するわけには行かないので
-  // デフォルトマネージャのエラーZDDにすり替える．
-  if ( mTopZdd ) {
-    Zdd* last = NULL;
-    for (Zdd* bdd = mTopZdd; bdd; bdd = bdd->mNext) {
-      bdd->mRoot = ZddEdge::make_error();
+  // CNFDD の解放
+  // と言っても CNFdd のオブジェクトを削除するわけには行かないので
+  // デフォルトマネージャのエラーCNFDDにすり替える．
+  if ( mTopCNFdd ) {
+    CNFdd* last = NULL;
+    for (CNFdd* bdd = mTopCNFdd; bdd; bdd = bdd->mNext) {
+      bdd->mRoot = CNFddEdge::make_error();
       bdd->mMgr = mDefaultMgr;
       last = bdd;
     }
-    Zdd* first = mDefaultMgr->mTopZdd;
-    mDefaultMgr->mTopZdd = mTopZdd;
-    mTopZdd->mPrev = NULL;
+    CNFdd* first = mDefaultMgr->mTopCNFdd;
+    mDefaultMgr->mTopCNFdd = mTopCNFdd;
+    mTopCNFdd->mPrev = NULL;
     last->mNext = first;
     if ( first ) {
       first->mPrev = last;
@@ -226,8 +218,8 @@ ZddMgrImpl::~ZddMgrImpl()
   dealloc_nodetable(mNodeTable, mTableSize);
 
   // 節点用のメモリブロックの解放
-  for (ZddNode* blk = mTopBlk; blk; ) {
-    ZddNode* temp = blk;
+  for (CNFddNode* blk = mTopBlk; blk; ) {
+    CNFddNode* temp = blk;
     blk = temp->mLink;
     dealloc_nodechunk(temp);
   }
@@ -236,8 +228,8 @@ ZddMgrImpl::~ZddMgrImpl()
   }
 
   // 変数の解放
-  for (ZddVar* var = mVarTop; var; ) {
-    ZddVar* next = var->mNext;
+  for (CNFddVar* var = mVarTop; var; ) {
+    CNFddVar* next = var->mNext;
     delete var;
     var = next;
   }
@@ -260,21 +252,21 @@ ZddMgrImpl::~ZddMgrImpl()
 
 // log用ストリームを設定する．
 void
-ZddMgrImpl::set_logstream(ostream& s)
+CNFddMgrImpl::set_logstream(ostream& s)
 {
   mLogFp = &s;
 }
 
 // log用ストリームを解除する．
 void
-ZddMgrImpl::unset_logstream()
+CNFddMgrImpl::unset_logstream()
 {
   mLogFp = mNullStream;
 }
 
 // log用ファイルポインタを読み出す．
 ostream&
-ZddMgrImpl::logstream() const
+CNFddMgrImpl::logstream() const
 {
   return *mLogFp;
 }
@@ -283,37 +275,37 @@ ZddMgrImpl::logstream() const
 // 確保に失敗したら false を返す．
 // 最後の変数の後ろに挿入される．
 bool
-ZddMgrImpl::new_var(VarId varid)
+CNFddMgrImpl::new_var(VarId varid)
 {
   return alloc_var(varid) != NULL;
 }
 
 // 変数を確保する．
-ZddVar*
-ZddMgrImpl::alloc_var(VarId varid)
+CNFddVar*
+CNFddMgrImpl::alloc_var(VarId varid)
 {
   if ( mVarTableSize == mVarNum ) {
-    ZddVar** old_table = mVarHashTable;
+    CNFddVar** old_table = mVarHashTable;
     ymuint64 old_size = mVarTableSize;
     ymuint64 new_size = mVarTableSize << 1;
-    ZddVar** new_hash = alloc_vartable(new_size);
+    CNFddVar** new_hash = alloc_vartable(new_size);
     if ( !new_hash ) {
       return NULL;
     }
     mVarTableSize = new_size;
     mVarHashTable = new_hash;
     dealloc_vartable(old_table, old_size);
-    for (ZddVar* var = mVarTop; var; var = var->mNext) {
+    for (CNFddVar* var = mVarTop; var; var = var->mNext) {
       reg_var(var);
     }
   }
-  ZddVar* var = new ZddVar(varid);
+  CNFddVar* var = new CNFddVar(varid);
   if ( var ) {
     reg_var(var);
     ++ mVarNum;
     // varid の昇順になるような位置に挿入する．
-    ZddVar** pprev = &mVarTop;
-    ZddVar* temp;
+    CNFddVar** pprev = &mVarTop;
+    CNFddVar* temp;
     while ( (temp = *pprev) && temp->varid() < varid ) {
       pprev = &(temp->mNext);
       temp = *pprev;
@@ -326,10 +318,10 @@ ZddMgrImpl::alloc_var(VarId varid)
 
 // 現在登録されている変数をそのレベルの昇順で返す．
 ymuint
-ZddMgrImpl::var_list(list<VarId>& vlist) const
+CNFddMgrImpl::var_list(list<VarId>& vlist) const
 {
   vlist.clear();
-  for (ZddVar* var = mVarTop; var; var = var->mNext) {
+  for (CNFddVar* var = mVarTop; var; var = var->mNext) {
     vlist.push_back(var->varid());
   }
   return mVarNum;
@@ -337,7 +329,7 @@ ZddMgrImpl::var_list(list<VarId>& vlist) const
 
 // 変数番号からレベルを得る．
 ymuint
-ZddMgrImpl::level(VarId varid) const
+CNFddMgrImpl::level(VarId varid) const
 {
   // 実は同じ
   return varid.val();
@@ -345,69 +337,83 @@ ZddMgrImpl::level(VarId varid) const
 
 // レベルから変数番号を得る．
 VarId
-ZddMgrImpl::varid(ymuint level) const
+CNFddMgrImpl::varid(ymuint level) const
 {
   // 実は同じ
   return VarId(level);
 }
 
-// @brief e1 $\cap$ e2 を計算する．
-ZddEdge
-ZddMgrImpl::cap(ZddEdge e1,
-		ZddEdge e2)
+// @brief e1 $\wedge$ e2 を計算する．
+CNFddEdge
+CNFddMgrImpl::conjunction(CNFddEdge e1,
+			  CNFddEdge e2)
 {
-  return mCapOp->apply(e1, e2);
+  return mConOp->apply(e1, e2);
 }
 
+#if 0
 // @brief e1 $\cup$ e2 を計算する．
-ZddEdge
-ZddMgrImpl::cup(ZddEdge e1,
-		ZddEdge e2)
+CNFddEdge
+CNFddMgrImpl::cup(CNFddEdge e1,
+		CNFddEdge e2)
 {
   return mCupOp->apply(e1, e2);
 }
+#endif
 
 // @brief src1 $\setdiff$ src2 を計算する．
-ZddEdge
-ZddMgrImpl::diff(ZddEdge e1,
-		 ZddEdge e2)
+CNFddEdge
+CNFddMgrImpl::diff(CNFddEdge e1,
+		 CNFddEdge e2)
 {
   return mDiffOp->apply(e1, e2);
 }
 
-// @brief 指定した変数の0枝と1枝を交換する．
+// @brief 指定した変数のリテラルを加える．
 // @param[in] e 枝
 // @param[in] var 交換を行う変数番号
-ZddEdge
-ZddMgrImpl::swap(ZddEdge e,
-		 VarId var)
+// @param[in] pol 極性
+CNFddEdge
+CNFddMgrImpl::add_literal(CNFddEdge e,
+			  VarId var,
+			  tPol pol)
 {
-  return mSwapOp->apply(e, level(var));
+  return mAddLiteralOp->apply(e, level(var), pol);
 }
 
 // @brief 指定された変数を含まないコファクターを返す．
-ZddEdge
-ZddMgrImpl::cofactor0(ZddEdge e,
-		      VarId var)
+// @param[in] e 枝
+// @param[in] var 変数番号
+CNFddEdge
+CNFddMgrImpl::cofactor_0(CNFddEdge e,
+			 VarId var)
 {
   return mCof0Op->apply(e, level(var));
 }
 
 // @brief 指定された変数を含むコファクターを返す．
-ZddEdge
-ZddMgrImpl::cofactor1(ZddEdge e,
-		      VarId var)
+// @param[in] e 枝
+// @param[in] var 変数番号
+CNFddEdge
+CNFddMgrImpl::cofactor_p(CNFddEdge e,
+			 VarId var)
 {
-  return mCof1Op->apply(e, level(var));
+  return mCofPOp->apply(e, level(var));
 }
 
-/// @brief e の参照回数が0なら true を返す．
-bool
-check_noref(ZddEdge e);
+// @brief 指定された変数を含むコファクターを返す．
+// @param[in] e 枝
+// @param[in] var 変数番号
+CNFddEdge
+CNFddMgrImpl::cofactor_n(CNFddEdge e,
+			 VarId var)
+{
+  return mCofNOp->apply(e, level(var));
+}
 
 // 節点テーブルを次に拡大する時の基準値を計算する．
 void
-ZddMgrImpl::set_next_limit_size()
+CNFddMgrImpl::set_next_limit_size()
 {
   // 制限値はロード値のリミットと現在のテーブルサイズから計算される
   mNextLimit = static_cast<ymuint64>(double(mTableSize) * mNtLoadLimit);
@@ -415,7 +421,7 @@ ZddMgrImpl::set_next_limit_size()
 
 // @brief ガーベージコレクションを許可する．
 void
-ZddMgrImpl::enable_gc()
+CNFddMgrImpl::enable_gc()
 {
   if ( mGcEnable > 0 ) {
     -- mGcEnable;
@@ -424,7 +430,7 @@ ZddMgrImpl::enable_gc()
 
 // @brief ガーベージコレクションを禁止する．
 void
-ZddMgrImpl::disable_gc()
+CNFddMgrImpl::disable_gc()
 {
   ++ mGcEnable;
 }
@@ -435,26 +441,26 @@ ZddMgrImpl::disable_gc()
 // その際，それらのノードに関係した演算結果テーブルの内容はクリアされる．
 // shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
 void
-ZddMgrImpl::gc(bool shrink_nodetable)
+CNFddMgrImpl::gc(bool shrink_nodetable)
 {
-  logstream() << "ZddMgrImpl::GC() begin...." << endl;
+  logstream() << "CNFddMgrImpl::GC() begin...." << endl;
 
   // 演算結果テーブルをスキャンしておかなければならない．
-  for (list<ZddOp*>::iterator p = mOpList.begin();
-       p != mOpList.end(); ++ p) {
-    ZddOp* op = *p;
-    op->sweep();
+  for (list<CompTbl*>::iterator p = mTblList.begin();
+       p != mTblList.end(); ++ p) {
+    CompTbl* tbl = *p;
+    if ( tbl->used_num() > 0 ) tbl->sweep();
   }
 
   // その他のテーブルの sweep を行う．
   mSweepMgr.prop_event();
 
   // 節点テーブルをスキャンしてゴミを取り除く
-  ZddNode** ptr = mNodeTable;
-  ZddNode** end = mNodeTable + mTableSize;
+  CNFddNode** ptr = mNodeTable;
+  CNFddNode** end = mNodeTable + mTableSize;
   do {
-    ZddNode* temp;
-    ZddNode** prev = ptr;
+    CNFddNode* temp;
+    CNFddNode** prev = ptr;
     while ( (temp = *prev) ) {
       if ( temp->noref() ) {
 	// どこからも参照されていないノードは節点テーブルから除く
@@ -475,10 +481,10 @@ ZddMgrImpl::gc(bool shrink_nodetable)
   // その時には，このブロックに含まれるノードはフリーリストから除かなければ
   // ならない．
   mFreeTop = NULL;
-  ZddNode** prev = &mFreeTop;
-  ZddNode** prev_blk = &mTopBlk;
+  CNFddNode** prev = &mFreeTop;
+  CNFddNode** prev_blk = &mTopBlk;
   ymuint64 delete_num = 0;
-  for (ZddNode* blk; (blk = *prev_blk);  ) {
+  for (CNFddNode* blk; (blk = *prev_blk);  ) {
     if ( scan_nodechunk(blk, NODE_UNIT, prev) ) {
       *prev_blk = blk->mLink;
       dealloc_nodechunk(blk);
@@ -524,7 +530,7 @@ ZddMgrImpl::gc(bool shrink_nodetable)
     }
   }
 
-  logstream() << "ZddMgrImpl::GC() end." << endl
+  logstream() << "CNFddMgrImpl::GC() end." << endl
 	      << "  " << free_num
 	      << " nodes are deleted from the node-table." << endl
 	      << "  " << delete_num << " nodes are (really) freed."
@@ -534,32 +540,32 @@ ZddMgrImpl::gc(bool shrink_nodetable)
 // 節点テーブルを拡張する
 // メモリアロケーションに失敗したら false を返す．
 bool
-ZddMgrImpl::resize(ymuint64 new_size)
+CNFddMgrImpl::resize(ymuint64 new_size)
 {
-  logstream() << "ZddMgrImpl::resize(" << new_size << ")" << endl;
+  logstream() << "CNFddMgrImpl::resize(" << new_size << ")" << endl;
 
-  ZddNode** new_table = alloc_nodetable(new_size);
+  CNFddNode** new_table = alloc_nodetable(new_size);
   if ( !new_table ) {
     // アロケーションに失敗した．
     return false;
   }
 
   ymuint64 old_size = mTableSize;
-  ZddNode** old_table = mNodeTable;
+  CNFddNode** old_table = mNodeTable;
   mNodeTable = new_table;
   mTableSize = new_size;
   mTableSize_1 = mTableSize - 1;
   set_next_limit_size();
-  ZddNode** tbl = old_table;
+  CNFddNode** tbl = old_table;
   if ( tbl ) {
-    ZddNode** end = tbl + old_size;
+    CNFddNode** end = tbl + old_size;
     do {
-      ZddNode* next;
-      ZddNode* temp;
+      CNFddNode* next;
+      CNFddNode* temp;
       for (temp = *tbl; temp; temp = next) {
 	next = temp->mLink;
 	ymuint pos = hash_func3(temp->edge0(), temp->edge1(), temp->level());
-	ZddNode*& entry = mNodeTable[pos & mTableSize_1];
+	CNFddNode*& entry = mNodeTable[pos & mTableSize_1];
 	temp->mLink = entry;
 	entry = temp;
       }
@@ -571,7 +577,7 @@ ZddMgrImpl::resize(ymuint64 new_size)
 
 // GC 前の sweep 処理を行うためのバインダーを登録する．
 void
-ZddMgrImpl::reg_sweep_binder(EventBinder* binder)
+CNFddMgrImpl::reg_sweep_binder(EventBinder* binder)
 {
   mSweepMgr.reg_binder(binder);
 }
@@ -581,30 +587,30 @@ ZddMgrImpl::reg_sweep_binder(EventBinder* binder)
 // パラメータを格納する構造体bdd_param_tに必要なパラメータを設定し，
 // 設定したいパラメータに対応するビットのみをmaskにセットする．
 void
-ZddMgrImpl::param(const ZddMgrParam& param,
+CNFddMgrImpl::param(const CNFddMgrParam& param,
 		  ymuint32 mask)
 {
-  if ( mask & ZddMgrParam::GC_THRESHOLD ) {
+  if ( mask & CNFddMgrParam::GC_THRESHOLD ) {
     mGcThreshold = param.mGcThreshold;
   }
-  if ( mask & ZddMgrParam::GC_NODE_LIMIT ) {
+  if ( mask & CNFddMgrParam::GC_NODE_LIMIT ) {
     mGcNodeLimit = param.mGcNodeLimit;
   }
-  if ( mask & ZddMgrParam::NT_LOAD_LIMIT ) {
+  if ( mask & CNFddMgrParam::NT_LOAD_LIMIT ) {
     mNtLoadLimit = param.mNtLoadLimit;
     set_next_limit_size();
   }
-  if ( mask & ZddMgrParam::RT_LOAD_LIMIT ) {
+  if ( mask & CNFddMgrParam::RT_LOAD_LIMIT ) {
     mRtLoadLimit = param.mRtLoadLimit;
   }
-  if ( mask & ZddMgrParam::MEM_LIMIT ) {
+  if ( mask & CNFddMgrParam::MEM_LIMIT ) {
     mMemLimit = param.mMemLimit;
   }
 }
 
 // パラメータを読み出す
 void
-ZddMgrImpl::param(ZddMgrParam& param) const
+CNFddMgrImpl::param(CNFddMgrParam& param) const
 {
   param.mGcThreshold = mGcThreshold;
   param.mGcNodeLimit = mGcNodeLimit;
@@ -615,7 +621,7 @@ ZddMgrImpl::param(ZddMgrParam& param) const
 
 // 名前を得る．
 const string&
-ZddMgrImpl::name() const
+CNFddMgrImpl::name() const
 {
   return mName;
 }
@@ -624,65 +630,73 @@ ZddMgrImpl::name() const
 // これらの変数はread-onlyなので，変数自体を外部で宣言せずに，
 // それを読み出す関数を定義している．
 ymuint64
-ZddMgrImpl::used_mem() const
+CNFddMgrImpl::used_mem() const
 {
   return mUsedMem;
 }
 
 ymuint64
-ZddMgrImpl::node_num() const
+CNFddMgrImpl::node_num() const
 {
   return mNodeNum;
 }
 
 ymuint64
-ZddMgrImpl::garbage_num() const
+CNFddMgrImpl::garbage_num() const
 {
   return mGarbageNum;
 }
 
 ymuint64
-ZddMgrImpl::avail_num() const
+CNFddMgrImpl::avail_num() const
 {
   return mFreeNum;
 }
 
 ymuint64
-ZddMgrImpl::gc_count() const
+CNFddMgrImpl::gc_count() const
 {
   return mGcCount;
 }
 
 // 同一の節点が存在するか調べ，ない時にのみ新たなノードを確保する
 // 使用メモリ量が上限を越えたら kEdgeInvalid を返す．
-ZddEdge
-ZddMgrImpl::new_node(ymuint level,
-		     ZddEdge e0,
-		     ZddEdge e1)
+CNFddEdge
+CNFddMgrImpl::new_node(ymuint level,
+		       CNFddEdge e_0,
+		       CNFddEdge e_p,
+		       CNFddEdge e_n)
 {
-  if ( e0.is_error() || e1.is_error() ) {
-    return ZddEdge::make_error();
+  if ( e_0.is_invalid() ) {
+    return e_0;
   }
-  if ( e0.is_overflow() || e1.is_overflow() ) {
-    return ZddEdge::make_overflow();
+  if ( e_p.is_invalid() ) {
+    return e_p;
+  }
+  if ( e_n.is_invalid() ) {
+    return e_n;
   }
 
   // 0 element 属性は0枝のみを考える．
-  bool zattr = e0.zattr();
-  e0.normalize();
+  bool zattr = e_0.zattr();
+  e_0.normalize();
 
-  ZddEdge ans;
-  if ( e1.is_zero() ) {
-    ans = e0;
+  CNFddEdge ans;
+  if ( e_p.is_zero() && e_n.is_zero() ) {
+    ans = e_0;
   }
   else {
     // 節点テーブルを探す．
-    ymuint64 pos = hash_func3(e0, e1, level);
+    ymuint64 pos = hash_func3(e_0, e_p, e_n, level);
     bool found = false;
-    for (ZddNode* temp = mNodeTable[pos & mTableSize_1]; temp; temp = temp->mLink) {
-      if ( temp->edge0() == e0 && temp->edge1() == e1 && temp->level() == level ) {
+    for (CNFddNode* temp = mNodeTable[pos & mTableSize_1];
+	 temp; temp = temp->mLink) {
+      if ( temp->edge_0() == e_0 &&
+	   temp->edge_p() == e_p &&
+	   temp->edge_n() == e_n &&
+	   temp->level() == level ) {
 	// 同一の節点がすでに登録されている
-	ans = ZddEdge(temp, false);
+	ans = CNFddEdge(temp, false);
 	found = true;
 	break;
       }
@@ -690,13 +704,14 @@ ZddMgrImpl::new_node(ymuint level,
     if ( !found ) {
       // 節点テーブルには登録されていなかったので新しい節点を取ってきて
       // 内容を設定する．
-      ZddNode* temp = alloc_node();
+      CNFddNode* temp = alloc_node();
       if ( !temp ) {
 	// メモリアロケーションに失敗した
-	return ZddEdge::make_overflow();
+	return CNFddEdge::make_overflow();
       }
-      temp->mEdge0 = e0;
-      temp->mEdge1 = e1;
+      temp->mEdge0 = e_0;
+      temp->mEdgeP = e_p;
+      temp->mEdgeN = e_n;
       temp->mLevel = level;
       temp->mRefMark = 0UL;  // mark = none, link = 0
 
@@ -705,15 +720,15 @@ ZddMgrImpl::new_node(ymuint level,
 	// ノード数が制限値を越えたのでテーブルを2倍に拡張する
 	if ( !resize(mTableSize << 1) ) {
 	  // リサイズが失敗した．
-	  return ZddEdge::make_overflow();
+	  return CNFddEdge::make_overflow();
 	}
       }
       {
-	ZddNode*& entry = mNodeTable[pos & mTableSize_1];
+	CNFddNode*& entry = mNodeTable[pos & mTableSize_1];
 	temp->mLink = entry;
 	entry = temp;
       }
-      ans = ZddEdge(temp);
+      ans = CNFddEdge(temp);
     }
   }
   ans.add_zattr(zattr);
@@ -723,14 +738,14 @@ ZddMgrImpl::new_node(ymuint level,
 
 // e の参照回数を増やす．
 void
-ZddMgrImpl::inc_rootref(ZddEdge e)
+CNFddMgrImpl::inc_rootref(CNFddEdge e)
 {
   activate(e);
 }
 
 // e の参照回数を減らす．
 void
-ZddMgrImpl::dec_rootref(ZddEdge e)
+CNFddMgrImpl::dec_rootref(CNFddEdge e)
 {
   deactivate(e);
 
@@ -745,27 +760,27 @@ ZddMgrImpl::dec_rootref(ZddEdge e)
 
 // mVarTable 中のマークを消す．
 void
-ZddMgrImpl::clear_varmark()
+CNFddMgrImpl::clear_varmark()
 {
-  for (ZddVar* var = mVarTop; var; var = var->mNext) {
+  for (CNFddVar* var = mVarTop; var; var = var->mNext) {
     var->mMark = 0;
   }
   mVarSet.clear();
 }
 
 // level の変数を取り出す．
-ZddVar*
-ZddMgrImpl::var_at(ymuint level) const
+CNFddVar*
+CNFddMgrImpl::var_at(ymuint level) const
 {
   return var_of(VarId(level));
 }
 
 // varid の変数を取出す．
-ZddVar*
-ZddMgrImpl::var_of(VarId varid) const
+CNFddVar*
+CNFddMgrImpl::var_of(VarId varid) const
 {
   ymuint64 pos = var_hash(varid) & (mVarTableSize - 1);
-  for (ZddVar* var = mVarHashTable[pos]; var; var = var->mLink) {
+  for (CNFddVar* var = mVarHashTable[pos]; var; var = var->mLink) {
     if ( var->varid() == varid ) {
       return var;
     }
@@ -776,10 +791,10 @@ ZddMgrImpl::var_of(VarId varid) const
 
 // Var を登録する．
 void
-ZddMgrImpl::reg_var(ZddVar* var)
+CNFddMgrImpl::reg_var(CNFddVar* var)
 {
   ymuint64 pos = var_hash(var->varid()) & (mVarTableSize - 1);
-  ZddVar*& entry = mVarHashTable[pos];
+  CNFddVar*& entry = mVarHashTable[pos];
   var->mLink = entry;
   entry = var;
 }
@@ -789,11 +804,12 @@ ZddMgrImpl::reg_var(ZddVar* var)
 // 無駄な関数呼び出しを避けるため，この関数を呼び出す前に，
 // このノードがロックされていないことを確認してあるものとする．
 void
-ZddMgrImpl::lockall(ZddNode* vp)
+CNFddMgrImpl::lockall(CNFddNode* vp)
 {
   -- mGarbageNum;
-  activate(vp->edge0());
-  activate(vp->edge1());
+  activate(vp->edge_0());
+  activate(vp->edge_p());
+  activate(vp->edge_n());
 }
 
 // ノードをアンロックする．
@@ -802,18 +818,26 @@ ZddMgrImpl::lockall(ZddNode* vp)
 // 無駄な関数呼び出しを避けるため，この関数を呼び出す前に，
 // このノードがロックされていたことは確認してあるものとする．
 void
-ZddMgrImpl::unlockall(ZddNode* vp)
+CNFddMgrImpl::unlockall(CNFddNode* vp)
 {
   ++ mGarbageNum;
-  deactivate(vp->edge0());
-  deactivate(vp->edge1());
+  deactivate(vp->edge_0());
+  deactivate(vp->edge_p());
+  deactivate(vp->edge_n());
+}
+
+// 演算結果テーブルを登録する．
+void
+CNFddMgrImpl::add_table(CompTbl* tbl)
+{
+  mTblList.push_back(tbl);
 }
 
 // 節点を確保する．
-ZddNode*
-ZddMgrImpl::alloc_node()
+CNFddNode*
+CNFddMgrImpl::alloc_node()
 {
-  ZddNode* temp;
+  CNFddNode* temp;
 
   if ( (temp = mFreeTop) ) {
     // フリーリストに節点があったのでそれを取り出す．
@@ -852,15 +876,15 @@ ZddMgrImpl::alloc_node()
 // ただし，チャンク全体が参照されていなかった場合にはフリーリストには
 // つながない．その場合には true を返す．
 bool
-ZddMgrImpl::scan_nodechunk(ZddNode* blk,
+CNFddMgrImpl::scan_nodechunk(CNFddNode* blk,
 			   ymuint blk_size,
-			   ZddNode**& prev)
+			   CNFddNode**& prev)
 {
-  ZddNode** prev_orig = prev;
+  CNFddNode** prev_orig = prev;
   bool can_delete = true;
   // メモリブロックの先頭のノードは次のブロックを指すポインタとして
   // 使っているのでスキャンから除外する．
-  ZddNode* temp = &blk[1];
+  CNFddNode* temp = &blk[1];
   for (ymuint i = 1; i < blk_size; ++ i, ++ temp) {
     if ( temp->noref() ) {
       *prev = temp;
@@ -878,70 +902,70 @@ ZddMgrImpl::scan_nodechunk(ZddNode* blk,
 
 // 変数テーブル用のメモリを確保する．
 // size はバイト単位ではなくエントリ数．
-ZddVar**
-ZddMgrImpl::alloc_vartable(ymuint size)
+CNFddVar**
+CNFddMgrImpl::alloc_vartable(ymuint size)
 {
-  ymuint64 byte_size = sizeof(ZddVar*) * size;
+  ymuint64 byte_size = sizeof(CNFddVar*) * size;
   void* ptr = allocate(byte_size);
   if ( ptr ) {
     memset(ptr, 0, byte_size);
   }
-  return static_cast<ZddVar**>(ptr);
+  return static_cast<CNFddVar**>(ptr);
 }
 
 // 変数テーブル用のメモリを解放する．
 // size はバイト単位ではなくエントリ数
 void
-ZddMgrImpl::dealloc_vartable(ZddVar** table,
+CNFddMgrImpl::dealloc_vartable(CNFddVar** table,
 			     ymuint size)
 {
-  ymuint64 byte_size = sizeof(ZddVar*) * size;
+  ymuint64 byte_size = sizeof(CNFddVar*) * size;
   deallocate(table, byte_size);
 }
 
 // 節点テーブル用のメモリを確保する．
 // size はバイト単位ではなくエントリ数
-ZddNode**
-ZddMgrImpl::alloc_nodetable(ymuint64 size)
+CNFddNode**
+CNFddMgrImpl::alloc_nodetable(ymuint64 size)
 {
-  ymuint64 byte_size = sizeof(ZddNode*) * size;
+  ymuint64 byte_size = sizeof(CNFddNode*) * size;
   void* ptr = allocate(byte_size);
   if ( ptr ) {
     memset(ptr, 0, byte_size);
   }
-  return static_cast<ZddNode**>(ptr);
+  return static_cast<CNFddNode**>(ptr);
 }
 
 // 節点テーブル用のメモリを解放する．
 // size はバイト単位ではなくエントリ数
 void
-ZddMgrImpl::dealloc_nodetable(ZddNode** table,
+CNFddMgrImpl::dealloc_nodetable(CNFddNode** table,
 			      ymuint64 size)
 {
-  ymuint64 byte_size = sizeof(ZddNode*) * size;
+  ymuint64 byte_size = sizeof(CNFddNode*) * size;
   deallocate(table, byte_size);
 }
 
 // 節点チャンク用のメモリを確保する．
-ZddNode*
-ZddMgrImpl::alloc_nodechunk()
+CNFddNode*
+CNFddMgrImpl::alloc_nodechunk()
 {
-  const ymuint64 byte_size = sizeof(ZddNode) * NODE_UNIT;
+  const ymuint64 byte_size = sizeof(CNFddNode) * NODE_UNIT;
   void* ptr = allocate(byte_size);
-  return static_cast<ZddNode*>(ptr);
+  return static_cast<CNFddNode*>(ptr);
 }
 
 // 節点チャンク用のメモリを解放する．
 void
-ZddMgrImpl::dealloc_nodechunk(ZddNode* chunk)
+CNFddMgrImpl::dealloc_nodechunk(CNFddNode* chunk)
 {
-  const ymuint64 byte_size = sizeof(ZddNode) * NODE_UNIT;
+  const ymuint64 byte_size = sizeof(CNFddNode) * NODE_UNIT;
   deallocate(chunk, byte_size);
 }
 
 // BDD パッケージ用のメモリ確保ルーティン
 void*
-ZddMgrImpl::allocate(ymuint64 size)
+CNFddMgrImpl::allocate(ymuint64 size)
 {
   if ( mOverflow || mMemLimit > 0 && mUsedMem + size > mMemLimit ) {
     // メモリ制限をオーバーしたので 0 を返す．
@@ -970,7 +994,7 @@ ZddMgrImpl::allocate(ymuint64 size)
 #if defined(BDD_DEBUG_MEMALLOC)
   {
     ios::fmtflags save = logstream().flags();
-    logstream() << "ZddMgrImpl::allocate(" << size << ") --> "
+    logstream() << "CNFddMgrImpl::allocate(" << size << ") --> "
 		<< setw(8) << hex << reinterpret_cast<ympuint>(ans) << dec
 		<< endl;
     logstream().flags(save);
@@ -981,13 +1005,13 @@ ZddMgrImpl::allocate(ymuint64 size)
 
 // BDD パッケージ用のメモリ解放ルーティン
 void
-ZddMgrImpl::deallocate(void* ptr,
+CNFddMgrImpl::deallocate(void* ptr,
 		       ymuint64 size)
 {
 #if defined(BDD_DEBUG_MEMALLOC)
   {
     ios::fmtflags save = logstream().flags();
-    logstream() << "ZddMgrImpl::deallocate("
+    logstream() << "CNFddMgrImpl::deallocate("
 		<< setw(8) << hex << reinterpret_cast<ympuint>(ptr) << dec
 		<< ", " << size << ")" << endl;
     logstream().flags(save);
@@ -1006,22 +1030,21 @@ ZddMgrImpl::deallocate(void* ptr,
 
 
 //////////////////////////////////////////////////////////////////////
-// ZddEdge に関連する関数
+// CNFddEdge に関連する関数
 //////////////////////////////////////////////////////////////////////
 
 // 節点のマークを消す．
 void
-clear_mark(ZddEdge e)
+clear_mark(CNFddEdge e)
 {
-  for ( ; ; ) {
-    ZddNode* vp = e.get_node();
-    if ( !vp || !vp->mark() ) {
-      break;
-    }
-    vp->mark(0);
-    clear_mark(vp->edge0());
-    e = vp->edge1();
+  CNFddNode* vp = e.get_node();
+  if ( !vp || !vp->mark() ) {
+    break;
   }
+  vp->mark(0);
+  clear_mark(vp->edge_0());
+  clear_mark(vp->edge_p());
+  clear_mark(vp->edge_n());
 }
 
-END_NAMESPACE_YM_ZDD
+END_NAMESPACE_YM_CNFDD

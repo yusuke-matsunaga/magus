@@ -1,36 +1,35 @@
-#ifndef ZDDMGRIMPL_H
-#define ZDDMGRIMPL_H
+#ifndef CNFDDMGRIMPL_H
+#define CNFDDMGRIMPL_H
 
-/// @file ZddMgrImpl.h
-/// @brief ZddMgrImpl のヘッダファイル
+/// @file CNFddMgrImpl.h
+/// @brief CNFddMgrImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_logic/Zdd.h"
+#include "ym_logic/CNFdd.h"
+//#include "CNFddNode.h"
+#include "CompTbl.h"
 #include "ym_utils/Binder.h"
-#include "ZddEdge.h"
-#include "ZddNode.h"
 
 
-BEGIN_NAMESPACE_YM_ZDD
+BEGIN_NAMESPACE_YM_CNFDD
 
-class ZddOp;
-class ZddUniOp;
-class ZddBinOp;
-class ZddVar;
-class ZddNode;
+class CNFddUnOp;
+class CNFddBinOp;
+class CNFddVar;
+class CNFddNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class ZddMgrImpl ZddMgrImpl.h "ZddMgrImpl.h"
-/// @param[in] ZDD を管理するクラス
+/// @class CNFddMgrImpl CNFddMgrImpl.h "CNFddMgrImpl.h"
+/// @param[in] CNFDD を管理するクラス
 //////////////////////////////////////////////////////////////////////
-class ZddMgrImpl
+class CNFddMgrImpl
 {
-  friend class Zdd;
-  friend class ZddOp;
+  friend class CNFdd;
+  friend class CompTbl;
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -39,18 +38,18 @@ public:
 
   /// @brief デフォルトマネージャを返す．
   static
-  ZddMgrImpl*
+  CNFddMgrImpl*
   default_mgr();
 
   /// @brief コンストラクタ
   /// @param[in] name 名前
   /// @param[in] option オプション
-  ZddMgrImpl(const string& name = string(),
-	     const string& option = string());
+  CNFddMgrImpl(const string& name = string(),
+	       const string& option = string());
 
   /// @brief デストラクタ
   virtual
-  ~ZddMgrImpl();
+  ~CNFddMgrImpl();
 
 
 public:
@@ -80,11 +79,11 @@ public:
   varid(ymuint level) const;
 
   /// @brief level の変数を取り出す．
-  ZddVar*
+  CNFddVar*
   var_at(ymuint level) const;
 
   /// @brief varid の変数を取出す．
-  ZddVar*
+  CNFddVar*
   var_of(VarId varid) const;
 
 
@@ -93,55 +92,71 @@ public:
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief e1 $\cap$ e2 を計算する．
-  ZddEdge
-  cap(ZddEdge e1,
-      ZddEdge e2);
+  /// @brief e1 $\wedge$ e2 を計算する．
+  CNFddEdge
+  conjunction(CNFddEdge e1,
+	      CNFddEdge e2);
 
+#if 0
   /// @brief e1 $\cup$ e2 を計算する．
-  ZddEdge
-  cup(ZddEdge e1,
-      ZddEdge e2);
+  CNFddEdge
+  cup(CNFddEdge e1,
+      CNFddEdge e2);
+#endif
 
   /// @brief src1 $\setdiff$ src2 を計算する．
-  ZddEdge
-  diff(ZddEdge e1,
-       ZddEdge e2);
+  CNFddEdge
+  diff(CNFddEdge e1,
+       CNFddEdge e2);
 
-  /// @brief 指定した変数の0枝と1枝を交換する．
+  /// @brief 指定した変数の肯定のリテラルを加える．
   /// @param[in] e 枝
   /// @param[in] var 交換を行う変数番号
-  ZddEdge
-  swap(ZddEdge e,
-       VarId var);
+  CNFddEdge
+  add_posiliteral(CNFddEdge e,
+		  VarId var);
+
+  /// @brief 指定した変数の否定のリテラルを加える．
+  /// @param[in] e 枝
+  /// @param[in] var 交換を行う変数番号
+  CNFddEdge
+  add_negaliteral(CNFddEdge e,
+		  VarId var);
 
   /// @brief 指定された変数を含まないコファクターを返す．
   /// @param[in] e 枝
-  /// @param[in] var 交換を行う変数番号
-  ZddEdge
-  cofactor0(ZddEdge e,
-	    VarId var);
+  /// @param[in] var 変数番号
+  CNFddEdge
+  cofactor_0(CNFddEdge e,
+	     VarId var);
 
   /// @brief 指定された変数を含むコファクターを返す．
   /// @param[in] e 枝
-  /// @param[in] var 交換を行う変数番号
-  ZddEdge
-  cofactor1(ZddEdge e,
-	    VarId var);
+  /// @param[in] var 変数番号
+  CNFddEdge
+  cofactor_p(CNFddEdge e,
+	     VarId var);
+
+  /// @brief 指定された変数を含むコファクターを返す．
+  /// @param[in] e 枝
+  /// @param[in] var 変数番号
+  CNFddEdge
+  cofactor_n(CNFddEdge e,
+	     VarId var);
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ZDDの根の枝の参照回数関数
+  // CNFDDの根の枝の参照回数関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief e の参照回数を増やす．
   void
-  inc_rootref(ZddEdge e);
+  inc_rootref(CNFddEdge e);
 
   /// @brief e の参照回数を減らす．
   void
-  dec_rootref(ZddEdge e);
+  dec_rootref(CNFddEdge e);
 
 
 public:
@@ -151,10 +166,11 @@ public:
 
   /// @brief 左右の枝が同じ場合にはその枝自身を返し，それ以外の場合には，
   /// @return 与えられた枝とインデックスを持つノードを返す．
-  ZddEdge
+  CNFddEdge
   new_node(ymuint level,
-	   ZddEdge l,
-	   ZddEdge h);
+	   CNFddEdge e_0,
+	   CNFddEdge e_p,
+	   CNFddEdge e_n);
 
 
 public:
@@ -162,18 +178,18 @@ public:
   // ノード数の計数や真理値表密度の計算など
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief e を根とするZDDのノード数を数える．
+  /// @brief e を根とするCNFDDのノード数を数える．
   ymuint64
-  node_count(ZddEdge e);
+  node_count(CNFddEdge e);
 
-  /// @brief edge_list に登録されたZDDのノード数を数える．
+  /// @brief edge_list に登録されたCNFDDのノード数を数える．
   ymuint64
-  node_count(const vector<ZddEdge>& edge_list);
+  node_count(const vector<CNFddEdge>& edge_list);
 
-  /// @brief ZDD の表す集合の要素数を返す．
+  /// @brief CNFDD の表す集合の要素数を返す．
   /// 無限長精度の整数(mpz_class)を用いて計算する．
   mpz_class
-  count(ZddEdge e);
+  count(CNFddEdge e);
 
 
 public:
@@ -181,13 +197,13 @@ public:
   // サポート関係の関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief e を根とするZDDのサポートに印をつける．
+  /// @brief e を根とするCNFDDのサポートに印をつける．
   ymuint
-  mark_support(ZddEdge e);
+  mark_support(CNFddEdge e);
 
-  /// @brief edge_list に登録されたZDDのサポートに印をつける．
+  /// @brief edge_list に登録されたCNFDDのサポートに印をつける．
   ymuint
-  mark_support(const vector<ZddEdge>& edge_list);
+  mark_support(const vector<CNFddEdge>& edge_list);
 
   /// @brief 印のついた変数をベクタに変換する．
   ymuint
@@ -222,12 +238,12 @@ public:
 
   /// @brief パラメータを設定する．設定したい項目のマスクビットを1とする．
   void
-  param(const ZddMgrParam& param,
+  param(const CNFddMgrParam& param,
 	ymuint32 mask);
 
   /// @brief パラメータを取得する．
   void
-  param(ZddMgrParam& param) const;
+  param(CNFddMgrParam& param) const;
 
   /// @brief 名前を得る．
   const string&
@@ -260,19 +276,19 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ZDDの管理用関数
+  // CNFDDの管理用関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief Zdd の根の枝をセットする時の関数
+  /// @brief CNFdd の根の枝をセットする時の関数
   void
-  set_zdd(Zdd* zdd_p,
-	  ZddEdge e);
+  set_zdd(CNFdd* zdd_p,
+	  CNFddEdge e);
 
   /// @brief zdd の根の枝を new_e に変更する．
-  /// new_e も同一の ZddMgr に属していると仮定する．
+  /// new_e も同一の CNFddMgr に属していると仮定する．
   void
-  assign(Zdd* zdd_p,
-	 ZddEdge new_e);
+  assign(CNFdd* zdd_p,
+	 CNFddEdge new_e);
 
 
 public:
@@ -293,21 +309,6 @@ public:
   logstream() const;
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // メモリ管理関係の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief このマネージャで使用するメモリ領域を確保する．
-  void*
-  allocate(ymuint64 size);
-
-  /// @brief このマネージャで確保したメモリを解放する．
-  void
-  deallocate(void* ptr,
-	     ymuint64 size);
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // 上記の XXX_op() の内部で用いられる再帰関数
@@ -315,16 +316,16 @@ private:
 
   /// @brief size() の下請関数
   void
-  count1(ZddEdge e);
+  count1(CNFddEdge e);
 
   /// @brief count の下請関数
   mpz_class
-  count_step(ZddEdge e,
-	     hash_map<ZddEdge, mpz_class>& mc_map);
+  count_step(CNFddEdge e,
+	     hash_map<CNFddEdge, mpz_class>& mc_map);
 
   /// @brief サポート変数に印をつける．
   void
-  sup_step(ZddEdge e);
+  sup_step(CNFddEdge e);
 
 
 private:
@@ -343,19 +344,23 @@ private:
 
   /// @brief ノードのリンク数を増やし，もしロックされていなければロックする
   void
-  activate(ZddEdge vd);
+  activate(CNFddEdge vd);
 
   /// @brief ノードのリンク数を減らし，他のリンクがなければロックを外す
   void
-  deactivate(ZddEdge vd);
+  deactivate(CNFddEdge vd);
 
   /// @brief vp と vp の子孫のノードをロックする
   void
-  lockall(ZddNode* vp);
+  lockall(CNFddNode* vp);
 
   /// @brief vp と vp の子孫ノードを(他に参照されていないもののみ)ロックを外す
   void
-  unlockall(ZddNode* vp);
+  unlockall(CNFddNode* vp);
+
+  /// @brief 演算結果テーブルを登録する．
+  void
+  add_table(CompTbl* tbl);
 
   /// @brief mVarTable 中のマークを消す．
   void
@@ -363,7 +368,7 @@ private:
 
   /// @brief Var を登録する．
   void
-  reg_var(ZddVar* var);
+  reg_var(CNFddVar* var);
 
 
 private:
@@ -372,50 +377,59 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 変数を確保する．
-  ZddVar*
+  CNFddVar*
   alloc_var(VarId varid);
 
   /// @brief 節点を確保する．
-  ZddNode*
+  CNFddNode*
   alloc_node();
 
   /// @brief 節点チャンクをスキャンして参照されていない節点をフリーリストにつなぐ
   /// ただし，チャンク全体が参照されていなかった場合にはフリーリストには
   /// つながない．その場合には true を返す．
   bool
-  scan_nodechunk(ZddNode* blk,
+  scan_nodechunk(CNFddNode* blk,
 		 ymuint blk_size,
-		 ZddNode**& prev);
+		 CNFddNode**& prev);
 
   /// @brief 変数テーブル用のメモリを確保する．
   /// size はバイト単位ではなくエントリ数．
-  ZddVar**
+  CNFddVar**
   alloc_vartable(ymuint size);
 
   /// @brief 変数テーブル用のメモリを解放する．
   /// size はバイト単位ではなくエントリ数
   void
-  dealloc_vartable(ZddVar** table,
+  dealloc_vartable(CNFddVar** table,
 		   ymuint size);
 
   /// @brief 節点テーブル用のメモリを確保する．
   /// size はバイト単位ではなくエントリ数
-  ZddNode**
+  CNFddNode**
   alloc_nodetable(ymuint64 size);
 
   /// @brief 節点テーブル用のメモリを解放する．
   /// size はバイト単位ではなくエントリ数
   void
-  dealloc_nodetable(ZddNode** table,
+  dealloc_nodetable(CNFddNode** table,
 		    ymuint64 size);
 
   /// @brief 節点チャンク用のメモリを確保する．
-  ZddNode*
+  CNFddNode*
   alloc_nodechunk();
 
   /// @brief 節点チャンク用のメモリを解放する．
   void
-  dealloc_nodechunk(ZddNode* chunk);
+  dealloc_nodechunk(CNFddNode* chunk);
+
+  /// @brief このマネージャで使用するメモリ領域を確保する．
+  void*
+  allocate(ymuint64 size);
+
+  /// @brief このマネージャで確保したメモリを解放する．
+  void
+  deallocate(void* ptr,
+	     ymuint64 size);
 
 
 private:
@@ -431,12 +445,12 @@ private:
 
 
   //////////////////////////////////////////////////////////////////////
-  // このマネージャに管理されている ZDD のリスト
+  // このマネージャに管理されている CNFDD のリスト
   //////////////////////////////////////////////////////////////////////
 
   // リストのためのダミーヘッダ
-  // ZDD としては用いない．
-  Zdd* mTopZdd;
+  // CNFDD としては用いない．
+  CNFdd* mTopCNFdd;
 
 
   //////////////////////////////////////////////////////////////////////
@@ -500,10 +514,10 @@ private:
   ymuint32 mVarNum;
 
   // 変数リストの先頭
-  ZddVar* mVarTop;
+  CNFddVar* mVarTop;
 
   // 変数番号をキーにして変数のポインタを格納しているハッシュ表
-  ZddVar** mVarHashTable;
+  CNFddVar** mVarHashTable;
 
 
   //////////////////////////////////////////////////////////////////////
@@ -520,33 +534,33 @@ private:
   ymuint64 mNextLimit;
 
   // テーブル本体
-  ZddNode** mNodeTable;
+  CNFddNode** mNodeTable;
 
 
   //////////////////////////////////////////////////////////////////////
   // 演算結果テーブル
   //////////////////////////////////////////////////////////////////////
 
+  // この CNFddMgr に登録されているテーブルのリスト
+  list<CompTbl*> mTblList;
+
   // cap 用の演算クラス
-  ZddBinOp* mCapOp;
+  CNFddBinOp* mCapOp;
 
   // cup 用の演算クラス
-  ZddBinOp* mCupOp;
+  CNFddBinOp* mCupOp;
 
   // diff 用の演算クラス
-  ZddBinOp* mDiffOp;
+  CNFddBinOp* mDiffOp;
 
   // swap 用の演算クラス
-  ZddUniOp* mSwapOp;
+  CNFddUnOp* mSwapOp;
 
   // cofactor0 用の演算クラス
-  ZddUniOp* mCof0Op;
+  CNFddUnOp* mCof0Op;
 
   // cofactor1 用の演算クラス
-  ZddUniOp* mCof1Op;
-
-  // 演算オブジェクトのリスト
-  list<ZddOp*> mOpList;
+  CNFddUnOp* mCof1Op;
 
 
   //////////////////////////////////////////////////////////////////////
@@ -554,16 +568,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // フリーな節点リストの先頭
-  ZddNode* mFreeTop;
+  CNFddNode* mFreeTop;
 
   // フリーな節点数
   ymuint64 mFreeNum;
 
   // 今までに確保したメモリブロックの先頭
-  ZddNode* mTopBlk;
+  CNFddNode* mTopBlk;
 
   // 現在使用中のブロック
-  ZddNode* mCurBlk;
+  CNFddNode* mCurBlk;
 
   // mCurBlk の何番目まで使用しているかを示すインデックス
   ymuint32 mCurIdx;
@@ -591,7 +605,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // サポート演算中で用いられる作業領域
-  list<ZddVar*> mVarSet;
+  list<CNFddVar*> mVarSet;
 
   // dump/size で節点数を数えるための作業領域
   ymuint64 mNum;
@@ -604,7 +618,7 @@ private:
 
   // デフォルトのオブジェクト
   static
-  ZddMgrImpl* mDefaultMgr;
+  CNFddMgrImpl* mDefaultMgr;
 
 };
 
@@ -613,28 +627,28 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief e を根とするZDDのノード数を数える．
+// @brief e を根とするCNFDDのノード数を数える．
 inline
 ymuint64
-ZddMgrImpl::node_count(ZddEdge e)
+CNFddMgrImpl::node_count(CNFddEdge e)
 {
-  return node_count(vector<ZddEdge>(1, e));
+  return node_count(vector<CNFddEdge>(1, e));
 }
 
-// @brief e を根とするZDDのサポートに印をつける．
+// @brief e を根とするCNFDDのサポートに印をつける．
 inline
 ymuint
-ZddMgrImpl::mark_support(ZddEdge e)
+CNFddMgrImpl::mark_support(CNFddEdge e)
 {
-  return mark_support(vector<ZddEdge>(1, e));
+  return mark_support(vector<CNFddEdge>(1, e));
 }
 
 // @brief ノードのリンク数を増やし，もしロックされていなければロックする
 inline
 void
-ZddMgrImpl::activate(ZddEdge vd)
+CNFddMgrImpl::activate(CNFddEdge vd)
 {
-  ZddNode* node = vd.get_node();
+  CNFddNode* node = vd.get_node();
   if ( node && node->linkinc() == 1 ) {
     lockall(node);
   }
@@ -643,9 +657,9 @@ ZddMgrImpl::activate(ZddEdge vd)
 // @brief ノードのリンク数を減らし，他のリンクがなければロックを外す
 inline
 void
-ZddMgrImpl::deactivate(ZddEdge vd)
+CNFddMgrImpl::deactivate(CNFddEdge vd)
 {
-  ZddNode* node = vd.get_node();
+  CNFddNode* node = vd.get_node();
   if ( node && node->linkdec() == 0 ) {
     unlockall(node);
   }
@@ -654,11 +668,11 @@ ZddMgrImpl::deactivate(ZddEdge vd)
 // @brief 演算テーブル用の load_limit を得る．
 inline
 double
-ZddMgrImpl::rt_load_limit() const
+CNFddMgrImpl::rt_load_limit() const
 {
   return mRtLoadLimit;
 }
 
-END_NAMESPACE_YM_ZDD
+END_NAMESPACE_YM_CNFDD
 
-#endif // ZDDMGRIMPL_H
+#endif // CNFDDMGRIMPL_H

@@ -10,6 +10,7 @@
 
 
 #include "ym_logic/zdd_nsdef.h"
+#include "ZddMgrImpl.h"
 #include "ZddEdge.h"
 #include "ZddNode.h"
 
@@ -17,87 +18,20 @@
 BEGIN_NAMESPACE_YM_ZDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class ZddUnOp ZddOp.h "ZddOp.h"
-/// @brief ZDD の単項演算を行うクラス
-//////////////////////////////////////////////////////////////////////
-class ZddUnOp
-{
-public:
-
-  /// @brief コンストラクタ
-  ZddUnOp() { }
-
-  /// @brief デストラクタ
-  virtual
-  ~ZddUnOp() { }
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // メインの関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算を行う関数
-  /// @param[in] left オペランド
-  /// @param[in] varid 変数番号
-  virtual
-  ZddEdge
-  apply(ZddEdge left,
-	VarId varid) = 0;
-
-
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 根のレベルにしたがって子供のノードを求める．
-  /// @param[in] f, g オペランド
-  /// @param[out] f_0, f_1 f の子供
-  /// @param[out] g_0, g_1 g の子供
-  /// @return 根のレベルを返す．
-  static
-  ymuint
-  split(ZddEdge f,
-	ZddEdge g,
-	ZddEdge& f_0,
-	ZddEdge& f_1,
-	ZddEdge& g_0,
-	ZddEdge& g_1);
-
-  /// @brief split() の下請け関数
-  /// @param[in] top_level 根のレベル
-  /// @param[in] level レベル
-  /// @param[in] e 枝
-  /// @param[in] node ノード
-  /// @param[out] e_0 0枝
-  /// @param[out] e_1 1枝
-  static
-  void
-  split1(ymuint top_level,
-	 ymuint level,
-	 ZddEdge e,
-	 ZddNode* node,
-	 ZddEdge& e_0,
-	 ZddEdge& e_1);
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class ZddOp ZddOp.h "ZddOp.h"
-/// @brief ZDD の二項演算を行うクラス
+/// @brief ZDD の演算を行うクラス
 //////////////////////////////////////////////////////////////////////
-class ZddBinOp
+class ZddOp
 {
 public:
 
   /// @brief コンストラクタ
-  ZddBinOp() { }
+  /// @param[in] mgr マネージャ
+  ZddOp(ZddMgrImpl* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~ZddBinOp() { }
+  ~ZddOp() { }
 
 
 public:
@@ -105,12 +39,10 @@ public:
   // メインの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 演算を行う関数
-  /// @param[in] left, right オペランド
+  /// @brief 次の GC で回収されるノードに関連した情報を削除する．
   virtual
-  ZddEdge
-  apply(ZddEdge left,
-	ZddEdge right) = 0;
+  void
+  sweep() = 0;
 
 
 protected:
@@ -118,19 +50,12 @@ protected:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 根のレベルにしたがって子供のノードを求める．
-  /// @param[in] f, g オペランド
-  /// @param[out] f_0, f_1 f の子供
-  /// @param[out] g_0, g_1 g の子供
-  /// @return 根のレベルを返す．
-  static
-  ymuint
-  split(ZddEdge f,
-	ZddEdge g,
-	ZddEdge& f_0,
-	ZddEdge& f_1,
-	ZddEdge& g_0,
-	ZddEdge& g_1);
+  /// @brief 左右の枝が同じ場合にはその枝自身を返し，それ以外の場合には，
+  /// @return 与えられた枝とインデックスを持つノードを返す．
+  ZddEdge
+  new_node(ymuint level,
+	   ZddEdge l,
+	   ZddEdge h);
 
   /// @brief split() の下請け関数
   /// @param[in] top_level 根のレベル
@@ -147,6 +72,19 @@ protected:
 	 ZddNode* node,
 	 ZddEdge& e_0,
 	 ZddEdge& e_1);
+
+  /// @brief マネージャを返す．
+  ZddMgrImpl*
+  mgr() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // マネージャ
+  ZddMgrImpl* mMgr;
 
 };
 
@@ -155,32 +93,24 @@ protected:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 根のレベルにしたがって子供のノードを求める．
-// @param[in] f, g オペランド
-// @param[out] f_0, f_1 f の子供
-// @param[out] g_0, g_1 g の子供
-// @return 根のレベルを返す．
+/// @brief コンストラクタ
+// @param[in] mgr マネージャ
 inline
-ymuint
-ZddBinOp::split(ZddEdge f,
-		ZddEdge g,
-		ZddEdge& f_0,
-		ZddEdge& f_1,
-		ZddEdge& g_0,
-		ZddEdge& g_1)
+ZddOp::ZddOp(ZddMgrImpl* mgr) :
+  mMgr(mgr)
 {
-  ZddNode* f_vp = f.get_node();
-  ZddNode* g_vp = g.get_node();
-  ymuint f_level = f_vp->level();
-  ymuint g_level = g_vp->level();
-  ymuint level = f_level;
-  if ( level > g_level ) {
-    level = g_level;
-  }
-  split1(level, f_level, f, f_vp, f_0, f_1);
-  split1(level, g_level, g, g_vp, g_0, g_1);
+  mMgr->mOpList.push_back(this);
+}
 
-  return level;
+// @brief 左右の枝が同じ場合にはその枝自身を返し，それ以外の場合には，
+// @return 与えられた枝とインデックスを持つノードを返す．
+inline
+ZddEdge
+ZddOp::new_node(ymuint level,
+		ZddEdge l,
+		ZddEdge h)
+{
+  return mMgr->new_node(level, l, h);
 }
 
 // @brief split() の下請け関数
@@ -192,12 +122,12 @@ ZddBinOp::split(ZddEdge f,
 // @param[out] e_1 1枝
 inline
 void
-ZddBinOp::split1(ymuint top_level,
-		 ymuint level,
-		 ZddEdge e,
-		 ZddNode* node,
-		 ZddEdge& e_0,
-		 ZddEdge& e_1)
+ZddOp::split1(ymuint top_level,
+	      ymuint level,
+	      ZddEdge e,
+	      ZddNode* node,
+	      ZddEdge& e_0,
+	      ZddEdge& e_1)
 {
   if ( top_level == level ) {
     e_0 = node->edge0();
@@ -208,6 +138,14 @@ ZddBinOp::split1(ymuint top_level,
     e_0 = e;
     e_1 = ZddEdge::make_zero();
   }
+}
+
+// @brief マネージャを返す．
+inline
+ZddMgrImpl*
+ZddOp::mgr() const
+{
+  return mMgr;
 }
 
 END_NAMESPACE_YM_ZDD

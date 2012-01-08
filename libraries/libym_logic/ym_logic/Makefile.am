@@ -20,6 +20,8 @@ noinst_HEADERS = \
 	ZddVector.h \
 	ZddList.h \
 	ZddMgr.h \
+	CNFdd.h \
+	CNFddMgr.h \
 	Bool3.h \
 	CvFunc.h \
 	Dg.h \
@@ -37,6 +39,7 @@ noinst_HEADERS = \
 	TvFunc.h \
 	TvFuncM.h \
 	bdd_nsdef.h \
+	cnfdd_nsdef.h \
 	lexp_nsdef.h \
 	npn_nsdef.h \
 	sat_nsdef.h \
