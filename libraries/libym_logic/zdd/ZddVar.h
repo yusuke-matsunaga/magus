@@ -56,9 +56,6 @@ private:
   // 作業用のマーク
   int mMark;
 
-  // compose用にZDDの枝を入れておくメンバ
-  ZddEdge mCompEdge;
-
   // 変数リスト中の次の要素を指すポインタ
   ZddVar* mNext;
 

@@ -22,6 +22,7 @@ class ZddUniOp;
 class ZddBinOp;
 class ZddVar;
 class ZddNode;
+class SupOp;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ZddMgrImpl ZddMgrImpl.h "ZddMgrImpl.h"
@@ -78,6 +79,10 @@ public:
   /// @brief レベルから変数番号を得る．
   VarId
   varid(ymuint level) const;
+
+  /// @brief 現在の最大レベル + 1を返す．
+  ymuint
+  max_level() const;
 
   /// @brief level の変数を取り出す．
   ZddVar*
@@ -544,6 +549,9 @@ private:
 
   // cofactor1 用の演算クラス
   ZddUniOp* mCof1Op;
+
+  // support 用の演算オブジェクト
+  SupOp* mSupOp;
 
   // 演算オブジェクトのリスト
   list<ZddOp*> mOpList;

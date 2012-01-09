@@ -52,8 +52,9 @@ libym_logic_zdd_la_SOURCES = \
 	Cof0Op.cc \
 	Cof1Op.h \
 	Cof1Op.cc \
+	SupOp.h \
+	SupOp.cc \
 	count.cc \
-	support.cc \
 	IdMgr.h \
 	IdMgr.cc \
 	Printer.h \

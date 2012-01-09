@@ -19,6 +19,7 @@
 #include "SwapOp.h"
 #include "Cof0Op.h"
 #include "Cof1Op.h"
+#include "SupOp.h"
 
 
 #if !defined(__SUNPRO_CC) || __SUNPRO_CC >= 0x500
@@ -193,6 +194,7 @@ ZddMgrImpl::ZddMgrImpl(const string& name,
   mSwapOp = new SwapOp(this);
   mCof0Op = new Cof0Op(this);
   mCof1Op = new Cof1Op(this);
+  mSupOp = new SupOp(this);
 }
 
 // デストラクタ
@@ -351,6 +353,13 @@ ZddMgrImpl::varid(ymuint level) const
   return VarId(level);
 }
 
+// @brief 現在の最大レベル + 1を返す．
+ymuint
+ZddMgrImpl::max_level() const
+{
+  return mVarNum + 1;
+}
+
 // @brief e1 $\cap$ e2 を計算する．
 ZddEdge
 ZddMgrImpl::cap(ZddEdge e1,
@@ -399,6 +408,27 @@ ZddMgrImpl::cofactor1(ZddEdge e,
 		      VarId var)
 {
   return mCof1Op->apply(e, level(var));
+}
+
+// edge_list に含まれる枝を根とするZDDのサポートに印をつける．
+ymuint
+ZddMgrImpl::mark_support(const vector<ZddEdge>& edge_list)
+{
+  return mSupOp->apply(edge_list);
+}
+
+// var_mark を列挙してマークのついた変数を vars に入れる．
+ymuint
+ZddMgrImpl::mark_to_vector(VarVector& vars)
+{
+  return mSupOp->to_list(vars);
+}
+
+// var_mark を列挙してマークのついた変数を vars に入れる．
+ymuint
+ZddMgrImpl::mark_to_list(VarList& vars)
+{
+  return mSupOp->to_list(vars);
 }
 
 // 節点テーブルを次に拡大する時の基準値を計算する．
