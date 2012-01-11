@@ -82,6 +82,27 @@ ZddMgr::make_overflow()
   return Zdd(mImpl, ZddEdge::make_overflow());
 }
 
+// @brief 2つの集合をマージする．
+Zdd
+ZddMgr::merge(const Zdd& left,
+	      const Zdd& right)
+{
+  ZddEdge e1(left.mRoot);
+  ZddEdge e2(right.mRoot);
+  ZddEdge ans = mImpl->merge(e1, e2);
+  return Zdd(mImpl, ans);
+}
+
+// @brief 要素数を制限する．
+Zdd
+ZddMgr::n_element(const Zdd& left,
+		  ymuint limit)
+{
+  ZddEdge e(left.mRoot);
+  ZddEdge ans = mImpl->n_element(e, limit);
+  return Zdd(mImpl, ans);
+}
+
 #if 0
 // singletonを表すZDDを作る．
 Zdd

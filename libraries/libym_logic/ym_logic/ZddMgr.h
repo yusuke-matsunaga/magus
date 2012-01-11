@@ -13,7 +13,6 @@
 #include "ym_logic/zdd_nsdef.h"
 #include "ym_logic/VarId.h"
 #include "ym_utils/Binder.h"
-//#include "ym_utils/BinIO.h"
 #include "gmpxx.h"
 
 
@@ -113,6 +112,16 @@ public:
   /// @return 生成された ZDD
   Zdd
   make_error();
+
+  /// @brief 2つの集合をマージする．
+  Zdd
+  merge(const Zdd& left,
+	const Zdd& right);
+
+  /// @brief 要素数を制限する．
+  Zdd
+  n_element(const Zdd& left,
+	    ymuint limit);
 
 
 public:

@@ -5,7 +5,8 @@
 SUBDIRS = \
 	bnet2aig \
 	makebdd \
-	lsim
+	lsim \
+	enumcut
 
 MAINTAINERCLEANFILES = Makefile.in
 

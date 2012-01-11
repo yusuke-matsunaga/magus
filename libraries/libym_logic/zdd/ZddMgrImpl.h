@@ -23,6 +23,7 @@ class ZddBinOp;
 class ZddVar;
 class ZddNode;
 class SupOp;
+class NeOp;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ZddMgrImpl ZddMgrImpl.h "ZddMgrImpl.h"
@@ -138,6 +139,11 @@ public:
   ZddEdge
   merge(ZddEdge e1,
 	ZddEdge e2);
+
+  /// @brief 要素数に制限をかける．
+  ZddEdge
+  n_element(ZddEdge e,
+	    ymuint limit);
 
 
 public:
@@ -560,6 +566,9 @@ private:
 
   // merge 用の演算オブジェクト
   ZddBinOp* mMergeOp;
+
+  // n_element 用の演算オブジェクト
+  NeOp* mNeOp;
 
   // 演算オブジェクトのリスト
   list<ZddOp*> mOpList;

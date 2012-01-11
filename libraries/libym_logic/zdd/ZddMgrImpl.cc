@@ -21,6 +21,7 @@
 #include "Cof1Op.h"
 #include "SupOp.h"
 #include "MergeOp.h"
+#include "NeOp.h"
 
 
 #if !defined(__SUNPRO_CC) || __SUNPRO_CC >= 0x500
@@ -197,6 +198,7 @@ ZddMgrImpl::ZddMgrImpl(const string& name,
   mCof1Op = new Cof1Op(this);
   mSupOp = new SupOp(this);
   mMergeOp = new MergeOp(this, mCupOp);
+  mNeOp = new NeOp(this);
 }
 
 // デストラクタ
@@ -418,6 +420,14 @@ ZddMgrImpl::merge(ZddEdge e1,
 		  ZddEdge e2)
 {
   return mMergeOp->apply(e1, e2);
+}
+
+// @brief 要素数に制限をかける．
+ZddEdge
+ZddMgrImpl::n_element(ZddEdge e,
+		      ymuint limit)
+{
+  return mNeOp->apply(e, limit);
 }
 
 // edge_list に含まれる枝を根とするZDDのサポートに印をつける．

@@ -314,4 +314,112 @@ CompTbl2::clear()
   }
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// クラス CompTbl1n
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] mgr 親の ZddMgrImpl
+// @param[in] name 名前
+CompTbl1n::CompTbl1n(ZddMgrImpl* mgr,
+		     const char* name) :
+  CompTbl(mgr, name)
+{
+  resize(kInitSize);
+}
+
+// @brief デストラクタ
+CompTbl1n::~CompTbl1n()
+{
+  deallocate((void*)mTable, mTableSize * sizeof(Cell));
+}
+
+// @brief ガーベージコレクションが起きた時の処理を行なう．
+void
+CompTbl1n::sweep()
+{
+  // ログを出力
+  logstream() << "CompTbl1n[" << mName << "]::sweep()" << endl;
+
+  // 削除されるノードに関連したセルをクリアする．
+  Cell* cell = mTable;
+  Cell* end = cell + mTableSize;
+  for ( ; cell != end; ++ cell) {
+    if ( !cell->mKey1.is_error() &&
+	 (cell->mKey1.noref() ||
+	  cell->mAns.noref()) ) {
+      cell->mKey1 = ZddEdge::make_error();
+      -- mUsedNum;
+    }
+  }
+}
+
+// @brief 内容をクリアする．
+void
+CompTbl1n::clear()
+{
+  Cell* cell = mTable;
+  Cell* end = cell + mTableSize;
+  for ( ; cell != end; ++ cell) {
+    cell->mKey1 = ZddEdge::make_error();
+    -- mUsedNum;
+  }
+}
+
+// @brief テーブルサイズを変更する．
+// @param[in] new_size 設定する値
+bool
+CompTbl1n::resize(ymuint64 new_size)
+{
+  // ログの出力
+  logstream() << "CompTbl1n[" << mName << "]::resize(" << new_size << ")"
+	      << endl;
+
+  // 新しいメモリ領域を確保する．
+  Cell* new_table = (Cell*)allocate(new_size * sizeof(Cell));
+  if ( new_table == NULL ) {
+    return false;
+  }
+
+  // 昔の値を保存する．
+  ymuint64 old_size = mTableSize;
+  Cell* old_table = mTable;
+
+  // 新たなサイズを設定し，テーブルを確保する．
+  mTable = new_table;
+  mTableSize = new_size;
+  mTableSize_1 = mTableSize - 1;
+  update_next_limit();
+
+  // 中身をクリアしておく．
+  Cell* top = mTable;
+  Cell* end = top + mTableSize;
+  do {
+    top->mKey1 = ZddEdge::make_error();
+    ++ top;
+  } while ( top != end );
+
+  // ハッシュし直して新しいテーブルに登録する．
+  mUsedNum = 0;
+  if ( old_size > 0 ) {
+    Cell* top = old_table;
+    Cell* end = top + old_size;
+    do {
+      if ( !top->mKey1.is_error() ) {
+	ymuint pos = hash_func(top->mKey1, top->mKey2);
+	Cell* temp = mTable + pos;
+	if ( temp->mKey1.is_error() ) ++ mUsedNum;
+	temp->mKey1 = top->mKey1;
+	temp->mKey2 = top->mKey2;
+	temp->mAns = top->mAns;
+      }
+      ++ top;
+    } while ( top != end );
+    deallocate((void*)old_table, old_size * sizeof(Cell));
+  }
+
+  return true;
+}
+
 END_NAMESPACE_YM_ZDD

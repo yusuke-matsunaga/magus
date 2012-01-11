@@ -275,6 +275,92 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class CompTbl1n CompTbl.h "CompTbl.h"
+/// @brief 1つの枝と数値をキーとして結果の枝を格納するテーブル
+//////////////////////////////////////////////////////////////////////
+class CompTbl1n :
+  public CompTbl
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] mgr 親の ZddMgrImpl
+  /// @param[in] name 名前
+  CompTbl1n(ZddMgrImpl* mgr,
+	    const char* name = 0);
+
+  /// @brief デストラクタ
+  virtual
+  ~CompTbl1n();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief id1 と n をキーとして検索を行なう
+  ZddEdge
+  get(ZddEdge id1,
+      ymuint n);
+
+  /// @brief 結果を登録する
+  void
+  put(ZddEdge id1,
+      ymuint n,
+      ZddEdge ans);
+
+  /// @brief ガーベージコレクションが起きた時の処理を行なう．
+  void
+  sweep();
+
+  /// @brief 内容をクリアする．
+  void
+  clear();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ハッシュ関数
+  ymuint64
+  hash_func(ZddEdge id1,
+	    ymuint n);
+
+  /// @brief テーブルサイズを変更する．
+  /// @param[in] new_size 設定する値
+  bool
+  resize(ymuint64 new_size);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  // キーが1つのセル
+  struct Cell
+  {
+    ZddEdge mKey1;
+    ymuint32 mKey2;
+    ZddEdge mAns;
+  };
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 実際のテーブル
+  Cell* mTable;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
@@ -363,6 +449,55 @@ CompTbl2::put(ZddEdge id1,
 	      ZddEdge ans)
 {
   if ( id1.is_invalid() || id2.is_invalid() || ans.is_invalid() ) {
+    return;
+  }
+  if ( check_tablesize() ) {
+    if ( !resize(mTableSize << 1) ) {
+      return;
+    }
+  }
+  Cell* tmp = mTable + hash_func(id1, id2);
+  if ( tmp->mKey1.is_error() ) mUsedNum ++;
+  tmp->mKey1 = id1;
+  tmp->mKey2 = id2;
+  tmp->mAns = ans;
+}
+
+// ハッシュ関数
+inline
+ymuint64
+CompTbl1n::hash_func(ZddEdge id1,
+		     ymuint id2)
+{
+  ymuint64 v1 = id1.hash();
+  ymuint64 v2 = id2;
+  return ymuint64(v1 + v2 + (v1 >> 2)) & mTableSize_1;
+  //    return size_t((id1 * (id2 + 2)) >> 2) & mTableSize_1;
+}
+
+// id1, id2をキーとして検索を行なう
+inline
+ZddEdge
+CompTbl1n::get(ZddEdge id1,
+	       ymuint id2)
+{
+  Cell* tmp = mTable + hash_func(id1, id2);
+  if ( tmp->mKey1 != id1 || tmp->mKey2 != id2 ) {
+    return ZddEdge::make_error();
+  }
+  else {
+    return tmp->mAns;
+  }
+}
+
+// 結果を登録する
+inline
+void
+CompTbl1n::put(ZddEdge id1,
+	       ymuint id2,
+	       ZddEdge ans)
+{
+  if ( id1.is_invalid() || ans.is_invalid() ) {
     return;
   }
   if ( check_tablesize() ) {

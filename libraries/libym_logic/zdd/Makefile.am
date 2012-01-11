@@ -56,6 +56,8 @@ libym_logic_zdd_la_SOURCES = \
 	SupOp.cc \
 	MergeOp.h \
 	MergeOp.cc \
+	NeOp.h \
+	NeOp.cc \
 	count.cc \
 	IdMgr.h \
 	IdMgr.cc \
