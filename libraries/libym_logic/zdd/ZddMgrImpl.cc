@@ -20,6 +20,7 @@
 #include "Cof0Op.h"
 #include "Cof1Op.h"
 #include "SupOp.h"
+#include "MergeOp.h"
 
 
 #if !defined(__SUNPRO_CC) || __SUNPRO_CC >= 0x500
@@ -195,6 +196,7 @@ ZddMgrImpl::ZddMgrImpl(const string& name,
   mCof0Op = new Cof0Op(this);
   mCof1Op = new Cof1Op(this);
   mSupOp = new SupOp(this);
+  mMergeOp = new MergeOp(this, mCupOp);
 }
 
 // デストラクタ
@@ -408,6 +410,14 @@ ZddMgrImpl::cofactor1(ZddEdge e,
 		      VarId var)
 {
   return mCof1Op->apply(e, level(var));
+}
+
+// @brief 要素ごとのユニオンを計算する．
+ZddEdge
+ZddMgrImpl::merge(ZddEdge e1,
+		  ZddEdge e2)
+{
+  return mMergeOp->apply(e1, e2);
 }
 
 // edge_list に含まれる枝を根とするZDDのサポートに印をつける．

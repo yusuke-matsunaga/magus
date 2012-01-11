@@ -134,6 +134,11 @@ public:
   cofactor1(ZddEdge e,
 	    VarId var);
 
+  /// @brief 要素ごとのユニオンを計算する．
+  ZddEdge
+  merge(ZddEdge e1,
+	ZddEdge e2);
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -552,6 +557,9 @@ private:
 
   // support 用の演算オブジェクト
   SupOp* mSupOp;
+
+  // merge 用の演算オブジェクト
+  ZddBinOp* mMergeOp;
 
   // 演算オブジェクトのリスト
   list<ZddOp*> mOpList;
