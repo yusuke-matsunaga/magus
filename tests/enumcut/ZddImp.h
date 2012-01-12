@@ -10,6 +10,8 @@
 
 
 #include "ym_logic/Zdd.h"
+#include "ym_logic/ZddMgr.h"
+#include "ym_networks/bdn.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

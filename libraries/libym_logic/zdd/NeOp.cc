@@ -40,7 +40,7 @@ NeOp::apply(ZddEdge left,
   if ( left.is_invalid() ) {
     return left;
   }
-
+  mCompTbl.clear();
   return apply_step(left, limit);
 }
 
@@ -48,7 +48,9 @@ NeOp::apply(ZddEdge left,
 void
 NeOp::sweep()
 {
-  mCompTbl.sweep();
+  if ( mCompTbl.used_num() > 0 ) {
+    mCompTbl.sweep();
+  }
 }
 
 // apply_step の下請け関数
@@ -56,6 +58,10 @@ ZddEdge
 NeOp::apply_step(ZddEdge f,
 		 ymuint n)
 {
+  if ( n == 0 ) {
+    return ZddEdge::make_zero();
+  }
+
   if ( f.is_const() ) {
     return f;
   }
@@ -72,17 +78,12 @@ NeOp::apply_step(ZddEdge f,
     if ( r_0.is_invalid() ) {
       return r_0;
     }
-    if ( n > 0 ) {
-      ZddEdge f_1 = f_node->edge1();
-      ZddEdge r_1 = apply_step(f_1, n - 1);
-      if ( r_1.is_invalid() ) {
-	return r_1;
-      }
-      result = new_node(f_level, r_0, r_1);
+    ZddEdge f_1 = f_node->edge1();
+    ZddEdge r_1 = apply_step(f_1, n - 1);
+    if ( r_1.is_invalid() ) {
+      return r_1;
     }
-    else {
-      result = r_0;
-    }
+    result = new_node(f_level, r_0, r_1);
     mCompTbl.put(f, n, result);
   }
   return result;

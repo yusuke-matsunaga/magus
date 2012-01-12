@@ -252,12 +252,9 @@ ZddMgrImpl::~ZddMgrImpl()
   dealloc_vartable(mVarHashTable, mVarTableSize);
 
   // 演算クラスの解放
-  delete mCapOp;
-  delete mCupOp;
-  delete mDiffOp;
-  delete mSwapOp;
-  delete mCof0Op;
-  delete mCof1Op;
+  for (list<ZddOp*>::iterator p = mOpList.begin(); p != mOpList.end(); ++ p) {
+    delete *p;
+  }
 
   // このマネージャに関わるメモリはすべて解放したはず．
   assert_cond( mUsedMem == 0, __FILE__, __LINE__);

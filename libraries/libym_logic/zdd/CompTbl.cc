@@ -204,8 +204,8 @@ CompTbl1::clear()
   Cell* end = cell + mTableSize;
   for ( ; cell != end; ++ cell) {
     cell->mKey1 = ZddEdge::make_error();
-    -- mUsedNum;
   }
+  mUsedNum = 0;
 }
 
 
@@ -310,8 +310,8 @@ CompTbl2::clear()
   Cell* end = cell + mTableSize;
   for ( ; cell != end; ++ cell) {
     cell->mKey1 = ZddEdge::make_error();
-    -- mUsedNum;
   }
+  mUsedNum = 0;
 }
 
 
@@ -346,9 +346,8 @@ CompTbl1n::sweep()
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
   for ( ; cell != end; ++ cell) {
-    if ( !cell->mKey1.is_error() &&
-	 (cell->mKey1.noref() ||
-	  cell->mAns.noref()) ) {
+    if ( cell->mKey1.is_error() || cell->mAns.is_const() ) continue;
+    if ( cell->mKey1.noref() || cell->mAns.noref() ) {
       cell->mKey1 = ZddEdge::make_error();
       -- mUsedNum;
     }
@@ -363,8 +362,8 @@ CompTbl1n::clear()
   Cell* end = cell + mTableSize;
   for ( ; cell != end; ++ cell) {
     cell->mKey1 = ZddEdge::make_error();
-    -- mUsedNum;
   }
+  mUsedNum = 0;
 }
 
 // @brief テーブルサイズを変更する．

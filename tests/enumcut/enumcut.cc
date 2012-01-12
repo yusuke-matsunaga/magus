@@ -20,6 +20,9 @@
 
 #include "TopDown.h"
 #include "BottomUp.h"
+#include "ZddImp.h"
+
+#include "ym_logic/ZddMgr.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -190,6 +193,12 @@ enumcut(const string& filename,
 
     enumcut(network, cut_size, &op);
   }
+  else if ( method_str == "zdd" ) {
+    ZddMgr mgr("zddmgr");
+    ZddImp enumcut(mgr);
+
+    enumcut(network, cut_size);
+  }
   else {
     cerr << "Unknown method: " << method_str << endl;
     return;
@@ -221,7 +230,7 @@ main(int argc,
     // docstr
     // argstr
     { "method", 'm', POPT_ARG_STRING, &method_str, 0,
-      "specify evaluation method", "bottom_up|top_down" },
+      "specify evaluation method", "bottom_up|top_down|zdd" },
 
     { "blif", '\0', POPT_ARG_NONE, NULL, 0x100,
       "blif mode", NULL },
