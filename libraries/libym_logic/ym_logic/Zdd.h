@@ -335,6 +335,11 @@ public:
   ymuint64
   print(ostream& s) const;
 
+  /// @brief 内容を集合の形で書き出す．
+  /// @param[in] s 出力ストリーム
+  void
+  print_set(ostream& s) const;
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 

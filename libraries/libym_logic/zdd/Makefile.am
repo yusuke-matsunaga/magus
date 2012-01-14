@@ -63,6 +63,8 @@ libym_logic_zdd_la_SOURCES = \
 	IdMgr.cc \
 	Printer.h \
 	Printer.cc \
+	Printer2.h \
+	Printer2.cc \
 	Dumper.h \
 	Dumper.cc \
 	Restorer.h \
