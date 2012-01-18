@@ -78,6 +78,8 @@ ZddImp::operator()(BdnMgr& network,
     nc_all += nc;
     cout << "Node#" << node->id() << endl;
     cut.print_set(cout);
+    cout << nc << " cuts, "
+	 << cut.node_count() << " nodes" << endl;
     cout << endl;
   }
   cout << "Total " << nc_all << " cuts" << endl;
