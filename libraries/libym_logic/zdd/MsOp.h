@@ -1,8 +1,8 @@
-#ifndef NEOP_H
-#define NEOP_H
+#ifndef MSOP_H
+#define MSOP_H
 
-/// @file NeOp.h
-/// @brief NeOp のヘッダファイル
+/// @file MsOp.h
+/// @brief MsOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -15,22 +15,26 @@
 
 BEGIN_NAMESPACE_YM_ZDD
 
+class ZddBinOp;
+
 //////////////////////////////////////////////////////////////////////
-/// @class NeOp NeOp.h "NeOp.h"
-/// @brief n-element 演算を求めるクラス
+/// @class MsOp MsOp.h "MsOp.h"
+/// @brief minimum setを求めるクラス
 //////////////////////////////////////////////////////////////////////
-class NeOp :
+class MsOp :
   public ZddOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr マネージャ
-  NeOp(ZddMgrImpl* mgr);
+  /// @param[in] diff_op 集合差演算オブジェクト
+  MsOp(ZddMgrImpl* mgr,
+       ZddBinOp* diff_op);
 
   /// @brief デストラクタ
   virtual
-  ~NeOp();
+  ~MsOp();
 
 
 public:
@@ -38,13 +42,11 @@ public:
   // メインの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief n-element 演算を行う関数
+  /// @brief minimum set 演算を行う関数
   /// @param[in] left オペランド
-  /// @param[in] level 変数のレベル
   virtual
   ZddEdge
-  apply(ZddEdge left,
-	ymuint limit);
+  apply(ZddEdge left);
 
   /// @brief 次の GC で回収されるノードに関連した情報を削除する．
   virtual
@@ -59,8 +61,7 @@ private:
 
   /// @brief 実際に演算を行う関数
   ZddEdge
-  apply_step(ZddEdge e,
-	     ymuint n);
+  apply_step(ZddEdge e);
 
 
 private:
@@ -69,10 +70,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 演算結果テーブル
-  CompTbl1n mCompTbl;
+  CompTbl1 mCompTbl;
+
+  // 集合差演算
+  ZddBinOp* mDiffOp;
 
 };
 
 END_NAMESPACE_YM_ZDD
 
-#endif // NEOP_H
+#endif // MSOP_H

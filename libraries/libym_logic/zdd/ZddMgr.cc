@@ -103,6 +103,15 @@ ZddMgr::n_element(const Zdd& left,
   return Zdd(mImpl, ans);
 }
 
+// @brief 極小集合のみにする．
+Zdd
+ZddMgr::minimum_set(const Zdd& left)
+{
+  ZddEdge e(left.mRoot);
+  ZddEdge ans = mImpl->minimum_set(e);
+  return Zdd(mImpl, ans);
+}
+
 #if 0
 // singletonを表すZDDを作る．
 Zdd

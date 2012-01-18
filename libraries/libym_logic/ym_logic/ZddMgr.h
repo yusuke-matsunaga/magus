@@ -123,6 +123,10 @@ public:
   n_element(const Zdd& left,
 	    ymuint limit);
 
+  /// @brief 極小集合のみにする．
+  Zdd
+  minimum_set(const Zdd& left);
+
 
 public:
   //////////////////////////////////////////////////////////////////////

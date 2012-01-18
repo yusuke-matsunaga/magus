@@ -109,7 +109,7 @@ SimpleOp::node_init(BdnNode* node)
 {
   mNcCur = 0;
   mCurNode = node;
-#if 0
+#if 1
   cout << "#" << mCurPos << ": Node#" << node->id() << endl;
 #endif
 }
@@ -121,7 +121,7 @@ SimpleOp::found_cut(BdnNode* root,
 {
   ++ mNcCur;
 
-#if 0
+#if 1
   cout << "found_cut(" << root->id() << ", {";
   for (ymuint i = 0; i < ni; ++ i) {
     cout << " " << inputs[i]->id();
@@ -139,7 +139,7 @@ SimpleOp::node_end(BdnNode* node)
   ++ mCurPos;
   mNcAll += mNcCur;
 
-#if 0
+#if 1
   cout << "    " << mNcCur << " cuts" << endl
        << endl;
 #endif

@@ -22,6 +22,7 @@
 #include "SupOp.h"
 #include "MergeOp.h"
 #include "NeOp.h"
+#include "MsOp.h"
 
 
 #if !defined(__SUNPRO_CC) || __SUNPRO_CC >= 0x500
@@ -103,7 +104,12 @@ bool
 ZddEdge::noref() const
 {
   ZddNode* node = get_node();
-  return node->noref();
+  if ( node != NULL ) {
+    return node->noref();
+  }
+  else {
+    return false;
+  }
 }
 
 
@@ -199,6 +205,7 @@ ZddMgrImpl::ZddMgrImpl(const string& name,
   mSupOp = new SupOp(this);
   mMergeOp = new MergeOp(this, mCupOp);
   mNeOp = new NeOp(this);
+  mMsOp = new MsOp(this, mDiffOp);
 }
 
 // デストラクタ
@@ -425,6 +432,13 @@ ZddMgrImpl::n_element(ZddEdge e,
 		      ymuint limit)
 {
   return mNeOp->apply(e, limit);
+}
+
+// @brief 極小集合のみする．
+ZddEdge
+ZddMgrImpl::minimum_set(ZddEdge e)
+{
+  return mMsOp->apply(e);
 }
 
 // edge_list に含まれる枝を根とするZDDのサポートに印をつける．

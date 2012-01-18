@@ -24,6 +24,7 @@ class ZddVar;
 class ZddNode;
 class SupOp;
 class NeOp;
+class MsOp;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ZddMgrImpl ZddMgrImpl.h "ZddMgrImpl.h"
@@ -144,6 +145,10 @@ public:
   ZddEdge
   n_element(ZddEdge e,
 	    ymuint limit);
+
+  /// @brief 極小集合のみする．
+  ZddEdge
+  minimum_set(ZddEdge e);
 
 
 public:
@@ -569,6 +574,9 @@ private:
 
   // n_element 用の演算オブジェクト
   NeOp* mNeOp;
+
+  // minimum_set 用の演算オブジェクト
+  MsOp* mMsOp;
 
   // 演算オブジェクトのリスト
   list<ZddOp*> mOpList;

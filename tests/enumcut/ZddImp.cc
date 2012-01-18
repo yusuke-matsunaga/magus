@@ -52,6 +52,9 @@ ZddImp::operator()(BdnMgr& network,
     mCuts[node->id()] = cut;
     mpz_class nc = cut.count();
     nc_all += nc;
+    cout << "Node#" << node->id() << endl;
+    cut.print_set(cout);
+    cout << endl;
   }
 
   vector<BdnNode*> node_list;
@@ -66,11 +69,16 @@ ZddImp::operator()(BdnMgr& network,
     Zdd cut1 = mCuts[node1->id()];
     Zdd cut = mMgr.merge(cut0, cut1);
     cut = mMgr.n_element(cut, limit);
+    cut = mMgr.minimum_set(cut);
     Zdd cut2 = mMgr.make_base();
     cut2.swap(VarId(node->id()));
-    mCuts[node->id()] = cut | cut2;
+    cut |= cut2;
+    mCuts[node->id()] = cut;
     mpz_class nc = cut.count();
     nc_all += nc;
+    cout << "Node#" << node->id() << endl;
+    cut.print_set(cout);
+    cout << endl;
   }
   cout << "Total " << nc_all << " cuts" << endl;
 }
