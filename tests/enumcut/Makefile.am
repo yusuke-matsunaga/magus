@@ -36,7 +36,9 @@ enumcut_SOURCES = \
 	TopDown.h \
 	TopDown.cc \
 	ZddImp.h \
-	ZddImp.cc
+	ZddImp.cc \
+	ZddTopDown.h \
+	ZddTopDown.cc
 
 enumcut_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \

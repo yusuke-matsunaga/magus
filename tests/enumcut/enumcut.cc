@@ -21,6 +21,7 @@
 #include "TopDown.h"
 #include "BottomUp.h"
 #include "ZddImp.h"
+#include "ZddTopDown.h"
 
 #include "ym_logic/ZddMgr.h"
 
@@ -196,6 +197,12 @@ enumcut(const string& filename,
   else if ( method_str == "zdd" ) {
     ZddMgr mgr("zddmgr");
     ZddImp enumcut(mgr);
+
+    enumcut(network, cut_size);
+  }
+  else if ( method_str == "zdd_top_down" ) {
+    ZddMgr mgr("zddmgr");
+    ZddTopDown enumcut(mgr);
 
     enumcut(network, cut_size);
   }

@@ -43,6 +43,13 @@ public:
 
 
 private:
+
+  Zdd
+  dfs(BdnNode* node,
+      const Zdd& cut);
+
+
+private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられるデータ構造
   //////////////////////////////////////////////////////////////////////
@@ -54,6 +61,9 @@ private:
 
     // footprint ノード
     vector<ymuint> mFpNodeList;
+
+    // 作業領域
+    ymuint32 mMark;
 
   };
 
