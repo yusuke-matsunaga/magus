@@ -102,8 +102,8 @@ SupOp::apply_sub(ZddEdge e)
     ymuint level = node->level();
     if ( mMarks[level] == 0 ) {
       mSupList.push_back(level);
+      mMarks[level] = 1;
     }
-    mMarks[level] = 1;
 
     apply_sub(node->edge0());
     e = node->edge1();

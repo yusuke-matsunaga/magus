@@ -147,6 +147,48 @@ test_binary(ZddMgr& zddmgr)
   return true;
 }
 
+// cofactor のテスト
+bool
+test_cofactor(ZddMgr& zddmgr)
+{
+  Zdd base = zddmgr.make_base();
+  Zdd var0 = base; var0.swap(VarId(0));
+  Zdd var1 = base; var1.swap(VarId(1));
+  Zdd var2 = base; var2.swap(VarId(2));
+  Zdd var3 = base; var3.swap(VarId(3));
+
+  Zdd set1 = var0 | var1 | var2 | var3;
+
+  if ( !check_zdd(zddmgr, var0.cofactor0(VarId(0)), "var0.cofactor0(0)", "") )
+    return false;
+
+  if ( !check_zdd(zddmgr, var0.cofactor1(VarId(0)), "var0.cofactor1(0)", "") )
+    return false;
+
+  if ( !check_zdd(zddmgr, var0.cofactor0(VarId(1)), "var0.cofactor0(1)", "") )
+    return false;
+
+  if ( !check_zdd(zddmgr, var0.cofactor1(VarId(1)), "var0.cofactor1(1)", "") )
+    return false;
+
+  if ( !check_zdd(zddmgr, set1.cofactor0(VarId(0)), "set1.cofactor0(0)", "") )
+    return false;
+
+  if ( !check_zdd(zddmgr, set1.cofactor1(VarId(0)), "set1.cofactor1(0)", "") )
+    return false;
+
+  if ( !check_zdd(zddmgr, base, "base", "") )
+    return false;
+
+  if ( !check_zdd(zddmgr, base.cofactor0(VarId(0)), "base.cofactor0(0)", "") )
+    return false;
+
+  if ( !check_zdd(zddmgr, base.cofactor1(VarId(0)), "base.cofactor1(0)", "") )
+    return false;
+
+  return true;
+}
+
 #if 0
 // support のテスト
 bool
@@ -238,7 +280,8 @@ test(ZddMgr& zddmgr)
   }
   return test_var_list(zddmgr, 10) &&
     test_const(zddmgr) &&
-    test_binary(zddmgr)
+    test_binary(zddmgr) &&
+    test_cofactor(zddmgr)
     ;
 }
 

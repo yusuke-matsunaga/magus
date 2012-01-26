@@ -61,10 +61,7 @@ Printer2::print_root(ZddEdge e)
 void
 Printer2::print_step(ZddEdge e)
 {
-  if ( e.is_zero() ) {
-    return;
-  }
-  if ( e.is_one() ) {
+  if ( e.zattr() ) {
     mStream << "{";
     for (vector<ymuint32>::iterator p = mElemList.begin();
 	 p != mElemList.end(); ++ p) {
@@ -72,16 +69,20 @@ Printer2::print_step(ZddEdge e)
       mStream << " " << mMgr->varid(l);
     }
     mStream << "}" << endl;
+  }
+
+  e.normalize();
+
+  if ( e.is_zero() ) {
     return;
   }
 
   ZddNode* node = e.get_node();
-  ymuint level = node->level();
   ZddEdge e0 = node->edge0();
   print_step(e0);
 
   ZddEdge e1 = node->edge1();
-  e1.add_zattr(e.zattr());
+  ymuint level = node->level();
   mElemList.push_back(level);
   print_step(e1);
   mElemList.pop_back();

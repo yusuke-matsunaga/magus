@@ -43,7 +43,8 @@ check_zdd(ZddMgr& zddmgr,
     }
   }
 
-  cout << "spec = ";
+  cout << zdd_str
+       << ": spec = ";
   for (vector<ymuint32>::iterator p = v_list.begin();
        p != v_list.end(); ++ p) {
     cout << " " << *p;

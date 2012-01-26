@@ -54,11 +54,8 @@ Cof0Op::apply_step(ZddEdge f)
   // 特別な場合の処理
   // 1：fが0なら答は0，
   // 2: fが1なら答は1
-  if ( f.is_zero() ) {
-    return ZddEdge::make_zero();
-  }
-  if ( f.is_one() ) {
-    return  ZddEdge::make_one();
+  if ( f.is_const() ) {
+    return f;
   }
 
   // この時点で f は終端ではない．
@@ -67,6 +64,7 @@ Cof0Op::apply_step(ZddEdge f)
   if ( f_level == mLevel ) {
     ZddEdge result = f_node->edge0();
     result.add_zattr(f.zattr());
+
     return result;
   }
   if ( f_level > mLevel ) {
