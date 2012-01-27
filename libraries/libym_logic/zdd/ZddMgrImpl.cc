@@ -421,9 +421,10 @@ ZddMgrImpl::cofactor1(ZddEdge e,
 // @brief 要素ごとのユニオンを計算する．
 ZddEdge
 ZddMgrImpl::merge(ZddEdge e1,
-		  ZddEdge e2)
+		  ZddEdge e2,
+		  ymuint limit)
 {
-  return mMergeOp->apply(e1, e2);
+  return mMergeOp->apply(e1, e2, limit);
 }
 
 // @brief 要素数に制限をかける．

@@ -13,6 +13,23 @@
 BEGIN_NAMESPACE_YM_ZDD
 
 //////////////////////////////////////////////////////////////////////
+// クラス ZddBinOpBase
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] mgr マネージャ
+ZddBinOpBase::ZddBinOpBase(ZddMgrImpl* mgr) :
+  ZddOp(mgr)
+{
+}
+
+// @brief デストラクタ
+ZddBinOpBase::~ZddBinOpBase()
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス ZddBinOp
 //////////////////////////////////////////////////////////////////////
 
@@ -21,7 +38,7 @@ BEGIN_NAMESPACE_YM_ZDD
 // @param[in] name テーブル名
 ZddBinOp::ZddBinOp(ZddMgrImpl* mgr,
 		   const char* name) :
-  ZddOp(mgr),
+  ZddBinOpBase(mgr),
   mCompTbl(mgr, name)
 {
 }

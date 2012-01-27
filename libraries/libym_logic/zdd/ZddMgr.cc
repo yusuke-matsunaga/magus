@@ -85,11 +85,12 @@ ZddMgr::make_overflow()
 // @brief 2つの集合をマージする．
 Zdd
 ZddMgr::merge(const Zdd& left,
-	      const Zdd& right)
+	      const Zdd& right,
+	      ymuint limit)
 {
   ZddEdge e1(left.mRoot);
   ZddEdge e2(right.mRoot);
-  ZddEdge ans = mImpl->merge(e1, e2);
+  ZddEdge ans = mImpl->merge(e1, e2, limit);
   return Zdd(mImpl, ans);
 }
 

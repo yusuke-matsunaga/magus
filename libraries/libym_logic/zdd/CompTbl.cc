@@ -421,4 +421,111 @@ CompTbl1n::resize(ymuint64 new_size)
   return true;
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// CompTbl2n
+//////////////////////////////////////////////////////////////////////
+
+// コンストラクタ
+CompTbl2n::CompTbl2n(ZddMgrImpl* mgr,
+		     const char* name) :
+  CompTbl(mgr, name)
+{
+  resize(kInitSize);
+}
+
+// デストラクタ
+CompTbl2n::~CompTbl2n()
+{
+  deallocate((void*)mTable, mTableSize * sizeof(Cell));
+}
+
+// テーブルサイズを変更する．
+bool
+CompTbl2n::resize(ymuint64 new_size)
+{
+  // ログの出力
+  logstream() << "CompTbl2n[" << mName << "]::resize(" << new_size << ")"
+	      << endl;
+
+  // 新たなサイズを設定し，テーブルを確保する．
+  Cell* new_table = (Cell*)allocate(new_size * sizeof(Cell));
+  if ( new_table == NULL ) {
+    return false;
+  }
+
+  // 昔の値を保存する．
+  ymuint64 old_size = mTableSize;
+  Cell* old_table = mTable;
+
+  mTable = new_table;
+  mTableSize = new_size;
+  mTableSize_1 = mTableSize - 1;
+  update_next_limit();
+
+  // 中身をクリアしておく．
+  Cell* top = mTable;
+  Cell* end = top + mTableSize;
+  do {
+    top->mKey1 = ZddEdge::make_error();
+    ++ top;
+  } while ( top != end );
+
+  // ハッシュし直して新しいテーブルに登録する．
+  mUsedNum = 0;
+  if ( old_size > 0 ) {
+    Cell* top = old_table;
+    Cell* end = top + old_size;
+    do {
+      if ( !top->mKey1.is_error() ) {
+	ymuint64 pos = hash_func(top->mKey1, top->mKey2, top->mKey3);
+	Cell* temp = mTable + pos;
+	if ( temp->mKey1.is_error() ) ++ mUsedNum;
+	temp->mKey1 = top->mKey1;
+	temp->mKey2 = top->mKey2;
+	temp->mKey3 = top->mKey3;
+	temp->mAns = top->mAns;
+      }
+      ++ top;
+    } while ( top != end );
+    deallocate((void*)old_table, old_size * sizeof(Cell));
+  }
+
+  return true;
+}
+
+// ZddMgr::GC()に対応する．
+// 具体的には GC で削除されるノードに関連したセルをクリアする．
+void
+CompTbl2n::sweep()
+{
+  // ログを出力
+  logstream() << "CompTbl2n[" << mName << "]::sweep()" << endl;
+
+  // 削除されるノードに関連したセルをクリアする．
+  Cell* cell = mTable;
+  Cell* end = cell + mTableSize;
+  for ( ; cell != end; ++ cell) {
+    if ( !cell->mKey1.is_error() &&
+	 (cell->mKey1.noref() ||
+	  cell->mKey2.noref() ||
+	  cell->mAns.noref()) ) {
+      cell->mKey1 = ZddEdge::make_error();
+      -- mUsedNum;
+    }
+  }
+}
+
+// クリアする．
+void
+CompTbl2n::clear()
+{
+  Cell* cell = mTable;
+  Cell* end = cell + mTableSize;
+  for ( ; cell != end; ++ cell) {
+    cell->mKey1 = ZddEdge::make_error();
+  }
+  mUsedNum = 0;
+}
+
 END_NAMESPACE_YM_ZDD

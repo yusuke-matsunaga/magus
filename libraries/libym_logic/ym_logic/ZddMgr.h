@@ -116,7 +116,8 @@ public:
   /// @brief 2つの集合をマージする．
   Zdd
   merge(const Zdd& left,
-	const Zdd& right);
+	const Zdd& right,
+	ymuint limit);
 
   /// @brief 要素数を制限する．
   Zdd

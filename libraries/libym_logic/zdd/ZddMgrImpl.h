@@ -23,6 +23,7 @@ class ZddBinOp;
 class ZddVar;
 class ZddNode;
 class SupOp;
+class MergeOp;
 class NeOp;
 class MsOp;
 
@@ -139,7 +140,8 @@ public:
   /// @brief 要素ごとのユニオンを計算する．
   ZddEdge
   merge(ZddEdge e1,
-	ZddEdge e2);
+	ZddEdge e2,
+	ymuint limit);
 
   /// @brief 要素数に制限をかける．
   ZddEdge
@@ -570,7 +572,7 @@ private:
   SupOp* mSupOp;
 
   // merge 用の演算オブジェクト
-  ZddBinOp* mMergeOp;
+  MergeOp* mMergeOp;
 
   // n_element 用の演算オブジェクト
   NeOp* mNeOp;
