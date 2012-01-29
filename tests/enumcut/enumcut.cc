@@ -21,6 +21,7 @@
 #include "TopDown.h"
 #include "BottomUp.h"
 #include "ZddImp.h"
+#include "ZddImp2.h"
 #include "ZddTopDown.h"
 
 #include "ym_logic/ZddMgr.h"
@@ -122,7 +123,7 @@ SimpleOp::found_cut(BdnNode* root,
 {
   ++ mNcCur;
 
-#if 1
+#if 0
   cout << "found_cut(" << root->id() << ", {";
   for (ymuint i = 0; i < ni; ++ i) {
     cout << " " << inputs[i]->id();
@@ -197,6 +198,12 @@ enumcut(const string& filename,
   else if ( method_str == "zdd" ) {
     ZddMgr mgr("zddmgr");
     ZddImp enumcut(mgr);
+
+    enumcut(network, cut_size);
+  }
+  else if ( method_str == "zdd2" ) {
+    ZddMgr mgr("zddmgr");
+    ZddImp2 enumcut(mgr);
 
     enumcut(network, cut_size);
   }

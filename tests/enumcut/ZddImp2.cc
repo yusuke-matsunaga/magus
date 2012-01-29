@@ -1,13 +1,13 @@
 
-/// @file ZddImp.cc
-/// @brief ZddImp の実装ファイル
+/// @file ZddImp2.cc
+/// @brief ZddImp2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ZddImp.h"
+#include "ZddImp2.h"
 
 #include "ym_networks/BdnMgr.h"
 #include "ym_networks/BdnNode.h"
@@ -17,13 +17,13 @@ BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ
 // @param[in] mgr
-ZddImp::ZddImp(ZddMgr& mgr) :
+ZddImp2::ZddImp2(ZddMgr& mgr) :
   mMgr(mgr)
 {
 }
 
 // @brief デストラクタ
-ZddImp::~ZddImp()
+ZddImp2::~ZddImp2()
 {
 }
 
@@ -31,8 +31,8 @@ ZddImp::~ZddImp()
 // @param[in] network 対象のネットワーク
 // @param[in] limit カットサイズの制限
 void
-ZddImp::operator()(BdnMgr& network,
-		   ymuint limit)
+ZddImp2::operator()(BdnMgr& network,
+		    ymuint limit)
 {
   ymuint n = network.max_node_id();
 
@@ -67,8 +67,7 @@ ZddImp::operator()(BdnMgr& network,
     BdnNode* node1 = node->fanin(1);
     Zdd cut0 = mCuts[node0->id()];
     Zdd cut1 = mCuts[node1->id()];
-    Zdd cut = mMgr.merge(cut0, cut1);
-    cut = mMgr.n_element(cut, limit);
+    Zdd cut = mMgr.merge(cut0, cut1, limit);
     cut = mMgr.minimum_set(cut);
     Zdd cut2 = mMgr.make_base();
     cut2.swap(VarId(node->id()));

@@ -116,6 +116,11 @@ public:
   /// @brief 2つの集合をマージする．
   Zdd
   merge(const Zdd& left,
+	const Zdd& right);
+
+  /// @brief 2つの集合をマージする．
+  Zdd
+  merge(const Zdd& left,
 	const Zdd& right,
 	ymuint limit);
 

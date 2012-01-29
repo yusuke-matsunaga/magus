@@ -23,7 +23,7 @@ class ZddBinOp;
 class ZddVar;
 class ZddNode;
 class SupOp;
-class MergeOp;
+class MergeOp2;
 class NeOp;
 class MsOp;
 
@@ -136,6 +136,11 @@ public:
   ZddEdge
   cofactor1(ZddEdge e,
 	    VarId var);
+
+  /// @brief 要素ごとのユニオンを計算する．
+  ZddEdge
+  merge(ZddEdge e1,
+	ZddEdge e2);
 
   /// @brief 要素ごとのユニオンを計算する．
   ZddEdge
@@ -572,7 +577,10 @@ private:
   SupOp* mSupOp;
 
   // merge 用の演算オブジェクト
-  MergeOp* mMergeOp;
+  ZddBinOp* mMergeOp;
+
+  // merge 用の演算オブジェクト
+  MergeOp2* mMergeOp2;
 
   // n_element 用の演算オブジェクト
   NeOp* mNeOp;

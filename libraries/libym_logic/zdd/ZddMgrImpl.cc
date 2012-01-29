@@ -21,6 +21,7 @@
 #include "Cof1Op.h"
 #include "SupOp.h"
 #include "MergeOp.h"
+#include "MergeOp2.h"
 #include "NeOp.h"
 #include "MsOp.h"
 
@@ -203,9 +204,10 @@ ZddMgrImpl::ZddMgrImpl(const string& name,
   mCof0Op = new Cof0Op(this);
   mCof1Op = new Cof1Op(this);
   mSupOp = new SupOp(this);
-  mMergeOp = new MergeOp(this, mCupOp);
   mNeOp = new NeOp(this);
   mMsOp = new MsOp(this, mDiffOp);
+  mMergeOp = new MergeOp(this, mCupOp);
+  mMergeOp2 = new MergeOp2(this, mCupOp, mNeOp, mMsOp);
 }
 
 // デストラクタ
@@ -421,10 +423,18 @@ ZddMgrImpl::cofactor1(ZddEdge e,
 // @brief 要素ごとのユニオンを計算する．
 ZddEdge
 ZddMgrImpl::merge(ZddEdge e1,
+		  ZddEdge e2)
+{
+  return mMergeOp->apply(e1, e2);
+}
+
+// @brief 要素ごとのユニオンを計算する．
+ZddEdge
+ZddMgrImpl::merge(ZddEdge e1,
 		  ZddEdge e2,
 		  ymuint limit)
 {
-  return mMergeOp->apply(e1, e2, limit);
+  return mMergeOp2->apply(e1, e2, limit);
 }
 
 // @brief 要素数に制限をかける．

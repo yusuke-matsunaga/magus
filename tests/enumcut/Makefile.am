@@ -37,6 +37,8 @@ enumcut_SOURCES = \
 	TopDown.cc \
 	ZddImp.h \
 	ZddImp.cc \
+	ZddImp2.h \
+	ZddImp2.cc \
 	ZddTopDown.h \
 	ZddTopDown.cc
 
