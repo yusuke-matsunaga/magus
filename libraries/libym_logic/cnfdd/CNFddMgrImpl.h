@@ -17,13 +17,14 @@
 
 BEGIN_NAMESPACE_YM_CNFDD
 
-class CNFddOp;
-class CNFddUniOp;
-class CNFddUniVOp;
-class CNFddBinOp;
+class Op;
+class UniOp;
+class UniNOp;
+class UniVOp;
+class BinOp;
+class SupOp;
 class CNFddVar;
 class CNFddNode;
-class SupOp;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CNFddMgrImpl CNFddMgrImpl.h "CNFddMgrImpl.h"
@@ -32,7 +33,7 @@ class SupOp;
 class CNFddMgrImpl
 {
   friend class CNFdd;
-  friend class CNFddOp;
+  friend class Op;
   friend class CompTbl;
 
 public:
@@ -115,9 +116,19 @@ public:
   diff(CNFddEdge e1,
        CNFddEdge e2);
 
+  /// @brief 要素ごとのユニオンを計算する．
+  CNFddEdge
+  merge(CNFddEdge e1,
+	CNFddEdge e2);
+
   /// @brief 他の節に支配されている節を取り除く
   CNFddEdge
-  make_minimum(CNFddEdge e1);
+  make_minimal(CNFddEdge e1);
+
+  /// @brief 要素数が limit 以下の要素のみを残す．
+  CNFddEdge
+  cut_off(CNFddEdge e1,
+	  ymuint limit);
 
   /// @brief 指定した変数の肯定のリテラルを加える．
   /// @param[in] e 枝
@@ -548,34 +559,40 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // この CNFddMgr に登録されている演算オブジェクトのリスト
-  list<CNFddOp*> mOpList;
+  list<Op*> mOpList;
 
   // conjunction 用の演算クラス
-  CNFddBinOp* mConOp;
+  BinOp* mConOp;
 
   // disjunction 用の演算クラス
-  CNFddBinOp* mDisOp;
+  BinOp* mDisOp;
 
   // diff 用の演算クラス
-  CNFddBinOp* mDiffOp;
+  BinOp* mDiffOp;
+
+  // merge 用の演算クラス
+  BinOp* mMergeOp;
+
+  // cut_off 用の演算クラス
+  UniNOp* mCutOp;
+
+  // make_minimal 用の演算クラス
+  UniOp* mMinOp;
 
   // add_posiliteral 用の演算クラス
-  CNFddUniVOp* mLitPOp;
+  UniVOp* mLitPOp;
 
   // add_negaliteral 用の演算クラス
-  CNFddUniVOp* mLitNOp;
-
-  // make_minimum 用の演算クラス
-  CNFddUniOp* mMinOp;
+  UniVOp* mLitNOp;
 
   // cofactor0 用の演算クラス
-  CNFddUniVOp* mCof0Op;
+  UniVOp* mCof0Op;
 
   // cofactorP 用の演算クラス
-  CNFddUniVOp* mCofPOp;
+  UniVOp* mCofPOp;
 
   // cofactorN 用の演算クラス
-  CNFddUniVOp* mCofNOp;
+  UniVOp* mCofNOp;
 
   // support 用の演算クラス
   SupOp* mSupOp;

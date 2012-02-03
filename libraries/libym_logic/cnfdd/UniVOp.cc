@@ -1,36 +1,36 @@
 
-/// @file CNFddUniVOp.cc
-/// @brief CNFddUniVOp の実装ファイル
+/// @file UniVOp.cc
+/// @brief UniVOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CNFddUniVOp.h"
+#include "UniVOp.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
-// クラス CNFddUniVOp
+// クラス UniVOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] mgr マネージャ
-CNFddUniVOp::CNFddUniVOp(CNFddMgrImpl& mgr) :
-  CNFddOp(mgr)
+UniVOp::UniVOp(CNFddMgrImpl& mgr) :
+  Op(mgr)
 {
 }
 
 // @brief デストラクタ
-CNFddUniVOp::~CNFddUniVOp()
+UniVOp::~UniVOp()
 {
 }
 
 // @brief 次の GC で回収されるノードに関連した情報を削除する．
 void
-CNFddUniVOp::sweep()
+UniVOp::sweep()
 {
   // なにもしない．
 }

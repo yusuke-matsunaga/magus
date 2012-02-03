@@ -1,36 +1,36 @@
-#ifndef CNFDDBINOP_H
-#define CNFDDBINOP_H
+#ifndef BINOP_H
+#define BINOP_H
 
-/// @file CNFddBinOp.h
-/// @brief CNFddBinOp のヘッダファイル
+/// @file BinOp.h
+/// @brief BinOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CNFddOp.h"
+#include "Op.h"
 #include "CompTbl.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class CNFddBinOpbase CNFddBinOp.h "CNFddbinOp.h"
+/// @class BinOpBase BinOp.h "BinOp.h"
 /// @brief CNFDD の二項演算を行うクラスの基底クラス
 //////////////////////////////////////////////////////////////////////
-class CNFddBinOpBase :
-  public CNFddOp
+class BinOpBase :
+  public Op
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr マネージャ
-  CNFddBinOpBase(CNFddMgrImpl& mgr);
+  BinOpBase(CNFddMgrImpl& mgr);
 
   /// @brief デストラクタ
   virtual
-  ~CNFddBinOpBase();
+  ~BinOpBase();
 
 
 protected:
@@ -58,23 +58,23 @@ protected:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CNFddBinOp CNFddBinOp.h "CNFddbinOp.h"
+/// @class BinOp BinOp.h "BinOp.h"
 /// @brief CNFDD の二項演算を行うクラス
 //////////////////////////////////////////////////////////////////////
-class CNFddBinOp :
-  public CNFddBinOpBase
+class BinOp :
+  public BinOpBase
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr マネージャ
   /// @param[in] name テーブル名
-  CNFddBinOp(CNFddMgrImpl& mgr,
-	     const char* name);
+  BinOp(CNFddMgrImpl& mgr,
+	const char* name);
 
   /// @brief デストラクタ
   virtual
-  ~CNFddBinOp();
+  ~BinOp();
 
 
 public:
@@ -134,14 +134,14 @@ private:
 // @return 根のレベルを返す．
 inline
 ymuint
-CNFddBinOpBase::split(CNFddEdge f,
-		      CNFddEdge g,
-		      CNFddEdge& f_0,
-		      CNFddEdge& f_p,
-		      CNFddEdge& f_n,
-		      CNFddEdge& g_0,
-		      CNFddEdge& g_p,
-		      CNFddEdge& g_n)
+BinOpBase::split(CNFddEdge f,
+		 CNFddEdge g,
+		 CNFddEdge& f_0,
+		 CNFddEdge& f_p,
+		 CNFddEdge& f_n,
+		 CNFddEdge& g_0,
+		 CNFddEdge& g_p,
+		 CNFddEdge& g_n)
 {
   CNFddNode* f_vp = f.get_node();
   CNFddNode* g_vp = g.get_node();
@@ -160,8 +160,8 @@ CNFddBinOpBase::split(CNFddEdge f,
 // @brief id1, id2をキーとして検索を行なう
 inline
 CNFddEdge
-CNFddBinOp::get(CNFddEdge id1,
-		CNFddEdge id2)
+BinOp::get(CNFddEdge id1,
+	   CNFddEdge id2)
 {
   return mCompTbl.get(id1, id2);
 }
@@ -169,13 +169,13 @@ CNFddBinOp::get(CNFddEdge id1,
 // @brief 結果を登録する
 inline
 void
-CNFddBinOp::put(CNFddEdge id1,
-		CNFddEdge id2,
-		CNFddEdge ans)
+BinOp::put(CNFddEdge id1,
+	   CNFddEdge id2,
+	   CNFddEdge ans)
 {
   return mCompTbl.put(id1, id2, ans);
 }
 
 END_NAMESPACE_YM_CNFDD
 
-#endif // CNFDDOP_H
+#endif // BINOP_H

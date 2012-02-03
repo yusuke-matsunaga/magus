@@ -1,11 +1,11 @@
-#ifndef CNFDDOP_H
-#define CNFDDOP_H
+#ifndef OP_H
+#define OP_H
 
-/// @file CNFddOp.h
-/// @brief CNFddOp のヘッダファイル
+/// @file Op.h
+/// @brief Op のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,20 +18,20 @@
 BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class CNFddOp CNFddOp.h "CNFddOp.h"
+/// @class Op Op.h "Op.h"
 /// @brief CNFDD の演算を行うクラス
 //////////////////////////////////////////////////////////////////////
-class CNFddOp
+class Op
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr マネージャ
-  CNFddOp(CNFddMgrImpl& mgr);
+  Op(CNFddMgrImpl& mgr);
 
   /// @brief デストラクタ
   virtual
-  ~CNFddOp() { }
+  ~Op() { }
 
 
 public:
@@ -102,7 +102,7 @@ private:
 /// @brief コンストラクタ
 // @param[in] mgr マネージャ
 inline
-CNFddOp::CNFddOp(CNFddMgrImpl& mgr) :
+Op::Op(CNFddMgrImpl& mgr) :
   mMgr(mgr)
 {
   mMgr.mOpList.push_back(this);
@@ -114,10 +114,10 @@ CNFddOp::CNFddOp(CNFddMgrImpl& mgr) :
 // @param[in] e_n n枝
 inline
 CNFddEdge
-CNFddOp::new_node(ymuint level,
-		  CNFddEdge e_0,
-		  CNFddEdge e_p,
-		  CNFddEdge e_n)
+Op::new_node(ymuint level,
+	     CNFddEdge e_0,
+	     CNFddEdge e_p,
+	     CNFddEdge e_n)
 {
   return mMgr.new_node(level, e_0, e_p, e_n);
 }
@@ -132,13 +132,13 @@ CNFddOp::new_node(ymuint level,
 // @param[out] e_n n枝
 inline
 void
-CNFddOp::split1(ymuint top_level,
-		ymuint level,
-		CNFddEdge e,
-		CNFddNode* node,
-		CNFddEdge& e_0,
-		CNFddEdge& e_p,
-		CNFddEdge& e_n)
+Op::split1(ymuint top_level,
+	   ymuint level,
+	   CNFddEdge e,
+	   CNFddNode* node,
+	   CNFddEdge& e_0,
+	   CNFddEdge& e_p,
+	   CNFddEdge& e_n)
 {
   if ( top_level == level ) {
     e_0 = node->edge_0();
@@ -155,11 +155,11 @@ CNFddOp::split1(ymuint top_level,
 // @brief マネージャを返す．
 inline
 CNFddMgrImpl&
-CNFddOp::mgr() const
+Op::mgr() const
 {
   return mMgr;
 }
 
 END_NAMESPACE_YM_CNFDD
 
-#endif // CNFDDOP_H
+#endif // OP_H

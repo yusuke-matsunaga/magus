@@ -79,9 +79,6 @@ Printer2::print_step(CNFddEdge e)
   }
 
   CNFddNode* node = e.get_node();
-  CNFddEdge e_0 = node->edge_0();
-  print_step(e_0);
-
   ymuint level = node->level();
   VarId var = mMgr->varid(level);
 
@@ -94,6 +91,9 @@ Printer2::print_step(CNFddEdge e)
   mElemList.push_back(Literal(var, kPolNega));
   print_step(e_n);
   mElemList.pop_back();
+
+  CNFddEdge e_0 = node->edge_0();
+  print_step(e_0);
 }
 
 END_NAMESPACE_YM_CNFDD

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "CNFddOp.h"
+#include "Op.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_CNFDD
 /// @brief サポートを求める演算を行うクラス
 //////////////////////////////////////////////////////////////////////
 class SupOp :
-  public CNFddOp
+  public Op
 {
 public:
 

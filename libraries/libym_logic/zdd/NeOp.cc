@@ -74,18 +74,18 @@ NeOp::apply_step(ZddEdge f,
     if ( r_0.is_invalid() ) {
       return r_0;
     }
-    ZddEdge f_1 = f_node->edge1();
-    ZddEdge r_1;
+
     if ( n > 0 ) {
-      r_1 = apply_step(f_1, n - 1);
+      ZddEdge f_1 = f_node->edge1();
+      ZddEdge r_1 = apply_step(f_1, n - 1);
       if ( r_1.is_invalid() ) {
 	return r_1;
       }
+      result = new_node(f_level, r_0, r_1);
     }
     else {
-      r_1 = ZddEdge::make_zero();
+      result = r_0;
     }
-    result = new_node(f_level, r_0, r_1);
     mCompTbl.put(f, n, result);
   }
   return result;

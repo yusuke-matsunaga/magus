@@ -1,56 +1,39 @@
 
-/// @file CNFddBinOp.cc
-/// @brief CNFddBinOp の実装ファイル
+/// @file UniOp.cc
+/// @brief UniOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CNFddBinOp.h"
+#include "UniOp.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
-// クラス CNFddBinOpBase
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] mgr マネージャ
-CNFddBinOpBase::CNFddBinOpBase(CNFddMgrImpl& mgr) :
-  CNFddOp(mgr)
-{
-}
-
-// @brief デストラクタ
-CNFddBinOpBase::~CNFddBinOpBase()
-{
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス CNFddBinOp
+// クラス UniOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] mgr マネージャ
 // @param[in] name テーブル名
-CNFddBinOp::CNFddBinOp(CNFddMgrImpl& mgr,
-		       const char* name) :
-  CNFddBinOpBase(mgr),
+UniOp::UniOp(CNFddMgrImpl& mgr,
+	     const char* name) :
+  Op(mgr),
   mCompTbl(mgr, name)
 {
 }
 
 // @brief デストラクタ
-CNFddBinOp::~CNFddBinOp()
+UniOp::~UniOp()
 {
 }
 
 // @brief 次の GC で回収されるノードに関連した情報を削除する．
 void
-CNFddBinOp::sweep()
+UniOp::sweep()
 {
   if ( mCompTbl.used_num() > 0 ) {
     mCompTbl.sweep();

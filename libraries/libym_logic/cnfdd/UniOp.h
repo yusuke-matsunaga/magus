@@ -1,35 +1,38 @@
-#ifndef CNFDDUNIVOP_H
-#define CNFDDUNIVOP_H
+#ifndef UNIOP_H
+#define UNIOP_H
 
-/// @file CNFddUniVOp.h
-/// @brief CNFddUniVOp のヘッダファイル
+/// @file UniOp.h
+/// @brief UniOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CNFddOp.h"
+#include "Op.h"
+#include "CompTbl.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class CNFddUniVOp CNFddOp.h "CNFddOp.h"
-/// @brief CNFDD の二項演算(一つは変数番号)を行うクラス
+/// @class UniOp UniOp.h "UniOp.h"
+/// @brief CNFDD の単項演算を行うクラス
 //////////////////////////////////////////////////////////////////////
-class CNFddUniVOp :
-  public CNFddOp
+class UniOp :
+  public Op
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr マネージャ
-  CNFddUniVOp(CNFddMgrImpl& mgr);
+  /// @param[in] name テーブル名
+  UniOp(CNFddMgrImpl& mgr,
+	const char* name);
 
   /// @brief デストラクタ
   virtual
-  ~CNFddUniVOp();
+  ~UniOp();
 
 
 public:
@@ -39,10 +42,9 @@ public:
 
   /// @brief 演算を行う関数
   /// @param[in] left オペランド
-  /// @param[in] level 変数のレベル
+  virtual
   CNFddEdge
-  apply(CNFddEdge left,
-	ymuint level);
+  apply(CNFddEdge left) = 0;
 
   /// @brief 次の GC で回収されるノードに関連した情報を削除する．
   virtual
@@ -54,12 +56,6 @@ protected:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算を実際に行う関数
-  /// @param[in] left オペランド
-  virtual
-  CNFddEdge
-  apply(CNFddEdge left) = 0;
 
   /// @brief 演算結果テーブルを検索する．
   /// @param[in] e1 オペランドの枝
@@ -73,25 +69,14 @@ protected:
   put(CNFddEdge e1,
       CNFddEdge ans);
 
-  /// @brief 演算結果テーブルをクリアする．
-  void
-  clear();
-
-  /// @brief apply の第2引数を取り出す．
-  ymuint
-  level() const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 一時的に結果を覚えておくハッシュ表
-  hash_map<CNFddEdge, CNFddEdge> mCompTbl;
-
-  // apply の第2引数
-  ymuint32 mLevel;
+  // 演算結果テーブル
+  CompTbl1 mCompTbl;
 
 };
 
@@ -100,31 +85,13 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 演算を行う関数
-// @param[in] left オペランド
-// @param[in] level 変数のレベル
-inline
-CNFddEdge
-CNFddUniVOp::apply(CNFddEdge left,
-		   ymuint level)
-{
-  mLevel = level;
-  return apply(left);
-}
-
 // @brief 演算結果テーブルを検索する．
 // @param[in] e1 オペランドの枝
 inline
 CNFddEdge
-CNFddUniVOp::get(CNFddEdge e1)
+UniOp::get(CNFddEdge e1)
 {
-  hash_map<CNFddEdge, CNFddEdge>::iterator p = mCompTbl.find(e1);
-  if ( p == mCompTbl.end() ) {
-    return CNFddEdge::make_error();
-  }
-  else {
-    return p->second;
-  }
+  return mCompTbl.get(e1);
 }
 
 // @brief 演算結果テーブルに登録する．
@@ -132,28 +99,12 @@ CNFddUniVOp::get(CNFddEdge e1)
 // @param[in] ans 結果の枝
 inline
 void
-CNFddUniVOp::put(CNFddEdge e1,
-		 CNFddEdge ans)
+UniOp::put(CNFddEdge e1,
+	   CNFddEdge ans)
 {
-  mCompTbl.insert(make_pair(e1, ans));
-}
-
-// @brief 演算結果テーブルをクリアする．
-inline
-void
-CNFddUniVOp::clear()
-{
-  mCompTbl.clear();
-}
-
-// @brief apply の第2引数を取り出す．
-inline
-ymuint
-CNFddUniVOp::level() const
-{
-  return mLevel;
+  mCompTbl.put(e1, ans);
 }
 
 END_NAMESPACE_YM_CNFDD
 
-#endif // CNFDDUNIVOP_H
+#endif // UNIOP_H

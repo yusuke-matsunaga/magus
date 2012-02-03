@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "CNFddBinOp.h"
+#include "BinOp.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_CNFDD
 /// @brief disjunction を求めるクラス
 //////////////////////////////////////////////////////////////////////
 class DisOp :
-  public CNFddBinOp
+  public BinOp
 {
 public:
 

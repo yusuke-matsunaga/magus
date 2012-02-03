@@ -1,35 +1,39 @@
-#ifndef CONOP_H
-#define CONOP_H
+#ifndef MINOP_H
+#define MINOP_H
 
-/// @file ConOp.h
-/// @brief ConOp のヘッダファイル
+/// @file MinOp.h
+/// @brief MinOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BinOp.h"
+#include "UniOp.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
 
+class BinOp;
+
 //////////////////////////////////////////////////////////////////////
-/// @class ConOp ConOp.h "ConOp.h"
-/// @brief conjunction を求めるクラス
+/// @class MinOp MinOp.h "MinOp.h"
+/// @brief make_minimal 演算を求めるクラス
 //////////////////////////////////////////////////////////////////////
-class ConOp :
-  public BinOp
+class MinOp :
+  public UniOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr CNFddMgrImpl
-  ConOp(CNFddMgrImpl& mgr);
+  /// @param[in] diff_op 集合差演算オブジェクト
+  MinOp(CNFddMgrImpl& mgr,
+	BinOp* diff_op);
 
   /// @brief デストラクタ
   virtual
-  ~ConOp();
+  ~MinOp();
 
 
 public:
@@ -37,12 +41,11 @@ public:
   // メインの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief \f$\wedge\f$演算を行う関数
-  /// @param[in] left, right オペランド
+  /// @brief make_minimal 演算を行う関数
+  /// @param[in] left オペランド
   virtual
   CNFddEdge
-  apply(CNFddEdge left,
-	CNFddEdge right);
+  apply(CNFddEdge left);
 
 
 private:
@@ -52,11 +55,19 @@ private:
 
   /// @brief 実際に演算を行う関数
   CNFddEdge
-  apply_step(CNFddEdge f,
-	     CNFddEdge g);
+  apply_step(CNFddEdge f);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 集合差演算オブジェクト
+  BinOp* mDiffOp;
 
 };
 
 END_NAMESPACE_YM_CNFDD
 
-#endif // CONOP_H
+#endif // MINOP_H

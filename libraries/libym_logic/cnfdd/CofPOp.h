@@ -5,21 +5,21 @@
 /// @brief CofPOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CNFddUniVOp.h"
+#include "UniVOp.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
 /// @class CofPOp CofPOp.h "CofPOp.h"
-/// @brief cofactorp0 演算を求めるクラス
+/// @brief cofactorp 演算を求めるクラス
 //////////////////////////////////////////////////////////////////////
 class CofPOp :
-  public CNFddUniVOp
+  public UniVOp
 {
 public:
 

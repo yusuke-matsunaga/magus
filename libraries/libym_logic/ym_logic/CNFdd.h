@@ -12,6 +12,7 @@
 
 #include "ym_logic/cnfdd_nsdef.h"
 #include "ym_logic/VarId.h"
+#include "ym_logic/Literal.h"
 #include "ym_utils/BinIO.h"
 #include "gmpxx.h"
 
@@ -159,10 +160,22 @@ public:
   const CNFdd&
   operator-=(const CNFdd& src);
 
+  /// @brief 要素ごとのユニオン付き代入
+  /// @param[in] src オペランド
+  /// @return 自分自身
+  const CNFdd&
+  operator*=(const CNFdd& src);
+
   /// @brief 他の節に支配されている節を取り除く
   /// @return 自分自身
   const CNFdd&
-  make_minimum();
+  make_minimal();
+
+  /// @brief 要素数が limit 以下の要素のみを残す．
+  /// @param[in] limit 要素数の制限値
+  /// @return 結果の CNFdd
+  CNFdd
+  cut_off(ymuint limit) const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -172,6 +185,12 @@ public:
   //////////////////////////////////////////////////////////////////////
   /// @name その他の演算
   /// @{
+
+  /// @brief 指定したリテラルを加える．
+  /// @param[in] literal リテラル
+  /// @return 自分自身を返す．
+  const CNFdd&
+  add_literal(Literal literal);
 
   /// @brief 指定した変数の肯定リテラルを加える．
   /// @param[in] var 変数番号
@@ -433,7 +452,7 @@ private:
 
 /// @relates CNFdd
 /// @ingroup CNFdd
-/// @brief conjunction (\f$cap\f$)演算
+/// @brief conjunction (\f$wedge\f$)演算
 /// @param[in] left, right オペランド
 /// @return left と right の intersection
 CNFdd
@@ -442,7 +461,7 @@ operator&(const CNFdd& left,
 
 /// @relates CNFdd
 /// @ingroup CNFdd
-/// @brief union (\f$cup\f$演算
+/// @brief disjunction (\f$vee\f$演算
 /// @param[in] left, right オペランド
 /// @return left と right の union
 CNFdd
@@ -456,6 +475,15 @@ operator|(const CNFdd& left,
 /// @return left と right の diff
 CNFdd
 operator-(const CNFdd& left,
+	  const CNFdd& right);
+
+/// @relates CNFdd
+/// @ingroup CNFdd
+/// @brief 要素ごとのユニオン)演算
+/// @param[in] left, right オペランド
+/// @return left と right の要素ごとのユニオン
+CNFdd
+operator*(const CNFdd& left,
 	  const CNFdd& right);
 
 /// @relates CNFdd
@@ -526,6 +554,30 @@ operator-(const CNFdd& left,
 	  const CNFdd& right)
 {
   return CNFdd(left).operator-=(right);
+}
+
+// @brief 要素ごとのユニオン)演算
+inline
+CNFdd
+operator*(const CNFdd& left,
+	  const CNFdd& right)
+{
+  return CNFdd(left).operator*=(right);
+}
+
+// @brief 指定したリテラルを加える．
+// @param[in] literal リテラル
+// @return 自分自身を返す．
+inline
+const CNFdd&
+CNFdd::add_literal(Literal literal)
+{
+  if ( literal.pol() == kPolPosi ) {
+    return add_posiliteral(literal.varid());
+  }
+  else {
+    return add_negaliteral(literal.varid());
+  }
 }
 
 #if 0

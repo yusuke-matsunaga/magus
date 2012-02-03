@@ -1,8 +1,8 @@
-#ifndef CONOP_H
-#define CONOP_H
+#ifndef MERGEOP_H
+#define MERGEOP_H
 
-/// @file ConOp.h
-/// @brief ConOp のヘッダファイル
+/// @file MergeOp.h
+/// @brief MergeOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
@@ -15,21 +15,23 @@
 BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class ConOp ConOp.h "ConOp.h"
-/// @brief conjunction を求めるクラス
+/// @class MergeOp MergeOp.h "MergeOp.h"
+/// @brief 要素ごとのユニオンを求めるクラス
 //////////////////////////////////////////////////////////////////////
-class ConOp :
+class MergeOp :
   public BinOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr CNFddMgrImpl
-  ConOp(CNFddMgrImpl& mgr);
+  /// @param[in] dis_op disjunction 演算オブジェクト
+  MergeOp(CNFddMgrImpl& mgr,
+	  BinOp* dis_op);
 
   /// @brief デストラクタ
   virtual
-  ~ConOp();
+  ~MergeOp();
 
 
 public:
@@ -55,8 +57,17 @@ private:
   apply_step(CNFddEdge f,
 	     CNFddEdge g);
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // disjunction 演算オブジェクト
+  BinOp* mDisOp;
+
 };
 
 END_NAMESPACE_YM_CNFDD
 
-#endif // CONOP_H
+#endif // MERGEOP_H

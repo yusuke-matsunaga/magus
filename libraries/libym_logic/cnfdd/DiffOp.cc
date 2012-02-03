@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_CNFDD
 // @brief コンストラクタ
 // @param[in] mgr CNFddMgrImpl
 DiffOp::DiffOp(CNFddMgrImpl& mgr) :
-  CNFddBinOp(mgr, "diff_table")
+  BinOp(mgr, "diff_table")
 {
 }
 

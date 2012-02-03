@@ -33,19 +33,27 @@ libym_logic_cnfdd_la_SOURCES = \
 	CNFddMgr.cc \
 	CNFddMgrImpl.h \
 	CNFddMgrImpl.cc \
-	CNFddOp.h \
-	CNFddUniOp.h \
-	CNFddUniOp.cc \
-	CNFddUniVOp.h \
-	CNFddUniVOp.cc \
-	CNFddBinOp.h \
-	CNFddBinOp.cc \
+	Op.h \
+	UniOp.h \
+	UniOp.cc \
+	UniNOp.h \
+	UniNOp.cc \
+	UniVOp.h \
+	UniVOp.cc \
+	BinOp.h \
+	BinOp.cc \
 	ConOp.h \
 	ConOp.cc \
 	DisOp.h \
 	DisOp.cc \
 	DiffOp.h \
 	DiffOp.cc \
+	MergeOp.h \
+	MergeOp.cc \
+	MinOp.h \
+	MinOp.cc \
+	CutOp.h \
+	CutOp.cc \
 	LitPOp.h \
 	LitPOp.cc \
 	LitNOp.h \

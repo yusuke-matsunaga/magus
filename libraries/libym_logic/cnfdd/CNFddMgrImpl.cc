@@ -16,6 +16,9 @@
 #include "ConOp.h"
 #include "DisOp.h"
 #include "DiffOp.h"
+#include "MergeOp.h"
+#include "MinOp.h"
+#include "CutOp.h"
 #include "LitPOp.h"
 #include "LitNOp.h"
 #include "Cof0Op.h"
@@ -185,6 +188,9 @@ CNFddMgrImpl::CNFddMgrImpl(const string& name,
   mConOp = new ConOp(*this);
   mDisOp = new DisOp(*this);
   mDiffOp = new DiffOp(*this);
+  mMergeOp = new MergeOp(*this, mDisOp);
+  mMinOp = new MinOp(*this, mDiffOp);
+  mCutOp = new CutOp(*this);
   mLitPOp = new LitPOp(*this);
   mLitNOp = new LitNOp(*this);
   mCof0Op = new Cof0Op(*this);
@@ -244,7 +250,7 @@ CNFddMgrImpl::~CNFddMgrImpl()
   dealloc_vartable(mVarHashTable, mVarTableSize);
 
   // 演算クラスの解放
-  for (list<CNFddOp*>::iterator p = mOpList.begin();
+  for (list<Op*>::iterator p = mOpList.begin();
        p != mOpList.end(); ++ p) {
     delete *p;
   }
@@ -378,6 +384,29 @@ CNFddMgrImpl::diff(CNFddEdge e1,
   return mDiffOp->apply(e1, e2);
 }
 
+// @brief 要素ごとのユニオンを計算する．
+CNFddEdge
+CNFddMgrImpl::merge(CNFddEdge e1,
+		    CNFddEdge e2)
+{
+  return mMergeOp->apply(e1, e2);
+}
+
+// @brief 他の節に支配されている節を取り除く
+CNFddEdge
+CNFddMgrImpl::make_minimal(CNFddEdge e1)
+{
+  return mMinOp->apply(e1);
+}
+
+// @brief 要素数が limit 以下の要素のみを残す．
+CNFddEdge
+CNFddMgrImpl::cut_off(CNFddEdge e1,
+		      ymuint limit)
+{
+  return mCutOp->apply(e1, limit);
+}
+
 // @brief 指定した変数の肯定のリテラルを加える．
 // @param[in] e 枝
 // @param[in] var 交換を行う変数番号
@@ -484,9 +513,9 @@ CNFddMgrImpl::gc(bool shrink_nodetable)
   logstream() << "CNFddMgrImpl::GC() begin...." << endl;
 
   // 演算結果テーブルをスキャンしておかなければならない．
-  for (list<CNFddOp*>::iterator p = mOpList.begin();
+  for (list<Op*>::iterator p = mOpList.begin();
        p != mOpList.end(); ++ p) {
-    CNFddOp* op = *p;
+    Op* op = *p;
     op->sweep();
   }
 

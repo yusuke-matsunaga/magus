@@ -207,8 +207,8 @@ CNFdd::operator&=(const CNFdd& src2)
     ans = CNFddEdge::make_error();
   }
   else {
-    CNFddEdge e1 = CNFddEdge(mRoot);
-    CNFddEdge e2 = CNFddEdge(src2.mRoot);
+    CNFddEdge e1(mRoot);
+    CNFddEdge e2(src2.mRoot);
     ans = mMgr->conjunction(e1, e2);
   }
   assign(ans);
@@ -225,8 +225,8 @@ CNFdd::operator|=(const CNFdd& src2)
     ans = CNFddEdge::make_error();
   }
   else {
-    CNFddEdge e1 = CNFddEdge(mRoot);
-    CNFddEdge e2 = CNFddEdge(src2.mRoot);
+    CNFddEdge e1(mRoot);
+    CNFddEdge e2(src2.mRoot);
     ans = mMgr->disjunction(e1, e2);
   }
   assign(ans);
@@ -243,12 +243,54 @@ CNFdd::operator-=(const CNFdd& src2)
     ans = CNFddEdge::make_error();
   }
   else {
-    CNFddEdge e1 = CNFddEdge(mRoot);
-    CNFddEdge e2 = CNFddEdge(src2.mRoot);
+    CNFddEdge e1(mRoot);
+    CNFddEdge e2(src2.mRoot);
     ans = mMgr->diff(e1, e2);
   }
   assign(ans);
   return *this;
+}
+
+// @brief 要素ごとのユニオン付き代入
+// @param[in] src オペランド
+// @return 自分自身
+const CNFdd&
+CNFdd::operator*=(const CNFdd& src2)
+{
+  CNFddEdge ans;
+  if ( mMgr != src2.mMgr ) {
+    // マネージャが異なる．
+    ans = CNFddEdge::make_error();
+  }
+  else {
+    CNFddEdge e1(mRoot);
+    CNFddEdge e2(src2.mRoot);
+    ans = mMgr->merge(e1, e2);
+  }
+  assign(ans);
+  return *this;
+}
+
+// @brief 他の節に支配されている節を取り除く
+// @return 自分自身
+const CNFdd&
+CNFdd::make_minimal()
+{
+  CNFddEdge e(mRoot);
+  CNFddEdge ans = mMgr->make_minimal(e);
+  assign(ans);
+  return *this;
+}
+
+// @brief 要素数が limit 以下の要素のみを残す．
+// @param[in] limit 要素数の制限値
+// @return 結果の CNFdd
+CNFdd
+CNFdd::cut_off(ymuint limit) const
+{
+  CNFddEdge e(mRoot);
+  CNFddEdge ans = mMgr->cut_off(e, limit);
+  return CNFdd(mMgr, ans);
 }
 
 #if 0
