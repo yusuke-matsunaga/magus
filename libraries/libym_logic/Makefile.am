@@ -9,6 +9,7 @@ SUBDIRS = \
 	npn \
 	bdd \
 	zdd \
+	cnfdd \
 	sat \
 	aig \
 	. \
@@ -36,6 +37,7 @@ libym_logic_la_LIBADD = \
 	npn/libym_logic_npn.la \
 	bdd/libym_logic_bdd.la \
 	zdd/libym_logic_zdd.la \
+	cnfdd/libym_logic_cnfdd.la \
 	sat/libym_logic_sat.la \
 	aig/libym_logic_aig.la
 

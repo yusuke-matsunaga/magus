@@ -44,9 +44,6 @@ CompTbl::CompTbl(CNFddMgrImpl& mgr,
 
   mMaxSize = kMaxSize;
   mTableSize = 0;
-
-  // リストに追加する．
-  mMgr.add_table(this);
 }
 
 // デストラクタ

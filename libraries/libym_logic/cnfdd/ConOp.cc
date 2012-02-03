@@ -1,59 +1,56 @@
 
-/// @file CapOp.cc
-/// @brief CapOp の実装ファイル
+/// @file ConOp.cc
+/// @brief ConOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CapOp.h"
-#include "ZddMgrImpl.h"
-#include "CompTbl.h"
+#include "ConOp.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
-// クラス CapOp
+// クラス ConOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] mgr ZddMgrImpl
-CapOp::CapOp(ZddMgrImpl& mgr) :
-  mMgr(mgr),
-  mCapTable(mgr, "cap_table")
+// @param[in] mgr CNFddMgrImpl
+ConOp::ConOp(CNFddMgrImpl& mgr) :
+  CNFddBinOp(mgr, "conjunction_table")
 {
 }
 
 // @brief デストラクタ
-CapOp::~CapOp()
+ConOp::~ConOp()
 {
 }
 
 // @brief \f$\cap\f$演算を行う関数
 // @param[in] left, right オペランド
-ZddEdge
-CapOp::apply(ZddEdge left,
-	     ZddEdge right)
+CNFddEdge
+ConOp::apply(CNFddEdge left,
+	     CNFddEdge right)
 {
   // エラー状態のチェック
-  if ( left.is_error() || right.is_error() ) {
-    // どちらかがエラー
-    return ZddEdge::make_error();
+  if ( left.is_invalid() ) {
+    // left が異常
+    return left;
   }
-  if ( left.is_overflow() || right.is_overflow() ) {
-    // どちらかがオーバーフロー
-    return ZddEdge::make_overflow();
+  if ( right.is_invalid() ) {
+    // right が異常
+    return right;
   }
 
-  return cap_step(left, right);
+  return apply_step(left, right);
 }
 
-// cap_op の下請け関数
-ZddEdge
-CapOp::cap_step(ZddEdge f,
-		ZddEdge g)
+// apply の下請け関数
+CNFddEdge
+ConOp::apply_step(CNFddEdge f,
+		  CNFddEdge g)
 {
   // 0-element 属性に対するルール
   // f, g ともに 0-element 属性をもっていたら答にも 0-element 属性を持たせる．
@@ -61,13 +58,13 @@ CapOp::cap_step(ZddEdge f,
   f.normalize();
   g.normalize();
 
-  ZddEdge ans_e;
+  CNFddEdge ans_e;
 
   // 特別な場合の処理
   // 1: 片方のCNFDDが0なら答は0，
   // 2: 同じCNFDDどうしなら答は自分自身
   if ( f.is_zero() || g.is_zero() ) {
-    ans_e = ZddEdge::make_zero();
+    ans_e = CNFddEdge::make_zero();
   }
   else if ( f == g ) {
     ans_e = f;
@@ -77,27 +74,35 @@ CapOp::cap_step(ZddEdge f,
 
     // 演算結果テーブルが当たりやすくなるように順序を正規化する
     if ( f > g ) {
-      ZddEdge tmp = f;
+      CNFddEdge tmp = f;
       f = g;
       g = tmp;
     }
 
-    ans_e = mCapTable.get(f, g);
+    ans_e = get(f, g);
     if ( ans_e.is_error() ) {
       // 演算結果テーブルには登録されていない
-      ZddEdge f_0, f_1;
-      ZddEdge g_0, g_1;
-      ymuint level = split(f, g, f_0, f_1, g_0, g_1);
-      ZddEdge r_0 = cap_step(f_0, g_0);
-      if ( r_0.is_overflow() ) {
-	return ZddEdge::make_overflow();
+      CNFddEdge f_0, f_p, f_n;
+      CNFddEdge g_0, g_p, g_n;
+      ymuint level = split(f, g, f_0, f_p, f_n, g_0, g_p, g_n);
+
+      CNFddEdge r_0 = apply_step(f_0, g_0);
+      if ( r_0.is_invalid() ) {
+	return r_0;
       }
-      ZddEdge r_1 = cap_step(f_1, g_1);
-      if ( r_1.is_overflow() ) {
-	return ZddEdge::make_overflow();
+
+      CNFddEdge r_p = apply_step(f_p, g_p);
+      if ( r_p.is_invalid() ) {
+	return r_p;
       }
-      ans_e = mMgr.new_node(level, r_0, r_1);
-      mCapTable.put(f, g, ans_e);
+
+      CNFddEdge r_n = apply_step(f_n, g_n);
+      if ( r_n.is_invalid() ) {
+	return r_n;
+      }
+
+      ans_e = new_node(level, r_0, r_p, r_n);
+      put(f, g, ans_e);
     }
   }
   return ans_e.add_zattr(zattr);

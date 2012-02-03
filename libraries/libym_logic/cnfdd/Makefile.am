@@ -34,24 +34,37 @@ libym_logic_cnfdd_la_SOURCES = \
 	CNFddMgrImpl.h \
 	CNFddMgrImpl.cc \
 	CNFddOp.h \
+	CNFddUniOp.h \
+	CNFddUniOp.cc \
+	CNFddUniVOp.h \
+	CNFddUniVOp.cc \
+	CNFddBinOp.h \
+	CNFddBinOp.cc \
 	ConOp.h \
 	ConOp.cc \
+	DisOp.h \
+	DisOp.cc \
 	DiffOp.h \
 	DiffOp.cc \
-	AddLiteralOp.h \
-	AddLiteralOp.cc \
+	LitPOp.h \
+	LitPOp.cc \
+	LitNOp.h \
+	LitNOp.cc \
 	Cof0Op.h \
 	Cof0Op.cc \
 	CofPOp.h \
 	CofPOp.cc \
 	CofNOp.h \
 	CofNOp.cc \
+	SupOp.h \
+	SupOp.cc \
 	count.cc \
-	support.cc \
 	IdMgr.h \
 	IdMgr.cc \
 	Printer.h \
 	Printer.cc \
+	Printer2.h \
+	Printer2.cc \
 	Dumper.h \
 	Dumper.cc \
 	Restorer.h \

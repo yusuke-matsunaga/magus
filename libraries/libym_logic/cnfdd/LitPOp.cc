@@ -1,37 +1,37 @@
 
-/// @file Cof0Op.cc
-/// @brief Cof0Op の実装ファイル
+/// @file LitPOp.cc
+/// @brief LitPOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "Cof0Op.h"
+#include "LitPOp.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
-// クラス Cof0Op
+// クラス LitPOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] mgr CNFddMgrImpl
-Cof0Op::Cof0Op(CNFddMgrImpl& mgr) :
+LitPOp::LitPOp(CNFddMgrImpl& mgr) :
   CNFddUniVOp(mgr)
 {
 }
 
 // @brief デストラクタ
-Cof0Op::~Cof0Op()
+LitPOp::~LitPOp()
 {
 }
 
 // @brief cofactor0 演算を行う関数
 // @param[in] left オペランド
 CNFddEdge
-Cof0Op::apply(CNFddEdge left)
+LitPOp::apply(CNFddEdge left)
 {
   // エラー状態のチェック
   if ( left.is_invalid() ) {
@@ -46,32 +46,40 @@ Cof0Op::apply(CNFddEdge left)
 
 // 下請け関数
 CNFddEdge
-Cof0Op::apply_step(CNFddEdge f)
+LitPOp::apply_step(CNFddEdge f)
 {
   // 特別な場合の処理
   // 1：fが0なら答は0，
-  // 2: fが1なら答は1
-  if ( f.is_const() ) {
-    return f;
+  // 2: fが1なら答は level() の p枝に base を持つノード
+  if ( f.is_zero() ) {
+    return CNFddEdge::make_zero();
+  }
+  if ( f.is_one() ) {
+    CNFddEdge zero = CNFddEdge::make_zero();
+    return new_node(level(), zero, f, zero);
   }
 
   // この時点で f は終端ではない．
-  CNFddNode* f_vp = f.get_node();
-  ymuint f_level = f_vp->level();
+  CNFddNode* f_node = f.get_node();
+  ymuint f_level = f_node->level();
   if ( f_level > level() ) {
-    return f;
+    CNFddEdge zero = CNFddEdge::make_zero();
+    return new_node(level(), zero, f, zero);
   }
   if ( f_level == level() ) {
-    CNFddEdge ans_e = f_vp->edge_0();
-    ans_e.add_zattr(f.zattr());
-    return ans_e;
+    // 0枝とp枝を取り替える．
+    CNFddEdge e_0 = f_node->edge_0();
+    e_0.add_zattr(f.zattr());
+    CNFddEdge e_p = f_node->edge_p();
+    CNFddEdge e_n = f_node->edge_n();
+    return new_node(f_level, e_p, e_0, e_n);
   }
 
   CNFddEdge ans_e = get(f);
   if ( ans_e.is_error()) {
     // 演算結果テーブルには登録されていない
     CNFddEdge f_0, f_p, f_n;
-    split1(f_level, f_level, f, f_vp, f_0, f_p, f_n);
+    split1(f_level, f_level, f, f_node, f_0, f_p, f_n);
 
     CNFddEdge r_0 = apply_step(f_0);
     if ( r_0.is_invalid() ) {

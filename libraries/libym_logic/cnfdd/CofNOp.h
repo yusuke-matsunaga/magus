@@ -1,8 +1,8 @@
-#ifndef COF0OP_H
-#define COF0OP_H
+#ifndef COFNOP_H
+#define COFNOP_H
 
-/// @file Cof0Op.h
-/// @brief Cof0Op のヘッダファイル
+/// @file CofNOp.h
+/// @brief CofNOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -15,21 +15,21 @@
 BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class Cof0Op Cof0Op.h "Cof0Op.h"
-/// @brief cofactor0 演算を求めるクラス
+/// @class CofNOp CofNOp.h "CofNOp.h"
+/// @brief cofactorp0 演算を求めるクラス
 //////////////////////////////////////////////////////////////////////
-class Cof0Op :
+class CofNOp :
   public CNFddUniVOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr CNFddMgrImpl
-  Cof0Op(CNFddMgrImpl& mgr);
+  CofNOp(CNFddMgrImpl& mgr);
 
   /// @brief デストラクタ
   virtual
-  ~Cof0Op();
+  ~CofNOp();
 
 
 public:
@@ -37,7 +37,7 @@ public:
   // メインの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief cofactor0 演算を行う関数
+  /// @brief cofactorp 演算を行う関数
   /// @param[in] left オペランド
   virtual
   CNFddEdge
@@ -57,4 +57,4 @@ private:
 
 END_NAMESPACE_YM_CNFDD
 
-#endif // COF0OP_H
+#endif // COFNOP_H

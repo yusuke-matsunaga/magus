@@ -231,6 +231,16 @@ public:
       CNFddEdge id2,
       CNFddEdge ans);
 
+  /// @brief ガーベージコレクションが起きた時の処理を行なう．
+  virtual
+  void
+  sweep();
+
+  /// @brief 内容をクリアする．
+  virtual
+  void
+  clear();
+
 
 private:
 
@@ -243,16 +253,6 @@ private:
   /// @param[in] new_size 新しい値
   bool
   resize(ymuint64 new_size);
-
-  /// @brief ガーベージコレクションが起きた時の処理を行なう．
-  virtual
-  void
-  sweep();
-
-  /// @brief 内容をクリアする．
-  virtual
-  void
-  clear();
 
 
 private:

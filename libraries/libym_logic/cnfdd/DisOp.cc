@@ -1,38 +1,38 @@
 
-/// @file DiffOp.cc
-/// @brief DiffOp の実装ファイル
+/// @file DisOp.cc
+/// @brief DisOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "DiffOp.h"
+#include "DisOp.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
-// クラス DiffOp
+// クラス DisOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] mgr CNFddMgrImpl
-DiffOp::DiffOp(CNFddMgrImpl& mgr) :
-  CNFddBinOp(mgr, "diff_table")
+DisOp::DisOp(CNFddMgrImpl& mgr) :
+  CNFddBinOp(mgr, "disjunction_table")
 {
 }
 
 // @brief デストラクタ
-DiffOp::~DiffOp()
+DisOp::~DisOp()
 {
 }
 
-// @brief \f$\setminus\f$演算を行う関数
+// @brief \f$\vee\f$演算を行う関数
 // @param[in] left, right オペランド
 CNFddEdge
-DiffOp::apply(CNFddEdge left,
-	      CNFddEdge right)
+DisOp::apply(CNFddEdge left,
+	     CNFddEdge right)
 {
   // エラー状態のチェック
   if ( left.is_invalid() ) {
@@ -40,38 +40,44 @@ DiffOp::apply(CNFddEdge left,
     return left;
   }
   if ( right.is_invalid() ) {
-    // ritht が異常
+    // right が異常
     return right;
   }
 
   return apply_step(left, right);
 }
 
-// cap_op の下請け関数
+// apply の下請け関数
 CNFddEdge
-DiffOp::apply_step(CNFddEdge f,
-		   CNFddEdge g)
+DisOp::apply_step(CNFddEdge f,
+		  CNFddEdge g)
 {
   // 0-element 属性に対するルール
-  // f が 0-element 属性をもっており g にないとき 0-element 属性を持たせる．
-  bool zattr = f.zattr() && !g.zattr();
+  // f, g のいずれかが 0-element 属性をもっていたら答にも 0-element 属性を持たせる．
+  bool zattr = f.zattr() || g.zattr();
   f.normalize();
   g.normalize();
 
   CNFddEdge ans_e;
 
   // 特別な場合の処理
-  // 1: f が 0 なら答は 0
-  // 2: g が 0 なら答は f
-  // 3: 同じCNFDDどうしなら答は 0
-  if ( f.is_zero() || g.is_zero() ) {
-    ans_e = f;
+  // 1: 片方のCNFDDが0なら答は他方，
+  // 2: 同じCNFDDどうしなら答は自分自身
+  if ( f.is_zero() ) {
+    ans_e = g;
   }
-  else if ( f == g ) {
-    ans_e = CNFddEdge::make_zero();
+  else if ( g.is_zero() || f == g ) {
+    ans_e = f;
   }
   else {
     // この時点で f,g は終端ではない．
+
+    // 演算結果テーブルが当たりやすくなるように順序を正規化する
+    if ( f > g ) {
+      CNFddEdge tmp = f;
+      f = g;
+      g = tmp;
+    }
 
     ans_e = get(f, g);
     if ( ans_e.is_error() ) {

@@ -9,9 +9,7 @@
 /// All rights reserved.
 
 
-#include "CNFddOp.h"
-#include "CNFddMgrImpl.h"
-#include "CompTbl.h"
+#include "CNFddBinOp.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
@@ -54,23 +52,11 @@ private:
 
   /// @brief 実際に演算を行う関数
   CNFddEdge
-  cap_step(CNFddEdge f,
-	   CNFddEdge g);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 親のマネージャ
-  CNFddMgrImpl& mMgr;
-
-  // 演算テーブル
-  CompTbl2 mCapTable;
+  apply_step(CNFddEdge f,
+	     CNFddEdge g);
 
 };
 
 END_NAMESPACE_YM_CNFDD
 
-#endif // CAPOP_H
+#endif // CONOP_H

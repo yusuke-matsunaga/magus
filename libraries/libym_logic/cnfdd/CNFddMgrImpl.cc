@@ -13,12 +13,15 @@
 #include "ym_logic/CNFddMgr.h"
 #include "CNFddVar.h"
 
-#include "CapOp.h"
-#include "CupOp.h"
+#include "ConOp.h"
+#include "DisOp.h"
 #include "DiffOp.h"
-#include "SwapOp.h"
+#include "LitPOp.h"
+#include "LitNOp.h"
 #include "Cof0Op.h"
-#include "Cof1Op.h"
+#include "CofPOp.h"
+#include "CofNOp.h"
+#include "SupOp.h"
 
 
 #if !defined(__SUNPRO_CC) || __SUNPRO_CC >= 0x500
@@ -176,15 +179,18 @@ CNFddMgrImpl::CNFddMgrImpl(const string& name,
   mVarTop = NULL;
 
   // 演算結果テーブルの初期化
-  mTblList.clear();
+  mOpList.clear();
 
   // 演算クラスの生成
-  mCapOp = new CapOp(*this);
-  mCupOp = new CupOp(*this);
+  mConOp = new ConOp(*this);
+  mDisOp = new DisOp(*this);
   mDiffOp = new DiffOp(*this);
-  mSwapOp = new SwapOp(*this);
+  mLitPOp = new LitPOp(*this);
+  mLitNOp = new LitNOp(*this);
   mCof0Op = new Cof0Op(*this);
-  mCof1Op = new Cof1Op(*this);
+  mCofPOp = new CofPOp(*this);
+  mCofNOp = new CofNOp(*this);
+  mSupOp = new SupOp(*this);
 }
 
 // デストラクタ
@@ -238,12 +244,10 @@ CNFddMgrImpl::~CNFddMgrImpl()
   dealloc_vartable(mVarHashTable, mVarTableSize);
 
   // 演算クラスの解放
-  delete mCapOp;
-  delete mCupOp;
-  delete mDiffOp;
-  delete mSwapOp;
-  delete mCof0Op;
-  delete mCof1Op;
+  for (list<CNFddOp*>::iterator p = mOpList.begin();
+       p != mOpList.end(); ++ p) {
+    delete *p;
+  }
 
   // このマネージャに関わるメモリはすべて解放したはず．
   assert_cond( mUsedMem == 0, __FILE__, __LINE__);
@@ -343,6 +347,13 @@ CNFddMgrImpl::varid(ymuint level) const
   return VarId(level);
 }
 
+// @brief 現在の最大レベル + 1を返す．
+ymuint
+CNFddMgrImpl::max_level() const
+{
+  return mVarNum + 1;
+}
+
 // @brief e1 $\wedge$ e2 を計算する．
 CNFddEdge
 CNFddMgrImpl::conjunction(CNFddEdge e1,
@@ -351,15 +362,13 @@ CNFddMgrImpl::conjunction(CNFddEdge e1,
   return mConOp->apply(e1, e2);
 }
 
-#if 0
-// @brief e1 $\cup$ e2 を計算する．
+// @brief e1 $\vee$ e2 を計算する．
 CNFddEdge
-CNFddMgrImpl::cup(CNFddEdge e1,
-		CNFddEdge e2)
+CNFddMgrImpl::disjunction(CNFddEdge e1,
+			  CNFddEdge e2)
 {
-  return mCupOp->apply(e1, e2);
+  return mDisOp->apply(e1, e2);
 }
-#endif
 
 // @brief src1 $\setdiff$ src2 を計算する．
 CNFddEdge
@@ -369,16 +378,24 @@ CNFddMgrImpl::diff(CNFddEdge e1,
   return mDiffOp->apply(e1, e2);
 }
 
-// @brief 指定した変数のリテラルを加える．
+// @brief 指定した変数の肯定のリテラルを加える．
 // @param[in] e 枝
 // @param[in] var 交換を行う変数番号
-// @param[in] pol 極性
 CNFddEdge
-CNFddMgrImpl::add_literal(CNFddEdge e,
-			  VarId var,
-			  tPol pol)
+CNFddMgrImpl::add_posiliteral(CNFddEdge e,
+			      VarId var)
 {
-  return mAddLiteralOp->apply(e, level(var), pol);
+  return mLitPOp->apply(e, level(var));
+}
+
+// @brief 指定した変数の否定のリテラルを加える．
+// @param[in] e 枝
+// @param[in] var 交換を行う変数番号
+CNFddEdge
+CNFddMgrImpl::add_negaliteral(CNFddEdge e,
+			      VarId var)
+{
+  return mLitNOp->apply(e, level(var));
 }
 
 // @brief 指定された変数を含まないコファクターを返す．
@@ -409,6 +426,27 @@ CNFddMgrImpl::cofactor_n(CNFddEdge e,
 			 VarId var)
 {
   return mCofNOp->apply(e, level(var));
+}
+
+// @brief edge_list に登録されたCNFDDのサポートに印をつける．
+ymuint
+CNFddMgrImpl::mark_support(const vector<CNFddEdge>& edge_list)
+{
+  return mSupOp->apply(edge_list);
+}
+
+// @brief 印のついた変数をベクタに変換する．
+ymuint
+CNFddMgrImpl::mark_to_vector(VarVector& support)
+{
+  return mSupOp->to_list(support);
+}
+
+// @brief 印のついた変数をリストに変換する．
+ymuint
+CNFddMgrImpl::mark_to_list(VarList& support)
+{
+  return mSupOp->to_list(support);
 }
 
 // 節点テーブルを次に拡大する時の基準値を計算する．
@@ -446,10 +484,10 @@ CNFddMgrImpl::gc(bool shrink_nodetable)
   logstream() << "CNFddMgrImpl::GC() begin...." << endl;
 
   // 演算結果テーブルをスキャンしておかなければならない．
-  for (list<CompTbl*>::iterator p = mTblList.begin();
-       p != mTblList.end(); ++ p) {
-    CompTbl* tbl = *p;
-    if ( tbl->used_num() > 0 ) tbl->sweep();
+  for (list<CNFddOp*>::iterator p = mOpList.begin();
+       p != mOpList.end(); ++ p) {
+    CNFddOp* op = *p;
+    op->sweep();
   }
 
   // その他のテーブルの sweep を行う．
@@ -564,7 +602,8 @@ CNFddMgrImpl::resize(ymuint64 new_size)
       CNFddNode* temp;
       for (temp = *tbl; temp; temp = next) {
 	next = temp->mLink;
-	ymuint pos = hash_func3(temp->edge0(), temp->edge1(), temp->level());
+	ymuint pos = hash_func3(temp->edge_0(), temp->edge_p(), temp->edge_n(),
+				temp->level());
 	CNFddNode*& entry = mNodeTable[pos & mTableSize_1];
 	temp->mLink = entry;
 	entry = temp;
@@ -826,13 +865,6 @@ CNFddMgrImpl::unlockall(CNFddNode* vp)
   deactivate(vp->edge_n());
 }
 
-// 演算結果テーブルを登録する．
-void
-CNFddMgrImpl::add_table(CompTbl* tbl)
-{
-  mTblList.push_back(tbl);
-}
-
 // 節点を確保する．
 CNFddNode*
 CNFddMgrImpl::alloc_node()
@@ -1033,13 +1065,26 @@ CNFddMgrImpl::deallocate(void* ptr,
 // CNFddEdge に関連する関数
 //////////////////////////////////////////////////////////////////////
 
+// @brief 参照されていない時にtrueを返す
+bool
+CNFddEdge::noref() const
+{
+  CNFddNode* node = get_node();
+  if ( node != NULL ) {
+    return node->noref();
+  }
+  else {
+    return false;
+  }
+}
+
 // 節点のマークを消す．
 void
 clear_mark(CNFddEdge e)
 {
   CNFddNode* vp = e.get_node();
   if ( !vp || !vp->mark() ) {
-    break;
+    return;
   }
   vp->mark(0);
   clear_mark(vp->edge_0());

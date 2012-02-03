@@ -9,9 +9,7 @@
 /// All rights reserved.
 
 
-#include "ZddOp.h"
-#include "ZddMgrImpl.h"
-#include "CompTbl.h"
+#include "CNFddBinOp.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
@@ -21,13 +19,13 @@ BEGIN_NAMESPACE_YM_CNFDD
 /// @brief 集合差を求めるクラス
 //////////////////////////////////////////////////////////////////////
 class DiffOp :
-  public ZddBinOp
+  public CNFddBinOp
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] mgr ZddMgrImpl
-  DiffOp(ZddMgrImpl& mgr);
+  /// @param[in] mgr CNFddMgrImpl
+  DiffOp(CNFddMgrImpl& mgr);
 
   /// @brief デストラクタ
   virtual
@@ -42,9 +40,9 @@ public:
   /// @brief \f$\setdiff\f$演算を行う関数
   /// @param[in] left, right オペランド
   virtual
-  ZddEdge
-  apply(ZddEdge left,
-	ZddEdge right);
+  CNFddEdge
+  apply(CNFddEdge left,
+	CNFddEdge right);
 
 
 private:
@@ -53,21 +51,9 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 実際に演算を行う関数
-  ZddEdge
-  diff_step(ZddEdge f,
-	    ZddEdge g);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 親のマネージャ
-  ZddMgrImpl& mMgr;
-
-  // 演算テーブル
-  CompTbl2 mDiffTable;
+  CNFddEdge
+  apply_step(CNFddEdge f,
+	     CNFddEdge g);
 
 };
 

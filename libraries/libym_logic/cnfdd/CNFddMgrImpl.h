@@ -10,17 +10,20 @@
 
 
 #include "ym_logic/CNFdd.h"
-//#include "CNFddNode.h"
-#include "CompTbl.h"
+#include "CNFddEdge.h"
+#include "CNFddNode.h"
 #include "ym_utils/Binder.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
 
-class CNFddUnOp;
+class CNFddOp;
+class CNFddUniOp;
+class CNFddUniVOp;
 class CNFddBinOp;
 class CNFddVar;
 class CNFddNode;
+class SupOp;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CNFddMgrImpl CNFddMgrImpl.h "CNFddMgrImpl.h"
@@ -29,6 +32,7 @@ class CNFddNode;
 class CNFddMgrImpl
 {
   friend class CNFdd;
+  friend class CNFddOp;
   friend class CompTbl;
 
 public:
@@ -78,6 +82,10 @@ public:
   VarId
   varid(ymuint level) const;
 
+  /// @brief 現在の最大レベル + 1を返す．
+  ymuint
+  max_level() const;
+
   /// @brief level の変数を取り出す．
   CNFddVar*
   var_at(ymuint level) const;
@@ -97,17 +105,19 @@ public:
   conjunction(CNFddEdge e1,
 	      CNFddEdge e2);
 
-#if 0
-  /// @brief e1 $\cup$ e2 を計算する．
+  /// @brief e1 $\vee$ e2 を計算する．
   CNFddEdge
-  cup(CNFddEdge e1,
-      CNFddEdge e2);
-#endif
+  disjunction(CNFddEdge e1,
+	      CNFddEdge e2);
 
   /// @brief src1 $\setdiff$ src2 を計算する．
   CNFddEdge
   diff(CNFddEdge e1,
        CNFddEdge e2);
+
+  /// @brief 他の節に支配されている節を取り除く
+  CNFddEdge
+  make_minimum(CNFddEdge e1);
 
   /// @brief 指定した変数の肯定のリテラルを加える．
   /// @param[in] e 枝
@@ -358,10 +368,6 @@ private:
   void
   unlockall(CNFddNode* vp);
 
-  /// @brief 演算結果テーブルを登録する．
-  void
-  add_table(CompTbl* tbl);
-
   /// @brief mVarTable 中のマークを消す．
   void
   clear_varmark();
@@ -541,26 +547,38 @@ private:
   // 演算結果テーブル
   //////////////////////////////////////////////////////////////////////
 
-  // この CNFddMgr に登録されているテーブルのリスト
-  list<CompTbl*> mTblList;
+  // この CNFddMgr に登録されている演算オブジェクトのリスト
+  list<CNFddOp*> mOpList;
 
-  // cap 用の演算クラス
-  CNFddBinOp* mCapOp;
+  // conjunction 用の演算クラス
+  CNFddBinOp* mConOp;
 
-  // cup 用の演算クラス
-  CNFddBinOp* mCupOp;
+  // disjunction 用の演算クラス
+  CNFddBinOp* mDisOp;
 
   // diff 用の演算クラス
   CNFddBinOp* mDiffOp;
 
-  // swap 用の演算クラス
-  CNFddUnOp* mSwapOp;
+  // add_posiliteral 用の演算クラス
+  CNFddUniVOp* mLitPOp;
+
+  // add_negaliteral 用の演算クラス
+  CNFddUniVOp* mLitNOp;
+
+  // make_minimum 用の演算クラス
+  CNFddUniOp* mMinOp;
 
   // cofactor0 用の演算クラス
-  CNFddUnOp* mCof0Op;
+  CNFddUniVOp* mCof0Op;
 
-  // cofactor1 用の演算クラス
-  CNFddUnOp* mCof1Op;
+  // cofactorP 用の演算クラス
+  CNFddUniVOp* mCofPOp;
+
+  // cofactorN 用の演算クラス
+  CNFddUniVOp* mCofNOp;
+
+  // support 用の演算クラス
+  SupOp* mSupOp;
 
 
   //////////////////////////////////////////////////////////////////////

@@ -1,35 +1,35 @@
-#ifndef COF0OP_H
-#define COF0OP_H
+#ifndef DISCONOP_H
+#define DISCONOP_H
 
-/// @file Cof0Op.h
-/// @brief Cof0Op のヘッダファイル
+/// @file DisOp.h
+/// @brief DisOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CNFddUniVOp.h"
+#include "CNFddBinOp.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class Cof0Op Cof0Op.h "Cof0Op.h"
-/// @brief cofactor0 演算を求めるクラス
+/// @class DisOp DisOp.h "DisOp.h"
+/// @brief disjunction を求めるクラス
 //////////////////////////////////////////////////////////////////////
-class Cof0Op :
-  public CNFddUniVOp
+class DisOp :
+  public CNFddBinOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr CNFddMgrImpl
-  Cof0Op(CNFddMgrImpl& mgr);
+  DisOp(CNFddMgrImpl& mgr);
 
   /// @brief デストラクタ
   virtual
-  ~Cof0Op();
+  ~DisOp();
 
 
 public:
@@ -37,11 +37,12 @@ public:
   // メインの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief cofactor0 演算を行う関数
-  /// @param[in] left オペランド
+  /// @brief \f$\vee\f$演算を行う関数
+  /// @param[in] left, right オペランド
   virtual
   CNFddEdge
-  apply(CNFddEdge left);
+  apply(CNFddEdge left,
+	CNFddEdge right);
 
 
 private:
@@ -51,10 +52,11 @@ private:
 
   /// @brief 実際に演算を行う関数
   CNFddEdge
-  apply_step(CNFddEdge f);
+  apply_step(CNFddEdge f,
+	     CNFddEdge g);
 
 };
 
 END_NAMESPACE_YM_CNFDD
 
-#endif // COF0OP_H
+#endif // DISCONOP_H

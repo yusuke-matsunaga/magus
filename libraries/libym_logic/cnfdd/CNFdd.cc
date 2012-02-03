@@ -215,8 +215,7 @@ CNFdd::operator&=(const CNFdd& src2)
   return *this;
 }
 
-#if 0
-// @brief union 付き代入
+// @brief disjunction 付き代入
 const CNFdd&
 CNFdd::operator|=(const CNFdd& src2)
 {
@@ -228,12 +227,11 @@ CNFdd::operator|=(const CNFdd& src2)
   else {
     CNFddEdge e1 = CNFddEdge(mRoot);
     CNFddEdge e2 = CNFddEdge(src2.mRoot);
-    ans = mMgr->cup(e1, e2);
+    ans = mMgr->disjunction(e1, e2);
   }
   assign(ans);
   return *this;
 }
-#endif
 
 // @brief diff 付き代入
 const CNFdd&

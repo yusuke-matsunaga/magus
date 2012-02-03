@@ -141,13 +141,13 @@ public:
   /// @name 論理演算＋代入演算子
   /// @{
 
-  /// @brief conjunction (\f$\cap\f$)付き代入
+  /// @brief conjunction (\f$\wedge\f$)付き代入
   /// @param[in] src オペランド
   /// @return 自分自身
   const CNFdd&
   operator&=(const CNFdd& src);
 
-  /// @brief disjunction (\f$\cup\f$)付き代入
+  /// @brief disjunction (\f$\vee\f$)付き代入
   /// @param[in] src オペランド
   /// @return 自分自身
   const CNFdd&
@@ -158,6 +158,11 @@ public:
   /// @return 自分自身
   const CNFdd&
   operator-=(const CNFdd& src);
+
+  /// @brief 他の節に支配されている節を取り除く
+  /// @return 自分自身
+  const CNFdd&
+  make_minimum();
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -346,6 +351,11 @@ public:
   /// @return ノード数を返す．
   ymuint64
   print(ostream& s) const;
+
+  /// @brief 内容を節ごとに書き出す．
+  /// @param[in] s 出力ストリーム
+  void
+  print_clause(ostream& s) const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
