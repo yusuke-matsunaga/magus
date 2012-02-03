@@ -144,6 +144,7 @@ AC_CONFIG_FILES([
 	makebdd/Makefile
 	lsim/Makefile
 	enumcut/Makefile
+	imp/Makefile
 	])
 
 
