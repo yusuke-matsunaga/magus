@@ -40,7 +40,9 @@ imp_SOURCES = \
 	SnXor.cc \
 	CnfImp.h \
 	CnfImp.cc \
-	CnfClause.h
+	CnfClause.h \
+	CnfImp2.h \
+	CnfImp2.cc
 
 imp_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \

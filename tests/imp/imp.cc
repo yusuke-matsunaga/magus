@@ -20,6 +20,7 @@
 
 #include "StrImp.h"
 #include "CnfImp.h"
+#include "CnfImp2.h"
 
 #include "ym_logic/ZddMgr.h"
 
@@ -65,6 +66,10 @@ imp(const string& filename,
   }
   else if ( method_str == "cnf" ) {
     CnfImp imp;
+    imp.learning(network, imp_list);
+  }
+  else if ( method_str == "cnf2" ) {
+    CnfImp2 imp;
     imp.learning(network, imp_list);
   }
   else {
