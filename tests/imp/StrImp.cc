@@ -12,6 +12,7 @@
 #include "SnInput.h"
 #include "SnAnd.h"
 #include "SnXor.h"
+#include "ImpInfo.h"
 #include "ym_networks/BdnMgr.h"
 #include "ym_networks/BdnNode.h"
 
@@ -34,12 +35,14 @@ StrImp::~StrImp()
 
 // @brief ネットワーク中の間接含意を求める．
 // @param[in] network 対象のネットワーク
-// @param[in] imp_list 間接含意のリスト
+// @param[in] imp_info 間接含意のリスト
 void
 StrImp::learning(const BdnMgr& network,
-		 vector<ImpInfo>& imp_list)
+		 ImpInfo& imp_info)
 {
   ymuint n = network.max_node_id();
+
+  imp_info.set_size(n);
 
   // BDN の情報を StrNode にコピーする．
   mNodeArray.clear();
@@ -133,6 +136,9 @@ StrImp::learning(const BdnMgr& network,
     cout << endl;
   }
 
+  ImpInfo d_imp;
+  d_imp.set_size(n);
+  cout << "DIRECT IMPLICATION" << endl;
   for (ymuint i = 0; i < n; ++ i) {
     StrNode* node = mNodeArray[i];
     if ( node == NULL ) continue;
@@ -143,13 +149,14 @@ StrImp::learning(const BdnMgr& network,
       const vector<StrNode*>& l_list = StrNode::learned_list();
       for (vector<StrNode*>::const_iterator p = l_list.begin();
 	   p != l_list.end(); ++ p) {
-	StrNode* src_node = *p;
-	bool src_val = (node->val() == 1) ? true : false;
-	imp_list.push_back(ImpInfo(src_node->id(), src_val, node->id(), true));
+	StrNode* dst_node = *p;
+	if ( dst_node == node ) continue;
+	ymuint val = (dst_node->val() == 1) ? 0 : 1;
+	d_imp.put(node->id(), 0, dst_node->id(), val);
+	cout << "Node#" << node->id() << ": " << 0
+	     << " => Node#" << dst_node->id() << ": " << val
+	     << endl;
       }
-      cout << "Node#" << node->id() << ": 0 -> "
-	   << l_list.size()
-	   << " learned implications" << endl;
     }
     else {
       // 単一の割り当てで矛盾が起こった．
@@ -163,19 +170,52 @@ StrImp::learning(const BdnMgr& network,
       const vector<StrNode*>& l_list = StrNode::learned_list();
       for (vector<StrNode*>::const_iterator p = l_list.begin();
 	   p != l_list.end(); ++ p) {
-	StrNode* src_node = *p;
-	bool src_val = (node->val() == 1) ? true : false;
-	imp_list.push_back(ImpInfo(src_node->id(), src_val, node->id(), false));
+	StrNode* dst_node = *p;
+	if ( dst_node == node ) continue;
+	ymuint val = (dst_node->val() == 1) ? 0 : 1;
+	d_imp.put(node->id(), 1, dst_node->id(), val);
+	cout << "Node#" << node->id() << ": " << 1
+	     << " => Node#" << dst_node->id() << ": " << val
+	     << endl;
       }
-      cout << "Node#" << node->id() << ": 1 -> "
-	   << l_list.size()
-	   << " learned implications" << endl;
     }
     else {
       // 単一の割り当てで矛盾が起こった．
       // node は 0 固定
     }
     StrNode::clear_imp();
+  }
+
+  cout << endl
+       << "INDIRECT IMPLICATION"
+       << endl;
+  for (ymuint src_id = 0; src_id < n; ++ src_id) {
+    for (ymuint src_val = 0; src_val <= 1; ++ src_val) {
+      const list<ImpCell>& imp_list = d_imp.get(src_id, src_val);
+      for (list<ImpCell>::const_iterator p = imp_list.begin();
+	   p != imp_list.end(); ++ p) {
+	const ImpCell& imp = *p;
+	ymuint dst_id = imp.dst_id();
+	ymuint dst_val = imp.dst_val();
+	if ( !d_imp.check(dst_id, dst_val ^ 1, src_id, src_val ^ 1) ) {
+	  if ( 0 ) {
+	    const list<ImpCell>& imp_list = d_imp.get(dst_id, dst_val ^ 1);
+	    for (list<ImpCell>::const_iterator p = imp_list.begin();
+		 p != imp_list.end(); ++ p) {
+	      const ImpCell& imp = *p;
+	      cout << "  Node#" << dst_id << ": " << (dst_val ^ 1)
+		   << " ==> Node#" << imp.dst_id()
+		   << ": " << imp.dst_val()
+		   << endl;
+	    }
+	  }
+	  imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
+	  cout << "Node#" << dst_id << ": " << (dst_val ^ 1)
+	       << " => Node#" << src_id << ": " << (src_val ^ 1)
+	       << endl;
+	}
+      }
+    }
   }
 }
 

@@ -97,13 +97,11 @@ SnXor::fwd0_imp0()
 
   case kStX0_X: // X0:X -> 00:0
     mState = kSt00_0;
-    mLearnedList.push_back(this);
     // ファンアウト先に0を伝搬する．
     return fwd_prop0();
 
   case kStX1_X: // X1:X -> 01:1
     mState = kSt01_1;
-    mLearnedList.push_back(this);
     // ファンアウト先に1を伝搬する．
     return fwd_prop1();
 
@@ -142,13 +140,11 @@ SnXor::fwd0_imp1()
 
   case kStX0_X: // X0:X -> 10:1
     mState = kSt10_1;
-    mLearnedList.push_back(this);
     // ファンアウト先に1を伝搬する．
     return fwd_prop1();
 
   case kStX1_X: // X1:X -> 11:0
     mState = kSt11_0;
-    mLearnedList.push_back(this);
     // ファンアウト先に0を伝搬する．
     return fwd_prop0();
 
@@ -187,13 +183,11 @@ SnXor::fwd1_imp0()
 
   case kSt0X_X: // 0X:X -> 00:0
     mState = kSt00_0;
-    mLearnedList.push_back(this);
     // ファンアウト先に0を伝搬する．
     return fwd_prop0();
 
   case kSt1X_X: // 1X:X -> 10:1
     mState = kSt10_1;
-    mLearnedList.push_back(this);
     // ファンアウト先に1を伝搬する．
     return fwd_prop1();
 
@@ -232,13 +226,11 @@ SnXor::fwd1_imp1()
 
   case kSt0X_X: // 0X:X -> 01:1
     mState = kSt01_1;
-    mLearnedList.push_back(this);
     // ファンアウト先に1を伝搬する．
     return fwd_prop1();
 
   case kSt1X_X: // 1X:X -> 11:0
     mState = kSt11_0;
-    mLearnedList.push_back(this);
     // ファンアウト先に0を伝搬する．
     return fwd_prop0();
 
@@ -262,31 +254,26 @@ SnXor::bwd_imp0()
   switch ( mState ) {
   case kStXX_X: // XX:X -> XX:0
     mChangedList.push_back(this);
-    mLearnedList.push_back(this);
     mState = kStXX_0;
     break;
 
   case kStX0_X: // X0:X -> 00:0
     mState = kSt00_0;
-    mLearnedList.push_back(this);
     // ファンイン0に0を伝搬する．
     return fanin0_prop0();
 
   case kStX1_X: // X1:X -> 11:0
     mState = kSt11_0;
-    mLearnedList.push_back(this);
     // ファンイン0に1を伝搬する．
     return fanin0_prop1();
 
   case kSt0X_X: // 0X:X -> 00:0
     mState = kSt00_0;
-    mLearnedList.push_back(this);
     // ファンイン1に0を伝搬する．
     return fanin1_prop0();
 
   case kSt1X_X: // 1X:X -> 11:0
     mState = kSt11_0;
-    mLearnedList.push_back(this);
     // ファンイン1に1を伝搬する．
     return fanin1_prop1();
 
@@ -311,31 +298,26 @@ SnXor::bwd_imp1()
   switch ( mState ) {
   case kStXX_X: // XX:X -> XX10
     mChangedList.push_back(this);
-    mLearnedList.push_back(this);
     mState = kStXX_1;
     break;
 
   case kStX0_X: // X0:X -> 10:1
     mState = kSt10_1;
-    mLearnedList.push_back(this);
     // ファンイン0に1を伝搬する．
     return fanin0_prop1();
 
   case kStX1_X: // X1:X -> 01:1
     mState = kSt01_1;
-    mLearnedList.push_back(this);
     // ファンイン0に0を伝搬する．
     return fanin0_prop0();
 
   case kSt0X_X: // 0X:X -> 01:1
     mState = kSt01_1;
-    mLearnedList.push_back(this);
     // ファンイン1に1を伝搬する．
     return fanin1_prop1();
 
   case kSt1X_X: // 1X:X -> 10:1
     mState = kSt10_1;
-    mLearnedList.push_back(this);
     // ファンイン1に0を伝搬する．
     return fanin1_prop0();
 

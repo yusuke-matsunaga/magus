@@ -100,6 +100,7 @@ StrNode::clear_imp()
 bool
 StrNode::fwd_prop0()
 {
+  mLearnedList.push_back(this);
   for (vector<StrEdge*>::iterator p = mFanouts.begin();
        p != mFanouts.end(); ++ p) {
     StrEdge* e = *p;
@@ -132,6 +133,7 @@ StrNode::fwd_prop0()
 bool
 StrNode::fwd_prop1()
 {
+  mLearnedList.push_back(this);
   for (vector<StrEdge*>::iterator p = mFanouts.begin();
        p != mFanouts.end(); ++ p) {
     StrEdge* e = *p;
@@ -206,7 +208,7 @@ StrNode::fanin1_prop0()
 bool
 StrNode::fanin1_prop1()
 {
-  StrEdge& e = mFanins[0];
+  StrEdge& e = mFanins[1];
   StrNode* node = e.src_node();
   if ( e.src_inv() ) {
     return node->bwd_prop0(this);
@@ -247,6 +249,9 @@ StrNode::bwd_prop0(StrNode* from_node)
       return stat;
     }
   }
+  if ( val() == 0 ) {
+    mLearnedList.push_back(this);
+  }
   return bwd_imp0();
 }
 
@@ -280,6 +285,9 @@ StrNode::bwd_prop1(StrNode* from_node)
     if ( !stat ) {
       return stat;
     }
+  }
+  if ( val() == 0 ) {
+    mLearnedList.push_back(this);
   }
   return bwd_imp1();
 }

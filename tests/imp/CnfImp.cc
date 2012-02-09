@@ -11,6 +11,7 @@
 #include "CnfClause.h"
 #include "ym_networks/BdnMgr.h"
 #include "ym_networks/BdnNode.h"
+#include "ImpInfo.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -31,10 +32,10 @@ CnfImp::~CnfImp()
 
 // @brief ネットワーク中の間接含意を求める．
 // @param[in] network 対象のネットワーク
-// @param[in] imp_list 間接含意のリスト
+// @param[in] imp_info 間接含意のリスト
 void
 CnfImp::learning(const BdnMgr& network,
-		 vector<ImpInfo>& imp_list)
+		 ImpInfo& imp_info)
 {
   // BDN から CNF を作る．
   vector<BdnNode*> node_list;

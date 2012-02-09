@@ -99,7 +99,6 @@ SnInput::bwd_imp0()
   switch ( mState ) {
   case kStX: // X -> 0
     mChangedList.push_back(this);
-    mLearnedList.push_back(this);
     mState = kSt0;
     break;
 
@@ -120,7 +119,6 @@ SnInput::bwd_imp1()
   switch ( mState ) {
   case kStX: // X -> 1
     mChangedList.push_back(this);
-    mLearnedList.push_back(this);
     mState = kSt1;
     break;
 

@@ -40,11 +40,11 @@ public:
 
   /// @brief ネットワーク中の間接含意を求める．
   /// @param[in] network 対象のネットワーク
-  /// @param[in] imp_list 間接含意のリスト
+  /// @param[in] imp_info 間接含意のリスト
   virtual
   void
   learning(const BdnMgr& network,
-	   vector<ImpInfo>& imp_list);
+	   ImpInfo& imp_info);
 
 
 private:

@@ -27,6 +27,8 @@ imp_CPPFLAGS = \
 
 imp_SOURCES = \
 	imp.cc \
+	ImpInfo.h \
+	ImpInfo.cc \
 	ImpBase.h \
 	StrImp.h \
 	StrImp.cc \

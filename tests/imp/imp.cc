@@ -22,6 +22,8 @@
 #include "CnfImp.h"
 #include "CnfImp2.h"
 
+#include "ImpInfo.h"
+
 #include "ym_logic/ZddMgr.h"
 
 #include "ym_utils/MsgMgr.h"
@@ -59,59 +61,22 @@ imp(const string& filename,
     }
   }
 
-  vector<ImpInfo> imp_list;
+  ImpInfo imp_info;
   if ( method_str == "structure" ) {
     StrImp imp;
-    imp.learning(network, imp_list);
+    imp.learning(network, imp_info);
   }
   else if ( method_str == "cnf" ) {
     CnfImp imp;
-    imp.learning(network, imp_list);
+    imp.learning(network, imp_info);
   }
   else if ( method_str == "cnf2" ) {
     CnfImp2 imp;
-    imp.learning(network, imp_list);
+    imp.learning(network, imp_info);
   }
   else {
     cerr << "Unknown method: " << method_str << endl;
   }
-
-#if 0
-  SimpleOp op;
-
-  if ( method_str == "bottom_up" ) {
-    BottomUp enumcut;
-
-    enumcut(network, cut_size, &op);
-  }
-  else if ( method_str == "top_down" ) {
-    TopDown enumcut;
-
-    enumcut(network, cut_size, &op);
-  }
-  else if ( method_str == "zdd" ) {
-    ZddMgr mgr("zddmgr");
-    ZddImp enumcut(mgr);
-
-    enumcut(network, cut_size);
-  }
-  else if ( method_str == "zdd2" ) {
-    ZddMgr mgr("zddmgr");
-    ZddImp2 enumcut(mgr);
-
-    enumcut(network, cut_size);
-  }
-  else if ( method_str == "zdd_top_down" ) {
-    ZddMgr mgr("zddmgr");
-    ZddTopDown enumcut(mgr);
-
-    enumcut(network, cut_size);
-  }
-  else {
-    cerr << "Unknown method: " << method_str << endl;
-    return;
-  }
-#endif
 }
 
 END_NAMESPACE_YM_NETWORKS
