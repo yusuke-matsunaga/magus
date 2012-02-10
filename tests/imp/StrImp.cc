@@ -138,7 +138,6 @@ StrImp::learning(const BdnMgr& network,
 
   ImpInfo d_imp;
   d_imp.set_size(n);
-  cout << "DIRECT IMPLICATION" << endl;
   for (ymuint i = 0; i < n; ++ i) {
     StrNode* node = mNodeArray[i];
     if ( node == NULL ) continue;
@@ -153,9 +152,6 @@ StrImp::learning(const BdnMgr& network,
 	if ( dst_node == node ) continue;
 	ymuint val = (dst_node->val() == 1) ? 0 : 1;
 	d_imp.put(node->id(), 0, dst_node->id(), val);
-	cout << "Node#" << node->id() << ": " << 0
-	     << " => Node#" << dst_node->id() << ": " << val
-	     << endl;
       }
     }
     else {
@@ -174,9 +170,6 @@ StrImp::learning(const BdnMgr& network,
 	if ( dst_node == node ) continue;
 	ymuint val = (dst_node->val() == 1) ? 0 : 1;
 	d_imp.put(node->id(), 1, dst_node->id(), val);
-	cout << "Node#" << node->id() << ": " << 1
-	     << " => Node#" << dst_node->id() << ": " << val
-	     << endl;
       }
     }
     else {
@@ -185,10 +178,9 @@ StrImp::learning(const BdnMgr& network,
     }
     StrNode::clear_imp();
   }
+  cout << "DIRECT IMPLICATION" << endl;
+  d_imp.print(cout);
 
-  cout << endl
-       << "INDIRECT IMPLICATION"
-       << endl;
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     for (ymuint src_val = 0; src_val <= 1; ++ src_val) {
       const list<ImpCell>& imp_list = d_imp.get(src_id, src_val);
@@ -210,13 +202,12 @@ StrImp::learning(const BdnMgr& network,
 	    }
 	  }
 	  imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
-	  cout << "Node#" << dst_id << ": " << (dst_val ^ 1)
-	       << " => Node#" << src_id << ": " << (src_val ^ 1)
-	       << endl;
 	}
       }
     }
   }
+  cout << "INDIRECT IMPLICATION" << endl;
+  imp_info.print(cout);
 }
 
 END_NAMESPACE_YM_NETWORKS

@@ -29,6 +29,7 @@ SnAnd::SnAnd(ymuint id,
 	     bool inv1) :
   StrNode(id, node0, inv0, node1, inv1)
 {
+  clear();
 }
 
 // @brief デストラクタ
@@ -63,6 +64,11 @@ SnAnd::val() const
 
   case kSt11_1:
     return 2;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
   return 0;
 }
@@ -107,6 +113,11 @@ SnAnd::fwd0_imp0()
   case kSt01_0: // no change
   case kSt00_0: // no change
     break;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
   return true;
 }
@@ -143,6 +154,11 @@ SnAnd::fwd0_imp1()
   case kSt1X_X: // no change
   case kSt10_0: // no change
   case kSt11_1: // no change
+    break;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
     break;
   }
   return true;
@@ -181,6 +197,11 @@ SnAnd::fwd1_imp0()
   case kSt00_0: // no change
   case kSt10_0: // no change
     break;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
   return true;
 }
@@ -218,6 +239,11 @@ SnAnd::fwd1_imp1()
   case kSt01_0: // no change
   case kSt11_1: // no change
     break;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
   return true;
 }
@@ -252,6 +278,11 @@ SnAnd::bwd_imp0()
 
   case kSt11_1: // illegal
     return false;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
   return true;
 }
@@ -276,7 +307,7 @@ SnAnd::bwd_imp1()
   case kStX1_X: // X1:X -> 11:1
     mState = kSt11_1;
     // ファンイン0に1を伝搬する．
-    return fanin0_prop0();
+    return fanin0_prop1();
 
   case kStXX_0: // illegal
   case kStX0_0: // illegal
@@ -287,6 +318,11 @@ SnAnd::bwd_imp1()
     return false;
 
   case kSt11_1: // no change
+    break;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
     break;
   }
   return true;

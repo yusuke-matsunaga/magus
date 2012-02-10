@@ -21,6 +21,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 SnInput::SnInput(ymuint id) :
   StrNode(id, NULL, false, NULL, false)
 {
+  clear();
 }
 
 // @brief デストラクタ
@@ -48,6 +49,11 @@ SnInput::val() const
 
   case kSt1:
     return 2;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
   return 0;
 }
@@ -107,6 +113,11 @@ SnInput::bwd_imp0()
 
   case kSt1: // illegal
     return false;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
 
   return true;
@@ -126,6 +137,11 @@ SnInput::bwd_imp1()
     return false;
 
   case kSt1: // no change
+    break;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
     break;
   }
   return true;

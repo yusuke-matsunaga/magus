@@ -29,6 +29,7 @@ SnXor::SnXor(ymuint id,
 	     bool inv1) :
   StrNode(id, node0, inv0, node1, inv1)
 {
+  clear();
 }
 
 // @brief デストラクタ
@@ -64,6 +65,11 @@ SnXor::val() const
   case kSt01_1:
   case kSt10_1:
     return 2;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
   return 0;
 }
@@ -114,6 +120,11 @@ SnXor::fwd0_imp0()
   case kSt10_1: // illegal
   case kSt11_0: // illegal
     return false;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
   return true;
 }
@@ -156,6 +167,11 @@ SnXor::fwd0_imp1()
   case kSt1X_X: // no change
   case kSt10_1: // no change
   case kSt11_0: // no change
+    break;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
     break;
   }
   return true;
@@ -200,6 +216,11 @@ SnXor::fwd1_imp0()
   case kSt01_1: // illegal
   case kSt11_0: // illegal
     return false;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
   return true;
 }
@@ -242,6 +263,11 @@ SnXor::fwd1_imp1()
   case kStX1_X: // no change
   case kSt01_1: // no change
   case kSt11_0: // no change
+    break;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
     break;
   }
   return true;
@@ -287,6 +313,11 @@ SnXor::bwd_imp0()
   case kSt10_1: // illegal
     return false;
 
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+
   }
   return true;
 }
@@ -330,6 +361,11 @@ SnXor::bwd_imp1()
   case kSt01_1: // no change
   case kSt10_1: // no change
     return false;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
   return true;
 }

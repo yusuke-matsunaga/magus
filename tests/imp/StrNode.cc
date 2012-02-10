@@ -166,6 +166,9 @@ StrNode::fwd_prop1()
 bool
 StrNode::fanin0_prop0()
 {
+#if 0
+  cout << "fanin0_prop0(" << id() << ")" << endl;
+#endif
   StrEdge& e = mFanins[0];
   StrNode* node = e.src_node();
   if ( e.src_inv() ) {
@@ -180,6 +183,9 @@ StrNode::fanin0_prop0()
 bool
 StrNode::fanin0_prop1()
 {
+#if 0
+  cout << "fanin0_prop1(" << id() << ")" << endl;
+#endif
   StrEdge& e = mFanins[0];
   StrNode* node = e.src_node();
   if ( e.src_inv() ) {
@@ -194,6 +200,9 @@ StrNode::fanin0_prop1()
 bool
 StrNode::fanin1_prop0()
 {
+#if 0
+  cout << "fanin1_prop0(" << id() << ")" << endl;
+#endif
   StrEdge& e = mFanins[1];
   StrNode* node = e.src_node();
   if ( e.src_inv() ) {
@@ -208,6 +217,9 @@ StrNode::fanin1_prop0()
 bool
 StrNode::fanin1_prop1()
 {
+#if 0
+  cout << "fanin1_prop1(" << id() << ")" << endl;
+#endif
   StrEdge& e = mFanins[1];
   StrNode* node = e.src_node();
   if ( e.src_inv() ) {
@@ -223,6 +235,13 @@ StrNode::fanin1_prop1()
 bool
 StrNode::bwd_prop0(StrNode* from_node)
 {
+#if 0
+  cout << "bwd_prop0(" << id();
+  if ( from_node ) {
+    cout << " <- " << from_node->id();
+  }
+  cout << ")" << endl;
+#endif
   for (vector<StrEdge*>::iterator p = mFanouts.begin();
        p != mFanouts.end(); ++ p) {
     StrEdge* e = *p;
@@ -260,6 +279,13 @@ StrNode::bwd_prop0(StrNode* from_node)
 bool
 StrNode::bwd_prop1(StrNode* from_node)
 {
+#if 0
+  cout << "bwd_prop1(" << id();
+  if ( from_node ) {
+    cout << " <- " << from_node->id();
+  }
+  cout << ")" << endl;
+#endif
   for (vector<StrEdge*>::iterator p = mFanouts.begin();
        p != mFanouts.end(); ++ p) {
     StrEdge* e = *p;

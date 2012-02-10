@@ -91,6 +91,11 @@ public:
 	ymuint dst_id,
 	ymuint dst_val) const;
 
+  /// @brief 内容を出力する．
+  /// @param[in] s 出力先のストリーム
+  void
+  print(ostream& s) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////

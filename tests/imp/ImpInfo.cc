@@ -54,6 +54,29 @@ ImpInfo::check(ymuint src_id,
   return false;
 }
 
+// @brief 内容を出力する．
+// @param[in] s 出力先のストリーム
+void
+ImpInfo::print(ostream& s) const
+{
+  ymuint n = mArray.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    const list<ImpCell>& imp_list = mArray[i];
+    if ( imp_list.empty() ) continue;
+    ymuint src_id = i / 2;
+    ymuint src_val = i % 2;
+    cout << "Node#" << src_id << ": " << src_val << endl;
+    for (list<ImpCell>::const_iterator p = imp_list.begin();
+	 p != imp_list.end(); ++ p) {
+      const ImpCell& imp = *p;
+      ymuint dst_id = imp.dst_id();
+      ymuint dst_val = imp.dst_val();
+      cout << "   => Node#" << dst_id << ": " << dst_val << endl;
+    }
+    cout << endl;
+  }
+}
+
 // @brief サイズを設定する．
 // @param[in] max_id ID番号の最大値
 void
