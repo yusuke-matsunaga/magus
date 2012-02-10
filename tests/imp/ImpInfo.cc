@@ -60,9 +60,11 @@ void
 ImpInfo::print(ostream& s) const
 {
   ymuint n = mArray.size();
+  ymuint c = 0;
   for (ymuint i = 0; i < n; ++ i) {
     const list<ImpCell>& imp_list = mArray[i];
     if ( imp_list.empty() ) continue;
+    c += imp_list.size();
     ymuint src_id = i / 2;
     ymuint src_val = i % 2;
     cout << "Node#" << src_id << ": " << src_val << endl;
@@ -75,6 +77,7 @@ ImpInfo::print(ostream& s) const
     }
     cout << endl;
   }
+  cout << "Total " << c << " implications" << endl;
 }
 
 // @brief サイズを設定する．

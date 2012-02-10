@@ -129,7 +129,9 @@ CnfImp2::learning(const BdnMgr& network,
     CNFdd new_clause = p_list * n_list;
     new_clause.make_minimal();
     new_clause = new_clause.cut_off(4);
-    cout << "  " << new_clause.count() << " learned implications" << endl;
+    new_clause.print_clause(cout);
+    cout << "  " << new_clause.count() << " learned implications"
+	 << ", " << new_clause.node_count() << " nodes" << endl;
     cnf |= new_clause;
     cnf.make_minimal();
   }

@@ -96,6 +96,7 @@ StrImp::learning(const BdnMgr& network,
     node->set_nfo(fo_count[id]);
   }
 
+#if 0
   for (ymuint i = 0; i < n; ++ i) {
     StrNode* node = mNodeArray[i];
     if ( node == NULL ) continue;
@@ -135,9 +136,8 @@ StrImp::learning(const BdnMgr& network,
     }
     cout << endl;
   }
+#endif
 
-  ImpInfo d_imp;
-  d_imp.set_size(n);
   for (ymuint i = 0; i < n; ++ i) {
     StrNode* node = mNodeArray[i];
     if ( node == NULL ) continue;
@@ -151,7 +151,7 @@ StrImp::learning(const BdnMgr& network,
 	StrNode* dst_node = *p;
 	if ( dst_node == node ) continue;
 	ymuint val = (dst_node->val() == 1) ? 0 : 1;
-	d_imp.put(node->id(), 0, dst_node->id(), val);
+	imp_info.put(node->id(), 0, dst_node->id(), val);
       }
     }
     else {
@@ -169,7 +169,7 @@ StrImp::learning(const BdnMgr& network,
 	StrNode* dst_node = *p;
 	if ( dst_node == node ) continue;
 	ymuint val = (dst_node->val() == 1) ? 0 : 1;
-	d_imp.put(node->id(), 1, dst_node->id(), val);
+	imp_info.put(node->id(), 1, dst_node->id(), val);
       }
     }
     else {
@@ -178,36 +178,10 @@ StrImp::learning(const BdnMgr& network,
     }
     StrNode::clear_imp();
   }
+#if 0
   cout << "DIRECT IMPLICATION" << endl;
-  d_imp.print(cout);
-
-  for (ymuint src_id = 0; src_id < n; ++ src_id) {
-    for (ymuint src_val = 0; src_val <= 1; ++ src_val) {
-      const list<ImpCell>& imp_list = d_imp.get(src_id, src_val);
-      for (list<ImpCell>::const_iterator p = imp_list.begin();
-	   p != imp_list.end(); ++ p) {
-	const ImpCell& imp = *p;
-	ymuint dst_id = imp.dst_id();
-	ymuint dst_val = imp.dst_val();
-	if ( !d_imp.check(dst_id, dst_val ^ 1, src_id, src_val ^ 1) ) {
-	  if ( 0 ) {
-	    const list<ImpCell>& imp_list = d_imp.get(dst_id, dst_val ^ 1);
-	    for (list<ImpCell>::const_iterator p = imp_list.begin();
-		 p != imp_list.end(); ++ p) {
-	      const ImpCell& imp = *p;
-	      cout << "  Node#" << dst_id << ": " << (dst_val ^ 1)
-		   << " ==> Node#" << imp.dst_id()
-		   << ": " << imp.dst_val()
-		   << endl;
-	    }
-	  }
-	  imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
-	}
-      }
-    }
-  }
-  cout << "INDIRECT IMPLICATION" << endl;
   imp_info.print(cout);
+#endif
 }
 
 END_NAMESPACE_YM_NETWORKS

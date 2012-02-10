@@ -19,6 +19,7 @@
 #include "ym_networks/BdnNode.h"
 
 #include "StrImp.h"
+#include "ContraImp.h"
 #include "CnfImp.h"
 #include "CnfImp2.h"
 
@@ -62,8 +63,12 @@ imp(const string& filename,
   }
 
   ImpInfo imp_info;
-  if ( method_str == "structure" ) {
+  if ( method_str == "direct" ) {
     StrImp imp;
+    imp.learning(network, imp_info);
+  }
+  else if ( method_str == "contra" ) {
+    ContraImp imp;
     imp.learning(network, imp_info);
   }
   else if ( method_str == "cnf" ) {
@@ -77,6 +82,7 @@ imp(const string& filename,
   else {
     cerr << "Unknown method: " << method_str << endl;
   }
+  imp_info.print(cout);
 }
 
 END_NAMESPACE_YM_NETWORKS

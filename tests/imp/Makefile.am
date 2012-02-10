@@ -40,6 +40,8 @@ imp_SOURCES = \
 	SnAnd.cc \
 	SnXor.h \
 	SnXor.cc \
+	ContraImp.h \
+	ContraImp.cc \
 	CnfImp.h \
 	CnfImp.cc \
 	CnfClause.h \
