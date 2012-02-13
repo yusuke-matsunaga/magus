@@ -16,6 +16,7 @@
 #include "ConOp.h"
 #include "DisOp.h"
 #include "DiffOp.h"
+#include "DiffOp2.h"
 #include "MergeOp.h"
 #include "MinOp.h"
 #include "CutOp.h"
@@ -189,7 +190,8 @@ CNFddMgrImpl::CNFddMgrImpl(const string& name,
   mDisOp = new DisOp(*this);
   mDiffOp = new DiffOp(*this);
   mMergeOp = new MergeOp(*this, mDisOp);
-  mMinOp = new MinOp(*this, mDiffOp);
+  BinOp* diff_op2 = new DiffOp2(*this, mDisOp);
+  mMinOp = new MinOp(*this, diff_op2);
   mCutOp = new CutOp(*this);
   mLitPOp = new LitPOp(*this);
   mLitNOp = new LitNOp(*this);

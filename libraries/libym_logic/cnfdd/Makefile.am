@@ -48,6 +48,8 @@ libym_logic_cnfdd_la_SOURCES = \
 	DisOp.cc \
 	DiffOp.h \
 	DiffOp.cc \
+	DiffOp2.h \
+	DiffOp2.cc \
 	MergeOp.h \
 	MergeOp.cc \
 	MinOp.h \

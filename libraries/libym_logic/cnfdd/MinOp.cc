@@ -51,9 +51,12 @@ CNFddEdge
 MinOp::apply_step(CNFddEdge f)
 {
   // 特別な場合の処理
-  // 1：fが0なら答は0，
-  // 2: fが1なら答は1
-  if ( f.is_const() ) {
+  // 1: f に 0-element 属性があったら答えは 1
+  // 2：fが0なら答は0，
+  if ( f.zattr() ) {
+    return CNFddEdge::make_one();
+  }
+  if ( f.is_zero() ) {
     return f;
   }
 
@@ -71,27 +74,32 @@ MinOp::apply_step(CNFddEdge f)
       return r_0;
     }
 
-    // p枝は0枝と重複している部分を取り除く
-    CNFddEdge r_p = apply_step(f_p);
-    if ( r_p.is_invalid() ) {
-      return r_p;
+    if ( r_0.is_one() ) {
+      ans_e = r_0;
     }
-    r_p = mDiffOp->apply(r_p, r_0);
-    if ( r_p.is_invalid() ) {
-      return r_p;
-    }
+    else {
+      // p枝は0枝と重複している部分を取り除く
+      CNFddEdge r_p = apply_step(f_p);
+      if ( r_p.is_invalid() ) {
+	return r_p;
+      }
+      r_p = mDiffOp->apply(r_p, r_0);
+      if ( r_p.is_invalid() ) {
+	return r_p;
+      }
 
-    // n枝は0枝と重複している部分を取り除く
-    CNFddEdge r_n = apply_step(f_n);
-    if ( r_n.is_invalid() ) {
-      return r_n;
-    }
-    r_n = mDiffOp->apply(r_n, r_0);
-    if ( r_n.is_invalid() ) {
-      return r_n;
-    }
+      // n枝は0枝と重複している部分を取り除く
+      CNFddEdge r_n = apply_step(f_n);
+      if ( r_n.is_invalid() ) {
+	return r_n;
+      }
+      r_n = mDiffOp->apply(r_n, r_0);
+      if ( r_n.is_invalid() ) {
+	return r_n;
+      }
 
-    ans_e = new_node(f_level, r_0, r_p, r_n);
+      ans_e = new_node(f_level, r_0, r_p, r_n);
+    }
     put(f, ans_e);
   }
   return ans_e;
