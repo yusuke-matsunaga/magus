@@ -54,6 +54,11 @@ public:
   ymuint
   val() const;
 
+  /// @brief ビットベクタ値の計算を行なう．
+  virtual
+  void
+  calc_bitval();
+
 
 public:
   //////////////////////////////////////////////////////////////////////

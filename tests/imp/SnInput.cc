@@ -58,6 +58,13 @@ SnInput::val() const
   return 0;
 }
 
+// @brief ビットベクタ値の計算を行なう．
+void
+SnInput::calc_bitval()
+{
+  assert_not_reached(__FILE__, __LINE__);
+}
+
 // @brief 状態を初期化する．
 void
 SnInput::clear()

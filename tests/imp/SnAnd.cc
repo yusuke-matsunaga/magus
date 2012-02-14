@@ -73,6 +73,21 @@ SnAnd::val() const
   return 0;
 }
 
+// @brief ビットベクタ値の計算を行なう．
+void
+SnAnd::calc_bitval()
+{
+  ymuint64 val0 = fanin0().src_node()->bitval();
+  if ( fanin0().src_inv() ) {
+    val0 = ~val0;
+  }
+  ymuint64 val1 = fanin1().src_node()->bitval();
+  if ( fanin1().src_inv() ) {
+    val1 = ~val1;
+  }
+  set_bitval(val0 & val1);
+}
+
 // @brief 状態を初期化する．
 void
 SnAnd::clear()

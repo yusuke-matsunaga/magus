@@ -154,6 +154,19 @@ public:
   ymuint
   val() const = 0;
 
+  /// @brief ビットベクタ値を返す．
+  ymuint64
+  bitval() const;
+
+  /// @brief ビットベクタ値を設定する．
+  void
+  set_bitval(ymuint64 bitval);
+
+  /// @brief ビットベクタ値の計算を行なう．
+  virtual
+  void
+  calc_bitval() = 0;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -264,6 +277,9 @@ private:
 
   // ファンアウトの枝のリスト
   vector<StrEdge*> mFanouts;
+
+  // ビットベクタ値
+  ymuint64 mBitVal;
 
 
 protected:
@@ -384,6 +400,22 @@ const vector<StrEdge*>&
 StrNode::fanout_list() const
 {
   return mFanouts;
+}
+
+// @brief ビットベクタ値を返す．
+inline
+ymuint64
+StrNode::bitval() const
+{
+  return mBitVal;
+}
+
+// @brief ビットベクタ値を設定する．
+inline
+void
+StrNode::set_bitval(ymuint64 bitval)
+{
+  mBitVal = bitval;
 }
 
 END_NAMESPACE_YM_NETWORKS

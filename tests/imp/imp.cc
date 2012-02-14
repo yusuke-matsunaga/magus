@@ -22,6 +22,7 @@
 #include "ContraImp.h"
 #include "CnfImp.h"
 #include "CnfImp2.h"
+#include "SatImp.h"
 
 #include "ImpInfo.h"
 
@@ -77,6 +78,10 @@ imp(const string& filename,
   }
   else if ( method_str == "cnf2" ) {
     CnfImp2 imp;
+    imp.learning(network, imp_info);
+  }
+  else if ( method_str == "sat" ) {
+    SatImp imp;
     imp.learning(network, imp_info);
   }
   else {
