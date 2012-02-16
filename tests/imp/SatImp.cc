@@ -154,8 +154,9 @@ SatImp::learning(const BdnMgr& network,
     node->set_nfo(fo_count[id]);
     nodes.push_back(node);
   }
+  cout << "CNF generated" << endl;
 
-#if 1
+#if 0
   for (ymuint i = 0; i < n; ++ i) {
     StrNode* node = node_array[i];
     if ( node == NULL ) continue;
@@ -215,6 +216,7 @@ SatImp::learning(const BdnMgr& network,
 	 << ": " << hex << node->bitval() << dec << endl;
 #endif
   }
+  cout << "random simulation end." << endl;
 
   // 直接含意を求める．
   StrImp strimp;
@@ -223,77 +225,135 @@ SatImp::learning(const BdnMgr& network,
 
   // シミュレーションでフィルタリングして残った候補を
   // SAT で調べる．
-  ymuint nsat = 0;
+  ImpInfo cand_info;
+  cand_info.set_size(n);
   for (ymuint i = 0; i < n; ++ i) {
+    cout << i << " / " << n << endl;
     StrNode* node0 = node_array[i];
     if ( node0 == NULL ) continue;
-    Literal lit0(VarId(i), kPolPosi);
     ymuint64 val0 = node0->bitval();
     for (ymuint j = 0; j < n; ++ j) {
       if ( i == j ) continue;
       StrNode* node1 = node_array[j];
       if ( node1 == NULL ) continue;
-      Literal lit1(VarId(j), kPolPosi);
       ymuint64 val1 = node1->bitval();
       // node0 が 0 の時に 0 となるノードを探す．
       if ( (~val0 & val1) == 0UL ) {
 	if ( !d_imp.check(i, 0, j, 0) &&
 	     !d_imp.check(j, 1, i, 1) ) {
-	  vector<Literal> tmp(2);
-	  vector<Bool3> model;
-	  tmp[0] = ~lit0;
-	  tmp[1] = lit1;
-	  ++ nsat;
-	  if ( solver.solve(tmp, model) == kB3False ) {
-	    imp_info.put(i, 0, j, 0);
-	  }
+	  cand_info.put(i, 0, j, 0);
 	}
       }
       // node0 が 0 の時に 1 となるノードを探す．
       else if ( (~val0 & ~val1) == 0UL ) {
 	if ( !d_imp.check(i, 0, j, 1) &&
 	     !d_imp.check(j, 0, i, 1) ) {
-	  vector<Literal> tmp(2);
-	  vector<Bool3> model;
-	  tmp[0] = ~lit0;
-	  tmp[1] = ~lit1;
-	  ++ nsat;
-	  if ( solver.solve(tmp, model) == kB3False ) {
-	    imp_info.put(i, 0, j, 1);
-	  }
+	  cand_info.put(i, 0, j, 1);
 	}
       }
       // node0 が 1 の時に 0 となるノードを探す．
       if ( (val0 & val1) == 0UL ) {
 	if ( !d_imp.check(i, 1, j, 0) &&
 	     !d_imp.check(j, 1, i, 0) ) {
-	  vector<Literal> tmp(2);
-	  vector<Bool3> model;
-	  tmp[0] = lit0;
-	  tmp[1] = lit1;
-	  ++ nsat;
-	  if ( solver.solve(tmp, model) == kB3False ) {
-	    imp_info.put(i, 1, j, 0);
-	  }
+	  cand_info.put(i, 1, j, 0);
 	}
       }
       // node0 が 1 の時に 1 となるノードを探す．
       else if ( (val0 & ~val1) == 0UL ) {
 	if ( !d_imp.check(i, 1, j, 1) &&
 	     !d_imp.check(j, 0, i, 0) ) {
-	  vector<Literal> tmp(2);
-	  vector<Bool3> model;
-	  tmp[0] = lit0;
-	  tmp[1] = ~lit1;
-	  ++ nsat;
-	  if ( solver.solve(tmp, model) == kB3False ) {
-	    imp_info.put(i, 1, j, 1);
-	  }
+	  cand_info.put(i, 1, j, 1);
 	}
       }
     }
   }
-  cout << "nsat = " << nsat << endl;
+  cout << "nsat0 = " << cand_info.size() << endl;
+
+  ymuint prev_size = cand_info.size();
+  ymuint count = 1;
+  ymuint nochg = 0;
+  for ( ; ; ) {
+    for (vector<StrNode*>::iterator p = inputs.begin();
+	 p != inputs.end(); ++ p) {
+      StrNode* node = *p;
+      ymuint64 val0 = rg.int32();
+      ymuint64 val1 = rg.int32();
+      ymuint64 bitval = (val0 << 32) | val1;
+      node->set_bitval(bitval);
+    }
+
+    for (vector<StrNode*>::iterator p = nodes.begin();
+	 p != nodes.end(); ++ p) {
+      StrNode* node = *p;
+      node->calc_bitval();
+    }
+
+    for (ymuint src_id = 0; src_id < n; ++ src_id) {
+      StrNode* node0 = node_array[src_id];
+      if ( node0 == NULL ) continue;
+      for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+	ymuint64 val0 = node0->bitval();
+	if ( src_val == 0 ) {
+	  val0 = ~val0;
+	}
+	list<ImpCell>& imp_list = cand_info.get(src_id, src_val);
+	for (list<ImpCell>::iterator p = imp_list.begin();
+	     p != imp_list.end(); ) {
+	  const ImpCell& imp = *p;
+	  ymuint dst_id = imp.dst_id();
+	  StrNode* node1 = node_array[dst_id];
+	  assert_cond( node1 != NULL, __FILE__, __LINE__);
+	  ymuint dst_val = imp.dst_val();
+	  ymuint64 val1 = node1->bitval();
+	  if ( dst_val == 0 ) {
+	    val1 = ~val1;
+	  }
+	  if ( (val0 & ~val1) != 0UL ) {
+	    list<ImpCell>::iterator q = p;
+	    ++ p;
+	    imp_list.erase(q);
+	  }
+	  else {
+	    ++ p;
+	  }
+	}
+      }
+    }
+    cout << "nsat" << count << " = " << cand_info.size() << endl;
+    if ( prev_size == cand_info.size() ) {
+      ++ nochg;
+      if ( nochg >= 10 ) {
+	break;
+      }
+    }
+    else {
+      nochg = 0;
+    }
+    prev_size = cand_info.size();
+  }
+
+  for (ymuint src_id = 0; src_id < n; ++ src_id) {
+    StrNode* node0 = node_array[src_id];
+    if ( node0 == NULL ) continue;
+    for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+      Literal lit0(VarId(src_id), src_val == 0 ? kPolNega : kPolPosi);
+      const list<ImpCell>& imp_list = cand_info.get(src_id, src_val);
+      for (list<ImpCell>::const_iterator p = imp_list.begin();
+	   p != imp_list.end(); ++ p) {
+	const ImpCell& imp = *p;
+	ymuint dst_id = imp.dst_id();
+	ymuint dst_val = imp.dst_val();
+	Literal lit1(VarId(dst_id), dst_val == 0 ? kPolNega : kPolPosi);
+	vector<Literal> tmp(2);
+	vector<Bool3> model;
+	tmp[0] = lit0;
+	tmp[1] = ~lit1;
+	if ( solver.solve(tmp, model) == kB3False ) {
+	  imp_info.put(src_id, src_val, dst_id, dst_val);
+	}
+      }
+    }
+  }
 }
 
 END_NAMESPACE_YM_NETWORKS

@@ -19,6 +19,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 // @brief 空のコンストラクタ
 ImpInfo::ImpInfo()
 {
+  mSize = 0;
 }
 
 // @brief デストラクタ
@@ -32,6 +33,16 @@ ImpInfo::~ImpInfo()
 const list<ImpCell>&
 ImpInfo::get(ymuint src_id,
 	     ymuint src_val) const
+{
+  return mArray[src_id * 2 + src_val];
+}
+
+// @brief 含意情報のリストを取り出す．
+// @param[in] src_id 含意元のノード番号
+// @param[in] src_val 含意元の値 ( 0 or 1 )
+list<ImpCell>&
+ImpInfo::get(ymuint src_id,
+	     ymuint src_val)
 {
   return mArray[src_id * 2 + src_val];
 }
@@ -54,17 +65,28 @@ ImpInfo::check(ymuint src_id,
   return false;
 }
 
+// @brief 含意の総数を得る．
+ymuint
+ImpInfo::size() const
+{
+  ymuint c = 0;
+  ymuint n = mArray.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    const list<ImpCell>& imp_list = mArray[i];
+    c += imp_list.size();
+  }
+  return c;
+}
+
 // @brief 内容を出力する．
 // @param[in] s 出力先のストリーム
 void
 ImpInfo::print(ostream& s) const
 {
   ymuint n = mArray.size();
-  ymuint c = 0;
   for (ymuint i = 0; i < n; ++ i) {
     const list<ImpCell>& imp_list = mArray[i];
     if ( imp_list.empty() ) continue;
-    c += imp_list.size();
     ymuint src_id = i / 2;
     ymuint src_val = i % 2;
     cout << "Node#" << src_id << ": " << src_val << endl;
@@ -77,7 +99,7 @@ ImpInfo::print(ostream& s) const
     }
     cout << endl;
   }
-  cout << "Total " << c << " implications" << endl;
+  cout << "Total " << size() << " implications" << endl;
 }
 
 // @brief サイズを設定する．
@@ -101,6 +123,7 @@ ImpInfo::put(ymuint src_id,
 	     ymuint dst_val)
 {
   mArray[src_id * 2 + src_val].push_back(ImpCell(dst_id, dst_val));
+  ++ mSize;
 }
 
 END_NAMESPACE_YM_NETWORKS

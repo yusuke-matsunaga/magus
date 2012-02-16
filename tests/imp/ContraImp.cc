@@ -72,8 +72,6 @@ ContraImp::learning(const BdnMgr& network,
       }
     }
   }
-  cout << "INDIRECT IMPLICATION" << endl;
-  imp_info.print(cout);
 }
 
 END_NAMESPACE_YM_NETWORKS

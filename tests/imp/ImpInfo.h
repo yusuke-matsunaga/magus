@@ -84,12 +84,23 @@ public:
   get(ymuint src_id,
       ymuint src_val) const;
 
+  /// @brief 含意情報のリストを取り出す．
+  /// @param[in] src_id 含意元のノード番号
+  /// @param[in] src_val 含意元の値 ( 0 or 1 )
+  list<ImpCell>&
+  get(ymuint src_id,
+      ymuint src_val);
+
   /// @brief 該当する含意情報が含まれているか調べる．
   bool
   check(ymuint src_id,
 	ymuint src_val,
 	ymuint dst_id,
 	ymuint dst_val) const;
+
+  /// @brief 含意の総数を得る．
+  ymuint
+  size() const;
 
   /// @brief 内容を出力する．
   /// @param[in] s 出力先のストリーム
@@ -123,6 +134,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 含意の総数
+  ymuint32 mSize;
 
   // 値を格納する配列
   vector<list<ImpCell> > mArray;

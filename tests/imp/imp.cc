@@ -87,7 +87,11 @@ imp(const string& filename,
   else {
     cerr << "Unknown method: " << method_str << endl;
   }
+#if 0
   imp_info.print(cout);
+#else
+  cout << "Total " << imp_info.size() << " implications" << endl;
+#endif
 }
 
 END_NAMESPACE_YM_NETWORKS
