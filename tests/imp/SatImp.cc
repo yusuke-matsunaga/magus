@@ -237,32 +237,36 @@ SatImp::learning(const BdnMgr& network,
       StrNode* node1 = node_array[j];
       if ( node1 == NULL ) continue;
       ymuint64 val1 = node1->bitval();
-      // node0 が 0 の時に 0 となるノードを探す．
-      if ( (~val0 & val1) == 0UL ) {
-	if ( !d_imp.check(i, 0, j, 0) &&
-	     !d_imp.check(j, 1, i, 1) ) {
-	  cand_info.put(i, 0, j, 0);
+      if ( ~val0 != 0UL ) {
+	// node0 が 0 の時に 0 となるノードを探す．
+	if ( (~val0 & val1) == 0UL ) {
+	  if ( !d_imp.check(i, 0, j, 0) &&
+	       !d_imp.check(j, 1, i, 1) ) {
+	    cand_info.put(i, 0, j, 0);
+	  }
+	}
+	// node0 が 0 の時に 1 となるノードを探す．
+	else if ( (~val0 & ~val1) == 0UL ) {
+	  if ( !d_imp.check(i, 0, j, 1) &&
+	       !d_imp.check(j, 0, i, 1) ) {
+	    cand_info.put(i, 0, j, 1);
+	  }
 	}
       }
-      // node0 が 0 の時に 1 となるノードを探す．
-      else if ( (~val0 & ~val1) == 0UL ) {
-	if ( !d_imp.check(i, 0, j, 1) &&
-	     !d_imp.check(j, 0, i, 1) ) {
-	  cand_info.put(i, 0, j, 1);
+      if ( val0 != 0UL ) {
+	// node0 が 1 の時に 0 となるノードを探す．
+	if ( (val0 & val1) == 0UL ) {
+	  if ( !d_imp.check(i, 1, j, 0) &&
+	       !d_imp.check(j, 1, i, 0) ) {
+	    cand_info.put(i, 1, j, 0);
+	  }
 	}
-      }
-      // node0 が 1 の時に 0 となるノードを探す．
-      if ( (val0 & val1) == 0UL ) {
-	if ( !d_imp.check(i, 1, j, 0) &&
-	     !d_imp.check(j, 1, i, 0) ) {
-	  cand_info.put(i, 1, j, 0);
-	}
-      }
-      // node0 が 1 の時に 1 となるノードを探す．
-      else if ( (val0 & ~val1) == 0UL ) {
-	if ( !d_imp.check(i, 1, j, 1) &&
-	     !d_imp.check(j, 0, i, 0) ) {
-	  cand_info.put(i, 1, j, 1);
+	// node0 が 1 の時に 1 となるノードを探す．
+	else if ( (val0 & ~val1) == 0UL ) {
+	  if ( !d_imp.check(i, 1, j, 1) &&
+	       !d_imp.check(j, 0, i, 0) ) {
+	    cand_info.put(i, 1, j, 1);
+	  }
 	}
       }
     }
@@ -320,7 +324,10 @@ SatImp::learning(const BdnMgr& network,
       }
     }
     cout << "nsat" << count << " = " << cand_info.size() << endl;
-    if ( prev_size == cand_info.size() ) {
+    ++ count;
+    ymuint diff = prev_size - cand_info.size();
+    prev_size = cand_info.size();
+    if ( diff < 10 ) {
       ++ nochg;
       if ( nochg >= 10 ) {
 	break;
@@ -329,9 +336,10 @@ SatImp::learning(const BdnMgr& network,
     else {
       nochg = 0;
     }
-    prev_size = cand_info.size();
   }
 
+  ymuint remain = cand_info.size();
+  count = 1;
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     StrNode* node0 = node_array[src_id];
     if ( node0 == NULL ) continue;
@@ -340,6 +348,8 @@ SatImp::learning(const BdnMgr& network,
       const list<ImpCell>& imp_list = cand_info.get(src_id, src_val);
       for (list<ImpCell>::const_iterator p = imp_list.begin();
 	   p != imp_list.end(); ++ p) {
+	cout << "sat#" << count << " / " << remain << endl;
+	++ count;
 	const ImpCell& imp = *p;
 	ymuint dst_id = imp.dst_id();
 	ymuint dst_val = imp.dst_val();
