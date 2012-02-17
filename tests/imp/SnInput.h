@@ -42,8 +42,8 @@ public:
   bool
   is_input() const;
 
-  /// @brief 値を返す．
-  ymuint
+  /// @brief 出力値を返す．
+  Bool3
   val() const;
 
   /// @brief ビットベクタ値の計算を行なう．

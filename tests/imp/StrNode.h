@@ -10,6 +10,8 @@
 
 
 #include "ym_networks/BdnMgr.h"
+#include "ym_logic/Bool3.h"
+#include "ImpInfo.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -149,9 +151,9 @@ public:
   const vector<StrEdge*>&
   fanout_list() const;
 
-  /// @brief 値を返す．
+  /// @brief 出力値を返す．
   virtual
-  ymuint
+  Bool3
   val() const = 0;
 
   /// @brief ビットベクタ値を返す．
@@ -215,7 +217,7 @@ public:
 
   /// @brief 直前の含意で学習されたノードのリストを返す．
   static
-  const vector<StrNode*>&
+  const vector<ImpCell>&
   learned_list();
 
   /// @brief 直前の含意の結果をクリアする．
@@ -293,7 +295,7 @@ protected:
 
   // 学習されたノードのリスト
   static
-  vector<StrNode*> mLearnedList;
+  vector<ImpCell> mLearnedList;
 
 };
 

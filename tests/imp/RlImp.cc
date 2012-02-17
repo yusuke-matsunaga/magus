@@ -1,13 +1,13 @@
 
-/// @file StrImp.cc
-/// @brief StrImp の実装ファイル
+/// @file RlImp.cc
+/// @brief RlImp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "StrImp.h"
+#include "RlImp.h"
 #include "StrNode.h"
 #include "SnInput.h"
 #include "SnAnd.h"
@@ -20,16 +20,16 @@
 BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
-// クラス StrImp
+// クラス RlImp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-StrImp::StrImp()
+RlImp::RlImp()
 {
 }
 
 // @brief デストラクタ
-StrImp::~StrImp()
+RlImp::~RlImp()
 {
 }
 
@@ -37,8 +37,8 @@ StrImp::~StrImp()
 // @param[in] network 対象のネットワーク
 // @param[in] imp_info 間接含意のリスト
 void
-StrImp::learning(const BdnMgr& network,
-		 ImpInfo& imp_info)
+RlImp::learning(const BdnMgr& network,
+		ImpInfo& imp_info)
 {
   ymuint n = network.max_node_id();
 
@@ -145,31 +145,47 @@ StrImp::learning(const BdnMgr& network,
     ymuint src_id = node->id();
 
     // node に 0 を割り当てる．
-    bool ok0 = node->bwd_prop0(NULL);
-    if ( ok0 ) {
-      imp_info.put(src_id, 0, StrNode::learned_list());
-    }
-    else {
-      // 単一の割り当てで矛盾が起こった．
-      // node は 1 固定
-    }
-    StrNode::clear_imp();
+    vector<ImpCell> imp0_list;
+    bool ok0 = make_all_implication(node, 0, imp0_list);
+    imp_info.put(src_id, 0, imp0_list);
 
     // node に 1 を割り当てる．
-    bool ok1 = node->bwd_prop1(NULL);
-    if ( ok1 ) {
-      imp_info.put(src_id, 1, StrNode::learned_list());
-    }
-    else {
-      // 単一の割り当てで矛盾が起こった．
-      // node は 0 固定
-    }
-    StrNode::clear_imp();
+    vector<ImpCell> imp1_list;
+    bool ok1 = make_all_implication(node, 1, imp1_list);
+    imp_info.put(src_id, 1, imp1_list);
   }
 #if 0
   cout << "DIRECT IMPLICATION" << endl;
   imp_info.print(cout);
 #endif
+}
+
+// @brief recursive learning を行なう．
+// @param[in] node ノード
+// @param[in] val 値
+// @param[in] imp_list 含意のリスト
+bool
+RlImp::make_all_implication(StrNode* node,
+			    ymuint val,
+			    vector<ImpCell>& imp_list)
+{
+  bool ok;
+  if ( val == 0 ) {
+    ok = node->bwd_prop0(NULL);
+  }
+  else {
+    ok = node->bwd_prop1(NULL);
+  }
+  if ( ok ) {
+    imp_list = StrNode::learned_list();
+  }
+  else {
+    // 単一の割り当てで矛盾が起こった．
+    // node は !val 固定
+  }
+  StrNode::clear_imp();
+
+  return ok;
 }
 
 END_NAMESPACE_YM_NETWORKS

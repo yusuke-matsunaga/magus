@@ -126,4 +126,24 @@ ImpInfo::put(ymuint src_id,
   ++ mSize;
 }
 
+// @brief 含意情報を追加する．
+// @param[in] src_id 含意元のノード番号
+// @param[in] src_val 含意元の値 ( 0 or 1 )
+// @param[in] imp_list 含意リスト
+void
+ImpInfo::put(ymuint src_id,
+	     ymuint src_val,
+	     const vector<ImpCell>& imp_list)
+{
+  list<ImpCell>& dst_list = mArray[src_id * 2 + src_val];
+  for (vector<ImpCell>::const_iterator p = imp_list.begin();
+       p != imp_list.end(); ++ p) {
+    ymuint dst_id = p->dst_id();
+    ymuint dst_val = p->dst_val();
+    if ( dst_id == src_id ) continue;
+    dst_list.push_back(ImpCell(dst_id, dst_val));
+  }
+  mSize += imp_list.size();
+}
+
 END_NAMESPACE_YM_NETWORKS

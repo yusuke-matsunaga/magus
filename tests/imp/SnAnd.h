@@ -50,9 +50,9 @@ public:
   bool
   is_and() const;
 
-  /// @brief 値を返す．
+  /// @brief 出力値を返す．
   virtual
-  ymuint
+  Bool3
   val() const;
 
   /// @brief ビットベクタ値の計算を行なう．

@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 
 vector<StrNode*> StrNode::mChangedList;
 
-vector<StrNode*> StrNode::mLearnedList;
+vector<ImpCell> StrNode::mLearnedList;
 
 // @brief コンストラクタ
 // @param[in] id ID番号
@@ -77,7 +77,7 @@ StrNode::changed_list()
 }
 
 // @brief 直前の含意で学習されたノードのリストを返す．
-const vector<StrNode*>&
+const vector<ImpCell>&
 StrNode::learned_list()
 {
   return mLearnedList;
@@ -100,7 +100,7 @@ StrNode::clear_imp()
 bool
 StrNode::fwd_prop0()
 {
-  mLearnedList.push_back(this);
+  mLearnedList.push_back(ImpCell(id(), 0));
   for (vector<StrEdge*>::iterator p = mFanouts.begin();
        p != mFanouts.end(); ++ p) {
     StrEdge* e = *p;
@@ -133,7 +133,7 @@ StrNode::fwd_prop0()
 bool
 StrNode::fwd_prop1()
 {
-  mLearnedList.push_back(this);
+  mLearnedList.push_back(ImpCell(id(), 1));
   for (vector<StrEdge*>::iterator p = mFanouts.begin();
        p != mFanouts.end(); ++ p) {
     StrEdge* e = *p;
@@ -268,8 +268,8 @@ StrNode::bwd_prop0(StrNode* from_node)
       return stat;
     }
   }
-  if ( val() == 0 ) {
-    mLearnedList.push_back(this);
+  if ( val() == kB3X ) {
+    mLearnedList.push_back(ImpCell(id(), 0));
   }
   return bwd_imp0();
 }
@@ -312,8 +312,8 @@ StrNode::bwd_prop1(StrNode* from_node)
       return stat;
     }
   }
-  if ( val() == 0 ) {
-    mLearnedList.push_back(this);
+  if ( val() == kB3X ) {
+    mLearnedList.push_back(ImpCell(id(), 1));
   }
   return bwd_imp1();
 }

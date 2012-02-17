@@ -3,7 +3,7 @@
 /// @brief 構造的含意の列挙プログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -23,6 +23,7 @@
 #include "CnfImp.h"
 #include "CnfImp2.h"
 #include "SatImp.h"
+#include "RlImp.h"
 
 #include "ImpInfo.h"
 
@@ -82,6 +83,10 @@ imp(const string& filename,
   }
   else if ( method_str == "sat" ) {
     SatImp imp;
+    imp.learning(network, imp_info);
+  }
+  else if ( method_str == "rl" ) {
+    RlImp imp;
     imp.learning(network, imp_info);
   }
   else {

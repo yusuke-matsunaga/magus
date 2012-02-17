@@ -44,15 +44,15 @@ SnAnd::is_and() const
   return true;
 }
 
-// @brief 値を返す．
-ymuint
+// @brief 出力値を返す．
+Bool3
 SnAnd::val() const
 {
   switch ( mState ) {
   case kStXX_X:
   case kSt1X_X:
   case kStX1_X:
-    return 0;
+    return kB3X;
 
   case kStXX_0:
   case kStX0_0:
@@ -60,17 +60,17 @@ SnAnd::val() const
   case kSt00_0:
   case kSt10_0:
   case kSt01_0:
-    return 1;
+    return kB3False;
 
   case kSt11_1:
-    return 2;
+    return kB3True;
 
   default:
     cout << "mState = " << mState << endl;
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
-  return 0;
+  return kB3X;
 }
 
 // @brief ビットベクタ値の計算を行なう．

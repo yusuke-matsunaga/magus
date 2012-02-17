@@ -44,8 +44,8 @@ SnXor::is_xor() const
   return true;
 }
 
-// @brief 値を返す．
-ymuint
+// @brief 出力値を返す．
+Bool3
 SnXor::val() const
 {
   switch ( mState ) {
@@ -54,24 +54,24 @@ SnXor::val() const
   case kStX1_X:
   case kSt0X_X:
   case kSt1X_X:
-    return 0;
+    return kB3X;
 
   case kStXX_0:
   case kSt00_0:
   case kSt11_0:
-    return 1;
+    return kB3False;
 
   case kStXX_1:
   case kSt01_1:
   case kSt10_1:
-    return 2;
+    return kB3True;
 
   default:
     cout << "mState = " << mState << endl;
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
-  return 0;
+  return kB3X;
 }
 
 // @brief ビットベクタ値の計算を行なう．

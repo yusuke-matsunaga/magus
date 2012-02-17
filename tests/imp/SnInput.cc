@@ -36,26 +36,26 @@ SnInput::is_input() const
   return true;
 }
 
-// @brief 値を返す．
-ymuint
+// @brief 出力値を返す．
+Bool3
 SnInput::val() const
 {
   switch ( mState ) {
   case kStX:
-    return 0;
+    return kB3X;
 
   case kSt0:
-    return 1;
+    return kB3False;
 
   case kSt1:
-    return 2;
+    return kB3True;
 
   default:
     cout << "mState = " << mState << endl;
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
-  return 0;
+  return kB3X;
 }
 
 // @brief ビットベクタ値の計算を行なう．

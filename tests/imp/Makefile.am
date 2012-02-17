@@ -48,7 +48,9 @@ imp_SOURCES = \
 	CnfImp2.h \
 	CnfImp2.cc \
 	SatImp.h \
-	SatImp.cc
+	SatImp.cc \
+	RlImp.h \
+	RlImp.cc
 
 imp_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
