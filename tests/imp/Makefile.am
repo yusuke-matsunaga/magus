@@ -30,8 +30,8 @@ imp_SOURCES = \
 	ImpInfo.h \
 	ImpInfo.cc \
 	ImpBase.h \
-	StrImp.h \
-	StrImp.cc \
+	ImpMgr.h \
+	ImpMgr.cc \
 	StrNode.h \
 	StrNode.cc \
 	SnInput.h \
@@ -40,6 +40,8 @@ imp_SOURCES = \
 	SnAnd.cc \
 	SnXor.h \
 	SnXor.cc \
+	StrImp.h \
+	StrImp.cc \
 	ContraImp.h \
 	ContraImp.cc \
 	CnfImp.h \
