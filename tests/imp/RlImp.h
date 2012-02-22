@@ -58,11 +58,13 @@ private:
   /// @param[in] imp_mgr ImpMgr
   /// @param[in] node ノード
   /// @param[in] val 値
-  /// @param[in] imp_list 含意のリスト
+  /// @param[in] level レベル
+  /// @param[out] imp_list 含意のリスト
   bool
   make_all_implication(ImpMgr& imp_mgr,
 		       StrNode* node,
 		       ymuint val,
+		       ymuint level,
 		       vector<ImpCell>& imp_list);
 
 

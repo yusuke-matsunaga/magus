@@ -268,21 +268,8 @@ private:
   // スタックのレベル
   ymuint32 mStackLevel;
 
-
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // クラスデータメンバ
-  //////////////////////////////////////////////////////////////////////
-
-#if 0
-  // 直前の含意で変化したノードのリスト
-  static
-  vector<StrNode*> mChangedList;
-
-  // 学習されたノードのリスト
-  static
-  vector<ImpCell> mLearnedList;
-#endif
+  // ImpMgr::mUnodeList 中の位置を示す反復子
+  list<StrNode*>::iterator mListIter;
 
 };
 

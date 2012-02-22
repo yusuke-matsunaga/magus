@@ -97,15 +97,12 @@ RlImp::learning(const BdnMgr& network,
 
     ymuint src_id = node->id();
 
-    // node に 0 を割り当てる．
-    vector<ImpCell> imp0_list;
-    bool ok0 = make_all_implication(imp_mgr, node, 0, imp0_list);
-    imp_info.put(src_id, 0, imp0_list);
-
-    // node に 1 を割り当てる．
-    vector<ImpCell> imp1_list;
-    bool ok1 = make_all_implication(imp_mgr, node, 1, imp1_list);
-    imp_info.put(src_id, 1, imp1_list);
+    // node に値を割り当てる．
+    for (ymuint val = 0; val < 2; ++ val) {
+      vector<ImpCell> imp_list;
+      bool ok = make_all_implication(imp_mgr, node, val, 1, imp_list);
+      imp_info.put(src_id, val, imp_list);
+    }
   }
 #if 0
   cout << "DIRECT IMPLICATION" << endl;
@@ -117,24 +114,38 @@ RlImp::learning(const BdnMgr& network,
 // @param[in] imp_mgr ImpMgr
 // @param[in] node ノード
 // @param[in] val 値
+// @param[in] level レベル
 // @param[in] imp_list 含意のリスト
 bool
 RlImp::make_all_implication(ImpMgr& imp_mgr,
 			    StrNode* node,
 			    ymuint val,
+			    ymuint level,
 			    vector<ImpCell>& imp_list)
 {
-  bool ok = imp_mgr.assert(node, val, imp_list);
-  if ( ok ) {
-    ;
+  if ( level == 0 ) {
+    imp_list.clear();
+    return true;
   }
   else {
-    // 単一の割り当てで矛盾が起こった．
-    // node は !val 固定
-  }
-  imp_mgr.backtrack();
+    bool ok = imp_mgr.assert(node, val, imp_list);
+    if ( ok ) {
+      vector<StrNode*> unode_list;
+      imp_mgr.get_unodelist(unode_list);
+      for (vector<StrNode*>::iterator p = unode_list.begin();
+	   p != unode_list.end(); ++ p) {
+	StrNode* unode = *p;
 
-  return ok;
+      }
+    }
+    else {
+      // 単一の割り当てで矛盾が起こった．
+      // node は !val 固定
+    }
+    imp_mgr.backtrack();
+
+    return ok;
+  }
 }
 
 END_NAMESPACE_YM_NETWORKS

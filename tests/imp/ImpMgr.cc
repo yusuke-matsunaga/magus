@@ -78,6 +78,7 @@ ImpMgr::set(const BdnMgr& src_network)
     const BdnNode* bnode = *p;
     ymuint id = bnode->id();
     StrNode* node = new SnInput(id);
+    node->mListIter = mUnodeList.end();
     mNodeArray[id] = node;
     node->set_nfo(fo_count[id]);
   }
@@ -105,6 +106,7 @@ ImpMgr::set(const BdnMgr& src_network)
     else {
       assert_not_reached(__FILE__, __LINE__);
     }
+    node->mListIter = mUnodeList.end();
     mNodeArray[id] = node;
     node->set_nfo(fo_count[id]);
   }
@@ -126,13 +128,6 @@ ImpMgr::assert(StrNode* node,
   else {
     return bwd_prop1(node, NULL, imp_list);
   }
-}
-
-// @brief 現在のスタックポインタの値を得る．
-ymuint
-ImpMgr::cur_sp() const
-{
-  return mMarkerStack.size();
 }
 
 // @brief 指定されたところまで値を戻す．
@@ -390,6 +385,33 @@ ImpMgr::bwd_prop1(StrNode* node,
     imp_list.push_back(ImpCell(node->id(), 1));
   }
   return node->bwd_imp1(*this, imp_list);
+}
+
+// @brief unjustified ノードを得る．
+void
+ImpMgr::get_unodelist(vector<StrNode*>& unode_list)
+{
+  unode_list.clear();
+  unode_list.reserve(mUnodeList.size());
+  unode_list.insert(unode_list.begin(), mUnodeList.begin(), mUnodeList.end());
+}
+
+// @brief ノードが unjustified になったときの処理を行なう．
+void
+ImpMgr::set_unjustified(StrNode* node)
+{
+  assert_cond( node->mListIter == mUnodeList.end(), __FILE__, __LINE__);
+  mUnodeList.push_back(node);
+  node->mListIter = mUnodeList.end();
+  -- node->mListIter;
+}
+
+// @brief ノードが unjustified でなくなったときの処理を行なう．
+void
+ImpMgr::reset_unjustified(StrNode* node)
+{
+  mUnodeList.erase(node->mListIter);
+  node->mListIter = mUnodeList.end();
 }
 
 // @brief ノードの値をスタックに積む．

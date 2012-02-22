@@ -5,7 +5,7 @@
 /// @brief ImpMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -78,10 +78,6 @@ public:
   assert(StrNode* node,
 	 ymuint val,
 	 vector<ImpCell>& imp_list);
-
-  /// @brief 現在のスタックポインタの値を得る．
-  ymuint
-  cur_sp() const;
 
   /// @brief 指定されたところまで値を戻す．
   void
@@ -163,6 +159,18 @@ public:
 	    StrNode* from_node,
 	    vector<ImpCell>& imp_list);
 
+  /// @brief unjustified ノードを得る．
+  void
+  get_unodelist(vector<StrNode*>& unode_list);
+
+  /// @brief ノードが unjustified になったときの処理を行なう．
+  void
+  set_unjustified(StrNode* ndoe);
+
+  /// @brief ノードが unjustified でなくなったときの処理を行なう．
+  void
+  reset_unjustified(StrNode* node);
+
   /// @brief ノードの値をスタックに積む．
   /// @param[in] node ノード
   /// @param[in] old_state 変更前の値
@@ -203,6 +211,9 @@ private:
 
   // マーカーのスタック
   vector<ymuint32> mMarkerStack;
+
+  // unjustified ノードのリスト
+  list<StrNode*> mUnodeList;
 
 };
 

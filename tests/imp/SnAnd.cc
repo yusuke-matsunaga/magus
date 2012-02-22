@@ -125,11 +125,13 @@ SnAnd::fwd0_imp0(ImpMgr& mgr,
 
   case kStX1_X: // X1:X -> 01:0
     change_value(mgr, kSt01_0);
+    mgr.reset_unjustified(this);
     // ファンアウト先に0を伝搬する．
     return mgr.fwd_prop0(this, imp_list);
 
   case kStXX_0: // XX:0 -> 0X:0
     change_value(mgr, kSt0X_0);
+    mgr.reset_unjustified(this);
     break;
 
   case kStX0_0: // X0:0 -> 00:0
@@ -163,15 +165,18 @@ SnAnd::fwd0_imp1(ImpMgr& mgr,
   switch ( mState ) {
   case kStXX_X: // XX:X -> 1X:X
     change_value(mgr, kSt1X_X);
+    mgr.set_unjustified(this);
     break;
 
   case kStX1_X: // X1:X -> 11:1
     change_value(mgr, kSt11_1);
+    mgr.reset_unjustified(this);
     // ファンアウト先に1を伝搬する．
     return mgr.fwd_prop1(this, imp_list);
 
   case kStXX_0: // XX:0 -> 10:0
     change_value(mgr, kSt10_0);
+    mgr.reset_unjustified(this);
     // ファンイン1に0を伝搬する．
     return mgr.fanin1_prop0(this, imp_list);
 
@@ -211,6 +216,7 @@ SnAnd::fwd1_imp0(ImpMgr& mgr,
 
   case kSt1X_X: // 1X:X -> 10:0
     change_value(mgr, kSt10_0);
+    mgr.reset_unjustified(this);
     // ファンアウト先に0を伝搬する．
     return mgr.fwd_prop0(this, imp_list);
 
@@ -220,6 +226,7 @@ SnAnd::fwd1_imp0(ImpMgr& mgr,
 
   case kStXX_0: // XX:0 -> X0:0
     change_value(mgr, kStX0_0);
+    mgr.reset_unjustified(this);
     break;
 
   case kStX1_X: // illegal
@@ -249,15 +256,18 @@ SnAnd::fwd1_imp1(ImpMgr& mgr,
   switch ( mState ) {
   case kStXX_X: // XX:X -> X1:X
     change_value(mgr, kStX1_X);
+    mgr.set_unjustified(this);
     break;
 
   case kSt1X_X: // 1X:X -> 11:1
     change_value(mgr, kSt11_1);
+    mgr.reset_unjustified(this);
     // ファンアウト先に1を伝搬する．
     return mgr.fwd_prop1(this, imp_list);
 
   case kStXX_0: // XX:0 -> 01:0
     change_value(mgr, kSt01_0);
+    mgr.reset_unjustified(this);
     // ファンイン0に0を伝搬する．
     return mgr.fanin0_prop0(this, imp_list);
 
@@ -292,15 +302,18 @@ SnAnd::bwd_imp0(ImpMgr& mgr,
   switch ( mState ) {
   case kStXX_X: // XX:X -> XX:0
     change_value(mgr, kStXX_0);
+    mgr.set_unjustified(this);
     break;
 
   case kSt1X_X: // 1X:X -> 10:0
     change_value(mgr, kSt10_0);
+    mgr.reset_unjustified(this);
     // ファンイン1に0を伝搬する．
     return mgr.fanin1_prop0(this, imp_list);
 
   case kStX1_X: // X1:X -> 01:0
     change_value(mgr, kSt01_0);
+    mgr.reset_unjustified(this);
     // ファンイン0に0を伝搬する．
     return mgr.fanin0_prop0(this, imp_list);
 
@@ -338,11 +351,13 @@ SnAnd::bwd_imp1(ImpMgr& mgr,
 
   case kSt1X_X: // 1X:X -> 11:1
     change_value(mgr, kSt11_1);
+    mgr.reset_unjustified(this);
     // ファンイン1に1を伝搬する．
     return mgr.fanin1_prop1(this, imp_list);
 
   case kStX1_X: // X1:X -> 11:1
     change_value(mgr, kSt11_1);
+    mgr.reset_unjustified(this);
     // ファンイン0に1を伝搬する．
     return mgr.fanin0_prop1(this, imp_list);
 
