@@ -21,6 +21,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 class SnInput :
   public StrNode
 {
+  friend class ImpMgr;
 public:
 
   /// @brief コンストラクタ
@@ -62,35 +63,63 @@ public:
   void
   clear();
 
+  /// @brief 状態を返す．
+  virtual
+  ymuint32
+  cur_state() const;
+
+  /// @brief 状態を元にもどす．
+  virtual
+  void
+  restore(ymuint32 val);
+
   /// @brief ファンイン0を0にする．
+  /// @param[in] mgr ImMgr
+  /// @param[out] imp_list 含意の結果を格納するリスト
   virtual
   bool
-  fwd0_imp0();
+  fwd0_imp0(ImpMgr& mgr,
+	    vector<ImpCell>& imp_list);
 
   /// @brief ファンイン0を1にする．
+  /// @param[in] mgr ImMgr
+  /// @param[out] imp_list 含意の結果を格納するリスト
   virtual
   bool
-  fwd0_imp1();
+  fwd0_imp1(ImpMgr& mgr,
+	    vector<ImpCell>& imp_list);
 
   /// @brief ファンイン1を0にする．
+  /// @param[in] mgr ImMgr
+  /// @param[out] imp_list 含意の結果を格納するリスト
   virtual
   bool
-  fwd1_imp0();
+  fwd1_imp0(ImpMgr& mgr,
+	    vector<ImpCell>& imp_list);
 
   /// @brief ファンイン1を1にする．
+  /// @param[in] mgr ImMgr
+  /// @param[out] imp_list 含意の結果を格納するリスト
   virtual
   bool
-  fwd1_imp1();
+  fwd1_imp1(ImpMgr& mgr,
+	    vector<ImpCell>& imp_list);
 
   /// @brief 出力を0にする．
+  /// @param[in] mgr ImMgr
+  /// @param[out] imp_list 含意の結果を格納するリスト
   virtual
   bool
-  bwd_imp0();
+  bwd_imp0(ImpMgr& mgr,
+	   vector<ImpCell>& imp_list);
 
   /// @brief 出力を1にする．
+  /// @param[in] mgr ImMgr
+  /// @param[out] imp_list 含意の結果を格納するリスト
   virtual
   bool
-  bwd_imp1();
+  bwd_imp1(ImpMgr& mgr,
+	   vector<ImpCell>& imp_list);
 
 
 private:
@@ -102,13 +131,14 @@ private:
   // X: 0
   // 0: 1
   // 1: 2
-  enum {
+  enum tState {
     kStX = 0,
     kSt0 = 1,
     kSt1 = 2
   } mState;
+
 };
 
 END_NAMESPACE_YM_NETWORKS
 
-#endif // SNAND_H
+#endif // SNINPUT_H

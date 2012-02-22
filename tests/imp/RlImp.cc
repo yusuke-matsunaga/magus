@@ -8,6 +8,7 @@
 
 
 #include "RlImp.h"
+#include "ImpMgr.h"
 #include "StrNode.h"
 #include "SnInput.h"
 #include "SnAnd.h"
@@ -44,57 +45,9 @@ RlImp::learning(const BdnMgr& network,
 
   imp_info.set_size(n);
 
-  // BDN の情報を StrNode にコピーする．
-  mNodeArray.clear();
-  mNodeArray.resize(n, NULL);
-
-  vector<BdnNode*> node_list;
-  network.sort(node_list);
-  vector<ymuint> fo_count(n, 0);
-  for (vector<BdnNode*>::iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    const BdnNode* bnode = *p;
-    const BdnNode* bnode0 = bnode->fanin0();
-    ++ fo_count[bnode0->id()];
-    const BdnNode* bnode1 = bnode->fanin1();
-    ++ fo_count[bnode1->id()];
-  }
-
-  const BdnNodeList& input_list = network.input_list();
-  for (BdnNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    const BdnNode* bnode = *p;
-    ymuint id = bnode->id();
-    StrNode* node = new SnInput(id);
-    mNodeArray[id] = node;
-    node->set_nfo(fo_count[id]);
-  }
-
-  for (vector<BdnNode*>::iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    const BdnNode* bnode = *p;
-    ymuint id = bnode->id();
-    const BdnNode* bnode0 = bnode->fanin0();
-    bool inv0 = bnode->fanin0_inv();
-    StrNode* node0 = mNodeArray[bnode0->id()];
-    assert_cond(node0 != NULL, __FILE__, __LINE__);
-    const BdnNode* bnode1 = bnode->fanin1();
-    bool inv1 = bnode->fanin1_inv();
-    StrNode* node1 = mNodeArray[bnode1->id()];
-    assert_cond(node1 != NULL, __FILE__, __LINE__);
-    StrNode* node = NULL;
-    if ( bnode->is_and() ) {
-      node = new SnAnd(id, node0, inv0, node1, inv1);
-    }
-    else if ( bnode->is_xor() ) {
-      node = new SnXor(id, node0, inv0, node1, inv1);
-    }
-    else {
-      assert_not_reached(__FILE__, __LINE__);
-    }
-    mNodeArray[id] = node;
-    node->set_nfo(fo_count[id]);
-  }
+  // BDN の情報を ImpMgr にコピーする．
+  ImpMgr imp_mgr;
+  imp_mgr.set(network);
 
 #if 0
   for (ymuint i = 0; i < n; ++ i) {
@@ -139,19 +92,19 @@ RlImp::learning(const BdnMgr& network,
 #endif
 
   for (ymuint i = 0; i < n; ++ i) {
-    StrNode* node = mNodeArray[i];
+    StrNode* node = imp_mgr.node(i);
     if ( node == NULL ) continue;
 
     ymuint src_id = node->id();
 
     // node に 0 を割り当てる．
     vector<ImpCell> imp0_list;
-    bool ok0 = make_all_implication(node, 0, imp0_list);
+    bool ok0 = make_all_implication(imp_mgr, node, 0, imp0_list);
     imp_info.put(src_id, 0, imp0_list);
 
     // node に 1 を割り当てる．
     vector<ImpCell> imp1_list;
-    bool ok1 = make_all_implication(node, 1, imp1_list);
+    bool ok1 = make_all_implication(imp_mgr, node, 1, imp1_list);
     imp_info.put(src_id, 1, imp1_list);
   }
 #if 0
@@ -161,29 +114,25 @@ RlImp::learning(const BdnMgr& network,
 }
 
 // @brief recursive learning を行なう．
+// @param[in] imp_mgr ImpMgr
 // @param[in] node ノード
 // @param[in] val 値
 // @param[in] imp_list 含意のリスト
 bool
-RlImp::make_all_implication(StrNode* node,
+RlImp::make_all_implication(ImpMgr& imp_mgr,
+			    StrNode* node,
 			    ymuint val,
 			    vector<ImpCell>& imp_list)
 {
-  bool ok;
-  if ( val == 0 ) {
-    ok = node->bwd_prop0(NULL);
-  }
-  else {
-    ok = node->bwd_prop1(NULL);
-  }
+  bool ok = imp_mgr.assert(node, val, imp_list);
   if ( ok ) {
-    imp_list = StrNode::learned_list();
+    ;
   }
   else {
     // 単一の割り当てで矛盾が起こった．
     // node は !val 固定
   }
-  StrNode::clear_imp();
+  imp_mgr.backtrack();
 
   return ok;
 }

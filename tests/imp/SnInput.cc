@@ -8,6 +8,7 @@
 
 
 #include "SnInput.h"
+#include "ImpMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -72,46 +73,74 @@ SnInput::clear()
   mState = kStX;
 }
 
+// @brief 状態を返す．
+ymuint32
+SnInput::cur_state() const
+{
+  return static_cast<ymuint32>(mState);
+}
+
+// @brief 状態を元にもどす．
+void
+SnInput::restore(ymuint32 val)
+{
+  mState = static_cast<tState>(val);
+}
 
 // @brief ファンイン0を0にする．
+// @param[in] mgr ImMgr
+// @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnInput::fwd0_imp0()
+SnInput::fwd0_imp0(ImpMgr& mgr,
+		   vector<ImpCell>& imp_list)
 {
   assert_not_reached(__FILE__, __LINE__);
   return false;
 }
 
 // @brief ファンイン0を1にする．
+// @param[in] mgr ImMgr
+// @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnInput::fwd0_imp1()
+SnInput::fwd0_imp1(ImpMgr& mgr,
+		   vector<ImpCell>& imp_list)
 {
   assert_not_reached(__FILE__, __LINE__);
   return false;
 }
 
 // @brief ファンイン1を0にする．
+// @param[in] mgr ImMgr
+// @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnInput::fwd1_imp0()
+SnInput::fwd1_imp0(ImpMgr& mgr,
+		   vector<ImpCell>& imp_list)
 {
   assert_not_reached(__FILE__, __LINE__);
   return false;
 }
 
 // @brief ファンイン1を1にする．
+// @param[in] mgr ImMgr
+// @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnInput::fwd1_imp1()
+SnInput::fwd1_imp1(ImpMgr& mgr,
+		   vector<ImpCell>& imp_list)
 {
   assert_not_reached(__FILE__, __LINE__);
   return false;
 }
 
 // @brief 出力を0にする．
+// @param[in] mgr ImMgr
+// @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnInput::bwd_imp0()
+SnInput::bwd_imp0(ImpMgr& mgr,
+		  vector<ImpCell>& imp_list)
 {
   switch ( mState ) {
   case kStX: // X -> 0
-    mChangedList.push_back(this);
+    mgr.save_value(this, static_cast<ymuint32>(mState));
     mState = kSt0;
     break;
 
@@ -122,7 +151,6 @@ SnInput::bwd_imp0()
     return false;
 
   default:
-    cout << "mState = " << mState << endl;
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
@@ -131,12 +159,14 @@ SnInput::bwd_imp0()
 }
 
 // @brief 出力を1にする．
+// @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnInput::bwd_imp1()
+SnInput::bwd_imp1(ImpMgr& mgr,
+		  vector<ImpCell>& imp_list)
 {
   switch ( mState ) {
   case kStX: // X -> 1
-    mChangedList.push_back(this);
+    mgr.save_value(this, static_cast<ymuint32>(mState));
     mState = kSt1;
     break;
 

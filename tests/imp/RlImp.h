@@ -15,6 +15,7 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
+class ImpMgr;
 class StrNode;
 
 //////////////////////////////////////////////////////////////////////
@@ -54,11 +55,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief recursive learning を行なう．
+  /// @param[in] imp_mgr ImpMgr
   /// @param[in] node ノード
   /// @param[in] val 値
   /// @param[in] imp_list 含意のリスト
   bool
-  make_all_implication(StrNode* node,
+  make_all_implication(ImpMgr& imp_mgr,
+		       StrNode* node,
 		       ymuint val,
 		       vector<ImpCell>& imp_list);
 

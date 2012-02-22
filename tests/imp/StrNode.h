@@ -17,6 +17,7 @@
 BEGIN_NAMESPACE_YM_NETWORKS
 
 class StrNode;
+class ImpMgr;
 
 //////////////////////////////////////////////////////////////////////
 /// @class StrEdge StrNode.h "StrNode.h"
@@ -86,6 +87,8 @@ private:
 //////////////////////////////////////////////////////////////////////
 class StrNode
 {
+  friend class ImpMgr;
+
 public:
 
   /// @brief コンストラクタ
@@ -156,6 +159,12 @@ public:
   Bool3
   val() const = 0;
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ビットベクタ関係の関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief ビットベクタ値を返す．
   ymuint64
   bitval() const;
@@ -180,90 +189,63 @@ public:
   void
   clear() = 0;
 
+  /// @brief 状態を返す．
+  virtual
+  ymuint32
+  cur_state() const = 0;
+
+  /// @brief 状態を元にもどす．
+  virtual
+  void
+  restore(ymuint32 val) = 0;
+
   /// @brief ファンイン0を0にする．
+  /// @param[in] mgr ImMgr
+  /// @param[out] imp_list 含意の結果を格納するリスト
   virtual
   bool
-  fwd0_imp0() = 0;
+  fwd0_imp0(ImpMgr& mgr,
+	    vector<ImpCell>& imp_list) = 0;
 
   /// @brief ファンイン0を1にする．
+  /// @param[in] mgr ImMgr
+  /// @param[out] imp_list 含意の結果を格納するリスト
   virtual
   bool
-  fwd0_imp1() = 0;
+  fwd0_imp1(ImpMgr& mgr,
+	    vector<ImpCell>& imp_list) = 0;
 
   /// @brief ファンイン1を0にする．
+  /// @param[in] mgr ImMgr
+  /// @param[out] imp_list 含意の結果を格納するリスト
   virtual
   bool
-  fwd1_imp0() = 0;
+  fwd1_imp0(ImpMgr& mgr,
+	    vector<ImpCell>& imp_list) = 0;
 
   /// @brief ファンイン1を1にする．
+  /// @param[in] mgr ImMgr
+  /// @param[out] imp_list 含意の結果を格納するリスト
   virtual
   bool
-  fwd1_imp1() = 0;
+  fwd1_imp1(ImpMgr& mgr,
+	    vector<ImpCell>& imp_list) = 0;
 
   /// @brief 出力を0にする．
+  /// @param[in] mgr ImMgr
+  /// @param[out] imp_list 含意の結果を格納するリスト
   virtual
   bool
-  bwd_imp0() = 0;
+  bwd_imp0(ImpMgr& mgr,
+	   vector<ImpCell>& imp_list) = 0;
 
   /// @brief 出力を1にする．
+  /// @param[in] mgr ImMgr
+  /// @param[out] imp_list 含意の結果を格納するリスト
   virtual
   bool
-  bwd_imp1() = 0;
-
-  /// @brief 直前の含意で値が変化したノードのリストを返す．
-  static
-  const vector<StrNode*>&
-  changed_list();
-
-  /// @brief 直前の含意で学習されたノードのリストを返す．
-  static
-  const vector<ImpCell>&
-  learned_list();
-
-  /// @brief 直前の含意の結果をクリアする．
-  static
-  void
-  clear_imp();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 下請け関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ファンアウト先に0を伝搬する．
-  bool
-  fwd_prop0();
-
-  /// @brief ファンアウト先に1を伝搬する．
-  bool
-  fwd_prop1();
-
-  /// @brief ファンイン0に0を伝搬する．
-  bool
-  fanin0_prop0();
-
-  /// @brief ファンイン0に1を伝搬する．
-  bool
-  fanin0_prop1();
-
-  /// @brief ファンイン1に0を伝搬する．
-  bool
-  fanin1_prop0();
-
-  /// @brief ファンイン1に1を伝搬する．
-  bool
-  fanin1_prop1();
-
-  /// @brief 後方含意を行う．
-  /// @param[in] from_node 含意元のノード
-  bool
-  bwd_prop0(StrNode* from_node);
-
-  /// @brief 後方含意を行う．
-  /// @param[in] from_node 含意元のノード
-  bool
-  bwd_prop1(StrNode* from_node);
+  bwd_imp1(ImpMgr& mgr,
+	   vector<ImpCell>& imp_list) = 0;;
 
 
 private:
@@ -283,12 +265,16 @@ private:
   // ビットベクタ値
   ymuint64 mBitVal;
 
+  // スタックのレベル
+  ymuint32 mStackLevel;
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
   // クラスデータメンバ
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   // 直前の含意で変化したノードのリスト
   static
   vector<StrNode*> mChangedList;
@@ -296,6 +282,7 @@ protected:
   // 学習されたノードのリスト
   static
   vector<ImpCell> mLearnedList;
+#endif
 
 };
 

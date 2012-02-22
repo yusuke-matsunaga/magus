@@ -16,10 +16,6 @@ BEGIN_NAMESPACE_YM_NETWORKS
 // クラス StrNode
 //////////////////////////////////////////////////////////////////////
 
-vector<StrNode*> StrNode::mChangedList;
-
-vector<ImpCell> StrNode::mLearnedList;
-
 // @brief コンストラクタ
 // @param[in] id ID番号
 // @param[in] node0 ファンイン0のノード
@@ -69,33 +65,7 @@ StrNode::is_xor() const
   return false;
 }
 
-// @brief 直前の含意で値が変化したノードのリストを返す．
-const vector<StrNode*>&
-StrNode::changed_list()
-{
-  return mChangedList;
-}
-
-// @brief 直前の含意で学習されたノードのリストを返す．
-const vector<ImpCell>&
-StrNode::learned_list()
-{
-  return mLearnedList;
-}
-
-// @brief 直前の含意の結果をクリアする．
-void
-StrNode::clear_imp()
-{
-  for (vector<StrNode*>::iterator p = mChangedList.begin();
-       p != mChangedList.end(); ++ p) {
-    StrNode* node = *p;
-    node->clear();
-  }
-  mChangedList.clear();
-  mLearnedList.clear();
-}
-
+#if 0
 // @brief ファンアウト先に0を伝搬する．
 bool
 StrNode::fwd_prop0()
@@ -317,5 +287,6 @@ StrNode::bwd_prop1(StrNode* from_node)
   }
   return bwd_imp1();
 }
+#endif
 
 END_NAMESPACE_YM_NETWORKS

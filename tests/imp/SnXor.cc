@@ -3,11 +3,12 @@
 /// @brief SnXor の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "SnXor.h"
+#include "ImpMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -16,12 +17,12 @@ BEGIN_NAMESPACE_YM_NETWORKS
 // クラス SnXor
 //////////////////////////////////////////////////////////////////////
 
-/// @brief コンストラクタ
-/// @param[in] id ID番号
-/// @param[in] node0 ファンイン0のノード
-/// @param[in] inv0 ファンイン0の極性
-/// @param[in] node1 ファンイン1のノード
-/// @param[in] inv1 ファンイン1の極性
+// @brief コンストラクタ
+// @param[in] id ID番号
+// @param[in] node0 ファンイン0のノード
+// @param[in] inv0 ファンイン0の極性
+// @param[in] node1 ファンイン1のノード
+// @param[in] inv1 ファンイン1の極性
 SnXor::SnXor(ymuint id,
 	     StrNode* node0,
 	     bool inv0,
@@ -96,35 +97,51 @@ SnXor::clear()
   mState = kStXX_X;
 }
 
+// @brief 状態を返す．
+ymuint32
+SnXor::cur_state() const
+{
+  return static_cast<ymuint32>(mState);
+}
+
+// @brief 状態を元にもどす．
+void
+SnXor::restore(ymuint32 val)
+{
+  mState = static_cast<tState>(val);
+}
+
 // @brief ファンイン0を0にする．
+// @param[in] mgr ImpMgr
+// @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnXor::fwd0_imp0()
+SnXor::fwd0_imp0(ImpMgr& mgr,
+		 vector<ImpCell>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> 0X:X
-    mState = kSt0X_X;
-    mChangedList.push_back(this);
+    change_value(mgr, kSt0X_X);
     break;
 
   case kStXX_0: // XX:0 -> 00:0
-    mState = kSt00_0;
+    change_value(mgr, kSt00_0);
     // ファンイン1に0を伝搬する．
-    return fanin1_prop0();
+    return mgr.fanin1_prop0(this, imp_list);
 
   case kStXX_1: // XX:1 -> 01:1
-    mState = kSt01_1;
+    change_value(mgr, kSt01_1);
     // ファンイン1に1を伝搬する．
-    return fanin1_prop1();
+    return mgr.fanin1_prop1(this, imp_list);
 
   case kStX0_X: // X0:X -> 00:0
-    mState = kSt00_0;
+    change_value(mgr, kSt00_0);
     // ファンアウト先に0を伝搬する．
-    return fwd_prop0();
+    return mgr.fwd_prop0(this, imp_list);
 
   case kStX1_X: // X1:X -> 01:1
-    mState = kSt01_1;
+    change_value(mgr, kSt01_1);
     // ファンアウト先に1を伝搬する．
-    return fwd_prop1();
+    return mgr.fwd_prop1(this, imp_list);
 
   case kSt0X_X: // no change
   case kSt00_0: // no change
@@ -137,7 +154,6 @@ SnXor::fwd0_imp0()
     return false;
 
   default:
-    cout << "mState = " << mState << endl;
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
@@ -145,34 +161,36 @@ SnXor::fwd0_imp0()
 }
 
 // @brief ファンイン0を1にする．
+// @param[in] mgr ImpMgr
+// @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnXor::fwd0_imp1()
+SnXor::fwd0_imp1(ImpMgr& mgr,
+		 vector<ImpCell>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> 1X:X
-    mChangedList.push_back(this);
-    mState = kSt1X_X;
+    change_value(mgr, kSt1X_X);
     break;
 
   case kStXX_0: // XX:0 -> 11:0
-    mState = kSt11_0;
+    change_value(mgr, kSt11_0);
     // ファンイン1に1を伝搬する．
-    return fanin1_prop1();
+    return mgr.fanin1_prop1(this, imp_list);
 
   case kStXX_1: // XX:1 -> 10:1
-    mState = kSt10_1;
+    change_value(mgr, kSt10_1);
     // ファンイン1に0を伝搬する．
-    return fanin1_prop0();
+    return mgr.fanin1_prop0(this, imp_list);
 
   case kStX0_X: // X0:X -> 10:1
-    mState = kSt10_1;
+    change_value(mgr, kSt10_1);
     // ファンアウト先に1を伝搬する．
-    return fwd_prop1();
+    return mgr.fwd_prop1(this, imp_list);
 
   case kStX1_X: // X1:X -> 11:0
-    mState = kSt11_0;
+    change_value(mgr, kSt11_0);
     // ファンアウト先に0を伝搬する．
-    return fwd_prop0();
+    return mgr.fwd_prop0(this, imp_list);
 
   case kSt0X_X: // illegal
   case kSt00_0: // illegal
@@ -185,7 +203,6 @@ SnXor::fwd0_imp1()
     break;
 
   default:
-    cout << "mState = " << mState << endl;
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
@@ -193,34 +210,36 @@ SnXor::fwd0_imp1()
 }
 
 // @brief ファンイン1を0にする．
+// @param[in] mgr ImpMgr
+// @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnXor::fwd1_imp0()
+SnXor::fwd1_imp0(ImpMgr& mgr,
+		 vector<ImpCell>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> X0:X
-    mChangedList.push_back(this);
-    mState = kStX0_X;
+    change_value(mgr, kStX0_X);
     break;
 
   case kStXX_0: // XX:0 -> 00:0
-    mState = kSt00_0;
+    change_value(mgr, kSt00_0);
     // ファンイン0に0を伝搬する．
-    return fanin0_prop0();
+    return mgr.fanin0_prop0(this, imp_list);
 
   case kStXX_1: // XX:1 -> 10:1
-    mState = kSt10_1;
+    change_value(mgr, kSt10_1);
     // ファンイン0に1を伝搬する．
-    return fanin0_prop1();
+    return mgr.fanin0_prop1(this, imp_list);
 
   case kSt0X_X: // 0X:X -> 00:0
-    mState = kSt00_0;
+    change_value(mgr, kSt00_0);
     // ファンアウト先に0を伝搬する．
-    return fwd_prop0();
+    return mgr.fwd_prop0(this, imp_list);
 
   case kSt1X_X: // 1X:X -> 10:1
-    mState = kSt10_1;
+    change_value(mgr, kSt10_1);
     // ファンアウト先に1を伝搬する．
-    return fwd_prop1();
+    return mgr.fwd_prop1(this, imp_list);
 
   case kStX0_X: // no change
   case kSt00_0: // no change
@@ -233,7 +252,6 @@ SnXor::fwd1_imp0()
     return false;
 
   default:
-    cout << "mState = " << mState << endl;
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
@@ -241,34 +259,36 @@ SnXor::fwd1_imp0()
 }
 
 // @brief ファンイン1を1にする．
+// @param[in] mgr ImpMgr
+// @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnXor::fwd1_imp1()
+SnXor::fwd1_imp1(ImpMgr& mgr,
+		 vector<ImpCell>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> X1:X
-    mChangedList.push_back(this);
-    mState = kStX1_X;
+    change_value(mgr, kStX1_X);
     break;
 
   case kStXX_0: // XX:0 -> 11:0
-    mState = kSt11_0;
+    change_value(mgr, kSt11_0);
     // ファンイン0に1を伝搬する．
-    return fanin0_prop1();
+    return mgr.fanin0_prop1(this, imp_list);
 
   case kStXX_1: // XX:1 -> 01:1
-    mState = kSt01_1;
+    change_value(mgr, kSt01_1);
     // ファンイン0に0を伝搬する．
-    return fanin0_prop0();
+    return mgr.fanin0_prop0(this, imp_list);
 
   case kSt0X_X: // 0X:X -> 01:1
-    mState = kSt01_1;
+    change_value(mgr, kSt01_1);
     // ファンアウト先に1を伝搬する．
-    return fwd_prop1();
+    return mgr.fwd_prop1(this, imp_list);
 
   case kSt1X_X: // 1X:X -> 11:0
-    mState = kSt11_0;
+    change_value(mgr, kSt11_0);
     // ファンアウト先に0を伝搬する．
-    return fwd_prop0();
+    return mgr.fwd_prop0(this, imp_list);
 
   case kStX0_X: // illegal
   case kSt00_0: // illegal
@@ -281,7 +301,6 @@ SnXor::fwd1_imp1()
     break;
 
   default:
-    cout << "mState = " << mState << endl;
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
@@ -289,34 +308,36 @@ SnXor::fwd1_imp1()
 }
 
 // @brief 出力を0にする．
+// @param[in] mgr ImMgr
+// @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnXor::bwd_imp0()
+SnXor::bwd_imp0(ImpMgr& mgr,
+		vector<ImpCell>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> XX:0
-    mChangedList.push_back(this);
-    mState = kStXX_0;
+    change_value(mgr, kStXX_0);
     break;
 
   case kStX0_X: // X0:X -> 00:0
-    mState = kSt00_0;
+    change_value(mgr, kSt00_0);
     // ファンイン0に0を伝搬する．
-    return fanin0_prop0();
+    return mgr.fanin0_prop0(this, imp_list);
 
   case kStX1_X: // X1:X -> 11:0
-    mState = kSt11_0;
+    change_value(mgr, kSt11_0);
     // ファンイン0に1を伝搬する．
-    return fanin0_prop1();
+    return mgr.fanin0_prop1(this, imp_list);
 
   case kSt0X_X: // 0X:X -> 00:0
-    mState = kSt00_0;
+    change_value(mgr, kSt00_0);
     // ファンイン1に0を伝搬する．
-    return fanin1_prop0();
+    return mgr.fanin1_prop0(this, imp_list);
 
   case kSt1X_X: // 1X:X -> 11:0
-    mState = kSt11_0;
+    change_value(mgr, kSt11_0);
     // ファンイン1に1を伝搬する．
-    return fanin1_prop1();
+    return mgr.fanin1_prop1(this, imp_list);
 
   case kStXX_0: // no change
   case kSt00_0: // no change
@@ -329,7 +350,6 @@ SnXor::bwd_imp0()
     return false;
 
   default:
-    cout << "mState = " << mState << endl;
     assert_not_reached(__FILE__, __LINE__);
     break;
 
@@ -338,34 +358,36 @@ SnXor::bwd_imp0()
 }
 
 // @brief 出力を1にする．
+// @param[in] mgr ImpMgr
+// @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnXor::bwd_imp1()
+SnXor::bwd_imp1(ImpMgr& mgr,
+		vector<ImpCell>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> XX10
-    mChangedList.push_back(this);
-    mState = kStXX_1;
+    change_value(mgr, kStXX_1);
     break;
 
   case kStX0_X: // X0:X -> 10:1
-    mState = kSt10_1;
+    change_value(mgr, kSt10_1);
     // ファンイン0に1を伝搬する．
-    return fanin0_prop1();
+    return mgr.fanin0_prop1(this, imp_list);
 
   case kStX1_X: // X1:X -> 01:1
-    mState = kSt01_1;
+    change_value(mgr, kSt01_1);
     // ファンイン0に0を伝搬する．
-    return fanin0_prop0();
+    return mgr.fanin0_prop0(this, imp_list);
 
   case kSt0X_X: // 0X:X -> 01:1
-    mState = kSt01_1;
+    change_value(mgr, kSt01_1);
     // ファンイン1に1を伝搬する．
-    return fanin1_prop1();
+    return mgr.fanin1_prop1(this, imp_list);
 
   case kSt1X_X: // 1X:X -> 10:1
-    mState = kSt10_1;
+    change_value(mgr, kSt10_1);
     // ファンイン1に0を伝搬する．
-    return fanin1_prop0();
+    return mgr.fanin1_prop0(this, imp_list);
 
   case kStXX_0: // illegal
   case kSt00_0: // illegal
@@ -378,11 +400,21 @@ SnXor::bwd_imp1()
     return false;
 
   default:
-    cout << "mState = " << mState << endl;
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
   return true;
+}
+
+// @brief 値を変える．
+// @param[in] mgr ImpMgr
+// @param[in] val 値
+void
+SnXor::change_value(ImpMgr& mgr,
+		    tState val)
+{
+  mgr.save_value(this, static_cast<ymuint32>(mState));
+  mState = val;
 }
 
 END_NAMESPACE_YM_NETWORKS

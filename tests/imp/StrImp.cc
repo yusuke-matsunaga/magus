@@ -8,6 +8,7 @@
 
 
 #include "StrImp.h"
+#include "ImpMgr.h"
 #include "StrNode.h"
 #include "SnInput.h"
 #include "SnAnd.h"
@@ -44,10 +45,12 @@ StrImp::learning(const BdnMgr& network,
 
   imp_info.set_size(n);
 
-  // BDN の情報を StrNode にコピーする．
-  mNodeArray.clear();
-  mNodeArray.resize(n, NULL);
+  ImpMgr imp_mgr;
 
+  // BDN の情報を ImpMgr にコピーする．
+  imp_mgr.set(network);
+
+#if 0
   vector<BdnNode*> node_list;
   network.sort(node_list);
   vector<ymuint> fo_count(n, 0);
@@ -95,7 +98,7 @@ StrImp::learning(const BdnMgr& network,
     mNodeArray[id] = node;
     node->set_nfo(fo_count[id]);
   }
-
+#endif
 #if 0
   for (ymuint i = 0; i < n; ++ i) {
     StrNode* node = mNodeArray[i];
@@ -139,32 +142,34 @@ StrImp::learning(const BdnMgr& network,
 #endif
 
   for (ymuint i = 0; i < n; ++ i) {
-    StrNode* node = mNodeArray[i];
+    StrNode* node = imp_mgr.node(i);
     if ( node == NULL ) continue;
 
     ymuint src_id = node->id();
 
     // node に 0 を割り当てる．
-    bool ok0 = node->bwd_prop0(NULL);
+    vector<ImpCell> imp_list0;
+    bool ok0 = imp_mgr.assert(node, 0, imp_list0);
     if ( ok0 ) {
-      imp_info.put(src_id, 0, StrNode::learned_list());
+      imp_info.put(src_id, 0, imp_list0);
     }
     else {
       // 単一の割り当てで矛盾が起こった．
       // node は 1 固定
     }
-    StrNode::clear_imp();
+    imp_mgr.backtrack();
 
     // node に 1 を割り当てる．
-    bool ok1 = node->bwd_prop1(NULL);
+    vector<ImpCell> imp_list1;
+    bool ok1 = imp_mgr.assert(node, 1, imp_list1);
     if ( ok1 ) {
-      imp_info.put(src_id, 1, StrNode::learned_list());
+      imp_info.put(src_id, 1, imp_list1);
     }
     else {
       // 単一の割り当てで矛盾が起こった．
       // node は 0 固定
     }
-    StrNode::clear_imp();
+    imp_mgr.backtrack();
   }
 #if 0
   cout << "DIRECT IMPLICATION" << endl;
