@@ -394,6 +394,48 @@ ImpMgr::get_unodelist(vector<StrNode*>& unode_list)
   unode_list.clear();
   unode_list.reserve(mUnodeList.size());
   unode_list.insert(unode_list.begin(), mUnodeList.begin(), mUnodeList.end());
+  ymuint n = mNodeArray.size();
+  vector<bool> umark(n, false);
+  ymuint c = 0;
+  for (ymuint i = 0; i < n; ++ i) {
+    StrNode* node = mNodeArray[i];
+    if ( node == NULL ) continue;
+    if ( node->is_unjustified() ) {
+      umark[i] = true;
+      ++ c;
+    }
+  }
+  bool error = false;
+  if ( c != mUnodeList.size() ) {
+    error = true;
+  }
+  else {
+    for (vector<StrNode*>::iterator p = unode_list.begin();
+	 p != unode_list.end(); ++ p) {
+      StrNode* node = *p;
+      if ( !node->is_unjustified() ) {
+	error = true;
+	break;
+      }
+    }
+  }
+  if ( error ) {
+    cout << "Error in ImpMgr::get_unode_list()" << endl;
+    cout << "mUnodeList";
+    for (list<StrNode*>::iterator p = mUnodeList.begin();
+	 p != mUnodeList.end(); ++ p) {
+      cout << " " << (*p)->id();
+    }
+    cout << endl
+	 << "unjustified node";
+    for (ymuint i = 0; i < n; ++ i) {
+      if ( umark[i] ) {
+	cout << " " << i;
+      }
+    }
+    cout << endl
+	 << endl;
+  }
 }
 
 // @brief ノードが unjustified になったときの処理を行なう．

@@ -59,6 +59,13 @@ SnInput::val() const
   return kB3X;
 }
 
+// @brief unjustified ノードの時 true を返す．
+bool
+SnInput::is_unjustified() const
+{
+  return false;
+}
+
 // @brief ビットベクタ値の計算を行なう．
 void
 SnInput::calc_bitval()

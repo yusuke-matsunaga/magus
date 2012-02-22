@@ -68,11 +68,29 @@ SnXor::val() const
     return kB3True;
 
   default:
-    cout << "mState = " << mState << endl;
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
   return kB3X;
+}
+
+// @brief unjustified ノードの時 true を返す．
+bool
+SnXor::is_unjustified() const
+{
+  switch ( mState ) {
+  case kStX0_X:
+  case kStX1_X:
+  case kSt0X_X:
+  case kSt1X_X:
+  case kStXX_0:
+  case kStXX_1:
+    return true;
+
+  default:
+    break;
+  }
+  return false;
 }
 
 // @brief ビットベクタ値の計算を行なう．

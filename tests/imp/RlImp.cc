@@ -135,7 +135,13 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
       for (vector<StrNode*>::iterator p = unode_list.begin();
 	   p != unode_list.end(); ++ p) {
 	StrNode* unode = *p;
-
+	if ( unode->is_and() ) {
+	}
+	else if ( unode->is_xor() ) {
+	}
+	else {
+	  assert_not_reached(__FILE__, __LINE__);
+	}
       }
     }
     else {

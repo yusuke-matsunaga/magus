@@ -159,6 +159,11 @@ public:
   Bool3
   val() const = 0;
 
+  /// @brief unjustified ノードの時 true を返す．
+  virtual
+  bool
+  is_unjustified() const = 0;
+
 
 public:
   //////////////////////////////////////////////////////////////////////

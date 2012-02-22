@@ -44,8 +44,20 @@ public:
   is_input() const;
 
   /// @brief 出力値を返す．
+  virtual
   Bool3
   val() const;
+
+  /// @brief unjustified ノードの時 true を返す．
+  virtual
+  bool
+  is_unjustified() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ビットベクタ関係の関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief ビットベクタ値の計算を行なう．
   virtual
