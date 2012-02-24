@@ -73,22 +73,6 @@ SnAnd::val() const
   return kB3X;
 }
 
-// @brief unjustified ノードの時 true を返す．
-bool
-SnAnd::is_unjustified() const
-{
-  switch ( mState ) {
-  case kSt1X_X:
-  case kStX1_X:
-  case kStXX_0:
-    return true;
-
-  default:
-    break;
-  }
-  return false;
-}
-
 // @brief ビットベクタ値の計算を行なう．
 void
 SnAnd::calc_bitval()
@@ -123,6 +107,91 @@ void
 SnAnd::restore(ymuint32 val)
 {
   mState = static_cast<tState>(val);
+}
+
+// @brief unjustified ノードの時 true を返す．
+bool
+SnAnd::is_unjustified() const
+{
+  switch ( mState ) {
+  case kSt1X_X:
+  case kStX1_X:
+  case kStXX_0:
+    return true;
+
+  default:
+    break;
+  }
+  return false;
+}
+
+// @brief justification パタン数を得る．
+ymuint
+SnAnd::justification_num()
+{
+  switch ( mState ) {
+  case kSt1X_X:
+    // 10:0 と 11:1
+    return 2;
+
+  case kStX1_X:
+    // 01:0 と 11:1
+    return 2;
+
+  case kStXX_0:
+    // 0X:0 と X0:0
+    return 2;
+
+  default:
+    break;
+  }
+  return 0;
+}
+
+// @brief justification パタン を得る．
+// @param[in] pos 位置番号 ( 0 <= pos < justification_num() )
+// @return 値割り当て
+ImpCell
+SnAnd::get_justification(ymuint pos)
+{
+  switch ( mState ) {
+  case kSt1X_X:
+    // 10:0 と 11:1
+    if ( pos == 0 ) {
+      // 10:0
+      return ImpCell(1, 0);
+    }
+    else if ( pos == 1 ) {
+      // 11:1
+      return ImpCell(1, 1);
+    }
+    break;
+
+  case kStX1_X:
+    // 01:0 と 11:1
+    if ( pos == 0 ) {
+      return ImpCell(0, 0);
+    }
+    else if ( pos == 1 ) {
+      return ImpCell(0, 1);
+    }
+    break;
+
+  case kStXX_0:
+    // 0X:0 と X0:0
+    if ( pos == 0 ) {
+      return ImpCell(0, 0);
+    }
+    else if ( pos == 1 ) {
+      return ImpCell(1, 0);
+    }
+    break;
+
+  default:
+    break;
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return ImpCell(0, 0);
 }
 
 // @brief ファンイン0を0にする．

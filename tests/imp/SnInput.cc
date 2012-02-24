@@ -59,13 +59,6 @@ SnInput::val() const
   return kB3X;
 }
 
-// @brief unjustified ノードの時 true を返す．
-bool
-SnInput::is_unjustified() const
-{
-  return false;
-}
-
 // @brief ビットベクタ値の計算を行なう．
 void
 SnInput::calc_bitval()
@@ -92,6 +85,29 @@ void
 SnInput::restore(ymuint32 val)
 {
   mState = static_cast<tState>(val);
+}
+
+// @brief unjustified ノードの時 true を返す．
+bool
+SnInput::is_unjustified() const
+{
+  return false;
+}
+
+// @brief justification パタン数を得る．
+ymuint
+SnInput::justification_num()
+{
+  return 0;
+}
+
+// @brief justification パタン を得る．
+// @param[in] pos 位置番号 ( 0 <= pos < justification_num() )
+// @return 値割り当て
+ImpCell
+SnInput::get_justification(ymuint pos)
+{
+  assert_not_reached(__FILE__, __LINE__);
 }
 
 // @brief ファンイン0を0にする．

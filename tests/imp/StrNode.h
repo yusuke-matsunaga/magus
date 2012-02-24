@@ -159,11 +159,6 @@ public:
   Bool3
   val() const = 0;
 
-  /// @brief unjustified ノードの時 true を返す．
-  virtual
-  bool
-  is_unjustified() const = 0;
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -203,6 +198,23 @@ public:
   virtual
   void
   restore(ymuint32 val) = 0;
+
+  /// @brief unjustified ノードの時 true を返す．
+  virtual
+  bool
+  is_unjustified() const = 0;
+
+  /// @brief justification パタン数を得る．
+  virtual
+  ymuint
+  justification_num() = 0;
+
+  /// @brief justification パタン を得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < justification_num() )
+  /// @return 値割り当て
+  virtual
+  ImpCell
+  get_justification(ymuint pos) = 0;
 
   /// @brief ファンイン0を0にする．
   /// @param[in] mgr ImMgr

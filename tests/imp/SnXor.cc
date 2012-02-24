@@ -74,25 +74,6 @@ SnXor::val() const
   return kB3X;
 }
 
-// @brief unjustified ノードの時 true を返す．
-bool
-SnXor::is_unjustified() const
-{
-  switch ( mState ) {
-  case kStX0_X:
-  case kStX1_X:
-  case kSt0X_X:
-  case kSt1X_X:
-  case kStXX_0:
-  case kStXX_1:
-    return true;
-
-  default:
-    break;
-  }
-  return false;
-}
-
 // @brief ビットベクタ値の計算を行なう．
 void
 SnXor::calc_bitval()
@@ -127,6 +108,134 @@ void
 SnXor::restore(ymuint32 val)
 {
   mState = static_cast<tState>(val);
+}
+
+// @brief unjustified ノードの時 true を返す．
+bool
+SnXor::is_unjustified() const
+{
+  switch ( mState ) {
+  case kStX0_X:
+  case kStX1_X:
+  case kSt0X_X:
+  case kSt1X_X:
+  case kStXX_0:
+  case kStXX_1:
+    return true;
+
+  default:
+    break;
+  }
+  return false;
+}
+
+// @brief justification パタン数を得る．
+ymuint
+SnXor::justification_num()
+{
+  switch ( mState ) {
+  case kStX0_X:
+    // 00:0 と 10:1
+    return 2;
+
+  case kStX1_X:
+    // 01:1 と 11:0
+    return 2;
+
+  case kSt0X_X:
+    // 00:0 と 01:1
+    return 2;
+
+  case kSt1X_X:
+    // 10:1 と 11:0
+    return 2;
+
+  case kStXX_0:
+    // 00:0 と 11:0
+    return 2;
+
+  case kStXX_1:
+    // 01:1 と 10:1
+    return 2;
+
+  default:
+    break;
+  }
+  return 0;
+}
+
+// @brief justification パタン を得る．
+// @param[in] pos 位置番号 ( 0 <= pos < justification_num() )
+// @return 値割り当て
+ImpCell
+SnXor::get_justification(ymuint pos)
+{
+  switch ( mState ) {
+  case kStX0_X:
+    // 00:0 と 10:1
+    if ( pos == 0 ) {
+      return ImpCell(0, 0);
+    }
+    else if ( pos == 1 ) {
+      return ImpCell(0, 1);
+    }
+    break;
+
+  case kStX1_X:
+    // 01:1 と 11:0
+    if ( pos == 0 ) {
+      return ImpCell(0, 0);
+    }
+    else if ( pos == 1 ) {
+      return ImpCell(0, 1);
+    }
+    break;
+
+  case kSt0X_X:
+    // 00:0 と 01:1
+    if ( pos == 0 ) {
+      return ImpCell(1, 0);
+    }
+    else if ( pos == 1 ) {
+      return ImpCell(1, 1);
+    }
+    break;
+
+  case kSt1X_X:
+    // 10:1 と 11:0
+    if ( pos == 0 ) {
+      return ImpCell(1, 0);
+    }
+    else if ( pos == 1 ) {
+      return ImpCell(1, 1);
+    }
+    break;
+
+  case kStXX_0:
+    // 00:0 と 11:0
+    if ( pos == 0 ) {
+      return ImpCell(0, 0);
+    }
+    else if ( pos == 1 ) {
+      return ImpCell(0, 1);
+    }
+    break;
+
+  case kStXX_1:
+    // 01:1 と 10:1
+    if ( pos == 0 ) {
+      return ImpCell(0, 0);
+    }
+    else if ( pos == 1 ) {
+      return ImpCell(0, 1);
+    }
+    break;
+
+  default:
+    break;
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return ImpCell(0, 0);
 }
 
 // @brief ファンイン0を0にする．

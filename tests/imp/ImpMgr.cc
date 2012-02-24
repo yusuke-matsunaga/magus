@@ -141,6 +141,16 @@ ImpMgr::backtrack()
     NodeChg& nc = mChgStack[i];
     StrNode* node = nc.mNode;
     node->restore(nc.mState);
+    if ( node->is_unjustified() ) {
+      if ( node->mListIter == mUnodeList.end() ) {
+	set_unjustified(node);
+      }
+    }
+    else {
+      if ( node->mListIter != mUnodeList.end() ) {
+	reset_unjustified(node);
+      }
+    }
   }
   mChgStack.erase(mChgStack.begin() + pos, mChgStack.end());
 }

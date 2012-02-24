@@ -100,7 +100,7 @@ RlImp::learning(const BdnMgr& network,
     // node に値を割り当てる．
     for (ymuint val = 0; val < 2; ++ val) {
       vector<ImpCell> imp_list;
-      bool ok = make_all_implication(imp_mgr, node, val, 1, imp_list);
+      bool ok = make_all_implication(imp_mgr, node, val, 2, imp_list);
       imp_info.put(src_id, val, imp_list);
     }
   }
@@ -135,12 +135,45 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
       for (vector<StrNode*>::iterator p = unode_list.begin();
 	   p != unode_list.end(); ++ p) {
 	StrNode* unode = *p;
-	if ( unode->is_and() ) {
+	ymuint np = unode->justification_num();
+	vector<vector<ImpCell> > imp_list_array;
+	imp_list_array.reserve(np);
+	for (ymuint i = 0; i < np; ++ i) {
+	  ImpCell imp = unode->get_justification(i);
+	  StrNode* inode = imp_mgr.node(imp.dst_id());
+	  ymuint ival = imp.dst_val();
+	  vector<ImpCell> imp_list1;
+	  bool ok1 = make_all_implication(imp_mgr, inode, ival, level - 1,
+					  imp_list1);
+	  if ( ok1 ) {
+	    imp_list_array.push_back(imp_list1);
+	  }
 	}
-	else if ( unode->is_xor() ) {
+	// 共通の割り当てを調べるための配列
+	vector<ymuint> vmark(imp_mgr.max_node_id(), 3);
+	vector<ymuint> common_list;
+	ymuint m = imp_list_array.size();
+	for (ymuint i = 0; i < m; ++ i) {
+	  const vector<ImpCell>& imp_list = imp_list_array[i];
+	  for (vector<ImpCell>::const_iterator p = imp_list.begin();
+	       p != imp_list.end(); ++ p) {
+	    const ImpCell& imp = *p;
+	    ymuint dst_id = imp.dst_id();
+	    ymuint val = imp.dst_val();
+	    if ( vmark[dst_id] == 3 ) {
+	      vmark[dst_id] = val;
+	      common_list.push_back(dst_id);
+	    }
+	    else if ( vmark[dst_id] != val ) {
+	      vmark[dst_id] = 2;
+	    }
+	  }
 	}
-	else {
-	  assert_not_reached(__FILE__, __LINE__);
+	ymuint nc = common_list.size();
+	for (ymuint i = 0; i < nc; ++ i) {
+	  ymuint dst_id = common_list[i];
+	  if ( vmark[dst_id] == 2 ) continue;
+	  imp_list.push_back(ImpCell(dst_id, vmark[dst_id]));
 	}
       }
     }
