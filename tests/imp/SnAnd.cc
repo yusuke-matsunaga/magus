@@ -148,6 +148,21 @@ SnAnd::justification_num()
   return 0;
 }
 
+BEGIN_NONAMESPACE
+
+inline
+ImpCell
+imp(const StrEdge& e,
+    ymuint val)
+{
+  if ( e.src_inv() ) {
+    val ^= 1;
+  }
+  return ImpCell(e.src_node()->id(), val);
+}
+
+END_NONAMESPACE
+
 // @brief justification パタン を得る．
 // @param[in] pos 位置番号 ( 0 <= pos < justification_num() )
 // @return 値割り当て
@@ -159,31 +174,31 @@ SnAnd::get_justification(ymuint pos)
     // 10:0 と 11:1
     if ( pos == 0 ) {
       // 10:0
-      return ImpCell(fanin1().src_node()->id(), 0);
+      return imp(fanin1(), 0);
     }
     else if ( pos == 1 ) {
       // 11:1
-      return ImpCell(fanin1().src_node()->id(), 1);
+      return imp(fanin1(), 1);
     }
     break;
 
   case kStX1_X:
     // 01:0 と 11:1
     if ( pos == 0 ) {
-      return ImpCell(fanin0().src_node()->id(), 0);
+      return imp(fanin0(), 0);
     }
     else if ( pos == 1 ) {
-      return ImpCell(fanin0().src_node()->id(), 1);
+      return imp(fanin0(), 1);
     }
     break;
 
   case kStXX_0:
     // 0X:0 と X0:0
     if ( pos == 0 ) {
-      return ImpCell(fanin0().src_node()->id(), 0);
+      return imp(fanin0(), 0);
     }
     else if ( pos == 1 ) {
-      return ImpCell(fanin1().src_node()->id(), 0);
+      return imp(fanin1(), 0);
     }
     break;
 

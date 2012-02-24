@@ -8,6 +8,7 @@
 
 
 #include "RlImp.h"
+#include "StrImp.h"
 #include "ImpMgr.h"
 #include "StrNode.h"
 #include "SnInput.h"
@@ -16,6 +17,7 @@
 #include "ImpInfo.h"
 #include "ym_networks/BdnMgr.h"
 #include "ym_networks/BdnNode.h"
+#include "ym_logic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -76,6 +78,89 @@ RlImp::learning(const BdnMgr& network,
       }
     }
   }
+  // 直接含意を求める．
+  StrImp strimp;
+  ImpInfo d_imp;
+  strimp.learning(network, d_imp);
+  for (ymuint src_id = 0; src_id < n; ++ src_id) {
+    for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+      list<ImpCell>& imp_list = imp_info.get(src_id, src_val);
+      for (list<ImpCell>::iterator p = imp_list.begin();
+	   p != imp_list.end(); ) {
+	list<ImpCell>::iterator q = p;
+	++ p;
+	const ImpCell& imp = *q;
+	ymuint dst_id = imp.dst_id();
+	ymuint dst_val = imp.dst_val();
+	if ( d_imp.check(src_id, src_val, dst_id, dst_val) ) {
+	  imp_list.erase(q);
+	}
+      }
+    }
+  }
+
+  // 検証
+  {
+    SatSolver solver;
+    for (ymuint i = 0; i < n; ++ i) {
+      VarId vid = solver.new_var();
+      assert_cond( vid.val() == i, __FILE__, __LINE__);
+    }
+    vector<BdnNode*> node_list;
+    network.sort(node_list);
+    for (vector<BdnNode*>::iterator p = node_list.begin();
+	 p != node_list.end(); ++ p) {
+      const BdnNode* bnode = *p;
+      ymuint id = bnode->id();
+      Literal lit(VarId(id), kPolPosi);
+
+      const BdnNode* bnode0 = bnode->fanin0();
+      bool inv0 = bnode->fanin0_inv();
+      Literal lit0(VarId(bnode0->id()), inv0 ? kPolNega : kPolPosi);
+
+      const BdnNode* bnode1 = bnode->fanin1();
+      bool inv1 = bnode->fanin1_inv();
+      Literal lit1(VarId(bnode1->id()), inv1 ? kPolNega : kPolPosi);
+
+      if ( bnode->is_and() ) {
+	solver.add_clause(lit0, ~lit);
+	solver.add_clause(lit1, ~lit);
+	solver.add_clause(~lit0, ~lit1, lit);
+      }
+      else if ( bnode->is_xor() ) {
+	solver.add_clause(lit0, ~lit1, lit);
+	solver.add_clause(~lit0, lit1, lit);
+	solver.add_clause(~lit0, ~lit1, ~lit);
+	solver.add_clause(lit0, lit1, ~lit);
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+    }
+
+    for (ymuint src_id = 0; src_id < n; ++ src_id) {
+      for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+	Literal lit0(VarId(src_id), src_val == 0 ? kPolNega : kPolPosi);
+	const list<ImpCell>& imp_list = imp_info.get(src_id, src_val);
+	for (list<ImpCell>::const_iterator p = imp_list.begin();
+	     p != imp_list.end(); ++ p) {
+	  const ImpCell& imp = *p;
+	  ymuint dst_id = imp.dst_id();
+	  ymuint dst_val = imp.dst_val();
+	  Literal lit1(VarId(dst_id), dst_val == 0 ? kPolNega : kPolPosi);
+	  vector<Literal> tmp(2);
+	  vector<Bool3> model;
+	  tmp[0] = lit0;
+	  tmp[1] = ~lit1;
+	  if ( solver.solve(tmp, model) != kB3False ) {
+	    cout << "Error: Node#" << src_id << ": " << src_val
+		 << " ==> Node#" << dst_id << ": " << dst_val << endl;
+	  }
+	}
+      }
+    }
+  }
+
 #if 1
   cout << "RECURSIVE LERNING IMPLICATION" << endl;
   imp_info.print(cout);
@@ -95,8 +180,20 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
 			    ymuint level,
 			    vector<ImpCell>& imp_list)
 {
+  cout << "make_all_implication(Node#" << node->id()
+       << ": " << val << " @level#" << level << ")" << endl;
+
   imp_list.clear();
   bool ok = imp_mgr.assert(node, val, imp_list);
+  cout << "direct implications {" << endl;
+  for (vector<ImpCell>::iterator p = imp_list.begin();
+       p != imp_list.end(); ++ p) {
+    const ImpCell& imp = *p;
+    ymuint dst_id = imp.dst_id();
+    ymuint dst_val = imp.dst_val();
+    cout << "  ==> Node#" << dst_id << ": " << dst_val << endl;
+  }
+  cout << "}" << endl;
   if ( ok ) {
     if ( level > 0 ) {
       vector<StrNode*> unode_list;
@@ -106,6 +203,7 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
       for (vector<StrNode*>::iterator p = unode_list.begin();
 	   p != unode_list.end(); ++ p) {
 	StrNode* unode = *p;
+	cout << "Unode: Node#" << unode->id() << endl;
 	ymuint np = unode->justification_num();
 	bool first = true;
 	vector<ymuint> common_val(imp_mgr.max_node_id(), 2);
@@ -114,6 +212,8 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
 	  ImpCell imp = unode->get_justification(i);
 	  StrNode* inode = imp_mgr.node(imp.dst_id());
 	  ymuint ival = imp.dst_val();
+	  cout << "  Inode: Node#" << inode->id()
+	       << ": " << ival << endl;
 	  vector<ImpCell> imp_list1;
 	  bool ok1 = make_all_implication(imp_mgr, inode, ival, level - 1,
 					  imp_list1);
@@ -161,8 +261,11 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
 	  ymuint dst_id = common_list[i];
 	  if ( common_val[dst_id] == 2 ) continue;
 	  imp_list.push_back(ImpCell(dst_id, common_val[dst_id]));
+	  cout << "  Common Implication: Node#" << dst_id
+	       << ": " << common_val[dst_id] << endl;
 	  vmark[dst_id] = true;
 	}
+	cout << "Unode: Node#" << unode->id() << " end" << endl;
       }
     }
   }
