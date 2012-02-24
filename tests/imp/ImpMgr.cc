@@ -121,6 +121,7 @@ ImpMgr::assert(StrNode* node,
 	       ymuint val,
 	       vector<ImpCell>& imp_list)
 {
+  mSrcId = node->id();
   mMarkerStack.push_back(mChgStack.size());
   if ( val == 0 ) {
     return bwd_prop0(node, NULL, imp_list);
@@ -164,7 +165,9 @@ bool
 ImpMgr::fwd_prop0(StrNode* node,
 		  vector<ImpCell>& imp_list)
 {
-  imp_list.push_back(ImpCell(node->id(), 0));
+  if ( node->id() != mSrcId ) {
+    imp_list.push_back(ImpCell(node->id(), 0));
+  }
   const vector<StrEdge*>& fo_list = node->fanout_list();
   for (vector<StrEdge*>::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
@@ -203,7 +206,9 @@ bool
 ImpMgr::fwd_prop1(StrNode* node,
 		  vector<ImpCell>& imp_list)
 {
-  imp_list.push_back(ImpCell(node->id(), 1));
+  if ( node->id() != mSrcId ) {
+    imp_list.push_back(ImpCell(node->id(), 1));
+  }
   const vector<StrEdge*>& fo_list = node->fanout_list();
   for (vector<StrEdge*>::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
@@ -347,7 +352,7 @@ ImpMgr::bwd_prop0(StrNode* node,
       return stat;
     }
   }
-  if ( node->val() == kB3X ) {
+  if ( node->id() != mSrcId && node->val() == kB3X ) {
     imp_list.push_back(ImpCell(node->id(), 0));
   }
   return node->bwd_imp0(*this, imp_list);
@@ -391,7 +396,7 @@ ImpMgr::bwd_prop1(StrNode* node,
       return stat;
     }
   }
-  if ( node->val() == kB3X ) {
+  if ( node->id() != mSrcId && node->val() == kB3X ) {
     imp_list.push_back(ImpCell(node->id(), 1));
   }
   return node->bwd_imp1(*this, imp_list);
@@ -477,6 +482,52 @@ ImpMgr::save_value(StrNode* node,
   if ( true || node->mStackLevel < cur_level ) {
     mChgStack.push_back(NodeChg(node, node->cur_state()));
     node->mStackLevel = cur_level;
+  }
+}
+
+// @brief 内容を書き出す．
+void
+ImpMgr::print_network(ostream& s) const
+{
+  ymuint n = mNodeArray.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    StrNode* node = mNodeArray[i];
+    if ( node == NULL ) continue;
+    cout << "Node#" << node->id() << ":";
+    if ( node->is_input() ) {
+      cout << "INPUT";
+    }
+    else if ( node->is_and() ) {
+      cout << "AND";
+    }
+    else if ( node->is_xor() ) {
+      cout << "XOR";
+    }
+    cout << endl;
+
+    if ( node->is_and() || node->is_xor() ) {
+      const StrEdge& e0 = node->fanin0();
+      cout << "  Fanin0: " << e0.src_node()->id();
+      if ( e0.src_inv() ) {
+	cout << "~";
+      }
+      cout << endl;
+      const StrEdge& e1 = node->fanin1();
+      cout << "  Fanin1: " << e1.src_node()->id();
+      if ( e1.src_inv() ) {
+	cout << "~";
+      }
+      cout << endl;
+    }
+
+    cout << "  Fanouts: ";
+    const vector<StrEdge*>& fo_list = node->fanout_list();
+    for (vector<StrEdge*>::const_iterator p = fo_list.begin();
+	 p != fo_list.end(); ++ p ) {
+      StrEdge* e = *p;
+      cout << " (" << e->dst_node()->id() << ", " << e->dst_pos() << ")";
+    }
+    cout << endl;
   }
 }
 

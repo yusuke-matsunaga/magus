@@ -42,7 +42,8 @@ void
 imp(const string& filename,
     bool blif,
     bool iscas89,
-    const string& method_str)
+    const string& method_str,
+    ymuint level)
 {
   MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
   MsgMgr::reg_handler(msg_handler);
@@ -87,6 +88,9 @@ imp(const string& filename,
   }
   else if ( method_str == "rl" ) {
     RlImp imp;
+    if ( level > 0 ) {
+      imp.set_learning_level(level);
+    }
     imp.learning(network, imp_info);
   }
   else {
@@ -112,6 +116,7 @@ main(int argc,
   const char* method_str = "bottom_up";
   bool blif = false;
   bool iscas = false;
+  ymuint level = 0;
 
   // オプション解析用のデータ
   const struct poptOption options[] = {
@@ -130,6 +135,9 @@ main(int argc,
 
     { "iscas89", '\0', POPT_ARG_NONE, NULL, 0x101,
       "iscas89 mode", NULL },
+
+    { "level", 'l', POPT_ARG_INT, &level, 0,
+      "specify recursive learning level", "<level>" },
 
     POPT_AUTOHELP
 
@@ -173,7 +181,7 @@ main(int argc,
   }
 
   string filename(str);
-  imp(filename, blif, iscas, method_str);
+  imp(filename, blif, iscas, method_str, level);
 
   return 0;
 }

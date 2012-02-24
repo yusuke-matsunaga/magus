@@ -108,6 +108,7 @@ ImpCell
 SnInput::get_justification(ymuint pos)
 {
   assert_not_reached(__FILE__, __LINE__);
+  return ImpCell(0, 0);
 }
 
 // @brief ファンイン0を0にする．

@@ -48,6 +48,10 @@ public:
   learning(const BdnMgr& network,
 	   ImpInfo& imp_info);
 
+  /// @brief ラーニングのレベルを設定する．
+  void
+  set_learning_level(ymuint level);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -73,8 +77,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 含意用のノードの配列
-  vector<StrNode*> mNodeArray;
+  // ラーニングのレベル
+  ymuint32 mLevel;
 
 };
 

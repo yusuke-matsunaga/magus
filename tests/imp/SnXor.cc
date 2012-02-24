@@ -174,60 +174,60 @@ SnXor::get_justification(ymuint pos)
   case kStX0_X:
     // 00:0 と 10:1
     if ( pos == 0 ) {
-      return ImpCell(0, 0);
+      return ImpCell(fanin0().src_node()->id(), 0);
     }
     else if ( pos == 1 ) {
-      return ImpCell(0, 1);
+      return ImpCell(fanin0().src_node()->id(), 1);
     }
     break;
 
   case kStX1_X:
     // 01:1 と 11:0
     if ( pos == 0 ) {
-      return ImpCell(0, 0);
+      return ImpCell(fanin0().src_node()->id(), 0);
     }
     else if ( pos == 1 ) {
-      return ImpCell(0, 1);
+      return ImpCell(fanin0().src_node()->id(), 1);
     }
     break;
 
   case kSt0X_X:
     // 00:0 と 01:1
     if ( pos == 0 ) {
-      return ImpCell(1, 0);
+      return ImpCell(fanin1().src_node()->id(), 0);
     }
     else if ( pos == 1 ) {
-      return ImpCell(1, 1);
+      return ImpCell(fanin1().src_node()->id(), 1);
     }
     break;
 
   case kSt1X_X:
     // 10:1 と 11:0
     if ( pos == 0 ) {
-      return ImpCell(1, 0);
+      return ImpCell(fanin1().src_node()->id(), 0);
     }
     else if ( pos == 1 ) {
-      return ImpCell(1, 1);
+      return ImpCell(fanin1().src_node()->id(), 1);
     }
     break;
 
   case kStXX_0:
     // 00:0 と 11:0
     if ( pos == 0 ) {
-      return ImpCell(0, 0);
+      return ImpCell(fanin0().src_node()->id(), 0);
     }
     else if ( pos == 1 ) {
-      return ImpCell(0, 1);
+      return ImpCell(fanin0().src_node()->id(), 1);
     }
     break;
 
   case kStXX_1:
     // 01:1 と 10:1
     if ( pos == 0 ) {
-      return ImpCell(0, 0);
+      return ImpCell(fanin0().src_node()->id(), 0);
     }
     else if ( pos == 1 ) {
-      return ImpCell(0, 1);
+      return ImpCell(fanin0().src_node()->id(), 1);
     }
     break;
 
@@ -235,7 +235,7 @@ SnXor::get_justification(ymuint pos)
     break;
   }
   assert_not_reached(__FILE__, __LINE__);
-  return ImpCell(0, 0);
+  return ImpCell(fanin0().src_node()->id(), 0);
 }
 
 // @brief ファンイン0を0にする．

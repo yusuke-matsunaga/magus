@@ -47,6 +47,10 @@ public:
   StrNode*
   node(ymuint id) const;
 
+  /// @brief 内容を書き出す．
+  void
+  print_network(ostream& s) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -205,6 +209,9 @@ private:
 
   // ノードの配列
   vector<StrNode*> mNodeArray;
+
+  // 現在のソースノードの番号
+  ymuint32 mSrcId;
 
   // 値の変更履歴を記憶するスタック
   vector<NodeChg> mChgStack;

@@ -159,31 +159,31 @@ SnAnd::get_justification(ymuint pos)
     // 10:0 と 11:1
     if ( pos == 0 ) {
       // 10:0
-      return ImpCell(1, 0);
+      return ImpCell(fanin1().src_node()->id(), 0);
     }
     else if ( pos == 1 ) {
       // 11:1
-      return ImpCell(1, 1);
+      return ImpCell(fanin1().src_node()->id(), 1);
     }
     break;
 
   case kStX1_X:
     // 01:0 と 11:1
     if ( pos == 0 ) {
-      return ImpCell(0, 0);
+      return ImpCell(fanin0().src_node()->id(), 0);
     }
     else if ( pos == 1 ) {
-      return ImpCell(0, 1);
+      return ImpCell(fanin0().src_node()->id(), 1);
     }
     break;
 
   case kStXX_0:
     // 0X:0 と X0:0
     if ( pos == 0 ) {
-      return ImpCell(0, 0);
+      return ImpCell(fanin0().src_node()->id(), 0);
     }
     else if ( pos == 1 ) {
-      return ImpCell(1, 0);
+      return ImpCell(fanin1().src_node()->id(), 0);
     }
     break;
 
