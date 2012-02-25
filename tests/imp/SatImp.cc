@@ -22,6 +22,12 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
+BEGIN_NONAMESPACE
+
+bool debug = true;
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス SatImp
 //////////////////////////////////////////////////////////////////////
@@ -154,49 +160,10 @@ SatImp::learning(const BdnMgr& network,
     node->set_nfo(fo_count[id]);
     nodes.push_back(node);
   }
-  cout << "CNF generated" << endl;
 
-#if 0
-  for (ymuint i = 0; i < n; ++ i) {
-    StrNode* node = node_array[i];
-    if ( node == NULL ) continue;
-    cout << "Node#" << node->id() << ":";
-    if ( node->is_input() ) {
-      cout << "INPUT";
-    }
-    else if ( node->is_and() ) {
-      cout << "AND";
-    }
-    else if ( node->is_xor() ) {
-      cout << "XOR";
-    }
-    cout << endl;
-
-    if ( node->is_and() || node->is_xor() ) {
-      const StrEdge& e0 = node->fanin0();
-      cout << "  Fanin0: " << e0.src_node()->id();
-      if ( e0.src_inv() ) {
-	cout << "~";
-      }
-      cout << endl;
-      const StrEdge& e1 = node->fanin1();
-      cout << "  Fanin1: " << e1.src_node()->id();
-      if ( e1.src_inv() ) {
-	cout << "~";
-      }
-      cout << endl;
-    }
-
-    cout << "  Fanouts: ";
-    const vector<StrEdge*>& fo_list = node->fanout_list();
-    for (vector<StrEdge*>::const_iterator p = fo_list.begin();
-	 p != fo_list.end(); ++ p ) {
-      StrEdge* e = *p;
-      cout << " (" << e->dst_node()->id() << ", " << e->dst_pos() << ")";
-    }
-    cout << endl;
+  if ( debug ) {
+    cout << "CNF generated" << endl;
   }
-#endif
 
   for (vector<StrNode*>::iterator p = inputs.begin();
        p != inputs.end(); ++ p) {
@@ -216,7 +183,10 @@ SatImp::learning(const BdnMgr& network,
 	 << ": " << hex << node->bitval() << dec << endl;
 #endif
   }
-  cout << "random simulation end." << endl;
+
+  if ( debug ) {
+    cout << "random simulation end." << endl;
+  }
 
   // 直接含意を求める．
   StrImp strimp;
@@ -228,7 +198,11 @@ SatImp::learning(const BdnMgr& network,
   ImpInfo cand_info;
   cand_info.set_size(n);
   for (ymuint i = 0; i < n; ++ i) {
-    cout << i << " / " << n << endl;
+    if ( debug ) {
+      if ( (i % 100) == 0 ) {
+	cout << i << " / " << n << endl;
+      }
+    }
     StrNode* node0 = node_array[i];
     if ( node0 == NULL ) continue;
     ymuint64 val0 = node0->bitval();
@@ -271,7 +245,9 @@ SatImp::learning(const BdnMgr& network,
       }
     }
   }
-  cout << "nsat0 = " << cand_info.size() << endl;
+  if ( debug ) {
+    cout << "nsat0 = " << cand_info.size() << endl;
+  }
 
   ymuint prev_size = cand_info.size();
   ymuint count = 1;
@@ -323,7 +299,11 @@ SatImp::learning(const BdnMgr& network,
 	}
       }
     }
-    cout << "nsat" << count << " = " << cand_info.size() << endl;
+    if ( debug ) {
+      if ( (count % 100) == 0 ) {
+	cout << "nsat" << count << " = " << cand_info.size() << endl;
+      }
+    }
     ++ count;
     ymuint diff = prev_size - cand_info.size();
     prev_size = cand_info.size();
@@ -348,7 +328,9 @@ SatImp::learning(const BdnMgr& network,
       const list<ImpCell>& imp_list = cand_info.get(src_id, src_val);
       for (list<ImpCell>::const_iterator p = imp_list.begin();
 	   p != imp_list.end(); ++ p) {
-	cout << "sat#" << count << " / " << remain << endl;
+	if ( debug ) {
+	  cout << "sat#" << count << " / " << remain << endl;
+	}
 	++ count;
 	const ImpCell& imp = *p;
 	ymuint dst_id = imp.dst_id();

@@ -22,6 +22,12 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
+BEGIN_NONAMESPACE
+
+bool debug = false;
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス RlImp
 //////////////////////////////////////////////////////////////////////
@@ -59,7 +65,7 @@ RlImp::learning(const BdnMgr& network,
   ImpMgr imp_mgr;
   imp_mgr.set(network);
 
-#if 1
+#if 0
   imp_mgr.print_network(cout);
 #endif
 
@@ -92,7 +98,8 @@ RlImp::learning(const BdnMgr& network,
 	const ImpCell& imp = *q;
 	ymuint dst_id = imp.dst_id();
 	ymuint dst_val = imp.dst_val();
-	if ( d_imp.check(src_id, src_val, dst_id, dst_val) ) {
+	if ( d_imp.check(src_id, src_val, dst_id, dst_val) ||
+	     d_imp.check(dst_id, dst_val ^ 1, src_id, src_val ^ 1) ) {
 	  imp_list.erase(q);
 	}
       }
@@ -100,7 +107,7 @@ RlImp::learning(const BdnMgr& network,
   }
 
   // 検証
-  {
+  if ( 0 ) {
     SatSolver solver;
     for (ymuint i = 0; i < n; ++ i) {
       VarId vid = solver.new_var();
@@ -161,7 +168,7 @@ RlImp::learning(const BdnMgr& network,
     }
   }
 
-#if 1
+#if 0
   cout << "RECURSIVE LERNING IMPLICATION" << endl;
   imp_info.print(cout);
 #endif
@@ -180,20 +187,26 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
 			    ymuint level,
 			    vector<ImpCell>& imp_list)
 {
-  cout << "make_all_implication(Node#" << node->id()
-       << ": " << val << " @level#" << level << ")" << endl;
+  if ( debug ) {
+    cout << "make_all_implication(Node#" << node->id()
+	 << ": " << val << " @level#" << level << ")" << endl;
+  }
 
   imp_list.clear();
   bool ok = imp_mgr.assert(node, val, imp_list);
-  cout << "direct implications {" << endl;
-  for (vector<ImpCell>::iterator p = imp_list.begin();
-       p != imp_list.end(); ++ p) {
-    const ImpCell& imp = *p;
-    ymuint dst_id = imp.dst_id();
-    ymuint dst_val = imp.dst_val();
-    cout << "  ==> Node#" << dst_id << ": " << dst_val << endl;
+
+  if ( debug ) {
+    cout << "direct implications {" << endl;
+    for (vector<ImpCell>::iterator p = imp_list.begin();
+	 p != imp_list.end(); ++ p) {
+      const ImpCell& imp = *p;
+      ymuint dst_id = imp.dst_id();
+      ymuint dst_val = imp.dst_val();
+      cout << "  ==> Node#" << dst_id << ": " << dst_val << endl;
+    }
+    cout << "}" << endl;
   }
-  cout << "}" << endl;
+
   if ( ok ) {
     if ( level > 0 ) {
       vector<StrNode*> unode_list;
@@ -203,7 +216,11 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
       for (vector<StrNode*>::iterator p = unode_list.begin();
 	   p != unode_list.end(); ++ p) {
 	StrNode* unode = *p;
-	cout << "Unode: Node#" << unode->id() << endl;
+
+	if ( debug ) {
+	  cout << "Unode: Node#" << unode->id() << endl;
+	}
+
 	ymuint np = unode->justification_num();
 	bool first = true;
 	vector<ymuint> common_val(imp_mgr.max_node_id(), 2);
@@ -212,8 +229,12 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
 	  ImpCell imp = unode->get_justification(i);
 	  StrNode* inode = imp_mgr.node(imp.dst_id());
 	  ymuint ival = imp.dst_val();
-	  cout << "  Inode: Node#" << inode->id()
-	       << ": " << ival << endl;
+
+	  if ( debug ) {
+	    cout << "  Inode: Node#" << inode->id()
+		 << ": " << ival << endl;
+	  }
+
 	  vector<ImpCell> imp_list1;
 	  bool ok1 = make_all_implication(imp_mgr, inode, ival, level - 1,
 					  imp_list1);
@@ -261,11 +282,17 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
 	  ymuint dst_id = common_list[i];
 	  if ( common_val[dst_id] == 2 ) continue;
 	  imp_list.push_back(ImpCell(dst_id, common_val[dst_id]));
-	  cout << "  Common Implication: Node#" << dst_id
-	       << ": " << common_val[dst_id] << endl;
+
+	  if ( debug ) {
+	    cout << "  Common Implication: Node#" << dst_id
+		 << ": " << common_val[dst_id] << endl;
+	  }
+
 	  vmark[dst_id] = true;
 	}
-	cout << "Unode: Node#" << unode->id() << " end" << endl;
+	if ( debug ) {
+	  cout << "Unode: Node#" << unode->id() << " end" << endl;
+	}
       }
     }
   }
