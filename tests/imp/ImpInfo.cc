@@ -8,6 +8,8 @@
 
 
 #include "ImpInfo.h"
+#include "ImpCell.h"
+#include "ImpList.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -17,9 +19,14 @@ BEGIN_NAMESPACE_YM_NETWORKS
 //////////////////////////////////////////////////////////////////////
 
 // @brief 空のコンストラクタ
-ImpInfo::ImpInfo()
+ImpInfo::ImpInfo() :
+  mAlloc(sizeof(ImpCell), 1024)
 {
-  mSize = 0;
+  mImpNum = 0;
+  mArray = NULL;
+  mHashSize = 0;
+  mHashTable = NULL;
+  alloc_table(1024);
 }
 
 // @brief デストラクタ
@@ -30,19 +37,9 @@ ImpInfo::~ImpInfo()
 // @brief 含意情報のリストを取り出す．
 // @param[in] src_id 含意元のノード番号
 // @param[in] src_val 含意元の値 ( 0 or 1 )
-const list<ImpCell>&
+const ImpList&
 ImpInfo::get(ymuint src_id,
 	     ymuint src_val) const
-{
-  return mArray[src_id * 2 + src_val];
-}
-
-// @brief 含意情報のリストを取り出す．
-// @param[in] src_id 含意元のノード番号
-// @param[in] src_val 含意元の値 ( 0 or 1 )
-list<ImpCell>&
-ImpInfo::get(ymuint src_id,
-	     ymuint src_val)
 {
   return mArray[src_id * 2 + src_val];
 }
@@ -54,11 +51,12 @@ ImpInfo::check(ymuint src_id,
 	       ymuint dst_id,
 	       ymuint dst_val) const
 {
-  const list<ImpCell>& imp_list = mArray[src_id * 2 + src_val];
-  for (list<ImpCell>::const_iterator p = imp_list.begin();
-       p != imp_list.end(); ++ p) {
-    const ImpCell& imp = *p;
-    if ( imp.dst_id() == dst_id && imp.dst_val() == dst_val ) {
+  ymuint pos = hash_func(src_id, src_val, dst_id, dst_val);
+  for (ImpCell* cell = mHashTable[pos]; cell; cell = cell->mLink) {
+    if ( cell->src_id() == src_id &&
+	 cell->src_val() == src_val &&
+	 cell->dst_id() == dst_id &&
+	 cell->dst_val() == dst_val ) {
       return true;
     }
   }
@@ -69,13 +67,7 @@ ImpInfo::check(ymuint src_id,
 ymuint
 ImpInfo::size() const
 {
-  ymuint c = 0;
-  ymuint n = mArray.size();
-  for (ymuint i = 0; i < n; ++ i) {
-    const list<ImpCell>& imp_list = mArray[i];
-    c += imp_list.size();
-  }
-  return c;
+  return mImpNum;
 }
 
 // @brief 内容を出力する．
@@ -83,14 +75,13 @@ ImpInfo::size() const
 void
 ImpInfo::print(ostream& s) const
 {
-  ymuint n = mArray.size();
-  for (ymuint i = 0; i < n; ++ i) {
-    const list<ImpCell>& imp_list = mArray[i];
+  for (ymuint i = 0; i < mArraySize; ++ i) {
+    const ImpList& imp_list = mArray[i];
     if ( imp_list.empty() ) continue;
     ymuint src_id = i / 2;
     ymuint src_val = i % 2;
     cout << "Node#" << src_id << ": " << src_val << endl;
-    for (list<ImpCell>::const_iterator p = imp_list.begin();
+    for (ImpList::iterator p = imp_list.begin();
 	 p != imp_list.end(); ++ p) {
       const ImpCell& imp = *p;
       ymuint dst_id = imp.dst_id();
@@ -102,13 +93,24 @@ ImpInfo::print(ostream& s) const
   cout << "Total " << size() << " implications" << endl;
 }
 
+// @brief 内容をクリアする．
+void
+ImpInfo::clear()
+{
+}
+
 // @brief サイズを設定する．
 // @param[in] max_id ID番号の最大値
 void
 ImpInfo::set_size(ymuint max_id)
 {
-  mArray.clear();
-  mArray.resize(max_id * 2);
+  clear();
+
+  mArraySize = max_id * 2;
+  mArray = new ImpList[mArraySize];
+  for (ymuint i = 0; i < mArraySize; ++ i) {
+    mArray[i].mTop = new_cell();
+  }
 }
 
 // @brief 含意情報を追加する．
@@ -122,8 +124,32 @@ ImpInfo::put(ymuint src_id,
 	     ymuint dst_id,
 	     ymuint dst_val)
 {
-  mArray[src_id * 2 + src_val].push_back(ImpCell(dst_id, dst_val));
-  ++ mSize;
+  ImpCell* cell = new_cell();
+  cell->set(src_id, src_val, dst_id, dst_val);
+  mArray[src_id * 2 + src_val].push_back(cell);
+
+  if ( mImpNum >= mHashLimit ) {
+    // テーブルを拡張する．
+    ymuint old_size = mHashSize;
+    ImpCell** old_table = mHashTable;
+    alloc_table(old_size << 1);
+    for (ymuint i = 0; i < old_size; ++ i) {
+      for (ImpCell* cell = old_table[i]; cell; ) {
+	ImpCell* next = cell->mLink;
+	ymuint pos = hash_func(cell->src_id(), cell->src_val(),
+			       cell->dst_id(), cell->dst_val());
+	cell->mLink = mHashTable[pos];
+	mHashTable[pos] = cell;
+	cell = next;
+      }
+    }
+    delete [] old_table;
+  }
+  ymuint pos = hash_func(src_id, src_val, dst_id, dst_val);
+  cell->mLink = mHashTable[pos];
+  mHashTable[pos] = cell;
+
+  ++ mImpNum;
 }
 
 // @brief 含意情報を追加する．
@@ -133,17 +159,49 @@ ImpInfo::put(ymuint src_id,
 void
 ImpInfo::put(ymuint src_id,
 	     ymuint src_val,
-	     const vector<ImpCell>& imp_list)
+	     const vector<ImpVal>& imp_list)
 {
-  list<ImpCell>& dst_list = mArray[src_id * 2 + src_val];
-  for (vector<ImpCell>::const_iterator p = imp_list.begin();
+  for (vector<ImpVal>::const_iterator p = imp_list.begin();
        p != imp_list.end(); ++ p) {
-    ymuint dst_id = p->dst_id();
-    ymuint dst_val = p->dst_val();
-    if ( dst_id == src_id ) continue;
-    dst_list.push_back(ImpCell(dst_id, dst_val));
+    ymuint dst_id = p->id();
+    ymuint dst_val = p->val();
+    if ( dst_id != src_id ) {
+      put(src_id, src_val, dst_id, dst_val);
+    }
   }
-  mSize += imp_list.size();
+}
+
+// @brief ImpCell を確保する．
+ImpCell*
+ImpInfo::new_cell()
+{
+  void* p = mAlloc.get_memory(sizeof(ImpCell));
+  ImpCell* cell = new (p) ImpCell;
+  cell->mLink = NULL;
+  return cell;
+}
+
+// @brief テーブルの領域を確保する．
+void
+ImpInfo::alloc_table(ymuint size)
+{
+  mHashSize = size;
+  mHashLimit = static_cast<ymuint>(mHashSize * 1.8);
+  mHashTable = new ImpCell*[mHashSize];
+  for (ymuint i = 0; i < mHashSize; ++ i) {
+    mHashTable[i] = NULL;
+  }
+}
+
+// @brief ハッシュ関数
+inline
+ymuint
+ImpInfo::hash_func(ymuint src_id,
+		   ymuint src_val,
+		   ymuint dst_id,
+		   ymuint dst_val) const
+{
+  return ((src_id * 2 + src_val) * 9 + (dst_id * 2 + dst_val)) % mHashSize;
 }
 
 END_NAMESPACE_YM_NETWORKS

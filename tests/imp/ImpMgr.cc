@@ -119,7 +119,7 @@ ImpMgr::set(const BdnMgr& src_network)
 bool
 ImpMgr::assert(StrNode* node,
 	       ymuint val,
-	       vector<ImpCell>& imp_list)
+	       vector<ImpVal>& imp_list)
 {
   mSrcId = node->id();
   mMarkerStack.push_back(mChgStack.size());
@@ -163,10 +163,10 @@ ImpMgr::backtrack()
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fwd_prop0(StrNode* node,
-		  vector<ImpCell>& imp_list)
+		  vector<ImpVal>& imp_list)
 {
   if ( node->id() != mSrcId ) {
-    imp_list.push_back(ImpCell(node->id(), 0));
+    imp_list.push_back(ImpVal(node->id(), 0));
   }
   const vector<StrEdge*>& fo_list = node->fanout_list();
   for (vector<StrEdge*>::const_iterator p = fo_list.begin();
@@ -204,10 +204,10 @@ ImpMgr::fwd_prop0(StrNode* node,
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fwd_prop1(StrNode* node,
-		  vector<ImpCell>& imp_list)
+		  vector<ImpVal>& imp_list)
 {
   if ( node->id() != mSrcId ) {
-    imp_list.push_back(ImpCell(node->id(), 1));
+    imp_list.push_back(ImpVal(node->id(), 1));
   }
   const vector<StrEdge*>& fo_list = node->fanout_list();
   for (vector<StrEdge*>::const_iterator p = fo_list.begin();
@@ -245,7 +245,7 @@ ImpMgr::fwd_prop1(StrNode* node,
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fanin0_prop0(StrNode* node,
-		     vector<ImpCell>& imp_list)
+		     vector<ImpVal>& imp_list)
 {
   const StrEdge& e = node->fanin0();
   StrNode* dst_node = e.src_node();
@@ -264,7 +264,7 @@ ImpMgr::fanin0_prop0(StrNode* node,
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fanin0_prop1(StrNode* node,
-		     vector<ImpCell>& imp_list)
+		     vector<ImpVal>& imp_list)
 {
   const StrEdge& e = node->fanin0();
   StrNode* dst_node = e.src_node();
@@ -283,7 +283,7 @@ ImpMgr::fanin0_prop1(StrNode* node,
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fanin1_prop0(StrNode* node,
-		     vector<ImpCell>& imp_list)
+		     vector<ImpVal>& imp_list)
 {
   const StrEdge& e = node->fanin1();
   StrNode* dst_node = e.src_node();
@@ -302,7 +302,7 @@ ImpMgr::fanin1_prop0(StrNode* node,
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fanin1_prop1(StrNode* node,
-		     vector<ImpCell>& imp_list)
+		     vector<ImpVal>& imp_list)
 {
   const StrEdge& e = node->fanin1();
   StrNode* dst_node = e.src_node();
@@ -323,7 +323,7 @@ ImpMgr::fanin1_prop1(StrNode* node,
 bool
 ImpMgr::bwd_prop0(StrNode* node,
 		  StrNode* from_node,
-		  vector<ImpCell>& imp_list)
+		  vector<ImpVal>& imp_list)
 {
   const vector<StrEdge*>& fo_list = node->fanout_list();
   for (vector<StrEdge*>::const_iterator p = fo_list.begin();
@@ -353,7 +353,7 @@ ImpMgr::bwd_prop0(StrNode* node,
     }
   }
   if ( node->id() != mSrcId && node->val() == kB3X ) {
-    imp_list.push_back(ImpCell(node->id(), 0));
+    imp_list.push_back(ImpVal(node->id(), 0));
   }
   return node->bwd_imp0(*this, imp_list);
 }
@@ -367,7 +367,7 @@ ImpMgr::bwd_prop0(StrNode* node,
 bool
 ImpMgr::bwd_prop1(StrNode* node,
 		  StrNode* from_node,
-		  vector<ImpCell>& imp_list)
+		  vector<ImpVal>& imp_list)
 {
   const vector<StrEdge*>& fo_list = node->fanout_list();
   for (vector<StrEdge*>::const_iterator p = fo_list.begin();
@@ -397,7 +397,7 @@ ImpMgr::bwd_prop1(StrNode* node,
     }
   }
   if ( node->id() != mSrcId && node->val() == kB3X ) {
-    imp_list.push_back(ImpCell(node->id(), 1));
+    imp_list.push_back(ImpVal(node->id(), 1));
   }
   return node->bwd_imp1(*this, imp_list);
 }

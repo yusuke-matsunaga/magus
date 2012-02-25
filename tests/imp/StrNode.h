@@ -213,7 +213,7 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < justification_num() )
   /// @return 値割り当て
   virtual
-  ImpCell
+  ImpVal
   get_justification(ymuint pos) = 0;
 
   /// @brief ファンイン0を0にする．
@@ -222,7 +222,7 @@ public:
   virtual
   bool
   fwd0_imp0(ImpMgr& mgr,
-	    vector<ImpCell>& imp_list) = 0;
+	    vector<ImpVal>& imp_list) = 0;
 
   /// @brief ファンイン0を1にする．
   /// @param[in] mgr ImMgr
@@ -230,7 +230,7 @@ public:
   virtual
   bool
   fwd0_imp1(ImpMgr& mgr,
-	    vector<ImpCell>& imp_list) = 0;
+	    vector<ImpVal>& imp_list) = 0;
 
   /// @brief ファンイン1を0にする．
   /// @param[in] mgr ImMgr
@@ -238,7 +238,7 @@ public:
   virtual
   bool
   fwd1_imp0(ImpMgr& mgr,
-	    vector<ImpCell>& imp_list) = 0;
+	    vector<ImpVal>& imp_list) = 0;
 
   /// @brief ファンイン1を1にする．
   /// @param[in] mgr ImMgr
@@ -246,7 +246,7 @@ public:
   virtual
   bool
   fwd1_imp1(ImpMgr& mgr,
-	    vector<ImpCell>& imp_list) = 0;
+	    vector<ImpVal>& imp_list) = 0;
 
   /// @brief 出力を0にする．
   /// @param[in] mgr ImMgr
@@ -254,7 +254,7 @@ public:
   virtual
   bool
   bwd_imp0(ImpMgr& mgr,
-	   vector<ImpCell>& imp_list) = 0;
+	   vector<ImpVal>& imp_list) = 0;
 
   /// @brief 出力を1にする．
   /// @param[in] mgr ImMgr
@@ -262,7 +262,7 @@ public:
   virtual
   bool
   bwd_imp1(ImpMgr& mgr,
-	   vector<ImpCell>& imp_list) = 0;;
+	   vector<ImpVal>& imp_list) = 0;;
 
 
 private:

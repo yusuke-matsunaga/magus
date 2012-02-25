@@ -10,7 +10,7 @@
 
 
 #include "ym_networks/bdn.h"
-#include "ImpInfo.h"
+#include "ImpVal.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -81,7 +81,7 @@ public:
   bool
   assert(StrNode* node,
 	 ymuint val,
-	 vector<ImpCell>& imp_list);
+	 vector<ImpVal>& imp_list);
 
   /// @brief 指定されたところまで値を戻す．
   void
@@ -94,7 +94,7 @@ public:
   /// @retval false 矛盾が発生した．
   bool
   fwd_prop0(StrNode* node,
-	    vector<ImpCell>& imp_list);
+	    vector<ImpVal>& imp_list);
 
   /// @brief ノードのファンアウト先に1を伝搬する．
   /// @param[in] node ノード
@@ -103,7 +103,7 @@ public:
   /// @retval false 矛盾が発生した．
   bool
   fwd_prop1(StrNode* node,
-	    vector<ImpCell>& imp_list);
+	    vector<ImpVal>& imp_list);
 
   /// @brief ノードのファンイン0に0を伝搬する．
   /// @param[in] node ノード
@@ -112,7 +112,7 @@ public:
   /// @retval false 矛盾が発生した．
   bool
   fanin0_prop0(StrNode* node,
-	       vector<ImpCell>& imp_list);
+	       vector<ImpVal>& imp_list);
 
   /// @brief ノードのファンイン0に1を伝搬する．
   /// @param[in] node ノード
@@ -121,7 +121,7 @@ public:
   /// @retval false 矛盾が発生した．
   bool
   fanin0_prop1(StrNode* node,
-	       vector<ImpCell>& imp_list);
+	       vector<ImpVal>& imp_list);
 
   /// @brief ノードのファンイン1に0を伝搬する．
   /// @param[in] node ノード
@@ -130,7 +130,7 @@ public:
   /// @retval false 矛盾が発生した．
   bool
   fanin1_prop0(StrNode* node,
-	       vector<ImpCell>& imp_list);
+	       vector<ImpVal>& imp_list);
 
   /// @brief ノードのファンイン1に1を伝搬する．
   /// @param[in] node ノード
@@ -139,7 +139,7 @@ public:
   /// @retval false 矛盾が発生した．
   bool
   fanin1_prop1(StrNode* node,
-	       vector<ImpCell>& imp_list);
+	       vector<ImpVal>& imp_list);
 
   /// @brief ノードに後方含意で0を割り当てる．
   /// @param[in] node ノード
@@ -150,7 +150,7 @@ public:
   bool
   bwd_prop0(StrNode* node,
 	    StrNode* from_node,
-	    vector<ImpCell>& imp_list);
+	    vector<ImpVal>& imp_list);
 
   /// @brief ノードに後方含意で1を割り当てる．
   /// @param[in] node ノード
@@ -161,7 +161,7 @@ public:
   bool
   bwd_prop1(StrNode* node,
 	    StrNode* from_node,
-	    vector<ImpCell>& imp_list);
+	    vector<ImpVal>& imp_list);
 
   /// @brief unjustified ノードを得る．
   void

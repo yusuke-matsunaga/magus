@@ -70,7 +70,20 @@ check(SatSolver& solver,
   }
 }
 
+ymuint
+count_list(const vector<list<ImpVal> >& cand_info)
+{
+  ymuint c = 0;
+  for (vector<list<ImpVal> >::const_iterator p = cand_info.begin();
+       p != cand_info.end(); ++ p) {
+    const list<ImpVal>& imp_list = *p;
+    c += imp_list.size();
+  }
+  return c;
+}
+
 END_NONAMESPACE
+
 
 // @brief ネットワーク中の間接含意を求める．
 // @param[in] network 対象のネットワーク
@@ -184,10 +197,6 @@ SatImp::learning(const BdnMgr& network,
 #endif
   }
 
-  if ( debug ) {
-    cout << "random simulation end." << endl;
-  }
-
   // 直接含意を求める．
   StrImp strimp;
   ImpInfo d_imp;
@@ -195,8 +204,7 @@ SatImp::learning(const BdnMgr& network,
 
   // シミュレーションでフィルタリングして残った候補を
   // SAT で調べる．
-  ImpInfo cand_info;
-  cand_info.set_size(n);
+  vector<list<ImpVal> > cand_info(n * 2);
   for (ymuint i = 0; i < n; ++ i) {
     if ( debug ) {
       if ( (i % 100) == 0 ) {
@@ -216,14 +224,14 @@ SatImp::learning(const BdnMgr& network,
 	if ( (~val0 & val1) == 0UL ) {
 	  if ( !d_imp.check(i, 0, j, 0) &&
 	       !d_imp.check(j, 1, i, 1) ) {
-	    cand_info.put(i, 0, j, 0);
+	    cand_info[i * 2 + 0].push_back(ImpVal(j, 0));
 	  }
 	}
 	// node0 が 0 の時に 1 となるノードを探す．
 	else if ( (~val0 & ~val1) == 0UL ) {
 	  if ( !d_imp.check(i, 0, j, 1) &&
 	       !d_imp.check(j, 0, i, 1) ) {
-	    cand_info.put(i, 0, j, 1);
+	    cand_info[i * 2 + 0].push_back(ImpVal(j, 1));
 	  }
 	}
       }
@@ -232,24 +240,24 @@ SatImp::learning(const BdnMgr& network,
 	if ( (val0 & val1) == 0UL ) {
 	  if ( !d_imp.check(i, 1, j, 0) &&
 	       !d_imp.check(j, 1, i, 0) ) {
-	    cand_info.put(i, 1, j, 0);
+	    cand_info[i * 2 + 1].push_back(ImpVal(j, 0));
 	  }
 	}
 	// node0 が 1 の時に 1 となるノードを探す．
 	else if ( (val0 & ~val1) == 0UL ) {
 	  if ( !d_imp.check(i, 1, j, 1) &&
 	       !d_imp.check(j, 0, i, 0) ) {
-	    cand_info.put(i, 1, j, 1);
+	    cand_info[i * 2 + 1].push_back(ImpVal(j, 1));
 	  }
 	}
       }
     }
   }
-  if ( debug ) {
-    cout << "nsat0 = " << cand_info.size() << endl;
-  }
 
-  ymuint prev_size = cand_info.size();
+  ymuint prev_size = count_list(cand_info);
+  if ( debug ) {
+    cout << "nsat0 = " << prev_size << endl;
+  }
   ymuint count = 1;
   ymuint nochg = 0;
   for ( ; ; ) {
@@ -276,20 +284,20 @@ SatImp::learning(const BdnMgr& network,
 	if ( src_val == 0 ) {
 	  val0 = ~val0;
 	}
-	list<ImpCell>& imp_list = cand_info.get(src_id, src_val);
-	for (list<ImpCell>::iterator p = imp_list.begin();
+	list<ImpVal>& imp_list = cand_info[src_id * 2 + src_val];
+	for (list<ImpVal>::iterator p = imp_list.begin();
 	     p != imp_list.end(); ) {
-	  const ImpCell& imp = *p;
-	  ymuint dst_id = imp.dst_id();
+	  const ImpVal& imp = *p;
+	  ymuint dst_id = imp.id();
 	  StrNode* node1 = node_array[dst_id];
 	  assert_cond( node1 != NULL, __FILE__, __LINE__);
-	  ymuint dst_val = imp.dst_val();
+	  ymuint dst_val = imp.val();
 	  ymuint64 val1 = node1->bitval();
 	  if ( dst_val == 0 ) {
 	    val1 = ~val1;
 	  }
 	  if ( (val0 & ~val1) != 0UL ) {
-	    list<ImpCell>::iterator q = p;
+	    list<ImpVal>::iterator q = p;
 	    ++ p;
 	    imp_list.erase(q);
 	  }
@@ -299,14 +307,17 @@ SatImp::learning(const BdnMgr& network,
 	}
       }
     }
+    ymuint cur_size = count_list(cand_info);
+    ymuint diff = prev_size - cur_size;
+    prev_size = cur_size;
+
     if ( debug ) {
       if ( (count % 100) == 0 ) {
-	cout << "nsat" << count << " = " << cand_info.size() << endl;
+	cout << "nsat" << count << " = " << cur_size << endl;
       }
     }
     ++ count;
-    ymuint diff = prev_size - cand_info.size();
-    prev_size = cand_info.size();
+
     if ( diff < 10 ) {
       ++ nochg;
       if ( nochg >= 10 ) {
@@ -318,23 +329,27 @@ SatImp::learning(const BdnMgr& network,
     }
   }
 
-  ymuint remain = cand_info.size();
+  if ( debug ) {
+    cout << "random simulation end." << endl;
+  }
+
+  ymuint remain = count_list(cand_info);
   count = 1;
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     StrNode* node0 = node_array[src_id];
     if ( node0 == NULL ) continue;
     for (ymuint src_val = 0; src_val < 2; ++ src_val) {
       Literal lit0(VarId(src_id), src_val == 0 ? kPolNega : kPolPosi);
-      const list<ImpCell>& imp_list = cand_info.get(src_id, src_val);
-      for (list<ImpCell>::const_iterator p = imp_list.begin();
+      const list<ImpVal>& imp_list = cand_info[src_id * 2 + src_val];
+      for (list<ImpVal>::const_iterator p = imp_list.begin();
 	   p != imp_list.end(); ++ p) {
 	if ( debug ) {
 	  cout << "sat#" << count << " / " << remain << endl;
 	}
 	++ count;
-	const ImpCell& imp = *p;
-	ymuint dst_id = imp.dst_id();
-	ymuint dst_val = imp.dst_val();
+	const ImpVal& imp = *p;
+	ymuint dst_id = imp.id();
+	ymuint dst_val = imp.val();
 	Literal lit1(VarId(dst_id), dst_val == 0 ? kPolNega : kPolPosi);
 	vector<Literal> tmp(2);
 	vector<Bool3> model;

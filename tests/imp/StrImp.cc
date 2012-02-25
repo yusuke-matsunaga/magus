@@ -148,7 +148,7 @@ StrImp::learning(const BdnMgr& network,
     ymuint src_id = node->id();
 
     // node に 0 を割り当てる．
-    vector<ImpCell> imp_list0;
+    vector<ImpVal> imp_list0;
     bool ok0 = imp_mgr.assert(node, 0, imp_list0);
     if ( ok0 ) {
       imp_info.put(src_id, 0, imp_list0);
@@ -160,7 +160,7 @@ StrImp::learning(const BdnMgr& network,
     imp_mgr.backtrack();
 
     // node に 1 を割り当てる．
-    vector<ImpCell> imp_list1;
+    vector<ImpVal> imp_list1;
     bool ok1 = imp_mgr.assert(node, 1, imp_list1);
     if ( ok1 ) {
       imp_info.put(src_id, 1, imp_list1);

@@ -167,14 +167,14 @@ SnXor::justification_num()
 BEGIN_NONAMESPACE
 
 inline
-ImpCell
+ImpVal
 imp(const StrEdge& e,
     ymuint val)
 {
   if ( e.src_inv() ) {
     val ^= 1;
   }
-  return ImpCell(e.src_node()->id(), val);
+  return ImpVal(e.src_node()->id(), val);
 }
 
 END_NONAMESPACE
@@ -182,7 +182,7 @@ END_NONAMESPACE
 // @brief justification パタン を得る．
 // @param[in] pos 位置番号 ( 0 <= pos < justification_num() )
 // @return 値割り当て
-ImpCell
+ImpVal
 SnXor::get_justification(ymuint pos)
 {
   switch ( mState ) {
@@ -258,7 +258,7 @@ SnXor::get_justification(ymuint pos)
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 SnXor::fwd0_imp0(ImpMgr& mgr,
-		 vector<ImpCell>& imp_list)
+		 vector<ImpVal>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> 0X:X
@@ -312,7 +312,7 @@ SnXor::fwd0_imp0(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 SnXor::fwd0_imp1(ImpMgr& mgr,
-		 vector<ImpCell>& imp_list)
+		 vector<ImpVal>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> 1X:X
@@ -366,7 +366,7 @@ SnXor::fwd0_imp1(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 SnXor::fwd1_imp0(ImpMgr& mgr,
-		 vector<ImpCell>& imp_list)
+		 vector<ImpVal>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> X0:X
@@ -420,7 +420,7 @@ SnXor::fwd1_imp0(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 SnXor::fwd1_imp1(ImpMgr& mgr,
-		 vector<ImpCell>& imp_list)
+		 vector<ImpVal>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> X1:X
@@ -474,7 +474,7 @@ SnXor::fwd1_imp1(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 SnXor::bwd_imp0(ImpMgr& mgr,
-		vector<ImpCell>& imp_list)
+		vector<ImpVal>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> XX:0
@@ -529,7 +529,7 @@ SnXor::bwd_imp0(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 SnXor::bwd_imp1(ImpMgr& mgr,
-		vector<ImpCell>& imp_list)
+		vector<ImpVal>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> XX:1

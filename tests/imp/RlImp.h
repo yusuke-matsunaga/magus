@@ -69,7 +69,7 @@ private:
 		       StrNode* node,
 		       ymuint val,
 		       ymuint level,
-		       vector<ImpCell>& imp_list);
+		       vector<ImpVal>& imp_list);
 
 
 private:
