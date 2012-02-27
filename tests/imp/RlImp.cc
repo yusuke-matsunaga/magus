@@ -36,7 +36,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 RlImp::RlImp()
 {
-  mLevel = 0;
+  mLevel = 1;
 }
 
 // @brief デストラクタ

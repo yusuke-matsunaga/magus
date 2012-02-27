@@ -130,7 +130,7 @@ CnfImp2::learning(const BdnMgr& network,
 #endif
     CNFdd new_clause = p_list * n_list;
     new_clause.make_minimal();
-    new_clause = new_clause.cut_off(4);
+    new_clause = new_clause.cut_off(3);
 #if 0
     new_clause.print_clause(cout);
 #endif

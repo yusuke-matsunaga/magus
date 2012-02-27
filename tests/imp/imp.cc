@@ -24,6 +24,7 @@
 #include "CnfImp2.h"
 #include "SatImp.h"
 #include "RlImp.h"
+#include "NaImp.h"
 
 #include "ImpInfo.h"
 
@@ -65,15 +66,79 @@ imp(const string& filename,
     }
   }
 
-  ImpInfo imp_info;
-  if ( method_str == "direct" ) {
-    StrImp imp;
-    imp.learning(network, imp_info);
+  StopWatch timer;
+
+  if ( method_str == "cnf" ) {
+    timer.reset();
+    timer.start();
+    CnfImp2 cnfimp;
+    ImpInfo cnf_imp;
+    cnfimp.learning(network, cnf_imp);
+    timer.stop();
+    USTime cnf_time = timer.time();
+    cout << "CNF Implications:             " << setw(10) << cnf_imp.size()
+	 << ": " << cnf_time << endl;
   }
-  else if ( method_str == "contra" ) {
-    ContraImp imp;
-    imp.learning(network, imp_info);
+  else {
+    timer.start();
+    StrImp strimp;
+    ImpInfo direct_imp;
+    strimp.learning(network, direct_imp);
+    timer.stop();
+    USTime direct_time = timer.time();
+
+    timer.reset();
+    timer.start();
+    ContraImp contraimp;
+    ImpInfo contra_imp;
+    contraimp.learning(network, direct_imp, contra_imp);
+    timer.stop();
+    USTime contra_time = timer.time();
+
+    timer.reset();
+    timer.start();
+    SatImp satimp;
+    ImpInfo sat_imp;
+    satimp.learning(network, direct_imp, sat_imp);
+    timer.stop();
+    USTime sat_time = timer.time();
+
+    timer.reset();
+    timer.start();
+    RlImp rlimp;
+    ImpInfo rl_imp;
+    if ( level > 0 ) {
+      rlimp.set_learning_level(level);
+    }
+#if 1
+    rlimp.learning(network, rl_imp);
+#endif
+    timer.stop();
+    USTime rl_time = timer.time();
+
+    timer.reset();
+    timer.start();
+    NaImp naimp;
+    ImpInfo na_imp;
+#if 0
+    naimp.learning(network, na_imp);
+#endif
+    timer.stop();
+    USTime na_time = timer.time();
+
+    cout << "Direct Implications:             " << setw(10) << direct_imp.size()
+	 << ": " << direct_time << endl
+	 << "Contraposition Implications:     " << setw(10) << contra_imp.size()
+	 << ": " << contra_time << endl
+	 << "D + C Implications:              " << setw(10) << direct_imp.size() + contra_imp.size() << endl
+	 << "Recursive Learning Implications: " << setw(10) << rl_imp.size()
+	 << ": " << rl_time << endl
+	 << "Naive Implications:              " << setw(10) << na_imp.size()
+	 << ": " << na_time << endl
+	 << "Complete Implications:           " << setw(10) << sat_imp.size() + direct_imp.size() + contra_imp.size()
+	 << ": " << sat_time << endl;
   }
+#if 0
   else if ( method_str == "cnf" ) {
     CnfImp imp;
     imp.learning(network, imp_info);
@@ -100,6 +165,7 @@ imp(const string& filename,
   imp_info.print(cout);
 #else
   cout << "Total " << imp_info.size() << " implications" << endl;
+#endif
 #endif
 }
 

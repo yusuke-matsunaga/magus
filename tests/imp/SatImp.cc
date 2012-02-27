@@ -18,6 +18,7 @@
 #include "ym_networks/BdnNode.h"
 #include "ym_logic/SatSolver.h"
 #include "ym_utils/RandGen.h"
+#include "ym_utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -55,7 +56,7 @@ check(SatSolver& solver,
   ymuint val0 = (src_val == 1) ? src_bv : ~src_bv;
   ymuint val1 = (dst_val == 1) ? dst_bv : ~dst_bv;
   if ( (val0 & ~val1) != 0UL ) {
-    cout << "Error(bitval): Node#" << src_id << ": " << src_val
+    cerr << "Error(bitval): Node#" << src_id << ": " << src_val
 	 << " -> Node#" << dst_id << ": " << dst_val << endl;
   }
   vector<Literal> tmp(2);
@@ -65,7 +66,7 @@ check(SatSolver& solver,
   tmp[0] = lit0;
   tmp[1] = ~lit1;
   if ( solver.solve(tmp, model) != kB3False ) {
-    cout << "Error(sat): Node#" << src_id << ": " << src_val
+    cerr << "Error(sat): Node#" << src_id << ": " << src_val
 	 << " -> Node#" << dst_id << ": " << dst_val << endl;
   }
 }
@@ -82,6 +83,70 @@ count_list(const vector<list<ImpVal> >& cand_info)
   return c;
 }
 
+void
+mark_tfo(StrNode* node,
+	 vector<bool>& mark,
+	 vector<StrNode*>& output_list)
+{
+  if ( mark[node->id()] ) {
+    return;
+  }
+  mark[node->id()] = true;
+
+  const vector<StrEdge*>& fo_list = node->fanout_list();
+  if ( fo_list.empty() ) {
+    output_list.push_back(node);
+  }
+  else {
+    for (vector<StrEdge*>::const_iterator p = fo_list.begin();
+	 p != fo_list.end(); ++ p) {
+      const StrEdge* e = *p;
+      mark_tfo(e->dst_node(), mark, output_list);
+    }
+  }
+}
+
+void
+mark_tfi(StrNode* node,
+	 vector<bool>& mark,
+	 vector<ymuint>& input_list)
+{
+  if ( mark[node->id()] ) {
+    return;
+  }
+  mark[node->id()] = true;
+
+  if ( node->is_input() ) {
+    input_list.push_back(node->id());
+  }
+  else {
+    mark_tfi(node->fanin0().src_node(), mark, input_list);
+    mark_tfi(node->fanin1().src_node(), mark, input_list);
+  }
+}
+
+bool
+check_intersect(const vector<ymuint>& list1,
+		const vector<ymuint>& list2)
+{
+  ymuint n1 = list1.size();
+  ymuint n2 = list2.size();
+  ymuint i1 = 0;
+  ymuint i2 = 0;
+  while ( i1 < n1 && i2 < n2 ) {
+    if ( list1[i1] < list2[i2] ) {
+      ++ i1;
+    }
+    else if ( list1[i1] > list2[i2] ) {
+      ++ i2;
+    }
+    else {
+      return true;
+    }
+  }
+  return false;
+}
+
 END_NONAMESPACE
 
 
@@ -90,6 +155,7 @@ END_NONAMESPACE
 // @param[in] imp_info 間接含意のリスト
 void
 SatImp::learning(const BdnMgr& network,
+		 const ImpInfo& d_imp,
 		 ImpInfo& imp_info)
 {
   RandGen rg;
@@ -175,7 +241,7 @@ SatImp::learning(const BdnMgr& network,
   }
 
   if ( debug ) {
-    cout << "CNF generated" << endl;
+    cerr << "CNF generated" << endl;
   }
 
   for (vector<StrNode*>::iterator p = inputs.begin();
@@ -192,15 +258,34 @@ SatImp::learning(const BdnMgr& network,
     StrNode* node = *p;
     node->calc_bitval();
 #if 0
-    cout << "Node#" << node->id()
+    cerr << "Node#" << node->id()
 	 << ": " << hex << node->bitval() << dec << endl;
 #endif
   }
 
-  // 直接含意を求める．
-  StrImp strimp;
-  ImpInfo d_imp;
-  strimp.learning(network, d_imp);
+  StopWatch timer;
+  timer.start();
+
+#if 1
+  // 各ノードから到達可能な入力ノードのリストを求める．
+  vector<vector<ymuint> > input_list_array(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    StrNode* node0 = node_array[i];
+    if ( node0 == NULL ) continue;
+
+    vector<bool> tfo_mark(n, false);
+    vector<StrNode*> output_list;
+    output_list.reserve(network.output_num());
+    mark_tfo(node0, tfo_mark, output_list);
+
+    vector<bool> tfi_mark(n, false);
+    for (vector<StrNode*>::iterator p = output_list.begin();
+	 p != output_list.end(); ++ p) {
+      StrNode* onode = *p;
+      mark_tfi(onode, tfi_mark, input_list_array[i]);
+    }
+  }
+#endif
 
   // シミュレーションでフィルタリングして残った候補を
   // SAT で調べる．
@@ -208,16 +293,23 @@ SatImp::learning(const BdnMgr& network,
   for (ymuint i = 0; i < n; ++ i) {
     if ( debug ) {
       if ( (i % 100) == 0 ) {
-	cout << i << " / " << n << endl;
+	cerr << i << " / " << n << endl;
       }
     }
     StrNode* node0 = node_array[i];
     if ( node0 == NULL ) continue;
+
     ymuint64 val0 = node0->bitval();
     for (ymuint j = 0; j < n; ++ j) {
       if ( i == j ) continue;
       StrNode* node1 = node_array[j];
       if ( node1 == NULL ) continue;
+
+#if 1
+      if ( !check_intersect(input_list_array[i], input_list_array[j]) ) {
+	continue;
+      }
+#endif
       ymuint64 val1 = node1->bitval();
       if ( ~val0 != 0UL ) {
 	// node0 が 0 の時に 0 となるノードを探す．
@@ -256,7 +348,7 @@ SatImp::learning(const BdnMgr& network,
 
   ymuint prev_size = count_list(cand_info);
   if ( debug ) {
-    cout << "nsat0 = " << prev_size << endl;
+    cerr << "nsat0 = " << prev_size << endl;
   }
   ymuint count = 1;
   ymuint nochg = 0;
@@ -313,7 +405,7 @@ SatImp::learning(const BdnMgr& network,
 
     if ( debug ) {
       if ( (count % 100) == 0 ) {
-	cout << "nsat" << count << " = " << cur_size << endl;
+	cerr << "nsat" << count << " = " << cur_size << endl;
       }
     }
     ++ count;
@@ -330,11 +422,18 @@ SatImp::learning(const BdnMgr& network,
   }
 
   if ( debug ) {
-    cout << "random simulation end." << endl;
+    cerr << "random simulation end." << endl;
   }
+
+  timer.stop();
+  USTime pre_time = timer.time();
+
+  timer.reset();
+  timer.start();
 
   ymuint remain = count_list(cand_info);
   count = 1;
+  ymuint nimp = 0;
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     StrNode* node0 = node_array[src_id];
     if ( node0 == NULL ) continue;
@@ -344,7 +443,7 @@ SatImp::learning(const BdnMgr& network,
       for (list<ImpVal>::const_iterator p = imp_list.begin();
 	   p != imp_list.end(); ++ p) {
 	if ( debug ) {
-	  cout << "sat#" << count << " / " << remain << endl;
+	  cerr << "sat#" << count << " / " << remain << endl;
 	}
 	++ count;
 	const ImpVal& imp = *p;
@@ -357,10 +456,18 @@ SatImp::learning(const BdnMgr& network,
 	tmp[1] = ~lit1;
 	if ( solver.solve(tmp, model) == kB3False ) {
 	  imp_info.put(src_id, src_val, dst_id, dst_val);
+	  ++ nimp;
 	}
       }
     }
   }
+  timer.stop();
+  USTime sat_time = timer.time();
+
+  cout << "SAT statistics" << endl
+       << " " << nimp << " / " << remain << endl
+       << "  simulation: " << pre_time << endl
+       << "  SAT:        " << sat_time << endl;
 }
 
 END_NAMESPACE_YM_NETWORKS

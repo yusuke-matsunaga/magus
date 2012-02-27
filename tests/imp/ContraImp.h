@@ -9,17 +9,18 @@
 /// All rights reserved.
 
 
-#include "ImpBase.h"
+#include "ym_networks/bdn.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
+
+class ImpInfo;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ContraImp ContraImp.h "ContraImp.h"
 /// @brief 対偶用いた間接含意エンジン
 //////////////////////////////////////////////////////////////////////
-class ContraImp :
-  public ImpBase
+class ContraImp
 {
 public:
 
@@ -39,9 +40,9 @@ public:
   /// @brief ネットワーク中の間接含意を求める．
   /// @param[in] network 対象のネットワーク
   /// @param[in] imp_info 間接含意のリスト
-  virtual
   void
   learning(const BdnMgr& network,
+	   const ImpInfo& direct_imp,
 	   ImpInfo& imp_info);
 
 };

@@ -1,35 +1,36 @@
-#ifndef SATIMP_H
-#define SATIMP_H
+#ifndef NAIMP_H
+#define NAIMP_H
 
-/// @file SatImp.h
-/// @brief SatImp のヘッダファイル
+/// @file NaImp.h
+/// @brief NaImp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/bdn.h"
+#include "ImpBase.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-class ImpInfo;
+class StrNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatImp SatImp.h "SatImp.h"
-/// @brief SATを用いた間接含意エンジン
+/// @class NaImp NaImp.h "NaImp.h"
+/// @brief 構造を用いた間接含意エンジン
 //////////////////////////////////////////////////////////////////////
-class SatImp
+class NaImp :
+  public ImpBase
 {
 public:
 
   /// @brief コンストラクタ
-  SatImp();
+  NaImp();
 
   /// @brief デストラクタ
   virtual
-  ~SatImp();
+  ~NaImp();
 
 
 public:
@@ -43,11 +44,10 @@ public:
   virtual
   void
   learning(const BdnMgr& network,
-	   const ImpInfo& direct_imp,
 	   ImpInfo& imp_info);
 
 };
 
 END_NAMESPACE_YM_NETWORKS
 
-#endif // SATIMP_H
+#endif // NAIMP_H

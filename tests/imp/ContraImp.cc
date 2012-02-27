@@ -8,7 +8,6 @@
 
 
 #include "ContraImp.h"
-#include "StrImp.h"
 #include "ImpInfo.h"
 #include "ImpVal.h"
 #include "ImpList.h"
@@ -37,27 +36,23 @@ ContraImp::~ContraImp()
 // @param[in] imp_info 間接含意のリスト
 void
 ContraImp::learning(const BdnMgr& network,
+		    const ImpInfo& direct_imp,
 		    ImpInfo& imp_info)
 {
   ymuint n = network.max_node_id();
 
   imp_info.set_size(n);
 
-  // 直接含意を求める．
-  StrImp strimp;
-  ImpInfo d_imp;
-  strimp.learning(network, d_imp);
-
-  // 対偶が d_imp に登録されていなかったら imp_info に追加する．
+  // 対偶が direct_imp に登録されていなかったら imp_info に追加する．
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     for (ymuint src_val = 0; src_val <= 1; ++ src_val) {
-      const ImpList& imp_list = d_imp.get(src_id, src_val);
+      const ImpList& imp_list = direct_imp.get(src_id, src_val);
       for (ImpList::iterator p = imp_list.begin();
 	   p != imp_list.end(); ++ p) {
 	const ImpCell& imp = *p;
 	ymuint dst_id = imp.dst_id();
 	ymuint dst_val = imp.dst_val();
-	if ( !d_imp.check(dst_id, dst_val ^ 1, src_id, src_val ^ 1) ) {
+	if ( !direct_imp.check(dst_id, dst_val ^ 1, src_id, src_val ^ 1) ) {
 	  imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
 	}
       }
