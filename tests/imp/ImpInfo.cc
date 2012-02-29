@@ -150,6 +150,29 @@ ImpInfo::put(ymuint src_id,
   mHashTable[pos] = cell;
 
   ++ mImpNum;
+
+#if defined(ANALYZE_HASH)
+  {
+    ymuint n = 0;
+    ymuint m = 0;
+    ymuint max = 0;
+    for (ymuint i = 0; i < mHashSize; ++ i) {
+      ymuint c = 0;
+      for (ImpCell* cell = mHashTable[i]; cell; cell = cell->mLink) {
+	++ c;
+      }
+      if ( c > 0 ) {
+	++ n;
+	if ( max < c ) {
+	  max = c;
+	}
+	m += c;
+      }
+    }
+    double avr = static_cast<double>(m) / static_cast<double>(n);
+    cout << "Hash avr. = " << avr << ", max = " << max << endl;
+  }
+#endif
 }
 
 // @brief 含意情報を追加する．
@@ -201,7 +224,9 @@ ImpInfo::hash_func(ymuint src_id,
 		   ymuint dst_id,
 		   ymuint dst_val) const
 {
-  return ((src_id * 2 + src_val) * 9 + (dst_id * 2 + dst_val)) % mHashSize;
+  ymuint32 id1 = src_id * 2 + src_val;
+  ymuint32 id2 = dst_id * 2 + dst_val;
+  return (((id1 + 1023) * id2) >> 8) % mHashSize;
 }
 
 END_NAMESPACE_YM_NETWORKS

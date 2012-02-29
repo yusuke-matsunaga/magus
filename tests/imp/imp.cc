@@ -99,7 +99,9 @@ imp(const string& filename,
     timer.start();
     SatImp satimp;
     ImpInfo sat_imp;
+#if 0
     satimp.learning(network, direct_imp, sat_imp);
+#endif
     timer.stop();
     USTime sat_time = timer.time();
 
@@ -110,7 +112,7 @@ imp(const string& filename,
     if ( level > 0 ) {
       rlimp.set_learning_level(level);
     }
-#if 1
+#if 0
     rlimp.learning(network, rl_imp);
 #endif
     timer.stop();
