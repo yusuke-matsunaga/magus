@@ -64,6 +64,14 @@ public:
   ymuint
   dst_val() const;
 
+  /// @brief ID1 を得る．
+  ymuint
+  id1() const;
+
+  /// @brief ID2 を得る．
+  ymuint
+  id2() const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -188,6 +196,22 @@ ymuint
 ImpCell::dst_val() const
 {
   return mDstVal.val();
+}
+
+// @brief ID1 を得る．
+inline
+ymuint
+ImpCell::id1() const
+{
+  return mSrcVal.packed_val();
+}
+
+// @brief ID2 を得る．
+inline
+ymuint
+ImpCell::id2() const
+{
+  return mDstVal.packed_val();
 }
 
 END_NAMESPACE_YM_NETWORKS

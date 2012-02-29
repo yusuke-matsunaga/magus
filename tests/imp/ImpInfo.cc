@@ -51,12 +51,11 @@ ImpInfo::check(ymuint src_id,
 	       ymuint dst_id,
 	       ymuint dst_val) const
 {
-  ymuint pos = hash_func(src_id, src_val, dst_id, dst_val);
+  ymuint id1 = src_id * 2 + src_val;
+  ymuint id2 = dst_id * 2 + dst_val;
+  ymuint pos = hash_func(id1, id2);
   for (ImpCell* cell = mHashTable[pos]; cell; cell = cell->mLink) {
-    if ( cell->src_id() == src_id &&
-	 cell->src_val() == src_val &&
-	 cell->dst_id() == dst_id &&
-	 cell->dst_val() == dst_val ) {
+    if ( cell->id1() == id1 && cell->id2() == id2 ) {
       return true;
     }
   }
@@ -136,8 +135,7 @@ ImpInfo::put(ymuint src_id,
     for (ymuint i = 0; i < old_size; ++ i) {
       for (ImpCell* cell = old_table[i]; cell; ) {
 	ImpCell* next = cell->mLink;
-	ymuint pos = hash_func(cell->src_id(), cell->src_val(),
-			       cell->dst_id(), cell->dst_val());
+	ymuint pos = hash_func(cell->id1(), cell->id2());
 	cell->mLink = mHashTable[pos];
 	mHashTable[pos] = cell;
 	cell = next;
@@ -145,7 +143,9 @@ ImpInfo::put(ymuint src_id,
     }
     delete [] old_table;
   }
-  ymuint pos = hash_func(src_id, src_val, dst_id, dst_val);
+  ymuint id1 = src_id * 2 + src_val;
+  ymuint id2 = dst_id * 2 + dst_val;
+  ymuint pos = hash_func(id1, id2);
   cell->mLink = mHashTable[pos];
   mHashTable[pos] = cell;
 
@@ -219,13 +219,9 @@ ImpInfo::alloc_table(ymuint size)
 // @brief ハッシュ関数
 inline
 ymuint
-ImpInfo::hash_func(ymuint src_id,
-		   ymuint src_val,
-		   ymuint dst_id,
-		   ymuint dst_val) const
+ImpInfo::hash_func(ymuint id1,
+		   ymuint id2) const
 {
-  ymuint32 id1 = src_id * 2 + src_val;
-  ymuint32 id2 = dst_id * 2 + dst_val;
   return (((id1 + 1023) * id2) >> 8) % mHashSize;
 }
 

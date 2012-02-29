@@ -113,10 +113,8 @@ private:
 
   /// @brief ハッシュ関数
   ymuint
-  hash_func(ymuint src_id,
-	    ymuint src_val,
-	    ymuint dst_id,
-	    ymuint dst_val) const;
+  hash_func(ymuint id1,
+	    ymuint id2) const;
 
 
 private:

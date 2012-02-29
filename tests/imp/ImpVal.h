@@ -61,6 +61,10 @@ public:
   ymuint
   val() const;
 
+  /// @brief 圧縮した値を返す．
+  ymuint
+  packed_val() const;
+
   /// @brief 等価比較演算子
   bool
   operator==(const ImpVal& right) const;
@@ -133,6 +137,14 @@ ymuint
 ImpVal::val() const
 {
   return mVal & 1U;
+}
+
+// @brief 圧縮した値を返す．
+inline
+ymuint
+ImpVal::packed_val() const
+{
+  return mVal;
 }
 
 // @brief 等価比較演算子

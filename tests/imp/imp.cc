@@ -128,6 +128,7 @@ imp(const string& filename,
     timer.stop();
     USTime na_time = timer.time();
 
+    cout << "Total " << network.lnode_num() << " nodes " << endl;
     cout << "Direct Implications:             " << setw(10) << direct_imp.size()
 	 << ": " << direct_time << endl
 	 << "Contraposition Implications:     " << setw(10) << contra_imp.size()
