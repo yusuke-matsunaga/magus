@@ -101,9 +101,6 @@ private:
   // 含意先の情報
   ImpVal mDstVal;
 
-  // リスト中の前の要素
-  ImpCell* mPrev;
-
   // リスト中の後の要素
   ImpCell* mNext;
 
@@ -121,8 +118,7 @@ private:
 inline
 ImpCell::ImpCell()
 {
-  mPrev = this;
-  mNext = this;
+  mNext = NULL;
   mLink = NULL;
 }
 
@@ -139,8 +135,7 @@ ImpCell::ImpCell(ymuint src_id,
   mSrcVal(src_id, src_val),
   mDstVal(dst_id, dst_val)
 {
-  mPrev = this;
-  mNext = this;
+  mNext = NULL;
   mLink = NULL;
 }
 

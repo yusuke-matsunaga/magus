@@ -26,6 +26,9 @@ public:
   ImpVal();
 
   /// @brief コンストラクタ
+  ImpVal(ymuint pval);
+
+  /// @brief コンストラクタ
   /// @param[in] id ノード番号
   /// @param[in] val 値
   ImpVal(ymuint id,
@@ -94,6 +97,13 @@ inline
 ImpVal::ImpVal()
 {
   mVal = 0;
+}
+
+// @brief コンストラクタ
+inline
+ImpVal::ImpVal(ymuint pval)
+{
+  mVal = pval;
 }
 
 // @brief コンストラクタ

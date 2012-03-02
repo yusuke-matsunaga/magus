@@ -30,6 +30,9 @@ public:
   /// @brief 空のコンストラクタ
   ImpInfo();
 
+  /// @brief コピーコンストラクタ
+  ImpInfo(const ImpInfo& src);
+
   /// @brief デストラクタ
   ~ImpInfo();
 
@@ -38,6 +41,14 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 値を取り出す関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 0縮退の時 true を返す．
+  bool
+  is_const0(ymuint id) const;
+
+  /// @brief 1縮退の時 true を返す．
+  bool
+  is_const1(ymuint id) const;
 
   /// @brief 含意情報のリストを取り出す．
   /// @param[in] src_id 含意元のノード番号
@@ -62,6 +73,18 @@ public:
   void
   print(ostream& s) const;
 
+  /// @brief 統計情報を出力する．
+  void
+  print_stats(ostream& s) const;
+
+  /// @brief 引き算
+  /// @param[in] right 比較対象
+  /// @param[out] result 結果を格納する変数
+  /// @return 結果の要素数を返す．( = result.size() )
+  ymuint
+  compare(const ImpInfo& right,
+	  ImpInfo& result) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -76,6 +99,14 @@ public:
   /// @param[in] max_id ID番号の最大値
   void
   set_size(ymuint max_id);
+
+  /// @brief 0縮退の印をつける．
+  void
+  set_0(ymuint id);
+
+  /// @brief 1縮退の印をつける．
+  void
+  set_1(ymuint id);
 
   /// @brief 含意情報を追加する．
   /// @param[in] src_id 含意元のノード番号
@@ -133,6 +164,9 @@ private:
 
   // ImpList の配列
   ImpList* mArray;
+
+  // 定数縮退の情報を納める配列
+  ymuint8* mConstArray;
 
   // ハッシュ表のサイズ
   ymuint32 mHashSize;

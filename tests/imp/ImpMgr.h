@@ -11,6 +11,7 @@
 
 #include "ym_networks/bdn.h"
 #include "ImpVal.h"
+#include "ym_utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -183,6 +184,16 @@ public:
 	     ymuint32 old_state);
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // シミュレーション関係の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ランダムシミュレーションを行なう．
+  void
+  random_sim();
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられるデータ構造
@@ -207,7 +218,13 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ノードの配列
+  // 入力の配列
+  vector<StrNode*> mInputArray;
+
+  // トポロジカル順に並べたノードのリスト
+  vector<StrNode*> mNodeList;
+
+  // ID番号をキーにしたノードの配列
   vector<StrNode*> mNodeArray;
 
   // 現在のソースノードの番号
@@ -221,6 +238,9 @@ private:
 
   // unjustified ノードのリスト
   list<StrNode*> mUnodeList;
+
+  // ランダムシミュレーション用の乱数発生器
+  RandGen mRandGen;
 
 };
 

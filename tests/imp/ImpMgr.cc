@@ -39,6 +39,8 @@ ImpMgr::clear()
        p != mNodeArray.end(); ++ p) {
     delete *p;
   }
+  mInputArray.clear();
+  mNodeList.clear();
   mNodeArray.clear();
   mChgStack.clear();
 }
@@ -73,17 +75,20 @@ ImpMgr::set(const BdnMgr& src_network)
 
   // 外部入力ノードを作る．
   const BdnNodeList& input_list = src_network.input_list();
+  mInputArray.reserve(input_list.size());
   for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     const BdnNode* bnode = *p;
     ymuint id = bnode->id();
     StrNode* node = new SnInput(id);
     node->mListIter = mUnodeList.end();
+    mInputArray.push_back(node);
     mNodeArray[id] = node;
     node->set_nfo(fo_count[id]);
   }
 
   // 論理ノードを作る．
+  mNodeList.reserve(node_list.size());
   for (vector<BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const BdnNode* bnode = *p;
@@ -107,6 +112,7 @@ ImpMgr::set(const BdnMgr& src_network)
       assert_not_reached(__FILE__, __LINE__);
     }
     node->mListIter = mUnodeList.end();
+    mNodeList.push_back(node);
     mNodeArray[id] = node;
     node->set_nfo(fo_count[id]);
   }
@@ -528,6 +534,26 @@ ImpMgr::print_network(ostream& s) const
       cout << " (" << e->dst_node()->id() << ", " << e->dst_pos() << ")";
     }
     cout << endl;
+  }
+}
+
+// @brief ランダムシミュレーションを行なう．
+void
+ImpMgr::random_sim()
+{
+  for (vector<StrNode*>::iterator p = mInputArray.begin();
+       p != mInputArray.end(); ++ p) {
+    StrNode* node = *p;
+    ymuint64 val0 = mRandGen.int32();
+    ymuint64 val1 = mRandGen.int32();
+    ymuint64 bitval = (val0 << 32) | val1;
+    node->set_bitval(bitval);
+  }
+
+  for (vector<StrNode*>::iterator p = mNodeList.begin();
+       p != mNodeList.end(); ++ p) {
+    StrNode* node = *p;
+    node->calc_bitval();
   }
 }
 

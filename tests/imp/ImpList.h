@@ -71,8 +71,11 @@ private:
   // 要素数
   ymuint32 mSize;
 
-  // 先頭要素を表すダミー
+  // 先頭の要素
   ImpCell* mTop;
+
+  // 末尾の要素
+  ImpCell* mLast;
 
 };
 
@@ -111,10 +114,12 @@ public:
   const ImpListIterator&
   operator++();
 
+#if 0
   /// @brief 前の要素に戻る．
   /// @return 自身を返す．
   const ImpListIterator&
   operator--();
+#endif
 
   /// @brief 等価比較関数
   bool
@@ -154,6 +159,8 @@ inline
 ImpList::ImpList()
 {
   mSize = 0;
+  mTop = NULL;
+  mLast = NULL;
 }
 
 // @brief デストラクタ
@@ -183,7 +190,7 @@ inline
 ImpListIterator
 ImpList::begin() const
 {
-  return ImpListIterator(mTop->mNext);
+  return ImpListIterator(mTop);
 }
 
 // @brief 末尾要素を表す反復子を返す．
@@ -191,7 +198,7 @@ inline
 ImpListIterator
 ImpList::end() const
 {
-  return ImpListIterator(mTop);
+  return ImpListIterator(NULL);
 }
 
 // @brief 要素を末尾に追加する．
@@ -199,11 +206,14 @@ inline
 void
 ImpList::push_back(ImpCell* cell)
 {
-  ImpCell* last = mTop->mPrev;
-  last->mNext = cell;
-  cell->mPrev = last;
-  cell->mNext = mTop;
-  mTop->mPrev = cell;
+  if ( mTop ) {
+    mLast->mNext = cell;
+    mLast = cell;
+  }
+  else {
+    mTop = mLast = cell;
+  }
+  ++ mSize;
 }
 
 // @brief 空のコンストラクタ
@@ -254,6 +264,7 @@ ImpListIterator::operator++()
   return *this;
 }
 
+#if 0
 // @brief 前の要素に戻る．
 // @return 自身を返す．
 inline
@@ -265,6 +276,7 @@ ImpListIterator::operator--()
   }
   return *this;
 }
+#endif
 
 // @brief 等価比較関数
 inline

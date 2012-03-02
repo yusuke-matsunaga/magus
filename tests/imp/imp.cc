@@ -99,7 +99,7 @@ imp(const string& filename,
     timer.start();
     SatImp satimp;
     ImpInfo sat_imp;
-#if 0
+#if 1
     satimp.learning(network, direct_imp, sat_imp);
 #endif
     timer.stop();
@@ -112,11 +112,20 @@ imp(const string& filename,
     if ( level > 0 ) {
       rlimp.set_learning_level(level);
     }
-#if 0
+#if 1
     rlimp.learning(network, rl_imp);
 #endif
     timer.stop();
     USTime rl_time = timer.time();
+
+    {
+      ImpInfo diff_imp;
+      ymuint diff = sat_imp.compare(rl_imp, diff_imp);
+      if ( diff > 0 ) {
+	cout << "Diff" << endl;
+	diff_imp.print(cout);
+      }
+    }
 
     timer.reset();
     timer.start();
@@ -128,6 +137,10 @@ imp(const string& filename,
     timer.stop();
     USTime na_time = timer.time();
 
+    cout << "d_imp" << endl;
+    direct_imp.print_stats(cout);
+    cout << "c_imp" << endl;
+    contra_imp.print_stats(cout);
     cout << "Total " << network.lnode_num() << " nodes " << endl;
     cout << "Direct Implications:             " << setw(10) << direct_imp.size()
 	 << ": " << direct_time << endl
@@ -138,7 +151,7 @@ imp(const string& filename,
 	 << ": " << rl_time << endl
 	 << "Naive Implications:              " << setw(10) << na_imp.size()
 	 << ": " << na_time << endl
-	 << "Complete Implications:           " << setw(10) << sat_imp.size() + direct_imp.size() + contra_imp.size()
+	 << "Complete Implications:           " << setw(10) << sat_imp.size()
 	 << ": " << sat_time << endl;
   }
 #if 0

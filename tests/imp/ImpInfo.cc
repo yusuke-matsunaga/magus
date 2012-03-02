@@ -24,6 +24,7 @@ ImpInfo::ImpInfo() :
 {
   mImpNum = 0;
   mArray = NULL;
+  mConstArray = NULL;
   mHashSize = 0;
   mHashTable = NULL;
   alloc_table(1024);
@@ -32,6 +33,20 @@ ImpInfo::ImpInfo() :
 // @brief デストラクタ
 ImpInfo::~ImpInfo()
 {
+}
+
+// @brief 0縮退の時 true を返す．
+bool
+ImpInfo::is_const0(ymuint id) const
+{
+  return mConstArray[id] == 1U;
+}
+
+/// @brief 1縮退の時 true を返す．
+bool
+ImpInfo::is_const1(ymuint id) const
+{
+  return mConstArray[id] == 2U;
 }
 
 // @brief 含意情報のリストを取り出す．
@@ -79,17 +94,26 @@ ImpInfo::print(ostream& s) const
     if ( imp_list.empty() ) continue;
     ymuint src_id = i / 2;
     ymuint src_val = i % 2;
-    cout << "Node#" << src_id << ": " << src_val << endl;
+    s << "Node#" << src_id << ": " << src_val << endl;
     for (ImpList::iterator p = imp_list.begin();
 	 p != imp_list.end(); ++ p) {
       const ImpCell& imp = *p;
       ymuint dst_id = imp.dst_id();
       ymuint dst_val = imp.dst_val();
-      cout << "   => Node#" << dst_id << ": " << dst_val << endl;
+      s << "   => Node#" << dst_id << ": " << dst_val << endl;
     }
-    cout << endl;
+    s << endl;
   }
-  cout << "Total " << size() << " implications" << endl;
+  s << "Total " << size() << " implications" << endl;
+}
+
+// @brief 統計情報を出力する．
+void
+ImpInfo::print_stats(ostream& s) const
+{
+  s << "Total " << size() << " implications ("
+    << static_cast<double>(size()) / (mArraySize * mArraySize) * 100
+    << "%)" << endl;
 }
 
 // @brief 内容をクリアする．
@@ -107,9 +131,24 @@ ImpInfo::set_size(ymuint max_id)
 
   mArraySize = max_id * 2;
   mArray = new ImpList[mArraySize];
-  for (ymuint i = 0; i < mArraySize; ++ i) {
-    mArray[i].mTop = new_cell();
+  mConstArray = new ymuint8[max_id];
+  for (ymuint i = 0; i < max_id; ++ i) {
+    mConstArray[i] = 0U;
   }
+}
+
+// @brief 0縮退の印をつける．
+void
+ImpInfo::set_0(ymuint id)
+{
+  mConstArray[id] = 1U;
+}
+
+// @brief 1縮退の印をつける．
+void
+ImpInfo::set_1(ymuint id)
+{
+  mConstArray[id] = 2U;
 }
 
 // @brief 含意情報を追加する．
@@ -223,6 +262,71 @@ ImpInfo::hash_func(ymuint id1,
 		   ymuint id2) const
 {
   return (((id1 + 1023) * id2) >> 8) % mHashSize;
+}
+
+// @brief 引き算
+// @param[in] right 比較対象
+// @param[out] result 結果を格納する変数
+// @return 結果の要素数を返す．( = result.size() )
+ymuint
+ImpInfo::compare(const ImpInfo& right,
+		 ImpInfo& result) const
+{
+  ymuint n = mArraySize;
+  assert_cond( n == right.mArraySize, __FILE__, __LINE__);
+  result.clear();
+  result.set_size(n);
+  for (ymuint src_i = 0; src_i < n; ++ src_i) {
+    if ( is_const0(src_i) || is_const1(src_i) ) continue;
+    const ImpList& imp_list0 = mArray[src_i];
+    const ImpList& imp_list1 = right.mArray[src_i];
+    ImpList::iterator p0 = imp_list0.begin();
+    ImpList::iterator p1 = imp_list1.begin();
+    ImpList::iterator e0 = imp_list0.end();
+    ImpList::iterator e1 = imp_list1.end();
+    ymuint n0 = imp_list0.size();
+    vector<ymuint> list0(n0);
+    for (ymuint i = 0; p0 != e0; ++ p0, ++ i) {
+      list0[i] = p0->id2();
+    }
+    sort(list0.begin(), list0.end());
+    ymuint n1 = imp_list1.size();
+    vector<ymuint> list1(n1);
+    for (ymuint i = 0; p1 != e1; ++ p1, ++ i) {
+      list1[i] = p1->id2();
+    }
+    sort(list1.begin(), list1.end());
+    ymuint i0 = 0;
+    ymuint i1 = 0;
+    while ( i0 < n0 && i1 < n1 ) {
+      ymuint id0 = list0[i0];
+      ymuint id1 = list1[i1];
+      if ( id0 < id1 ) {
+	++ i0;
+      }
+      else if ( id0 > id1 ) {
+	ymuint dst_id = id1 / 2;
+	if ( !is_const0(dst_id) && is_const1(dst_id) ) {
+	  result.put(src_i / 2, src_i % 2,
+		     dst_id, id1 % 2);
+	}
+	++ i1;
+      }
+      else { // id0 == id1
+	++ i0;
+	++ i1;
+      }
+    }
+    for ( ; i1 < n1; ++ i1) {
+      ymuint id2 = list1[i1];
+      ymuint dst_id = id2 / 2;
+      if ( !is_const0(dst_id) && is_const1(dst_id) ) {
+	result.put(src_i / 2, src_i % 2,
+		   dst_id, id2 % 2);
+      }
+    }
+  }
+  return result.size();
 }
 
 END_NAMESPACE_YM_NETWORKS
