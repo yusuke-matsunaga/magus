@@ -54,6 +54,8 @@ imp_SOURCES = \
 	CnfImp2.cc \
 	SatImp.h \
 	SatImp.cc \
+	SatImp2.h \
+	SatImp2.cc \
 	RlImp.h \
 	RlImp.cc \
 	NaImp.h \
