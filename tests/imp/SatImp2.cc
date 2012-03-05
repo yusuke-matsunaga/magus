@@ -196,52 +196,6 @@ SatImp2::learning(const BdnMgr& network,
   ImpMgr imp_mgr;
   imp_mgr.set(network);
 
-  // BDN から CNF を作る．
-#if 0
-  vector<BdnNode*> node_list;
-  network.sort(node_list);
-  for (vector<BdnNode*>::iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    const BdnNode* bnode = *p;
-    ymuint id = bnode->id();
-    Literal lit(VarId(id), kPolPosi);
-
-    const BdnNode* bnode0 = bnode->fanin0();
-    bool inv0 = bnode->fanin0_inv();
-    Literal lit0(VarId(bnode0->id()), inv0 ? kPolNega : kPolPosi);
-
-    const BdnNode* bnode1 = bnode->fanin1();
-    bool inv1 = bnode->fanin1_inv();
-    Literal lit1(VarId(bnode1->id()), inv1 ? kPolNega : kPolPosi);
-
-    if ( bnode->is_and() ) {
-      solver.add_clause(lit0, ~lit);
-      solver.add_clause(lit1, ~lit);
-      solver.add_clause(~lit0, ~lit1, lit);
-    }
-    else if ( bnode->is_xor() ) {
-      solver.add_clause(lit0, ~lit1, lit);
-      solver.add_clause(~lit0, lit1, lit);
-      solver.add_clause(~lit0, ~lit1, ~lit);
-      solver.add_clause(lit0, lit1, ~lit);
-    }
-    else {
-      assert_not_reached(__FILE__, __LINE__);
-    }
-  }
-
-  if ( debug ) {
-    cerr << "CNF generated" << endl;
-  }
-#endif
-
-#if 1
-  imp_mgr.print_network(cout);
-#endif
-
-  StopWatch timer;
-  timer.start();
-
   // 各ノードから到達可能な入力ノードのリストを求める．
   vector<vector<ymuint> > input_list_array(n);
   for (ymuint i = 0; i < n; ++ i) {
@@ -274,6 +228,7 @@ SatImp2::learning(const BdnMgr& network,
 
   // シミュレーションでフィルタリングして残った候補を
   // SAT で調べる．
+
   imp_mgr.random_sim();
   vector<list<ImpVal> > cand_info(n * 2);
   vector<ymuint32> const_flag(n, 0U);
@@ -334,7 +289,7 @@ SatImp2::learning(const BdnMgr& network,
   if ( debug ) {
     cerr << "nsat0 = " << prev_size << endl;
   }
-  ymuint count = 1;
+  ymuint count_sim = 1;
   ymuint nochg = 0;
   for ( ; ; ) {
     imp_mgr.random_sim();
@@ -384,11 +339,11 @@ SatImp2::learning(const BdnMgr& network,
     prev_size = cur_size;
 
     if ( debug ) {
-      if ( (count % 100) == 0 ) {
-	cerr << "nsat" << count << " = " << cur_size << endl;
+      if ( (count_sim % 100) == 0 ) {
+	cerr << "nsat" << count_sim << " = " << cur_size << endl;
       }
     }
-    ++ count;
+    ++ count_sim;
 
     if ( diff < 10 ) {
       ++ nochg;
@@ -405,11 +360,12 @@ SatImp2::learning(const BdnMgr& network,
     cerr << "random simulation end." << endl;
   }
 
-  timer.stop();
-  USTime pre_time = timer.time();
-
-  timer.reset();
-  timer.start();
+  ymuint32 count_0_success = 0;
+  ymuint32 count_0_fail = 0;
+  ymuint32 count_1_success = 0;
+  ymuint32 count_1_fail = 0;
+  ymuint32 count_imp_success = 0;
+  ymuint32 count_imp_fail = 0;
 
   for (ymuint i = 0; i < n; ++ i) {
     StrNode* node0 = imp_mgr.node(i);
@@ -437,9 +393,11 @@ SatImp2::learning(const BdnMgr& network,
 	cout << "Node#" << i << " is const-1" << endl;
 #endif
 	imp_info.set_1(i);
+	++ count_1_success;
       }
       else {
 	const_flag[i] = 3U;
+	++ count_1_fail;
       }
     }
     else if ( (const_flag[i] & 2U) == 0U ) {
@@ -464,34 +422,36 @@ SatImp2::learning(const BdnMgr& network,
 	cout << "Node#" << i << " is const-0" << endl;
 #endif
 	imp_info.set_0(i);
+	++ count_0_success;
       }
       else {
 	const_flag[i] = 3U;
+	++ count_0_fail;
       }
     }
   }
 
   ymuint remain = count_list(cand_info);
-  count = 1;
-  ymuint nimp = 0;
+  ymuint32 count_sat = 1;
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     if ( const_flag[src_id] != 3U ) continue;
+
     StrNode* node0 = imp_mgr.node(src_id);
     if ( node0 == NULL ) continue;
+
     for (ymuint src_val = 0; src_val < 2; ++ src_val) {
       Literal lit0(VarId(src_id), src_val == 0 ? kPolNega : kPolPosi);
       const list<ImpVal>& imp_list = cand_info[src_id * 2 + src_val];
       for (list<ImpVal>::const_iterator p = imp_list.begin();
 	   p != imp_list.end(); ++ p) {
 	if ( debug ) {
-	  cerr << "sat#" << count << " / " << remain << endl;
+	  cerr << "sat#" << count_sat << " / " << remain << endl;
 	}
-	++ count;
+	++ count_sat;
 	const ImpVal& imp = *p;
 	ymuint dst_id = imp.id();
 	ymuint dst_val = imp.val();
 	if ( const_flag[dst_id] != 3U ) continue;
-
 
 	SatSolver solver;
 	for (ymuint i = 0; i < n; ++ i) {
@@ -510,18 +470,23 @@ SatImp2::learning(const BdnMgr& network,
 	if ( solver.solve(tmp, model) == kB3False ) {
 	  imp_info.put(src_id, src_val, dst_id, dst_val);
 	  imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
-	  nimp += 2;
+	  ++ count_imp_success;
+	}
+	else {
+	  ++ count_imp_fail;
 	}
       }
     }
   }
-  timer.stop();
-  USTime sat_time = timer.time();
 
   cout << "SAT statistics" << endl
-       << " " << nimp << " / " << remain << endl
-       << "  simulation: " << pre_time << endl
-       << "  SAT:        " << sat_time << endl;
+       << "  simulation:      " << setw(10) << count_sim << endl
+       << "  const-0: success " << setw(10) << count_0_success << endl
+       << "           fail    " << setw(10) << count_0_fail << endl
+       << "  const-1: success " << setw(10) << count_1_success << endl
+       << "           fail    " << setw(10) << count_1_fail << endl
+       << "  imp:     success " << setw(10) << count_imp_success << endl
+       << "           fail    " << setw(10) << count_imp_fail << endl;
 }
 
 END_NAMESPACE_YM_NETWORKS

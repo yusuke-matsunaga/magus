@@ -129,7 +129,7 @@ imp(const string& filename,
     timer.stop();
     USTime rl_time = timer.time();
 
-    {
+    if ( 0 ) {
       ImpInfo diff_imp;
       ymuint diff = sat_imp.compare(rl_imp, diff_imp);
       if ( diff > 0 ) {
