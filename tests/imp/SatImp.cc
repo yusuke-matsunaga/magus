@@ -380,11 +380,12 @@ SatImp::learning(const BdnMgr& network,
 
     if ( (const_flag[i] & 1U) == 0U ) {
       // 0 になったことがない．
-      vector<Literal> tmp(1);
+      Literal lit(VarId(i), kPolNega);
+      vector<Literal> tmp(1, lit);
       vector<Bool3> model;
-      tmp[0] = Literal(VarId(i), kPolNega);
       if ( solver.solve(tmp, model) == kB3False ) {
 	// node0 は 1 固定
+	solver.add_clause(~lit);
 #if 0
 	cout << "Node#" << i << " is const-1" << endl;
 #endif
@@ -396,11 +397,12 @@ SatImp::learning(const BdnMgr& network,
     }
     else if ( (const_flag[i] & 2U) == 0U ) {
       // 1 になったことがない．
-      vector<Literal> tmp(1);
+      Literal lit(VarId(i), kPolPosi);
+      vector<Literal> tmp(1, lit);
       vector<Bool3> model;
-      tmp[0] = Literal(VarId(i), kPolPosi);
       if ( solver.solve(tmp, model) == kB3False ) {
 	// node0 は 0 固定
+	solver.add_clause(~lit);
 #if 0
 	cout << "Node#" << i << " is const-0" << endl;
 #endif
@@ -441,7 +443,9 @@ SatImp::learning(const BdnMgr& network,
 	  imp_info.put(src_id, src_val, dst_id, dst_val);
 	  imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
 	  nimp += 2;
+#if 1
 	  solver.add_clause(~lit0, lit1);
+#endif
 	}
       }
     }
