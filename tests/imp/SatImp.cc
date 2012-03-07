@@ -143,6 +143,23 @@ to_literal(ymuint id,
   return Literal(VarId(id), (val == 0) ? kPolNega : kPolPosi);
 }
 
+struct NodeInfo
+{
+  NodeInfo()
+  {
+  }
+
+  NodeInfo(StrNode* node,
+	   bool inv) :
+    mNode(node),
+    mInv(inv)
+  {
+  }
+
+  StrNode* mNode;
+  bool mInv;
+};
+
 END_NONAMESPACE
 
 
@@ -240,7 +257,7 @@ SatImp::learning(ImpMgr& imp_mgr,
   imp_mgr.random_sim();
   vector<list<ImpVal> > cand_info(n * 2);
   vector<ymuint32> const_flag(n, 0U);
-
+  hash_map<ymuint64, list<NodeInfo> > node_hash;
   for (ymuint i = 0; i < n; ++ i) {
     if ( debug ) {
       if ( (i % 100) == 0 ) {
@@ -257,6 +274,22 @@ SatImp::learning(ImpMgr& imp_mgr,
     }
     if ( val0 != 0UL ) {
       const_flag[i] |= 2UL;
+    }
+    if ( val0 != 0UL && val0 != ~0UL ) {
+      bool inv = false;
+      ymuint64 c_val0 = val0;
+      if ( c_val0 & 1UL ) {
+	c_val0 = ~c_val0;
+	inv = true;
+      }
+      hash_map<ymuint64, list<NodeInfo> >::iterator p = node_hash.find(c_val0);
+      if ( p == node_hash.end() ) {
+	node_hash.insert(make_pair(c_val0, list<NodeInfo>()));
+	p = node_hash.find(c_val0);
+	assert_cond( p != node_hash.end(), __FILE__, __LINE__);
+      }
+      list<NodeInfo>& node_list = p->second;
+      node_list.push_back(NodeInfo(node0, inv));
     }
 
     for (ymuint j = i + 1; j < n; ++ j) {
@@ -314,9 +347,6 @@ SatImp::learning(ImpMgr& imp_mgr,
 	imp_info.set_1(i);
 	const_list.push_back(i);
       }
-      else {
-	const_flag[i] = 3U;
-      }
     }
     else if ( (const_flag[i] & 2U) == 0U ) {
       // 1 になったことがない．
@@ -331,9 +361,6 @@ SatImp::learning(ImpMgr& imp_mgr,
 #endif
 	imp_info.set_0(i);
 	const_list.push_back(i);
-      }
-      else {
-	const_flag[i] = 3U;
       }
     }
   }
@@ -362,6 +389,57 @@ SatImp::learning(ImpMgr& imp_mgr,
       }
     }
   }
+
+#if 1
+  for (hash_map<ymuint64, list<NodeInfo> >::iterator p = node_hash.begin();
+       p != node_hash.end(); ++ p) {
+    if ( p->first == 0ULL || p->first == ~0ULL ) continue;
+
+    const list<NodeInfo>& node_list = p->second;
+    ymuint nc = node_list.size();
+    if ( nc == 1 ) continue;
+    vector<NodeInfo> tmp_array(n);
+    {
+      ymuint i = 0;
+      for (list<NodeInfo>::const_iterator q = node_list.begin();
+	   q != node_list.end(); ++ q, ++ i) {
+	tmp_array[i] = *q;
+      }
+    }
+    for (ymuint i = 0; i < nc; ++ i) {
+      const NodeInfo& node_info1 = tmp_array[i];
+      StrNode* node1 = node_info1.mNode;
+      Literal lit1(VarId(node1->id()), node_info1.mInv ? kPolNega : kPolPosi);
+      for (ymuint j = i + 1; j < nc; ++ j) {
+	const NodeInfo& node_info2 = tmp_array[j];
+	StrNode* node2 = node_info2.mNode;
+	Literal lit2(VarId(node2->id()), node_info2.mInv ? kPolNega : kPolPosi);
+	vector<Literal> tmp(2);
+	tmp[0] = lit1;
+	tmp[1] = ~lit2;
+	vector<Bool3> model;
+	if ( solver.solve(tmp, model) != kB3False ) {
+	  continue;
+	}
+	tmp[0] = ~lit1;
+	tmp[1] = lit2;
+	if ( solver.solve(tmp, model) != kB3False ) {
+	  continue;
+	}
+	cout << "Node#" << node1->id()
+	     << " and Node#" << node2->id()
+	     << " are equivalent" << endl;
+	solver.add_clause(lit1, ~lit2);
+	solver.add_clause(~lit2, lit1);
+#if 0
+	ymuint val2 = node_info1.mInv ^ node_info2.mInv ? 0 : 1;
+	imp_info.put(node1->id(), 0, node2->id(), val2 ^ 1);
+	imp_info.put(node1->id(), 1, node2->id(), val2);
+#endif
+      }
+    }
+  }
+#endif
 
   ymuint prev_size = count_list(cand_info);
   if ( debug ) {
