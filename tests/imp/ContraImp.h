@@ -14,6 +14,7 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
+class ImpMgr;
 class ImpInfo;
 
 //////////////////////////////////////////////////////////////////////
@@ -38,10 +39,10 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ネットワーク中の間接含意を求める．
-  /// @param[in] network 対象のネットワーク
+  /// @param[in] imp_mgr マネージャ
   /// @param[in] imp_info 間接含意のリスト
   void
-  learning(const BdnMgr& network,
+  learning(ImpMgr& imp_mgr,
 	   const ImpInfo& direct_imp,
 	   ImpInfo& imp_info);
 

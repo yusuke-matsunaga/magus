@@ -8,6 +8,7 @@
 
 
 #include "ContraImp.h"
+#include "ImpMgr.h"
 #include "ImpInfo.h"
 #include "ImpVal.h"
 #include "ImpList.h"
@@ -32,14 +33,14 @@ ContraImp::~ContraImp()
 }
 
 // @brief ネットワーク中の間接含意を求める．
-// @param[in] network 対象のネットワーク
+// @param[in] imp_mgr マネージャ
 // @param[in] imp_info 間接含意のリスト
 void
-ContraImp::learning(const BdnMgr& network,
+ContraImp::learning(ImpMgr& imp_mgr,
 		    const ImpInfo& direct_imp,
 		    ImpInfo& imp_info)
 {
-  ymuint n = network.max_node_id();
+  ymuint n = imp_mgr.max_node_id();
 
   imp_info.set_size(n);
 

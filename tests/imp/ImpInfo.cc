@@ -162,6 +162,9 @@ ImpInfo::put(ymuint src_id,
 	     ymuint dst_id,
 	     ymuint dst_val)
 {
+  if ( check(src_id, src_val, dst_id, dst_val) ) {
+    return;
+  }
   ImpCell* cell = new_cell();
   cell->set(src_id, src_val, dst_id, dst_val);
   mArray[src_id * 2 + src_val].push_back(cell);

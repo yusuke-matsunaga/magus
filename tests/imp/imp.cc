@@ -18,6 +18,9 @@
 #include "ym_networks/BdnIscas89Reader.h"
 #include "ym_networks/BdnNode.h"
 
+#include "ImpMgr.h"
+#include "ImpInfo.h"
+
 #include "StrImp.h"
 #include "ContraImp.h"
 #include "CnfImp.h"
@@ -26,8 +29,6 @@
 #include "SatImp2.h"
 #include "RlImp.h"
 #include "NaImp.h"
-
-#include "ImpInfo.h"
 
 #include "ym_logic/ZddMgr.h"
 
@@ -82,9 +83,15 @@ imp(const string& filename,
   }
   else {
     timer.start();
+
+    ImpMgr imp_mgr;
+
+    // BDN の情報を ImpMgr にコピーする．
+    imp_mgr.set(network);
+
     StrImp strimp;
     ImpInfo direct_imp;
-    strimp.learning(network, direct_imp);
+    strimp.learning(imp_mgr, direct_imp);
     timer.stop();
     USTime direct_time = timer.time();
 
@@ -92,7 +99,7 @@ imp(const string& filename,
     timer.start();
     ContraImp contraimp;
     ImpInfo contra_imp;
-    contraimp.learning(network, direct_imp, contra_imp);
+    contraimp.learning(imp_mgr, direct_imp, contra_imp);
     timer.stop();
     USTime contra_time = timer.time();
 
@@ -101,7 +108,7 @@ imp(const string& filename,
     SatImp satimp;
     ImpInfo sat_imp;
 #if 1
-    satimp.learning(network, direct_imp, sat_imp);
+    satimp.learning(imp_mgr, direct_imp, sat_imp);
 #endif
     timer.stop();
     USTime sat_time = timer.time();
@@ -110,8 +117,8 @@ imp(const string& filename,
     timer.start();
     SatImp2 satimp2;
     ImpInfo sat2_imp;
-#if 1
-    satimp2.learning(network, direct_imp, sat2_imp);
+#if 0
+    satimp2.learning(imp_mgr, direct_imp, sat2_imp);
 #endif
     timer.stop();
     USTime sat2_time = timer.time();

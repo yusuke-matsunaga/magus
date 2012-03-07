@@ -12,12 +12,11 @@
 #include "SnInput.h"
 #include "SnAnd.h"
 #include "SnXor.h"
+#include "ImpMgr.h"
 #include "ImpInfo.h"
 #include "ImpList.h"
 #include "ImpMgr.h"
 #include "StrImp.h"
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnNode.h"
 #include "ym_logic/SatSolver.h"
 #include "ym_utils/RandGen.h"
 #include "ym_utils/StopWatch.h"
@@ -181,20 +180,16 @@ END_NONAMESPACE
 
 
 // @brief ネットワーク中の間接含意を求める．
-// @param[in] network 対象のネットワーク
+// @param[in] imp_mgr マネージャ
 // @param[in] imp_info 間接含意のリスト
 void
-SatImp2::learning(const BdnMgr& network,
+SatImp2::learning(ImpMgr& imp_mgr,
 		  const ImpInfo& d_imp,
 		  ImpInfo& imp_info)
 {
-  ymuint n = network.max_node_id();
+  ymuint n = imp_mgr.max_node_id();
 
   imp_info.set_size(n);
-
-  // BDN の情報を ImpMgr にコピーする．
-  ImpMgr imp_mgr;
-  imp_mgr.set(network);
 
   // 各ノードから到達可能な入力ノードのリストを求める．
   vector<vector<ymuint> > input_list_array(n);

@@ -11,8 +11,6 @@
 #include "ImpMgr.h"
 #include "StrNode.h"
 #include "ImpInfo.h"
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -32,20 +30,15 @@ StrImp::~StrImp()
 }
 
 // @brief ネットワーク中の間接含意を求める．
-// @param[in] network 対象のネットワーク
+// @param[in] imp_mgr マネージャ
 // @param[in] imp_info 間接含意のリスト
 void
-StrImp::learning(const BdnMgr& network,
+StrImp::learning(ImpMgr& imp_mgr,
 		 ImpInfo& imp_info)
 {
-  ymuint n = network.max_node_id();
+  ymuint n = imp_mgr.max_node_id();
 
   imp_info.set_size(n);
-
-  ImpMgr imp_mgr;
-
-  // BDN の情報を ImpMgr にコピーする．
-  imp_mgr.set(network);
 
   for (ymuint i = 0; i < n; ++ i) {
     StrNode* node = imp_mgr.node(i);

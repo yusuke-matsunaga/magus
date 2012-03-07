@@ -9,19 +9,19 @@
 /// All rights reserved.
 
 
-#include "ImpBase.h"
+#include "ym_networks/bdn.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-class StrNode;
+class ImpMgr;
+class ImpInfo;
 
 //////////////////////////////////////////////////////////////////////
 /// @class StrImp StrImp.h "StrImp.h"
 /// @brief 構造を用いた間接含意エンジン
 //////////////////////////////////////////////////////////////////////
-class StrImp :
-  public ImpBase
+class StrImp
 {
 public:
 
@@ -39,11 +39,11 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ネットワーク中の間接含意を求める．
-  /// @param[in] network 対象のネットワーク
+  /// @param[in] imp_mgr マネージャ
   /// @param[in] imp_info 間接含意のリスト
   virtual
   void
-  learning(const BdnMgr& network,
+  learning(ImpMgr& imp_mgr,
 	   ImpInfo& imp_info);
 
 };
