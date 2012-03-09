@@ -130,7 +130,7 @@ imp(const string& filename,
     if ( level > 0 ) {
       rlimp.set_learning_level(level);
     }
-#if 1
+#if 0
     rlimp.learning(network, rl_imp);
 #endif
     timer.stop();

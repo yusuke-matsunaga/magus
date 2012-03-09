@@ -45,6 +45,89 @@ ImpMgr::clear()
   mChgStack.clear();
 }
 
+BEGIN_NONAMESPACE
+
+ymuint lnum;
+ymuint gnum;
+
+void
+mark_tfi(const BdnNode* node,
+	 vector<bool>& mark,
+	 vector<bool>& gmark,
+	 vector<const BdnNode*>& marked_inputs)
+{
+  if ( mark[node->id()] ) {
+    return;
+  }
+  mark[node->id()] = true;
+  ++ lnum;
+
+  if ( !gmark[node->id()] ) {
+    gmark[node->id()] = true;
+    ++ gnum;
+  }
+
+  if ( node->is_input() ) {
+    marked_inputs.push_back(node);
+  }
+  else if ( node->is_logic() ) {
+    mark_tfi(node->fanin0(), mark, gmark, marked_inputs);
+    mark_tfi(node->fanin1(), mark, gmark, marked_inputs);
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
+  }
+}
+
+void
+mark_tfi2(const BdnNode* node,
+	  vector<bool>& mark,
+	  vector<const BdnNode*>& marked_inputs)
+{
+  if ( mark[node->id()] ) {
+    return;
+  }
+  mark[node->id()] = true;
+
+  if ( node->is_input() ) {
+    marked_inputs.push_back(node);
+  }
+  else if ( node->is_logic() ) {
+    ++ lnum;
+    mark_tfi2(node->fanin0(), mark, marked_inputs);
+    mark_tfi2(node->fanin1(), mark, marked_inputs);
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
+  }
+}
+
+void
+mark_tfo(const BdnNode* node,
+	 vector<bool>& mark,
+	 vector<const BdnNode*>& marked_outputs)
+{
+  if ( mark[node->id()] ) {
+    return;
+  }
+  mark[node->id()] = true;
+
+  if ( node->is_output() ) {
+    marked_outputs.push_back(node);
+  }
+  else {
+    const BdnFanoutList& fo_list = node->fanout_list();
+    for (BdnFanoutList::const_iterator p = fo_list.begin();
+	 p != fo_list.end(); ++ p) {
+      const BdnEdge* e = *p;
+      const BdnNode* onode = e->to();
+      mark_tfo(onode, mark, marked_outputs);
+    }
+  }
+}
+
+END_NONAMESPACE
+
 // @brief ネットワークを設定する．
 // @param[in] src_network 元となるネットワーク
 void
@@ -115,6 +198,143 @@ ImpMgr::set(const BdnMgr& src_network)
     mNodeList.push_back(node);
     mNodeArray[id] = node;
     node->set_nfo(fo_count[id]);
+  }
+
+  if ( 0 ) {
+    const BdnNodeList& output_list = src_network.output_list();
+    ymuint i = 0;
+    vector<bool> gmark(n, false);
+    for (BdnNodeList::const_iterator p = output_list.begin();
+	 p != output_list.end(); ++ p, ++ i) {
+      const BdnNode* onode = *p;
+      const BdnNode* node = onode->output_fanin();
+      if ( node == NULL ) {
+	continue;
+      }
+      vector<bool> mark(n, false);
+      vector<const BdnNode*> marked_inputs;
+      marked_inputs.reserve(input_list.size());
+      lnum = 0;
+      gnum = 0;
+      mark_tfi(node, mark, gmark, marked_inputs);
+      cout << "PO#" << i << ": " << lnum << " nodes( "
+	   << gnum << " ), " << marked_inputs.size() << " inputs" << endl;
+    }
+  }
+  if ( 0 ) {
+    const BdnNodeList& output_list = src_network.output_list();
+    ymuint no = output_list.size();
+    ymuint i = 0;
+    vector<vector<const BdnNode*> > outputs_array(no);
+    vector<vector<ymuint> > neighbor_array(no);
+    for (BdnNodeList::const_iterator p = output_list.begin();
+	 p != output_list.end(); ++ p, ++ i) {
+      const BdnNode* onode = *p;
+      const BdnNode* node = onode->output_fanin();
+      if ( node == NULL ) {
+	continue;
+      }
+      vector<bool> mark(n, false);
+      vector<const BdnNode*> marked_inputs;
+      marked_inputs.reserve(input_list.size());
+      mark_tfi2(node, mark, marked_inputs);
+      vector<bool> mark2(n, false);
+      vector<const BdnNode*>& marked_outputs = outputs_array[i];
+      marked_outputs.reserve(no);
+      for (vector<const BdnNode*>::iterator p = marked_inputs.begin();
+	   p != marked_inputs.end(); ++ p) {
+	const BdnNode* node = *p;
+	mark_tfo(node, mark2, marked_outputs);
+      }
+      vector<ymuint>& neighbor = neighbor_array[i];
+      neighbor.reserve(marked_outputs.size());
+      for (vector<const BdnNode*>::iterator p = marked_outputs.begin();
+	   p != marked_outputs.end(); ++ p) {
+	const BdnNode* onode = *p;
+	neighbor.push_back(onode->id());
+      }
+      sort(neighbor.begin(), neighbor.end());
+    }
+    vector<bool> covered(no, false);
+    for (ymuint i = 0; i < no; ++ i) {
+      if ( covered[i] ) continue;
+      const vector<ymuint>& list1 = neighbor_array[i];
+      ymuint n1 = list1.size();
+      for (ymuint j = i + 1; j < no; ++ j) {
+	if ( covered[j] ) continue;
+	const vector<ymuint>& list2 = neighbor_array[j];
+	ymuint n2 = list2.size();
+	if ( n1 >= n2 ) {
+	  // list1 が list2 を包含しているか調べる．
+	  ymuint i1 = 0;
+	  ymuint i2 = 0;
+	  while ( i1 < n1 && i2 < n2 ) {
+	    ymuint v1 = list1[i1];
+	    ymuint v2 = list2[i2];
+	    if ( v1 < v2 ) {
+	      ++ i1;
+	    }
+	    else if ( v1 > v2 ) {
+	      break;
+	    }
+	    else { // v1 == v2
+	      ++ i1;
+	      ++ i2;
+	    }
+	  }
+	  if ( i2 == n2 ) {
+	    covered[j] = true;
+	  }
+	}
+	else {
+	  // list2 が list1 包含しているか調べる．
+	  ymuint i1 = 0;
+	  ymuint i2 = 0;
+	  while ( i1 < n1 && i2 < n2 ) {
+	    ymuint v1 = list1[i1];
+	    ymuint v2 = list2[i2];
+	    if ( v1 > v2 ) {
+	      ++ i2;
+	    }
+	    else if ( v1 < v2 ) {
+	      break;
+	    }
+	    else { // v1 == v2
+	      ++ i1;
+	      ++ i2;
+	    }
+	  }
+	  if ( i1 == n1 ) {
+	    covered[i] = true;
+	    break;
+	  }
+	}
+      }
+    }
+
+    ymuint g = 0;
+    for (ymuint i = 0; i < no; ++ i) {
+      if ( covered[i] ) continue;
+
+      const vector<const BdnNode*>& outputs = outputs_array[i];
+      lnum = 0;
+      vector<bool> mark3(n, false);
+      vector<const BdnNode*> marked_inputs2;
+      for (vector<const BdnNode*>::const_iterator p = outputs.begin();
+	   p != outputs.end(); ++ p) {
+	const BdnNode* onode = *p;
+	const BdnNode* node = onode->output_fanin();
+	assert_cond( node != NULL, __FILE__, __LINE__);
+	marked_inputs2.reserve(input_list.size());
+	mark_tfi2(node, mark3, marked_inputs2);
+      }
+      cout << "GROUP#" << g << ": " << lnum << " nodes"
+	   << ", " << marked_inputs2.size() << " inputs" << endl;
+      ++ g;
+    }
+    cout << "Total " << g << " groups" << endl
+	 << "Original " << src_network.lnode_num() << " nodes, "
+	 << src_network.input_num() << " inputs" << endl;
   }
 }
 
