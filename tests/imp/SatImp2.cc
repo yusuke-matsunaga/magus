@@ -260,7 +260,7 @@ SatImp2::learning(ImpMgr& imp_mgr,
 	}
       }
       // node0 が 0 の時に 1 となるノードを探す．
-      else if ( (~val0 & ~val1) == 0UL ) {
+      if ( (~val0 & ~val1) == 0UL ) {
 	if ( !imp_info.check(i, 0, j, 1) ) {
 	  cand_info[i * 2 + 0].push_back(ImpVal(j, 1));
 	}
@@ -272,7 +272,7 @@ SatImp2::learning(ImpMgr& imp_mgr,
 	}
       }
       // node0 が 1 の時に 1 となるノードを探す．
-      else if ( (val0 & ~val1) == 0UL ) {
+      if ( (val0 & ~val1) == 0UL ) {
 	if ( !imp_info.check(i, 1, j, 1) ) {
 	  cand_info[i * 2 + 1].push_back(ImpVal(j, 1));
 	}
@@ -429,7 +429,7 @@ SatImp2::learning(ImpMgr& imp_mgr,
   ymuint remain = count_list(cand_info);
   ymuint32 count_sat = 1;
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
-    if ( const_flag[src_id] != 3U ) continue;
+    if ( imp_info.is_const0(src_id) || imp_info.is_const1(src_id) ) continue;
 
     StrNode* node0 = imp_mgr.node(src_id);
     if ( node0 == NULL ) continue;
@@ -446,7 +446,7 @@ SatImp2::learning(ImpMgr& imp_mgr,
 	const ImpVal& imp = *p;
 	ymuint dst_id = imp.id();
 	ymuint dst_val = imp.val();
-	if ( const_flag[dst_id] != 3U ) continue;
+	if ( imp_info.is_const0(dst_id) || imp_info.is_const1(dst_id) ) continue;
 
 	SatSolver solver;
 	for (ymuint i = 0; i < n; ++ i) {

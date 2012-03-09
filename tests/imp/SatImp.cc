@@ -175,45 +175,6 @@ SatImp::learning(ImpMgr& imp_mgr,
 
   imp_info.set_size(n);
 
-  SatSolver solver;
-  for (ymuint id = 0; id < n; ++ id) {
-    VarId vid = solver.new_var();
-    assert_cond( vid.val() == id, __FILE__, __LINE__);
-  }
-
-  // ImpMgr から CNF を作る．
-  for (ymuint id = 0; id < n; ++ id) {
-    StrNode* node = imp_mgr.node(id);
-    if ( node == NULL ) continue;
-    if ( node->is_input() ) continue;
-
-    Literal lit(VarId(id), kPolPosi);
-
-    const StrEdge& e0 = node->fanin0();
-    StrNode* node0 = e0.src_node();
-    bool inv0 = e0.src_inv();
-    Literal lit0(VarId(node0->id()), inv0 ? kPolNega : kPolPosi);
-
-    const StrEdge& e1 = node->fanin1();
-    StrNode* node1 = e1.src_node();
-    bool inv1 = e1.src_inv();
-    Literal lit1(VarId(node1->id()), inv1 ? kPolNega : kPolPosi);
-
-    if ( node->is_and() ) {
-      solver.add_clause(lit0, ~lit);
-      solver.add_clause(lit1, ~lit);
-      solver.add_clause(~lit0, ~lit1, lit);
-    }
-    else if ( node->is_xor() ) {
-      solver.add_clause(lit0, ~lit1, lit);
-      solver.add_clause(~lit0, lit1, lit);
-      solver.add_clause(~lit0, ~lit1, ~lit);
-      solver.add_clause(lit0, lit1, ~lit);
-    }
-    else {
-      assert_not_reached(__FILE__, __LINE__);
-    }
-  }
 
   if ( debug ) {
     cerr << "CNF generated" << endl;
@@ -258,7 +219,7 @@ SatImp::learning(ImpMgr& imp_mgr,
   vector<list<ImpVal> > cand_info(n * 2);
   vector<ymuint32> const_flag(n, 0U);
   hash_map<ymuint64, list<NodeInfo> > node_hash;
-  for (ymuint i = 0; i < n; ++ i) {
+  for (ymuint i = 1; i < n; ++ i) {
     if ( debug ) {
       if ( (i % 100) == 0 ) {
 	cerr << i << " / " << n << endl;
@@ -292,7 +253,7 @@ SatImp::learning(ImpMgr& imp_mgr,
       node_list.push_back(NodeInfo(node0, inv));
     }
 
-    for (ymuint j = i + 1; j < n; ++ j) {
+    for (ymuint j = 0; j < i; ++ j) {
       StrNode* node1 = imp_mgr.node(j);
       if ( node1 == NULL ) continue;
 
@@ -328,69 +289,112 @@ SatImp::learning(ImpMgr& imp_mgr,
     }
   }
 
-  list<ymuint> const_list;
-  for (ymuint i = 0; i < n; ++ i) {
-    StrNode* node0 = imp_mgr.node(i);
-    if ( node0 == NULL ) continue;
-
-    if ( (const_flag[i] & 1U) == 0U ) {
-      // 0 になったことがない．
-      Literal lit(VarId(i), kPolNega);
-      vector<Literal> tmp(1, lit);
-      vector<Bool3> model;
-      if ( solver.solve(tmp, model) == kB3False ) {
-	// node0 は 1 固定
-	solver.add_clause(~lit);
 #if 1
-	cout << "Node#" << i << " is const-1" << endl;
+  {
+    SatSolver solver;
+    for (ymuint id = 0; id < n; ++ id) {
+      VarId vid = solver.new_var();
+      assert_cond( vid.val() == id, __FILE__, __LINE__);
+    }
+
+    // ImpMgr から CNF を作る．
+    for (ymuint id = 0; id < n; ++ id) {
+      StrNode* node = imp_mgr.node(id);
+      if ( node == NULL ) continue;
+      if ( node->is_input() ) continue;
+
+      Literal lit(VarId(id), kPolPosi);
+
+      const StrEdge& e0 = node->fanin0();
+      StrNode* node0 = e0.src_node();
+      bool inv0 = e0.src_inv();
+      Literal lit0(VarId(node0->id()), inv0 ? kPolNega : kPolPosi);
+
+      const StrEdge& e1 = node->fanin1();
+      StrNode* node1 = e1.src_node();
+      bool inv1 = e1.src_inv();
+      Literal lit1(VarId(node1->id()), inv1 ? kPolNega : kPolPosi);
+
+      if ( node->is_and() ) {
+	solver.add_clause(lit0, ~lit);
+	solver.add_clause(lit1, ~lit);
+	solver.add_clause(~lit0, ~lit1, lit);
+      }
+      else if ( node->is_xor() ) {
+	solver.add_clause(lit0, ~lit1, lit);
+	solver.add_clause(~lit0, lit1, lit);
+	solver.add_clause(~lit0, ~lit1, ~lit);
+	solver.add_clause(lit0, lit1, ~lit);
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+    }
+
+    list<ymuint> const_list;
+    for (ymuint i = 0; i < n; ++ i) {
+      StrNode* node0 = imp_mgr.node(i);
+      if ( node0 == NULL ) continue;
+
+      if ( (const_flag[i] & 1U) == 0U ) {
+	// 0 になったことがない．
+	Literal lit(VarId(i), kPolNega);
+	vector<Literal> tmp(1, lit);
+	vector<Bool3> model;
+	if ( solver.solve(tmp, model) == kB3False ) {
+	  // node0 は 1 固定
+	  solver.add_clause(~lit);
+#if 1
+	  cout << "Node#" << i << " is const-1" << endl;
 #endif
-	imp_info.set_1(i);
-	const_list.push_back(i);
+	  imp_info.set_1(i);
+	  const_list.push_back(i);
+	}
       }
-    }
-    else if ( (const_flag[i] & 2U) == 0U ) {
-      // 1 になったことがない．
-      Literal lit(VarId(i), kPolPosi);
-      vector<Literal> tmp(1, lit);
-      vector<Bool3> model;
-      if ( solver.solve(tmp, model) == kB3False ) {
-	// node0 は 0 固定
-	solver.add_clause(~lit);
+      else if ( (const_flag[i] & 2U) == 0U ) {
+	// 1 になったことがない．
+	Literal lit(VarId(i), kPolPosi);
+	vector<Literal> tmp(1, lit);
+	vector<Bool3> model;
+	if ( solver.solve(tmp, model) == kB3False ) {
+	  // node0 は 0 固定
+	  solver.add_clause(~lit);
 #if 1
-	cout << "Node#" << i << " is const-0" << endl;
+	  cout << "Node#" << i << " is const-0" << endl;
 #endif
-	imp_info.set_0(i);
-	const_list.push_back(i);
-      }
-    }
-  }
-  for (list<ymuint>::const_iterator p = const_list.begin();
-       p != const_list.end(); ++ p) {
-    ymuint id = *p;
-    cand_info[id * 2 + 0].clear();
-    cand_info[id * 2 + 1].clear();
-  }
-  for (ymuint src_id = 0; src_id < n; ++ src_id) {
-    StrNode* node0 = imp_mgr.node(src_id);
-    if ( node0 == NULL ) continue;
-
-    for (ymuint src_val = 0; src_val < 2; ++ src_val) {
-      list<ImpVal>& imp_list = cand_info[src_id * 2 + src_val];
-      for (list<ImpVal>::iterator p = imp_list.begin(); p != imp_list.end(); ) {
-	ymuint dst_id = p->id();
-	if ( imp_info.is_const0(dst_id) || imp_info.is_const1(dst_id) ) {
-	  list<ImpVal>::iterator q = p;
-	  ++ p;
-	  imp_list.erase(q);
-	}
-	else {
-	  ++ p;
+	  imp_info.set_0(i);
+	  const_list.push_back(i);
 	}
       }
     }
-  }
+    for (list<ymuint>::const_iterator p = const_list.begin();
+	 p != const_list.end(); ++ p) {
+      ymuint id = *p;
+      cand_info[id * 2 + 0].clear();
+      cand_info[id * 2 + 1].clear();
+    }
+    for (ymuint src_id = 0; src_id < n; ++ src_id) {
+      StrNode* node0 = imp_mgr.node(src_id);
+      if ( node0 == NULL ) continue;
 
-#if 1
+      for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+	list<ImpVal>& imp_list = cand_info[src_id * 2 + src_val];
+	for (list<ImpVal>::iterator p = imp_list.begin(); p != imp_list.end(); ) {
+	  ymuint dst_id = p->id();
+	  if ( imp_info.is_const0(dst_id) || imp_info.is_const1(dst_id) ) {
+	    list<ImpVal>::iterator q = p;
+	    ++ p;
+	    imp_list.erase(q);
+	  }
+	  else {
+	    ++ p;
+	  }
+	}
+      }
+    }
+  }
+#endif
+#if 0
   for (hash_map<ymuint64, list<NodeInfo> >::iterator p = node_hash.begin();
        p != node_hash.end(); ++ p) {
     if ( p->first == 0ULL || p->first == ~0ULL ) continue;
@@ -517,6 +521,111 @@ SatImp::learning(ImpMgr& imp_mgr,
   timer.reset();
   timer.start();
 
+#if 0
+  if ( 0 ) {
+    list<ymuint> const_list;
+    for (ymuint i = 0; i < n; ++ i) {
+      StrNode* node0 = imp_mgr.node(i);
+      if ( node0 == NULL ) continue;
+
+      if ( (const_flag[i] & 1U) == 0U ) {
+	// 0 になったことがない．
+	Literal lit(VarId(i), kPolNega);
+	vector<Literal> tmp(1, lit);
+	vector<Bool3> model;
+	if ( solver.solve(tmp, model) == kB3False ) {
+	  // node0 は 1 固定
+	  solver.add_clause(~lit);
+#if 1
+	  cout << "Node#" << i << " is const-1" << endl;
+#endif
+	  imp_info.set_1(i);
+	  const_list.push_back(i);
+	}
+      }
+      else if ( (const_flag[i] & 2U) == 0U ) {
+	// 1 になったことがない．
+	Literal lit(VarId(i), kPolPosi);
+	vector<Literal> tmp(1, lit);
+	vector<Bool3> model;
+	if ( solver.solve(tmp, model) == kB3False ) {
+	  // node0 は 0 固定
+	  solver.add_clause(~lit);
+#if 1
+	  cout << "Node#" << i << " is const-0" << endl;
+#endif
+	  imp_info.set_0(i);
+	  const_list.push_back(i);
+	}
+      }
+    }
+    for (list<ymuint>::const_iterator p = const_list.begin();
+	 p != const_list.end(); ++ p) {
+      ymuint id = *p;
+      cand_info[id * 2 + 0].clear();
+      cand_info[id * 2 + 1].clear();
+    }
+    for (ymuint src_id = 0; src_id < n; ++ src_id) {
+      StrNode* node0 = imp_mgr.node(src_id);
+      if ( node0 == NULL ) continue;
+
+      for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+	list<ImpVal>& imp_list = cand_info[src_id * 2 + src_val];
+	for (list<ImpVal>::iterator p = imp_list.begin(); p != imp_list.end(); ) {
+	  ymuint dst_id = p->id();
+	  if ( imp_info.is_const0(dst_id) || imp_info.is_const1(dst_id) ) {
+	    list<ImpVal>::iterator q = p;
+	    ++ p;
+	    imp_list.erase(q);
+	  }
+	  else {
+	    ++ p;
+	  }
+	}
+      }
+    }
+  }
+#endif
+
+  SatSolver solver;
+  for (ymuint id = 0; id < n; ++ id) {
+    VarId vid = solver.new_var();
+    assert_cond( vid.val() == id, __FILE__, __LINE__);
+#if 1
+    StrNode* node = imp_mgr.node(id);
+    if ( node == NULL ) continue;
+
+    if ( !node->is_input() ) {
+      Literal lit(VarId(id), kPolPosi);
+
+      const StrEdge& e0 = node->fanin0();
+      StrNode* node0 = e0.src_node();
+      bool inv0 = e0.src_inv();
+      Literal lit0(VarId(node0->id()), inv0 ? kPolNega : kPolPosi);
+
+      const StrEdge& e1 = node->fanin1();
+      StrNode* node1 = e1.src_node();
+      bool inv1 = e1.src_inv();
+      Literal lit1(VarId(node1->id()), inv1 ? kPolNega : kPolPosi);
+
+      if ( node->is_and() ) {
+	solver.add_clause(lit0, ~lit);
+	solver.add_clause(lit1, ~lit);
+	solver.add_clause(~lit0, ~lit1, lit);
+      }
+      else if ( node->is_xor() ) {
+	solver.add_clause(lit0, ~lit1, lit);
+	solver.add_clause(~lit0, lit1, lit);
+	solver.add_clause(~lit0, ~lit1, ~lit);
+	solver.add_clause(lit0, lit1, ~lit);
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+    }
+#endif
+  }
+
   ymuint remain = count_list(cand_info);
   count = 1;
   ymuint count_solve = 0;
@@ -527,8 +636,39 @@ SatImp::learning(ImpMgr& imp_mgr,
       continue;
     }
 
-    StrNode* node0 = imp_mgr.node(src_id);
-    if ( node0 == NULL ) continue;
+    StrNode* node = imp_mgr.node(src_id);
+    if ( node == NULL ) continue;
+
+#if 0
+    if ( !node->is_input() ) {
+      Literal lit(VarId(src_id), kPolPosi);
+
+      const StrEdge& e0 = node->fanin0();
+      StrNode* node0 = e0.src_node();
+      bool inv0 = e0.src_inv();
+      Literal lit0(VarId(node0->id()), inv0 ? kPolNega : kPolPosi);
+
+      const StrEdge& e1 = node->fanin1();
+      StrNode* node1 = e1.src_node();
+      bool inv1 = e1.src_inv();
+      Literal lit1(VarId(node1->id()), inv1 ? kPolNega : kPolPosi);
+
+      if ( node->is_and() ) {
+	solver.add_clause(lit0, ~lit);
+	solver.add_clause(lit1, ~lit);
+	solver.add_clause(~lit0, ~lit1, lit);
+      }
+      else if ( node->is_xor() ) {
+	solver.add_clause(lit0, ~lit1, lit);
+	solver.add_clause(~lit0, lit1, lit);
+	solver.add_clause(~lit0, ~lit1, ~lit);
+	solver.add_clause(lit0, lit1, ~lit);
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+    }
+#endif
 
     for (ymuint src_val = 0; src_val < 2; ++ src_val) {
       Literal lit0(VarId(src_id), src_val == 0 ? kPolNega : kPolPosi);

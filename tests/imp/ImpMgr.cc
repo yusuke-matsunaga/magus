@@ -44,6 +44,89 @@ ImpMgr::clear()
   mChgStack.clear();
 }
 
+BEGIN_NONAMESPACE
+
+ymuint lnum;
+ymuint gnum;
+
+void
+mark_tfi(const BdnNode* node,
+	 vector<bool>& mark,
+	 vector<bool>& gmark,
+	 vector<const BdnNode*>& marked_inputs)
+{
+  if ( mark[node->id()] ) {
+    return;
+  }
+  mark[node->id()] = true;
+  ++ lnum;
+
+  if ( !gmark[node->id()] ) {
+    gmark[node->id()] = true;
+    ++ gnum;
+  }
+
+  if ( node->is_input() ) {
+    marked_inputs.push_back(node);
+  }
+  else if ( node->is_logic() ) {
+    mark_tfi(node->fanin0(), mark, gmark, marked_inputs);
+    mark_tfi(node->fanin1(), mark, gmark, marked_inputs);
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
+  }
+}
+
+void
+mark_tfi2(const BdnNode* node,
+	  vector<bool>& mark,
+	  vector<const BdnNode*>& marked_inputs)
+{
+  if ( mark[node->id()] ) {
+    return;
+  }
+  mark[node->id()] = true;
+
+  if ( node->is_input() ) {
+    marked_inputs.push_back(node);
+  }
+  else if ( node->is_logic() ) {
+    ++ lnum;
+    mark_tfi2(node->fanin0(), mark, marked_inputs);
+    mark_tfi2(node->fanin1(), mark, marked_inputs);
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
+  }
+}
+
+void
+mark_tfo(const BdnNode* node,
+	 vector<bool>& mark,
+	 vector<const BdnNode*>& marked_outputs)
+{
+  if ( mark[node->id()] ) {
+    return;
+  }
+  mark[node->id()] = true;
+
+  if ( node->is_output() ) {
+    marked_outputs.push_back(node);
+  }
+  else {
+    const BdnFanoutList& fo_list = node->fanout_list();
+    for (BdnFanoutList::const_iterator p = fo_list.begin();
+	 p != fo_list.end(); ++ p) {
+      const BdnEdge* e = *p;
+      const BdnNode* onode = e->to();
+      mark_tfo(onode, mark, marked_outputs);
+    }
+  }
+}
+
+END_NONAMESPACE
+
 // @brief ネットワークを設定する．
 // @param[in] src_network 元となるネットワーク
 void
