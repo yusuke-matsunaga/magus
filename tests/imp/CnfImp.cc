@@ -9,8 +9,7 @@
 
 #include "CnfImp.h"
 #include "CnfClause.h"
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnNode.h"
+#include "ImpMgr.h"
 #include "ImpInfo.h"
 
 
@@ -31,12 +30,13 @@ CnfImp::~CnfImp()
 }
 
 // @brief ネットワーク中の間接含意を求める．
-// @param[in] network 対象のネットワーク
+// @param[in] imp_mgr マネージャ
 // @param[in] imp_info 間接含意のリスト
 void
-CnfImp::learning(const BdnMgr& network,
+CnfImp::learning(ImpMgr& imp_mgr,
 		 ImpInfo& imp_info)
 {
+#if 0
   // BDN から CNF を作る．
   vector<BdnNode*> node_list;
   network.sort(node_list);
@@ -256,6 +256,7 @@ CnfImp::learning(const BdnMgr& network,
     }
     cout << "  " << nimp << " learned implications" << endl;
   }
+#endif
 }
 
 END_NAMESPACE_YM_NETWORKS

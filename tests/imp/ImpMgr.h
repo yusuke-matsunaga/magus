@@ -9,18 +9,17 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bdn.h"
+#include "ym_networks/BNetwork.h"
+#include "ImpNode.h"
 #include "ImpVal.h"
 #include "ym_utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-class StrNode;
-
 //////////////////////////////////////////////////////////////////////
 /// @class ImpMgr ImpMgr.h "ImpMgr.h"
-/// @brief StrNode の含意操作を行うクラス
+/// @brief ImpNode の含意操作を行うクラス
 //////////////////////////////////////////////////////////////////////
 class ImpMgr
 {
@@ -38,15 +37,15 @@ public:
   // 情報を取り出す関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ノード番号の最大値+1を得る．
+  /// @brief BNode 番号の最大値+1を得る．
   ymuint
-  max_node_id() const;
+  max_bnode_id() const;
 
-  /// @brief ノードを得る．
-  /// @param[in] id ノード番号 ( 0 <= id < max_node_id() )
+  /// @brief BNode に対応するハンドルを得る．
+  /// @param[in] id BNode のノード番号 ( 0 <= id < max_bnode_id() )
   /// @note 場合によっては NULL が返ることもある
-  StrNode*
-  node(ymuint id) const;
+  ImpNodeHandle
+  bnode_handle(ymuint id) const;
 
   /// @brief 内容を書き出す．
   void
@@ -65,7 +64,7 @@ public:
   /// @brief ネットワークを設定する．
   /// @param[in] src_network 元となるネットワーク
   void
-  set(const BdnMgr& src_network);
+  set(const BNetwork& src_network);
 
 
 public:
@@ -80,7 +79,7 @@ public:
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  assert(StrNode* node,
+  assert(ImpNode* node,
 	 ymuint val,
 	 vector<ImpVal>& imp_list);
 
@@ -94,7 +93,7 @@ public:
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  fwd_prop0(StrNode* node,
+  fwd_prop0(ImpNode* node,
 	    vector<ImpVal>& imp_list);
 
   /// @brief ノードのファンアウト先に1を伝搬する．
@@ -103,7 +102,7 @@ public:
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  fwd_prop1(StrNode* node,
+  fwd_prop1(ImpNode* node,
 	    vector<ImpVal>& imp_list);
 
   /// @brief ノードのファンイン0に0を伝搬する．
@@ -112,7 +111,7 @@ public:
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  fanin0_prop0(StrNode* node,
+  fanin0_prop0(ImpNode* node,
 	       vector<ImpVal>& imp_list);
 
   /// @brief ノードのファンイン0に1を伝搬する．
@@ -121,7 +120,7 @@ public:
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  fanin0_prop1(StrNode* node,
+  fanin0_prop1(ImpNode* node,
 	       vector<ImpVal>& imp_list);
 
   /// @brief ノードのファンイン1に0を伝搬する．
@@ -130,7 +129,7 @@ public:
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  fanin1_prop0(StrNode* node,
+  fanin1_prop0(ImpNode* node,
 	       vector<ImpVal>& imp_list);
 
   /// @brief ノードのファンイン1に1を伝搬する．
@@ -139,7 +138,7 @@ public:
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  fanin1_prop1(StrNode* node,
+  fanin1_prop1(ImpNode* node,
 	       vector<ImpVal>& imp_list);
 
   /// @brief ノードに後方含意で0を割り当てる．
@@ -149,8 +148,8 @@ public:
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  bwd_prop0(StrNode* node,
-	    StrNode* from_node,
+  bwd_prop0(ImpNode* node,
+	    ImpNode* from_node,
 	    vector<ImpVal>& imp_list);
 
   /// @brief ノードに後方含意で1を割り当てる．
@@ -160,27 +159,27 @@ public:
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  bwd_prop1(StrNode* node,
-	    StrNode* from_node,
+  bwd_prop1(ImpNode* node,
+	    ImpNode* from_node,
 	    vector<ImpVal>& imp_list);
 
   /// @brief unjustified ノードを得る．
   void
-  get_unodelist(vector<StrNode*>& unode_list);
+  get_unodelist(vector<ImpNode*>& unode_list);
 
   /// @brief ノードが unjustified になったときの処理を行なう．
   void
-  set_unjustified(StrNode* ndoe);
+  set_unjustified(ImpNode* ndoe);
 
   /// @brief ノードが unjustified でなくなったときの処理を行なう．
   void
-  reset_unjustified(StrNode* node);
+  reset_unjustified(ImpNode* node);
 
   /// @brief ノードの値をスタックに積む．
   /// @param[in] node ノード
   /// @param[in] old_state 変更前の値
   void
-  save_value(StrNode* node,
+  save_value(ImpNode* node,
 	     ymuint32 old_state);
 
 
@@ -196,6 +195,57 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 論理式に対応したノードの木を作る．
+  ImpNodeHandle
+  make_tree(const LogExpr& expr,
+	    const vector<ImpNodeHandle>& fanins);
+
+  /// @brief AND ノードの木を作る．
+  /// @param[in] fanins 葉のノードの配列
+  /// @param[in] begin 開始位置
+  /// @param[in] end 終了位置
+  ImpNodeHandle
+  make_and(const vector<ImpNodeHandle>& fanins,
+	   ymuint begin,
+	   ymuint end);
+
+  /// @brief XOR ノードの木を作る．
+  /// @param[in] fanins 葉のノードの配列
+  /// @param[in] begin 開始位置
+  /// @param[in] end 終了位置
+  ImpNodeHandle
+  make_xor(const vector<ImpNodeHandle>& fanins,
+	   ymuint begin,
+	   ymuint end);
+
+  /// @brief 入力ノードを作る．
+  /// @param[in] bnode_id BNode-ID
+  ImpNode*
+  new_input(ymuint bnode_id);
+
+  /// @brief ANDノードを作る．
+  /// @param[in] handle0 ファンイン0のハンドル
+  /// @param[in] handle1 ファンイン1のハンドル
+  ImpNode*
+  new_and(ImpNodeHandle handle0,
+	  ImpNodeHandle handle1);
+
+  /// @brief ノードに BNode-ID を割り当てる．
+  void
+  set_bnode_id(ImpNode* node,
+	       bool inv,
+	       ymuint bnode_id);
+
+  /// @brief ノードを登録する．
+  void
+  reg_node(ImpNode* node);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // 内部で用いられるデータ構造
   //////////////////////////////////////////////////////////////////////
 
@@ -203,11 +253,11 @@ private:
   struct NodeChg
   {
     /// @brief コンストラクタ
-    NodeChg(StrNode* node = NULL,
+    NodeChg(ImpNode* node = NULL,
 	    ymuint32 state = 0U);
 
     /// @brief ノード
-    StrNode* mNode;
+    ImpNode* mNode;
     /// @brief 変更前の状態
     ymuint32 mState;
   };
@@ -219,13 +269,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入力の配列
-  vector<StrNode*> mInputArray;
+  vector<ImpNode*> mInputArray;
 
   // トポロジカル順に並べたノードのリスト
-  vector<StrNode*> mNodeList;
+  vector<ImpNode*> mNodeList;
 
-  // ID番号をキーにしたノードの配列
-  vector<StrNode*> mNodeArray;
+  // ImpNode のID番号をキーにしたノードの配列
+  vector<ImpNode*> mNodeArray;
+
+  // もとの BNode のID番号をキーにしたハンドルの配列
+  vector<ImpNodeHandle> mNodeMap;
 
   // 現在のソースノードの番号
   ymuint32 mSrcId;
@@ -237,7 +290,7 @@ private:
   vector<ymuint32> mMarkerStack;
 
   // unjustified ノードのリスト
-  list<StrNode*> mUnodeList;
+  list<ImpNode*> mUnodeList;
 
   // ランダムシミュレーション用の乱数発生器
   RandGen mRandGen;
@@ -252,24 +305,24 @@ private:
 // @brief ノード番号の最大値+1を得る．
 inline
 ymuint
-ImpMgr::max_node_id() const
+ImpMgr::max_bnode_id() const
 {
-  return mNodeArray.size();
+  return mNodeMap.size();
 }
 
 // @brief ノードを得る．
 // @param[in] id ノード番号 ( 0 <= id < max_node_id() )
 inline
-StrNode*
-ImpMgr::node(ymuint id) const
+ImpNodeHandle
+ImpMgr::bnode_handle(ymuint id) const
 {
-  assert_cond( id < max_node_id(), __FILE__, __LINE__);
-  return mNodeArray[id];
+  assert_cond( id < max_bnode_id(), __FILE__, __LINE__);
+  return mNodeMap[id];
 }
 
 // @brief コンストラクタ
 inline
-ImpMgr::NodeChg::NodeChg(StrNode* node,
+ImpMgr::NodeChg::NodeChg(ImpNode* node,
 			 ymuint32 state) :
   mNode(node),
   mState(state)

@@ -35,14 +35,12 @@ imp_SOURCES = \
 	ImpBase.h \
 	ImpMgr.h \
 	ImpMgr.cc \
-	StrNode.h \
-	StrNode.cc \
-	SnInput.h \
-	SnInput.cc \
-	SnAnd.h \
-	SnAnd.cc \
-	SnXor.h \
-	SnXor.cc \
+	ImpNode.h \
+	ImpNode.cc \
+	ImpInput.h \
+	ImpInput.cc \
+	ImpAnd.h \
+	ImpAnd.cc \
 	StrImp.h \
 	StrImp.cc \
 	ContraImp.h \

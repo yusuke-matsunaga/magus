@@ -9,7 +9,7 @@
 
 #include "StrImp.h"
 #include "ImpMgr.h"
-#include "StrNode.h"
+#include "ImpNode.h"
 #include "ImpInfo.h"
 
 
@@ -36,14 +36,15 @@ void
 StrImp::learning(ImpMgr& imp_mgr,
 		 ImpInfo& imp_info)
 {
-  ymuint n = imp_mgr.max_node_id();
+  ymuint n = imp_mgr.max_bnode_id();
 
   imp_info.set_size(n);
 
   for (ymuint i = 0; i < n; ++ i) {
-    StrNode* node = imp_mgr.node(i);
-    if ( node == NULL ) continue;
+    ImpNodeHandle handle = imp_mgr.bnode_handle(i);
+    if ( handle.is_const() ) continue;
 
+    ImpNode* node = handle.node();
     ymuint src_id = node->id();
 
     // node に 0 を割り当てる．

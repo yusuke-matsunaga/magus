@@ -1,53 +1,47 @@
 
-/// @file SnAnd.cc
-/// @brief SnAnd の実装ファイル
+/// @file ImpAnd.cc
+/// @brief ImpAnd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SnAnd.h"
+#include "ImpAnd.h"
 #include "ImpMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
-// クラス SnAnd
+// クラス ImpAnd
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] id ID番号
-// @param[in] node0 ファンイン0のノード
-// @param[in] inv0 ファンイン0の極性
-// @param[in] node1 ファンイン1のノード
-// @param[in] inv1 ファンイン1の極性
-SnAnd::SnAnd(ymuint id,
-	     StrNode* node0,
-	     bool inv0,
-	     StrNode* node1,
-	     bool inv1) :
-  StrNode(id, node0, inv0, node1, inv1)
+// @param[in] handle0 ファンイン0のハンドル
+// @param[in] handle1 ファンイン1のハンドル
+ImpAnd::ImpAnd(ImpNodeHandle handle0,
+	       ImpNodeHandle handle1) :
+  ImpNode(handle0, handle1)
 {
   clear();
 }
 
 // @brief デストラクタ
-SnAnd::~SnAnd()
+ImpAnd::~ImpAnd()
 {
 }
 
 // @brief AND タイプのときに true を返す．
 bool
-SnAnd::is_and() const
+ImpAnd::is_and() const
 {
   return true;
 }
 
 // @brief 出力値を返す．
 Bool3
-SnAnd::val() const
+ImpAnd::val() const
 {
   switch ( mState ) {
   case kStXX_X:
@@ -75,7 +69,7 @@ SnAnd::val() const
 
 // @brief ビットベクタ値の計算を行なう．
 void
-SnAnd::calc_bitval()
+ImpAnd::calc_bitval()
 {
   ymuint64 val0 = fanin0().src_node()->bitval();
   if ( fanin0().src_inv() ) {
@@ -90,28 +84,28 @@ SnAnd::calc_bitval()
 
 // @brief 状態を初期化する．
 void
-SnAnd::clear()
+ImpAnd::clear()
 {
   mState = kStXX_X;
 }
 
 // @brief 状態を返す．
 ymuint32
-SnAnd::cur_state() const
+ImpAnd::cur_state() const
 {
   return static_cast<ymuint32>(mState);
 }
 
 // @brief 状態を元にもどす．
 void
-SnAnd::restore(ymuint32 val)
+ImpAnd::restore(ymuint32 val)
 {
   mState = static_cast<tState>(val);
 }
 
 // @brief unjustified ノードの時 true を返す．
 bool
-SnAnd::is_unjustified() const
+ImpAnd::is_unjustified() const
 {
   switch ( mState ) {
   case kSt1X_X:
@@ -127,7 +121,7 @@ SnAnd::is_unjustified() const
 
 // @brief justification パタン数を得る．
 ymuint
-SnAnd::justification_num()
+ImpAnd::justification_num()
 {
   switch ( mState ) {
   case kSt1X_X:
@@ -152,7 +146,7 @@ BEGIN_NONAMESPACE
 
 inline
 ImpVal
-imp(const StrEdge& e,
+imp(const ImpEdge& e,
     ymuint val)
 {
   if ( e.src_inv() ) {
@@ -167,7 +161,7 @@ END_NONAMESPACE
 // @param[in] pos 位置番号 ( 0 <= pos < justification_num() )
 // @return 値割り当て
 ImpVal
-SnAnd::get_justification(ymuint pos)
+ImpAnd::get_justification(ymuint pos)
 {
   switch ( mState ) {
   case kSt1X_X:
@@ -213,8 +207,8 @@ SnAnd::get_justification(ymuint pos)
 // @param[in] mgr ImpMgr
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnAnd::fwd0_imp0(ImpMgr& mgr,
-		 vector<ImpVal>& imp_list)
+ImpAnd::fwd0_imp0(ImpMgr& mgr,
+		  vector<ImpVal>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> 0X:0
@@ -258,8 +252,8 @@ SnAnd::fwd0_imp0(ImpMgr& mgr,
 // @param[in] mgr ImpMgr
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnAnd::fwd0_imp1(ImpMgr& mgr,
-		 vector<ImpVal>& imp_list)
+ImpAnd::fwd0_imp1(ImpMgr& mgr,
+		  vector<ImpVal>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> 1X:X
@@ -304,8 +298,8 @@ SnAnd::fwd0_imp1(ImpMgr& mgr,
 // @param[in] mgr ImpMgr
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnAnd::fwd1_imp0(ImpMgr& mgr,
-		 vector<ImpVal>& imp_list)
+ImpAnd::fwd1_imp0(ImpMgr& mgr,
+		  vector<ImpVal>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> X0:0
@@ -349,8 +343,8 @@ SnAnd::fwd1_imp0(ImpMgr& mgr,
 // @param[in] mgr ImpMgr
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnAnd::fwd1_imp1(ImpMgr& mgr,
-		 vector<ImpVal>& imp_list)
+ImpAnd::fwd1_imp1(ImpMgr& mgr,
+		  vector<ImpVal>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> X1:X
@@ -395,8 +389,8 @@ SnAnd::fwd1_imp1(ImpMgr& mgr,
 // @param[in] mgr ImpMgr
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnAnd::bwd_imp0(ImpMgr& mgr,
-		vector<ImpVal>& imp_list)
+ImpAnd::bwd_imp0(ImpMgr& mgr,
+		 vector<ImpVal>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> XX:0
@@ -438,8 +432,8 @@ SnAnd::bwd_imp0(ImpMgr& mgr,
 // @param[in] mgr ImpMgr
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
-SnAnd::bwd_imp1(ImpMgr& mgr,
-		vector<ImpVal>& imp_list)
+ImpAnd::bwd_imp1(ImpMgr& mgr,
+		 vector<ImpVal>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> 11:1
@@ -482,8 +476,8 @@ SnAnd::bwd_imp1(ImpMgr& mgr,
 // @param[in] mgr ImpMgr
 // @param[in] val 値
 void
-SnAnd::change_value(ImpMgr& mgr,
-		    tState val)
+ImpAnd::change_value(ImpMgr& mgr,
+		     tState val)
 {
   mgr.save_value(this, static_cast<ymuint32>(mState));
   mState = val;

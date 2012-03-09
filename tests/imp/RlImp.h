@@ -9,21 +9,19 @@
 /// All rights reserved.
 
 
-#include "ImpBase.h"
-#include "ImpInfo.h"
+#include "ym_networks/BNetwork.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
 class ImpMgr;
-class StrNode;
+class ImpInfo;
 
 //////////////////////////////////////////////////////////////////////
 /// @class RlImp RlImp.h "RlImp.h"
-/// @brief 構造を用いた間接含意エンジン
+/// @brief recursive learning を用いた間接含意エンジン
 //////////////////////////////////////////////////////////////////////
-class RlImp :
-  public ImpBase
+class RlImp
 {
 public:
 
@@ -41,11 +39,11 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ネットワーク中の間接含意を求める．
-  /// @param[in] network 対象のネットワーク
+  /// @param[in] imp_mgr マネージャ
   /// @param[in] imp_info 間接含意のリスト
   virtual
   void
-  learning(const BdnMgr& network,
+  learning(ImpMgr& imp_mgr,
 	   ImpInfo& imp_info);
 
   /// @brief ラーニングのレベルを設定する．
@@ -66,7 +64,7 @@ private:
   /// @param[out] imp_list 含意のリスト
   bool
   make_all_implication(ImpMgr& imp_mgr,
-		       StrNode* node,
+		       ImpNode* node,
 		       ymuint val,
 		       ymuint level,
 		       vector<ImpVal>& imp_list);

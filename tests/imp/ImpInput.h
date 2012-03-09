@@ -1,44 +1,35 @@
-#ifndef SNAND_H
-#define SNAND_H
+#ifndef IMPINPUT_H
+#define IMPINPUT_H
 
-/// @file SnAnd.h
-/// @brief SnAnd のヘッダファイル
+/// @file ImpInput.h
+/// @brief ImpInput のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "StrNode.h"
+#include "ImpNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
-/// @class SnAnd SnAnd.h "SnAnd.h"
-/// @brief StrImp で用いられるノード
+/// @class ImpInput ImpInput.h "ImpInput.h"
+/// @brief 外部入力ノードを表すクラス
 //////////////////////////////////////////////////////////////////////
-class SnAnd :
-  public StrNode
+class ImpInput :
+  public ImpNode
 {
   friend class ImpMgr;
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  /// @param[in] node0 ファンイン0のノード
-  /// @param[in] inv0 ファンイン0の極性
-  /// @param[in] node1 ファンイン1のノード
-  /// @param[in] inv1 ファンイン1の極性
-  SnAnd(ymuint id,
-	StrNode* node0,
-	bool inv0,
-	StrNode* node1,
-	bool inv1);
+  ImpInput();
 
   /// @brief デストラクタ
   virtual
-  ~SnAnd();
+  ~ImpInput();
 
 
 public:
@@ -46,10 +37,10 @@ public:
   // 内容を取り出す関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief AND タイプのときに true を返す．
+  /// @brief 外部入力のときに true を返す．
   virtual
   bool
-  is_and() const;
+  is_input() const;
 
   /// @brief 出力値を返す．
   virtual
@@ -143,7 +134,7 @@ public:
   virtual
   bool
   bwd_imp0(ImpMgr& mgr,
-	    vector<ImpVal>& imp_list);
+	   vector<ImpVal>& imp_list);
 
   /// @brief 出力を1にする．
   /// @param[in] mgr ImMgr
@@ -151,67 +142,7 @@ public:
   virtual
   bool
   bwd_imp1(ImpMgr& mgr,
-	    vector<ImpVal>& imp_list);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  // 状態
-  // XX:X   0
-  // XX:0   1
-  // XX:1   -
-  // X0:X   -
-  // X0:0   2
-  // X0:1   -
-  // X1:X   3
-  // X1:0   -
-  // X1:1   -
-  // 0X:X   -
-  // 0X:0   4
-  // 0X:1   -
-  // 00:X   -
-  // 00:0   5
-  // 00:1   -
-  // 01:X   -
-  // 01:0   6
-  // 01:1   -
-  // 1X:X   7
-  // 1X:0   -
-  // 1X:1   -
-  // 10:X   -
-  // 10:0   8
-  // 10:1   -
-  // 11:X   -
-  // 11:0   -
-  // 11:1   9
-  enum tState {
-    kStXX_X = 0,
-    kSt1X_X = 1,
-    kStX1_X = 2,
-    kStXX_0 = 3,
-    kStX0_0 = 4,
-    kSt0X_0 = 5,
-    kSt00_0 = 6,
-    kSt10_0 = 7,
-    kSt01_0 = 8,
-    kSt11_1 = 9
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 下請け関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 値を変える．
-  /// @param[in] mgr ImMgr
-  /// @param[in] val 値
-  void
-  change_value(ImpMgr& mgr,
-	       tState val);
+	   vector<ImpVal>& imp_list);
 
 
 private:
@@ -220,10 +151,17 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 状態
-  tState mState;
+  // X: 0
+  // 0: 1
+  // 1: 2
+  enum tState {
+    kStX = 0,
+    kSt0 = 1,
+    kSt1 = 2
+  } mState;
 
 };
 
 END_NAMESPACE_YM_NETWORKS
 
-#endif // SNAND_H
+#endif // IMPINPUT_H

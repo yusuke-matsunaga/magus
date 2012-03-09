@@ -13,10 +13,9 @@
 #error "<popt.h> not found."
 #endif
 
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnBlifReader.h"
-#include "ym_networks/BdnIscas89Reader.h"
-#include "ym_networks/BdnNode.h"
+#include "ym_networks/BNetwork.h"
+#include "ym_networks/BNetBlifReader.h"
+#include "ym_networks/BNetIscas89Reader.h"
 
 #include "ImpMgr.h"
 #include "ImpInfo.h"
@@ -51,17 +50,17 @@ imp(const string& filename,
   MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
   MsgMgr::reg_handler(msg_handler);
 
-  BdnMgr network;
+  BNetwork network;
 
   if ( blif ) {
-    BdnBlifReader read;
+    BNetBlifReader read;
     if ( !read(filename, network) ) {
       cerr << "Error in reading " << filename << endl;
       return;
     }
   }
   else {
-    BdnIscas89Reader read;
+    BNetIscas89Reader read;
     if ( !read(filename, network) ) {
       cerr << "Error in reading " << filename << endl;
       return;
@@ -73,13 +72,20 @@ imp(const string& filename,
   if ( method_str == "cnf" ) {
     timer.reset();
     timer.start();
+
+    ImpMgr imp_mgr;
+
+#if 0
+    // BDN の情報を ImpMgr にコピーする．
+    imp_mgr.set(network);
     CnfImp2 cnfimp;
     ImpInfo cnf_imp;
-    cnfimp.learning(network, cnf_imp);
+    cnfimp.learning(imp_mgr, cnf_imp);
     timer.stop();
     USTime cnf_time = timer.time();
     cout << "CNF Implications:             " << setw(10) << cnf_imp.size()
 	 << ": " << cnf_time << endl;
+#endif
   }
   else {
     timer.start();
@@ -131,7 +137,7 @@ imp(const string& filename,
       rlimp.set_learning_level(level);
     }
 #if 1
-    rlimp.learning(network, rl_imp);
+    rlimp.learning(imp_mgr, rl_imp);
 #endif
     timer.stop();
     USTime rl_time = timer.time();
@@ -159,7 +165,7 @@ imp(const string& filename,
     direct_imp.print_stats(cout);
     cout << "c_imp" << endl;
     contra_imp.print_stats(cout);
-    cout << "Total " << network.lnode_num() << " nodes " << endl;
+    cout << "Total " << network.logic_node_num() << " nodes " << endl;
     cout << "Direct Implications:             " << setw(10) << direct_imp.size()
 	 << ": " << direct_time << endl
 	 << "Contraposition Implications:     " << setw(10) << contra_imp.size()

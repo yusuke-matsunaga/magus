@@ -1,36 +1,38 @@
-#ifndef SNINPUT_H
-#define SNINPUT_H
+#ifndef IMPAND_H
+#define IMPAND_H
 
-/// @file SnInput.h
-/// @brief SnInput のヘッダファイル
+/// @file ImpAnd.h
+/// @brief ImpAnd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "StrNode.h"
+#include "ImpNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
-/// @class SnInput SnInput.h "SnInput.h"
-/// @brief StrImp で用いられるノード
+/// @class ImpAnd ImpAnd.h "ImpAnd.h"
+/// @brief AND ノードを表すクラス
 //////////////////////////////////////////////////////////////////////
-class SnInput :
-  public StrNode
+class ImpAnd :
+  public ImpNode
 {
   friend class ImpMgr;
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  SnInput(ymuint id);
+  /// @param[in] handle0 ファンイン0のハンドル
+  /// @param[in] handle1 ファンイン1のハンドル
+  ImpAnd(ImpNodeHandle handle0,
+	 ImpNodeHandle handle1);
 
   /// @brief デストラクタ
   virtual
-  ~SnInput();
+  ~ImpAnd();
 
 
 public:
@@ -38,10 +40,10 @@ public:
   // 内容を取り出す関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 外部入力のときに true を返す．
+  /// @brief AND タイプのときに true を返す．
   virtual
   bool
-  is_input() const;
+  is_and() const;
 
   /// @brief 出力値を返す．
   virtual
@@ -148,21 +150,74 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  // 状態
+  // XX:X   0
+  // XX:0   1
+  // XX:1   -
+  // X0:X   -
+  // X0:0   2
+  // X0:1   -
+  // X1:X   3
+  // X1:0   -
+  // X1:1   -
+  // 0X:X   -
+  // 0X:0   4
+  // 0X:1   -
+  // 00:X   -
+  // 00:0   5
+  // 00:1   -
+  // 01:X   -
+  // 01:0   6
+  // 01:1   -
+  // 1X:X   7
+  // 1X:0   -
+  // 1X:1   -
+  // 10:X   -
+  // 10:0   8
+  // 10:1   -
+  // 11:X   -
+  // 11:0   -
+  // 11:1   9
+  enum tState {
+    kStXX_X = 0,
+    kSt1X_X = 1,
+    kStX1_X = 2,
+    kStXX_0 = 3,
+    kStX0_0 = 4,
+    kSt0X_0 = 5,
+    kSt00_0 = 6,
+    kSt10_0 = 7,
+    kSt01_0 = 8,
+    kSt11_1 = 9
+  };
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 値を変える．
+  /// @param[in] mgr ImMgr
+  /// @param[in] val 値
+  void
+  change_value(ImpMgr& mgr,
+	       tState val);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // 状態
-  // X: 0
-  // 0: 1
-  // 1: 2
-  enum tState {
-    kStX = 0,
-    kSt0 = 1,
-    kSt1 = 2
-  } mState;
+  tState mState;
 
 };
 
 END_NAMESPACE_YM_NETWORKS
 
-#endif // SNINPUT_H
+#endif // IMPAND_H

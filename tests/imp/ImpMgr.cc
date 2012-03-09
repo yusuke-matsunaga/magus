@@ -3,15 +3,13 @@
 /// @brief ImpMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ImpMgr.h"
-#include "SnInput.h"
-#include "SnAnd.h"
-#include "SnXor.h"
-#include "ym_networks/BdnNode.h"
+#include "ImpInput.h"
+#include "ImpAnd.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -35,87 +33,218 @@ ImpMgr::~ImpMgr()
 void
 ImpMgr::clear()
 {
-  for (vector<StrNode*>::iterator p = mNodeArray.begin();
+  for (vector<ImpNode*>::iterator p = mNodeArray.begin();
        p != mNodeArray.end(); ++ p) {
     delete *p;
   }
   mInputArray.clear();
   mNodeList.clear();
   mNodeArray.clear();
+  mNodeMap.clear();
   mChgStack.clear();
 }
 
 // @brief ネットワークを設定する．
 // @param[in] src_network 元となるネットワーク
 void
-ImpMgr::set(const BdnMgr& src_network)
+ImpMgr::set(const BNetwork& src_network)
 {
   clear();
 
   ymuint n = src_network.max_node_id();
 
   // 配列を確保する．
-  mNodeArray.clear();
-  mNodeArray.resize(n, NULL);
+  mNodeMap.clear();
+  mNodeMap.resize(n);
 
   // node_list に src_network のノードをトポロジカル順に並べる．
-  vector<BdnNode*> node_list;
-  src_network.sort(node_list);
+  BNodeVector node_list;
+  src_network.tsort(node_list);
 
   // 各ノードのファンアウト数を数える．
   vector<ymuint> fo_count(n, 0);
-  for (vector<BdnNode*>::iterator p = node_list.begin();
+  for (BNodeVector::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
-    const BdnNode* bnode = *p;
-    const BdnNode* bnode0 = bnode->fanin0();
-    ++ fo_count[bnode0->id()];
-    const BdnNode* bnode1 = bnode->fanin1();
-    ++ fo_count[bnode1->id()];
+    const BNode* bnode = *p;
+    ymuint ni = bnode->ni();
+    for (ymuint i = 0; i < ni; ++ i) {
+      BNode* inode = bnode->fanin(i);
+      ++ fo_count[inode->id()];
+    }
   }
 
   // 外部入力ノードを作る．
-  const BdnNodeList& input_list = src_network.input_list();
+  const BNodeList& input_list = src_network.inputs();
   mInputArray.reserve(input_list.size());
-  for (BdnNodeList::const_iterator p = input_list.begin();
+  for (BNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
-    const BdnNode* bnode = *p;
+    const BNode* bnode = *p;
     ymuint id = bnode->id();
-    StrNode* node = new SnInput(id);
+    ImpNode* node = new_input(id);
     node->mListIter = mUnodeList.end();
-    mInputArray.push_back(node);
-    mNodeArray[id] = node;
     node->set_nfo(fo_count[id]);
+    mInputArray.push_back(node);
   }
 
   // 論理ノードを作る．
-  mNodeList.reserve(node_list.size());
-  for (vector<BdnNode*>::iterator p = node_list.begin();
+  for (BNodeVector::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
-    const BdnNode* bnode = *p;
+    const BNode* bnode = *p;
     ymuint id = bnode->id();
-    const BdnNode* bnode0 = bnode->fanin0();
-    bool inv0 = bnode->fanin0_inv();
-    StrNode* node0 = mNodeArray[bnode0->id()];
-    assert_cond(node0 != NULL, __FILE__, __LINE__);
-    const BdnNode* bnode1 = bnode->fanin1();
-    bool inv1 = bnode->fanin1_inv();
-    StrNode* node1 = mNodeArray[bnode1->id()];
-    assert_cond(node1 != NULL, __FILE__, __LINE__);
-    StrNode* node = NULL;
-    if ( bnode->is_and() ) {
-      node = new SnAnd(id, node0, inv0, node1, inv1);
+    ymuint ni = bnode->ni();
+    vector<ImpNodeHandle> fanins(ni);
+    for (ymuint i = 0; i < ni; ++ i) {
+      const BNode* ibnode = bnode->fanin(i);
+      ImpNodeHandle ihandle = mNodeMap[ibnode->id()];
+      fanins[i] = ihandle;
     }
-    else if ( bnode->is_xor() ) {
-      node = new SnXor(id, node0, inv0, node1, inv1);
-    }
-    else {
-      assert_not_reached(__FILE__, __LINE__);
-    }
+    ImpNodeHandle handle = make_tree(bnode->func(), fanins);
+    ImpNode* node = handle.node();
     node->mListIter = mUnodeList.end();
-    mNodeList.push_back(node);
-    mNodeArray[id] = node;
     node->set_nfo(fo_count[id]);
+    set_bnode_id(node, handle.inv(), id);
   }
+}
+
+// @brief 論理式に対応したノードの木を作る．
+ImpNodeHandle
+ImpMgr::make_tree(const LogExpr& expr,
+		  const vector<ImpNodeHandle>& fanins)
+{
+  if ( expr.is_zero() ) {
+    return ImpNodeHandle::make_zero();
+  }
+  if ( expr.is_one() ) {
+    return ImpNodeHandle::make_one();
+  }
+  if ( expr.is_posiliteral() ) {
+    VarId vid = expr.varid();
+    return fanins[vid.val()];
+  }
+  if ( expr.is_negaliteral() ) {
+    VarId vid = expr.varid();
+    return ~fanins[vid.val()];
+  }
+
+  ymuint nc = expr.child_num();
+  vector<ImpNodeHandle> child_array(nc);
+  bool child_inv = expr.is_or();
+  for (ymuint i = 0; i < nc; ++ i) {
+    child_array[i] = make_tree(expr.child(i), fanins);
+    if ( child_inv ) {
+      child_array[i] = ~child_array[i];
+    }
+  }
+
+  if ( expr.is_and() ) {
+    return make_and(child_array, 0, nc);
+  }
+  if ( expr.is_or() ) {
+    return ~make_and(child_array, 0, nc);
+  }
+  if ( expr.is_xor() ) {
+    return make_xor(child_array, 0, nc);
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return ImpNodeHandle::make_zero();
+}
+
+// @brief AND ノードの木を作る．
+// @param[in] fanins 葉のノードの配列
+// @param[in] begin 開始位置
+// @param[in] end 終了位置
+ImpNodeHandle
+ImpMgr::make_and(const vector<ImpNodeHandle>& fanins,
+		 ymuint begin,
+		 ymuint end)
+{
+  ymuint n = end - begin;
+  assert_cond( n > 0, __FILE__, __LINE__);
+
+  if ( n == 1 ) {
+    return fanins[begin];
+  }
+
+  ymuint h = n / 2;
+  ImpNodeHandle l = make_and(fanins, begin, begin + h);
+  ImpNodeHandle r = make_and(fanins, begin + h, end);
+  ImpNode* lnode = l.node();
+  lnode->set_nfo(1);
+  ImpNode* rnode = r.node();
+  rnode->set_nfo(1);
+  ImpNode* node = new_and(l, r);
+  return ImpNodeHandle(node, false);
+}
+
+// @brief XOR ノードの木を作る．
+ImpNodeHandle
+ImpMgr::make_xor(const vector<ImpNodeHandle>& fanins,
+		 ymuint begin,
+		 ymuint end)
+{
+  ymuint n = end - begin;
+  assert_cond( n > 0, __FILE__, __LINE__);
+
+  if ( n == 1 ) {
+    return fanins[begin];
+  }
+
+  ymuint h = n / 2;
+  ImpNodeHandle l = make_xor(fanins, begin, begin + h);
+  ImpNodeHandle r = make_xor(fanins, begin + h, end);
+  ImpNode* lnode = l.node();
+  lnode->set_nfo(2);
+  ImpNode* rnode = r.node();
+  rnode->set_nfo(2);
+  ImpNode* node1 = new_and(l, ~r);
+  node1->set_nfo(1);
+  ImpNode* node2 = new_and(~l, r);
+  node2->set_nfo(1);
+  ImpNode* node = new_and(ImpNodeHandle(node1, true),
+			  ImpNodeHandle(node2, true));
+  return ImpNodeHandle(node, true);
+}
+
+// @brief 入力ノードを作る．
+// @param[in] bnode_id BNode-ID
+ImpNode*
+ImpMgr::new_input(ymuint bnode_id)
+{
+  ImpNode* node = new ImpInput();
+  reg_node(node);
+  set_bnode_id(node, false, bnode_id);
+  return node;
+}
+
+// @brief ANDノードを作る．
+// @param[in] handle0 ファンイン0のハンドル
+// @param[in] handle1 ファンイン1のハンドル
+ImpNode*
+ImpMgr::new_and(ImpNodeHandle handle0,
+		ImpNodeHandle handle1)
+{
+  ImpNode* node = new ImpAnd(handle0, handle1);
+  reg_node(node);
+  mNodeList.push_back(node);
+  return node;
+}
+
+// @brief ノードに BNode-ID を割り当てる．
+void
+ImpMgr::set_bnode_id(ImpNode* node,
+		     bool inv,
+		     ymuint bnode_id)
+{
+  node->mBNodeId = (bnode_id << 1) | static_cast<ymuint>(inv);
+  mNodeMap[bnode_id] = ImpNodeHandle(node, inv);
+}
+
+// @brief ノードを登録する．
+void
+ImpMgr::reg_node(ImpNode* node)
+{
+  node->mId = mNodeArray.size();
+  mNodeArray.push_back(node);
 }
 
 // @brief ノードに値を設定し含意操作を行う．
@@ -123,7 +252,7 @@ ImpMgr::set(const BdnMgr& src_network)
 // @param[in] val 設定する値 ( 0 or 1 )
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
-ImpMgr::assert(StrNode* node,
+ImpMgr::assert(ImpNode* node,
 	       ymuint val,
 	       vector<ImpVal>& imp_list)
 {
@@ -146,7 +275,7 @@ ImpMgr::backtrack()
   for (ymuint i = mChgStack.size(); i > pos; ) {
     -- i;
     NodeChg& nc = mChgStack[i];
-    StrNode* node = nc.mNode;
+    ImpNode* node = nc.mNode;
     node->restore(nc.mState);
     if ( node->is_unjustified() ) {
       if ( node->mListIter == mUnodeList.end() ) {
@@ -168,17 +297,17 @@ ImpMgr::backtrack()
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
-ImpMgr::fwd_prop0(StrNode* node,
+ImpMgr::fwd_prop0(ImpNode* node,
 		  vector<ImpVal>& imp_list)
 {
   if ( node->id() != mSrcId ) {
     imp_list.push_back(ImpVal(node->id(), 0));
   }
-  const vector<StrEdge*>& fo_list = node->fanout_list();
-  for (vector<StrEdge*>::const_iterator p = fo_list.begin();
+  const vector<ImpEdge*>& fo_list = node->fanout_list();
+  for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
-    StrEdge* e = *p;
-    StrNode* node = e->dst_node();
+    ImpEdge* e = *p;
+    ImpNode* node = e->dst_node();
     bool stat;
     if ( e->src_inv() ) {
       if ( e->dst_pos() == 0 ) {
@@ -209,17 +338,17 @@ ImpMgr::fwd_prop0(StrNode* node,
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
-ImpMgr::fwd_prop1(StrNode* node,
+ImpMgr::fwd_prop1(ImpNode* node,
 		  vector<ImpVal>& imp_list)
 {
   if ( node->id() != mSrcId ) {
     imp_list.push_back(ImpVal(node->id(), 1));
   }
-  const vector<StrEdge*>& fo_list = node->fanout_list();
-  for (vector<StrEdge*>::const_iterator p = fo_list.begin();
+  const vector<ImpEdge*>& fo_list = node->fanout_list();
+  for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
-    StrEdge* e = *p;
-    StrNode* node = e->dst_node();
+    ImpEdge* e = *p;
+    ImpNode* node = e->dst_node();
     bool stat;
     if ( e->src_inv() ) {
       if ( e->dst_pos() == 0 ) {
@@ -250,11 +379,11 @@ ImpMgr::fwd_prop1(StrNode* node,
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
-ImpMgr::fanin0_prop0(StrNode* node,
+ImpMgr::fanin0_prop0(ImpNode* node,
 		     vector<ImpVal>& imp_list)
 {
-  const StrEdge& e = node->fanin0();
-  StrNode* dst_node = e.src_node();
+  const ImpEdge& e = node->fanin0();
+  ImpNode* dst_node = e.src_node();
   if ( e.src_inv() ) {
     return bwd_prop1(dst_node, node, imp_list);
   }
@@ -269,11 +398,11 @@ ImpMgr::fanin0_prop0(StrNode* node,
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
-ImpMgr::fanin0_prop1(StrNode* node,
+ImpMgr::fanin0_prop1(ImpNode* node,
 		     vector<ImpVal>& imp_list)
 {
-  const StrEdge& e = node->fanin0();
-  StrNode* dst_node = e.src_node();
+  const ImpEdge& e = node->fanin0();
+  ImpNode* dst_node = e.src_node();
   if ( e.src_inv() ) {
     return bwd_prop0(dst_node, node, imp_list);
   }
@@ -288,11 +417,11 @@ ImpMgr::fanin0_prop1(StrNode* node,
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
-ImpMgr::fanin1_prop0(StrNode* node,
+ImpMgr::fanin1_prop0(ImpNode* node,
 		     vector<ImpVal>& imp_list)
 {
-  const StrEdge& e = node->fanin1();
-  StrNode* dst_node = e.src_node();
+  const ImpEdge& e = node->fanin1();
+  ImpNode* dst_node = e.src_node();
   if ( e.src_inv() ) {
     return bwd_prop1(dst_node, node, imp_list);
   }
@@ -307,11 +436,11 @@ ImpMgr::fanin1_prop0(StrNode* node,
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
-ImpMgr::fanin1_prop1(StrNode* node,
+ImpMgr::fanin1_prop1(ImpNode* node,
 		     vector<ImpVal>& imp_list)
 {
-  const StrEdge& e = node->fanin1();
-  StrNode* dst_node = e.src_node();
+  const ImpEdge& e = node->fanin1();
+  ImpNode* dst_node = e.src_node();
   if ( e.src_inv() ) {
     return bwd_prop0(dst_node, node, imp_list);
   }
@@ -327,15 +456,15 @@ ImpMgr::fanin1_prop1(StrNode* node,
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
-ImpMgr::bwd_prop0(StrNode* node,
-		  StrNode* from_node,
+ImpMgr::bwd_prop0(ImpNode* node,
+		  ImpNode* from_node,
 		  vector<ImpVal>& imp_list)
 {
-  const vector<StrEdge*>& fo_list = node->fanout_list();
-  for (vector<StrEdge*>::const_iterator p = fo_list.begin();
+  const vector<ImpEdge*>& fo_list = node->fanout_list();
+  for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
-    StrEdge* e = *p;
-    StrNode* dst_node = e->dst_node();
+    ImpEdge* e = *p;
+    ImpNode* dst_node = e->dst_node();
     if ( dst_node == from_node ) continue;
     bool stat;
     if ( e->src_inv() ) {
@@ -371,15 +500,15 @@ ImpMgr::bwd_prop0(StrNode* node,
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
-ImpMgr::bwd_prop1(StrNode* node,
-		  StrNode* from_node,
+ImpMgr::bwd_prop1(ImpNode* node,
+		  ImpNode* from_node,
 		  vector<ImpVal>& imp_list)
 {
-  const vector<StrEdge*>& fo_list = node->fanout_list();
-  for (vector<StrEdge*>::const_iterator p = fo_list.begin();
+  const vector<ImpEdge*>& fo_list = node->fanout_list();
+  for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
-    StrEdge* e = *p;
-    StrNode* dst_node = e->dst_node();
+    ImpEdge* e = *p;
+    ImpNode* dst_node = e->dst_node();
     if ( dst_node == from_node ) continue;
     bool stat;
     if ( e->src_inv() ) {
@@ -410,7 +539,7 @@ ImpMgr::bwd_prop1(StrNode* node,
 
 // @brief unjustified ノードを得る．
 void
-ImpMgr::get_unodelist(vector<StrNode*>& unode_list)
+ImpMgr::get_unodelist(vector<ImpNode*>& unode_list)
 {
   unode_list.clear();
   unode_list.reserve(mUnodeList.size());
@@ -419,7 +548,7 @@ ImpMgr::get_unodelist(vector<StrNode*>& unode_list)
   vector<bool> umark(n, false);
   ymuint c = 0;
   for (ymuint i = 0; i < n; ++ i) {
-    StrNode* node = mNodeArray[i];
+    ImpNode* node = mNodeArray[i];
     if ( node == NULL ) continue;
     if ( node->is_unjustified() ) {
       umark[i] = true;
@@ -431,9 +560,9 @@ ImpMgr::get_unodelist(vector<StrNode*>& unode_list)
     error = true;
   }
   else {
-    for (vector<StrNode*>::iterator p = unode_list.begin();
+    for (vector<ImpNode*>::iterator p = unode_list.begin();
 	 p != unode_list.end(); ++ p) {
-      StrNode* node = *p;
+      ImpNode* node = *p;
       if ( !node->is_unjustified() ) {
 	error = true;
 	break;
@@ -443,7 +572,7 @@ ImpMgr::get_unodelist(vector<StrNode*>& unode_list)
   if ( error ) {
     cout << "Error in ImpMgr::get_unode_list()" << endl;
     cout << "mUnodeList";
-    for (list<StrNode*>::iterator p = mUnodeList.begin();
+    for (list<ImpNode*>::iterator p = mUnodeList.begin();
 	 p != mUnodeList.end(); ++ p) {
       cout << " " << (*p)->id();
     }
@@ -461,7 +590,7 @@ ImpMgr::get_unodelist(vector<StrNode*>& unode_list)
 
 // @brief ノードが unjustified になったときの処理を行なう．
 void
-ImpMgr::set_unjustified(StrNode* node)
+ImpMgr::set_unjustified(ImpNode* node)
 {
   assert_cond( node->mListIter == mUnodeList.end(), __FILE__, __LINE__);
   mUnodeList.push_back(node);
@@ -471,7 +600,7 @@ ImpMgr::set_unjustified(StrNode* node)
 
 // @brief ノードが unjustified でなくなったときの処理を行なう．
 void
-ImpMgr::reset_unjustified(StrNode* node)
+ImpMgr::reset_unjustified(ImpNode* node)
 {
   mUnodeList.erase(node->mListIter);
   node->mListIter = mUnodeList.end();
@@ -481,7 +610,7 @@ ImpMgr::reset_unjustified(StrNode* node)
 // @param[in] node ノード
 // @param[in] old_state 変更前の値
 void
-ImpMgr::save_value(StrNode* node,
+ImpMgr::save_value(ImpNode* node,
 		   ymuint32 old_state)
 {
   ymuint cur_level = mMarkerStack.size();
@@ -497,7 +626,7 @@ ImpMgr::print_network(ostream& s) const
 {
   ymuint n = mNodeArray.size();
   for (ymuint i = 0; i < n; ++ i) {
-    StrNode* node = mNodeArray[i];
+    ImpNode* node = mNodeArray[i];
     if ( node == NULL ) continue;
     cout << "Node#" << node->id() << ":";
     if ( node->is_input() ) {
@@ -506,19 +635,16 @@ ImpMgr::print_network(ostream& s) const
     else if ( node->is_and() ) {
       cout << "AND";
     }
-    else if ( node->is_xor() ) {
-      cout << "XOR";
-    }
     cout << endl;
 
-    if ( node->is_and() || node->is_xor() ) {
-      const StrEdge& e0 = node->fanin0();
+    if ( node->is_and() ) {
+      const ImpEdge& e0 = node->fanin0();
       cout << "  Fanin0: " << e0.src_node()->id();
       if ( e0.src_inv() ) {
 	cout << "~";
       }
       cout << endl;
-      const StrEdge& e1 = node->fanin1();
+      const ImpEdge& e1 = node->fanin1();
       cout << "  Fanin1: " << e1.src_node()->id();
       if ( e1.src_inv() ) {
 	cout << "~";
@@ -527,10 +653,10 @@ ImpMgr::print_network(ostream& s) const
     }
 
     cout << "  Fanouts: ";
-    const vector<StrEdge*>& fo_list = node->fanout_list();
-    for (vector<StrEdge*>::const_iterator p = fo_list.begin();
+    const vector<ImpEdge*>& fo_list = node->fanout_list();
+    for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
 	 p != fo_list.end(); ++ p ) {
-      StrEdge* e = *p;
+      ImpEdge* e = *p;
       cout << " (" << e->dst_node()->id() << ", " << e->dst_pos() << ")";
     }
     cout << endl;
@@ -541,18 +667,18 @@ ImpMgr::print_network(ostream& s) const
 void
 ImpMgr::random_sim()
 {
-  for (vector<StrNode*>::iterator p = mInputArray.begin();
+  for (vector<ImpNode*>::iterator p = mInputArray.begin();
        p != mInputArray.end(); ++ p) {
-    StrNode* node = *p;
+    ImpNode* node = *p;
     ymuint64 val0 = mRandGen.int32();
     ymuint64 val1 = mRandGen.int32();
     ymuint64 bitval = (val0 << 32) | val1;
     node->set_bitval(bitval);
   }
 
-  for (vector<StrNode*>::iterator p = mNodeList.begin();
+  for (vector<ImpNode*>::iterator p = mNodeList.begin();
        p != mNodeList.end(); ++ p) {
-    StrNode* node = *p;
+    ImpNode* node = *p;
     node->calc_bitval();
   }
 }

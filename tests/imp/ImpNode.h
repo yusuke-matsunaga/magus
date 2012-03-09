@@ -1,8 +1,8 @@
-#ifndef STRNODE_H
-#define STRNODE_H
+#ifndef IMPNODE_H
+#define IMPNODE_H
 
-/// @file StrNode.h
-/// @brief StrNode のヘッダファイル
+/// @file ImpNode.h
+/// @brief ImpNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -16,32 +16,115 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-class StrNode;
+class ImpNode;
 class ImpMgr;
 
 //////////////////////////////////////////////////////////////////////
-/// @class StrEdge StrNode.h "StrNode.h"
-/// @brief StrNode の間の枝を表すクラス
+/// @class ImpNodeHandle ImpNode.h "ImpNode.h"
+/// @brief ImpNode と極性の対を表すクラス
 //////////////////////////////////////////////////////////////////////
-class StrEdge
+class ImpNodeHandle
+{
+public:
+
+  /// @brief 空のコンストラクタ
+  ImpNodeHandle();
+
+  /// @brief 値を指定したコンストラクタ
+  /// @param[in] node ノード
+  /// @param[in] inv 反転属性 (true で反転)
+  ImpNodeHandle(ImpNode* node,
+		bool inv);
+
+  /// @brief デストラクタ
+  ~ImpNodeHandle();
+
+  /// @brief 値をセットする．
+  /// @param[in] node ノード
+  /// @param[in] inv 反転属性 (true で反転)
+  void
+  set(ImpNode* node,
+      bool inv);
+
+  /// @brief 定数0を作る．
+  static
+  ImpNodeHandle
+  make_zero();
+
+  /// @brief 定数1を作る．
+  static
+  ImpNodeHandle
+  make_one();
+
+
+public:
+
+  /// @brief 否定したハンドルを返す．
+  ImpNodeHandle
+  operator~() const;
+
+  /// @brief ノードを得る．
+  ImpNode*
+  node() const;
+
+  /// @brief 反転属性を得る．
+  bool
+  inv() const;
+
+  /// @brief 定数0を表している時 true を返す．
+  bool
+  is_zero() const;
+
+  /// @brief 定数1を表している時 true を返す．
+  bool
+  is_one() const;
+
+  /// @brief 定数を表している時 true を返す．
+  bool
+  is_const() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容を直接指定したコンストラクタ
+  ImpNodeHandle(ympuint data);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ポインタと極性をパックしたもの
+  ympuint mBody;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class ImpEdge ImpNode.h "ImpNode.h"
+/// @brief ImpNode の間の枝を表すクラス
+//////////////////////////////////////////////////////////////////////
+class ImpEdge
 {
 public:
 
   /// @brief コンストラクタ
-  StrEdge();
+  ImpEdge();
 
   /// @brief デストラクタ
-  ~StrEdge();
+  ~ImpEdge();
 
   /// @brief 設定する．
-  /// @param[in] src_node 入力元のノード
-  /// @param[in] inv 極性
+  /// @param[in] src 入力元のハンドル
   /// @param[in] dst_node 出力先のノード
-  /// @param[in] dst_pos 出力先のファンイン番号(0 or 1)
+  /// @param[in] dst_pos 出力先のファンイン番号 ( 0 or 1 )
   void
-  set(StrNode* src_node,
-      bool inv,
-      StrNode* dst_node,
+  set(ImpNodeHandle src,
+      ImpNode* dst_node,
       ymuint dst_pos);
 
 
@@ -50,16 +133,20 @@ public:
   // 情報を取り出す関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 入力元のハンドルを返す．
+  ImpNodeHandle
+  src() const;
+
   /// @brief 入力元のノードを返す．
-  StrNode*
+  ImpNode*
   src_node() const;
 
-  /// @brief 極性を返す．
+  /// @brief 入力元の反転属性を返す．
   bool
   src_inv() const;
 
   /// @brief 出力先のノードを返す．
-  StrNode*
+  ImpNode*
   dst_node() const;
 
   /// @brief 出力先のファンイン番号を返す．
@@ -72,8 +159,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 入力元のノード + 極性情報
-  ympuint mSrcInfo;
+  // 入力元のハンドル
+  ImpNodeHandle mSrc;
 
   // 出力先のノード + ファンイン番号
   ympuint mDstInfo;
@@ -82,30 +169,24 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class StrNode StrNode.h "StrNode.h"
+/// @class ImpNode ImpNode.h "ImpNode.h"
 /// @brief StrImp で用いられるノード
 //////////////////////////////////////////////////////////////////////
-class StrNode
+class ImpNode
 {
   friend class ImpMgr;
 
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  /// @param[in] node0 ファンイン0のノード
-  /// @param[in] inv0 ファンイン0の極性
-  /// @param[in] node1 ファンイン1のノード
-  /// @param[in] inv1 ファンイン1の極性
-  StrNode(ymuint id,
-	  StrNode* node0,
-	  bool inv0,
-	  StrNode* node1,
-	  bool inv1);
+  /// @param[in] handle0 ファンイン0のハンドル
+  /// @param[in] handle1 ファンイン1のハンドル
+  ImpNode(ImpNodeHandle handle0,
+	  ImpNodeHandle handle1);
 
   /// @brief デストラクタ
   virtual
-  ~StrNode();
+  ~ImpNode();
 
 
 public:
@@ -123,6 +204,14 @@ public:
   // 内容を取り出す関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief BNode の ID 番号を返す．
+  ymuint
+  bnode_id() const;
+
+  /// @brief BNode の極性を返す．
+  bool
+  bnode_inv() const;
+
   /// @brief ID 番号を返す．
   ymuint
   id() const;
@@ -137,21 +226,16 @@ public:
   bool
   is_and() const;
 
-  /// @brief XOR タイプのときに true を返す．
-  virtual
-  bool
-  is_xor() const;
-
   /// @brief ファンイン0の枝を返す．
-  const StrEdge&
+  const ImpEdge&
   fanin0() const;
 
   /// @brief ファンイン1の枝を返す．
-  const StrEdge&
+  const ImpEdge&
   fanin1() const;
 
   /// @brief ファンアウトの枝のリストを返す．
-  const vector<StrEdge*>&
+  const vector<ImpEdge*>&
   fanout_list() const;
 
   /// @brief 出力値を返す．
@@ -270,14 +354,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // BNode のID番号
+  ymuint32 mBNodeId;
+
   // ID番号
   ymuint32 mId;
 
   // ファンインの枝
-  StrEdge mFanins[2];
+  ImpEdge mFanins[2];
 
   // ファンアウトの枝のリスト
-  vector<StrEdge*> mFanouts;
+  vector<ImpEdge*> mFanouts;
 
   // ビットベクタ値
   ymuint64 mBitVal;
@@ -286,7 +373,7 @@ private:
   ymuint32 mStackLevel;
 
   // ImpMgr::mUnodeList 中の位置を示す反復子
-  list<StrNode*>::iterator mListIter;
+  list<ImpNode*>::iterator mListIter;
 
 };
 
@@ -295,62 +382,173 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
+// @brief 空のコンストラクタ
 inline
-StrEdge::StrEdge()
+ImpNodeHandle::ImpNodeHandle()
+{
+  mBody = 0UL;
+}
+
+// @brief 値を指定したコンストラクタ
+// @param[in] node ノード
+// @param[in] inv 反転属性 (true で反転)
+inline
+ImpNodeHandle::ImpNodeHandle(ImpNode* node,
+			     bool inv)
+{
+  set(node, inv);
+}
+
+// @brief 内容を直接指定したコンストラクタ
+inline
+ImpNodeHandle::ImpNodeHandle(ympuint data) :
+  mBody(data)
 {
 }
 
 // @brief デストラクタ
 inline
-StrEdge::~StrEdge()
+ImpNodeHandle::~ImpNodeHandle()
+{
+}
+
+// @brief 値をセットする．
+// @param[in] node ノード
+// @param[in] inv 反転属性 (true で反転)
+inline
+void
+ImpNodeHandle::set(ImpNode* node,
+		   bool inv)
+{
+  mBody = reinterpret_cast<ympuint>(node) | inv;
+}
+
+// @brief 定数0を作る．
+inline
+ImpNodeHandle
+ImpNodeHandle::make_zero()
+{
+  return ImpNodeHandle(0ULL);
+}
+
+// @brief 定数1を作る．
+inline
+ImpNodeHandle
+ImpNodeHandle::make_one()
+{
+  return ImpNodeHandle(1ULL);
+}
+
+// @brief 否定したハンドルを返す．
+inline
+ImpNodeHandle
+ImpNodeHandle::operator~() const
+{
+  return ImpNodeHandle(mBody ^ 1ULL);
+}
+
+// @brief ノードを得る．
+inline
+ImpNode*
+ImpNodeHandle::node() const
+{
+  return reinterpret_cast<ImpNode*>(mBody & ~1ULL);
+}
+
+// @brief 反転属性を得る．
+inline
+bool
+ImpNodeHandle::inv() const
+{
+  return static_cast<bool>(mBody & 1ULL);
+}
+
+// @brief 定数0を表している時 true を返す．
+inline
+bool
+ImpNodeHandle::is_zero() const
+{
+  return mBody == 0ULL;
+}
+
+// @brief 定数1を表している時 true を返す．
+inline
+bool
+ImpNodeHandle::is_one() const
+{
+  return mBody == 1ULL;
+}
+
+// @brief 定数を表している時 true を返す．
+inline
+bool
+ImpNodeHandle::is_const() const
+{
+  return (mBody & ~0ULL) == 0ULL;
+}
+
+// @brief コンストラクタ
+inline
+ImpEdge::ImpEdge()
+{
+}
+
+// @brief デストラクタ
+inline
+ImpEdge::~ImpEdge()
 {
 }
 
 // @brief 設定する．
-// @param[in] src_node 入力元のノード
-// @param[in] inv 極性
+// @param[in] src 入力元のハンドル
 // @param[in] dst_node 出力先のノード
 // @param[in] dst_pos 出力先のファンイン番号(0 or 1)
 inline
 void
-StrEdge::set(StrNode* src_node,
-	     bool inv,
-	     StrNode* dst_node,
+ImpEdge::set(ImpNodeHandle src,
+	     ImpNode* dst_node,
 	     ymuint dst_pos)
 {
-  mSrcInfo = reinterpret_cast<ympuint>(src_node) | static_cast<ympuint>(inv);
+  mSrc = src;
   mDstInfo = reinterpret_cast<ympuint>(dst_node) | (dst_pos & 1U);
+}
+
+// @brief 入力元のハンドルを返す．
+inline
+ImpNodeHandle
+ImpEdge::src() const
+{
+  return mSrc;
 }
 
 // @brief 入力元のノードを返す．
 inline
-StrNode*
-StrEdge::src_node() const
+ImpNode*
+ImpEdge::src_node() const
 {
-  return reinterpret_cast<StrNode*>(mSrcInfo & ~1UL);
+  return mSrc.node();
 }
 
 // @brief 極性を返す．
 inline
 bool
-StrEdge::src_inv() const
+ImpEdge::src_inv() const
 {
-  return static_cast<bool>(mSrcInfo & 1UL);
+  return mSrc.inv();
 }
 
 // @brief 出力先のノードを返す．
 inline
-StrNode*
-StrEdge::dst_node() const
+ImpNode*
+ImpEdge::dst_node() const
 {
-  return reinterpret_cast<StrNode*>(mDstInfo & ~1UL);
+  return reinterpret_cast<ImpNode*>(mDstInfo & ~1UL);
 }
 
 // @brief 出力先のファンイン番号を返す．
 inline
 ymuint
-StrEdge::dst_pos() const
+ImpEdge::dst_pos() const
 {
   return static_cast<ymuint>(mDstInfo & 1UL);
 }
@@ -358,39 +556,55 @@ StrEdge::dst_pos() const
 // @brief ファンアウト数を設定する．
 inline
 void
-StrNode::set_nfo(ymuint n)
+ImpNode::set_nfo(ymuint n)
 {
   mFanouts.reserve(n);
+}
+
+// @brief BNode の ID 番号を返す．
+inline
+ymuint
+ImpNode::bnode_id() const
+{
+  return mBNodeId >> 1;
+}
+
+// @brief BNode の極性を返す．
+inline
+bool
+ImpNode::bnode_inv() const
+{
+  return static_cast<bool>(mBNodeId & 1U);
 }
 
 // @brief ID 番号を返す．
 inline
 ymuint
-StrNode::id() const
+ImpNode::id() const
 {
   return mId;
 }
 
 // @brief ファンイン0の枝を返す．
 inline
-const StrEdge&
-StrNode::fanin0() const
+const ImpEdge&
+ImpNode::fanin0() const
 {
   return mFanins[0];
 }
 
 // @brief ファンイン1の枝を返す．
 inline
-const StrEdge&
-StrNode::fanin1() const
+const ImpEdge&
+ImpNode::fanin1() const
 {
   return mFanins[1];
 }
 
 // @brief ファンアウトの枝のリストを返す．
 inline
-const vector<StrEdge*>&
-StrNode::fanout_list() const
+const vector<ImpEdge*>&
+ImpNode::fanout_list() const
 {
   return mFanouts;
 }
@@ -398,7 +612,7 @@ StrNode::fanout_list() const
 // @brief ビットベクタ値を返す．
 inline
 ymuint64
-StrNode::bitval() const
+ImpNode::bitval() const
 {
   return mBitVal;
 }
@@ -406,11 +620,11 @@ StrNode::bitval() const
 // @brief ビットベクタ値を設定する．
 inline
 void
-StrNode::set_bitval(ymuint64 bitval)
+ImpNode::set_bitval(ymuint64 bitval)
 {
   mBitVal = bitval;
 }
 
 END_NAMESPACE_YM_NETWORKS
 
-#endif // STRNODE_H
+#endif // IMPNODE_H

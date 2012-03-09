@@ -9,17 +9,19 @@
 /// All rights reserved.
 
 
-#include "ImpBase.h"
+#include "ym_networks/BNetwork.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
+
+class ImpMgr;
+class ImpInfo;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CnfImp CnfImp.h "CnfImp.h"
 /// @brief CNFを用いた間接含意エンジン
 //////////////////////////////////////////////////////////////////////
-class CnfImp :
-  public ImpBase
+class CnfImp
 {
 public:
 
@@ -41,7 +43,7 @@ public:
   /// @param[in] imp_info 間接含意のリスト
   virtual
   void
-  learning(const BdnMgr& network,
+  learning(ImpMgr& imp_mgr,
 	   ImpInfo& imp_info);
 
 

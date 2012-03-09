@@ -10,14 +10,9 @@
 #include "RlImp.h"
 #include "StrImp.h"
 #include "ImpMgr.h"
-#include "StrNode.h"
-#include "SnInput.h"
-#include "SnAnd.h"
-#include "SnXor.h"
+#include "ImpNode.h"
 #include "ImpInfo.h"
 #include "ImpList.h"
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnNode.h"
 #include "ym_logic/SatSolver.h"
 
 
@@ -52,32 +47,27 @@ RlImp::set_learning_level(ymuint level)
 }
 
 // @brief ネットワーク中の間接含意を求める．
-// @param[in] network 対象のネットワーク
+// @param[in] imp_mgr マネージャ
 // @param[in] imp_info 間接含意のリスト
 void
-RlImp::learning(const BdnMgr& network,
+RlImp::learning(ImpMgr& imp_mgr,
 		ImpInfo& imp_info)
 {
-  ymuint n = network.max_node_id();
+  ymuint n = imp_mgr.max_node_id();
 
   imp_info.set_size(n);
 
-  // BDN の情報を ImpMgr にコピーする．
-  ImpMgr imp_mgr;
-  imp_mgr.set(network);
-
-#if 0
-  imp_mgr.print_network(cout);
-#endif
-
   for (ymuint i = 0; i < n; ++ i) {
-    StrNode* node = imp_mgr.node(i);
-    if ( node == NULL ) continue;
+    ImpNodeHandle handle = imp_mgr.node_handle(i);
+    if ( handle.is_const() ) continue;
 
+    ImpNode* node = handle.node();
+    bool inv = handle.inv();
     ymuint src_id = node->id();
 
     // node に値を割り当てる．
     for (ymuint val = 0; val < 2; ++ val) {
+      ymuint c_val = val ^ static_cast<ymuint>(inv);
       vector<ImpVal> imp_list;
       bool ok = make_all_implication(imp_mgr, node, val, mLevel, imp_list);
       if ( ok ) {
@@ -186,7 +176,7 @@ RlImp::learning(const BdnMgr& network,
 // @param[in] imp_list 含意のリスト
 bool
 RlImp::make_all_implication(ImpMgr& imp_mgr,
-			    StrNode* node,
+			    ImpNode* node,
 			    ymuint val,
 			    ymuint level,
 			    vector<ImpVal>& imp_list)
@@ -213,13 +203,13 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
 
   if ( ok ) {
     if ( level > 0 ) {
-      vector<StrNode*> unode_list;
+      vector<ImpNode*> unode_list;
       imp_mgr.get_unodelist(unode_list);
       // 共通の割り当てを調べるための配列
       vector<bool> vmark(imp_mgr.max_node_id(), false);
-      for (vector<StrNode*>::iterator p = unode_list.begin();
+      for (vector<ImpNode*>::iterator p = unode_list.begin();
 	   p != unode_list.end(); ++ p) {
-	StrNode* unode = *p;
+	ImpNode* unode = *p;
 
 	if ( debug ) {
 	  cout << "Unode: Node#" << unode->id() << endl;
@@ -231,7 +221,7 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
 	vector<ymuint> common_list;
 	for (ymuint i = 0; i < np; ++ i) {
 	  ImpVal imp = unode->get_justification(i);
-	  StrNode* inode = imp_mgr.node(imp.id());
+	  ImpNode* inode = imp_mgr.node(imp.id());
 	  ymuint ival = imp.val();
 
 	  if ( debug ) {
