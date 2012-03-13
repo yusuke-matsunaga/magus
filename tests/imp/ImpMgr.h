@@ -11,7 +11,8 @@
 
 #include "ym_networks/BNetwork.h"
 #include "ImpNode.h"
-#include "ImpVal.h"
+#include "ImpDst.h"
+#include "BNodeMap.h"
 #include "ym_utils/RandGen.h"
 
 
@@ -37,15 +38,23 @@ public:
   // 情報を取り出す関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief BNode 番号の最大値+1を得る．
+  /// @brief ノード数 (ノード番号の最大値+1) を得る
   ymuint
-  max_bnode_id() const;
+  node_num() const;
 
-  /// @brief BNode に対応するハンドルを得る．
-  /// @param[in] id BNode のノード番号 ( 0 <= id < max_bnode_id() )
-  /// @note 場合によっては NULL が返ることもある
-  ImpNodeHandle
-  bnode_handle(ymuint id) const;
+  /// @brief ノードを取り出す．
+  /// @param[in] id ノード番号
+  ImpNode*
+  node(ymuint id) const;
+
+  /// @brief トポロジカル順のノードリストを得る．
+  /// @param[out] node_list 結果を格納する変数
+  void
+  get_node_list(vector<ImpNode*>& node_list) const;
+
+  /// @brief BNode との対応付けの情報を返す．
+  const BNodeMap&
+  bnodemap() const;
 
   /// @brief 内容を書き出す．
   void
@@ -81,7 +90,7 @@ public:
   bool
   assert(ImpNode* node,
 	 ymuint val,
-	 vector<ImpVal>& imp_list);
+	 vector<ImpDst>& imp_list);
 
   /// @brief 指定されたところまで値を戻す．
   void
@@ -94,7 +103,7 @@ public:
   /// @retval false 矛盾が発生した．
   bool
   fwd_prop0(ImpNode* node,
-	    vector<ImpVal>& imp_list);
+	    vector<ImpDst>& imp_list);
 
   /// @brief ノードのファンアウト先に1を伝搬する．
   /// @param[in] node ノード
@@ -103,7 +112,7 @@ public:
   /// @retval false 矛盾が発生した．
   bool
   fwd_prop1(ImpNode* node,
-	    vector<ImpVal>& imp_list);
+	    vector<ImpDst>& imp_list);
 
   /// @brief ノードのファンイン0に0を伝搬する．
   /// @param[in] node ノード
@@ -112,7 +121,7 @@ public:
   /// @retval false 矛盾が発生した．
   bool
   fanin0_prop0(ImpNode* node,
-	       vector<ImpVal>& imp_list);
+	       vector<ImpDst>& imp_list);
 
   /// @brief ノードのファンイン0に1を伝搬する．
   /// @param[in] node ノード
@@ -121,7 +130,7 @@ public:
   /// @retval false 矛盾が発生した．
   bool
   fanin0_prop1(ImpNode* node,
-	       vector<ImpVal>& imp_list);
+	       vector<ImpDst>& imp_list);
 
   /// @brief ノードのファンイン1に0を伝搬する．
   /// @param[in] node ノード
@@ -130,7 +139,7 @@ public:
   /// @retval false 矛盾が発生した．
   bool
   fanin1_prop0(ImpNode* node,
-	       vector<ImpVal>& imp_list);
+	       vector<ImpDst>& imp_list);
 
   /// @brief ノードのファンイン1に1を伝搬する．
   /// @param[in] node ノード
@@ -139,7 +148,7 @@ public:
   /// @retval false 矛盾が発生した．
   bool
   fanin1_prop1(ImpNode* node,
-	       vector<ImpVal>& imp_list);
+	       vector<ImpDst>& imp_list);
 
   /// @brief ノードに後方含意で0を割り当てる．
   /// @param[in] node ノード
@@ -150,7 +159,7 @@ public:
   bool
   bwd_prop0(ImpNode* node,
 	    ImpNode* from_node,
-	    vector<ImpVal>& imp_list);
+	    vector<ImpDst>& imp_list);
 
   /// @brief ノードに後方含意で1を割り当てる．
   /// @param[in] node ノード
@@ -161,7 +170,7 @@ public:
   bool
   bwd_prop1(ImpNode* node,
 	    ImpNode* from_node,
-	    vector<ImpVal>& imp_list);
+	    vector<ImpDst>& imp_list);
 
   /// @brief unjustified ノードを得る．
   void
@@ -222,9 +231,8 @@ private:
 	   ymuint end);
 
   /// @brief 入力ノードを作る．
-  /// @param[in] bnode_id BNode-ID
   ImpNode*
-  new_input(ymuint bnode_id);
+  new_input();
 
   /// @brief ANDノードを作る．
   /// @param[in] handle0 ファンイン0のハンドル
@@ -271,14 +279,14 @@ private:
   // 入力の配列
   vector<ImpNode*> mInputArray;
 
-  // トポロジカル順に並べたノードのリスト
+  // トポロジカル順に並べたANDノードのリスト
   vector<ImpNode*> mNodeList;
 
   // ImpNode のID番号をキーにしたノードの配列
   vector<ImpNode*> mNodeArray;
 
-  // もとの BNode のID番号をキーにしたハンドルの配列
-  vector<ImpNodeHandle> mNodeMap;
+  // BNode と ImpNode の対応付けの情報を持つオブジェクト
+  BNodeMap mBNodeMap;
 
   // 現在のソースノードの番号
   ymuint32 mSrcId;
@@ -302,22 +310,39 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief ノード番号の最大値+1を得る．
+// @brief ノード数 (ノード番号の最大値+1) を得る
 inline
 ymuint
-ImpMgr::max_bnode_id() const
+ImpMgr::node_num() const
 {
-  return mNodeMap.size();
+  return mNodeArray.size();
 }
 
-// @brief ノードを得る．
-// @param[in] id ノード番号 ( 0 <= id < max_node_id() )
+// @brief ノードを取り出す．
+// @param[in] id ノード番号
 inline
-ImpNodeHandle
-ImpMgr::bnode_handle(ymuint id) const
+ImpNode*
+ImpMgr::node(ymuint id) const
 {
-  assert_cond( id < max_bnode_id(), __FILE__, __LINE__);
-  return mNodeMap[id];
+  assert_cond( id < mNodeArray.size(), __FILE__, __LINE__);
+  return mNodeArray[id];
+}
+
+// @brief トポロジカル順のノードリストを得る．
+// @param[out] node_list 結果を格納する変数
+inline
+void
+ImpMgr::get_node_list(vector<ImpNode*>& node_list) const
+{
+  node_list = mNodeList;
+}
+
+// @brief BNode との対応付けの情報を返す．
+inline
+const BNodeMap&
+ImpMgr::bnodemap() const
+{
+  return mBNodeMap;
 }
 
 // @brief コンストラクタ

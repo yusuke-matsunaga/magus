@@ -10,12 +10,14 @@
 
 
 #include "ym_networks/BNetwork.h"
+#include "ImpDst.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
 class ImpMgr;
 class ImpInfo;
+class ImpNode;
 
 //////////////////////////////////////////////////////////////////////
 /// @class RlImp RlImp.h "RlImp.h"
@@ -67,7 +69,7 @@ private:
 		       ImpNode* node,
 		       ymuint val,
 		       ymuint level,
-		       vector<ImpVal>& imp_list);
+		       vector<ImpDst>& imp_list);
 
 
 private:

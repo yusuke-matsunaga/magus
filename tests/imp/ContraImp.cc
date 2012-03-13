@@ -40,7 +40,7 @@ ContraImp::learning(ImpMgr& imp_mgr,
 		    const ImpInfo& direct_imp,
 		    ImpInfo& imp_info)
 {
-  ymuint n = imp_mgr.max_bnode_id();
+  ymuint n = imp_mgr.node_num();
 
   imp_info.set_size(n);
 

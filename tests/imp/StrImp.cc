@@ -36,22 +36,24 @@ void
 StrImp::learning(ImpMgr& imp_mgr,
 		 ImpInfo& imp_info)
 {
-  ymuint n = imp_mgr.max_bnode_id();
+  ymuint n = imp_mgr.node_num();
 
   imp_info.set_size(n);
 
-  for (ymuint i = 0; i < n; ++ i) {
-    ImpNodeHandle handle = imp_mgr.bnode_handle(i);
-    if ( handle.is_const() ) continue;
-
-    ImpNode* node = handle.node();
-    ymuint src_id = node->id();
+  for (ymuint src_id = 0; src_id < n; ++ src_id) {
+    ImpNode* node = imp_mgr.node(src_id);
 
     // node に 0 を割り当てる．
-    vector<ImpVal> imp_list0;
+    vector<ImpDst> imp_list0;
     bool ok0 = imp_mgr.assert(node, 0, imp_list0);
     if ( ok0 ) {
-      imp_info.put(src_id, 0, imp_list0);
+      for (vector<ImpDst>::iterator p = imp_list0.begin();
+	   p != imp_list0.end(); ++ p) {
+	const ImpDst& imp = *p;
+	ImpNode* dst_node = imp.node();
+	ymuint dst_id = dst_node->id();
+	imp_info.put(src_id, 0, dst_id, imp.val());
+      }
     }
     else {
       // 単一の割り当てで矛盾が起こった．
@@ -60,10 +62,16 @@ StrImp::learning(ImpMgr& imp_mgr,
     imp_mgr.backtrack();
 
     // node に 1 を割り当てる．
-    vector<ImpVal> imp_list1;
+    vector<ImpDst> imp_list1;
     bool ok1 = imp_mgr.assert(node, 1, imp_list1);
     if ( ok1 ) {
-      imp_info.put(src_id, 1, imp_list1);
+      for (vector<ImpDst>::iterator p = imp_list1.begin();
+	   p != imp_list1.end(); ++ p) {
+	const ImpDst& imp = *p;
+	ImpNode* dst_node = imp.node();
+	ymuint dst_id = dst_node->id();
+	imp_info.put(src_id, 1, dst_id, imp.val());
+      }
     }
     else {
       // 単一の割り当てで矛盾が起こった．

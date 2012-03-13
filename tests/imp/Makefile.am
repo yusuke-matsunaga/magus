@@ -27,6 +27,8 @@ imp_CPPFLAGS = \
 
 imp_SOURCES = \
 	imp.cc \
+	BNodeMap.h \
+	BNodeMap.cc \
 	ImpVal.h \
 	ImpCell.h \
 	ImpList.h \

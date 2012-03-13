@@ -12,6 +12,7 @@
 #include "ym_networks/BdnMgr.h"
 #include "ym_logic/Bool3.h"
 #include "ImpInfo.h"
+#include "ImpDst.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -204,14 +205,6 @@ public:
   // 内容を取り出す関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief BNode の ID 番号を返す．
-  ymuint
-  bnode_id() const;
-
-  /// @brief BNode の極性を返す．
-  bool
-  bnode_inv() const;
-
   /// @brief ID 番号を返す．
   ymuint
   id() const;
@@ -297,7 +290,7 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < justification_num() )
   /// @return 値割り当て
   virtual
-  ImpVal
+  ImpDst
   get_justification(ymuint pos) = 0;
 
   /// @brief ファンイン0を0にする．
@@ -306,7 +299,7 @@ public:
   virtual
   bool
   fwd0_imp0(ImpMgr& mgr,
-	    vector<ImpVal>& imp_list) = 0;
+	    vector<ImpDst>& imp_list) = 0;
 
   /// @brief ファンイン0を1にする．
   /// @param[in] mgr ImMgr
@@ -314,7 +307,7 @@ public:
   virtual
   bool
   fwd0_imp1(ImpMgr& mgr,
-	    vector<ImpVal>& imp_list) = 0;
+	    vector<ImpDst>& imp_list) = 0;
 
   /// @brief ファンイン1を0にする．
   /// @param[in] mgr ImMgr
@@ -322,7 +315,7 @@ public:
   virtual
   bool
   fwd1_imp0(ImpMgr& mgr,
-	    vector<ImpVal>& imp_list) = 0;
+	    vector<ImpDst>& imp_list) = 0;
 
   /// @brief ファンイン1を1にする．
   /// @param[in] mgr ImMgr
@@ -330,7 +323,7 @@ public:
   virtual
   bool
   fwd1_imp1(ImpMgr& mgr,
-	    vector<ImpVal>& imp_list) = 0;
+	    vector<ImpDst>& imp_list) = 0;
 
   /// @brief 出力を0にする．
   /// @param[in] mgr ImMgr
@@ -338,7 +331,7 @@ public:
   virtual
   bool
   bwd_imp0(ImpMgr& mgr,
-	   vector<ImpVal>& imp_list) = 0;
+	   vector<ImpDst>& imp_list) = 0;
 
   /// @brief 出力を1にする．
   /// @param[in] mgr ImMgr
@@ -346,16 +339,13 @@ public:
   virtual
   bool
   bwd_imp1(ImpMgr& mgr,
-	   vector<ImpVal>& imp_list) = 0;;
+	   vector<ImpDst>& imp_list) = 0;;
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // BNode のID番号
-  ymuint32 mBNodeId;
 
   // ID番号
   ymuint32 mId;
@@ -559,22 +549,6 @@ void
 ImpNode::set_nfo(ymuint n)
 {
   mFanouts.reserve(n);
-}
-
-// @brief BNode の ID 番号を返す．
-inline
-ymuint
-ImpNode::bnode_id() const
-{
-  return mBNodeId >> 1;
-}
-
-// @brief BNode の極性を返す．
-inline
-bool
-ImpNode::bnode_inv() const
-{
-  return static_cast<bool>(mBNodeId & 1U);
 }
 
 // @brief ID 番号を返す．

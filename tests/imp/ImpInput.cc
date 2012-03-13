@@ -103,11 +103,11 @@ ImpInput::justification_num()
 // @brief justification パタン を得る．
 // @param[in] pos 位置番号 ( 0 <= pos < justification_num() )
 // @return 値割り当て
-ImpVal
+ImpDst
 ImpInput::get_justification(ymuint pos)
 {
   assert_not_reached(__FILE__, __LINE__);
-  return ImpVal(0, 0);
+  return ImpDst(NULL, 0);
 }
 
 // @brief ファンイン0を0にする．
@@ -115,7 +115,7 @@ ImpInput::get_justification(ymuint pos)
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 ImpInput::fwd0_imp0(ImpMgr& mgr,
-		    vector<ImpVal>& imp_list)
+		    vector<ImpDst>& imp_list)
 {
   assert_not_reached(__FILE__, __LINE__);
   return false;
@@ -126,7 +126,7 @@ ImpInput::fwd0_imp0(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 ImpInput::fwd0_imp1(ImpMgr& mgr,
-		    vector<ImpVal>& imp_list)
+		    vector<ImpDst>& imp_list)
 {
   assert_not_reached(__FILE__, __LINE__);
   return false;
@@ -137,7 +137,7 @@ ImpInput::fwd0_imp1(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 ImpInput::fwd1_imp0(ImpMgr& mgr,
-		    vector<ImpVal>& imp_list)
+		    vector<ImpDst>& imp_list)
 {
   assert_not_reached(__FILE__, __LINE__);
   return false;
@@ -148,7 +148,7 @@ ImpInput::fwd1_imp0(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 ImpInput::fwd1_imp1(ImpMgr& mgr,
-		    vector<ImpVal>& imp_list)
+		    vector<ImpDst>& imp_list)
 {
   assert_not_reached(__FILE__, __LINE__);
   return false;
@@ -159,7 +159,7 @@ ImpInput::fwd1_imp1(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 ImpInput::bwd_imp0(ImpMgr& mgr,
-		   vector<ImpVal>& imp_list)
+		   vector<ImpDst>& imp_list)
 {
   switch ( mState ) {
   case kStX: // X -> 0
@@ -185,7 +185,7 @@ ImpInput::bwd_imp0(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 ImpInput::bwd_imp1(ImpMgr& mgr,
-		   vector<ImpVal>& imp_list)
+		   vector<ImpDst>& imp_list)
 {
   switch ( mState ) {
   case kStX: // X -> 1

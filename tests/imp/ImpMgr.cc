@@ -40,92 +40,9 @@ ImpMgr::clear()
   mInputArray.clear();
   mNodeList.clear();
   mNodeArray.clear();
-  mNodeMap.clear();
+  mBNodeMap.clear();
   mChgStack.clear();
 }
-
-BEGIN_NONAMESPACE
-
-ymuint lnum;
-ymuint gnum;
-
-void
-mark_tfi(const BdnNode* node,
-	 vector<bool>& mark,
-	 vector<bool>& gmark,
-	 vector<const BdnNode*>& marked_inputs)
-{
-  if ( mark[node->id()] ) {
-    return;
-  }
-  mark[node->id()] = true;
-  ++ lnum;
-
-  if ( !gmark[node->id()] ) {
-    gmark[node->id()] = true;
-    ++ gnum;
-  }
-
-  if ( node->is_input() ) {
-    marked_inputs.push_back(node);
-  }
-  else if ( node->is_logic() ) {
-    mark_tfi(node->fanin0(), mark, gmark, marked_inputs);
-    mark_tfi(node->fanin1(), mark, gmark, marked_inputs);
-  }
-  else {
-    assert_not_reached(__FILE__, __LINE__);
-  }
-}
-
-void
-mark_tfi2(const BdnNode* node,
-	  vector<bool>& mark,
-	  vector<const BdnNode*>& marked_inputs)
-{
-  if ( mark[node->id()] ) {
-    return;
-  }
-  mark[node->id()] = true;
-
-  if ( node->is_input() ) {
-    marked_inputs.push_back(node);
-  }
-  else if ( node->is_logic() ) {
-    ++ lnum;
-    mark_tfi2(node->fanin0(), mark, marked_inputs);
-    mark_tfi2(node->fanin1(), mark, marked_inputs);
-  }
-  else {
-    assert_not_reached(__FILE__, __LINE__);
-  }
-}
-
-void
-mark_tfo(const BdnNode* node,
-	 vector<bool>& mark,
-	 vector<const BdnNode*>& marked_outputs)
-{
-  if ( mark[node->id()] ) {
-    return;
-  }
-  mark[node->id()] = true;
-
-  if ( node->is_output() ) {
-    marked_outputs.push_back(node);
-  }
-  else {
-    const BdnFanoutList& fo_list = node->fanout_list();
-    for (BdnFanoutList::const_iterator p = fo_list.begin();
-	 p != fo_list.end(); ++ p) {
-      const BdnEdge* e = *p;
-      const BdnNode* onode = e->to();
-      mark_tfo(onode, mark, marked_outputs);
-    }
-  }
-}
-
-END_NONAMESPACE
 
 // @brief ネットワークを設定する．
 // @param[in] src_network 元となるネットワーク
@@ -137,8 +54,7 @@ ImpMgr::set(const BNetwork& src_network)
   ymuint n = src_network.max_node_id();
 
   // 配列を確保する．
-  mNodeMap.clear();
-  mNodeMap.resize(n);
+  mBNodeMap.set_bnode_size(n);
 
   // node_list に src_network のノードをトポロジカル順に並べる．
   BNodeVector node_list;
@@ -163,9 +79,9 @@ ImpMgr::set(const BNetwork& src_network)
        p != input_list.end(); ++ p) {
     const BNode* bnode = *p;
     ymuint id = bnode->id();
-    ImpNode* node = new_input(id);
-    node->mListIter = mUnodeList.end();
+    ImpNode* node = new_input();
     node->set_nfo(fo_count[id]);
+    mBNodeMap.bind(id, node, false);
     mInputArray.push_back(node);
   }
 
@@ -178,14 +94,14 @@ ImpMgr::set(const BNetwork& src_network)
     vector<ImpNodeHandle> fanins(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       const BNode* ibnode = bnode->fanin(i);
-      ImpNodeHandle ihandle = mNodeMap[ibnode->id()];
+      ImpNodeHandle ihandle = mBNodeMap.bnode_handle(ibnode->id());
       fanins[i] = ihandle;
     }
     ImpNodeHandle handle = make_tree(bnode->func(), fanins);
     ImpNode* node = handle.node();
     node->mListIter = mUnodeList.end();
     node->set_nfo(fo_count[id]);
-    set_bnode_id(node, handle.inv(), id);
+    mBNodeMap.bind(id, node, handle.inv());
   }
 }
 
@@ -251,6 +167,14 @@ ImpMgr::make_and(const vector<ImpNodeHandle>& fanins,
   ymuint h = n / 2;
   ImpNodeHandle l = make_and(fanins, begin, begin + h);
   ImpNodeHandle r = make_and(fanins, begin + h, end);
+
+  if ( l.is_zero() || r.is_one() ) {
+    return l;
+  }
+  if ( r.is_zero() || l.is_one() ) {
+    return r;
+  }
+
   ImpNode* lnode = l.node();
   lnode->set_nfo(1);
   ImpNode* rnode = r.node();
@@ -275,6 +199,20 @@ ImpMgr::make_xor(const vector<ImpNodeHandle>& fanins,
   ymuint h = n / 2;
   ImpNodeHandle l = make_xor(fanins, begin, begin + h);
   ImpNodeHandle r = make_xor(fanins, begin + h, end);
+
+  if ( l.is_zero() ) {
+    return r;
+  }
+  if ( l.is_one() ) {
+    return ~r;
+  }
+  if ( r.is_zero() ) {
+    return l;
+  }
+  if ( r.is_one() ) {
+    return ~l;
+  }
+
   ImpNode* lnode = l.node();
   lnode->set_nfo(2);
   ImpNode* rnode = r.node();
@@ -289,13 +227,11 @@ ImpMgr::make_xor(const vector<ImpNodeHandle>& fanins,
 }
 
 // @brief 入力ノードを作る．
-// @param[in] bnode_id BNode-ID
 ImpNode*
-ImpMgr::new_input(ymuint bnode_id)
+ImpMgr::new_input()
 {
   ImpNode* node = new ImpInput();
   reg_node(node);
-  set_bnode_id(node, false, bnode_id);
   return node;
 }
 
@@ -312,22 +248,13 @@ ImpMgr::new_and(ImpNodeHandle handle0,
   return node;
 }
 
-// @brief ノードに BNode-ID を割り当てる．
-void
-ImpMgr::set_bnode_id(ImpNode* node,
-		     bool inv,
-		     ymuint bnode_id)
-{
-  node->mBNodeId = (bnode_id << 1) | static_cast<ymuint>(inv);
-  mNodeMap[bnode_id] = ImpNodeHandle(node, inv);
-}
-
 // @brief ノードを登録する．
 void
 ImpMgr::reg_node(ImpNode* node)
 {
   node->mId = mNodeArray.size();
   mNodeArray.push_back(node);
+  node->mListIter = mUnodeList.end();
 }
 
 // @brief ノードに値を設定し含意操作を行う．
@@ -337,7 +264,7 @@ ImpMgr::reg_node(ImpNode* node)
 bool
 ImpMgr::assert(ImpNode* node,
 	       ymuint val,
-	       vector<ImpVal>& imp_list)
+	       vector<ImpDst>& imp_list)
 {
   mSrcId = node->id();
   mMarkerStack.push_back(mChgStack.size());
@@ -381,10 +308,10 @@ ImpMgr::backtrack()
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fwd_prop0(ImpNode* node,
-		  vector<ImpVal>& imp_list)
+		  vector<ImpDst>& imp_list)
 {
   if ( node->id() != mSrcId ) {
-    imp_list.push_back(ImpVal(node->id(), 0));
+    imp_list.push_back(ImpDst(node, 0));
   }
   const vector<ImpEdge*>& fo_list = node->fanout_list();
   for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
@@ -422,10 +349,10 @@ ImpMgr::fwd_prop0(ImpNode* node,
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fwd_prop1(ImpNode* node,
-		  vector<ImpVal>& imp_list)
+		  vector<ImpDst>& imp_list)
 {
   if ( node->id() != mSrcId ) {
-    imp_list.push_back(ImpVal(node->id(), 1));
+    imp_list.push_back(ImpDst(node, 1));
   }
   const vector<ImpEdge*>& fo_list = node->fanout_list();
   for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
@@ -463,7 +390,7 @@ ImpMgr::fwd_prop1(ImpNode* node,
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fanin0_prop0(ImpNode* node,
-		     vector<ImpVal>& imp_list)
+		     vector<ImpDst>& imp_list)
 {
   const ImpEdge& e = node->fanin0();
   ImpNode* dst_node = e.src_node();
@@ -482,7 +409,7 @@ ImpMgr::fanin0_prop0(ImpNode* node,
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fanin0_prop1(ImpNode* node,
-		     vector<ImpVal>& imp_list)
+		     vector<ImpDst>& imp_list)
 {
   const ImpEdge& e = node->fanin0();
   ImpNode* dst_node = e.src_node();
@@ -501,7 +428,7 @@ ImpMgr::fanin0_prop1(ImpNode* node,
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fanin1_prop0(ImpNode* node,
-		     vector<ImpVal>& imp_list)
+		     vector<ImpDst>& imp_list)
 {
   const ImpEdge& e = node->fanin1();
   ImpNode* dst_node = e.src_node();
@@ -520,7 +447,7 @@ ImpMgr::fanin1_prop0(ImpNode* node,
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fanin1_prop1(ImpNode* node,
-		     vector<ImpVal>& imp_list)
+		     vector<ImpDst>& imp_list)
 {
   const ImpEdge& e = node->fanin1();
   ImpNode* dst_node = e.src_node();
@@ -541,7 +468,7 @@ ImpMgr::fanin1_prop1(ImpNode* node,
 bool
 ImpMgr::bwd_prop0(ImpNode* node,
 		  ImpNode* from_node,
-		  vector<ImpVal>& imp_list)
+		  vector<ImpDst>& imp_list)
 {
   const vector<ImpEdge*>& fo_list = node->fanout_list();
   for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
@@ -571,7 +498,7 @@ ImpMgr::bwd_prop0(ImpNode* node,
     }
   }
   if ( node->id() != mSrcId && node->val() == kB3X ) {
-    imp_list.push_back(ImpVal(node->id(), 0));
+    imp_list.push_back(ImpDst(node, 0));
   }
   return node->bwd_imp0(*this, imp_list);
 }
@@ -585,7 +512,7 @@ ImpMgr::bwd_prop0(ImpNode* node,
 bool
 ImpMgr::bwd_prop1(ImpNode* node,
 		  ImpNode* from_node,
-		  vector<ImpVal>& imp_list)
+		  vector<ImpDst>& imp_list)
 {
   const vector<ImpEdge*>& fo_list = node->fanout_list();
   for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
@@ -615,7 +542,7 @@ ImpMgr::bwd_prop1(ImpNode* node,
     }
   }
   if ( node->id() != mSrcId && node->val() == kB3X ) {
-    imp_list.push_back(ImpVal(node->id(), 1));
+    imp_list.push_back(ImpDst(node, 1));
   }
   return node->bwd_imp1(*this, imp_list);
 }

@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
+class ImpNode;
+
 //////////////////////////////////////////////////////////////////////
 /// @class ImpVal ImpVal.h "ImpVal.h"
 /// @brief ノード番号と値の組を表すクラス
@@ -96,7 +98,7 @@ private:
 inline
 ImpVal::ImpVal()
 {
-  mVal = 0;
+  mVal = 0U;
 }
 
 // @brief コンストラクタ
@@ -107,8 +109,8 @@ ImpVal::ImpVal(ymuint pval)
 }
 
 // @brief コンストラクタ
-// @param[in] id 含意先のノード番号
-// @param[in] val 含意先の値
+// @param[in] id ノード番号
+// @param[in] val 値
 inline
 ImpVal::ImpVal(ymuint id,
 	       ymuint val)
@@ -130,7 +132,7 @@ void
 ImpVal::set(ymuint id,
 	    ymuint val)
 {
-  mVal = (id * 2) + val;
+  mVal = id * 2 + val;
 }
 
 // @brief ノード番号を取り出す．

@@ -145,14 +145,14 @@ ImpAnd::justification_num()
 BEGIN_NONAMESPACE
 
 inline
-ImpVal
+ImpDst
 imp(const ImpEdge& e,
     ymuint val)
 {
   if ( e.src_inv() ) {
     val ^= 1;
   }
-  return ImpVal(e.src_node()->id(), val);
+  return ImpDst(e.src_node(), val);
 }
 
 END_NONAMESPACE
@@ -160,7 +160,7 @@ END_NONAMESPACE
 // @brief justification パタン を得る．
 // @param[in] pos 位置番号 ( 0 <= pos < justification_num() )
 // @return 値割り当て
-ImpVal
+ImpDst
 ImpAnd::get_justification(ymuint pos)
 {
   switch ( mState ) {
@@ -200,7 +200,7 @@ ImpAnd::get_justification(ymuint pos)
     break;
   }
   assert_not_reached(__FILE__, __LINE__);
-  return ImpVal(0, 0);
+  return ImpDst(NULL, 0);
 }
 
 // @brief ファンイン0を0にする．
@@ -208,7 +208,7 @@ ImpAnd::get_justification(ymuint pos)
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 ImpAnd::fwd0_imp0(ImpMgr& mgr,
-		  vector<ImpVal>& imp_list)
+		  vector<ImpDst>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> 0X:0
@@ -253,7 +253,7 @@ ImpAnd::fwd0_imp0(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 ImpAnd::fwd0_imp1(ImpMgr& mgr,
-		  vector<ImpVal>& imp_list)
+		  vector<ImpDst>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> 1X:X
@@ -299,7 +299,7 @@ ImpAnd::fwd0_imp1(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 ImpAnd::fwd1_imp0(ImpMgr& mgr,
-		  vector<ImpVal>& imp_list)
+		  vector<ImpDst>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> X0:0
@@ -344,7 +344,7 @@ ImpAnd::fwd1_imp0(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 ImpAnd::fwd1_imp1(ImpMgr& mgr,
-		  vector<ImpVal>& imp_list)
+		  vector<ImpDst>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> X1:X
@@ -390,7 +390,7 @@ ImpAnd::fwd1_imp1(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 ImpAnd::bwd_imp0(ImpMgr& mgr,
-		 vector<ImpVal>& imp_list)
+		 vector<ImpDst>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> XX:0
@@ -433,7 +433,7 @@ ImpAnd::bwd_imp0(ImpMgr& mgr,
 // @param[out] imp_list 含意の結果を格納するリスト
 bool
 ImpAnd::bwd_imp1(ImpMgr& mgr,
-		 vector<ImpVal>& imp_list)
+		 vector<ImpDst>& imp_list)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> 11:1
