@@ -8,6 +8,7 @@
 
 
 #include "ImpMgr.h"
+#include "ym_networks/BdnNode.h"
 #include "ImpInput.h"
 #include "ImpAnd.h"
 
@@ -82,7 +83,6 @@ ImpMgr::set(const BNetwork& src_network)
     ImpNode* node = new_input();
     node->set_nfo(fo_count[id]);
     mBNodeMap.bind(id, node, false);
-    mInputArray.push_back(node);
   }
 
   // 論理ノードを作る．
@@ -99,8 +99,81 @@ ImpMgr::set(const BNetwork& src_network)
     }
     ImpNodeHandle handle = make_tree(bnode->func(), fanins);
     ImpNode* node = handle.node();
-    node->mListIter = mUnodeList.end();
+    if ( node != NULL ) {
+      node->set_nfo(fo_count[id]);
+    }
+    mBNodeMap.bind(id, node, handle.inv());
+  }
+}
+
+// @brief ネットワークを設定する．
+// @param[in] src_network 元となるネットワーク
+void
+ImpMgr::set(const BdnMgr& src_network)
+{
+  clear();
+
+  ymuint n = src_network.max_node_id();
+
+  // 配列を確保する．
+  mBNodeMap.set_bnode_size(n);
+
+  // node_list に src_network のノードをトポロジカル順に並べる．
+  vector<BdnNode*> node_list;
+  src_network.sort(node_list);
+
+  // 各ノードのファンアウト数を数える．
+  vector<ymuint> fo_count(n, 0);
+  for (vector<BdnNode*>::iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    const BdnNode* bnode = *p;
+    for (ymuint i = 0; i < 2; ++ i) {
+      const BdnNode* inode = bnode->fanin(i);
+      ++ fo_count[inode->id()];
+    }
+  }
+
+  // 外部入力ノードを作る．
+  const BdnNodeList& input_list = src_network.input_list();
+  mInputArray.reserve(input_list.size());
+  for (BdnNodeList::const_iterator p = input_list.begin();
+       p != input_list.end(); ++ p) {
+    const BdnNode* bnode = *p;
+    ymuint id = bnode->id();
+    ImpNode* node = new_input();
     node->set_nfo(fo_count[id]);
+    mBNodeMap.bind(id, node, false);
+  }
+
+  // 論理ノードを作る．
+  for (vector<BdnNode*>::const_iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    const BdnNode* bnode = *p;
+    ymuint id = bnode->id();
+    const BdnNode* ibnode0 = bnode->fanin0();
+    const BdnNode* ibnode1 = bnode->fanin1();
+    ImpNodeHandle ihandle0 = mBNodeMap.bnode_handle(ibnode0->id());
+    if ( bnode->fanin0_inv() ) {
+      ihandle0 = ~ihandle0;
+    }
+    ImpNodeHandle ihandle1 = mBNodeMap.bnode_handle(ibnode1->id());
+    if ( bnode->fanin1_inv() ) {
+      ihandle1 = ~ihandle1;
+    }
+    vector<ImpNodeHandle> ihandles(2);
+    ihandles[0] = ihandle0;
+    ihandles[1] = ihandle1;
+    ImpNodeHandle handle;
+    if ( bnode->is_and() ) {
+      handle = make_and(ihandles, 0, 2);
+    }
+    else { // bnode->is_xor()
+      handle = make_xor(ihandles, 0, 2);
+    }
+    ImpNode* node = handle.node();
+    if ( node != NULL ) {
+      node->set_nfo(fo_count[id]);
+    }
     mBNodeMap.bind(id, node, handle.inv());
   }
 }
@@ -232,6 +305,7 @@ ImpMgr::new_input()
 {
   ImpNode* node = new ImpInput();
   reg_node(node);
+  mInputArray.push_back(node);
   return node;
 }
 

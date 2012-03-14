@@ -119,15 +119,6 @@ public:
       ymuint dst_id,
       ymuint dst_val);
 
-  /// @brief 含意情報を追加する．
-  /// @param[in] src_id 含意元のノード番号
-  /// @param[in] src_val 含意元の値 ( 0 or 1 )
-  /// @param[in] imp_list 含意リスト
-  void
-  put(ymuint src_id,
-      ymuint src_val,
-      const vector<ImpVal>& imp_list);
-
 
 private:
   //////////////////////////////////////////////////////////////////////

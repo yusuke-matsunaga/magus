@@ -10,6 +10,7 @@
 
 
 #include "ym_networks/BNetwork.h"
+#include "ym_networks/BdnMgr.h"
 #include "ImpNode.h"
 #include "ImpDst.h"
 #include "BNodeMap.h"
@@ -47,6 +48,10 @@ public:
   ImpNode*
   node(ymuint id) const;
 
+  /// @brief 入力数を得る．
+  ymuint
+  input_num() const;
+
   /// @brief トポロジカル順のノードリストを得る．
   /// @param[out] node_list 結果を格納する変数
   void
@@ -74,6 +79,11 @@ public:
   /// @param[in] src_network 元となるネットワーク
   void
   set(const BNetwork& src_network);
+
+  /// @brief ネットワークを設定する．
+  /// @param[in] src_network 元となるネットワーク
+  void
+  set(const BdnMgr& src_network);
 
 
 public:
@@ -309,6 +319,14 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief 入力数を得る．
+inline
+ymuint
+ImpMgr::input_num() const
+{
+  return mInputArray.size();
+}
 
 // @brief ノード数 (ノード番号の最大値+1) を得る
 inline

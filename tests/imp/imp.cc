@@ -13,9 +13,10 @@
 #error "<popt.h> not found."
 #endif
 
-#include "ym_networks/BNetwork.h"
-#include "ym_networks/BNetBlifReader.h"
-#include "ym_networks/BNetIscas89Reader.h"
+#include "ym_networks/BdnMgr.h"
+#include "ym_networks/BdnNode.h"
+#include "ym_networks/BdnBlifReader.h"
+#include "ym_networks/BdnIscas89Reader.h"
 
 #include "ImpMgr.h"
 #include "ImpInfo.h"
@@ -50,18 +51,18 @@ imp(const string& filename,
   MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
   MsgMgr::reg_handler(msg_handler);
 
-  BNetwork network;
+  BdnMgr bdn_network;
 
   if ( blif ) {
-    BNetBlifReader read;
-    if ( !read(filename, network) ) {
+    BdnBlifReader bdn_read;
+    if ( !bdn_read(filename, bdn_network) ) {
       cerr << "Error in reading " << filename << endl;
       return;
     }
   }
   else {
-    BNetIscas89Reader read;
-    if ( !read(filename, network) ) {
+    BdnIscas89Reader bdn_read;
+    if ( !bdn_read(filename, bdn_network) ) {
       cerr << "Error in reading " << filename << endl;
       return;
     }
@@ -93,7 +94,7 @@ imp(const string& filename,
     ImpMgr imp_mgr;
 
     // BDN の情報を ImpMgr にコピーする．
-    imp_mgr.set(network);
+    imp_mgr.set(bdn_network);
 
     StrImp strimp;
     ImpInfo direct_imp;
@@ -165,7 +166,33 @@ imp(const string& filename,
     direct_imp.print_stats(cout);
     cout << "c_imp" << endl;
     contra_imp.print_stats(cout);
-    cout << "Total " << network.logic_node_num() << " nodes " << endl;
+
+    ymuint and_node = 0;
+    ymuint xor_node = 0;
+    {
+      const BdnNodeList& node_list = bdn_network.lnode_list();
+      for (BdnNodeList::const_iterator p = node_list.begin();
+	   p != node_list.end(); ++ p) {
+	const BdnNode* node = *p;
+	if ( node->is_and() ) {
+	  ++ and_node;
+	}
+	else if ( node->is_xor() ) {
+	  ++ xor_node;
+	}
+	else {
+	  assert_not_reached(__FILE__, __LINE__);
+	}
+      }
+    }
+    ymuint node_num2 = bdn_network.lnode_num();
+    cout << "BDN:" << endl
+	 << "Total " << bdn_network.input_num() << " inputs" << endl
+	 << "Total " << node_num2 << " nodes"
+	 << " ( " << and_node << " ANDs + "
+	 << xor_node << " XORs )" << endl
+	 << "Total " << imp_mgr.node_num() - imp_mgr.input_num()
+	 << " ImpNodes" << endl;
     cout << "Direct Implications:             " << setw(10) << direct_imp.size()
 	 << ": " << direct_time << endl
 	 << "Contraposition Implications:     " << setw(10) << contra_imp.size()

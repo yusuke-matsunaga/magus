@@ -217,25 +217,6 @@ ImpInfo::put(ymuint src_id,
 #endif
 }
 
-// @brief 含意情報を追加する．
-// @param[in] src_id 含意元のノード番号
-// @param[in] src_val 含意元の値 ( 0 or 1 )
-// @param[in] imp_list 含意リスト
-void
-ImpInfo::put(ymuint src_id,
-	     ymuint src_val,
-	     const vector<ImpVal>& imp_list)
-{
-  for (vector<ImpVal>::const_iterator p = imp_list.begin();
-       p != imp_list.end(); ++ p) {
-    ymuint dst_id = p->id();
-    ymuint dst_val = p->val();
-    if ( dst_id != src_id ) {
-      put(src_id, src_val, dst_id, dst_val);
-    }
-  }
-}
-
 // @brief ImpCell を確保する．
 ImpCell*
 ImpInfo::new_cell()

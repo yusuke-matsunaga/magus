@@ -97,10 +97,12 @@ BNodeMap::bind(ymuint bnode_id,
 {
   assert_cond( bnode_id < max_bnode_id(), __FILE__, __LINE__);
   mBNodeMap[bnode_id] = ImpNodeHandle(node, inv);
-  ymuint id = node->id();
-  if ( mImpNodeMap.size() <= id ) {
-    mImpNodeMap.resize(id + 1, 0xFFFFFFFF);
-    mImpNodeMap[id] = (node->id() << 1) | static_cast<ymuint>(inv);
+  if ( node != NULL ) {
+    ymuint id = node->id();
+    if ( mImpNodeMap.size() <= id ) {
+      mImpNodeMap.resize(id + 1, 0xFFFFFFFF);
+      mImpNodeMap[id] = (node->id() << 1) | static_cast<ymuint>(inv);
+    }
   }
 }
 
