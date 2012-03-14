@@ -62,6 +62,7 @@ void
 Alloc::destroy()
 {
   mUsedSize = 0;
+  _destroy();
 }
 
 // @brief 内部状態を出力する．
