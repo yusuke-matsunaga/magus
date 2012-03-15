@@ -343,7 +343,7 @@ SatImp::learning(ImpMgr& imp_mgr,
   imp_mgr.random_sim();
   vector<list<ImpDst> > cand_info(n * 2);
   vector<ymuint32> const_flag(n, 0U);
-  hash_map<ymuint64, list<NodeInfo> > node_hash;
+  //hash_map<ymuint64, list<NodeInfo> > node_hash;
   for (ymuint i = 1; i < n; ++ i) {
     if ( debug ) {
       if ( (i % 100) == 0 ) {
@@ -361,6 +361,7 @@ SatImp::learning(ImpMgr& imp_mgr,
     if ( val0 != 0UL ) {
       const_flag[i] |= 2UL;
     }
+#if 0
     if ( val0 != 0UL && val0 != ~0UL ) {
       bool inv = false;
       ymuint64 c_val0 = val0;
@@ -377,6 +378,7 @@ SatImp::learning(ImpMgr& imp_mgr,
       list<NodeInfo>& node_list = p->second;
       node_list.push_back(NodeInfo(node0, inv));
     }
+#endif
 
     for (ymuint j = 0; j < i; ++ j) {
       ImpNode* node1 = imp_mgr.node(j);
@@ -638,6 +640,11 @@ SatImp::learning(ImpMgr& imp_mgr,
   ymuint count_abort = 0;
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     if ( imp_info.is_const0(src_id) || imp_info.is_const1(src_id) ) {
+      continue;
+    }
+
+    if ( cand_info[src_id * 2 + 0].empty() &&
+	 cand_info[src_id * 2 + 1].empty() ) {
       continue;
     }
 

@@ -122,16 +122,6 @@ imp(const string& filename,
 
     timer.reset();
     timer.start();
-    SatImp2 satimp2;
-    ImpInfo sat2_imp;
-#if 0
-    satimp2.learning(imp_mgr, direct_imp, sat2_imp);
-#endif
-    timer.stop();
-    USTime sat2_time = timer.time();
-
-    timer.reset();
-    timer.start();
     RlImp rlimp;
     ImpInfo rl_imp;
     if ( level > 0 ) {
@@ -186,6 +176,7 @@ imp(const string& filename,
       }
     }
     ymuint node_num2 = bdn_network.lnode_num();
+    ymuint dcimp = direct_imp.size() + contra_imp.size();
     cout << "BDN:" << endl
 	 << "Total " << bdn_network.input_num() << " inputs" << endl
 	 << "Total " << node_num2 << " nodes"
@@ -197,15 +188,13 @@ imp(const string& filename,
 	 << ": " << direct_time << endl
 	 << "Contraposition Implications:     " << setw(10) << contra_imp.size()
 	 << ": " << contra_time << endl
-	 << "D + C Implications:              " << setw(10) << direct_imp.size() + contra_imp.size() << endl
-	 << "Recursive Learning Implications: " << setw(10) << rl_imp.size()
+	 << "D + C Implications:              " << setw(10) << dcimp << endl
+	 << "Recursive Learning Implications: " << setw(10) << rl_imp.size() - dcimp
 	 << ": " << rl_time << endl
 	 << "Naive Implications:              " << setw(10) << na_imp.size()
 	 << ": " << na_time << endl
-	 << "Complete Implications:           " << setw(10) << sat_imp.size()
-	 << ": " << sat_time << endl
-	 << "Complete Implications2:          " << setw(10) << sat2_imp.size()
-	 << ": " << sat2_time << endl;
+	 << "Complete Implications:           " << setw(10) << sat_imp.size() - dcimp
+	 << ": " << sat_time << endl;
   }
 #if 0
   else if ( method_str == "cnf" ) {
