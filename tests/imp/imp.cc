@@ -26,7 +26,6 @@
 #include "CnfImp.h"
 #include "CnfImp2.h"
 #include "SatImp.h"
-#include "SatImp2.h"
 #include "RlImp.h"
 #include "NaImp.h"
 
@@ -128,7 +127,7 @@ imp(const string& filename,
       rlimp.set_learning_level(level);
     }
 #if 1
-    rlimp.learning(imp_mgr, rl_imp);
+    rlimp.learning(imp_mgr, direct_imp, rl_imp);
 #endif
     timer.stop();
     USTime rl_time = timer.time();
@@ -146,8 +145,8 @@ imp(const string& filename,
     timer.start();
     NaImp naimp;
     ImpInfo na_imp;
-#if 0
-    naimp.learning(network, na_imp);
+#if 1
+    naimp.learning(imp_mgr, direct_imp, na_imp);
 #endif
     timer.stop();
     USTime na_time = timer.time();
@@ -189,11 +188,11 @@ imp(const string& filename,
 	 << "Contraposition Implications:     " << setw(10) << contra_imp.size()
 	 << ": " << contra_time << endl
 	 << "D + C Implications:              " << setw(10) << dcimp << endl
-	 << "Recursive Learning Implications: " << setw(10) << rl_imp.size() - dcimp
+	 << "Recursive Learning Implications: " << setw(10) << rl_imp.size()
 	 << ": " << rl_time << endl
 	 << "Naive Implications:              " << setw(10) << na_imp.size()
 	 << ": " << na_time << endl
-	 << "Complete Implications:           " << setw(10) << sat_imp.size() - dcimp
+	 << "Complete Implications:           " << setw(10) << sat_imp.size()
 	 << ": " << sat_time << endl;
   }
 #if 0

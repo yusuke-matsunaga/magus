@@ -5,23 +5,23 @@
 /// @brief NaImp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ImpBase.h"
+#include "ym_networks/bdn.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-class StrNode;
+class ImpMgr;
+class ImpInfo;
 
 //////////////////////////////////////////////////////////////////////
 /// @class NaImp NaImp.h "NaImp.h"
 /// @brief 構造を用いた間接含意エンジン
 //////////////////////////////////////////////////////////////////////
-class NaImp :
-  public ImpBase
+class NaImp
 {
 public:
 
@@ -29,7 +29,6 @@ public:
   NaImp();
 
   /// @brief デストラクタ
-  virtual
   ~NaImp();
 
 
@@ -39,11 +38,13 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ネットワーク中の間接含意を求める．
-  /// @param[in] network 対象のネットワーク
-  /// @param[in] imp_info 間接含意のリスト
+  /// @param[in] imp_mgr マネージャ
+  /// @param[in] direct_imp 直接含意のリスト
+  /// @param[out] imp_info 間接含意のリスト
   virtual
   void
-  learning(const BdnMgr& network,
+  learning(ImpMgr& imp_mgr,
+	   const ImpInfo& direct_imp,
 	   ImpInfo& imp_info);
 
 };

@@ -52,6 +52,11 @@ public:
   ymuint
   input_num() const;
 
+  /// @brief 入力ノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  ImpNode*
+  input_node(ymuint pos) const;
+
   /// @brief トポロジカル順のノードリストを得る．
   /// @param[out] node_list 結果を格納する変数
   void
@@ -326,6 +331,16 @@ ymuint
 ImpMgr::input_num() const
 {
   return mInputArray.size();
+}
+
+// @brief 入力ノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+inline
+ImpNode*
+ImpMgr::input_node(ymuint pos) const
+{
+  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  return mInputArray[pos];
 }
 
 // @brief ノード数 (ノード番号の最大値+1) を得る

@@ -29,7 +29,6 @@ public:
   SatImp();
 
   /// @brief デストラクタ
-  virtual
   ~SatImp();
 
 
@@ -40,7 +39,8 @@ public:
 
   /// @brief ネットワーク中の間接含意を求める．
   /// @param[in] imp_mgr マネージャ
-  /// @param[in] imp_info 間接含意のリスト
+  /// @param[in] direct_imp 直接含意のリスト
+  /// @param[out] imp_info 間接含意のリスト
   void
   learning(ImpMgr& imp_mgr,
 	   const ImpInfo& direct_imp,

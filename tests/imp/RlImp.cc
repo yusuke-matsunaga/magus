@@ -48,9 +48,11 @@ RlImp::set_learning_level(ymuint level)
 
 // @brief ネットワーク中の間接含意を求める．
 // @param[in] imp_mgr マネージャ
+// @param[in] direct_imp 直接含意のリスト
 // @param[in] imp_info 間接含意のリスト
 void
 RlImp::learning(ImpMgr& imp_mgr,
+		const ImpInfo& direct_imp,
 		ImpInfo& imp_info)
 {
   ymuint n = imp_mgr.node_num();
@@ -70,7 +72,12 @@ RlImp::learning(ImpMgr& imp_mgr,
 	  ImpNode* dst_node = p->node();
 	  ymuint dst_id = dst_node->id();
 	  ymuint dst_val = p->val();
-	  imp_info.put(src_id, src_val, dst_id, dst_val);
+	  if ( !imp_info.check(src_id, src_val, dst_id, dst_val) ) {
+	    imp_info.put(src_id, src_val, dst_id, dst_val);
+	  }
+	  if ( !imp_info.check(dst_id, dst_val ^ 1, src_id, src_id ^ 1) ) {
+	    imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
+	  }
 	}
       }
     }
