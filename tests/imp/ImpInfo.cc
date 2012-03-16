@@ -81,7 +81,27 @@ ImpInfo::check(ymuint src_id,
 ymuint
 ImpInfo::size() const
 {
-  return mImpNum;
+  ymuint n = 0;
+  for (ymuint i = 0; i < mArraySize; ++ i) {
+    ymuint src_id = i / 2;
+    if ( is_const0(src_id) || is_const1(src_id) ) {
+      continue;
+    }
+    const ImpList& imp_list = mArray[i];
+    if ( imp_list.empty() ) {
+      continue;
+    }
+    for (ImpList::iterator p = imp_list.begin();
+	 p != imp_list.end(); ++ p) {
+      const ImpCell& imp = *p;
+      ymuint dst_id = imp.dst_id();
+      if ( is_const0(dst_id) || is_const1(dst_id) ) {
+	continue;
+      }
+      ++ n;
+    }
+  }
+  return n;
 }
 
 // @brief 内容を出力する．
@@ -215,6 +235,16 @@ ImpInfo::put(ymuint src_id,
     cout << "Hash avr. = " << avr << ", max = " << max << endl;
   }
 #endif
+}
+
+// @brief 定数縮退の情報をコピーする．
+void
+ImpInfo::copy_const(const ImpInfo& src)
+{
+  ymuint n = mArraySize / 2;
+  for (ymuint i = 0; i < n; ++ i) {
+    mConstArray[i] = src.mConstArray[i];
+  }
 }
 
 // @brief ImpCell を確保する．

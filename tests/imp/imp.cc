@@ -156,6 +156,11 @@ imp(const string& filename,
     cout << "c_imp" << endl;
     contra_imp.print_stats(cout);
 
+    direct_imp.copy_const(sat_imp);
+    contra_imp.copy_const(sat_imp);
+    rl_imp.copy_const(sat_imp);
+    na_imp.copy_const(sat_imp);
+
     ymuint and_node = 0;
     ymuint xor_node = 0;
     {

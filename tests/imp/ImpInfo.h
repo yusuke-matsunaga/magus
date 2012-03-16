@@ -119,6 +119,10 @@ public:
       ymuint dst_id,
       ymuint dst_val);
 
+  /// @brief 定数縮退の情報をコピーする．
+  void
+  copy_const(const ImpInfo& src);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
