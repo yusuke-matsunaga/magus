@@ -19,10 +19,82 @@ BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
 
+#if defined(YM_DEBUG)
 bool debug = true;
+#else
+bool debug = false;
+#endif
+
+
+//////////////////////////////////////////////////////////////////////
+// ImpVal のリストをソートするための比較関数
+//////////////////////////////////////////////////////////////////////
+struct ImpComp
+{
+  bool
+  operator()(const ImpVal& imp1,
+	     const ImpVal& imp2) const
+  {
+    ymuint id1 = imp1.id();
+    ymuint id2 = imp2.id();
+    if ( id1 < id2 ) {
+      return true;
+    }
+    if ( id1 > id2 ) {
+      return false;
+    }
+    // id1 == id2
+    ymuint val1 = imp1.val();
+    ymuint val2 = imp2.val();
+    return val1 <= val2;
+  }
+};
+
+inline
+void
+print_val(ymuint id,
+	  ymuint val)
+{
+  if ( val == 0 ) {
+    cout << "~";
+  }
+  cout << id;
+}
 
 void
-print_list(const list<ImpVal>& imp_list);
+print_list(const list<ImpVal>& imp_list)
+{
+  for (list<ImpVal>::const_iterator p = imp_list.begin();
+       p != imp_list.end(); ++ p) {
+    cout << " ";
+    print_val(p->id(), p->val());
+  }
+  cout << endl;
+}
+
+bool
+insert(list<ImpVal>& imp_list,
+       list<ImpVal>::iterator& p,
+       const ImpVal& imp)
+{
+  for ( ; p != imp_list.end(); ++ p) {
+    ymuint id = p->id();
+    if ( id == imp.id() ) {
+      if ( p->val() == imp.val() ) {
+	return true;
+      }
+      else {
+	return false;
+      }
+    }
+    else if ( id > imp.id() ) {
+      imp_list.insert(p, imp);
+      return true;
+    }
+  }
+  imp_list.push_back(imp);
+  return true;
+}
 
 bool
 cup(const list<ImpVal>& src1,
@@ -33,35 +105,46 @@ cup(const list<ImpVal>& src1,
   list<ImpVal>::const_iterator e1 = src1.end();
   list<ImpVal>::const_iterator p2 = src2.begin();
   list<ImpVal>::const_iterator e2 = src2.end();
+  list<ImpVal>::iterator p3 = dst.begin();
   while ( p1 != e1 && p2 != e2 ) {
     const ImpVal& imp1 = *p1;
     const ImpVal& imp2 = *p2;
     ymuint id1 = imp1.id();
     ymuint id2 = imp2.id();
     if ( id1 < id2 ) {
-      dst.push_back(imp1);
+      if ( !insert(dst, p3, imp1) ) {
+	return false;
+      }
       ++ p1;
     }
     else if ( id1 > id2 ) {
-      dst.push_back(imp2);
+      if ( !insert(dst, p3, imp2) ) {
+	return false;
+      }
       ++ p2;
     }
     else { // id1 == id2
       if ( imp1.val() != imp2.val() ) {
 	return false;
       }
-      dst.push_back(imp1);
+      if ( !insert(dst, p3, imp1) ) {
+	return false;
+      }
       ++ p1;
       ++ p2;
     }
   }
   for ( ; p1 != e1; ++ p1) {
     const ImpVal& imp = *p1;
-    dst.push_back(imp);
+    if ( !insert(dst, p3, imp) ) {
+      return false;
+    }
   }
   for ( ; p2 != e2; ++ p2) {
     const ImpVal& imp = *p2;
-    dst.push_back(imp);
+    if ( !insert(dst, p3, imp) ) {
+      return false;
+    }
   }
   return true;
 }
@@ -75,6 +158,7 @@ cap(const list<ImpVal>& src1,
   list<ImpVal>::const_iterator e1 = src1.end();
   list<ImpVal>::const_iterator p2 = src2.begin();
   list<ImpVal>::const_iterator e2 = src2.end();
+  list<ImpVal>::iterator p3 = dst.begin();
   while ( p1 != e1 && p2 != e2 ) {
     const ImpVal& imp1 = *p1;
     const ImpVal& imp2 = *p2;
@@ -88,7 +172,7 @@ cap(const list<ImpVal>& src1,
     }
     else { // id1 == id2
       if ( imp1.val() == imp2.val() ) {
-	dst.push_back(imp1);
+	insert(dst, p3, imp1);
       }
       ++ p1;
       ++ p2;
@@ -117,7 +201,7 @@ merge(list<ImpVal>& dst,
       ++ q;
     }
     else { // id1 == id2
-      assert_cond( imp1.val() == imp2.val(), __FILE__, __LINE__);
+      //assert_cond( imp1.val() == imp2.val(), __FILE__, __LINE__);
       ++ p;
       ++ q;
     }
@@ -142,28 +226,6 @@ put(ymuint src_id,
     imp_info.put(src_id, src_val, dst_id, dst_val);
     imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
   }
-}
-
-inline
-void
-print_val(ymuint id,
-	  ymuint val)
-{
-  if ( val == 0 ) {
-    cout << "~";
-  }
-  cout << id;
-}
-
-void
-print_list(const list<ImpVal>& imp_list)
-{
-  for (list<ImpVal>::const_iterator p = imp_list.begin();
-       p != imp_list.end(); ++ p) {
-    cout << " ";
-    print_val(p->id(), p->val());
-  }
-  cout << endl;
 }
 
 inline
@@ -200,245 +262,293 @@ NaImp::learning(ImpMgr& imp_mgr,
 		const ImpInfo& direct_imp,
 		ImpInfo& imp_info)
 {
-  imp_mgr.print_network(cout);
+  //imp_mgr.print_network(cout);
 
   ymuint n = imp_mgr.node_num();
 
-  imp_info.set_size(n);
-
   vector<list<ImpVal> > imp_lists(n * 2);
 
-  // 外部入力ノードの割り当て情報を作る．
-  ymuint npi = imp_mgr.input_num();
-  for (ymuint i = 0; i < npi; ++ i) {
-    ImpNode* node = imp_mgr.input_node(i);
-    ymuint id = node->id();
-    ymuint idx_0 = id * 2 + 0;
-    ymuint idx_1 = id * 2 + 1;
-    // 入力は自分自身だけ
-    imp_lists[idx_0].push_back(ImpVal(id, 0));
-    imp_lists[idx_1].push_back(ImpVal(id, 1));
+  // direct_imp の情報を imp_lists にコピーする．
+  for (ymuint src_id = 0; src_id < n; ++ src_id) {
+    ImpNode* node = imp_mgr.node(src_id);
+    if ( node == NULL ) {
+      continue;
+    }
+    // 自分自身を追加する．
+    imp_lists[src_id * 2 + 0].push_back(ImpVal(src_id, 0));
+    imp_lists[src_id * 2 + 1].push_back(ImpVal(src_id, 1));
+
+    for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+      const ImpList& imp_list = direct_imp.get(src_id, src_val);
+      for (ImpList::iterator p = imp_list.begin();
+	   p != imp_list.end(); ++ p) {
+	const ImpCell& imp = *p;
+	ymuint dst_id = imp.dst_id();
+	ymuint dst_val = imp.dst_val();
+	imp_lists[dst_id * 2 + dst_val].push_back(ImpVal(src_id, src_val));
+	ymuint src_val1 = src_val ^ 1;
+	ymuint dst_val1 = dst_val ^ 1;
+	if ( !direct_imp.check(dst_id, dst_val1, src_id, src_val1) ) {
+	  imp_lists[src_id * 2 + src_val1].push_back(ImpVal(dst_id, dst_val1));
+	}
+      }
+    }
+  }
+  for (ymuint i = 0; i < n; ++ i) {
+    for (ymint val = 0; val < 2; ++ val) {
+      list<ImpVal>& imp_list = imp_lists[i * 2 + val];
+      imp_list.sort(ImpComp());
+      if ( debug ) {
+	cout << "Node#" << i << ":" << val << endl;
+	print_list(imp_list);
+      }
+    }
   }
 
   // 論理ノードの割り当て情報を作る．
   vector<ImpNode*> node_list;
   imp_mgr.get_node_list(node_list);
-  for (vector<ImpNode*>::iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    ImpNode* node = *p;
-    ymuint id = node->id();
-    ymuint idx_0 = id * 2 + 0;
-    ymuint idx_1 = id * 2 + 1;
 
-    const ImpEdge& e0 = node->fanin0();
-    ImpNode* node0 = e0.src_node();
-    ymuint id0 = node0->id();
-    bool inv0 = e0.src_inv();
-    ymuint idx0_0 = id0 * 2 + (inv0 ? 1 : 0);
-    ymuint idx0_1 = idx0_0 ^ 1;
+  for ( ; ; ) {
+    ymuint delta = 0;
+    for (vector<ImpNode*>::iterator p = node_list.begin();
+	 p != node_list.end(); ++ p) {
+      ImpNode* node = *p;
+      ymuint id = node->id();
+      ymuint idx_0 = id * 2 + 0;
+      ymuint idx_1 = id * 2 + 1;
 
-    const ImpEdge& e1 = node->fanin1();
-    ImpNode* node1 = e1.src_node();
-    ymuint id1 = node1->id();
-    bool inv1 = e1.src_inv();
-    ymuint idx1_0 = id1 * 2 + (inv1 ? 1: 0);
-    ymuint idx1_1 = idx1_0 ^ 1;
+      const ImpEdge& e0 = node->fanin0();
+      ImpNode* node0 = e0.src_node();
+      ymuint id0 = node0->id();
+      bool inv0 = e0.src_inv();
+      ymuint idx0_0 = id0 * 2 + (inv0 ? 1 : 0);
+      ymuint idx0_1 = idx0_0 ^ 1;
 
-    // 出力が0になる割り当ては入力が0になる割り当ての共通部分
-    {
-      const list<ImpVal>& imp_list0 = imp_lists[idx0_0];
-      const list<ImpVal>& imp_list1 = imp_lists[idx1_0];
-      if ( debug ) {
-	cout << "Node#" << id << ": 0" << endl
+      const ImpEdge& e1 = node->fanin1();
+      ImpNode* node1 = e1.src_node();
+      ymuint id1 = node1->id();
+      bool inv1 = e1.src_inv();
+      ymuint idx1_0 = id1 * 2 + (inv1 ? 1: 0);
+      ymuint idx1_1 = idx1_0 ^ 1;
+
+      // 出力が0になる条件は入力が0になる条件のユニオン
+      {
+	const list<ImpVal>& imp_list0 = imp_lists[idx0_0];
+	const list<ImpVal>& imp_list1 = imp_lists[idx1_0];
+	if ( debug ) {
+	  cout << "Node#" << id << ": 0" << endl
 	     << "  fanin0: ";
-	if ( inv0 ) {
-	  cout << "~";
+	  if ( inv0 ) {
+	    cout << "~";
+	  }
+	  cout << "Node#" << id0 << " ";
+	  print_list(imp_list0);
+	  cout << "  fanin1: ";
+	  if ( inv1 ) {
+	    cout << "~";
+	  }
+	  cout << "Node#" << id1 << " ";
+	  print_list(imp_list1);
 	}
-	cout << "Node#" << id0 << " ";
-	print_list(imp_list0);
-	cout << "  fanin1: ";
-	if ( inv1 ) {
-	  cout << "~";
-	}
-	cout << "Node#" << id1 << " ";
-	print_list(imp_list1);
-      }
-      list<ImpVal>& imp_list = imp_lists[idx_0];
-      cap(imp_list0, imp_list1, imp_list);
-      for (list<ImpVal>::iterator p = imp_list.begin();
-	   p != imp_list.end(); ++ p) {
-	const ImpVal& imp = *p;
-	ymuint id1 = imp.id();
-	ymuint val1 = imp.val();
-	put(id, 0, id1, val1, imp_info, direct_imp);
-      }
-      // 最後に自分自身を足しておく
-      bool done = false;
-      for (list<ImpVal>::iterator p = imp_list.begin();
-	   p != imp_list.end(); ++ p) {
-	if ( p->id() > id ) {
-	  imp_list.insert(p, ImpVal(id, 0));
-	  done = true;
-	  break;
+	list<ImpVal>& imp_list = imp_lists[idx_0];
+	ymuint nprev = imp_list.size();
+	bool stat = cup(imp_list0, imp_list1, imp_list);
+	delta += imp_list.size() - nprev;
+	if ( debug ) {
+	  cout << "  result" << endl
+	       << "   ";
+	  print_list(imp_list);
+	  cout << endl;
 	}
       }
-      if ( !done ) {
-	imp_list.push_back(ImpVal(id, 0));
-      }
-      if ( debug ) {
-	cout << "  result" << endl
-	     << "   ";
-	print_list(imp_list);
-	cout << endl
-	     << endl;
+      // 出力が1になる条件は入力が1になる条件のインターセクション
+      {
+	const list<ImpVal>& imp_list0 = imp_lists[idx0_1];
+	const list<ImpVal>& imp_list1 = imp_lists[idx1_1];
+	if ( debug ) {
+	  cout << "Node#" << id << ": 1" << endl
+	       << "  fanin0: ";
+	  if ( inv0 ) {
+	    cout << "~";
+	  }
+	  cout << "Node#" << id0 << " ";
+	  print_list(imp_list0);
+	  cout << "  fanin1: ";
+	  if ( inv1 ) {
+	    cout << "~";
+	  }
+	  cout << "Node#" << id1 << " ";
+	  print_list(imp_list1);
+	}
+	list<ImpVal>& imp_list = imp_lists[idx_1];
+	ymuint nprev = imp_list.size();
+	cap(imp_list0, imp_list1, imp_list);
+	delta += imp_list.size() - nprev;
+	if ( debug ) {
+	  cout << "  result" << endl
+	       << "   ";
+	  print_list(imp_list);
+	  cout << endl;
+	}
       }
     }
-    // 出力が1になる割り当ては入力が1になる割り当ての和
-    {
-      const list<ImpVal>& imp_list0 = imp_lists[idx0_1];
-      const list<ImpVal>& imp_list1 = imp_lists[idx1_1];
-      if ( debug ) {
-	cout << "Node#" << id << ": 1" << endl
-	     << "  fanin0: ";
-	if ( inv0 ) {
-	  cout << "~";
+    cout << "phase1: delta = " << delta << endl;
+
+    for (vector<ImpNode*>::reverse_iterator p = node_list.rbegin();
+	 p != node_list.rend(); ++ p) {
+      ImpNode* node = *p;
+      ymuint id = node->id();
+      ymuint idx_0 = id * 2 + 0;
+      ymuint idx_1 = id * 2 + 1;
+
+      const ImpEdge& e0 = node->fanin0();
+      ImpNode* node0 = e0.src_node();
+      ymuint id0 = node0->id();
+      bool inv0 = e0.src_inv();
+      ymuint idx0_0 = id0 * 2 + (inv0 ? 1 : 0);
+      ymuint idx0_1 = idx0_0 ^ 1;
+
+      const ImpEdge& e1 = node->fanin1();
+      ImpNode* node1 = e1.src_node();
+      ymuint id1 = node1->id();
+      bool inv1 = e1.src_inv();
+      ymuint idx1_0 = id1 * 2 + (inv1 ? 1: 0);
+      ymuint idx1_1 = idx1_0 ^ 1;
+
+      { // 出力の0の条件とファンイン0の1の条件の共通部分がファンイン1の0の条件となる．
+	list<ImpVal>& imp_list_o_0 = imp_lists[idx_0];
+	list<ImpVal>& imp_list_i0_1 = imp_lists[idx0_1];
+	list<ImpVal>& imp_list_i1_0 = imp_lists[idx1_0];
+	if ( debug ) {
+	  cout << "Node#" << id << ":0";
+	  print_list(imp_list_o_0);
+	  cout << "fanin0: ";
+	  if ( inv0 ) {
+	    cout << "~";
+	  }
+	  cout << "Node#" << id0 << ":1";
+	  print_list(imp_list_i0_1);
 	}
-	cout << "Node#" << id0 << " ";
-	print_list(imp_list0);
-	cout << "  fanin1: ";
-	if ( inv1 ) {
-	  cout << "~";
+	ymuint nprev = imp_list_i1_0.size();
+	cap(imp_list_o_0, imp_list_i0_1, imp_list_i1_0);
+	delta += imp_list_i1_0.size() - nprev;
+	if ( debug ) {
+	  cout << "  result" << endl
+	       << "   ";
+	  print_list(imp_list_i1_0);
+	  cout << endl
+	       << endl;
 	}
-	cout << "Node#" << id1 << " ";
-	print_list(imp_list1);
       }
-      list<ImpVal>& imp_list = imp_lists[idx_1];
-      bool stat = cup(imp_list0, imp_list1, imp_list);
-      if ( stat ) {
-	for (list<ImpVal>::iterator p = imp_list.begin();
-	     p != imp_list.end(); ++ p) {
-	  const ImpVal& imp = *p;
-	  ymuint id1 = imp.id();
-	  ymuint val1 = imp.val();
-	  put(id, 1, id1, val1, imp_info, direct_imp);
+      { // 出力の0の条件とファンイン1の1の条件の共通部分がファンイン0の0の条件となる．
+	list<ImpVal>& imp_list_o_0 = imp_lists[idx_0];
+	list<ImpVal>& imp_list_i1_1 = imp_lists[idx1_1];
+	list<ImpVal>& imp_list_i0_0 = imp_lists[idx0_0];
+	if ( debug ) {
+	  cout << "Node#" << id << ":0";
+	  print_list(imp_list_o_0);
+	  cout << "fanin1: ";
+	  if ( inv1 ) {
+	    cout << "~";
+	  }
+	  cout << "Node#" << id1 << ":1";
+	  print_list(imp_list_i1_1);
+	}
+	ymuint nprev = imp_list_i0_0.size();
+	cap(imp_list_o_0, imp_list_i1_1, imp_list_i0_0);
+	delta += imp_list_i0_0.size() - nprev;
+	if ( debug ) {
+	  cout << "  result" << endl
+	       << "   ";
+	  print_list(imp_list_i0_0);
+	  cout << endl
+	       << endl;
 	}
       }
-      // 最後に自分自身を足しておく
-      bool done = false;
-      for (list<ImpVal>::iterator p = imp_list.begin();
+      { // 出力の1の条件がファンイン0の1の条件となる．
+	list<ImpVal>& imp_list_o_1 = imp_lists[idx_1];
+	list<ImpVal>& imp_list_i0_1 = imp_lists[idx0_1];
+	if ( debug ) {
+	  cout << "Node#" << id << ":1";
+	  print_list(imp_list_o_1);
+	  cout << "  fanin0: ";
+	  if ( inv0 ) {
+	    cout << "~";
+	  }
+	  cout << "Node#" << id0 << ":1";
+	  print_list(imp_list_i0_1);
+	}
+	ymuint nprev = imp_list_i0_1.size();
+	merge(imp_list_i0_1, imp_list_o_1);
+	delta += imp_list_i0_1.size() - nprev;
+	if ( debug ) {
+	  cout << "  result" << endl
+	       << "   ";
+	  print_list(imp_list_i0_1);
+	  cout << endl
+	       << endl;
+	}
+      }
+      { // 出力の1の条件がファンイン1の1の条件となる．
+	list<ImpVal>& imp_list_o_1 = imp_lists[idx_1];
+	list<ImpVal>& imp_list_i1_1 = imp_lists[idx1_1];
+	if ( debug ) {
+	  cout << "Node#" << id << ":1";
+	  print_list(imp_list_o_1);
+	  cout << "  fanin1: ";
+	  if ( inv1 ) {
+	    cout << "~";
+	  }
+	  cout << "Node#" << id1 << ":1";
+	  print_list(imp_list_i1_1);
+	}
+	ymuint nprev = imp_list_i1_1.size();
+	merge(imp_list_i1_1, imp_list_o_1);
+	delta += imp_list_i1_1.size() - nprev;
+	if ( debug ) {
+	  cout << "  result" << endl
+	       << "   ";
+	  print_list(imp_list_i1_1);
+	  cout << endl
+	       << endl;
+	}
+      }
+    }
+    cout << "phase2: delta = " << delta << endl;
+    if ( delta == 0 ) {
+      break;
+    }
+  }
+
+  // imp_lists の情報から imp_info を作る．
+  imp_info.set_size(n);
+  for (ymuint dst_id = 0; dst_id < n; ++ dst_id) {
+    ImpNode* node = imp_mgr.node(dst_id);
+    if ( node == NULL ) {
+      continue;
+    }
+    for (ymuint dst_val = 0; dst_val < 2; ++ dst_val) {
+      const list<ImpVal>& imp_list = imp_lists[dst_id * 2 + dst_val];
+      for (list<ImpVal>::const_iterator p = imp_list.begin();
 	   p != imp_list.end(); ++ p) {
-	if ( p->id() > id ) {
-	  imp_list.insert(p, ImpVal(id, 1));
-	  done = true;
-	  break;
+	const ImpVal& val = *p;
+	ymuint src_id = val.id();
+	ymuint src_val = val.val();
+	if ( src_id == dst_id ) {
+	  continue;
 	}
-      }
-      if ( !done ) {
-	imp_list.push_back(ImpVal(id, 1));
-      }
-      if ( debug ) {
-	cout << "  result" << endl
-	     << "   ";
-	print_list(imp_list);
-	cout << endl
-	     << endl;
+	if ( !imp_info.check(src_id, src_val, dst_id, dst_val) ) {
+	  imp_info.put(src_id, src_val, dst_id, dst_val);
+	}
+	if ( !imp_info.check(dst_id, dst_val ^ 1, src_id, src_val ^ 1) ) {
+	  imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
+	}
       }
     }
   }
 
 #if 0
-  for (vector<ImpNode*>::reverse_iterator p = node_list.rbegin();
-       p != node_list.rend(); ++ p) {
-    ImpNode* node = *p;
-    ymuint id = node->id();
-    ymuint idx_0 = id * 2 + 0;
-    ymuint idx_1 = id * 2 + 1;
-
-    const ImpEdge& e0 = node->fanin0();
-    ImpNode* node0 = e0.src_node();
-    ymuint id0 = node0->id();
-    bool inv0 = e0.src_inv();
-    ymuint idx0_0 = id0 * 2 + (inv0 ? 1 : 0);
-    ymuint idx0_1 = idx0_0 ^ 1;
-
-    const ImpEdge& e1 = node->fanin1();
-    ImpNode* node1 = e1.src_node();
-    ymuint id1 = node1->id();
-    bool inv1 = e1.src_inv();
-    ymuint idx1_0 = id1 * 2 + (inv1 ? 1: 0);
-    ymuint idx1_1 = idx1_0 ^ 1;
-
-#if 1
-    { // 出力の0とファンイン0の1の共通部分がファンイン1の0の含意となる．
-      list<ImpVal>& imp_list_o_0 = imp_lists[idx_0];
-      list<ImpVal>& imp_list_i0_1 = imp_lists[idx0_1];
-      list<ImpVal>& imp_list_i1_0 = imp_lists[idx1_0];
-      list<ImpVal> tmp_list;
-      cap(imp_list_o_0, imp_list_i0_1, tmp_list);
-      for (list<ImpVal>::iterator p = tmp_list.begin();
-	   p != tmp_list.end(); ++ p) {
-	const ImpVal& imp = *p;
-	put(id1, 0, imp.id(), imp.val(), imp_info, direct_imp);
-      }
-      merge(imp_list_i1_0, tmp_list);
-    }
-    { // 出力の0とファンイン1の1の共通部分がファンイン0の0の含意となる．
-      list<ImpVal>& imp_list_o_0 = imp_lists[idx_0];
-      list<ImpVal>& imp_list_i1_1 = imp_lists[idx1_1];
-      list<ImpVal>& imp_list_i0_0 = imp_lists[idx0_0];
-      list<ImpVal> tmp_list;
-      cap(imp_list_o_0, imp_list_i1_1, tmp_list);
-      for (list<ImpVal>::iterator p = tmp_list.begin();
-	   p != tmp_list.end(); ++ p) {
-	const ImpVal& imp = *p;
-	put(id0, 0, imp.id(), imp.val(), imp_info, direct_imp);
-      }
-      merge(imp_list_i0_0, tmp_list);
-    }
-#endif
-#if 0
-    { // 出力の1がファンイン0の1の含意となる．
-      list<ImpVal>& imp_list_o_1 = imp_lists[idx_1];
-      list<ImpVal>& imp_list_i0_1 = imp_lists[idx0_1];
-      for (list<ImpVal>::iterator p = imp_list_o_1.begin();
-	   p != imp_list_o_1.end(); ++ p) {
-	const ImpVal& imp = *p;
-	put(id0, 1, imp.id(), imp.val(), imp_info, direct_imp);
-      }
-      merge(imp_list_i0_1, imp_list_o_1);
-    }
-    { // 出力の1がファンイン1の1の含意となる．
-      list<ImpVal>& imp_list_o_1 = imp_lists[idx_1];
-      list<ImpVal>& imp_list_i1_1 = imp_lists[idx1_1];
-      if ( debug ) {
-	cout << "Node#" << id << ":1";
-	print_list(imp_list_o_1);
-	cout << "  fanin1: ";
-	if ( inv1 ) {
-	  cout << "~";
-	}
-	cout << "Node#" << id1 << ":1";
-	print_list(imp_list_i1_1);
-      }
-      for (list<ImpVal>::iterator p = imp_list_o_1.begin();
-	   p != imp_list_o_1.end(); ++ p) {
-	const ImpVal& imp = *p;
-	put(id1, 1, imp.id(), imp.val(), imp_info, direct_imp);
-      }
-      merge(imp_list_i1_1, imp_list_o_1);
-      if ( debug ) {
-	cout << "  result" << endl
-	     << "   ";
-	print_list(imp_list_i1_1);
-	cout << endl
-	     << endl;
-      }
-    }
-#endif
-  }
-#endif
-
-#if 1
   // 検証
   {
     SatSolver solver1;
