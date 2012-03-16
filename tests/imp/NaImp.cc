@@ -24,7 +24,7 @@ bool debug = true;
 void
 print_list(const list<ImpVal>& imp_list);
 
-void
+bool
 cup(const list<ImpVal>& src1,
     const list<ImpVal>& src2,
     list<ImpVal>& dst)
@@ -47,7 +47,9 @@ cup(const list<ImpVal>& src1,
       ++ p2;
     }
     else { // id1 == id2
-      assert_cond( imp1.val() == imp2.val(), __FILE__, __LINE__);
+      if ( imp1.val() != imp2.val() ) {
+	return false;
+      }
       dst.push_back(imp1);
       ++ p1;
       ++ p2;
@@ -61,6 +63,7 @@ cup(const list<ImpVal>& src1,
     const ImpVal& imp = *p2;
     dst.push_back(imp);
   }
+  return true;
 }
 
 void
@@ -245,6 +248,21 @@ NaImp::learning(ImpMgr& imp_mgr,
     {
       const list<ImpVal>& imp_list0 = imp_lists[idx0_0];
       const list<ImpVal>& imp_list1 = imp_lists[idx1_0];
+      if ( debug ) {
+	cout << "Node#" << id << ": 0" << endl
+	     << "  fanin0: ";
+	if ( inv0 ) {
+	  cout << "~";
+	}
+	cout << "Node#" << id0 << " ";
+	print_list(imp_list0);
+	cout << "  fanin1: ";
+	if ( inv1 ) {
+	  cout << "~";
+	}
+	cout << "Node#" << id1 << " ";
+	print_list(imp_list1);
+      }
       list<ImpVal>& imp_list = imp_lists[idx_0];
       cap(imp_list0, imp_list1, imp_list);
       for (list<ImpVal>::iterator p = imp_list.begin();
@@ -268,7 +286,19 @@ NaImp::learning(ImpMgr& imp_mgr,
 	imp_list.push_back(ImpVal(id, 0));
       }
       if ( debug ) {
-	cout << "Node#" << id << ": 0" << endl
+	cout << "  result" << endl
+	     << "   ";
+	print_list(imp_list);
+	cout << endl
+	     << endl;
+      }
+    }
+    // 出力が1になる割り当ては入力が1になる割り当ての和
+    {
+      const list<ImpVal>& imp_list0 = imp_lists[idx0_1];
+      const list<ImpVal>& imp_list1 = imp_lists[idx1_1];
+      if ( debug ) {
+	cout << "Node#" << id << ": 1" << endl
 	     << "  fanin0: ";
 	if ( inv0 ) {
 	  cout << "~";
@@ -281,25 +311,17 @@ NaImp::learning(ImpMgr& imp_mgr,
 	}
 	cout << "Node#" << id1 << " ";
 	print_list(imp_list1);
-	cout << "  result" << endl
-	     << "   ";
-	print_list(imp_list);
-	cout << endl
-	     << endl;
       }
-    }
-    // 出力が1になる割り当ては入力が1になる割り当ての和
-    {
-      const list<ImpVal>& imp_list0 = imp_lists[idx0_1];
-      const list<ImpVal>& imp_list1 = imp_lists[idx1_1];
       list<ImpVal>& imp_list = imp_lists[idx_1];
-      cup(imp_list0, imp_list1, imp_list);
-      for (list<ImpVal>::iterator p = imp_list.begin();
-	   p != imp_list.end(); ++ p) {
-	const ImpVal& imp = *p;
-	ymuint id1 = imp.id();
-	ymuint val1 = imp.val();
-	put(id, 1, id1, val1, imp_info, direct_imp);
+      bool stat = cup(imp_list0, imp_list1, imp_list);
+      if ( stat ) {
+	for (list<ImpVal>::iterator p = imp_list.begin();
+	     p != imp_list.end(); ++ p) {
+	  const ImpVal& imp = *p;
+	  ymuint id1 = imp.id();
+	  ymuint val1 = imp.val();
+	  put(id, 1, id1, val1, imp_info, direct_imp);
+	}
       }
       // 最後に自分自身を足しておく
       bool done = false;
@@ -315,19 +337,6 @@ NaImp::learning(ImpMgr& imp_mgr,
 	imp_list.push_back(ImpVal(id, 1));
       }
       if ( debug ) {
-	cout << "Node#" << id << ": 1" << endl
-	     << "  fanin0: ";
-	if ( inv0 ) {
-	  cout << "~";
-	}
-	cout << "Node#" << id0 << " ";
-	print_list(imp_list0);
-	cout << "  fanin1: ";
-	if ( inv1 ) {
-	  cout << "~";
-	}
-	cout << "Node#" << id1 << " ";
-	print_list(imp_list1);
 	cout << "  result" << endl
 	     << "   ";
 	print_list(imp_list);
@@ -337,6 +346,7 @@ NaImp::learning(ImpMgr& imp_mgr,
     }
   }
 
+#if 0
   for (vector<ImpNode*>::reverse_iterator p = node_list.rbegin();
        p != node_list.rend(); ++ p) {
     ImpNode* node = *p;
@@ -426,6 +436,7 @@ NaImp::learning(ImpMgr& imp_mgr,
     }
 #endif
   }
+#endif
 
 #if 1
   // 検証
