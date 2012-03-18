@@ -1,15 +1,15 @@
 # Process this file with autoconf to produce a configure script
-dnl
+#
 # $Id: configure.ac 2507 2009-10-17 16:24:02Z matsunaga $
 
 # ===================================================================
 # Initial block
 # ===================================================================
-AC_REVISION($Rev: 2507 $)dnl
-
-AC_INIT([ymtools-tests], [1.0],
+AC_INIT([bb], [1.0],
         [yusuke_matsunaga@ieee.org],
-        [ymtools-tests])dnl
+        [bb])dnl
+
+AC_REVISION($Rev: 2507 $)dnl
 
 AC_PREREQ(2.57)dnl
 
@@ -18,7 +18,7 @@ Copyright (C) 2006-2011 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
-AC_CONFIG_SRCDIR([makebdd/makebdd.cc])dnl
+AC_CONFIG_SRCDIR([include/bb_nsdef.h])dnl
 
 AC_CONFIG_AUX_DIR([config])dnl
 AC_CONFIG_MACRO_DIR([config])dnl
@@ -26,7 +26,7 @@ AC_SUBST(ac_aux_dir)dnl
 
 AM_INIT_AUTOMAKE()dnl
 
-AC_DEFINE_UNQUOTED(SEAL_VERSION, "${VERSION}", [SEAL version])dnl
+AC_DEFINE_UNQUOTED(ATPG_VERSION, "${VERSION}", [BB version])dnl
 
 
 # ===================================================================
@@ -41,11 +41,6 @@ AC_PROG_INSTALL
 AC_PROG_YACC
 AM_PROG_LEX
 AC_PROG_LIBTOOL
-AC_CHECK_PROG([DOXYGEN],
-	      [doxygen],
-	      [doxygen Doxyfile],
-	      [@echo \"You'll need to install 'doxygen'\"])
-AC_SUBST(DOXYGEN)
 
 if test $enable_shared = no; then
   AC_DEFINE(BUILD_STATIC, 1, [Define for doing static link])
@@ -72,14 +67,7 @@ fi
 # ===================================================================
 # Check for size of built-in types
 # ===================================================================
-AC_CHECK_SIZEOF(char)
-AC_CHECK_SIZEOF(unsigned char)
-AC_CHECK_SIZEOF(int)
-AC_CHECK_SIZEOF(unsigned int)
-AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(unsigned long)
-AC_CHECK_SIZEOF(void*)
-AC_CHECK_SIZEOF(size_t)
 
 _AC_COMPUTE_INT([__alignof__ (double)], ym_alignof_double)
 AC_DEFINE_UNQUOTED(ALIGNOF_DOUBLE, $ym_alignof_double, [Alignment of double])
@@ -96,27 +84,21 @@ AC_DEFINE_UNQUOTED(ALIGNOF_DOUBLE, $ym_alignof_double, [Alignment of double])
 
 
 # ===================================================================
-# Check for gmp
-# ===================================================================
-YM_CHECK_GMP
-
-
-# ===================================================================
 # Check for popt
 # ===================================================================
-YM_CHECK_POPT
+#YM_CHECK_POPT
 
 
 # ===================================================================
 # Check for TCL environment
 # ===================================================================
-YM_CHECK_TCL
+#YM_CHECK_TCL
 
 
 # ===================================================================
 # Check for tclreadline
 # ===================================================================
-YM_CHECK_TCLREADLINE
+#YM_CHECK_TCLREADLINE
 
 
 # ===================================================================
@@ -129,10 +111,26 @@ AC_LANG_CPLUSPLUS
 # Local definitions
 # ===================================================================
 
-YMTOOLS_SRCDIR="\$(top_srcdir)/.."
-YMTOOLS_BUILDDIR="\$(top_builddir)/.."
+YMTOOLS_SRCDIR="\$(top_srcdir)/../.."
+YMTOOLS_BUILDDIR="\$(top_builddir)/../.."
 AC_SUBST([YMTOOLS_SRCDIR])
 AC_SUBST([YMTOOLS_BUILDDIR])
+
+
+# ===================================================================
+# Set 'atpg' directory
+# ===================================================================
+#AC_ARG_WITH(atpg-library,
+#[  --with-atpg-library=DIR package dependent directory],
+#[ATPG_LIBDIR=$withval],
+#[ATPG_LIBDIR='${prefix}/lib/AC_PACKAGE_NAME[]AC_PACKAGE_VERSION]')dnl
+#AC_SUBST(ATPG_LIBDIR)dnl
+
+#ATPG_DATADIR='${prefix}/share/AC_PACKAGE_NAME[]AC_PACKAGE_VERSION'
+#AC_SUBST(ATPG_DATADIR)dnl
+
+#ATPG_BINDIR='${bindir}'
+#AC_SUBST(ATPG_BINDIR)dnl
 
 
 # ===================================================================
@@ -140,16 +138,10 @@ AC_SUBST([YMTOOLS_BUILDDIR])
 # ===================================================================
 AC_CONFIG_FILES([
 	Makefile
-	bnet2aig/Makefile
-	makebdd/Makefile
-	lsim/Makefile
-	enumcut/Makefile
-	imp/Makefile
-	imp/bb/Makefile
-	imp/bb/include/Makefile
-	imp/bb/src/Makefile
-	imp/bb/src/parser/Makefile
-	imp/bb/src/pt/Makefile
+	include/Makefile
+	src/Makefile
+	src/parser/Makefile
+	src/pt/Makefile
 	])
 
 

@@ -2,7 +2,7 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS =
+SUBDIRS = . bb
 
 EXTRA_DIST = local_defs $(TESTS)
 
