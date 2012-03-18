@@ -384,7 +384,9 @@ NaImp::learning(ImpMgr& imp_mgr,
 	}
       }
     }
+#if 0
     cout << "phase1: delta = " << delta << endl;
+#endif
 
     for (vector<ImpNode*>::reverse_iterator p = node_list.rbegin();
 	 p != node_list.rend(); ++ p) {
@@ -506,7 +508,9 @@ NaImp::learning(ImpMgr& imp_mgr,
 	}
       }
     }
+#if 0
     cout << "phase2: delta = " << delta << endl;
+#endif
     if ( delta == 0 ) {
       break;
     }

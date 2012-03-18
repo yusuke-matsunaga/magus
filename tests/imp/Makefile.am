@@ -20,13 +20,32 @@ TESTS =
 noinst_PROGRAMS = \
 	imp
 
+noinst_LTLIBRARIES = \
+	libym_imp.la
+
 imp_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	@POPT_INCLUDES@
 
 imp_SOURCES = \
-	imp.cc \
+	imp.cc
+
+imp_LDADD = \
+	libym_imp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	@POPT_LIBS@
+
+imp_LDFLAGS =
+
+libym_imp_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	@GMP_INCLUDES@
+
+libym_imp_la_SOURCES = \
 	BNodeMap.h \
 	BNodeMap.cc \
 	ImpVal.h \
@@ -57,14 +76,4 @@ imp_SOURCES = \
 	RlImp.h \
 	RlImp.cc \
 	NaImp.h \
-	NaImp.cc \
-	NaImp2.h \
-	NaImp2.cc
-
-imp_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
-	@POPT_LIBS@
-
-imp_LDFLAGS =
+	NaImp.cc

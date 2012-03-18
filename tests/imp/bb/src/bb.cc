@@ -20,8 +20,54 @@
 #include "ym_utils/StopWatch.h"
 #include "ym_utils/MsgHandler.h"
 
+#include "ImpMgr.h"
+#include "ImpInfo.h"
+#include "StrImp.h"
+#include "NaImp.h"
+#include "ImpNode.h"
+
 
 BEGIN_NAMESPACE_YM_BB
+
+using nsYm::nsNetworks::ImpMgr;
+using nsYm::nsNetworks::ImpInfo;
+using nsYm::nsNetworks::ImpNode;
+using nsYm::nsNetworks::ImpNodeHandle;
+using nsYm::nsNetworks::StrImp;
+using nsYm::nsNetworks::NaImp;
+
+ImpNodeHandle
+make_node(ImpMgr& imp_mgr,
+	  Aig aig,
+	  hash_map<Aig, ImpNodeHandle>& node_map)
+{
+  hash_map<Aig, ImpNodeHandle>::iterator p = node_map.find(aig);
+  if ( p != node_map.end() ) {
+    return p->second;
+  }
+
+  ImpNodeHandle node_handle;
+  if ( aig.is_zero() ) {
+    node_handle = ImpNodeHandle::make_zero();
+  }
+  else if ( aig.is_one() ) {
+    node_handle = ImpNodeHandle::make_one();
+  }
+  else if ( aig.is_input() ) {
+    ImpNode* node = imp_mgr.new_input();
+    node_handle.set(node, aig.inv());
+  }
+  else { // aig.is_and()
+    Aig aig0 = aig.fanin0();
+    Aig aig1 = aig.fanin1();
+    ImpNodeHandle inode0 = make_node(imp_mgr, aig0, node_map);
+    ImpNodeHandle inode1 = make_node(imp_mgr, aig1, node_map);
+    ImpNode* node = imp_mgr.new_and(inode0, inode1);
+    node_handle.set(node, aig.inv());
+  }
+  node_map.insert(make_pair(aig, node_handle));
+  return node_handle;
+}
 
 void
 bb(const char* file_name,
@@ -164,6 +210,24 @@ bb(const char* file_name,
 	}
       }
 #else
+      ImpMgr imp_mgr;
+      hash_map<Aig, ImpNodeHandle> node_map;
+      vector<ImpNodeHandle> node_list;
+      node_list.reserve(root_list.size());
+      for (vector<Aig>::iterator p = root_list.begin();
+	   p != root_list.end(); ++ p) {
+	Aig root = *p;
+	ImpNodeHandle handle = make_node(imp_mgr, root, node_map);
+	node_list.push_back(handle);
+      }
+      StrImp str_imp;
+      ImpInfo direct_imp;
+      str_imp.learning(imp_mgr, direct_imp);
+
+      NaImp na_imp;
+      ImpInfo na_imp_info;
+      na_imp.learning(imp_mgr, direct_imp, na_imp_info);
+
       if ( c == loop_num - 1 ) {
 	cout << "Unknown" << endl;
       }

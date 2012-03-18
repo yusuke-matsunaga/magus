@@ -90,6 +90,40 @@ public:
   void
   set(const BdnMgr& src_network);
 
+  /// @brief 論理式に対応したノードの木を作る．
+  ImpNodeHandle
+  make_tree(const LogExpr& expr,
+	    const vector<ImpNodeHandle>& fanins);
+
+  /// @brief AND ノードの木を作る．
+  /// @param[in] fanins 葉のノードの配列
+  /// @param[in] begin 開始位置
+  /// @param[in] end 終了位置
+  ImpNodeHandle
+  make_and(const vector<ImpNodeHandle>& fanins,
+	   ymuint begin,
+	   ymuint end);
+
+  /// @brief XOR ノードの木を作る．
+  /// @param[in] fanins 葉のノードの配列
+  /// @param[in] begin 開始位置
+  /// @param[in] end 終了位置
+  ImpNodeHandle
+  make_xor(const vector<ImpNodeHandle>& fanins,
+	   ymuint begin,
+	   ymuint end);
+
+  /// @brief 入力ノードを作る．
+  ImpNode*
+  new_input();
+
+  /// @brief ANDノードを作る．
+  /// @param[in] handle0 ファンイン0のハンドル
+  /// @param[in] handle1 ファンイン1のハンドル
+  ImpNode*
+  new_and(ImpNodeHandle handle0,
+	  ImpNodeHandle handle1);
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -221,40 +255,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理式に対応したノードの木を作る．
-  ImpNodeHandle
-  make_tree(const LogExpr& expr,
-	    const vector<ImpNodeHandle>& fanins);
-
-  /// @brief AND ノードの木を作る．
-  /// @param[in] fanins 葉のノードの配列
-  /// @param[in] begin 開始位置
-  /// @param[in] end 終了位置
-  ImpNodeHandle
-  make_and(const vector<ImpNodeHandle>& fanins,
-	   ymuint begin,
-	   ymuint end);
-
-  /// @brief XOR ノードの木を作る．
-  /// @param[in] fanins 葉のノードの配列
-  /// @param[in] begin 開始位置
-  /// @param[in] end 終了位置
-  ImpNodeHandle
-  make_xor(const vector<ImpNodeHandle>& fanins,
-	   ymuint begin,
-	   ymuint end);
-
-  /// @brief 入力ノードを作る．
-  ImpNode*
-  new_input();
-
-  /// @brief ANDノードを作る．
-  /// @param[in] handle0 ファンイン0のハンドル
-  /// @param[in] handle1 ファンイン1のハンドル
-  ImpNode*
-  new_and(ImpNodeHandle handle0,
-	  ImpNodeHandle handle1);
 
   /// @brief ノードに BNode-ID を割り当てる．
   void
