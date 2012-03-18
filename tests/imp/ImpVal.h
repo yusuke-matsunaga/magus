@@ -78,6 +78,26 @@ public:
   bool
   operator!=(const ImpVal& right) const;
 
+  /// @brief 大小比較演算子
+  bool
+  operator<(const ImpVal& right) const;
+
+  /// @brief 大小比較演算子
+  bool
+  operator>(const ImpVal& right) const;
+
+  /// @brief 大小比較演算子
+  bool
+  operator<=(const ImpVal& right) const;
+
+  /// @brief 大小比較演算子
+  bool
+  operator>=(const ImpVal& right) const;
+
+  /// @brief 内容を出力する．
+  void
+  print(ostream& s) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -172,7 +192,50 @@ inline
 bool
 ImpVal::operator!=(const ImpVal& right) const
 {
-  return mVal != right.mVal;
+  return !operator==(right);
+}
+
+// @brief 大小比較演算子
+inline
+bool
+ImpVal::operator<(const ImpVal& right) const
+{
+  return mVal < right.mVal;
+}
+
+// @brief 大小比較演算子
+inline
+bool
+ImpVal::operator>(const ImpVal& right) const
+{
+  return right.operator<(*this);
+}
+
+// @brief 大小比較演算子
+inline
+bool
+ImpVal::operator<=(const ImpVal& right) const
+{
+  return !right.operator<(*this);
+}
+
+// @brief 大小比較演算子
+inline
+bool
+ImpVal::operator>=(const ImpVal& right) const
+{
+  return !operator<(right);
+}
+
+// @brief 内容を出力する．
+inline
+void
+ImpVal::print(ostream& s) const
+{
+  if ( val() == 0 ) {
+    s << "~";
+  }
+  s << id();
 }
 
 END_NAMESPACE_YM_NETWORKS

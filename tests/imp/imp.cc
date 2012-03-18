@@ -28,6 +28,7 @@
 #include "SatImp.h"
 #include "RlImp.h"
 #include "NaImp.h"
+#include "NaImp2.h"
 
 #include "ym_logic/ZddMgr.h"
 
@@ -151,6 +152,16 @@ imp(const string& filename,
     timer.stop();
     USTime na_time = timer.time();
 
+    timer.reset();
+    timer.start();
+    NaImp2 naimp2;
+    ImpInfo na_imp2;
+#if 1
+    naimp2.learning(imp_mgr, direct_imp, na_imp2);
+#endif
+    timer.stop();
+    USTime na_time2 = timer.time();
+
     cout << "d_imp" << endl;
     direct_imp.print_stats(cout);
     cout << "c_imp" << endl;
@@ -160,6 +171,7 @@ imp(const string& filename,
     contra_imp.copy_const(sat_imp);
     rl_imp.copy_const(sat_imp);
     na_imp.copy_const(sat_imp);
+    na_imp2.copy_const(sat_imp);
 #endif
     ymuint and_node = 0;
     ymuint xor_node = 0;
@@ -197,6 +209,8 @@ imp(const string& filename,
 	 << ": " << rl_time << endl
 	 << "Naive Implications:              " << setw(10) << na_imp.size()
 	 << ": " << na_time << endl
+	 << "Naive Implications(2):           " << setw(10) << na_imp2.size()
+	 << ": " << na_time2 << endl
 	 << "Complete Implications:           " << setw(10) << sat_imp.size()
 	 << ": " << sat_time << endl;
   }

@@ -1,17 +1,18 @@
 
-/// @file NaImp.cc
-/// @brief NaImp の実装ファイル
+/// @file NaImp2.cc
+/// @brief NaImp2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "NaImp.h"
+#include "NaImp2.h"
 #include "ImpMgr.h"
 #include "ImpInfo.h"
 #include "ImpNode.h"
 #include "ImpList.h"
+#include "ImpVals.h"
 #include "ym_logic/SatSolver.h"
 
 
@@ -25,180 +26,87 @@ bool debug = true;
 bool debug = false;
 #endif
 
-
-//////////////////////////////////////////////////////////////////////
-// ImpVal のリストをソートするための比較関数
-//////////////////////////////////////////////////////////////////////
-struct ImpComp
-{
-  bool
-  operator()(const ImpVal& imp1,
-	     const ImpVal& imp2) const
-  {
-    ymuint id1 = imp1.id();
-    ymuint id2 = imp2.id();
-    if ( id1 < id2 ) {
-      return true;
-    }
-    if ( id1 > id2 ) {
-      return false;
-    }
-    // id1 == id2
-    ymuint val1 = imp1.val();
-    ymuint val2 = imp2.val();
-    return val1 <= val2;
-  }
-};
-
 void
-print_list(const list<ImpVal>& imp_list)
+print_list(const list<ImpVals>& imp_list)
 {
-  for (list<ImpVal>::const_iterator p = imp_list.begin();
+  for (list<ImpVals>::const_iterator p = imp_list.begin();
        p != imp_list.end(); ++ p) {
-    const ImpVal& val = *p;
+    const ImpVals& vals = *p;
     cout << " ";
-    val.print(cout);
+    vals.print(cout);
   }
   cout << endl;
 }
 
-bool
-insert(list<ImpVal>& imp_list,
-       list<ImpVal>::iterator& p,
-       const ImpVal& imp)
-{
-  for ( ; p != imp_list.end(); ++ p) {
-    ymuint id = p->id();
-    if ( id == imp.id() ) {
-      if ( p->val() == imp.val() ) {
-	return true;
-      }
-      else {
-	return false;
-      }
-    }
-    else if ( id > imp.id() ) {
-      imp_list.insert(p, imp);
-      return true;
-    }
-  }
-  imp_list.push_back(imp);
-  return true;
-}
-
-bool
-cup(const list<ImpVal>& src1,
-    const list<ImpVal>& src2,
-    list<ImpVal>& dst)
-{
-  list<ImpVal>::const_iterator p1 = src1.begin();
-  list<ImpVal>::const_iterator e1 = src1.end();
-  list<ImpVal>::const_iterator p2 = src2.begin();
-  list<ImpVal>::const_iterator e2 = src2.end();
-  list<ImpVal>::iterator p3 = dst.begin();
-  while ( p1 != e1 && p2 != e2 ) {
-    const ImpVal& imp1 = *p1;
-    const ImpVal& imp2 = *p2;
-    ymuint id1 = imp1.id();
-    ymuint id2 = imp2.id();
-    if ( id1 < id2 ) {
-      if ( !insert(dst, p3, imp1) ) {
-	return false;
-      }
-      ++ p1;
-    }
-    else if ( id1 > id2 ) {
-      if ( !insert(dst, p3, imp2) ) {
-	return false;
-      }
-      ++ p2;
-    }
-    else { // id1 == id2
-      if ( imp1.val() != imp2.val() ) {
-	return false;
-      }
-      if ( !insert(dst, p3, imp1) ) {
-	return false;
-      }
-      ++ p1;
-      ++ p2;
-    }
-  }
-  for ( ; p1 != e1; ++ p1) {
-    const ImpVal& imp = *p1;
-    if ( !insert(dst, p3, imp) ) {
-      return false;
-    }
-  }
-  for ( ; p2 != e2; ++ p2) {
-    const ImpVal& imp = *p2;
-    if ( !insert(dst, p3, imp) ) {
-      return false;
-    }
-  }
-  return true;
-}
-
 void
-cap(const list<ImpVal>& src1,
-    const list<ImpVal>& src2,
-    list<ImpVal>& dst)
+merge(list<ImpVals>& dst_list,
+      const list<ImpVals>& src_list)
 {
-  list<ImpVal>::const_iterator p1 = src1.begin();
-  list<ImpVal>::const_iterator e1 = src1.end();
-  list<ImpVal>::const_iterator p2 = src2.begin();
-  list<ImpVal>::const_iterator e2 = src2.end();
-  list<ImpVal>::iterator p3 = dst.begin();
-  while ( p1 != e1 && p2 != e2 ) {
-    const ImpVal& imp1 = *p1;
-    const ImpVal& imp2 = *p2;
-    ymuint id1 = imp1.id();
-    ymuint id2 = imp2.id();
-    if ( id1 < id2 ) {
-      ++ p1;
-    }
-    else if ( id1 > id2 ) {
-      ++ p2;
-    }
-    else { // id1 == id2
-      if ( imp1.val() == imp2.val() ) {
-	insert(dst, p3, imp1);
-      }
-      ++ p1;
-      ++ p2;
-    }
-  }
-}
-
-void
-merge(list<ImpVal>& dst,
-      list<ImpVal>& src)
-{
-  list<ImpVal>::iterator p = dst.begin();
-  list<ImpVal>::iterator p_end = dst.end();
-  list<ImpVal>::iterator q = src.begin();
-  list<ImpVal>::iterator q_end = src.end();
+  list<ImpVals>::iterator p = dst_list.begin();
+  list<ImpVals>::iterator p_end = dst_list.end();
+  list<ImpVals>::const_iterator q = src_list.begin();
+  list<ImpVals>::const_iterator q_end = src_list.end();
   while ( p != p_end && q != q_end ) {
-    const ImpVal& imp1 = *p;
-    const ImpVal& imp2 = *q;
-    ymuint id1 = imp1.id();
-    ymuint id2 = imp2.id();
-    if ( id1 < id2 ) {
+    const ImpVals& imp1 = *p;
+    const ImpVals& imp2 = *q;
+    if ( imp1 < imp2 ) {
       ++ p;
     }
-    else if ( id1 > id2 ) {
-      dst.insert(p, imp2);
+    else if ( imp1 > imp2 ) {
+      dst_list.insert(p, imp2);
       ++ q;
     }
     else { // id1 == id2
-      //assert_cond( imp1.val() == imp2.val(), __FILE__, __LINE__);
       ++ p;
       ++ q;
     }
   }
   for ( ; q != q_end; ++ q) {
-    const ImpVal& imp = *q;
-    dst.push_back(imp);
+    const ImpVals& imp = *q;
+    dst_list.push_back(imp);
+  }
+}
+
+void
+and_merge(list<ImpVals>& dst_list,
+	  const list<ImpVals>& src_list1,
+	  const list<ImpVals>& src_list2)
+{
+  list<ImpVals>::iterator p = dst_list.begin();
+  list<ImpVals>::iterator p_end = dst_list.end();
+  list<ImpVals>::const_iterator q1 = src_list1.begin();
+  list<ImpVals>::const_iterator q1_end = src_list1.end();
+  list<ImpVals>::const_iterator q2 = src_list2.begin();
+  list<ImpVals>::const_iterator q2_end = src_list2.end();
+  while ( p != p_end && q1 != q1_end && q2 != q2_end ) {
+    const ImpVals& imp = *p;
+    const ImpVals& imp1 = *q1;
+    const ImpVals& imp2 = *q2;
+    if ( id1 < id2 ) {
+      ++ p;
+    }
+    else if ( id1 > id2 ) {
+      dst_list.insert(p, imp2);
+      ++ q;
+    }
+    else { // id1 == id2
+      ++ p;
+      ++ q;
+    }
+  }
+}
+
+void
+extract(const list<ImpVals>& src_list,
+	list<ImpVal>& imp_list)
+{
+  for (list<ImpVals>::const_iterator p = src_list.begin();
+       p != src_list.end(); ++ p) {
+    const ImpVals& vals = *p;
+    if ( vals.num() > 1 ) {
+      continue;
+    }
+    imp_list.push_back(vals.val(0));
   }
 }
 
@@ -230,16 +138,16 @@ END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス NaImp
+// クラス NaImp2
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NaImp::NaImp()
+NaImp2::NaImp2()
 {
 }
 
 // @brief デストラクタ
-NaImp::~NaImp()
+NaImp2::~NaImp2()
 {
 }
 
@@ -248,15 +156,15 @@ NaImp::~NaImp()
 // @param[in] direct_imp 直接含意のリスト
 // @param[in] imp_info 間接含意のリスト
 void
-NaImp::learning(ImpMgr& imp_mgr,
-		const ImpInfo& direct_imp,
-		ImpInfo& imp_info)
+NaImp2::learning(ImpMgr& imp_mgr,
+		 const ImpInfo& direct_imp,
+		 ImpInfo& imp_info)
 {
   //imp_mgr.print_network(cout);
 
   ymuint n = imp_mgr.node_num();
 
-  vector<list<ImpVal> > imp_lists(n * 2);
+  vector<list<ImpVals> > imp_lists(n * 2);
 
   // direct_imp の情報を imp_lists にコピーする．
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
@@ -265,34 +173,31 @@ NaImp::learning(ImpMgr& imp_mgr,
       continue;
     }
     // 自分自身を追加する．
-    imp_lists[src_id * 2 + 0].push_back(ImpVal(src_id, 0));
-    imp_lists[src_id * 2 + 1].push_back(ImpVal(src_id, 1));
+    for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+      list<ImpVals>& imp_list = imp_lists[src_id * 2 + src_val];
+      imp_list.push_back(ImpVals(ImpVal(src_id, src_val)));
+    }
 
     for (ymuint src_val = 0; src_val < 2; ++ src_val) {
-      const ImpList& imp_list = direct_imp.get(src_id, src_val);
-      for (ImpList::iterator p = imp_list.begin();
-	   p != imp_list.end(); ++ p) {
+      const ImpList& src_list = direct_imp.get(src_id, src_val);
+      for (ImpList::iterator p = src_list.begin();
+	   p != src_list.end(); ++ p) {
 	const ImpCell& imp = *p;
 	ymuint dst_id = imp.dst_id();
 	ymuint dst_val = imp.dst_val();
-	imp_lists[dst_id * 2 + dst_val].push_back(ImpVal(src_id, src_val));
+	imp_lists[dst_id * 2 + dst_val].push_back(ImpVals(ImpVal(src_id, src_val)));
 	ymuint src_val1 = src_val ^ 1;
 	ymuint dst_val1 = dst_val ^ 1;
 	if ( !direct_imp.check(dst_id, dst_val1, src_id, src_val1) ) {
-	  imp_lists[src_id * 2 + src_val1].push_back(ImpVal(dst_id, dst_val1));
+	  imp_lists[src_id * 2 + src_val1].push_back(ImpVals(ImpVal(dst_id, dst_val1)));
 	}
       }
     }
   }
-  for (ymuint i = 0; i < n; ++ i) {
-    for (ymint val = 0; val < 2; ++ val) {
-      list<ImpVal>& imp_list = imp_lists[i * 2 + val];
-      //imp_list.sort(ImpComp());
-      imp_list.sort();
-      if ( debug ) {
-	cout << "Node#" << i << ":" << val << endl;
-	print_list(imp_list);
-      }
+
+  for (ymuint id = 0; id < n; ++ id) {
+    for (ymuint val = 0; val < 2; ++ val) {
+      imp_lists[id * 2 + val].sort();
     }
   }
 
@@ -301,7 +206,7 @@ NaImp::learning(ImpMgr& imp_mgr,
   imp_mgr.get_node_list(node_list);
 
   for ( ; ; ) {
-    ymuint delta = 0;
+    bool delta = false;
     for (vector<ImpNode*>::iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
       ImpNode* node = *p;
@@ -325,8 +230,8 @@ NaImp::learning(ImpMgr& imp_mgr,
 
       // 出力が0になる条件は入力が0になる条件のユニオン
       {
-	const list<ImpVal>& imp_list0 = imp_lists[idx0_0];
-	const list<ImpVal>& imp_list1 = imp_lists[idx1_0];
+	const list<ImpVals>& imp_list0 = imp_lists[idx0_0];
+	const list<ImpVals>& imp_list1 = imp_lists[idx1_0];
 	if ( debug ) {
 	  cout << "Node#" << id << ": 0" << endl
 	     << "  fanin0: ";
@@ -342,9 +247,10 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  cout << "Node#" << id1 << " ";
 	  print_list(imp_list1);
 	}
-	list<ImpVal>& imp_list = imp_lists[idx_0];
+	list<ImpVals>& imp_list = imp_lists[idx_0];
 	ymuint nprev = imp_list.size();
-	bool stat = cup(imp_list0, imp_list1, imp_list);
+	merge(imp_list, imp_list0);
+	merge(imp_list, imp_list1);
 	delta += imp_list.size() - nprev;
 	if ( debug ) {
 	  cout << "  result" << endl
@@ -355,8 +261,8 @@ NaImp::learning(ImpMgr& imp_mgr,
       }
       // 出力が1になる条件は入力が1になる条件のインターセクション
       {
-	const list<ImpVal>& imp_list0 = imp_lists[idx0_1];
-	const list<ImpVal>& imp_list1 = imp_lists[idx1_1];
+	const list<ImpVals>& imp_list0 = imp_lists[idx0_1];
+	const list<ImpVals>& imp_list1 = imp_lists[idx1_1];
 	if ( debug ) {
 	  cout << "Node#" << id << ": 1" << endl
 	       << "  fanin0: ";
@@ -374,7 +280,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	}
 	list<ImpVal>& imp_list = imp_lists[idx_1];
 	ymuint nprev = imp_list.size();
-	cap(imp_list0, imp_list1, imp_list);
+	and_merge(imp_list, imp_list0, imp_list1);
 	delta += imp_list.size() - nprev;
 	if ( debug ) {
 	  cout << "  result" << endl
@@ -407,10 +313,11 @@ NaImp::learning(ImpMgr& imp_mgr,
       ymuint idx1_0 = id1 * 2 + (inv1 ? 1: 0);
       ymuint idx1_1 = idx1_0 ^ 1;
 
-      { // 出力の0の条件とファンイン0の1の条件の共通部分がファンイン1の0の条件となる．
-	list<ImpVal>& imp_list_o_0 = imp_lists[idx_0];
-	list<ImpVal>& imp_list_i0_1 = imp_lists[idx0_1];
-	list<ImpVal>& imp_list_i1_0 = imp_lists[idx1_0];
+      { // 出力の0の条件とファンイン0の1の条件の共通部分が
+	// ファンイン1の0の条件となる．
+	const list<ImpVals>& imp_list_o_0 = imp_lists[idx_0];
+	const list<ImpVals>& imp_list_i0_1 = imp_lists[idx0_1];
+	list<ImpVals>& imp_list_i1_0 = imp_lists[idx1_0];
 	if ( debug ) {
 	  cout << "Node#" << id << ":0";
 	  print_list(imp_list_o_0);
@@ -422,20 +329,20 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  print_list(imp_list_i0_1);
 	}
 	ymuint nprev = imp_list_i1_0.size();
-	cap(imp_list_o_0, imp_list_i0_1, imp_list_i1_0);
+	and_merge(imp_list_i1_0, imp_list_o_0, imp_list_i0_1);
 	delta += imp_list_i1_0.size() - nprev;
 	if ( debug ) {
 	  cout << "  result" << endl
 	       << "   ";
 	  print_list(imp_list_i1_0);
-	  cout << endl
-	       << endl;
+	  cout << endl;
 	}
       }
-      { // 出力の0の条件とファンイン1の1の条件の共通部分がファンイン0の0の条件となる．
-	list<ImpVal>& imp_list_o_0 = imp_lists[idx_0];
-	list<ImpVal>& imp_list_i1_1 = imp_lists[idx1_1];
-	list<ImpVal>& imp_list_i0_0 = imp_lists[idx0_0];
+      { // 出力の0の条件とファンイン1の1の条件の共通部分が
+	// ファンイン0の0の条件となる．
+	const list<ImpVals>& imp_list_o_0 = imp_lists[idx_0];
+	const list<ImpVals>& imp_list_i1_1 = imp_lists[idx1_1];
+	list<ImpVals>& imp_list_i0_0 = imp_lists[idx0_0];
 	if ( debug ) {
 	  cout << "Node#" << id << ":0";
 	  print_list(imp_list_o_0);
@@ -447,19 +354,18 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  print_list(imp_list_i1_1);
 	}
 	ymuint nprev = imp_list_i0_0.size();
-	cap(imp_list_o_0, imp_list_i1_1, imp_list_i0_0);
+	and_merge(imp_list_i0_0, imp_list_o_0, imp_list_i1_1);
 	delta += imp_list_i0_0.size() - nprev;
 	if ( debug ) {
 	  cout << "  result" << endl
 	       << "   ";
 	  print_list(imp_list_i0_0);
-	  cout << endl
-	       << endl;
+	  cout << endl;
 	}
       }
       { // 出力の1の条件がファンイン0の1の条件となる．
-	list<ImpVal>& imp_list_o_1 = imp_lists[idx_1];
-	list<ImpVal>& imp_list_i0_1 = imp_lists[idx0_1];
+	const list<ImpVals>& imp_list_o_1 = imp_lists[idx_1];
+	list<ImpVals>& imp_list_i0_1 = imp_lists[idx0_1];
 	if ( debug ) {
 	  cout << "Node#" << id << ":1";
 	  print_list(imp_list_o_1);
@@ -477,13 +383,12 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  cout << "  result" << endl
 	       << "   ";
 	  print_list(imp_list_i0_1);
-	  cout << endl
-	       << endl;
+	  cout << endl;
 	}
       }
       { // 出力の1の条件がファンイン1の1の条件となる．
-	list<ImpVal>& imp_list_o_1 = imp_lists[idx_1];
-	list<ImpVal>& imp_list_i1_1 = imp_lists[idx1_1];
+	const list<ImpVals>& imp_list_o_1 = imp_lists[idx_1];
+	list<ImpVals>& imp_list_i1_1 = imp_lists[idx1_1];
 	if ( debug ) {
 	  cout << "Node#" << id << ":1";
 	  print_list(imp_list_o_1);
@@ -501,8 +406,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  cout << "  result" << endl
 	       << "   ";
 	  print_list(imp_list_i1_1);
-	  cout << endl
-	       << endl;
+	  cout << endl;
 	}
       }
     }
@@ -519,8 +423,11 @@ NaImp::learning(ImpMgr& imp_mgr,
     if ( node == NULL ) {
       continue;
     }
+    cout << "dst_id = " << dst_id << endl;
     for (ymuint dst_val = 0; dst_val < 2; ++ dst_val) {
-      const list<ImpVal>& imp_list = imp_lists[dst_id * 2 + dst_val];
+      const list<ImpVals>& src_list = imp_lists[dst_id * 2 + dst_val];
+      list<ImpVal> imp_list;
+      extract(src_list, imp_list);
       for (list<ImpVal>::const_iterator p = imp_list.begin();
 	   p != imp_list.end(); ++ p) {
 	const ImpVal& val = *p;
