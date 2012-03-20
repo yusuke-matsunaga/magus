@@ -145,6 +145,8 @@ AC_CONFIG_FILES([
 	lsim/Makefile
 	enumcut/Makefile
 	imp/Makefile
+	imp/include/Makefile
+	imp/libym_imp/Makefile
 	imp/bb/Makefile
 	imp/bb/include/Makefile
 	imp/bb/src/Makefile
