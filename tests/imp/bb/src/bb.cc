@@ -22,8 +22,7 @@
 
 #include "ImpMgr.h"
 #include "ImpInfo.h"
-#include "StrImp.h"
-#include "NaImp.h"
+#include "ImpBase.h"
 #include "ImpNode.h"
 
 
@@ -33,8 +32,7 @@ using nsYm::nsNetworks::ImpMgr;
 using nsYm::nsNetworks::ImpInfo;
 using nsYm::nsNetworks::ImpNode;
 using nsYm::nsNetworks::ImpNodeHandle;
-using nsYm::nsNetworks::StrImp;
-using nsYm::nsNetworks::NaImp;
+using nsYm::nsNetworks::ImpBase;
 
 ImpNodeHandle
 make_node(ImpMgr& imp_mgr,
@@ -220,13 +218,10 @@ bb(const char* file_name,
 	ImpNodeHandle handle = make_node(imp_mgr, root, node_map);
 	node_list.push_back(handle);
       }
-      StrImp str_imp;
-      ImpInfo direct_imp;
-      str_imp.learning(imp_mgr, direct_imp);
 
-      NaImp na_imp;
+      ImpBase imp_base;
       ImpInfo na_imp_info;
-      na_imp.learning(imp_mgr, direct_imp, na_imp_info);
+      imp_base.learning(imp_mgr, "", na_imp_info);
 
       if ( c == loop_num - 1 ) {
 	cout << "Unknown" << endl;

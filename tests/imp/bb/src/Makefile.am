@@ -12,7 +12,7 @@ MAINTAINERCLEANFILES = Makefile.in
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/imp \
+	-I$(top_srcdir)/imp/include \
 	-I$(top_srcdir)/imp/bb/include
 
 bin_PROGRAMS = \
@@ -21,7 +21,7 @@ bin_PROGRAMS = \
 bb_SOURCES = \
 	bb.cc
 bb_LDADD = \
-	$(top_builddir)/imp/libym_imp.la \
+	$(top_builddir)/imp/libym_imp/libym_imp.la \
 	parser/libbb_parser.la \
 	pt/libbb_pt.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \

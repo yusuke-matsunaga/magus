@@ -5,7 +5,7 @@
 /// @brief ImpBase のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,19 +14,22 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
+class ImpMgr;
 class ImpInfo;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ImpBase ImpBase.h "ImpBase.h"
-/// @brief 含意を求める基底クラス
+/// @brief 含意を求めるクラス
 //////////////////////////////////////////////////////////////////////
 class ImpBase
 {
 public:
 
+  /// @brief コンストラクタ
+  ImpBase();
+
   /// @brief デストラクタ
-  virtual
-  ~ImpBase() { }
+  ~ImpBase();
 
 
 public:
@@ -35,12 +38,13 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ネットワーク中の間接含意を求める．
-  /// @param[in] network 対象のネットワーク
-  /// @param[in] imp_info 間接含意のリスト
-  virtual
+  /// @param[in] imp_mgr マネージャ
+  /// @param[in] method 手法を表す文字列
+  /// @param[out] imp_info 間接含意のリスト
   void
-  learning(const BdnMgr& network,
-	   ImpInfo& imp_info) = 0;
+  learning(ImpMgr& imp_mgr,
+	   const string& method,
+	   ImpInfo& imp_info);
 
 };
 

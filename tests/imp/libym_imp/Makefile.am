@@ -22,7 +22,7 @@ libym_imp_la_CPPFLAGS = \
 libym_imp_la_SOURCES = \
 	BNodeMap.cc \
 	ImpInfo.cc \
-	ImpBase.h \
+	ImpBase.cc \
 	ImpMgr.cc \
 	ImpNode.cc \
 	ImpInput.h \

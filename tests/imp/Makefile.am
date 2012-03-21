@@ -22,6 +22,8 @@ noinst_PROGRAMS = \
 imp_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/imp/include \
+	-I$(top_srcdir)/imp/libym_imp \
 	@GMP_INCLUDES@
 
 imp_SOURCES = \
@@ -32,6 +34,7 @@ imp_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(POPT_LIBS) \
 	$(GMP_LIBS)
 
 imp_LDFLAGS =

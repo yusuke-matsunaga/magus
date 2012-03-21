@@ -12,9 +12,10 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	BNodeMap.h \
-	ImpVal.h \
+	ImpBase.h \
 	ImpCell.h \
-	ImpList.h \
 	ImpInfo.h \
+	ImpList.h \
 	ImpMgr.h \
-	ImpNode.h
+	ImpNode.h \
+	ImpVal.h
