@@ -43,4 +43,6 @@ libym_imp_la_SOURCES = \
 	RlImp.h \
 	RlImp.cc \
 	NaImp.h \
-	NaImp.cc
+	NaImp.cc \
+	ImpValList.h \
+	ImpValList.cc
