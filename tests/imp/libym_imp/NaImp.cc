@@ -25,31 +25,6 @@ bool debug = true;
 bool debug = false;
 #endif
 
-
-//////////////////////////////////////////////////////////////////////
-// ImpVal のリストをソートするための比較関数
-//////////////////////////////////////////////////////////////////////
-struct ImpComp
-{
-  bool
-  operator()(const ImpVal& imp1,
-	     const ImpVal& imp2) const
-  {
-    ymuint id1 = imp1.id();
-    ymuint id2 = imp2.id();
-    if ( id1 < id2 ) {
-      return true;
-    }
-    if ( id1 > id2 ) {
-      return false;
-    }
-    // id1 == id2
-    ymuint val1 = imp1.val();
-    ymuint val2 = imp2.val();
-    return val1 <= val2;
-  }
-};
-
 void
 print_list(const list<ImpVal>& imp_list)
 {
@@ -287,7 +262,6 @@ NaImp::learning(ImpMgr& imp_mgr,
   for (ymuint i = 0; i < n; ++ i) {
     for (ymint val = 0; val < 2; ++ val) {
       list<ImpVal>& imp_list = imp_lists[i * 2 + val];
-      //imp_list.sort(ImpComp());
       imp_list.sort();
       if ( debug ) {
 	cout << "Node#" << i << ":" << val << endl;
