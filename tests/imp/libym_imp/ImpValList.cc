@@ -92,7 +92,7 @@ ImpValList::merge(const ImpValList& src)
       new_cell->mVal = src_cell->mVal;
       prev->mLink = new_cell;
       new_cell->mLink = cell;
-      prev = cell;
+      prev = new_cell;
       src_cell = src_cell->mLink;
       ++ mNum;
     }
@@ -139,7 +139,7 @@ ImpValList::cap_merge(const ImpValList& src1,
 	new_cell->mVal = src1_cell->mVal;
 	prev->mLink = new_cell;
 	new_cell->mLink = cell;
-	prev = cell;
+	prev = new_cell;
 	src1_cell = src1_cell->mLink;
 	src2_cell = src2_cell->mLink;
 	++ mNum;

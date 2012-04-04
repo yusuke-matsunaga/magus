@@ -40,31 +40,24 @@ print_list(const list<ImpVal>& imp_list)
   cout << endl;
 }
 
-bool
+void
 insert(list<ImpVal>& imp_list,
        list<ImpVal>::iterator& p,
        const ImpVal& imp)
 {
   for ( ; p != imp_list.end(); ++ p) {
-    ymuint id = p->id();
-    if ( id == imp.id() ) {
-      if ( p->val() == imp.val() ) {
-	return true;
-      }
-      else {
-	return false;
-      }
+    if ( *p == imp ) {
+      return;
     }
-    else if ( id > imp.id() ) {
+    else if ( *p > imp ) {
       imp_list.insert(p, imp);
-      return true;
+      return;
     }
   }
   imp_list.push_back(imp);
-  return true;
 }
 
-bool
+void
 cup(const list<ImpVal>& src1,
     const list<ImpVal>& src2,
     list<ImpVal>& dst)
@@ -77,44 +70,28 @@ cup(const list<ImpVal>& src1,
   while ( p1 != e1 && p2 != e2 ) {
     const ImpVal& imp1 = *p1;
     const ImpVal& imp2 = *p2;
-    ymuint id1 = imp1.id();
-    ymuint id2 = imp2.id();
-    if ( id1 < id2 ) {
-      if ( !insert(dst, p3, imp1) ) {
-	return false;
-      }
+    if ( imp1 < imp2 ) {
+      insert(dst, p3, imp1);
       ++ p1;
     }
-    else if ( id1 > id2 ) {
-      if ( !insert(dst, p3, imp2) ) {
-	return false;
-      }
+    else if ( imp1 > imp2 ) {
+      insert(dst, p3, imp2);
       ++ p2;
     }
-    else { // id1 == id2
-      if ( imp1.val() != imp2.val() ) {
-	return false;
-      }
-      if ( !insert(dst, p3, imp1) ) {
-	return false;
-      }
+    else { // imp1 == imp2
+      insert(dst, p3, imp1);
       ++ p1;
       ++ p2;
     }
   }
   for ( ; p1 != e1; ++ p1) {
     const ImpVal& imp = *p1;
-    if ( !insert(dst, p3, imp) ) {
-      return false;
-    }
+    insert(dst, p3, imp);
   }
   for ( ; p2 != e2; ++ p2) {
     const ImpVal& imp = *p2;
-    if ( !insert(dst, p3, imp) ) {
-      return false;
-    }
+    insert(dst, p3, imp);
   }
-  return true;
 }
 
 void
@@ -130,18 +107,14 @@ cap(const list<ImpVal>& src1,
   while ( p1 != e1 && p2 != e2 ) {
     const ImpVal& imp1 = *p1;
     const ImpVal& imp2 = *p2;
-    ymuint id1 = imp1.id();
-    ymuint id2 = imp2.id();
-    if ( id1 < id2 ) {
+    if ( imp1 < imp2 ) {
       ++ p1;
     }
-    else if ( id1 > id2 ) {
+    else if ( imp1 > imp2 ) {
       ++ p2;
     }
-    else { // id1 == id2
-      if ( imp1.val() == imp2.val() ) {
-	insert(dst, p3, imp1);
-      }
+    else { // imp1 == imp2
+      insert(dst, p3, imp1);
       ++ p1;
       ++ p2;
     }
@@ -159,17 +132,14 @@ merge(list<ImpVal>& dst,
   while ( p != p_end && q != q_end ) {
     const ImpVal& imp1 = *p;
     const ImpVal& imp2 = *q;
-    ymuint id1 = imp1.id();
-    ymuint id2 = imp2.id();
-    if ( id1 < id2 ) {
+    if ( imp1 < imp2 ) {
       ++ p;
     }
-    else if ( id1 > id2 ) {
+    else if ( imp1 > imp2 ) {
       dst.insert(p, imp2);
       ++ q;
     }
-    else { // id1 == id2
-      //assert_cond( imp1.val() == imp2.val(), __FILE__, __LINE__);
+    else { // imp1 == imp2
       ++ p;
       ++ q;
     }
@@ -178,6 +148,29 @@ merge(list<ImpVal>& dst,
     const ImpVal& imp = *q;
     dst.push_back(imp);
   }
+}
+
+void
+compare(const ImpValList& imp_list1,
+	const list<ImpVal>& imp_list2)
+{
+  ImpValListIter p1 = imp_list1.begin();
+  list<ImpVal>::const_iterator p2 = imp_list2.begin();
+  while ( p1 != imp_list1.end() && p2 != imp_list2.end() ) {
+    if ( *p1 != *p2 ) {
+      goto error;
+    }
+    ++ p1;
+    ++ p2;
+  }
+  return;
+
+ error:
+  cout << "Mismatch" << endl
+       << "ImpValList:";
+  imp_list1.print(cout);
+  cout << "list<ImpVal>:";
+  print_list(imp_list2);
 }
 
 void
@@ -234,12 +227,8 @@ NaImp::learning(ImpMgr& imp_mgr,
 
   ymuint n = imp_mgr.node_num();
 
-#if defined(USE_IMPVALLIST)
   vector<ImpValList> imp_lists(n * 2);
-#else
-  vector<list<ImpVal> > imp_lists(n * 2);
-#endif
-
+  vector<list<ImpVal> > imp_lists2(n * 2);
 
   // direct_imp の情報を imp_lists にコピーする．
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
@@ -248,12 +237,11 @@ NaImp::learning(ImpMgr& imp_mgr,
       continue;
     }
     // 自分自身を追加する．
-#if defined(USE_IMPVALLIST)
     imp_lists[src_id * 2 + 0].insert(ImpVal(src_id, 0));
     imp_lists[src_id * 2 + 1].insert(ImpVal(src_id, 1));
-#else
-    imp_lists[src_id * 2 + 0].push_back(ImpVal(src_id, 0));
-    imp_lists[src_id * 2 + 1].push_back(ImpVal(src_id, 1));
+#if 0
+    imp_lists2[src_id * 2 + 0].push_back(ImpVal(src_id, 0));
+    imp_lists2[src_id * 2 + 1].push_back(ImpVal(src_id, 1));
 #endif
 
     for (ymuint src_val = 0; src_val < 2; ++ src_val) {
@@ -263,24 +251,32 @@ NaImp::learning(ImpMgr& imp_mgr,
 	const ImpCell& imp = *p;
 	ymuint dst_id = imp.dst_id();
 	ymuint dst_val = imp.dst_val();
-#if defined(USE_IMPVALLIST)
 	imp_lists[dst_id * 2 + dst_val].insert(ImpVal(src_id, src_val));
-#else
-	imp_lists[dst_id * 2 + dst_val].push_back(ImpVal(src_id, src_val));
+#if 0
+	imp_lists2[dst_id * 2 + dst_val].push_back(ImpVal(src_id, src_val));
 #endif
 	ymuint src_val1 = src_val ^ 1;
 	ymuint dst_val1 = dst_val ^ 1;
 	if ( !direct_imp.check(dst_id, dst_val1, src_id, src_val1) ) {
-#if defined(USE_IMPVALLIST)
 	  imp_lists[src_id * 2 + src_val1].insert(ImpVal(dst_id, dst_val1));
-#else
-	  imp_lists[src_id * 2 + src_val1].push_back(ImpVal(dst_id, dst_val1));
+#if 0
+	  imp_lists2[src_id * 2 + src_val1].push_back(ImpVal(dst_id, dst_val1));
 #endif
 	}
       }
     }
   }
-#if defined(USE_IMPVALLIST)
+
+#if 0
+  for (ymuint i = 0; i < n; ++ i) {
+    for (ymint val = 0; val < 2; ++ val) {
+      list<ImpVal>& imp_list = imp_lists2[i * 2 + val];
+      imp_list.sort();
+      compare(imp_lists[i * 2 + val], imp_list);
+    }
+  }
+#endif
+
   if ( debug ) {
     for (ymuint i = 0; i < n; ++ i) {
       for (ymint val = 0; val < 2; ++ val) {
@@ -290,18 +286,6 @@ NaImp::learning(ImpMgr& imp_mgr,
       }
     }
   }
-#else
-  for (ymuint i = 0; i < n; ++ i) {
-    for (ymint val = 0; val < 2; ++ val) {
-      list<ImpVal>& imp_list = imp_lists[i * 2 + val];
-      imp_list.sort();
-      if ( debug ) {
-	cout << "Node#" << i << ":" << val << endl;
-	print_list(imp_list);
-      }
-    }
-  }
-#endif
 
   // 論理ノードの割り当て情報を作る．
   vector<ImpNode*> node_list;
@@ -332,7 +316,6 @@ NaImp::learning(ImpMgr& imp_mgr,
 
       // 出力が0になる条件は入力が0になる条件のユニオン
       {
-#if defined(USE_IMPVALLIST)
 	const ImpValList& imp_list0 = imp_lists[idx0_0];
 	const ImpValList& imp_list1 = imp_lists[idx1_0];
 	ImpValList& imp_list = imp_lists[idx_0];
@@ -363,10 +346,12 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  imp_list.print(cout);
 	  cout << endl;
 	}
-#else
-	const list<ImpVal>& imp_list0 = imp_lists[idx0_0];
-	const list<ImpVal>& imp_list1 = imp_lists[idx1_0];
-	list<ImpVal>& imp_list = imp_lists[idx_0];
+      }
+#if 0
+      {
+	const list<ImpVal>& imp_list0 = imp_lists2[idx0_0];
+	const list<ImpVal>& imp_list1 = imp_lists2[idx1_0];
+	list<ImpVal>& imp_list = imp_lists2[idx_0];
 	if ( debug ) {
 	  cout << "cup_merge" << endl;
 	  cout << "Node#" << id << ": 0 ";
@@ -385,7 +370,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  print_list(imp_list1);
 	}
 	ymuint nprev = imp_list.size();
-	bool stat = cup(imp_list0, imp_list1, imp_list);
+	cup(imp_list0, imp_list1, imp_list);
 	delta += imp_list.size() - nprev;
 	if ( debug ) {
 	  cout << "  result" << endl
@@ -393,11 +378,11 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  print_list(imp_list);
 	  cout << endl;
 	}
-#endif
       }
+      compare(imp_lists[idx_0], imp_lists2[idx_0]);
+#endif
       // 出力が1になる条件は入力が1になる条件のインターセクション
       {
-#if defined(USE_IMPVALLIST)
 	const ImpValList& imp_list0 = imp_lists[idx0_1];
 	const ImpValList& imp_list1 = imp_lists[idx1_1];
 	ImpValList& imp_list = imp_lists[idx_1];
@@ -427,10 +412,12 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  imp_list.print(cout);
 	  cout << endl;
 	}
-#else
-	const list<ImpVal>& imp_list0 = imp_lists[idx0_1];
-	const list<ImpVal>& imp_list1 = imp_lists[idx1_1];
-	list<ImpVal>& imp_list = imp_lists[idx_1];
+      }
+#if 0
+      {
+	const list<ImpVal>& imp_list0 = imp_lists2[idx0_1];
+	const list<ImpVal>& imp_list1 = imp_lists2[idx1_1];
+	list<ImpVal>& imp_list = imp_lists2[idx_1];
 	if ( debug ) {
 	  cout << "cap_merge" << endl;
 	  cout << "Node#" << id << ": 1 ";
@@ -457,14 +444,15 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  print_list(imp_list);
 	  cout << endl;
 	}
-#endif
       }
+      compare(imp_lists[idx_1], imp_lists2[idx_1]);
+#endif
     }
 #if 1
     cout << "phase1: delta = " << delta << endl;
 #endif
 
-#if 0
+#if 1
     for (vector<ImpNode*>::reverse_iterator p = node_list.rbegin();
 	 p != node_list.rend(); ++ p) {
       ImpNode* node = *p;
@@ -746,7 +734,7 @@ NaImp::learning(ImpMgr& imp_mgr,
     }
   }
 
-#if 1
+#if 0
   // 検証
   {
     SatSolver solver1;
