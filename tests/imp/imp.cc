@@ -23,6 +23,7 @@
 
 #include "StrImp.h"
 #include "ContraImp.h"
+#include "ConstImp.h"
 #include "CnfImp.h"
 #include "CnfImp2.h"
 #include "SatImp.h"
@@ -112,6 +113,17 @@ imp(const string& filename,
 
     timer.reset();
     timer.start();
+    ConstImp constimp;
+    ImpInfo const_imp;
+    constimp.learning(imp_mgr, direct_imp, const_imp);
+    timer.stop();
+    USTime const_time = timer.time();
+
+    direct_imp.copy_const(const_imp);
+    const_imp.copy_const(const_imp);
+
+    timer.reset();
+    timer.start();
     SatImp satimp;
     ImpInfo sat_imp;
 #if 1
@@ -168,15 +180,7 @@ imp(const string& filename,
     direct_imp.print_stats(cout);
     cout << "c_imp" << endl;
     contra_imp.print_stats(cout);
-#if 1
-    direct_imp.copy_const(sat_imp);
-    contra_imp.copy_const(sat_imp);
-    rl_imp.copy_const(sat_imp);
-    na_imp.copy_const(sat_imp);
-#if 0
-    na_imp2.copy_const(sat_imp);
-#endif
-#endif
+
     ymuint and_node = 0;
     ymuint xor_node = 0;
     {
@@ -213,6 +217,7 @@ imp(const string& filename,
 	 << ": " << rl_time << endl
 	 << "Naive Implications:              " << setw(10) << na_imp.size()
 	 << ": " << na_time << endl
+	 << ":                                " << setw(10) << na_imp.imp_num() << endl
 #if 0
 	 << "Naive Implications(2):           " << setw(10) << na_imp2.size()
 	 << ": " << na_time2 << endl

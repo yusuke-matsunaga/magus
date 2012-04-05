@@ -227,11 +227,17 @@ NaImp::learning(ImpMgr& imp_mgr,
 
   ymuint n = imp_mgr.node_num();
 
+  imp_info.set_size(n);
+  // 定数ノードの情報をコピーしておく．
+  imp_info.copy_const(direct_imp);
+
   vector<ImpValList> imp_lists(n * 2);
-  vector<list<ImpVal> > imp_lists2(n * 2);
 
   // direct_imp の情報を imp_lists にコピーする．
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
+    if ( imp_info.is_const0(src_id) || imp_info.is_const1(src_id) ) {
+      continue;
+    }
     ImpNode* node = imp_mgr.node(src_id);
     if ( node == NULL ) {
       continue;
@@ -239,10 +245,6 @@ NaImp::learning(ImpMgr& imp_mgr,
     // 自分自身を追加する．
     imp_lists[src_id * 2 + 0].insert(ImpVal(src_id, 0));
     imp_lists[src_id * 2 + 1].insert(ImpVal(src_id, 1));
-#if 0
-    imp_lists2[src_id * 2 + 0].push_back(ImpVal(src_id, 0));
-    imp_lists2[src_id * 2 + 1].push_back(ImpVal(src_id, 1));
-#endif
 
     for (ymuint src_val = 0; src_val < 2; ++ src_val) {
       const ImpList& imp_list = direct_imp.get(src_id, src_val);
@@ -250,32 +252,19 @@ NaImp::learning(ImpMgr& imp_mgr,
 	   p != imp_list.end(); ++ p) {
 	const ImpCell& imp = *p;
 	ymuint dst_id = imp.dst_id();
+	if ( imp_info.is_const0(dst_id) || imp_info.is_const1(dst_id) ) {
+	  continue;
+	}
 	ymuint dst_val = imp.dst_val();
 	imp_lists[dst_id * 2 + dst_val].insert(ImpVal(src_id, src_val));
-#if 0
-	imp_lists2[dst_id * 2 + dst_val].push_back(ImpVal(src_id, src_val));
-#endif
 	ymuint src_val1 = src_val ^ 1;
 	ymuint dst_val1 = dst_val ^ 1;
 	if ( !direct_imp.check(dst_id, dst_val1, src_id, src_val1) ) {
 	  imp_lists[src_id * 2 + src_val1].insert(ImpVal(dst_id, dst_val1));
-#if 0
-	  imp_lists2[src_id * 2 + src_val1].push_back(ImpVal(dst_id, dst_val1));
-#endif
 	}
       }
     }
   }
-
-#if 0
-  for (ymuint i = 0; i < n; ++ i) {
-    for (ymint val = 0; val < 2; ++ val) {
-      list<ImpVal>& imp_list = imp_lists2[i * 2 + val];
-      imp_list.sort();
-      compare(imp_lists[i * 2 + val], imp_list);
-    }
-  }
-#endif
 
   if ( debug ) {
     for (ymuint i = 0; i < n; ++ i) {
@@ -297,6 +286,9 @@ NaImp::learning(ImpMgr& imp_mgr,
 	 p != node_list.end(); ++ p) {
       ImpNode* node = *p;
       ymuint id = node->id();
+      if ( imp_info.is_const0(id) || imp_info.is_const1(id) ) {
+	continue;
+      }
       ymuint idx_0 = id * 2 + 0;
       ymuint idx_1 = id * 2 + 1;
 
@@ -347,40 +339,6 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  cout << endl;
 	}
       }
-#if 0
-      {
-	const list<ImpVal>& imp_list0 = imp_lists2[idx0_0];
-	const list<ImpVal>& imp_list1 = imp_lists2[idx1_0];
-	list<ImpVal>& imp_list = imp_lists2[idx_0];
-	if ( debug ) {
-	  cout << "cup_merge" << endl;
-	  cout << "Node#" << id << ": 0 ";
-	  print_list(imp_list);
-	  cout << "  fanin0: ";
-	  if ( inv0 ) {
-	    cout << "~";
-	  }
-	  cout << "Node#" << id0 << " ";
-	  print_list(imp_list0);
-	  cout << "  fanin1: ";
-	  if ( inv1 ) {
-	    cout << "~";
-	  }
-	  cout << "Node#" << id1 << " ";
-	  print_list(imp_list1);
-	}
-	ymuint nprev = imp_list.size();
-	cup(imp_list0, imp_list1, imp_list);
-	delta += imp_list.size() - nprev;
-	if ( debug ) {
-	  cout << "  result" << endl
-	       << "   ";
-	  print_list(imp_list);
-	  cout << endl;
-	}
-      }
-      compare(imp_lists[idx_0], imp_lists2[idx_0]);
-#endif
       // 出力が1になる条件は入力が1になる条件のインターセクション
       {
 	const ImpValList& imp_list0 = imp_lists[idx0_1];
@@ -413,46 +371,11 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  cout << endl;
 	}
       }
-#if 0
-      {
-	const list<ImpVal>& imp_list0 = imp_lists2[idx0_1];
-	const list<ImpVal>& imp_list1 = imp_lists2[idx1_1];
-	list<ImpVal>& imp_list = imp_lists2[idx_1];
-	if ( debug ) {
-	  cout << "cap_merge" << endl;
-	  cout << "Node#" << id << ": 1 ";
-	  print_list(imp_list);
-	  cout << "  fanin0: ";
-	  if ( inv0 ) {
-	    cout << "~";
-	  }
-	  cout << "Node#" << id0 << " ";
-	  print_list(imp_list0);
-	  cout << "  fanin1: ";
-	  if ( inv1 ) {
-	    cout << "~";
-	  }
-	  cout << "Node#" << id1 << " ";
-	  print_list(imp_list1);
-	}
-	ymuint nprev = imp_list.size();
-	cap(imp_list0, imp_list1, imp_list);
-	delta += imp_list.size() - nprev;
-	if ( debug ) {
-	  cout << "  result" << endl
-	       << "   ";
-	  print_list(imp_list);
-	  cout << endl;
-	}
-      }
-      compare(imp_lists[idx_1], imp_lists2[idx_1]);
-#endif
     }
 #if 1
     cout << "phase1: delta = " << delta << endl;
 #endif
 
-#if 1
     for (vector<ImpNode*>::reverse_iterator p = node_list.rbegin();
 	 p != node_list.rend(); ++ p) {
       ImpNode* node = *p;
@@ -474,8 +397,8 @@ NaImp::learning(ImpMgr& imp_mgr,
       ymuint idx1_0 = id1 * 2 + (inv1 ? 1: 0);
       ymuint idx1_1 = idx1_0 ^ 1;
 
-      { // 出力の0の条件とファンイン0の1の条件の共通部分がファンイン1の0の条件となる．
-#if defined(USE_IMPVALLIST)
+      if ( !imp_info.is_const0(id1) && !imp_info.is_const1(id1) ) {
+	// 出力の0の条件とファンイン0の1の条件の共通部分がファンイン1の0の条件となる．
 	const ImpValList& imp_list_o_0 = imp_lists[idx_0];
 	const ImpValList& imp_list_i0_1 = imp_lists[idx0_1];
 	ImpValList& imp_list_i1_0 = imp_lists[idx1_0];
@@ -500,35 +423,9 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  cout << endl
 	       << endl;
 	}
-#else
-	list<ImpVal>& imp_list_o_0 = imp_lists[idx_0];
-	list<ImpVal>& imp_list_i0_1 = imp_lists[idx0_1];
-	list<ImpVal>& imp_list_i1_0 = imp_lists[idx1_0];
-	if ( debug ) {
-	  cout << "cap_merge" << endl;
-	  cout << "Node#" << id << ":0";
-	  print_list(imp_list_o_0);
-	  cout << "fanin0: ";
-	  if ( inv0 ) {
-	    cout << "~";
-	  }
-	  cout << "Node#" << id0 << ":1";
-	  print_list(imp_list_i0_1);
-	}
-	ymuint nprev = imp_list_i1_0.size();
-	cap(imp_list_o_0, imp_list_i0_1, imp_list_i1_0);
-	delta += imp_list_i1_0.size() - nprev;
-	if ( debug ) {
-	  cout << "  result" << endl
-	       << "   ";
-	  print_list(imp_list_i1_0);
-	  cout << endl
-	       << endl;
-	}
-#endif
       }
-      { // 出力の0の条件とファンイン1の1の条件の共通部分がファンイン0の0の条件となる．
-#if defined(USE_IMPVALLIST)
+      if ( !imp_info.is_const0(id0) && !imp_info.is_const1(id0) ) {
+	// 出力の0の条件とファンイン1の1の条件の共通部分がファンイン0の0の条件となる．
 	const ImpValList& imp_list_o_0 = imp_lists[idx_0];
 	const ImpValList& imp_list_i1_1 = imp_lists[idx1_1];
 	ImpValList& imp_list_i0_0 = imp_lists[idx0_0];
@@ -553,35 +450,9 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  cout << endl
 	       << endl;
 	}
-#else
-	list<ImpVal>& imp_list_o_0 = imp_lists[idx_0];
-	list<ImpVal>& imp_list_i1_1 = imp_lists[idx1_1];
-	list<ImpVal>& imp_list_i0_0 = imp_lists[idx0_0];
-	if ( debug ) {
-	  cout << "cap_merge" << endl;
-	  cout << "Node#" << id << ":0";
-	  print_list(imp_list_o_0);
-	  cout << "fanin1: ";
-	  if ( inv1 ) {
-	    cout << "~";
-	  }
-	  cout << "Node#" << id1 << ":1";
-	  print_list(imp_list_i1_1);
-	}
-	ymuint nprev = imp_list_i0_0.size();
-	cap(imp_list_o_0, imp_list_i1_1, imp_list_i0_0);
-	delta += imp_list_i0_0.size() - nprev;
-	if ( debug ) {
-	  cout << "  result" << endl
-	       << "   ";
-	  print_list(imp_list_i0_0);
-	  cout << endl
-	       << endl;
-	}
-#endif
       }
-      { // 出力の1の条件がファンイン0の1の条件となる．
-#if defined(USE_IMPVALLIST)
+      if ( !imp_info.is_const0(id0) && !imp_info.is_const1(id0) ) {
+	// 出力の1の条件がファンイン0の1の条件となる．
 	const ImpValList& imp_list_o_1 = imp_lists[idx_1];
 	ImpValList& imp_list_i0_1 = imp_lists[idx0_1];
 	if ( debug ) {
@@ -604,33 +475,9 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  cout << endl
 	       << endl;
 	}
-#else
-	list<ImpVal>& imp_list_o_1 = imp_lists[idx_1];
-	list<ImpVal>& imp_list_i0_1 = imp_lists[idx0_1];
-	if ( debug ) {
-	  cout << "Node#" << id << ":1";
-	  print_list(imp_list_o_1);
-	  cout << "  fanin0: ";
-	  if ( inv0 ) {
-	    cout << "~";
-	  }
-	  cout << "Node#" << id0 << ":1";
-	  print_list(imp_list_i0_1);
-	}
-	ymuint nprev = imp_list_i0_1.size();
-	merge(imp_list_i0_1, imp_list_o_1);
-	delta += imp_list_i0_1.size() - nprev;
-	if ( debug ) {
-	  cout << "  result" << endl
-	       << "   ";
-	  print_list(imp_list_i0_1);
-	  cout << endl
-	       << endl;
-	}
-#endif
       }
-      { // 出力の1の条件がファンイン1の1の条件となる．
-#if defined(USE_IMPVALLIST)
+      if ( !imp_info.is_const0(id1) && !imp_info.is_const1(id1) ) {
+	// 出力の1の条件がファンイン1の1の条件となる．
 	const ImpValList& imp_list_o_1 = imp_lists[idx_1];
 	ImpValList& imp_list_i1_1 = imp_lists[idx1_1];
 	if ( debug ) {
@@ -653,33 +500,8 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  cout << endl
 	       << endl;
 	}
-#else
-	list<ImpVal>& imp_list_o_1 = imp_lists[idx_1];
-	list<ImpVal>& imp_list_i1_1 = imp_lists[idx1_1];
-	if ( debug ) {
-	  cout << "Node#" << id << ":1";
-	  print_list(imp_list_o_1);
-	  cout << "  fanin1: ";
-	  if ( inv1 ) {
-	    cout << "~";
-	  }
-	  cout << "Node#" << id1 << ":1";
-	  print_list(imp_list_i1_1);
-	}
-	ymuint nprev = imp_list_i1_1.size();
-	merge(imp_list_i1_1, imp_list_o_1);
-	delta += imp_list_i1_1.size() - nprev;
-	if ( debug ) {
-	  cout << "  result" << endl
-	       << "   ";
-	  print_list(imp_list_i1_1);
-	  cout << endl
-	       << endl;
-	}
-#endif
       }
     }
-#endif
 #if 1
     cout << "phase2: delta = " << delta << endl;
 #endif
@@ -689,14 +511,12 @@ NaImp::learning(ImpMgr& imp_mgr,
   }
 
   // imp_lists の情報から imp_info を作る．
-  imp_info.set_size(n);
   for (ymuint dst_id = 0; dst_id < n; ++ dst_id) {
     ImpNode* node = imp_mgr.node(dst_id);
     if ( node == NULL ) {
       continue;
     }
     for (ymuint dst_val = 0; dst_val < 2; ++ dst_val) {
-#if defined(USE_IMPVALLIST)
       const ImpValList& imp_list = imp_lists[dst_id * 2 + dst_val];
       for (ImpValListIter p = imp_list.begin();
 	   p != imp_list.end(); ++ p) {
@@ -713,24 +533,6 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
 	}
       }
-#else
-      const list<ImpVal>& imp_list = imp_lists[dst_id * 2 + dst_val];
-      for (list<ImpVal>::const_iterator p = imp_list.begin();
-	   p != imp_list.end(); ++ p) {
-	const ImpVal& val = *p;
-	ymuint src_id = val.id();
-	ymuint src_val = val.val();
-	if ( src_id == dst_id ) {
-	  continue;
-	}
-	if ( !imp_info.check(src_id, src_val, dst_id, dst_val) ) {
-	  imp_info.put(src_id, src_val, dst_id, dst_val);
-	}
-	if ( !imp_info.check(dst_id, dst_val ^ 1, src_id, src_val ^ 1) ) {
-	  imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
-	}
-      }
-#endif
     }
   }
 

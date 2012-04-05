@@ -68,6 +68,10 @@ public:
   ymuint
   size() const;
 
+  /// @brief 実際に保持している含意の総数を返す．
+  ymuint
+  imp_num() const;
+
   /// @brief 内容を出力する．
   /// @param[in] s 出力先のストリーム
   void

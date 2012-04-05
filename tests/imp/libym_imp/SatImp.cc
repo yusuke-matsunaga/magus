@@ -337,14 +337,17 @@ SatImp::learning(ImpMgr& imp_mgr,
       }
     }
   }
+  // 定数ノードの情報をコピーしておく．
+  imp_info.copy_const(d_imp);
 
   // シミュレーションでフィルタリングして残った候補を
   // SAT で調べる．
   imp_mgr.random_sim();
   vector<list<ImpDst> > cand_info(n * 2);
-  vector<ymuint32> const_flag(n, 0U);
-  //hash_map<ymuint64, list<NodeInfo> > node_hash;
   for (ymuint i = 1; i < n; ++ i) {
+    if ( imp_info.is_const0(i) || imp_info.is_const1(i) ) {
+      continue;
+    }
     if ( debug ) {
       if ( (i % 100) == 0 ) {
 	cerr << i << " / " << n << endl;
@@ -355,32 +358,11 @@ SatImp::learning(ImpMgr& imp_mgr,
 
     ymuint64 val0 = node0->bitval();
 
-    if ( val0 != ~0UL ) {
-      const_flag[i] |= 1UL;
-    }
-    if ( val0 != 0UL ) {
-      const_flag[i] |= 2UL;
-    }
-#if 0
-    if ( val0 != 0UL && val0 != ~0UL ) {
-      bool inv = false;
-      ymuint64 c_val0 = val0;
-      if ( c_val0 & 1UL ) {
-	c_val0 = ~c_val0;
-	inv = true;
-      }
-      hash_map<ymuint64, list<NodeInfo> >::iterator p = node_hash.find(c_val0);
-      if ( p == node_hash.end() ) {
-	node_hash.insert(make_pair(c_val0, list<NodeInfo>()));
-	p = node_hash.find(c_val0);
-	assert_cond( p != node_hash.end(), __FILE__, __LINE__);
-      }
-      list<NodeInfo>& node_list = p->second;
-      node_list.push_back(NodeInfo(node0, inv));
-    }
-#endif
-
     for (ymuint j = 0; j < i; ++ j) {
+      if ( imp_info.is_const0(j) || imp_info.is_const1(j) ) {
+	continue;
+      }
+
       ImpNode* node1 = imp_mgr.node(j);
 
       if ( !check_intersect(input_list_array[i], input_list_array[j]) ) {
@@ -414,151 +396,6 @@ SatImp::learning(ImpMgr& imp_mgr,
       }
     }
   }
-
-#if 1
-  {
-    // ImpMgr から CNF を作る．
-    SatSolver solver;
-
-    for (ymuint i = 0; i < n; ++ i) {
-      VarId vid = solver.new_var();
-      assert_cond( vid.val() == i, __FILE__, __LINE__);
-    }
-
-    for (ymuint i = 0; i < n; ++ i) {
-      ImpNode* node = imp_mgr.node(i);
-      if ( node->is_input() ) continue;
-
-      VarId vid(i);
-      Literal lit(vid, kPolPosi);
-
-      const ImpEdge& e0 = node->fanin0();
-      ImpNode* node0 = e0.src_node();
-      VarId vid0(node0->id());
-      bool inv0 = e0.src_inv();
-      Literal lit0(vid0, inv0 ? kPolNega : kPolPosi);
-
-      const ImpEdge& e1 = node->fanin1();
-      ImpNode* node1 = e1.src_node();
-      VarId vid1(node1->id());
-      bool inv1 = e1.src_inv();
-      Literal lit1(vid1, inv1 ? kPolNega : kPolPosi);
-
-      solver.add_clause(lit0, ~lit);
-      solver.add_clause(lit1, ~lit);
-      solver.add_clause(~lit0, ~lit1, lit);
-    }
-
-    list<ymuint> const_list;
-    for (ymuint i = 0; i < n; ++ i) {
-      if ( (const_flag[i] & 1U) == 0U ) {
-	// 0 になったことがない．
-	VarId vid(i);
-	Literal lit(vid, kPolNega);
-	vector<Literal> tmp(1, lit);
-	vector<Bool3> model;
-	if ( solver.solve(tmp, model) == kB3False ) {
-	  // node0 は 1 固定
-	  solver.add_clause(~lit);
-#if 1
-	  cout << "Node#" << i << " is const-1" << endl;
-#endif
-	  imp_info.set_1(i);
-	  const_list.push_back(i);
-	}
-      }
-      else if ( (const_flag[i] & 2U) == 0U ) {
-	// 1 になったことがない．
-	VarId vid(i);
-	Literal lit(vid, kPolPosi);
-	vector<Literal> tmp(1, lit);
-	vector<Bool3> model;
-	if ( solver.solve(tmp, model) == kB3False ) {
-	  // node0 は 0 固定
-	  solver.add_clause(~lit);
-#if 1
-	  cout << "Node#" << i << " is const-0" << endl;
-#endif
-	  imp_info.set_0(i);
-	  const_list.push_back(i);
-	}
-      }
-    }
-    for (list<ymuint>::const_iterator p = const_list.begin();
-	 p != const_list.end(); ++ p) {
-      ymuint id = *p;
-      cand_info[id * 2 + 0].clear();
-      cand_info[id * 2 + 1].clear();
-    }
-    for (ymuint src_id = 0; src_id < n; ++ src_id) {
-      for (ymuint src_val = 0; src_val < 2; ++ src_val) {
-	list<ImpDst>& imp_list = cand_info[src_id * 2 + src_val];
-	for (list<ImpDst>::iterator p = imp_list.begin(); p != imp_list.end(); ) {
-	  ImpNode* dst_node = p->node();
-	  ymuint dst_id = dst_node->id();
-	  if ( imp_info.is_const0(dst_id) || imp_info.is_const1(dst_id) ) {
-	    list<ImpDst>::iterator q = p;
-	    ++ p;
-	    imp_list.erase(q);
-	  }
-	  else {
-	    ++ p;
-	  }
-	}
-      }
-    }
-  }
-#endif
-#if 0
-  for (hash_map<ymuint64, list<NodeInfo> >::iterator p = node_hash.begin();
-       p != node_hash.end(); ++ p) {
-    if ( p->first == 0ULL || p->first == ~0ULL ) continue;
-
-    const list<NodeInfo>& node_list = p->second;
-    ymuint nc = node_list.size();
-    if ( nc == 1 ) continue;
-    vector<NodeInfo> tmp_array(n);
-    {
-      ymuint i = 0;
-      for (list<NodeInfo>::const_iterator q = node_list.begin();
-	   q != node_list.end(); ++ q, ++ i) {
-	tmp_array[i] = *q;
-      }
-    }
-    for (ymuint i = 0; i < nc; ++ i) {
-      const NodeInfo& node_info1 = tmp_array[i];
-      ImpNode* node1 = node_info1.mNode;
-      Literal lit1(VarId(node1->id()), node_info1.mInv ? kPolNega : kPolPosi);
-      for (ymuint j = i + 1; j < nc; ++ j) {
-	const NodeInfo& node_info2 = tmp_array[j];
-	ImpNode* node2 = node_info2.mNode;
-	Literal lit2(VarId(node2->id()), node_info2.mInv ? kPolNega : kPolPosi);
-	vector<Literal> tmp(2);
-	tmp[0] = lit1;
-	tmp[1] = ~lit2;
-	vector<Bool3> model;
-	if ( solver.solve(tmp, model) != kB3False ) {
-	  continue;
-	}
-	tmp[0] = ~lit1;
-	tmp[1] = lit2;
-	if ( solver.solve(tmp, model) != kB3False ) {
-	  continue;
-	}
-	cout << "Node#" << node1->id()
-	     << " and Node#" << node2->id()
-	     << " are equivalent" << endl;
-	solver.add_clause(lit1, ~lit2);
-	solver.add_clause(~lit2, lit1);
-#if 0
-	ymuint val2 = node_info1.mInv ^ node_info2.mInv ? 0 : 1;
-	imp_info.put(node1->id(), 0, node2->id(), val2 ^ 1);
-	imp_info.put(node1->id(), 1, node2->id(), val2);
-#endif
-      }
-    }
-  }
-#endif
 
   ymuint prev_size = count_list(cand_info);
   if ( debug ) {

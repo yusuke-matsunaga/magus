@@ -82,30 +82,8 @@ RlImp::learning(ImpMgr& imp_mgr,
       }
     }
   }
-
-#if 0
-  // 直接含意を求める．
-  StrImp strimp;
-  ImpInfo d_imp;
-  strimp.learning(network, d_imp);
-  for (ymuint src_id = 0; src_id < n; ++ src_id) {
-    for (ymuint src_val = 0; src_val < 2; ++ src_val) {
-      list<ImpVal>& imp_list = imp_info.get(src_id, src_val);
-      for (list<ImpVal>::iterator p = imp_list.begin();
-	   p != imp_list.end(); ) {
-	list<ImpVal>::iterator q = p;
-	++ p;
-	const ImpVal& imp = *q;
-	ymuint dst_id = imp.id();
-	ymuint dst_val = imp.val();
-	if ( d_imp.check(src_id, src_val, dst_id, dst_val) ||
-	     d_imp.check(dst_id, dst_val ^ 1, src_id, src_val ^ 1) ) {
-	  imp_list.erase(q);
-	}
-      }
-    }
-  }
-#endif
+  // 定数ノードの情報をコピーしておく．
+  imp_info.copy_const(direct_imp);
 
 #if 0
   // 検証

@@ -104,6 +104,9 @@ private:
   // 先頭を表すダミー
   Cell mDummyTop;
 
+  // 末尾を指すポインタ
+  Cell* mTail;
+
   // Cell のメモリ確保用オブジェクト
   static
   UnitAlloc mAlloc;

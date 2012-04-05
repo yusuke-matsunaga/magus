@@ -40,6 +40,8 @@ libym_imp_la_SOURCES = \
 	CnfImp2.cc \
 	SatImp.h \
 	SatImp.cc \
+	ConstImp.h \
+	ConstImp.cc \
 	RlImp.h \
 	RlImp.cc \
 	NaImp.h \

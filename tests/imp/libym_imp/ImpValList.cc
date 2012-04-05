@@ -21,7 +21,8 @@ UnitAlloc ImpValList::mAlloc(sizeof(Cell), 1024);
 
 /// @brief 空のコンストラクタ
 ImpValList::ImpValList() :
-  mNum(0)
+  mNum(0),
+  mTail(NULL)
 {
 }
 
@@ -48,6 +49,15 @@ void
 ImpValList::insert(ImpVal val)
 {
   sanity_check();
+  if ( mTail && mTail->mVal < val ) {
+    Cell* new_cell = get_cell();
+    new_cell->mVal = val;
+    mTail->mLink = new_cell;
+    new_cell->mLink = NULL;
+    mTail = new_cell;
+    ++ mNum;
+    return;
+  }
   Cell* prev = &mDummyTop;
   Cell* cell = NULL;
   while ( (cell = prev->mLink) != NULL ) {
@@ -104,6 +114,12 @@ ImpValList::merge(const ImpValList& src)
     new_cell->mLink = NULL;
     prev = new_cell;
     ++ mNum;
+  }
+  for ( cell = mDummyTop.mLink; ; cell = cell->mLink) {
+    if ( cell->mLink == NULL ) {
+      mTail = cell;
+      break;
+    }
   }
   sanity_check();
 }
@@ -164,6 +180,12 @@ ImpValList::cap_merge(const ImpValList& src1,
       ++ mNum;
     }
   }
+  for ( cell = mDummyTop.mLink; ; cell = cell->mLink) {
+    if ( cell->mLink == NULL ) {
+      mTail = cell;
+      break;
+    }
+  }
   sanity_check();
 }
 
@@ -212,6 +234,7 @@ ImpValList::put_cell(Cell* cell)
 void
 ImpValList::sanity_check() const
 {
+#if 0
   ymuint n = 0;
   Cell* cell = mDummyTop.mLink;
   if ( cell != NULL ) {
@@ -233,6 +256,7 @@ ImpValList::sanity_check() const
     print(cout);
     abort();
   }
+#endif
 }
 
 END_NAMESPACE_YM_NETWORKS
