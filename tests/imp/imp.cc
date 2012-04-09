@@ -97,11 +97,23 @@ imp(const string& filename,
     // BDN の情報を ImpMgr にコピーする．
     imp_mgr.set(bdn_network);
 
+    timer.reset();
+    timer.start();
+    ConstImp constimp;
+    ImpInfo const_imp;
+    constimp.learning(imp_mgr, const_imp);
+    timer.stop();
+    USTime const_time = timer.time();
+
+    timer.reset();
+    timer.start();
     StrImp strimp;
     ImpInfo direct_imp;
     strimp.learning(imp_mgr, direct_imp);
     timer.stop();
     USTime direct_time = timer.time();
+
+    direct_imp.copy_const(const_imp);
 
     timer.reset();
     timer.start();
@@ -111,22 +123,13 @@ imp(const string& filename,
     timer.stop();
     USTime contra_time = timer.time();
 
-    timer.reset();
-    timer.start();
-    ConstImp constimp;
-    ImpInfo const_imp;
-    constimp.learning(imp_mgr, direct_imp, const_imp);
-    timer.stop();
-    USTime const_time = timer.time();
-
-    direct_imp.copy_const(const_imp);
-    const_imp.copy_const(const_imp);
+    contra_imp.copy_const(const_imp);
 
     timer.reset();
     timer.start();
     SatImp satimp;
     ImpInfo sat_imp;
-#if 1
+#if 0
     satimp.learning(imp_mgr, direct_imp, sat_imp);
 #endif
     timer.stop();
@@ -139,7 +142,7 @@ imp(const string& filename,
     if ( level > 0 ) {
       rlimp.set_learning_level(level);
     }
-#if 1
+#if 0
     rlimp.learning(imp_mgr, direct_imp, rl_imp);
 #endif
     timer.stop();
@@ -176,11 +179,6 @@ imp(const string& filename,
     USTime na_time2 = timer.time();
 #endif
 
-    cout << "d_imp" << endl;
-    direct_imp.print_stats(cout);
-    cout << "c_imp" << endl;
-    contra_imp.print_stats(cout);
-
     ymuint and_node = 0;
     ymuint xor_node = 0;
     {
@@ -207,8 +205,10 @@ imp(const string& filename,
 	 << " ( " << and_node << " ANDs + "
 	 << xor_node << " XORs )" << endl
 	 << "Total " << imp_mgr.node_num() - imp_mgr.input_num()
-	 << " ImpNodes" << endl;
-    cout << "Direct Implications:             " << setw(10) << direct_imp.size()
+	 << " ImpNodes" << endl
+	 << "Constant detection:              " << setw(10) << 0
+	 << ": " << const_time << endl
+	 << "Direct Implications:             " << setw(10) << direct_imp.size()
 	 << ": " << direct_time << endl
 	 << "Contraposition Implications:     " << setw(10) << contra_imp.size()
 	 << ": " << contra_time << endl

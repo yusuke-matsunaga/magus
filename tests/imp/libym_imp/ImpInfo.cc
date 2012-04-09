@@ -23,6 +23,7 @@ ImpInfo::ImpInfo() :
   mAlloc(sizeof(ImpCell), 1024)
 {
   mImpNum = 0;
+  mArraySize = 0;
   mArray = NULL;
   mConstArray = NULL;
   mHashSize = 0;

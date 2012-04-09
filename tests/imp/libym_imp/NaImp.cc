@@ -23,7 +23,7 @@ BEGIN_NONAMESPACE
 #define USE_IMPVALLIST
 
 #if defined(YM_DEBUG)
-bool debug = true;
+bool debug = false;
 #else
 bool debug = false;
 #endif
@@ -233,6 +233,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 
   vector<ImpValList> imp_lists(n * 2);
 
+#if 0
   // direct_imp の情報を imp_lists にコピーする．
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     if ( imp_info.is_const0(src_id) || imp_info.is_const1(src_id) ) {
@@ -256,15 +257,61 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  continue;
 	}
 	ymuint dst_val = imp.dst_val();
-	imp_lists[dst_id * 2 + dst_val].insert(ImpVal(src_id, src_val));
 	ymuint src_val1 = src_val ^ 1;
 	ymuint dst_val1 = dst_val ^ 1;
+	imp_lists[dst_id * 2 + dst_val].insert(ImpVal(src_id, src_val));
 	if ( !direct_imp.check(dst_id, dst_val1, src_id, src_val1) ) {
 	  imp_lists[src_id * 2 + src_val1].insert(ImpVal(dst_id, dst_val1));
 	}
       }
     }
   }
+#else
+  // direct_imp の情報を imp_lists にコピーする．
+  vector<vector<ImpVal> > imp_lists_array(n * 2);
+  for (ymuint src_id = 0; src_id < n; ++ src_id) {
+    if ( imp_info.is_const0(src_id) || imp_info.is_const1(src_id) ) {
+      continue;
+    }
+    ImpNode* node = imp_mgr.node(src_id);
+    if ( node == NULL ) {
+      continue;
+    }
+    // 自分自身を追加する．
+    imp_lists_array[src_id * 2 + 0].push_back(ImpVal(src_id, 0));
+    imp_lists_array[src_id * 2 + 1].push_back(ImpVal(src_id, 1));
+
+    for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+      const ImpList& imp_list = direct_imp.get(src_id, src_val);
+      for (ImpList::iterator p = imp_list.begin();
+	   p != imp_list.end(); ++ p) {
+	const ImpCell& imp = *p;
+	ymuint dst_id = imp.dst_id();
+	if ( imp_info.is_const0(dst_id) || imp_info.is_const1(dst_id) ) {
+	  continue;
+	}
+	ymuint dst_val = imp.dst_val();
+	ymuint src_val1 = src_val ^ 1;
+	ymuint dst_val1 = dst_val ^ 1;
+	imp_lists_array[dst_id * 2 + dst_val].push_back(ImpVal(src_id, src_val));
+	if ( !direct_imp.check(dst_id, dst_val1, src_id, src_val1) ) {
+	  imp_lists_array[src_id * 2 + src_val1].push_back(ImpVal(dst_id, dst_val1));
+	}
+      }
+    }
+  }
+  for (ymuint i = 0; i < n; ++ i) {
+    for (ymuint val = 0; val < 2; ++ val) {
+      vector<ImpVal>& imp_list = imp_lists_array[i * 2 + val];
+      //imp_list.sort();
+      sort(imp_list.begin(), imp_list.end());
+      ImpValList& dst_list = imp_lists[i * 2 + val];
+      for (vector<ImpVal>::iterator p = imp_list.begin(); p != imp_list.end(); ++ p) {
+	dst_list.insert(*p);
+      }
+    }
+  }
+#endif
 
   if ( debug ) {
     for (ymuint i = 0; i < n; ++ i) {
@@ -275,6 +322,9 @@ NaImp::learning(ImpMgr& imp_mgr,
       }
     }
   }
+#if 1
+    cout << "phase0:" << endl;
+#endif
 
   // 論理ノードの割り当て情報を作る．
   vector<ImpNode*> node_list;
@@ -451,6 +501,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	       << endl;
 	}
       }
+
       if ( !imp_info.is_const0(id0) && !imp_info.is_const1(id0) ) {
 	// 出力の1の条件がファンイン0の1の条件となる．
 	const ImpValList& imp_list_o_1 = imp_lists[idx_1];
@@ -511,6 +562,7 @@ NaImp::learning(ImpMgr& imp_mgr,
   }
 
   // imp_lists の情報から imp_info を作る．
+#if 1
   for (ymuint dst_id = 0; dst_id < n; ++ dst_id) {
     ImpNode* node = imp_mgr.node(dst_id);
     if ( node == NULL ) {
@@ -535,6 +587,32 @@ NaImp::learning(ImpMgr& imp_mgr,
       }
     }
   }
+#else
+  for (ymuint src_id = 0; src_id < n; ++ src_id) {
+    ImpNode* node = imp_mgr.node(src_id);
+    if ( node == NULL ) {
+      continue;
+    }
+    for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+      const ImpValList& imp_list = imp_lists[src_id * 2 + src_val];
+      for (ImpValListIter p = imp_list.begin();
+	   p != imp_list.end(); ++ p) {
+	const ImpVal& val = *p;
+	ymuint dst_id = val.id();
+	ymuint dst_val = val.val();
+	if ( src_id == dst_id ) {
+	  continue;
+	}
+	if ( !imp_info.check(src_id, src_val, dst_id, dst_val) ) {
+	  imp_info.put(src_id, src_val, dst_id, dst_val);
+	}
+	if ( !imp_info.check(dst_id, dst_val ^ 1, src_id, src_val ^ 1) ) {
+	  imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
+	}
+      }
+    }
+  }
+#endif
 
 #if 0
   // 検証
