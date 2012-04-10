@@ -21,9 +21,9 @@ UnitAlloc ImpValList::mAlloc(sizeof(Cell), 1024);
 
 /// @brief 空のコンストラクタ
 ImpValList::ImpValList() :
-  mNum(0),
-  mTail(NULL)
+  mNum(0)
 {
+  mDummyTop.mLink = NULL;
 }
 
 // @brief デストラクタ
@@ -44,41 +44,20 @@ ImpValList::num() const
   return mNum;
 }
 
-// @brief 要素を追加する．
+// @brief 要素のリストを追加する．
 void
-ImpValList::insert(ImpVal val)
+ImpValList::insert(const vector<ImpVal>& val_list)
 {
-  sanity_check();
-  if ( mTail && mTail->mVal < val ) {
+  assert_cond( mDummyTop.mLink == NULL, __FILE__, __LINE__);
+  Cell* last = &mDummyTop;
+  for (vector<ImpVal>::const_iterator p = val_list.begin(); p != val_list.end(); ++ p) {
+    const ImpVal& val = *p;
     Cell* new_cell = get_cell();
     new_cell->mVal = val;
-    mTail->mLink = new_cell;
-    new_cell->mLink = NULL;
-    mTail = new_cell;
-    ++ mNum;
-    return;
+    last->mLink = new_cell;
+    last = new_cell;
   }
-  Cell* prev = &mDummyTop;
-  Cell* cell = NULL;
-  while ( (cell = prev->mLink) != NULL ) {
-    if ( cell->mVal == val ) {
-      // 同じ値があった．
-      // なにもしないで終わる．
-      return;
-    }
-    else if ( cell->mVal > val ) {
-      break;
-    }
-    else { // cell->mVal < val
-      prev = cell;
-    }
-  }
-  Cell* new_cell = get_cell();
-  new_cell->mVal = val;
-  prev->mLink = new_cell;
-  new_cell->mLink = cell;
-  ++ mNum;
-  sanity_check();
+  mNum = val_list.size();
 }
 
 // @brief リストの内容をマージする．
@@ -114,12 +93,6 @@ ImpValList::merge(const ImpValList& src)
     new_cell->mLink = NULL;
     prev = new_cell;
     ++ mNum;
-  }
-  for ( cell = mDummyTop.mLink; ; cell = cell->mLink) {
-    if ( cell->mLink == NULL ) {
-      mTail = cell;
-      break;
-    }
   }
   sanity_check();
 }
@@ -178,12 +151,6 @@ ImpValList::cap_merge(const ImpValList& src1,
       src1_cell = src1_cell->mLink;
       src2_cell = src2_cell->mLink;
       ++ mNum;
-    }
-  }
-  for ( cell = mDummyTop.mLink; ; cell = cell->mLink) {
-    if ( cell->mLink == NULL ) {
-      mTail = cell;
-      break;
     }
   }
   sanity_check();

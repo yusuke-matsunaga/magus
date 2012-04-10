@@ -127,6 +127,10 @@ public:
   void
   copy_const(const ImpInfo& src);
 
+  /// @brief 要素数のヒントを与える．
+  void
+  reserve(ymuint size);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

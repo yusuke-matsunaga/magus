@@ -129,7 +129,7 @@ imp(const string& filename,
     timer.start();
     SatImp satimp;
     ImpInfo sat_imp;
-#if 0
+#if 1
     satimp.learning(imp_mgr, direct_imp, sat_imp);
 #endif
     timer.stop();
@@ -142,7 +142,7 @@ imp(const string& filename,
     if ( level > 0 ) {
       rlimp.set_learning_level(level);
     }
-#if 0
+#if 1
     rlimp.learning(imp_mgr, direct_imp, rl_imp);
 #endif
     timer.stop();
