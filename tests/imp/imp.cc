@@ -212,6 +212,7 @@ imp(const string& filename,
 	 << ": " << direct_time << endl
 	 << "Contraposition Implications:     " << setw(10) << contra_imp.size()
 	 << ": " << contra_time << endl
+	 << "                                 " << setw(10) << contra_imp.imp_num() << endl
 	 << "D + C Implications:              " << setw(10) << dcimp << endl
 	 << "Recursive Learning Implications: " << setw(10) << rl_imp.size()
 	 << ": " << rl_time << endl
