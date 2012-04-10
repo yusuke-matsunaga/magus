@@ -23,6 +23,7 @@ ImpInfo::ImpInfo() :
   mAlloc(sizeof(ImpCell), 1024)
 {
   mImpNum = 0;
+  mArraySize = 0;
   mArray = NULL;
   mConstArray = NULL;
   mHashSize = 0;
@@ -198,6 +199,7 @@ ImpInfo::put(ymuint src_id,
 
   if ( mImpNum >= mHashLimit ) {
     // テーブルを拡張する．
+    cout << "ImpInfo::expand()" << endl;
     ymuint old_size = mHashSize;
     ImpCell** old_table = mHashTable;
     alloc_table(old_size << 1);
@@ -242,6 +244,31 @@ ImpInfo::put(ymuint src_id,
     cout << "Hash avr. = " << avr << ", max = " << max << endl;
   }
 #endif
+}
+
+// @brief 要素数のヒントを与える．
+void
+ImpInfo::reserve(ymuint size)
+{
+  ymuint old_size = mHashSize;
+  ImpCell** old_table = mHashTable;
+  ymuint new_size = old_size;
+  while ( new_size < size ) {
+    new_size <<= 1;
+  }
+  if ( new_size > old_size ) {
+    alloc_table(new_size);
+    for (ymuint i = 0; i < old_size; ++ i) {
+      for (ImpCell* cell = old_table[i]; cell; ) {
+	ImpCell* next = cell->mLink;
+	ymuint pos = hash_func(cell->id1(), cell->id2());
+	cell->mLink = mHashTable[pos];
+	mHashTable[pos] = cell;
+	cell = next;
+      }
+    }
+    delete [] old_table;
+  }
 }
 
 // @brief 定数縮退の情報をコピーする．

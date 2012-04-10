@@ -39,9 +39,9 @@ public:
   ymuint
   num() const;
 
-  /// @brief 要素を追加する．
+  /// @brief 要素のリストを追加する．
   void
-  insert(ImpVal val);
+  insert(const vector<ImpVal>& val_list);
 
   /// @brief リストの内容をマージする．
   void
@@ -103,9 +103,6 @@ private:
 
   // 先頭を表すダミー
   Cell mDummyTop;
-
-  // 末尾を指すポインタ
-  Cell* mTail;
 
   // Cell のメモリ確保用オブジェクト
   static

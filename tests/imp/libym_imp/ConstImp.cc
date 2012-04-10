@@ -140,8 +140,7 @@ END_NONAMESPACE
 // @param[in] imp_info 間接含意のリスト
 void
 ConstImp::learning(ImpMgr& imp_mgr,
-		 const ImpInfo& d_imp,
-		 ImpInfo& imp_info)
+		   ImpInfo& imp_info)
 {
   StopWatch timer;
   timer.start();
