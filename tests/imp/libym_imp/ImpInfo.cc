@@ -25,7 +25,6 @@ ImpInfo::ImpInfo() :
   mImpNum = 0;
   mArraySize = 0;
   mArray = NULL;
-  mConstArray = NULL;
   mHashSize = 0;
   mHashTable = NULL;
   alloc_table(1024);
@@ -34,20 +33,6 @@ ImpInfo::ImpInfo() :
 // @brief デストラクタ
 ImpInfo::~ImpInfo()
 {
-}
-
-// @brief 0縮退の時 true を返す．
-bool
-ImpInfo::is_const0(ymuint id) const
-{
-  return mConstArray[id] == 1U;
-}
-
-/// @brief 1縮退の時 true を返す．
-bool
-ImpInfo::is_const1(ymuint id) const
-{
-  return mConstArray[id] == 2U;
 }
 
 // @brief 含意情報のリストを取り出す．
@@ -85,20 +70,11 @@ ImpInfo::size() const
   ymuint n = 0;
   for (ymuint i = 0; i < mArraySize; ++ i) {
     ymuint src_id = i / 2;
-    if ( is_const0(src_id) || is_const1(src_id) ) {
-      continue;
-    }
     const ImpList& imp_list = mArray[i];
-    if ( imp_list.empty() ) {
-      continue;
-    }
     for (ImpList::iterator p = imp_list.begin();
 	 p != imp_list.end(); ++ p) {
       const ImpCell& imp = *p;
       ymuint dst_id = imp.dst_id();
-      if ( is_const0(dst_id) || is_const1(dst_id) ) {
-	continue;
-      }
       ++ n;
     }
   }
@@ -159,24 +135,6 @@ ImpInfo::set_size(ymuint max_id)
 
   mArraySize = max_id * 2;
   mArray = new ImpList[mArraySize];
-  mConstArray = new ymuint8[max_id];
-  for (ymuint i = 0; i < max_id; ++ i) {
-    mConstArray[i] = 0U;
-  }
-}
-
-// @brief 0縮退の印をつける．
-void
-ImpInfo::set_0(ymuint id)
-{
-  mConstArray[id] = 1U;
-}
-
-// @brief 1縮退の印をつける．
-void
-ImpInfo::set_1(ymuint id)
-{
-  mConstArray[id] = 2U;
 }
 
 // @brief 含意情報を追加する．
@@ -271,16 +229,6 @@ ImpInfo::reserve(ymuint size)
   }
 }
 
-// @brief 定数縮退の情報をコピーする．
-void
-ImpInfo::copy_const(const ImpInfo& src)
-{
-  ymuint n = mArraySize / 2;
-  for (ymuint i = 0; i < n; ++ i) {
-    mConstArray[i] = src.mConstArray[i];
-  }
-}
-
 // @brief ImpCell を確保する．
 ImpCell*
 ImpInfo::new_cell()
@@ -325,7 +273,6 @@ ImpInfo::compare(const ImpInfo& right,
   result.clear();
   result.set_size(n);
   for (ymuint src_i = 0; src_i < n; ++ src_i) {
-    if ( is_const0(src_i) || is_const1(src_i) ) continue;
     const ImpList& imp_list0 = mArray[src_i];
     const ImpList& imp_list1 = right.mArray[src_i];
     ImpList::iterator p0 = imp_list0.begin();
@@ -354,10 +301,8 @@ ImpInfo::compare(const ImpInfo& right,
       }
       else if ( id0 > id1 ) {
 	ymuint dst_id = id1 / 2;
-	if ( !is_const0(dst_id) && is_const1(dst_id) ) {
-	  result.put(src_i / 2, src_i % 2,
-		     dst_id, id1 % 2);
-	}
+	result.put(src_i / 2, src_i % 2,
+		   dst_id, id1 % 2);
 	++ i1;
       }
       else { // id0 == id1
@@ -368,10 +313,8 @@ ImpInfo::compare(const ImpInfo& right,
     for ( ; i1 < n1; ++ i1) {
       ymuint id2 = list1[i1];
       ymuint dst_id = id2 / 2;
-      if ( !is_const0(dst_id) && is_const1(dst_id) ) {
-	result.put(src_i / 2, src_i % 2,
-		   dst_id, id2 % 2);
-      }
+      result.put(src_i / 2, src_i % 2,
+		 dst_id, id2 % 2);
     }
   }
   return result.size();

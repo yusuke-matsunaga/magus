@@ -41,6 +41,7 @@ ImpMgr::clear()
   mInputArray.clear();
   mNodeList.clear();
   mNodeArray.clear();
+  mConstArray.clear();
   mBNodeMap.clear();
   mChgStack.clear();
 }
@@ -322,12 +323,23 @@ ImpMgr::new_and(ImpNodeHandle handle0,
   return node;
 }
 
+// @brief 定数の印をつける．
+// @param[in] id ノード番号
+// @param[in] val 値 ( 0 or 1 )
+void
+ImpMgr::set_const(ymuint id,
+		  ymuint val)
+{
+  mConstArray[id] = (val << 1) | 1U;
+}
+
 // @brief ノードを登録する．
 void
 ImpMgr::reg_node(ImpNode* node)
 {
   node->mId = mNodeArray.size();
   mNodeArray.push_back(node);
+  mConstArray.push_back(0U);
   node->mListIter = mUnodeList.end();
 }
 

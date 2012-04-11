@@ -100,8 +100,9 @@ imp(const string& filename,
     timer.reset();
     timer.start();
     ConstImp constimp;
-    ImpInfo const_imp;
-    constimp.learning(imp_mgr, const_imp);
+#if 0
+    constimp.learning(imp_mgr);
+#endif
     timer.stop();
     USTime const_time = timer.time();
 
@@ -113,8 +114,6 @@ imp(const string& filename,
     timer.stop();
     USTime direct_time = timer.time();
 
-    direct_imp.copy_const(const_imp);
-
     timer.reset();
     timer.start();
     ContraImp contraimp;
@@ -122,8 +121,6 @@ imp(const string& filename,
     contraimp.learning(imp_mgr, direct_imp, contra_imp);
     timer.stop();
     USTime contra_time = timer.time();
-
-    contra_imp.copy_const(const_imp);
 
     timer.reset();
     timer.start();
