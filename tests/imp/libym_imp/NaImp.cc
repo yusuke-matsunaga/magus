@@ -559,7 +559,7 @@ NaImp::learning(ImpMgr& imp_mgr,
     }
   }
 
-#if 1
+#if 0
   // 検証
   {
     SatSolver solver1;

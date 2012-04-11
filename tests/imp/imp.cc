@@ -100,7 +100,7 @@ imp(const string& filename,
     timer.reset();
     timer.start();
     ConstImp constimp;
-#if 0
+#if 1
     constimp.learning(imp_mgr);
 #endif
     timer.stop();
