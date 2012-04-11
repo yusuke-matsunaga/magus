@@ -553,21 +553,13 @@ NaImp::learning(ImpMgr& imp_mgr,
 	if ( src_id == dst_id ) {
 	  continue;
 	}
-	if ( !imp_info.check(src_id, src_val, dst_id, dst_val) ) {
-#if 1
-	  imp_info.put(src_id, src_val, dst_id, dst_val);
-#endif
-	}
-	if ( !imp_info.check(dst_id, dst_val ^ 1, src_id, src_val ^ 1) ) {
-#if 1
-	  imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
-#endif
-	}
+	imp_info.put(src_id, src_val, dst_id, dst_val);
+	imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
       }
     }
   }
 
-#if 0
+#if 1
   // 検証
   {
     SatSolver solver1;

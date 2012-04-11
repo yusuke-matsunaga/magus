@@ -157,7 +157,6 @@ ImpInfo::put(ymuint src_id,
 
   if ( mImpNum >= mHashLimit ) {
     // テーブルを拡張する．
-    cout << "ImpInfo::expand()" << endl;
     ymuint old_size = mHashSize;
     ImpCell** old_table = mHashTable;
     alloc_table(old_size << 1);
