@@ -137,17 +137,13 @@ END_NONAMESPACE
 
 // @brief ネットワーク中の間接含意を求める．
 // @param[in] imp_mgr マネージャ
-// @param[in] imp_info 間接含意のリスト
 void
-ConstImp::learning(ImpMgr& imp_mgr,
-		   ImpInfo& imp_info)
+ConstImp::learning(ImpMgr& imp_mgr)
 {
   StopWatch timer;
   timer.start();
 
   ymuint n = imp_mgr.node_num();
-
-  imp_info.set_size(n);
 
   // 各ノードから到達可能な入力ノードのリストを求める．
   vector<vector<ymuint> > input_list_array(n);
@@ -241,7 +237,7 @@ ConstImp::learning(ImpMgr& imp_mgr,
 #if 1
 	  cout << "Node#" << i << " is const-1" << endl;
 #endif
-	  imp_info.set_1(i);
+	  imp_mgr.set_const(i, 1);
 	  const_list.push_back(i);
 	  ++ count_unsat;
 	}
@@ -266,7 +262,7 @@ ConstImp::learning(ImpMgr& imp_mgr,
 #if 1
 	  cout << "Node#" << i << " is const-0" << endl;
 #endif
-	  imp_info.set_0(i);
+	  imp_mgr.set_const(i, 0);
 	  const_list.push_back(i);
 	  ++ count_unsat;
 	}
@@ -290,7 +286,7 @@ ConstImp::learning(ImpMgr& imp_mgr,
 	for (list<ImpDst>::iterator p = imp_list.begin(); p != imp_list.end(); ) {
 	  ImpNode* dst_node = p->node();
 	  ymuint dst_id = dst_node->id();
-	  if ( imp_info.is_const0(dst_id) || imp_info.is_const1(dst_id) ) {
+	  if ( imp_mgr.is_const(dst_id) ) {
 	    list<ImpDst>::iterator q = p;
 	    ++ p;
 	    imp_list.erase(q);

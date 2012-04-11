@@ -57,6 +57,18 @@ public:
   ImpNode*
   input_node(ymuint pos) const;
 
+  /// @brief id 番めのノードが定数かどうか調べる．
+  bool
+  is_const(ymuint id) const;
+
+  /// @brief id 番めのノードが定数かどうか調べる．
+  bool
+  is_const0(ymuint id) const;
+
+  /// @brief id 番めのノードが定数かどうか調べる．
+  bool
+  is_const1(ymuint id) const;
+
   /// @brief トポロジカル順のノードリストを得る．
   /// @param[out] node_list 結果を格納する変数
   void
@@ -123,6 +135,13 @@ public:
   ImpNode*
   new_and(ImpNodeHandle handle0,
 	  ImpNodeHandle handle1);
+
+  /// @brief 定数の印をつける．
+  /// @param[in] id ノード番号
+  /// @param[in] val 値 ( 0 or 1 )
+  void
+  set_const(ymuint id,
+	    ymuint val);
 
 
 public:
@@ -300,6 +319,9 @@ private:
   // ImpNode のID番号をキーにしたノードの配列
   vector<ImpNode*> mNodeArray;
 
+  // 定数マークの配列
+  vector<ymuint8> mConstArray;
+
   // BNode と ImpNode の対応付けの情報を持つオブジェクト
   BNodeMap mBNodeMap;
 
@@ -359,6 +381,30 @@ ImpMgr::node(ymuint id) const
 {
   assert_cond( id < mNodeArray.size(), __FILE__, __LINE__);
   return mNodeArray[id];
+}
+
+// @brief id 番めのノードが定数かどうか調べる．
+inline
+bool
+ImpMgr::is_const(ymuint id) const
+{
+  return static_cast<bool>(mConstArray[id] & 1U);
+}
+
+// @brief id 番めのノードが定数かどうか調べる．
+inline
+bool
+ImpMgr::is_const0(ymuint id) const
+{
+  return mConstArray[id] == 1U;
+}
+
+// @brief id 番めのノードが定数かどうか調べる．
+inline
+bool
+ImpMgr::is_const1(ymuint id) const
+{
+  return mConstArray[id] == 3U;
 }
 
 // @brief トポロジカル順のノードリストを得る．

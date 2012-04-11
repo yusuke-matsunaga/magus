@@ -39,10 +39,8 @@ public:
 
   /// @brief ネットワーク中の間接含意を求める．
   /// @param[in] imp_mgr マネージャ
-  /// @param[out] imp_info 間接含意のリスト
   void
-  learning(ImpMgr& imp_mgr,
-	   ImpInfo& imp_info);
+  learning(ImpMgr& imp_mgr);
 
 };
 

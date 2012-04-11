@@ -337,15 +337,13 @@ SatImp::learning(ImpMgr& imp_mgr,
       }
     }
   }
-  // 定数ノードの情報をコピーしておく．
-  imp_info.copy_const(d_imp);
 
   // シミュレーションでフィルタリングして残った候補を
   // SAT で調べる．
   imp_mgr.random_sim();
   vector<list<ImpDst> > cand_info(n * 2);
   for (ymuint i = 1; i < n; ++ i) {
-    if ( imp_info.is_const0(i) || imp_info.is_const1(i) ) {
+    if ( imp_mgr.is_const(i) ) {
       continue;
     }
     if ( debug ) {
@@ -359,7 +357,7 @@ SatImp::learning(ImpMgr& imp_mgr,
     ymuint64 val0 = node0->bitval();
 
     for (ymuint j = 0; j < i; ++ j) {
-      if ( imp_info.is_const0(j) || imp_info.is_const1(j) ) {
+      if ( imp_mgr.is_const(j) ) {
 	continue;
       }
 
@@ -476,7 +474,7 @@ SatImp::learning(ImpMgr& imp_mgr,
   ymuint count_unsat = 0;
   ymuint count_abort = 0;
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
-    if ( imp_info.is_const0(src_id) || imp_info.is_const1(src_id) ) {
+    if ( imp_mgr.is_const(src_id) ) {
       continue;
     }
 
@@ -492,11 +490,11 @@ SatImp::learning(ImpMgr& imp_mgr,
     for (ymuint id = 0; id < n; ++ id) {
       VarId vid = solver.new_var();
       assert_cond( vid.val() == id, __FILE__, __LINE__);
-      if ( imp_info.is_const0(id) ) {
+      if ( imp_mgr.is_const0(id) ) {
 	Literal lit(vid, kPolNega);
 	solver.add_clause(lit);
       }
-      else if ( imp_info.is_const1(id) ) {
+      else if ( imp_mgr.is_const1(id) ) {
 	Literal lit(vid, kPolPosi);
 	solver.add_clause(lit);
       }
@@ -521,7 +519,7 @@ SatImp::learning(ImpMgr& imp_mgr,
 	ymuint dst_val = p->val();
 	Literal lit1(VarId(dst_id), dst_val == 0 ? kPolNega : kPolPosi);
 
-	if ( imp_info.is_const0(dst_id) || imp_info.is_const1(dst_id) ) {
+	if ( imp_mgr.is_const(dst_id) ) {
 	  continue;
 	}
 
@@ -556,7 +554,7 @@ SatImp::learning(ImpMgr& imp_mgr,
 
 	    if ( dst_id1 == src_id ) continue;
 
-	    if ( imp_info.is_const0(dst_id1) || imp_info.is_const1(dst_id1) ) {
+	    if ( imp_mgr.is_const(dst_id1) ) {
 	      continue;
 	    }
 
@@ -577,7 +575,7 @@ SatImp::learning(ImpMgr& imp_mgr,
 
 	    if ( dst_id2 == dst_id ) continue;
 
-	    if ( imp_info.is_const0(dst_id2) || imp_info.is_const1(dst_id2) ) {
+	    if ( imp_mgr.is_const(dst_id2) ) {
 	      continue;
 	    }
 

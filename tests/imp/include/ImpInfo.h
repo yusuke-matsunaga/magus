@@ -42,14 +42,6 @@ public:
   // 値を取り出す関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 0縮退の時 true を返す．
-  bool
-  is_const0(ymuint id) const;
-
-  /// @brief 1縮退の時 true を返す．
-  bool
-  is_const1(ymuint id) const;
-
   /// @brief 含意情報のリストを取り出す．
   /// @param[in] src_id 含意元のノード番号
   /// @param[in] src_val 含意元の値 ( 0 or 1 )
@@ -104,14 +96,6 @@ public:
   void
   set_size(ymuint max_id);
 
-  /// @brief 0縮退の印をつける．
-  void
-  set_0(ymuint id);
-
-  /// @brief 1縮退の印をつける．
-  void
-  set_1(ymuint id);
-
   /// @brief 含意情報を追加する．
   /// @param[in] src_id 含意元のノード番号
   /// @param[in] src_val 含意元の値 ( 0 or 1 )
@@ -122,10 +106,6 @@ public:
       ymuint src_val,
       ymuint dst_id,
       ymuint dst_val);
-
-  /// @brief 定数縮退の情報をコピーする．
-  void
-  copy_const(const ImpInfo& src);
 
   /// @brief 要素数のヒントを与える．
   void
@@ -167,9 +147,6 @@ private:
 
   // ImpList の配列
   ImpList* mArray;
-
-  // 定数縮退の情報を納める配列
-  ymuint8* mConstArray;
 
   // ハッシュ表のサイズ
   ymuint32 mHashSize;

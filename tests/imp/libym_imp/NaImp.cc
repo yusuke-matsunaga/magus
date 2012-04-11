@@ -231,8 +231,6 @@ NaImp::learning(ImpMgr& imp_mgr,
   ymuint n = imp_mgr.node_num();
 
   imp_info.set_size(n);
-  // 定数ノードの情報をコピーしておく．
-  imp_info.copy_const(direct_imp);
 
   vector<ImpValList> imp_lists(n * 2);
 
@@ -242,7 +240,7 @@ NaImp::learning(ImpMgr& imp_mgr,
   // direct_imp の情報を imp_lists にコピーする．
   vector<vector<ImpVal> > imp_lists_array(n * 2);
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
-    if ( imp_info.is_const0(src_id) || imp_info.is_const1(src_id) ) {
+    if ( imp_mgr.is_const(src_id) ) {
       continue;
     }
     ImpNode* node = imp_mgr.node(src_id);
@@ -259,7 +257,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	   p != imp_list.end(); ++ p) {
 	const ImpCell& imp = *p;
 	ymuint dst_id = imp.dst_id();
-	if ( imp_info.is_const0(dst_id) || imp_info.is_const1(dst_id) ) {
+	if ( imp_mgr.is_const(dst_id) ) {
 	  continue;
 	}
 	ymuint dst_val = imp.dst_val();
@@ -306,7 +304,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	 p != node_list.end(); ++ p) {
       ImpNode* node = *p;
       ymuint id = node->id();
-      if ( imp_info.is_const0(id) || imp_info.is_const1(id) ) {
+      if ( imp_mgr.is_const(id) ) {
 	continue;
       }
       ymuint idx_0 = id * 2 + 0;
@@ -417,7 +415,7 @@ NaImp::learning(ImpMgr& imp_mgr,
       ymuint idx1_0 = id1 * 2 + (inv1 ? 1: 0);
       ymuint idx1_1 = idx1_0 ^ 1;
 
-      if ( !imp_info.is_const0(id1) && !imp_info.is_const1(id1) ) {
+      if ( !imp_mgr.is_const(id1) ) {
 	// 出力の0の条件とファンイン0の1の条件の共通部分がファンイン1の0の条件となる．
 	const ImpValList& imp_list_o_0 = imp_lists[idx_0];
 	const ImpValList& imp_list_i0_1 = imp_lists[idx0_1];
@@ -444,7 +442,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	       << endl;
 	}
       }
-      if ( !imp_info.is_const0(id0) && !imp_info.is_const1(id0) ) {
+      if ( !imp_mgr.is_const(id0) ) {
 	// 出力の0の条件とファンイン1の1の条件の共通部分がファンイン0の0の条件となる．
 	const ImpValList& imp_list_o_0 = imp_lists[idx_0];
 	const ImpValList& imp_list_i1_1 = imp_lists[idx1_1];
@@ -472,7 +470,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	}
       }
 
-      if ( !imp_info.is_const0(id0) && !imp_info.is_const1(id0) ) {
+      if ( !imp_mgr.is_const(id0) ) {
 	// 出力の1の条件がファンイン0の1の条件となる．
 	const ImpValList& imp_list_o_1 = imp_lists[idx_1];
 	ImpValList& imp_list_i0_1 = imp_lists[idx0_1];
@@ -497,7 +495,8 @@ NaImp::learning(ImpMgr& imp_mgr,
 	       << endl;
 	}
       }
-      if ( !imp_info.is_const0(id1) && !imp_info.is_const1(id1) ) {
+
+      if ( !imp_mgr.is_const(id1) ) {
 	// 出力の1の条件がファンイン1の1の条件となる．
 	const ImpValList& imp_list_o_1 = imp_lists[idx_1];
 	ImpValList& imp_list_i1_1 = imp_lists[idx1_1];

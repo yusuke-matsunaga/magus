@@ -82,8 +82,6 @@ RlImp::learning(ImpMgr& imp_mgr,
       }
     }
   }
-  // 定数ノードの情報をコピーしておく．
-  imp_info.copy_const(direct_imp);
 
 #if 0
   // 検証
