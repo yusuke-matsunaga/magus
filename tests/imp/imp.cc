@@ -99,15 +99,6 @@ imp(const string& filename,
 
     timer.reset();
     timer.start();
-    ConstImp constimp;
-#if 1
-    constimp.learning(imp_mgr);
-#endif
-    timer.stop();
-    USTime const_time = timer.time();
-
-    timer.reset();
-    timer.start();
     StrImp strimp;
     ImpInfo direct_imp;
     strimp.learning(imp_mgr, direct_imp);
@@ -124,13 +115,13 @@ imp(const string& filename,
 
     timer.reset();
     timer.start();
-    SatImp satimp;
-    ImpInfo sat_imp;
+    NaImp naimp;
+    ImpInfo na_imp;
 #if 1
-    satimp.learning(imp_mgr, direct_imp, sat_imp);
+    naimp.learning(imp_mgr, direct_imp, na_imp);
 #endif
     timer.stop();
-    USTime sat_time = timer.time();
+    USTime na_time = timer.time();
 
     timer.reset();
     timer.start();
@@ -145,24 +136,24 @@ imp(const string& filename,
     timer.stop();
     USTime rl_time = timer.time();
 
-    if ( 0 ) {
-      ImpInfo diff_imp;
-      ymuint diff = sat_imp.compare(rl_imp, diff_imp);
-      if ( diff > 0 ) {
-	cout << "Diff" << endl;
-	diff_imp.print(cout);
-      }
-    }
+    timer.reset();
+    timer.start();
+    ConstImp constimp;
+#if 1
+    constimp.learning(imp_mgr);
+#endif
+    timer.stop();
+    USTime const_time = timer.time();
 
     timer.reset();
     timer.start();
-    NaImp naimp;
-    ImpInfo na_imp;
+    SatImp satimp;
+    ImpInfo sat_imp;
 #if 1
-    naimp.learning(imp_mgr, direct_imp, na_imp);
+    satimp.learning(imp_mgr, direct_imp, sat_imp);
 #endif
     timer.stop();
-    USTime na_time = timer.time();
+    USTime sat_time = timer.time();
 
 #if 0
     timer.reset();
@@ -195,7 +186,7 @@ imp(const string& filename,
       }
     }
     ymuint node_num2 = bdn_network.lnode_num();
-    ymuint dcimp = direct_imp.size() + contra_imp.size();
+
     cout << "BDN:" << endl
 	 << "Total " << bdn_network.input_num() << " inputs" << endl
 	 << "Total " << node_num2 << " nodes"
@@ -205,22 +196,19 @@ imp(const string& filename,
 	 << " ImpNodes" << endl
 	 << "Constant detection:              " << setw(10) << 0
 	 << ": " << const_time << endl
-	 << "Direct Implications:             " << setw(10) << direct_imp.size()
+	 << "Direct Implications:             " << setw(10) << direct_imp.size(imp_mgr)
 	 << ": " << direct_time << endl
-	 << "Contraposition Implications:     " << setw(10) << contra_imp.size()
+	 << "Contraposition Implications:     " << setw(10) << contra_imp.size(imp_mgr)
 	 << ": " << contra_time << endl
-	 << "                                 " << setw(10) << contra_imp.imp_num() << endl
-	 << "D + C Implications:              " << setw(10) << dcimp << endl
-	 << "Recursive Learning Implications: " << setw(10) << rl_imp.size()
+	 << "Recursive Learning Implications: " << setw(10) << rl_imp.size(imp_mgr)
 	 << ": " << rl_time << endl
-	 << "Naive Implications:              " << setw(10) << na_imp.size()
+	 << "Naive Implications:              " << setw(10) << na_imp.size(imp_mgr)
 	 << ": " << na_time << endl
-	 << ":                                " << setw(10) << na_imp.imp_num() << endl
 #if 0
-	 << "Naive Implications(2):           " << setw(10) << na_imp2.size()
+	 << "Naive Implications(2):           " << setw(10) << na_imp2.size(imp_mgr)
 	 << ": " << na_time2 << endl
 #endif
-	 << "Complete Implications:           " << setw(10) << sat_imp.size()
+	 << "Complete Implications:           " << setw(10) << sat_imp.size(imp_mgr)
 	 << ": " << sat_time << endl;
   }
 #if 0

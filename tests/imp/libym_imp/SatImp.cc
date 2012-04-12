@@ -10,7 +10,7 @@
 #include "SatImp.h"
 #include "ImpNode.h"
 #include "ImpInfo.h"
-#include "ImpList.h"
+#include "ImpHash.h"
 #include "ImpMgr.h"
 #include "StrImp.h"
 #include "ym_logic/SatSolver.h"
@@ -24,6 +24,19 @@ BEGIN_NAMESPACE_YM_NETWORKS
 BEGIN_NONAMESPACE
 
 bool debug = true;
+
+void
+put(ymuint src_id,
+    ymuint src_val,
+    ymuint dst_id,
+    ymuint dst_val,
+    ImpHash& imp_hash,
+    vector<vector<ImpVal> >& imp_list_array)
+{
+  imp_hash.put(src_id, src_val, dst_id, dst_val);
+  imp_list_array[src_id * 2 + src_val].push_back(ImpVal(dst_id, dst_val));
+  imp_list_array[dst_id * 2 + (dst_val ^ 1)].push_back(ImpVal(src_id, src_val ^ 1));
+}
 
 END_NONAMESPACE
 
@@ -207,7 +220,7 @@ justify(ImpMgr& imp_mgr,
     ImpDst imp = unode0->get_justification(i);
     ImpNode* node = imp.node();
     ymuint val = imp.val();
-    vector<ImpDst> imp_list;
+    vector<ImpVal> imp_list;
     bool stat1 = imp_mgr.assert(node, val, imp_list);
     if ( stat1 ) {
       if ( depth > 0 ) {
@@ -238,7 +251,7 @@ str_sat(ImpMgr& imp_mgr,
 	ImpNode* node2,
 	ymuint val2)
 {
-  vector<ImpDst> imp_list;
+  vector<ImpVal> imp_list;
   bool stat1 = imp_mgr.assert(node1, val1, imp_list);
   if ( stat1 == false ) {
     imp_mgr.backtrack();
@@ -310,7 +323,11 @@ SatImp::learning(ImpMgr& imp_mgr,
 
   ymuint n = imp_mgr.node_num();
 
+  ImpHash imp_hash;
+
   imp_info.set_size(n);
+
+  vector<vector<ImpVal> > imp_list_array(n * 2);
 
   // 各ノードから到達可能な入力ノードのリストを求める．
   vector<vector<ymuint> > input_list_array(n);
@@ -325,15 +342,11 @@ SatImp::learning(ImpMgr& imp_mgr,
   // 直接含意と対偶の含意をコピーしておく
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     for (ymuint src_val = 0; src_val < 2; ++ src_val) {
-      const ImpList& imp_list = d_imp.get(src_id, src_val);
-      for (ImpList::iterator p = imp_list.begin(); p != imp_list.end(); ++ p) {
-	const ImpCell& cell = *p;
-	ymuint dst_id = cell.dst_id();
-	ymuint dst_val = cell.dst_val();
-	imp_info.put(src_id, src_val, dst_id, dst_val);
-	if ( !d_imp.check(dst_id, dst_val ^ 1, src_id, src_val ^ 1) ) {
-	  imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
-	}
+      const vector<ImpVal>& imp_list = d_imp.get(src_id, src_val);
+      for (vector<ImpVal>::const_iterator p = imp_list.begin(); p != imp_list.end(); ++ p) {
+	ymuint dst_id = p->id();
+	ymuint dst_val = p->val();
+	put(src_id, src_val, dst_id, dst_val, imp_hash, imp_list_array);
       }
     }
   }
@@ -345,11 +358,6 @@ SatImp::learning(ImpMgr& imp_mgr,
   for (ymuint i = 1; i < n; ++ i) {
     if ( imp_mgr.is_const(i) ) {
       continue;
-    }
-    if ( debug ) {
-      if ( (i % 100) == 0 ) {
-	cerr << i << " / " << n << endl;
-      }
     }
 
     ImpNode* node0 = imp_mgr.node(i);
@@ -370,25 +378,25 @@ SatImp::learning(ImpMgr& imp_mgr,
 
       // node0 が 0 の時に 0 となるノードを探す．
       if ( (~val0 & val1) == 0UL ) {
-	if ( !imp_info.check(i, 0, j, 0) ) {
+	if ( !imp_hash.check(i, 0, j, 0) ) {
 	  cand_info[i * 2 + 0].push_back(ImpDst(node1, 0));
 	}
       }
       // node0 が 0 の時に 1 となるノードを探す．
       if ( (~val0 & ~val1) == 0UL ) {
-	if ( !imp_info.check(i, 0, j, 1) ) {
+	if ( !imp_hash.check(i, 0, j, 1) ) {
 	  cand_info[i * 2 + 0].push_back(ImpDst(node1, 1));
 	}
       }
       // node0 が 1 の時に 0 となるノードを探す．
       if ( (val0 & val1) == 0UL ) {
-	if ( !imp_info.check(i, 1, j, 0) ) {
+	if ( !imp_hash.check(i, 1, j, 0) ) {
 	  cand_info[i * 2 + 1].push_back(ImpDst(node1, 0));
 	}
       }
       // node0 が 1 の時に 1 となるノードを探す．
       if ( (val0 & ~val1) == 0UL ) {
-	if ( !imp_info.check(i, 1, j, 1) ) {
+	if ( !imp_hash.check(i, 1, j, 1) ) {
 	  cand_info[i * 2 + 1].push_back(ImpDst(node1, 1));
 	}
       }
@@ -467,6 +475,7 @@ SatImp::learning(ImpMgr& imp_mgr,
   timer.reset();
   timer.start();
 
+
   ymuint remain = count_list(cand_info);
   count = 1;
   ymuint count_solve = 0;
@@ -508,9 +517,7 @@ SatImp::learning(ImpMgr& imp_mgr,
 	   p != imp_list.end(); ++ p) {
 	if ( debug ) {
 	  if ( (count % 1000) == 0 ) {
-	    cerr << "sat#" << count << " / " << remain;
-	    cerr << ": ";
-	    imp_info.print_stats(cerr);
+	    cerr << "sat#" << count << " / " << remain << endl;
 	  }
 	}
 	++ count;
@@ -523,7 +530,7 @@ SatImp::learning(ImpMgr& imp_mgr,
 	  continue;
 	}
 
-	if ( imp_info.check(src_id, src_val, dst_id, dst_val) ) {
+	if ( imp_hash.check(src_id, src_val, dst_id, dst_val) ) {
 	  continue;
 	}
 
@@ -539,18 +546,16 @@ SatImp::learning(ImpMgr& imp_mgr,
 	  // 含意が証明された．
 	  ++ count_unsat;
 
-	  imp_info.put(src_id, src_val, dst_id, dst_val);
-	  imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
+	  put(src_id, src_val, dst_id, dst_val, imp_hash, imp_list_array);
 	  solver.add_clause(~lit0, lit1);
 
 	  // src_id:src_val ==> dst_id:dst_val と
 	  // dst_id:dst_val から導かれる含意を合成する．
-	  const ImpList& imp_list1 = imp_info.get(dst_id, dst_val);
-	  for (ImpList::iterator p1 = imp_list1.begin();
+	  const vector<ImpVal>& imp_list1 = imp_list_array[dst_id * 2 + dst_val];
+	  for (vector<ImpVal>::const_iterator p1 = imp_list1.begin();
 	       p1 != imp_list1.end(); ++ p1) {
-	    const ImpCell& imp = *p1;
-	    ymuint dst_id1 = imp.dst_id();
-	    ymuint dst_val1 = imp.dst_val();
+	    ymuint dst_id1 = p1->id();
+	    ymuint dst_val1 = p1->val();
 
 	    if ( dst_id1 == src_id ) continue;
 
@@ -558,20 +563,18 @@ SatImp::learning(ImpMgr& imp_mgr,
 	      continue;
 	    }
 
-	    if ( !imp_info.check(src_id, src_val, dst_id1, dst_val1) ) {
-	      imp_info.put(src_id, src_val, dst_id1, dst_val1);
-	      imp_info.put(dst_id1, dst_val1 ^ 1, src_id, src_val ^ 1);
+	    if ( !imp_hash.check(src_id, src_val, dst_id1, dst_val1) ) {
+	      put(src_id, src_val, dst_id1, dst_val1, imp_hash, imp_list_array);
 	    }
 	  }
 
 	  // dst_id:~dst_val ==> src_id:~src_val と
 	  // src_id:~src_val から導かれる含意を合成する．
-	  const ImpList& imp_list2 = imp_info.get(src_id, src_val ^ 1);
-	  for (ImpList::iterator p2 = imp_list2.begin();
+	  const vector<ImpVal>& imp_list2 = imp_list_array[src_id * 2 + (src_val ^ 1)];
+	  for (vector<ImpVal>::const_iterator p2 = imp_list2.begin();
 	       p2 != imp_list2.end(); ++ p2) {
-	    const ImpCell& imp = *p2;
-	    ymuint dst_id2 = imp.dst_id();
-	    ymuint dst_val2 = imp.dst_val();
+	    ymuint dst_id2 = p2->id();
+	    ymuint dst_val2 = p2->val();
 
 	    if ( dst_id2 == dst_id ) continue;
 
@@ -579,9 +582,8 @@ SatImp::learning(ImpMgr& imp_mgr,
 	      continue;
 	    }
 
-	    if ( !imp_info.check(dst_id, dst_val ^ 1, dst_id2, dst_val2) ) {
-	      imp_info.put(dst_id, dst_val ^ 1, dst_id2, dst_val2);
-	      imp_info.put(dst_id2, dst_val2 ^ 1, dst_id, dst_val);
+	    if ( !imp_hash.check(dst_id, dst_val ^ 1, dst_id2, dst_val2) ) {
+	      put(dst_id, dst_val ^ 1, dst_id2, dst_val2, imp_hash, imp_list_array);
 	    }
 	  }
 	}
@@ -594,6 +596,9 @@ SatImp::learning(ImpMgr& imp_mgr,
       }
     }
   }
+
+  imp_info.set(imp_list_array);
+
   timer.stop();
   USTime sat_time = timer.time();
 
@@ -636,12 +641,6 @@ SatImp::learning(ImpMgr& imp_mgr,
 	solver1.add_clause(lit1, ~lit);
 	solver1.add_clause(~lit0, ~lit1, lit);
       }
-      else if ( node->is_xor() ) {
-	solver1.add_clause(lit0, ~lit1, lit);
-	solver1.add_clause(~lit0, lit1, lit);
-	solver1.add_clause(~lit0, ~lit1, ~lit);
-	solver1.add_clause(lit0, lit1, ~lit);
-      }
       else {
 	assert_not_reached(__FILE__, __LINE__);
       }
@@ -651,13 +650,10 @@ SatImp::learning(ImpMgr& imp_mgr,
     for (ymuint src_id = 0; src_id < n; ++ src_id) {
       for (ymuint src_val = 0; src_val < 2; ++ src_val) {
 	Literal lit0(to_literal(src_id, src_val));
-	const ImpList& imp_list = imp_info.get(src_id, src_val);
-	for (ImpList::iterator p = imp_list.begin(); p != imp_list.end(); ++ p) {
-	  const ImpCell& imp = *p;
-	  ymuint dst_id = imp.dst_id();
-	  ymuint dst_val = imp.dst_val();
-	  assert_cond( imp_info.check(src_id, src_val, dst_id, dst_val),
-		       __FILE__, __LINE__);
+	const vector<ImpVal>& imp_list = imp_info.get(src_id, src_val);
+	for (vector<ImpVal>::const_iterator p = imp_list.begin(); p != imp_list.end(); ++ p) {
+	  ymuint dst_id = p->id();
+	  ymuint dst_val = p->val();
 	  Literal lit1(to_literal(dst_id, dst_val));
 	  vector<Literal> tmp(2);
 	  tmp[0] = lit0;

@@ -21,9 +21,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 //////////////////////////////////////////////////////////////////////
 class ImpCell
 {
-  friend class ImpInfo;
-  friend class ImpList;
-  friend class ImpListIterator;
+  friend class ImpHash;
 public:
 
   /// @brief 空のコンストラクタ
@@ -101,9 +99,6 @@ private:
   // 含意先の情報
   ImpVal mDstVal;
 
-  // リスト中の後の要素
-  ImpCell* mNext;
-
   // ハッシュ用のリンク
   ImpCell* mLink;
 
@@ -118,7 +113,6 @@ private:
 inline
 ImpCell::ImpCell()
 {
-  mNext = NULL;
   mLink = NULL;
 }
 
@@ -135,7 +129,6 @@ ImpCell::ImpCell(ymuint src_id,
   mSrcVal(src_id, src_val),
   mDstVal(dst_id, dst_val)
 {
-  mNext = NULL;
   mLink = NULL;
 }
 

@@ -12,7 +12,6 @@
 #include "ImpMgr.h"
 #include "ImpNode.h"
 #include "ImpInfo.h"
-#include "ImpList.h"
 #include "ym_logic/SatSolver.h"
 
 
@@ -59,29 +58,37 @@ RlImp::learning(ImpMgr& imp_mgr,
 
   imp_info.set_size(n);
 
+  vector<vector<ImpVal> > imp_list_array(n * 2);
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
+    if ( imp_mgr.is_const(src_id) ) {
+      continue;
+    }
+
     ImpNode* src_node = imp_mgr.node(src_id);
 
     // src_node に値を割り当てる．
     for (ymuint src_val = 0; src_val < 2; ++ src_val) {
-      vector<ImpDst> imp_list;
+      vector<ImpVal> imp_list;
       bool ok = make_all_implication(imp_mgr, src_node, src_val, mLevel, imp_list);
       if ( ok ) {
-	for (vector<ImpDst>::iterator p = imp_list.begin();
+	for (vector<ImpVal>::iterator p = imp_list.begin();
 	     p != imp_list.end(); ++ p) {
-	  ImpNode* dst_node = p->node();
-	  ymuint dst_id = dst_node->id();
-	  ymuint dst_val = p->val();
-	  if ( !imp_info.check(src_id, src_val, dst_id, dst_val) ) {
-	    imp_info.put(src_id, src_val, dst_id, dst_val);
-	  }
-	  if ( !imp_info.check(dst_id, dst_val ^ 1, src_id, src_id ^ 1) ) {
-	    imp_info.put(dst_id, dst_val ^ 1, src_id, src_val ^ 1);
-	  }
+	  const ImpVal& imp = *p;
+	  ymuint dst_id = imp.id();
+	  ymuint dst_val = imp.val();
+	  imp_list_array[src_id * 2 + src_val].push_back(ImpVal(dst_id, dst_val));
+	  imp_list_array[dst_id * 2 + (dst_val ^ 1)].push_back(ImpVal(src_id, src_val ^ 1));
 	}
+      }
+      else {
+	// 単一の値割り当てが失敗するということは逆の値で固定されている．
+	imp_mgr.set_const(src_id, src_val ^ 1);
+	cout << "Node#" << src_id << " is const-" << (src_val ^ 1) << endl;
       }
     }
   }
+
+  imp_info.set(imp_list_array);
 
 #if 0
   // 検証
@@ -126,12 +133,11 @@ RlImp::learning(ImpMgr& imp_mgr,
     for (ymuint src_id = 0; src_id < n; ++ src_id) {
       for (ymuint src_val = 0; src_val < 2; ++ src_val) {
 	Literal lit0(VarId(src_id), src_val == 0 ? kPolNega : kPolPosi);
-	const ImpList& imp_list = imp_info.get(src_id, src_val);
-	for (ImpList::iterator p = imp_list.begin();
+	const vector<ImpVal>& imp_list = imp_info.get(src_id, src_val);
+	for (vector<ImpVal>::const_iterator p = imp_list.begin();
 	     p != imp_list.end(); ++ p) {
-	  const ImpCell& imp = *p;
-	  ymuint dst_id = imp.dst_id();
-	  ymuint dst_val = imp.dst_val();
+	  ymuint dst_id = p->id();
+	  ymuint dst_val = p->val();
 	  Literal lit1(VarId(dst_id), dst_val == 0 ? kPolNega : kPolPosi);
 	  vector<Literal> tmp(2);
 	  vector<Bool3> model;
@@ -164,7 +170,7 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
 			    ImpNode* node,
 			    ymuint val,
 			    ymuint level,
-			    vector<ImpDst>& imp_list)
+			    vector<ImpVal>& imp_list)
 {
   if ( debug ) {
     cout << "make_all_implication(Node#" << node->id()
@@ -178,11 +184,11 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
 
   if ( debug ) {
     cout << "direct implications {" << endl;
-    for (vector<ImpDst>::iterator p = imp_list.begin();
+    for (vector<ImpVal>::iterator p = imp_list.begin();
 	 p != imp_list.end(); ++ p) {
-      ImpNode* dst_node = p->node();
+      ymuint dst_id = p->id();
       ymuint dst_val = p->val();
-      cout << "  ==> Node#" << dst_node->id() << ": " << dst_val << endl;
+      cout << "  ==> Node#" << dst_id << ": " << dst_val << endl;
     }
     cout << "}" << endl;
   }
@@ -204,7 +210,7 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
 	ymuint np = unode->justification_num();
 	bool first = true;
 	vector<ymuint> common_val(n2, 2);
-	vector<ImpNode*> common_list;
+	vector<ymuint> common_list;
 	for (ymuint i = 0; i < np; ++ i) {
 	  ImpDst imp = unode->get_justification(i);
 	  ImpNode* inode = imp.node();
@@ -215,44 +221,41 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
 		 << ": " << ival << endl;
 	  }
 
-	  vector<ImpDst> imp_list1;
+	  vector<ImpVal> imp_list1;
 	  bool ok1 = make_all_implication(imp_mgr, inode, ival, level - 1,
 					  imp_list1);
 	  if ( ok1 ) {
 	    if ( first ) {
 	      first = false;
-	      for (vector<ImpDst>::iterator p = imp_list1.begin();
+	      for (vector<ImpVal>::iterator p = imp_list1.begin();
 		   p != imp_list1.end(); ++ p) {
-		const ImpDst& imp = *p;
-		ImpNode* dst_node = imp.node();
-		ymuint dst_id = dst_node->id();
+		const ImpVal& imp = *p;
+		ymuint dst_id = imp.id();
 		ymuint val = imp.val();
 		if ( vmark[dst_id] ) {
 		  common_val[dst_id] = 2;
 		}
 		else {
 		  common_val[dst_id] = val;
-		  common_list.push_back(dst_node);
+		  common_list.push_back(dst_id);
 		}
 	      }
 	    }
 	    else {
 	      vector<bool> vmark1(n2, false);
-	      for (vector<ImpDst>::iterator p = imp_list1.begin();
+	      for (vector<ImpVal>::iterator p = imp_list1.begin();
 		   p != imp_list1.end(); ++ p) {
-		const ImpDst& imp = *p;
-		ImpNode* dst_node = imp.node();;
-		ymuint dst_id = dst_node->id();
+		const ImpVal& imp = *p;
+		ymuint dst_id = imp.id();
 		ymuint val = imp.val();
 		if ( common_val[dst_id] != val ) {
 		  common_val[dst_id] = 2;
 		}
 		vmark1[dst_id] = true;
 	      }
-	      for (vector<ImpNode*>::iterator p = common_list.begin();
+	      for (vector<ymuint>::iterator p = common_list.begin();
 		   p != common_list.end(); ++ p) {
-		ImpNode* dst_node = *p;
-		ymuint dst_id = dst_node->id();
+		ymuint dst_id = *p;
 		if ( !vmark1[dst_id] ) {
 		  common_val[dst_id] = 2;
 		}
@@ -262,13 +265,12 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
 	}
 	ymuint nc = common_list.size();
 	for (ymuint i = 0; i < nc; ++ i) {
-	  ImpNode* dst_node = common_list[i];
-	  ymuint dst_id = dst_node->id();
+	  ymuint dst_id = common_list[i];
 	  if ( common_val[dst_id] == 2 ) continue;
-	  imp_list.push_back(ImpDst(dst_node, common_val[dst_id]));
+	  imp_list.push_back(ImpVal(dst_id, common_val[dst_id]));
 
 	  if ( debug ) {
-	    cout << "  Common Implication: Node#" << dst_node->id()
+	    cout << "  Common Implication: Node#" << dst_id
 		 << ": " << common_val[dst_id] << endl;
 	  }
 

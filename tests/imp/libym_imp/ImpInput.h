@@ -102,7 +102,7 @@ public:
   virtual
   bool
   fwd0_imp0(ImpMgr& mgr,
-	    vector<ImpDst>& imp_list);
+	    vector<ImpVal>& imp_list);
 
   /// @brief ファンイン0を1にする．
   /// @param[in] mgr ImMgr
@@ -110,7 +110,7 @@ public:
   virtual
   bool
   fwd0_imp1(ImpMgr& mgr,
-	    vector<ImpDst>& imp_list);
+	    vector<ImpVal>& imp_list);
 
   /// @brief ファンイン1を0にする．
   /// @param[in] mgr ImMgr
@@ -118,7 +118,7 @@ public:
   virtual
   bool
   fwd1_imp0(ImpMgr& mgr,
-	    vector<ImpDst>& imp_list);
+	    vector<ImpVal>& imp_list);
 
   /// @brief ファンイン1を1にする．
   /// @param[in] mgr ImMgr
@@ -126,7 +126,7 @@ public:
   virtual
   bool
   fwd1_imp1(ImpMgr& mgr,
-	    vector<ImpDst>& imp_list);
+	    vector<ImpVal>& imp_list);
 
   /// @brief 出力を0にする．
   /// @param[in] mgr ImMgr
@@ -134,7 +134,7 @@ public:
   virtual
   bool
   bwd_imp0(ImpMgr& mgr,
-	   vector<ImpDst>& imp_list);
+	   vector<ImpVal>& imp_list);
 
   /// @brief 出力を1にする．
   /// @param[in] mgr ImMgr
@@ -142,7 +142,7 @@ public:
   virtual
   bool
   bwd_imp1(ImpMgr& mgr,
-	   vector<ImpDst>& imp_list);
+	   vector<ImpVal>& imp_list);
 
 
 private:
