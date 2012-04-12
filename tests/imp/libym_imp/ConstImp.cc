@@ -10,7 +10,6 @@
 #include "ConstImp.h"
 #include "ImpNode.h"
 #include "ImpInfo.h"
-#include "ImpList.h"
 #include "ImpMgr.h"
 #include "StrImp.h"
 #include "ym_logic/SatSolver.h"
@@ -165,6 +164,10 @@ ConstImp::learning(ImpMgr& imp_mgr)
       if ( (i % 100) == 0 ) {
 	cerr << i << " / " << n << endl;
       }
+    }
+
+    if ( imp_mgr.is_const(i) ) {
+      continue;
     }
 
     ImpNode* node0 = imp_mgr.node(i);

@@ -10,7 +10,7 @@
 
 
 #include "ym_networks/BNetwork.h"
-#include "ImpDst.h"
+#include "ImpVal.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -71,7 +71,7 @@ private:
 		       ImpNode* node,
 		       ymuint val,
 		       ymuint level,
-		       vector<ImpDst>& imp_list);
+		       vector<ImpVal>& imp_list);
 
 
 private:

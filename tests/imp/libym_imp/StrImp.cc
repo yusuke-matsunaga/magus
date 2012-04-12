@@ -40,49 +40,38 @@ StrImp::learning(ImpMgr& imp_mgr,
 
   imp_info.set_size(n);
 
+  vector<vector<ImpVal> > imp_list_array(n * 2);
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     ImpNode* node = imp_mgr.node(src_id);
 
     // node に 0 を割り当てる．
-    vector<ImpDst> imp_list0;
+    vector<ImpVal>& imp_list0 = imp_list_array[src_id * 2 + 0];
     bool ok0 = imp_mgr.assert(node, 0, imp_list0);
-    if ( ok0 ) {
-      for (vector<ImpDst>::iterator p = imp_list0.begin();
-	   p != imp_list0.end(); ++ p) {
-	const ImpDst& imp = *p;
-	ImpNode* dst_node = imp.node();
-	ymuint dst_id = dst_node->id();
-	imp_info.put(src_id, 0, dst_id, imp.val());
-      }
-    }
-    else {
+    if ( !ok0 ) {
+      imp_list0.clear();
       // 単一の割り当てで矛盾が起こった．
       // node は 1 固定
+      imp_mgr.set_const(src_id, 1);
+      cout << "Node#" << src_id << " is const-1" << endl;
     }
     imp_mgr.backtrack();
 
     // node に 1 を割り当てる．
-    vector<ImpDst> imp_list1;
+    vector<ImpVal>& imp_list1 = imp_list_array[src_id * 2 + 1];
     bool ok1 = imp_mgr.assert(node, 1, imp_list1);
-    if ( ok1 ) {
-      for (vector<ImpDst>::iterator p = imp_list1.begin();
-	   p != imp_list1.end(); ++ p) {
-	const ImpDst& imp = *p;
-	ImpNode* dst_node = imp.node();
-	ymuint dst_id = dst_node->id();
-	imp_info.put(src_id, 1, dst_id, imp.val());
-      }
-    }
-    else {
+    if ( !ok1 ) {
+      imp_list1.clear();
       // 単一の割り当てで矛盾が起こった．
       // node は 0 固定
+      imp_mgr.set_const(src_id, 0);
+      cout << "Node#" << src_id << " is const-0" << endl;
     }
     imp_mgr.backtrack();
   }
-#if 0
-  cout << "DIRECT IMPLICATION" << endl;
-  imp_info.print(cout);
-#endif
+
+  // imp_list_array の内容を imp_info にコピーする．
+  imp_info.set(imp_list_array);
+
 }
 
 END_NAMESPACE_YM_NETWORKS

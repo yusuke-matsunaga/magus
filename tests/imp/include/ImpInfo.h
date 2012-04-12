@@ -11,13 +11,11 @@
 
 #include "ym_networks/bdn.h"
 #include "ImpVal.h"
-#include "ym_utils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-class ImpCell;
-class ImpList;
+class ImpMgr;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ImpInfo ImpInfo.h "ImpInfo.h"
@@ -45,20 +43,13 @@ public:
   /// @brief 含意情報のリストを取り出す．
   /// @param[in] src_id 含意元のノード番号
   /// @param[in] src_val 含意元の値 ( 0 or 1 )
-  const ImpList&
+  const vector<ImpVal>&
   get(ymuint src_id,
       ymuint src_val) const;
 
-  /// @brief 該当する含意情報が含まれているか調べる．
-  bool
-  check(ymuint src_id,
-	ymuint src_val,
-	ymuint dst_id,
-	ymuint dst_val) const;
-
   /// @brief 含意の総数を得る．
   ymuint
-  size() const;
+  size(const ImpMgr& imp_mgr) const;
 
   /// @brief 実際に保持している含意の総数を返す．
   ymuint
@@ -72,14 +63,6 @@ public:
   /// @brief 統計情報を出力する．
   void
   print_stats(ostream& s) const;
-
-  /// @brief 引き算
-  /// @param[in] right 比較対象
-  /// @param[out] result 結果を格納する変数
-  /// @return 結果の要素数を返す．( = result.size() )
-  ymuint
-  compare(const ImpInfo& right,
-	  ImpInfo& result) const;
 
 
 public:
@@ -96,39 +79,9 @@ public:
   void
   set_size(ymuint max_id);
 
-  /// @brief 含意情報を追加する．
-  /// @param[in] src_id 含意元のノード番号
-  /// @param[in] src_val 含意元の値 ( 0 or 1 )
-  /// @param[in] dst_id 含意先のノード番号
-  /// @param[in] dst_val 含意先の値 ( 0 or 1 )
+  /// @brief 内容をセットする．
   void
-  put(ymuint src_id,
-      ymuint src_val,
-      ymuint dst_id,
-      ymuint dst_val);
-
-  /// @brief 要素数のヒントを与える．
-  void
-  reserve(ymuint size);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ImpCell を確保する．
-  ImpCell*
-  new_cell();
-
-  /// @brief テーブルの領域を確保する．
-  void
-  alloc_table(ymuint size);
-
-  /// @brief ハッシュ関数
-  ymuint
-  hash_func(ymuint id1,
-	    ymuint id2) const;
+  set(vector<vector<ImpVal> >& imp_list_array);
 
 
 private:
@@ -136,26 +89,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ImpCell 用のアロケータ
-  UnitAlloc mAlloc;
-
-  // 含意の総数
-  ymuint32 mImpNum;
-
   // mArray のサイズ
   ymuint32 mArraySize;
 
   // ImpList の配列
-  ImpList* mArray;
-
-  // ハッシュ表のサイズ
-  ymuint32 mHashSize;
-
-  // ハッシュ表を拡大する目安
-  ymuint32 mHashLimit;
-
-  // ハッシュ表
-  ImpCell** mHashTable;
+  vector<ImpVal>* mArray;
 
 };
 
