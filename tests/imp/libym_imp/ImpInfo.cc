@@ -9,9 +9,22 @@
 
 #include "ImpInfo.h"
 #include "ImpMgr.h"
+#include "ym_logic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
+
+BEGIN_NONAMESPACE
+
+inline
+Literal
+to_literal(ymuint id,
+	   ymuint val)
+{
+  return Literal(VarId(id), (val == 0) ? kPolNega : kPolPosi);
+}
+
+END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
 // クラス ImpInfo
@@ -136,6 +149,104 @@ ImpInfo::set(vector<vector<ImpVal> >& imp_list_array)
     imp_list.erase(p, imp_list.end());
     mArray[i] = imp_list;
   }
+}
+
+// @brief 内容をセットする．
+void
+ImpInfo::set(vector<vector<ImpVal> >& imp_list_array,
+	     const ImpInfo& src)
+{
+  for (ymuint i = 0; i < mArraySize; ++ i) {
+    vector<ImpVal>& imp_list = imp_list_array[i];
+    sort(imp_list.begin(), imp_list.end());
+    vector<ImpVal>::iterator p = unique(imp_list.begin(), imp_list.end());
+    imp_list.erase(p, imp_list.end());
+    const vector<ImpVal>& src_list = src.mArray[i];
+    mArray[i].clear();
+    vector<ImpVal>::const_iterator p1 = imp_list.begin();
+    vector<ImpVal>::const_iterator e1 = imp_list.end();
+    vector<ImpVal>::const_iterator p2 = src_list.begin();
+    vector<ImpVal>::const_iterator e2 = src_list.end();
+    while ( p1 != e1 && p2 != e2 ) {
+      const ImpVal& val1 = *p1;
+      const ImpVal& val2 = *p2;
+      if ( val1 < val2 ) {
+	mArray[i].push_back(val1);
+	++ p1;
+      }
+      else if ( val1 == val2 ) {
+	++ p1;
+	++ p2;
+      }
+      else { // val1 > val2
+	++ p2;
+      }
+    }
+    for ( ; p1 != e1; ++ p1) {
+      mArray[i].push_back(*p1);
+    }
+  }
+}
+
+// 検証する．
+void
+verify(const ImpMgr& imp_mgr,
+       const ImpInfo& imp_info)
+{
+  ymuint n = imp_mgr.node_num();
+
+  SatSolver solver1;
+  for (ymuint id = 0; id < n; ++ id) {
+    VarId vid = solver1.new_var();
+    assert_cond( vid.val() == id, __FILE__, __LINE__);
+  }
+
+  // ImpMgr から CNF を作る．
+  for (ymuint id = 0; id < n; ++ id) {
+    ImpNode* node = imp_mgr.node(id);
+    if ( node == NULL ) continue;
+    if ( node->is_input() ) continue;
+
+    Literal lit(VarId(id), kPolPosi);
+
+    const ImpEdge& e0 = node->fanin0();
+    ImpNode* node0 = e0.src_node();
+    bool inv0 = e0.src_inv();
+    Literal lit0(VarId(node0->id()), inv0 ? kPolNega : kPolPosi);
+
+    const ImpEdge& e1 = node->fanin1();
+    ImpNode* node1 = e1.src_node();
+    bool inv1 = e1.src_inv();
+    Literal lit1(VarId(node1->id()), inv1 ? kPolNega : kPolPosi);
+
+    solver1.add_clause(lit0, ~lit);
+    solver1.add_clause(lit1, ~lit);
+    solver1.add_clause(~lit0, ~lit1, lit);
+  }
+
+  ymuint nerr = 0;
+  for (ymuint src_id = 0; src_id < n; ++ src_id) {
+    for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+      Literal lit0(to_literal(src_id, src_val));
+      const vector<ImpVal>& imp_list = imp_info.get(src_id, src_val);
+      for (vector<ImpVal>::const_iterator p = imp_list.begin();
+	   p != imp_list.end(); ++ p) {
+	ymuint dst_id = p->id();
+	ymuint dst_val = p->val();
+	Literal lit1(to_literal(dst_id, dst_val));
+	vector<Literal> tmp(2);
+	tmp[0] = lit0;
+	tmp[1] = ~lit1;
+	vector<Bool3> model;
+	if ( solver1.solve(tmp, model) != kB3False ) {
+	  cout << "ERROR: Node#" << src_id << ": " << src_val
+	       << " ==> Node#" << dst_id << ": " << dst_val << endl;
+	  ++ nerr;
+	}
+      }
+    }
+  }
+  cout << "Total " << nerr << " errors" << endl;
 }
 
 END_NAMESPACE_YM_NETWORKS

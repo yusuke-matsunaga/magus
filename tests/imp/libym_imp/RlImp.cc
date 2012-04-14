@@ -12,7 +12,6 @@
 #include "ImpMgr.h"
 #include "ImpNode.h"
 #include "ImpInfo.h"
-#include "ym_logic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -88,75 +87,7 @@ RlImp::learning(ImpMgr& imp_mgr,
     }
   }
 
-  imp_info.set(imp_list_array);
-
-#if 0
-  // 検証
-  if ( 0 ) {
-    SatSolver solver;
-    for (ymuint i = 0; i < n; ++ i) {
-      VarId vid = solver.new_var();
-      assert_cond( vid.val() == i, __FILE__, __LINE__);
-    }
-    vector<BdnNode*> node_list;
-    network.sort(node_list);
-    for (vector<BdnNode*>::iterator p = node_list.begin();
-	 p != node_list.end(); ++ p) {
-      const BdnNode* bnode = *p;
-      ymuint id = bnode->id();
-      Literal lit(VarId(id), kPolPosi);
-
-      const BdnNode* bnode0 = bnode->fanin0();
-      bool inv0 = bnode->fanin0_inv();
-      Literal lit0(VarId(bnode0->id()), inv0 ? kPolNega : kPolPosi);
-
-      const BdnNode* bnode1 = bnode->fanin1();
-      bool inv1 = bnode->fanin1_inv();
-      Literal lit1(VarId(bnode1->id()), inv1 ? kPolNega : kPolPosi);
-
-      if ( bnode->is_and() ) {
-	solver.add_clause(lit0, ~lit);
-	solver.add_clause(lit1, ~lit);
-	solver.add_clause(~lit0, ~lit1, lit);
-      }
-      else if ( bnode->is_xor() ) {
-	solver.add_clause(lit0, ~lit1, lit);
-	solver.add_clause(~lit0, lit1, lit);
-	solver.add_clause(~lit0, ~lit1, ~lit);
-	solver.add_clause(lit0, lit1, ~lit);
-      }
-      else {
-	assert_not_reached(__FILE__, __LINE__);
-      }
-    }
-
-    for (ymuint src_id = 0; src_id < n; ++ src_id) {
-      for (ymuint src_val = 0; src_val < 2; ++ src_val) {
-	Literal lit0(VarId(src_id), src_val == 0 ? kPolNega : kPolPosi);
-	const vector<ImpVal>& imp_list = imp_info.get(src_id, src_val);
-	for (vector<ImpVal>::const_iterator p = imp_list.begin();
-	     p != imp_list.end(); ++ p) {
-	  ymuint dst_id = p->id();
-	  ymuint dst_val = p->val();
-	  Literal lit1(VarId(dst_id), dst_val == 0 ? kPolNega : kPolPosi);
-	  vector<Literal> tmp(2);
-	  vector<Bool3> model;
-	  tmp[0] = lit0;
-	  tmp[1] = ~lit1;
-	  if ( solver.solve(tmp, model) != kB3False ) {
-	    cout << "Error: Node#" << src_id << ": " << src_val
-		 << " ==> Node#" << dst_id << ": " << dst_val << endl;
-	  }
-	}
-      }
-    }
-  }
-#endif
-
-#if 0
-  cout << "RECURSIVE LERNING IMPLICATION" << endl;
-  imp_info.print(cout);
-#endif
+  imp_info.set(imp_list_array, direct_imp);
 }
 
 // @brief recursive learning を行なう．

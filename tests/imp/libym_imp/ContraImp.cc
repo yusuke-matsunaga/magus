@@ -60,7 +60,7 @@ ContraImp::learning(ImpMgr& imp_mgr,
   }
 
   // imp_list_array の内容を imp_info にコピーする．
-  imp_info.set(imp_list_array);
+  imp_info.set(imp_list_array, direct_imp);
 }
 
 END_NAMESPACE_YM_NETWORKS

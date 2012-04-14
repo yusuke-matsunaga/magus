@@ -83,6 +83,11 @@ public:
   void
   set(vector<vector<ImpVal> >& imp_list_array);
 
+  /// @brief 内容をセットする．
+  void
+  set(vector<vector<ImpVal> >& imp_list_array,
+      const ImpInfo& src);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -96,6 +101,11 @@ private:
   vector<ImpVal>* mArray;
 
 };
+
+// 検証する．
+void
+verify(const ImpMgr& imp_mgr,
+       const ImpInfo& imp_info);
 
 END_NAMESPACE_YM_NETWORKS
 

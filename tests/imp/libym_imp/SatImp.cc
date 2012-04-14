@@ -40,6 +40,7 @@ put(ymuint src_id,
 
 END_NONAMESPACE
 
+
 //////////////////////////////////////////////////////////////////////
 // クラス SatImp
 //////////////////////////////////////////////////////////////////////
@@ -282,31 +283,6 @@ print_fanin(ostream& s,
   s << e.src_node()->id();
 }
 
-inline
-Literal
-to_literal(ymuint id,
-	   ymuint val)
-{
-  return Literal(VarId(id), (val == 0) ? kPolNega : kPolPosi);
-}
-
-struct NodeInfo
-{
-  NodeInfo()
-  {
-  }
-
-  NodeInfo(ImpNode* node,
-	   bool inv) :
-    mNode(node),
-    mInv(inv)
-  {
-  }
-
-  ImpNode* mNode;
-  bool mInv;
-};
-
 END_NONAMESPACE
 
 
@@ -343,7 +319,8 @@ SatImp::learning(ImpMgr& imp_mgr,
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     for (ymuint src_val = 0; src_val < 2; ++ src_val) {
       const vector<ImpVal>& imp_list = d_imp.get(src_id, src_val);
-      for (vector<ImpVal>::const_iterator p = imp_list.begin(); p != imp_list.end(); ++ p) {
+      for (vector<ImpVal>::const_iterator p = imp_list.begin();
+	   p != imp_list.end(); ++ p) {
 	ymuint dst_id = p->id();
 	ymuint dst_val = p->val();
 	put(src_id, src_val, dst_id, dst_val, imp_hash, imp_list_array);
@@ -597,7 +574,7 @@ SatImp::learning(ImpMgr& imp_mgr,
     }
   }
 
-  imp_info.set(imp_list_array);
+  imp_info.set(imp_list_array, d_imp);
 
   timer.stop();
   USTime sat_time = timer.time();
@@ -608,68 +585,6 @@ SatImp::learning(ImpMgr& imp_mgr,
        << " / " << count_solve << endl
        << "  simulation: " << pre_time << endl
        << "  SAT:        " << sat_time << endl;
-
-#if 0
-  // 検証
-  if ( 1 ) {
-    SatSolver solver1;
-    for (ymuint id = 0; id < n; ++ id) {
-      VarId vid = solver1.new_var();
-      assert_cond( vid.val() == id, __FILE__, __LINE__);
-    }
-
-    // ImpMgr から CNF を作る．
-    for (ymuint id = 0; id < n; ++ id) {
-      ImpNode* node = imp_mgr.node(id);
-      if ( node == NULL ) continue;
-      if ( node->is_input() ) continue;
-
-      Literal lit(VarId(id), kPolPosi);
-
-      const ImpEdge& e0 = node->fanin0();
-      ImpNode* node0 = e0.src_node();
-      bool inv0 = e0.src_inv();
-      Literal lit0(VarId(node0->id()), inv0 ? kPolNega : kPolPosi);
-
-      const ImpEdge& e1 = node->fanin1();
-      ImpNode* node1 = e1.src_node();
-      bool inv1 = e1.src_inv();
-      Literal lit1(VarId(node1->id()), inv1 ? kPolNega : kPolPosi);
-
-      if ( node->is_and() ) {
-	solver1.add_clause(lit0, ~lit);
-	solver1.add_clause(lit1, ~lit);
-	solver1.add_clause(~lit0, ~lit1, lit);
-      }
-      else {
-	assert_not_reached(__FILE__, __LINE__);
-      }
-    }
-
-    ymuint nerr = 0;
-    for (ymuint src_id = 0; src_id < n; ++ src_id) {
-      for (ymuint src_val = 0; src_val < 2; ++ src_val) {
-	Literal lit0(to_literal(src_id, src_val));
-	const vector<ImpVal>& imp_list = imp_info.get(src_id, src_val);
-	for (vector<ImpVal>::const_iterator p = imp_list.begin(); p != imp_list.end(); ++ p) {
-	  ymuint dst_id = p->id();
-	  ymuint dst_val = p->val();
-	  Literal lit1(to_literal(dst_id, dst_val));
-	  vector<Literal> tmp(2);
-	  tmp[0] = lit0;
-	  tmp[1] = ~lit1;
-	  vector<Bool3> model;
-	  if ( solver1.solve(tmp, model) != kB3False ) {
-	    cout << "ERROR: Node#" << src_id << ": " << src_val
-		 << " ==> Node#" << dst_id << ": " << dst_val << endl;
-	    ++ nerr;
-	  }
-	}
-      }
-    }
-    cout << "Total " << nerr << " errors" << endl;
-  }
-#endif
 }
 
 END_NAMESPACE_YM_NETWORKS

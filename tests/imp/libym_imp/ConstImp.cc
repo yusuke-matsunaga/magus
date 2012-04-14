@@ -19,12 +19,6 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-BEGIN_NONAMESPACE
-
-bool debug = true;
-
-END_NONAMESPACE
-
 //////////////////////////////////////////////////////////////////////
 // クラス ConstImp
 //////////////////////////////////////////////////////////////////////
@@ -160,12 +154,6 @@ ConstImp::learning(ImpMgr& imp_mgr)
   vector<list<ImpDst> > cand_info(n * 2);
   vector<ymuint32> const_flag(n, 0U);
   for (ymuint i = 1; i < n; ++ i) {
-    if ( debug ) {
-      if ( (i % 100) == 0 ) {
-	cerr << i << " / " << n << endl;
-      }
-    }
-
     if ( imp_mgr.is_const(i) ) {
       continue;
     }
