@@ -122,8 +122,8 @@ NaImp::learning(ImpMgr& imp_mgr,
   vector<ImpNode*> node_list;
   imp_mgr.get_node_list(node_list);
 
-  for ( ; ; ) {
-    ymuint delta = 0;
+  for (bool first = true; ; first = false) {
+    bool change = false;
     for (vector<ImpNode*>::iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
       ImpNode* node = *p;
@@ -150,73 +150,39 @@ NaImp::learning(ImpMgr& imp_mgr,
 
       // 出力が0になる条件は入力が0になる条件のユニオン
       {
-	const ImpValList& imp_list0 = imp_lists[idx0_0];
-	const ImpValList& imp_list1 = imp_lists[idx1_0];
-	ImpValList& imp_list = imp_lists[idx_0];
-	if ( debug ) {
-	  cout << "cup_merge" << endl;
-	  cout << "Node#" << id << ": 0 ";
-	  imp_list.print(cout);
-	  cout << "  fanin0: ";
-	  if ( inv0 ) {
-	    cout << "~";
-	  }
-	  cout << "Node#" << id0 << " ";
-	  imp_list0.print(cout);
-	  cout << "  fanin1: ";
-	  if ( inv1 ) {
-	    cout << "~";
-	  }
-	  cout << "Node#" << id1 << " ";
-	  imp_list1.print(cout);
+	const ImpValList& src1_list = imp_lists[idx0_0];
+	const ImpValList& src2_list = imp_lists[idx1_0];
+	ImpValList& dst_list = imp_lists[idx_0];
+	if ( !first ) {
+	  dst_list.reset_delta();
 	}
-	ymuint nprev = imp_list.num();
-	imp_list.merge(imp_list0);
-	imp_list.merge(imp_list1);
-	delta += imp_list.num() - nprev;
-	if ( debug ) {
-	  cout << "  result" << endl
-	       << "   ";
-	  imp_list.print(cout);
-	  cout << endl;
+	if ( src1_list.delta() > 0 ) {
+	  dst_list.merge(src1_list);
+	}
+	if ( src2_list.delta() > 0 ) {
+	  dst_list.merge(src2_list);
+	}
+	if ( dst_list.delta() > 0 ) {
+	  change = true;
 	}
       }
       // 出力が1になる条件は入力が1になる条件のインターセクション
       {
-	const ImpValList& imp_list0 = imp_lists[idx0_1];
-	const ImpValList& imp_list1 = imp_lists[idx1_1];
-	ImpValList& imp_list = imp_lists[idx_1];
-	if ( debug ) {
-	  cout << "cap_merge" << endl;
-	  cout << "Node#" << id << ": 1 ";
-	  imp_list.print(cout);
-	  cout << "  fanin0: ";
-	  if ( inv0 ) {
-	    cout << "~";
-	  }
-	  cout << "Node#" << id0 << " ";
-	  imp_list0.print(cout);
-	  cout << "  fanin1: ";
-	  if ( inv1 ) {
-	    cout << "~";
-	  }
-	  cout << "Node#" << id1 << " ";
-	  imp_list1.print(cout);
+	const ImpValList& src1_list = imp_lists[idx0_1];
+	const ImpValList& src2_list = imp_lists[idx1_1];
+	ImpValList& dst_list = imp_lists[idx_1];
+	if ( !first ) {
+	  dst_list.reset_delta();
 	}
-	ymuint nprev = imp_list.num();
-	imp_list.cap_merge(imp_list0, imp_list1);
-	delta += imp_list.num() - nprev;
-	if ( debug ) {
-	  cout << "  result" << endl
-	       << "   ";
-	  imp_list.print(cout);
-	  cout << endl;
+	if ( src1_list.delta() > 0 ||
+	     src2_list.delta() > 0 ) {
+	  dst_list.cap_merge(src1_list, src2_list);
+	}
+	if ( dst_list.delta() > 0 ) {
+	  change = true;
 	}
       }
     }
-#if 1
-    cout << "phase1: delta = " << delta << endl;
-#endif
 
     for (vector<ImpNode*>::reverse_iterator p = node_list.rbegin();
 	 p != node_list.rend(); ++ p) {
@@ -242,116 +208,57 @@ NaImp::learning(ImpMgr& imp_mgr,
       if ( !imp_mgr.is_const(id1) ) {
 	// 出力の0の条件とファンイン0の1の条件の共通部分が
 	// ファンイン1の0の条件となる．
-	const ImpValList& imp_list_o_0 = imp_lists[idx_0];
-	const ImpValList& imp_list_i0_1 = imp_lists[idx0_1];
-	ImpValList& imp_list_i1_0 = imp_lists[idx1_0];
-	if ( debug ) {
-	  cout << "cap_merge" << endl;
-	  cout << "Node#" << id << ":0 ";
-	  imp_list_o_0.print(cout);
-	  cout << "fanin0: ";
-	  if ( inv0 ) {
-	    cout << "~";
+	const ImpValList& src1_list = imp_lists[idx_0];
+	const ImpValList& src2_list = imp_lists[idx0_1];
+	if ( src1_list.delta() > 0 ||
+	     src2_list.delta() > 0 ) {
+	  ImpValList& dst_list = imp_lists[idx1_0];
+	  dst_list.cap_merge(src1_list, src2_list);
+	  if ( dst_list.delta() > 0 ) {
+	    change = true;
 	  }
-	  cout << "Node#" << id0 << ":1";
-	  imp_list_i0_1.print(cout);
-	}
-	ymuint nprev = imp_list_i1_0.num();
-	imp_list_i1_0.cap_merge(imp_list_o_0, imp_list_i0_1);
-	delta += imp_list_i1_0.num() - nprev;
-	if ( debug ) {
-	  cout << "  result" << endl
-	       << "   ";
-	  imp_list_i1_0.print(cout);
-	  cout << endl
-	       << endl;
 	}
       }
       if ( !imp_mgr.is_const(id0) ) {
 	// 出力の0の条件とファンイン1の1の条件の共通部分が
 	// ファンイン0の0の条件となる．
-	const ImpValList& imp_list_o_0 = imp_lists[idx_0];
-	const ImpValList& imp_list_i1_1 = imp_lists[idx1_1];
-	ImpValList& imp_list_i0_0 = imp_lists[idx0_0];
-	if ( debug ) {
-	  cout << "cap_merge" << endl;
-	  cout << "Node#" << id << ":0";
-	  imp_list_o_0.print(cout);
-	  cout << "fanin1: ";
-	  if ( inv1 ) {
-	    cout << "~";
+	const ImpValList& src1_list = imp_lists[idx_0];
+	const ImpValList& src2_list = imp_lists[idx1_1];
+	if ( src1_list.delta() > 0 ||
+	     src2_list.delta() > 0 ) {
+	  ImpValList& dst_list = imp_lists[idx0_0];
+	  dst_list.cap_merge(src1_list, src2_list);
+	  if ( dst_list.delta() > 0 ) {
+	    change = true;
 	  }
-	  cout << "Node#" << id1 << ":1";
-	  imp_list_i1_1.print(cout);
-	}
-	ymuint nprev = imp_list_i0_0.num();
-	imp_list_i0_0.cap_merge(imp_list_o_0, imp_list_i1_1);
-	delta += imp_list_i0_0.num() - nprev;
-	if ( debug ) {
-	  cout << "  result" << endl
-	       << "   ";
-	  imp_list_i0_0.print(cout);
-	  cout << endl
-	       << endl;
 	}
       }
 
       if ( !imp_mgr.is_const(id0) ) {
 	// 出力の1の条件がファンイン0の1の条件となる．
-	const ImpValList& imp_list_o_1 = imp_lists[idx_1];
-	ImpValList& imp_list_i0_1 = imp_lists[idx0_1];
-	if ( debug ) {
-	  cout << "Node#" << id << ":1";
-	  imp_list_o_1.print(cout);
-	  cout << "  fanin0: ";
-	  if ( inv0 ) {
-	    cout << "~";
+	const ImpValList& src_list = imp_lists[idx_1];
+	if ( src_list.delta() > 0 ) {
+	  ImpValList& dst_list = imp_lists[idx0_1];
+	  dst_list.merge(src_list);
+	  if ( dst_list.delta() > 0 ) {
+	    change = true;
 	  }
-	  cout << "Node#" << id0 << ":1";
-	  imp_list_i0_1.print(cout);
-	}
-	ymuint nprev = imp_list_i0_1.num();
-	imp_list_i0_1.merge(imp_list_o_1);
-	delta += imp_list_i0_1.num() - nprev;
-	if ( debug ) {
-	  cout << "  result" << endl
-	       << "   ";
-	  imp_list_i0_1.print(cout);
-	  cout << endl
-	       << endl;
 	}
       }
 
       if ( !imp_mgr.is_const(id1) ) {
 	// 出力の1の条件がファンイン1の1の条件となる．
-	const ImpValList& imp_list_o_1 = imp_lists[idx_1];
-	ImpValList& imp_list_i1_1 = imp_lists[idx1_1];
-	if ( debug ) {
-	  cout << "Node#" << id << ":1";
-	  imp_list_o_1.print(cout);
-	  cout << "  fanin1: ";
-	  if ( inv1 ) {
-	    cout << "~";
+	const ImpValList& src_list = imp_lists[idx_1];
+	if ( src_list.delta() > 0 ) {
+	  ImpValList& dst_list = imp_lists[idx1_1];
+	  dst_list.merge(src_list);
+	  if ( dst_list.delta() > 0 ) {
+	    change = true;
 	  }
-	  cout << "Node#" << id1 << ":1";
-	  imp_list_i1_1.print(cout);
-	}
-	ymuint nprev = imp_list_i1_1.num();
-	imp_list_i1_1.merge(imp_list_o_1);
-	delta += imp_list_i1_1.num() - nprev;
-	if ( debug ) {
-	  cout << "  result" << endl
-	       << "   ";
-	  imp_list_i1_1.print(cout);
-	  cout << endl
-	       << endl;
 	}
       }
     }
-#if 1
-    cout << "phase2: delta = " << delta << endl;
-#endif
-    if ( delta == 0 ) {
+    if ( !change ) {
       break;
     }
   }

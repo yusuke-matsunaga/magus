@@ -60,6 +60,14 @@ public:
   ImpValListIter
   end() const;
 
+  /// @brief 増分を得る．
+  ymuint
+  delta() const;
+
+  /// @brief 増分のカウントをリセットする．
+  void
+  reset_delta();
+
   /// @brief 内容を出力する
   void
   print(ostream& s) const;
@@ -99,10 +107,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 要素数
-  ymuint mNum;
+  ymuint32 mNum;
 
   // 先頭を表すダミー
   Cell mDummyTop;
+
+  // 増分計算用の変数
+  ymuint32 mDeltaBase;
 
   // Cell のメモリ確保用オブジェクト
   static
@@ -158,6 +169,22 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief 増分を得る．
+inline
+ymuint
+ImpValList::delta() const
+{
+  return mNum - mDeltaBase;
+}
+
+// @brief 増分のカウントをリセットする．
+inline
+void
+ImpValList::reset_delta()
+{
+  mDeltaBase = mNum;
+}
 
 // @brief コンストラクタ
 inline
