@@ -60,17 +60,13 @@ public:
   ImpValListIter
   end() const;
 
-  /// @brief ラベルを得る．
+  /// @brief 増分を得る．
   ymuint
-  label() const;
+  delta() const;
 
-  /// @brief ラベルをつける．
+  /// @brief 増分のカウントをリセットする．
   void
-  set_label(ymuint label);
-
-  /// @brief ラベルを足す．
-  void
-  add_label(ymuint label);
+  reset_delta();
 
   /// @brief 内容を出力する
   void
@@ -111,13 +107,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 要素数
-  ymuint mNum;
+  ymuint32 mNum;
 
   // 先頭を表すダミー
   Cell mDummyTop;
 
-  // 世代を表すラベル
-  ymuint32 mLabel;
+  // 増分計算用の変数
+  ymuint32 mDeltaBase;
 
   // Cell のメモリ確保用オブジェクト
   static
@@ -174,28 +170,20 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief ラベルを得る．
+// @brief 増分を得る．
 inline
 ymuint
-ImpValList::label() const
+ImpValList::delta() const
 {
-  return mLabel;
+  return mNum - mDeltaBase;
 }
 
-// @brief ラベルをつける．
+// @brief 増分のカウントをリセットする．
 inline
 void
-ImpValList::set_label(ymuint label)
+ImpValList::reset_delta()
 {
-  mLabel = label;
-}
-
-// @brief ラベルを足す．
-inline
-void
-ImpValList::add_label(ymuint label)
-{
-  mLabel += label;
+  mDeltaBase = mNum;
 }
 
 // @brief コンストラクタ

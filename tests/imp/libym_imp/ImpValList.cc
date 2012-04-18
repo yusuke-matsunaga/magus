@@ -21,7 +21,8 @@ UnitAlloc ImpValList::mAlloc(sizeof(Cell), 1024);
 
 /// @brief 空のコンストラクタ
 ImpValList::ImpValList() :
-  mNum(0)
+  mNum(0),
+  mDeltaBase(0)
 {
   mDummyTop.mLink = NULL;
 }
