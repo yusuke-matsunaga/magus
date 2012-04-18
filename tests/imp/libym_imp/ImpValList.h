@@ -68,6 +68,10 @@ public:
   void
   set_label(ymuint label);
 
+  /// @brief ラベルを足す．
+  void
+  add_label(ymuint label);
+
   /// @brief 内容を出力する
   void
   print(ostream& s) const;
@@ -184,6 +188,14 @@ void
 ImpValList::set_label(ymuint label)
 {
   mLabel = label;
+}
+
+// @brief ラベルを足す．
+inline
+void
+ImpValList::add_label(ymuint label)
+{
+  mLabel += label;
 }
 
 // @brief コンストラクタ

@@ -161,19 +161,18 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  dst_list.merge(src2_list);
 	}
 	ymuint delta1 = dst_list.num() - nprev;
-	dst_list.set_label(delta1);
 	delta += delta1;
       }
       // 出力が1になる条件は入力が1になる条件のインターセクション
       {
 	const ImpValList& src1_list = imp_lists[idx0_1];
 	const ImpValList& src2_list = imp_lists[idx1_1];
-	if ( src1_list.label() > 0 || src2_list.label() > 0 ) {
+	if ( src1_list.label() > 0 ||
+	     src2_list.label() > 0 ) {
 	  ImpValList& dst_list = imp_lists[idx_1];
 	  ymuint nprev = first ? 0 : dst_list.num();
 	  dst_list.cap_merge(src1_list, src2_list);
 	  ymuint delta1 = dst_list.num() - nprev;
-	  dst_list.set_label(delta1);
 	  delta += delta1;
 	}
       }
@@ -181,11 +180,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 #if 1
     cout << "phase1: delta = " << delta << endl;
 #endif
-    if ( delta == 0 ) {
-      break;
-    }
 
-    delta = 0;
     for (vector<ImpNode*>::reverse_iterator p = node_list.rbegin();
 	 p != node_list.rend(); ++ p) {
       ImpNode* node = *p;
@@ -212,12 +207,13 @@ NaImp::learning(ImpMgr& imp_mgr,
 	// ファンイン1の0の条件となる．
 	const ImpValList& src1_list = imp_lists[idx_0];
 	const ImpValList& src2_list = imp_lists[idx0_1];
-	if ( true || src1_list.label() > 0 || src2_list.label() > 0 ) {
+	if ( src1_list.label() > 0 ||
+	     src2_list.label() > 0 ) {
 	  ImpValList& dst_list = imp_lists[idx1_0];
 	  ymuint nprev = dst_list.num();
 	  dst_list.cap_merge(src1_list, src2_list);
 	  ymuint delta1 = dst_list.num() - nprev;
-	  dst_list.set_label(delta1);
+	  dst_list.add_label(delta1);
 	  delta += delta1;
 	}
       }
@@ -226,12 +222,13 @@ NaImp::learning(ImpMgr& imp_mgr,
 	// ファンイン0の0の条件となる．
 	const ImpValList& src1_list = imp_lists[idx_0];
 	const ImpValList& src2_list = imp_lists[idx1_1];
-	if ( true || src1_list.label() > 0 || src2_list.label() ) {
+	if ( src1_list.label() > 0 ||
+	     src2_list.label() > 0 ) {
 	  ImpValList& dst_list = imp_lists[idx0_0];
 	  ymuint nprev = dst_list.num();
 	  dst_list.cap_merge(src1_list, src2_list);
 	  ymuint delta1 = dst_list.num() - nprev;
-	  dst_list.set_label(delta1);
+	  dst_list.add_label(delta1);
 	  delta += delta1;
 	}
       }
@@ -239,12 +236,12 @@ NaImp::learning(ImpMgr& imp_mgr,
       if ( !imp_mgr.is_const(id0) ) {
 	// 出力の1の条件がファンイン0の1の条件となる．
 	const ImpValList& src_list = imp_lists[idx_1];
-	if ( true || src_list.label() > 0 ) {
+	if ( src_list.label() > 0 ) {
 	  ImpValList& dst_list = imp_lists[idx0_1];
 	  ymuint nprev = dst_list.num();
 	  dst_list.merge(src_list);
 	  ymuint delta1 = dst_list.num() - nprev;
-	  dst_list.set_label(delta1);
+	  dst_list.add_label(delta1);
 	  delta += delta1;
 	}
       }
@@ -252,12 +249,12 @@ NaImp::learning(ImpMgr& imp_mgr,
       if ( !imp_mgr.is_const(id1) ) {
 	// 出力の1の条件がファンイン1の1の条件となる．
 	const ImpValList& src_list = imp_lists[idx_1];
-	if ( true || src_list.label() > 0 ) {
+	if ( src_list.label() > 0 ) {
 	  ImpValList& dst_list = imp_lists[idx1_1];
 	  ymuint nprev = dst_list.num();
 	  dst_list.merge(src_list);
 	  ymuint delta1 = dst_list.num() - nprev;
-	  dst_list.set_label(delta1);
+	  dst_list.add_label(delta1);
 	  delta += delta1;
 	}
       }
