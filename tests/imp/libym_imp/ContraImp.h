@@ -43,7 +43,6 @@ public:
   /// @param[in] imp_info 間接含意のリスト
   void
   learning(ImpMgr& imp_mgr,
-	   const ImpInfo& direct_imp,
 	   ImpInfo& imp_info);
 
 };

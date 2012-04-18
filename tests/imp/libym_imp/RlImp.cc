@@ -8,7 +8,6 @@
 
 
 #include "RlImp.h"
-#include "StrImp.h"
 #include "ImpMgr.h"
 #include "ImpNode.h"
 #include "ImpInfo.h"
@@ -46,11 +45,9 @@ RlImp::set_learning_level(ymuint level)
 
 // @brief ネットワーク中の間接含意を求める．
 // @param[in] imp_mgr マネージャ
-// @param[in] direct_imp 直接含意のリスト
 // @param[in] imp_info 間接含意のリスト
 void
 RlImp::learning(ImpMgr& imp_mgr,
-		const ImpInfo& direct_imp,
 		ImpInfo& imp_info)
 {
   ymuint n = imp_mgr.node_num();
@@ -82,12 +79,11 @@ RlImp::learning(ImpMgr& imp_mgr,
       else {
 	// 単一の値割り当てが失敗するということは逆の値で固定されている．
 	imp_mgr.set_const(src_id, src_val ^ 1);
-	cout << "Node#" << src_id << " is const-" << (src_val ^ 1) << endl;
       }
     }
   }
 
-  imp_info.set(imp_list_array, direct_imp);
+  imp_info.set(imp_list_array);
 }
 
 // @brief recursive learning を行なう．

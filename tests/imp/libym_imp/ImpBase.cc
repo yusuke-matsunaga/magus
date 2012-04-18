@@ -8,8 +8,6 @@
 
 
 #include "ImpBase.h"
-//#include "ImpMgr.h"
-//#include "ImpNode.h"
 #include "ImpInfo.h"
 
 #include "StrImp.h"
@@ -47,31 +45,32 @@ ImpBase::learning(ImpMgr& imp_mgr,
 		  const string& method,
 		  ImpInfo& imp_info)
 {
-  StrImp strimp;
-  ImpInfo direct_imp;
-  strimp.learning(imp_mgr, direct_imp);
 
-  if ( method == "contra" ) {
-    ContraImp contraimp;
-    contraimp.learning(imp_mgr, direct_imp, imp_info);
+  if ( method == "direct" ) {
+    StrImp imp;
+    imp.learning(imp_mgr, imp_info);
+  }
+  else if ( method == "contra" ) {
+    ContraImp imp;
+    imp.learning(imp_mgr, imp_info);
   }
   else if ( method == "recursive" ) {
-    RlImp rlimp;
-    rlimp.set_learning_level(1);
-    rlimp.learning(imp_mgr, direct_imp, imp_info);
+    RlImp imp;
+    imp.set_learning_level(1);
+    imp.learning(imp_mgr, imp_info);
   }
   else if ( method == "exact" ) {
-    SatImp satimp;
-    satimp.learning(imp_mgr, direct_imp, imp_info);
+    SatImp imp;
+    imp.learning(imp_mgr, imp_info);
   }
   else if ( method == "naive" ) {
-    NaImp naimp;
-    naimp.learning(imp_mgr, direct_imp, imp_info);
+    NaImp imp;
+    imp.learning(imp_mgr, imp_info);
   }
   else {
     // default fall-back
-    ContraImp contraimp;
-    contraimp.learning(imp_mgr, direct_imp, imp_info);
+    StrImp imp;
+    imp.learning(imp_mgr, imp_info);
   }
 }
 

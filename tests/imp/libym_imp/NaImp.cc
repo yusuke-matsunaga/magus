@@ -48,7 +48,6 @@ NaImp::~NaImp()
 // @param[in] imp_info 間接含意のリスト
 void
 NaImp::learning(ImpMgr& imp_mgr,
-		const ImpInfo& direct_imp,
 		ImpInfo& imp_info)
 {
   cerr << "NaImp start" << endl;
@@ -66,9 +65,6 @@ NaImp::learning(ImpMgr& imp_mgr,
   {
     vector<vector<ImpVal> > imp_lists_array(n * 2);
     for (ymuint src_id = 0; src_id < n; ++ src_id) {
-      if ( imp_mgr.is_const(src_id) ) {
-	continue;
-      }
       ImpNode* node = imp_mgr.node(src_id);
       if ( node == NULL ) {
 	continue;
@@ -77,19 +73,43 @@ NaImp::learning(ImpMgr& imp_mgr,
       imp_lists_array[src_id * 2 + 0].push_back(ImpVal(src_id, 0));
       imp_lists_array[src_id * 2 + 1].push_back(ImpVal(src_id, 1));
 
-      for (ymuint src_val = 0; src_val < 2; ++ src_val) {
-	const vector<ImpVal>& imp_list = direct_imp.get(src_id, src_val);
-	for (vector<ImpVal>::const_iterator p = imp_list.begin();
-	     p != imp_list.end(); ++ p) {
-	  ymuint dst_id = p->id();
-	  if ( imp_mgr.is_const(dst_id) ) {
-	    continue;
+      // node に 0 を割り当てる．
+      vector<ImpVal> imp_list0;
+      bool ok0 = imp_mgr.assert(node, 0, imp_list0);
+      if ( !ok0 ) {
+	imp_list0.clear();
+	// 単一の割り当てで矛盾が起こった．
+	// node は 1 固定
+	imp_mgr.set_const(src_id, 1);
+      }
+      imp_mgr.backtrack();
+
+      // node に 1 を割り当てる．
+      vector<ImpVal> imp_list1;
+      bool ok1 = imp_mgr.assert(node, 1, imp_list1);
+      if ( !ok1 ) {
+	imp_list1.clear();
+	// 単一の割り当てで矛盾が起こった．
+	// node は 0 固定
+	imp_mgr.set_const(src_id, 0);
+      }
+      imp_mgr.backtrack();
+
+      if ( !imp_mgr.is_const(src_id) ) {
+	for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+	  const vector<ImpVal>& imp_list = (src_val == 0) ? imp_list0 : imp_list1;
+	  for (vector<ImpVal>::const_iterator p = imp_list.begin();
+	       p != imp_list.end(); ++ p) {
+	    ymuint dst_id = p->id();
+	    if ( imp_mgr.is_const(dst_id) ) {
+	      continue;
+	    }
+	    ymuint dst_val = p->val();
+	    ymuint src_val1 = src_val ^ 1;
+	    ymuint dst_val1 = dst_val ^ 1;
+	    imp_lists_array[dst_id * 2 + dst_val].push_back(ImpVal(src_id, src_val));
+	    imp_lists_array[src_id * 2 + src_val1].push_back(ImpVal(dst_id, dst_val1));
 	  }
-	  ymuint dst_val = p->val();
-	  ymuint src_val1 = src_val ^ 1;
-	  ymuint dst_val1 = dst_val ^ 1;
-	  imp_lists_array[dst_id * 2 + dst_val].push_back(ImpVal(src_id, src_val));
-	  imp_lists_array[src_id * 2 + src_val1].push_back(ImpVal(dst_id, dst_val1));
 	}
       }
     }
@@ -119,7 +139,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 #if 1
   timer.stop();
   USTime time = timer.time();
-  cout << "phase0:" << time << endl;
+  cerr << "phase0:" << time << endl;
   timer.reset();
   timer.start();
 #endif
@@ -351,8 +371,10 @@ NaImp::learning(ImpMgr& imp_mgr,
       }
     }
     // imp_list_array の内容を imp_info にコピーする．
-    imp_info.set(imp_list_array, direct_imp);
+    imp_info.set(imp_list_array);
   }
+
+  check_const(imp_mgr, imp_info);
 
   //verify(imp_mgr, imp_info);
 

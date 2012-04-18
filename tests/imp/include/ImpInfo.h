@@ -102,6 +102,11 @@ private:
 
 };
 
+// 定数ノードの検査を行う．
+void
+check_const(ImpMgr& imp_mgr,
+	    const ImpInfo& imp_info);
+
 // 検証する．
 void
 verify(const ImpMgr& imp_mgr,

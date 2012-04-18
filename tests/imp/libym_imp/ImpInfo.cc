@@ -188,6 +188,41 @@ ImpInfo::set(vector<vector<ImpVal> >& imp_list_array,
   }
 }
 
+// 定数ノードの検査を行う．
+void
+check_const(ImpMgr& imp_mgr,
+	    const ImpInfo& imp_info)
+{
+  cout << "check_const" << endl;
+  ymuint n = imp_mgr.node_num();
+  ymuint nc = 0;
+  for (ymuint id = 0; id < n; ++ id) {
+    if ( imp_mgr.is_const(id) ) {
+      continue;
+    }
+    for (ymuint val = 0; val < 2; ++ val) {
+      const vector<ImpVal>& imp_list = imp_info.get(id, val);
+      ImpVal pval;
+      for (vector<ImpVal>::const_iterator p = imp_list.begin();
+	   p != imp_list.end(); ++ p) {
+	ImpVal impval = *p;
+	if ( p == imp_list.begin() ) {
+	  continue;
+	}
+	if ( pval.id() == impval.id() ) {
+	  assert_cond( pval.val() != impval.val(), __FILE__, __LINE__);
+	  imp_mgr.set_const(id, val ^ 1);
+	  cout << "Node#" << id << " is const-" << (val ^ 1) << endl;
+	  ++ nc;
+	  break;
+	}
+	pval = impval;
+      }
+    }
+  }
+  cout << "Total " << nc << " constant nodes" << endl;
+}
+
 // 検証する．
 void
 verify(const ImpMgr& imp_mgr,

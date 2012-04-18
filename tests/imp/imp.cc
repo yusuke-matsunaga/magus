@@ -109,7 +109,7 @@ imp(const string& filename,
     timer.start();
     ContraImp contraimp;
     ImpInfo contra_imp;
-    contraimp.learning(imp_mgr, direct_imp, contra_imp);
+    contraimp.learning(imp_mgr, contra_imp);
     timer.stop();
     USTime contra_time = timer.time();
 
@@ -118,7 +118,7 @@ imp(const string& filename,
     NaImp naimp;
     ImpInfo na_imp;
 #if 1
-    naimp.learning(imp_mgr, direct_imp, na_imp);
+    naimp.learning(imp_mgr, na_imp);
 #endif
     timer.stop();
     USTime na_time = timer.time();
@@ -130,8 +130,8 @@ imp(const string& filename,
     if ( level > 0 ) {
       rlimp.set_learning_level(level);
     }
-#if 0
-    rlimp.learning(imp_mgr, direct_imp, rl_imp);
+#if 1
+    rlimp.learning(imp_mgr, rl_imp);
 #endif
     timer.stop();
     USTime rl_time = timer.time();
@@ -149,8 +149,8 @@ imp(const string& filename,
     timer.start();
     SatImp satimp;
     ImpInfo sat_imp;
-#if 0
-    satimp.learning(imp_mgr, direct_imp, sat_imp);
+#if 1
+    satimp.learning(imp_mgr, sat_imp);
 #endif
     timer.stop();
     USTime sat_time = timer.time();
@@ -161,7 +161,7 @@ imp(const string& filename,
     NaImp2 naimp2;
     ImpInfo na_imp2;
 #if 1
-    naimp2.learning(imp_mgr, direct_imp, na_imp2);
+    naimp2.learning(imp_mgr, na_imp2);
 #endif
     timer.stop();
     USTime na_time2 = timer.time();

@@ -291,7 +291,6 @@ END_NONAMESPACE
 // @param[in] imp_info 間接含意のリスト
 void
 SatImp::learning(ImpMgr& imp_mgr,
-		 const ImpInfo& d_imp,
 		 ImpInfo& imp_info)
 {
   StopWatch timer;
@@ -317,13 +316,39 @@ SatImp::learning(ImpMgr& imp_mgr,
 
   // 直接含意と対偶の含意をコピーしておく
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
-    for (ymuint src_val = 0; src_val < 2; ++ src_val) {
-      const vector<ImpVal>& imp_list = d_imp.get(src_id, src_val);
-      for (vector<ImpVal>::const_iterator p = imp_list.begin();
-	   p != imp_list.end(); ++ p) {
-	ymuint dst_id = p->id();
-	ymuint dst_val = p->val();
-	put(src_id, src_val, dst_id, dst_val, imp_hash, imp_list_array);
+    ImpNode* node = imp_mgr.node(src_id);
+
+    // node に 0 を割り当てる．
+    vector<ImpVal> imp_list0;
+    bool ok0 = imp_mgr.assert(node, 0, imp_list0);
+    if ( !ok0 ) {
+      imp_list0.clear();
+      // 単一の割り当てで矛盾が起こった．
+      // node は 1 固定
+      imp_mgr.set_const(src_id, 1);
+    }
+    imp_mgr.backtrack();
+
+    // node に 1 を割り当てる．
+    vector<ImpVal> imp_list1;
+    bool ok1 = imp_mgr.assert(node, 1, imp_list1);
+    if ( !ok1 ) {
+      imp_list1.clear();
+      // 単一の割り当てで矛盾が起こった．
+      // node は 0 固定
+      imp_mgr.set_const(src_id, 0);
+    }
+    imp_mgr.backtrack();
+
+    if ( !imp_mgr.is_const(src_id) ) {
+      for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+	const vector<ImpVal>& imp_list = (src_val == 0) ? imp_list0 : imp_list1;
+	for (vector<ImpVal>::const_iterator p = imp_list.begin();
+	     p != imp_list.end(); ++ p) {
+	  ymuint dst_id = p->id();
+	  ymuint dst_val = p->val();
+	  put(src_id, src_val, dst_id, dst_val, imp_hash, imp_list_array);
+	}
       }
     }
   }
@@ -574,7 +599,7 @@ SatImp::learning(ImpMgr& imp_mgr,
     }
   }
 
-  imp_info.set(imp_list_array, d_imp);
+  imp_info.set(imp_list_array);
 
   timer.stop();
   USTime sat_time = timer.time();

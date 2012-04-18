@@ -52,7 +52,6 @@ StrImp::learning(ImpMgr& imp_mgr,
       // 単一の割り当てで矛盾が起こった．
       // node は 1 固定
       imp_mgr.set_const(src_id, 1);
-      cout << "Node#" << src_id << " is const-1" << endl;
     }
     imp_mgr.backtrack();
 
@@ -64,7 +63,6 @@ StrImp::learning(ImpMgr& imp_mgr,
       // 単一の割り当てで矛盾が起こった．
       // node は 0 固定
       imp_mgr.set_const(src_id, 0);
-      cout << "Node#" << src_id << " is const-0" << endl;
     }
     imp_mgr.backtrack();
   }
