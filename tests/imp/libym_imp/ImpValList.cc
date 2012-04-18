@@ -22,7 +22,7 @@ UnitAlloc ImpValList::mAlloc(sizeof(Cell), 1024);
 /// @brief 空のコンストラクタ
 ImpValList::ImpValList() :
   mNum(0),
-  mDeltaBase(0)
+  mChanged(0)
 {
   mDummyTop.mLink = NULL;
 }
@@ -59,6 +59,9 @@ ImpValList::insert(const vector<ImpVal>& val_list)
     last = new_cell;
   }
   mNum = val_list.size();
+  if ( mNum > 0 ) {
+    mChanged = true;
+  }
 }
 
 // @brief リストの内容をマージする．
@@ -66,6 +69,7 @@ void
 ImpValList::merge(const ImpValList& src)
 {
   sanity_check();
+  ymuint old_num = mNum;
   Cell* prev = &mDummyTop;
   Cell* cell = NULL;
   Cell* src_cell = src.mDummyTop.mLink;
@@ -95,6 +99,9 @@ ImpValList::merge(const ImpValList& src)
     prev = new_cell;
     ++ mNum;
   }
+  if ( mNum > old_num ) {
+    mChanged = true;
+  }
   sanity_check();
 }
 
@@ -104,6 +111,7 @@ ImpValList::cap_merge(const ImpValList& src1,
 		      const ImpValList& src2)
 {
   sanity_check();
+  ymuint old_num = mNum;
   Cell* prev = &mDummyTop;
   Cell* cell = NULL;
   Cell* src1_cell = src1.mDummyTop.mLink;
@@ -153,6 +161,9 @@ ImpValList::cap_merge(const ImpValList& src1,
       src2_cell = src2_cell->mLink;
       ++ mNum;
     }
+  }
+  if ( mNum > old_num ) {
+    mChanged = true;
   }
   sanity_check();
 }

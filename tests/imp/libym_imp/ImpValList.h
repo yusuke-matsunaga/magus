@@ -60,13 +60,25 @@ public:
   ImpValListIter
   end() const;
 
-  /// @brief 増分を得る．
-  ymuint
-  delta() const;
+  /// @brief 前回から変化していたら true を返す．
+  bool
+  changed() const;
 
-  /// @brief 増分のカウントをリセットする．
+  /// @brief phase1 中で変化があったことを記録する．
   void
-  reset_delta();
+  set_change1();
+
+  /// @brief change1 フラグを消す．
+  void
+  reset_change1();
+
+  /// @brief phase2 中で変化があったことを記録する．
+  void
+  set_change2();
+
+  /// @brief change2 フラグを消す．
+  void
+  reset_change2();
 
   /// @brief 内容を出力する
   void
@@ -109,11 +121,11 @@ private:
   // 要素数
   ymuint32 mNum;
 
+  // 変化フラグ
+  ymuint8 mChanged;
+
   // 先頭を表すダミー
   Cell mDummyTop;
-
-  // 増分計算用の変数
-  ymuint32 mDeltaBase;
 
   // Cell のメモリ確保用オブジェクト
   static
@@ -170,20 +182,44 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 増分を得る．
+// @brief 前回から変化していたら true を返す．
 inline
-ymuint
-ImpValList::delta() const
+bool
+ImpValList::changed() const
 {
-  return mNum - mDeltaBase;
+  return mChanged != 0U;
 }
 
-// @brief 増分のカウントをリセットする．
+// @brief phase1 中で変化があったことを記録する．
 inline
 void
-ImpValList::reset_delta()
+ImpValList::set_change1()
 {
-  mDeltaBase = mNum;
+  mChanged |= 1U;
+}
+
+// @brief change1 フラグを消す．
+inline
+void
+ImpValList::reset_change1()
+{
+  mChanged &= ~1U;
+}
+
+// @brief phase2 中で変化があったことを記録する．
+inline
+void
+ImpValList::set_change2()
+{
+  mChanged |= 2U;
+}
+
+// @brief change2 フラグを消す．
+inline
+void
+ImpValList::reset_change2()
+{
+  mChanged &= ~2U;
 }
 
 // @brief コンストラクタ
