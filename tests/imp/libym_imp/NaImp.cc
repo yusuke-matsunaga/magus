@@ -356,6 +356,8 @@ NaImp::learning(ImpMgr& imp_mgr,
     }
   }
 
+  cout << "phase3: " << endl;
+
   // imp_lists の情報から imp_info を作る．
   {
     vector<vector<ImpVal> > imp_list_array(n * 2);
@@ -385,6 +387,8 @@ NaImp::learning(ImpMgr& imp_mgr,
     // imp_list_array の内容を imp_info にコピーする．
     imp_info.set(imp_list_array, direct_imp);
   }
+
+  cout << "NaImp end" << endl;
 }
 
 END_NAMESPACE_YM_NETWORKS
