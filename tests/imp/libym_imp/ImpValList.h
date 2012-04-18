@@ -60,6 +60,14 @@ public:
   ImpValListIter
   end() const;
 
+  /// @brief ラベルを得る．
+  ymuint
+  label() const;
+
+  /// @brief ラベルをつける．
+  void
+  set_label(ymuint label);
+
   /// @brief 内容を出力する
   void
   print(ostream& s) const;
@@ -103,6 +111,9 @@ private:
 
   // 先頭を表すダミー
   Cell mDummyTop;
+
+  // 世代を表すラベル
+  ymuint32 mLabel;
 
   // Cell のメモリ確保用オブジェクト
   static
@@ -158,6 +169,22 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief ラベルを得る．
+inline
+ymuint
+ImpValList::label() const
+{
+  return mLabel;
+}
+
+// @brief ラベルをつける．
+inline
+void
+ImpValList::set_label(ymuint label)
+{
+  mLabel = label;
+}
 
 // @brief コンストラクタ
 inline

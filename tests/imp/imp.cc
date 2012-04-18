@@ -139,7 +139,7 @@ imp(const string& filename,
     timer.reset();
     timer.start();
     ConstImp constimp;
-#if 1
+#if 0
     constimp.learning(imp_mgr);
 #endif
     timer.stop();
