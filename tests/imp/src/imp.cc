@@ -110,6 +110,7 @@ imp(const string& filename,
     ContraImp contraimp;
     ImpInfo contra_imp;
     contraimp.learning(imp_mgr, contra_imp);
+    //contra_imp.make_closure();
     timer.stop();
     USTime contra_time = timer.time();
 
@@ -119,6 +120,7 @@ imp(const string& filename,
     ImpInfo na_imp;
 #if 1
     naimp.learning(imp_mgr, na_imp);
+    //na_imp.make_closure();
 #endif
     timer.stop();
     USTime na_time = timer.time();
@@ -132,6 +134,7 @@ imp(const string& filename,
     }
 #if 1
     rlimp.learning(imp_mgr, rl_imp);
+    //rl_imp.make_closure();
 #endif
     timer.stop();
     USTime rl_time = timer.time();
@@ -196,19 +199,19 @@ imp(const string& filename,
 	 << " ImpNodes" << endl
 	 << "Constant detection:              " << setw(10) << 0
 	 << ": " << const_time << endl
-	 << "Direct Implications:             " << setw(10) << direct_imp.size(imp_mgr)
+	 << "Direct Implications:             " << setw(10) << direct_imp.imp_num(imp_mgr)
 	 << ": " << direct_time << endl
-	 << "Contraposition Implications:     " << setw(10) << contra_imp.size(imp_mgr)
+	 << "Contraposition Implications:     " << setw(10) << contra_imp.imp_num(imp_mgr)
 	 << ": " << contra_time << endl
-	 << "Recursive Learning Implications: " << setw(10) << rl_imp.size(imp_mgr)
+	 << "Recursive Learning Implications: " << setw(10) << rl_imp.imp_num(imp_mgr)
 	 << ": " << rl_time << endl
-	 << "Naive Implications:              " << setw(10) << na_imp.size(imp_mgr)
+	 << "Naive Implications:              " << setw(10) << na_imp.imp_num(imp_mgr)
 	 << ": " << na_time << endl
 #if 0
-	 << "Naive Implications(2):           " << setw(10) << na_imp2.size(imp_mgr)
+	 << "Naive Implications(2):           " << setw(10) << na_imp2.imp_num(imp_mgr)
 	 << ": " << na_time2 << endl
 #endif
-	 << "Complete Implications:           " << setw(10) << sat_imp.size(imp_mgr)
+	 << "Complete Implications:           " << setw(10) << sat_imp.imp_num(imp_mgr)
 	 << ": " << sat_time << endl;
   }
 #if 0

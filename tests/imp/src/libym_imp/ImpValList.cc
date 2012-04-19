@@ -45,9 +45,9 @@ ImpValList::num() const
   return mNum;
 }
 
-// @brief 要素のリストを追加する．
+// @brief 要素のリストをセットする．
 void
-ImpValList::insert(const vector<ImpVal>& val_list)
+ImpValList::set(const vector<ImpVal>& val_list)
 {
   assert_cond( mDummyTop.mLink == NULL, __FILE__, __LINE__);
   Cell* last = &mDummyTop;
@@ -59,9 +59,6 @@ ImpValList::insert(const vector<ImpVal>& val_list)
     last = new_cell;
   }
   mNum = val_list.size();
-  if ( mNum > 0 ) {
-    mChanged = true;
-  }
 }
 
 // @brief リストの内容をマージする．
@@ -69,7 +66,6 @@ void
 ImpValList::merge(const ImpValList& src)
 {
   sanity_check();
-  ymuint old_num = mNum;
   Cell* prev = &mDummyTop;
   Cell* cell = NULL;
   Cell* src_cell = src.mDummyTop.mLink;
@@ -99,8 +95,44 @@ ImpValList::merge(const ImpValList& src)
     prev = new_cell;
     ++ mNum;
   }
-  if ( mNum > old_num ) {
-    mChanged = true;
+  sanity_check();
+}
+
+// @brief リストの内容をマージする．
+void
+ImpValList::merge(const vector<ImpVal>& src)
+{
+  sanity_check();
+  Cell* prev = &mDummyTop;
+  Cell* cell = NULL;
+  vector<ImpVal>::const_iterator src_p = src.begin();
+  vector<ImpVal>::const_iterator src_e = src.end();
+  while ( (cell = prev->mLink) != NULL && src_p != src_e ) {
+    const ImpVal& val = *src_p;
+    if ( cell->mVal < val ) {
+      prev = cell;
+    }
+    else if ( cell->mVal == val ) {
+      prev = cell;
+      ++ src_p;
+    }
+    else { // cell->mVal > val
+      Cell* new_cell = get_cell();
+      new_cell->mVal = *src_p;
+      prev->mLink = new_cell;
+      new_cell->mLink = cell;
+      prev = new_cell;
+      ++ src_p;
+      ++ mNum;
+    }
+  }
+  for ( ; src_p != src_e; ++ src_p) {
+    Cell* new_cell = get_cell();
+    new_cell->mVal = *src_p;
+    prev->mLink = new_cell;
+    new_cell->mLink = NULL;
+    prev = new_cell;
+    ++ mNum;
   }
   sanity_check();
 }
@@ -111,7 +143,6 @@ ImpValList::cap_merge(const ImpValList& src1,
 		      const ImpValList& src2)
 {
   sanity_check();
-  ymuint old_num = mNum;
   Cell* prev = &mDummyTop;
   Cell* cell = NULL;
   Cell* src1_cell = src1.mDummyTop.mLink;
@@ -161,9 +192,6 @@ ImpValList::cap_merge(const ImpValList& src1,
       src2_cell = src2_cell->mLink;
       ++ mNum;
     }
-  }
-  if ( mNum > old_num ) {
-    mChanged = true;
   }
   sanity_check();
 }

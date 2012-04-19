@@ -13,7 +13,7 @@ INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/imp/include \
-	-I$(top_srcdir)/imp/bb/include
+	-I$(top_srcdir)/imp/src/bb/include
 
 bin_PROGRAMS = \
 	bb

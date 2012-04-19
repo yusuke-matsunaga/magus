@@ -146,12 +146,13 @@ AC_CONFIG_FILES([
 	enumcut/Makefile
 	imp/Makefile
 	imp/include/Makefile
-	imp/libym_imp/Makefile
-	imp/bb/Makefile
-	imp/bb/include/Makefile
-	imp/bb/src/Makefile
-	imp/bb/src/parser/Makefile
-	imp/bb/src/pt/Makefile
+	imp/src/Makefile
+	imp/src/libym_imp/Makefile
+	imp/src/bb/Makefile
+	imp/src/bb/include/Makefile
+	imp/src/bb/src/Makefile
+	imp/src/bb/src/parser/Makefile
+	imp/src/bb/src/pt/Makefile
 	])
 
 

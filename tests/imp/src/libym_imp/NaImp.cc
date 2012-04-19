@@ -120,7 +120,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	vector<ImpVal>::iterator p = unique(imp_list.begin(), imp_list.end());
 	imp_list.erase(p, imp_list.end());
 	ImpValList& dst_list = imp_lists[i * 2 + val];
-	dst_list.insert(imp_list);
+	dst_list.set(imp_list);
 	dst_list.set_change1();
 	dst_list.set_change2();
       }
@@ -162,7 +162,6 @@ NaImp::learning(ImpMgr& imp_mgr,
     rnode_list.push_back(imp_mgr.input_node(i));
   }
 
-  bool smart = false;
   for (bool first = true; ; first = false) {
     ymuint delta = 0;
     for (vector<ImpNode*>::iterator p = node_list.begin();
@@ -199,10 +198,10 @@ NaImp::learning(ImpMgr& imp_mgr,
 	ImpValList& dst_list = imp_lists[idx_0];
 	dst_list.reset_change1();
 	ymuint old_num = dst_list.num();
-	if ( smart || src1_list.changed() ) {
+	if ( src1_list.changed() ) {
 	  dst_list.merge(src1_list);
 	}
-	if ( smart || src2_list.changed() ) {
+	if ( src2_list.changed() ) {
 	  dst_list.merge(src2_list);
 	}
 	ymuint delta1 = dst_list.num() - old_num;
@@ -229,7 +228,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	ImpValList& dst_list = imp_lists[idx_1];
 	dst_list.reset_change1();
 	ymuint old_num = dst_list.num();
-	if ( smart || src1_list.changed() ||
+	if ( src1_list.changed() ||
 	     src2_list.changed() ) {
 	  dst_list.cap_merge(src1_list, src2_list);
 	}
@@ -291,7 +290,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  const ImpValList& src2_list = imp_lists[sidx_1];
 	  ImpValList& dst_list = inv ? dst1_list : dst0_list;
 	  ymuint old_num = dst_list.num();
-	  if ( smart || src1_list.changed() ||
+	  if ( src1_list.changed() ||
 	       src2_list.changed() ) {
 	    dst_list.cap_merge(src1_list, src2_list);
 	  }
@@ -317,7 +316,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  const ImpValList& src_list = imp_lists[oidx_1];
 	  ImpValList& dst_list = inv ? dst0_list : dst1_list;
 	  ymuint old_num = dst_list.num();
-	  if ( smart || src_list.changed() ) {
+	  if ( src_list.changed() ) {
 	    dst_list.merge(src_list);
 	  }
 	  ymuint delta1 = dst_list.num() - old_num;
@@ -339,10 +338,43 @@ NaImp::learning(ImpMgr& imp_mgr,
     if ( delta == 0 ) {
       break;
     }
+
+    if ( true ) {
+      vector<vector<ImpVal> > tmp_list_array(n * 2);
+      for (ymuint id = 0; id < n; ++ id) {
+	for (ymuint val = 0; val < 2; ++ val) {
+	  ImpValList& imp_list = imp_lists[id * 2 + val];
+	  for (ImpValListIter p = imp_list.begin();
+	       p != imp_list.end(); ++ p) {
+	    const ImpVal& impval = *p;
+	    ymuint src_id = impval.id();
+	    ymuint src_val = impval.val();
+	    if ( src_id == id ) {
+	      continue;
+	    }
+	    tmp_list_array[src_id * 2 + (src_val ^ 1)].push_back(ImpVal(id, val ^ 1));
+	  }
+	}
+      }
+      ymuint n2 = n * 2;
+      for (ymuint i = 0; i < n2; ++ i) {
+	vector<ImpVal>& tmp_list = tmp_list_array[i];
+	sort(tmp_list.begin(), tmp_list.end());
+#if 0
+	vector<ImpVal>::iterator ep = unique(tmp_list.begin(), tmp_list.end());
+	tmp_list.erase(ep, tmp_list.end());
+#endif
+	ImpValList& dst_list = imp_lists[i];
+	ymuint old_num = dst_list.num();
+	dst_list.merge(tmp_list);
+	delta += dst_list.num() - old_num;
+      }
+    }
+    cerr << "phase3: delta = " << delta << endl;
   }
 
   USTime time2 = timer.time();
-  cerr << "phase3: " << time2 << endl;
+  cerr << "phase4: " << time2 << endl;
 
   // imp_lists の情報から imp_info を作る．
   {
@@ -374,9 +406,12 @@ NaImp::learning(ImpMgr& imp_mgr,
     imp_info.set(imp_list_array);
   }
 
+#if 0
   check_const(imp_mgr, imp_info);
-
-  //verify(imp_mgr, imp_info);
+#endif
+#if 0
+  verify(imp_mgr, imp_info);
+#endif
 
   cerr << "NaImp end" << endl;
 }

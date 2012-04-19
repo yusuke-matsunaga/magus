@@ -43,6 +43,13 @@ ImpInfo::~ImpInfo()
   delete [] mArray;
 }
 
+// @brief サイズを得る．
+ymuint
+ImpInfo::size() const
+{
+  return mArraySize / 2;
+}
+
 // @brief 含意情報のリストを取り出す．
 // @param[in] src_id 含意元のノード番号
 // @param[in] src_val 含意元の値 ( 0 or 1 )
@@ -55,7 +62,7 @@ ImpInfo::get(ymuint src_id,
 
 // @brief 含意の総数を得る．
 ymuint
-ImpInfo::size(const ImpMgr& imp_mgr) const
+ImpInfo::imp_num(const ImpMgr& imp_mgr) const
 {
   ymuint n = 0;
   for (ymuint i = 0; i < mArraySize; ++ i) {
@@ -221,6 +228,47 @@ check_const(ImpMgr& imp_mgr,
     }
   }
   cout << "Total " << nc << " constant nodes" << endl;
+}
+
+// 推移的閉包を求める．
+void
+ImpInfo::make_closure()
+{
+  ymuint round = 1;
+  for ( ; ; ) {
+    cout << "Round#" << round << endl;
+    bool changed = false;
+    ymuint nc = 0;
+    for (ymuint id1 = 0; id1 < mArraySize; ++ id1) {
+      vector<ImpVal>& imp_list1 = mArray[id1];
+      vector<ImpVal> new_list;
+      for (vector<ImpVal>::iterator p = imp_list1.begin();
+	   p != imp_list1.end(); ++ p) {
+	ImpVal impval1 = *p;
+	ymuint id2 = impval1.id();
+	ymuint val2 = impval1.val();
+	vector<ImpVal>& imp_list2 = mArray[id2 * 2 + val2];
+	for (vector<ImpVal>::iterator q = imp_list2.begin();
+	     q != imp_list2.end(); ++ q) {
+	  new_list.push_back(*q);
+	}
+      }
+      ymuint old_num = imp_list1.size();
+      imp_list1.insert(imp_list1.end(), new_list.begin(), new_list.end());
+      sort(imp_list1.begin(), imp_list1.end());
+      vector<ImpVal>::iterator ep = unique(imp_list1.begin(), imp_list1.end());
+      imp_list1.erase(ep, imp_list1.end());
+      if ( imp_list1.size() > old_num ) {
+	++ nc;
+	changed = true;
+      }
+    }
+    cout << "  Changed nodes : " << nc << endl;
+    if ( !changed ) {
+      break;
+    }
+    ++ round;
+  }
 }
 
 // 検証する．

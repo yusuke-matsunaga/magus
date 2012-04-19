@@ -39,13 +39,17 @@ public:
   ymuint
   num() const;
 
-  /// @brief 要素のリストを追加する．
+  /// @brief 要素のリストをセットする．
   void
-  insert(const vector<ImpVal>& val_list);
+  set(const vector<ImpVal>& val_list);
 
   /// @brief リストの内容をマージする．
   void
   merge(const ImpValList& src);
+
+  /// @brief リストの内容をマージする．
+  void
+  merge(const vector<ImpVal>& src);
 
   /// @brief 2つのリストの共通部分をマージする．
   void

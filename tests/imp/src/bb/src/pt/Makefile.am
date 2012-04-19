@@ -5,7 +5,7 @@
 INCLUDES = \
 	-I $(YMTOOLS_SRCDIR)/include \
 	-I $(YMTOOLS_BUILDDIR)/include \
-	-I $(top_srcdir)/imp/bb/include
+	-I $(top_srcdir)/imp/src/bb/include
 
 MAINTAINERCLEANFILES = Makefile.in
 

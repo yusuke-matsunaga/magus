@@ -40,6 +40,10 @@ public:
   // 値を取り出す関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief サイズを得る．
+  ymuint
+  size() const;
+
   /// @brief 含意情報のリストを取り出す．
   /// @param[in] src_id 含意元のノード番号
   /// @param[in] src_val 含意元の値 ( 0 or 1 )
@@ -49,7 +53,7 @@ public:
 
   /// @brief 含意の総数を得る．
   ymuint
-  size(const ImpMgr& imp_mgr) const;
+  imp_num(const ImpMgr& imp_mgr) const;
 
   /// @brief 実際に保持している含意の総数を返す．
   ymuint
@@ -88,6 +92,10 @@ public:
   set(vector<vector<ImpVal> >& imp_list_array,
       const ImpInfo& src);
 
+  /// @brief 推移的閉包を求める．
+  void
+  make_closure();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -102,12 +110,12 @@ private:
 
 };
 
-// 定数ノードの検査を行う．
+/// @brief 定数ノードの検査を行う．
 void
 check_const(ImpMgr& imp_mgr,
 	    const ImpInfo& imp_info);
 
-// 検証する．
+/// @brief 検証する．
 void
 verify(const ImpMgr& imp_mgr,
        const ImpInfo& imp_info);
