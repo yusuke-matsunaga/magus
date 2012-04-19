@@ -1,22 +1,20 @@
-#ifndef MAGUS_TCLOBJMSGHANDLER_H
-#define MAGUS_TCLOBJMSGHANDLER_H
+#ifndef YM_TCLPP_TCLOBJMSGHANDLER_H
+#define YM_TCLPP_TCLOBJMSGHANDLER_H
 
-/// @file TclObjMsgHandler.h
+/// @file ym_tclpp/TclObjMsgHandler.h
 /// @brief TclObjMsgHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetIoCmd.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "magus_nsdef.h"
+#include "ym_tclpp/tclpp_nsdef.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_tclpp/TclObj.h"
 
 
-BEGIN_NAMESPACE_MAGUS
+BEGIN_NAMESPACE_YM_TCLPP
 
 //////////////////////////////////////////////////////////////////////
 /// @class TclObjMsgHandler BNetIoCmd.h "BNetIoCmd.h"
@@ -73,6 +71,6 @@ private:
 
 };
 
-END_NAMESPACE_MAGUS
+END_NAMESPACE_YM_TCLPP
 
-#endif //  MAGUS_TCLOBJMSGHANDLER_H
+#endif //  YM_TCLPP_TCLOBJMSGHANDLER_H

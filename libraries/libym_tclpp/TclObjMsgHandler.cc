@@ -1,19 +1,17 @@
 
-/// @file src/core/TclObjMsgHandler.cc
+/// @file TclObjMsgHandler.cc
 /// @brief TclObjMsgHandler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetIoCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "TclObjMsgHandler.h"
+#include "ym_tclpp/TclObjMsgHandler.h"
 #include "ym_utils/FileRegion.h"
 
 
-BEGIN_NAMESPACE_MAGUS
+BEGIN_NAMESPACE_YM_TCLPP
 
 //////////////////////////////////////////////////////////////////////
 // TclObj に出力するメッセージハンドラ
@@ -62,4 +60,4 @@ TclObjMsgHandler::msg_obj() const
   return mMsg;
 }
 
-END_NAMESPACE_MAGUS
+END_NAMESPACE_YM_TCLPP

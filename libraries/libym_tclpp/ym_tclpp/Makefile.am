@@ -13,6 +13,7 @@ noinst_HEADERS = \
 	TclCmd.h \
 	TclHandler.h \
 	TclObj.h \
+	TclObjMsgHandler.h \
 	TclPopt.h \
 	TclVarTrace.h \
 	tclpp_nsdef.h
