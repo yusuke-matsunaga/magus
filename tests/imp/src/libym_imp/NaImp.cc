@@ -339,7 +339,7 @@ NaImp::learning(ImpMgr& imp_mgr,
       break;
     }
 
-    if ( true ) {
+    if ( false ) {
       vector<vector<ImpVal> > tmp_list_array(n * 2);
       for (ymuint id = 0; id < n; ++ id) {
 	for (ymuint val = 0; val < 2; ++ val) {

@@ -12,8 +12,15 @@
 #include "ym_networks/BdnBlifReader.h"
 #include "ym_networks/BdnIscas89Reader.h"
 #include "ym_utils/MsgMgr.h"
+#include "ym_utils/StopWatch.h"
 #include "ym_tclpp/TclObjMsgHandler.h"
-#include "ImpCmd.h"
+#include "ym_tclpp/TclPopt.h"
+
+#include "StrImp.h"
+#include "ContraImp.h"
+#include "SatImp.h"
+#include "RlImp.h"
+#include "NaImp.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -162,6 +169,87 @@ ReadIscas89Cmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
+// @brief コンストラクタ
+// @param[in] imp_data 共通のデータ
+LearningCmd::LearningCmd(ImpData* imp_data) :
+  ImpCmd(imp_data)
+{
+  mPoptMethod = new TclPoptStr(this, "method",
+			       "specify learning algorithm",
+			       "direct|contra|recursive|naive|exact");
+  mPoptLevel = new TclPoptInt(this, "level",
+			      "specify recursive learing level",
+			      "integer");
+  mPoptDump = new TclPopt(this, "dump",
+			  "dump indirect implications");
+  mPoptVerify = new TclPopt(this, "verify",
+			    "verify indirect implications");
+}
+
+// @brief デストラクタ
+LearningCmd::~LearningCmd()
+{
+}
+
+// @brief コマンドを実行する仮想関数
+int
+LearningCmd::cmd_proc(TclObjVector& objv)
+{
+  StopWatch timer;
+
+  timer.start();
+
+  string method = "direct";
+  if ( mPoptMethod->is_specified() ) {
+    method = mPoptMethod->val();
+  }
+
+  ImpInfo imp_info;
+  if ( method == "direct" ) {
+    StrImp imp;
+    imp.learning(mgr(), imp_info);
+  }
+  else if ( method == "contra" ) {
+    ContraImp imp;
+    imp.learning(mgr(), imp_info);
+  }
+  else if ( method == "recursive" ) {
+    RlImp imp;
+    if ( mPoptLevel->is_specified() ) {
+      int level = mPoptLevel->val();
+      imp.set_learning_level(level);
+    }
+    imp.learning(mgr(), imp_info);
+  }
+  else if ( method == "naive" ) {
+    NaImp imp;
+    imp.learning(mgr(), imp_info);
+  }
+  else if ( method == "exact" ) {
+    SatImp imp;
+    imp.learning(mgr(), imp_info);
+  }
+  else {
+    string emsg = method + ": unknown method";
+    set_result(emsg);
+    return TCL_ERROR;
+  }
+
+  timer.stop();
+  cout << setw(10) << imp_info.imp_num(mgr()) << " implications"
+       << "\t" << timer.time()
+       << endl;
+
+  if ( mPoptVerify->is_specified() ) {
+    verify(mgr(), imp_info);
+  }
+  if ( mPoptDump->is_specified() ) {
+    imp_info.print(cout);
+  }
+
+  return TCL_OK;
+}
+
 END_NAMESPACE_YM_NETWORKS
 
 
@@ -191,7 +279,7 @@ imp_init(Tcl_Interp* interp)
 
   TclCmdBinder1<ReadBlifCmd, ImpData*>::reg(interp, data, "imp::read_blif");
   TclCmdBinder1<ReadIscas89Cmd, ImpData*>::reg(interp, data, "imp::read_iscas89");
-
+  TclCmdBinder1<LearningCmd, ImpData*>::reg(interp, data, "imp::learning");
 
 
   //////////////////////////////////////////////////////////////////////
@@ -203,6 +291,7 @@ imp_init(Tcl_Interp* interp)
     "namespace eval imp {\n"
     "proc complete(read_blif) { t s e l p m } { return \"\" }\n"
     "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
+    "proc complete(learning) { t s e l p m } { return \"\" }\n"
     "}\n"
     "}\n";
   if ( Tcl_Eval(interp, completer) == TCL_ERROR ) {

@@ -118,6 +118,52 @@ protected:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+/// @class LearningCmd ImpCmd.h "ImpCmd.h"
+/// @brief 間接含意を求めるコマンド
+//////////////////////////////////////////////////////////////////////
+class LearningCmd :
+  public ImpCmd
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] imp_data 共通のデータ
+  LearningCmd(ImpData* imp_data);
+
+  /// @brief デストラクタ
+  virtual
+  ~LearningCmd();
+
+
+protected:
+
+  /// @brief コマンドを実行する仮想関数
+  virtual
+  int
+  cmd_proc(TclObjVector& objv);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // method オプション
+  TclPoptStr* mPoptMethod;
+
+  // level オプション
+  TclPoptInt* mPoptLevel;
+
+  // dump オプション
+  TclPopt* mPoptDump;
+
+  // verify オプション
+  TclPopt* mPoptVerify;
+
+};
+
 END_NAMESPACE_YM_NETWORKS
 
 #endif // IMPCMD_H
