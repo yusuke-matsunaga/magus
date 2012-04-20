@@ -164,6 +164,34 @@ private:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+/// @class CheckConstCmd ImpCmd.h "ImpCmd.h"
+/// @brief 定数チェックを行うコマンド
+//////////////////////////////////////////////////////////////////////
+class CheckConstCmd :
+  public ImpCmd
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] imp_data 共通のデータ
+  CheckConstCmd(ImpData* imp_data);
+
+  /// @brief デストラクタ
+  virtual
+  ~CheckConstCmd();
+
+
+protected:
+
+  /// @brief コマンドを実行する仮想関数
+  virtual
+  int
+  cmd_proc(TclObjVector& objv);
+
+};
+
 END_NAMESPACE_YM_NETWORKS
 
 #endif // IMPCMD_H

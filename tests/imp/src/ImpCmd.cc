@@ -21,6 +21,7 @@
 #include "SatImp.h"
 #include "RlImp.h"
 #include "NaImp.h"
+#include "ConstImp.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -176,7 +177,7 @@ LearningCmd::LearningCmd(ImpData* imp_data) :
 {
   mPoptMethod = new TclPoptStr(this, "method",
 			       "specify learning algorithm",
-			       "direct|contra|recursive|naive|exact");
+			       "direct|contra|recursive|naive|naive2|exact");
   mPoptLevel = new TclPoptInt(this, "level",
 			      "specify recursive learing level",
 			      "integer");
@@ -225,6 +226,11 @@ LearningCmd::cmd_proc(TclObjVector& objv)
     NaImp imp;
     imp.learning(mgr(), imp_info);
   }
+  else if ( method == "naive2" ) {
+    NaImp imp;
+    imp.use_contra(false);
+    imp.learning(mgr(), imp_info);
+  }
   else if ( method == "exact" ) {
     SatImp imp;
     imp.learning(mgr(), imp_info);
@@ -247,6 +253,32 @@ LearningCmd::cmd_proc(TclObjVector& objv)
     imp_info.print(cout);
   }
 
+  return TCL_OK;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス CheckConstCmd
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] imp_data 共通のデータ
+CheckConstCmd::CheckConstCmd(ImpData* imp_data) :
+  ImpCmd(imp_data)
+{
+}
+
+// @brief デストラクタ
+CheckConstCmd::~CheckConstCmd()
+{
+}
+
+// @brief コマンドを実行する仮想関数
+int
+CheckConstCmd::cmd_proc(TclObjVector& objv)
+{
+  ConstImp imp;
+  imp.learning(mgr());
   return TCL_OK;
 }
 
@@ -280,6 +312,7 @@ imp_init(Tcl_Interp* interp)
   TclCmdBinder1<ReadBlifCmd, ImpData*>::reg(interp, data, "imp::read_blif");
   TclCmdBinder1<ReadIscas89Cmd, ImpData*>::reg(interp, data, "imp::read_iscas89");
   TclCmdBinder1<LearningCmd, ImpData*>::reg(interp, data, "imp::learning");
+  TclCmdBinder1<CheckConstCmd, ImpData*>::reg(interp, data, "imp::check_const");
 
 
   //////////////////////////////////////////////////////////////////////
@@ -292,6 +325,7 @@ imp_init(Tcl_Interp* interp)
     "proc complete(read_blif) { t s e l p m } { return \"\" }\n"
     "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
     "proc complete(learning) { t s e l p m } { return \"\" }\n"
+    "proc complete(check_const) { t s e l p m } { return \"\" }\n"
     "}\n"
     "}\n";
   if ( Tcl_Eval(interp, completer) == TCL_ERROR ) {
