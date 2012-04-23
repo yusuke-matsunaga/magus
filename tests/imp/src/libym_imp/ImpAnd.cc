@@ -214,13 +214,13 @@ ImpAnd::fwd0_imp0(ImpMgr& mgr,
   case kStXX_X: // XX:X -> 0X:0
     change_value(mgr, kSt0X_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fwd_prop0(this, imp_list);
+    return mgr.fanout_prop0(this, imp_list);
 
   case kStX1_X: // X1:X -> 01:0
     change_value(mgr, kSt01_0);
     mgr.reset_unjustified(this);
     // ファンアウト先に0を伝搬する．
-    return mgr.fwd_prop0(this, imp_list);
+    return mgr.fanout_prop0(this, imp_list);
 
   case kStXX_0: // XX:0 -> 0X:0
     change_value(mgr, kSt0X_0);
@@ -265,7 +265,7 @@ ImpAnd::fwd0_imp1(ImpMgr& mgr,
     change_value(mgr, kSt11_1);
     mgr.reset_unjustified(this);
     // ファンアウト先に1を伝搬する．
-    return mgr.fwd_prop1(this, imp_list);
+    return mgr.fanout_prop1(this, imp_list);
 
   case kStXX_0: // XX:0 -> 10:0
     change_value(mgr, kSt10_0);
@@ -305,13 +305,13 @@ ImpAnd::fwd1_imp0(ImpMgr& mgr,
   case kStXX_X: // XX:X -> X0:0
     change_value(mgr, kStX0_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fwd_prop0(this, imp_list);
+    return mgr.fanout_prop0(this, imp_list);
 
   case kSt1X_X: // 1X:X -> 10:0
     change_value(mgr, kSt10_0);
     mgr.reset_unjustified(this);
     // ファンアウト先に0を伝搬する．
-    return mgr.fwd_prop0(this, imp_list);
+    return mgr.fanout_prop0(this, imp_list);
 
   case kSt0X_0: // 0X:0 -> 00:0
     change_value(mgr, kSt00_0);
@@ -356,7 +356,7 @@ ImpAnd::fwd1_imp1(ImpMgr& mgr,
     change_value(mgr, kSt11_1);
     mgr.reset_unjustified(this);
     // ファンアウト先に1を伝搬する．
-    return mgr.fwd_prop1(this, imp_list);
+    return mgr.fanout_prop1(this, imp_list);
 
   case kStXX_0: // XX:0 -> 01:0
     change_value(mgr, kSt01_0);
@@ -453,6 +453,248 @@ ImpAnd::bwd_imp1(ImpMgr& mgr,
     mgr.reset_unjustified(this);
     // ファンイン0に1を伝搬する．
     return mgr.fanin0_prop1(this, imp_list);
+
+  case kStXX_0: // illegal
+  case kStX0_0: // illegal
+  case kSt0X_0: // illegal
+  case kSt00_0: // illegal
+  case kSt10_0: // illegal
+  case kSt01_0: // illegal
+    return false;
+
+  case kSt11_1: // no change
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+  return true;
+}
+
+// @brief ファンイン0を0にする．
+// @param[in] mgr ImMgr
+bool
+ImpAnd::fwd0_imp0(ImpMgr& mgr)
+{
+  switch ( mState ) {
+  case kStXX_X: // XX:X -> 0X:0
+    change_value(mgr, kSt0X_0);
+    // ファンアウト先に0を伝搬する．
+    return mgr.fanout_prop0(this);
+
+  case kStX1_X: // X1:X -> 01:0
+    change_value(mgr, kSt01_0);
+    // ファンアウト先に0を伝搬する．
+    return mgr.fanout_prop0(this);
+
+  case kStXX_0: // XX:0 -> 0X:0
+    change_value(mgr, kSt0X_0);
+    break;
+
+  case kStX0_0: // X0:0 -> 00:0
+    change_value(mgr, kSt00_0);
+    break;
+
+  case kSt1X_X: // illegal
+  case kSt10_0: // illegal
+  case kSt11_1: // illegal
+    return false;
+
+  case kSt0X_0: // no change
+  case kSt01_0: // no change
+  case kSt00_0: // no change
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+  return true;
+}
+
+// @brief ファンイン0を1にする．
+// @param[in] mgr ImMgr
+bool
+ImpAnd::fwd0_imp1(ImpMgr& mgr)
+{
+  switch ( mState ) {
+  case kStXX_X: // XX:X -> 1X:X
+    change_value(mgr, kSt1X_X);
+    break;
+
+  case kStX1_X: // X1:X -> 11:1
+    change_value(mgr, kSt11_1);
+    // ファンアウト先に1を伝搬する．
+    return mgr.fanout_prop1(this);
+
+  case kStXX_0: // XX:0 -> 10:0
+    change_value(mgr, kSt10_0);
+    // ファンイン1に0を伝搬する．
+    return mgr.fanin1_prop0(this);
+
+  case kStX0_0: // X0:0 -> 10:0
+    change_value(mgr, kSt10_0);
+    break;
+
+  case kSt0X_0: // illegal
+  case kSt00_0: // illegal
+  case kSt01_0: // illegal
+    return false;
+
+  case kSt1X_X: // no change
+  case kSt10_0: // no change
+  case kSt11_1: // no change
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+  return true;
+}
+
+// @brief ファンイン1を0にする．
+// @param[in] mgr ImMgr
+bool
+ImpAnd::fwd1_imp0(ImpMgr& mgr)
+{
+  switch ( mState ) {
+  case kStXX_X: // XX:X -> X0:0
+    change_value(mgr, kStX0_0);
+    // ファンアウト先に0を伝搬する．
+    return mgr.fanout_prop0(this);
+
+  case kSt1X_X: // 1X:X -> 10:0
+    change_value(mgr, kSt10_0);
+    // ファンアウト先に0を伝搬する．
+    return mgr.fanout_prop0(this);
+
+  case kSt0X_0: // 0X:0 -> 00:0
+    change_value(mgr, kSt00_0);
+    break;
+
+  case kStXX_0: // XX:0 -> X0:0
+    change_value(mgr, kStX0_0);
+    break;
+
+  case kStX1_X: // illegal
+  case kSt01_0: // illegal
+  case kSt11_1: // illegal
+    return false;
+
+  case kStX0_0: // no change
+  case kSt00_0: // no change
+  case kSt10_0: // no change
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+  return true;
+}
+
+// @brief ファンイン1を1にする．
+// @param[in] mgr ImMgr
+bool
+ImpAnd::fwd1_imp1(ImpMgr& mgr)
+{
+  switch ( mState ) {
+  case kStXX_X: // XX:X -> X1:X
+    change_value(mgr, kStX1_X);
+    break;
+
+  case kSt1X_X: // 1X:X -> 11:1
+    change_value(mgr, kSt11_1);
+    // ファンアウト先に1を伝搬する．
+    return mgr.fanout_prop1(this);
+
+  case kStXX_0: // XX:0 -> 01:0
+    change_value(mgr, kSt01_0);
+    // ファンイン0に0を伝搬する．
+    return mgr.fanin0_prop0(this);
+
+  case kSt0X_0: // 0X:0 -> 01:0
+    change_value(mgr, kSt01_0);
+    break;
+
+  case kStX0_0: // illegal
+  case kSt00_0: // illegal
+  case kSt10_0: // illegal
+    return false;
+
+  case kStX1_X: // no change
+  case kSt01_0: // no change
+  case kSt11_1: // no change
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+  return true;
+}
+
+// @brief 出力を0にする．
+// @param[in] mgr ImMgr
+bool
+ImpAnd::bwd_imp0(ImpMgr& mgr)
+{
+  switch ( mState ) {
+  case kStXX_X: // XX:X -> XX:0
+    change_value(mgr, kStXX_0);
+    break;
+
+  case kSt1X_X: // 1X:X -> 10:0
+    change_value(mgr, kSt10_0);
+    // ファンイン1に0を伝搬する．
+    return mgr.fanin1_prop0(this);
+
+  case kStX1_X: // X1:X -> 01:0
+    change_value(mgr, kSt01_0);
+    // ファンイン0に0を伝搬する．
+    return mgr.fanin0_prop0(this);
+
+  case kStXX_0: // no change
+  case kStX0_0: // no change
+  case kSt0X_0: // no change
+  case kSt00_0: // no change
+  case kSt10_0: // no change
+  case kSt01_0: // no change
+    break;
+
+  case kSt11_1: // illegal
+    return false;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+  return true;
+}
+
+// @brief 出力を1にする．
+// @param[in] mgr ImMgr
+bool
+ImpAnd::bwd_imp1(ImpMgr& mgr)
+{
+  switch ( mState ) {
+  case kStXX_X: // XX:X -> 11:1
+    change_value(mgr, kSt11_1);
+    // ファンイン0に1を伝搬する．
+    // ファンイン1に1を伝搬する．
+    return mgr.fanin0_prop1(this) && mgr.fanin1_prop1(this);
+
+  case kSt1X_X: // 1X:X -> 11:1
+    change_value(mgr, kSt11_1);
+    // ファンイン1に1を伝搬する．
+    return mgr.fanin1_prop1(this);
+
+  case kStX1_X: // X1:X -> 11:1
+    change_value(mgr, kSt11_1);
+    // ファンイン0に1を伝搬する．
+    return mgr.fanin0_prop1(this);
 
   case kStXX_0: // illegal
   case kStX0_0: // illegal

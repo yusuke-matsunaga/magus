@@ -259,7 +259,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 含意を行う関数
+  // ラーニング用の含意を行う関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 状態を初期化する．
@@ -343,6 +343,49 @@ public:
 	   vector<ImpVal>& imp_list) = 0;;
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 含意を行う関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ファンイン0を0にする．
+  /// @param[in] mgr ImMgr
+  virtual
+  bool
+  fwd0_imp0(ImpMgr& mgr) = 0;
+
+  /// @brief ファンイン0を1にする．
+  /// @param[in] mgr ImMgr
+  virtual
+  bool
+  fwd0_imp1(ImpMgr& mgr) = 0;
+
+  /// @brief ファンイン1を0にする．
+  /// @param[in] mgr ImMgr
+  virtual
+  bool
+  fwd1_imp0(ImpMgr& mgr) = 0;
+
+  /// @brief ファンイン1を1にする．
+  /// @param[in] mgr ImMgr
+  virtual
+  bool
+  fwd1_imp1(ImpMgr& mgr) = 0;
+
+  /// @brief 出力を0にする．
+  /// @param[in] mgr ImMgr
+  virtual
+  bool
+  bwd_imp0(ImpMgr& mgr) = 0;
+
+  /// @brief 出力を1にする．
+  /// @param[in] mgr ImMgr
+  virtual
+  bool
+  bwd_imp1(ImpMgr& mgr) = 0;
+
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -365,6 +408,9 @@ private:
 
   // ImpMgr::mUnodeList 中の位置を示す反復子
   list<ImpNode*>::iterator mListIter;
+
+  // 間接含意のリスト(直接含意も含む)
+  vector<ImpVal> mImpList;
 
 };
 

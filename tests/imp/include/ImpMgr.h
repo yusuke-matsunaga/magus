@@ -146,7 +146,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 含意操作を行う関数
+  // ラーニング用の含意操作を行う関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ノードに値を設定し含意操作を行う．
@@ -170,8 +170,8 @@ public:
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  fwd_prop0(ImpNode* node,
-	    vector<ImpVal>& imp_list);
+  fanout_prop0(ImpNode* node,
+	       vector<ImpVal>& imp_list);
 
   /// @brief ノードのファンアウト先に1を伝搬する．
   /// @param[in] node ノード
@@ -179,8 +179,8 @@ public:
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  fwd_prop1(ImpNode* node,
-	    vector<ImpVal>& imp_list);
+  fanout_prop1(ImpNode* node,
+	       vector<ImpVal>& imp_list);
 
   /// @brief ノードのファンイン0に0を伝搬する．
   /// @param[in] node ノード
@@ -258,6 +258,81 @@ public:
   void
   save_value(ImpNode* node,
 	     ymuint32 old_state);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 含意操作を行う関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードに値を設定し含意操作を行う．
+  /// @param[in] node ノード
+  /// @param[in] val 設定する値 ( 0 or 1 )
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  assert(ImpNode* node,
+	 ymuint val);
+
+  /// @brief ノードのファンアウト先に0を伝搬する．
+  /// @param[in] node ノード
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanout_prop0(ImpNode* node);
+
+  /// @brief ノードのファンアウト先に1を伝搬する．
+  /// @param[in] node ノード
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanout_prop1(ImpNode* node);
+
+  /// @brief ノードのファンイン0に0を伝搬する．
+  /// @param[in] node ノード
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanin0_prop0(ImpNode* node);
+
+  /// @brief ノードのファンイン0に1を伝搬する．
+  /// @param[in] node ノード
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanin0_prop1(ImpNode* node);
+
+  /// @brief ノードのファンイン1に0を伝搬する．
+  /// @param[in] node ノード
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanin1_prop0(ImpNode* node);
+
+  /// @brief ノードのファンイン1に1を伝搬する．
+  /// @param[in] node ノード
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanin1_prop1(ImpNode* node);
+
+  /// @brief ノードに後方含意で0を割り当てる．
+  /// @param[in] node ノード
+  /// @param[in] from_node 含意元のノード
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  bwd_prop0(ImpNode* node,
+	    ImpNode* from_node);
+
+  /// @brief ノードに後方含意で1を割り当てる．
+  /// @param[in] node ノード
+  /// @param[in] from_node 含意元のノード
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  bwd_prop1(ImpNode* node,
+	    ImpNode* from_node);
 
 
 public:

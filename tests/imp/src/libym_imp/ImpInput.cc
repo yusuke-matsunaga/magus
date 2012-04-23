@@ -207,4 +207,90 @@ ImpInput::bwd_imp1(ImpMgr& mgr,
   return true;
 }
 
+// @brief ファンイン0を0にする．
+// @param[in] mgr ImMgr
+bool
+ImpInput::fwd0_imp0(ImpMgr& mgr)
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
+}
+
+// @brief ファンイン0を1にする．
+// @param[in] mgr ImMgr
+bool
+ImpInput::fwd0_imp1(ImpMgr& mgr)
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
+}
+
+// @brief ファンイン1を0にする．
+// @param[in] mgr ImMgr
+bool
+ImpInput::fwd1_imp0(ImpMgr& mgr)
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
+}
+
+// @brief ファンイン1を1にする．
+// @param[in] mgr ImMgr
+bool
+ImpInput::fwd1_imp1(ImpMgr& mgr)
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
+}
+
+// @brief 出力を0にする．
+// @param[in] mgr ImMgr
+bool
+ImpInput::bwd_imp0(ImpMgr& mgr)
+{
+  switch ( mState ) {
+  case kStX: // X -> 0
+    mgr.save_value(this, static_cast<ymuint32>(mState));
+    mState = kSt0;
+    break;
+
+  case kSt0: // no change
+    break;
+
+  case kSt1: // illegal
+    return false;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+
+  return true;
+}
+
+// @brief 出力を1にする．
+// @param[in] mgr ImMgr
+bool
+ImpInput::bwd_imp1(ImpMgr& mgr)
+{
+  switch ( mState ) {
+  case kStX: // X -> 1
+    mgr.save_value(this, static_cast<ymuint32>(mState));
+    mState = kSt1;
+    break;
+
+  case kSt0: // illegal
+    return false;
+
+  case kSt1: // no change
+    break;
+
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+  return true;
+}
+
 END_NAMESPACE_YM_NETWORKS

@@ -64,7 +64,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 含意を行う関数
+  // ラーニング用の含意を行う関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 状態を初期化する．
@@ -146,6 +146,48 @@ public:
   bool
   bwd_imp1(ImpMgr& mgr,
 	   vector<ImpVal>& imp_list);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 含意を行う関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ファンイン0を0にする．
+  /// @param[in] mgr ImMgr
+  virtual
+  bool
+  fwd0_imp0(ImpMgr& mgr);
+
+  /// @brief ファンイン0を1にする．
+  /// @param[in] mgr ImMgr
+  virtual
+  bool
+  fwd0_imp1(ImpMgr& mgr);
+
+  /// @brief ファンイン1を0にする．
+  /// @param[in] mgr ImMgr
+  virtual
+  bool
+  fwd1_imp0(ImpMgr& mgr);
+
+  /// @brief ファンイン1を1にする．
+  /// @param[in] mgr ImMgr
+  virtual
+  bool
+  fwd1_imp1(ImpMgr& mgr);
+
+  /// @brief 出力を0にする．
+  /// @param[in] mgr ImMgr
+  virtual
+  bool
+  bwd_imp0(ImpMgr& mgr);
+
+  /// @brief 出力を1にする．
+  /// @param[in] mgr ImMgr
+  virtual
+  bool
+  bwd_imp1(ImpMgr& mgr);
 
 
 private:
