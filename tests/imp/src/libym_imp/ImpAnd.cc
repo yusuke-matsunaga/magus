@@ -214,13 +214,13 @@ ImpAnd::fwd0_imp0(ImpMgr& mgr,
   case kStXX_X: // XX:X -> 0X:0
     change_value(mgr, kSt0X_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, imp_list);
+    return mgr.fanout_prop0(this, NULL, imp_list);
 
   case kStX1_X: // X1:X -> 01:0
     change_value(mgr, kSt01_0);
     mgr.reset_unjustified(this);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, imp_list);
+    return mgr.fanout_prop0(this, NULL, imp_list);
 
   case kStXX_0: // XX:0 -> 0X:0
     change_value(mgr, kSt0X_0);
@@ -265,7 +265,7 @@ ImpAnd::fwd0_imp1(ImpMgr& mgr,
     change_value(mgr, kSt11_1);
     mgr.reset_unjustified(this);
     // ファンアウト先に1を伝搬する．
-    return mgr.fanout_prop1(this, imp_list);
+    return mgr.fanout_prop1(this, NULL, imp_list);
 
   case kStXX_0: // XX:0 -> 10:0
     change_value(mgr, kSt10_0);
@@ -305,13 +305,13 @@ ImpAnd::fwd1_imp0(ImpMgr& mgr,
   case kStXX_X: // XX:X -> X0:0
     change_value(mgr, kStX0_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, imp_list);
+    return mgr.fanout_prop0(this, NULL, imp_list);
 
   case kSt1X_X: // 1X:X -> 10:0
     change_value(mgr, kSt10_0);
     mgr.reset_unjustified(this);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, imp_list);
+    return mgr.fanout_prop0(this, NULL, imp_list);
 
   case kSt0X_0: // 0X:0 -> 00:0
     change_value(mgr, kSt00_0);
@@ -356,7 +356,7 @@ ImpAnd::fwd1_imp1(ImpMgr& mgr,
     change_value(mgr, kSt11_1);
     mgr.reset_unjustified(this);
     // ファンアウト先に1を伝搬する．
-    return mgr.fanout_prop1(this, imp_list);
+    return mgr.fanout_prop1(this, NULL, imp_list);
 
   case kStXX_0: // XX:0 -> 01:0
     change_value(mgr, kSt01_0);
@@ -481,12 +481,12 @@ ImpAnd::fwd0_imp0(ImpMgr& mgr)
   case kStXX_X: // XX:X -> 0X:0
     change_value(mgr, kSt0X_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this);
+    return mgr.fanout_prop0(this, NULL);
 
   case kStX1_X: // X1:X -> 01:0
     change_value(mgr, kSt01_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this);
+    return mgr.fanout_prop0(this, NULL);
 
   case kStXX_0: // XX:0 -> 0X:0
     change_value(mgr, kSt0X_0);
@@ -526,7 +526,7 @@ ImpAnd::fwd0_imp1(ImpMgr& mgr)
   case kStX1_X: // X1:X -> 11:1
     change_value(mgr, kSt11_1);
     // ファンアウト先に1を伝搬する．
-    return mgr.fanout_prop1(this);
+    return mgr.fanout_prop1(this, NULL);
 
   case kStXX_0: // XX:0 -> 10:0
     change_value(mgr, kSt10_0);
@@ -563,12 +563,12 @@ ImpAnd::fwd1_imp0(ImpMgr& mgr)
   case kStXX_X: // XX:X -> X0:0
     change_value(mgr, kStX0_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this);
+    return mgr.fanout_prop0(this, NULL);
 
   case kSt1X_X: // 1X:X -> 10:0
     change_value(mgr, kSt10_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this);
+    return mgr.fanout_prop0(this, NULL);
 
   case kSt0X_0: // 0X:0 -> 00:0
     change_value(mgr, kSt00_0);
@@ -608,7 +608,7 @@ ImpAnd::fwd1_imp1(ImpMgr& mgr)
   case kSt1X_X: // 1X:X -> 11:1
     change_value(mgr, kSt11_1);
     // ファンアウト先に1を伝搬する．
-    return mgr.fanout_prop1(this);
+    return mgr.fanout_prop1(this, NULL);
 
   case kStXX_0: // XX:0 -> 01:0
     change_value(mgr, kSt01_0);

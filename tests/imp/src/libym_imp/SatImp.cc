@@ -601,6 +601,41 @@ SatImp::learning(ImpMgr& imp_mgr,
 
   imp_info.set(imp_list_array);
 
+  {
+    for (ymuint id = 0; id < n; ++ id) {
+      ImpNode* node = imp_mgr.node(id);
+      for (ymuint val = 0; val < 2; ++ val) {
+	const vector<ImpVal>& imp_list = imp_info.get(id, val);
+	imp_mgr.set_ind_imp(node, val, imp_list);
+      }
+    }
+
+    for (ymuint id = 0; id < n; ++ id) {
+      if ( imp_mgr.is_const(id) ) {
+	continue;
+      }
+      ImpNode* node = imp_mgr.node(id);
+
+      // node に 0 を割り当てる．
+      bool ok0 = imp_mgr.assert(node, 0);
+      if ( !ok0 ) {
+	// node は1固定
+	cout << "Node#" << id << " is const-1" << endl;
+	imp_mgr.set_const(id, 1);
+      }
+      imp_mgr.backtrack();
+
+      // node に 1 を割り当てる．
+      bool ok1 = imp_mgr.assert(node, 1);
+      if ( !ok1 ) {
+	// node は0固定
+	cout << "Node#" << id << " is const-0" << endl;
+	imp_mgr.set_const(id, 0);
+      }
+      imp_mgr.backtrack();
+    }
+  }
+
   timer.stop();
   USTime sat_time = timer.time();
 

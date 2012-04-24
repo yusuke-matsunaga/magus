@@ -8,6 +8,7 @@
 
 
 #include "ImpNode.h"
+#include "ImpMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -51,6 +52,68 @@ bool
 ImpNode::is_and() const
 {
   return false;
+}
+
+// @brief 0の間接含意を行う．
+bool
+ImpNode::ind_imp0(ImpMgr& mgr)
+{
+  for (vector<ImpDst>::iterator p = mImpList[0].begin();
+       p != mImpList[0].end(); ++ p) {
+    ImpNode* dst_node = p->node();
+    bool stat = true;
+    if ( p->val() == 0 ) {
+      if ( dst_node->val() == kB3X ) {
+	stat = mgr.bwd_prop0(dst_node, NULL);
+      }
+      else if ( dst_node->val() == kB3True ) {
+	stat = false;
+      }
+    }
+    else {
+      if ( dst_node->val() == kB3X ) {
+	stat = mgr.bwd_prop1(dst_node, NULL);
+      }
+      else if ( dst_node->val() == kB3False ) {
+	stat = false;
+      }
+    }
+    if ( !stat ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// @brief 1の間接含意を行う．
+bool
+ImpNode::ind_imp1(ImpMgr& mgr)
+{
+  for (vector<ImpDst>::iterator p = mImpList[1].begin();
+       p != mImpList[1].end(); ++ p) {
+    ImpNode* dst_node = p->node();
+    bool stat = true;
+    if ( p->val() == 0 ) {
+      if ( dst_node->val() == kB3X ) {
+	stat = mgr.bwd_prop0(p->node(), NULL);
+      }
+      else if ( dst_node->val() == kB3True ) {
+	stat = false;
+      }
+    }
+    else {
+      if ( dst_node->val() == kB3X ) {
+	stat = mgr.bwd_prop1(p->node(), NULL);
+      }
+      else if ( dst_node->val() == kB3False ) {
+	stat = false;
+      }
+    }
+    if ( !stat ) {
+      return false;
+    }
+  }
+  return true;
 }
 
 END_NAMESPACE_YM_NETWORKS

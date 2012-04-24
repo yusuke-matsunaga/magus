@@ -426,10 +426,55 @@ NaImp::learning(ImpMgr& imp_mgr,
 	}
       }
     }
+#if 0
     // imp_list_array の内容を imp_info にコピーする．
     imp_info.set(imp_list_array);
+
+    for (ymuint id = 0; id < n; ++ id) {
+      ImpNode* node = imp_mgr.node(id);
+      for (ymuint val = 0; val < 2; ++ val) {
+	const vector<ImpVal>& imp_list = imp_info.get(id, val);
+	imp_mgr.set_ind_imp(node, val, imp_list);
+      }
+    }
+#else
+    for (ymuint id = 0; id < n; ++ id) {
+      ImpNode* node = imp_mgr.node(id);
+      for (ymuint val = 0; val < 2; ++ val) {
+	vector<ImpVal>& imp_list = imp_list_array[id * 2 + val];
+	sort(imp_list.begin(), imp_list.end());
+	vector<ImpVal>::iterator p = unique(imp_list.begin(), imp_list.end());
+	imp_list.erase(p, imp_list.end());
+	imp_mgr.set_ind_imp(node, val, imp_list);
+      }
+    }
+#endif
   }
 
+  for (ymuint id = 0; id < n; ++ id) {
+    if ( imp_mgr.is_const(id) ) {
+      continue;
+    }
+    ImpNode* node = imp_mgr.node(id);
+
+    // node に 0 を割り当てる．
+    bool ok0 = imp_mgr.assert(node, 0);
+    if ( !ok0 ) {
+      // node は1固定
+      cout << "Node#" << id << " is const-1" << endl;
+      imp_mgr.set_const(id, 1);
+    }
+    imp_mgr.backtrack();
+
+    // node に 1 を割り当てる．
+    bool ok1 = imp_mgr.assert(node, 1);
+    if ( !ok1 ) {
+      // node は0固定
+      cout << "Node#" << id << " is const-0" << endl;
+      imp_mgr.set_const(id, 0);
+    }
+    imp_mgr.backtrack();
+  }
 #if 0
   check_const(imp_mgr, imp_info);
 #endif

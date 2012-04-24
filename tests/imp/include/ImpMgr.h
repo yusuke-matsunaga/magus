@@ -160,26 +160,26 @@ public:
 	 ymuint val,
 	 vector<ImpVal>& imp_list);
 
-  /// @brief 指定されたところまで値を戻す．
-  void
-  backtrack();
-
   /// @brief ノードのファンアウト先に0を伝搬する．
   /// @param[in] node ノード
+  /// @param[in] from 後方含意の場合の含意元のノード
   /// @param[out] imp_list 含意の結果を格納するリスト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
   fanout_prop0(ImpNode* node,
+	       ImpNode* from,
 	       vector<ImpVal>& imp_list);
 
   /// @brief ノードのファンアウト先に1を伝搬する．
   /// @param[in] node ノード
+  /// @param[in] from 後方含意の場合の含意元のノード
   /// @param[out] imp_list 含意の結果を格納するリスト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
   fanout_prop1(ImpNode* node,
+	       ImpNode* from,
 	       vector<ImpVal>& imp_list);
 
   /// @brief ノードのファンイン0に0を伝搬する．
@@ -252,12 +252,11 @@ public:
   void
   reset_unjustified(ImpNode* node);
 
-  /// @brief ノードの値をスタックに積む．
-  /// @param[in] node ノード
-  /// @param[in] old_state 変更前の値
+  /// @brief ラーニング結果を各ノードに設定する．
   void
-  save_value(ImpNode* node,
-	     ymuint32 old_state);
+  set_ind_imp(ImpNode* node,
+	      ymuint val,
+	      const vector<ImpVal>& imp_list);
 
 
 public:
@@ -274,19 +273,34 @@ public:
   assert(ImpNode* node,
 	 ymuint val);
 
+  /// @brief 指定されたところまで値を戻す．
+  void
+  backtrack();
+
+  /// @brief ノードの値をスタックに積む．
+  /// @param[in] node ノード
+  /// @param[in] old_state 変更前の値
+  void
+  save_value(ImpNode* node,
+	     ymuint32 old_state);
+
   /// @brief ノードのファンアウト先に0を伝搬する．
   /// @param[in] node ノード
+  /// @param[in] from 後方含意の場合の含意元のノード
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  fanout_prop0(ImpNode* node);
+  fanout_prop0(ImpNode* node,
+	       ImpNode* from);
 
   /// @brief ノードのファンアウト先に1を伝搬する．
   /// @param[in] node ノード
+  /// @param[in] from 後方含意の場合の含意元のノード
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  fanout_prop1(ImpNode* node);
+  fanout_prop1(ImpNode* node,
+	       ImpNode* from);
 
   /// @brief ノードのファンイン0に0を伝搬する．
   /// @param[in] node ノード

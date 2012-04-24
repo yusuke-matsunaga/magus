@@ -384,6 +384,13 @@ public:
   bool
   bwd_imp1(ImpMgr& mgr) = 0;
 
+  /// @brief 0の間接含意を行う．
+  bool
+  ind_imp0(ImpMgr& mgr);
+
+  /// @brief 1の間接含意を行う．
+  bool
+  ind_imp1(ImpMgr& mgr);
 
 
 private:
@@ -410,7 +417,7 @@ private:
   list<ImpNode*>::iterator mListIter;
 
   // 間接含意のリスト(直接含意も含む)
-  vector<ImpVal> mImpList;
+  vector<ImpDst> mImpList[2];
 
 };
 
