@@ -25,6 +25,17 @@ bool debug = false;
 bool debug = false;
 #endif
 
+
+// 対象のベクタを整列して単一化する．
+inline
+void
+sort_unique(vector<ImpVal>& imp_list)
+{
+  sort(imp_list.begin(), imp_list.end());
+  vector<ImpVal>::iterator ep = unique(imp_list.begin(), imp_list.end());
+  imp_list.erase(ep, imp_list.end());
+}
+
 END_NONAMESPACE
 
 
@@ -77,35 +88,19 @@ NaImp::learning(ImpMgr& imp_mgr,
       if ( node == NULL ) {
 	continue;
       }
-      // 自分自身を追加する．
-      imp_lists_array[src_id * 2 + 0].push_back(ImpVal(src_id, 0));
-      imp_lists_array[src_id * 2 + 1].push_back(ImpVal(src_id, 1));
 
-      // node に 0 を割り当てる．
-      vector<ImpVal> imp_list0;
-      bool ok0 = imp_mgr.assert(node, 0, imp_list0);
-      if ( !ok0 ) {
-	imp_list0.clear();
-	// 単一の割り当てで矛盾が起こった．
-	// node は 1 固定
-	imp_mgr.set_const(src_id, 1);
-      }
-      imp_mgr.backtrack();
+      for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+	// src_val の反対の値
+	ymuint src_val1 = src_val ^ 1;
 
-      // node に 1 を割り当てる．
-      vector<ImpVal> imp_list1;
-      bool ok1 = imp_mgr.assert(node, 1, imp_list1);
-      if ( !ok1 ) {
-	imp_list1.clear();
-	// 単一の割り当てで矛盾が起こった．
-	// node は 0 固定
-	imp_mgr.set_const(src_id, 0);
-      }
-      imp_mgr.backtrack();
+	// 自分自身を追加する．
+	imp_lists_array[src_id * 2 + src_val].push_back(ImpVal(src_id, src_val));
 
-      if ( !imp_mgr.is_const(src_id) ) {
-	for (ymuint src_val = 0; src_val < 2; ++ src_val) {
-	  const vector<ImpVal>& imp_list = (src_val == 0) ? imp_list0 : imp_list1;
+	// node に src_val を割り当てる．
+	vector<ImpVal> imp_list;
+	bool ok = imp_mgr.assert(node, src_val, imp_list);
+	imp_mgr.backtrack();
+	if ( ok ) {
 	  for (vector<ImpVal>::const_iterator p = imp_list.begin();
 	       p != imp_list.end(); ++ p) {
 	    ymuint dst_id = p->id();
@@ -113,20 +108,30 @@ NaImp::learning(ImpMgr& imp_mgr,
 	      continue;
 	    }
 	    ymuint dst_val = p->val();
-	    ymuint src_val1 = src_val ^ 1;
 	    ymuint dst_val1 = dst_val ^ 1;
 	    imp_lists_array[dst_id * 2 + dst_val].push_back(ImpVal(src_id, src_val));
 	    imp_lists_array[src_id * 2 + src_val1].push_back(ImpVal(dst_id, dst_val1));
 	  }
 	}
+	else {
+	  // 単一の割り当てで矛盾が起こった．
+	  // node は src_val1 固定
+	  cout << "Node#" << src_id << " is const-" << src_val1 << endl;
+	  imp_mgr.set_const(src_id, src_val1);
+#if 0
+	  imp_mgr.assert(node, src_val1);
+#endif
+	  break;
+	}
       }
     }
     for (ymuint i = 0; i < n; ++ i) {
+      if ( imp_mgr.is_const(i) ) {
+	continue;
+      }
       for (ymuint val = 0; val < 2; ++ val) {
 	vector<ImpVal>& imp_list = imp_lists_array[i * 2 + val];
-	sort(imp_list.begin(), imp_list.end());
-	vector<ImpVal>::iterator p = unique(imp_list.begin(), imp_list.end());
-	imp_list.erase(p, imp_list.end());
+	sort_unique(imp_list);
 	ImpValList& dst_list = imp_lists[i * 2 + val];
 	dst_list.set(imp_list);
 	dst_list.set_change1();
@@ -442,9 +447,7 @@ NaImp::learning(ImpMgr& imp_mgr,
       ImpNode* node = imp_mgr.node(id);
       for (ymuint val = 0; val < 2; ++ val) {
 	vector<ImpVal>& imp_list = imp_list_array[id * 2 + val];
-	sort(imp_list.begin(), imp_list.end());
-	vector<ImpVal>::iterator p = unique(imp_list.begin(), imp_list.end());
-	imp_list.erase(p, imp_list.end());
+	sort_unique(imp_list);
 	imp_mgr.set_ind_imp(node, val, imp_list);
       }
     }
@@ -457,23 +460,18 @@ NaImp::learning(ImpMgr& imp_mgr,
     }
     ImpNode* node = imp_mgr.node(id);
 
-    // node に 0 を割り当てる．
-    bool ok0 = imp_mgr.assert(node, 0);
-    if ( !ok0 ) {
-      // node は1固定
-      cout << "Node#" << id << " is const-1" << endl;
-      imp_mgr.set_const(id, 1);
+    for (ymuint val = 0; val < 2; ++ val) {
+      // node に val を割り当てる．
+      bool ok = imp_mgr.assert(node, val);
+      imp_mgr.backtrack();
+      if ( !ok ) {
+	// node は (val ^ 1)固定
+	cout << "Node#" << id << " is const-" << (val ^ 1) << endl;
+	imp_mgr.set_const(id, val ^ 1);
+	imp_mgr.assert(node, val ^ 1);
+	break;
+      }
     }
-    imp_mgr.backtrack();
-
-    // node に 1 を割り当てる．
-    bool ok1 = imp_mgr.assert(node, 1);
-    if ( !ok1 ) {
-      // node は0固定
-      cout << "Node#" << id << " is const-0" << endl;
-      imp_mgr.set_const(id, 0);
-    }
-    imp_mgr.backtrack();
   }
 #if 0
   check_const(imp_mgr, imp_info);
