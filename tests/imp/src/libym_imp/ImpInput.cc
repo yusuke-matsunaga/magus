@@ -293,4 +293,16 @@ ImpInput::bwd_imp1(ImpMgr& mgr)
   return true;
 }
 
+// @brief 定数伝搬を行なう．
+// @param[in] mgr ImMgr
+// @param[in] val 値
+// @param[in] ipos 入力位置
+void
+ImpInput::prop_const(ImpMgr& mgr,
+		     ymuint val,
+		     ymuint ipos)
+{
+  assert_not_reached( __FILE__, __LINE__);
+}
+
 END_NAMESPACE_YM_NETWORKS

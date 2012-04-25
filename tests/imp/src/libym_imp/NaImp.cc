@@ -71,14 +71,14 @@ NaImp::learning(ImpMgr& imp_mgr,
 {
   cerr << "NaImp start" << endl;
 
+  StopWatch timer;
+  timer.start();
+
   ymuint n = imp_mgr.node_num();
 
   imp_info.set_size(n);
 
   vector<ImpValList> imp_lists(n * 2);
-
-  StopWatch timer;
-  timer.start();
 
   // direct_imp の情報を imp_lists にコピーする．
   {
@@ -118,9 +118,6 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  // node は src_val1 固定
 	  cout << "Node#" << src_id << " is const-" << src_val1 << endl;
 	  imp_mgr.set_const(src_id, src_val1);
-#if 0
-	  imp_mgr.assert(node, src_val1);
-#endif
 	  break;
 	}
       }
@@ -133,7 +130,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	vector<ImpVal>& imp_list = imp_lists_array[i * 2 + val];
 	sort_unique(imp_list);
 	ImpValList& dst_list = imp_lists[i * 2 + val];
-	dst_list.set(imp_list);
+	dst_list.set(imp_mgr, imp_list);
 	dst_list.set_change1();
 	dst_list.set_change2();
       }
@@ -203,60 +200,78 @@ NaImp::learning(ImpMgr& imp_mgr,
 	ymuint idx1_1 = idx1_0 ^ 1;
 
 	// 出力が0になる条件は入力が0になる条件のユニオン
-	{
-	  if ( debug ) {
-	    cout << "Node#" << id << ":0" << endl;
-	  }
-	  const ImpValList& src1_list = imp_lists[idx0_0];
-	  const ImpValList& src2_list = imp_lists[idx1_0];
-	  ImpValList& dst_list = imp_lists[idx_0];
-	  dst_list.reset_change1();
-	  ymuint old_num = dst_list.num();
-	  if ( src1_list.changed() ) {
-	    dst_list.merge(src1_list);
-	  }
-	  if ( src2_list.changed() ) {
-	    dst_list.merge(src2_list);
-	  }
-	  ymuint delta1 = dst_list.num() - old_num;
-	  if ( delta1 > 0 ) {
-	    dst_list.set_change1();
-	  }
-	  delta += delta1;
-	  if ( debug ) {
-	    if ( delta1 > 0 ) {
-	      cout << " Node#" << id << ":0 changed" << endl;
-	    }
-	    dst_list.print(cout);
-	    cout << endl
-		 << endl;
-	  }
+	if ( imp_mgr.is_const(id0) ) {
+	  // ファンイン0が定数(たぶん1)だった．
+	  assert_cond( imp_mgr.is_const1(id0), __FILE__, __LINE__);
+	  assert_cond( !imp_mgr.is_const(id1), __FILE__, __LINE__);
+	  // ファンイン1の条件をそのままコピー
+	  imp_lists[idx_0].merge(imp_lists[idx1_0]);
+	  imp_lists[idx_1].merge(imp_lists[idx1_1]);
 	}
-	// 出力が1になる条件は入力が1になる条件のインターセクション
-	{
-	  if ( debug ) {
-	    cout << "Node#" << id << ":1" << endl;
-	  }
-	  const ImpValList& src1_list = imp_lists[idx0_1];
-	  const ImpValList& src2_list = imp_lists[idx1_1];
-	  ImpValList& dst_list = imp_lists[idx_1];
-	  dst_list.reset_change1();
-	  ymuint old_num = dst_list.num();
-	  if ( src1_list.changed() ||
-	       src2_list.changed() ) {
-	    dst_list.cap_merge(src1_list, src2_list);
-	  }
-	  ymuint delta1 = dst_list.num() - old_num;
-	  if ( delta1 > 0 ) {
-	    dst_list.set_change1();
-	  }
-	  delta += delta1;
-	  if ( debug ) {
-	    if ( delta1 > 0 ) {
-	      cout << " Node#" << id << ":1 changed" << endl;
+	else if ( imp_mgr.is_const(id1) ) {
+	  // ファンイン1が定数(たぶん1)だった．
+	  assert_cond( imp_mgr.is_const1(id1), __FILE__, __LINE__);
+	  assert_cond( !imp_mgr.is_const(id0), __FILE__, __LINE__);
+	  // ファンイン0の条件をそのままコピー
+	  imp_lists[idx_0].merge(imp_lists[idx0_0]);
+	  imp_lists[idx_1].merge(imp_lists[idx0_1]);
+	}
+	else {
+	  {
+	    if ( debug ) {
+	      cout << "Node#" << id << ":0" << endl;
 	    }
-	    dst_list.print(cout);
-	    cout << endl << endl;
+	    const ImpValList& src1_list = imp_lists[idx0_0];
+	    const ImpValList& src2_list = imp_lists[idx1_0];
+	    ImpValList& dst_list = imp_lists[idx_0];
+	    dst_list.reset_change1();
+	    ymuint old_num = dst_list.num();
+	    if ( src1_list.changed() ) {
+	      dst_list.merge(src1_list);
+	    }
+	    if ( src2_list.changed() ) {
+	      dst_list.merge(src2_list);
+	    }
+	    ymuint delta1 = dst_list.num() - old_num;
+	    if ( delta1 > 0 ) {
+	      dst_list.set_change1();
+	    }
+	    delta += delta1;
+	    if ( debug ) {
+	      if ( delta1 > 0 ) {
+		cout << " Node#" << id << ":0 changed" << endl;
+	      }
+	      dst_list.print(cout);
+	      cout << endl
+		   << endl;
+	    }
+	  }
+	  // 出力が1になる条件は入力が1になる条件のインターセクション
+	  {
+	    if ( debug ) {
+	      cout << "Node#" << id << ":1" << endl;
+	    }
+	    const ImpValList& src1_list = imp_lists[idx0_1];
+	    const ImpValList& src2_list = imp_lists[idx1_1];
+	    ImpValList& dst_list = imp_lists[idx_1];
+	    dst_list.reset_change1();
+	    ymuint old_num = dst_list.num();
+	    if ( src1_list.changed() ||
+		 src2_list.changed() ) {
+	      dst_list.cap_merge(src1_list, src2_list);
+	    }
+	    ymuint delta1 = dst_list.num() - old_num;
+	    if ( delta1 > 0 ) {
+	      dst_list.set_change1();
+	    }
+	    delta += delta1;
+	    if ( debug ) {
+	      if ( delta1 > 0 ) {
+		cout << " Node#" << id << ":1 changed" << endl;
+	      }
+	      dst_list.print(cout);
+	      cout << endl << endl;
+	    }
 	  }
 	}
       }
@@ -294,7 +309,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  bool sinv = other_edge.src_inv();
 	  ymuint sidx_1 = sid * 2 + (sinv ? 0 : 1);
 
-	  // 出力の0の条件と他方のファンイン1の1の条件の共通部分が
+	  // 出力の0の条件と他方のファンインの1の条件の共通部分が
 	  // 0の条件となる．
 	  {
 	    if ( debug ) {
@@ -375,7 +390,9 @@ NaImp::learning(ImpMgr& imp_mgr,
 	    if ( src_id == id ) {
 	      continue;
 	    }
-	    tmp_list_array[src_id * 2 + (src_val ^ 1)].push_back(ImpVal(id, val ^ 1));
+	    ymuint val1 = val ^ 1;
+	    ymuint src_val1 = src_val ^ 1;
+	    tmp_list_array[src_id * 2 + src_val1].push_back(ImpVal(id, val1));
 	  }
 	}
       }

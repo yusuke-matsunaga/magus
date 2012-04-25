@@ -480,11 +480,13 @@ ImpAnd::fwd0_imp0(ImpMgr& mgr)
   switch ( mState ) {
   case kStXX_X: // XX:X -> 0X:0
     change_value(mgr, kSt0X_0);
+    cout << "Node#" << id() << " ==> 0" << endl;
     // ファンアウト先に0を伝搬する．
     return mgr.fanout_prop0(this, NULL);
 
   case kStX1_X: // X1:X -> 01:0
     change_value(mgr, kSt01_0);
+    cout << "Node#" << id() << " ==> 0" << endl;
     // ファンアウト先に0を伝搬する．
     return mgr.fanout_prop0(this, NULL);
 
@@ -525,6 +527,7 @@ ImpAnd::fwd0_imp1(ImpMgr& mgr)
 
   case kStX1_X: // X1:X -> 11:1
     change_value(mgr, kSt11_1);
+    cout << "Node#" << id() << " ==> 1" << endl;
     // ファンアウト先に1を伝搬する．
     return mgr.fanout_prop1(this, NULL);
 
@@ -562,11 +565,13 @@ ImpAnd::fwd1_imp0(ImpMgr& mgr)
   switch ( mState ) {
   case kStXX_X: // XX:X -> X0:0
     change_value(mgr, kStX0_0);
+    cout << "Node#" << id() << " ==> 0" << endl;
     // ファンアウト先に0を伝搬する．
     return mgr.fanout_prop0(this, NULL);
 
   case kSt1X_X: // 1X:X -> 10:0
     change_value(mgr, kSt10_0);
+    cout << "Node#" << id() << " ==> 0" << endl;
     // ファンアウト先に0を伝搬する．
     return mgr.fanout_prop0(this, NULL);
 
@@ -607,6 +612,7 @@ ImpAnd::fwd1_imp1(ImpMgr& mgr)
 
   case kSt1X_X: // 1X:X -> 11:1
     change_value(mgr, kSt11_1);
+    cout << "Node#" << id() << " ==> 1" << endl;
     // ファンアウト先に1を伝搬する．
     return mgr.fanout_prop1(this, NULL);
 
@@ -712,6 +718,138 @@ ImpAnd::bwd_imp1(ImpMgr& mgr)
     break;
   }
   return true;
+}
+
+// @brief 定数伝搬を行なう．
+// @param[in] mgr ImMgr
+// @param[in] val 値
+// @param[in] ipos 入力位置
+void
+ImpAnd::prop_const(ImpMgr& mgr,
+		   ymuint val,
+		   ymuint ipos)
+{
+  switch ( mState ) {
+  case kStXX_X:
+    if ( ipos == 0 ) {
+      if ( val == 0 ) {
+	mState = kSt0X_0;
+	mgr.set_const(id(), 0);
+      }
+      else {
+	mState = kSt1X_X;
+      }
+    }
+    else {
+      if ( val == 0 ) {
+	mState = kStX0_0;
+	mgr.set_const(id(), 0);
+      }
+      else {
+	mState = kStX1_X;
+      }
+    }
+    break;
+
+  case kStX1_X:
+    if ( ipos == 0 ) {
+      if ( val == 0 ) {
+	mState = kSt01_0;
+	mgr.set_const(id(), 0);
+      }
+      else {
+	mState = kSt11_1;
+	mgr.set_const(id(), 1);
+      }
+    }
+    else {
+      assert_cond( val == 1, __FILE__, __LINE__);
+    }
+    break;
+
+  case kSt1X_X:
+    if ( ipos == 0 ) {
+      assert_cond( val == 1, __FILE__, __LINE__);
+    }
+    else {
+      if ( val == 0 ) {
+	mState = kSt10_0;
+	mgr.set_const(id(), 0);
+      }
+      else {
+	mState = kSt11_1;
+	mgr.set_const(id(), 1);
+      }
+    }
+    break;
+
+  case kStXX_0:
+    if ( ipos == 0 ) {
+      if ( val == 0 ) {
+	mState = kSt0X_0;
+      }
+      else {
+	mState = kSt10_0;
+      }
+    }
+    else {
+      if ( val == 0 ) {
+	mState = kStX0_0;
+      }
+      else {
+	mState = kSt01_0;
+      }
+    }
+    break;
+
+  case kStX0_0:
+    if ( ipos == 0 ) {
+      // どうでもいい
+    }
+    else {
+      assert_cond( val == 0, __FILE__, __LINE__);
+    }
+    break;
+
+  case kSt0X_0:
+    if ( ipos == 0 ) {
+      assert_cond( val == 0, __FILE__, __LINE__);
+    }
+    else {
+      // どうでもいい
+    }
+    break;
+
+  case kSt00_0:
+    assert_cond( val == 0, __FILE__, __LINE__);
+    break;
+
+  case kSt01_0:
+    if ( ipos == 0 ) {
+      assert_cond( val == 0, __FILE__, __LINE__);
+    }
+    else {
+      assert_cond( val == 1, __FILE__, __LINE__);
+    }
+    break;
+
+  case kSt10_0:
+    if ( ipos == 0 ) {
+      assert_cond( val == 1, __FILE__, __LINE__);
+    }
+    else {
+      assert_cond( val == 0, __FILE__, __LINE__);
+    }
+    break;
+
+  case kSt11_1:
+    assert_cond( val == 1, __FILE__, __LINE__);
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
 }
 
 // @brief 値を変える．

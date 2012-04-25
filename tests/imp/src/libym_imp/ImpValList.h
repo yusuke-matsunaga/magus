@@ -15,6 +15,7 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
+class ImpMgr;
 class ImpValListIter;
 
 //////////////////////////////////////////////////////////////////////
@@ -41,7 +42,8 @@ public:
 
   /// @brief 要素のリストをセットする．
   void
-  set(const vector<ImpVal>& val_list);
+  set(ImpMgr& mgr,
+      const vector<ImpVal>& val_list);
 
   /// @brief リストの内容をマージする．
   void

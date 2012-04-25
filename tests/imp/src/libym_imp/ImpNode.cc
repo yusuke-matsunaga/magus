@@ -54,6 +54,26 @@ ImpNode::is_and() const
   return false;
 }
 
+// @brief 定数に設定する．
+// @param[in] mgr ImMgr
+// @param[in] val 値
+void
+ImpNode::set_const(ImpMgr& mgr,
+		   ymuint val)
+{
+  const vector<ImpEdge*>& fo_list = fanout_list();
+  for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
+       p != fo_list.end(); ++ p) {
+    ImpEdge* e = *p;
+    ImpNode* dst_node = e->dst_node();
+    ymuint val1 = val;
+    if ( e->src_inv() ) {
+      val1 ^= 1;
+    }
+    dst_node->prop_const(mgr, val1, e->dst_pos());
+  }
+}
+
 // @brief 0の間接含意を行う．
 bool
 ImpNode::ind_imp0(ImpMgr& mgr)

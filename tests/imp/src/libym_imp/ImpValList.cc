@@ -8,6 +8,7 @@
 
 
 #include "ImpValList.h"
+#include "ImpMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -47,12 +48,17 @@ ImpValList::num() const
 
 // @brief 要素のリストをセットする．
 void
-ImpValList::set(const vector<ImpVal>& val_list)
+ImpValList::set(ImpMgr& mgr,
+		const vector<ImpVal>& val_list)
 {
   assert_cond( mDummyTop.mLink == NULL, __FILE__, __LINE__);
   Cell* last = &mDummyTop;
-  for (vector<ImpVal>::const_iterator p = val_list.begin(); p != val_list.end(); ++ p) {
+  for (vector<ImpVal>::const_iterator p = val_list.begin();
+       p != val_list.end(); ++ p) {
     const ImpVal& val = *p;
+    if ( mgr.is_const(val.id()) ) {
+      continue;
+    }
     Cell* new_cell = get_cell();
     new_cell->mVal = val;
     last->mLink = new_cell;

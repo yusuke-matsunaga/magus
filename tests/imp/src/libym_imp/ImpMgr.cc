@@ -331,6 +331,8 @@ ImpMgr::set_const(ymuint id,
 		  ymuint val)
 {
   mConstArray[id] = (val << 1) | 1U;
+  ImpNode* node = mNodeList[id];
+  node->set_const(*this, val);
 }
 
 // @brief ノードを登録する．

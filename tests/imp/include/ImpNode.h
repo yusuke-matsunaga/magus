@@ -384,11 +384,30 @@ public:
   bool
   bwd_imp1(ImpMgr& mgr) = 0;
 
+  /// @brief 定数に設定する．
+  /// @param[in] mgr ImMgr
+  /// @param[in] val 値
+  void
+  set_const(ImpMgr& mgr,
+	    ymuint val);
+
+  /// @brief 定数伝搬を行なう．
+  /// @param[in] mgr ImMgr
+  /// @param[in] val 値
+  /// @param[in] ipos 入力位置
+  virtual
+  void
+  prop_const(ImpMgr& mgr,
+	     ymuint val,
+	     ymuint ipos) = 0;
+
   /// @brief 0の間接含意を行う．
+  /// @param[in] mgr ImMgr
   bool
   ind_imp0(ImpMgr& mgr);
 
   /// @brief 1の間接含意を行う．
+  /// @param[in] mgr ImMgr
   bool
   ind_imp1(ImpMgr& mgr);
 

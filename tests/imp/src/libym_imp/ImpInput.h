@@ -186,6 +186,16 @@ public:
   bool
   bwd_imp1(ImpMgr& mgr);
 
+  /// @brief 定数伝搬を行なう．
+  /// @param[in] mgr ImMgr
+  /// @param[in] val 値
+  /// @param[in] ipos 入力位置
+  virtual
+  void
+  prop_const(ImpMgr& mgr,
+	     ymuint val,
+	     ymuint ipos);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
