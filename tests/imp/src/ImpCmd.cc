@@ -21,6 +21,7 @@
 #include "SatImp.h"
 #include "RlImp.h"
 #include "NaImp.h"
+#include "CnfImp.h"
 #include "ConstImp.h"
 
 
@@ -177,7 +178,7 @@ LearningCmd::LearningCmd(ImpData* imp_data) :
 {
   mPoptMethod = new TclPoptStr(this, "method",
 			       "specify learning algorithm",
-			       "direct|contra|recursive|naive|naive2|exact");
+			       "direct|contra|recursive|naive|naive2|cnf|exact");
   mPoptLevel = new TclPoptInt(this, "level",
 			      "specify recursive learing level",
 			      "integer");
@@ -229,6 +230,10 @@ LearningCmd::cmd_proc(TclObjVector& objv)
   else if ( method == "naive2" ) {
     NaImp imp;
     imp.use_contra(false);
+    imp.learning(mgr(), imp_info);
+  }
+  else if ( method == "cnf" ) {
+    CnfImp imp;
     imp.learning(mgr(), imp_info);
   }
   else if ( method == "exact" ) {

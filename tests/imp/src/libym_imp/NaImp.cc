@@ -499,7 +499,6 @@ NaImp::learning(ImpMgr& imp_mgr,
 	// node は (val ^ 1)固定
 	cout << "Node#" << id << " is const-" << (val ^ 1) << endl;
 	imp_mgr.set_const(id, val ^ 1);
-	imp_mgr.assert(node, val ^ 1);
 	break;
       }
     }
