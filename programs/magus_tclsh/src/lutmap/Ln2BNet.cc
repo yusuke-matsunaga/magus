@@ -34,16 +34,18 @@ Ln2BNet::operator()(const LnGraph& src_network,
   for (LnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     const LnNode* src_node = *p;
-    const LnPort* port = src_network.port(src_node);
     string name;
-    if ( port->bit_width() == 1 ) {
-      name = port->name();
-    }
-    else {
-      // 手抜き
-      ostringstream buf;
-      buf << port->name() << "[" << src_network.port_pos(src_node) << "]";
-      name = buf.str();
+    const LnPort* port = src_network.port(src_node);
+    if ( port ) {
+      if ( port->bit_width() == 1 ) {
+	name = port->name();
+      }
+      else {
+	// 手抜き
+	ostringstream buf;
+	buf << port->name() << "[" << src_network.port_pos(src_node) << "]";
+	name = buf.str();
+      }
     }
     BNode* dst_node = manip.new_input(name);
     node_assoc[src_node->id()] = dst_node;
@@ -112,16 +114,18 @@ Ln2BNet::operator()(const LnGraph& src_network,
     BNode* dst_inode = node_assoc[inode->id()];
     assert_cond(dst_inode, __FILE__, __LINE__);
 
-    const LnPort* port = src_network.port(onode);
     string name;
-    if ( port->bit_width() == 1 ) {
-      name = port->name();
-    }
-    else {
-      // 手抜き
-      ostringstream buf;
-      buf << port->name() << "[" << src_network.port_pos(onode) << "]";
-      name = buf.str();
+    const LnPort* port = src_network.port(onode);
+    if ( port ) {
+      if ( port->bit_width() == 1 ) {
+	name = port->name();
+      }
+      else {
+	// 手抜き
+	ostringstream buf;
+	buf << port->name() << "[" << src_network.port_pos(onode) << "]";
+	name = buf.str();
+      }
     }
     BNode* dst_onode = manip.new_output(name);
     bool stat = manip.change_output(dst_onode, dst_inode);
