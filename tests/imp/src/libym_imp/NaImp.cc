@@ -46,12 +46,20 @@ END_NONAMESPACE
 // @brief コンストラクタ
 NaImp::NaImp()
 {
+  mUseDI = true;
   mUseContra = true;
 }
 
 // @brief デストラクタ
 NaImp::~NaImp()
 {
+}
+
+// @brief 直接含意を用いるかどうかのフラグをセットする．
+void
+NaImp::use_di(bool use)
+{
+  mUseDI = use;
 }
 
 // @brief 対偶の関係を用いるかどうかのフラグをセットする．
@@ -96,29 +104,31 @@ NaImp::learning(ImpMgr& imp_mgr,
 	// 自分自身を追加する．
 	imp_lists_array[src_id * 2 + src_val].push_back(ImpVal(src_id, src_val));
 
-	// node に src_val を割り当てる．
-	vector<ImpVal> imp_list;
-	bool ok = imp_mgr.assert(node, src_val, imp_list);
-	imp_mgr.backtrack();
-	if ( ok ) {
-	  for (vector<ImpVal>::const_iterator p = imp_list.begin();
-	       p != imp_list.end(); ++ p) {
-	    ymuint dst_id = p->id();
-	    if ( imp_mgr.is_const(dst_id) ) {
-	      continue;
+	if ( mUseDI ) {
+	  // node に src_val を割り当てる．
+	  vector<ImpVal> imp_list;
+	  bool ok = imp_mgr.assert(node, src_val, imp_list);
+	  imp_mgr.backtrack();
+	  if ( ok ) {
+	    for (vector<ImpVal>::const_iterator p = imp_list.begin();
+		 p != imp_list.end(); ++ p) {
+	      ymuint dst_id = p->id();
+	      if ( imp_mgr.is_const(dst_id) ) {
+		continue;
+	      }
+	      ymuint dst_val = p->val();
+	      ymuint dst_val1 = dst_val ^ 1;
+	      imp_lists_array[dst_id * 2 + dst_val].push_back(ImpVal(src_id, src_val));
+	      imp_lists_array[src_id * 2 + src_val1].push_back(ImpVal(dst_id, dst_val1));
 	    }
-	    ymuint dst_val = p->val();
-	    ymuint dst_val1 = dst_val ^ 1;
-	    imp_lists_array[dst_id * 2 + dst_val].push_back(ImpVal(src_id, src_val));
-	    imp_lists_array[src_id * 2 + src_val1].push_back(ImpVal(dst_id, dst_val1));
 	  }
-	}
-	else {
-	  // 単一の割り当てで矛盾が起こった．
-	  // node は src_val1 固定
-	  cout << "Node#" << src_id << " is const-" << src_val1 << endl;
-	  imp_mgr.set_const(src_id, src_val1);
-	  break;
+	  else {
+	    // 単一の割り当てで矛盾が起こった．
+	    // node は src_val1 固定
+	    cout << "Node#" << src_id << " is const-" << src_val1 << endl;
+	    imp_mgr.set_const(src_id, src_val1);
+	    break;
+	  }
 	}
       }
     }
@@ -462,7 +472,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	}
       }
     }
-#if 0
+#if 1
     // imp_list_array の内容を imp_info にコピーする．
     imp_info.set(imp_list_array);
 

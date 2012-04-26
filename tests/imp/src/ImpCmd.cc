@@ -225,11 +225,26 @@ LearningCmd::cmd_proc(TclObjVector& objv)
   }
   else if ( method == "naive" ) {
     NaImp imp;
+    imp.use_di(false);
+    imp.use_contra(false);
+    imp.learning(mgr(), imp_info);
+  }
+  else if ( method == "naive1" ) {
+    NaImp imp;
+    imp.use_di(true);
+    imp.use_contra(false);
     imp.learning(mgr(), imp_info);
   }
   else if ( method == "naive2" ) {
     NaImp imp;
-    imp.use_contra(false);
+    imp.use_di(false);
+    imp.use_contra(true);
+    imp.learning(mgr(), imp_info);
+  }
+  else if ( method == "naive3" ) {
+    NaImp imp;
+    imp.use_di(true);
+    imp.use_contra(true);
     imp.learning(mgr(), imp_info);
   }
   else if ( method == "cnf" ) {
