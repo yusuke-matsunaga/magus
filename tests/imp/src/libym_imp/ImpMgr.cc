@@ -331,7 +331,7 @@ ImpMgr::set_const(ymuint id,
 		  ymuint val)
 {
   mConstArray[id] = (val << 1) | 1U;
-  ImpNode* node = mNodeList[id];
+  ImpNode* node = this->node(id);
   node->set_const(*this, val);
 }
 
@@ -543,11 +543,11 @@ ImpMgr::bwd_prop0(ImpNode* node,
 		  ImpNode* from_node,
 		  vector<ImpVal>& imp_list)
 {
-  if ( node->id() != mSrcId && node->val() == kB3X ) {
-    imp_list.push_back(ImpVal(node->id(), 0));
+  bool stat = node->bwd_imp0(*this, imp_list);
+  if ( stat ) {
+    stat = fanout_prop0(node, from_node, imp_list);
   }
-  fanout_prop0(node, from_node, imp_list);
-  return node->bwd_imp0(*this, imp_list);
+  return stat;
 }
 
 // @brief ノードに後方含意で1を割り当てる．
@@ -561,11 +561,11 @@ ImpMgr::bwd_prop1(ImpNode* node,
 		  ImpNode* from_node,
 		  vector<ImpVal>& imp_list)
 {
-  if ( node->id() != mSrcId && node->val() == kB3X ) {
-    imp_list.push_back(ImpVal(node->id(), 1));
+  bool stat = node->bwd_imp1(*this, imp_list);
+  if ( stat ) {
+    stat = fanout_prop1(node, from_node, imp_list);
   }
-  fanout_prop1(node, from_node, imp_list);
-  return node->bwd_imp1(*this, imp_list);
+  return stat;
 }
 
 // @brief ノードに値を設定し含意操作を行う．
@@ -864,18 +864,22 @@ ImpMgr::get_unodelist(vector<ImpNode*>& unode_list)
 void
 ImpMgr::set_unjustified(ImpNode* node)
 {
+#if 0
   assert_cond( node->mListIter == mUnodeList.end(), __FILE__, __LINE__);
   mUnodeList.push_back(node);
   node->mListIter = mUnodeList.end();
   -- node->mListIter;
+#endif
 }
 
 // @brief ノードが unjustified でなくなったときの処理を行なう．
 void
 ImpMgr::reset_unjustified(ImpNode* node)
 {
+#if 0
   mUnodeList.erase(node->mListIter);
   node->mListIter = mUnodeList.end();
+#endif
 }
 
 // @brief ラーニング結果を各ノードに設定する．
@@ -903,40 +907,40 @@ ImpMgr::print_network(ostream& s) const
 {
   ymuint n = mNodeArray.size();
   for (ymuint i = 0; i < n; ++ i) {
-    ImpNode* node = mNodeArray[i];
+    ImpNode* node = this->node(i);
     if ( node == NULL ) continue;
-    cout << "Node#" << node->id() << ":";
+    s << "Node#" << node->id() << ":";
     if ( node->is_input() ) {
-      cout << "INPUT";
+      s << "INPUT";
     }
     else if ( node->is_and() ) {
-      cout << "AND";
+      s << "AND";
     }
-    cout << endl;
+    s << endl;
 
     if ( node->is_and() ) {
       const ImpEdge& e0 = node->fanin0();
-      cout << "  Fanin0: " << e0.src_node()->id();
+      s << "  Fanin0: " << e0.src_node()->id();
       if ( e0.src_inv() ) {
-	cout << "~";
+	s << "~";
       }
-      cout << endl;
+      s << endl;
       const ImpEdge& e1 = node->fanin1();
-      cout << "  Fanin1: " << e1.src_node()->id();
+      s << "  Fanin1: " << e1.src_node()->id();
       if ( e1.src_inv() ) {
-	cout << "~";
+	s << "~";
       }
-      cout << endl;
+      s << endl;
     }
 
-    cout << "  Fanouts: ";
+    s << "  Fanouts: ";
     const vector<ImpEdge*>& fo_list = node->fanout_list();
     for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
 	 p != fo_list.end(); ++ p ) {
       ImpEdge* e = *p;
-      cout << " (" << e->dst_node()->id() << ", " << e->dst_pos() << ")";
+      s << " (" << e->dst_node()->id() << ", " << e->dst_pos() << ")";
     }
-    cout << endl;
+    s << endl;
   }
 }
 

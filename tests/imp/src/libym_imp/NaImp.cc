@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 BEGIN_NONAMESPACE
 
 #if defined(YM_DEBUG)
-bool debug = false;
+bool debug = true;
 #else
 bool debug = false;
 #endif
@@ -201,16 +201,14 @@ NaImp::learning(ImpMgr& imp_mgr,
 
 	// 出力が0になる条件は入力が0になる条件のユニオン
 	if ( imp_mgr.is_const(id0) ) {
-	  // ファンイン0が定数(たぶん1)だった．
-	  assert_cond( imp_mgr.is_const1(id0), __FILE__, __LINE__);
+	  // ファンイン0が定数だった．
 	  assert_cond( !imp_mgr.is_const(id1), __FILE__, __LINE__);
 	  // ファンイン1の条件をそのままコピー
 	  imp_lists[idx_0].merge(imp_lists[idx1_0]);
 	  imp_lists[idx_1].merge(imp_lists[idx1_1]);
 	}
 	else if ( imp_mgr.is_const(id1) ) {
-	  // ファンイン1が定数(たぶん1)だった．
-	  assert_cond( imp_mgr.is_const1(id1), __FILE__, __LINE__);
+	  // ファンイン1が定数だった．
 	  assert_cond( !imp_mgr.is_const(id0), __FILE__, __LINE__);
 	  // ファンイン0の条件をそのままコピー
 	  imp_lists[idx_0].merge(imp_lists[idx0_0]);
@@ -309,6 +307,22 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  bool sinv = other_edge.src_inv();
 	  ymuint sidx_1 = sid * 2 + (sinv ? 0 : 1);
 
+	  if ( imp_mgr.is_const(oid) ) {
+	    // 出力が定数だった．
+	    continue;
+	  }
+	  if ( imp_mgr.is_const1(sid) ) {
+	    // 他方のファンインが定数1だった
+	    if ( inv ) {
+	      dst0_list.merge(imp_lists[oidx_1]);
+	      dst1_list.merge(imp_lists[oidx_0]);
+	    }
+	    else {
+	      dst0_list.merge(imp_lists[oidx_0]);
+	      dst1_list.merge(imp_lists[oidx_1]);
+	    }
+	    continue;
+	  }
 	  // 出力の0の条件と他方のファンインの1の条件の共通部分が
 	  // 0の条件となる．
 	  {

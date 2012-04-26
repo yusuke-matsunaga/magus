@@ -469,6 +469,7 @@ ImpNode*
 ImpMgr::node(ymuint id) const
 {
   assert_cond( id < mNodeArray.size(), __FILE__, __LINE__);
+  assert_cond( mNodeArray[id]->id() == id, __FILE__, __LINE__);
   return mNodeArray[id];
 }
 

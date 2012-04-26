@@ -282,6 +282,54 @@ CheckConstCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// クラス PrintCmd
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] imp_data 共通のデータ
+PrintCmd::PrintCmd(ImpData* imp_data) :
+  ImpCmd(imp_data)
+{
+  set_usage_string("?<filename>?");
+}
+
+// @brief デストラクタ
+PrintCmd::~PrintCmd()
+{
+}
+
+// @brief コマンドを実行する仮想関数
+int
+PrintCmd::cmd_proc(TclObjVector& objv)
+{
+  ymuint objc = objv.size();
+
+  // このコマンドはファイル名のみを引数にとる．
+  // 引数がなければ標準出力に出す．
+  if ( objc > 2 ) {
+    print_usage();
+    return TCL_ERROR;
+  }
+
+  // 出力先のファイルを開く
+  ostream* osp = &cout;
+  ofstream ofs;
+  if ( objc == 2 ) {
+    string filename = objv[1];
+    if ( !open_ofile(ofs, filename) ) {
+      // ファイルが開けなかった．
+      return TCL_ERROR;
+    }
+    osp = &ofs;
+  }
+
+  mgr().print_network(*osp);
+
+  return TCL_OK;
+}
+
 END_NAMESPACE_YM_NETWORKS
 
 
@@ -313,6 +361,7 @@ imp_init(Tcl_Interp* interp)
   TclCmdBinder1<ReadIscas89Cmd, ImpData*>::reg(interp, data, "imp::read_iscas89");
   TclCmdBinder1<LearningCmd, ImpData*>::reg(interp, data, "imp::learning");
   TclCmdBinder1<CheckConstCmd, ImpData*>::reg(interp, data, "imp::check_const");
+  TclCmdBinder1<PrintCmd, ImpData*>::reg(interp, data, "imp::print_network");
 
 
   //////////////////////////////////////////////////////////////////////
@@ -326,6 +375,7 @@ imp_init(Tcl_Interp* interp)
     "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
     "proc complete(learning) { t s e l p m } { return \"\" }\n"
     "proc complete(check_const) { t s e l p m } { return \"\" }\n"
+    "proc complete(print_network) { t s e l p m } { return \"\" }\n"
     "}\n"
     "}\n";
   if ( Tcl_Eval(interp, completer) == TCL_ERROR ) {

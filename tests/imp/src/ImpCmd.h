@@ -192,6 +192,34 @@ protected:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+/// @class PrintCmd ImpCmd.h "ImpCmd.h"
+/// @brief ネットワークを出力するコマンド
+//////////////////////////////////////////////////////////////////////
+class PrintCmd :
+  public ImpCmd
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] imp_data 共通のデータ
+  PrintCmd(ImpData* imp_data);
+
+  /// @brief デストラクタ
+  virtual
+  ~PrintCmd();
+
+
+protected:
+
+  /// @brief コマンドを実行する仮想関数
+  virtual
+  int
+  cmd_proc(TclObjVector& objv);
+
+};
+
 END_NAMESPACE_YM_NETWORKS
 
 #endif // IMPCMD_H
