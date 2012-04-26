@@ -21,7 +21,7 @@ bin_PROGRAMS = \
 bb_SOURCES = \
 	bb.cc
 bb_LDADD = \
-	$(top_builddir)/imp/libym_imp/libym_imp.la \
+	$(top_builddir)/imp/src/libym_imp/libym_imp.la \
 	parser/libbb_parser.la \
 	pt/libbb_pt.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
