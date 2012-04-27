@@ -33,6 +33,7 @@ ImpNode::ImpNode(ImpNodeHandle handle0,
   if ( node1 != NULL ) {
     node1->mFanouts.push_back(&mFanins[1]);
   }
+  mConstState = 0U;
 }
 
 // @brief デストラクタ
@@ -61,6 +62,7 @@ void
 ImpNode::set_const(ImpMgr& mgr,
 		   ymuint val)
 {
+  mConstState = (1U << val);
   const vector<ImpEdge*>& fo_list = fanout_list();
   for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {

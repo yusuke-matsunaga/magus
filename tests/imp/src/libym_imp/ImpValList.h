@@ -86,6 +86,14 @@ public:
   void
   reset_change2();
 
+  /// @brief phase3 用フラグ
+  bool
+  changed3() const;
+
+  /// @brief phase3 用フラグを消す．
+  void
+  reset_change3();
+
   /// @brief 内容を出力する
   void
   print(ostream& s) const;
@@ -193,7 +201,7 @@ inline
 bool
 ImpValList::changed() const
 {
-  return mChanged != 0U;
+  return (mChanged & 3U) != 0U;
 }
 
 // @brief phase1 中で変化があったことを記録する．
@@ -201,7 +209,7 @@ inline
 void
 ImpValList::set_change1()
 {
-  mChanged |= 1U;
+  mChanged |= 5U;
 }
 
 // @brief change1 フラグを消す．
@@ -217,7 +225,7 @@ inline
 void
 ImpValList::set_change2()
 {
-  mChanged |= 2U;
+  mChanged |= 6U;
 }
 
 // @brief change2 フラグを消す．
@@ -226,6 +234,22 @@ void
 ImpValList::reset_change2()
 {
   mChanged &= ~2U;
+}
+
+// @brief phase3 用フラグ
+inline
+bool
+ImpValList::changed3() const
+{
+  return static_cast<bool>((mChanged >> 2) & 1);
+}
+
+// @brief phase3 用フラグを消す．
+inline
+void
+ImpValList::reset_change3()
+{
+  mChanged &= ~4U;
 }
 
 // @brief コンストラクタ

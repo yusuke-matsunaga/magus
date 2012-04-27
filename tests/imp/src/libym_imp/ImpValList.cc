@@ -220,6 +220,25 @@ ImpValList::end() const
 void
 ImpValList::print(ostream& s) const
 {
+  if ( mChanged & 1U ) {
+    s << "C";
+  }
+  else {
+    s << "-";
+  }
+  if ( mChanged & 2U ) {
+    s << "C";
+  }
+  else {
+    s << "-";
+  }
+  if ( mChanged & 4U ) {
+    s << "C";
+  }
+  else {
+    s << "-";
+  }
+  s << endl;
   for (Cell* cell = mDummyTop.mLink; cell; cell = cell->mLink) {
     const ImpVal& val = cell->mVal;
     cout << " ";

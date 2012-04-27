@@ -41,7 +41,6 @@ ImpMgr::clear()
   mInputArray.clear();
   mNodeList.clear();
   mNodeArray.clear();
-  mConstArray.clear();
   mBNodeMap.clear();
   mChgStack.clear();
 }
@@ -330,7 +329,6 @@ void
 ImpMgr::set_const(ymuint id,
 		  ymuint val)
 {
-  mConstArray[id] = (val << 1) | 1U;
   ImpNode* node = this->node(id);
   node->set_const(*this, val);
 }
@@ -341,7 +339,6 @@ ImpMgr::reg_node(ImpNode* node)
 {
   node->mId = mNodeArray.size();
   mNodeArray.push_back(node);
-  mConstArray.push_back(0U);
   node->mListIter = mUnodeList.end();
 }
 

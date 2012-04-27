@@ -408,9 +408,6 @@ private:
   // ImpNode のID番号をキーにしたノードの配列
   vector<ImpNode*> mNodeArray;
 
-  // 定数マークの配列
-  vector<ymuint8> mConstArray;
-
   // BNode と ImpNode の対応付けの情報を持つオブジェクト
   BNodeMap mBNodeMap;
 
@@ -478,7 +475,7 @@ inline
 bool
 ImpMgr::is_const(ymuint id) const
 {
-  return static_cast<bool>(mConstArray[id] & 1U);
+  return node(id)->is_const();
 }
 
 // @brief id 番めのノードが定数かどうか調べる．
@@ -486,7 +483,7 @@ inline
 bool
 ImpMgr::is_const0(ymuint id) const
 {
-  return mConstArray[id] == 1U;
+  return node(id)->is_const0();
 }
 
 // @brief id 番めのノードが定数かどうか調べる．
@@ -494,7 +491,7 @@ inline
 bool
 ImpMgr::is_const1(ymuint id) const
 {
-  return mConstArray[id] == 3U;
+  return node(id)->is_const1();
 }
 
 // @brief トポロジカル順のノードリストを得る．
