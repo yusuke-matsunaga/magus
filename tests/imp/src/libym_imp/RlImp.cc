@@ -11,6 +11,7 @@
 #include "ImpMgr.h"
 #include "ImpNode.h"
 #include "ImpInfo.h"
+#include "ImpListRec.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -107,7 +108,8 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
   ymuint n2 = imp_mgr.node_num();
 
   imp_list.clear();
-  bool ok = imp_mgr.assert(node, val, imp_list);
+  ImpListRec rec(node->id(), imp_list);
+  bool ok = imp_mgr.assert(node, val, rec);
 
   if ( debug ) {
     cout << "direct implications {" << endl;

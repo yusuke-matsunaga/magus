@@ -11,6 +11,7 @@
 #include "ImpMgr.h"
 #include "ImpInfo.h"
 #include "ImpNode.h"
+#include "ImpListRec.h"
 #include "ImpValList.h"
 #include "ym_utils/StopWatch.h"
 
@@ -107,7 +108,8 @@ NaImp::learning(ImpMgr& imp_mgr,
 	if ( mUseDI ) {
 	  // node に src_val を割り当てる．
 	  vector<ImpVal> imp_list;
-	  bool ok = imp_mgr.assert(node, src_val, imp_list);
+	  ImpListRec rec(src_id, imp_list);
+	  bool ok = imp_mgr.assert(node, src_val, rec);
 	  imp_mgr.backtrack();
 	  if ( ok ) {
 	    for (vector<ImpVal>::const_iterator p = imp_list.begin();

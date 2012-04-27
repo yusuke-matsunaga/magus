@@ -11,6 +11,7 @@
 #include "ImpMgr.h"
 #include "ImpNode.h"
 #include "ImpInfo.h"
+#include "ImpListRec.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -44,27 +45,17 @@ StrImp::learning(ImpMgr& imp_mgr,
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     ImpNode* node = imp_mgr.node(src_id);
 
-    // node に 0 を割り当てる．
-    vector<ImpVal>& imp_list0 = imp_list_array[src_id * 2 + 0];
-    bool ok0 = imp_mgr.assert(node, 0, imp_list0);
-    if ( !ok0 ) {
-      imp_list0.clear();
-      // 単一の割り当てで矛盾が起こった．
-      // node は 1 固定
-      imp_mgr.set_const(src_id, 1);
+    for (ymuint val = 0; val < 2; ++ val) {
+      // node に val を割り当てる．
+      ImpListRec rec(src_id, imp_list_array[src_id * 2 + val]);
+      bool ok = imp_mgr.assert(node, val, rec);
+      imp_mgr.backtrack();
+      if ( !ok ) {
+	// 単一の割り当てで矛盾が起こった．
+	// node は val ^ 1 固定
+	imp_mgr.set_const(src_id, val ^ 1);
+      }
     }
-    imp_mgr.backtrack();
-
-    // node に 1 を割り当てる．
-    vector<ImpVal>& imp_list1 = imp_list_array[src_id * 2 + 1];
-    bool ok1 = imp_mgr.assert(node, 1, imp_list1);
-    if ( !ok1 ) {
-      imp_list1.clear();
-      // 単一の割り当てで矛盾が起こった．
-      // node は 0 固定
-      imp_mgr.set_const(src_id, 0);
-    }
-    imp_mgr.backtrack();
   }
 
   // imp_list_array の内容を imp_info にコピーする．

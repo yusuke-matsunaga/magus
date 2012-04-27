@@ -19,6 +19,8 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
+class ImpRec;
+
 //////////////////////////////////////////////////////////////////////
 /// @class ImpMgr ImpMgr.h "ImpMgr.h"
 /// @brief ImpNode の含意操作を行うクラス
@@ -146,99 +148,99 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ラーニング用の含意操作を行う関数
+  // ImpRec を用いた含意関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ノードに値を設定し含意操作を行う．
   /// @param[in] node ノード
   /// @param[in] val 設定する値 ( 0 or 1 )
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
   assert(ImpNode* node,
 	 ymuint val,
-	 vector<ImpVal>& imp_list);
+	 ImpRec& rec);
 
   /// @brief ノードのファンアウト先に0を伝搬する．
   /// @param[in] node ノード
   /// @param[in] from 後方含意の場合の含意元のノード
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
   fanout_prop0(ImpNode* node,
 	       ImpNode* from,
-	       vector<ImpVal>& imp_list);
+	       ImpRec& rec);
 
   /// @brief ノードのファンアウト先に1を伝搬する．
   /// @param[in] node ノード
   /// @param[in] from 後方含意の場合の含意元のノード
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
   fanout_prop1(ImpNode* node,
 	       ImpNode* from,
-	       vector<ImpVal>& imp_list);
+	       ImpRec& rec);
 
   /// @brief ノードのファンイン0に0を伝搬する．
   /// @param[in] node ノード
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
   fanin0_prop0(ImpNode* node,
-	       vector<ImpVal>& imp_list);
+	       ImpRec& rec);
 
   /// @brief ノードのファンイン0に1を伝搬する．
   /// @param[in] node ノード
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
   fanin0_prop1(ImpNode* node,
-	       vector<ImpVal>& imp_list);
+	       ImpRec& rec);
 
   /// @brief ノードのファンイン1に0を伝搬する．
   /// @param[in] node ノード
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
   fanin1_prop0(ImpNode* node,
-	       vector<ImpVal>& imp_list);
+	       ImpRec& rec);
 
   /// @brief ノードのファンイン1に1を伝搬する．
   /// @param[in] node ノード
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
   fanin1_prop1(ImpNode* node,
-	       vector<ImpVal>& imp_list);
+	       ImpRec& rec);
 
   /// @brief ノードに後方含意で0を割り当てる．
   /// @param[in] node ノード
   /// @param[in] from_node 含意元のノード
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
   bwd_prop0(ImpNode* node,
 	    ImpNode* from_node,
-	    vector<ImpVal>& imp_list);
+	    ImpRec& rec);
 
   /// @brief ノードに後方含意で1を割り当てる．
   /// @param[in] node ノード
   /// @param[in] from_node 含意元のノード
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
   bwd_prop1(ImpNode* node,
 	    ImpNode* from_node,
-	    vector<ImpVal>& imp_list);
+	    ImpRec& rec);
 
   /// @brief unjustified ノードを得る．
   void

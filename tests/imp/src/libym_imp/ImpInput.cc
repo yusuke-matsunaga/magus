@@ -112,10 +112,10 @@ ImpInput::get_justification(ymuint pos)
 
 // @brief ファンイン0を0にする．
 // @param[in] mgr ImMgr
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 bool
 ImpInput::fwd0_imp0(ImpMgr& mgr,
-		    vector<ImpVal>& imp_list)
+		    ImpRec& rec)
 {
   assert_not_reached(__FILE__, __LINE__);
   return false;
@@ -123,10 +123,10 @@ ImpInput::fwd0_imp0(ImpMgr& mgr,
 
 // @brief ファンイン0を1にする．
 // @param[in] mgr ImMgr
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 bool
 ImpInput::fwd0_imp1(ImpMgr& mgr,
-		    vector<ImpVal>& imp_list)
+		    ImpRec& rec)
 {
   assert_not_reached(__FILE__, __LINE__);
   return false;
@@ -134,10 +134,10 @@ ImpInput::fwd0_imp1(ImpMgr& mgr,
 
 // @brief ファンイン1を0にする．
 // @param[in] mgr ImMgr
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 bool
 ImpInput::fwd1_imp0(ImpMgr& mgr,
-		    vector<ImpVal>& imp_list)
+		    ImpRec& rec)
 {
   assert_not_reached(__FILE__, __LINE__);
   return false;
@@ -145,10 +145,10 @@ ImpInput::fwd1_imp0(ImpMgr& mgr,
 
 // @brief ファンイン1を1にする．
 // @param[in] mgr ImMgr
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 bool
 ImpInput::fwd1_imp1(ImpMgr& mgr,
-		    vector<ImpVal>& imp_list)
+		    ImpRec& rec)
 {
   assert_not_reached(__FILE__, __LINE__);
   return false;
@@ -156,10 +156,10 @@ ImpInput::fwd1_imp1(ImpMgr& mgr,
 
 // @brief 出力を0にする．
 // @param[in] mgr ImMgr
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 bool
 ImpInput::bwd_imp0(ImpMgr& mgr,
-		   vector<ImpVal>& imp_list)
+		   ImpRec& rec)
 {
   switch ( mState ) {
   case kStX: // X -> 0
@@ -182,10 +182,11 @@ ImpInput::bwd_imp0(ImpMgr& mgr,
 }
 
 // @brief 出力を1にする．
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] mgr ImMgr
+// @param[in] rec 含意を記録するオブジェクト
 bool
 ImpInput::bwd_imp1(ImpMgr& mgr,
-		   vector<ImpVal>& imp_list)
+		   ImpRec& rec)
 {
   switch ( mState ) {
   case kStX: // X -> 1

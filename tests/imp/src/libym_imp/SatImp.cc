@@ -12,9 +12,8 @@
 #include "ImpInfo.h"
 #include "ImpHash.h"
 #include "ImpMgr.h"
-#include "StrImp.h"
+#include "ImpListRec.h"
 #include "ym_logic/SatSolver.h"
-#include "ym_utils/MFSet.h"
 #include "ym_utils/RandGen.h"
 #include "ym_utils/StopWatch.h"
 
@@ -184,45 +183,13 @@ justify(ImpMgr& imp_mgr,
 
   ImpNode* unode0 = unode_list[0];
   ymuint np = unode0->justification_num();
-#if 0
-  bool has_x = false;
   bool sat = false;
   for (ymuint i = 0; i < np && !sat; ++ i) {
     ImpDst imp = unode0->get_justification(i);
     ImpNode* node = imp.node();
     ymuint val = imp.val();
-    vector<ImpDst> imp_list;
-    bool stat1 = imp_mgr.assert(node, val, imp_list);
-    if ( stat1 ) {
-      if ( depth > 0 ) {
-	Bool3 stat2 = justify(imp_mgr, depth - 1);
-	if ( stat2 == kB3True ) {
-	  sat = true;
-	}
-	if ( stat2 == kB3X ) {
-	  has_x = true;
-	}
-      }
-      else {
-	has_x = true;
-      }
-    }
+    bool stat1 = imp_mgr.assert(node, val);
     imp_mgr.backtrack();
-  }
-  if ( has_x ) {
-    return kB3X;
-  }
-  else {
-    return kB3False;
-  }
-#else
-  bool sat = false;
-  for (ymuint i = 0; i < np && !sat; ++ i) {
-    ImpDst imp = unode0->get_justification(i);
-    ImpNode* node = imp.node();
-    ymuint val = imp.val();
-    vector<ImpVal> imp_list;
-    bool stat1 = imp_mgr.assert(node, val, imp_list);
     if ( stat1 ) {
       if ( depth > 0 ) {
 	Bool3 stat2 = justify(imp_mgr, depth - 1);
@@ -231,7 +198,6 @@ justify(ImpMgr& imp_mgr,
 	}
       }
     }
-    imp_mgr.backtrack();
     if ( stat1 ) {
       break;
     }
@@ -242,7 +208,6 @@ justify(ImpMgr& imp_mgr,
   else {
     return kB3X;
   }
-#endif
 }
 
 Bool3
@@ -252,13 +217,12 @@ str_sat(ImpMgr& imp_mgr,
 	ImpNode* node2,
 	ymuint val2)
 {
-  vector<ImpVal> imp_list;
-  bool stat1 = imp_mgr.assert(node1, val1, imp_list);
+  bool stat1 = imp_mgr.assert(node1, val1);
   if ( stat1 == false ) {
     imp_mgr.backtrack();
     return kB3False;
   }
-  bool stat2 = imp_mgr.assert(node2, val2, imp_list);
+  bool stat2 = imp_mgr.assert(node2, val2);
   if ( stat2 == false ) {
     imp_mgr.backtrack();
     imp_mgr.backtrack();
@@ -318,37 +282,24 @@ SatImp::learning(ImpMgr& imp_mgr,
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     ImpNode* node = imp_mgr.node(src_id);
 
-    // node に 0 を割り当てる．
-    vector<ImpVal> imp_list0;
-    bool ok0 = imp_mgr.assert(node, 0, imp_list0);
-    if ( !ok0 ) {
-      imp_list0.clear();
-      // 単一の割り当てで矛盾が起こった．
-      // node は 1 固定
-      imp_mgr.set_const(src_id, 1);
-    }
-    imp_mgr.backtrack();
-
-    // node に 1 を割り当てる．
-    vector<ImpVal> imp_list1;
-    bool ok1 = imp_mgr.assert(node, 1, imp_list1);
-    if ( !ok1 ) {
-      imp_list1.clear();
-      // 単一の割り当てで矛盾が起こった．
-      // node は 0 固定
-      imp_mgr.set_const(src_id, 0);
-    }
-    imp_mgr.backtrack();
-
-    if ( !imp_mgr.is_const(src_id) ) {
-      for (ymuint src_val = 0; src_val < 2; ++ src_val) {
-	const vector<ImpVal>& imp_list = (src_val == 0) ? imp_list0 : imp_list1;
+    for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+      // node に src_val を割り当てる．
+      vector<ImpVal> imp_list;
+      ImpListRec rec(src_id, imp_list);
+      bool ok = imp_mgr.assert(node, src_val, rec);
+      imp_mgr.backtrack();
+      if ( ok ) {
 	for (vector<ImpVal>::const_iterator p = imp_list.begin();
 	     p != imp_list.end(); ++ p) {
 	  ymuint dst_id = p->id();
 	  ymuint dst_val = p->val();
 	  put(src_id, src_val, dst_id, dst_val, imp_hash, imp_list_array);
 	}
+      }
+      else {
+	// 単一の割り当てで矛盾が起こった．
+	// node は src_val ^ 1 固定
+	imp_mgr.set_const(src_id, src_val ^ 1);
       }
     }
   }

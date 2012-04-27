@@ -205,22 +205,22 @@ ImpAnd::get_justification(ymuint pos)
 
 // @brief ファンイン0を0にする．
 // @param[in] mgr ImpMgr
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 bool
 ImpAnd::fwd0_imp0(ImpMgr& mgr,
-		  vector<ImpVal>& imp_list)
+		  ImpRec& rec)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> 0X:0
     change_value(mgr, kSt0X_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, NULL, imp_list);
+    return mgr.fanout_prop0(this, NULL, rec);
 
   case kStX1_X: // X1:X -> 01:0
     change_value(mgr, kSt01_0);
     mgr.reset_unjustified(this);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, NULL, imp_list);
+    return mgr.fanout_prop0(this, NULL, rec);
 
   case kStXX_0: // XX:0 -> 0X:0
     change_value(mgr, kSt0X_0);
@@ -250,10 +250,10 @@ ImpAnd::fwd0_imp0(ImpMgr& mgr,
 
 // @brief ファンイン0を1にする．
 // @param[in] mgr ImpMgr
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 bool
 ImpAnd::fwd0_imp1(ImpMgr& mgr,
-		  vector<ImpVal>& imp_list)
+		  ImpRec& rec)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> 1X:X
@@ -265,13 +265,13 @@ ImpAnd::fwd0_imp1(ImpMgr& mgr,
     change_value(mgr, kSt11_1);
     mgr.reset_unjustified(this);
     // ファンアウト先に1を伝搬する．
-    return mgr.fanout_prop1(this, NULL, imp_list);
+    return mgr.fanout_prop1(this, NULL, rec);
 
   case kStXX_0: // XX:0 -> 10:0
     change_value(mgr, kSt10_0);
     mgr.reset_unjustified(this);
     // ファンイン1に0を伝搬する．
-    return mgr.fanin1_prop0(this, imp_list);
+    return mgr.fanin1_prop0(this, rec);
 
   case kStX0_0: // X0:0 -> 10:0
     change_value(mgr, kSt10_0);
@@ -296,22 +296,22 @@ ImpAnd::fwd0_imp1(ImpMgr& mgr,
 
 // @brief ファンイン1を0にする．
 // @param[in] mgr ImpMgr
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 bool
 ImpAnd::fwd1_imp0(ImpMgr& mgr,
-		  vector<ImpVal>& imp_list)
+		  ImpRec& rec)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> X0:0
     change_value(mgr, kStX0_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, NULL, imp_list);
+    return mgr.fanout_prop0(this, NULL, rec);
 
   case kSt1X_X: // 1X:X -> 10:0
     change_value(mgr, kSt10_0);
     mgr.reset_unjustified(this);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, NULL, imp_list);
+    return mgr.fanout_prop0(this, NULL, rec);
 
   case kSt0X_0: // 0X:0 -> 00:0
     change_value(mgr, kSt00_0);
@@ -341,10 +341,10 @@ ImpAnd::fwd1_imp0(ImpMgr& mgr,
 
 // @brief ファンイン1を1にする．
 // @param[in] mgr ImpMgr
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 bool
 ImpAnd::fwd1_imp1(ImpMgr& mgr,
-		  vector<ImpVal>& imp_list)
+		  ImpRec& rec)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> X1:X
@@ -356,13 +356,13 @@ ImpAnd::fwd1_imp1(ImpMgr& mgr,
     change_value(mgr, kSt11_1);
     mgr.reset_unjustified(this);
     // ファンアウト先に1を伝搬する．
-    return mgr.fanout_prop1(this, NULL, imp_list);
+    return mgr.fanout_prop1(this, NULL, rec);
 
   case kStXX_0: // XX:0 -> 01:0
     change_value(mgr, kSt01_0);
     mgr.reset_unjustified(this);
     // ファンイン0に0を伝搬する．
-    return mgr.fanin0_prop0(this, imp_list);
+    return mgr.fanin0_prop0(this, rec);
 
   case kSt0X_0: // 0X:0 -> 01:0
     change_value(mgr, kSt01_0);
@@ -387,10 +387,10 @@ ImpAnd::fwd1_imp1(ImpMgr& mgr,
 
 // @brief 出力を0にする．
 // @param[in] mgr ImpMgr
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 bool
 ImpAnd::bwd_imp0(ImpMgr& mgr,
-		 vector<ImpVal>& imp_list)
+		 ImpRec& rec)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> XX:0
@@ -402,13 +402,13 @@ ImpAnd::bwd_imp0(ImpMgr& mgr,
     change_value(mgr, kSt10_0);
     mgr.reset_unjustified(this);
     // ファンイン1に0を伝搬する．
-    return mgr.fanin1_prop0(this, imp_list);
+    return mgr.fanin1_prop0(this, rec);
 
   case kStX1_X: // X1:X -> 01:0
     change_value(mgr, kSt01_0);
     mgr.reset_unjustified(this);
     // ファンイン0に0を伝搬する．
-    return mgr.fanin0_prop0(this, imp_list);
+    return mgr.fanin0_prop0(this, rec);
 
   case kStXX_0: // no change
   case kStX0_0: // no change
@@ -430,29 +430,29 @@ ImpAnd::bwd_imp0(ImpMgr& mgr,
 
 // @brief 出力を1にする．
 // @param[in] mgr ImpMgr
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 bool
 ImpAnd::bwd_imp1(ImpMgr& mgr,
-		 vector<ImpVal>& imp_list)
+		 ImpRec& rec)
 {
   switch ( mState ) {
   case kStXX_X: // XX:X -> 11:1
     change_value(mgr, kSt11_1);
     // ファンイン0に1を伝搬する．
     // ファンイン1に1を伝搬する．
-    return mgr.fanin0_prop1(this, imp_list) && mgr.fanin1_prop1(this, imp_list);
+    return mgr.fanin0_prop1(this, rec) && mgr.fanin1_prop1(this, rec);
 
   case kSt1X_X: // 1X:X -> 11:1
     change_value(mgr, kSt11_1);
     mgr.reset_unjustified(this);
     // ファンイン1に1を伝搬する．
-    return mgr.fanin1_prop1(this, imp_list);
+    return mgr.fanin1_prop1(this, rec);
 
   case kStX1_X: // X1:X -> 11:1
     change_value(mgr, kSt11_1);
     mgr.reset_unjustified(this);
     // ファンイン0に1を伝搬する．
-    return mgr.fanin0_prop1(this, imp_list);
+    return mgr.fanin0_prop1(this, rec);
 
   case kStXX_0: // illegal
   case kStX0_0: // illegal
@@ -723,6 +723,99 @@ ImpAnd::prop_const(ImpMgr& mgr,
 		   ymuint val,
 		   ymuint ipos)
 {
+#if 1
+  switch ( mState ) {
+  case kStXX_X:
+    if ( val == 0 ) {
+      cout << "Node#" << id() << " is const0" << endl;
+      mgr.set_const(id(), 0);
+    }
+    break;
+
+  case kStX1_X:
+    if ( ipos == 0 ) {
+      if ( val == 0 ) {
+	cout << "Node#" << id() << " is const0" << endl;
+	mgr.set_const(id(), 0);
+      }
+      else {
+	cout << "Node#" << id() << " is const1" << endl;
+	mgr.set_const(id(), 1);
+      }
+    }
+    else {
+      assert_cond( val == 1, __FILE__, __LINE__);
+    }
+    break;
+
+  case kSt1X_X:
+    if ( ipos == 0 ) {
+      assert_cond( val == 1, __FILE__, __LINE__);
+    }
+    else {
+      if ( val == 0 ) {
+	cout << "Node#" << id() << " is const0" << endl;
+	mgr.set_const(id(), 0);
+      }
+      else {
+	cout << "Node#" << id() << " is const1" << endl;
+	mgr.set_const(id(), 1);
+      }
+    }
+    break;
+
+  case kStXX_0:
+    break;
+
+  case kStX0_0:
+    if ( ipos == 0 ) {
+      // どうでもいい
+    }
+    else {
+      assert_cond( val == 0, __FILE__, __LINE__);
+    }
+    break;
+
+  case kSt0X_0:
+    if ( ipos == 0 ) {
+      assert_cond( val == 0, __FILE__, __LINE__);
+    }
+    else {
+      // どうでもいい
+    }
+    break;
+
+  case kSt00_0:
+    assert_cond( val == 0, __FILE__, __LINE__);
+    break;
+
+  case kSt01_0:
+    if ( ipos == 0 ) {
+      assert_cond( val == 0, __FILE__, __LINE__);
+    }
+    else {
+      assert_cond( val == 1, __FILE__, __LINE__);
+    }
+    break;
+
+  case kSt10_0:
+    if ( ipos == 0 ) {
+      assert_cond( val == 1, __FILE__, __LINE__);
+    }
+    else {
+      assert_cond( val == 0, __FILE__, __LINE__);
+    }
+    break;
+
+  case kSt11_1:
+    assert_cond( val == 1, __FILE__, __LINE__);
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+#else
   switch ( mState ) {
   case kStXX_X:
     if ( ipos == 0 ) {
@@ -850,6 +943,7 @@ ImpAnd::prop_const(ImpMgr& mgr,
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
+#endif
 }
 
 // @brief 値を変える．

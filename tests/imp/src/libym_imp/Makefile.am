@@ -31,6 +31,8 @@ libym_imp_la_SOURCES = \
 	ImpInput.cc \
 	ImpAnd.h \
 	ImpAnd.cc \
+	ImpListRec.h \
+	ImpListRec.cc \
 	StrImp.h \
 	StrImp.cc \
 	ContraImp.h \

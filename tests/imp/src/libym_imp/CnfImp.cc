@@ -10,6 +10,7 @@
 #include "CnfImp.h"
 #include "ImpMgr.h"
 #include "ImpInfo.h"
+#include "ImpListRec.h"
 #include "ym_logic/CNFdd.h"
 #include "ym_logic/CNFddMgr.h"
 #include "ym_utils/StopWatch.h"
@@ -98,7 +99,8 @@ CnfImp::learning(ImpMgr& imp_mgr,
 
 	// node に src_val を割り当てる．
 	vector<ImpVal> imp_list;
-	bool ok = imp_mgr.assert(node, src_val, imp_list);
+	ImpListRec rec(src_id, imp_list);
+	bool ok = imp_mgr.assert(node, src_val, rec);
 	imp_mgr.backtrack();
 	if ( ok ) {
 	  for (vector<ImpVal>::const_iterator p = imp_list.begin();

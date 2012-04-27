@@ -20,6 +20,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 
 class ImpNode;
 class ImpMgr;
+class ImpRec;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ImpNodeHandle ImpNode.h "ImpNode.h"
@@ -308,51 +309,51 @@ public:
 
   /// @brief ファンイン0を0にする．
   /// @param[in] mgr ImMgr
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   virtual
   bool
   fwd0_imp0(ImpMgr& mgr,
-	    vector<ImpVal>& imp_list) = 0;
+	    ImpRec& rec) = 0;
 
   /// @brief ファンイン0を1にする．
   /// @param[in] mgr ImMgr
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   virtual
   bool
   fwd0_imp1(ImpMgr& mgr,
-	    vector<ImpVal>& imp_list) = 0;
+	    ImpRec& rec) = 0;
 
   /// @brief ファンイン1を0にする．
   /// @param[in] mgr ImMgr
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   virtual
   bool
   fwd1_imp0(ImpMgr& mgr,
-	    vector<ImpVal>& imp_list) = 0;
+	    ImpRec& rec) = 0;
 
   /// @brief ファンイン1を1にする．
   /// @param[in] mgr ImMgr
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   virtual
   bool
   fwd1_imp1(ImpMgr& mgr,
-	    vector<ImpVal>& imp_list) = 0;
+	    ImpRec& rec) = 0;
 
   /// @brief 出力を0にする．
   /// @param[in] mgr ImMgr
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   virtual
   bool
   bwd_imp0(ImpMgr& mgr,
-	   vector<ImpVal>& imp_list) = 0;
+	   ImpRec& rec) = 0;
 
   /// @brief 出力を1にする．
   /// @param[in] mgr ImMgr
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   virtual
   bool
   bwd_imp1(ImpMgr& mgr,
-	   vector<ImpVal>& imp_list) = 0;;
+	   ImpRec& rec) = 0;
 
 
 public:
