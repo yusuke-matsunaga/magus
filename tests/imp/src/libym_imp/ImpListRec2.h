@@ -1,8 +1,8 @@
-#ifndef IMPLISTREC_H
-#define IMPLISTREC_H
+#ifndef IMPLISTREC2_H
+#define IMPLISTREC2_H
 
-/// @file ImpListRec.h
-/// @brief ImpListRec のヘッダファイル
+/// @file ImpListRec2.h
+/// @brief ImpListRec2 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
@@ -17,20 +17,20 @@ BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class ImpListRec ImpListRec.h "ImpListRec.h"
-/// @brief 結果を imp_list に格納する ImpRec
+/// @brief 結果を imp_list の配列に格納する ImpRec
 //////////////////////////////////////////////////////////////////////
-class ImpListRec :
+class ImpListRec2 :
   public ImpRec
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] imp_list 含意結果を格納するリスト
-  ImpListRec(vector<ImpVal>& imp_list);
+  /// @param[in] imp_list_array 含意結果を格納するリストの配列
+  ImpListRec2(vector<vector<ImpVal> >& imp_list_array);
 
   /// @brief デストラクタ
   virtual
-  ~ImpListRec();
+  ~ImpListRec2();
 
 
 public:
@@ -53,11 +53,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 含意結果を格納するリスト
-  vector<ImpVal>& mImpList;
+  // 含意結果を格納するリストの配列
+  vector<vector<ImpVal> >& mImpListArray;
 
 };
 
 END_NAMESPACE_YM_NETWORKS
 
-#endif // IMPLISTREC_H
+#endif // IMPLISTREC2_H

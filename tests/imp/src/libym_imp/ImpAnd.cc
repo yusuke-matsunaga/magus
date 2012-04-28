@@ -723,7 +723,7 @@ ImpAnd::prop_const(ImpMgr& mgr,
 		   ymuint val,
 		   ymuint ipos)
 {
-#if 1
+#if 0
   switch ( mState ) {
   case kStXX_X:
     if ( val == 0 ) {
@@ -822,7 +822,7 @@ ImpAnd::prop_const(ImpMgr& mgr,
       if ( val == 0 ) {
 	mState = kSt0X_0;
 	cout << "Node#" << id() << " is const0" << endl;
-	mgr.set_const(id(), 0);
+	set_const(mgr, 0);
       }
       else {
 	mState = kSt1X_X;
@@ -832,7 +832,7 @@ ImpAnd::prop_const(ImpMgr& mgr,
       if ( val == 0 ) {
 	mState = kStX0_0;
 	cout << "Node#" << id() << " is const0" << endl;
-	mgr.set_const(id(), 0);
+	set_const(mgr, 0);
       }
       else {
 	mState = kStX1_X;
@@ -845,12 +845,12 @@ ImpAnd::prop_const(ImpMgr& mgr,
       if ( val == 0 ) {
 	mState = kSt01_0;
 	cout << "Node#" << id() << " is const0" << endl;
-	mgr.set_const(id(), 0);
+	set_const(mgr, 0);
       }
       else {
 	mState = kSt11_1;
 	cout << "Node#" << id() << " is const1" << endl;
-	mgr.set_const(id(), 1);
+	set_const(mgr, 1);
       }
     }
     else {
@@ -866,12 +866,12 @@ ImpAnd::prop_const(ImpMgr& mgr,
       if ( val == 0 ) {
 	mState = kSt10_0;
 	cout << "Node#" << id() << " is const0" << endl;
-	mgr.set_const(id(), 0);
+	set_const(mgr, 0);
       }
       else {
 	mState = kSt11_1;
 	cout << "Node#" << id() << " is const1" << endl;
-	mgr.set_const(id(), 1);
+	set_const(mgr, 1);
       }
     }
     break;

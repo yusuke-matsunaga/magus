@@ -304,6 +304,42 @@ CheckConstCmd::cmd_proc(TclObjVector& objv)
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス PrintConstCmd
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] imp_data 共通のデータ
+PrintConstCmd::PrintConstCmd(ImpData* imp_data) :
+  ImpCmd(imp_data)
+{
+}
+
+// @brief デストラクタ
+PrintConstCmd::~PrintConstCmd()
+{
+}
+
+// @brief コマンドを実行する仮想関数
+int
+PrintConstCmd::cmd_proc(TclObjVector& objv)
+{
+  ymuint n = mgr().node_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    if ( mgr().is_const(i) ) {
+      if ( mgr().is_const0(i) ) {
+	cout << "Node#" << i << " is const-0" << endl;
+      }
+      else if ( mgr().is_const1(i) ) {
+	cout << "Node#" << i << " is const-1" << endl;
+      }
+    }
+  }
+
+  return TCL_OK;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス PrintCmd
 //////////////////////////////////////////////////////////////////////
 
@@ -381,6 +417,7 @@ imp_init(Tcl_Interp* interp)
   TclCmdBinder1<ReadIscas89Cmd, ImpData*>::reg(interp, data, "imp::read_iscas89");
   TclCmdBinder1<LearningCmd, ImpData*>::reg(interp, data, "imp::learning");
   TclCmdBinder1<CheckConstCmd, ImpData*>::reg(interp, data, "imp::check_const");
+  TclCmdBinder1<PrintConstCmd, ImpData*>::reg(interp, data, "imp::print_const");
   TclCmdBinder1<PrintCmd, ImpData*>::reg(interp, data, "imp::print_network");
 
 
@@ -395,6 +432,7 @@ imp_init(Tcl_Interp* interp)
     "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
     "proc complete(learning) { t s e l p m } { return \"\" }\n"
     "proc complete(check_const) { t s e l p m } { return \"\" }\n"
+    "proc complete(print_const) { t s e l p m } { return \"\" }\n"
     "proc complete(print_network) { t s e l p m } { return \"\" }\n"
     "}\n"
     "}\n";

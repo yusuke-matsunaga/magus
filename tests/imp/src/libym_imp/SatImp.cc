@@ -285,7 +285,7 @@ SatImp::learning(ImpMgr& imp_mgr,
     for (ymuint src_val = 0; src_val < 2; ++ src_val) {
       // node に src_val を割り当てる．
       vector<ImpVal> imp_list;
-      ImpListRec rec(src_id, imp_list);
+      ImpListRec rec(imp_list);
       bool ok = imp_mgr.assert(node, src_val, rec);
       imp_mgr.backtrack();
       if ( ok ) {

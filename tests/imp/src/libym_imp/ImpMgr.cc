@@ -352,7 +352,7 @@ ImpMgr::assert(ImpNode* node,
 	       ymuint val,
 	       ImpRec& rec)
 {
-  mSrcId = node->id();
+  rec.set_src(node, val);
   mMarkerStack.push_back(mChgStack.size());
   if ( val == 0 ) {
     return bwd_prop0(node, NULL, rec);
@@ -860,18 +860,22 @@ ImpMgr::get_unodelist(vector<ImpNode*>& unode_list)
 void
 ImpMgr::set_unjustified(ImpNode* node)
 {
+#if 0
   assert_cond( node->mListIter == mUnodeList.end(), __FILE__, __LINE__);
   mUnodeList.push_back(node);
   node->mListIter = mUnodeList.end();
   -- node->mListIter;
+#endif
 }
 
 // @brief ノードが unjustified でなくなったときの処理を行なう．
 void
 ImpMgr::reset_unjustified(ImpNode* node)
 {
+#if 0
   mUnodeList.erase(node->mListIter);
   node->mListIter = mUnodeList.end();
+#endif
 }
 
 // @brief ラーニング結果を各ノードに設定する．

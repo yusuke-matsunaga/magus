@@ -108,7 +108,7 @@ RlImp::make_all_implication(ImpMgr& imp_mgr,
   ymuint n2 = imp_mgr.node_num();
 
   imp_list.clear();
-  ImpListRec rec(node->id(), imp_list);
+  ImpListRec rec(imp_list);
   bool ok = imp_mgr.assert(node, val, rec);
 
   if ( debug ) {

@@ -153,7 +153,7 @@ ConstImp::learning(ImpMgr& imp_mgr)
   imp_mgr.random_sim();
   vector<list<ImpDst> > cand_info(n * 2);
   vector<ymuint32> const_flag(n, 0U);
-  for (ymuint i = 1; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     if ( imp_mgr.is_const(i) ) {
       continue;
     }
@@ -214,6 +214,10 @@ ConstImp::learning(ImpMgr& imp_mgr)
 
     list<ymuint> const_list;
     for (ymuint i = 0; i < n; ++ i) {
+      if ( imp_mgr.is_const(i) ) {
+	continue;
+      }
+
       if ( (const_flag[i] & 1U) == 0U ) {
 	// 0 になったことがない．
 	VarId vid(i);

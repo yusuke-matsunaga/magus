@@ -413,9 +413,6 @@ private:
   // BNode と ImpNode の対応付けの情報を持つオブジェクト
   BNodeMap mBNodeMap;
 
-  // 現在のソースノードの番号
-  ymuint32 mSrcId;
-
   // 値の変更履歴を記憶するスタック
   vector<NodeChg> mChgStack;
 

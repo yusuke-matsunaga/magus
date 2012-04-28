@@ -11,7 +11,7 @@
 #include "ImpMgr.h"
 #include "ImpInfo.h"
 #include "ImpNode.h"
-#include "ImpListRec.h"
+#include "ImpListRec3.h"
 #include "ImpValList.h"
 #include "ym_utils/StopWatch.h"
 
@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 BEGIN_NONAMESPACE
 
 #if defined(YM_DEBUG)
-bool debug = true;
+bool debug = false;
 #else
 bool debug = false;
 #endif
@@ -92,6 +92,7 @@ NaImp::learning(ImpMgr& imp_mgr,
   // direct_imp の情報を imp_lists にコピーする．
   {
     vector<vector<ImpVal> > imp_lists_array(n * 2);
+    ImpListRec3 rec(imp_lists_array);
     for (ymuint src_id = 0; src_id < n; ++ src_id) {
       ImpNode* node = imp_mgr.node(src_id);
       if ( node == NULL ) {
@@ -107,24 +108,9 @@ NaImp::learning(ImpMgr& imp_mgr,
 
 	if ( mUseDI ) {
 	  // node に src_val を割り当てる．
-	  vector<ImpVal> imp_list;
-	  ImpListRec rec(src_id, imp_list);
 	  bool ok = imp_mgr.assert(node, src_val, rec);
 	  imp_mgr.backtrack();
-	  if ( ok ) {
-	    for (vector<ImpVal>::const_iterator p = imp_list.begin();
-		 p != imp_list.end(); ++ p) {
-	      ymuint dst_id = p->id();
-	      if ( imp_mgr.is_const(dst_id) ) {
-		continue;
-	      }
-	      ymuint dst_val = p->val();
-	      ymuint dst_val1 = dst_val ^ 1;
-	      imp_lists_array[dst_id * 2 + dst_val].push_back(ImpVal(src_id, src_val));
-	      imp_lists_array[src_id * 2 + src_val1].push_back(ImpVal(dst_id, dst_val1));
-	    }
-	  }
-	  else {
+	  if ( !ok ) {
 	    // 単一の割り当てで矛盾が起こった．
 	    // node は src_val1 固定
 	    cout << "Node#" << src_id << " is const-" << src_val1 << endl;

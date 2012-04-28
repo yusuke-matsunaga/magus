@@ -47,7 +47,7 @@ StrImp::learning(ImpMgr& imp_mgr,
 
     for (ymuint val = 0; val < 2; ++ val) {
       // node に val を割り当てる．
-      ImpListRec rec(src_id, imp_list_array[src_id * 2 + val]);
+      ImpListRec rec(imp_list_array[src_id * 2 + val]);
       bool ok = imp_mgr.assert(node, val, rec);
       imp_mgr.backtrack();
       if ( !ok ) {

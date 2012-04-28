@@ -33,6 +33,10 @@ libym_imp_la_SOURCES = \
 	ImpAnd.cc \
 	ImpListRec.h \
 	ImpListRec.cc \
+	ImpListRec2.h \
+	ImpListRec2.cc \
+	ImpListRec3.h \
+	ImpListRec3.cc \
 	StrImp.h \
 	StrImp.cc \
 	ContraImp.h \
