@@ -96,21 +96,38 @@ count_list(const vector<list<ImpDst> >& cand_info)
 
 void
 mark_tfi(ImpNode* node,
-	 vector<bool>& mark,
-	 vector<ymuint>& input_list)
+	 vector<bool>& mark)
 {
   if ( mark[node->id()] ) {
     return;
   }
   mark[node->id()] = true;
 
-  if ( node->is_input() ) {
-    input_list.push_back(node->id());
+  if ( node->is_and() ) {
+    mark_tfi(node->fanin0().src_node(), mark);
+    mark_tfi(node->fanin1().src_node(), mark);
   }
-  else {
-    mark_tfi(node->fanin0().src_node(), mark, input_list);
-    mark_tfi(node->fanin1().src_node(), mark, input_list);
+}
+
+bool
+mark_tfi2(ImpNode* node,
+	  vector<bool>& mark,
+	  const vector<bool>& ref_mark)
+{
+  if ( mark[node->id()] ) {
+    return false;
   }
+  mark[node->id()] = true;
+
+  if ( ref_mark[node->id()] ) {
+    return true;
+  }
+
+  if ( node->is_and() ) {
+    return mark_tfi2(node->fanin0().src_node(), mark, ref_mark) ||
+      mark_tfi2(node->fanin1().src_node(), mark, ref_mark);
+  }
+  return false;
 }
 
 bool
@@ -268,16 +285,6 @@ SatImp::learning(ImpMgr& imp_mgr,
 
   vector<vector<ImpVal> > imp_list_array(n * 2);
 
-  // 各ノードから到達可能な入力ノードのリストを求める．
-  vector<vector<ymuint> > input_list_array(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    ImpNode* node0 = imp_mgr.node(i);
-
-    vector<bool> tfi_mark(n, false);
-    mark_tfi(node0, tfi_mark, input_list_array[i]);
-    sort(input_list_array[i].begin(), input_list_array[i].end());
-  }
-
   // 直接含意と対偶の含意をコピーしておく
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     ImpNode* node = imp_mgr.node(src_id);
@@ -304,16 +311,33 @@ SatImp::learning(ImpMgr& imp_mgr,
     }
   }
 
+  cerr << "Phase0 end" << timer.time() << endl;
+
+#if 0
+  // 各ノードから到達可能な入力ノードのリストを求める．
+  vector<vector<ymuint> > input_list_array(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    ImpNode* node0 = imp_mgr.node(i);
+
+    vector<bool> tfi_mark(n, false);
+    mark_tfi(node0, tfi_mark, input_list_array[i]);
+    sort(input_list_array[i].begin(), input_list_array[i].end());
+  }
+#endif
+
   // シミュレーションでフィルタリングして残った候補を
   // SAT で調べる．
   imp_mgr.random_sim();
   vector<list<ImpDst> > cand_info(n * 2);
-  for (ymuint i = 1; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     if ( imp_mgr.is_const(i) ) {
       continue;
     }
 
     ImpNode* node0 = imp_mgr.node(i);
+
+    vector<bool> tfi_mark(n, false);
+    mark_tfi(node0, tfi_mark);
 
     ymuint64 val0 = node0->bitval();
 
@@ -324,7 +348,8 @@ SatImp::learning(ImpMgr& imp_mgr,
 
       ImpNode* node1 = imp_mgr.node(j);
 
-      if ( !check_intersect(input_list_array[i], input_list_array[j]) ) {
+      vector<bool> tfi_mark2(n, false);
+      if ( !mark_tfi2(node0, tfi_mark2, tfi_mark) ) {
 	continue;
       }
       ymuint64 val1 = node1->bitval();

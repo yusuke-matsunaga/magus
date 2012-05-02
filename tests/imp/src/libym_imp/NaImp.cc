@@ -414,6 +414,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	  }
 	}
       }
+
       cerr << "phase2: delta = " << delta << endl;
       if ( debug ) {
 	cout << "Phase2 end" << endl;
@@ -428,6 +429,7 @@ NaImp::learning(ImpMgr& imp_mgr,
       if ( delta == 0 ) {
 	break;
       }
+
     }
 
     if ( mUseContra ) { // 対偶を加えておく
