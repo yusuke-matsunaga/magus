@@ -4,8 +4,6 @@
 /// @brief GDS-II のパーサ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GdsParser.yy 2507 2009-10-17 16:24:02Z matsunaga $
-///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -33,13 +31,23 @@ BEGIN_NAMESPACE_YM_GDS_PARSER
 
 // このファイルで定義されている関数
 int
-yylex();
+yylex(YYSTYPE* lvalp,
+      GdsScanner& scanner);
 
 int
-yyerror(const char* );
+yyerror(GdsScanner& scanner,
+	const char* msg);
 
 %}
 
+// "pure" parser にする．
+%define api.pure
+
+// yyparse の引数
+%parse-param {GdsScanner& scanner}
+
+// yylex の引数
+%lex-param {GdsScanner& scanner}
 
 // トークンの定義
 %token ERROR
@@ -282,26 +290,16 @@ star_property
 
 %%
 
-// yylex で用いる静的メンバ
-static
-GdsScanner* gds_scanner = NULL;
-
-// scannar を設定する関数
-void
-set_scanner(GdsScanner* scanner)
-{
-  gds_scanner = scanner;
-}
-
 // 一文字(ここでは 1 record)をとってくる関数
 int
-yylex()
+yylex(YYSTYPE* lvalp,
+      GdsScanner& scanner)
 {
-  GdsRecord* rec = gds_scanner->read_rec();
+  GdsRecord* rec = scanner.read_rec();
   if ( rec ) {
     GdsDumper dumper(cout);
     dumper(*rec);
-    yylval = rec;
+    *lvalp = rec;
     return rec->rtype_token();
   }
   return 0;
@@ -310,10 +308,11 @@ yylex()
 // yacc パーサが内部で呼び出す関数
 // エラーメッセージを出力する．
 int
-yyerror(const char* s)
+yyerror(GdsScanner& scanner,
+	const char* s)
 {
   error_header(__FILE__, __LINE__, "GdsParser",
-	       gds_scanner->cur_pos(), s);
+	       scanner.cur_pos(), s);
   msg_end();
 
   return 1;

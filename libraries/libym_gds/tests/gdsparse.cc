@@ -16,11 +16,8 @@
 
 BEGIN_NAMESPACE_YM_GDS_PARSER
 
-void
-set_scanner(GdsScanner* scanner);
-
 int
-yyparse();
+yyparse(GdsScanner& scanner);
 
 END_NAMESPACE_YM_GDS_PARSER
 
@@ -35,9 +32,7 @@ main(int argc,
   GdsScanner scanner(cin, mgr);
   //GdsDumper dumper(cout);
 
-  nsParser::set_scanner(&scanner);
-
-  nsParser::yyparse();
+  nsParser::yyparse(scanner);
 
   return 0;
 }

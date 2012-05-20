@@ -7,10 +7,13 @@ SUBDIRS = \
 	. \
 	tests
 
-YFLAGS = -d -v
+AM_YFLAGS = -d -v
 
 CLEANFILES = \
-	GdsParser.cc GdsParser.h y.output GdsParser.output
+	GdsParser.cc \
+	GdsParser.h \
+	y.output \
+	GdsParser.output
 
 MAINTAINERCLEANFILES = Makefile.in
 
