@@ -29,7 +29,7 @@
 BEGIN_NAMESPACE_YM_GDS_PARSER
 
 // yacc/bison が生成したヘッダファイル
-#include "GdsParser.h"
+#include "GdsParser.hh"
 
 // このファイルで定義されている関数
 int
@@ -40,10 +40,8 @@ yyerror(const char* );
 
 %}
 
-// 定義ファイル名
-%defines "GdsParser.h"
 
-// トークン
+// トークンの定義
 %token ERROR
 
 %token HEADER

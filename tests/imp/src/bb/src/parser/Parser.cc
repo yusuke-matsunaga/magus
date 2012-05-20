@@ -14,7 +14,7 @@
 
 BEGIN_NAMESPACE_YM_BB
 
-#include "bb_grammer.h"
+#include "bb_grammer.hh"
 
 
 // @brief コンストラクタ

@@ -16,7 +16,7 @@ BEGIN_NAMESPACE_YM_BB
 
 class PtNode;
 
-#include "bb_grammer.h"
+#include "bb_grammer.hh"
 
 // コンストラクタ
 Lexer::Lexer(MsgMgr& msg_mgr) :

@@ -13,7 +13,7 @@
 
 BEGIN_NAMESPACE_YM_MISLIB
 
-#include "mislib_grammer.h"
+#include "mislib_grammer.hh"
 
 
 // コンストラクタ

@@ -63,11 +63,9 @@ END_NONAMESPACE
 
 %} // C++ 宣言部おわり
 
-// "pure" parser にする．
-%pure-parser
 
-// 定義ファイル名
-%defines "mislib_grammer.h"
+// "pure" parser にする．
+%define api.pure
 
 // 位置のトラッキングを行う．
 %locations

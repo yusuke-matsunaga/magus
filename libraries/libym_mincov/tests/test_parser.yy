@@ -36,9 +36,8 @@ TestMatrix test_matrix(0, 0, 0);
 
 %}
 
-// 定義ファイル名
-%defines "test_parser.h"
 
+// トークンの定義
 %token NUMBER
 %token INIT
 %token CLEAR

@@ -19,7 +19,7 @@ END_NONAMESPACE
 
 BEGIN_NAMESPACE_YM_ISCAS89
 
-#include "iscas89_grammer.h"
+#include "iscas89_grammer.hh"
 
 
 //////////////////////////////////////////////////////////////////////

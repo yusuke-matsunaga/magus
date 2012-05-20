@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_ISCAS89
 
 // yacc/bison が生成するヘッダファイル
-#include "iscas89_grammer.h"
+#include "iscas89_grammer.hh"
 
 //////////////////////////////////////////////////////////////////////
 // Iscas89ParserImpl

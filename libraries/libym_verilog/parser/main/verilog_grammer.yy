@@ -37,7 +37,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 // yacc/bison が生成したヘッダファイル
-#include "verilog_grammer.h"
+#include "verilog_grammer.hh"
 
 
 // 字句解析関数
@@ -83,11 +83,9 @@ fr_merge(const FileRegion fr_array[],
 
 %}
 
+
 // "pure" parser にする．
 %define api.pure
-
-// 定義ファイル名
-%defines "verilog_grammer.h"
 
 // 位置のトラッキングを行う．
 %locations
