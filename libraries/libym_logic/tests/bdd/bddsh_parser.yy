@@ -39,6 +39,9 @@ void prompt();
 
 %}
 
+// 定義ファイル名
+%defines "bddsh_parser.h"
+
 %token NUMBER
 %token TRUE
 %token FALSE

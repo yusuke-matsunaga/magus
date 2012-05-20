@@ -83,6 +83,9 @@ fr_merge(const FileRegion fr_array[],
 // "pure" parser にする．
 %define api.pure
 
+// 定義ファイル名
+%defines "bb_grammer.h"
+
 // 位置のトラッキングを行う．
 %locations
 

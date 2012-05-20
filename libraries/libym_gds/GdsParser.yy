@@ -32,13 +32,16 @@ BEGIN_NAMESPACE_YM_GDS_PARSER
 #include "GdsParser.h"
 
 // このファイルで定義されている関数
-extern
-int yylex();
+int
+yylex();
 
-extern 
-int yyerror(const char* );
- 
+int
+yyerror(const char* );
+
 %}
+
+// 定義ファイル名
+%defines "GdsParser.h"
 
 // トークン
 %token ERROR

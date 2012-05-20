@@ -19,22 +19,25 @@ using namespace std;
 extern
 int yylex();
 int yyerror(const char*);
- 
-  
+
+
 BEGIN_NAMESPACE_YM_MINCOV
-  
+
 #include "test_parser.h"
 
 #define YYSTYPE int
-  
+
 bool interactive = false;
 
 void
 prompt();
- 
+
 TestMatrix test_matrix(0, 0, 0);
- 
+
 %}
+
+// 定義ファイル名
+%defines "test_parser.h"
 
 %token NUMBER
 %token INIT
@@ -135,7 +138,7 @@ int
 yyerror(const char* s)
 {
   using namespace std;
-  
+
   cerr << s << endl;
   return 1;
 }
@@ -146,7 +149,7 @@ main(int argc,
      char** argv)
 {
   using namespace nsYm::nsMincov;
-  
+
   extern FILE* yyin;
   if ( argc == 2 ) {
     yyin = fopen(argv[1], "r");

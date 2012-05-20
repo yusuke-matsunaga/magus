@@ -66,6 +66,9 @@ END_NONAMESPACE
 // "pure" parser にする．
 %pure-parser
 
+// 定義ファイル名
+%defines "mislib_grammer.h"
+
 // 位置のトラッキングを行う．
 %locations
 

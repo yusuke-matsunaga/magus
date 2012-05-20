@@ -28,6 +28,9 @@ hash_map<string, BitVector> id_table;
 string lname;
 %}
 
+// 定義ファイル名
+%defines "bvcalc.h"
+
 %token NUMBER
 %token ID
 %token SEMI
