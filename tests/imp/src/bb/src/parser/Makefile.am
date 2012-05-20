@@ -2,21 +2,21 @@
 
 ## $Id: Makefile.am 697 2007-05-28 17:10:53Z matsunaga $
 
-INCLUDES = \
-	-I $(YMTOOLS_SRCDIR)/include \
-	-I $(YMTOOLS_BUILDDIR)/include \
-	-I $(top_srcdir)/imp/src/bb/include
-
-YFLAGS=-d -v
+AM_YFLAGS = -d -v
 
 CLEANFILES = \
-	bb_grammer.cc bb_grammer.h y.output bb_grammer.output \
+	bb_grammer.cc bb_grammer.hh y.output bb_grammer.output \
 	bblex.cc
 
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = \
 	libbb_parser.la
+
+libbb_parser_la_CPPFLAGS = \
+	-I $(YMTOOLS_SRCDIR)/include \
+	-I $(YMTOOLS_BUILDDIR)/include \
+	-I $(top_srcdir)/imp/src/bb/include
 
 libbb_parser_la_SOURCES = \
 	bb_grammer.yy \
