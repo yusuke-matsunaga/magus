@@ -1,12 +1,10 @@
 %{
 
-/// @file programs/bb/src/bb_grammer.yy
+/// @file bb_grammer.yy
 /// @brief bbの構文解析用ソース
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: bvcalc.yy 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
