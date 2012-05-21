@@ -22,7 +22,7 @@ libbb_parser_la_SOURCES = \
 	bb_grammer.yy \
 	Lexer.h \
 	Lexer.cc \
-	Parser.cc
+	Driver.cc
 
 libbb_parser_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

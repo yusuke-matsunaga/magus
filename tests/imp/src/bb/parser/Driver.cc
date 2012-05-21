@@ -1,13 +1,13 @@
 
-/// @file programs/bb/src/Parser.cc
-/// @brief Parser の実装ファイル
+/// @file Driver.cc
+/// @brief Driver の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "Parser.h"
+#include "Driver.h"
 #include "Lexer.h"
 #include "PtMgr.h"
 
@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_BB
 // @param[in] msg_mgr メッセージマネージャ
 // @param[in] ptmgr 読んだ結果のパース木を登録するマネージャ
 // @param[in] alloc メモリアロケータ
-Parser::Parser(MsgMgr& msg_mgr,
+Driver::Driver(MsgMgr& msg_mgr,
 	       PtMgr& ptmgr) :
   mLexer(new Lexer(msg_mgr)),
   mMsgMgr(msg_mgr),
@@ -31,7 +31,7 @@ Parser::Parser(MsgMgr& msg_mgr,
 }
 
 // @brief デストラクタ
-Parser::~Parser()
+Driver::~Driver()
 {
   delete mLexer;
 }
@@ -40,9 +40,9 @@ Parser::~Parser()
 // @param[in] file_name ファイル名
 // @return 読み込みに成功したら true を返す．
 bool
-Parser::read(const char* file_name)
+Driver::read(const char* file_name)
 {
-  int yyparse(Parser&);
+  int yyparse(Driver&);
 
   mPtMgr.init();
 
@@ -57,21 +57,21 @@ Parser::read(const char* file_name)
 
 // @brief ビット幅を得る．
 ymuint
-Parser::bit_width() const
+Driver::bit_width() const
 {
   return mBitWidth;
 }
 
 // @brief ビット幅を設定する．
 void
-Parser::set_bit_width(ymuint bw)
+Driver::set_bit_width(ymuint bw)
 {
   mBitWidth = bw;
 }
 
 // @brief 識別子ノードを作る．
 PtNode*
-Parser::new_id(const FileRegion& file_region,
+Driver::new_id(const FileRegion& file_region,
 	       ymuint id)
 {
   return mPtMgr.new_id(file_region, id);
@@ -79,7 +79,7 @@ Parser::new_id(const FileRegion& file_region,
 
 // @brief 定数ノードを作る．
 PtNode*
-Parser::new_const(const FileRegion& file_region,
+Driver::new_const(const FileRegion& file_region,
 		  ymint32 value)
 {
   return mPtMgr.new_const(file_region, value);
@@ -87,7 +87,7 @@ Parser::new_const(const FileRegion& file_region,
 
 // @brief neg ノードを作る．
 PtNode*
-Parser::new_neg(const FileRegion& file_region,
+Driver::new_neg(const FileRegion& file_region,
 		PtNode* opr1)
 {
   return mPtMgr.new_neg(file_region, opr1);
@@ -95,7 +95,7 @@ Parser::new_neg(const FileRegion& file_region,
 
 // @brief uminus ノードを作る．
 PtNode*
-Parser::new_uminus(const FileRegion& file_region,
+Driver::new_uminus(const FileRegion& file_region,
 		   PtNode* opr1)
 {
   return mPtMgr.new_uminus(file_region, opr1);
@@ -103,7 +103,7 @@ Parser::new_uminus(const FileRegion& file_region,
 
 // @brief add ノードを作る．
 PtNode*
-Parser::new_add(const FileRegion& file_region,
+Driver::new_add(const FileRegion& file_region,
 		PtNode* opr1,
 		PtNode* opr2)
 {
@@ -112,7 +112,7 @@ Parser::new_add(const FileRegion& file_region,
 
 // @brief sub ノードを作る．
 PtNode*
-Parser::new_sub(const FileRegion& file_region,
+Driver::new_sub(const FileRegion& file_region,
 		PtNode* opr1,
 		PtNode* opr2)
 {
@@ -121,7 +121,7 @@ Parser::new_sub(const FileRegion& file_region,
 
 // @brief mul ノードを作る．
 PtNode*
-Parser::new_mul(const FileRegion& file_region,
+Driver::new_mul(const FileRegion& file_region,
 		PtNode* opr1,
 		PtNode* opr2)
 {
@@ -130,7 +130,7 @@ Parser::new_mul(const FileRegion& file_region,
 
 // @brief div ノードを作る．
 PtNode*
-Parser::new_div(const FileRegion& file_region,
+Driver::new_div(const FileRegion& file_region,
 		PtNode* opr1,
 		PtNode* opr2)
 {
@@ -139,7 +139,7 @@ Parser::new_div(const FileRegion& file_region,
 
 // @brief mod ノードを作る．
 PtNode*
-Parser::new_mod(const FileRegion& file_region,
+Driver::new_mod(const FileRegion& file_region,
 		PtNode* opr1,
 		PtNode* opr2)
 {
@@ -148,7 +148,7 @@ Parser::new_mod(const FileRegion& file_region,
 
 // @brief and ノード作る．
 PtNode*
-Parser::new_and(const FileRegion& file_region,
+Driver::new_and(const FileRegion& file_region,
 		PtNode* opr1,
 		PtNode* opr2)
 {
@@ -157,7 +157,7 @@ Parser::new_and(const FileRegion& file_region,
 
 // @brief or ノードを作る．
 PtNode*
-Parser::new_or(const FileRegion& file_region,
+Driver::new_or(const FileRegion& file_region,
 	       PtNode* opr1,
 	       PtNode* opr2)
 {
@@ -166,7 +166,7 @@ Parser::new_or(const FileRegion& file_region,
 
 // @brief xor ノードを作る．
 PtNode*
-Parser::new_xor(const FileRegion& file_region,
+Driver::new_xor(const FileRegion& file_region,
 		PtNode* opr1,
 		PtNode* opr2)
 {
@@ -175,7 +175,7 @@ Parser::new_xor(const FileRegion& file_region,
 
 // @brief sll ノードを作る．
 PtNode*
-Parser::new_sll(const FileRegion& file_region,
+Driver::new_sll(const FileRegion& file_region,
 		PtNode* opr1,
 		PtNode* opr2)
 {
@@ -184,7 +184,7 @@ Parser::new_sll(const FileRegion& file_region,
 
 // @brief srl ノードを作る．
 PtNode*
-Parser::new_srl(const FileRegion& file_region,
+Driver::new_srl(const FileRegion& file_region,
 		PtNode* opr1,
 		PtNode* opr2)
 {
@@ -193,7 +193,7 @@ Parser::new_srl(const FileRegion& file_region,
 
 // @brief 新しい代入文を追加する．
 void
-Parser::new_assign(const FileRegion& file_region,
+Driver::new_assign(const FileRegion& file_region,
 		   ymuint lhs_id,
 		   PtNode* rhs)
 {
@@ -202,7 +202,7 @@ Parser::new_assign(const FileRegion& file_region,
 
 // @brief 新しい等式を追加する．
 void
-Parser::new_eq(const FileRegion& file_region,
+Driver::new_eq(const FileRegion& file_region,
 	       PtNode* lhs,
 	       PtNode* rhs)
 {
@@ -211,7 +211,7 @@ Parser::new_eq(const FileRegion& file_region,
 
 // @brief 新しい不等式を追加する．
 void
-Parser::new_lt(const FileRegion& file_region,
+Driver::new_lt(const FileRegion& file_region,
 	       PtNode* lhs,
 	       PtNode* rhs)
 {
@@ -220,7 +220,7 @@ Parser::new_lt(const FileRegion& file_region,
 
 // @brief 新しい不等式を追加する．
 void
-Parser::new_le(const FileRegion& file_region,
+Driver::new_le(const FileRegion& file_region,
 	       PtNode* lhs,
 	       PtNode* rhs)
 {
@@ -229,7 +229,7 @@ Parser::new_le(const FileRegion& file_region,
 
 // @brief 新しい不等式を追加する．
 void
-Parser::new_gt(const FileRegion& file_region,
+Driver::new_gt(const FileRegion& file_region,
 	       PtNode* lhs,
 	       PtNode* rhs)
 {
@@ -238,7 +238,7 @@ Parser::new_gt(const FileRegion& file_region,
 
 // @brief 新しい不等式を追加する．
 void
-Parser::new_ge(const FileRegion& file_region,
+Driver::new_ge(const FileRegion& file_region,
 	       PtNode* lhs,
 	       PtNode* rhs)
 {
@@ -247,7 +247,7 @@ Parser::new_ge(const FileRegion& file_region,
 
 // @brief 新しい変数を追加する．
 void
-Parser::new_var(const FileRegion& file_region,
+Driver::new_var(const FileRegion& file_region,
 		ymuint id)
 {
   mPtMgr.new_var(file_region, id);
@@ -255,7 +255,7 @@ Parser::new_var(const FileRegion& file_region,
 
 // @brief 新しい変数を追加する．
 void
-Parser::new_var(const FileRegion& file_region,
+Driver::new_var(const FileRegion& file_region,
 		ymuint id,
 		int start,
 		int end)
@@ -265,7 +265,7 @@ Parser::new_var(const FileRegion& file_region,
 
 // @brief 新しい変数を追加する．
 void
-Parser::new_var(const FileRegion& file_region,
+Driver::new_var(const FileRegion& file_region,
 		ymuint id,
 		int start,
 		int end,
@@ -279,7 +279,7 @@ Parser::new_var(const FileRegion& file_region,
 // @param[out] lloc 位置情報を格納する変数
 // @return 読み込んだトークンの id を返す．
 int
-Parser::yylex(YYSTYPE& lval,
+Driver::yylex(YYSTYPE& lval,
 	      FileRegion& lloc)
 {
   int id = mLexer->read_token();
@@ -316,7 +316,7 @@ Parser::yylex(YYSTYPE& lval,
 // @param[in] label メッセージラベル
 // @param[in] body メッセージ本文
 void
-Parser::put_msg(const char* src_file,
+Driver::put_msg(const char* src_file,
 		int src_line,
 		const FileRegion& file_loc,
 		tMsgType type,
@@ -334,7 +334,7 @@ Parser::put_msg(const char* src_file,
 // @param[in] label メッセージラベル
 // @param[in] body メッセージ本文
 void
-Parser::put_msg(const char* src_file,
+Driver::put_msg(const char* src_file,
 		int src_line,
 		const FileRegion& file_loc,
 		tMsgType type,

@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "Parser.h"
+#include "Driver.h"
 #include "PtMgr.h"
 #include "Var.h"
 #include "Assign.h"
@@ -77,10 +77,10 @@ bb(const char* file_name,
   StreamMsgHandler* msg_handler = new StreamMsgHandler(&cerr);
   msgmgr.reg_handler(msg_handler);
 
-  Parser parser(msgmgr, ptmgr);
+  Driver driver(msgmgr, ptmgr);
 
   cout << "reading " << file_name << endl;
-  if ( !parser.read(file_name) ) {
+  if ( !driver.read(file_name) ) {
     cout << "  failed" << endl;
     return;
   }
@@ -125,7 +125,7 @@ bb(const char* file_name,
 	 << "Rhs: " << constr->rhs()->decompile() << endl;
   }
 
-  ymuint bw = parser.bit_width();
+  ymuint bw = driver.bit_width();
 
   StopWatch timer;
   timer.start();

@@ -1,11 +1,11 @@
-#ifndef BB_INCLUDE_PARSER_H
-#define BB_INCLUDE_PARSER_H
+#ifndef DRIVER_H
+#define DRIVER_H
 
-/// @file bb/include/Parser.h
-/// @brief Parser のヘッダファイル
+/// @file Driver.h
+/// @brief Driver のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -22,21 +22,21 @@ class PtNode;
 union YYSTYPE;
 
 //////////////////////////////////////////////////////////////////////
-/// @class Parser Parser.h "Parser.h"
+/// @class Driver Driver.h "Driver.h"
 /// @brief BB 用のパーサーマネージャ
 //////////////////////////////////////////////////////////////////////
-class Parser
+class Driver
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] msg_mgr メッセージマネージャ
   /// @param[in] ptmgr 呼んだ結果のパース木を登録するマネージャ
-  Parser(MsgMgr& msg_mgr,
+  Driver(MsgMgr& msg_mgr,
 	 PtMgr& ptmgr);
 
   /// @brief デストラクタ
-  ~Parser();
+  ~Driver();
 
 
 public:
@@ -272,4 +272,4 @@ private:
 
 END_NAMESPACE_YM_BB
 
-#endif // BB_INCLUDE_PARSER_H
+#endif // DRIVER_H

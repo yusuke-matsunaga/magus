@@ -10,7 +10,7 @@
 
 #include "bb_nsdef.h"
 #include "ym_utils/FileRegion.h"
-#include "Parser.h"
+#include "Driver.h"
 
 
 using namespace nsYm::nsBb;
@@ -39,12 +39,12 @@ class PtNode;
 int
 yylex(YYSTYPE*,
       YYLTYPE*,
-      Parser&);
+      Driver&);
 
 // エラー報告関数
 int
 yyerror(YYLTYPE*,
-	Parser&,
+	Driver&,
 	const char*);
 
 
@@ -86,10 +86,10 @@ fr_merge(const FileRegion fr_array[],
 %locations
 
 // yyparse の引数
-%parse-param {Parser& parser}
+%parse-param {Driver& driver}
 
 // yylex の引数
-%lex-param {Parser& parser}
+%lex-param {Driver& driver}
 
 // トークンの値の型
 %union {
@@ -133,7 +133,7 @@ start
 bw_block
 : BIT_WIDTH EQ NUMBER SEMI
 {
-  parser.set_bit_width($3);
+  driver.set_bit_width($3);
 }
 ;
 
@@ -150,42 +150,42 @@ constr_block
 var_definition
 : VAR ID SEMI
 {
-  parser.new_var(@$, $2);
+  driver.new_var(@$, $2);
 }
 | VAR ID LB NUMBER COMMA NUMBER RB SEMI
 {
-  parser.new_var(@$, $2, $4, $6);
+  driver.new_var(@$, $2, $4, $6);
 }
 | VAR ID LB NUMBER COMMA NUMBER COMMA NUMBER RB SEMI
 {
-  parser.new_var(@$, $2, $4, $6, $8);
+  driver.new_var(@$, $2, $4, $6, $8);
 }
 ;
 
 constr
 : ID COLONEQ expr SEMI
 {
-  parser.new_assign(@$, $1, $3);
+  driver.new_assign(@$, $1, $3);
 }
 | expr EQ expr SEMI
 {
-  parser.new_eq(@$, $1, $3);
+  driver.new_eq(@$, $1, $3);
 }
 | expr LT expr SEMI
 {
-  parser.new_lt(@$, $1, $3);
+  driver.new_lt(@$, $1, $3);
 }
 | expr LE expr SEMI
 {
-  parser.new_le(@$, $1, $3);
+  driver.new_le(@$, $1, $3);
 }
 | expr GT expr SEMI
 {
-  parser.new_gt(@$, $1, $3);
+  driver.new_gt(@$, $1, $3);
 }
 | expr GE expr SEMI
 {
-  parser.new_ge(@$, $1, $3);
+  driver.new_ge(@$, $1, $3);
 }
 ;
 
@@ -200,62 +200,62 @@ expr
 }
 | TILDE expr
 {
-  $$ = parser.new_neg(@$, $2);
+  $$ = driver.new_neg(@$, $2);
 }
 | SUB expr %prec UMINUS
 {
-  $$ = parser.new_uminus(@$, $2);
+  $$ = driver.new_uminus(@$, $2);
 }
 | expr ADD expr
 {
-  $$ = parser.new_add(@$, $1, $3);
+  $$ = driver.new_add(@$, $1, $3);
 }
 | expr SUB expr
 {
-  $$ = parser.new_sub(@$, $1, $3);
+  $$ = driver.new_sub(@$, $1, $3);
 }
 | expr MUL expr
 {
-  $$ = parser.new_mul(@$, $1, $3);
+  $$ = driver.new_mul(@$, $1, $3);
 }
 | expr DIV expr
 {
-  $$ = parser.new_div(@$, $1, $3);
+  $$ = driver.new_div(@$, $1, $3);
 }
 | expr MOD expr
 {
-  $$ = parser.new_mod(@$, $1, $3);
+  $$ = driver.new_mod(@$, $1, $3);
 }
 | expr BAND expr
 {
-  $$ = parser.new_and(@$, $1, $3);
+  $$ = driver.new_and(@$, $1, $3);
 }
 | expr BOR expr
 {
-  $$ = parser.new_or(@$, $1, $3);
+  $$ = driver.new_or(@$, $1, $3);
 }
 | expr BXOR expr
 {
-  $$ = parser.new_xor(@$, $1, $3);
+  $$ = driver.new_xor(@$, $1, $3);
 }
 | expr LTLT expr
 {
-  $$ = parser.new_sll(@$, $1, $3);
+  $$ = driver.new_sll(@$, $1, $3);
 }
 | expr GTGT expr
 {
-  $$ = parser.new_srl(@$, $1, $3);
+  $$ = driver.new_srl(@$, $1, $3);
 }
 ;
 
 term
 : ID
 {
-  $$ = parser.new_id(@$, $1);
+  $$ = driver.new_id(@$, $1);
 }
 | NUMBER
 {
-  $$ = parser.new_const(@$, $1);
+  $$ = driver.new_const(@$, $1);
 }
 ;
 
@@ -269,14 +269,14 @@ term
 int
 yylex(YYSTYPE* lvalp,
       YYLTYPE* llocp,
-      Parser& parser)
+      Driver& driver)
 {
-  return parser.yylex(*lvalp, *llocp);
+  return driver.yylex(*lvalp, *llocp);
 }
 
 int
 yyerror(YYLTYPE* llocp,
-	Parser& parser,
+	Driver& driver,
 	const char* s)
 {
   string s2;
@@ -289,7 +289,7 @@ yyerror(YYLTYPE* llocp,
     s2 = s;
   }
 
-  parser.put_msg(__FILE__, __LINE__,
+  driver.put_msg(__FILE__, __LINE__,
 		 *llocp,
 		 kMsgError,
 		 "PARS",
