@@ -150,9 +150,8 @@ AC_CONFIG_FILES([
 	imp/src/libym_imp/Makefile
 	imp/src/bb/Makefile
 	imp/src/bb/include/Makefile
-	imp/src/bb/src/Makefile
-	imp/src/bb/src/parser/Makefile
-	imp/src/bb/src/pt/Makefile
+	imp/src/bb/parser/Makefile
+	imp/src/bb/pt/Makefile
 	])
 
 
