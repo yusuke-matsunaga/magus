@@ -84,8 +84,7 @@ bool
 MislibParserImpl::read_file(const string& filename,
 			    MislibMgrImpl* mgr)
 {
-  int yyparse(MislibParserImpl& parser,
-	      MislibMgrImpl* mgr);
+  int yyparse(MislibParserImpl& parser);
 
   if ( !mLex.open_file(filename) ) {
     // エラー
@@ -107,7 +106,7 @@ MislibParserImpl::read_file(const string& filename,
 
   // パース木を作る．
   // 結果は MislibMgrImpl が持っている．
-  yyparse(*this, mgr);
+  yyparse(*this);
 
   if ( MsgMgr::error_num() > prev_errnum ) {
     // 異常終了
