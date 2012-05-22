@@ -1,64 +1,28 @@
 
-/// @file libym_smtlibv2/parser/SmtLibLex.cc
-/// @brief SmtLibLex の実装ファイル
+/// @file libym_smtlibv2/parser/SmtLibScanner.cc
+/// @brief SmtLibScanner の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SmtLibLex.cc 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: SmtLibScanner.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SmtLibLex.h"
+#include "SmtLibScanner.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 // コンストラクタ
-SmtLibLex::SmtLibLex(MsgMgr& msg_mgr) :
-  mMsgMgr(msg_mgr)
+SmtLibScanner::SmtLibScanner()
 {
-  init();
 }
 
 // デストラクタ
-SmtLibLex::~SmtLibLex()
+SmtLibScanner::~SmtLibScanner()
 {
-  close_file();
-}
-
-// ファイルをセットする．
-// 自動的にに clear() を呼ぶ．
-// ファイルのオープンに失敗したら false を返す．
-bool
-SmtLibLex::open_file(const string& filename)
-{
-  init();
-  mInput.open(filename.c_str());
-  if ( !mInput ) {
-    return false;
-  }
-  mCurFileDesc = mFileDescMgr.new_file_desc(filename);
-  return true;
-}
-
-// ファイルをクローズする．
-void
-SmtLibLex::close_file()
-{
-  mInput.close();
-  mCurFileDesc = NULL;
-}
-
-// 初期化
-void
-SmtLibLex::init()
-{
-  mCurFileDesc = NULL;
-  mUngetChar = 0;
-  mCR = false;
-  mCurLine = 1;
-  mCurColumn = 0;
 }
 
 
@@ -142,7 +106,16 @@ END_NONAMESPACE
 // - 改行は改行として扱う．
 // - 空白，タブ，バックスラッシュ＋改行は区切り文字とみなす．
 tTokenType
-SmtLibLex::read_token()
+SmtLibScanner::read_token(FileRegion& loc)
+{
+  tTokenType tok = scan();
+  loc = cur_loc();
+  return tok;
+}
+
+// @brief read_token() の下請け関数
+tTokenType
+SmtLibScanner::scan()
 {
   int c;
 
@@ -150,7 +123,8 @@ SmtLibLex::read_token()
 
  ST_INIT: // 初期状態
   c = get();
-  mFirstColumn = mCurColumn;
+  set_first_loc();
+
   if ( c == '0' ) {
     mCurString.put_char(c);
     goto ST_ZERO;
@@ -173,7 +147,6 @@ SmtLibLex::read_token()
     goto ST_INIT; // 最初の空白は読み飛ばす．
 
   case '\n':
-    nl();
     return kNlToken;
 
   case '#':
@@ -206,25 +179,26 @@ SmtLibLex::read_token()
   assert_not_reached(__FILE__, __LINE__);
 
  ST_ZERO: // 一文字目が 0 の時
-  c = get();
+  c = peek();
   if ( c == '.' ) {
+    accept();
     mCurString.put_char(c);
     goto ST_DEC1;
   }
-  unget();
   return kNumToken;
 
  ST_NUM1: // 一文字目が[1-9]の時
-  c = get();
+  c = peek();
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto ST_NUM1;
   }
   if ( c == '.' ) {
+    accept();
     mCurString.put_char(c);
     goto ST_DEC1;
   }
-  unget();
   return kNumToken;
 
  ST_DEC1: // 0|[1-9][0-9]*'.' を読み込んだ時
@@ -233,21 +207,20 @@ SmtLibLex::read_token()
     mCurString.put_char(c);
     goto ST_DEC2;
   }
-  { // '.' の直後はかならず数字
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
-		    kMsgError,
-		    "SMTLIB_LEX",
-		    "digit number expected after dot.");
-    return kErrorToken;
-  }
+  // '.' の直後はかならず数字
+  MsgMgr::put_msg(__FILE__, __LINE__, cur_loc(),
+		  kMsgError,
+		  "SMTLIB_LEX",
+		  "digit number expected after dot.");
+  return kErrorToken;
 
  ST_DEC2: // 0|[1-9][0-9]*'.'[0-9]* を読み込んだ時
-  c = get();
+  c = peek();
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto ST_DEC2;
   }
-  unget();
   return kDecToken;
 
  ST_SHARP: // 一文字目が # だった時
@@ -267,16 +240,16 @@ SmtLibLex::read_token()
     mCurString.put_char(c);
     goto ST_BIN1;
   }
-  // 最低1文字は2進数を表すもじがなければならない．
+  // 最低1文字は2進数を表す文字がなければならない．
   goto SYNTAX_ERROR;
 
  ST_BIN1: // "#b[01]+" を読み込んだ後
-  c = get();
+  c = peek();
   if ( is_binchar(c) ) {
+    accept();
     mCurString.put_char(c);
     goto ST_BIN1;
   }
-  unget();
   return kBinToken;
 
  ST_HEX: // "#x" を読み込んだ後
@@ -289,21 +262,21 @@ SmtLibLex::read_token()
   goto SYNTAX_ERROR;
 
  ST_HEX1: // "#x[0-9a-fA-F]+" を読み込んだ後
-  c = get();
+  c = peek();
   if ( is_hexchar(c) ) {
+    accept();
     mCurString.put_char(c);
     goto ST_HEX1;
   }
-  unget();
   return kHexToken;
 
  ST_SYM1: // 一文字目が文字だった時
-  c = get();
+  c = peek();
   if ( is_strdigitchar(c) ) {
+    accept();
     mCurString.put_char(c);
     goto ST_SYM1;
   }
-  unget();
   return kSymbolToken;
 
  ST_DQ: // 一文字目が " だった時
@@ -319,14 +292,14 @@ SmtLibLex::read_token()
   }
   if ( c == '\n' ) {
     // " ... " の間に改行があった．
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+    MsgMgr::put_msg(__FILE__, __LINE__, cur_loc(),
 		    kMsgError,
 		    "SMTLIB_LEX",
 		    "newline inside double-quoted string.");
     return kErrorToken;
   }
   if ( c == EOF ) {
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+    MsgMgr::put_msg(__FILE__, __LINE__, cur_loc(),
 		    kMsgError,
 		    "SMTLIB_LEX",
 		    "unexpected end-of-file in double-quoted string.");
@@ -342,7 +315,7 @@ SmtLibLex::read_token()
   }
   if ( c == '\\' ) {
     // | ... | の間にバックスラッシュがあった．
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+    MsgMgr::put_msg(__FILE__, __LINE__, cur_loc(),
 		    kMsgError,
 		    "SMTLIB_LEX",
 		    "baskslash inside quoted symbol.");
@@ -350,31 +323,27 @@ SmtLibLex::read_token()
   }
   if ( c == EOF ) {
     // | ... | が終わる前に EOF が来た．
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+    MsgMgr::put_msg(__FILE__, __LINE__, cur_loc(),
 		    kMsgError,
 		    "SMTLIB_LEX",
 		    "unexpected end-of-file in quoted symbol.");
     return kErrorToken;
   }
-  if ( c == '\n' ) {
-    nl();
-  }
   mCurString.put_char(c);
   goto ST_Q_SYM1;
 
  ST_KEY1: // 一文字目が : だった時
-  c = get();
+  c = peek();
   if ( is_strdigitchar(c) ) {
+    accept();
     mCurString.put_char(c);
     goto ST_KEY1;
   }
-  unget();
   return kKeywordToken;
 
  ST_COMMENT1: // ; を読み込んだ直後
   c = get();
   if ( c == '\n' ) {
-    nl();
     goto ST_INIT;
   }
   if ( c == EOF ) {
@@ -383,77 +352,12 @@ SmtLibLex::read_token()
   goto ST_COMMENT1;
 
  SYNTAX_ERROR:
-  mMsgMgr.put_msg(__FILE__, __LINE__,
-		  cur_file_region(),
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  cur_loc(),
 		  kMsgError,
 		  "SMTLIB_LEX",
 		  "syntax error");
   return kErrorToken;
-}
-
-// 一文字読み出す．
-int
-SmtLibLex::get()
-{
-  int c = 0;
-
-  if ( mUngetChar != 0 ) {
-    // 戻された文字があったらそれを返す．
-    c = mUngetChar;
-    mUngetChar = 0;
-  }
-  else {
-    for ( ; ; ) {
-      c = mInput.get();
-      if ( c == EOF ) {
-	break;
-      }
-      // Windows(DOS)/Mac/UNIX の間で改行コードの扱いが異なるのでここで
-      // 強制的に '\n' に書き換えてしまう．
-      // Windows : '\r', '\n'
-      // Mac     : '\r'
-      // UNIX    : '\n'
-      // なので '\r' を '\n' に書き換えてしまう．
-      // ただし次に本当の '\n' が来たときには無視するために
-      // mCR を true にしておく．
-      if ( c == '\r' ) {
-	mCR = true;
-	c = '\n';
-	break;
-      }
-      if ( c == '\n' ) {
-	if ( mCR ) {
-	  // 直前に '\r' を読んで '\n' を返していたので今の '\n' を
-	  // 無視する．これが唯一ループを回る条件
-	  mCR = false;
-	  continue;
-	}
-	break;
-      }
-      // 普通の文字の時はそのまま返す．
-      mCR = false;
-      break;
-    }
-  }
-  ++ mCurColumn;
-  mLastChar = c;
-  return c;
-}
-
-// 一文字読み戻す．
-void
-SmtLibLex::unget()
-{
-  mUngetChar = mLastChar;
-  -- mCurColumn;
-}
-
-// 改行を読み込んだ時の処理
-void
-SmtLibLex::nl()
-{
-  ++ mCurLine;
-  mCurColumn = 0;
 }
 
 END_NAMESPACE_YM_SMTLIBV2

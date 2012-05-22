@@ -68,7 +68,7 @@ protected:
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibTerminalNode(const FileRegion& loc,
-		     StrId val);
+		     const ShString& val);
 
   /// @brief デストラクタ
   virtual
@@ -123,7 +123,7 @@ private:
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibNumNode(const FileRegion& loc,
-		StrId val);
+		const ShString& val);
 
   /// @brief デストラクタ
   virtual
@@ -158,7 +158,7 @@ private:
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibDecNode(const FileRegion& loc,
-		StrId val);
+		const ShString& val);
 
   /// @brief デストラクタ
   virtual
@@ -193,7 +193,7 @@ private:
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibHexNode(const FileRegion& loc,
-		StrId val);
+		const ShString& val);
 
   /// @brief デストラクタ
   virtual
@@ -228,7 +228,7 @@ private:
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibBinNode(const FileRegion& loc,
-		StrId val);
+		const ShString& val);
 
   /// @brief デストラクタ
   virtual
@@ -263,7 +263,7 @@ private:
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibStringNode(const FileRegion& loc,
-		   StrId val);
+		   const ShString& val);
 
   /// @brief デストラクタ
   virtual
@@ -298,7 +298,7 @@ private:
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibSymbolNode(const FileRegion& loc,
-		   StrId val);
+		   const ShString& val);
 
   /// @brief デストラクタ
   virtual
@@ -333,7 +333,7 @@ private:
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibKeywordNode(const FileRegion& loc,
-		    StrId val);
+		    const ShString& val);
 
   /// @brief デストラクタ
   virtual

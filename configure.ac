@@ -1,6 +1,4 @@
 # Process this file with autoconf to produce a configure script
-#
-# $Id: configure.ac 2507 2009-10-17 16:24:02Z matsunaga $
 
 # ===================================================================
 # Initial block
@@ -14,7 +12,7 @@ AC_REVISION($Rev: 2507 $)dnl
 AC_PREREQ(2.57)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2005-2011 Yusuke Matsunaga
+Copyright (C) 2005-2012 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 

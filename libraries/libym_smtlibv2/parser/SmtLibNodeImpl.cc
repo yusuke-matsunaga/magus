@@ -44,7 +44,7 @@ SmtLibNodeBase::loc() const
 // @param[in] loc ファイル上の位置
 // @param[in] val 値
 SmtLibTerminalNode::SmtLibTerminalNode(const FileRegion& loc,
-				       StrId val) :
+				       const ShString& val) :
   SmtLibNodeBase(loc),
   mVal(val)
 {
@@ -86,7 +86,7 @@ SmtLibTerminalNode::child(ymuint pos) const
 // @param[in] loc ファイル上の位置
 // @param[in] val 値
 SmtLibNumNode::SmtLibNumNode(const FileRegion& loc,
-			     StrId val) :
+			     const ShString& val) :
   SmtLibTerminalNode(loc, val)
 {
 }
@@ -112,7 +112,7 @@ SmtLibNumNode::type() const
 // @param[in] loc ファイル上の位置
 // @param[in] val 値
 SmtLibDecNode::SmtLibDecNode(const FileRegion& loc,
-			     StrId val) :
+			     const ShString& val) :
   SmtLibTerminalNode(loc, val)
 {
 }
@@ -138,7 +138,7 @@ SmtLibDecNode::type() const
 // @param[in] loc ファイル上の位置
 // @param[in] val 値
 SmtLibHexNode::SmtLibHexNode(const FileRegion& loc,
-			     StrId val) :
+			     const ShString& val) :
   SmtLibTerminalNode(loc, val)
 {
 }
@@ -164,7 +164,7 @@ SmtLibHexNode::type() const
 // @param[in] loc ファイル上の位置
 // @param[in] val 値
 SmtLibBinNode::SmtLibBinNode(const FileRegion& loc,
-			     StrId val) :
+			     const ShString& val) :
   SmtLibTerminalNode(loc, val)
 {
 }
@@ -190,7 +190,7 @@ SmtLibBinNode::type() const
 // @param[in] loc ファイル上の位置
 // @param[in] val 値
 SmtLibStringNode::SmtLibStringNode(const FileRegion& loc,
-				   StrId val) :
+				   const ShString& val) :
   SmtLibTerminalNode(loc, val)
 {
 }
@@ -216,7 +216,7 @@ SmtLibStringNode::type() const
 // @param[in] loc ファイル上の位置
 // @param[in] val 値
 SmtLibSymbolNode::SmtLibSymbolNode(const FileRegion& loc,
-				   StrId val) :
+				   const ShString& val) :
   SmtLibTerminalNode(loc, val)
 {
 }
@@ -242,7 +242,7 @@ SmtLibSymbolNode::type() const
 // @param[in] loc ファイル上の位置
 // @param[in] val 値
 SmtLibKeywordNode::SmtLibKeywordNode(const FileRegion& loc,
-				     StrId val) :
+				     const ShString& val) :
   SmtLibTerminalNode(loc, val)
 {
 }
