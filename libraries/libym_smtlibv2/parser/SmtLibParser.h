@@ -14,7 +14,7 @@
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/FileRegion.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
 #include "ym_utils/ShString.h"
 
 #include "SmtLibScanner.h"
