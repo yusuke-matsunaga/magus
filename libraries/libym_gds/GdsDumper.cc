@@ -26,7 +26,7 @@ GdsDumper::GdsDumper(ostream& os) :
   mOs(os)
 {
 }
-  
+
 // デストラクタ
 GdsDumper::~GdsDumper()
 {
@@ -39,18 +39,18 @@ GdsDumper::operator()(const GdsRecord& record)
   // 生データの出力
   mOs << endl
       << hex << setw(8) << record.offset() << dec << ": ";
-  size_t us = record.size() >> 8;
-  size_t ls = record.size() & 255;
+  ymuint us = record.size() >> 8;
+  ymuint ls = record.size() & 255;
   dump_byte(us);
   dump_byte(ls);
   mOs << " ";
-  size_t rt = static_cast<tGdsByte>(record.rtype());
-  size_t dt = static_cast<tGdsByte>(record.dtype());
+  ymuint rt = static_cast<ymuint8>(record.rtype());
+  ymuint dt = static_cast<ymuint8>(record.dtype());
   dump_byte(rt);
   dump_byte(dt);
   mOs << " ";
-  size_t dsize = record.dsize();
-  for (size_t i = 0; i < dsize; ++ i) {
+  ymuint dsize = record.dsize();
+  for (ymuint i = 0; i < dsize; ++ i) {
     dump_byte(record.conv_1byte(i));
     if ( (i + 4) % 24 == 23 ) {
       mOs << endl << "          ";
@@ -130,7 +130,7 @@ GdsDumper::dump_UNITS(const GdsRecord& record)
 {
   double uu = record.conv_8byte_real(0);
   double mu = record.conv_8byte_real(1);
-  
+
   mOs << endl << scientific
       << "    1 database unit = " << uu << " user units" << endl
       << "    1 database unit = " << mu << " meters" << endl;
@@ -346,12 +346,12 @@ GdsDumper::dump_2digit(int num)
 
 // 1バイトのデータを出力する．
 void
-GdsDumper::dump_byte(tGdsByte byte)
+GdsDumper::dump_byte(ymuint8 byte)
 {
-  int hb[2];
+  ymuint hb[2];
   hb[0] = byte >> 4;
   hb[1] = byte & 15;
-  for (size_t i = 0; i < 2; ++ i) {
+  for (ymuint i = 0; i < 2; ++ i) {
     int x = hb[i];
     if ( x >= 10 ) {
       mOs << static_cast<char>('a' + x - 10);

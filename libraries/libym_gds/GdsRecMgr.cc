@@ -1,11 +1,9 @@
 
-/// @file libym_gds/GdsRecMgr.cc
+/// @file GdsRecMgr.cc
 /// @brief GdsRecMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GdsRecMgr.cc 997 2007-09-07 09:58:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -28,9 +26,9 @@ GdsRecMgr::~GdsRecMgr()
 
 // @brief レコードの生成
 GdsRecord*
-GdsRecMgr::alloc_rec(size_t dsize)
+GdsRecMgr::alloc_rec(ymuint32 dsize)
 {
-  size_t recsize = sizeof(GdsRecord) + (dsize - 1) * sizeof(tGdsByte);
+  ymuint32 recsize = sizeof(GdsRecord) + (dsize - 1) * sizeof(ymuint8);
   void* p = mAlloc.get_memory(recsize);
   return new (p) GdsRecord;
 }
@@ -40,7 +38,7 @@ GdsRecMgr::alloc_rec(size_t dsize)
 void
 GdsRecMgr::free_rec(GdsRecord* rec)
 {
-  size_t recsize = sizeof(GdsRecord) + (rec->dsize() - 1) * sizeof(tGdsByte);
+  ymuint32 recsize = sizeof(GdsRecord) + (rec->dsize() - 1) * sizeof(ymuint8);
   mAlloc.put_memory(recsize, rec);
 }
 

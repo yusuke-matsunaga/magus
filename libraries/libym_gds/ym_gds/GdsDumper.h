@@ -107,7 +107,7 @@ private:
 
   // 1バイトのデータを出力する．
   void
-  dump_byte(tGdsByte byte);
+  dump_byte(ymuint8 byte);
 
 
 private:

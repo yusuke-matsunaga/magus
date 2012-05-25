@@ -35,7 +35,7 @@ public:
   /// @brief レコードの生成
   /// @param[in] dsize データサイズ
   GdsRecord*
-  alloc_rec(size_t dsize);
+  alloc_rec(ymuint32 dsize);
 
   /// @brief レコードの破壊
   /// @param[in] rec 破壊するレコード

@@ -2,10 +2,10 @@
 #define YM_GDS_GDSSCANNER_H
 
 /// @file ym_gds/GdsScanner.h
-/// @brief GDS-II ファイルの読み込みを行うクラス
+/// @brief GdsScanner のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -25,7 +25,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] is 入力ストリーム
   /// @param[in] mgr GdsRecord 管理用のオブジェクト
-  GdsScanner(std::istream& is,
+  GdsScanner(istream& is,
 	     GdsRecMgr& mgr);
 
   /// @brief デストラクタ
@@ -41,18 +41,18 @@ public:
   read_rec();
 
   /// @brief 現在の位置を返す．
-  size_t
+  ymuint32
   cur_pos() const;
 
 
 private:
 
   // ストリームから1バイト読んで符号なし整数に変換する．
-  ymuint
+  ymuint8
   read_1byte_uint();
 
   // ストリームから2バイト読んで符号なし整数に変換する．
-  ymuint
+  ymuint16
   read_2byte_uint();
 
 
@@ -62,10 +62,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入力ストリーム
-  std::istream& mIs;
+  istream& mIs;
 
   // 入力ストリームから読み込んだバイト数
-  size_t mPos;
+  ymuint32 mPos;
 
   // GdsRecord の管理用オブジェクト
   GdsRecMgr& mMgr;
@@ -74,4 +74,4 @@ private:
 
 END_NAMESPACE_YM_GDS
 
-#endif
+#endif // YM_GDS_GDSSCANNER_H

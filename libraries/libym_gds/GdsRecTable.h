@@ -1,11 +1,11 @@
 #ifndef GDSLIB_GDSRECTABLE_H
 #define GDSLIB_GDSRECTABLE_H
 
-/// @file libym_gds/GdsRecTable.h
-/// @brief GDS-II の予約語の変換テーブル
+/// @file GdsRecTable.h
+/// @brief GdsRecTable のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,7 +15,8 @@
 BEGIN_NAMESPACE_YM_GDS
 
 //////////////////////////////////////////////////////////////////////
-// Record type とトークンの変換テーブル
+/// @class GdsRecTable GdsRecTable.h "GdsRecTable.h"
+/// @brief GDS-II の予約語の変換テーブル
 //////////////////////////////////////////////////////////////////////
 class GdsRecTable
 {
@@ -69,12 +70,16 @@ private:
   {
     // レコード型
     tGdsRtype mRtype;
+
     // トークン値
     int mToken;
+
     // 文字列(表示用)
     const char* mString;
+
     // 期待されるデータ型
     tGdsDtype mDtype;
+
     // データ数
     // 負数の場合にはその絶対値の倍数の可変
     int mDataNum;

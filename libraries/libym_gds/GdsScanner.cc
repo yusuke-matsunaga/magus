@@ -1,11 +1,9 @@
 
-/// @file libym_gds/GdsScanner.cc
-/// @brief GDS-II の字句解析器
+/// @file GdsScanner.cc
+/// @brief GdsScanner の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GdsScanner.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -24,7 +22,7 @@ BEGIN_NAMESPACE_YM_GDS
 
 // コンストラクタ
 // 入力ストリームを指定する．
-GdsScanner::GdsScanner(std::istream& is,
+GdsScanner::GdsScanner(istream& is,
 		       GdsRecMgr& mgr) :
   mIs(is),
   mPos(0),
@@ -42,8 +40,8 @@ GdsScanner::~GdsScanner()
 GdsRecord*
 GdsScanner::read_rec()
 {
-  size_t size = 0;
-  size_t offset = 0;
+  ymuint32 size = 0;
+  ymuint32 offset = 0;
   while ( size == 0 ) {
     if ( mIs.eof() ) {
       return NULL;
@@ -61,7 +59,7 @@ GdsScanner::read_rec()
     return NULL;
   }
 
-  size_t dsize = size - 4;
+  ymuint32 dsize = size - 4;
   tGdsRtype rtype = static_cast<tGdsRtype>(read_1byte_uint());
   tGdsDtype dtype = static_cast<tGdsDtype>(read_1byte_uint());
 
@@ -135,31 +133,31 @@ GdsScanner::read_rec()
 }
 
 // 現在の位置を返す．
-size_t
+ymuint32
 GdsScanner::cur_pos() const
 {
   return mPos;
 }
 
 // ストリームから1バイト読んで符号なし整数に変換する．
-ymuint
+ymuint8
 GdsScanner::read_1byte_uint()
 {
   char buf[1] = { 0 };
   mIs.read(buf, 1);
   mPos += 1;
-  return static_cast<ymuint>(buf[0]);
+  return static_cast<ymuint8>(buf[0]);
 }
 
 // ストリームから2バイト読んで符号なし整数に変換する．
-ymuint
+ymuint16
 GdsScanner::read_2byte_uint()
 {
   char buf[2] = { 0, 0 };
   mIs.read(buf, 2);
   mPos += 2;
-  ymuint ans = static_cast<ymuint>(buf[0]) << 8;
-  ans += static_cast<ymuint>(buf[1]);
+  ymuint16 ans = static_cast<ymuint8>(buf[0]) << 8;
+  ans += static_cast<ymuint8>(buf[1]);
   return ans;
 }
 
