@@ -10,6 +10,7 @@
 
 #include "ym_gds/Msg.h"
 #include "ym_gds/GdsScanner.h"
+#include "ym_gds/GdsRecMgr.h"
 #include "ym_gds/GdsDumper.h"
 #include "ym_gds/GdsRecord.h"
 
@@ -32,10 +33,12 @@ BEGIN_NAMESPACE_YM_GDS_PARSER
 // このファイルで定義されている関数
 int
 yylex(YYSTYPE* lvalp,
+      GdsRecMgr& mgr,
       GdsScanner& scanner);
 
 int
-yyerror(GdsScanner& scanner,
+yyerror(GdsRecMgr& mgr,
+	GdsScanner& scanner,
 	const char* msg);
 
 %}
@@ -44,9 +47,11 @@ yyerror(GdsScanner& scanner,
 %define api.pure
 
 // yyparse の引数
+%parse-param {GdsRecMgr& mgr}
 %parse-param {GdsScanner& scanner}
 
 // yylex の引数
+%lex-param {GdsRecMgr& mgr}
 %lex-param {GdsScanner& scanner}
 
 // トークンの定義
@@ -129,42 +134,88 @@ yyerror(GdsScanner& scanner,
 stream_format
 : HEADER BGNLIB opt_LIBDIRSIZE opt_SRFNAME opt_LIBSECUR
   LIBNAME opt_REFLIBS opt_FONTS opt_ATTRTABLE opt_GENERATIONS
-  opt_FormatType UNITS star_structure ENDLIB
+  opt_FormatType UNITS
+{
+  // bgnlib($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
+}
+  star_structure ENDLIB
 ;
 
 opt_LIBDIRSIZE
 : // null
+{
+  $$ = NULL;
+}
 | LIBDIRSIZE
+{
+  $$ = $1;
+}
 ;
 
 opt_SRFNAME
 : // null
+{
+  $$ = NULL;
+}
 | SRFNAME
+{
+  $$ = $1;
+}
 ;
 
 opt_LIBSECUR
 : // null
+{
+  $$ = NULL;
+}
 | LIBSECUR
+{
+  $$ = $1;
+}
 ;
 
 opt_REFLIBS
 : // null
+{
+  $$ = NULL;
+}
 | REFLIBS
+{
+  $$ = $1;
+}
 ;
 
 opt_FONTS
 : // null
+{
+  $$ = NULL;
+}
 | FONTS
+{
+  $$ = $1;
+}
 ;
 
 opt_ATTRTABLE
 : // null
+{
+  $$ = NULL;
+}
 | ATTRTABLE
+{
+  $$ = $1;
+}
 ;
 
 opt_GENERATIONS
 : // null
+{
+  $$ = NULL;
+}
 | GENERATIONS
+{
+  $$ = $1;
+}
 ;
 
 opt_FormatType
@@ -293,10 +344,12 @@ star_property
 // 一文字(ここでは 1 record)をとってくる関数
 int
 yylex(YYSTYPE* lvalp,
+      GdsRecMgr& mgr,
       GdsScanner& scanner)
 {
-  GdsRecord* rec = scanner.read_rec();
-  if ( rec ) {
+  bool stat = scanner.read_rec();
+  if ( stat ) {
+    GdsRecord* rec = mgr.new_record(scanner);
     GdsDumper dumper(cout);
     dumper(*rec);
     *lvalp = rec;
@@ -308,7 +361,8 @@ yylex(YYSTYPE* lvalp,
 // yacc パーサが内部で呼び出す関数
 // エラーメッセージを出力する．
 int
-yyerror(GdsScanner& scanner,
+yyerror(GdsRecMgr& mgr,
+	GdsScanner& scanner,
 	const char* s)
 {
   error_header(__FILE__, __LINE__, "GdsParser",

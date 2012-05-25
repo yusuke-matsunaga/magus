@@ -3,9 +3,7 @@
 /// @brief GDS-II ファイルのパーサーテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: gdsparse.cc 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,7 +15,8 @@
 BEGIN_NAMESPACE_YM_GDS_PARSER
 
 int
-yyparse(GdsScanner& scanner);
+yyparse(GdsRecMgr& mgr,
+	GdsScanner& scanner);
 
 END_NAMESPACE_YM_GDS_PARSER
 
@@ -29,10 +28,10 @@ main(int argc,
   using namespace nsYm::nsGds;
 
   GdsRecMgr mgr;
-  GdsScanner scanner(cin, mgr);
+  GdsScanner scanner(cin);
   //GdsDumper dumper(cout);
 
-  nsParser::yyparse(scanner);
+  nsParser::yyparse(mgr, scanner);
 
   return 0;
 }

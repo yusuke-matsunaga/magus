@@ -24,36 +24,64 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] is 入力ストリーム
-  /// @param[in] mgr GdsRecord 管理用のオブジェクト
-  GdsScanner(istream& is,
-	     GdsRecMgr& mgr);
+  GdsScanner(istream& is);
 
   /// @brief デストラクタ
   ~GdsScanner();
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief レコード一つ分の読み込みを行う．
-  /// @retval record 読み込んだレコード
-  /// @retval NULL エラーが起った場合や末尾に達した場合
-  GdsRecord*
+  /// @retval true 読み込みが成功した．
+  /// @retval false エラーが起った場合や末尾に達した場合
+  bool
   read_rec();
 
-  /// @brief 現在の位置を返す．
+  /// @brief 直前の read_rec() で読んだレコードのオフセットを得る．
+  ymuint32
+  cur_offset() const;
+
+  /// @brief 直前の read_rec() で読んだレコードのサイズを得る．
+  ymuint32
+  cur_size() const;
+
+  /// @brief 直前の read_rec() で読んだレコードの型を得る．
+  tGdsRtype
+  cur_rtype() const;
+
+  /// @brief 直前の read_rec() で読んだレコードのデータ型を得る．
+  tGdsDtype
+  cur_dtype() const;
+
+  /// @brief 直前の read_rec() で読んだレコードのデータを得る．
+  ymuint8*
+  cur_data() const;
+
+  /// @brief 現在のファイル上の位置を返す．
   ymuint32
   cur_pos() const;
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
-  // ストリームから1バイト読んで符号なし整数に変換する．
+  /// @brief ストリームから1バイト読んで符号なし整数に変換する．
   ymuint8
   read_1byte_uint();
 
-  // ストリームから2バイト読んで符号なし整数に変換する．
+  /// @brief ストリームから2バイト読んで符号なし整数に変換する．
   ymuint16
   read_2byte_uint();
+
+  /// @brief バッファを確保する．
+  void
+  alloc_buff(ymuint32 req_size);
 
 
 private:
@@ -65,12 +93,80 @@ private:
   istream& mIs;
 
   // 入力ストリームから読み込んだバイト数
-  ymuint32 mPos;
+  ymuint32 mCurPos;
 
-  // GdsRecord の管理用オブジェクト
-  GdsRecMgr& mMgr;
+  // 現在のレコードのオフセット
+  ymuint32 mCurOffset;
+
+  // 現在のレコードのサイズ
+  ymuint32 mCurSize;
+
+  // 現在のレコードの型
+  tGdsRtype mCurRtype;
+
+  // 現在のレコードのデータ型
+  tGdsDtype mCurDtype;
+
+  // 現在のレコードのデータバッファ
+  ymuint8* mDataBuff;
+
+  // mCurData のサイズ
+  ymuint32 mBuffSize;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 直前の read_rec() で読んだレコードのオフセットを得る．
+inline
+ymuint32
+GdsScanner::cur_offset() const
+{
+  return mCurOffset;
+}
+
+// @brief 直前の read_rec() で読んだレコードのサイズを得る．
+inline
+ymuint32
+GdsScanner::cur_size() const
+{
+  return mCurSize;
+}
+
+// @brief 直前の read_rec() で読んだレコードの型を得る．
+inline
+tGdsRtype
+GdsScanner::cur_rtype() const
+{
+  return mCurRtype;
+}
+
+// @brief 直前の read_rec() で読んだレコードのデータ型を得る．
+inline
+tGdsDtype
+GdsScanner::cur_dtype() const
+{
+  return mCurDtype;
+}
+
+// @brief 現在のファイル上の位置を返す．
+inline
+ymuint32
+GdsScanner::cur_pos() const
+{
+  return mCurPos;
+}
+
+// @brief 直前の read_rec() で読んだレコードのデータを得る．
+inline
+ymuint8*
+GdsScanner::cur_data() const
+{
+  return mDataBuff;
+}
 
 END_NAMESPACE_YM_GDS
 

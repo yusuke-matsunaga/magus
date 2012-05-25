@@ -21,7 +21,6 @@ BEGIN_NAMESPACE_YM_GDS
 class GdsRecord
 {
   friend class GdsRecMgr;
-  friend class GdsScanner;
 
 private:
   //////////////////////////////////////////////////////////////////////

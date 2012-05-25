@@ -3,9 +3,7 @@
 /// @brief GDS-II ファイルダンププログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: gdsprint.cc 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -23,18 +21,18 @@ main(int argc,
   using namespace nsYm::nsGds;
 
   GdsRecMgr mgr;
-  GdsScanner scanner(cin, mgr);
+  GdsScanner scanner(cin);
   GdsDumper dumper(cout);
-  
+
   MsgMgr& msgmgr = MsgMgr::the_mgr();
   tMsgMask msgmask = kMsgMaskError | kMsgMaskWarning;
   TestMsgHandler* tmh = new TestMsgHandler(msgmask);
   msgmgr.reg_handler(tmh);
 
-  GdsRecord* rec;
-  while ( (rec = scanner.read_rec()) ) {
+  while ( scanner.read_rec() ) {
+    GdsRecord* rec = mgr.new_record(scanner);
     dumper(*rec);
-    mgr.free_rec(rec);
+    mgr.free_record(rec);
   }
 
   return 0;

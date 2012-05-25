@@ -8,8 +8,6 @@
 
 
 #include "ym_gds/GdsScanner.h"
-#include "ym_gds/GdsRecMgr.h"
-#include "ym_gds/GdsRecord.h"
 #include "ym_gds/Msg.h"
 #include "GdsRecTable.h"
 
@@ -22,31 +20,35 @@ BEGIN_NAMESPACE_YM_GDS
 
 // コンストラクタ
 // 入力ストリームを指定する．
-GdsScanner::GdsScanner(istream& is,
-		       GdsRecMgr& mgr) :
+GdsScanner::GdsScanner(istream& is) :
   mIs(is),
-  mPos(0),
-  mMgr(mgr)
+  mCurPos(0),
+  mDataBuff(NULL),
+  mBuffSize(0)
 {
+  mBuffSize = 1024;
+  mDataBuff = new ymuint8[mBuffSize];
 }
 
 // デストラクタ
 GdsScanner::~GdsScanner()
 {
+  delete [] mDataBuff;
 }
 
-// レコード一つ分の読み込みを行う．
-// エラーが起った場合や末尾に達した場合には NULL を返す．
-GdsRecord*
+// @brief レコード一つ分の読み込みを行う．
+// @retval true 読み込みが成功した．
+// @retval false エラーが起った場合や末尾に達した場合
+bool
 GdsScanner::read_rec()
 {
   ymuint32 size = 0;
   ymuint32 offset = 0;
   while ( size == 0 ) {
     if ( mIs.eof() ) {
-      return NULL;
+      return false;
     }
-    offset = mPos;
+    offset = mCurPos;
     size = read_2byte_uint();
     // null word をスキップする．
   }
@@ -56,25 +58,25 @@ GdsScanner::read_rec()
     error_header(__FILE__, __LINE__, "GdsScanner", offset)
       << "illegal size (" << size << ")";
     msg_end();
-    return NULL;
+    return false;
   }
 
   ymuint32 dsize = size - 4;
-  tGdsRtype rtype = static_cast<tGdsRtype>(read_1byte_uint());
-  tGdsDtype dtype = static_cast<tGdsDtype>(read_1byte_uint());
+  mCurRtype = static_cast<tGdsRtype>(read_1byte_uint());
+  mCurDtype = static_cast<tGdsDtype>(read_1byte_uint());
 
   // データの integrity check を行う．
   const GdsRecTable& table = GdsRecTable::obj();
-  if ( table.dtype(rtype) != dtype ) {
+  if ( table.dtype(mCurRtype) != mCurDtype ) {
     error_header(__FILE__, __LINE__, "GdsScanner", offset)
       << "data type mismatch: record type = "
-      << table.rtype_string(rtype)
-      << ", data type = " << table.dtype_string(dtype);
+      << table.rtype_string(mCurRtype)
+      << ", data type = " << table.dtype_string(mCurDtype);
     msg_end();
-    return NULL;
+    return false;
   }
   int unit_size = 1;
-  switch ( dtype ) {
+  switch ( mCurDtype ) {
   case kGdsNodata:                   break;
   case kGdsBitArray: unit_size =  2; break;
   case kGds2Int:     unit_size =  2; break;
@@ -83,18 +85,18 @@ GdsScanner::read_rec()
   case kGds8Real:    unit_size =  8; break;
   case kGdsString:   unit_size = -2; break;
   }
-  int exp_dsize = unit_size * table.data_num(rtype);
+  int exp_dsize = unit_size * table.data_num(mCurRtype);
   if ( exp_dsize >= 0 ) {
     if ( exp_dsize != static_cast<int>(dsize) ) {
       error_header(__FILE__, __LINE__, "GdsScanner", offset)
 	<< "data size mismatch: record type = "
-	<< table.rtype_string(rtype)
+	<< table.rtype_string(mCurRtype)
 	<< " expected data size = "
 	<< exp_dsize
 	<< ", real data size = "
 	<< dsize;
       msg_end();
-      return NULL;
+      return false;
     }
   }
   else {
@@ -103,40 +105,31 @@ GdsScanner::read_rec()
     if ( dsize % unit != 0 ) {
       error_header(__FILE__, __LINE__, "GdsScanner", offset)
 	<< "data size mismatch: record type = "
-	<< table.rtype_string(rtype)
+	<< table.rtype_string(mCurRtype)
 	<< " expected data size = "
 	<< unit
 	<< " x N, real data size = "
 	<< dsize;
       msg_end();
-      return NULL;
+      return false;
     }
   }
 
-  GdsRecord* rec = mMgr.alloc_rec(dsize);
-  rec->mOffset = offset;
-  rec->mSize = size;
-  rec->mRtype = rtype;
-  rec->mDtype = dtype;
-  mIs.read(reinterpret_cast<char*>(rec->mData), dsize);
-  mPos += dsize;
+  mCurOffset = offset;
+  mCurSize = size;
+
+  alloc_buff(dsize);
+  mIs.read(reinterpret_cast<char*>(mDataBuff), dsize);
+  mCurPos += dsize;
 
   if ( !mIs.good() ) {
     error_header(__FILE__, __LINE__, "GdsScanner", offset)
       << "unknown error occured during read";
     msg_end();
-    delete rec;
-    return NULL;
+    return false;
   }
 
-  return rec;
-}
-
-// 現在の位置を返す．
-ymuint32
-GdsScanner::cur_pos() const
-{
-  return mPos;
+  return true;
 }
 
 // ストリームから1バイト読んで符号なし整数に変換する．
@@ -145,7 +138,7 @@ GdsScanner::read_1byte_uint()
 {
   char buf[1] = { 0 };
   mIs.read(buf, 1);
-  mPos += 1;
+  mCurPos += 1;
   return static_cast<ymuint8>(buf[0]);
 }
 
@@ -155,10 +148,25 @@ GdsScanner::read_2byte_uint()
 {
   char buf[2] = { 0, 0 };
   mIs.read(buf, 2);
-  mPos += 2;
+  mCurPos += 2;
   ymuint16 ans = static_cast<ymuint8>(buf[0]) << 8;
   ans += static_cast<ymuint8>(buf[1]);
   return ans;
+}
+
+// @brief バッファを確保する．
+void
+GdsScanner::alloc_buff(ymuint32 req_size)
+{
+  ymuint old_size = mBuffSize;
+  while ( mBuffSize < req_size ) {
+    mBuffSize <<= 1;
+  }
+
+  if ( mBuffSize != old_size ) {
+    delete [] mDataBuff;
+    mDataBuff = new ymuint8[mBuffSize];
+  }
 }
 
 END_NAMESPACE_YM_GDS

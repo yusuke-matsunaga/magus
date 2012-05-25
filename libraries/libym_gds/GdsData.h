@@ -1,7 +1,7 @@
 #ifndef GDSLIB_GDSDATA_H
 #define GDSLIB_GDSDATA_H
 
-/// @file libym_gds/GdsData.h
+/// @file GdsData.h
 /// @brief GDS-II の基本データ型
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -22,12 +22,12 @@ class Property;
 //////////////////////////////////////////////////////////////////////
 struct Date
 {
-  int mYear;
-  int mMonth;
-  int mDay;
-  int mHour;
-  int mMin;
-  int mSec;
+  ymuint8 mYear;
+  ymuint8 mMonth;
+  ymuint8 mDay;
+  ymuint8 mHour;
+  ymuint8 mMin;
+  ymuint8 mSec;
 };
 
 
@@ -36,9 +36,9 @@ struct Date
 //////////////////////////////////////////////////////////////////////
 struct ACL
 {
-  int mGroup;
-  int mUser;
-  int mAccess;
+  ymuint16 mGroup;
+  ymuint16 mUser;
+  ymuint16 mAccess;
 };
 
 
@@ -135,7 +135,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // バージョン番号
-  int mVersionNo;
+  ymuint16 mVersionNo;
 
   // 最終更新日時
   Date mLastModificationTime;

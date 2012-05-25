@@ -33,14 +33,14 @@ public:
 public:
 
   /// @brief レコードの生成
-  /// @param[in] dsize データサイズ
+  /// @param[in] scanner 字句解析器
   GdsRecord*
-  alloc_rec(ymuint32 dsize);
+  new_record(const GdsScanner& scanner);
 
   /// @brief レコードの破壊
   /// @param[in] rec 破壊するレコード
   void
-  free_rec(GdsRecord* rec);
+  free_record(GdsRecord* rec);
 
 
 private:

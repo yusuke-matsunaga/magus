@@ -1,11 +1,9 @@
 
-/// @file libym_gds/GdsDumper.cc
-/// @brief GDS-II の内容を出力するためのクラス
+/// @file GdsDumper.cc
+/// @brief GdsDumper の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GdsDumper.cc 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -100,7 +98,7 @@ GdsDumper::operator()(const GdsRecord& record)
 
 // HEADER の出力
 void
-GdsDumper::dump_HEADER(const GdsRecord& record)
+GdsDumper::dump_HEADER(const ymuint8 data[])
 {
   int version = record.conv_2byte_int(0);
   mOs << "  Release " << version << endl;
@@ -108,10 +106,10 @@ GdsDumper::dump_HEADER(const GdsRecord& record)
 
 // BGNLIB の出力
 void
-GdsDumper::dump_BGNLIB(const GdsRecord& record)
+GdsDumper::dump_BGNLIB(const ymuint8 data[])
 {
-  int buf[12];
-  for (size_t i = 0; i < 12; ++ i) {
+  ymuint16 buf[12];
+  for (ymuint i = 0; i < 12; ++ i) {
     buf[i] = record.conv_2byte_int(i);
   }
 
@@ -126,7 +124,7 @@ GdsDumper::dump_BGNLIB(const GdsRecord& record)
 
 // UNITS の出力
 void
-GdsDumper::dump_UNITS(const GdsRecord& record)
+GdsDumper::dump_UNITS(const ymuint8 data[])
 {
   double uu = record.conv_8byte_real(0);
   double mu = record.conv_8byte_real(1);
@@ -138,10 +136,10 @@ GdsDumper::dump_UNITS(const GdsRecord& record)
 
 // BGNSTR の出力
 void
-GdsDumper::dump_BGNSTR(const GdsRecord& record)
+GdsDumper::dump_BGNSTR(const ymuint8 data[])
 {
-  int buf[12];
-  for (size_t i = 0; i < 12; ++ i) {
+  ymuint16 buf[12];
+  for (ymuint i = 0; i < 12; ++ i) {
     buf[i] = record.conv_2byte_int(i);
   }
   mOs << endl
@@ -155,11 +153,11 @@ GdsDumper::dump_BGNSTR(const GdsRecord& record)
 
 // XY の出力
 void
-GdsDumper::dump_XY(const GdsRecord& record)
+GdsDumper::dump_XY(const ymuint8 data[])
 {
   mOs << endl;
-  size_t n = record.dsize() / 8;
-  for (size_t i = 0; i < n; ++ i) {
+  ymuint n = record.dsize() / 8;
+  for (ymuint i = 0; i < n; ++ i) {
     int x = record.conv_4byte_int(i * 2);
     int y = record.conv_4byte_int(i * 2 + 1);
     mOs << "  (" << x << ", " << y << ")"
@@ -169,7 +167,7 @@ GdsDumper::dump_XY(const GdsRecord& record)
 
 // COLROW の出力
 void
-GdsDumper::dump_COLROW(const GdsRecord& record)
+GdsDumper::dump_COLROW(const ymuint8 data[])
 {
   int col = record.conv_2byte_int(0);
   int row = record.conv_2byte_int(1);
@@ -179,12 +177,12 @@ GdsDumper::dump_COLROW(const GdsRecord& record)
 
 // PRESENTATION の出力
 void
-GdsDumper::dump_PRESENTATION(const GdsRecord& record)
+GdsDumper::dump_PRESENTATION(const ymuint8 data[])
 {
-  size_t data = static_cast<size_t>(record.conv_2byte_int(0));
+  ymuint data = static_cast<ymuint>(record.conv_2byte_int(0));
 
   // font type
-  int font = 0;
+  ymuint font = 0;
   switch ( (data >> 10) & 3 ) {
   case 0: font = 0; break;
   case 1: font = 1; break;
@@ -214,9 +212,9 @@ GdsDumper::dump_PRESENTATION(const GdsRecord& record)
 
 // STRANS の出力
 void
-GdsDumper::dump_STRANS(const GdsRecord& record)
+GdsDumper::dump_STRANS(const ymuint8 data[])
 {
-  size_t data = static_cast<size_t>(record.conv_2byte_int(0));
+  ymuint data = static_cast<ymuint>(record.conv_2byte_int(0));
 
   // reflection
   const char* ref = "no";
@@ -243,9 +241,9 @@ GdsDumper::dump_STRANS(const GdsRecord& record)
 
 // ELFLAGS の出力
 void
-GdsDumper::dump_ELFLAGS(const GdsRecord& record)
+GdsDumper::dump_ELFLAGS(const ymuint8 data[])
 {
-  size_t data = record.conv_2byte_int(0);
+  ymuint data = record.conv_2byte_int(0);
 
   // Template data
   const char* td = "no";
@@ -265,15 +263,15 @@ GdsDumper::dump_ELFLAGS(const GdsRecord& record)
 
 // LIBSECUR の出力
 void
-GdsDumper::dump_LIBSECUR(const GdsRecord& record)
+GdsDumper::dump_LIBSECUR(const ymuint8 data[])
 {
   // 実は良く分かっていない．
   mOs << endl;
-  size_t n = record.dsize() / 6;
-  for (size_t i = 0; i < n; ++ i) {
-    int g = record.conv_2byte_int(i * 3);
-    int u = record.conv_2byte_int(i * 3 + 1);
-    int a = record.conv_2byte_int(i * 3 + 2);
+  ymuint n = record.dsize() / 6;
+  for (ymuint i = 0; i < n; ++ i) {
+    ymuint g = record.conv_2byte_int(i * 3);
+    ymuint u = record.conv_2byte_int(i * 3 + 1);
+    ymuint a = record.conv_2byte_int(i * 3 + 2);
     mOs << "    group: " << g << "  user: " << u << "  access: "
 	<< oct << a << dec << endl;
   }
@@ -281,7 +279,7 @@ GdsDumper::dump_LIBSECUR(const GdsRecord& record)
 
 // data type が 2 byte integer 一つの場合の出力
 void
-GdsDumper::dump_2int(const GdsRecord& record)
+GdsDumper::dump_2int(const ymuint8 data[])
 {
   mOs << " " << record.conv_2byte_int(0)
       << endl;
@@ -289,7 +287,7 @@ GdsDumper::dump_2int(const GdsRecord& record)
 
 // data type が 4 byte integer 一つの場合の出力
 void
-GdsDumper::dump_4int(const GdsRecord& record)
+GdsDumper::dump_4int(const ymuint8 data[])
 {
   mOs << " " << record.conv_4byte_int(0)
       << endl;
@@ -297,7 +295,8 @@ GdsDumper::dump_4int(const GdsRecord& record)
 
 // data type が 8 byte real 一つの場合の出力
 void
-GdsDumper::dump_8real(const GdsRecord& record, bool s_form)
+GdsDumper::dump_8real(const ymuint8 data[],
+		      bool s_form)
 {
   mOs << " ";
   if ( s_form ) {
@@ -312,7 +311,7 @@ GdsDumper::dump_8real(const GdsRecord& record, bool s_form)
 
 // data type が ASCII String の場合の出力
 void
-GdsDumper::dump_string(const GdsRecord& record)
+GdsDumper::dump_string(const ymuint8 data[])
 {
   mOs << " " << record.conv_string()
       << endl;
@@ -320,7 +319,7 @@ GdsDumper::dump_string(const GdsRecord& record)
 
 // 時刻のデータを出力する．
 void
-GdsDumper::dump_date(int buf[])
+GdsDumper::dump_date(ymuint16 buf[])
 {
   dump_2digit(buf[1]);  // month;
   mOs << "/";
@@ -337,10 +336,10 @@ GdsDumper::dump_date(int buf[])
 
 // 2桁の整数を0つきで出力する．
 void
-GdsDumper::dump_2digit(int num)
+GdsDumper::dump_2digit(ymuint num)
 {
-  int u = num / 10;
-  int l = num - u * 10;
+  ymuint u = num / 10;
+  ymuint l = num - u * 10;
   mOs << u << l;
 }
 
@@ -360,6 +359,163 @@ GdsDumper::dump_byte(ymuint8 byte)
       mOs << static_cast<char>('0' + x);
     }
   }
+}
+
+// @brief data を 2バイト整数の配列とみなして pos 番めの要素を返す．
+// @param[in] data データ
+// @param[in] pos 位置
+ymint16
+GdsDumper::conv_2byte_int(const ymuint8 data[],
+			  ymuint pos)
+{
+  ymuint32 offset = pos * 2;
+  ymuint16 ans = (data[offset] << 8) + data[offset + 1];
+  return static_cast<ymint16>(ans);
+
+}
+
+// @brief pos 番目の 4バイトのデータを符号つき数(2の補数表現)に変換する．
+// @param[in] data データ
+// @param[in] pos 位置
+ymint32
+GdsDumper::conv_4byte_int(const ymuint8 data[],
+			  ymuint32 pos) const
+{
+  ymuint32 offset = pos * 4;
+  ymuint32 ans;
+  ans  = (data[offset + 0] << 24);
+  ans += (data[offset + 1] << 16);
+  ans += (data[offset + 2] <<  8);
+  ans += (data[offset + 3] <<  0);
+  return static_cast<ymint32>(ans);
+}
+
+// @brief pos 番目の 4バイトのデータを浮動小数点数に変換する．
+// @param[in] data データ
+// @param[in] pos 位置
+double
+GdsDumper::conv_4byte_real(const ymuint8 data[],
+			   ymuint32 pos) const
+{
+  ymuint32 offset = pos * 4;
+  bool zero = true;
+  ymuint v[4];
+  for (ymuint i = 0; i < 4; ++ i) {
+    v[i] = data[offset + i];
+    if ( v[i] ) {
+      zero = false;
+    }
+  }
+  if ( zero ) {
+    // すべてのビットが0なら0
+    return 0.0;
+  }
+  ymuint sign = (v[0] >> 7) & 1;
+  ymuint exp = (v[0] & 127); // +64 のゲタをはいている．
+  ymuint mag = (v[1] << 16) + (v[2] << 8) + v[0];
+  double ans = 0.0;
+  double w = 0.5;
+  if ( exp >= 64 ) {
+    ymuint sn = exp - 64;
+    for (ymuint i = 0; i < sn; ++ i) {
+      w *= 16.0;
+    }
+  }
+  else {
+    ymuint sn = 64 - exp;
+    for (ymuint i = 0; i < sn; ++ i) {
+      w /= 16.0;
+    }
+  }
+  ymuint mask = (1 << 23);
+  for (ymuint i = 0; i < 24; ++ i) {
+    if ( mag & mask ) {
+      ans += w;
+    }
+    mask >>= 1;
+    w /= 2.0;
+  }
+  if ( sign ) {
+    ans = -ans;
+  }
+  return ans;
+}
+
+// @brief pos 番目の 8バイトのデータを浮動小数点数に変換する．
+// @param[in] data データ
+// @param[in] pos 位置
+double
+GdsDumper::conv_8byte_real(const ymuint8 data[],
+			   ymuint32 pos) const
+{
+  ymuint offset = pos * 8;
+  bool zero = true;
+  ymuint v[8];
+  for (ymuint i = 0; i < 8; ++ i) {
+    v[i] = data[offset + i];
+    if ( v[i] ) {
+      zero = false;
+    }
+  }
+  if ( zero ) {
+    // すべてのビットが0なら0
+    return 0.0;
+  }
+  ymuint sign = (v[0] >> 7) & 1;
+  ymuint exp = (v[0] & 127); // +64 のゲタをはいている．
+  double ans = 0.0;
+  double w = 0.5;
+  if ( exp >= 64 ) {
+    ymuint sn = exp - 64;
+    for (ymuint i = 0; i < sn; ++ i) {
+      w *= 16.0;
+    }
+  }
+  else {
+    ymuint sn = 64 - exp;
+    for (ymuint i = 0; i < sn; ++ i) {
+      w /= 16.0;
+    }
+  }
+  ymuint block = 1;
+  ymuint mask = (1 << 7);
+  for (ymuint i = 0; i < 56; ++ i) {
+    if ( v[block] & mask ) {
+      ans += w;
+    }
+    mask >>= 1;
+    if ( mask == 0 ) {
+      ++ block;
+      mask = (1 << 7);
+    }
+    w /= 2.0;
+  }
+  if ( sign ) {
+    ans = -ans;
+  }
+  return ans;
+}
+
+// @brief データを文字列に変換する．
+// @param[in] data データ
+// @param[in] n データサイズ
+string
+GdsDumper::conv_string(const ymuint8 data[],
+		       ymuint32 n) const
+{
+  ymuint len = n;
+  for (ymuint i = 0; i < n; ++ i) {
+    if ( data[i] == '\0' ) {
+      len = i;
+      break;
+    }
+  }
+  string buf;
+  for (ymuint i = 0; i < len; ++ i) {
+    buf.push_back(mData[i]);
+  }
+
+  return buf;
 }
 
 END_NAMESPACE_YM_GDS
