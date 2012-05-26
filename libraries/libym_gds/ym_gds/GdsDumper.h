@@ -39,11 +39,30 @@ public:
   void
   operator()(const GdsRecord& record);
 
+  /// @brief 直前に読み込んだ record の内容を出力する．
+  /// @param[in] scanner 字句解析器
+  void
+  operator()(const GdsScanner& scanner);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いる下請け関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief record の共通部分の出力
+  /// @param[in] data データ
+  /// @param[in] offset オフセット
+  /// @param[in] size サイズ
+  /// @param[in] rtype レコードの型
+  /// @param[in] dtype レコードのデータ型
+  /// @param[in] data データ
+  void
+  dump_common(ymuint32 offset,
+	      ymuint32 size,
+	      tGdsRtype rtype,
+	      tGdsDtype dtype,
+	      const ymuint8 data[]);
 
   /// @brief HEADER の出力
   /// @param[in] data データ
@@ -67,8 +86,10 @@ private:
 
   /// @brief XY の出力
   /// @param[in] data データ
+  /// @param[in] dsize データサイズ
   void
-  dump_XY(const ymuint8 data[]);
+  dump_XY(const ymuint8 data[],
+	  ymuint dsize);
 
   /// @brief COLROW の出力
   /// @param[in] data データ
@@ -93,7 +114,13 @@ private:
   /// @brief LIBSECUR の出力
   /// @param[in] data データ
   void
-  dump_LIBSECUR(const ymuint8 data[]);
+  dump_LIBSECUR(const ymuint8 data[],
+		ymuint dsize);
+
+  /// @brief PATHTYPE の出力
+  /// @param[in] data データ
+  void
+  dump_PATHTYPE(const ymuint8 data[]);
 
   /// @brief data type が 2 byte integer 一つの場合の出力
   /// @param[in] data データ
@@ -114,8 +141,10 @@ private:
 
   /// @brief data type が ASCII String の場合の出力
   /// @param[in] data データ
+  /// @param[in] dsize データ長
   void
-  dump_string(const ymuint8 data[]);
+  dump_string(const ymuint8 data[],
+	      ymuint dsize);
 
   /// @brief 時刻のデータを出力する．
   void
@@ -168,6 +197,17 @@ private:
   string
   conv_string(const ymuint8 data[],
 	      ymuint32 n);
+
+  /// @brief データを BitArray に変換する．
+  /// @param[in] data データ
+  /// @param[in] base 開始位置(ビット)
+  /// @param[in] width ビット幅
+  /// @note 単位はバイトではなくビット
+  static
+  ymuint
+  conv_bitarray(const ymuint8 data[],
+		ymuint base,
+		ymuint width);
 
 
 private:

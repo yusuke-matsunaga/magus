@@ -68,6 +68,10 @@ public:
   ymuint32
   dsize() const;
 
+  /// @brief データバッファを取り出す．
+  const ymuint8*
+  data() const;
+
   /// @brief pos 番目のバイトデータを返す．
   /// @param[in] pos 位置
   ymuint8
@@ -169,6 +173,14 @@ ymuint32
 GdsRecord::dsize() const
 {
   return size() - 4;
+}
+
+// @brief データバッファを取り出す．
+inline
+const ymuint8*
+GdsRecord::data() const
+{
+  return mData;
 }
 
 // pos 番目のバイトデータを返す．

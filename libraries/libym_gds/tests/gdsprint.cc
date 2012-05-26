@@ -8,8 +8,6 @@
 
 
 #include "ym_gds/GdsScanner.h"
-#include "ym_gds/GdsRecMgr.h"
-#include "ym_gds/GdsRecord.h"
 #include "ym_gds/GdsDumper.h"
 #include "ym_gds/Msg.h"
 
@@ -20,7 +18,6 @@ main(int argc,
   using namespace std;
   using namespace nsYm::nsGds;
 
-  GdsRecMgr mgr;
   GdsScanner scanner(cin);
   GdsDumper dumper(cout);
 
@@ -30,9 +27,7 @@ main(int argc,
   msgmgr.reg_handler(tmh);
 
   while ( scanner.read_rec() ) {
-    GdsRecord* rec = mgr.new_record(scanner);
-    dumper(*rec);
-    mgr.free_record(rec);
+    dumper(scanner);
   }
 
   return 0;

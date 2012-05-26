@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "ym_gds/gds_nsdef.h"
 #include "ym_gds/GdsDumper.h"
 #include "ym_gds/GdsRecord.h"
+#include "ym_gds/GdsScanner.h"
 #include "GdsRecTable.h"
 
 
@@ -34,24 +34,53 @@ GdsDumper::~GdsDumper()
 void
 GdsDumper::operator()(const GdsRecord& record)
 {
-  // 生データの出力
+  dump_common(record.offset(), record.size(),
+	      record.rtype(), record.dtype(),
+	      record.data());
+}
+
+// @brief 直前に読み込んだ record の内容を出力する．
+// @param[in] scanner 字句解析器
+void
+GdsDumper::operator()(const GdsScanner& scanner)
+{
+  dump_common(scanner.cur_offset(), scanner.cur_size(),
+	      scanner.cur_rtype(), scanner.cur_dtype(),
+	      scanner.cur_data());
+}
+
+// @brief record の共通部分の出力
+// @param[in] data データ
+// @param[in] offset オフセット
+// @param[in] size サイズ
+// @param[in] rtype レコードの型
+// @param[in] dtype レコードのデータ型
+// @param[in] data データ
+void
+GdsDumper::dump_common(ymuint32 offset,
+		       ymuint32 size,
+		       tGdsRtype rtype,
+		       tGdsDtype dtype,
+		       const ymuint8 data[])
+{
+  // オフセット : サイズ 生データ
   mOs << endl
-      << hex << setw(8) << record.offset() << dec << ": ";
-  ymuint us = record.size() >> 8;
-  ymuint ls = record.size() & 255;
+      << hex << setw(7) << offset << dec << ": ";
+  ymuint us = size >> 8;
+  ymuint ls = size & 255;
   dump_byte(us);
   dump_byte(ls);
   mOs << " ";
-  ymuint rt = static_cast<ymuint8>(record.rtype());
-  ymuint dt = static_cast<ymuint8>(record.dtype());
+  ymuint rt = static_cast<ymuint8>(rtype);
+  ymuint dt = static_cast<ymuint8>(dtype);
   dump_byte(rt);
   dump_byte(dt);
   mOs << " ";
-  ymuint dsize = record.dsize();
+  ymuint dsize = size - 4;
   for (ymuint i = 0; i < dsize; ++ i) {
-    dump_byte(record.conv_1byte(i));
+    dump_byte(data[i]);
     if ( (i + 4) % 24 == 23 ) {
-      mOs << endl << "          ";
+      mOs << " " << endl << "         ";
     }
     else if ( i % 2 == 1 ) {
       mOs << " ";
@@ -62,32 +91,33 @@ GdsDumper::operator()(const GdsRecord& record)
   const GdsRecTable& table = GdsRecTable::obj();
 
   // 整形された出力
-  mOs << "  " << record.rtype_string();
-  switch ( record.rtype() ) {
-  case kGdsHEADER:       dump_HEADER(record);       return;
-  case kGdsBGNLIB:       dump_BGNLIB(record);       return;
-  case kGdsUNITS:        dump_UNITS(record);        return;
-  case kGdsBGNSTR:       dump_BGNSTR(record);       return;
-  case kGdsXY:           dump_XY(record);           return;
-  case kGdsCOLROW:       dump_COLROW(record);       return;
-  case kGdsPRESENTATION: dump_PRESENTATION(record); return;
-  case kGdsSTRANS:       dump_STRANS(record);       return;
-  case kGdsELFLAGS:      dump_ELFLAGS(record);      return;
-  case kGdsLIBSECUR:     dump_LIBSECUR(record);     return;
+  mOs << "  " << table.rtype_string(rtype);
+  switch ( rtype ) {
+  case kGdsHEADER:       dump_HEADER(data);          return;
+  case kGdsBGNLIB:       dump_BGNLIB(data);          return;
+  case kGdsUNITS:        dump_UNITS(data);           return;
+  case kGdsBGNSTR:       dump_BGNSTR(data);          return;
+  case kGdsXY:           dump_XY(data, dsize);       return;
+  case kGdsCOLROW:       dump_COLROW(data);          return;
+  case kGdsPRESENTATION: dump_PRESENTATION(data);    return;
+  case kGdsSTRANS:       dump_STRANS(data);          return;
+  case kGdsELFLAGS:      dump_ELFLAGS(data);         return;
+  case kGdsLIBSECUR:     dump_LIBSECUR(data, dsize); return;
+  case kGdsPATHTYPE:     dump_PATHTYPE(data);        return;
   default:
     break;
   }
-  if ( record.dtype() == kGdsNodata ) {
+  if ( dtype == kGdsNodata ) {
     mOs << endl;
     return;
   }
 
-  if ( table.data_num(record.rtype()) == 1 ) {
-    switch ( record.dtype() ) {
-    case kGds2Int:   dump_2int(record);         return;
-    case kGds4Int:   dump_4int(record);         return;
-    case kGds8Real:  dump_8real(record, false); return;
-    case kGdsString: dump_string(record);       return;
+  if ( table.data_num(rtype) == 1 ) {
+    switch ( dtype ) {
+    case kGds2Int:   dump_2int(data);          return;
+    case kGds4Int:   dump_4int(data);          return;
+    case kGds8Real:  dump_8real(data, false);  return;
+    case kGdsString: dump_string(data, dsize); return;
     default:
       break;
     }
@@ -100,7 +130,7 @@ GdsDumper::operator()(const GdsRecord& record)
 void
 GdsDumper::dump_HEADER(const ymuint8 data[])
 {
-  int version = record.conv_2byte_int(0);
+  int version = conv_2byte_int(data, 0);
   mOs << "  Release " << version << endl;
 }
 
@@ -110,7 +140,7 @@ GdsDumper::dump_BGNLIB(const ymuint8 data[])
 {
   ymuint16 buf[12];
   for (ymuint i = 0; i < 12; ++ i) {
-    buf[i] = record.conv_2byte_int(i);
+    buf[i] = conv_2byte_int(data, i);
   }
 
   mOs << endl
@@ -126,8 +156,8 @@ GdsDumper::dump_BGNLIB(const ymuint8 data[])
 void
 GdsDumper::dump_UNITS(const ymuint8 data[])
 {
-  double uu = record.conv_8byte_real(0);
-  double mu = record.conv_8byte_real(1);
+  double uu = conv_8byte_real(data, 0);
+  double mu = conv_8byte_real(data, 1);
 
   mOs << endl << scientific
       << "    1 database unit = " << uu << " user units" << endl
@@ -140,7 +170,7 @@ GdsDumper::dump_BGNSTR(const ymuint8 data[])
 {
   ymuint16 buf[12];
   for (ymuint i = 0; i < 12; ++ i) {
-    buf[i] = record.conv_2byte_int(i);
+    buf[i] = conv_2byte_int(data, i);
   }
   mOs << endl
       << "    Creation time ";
@@ -153,14 +183,15 @@ GdsDumper::dump_BGNSTR(const ymuint8 data[])
 
 // XY の出力
 void
-GdsDumper::dump_XY(const ymuint8 data[])
+GdsDumper::dump_XY(const ymuint8 data[],
+		   ymuint dsize)
 {
   mOs << endl;
-  ymuint n = record.dsize() / 8;
+  ymuint n = dsize / 8;
   for (ymuint i = 0; i < n; ++ i) {
-    int x = record.conv_4byte_int(i * 2);
-    int y = record.conv_4byte_int(i * 2 + 1);
-    mOs << "  (" << x << ", " << y << ")"
+    int x = conv_4byte_int(data, i * 2 + 0);
+    int y = conv_4byte_int(data, i * 2 + 1);
+    mOs << "    (" << x << " , " << y << ")"
 	<< endl;
   }
 }
@@ -169,8 +200,8 @@ GdsDumper::dump_XY(const ymuint8 data[])
 void
 GdsDumper::dump_COLROW(const ymuint8 data[])
 {
-  int col = record.conv_2byte_int(0);
-  int row = record.conv_2byte_int(1);
+  int col = conv_2byte_int(data, 0);
+  int row = conv_2byte_int(data, 1);
   mOs << " " << col << " cols, " << row << " rows"
       << endl;
 }
@@ -179,11 +210,9 @@ GdsDumper::dump_COLROW(const ymuint8 data[])
 void
 GdsDumper::dump_PRESENTATION(const ymuint8 data[])
 {
-  ymuint data = static_cast<ymuint>(record.conv_2byte_int(0));
-
   // font type
   ymuint font = 0;
-  switch ( (data >> 10) & 3 ) {
+  switch ( conv_bitarray(data, 10, 2) ) {
   case 0: font = 0; break;
   case 1: font = 1; break;
   case 2: font = 2; break;
@@ -192,7 +221,7 @@ GdsDumper::dump_PRESENTATION(const ymuint8 data[])
 
   // vertical justification
   const char* vj = "";
-  switch ( (data >> 12) & 3 ) {
+  switch ( conv_bitarray(data, 12, 2) ) {
   case 0: vj = "top"; break;
   case 1: vj = "middle"; break;
   case 2: vj = "bottom"; break;
@@ -200,7 +229,7 @@ GdsDumper::dump_PRESENTATION(const ymuint8 data[])
 
   // horizontal justification
   const char* hj = "";
-  switch ( (data >> 14) & 3 ) {
+  switch ( conv_bitarray(data, 14, 2) ) {
   case 0: hj = "left"; break;
   case 1: hj = "middle"; break;
   case 2: hj = "right"; break;
@@ -214,74 +243,83 @@ GdsDumper::dump_PRESENTATION(const ymuint8 data[])
 void
 GdsDumper::dump_STRANS(const ymuint8 data[])
 {
-  ymuint data = static_cast<ymuint>(record.conv_2byte_int(0));
-
   // reflection
-  const char* ref = "no";
-  if ( data & 1 ) {
-    ref = "yes";
+  if ( conv_bitarray(data, 0, 1) ) {
+    mOs << "  reflect";
   }
+
+  mOs << " ";
 
   // absolute magnification
-  const char* am = "no";
-  if ( data & (1 << 13) ) {
-    am = "yes";
+  if ( conv_bitarray(data, 13, 1) ) {
+    mOs << "absolute magnificaion";
   }
+
+  mOs << " ";
 
   // absolute angle
-  const char* aa = "no";
-  if ( data & (1 << 14) ) {
-    aa = "yes";
+  if ( conv_bitarray(data, 14, 1) ) {
+    mOs << "absolute angle";
   }
 
-  mOs << "  reflection: " << ref << "  absolute magnification: "
-      << am << "  absolute angle: " << aa
-      << endl;
+  mOs << endl;
 }
 
 // ELFLAGS の出力
 void
 GdsDumper::dump_ELFLAGS(const ymuint8 data[])
 {
-  ymuint data = record.conv_2byte_int(0);
-
   // Template data
-  const char* td = "no";
-  if ( data & (1 << 15) ) {
-    td = "yes";
+  if ( conv_bitarray(data, 15, 1) ) {
+    mOs << " template data";
   }
 
   // External data
-  const char* ed = "no";
-  if ( data & (1 << 14) ) {
-    ed = "yes";
+  if ( conv_bitarray(data, 14, 1) ) {
+    mOs << " external data";
   }
 
-  mOs << "  template data: " << td << "  external data: " << ed
-      << endl;
+  mOs << endl;
 }
 
 // LIBSECUR の出力
 void
-GdsDumper::dump_LIBSECUR(const ymuint8 data[])
+GdsDumper::dump_LIBSECUR(const ymuint8 data[],
+			 ymuint dsize)
 {
   // 実は良く分かっていない．
   mOs << endl;
-  ymuint n = record.dsize() / 6;
+  ymuint n = dsize / 6;
   for (ymuint i = 0; i < n; ++ i) {
-    ymuint g = record.conv_2byte_int(i * 3);
-    ymuint u = record.conv_2byte_int(i * 3 + 1);
-    ymuint a = record.conv_2byte_int(i * 3 + 2);
+    ymuint g = conv_2byte_int(data, i * 3 + 0);
+    ymuint u = conv_2byte_int(data, i * 3 + 1);
+    ymuint a = conv_2byte_int(data, i * 3 + 2);
     mOs << "    group: " << g << "  user: " << u << "  access: "
 	<< oct << a << dec << endl;
   }
+}
+
+// @brief PATHTYPE の出力
+// @param[in] data データ
+void
+GdsDumper::dump_PATHTYPE(const ymuint8 data[])
+{
+  int val = conv_2byte_int(data, 0);
+  const char* type_str = "";
+  switch ( val ) {
+  case 0: type_str = "square ends"; break;
+  case 1: type_str = "round ends"; break;
+  case 2: type_str = "extended square ends"; break;
+  case 3: type_str = "variable square ends"; break;
+  }
+  mOs << " " << type_str << endl;
 }
 
 // data type が 2 byte integer 一つの場合の出力
 void
 GdsDumper::dump_2int(const ymuint8 data[])
 {
-  mOs << " " << record.conv_2byte_int(0)
+  mOs << " " << conv_2byte_int(data, 0)
       << endl;
 }
 
@@ -289,7 +327,7 @@ GdsDumper::dump_2int(const ymuint8 data[])
 void
 GdsDumper::dump_4int(const ymuint8 data[])
 {
-  mOs << " " << record.conv_4byte_int(0)
+  mOs << " " << conv_4byte_int(data, 0)
       << endl;
 }
 
@@ -305,15 +343,16 @@ GdsDumper::dump_8real(const ymuint8 data[],
   else {
     mOs << fixed;
   }
-  mOs << record.conv_8byte_real(0)
+  mOs << conv_8byte_real(data, 0)
       << endl;
 }
 
 // data type が ASCII String の場合の出力
 void
-GdsDumper::dump_string(const ymuint8 data[])
+GdsDumper::dump_string(const ymuint8 data[],
+		       ymuint n)
 {
-  mOs << " " << record.conv_string()
+  mOs << " " << conv_string(data, n)
       << endl;
 }
 
@@ -369,7 +408,9 @@ GdsDumper::conv_2byte_int(const ymuint8 data[],
 			  ymuint pos)
 {
   ymuint32 offset = pos * 2;
-  ymuint16 ans = (data[offset] << 8) + data[offset + 1];
+  ymuint16 ans;
+  ans  = (data[offset + 0] << 8);
+  ans += (data[offset + 1] << 0);
   return static_cast<ymint16>(ans);
 
 }
@@ -379,7 +420,7 @@ GdsDumper::conv_2byte_int(const ymuint8 data[],
 // @param[in] pos 位置
 ymint32
 GdsDumper::conv_4byte_int(const ymuint8 data[],
-			  ymuint32 pos) const
+			  ymuint32 pos)
 {
   ymuint32 offset = pos * 4;
   ymuint32 ans;
@@ -395,7 +436,7 @@ GdsDumper::conv_4byte_int(const ymuint8 data[],
 // @param[in] pos 位置
 double
 GdsDumper::conv_4byte_real(const ymuint8 data[],
-			   ymuint32 pos) const
+			   ymuint32 pos)
 {
   ymuint32 offset = pos * 4;
   bool zero = true;
@@ -446,7 +487,7 @@ GdsDumper::conv_4byte_real(const ymuint8 data[],
 // @param[in] pos 位置
 double
 GdsDumper::conv_8byte_real(const ymuint8 data[],
-			   ymuint32 pos) const
+			   ymuint32 pos)
 {
   ymuint offset = pos * 8;
   bool zero = true;
@@ -501,7 +542,7 @@ GdsDumper::conv_8byte_real(const ymuint8 data[],
 // @param[in] n データサイズ
 string
 GdsDumper::conv_string(const ymuint8 data[],
-		       ymuint32 n) const
+		       ymuint32 n)
 {
   ymuint len = n;
   for (ymuint i = 0; i < n; ++ i) {
@@ -512,10 +553,34 @@ GdsDumper::conv_string(const ymuint8 data[],
   }
   string buf;
   for (ymuint i = 0; i < len; ++ i) {
-    buf.push_back(mData[i]);
+    buf.push_back(data[i]);
   }
 
   return buf;
+}
+
+// @brief データを BitArray に変換する．
+// @param[in] data データ
+// @param[in] base 開始位置(ビット)
+// @param[in] width ビット幅
+// @note 単位はバイトではなくビット
+ymuint
+GdsDumper::conv_bitarray(const ymuint8 data[],
+			 ymuint base,
+			 ymuint width)
+{
+  ymuint16 val = conv_2byte_int(data, 0);
+  ymuint sft = 15 - base;
+  ymuint ans = 0U;
+  ymuint bit = 1U << sft;
+  for (ymuint i = 0; i < width; ++ i) {
+    ans <<= 1;
+    if ( val & bit ) {
+      ans |= 1U;
+    }
+    bit >>= 1;
+  }
+  return ans;
 }
 
 END_NAMESPACE_YM_GDS
