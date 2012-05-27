@@ -132,13 +132,14 @@ yyerror(GdsRecMgr& mgr,
 %%
 
 stream_format
+: header star_structure ENDLIB
+;
+
+// ヘッダ部分
+header
 : HEADER BGNLIB opt_LIBDIRSIZE opt_SRFNAME opt_LIBSECUR
   LIBNAME opt_REFLIBS opt_FONTS opt_ATTRTABLE opt_GENERATIONS
   opt_FormatType UNITS
-{
-  // bgnlib($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
-}
-  star_structure ENDLIB
 ;
 
 opt_LIBDIRSIZE
@@ -235,8 +236,12 @@ star_structure
 ;
 
 structure
-: BGNSTR STRNAME          star_element ENDSTR
-| BGNSTR STRNAME STRCLASS star_element ENDSTR
+: struct_head star_element ENDSTR
+;
+
+struct_head
+: BGNSTR STRNAME
+| BGNSTR STRNAME STRCLASS
 ;
 
 star_element
@@ -293,32 +298,68 @@ textbody
 
 opt_ELFLAGS
 : // null
+{
+  $$ = NULL;
+}
 | ELFLAGS
+{
+  $$ = $1;
+}
 ;
 
 opt_PLEX
 : // null
+{
+  $$ = NULL;
+}
 | PLEX
+{
+  $$ = $1;
+}
 ;
 
 opt_PATHTYPE
 : // null
+{
+  $$ = NULL;
+}
 | PATHTYPE
+{
+  $$ = $1;
+}
 ;
 
 opt_WIDTH
 : // null
+{
+  $$ = NULL;
+}
 | WIDTH
+{
+  $$ = $1;
+}
 ;
 
 opt_BGNEXTN
 : // null
+{
+  $$ = NULL;
+}
 | BGNEXTN
+{
+  $$ = $1;
+}
 ;
 
 opt_ENDEXTN
 : // null
+{
+  $$ = NULL;
+}
 | ENDEXTN
+{
+  $$ = $1;
+}
 ;
 
 opt_strans
@@ -331,12 +372,21 @@ opt_strans
 
 opt_PRESENTATION
 : // null
+{
+  $$ = NULL;
+}
 | PRESENTATION
+{
+  $$ = $1;
+}
 ;
 
 star_property
 : // null
 | star_property PROPATTR PROPVALUE
+{
+  // mgr.add_property($2, $3);
+}
 ;
 
 %%
