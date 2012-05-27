@@ -67,10 +67,9 @@ GdsScanner::read_rec()
 {
   mCurSize = 0;
   while ( mCurSize == 0 ) {
-    if ( is_eof() ) {
+    if ( !read_2byte_uint(mCurSize) ) {
       return false;
     }
-    mCurSize = read_2byte_uint();
     // null word をスキップする．
   }
 
@@ -84,7 +83,10 @@ GdsScanner::read_rec()
   }
 
   ymuint32 dsize = mCurSize - 4;
-  ymuint16 tmp_word = read_2byte_uint();
+  ymuint tmp_word;
+  if ( !read_2byte_uint(tmp_word) ) {
+    return false;
+  }
   mCurRtype = static_cast<tGdsRtype>(tmp_word >> 8);
   mCurDtype = static_cast<tGdsDtype>(tmp_word & 0xFF);
 
@@ -138,46 +140,92 @@ GdsScanner::read_rec()
     }
   }
 
-  block_read(dsize);
-  alloc_buff(dsize);
-  mIs.read(reinterpret_cast<char*>(mDataBuff), dsize);
-  mCurPos += dsize;
-
-  if ( !mIs.good() ) {
-    error_header(__FILE__, __LINE__, "GdsScanner", offset)
-      << "unknown error occured during read";
-    msg_end();
+  if ( !read_block(dsize) ) {
     return false;
   }
 
   return true;
 }
 
-// ストリームから2バイト読んで符号なし整数に変換する．
-ymuint16
-GdsScanner::read_2byte_uint()
-{
-  char buf[2] = { 0, 0 };
-
-  if ( mReadPos < mEndPos ) {
-    buf[0] = mBuff[mReadPos];
-    ++ mReadPos;
-
-  mIs.read(buf, 2);
-  mCurPos += 2;
-  ymuint16 ans = static_cast<ymuint8>(buf[0]) << 8;
-  ans += static_cast<ymuint8>(buf[1]);
-  return ans;
-}
-
-// @brief ブロック読み込みを行う．
-// @param[in] dsize 読み込むサイズ
+// @brief 2バイト読んで符号なし整数に変換する．
+// @param[out] val 読み込んだ値を格納する変数
 // @retval true 読み込みが成功した．
 // @retval false 読み込みが失敗した．
 bool
+GdsScanner::read_2byte_uint(ymuint& val)
+{
+  ymuint val0;
+  if ( !read_1byte(val0) ) {
+    return false;
+  }
+
+  ymuint val1;
+  if ( !read_1byte(val1) ) {
+    return false;
+  }
+
+  val  = val0 << 8;
+  val += val1 << 0;
+
+  return true;
+}
+
+// @brief 1バイト読み込む．
+// @param[out] val 読み込んだ値を格納する変数
+// @retval true 読み込みが成功した．
+// @retval false 読み込みが失敗した．
+bool
+GdsScanner::read_1byte(ymuint& val)
+{
+  while ( mReadPos >= mEndPos ) {
+    bool stat = raw_read();
+    if ( !stat ) {
+      return false;
+    }
+  }
+
+  val = mBuff[mReadPos];
+  ++ mReadPos;
+  ++ mCurPos;
+
+  return true;
+}
+
+// @brief データブロックを読み込む．
+// @param[in] dsize 読み込むサイズ
+// @retval true 読み込みが成功した．
+// @retval false 読み込みが失敗した．
+// @note 結果は mDataBuff に格納される．
+bool
 GdsScanner::read_block(ymuint dsize)
 {
-  alloc_buff(req_size);
+  alloc_buff(dsize);
+
+  ymuint wpos = 0;
+  while ( dsize > 0 ) {
+    ymuint n = dsize;
+    if ( mReadPos + n >= mEndPos ) {
+      n = mEndPos - mReadPos;
+    }
+    if ( n > 0 ) {
+      ymuint8* sp = mBuff + mReadPos;
+      ymuint8* dp = mDataBuff + wpos;
+      for (ymuint i = 0; i < n; ++ i, ++ sp, ++ dp) {
+	*dp = *sp;
+      }
+      mReadPos += n;
+      mCurPos += n;
+      wpos += n;
+      dsize -= n;
+    }
+    else {
+      if ( !raw_read() ) {
+	return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 // @brief バッファを確保する．
@@ -206,8 +254,16 @@ GdsScanner::raw_read()
   ssize_t n = read(mFd, mBuff, 4096);
   if ( n < 0 ) {
     // エラー
+    error_header(__FILE__, __LINE__, "GdsScanner", mCurPos)
+      << "error occured in 'read()'";
+    msg_end();
     return false;
   }
+  if ( n == 0 ) {
+    // EOF
+    return false;
+  }
+
   mEndPos = static_cast<ymuint>(n);
   mReadPos = 0;
 

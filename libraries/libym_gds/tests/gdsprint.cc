@@ -18,8 +18,18 @@ main(int argc,
   using namespace std;
   using namespace nsYm::nsGds;
 
-  GdsScanner scanner(cin);
+  if ( argc != 2 ) {
+    cerr << "USAGE: " << argv[0] << " <gds2 filename>" << endl;
+    return 1;
+  }
+
+  GdsScanner scanner;
   GdsDumper dumper(cout);
+
+  if ( !scanner.open_file(argv[1]) ) {
+    cerr << argv[1] << ": No such file" << endl;
+    return 2;
+  }
 
   MsgMgr& msgmgr = MsgMgr::the_mgr();
   tMsgMask msgmask = kMsgMaskError | kMsgMaskWarning;
@@ -29,6 +39,8 @@ main(int argc,
   while ( scanner.read_rec() ) {
     dumper(scanner);
   }
+
+  scanner.close_file();
 
   return 0;
 }

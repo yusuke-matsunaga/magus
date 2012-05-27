@@ -27,11 +27,22 @@ main(int argc,
   using namespace std;
   using namespace nsYm::nsGds;
 
+  if ( argc != 2 ) {
+    cerr << "USAGE: " << argv[0] << " <gds2 filename>" << endl;
+    return 1;
+  }
+
   GdsRecMgr mgr;
-  GdsScanner scanner(cin);
-  //GdsDumper dumper(cout);
+  GdsScanner scanner;
+
+  if ( !scanner.open_file(argv[1]) ) {
+    cerr << argv[1] << ": No such file" << endl;
+    return 2;
+  }
 
   nsParser::yyparse(mgr, scanner);
+
+  scanner.close_file();
 
   return 0;
 }

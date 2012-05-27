@@ -82,23 +82,30 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 2バイト読んで符号なし整数に変換する．
-  ymuint16
-  read_2byte_uint();
+  /// @param[out] val 読み込んだ値を格納する変数
+  /// @retval true 読み込みが成功した．
+  /// @retval false 読み込みが失敗した．
+  bool
+  read_2byte_uint(ymuint& val);
 
-  /// @brief ブロック読み込みを行う．
+  /// @brief 1バイト読み込む．
+  /// @param[out] val 読み込んだ値を格納する変数
+  /// @retval true 読み込みが成功した．
+  /// @retval false 読み込みが失敗した．
+  bool
+  read_1byte(ymuint& val);
+
+  /// @brief データブロックを読み込む．
   /// @param[in] dsize 読み込むサイズ
   /// @retval true 読み込みが成功した．
   /// @retval false 読み込みが失敗した．
+  /// @note 結果は mDataBuff に格納される．
   bool
   read_block(ymuint dsize);
 
   /// @brief データバッファを確保する．
   void
   alloc_buff(ymuint32 req_size);
-
-  /// @brief ファイルの末尾に到達していたら true を返す．
-  bool
-  is_eof() const;
 
   /// @brief 低レベルの読み込みを行う．
   bool

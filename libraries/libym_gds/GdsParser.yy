@@ -350,8 +350,10 @@ yylex(YYSTYPE* lvalp,
   bool stat = scanner.read_rec();
   if ( stat ) {
     GdsRecord* rec = mgr.new_record(scanner);
+#if 0
     GdsDumper dumper(cout);
     dumper(*rec);
+#endif
     *lvalp = rec;
     return rec->rtype_token();
   }
