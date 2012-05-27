@@ -23,8 +23,7 @@ class GdsScanner
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] is 入力ストリーム
-  GdsScanner(istream& is);
+  GdsScanner();
 
   /// @brief デストラクタ
   ~GdsScanner();
@@ -34,6 +33,17 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief ファイルを開く
+  /// @param[in] filenmae ファイル名
+  /// @retval true オープンに成功した．
+  /// @retval false オープンに失敗した．
+  bool
+  open_file(const string& filename);
+
+  /// @brief ファイルを閉じる．
+  void
+  close_file();
 
   /// @brief レコード一つ分の読み込みを行う．
   /// @retval true 読み込みが成功した．
@@ -71,17 +81,28 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ストリームから1バイト読んで符号なし整数に変換する．
-  ymuint8
-  read_1byte_uint();
-
-  /// @brief ストリームから2バイト読んで符号なし整数に変換する．
+  /// @brief 2バイト読んで符号なし整数に変換する．
   ymuint16
   read_2byte_uint();
 
-  /// @brief バッファを確保する．
+  /// @brief ブロック読み込みを行う．
+  /// @param[in] dsize 読み込むサイズ
+  /// @retval true 読み込みが成功した．
+  /// @retval false 読み込みが失敗した．
+  bool
+  read_block(ymuint dsize);
+
+  /// @brief データバッファを確保する．
   void
   alloc_buff(ymuint32 req_size);
+
+  /// @brief ファイルの末尾に到達していたら true を返す．
+  bool
+  is_eof() const;
+
+  /// @brief 低レベルの読み込みを行う．
+  bool
+  raw_read();
 
 
 private:
@@ -89,8 +110,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 入力ストリーム
-  istream& mIs;
+  // 入力のファイル記述子
+  int mFd;
+
+  // ファイルバッファ
+  ymuint8 mBuff[4096];
+
+  // mBuff の読み出し位置
+  ymuint16 mReadPos;
+
+  // mBuff の終端位置
+  ymuint16 mEndPos;
 
   // 入力ストリームから読み込んだバイト数
   ymuint32 mCurPos;
