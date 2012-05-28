@@ -13,7 +13,7 @@
 BEGIN_NAMESPACE_YM_GDS_PARSER
 
 // yacc/bison が生成したヘッダファイル
-#include "GdsParser.hh"
+#include "gds_grammer.hh"
 
 END_NAMESPACE_YM_GDS_PARSER
 

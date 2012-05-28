@@ -145,8 +145,17 @@ enum tGdsDtype {
 
 class GdsRecord;
 class GdsRecMgr;
+class GdsParser;
 class GdsScanner;
 class GdsDumper;
+
+class GdsString;
+class GdsDate;
+class GdsUnit;
+class GdsXY;
+class GdsColRow;
+class GdsACL;
+class GdsFormat;
 
 END_NAMESPACE_YM_GDS
 

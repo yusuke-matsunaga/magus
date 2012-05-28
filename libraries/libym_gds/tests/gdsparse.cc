@@ -8,17 +8,8 @@
 
 
 #include "ym_gds/gds_nsdef.h"
-#include "ym_gds/GdsScanner.h"
-#include "ym_gds/GdsRecMgr.h"
+#include "ym_gds/GdsParser.h"
 
-
-BEGIN_NAMESPACE_YM_GDS_PARSER
-
-int
-yyparse(GdsRecMgr& mgr,
-	GdsScanner& scanner);
-
-END_NAMESPACE_YM_GDS_PARSER
 
 int
 main(int argc,
@@ -32,17 +23,13 @@ main(int argc,
     return 1;
   }
 
-  GdsRecMgr mgr;
-  GdsScanner scanner;
+  GdsParser parser;
 
-  if ( !scanner.open_file(argv[1]) ) {
-    cerr << argv[1] << ": No such file" << endl;
+  bool stat = parser.parse(argv[1]);
+  if ( !stat ) {
+    cerr << "Error!" << endl;
     return 2;
   }
-
-  nsParser::yyparse(mgr, scanner);
-
-  scanner.close_file();
 
   return 0;
 }

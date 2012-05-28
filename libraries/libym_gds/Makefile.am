@@ -10,10 +10,10 @@ SUBDIRS = \
 AM_YFLAGS = -d -v
 
 CLEANFILES = \
-	GdsParser.cc \
-	GdsParser.h \
+	gds_grammer.cc \
+	gds_grammer.hh \
 	y.output \
-	GdsParser.output
+	gds_grammer.output
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -35,13 +35,12 @@ libym_gds_la_CPPFLAGS = \
 
 libym_gds_la_SOURCES = \
 	Msg.cc \
-	GdsParser.yy \
+	gds_grammer.yy \
 	GdsRecTable.h \
 	GdsRecTable.cc \
 	GdsRecMgr.cc \
 	GdsRecord.cc \
-	GdsData.h \
-	GdsData.cc \
+	GdsParser.cc \
 	GdsScanner.cc \
 	GdsDumper.cc
 

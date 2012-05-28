@@ -2,7 +2,7 @@
 #define GDSLIB_GDSDATA_H
 
 /// @file GdsData.h
-/// @brief GDS-II の基本データ型
+/// @brief GdsData のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
@@ -13,6 +13,26 @@
 
 
 BEGIN_NAMESPACE_YM_GDS
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class GdsData GdsData.h "ym_gds/GdsData.h"
+/// @brief GdsII のデータを表す基底クラス
+//////////////////////////////////////////////////////////////////////
+class GdsData
+{
+public:
+
+  /// @brief コンストラクタ
+  GdsData();
+
+  /// @brief デストラクタ
+  virtual
+  ~GdsData();
+
+
+public:
+};
 
 class Element;
 class Property;

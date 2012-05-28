@@ -13,7 +13,6 @@
 #include "ImpNode.h"
 #include "ImpList.h"
 #include "ImpVals.h"
-#include "ym_logic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

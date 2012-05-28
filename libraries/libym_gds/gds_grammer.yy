@@ -1,44 +1,34 @@
 %{
 
-/// @file libym_gds/GdsParser.yy
+/// @file libym_gds/gds_grammer.yy
 /// @brief GDS-II のパーサ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_gds/Msg.h"
-#include "ym_gds/GdsScanner.h"
-#include "ym_gds/GdsRecMgr.h"
-#include "ym_gds/GdsDumper.h"
-#include "ym_gds/GdsRecord.h"
+#include "ym_gds/GdsParser.h"
+#include "GdsRecTable.h"
 
 
 // より詳細なエラー情報を出力させる．
 #define YYERROR_VERBOSE 1
 
-// シンボルの値を GdsRecord へのポインタに変更
-// このやり方が正しいかどうかは知らない．
-#ifdef YYSTYPE
-#undef YYSTYPE
-#endif
-#define YYSTYPE GdsRecord*
 
 BEGIN_NAMESPACE_YM_GDS_PARSER
 
 // yacc/bison が生成したヘッダファイル
-#include "GdsParser.hh"
+#include "gds_grammer.hh"
 
 // このファイルで定義されている関数
 int
 yylex(YYSTYPE* lvalp,
-      GdsRecMgr& mgr,
-      GdsScanner& scanner);
+      GdsParser& parser);
 
 int
-yyerror(GdsRecMgr& mgr,
-	GdsScanner& scanner,
+yyerror(GdsParser& parser,
 	const char* msg);
 
 %}
@@ -47,76 +37,87 @@ yyerror(GdsRecMgr& mgr,
 %define api.pure
 
 // yyparse の引数
-%parse-param {GdsRecMgr& mgr}
-%parse-param {GdsScanner& scanner}
+%parse-param {GdsParser& parser}
 
 // yylex の引数
-%lex-param {GdsRecMgr& mgr}
-%lex-param {GdsScanner& scanner}
+%lex-param {GdsParser& parser}
+
+// トークンの型
+%union {
+  ymint32    int_type;
+  double     real_type;
+  GdsString* string_type;
+  GdsDate*   date_type;
+  GdsUnit*   unit_type;
+  GdsXY*     xy_type;
+  GdsColRow* colrow_type;
+  GdsACL*    acl_type;
+  GdsFormat* format_type;
+}
 
 // トークンの定義
 %token ERROR
 
-%token HEADER
-%token BGNLIB
-%token LIBNAME
-%token UNITS
+%token <int_type> HEADER
+%token <date_type> BGNLIB
+%token <string_type> LIBNAME
+%token <unit_type> UNITS
 %token ENDLIB
-%token BGNSTR
-%token STRNAME
+%token <date_type> BGNSTR
+%token <string_type> STRNAME
 %token ENDSTR
 %token BOUNDARY
 %token PATH
 %token SREF
 %token AREF
 %token TEXT
-%token LAYER
-%token DATATYPE
-%token WIDTH
-%token XY
+%token <int_type> LAYER
+%token <int_type> DATATYPE
+%token <int_type> WIDTH
+%token <xy_type> XY
 %token ENDEL
-%token SNAME
-%token COLROW
+%token <string_type> SNAME
+%token <colrow_type> COLROW
 %token TEXTNODE
 %token NODE
 %token TEXTTYPE
-%token PRESENTATION
+%token <int_type> PRESENTATION
 %token SPACING
-%token STRING
-%token STRANS
-%token MAG
-%token ANGLE
+%token <string_type> STRING
+%token <int_type> STRANS
+%token <real_type> MAG
+%token <real_type> ANGLE
 %token UINTEGER
 %token USTRING
-%token REFLIBS
-%token FONTS
-%token PATHTYPE
-%token GENERATIONS
-%token ATTRTABLE
-%token STYPTABLE
-%token STRTYPE
-%token ELFLAGS
-%token ELKEY
-%token LINKTYPE
-%token LINKKEYS
-%token NODETYPE
-%token PROPATTR
-%token PROPVALUE
+%token <string_type> REFLIBS
+%token <string_type> FONTS
+%token <int_type> PATHTYPE
+%token <int_type> GENERATIONS
+%token <string_type> ATTRTABLE
+%token <string_type> STYPTABLE
+%token <int_type> STRTYPE
+%token <int_type> ELFLAGS
+%token <int_type> ELKEY
+%token <int_type> LINKTYPE
+%token <int_type> LINKKEYS
+%token <int_type> NODETYPE
+%token <int_type> PROPATTR
+%token <string_type> PROPVALUE
 %token BOX
-%token BOXTYPE
-%token PLEX
-%token BGNEXTN
-%token ENDEXTN
-%token TAPENUM
+%token <int_type> BOXTYPE
+%token <int_type> PLEX
+%token <int_type> BGNEXTN
+%token <int_type> ENDEXTN
+%token <int_type> TAPENUM
 %token TAPECODE
-%token STRCLASS
+%token <int_type> STRCLASS
 %token RESERVED
-%token FORMAT
-%token MASK
+%token <int_type> FORMAT
+%token <string_type> MASK
 %token ENDMASKS
-%token LIBDIRSIZE
-%token SRFNAME
-%token LIBSECUR
+%token <int_type> LIBDIRSIZE
+%token <string_type> SRFNAME
+%token <acl_type> LIBSECUR
 %token BORDER
 %token SOFTFENCE
 %token HARDFENCE
@@ -127,6 +128,24 @@ yyerror(GdsRecMgr& mgr,
 %token USERCONSTRAINT
 %token SPACER_ERROR
 %token CONTACT
+
+
+// 非終端ノードの型定義
+%type <int_type> opt_LIBDIRSIZE
+%type <string_type> opt_SRFNAME
+%type <acl_type> opt_LIBSECUR
+%type <string_type> opt_REFLIBS
+%type <string_type> opt_FONTS
+%type <string_type> opt_ATTRTABLE
+%type <int_type> opt_GENERATIONS
+%type <format_type> opt_FormatType
+%type <int_type> opt_ELFLAGS
+%type <int_type> opt_PLEX
+%type <int_type> opt_PATHTYPE
+%type <int_type> opt_WIDTH
+%type <int_type> opt_BGNEXTN
+%type <int_type> opt_ENDEXTN
+%type <int_type> opt_PRESENTATION
 
 
 %%
@@ -145,7 +164,7 @@ header
 opt_LIBDIRSIZE
 : // null
 {
-  $$ = NULL;
+  $$ = 0;
 }
 | LIBDIRSIZE
 {
@@ -221,8 +240,17 @@ opt_GENERATIONS
 
 opt_FormatType
 : // null
+{
+  $$ = NULL;
+}
 | FORMAT
+{
+  $$ = NULL;
+}
 | FORMAT plus_MASK ENDMASKS
+{
+  $$ = NULL;
+}
 ;
 
 plus_MASK
@@ -299,7 +327,7 @@ textbody
 opt_ELFLAGS
 : // null
 {
-  $$ = NULL;
+  $$ = 0;
 }
 | ELFLAGS
 {
@@ -321,7 +349,7 @@ opt_PLEX
 opt_PATHTYPE
 : // null
 {
-  $$ = NULL;
+  $$ = 0;
 }
 | PATHTYPE
 {
@@ -332,7 +360,7 @@ opt_PATHTYPE
 opt_WIDTH
 : // null
 {
-  $$ = NULL;
+  $$ = 0;
 }
 | WIDTH
 {
@@ -343,7 +371,7 @@ opt_WIDTH
 opt_BGNEXTN
 : // null
 {
-  $$ = NULL;
+  $$ = 0;
 }
 | BGNEXTN
 {
@@ -354,7 +382,7 @@ opt_BGNEXTN
 opt_ENDEXTN
 : // null
 {
-  $$ = NULL;
+  $$ = 0;
 }
 | ENDEXTN
 {
@@ -394,34 +422,18 @@ star_property
 // 一文字(ここでは 1 record)をとってくる関数
 int
 yylex(YYSTYPE* lvalp,
-      GdsRecMgr& mgr,
-      GdsScanner& scanner)
+      GdsParser& parser)
 {
-  bool stat = scanner.read_rec();
-  if ( stat ) {
-    GdsRecord* rec = mgr.new_record(scanner);
-#if 0
-    GdsDumper dumper(cout);
-    dumper(*rec);
-#endif
-    *lvalp = rec;
-    return rec->rtype_token();
-  }
-  return 0;
+  return parser.yylex(*lvalp);
 }
 
 // yacc パーサが内部で呼び出す関数
 // エラーメッセージを出力する．
 int
-yyerror(GdsRecMgr& mgr,
-	GdsScanner& scanner,
+yyerror(GdsParser& parser,
 	const char* s)
 {
-  error_header(__FILE__, __LINE__, "GdsParser",
-	       scanner.cur_pos(), s);
-  msg_end();
-
-  return 1;
+  return parser.yyerror(s);
 }
 
 END_NAMESPACE_YM_GDS_PARSER
