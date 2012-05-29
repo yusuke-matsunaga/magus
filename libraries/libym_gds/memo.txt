@@ -39,7 +39,8 @@ record 番号  record 名       データ型
          19   COLROW       Two-Byte Signed Integer x 2
          20   TEXTNODE     No Data Present
          21   NODE         No Data Present
-         22   PRESENTATION Bit Array ( 16 bits )
+	 22   TEXTTYPE     Tow-Byte Signed Integer ( 0 - 255 )
+         23   PRESENTATION Bit Array ( 16 bits )
          24   SPACING      ---
          25   STRING       ASCII String
          26   STRANS       Bit Array ( 16 bits )

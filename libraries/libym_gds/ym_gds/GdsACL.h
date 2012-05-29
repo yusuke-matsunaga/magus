@@ -20,9 +20,20 @@ BEGIN_NAMESPACE_YM_GDS
 //////////////////////////////////////////////////////////////////////
 class GdsACL
 {
-public:
+  friend class GdsParser;
 
-  /// @brief
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] group グループ番号
+  /// @param[in] user ユーザー番号
+  /// @param[in] access アクセスコード
+  GdsACL(ymuint group,
+	 ymuint user,
+	 ymuint access);
+
+  /// @brief デストラクタ
+  ~GdsACL();
 
 
 public:
@@ -30,6 +41,7 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 要素数
   /// @brief グループIDを得る．
   ymuint
   group() const;
@@ -41,6 +53,10 @@ public:
   /// @brief アクセスコードを得る．
   ymuint
   access() const;
+
+  /// @brief 次の要素を得る．
+  const GdsACL*
+  next() const;
 
 
 private:
@@ -57,7 +73,69 @@ private:
   // アクセスコード
   ymuint16 mAccess;
 
+  // 次の要素
+  GdsACL* mNext;
+
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] group グループ番号
+// @param[in] user ユーザー番号
+// @param[in] access アクセスコード
+inline
+GdsACL::GdsACL(ymuint group,
+	       ymuint user,
+	       ymuint access) :
+  mGroup(group),
+  mUser(user),
+  mAccess(access),
+  mNext(NULL)
+{
+}
+
+// @brief デストラクタ
+inline
+GdsACL::~GdsACL()
+{
+}
+
+// @brief 要素数
+// @brief グループIDを得る．
+inline
+ymuint
+GdsACL::group() const
+{
+  return mGroup;
+}
+
+// @brief ユーザーIDを得る．
+inline
+ymuint
+GdsACL::user() const
+{
+  return mUser;
+}
+
+// @brief アクセスコードを得る．
+inline
+ymuint
+GdsACL::access() const
+{
+  return mAccess;
+}
+
+// @brief 次の要素を得る．
+inline
+const GdsACL*
+GdsACL::next() const
+{
+  return mNext;
+}
 
 END_NAMESPACE_YM_GDS
 

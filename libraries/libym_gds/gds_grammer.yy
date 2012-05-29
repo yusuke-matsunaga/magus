@@ -44,24 +44,27 @@ yyerror(GdsParser& parser,
 
 // トークンの型
 %union {
-  ymint32    int_type;
+  ymint16    int2_type;
+  ymint32    int4_type;
   double     real_type;
-  GdsString* string_type;
-  GdsDate*   date_type;
-  GdsUnit*   unit_type;
-  GdsXY*     xy_type;
-  GdsColRow* colrow_type;
+  ymuint16   bitarray_type;
+
   GdsACL*    acl_type;
+  GdsColRow* colrow_type;
+  GdsDate*   date_type;
   GdsFormat* format_type;
+  GdsString* string_type;
+  GdsUnits*  units_type;
+  GdsXY*     xy_type;
 }
 
 // トークンの定義
 %token ERROR
 
-%token <int_type> HEADER
+%token <int2_type> HEADER
 %token <date_type> BGNLIB
 %token <string_type> LIBNAME
-%token <unit_type> UNITS
+%token <units_type> UNITS
 %token ENDLIB
 %token <date_type> BGNSTR
 %token <string_type> STRNAME
@@ -71,51 +74,51 @@ yyerror(GdsParser& parser,
 %token SREF
 %token AREF
 %token TEXT
-%token <int_type> LAYER
-%token <int_type> DATATYPE
-%token <int_type> WIDTH
+%token <int2_type> LAYER
+%token <int2_type> DATATYPE
+%token <int4_type> WIDTH
 %token <xy_type> XY
 %token ENDEL
 %token <string_type> SNAME
 %token <colrow_type> COLROW
 %token TEXTNODE
 %token NODE
-%token TEXTTYPE
-%token <int_type> PRESENTATION
+%token <int2_type> TEXTTYPE
+%token <bitarray_type> PRESENTATION
 %token SPACING
 %token <string_type> STRING
-%token <int_type> STRANS
+%token <bitarray_type> STRANS
 %token <real_type> MAG
 %token <real_type> ANGLE
 %token UINTEGER
 %token USTRING
 %token <string_type> REFLIBS
 %token <string_type> FONTS
-%token <int_type> PATHTYPE
-%token <int_type> GENERATIONS
+%token <int2_type> PATHTYPE
+%token <int2_type> GENERATIONS
 %token <string_type> ATTRTABLE
 %token <string_type> STYPTABLE
-%token <int_type> STRTYPE
-%token <int_type> ELFLAGS
-%token <int_type> ELKEY
-%token <int_type> LINKTYPE
-%token <int_type> LINKKEYS
-%token <int_type> NODETYPE
-%token <int_type> PROPATTR
+%token <int2_type> STRTYPE
+%token <bitarray_type> ELFLAGS
+%token <int4_type> ELKEY
+%token <int2_type> LINKTYPE
+%token <int4_type> LINKKEYS
+%token <int2_type> NODETYPE
+%token <int2_type> PROPATTR
 %token <string_type> PROPVALUE
 %token BOX
-%token <int_type> BOXTYPE
-%token <int_type> PLEX
-%token <int_type> BGNEXTN
-%token <int_type> ENDEXTN
-%token <int_type> TAPENUM
+%token <int2_type> BOXTYPE
+%token <int4_type> PLEX
+%token <int4_type> BGNEXTN
+%token <int4_type> ENDEXTN
+%token <int2_type> TAPENUM
 %token TAPECODE
-%token <int_type> STRCLASS
+%token <int2_type> STRCLASS
 %token RESERVED
-%token <int_type> FORMAT
+%token <int2_type> FORMAT
 %token <string_type> MASK
 %token ENDMASKS
-%token <int_type> LIBDIRSIZE
+%token <int2_type> LIBDIRSIZE
 %token <string_type> SRFNAME
 %token <acl_type> LIBSECUR
 %token BORDER
@@ -131,21 +134,21 @@ yyerror(GdsParser& parser,
 
 
 // 非終端ノードの型定義
-%type <int_type> opt_LIBDIRSIZE
+%type <int2_type> opt_LIBDIRSIZE
 %type <string_type> opt_SRFNAME
 %type <acl_type> opt_LIBSECUR
 %type <string_type> opt_REFLIBS
 %type <string_type> opt_FONTS
 %type <string_type> opt_ATTRTABLE
-%type <int_type> opt_GENERATIONS
+%type <int2_type> opt_GENERATIONS
 %type <format_type> opt_FormatType
-%type <int_type> opt_ELFLAGS
-%type <int_type> opt_PLEX
-%type <int_type> opt_PATHTYPE
-%type <int_type> opt_WIDTH
-%type <int_type> opt_BGNEXTN
-%type <int_type> opt_ENDEXTN
-%type <int_type> opt_PRESENTATION
+%type <bitarray_type> opt_ELFLAGS
+%type <int4_type> opt_PLEX
+%type <int2_type> opt_PATHTYPE
+%type <int4_type> opt_WIDTH
+%type <int4_type> opt_BGNEXTN
+%type <int4_type> opt_ENDEXTN
+%type <bitarray_type> opt_PRESENTATION
 
 
 %%

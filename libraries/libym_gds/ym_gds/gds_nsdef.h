@@ -149,13 +149,13 @@ class GdsParser;
 class GdsScanner;
 class GdsDumper;
 
-class GdsString;
-class GdsDate;
-class GdsUnit;
-class GdsXY;
-class GdsColRow;
 class GdsACL;
+class GdsColRow;
+class GdsDate;
 class GdsFormat;
+class GdsString;
+class GdsUnits;
+class GdsXY;
 
 END_NAMESPACE_YM_GDS
 

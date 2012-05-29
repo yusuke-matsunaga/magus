@@ -34,15 +34,15 @@ libym_gds_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_gds_la_SOURCES = \
-	Msg.cc \
 	gds_grammer.yy \
+	Msg.cc \
+	GdsDumper.cc \
+	GdsParser.cc \
 	GdsRecTable.h \
 	GdsRecTable.cc \
 	GdsRecMgr.cc \
 	GdsRecord.cc \
-	GdsParser.cc \
-	GdsScanner.cc \
-	GdsDumper.cc
+	GdsScanner.cc
 
 libym_gds_la_LIBADD =
 #	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

@@ -11,11 +11,12 @@
 
 #include "ym_gds/gds_nsdef.h"
 #include "ym_gds/GdsScanner.h"
+#include "ym_utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_GDS_PARSER
 
-// かなりかっこわるい＆危ない使い方．
+// かなりかっこわるい & 危ない使い方．
 union YYSTYPE;
 
 END_NAMESPACE_YM_GDS_PARSER
@@ -55,10 +56,6 @@ public:
   // gds_grammer.yy で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief GdsDate の作成
-  GdsDate*
-  new_date();
-
   /// @brief yylex() の実装
   int
   yylex(nsParser::YYSTYPE& lval);
@@ -70,8 +67,61 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief GdsACL の作成
+  GdsACL*
+  new_acl();
+
+  /// @brief GdsColRow の作成
+  GdsColRow*
+  new_colrow();
+
+  /// @brief GdsFormat の作成
+  GdsFormat*
+  new_format();
+
+  /// @brief GdsDate の作成
+  GdsDate*
+  new_date();
+
+  /// @brief GdsUnits の作成
+  GdsUnits*
+  new_units();
+
+  /// @brief GdsString の作成
+  GdsString*
+  new_string();
+
+  /// @brief GdsXY の作成
+  GdsXY*
+  new_xy();
+
+  /// @brief int2 の作成
+  ymint16
+  new_int2();
+
+  /// @brief int4 の作成
+  ymint32
+  new_int4();
+
+  /// @brief real の作成
+  double
+  new_real();
+
+  /// @brief BitArray の作成
+  ymuint16
+  new_bitarray();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 領域確保用のオブジェクト
+  SimpleAlloc mAlloc;
 
   // 字句解析器
   GdsScanner mScanner;

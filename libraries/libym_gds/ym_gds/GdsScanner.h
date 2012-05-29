@@ -67,9 +67,33 @@ public:
   tGdsDtype
   cur_dtype() const;
 
+  /// @brief 直前お read_rec() で読んだレコードのデータサイズを得る．
+  ymuint32
+  cur_dsize() const;
+
   /// @brief 直前の read_rec() で読んだレコードのデータを得る．
   ymuint8*
   cur_data() const;
+
+  /// @brief 直前の read_rec() で読んだレコードのデータを2バイト整数に変換する．
+  /// @param[in] pos 位置 (2バイト分で1つ)
+  ymint16
+  conv_2byte_int(ymuint pos) const;
+
+  /// @brief 直前の read_rec() で読んだレコードのデータを4バイト整数に変換する．
+  /// @param[in] pos 位置 (4バイト分で1つ)
+  ymint32
+  conv_4byte_int(ymuint pos) const;
+
+  /// @brief 直前の read_rec() で読んだレコードのデータを4バイト浮動小数点数に変換する．
+  /// @param[in] pos 位置 (4バイト分で1つ)
+  double
+  conv_4byte_real(ymuint pos) const;
+
+  /// @brief 直前の read_rec() で読んだレコードのデータを8バイト浮動小数点数に変換する．
+  /// @param[in] pos 位置 (8バイト分で1つ)
+  double
+  conv_8byte_real(ymuint pos) const;
 
   /// @brief 現在のファイル上の位置を返す．
   ymuint32
@@ -187,6 +211,14 @@ tGdsDtype
 GdsScanner::cur_dtype() const
 {
   return mCurDtype;
+}
+
+// @brief 直前お read_rec() で読んだレコードのデータサイズを得る．
+inline
+ymuint32
+GdsScanner::cur_dsize() const
+{
+  return cur_size() - 4;
 }
 
 // @brief 現在のファイル上の位置を返す．

@@ -20,7 +20,9 @@ BEGIN_NAMESPACE_YM_GDS
 //////////////////////////////////////////////////////////////////////
 class GdsDate
 {
-public:
+  friend class GdsParser;
+
+private:
 
   /// @brief 空のコンストラクタ
   /// @note 内容は不定

@@ -147,6 +147,134 @@ GdsScanner::read_rec()
   return true;
 }
 
+// @brief 直前の read_rec() で読んだレコードのデータを2バイト整数に変換する．
+// @param[in] pos 位置 (2バイト分で1つ)
+ymint16
+GdsScanner::conv_2byte_int(ymuint pos) const
+{
+  ymuint32 offset = pos * 2;
+  ymuint16 ans;
+  ans  = (mDataBuff[offset + 0] << 8);
+  ans += (mDataBuff[offset + 1] << 0);
+  return static_cast<ymint16>(ans);
+}
+
+// @brief 直前の read_rec() で読んだレコードのデータを4バイト整数に変換する．
+// @param[in] pos 位置 (4バイト分で1つ)
+ymint32
+GdsScanner::conv_4byte_int(ymuint pos) const
+{
+  ymuint32 offset = pos * 4;
+  ymuint32 ans;
+  ans  = (mDataBuff[offset + 0] << 24);
+  ans += (mDataBuff[offset + 1] << 16);
+  ans += (mDataBuff[offset + 2] <<  8);
+  ans += (mDataBuff[offset + 3] <<  0);
+  return static_cast<ymint32>(ans);
+}
+
+// @brief 直前の read_rec() で読んだレコードのデータを4バイト浮動小数点数に変換する．
+// @param[in] pos 位置 (4バイト分で1つ)
+double
+GdsScanner::conv_4byte_real(ymuint pos) const
+{
+  ymuint32 offset = pos * 4;
+  bool zero = true;
+  ymuint v[4];
+  for (ymuint i = 0; i < 4; ++ i) {
+    v[i] = mDataBuff[offset + i];
+    if ( v[i] ) {
+      zero = false;
+    }
+  }
+  if ( zero ) {
+    // すべてのビットが0なら0
+    return 0.0;
+  }
+  ymuint sign = (v[0] >> 7) & 1;
+  ymuint exp = (v[0] & 127); // +64 のゲタをはいている．
+  ymuint mag = (v[1] << 16) + (v[2] << 8) + v[0];
+  double ans = 0.0;
+  double w = 0.5;
+  if ( exp >= 64 ) {
+    ymuint sn = exp - 64;
+    for (ymuint i = 0; i < sn; ++ i) {
+      w *= 16.0;
+    }
+  }
+  else {
+    ymuint sn = 64 - exp;
+    for (ymuint i = 0; i < sn; ++ i) {
+      w /= 16.0;
+    }
+  }
+  ymuint mask = (1 << 23);
+  for (ymuint i = 0; i < 24; ++ i) {
+    if ( mag & mask ) {
+      ans += w;
+    }
+    mask >>= 1;
+    w /= 2.0;
+  }
+  if ( sign ) {
+    ans = -ans;
+  }
+  return ans;
+}
+
+// @brief 直前の read_rec() で読んだレコードのデータを8バイト浮動小数点数に変換する．
+// @param[in] pos 位置 (8バイト分で1つ)
+double
+GdsScanner::conv_8byte_real(ymuint pos) const
+{
+  ymuint offset = pos * 8;
+  bool zero = true;
+  ymuint v[8];
+  for (ymuint i = 0; i < 8; ++ i) {
+    v[i] = mDataBuff[offset + i];
+    if ( v[i] ) {
+      zero = false;
+    }
+  }
+  if ( zero ) {
+    // すべてのビットが0なら0
+    return 0.0;
+  }
+  ymuint sign = (v[0] >> 7) & 1;
+  ymuint exp = (v[0] & 127); // +64 のゲタをはいている．
+  double ans = 0.0;
+  double w = 0.5;
+  if ( exp >= 64 ) {
+    ymuint sn = exp - 64;
+    for (ymuint i = 0; i < sn; ++ i) {
+      w *= 16.0;
+    }
+  }
+  else {
+    ymuint sn = 64 - exp;
+    for (ymuint i = 0; i < sn; ++ i) {
+      w /= 16.0;
+    }
+  }
+  ymuint block = 1;
+  ymuint mask = (1 << 7);
+  for (ymuint i = 0; i < 56; ++ i) {
+    if ( v[block] & mask ) {
+      ans += w;
+    }
+    mask >>= 1;
+    if ( mask == 0 ) {
+      ++ block;
+      mask = (1 << 7);
+    }
+    w /= 2.0;
+  }
+  if ( sign ) {
+    ans = -ans;
+  }
+  return ans;
+}
+
 // @brief 2バイト読んで符号なし整数に変換する．
 // @param[out] val 読み込んだ値を格納する変数
 // @retval true 読み込みが成功した．
