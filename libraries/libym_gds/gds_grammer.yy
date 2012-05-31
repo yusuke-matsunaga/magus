@@ -53,6 +53,7 @@ yyerror(GdsParser& parser,
   GdsColRow* colrow_type;
   GdsDate*   date_type;
   GdsFormat* format_type;
+  GdsStrans* strans_type;
   GdsString* string_type;
   GdsUnits*  units_type;
   GdsXY*     xy_type;
@@ -149,7 +150,7 @@ yyerror(GdsParser& parser,
 %type <int4_type> opt_BGNEXTN
 %type <int4_type> opt_ENDEXTN
 %type <bitarray_type> opt_PRESENTATION
-
+%type <strans_type> opt_strans
 
 %%
 
@@ -315,16 +316,16 @@ text
 : TEXT opt_ELFLAGS opt_PLEX LAYER textbody
 ;
 
+textbody
+: TEXTTYPE opt_PRESENTATION opt_PATHTYPE opt_WIDTH opt_strans XY STRING
+;
+
 node
 : NODE opt_ELFLAGS opt_PLEX LAYER NODETYPE XY
 ;
 
 box
 : BOX opt_ELFLAGS opt_PLEX LAYER BOXTYPE XY
-;
-
-textbody
-: TEXTTYPE opt_PRESENTATION opt_PATHTYPE opt_WIDTH opt_strans XY STRING
 ;
 
 opt_ELFLAGS
@@ -341,7 +342,7 @@ opt_ELFLAGS
 opt_PLEX
 : // null
 {
-  $$ = NULL;
+  $$ = 0;
 }
 | PLEX
 {
@@ -396,9 +397,21 @@ opt_ENDEXTN
 opt_strans
 : // null
 | STRANS
+{
+  $$ = parser.new_strans($1, 0.0, 0.0);
+}
 | STRANS     ANGLE
+{
+  $$ = parser.new_strans($1, 0.0, $2);
+}
 | STRANS MAG
+{
+  $$ = parser.new_strans($1, $2, 0.0);
+}
 | STRANS MAG ANGLE
+{
+  $$ = parser.new_strans($1, $2, $3);
+}
 ;
 
 opt_PRESENTATION
@@ -414,9 +427,12 @@ opt_PRESENTATION
 
 star_property
 : // null
+{
+  parser.clear_property();
+}
 | star_property PROPATTR PROPVALUE
 {
-  // mgr.add_property($2, $3);
+  parser.add_property($2, $3);
 }
 ;
 

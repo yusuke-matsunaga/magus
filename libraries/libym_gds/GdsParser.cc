@@ -14,6 +14,8 @@
 #include "ym_gds/GdsACL.h"
 #include "ym_gds/GdsColRow.h"
 #include "ym_gds/GdsDate.h"
+#include "ym_gds/GdsProperty.h"
+#include "ym_gds/GdsStrans.h"
 #include "ym_gds/GdsString.h"
 #include "ym_gds/GdsUnits.h"
 #include "ym_gds/GdsXY.h"
@@ -58,6 +60,38 @@ GdsParser::parse(const string& filename)
   mScanner.close_file();
 
   return true;
+}
+
+// @brief GdsStrans の作成
+GdsStrans*
+GdsParser::new_strans(ymuint flags,
+		      double mag,
+		      double angle)
+{
+  void* p = mAlloc.get_memory(sizeof(GdsStrans));
+  GdsStrans* strans = new (p) GdsStrans(flags, mag, angle);
+
+  return strans;
+}
+
+// @brief property リストのクリア
+void
+GdsParser::clear_property()
+{
+  mPropList.clear();
+}
+
+// @brief GdsProperty の作成
+// @param[in] attr PROPATTR の値
+// @param[in] value PROPVALUE の値
+void
+GdsParser::add_property(ymuint attr,
+			GdsString* value)
+{
+  void* p = mAlloc.get_memory(sizeof(GdsProperty));
+  GdsProperty* prop = new (p) GdsProperty(attr, value);
+
+  mPropList.push_back(prop);
 }
 
 // @brief yylex() の実装

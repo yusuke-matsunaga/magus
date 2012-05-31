@@ -56,6 +56,23 @@ public:
   // gds_grammer.yy で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief GdsStrans の作成
+  GdsStrans*
+  new_strans(ymuint flags,
+	     double mag,
+	     double angle);
+
+  /// @brief property リストのクリア
+  void
+  clear_property();
+
+  /// @brief GdsProperty を作成し，property リストに追加する．
+  /// @param[in] attr PROPATTR の値
+  /// @param[in] value PROPVALUE の値
+  void
+  add_property(ymuint attr,
+	       GdsString* value);
+
   /// @brief yylex() の実装
   int
   yylex(nsParser::YYSTYPE& lval);
@@ -78,21 +95,21 @@ private:
   GdsColRow*
   new_colrow();
 
-  /// @brief GdsFormat の作成
-  GdsFormat*
-  new_format();
-
   /// @brief GdsDate の作成
   GdsDate*
   new_date();
 
-  /// @brief GdsUnits の作成
-  GdsUnits*
-  new_units();
+  /// @brief GdsFormat の作成
+  GdsFormat*
+  new_format();
 
   /// @brief GdsString の作成
   GdsString*
   new_string();
+
+  /// @brief GdsUnits の作成
+  GdsUnits*
+  new_units();
 
   /// @brief GdsXY の作成
   GdsXY*
@@ -125,6 +142,9 @@ private:
 
   // 字句解析器
   GdsScanner mScanner;
+
+  // property のリスト
+  vector<GdsProperty*> mPropList;
 
 };
 

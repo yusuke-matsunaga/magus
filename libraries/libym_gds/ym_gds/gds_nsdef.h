@@ -153,6 +153,8 @@ class GdsACL;
 class GdsColRow;
 class GdsDate;
 class GdsFormat;
+class GdsProperty;
+class GdsStrans;
 class GdsString;
 class GdsUnits;
 class GdsXY;
