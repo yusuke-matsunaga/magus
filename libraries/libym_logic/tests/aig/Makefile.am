@@ -40,9 +40,12 @@ genpat_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
 
 genpat2_SOURCES = \
-	genpat2.cc
+	genpat2.cc \
+	GenPat.h \
+	GenPat.cc
 
-genpat2_LDADD =
+genpat2_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
 
 enum_pat3_SOURCES = \
 	enum_pat3.cc
