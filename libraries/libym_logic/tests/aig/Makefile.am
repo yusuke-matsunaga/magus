@@ -29,7 +29,8 @@ AM_CPPFLAGS = \
 noinst_PROGRAMS = \
 	genpat \
 	genpat2 \
-	enum_pat3
+	enum_pat3 \
+	genaig
 
 genpat_SOURCES = \
 	GpNode.h \
@@ -51,4 +52,12 @@ enum_pat3_SOURCES = \
 	enum_pat3.cc
 
 enum_pat3_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
+
+genaig_SOURCES = \
+	genaig.cc \
+	GenAig.h \
+	GenAig.cc
+
+genaig_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
