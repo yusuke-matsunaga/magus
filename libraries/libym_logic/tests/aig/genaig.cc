@@ -22,7 +22,7 @@ main(int argc,
 
 
   cout << "genaig(3)" << endl;
-  genaig(3, 4);
+  genaig(3, 2);
 
 #if 0
   cout << "genaig(4)" << endl;

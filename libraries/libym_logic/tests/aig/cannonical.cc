@@ -178,9 +178,9 @@ cannonical(ymuint ni)
     for (ymuint32 func = 0; func < 256; ++ func) {
       ymuint8 cperm[4];
       ymuint32 cfunc = cannonical3(func, cperm);
-      cout << "  0x" << setw(2) << setfill('0')
+      cout << "  { 0x" << setw(2) << setfill('0')
 	   << hex << cfunc << dec
-	   << ", "
+	   << ", {"
 	   << static_cast<ymuint>(cperm[0])
 	   << ", "
 	   << static_cast<ymuint>(cperm[1])
@@ -188,16 +188,16 @@ cannonical(ymuint ni)
 	   << static_cast<ymuint>(cperm[2])
 	   << ", "
 	   << static_cast<ymuint>(cperm[3])
-	   << ", " << endl;
+	   << "}}, " << endl;
     }
   }
   else {
     for (ymuint32 func = 0; func < 65536; ++ func) {
       ymuint8 cperm[5];
       ymuint32 cfunc = cannonical4(func, cperm);
-      cout << "  0x" << setw(4) << setfill('0')
+      cout << "  { 0x" << setw(4) << setfill('0')
 	   << hex << cfunc << dec
-	   << ", "
+	   << ", {"
 	   << static_cast<ymuint>(cperm[0])
 	   << ", "
 	   << static_cast<ymuint>(cperm[1])
@@ -207,7 +207,7 @@ cannonical(ymuint ni)
 	   << static_cast<ymuint>(cperm[3])
 	   << ", "
 	   << static_cast<ymuint>(cperm[4])
-	   << ", " << endl;
+	   << "}}, " << endl;
     }
   }
 }

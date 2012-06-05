@@ -14,6 +14,18 @@ BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
+struct Npn3Cannon
+{
+  ymuint32 mFunc;
+  ymuint8 mPerm[4];
+};
+
+struct Npn4Cannon
+{
+  ymuint32 mFunc;
+  ymuint8 mPerm[5];
+};
+
 // 3入力のNPN同値類代表関数
 ymuint32 npn3rep[] = {
 #include "npn3rep.h"
@@ -24,6 +36,11 @@ ymuint8 npn3perm[][4] = {
 #include "npn3perm.h"
 };
 
+// 3入力のNPN同値類代表関数への変換を表す配列
+Npn3Cannon npn3cannon[] = {
+#include "npn3cannon.h"
+};
+
 // 4入力のNPN同値類代表関数
 ymuint32 npn4rep[] = {
 #include "npn4rep.h"
@@ -32,6 +49,11 @@ ymuint32 npn4rep[] = {
 // 4入力のNPN変換を表す配列
 ymuint8 npn4perm[][5] = {
 #include "npn4perm.h"
+};
+
+// 4入力のNPN同値類代表関数への変換を表す配列
+Npn4Cannon npn4cannon[] = {
+#include "npn4cannon.h"
 };
 
 #if 0
@@ -234,7 +256,7 @@ GenAig::aig_mode(ymuint slack)
   // レベル1以上のパタンを作る．
   ymuint max_level = 0;
   for (ymuint level = 0;
-       level < mCandListArray.size() && mRemainFunc > 0;
+       level < mCandListArray.size();
        ++ level) {
     cout << endl
 	 << "level = " << level << ", remain_func = " << mRemainFunc << endl;
@@ -246,6 +268,10 @@ GenAig::aig_mode(ymuint slack)
       npn_expand(aigpat.mFunc, aigpat.mAig, level);
     }
     cout << "  expand " << mAigList[level].size() << " patterns" << endl;
+
+    if ( mRemainFunc == 0 ) {
+      break;
+    }
 
     // level の代表パタンと他のパタンとの対を作る．
     const vector<AigPat>& src_list1 = mAigList[level];
@@ -372,20 +398,13 @@ ymuint32
 GenAig::cannonical3(ymuint32 func,
 		    ymuint8 cperm[])
 {
-  // ベタなやり方
-  for (ymuint p = 0; p < 96; ++ p) {
-    ymuint8* perm = npn3perm[p];
-    ymuint32 fv1 = xform_func3(func, perm);
-    if ( mNpnHash.count(fv1) > 0 ) {
-      cperm[0] = perm[0];
-      cperm[1] = perm[1];
-      cperm[2] = perm[2];
-      cperm[3] = perm[3];
-      return fv1;
-    }
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  return 0;
+  const Npn3Cannon& cannon = npn3cannon[func];
+  ymuint32 cfunc = cannon.mFunc;
+  cperm[0] = cannon.mPerm[0];
+  cperm[1] = cannon.mPerm[1];
+  cperm[2] = cannon.mPerm[2];
+  cperm[3] = cannon.mPerm[3];
+  return cfunc;
 }
 
 // @brief 関数ベクタを代表関数に変換する(4入力版)
@@ -393,21 +412,14 @@ ymuint32
 GenAig::cannonical4(ymuint32 func,
 		    ymuint8 cperm[])
 {
-  // ベタなやり方
-  for (ymuint p = 0; p < 768; ++ p) {
-    ymuint8* perm = npn4perm[p];
-    ymuint32 fv1 = xform_func4(func, perm);
-    if ( mNpnHash.count(fv1) > 0 ) {
-      cperm[0] = perm[0];
-      cperm[1] = perm[1];
-      cperm[2] = perm[2];
-      cperm[3] = perm[3];
-      cperm[4] = perm[4];
-      return fv1;
-    }
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  return 0;
+  const Npn4Cannon& cannon = npn4cannon[func];
+  ymuint32 cfunc = cannon.mFunc;
+  cperm[0] = cannon.mPerm[0];
+  cperm[1] = cannon.mPerm[1];
+  cperm[2] = cannon.mPerm[2];
+  cperm[3] = cannon.mPerm[3];
+  cperm[4] = cannon.mPerm[4];
+  return cfunc;
 }
 
 // @brief 関数ベクタを変換する(3入力版)
