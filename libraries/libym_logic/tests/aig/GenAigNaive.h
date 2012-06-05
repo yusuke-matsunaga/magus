@@ -1,8 +1,8 @@
-#ifndef GENAIG_H
-#define GENAIG_H
+#ifndef GENAIGNAIVE_H
+#define GENAIGNAIVE_H
 
-/// @file GenAig.h
-/// @brief GenAig のヘッダファイル
+/// @file GenAigNaive.h
+/// @brief GenAigNaive のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
@@ -18,18 +18,18 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GenAig GenAig.h "GenAig.h"
+/// @class GenAigNaive GenAigNaive.h "GenAigNaive.h"
 /// @brief 最小サイズのAIGを求めるためのクラス
 //////////////////////////////////////////////////////////////////////
-class GenAig
+class GenAigNaive
 {
 public:
 
   /// @brief コンストラクタ
-  GenAig();
+  GenAigNaive();
 
   /// @brief デストラクタ
-  ~GenAig();
+  ~GenAigNaive();
 
 
 public:
@@ -48,55 +48,6 @@ private:
   /// @brief AIG モード
   void
   aig_mode(ymuint slack);
-
-  /// @brief NPN同値類を求める．
-  /// @param[in] fv 関数ベクタ
-  /// @param[in] aig AIG
-  /// @param[in] level レベル
-  void
-  npn_expand(ymuint32 fv,
-	     Aig aig,
-	     ymuint32 level);
-
-  /// @brief 関数ベクタを代表関数に変換する(3入力版)
-  ymuint32
-  cannonical3(ymuint32 func,
-	      ymuint8 perm[]);
-
-  /// @brief 関数ベクタを代表関数に変換する(4入力版)
-  ymuint32
-  cannonical4(ymuint32 func,
-	      ymuint8 perm[]);
-
-  /// @brief 関数ベクタを変換する(3入力版)
-  ymuint32
-  xform_func3(ymuint32 fv,
-	      const ymuint8 perm[]);
-
-  /// @brief 関数ベクタを変換する(4入力版)
-  ymuint32
-  xform_func4(ymuint32 fv,
-	      const ymuint8 perm[]);
-
-  /// @brief AIG を変換する(3入力版)
-  Aig
-  xform3(Aig aig,
-	 const ymuint8 perm[]);
-
-  /// @brief xform3 の下請け関数
-  Aig
-  xf3_sub(Aig aig,
-	  const ymuint8 perm[]);
-
-  /// @brief AIG を変換する(4入力版)
-  Aig
-  xform4(Aig aig,
-	 const ymuint8 perm[]);
-
-  /// @brief xform4 の下請け関数
-  Aig
-  xf4_sub(Aig aig,
-	  const ymuint8 perm[]);
 
   /// @brief パタンを登録する．
   /// @param[in] aig AIG
@@ -136,9 +87,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // NPN同値類代表関数を表すハッシュ表
-  hash_set<ymuint32> mNpnHash;
 
   // AIGMGR
   AigMgr mMgr;

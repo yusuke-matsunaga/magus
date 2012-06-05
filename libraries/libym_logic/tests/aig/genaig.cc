@@ -9,6 +9,8 @@
 
 #include "ymtools.h"
 #include "GenAig.h"
+#include "GenAigNaive.h"
+#include "GenAigDj.h"
 
 
 int
@@ -22,12 +24,10 @@ main(int argc,
 
 
   cout << "genaig(3)" << endl;
-  genaig(3, 2);
+  genaig(3);
 
-#if 0
   cout << "genaig(4)" << endl;
   genaig(4);
-#endif
 
   return 0;
 }

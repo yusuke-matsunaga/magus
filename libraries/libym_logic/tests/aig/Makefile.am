@@ -59,7 +59,11 @@ enum_pat3_LDADD = \
 genaig_SOURCES = \
 	genaig.cc \
 	GenAig.h \
-	GenAig.cc
+	GenAig.cc \
+	GenAigNaive.h \
+	GenAigNaive.cc \
+	GenAigDj.h \
+	GenAigDj.cc
 
 genaig_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
