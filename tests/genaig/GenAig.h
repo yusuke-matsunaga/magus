@@ -111,7 +111,8 @@ private:
   /// @note 具体的には aig1 & aig2 と ~aig & aig
   void
   compose(AigPat aig1,
-	  AigPat aig2);
+	  AigPat aig2,
+	  ymuint level_base);
 
   /// @brief AIG の対を登録する．
   /// @note 結果は mCandListArray に追加される．
@@ -126,6 +127,19 @@ private:
   add_cand(Aig aig,
 	   ymuint32 func,
 	   ymuint level);
+
+  /// @brief aig の子供に印をつけてノード数を数える．
+  ymuint
+  count1(Aig aig);
+
+  /// @brief count1 で印のついていないノード数を数える．
+  ymuint
+  count2(Aig aig);
+
+  /// @brief count2 の下請け関数
+  ymuint
+  count2_sub(Aig aig,
+	     hash_set<Aig>& hash);
 
   /// @brief AigPat の内容が正しいか調べる．
   bool
@@ -166,6 +180,9 @@ private:
   // レベルごとのAigPat のリスト
   vector<vector<AigPat> > mAigList;
 
+  // レベルごとの代表関数のAigPatのリスト
+  vector<vector<AigPat> > mRepAigList;
+
   // AigPat の候補のリスト
   vector<vector<AigPat> > mCandListArray;
 
@@ -180,6 +197,9 @@ private:
 
   // 登録されている AIG のハッシュ
   hash_set<Aig> mAigHash;
+
+  // count 用の AIG のハッシュ
+  hash_set<Aig> mCountHash;
 
 };
 

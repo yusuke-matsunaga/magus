@@ -24,22 +24,35 @@ distclean-local:
 
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(YMTOOLS_BUILDDIR)/include \
+	@POPT_INCLUDES@
 
 noinst_PROGRAMS = \
-	genpat \
-	enum_pat3
+	npngen \
+	cannonical \
+	genaig
 
-genpat_SOURCES = \
-	GpNode.h \
-	GpNode.cc \
-	genpat.cc
+genaig_SOURCES = \
+	genaig.cc \
+	GenAig.h \
+	GenAig.cc \
+	GenAigNaive.h \
+	GenAigNaive.cc \
+	GenAigDj.h \
+	GenAigDj.cc
 
-genpat_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
+genaig_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	@POPT_LIBS@
 
-enum_pat3_SOURCES = \
-	enum_pat3.cc
+npngen_SOURCES = \
+	npngen.cc
 
-enum_pat3_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
+npngen_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+cannonical_SOURCES = \
+	cannonical.cc
+
+cannonical_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

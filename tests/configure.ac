@@ -152,6 +152,7 @@ AC_CONFIG_FILES([
 	imp/src/bb/include/Makefile
 	imp/src/bb/parser/Makefile
 	imp/src/bb/pt/Makefile
+	genaig/Makefile
 	])
 
 

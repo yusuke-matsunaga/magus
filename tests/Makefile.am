@@ -7,7 +7,8 @@ SUBDIRS = \
 	makebdd \
 	lsim \
 	enumcut \
-	imp
+	imp \
+	genaig
 
 MAINTAINERCLEANFILES = Makefile.in
 

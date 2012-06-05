@@ -110,6 +110,7 @@ void
 GenAig::aig_mode(ymuint slack)
 {
   mAigList.clear();
+  mRepAigList.clear();
   mCandListArray.clear();
   mFuncArray.clear();
   mFuncLevel.clear();
@@ -151,31 +152,31 @@ GenAig::aig_mode(ymuint slack)
     }
 
     // level の代表パタンと他のパタンとの対を作る．
-    const vector<AigPat>& src_list1 = mAigList[level];
+    const vector<AigPat>& src_list1 = mRepAigList[level];
     ymuint n1 = src_list1.size();
     for (ymuint i = 0; i < n1; ++ i) {
       const AigPat& aigpat1 = src_list1[i];
 
-      ymuint32 func1 = aigpat1.mFunc;
-      if ( mNpnHash.count(func1) == 0 ) {
-	// 代表関数以外はスキップ
-	continue;
-      }
+      mCountHash.clear();
+      ymuint level_base = count1(aigpat1.mAig);
+
       for (ymuint l = 0; l < level; ++ l) {
 	const vector<AigPat>& src_list2 = mAigList[l];
-	for (vector<AigPat>::const_iterator q = src_list2.begin();
-	     q != src_list2.end(); ++ q) {
-	  const AigPat& aigpat2 = *q;
-	  compose(aigpat1, aigpat2);
+	ymuint n2 = src_list2.size();
+	for (ymuint j = 0; j < n2; ++ j) {
+	  const AigPat& aigpat2 = src_list2[j];
+	  cout << "L#" << l << ": " << j << " / " << n2
+	       << " | " << i << " / " << n1 << endl;
+	  compose(aigpat1, aigpat2, level_base);
 	}
       }
-      for (ymuint j = 0; j < n1; ++ j) {
-	const AigPat& aigpat2 = src_list1[j];
-	ymuint32 func2 = aigpat2.mFunc;
-	if ( j >= i && mNpnHash.count(func2) > 0 ) {
-	  continue;
-	}
-	compose(aigpat1, aigpat2);
+      const vector<AigPat>& src_list2 = mAigList[level];
+      ymuint n2 = src_list2.size();
+      for (ymuint j = 0; j < n2; ++ j) {
+	cout << "L#" << level << ": " << j << " / " << n2
+	     << " | " << i << " / " << n1 << endl;
+	const AigPat& aigpat2 = src_list2[j];
+	compose(aigpat1, aigpat2, level_base);
       }
     }
   }
@@ -200,41 +201,6 @@ GenAig::aig_mode(ymuint slack)
 	 << endl;
   }
 }
-
-BEGIN_NONAMESPACE
-
-ymuint
-count_sub(Aig aig,
-	  hash_set<Aig>& aig_hash)
-{
-  if ( aig.inv() ) {
-    aig = ~aig;
-  }
-
-  ymuint ans = 0;
-  if ( aig_hash.count(aig) == 0 ) {
-    aig_hash.insert(aig);
-    if ( aig.is_and() ) {
-      ans = 1;
-      ans += count_sub(aig.fanin0(), aig_hash);
-      ans += count_sub(aig.fanin1(), aig_hash);
-    }
-  }
-  return ans;
-}
-
-ymuint
-count(Aig aig1,
-      Aig aig2)
-{
-  hash_set<Aig> aig_hash;
-  ymuint ans;
-  ans = count_sub(aig1, aig_hash);
-  ans += count_sub(aig2, aig_hash);
-  return ans;
-}
-
-END_NONAMESPACE
 
 // @brief NPN同値類を求める．
 // @param[in] fv 関数ベクタ
@@ -496,32 +462,87 @@ GenAig::add_pat(Aig aig,
 
   while ( mAigList.size() <= level ) {
     mAigList.push_back(vector<AigPat>());
+    mRepAigList.push_back(vector<AigPat>());
   }
   mAigList[level].push_back(aigpat);
+  if ( mNpnHash.count(fv) > 0 ) {
+    mRepAigList[level].push_back(aigpat);
+  }
 }
+
+BEGIN_NONAMESPACE
+
+#if 1
+ymuint
+count_sub(Aig aig,
+	  hash_set<Aig>& aig_hash)
+{
+  if ( aig.inv() ) {
+    aig = ~aig;
+  }
+
+  ymuint ans = 0;
+  if ( aig_hash.count(aig) == 0 ) {
+    aig_hash.insert(aig);
+    if ( aig.is_and() ) {
+      ans = 1;
+      ans += count_sub(aig.fanin0(), aig_hash);
+      ans += count_sub(aig.fanin1(), aig_hash);
+    }
+  }
+  return ans;
+}
+
+ymuint
+count(Aig aig1,
+      Aig aig2)
+{
+  hash_set<Aig> aig_hash;
+  ymuint ans;
+  ans = count_sub(aig1, aig_hash);
+  ans += count_sub(aig2, aig_hash);
+  return ans;
+}
+#endif
+
+END_NONAMESPACE
 
 // @brief 2つのAIGから新しいパタンを作る．
 // @note 具体的には aig1 & aig2 と ~aig & aig
 void
 GenAig::compose(AigPat aigpat1,
-		AigPat aigpat2)
+		AigPat aigpat2,
+		ymuint level_base)
 {
   ymuint32 fv1 = aigpat1.mFunc;
   ymuint32 fv2 = aigpat2.mFunc;
+  ymuint32 fv3 = fv1 & fv2;
+  ymuint32 fv1_n = ~fv1 & mMask;
+  ymuint32 fv4 = fv1_n & fv2;
+
+  bool valid1 = false;
+  if ( fv3 != 0U && fv3 != fv1 && fv3 != fv2 ) {
+    valid1 = true;
+  }
+  bool valid2 = false;
+  if ( fv4 != 0U && fv4 != fv1_n && fv4 != fv2 ) {
+    valid2 = true;
+  }
+
+  if ( !valid1 && !valid2 ) {
+    return;
+  }
 
   Aig aig1 = aigpat1.mAig;
   Aig aig2 = aigpat2.mAig;
 
-  ymuint level = count(aig1, aig2) + 1;
+  ymuint level = count2(aig2) + level_base + 1;
 
-  ymuint32 fv3 = fv1 & fv2;
-  if ( fv3 != 0U && fv3 != fv1 && fv3 != fv2 ) {
+  if ( valid1 ) {
     add_aigpair(aig1, aig2, fv3, level);
   }
 
-  ymuint32 fv1_n = ~fv1 & mMask;
-  ymuint32 fv4 = fv1_n & fv2;
-  if ( fv4 != 0U && fv4 != fv1_n && fv4 != fv2 ) {
+  if ( valid2 ) {
     add_aigpair(~aig1, aig2, fv4, level);
   }
 }
@@ -553,11 +574,10 @@ GenAig::add_aigpair(Aig aig1,
     caig = xform4(aig, cperm);
   }
 
-  if ( mAigHash.count(caig) > 0 ) {
-    return;
+  if ( mAigHash.count(caig) == 0 ) {
+    mAigHash.insert(caig);
+    add_cand(caig, cfunc, level);
   }
-  mAigHash.insert(caig);
-  add_cand(caig, cfunc, level);
 }
 
 // @brief 候補のリストに追加する．
@@ -575,6 +595,60 @@ GenAig::add_cand(Aig aig,
     mCandListArray.push_back(vector<AigPat>());
   }
   mCandListArray[level].push_back(aigpat);
+}
+
+// @brief aig の子供に印をつけてノード数を数える．
+ymuint
+GenAig::count1(Aig aig)
+{
+  if ( aig.inv() ) {
+    aig = ~aig;
+  }
+
+  if ( mCountHash.count(aig) > 0 ) {
+    return 0;
+  }
+
+  mCountHash.insert(aig);
+  ymuint ans = 0;
+  if ( aig.is_and() ) {
+    ans = 1;
+    ans += count1(aig.fanin0());
+    ans += count1(aig.fanin1());
+  }
+  return ans;
+}
+
+// @brief count1 で印のついていないノード数を数える．
+ymuint
+GenAig::count2(Aig aig)
+{
+  hash_set<Aig> hash1;
+  return count2_sub(aig, hash1);
+}
+
+// @brief count2 の下請け関数
+ymuint
+GenAig::count2_sub(Aig aig,
+		   hash_set<Aig>& hash)
+{
+  if ( aig.inv() ) {
+    aig = ~aig;
+  }
+
+  if ( mCountHash.count(aig) > 0 ||
+       hash.count(aig) > 0 ) {
+    return 0;
+  }
+
+  hash.insert(aig);
+  ymuint ans = 0;
+  if ( aig.is_and() ) {
+    ans = 1;
+    ans += count2_sub(aig.fanin0(), hash);
+    ans += count2_sub(aig.fanin1(), hash);
+  }
+  return ans;
 }
 
 BEGIN_NONAMESPACE
