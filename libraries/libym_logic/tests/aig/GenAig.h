@@ -16,30 +16,56 @@
 
 BEGIN_NAMESPACE_YM
 
-// 一つの関数に対するAIGリスト
-// ただし最小レベルに等しいAIGのみを保持する．
-struct AigList
+/// @brief パタンを表すデータ構造
+struct Pat
+{
+  /// @brief コンストラクタ
+  /// @param[in] f0 左の子供の関数ベクタ
+  /// @param[in] f1 右の子供の関数ベクタ
+  /// @param[in] tv 自身の関数ベクタ
+  Pat(ymuint32 f0,
+      ymuint32 f1,
+      ymuint32 tv) :
+    mF0(f0),
+    mF1(f1),
+    mTv(tv)
+  {
+  }
+
+  ymuint32 mF0;
+  ymuint32 mF1;
+  ymuint32 mTv;
+};
+
+
+// 一つの関数に対するパタンリスト
+// ただし最小レベルに等しいパタンのみを保持する．
+struct PatList
 {
   // 最小レベル
   ymuint32 mMinLevel;
 
-  // AIGのリスト
-  vector<Aig> mList;
+  // パタンリスト
+  vector<Pat> mList;
 
   /// @brief コンストラクタ
-  AigList() :
+  PatList() :
     mMinLevel(0xffffffff)
   {
   }
 
   /// @brief 追加する．
   /// @param[in] level レベル
-  /// @param[in] aig AIG
+  /// @param[in] f0 左の子供の関数ベクタ
+  /// @param[in] f1 右の子供の関数ベクタ
+  /// @param[in] tv 自身の関数ベクタ
   /// @retval true 最初のパタンだった．
   /// @retval false 他のパタンが登録されていた．
   bool
   push_back(ymuint32 level,
-	    Aig aig)
+	    ymuint32 f0,
+	    ymuint32 f1,
+	    ymuint32 tv)
   {
     bool ans = mList.empty();
     if ( mMinLevel > level ) {
@@ -47,7 +73,7 @@ struct AigList
       mList.clear();
     }
     if ( mMinLevel == level ) {
-      mList.push_back(aig);
+      mList.push_back(Pat(f0, f1, tv));
     }
     return ans;
   }
@@ -55,24 +81,29 @@ struct AigList
 };
 
 
-/// @brief AIG の対を表すクラス
-struct AigPair
+//////////////////////////////////////////////////////////////////////
+/// @class AigPat GenAig.h "GenAig.h"
+/// @brief AIG とそれに付随する情報を表すクラス
+//////////////////////////////////////////////////////////////////////
+struct AigPat
 {
-  AigPair(Aig aig1,
-	  Aig aig2,
-	  ymuint32 func,
-	  ymuint size) :
-    mAig1(aig1),
-    mAig2(aig2),
-    mFunc(func),
-    mSize(size)
-  {
-  }
+  // 空のコンストラクタ
+  AigPat();
 
-  Aig mAig1;
-  Aig mAig2;
+  // コンストラクタ
+  AigPat(Aig aig,
+	 ymuint32 func,
+	 ymuint level);
+
+  // AIG
+  Aig mAig;
+
+  // 関数ベクタ
   ymuint32 mFunc;
-  ymuint32 mSize;
+
+  // レベル
+  ymuint32 mLevel;
+
 };
 
 
@@ -95,7 +126,8 @@ public:
 
   /// @brief ni 入力の全ての関数のAIGを求める．
   void
-  operator()(ymuint ni);
+  operator()(ymuint ni,
+	     ymuint slack = 0);
 
 
 private:
@@ -103,36 +135,98 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 2つのから新しいパタンを合成する．
+  /// @brief FF モードの関数レベルを計算する．
   void
-  compose(ymuint32 func1,
-	  ymuint32 func2,
-	  ymuint level);
+  ff_mode();
 
   /// @brief パタンを登録する．
   /// @param[in] fv 関数ベクタ
-  /// @param[in] aig AIG
+  /// @param[in] f0 左の子供の関数ベクタ
+  /// @param[in] f1 右の子供の関数ベクタ
+  /// @param[in] tv 自分自身の関数ベクタ
   /// @param[in] level レベル
   void
   add_pat(ymuint32 fv,
-	  Aig aig,
+	  ymuint32 f0,
+	  ymuint32 f1,
+	  ymuint32 tv,
 	  ymuint32 level);
 
-  /// @brief パタンを登録する．
+  /// @brief AIG モード
+  void
+  aig_mode(ymuint slack);
+
+  /// @brief NPN同値類を求める．
   /// @param[in] fv 関数ベクタ
   /// @param[in] aig AIG
   /// @param[in] level レベル
   void
-  add_pat1(ymuint32 fv,
-	   Aig aig,
-	   ymuint32 level);
+  npn_expand(ymuint32 fv,
+	     Aig aig,
+	     ymuint32 level);
+
+  /// @brief 関数ベクタを代表関数に変換する(3入力版)
+  ymuint32
+  cannonical3(ymuint32 func,
+	      ymuint8 perm[]);
+
+  /// @brief 関数ベクタを代表関数に変換する(4入力版)
+  ymuint32
+  cannonical4(ymuint32 func,
+	      ymuint8 perm[]);
+
+  /// @brief 関数ベクタを変換する(3入力版)
+  ymuint32
+  xform_func3(ymuint32 fv,
+	      const ymuint8 perm[]);
+
+  /// @brief 関数ベクタを変換する(4入力版)
+  ymuint32
+  xform_func4(ymuint32 fv,
+	      const ymuint8 perm[]);
+
+  /// @brief AIG を変換する(3入力版)
+  Aig
+  xform3(Aig aig,
+	 const ymuint8 perm[]);
+
+  /// @brief xform3 の下請け関数
+  Aig
+  xf3_sub(Aig aig,
+	  const ymuint8 perm[]);
+
+  /// @brief AIG を変換する(4入力版)
+  Aig
+  xform4(Aig aig,
+	 const ymuint8 perm[]);
+
+  /// @brief xform4 の下請け関数
+  Aig
+  xf4_sub(Aig aig,
+	  const ymuint8 perm[]);
+
+  /// @brief パタンを登録する．
+  /// @param[in] aig AIG
+  /// @param[in] fv 関数ベクタ
+  /// @param[in] level レベル
+  void
+  add_pat(Aig aig,
+	  ymuint32 fv,
+	  ymuint32 level);
+
+  /// @brief 2つのAIGから新しいパタンを作る．
+  /// @note 具体的には aig1 & aig2 と ~aig & aig
+  void
+  compose(AigPat aig1,
+	  AigPat aig2);
 
   /// @brief AIG の対を登録する．
-  /// @note 結果は mAigPairListArray に追加される．
+  /// @note 結果は mCandListArray に追加される．
   void
   add_aigpair(Aig aig1,
 	      Aig aig2,
-	      ymuint32 func);
+	      ymuint32 func,
+	      ymuint level);
 
 
 private:
@@ -140,11 +234,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 3入力のNPN同値類代表関数を表すハッシュ表
-  hash_set<ymuint32> mNpn3Hash;
-
-  // 4入力のNPN同値類代表関数を表すハッシュ表
-  hash_set<ymuint32> mNpn4Hash;
+  // NPN同値類代表関数を表すハッシュ表
+  hash_set<ymuint32> mNpnHash;
 
   // AIGMGR
   AigMgr mMgr;
@@ -155,20 +246,48 @@ private:
   // 関数ベクタの要素数
   ymuint32 mNp;
 
+  // 関数の数
+  ymuint32 mNf;
+
   // 関数ベクタ用のマスク
   ymuint32 mMask;
 
   // パタンの求まっていない関数の数．
   ymuint32 mRemainFunc;
 
-  // 関数ベクタをキーとして AIG のリストを保持する配列
-  vector<AigList> mFuncTable;
 
-  // 全ての AIG のリスト
-  vector<Aig> mAigList;
+  //////////////////////////////////////////////////////////////////////
+  // FF モードの用の変数
+  //////////////////////////////////////////////////////////////////////
 
-  // レベルごとのAIGの対のリスト
-  vector<vector<AigPair> > mAigPairListArray;
+  // 関数ベクタをキーにしてパタンリストを保持する配列
+  vector<PatList> mFuncTable;
+
+  // レベルごとの関数のリスト
+  vector<vector<ymuint32> > mFuncListArray;
+
+
+  //////////////////////////////////////////////////////////////////////
+  // AIG モード用の変数
+  //////////////////////////////////////////////////////////////////////
+
+  // レベルごとのAigPat のリスト
+  vector<vector<AigPat> > mAigList;
+
+  // AigPat の候補のリスト
+  vector<vector<AigPat> > mCandListArray;
+
+  // 関数ごとのパタンのリストを記録する配列
+  vector<vector<AigPat> > mFuncArray;
+
+  // 関数の最小レベルを記録する配列
+  vector<ymuint32> mFuncLevel;
+
+  // 最小レベルからの乖離を表すパラメータ
+  ymuint32 mSlack;
+
+  // 登録されている AIG のハッシュ
+  hash_set<Aig> mAigHash;
 
 };
 

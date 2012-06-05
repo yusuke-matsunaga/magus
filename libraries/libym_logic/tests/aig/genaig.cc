@@ -20,11 +20,9 @@ main(int argc,
 
   GenAig genaig;
 
-  cout << "genaig(2)" << endl;
-  genaig(2);
 
   cout << "genaig(3)" << endl;
-  genaig(3);
+  genaig(3, 4);
 
 #if 0
   cout << "genaig(4)" << endl;

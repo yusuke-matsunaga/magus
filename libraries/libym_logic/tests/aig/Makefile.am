@@ -27,6 +27,8 @@ AM_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 noinst_PROGRAMS = \
+	npngen \
+	cannonical \
 	genpat \
 	genpat2 \
 	enum_pat3 \
@@ -61,3 +63,15 @@ genaig_SOURCES = \
 
 genaig_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
+
+npngen_SOURCES = \
+	npngen.cc
+
+npngen_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+cannonical_SOURCES = \
+	cannonical.cc
+
+cannonical_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

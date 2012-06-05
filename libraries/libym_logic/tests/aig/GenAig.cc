@@ -19,20 +19,27 @@ ymuint32 npn3rep[] = {
 #include "npn3rep.h"
 };
 
+// 3入力のNPN変換を表す配列
+ymuint8 npn3perm[][4] = {
+#include "npn3perm.h"
+};
+
 // 4入力のNPN同値類代表関数
 ymuint32 npn4rep[] = {
 #include "npn4rep.h"
 };
 
+// 4入力のNPN変換を表す配列
+ymuint8 npn4perm[][5] = {
+#include "npn4perm.h"
+};
+
+#if 0
 // 5入力のNPN同値類代表関数
 ymuint32 npn5rep[] = {
-#if 0
 #include "npn5rep.h"
-#else
-  0xacb00e68U,
-  0xFFFFFFFFU
-#endif
 };
+#endif
 
 END_NONAMESPACE
 
@@ -44,12 +51,6 @@ END_NONAMESPACE
 // @brief コンストラクタ
 GenAig::GenAig()
 {
-  for (ymuint i = 0; npn3rep[i] != 0xFF; ++ i) {
-    mNpn3Hash.insert(npn3rep[i]);
-  }
-  for (ymuint i = 0; npn4rep[i] != 0xFFFF; ++ i) {
-    mNpn4Hash.insert(npn4rep[i]);
-  }
 }
 
 // @brief デストラクタ
@@ -59,21 +60,45 @@ GenAig::~GenAig()
 
 // @brief ni 入力の全ての関数のパタンを求める．
 void
-GenAig::operator()(ymuint ni)
+GenAig::operator()(ymuint ni,
+		   ymuint slack)
 {
-  mFuncTable.clear();
-  mAigPairListArray.clear();
 
   mNi = ni;
   mNp = 1U << ni;
-  ymuint nf = 1U << mNp;
-  mMask = nf - 1U;
-  mFuncTable.resize(nf);
+  mNf = 1U << mNp;
+  mMask = mNf - 1U;
 
-  mRemainFunc = nf - 2;
+  if ( mNi == 3 ) {
+    for (ymuint i = 0; npn3rep[i] != 0xFF; ++ i) {
+      mNpnHash.insert(npn3rep[i]);
+    }
+  }
+  else if ( mNi == 4 ) {
+    for (ymuint i = 0; npn4rep[i] != 0xFFFF; ++ i) {
+      mNpnHash.insert(npn4rep[i]);
+    }
+  }
+
+  ff_mode();
+
+  aig_mode(slack);
+}
+
+// @brief FF モードの関数レベルを計算する．
+void
+GenAig::ff_mode()
+{
+  mFuncTable.clear();
+  mFuncListArray.clear();
+
+  mFuncTable.resize(mNf, PatList());
+
+  mRemainFunc = mNf - 2;
 
   // レベル0のパタンを作る．
-  for (ymuint i = 0; i < ni; ++ i) {
+  mFuncListArray.push_back(vector<ymuint32>());
+  for (ymuint i = 0; i < mNi; ++ i) {
     ymuint32 fv;
     switch ( i ) {
     case 0: fv = 0xaaaaaaaa; break;
@@ -85,8 +110,7 @@ GenAig::operator()(ymuint ni)
     }
 
     fv &= mMask;
-    Aig iaig = mMgr.make_input(VarId(i));
-    add_pat(fv, iaig, 0);
+    add_pat(fv, 0, 0, fv, 0);
   }
 
   // レベル1以上のパタンを作る．
@@ -95,80 +119,162 @@ GenAig::operator()(ymuint ni)
     cout << endl
 	 << "level = " << level << ", remain_func = " << mRemainFunc << endl;
     max_level = level;
-    ymuint n = mAigPairListArray[level].size();
-    for (ymuint i = 0; i < n; ++ i) {
-      const AigPair& aigpair = mAigPairListArray[level][i];
-      Aig aig1 = aigpair.mAig1;
-      Aig aig2 = aigpair.mAig2;
-      Aig aig = mMgr.make_and(aig1, aig2);
-      add_pat(aigpair.mFunc, aig, level);
-    }
-  }
-
-#if 0
-  for (ymuint level = 2; level <= max_level; ++ level) {
-    const vector<ymuint32>& func_list = mFuncListArray[level];
-    for (vector<ymuint32>::const_iterator p = func_list.begin();
-	 p != func_list.end(); ++ p) {
-      ymuint32 func = *p;
-      cout << "func = [" << hex << func << dec << "]" << endl;
-      const vector<Pat>& pat_list = mFuncTable[func].mList;
-      for (vector<Pat>::const_iterator q = pat_list.begin();
-	   q != pat_list.end(); ++ q) {
-	const Pat& pat = *q;
-	ymuint32 f0 = pat.mF0;
-	ymuint32 f1 = pat.mF1;
-	const vector<LogExpr>& ff_list0 = mLogExprTable[f0];
-	const vector<LogExpr>& ff_list1 = mLogExprTable[f1];
-	vector<LogExpr>& dst_list = mLogExprTable[func];
-	for (vector<LogExpr>::const_iterator r0 = ff_list0.begin();
-	     r0 != ff_list0.end(); ++ r0) {
-	  LogExpr ff0 = *r0;
-	  for (vector<LogExpr>::const_iterator r1 = ff_list1.begin();
-	       r1 != ff_list1.end(); ++ r1) {
-	    LogExpr ff1 = *r1;
-	    LogExpr ff;
-	    switch ( pat.mTv ) {
-	    case 0x06: ff = ff0 ^ ff1; break;
-	    case 0x07: ff = ~(ff0 & ff1); break;
-	    case 0x08: ff = ff0 & ff1; break;
-	    case 0x09: ff = ~ff0 ^ ff1; break;
-	    case 0x00:
-	    case 0x01:
-	    case 0x02:
-	    case 0x03:
-	    case 0x04:
-	    case 0x05:
-	    case 0x0A:
-	    case 0x0B:
-	    case 0x0C:
-	    case 0x0D:
-	    case 0x0E:
-	    case 0x0F: assert_not_reached(__FILE__, __LINE__);
-	    }
-	    dst_list.push_back(ff);
-#if 0
-	    cout << "  " << ff << endl;
-	    cout << "    ff0 = " << ff0 << " [" << hex << f0 << dec << "]" << endl
-		 << "    ff1 = " << ff1 << " [" << hex << f1 << dec << "]" << endl;
-#endif
+    mFuncListArray.push_back(vector<ymuint32>());
+    ymuint h = (level + 1) / 2;
+    for (ymuint llevel = 0; llevel < h; ++ llevel) {
+      ymuint rlevel = level - llevel - 1;
+      cout << "  l-level = " << llevel
+	   << ", r-level = " << rlevel << endl;
+      // llevel 左の子供のレベル
+      // rlevel 右の子供のレベル
+      if ( llevel == rlevel ) {
+	const vector<ymuint32>& func_list = mFuncListArray[llevel];
+	ymuint n = func_list.size();
+	for (ymuint l = 0; l < n; ++ l) {
+	  ymuint32 func1 = func_list[l];
+	  for (ymuint r = l + 1; r < n; ++ r) {
+	    ymuint32 func2 = func_list[r];
+	    add_pat(func1 & func2, func1, func2, 0x08, level);
 	  }
 	}
-#if 0
-	cout << endl;
-#endif
+      }
+      else {
+	const vector<ymuint32>& l_func_list = mFuncListArray[llevel];
+	const vector<ymuint32>& r_func_list = mFuncListArray[rlevel];
+	ymuint nl = l_func_list.size();
+	ymuint nr = r_func_list.size();
+	for (ymuint l = 0; l < nl; ++ l) {
+	  ymuint32 func1 = l_func_list[l];
+	  for (ymuint r = 0; r < nr; ++ r) {
+	    ymuint32 func2 = r_func_list[r];
+	    add_pat(func1 & func2, func1, func2, 0x08, level);
+	  }
+	}
       }
     }
   }
-#endif
 
   ymuint total_cost = 0;
-  for (ymuint i = 1; i < nf - 1; ++ i) {
+  for (ymuint i = 1; i < mNf - 1; ++ i) {
     if ( mFuncTable[i].mList.empty() ) {
       cout << "error for function#" << i << endl;
       exit(1);
     }
     total_cost += mFuncTable[i].mMinLevel;
+  }
+  cout << "total cost = " << total_cost << endl
+       << endl;
+}
+
+/// @brief パタンを登録する．
+/// @param[in] fv 関数ベクタ
+/// @param[in] f0 左の子供の関数ベクタ
+/// @param[in] f1 右の子供の関数ベクタ
+/// @param[in] tv 自分自身の関数ベクタ
+/// @param[in] level レベル
+void
+GenAig::add_pat(ymuint32 fv,
+		ymuint32 f0,
+		ymuint32 f1,
+		ymuint32 tv,
+		ymuint32 level)
+{
+  if ( fv == 0U || (~fv & mMask) == 0U ) {
+    return;
+  }
+
+  if ( mFuncTable[fv].push_back(level, f0, f1, tv) ) {
+    mFuncListArray[level].push_back(fv);
+    -- mRemainFunc;
+#if 0
+    cout << "[" << hex << fv << dec << "]: "
+	 << "fv1 = " << hex << f0 << dec
+	 << ", fv2 = " << hex << f1 << dec
+	 << ", tv  = " << tv << endl;
+#endif
+  }
+  ymuint32 fv_n = ~fv & mMask;
+  if ( mFuncTable[fv_n].push_back(level, f0, f1, 15 - tv) ) {
+    mFuncListArray[level].push_back(fv_n);
+    -- mRemainFunc;
+#if 0
+    cout << "[" << hex << fv_n << dec << "]: "
+	 << "fv1 = " << hex << f0 << dec
+	 << ", fv2 = " << hex << f1 << dec
+	 << ", tv  = " << (15 - tv) << endl;
+#endif
+  }
+}
+
+// @brief AIG モード
+void
+GenAig::aig_mode(ymuint slack)
+{
+  mFuncArray.clear();
+  mFuncLevel.clear();
+  mAigList.clear();
+  mAigHash.clear();
+
+  mFuncArray.resize(mNf);
+  mFuncLevel.resize(mNf);
+
+  mSlack = slack;
+
+  // 定数0と定数1は除く
+  mRemainFunc = mNf - 2;
+
+  // レベル0のパタンを作る．
+  {
+    ymuint32 fv = 0xaaaaaaaa & mMask;
+    Aig iaig = mMgr.make_input(VarId(0));
+    mCandListArray.push_back(vector<AigPat>());
+    mCandListArray[0].push_back(AigPat(iaig, fv, 0));
+  }
+
+  // レベル1以上のパタンを作る．
+  ymuint max_level = 0;
+  for (ymuint level = 0;
+       level < mCandListArray.size() && mRemainFunc > 0;
+       ++ level) {
+    cout << endl
+	 << "level = " << level << ", remain_func = " << mRemainFunc << endl;
+    max_level = level;
+    ymuint n = mCandListArray[level].size();
+    cout << "  " << n << " seed patterns" << endl;
+    for (ymuint i = 0; i < n; ++ i) {
+      const AigPat& aigpat = mCandListArray[level][i];
+      npn_expand(aigpat.mFunc, aigpat.mAig, level);
+    }
+    cout << "  expand " << mAigList[level].size() << " patterns" << endl;
+
+    // level の代表パタンと他のパタンとの対を作る．
+    const vector<AigPat>& src_list1 = mAigList[level];
+    for (vector<AigPat>::const_iterator p = src_list1.begin();
+	 p != src_list1.end(); ++ p) {
+      const AigPat& aigpat1 = *p;
+      ymuint32 func1 = aigpat1.mFunc;
+      if ( mNpnHash.count(func1) == 0 ) {
+	// 代表関数以外はスキップ
+	continue;
+      }
+      for (ymuint l = 0; l <= level; ++ l) {
+	const vector<AigPat>& src_list2 = mAigList[l];
+	for (vector<AigPat>::const_iterator q = src_list2.begin();
+	     q != src_list2.end(); ++ q) {
+	  const AigPat& aigpat2 = *q;
+	  compose(aigpat1, aigpat2);
+	}
+      }
+    }
+  }
+
+  ymuint total_cost = 0;
+  for (ymuint i = 1; i < mNf - 1; ++ i) {
+    if ( mFuncArray[i].empty() ) {
+      cout << "error for function#" << i << endl;
+      exit(1);
+    }
+    total_cost += mFuncLevel[i];
   }
   cout << "total cost = " << total_cost << endl
        << endl;
@@ -209,50 +315,274 @@ count(Aig aig1,
 
 END_NONAMESPACE
 
-// @brief 2つの関数から新しいパタンを合成する．
+// @brief NPN同値類を求める．
+// @param[in] fv 関数ベクタ
+// @param[in] aig AIG
+// @param[in] level レベル
 void
-GenAig::compose(ymuint32 func1,
-		ymuint32 func2,
-		ymuint level)
+GenAig::npn_expand(ymuint32 fv,
+		   Aig aig,
+		   ymuint32 level)
 {
-  ymuint32 func = func1 & func2;
-  if ( mFuncTable[func].mMinLevel < level ) {
-    return;
-  }
-
-  const AigList& aig_list1 = mFuncTable[func1];
-  const AigList& aig_list2 = mFuncTable[func2];
-  for (vector<Aig>::const_iterator p1 = aig_list1.mList.begin();
-       p1 != aig_list1.mList.end(); ++ p1) {
-    Aig aig1 = *p1;
-    for (vector<Aig>::const_iterator p2 = aig_list2.mList.begin();
-	 p2 != aig_list2.mList.end(); ++ p2) {
-      Aig aig2 = *p2;
-      ymuint level1 = count(aig1, aig2) + 1;
-      if ( level1 != level ) {
-	continue;
+  hash_set<ymuint32> func_hash;
+  if ( mNi == 3 ) {
+    for (ymuint p = 0; p < 96; ++ p) {
+      ymuint8* perm = npn3perm[p];
+      ymuint32 fv1 = xform_func3(fv, perm);
+      if ( func_hash.count(fv1) == 0 ) {
+	func_hash.insert(fv1);
+	Aig aig1 = xform3(aig, perm);
+	if ( 0 ) {
+	  cout << endl
+	       << "perm[0] = " << static_cast<ymuint>(perm[0]) << endl
+	       << "perm[1] = " << static_cast<ymuint>(perm[1]) << endl
+	       << "perm[2] = " << static_cast<ymuint>(perm[2]) << endl
+	       << "perm[3] = " << static_cast<ymuint>(perm[3]) << endl;
+	  cout << "func(" << hex << fv << dec << ") = "
+	       << hex << fv1 << dec << endl;
+	  cout << "xform3(" << aig << ") = " << aig1 << endl;
+	  list<Aig> tmp_list;
+	  tmp_list.push_back(aig);
+	  tmp_list.push_back(aig1);
+	  mMgr.print_handles(cout, tmp_list);
+	  cout << endl;
+	}
+	add_pat(aig1, fv1, level);
       }
-      Aig aig = mMgr.make_and(aig1, aig2);
-      add_pat(func, aig, level);
     }
+  }
+  else if ( mNi == 4 ) {
+    for (ymuint p = 0; p < 768; ++ p) {
+      ymuint8* perm = npn4perm[p];
+      ymuint32 fv1 = xform_func4(fv, perm);
+      if ( func_hash.count(fv1) == 0 ) {
+	func_hash.insert(fv1);
+	Aig aig1 = xform4(aig, perm);
+	add_pat(aig1, fv1, level);
+      }
+    }
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
   }
 }
 
-/// @brief パタンを登録する．
-/// @param[in] fv 関数ベクタ
-/// @param[in] aig AIG
-/// @param[in] level レベル
-void
-GenAig::add_pat(ymuint32 fv,
-		Aig aig,
-		ymuint32 level)
+// @brief 関数ベクタを代表関数に変換する(3入力版)
+ymuint32
+GenAig::cannonical3(ymuint32 func,
+		    ymuint8 cperm[])
 {
-  if ( mFuncTable[fv].mMinLevel < level ) {
-    return;
+  // ベタなやり方
+  for (ymuint p = 0; p < 96; ++ p) {
+    ymuint8* perm = npn3perm[p];
+    ymuint32 fv1 = xform_func3(func, perm);
+    if ( mNpnHash.count(fv1) > 0 ) {
+      cperm[0] = perm[0];
+      cperm[1] = perm[1];
+      cperm[2] = perm[2];
+      cperm[3] = perm[3];
+      return fv1;
+    }
   }
-  add_pat1(fv, aig, level);
-  ymuint32 fv_n = ~fv & mMask;
-  add_pat1(fv_n, ~aig, level);
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
+}
+
+// @brief 関数ベクタを代表関数に変換する(4入力版)
+ymuint32
+GenAig::cannonical4(ymuint32 func,
+		    ymuint8 cperm[])
+{
+  // ベタなやり方
+  for (ymuint p = 0; p < 768; ++ p) {
+    ymuint8* perm = npn4perm[p];
+    ymuint32 fv1 = xform_func4(func, perm);
+    if ( mNpnHash.count(fv1) > 0 ) {
+      cperm[0] = perm[0];
+      cperm[1] = perm[1];
+      cperm[2] = perm[2];
+      cperm[3] = perm[3];
+      cperm[4] = perm[4];
+      return fv1;
+    }
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
+}
+
+// @brief 関数ベクタを変換する(3入力版)
+ymuint32
+GenAig::xform_func3(ymuint32 fv,
+		    const ymuint8 perm[])
+{
+  ymuint32 ans = 0U;
+  ymuint8 pols = perm[3];
+  for (ymuint p = 0; p < 8; ++ p) {
+    if ( fv & (1U << p) ) {
+      ymuint v0 = (p >> 0) & 1U;
+      ymuint v1 = (p >> 1) & 1U;
+      ymuint v2 = (p >> 2) & 1U;
+      if ( pols & 1U ) {
+	v0 ^= 1U;
+      }
+      if ( pols & 2U ) {
+	v1 ^= 1U;
+      }
+      if ( pols & 4U ) {
+	v2 ^= 1U;
+      }
+      ymuint q = 0U;
+      if ( v0 ) {
+	q |= (1U << perm[0]);
+      }
+      if ( v1 ) {
+	q |= (1U << perm[1]);
+      }
+      if ( v2 ) {
+	q |= (1U << perm[2]);
+      }
+      ans |= (1U << q);
+    }
+  }
+  if ( pols & 8U ) {
+    ans = ~ans & mMask;
+  }
+  return ans;
+}
+
+// @brief 関数ベクタを変換する(4入力版)
+ymuint32
+GenAig::xform_func4(ymuint32 fv,
+		    const ymuint8 perm[])
+{
+  ymuint32 ans = 0U;
+  ymuint8 pols = perm[4];
+  for (ymuint p = 0; p < 16; ++ p) {
+    if ( fv & (1U << p) ) {
+      ymuint v0 = (p >> 0) & 1U;
+      ymuint v1 = (p >> 1) & 1U;
+      ymuint v2 = (p >> 2) & 1U;
+      ymuint v3 = (p >> 3) & 1U;
+      if ( pols & 1U ) {
+	v0 ^= 1U;
+      }
+      if ( pols & 2U ) {
+	v1 ^= 1U;
+      }
+      if ( pols & 4U ) {
+	v2 ^= 1U;
+      }
+      if ( pols & 8U ) {
+	v3 ^= 1U;
+      }
+      ymuint q = 0U;
+      if ( v0 ) {
+	q |= (1U << perm[0]);
+      }
+      if ( v1 ) {
+	q |= (1U << perm[1]);
+      }
+      if ( v2 ) {
+	q |= (1U << perm[2]);
+      }
+      if ( v3 ) {
+	q |= (1U << perm[3]);
+      }
+      ans |= (1U << q);
+    }
+  }
+  if ( pols & 16U ) {
+    ans = ~ans & mMask;
+  }
+  return ans;
+}
+
+// @brief AIG を変換する(3入力版)
+Aig
+GenAig::xform3(Aig aig,
+	       const ymuint8 perm[])
+{
+  Aig aig1 = xf3_sub(aig, perm);
+  if ( perm[3] & 8U ) {
+    aig1 = ~aig1;
+  }
+  return aig1;
+}
+
+// @brief xform3 の下請け関数
+Aig
+GenAig::xf3_sub(Aig aig,
+		const ymuint8 perm[])
+{
+  if ( aig.is_input() ) {
+    VarId vid = aig.input_id();
+    ymuint id = vid.val();
+    VarId new_vid(perm[id]);
+    Aig aig1 = mMgr.make_input(new_vid);
+    if ( aig.inv() ) {
+      aig1 = ~aig1;
+    }
+    if ( perm[3] & (1U << id) ) {
+      aig1 = ~aig1;
+    }
+    return aig1;
+  }
+  if ( aig.is_and() ) {
+    Aig aig1 = xf3_sub(aig.fanin0(), perm);
+    Aig aig2 = xf3_sub(aig.fanin1(), perm);
+    Aig ans = mMgr.make_and(aig1, aig2);
+    if ( aig.inv() ) {
+      ans = ~ans;
+    }
+    return ans;
+  }
+  cout << "Error : aig is constant." << endl;
+  assert_not_reached(__FILE__, __LINE__);
+  return Aig();
+}
+
+// @brief AIG を変換する(4入力版)
+Aig
+GenAig::xform4(Aig aig,
+	       const ymuint8 perm[])
+{
+  Aig aig1 = xf4_sub(aig, perm);
+  if ( perm[4] & 16U ) {
+    aig1 = ~aig1;
+  }
+  return aig1;
+}
+
+// @brief xform4 の下請け関数
+Aig
+GenAig::xf4_sub(Aig aig,
+		const ymuint8 perm[])
+{
+  if ( aig.is_input() ) {
+    VarId vid = aig.input_id();
+    ymuint id = vid.val();
+    VarId new_vid(perm[id]);
+    Aig aig1 = mMgr.make_input(new_vid);
+    if ( aig.inv() ) {
+      aig1 = ~aig1;
+    }
+    if ( perm[4] & (1U << id) ) {
+      aig1 = ~aig1;
+    }
+    return aig1;
+  }
+  if ( aig.is_and() ) {
+    Aig aig1 = xf4_sub(aig.fanin0(), perm);
+    Aig aig2 = xf4_sub(aig.fanin1(), perm);
+    Aig ans = mMgr.make_and(aig1, aig2);
+    if ( aig.inv() ) {
+      ans = ~ans;
+    }
+    return ans;
+  }
+  cout << "Error : aig is constant." << endl;
+  assert_not_reached(__FILE__, __LINE__);
+  return Aig();
 }
 
 // @brief パタンを登録する．
@@ -260,41 +590,116 @@ GenAig::add_pat(ymuint32 fv,
 // @param[in] aig AIG
 // @param[in] level レベル
 void
-GenAig::add_pat1(ymuint32 fv,
-		 Aig aig,
-		 ymuint32 level)
+GenAig::add_pat(Aig aig,
+		ymuint32 fv,
+		ymuint32 level)
 {
-  if ( mFuncTable[fv].push_back(level, aig) ) {
+  AigPat aigpat(aig, fv, level);
+
+  if ( mFuncArray[fv].empty() ) {
+    mFuncLevel[fv] = level;
     -- mRemainFunc;
+    cout << "add_pat(" << hex << aigpat.mFunc
+	 << dec << ", Aig(" << aigpat.mAig
+	 << "), Level#" << level
+	 << ")" << endl;
+  }
+  mFuncArray[fv].push_back(aigpat);
+
+  while ( mAigList.size() <= level ) {
+    mAigList.push_back(vector<AigPat>());
+  }
+  mAigList[level].push_back(aigpat);
+  if ( 0 ) {
+    cout << "add_pat(" << hex << aigpat.mFunc
+	 << dec << ", Aig(" << aigpat.mAig
+	 << "), Level#" << level
+	 << ")" << endl;
+  }
+}
+
+// @brief 2つのAIGから新しいパタンを作る．
+// @note 具体的には aig1 & aig2 と ~aig & aig
+void
+GenAig::compose(AigPat aigpat1,
+		AigPat aigpat2)
+{
+  ymuint32 fv1 = aigpat1.mFunc;
+  ymuint32 fv2 = aigpat2.mFunc;
+
+  Aig aig1 = aigpat1.mAig;
+  Aig aig2 = aigpat2.mAig;
+
+  ymuint level = count(aig1, aig2) + 1;
+
+  ymuint32 fv3 = fv1 & fv2;
+  if ( fv3 != 0U && fv3 != fv1 && fv3 != fv2 ) {
+    add_aigpair(aig1, aig2, fv3, level);
   }
 
-  ymuint nf = 1U << mNp;
-  for (ymuint32 v = 0; v < nf; ++ v) {
-    ymuint32 fv1 = fv & v;
-    if ( fv1 == fv || fv1 == 0U ) {
-      continue;
-    }
-    for (vector<Aig>::iterator p = mFuncTable[v].mList.begin();
-	 p != mFuncTable[v].mList.end(); ++ p) {
-      Aig aig1 = *p;
-      add_aigpair(aig1, aig, fv1);
-    }
+  ymuint32 fv1_n = ~fv1 & mMask;
+  ymuint32 fv4 = fv1_n & fv2;
+  if ( fv4 != 0U && fv4 != fv1_n && fv4 != fv2 ) {
+    add_aigpair(~aig1, aig2, fv4, level);
   }
 }
 
 // @brief AIG の対を登録する．
-// @note 結果は mAigPairListArray に追加される．
+// @note 結果は mCandListArray に追加される．
 void
 GenAig::add_aigpair(Aig aig1,
 		    Aig aig2,
-		    ymuint32 func)
+		    ymuint32 func,
+		    ymuint level)
 {
-  ymuint level = count(aig1, aig2) + 1;
-  while ( mAigPairListArray.size() <= level ) {
-    mAigPairListArray.push_back(vector<AigPair>());
+  if ( !mFuncArray[func].empty() && (mFuncLevel[func] + mSlack) < level ) {
+    return;
   }
+  while ( mCandListArray.size() <= level ) {
+    mCandListArray.push_back(vector<AigPat>());
+  }
+
   Aig aig = mMgr.make_and(aig1, aig2);
-  mAigPairListArray[level].push_back(AigPair(aig1, aig2, func, level));
+
+  ymuint32 cfunc;
+  Aig caig;
+  if ( mNi == 3 ) {
+    ymuint8 cperm[4];
+    cfunc = cannonical3(func, cperm);
+    caig = xform3(aig, cperm);
+  }
+  else {
+    ymuint8 cperm[5];
+    cfunc = cannonical4(func, cperm);
+    caig = xform4(aig, cperm);
+  }
+
+  if ( mAigHash.count(caig) > 0 ) {
+    return;
+  }
+  mAigHash.insert(caig);
+  mCandListArray[level].push_back(AigPat(caig, cfunc, level));
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス AigPat
+//////////////////////////////////////////////////////////////////////
+
+// 空のコンストラクタ
+AigPat::AigPat()
+{
+}
+
+// コンストラクタ
+AigPat::AigPat(Aig aig,
+	       ymuint32 func,
+	       ymuint level) :
+  mAig(aig),
+  mFunc(func),
+  mLevel(level)
+{
+
 }
 
 END_NAMESPACE_YM
