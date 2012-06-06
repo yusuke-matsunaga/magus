@@ -73,16 +73,6 @@ END_NONAMESPACE
 void
 RwtMgr::init()
 {
-#if 0
-  // 関数リストの読み込み
-  hash_set<ymuint16> func_hash;
-  ymuint nf = 1;
-  for ( ; s_RwtPracticalClasses[nf] != 0x0000; ++ nf) {
-    func_hash.insert(s_RwtPracticalClasses[nf]);
-  }
-  func_hash.insert(0);
-#endif
-
   // ノードテーブルの要素数を数える．
   ymuint nn = 0;
   for ( ; ; ++ nn) {
