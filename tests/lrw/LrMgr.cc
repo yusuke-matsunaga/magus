@@ -1,23 +1,15 @@
 
-/// @file libym_aig/LrMgr.cc
+/// @file LrMgr.cc
 /// @brief LrMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: LrMgr.cc 1594 2008-07-18 10:26:12Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "LrMgr.h"
-#include "ym_aig/AigNode.h"
-#include "ym_aig/AigNetwork.h"
-#include "ym_aig/AigManip.h"
-#include "ym_aig/AigCutHolder.h"
-#include "ym_aig/AigCut.h"
-#include "ym_npn/NpnMgr.h"
-#include "ym_npn/TvFunc.h"
-#include "ym_aig/AigBlifWriter.h"
+#include "ym_logic/Aig.h"
+#include "ym_logic/AigMgr.h"
 
 
 #if defined(YM_DEBUG)
@@ -36,6 +28,32 @@ BEGIN_NONAMESPACE
 
 const ymuint debug = DEBUG_FLAG;
 
+struct Npn4Cannon
+{
+  ymuint32 mFunc;
+  ymuint8 mPerm[5];
+};
+
+// 4入力のNPN同値類の代表関数への変換を表す配列
+Npn4Cannon npn4cannon[] = {
+#include "npn4cannon.h"
+};
+
+// @brief 関数ベクタを代表関数に変換する(4入力版)
+ymuint32
+cannonical4(ymuint32 func,
+	    ymuint8 cperm[])
+{
+  const Npn4Cannon& cannon = npn4cannon[func];
+  ymuint32 cfunc = cannon.mFunc;
+  cperm[0] = cannon.mPerm[0];
+  cperm[1] = cannon.mPerm[1];
+  cperm[2] = cannon.mPerm[2];
+  cperm[3] = cannon.mPerm[3];
+  cperm[4] = cannon.mPerm[4];
+  return cfunc;
+}
+
 END_NONAMESPACE
 
 
@@ -48,7 +66,7 @@ LrMgr::LrMgr()
 {
   mLogLevel = 0;
   mLogStream = new ofstream("/dev/null");
-  
+
   init_table();
 }
 
@@ -61,7 +79,7 @@ LrMgr::~LrMgr()
 }
 
 BEGIN_NONAMESPACE
-
+#if 0
 void
 cg_step1(AigNode* node,
 	 vector<ymuint32>& marks,
@@ -147,7 +165,7 @@ mark_nnode(AigNode* node,
   if ( (marks[node->id()] & 4U) == 4U ) {
     return;
   }
-  
+
   marks[node->id()] |= 4U;
   assert_cond(node->is_and(), __FILE__, __LINE__);
   mark_nnode(node->fanin0(), marks);
@@ -200,7 +218,7 @@ mark_dnode(const AigCut* cut,
 	   AigNode* new_node,
 	   vector<ymuint32>& marks)
 {
-  for (size_t i = 0; i < cut->ni(); ++ i) {
+  for (ymuint i = 0; i < cut->ni(); ++ i) {
     AigNode* inode = cut->input(i);
     marks[inode->id()] |= 2U;
   }
@@ -212,23 +230,24 @@ mark_dnode(const AigCut* cut,
     clear_nnode(new_node, marks);
   }
 }
-
+#endif
 END_NONAMESPACE
 
 // @brief local rewrite を行う．
 void
 LrMgr::local_rewrite(AigMgr& aig_mgr)
 {
+#if 0
   ymuint nn = aig_mgr.node_num();
-  
+
   vector<AigNode*> node_array(na);
-  for (size_t i = 0; i < na; ++ i) {
+  for (ymuint i = 0; i < na; ++ i) {
     AigNode* node = network.sorted_andnode(i);
     node_array[i] = node;
   }
   vector<ymuint32> marks(network.max_node_id(), 0U);
   list<pair<AigNode*, AigHandle> > subst_pair;
-  for (size_t i = 0; i < na; ++ i) {
+  for (ymuint i = 0; i < na; ++ i) {
     AigNode* node = node_array[i];
     int best_gain = 0;
     const AigCut* best_cut = NULL;
@@ -275,7 +294,7 @@ LrMgr::local_rewrite(AigMgr& aig_mgr)
       for (size_t i = 0; i < best_cut->ni(); ++ i) {
 	inputs[i] = AigHandle(best_cut->input(i), false);
       }
-      
+
       AigHandle new_handle = best_templ.make_aig(manip, inputs);
       subst_pair.push_back(make_pair(node, new_handle));
       mark_dnode(best_cut, new_handle.node(), marks);
@@ -287,13 +306,14 @@ LrMgr::local_rewrite(AigMgr& aig_mgr)
     AigHandle new_handle = p->second;
     manip.node_subst(node, new_handle.node(), new_handle.inv());
   }
-  
+
   manip.clean_up();
+#endif
 }
 
 // 与えられた関数に対する AigTemplate を求める．
 bool
-LrMgr::find_aig(size_t ni,
+LrMgr::find_aig(ymuint ni,
 		ymuint32 pat,
 		AigTemplate& templ)
 {
@@ -306,40 +326,18 @@ LrMgr::find_aig(size_t ni,
     return true;
   }
   if ( ni == 4 ) {
-    NpnMap cmap;
-    ymuint32 pat0;
-    {
-      vector<int> vals(16);
-      for (size_t i = 0; i < 16; ++ i) {
-	if ( pat & (1U << i) ) {
-	  vals[i] = 1;
-	}
-	else {
-	  vals[i] = 0;
-	}
-      }
-      TvFunc func(4, vals);
-      NpnMgr mgr;
-      mgr.cannonical(func, cmap);
-      TvFunc func0 = func.xform(cmap);
-      pat0 = 0U;
-      for (size_t i = 0; i < 16; ++ i) {
-	if ( func0.value(i) ) {
-	  pat0 |= (1U << i);
-	}
-      }
-    }
-    hash_map<ymuint32, size_t>::const_iterator p = npn4map.find(pat0);
+    ymuint8 perm[5];
+    ymuint32 cpat = cannonical4(pat, perm);
+    hash_map<ymuint32, ymuint8>::const_iterator p = npn4map.find(cpat);
     assert_cond(p != npn4map.end(), __FILE__, __LINE__);
-    size_t id = p->second;
+    ymuint id = p->second;
     templ = aig4table[id];
-    NpnMap rmap = inverse(cmap);
-    templ.set_npnmap(rmap);
+    templ.xform(perm);
     return true;
   }
   return false;
 }
-  
+
 // @brief ログレベルを設定する．
 void
 LrMgr::set_loglevel(int level)

@@ -36,20 +36,6 @@ GenAigDj::operator()(ymuint ni)
   mNf = 1U << mNp;
   mMask = mNf - 1U;
 
-  ff_mode();
-}
-
-// @brief 関数ベクタに対応するレベルを返す．
-ymuint
-GenAigDj::level(ymuint32 func) const
-{
-  return mFuncTable[func].mMinLevel;
-}
-
-// @brief FF モードの関数レベルを計算する．
-void
-GenAigDj::ff_mode()
-{
   mFuncTable.clear();
   mFuncListArray.clear();
 
@@ -162,6 +148,13 @@ GenAigDj::add_pat(ymuint32 fv,
     mFuncListArray[level].push_back(fv_n);
     -- mRemainFunc;
   }
+}
+
+// @brief 関数ベクタに対応するレベルを返す．
+ymuint
+GenAigDj::level(ymuint32 func) const
+{
+  return mFuncTable[func].mMinLevel;
 }
 
 END_NAMESPACE_YM

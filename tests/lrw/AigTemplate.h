@@ -1,15 +1,15 @@
-#ifndef LIBYM_AIG_AIGTEMPLATE_H
-#define LIBYM_AIG_AIGTEMPLATE_H
+#ifndef AIGTEMPLATE_H
+#define AIGTEMPLATE_H
 
-/// @file libym_aig/AigTemplate.h
+/// @file AigTemplate.h
 /// @brief AigTemplate のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_aig/aig_nsdef.h"
+#include "ym_logic/aig_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_AIG
@@ -114,6 +114,10 @@ public:
   /// @brief 出力の極性をセットする．
   void
   set_opol(ymuint pol);
+
+  /// @brief NPN変換を施す．
+  void
+  xform(ymuint8 perm[]);
 
 
 private:
@@ -238,4 +242,4 @@ AigTemplate::opol() const
 
 END_NAMESPACE_YM_AIG
 
-#endif // LIBYM_AIG_AIGTEMPLATE_H
+#endif // AIGTEMPLATE_H

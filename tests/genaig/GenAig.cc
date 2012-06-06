@@ -130,6 +130,9 @@ GenAig::aig_mode(ymuint slack)
   // 定数0と定数1は除く
   mRemainFunc = mNf - 2;
 
+  // かなり怪しいコード
+  mRemainRep = (mNi == 3) ? 13 : 221;
+
   // レベル0のパタンを作る．
   {
     ymuint32 fv = 0xaaaaaaaa & mMask;
@@ -141,7 +144,8 @@ GenAig::aig_mode(ymuint slack)
   ymuint max_level = 0;
   for (ymuint level = 0; level < mCandListArray.size(); ++ level ) {
     cout << endl
-	 << "level = " << level << ", remain_func = " << mRemainFunc << endl;
+	 << "level = " << level << ", remain_func = " << mRemainFunc << endl
+	 << "   remain_rep = " << mRemainRep << endl;
     max_level = level;
 
     while ( mAigList.size() <= level ) {
@@ -258,34 +262,6 @@ GenAig::npn_expand(ymuint32 fv,
 		   Aig aig,
 		   ymuint32 level)
 {
-#if 0
-  hash_set<ymuint32> func_hash;
-  if ( mNi == 3 ) {
-    for (ymuint p = 0; p < 96; ++ p) {
-      ymuint8* perm = npn3perm[p];
-      ymuint32 fv1 = xform_func3(fv, perm);
-      if ( func_hash.count(fv1) == 0 ) {
-	func_hash.insert(fv1);
-	Aig aig1 = xform3(aig, perm);
-	add_pat(aig1, fv1, level);
-      }
-    }
-  }
-  else if ( mNi == 4 ) {
-    for (ymuint p = 0; p < 768; ++ p) {
-      ymuint8* perm = npn4perm[p];
-      ymuint32 fv1 = xform_func4(fv, perm);
-      if ( func_hash.count(fv1) == 0 ) {
-	func_hash.insert(fv1);
-	Aig aig1 = xform4(aig, perm);
-	add_pat(aig1, fv1, level);
-      }
-    }
-  }
-  else {
-    assert_not_reached(__FILE__, __LINE__);
-  }
-#else
   if ( mNi == 3 ) {
     hash_map<ymuint32, vector<FuncXform> >::const_iterator p;
     p = mNpnHash.find(fv);
@@ -312,7 +288,6 @@ GenAig::npn_expand(ymuint32 fv,
       add_pat(aig1, fv1, level);
     }
   }
-#endif
 }
 
 // @brief 関数ベクタを代表関数に変換する(3入力版)
@@ -358,6 +333,9 @@ GenAig::add_pat(Aig aig,
   if ( mFuncArray[fv].empty() ) {
     mFuncLevel[fv] = level;
     -- mRemainFunc;
+    if ( mNpnHash.count(fv) > 0 ) {
+      -- mRemainRep;
+    }
   }
   else if ( mFuncLevel[fv] > level ) {
     mFuncLevel[fv] = level;

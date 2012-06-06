@@ -1,11 +1,9 @@
 
-/// @file libym_aig/AigTemplate.cc
+/// @file AigTemplate.cc
 /// @brief AigTemplate の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: AigTemplate.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -27,7 +25,7 @@ AigTemplate::~AigTemplate()
 {
   delete [] mNodeArray;
 }
-  
+
 // @brief 初期化する．
 // @param[in] leaf_num 入力数
 // @param[in] and_num AND ノード数
@@ -57,7 +55,7 @@ AigTemplate::set_and(ymuint pos,
     mNodeArray[base + 1] = fanin1;
   }
 }
-  
+
 // @brief 出力の極性をセットする．
 void
 AigTemplate::set_opol(ymuint pol)
@@ -68,6 +66,12 @@ AigTemplate::set_opol(ymuint pol)
   else {
     mLeafNum &= ~1U;
   }
+}
+
+// @brief NPN変換を施す．
+void
+AigTemplate::xform(ymuint8 perm[])
+{
 }
 
 #if 0
@@ -104,7 +108,7 @@ AigTemplate::make_aig(AigManip& manip,
       if ( node->inv0() ) {
 	input0 = ~input0;
       }
-  
+
       AigHandle input1 = node_map[node->input1()];
       if ( node->inv1() ) {
 	input1 = ~input1;
