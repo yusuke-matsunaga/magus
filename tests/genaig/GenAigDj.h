@@ -104,6 +104,10 @@ public:
   void
   operator()(ymuint ni);
 
+  /// @brief 関数ベクタに対応するレベルを返す．
+  ymuint
+  level(ymuint32 func) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

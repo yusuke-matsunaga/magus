@@ -8,6 +8,7 @@
 
 
 #include "GenAig.h"
+#include "GenAigDj.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -63,6 +64,10 @@ ymuint32 npn5rep[] = {
 };
 #endif
 
+ymuint32 n_compose;
+ymuint32 level_over;
+ymuint32 duplicate_aig;
+
 END_NONAMESPACE
 
 
@@ -109,6 +114,7 @@ GenAig::operator()(ymuint ni,
 void
 GenAig::aig_mode(ymuint slack)
 {
+
   mAigList.clear();
   mRepAigList.clear();
   mCandListArray.clear();
@@ -118,6 +124,17 @@ GenAig::aig_mode(ymuint slack)
 
   mFuncArray.resize(mNf);
   mFuncLevel.resize(mNf);
+
+  GenAigDj dj;
+
+  dj(mNi);
+  for (ymuint32 func = 1; func < mNf - 1; ++ func) {
+    mFuncLevel[func] = dj.level(func);
+  }
+
+  n_compose = 0;
+  level_over = 0;
+  duplicate_aig = 0;
 
   mSlack = slack;
 
@@ -138,11 +155,48 @@ GenAig::aig_mode(ymuint slack)
 	 << "level = " << level << ", remain_func = " << mRemainFunc << endl;
     max_level = level;
 
+    while ( mAigList.size() <= level ) {
+      mAigList.push_back(vector<AigPat>());
+    }
+    while ( mRepAigList.size() <= level ) {
+      mRepAigList.push_back(vector<AigPat>());
+    }
+
     ymuint n = mCandListArray[level].size();
     cout << "  " << n << " seed patterns" << endl;
     for (ymuint i = 0; i < n; ++ i) {
       const AigPat& aigpat = mCandListArray[level][i];
-      npn_expand(aigpat.mFunc, aigpat.mAig, level);
+      if ( mFuncLevel[aigpat.mFunc] + mSlack < level ) {
+	continue;
+      }
+      mRepAigList[level].push_back(aigpat);
+    }
+
+    const vector<AigPat>& src_list1 = mRepAigList[level];
+    ymuint n1 = src_list1.size();
+    for (ymuint i = 0; i < n1; ++ i) {
+      const AigPat& aigpat1 = src_list1[i];
+#if 1
+      mCountHash.clear();
+      ymuint level_base = count1(aigpat1.mAig);
+
+      for (ymuint l = 0; l < level; ++ l) {
+	const vector<AigPat>& src_list2 = mAigList[l];
+	ymuint n2 = src_list2.size();
+	for (ymuint j = 0; j < n2; ++ j) {
+	  const AigPat& aigpat2 = src_list2[j];
+	  compose(aigpat1, aigpat2, level_base);
+	}
+      }
+#endif
+    }
+    cout << "compose1 end" << endl;
+
+    for (ymuint i = 0; i < n; ++ i) {
+      const AigPat& aigpat = mCandListArray[level][i];
+      if ( mFuncLevel[aigpat.mFunc] >= level ) {
+	npn_expand(aigpat.mFunc, aigpat.mAig, level);
+      }
     }
     cout << "  expand " << mAigList[level].size() << " patterns" << endl;
 
@@ -152,29 +206,33 @@ GenAig::aig_mode(ymuint slack)
     }
 
     // level の代表パタンと他のパタンとの対を作る．
-    const vector<AigPat>& src_list1 = mRepAigList[level];
-    ymuint n1 = src_list1.size();
     for (ymuint i = 0; i < n1; ++ i) {
       const AigPat& aigpat1 = src_list1[i];
 
       mCountHash.clear();
       ymuint level_base = count1(aigpat1.mAig);
 
+#if 0
       for (ymuint l = 0; l < level; ++ l) {
 	const vector<AigPat>& src_list2 = mAigList[l];
 	ymuint n2 = src_list2.size();
 	for (ymuint j = 0; j < n2; ++ j) {
 	  const AigPat& aigpat2 = src_list2[j];
-	  cout << "L#" << l << ": " << j << " / " << n2
-	       << " | " << i << " / " << n1 << endl;
+	  if ( 0 ) {
+	    cout << "L#" << l << ": " << j << " / " << n2
+		 << " | " << i << " / " << n1 << endl;
+	  }
 	  compose(aigpat1, aigpat2, level_base);
 	}
       }
+#endif
       const vector<AigPat>& src_list2 = mAigList[level];
       ymuint n2 = src_list2.size();
       for (ymuint j = 0; j < n2; ++ j) {
-	cout << "L#" << level << ": " << j << " / " << n2
-	     << " | " << i << " / " << n1 << endl;
+	if ( 0 ) {
+	  cout << "L#" << level << ": " << j << " / " << n2
+	       << " | " << i << " / " << n1 << endl;
+	}
 	const AigPat& aigpat2 = src_list2[j];
 	compose(aigpat1, aigpat2, level_base);
       }
@@ -200,6 +258,10 @@ GenAig::aig_mode(ymuint slack)
     cout << "total cost = " << total_cost << endl
 	 << endl;
   }
+
+  cout << "# of compose = " << n_compose << endl
+       << "level over = " << level_over << endl
+       << "duplicate aig = " << duplicate_aig << endl;
 }
 
 // @brief NPN同値類を求める．
@@ -458,16 +520,13 @@ GenAig::add_pat(Aig aig,
     mFuncLevel[fv] = level;
     -- mRemainFunc;
   }
+  else if ( mFuncLevel[fv] > level ) {
+    mFuncLevel[fv] = level;
+  }
+
   mFuncArray[fv].push_back(aigpat);
 
-  while ( mAigList.size() <= level ) {
-    mAigList.push_back(vector<AigPat>());
-    mRepAigList.push_back(vector<AigPat>());
-  }
   mAigList[level].push_back(aigpat);
-  if ( mNpnHash.count(fv) > 0 ) {
-    mRepAigList[level].push_back(aigpat);
-  }
 }
 
 BEGIN_NONAMESPACE
@@ -514,6 +573,8 @@ GenAig::compose(AigPat aigpat1,
 		AigPat aigpat2,
 		ymuint level_base)
 {
+  ++ n_compose;
+
   ymuint32 fv1 = aigpat1.mFunc;
   ymuint32 fv2 = aigpat2.mFunc;
   ymuint32 fv3 = fv1 & fv2;
@@ -522,11 +583,15 @@ GenAig::compose(AigPat aigpat1,
 
   bool valid1 = false;
   if ( fv3 != 0U && fv3 != fv1 && fv3 != fv2 ) {
-    valid1 = true;
+    if ( (mFuncLevel[fv3] + mSlack) >= level_base + 1 ) {
+      valid1 = true;
+    }
   }
   bool valid2 = false;
   if ( fv4 != 0U && fv4 != fv1_n && fv4 != fv2 ) {
-    valid2 = true;
+    if ( (mFuncLevel[fv4] + mSlack) >= level_base + 1 ) {
+      valid2 = true;
+    }
   }
 
   if ( !valid1 && !valid2 ) {
@@ -555,7 +620,8 @@ GenAig::add_aigpair(Aig aig1,
 		    ymuint32 func,
 		    ymuint level)
 {
-  if ( !mFuncArray[func].empty() && (mFuncLevel[func] + mSlack) < level ) {
+  if ( (mFuncLevel[func] + mSlack) < level ) {
+    ++ level_over;
     return;
   }
 
@@ -577,6 +643,9 @@ GenAig::add_aigpair(Aig aig1,
   if ( mAigHash.count(caig) == 0 ) {
     mAigHash.insert(caig);
     add_cand(caig, cfunc, level);
+  }
+  else {
+    ++ duplicate_aig;
   }
 }
 

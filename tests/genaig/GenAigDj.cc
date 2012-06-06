@@ -39,6 +39,13 @@ GenAigDj::operator()(ymuint ni)
   ff_mode();
 }
 
+// @brief 関数ベクタに対応するレベルを返す．
+ymuint
+GenAigDj::level(ymuint32 func) const
+{
+  return mFuncTable[func].mMinLevel;
+}
+
 // @brief FF モードの関数レベルを計算する．
 void
 GenAigDj::ff_mode()
