@@ -34,6 +34,14 @@ noinst_PROGRAMS = \
 
 genaig_SOURCES = \
 	genaig.cc \
+	npn3cannon.h \
+	npn3perm.h \
+	npn3rep.h \
+	npn4cannon.h \
+	npn4perm.h \
+	npn4rep.h \
+	AigPat.h \
+	FuncXform.h \
 	GenAig.h \
 	GenAig.cc \
 	GenAigNaive.h \

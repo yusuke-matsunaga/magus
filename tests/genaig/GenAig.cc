@@ -37,7 +37,7 @@ ymuint8 npn3perm[][4] = {
 #include "npn3perm.h"
 };
 
-// 3入力のNPN同値類代表関数への変換を表す配列
+// 3入力のNPN同値類の代表関数への変換を表す配列
 Npn3Cannon npn3cannon[] = {
 #include "npn3cannon.h"
 };
@@ -52,17 +52,10 @@ ymuint8 npn4perm[][5] = {
 #include "npn4perm.h"
 };
 
-// 4入力のNPN同値類代表関数への変換を表す配列
+// 4入力のNPN同値類の代表関数への変換を表す配列
 Npn4Cannon npn4cannon[] = {
 #include "npn4cannon.h"
 };
-
-#if 0
-// 5入力のNPN同値類代表関数
-ymuint32 npn5rep[] = {
-#include "npn5rep.h"
-};
-#endif
 
 ymuint32 n_compose;
 ymuint32 level_over;
@@ -97,14 +90,10 @@ GenAig::operator()(ymuint ni,
   mMask = mNf - 1U;
 
   if ( mNi == 3 ) {
-    for (ymuint i = 0; npn3rep[i] != 0xFF; ++ i) {
-      mNpnHash.insert(npn3rep[i]);
-    }
+    init_npn3rep();
   }
   else if ( mNi == 4 ) {
-    for (ymuint i = 0; npn4rep[i] != 0xFFFF; ++ i) {
-      mNpnHash.insert(npn4rep[i]);
-    }
+    init_npn4rep();
   }
 
   aig_mode(slack);
@@ -174,29 +163,10 @@ GenAig::aig_mode(ymuint slack)
 
     const vector<AigPat>& src_list1 = mRepAigList[level];
     ymuint n1 = src_list1.size();
+    cout << "  " << n1 << " true seed patterns" << endl;
     for (ymuint i = 0; i < n1; ++ i) {
-      const AigPat& aigpat1 = src_list1[i];
-#if 1
-      mCountHash.clear();
-      ymuint level_base = count1(aigpat1.mAig);
-
-      for (ymuint l = 0; l < level; ++ l) {
-	const vector<AigPat>& src_list2 = mAigList[l];
-	ymuint n2 = src_list2.size();
-	for (ymuint j = 0; j < n2; ++ j) {
-	  const AigPat& aigpat2 = src_list2[j];
-	  compose(aigpat1, aigpat2, level_base);
-	}
-      }
-#endif
-    }
-    cout << "compose1 end" << endl;
-
-    for (ymuint i = 0; i < n; ++ i) {
-      const AigPat& aigpat = mCandListArray[level][i];
-      if ( mFuncLevel[aigpat.mFunc] >= level ) {
-	npn_expand(aigpat.mFunc, aigpat.mAig, level);
-      }
+      const AigPat& aigpat = src_list1[i];
+      npn_expand(aigpat.mFunc, aigpat.mAig, level);
     }
     cout << "  expand " << mAigList[level].size() << " patterns" << endl;
 
@@ -212,7 +182,6 @@ GenAig::aig_mode(ymuint slack)
       mCountHash.clear();
       ymuint level_base = count1(aigpat1.mAig);
 
-#if 0
       for (ymuint l = 0; l < level; ++ l) {
 	const vector<AigPat>& src_list2 = mAigList[l];
 	ymuint n2 = src_list2.size();
@@ -225,7 +194,7 @@ GenAig::aig_mode(ymuint slack)
 	  compose(aigpat1, aigpat2, level_base);
 	}
       }
-#endif
+
       const vector<AigPat>& src_list2 = mAigList[level];
       ymuint n2 = src_list2.size();
       for (ymuint j = 0; j < n2; ++ j) {
@@ -243,7 +212,7 @@ GenAig::aig_mode(ymuint slack)
   bool error = false;
   for (ymuint i = 1; i < mNf - 1; ++ i) {
     if ( mFuncArray[i].empty() ) {
-      cout << "No patterns for function["
+      cerr << "No patterns for function["
 	   << setw(mNp / 4) << setfill('0') << hex << i << dec << "]" << endl;
       error = true;
     }
@@ -252,16 +221,32 @@ GenAig::aig_mode(ymuint slack)
     }
   }
   if ( error ) {
-    cout << "Error occured" << endl;
+    cerr << "Error occured" << endl;
   }
   else {
-    cout << "total cost = " << total_cost << endl
-	 << endl;
+    cout << "# total cost = " << total_cost << endl;
+    list<Aig> aig_list;
+    for (ymuint i = 1; i < mNf - 1; ++ i) {
+      if ( mNpnHash.count(i) == 0 ) {
+	continue;
+      }
+      cout << "Function#" << hex << setw(mNp / 4) << setfill('0')
+	   << i << dec << ": "
+	   << "Level " << mFuncLevel[i] << ": ";
+      for (vector<AigPat>::iterator p = mFuncArray[i].begin();
+	   p != mFuncArray[i].end(); ++ p) {
+	Aig aig = p->mAig;
+	cout << " " << aig;
+	aig_list.push_back(aig);
+      }
+      cout << endl;
+    }
+    mMgr.print_handles(cout, aig_list);
   }
 
-  cout << "# of compose = " << n_compose << endl
-       << "level over = " << level_over << endl
-       << "duplicate aig = " << duplicate_aig << endl;
+  cout << "# # of compose = " << n_compose << endl
+       << "# level over = " << level_over << endl
+       << "# duplicate aig = " << duplicate_aig << endl;
 }
 
 // @brief NPN同値類を求める．
@@ -273,6 +258,7 @@ GenAig::npn_expand(ymuint32 fv,
 		   Aig aig,
 		   ymuint32 level)
 {
+#if 0
   hash_set<ymuint32> func_hash;
   if ( mNi == 3 ) {
     for (ymuint p = 0; p < 96; ++ p) {
@@ -299,6 +285,34 @@ GenAig::npn_expand(ymuint32 fv,
   else {
     assert_not_reached(__FILE__, __LINE__);
   }
+#else
+  if ( mNi == 3 ) {
+    hash_map<ymuint32, vector<FuncXform> >::const_iterator p;
+    p = mNpnHash.find(fv);
+    assert_cond( p != mNpnHash.end(), __FILE__, __LINE__);
+    const vector<FuncXform>& xf_list = p->second;
+    for (vector<FuncXform>::const_iterator q = xf_list.begin();
+	 q != xf_list.end(); ++ q) {
+      const FuncXform& xform = *q;
+      ymuint32 fv1 = xform.mVector;
+      Aig aig1 = xform3(aig, xform.mPerm);
+      add_pat(aig1, fv1, level);
+    }
+  }
+  else {
+    hash_map<ymuint32, vector<FuncXform> >::const_iterator p;
+    p = mNpnHash.find(fv);
+    assert_cond( p != mNpnHash.end(), __FILE__, __LINE__);
+    const vector<FuncXform>& xf_list = p->second;
+    for (vector<FuncXform>::const_iterator q = xf_list.begin();
+	 q != xf_list.end(); ++ q) {
+      const FuncXform& xform = *q;
+      ymuint32 fv1 = xform.mVector;
+      Aig aig1 = xform4(aig, xform.mPerm);
+      add_pat(aig1, fv1, level);
+    }
+  }
+#endif
 }
 
 // @brief 関数ベクタを代表関数に変換する(3入力版)
@@ -330,181 +344,6 @@ GenAig::cannonical4(ymuint32 func,
   return cfunc;
 }
 
-// @brief 関数ベクタを変換する(3入力版)
-ymuint32
-GenAig::xform_func3(ymuint32 fv,
-		    const ymuint8 perm[])
-{
-  ymuint32 ans = 0U;
-  ymuint8 pols = perm[3];
-  for (ymuint p = 0; p < 8; ++ p) {
-    if ( fv & (1U << p) ) {
-      ymuint v0 = (p >> 0) & 1U;
-      ymuint v1 = (p >> 1) & 1U;
-      ymuint v2 = (p >> 2) & 1U;
-      if ( pols & 1U ) {
-	v0 ^= 1U;
-      }
-      if ( pols & 2U ) {
-	v1 ^= 1U;
-      }
-      if ( pols & 4U ) {
-	v2 ^= 1U;
-      }
-      ymuint q = 0U;
-      if ( v0 ) {
-	q |= (1U << perm[0]);
-      }
-      if ( v1 ) {
-	q |= (1U << perm[1]);
-      }
-      if ( v2 ) {
-	q |= (1U << perm[2]);
-      }
-      ans |= (1U << q);
-    }
-  }
-  if ( pols & 8U ) {
-    ans = ~ans & mMask;
-  }
-  return ans;
-}
-
-// @brief 関数ベクタを変換する(4入力版)
-ymuint32
-GenAig::xform_func4(ymuint32 fv,
-		    const ymuint8 perm[])
-{
-  ymuint32 ans = 0U;
-  ymuint8 pols = perm[4];
-  for (ymuint p = 0; p < 16; ++ p) {
-    if ( fv & (1U << p) ) {
-      ymuint v0 = (p >> 0) & 1U;
-      ymuint v1 = (p >> 1) & 1U;
-      ymuint v2 = (p >> 2) & 1U;
-      ymuint v3 = (p >> 3) & 1U;
-      if ( pols & 1U ) {
-	v0 ^= 1U;
-      }
-      if ( pols & 2U ) {
-	v1 ^= 1U;
-      }
-      if ( pols & 4U ) {
-	v2 ^= 1U;
-      }
-      if ( pols & 8U ) {
-	v3 ^= 1U;
-      }
-      ymuint q = 0U;
-      if ( v0 ) {
-	q |= (1U << perm[0]);
-      }
-      if ( v1 ) {
-	q |= (1U << perm[1]);
-      }
-      if ( v2 ) {
-	q |= (1U << perm[2]);
-      }
-      if ( v3 ) {
-	q |= (1U << perm[3]);
-      }
-      ans |= (1U << q);
-    }
-  }
-  if ( pols & 16U ) {
-    ans = ~ans & mMask;
-  }
-  return ans;
-}
-
-// @brief AIG を変換する(3入力版)
-Aig
-GenAig::xform3(Aig aig,
-	       const ymuint8 perm[])
-{
-  Aig aig1 = xf3_sub(aig, perm);
-  if ( perm[3] & 8U ) {
-    aig1 = ~aig1;
-  }
-  return aig1;
-}
-
-// @brief xform3 の下請け関数
-Aig
-GenAig::xf3_sub(Aig aig,
-		const ymuint8 perm[])
-{
-  if ( aig.is_input() ) {
-    VarId vid = aig.input_id();
-    ymuint id = vid.val();
-    VarId new_vid(perm[id]);
-    Aig aig1 = mMgr.make_input(new_vid);
-    if ( aig.inv() ) {
-      aig1 = ~aig1;
-    }
-    if ( perm[3] & (1U << id) ) {
-      aig1 = ~aig1;
-    }
-    return aig1;
-  }
-  if ( aig.is_and() ) {
-    Aig aig1 = xf3_sub(aig.fanin0(), perm);
-    Aig aig2 = xf3_sub(aig.fanin1(), perm);
-    Aig ans = mMgr.make_and(aig1, aig2);
-    if ( aig.inv() ) {
-      ans = ~ans;
-    }
-    return ans;
-  }
-  cout << "Error : aig is constant." << endl;
-  assert_not_reached(__FILE__, __LINE__);
-  return Aig();
-}
-
-// @brief AIG を変換する(4入力版)
-Aig
-GenAig::xform4(Aig aig,
-	       const ymuint8 perm[])
-{
-  Aig aig1 = xf4_sub(aig, perm);
-  if ( perm[4] & 16U ) {
-    aig1 = ~aig1;
-  }
-  return aig1;
-}
-
-// @brief xform4 の下請け関数
-Aig
-GenAig::xf4_sub(Aig aig,
-		const ymuint8 perm[])
-{
-  if ( aig.is_input() ) {
-    VarId vid = aig.input_id();
-    ymuint id = vid.val();
-    VarId new_vid(perm[id]);
-    Aig aig1 = mMgr.make_input(new_vid);
-    if ( aig.inv() ) {
-      aig1 = ~aig1;
-    }
-    if ( perm[4] & (1U << id) ) {
-      aig1 = ~aig1;
-    }
-    return aig1;
-  }
-  if ( aig.is_and() ) {
-    Aig aig1 = xf4_sub(aig.fanin0(), perm);
-    Aig aig2 = xf4_sub(aig.fanin1(), perm);
-    Aig ans = mMgr.make_and(aig1, aig2);
-    if ( aig.inv() ) {
-      ans = ~ans;
-    }
-    return ans;
-  }
-  cout << "Error : aig is constant." << endl;
-  assert_not_reached(__FILE__, __LINE__);
-  return Aig();
-}
-
 // @brief パタンを登録する．
 // @param[in] fv 関数ベクタ
 // @param[in] aig AIG
@@ -528,43 +367,6 @@ GenAig::add_pat(Aig aig,
 
   mAigList[level].push_back(aigpat);
 }
-
-BEGIN_NONAMESPACE
-
-#if 1
-ymuint
-count_sub(Aig aig,
-	  hash_set<Aig>& aig_hash)
-{
-  if ( aig.inv() ) {
-    aig = ~aig;
-  }
-
-  ymuint ans = 0;
-  if ( aig_hash.count(aig) == 0 ) {
-    aig_hash.insert(aig);
-    if ( aig.is_and() ) {
-      ans = 1;
-      ans += count_sub(aig.fanin0(), aig_hash);
-      ans += count_sub(aig.fanin1(), aig_hash);
-    }
-  }
-  return ans;
-}
-
-ymuint
-count(Aig aig1,
-      Aig aig2)
-{
-  hash_set<Aig> aig_hash;
-  ymuint ans;
-  ans = count_sub(aig1, aig_hash);
-  ans += count_sub(aig2, aig_hash);
-  return ans;
-}
-#endif
-
-END_NONAMESPACE
 
 // @brief 2つのAIGから新しいパタンを作る．
 // @note 具体的には aig1 & aig2 と ~aig & aig
@@ -750,6 +552,26 @@ aig_to_func(Aig aig)
   return func;
 }
 
+ymuint
+count_sub(Aig aig,
+	  hash_set<Aig>& aig_hash)
+{
+  if ( aig.inv() ) {
+    aig = ~aig;
+  }
+
+  ymuint ans = 0;
+  if ( aig_hash.count(aig) == 0 ) {
+    aig_hash.insert(aig);
+    if ( aig.is_and() ) {
+      ans = 1;
+      ans += count_sub(aig.fanin0(), aig_hash);
+      ans += count_sub(aig.fanin1(), aig_hash);
+    }
+  }
+  return ans;
+}
+
 END_NONAMESPACE
 
 // @brief AigPat の内容が正しいか調べる．
@@ -768,6 +590,225 @@ GenAig::sanity_check(AigPat aigpat)
     return false;
   }
   return true;
+}
+
+void
+GenAig::init_npn3rep()
+{
+  for (ymuint i = 0; npn3rep[i] != 0xFF; ++ i) {
+    ymuint32 fv = npn3rep[i];
+
+    vector<FuncXform> tmp_list;
+    hash_set<ymuint32> func_hash;
+    for (ymuint p = 0; p < 96; ++ p) {
+      ymuint8* perm = npn3perm[p];
+      ymuint32 fv1 = xform_func3(fv, perm);
+      if ( func_hash.count(fv1) == 0 ) {
+	func_hash.insert(fv1);
+	tmp_list.push_back(FuncXform(fv1, perm[0], perm[1], perm[2], perm[3]));
+      }
+    }
+
+    mNpnHash.insert(make_pair(fv, tmp_list));
+  }
+}
+
+// @brief 4入力関数の情報をセットアップする．
+void
+GenAig::init_npn4rep()
+{
+  for (ymuint i = 0; npn4rep[i] != 0xFFFF; ++ i) {
+    ymuint32 fv = npn4rep[i];
+
+    vector<FuncXform> tmp_list;
+    hash_set<ymuint32> func_hash;
+    for (ymuint p = 0; p < 768; ++ p) {
+      ymuint8* perm = npn4perm[p];
+      ymuint32 fv1 = xform_func4(fv, perm);
+      if ( func_hash.count(fv1) == 0 ) {
+	func_hash.insert(fv1);
+	tmp_list.push_back(FuncXform(fv1, perm[0], perm[1],
+				     perm[2], perm[3], perm[4]));
+      }
+    }
+
+    mNpnHash.insert(make_pair(fv, tmp_list));
+  }
+}
+
+// @brief 関数ベクタを変換する(3入力版)
+ymuint32
+GenAig::xform_func3(ymuint32 fv,
+		    const ymuint8 perm[])
+{
+  ymuint32 ans = 0U;
+  ymuint8 pols = perm[3];
+  for (ymuint p = 0; p < 8; ++ p) {
+    if ( fv & (1U << p) ) {
+      ymuint v0 = (p >> 0) & 1U;
+      ymuint v1 = (p >> 1) & 1U;
+      ymuint v2 = (p >> 2) & 1U;
+      if ( pols & 1U ) {
+	v0 ^= 1U;
+      }
+      if ( pols & 2U ) {
+	v1 ^= 1U;
+      }
+      if ( pols & 4U ) {
+	v2 ^= 1U;
+      }
+      ymuint q = 0U;
+      if ( v0 ) {
+	q |= (1U << perm[0]);
+      }
+      if ( v1 ) {
+	q |= (1U << perm[1]);
+      }
+      if ( v2 ) {
+	q |= (1U << perm[2]);
+      }
+      ans |= (1U << q);
+    }
+  }
+  if ( pols & 8U ) {
+    ans = ~ans & mMask;
+  }
+  return ans;
+}
+
+// @brief 関数ベクタを変換する(4入力版)
+ymuint32
+GenAig::xform_func4(ymuint32 fv,
+		    const ymuint8 perm[])
+{
+  ymuint32 ans = 0U;
+  ymuint8 pols = perm[4];
+  for (ymuint p = 0; p < 16; ++ p) {
+    if ( fv & (1U << p) ) {
+      ymuint v0 = (p >> 0) & 1U;
+      ymuint v1 = (p >> 1) & 1U;
+      ymuint v2 = (p >> 2) & 1U;
+      ymuint v3 = (p >> 3) & 1U;
+      if ( pols & 1U ) {
+	v0 ^= 1U;
+      }
+      if ( pols & 2U ) {
+	v1 ^= 1U;
+      }
+      if ( pols & 4U ) {
+	v2 ^= 1U;
+      }
+      if ( pols & 8U ) {
+	v3 ^= 1U;
+      }
+      ymuint q = 0U;
+      if ( v0 ) {
+	q |= (1U << perm[0]);
+      }
+      if ( v1 ) {
+	q |= (1U << perm[1]);
+      }
+      if ( v2 ) {
+	q |= (1U << perm[2]);
+      }
+      if ( v3 ) {
+	q |= (1U << perm[3]);
+      }
+      ans |= (1U << q);
+    }
+  }
+  if ( pols & 16U ) {
+    ans = ~ans & mMask;
+  }
+  return ans;
+}
+
+// @brief AIG を変換する(3入力版)
+Aig
+GenAig::xform3(Aig aig,
+	       const ymuint8 perm[])
+{
+  Aig aig1 = xf3_sub(aig, perm);
+  if ( perm[3] & 8U ) {
+    aig1 = ~aig1;
+  }
+  return aig1;
+}
+
+// @brief xform3 の下請け関数
+Aig
+GenAig::xf3_sub(Aig aig,
+		const ymuint8 perm[])
+{
+  if ( aig.is_input() ) {
+    VarId vid = aig.input_id();
+    ymuint id = vid.val();
+    VarId new_vid(perm[id]);
+    Aig aig1 = mMgr.make_input(new_vid);
+    if ( aig.inv() ) {
+      aig1 = ~aig1;
+    }
+    if ( perm[3] & (1U << id) ) {
+      aig1 = ~aig1;
+    }
+    return aig1;
+  }
+  if ( aig.is_and() ) {
+    Aig aig1 = xf3_sub(aig.fanin0(), perm);
+    Aig aig2 = xf3_sub(aig.fanin1(), perm);
+    Aig ans = mMgr.make_and(aig1, aig2);
+    if ( aig.inv() ) {
+      ans = ~ans;
+    }
+    return ans;
+  }
+  cout << "Error : aig is constant." << endl;
+  assert_not_reached(__FILE__, __LINE__);
+  return Aig();
+}
+
+// @brief AIG を変換する(4入力版)
+Aig
+GenAig::xform4(Aig aig,
+	       const ymuint8 perm[])
+{
+  Aig aig1 = xf4_sub(aig, perm);
+  if ( perm[4] & 16U ) {
+    aig1 = ~aig1;
+  }
+  return aig1;
+}
+
+// @brief xform4 の下請け関数
+Aig
+GenAig::xf4_sub(Aig aig,
+		const ymuint8 perm[])
+{
+  if ( aig.is_input() ) {
+    VarId vid = aig.input_id();
+    ymuint id = vid.val();
+    VarId new_vid(perm[id]);
+    Aig aig1 = mMgr.make_input(new_vid);
+    if ( aig.inv() ) {
+      aig1 = ~aig1;
+    }
+    if ( perm[4] & (1U << id) ) {
+      aig1 = ~aig1;
+    }
+    return aig1;
+  }
+  if ( aig.is_and() ) {
+    Aig aig1 = xf4_sub(aig.fanin0(), perm);
+    Aig aig2 = xf4_sub(aig.fanin1(), perm);
+    Aig ans = mMgr.make_and(aig1, aig2);
+    if ( aig.inv() ) {
+      ans = ~ans;
+    }
+    return ans;
+  }
+  cout << "Error : aig is constant." << endl;
+  assert_not_reached(__FILE__, __LINE__);
+  return Aig();
 }
 
 END_NAMESPACE_YM

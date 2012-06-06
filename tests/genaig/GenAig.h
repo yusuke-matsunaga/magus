@@ -13,6 +13,7 @@
 #include "ym_logic/AigMgr.h"
 #include "ym_logic/Aig.h"
 #include "AigPat.h"
+#include "FuncXform.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -141,6 +142,14 @@ private:
   count2_sub(Aig aig,
 	     hash_set<Aig>& hash);
 
+  /// @brief 3入力関数の情報をセットアップする．
+  void
+  init_npn3rep();
+
+  /// @brief 4入力関数の情報をセットアップする．
+  void
+  init_npn4rep();
+
   /// @brief AigPat の内容が正しいか調べる．
   bool
   sanity_check(AigPat aigpat);
@@ -152,7 +161,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // NPN同値類代表関数を表すハッシュ表
-  hash_set<ymuint32> mNpnHash;
+  hash_map<ymuint32, vector<FuncXform> > mNpnHash;
 
   // AIGMGR
   AigMgr mMgr;
