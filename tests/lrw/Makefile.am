@@ -30,6 +30,7 @@ AM_CPPFLAGS = \
 
 noinst_PROGRAMS = \
 	read_table \
+	genpat
 	lrw
 
 read_table_SOURCES = \
@@ -41,6 +42,18 @@ read_table_SOURCES = \
 
 read_table_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+genpat_SOURCES = \
+	GenPat.h \
+	GenPat.cc \
+	GpMgr.h \
+	GpMgr.cc \
+	GpNode.h \
+	genpat.cc
+
+genpat_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	@POPT_LIBS@
 
 lrw_SOURCES = \
 	AigTemplate.h \
