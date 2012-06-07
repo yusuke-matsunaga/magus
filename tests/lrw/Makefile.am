@@ -30,7 +30,9 @@ AM_CPPFLAGS = \
 
 noinst_PROGRAMS = \
 	read_table \
-	genpat
+	xform_comp_gen \
+	npntest \
+	genpat \
 	lrw
 
 read_table_SOURCES = \
@@ -41,6 +43,19 @@ read_table_SOURCES = \
 	RwtNode.h
 
 read_table_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+xform_comp_gen_SOURCES = \
+	xform_comp_gen.cc
+
+xform_comp_gen_LDADD =
+
+npntest_SOURCES = \
+	NpnXform.h \
+	NpnXform.cc \
+	npntest.cc
+
+npntest_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 genpat_SOURCES = \
