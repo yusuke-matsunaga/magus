@@ -17,8 +17,8 @@ BEGIN_NONAMESPACE
 
 struct Npn4Cannon
 {
-  ymuint32 mFunc;
-  ymuint8 mPerm[5];
+  ymuint16 mFunc;
+  ymuint16 mPerm;
 };
 
 // 4入力のNPN同値類代表関数
@@ -27,7 +27,7 @@ ymuint32 npn4rep[] = {
 };
 
 // 4入力のNPN変換を表す配列
-ymuint8 npn4perm[][5] = {
+ymuint16 npn4perm[] = {
 #include "npn4perm.h"
 };
 
@@ -229,24 +229,9 @@ GenPat::npn_expand(GpHandle handle,
   for (vector<FuncXform>::const_iterator q = xf_list.begin();
        q != xf_list.end(); ++ q) {
     const FuncXform& xform = *q;
-    GpHandle handle1 = xform4(handle, xform.mPerm);
+    GpHandle handle1 = xform4(handle, xform.mXf);
     add_pat(handle1, level);
   }
-}
-
-// @brief 関数ベクタを代表関数に変換する(4入力版)
-ymuint32
-GenPat::cannonical4(ymuint32 func,
-		    ymuint8 cperm[])
-{
-  const Npn4Cannon& cannon = npn4cannon[func];
-  ymuint32 cfunc = cannon.mFunc;
-  cperm[0] = cannon.mPerm[0];
-  cperm[1] = cannon.mPerm[1];
-  cperm[2] = cannon.mPerm[2];
-  cperm[3] = cannon.mPerm[3];
-  cperm[4] = cannon.mPerm[4];
-  return cfunc;
 }
 
 // @brief パタンを登録する．
@@ -286,7 +271,7 @@ GenPat::compose(GpHandle handle1,
   ymuint32 fv1 = handle1.func();
   ymuint32 fv2 = handle2.func();
   ymuint32 fv3 = fv1 & fv2;
-  ymuint32 fv1_n = ~fv1 & 0xFFFF;
+  ymuint32 fv1_n = fv1 ^ 0xFFFF;
   ymuint32 fv4 = fv1_n & fv2;
   ymuint32 fv5 = fv1 ^ fv2;
 
@@ -337,14 +322,8 @@ void
 GenPat::add_pair(GpHandle handle,
 		 ymuint level)
 {
-  ymuint32 cfunc;
-  GpHandle chandle;
-  ymuint8 cperm[5];
-  cfunc = cannonical4(handle.func(), cperm);
-  chandle = xform4(handle, cperm);
-
-  assert_cond( cfunc == chandle.func(), __FILE__, __LINE__);
-  assert_cond( mNpnHash.count(cfunc) > 0, __FILE__, __LINE__);
+  NpnXform xf(npn4cannon[handle.func()].mPerm);
+  GpHandle chandle = xform4(handle, xf);
 
   GpNode* node = chandle.node();
   if ( mGpHash.count(node->id()) == 0 ) {
@@ -422,6 +401,57 @@ GenPat::count2_sub(GpNode* node,
   return ans;
 }
 
+
+BEGIN_NONAMESPACE
+
+// @brief 関数ベクタを変換する(4入力版)
+ymuint16
+xform_func4(ymuint16 fv,
+	    NpnXform xf)
+{
+  ymuint16 ans = 0U;
+  for (ymuint p = 0; p < 16; ++ p) {
+    if ( fv & (1U << p) ) {
+      ymuint v0 = (p >> 0) & 1U;
+      ymuint v1 = (p >> 1) & 1U;
+      ymuint v2 = (p >> 2) & 1U;
+      ymuint v3 = (p >> 3) & 1U;
+      if ( xf.input_inv(0) ) {
+	v0 ^= 1U;
+      }
+      if ( xf.input_inv(1) ) {
+	v1 ^= 1U;
+      }
+      if ( xf.input_inv(2) ) {
+	v2 ^= 1U;
+      }
+      if ( xf.input_inv(3) ) {
+	v3 ^= 1U;
+      }
+      ymuint q = 0U;
+      if ( v0 ) {
+	q |= (1U << xf.input_perm(0));
+      }
+      if ( v1 ) {
+	q |= (1U << xf.input_perm(1));
+      }
+      if ( v2 ) {
+	q |= (1U << xf.input_perm(2));
+      }
+      if ( v3 ) {
+	q |= (1U << xf.input_perm(3));
+      }
+      ans |= (1U << q);
+    }
+  }
+  if ( xf.output_inv() ) {
+    ans ^= 0xFFFF;
+  }
+  return ans;
+}
+
+END_NONAMESPACE
+
 // @brief 4入力関数の情報をセットアップする．
 void
 GenPat::init_npn4rep()
@@ -432,12 +462,11 @@ GenPat::init_npn4rep()
     vector<FuncXform> tmp_list;
     hash_set<ymuint32> func_hash;
     for (ymuint p = 0; p < 768; ++ p) {
-      ymuint8* perm = npn4perm[p];
-      ymuint32 fv1 = xform_func4(fv, perm);
+      NpnXform xf(npn4perm[p]);
+      ymuint16 fv1 = xform_func4(fv, xf);
       if ( func_hash.count(fv1) == 0 ) {
 	func_hash.insert(fv1);
-	tmp_list.push_back(FuncXform(fv1, perm[0], perm[1],
-				     perm[2], perm[3], perm[4]));
+	tmp_list.push_back(FuncXform(fv1, xf.data()));
       }
     }
 
@@ -445,67 +474,20 @@ GenPat::init_npn4rep()
   }
 }
 
-// @brief 関数ベクタを変換する(4入力版)
-ymuint32
-GenPat::xform_func4(ymuint32 fv,
-		    const ymuint8 perm[])
-{
-  ymuint32 ans = 0U;
-  ymuint8 pols = perm[4];
-  for (ymuint p = 0; p < 16; ++ p) {
-    if ( fv & (1U << p) ) {
-      ymuint v0 = (p >> 0) & 1U;
-      ymuint v1 = (p >> 1) & 1U;
-      ymuint v2 = (p >> 2) & 1U;
-      ymuint v3 = (p >> 3) & 1U;
-      if ( pols & 1U ) {
-	v0 ^= 1U;
-      }
-      if ( pols & 2U ) {
-	v1 ^= 1U;
-      }
-      if ( pols & 4U ) {
-	v2 ^= 1U;
-      }
-      if ( pols & 8U ) {
-	v3 ^= 1U;
-      }
-      ymuint q = 0U;
-      if ( v0 ) {
-	q |= (1U << perm[0]);
-      }
-      if ( v1 ) {
-	q |= (1U << perm[1]);
-      }
-      if ( v2 ) {
-	q |= (1U << perm[2]);
-      }
-      if ( v3 ) {
-	q |= (1U << perm[3]);
-      }
-      ans |= (1U << q);
-    }
-  }
-  if ( pols & 16U ) {
-    ans = ~ans & 0xFFFF;
-  }
-  return ans;
-}
-
 // @brief GpHandle を変換する(4入力版)
 GpHandle
 GenPat::xform4(GpHandle handle,
-	       const ymuint8 perm[])
+	       NpnXform xf)
 {
   if ( handle.is_const1() || handle.is_const0() ) {
-    if ( perm[4] & 16 ) {
+    if ( xf.output_inv() ) {
       handle = ~handle;
     }
     return handle;
   }
 
-  GpHandle handle1 = xf4_sub(handle, perm);
-  if ( perm[4] & 16U ) {
+  GpHandle handle1 = xf4_sub(handle, xf);
+  if ( xf.output_inv() ) {
     handle1 = ~handle1;
   }
   return handle1;
@@ -514,26 +496,26 @@ GenPat::xform4(GpHandle handle,
 // @brief xform4 の下請け関数
 GpHandle
 GenPat::xf4_sub(GpHandle handle,
-		const ymuint8 perm[])
+		NpnXform xf)
 {
   GpNode* node = handle.node();
   bool inv = handle.inv();
 
   if (node->is_input() ) {
     ymuint id = node->input_id();
-    ymuint new_id = perm[id];
+    ymuint new_id = xf.input_perm(id);
     GpHandle handle1 = mMgr.make_input(new_id);
     if ( inv ) {
       handle1 = ~handle1;
     }
-    if ( perm[4] & (1U << id) ) {
+    if ( xf.input_inv(id) ) {
       handle1 = ~handle1;
     }
     return handle1;
   }
 
-  GpHandle handle1 = xf4_sub(node->fanin0(), perm);
-  GpHandle handle2 = xf4_sub(node->fanin1(), perm);
+  GpHandle handle1 = xf4_sub(node->fanin0(), xf);
+  GpHandle handle2 = xf4_sub(node->fanin1(), xf);
   GpHandle ans;
   if ( node->is_and() ) {
     ans = mMgr.make_and(handle1, handle2);
@@ -638,7 +620,7 @@ GenPat::add_func(ymuint16 func,
     mFuncListArray[level].push_back(func);
     -- mRemainFunc;
   }
-  ymuint16 func_n = ~func;
+  ymuint16 func_n = func ^ 0xFFFF;
   if ( mUpperLevel[func_n] == 0xFFFF ) {
     mUpperLevel[func_n] = level;
     mFuncListArray[level].push_back(func_n);

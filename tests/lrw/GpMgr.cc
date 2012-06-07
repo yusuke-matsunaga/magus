@@ -28,6 +28,7 @@ GpMgr::GpMgr() :
 // @brief デストラクタ
 GpMgr::~GpMgr()
 {
+  delete [] mHashTable;
   // ノードのメモリは mAlloc のデストラクタで無事開放される．
 }
 

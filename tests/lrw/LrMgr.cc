@@ -30,8 +30,8 @@ const ymuint debug = DEBUG_FLAG;
 
 struct Npn4Cannon
 {
-  ymuint32 mFunc;
-  ymuint8 mPerm[5];
+  ymuint16 mFunc;
+  ymuint16 mPerm;
 };
 
 // 4入力のNPN同値類の代表関数への変換を表す配列
@@ -40,17 +40,13 @@ Npn4Cannon npn4cannon[] = {
 };
 
 // @brief 関数ベクタを代表関数に変換する(4入力版)
-ymuint32
-cannonical4(ymuint32 func,
-	    ymuint8 cperm[])
+ymuint16
+cannonical4(ymuint16 func,
+	    ymuint16& cperm)
 {
   const Npn4Cannon& cannon = npn4cannon[func];
   ymuint32 cfunc = cannon.mFunc;
-  cperm[0] = cannon.mPerm[0];
-  cperm[1] = cannon.mPerm[1];
-  cperm[2] = cannon.mPerm[2];
-  cperm[3] = cannon.mPerm[3];
-  cperm[4] = cannon.mPerm[4];
+  cperm = cannon.mPerm;
   return cfunc;
 }
 
@@ -326,8 +322,8 @@ LrMgr::find_aig(ymuint ni,
     return true;
   }
   if ( ni == 4 ) {
-    ymuint8 perm[5];
-    ymuint32 cpat = cannonical4(pat, perm);
+    ymuint16 perm;
+    ymuint16 cpat = cannonical4(pat, perm);
     hash_map<ymuint32, ymuint8>::const_iterator p = npn4map.find(cpat);
     assert_cond(p != npn4map.end(), __FILE__, __LINE__);
     ymuint id = p->second;

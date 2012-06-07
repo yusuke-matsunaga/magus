@@ -7,7 +7,6 @@
 
 
 #include "ymtools.h"
-#include "ym_utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM

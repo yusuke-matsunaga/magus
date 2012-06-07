@@ -32,6 +32,11 @@ public:
   NpnXform(ymuint pid,
 	   ymuint pols);
 
+  /// @brief 生のデータを引数にしたコンストラクタ
+  /// @note 危険
+  explicit
+  NpnXform(ymuint data);
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -54,6 +59,21 @@ public:
   /// @brief 出力の極性を得る．
   bool
   output_inv() const;
+
+  /// @brief 生のデータを取り出す．
+  /// @note 値域は 0 - 1023
+  ymuint
+  data() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を設定する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 出力の反転属性を反転させる．
+  void
+  flip_oinv();
 
 
 public:
@@ -95,6 +115,12 @@ private:
 };
 
 
+/// @brief 関数ベクタを変換する．
+ymuint16
+xform(ymuint16 func,
+      NpnXform xf);
+
+
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
@@ -117,6 +143,14 @@ NpnXform::NpnXform(ymuint pid,
 {
 }
 
+// @brief 生のデータを引数にしたコンストラクタ
+// @note 危険
+inline
+NpnXform::NpnXform(ymuint data) :
+  mData(data)
+{
+}
+
 // @brief 入力の極性を得る．
 // @param[in] pos 元の入力位置 ( 0 <= pos < 4 )
 // @retval true 反転あり
@@ -134,6 +168,22 @@ bool
 NpnXform::output_inv() const
 {
   return static_cast<bool>((mData >> 4) & 1U);
+}
+
+// @brief 生のデータを取り出す．
+inline
+ymuint
+NpnXform::data() const
+{
+  return mData;
+}
+
+// @brief 出力の反転属性を反転させる．
+inline
+void
+NpnXform::flip_oinv()
+{
+  mData ^= 16U;
 }
 
 END_NAMESPACE_YM

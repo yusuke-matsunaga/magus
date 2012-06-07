@@ -11,6 +11,7 @@
 
 #include "ymtools.h"
 #include "GpMgr.h"
+#include "NpnXform.h"
 #include "FuncXform.h"
 
 
@@ -50,25 +51,15 @@ private:
   npn_expand(GpHandle handle,
 	     ymuint32 level);
 
-  /// @brief 関数ベクタを代表関数に変換する(4入力版)
-  ymuint32
-  cannonical4(ymuint32 func,
-	      ymuint8 perm[]);
-
-  /// @brief 関数ベクタを変換する(4入力版)
-  ymuint32
-  xform_func4(ymuint32 fv,
-	      const ymuint8 perm[]);
-
   /// @brief GpHandle を変換する(4入力版)
   GpHandle
   xform4(GpHandle handle,
-	 const ymuint8 perm[]);
+	 NpnXform xf);
 
   /// @brief xform4 の下請け関数
   GpHandle
   xf4_sub(GpHandle handle,
-	  const ymuint8 perm[]);
+	  NpnXform xf);
 
   /// @brief パタンを登録する．
   /// @param[in] handle ハンドル

@@ -29,11 +29,26 @@ AM_CPPFLAGS = \
 
 
 noinst_PROGRAMS = \
+	npngen \
+	cannonical \
 	read_table \
 	xform_comp_gen \
 	npntest \
 	genpat \
 	lrw
+
+npngen_SOURCES = \
+	npngen.cc \
+	NpnXform.h \
+	NpnXform.cc
+
+npngen_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+cannonical_SOURCES = \
+	cannonical.cc \
+	NpnXform.h \
+	NpnXform.cc
 
 read_table_SOURCES = \
 	read_table.cc \
@@ -59,6 +74,11 @@ npntest_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 genpat_SOURCES = \
+	NpnXform.h \
+	NpnXform.cc \
+	NpnNode.h \
+	NpnNodeMgr.h \
+	NpnNodeMgr.cc \
 	GenPat.h \
 	GenPat.cc \
 	GpMgr.h \

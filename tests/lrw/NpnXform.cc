@@ -201,4 +201,50 @@ NpnXform::perm_id(ymuint perm[])
   return 0;
 }
 
+// @brief 関数ベクタを変換する．
+ymuint16
+xform(ymuint16 func,
+      NpnXform xf)
+{
+  ymuint16 ans = 0U;
+  for (ymuint p = 0; p < 16; ++ p) {
+    if ( func & (1U << p) ) {
+      ymuint v0 = (p >> 0) & 1U;
+      ymuint v1 = (p >> 1) & 1U;
+      ymuint v2 = (p >> 2) & 1U;
+      ymuint v3 = (p >> 3) & 1U;
+      if ( xf.input_inv(0) ) {
+	v0 ^= 1U;
+      }
+      if ( xf.input_inv(1) ) {
+	v1 ^= 1U;
+      }
+      if ( xf.input_inv(2) ) {
+	v2 ^= 1U;
+      }
+      if ( xf.input_inv(3) ) {
+	v3 ^= 1U;
+      }
+      ymuint q = 0U;
+      if ( v0 ) {
+	q |= (1U << xf.input_perm(0));
+      }
+      if ( v1 ) {
+	q |= (1U << xf.input_perm(1));
+      }
+      if ( v2 ) {
+	q |= (1U << xf.input_perm(2));
+      }
+      if ( v3 ) {
+	q |= (1U << xf.input_perm(3));
+      }
+      ans |= (1U << q);
+    }
+  }
+  if ( xf.output_inv() ) {
+    ans ^= 0xFFFF;
+  }
+  return ans;
+}
+
 END_NAMESPACE_YM

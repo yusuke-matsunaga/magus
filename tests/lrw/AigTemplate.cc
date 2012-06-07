@@ -70,7 +70,7 @@ AigTemplate::set_opol(ymuint pol)
 
 // @brief NPN変換を施す．
 void
-AigTemplate::xform(ymuint8 perm[])
+AigTemplate::xform(ymuint16 perm)
 {
 }
 

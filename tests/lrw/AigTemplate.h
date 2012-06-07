@@ -117,7 +117,7 @@ public:
 
   /// @brief NPN変換を施す．
   void
-  xform(ymuint8 perm[]);
+  xform(ymuint16 perm);
 
 
 private:
