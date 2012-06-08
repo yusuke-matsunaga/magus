@@ -303,7 +303,7 @@ GpMgr::dump_handle(ostream& s,
   }
   hash_set<ymuint32> tmp_hash;
   for (vector<GpHandle>::const_iterator p = handle_list.begin();
-       p != handle_list.end(); ++ p, ++ i) {
+       p != handle_list.end(); ++ p) {
     GpHandle handle = *p;
     if ( handle.is_const0() || handle.is_const1() ) {
       continue;

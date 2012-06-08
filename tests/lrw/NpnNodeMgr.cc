@@ -41,14 +41,14 @@ NpnNodeMgr::NpnNodeMgr() :
   alloc_table(1024);
 
   // 定数ノードの生成
-  mConstNode = new_node();
+  mConstNode = alloc_node();
   mConstNode->mVolume = 0;
   mConstNode->mFunc = 0x0000;
   mConstNode->mSlink = NULL;
   assert_cond( mConstNode->id() == 0, __FILE__, __LINE__);
 
   // 入力ノードの生成
-  mInputNode = new_node();
+  mInputNode = alloc_node();
   mInputNode->mId |= 1U;
   mInputNode->mVolume = 0;
   mInputNode->mFunc = 0xaaaa;
@@ -84,17 +84,19 @@ NpnNodeMgr::make_const1()
 NpnHandle
 NpnNodeMgr::make_input(ymuint input_id)
 {
-  ymuint perm[4];
-  perm[0] = input_id;
-  ymuint rpos = 0;
-  for (ymuint i = 1; i < 4; ++ i, ++ rpos) {
-    if ( rpos == input_id ) {
-      ++ rpos;
-    }
-    perm[i] = rpos;
+  // 回りくどいけど正規化のための手順を行なう．
+  ymuint16 func = 0U;
+  switch ( input_id ) {
+  case 0: func = 0xaaaa; break;
+  case 1: func = 0xcccc; break;
+  case 2: func = 0xf0f0; break;
+  case 3: func = 0xff00; break;
   }
-  ymuint pid = NpnXform::perm_id(perm);
-  return NpnHandle(1, NpnXform(pid, 0U));
+  const Npn4Cannon& npn_cannon = npn4cannon[func];
+  ymuint16 c_func = npn_cannon.mFunc;
+  assert_cond( c_func == 0xaaaa, __FILE__, __LINE__);
+  NpnXform xf(npn_cannon.mPerm);
+  return NpnHandle(1, inverse(xf));
 }
 
 // @brief ANDノードを生成する．
@@ -122,11 +124,11 @@ NpnNodeMgr::make_and(NpnHandle fanin0,
 
   // func がNPN同値類の代表関数になるように正規化する．
   const Npn4Cannon& npn_cannon = npn4cannon[func];
-  ymuint16 cfunc = npn_cannon.mFunc;
+  ymuint16 c_func = npn_cannon.mFunc;
   ymuint16 perm = npn_cannon.mPerm;
   bool oinv = (perm >> 4) & 1U;
   if ( oinv ) {
-    cfunc ^= 0xFFFF;
+    c_func ^= 0xFFFF;
   }
   perm &= ~16U;
   NpnXform xf(perm);
@@ -135,40 +137,8 @@ NpnNodeMgr::make_and(NpnHandle fanin0,
   NpnHandle c_fanin0 = fanin0 * xf;
   NpnHandle c_fanin1 = fanin1 * xf;
 
-  // 順番の正規化
-  if ( c_fanin0 > c_fanin1 ) {
-    NpnHandle tmp = c_fanin0;
-    c_fanin0 = c_fanin1;
-    c_fanin1 = tmp;
-  }
-
-  // 同じ構造を持つノードがないか調べる．
-  ymuint pos = hash_func(c_fanin0, c_fanin1, false);
-  ymuint idx = pos % mHashSize;
-  for (NpnNode* node = mHashTable[idx]; node; node = node->mSlink) {
-    if ( node->mFanin[0] == c_fanin0 &&
-	 node->mFanin[1] == c_fanin1 &&
-	 node->is_and() ) {
-      return NpnHandle(node->id(), inv_xf);
-    }
-  }
-
-  // 新しいノードを作る．
-  NpnNode* node = new_node();
-  node->mId |= 2U;
-  node->mFunc = cfunc;
-  node->mFanin[0] = c_fanin0;
-  node->mFanin[1] = c_fanin1;
-
-  // ハッシュ表に登録する．
-  if ( mAndList.size() >= mNextLimit ) {
-    alloc_table(mHashSize * 2);
-    // サイズが変わったのでインデックスを再計算する．
-    idx = pos % mHashSize;
-  }
-  node->mSlink = mHashTable[idx];
-  mHashTable[idx] = node;
-  mAndList.push_back(node);
+  // 既存の等価なノードを探すか新しいノードを作る．
+  NpnNode* node = new_node(false, c_func, c_fanin0, c_fanin1);
 
   return NpnHandle(node->id(), inv_xf);
 }
@@ -212,11 +182,11 @@ NpnNodeMgr::make_xor(NpnHandle fanin0,
 
   // func がNPN同値類の代表関数になるように正規化する．
   const Npn4Cannon& npn_cannon = npn4cannon[func];
-  ymuint16 cfunc = npn_cannon.mFunc;
+  ymuint16 c_func = npn_cannon.mFunc;
   ymuint16 perm = npn_cannon.mPerm;
   bool oinv = (perm >> 4) & 1U;
   if ( oinv ) {
-    cfunc ^= 0xFFFF;
+    c_func ^= 0xFFFF;
   }
   perm &= ~16U;
   NpnXform xf(perm);
@@ -227,40 +197,8 @@ NpnNodeMgr::make_xor(NpnHandle fanin0,
   NpnHandle c_fanin0 = fanin0 * xf;
   NpnHandle c_fanin1 = fanin1 * xf;
 
-  // 順番の正規化
-  if ( c_fanin0 > c_fanin1 ) {
-    NpnHandle tmp = c_fanin0;
-    c_fanin0 = c_fanin1;
-    c_fanin1 = tmp;
-  }
-
-  // 同じ構造を持つノードがないか調べる．
-  ymuint pos = hash_func(c_fanin0, c_fanin1, true);
-  ymuint idx = pos % mHashSize;
-  for (NpnNode* node = mHashTable[idx]; node; node = node->mSlink) {
-    if ( node->mFanin[0] == c_fanin0 &&
-	 node->mFanin[1] == c_fanin1 &&
-	 node->is_xor() ) {
-      return NpnHandle(node->id(), inv_xf);
-    }
-  }
-
-  // 新しいノードを作る．
-  NpnNode* node = new_node();
-  node->mId |= 3U;
-  node->mFunc = cfunc;
-  node->mFanin[0] = c_fanin0;
-  node->mFanin[1] = c_fanin1;
-
-  // ハッシュ表に登録する．
-  if ( mAndList.size() >= mNextLimit ) {
-    alloc_table(mHashSize * 2);
-    // サイズが変わったのでインデックスを再計算する．
-    idx = pos % mHashSize;
-  }
-  node->mSlink = mHashTable[idx];
-  mHashTable[idx] = node;
-  mAndList.push_back(node);
+  // 既存の等価なノードを探すか新しいノードを作る．
+  NpnNode* node = new_node(true, c_func, c_fanin0, c_fanin1);
 
   return NpnHandle(node->id(), inv_xf);
 }
@@ -273,9 +211,56 @@ NpnNodeMgr::func(NpnHandle handle) const
   return xform(node->func(), handle.npn_xform());
 }
 
+// @brief 新しいノードを登録する関数
+// @param[in] is_xor XOR ノードの時 true にするフラグ
+// @param[in] func 関数ベクタ
+// @param[in] fanin0, fanin1 ファンインのハンドル
+// @note おなじノードが既に存在していたらそのノードを返す．
+NpnNode*
+NpnNodeMgr::new_node(bool is_xor,
+		     ymuint16 func,
+		     NpnHandle fanin0,
+		     NpnHandle fanin1)
+{
+  // 順番の正規化
+  if ( fanin0 > fanin1 ) {
+    NpnHandle tmp = fanin0;
+    fanin0 = fanin1;
+    fanin1 = tmp;
+  }
+
+  ymuint type_pat = is_xor ? 3U : 2U;
+  ymuint pos = hash_func(fanin0, fanin1, is_xor);
+  ymuint idx = pos % mHashSize;
+  for (NpnNode* node = mHashTable[idx]; node; node = node->mSlink) {
+    if ( node->mFanin[0] == fanin0 &&
+	 node->mFanin[1] == fanin1 &&
+	 (node->mId & 3U) == type_pat ) {
+      return node;
+    }
+  }
+  NpnNode* node = alloc_node();
+  node->mId |= type_pat;
+  node->mFunc = func;
+  node->mFanin[0] = fanin0;
+  node->mFanin[1] = fanin1;
+
+  // ハッシュ表に登録する．
+  if ( mAndList.size() >= mNextLimit ) {
+    alloc_table(mHashSize * 2);
+    // サイズが変わったのでインデックスを再計算する．
+    idx = pos % mHashSize;
+  }
+  node->mSlink = mHashTable[idx];
+  mHashTable[idx] = node;
+  mAndList.push_back(node);
+
+  return node;
+}
+
 // @brief ノードを生成する関数
 NpnNode*
-NpnNodeMgr::new_node()
+NpnNodeMgr::alloc_node()
 {
   void* p = mAlloc.get_memory(sizeof(NpnNode));
   ymuint id = mNodeList.size();
@@ -283,6 +268,48 @@ NpnNodeMgr::new_node()
   mNodeList.push_back(node);
   return node;
 }
+
+BEGIN_NONAMESPACE
+
+void
+print_input(ostream& s,
+	    ymuint pos,
+	    bool inv)
+{
+  s << pos;
+  if ( inv ) {
+    s << "N";
+  }
+  else {
+    s << "P";
+  }
+}
+
+void
+print_handle(ostream& s,
+	     NpnHandle handle)
+{
+  ymuint id = handle.node_id();
+  NpnXform xf = handle.npn_xform();
+  s << "NODE#" << id << " : ";
+  s << "(";
+  print_input(s, xf.input_perm(0), xf.input_inv(0));
+  s << ", ";
+  print_input(s, xf.input_perm(1), xf.input_inv(1));
+  s << ", ";
+  print_input(s, xf.input_perm(2), xf.input_inv(2));
+  s << ", ";
+  print_input(s, xf.input_perm(3), xf.input_inv(3));
+  s << ")|";
+  if ( xf.output_inv() ) {
+    s << "N";
+  }
+  else {
+    s << "P";
+  }
+}
+
+END_NONAMESPACE
 
 // @brief ハンドルとその子供の内容を出力する．
 void
@@ -298,7 +325,67 @@ void
 NpnNodeMgr::dump_handle(ostream& s,
 			const vector<NpnHandle>& handle_list) const
 {
+  s << "dump_handle" << endl
+    << "----------------------------------------" << endl;
+  ymuint i = 0;
+  for (vector<NpnHandle>::const_iterator p = handle_list.begin();
+       p != handle_list.end(); ++ p, ++ i) {
+    NpnHandle handle = *p;
+    s << "Handle#" << i << ": ";
+    print_handle(s, handle);
+    cout << endl;
+  }
+  s << "----------------------------------------" << endl;
+
+  hash_set<ymuint32> node_hash;
+  for (vector<NpnHandle>::const_iterator p = handle_list.begin();
+       p != handle_list.end(); ++ p) {
+    NpnHandle handle = *p;
+    dh_sub(s, handle.node_id(), node_hash);
+  }
+  s << "----------------------------------------" << endl;
 }
+
+// @brief dump_handle() の下請け関数
+void
+NpnNodeMgr::dh_sub(ostream& s,
+		   ymuint id,
+		   hash_set<ymuint32>& node_hash) const
+{
+  if ( node_hash.count(id) > 0 ) {
+    return;
+  }
+  node_hash.insert(id);
+
+  NpnNode* node = mNodeList[id];
+
+  if ( node->is_logic() ) {
+    dh_sub(s, node->fanin0().node_id(), node_hash);
+    dh_sub(s, node->fanin1().node_id(), node_hash);
+  }
+
+  s << "NODE#" << id << ": ";
+  if ( node->is_const() ) {
+    s << "CONST0" << endl;
+  }
+  else if ( node->is_input() ) {
+    s << "INPUT" << endl;
+  }
+  else { // node->is_logic()
+    if ( node->is_and() ) {
+      s << "AND";
+    }
+    else {
+      s << "XOR";
+    }
+    s << "( ";
+    print_handle(s, node->fanin0());
+    s << " , ";
+    print_handle(s, node->fanin1());
+    s << " )" << endl;
+  }
+}
+
 
 // @brief ハッシュ関数
 ymuint32

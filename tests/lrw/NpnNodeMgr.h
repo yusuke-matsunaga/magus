@@ -94,9 +94,20 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 新しいノードを登録する関数
+  /// @param[in] is_xor XOR ノードの時 true にするフラグ
+  /// @param[in] func 関数ベクタ
+  /// @param[in] fanin0, fanin1 ファンインのハンドル
+  /// @note おなじノードが既に存在していたらそのノードを返す．
+  NpnNode*
+  new_node(bool is_xor,
+	   ymuint16 func,
+	   NpnHandle fanin0,
+	   NpnHandle fanin1);
+
   /// @brief ノードを生成する関数
   NpnNode*
-  new_node();
+  alloc_node();
 
   /// @brief ハッシュ関数
   ymuint32
@@ -107,6 +118,12 @@ private:
   /// @brief ハッシュテーブルを拡大する．
   void
   alloc_table(ymuint req_size);
+
+  /// @brief dump_handle() の下請け関数
+  void
+  dh_sub(ostream& s,
+	 ymuint id,
+	 hash_set<ymuint32>& node_hash) const;
 
 
 private:

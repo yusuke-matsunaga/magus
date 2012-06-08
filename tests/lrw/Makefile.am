@@ -34,6 +34,7 @@ noinst_PROGRAMS = \
 	read_table \
 	xform_comp_gen \
 	npntest \
+	npnnodemgr_test \
 	genpat \
 	lrw
 
@@ -71,6 +72,17 @@ npntest_SOURCES = \
 	npntest.cc
 
 npntest_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+npnnodemgr_test_SOURCES = \
+	NpnXform.h \
+	NpnXform.cc \
+	NpnNode.h \
+	NpnNodeMgr.h \
+	NpnNodeMgr.cc \
+	npnnodemgr_test.cc
+
+npnnodemgr_test_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 genpat_SOURCES = \
