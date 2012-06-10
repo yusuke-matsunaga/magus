@@ -52,6 +52,7 @@ yyerror(GdsParser& parser,
   GdsACL*    acl_type;
   GdsColRow* colrow_type;
   GdsDate*   date_type;
+  GdsElement* element_type;
   GdsFormat* format_type;
   GdsStrans* strans_type;
   GdsString* string_type;
@@ -151,6 +152,16 @@ yyerror(GdsParser& parser,
 %type <int4_type> opt_ENDEXTN
 %type <bitarray_type> opt_PRESENTATION
 %type <strans_type> opt_strans
+%type <element_type> element
+%type <element_type> elem_header
+%type <element_type> boundary
+%type <element_type> path
+%type <element_type> sref
+%type <element_type> aref
+%type <element_type> text
+%type <element_type> textbody
+%type <element_type> node
+%type <element_type> box
 
 %%
 
@@ -283,49 +294,78 @@ star_element
 
 element
 : elem_header star_property ENDEL
+{
+  parser.set_property($1);
+  $$ = $1;
+}
 ;
 
 elem_header
-: boundary
-| path
-| sref
-| aref
-| text
-| node
-| box
+: boundary { $$ = $1; }
+| path     { $$ = $1; }
+| sref     { $$ = $1; }
+| aref     { $$ = $1; }
+| text     { $$ = $1; }
+| node     { $$ = $1; }
+| box      { $$ = $1; }
 ;
 
 boundary
 : BOUNDARY opt_ELFLAGS opt_PLEX LAYER DATATYPE XY
+{
+  $$ = parser.new_boundary($2, $3, $4, $5, $6);
+}
 ;
 
 path
 : PATH opt_ELFLAGS opt_PLEX LAYER DATATYPE opt_PATHTYPE
-  opt_WIDTH opt_BGNEXTN opt_ENDEXTN XY
+opt_WIDTH opt_BGNEXTN opt_ENDEXTN XY
+{
+  //$$ = parser.new_path($2, $3, $4, $5, $6, $7, $8, $9, $10);
+  $$ = NULL;
+}
 ;
 
 sref
 : SREF opt_ELFLAGS opt_PLEX SNAME opt_strans XY
+{
+  $$ = NULL;
+}
 ;
 
 aref
 : AREF opt_ELFLAGS opt_PLEX SNAME opt_strans COLROW XY
+{
+  $$ = NULL;
+}
 ;
 
 text
 : TEXT opt_ELFLAGS opt_PLEX LAYER textbody
+{
+  $$ = NULL;
+}
 ;
 
 textbody
 : TEXTTYPE opt_PRESENTATION opt_PATHTYPE opt_WIDTH opt_strans XY STRING
+{
+  $$ = NULL;
+}
 ;
 
 node
 : NODE opt_ELFLAGS opt_PLEX LAYER NODETYPE XY
+{
+  $$ = NULL;
+}
 ;
 
 box
 : BOX opt_ELFLAGS opt_PLEX LAYER BOXTYPE XY
+{
+  $$ = NULL;
+}
 ;
 
 opt_ELFLAGS
@@ -396,6 +436,9 @@ opt_ENDEXTN
 
 opt_strans
 : // null
+{
+  $$ = NULL;
+}
 | STRANS
 {
   $$ = parser.new_strans($1, 0.0, 0.0);

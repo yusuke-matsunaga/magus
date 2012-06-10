@@ -12,6 +12,7 @@
 #include "GdsRecTable.h"
 
 #include "ym_gds/GdsACL.h"
+#include "ym_gds/GdsBoundary.h"
 #include "ym_gds/GdsColRow.h"
 #include "ym_gds/GdsDate.h"
 #include "ym_gds/GdsProperty.h"
@@ -62,6 +63,20 @@ GdsParser::parse(const string& filename)
   return true;
 }
 
+// @brief GdsBoundary の作成
+GdsElement*
+GdsParser::new_boundary(ymuint16 elflags,
+			ymint32 plex,
+			ymint16 layer,
+			ymint16 datatype,
+			GdsXY* xy)
+{
+  void* p = mAlloc.get_memory(sizeof(GdsBoundary));
+  GdsBoundary* boundary = new (p) GdsBoundary(elflags, plex, layer, datatype, xy);
+
+  return boundary;
+}
+
 // @brief GdsStrans の作成
 GdsStrans*
 GdsParser::new_strans(ymuint flags,
@@ -92,6 +107,17 @@ GdsParser::add_property(ymuint attr,
   GdsProperty* prop = new (p) GdsProperty(attr, value);
 
   mPropList.push_back(prop);
+}
+
+// @brief property リストを GdsElement にセットする．
+void
+GdsParser::set_property(GdsElement* elem)
+{
+  assert_cond( elem != NULL, __FILE__, __LINE__);
+
+  elem->mPropertyList = mPropList;
+
+  clear_property();
 }
 
 // @brief yylex() の実装

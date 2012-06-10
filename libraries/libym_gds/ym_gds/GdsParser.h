@@ -56,6 +56,14 @@ public:
   // gds_grammer.yy で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief GdsBoundary の作成
+  GdsElement*
+  new_boundary(ymuint16 elflags,
+	       ymint32 plex,
+	       ymint16 layer,
+	       ymint16 datatype,
+	       GdsXY* xy);
+
   /// @brief GdsStrans の作成
   GdsStrans*
   new_strans(ymuint flags,
@@ -72,6 +80,10 @@ public:
   void
   add_property(ymuint attr,
 	       GdsString* value);
+
+  /// @brief property リストを GdsElement にセットする．
+  void
+  set_property(GdsElement* elem);
 
   /// @brief yylex() の実装
   int
