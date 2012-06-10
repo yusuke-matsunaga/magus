@@ -1,20 +1,19 @@
-#ifndef LIBYM_AIG_LRMGR_H
-#define LIBYM_AIG_LRMGR_H
+#ifndef LRMGR_H
+#define LRMGR_H
 
-/// @file libym_aig/LrMgr.h
+/// @file LrMgr.h
 /// @brief LrMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
+#include "ym_logic/AigMgr.h"
 #include "AigTemplate.h"
 
 
 BEGIN_NAMESPACE_YM_AIG
-
-class AigMgr;
 
 //////////////////////////////////////////////////////////////////////
 // local rewrite を行うクラス
@@ -48,9 +47,14 @@ public:
 
 private:
 
-  // 与えられた関数に対する AigTemplate を求める．
+  /// @brief 与えられた関数に対する AigTemplate を求める．
+  /// @param[in] ni 関数の入力数
+  /// @param[in] pata 関数ベクタ
+  /// @param[out] templ 対応するテンプレート
+  /// @retval true テンプレートが見つかった．
+  /// @retval false テンプレートが見つからなかった．
   bool
-  find_aig(size_t ni,
+  find_aig(ymuint ni,
 	   ymuint32 pat,
 	   AigTemplate& templ);
 
@@ -77,7 +81,7 @@ private:
   AigTemplate aig4table[222];
 
   // NPN同値類の代表関数のパタンから aig4table の番号を得るためのハッシュ表
-  hash_map<ymuint32, size_t> npn4map;
+  hash_map<ymuint32, ymuint8> npn4map;
 
   // ログレベル
   int mLogLevel;
@@ -89,4 +93,4 @@ private:
 
 END_NAMESPACE_YM_AIG
 
-#endif // LIBYM_AIG_LRMGR_H
+#endif // LRMGR_H
