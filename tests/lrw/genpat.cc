@@ -16,9 +16,16 @@ int
 genpat(int argc,
        const char** argv)
 {
-  GenPat gp;
+  if ( argc == 2 && strcmp(argv[1], "2") == 0 ) {
+    GenPat2 gp;
 
-  gp();
+    gp();
+  }
+  else {
+    GenPat gp;
+
+    gp();
+  }
 
   return 0;
 }

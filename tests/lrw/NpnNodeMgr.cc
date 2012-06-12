@@ -221,6 +221,18 @@ NpnNodeMgr::cannonical(NpnHandle src)
   const Npn4Cannon& npn_cannon = npn4cannon[f];
   ymuint id = src.node_id();
   NpnXform xf(npn_cannon.mPerm);
+  ymuint16 cf = xform(f, xf);
+  NpnNode* node = mNodeList[id];
+  if ( node->func() == (cf ^ 0xFFFF) ) {
+    xf.flip_oinv();
+  }
+  else {
+    if ( node->func() != cf ) {
+      cout << "node->func() = " << hex << setw(4) << setfill('0') << node->func()
+	   << ", cf = " << setw(4) << setfill('0') << f << dec << endl;
+    }
+    assert_cond( node->func() == cf, __FILE__, __LINE__);
+  }
   return NpnHandle(id, inverse(xf));
 }
 
