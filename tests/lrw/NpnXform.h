@@ -120,6 +120,11 @@ ymuint16
 xform(ymuint16 func,
       NpnXform xf);
 
+/// @brief 内容を表示する．
+ostream&
+operator<<(ostream& s,
+	   NpnXform xf);
+
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義

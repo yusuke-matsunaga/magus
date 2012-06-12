@@ -7,6 +7,7 @@
 /// All rights reserved.
 
 #include "GenPat.h"
+#include "GenPat2.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -15,7 +16,7 @@ int
 genpat(int argc,
        const char** argv)
 {
-  GenPat gp;
+  GenPat2 gp;
 
   gp();
 

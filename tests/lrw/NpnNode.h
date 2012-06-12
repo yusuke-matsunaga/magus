@@ -60,6 +60,10 @@ public:
   bool
   oinv() const;
 
+  /// @brief ハッシュ用の値を返す．
+  ymuint
+  hash() const;
+
   /// @brief 出力を反転したハンドルを返す．
   NpnHandle
   operator~() const;
@@ -294,6 +298,14 @@ NpnHandle::operator*(NpnXform xf) const
   ymuint id = node_id();
   NpnXform xf0 = npn_xform();
   return NpnHandle(id, xf0 * xf);
+}
+
+// @brief ハッシュ用の値を返す．
+inline
+ymuint
+NpnHandle::hash() const
+{
+  return mData;
 }
 
 // @brief 等価比較

@@ -93,6 +93,8 @@ genpat_SOURCES = \
 	NpnNodeMgr.cc \
 	GenPat.h \
 	GenPat.cc \
+	GenPat2.h \
+	GenPat2.cc \
 	GpMgr.h \
 	GpMgr.cc \
 	GpNode.h \

@@ -1,5 +1,5 @@
-#ifndef FUNCXORM_H
-#define FUNCXORM_h
+#ifndef FUNCXFORM_H
+#define FUNCXFORM_H
 
 /// @file FuncXform.h
 /// @brief FuncXform のヘッダファイル
@@ -40,4 +40,4 @@ struct FuncXform
 
 END_NAMESPACE_YM
 
-#endif // FUNCXORM_H
+#endif // FUNCXFORM_H

@@ -272,41 +272,12 @@ NpnNodeMgr::alloc_node()
 BEGIN_NONAMESPACE
 
 void
-print_input(ostream& s,
-	    ymuint pos,
-	    bool inv)
-{
-  s << pos;
-  if ( inv ) {
-    s << "N";
-  }
-  else {
-    s << "P";
-  }
-}
-
-void
 print_handle(ostream& s,
 	     NpnHandle handle)
 {
   ymuint id = handle.node_id();
   NpnXform xf = handle.npn_xform();
-  s << "NODE#" << id << " : ";
-  s << "(";
-  print_input(s, xf.input_perm(0), xf.input_inv(0));
-  s << ", ";
-  print_input(s, xf.input_perm(1), xf.input_inv(1));
-  s << ", ";
-  print_input(s, xf.input_perm(2), xf.input_inv(2));
-  s << ", ";
-  print_input(s, xf.input_perm(3), xf.input_inv(3));
-  s << ")|";
-  if ( xf.output_inv() ) {
-    s << "N";
-  }
-  else {
-    s << "P";
-  }
+  s << "NODE#" << id << " : " << xf;
 }
 
 END_NONAMESPACE
