@@ -94,6 +94,10 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 枝を正規化する．
+  NpnHandle
+  cannonical(NpnHandle src);
+
   /// @brief 新しいノードを登録する関数
   /// @param[in] is_xor XOR ノードの時 true にするフラグ
   /// @param[in] func 関数ベクタ

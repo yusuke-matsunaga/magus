@@ -134,8 +134,8 @@ NpnNodeMgr::make_and(NpnHandle fanin0,
   NpnXform xf(perm);
   NpnXform inv_xf = inverse(xf);
 
-  NpnHandle c_fanin0 = fanin0 * xf;
-  NpnHandle c_fanin1 = fanin1 * xf;
+  NpnHandle c_fanin0 = cannonical(fanin0 * xf);
+  NpnHandle c_fanin1 = cannonical(fanin1 * xf);
 
   // 既存の等価なノードを探すか新しいノードを作る．
   NpnNode* node = new_node(false, c_func, c_fanin0, c_fanin1);
@@ -194,8 +194,8 @@ NpnNodeMgr::make_xor(NpnHandle fanin0,
   if ( iinv ) {
     inv_xf.flip_oinv();
   }
-  NpnHandle c_fanin0 = fanin0 * xf;
-  NpnHandle c_fanin1 = fanin1 * xf;
+  NpnHandle c_fanin0 = cannonical(fanin0 * xf);
+  NpnHandle c_fanin1 = cannonical(fanin1 * xf);
 
   // 既存の等価なノードを探すか新しいノードを作る．
   NpnNode* node = new_node(true, c_func, c_fanin0, c_fanin1);
@@ -209,6 +209,19 @@ NpnNodeMgr::func(NpnHandle handle) const
 {
   NpnNode* node = mNodeList[handle.node_id()];
   return xform(node->func(), handle.npn_xform());
+}
+
+// @brief 枝を正規化する．
+NpnHandle
+NpnNodeMgr::cannonical(NpnHandle src)
+{
+  // まどろっこしいけど，いったん，関数の正規形を求めて
+  // それへの変換の正規形を求める．
+  ymuint16 f = func(src);
+  const Npn4Cannon& npn_cannon = npn4cannon[f];
+  ymuint id = src.node_id();
+  NpnXform xf(npn_cannon.mPerm);
+  return NpnHandle(id, inverse(xf));
 }
 
 // @brief 新しいノードを登録する関数
