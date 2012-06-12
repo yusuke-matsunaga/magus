@@ -16,7 +16,7 @@ int
 genpat(int argc,
        const char** argv)
 {
-  GenPat2 gp;
+  GenPat gp;
 
   gp();
 
