@@ -127,6 +127,10 @@ GenPat::operator()(ymuint slack)
     cout << "  " << n1 << " true seed patterns" << endl;
     for (ymuint i = 0; i < n1; ++ i) {
       GpHandle handle = src_list1[i];
+      if ( 1 ) {
+	mMgr.dump_handle(cout, handle);
+	cout << endl;
+      }
       npn_expand(handle, level);
     }
     cout << "  expand " << mGpList[level].size() << " patterns" << endl;

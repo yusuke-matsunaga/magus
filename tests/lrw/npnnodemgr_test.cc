@@ -30,6 +30,8 @@ npnnodemgr_test()
   NpnHandle and13 = mgr.make_and(x1, x3);
   NpnHandle and0n1n = mgr.make_and(~x0, ~x1);
   NpnHandle or1 = ~mgr.make_and(~and01, ~and13);
+  NpnHandle and23 = mgr.make_and(x2, x3);
+  NpnHandle andor0123 = ~mgr.make_and(~and01, ~and23);
 
   vector<NpnHandle> handle_list;
   handle_list.push_back(c0);
@@ -42,6 +44,7 @@ npnnodemgr_test()
   handle_list.push_back(and13);
   handle_list.push_back(and0n1n);
   handle_list.push_back(or1);
+  handle_list.push_back(andor0123);
 
   mgr.dump_handle(cout, handle_list);
 }
