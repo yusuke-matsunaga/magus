@@ -107,32 +107,28 @@ BASEDIR=`cd $basedir; pwd`
 # プログラム名の設定
 set_program
 
+# 必要な変数の設定
+AUTOGEN_COMMON="./autogen.common"
+
 # サブモジュールのディレクトリ名
-SUBMODULE=`cat $BASEDIR/etc/modules`
+SUBMODULE=`cat $BASEDIR/modules`
 
 # 第1引数に応じた処理を行う．
  case $# in
      0)
-	 clean_config $BASEDIR/config
+         clean_config $BASEDIR/config
 	 clean $BASEDIR
 	 clean $BASEDIR/include
 	 for module in $SUBMODULE; do
 	     clean_config $BASEDIR/$module
 	     clean $BASEDIR/$module
 	 done
-         boot $BASEDIR
-	 boot $BASEDIR/include
-	 for module in $SUBMODULE; do
-	     boot $BASEDIR/$module
-	 done
-         ;;
+	 ;;
      1)
-	 clean_config $1
+         clean_config $1
 	 clean $1
-         boot $1
-         ;;
+	 ;;
      *)
-	 echo "Usage: $0 [<module-name>] : (re)generating configure script"
-	 exit 255
+	 echo "Usgae: $0 [<module-name>] : clean up the source tree"
 	 ;;
  esac
