@@ -56,6 +56,21 @@ public:
   // gds_grammer.yy で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief GdsAref の作成
+  /// @param[in] elflags ELFLAGS の値
+  /// @param[in] plex PLEX の値
+  /// @param[in] strname 構造名
+  /// @param[in] strans STRANS の値
+  /// @param[in] colrow 列と行の数
+  /// @param[in] xy 座標
+  GdsElement*
+  new_aref(ymuint16 elflags,
+	   ymint32 plex,
+	   GdsString* strname,
+	   GdsStrans* strans,
+	   ymuint32 colrow,
+	   GdsXY* xy);
+
   /// @brief GdsBoundary の作成
   /// @param[in] elflags ELFLAGS の値
   /// @param[in] plex PLEX の値
@@ -114,6 +129,19 @@ public:
 	   ymint32 width,
 	   ymint32 bgn_extn,
 	   ymint32 end_extn,
+	   GdsXY* xy);
+
+  /// @brief GdsSref の作成
+  /// @param[in] elflags ELFLAGS の値
+  /// @param[in] plex PLEX の値
+  /// @param[in] strname 構造名
+  /// @param[in] strans STRANS の値
+  /// @param[in] xy 座標
+  GdsElement*
+  new_sref(ymuint16 elflags,
+	   ymint32 plex,
+	   GdsString* strname,
+	   GdsStrans* strans,
 	   GdsXY* xy);
 
   /// @brief GdsText の作成
@@ -178,8 +206,8 @@ private:
   GdsACL*
   new_acl();
 
-  /// @brief GdsColRow の作成
-  GdsColRow*
+  /// @brief COLROW の作成
+  ymuint32
   new_colrow();
 
   /// @brief GdsDate の作成

@@ -43,6 +43,8 @@ libym_gds_la_SOURCES = \
 	GdsRecMgr.cc \
 	GdsRecord.cc \
 	GdsScanner.cc \
+	GdsAref.h \
+	GdsAref.cc \
 	GdsBoundary.h \
 	GdsBoundary.cc \
 	GdsBox.h \
@@ -50,8 +52,12 @@ libym_gds_la_SOURCES = \
 	GdsElement.cc \
 	GdsNode.h \
 	GdsNode.cc \
+	GdsRefBase.h \
+	GdsRefBase.cc \
 	GdsPath.h \
 	GdsPath.cc \
+	GdsSref.h \
+	GdsSref.cc \
 	GdsText.h \
 	GdsText.cc
 

@@ -20,10 +20,12 @@
 #include "ym_gds/GdsUnits.h"
 #include "ym_gds/GdsXY.h"
 
+#include "GdsAref.h"
 #include "GdsBoundary.h"
 #include "GdsBox.h"
 #include "GdsNode.h"
 #include "GdsPath.h"
+#include "GdsSref.h"
 #include "GdsText.h"
 
 
@@ -68,7 +70,33 @@ GdsParser::parse(const string& filename)
   return true;
 }
 
+// @brief GdsAref の作成
+// @param[in] elflags ELFLAGS の値
+// @param[in] plex PLEX の値
+// @param[in] strname 構造名
+// @param[in] strans STRANS の値
+// @param[in] colrow 列と行の数
+// @param[in] xy 座標
+GdsElement*
+GdsParser::new_aref(ymuint16 elflags,
+		    ymint32 plex,
+		    GdsString* strname,
+		    GdsStrans* strans,
+		    ymuint32 colrow,
+		    GdsXY* xy)
+{
+  void* p = mAlloc.get_memory(sizeof(GdsAref));
+  GdsAref* aref = new (p) GdsAref(elflags, plex, strname, strans, colrow, xy);
+
+  return aref;
+}
+
 // @brief GdsBoundary の作成
+// @param[in] elflags ELFLAGS の値
+// @param[in] plex PLEX の値
+// @param[in] layer LAYER の値
+// @param[in] datatype DATATYPE の値
+// @param[in] xy XY の値
 GdsElement*
 GdsParser::new_boundary(ymuint16 elflags,
 			ymint32 plex,
@@ -145,6 +173,25 @@ GdsParser::new_path(ymuint16 elflags,
   GdsPath* path = new (p) GdsPath(elflags, plex, layer, datatype, pathtype, width, bgn_extn, end_extn, xy);
 
   return path;
+}
+
+// @brief GdsSref の作成
+// @param[in] elflags ELFLAGS の値
+// @param[in] plex PLEX の値
+// @param[in] strname 構造名
+// @param[in] strans STRANS の値
+// @param[in] xy 座標
+GdsElement*
+GdsParser::new_sref(ymuint16 elflags,
+		    ymint32 plex,
+		    GdsString* strname,
+		    GdsStrans* strans,
+		    GdsXY* xy)
+{
+  void* p = mAlloc.get_memory(sizeof(GdsSref));
+  GdsSref* sref = new (p) GdsSref(elflags, plex, strname, strans, xy);
+
+  return sref;
 }
 
 // @brief GdsText の作成
@@ -297,16 +344,13 @@ GdsParser::new_acl()
   return top;
 }
 
-// @brief GdsColRow の作成
-GdsColRow*
+// @brief COLROW の作成
+ymuint32
 GdsParser::new_colrow()
 {
   ymint col = mScanner.conv_2byte_int(0);
   ymint row = mScanner.conv_2byte_int(1);
-  void* p = mAlloc.get_memory(sizeof(GdsColRow));
-  GdsColRow* colrow = new (p) GdsColRow(col, row);
-
-  return colrow;
+  return (static_cast<ymuint32>(col) << 16) | static_cast<ymuint32>(row);
 }
 
 // @brief GdsDate の作成

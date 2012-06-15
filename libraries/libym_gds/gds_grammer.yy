@@ -48,9 +48,9 @@ yyerror(GdsParser& parser,
   ymint32     int4_type;
   double      real_type;
   ymuint16    bitarray_type;
+  ymuint32    colrow_type;
 
   GdsACL*     acl_type;
-  GdsColRow*  colrow_type;
   GdsDate*    date_type;
   GdsElement* element_type;
   GdsFormat*  format_type;
@@ -327,14 +327,14 @@ path
 sref
 : SREF opt_ELFLAGS opt_PLEX SNAME opt_strans XY
 {
-  $$ = NULL;
+  $$ = parser.new_sref($2, $3, $4, $5, $6);
 }
 ;
 
 aref
 : AREF opt_ELFLAGS opt_PLEX SNAME opt_strans COLROW XY
 {
-  $$ = NULL;
+  $$ = parser.new_aref($2, $3, $4, $5, $6, $7);
 }
 ;
 
