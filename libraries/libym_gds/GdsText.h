@@ -1,7 +1,7 @@
-#ifndef YM_GDS_GDSTEXT_H
-#define YM_GDS_GDSTEXT_H
+#ifndef GDSTEXT_H
+#define GDSTEXT_H
 
-/// @file ym_gds/GdsText.h
+/// @file GdsText.h
 /// @brief GdsText のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_GDS
 
 //////////////////////////////////////////////////////////////////////
-/// @class GdsText GdsText.h "ym_gds/GdsText.h"
+/// @class GdsText GdsText.h "GdsText.h"
 /// @brief TEXT を表すクラス
 //////////////////////////////////////////////////////////////////////
 class GdsText :
@@ -48,6 +48,7 @@ private:
 	  GdsString* body);
 
   /// @brief デストラクタ
+  virtual
   ~GdsText();
 
 
@@ -57,48 +58,59 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 層番号を返す．
+  virtual
   int
   layer() const;
 
   /// @brief テキスト型を返す．
+  virtual
   int
   texttype() const;
 
   /// @brief パスタイプを返す．
+  virtual
   int
   pathtype() const;
 
   /// @brief 幅を返す．
+  virtual
   int
   width() const;
 
   /// @brief reflection ビットが立っていたら true を返す．
+  virtual
   bool
   reflection() const;
 
   /// @brief absolute magnification ビットが立っていたら true を返す．
+  virtual
   bool
   absolute_magnification() const;
 
   /// @brief absolute angle ビットが立っていたら true を返す．
+  virtual
   bool
   absolute_angle() const;
 
   /// @brief magnification factor を返す．
+  virtual
   double
   mag() const;
 
   /// @brief angular rotation factor を返す．
+  virtual
   double
   angle() const;
 
   /// @brief 座標を返す．
-  XY
+  virtual
+  GdsXY*
   xy() const;
 
   /// @brief 本体の文字列を返す．
+  virtual
   const char*
-  body() const;
+  text() const;
 
 
 private:
@@ -109,8 +121,8 @@ private:
   // 層番号 ( 0 - 255 )
   ymuint8 mLayer;
 
-  // TEXTTYPE
-  int mTextType;
+  // TEXTTYPE ( 0 - 255 )
+  ymuint8 mTextType;
 
   // PRESENTATION
   ymuint16 mPresentation;
@@ -118,7 +130,7 @@ private:
   // パスタイプ ( 0 - 4 )
   ymuint8 mPathType;
 
-  /// 幅
+  // 幅
   ymint32 mWidth;
 
   // STRANS
@@ -134,4 +146,4 @@ private:
 
 END_NAMESPACE_YM_GDS
 
-#endif // YM_GDS_GDSTEXT_H
+#endif // GDSTEXT_H

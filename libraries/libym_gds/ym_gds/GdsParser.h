@@ -57,12 +57,87 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief GdsBoundary の作成
+  /// @param[in] elflags ELFLAGS の値
+  /// @param[in] plex PLEX の値
+  /// @param[in] layer LAYER の値
+  /// @param[in] datatype DATATYPE の値
+  /// @param[in] xy XY の値
   GdsElement*
   new_boundary(ymuint16 elflags,
 	       ymint32 plex,
 	       ymint16 layer,
 	       ymint16 datatype,
 	       GdsXY* xy);
+
+  /// @brief GdsBox の作成
+  /// @param[in] elflags ELFLAGS の値
+  /// @param[in] plex PLEX の値
+  /// @param[in] layer LAYER の値
+  /// @param[in] boxtype BOXTYPE の値
+  /// @param[in] xy XY の値
+  GdsElement*
+  new_box(ymuint16 elflags,
+	  ymint32 plex,
+	  ymint16 layer,
+	  ymint16 datatype,
+	  GdsXY* xy);
+
+  /// @brief GdsNode の作成
+  /// @param[in] elflags ELFLAGS の値
+  /// @param[in] plex PLEX の値
+  /// @param[in] layer LAYER の値
+  /// @param[in] datatype DATATYPE の値
+  /// @param[in] xy XY の値
+  GdsElement*
+  new_node(ymuint16 elflags,
+	   ymint32 plex,
+	   ymint16 layer,
+	   ymint16 nodetype,
+	   GdsXY* xy);
+
+  /// @brief GdsPath の作成
+  /// @param[in] elflags ELFLAGS の値
+  /// @param[in] plex PLEX の値
+  /// @param[in] layer LAYER の値
+  /// @param[in] datatype DATATYPE の値
+  /// @param[in] pathtype PATYTYPE の値
+  /// @param[in] width WIDTH の値
+  /// @param[in] bgn_extn BGNEXTN の値
+  /// @param[in] end_extn ENDEXTN の値
+  /// @param[in] xy XY の値
+  GdsElement*
+  new_path(ymuint16 elflags,
+	   ymint32 plex,
+	   ymint16 layer,
+	   ymint16 datatype,
+	   ymint16 pathtype,
+	   ymint32 width,
+	   ymint32 bgn_extn,
+	   ymint32 end_extn,
+	   GdsXY* xy);
+
+  /// @brief GdsText の作成
+  /// @param[in] elflags ELFLAGS の値
+  /// @param[in] plex PLEX の値
+  /// @param[in] layer LAYER の値
+  /// @param[in] texttype TEXTTYPE の値
+  /// @param[in] presentation PRESENTATION の値
+  /// @param[in] pathtype PATHTYPE の値
+  /// @param[in] width WIDTH の値
+  /// @param[in] strans STRANS の値
+  /// @param[in] xy XY座標
+  /// @param[in] body 本体の文字列
+  GdsElement*
+  new_text(ymuint16 elflags,
+	   ymint32 plex,
+	   ymint16 layer,
+	   ymint16 texttype,
+	   ymuint16 presentation,
+	   ymint16 pathtype,
+	   ymint32 width,
+	   GdsStrans* strans,
+	   GdsXY* xy,
+	   GdsString* body);
 
   /// @brief GdsStrans の作成
   GdsStrans*

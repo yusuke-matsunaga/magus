@@ -31,6 +31,7 @@ protected:
 	     ymint32 plex);
 
   /// @brief デストラクタ
+  virtual
   ~GdsElement();
 
 
@@ -50,6 +51,81 @@ public:
   /// @brief plex 番号を返す．
   int
   plex() const;
+
+  /// @brief 層番号を返す．
+  virtual
+  int
+  layer() const;
+
+  /// @brief データ型を返す．
+  virtual
+  int
+  datatype() const;
+
+  /// @brief ボックス型を返す．
+  virtual
+  int
+  boxtype() const;
+
+  /// @brief パスタイプを返す．
+  virtual
+  int
+  pathtype() const;
+
+  /// @brief テキスト型を返す．
+  virtual
+  int
+  texttype() const;
+
+  /// @brief 幅を返す．
+  virtual
+  int
+  width() const;
+
+  /// @brief reflection ビットが立っていたら true を返す．
+  virtual
+  bool
+  reflection() const;
+
+  /// @brief absolute magnification ビットが立っていたら true を返す．
+  virtual
+  bool
+  absolute_magnification() const;
+
+  /// @brief absolute angle ビットが立っていたら true を返す．
+  virtual
+  bool
+  absolute_angle() const;
+
+  /// @brief magnification factor を返す．
+  virtual
+  double
+  mag() const;
+
+  /// @brief angular rotation factor を返す．
+  virtual
+  double
+  angle() const;
+
+  /// @brief BGNEXTN を返す．
+  virtual
+  int
+  bgn_extn() const;
+
+  /// @brief ENDEXTN を返す．
+  virtual
+  int
+  end_extn() const;
+
+  /// @brief 座標のリストを返す．
+  virtual
+  GdsXY*
+  xy() const;
+
+  /// @brief 本体の文字列を返す．
+  virtual
+  const char*
+  text() const;
 
   /// @brief property のリストを返す．
   const vector<GdsProperty*>&
@@ -71,62 +147,6 @@ private:
   vector<GdsProperty*> mPropertyList;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] elflags ELFLAGS の値
-// @param[in] plex PLEX の値
-inline
-GdsElement::GdsElement(ymuint16 elflags,
-		       ymint32 plex) :
-  mElFlags(elflags),
-  mPlex(plex)
-{
-}
-
-// @brief デストラクタ
-inline
-GdsElement::~GdsElement()
-{
-}
-
-// @brief external data ビットが立っているとき true を返す．
-inline
-bool
-GdsElement::external_data() const
-{
-  // conv_bitarray(mElFlags, 15, 1);
-  return false;
-}
-
-// @brief template data ビットが立っているとき true を返す．
-inline
-bool
-GdsElement::template_data() const
-{
-  // conv_bitarray(mElFlags, 14, 1);
-  return false;
-}
-
-// @brief plex 番号を返す．
-inline
-int
-GdsElement::plex() const
-{
-  return mPlex;
-}
-
-// @brief property のリストを返す．
-inline
-const vector<GdsProperty*>&
-GdsElement::property_list() const
-{
-  return mPropertyList;
-}
 
 END_NAMESPACE_YM_GDS
 

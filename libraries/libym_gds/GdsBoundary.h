@@ -1,7 +1,7 @@
-#ifndef YM_GDS_GDSBOUNDARY_H
-#define YM_GDS_GDSBOUNDARY_H
+#ifndef GDSBOUNDARY_H
+#define GDSBOUNDARY_H
 
-/// @file ym_gds/GdsBoundery.h
+/// @file GdsBoundery.h
 /// @brief GdsBoundary のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_GDS
 
 //////////////////////////////////////////////////////////////////////
-/// @class GdsBoundary GdsBoundary.h "ym_gds/GdsBoundary.h"
+/// @class GdsBoundary GdsBoundary.h "GdsBoundary.h"
 /// @brief BOUNDARY を表すクラス
 //////////////////////////////////////////////////////////////////////
 class GdsBoundary :
@@ -38,6 +38,7 @@ private:
 	      GdsXY* xy);
 
   /// @brief デストラクタ
+  virtual
   ~GdsBoundary();
 
 
@@ -47,14 +48,17 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 層番号を返す．
+  virtual
   int
   layer() const;
 
   /// @brief データ型を返す．
+  virtual
   int
   datatype() const;
 
   /// @brief 座標のリストを返す．
+  virtual
   GdsXY*
   xy() const;
 
@@ -75,55 +79,6 @@ private:
 
 };
 
-// @brief コンストラクタ
-// @param[in] elflags ELFLAGS の値
-// @param[in] plex PLEX の値
-// @param[in] layer LAYER の値
-// @param[in] datatype DATATYPE の値
-// @param[in] xy XY の値
-inline
-GdsBoundary::GdsBoundary(ymuint16 elflags,
-			 ymint32 plex,
-			 ymint16 layer,
-			 ymint16 datatype,
-			 GdsXY* xy) :
-  GdsElement(elflags, plex),
-  mLayer(layer),
-  mDataType(datatype),
-  mXY(xy)
-{
-}
-
-// @brief デストラクタ
-inline
-GdsBoundary::~GdsBoundary()
-{
-}
-
-// @brief 層番号を返す．
-inline
-int
-GdsBoundary::layer() const
-{
-  return mLayer;
-}
-
-// @brief データ型を返す．
-inline
-int
-GdsBoundary::datatype() const
-{
-  return mDataType;
-}
-
-// @brief 座標のリストを返す．
-inline
-GdsXY*
-GdsBoundary::xy() const
-{
-  return mXY;
-}
-
 END_NAMESPACE_YM_GDS
 
-#endif // YM_GDS_GDSBOUNDARY_H
+#endif // GDSBOUNDARY_H

@@ -12,7 +12,6 @@
 #include "GdsRecTable.h"
 
 #include "ym_gds/GdsACL.h"
-#include "ym_gds/GdsBoundary.h"
 #include "ym_gds/GdsColRow.h"
 #include "ym_gds/GdsDate.h"
 #include "ym_gds/GdsProperty.h"
@@ -20,6 +19,12 @@
 #include "ym_gds/GdsString.h"
 #include "ym_gds/GdsUnits.h"
 #include "ym_gds/GdsXY.h"
+
+#include "GdsBoundary.h"
+#include "GdsBox.h"
+#include "GdsNode.h"
+#include "GdsPath.h"
+#include "GdsText.h"
 
 
 BEGIN_NAMESPACE_YM_GDS_PARSER
@@ -75,6 +80,100 @@ GdsParser::new_boundary(ymuint16 elflags,
   GdsBoundary* boundary = new (p) GdsBoundary(elflags, plex, layer, datatype, xy);
 
   return boundary;
+}
+
+// @brief GdsBox の作成
+// @param[in] elflags ELFLAGS の値
+// @param[in] plex PLEX の値
+// @param[in] layer LAYER の値
+// @param[in] boxtype BOXTYPE の値
+// @param[in] xy XY の値
+GdsElement*
+GdsParser::new_box(ymuint16 elflags,
+		   ymint32 plex,
+		   ymint16 layer,
+		   ymint16 datatype,
+		   GdsXY* xy)
+{
+  void* p = mAlloc.get_memory(sizeof(GdsBox));
+  GdsBox* box = new (p) GdsBox(elflags, plex, layer, datatype, xy);
+
+  return box;
+}
+
+// @brief GdsNode の作成
+// @param[in] elflags ELFLAGS の値
+// @param[in] plex PLEX の値
+// @param[in] layer LAYER の値
+// @param[in] datatype DATATYPE の値
+// @param[in] xy XY の値
+GdsElement*
+GdsParser::new_node(ymuint16 elflags,
+		    ymint32 plex,
+		    ymint16 layer,
+		    ymint16 nodetype,
+		    GdsXY* xy)
+{
+  void* p = mAlloc.get_memory(sizeof(GdsNode));
+  GdsNode* node = new (p) GdsNode(elflags, plex, layer, nodetype, xy);
+
+  return node;
+}
+
+// @brief GdsPath の作成
+// @param[in] elflags ELFLAGS の値
+// @param[in] plex PLEX の値
+// @param[in] layer LAYER の値
+// @param[in] datatype DATATYPE の値
+// @param[in] pathtype PATYTYPE の値
+// @param[in] width WIDTH の値
+// @param[in] bgn_extn BGNEXTN の値
+// @param[in] end_extn ENDEXTN の値
+// @param[in] xy XY の値
+GdsElement*
+GdsParser::new_path(ymuint16 elflags,
+		    ymint32 plex,
+		    ymint16 layer,
+		    ymint16 datatype,
+		    ymint16 pathtype,
+		    ymint32 width,
+		    ymint32 bgn_extn,
+		    ymint32 end_extn,
+		    GdsXY* xy)
+{
+  void* p = mAlloc.get_memory(sizeof(GdsPath));
+  GdsPath* path = new (p) GdsPath(elflags, plex, layer, datatype, pathtype, width, bgn_extn, end_extn, xy);
+
+  return path;
+}
+
+// @brief GdsText の作成
+// @param[in] elflags ELFLAGS の値
+// @param[in] plex PLEX の値
+// @param[in] layer LAYER の値
+// @param[in] texttype TEXTTYPE の値
+// @param[in] presentation PRESENTATION の値
+// @param[in] pathtype PATHTYPE の値
+// @param[in] width WIDTH の値
+// @param[in] strans STRANS の値
+// @param[in] xy XY座標
+// @param[in] body 本体の文字列
+GdsElement*
+GdsParser::new_text(ymuint16 elflags,
+		    ymint32 plex,
+		    ymint16 layer,
+		    ymint16 texttype,
+		    ymuint16 presentation,
+		    ymint16 pathtype,
+		    ymint32 width,
+		    GdsStrans* strans,
+		    GdsXY* xy,
+		    GdsString* body)
+{
+  void* p = mAlloc.get_memory(sizeof(GdsText));
+  GdsText* text = new (p) GdsText(elflags, plex, layer, texttype, presentation, pathtype, width, strans, xy, body);
+
+  return text;
 }
 
 // @brief GdsStrans の作成

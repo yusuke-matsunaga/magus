@@ -44,20 +44,20 @@ yyerror(GdsParser& parser,
 
 // トークンの型
 %union {
-  ymint16    int2_type;
-  ymint32    int4_type;
-  double     real_type;
-  ymuint16   bitarray_type;
+  ymint16     int2_type;
+  ymint32     int4_type;
+  double      real_type;
+  ymuint16    bitarray_type;
 
-  GdsACL*    acl_type;
-  GdsColRow* colrow_type;
-  GdsDate*   date_type;
+  GdsACL*     acl_type;
+  GdsColRow*  colrow_type;
+  GdsDate*    date_type;
   GdsElement* element_type;
-  GdsFormat* format_type;
-  GdsStrans* strans_type;
-  GdsString* string_type;
-  GdsUnits*  units_type;
-  GdsXY*     xy_type;
+  GdsFormat*  format_type;
+  GdsStrans*  strans_type;
+  GdsString*  string_type;
+  GdsUnits*   units_type;
+  GdsXY*      xy_type;
 }
 
 // トークンの定義
@@ -159,7 +159,6 @@ yyerror(GdsParser& parser,
 %type <element_type> sref
 %type <element_type> aref
 %type <element_type> text
-%type <element_type> textbody
 %type <element_type> node
 %type <element_type> box
 
@@ -318,11 +317,10 @@ boundary
 ;
 
 path
-: PATH opt_ELFLAGS opt_PLEX LAYER DATATYPE opt_PATHTYPE
-opt_WIDTH opt_BGNEXTN opt_ENDEXTN XY
+: PATH opt_ELFLAGS opt_PLEX LAYER DATATYPE
+  opt_PATHTYPE opt_WIDTH opt_BGNEXTN opt_ENDEXTN XY
 {
-  //$$ = parser.new_path($2, $3, $4, $5, $6, $7, $8, $9, $10);
-  $$ = NULL;
+  $$ = parser.new_path($2, $3, $4, $5, $6, $7, $8, $9, $10);
 }
 ;
 
@@ -341,30 +339,26 @@ aref
 ;
 
 text
-: TEXT opt_ELFLAGS opt_PLEX LAYER textbody
+: TEXT opt_ELFLAGS opt_PLEX LAYER TEXTTYPE
+  opt_PRESENTATION opt_PATHTYPE opt_WIDTH opt_strans
+  XY STRING
 {
-  $$ = NULL;
+  $$ = parser.new_text($2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
 }
 ;
-
-textbody
-: TEXTTYPE opt_PRESENTATION opt_PATHTYPE opt_WIDTH opt_strans XY STRING
-{
-  $$ = NULL;
-}
 ;
 
 node
 : NODE opt_ELFLAGS opt_PLEX LAYER NODETYPE XY
 {
-  $$ = NULL;
+  $$ = parser.new_node($2, $3, $4, $5, $6);
 }
 ;
 
 box
 : BOX opt_ELFLAGS opt_PLEX LAYER BOXTYPE XY
 {
-  $$ = NULL;
+  $$ = parser.new_box($2, $3, $4, $5, $6);
 }
 ;
 

@@ -42,7 +42,18 @@ libym_gds_la_SOURCES = \
 	GdsRecTable.cc \
 	GdsRecMgr.cc \
 	GdsRecord.cc \
-	GdsScanner.cc
+	GdsScanner.cc \
+	GdsBoundary.h \
+	GdsBoundary.cc \
+	GdsBox.h \
+	GdsBox.cc \
+	GdsElement.cc \
+	GdsNode.h \
+	GdsNode.cc \
+	GdsPath.h \
+	GdsPath.cc \
+	GdsText.h \
+	GdsText.cc
 
 libym_gds_la_LIBADD =
 #	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
