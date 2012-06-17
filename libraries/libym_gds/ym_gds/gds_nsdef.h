@@ -150,10 +150,9 @@ class GdsScanner;
 class GdsDumper;
 
 class GdsACL;
-class GdsBoundary;
-class GdsBox;
-class GdsColRow;
+class GdsData;
 class GdsDate;
+class GdsStruct;
 class GdsElement;
 class GdsFormat;
 class GdsProperty;

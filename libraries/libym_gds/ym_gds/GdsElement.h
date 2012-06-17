@@ -127,9 +127,13 @@ public:
   const char*
   text() const;
 
-  /// @brief property のリストを返す．
-  const vector<GdsProperty*>&
-  property_list() const;
+  /// @brief property の先頭要素を返す．
+  const GdsProperty*
+  property() const;
+
+  /// @brief 次の要素を返す．
+  const GdsElement*
+  next();
 
 
 private:
@@ -143,8 +147,11 @@ private:
   // PLEX
   ymint32 mPlex;
 
-  // property のリスト
-  vector<GdsProperty*> mPropertyList;
+  // property の先頭要素
+  GdsProperty* mProperty;
+
+  // 次の要素
+  GdsElement* mLink;
 
 };
 

@@ -12,11 +12,13 @@
 #include "GdsRecTable.h"
 
 #include "ym_gds/GdsACL.h"
-#include "ym_gds/GdsColRow.h"
+#include "ym_gds/GdsData.h"
 #include "ym_gds/GdsDate.h"
+#include "ym_gds/GdsFormat.h"
 #include "ym_gds/GdsProperty.h"
 #include "ym_gds/GdsStrans.h"
 #include "ym_gds/GdsString.h"
+#include "ym_gds/GdsStruct.h"
 #include "ym_gds/GdsUnits.h"
 #include "ym_gds/GdsXY.h"
 
@@ -63,11 +65,85 @@ GdsParser::parse(const string& filename)
     return false;
   }
 
+  mCurData = NULL;
+  mFormatType = 0;
+  mMasks.clear();
+
   nsParser::yyparse(*this);
 
   mScanner.close_file();
 
   return true;
+}
+
+// @brief GdsData の生成
+// @param[in] version バージョン番号
+// @param[in] date 2つの日時の配列
+// @param[in] libdirsize LIBDIRSIZE の値
+// @param[in] srfname SRFNAME の値
+// @param[in] acl LIBSECURE の値
+// @param[in] libname LIBNAME の値
+// @param[in] reflibs REFLIBS の値
+// @param[in] fonts FONTS の値
+// @param[in] attrtable ATTRTABLE の値
+// @param[in] generations GENERATIONS の値
+// @param[in] units UNITS の値
+void
+GdsParser::new_header(ymint16 version,
+		      GdsDate* date,
+		      ymint16 libdirsize,
+		      GdsString* srfname,
+		      GdsACL* acl,
+		      GdsString* libname,
+		      GdsString* reflibs,
+		      GdsString* fonts,
+		      GdsString* attrtable,
+		      ymint16 generations,
+		      GdsUnits* units)
+{
+  GdsFormat* format = new_format();
+
+  void* p = mAlloc.get_memory(sizeof(GdsData));
+  mCurData = new (p) GdsData(version, date, libdirsize, srfname, acl, libname,
+			     reflibs, fonts, attrtable, generations, format, units);
+  mCurStruct = NULL;
+}
+
+// @brief フォーマットタイプの設定
+// @param[in] type フォーマットタイプ
+void
+GdsParser::set_format(ymint16 type)
+{
+  mFormatType = type;
+}
+
+// @brief マスクの追加
+// @param[in] mask マスク
+void
+GdsParser::add_mask(GdsString* mask)
+{
+  mMasks.push_back(mask);
+}
+
+// @brief GdsStruct の追加
+// @param[in] date 2つの日時の配列
+// @param[in] strname 構造名
+void
+GdsParser::add_struct(GdsDate* date,
+		      GdsString* strname)
+{
+  void* p = mAlloc.get_memory(sizeof(GdsStruct));
+  GdsStruct* str = new (p) GdsStruct(date, strname);
+
+  if ( mCurStruct ) {
+    mCurStruct->mLink = str;
+  }
+  else {
+    mCurData->mStruct = str;
+  }
+  mCurStruct = str;
+
+  mCurElement = NULL;
 }
 
 // @brief GdsAref の作成
@@ -77,8 +153,8 @@ GdsParser::parse(const string& filename)
 // @param[in] strans STRANS の値
 // @param[in] colrow 列と行の数
 // @param[in] xy 座標
-GdsElement*
-GdsParser::new_aref(ymuint16 elflags,
+void
+GdsParser::add_aref(ymuint16 elflags,
 		    ymint32 plex,
 		    GdsString* strname,
 		    GdsStrans* strans,
@@ -88,7 +164,7 @@ GdsParser::new_aref(ymuint16 elflags,
   void* p = mAlloc.get_memory(sizeof(GdsAref));
   GdsAref* aref = new (p) GdsAref(elflags, plex, strname, strans, colrow, xy);
 
-  return aref;
+  add_element(aref);
 }
 
 // @brief GdsBoundary の作成
@@ -97,8 +173,8 @@ GdsParser::new_aref(ymuint16 elflags,
 // @param[in] layer LAYER の値
 // @param[in] datatype DATATYPE の値
 // @param[in] xy XY の値
-GdsElement*
-GdsParser::new_boundary(ymuint16 elflags,
+void
+GdsParser::add_boundary(ymuint16 elflags,
 			ymint32 plex,
 			ymint16 layer,
 			ymint16 datatype,
@@ -107,7 +183,7 @@ GdsParser::new_boundary(ymuint16 elflags,
   void* p = mAlloc.get_memory(sizeof(GdsBoundary));
   GdsBoundary* boundary = new (p) GdsBoundary(elflags, plex, layer, datatype, xy);
 
-  return boundary;
+  add_element(boundary);
 }
 
 // @brief GdsBox の作成
@@ -116,8 +192,8 @@ GdsParser::new_boundary(ymuint16 elflags,
 // @param[in] layer LAYER の値
 // @param[in] boxtype BOXTYPE の値
 // @param[in] xy XY の値
-GdsElement*
-GdsParser::new_box(ymuint16 elflags,
+void
+GdsParser::add_box(ymuint16 elflags,
 		   ymint32 plex,
 		   ymint16 layer,
 		   ymint16 datatype,
@@ -126,7 +202,7 @@ GdsParser::new_box(ymuint16 elflags,
   void* p = mAlloc.get_memory(sizeof(GdsBox));
   GdsBox* box = new (p) GdsBox(elflags, plex, layer, datatype, xy);
 
-  return box;
+  add_element(box);
 }
 
 // @brief GdsNode の作成
@@ -135,8 +211,8 @@ GdsParser::new_box(ymuint16 elflags,
 // @param[in] layer LAYER の値
 // @param[in] datatype DATATYPE の値
 // @param[in] xy XY の値
-GdsElement*
-GdsParser::new_node(ymuint16 elflags,
+void
+GdsParser::add_node(ymuint16 elflags,
 		    ymint32 plex,
 		    ymint16 layer,
 		    ymint16 nodetype,
@@ -145,7 +221,7 @@ GdsParser::new_node(ymuint16 elflags,
   void* p = mAlloc.get_memory(sizeof(GdsNode));
   GdsNode* node = new (p) GdsNode(elflags, plex, layer, nodetype, xy);
 
-  return node;
+  add_element(node);
 }
 
 // @brief GdsPath の作成
@@ -158,8 +234,8 @@ GdsParser::new_node(ymuint16 elflags,
 // @param[in] bgn_extn BGNEXTN の値
 // @param[in] end_extn ENDEXTN の値
 // @param[in] xy XY の値
-GdsElement*
-GdsParser::new_path(ymuint16 elflags,
+void
+GdsParser::add_path(ymuint16 elflags,
 		    ymint32 plex,
 		    ymint16 layer,
 		    ymint16 datatype,
@@ -172,7 +248,7 @@ GdsParser::new_path(ymuint16 elflags,
   void* p = mAlloc.get_memory(sizeof(GdsPath));
   GdsPath* path = new (p) GdsPath(elflags, plex, layer, datatype, pathtype, width, bgn_extn, end_extn, xy);
 
-  return path;
+  add_element(path);
 }
 
 // @brief GdsSref の作成
@@ -181,8 +257,8 @@ GdsParser::new_path(ymuint16 elflags,
 // @param[in] strname 構造名
 // @param[in] strans STRANS の値
 // @param[in] xy 座標
-GdsElement*
-GdsParser::new_sref(ymuint16 elflags,
+void
+GdsParser::add_sref(ymuint16 elflags,
 		    ymint32 plex,
 		    GdsString* strname,
 		    GdsStrans* strans,
@@ -191,7 +267,7 @@ GdsParser::new_sref(ymuint16 elflags,
   void* p = mAlloc.get_memory(sizeof(GdsSref));
   GdsSref* sref = new (p) GdsSref(elflags, plex, strname, strans, xy);
 
-  return sref;
+  add_element(sref);
 }
 
 // @brief GdsText の作成
@@ -205,8 +281,8 @@ GdsParser::new_sref(ymuint16 elflags,
 // @param[in] strans STRANS の値
 // @param[in] xy XY座標
 // @param[in] body 本体の文字列
-GdsElement*
-GdsParser::new_text(ymuint16 elflags,
+void
+GdsParser::add_text(ymuint16 elflags,
 		    ymint32 plex,
 		    ymint16 layer,
 		    ymint16 texttype,
@@ -220,7 +296,7 @@ GdsParser::new_text(ymuint16 elflags,
   void* p = mAlloc.get_memory(sizeof(GdsText));
   GdsText* text = new (p) GdsText(elflags, plex, layer, texttype, presentation, pathtype, width, strans, xy, body);
 
-  return text;
+  add_element(text);
 }
 
 // @brief GdsStrans の作成
@@ -235,11 +311,19 @@ GdsParser::new_strans(ymuint flags,
   return strans;
 }
 
-// @brief property リストのクリア
+// @brief GdsElement (の派生要素)の追加
 void
-GdsParser::clear_property()
+GdsParser::add_element(GdsElement* elem)
 {
-  mPropList.clear();
+  if ( mCurElement ) {
+    mCurElement->mLink = elem;
+  }
+  else {
+    mCurStruct->mElement = elem;
+  }
+  mCurElement = elem;
+
+  mCurProperty = NULL;
 }
 
 // @brief GdsProperty の作成
@@ -252,18 +336,13 @@ GdsParser::add_property(ymuint attr,
   void* p = mAlloc.get_memory(sizeof(GdsProperty));
   GdsProperty* prop = new (p) GdsProperty(attr, value);
 
-  mPropList.push_back(prop);
-}
-
-// @brief property リストを GdsElement にセットする．
-void
-GdsParser::set_property(GdsElement* elem)
-{
-  assert_cond( elem != NULL, __FILE__, __LINE__);
-
-  elem->mPropertyList = mPropList;
-
-  clear_property();
+  if ( mCurProperty ) {
+    mCurProperty->mLink = prop;
+  }
+  else {
+    mCurElement->mProperty = prop;
+  }
+  mCurProperty = prop;
 }
 
 // @brief yylex() の実装
@@ -319,6 +398,23 @@ GdsParser::yyerror(const char* s)
   msg_end();
 
   return 1;
+}
+
+// @brief GdsFormat の作成
+GdsFormat*
+GdsParser::new_format()
+{
+  if ( mFormatType == 0 && mMasks.empty() ) {
+    return NULL;
+  }
+  ymuint nm = mMasks.size();
+  void* p = mAlloc.get_memory(sizeof(GdsFormat) + (nm - 1) * sizeof(GdsString*));
+  GdsFormat* format = new (p) GdsFormat(mFormatType);
+  format->mMaskNum = nm;
+  for (ymuint i = 0; i < nm; ++ i) {
+    format->mMasks[i] = mMasks[i];
+  }
+  return format;
 }
 
 // @brief GdsACL の作成

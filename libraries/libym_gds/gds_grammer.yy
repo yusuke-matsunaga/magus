@@ -52,8 +52,6 @@ yyerror(GdsParser& parser,
 
   GdsACL*     acl_type;
   GdsDate*    date_type;
-  GdsElement* element_type;
-  GdsFormat*  format_type;
   GdsStrans*  strans_type;
   GdsString*  string_type;
   GdsUnits*   units_type;
@@ -143,7 +141,6 @@ yyerror(GdsParser& parser,
 %type <string_type> opt_FONTS
 %type <string_type> opt_ATTRTABLE
 %type <int2_type> opt_GENERATIONS
-%type <format_type> opt_FormatType
 %type <bitarray_type> opt_ELFLAGS
 %type <int4_type> opt_PLEX
 %type <int2_type> opt_PATHTYPE
@@ -152,15 +149,6 @@ yyerror(GdsParser& parser,
 %type <int4_type> opt_ENDEXTN
 %type <bitarray_type> opt_PRESENTATION
 %type <strans_type> opt_strans
-%type <element_type> element
-%type <element_type> elem_header
-%type <element_type> boundary
-%type <element_type> path
-%type <element_type> sref
-%type <element_type> aref
-%type <element_type> text
-%type <element_type> node
-%type <element_type> box
 
 %%
 
@@ -173,6 +161,9 @@ header
 : HEADER BGNLIB opt_LIBDIRSIZE opt_SRFNAME opt_LIBSECUR
   LIBNAME opt_REFLIBS opt_FONTS opt_ATTRTABLE opt_GENERATIONS
   opt_FormatType UNITS
+{
+  parser.new_header($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $12);
+}
 ;
 
 opt_LIBDIRSIZE
@@ -254,22 +245,25 @@ opt_GENERATIONS
 
 opt_FormatType
 : // null
-{
-  $$ = NULL;
-}
 | FORMAT
 {
-  $$ = NULL;
+  parser.set_format($1);
 }
 | FORMAT plus_MASK ENDMASKS
 {
-  $$ = NULL;
+  parser.set_format($1);
 }
 ;
 
 plus_MASK
 : MASK
+{
+  parser.add_mask($1);
+}
 | plus_MASK MASK
+{
+  parser.add_mask($2);
+}
 ;
 
 star_structure
@@ -283,7 +277,13 @@ structure
 
 struct_head
 : BGNSTR STRNAME
+{
+  parser.add_struct($1, $2);
+}
 | BGNSTR STRNAME STRCLASS
+{
+  parser.add_struct($1, $2);
+}
 ;
 
 star_element
@@ -293,26 +293,22 @@ star_element
 
 element
 : elem_header star_property ENDEL
-{
-  parser.set_property($1);
-  $$ = $1;
-}
 ;
 
 elem_header
-: boundary { $$ = $1; }
-| path     { $$ = $1; }
-| sref     { $$ = $1; }
-| aref     { $$ = $1; }
-| text     { $$ = $1; }
-| node     { $$ = $1; }
-| box      { $$ = $1; }
+: boundary
+| path
+| sref
+| aref
+| text
+| node
+| box
 ;
 
 boundary
 : BOUNDARY opt_ELFLAGS opt_PLEX LAYER DATATYPE XY
 {
-  $$ = parser.new_boundary($2, $3, $4, $5, $6);
+  parser.add_boundary($2, $3, $4, $5, $6);
 }
 ;
 
@@ -320,21 +316,21 @@ path
 : PATH opt_ELFLAGS opt_PLEX LAYER DATATYPE
   opt_PATHTYPE opt_WIDTH opt_BGNEXTN opt_ENDEXTN XY
 {
-  $$ = parser.new_path($2, $3, $4, $5, $6, $7, $8, $9, $10);
+  parser.add_path($2, $3, $4, $5, $6, $7, $8, $9, $10);
 }
 ;
 
 sref
 : SREF opt_ELFLAGS opt_PLEX SNAME opt_strans XY
 {
-  $$ = parser.new_sref($2, $3, $4, $5, $6);
+  parser.add_sref($2, $3, $4, $5, $6);
 }
 ;
 
 aref
 : AREF opt_ELFLAGS opt_PLEX SNAME opt_strans COLROW XY
 {
-  $$ = parser.new_aref($2, $3, $4, $5, $6, $7);
+  parser.add_aref($2, $3, $4, $5, $6, $7);
 }
 ;
 
@@ -343,22 +339,22 @@ text
   opt_PRESENTATION opt_PATHTYPE opt_WIDTH opt_strans
   XY STRING
 {
-  $$ = parser.new_text($2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
+  parser.add_text($2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
 }
 ;
-;
+
 
 node
 : NODE opt_ELFLAGS opt_PLEX LAYER NODETYPE XY
 {
-  $$ = parser.new_node($2, $3, $4, $5, $6);
+  parser.add_node($2, $3, $4, $5, $6);
 }
 ;
 
 box
 : BOX opt_ELFLAGS opt_PLEX LAYER BOXTYPE XY
 {
-  $$ = parser.new_box($2, $3, $4, $5, $6);
+  parser.add_box($2, $3, $4, $5, $6);
 }
 ;
 
@@ -464,9 +460,6 @@ opt_PRESENTATION
 
 star_property
 : // null
-{
-  parser.clear_property();
-}
 | star_property PROPATTR PROPVALUE
 {
   parser.add_property($2, $3);

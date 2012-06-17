@@ -22,7 +22,8 @@ BEGIN_NAMESPACE_YM_GDS
 GdsElement::GdsElement(ymuint16 elflags,
 		       ymint32 plex) :
   mElFlags(elflags),
-  mPlex(plex)
+  mPlex(plex),
+  mProperty(NULL)
 {
 }
 
@@ -159,11 +160,18 @@ GdsElement::text() const
   return NULL;
 }
 
-// @brief property のリストを返す．
-const vector<GdsProperty*>&
-GdsElement::property_list() const
+// @brief property の先頭要素を返す．
+const GdsProperty*
+GdsElement::property() const
 {
-  return mPropertyList;
+  return mProperty;
+}
+
+// @brief 次の要素を返す．
+const GdsElement*
+GdsElement::next()
+{
+  return mLink;
 }
 
 END_NAMESPACE_YM_GDS
