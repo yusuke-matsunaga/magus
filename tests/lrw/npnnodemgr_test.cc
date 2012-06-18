@@ -43,6 +43,12 @@ npnnodemgr_test()
   NpnHandle orand011n = mgr.make_or(and01, ~x1);
   NpnHandle and01n = mgr.make_and(x0, ~x1);
   NpnHandle orand01n1 = mgr.make_or(and01n, x1);
+  NpnHandle xor01 = mgr.make_xor(x0, x1);
+  NpnHandle xor0n1 = mgr.make_xor(~x0, x1);
+  NpnHandle xor01n = mgr.make_xor(x0, ~x1);
+  NpnHandle xor0n1n = mgr.make_xor(~x0, ~x1);
+  NpnHandle xor012n = mgr.make_xor(xor01, x2n);
+  NpnHandle xor01n2 = mgr.make_xor(~xor01, x2);
 
   cout << "const0" << endl;
   mgr.dump_handle(cout, c0);
@@ -91,6 +97,24 @@ npnnodemgr_test()
 
   cout << "(x0 & ~x1) | x1" << endl;
   mgr.dump_handle(cout, orand01n1);
+
+  cout << "x0 ^ x1" << endl;
+  mgr.dump_handle(cout, xor01);
+
+  cout << "~x0 ^ x1" << endl;
+  mgr.dump_handle(cout, xor0n1);
+
+  cout << "x0 ^ ~x1" << endl;
+  mgr.dump_handle(cout, xor01n);
+
+  cout << "~x0 ^ ~x1" << endl;
+  mgr.dump_handle(cout, xor0n1n);
+
+  cout << "(x0 ^ x1) ^ ~x2" << endl;
+  mgr.dump_handle(cout, xor012n);
+
+  cout << "~(x0 ^ x1) ^ x2" << endl;
+  mgr.dump_handle(cout, xor01n2);
 }
 
 END_NAMESPACE_YM

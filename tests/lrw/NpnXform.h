@@ -164,7 +164,7 @@ inline
 bool
 NpnXform::input_inv(ymuint pos) const
 {
-  return static_cast<bool>((mData >> pos) & 1U);
+  return static_cast<bool>((mData >> (pos + 1)) & 1U);
 }
 
 // @brief 出力の極性を得る．
@@ -172,7 +172,7 @@ inline
 bool
 NpnXform::output_inv() const
 {
-  return static_cast<bool>((mData >> 4) & 1U);
+  return static_cast<bool>(mData & 1U);
 }
 
 // @brief 生のデータを取り出す．
@@ -188,7 +188,7 @@ inline
 void
 NpnXform::flip_oinv()
 {
-  mData ^= 16U;
+  mData ^= 1U;
 }
 
 END_NAMESPACE_YM

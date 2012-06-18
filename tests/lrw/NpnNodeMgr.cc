@@ -75,7 +75,7 @@ NpnHandle
 NpnNodeMgr::make_const1()
 {
   // ちょっとトリッキーなコード
-  return NpnHandle(0, NpnXform(0, 16U));
+  return NpnHandle(0, NpnXform(0, 1U));
 }
 
 // @brief 入力ノードを生成する．
@@ -126,11 +126,11 @@ NpnNodeMgr::make_and(NpnHandle fanin0,
   const Npn4Cannon& npn_cannon = npn4cannon[func];
   ymuint16 c_func = npn_cannon.mFunc;
   ymuint16 perm = npn_cannon.mPerm;
-  bool oinv = (perm >> 4) & 1U;
+  bool oinv = (perm >> 0) & 1U;
   if ( oinv ) {
     c_func ^= 0xFFFF;
   }
-  perm &= ~16U;
+  perm &= ~1U;
   NpnXform xf(perm);
   NpnXform inv_xf = inverse(xf);
 
@@ -182,33 +182,33 @@ NpnNodeMgr::make_xor(NpnHandle fanin0,
     return fanin1;
   }
 
-  // XOR ノードの入力には出力反転属性をつけない．
-  bool iinv = false;
-  if ( fanin0.oinv() ) {
-    fanin0 = ~fanin0;
-    iinv = !iinv;
-  }
-  if ( fanin1.oinv() ) {
-    fanin1 = ~fanin1;
-    iinv = !iinv;
-  }
-
   // func がNPN同値類の代表関数になるように正規化する．
   const Npn4Cannon& npn_cannon = npn4cannon[func];
   ymuint16 c_func = npn_cannon.mFunc;
   ymuint16 perm = npn_cannon.mPerm;
-  bool oinv = (perm >> 4) & 1U;
+  bool oinv = (perm >> 0) & 1U;
   if ( oinv ) {
     c_func ^= 0xFFFF;
   }
-  perm &= ~16U;
+  perm &= ~1U;
   NpnXform xf(perm);
   NpnXform inv_xf = inverse(xf);
+
+  NpnHandle c_fanin0 = cannonical(fanin0 * xf);
+  NpnHandle c_fanin1 = cannonical(fanin1 * xf);
+  // XOR ノードの入力には出力反転属性をつけない．
+  bool iinv = false;
+  if ( c_fanin0.oinv() ) {
+    c_fanin0 = ~c_fanin0;
+    iinv = !iinv;
+  }
+  if ( c_fanin1.oinv() ) {
+    c_fanin1 = ~c_fanin1;
+    iinv = !iinv;
+  }
   if ( iinv ) {
     inv_xf.flip_oinv();
   }
-  NpnHandle c_fanin0 = cannonical(fanin0 * xf);
-  NpnHandle c_fanin1 = cannonical(fanin1 * xf);
 
   // 既存の等価なノードを探すか新しいノードを作る．
   NpnNode* node = new_node(true, c_func, c_fanin0, c_fanin1);
@@ -235,7 +235,7 @@ NpnNodeMgr::cannonical(NpnHandle src)
   ymuint id = src.node_id();
   NpnXform xf(npn_cannon.mPerm);
   ymuint16 cf = xform(f, xf);
-#if 0
+
   NpnNode* node = mNodeList[id];
   if ( node->func() == (cf ^ 0xFFFF) ) {
     xf.flip_oinv();
@@ -247,7 +247,6 @@ NpnNodeMgr::cannonical(NpnHandle src)
     }
     assert_cond( node->func() == cf, __FILE__, __LINE__);
   }
-#endif
   return NpnHandle(id, inverse(xf));
 }
 

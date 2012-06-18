@@ -105,15 +105,15 @@ nperm_table_gen()
   for (ymuint nn = 0; nn < 32; ++ nn) {
     ymuint inv[4];
     for (ymuint i = 0; i < 4; ++ i) {
-      inv[i] = (nn >> i) & 1U;
+      inv[i] = (nn >> (i + 1)) & 1U;
     }
 
     cout << "  ";
     const char* comma = "";
     for (ymuint i = 0; i < 24; ++ i) {
-      ymuint new_nn = nn & 16U;
+      ymuint new_nn = nn & 1U;
       for (ymuint j = 0; j < 4; ++ j) {
-	new_nn |= (inv[j] << perm[i][j]);
+	new_nn |= (inv[j] << (perm[i][j] + 1));
       }
       cout << comma << new_nn;
       comma = ",";
@@ -131,15 +131,15 @@ inv_nperm_table_gen()
   for (ymuint nn = 0; nn < 32; ++ nn) {
     ymuint inv[4];
     for (ymuint i = 0; i < 4; ++ i) {
-      inv[i] = (nn >> i) & 1U;
+      inv[i] = (nn >> (i + 1)) & 1U;
     }
 
     cout << "  ";
     const char* comma = "";
     for (ymuint i = 0; i < 24; ++ i) {
-      ymuint new_nn = nn & 16U;
+      ymuint new_nn = nn & 1U;
       for (ymuint j = 0; j < 4; ++ j) {
-	new_nn |= (inv[perm[i][j]] << j);
+	new_nn |= (inv[perm[i][j]] << (j + 1));
       }
       cout << comma << new_nn;
       comma = ",";

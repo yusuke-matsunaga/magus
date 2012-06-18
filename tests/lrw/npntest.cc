@@ -79,14 +79,14 @@ test1()
 	  error1 = true;
 	  break;
 	}
-	ymuint p_ref = (pols >> i) & 1U;
+	ymuint p_ref = (pols >> (i + 1)) & 1U;
 	ymuint p_cur = xf.input_inv(i);
 	if ( p_ref != p_cur ) {
 	  error1 = true;
 	  break;
 	}
       }
-      ymuint p_ref = (pols >> 4) & 1U;
+      ymuint p_ref = pols & 1U;
       ymuint p_cur = xf.output_inv();
       if ( p_ref != p_cur ) {
 	error1 = true;
@@ -99,12 +99,6 @@ test1()
 	     << ", " << perm[2]
 	     << ", " << perm[3]
 	     << ") ";
-	if ( pols & 1U ) {
-	  cout << "N";
-	}
-	else {
-	  cout << "P";
-	}
 	if ( pols & 2U ) {
 	  cout << "N";
 	}
@@ -123,8 +117,14 @@ test1()
 	else {
 	  cout << "P";
 	}
-	cout << "|";
 	if ( pols & 16U ) {
+	  cout << "N";
+	}
+	else {
+	  cout << "P";
+	}
+	cout << "|";
+	if ( pols & 1U ) {
 	  cout << "N";
 	}
 	else {
@@ -177,15 +177,15 @@ test2()
 	  ymuint j2 = perm2[i2];
 	  ymuint j3 = perm2[i3];
 
-	  ymuint inv0 = (pols >> 0) & 1U;
-	  inv0 ^= ((pols2 >> i0) & 1U);
-	  ymuint inv1 = (pols >> 1) & 1U;
-	  inv1 ^= ((pols2 >> i1) & 1U);
-	  ymuint inv2 = (pols >> 2) & 1U;
-	  inv2 ^= ((pols2 >> i2) & 1U);
-	  ymuint inv3 = (pols >> 3) & 1U;
-	  inv3 ^= ((pols2 >> i3) & 1U);
-	  ymuint oinv = ((pols >> 4) & 1U) ^ ((pols2 >> 4) & 1U);
+	  ymuint inv0 = (pols >> 1) & 1U;
+	  inv0 ^= ((pols2 >> (i0 + 1)) & 1U);
+	  ymuint inv1 = (pols >> 2) & 1U;
+	  inv1 ^= ((pols2 >> (i1 + 1)) & 1U);
+	  ymuint inv2 = (pols >> 3) & 1U;
+	  inv2 ^= ((pols2 >> (i2 + 1)) & 1U);
+	  ymuint inv3 = (pols >> 4) & 1U;
+	  inv3 ^= ((pols2 >> (i3 + 1)) & 1U);
+	  ymuint oinv = ((pols >> 0) & 1U) ^ ((pols2 >> 0) & 1U);
 
 	  if ( cxf.input_perm(0) != j0 ||
 	       cxf.input_perm(1) != j1 ||

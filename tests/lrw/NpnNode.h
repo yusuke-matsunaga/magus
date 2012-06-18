@@ -277,7 +277,7 @@ inline
 bool
 NpnHandle::oinv() const
 {
-  return static_cast<bool>((mData >> 4) & 1U);
+  return static_cast<bool>(mData & 1U);
 }
 
 // @brief 出力を反転したハンドルを返す．
@@ -285,7 +285,7 @@ inline
 NpnHandle
 NpnHandle::operator~() const
 {
-  return NpnHandle(mData ^ 16U);
+  return NpnHandle(mData ^ 1U);
 }
 
 // @brief NPN変換を施す．

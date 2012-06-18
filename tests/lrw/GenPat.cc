@@ -113,13 +113,38 @@ GenPat::operator()(ymuint slack)
 
     ymuint n = mCandListArray[level].size();
     cout << "  " << n << " seed patterns" << endl;
+    hash_map<ymuint16, vector<GpHandle> > pat_list;
+    vector<ymuint16> flist;
     for (ymuint i = 0; i < n; ++ i) {
       GpHandle handle = mCandListArray[level][i];
-      GpNode* node = handle.node();
-      if ( mFuncLevel[node->func()] + mSlack < level ) {
+      ymuint16 func = handle.func();
+      if ( mFuncLevel[func] + mSlack < level ) {
 	continue;
       }
       mRepList[level].push_back(handle);
+      if ( pat_list.count(func) == 0 ) {
+	flist.push_back(func);
+      }
+      pat_list[func].push_back(handle);
+    }
+
+    sort(flist.begin(), flist.end());
+    for (vector<ymuint16>::iterator p = flist.begin(); p != flist.end(); ++ p) {
+      hash_map<ymuint16, vector<GpHandle> >::iterator q = pat_list.find(*p);
+      assert_cond( q != pat_list.end(), __FILE__, __LINE__);
+      vector<GpHandle>& handle_list = q->second;
+      if ( handle_list.size() < 2 ) {
+	continue;
+      }
+      cout << "Function: " << setw(4) << setfill('0') << hex << *p << dec << endl;
+      for (vector<GpHandle>::iterator r = handle_list.begin();
+	   r != handle_list.end(); ++ r) {
+	mMgr.dump_handle(cout, *r);
+      }
+      cout << endl;
+    }
+    if ( level == 4 ) {
+      exit(0);
     }
 
     const vector<GpHandle>& src_list1 = mRepList[level];
@@ -127,7 +152,7 @@ GenPat::operator()(ymuint slack)
     cout << "  " << n1 << " true seed patterns" << endl;
     for (ymuint i = 0; i < n1; ++ i) {
       GpHandle handle = src_list1[i];
-      if ( 1 ) {
+      if ( 0 ) {
 	mMgr.dump_handle(cout, handle);
 	cout << endl;
       }
