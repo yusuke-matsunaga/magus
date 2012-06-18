@@ -26,27 +26,52 @@ npnnodemgr_test()
   NpnHandle x2 = mgr.make_input(2);
   NpnHandle x3 = mgr.make_input(3);
 
+  NpnHandle x2n = ~x2;
+
   NpnHandle and01 = mgr.make_and(x0, x1);
   NpnHandle and13 = mgr.make_and(x1, x3);
   NpnHandle and0n1n = mgr.make_and(~x0, ~x1);
   NpnHandle or1 = ~mgr.make_and(~and01, ~and13);
   NpnHandle and23 = mgr.make_and(x2, x3);
   NpnHandle andor0123 = ~mgr.make_and(~and01, ~and23);
+  NpnHandle and0n2 = mgr.make_and(~x0, x2);
+  NpnHandle mpx = ~mgr.make_and(~and01, ~and0n2);
 
-  vector<NpnHandle> handle_list;
-  handle_list.push_back(c0);
-  handle_list.push_back(c1);
-  handle_list.push_back(x0);
-  handle_list.push_back(x1);
-  handle_list.push_back(x2);
-  handle_list.push_back(x3);
-  handle_list.push_back(and01);
-  handle_list.push_back(and13);
-  handle_list.push_back(and0n1n);
-  handle_list.push_back(or1);
-  handle_list.push_back(andor0123);
+  cout << "const0" << endl;
+  mgr.dump_handle(cout, c0);
 
-  mgr.dump_handle(cout, handle_list);
+  cout << "const1" << endl;
+  mgr.dump_handle(cout, c1);
+
+  cout << "x0" << endl;
+  mgr.dump_handle(cout, x0);
+
+  cout << "x1" << endl;
+  mgr.dump_handle(cout, x1);
+
+  cout << "~x2" << endl;
+  mgr.dump_handle(cout, x2n);
+
+  cout << "x0 & x1" << endl;
+  mgr.dump_handle(cout, and01);
+
+  cout << "x1 & x3" << endl;
+  mgr.dump_handle(cout, and13);
+
+  cout << "~x0 & ~x1" << endl;
+  mgr.dump_handle(cout, and0n1n);
+
+  cout << "(x0 & x1) | (x1 & x3)" << endl;
+  mgr.dump_handle(cout, or1);
+
+  cout << "(x0 & x1) | (x2 & x3)" << endl;
+  mgr.dump_handle(cout, andor0123);
+
+  cout << "~x0 & x2" << endl;
+  mgr.dump_handle(cout, and0n2);
+
+  cout << "(x0 & x1) | (~x0 & x2)" << endl;
+  mgr.dump_handle(cout, mpx);
 }
 
 END_NAMESPACE_YM
