@@ -61,6 +61,16 @@ public:
   make_and(NpnHandle fanin0,
 	   NpnHandle fanin1);
 
+  /// @brief ORノードを生成する．
+  /// @param[in] fanin0 ファンイン0
+  /// @param[in] fanin1 ファンイン1
+  /// @note もしも既に同じ構造のノードがあればそれを返す．
+  /// @note 場合によってはファンインその物や定数ノードを返すこともある．
+  /// @note 実際には AND ノード＋反転属性
+  NpnHandle
+  make_or(NpnHandle fanin0,
+	  NpnHandle fanin1);
+
   /// @brief XORノードを生成する．
   /// @param[in] fanin0 ファンイン0
   /// @param[in] fanin1 ファンイン1

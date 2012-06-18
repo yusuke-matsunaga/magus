@@ -31,11 +31,18 @@ npnnodemgr_test()
   NpnHandle and01 = mgr.make_and(x0, x1);
   NpnHandle and13 = mgr.make_and(x1, x3);
   NpnHandle and0n1n = mgr.make_and(~x0, ~x1);
-  NpnHandle or1 = ~mgr.make_and(~and01, ~and13);
+  NpnHandle or1 = mgr.make_or(and01, and13);
   NpnHandle and23 = mgr.make_and(x2, x3);
-  NpnHandle andor0123 = ~mgr.make_and(~and01, ~and23);
+  NpnHandle orand0123 = mgr.make_or(and01, and23);
   NpnHandle and0n2 = mgr.make_and(~x0, x2);
-  NpnHandle mpx = ~mgr.make_and(~and01, ~and0n2);
+  NpnHandle mpx1 = mgr.make_or(and01, and0n2);
+  NpnHandle and0n1 = mgr.make_and(~x0, x1);
+  NpnHandle and02 = mgr.make_and(x0, x2);
+  NpnHandle mpx2 = mgr.make_or(and0n1, and02);
+  NpnHandle and012n = mgr.make_and(and01, ~x2);
+  NpnHandle orand011n = mgr.make_or(and01, ~x1);
+  NpnHandle and01n = mgr.make_and(x0, ~x1);
+  NpnHandle orand01n1 = mgr.make_or(and01n, x1);
 
   cout << "const0" << endl;
   mgr.dump_handle(cout, c0);
@@ -65,13 +72,25 @@ npnnodemgr_test()
   mgr.dump_handle(cout, or1);
 
   cout << "(x0 & x1) | (x2 & x3)" << endl;
-  mgr.dump_handle(cout, andor0123);
+  mgr.dump_handle(cout, orand0123);
 
   cout << "~x0 & x2" << endl;
   mgr.dump_handle(cout, and0n2);
 
   cout << "(x0 & x1) | (~x0 & x2)" << endl;
-  mgr.dump_handle(cout, mpx);
+  mgr.dump_handle(cout, mpx1);
+
+  cout << "(~x0 & x1) | (x0 & x2)" << endl;
+  mgr.dump_handle(cout, mpx2);
+
+  cout << "(x0 & x1) & ~x2)" << endl;
+  mgr.dump_handle(cout, and012n);
+
+  cout << "(x0 & x1) | ~x1" << endl;
+  mgr.dump_handle(cout, orand011n);
+
+  cout << "(x0 & ~x1) | x1" << endl;
+  mgr.dump_handle(cout, orand01n1);
 }
 
 END_NAMESPACE_YM

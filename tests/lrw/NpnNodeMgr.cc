@@ -143,6 +143,19 @@ NpnNodeMgr::make_and(NpnHandle fanin0,
   return NpnHandle(node->id(), inv_xf);
 }
 
+// @brief ORノードを生成する．
+// @param[in] fanin0 ファンイン0
+// @param[in] fanin1 ファンイン1
+// @note もしも既に同じ構造のノードがあればそれを返す．
+// @note 場合によってはファンインその物や定数ノードを返すこともある．
+// @note 実際には AND ノード＋反転属性
+NpnHandle
+NpnNodeMgr::make_or(NpnHandle fanin0,
+		    NpnHandle fanin1)
+{
+  return ~make_and(~fanin0, ~fanin1);
+}
+
 // @brief XORノードを生成する．
 // @param[in] fanin0 ファンイン0
 // @param[in] fanin1 ファンイン1
@@ -222,6 +235,7 @@ NpnNodeMgr::cannonical(NpnHandle src)
   ymuint id = src.node_id();
   NpnXform xf(npn_cannon.mPerm);
   ymuint16 cf = xform(f, xf);
+#if 0
   NpnNode* node = mNodeList[id];
   if ( node->func() == (cf ^ 0xFFFF) ) {
     xf.flip_oinv();
@@ -233,6 +247,7 @@ NpnNodeMgr::cannonical(NpnHandle src)
     }
     assert_cond( node->func() == cf, __FILE__, __LINE__);
   }
+#endif
   return NpnHandle(id, inverse(xf));
 }
 
