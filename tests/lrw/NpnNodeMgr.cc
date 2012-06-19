@@ -208,6 +208,7 @@ NpnNodeMgr::make_xor(NpnHandle fanin0,
 
   NpnHandle c_fanin0 = cannonical(fanin0 * xf);
   NpnHandle c_fanin1 = cannonical(fanin1 * xf);
+
   // XOR ノードの入力には出力反転属性をつけない．
   bool iinv = false;
   if ( c_fanin0.oinv() ) {
@@ -275,6 +276,7 @@ NpnNodeMgr::new_node(bool is_xor,
 {
 
   if ( func == 0x1888 ) {
+    cout << "===================================================" << endl;
     cout << "func = 0x1888" << endl;
     cout << "fanin0" << endl;
     dump_handle(cout, fanin0);
@@ -303,7 +305,7 @@ NpnNodeMgr::new_node(bool is_xor,
       xfanin0 = xfanin1;
       xfanin1 = tmp;
     }
-#if 0
+#if 1
     if ( func == 0x1888 ) {
       cout << "xfanin0" << endl;
       dump_handle(cout, xfanin0);
@@ -312,10 +314,14 @@ NpnNodeMgr::new_node(bool is_xor,
       dump_handle(cout, xfanin1);
       cout << endl;
     }
-    if ( min_fanin0 > xfanin0 ||
-	 (min_fanin0 == xfanin0 && min_fanin1 > xfanin1) ) {
+    if ( min_fanin0 > xfanin0 ) {
       min_fanin0 = xfanin0;
       min_fanin1 = xfanin1;
+    }
+    else if ( min_fanin0 == xfanin0 ) {
+      if ( min_fanin1 > xfanin1) {
+	min_fanin1 = xfanin1;
+      }
     }
 #endif
   }

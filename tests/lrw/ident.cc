@@ -96,6 +96,7 @@ ident(int argc,
     ymuint16 func = npn4rep[i];
     vector<ymuint16> ident_list;
     get_ident(func, ident_list);
+#if 0
     cout << "{";
     const char* comma = "";
     for (vector<ymuint16>::iterator p = ident_list.begin();
@@ -104,6 +105,14 @@ ident(int argc,
       comma = ", ";
     }
     cout << "}";
+#else
+    cout << setw(4) << setfill('0') << hex << func << dec << endl;
+    for (vector<ymuint16>::iterator p = ident_list.begin();
+	 p != ident_list.end(); ++ p) {
+      NpnXform xf(*p);
+      cout << xf << endl;
+    }
+#endif
   }
   cout << endl;
   return 0;
