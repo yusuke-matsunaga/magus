@@ -26,6 +26,16 @@ Npn4Cannon npn4cannon[] = {
 #include "npn4cannon.h"
 };
 
+// 4入力のNPN同値類代表関数
+ymuint32 npn4rep[] = {
+#include "npn4rep.h"
+};
+
+// 4入力のNPN変換を表す配列
+ymuint16 npn4perm[] = {
+#include "npn4perm.h"
+};
+
 END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
@@ -39,6 +49,8 @@ NpnNodeMgr::NpnNodeMgr() :
   mHashSize(0)
 {
   alloc_table(1024);
+
+  make_ident_list();
 
   // 定数ノードの生成
   mConstNode = alloc_node();
@@ -261,12 +273,71 @@ NpnNodeMgr::new_node(bool is_xor,
 		     NpnHandle fanin0,
 		     NpnHandle fanin1)
 {
+
+  if ( func == 0x1888 ) {
+    cout << "func = 0x1888" << endl;
+    cout << "fanin0" << endl;
+    dump_handle(cout, fanin0);
+    cout << endl
+	 << "fanin1" << endl;
+    dump_handle(cout, fanin1);
+    cout << endl;
+  }
+
+  // fanin0, fanin1 に対して func の恒等変換を行い，もっとも「小さい」ものを求める．
+  NpnHandle min_fanin0 = fanin0;
+  NpnHandle min_fanin1 = fanin1;
+  if ( min_fanin0 > min_fanin1 ) {
+    NpnHandle tmp = min_fanin0;
+    min_fanin0 = min_fanin1;
+    min_fanin1 = tmp;
+  }
+  const vector<NpnXform>& ident_list = mIdentList[func];
+  for (vector<NpnXform>::const_iterator p = ident_list.begin();
+       p != ident_list.end(); ++ p) {
+    NpnXform xf1 = *p;
+    NpnHandle xfanin0 = fanin0 * xf1;
+    NpnHandle xfanin1 = fanin1 * xf1;
+    if ( xfanin0 > xfanin1 ) {
+      NpnHandle tmp = xfanin0;
+      xfanin0 = xfanin1;
+      xfanin1 = tmp;
+    }
+#if 0
+    if ( func == 0x1888 ) {
+      cout << "xfanin0" << endl;
+      dump_handle(cout, xfanin0);
+      cout << endl
+	   << "xfanin1" << endl;
+      dump_handle(cout, xfanin1);
+      cout << endl;
+    }
+    if ( min_fanin0 > xfanin0 ||
+	 (min_fanin0 == xfanin0 && min_fanin1 > xfanin1) ) {
+      min_fanin0 = xfanin0;
+      min_fanin1 = xfanin1;
+    }
+#endif
+  }
+  if ( func == 0x1888 ) {
+    cout << "min_fanin0" << endl;
+    dump_handle(cout, min_fanin0);
+    cout << endl
+	 << "min_fanin1" << endl;
+    dump_handle(cout, min_fanin1);
+    cout << endl;
+  }
+  fanin0 = min_fanin0;
+  fanin1 = min_fanin1;
+
+#if 0
   // 順番の正規化
   if ( fanin0 > fanin1 ) {
     NpnHandle tmp = fanin0;
     fanin0 = fanin1;
     fanin1 = tmp;
   }
+#endif
 
   ymuint type_pat = is_xor ? 3U : 2U;
   ymuint pos = hash_func(fanin0, fanin1, is_xor);
@@ -295,6 +366,28 @@ NpnNodeMgr::new_node(bool is_xor,
   mAndList.push_back(node);
 
   return node;
+}
+
+// @brief mIdentList を設定する．
+void
+NpnNodeMgr::make_ident_list()
+{
+  vector<NpnXform> perm_list;
+  for (ymuint p = 0; p < 768; ++ p) {
+    perm_list.push_back(NpnXform(npn4perm[p]));
+  }
+
+  for (ymuint i = 0; npn4rep[i] != 0xFFFF; ++ i) {
+    ymuint16 func = npn4rep[i];
+    for (vector<NpnXform>::iterator p = perm_list.begin();
+	 p != perm_list.end(); ++ p) {
+      NpnXform xf = *p;
+      ymuint16 func1 = xform(func, xf);
+      if ( func1 == func ) {
+	mIdentList[func].push_back(xf);
+      }
+    }
+  }
 }
 
 // @brief ノードを生成する関数
@@ -335,8 +428,7 @@ void
 NpnNodeMgr::dump_handle(ostream& s,
 			const vector<NpnHandle>& handle_list) const
 {
-  s << "dump_handle" << endl
-    << "----------------------------------------" << endl;
+  s << "----------------------------------------" << endl;
   ymuint i = 0;
   for (vector<NpnHandle>::const_iterator p = handle_list.begin();
        p != handle_list.end(); ++ p, ++ i) {

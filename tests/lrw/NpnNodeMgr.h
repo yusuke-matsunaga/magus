@@ -11,6 +11,7 @@
 
 #include "ymtools.h"
 #include "ym_utils/SimpleAlloc.h"
+#include "NpnXform.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -104,6 +105,10 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief mIdentList を設定する．
+  void
+  make_ident_list();
+
   /// @brief 枝を正規化する．
   NpnHandle
   cannonical(NpnHandle src);
@@ -168,6 +173,9 @@ private:
 
   // mHashTable を拡大する目安
   ymuint32 mNextLimit;
+
+  // 恒等変換のリスト
+  hash_map<ymuint16, vector<NpnXform> > mIdentList;
 
 };
 

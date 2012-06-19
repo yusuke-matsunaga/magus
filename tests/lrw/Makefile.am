@@ -31,6 +31,7 @@ AM_CPPFLAGS = \
 noinst_PROGRAMS = \
 	npngen \
 	cannonical \
+	ident \
 	read_table \
 	xform_comp_gen \
 	npntest \
@@ -48,6 +49,11 @@ npngen_LDADD = \
 
 cannonical_SOURCES = \
 	cannonical.cc \
+	NpnXform.h \
+	NpnXform.cc
+
+ident_SOURCES = \
+	ident.cc \
 	NpnXform.h \
 	NpnXform.cc
 
