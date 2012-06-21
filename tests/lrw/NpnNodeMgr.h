@@ -89,6 +89,10 @@ public:
   ymuint16
   func(NpnHandle handle) const;
 
+  /// @brief 展開したノード数を仮想的に返す．
+  ymuint
+  count(NpnHandle handle) const;
+
   /// @brief ハンドルとその子供の内容を出力する．
   void
   dump_handle(ostream& s,
@@ -137,6 +141,11 @@ private:
   /// @brief ハッシュテーブルを拡大する．
   void
   alloc_table(ymuint req_size);
+
+  /// @brief count() の下請け関数
+  ymuint
+  count_sub(NpnHandle handle,
+	    hash_set<ymuint32>& hash1) const;
 
   /// @brief dump_handle() の下請け関数
   void

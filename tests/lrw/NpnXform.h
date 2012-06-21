@@ -60,6 +60,10 @@ public:
   bool
   output_inv() const;
 
+  /// @brief 与えられたサポートに関する同値類の代表変換を求める．
+  NpnXform
+  rep(ymuint8 sup) const;
+
   /// @brief 生のデータを取り出す．
   /// @note 値域は 0 - 1023
   ymuint

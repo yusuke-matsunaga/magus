@@ -262,16 +262,18 @@ dh_sub(ostream& s,
   if ( h_hash.count(node->id()) > 0 ) {
     return;
   }
-
   h_hash.insert(node->id());
-  if ( node->is_input() ) {
-    s << "Node#" << node->id()
-      << ": INPUT(" << node->input_id() << ")" << endl;
-  }
-  else {
+
+  if ( node->is_logic() ) {
     dh_sub(s, node->fanin0_node(), h_hash);
     dh_sub(s, node->fanin1_node(), h_hash);
-    s << "Node#" << node->id() << ": ";
+  }
+
+  s << "Node#" << node->id() << ": ";
+  if ( node->is_input() ) {
+    s << "INPUT(" << node->input_id() << ")" << endl;
+  }
+  else { // node->is_logic()
     if ( node->is_and() ) {
       s << "AND";
     }
@@ -293,6 +295,7 @@ void
 GpMgr::dump_handle(ostream& s,
 		   const vector<GpHandle>& handle_list) const
 {
+  s << "----------------------------------------" << endl;
   ymuint i = 0;
   for (vector<GpHandle>::const_iterator p = handle_list.begin();
        p != handle_list.end(); ++ p, ++ i) {
@@ -301,6 +304,8 @@ GpMgr::dump_handle(ostream& s,
     print_handle(s, handle);
     cout << endl;
   }
+  s << "----------------------------------------" << endl;
+
   hash_set<ymuint32> tmp_hash;
   for (vector<GpHandle>::const_iterator p = handle_list.begin();
        p != handle_list.end(); ++ p) {
@@ -310,6 +315,7 @@ GpMgr::dump_handle(ostream& s,
     }
     dh_sub(s, handle.node(), tmp_hash);
   }
+  s << "----------------------------------------" << endl;
 }
 
 BEGIN_NONAMESPACE

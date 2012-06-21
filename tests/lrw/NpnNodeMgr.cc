@@ -54,16 +54,18 @@ NpnNodeMgr::NpnNodeMgr() :
 
   // 定数ノードの生成
   mConstNode = alloc_node();
-  mConstNode->mVolume = 0;
-  mConstNode->mFunc = 0x0000;
+  mConstNode->mVolume = 0U;
+  mConstNode->mFunc = 0x0000U;
+  mConstNode->mSupport = 0U;
   mConstNode->mSlink = NULL;
   assert_cond( mConstNode->id() == 0, __FILE__, __LINE__);
 
   // 入力ノードの生成
   mInputNode = alloc_node();
   mInputNode->mId |= 1U;
-  mInputNode->mVolume = 0;
+  mInputNode->mVolume = 0U;
   mInputNode->mFunc = 0xaaaa;
+  mInputNode->mSupport = 0x1U;
   mInputNode->mSlink = NULL;
   assert_cond( mInputNode->id() == 1, __FILE__, __LINE__);
 }
@@ -237,6 +239,39 @@ NpnNodeMgr::func(NpnHandle handle) const
   return xform(node->func(), handle.npn_xform());
 }
 
+// @brief 展開したノード数を仮想的に返す．
+ymuint
+NpnNodeMgr::count(NpnHandle handle) const
+{
+  hash_set<ymuint32> hash1;
+  return count_sub(handle, hash1);
+}
+
+// @brief count() の下請け関数
+ymuint
+NpnNodeMgr::count_sub(NpnHandle handle,
+		      hash_set<ymuint32>& hash1) const
+{
+  NpnNode* node = mNodeList[handle.node_id()];
+  if ( !node->is_logic() ) {
+    return 0;
+  }
+
+  NpnXform xf = handle.npn_xform();
+  NpnXform xf0 = xf.rep(node->support());
+  NpnHandle rep_handle(node->id(), xf0);
+  ymuint sig = rep_handle.hash();
+  if ( hash1.count(sig) > 0 ) {
+    return 0;
+  }
+  hash1.insert(sig);
+
+  ymuint ans = 1;
+  ans += count_sub(node->fanin0() * xf0, hash1);
+  ans += count_sub(node->fanin1() * xf0, hash1);
+  return ans;
+}
+
 // @brief 枝を正規化する．
 NpnHandle
 NpnNodeMgr::cannonical(NpnHandle src)
@@ -263,6 +298,48 @@ NpnNodeMgr::cannonical(NpnHandle src)
   return NpnHandle(id, inverse(xf));
 }
 
+BEGIN_NONAMESPACE
+
+// 関数のサポートを求める．
+ymuint
+support(ymuint16 func)
+{
+  // 数が少ないので個別にやる．
+  ymuint ans = 0U;
+
+  // 0 番めの変数
+  ymuint16 c0_0 = func & 0x5555U;
+  ymuint16 c0_1 = (func & 0xaaaaU) >> 1;
+  if ( c0_0 != c0_1 ) {
+    ans |= 1U;
+  }
+
+  // 1 番めの変数
+  ymuint16 c1_0 = func & 0x3333U;
+  ymuint16 c1_1 = (func & 0xccccU) >> 2;
+  if ( c1_0 != c1_1 ) {
+    ans |= 2U;
+  }
+
+  // 2 番めの変数
+  ymuint16 c2_0 = func & 0x0f0fU;
+  ymuint16 c2_1 = (func & 0xf0f0U) >> 4;
+  if ( c2_0 != c2_1 ) {
+    ans |= 4U;
+  }
+
+  // 3 番めの変数
+  ymuint16 c3_0 = func & 0x00ffU;
+  ymuint16 c3_1 = (func & 0xff00U) >> 8;
+  if ( c3_0 != c3_1 ) {
+    ans |= 8;
+  }
+
+  return ans;
+}
+
+END_NONAMESPACE
+
 // @brief 新しいノードを登録する関数
 // @param[in] is_xor XOR ノードの時 true にするフラグ
 // @param[in] func 関数ベクタ
@@ -274,17 +351,6 @@ NpnNodeMgr::new_node(bool is_xor,
 		     NpnHandle fanin0,
 		     NpnHandle fanin1)
 {
-
-  if ( func == 0x1888 ) {
-    cout << "===================================================" << endl;
-    cout << "func = 0x1888" << endl;
-    cout << "fanin0" << endl;
-    dump_handle(cout, fanin0);
-    cout << endl
-	 << "fanin1" << endl;
-    dump_handle(cout, fanin1);
-    cout << endl;
-  }
 
   // fanin0, fanin1 に対して func の恒等変換を行い，もっとも「小さい」ものを求める．
   NpnHandle min_fanin0 = fanin0;
@@ -305,33 +371,6 @@ NpnNodeMgr::new_node(bool is_xor,
       xfanin0 = xfanin1;
       xfanin1 = tmp;
     }
-#if 1
-    if ( func == 0x1888 ) {
-      cout << "xfanin0" << endl;
-      dump_handle(cout, xfanin0);
-      cout << endl
-	   << "xfanin1" << endl;
-      dump_handle(cout, xfanin1);
-      cout << endl;
-    }
-    if ( min_fanin0 > xfanin0 ) {
-      min_fanin0 = xfanin0;
-      min_fanin1 = xfanin1;
-    }
-    else if ( min_fanin0 == xfanin0 ) {
-      if ( min_fanin1 > xfanin1) {
-	min_fanin1 = xfanin1;
-      }
-    }
-#endif
-  }
-  if ( func == 0x1888 ) {
-    cout << "min_fanin0" << endl;
-    dump_handle(cout, min_fanin0);
-    cout << endl
-	 << "min_fanin1" << endl;
-    dump_handle(cout, min_fanin1);
-    cout << endl;
   }
   fanin0 = min_fanin0;
   fanin1 = min_fanin1;
@@ -358,6 +397,7 @@ NpnNodeMgr::new_node(bool is_xor,
   NpnNode* node = alloc_node();
   node->mId |= type_pat;
   node->mFunc = func;
+  node->mSupport = support(func);
   node->mFanin[0] = fanin0;
   node->mFanin[1] = fanin1;
 
@@ -441,7 +481,7 @@ NpnNodeMgr::dump_handle(ostream& s,
     NpnHandle handle = *p;
     s << "Handle#" << i << ": ";
     print_handle(s, handle);
-    cout << endl;
+    s << endl;
   }
   s << "----------------------------------------" << endl;
 

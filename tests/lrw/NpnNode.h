@@ -166,6 +166,12 @@ public:
   ymuint16
   func() const;
 
+  /// @brief このノードが表す関数のサポートを返す．
+  /// @note サポートは 0 から 15 までの符号なし整数
+  /// @note i ビット目が 1 なら i 番めの変数を含んでいる．
+  ymuint
+  support() const;
+
   /// @brief 定数ノードの時 true を返す．
   bool
   is_const() const;
@@ -205,6 +211,9 @@ private:
 
   // ボリューム
   ymuint8 mVolume;
+
+  // サポート
+  ymuint8 mSupport;
 
   // このノードが表している関数ベクタ
   ymuint16 mFunc;
@@ -392,6 +401,16 @@ ymuint16
 NpnNode::func() const
 {
   return mFunc;
+}
+
+// @brief このノードが表す関数のサポートを返す．
+// @note サポートは 0 から 15 までの符号なし整数
+// @note i ビット目が 1 なら i 番めの変数を含んでいる．
+inline
+ymuint
+NpnNode::support() const
+{
+  return mSupport;
 }
 
 // @brief 定数ノードの時 true を返す．

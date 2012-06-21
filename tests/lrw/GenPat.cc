@@ -133,14 +133,8 @@ GenPat::operator()(ymuint slack)
       hash_map<ymuint16, vector<GpHandle> >::iterator q = pat_list.find(*p);
       assert_cond( q != pat_list.end(), __FILE__, __LINE__);
       vector<GpHandle>& handle_list = q->second;
-      if ( handle_list.size() < 2 ) {
-	continue;
-      }
       cout << "Function: " << setw(4) << setfill('0') << hex << *p << dec << endl;
-      for (vector<GpHandle>::iterator r = handle_list.begin();
-	   r != handle_list.end(); ++ r) {
-	mMgr.dump_handle(cout, *r);
-      }
+      mMgr.dump_handle(cout, handle_list);
       cout << endl;
     }
     if ( level == 4 ) {

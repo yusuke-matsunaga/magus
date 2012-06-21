@@ -133,14 +133,8 @@ GenPat2::operator()(ymuint slack)
       hash_map<ymuint16, vector<NpnHandle> >::iterator q = pat_list.find(*p);
       assert_cond( q != pat_list.end(), __FILE__, __LINE__);
       vector<NpnHandle>& handle_list = q->second;
-      if ( handle_list.size() < 2 ) {
-	continue;
-      }
       cout << "Function: " << setw(4) << setfill('0') << hex << *p << dec << endl;
-      for (vector<NpnHandle>::iterator r = handle_list.begin();
-	   r != handle_list.end(); ++ r) {
-	mMgr.dump_handle(cout, *r);
-      }
+      mMgr.dump_handle(cout, handle_list);
       cout << endl;
     }
     if ( level == 4 ) {
@@ -297,10 +291,10 @@ GenPat2::compose(NpnHandle handle1,
   ymuint32 fv1 = mMgr.func(handle1);
   ymuint32 fv2 = mMgr.func(handle2);
   ymuint32 fv3 = fv1 & fv2;
-  ymuint32 fv1_n = fv1 ^ 0xFFFF;
-  ymuint32 fv4 = fv1_n & fv2;
+  ymuint32 fv4 = fv1 | fv2;
   ymuint32 fv5 = fv1 ^ fv2;
 
+#if 0
   bool valid1 = false;
   if ( fv3 != 0U && fv3 != fv1 && fv3 != fv2 ) {
     if ( (mFuncLevel[fv3] + mSlack) >= level_base + 1 ) {
@@ -308,7 +302,7 @@ GenPat2::compose(NpnHandle handle1,
     }
   }
   bool valid2 = false;
-  if ( fv4 != 0U && fv4 != fv1_n && fv4 != fv2 ) {
+  if ( fv4 != 0xFFFFU && fv4 != fv1 && fv4 != fv2 ) {
     if ( (mFuncLevel[fv4] + mSlack) >= level_base + 1 ) {
       valid2 = true;
     }
@@ -326,13 +320,18 @@ GenPat2::compose(NpnHandle handle1,
 
   ymuint level = count2(handle2) + level_base + 1;
 
+  if ( 0 ) {
+    NpnHandle tmp = mMgr.make_xor(handle1, handle2);
+    level = mMgr.count(tmp);
+  }
+
   if ( valid1 && (mFuncLevel[fv3] + mSlack) >= level ) {
     NpnHandle handle = mMgr.make_and(handle1, handle2);
     add_pair(handle, level);
   }
 
   if ( valid2 && (mFuncLevel[fv4] + mSlack) >= level ) {
-    NpnHandle handle = mMgr.make_and(~handle1, handle2);
+    NpnHandle handle = mMgr.make_or(handle1, handle2);
     add_pair(handle, level);
   }
 
@@ -340,6 +339,69 @@ GenPat2::compose(NpnHandle handle1,
     NpnHandle handle = mMgr.make_xor(handle1, handle2);
     add_pair(handle, level);
   }
+#else
+  ymuint level = count2(handle2) + level_base + 1;
+  if ( fv3 != 0U && fv3 != fv1 && fv3 != fv2 ) {
+    NpnHandle handle = mMgr.make_and(handle1, handle2);
+    ymuint level1 = mMgr.count(handle);
+    if ( level != level1 ) {
+      cout << "error: level = " << level << ", level1 = " << level1 << endl;
+      mMgr.dump_handle(cout, handle1);
+      cout << endl;
+      mMgr.dump_handle(cout, handle2);
+      cout << endl;
+      mMgr.dump_handle(cout, handle);
+      cout << endl;
+      if ( level > level1 ) {
+	level = level1;
+      }
+    }
+    //assert_cond( level == level1, __FILE__, __LINE__);
+    if ( (mFuncLevel[fv3] + mSlack) >= level ) {
+      add_pair(handle, level);
+    }
+  }
+  if ( fv4 != 0xFFFFU && fv4 != fv1 && fv4 != fv2 ) {
+    NpnHandle handle = mMgr.make_or(handle1, handle2);
+    ymuint level1 = mMgr.count(handle);
+    if ( level != level1 ) {
+      cout << "error: level = " << level << ", level1 = " << level1 << endl;
+      mMgr.dump_handle(cout, handle1);
+      cout << endl;
+      mMgr.dump_handle(cout, handle2);
+      cout << endl;
+      mMgr.dump_handle(cout, handle);
+      cout << endl;
+      if ( level > level1 ) {
+	level = level1;
+      }
+    }
+    //assert_cond( level == level1, __FILE__, __LINE__);
+    if ( (mFuncLevel[fv4] + mSlack) >= level ) {
+      add_pair(handle, level);
+    }
+  }
+  if ( fv5 != 0U && fv5 != 0xFFFF && fv5 != fv1 && fv5 != fv2 ) {
+    NpnHandle handle = mMgr.make_xor(handle1, handle2);
+    ymuint level1 = mMgr.count(handle);
+    if ( level != level1 ) {
+      cout << "error: level = " << level << ", level1 = " << level1 << endl;
+      mMgr.dump_handle(cout, handle1);
+      cout << endl;
+      mMgr.dump_handle(cout, handle2);
+      cout << endl;
+      mMgr.dump_handle(cout, handle);
+      cout << endl;
+      if ( level > level1 ) {
+	level = level1;
+      }
+    }
+    //assert_cond( level == level1, __FILE__, __LINE__);
+    if ( (mFuncLevel[fv5] + mSlack) >= level ) {
+      add_pair(handle, level);
+    }
+  }
+#endif
 }
 
 // @brief NpnHandle を登録する．
@@ -375,18 +437,22 @@ GenPat2::add_cand(NpnHandle handle,
 ymuint
 GenPat2::count1(NpnHandle handle)
 {
-  if ( mCountHash.count(handle.hash()) > 0 ) {
+  NpnNode* node = mMgr.node(handle.node_id());
+  if ( !node->is_logic() ) {
     return 0;
   }
-  mCountHash.insert(handle.hash());
 
-  ymuint ans = 0;
-  NpnNode* node = mMgr.node(handle.node_id());
-  if ( node->is_logic() ) {
-    ans = 1;
-    ans += count1(node->fanin0());
-    ans += count1(node->fanin1());
+  NpnXform xf = handle.npn_xform();
+  NpnXform xf0 = xf.rep(node->support());
+  ymuint sig = (node->id() << 10) | xf0.data();
+  if ( mCountHash.count(sig) > 0 ) {
+    return 0;
   }
+  mCountHash.insert(sig);
+
+  ymuint ans = 1;
+  ans += count1(node->fanin0() * xf0);
+  ans += count1(node->fanin1() * xf0);
   return ans;
 }
 
@@ -403,22 +469,24 @@ ymuint
 GenPat2::count2_sub(NpnHandle handle,
 		    hash_set<ymuint32>& hash)
 {
-  if ( mCountHash.count(handle.hash()) > 0 ||
-       hash.count(handle.hash()) > 0 ) {
+  NpnNode* node = mMgr.node(handle.node_id());
+  if ( !node->is_logic() ) {
     return 0;
   }
-  hash.insert(handle.hash());
 
-  ymuint ans = 0;
-  NpnNode* node = mMgr.node(handle.node_id());
-  if ( node->is_logic() ) {
-    ans = 1;
-    ans += count2_sub(node->fanin0(), hash);
-    ans += count2_sub(node->fanin1(), hash);
+  NpnXform xf = handle.npn_xform();
+  NpnXform xf0 = xf.rep(node->support());
+  ymuint sig = (node->id() << 10) | xf0.data();
+  if ( mCountHash.count(sig) > 0 || hash.count(sig) > 0 ) {
+    return 0;
   }
+  hash.insert(sig);
+
+  ymuint ans = 1;
+  ans += count2_sub(node->fanin0() * xf0, hash);
+  ans += count2_sub(node->fanin1() * xf0, hash);
   return ans;
 }
-
 
 BEGIN_NONAMESPACE
 

@@ -16,50 +16,32 @@ BEGIN_NONAMESPACE
 
 // 順列を表す配列
 ymuint8 perm_table[24][4] = {
-  { 0, 1, 2, 3},
-  { 0, 1, 3, 2},
-  { 0, 2, 1, 3},
-  { 0, 2, 3, 1},
-  { 0, 3, 1, 2},
-  { 0, 3, 2, 1},
-  { 1, 0, 2, 3},
-  { 1, 0, 3, 2},
-  { 1, 2, 0, 3},
-  { 1, 2, 3, 0},
-  { 1, 3, 0, 2},
-  { 1, 3, 2, 0},
-  { 2, 0, 1, 3},
-  { 2, 0, 3, 1},
-  { 2, 1, 0, 3},
-  { 2, 1, 3, 0},
-  { 2, 3, 0, 1},
-  { 2, 3, 1, 0},
-  { 3, 0, 1, 2},
-  { 3, 0, 2, 1},
-  { 3, 1, 0, 2},
-  { 3, 1, 2, 0},
-  { 3, 2, 0, 1},
-  { 3, 2, 1, 0}
+#include "perm_table"
 };
 
 // 順列のみの合成テーブル
 ymuint8 comp_table[24 * 24] = {
-  #include "comp_table"
+#include "comp_table"
 };
 
 // 順列のみの逆変換テーブル
 ymuint8 inv_table[24] = {
-  #include "inv_table"
+#include "inv_table"
 };
 
 // 入出力の反転ビットの変換テーブル
 ymuint8 nperm_table[32 * 24] = {
-  #include "nperm_table"
+#include "nperm_table"
 };
 
 // 入出力の反転ビットの逆変換テーブル
 ymuint8 inv_nperm_table[32 * 24] = {
-  #include "inv_nperm_table"
+#include "inv_nperm_table"
+};
+
+// サポートごとの代表変換テーブル
+ymuint8 rep_perm_table[24][16] = {
+#include "rep_perm_table"
 };
 
 END_NONAMESPACE
@@ -73,6 +55,17 @@ NpnXform::input_perm(ymuint pos) const
 {
   ymuint pid = (mData >> 5) & 31U;
   return perm_table[pid][pos];
+}
+
+// @brief 与えられたサポートに関する同値類の代表変換を求める．
+NpnXform
+NpnXform::rep(ymuint8 sup) const
+{
+  ymuint perm = (mData >> 5) & 31U;
+  ymuint pols = mData & 31U;
+  ymuint rep_perm = rep_perm_table[perm][sup];
+  ymuint rep_pols = pols & (sup << 1);
+  return NpnXform(rep_perm, rep_pols);
 }
 
 // @brief 合成する．
