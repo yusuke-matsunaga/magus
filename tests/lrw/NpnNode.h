@@ -108,31 +108,37 @@ private:
 };
 
 /// @brief 等価比較
+/// @param[in] left, right オペランド
 bool
 operator==(NpnHandle left,
 	   NpnHandle right);
 
 /// @brief 非等価比較
+/// @param[in] left, right オペランド
 bool
 operator!=(NpnHandle left,
 	   NpnHandle right);
 
 /// @brief 大小比較 ( < )
+/// @param[in] left, right オペランド
 bool
 operator<(NpnHandle left,
 	  NpnHandle right);
 
 /// @brief 大小比較 ( > )
+/// @param[in] left, right オペランド
 bool
 operator>(NpnHandle left,
 	  NpnHandle right);
 
 /// @brief 大小比較 ( <= )
+/// @param[in] left, right オペランド
 bool
 operator<=(NpnHandle left,
 	   NpnHandle right);
 
 /// @brief 大小比較 ( >= )
+/// @param[in] left, right オペランド
 bool
 operator>=(NpnHandle left,
 	   NpnHandle right);

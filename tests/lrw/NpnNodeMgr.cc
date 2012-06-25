@@ -36,7 +36,15 @@ ymuint16 npn4perm[] = {
 #include "npn4perm.h"
 };
 
+void
+print_func(ostream& s,
+	   ymuint16 func)
+{
+  s << hex << setw(4) << setfill('0') << func << dec;
+}
+
 END_NONAMESPACE
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス NpnNodeMgr
@@ -141,20 +149,18 @@ NpnNodeMgr::make_and(NpnHandle fanin0,
   ymuint16 c_func = npn_cannon.mFunc;
   ymuint16 perm = npn_cannon.mPerm;
   bool oinv = (perm >> 0) & 1U;
-  if ( oinv ) {
-    c_func ^= 0xFFFF;
-  }
   perm &= ~1U;
+
   NpnXform xf(perm);
   NpnXform inv_xf = inverse(xf);
 
-  NpnHandle c_fanin0 = cannonical(fanin0 * xf);
-  NpnHandle c_fanin1 = cannonical(fanin1 * xf);
+  NpnHandle c_fanin0 = fanin0 * xf;
+  NpnHandle c_fanin1 = fanin1 * xf;
 
   // 既存の等価なノードを探すか新しいノードを作る．
-  NpnNode* node = new_node(false, c_func, c_fanin0, c_fanin1);
+  NpnHandle ohandle = new_node(false, c_func, oinv, c_fanin0, c_fanin1);
 
-  return NpnHandle(node->id(), inv_xf);
+  return ohandle * inv_xf;
 }
 
 // @brief ORノードを生成する．
@@ -201,34 +207,18 @@ NpnNodeMgr::make_xor(NpnHandle fanin0,
   ymuint16 c_func = npn_cannon.mFunc;
   ymuint16 perm = npn_cannon.mPerm;
   bool oinv = (perm >> 0) & 1U;
-  if ( oinv ) {
-    c_func ^= 0xFFFF;
-  }
   perm &= ~1U;
+
   NpnXform xf(perm);
   NpnXform inv_xf = inverse(xf);
 
-  NpnHandle c_fanin0 = cannonical(fanin0 * xf);
-  NpnHandle c_fanin1 = cannonical(fanin1 * xf);
-
-  // XOR ノードの入力には出力反転属性をつけない．
-  bool iinv = false;
-  if ( c_fanin0.oinv() ) {
-    c_fanin0 = ~c_fanin0;
-    iinv = !iinv;
-  }
-  if ( c_fanin1.oinv() ) {
-    c_fanin1 = ~c_fanin1;
-    iinv = !iinv;
-  }
-  if ( iinv ) {
-    inv_xf.flip_oinv();
-  }
+  NpnHandle c_fanin0 = fanin0 * xf;
+  NpnHandle c_fanin1 = fanin1 * xf;
 
   // 既存の等価なノードを探すか新しいノードを作る．
-  NpnNode* node = new_node(true, c_func, c_fanin0, c_fanin1);
+  NpnHandle ohandle = new_node(true, c_func, oinv, c_fanin0, c_fanin1);
 
-  return NpnHandle(node->id(), inv_xf);
+  return ohandle * inv_xf;
 }
 
 // @brief ハンドルの表す関数を返す．
@@ -258,7 +248,7 @@ NpnNodeMgr::count_sub(NpnHandle handle,
   }
 
   NpnXform xf = handle.npn_xform();
-  NpnXform xf0 = xf.rep(node->support());
+  NpnXform xf0 = xf.rep(node->func());
   NpnHandle rep_handle(node->id(), xf0);
   ymuint sig = rep_handle.hash();
   if ( hash1.count(sig) > 0 ) {
@@ -270,32 +260,6 @@ NpnNodeMgr::count_sub(NpnHandle handle,
   ans += count_sub(node->fanin0() * xf0, hash1);
   ans += count_sub(node->fanin1() * xf0, hash1);
   return ans;
-}
-
-// @brief 枝を正規化する．
-NpnHandle
-NpnNodeMgr::cannonical(NpnHandle src)
-{
-  // まどろっこしいけど，いったん，関数の正規形を求めて
-  // それへの変換の正規形を求める．
-  ymuint16 f = func(src);
-  const Npn4Cannon& npn_cannon = npn4cannon[f];
-  ymuint id = src.node_id();
-  NpnXform xf(npn_cannon.mPerm);
-  ymuint16 cf = xform(f, xf);
-
-  NpnNode* node = mNodeList[id];
-  if ( node->func() == (cf ^ 0xFFFF) ) {
-    xf.flip_oinv();
-  }
-  else {
-    if ( node->func() != cf ) {
-      cout << "node->func() = " << hex << setw(4) << setfill('0') << node->func()
-	   << ", cf = " << setw(4) << setfill('0') << f << dec << endl;
-    }
-    assert_cond( node->func() == cf, __FILE__, __LINE__);
-  }
-  return NpnHandle(id, inverse(xf));
 }
 
 BEGIN_NONAMESPACE
@@ -345,44 +309,230 @@ END_NONAMESPACE
 // @param[in] func 関数ベクタ
 // @param[in] fanin0, fanin1 ファンインのハンドル
 // @note おなじノードが既に存在していたらそのノードを返す．
-NpnNode*
+NpnHandle
 NpnNodeMgr::new_node(bool is_xor,
-		     ymuint16 func,
+		     ymuint16 c_func,
+		     bool c_oinv,
 		     NpnHandle fanin0,
 		     NpnHandle fanin1)
 {
+  NpnHandle orig_fanin0 = fanin0;
+  NpnHandle orig_fanin1 = fanin1;
+  NpnXform oxf;
+  ymuint16 func = c_func;
+  if ( c_oinv ) {
+    func ^= 0xFFFFU;
+    oxf.flip_oinv();
+  }
+  { // デバッグ用の表示
+    cout << "=======<<new_node>>========================================" << endl;
+    cout << "func: ";
+    print_func(cout, func);
+    cout << endl;
+    if ( is_xor ) {
+      if ( c_oinv ) {
+	cout << "XNOR" << endl;
+      }
+      else {
+	cout << "XOR" << endl;
+      }
+    }
+    else {
+      if ( c_oinv ) {
+	cout << "NAND" << endl;
+      }
+      else {
+	cout << "AND" << endl;
+      }
+    }
 
-  // fanin0, fanin1 に対して func の恒等変換を行い，もっとも「小さい」ものを求める．
+    cout << "  func0: ";
+    print_func(cout, this->func(fanin0));
+    cout << endl
+	 << "  func1: ";
+    print_func(cout, this->func(fanin1));
+    cout << endl
+	 << endl;
+    vector<NpnHandle> tmp;
+    tmp.push_back(fanin0);
+    tmp.push_back(fanin1);
+    dump_handle(cout, tmp);
+    cout << endl;
+  }
+  { // デバッグ用のチェック
+    ymuint16 func0 = this->func(fanin0);
+    ymuint16 func1 = this->func(fanin1);
+    ymuint16 tmp_func;
+    if ( is_xor ) {
+      tmp_func = func0 ^ func1;
+    }
+    else {
+      tmp_func = func0 & func1;
+    }
+    if ( func != tmp_func ) {
+      if ( is_xor ) {
+	cout << "XOR" << endl;
+      }
+      else {
+	cout << "AND" << endl;
+      }
+      cout << "func: ";
+      print_func(cout, func);
+      cout << ", tmp_func: ";
+      print_func(cout, tmp_func);
+      cout << endl;
+      dump_handle(cout, fanin0);
+      dump_handle(cout, fanin1);
+      cout << endl;
+    }
+    assert_cond( func == tmp_func, __FILE__, __LINE__);
+  }
+
+  ymuint sup = support(c_func);
+
+  // fanin0, fanin1 に対して c_func の恒等変換を行い，
+  // もっとも「小さい」ものを求める．
   NpnHandle min_fanin0 = fanin0;
   NpnHandle min_fanin1 = fanin1;
+  bool min_oinv = false;
   if ( min_fanin0 > min_fanin1 ) {
     NpnHandle tmp = min_fanin0;
     min_fanin0 = min_fanin1;
     min_fanin1 = tmp;
   }
-  const vector<NpnXform>& ident_list = mIdentList[func];
+  {
+    cout << "initial min_fanins" << endl;
+    vector<NpnHandle> tmp;
+    tmp.push_back(min_fanin0);
+    tmp.push_back(min_fanin1);
+    dump_handle(cout, tmp);
+  }
+
+  assert_cond( mIdentList.count(c_func) > 0, __FILE__, __LINE__);
+  const vector<NpnXform>& ident_list = mIdentList[c_func];
   for (vector<NpnXform>::const_iterator p = ident_list.begin();
        p != ident_list.end(); ++ p) {
     NpnXform xf1 = *p;
-    NpnHandle xfanin0 = fanin0 * xf1;
-    NpnHandle xfanin1 = fanin1 * xf1;
+    NpnXform cxf1 = xf1.rep(c_func);
+    if ( cxf1 != xf1 ) {
+      continue;
+    }
+    bool oinv = xf1.output_inv();
+    if ( oinv ) {
+      xf1.flip_oinv();
+    }
+    NpnHandle xfanin0 = cannonical(fanin0 * xf1);
+    NpnHandle xfanin1 = cannonical(fanin1 * xf1);
+
+    if ( is_xor ) {
+      if ( xfanin0.oinv() ) {
+	xfanin0 = ~xfanin0;
+	oinv = !oinv;
+      }
+      if ( xfanin1.oinv() ) {
+	xfanin1 = ~xfanin1;
+	oinv = !oinv;
+      }
+    }
+
+    if ( 1 ) {
+      cout << "xf1 = " << xf1 << endl;
+      cout << "oinv = " << oinv << endl;
+      vector<NpnHandle> tmp;
+      tmp.push_back(xfanin0);
+      tmp.push_back(xfanin1);
+      dump_handle(cout, tmp);
+    }
+    {
+      ymuint16 f0 = this->func(xfanin0);
+      ymuint16 f1 = this->func(xfanin1);
+      ymuint16 f;
+      if ( is_xor ) {
+	f = f0 ^ f1;
+      }
+      else {
+	f = f0 & f1;
+      }
+      ymuint16 func0 = func;
+      if ( oinv ) {
+	func0 ^= 0xFFFF;
+      }
+      if ( f != func0 ) {
+	cout << "Error" << endl;
+	cout << "Original fanins" << endl;
+	dump_handle(cout, orig_fanin0);
+	dump_handle(cout, orig_fanin1);
+	cout << endl
+	     << "xformed fanins" << endl;
+	dump_handle(cout, xfanin0);
+	dump_handle(cout, xfanin1);
+	cout << endl;
+	cout << "xf = " << xf1 << endl;
+	cout << "func: " << hex << setw(4) << setfill('0') << func << dec
+	     << ", x_func: " << hex << setw(4) << setfill('0') << f << dec
+	   << endl;
+      }
+    }
     if ( xfanin0 > xfanin1 ) {
       NpnHandle tmp = xfanin0;
       xfanin0 = xfanin1;
       xfanin1 = tmp;
     }
+    if ( min_fanin0 > xfanin0 ) {
+      min_fanin0 = xfanin0;
+      min_fanin1 = xfanin1;
+      min_oinv = oinv;
+    }
+    else if ( min_fanin0 == xfanin0 && min_fanin1 > xfanin1 ) {
+      min_fanin1 = xfanin1;
+      min_oinv = oinv;
+    }
   }
+
   fanin0 = min_fanin0;
   fanin1 = min_fanin1;
-
-#if 0
-  // 順番の正規化
-  if ( fanin0 > fanin1 ) {
-    NpnHandle tmp = fanin0;
-    fanin0 = fanin1;
-    fanin1 = tmp;
+  if ( min_oinv ) {
+    oxf.flip_oinv();
+    func ^= 0xFFFF;
   }
-#endif
+  if ( 1 ) {
+    cout << "min_oinv = " << min_oinv << endl;
+    vector<NpnHandle> tmp;
+    tmp.push_back(fanin0);
+    tmp.push_back(fanin1);
+    dump_handle(cout, tmp);
+    cout << "=================================================" << endl;
+  }
+
+  {
+    ymuint16 func0 = this->func(fanin0);
+    ymuint16 func1 = this->func(fanin1);
+    ymuint16 tmp_func;
+    if ( is_xor ) {
+      tmp_func = func0 ^ func1;
+    }
+    else {
+      tmp_func = func0 & func1;
+    }
+    if ( func != tmp_func ) {
+      if ( is_xor ) {
+	cout << "XOR" << endl;
+      }
+      else {
+	cout << "AND" << endl;
+      }
+      cout << "func: " << hex << setw(4) << setfill('0') << func << dec
+	   << ", tmp_func: " << hex << setw(4) << setfill('0') << tmp_func << dec
+	   << endl;
+      dump_handle(cout, fanin0);
+      dump_handle(cout, fanin1);
+      cout << endl
+	   << "Original fanin" << endl;
+      dump_handle(cout, orig_fanin0);
+      dump_handle(cout, orig_fanin1);
+    }
+    assert_cond( func == tmp_func, __FILE__, __LINE__);
+  }
 
   ymuint type_pat = is_xor ? 3U : 2U;
   ymuint pos = hash_func(fanin0, fanin1, is_xor);
@@ -391,13 +541,13 @@ NpnNodeMgr::new_node(bool is_xor,
     if ( node->mFanin[0] == fanin0 &&
 	 node->mFanin[1] == fanin1 &&
 	 (node->mId & 3U) == type_pat ) {
-      return node;
+      return NpnHandle(node->id(), oxf);
     }
   }
   NpnNode* node = alloc_node();
   node->mId |= type_pat;
   node->mFunc = func;
-  node->mSupport = support(func);
+  node->mSupport = sup;
   node->mFanin[0] = fanin0;
   node->mFanin[1] = fanin1;
 
@@ -411,7 +561,43 @@ NpnNodeMgr::new_node(bool is_xor,
   mHashTable[idx] = node;
   mAndList.push_back(node);
 
-  return node;
+  return NpnHandle(node->id(), oxf);
+}
+
+// @brief 枝を正規化する．
+NpnHandle
+NpnNodeMgr::cannonical(NpnHandle src)
+{
+  ymuint id = src.node_id();
+  NpnNode* node = mNodeList[id];
+  NpnXform xf = src.npn_xform();
+  NpnXform cxf = xf.rep(node->func());
+  NpnHandle ans(id, cxf);
+
+  if ( 0 ) {
+    cout << "Cannonical" << endl
+	 << "Node#" << id << ", support = ";
+    for (ymuint i = 0; i < 4; ++ i) {
+      cout << ((node->support() >> i) & 1U);
+    }
+    cout << endl;
+    vector<NpnHandle> tmp;
+    tmp.push_back(src);
+    tmp.push_back(ans);
+    dump_handle(cout, tmp);
+  }
+  {
+    ymuint16 f0 = func(src);
+    ymuint16 f1 = func(ans);
+    if ( f0 != f1 ) {
+      cout << "Error in cannonical" << endl;
+      vector<NpnHandle> tmp;
+      tmp.push_back(src);
+      tmp.push_back(ans);
+      dump_handle(cout, tmp);
+    }
+  }
+  return ans;
 }
 
 // @brief mIdentList を設定する．
@@ -534,6 +720,93 @@ NpnNodeMgr::dh_sub(ostream& s,
   }
 }
 
+// @brief ハンドルとその子供の内容を出力する．
+void
+NpnNodeMgr::dump_handle2(ostream& s,
+			 NpnHandle handle) const
+{
+  vector<NpnHandle> tmp_list(1, handle);
+  dump_handle2(s, tmp_list);
+}
+
+// @brief 複数のハンドルとその子供の内容を出力する．
+void
+NpnNodeMgr::dump_handle2(ostream& s,
+			 const vector<NpnHandle>& handle_list) const
+{
+  s << "----------------------------------------" << endl;
+  ymuint i = 0;
+  for (vector<NpnHandle>::const_iterator p = handle_list.begin();
+       p != handle_list.end(); ++ p, ++ i) {
+    NpnHandle handle = *p;
+    s << "Handle#" << i << ": ";
+    print_handle(s, handle);
+    s << endl;
+  }
+  s << "----------------------------------------" << endl;
+
+  hash_set<ymuint32> node_hash;
+  for (vector<NpnHandle>::const_iterator p = handle_list.begin();
+       p != handle_list.end(); ++ p) {
+    NpnHandle handle = *p;
+    dh2_sub(s, handle, node_hash);
+  }
+  s << "----------------------------------------" << endl;
+}
+
+// @brief dump_handle2() の下請け関数
+void
+NpnNodeMgr::dh2_sub(ostream& s,
+		    NpnHandle handle,
+		    hash_set<ymuint32>& node_hash) const
+{
+  ymuint id = handle.node_id();
+  NpnNode* node = mNodeList[id];
+  NpnXform xf = handle.npn_xform();
+  NpnXform xf0 = xf.rep(node->func());
+  NpnHandle rep_handle(id, xf0);
+  ymuint sig = rep_handle.hash();
+  if ( node_hash.count(sig) > 0 ) {
+    return;
+  }
+  node_hash.insert(sig);
+
+  if ( node->is_logic() ) {
+    dh2_sub(s, node->fanin0() * xf0, node_hash);
+    dh2_sub(s, node->fanin1() * xf0, node_hash);
+  }
+
+  print_handle(s, rep_handle);
+  s << ": ";
+  if ( node->is_const() ) {
+    if ( xf0.output_inv() ) {
+      s << "CONST1" << endl;
+    }
+    else {
+      s << "CONST0" << endl;
+    }
+  }
+  else if ( node->is_input() ) {
+    ymuint iid = xf0.input_perm(0);
+    if ( xf0.input_inv(0) ) {
+      s << "~";
+    }
+    s << "INPUT" << iid << endl;
+  }
+  else { // node->is_logic()
+    if ( node->is_and() ) {
+      s << "AND";
+    }
+    else {
+      s << "XOR";
+    }
+    s << "( ";
+    print_handle(s, node->fanin0() * xf0);
+    s << " , ";
+    print_handle(s, node->fanin1() * xf0);
+    s << " )" << endl;
+  }
+}
 
 // @brief ハッシュ関数
 ymuint32

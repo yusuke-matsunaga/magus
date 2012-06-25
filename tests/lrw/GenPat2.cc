@@ -279,6 +279,48 @@ GenPat2::add_pat(NpnHandle handle,
   mNpnNodeList[level].push_back(handle);
 }
 
+BEGIN_NONAMESPACE
+
+// 関数のサポートを求める．
+ymuint
+support(ymuint16 func)
+{
+  // 数が少ないので個別にやる．
+  ymuint ans = 0U;
+
+  // 0 番めの変数
+  ymuint16 c0_0 = func & 0x5555U;
+  ymuint16 c0_1 = (func & 0xaaaaU) >> 1;
+  if ( c0_0 != c0_1 ) {
+    ans |= 1U;
+  }
+
+  // 1 番めの変数
+  ymuint16 c1_0 = func & 0x3333U;
+  ymuint16 c1_1 = (func & 0xccccU) >> 2;
+  if ( c1_0 != c1_1 ) {
+    ans |= 2U;
+  }
+
+  // 2 番めの変数
+  ymuint16 c2_0 = func & 0x0f0fU;
+  ymuint16 c2_1 = (func & 0xf0f0U) >> 4;
+  if ( c2_0 != c2_1 ) {
+    ans |= 4U;
+  }
+
+  // 3 番めの変数
+  ymuint16 c3_0 = func & 0x00ffU;
+  ymuint16 c3_1 = (func & 0xff00U) >> 8;
+  if ( c3_0 != c3_1 ) {
+    ans |= 8;
+  }
+
+  return ans;
+}
+
+END_NONAMESPACE
+
 // @brief 2つのノードから新しいパタンを作る．
 // @note 具体的には aig1 & aig2 と ~aig & aig
 void
@@ -294,6 +336,22 @@ GenPat2::compose(NpnHandle handle1,
   ymuint32 fv4 = fv1 | fv2;
   ymuint32 fv5 = fv1 ^ fv2;
 
+  ymuint sup0 = support(fv1) | support(fv2);
+  ymuint sup3 = support(fv3);
+  bool valid1 = true;
+  if ( sup3 != sup0 ) {
+    valid1 = false;
+  }
+  ymuint sup4 = support(fv4);
+  bool valid2 = true;
+  if ( sup4 != sup0 ) {
+    valid2 = false;
+  }
+  ymuint sup5 = support(fv5);
+  bool valid3 = true;
+  if ( sup5 != sup0 ) {
+    valid3 = false;
+  }
 #if 0
   bool valid1 = false;
   if ( fv3 != 0U && fv3 != fv1 && fv3 != fv2 ) {
@@ -341,7 +399,7 @@ GenPat2::compose(NpnHandle handle1,
   }
 #else
   ymuint level = count2(handle2) + level_base + 1;
-  if ( fv3 != 0U && fv3 != fv1 && fv3 != fv2 ) {
+  if ( valid1 && fv3 != fv1 && fv3 != fv2 ) {
     NpnHandle handle = mMgr.make_and(handle1, handle2);
     ymuint level1 = mMgr.count(handle);
     if ( level != level1 ) {
@@ -352,6 +410,14 @@ GenPat2::compose(NpnHandle handle1,
       cout << endl;
       mMgr.dump_handle(cout, handle);
       cout << endl;
+      cout << "sup0 = " << sup0 << endl
+	   << "sup3 = " << sup3 << endl;
+      mMgr.dump_handle2(cout, handle1);
+      cout << endl;
+      mMgr.dump_handle2(cout, handle2);
+      cout << endl;
+      mMgr.dump_handle2(cout, handle);
+      cout << endl;
       if ( level > level1 ) {
 	level = level1;
       }
@@ -361,7 +427,7 @@ GenPat2::compose(NpnHandle handle1,
       add_pair(handle, level);
     }
   }
-  if ( fv4 != 0xFFFFU && fv4 != fv1 && fv4 != fv2 ) {
+  if ( valid2 && fv4 != fv1 && fv4 != fv2 ) {
     NpnHandle handle = mMgr.make_or(handle1, handle2);
     ymuint level1 = mMgr.count(handle);
     if ( level != level1 ) {
@@ -372,6 +438,14 @@ GenPat2::compose(NpnHandle handle1,
       cout << endl;
       mMgr.dump_handle(cout, handle);
       cout << endl;
+      cout << "sup0 = " << sup0 << endl
+	   << "sup4 = " << sup4 << endl;
+      mMgr.dump_handle2(cout, handle1);
+      cout << endl;
+      mMgr.dump_handle2(cout, handle2);
+      cout << endl;
+      mMgr.dump_handle2(cout, handle);
+      cout << endl;
       if ( level > level1 ) {
 	level = level1;
       }
@@ -381,7 +455,7 @@ GenPat2::compose(NpnHandle handle1,
       add_pair(handle, level);
     }
   }
-  if ( fv5 != 0U && fv5 != 0xFFFF && fv5 != fv1 && fv5 != fv2 ) {
+  if ( valid3 && fv5 != 0xFFFF && fv5 != fv1 && fv5 != fv2 ) {
     NpnHandle handle = mMgr.make_xor(handle1, handle2);
     ymuint level1 = mMgr.count(handle);
     if ( level != level1 ) {
@@ -391,6 +465,14 @@ GenPat2::compose(NpnHandle handle1,
       mMgr.dump_handle(cout, handle2);
       cout << endl;
       mMgr.dump_handle(cout, handle);
+      cout << endl;
+      cout << "sup0 = " << sup0 << endl
+	   << "sup5 = " << sup5 << endl;
+      mMgr.dump_handle2(cout, handle1);
+      cout << endl;
+      mMgr.dump_handle2(cout, handle2);
+      cout << endl;
+      mMgr.dump_handle2(cout, handle);
       cout << endl;
       if ( level > level1 ) {
 	level = level1;
@@ -443,7 +525,7 @@ GenPat2::count1(NpnHandle handle)
   }
 
   NpnXform xf = handle.npn_xform();
-  NpnXform xf0 = xf.rep(node->support());
+  NpnXform xf0 = xf.rep(node->func());
   ymuint sig = (node->id() << 10) | xf0.data();
   if ( mCountHash.count(sig) > 0 ) {
     return 0;
@@ -475,7 +557,7 @@ GenPat2::count2_sub(NpnHandle handle,
   }
 
   NpnXform xf = handle.npn_xform();
-  NpnXform xf0 = xf.rep(node->support());
+  NpnXform xf0 = xf.rep(node->func());
   ymuint sig = (node->id() << 10) | xf0.data();
   if ( mCountHash.count(sig) > 0 || hash.count(sig) > 0 ) {
     return 0;

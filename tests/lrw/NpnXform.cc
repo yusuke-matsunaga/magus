@@ -57,21 +57,29 @@ NpnXform::input_perm(ymuint pos) const
   return perm_table[pid][pos];
 }
 
-// @brief 与えられたサポートに関する同値類の代表変換を求める．
+// @brief 与えられた関数に関する同値類の代表変換を求める．
 NpnXform
-NpnXform::rep(ymuint8 sup) const
+NpnXform::rep(ymuint16 func) const
 {
+  ymuint8 sup = support(func);
   ymuint perm = (mData >> 5) & 31U;
   ymuint pols = mData & 31U;
   ymuint rep_perm = rep_perm_table[perm][sup];
-  ymuint rep_pols = pols & (sup << 1);
+  ymuint rep_pols = pols & ((sup << 1) | 1U);
+
+  // 特別な場合の処理
+  // 入力ノードおよび入力ノードをファンインとするXORノード
+  // の場合，入力の反転属性を出力に付け替える．
+  if ( sup == 1U && rep_pols == 3U ) {
+    rep_pols = 0U;
+  }
   return NpnXform(rep_perm, rep_pols);
 }
 
 // @brief 合成する．
 NpnXform
-operator*(const NpnXform& left,
-	  const NpnXform& right)
+operator*(NpnXform left,
+	  NpnXform right)
 {
   ymuint l_perm = (left.mData >> 5) & 31U;
   ymuint r_perm = (right.mData >> 5) & 31U;
@@ -84,7 +92,7 @@ operator*(const NpnXform& left,
 
 // @brief 逆変換を求める．
 NpnXform
-inverse(const NpnXform& left)
+inverse(NpnXform left)
 {
   ymuint l_perm = (left.mData >> 5) & 31U;
   ymuint l_pols = left.mData & 31U;

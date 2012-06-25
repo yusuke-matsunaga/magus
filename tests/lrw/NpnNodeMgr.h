@@ -103,6 +103,16 @@ public:
   dump_handle(ostream& s,
 	      const vector<NpnHandle>& handle_list) const;
 
+  /// @brief ハンドルとその子供の内容を出力する．
+  void
+  dump_handle2(ostream& s,
+	       NpnHandle handle) const;
+
+  /// @brief 複数のハンドルとその子供の内容を出力する．
+  void
+  dump_handle2(ostream& s,
+	       const vector<NpnHandle>& handle_list) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -122,9 +132,10 @@ private:
   /// @param[in] func 関数ベクタ
   /// @param[in] fanin0, fanin1 ファンインのハンドル
   /// @note おなじノードが既に存在していたらそのノードを返す．
-  NpnNode*
+  NpnHandle
   new_node(bool is_xor,
 	   ymuint16 func,
+	   bool oinv,
 	   NpnHandle fanin0,
 	   NpnHandle fanin1);
 
@@ -152,6 +163,12 @@ private:
   dh_sub(ostream& s,
 	 ymuint id,
 	 hash_set<ymuint32>& node_hash) const;
+
+  /// @brief dump_handle() の下請け関数
+  void
+  dh2_sub(ostream& s,
+	  NpnHandle handle,
+	  hash_set<ymuint32>& node_hash) const;
 
 
 private:

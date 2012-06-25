@@ -60,9 +60,9 @@ public:
   bool
   output_inv() const;
 
-  /// @brief 与えられたサポートに関する同値類の代表変換を求める．
+  /// @brief 与えられた関数に関する同値類の代表変換を求める．
   NpnXform
-  rep(ymuint8 sup) const;
+  rep(ymuint16 func) const;
 
   /// @brief 生のデータを取り出す．
   /// @note 値域は 0 - 1023
@@ -99,13 +99,25 @@ public:
   /// @brief 合成する．
   friend
   NpnXform
-  operator*(const NpnXform& left,
-	    const NpnXform& right);
+  operator*(NpnXform left,
+	    NpnXform right);
 
   /// @brief 逆変換を求める．
   friend
   NpnXform
-  inverse(const NpnXform& left);
+  inverse(NpnXform left);
+
+  /// @brief 等価比較
+  friend
+  bool
+  operator==(NpnXform left,
+	     NpnXform right);
+
+  /// @brief 大小比較
+  friend
+  bool
+  operator<(NpnXform left,
+	    NpnXform right);
 
 
 private:
@@ -118,13 +130,50 @@ private:
 
 };
 
+/// @brief 等価比較
+/// @param[in] left, right オペランド
+bool
+operator==(NpnXform left,
+	   NpnXform right);
+
+/// @brief 非等価比較
+/// @param[in] left, right オペランド
+bool
+operator!=(NpnXform left,
+	   NpnXform right);
+
+/// @brief 大小比較 ( < )
+/// @param[in] left, right オペランド
+bool
+operator<(NpnXform left,
+	  NpnXform right);
+
+/// @brief 大小比較 ( > )
+/// @param[in] left, right オペランド
+bool
+operator>(NpnXform left,
+	  NpnXform right);
+
+/// @brief 大小比較 ( <= )
+/// @param[in] left, right オペランド
+bool
+operator<=(NpnXform left,
+	   NpnXform right);
+
+/// @brief 大小比較 ( >= )
+/// @param[in] left, right オペランド
+bool
+operator>=(NpnXform left,
+	   NpnXform right);
 
 /// @brief 関数ベクタを変換する．
+/// @param[in] left, right オペランド
 ymuint16
 xform(ymuint16 func,
       NpnXform xf);
 
 /// @brief 内容を表示する．
+/// @param[in] left, right オペランド
 ostream&
 operator<<(ostream& s,
 	   NpnXform xf);
@@ -193,6 +242,66 @@ void
 NpnXform::flip_oinv()
 {
   mData ^= 1U;
+}
+
+// @brief 等価比較
+// @param[in] left, right オペランド
+inline
+bool
+operator==(NpnXform left,
+	   NpnXform right)
+{
+  return left.mData == right.mData;
+}
+
+// @brief 非等価比較
+// @param[in] left, right オペランド
+inline
+bool
+operator!=(NpnXform left,
+	   NpnXform right)
+{
+  return !operator==(left, right);
+}
+
+// @brief 大小比較 ( < )
+// @param[in] left, right オペランド
+inline
+bool
+operator<(NpnXform left,
+	  NpnXform right)
+{
+  return left.mData < right.mData;
+}
+
+// @brief 大小比較 ( > )
+// @param[in] left, right オペランド
+inline
+bool
+operator>(NpnXform left,
+	  NpnXform right)
+{
+  return operator<(right, left);
+}
+
+// @brief 大小比較 ( <= )
+// @param[in] left, right オペランド
+inline
+bool
+operator<=(NpnXform left,
+	   NpnXform right)
+{
+  return !operator<(right, left);
+}
+
+// @brief 大小比較 ( >= )
+// @param[in] left, right オペランド
+inline
+bool
+operator>=(NpnXform left,
+	   NpnXform right)
+{
+  return !operator<(left, right);
 }
 
 END_NAMESPACE_YM
