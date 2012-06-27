@@ -60,9 +60,9 @@ public:
   bool
   output_inv() const;
 
-  /// @brief 与えられた関数に関する同値類の代表変換を求める．
+  /// @brief 与えられた関数のサポートに関する同値類の代表変換を求める．
   NpnXform
-  rep(ymuint16 func) const;
+  rep(ymuint8 sup) const;
 
   /// @brief 生のデータを取り出す．
   /// @note 値域は 0 - 1023

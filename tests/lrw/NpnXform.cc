@@ -57,11 +57,10 @@ NpnXform::input_perm(ymuint pos) const
   return perm_table[pid][pos];
 }
 
-// @brief 与えられた関数に関する同値類の代表変換を求める．
+// @brief 与えられた関数のサポートに関する同値類の代表変換を求める．
 NpnXform
-NpnXform::rep(ymuint16 func) const
+NpnXform::rep(ymuint8 sup) const
 {
-  ymuint8 sup = support(func);
   ymuint perm = (mData >> 5) & 31U;
   ymuint pols = mData & 31U;
   ymuint rep_perm = rep_perm_table[perm][sup];

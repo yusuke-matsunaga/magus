@@ -36,6 +36,13 @@ Npn4Cannon npn4cannon[] = {
 #include "npn4cannon.h"
 };
 
+void
+print_func(ostream& s,
+	   ymuint16 func)
+{
+  s << hex << setw(4) << setfill('0') << func << dec;
+}
+
 ymuint32 n_compose;
 ymuint32 level_over;
 ymuint32 duplicate_aig;
@@ -404,6 +411,9 @@ GenPat2::compose(NpnHandle handle1,
     ymuint level1 = mMgr.count(handle);
     if ( level != level1 ) {
       cout << "error: level = " << level << ", level1 = " << level1 << endl;
+      cout << "func:" << endl;
+      print_func(cout, fv3);
+      cout << endl;
       mMgr.dump_handle(cout, handle1);
       cout << endl;
       mMgr.dump_handle(cout, handle2);
@@ -432,6 +442,9 @@ GenPat2::compose(NpnHandle handle1,
     ymuint level1 = mMgr.count(handle);
     if ( level != level1 ) {
       cout << "error: level = " << level << ", level1 = " << level1 << endl;
+      cout << "func:" << endl;
+      print_func(cout, fv4);
+      cout << endl;
       mMgr.dump_handle(cout, handle1);
       cout << endl;
       mMgr.dump_handle(cout, handle2);
@@ -460,6 +473,9 @@ GenPat2::compose(NpnHandle handle1,
     ymuint level1 = mMgr.count(handle);
     if ( level != level1 ) {
       cout << "error: level = " << level << ", level1 = " << level1 << endl;
+      cout << "func:" << endl;
+      print_func(cout, fv5);
+      cout << endl;
       mMgr.dump_handle(cout, handle1);
       cout << endl;
       mMgr.dump_handle(cout, handle2);
@@ -525,7 +541,10 @@ GenPat2::count1(NpnHandle handle)
   }
 
   NpnXform xf = handle.npn_xform();
-  NpnXform xf0 = xf.rep(node->func());
+  NpnXform xf0 = xf.rep(node->support());
+  if ( xf0.output_inv() ) {
+    xf0.flip_oinv();
+  }
   ymuint sig = (node->id() << 10) | xf0.data();
   if ( mCountHash.count(sig) > 0 ) {
     return 0;
@@ -557,7 +576,10 @@ GenPat2::count2_sub(NpnHandle handle,
   }
 
   NpnXform xf = handle.npn_xform();
-  NpnXform xf0 = xf.rep(node->func());
+  NpnXform xf0 = xf.rep(node->support());
+  if ( xf0.output_inv() ) {
+    xf0.flip_oinv();
+  }
   ymuint sig = (node->id() << 10) | xf0.data();
   if ( mCountHash.count(sig) > 0 || hash.count(sig) > 0 ) {
     return 0;
