@@ -123,6 +123,13 @@ private:
   void
   make_ident_list();
 
+  /// @brief 2つのNPN変換が両立するか調べる．
+  bool
+  check_compat(NpnXform xf0,
+	       NpnXform xf1,
+	       const vector<NpnHandle>& eq_list,
+	       const vector<pair<NpnHandle, NpnHandle> >& neq_list);
+
   /// @brief 枝を正規化する．
   NpnHandle
   cannonical(NpnHandle src);
@@ -130,6 +137,7 @@ private:
   /// @brief 新しいノードを登録する関数
   /// @param[in] is_xor XOR ノードの時 true にするフラグ
   /// @param[in] func 関数ベクタ
+  /// @param[in] oinv 出力の極性
   /// @param[in] fanin0, fanin1 ファンインのハンドル
   /// @note おなじノードが既に存在していたらそのノードを返す．
   NpnHandle

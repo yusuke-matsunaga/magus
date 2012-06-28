@@ -40,6 +40,44 @@ ymuint32 n_compose;
 ymuint32 level_over;
 ymuint32 duplicate_aig;
 
+// 関数のサポートを求める．
+ymuint
+support(ymuint16 func)
+{
+  // 数が少ないので個別にやる．
+  ymuint ans = 0U;
+
+  // 0 番めの変数
+  ymuint16 c0_0 = func & 0x5555U;
+  ymuint16 c0_1 = (func & 0xaaaaU) >> 1;
+  if ( c0_0 != c0_1 ) {
+    ans |= 1U;
+  }
+
+  // 1 番めの変数
+  ymuint16 c1_0 = func & 0x3333U;
+  ymuint16 c1_1 = (func & 0xccccU) >> 2;
+  if ( c1_0 != c1_1 ) {
+    ans |= 2U;
+  }
+
+  // 2 番めの変数
+  ymuint16 c2_0 = func & 0x0f0fU;
+  ymuint16 c2_1 = (func & 0xf0f0U) >> 4;
+  if ( c2_0 != c2_1 ) {
+    ans |= 4U;
+  }
+
+  // 3 番めの変数
+  ymuint16 c3_0 = func & 0x00ffU;
+  ymuint16 c3_1 = (func & 0xff00U) >> 8;
+  if ( c3_0 != c3_1 ) {
+    ans |= 8;
+  }
+
+  return ans;
+}
+
 END_NONAMESPACE
 
 
@@ -298,23 +336,42 @@ GenPat::compose(GpHandle handle1,
   ymuint32 fv4 = fv1_n & fv2;
   ymuint32 fv5 = fv1 ^ fv2;
 
-  bool valid1 = false;
-  if ( fv3 != 0U && fv3 != fv1 && fv3 != fv2 ) {
-    if ( (mFuncLevel[fv3] + mSlack) >= level_base + 1 ) {
-      valid1 = true;
-    }
+  ymuint sup0 = support(fv1) | support(fv2);
+
+  ymuint sup3 = support(fv3);
+  bool valid1 = true;
+  if ( sup3 != sup0 ) {
+    valid1 = false;
   }
-  bool valid2 = false;
-  if ( fv4 != 0U && fv4 != fv1_n && fv4 != fv2 ) {
-    if ( (mFuncLevel[fv4] + mSlack) >= level_base + 1 ) {
-      valid2 = true;
-    }
+  else if ( fv3 == fv1 || fv3 == fv2 ) {
+    valid1 = false;
   }
-  bool valid3 = false;
-  if ( fv5 != 0U && fv5 != 0xFFFF && fv5 != fv1 && fv5 != fv2 ) {
-    if ( (mFuncLevel[fv5] + mSlack) >= level_base + 1 ) {
-      valid3 = true;
-    }
+  else if ( (mFuncLevel[fv3] + mSlack) < level_base + 1 ) {
+    valid1 = false;
+  }
+
+  ymuint sup4 = support(fv4);
+  bool valid2 = true;
+  if ( sup4 != sup0 ) {
+    valid2 = false;
+  }
+  else if ( fv4 == fv1 || fv4 == fv2 ) {
+    valid2 = false;
+  }
+  else if ( (mFuncLevel[fv4] + mSlack) < level_base + 1 ) {
+    valid2 = false;
+  }
+
+  ymuint sup5 = support(fv5);
+  bool valid3 = true;
+  if ( sup5 != sup0 ) {
+    valid3 = false;
+  }
+  else if ( fv5 == fv1 || fv5 == fv2 ) {
+    valid3 = false;
+  }
+  else if ( (mFuncLevel[fv5] + mSlack) < level_base + 1 ) {
+    valid3 = false;
   }
 
   if ( !valid1 && !valid2 && !valid3 ) {

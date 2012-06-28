@@ -23,6 +23,51 @@ ymuint16 npn4perm[] = {
 #include "npn4perm.h"
 };
 
+// サポートごとの代表変換テーブル
+ymuint8 rep_perm_table[24][16] = {
+#include "rep_perm_table"
+};
+
+
+// 関数のサポートを求める．
+ymuint
+support(ymuint16 func)
+{
+  // 数が少ないので個別にやる．
+  ymuint ans = 0U;
+
+  // 0 番めの変数
+  ymuint16 c0_0 = func & 0x5555U;
+  ymuint16 c0_1 = (func & 0xaaaaU) >> 1;
+  if ( c0_0 != c0_1 ) {
+    ans |= 1U;
+  }
+
+  // 1 番めの変数
+  ymuint16 c1_0 = func & 0x3333U;
+  ymuint16 c1_1 = (func & 0xccccU) >> 2;
+  if ( c1_0 != c1_1 ) {
+    ans |= 2U;
+  }
+
+  // 2 番めの変数
+  ymuint16 c2_0 = func & 0x0f0fU;
+  ymuint16 c2_1 = (func & 0xf0f0U) >> 4;
+  if ( c2_0 != c2_1 ) {
+    ans |= 4U;
+  }
+
+  // 3 番めの変数
+  ymuint16 c3_0 = func & 0x00ffU;
+  ymuint16 c3_1 = (func & 0xff00U) >> 8;
+  if ( c3_0 != c3_1 ) {
+    ans |= 8;
+  }
+
+  return ans;
+}
+
+
 // @brief 関数ベクタを変換する(4入力版)
 ymuint32
 xform_func4(ymuint16 fv,
@@ -76,9 +121,14 @@ void
 get_ident(ymuint16 func,
 	  vector<ymuint16>& ident_list)
 {
+  ymuint sup = support(func);
   for (ymuint p = 0; p < 768; ++ p) {
     ymuint16 perm_data = npn4perm[p];
-    ymuint16 func1 = xform_func4(func, perm_data);
+    NpnXform xf(perm_data);
+    if ( xf.rep(sup) != xf ) {
+      continue;
+    }
+    ymuint16 func1 = xform(func, xf);
     if ( func1 == func ) {
       ident_list.push_back(perm_data);
     }

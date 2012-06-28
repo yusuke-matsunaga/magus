@@ -44,6 +44,11 @@ ymuint8 rep_perm_table[24][16] = {
 #include "rep_perm_table"
 };
 
+// 0 番めと 1 番めの順番を入れ替えるテーブル
+ymuint8 xchg2_table[24] = {
+#include "xchg2_table"
+};
+
 END_NONAMESPACE
 
 
@@ -67,12 +72,27 @@ NpnXform::rep(ymuint8 sup) const
   ymuint rep_pols = pols & ((sup << 1) | 1U);
 
   // 特別な場合の処理
-  // 入力ノードおよび入力ノードをファンインとするXORノード
-  // の場合，入力の反転属性を出力に付け替える．
-  if ( sup == 1U && rep_pols == 3U ) {
-    rep_pols = 0U;
+  // 入力ノードの場合，入力の反転属性を出力に付け替える．
+  if ( sup == 1U && rep_pols & 2U ) {
+    rep_pols ^= 3U;
   }
+
   return NpnXform(rep_perm, rep_pols);
+}
+
+// @brief 0 番めと 1番めを取り替える．
+void
+NpnXform::xchg2()
+{
+  ymuint perm = (mData >> 5) & 31U;
+  ymuint pols = mData & 31U;
+  ymuint xperm = xchg2_table[perm];
+  ymuint pols0 = pols & 2U;
+  ymuint pols1 = pols & 4U;
+  ymuint xpols = pols & ~6U;
+  xpols |= pols0 << 1;
+  xpols |= pols1 >> 1;
+  mData = (xperm << 5) | xpols;
 }
 
 // @brief 合成する．

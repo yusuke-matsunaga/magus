@@ -64,6 +64,10 @@ public:
   NpnXform
   rep(ymuint8 sup) const;
 
+  /// @brief 0 番めと 1番めを取り替える．
+  void
+  xchg2();
+
   /// @brief 生のデータを取り出す．
   /// @note 値域は 0 - 1023
   ymuint

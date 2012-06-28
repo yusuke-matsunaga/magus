@@ -51,18 +51,6 @@ private:
   npn_expand(NpnHandle handle,
 	     ymuint32 level);
 
-#if 0
-  /// @brief NpnHandle を変換する(4入力版)
-  NpnHandle
-  xform4(NpnHandle handle,
-	 NpnXform xf);
-
-  /// @brief xform4 の下請け関数
-  NpnHandle
-  xf4_sub(NpnHandle handle,
-	  NpnXform xf);
-#endif
-
   /// @brief パタンを登録する．
   /// @param[in] handle ハンドル
   /// @param[in] fv 関数ベクタ

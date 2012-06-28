@@ -144,7 +144,7 @@ GenPat2::operator()(ymuint slack)
       mMgr.dump_handle(cout, handle_list);
       cout << endl;
     }
-    if ( level == 4 ) {
+    if ( true && level == 4 ) {
       exit(0);
     }
 
@@ -344,39 +344,41 @@ GenPat2::compose(NpnHandle handle1,
   ymuint32 fv5 = fv1 ^ fv2;
 
   ymuint sup0 = support(fv1) | support(fv2);
+
   ymuint sup3 = support(fv3);
   bool valid1 = true;
   if ( sup3 != sup0 ) {
     valid1 = false;
   }
+  else if ( fv3 == fv1 || fv3 == fv2 ) {
+    valid1 = false;
+  }
+  else if ( (mFuncLevel[fv3] + mSlack) < level_base + 1 ) {
+    valid1 = false;
+  }
+
   ymuint sup4 = support(fv4);
   bool valid2 = true;
   if ( sup4 != sup0 ) {
     valid2 = false;
   }
+  else if ( fv4 == fv1 || fv4 == fv2 ) {
+    valid2 = false;
+  }
+  else if ( (mFuncLevel[fv4] + mSlack) < level_base + 1 ) {
+    valid2 = false;
+  }
+
   ymuint sup5 = support(fv5);
   bool valid3 = true;
   if ( sup5 != sup0 ) {
     valid3 = false;
   }
-#if 0
-  bool valid1 = false;
-  if ( fv3 != 0U && fv3 != fv1 && fv3 != fv2 ) {
-    if ( (mFuncLevel[fv3] + mSlack) >= level_base + 1 ) {
-      valid1 = true;
-    }
+  else if ( fv5 == fv1 || fv5 == fv2 ) {
+    valid3 = false;
   }
-  bool valid2 = false;
-  if ( fv4 != 0xFFFFU && fv4 != fv1 && fv4 != fv2 ) {
-    if ( (mFuncLevel[fv4] + mSlack) >= level_base + 1 ) {
-      valid2 = true;
-    }
-  }
-  bool valid3 = false;
-  if ( fv5 != 0U && fv5 != 0xFFFF && fv5 != fv1 && fv5 != fv2 ) {
-    if ( (mFuncLevel[fv5] + mSlack) >= level_base + 1 ) {
-      valid3 = true;
-    }
+  else if ( (mFuncLevel[fv5] + mSlack) < level_base + 1 ) {
+    valid3 = false;
   }
 
   if ( !valid1 && !valid2 && !valid3 ) {
@@ -384,11 +386,6 @@ GenPat2::compose(NpnHandle handle1,
   }
 
   ymuint level = count2(handle2) + level_base + 1;
-
-  if ( 0 ) {
-    NpnHandle tmp = mMgr.make_xor(handle1, handle2);
-    level = mMgr.count(tmp);
-  }
 
   if ( valid1 && (mFuncLevel[fv3] + mSlack) >= level ) {
     NpnHandle handle = mMgr.make_and(handle1, handle2);
@@ -404,102 +401,6 @@ GenPat2::compose(NpnHandle handle1,
     NpnHandle handle = mMgr.make_xor(handle1, handle2);
     add_pair(handle, level);
   }
-#else
-  ymuint level = count2(handle2) + level_base + 1;
-  if ( valid1 && fv3 != fv1 && fv3 != fv2 ) {
-    NpnHandle handle = mMgr.make_and(handle1, handle2);
-    ymuint level1 = mMgr.count(handle);
-    if ( level != level1 ) {
-      cout << "error: level = " << level << ", level1 = " << level1 << endl;
-      cout << "func:" << endl;
-      print_func(cout, fv3);
-      cout << endl;
-      mMgr.dump_handle(cout, handle1);
-      cout << endl;
-      mMgr.dump_handle(cout, handle2);
-      cout << endl;
-      mMgr.dump_handle(cout, handle);
-      cout << endl;
-      cout << "sup0 = " << sup0 << endl
-	   << "sup3 = " << sup3 << endl;
-      mMgr.dump_handle2(cout, handle1);
-      cout << endl;
-      mMgr.dump_handle2(cout, handle2);
-      cout << endl;
-      mMgr.dump_handle2(cout, handle);
-      cout << endl;
-      if ( level > level1 ) {
-	level = level1;
-      }
-    }
-    //assert_cond( level == level1, __FILE__, __LINE__);
-    if ( (mFuncLevel[fv3] + mSlack) >= level ) {
-      add_pair(handle, level);
-    }
-  }
-  if ( valid2 && fv4 != fv1 && fv4 != fv2 ) {
-    NpnHandle handle = mMgr.make_or(handle1, handle2);
-    ymuint level1 = mMgr.count(handle);
-    if ( level != level1 ) {
-      cout << "error: level = " << level << ", level1 = " << level1 << endl;
-      cout << "func:" << endl;
-      print_func(cout, fv4);
-      cout << endl;
-      mMgr.dump_handle(cout, handle1);
-      cout << endl;
-      mMgr.dump_handle(cout, handle2);
-      cout << endl;
-      mMgr.dump_handle(cout, handle);
-      cout << endl;
-      cout << "sup0 = " << sup0 << endl
-	   << "sup4 = " << sup4 << endl;
-      mMgr.dump_handle2(cout, handle1);
-      cout << endl;
-      mMgr.dump_handle2(cout, handle2);
-      cout << endl;
-      mMgr.dump_handle2(cout, handle);
-      cout << endl;
-      if ( level > level1 ) {
-	level = level1;
-      }
-    }
-    //assert_cond( level == level1, __FILE__, __LINE__);
-    if ( (mFuncLevel[fv4] + mSlack) >= level ) {
-      add_pair(handle, level);
-    }
-  }
-  if ( valid3 && fv5 != 0xFFFF && fv5 != fv1 && fv5 != fv2 ) {
-    NpnHandle handle = mMgr.make_xor(handle1, handle2);
-    ymuint level1 = mMgr.count(handle);
-    if ( level != level1 ) {
-      cout << "error: level = " << level << ", level1 = " << level1 << endl;
-      cout << "func:" << endl;
-      print_func(cout, fv5);
-      cout << endl;
-      mMgr.dump_handle(cout, handle1);
-      cout << endl;
-      mMgr.dump_handle(cout, handle2);
-      cout << endl;
-      mMgr.dump_handle(cout, handle);
-      cout << endl;
-      cout << "sup0 = " << sup0 << endl
-	   << "sup5 = " << sup5 << endl;
-      mMgr.dump_handle2(cout, handle1);
-      cout << endl;
-      mMgr.dump_handle2(cout, handle2);
-      cout << endl;
-      mMgr.dump_handle2(cout, handle);
-      cout << endl;
-      if ( level > level1 ) {
-	level = level1;
-      }
-    }
-    //assert_cond( level == level1, __FILE__, __LINE__);
-    if ( (mFuncLevel[fv5] + mSlack) >= level ) {
-      add_pair(handle, level);
-    }
-  }
-#endif
 }
 
 // @brief NpnHandle を登録する．
@@ -663,63 +564,6 @@ GenPat2::init_npn4rep()
     mNpnHash.insert(make_pair(fv, tmp_list));
   }
 }
-
-#if 0
-// @brief NpnHandle を変換する(4入力版)
-NpnHandle
-GenPat2::xform4(NpnHandle handle,
-		NpnXform xf)
-{
-  if ( handle.is_const1() || handle.is_const0() ) {
-    if ( xf.output_inv() ) {
-      handle = ~handle;
-    }
-    return handle;
-  }
-
-  NpnHandle handle1 = xf4_sub(handle, xf);
-  if ( xf.output_inv() ) {
-    handle1 = ~handle1;
-  }
-  return handle1;
-}
-
-// @brief xform4 の下請け関数
-NpnHandle
-GenPat2::xf4_sub(NpnHandle handle,
-		NpnXform xf)
-{
-  NpnNode* node = handle.node();
-  bool inv = handle.inv();
-
-  if (node->is_input() ) {
-    ymuint id = node->input_id();
-    ymuint new_id = xf.input_perm(id);
-    NpnHandle handle1 = mMgr.make_input(new_id);
-    if ( inv ) {
-      handle1 = ~handle1;
-    }
-    if ( xf.input_inv(id) ) {
-      handle1 = ~handle1;
-    }
-    return handle1;
-  }
-
-  NpnHandle handle1 = xf4_sub(node->fanin0(), xf);
-  NpnHandle handle2 = xf4_sub(node->fanin1(), xf);
-  NpnHandle ans;
-  if ( node->is_and() ) {
-    ans = mMgr.make_and(handle1, handle2);
-  }
-  else {
-    ans = mMgr.make_xor(handle1, handle2);
-  }
-  if ( inv ) {
-    ans = ~ans;
-  }
-  return ans;
-}
-#endif
 
 // @brief 関数ごとのレベルの上限をセットする．
 void
