@@ -64,12 +64,36 @@ public:
   LcPatNode*
   fanin(ymuint pos) const;
 
+  /// @brief AND/XOR の時にファンイン0のノードを返す．
+  LcPatNode*
+  fanin0() const;
+
+  /// @brief AND/XOR の時にファンイン1のノードを返す．
+  LcPatNode*
+  fanin1() const;
+
   /// @brief AND/XOR の時にファンインの極性を返す．
   /// @param[in] pos 位置 ( 0 or 1 )
   /// @retval true 反転あり
   /// @retval false 反転なし
   bool
   fanin_inv(ymuint pos) const;
+
+  /// @brief AND/XOR の時にファンイン0の極性を返す．
+  /// @retval true 反転あり
+  /// @retval false 反転なし
+  bool
+  fanin_inv0() const;
+
+  /// @brief AND/XOR の時にファンイン1の極性を返す．
+  /// @retval true 反転あり
+  /// @retval false 反転なし
+  bool
+  fanin_inv1() const;
+
+  /// @brief シグネチャを返す．
+  const string&
+  signature() const;
 
 
 private:
@@ -125,6 +149,9 @@ private:
   //  + ファンインの極性 ( 1bit x 2)
   ymuint32 mType;
 
+  // シグネチャ
+  string mSignature;
+
   // lock ビット
   bool mLocked;
 
@@ -135,6 +162,123 @@ private:
   LcPatNode* mLink;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief ノード番号を返す．
+inline
+ymuint
+LcPatNode::id() const
+{
+  return mId;
+}
+
+// @brief 'lock' 状態を得る．
+inline
+bool
+LcPatNode::is_locked() const
+{
+  return mLocked;
+}
+
+// @brief 入力の時 true を返す．
+inline
+bool
+LcPatNode::is_input() const
+{
+  return ((mType & 3U) == kInput);
+}
+
+// @brief AND の時 true を返す．
+inline
+bool
+LcPatNode::is_and() const
+{
+  return ((mType & 3U) == kAnd);
+}
+
+// @brief XOR の時 true を返す．
+inline
+bool
+LcPatNode::is_xor() const
+{
+  return ((mType & 3U) == kXor);
+}
+
+// @brief 入力の時に入力番号を返す．
+inline
+ymuint
+LcPatNode::input_id() const
+{
+  return mType >> 2;
+}
+
+// @brief AND/XOR の時にファンインのノードを返す．
+// @param[in] pos 位置 ( 0 or 1 )
+inline
+LcPatNode*
+LcPatNode::fanin(ymuint pos) const
+{
+  return mFanin[pos];
+}
+
+// @brief AND/XOR の時にファンイン0のノードを返す．
+inline
+LcPatNode*
+LcPatNode::fanin0() const
+{
+  return mFanin[0];
+}
+
+// @brief AND/XOR の時にファンイン1のノードを返す．
+inline
+LcPatNode*
+LcPatNode::fanin1() const
+{
+  return mFanin[1];
+}
+
+// @brief AND/XOR の時にファンインの極性を返す．
+// @param[in] pos 位置 ( 0 or 1 )
+// @retval true 反転あり
+// @retval false 反転なし
+inline
+bool
+LcPatNode::fanin_inv(ymuint pos) const
+{
+  return static_cast<bool>((mType >> (pos + 2)) & 1U);
+}
+
+// @brief AND/XOR の時にファンイン0の極性を返す．
+// @retval true 反転あり
+// @retval false 反転なし
+inline
+bool
+LcPatNode::fanin_inv0() const
+{
+  return static_cast<bool>((mType >> 2) & 1U);
+}
+
+// @brief AND/XOR の時にファンイン1の極性を返す．
+// @retval true 反転あり
+// @retval false 反転なし
+inline
+bool
+LcPatNode::fanin_inv1() const
+{
+  return static_cast<bool>((mType >> 3) & 1U);
+}
+
+// @brief シグネチャを返す．
+inline
+const string&
+LcPatNode::signature() const
+{
+  return mSignature;
+}
 
 END_NAMESPACE_YM_CELL_LIBCOMP
 

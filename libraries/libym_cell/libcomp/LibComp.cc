@@ -122,6 +122,28 @@ LibComp::compile(const CellLibrary& library)
     LogExpr xor_ex = lit0 ^ lit1;
     reg_expr(xor_ex);
   }
+  // MUX2 のパタンを登録しておく．
+  {
+    LogExpr lit0 = LogExpr::make_posiliteral(VarId(0));
+    LogExpr lit1 = LogExpr::make_posiliteral(VarId(1));
+    LogExpr lit2 = LogExpr::make_posiliteral(VarId(2));
+    LogExpr mux2_ex = lit0 & ~lit2 | lit1 & lit2;
+    reg_expr(mux2_ex);
+  }
+  // MUX4 のパタンを登録しておく．
+  {
+    LogExpr lit0 = LogExpr::make_posiliteral(VarId(0));
+    LogExpr lit1 = LogExpr::make_posiliteral(VarId(1));
+    LogExpr lit2 = LogExpr::make_posiliteral(VarId(2));
+    LogExpr lit3 = LogExpr::make_posiliteral(VarId(3));
+    LogExpr lit4 = LogExpr::make_posiliteral(VarId(4));
+    LogExpr lit5 = LogExpr::make_posiliteral(VarId(5));
+    LogExpr mux4_ex = lit0 & ~lit4 & ~lit5 |
+      lit1 & lit4 & ~lit5 |
+      lit2 & ~lit4 & lit5 |
+      lit3 & lit4 & lit5;
+    reg_expr(mux4_ex);
+  }
 
   ymuint nc = library.cell_num();
   for (ymuint i = 0; i < nc; ++ i) {
@@ -131,7 +153,12 @@ LibComp::compile(const CellLibrary& library)
       mLogicMgr.add_cell(cell);
 
       // パタンを作る．
+      ymuint ni2 = cell->input_num2();
       ymuint no2 = cell->output_num2();
+      if ( ni2 > 8 ) {
+	// 入力ピンが8つ以上のセルは対象外
+	continue;
+      }
       if ( no2 != 1 ) {
 	// 出力ピンが複数あるセルは対象外
 	continue;

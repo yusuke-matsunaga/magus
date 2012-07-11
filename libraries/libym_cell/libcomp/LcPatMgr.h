@@ -97,6 +97,12 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 2つの論理式が等しいかどうか調べる．
+  static
+  bool
+  check_equivalent(const LogExpr& expr1,
+		   const LogExpr& expr2);
+
   /// @brief 使われていないパタンとノードを削除してID番号を詰める．
   /// @note 同時に入力ノードの入力番号とノード番号を一致させる．
   void
@@ -109,19 +115,24 @@ private:
   pg_sub(const LogExpr& expr,
 	 vector<LcPatHandle>& pg_list);
 
-  /// pg_list に new_handle を追加する．
-  /// ただし，同形のパタンがすでにある場合には追加しない．
+  /// @brief pg_list に new_handle を追加する．
+  /// @note ただし，同形のパタンがすでにある場合には追加しない．
   static
   void
   add_pg_list(vector<LcPatHandle>& pg_list,
+	      hash_set<string>& pg_hash,
 	      LcPatHandle new_handle);
 
-  /// @brief 同形か調べる．
-  /// @param[in] node1, node2 根のノード
-  static
-  bool
-  check_isomorphic(const LcPatNode* node1,
-		   const LcPatNode* node2);
+  /// @brief テンプレートにしたがって2分木を作る．
+  /// @param[in] expr 論理式 (演算の種類を表すのに用いる)
+  /// @param[in] input 入力の配列
+  /// @param[in] pat 2分木の形を表す配列
+  /// @param[inout] pos pat[] 中の位置を示す変数
+  LcPatHandle
+  make_bintree(const LogExpr& expr,
+	       const vector<LcPatHandle>& input,
+	       int pat[],
+	       ymuint& pos);
 
   /// @brief 入力ノードを作る．
   /// @param[in] var 入力変数
@@ -129,14 +140,9 @@ private:
   LcPatNode*
   make_input(VarId var);
 
-  /// @brief テンプレートにしたがって2分木を作る．
-  LcPatHandle
-  make_bintree(const LogExpr& expr,
-	       const vector<LcPatHandle>& input,
-	       int pat[],
-	       ymuint& pos);
-
   /// @brief 論理式の種類に応じてノードを作る．
+  /// @param[in] expr 論理式 (演算の種類を表すのに用いる)
+  /// @param[in] l_handle, r_handle 左右の子供のパタン
   LcPatHandle
   make_node(const LogExpr& expr,
 	    LcPatHandle l_handle,
@@ -240,6 +246,10 @@ private:
   // 代表関数番号のリスト
   // 配列のインデックスはパタン番号
   vector<ymuint32> mRepList;
+
+  // 処理済みの論理式を収めたリストの配列
+  // 配列のキーは代表関数番号
+  vector<vector<LogExpr> > mExprList;
 
 };
 
