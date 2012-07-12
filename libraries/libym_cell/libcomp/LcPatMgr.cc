@@ -124,7 +124,6 @@ LcPatMgr::reg_pat(const LogExpr& expr,
   pg_sub(expr, tmp_pat_list);
 
   // 重複チェック
-  // 今は2乗オーダーのバカなアルゴリズムを使っている．
   hash_set<string> pg_hash;
   ymuint n = mPatList.size();
   for (ymuint i = 0; i < n; ++ i) {

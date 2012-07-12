@@ -59,6 +59,7 @@ LibComp::LibComp() :
   mFFMgr(*this),
   mLatchMgr(*this)
 {
+  mMux4Id = 0xFFFFFFFFU;
 }
 
 // @brief デストラクタ
@@ -113,6 +114,7 @@ LibComp::compile(const CellLibrary& library)
   mFFMgr.init();
   mLatchMgr.init();
   mPatMgr.init();
+  mMux4Id = 0xFFFFFFFFU;
 
   // XOR のパタンを登録しておく．
   // これはちょっとしたハック
@@ -143,6 +145,11 @@ LibComp::compile(const CellLibrary& library)
       lit2 & ~lit4 & lit5 |
       lit3 & lit4 & lit5;
     reg_expr(mux4_ex);
+
+    TvFunc f = mux4_ex.make_tv();
+    LcGroup* fgroup = mLogicMgr.find_group(TvFuncM(f));
+    const LcClass* fclass = fgroup->parent();
+    mMux4Id = fclass->id();
   }
 
   ymuint nc = library.cell_num();
@@ -260,6 +267,11 @@ LibComp::reg_expr(const LogExpr& expr)
   TvFunc f = expr.make_tv();
   LcGroup* fgroup = mLogicMgr.find_group(TvFuncM(f));
   const LcClass* fclass = fgroup->parent();
+
+  if ( fclass->id() == mMux4Id ) {
+    // かなり苦しいハック
+    return;
+  }
 
   // fclass->rep_func() を用いる理由は論理式に現れる変数が
   // 真のサポートとは限らないから
