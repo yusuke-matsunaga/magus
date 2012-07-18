@@ -149,6 +149,81 @@ ImpValList::cap_merge(const ImpValList& src1,
 		      const ImpValList& src2)
 {
   sanity_check();
+
+#if 0
+  // special case
+  {
+    Cell* src0_cell = mDummyTop.mLink;
+    Cell* src1_cell = src1.mDummyTop.mLink;
+    bool p_found = false;
+    bool n_found = false;
+    while ( src0_cell != NULL && src1_cell != NULL ) {
+      ymuint id0 = src0_cell->mVal.id();
+      ymuint id1 = src1_cell->mVal.id();
+      if ( id0 < id1 ) {
+	src0_cell = src0_cell->mLink;
+      }
+      else if ( id0 > id1 ) {
+	src1_cell = src1_cell->mLink;
+      }
+      else { // id0 == id1
+	if ( src0_cell->mVal.val() == src1_cell->mVal.val() ) {
+	  // 同相で同じ
+	  p_found = true;
+	  break;
+	}
+	else {
+	  // 逆相で同じ
+	  n_found = true;
+	}
+	break;
+      }
+    }
+    if ( p_found ) {
+      return;
+    }
+    if ( n_found ) {
+      merge(src2);
+      return;
+    }
+  }
+  {
+    Cell* src0_cell = mDummyTop.mLink;
+    Cell* src1_cell = src2.mDummyTop.mLink;
+    bool p_found = false;
+    bool n_found = false;
+    while ( src0_cell != NULL && src1_cell != NULL ) {
+      ymuint id0 = src0_cell->mVal.id();
+      ymuint id1 = src1_cell->mVal.id();
+      if ( id0 < id1 ) {
+	src0_cell = src0_cell->mLink;
+      }
+      else if ( id0 > id1 ) {
+	src1_cell = src1_cell->mLink;
+      }
+      else { // id0 == id1
+	if ( src0_cell->mVal.val() == src1_cell->mVal.val() ) {
+	  // 同相で同じ
+	  p_found = true;
+	  break;
+	}
+	else {
+	  // 逆相で同じ
+	  n_found = true;
+	}
+	break;
+      }
+    }
+    if ( p_found ) {
+      return;
+    }
+    if ( n_found ) {
+      merge(src1);
+      return;
+    }
+  }
+#endif
+
   Cell* prev = &mDummyTop;
   Cell* cell = NULL;
   Cell* src1_cell = src1.mDummyTop.mLink;
