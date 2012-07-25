@@ -194,12 +194,12 @@ VlWriter::put_elem(const char* name,
 		   int lsb,
 		   int msb)
 {
-  put_elem(name);
-  put_str("[");
+  put_str(" [");
   put_num(lsb);
   put_str(":");
   put_num(msb);
   put_str("]");
+  put_elem(name);
 }
 
 // @bried 宣言要素を出力する(範囲指定付き)
