@@ -143,6 +143,11 @@ bool
 operator>=(NpnHandle left,
 	   NpnHandle right);
 
+/// @brief ストリーム出力
+ostream&
+operator<<(ostream& s,
+	   NpnHandle handle);
+
 
 //////////////////////////////////////////////////////////////////////
 /// @class NpnNode NpnNode.h "NpnNode.h"
@@ -375,6 +380,18 @@ operator>=(NpnHandle left,
 	   NpnHandle right)
 {
   return !operator<(left, right);
+}
+
+// @brief ストリーム出力
+inline
+ostream&
+operator<<(ostream& s,
+	   NpnHandle handle)
+{
+  ymuint id = handle.node_id();
+  NpnXform xf = handle.npn_xform();
+  s << xf << ": NODE#" << id;
+  return s;
 }
 
 // @brief コンストラクタ

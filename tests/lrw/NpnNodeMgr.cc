@@ -43,6 +43,8 @@ print_func(ostream& s,
   s << hex << setw(4) << setfill('0') << func << dec;
 }
 
+bool debug_check_compat = false;
+
 END_NONAMESPACE
 
 
@@ -275,78 +277,33 @@ support(ymuint16 func)
 }
 
 void
-mark1(NpnNodeMgr* mgr,
-      ymuint id,
-      hash_set<ymuint32>& node_hash)
+print_lists(ostream& s,
+	    const vector<NpnHandle>& handle_list,
+	    const vector<pair<NpnHandle, NpnHandle> >& sym_list)
 {
-  NpnNode* node = mgr->node(id);
-  if ( true && !node->is_logic() ) {
-    return;
+  if ( !sym_list.empty() ) {
+    s << "sym_list:" << endl;
+    for (vector<pair<NpnHandle, NpnHandle> >::const_iterator q =
+	   sym_list.begin();
+	 q != sym_list.end(); ++ q) {
+      NpnHandle h0 = q->first;
+      NpnHandle h1 = q->second;
+      s << "   {" << h0 << ", " << h1 << "}" << endl;
+    }
+    s << endl;
   }
-
-  if ( node_hash.count(id) > 0 ) {
-    return;
+  if ( !handle_list.empty() ) {
+    s << "handle_list:" << endl;
+    for (vector<NpnHandle>::const_iterator q = handle_list.begin();
+	 q != handle_list.end(); ++ q) {
+      s << "  " << *q << endl;
+    }
+    s << endl;
   }
-  node_hash.insert(id);
-
-  if ( node->is_logic() ) {
-    mark1(mgr, node->fanin0().node_id(), node_hash);
-    mark1(mgr, node->fanin1().node_id(), node_hash);
-  }
-}
-
-void
-mark2(NpnNodeMgr* mgr,
-      ymuint id,
-      hash_set<ymuint32>& node_hash,
-      hash_set<ymuint32>& node_hash2,
-      vector<ymuint32>& node_list)
-{
-  NpnNode* node = mgr->node(id);
-  if ( true && !node->is_logic() ) {
-    return;
-  }
-
-  if ( node_hash2.count(id) > 0 ) {
-    return;
-  }
-  node_hash2.insert(id);
-
-  if ( node_hash.count(id) > 0 ) {
-    node_list.push_back(id);
-  }
-
-  if ( node->is_logic() ) {
-    mark2(mgr, node->fanin0().node_id(), node_hash, node_hash2, node_list);
-    mark2(mgr, node->fanin1().node_id(), node_hash, node_hash2, node_list);
-  }
-}
-
-void
-mark3(NpnNodeMgr* mgr,
-      ymuint id0,
-      NpnHandle handle,
-      hash_set<ymuint32>& handle_hash,
-      vector<NpnHandle>& handle_list)
-{
-  ymuint sig = handle.hash();
-  if ( handle_hash.count(sig) > 0 ) {
-    return;
-  }
-  handle_hash.insert(sig);
-
-  ymuint id = handle.node_id();
-  if ( id == id0 ) {
-    handle_list.push_back(handle);
-  }
-
-  NpnXform xf = handle.npn_xform();
-  NpnNode* node = mgr->node(id);
-  mark3(mgr, id0, node->fanin0() * xf, handle_hash, handle_list);
-  mark3(mgr, id0, node->fanin1() * xf, handle_hash, handle_list);
 }
 
 END_NONAMESPACE
+
 
 // @brief 新しいノードを登録する関数
 // @param[in] is_xor XOR ノードの時 true にするフラグ
@@ -361,6 +318,8 @@ NpnNodeMgr::new_node(bool is_xor,
 		     NpnHandle fanin0,
 		     NpnHandle fanin1)
 {
+  bool debug = false;
+
   NpnHandle orig_fanin0 = fanin0;
   NpnHandle orig_fanin1 = fanin1;
   NpnXform oxf;
@@ -369,7 +328,10 @@ NpnNodeMgr::new_node(bool is_xor,
     func ^= 0xFFFFU;
     oxf.flip_oinv();
   }
-  if ( 0 ) { // デバッグ用の表示
+
+  debug = (func == 0x2ac0);
+
+  if ( debug ) { // デバッグ用の表示
     cout << "=======<<new_node>>========================================" << endl;
     cout << "func: ";
     print_func(cout, func);
@@ -405,37 +367,53 @@ NpnNodeMgr::new_node(bool is_xor,
     cout << endl;
   }
 
+  debug_check_compat = (func == 0x2ac0);
+
   // fanin0 と fanin1 に共通なノードを求める．
   vector<NpnHandle> eq_list;
   vector<pair<NpnHandle, NpnHandle> > neq_list;
+  vector<pair<NpnHandle, NpnHandle> > symeq0_list;
+  vector<pair<NpnHandle, NpnHandle> > symeq1_list;
+  vector<pair<NpnHandle, NpnHandle> > ssymeq_list;
   {
+    bool debug_eq_list = false;
+
+    if ( func == 0x2ac0 ) {
+      debug_eq_list = true;
+    }
+
     hash_set<ymuint32> node_hash;
     vector<ymuint32> node_list;
-    mark1(this, fanin0.node_id(), node_hash);
+    mark1(fanin0, node_hash);
     hash_set<ymuint32> node_hash2;
-    mark2(this, fanin1.node_id(), node_hash, node_hash2, node_list);
+    mark2(fanin1, node_hash, node_hash2, node_list);
     for (vector<ymuint32>::const_iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
       ymuint id = *p;
+
       // Node#(id) に関する fanin0 と fanin1 の組を求める．
-      hash_set<ymuint32> handle_hash;
       vector<NpnHandle> handle_list0;
-      mark3(this, id, fanin0, handle_hash, handle_list0);
-      handle_hash.clear();
+      vector<pair<NpnHandle, NpnHandle> > sym_list0;
+      make_list(id, fanin0, handle_list0, sym_list0);
+      if ( debug_eq_list ) {
+	cout << "fanin0:" << endl;
+	print_lists(cout, handle_list0, sym_list0);
+      }
+
       vector<NpnHandle> handle_list1;
-      mark3(this, id, fanin1, handle_hash, handle_list1);
+      vector<pair<NpnHandle, NpnHandle> > sym_list1;
+      make_list(id, fanin1, handle_list1, sym_list1);
+      if ( debug_eq_list ) {
+	cout << "fanin1:" << endl;
+	print_lists(cout, handle_list1, sym_list1);
+      }
+
       for (vector<NpnHandle>::iterator q = handle_list0.begin();
 	   q != handle_list0.end(); ++ q) {
-	NpnHandle h0 = cannonical(*q);
-	if ( h0.oinv() ) {
-	  h0 = ~h0;
-	}
+	NpnHandle h0 = *q;
 	for (vector<NpnHandle>::iterator r = handle_list1.begin();
 	     r != handle_list1.end(); ++ r) {
-	  NpnHandle h1 = cannonical(*r);
-	  if ( h1.oinv() ) {
-	    h1 = ~h1;
-	  }
+	  NpnHandle h1 = *r;
 	  if ( h0 == h1 ) {
 	    eq_list.push_back(h0);
 	  }
@@ -443,28 +421,134 @@ NpnNodeMgr::new_node(bool is_xor,
 	    neq_list.push_back(make_pair(h0, h1));
 	  }
 	}
+	for (vector<pair<NpnHandle, NpnHandle> >::iterator r = sym_list1.begin();
+	     r != sym_list1.end(); ++ r) {
+	  NpnHandle h1 = r->first;
+	  NpnHandle h2 = r->second;
+	  if ( h0 == h1 ) {
+	    symeq1_list.push_back(make_pair(h0, h2));
+	  }
+	  else if ( h0 == h2 ) {
+	    symeq1_list.push_back(make_pair(h0, h1));
+	  }
+	  else {
+	    neq_list.push_back(make_pair(h0, h1));
+	    neq_list.push_back(make_pair(h0, h2));
+	  }
+	}
+      }
+      for (vector<pair<NpnHandle, NpnHandle> >::iterator q = sym_list0.begin();
+	   q != sym_list0.end(); ++ q) {
+	NpnHandle h0 = q->first;
+	NpnHandle h1 = q->second;
+	for (vector<NpnHandle>::iterator r = handle_list1.begin();
+	     r != handle_list1.end(); ++ r) {
+	  NpnHandle h2 = *r;
+	  if ( h0 == h2 ) {
+	    symeq0_list.push_back(make_pair(h0, h1));
+	  }
+	  else if ( h1 == h2 ) {
+	    symeq0_list.push_back(make_pair(h1, h0));
+	  }
+	  else {
+	    neq_list.push_back(make_pair(h0, h2));
+	    neq_list.push_back(make_pair(h1, h2));
+	  }
+	}
+	for (vector<pair<NpnHandle, NpnHandle> >::iterator r = sym_list1.begin();
+	     r != sym_list1.end(); ++ r) {
+	  NpnHandle h2 = r->first;
+	  NpnHandle h3 = r->second;
+	  if ( h0 == h2 ) {
+	    if ( h1 != h3 ) {
+	      ssymeq_list.push_back(make_pair(h0, h1));
+	      ssymeq_list.push_back(make_pair(h2, h3));
+	    }
+	  }
+	  else if ( h0 == h3 ) {
+	    assert_cond( h1 != h2, __FILE__, __LINE__);
+	    ssymeq_list.push_back(make_pair(h0, h1));
+	    ssymeq_list.push_back(make_pair(h2, h3));
+	  }
+	  else if ( h1 == h2 ) {
+	    ssymeq_list.push_back(make_pair(h0, h1));
+	    ssymeq_list.push_back(make_pair(h2, h3));
+	  }
+	  else if ( h1 == h3 ) {
+	    ssymeq_list.push_back(make_pair(h0, h1));
+	    ssymeq_list.push_back(make_pair(h2, h3));
+	  }
+	  else {
+	    neq_list.push_back(make_pair(h0, h2));
+	    neq_list.push_back(make_pair(h1, h2));
+	    neq_list.push_back(make_pair(h0, h3));
+	    neq_list.push_back(make_pair(h1, h3));
+	  }
+	}
       }
     }
-  }
-  if ( 0 ) {
-    cout << " eq_list:" << endl;
-    for (vector<NpnHandle>::const_iterator p = eq_list.begin();
-	 p != eq_list.end(); ++ p) {
-      NpnHandle h = *p;
-      dump_handle(cout, h);
+    if ( debug_eq_list ) {
+      cout << " eq_list:" << endl;
+      for (vector<NpnHandle>::const_iterator p = eq_list.begin();
+	   p != eq_list.end(); ++ p) {
+	NpnHandle h = *p;
+	dump_handle(cout, h);
+      }
+      cout << endl;
+      cout << " neq_list:" << endl;
+      for (vector<pair<NpnHandle, NpnHandle> >::const_iterator p = neq_list.begin();
+	   p != neq_list.end(); ++ p) {
+	NpnHandle h0 = p->first;
+	NpnHandle h1 = p->second;
+	vector<NpnHandle> tmp_handles;
+	tmp_handles.push_back(h0);
+	tmp_handles.push_back(h1);
+	dump_handle(cout, tmp_handles);
+      }
+      cout << endl;
+      cout << " symeq0_list:" << endl;
+      for (vector<pair<NpnHandle, NpnHandle> >::const_iterator p
+	     = symeq0_list.begin();
+	   p != symeq0_list.end(); ++ p) {
+	NpnHandle h0 = p->first;
+	NpnHandle h1 = p->second;
+	vector<NpnHandle> tmp_handles;
+	tmp_handles.push_back(h0);
+	tmp_handles.push_back(h1);
+	dump_handle(cout, tmp_handles);
+      }
+      cout << endl;
+      cout << " symeq1_list:" << endl;
+      for (vector<pair<NpnHandle, NpnHandle> >::const_iterator p
+	     = symeq1_list.begin();
+	   p != symeq1_list.end(); ++ p) {
+	NpnHandle h0 = p->first;
+	NpnHandle h1 = p->second;
+	vector<NpnHandle> tmp_handles;
+	tmp_handles.push_back(h0);
+	tmp_handles.push_back(h1);
+	dump_handle(cout, tmp_handles);
+      }
+      cout << endl;
+      cout << " ssymeq_list:" << endl;
+      for (vector<pair<NpnHandle, NpnHandle> >::const_iterator p
+	     = ssymeq_list.begin();
+	   p != ssymeq_list.end(); ++ p) {
+	NpnHandle h0 = p->first;
+	NpnHandle h1 = p->second;
+	vector<NpnHandle> tmp_handles;
+	tmp_handles.push_back(h0);
+	tmp_handles.push_back(h1);
+	dump_handle(cout, tmp_handles);
+      }
+      cout << endl;
+      cout << endl;
     }
-    cout << endl;
-    cout << " neq_list:" << endl;
-    for (vector<pair<NpnHandle, NpnHandle> >::const_iterator p = neq_list.begin();
-	 p != neq_list.end(); ++ p) {
-      NpnHandle h0 = p->first;
-      NpnHandle h1 = p->second;
-      vector<NpnHandle> tmp_handles;
-      tmp_handles.push_back(h0);
-      tmp_handles.push_back(h1);
-      dump_handle(cout, tmp_handles);
-    }
-    cout << endl << endl;
+    NpnXform xf0;
+    NpnXform xf1;
+    bool stat = check_compat(xf0, xf1, eq_list, neq_list,
+			     symeq0_list, symeq1_list, ssymeq_list);
+    assert_cond( stat, __FILE__, __LINE__);
   }
 
   // Phase-1: f = g0 o g1 ( o は AND/XOR ) の同位体変換のうち
@@ -521,7 +605,7 @@ NpnNodeMgr::new_node(bool is_xor,
     }
   }
   if ( 0 ) { // デバッグ用の表示
-    cout << "=======<<new_node: Phase-1>>===================================" << endl;
+    cout << "=======<<new_node: Phase-1>>==========================" << endl;
     cout << "func: ";
     print_func(cout, func);
     cout << endl;
@@ -589,15 +673,27 @@ NpnNodeMgr::new_node(bool is_xor,
 	 p != ident_list0.end(); ++ p) {
       NpnXform xf0 = cxf0 * (*p) * inv_cxf0;
       xf0 = xf0.rep(sup0);
+      if ( debug ) {
+	cout << "xf0: " << xf0 << endl;
+      }
       // もとの構造と等価な構造を持つかチェックする．
       bool valid = false;
       for (vector<NpnXform>::const_iterator q = ident_list1.begin();
 	   q != ident_list1.end(); ++ q) {
 	NpnXform xf1 = cxf1 * (*q) * inv_cxf1;
 	xf1 = xf1.rep(sup1);
-	if ( check_compat(xf0, xf1, eq_list, neq_list) ) {
+	if ( debug ) {
+	  cout << "  xf1: " << xf1 << endl;
+	}
+	if ( check_compat(xf0, xf1, eq_list, neq_list,
+			  symeq0_list, symeq1_list, ssymeq_list) ) {
 	  valid = true;
 	  break;
+	}
+	else {
+	  if ( debug ) {
+	    cout << "  invalid" << endl;
+	  }
 	}
       }
       if ( !valid ) {
@@ -605,6 +701,9 @@ NpnNodeMgr::new_node(bool is_xor,
       }
 
       NpnHandle xfanin0 = cannonical(fanin0 * xf0);
+      if ( debug ) {
+	cout << "xfanin0: " << xfanin0 << endl;
+      }
       bool oinv = false;
       if ( is_xor && xfanin0.oinv() ) {
 	xfanin0 = ~xfanin0;
@@ -625,7 +724,7 @@ NpnNodeMgr::new_node(bool is_xor,
       }
       assert_cond( this->func(min_fanin0) == tmp_func0, __FILE__, __LINE__);
     }
-    if ( 0 ) {
+    if ( debug ) {
       cout << "min_fanin0:" << endl;
       dump_handle(cout, min_fanin0);
     }
@@ -636,10 +735,20 @@ NpnNodeMgr::new_node(bool is_xor,
 	 p != ident_list1.end(); ++ p) {
       NpnXform xf1 = cxf1 * (*p) * inv_cxf1;
       xf1 = xf1.rep(sup1);
-      if ( !check_compat(min_xf0, xf1, eq_list, neq_list) ) {
+      if ( debug ) {
+	cout << "xf1: " << xf1 << endl;
+      }
+      if ( !check_compat(min_xf0, xf1, eq_list, neq_list,
+			 symeq0_list, symeq1_list, ssymeq_list) ) {
+	if ( debug ) {
+	  cout << "  invalid" << endl;
+	}
 	continue;
       }
       NpnHandle xfanin1 = cannonical(fanin1 * xf1);
+      if ( debug ) {
+	cout << "xfanin1: " << xfanin1 << endl;
+      }
       bool oinv = false;
       if ( is_xor && xfanin1.oinv() ) {
 	xfanin1 = ~xfanin1;
@@ -660,6 +769,10 @@ NpnNodeMgr::new_node(bool is_xor,
       }
       assert_cond( this->func(min_fanin1) == tmp_func1, __FILE__, __LINE__);
     }
+    if ( debug ) {
+      cout << "min_fanin1:" << endl;
+      dump_handle(cout, min_fanin1);
+    }
 
     if ( min_fanin0 < min_fanin1 ) {
       fanin0 = min_fanin0;
@@ -674,8 +787,8 @@ NpnNodeMgr::new_node(bool is_xor,
       func ^= 0xFFFF;
     }
   }
-  if ( 0 ) { // デバッグ用の表示
-    cout << "=======<<new_node: Phase-2>>===================================" << endl;
+  if ( debug ) { // デバッグ用の表示
+    cout << "=======<<new_node: Phase-2>>===============================" << endl;
     cout << "func: ";
     print_func(cout, func);
     cout << endl;
@@ -749,7 +862,7 @@ NpnNodeMgr::new_node(bool is_xor,
     if ( node->mFanin[0] == fanin0 &&
 	 node->mFanin[1] == fanin1 &&
 	 (node->mId & 3U) == type_pat ) {
-      if ( 0 ) {
+      if ( debug ) {
 	cout << "node->id() = " << node->id()
 	     << ", xf = " << oxf << endl
 	     << "=====<<new_node end>>======================================" << endl;
@@ -774,7 +887,7 @@ NpnNodeMgr::new_node(bool is_xor,
   mHashTable[idx] = node;
   mAndList.push_back(node);
 
-  if ( 0 ) {
+  if ( debug ) {
     cout << "node->id() = " << node->id()
 	 << ", xf = " << oxf << endl;
     dump_handle(cout, NpnHandle(node->id(), oxf));
@@ -784,14 +897,161 @@ NpnNodeMgr::new_node(bool is_xor,
   return NpnHandle(node->id(), oxf);
 }
 
+void
+NpnNodeMgr::make_list(ymuint id0,
+		      NpnHandle handle,
+		      vector<NpnHandle>& handle_list,
+		      vector<pair<NpnHandle, NpnHandle> >& sym_list)
+{
+  hash_set<ymuint32> handle_hash;
+
+  handle = cannonical(handle);
+  if ( handle.oinv() ) {
+    handle = ~handle;
+  }
+
+  if ( handle.node_id() == id0 ) {
+    handle_list.push_back(handle);
+  }
+  vector<pair<NpnHandle, NpnHandle> > tmp_sym_list;
+  mark3(id0, handle, handle_hash, handle_list, tmp_sym_list);
+
+  // かなり手抜きの鈍いコード
+
+  // tmp_sym_list の重複を取り除く
+  sort(tmp_sym_list.begin(), tmp_sym_list.end());
+  vector<pair<NpnHandle, NpnHandle> >::iterator sym_end =
+    unique(tmp_sym_list.begin(), tmp_sym_list.end());
+
+  for (vector<pair<NpnHandle, NpnHandle> >::iterator p = tmp_sym_list.begin();
+       p != sym_end; ++ p) {
+    NpnHandle h0 = p->first;
+    NpnHandle h1 = p->second;
+    if ( find(handle_list.begin(), handle_list.end(), h0) != handle_list.end() ||
+	 find(handle_list.begin(), handle_list.end(), h1) != handle_list.end() ) {
+      handle_list.push_back(h0);
+      handle_list.push_back(h1);
+      continue;
+    }
+    vector<pair<NpnHandle, NpnHandle> >::iterator q = p;
+    ++ q;
+    bool found = false;
+    for ( ; q != sym_end; ++ q) {
+      if ( h0 == q->first || h0 == q->second ||
+	   h1 == q->first || h1 == q->second ) {
+	found = true;
+	break;
+      }
+    }
+    if ( found ) {
+      handle_list.push_back(h0);
+      handle_list.push_back(h1);
+      continue;
+    }
+    sym_list.push_back(*p);
+  }
+  sort(handle_list.begin(), handle_list.end());
+  vector<NpnHandle>::iterator h_end =
+    unique(handle_list.begin(), handle_list.end());
+  handle_list.erase(h_end, handle_list.end());
+}
+
+void
+NpnNodeMgr::mark1(NpnHandle handle,
+		  hash_set<ymuint32>& node_hash)
+{
+  ymuint id = handle.node_id();
+  if ( node_hash.count(id) > 0 ) {
+    return;
+  }
+  node_hash.insert(id);
+
+  NpnNode* node = this->node(id);
+  if ( node->is_logic() ) {
+    mark1(node->fanin0(), node_hash);
+    mark1(node->fanin1(), node_hash);
+  }
+}
+
+void
+NpnNodeMgr::mark2(NpnHandle handle,
+		  hash_set<ymuint32>& node_hash,
+		  hash_set<ymuint32>& node_hash2,
+		  vector<ymuint32>& node_list)
+{
+  ymuint id = handle.node_id();
+  if ( node_hash2.count(id) > 0 ) {
+    return;
+  }
+  node_hash2.insert(id);
+
+  if ( node_hash.count(id) > 0 ) {
+    node_list.push_back(id);
+  }
+
+  NpnNode* node = this->node(id);
+  if ( node->is_logic() ) {
+    mark2(node->fanin0(), node_hash, node_hash2, node_list);
+    mark2(node->fanin1(), node_hash, node_hash2, node_list);
+  }
+}
+
+void
+NpnNodeMgr::mark3(ymuint id0,
+		  NpnHandle handle,
+		  hash_set<ymuint32>& handle_hash,
+		  vector<NpnHandle>& handle_list,
+		  vector<pair<NpnHandle, NpnHandle> >& sym_list)
+{
+  ymuint sig = handle.hash();
+  if ( handle_hash.count(sig) > 0 ) {
+    return;
+  }
+  handle_hash.insert(sig);
+
+  ymuint id = handle.node_id();
+
+  NpnXform xf = handle.npn_xform();
+  NpnNode* node = this->node(id);
+  NpnHandle handle0 = cannonical(node->fanin0() * xf);
+  if ( handle0.oinv() ) {
+    handle0 = ~handle0;
+  }
+  NpnHandle handle1 = cannonical(node->fanin1() * xf);
+  if ( handle1.oinv() ) {
+    handle1 = ~handle1;
+  }
+  if ( handle0.node_id() == id0 ) {
+    if ( handle1.node_id() == id0 ) {
+      if ( handle0 < handle1 ) {
+	sym_list.push_back(make_pair(handle0, handle1));
+      }
+      else {
+	sym_list.push_back(make_pair(handle1, handle0));
+      }
+    }
+    else {
+      handle_list.push_back(handle0);
+    }
+  }
+  else if ( handle1.node_id() == id0 ) {
+    handle_list.push_back(handle1);
+  }
+  mark3(id0, handle0, handle_hash, handle_list, sym_list);
+  mark3(id0, handle1, handle_hash, handle_list, sym_list);
+}
+
 // 2つのNPN変換が両立するか調べる．
 bool
 NpnNodeMgr::check_compat(NpnXform xf0,
 			 NpnXform xf1,
 			 const vector<NpnHandle>& eq_list,
-			 const vector<pair<NpnHandle, NpnHandle> >& neq_list)
+			 const vector<pair<NpnHandle, NpnHandle> >& neq_list,
+			 const vector<pair<NpnHandle, NpnHandle> >& symeq0_list,
+			 const vector<pair<NpnHandle, NpnHandle> >& symeq1_list,
+			 const vector<pair<NpnHandle, NpnHandle> >& ssymeq_list)
 {
-  if ( 0 ) {
+  if ( debug_check_compat ) {
     cout << "check_compatible" << endl
 	 << " xf0: " << xf0 << endl
 	 << " xf1: " << xf1 << endl;
@@ -808,20 +1068,20 @@ NpnNodeMgr::check_compat(NpnXform xf0,
     if ( h1.oinv() ) {
       h1 = ~h1;
     }
-    if ( 0 ) {
+    if ( debug_check_compat ) {
       cout << "h * xf0" << endl;
       dump_handle(cout, h0);
       cout << "h * xf1" << endl;
       dump_handle(cout, h1);
     }
     if ( h0 != h1 ) {
-      if ( 0 ) {
+      if ( debug_check_compat ) {
 	cout << "false" << endl;
       }
       return false;
     }
   }
-  if ( 0 ) {
+  if ( debug_check_compat ) {
     cout << "neq_list" << endl;
   }
   for (vector<pair<NpnHandle, NpnHandle> >::const_iterator p = neq_list.begin();
@@ -836,20 +1096,87 @@ NpnNodeMgr::check_compat(NpnXform xf0,
     if ( h1.oinv() ) {
       h1 = ~h1;
     }
-    if ( 0 ) {
+    if ( debug_check_compat ) {
       cout << "h0 * xf0" << endl;
       dump_handle(cout, h0);
       cout << "h1 * xf1" << endl;
       dump_handle(cout, h1);
     }
     if ( h0 == h1 ) {
-      if ( 0 ) {
+      if ( debug_check_compat ) {
 	cout << "false" << endl;
       }
       return false;
     }
   }
-  if ( 0 ) {
+  for (vector<pair<NpnHandle, NpnHandle> >::const_iterator p = symeq0_list.begin();
+       p != symeq0_list.end(); ++ p) {
+    NpnHandle h0 = cannonical(p->first * xf0);
+    if ( h0.oinv() ) {
+      h0 = ~h0;
+    }
+    NpnHandle h1 = cannonical(p->second * xf0);
+    if ( h1.oinv() ) {
+      h1 = ~h1;
+    }
+    NpnHandle h2 = cannonical(p->first * xf1);
+    if ( h2.oinv() ) {
+      h2 = ~h1;
+    }
+    if ( h0 != h2 && h1 != h2 ) {
+      return false;
+    }
+  }
+  for (vector<pair<NpnHandle, NpnHandle> >::const_iterator p = symeq1_list.begin();
+       p != symeq1_list.end(); ++ p) {
+    NpnHandle h0 = cannonical(p->first * xf1);
+    if ( h0.oinv() ) {
+      h0 = ~h0;
+    }
+    NpnHandle h1 = cannonical(p->second * xf1);
+    if ( h1.oinv() ) {
+      h1 = ~h1;
+    }
+    NpnHandle h2 = cannonical(p->first * xf0);
+    if ( h2.oinv() ) {
+      h2 = ~h1;
+    }
+    if ( h0 != h2 && h1 != h2 ) {
+      return false;
+    }
+  }
+  for (vector<pair<NpnHandle, NpnHandle> >::const_iterator p = ssymeq_list.begin();
+       p != ssymeq_list.end(); ++ p) {
+    NpnHandle h0 = p->first;
+    NpnHandle h1 = p->second;
+    ++ p;
+    NpnHandle h2 = p->first;
+    NpnHandle h3 = p->second;
+    h0 = cannonical(h0 * xf0);
+    if ( h0.oinv() ) {
+      h0 = ~h0;
+    }
+    h1 = cannonical(h1 * xf0);
+    if ( h1.oinv() ) {
+      h1 = ~h1;
+    }
+    h2 = cannonical(h2 * xf1);
+    if ( h2.oinv() ) {
+      h2 = ~h2;
+    }
+    h3 = cannonical(h3 * xf1);
+    if ( h3.oinv() ) {
+      h3 = ~h3;
+    }
+    if ( h0 == h2 && h1 != h3 ||
+	 h0 == h3 && h1 != h2 ||
+	 h1 == h2 && h0 != h3 ||
+	 h1 == h3 && h0 != h2 ) {
+      continue;
+    }
+    return false;
+  }
+  if ( debug_check_compat ) {
     cout << "true" << endl;
   }
   return true;
@@ -862,19 +1189,72 @@ NpnNodeMgr::cannonical(NpnHandle src)
   ymuint id = src.node_id();
   NpnNode* node = mNodeList[id];
   NpnXform xf = src.npn_xform();
-  NpnXform cxf = xf.rep(node->support());
 
-  // 入力ノード同士の AND/XOR ノードの場合
-  if ( node->is_logic() &&
-       node->fanin0().node_id() == 0 &&
-       node->fanin1().node_id() == 0 ) {
-    assert_cond( node->support() == 3U, __FILE__, __LINE__);
-    ymuint p0 = cxf.input_perm(0);
-    ymuint p1 = cxf.input_perm(1);
-    if ( p0 > p1 ) {
-      cxf.xchg2();
+  if ( node->is_logic() ) {
+    NpnHandle fanin0 = node->fanin0();
+    NpnHandle fanin1 = node->fanin1();
+    if ( fanin0.node_id() == node->fanin1().node_id() ) {
+      // 同じノードをファンインに持つ AND/XOR ノードの場合
+      NpnXform cxf1 = xf;
+      bool oinv = false;
+      if ( cxf1.output_inv() ) {
+	cxf1.flip_oinv();
+	oinv = true;
+      }
+      NpnHandle xfanin0 = fanin0 * cxf1;
+      NpnHandle xfanin1 = fanin1 * cxf1;
+      if ( fanin0.oinv() == fanin1.oinv() && xfanin0 > xfanin1 ) {
+	// fanin0 と fanin1 を交換する効果を持つように cxf を細工する．
+	NpnXform xf0 = fanin0.npn_xform();
+	NpnXform xf1 = fanin1.npn_xform();
+	NpnXform xf0inv = inverse(xf0);
+	NpnXform xf1inv = inverse(xf1);
+	NpnXform cxfalt = xf0inv * xf1 * cxf1;
+	NpnXform cxfalt2 = xf1inv * xf0 * cxf1;
+	if ( fanin0 * cxfalt != xfanin1 ) {
+	  cout << "cxf1: " << cxf1 << endl
+	       << "xf0: " << xf0 << endl
+	       << "xf1: " << xf1 << endl
+	       << "xf0inv: " << xf0inv << endl
+	       << "xf1inv: " << xf1inv << endl
+	       << "fanin0: " << fanin0 << endl
+	       << "fanin1: " << fanin1 << endl
+	       << "xfanin0: " << xfanin0 << endl
+	       << "xfanin1: " << xfanin1 << endl
+	       << "cxfalt: " << cxfalt << endl
+	       << "cxfalt2: " << cxfalt2 << endl
+	       << "fanin0 * cxfalt: " << fanin0 * cxfalt << endl
+	       << "fanin1 * cxfalt: " << fanin1 * cxfalt << endl
+	       << "xfanin1: " << xfanin1 << endl;
+	}
+	if ( fanin1 * cxfalt != xfanin0 ) {
+	  cout << "cxf1: " << cxf1 << endl
+	       << "xf0: " << xf0 << endl
+	       << "xf1: " << xf1 << endl
+	       << "xf0inv: " << xf0inv << endl
+	       << "xf1inv: " << xf1inv << endl
+	       << "fanin0: " << fanin0 << endl
+	       << "fanin1: " << fanin1 << endl
+	       << "xfanin0: " << xfanin0 << endl
+	       << "xfanin1: " << xfanin1 << endl
+	       << "cxfalt: " << cxfalt << endl
+	       << "cxfalt2: " << cxfalt2 << endl
+	       << "fanin0 * cxfalt: " << fanin0 * cxfalt << endl
+	       << "fanin1 * cxfalt: " << fanin1 * cxfalt << endl
+	       << "xfanin0: " << xfanin0 << endl;
+	}
+	assert_cond( fanin0 * cxfalt == xfanin1, __FILE__, __LINE__);
+	assert_cond( fanin1 * cxfalt == xfanin0, __FILE__, __LINE__);
+	xf = cxfalt;
+	if ( oinv ) {
+	  xf.flip_oinv();
+	}
+      }
     }
   }
+
+  NpnXform cxf = xf.rep(node->support());
+
 
   NpnHandle ans(id, cxf);
 
@@ -978,19 +1358,6 @@ NpnNodeMgr::alloc_node()
   return node;
 }
 
-BEGIN_NONAMESPACE
-
-void
-print_handle(ostream& s,
-	     NpnHandle handle)
-{
-  ymuint id = handle.node_id();
-  NpnXform xf = handle.npn_xform();
-  s << "NODE#" << id << " : " << xf;
-}
-
-END_NONAMESPACE
-
 // @brief ハンドルとその子供の内容を出力する．
 void
 NpnNodeMgr::dump_handle(ostream& s,
@@ -1010,9 +1377,7 @@ NpnNodeMgr::dump_handle(ostream& s,
   for (vector<NpnHandle>::const_iterator p = handle_list.begin();
        p != handle_list.end(); ++ p, ++ i) {
     NpnHandle handle = *p;
-    s << "Handle#" << i << ": ";
-    print_handle(s, handle);
-    s << endl;
+    s << "Handle#" << i << ": " << handle << endl;
   }
   s << "----------------------------------------" << endl;
 
@@ -1057,11 +1422,9 @@ NpnNodeMgr::dh_sub(ostream& s,
     else {
       s << "XOR";
     }
-    s << "( ";
-    print_handle(s, node->fanin0());
-    s << " , ";
-    print_handle(s, node->fanin1());
-    s << " )" << endl;
+    s << "( " << node->fanin0()
+      << ", " << node->fanin1()
+      << " )" << endl;
   }
 }
 
@@ -1084,9 +1447,7 @@ NpnNodeMgr::dump_handle2(ostream& s,
   for (vector<NpnHandle>::const_iterator p = handle_list.begin();
        p != handle_list.end(); ++ p, ++ i) {
     NpnHandle handle = *p;
-    s << "Handle#" << i << ": ";
-    print_handle(s, handle);
-    s << endl;
+    s << "Handle#" << i << ": " << handle << endl;
   }
   s << "----------------------------------------" << endl;
 
@@ -1121,8 +1482,7 @@ NpnNodeMgr::dh2_sub(ostream& s,
     dh2_sub(s, node->fanin1() * xf0, node_hash);
   }
 
-  print_handle(s, rep_handle);
-  s << ": ";
+  s << rep_handle << ": ";
   if ( node->is_const() ) {
     if ( xf0.output_inv() ) {
       s << "CONST1" << endl;
@@ -1145,11 +1505,11 @@ NpnNodeMgr::dh2_sub(ostream& s,
     else {
       s << "XOR";
     }
-    s << "( ";
-    print_handle(s, node->fanin0() * xf0);
-    s << " , ";
-    print_handle(s, node->fanin1() * xf0);
-    s << " )" << endl;
+    s << "( "
+      << (node->fanin0() * xf0)
+      << " , "
+      << (node->fanin1() * xf0)
+      << " )" << endl;
   }
 }
 
