@@ -480,7 +480,7 @@ Str2IntGroupHandler::check_group_value(const ShString& attr_name,
 		    "string value is expected.");
     return false;
   }
-  if ( !third->is_string() ) {
+  if ( !third->is_int() ) {
     MsgMgr::put_msg(__FILE__, __LINE__, second->loc(),
 		    kMsgError,
 		    "DOTLIB_PARSER",
