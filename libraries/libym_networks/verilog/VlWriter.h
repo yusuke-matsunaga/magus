@@ -209,6 +209,13 @@ public:
   // 低レベル関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 範囲を出力する．
+  /// @param[in] msb 範囲の MSB
+  /// @param[in] lsb 範囲の LSB
+  void
+  put_range(int msb,
+	    int lsb);
+
   /// @brief 識別子を出力する．
   /// @param[in] name 識別子名
   /// @note 場合によってはエスケープ文字列にする．
