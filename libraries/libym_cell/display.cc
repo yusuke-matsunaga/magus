@@ -189,6 +189,63 @@ void
 display_library(ostream& s,
 		const CellLibrary& library)
 {
+  // ライブラリ名
+  s << "Library(" << library.name() << ")" << endl;
+
+  // テクノロジ
+  s << "  technology: ";
+  switch ( library.technology() ) {
+  case CellLibrary::kTechAsic: s << "asic"; break;
+  case CellLibrary::kTechFpga: s << "fpga"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
+  }
+  s << endl;
+
+  // 遅延モデル
+  s << "  delay_model: ";
+  switch ( library.delay_model() ) {
+  case CellLibrary::kDelayGenericCmos: s << "generic_cmos"; break;
+  case CellLibrary::kDelayTableLookup: s << "table_lookup"; break;
+  case CellLibrary::kDelayPiecewiseCmos: s << "piecewise_cmos"; break;
+  case CellLibrary::kDelayCmos2: s << "cmos2"; break;
+  case CellLibrary::kDelayDcm:  s << "dcm"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
+  }
+  s << endl;
+
+  // バス命名規則
+  s << "  bus_naming_style: " << library.bus_naming_style() << endl;
+
+  // 日付
+  s << "  date: " << library.date() << endl;
+
+  // リビジョン
+  s << "  revision: " << library.revision() << endl;
+
+  // コメント
+  s << "  comment: " << library.comment() << endl;
+
+  // 時間単位
+  s << "  time_unit: " << library.time_unit() << endl;
+
+  // 電圧単位
+  s << "  voltage_unit: " << library.voltage_unit() << endl;
+
+  // 電流単位
+  s << "  current_unit: " << library.current_unit() << endl;
+
+  // 抵抗単位
+  s << "  pulling_resistance_unit: " << library.pulling_resistance_unit() << endl;
+
+  // 容量単位
+  s << "  capacitive_load_unit: " << library.capacitive_load_unit() << endl;
+
+  // 電力単位
+  s << "  leakage_power_unit: " << library.leakage_power_unit() << endl;
+
+  s << endl;
+
+  // セル
   ymuint n = library.cell_num();
   for (ymuint i = 0; i < n; ++ i) {
     const Cell* cell = library.cell(i);

@@ -363,6 +363,11 @@ public:
   void
   set_name(const string& name) = 0;
 
+  /// @brief 遅延モデルを設定する．
+  virtual
+  void
+  set_delay_model(tDelayModel delay_model) = 0;
+
   /// @brief 属性を設定する．
   /// @param[in] attr_name 属性名
   /// @param[in] value 値

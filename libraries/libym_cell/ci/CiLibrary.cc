@@ -408,6 +408,13 @@ CiLibrary::set_name(const string& name)
   mName = name;
 }
 
+// @brief 遅延モデルを設定する．
+void
+CiLibrary::set_delay_model(tDelayModel delay_model)
+{
+  mDelayModel = delay_model;
+}
+
 // @brief 属性を設定する．
 // @param[in] attr_name 属性名
 // @param[in] value 値
@@ -439,7 +446,7 @@ CiLibrary::set_attr(const string& attr_name,
   else if ( attr_name == "pulling_resistance_unit" ) {
     mPullingResistanceUnit = value;
   }
-  else if ( attr_name == "capacitiveLoad_unit" ) {
+  else if ( attr_name == "capacitive_load_unit" ) {
     mCapacitiveLoadUnit = value;
   }
   else if ( attr_name == "leakage_power_unit" ) {

@@ -90,10 +90,41 @@ DotlibNode::get_library_info(DotlibLibrary& library_info) const
   }
 
   // 'delay_model' を取り出す．
-  if ( !library_info.get_singleton_or_null("delay_model",
-					   library_info.mDelayModel) ) {
+  const DotlibNode* dm_node = NULL;
+  if ( !library_info.get_singleton_or_null("delay_model", dm_node) ) {
     return false;
   }
+  CellLibrary::tDelayModel delay_model = CellLibrary::kDelayGenericCmos;
+  if ( dm_node != NULL ) {
+    ShString value = dm_node->string_value();
+    if ( value == "generic_cmos" ) {
+      delay_model = CellLibrary::kDelayGenericCmos;
+    }
+    else if ( value == "table_lookup" ) {
+      delay_model = CellLibrary::kDelayTableLookup;
+    }
+    else if ( value == "piecewise_cmos" ) {
+      delay_model = CellLibrary::kDelayPiecewiseCmos;
+    }
+    else if ( value == "cmos2" ) {
+      delay_model = CellLibrary::kDelayCmos2;
+    }
+    else if ( value == "dcm" ) {
+      delay_model = CellLibrary::kDelayDcm;
+    }
+    else {
+      ostringstream buf;
+      buf << value << ": Illegal value for 'delay_model'."
+	  << " 'generic_cmos', 'table_lookup', 'piecewise_cmos', 'cmos2' or 'dcm' are expected.";
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      dm_node->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      buf.str());
+      return false;
+    }
+  }
+  library_info.mDelayModel = delay_model;
 
   // 'bus_naming_style' を取り出す．
   if ( !library_info.get_singleton_or_null("bus_naming_style",

@@ -109,6 +109,71 @@ gen_library(const DotlibNode* dt_library)
   CellLibrary* library = CellLibrary::new_obj();
   library->set_name(library_info.name());
 
+  // 'technology' の設定
+
+  // 'delay_model' の設定
+  library->set_delay_model(library_info.delay_model());
+
+  // 'bus_naming_style' の設定
+  if ( library_info.bus_naming_style() ) {
+    ShString value = library_info.bus_naming_style()->string_value();
+    library->set_attr("bus_naming_style", value);
+  }
+
+  // 'comment' の設定
+  if ( library_info.comment() ) {
+    ShString value = library_info.comment()->string_value();
+    library->set_attr("comment", value);
+  }
+
+  // 'date' の設定
+  if ( library_info.date() ) {
+    ShString value = library_info.date()->string_value();
+    library->set_attr("date", value);
+  }
+
+  // 'revision' の設定
+  if ( library_info.revision() ) {
+    ShString value = library_info.revision()->string_value();
+    library->set_attr("revision", value);
+  }
+
+  // 'time_unit' の設定
+  if ( library_info.time_unit() ) {
+    ShString value = library_info.time_unit()->string_value();
+    library->set_attr("time_unit", value);
+  }
+
+  // 'voltage_unit' の設定
+  if ( library_info.voltage_unit() ) {
+    ShString value = library_info.voltage_unit()->string_value();
+    library->set_attr("voltage_unit", value);
+  }
+
+  // 'current_unit' の設定
+  if ( library_info.current_unit() ) {
+    ShString value = library_info.current_unit()->string_value();
+    library->set_attr("current_unit", value);
+  }
+
+  // 'pulling_resistance_unit' の設定
+  if ( library_info.pulling_resistance_unit() ) {
+    ShString value = library_info.pulling_resistance_unit()->string_value();
+    library->set_attr("pulling_resistance_unit", value);
+  }
+
+  // 'capacitive_load_unit' の設定
+  if ( library_info.capacitive_load_unit() ) {
+    ShString value = library_info.capacitive_load_unit()->string_value();
+    library->set_attr("capacitive_load_unit", value);
+  }
+
+  // 'leakage_power_unit' の設定
+  if ( library_info.leakage_power_unit() ) {
+    ShString value = library_info.leakage_power_unit()->string_value();
+    library->set_attr("leakage_power_unit", value);
+  }
+
   // セル数の設定
   const list<const DotlibNode*>& dt_cell_list = library_info.cell_list();
   library->set_cell_num(dt_cell_list.size());

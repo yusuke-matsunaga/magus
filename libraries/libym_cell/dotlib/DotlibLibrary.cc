@@ -33,12 +33,15 @@ DotlibLibrary::init()
 {
   DotlibAttrMap::init();
 
+  mDelayModel = CellLibrary::kDelayGenericCmos;
   mBusNamingStyle = NULL;
   mComment = NULL;
   mDate = NULL;
   mRevision = NULL;
+  mCapacitiveLoadUnit = NULL;
   mCurrentUnit = NULL;
   mLeakagePowerUnit = NULL;
+  mPullingResistanceUnit = NULL;
   mTimeUnit = NULL;
   mVoltageUnit = NULL;
 
@@ -50,6 +53,13 @@ ShString
 DotlibLibrary::name() const
 {
   return mName;
+}
+
+// @brief "delay_model" を返す．
+CellLibrary::tDelayModel
+DotlibLibrary::delay_model() const
+{
+  return mDelayModel;
 }
 
 // @brief "bus_naming_style" を返す．
@@ -80,6 +90,13 @@ DotlibLibrary::revision() const
   return mRevision;
 }
 
+// @brief "capacitive_load_unit" を返す．
+const DotlibNode*
+DotlibLibrary::capacitive_load_unit() const
+{
+  return mCapacitiveLoadUnit;
+}
+
 // @brief "current_unit" を返す．
 const DotlibNode*
 DotlibLibrary::current_unit() const
@@ -92,6 +109,13 @@ const DotlibNode*
 DotlibLibrary::leakage_power_unit() const
 {
   return mLeakagePowerUnit;
+}
+
+// @brief "pulling_resistance_unit" を返す．
+const DotlibNode*
+DotlibLibrary::pulling_resistance_unit() const
+{
+  return mPullingResistanceUnit;
 }
 
 // @brief "time_unit" を返す．

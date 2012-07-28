@@ -242,35 +242,60 @@ HandlerFactory::new_library(DotlibParserImpl& parser)
   //rise_net_delay : name ;
 
   // group statements
-  handler->reg_handler("cell", new_cell(handler));
-  handler->reg_handler("dc_current_template", new_template(handler));
-  handler->reg_handler("em_lut_template", new_template(handler));
-  handler->reg_handler("fall_transition_degradation", new_group(handler));
-  handler->reg_handler("faults_lut_template", new_template(handler));
-  handler->reg_handler("input_voltage", new_input_voltage(handler));
-  handler->reg_handler("iv_lut_template", new_template(handler));
-  handler->reg_handler("lu_table_template", new_template(handler));
-  handler->reg_handler("noise_lut_template", new_template(handler));
+  handler->reg_handler("cell",
+		       new_cell(handler));
+  handler->reg_handler("dc_current_template",
+		       new_template(handler));
+  handler->reg_handler("em_lut_template",
+		       new_template(handler));
+  handler->reg_handler("fall_transition_degradation",
+		       new_group(handler));
+  handler->reg_handler("faults_lut_template",
+		       new_template(handler));
+  handler->reg_handler("input_voltage",
+		       new_input_voltage(handler));
+  handler->reg_handler("iv_lut_template",
+		       new_template(handler));
+  handler->reg_handler("lu_table_template",
+		       new_template(handler));
+  handler->reg_handler("noise_lut_template",
+		       new_template(handler));
   handler->reg_handler("operating_conditions",
 		       new_operating_conditions(handler));
-  handler->reg_handler("output_voltage", new_output_voltage(handler));
-  handler->reg_handler("output_current_template", new_template(handler));
-  handler->reg_handler("part", new_group(handler));
-  handler->reg_handler("poly_template", new_template(handler));
-  handler->reg_handler("power_lut_template", new_template(handler));
-  handler->reg_handler("power_poly_template", new_template(handler));
-  handler->reg_handler("power_supply", new_group(handler));
-  handler->reg_handler("propagation_lut_template", new_template(handler));
-  handler->reg_handler("rise_transition_degradation", new_group(handler));
-  handler->reg_handler("scaled_cell", new_group(handler));
-  handler->reg_handler("scaling_factors", new_group(handler));
-  handler->reg_handler("timing", new_group(handler));
-  handler->reg_handler("timing_range", new_group(handler));
-  handler->reg_handler("type", new_group(handler));
-  handler->reg_handler("wire_load", new_wire_load(handler));
+  handler->reg_handler("output_voltage",
+		       new_output_voltage(handler));
+  handler->reg_handler("output_current_template",
+		       new_template(handler));
+  handler->reg_handler("part",
+		       new_group(handler));
+  handler->reg_handler("poly_template",
+		       new_template(handler));
+  handler->reg_handler("power_lut_template",
+		       new_template(handler));
+  handler->reg_handler("power_poly_template",
+		       new_template(handler));
+  handler->reg_handler("power_supply",
+		       new_group(handler));
+  handler->reg_handler("propagation_lut_template",
+		       new_template(handler));
+  handler->reg_handler("rise_transition_degradation",
+		       new_group(handler));
+  handler->reg_handler("scaled_cell",
+		       new_group(handler));
+  handler->reg_handler("scaling_factors",
+		       new_group(handler));
+  handler->reg_handler("timing",
+		       new_group(handler));
+  handler->reg_handler("timing_range",
+		       new_group(handler));
+  handler->reg_handler("type",
+		       new_group(handler));
+  handler->reg_handler("wire_load",
+		       new_wire_load(handler));
   handler->reg_handler("wire_load_selection",
 		       new_wire_load_selection(handler));
-  handler->reg_handler("wire_load_table", new_wire_load_table(handler));
+  handler->reg_handler("wire_load_table",
+		       new_wire_load_table(handler));
 
   return handler;
 }

@@ -10,6 +10,7 @@
 
 
 #include "DotlibAttrMap.h"
+#include "ym_cell/CellLibrary.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -42,6 +43,10 @@ public:
   ShString
   name() const;
 
+  /// @brief "delay_model" を返す．
+  CellLibrary::tDelayModel
+  delay_model() const;
+
   /// @brief "bus_naming_style" を返す．
   const DotlibNode*
   bus_naming_style() const;
@@ -58,6 +63,10 @@ public:
   const DotlibNode*
   revision() const;
 
+  /// @brief "capacitive_load_unit" を返す．
+  const DotlibNode*
+  capacitive_load_unit() const;
+
   /// @brief "current_unit" を返す．
   const DotlibNode*
   current_unit() const;
@@ -65,6 +74,10 @@ public:
   /// @brief "leakage_power_unit" を返す．
   const DotlibNode*
   leakage_power_unit() const;
+
+  /// @brief "pulling_resistance_unit" を返す．
+  const DotlibNode*
+  pulling_resistance_unit() const;
 
   /// @brief "time_unit" を返す．
   const DotlibNode*
@@ -88,7 +101,7 @@ private:
   ShString mName;
 
   // "delay_model"
-  const DotlibNode* mDelayModel;
+  CellLibrary::tDelayModel mDelayModel;
 
   // "bus_naming_style"
   const DotlibNode* mBusNamingStyle;
@@ -101,6 +114,9 @@ private:
 
   // "revision"
   const DotlibNode* mRevision;
+
+  // "capacitive_load_unit"
+  const DotlibNode* mCapacitiveLoadUnit;
 
   // "current_unit"
   const DotlibNode* mCurrentUnit;
