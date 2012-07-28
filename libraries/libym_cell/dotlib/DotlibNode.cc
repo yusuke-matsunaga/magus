@@ -59,6 +59,7 @@ get_string(const DotlibNode* node,
 
 END_NONAMESPACE
 
+
 //////////////////////////////////////////////////////////////////////
 // クラス DotlibNode
 //////////////////////////////////////////////////////////////////////
@@ -86,6 +87,12 @@ DotlibNode::get_library_info(DotlibLibrary& library_info) const
     else {
       library_info.add(attr_name, attr_value);
     }
+  }
+
+  // 'delay_model' を取り出す．
+  if ( !library_info.get_singleton_or_null("delay_model",
+					   library_info.mDelayModel) ) {
+    return false;
   }
 
   // 'bus_naming_style' を取り出す．
@@ -139,12 +146,6 @@ DotlibNode::get_library_info(DotlibLibrary& library_info) const
   // 'voltage_unit' を取り出す．
   if ( !library_info.get_singleton_or_null("voltage_unit",
 					   library_info.mVoltageUnit) ) {
-    return false;
-  }
-
-  // 'delay_model' を取り出す．
-  if ( !library_info.get_singleton_or_null("delay_model",
-					   library_info.mDelayModel) ) {
     return false;
   }
 
@@ -644,7 +645,7 @@ DotlibNode::get_timing_info(DotlibTiming& timing_info) const
     timing_info.add(attr_name, attr_value);
   }
 
-
+  return true;
 }
 
 // @brief 1つの文字列からなるリストの場合に文字列を返す．

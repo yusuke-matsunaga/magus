@@ -87,6 +87,9 @@ private:
   // ライブラリ名
   ShString mName;
 
+  // "delay_model"
+  const DotlibNode* mDelayModel;
+
   // "bus_naming_style"
   const DotlibNode* mBusNamingStyle;
 
@@ -113,9 +116,6 @@ private:
 
   // "voltage_unit"
   const DotlibNode* mVoltageUnit;
-
-  // "delay_model"
-  const DotlibNode* mDelayModel;
 
   // セル定義のリスト
   list<const DotlibNode*> mCellList;
