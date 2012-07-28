@@ -192,6 +192,7 @@ display_library(ostream& s,
   ymuint n = library.cell_num();
   for (ymuint i = 0; i < n; ++ i) {
     const Cell* cell = library.cell(i);
+    // セル名とセルの種類を出力
     s << "Cell#" << cell->id() << " (" << cell->name() << ") : ";
     if ( cell->is_logic() ) {
       s << "Combinational Logic";
@@ -210,9 +211,11 @@ display_library(ostream& s,
     }
     s << endl;
 
+    // 面積
     s << "  area = " << cell->area() << endl;
 
     if ( cell->is_ff() ) {
+      // FF の情報
       s << "  Next State         = " << cell->next_state_expr() << endl
 	<< "  Clock              = " << cell->clock_expr() << endl;
       if ( !cell->clock2_expr().is_zero() ) {
@@ -230,6 +233,7 @@ display_library(ostream& s,
       }
     }
     if ( cell->is_latch() ) {
+      // ラッチの情報
       s << "  Data In            = " << cell->data_in_expr() << endl
 	<< "  Enable             = " << cell->enable_expr() << endl;
       if ( !cell->enable2_expr().is_zero() ) {
@@ -247,17 +251,20 @@ display_library(ostream& s,
       }
     }
 
+    // ピンの情報
     ymuint npin = cell->pin_num();
     for (ymuint pin_id = 0; pin_id < npin; ++ pin_id) {
       const CellPin* pin = cell->pin(pin_id);
       s << "  Pin#" << pin_id << "[ " << pin->name() << " ]: ";
       if ( pin->is_input() ) {
+	// 入力ピン
 	s << "Input#" << pin->input_id() << endl
 	  << "    Capacitance      = " << pin->capacitance() << endl
 	  << "    Rise Capacitance = " << pin->rise_capacitance() << endl
 	  << "    Fall Capacitance = " << pin->fall_capacitance() << endl;
       }
       else if ( pin->is_output() ) {
+	// 出力ピン
 	ymuint opos = pin->output_id();
 	s << "Output# " << opos << endl;
 	if ( cell->has_logic(opos) ) {
@@ -274,6 +281,7 @@ display_library(ostream& s,
 	  << "    Min Transition   = " << pin->min_transition() << endl;
       }
       else if ( pin->is_inout() ) {
+	// 入出力ピン
 	ymuint opos = pin->output_id();
 	s << "Inout#(" << pin->input_id() << ", " << opos << ")" << endl;
 	if ( cell->has_logic(opos) ) {
@@ -293,11 +301,13 @@ display_library(ostream& s,
 	  << "    Min Transition   = " << pin->min_transition() << endl;
       }
       else if ( pin->is_internal() ) {
+	// 内部ピン
 	ymuint itpos = pin->internal_id();
 	s << "Internal#(" << itpos << ")" << endl;
       }
     }
 
+    // タイミング情報
     ymuint ni2 = cell->input_num2();
     ymuint no2 = cell->output_num2();
     for (ymuint ipos = 0; ipos < ni2; ++ ipos) {
@@ -306,182 +316,10 @@ display_library(ostream& s,
 	display_timing(s, cell, ipos, opos, kCellNegaUnate);
       }
     }
-
-#if 0
-    for (ymuint j = 0; j < np; ++ j) {
-      const CellPin* pin = cell->pin(j);
-      s << "  Pin#" << pin->id() << ":" << endl
-	<< "    Name             = " << pin->name() << endl;
-
-      switch ( pin->direction() ) {
-      case CellPin::kDirInput:
-	s << "    Direction        = INPUT" << endl
-	  << "    Capacitance      = " << pin->capacitance() << endl
-	  << "    Rise Capacitance = " << pin->rise_capacitance() << endl
-	  << "    Fall Capacitance = " << pin->fall_capacitance() << endl;
-	break;
-
-      case CellPin::kDirOutput:
-	s << "    Direction        = OUTPUT" << endl;
-	if ( pin->has_function() ) {
-	  s << "    Function         = " << pin->function() << endl;
-	}
-	if ( pin->has_three_state() ) {
-	  s << "    Three State      = " << pin->three_state() << endl;
-	}
-	s << "    Max Fanout       = " << pin->max_fanout() << endl
-	  << "    Min Fanout       = " << pin->min_fanout() << endl
-	  << "    Max Capacitance  = " << pin->max_capacitance() << endl
-	  << "    Min Capacitance  = " << pin->min_capacitance() << endl
-	  << "    Max Transition   = " << pin->max_transition() << endl
-	  << "    Min Transition   = " << pin->min_transition() << endl;
-	for (ymuint k = 0; k < np; ++ k) {
-	  display_timing(s, cell, pin, k, kCellPosiUnate);
-	  display_timing(s, cell, pin, k, kCellNegaUnate);
-	}
-	break;
-
-      case CellPin::kDirInout:
-	s << "    Direction        = INOUT" << endl;
-	if ( pin->has_function() ) {
-	  s << "    Function         = " << pin->function() << endl;
-	}
-	if ( pin->has_three_state() ) {
-	  s << "    Three State      = " << pin->three_state() << endl;
-	}
-	s << "    Capacitance      = " << pin->capacitance() << endl
-	  << "    Rise Capacitance = " << pin->rise_capacitance() << endl
-	  << "    Fall Capacitance = " << pin->fall_capacitance() << endl
-	  << "    Max Fanout       = " << pin->max_fanout() << endl
-	  << "    Min Fanout       = " << pin->min_fanout() << endl
-	  << "    Max Capacitance  = " << pin->max_capacitance() << endl
-	  << "    Min Capacitance  = " << pin->min_capacitance() << endl
-	  << "    Max Transition   = " << pin->max_transition() << endl
-	  << "    Min Transition   = " << pin->min_transition() << endl;
-	for (ymuint k = 0; k < np; ++ k) {
-	  display_timing(s, cell, pin, k, kCellPosiUnate);
-	  display_timing(s, cell, pin, k, kCellNegaUnate);
-	}
-	break;
-
-      case CellPin::kDirInternal:
-	s << "    Direction        = INTERNAL" << endl;
-	break;
-
-      default:
-	assert_not_reached(__FILE__, __LINE__);
-      }
-    }
-    s << endl;
-
-    if ( cell->is_ff() ) {
-      s << "  ff ( " << cell->var1_name()
-	<< ", " << cell->var2_name() << " )" << endl
-	<< "    next_state        = " << cell->next_state() << endl
-	<< "    clocked_on        = " << cell->clocked_on() << endl;
-      if ( !cell->clocked_on_also().is_zero() ) {
-	s << "    clocked_on_also   = " << cell->clocked_on_also() << endl;
-      }
-      if ( !cell->clear().is_zero() ) {
-	s << "    clear             = " << cell->clear() << endl;
-      }
-      if ( !cell->preset().is_zero() ) {
-	s << "    preset            = " << cell->preset() << endl;
-      }
-      if ( !cell->clear().is_zero() && !cell->preset().is_zero() ) {
-	s << "    clear_preset_var1 = " << cell->clear_preset_var1() << endl
-	  << "    clear_preset_var2 = " << cell->clear_preset_var2() << endl;
-      }
-    }
-    else if ( cell->is_latch() ) {
-      s << "  latch ( " << cell->var1_name()
-	<< ", " << cell->var2_name() << " )" << endl
-	<< "    data_in           = " << cell->data_in() << endl
-	<< "    enable            = " << cell->enable() << endl;
-      if ( !cell->enable().is_zero() ) {
-	s << "    enable_also       = " << cell->enable_also() << endl;
-      }
-      if ( !cell->clear().is_zero() ) {
-	s << "    clear             = " << cell->clear() << endl;
-      }
-      if ( !cell->preset().is_zero() ) {
-	s << "    preset            = " << cell->preset() << endl;
-      }
-      if ( !cell->clear().is_zero() && !cell->preset().is_zero() ) {
-	s << "    clear_preset_var1 = " << cell->clear_preset_var1() << endl
-	  << "    clear_preset_var2 = " << cell->clear_preset_var2() << endl;
-      }
-    }
-
-    ymuint np = cell->pin_num();
-    for (ymuint j = 0; j < np; ++ j) {
-      const CellPin* pin = cell->pin(j);
-      s << "  Pin#" << pin->id() << ":" << endl
-	<< "    Name             = " << pin->name() << endl;
-
-      switch ( pin->direction() ) {
-      case CellPin::kDirInput:
-	s << "    Direction        = INPUT" << endl
-	  << "    Capacitance      = " << pin->capacitance() << endl
-	  << "    Rise Capacitance = " << pin->rise_capacitance() << endl
-	  << "    Fall Capacitance = " << pin->fall_capacitance() << endl;
-	break;
-
-      case CellPin::kDirOutput:
-	s << "    Direction        = OUTPUT" << endl;
-	if ( pin->has_function() ) {
-	  s << "    Function         = " << pin->function() << endl;
-	}
-	if ( pin->has_three_state() ) {
-	  s << "    Three State      = " << pin->three_state() << endl;
-	}
-	s << "    Max Fanout       = " << pin->max_fanout() << endl
-	  << "    Min Fanout       = " << pin->min_fanout() << endl
-	  << "    Max Capacitance  = " << pin->max_capacitance() << endl
-	  << "    Min Capacitance  = " << pin->min_capacitance() << endl
-	  << "    Max Transition   = " << pin->max_transition() << endl
-	  << "    Min Transition   = " << pin->min_transition() << endl;
-	for (ymuint k = 0; k < np; ++ k) {
-	  display_timing(s, cell, pin, k, kCellPosiUnate);
-	  display_timing(s, cell, pin, k, kCellNegaUnate);
-	}
-	break;
-
-      case CellPin::kDirInout:
-	s << "    Direction        = INOUT" << endl;
-	if ( pin->has_function() ) {
-	  s << "    Function         = " << pin->function() << endl;
-	}
-	if ( pin->has_three_state() ) {
-	  s << "    Three State      = " << pin->three_state() << endl;
-	}
-	s << "    Capacitance      = " << pin->capacitance() << endl
-	  << "    Rise Capacitance = " << pin->rise_capacitance() << endl
-	  << "    Fall Capacitance = " << pin->fall_capacitance() << endl
-	  << "    Max Fanout       = " << pin->max_fanout() << endl
-	  << "    Min Fanout       = " << pin->min_fanout() << endl
-	  << "    Max Capacitance  = " << pin->max_capacitance() << endl
-	  << "    Min Capacitance  = " << pin->min_capacitance() << endl
-	  << "    Max Transition   = " << pin->max_transition() << endl
-	  << "    Min Transition   = " << pin->min_transition() << endl;
-	for (ymuint k = 0; k < np; ++ k) {
-	  display_timing(s, cell, pin, k, kCellPosiUnate);
-	  display_timing(s, cell, pin, k, kCellNegaUnate);
-	}
-	break;
-
-      case CellPin::kDirInternal:
-	s << "    Direction        = INTERNAL" << endl;
-	break;
-
-      default:
-	assert_not_reached(__FILE__, __LINE__);
-      }
-    }
-#endif
     s << endl;
   }
 
+  // セルグループの情報
   s << "Cell Group" << endl;
   ymuint nc = library.npn_class_num();
   for (ymuint i = 0; i < nc; ++ i) {
@@ -491,6 +329,7 @@ display_library(ostream& s,
     display_class(s, buf.str().c_str(), cclass);
   }
 
+  // 既定セルグループの情報
   display_group(s, "Const0 Group", library.const0_func());
   display_group(s, "Const1 Group", library.const1_func());
   display_group(s, "Buffer Group", library.buf_func());
@@ -506,6 +345,7 @@ display_library(ostream& s,
   display_latch_class(s, "Latch_S Class", library.simple_latch_class(false, true));
   display_latch_class(s, "Latch_RS Class", library.simple_latch_class(true, true));
 
+  // パタングラフの情報
   s << "==== PatMgr dump start ====" << endl;
 
   // ノードの種類の出力

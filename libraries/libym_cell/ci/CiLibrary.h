@@ -583,15 +583,15 @@ public:
   /// @brief セルの内部ピンを生成する．
   /// @param[in] cell_id セル番号
   /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
-  /// @param[in] internal_id 入力ピン番号 ( 0 <= internal_id < cell->internal_num() )
+  /// @param[in] int_id 入力ピン番号 ( 0 <= int_id < cell->internal_num() )
   /// @param[in] name 内部ピン名
   void
   new_cell_internal(ymuint cell_id,
 		    ymuint pin_id,
-		    ymuint internal_id,
+		    ymuint int_id,
 		    const string& name);
 
-  /// @brief タイミング情報を作る．
+  /// @brief タイミング情報を作る(ジェネリック遅延モデル)．
   /// @param[in] id ID番号
   /// @param[in] type タイミングの型
   /// @param[in] intrinsic_rise 立ち上がり固有遅延
@@ -610,6 +610,54 @@ public:
 	     CellTime slope_fall,
 	     CellResistance rise_resistance,
 	     CellResistance fall_resistance);
+
+#if 0
+  /// @brief タイミング情報を作る(折れ線近似)．
+  /// @param[in] id ID番号
+  /// @param[in] timing_type タイミングの型
+  /// @param[in] intrinsic_rise 立ち上がり固有遅延
+  /// @param[in] intrinsic_fall 立ち下がり固有遅延
+  /// @param[in] slope_rise 立ち上がりスロープ遅延
+  /// @param[in] slope_fall 立ち下がりスロープ遅延
+  virtual
+  CellTiming*
+  new_timing(ymuint id,
+	     tCellTimingType timing_type,
+	     CellTime intrinsic_rise,
+	     CellTime intrinsic_fall,
+	     CellTime slope_rise,
+	     CellTime slope_fall,
+	     CellResistance rise_pin_resistance,
+	     CellResistance fall_pin_resistance);
+#endif
+
+  /// @brief タイミング情報を作る(非線形タイプ1)．
+  /// @param[in] id ID番号
+  /// @param[in] timing_type タイミングの型
+  /// @param[in] cell_rise 立ち上がりセル遅延テーブル
+  /// @param[in] cell_fall 立ち下がりセル遅延テーブル
+  virtual
+  CellTiming*
+  new_timing(ymuint id,
+	     tCellTimingType timing_type,
+	     CellLut* cell_rise,
+	     CellLut* cell_fall);
+
+  /// @brief タイミング情報を作る(非線形タイプ2)．
+  /// @param[in] id ID番号
+  /// @param[in] timing_type タイミングの型
+  /// @param[in] rise_transition 立ち上がり遷移遅延テーブル
+  /// @param[in] fall_transition 立ち下がり遷移遅延テーブル
+  /// @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
+  /// @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
+  virtual
+  CellTiming*
+  new_timing(ymuint id,
+	     tCellTimingType timing_type,
+	     CellLut* rise_transition,
+	     CellLut* fall_transition,
+	     CellLut* rise_propagation,
+	     CellLut* fall_propagation);
 
   /// @brief タイミング情報をセットする．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )

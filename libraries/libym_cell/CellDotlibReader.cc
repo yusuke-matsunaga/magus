@@ -392,97 +392,6 @@ gen_library(const DotlibNode* dt_library)
 				   max_fanout, min_fanout,
 				   max_capacitance, min_capacitance,
 				   max_transition, min_transition);
-#if 0
-	  const DotlibNode* func_node = pin_info.function();
-	  if ( func_node ) {
-	    LogExpr expr = dot2expr(func_node, pin_map);
-	    cell->set_logic_expr(o_pos, expr);
-#if 0
-	    TvFunc tv_function = expr.make_tv(ni);
-	    for (ymuint i = 0; i < ni; ++ i) {
-	      // タイミング情報の設定
-	      const DotlibNode* pt_pin = ipin_array[i];
-	      TvFunc p_func = tv_function.cofactor(i, kPolPosi);
-	      TvFunc n_func = tv_function.cofactor(i, kPolNega);
-	      tCellTimingSense sense_real = kSenseNonUnate;
-	      bool redundant = false;
-	      if ( ~p_func && n_func ) {
-		if ( ~n_func && p_func ) {
-		  sense_real = kCellNonUnate;
-		}
-		else {
-		  sense_real = kCellNegaUnate;
-		}
-	      }
-	      else {
-		if ( ~n_func && p_func ) {
-		  sense_real = kCellPosiUnate;
-		}
-		else {
-		  // つまり p_func == n_func ということ．
-		  // つまりこの変数は出力に影響しない．
-		  ostringstream buf;
-		  buf << "The output function does not depend on the input pin, "
-		      << pt_pin->name()->str() << ".";
-		  MsgMgr::put_msg(__FILE__, __LINE__,
-				  pt_pin->loc(),
-				  kMsgWarning,
-				  "DOTLIB_PARSER",
-				  buf.str());
-		  redundant = true;
-		}
-	      }
-
-	      tCellTimingSense sense = kCellNonUnate;
-	      switch ( pt_pin->phase()->type() ) {
-	      case DotlibNode::kNoninv:
-		sense = kCellPosiUnate;
-		break;
-
-	      case DotlibNode::kInv:
-		sense = kCellNegaUnate;
-		break;
-
-	      case DotlibNode::kUnknown:
-		sense = kCellNonUnate;
-		break;
-
-	      default:
-		assert_not_reached(__FILE__, __LINE__); break;
-	      }
-
-	      if ( sense != sense_real ) {
-		ostringstream buf;
-		buf << "Phase description does not match the logic expression. "
-		    << "Ignored.";
-		MsgMgr::put_msg(__FILE__, __LINE__,
-				pt_pin->phase()->loc(),
-				kMsgWarning,
-				"DOTLIB_PARSER",
-				buf.str());
-		sense = sense_real;
-	      }
-	      CellTime r_i(pt_pin->rise_block_delay()->num());
-	      CellResistance r_r(pt_pin->rise_fanout_delay()->num());
-	      CellTime f_i(pt_pin->fall_block_delay()->num());
-	      CellResistance f_r(pt_pin->fall_fanout_delay()->num());
-	      CellTiming* timing = library->new_timing(i, kTimingCombinational,
-						       r_i, f_i,
-						       CellTime(0.0),
-						       CellTime(0.0),
-						       r_r, f_r);
-	      if ( !redundant ) {
-		library->set_cell_timing(cell, i, o_pos, sense, timing);
-	      }
-	    }
-#endif
-	  }
-	  const DotlibNode* three_state = pin_info.three_state();
-	  if ( three_state ) {
-	    LogExpr expr = dot2expr(three_state, pin_map);
-	    cell->set_tristate_expr(o_pos, expr);
-	  }
-#endif
 	}
 	++ o_pos;
 	break;
@@ -498,7 +407,9 @@ gen_library(const DotlibNode* dt_library)
 	  CellCapacitance min_capacitance(pin_info.min_capacitance());
 	  CellTime max_transition(pin_info.max_transition());
 	  CellTime min_transition(pin_info.min_transition());
-	  library->new_cell_inout(cell_id, i, io_pos + ni, io_pos + no, pin_info.name(),
+	  ymuint i_pos2 = io_pos + ni;
+	  ymuint o_pos2 = io_pos + no;
+	  library->new_cell_inout(cell_id, i, i_pos2, o_pos2, pin_info.name(),
 				  cap, rise_cap, fall_cap,
 				  max_fanout, min_fanout,
 				  max_capacitance, min_capacitance,
@@ -517,6 +428,115 @@ gen_library(const DotlibNode* dt_library)
       }
     }
 
+#if 0
+    // タイミング情報の生成
+    for (ymuint i = 0; i < npin; ++ i) {
+      const DotlibPin& pin_info = pin_info_array[i];
+      switch ( pin_info.direction() ) {
+      case DotlibPin::kOutput:
+      case DotlibPin::kInout:
+	{
+	  const list<const DotlibNode*>& timing_list = pin_info.timing_list();
+	  for (list<const DotlibNode*>::cosnt_iterator p = timing_list.begin();
+	       p != timing_list.end(); ++ p) {
+	    cosnt DotlibNode* dt_timing = *p;
+	    if ( !dt_timing->get_timing_info(timing_info) ) {
+	      error = true;
+	      continue;
+	    }
+	  }
+	}
+      default:
+	break;
+      }
+    }
+#endif
+#if 0
+    const Cell* cell = library->cell(cell_id);
+    for (ymuint oid = 0; oid < no2; ++ oid) {
+      bool has_logic = cell->has_logic(oid);
+      if ( has_logic ) {
+	LogExpr expr = cell->logic_expr(oid);
+	TvFunc tv_function = expr.make_tv(ni2);
+      }
+      for (ymuint iid = 0; iid < ni2; +; iid) {
+	// タイミング情報の設定
+	const DotlibNode* pt_pin = ipin_array[i];
+	TvFunc p_func = tv_function.cofactor(iid, kPolPosi);
+	TvFunc n_func = tv_function.cofactor(iid, kPolNega);
+	tCellTimingSense sense_real = kSenseNonUnate;
+	bool redundant = false;
+	if ( ~p_func && n_func ) {
+	  if ( ~n_func && p_func ) {
+	    sense_real = kCellNonUnate;
+	  }
+	  else {
+	    sense_real = kCellNegaUnate;
+	  }
+	}
+	else {
+	  if ( ~n_func && p_func ) {
+	    sense_real = kCellPosiUnate;
+	  }
+	  else {
+	    // つまり p_func == n_func ということ．
+	    // つまりこの変数は出力に影響しない．
+	    ostringstream buf;
+	    buf << "The output function does not depend on the input pin, "
+		<< pt_pin->name()->str() << ".";
+	    MsgMgr::put_msg(__FILE__, __LINE__,
+			    pt_pin->loc(),
+			    kMsgWarning,
+			    "DOTLIB_PARSER",
+			    buf.str());
+	    redundant = true;
+	  }
+	}
+
+	tCellTimingSense sense = kCellNonUnate;
+	switch ( pt_pin->phase()->type() ) {
+	case DotlibNode::kNoninv:
+	  sense = kCellPosiUnate;
+	  break;
+
+	case DotlibNode::kInv:
+	  sense = kCellNegaUnate;
+	  break;
+
+	case DotlibNode::kUnknown:
+	  sense = kCellNonUnate;
+	  break;
+
+	default:
+	  assert_not_reached(__FILE__, __LINE__); break;
+	}
+
+	if ( sense != sense_real ) {
+	  ostringstream buf;
+	  buf << "Phase description does not match the logic expression. "
+	      << "Ignored.";
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_pin->phase()->loc(),
+			  kMsgWarning,
+			  "DOTLIB_PARSER",
+			  buf.str());
+	  sense = sense_real;
+	}
+	CellTime r_i(pt_pin->rise_block_delay()->num());
+	CellResistance r_r(pt_pin->rise_fanout_delay()->num());
+	CellTime f_i(pt_pin->fall_block_delay()->num());
+	CellResistance f_r(pt_pin->fall_fanout_delay()->num());
+	CellTiming* timing = library->new_timing(i, kTimingCombinational,
+						 r_i, f_i,
+						 CellTime(0.0),
+						 CellTime(0.0),
+						 r_r, f_r);
+	if ( !redundant ) {
+	  library->set_cell_timing(cell, i, o_pos, sense, timing);
+	}
+      }
+    }
+#endif
   }
 
   library->compile();

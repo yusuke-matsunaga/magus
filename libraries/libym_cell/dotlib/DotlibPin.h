@@ -1,7 +1,7 @@
 #ifndef YM_DOTLIB_DOTLIBPIN_H
 #define YM_DOTLIB_DOTLIBPIN_H
 
-/// @file ym_dotlib/DotlibPin.h
+/// @file dotlib/DotlibPin.h
 /// @brief DotlibPin のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

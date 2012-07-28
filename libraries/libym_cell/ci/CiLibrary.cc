@@ -877,7 +877,7 @@ CiLibrary::new_cell_internal(ymuint cell_id,
   pin->mInternalId = internal_id;
 }
 
-// @brief タイミング情報を作る．
+// @brief タイミング情報を作る(ジェネリック遅延モデル)．
 // @param[in] id ID番号
 // @param[in] type タイミングの型
 // @param[in] intrinsic_rise 立ち上がり固有遅延
@@ -904,6 +904,78 @@ CiLibrary::new_timing(ymuint id,
 					     slope_fall,
 					     rise_resistance,
 					     fall_resistance);
+  return timing;
+}
+
+#if 0
+// @brief タイミング情報を作る(折れ線近似)．
+// @param[in] id ID番号
+// @param[in] timing_type タイミングの型
+// @param[in] intrinsic_rise 立ち上がり固有遅延
+// @param[in] intrinsic_fall 立ち下がり固有遅延
+// @param[in] slope_rise 立ち上がりスロープ遅延
+// @param[in] slope_fall 立ち下がりスロープ遅延
+CellTiming*
+CiLibrary::new_timing(ymuint id,
+		      tCellTimingType timing_type,
+		      CellTime intrinsic_rise,
+		      CellTime intrinsic_fall,
+		      CellTime slope_rise,
+		      CellTime slope_fall,
+		      CellResistance rise_pin_resistance,
+		      CellResistance fall_pin_resistance)
+{
+  void* p = mAlloc.get_memory(sizeof(CiTimingPiecewise));
+  CiTiming* timing = new (p) CiTimingPiecewise(id, timing_type,
+					       intrinsic_rise,
+					       intrinsic_fall,
+					       slope_rise,
+					       slope_fall,
+					       rise_pin_resistance,
+					       fall_pin_resistance);
+  return timing;
+}
+#endif
+
+// @brief タイミング情報を作る(非線形タイプ1)．
+// @param[in] id ID番号
+// @param[in] timing_type タイミングの型
+// @param[in] cell_rise 立ち上がりセル遅延テーブル
+// @param[in] cell_fall 立ち下がりセル遅延テーブル
+CellTiming*
+CiLibrary::new_timing(ymuint id,
+		      tCellTimingType timing_type,
+		      CellLut* cell_rise,
+		      CellLut* cell_fall)
+{
+  void* p = mAlloc.get_memory(sizeof(CiTimingNonlinear1));
+  CiTiming* timing = new (p) CiTimingNonlinear1(id, timing_type,
+						cell_rise,
+						cell_fall);
+  return timing;
+}
+
+// @brief タイミング情報を作る(非線形タイプ2)．
+// @param[in] id ID番号
+// @param[in] timing_type タイミングの型
+// @param[in] rise_transition 立ち上がり遷移遅延テーブル
+// @param[in] fall_transition 立ち下がり遷移遅延テーブル
+// @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
+// @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
+CellTiming*
+CiLibrary::new_timing(ymuint id,
+		      tCellTimingType timing_type,
+		      CellLut* rise_transition,
+		      CellLut* fall_transition,
+		      CellLut* rise_propagation,
+		      CellLut* fall_propagation)
+{
+  void* p = mAlloc.get_memory(sizeof(CiTimingNonlinear2));
+  CiTiming* timing = new (p) CiTimingNonlinear2(id, timing_type,
+						rise_transition,
+						fall_transition,
+						rise_propagation,
+						fall_propagation);
   return timing;
 }
 
