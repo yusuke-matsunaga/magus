@@ -35,9 +35,11 @@ public:
   /// @brief 遅延モデルを表す列挙型
   //////////////////////////////////////////////////////////////////////
   enum tDelayModel {
-    kDelayGeneric,
-    kDelayPiecewise,
-    kDelayNonlinear
+    kDelayGenericCmos,
+    kDelayTableLookup,
+    kDelayPiecewiseCmos,
+    kDelayCmos2,
+    kDelayDcm
   };
 
 public:
@@ -76,9 +78,11 @@ public:
 
   /// @brief 遅延モデルの取得
   /// 返り値は
-  /// - kDelayGeneric
-  /// - kDelayPiecewise
-  /// - kDelayNonlinear
+  /// - kDelayGenericCmos
+  /// - kDelayTableLookup
+  /// - kDelayPiecewiseCmos
+  /// - kDelayCmos2
+  /// - kDelayDcm
   /// のいずれか
   virtual
   tDelayModel

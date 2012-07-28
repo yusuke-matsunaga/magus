@@ -13,6 +13,7 @@
 #include "DotlibFF.h"
 #include "DotlibLatch.h"
 #include "DotlibPin.h"
+#include "DotlibTiming.h"
 #include "ym_utils/MsgMgr.h"
 
 
@@ -85,6 +86,66 @@ DotlibNode::get_library_info(DotlibLibrary& library_info) const
     else {
       library_info.add(attr_name, attr_value);
     }
+  }
+
+  // 'bus_naming_style' を取り出す．
+  if ( !library_info.get_singleton_or_null("bus_naming_style",
+					   library_info.mBusNamingStyle) ) {
+    return false;
+  }
+
+  // 'comment' を取り出す．
+  if ( !library_info.get_singleton_or_null("comment",
+					   library_info.mComment) ) {
+    return false;
+  }
+
+  // 'date' を取り出す．
+  if ( !library_info.get_singleton_or_null("date",
+					   library_info.mDate) ) {
+    return false;
+  }
+
+  // 'revision' を取り出す．
+  if ( !library_info.get_singleton_or_null("revision",
+					   library_info.mRevision) ) {
+    return false;
+  }
+
+  // 'current_unit' を取り出す．
+  if ( !library_info.get_singleton_or_null("current_unit",
+					   library_info.mCurrentUnit) ) {
+    return false;
+  }
+
+  // 'leakage_power_unit' を取り出す．
+  if ( !library_info.get_singleton_or_null("leakage_power_unit",
+					   library_info.mLeakagePowerUnit) ) {
+    return false;
+  }
+
+  // 'pulling_resistance_unit' を取り出す．
+  if ( !library_info.get_singleton_or_null("pulling_resistance_unit",
+					   library_info.mPullingResistanceUnit) ) {
+    return false;
+  }
+
+  // 'time_unit' を取り出す．
+  if ( !library_info.get_singleton_or_null("time_unit",
+					   library_info.mTimeUnit) ) {
+    return false;
+  }
+
+  // 'voltage_unit' を取り出す．
+  if ( !library_info.get_singleton_or_null("voltage_unit",
+					   library_info.mVoltageUnit) ) {
+    return false;
+  }
+
+  // 'delay_model' を取り出す．
+  if ( !library_info.get_singleton_or_null("delay_model",
+					   library_info.mDelayModel) ) {
+    return false;
   }
 
   return true;
@@ -398,16 +459,10 @@ DotlibNode::get_pin_info(DotlibPin& pin_info) const
   // 'direction' の翻訳をする．
   const DotlibNode* direction_node;
   if ( !pin_info.get_singleton("direction", loc(), direction_node) ) {
+    // 'direction' がないのはエラー
     return false;
   }
-  if ( !direction_node->is_string() ) {
-    MsgMgr::put_msg(__FILE__, __LINE__,
-		    direction_node->loc(),
-		    kMsgError,
-		    "DOTLIB_PARSER",
-		    "String value is expected.");
-    return false;
-  }
+  // 'direction' のハンドラは StrSimpleHandler なので文字列のはず．
   ShString value = direction_node->string_value();
   if ( value == "input" ) {
     pin_info.mDirection = DotlibPin::kInput;
@@ -444,7 +499,7 @@ DotlibNode::get_pin_info(DotlibPin& pin_info) const
     }
   }
   else {
-    pin_info.mCapacitance = NULL;
+    pin_info.mCapacitance = 0.0;
   }
 
   const DotlibNode* rcap_node = NULL;
@@ -559,7 +614,37 @@ DotlibNode::get_pin_info(DotlibPin& pin_info) const
     return false;
   }
 
+  // 'internal_node' を取り出す．
+  if ( !pin_info.get_singleton_or_null("internal_node", pin_info.mInternalNode) ) {
+    return false;
+  }
+
+  // 'pin_func_type' を取り出す．
+  if ( !pin_info.get_singleton_or_null("pin_func_type", pin_info.mPinFuncType) ) {
+    return false;
+  }
+
   return true;
+}
+
+// @brief タイミングを表すノードから情報を取り出す．
+// @param[out] timing_info タイミングの情報を格納する変数
+// @retval true 正しく読み込めた．
+// @retval false エラーが起こった．
+// @note エラーは MsgMgr に出力する．
+bool
+DotlibNode::get_timing_info(DotlibTiming& timing_info) const
+{
+  timing_info.init();
+
+  // 属性のリストをつくる．　
+  for (const DotlibNode* attr = attr_top(); attr; attr = attr->next()) {
+    ShString attr_name = attr->attr_name();
+    const DotlibNode* attr_value = attr->attr_value();
+    timing_info.add(attr_name, attr_value);
+  }
+
+
 }
 
 // @brief 1つの文字列からなるリストの場合に文字列を返す．

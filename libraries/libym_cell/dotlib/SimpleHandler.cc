@@ -23,8 +23,12 @@ BEGIN_NAMESPACE_YM_DOTLIB
 
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
-SimpleHandler::SimpleHandler(GroupHandler* parent) :
-  DotlibHandler(parent)
+// @param[in] sym_mode シンボルモード
+// @note シンボルモードの時は数字で始まっていても文字列とみなす．
+SimpleHandler::SimpleHandler(GroupHandler* parent,
+			     bool sym_mode) :
+  DotlibHandler(parent),
+  mSymMode(sym_mode)
 {
 }
 
@@ -72,7 +76,7 @@ DotlibNodeImpl*
 SimpleHandler::read_value()
 {
   FileRegion loc;
-  tTokenType value_type = parser().read_token(loc, false);
+  tTokenType value_type = parser().read_token(loc, mSymMode);
   DotlibNodeImpl* value = new_value(value_type, loc);
   return value;
 }
@@ -92,30 +96,37 @@ SimpleHandler::set_value(const ShString& attr_name,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス SymSimpleHandler
+// クラス StrSimpleHandler
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SymSimpleHandler::SymSimpleHandler(GroupHandler* parent) :
-  SimpleHandler(parent)
+// @param[in] parent 親のハンドラ
+// @param[in] sym_mode シンボルモード
+// @note シンボルモードの時は数字で始まっていても文字列とみなす．
+StrSimpleHandler::StrSimpleHandler(GroupHandler* parent,
+				   bool sym_mode) :
+  SimpleHandler(parent, sym_mode)
 {
 }
 
 // @brief デストラクタ
-SymSimpleHandler::~SymSimpleHandler()
+StrSimpleHandler::~StrSimpleHandler()
 {
 }
 
-// @brief 値を読み込む処理
-// @return 値を表す DotlibNode を返す．
-// @note エラーが起きたら NULL を返す．
-// @note ここではシンボルモードで DotlibParser::read_token() を呼ぶ．
+// @brief 値を読み込む．
 DotlibNodeImpl*
-SymSimpleHandler::read_value()
+StrSimpleHandler::read_value()
 {
-  FileRegion loc;
-  tTokenType value_type = parser().read_token(loc, true);
-  DotlibNodeImpl* value = new_value(value_type, loc);
+  DotlibNodeImpl* value = SimpleHandler::read_value();
+  if ( !value->is_string() ) {
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    value->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "Syntax error. string value is expected.");
+    return NULL;
+  }
   return value;
 }
 
@@ -126,7 +137,7 @@ SymSimpleHandler::read_value()
 
 // @brief コンストラクタ
 IntSimpleHandler::IntSimpleHandler(GroupHandler* parent) :
-  SimpleHandler(parent)
+  SimpleHandler(parent, false)
 {
 }
 
@@ -158,7 +169,7 @@ IntSimpleHandler::read_value()
 
 // @brief コンストラクタ
 FloatSimpleHandler::FloatSimpleHandler(GroupHandler* parent) :
-  SimpleHandler(parent)
+  SimpleHandler(parent, false)
 {
 }
 
@@ -178,38 +189,6 @@ FloatSimpleHandler::read_value()
 		    kMsgError,
 		    "DOTLIB_PARSER",
 		    "Syntax error. float value is expected.");
-    return NULL;
-  }
-  return value;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス StrSimpleHandler
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-StrSimpleHandler::StrSimpleHandler(GroupHandler* parent) :
-  SimpleHandler(parent)
-{
-}
-
-// @brief デストラクタ
-StrSimpleHandler::~StrSimpleHandler()
-{
-}
-
-// @brief 値を読み込む．
-DotlibNodeImpl*
-StrSimpleHandler::read_value()
-{
-  DotlibNodeImpl* value = SimpleHandler::read_value();
-  if ( !value->is_string() ) {
-    MsgMgr::put_msg(__FILE__, __LINE__,
-		    value->loc(),
-		    kMsgError,
-		    "DOTLIB_PARSER",
-		    "Syntax error. string value is expected.");
     return NULL;
   }
   return value;

@@ -240,6 +240,14 @@ public:
   bool
   get_pin_info(DotlibPin& pin_info) const;
 
+  /// @brief タイミングを表すノードから情報を取り出す．
+  /// @param[out] timing_info タイミングの情報を格納する変数
+  /// @retval true 正しく読み込めた．
+  /// @retval false エラーが起こった．
+  /// @note エラーは MsgMgr に出力する．
+  bool
+  get_timing_info(DotlibTiming& timing_info) const;
+
   /// @brief 1つの文字列からなるリストの場合に文字列を返す．
   /// @note 仮定が外れたらアボートする．
   ShString

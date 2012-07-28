@@ -768,6 +768,9 @@ private:
   // 電力単位
   string mLeakagePowerUnit;
 
+  // 遅延モデル
+  tDelayModel mDelayModel;
+
   // セル数
   ymuint32 mCellNum;
 

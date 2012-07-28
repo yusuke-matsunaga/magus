@@ -118,7 +118,7 @@ DefineHandler::read_attr(const ShString& attr_name,
     new_handler = new FloatSimpleHandler(g_handler);
   }
   else if ( type_str == "string" ) {
-    new_handler = new StrSimpleHandler(g_handler);
+    new_handler = new StrSimpleHandler(g_handler, false);
   }
   else {
     ostringstream buf;

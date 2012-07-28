@@ -105,11 +105,17 @@ private:
   // "leakage_power_unit"
   const DotlibNode* mLeakagePowerUnit;
 
+  // "pulling_resistance_unit"
+  const DotlibNode* mPullingResistanceUnit;
+
   // "time_unit"
   const DotlibNode* mTimeUnit;
 
   // "voltage_unit"
   const DotlibNode* mVoltageUnit;
+
+  // "delay_model"
+  const DotlibNode* mDelayModel;
 
   // セル定義のリスト
   list<const DotlibNode*> mCellList;

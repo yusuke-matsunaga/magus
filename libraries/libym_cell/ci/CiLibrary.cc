@@ -49,6 +49,7 @@ CellLibrary::new_obj()
 CiLibrary::CiLibrary() :
   mAlloc(4096)
 {
+  mDelayModel = kDelayGenericCmos;
 }
 
 // @brief デストラクタ
@@ -73,14 +74,16 @@ CiLibrary::technology() const
 
 // @brief 遅延モデルの取得
 // 返り値は
-// - kDelayGeneric
-// - kDelayPiecewise
-// - kDelayNonlinear
+// - kDelayGenericCmos
+// - kDelayTableLookup
+// - kDelayPiecewiseCmos
+// - kDelayCmos2
+// - kDelayDcm
 // のいずれか
 CellLibrary::tDelayModel
 CiLibrary::delay_model() const
 {
-  return kDelayGeneric;
+  return mDelayModel;
 }
 
 // @brief バス命名規則の取得

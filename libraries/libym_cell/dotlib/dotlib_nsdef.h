@@ -39,6 +39,7 @@ class DotlibFL;
 class DotlibFF;
 class DotlibLatch;
 class DotlibPin;
+class DotlibTiming;
 
 END_NAMESPACE_YM_DOTLIB
 

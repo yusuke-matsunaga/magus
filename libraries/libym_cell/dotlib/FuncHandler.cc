@@ -24,7 +24,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 FuncHandler::FuncHandler(GroupHandler* parent) :
-  SimpleHandler(parent)
+  SimpleHandler(parent, false)
 {
 }
 

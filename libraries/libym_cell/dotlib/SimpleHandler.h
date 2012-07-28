@@ -25,7 +25,10 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] parent 親のハンドラ
-  SimpleHandler(GroupHandler* parent);
+  /// @param[in] sym_mode シンボルモード
+  /// @note シンボルモードの時は数字で始まっていても文字列とみなす．
+  SimpleHandler(GroupHandler* parent,
+		bool sym_mode);
 
   /// @brief デストラクタ
   virtual
@@ -70,23 +73,36 @@ protected:
 	    const FileRegion& attr_loc,
 	    DotlibNodeImpl* value);
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // シンボルメンバ
+  bool mSymMode;
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SymSimpleHandler SimpleHandler.h "SimpleHandler.h"
-/// @brief 数字で始まっていても SYMBOL とみなす SimpleHandler
+/// @class StrSimpleHandler SimpleHandler.h "SimpleHandler.h"
+/// @brief 文字列を取る属性用のハンドラ
 //////////////////////////////////////////////////////////////////////
-class SymSimpleHandler :
+class StrSimpleHandler :
   public SimpleHandler
 {
 public:
 
   /// @brief コンストラクタ
-  SymSimpleHandler(GroupHandler* parent);
+  /// @param[in] parent 親のハンドラ
+  /// @param[in] sym_mode シンボルモード
+  /// @note シンボルモードの時は数字で始まっていても文字列とみなす．
+  StrSimpleHandler(GroupHandler* parent,
+		   bool sym_mode);
 
   /// @brief デストラクタ
-  ~SymSimpleHandler();
+  ~StrSimpleHandler();
 
 
 protected:
@@ -94,10 +110,7 @@ protected:
   // SimpleHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 値を読み込む処理
-  /// @return 値を表す DotlibNode を返す．
-  /// @note エラーが起きたら NULL を返す．
-  /// @note ここではシンボルモードで DotlibParser::read_token() を呼ぶ．
+  /// @brief 値を読み込む．
   virtual
   DotlibNodeImpl*
   read_value();
@@ -115,6 +128,7 @@ class IntSimpleHandler :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] parent 親のハンドラ
   IntSimpleHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
@@ -144,6 +158,7 @@ class BoolSimpleHandler :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] parent 親のハンドラ
   BoolSimpleHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
@@ -173,39 +188,11 @@ class FloatSimpleHandler :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] parent 親のハンドラ
   FloatSimpleHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   ~FloatSimpleHandler();
-
-
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // SimpleHandler の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 値を読み込む．
-  virtual
-  DotlibNodeImpl*
-  read_value();
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class StrSimpleHandler SimpleHandler.h "SimpleHandler.h"
-/// @brief 文字列を取る属性用のハンドラ
-//////////////////////////////////////////////////////////////////////
-class StrSimpleHandler :
-  public SimpleHandler
-{
-public:
-
-  /// @brief コンストラクタ
-  StrSimpleHandler(GroupHandler* parent);
-
-  /// @brief デストラクタ
-  ~StrSimpleHandler();
 
 
 protected:

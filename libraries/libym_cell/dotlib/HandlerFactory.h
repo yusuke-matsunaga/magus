@@ -209,15 +209,19 @@ public:
 
   /// @brief 汎用の simple attribute 用のハンドラを作る．
   /// @param[in] parent 親のハンドラ
+  /// @param[in] sym_mode シンボルモード
   static
   DotlibHandler*
-  new_simple(GroupHandler* parent);
+  new_simple(GroupHandler* parent,
+	     bool sym_mode);
 
-  /// @brief シンボルモードの simple attribute 用のハンドラを作る．
+  /// @brief 文字列の simple attribute 用のハンドラを作る．
   /// @param[in] parent 親のハンドラ
+  /// @param[in] sym_mode シンボルモード
   static
   DotlibHandler*
-  new_sym_simple(GroupHandler* parent);
+  new_string_simple(GroupHandler* parent,
+		    bool sym_mode);
 
   /// @brief 整数の simple attribute 用のハンドラを作る．
   /// @param[in] parent 親のハンドラ
@@ -230,12 +234,6 @@ public:
   static
   DotlibHandler*
   new_float_simple(GroupHandler* parent);
-
-  /// @brief 文字列の simple attribute 用のハンドラを作る．
-  /// @param[in] parent 親のハンドラ
-  static
-  DotlibHandler*
-  new_string_simple(GroupHandler* parent);
 
   /// @brief 式の simple attribute 用のハンドラを作る．
   /// @param[in] parent 親のハンドラ
