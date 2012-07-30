@@ -27,7 +27,7 @@ public:
   /// @brief テクノロジを表す列挙型
   //////////////////////////////////////////////////////////////////////
   enum tTechnology {
-    kTechAsic,
+    kTechCmos,
     kTechFpga
   };
 
@@ -69,7 +69,7 @@ public:
 
   /// @brief テクノロジの取得
   /// 返り値は
-  /// - kTechAsic
+  /// - kTechCmos
   /// - kTechFpga
   /// のどちらか
   virtual
@@ -369,6 +369,11 @@ public:
   virtual
   void
   set_name(const string& name) = 0;
+
+  /// @brief 'technology' を設定する．
+  virtual
+  void
+  set_technology(tTechnology technology) = 0;
 
   /// @brief 遅延モデルを設定する．
   /// @param[in] delay_model 遅延モデル．

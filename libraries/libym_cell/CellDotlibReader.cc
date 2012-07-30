@@ -110,6 +110,7 @@ gen_library(const DotlibNode* dt_library)
   library->set_name(library_info.name());
 
   // 'technology' の設定
+  library->set_technology(library_info.technology());
 
   // 'delay_model' の設定
   library->set_delay_model(library_info.delay_model());

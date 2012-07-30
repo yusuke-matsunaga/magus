@@ -357,6 +357,11 @@ public:
   void
   set_name(const string& name);
 
+  /// @brief 'technology' を設定する．
+  virtual
+  void
+  set_technology(tTechnology technology);
+
   /// @brief 遅延モデルを設定する．
   /// @param[in] delay_model 遅延モデル．
   virtual
@@ -758,6 +763,9 @@ private:
 
   // 名前
   string mName;
+
+  // テクノロジ
+  tTechnology mTechnology;
 
   // バス命名規則
   string mBusNamingStyle;

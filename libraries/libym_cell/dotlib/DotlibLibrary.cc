@@ -33,12 +33,13 @@ DotlibLibrary::init()
 {
   DotlibAttrMap::init();
 
+  mTechnology = CellLibrary::kTechCmos;
   mDelayModel = CellLibrary::kDelayGenericCmos;
   mBusNamingStyle = NULL;
   mComment = NULL;
   mDate = NULL;
   mRevision = NULL;
-  mCapacitiveLoadUnit = NULL;
+  mCapacitiveLoadUnit = 0.0;
   mCurrentUnit = NULL;
   mLeakagePowerUnit = NULL;
   mPullingResistanceUnit = NULL;
@@ -53,6 +54,13 @@ ShString
 DotlibLibrary::name() const
 {
   return mName;
+}
+
+// @brief "technology" を返す．
+CellLibrary::tTechnology
+DotlibLibrary::technology() const
+{
+  return mTechnology;
 }
 
 // @brief "delay_model" を返す．

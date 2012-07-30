@@ -49,6 +49,7 @@ CellLibrary::new_obj()
 CiLibrary::CiLibrary() :
   mAlloc(4096)
 {
+  mTechnology = kTechCmos;
   mDelayModel = kDelayGenericCmos;
 }
 
@@ -65,11 +66,10 @@ CiLibrary::name() const
 }
 
 // @brief テクノロジの取得
-// このクラスは常に kTechAsic を返す．
 CellLibrary::tTechnology
 CiLibrary::technology() const
 {
-  return kTechAsic;
+  return mTechnology;
 }
 
 // @brief 遅延モデルの取得
@@ -415,6 +415,13 @@ void
 CiLibrary::set_name(const string& name)
 {
   mName = name;
+}
+
+// @brief 'technology' を設定する．
+void
+CiLibrary::set_technology(tTechnology technology)
+{
+  mTechnology = technology;
 }
 
 // @brief 遅延モデルを設定する．

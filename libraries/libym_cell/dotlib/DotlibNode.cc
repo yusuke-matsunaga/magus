@@ -89,6 +89,47 @@ DotlibNode::get_library_info(DotlibLibrary& library_info) const
     }
   }
 
+  // 'technology' を取り出す．
+  const DotlibNode* tech_node = NULL;
+  if ( !library_info.get_singleton_or_null("technology", tech_node) ) {
+    return false;
+  }
+  if ( tech_node ) {
+    assert_cond( tech_node->is_list(), __FILE__, __LINE__);
+    if ( tech_node->list_size() != 1 ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tech_node->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error");
+      return false;
+    }
+    const DotlibNode* top = tech_node->top();
+    if ( !top->is_string() ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tech_node->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error. string required.");
+      return false;
+    }
+    ShString str = top->string_value();
+    if ( str == "cmos" ) {
+      library_info.mTechnology = CellLibrary::kTechCmos;
+    }
+    else if ( str == "fpga" ) {
+      library_info.mTechnology = CellLibrary::kTechFpga;
+    }
+    else {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      top->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error. only 'asic' or 'fpga' are allowed.");
+      return false;
+    }
+  }
+
   // 'delay_model' を取り出す．
   const DotlibNode* dm_node = NULL;
   if ( !library_info.get_singleton_or_null("delay_model", dm_node) ) {

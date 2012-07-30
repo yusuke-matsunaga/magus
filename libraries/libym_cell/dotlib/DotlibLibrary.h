@@ -43,6 +43,10 @@ public:
   ShString
   name() const;
 
+  /// @brief "technology" を返す．
+  CellLibrary::tTechnology
+  technology() const;
+
   /// @brief "delay_model" を返す．
   CellLibrary::tDelayModel
   delay_model() const;
@@ -104,6 +108,9 @@ private:
 
   // ライブラリ名
   ShString mName;
+
+  // "technology"
+  CellLibrary::tTechnology mTechnology;
 
   // "delay_model"
   CellLibrary::tDelayModel mDelayModel;

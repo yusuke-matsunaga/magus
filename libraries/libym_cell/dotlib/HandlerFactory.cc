@@ -105,12 +105,12 @@ HandlerFactory::new_library(DotlibParserImpl& parser)
   handler->reg_handler("default_rise_pin_resistance",            flt_simple);
   handler->reg_handler("default_slope_fall",                     flt_simple);
   handler->reg_handler("default_slope_rise",                     flt_simple);
-  handler->reg_handler("default_wire_load",                      flt_simple);
+  handler->reg_handler("default_wire_load",                      str_simple);
   handler->reg_handler("default_wire_load_area",                 flt_simple);
   handler->reg_handler("default_wire_load_capacitance",          flt_simple);
-  handler->reg_handler("default_wire_load_mode",                 flt_simple);
+  handler->reg_handler("default_wire_load_mode",                 str_simple);
   handler->reg_handler("default_wire_load_resistance",           flt_simple);
-  handler->reg_handler("default_wire_load_selection",            flt_simple);
+  handler->reg_handler("default_wire_load_selection",            str_simple);
 
   // scaling attributes
   handler->reg_handler("k_process_cell_fall",                    flt_simple);
