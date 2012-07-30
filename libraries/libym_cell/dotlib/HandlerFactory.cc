@@ -51,26 +51,26 @@ HandlerFactory::new_library(DotlibParserImpl& parser)
   handler->reg_handler("current_unit",                           symstr_simple);
   handler->reg_handler("date",                                   str_simple);
   handler->reg_handler("delay_model",                            str_simple);
-  handler->reg_handler("em_temp_degradation_factor",             simple);
-  handler->reg_handler("fpga_technology",                        simple);
-  handler->reg_handler("in_place_swap_mode",                     simple);
+  handler->reg_handler("em_temp_degradation_factor",             flt_simple);
+  handler->reg_handler("fpga_technology",                        str_simple);
+  handler->reg_handler("in_place_swap_mode",                     str_simple);
   handler->reg_handler("input_threshold_pct_fall",               simple);
   handler->reg_handler("input_threshold_pct_rise",               simple);
   handler->reg_handler("leakage_power_unit",                     symstr_simple);
-  handler->reg_handler("nom_calc_mode",                          simple);
-  handler->reg_handler("nom_process",                            simple);
-  handler->reg_handler("nom_temperature",                        simple);
-  handler->reg_handler("nom_voltage",                            simple);
+  handler->reg_handler("nom_calc_mode",                          str_simple);
+  handler->reg_handler("nom_process",                            flt_simple);
+  handler->reg_handler("nom_temperature",                        flt_simple);
+  handler->reg_handler("nom_voltage",                            flt_simple);
   handler->reg_handler("output_threshold_pct_fall",              simple);
   handler->reg_handler("output_threshold_pct_rise",              simple);
-  handler->reg_handler("piece_type",                             simple);
-  handler->reg_handler("power_model",                            simple);
-  handler->reg_handler("preferred_output_pad_slew_rate_control", simple);
-  handler->reg_handler("preferred_input_pad_voltage",            simple);
-  handler->reg_handler("preferred_output_pad_voltage",           simple);
+  handler->reg_handler("piece_type",                             str_simple);
+  handler->reg_handler("power_model",                            str_simple);
+  handler->reg_handler("preferred_output_pad_slew_rate_control", str_simple);
+  handler->reg_handler("preferred_input_pad_voltage",            str_simple);
+  handler->reg_handler("preferred_output_pad_voltage",           str_simple);
   handler->reg_handler("pulling_resistance_unit",                symstr_simple);
   handler->reg_handler("revision",                               symstr_simple);
-  handler->reg_handler("simulation",                             simple);
+  handler->reg_handler("simulation",                             str_simple);
   handler->reg_handler("slew_derate_from_library",               simple);
   handler->reg_handler("slew_lower_threshold_pct_fall",          simple);
   handler->reg_handler("slew_lower_threshold_pct_rise",          simple);
@@ -81,7 +81,7 @@ HandlerFactory::new_library(DotlibParserImpl& parser)
 
   // default attributes
   handler->reg_handler("default_cell_leakage_power",             flt_simple);
-  handler->reg_handler("default_connection_class",               flt_simple);
+  handler->reg_handler("default_connection_class",               str_simple);
   handler->reg_handler("default_fall_delay_intercept",           flt_simple);
   handler->reg_handler("default_fall_pin_resistance",            flt_simple);
   handler->reg_handler("default_fanout_load",                    flt_simple);
