@@ -227,6 +227,7 @@ HandlerFactory::new_library(DotlibParserImpl& parser)
 
   // complex attributes
   DotlibHandler* complex = new_complex(handler);
+  DotlibHandler* str1_complex = new_str1_complex(handler);
   DotlibHandler* define = new_define(handler);
   handler->reg_handler("capacitive_load_unit",                   complex);
   handler->reg_handler("default_part",                           complex);
@@ -236,7 +237,7 @@ HandlerFactory::new_library(DotlibParserImpl& parser)
   handler->reg_handler("library_features",                       complex);
   handler->reg_handler("piece_define",                           complex);
   handler->reg_handler("routing_layers",                         complex);
-  handler->reg_handler("technology",                             complex);
+  handler->reg_handler("technology",                             str1_complex);
 
   //fall_net_delay : name ;
   //rise_net_delay : name ;
@@ -1003,6 +1004,14 @@ DotlibHandler*
 HandlerFactory::new_complex(GroupHandler* parent)
 {
   return new ComplexHandler(parent);
+}
+
+// @brief string1 complex attribute 用のハンドラを作る．
+// @param[in] parent 親のハンドラ
+DotlibHandler*
+HandlerFactory::new_str1_complex(GroupHandler* parent)
+{
+  return new Str1ComplexHandler(parent);
 }
 
 // @brief define complex attribute 用のハンドラを作る．

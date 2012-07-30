@@ -256,7 +256,7 @@ EmptyGroupHandler::check_group_value(const ShString& attr_name,
 {
   ymuint n = value_list->list_size();
   if ( n > 0 ) {
-    const DotlibNode* top = value_list->top();
+    const DotlibNode* top = value_list->list_elem(0);
     FileRegion loc = top->loc();
     ostringstream buf;
     buf << attr_name << " statement does not have parameters.";
@@ -316,9 +316,9 @@ Str1GroupHandler::check_group_value(const ShString& attr_name,
     return false;
   }
 
-  const DotlibNode* top = value_list->top();
+  const DotlibNode* top = value_list->list_elem(0);
   if ( n > 1 ) {
-    const DotlibNode* second = top->next();
+    const DotlibNode* second = value_list->list_elem(1);
     FileRegion loc = second->loc();
     ostringstream buf;
     buf << attr_name << " statement has only one string parameter.";
@@ -379,10 +379,10 @@ Str2GroupHandler::check_group_value(const ShString& attr_name,
     return false;
   }
 
-  const DotlibNode* top = value_list->top();
-  const DotlibNode* second = top->next();
+  const DotlibNode* top = value_list->list_elem(0);
+  const DotlibNode* second = value_list->list_elem(1);
   if ( n > 2 ) {
-    const DotlibNode* third = second->next();
+    const DotlibNode* third = value_list->list_elem(2);
     FileRegion loc = third->loc();
     ostringstream buf;
     buf << attr_name << " statement has two string parameters.";
@@ -451,11 +451,11 @@ Str2IntGroupHandler::check_group_value(const ShString& attr_name,
     return false;
   }
 
-  const DotlibNode* top = value_list->top();
-  const DotlibNode* second = top->next();
-  const DotlibNode* third = second->next();
+  const DotlibNode* top = value_list->list_elem(0);
+  const DotlibNode* second = value_list->list_elem(1);
+  const DotlibNode* third = value_list->list_elem(2);
   if ( n > 3 ) {
-    const DotlibNode* forth = third->next();
+    const DotlibNode* forth = value_list->list_elem(3);
   FileRegion loc = forth->loc();
     ostringstream buf;
     buf << attr_name << " statement has two string and an integer parameters.";

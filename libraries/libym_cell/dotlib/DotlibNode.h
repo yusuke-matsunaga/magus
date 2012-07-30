@@ -143,17 +143,18 @@ public:
   const DotlibNode*
   opr2() const = 0;
 
-  /// @brief リストの先頭の要素を返す．
-  /// @note is_list() = true の時のみ意味を持つ．
-  virtual
-  const DotlibNode*
-  top() const = 0;
-
   /// @brief リストの要素数を返す．
   /// @note is_list() = true の時のみ意味を持つ．
   virtual
   ymuint
   list_size() const = 0;
+
+  /// @brief リストの要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < list_size() )
+  /// @note is_list() == true の時のみ意味を持つ．
+  virtual
+  const DotlibNode*
+  list_elem(ymuint pos) const = 0;
 
   /// @brief グループの値を得る．
   /// @note is_group() = true の時のみ意味を持つ．

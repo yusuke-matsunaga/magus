@@ -66,6 +66,83 @@ protected:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+/// @class Str1ComplexHandler DotlibHandler.h "DotlibHandler.h"
+/// @brief 1つの文字列型をとる complex attribute ハンドラ
+//////////////////////////////////////////////////////////////////////
+class Str1ComplexHandler :
+  public ComplexHandler
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] parent 親のハンドラ
+  Str1ComplexHandler(GroupHandler* parent);
+
+  /// @brief デストラクタ
+  virtual
+  ~Str1ComplexHandler();
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // ComplexHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 値を読み込んだ時の処理
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value 値のリスト
+  /// @param[in] end_loc 右括弧の位置
+  virtual
+  bool
+  set_value(const ShString& attr_name,
+	    const FileRegion& attr_loc,
+	    DotlibNodeImpl* value,
+	    const FileRegion& end_loc);
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class UnitComplexHandler DotlibHandler.h "DotlibHandler.h"
+/// @brief 単位型のcomplex attribute ハンドラ
+//////////////////////////////////////////////////////////////////////
+class UnitComplexHandler :
+  public ComplexHandler
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] parent 親のハンドラ
+  UnitComplexHandler(GroupHandler* parent);
+
+  /// @brief デストラクタ
+  virtual
+  ~UnitComplexHandler();
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // ComplexHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 値を読み込んだ時の処理
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value 値のリスト
+  /// @param[in] end_loc 右括弧の位置
+  virtual
+  bool
+  set_value(const ShString& attr_name,
+	    const FileRegion& attr_loc,
+	    DotlibNodeImpl* value,
+	    const FileRegion& end_loc);
+
+};
+
+
 END_NAMESPACE_YM_DOTLIB
 
 #endif // LIBYM_DOTLIB_COMPLEXHANDLER_H

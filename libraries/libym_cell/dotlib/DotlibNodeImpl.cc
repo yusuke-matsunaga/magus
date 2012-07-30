@@ -159,15 +159,6 @@ DotlibNodeImpl::opr2() const
   return NULL;
 }
 
-// @brief リストの先頭の要素を返す．
-// @note is_list() = true の時のみ意味を持つ．
-const DotlibNode*
-DotlibNodeImpl::top() const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
 // @brief リストの要素数を返す．
 // @note is_list() = true の時のみ意味を持つ．
 ymuint
@@ -175,6 +166,16 @@ DotlibNodeImpl::list_size() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return 0;
+}
+
+// @brief リストの要素を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < list_size() )
+// @note is_list() == true の時のみ意味を持つ．
+const DotlibNode*
+DotlibNodeImpl::list_elem(ymuint pos) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
 }
 
 // @brief グループの値を得る．
@@ -582,9 +583,7 @@ DotlibOpr::dump(ostream& s,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-DotlibList::DotlibList() :
-  mTop(NULL),
-  mTail(NULL)
+DotlibList::DotlibList()
 {
 }
 
@@ -611,18 +610,10 @@ DotlibList::is_list() const
 FileRegion
 DotlibList::loc() const
 {
-  if ( mTop == NULL ) {
+  if ( mBody.empty() ) {
     return FileRegion();
   }
-  return FileRegion(mTop->loc(), mTail->loc());
-}
-
-// @brief リストの先頭の要素を返す．
-// @note type() が kList の時のみ意味をもつ．
-const DotlibNode*
-DotlibList::top() const
-{
-  return mTop;
+  return FileRegion(mBody.front()->loc(), mBody.back()->loc());
 }
 
 // @brief リストの要素数を返す．
@@ -630,11 +621,16 @@ DotlibList::top() const
 ymuint
 DotlibList::list_size() const
 {
-  ymuint n = 0;
-  for (const DotlibNode* v = top(); v; v = v->next()) {
-    ++ n;
-  }
-  return n;
+  return mBody.size();
+}
+
+// @brief リストの要素を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < list_size() )
+// @note is_list() == true の時のみ意味を持つ．
+const DotlibNode*
+DotlibList::list_elem(ymuint pos) const
+{
+  return mBody[pos];
 }
 
 // @brief 内容をストリーム出力する．
@@ -646,7 +642,9 @@ DotlibList::dump(ostream& s,
 {
   s << "(";
   const char* comma = "";
-  for (const DotlibNode* v = top(); v; v = v->next()) {
+  for (vector<const DotlibNodeImpl*>::const_iterator p = mBody.begin();
+       p != mBody.end(); ++ p) {
+    const DotlibNodeImpl* v = *p;
     s << comma;
     v->dump(s, 0);
     comma = ", ";
@@ -660,13 +658,7 @@ DotlibList::dump(ostream& s,
 void
 DotlibList::add_node(DotlibNodeImpl* node)
 {
-  if ( mTop != NULL ) {
-    mTail->mNext = node;
-    mTail = node;
-  }
-  else {
-    mTop = mTail = node;
-  }
+  mBody.push_back(node);
 }
 
 

@@ -104,17 +104,18 @@ public:
   const DotlibNode*
   opr2() const;
 
-  /// @brief リストの先頭の要素を返す．
-  /// @note is_list() = true の時のみ意味を持つ．
-  virtual
-  const DotlibNode*
-  top() const;
-
   /// @brief リストの要素数を返す．
   /// @note is_list() = true の時のみ意味を持つ．
   virtual
   ymuint
   list_size() const;
+
+  /// @brief リストの要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < list_size() )
+  /// @note is_list() == true の時のみ意味を持つ．
+  virtual
+  const DotlibNode*
+  list_elem(ymuint pos) const;
 
   /// @brief グループの値を得る．
   /// @note is_group() = true の時のみ意味を持つ．
@@ -582,17 +583,18 @@ public:
   FileRegion
   loc() const;
 
-  /// @brief リストの先頭の要素を返す．
-  /// @note type() が kList の時のみ意味をもつ．
-  virtual
-  const DotlibNode*
-  top() const;
-
   /// @brief リストの要素数を返す．
   /// @note is_list() = true の時のみ意味を持つ．
   virtual
   ymuint
   list_size() const;
+
+  /// @brief リストの要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < list_size() )
+  /// @note is_list() == true の時のみ意味を持つ．
+  virtual
+  const DotlibNode*
+  list_elem(ymuint pos) const;
 
   /// @brief 内容をストリーム出力する．
   /// @param[in] s 出力先のストリーム
@@ -621,11 +623,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 先頭の要素
-  const DotlibNodeImpl* mTop;
-
-  // 末尾の要素
-  DotlibNodeImpl* mTail;
+  // 要素
+  vector<const DotlibNodeImpl*> mBody;
 
 };
 

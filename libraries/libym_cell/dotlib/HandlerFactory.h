@@ -195,6 +195,12 @@ public:
   DotlibHandler*
   new_complex(GroupHandler* parent);
 
+  /// @brief 1つの文字列をとる complex attribute 用のハンドラを作る．
+  /// @param[in] parent 親のハンドラ
+  static
+  DotlibHandler*
+  new_str1_complex(GroupHandler* parent);
+
   /// @brief define complex attribute 用のハンドラを作る．
   /// @param[in] parent 親のハンドラ
   static

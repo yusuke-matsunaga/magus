@@ -96,23 +96,7 @@ DotlibNode::get_library_info(DotlibLibrary& library_info) const
   }
   if ( tech_node ) {
     assert_cond( tech_node->is_list(), __FILE__, __LINE__);
-    if ( tech_node->list_size() != 1 ) {
-      MsgMgr::put_msg(__FILE__, __LINE__,
-		      tech_node->loc(),
-		      kMsgError,
-		      "DOTLIB_PARSER",
-		      "Syntax error");
-      return false;
-    }
-    const DotlibNode* top = tech_node->top();
-    if ( !top->is_string() ) {
-      MsgMgr::put_msg(__FILE__, __LINE__,
-		      tech_node->loc(),
-		      kMsgError,
-		      "DOTLIB_PARSER",
-		      "Syntax error. string required.");
-      return false;
-    }
+    const DotlibNode* top = tech_node->list_elem(0);
     ShString str = top->string_value();
     if ( str == "cmos" ) {
       library_info.mTechnology = CellLibrary::kTechCmos;
@@ -226,7 +210,7 @@ DotlibNode::get_library_info(DotlibLibrary& library_info) const
 		      "Syntax error");
       return false;
     }
-    const DotlibNode* top = clu->top();
+    const DotlibNode* top = clu->list_elem(0);
     if ( top->is_int() ) {
       library_info.mCapacitiveLoadUnit = top->int_value();
     }
@@ -241,7 +225,7 @@ DotlibNode::get_library_info(DotlibLibrary& library_info) const
 		      "Syntax error, a number expected");
       return false;
     }
-    const DotlibNode* next = top->next();
+    const DotlibNode* next = clu->list_elem(1);
     if ( !next->is_string() ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      next->loc(),
@@ -771,7 +755,7 @@ DotlibNode::get_string_from_value_list() const
 {
   assert_cond( is_list(), __FILE__, __LINE__);
   assert_cond( list_size() == 1, __FILE__, __LINE__);
-  const DotlibNode* value = top();
+  const DotlibNode* value = list_elem(0);
   assert_cond( value->is_string(), __FILE__, __LINE__);
   return value->string_value();
 }
@@ -795,7 +779,7 @@ DotlibNode::get_string_pair(ShString& str1,
 		    "Expected list size is 2.");
     return false;
   }
-  const DotlibNode* node1 = top();
+  const DotlibNode* node1 = list_elem(0);
   assert_cond( node1 != NULL, __FILE__, __LINE__);
   if ( !node1->is_string() ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
@@ -805,7 +789,7 @@ DotlibNode::get_string_pair(ShString& str1,
 		    "String value is expected.");
     return false;
   }
-  const DotlibNode* node2 = node1->next();
+  const DotlibNode* node2 = list_elem(1);
   assert_cond( node2 != NULL, __FILE__, __LINE__);
   if ( !node2->is_string() ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
