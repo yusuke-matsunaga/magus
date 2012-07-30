@@ -90,11 +90,18 @@ DotlibLibrary::revision() const
   return mRevision;
 }
 
-// @brief "capacitive_load_unit" を返す．
-const DotlibNode*
+// @brief "capacitive_load_unit"->top() を返す．
+double
 DotlibLibrary::capacitive_load_unit() const
 {
   return mCapacitiveLoadUnit;
+}
+
+// @brief "capacitive_load_unit"->top()->next() を返す．
+string
+DotlibLibrary::capacitive_load_unit_str() const
+{
+  return mCapacitiveLoadUnitStr;
 }
 
 // @brief "current_unit" を返す．

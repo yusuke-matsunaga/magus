@@ -63,9 +63,14 @@ public:
   const DotlibNode*
   revision() const;
 
-  /// @brief "capacitive_load_unit" を返す．
-  const DotlibNode*
+  /// @brief "capacitive_load_unit"->top() の値を返す．
+  /// @note 未定義なら 0.0 が返る．
+  double
   capacitive_load_unit() const;
+
+  /// @brief "capacitive_load_unit"->top()->next() の値を返す．
+  string
+  capacitive_load_unit_str() const;
 
   /// @brief "current_unit" を返す．
   const DotlibNode*
@@ -115,8 +120,11 @@ private:
   // "revision"
   const DotlibNode* mRevision;
 
-  // "capacitive_load_unit"
-  const DotlibNode* mCapacitiveLoadUnit;
+  // "capacitive_load_unit->top"
+  double mCapacitiveLoadUnit;
+
+  // "capacitive_load_unit->top->next"
+  ShString mCapacitiveLoadUnitStr;
 
   // "current_unit"
   const DotlibNode* mCurrentUnit;

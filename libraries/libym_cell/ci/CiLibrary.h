@@ -116,9 +116,16 @@ public:
   pulling_resistance_unit() const;
 
   /// @brief 容量単位の取得
+  /// @note なぜかここだけインターフェイスが異なる．
+  virtual
+  double
+  capacitive_load_unit() const;
+
+  /// @brief 容量単位文字列の取得
+  /// @note なぜかここだけインターフェイスが異なる．
   virtual
   string
-  capacitive_load_unit() const;
+  capacitive_load_unit_str() const;
 
   /// @brief 電力単位の取得
   virtual
@@ -351,9 +358,18 @@ public:
   set_name(const string& name);
 
   /// @brief 遅延モデルを設定する．
+  /// @param[in] delay_model 遅延モデル．
   virtual
   void
   set_delay_model(tDelayModel delay_model);
+
+  /// @brief 'capacitive_load_unit' を設定する．
+  /// @param[in] unit 単位
+  /// @param[in] ustr 単位の後に表示する文字列
+  virtual
+  void
+  set_capacitive_load_unit(double unit,
+			   const string& ustr);
 
   /// @brief 属性を設定する．
   /// @param[in] attr_name 属性名
@@ -768,7 +784,10 @@ private:
   string mPullingResistanceUnit;
 
   // 容量単位
-  string mCapacitiveLoadUnit;
+  double mCapacitiveLoadUnit;
+
+  // 容量単位の文字列
+  string mCapacitiveLoadUnitStr;
 
   // 電力単位
   string mLeakagePowerUnit;

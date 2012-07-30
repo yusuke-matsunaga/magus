@@ -168,6 +168,50 @@ DotlibNode::get_library_info(DotlibLibrary& library_info) const
     return false;
   }
 
+  // 'capacitive_load_unit' を取り出す．
+  const DotlibNode* clu = NULL;
+  if ( !library_info.get_singleton_or_null("capacitive_load_unit",
+					   clu) ) {
+    return false;
+  }
+  if ( clu ) {
+    // clu は ComplexHandler で読んでいるからリストのはず．
+    assert_cond( clu->is_list(), __FILE__, __LINE__);
+    if ( clu->list_size() != 2 ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      clu->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error");
+      return false;
+    }
+    const DotlibNode* top = clu->top();
+    if ( top->is_int() ) {
+      library_info.mCapacitiveLoadUnit = top->int_value();
+    }
+    else if ( top->is_float() ) {
+      library_info.mCapacitiveLoadUnit = top->float_value();
+    }
+    else {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      top->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error, a number expected");
+      return false;
+    }
+    const DotlibNode* next = top->next();
+    if ( !next->is_string() ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      next->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error, a string expected");
+      return false;
+    }
+    library_info.mCapacitiveLoadUnitStr = next->string_value();
+  }
+
   // 'time_unit' を取り出す．
   if ( !library_info.get_singleton_or_null("time_unit",
 					   library_info.mTimeUnit) ) {

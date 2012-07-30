@@ -238,7 +238,8 @@ display_library(ostream& s,
   s << "  pulling_resistance_unit: " << library.pulling_resistance_unit() << endl;
 
   // 容量単位
-  s << "  capacitive_load_unit: " << library.capacitive_load_unit() << endl;
+  s << "  capacitive_load_unit: " << library.capacitive_load_unit()
+    << library.capacitive_load_unit_str() << endl;
 
   // 電力単位
   s << "  leakage_power_unit: " << library.leakage_power_unit() << endl;

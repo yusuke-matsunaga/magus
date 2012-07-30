@@ -143,10 +143,19 @@ CiLibrary::pulling_resistance_unit() const
 }
 
 // @brief 容量単位の取得
-string
+// @note なぜかここだけインターフェイスが異なる．
+double
 CiLibrary::capacitive_load_unit() const
 {
   return mCapacitiveLoadUnit;
+}
+
+// @brief 容量単位文字列の取得
+// @note なぜかここだけインターフェイスが異なる．
+string
+CiLibrary::capacitive_load_unit_str() const
+{
+  return mCapacitiveLoadUnitStr;
 }
 
 // @brief 電力単位の取得
@@ -415,6 +424,17 @@ CiLibrary::set_delay_model(tDelayModel delay_model)
   mDelayModel = delay_model;
 }
 
+// @brief 'capacitive_load_unit' を設定する．
+// @param[in] unit 単位
+// @param[in] ustr 単位の後に表示する文字列
+void
+CiLibrary::set_capacitive_load_unit(double unit,
+				    const string& ustr)
+{
+  mCapacitiveLoadUnit = unit;
+  mCapacitiveLoadUnitStr = ustr;
+}
+
 // @brief 属性を設定する．
 // @param[in] attr_name 属性名
 // @param[in] value 値
@@ -445,9 +465,6 @@ CiLibrary::set_attr(const string& attr_name,
   }
   else if ( attr_name == "pulling_resistance_unit" ) {
     mPullingResistanceUnit = value;
-  }
-  else if ( attr_name == "capacitive_load_unit" ) {
-    mCapacitiveLoadUnit = value;
   }
   else if ( attr_name == "leakage_power_unit" ) {
     mLeakagePowerUnit = value;

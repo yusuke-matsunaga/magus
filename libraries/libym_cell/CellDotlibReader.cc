@@ -164,8 +164,9 @@ gen_library(const DotlibNode* dt_library)
 
   // 'capacitive_load_unit' の設定
   if ( library_info.capacitive_load_unit() ) {
-    ShString value = library_info.capacitive_load_unit()->string_value();
-    library->set_attr("capacitive_load_unit", value);
+    double u = library_info.capacitive_load_unit();
+    string ustr = library_info.capacitive_load_unit_str();
+    library->set_capacitive_load_unit(u, ustr);
   }
 
   // 'leakage_power_unit' の設定
