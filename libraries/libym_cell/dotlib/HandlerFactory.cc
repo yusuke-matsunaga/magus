@@ -228,8 +228,9 @@ HandlerFactory::new_library(DotlibParserImpl& parser)
   // complex attributes
   DotlibHandler* complex = new_complex(handler);
   DotlibHandler* str1_complex = new_str1_complex(handler);
+  DotlibHandler* unit_complex = new_unit_complex(handler);
   DotlibHandler* define = new_define(handler);
-  handler->reg_handler("capacitive_load_unit",                   complex);
+  handler->reg_handler("capacitive_load_unit",                   unit_complex);
   handler->reg_handler("default_part",                           complex);
   handler->reg_handler("define",                                 define);
   handler->reg_handler("define_cell_area",                       complex);
@@ -1012,6 +1013,14 @@ DotlibHandler*
 HandlerFactory::new_str1_complex(GroupHandler* parent)
 {
   return new Str1ComplexHandler(parent);
+}
+
+// @brief 単位指定用の complex attribute 用のハンドラを作る．
+// @param[in] parent 親のハンドラ
+DotlibHandler*
+HandlerFactory::new_unit_complex(GroupHandler* parent)
+{
+  return new UnitComplexHandler(parent);
 }
 
 // @brief define complex attribute 用のハンドラを作る．

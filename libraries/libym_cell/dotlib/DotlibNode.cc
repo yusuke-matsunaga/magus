@@ -95,9 +95,7 @@ DotlibNode::get_library_info(DotlibLibrary& library_info) const
     return false;
   }
   if ( tech_node ) {
-    assert_cond( tech_node->is_list(), __FILE__, __LINE__);
-    const DotlibNode* top = tech_node->list_elem(0);
-    ShString str = top->string_value();
+    ShString str = tech_node->get_string_from_value_list();
     if ( str == "cmos" ) {
       library_info.mTechnology = CellLibrary::kTechCmos;
     }
@@ -106,7 +104,7 @@ DotlibNode::get_library_info(DotlibLibrary& library_info) const
     }
     else {
       MsgMgr::put_msg(__FILE__, __LINE__,
-		      top->loc(),
+		      tech_node->loc(),
 		      kMsgError,
 		      "DOTLIB_PARSER",
 		      "Syntax error. only 'asic' or 'fpga' are allowed.");
@@ -195,8 +193,7 @@ DotlibNode::get_library_info(DotlibLibrary& library_info) const
 
   // 'capacitive_load_unit' を取り出す．
   const DotlibNode* clu = NULL;
-  if ( !library_info.get_singleton_or_null("capacitive_load_unit",
-					   clu) ) {
+  if ( !library_info.get_singleton_or_null("capacitive_load_unit", clu) ) {
     return false;
   }
   if ( clu ) {

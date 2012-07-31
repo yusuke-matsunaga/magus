@@ -201,6 +201,12 @@ public:
   DotlibHandler*
   new_str1_complex(GroupHandler* parent);
 
+  /// @brief 単位指定用の complex attribute 用のハンドラを作る．
+  /// @param[in] parent 親のハンドラ
+  static
+  DotlibHandler*
+  new_unit_complex(GroupHandler* parent);
+
   /// @brief define complex attribute 用のハンドラを作る．
   /// @param[in] parent 親のハンドラ
   static
