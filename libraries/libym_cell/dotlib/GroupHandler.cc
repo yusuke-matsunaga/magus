@@ -124,7 +124,7 @@ GroupHandler::add_attr(const ShString& attr_name,
 		       DotlibNodeImpl* value,
 		       const FileRegion& loc)
 {
-  DotlibNodeImpl* attr = mgr()->new_attr(attr_name, value, loc);
+  DotlibAttr* attr = mgr()->new_attr(attr_name, value, loc);
   mNode->add_attr(attr);
   return true;
 }
@@ -195,8 +195,7 @@ GroupHandler::end_group(const ShString& attr_name,
 {
   FileRegion loc(attr_loc, end_loc);
   if ( attr_name == "library" ) {
-    DotlibNodeImpl* root = mgr()->new_attr(attr_name, mNode, loc);
-    mgr()->set_root_node(root);
+    mgr()->set_root_node(mNode);
   }
   else {
     parent()->add_attr(attr_name, mNode, loc);

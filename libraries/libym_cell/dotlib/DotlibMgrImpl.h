@@ -122,14 +122,14 @@ public:
 	    const FileRegion& loc);
 
   /// @brief DotlibAttr を生成する．
-  DotlibNodeImpl*
+  DotlibAttr*
   new_attr(const ShString& attr_name,
 	   const DotlibNode* value,
 	   const FileRegion& loc);
 
   /// @brief 根のノードを設定する．
   void
-  set_root_node(DotlibNodeImpl* root);
+  set_root_node(DotlibNode* root);
 
   /// @brief 根のノードを返す．
   const DotlibNode*
@@ -150,7 +150,7 @@ private:
   SimpleAlloc mAlloc;
 
   // 根のノード
-  DotlibNodeImpl* mRoot;
+  DotlibNode* mRoot;
 
   // 個々の要素の使用数
   ymuint32 mIntNum;

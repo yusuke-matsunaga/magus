@@ -69,11 +69,6 @@ public:
   bool
   is_group() const;
 
-  /// @brief 属性型(kAttr)の時に true を返す．
-  virtual
-  bool
-  is_attr() const;
-
   /// @brief 整数値を返す．
   /// @note is_int() = true の時のみ意味を持つ．
   virtual
@@ -126,26 +121,8 @@ public:
   /// @brief 先頭の属性を得る．
   /// @note is_group() = true の時のみ意味を持つ．
   virtual
-  const DotlibNode*
+  const DotlibAttr*
   attr_top() const;
-
-  /// @brief 属性名を得る．
-  /// @note is_attr() = true の時のみ意味を持つ．
-  virtual
-  ShString
-  attr_name() const;
-
-  /// @brief 属性の値を得る．
-  /// @note is_attr() = true の時のみ意味を持つ．
-  virtual
-  const DotlibNode*
-  attr_value() const;
-
-  /// @brief リストの次の要素を得る．
-  /// @note これはすべての型で意味を持つ．
-  virtual
-  const DotlibNode*
-  next() const;
 
 
 public:
@@ -165,21 +142,7 @@ public:
   /// @note is_group() = true の時のみ意味を持つ．
   virtual
   void
-  add_attr(DotlibNodeImpl* attr);
-
-  /// @brief 次の要素を設定する．
-  /// @param[in] next 次の要素
-  void
-  set_next(DotlibNodeImpl* next);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 次の要素を指すリンクポインタ
-  DotlibNodeImpl* mNext;
+  add_attr(DotlibAttr* attr);
 
 };
 
@@ -673,7 +636,7 @@ public:
   /// @brief 先頭の属性を得る．
   /// @note type() が kGroup の時のみ意味を持つ．
   virtual
-  const DotlibNode*
+  const DotlibAttr*
   attr_top() const;
 
   /// @brief 内容をストリーム出力する．
@@ -695,7 +658,7 @@ public:
   /// @note type() が kGroup の時のみ意味を持つ．
   virtual
   void
-  add_attr(DotlibNodeImpl* attr);
+  add_attr(DotlibAttr* attr);
 
 
 private:
@@ -707,82 +670,10 @@ private:
   const DotlibNode* mValue;
 
   // 属性の先頭
-  DotlibNodeImpl* mAttrTop;
+  DotlibAttr* mAttrTop;
 
   // 属性の末尾
-  DotlibNodeImpl* mAttrTail;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class DotlibAttr DotlibNodeImpl.h "DotlibNodeImpl.h"
-/// @brief 属性を表す DotlibNode の継承クラス
-//////////////////////////////////////////////////////////////////////
-class DotlibAttr :
-  public DotlibNodeBase
-{
-  friend class DotlibMgrImpl;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] attr_name 属性名
-  /// @param[in] value 値
-  /// @param[in] loc ファイル上の位置
-  DotlibAttr(const ShString& attr_name,
-	     const DotlibNode* value,
-	     const FileRegion& loc);
-
-  /// @brief デストラクタ
-  virtual
-  ~DotlibAttr();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を参照する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 型を得る．
-  virtual
-  tType
-  type() const;
-
-  /// @brief 属性型(kAttr)の時に true を返す．
-  virtual
-  bool
-  is_attr() const;
-
-  /// @brief 属性名を得る．
-  virtual
-  ShString
-  attr_name() const;
-
-  /// @brief 属性の値を得る．
-  virtual
-  const DotlibNode*
-  attr_value() const;
-
-  /// @brief 内容をストリーム出力する．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] indent インデント量
-  virtual
-  void
-  dump(ostream& s,
-       ymuint indent = 0) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 属性名
-  ShString mAttrName;
-
-  // 値
-  const DotlibNode* mValue;
+  DotlibAttr* mAttrTail;
 
 };
 

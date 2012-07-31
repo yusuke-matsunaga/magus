@@ -51,9 +51,7 @@ public:
     /// @brief リスト
     kList,
     /// @brief グループ
-    kGroup,
-    /// @brief 属性
-    kAttr
+    kGroup
   };
 
 protected:
@@ -102,11 +100,6 @@ public:
   virtual
   bool
   is_group() const = 0;
-
-  /// @brief 属性型(kAttr)の時に true を返す．
-  virtual
-  bool
-  is_attr() const = 0;
 
   /// @brief ファイル上の位置を返す．
   virtual
@@ -166,26 +159,8 @@ public:
   /// @note is_group() = true の時のみ意味を持つ．
   /// @note 返り値のノードの型は kAttr
   virtual
-  const DotlibNode*
+  const DotlibAttr*
   attr_top() const = 0;
-
-  /// @brief 属性名を得る．
-  /// @note is_attr() = true の時のみ意味を持つ．
-  virtual
-  ShString
-  attr_name() const = 0;
-
-  /// @brief 属性の値を得る．
-  /// @note is_attr() = true の時のみ意味を持つ．
-  virtual
-  const DotlibNode*
-  attr_value() const = 0;
-
-  /// @brief リストの次の要素を得る．
-  /// @note これはすべての型で意味を持つ．
-  virtual
-  const DotlibNode*
-  next() const = 0;
 
   /// @brief 内容をストリーム出力する．
   /// @param[in] s 出力先のストリーム

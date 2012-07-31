@@ -57,6 +57,8 @@ libym_cell_dotlib_la_SOURCES = \
 	DotlibMgrImpl.h \
 	DotlibMgrImpl.cc \
 	DotlibNode.h \
+	DotlibAttr.h \
+	DotlibAttr.cc \
 	DotlibNodeImpl.h \
 	DotlibNodeImpl.cc \
 	DotlibNode.cc \

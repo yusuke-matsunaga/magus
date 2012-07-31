@@ -8,6 +8,7 @@
 
 
 #include "DotlibNode.h"
+#include "DotlibAttr.h"
 #include "DotlibLibrary.h"
 #include "DotlibCell.h"
 #include "DotlibFF.h"
@@ -78,7 +79,7 @@ DotlibNode::get_library_info(DotlibLibrary& library_info) const
   library_info.mName = group_value()->get_string_from_value_list();
 
   // 属性のリストを作る．
-  for (const DotlibNode* attr = attr_top(); attr; attr = attr->next()) {
+  for (const DotlibAttr* attr = attr_top(); attr; attr = attr->next()) {
     ShString attr_name = attr->attr_name();
     const DotlibNode* attr_value = attr->attr_value();
     if ( attr_name == "cell" ) {
@@ -263,7 +264,7 @@ DotlibNode::get_cell_info(DotlibCell& cell_info) const
   cell_info.mName = group_value()->get_string_from_value_list();
 
   // 属性のリストを作る．
-  for (const DotlibNode* attr = attr_top(); attr; attr = attr->next()) {
+  for (const DotlibAttr* attr = attr_top(); attr; attr = attr->next()) {
     ShString attr_name = attr->attr_name();
     const DotlibNode* attr_value = attr->attr_value();
     if ( attr_name == "pin" ) {
@@ -448,7 +449,7 @@ DotlibNode::get_fl_info(DotlibFL& fl_info) const
   }
 
   // 属性のリストを作る．
-  for (const DotlibNode* attr = attr_top(); attr; attr = attr->next()) {
+  for (const DotlibAttr* attr = attr_top(); attr; attr = attr->next()) {
     ShString attr_name = attr->attr_name();
     const DotlibNode* attr_value = attr->attr_value();
     fl_info.add(attr_name, attr_value);
@@ -543,7 +544,7 @@ DotlibNode::get_pin_info(DotlibPin& pin_info) const
   pin_info.mName = group_value()->get_string_from_value_list();
 
   // 属性のリストを作る．
-  for (const DotlibNode* attr = attr_top(); attr; attr = attr->next()) {
+  for (const DotlibAttr* attr = attr_top(); attr; attr = attr->next()) {
     ShString attr_name = attr->attr_name();
     const DotlibNode* attr_value = attr->attr_value();
     if ( attr_name == "timing" ) {
@@ -736,7 +737,7 @@ DotlibNode::get_timing_info(DotlibTiming& timing_info) const
   timing_info.init();
 
   // 属性のリストをつくる．　
-  for (const DotlibNode* attr = attr_top(); attr; attr = attr->next()) {
+  for (const DotlibAttr* attr = attr_top(); attr; attr = attr->next()) {
     ShString attr_name = attr->attr_name();
     const DotlibNode* attr_value = attr->attr_value();
     timing_info.add(attr_name, attr_value);

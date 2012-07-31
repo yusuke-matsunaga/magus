@@ -78,7 +78,7 @@ dotlibparser_test(int argc,
       // break を使いたいだけの擬似ループ
       const DotlibNode* dt_library = mgr.root_node();
       DotlibLibrary library_info;
-      if ( !dt_library->attr_value()->get_library_info(library_info) ) {
+      if ( !dt_library->get_library_info(library_info) ) {
 	break;
       }
       cout << "library name = " << library_info.name() << endl;

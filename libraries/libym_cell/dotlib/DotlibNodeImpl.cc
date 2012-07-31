@@ -8,6 +8,7 @@
 
 
 #include "DotlibNodeImpl.h"
+#include "DotlibAttr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -55,8 +56,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-DotlibNodeImpl::DotlibNodeImpl() :
-  mNext(NULL)
+DotlibNodeImpl::DotlibNodeImpl()
 {
 }
 
@@ -103,13 +103,6 @@ DotlibNodeImpl::is_list() const
 // @brief グループ型(kGroup)の時に true を返す．
 bool
 DotlibNodeImpl::is_group() const
-{
-  return false;
-}
-
-// @brief 属性型(kAttr)の時に true を返す．
-bool
-DotlibNodeImpl::is_attr() const
 {
   return false;
 }
@@ -189,36 +182,11 @@ DotlibNodeImpl::group_value() const
 
 // @brief 先頭の属性を得る．
 // @note is_group() = true の時のみ意味を持つ．
-const DotlibNode*
+const DotlibAttr*
 DotlibNodeImpl::attr_top() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
-}
-
-// @brief 属性名を得る．
-// @note is_attr() = true の時のみ意味を持つ．
-ShString
-DotlibNodeImpl::attr_name() const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return ShString();
-}
-
-// @brief 属性の値を得る．
-// @note is_attr() = true の時のみ意味を持つ．
-const DotlibNode*
-DotlibNodeImpl::attr_value() const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
-// @brief 次の要素を得る．
-const DotlibNode*
-DotlibNodeImpl::next() const
-{
-  return mNext;
 }
 
 // @brief 要素を追加する．
@@ -234,7 +202,7 @@ DotlibNodeImpl::add_node(DotlibNodeImpl* node)
 // @param[in] attr 属性
 // @note type() が kGroup の時のみ意味を持つ．
 void
-DotlibNodeImpl::add_attr(DotlibNodeImpl* attr)
+DotlibNodeImpl::add_attr(DotlibAttr* attr)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
@@ -707,7 +675,7 @@ DotlibGroup::group_value() const
 
 // @brief 先頭の属性を得る．
 // @note type() が kGroup の時のみ意味を持つ．
-const DotlibNode*
+const DotlibAttr*
 DotlibGroup::attr_top() const
 {
   return mAttrTop;
@@ -723,8 +691,8 @@ DotlibGroup::dump(ostream& s,
   s << ' ';
   group_value()->dump(s, 0);
   s << " {" << endl;
-  for (const DotlibNode* node = attr_top(); node; node = node->next()) {
-    node->dump(s, indent + 2);
+  for (const DotlibAttr* attr = attr_top(); attr; attr = attr->next()) {
+    attr->dump(s, indent + 2);
   }
   s << indent_str(indent) << "}";
 }
@@ -733,7 +701,7 @@ DotlibGroup::dump(ostream& s,
 // @param[in] attr 属性
 // @note type() が kGroup の時のみ意味を持つ．
 void
-DotlibGroup::add_attr(DotlibNodeImpl* attr)
+DotlibGroup::add_attr(DotlibAttr* attr)
 {
   if ( mAttrTop != NULL ) {
     mAttrTail->mNext = attr;
@@ -742,72 +710,6 @@ DotlibGroup::add_attr(DotlibNodeImpl* attr)
   else {
     mAttrTop = mAttrTail = attr;
   }
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス DotlibAttr
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] attr_name 属性名
-// @param[in] value 値
-// @param[in] loc ファイル上の位置
-DotlibAttr::DotlibAttr(const ShString& attr_name,
-		       const DotlibNode* value,
-		       const FileRegion& loc) :
-  DotlibNodeBase(loc),
-  mAttrName(attr_name),
-  mValue(value)
-{
-}
-
-// @brief デストラクタ
-DotlibAttr::~DotlibAttr()
-{
-}
-
-// @brief 型を得る．
-DotlibNode::tType
-DotlibAttr::type() const
-{
-  return kAttr;
-}
-
-// @brief 属性型(kAttr)の時に true を返す．
-bool
-DotlibAttr::is_attr() const
-{
-  return true;
-}
-
-// @brief 属性名を得る．
-ShString
-DotlibAttr::attr_name() const
-{
-  return mAttrName;
-}
-
-// @brief 属性の値を得る．
-const DotlibNode*
-DotlibAttr::attr_value() const
-{
-  return mValue;
-}
-
-// @brief 内容をストリーム出力する．
-// @param[in] s 出力先のストリーム
-// @param[in] indent インデント量
-void
-DotlibAttr::dump(ostream& s,
-		 ymuint indent) const
-{
-  s << indent_str(indent) << attr_name() << ": ";
-  attr_value()->dump(s, indent);
-  if ( attr_value()->type() != kGroup ) {
-    s << ";";
-  }
-  s << endl;
 }
 
 END_NAMESPACE_YM_DOTLIB

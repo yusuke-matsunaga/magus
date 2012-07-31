@@ -9,6 +9,7 @@
 
 #include "DotlibMgrImpl.h"
 #include "DotlibNodeImpl.h"
+#include "DotlibAttr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -205,20 +206,20 @@ DotlibMgrImpl::new_group(const DotlibNode* value,
 }
 
 // @brief DotlibAttr を生成する．
-DotlibNodeImpl*
+DotlibAttr*
 DotlibMgrImpl::new_attr(const ShString& attr_name,
 			const DotlibNode* value,
 			const FileRegion& loc)
 {
   ++ mAttrNum;
   void* p = mAlloc.get_memory(sizeof(DotlibAttr));
-  DotlibNodeImpl* node =  new (p) DotlibAttr(attr_name, value, loc);
-  return node;
+  DotlibAttr* attr =  new (p) DotlibAttr(attr_name, value, loc);
+  return attr;
 }
 
 // @brief 根のノードを設定する．
 void
-DotlibMgrImpl::set_root_node(DotlibNodeImpl* root)
+DotlibMgrImpl::set_root_node(DotlibNode* root)
 {
   mRoot = root;
 }

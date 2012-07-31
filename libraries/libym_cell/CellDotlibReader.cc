@@ -646,7 +646,7 @@ CellDotlibReader::operator()(const string& filename)
   if ( !parser.read_file(filename, mgr, false) ) {
     return NULL;
   }
-  return gen_library(mgr.root_node()->attr_value());
+  return gen_library(mgr.root_node());
 }
 
 END_NAMESPACE_YM_CELL
