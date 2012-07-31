@@ -21,8 +21,6 @@ BEGIN_NAMESPACE_YM_DOTLIB
 class DotlibPin :
   public DotlibAttrMap
 {
-  friend class DotlibNode;
-
 public:
   //////////////////////////////////////////////////////////////////////
   // 列挙型の定義
@@ -52,9 +50,9 @@ public:
 
 public:
 
-  /// @brief 内容を初期化する．
-  void
-  init();
+  /// @brief 内容をセットする．
+  bool
+  set_data(const DotlibNode* pin_node);
 
   /// @brief 名前を返す．
   ShString

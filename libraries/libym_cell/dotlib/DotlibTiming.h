@@ -21,8 +21,6 @@ BEGIN_NAMESPACE_YM_DOTLIB
 class DotlibTiming :
   public DotlibAttrMap
 {
-  friend class DotlibNode;
-
 public:
 
   /// @brief コンストラクタ
@@ -34,45 +32,21 @@ public:
 
 public:
 
-  /// @brief 内容を初期化する．
-  void
-  init();
-
-  /// @brief "fall_resistance" を返す．
-  const DotlibNode*
-  fall_resistance() const;
-
-  /// @brief "rise_resistance" を返す．
-  const DotlibNode*
-  rise_resistance() const;
-
-  /// @brief "intrinsic_fall" を返す．
-  const DotlibNode*
-  intrinsic_fall() const;
-
-  /// @brief "intrinsic_rise" を返す．
-  const DotlibNode*
-  intrinsic_rise() const;
-
-  /// @brief "related_bus_equivalent" を返す．
-  const DotlibNode*
-  related_bus_equivalent() const;
-
-  /// @brief "related_bus_pins" を返す．
-  const DotlibNode*
-  related_bus_pins() const;
+  /// @brief 内容をセットする．
+  bool
+  set_data(const DotlibNode* timing_node);
 
   /// @brief "related_pin" を返す．
   const DotlibNode*
   related_pin() const;
 
-  /// @brief "slope_fall" を返す．
+  /// @brief "related_bus_pins" を返す．
   const DotlibNode*
-  slope_fall() const;
+  related_bus_pins() const;
 
-  /// @brief "slope_rise" を返す．
+  /// @brief "related_bus_equivalent" を返す．
   const DotlibNode*
-  slope_rise() const;
+  related_bus_equivalent() const;
 
   /// @brief "timing_sense" を返す．
   const DotlibNode*
@@ -94,73 +68,97 @@ public:
   const DotlibNode*
   when_end() const;
 
-  /// @brief "fall_delay_intercept" を返す．
+  /// @brief "rise_resistance" を返す．
   const DotlibNode*
-  fall_delay_intercept() const;
+  rise_resistance() const;
+
+  /// @brief "fall_resistance" を返す．
+  const DotlibNode*
+  fall_resistance() const;
+
+  /// @brief "intrinsic_rise" を返す．
+  const DotlibNode*
+  intrinsic_rise() const;
+
+  /// @brief "intrinsic_fall" を返す．
+  const DotlibNode*
+  intrinsic_fall() const;
+
+  /// @brief "slope_rise" を返す．
+  const DotlibNode*
+  slope_rise() const;
+
+  /// @brief "slope_fall" を返す．
+  const DotlibNode*
+  slope_fall() const;
 
   /// @brief "rise_delay_intercept" を返す．
   const DotlibNode*
   rise_delay_intercept() const;
 
-  /// @brief "fall_pin_resistance" を返す．
+  /// @brief "fall_delay_intercept" を返す．
   const DotlibNode*
-  fall_pin_resistance() const;
+  fall_delay_intercept() const;
 
   /// @brief "rise_pin_resistance" を返す．
   const DotlibNode*
   rise_pin_resistance() const;
 
+  /// @brief "fall_pin_resistance" を返す．
+  const DotlibNode*
+  fall_pin_resistance() const;
+
   /// @brief "cell_degradation" を返す．
   const DotlibNode*
   cell_degradation() const;
-
-  /// @brief "cell_fall" を返す．
-  const DotlibNode*
-  cell_fall() const;
 
   /// @brief "cell_rise" を返す．
   const DotlibNode*
   cell_rise() const;
 
-  /// @brief "fall_constraint" を返す．
+  /// @brief "cell_fall" を返す．
   const DotlibNode*
-  fall_constraint() const;
+  cell_fall() const;
 
   /// @brief "rise_constraint" を返す．
   const DotlibNode*
   rise_constraint() const;
 
-  /// @brief "fall_propagation" を返す．
+  /// @brief "fall_constraint" を返す．
   const DotlibNode*
-  fall_propagation() const;
+  fall_constraint() const;
 
   /// @brief "rise_propagation" を返す．
   const DotlibNode*
   rise_propagation() const;
 
-  /// @brief "fall_transition" を返す．
+  /// @brief "fall_propagation" を返す．
   const DotlibNode*
-  fall_transition() const;
+  fall_propagation() const;
 
   /// @brief "rise_transition" を返す．
   const DotlibNode*
   rise_transition() const;
 
-  /// @brief "retaining_fall" を返す．
+  /// @brief "fall_transition" を返す．
   const DotlibNode*
-  retaining_fall() const;
+  fall_transition() const;
 
   /// @brief "retaining_rise" を返す．
   const DotlibNode*
   retaining_rise() const;
 
-  /// @brief "retain_fall_slew" を返す．
+  /// @brief "retaining_fall" を返す．
   const DotlibNode*
-  retain_fall_slew() const;
+  retaining_fall() const;
 
   /// @brief "retain_rise_slew" を返す．
   const DotlibNode*
   retain_rise_slew() const;
+
+  /// @brief "retain_fall_slew" を返す．
+  const DotlibNode*
+  retain_fall_slew() const;
 
 
 private:
@@ -168,32 +166,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // fall_resistance
-  const DotlibNode* mFallResistance;
-
-  // rise_resistance
-  const DotlibNode* mRiseResistance;
-
-  // intrinsic_fall
-  const DotlibNode* mIntrinsicFall;
-
-  // intrinsic_rise
-  const DotlibNode* mIntrinsicRise;
-
-  // related_bus_equivalent
-  const DotlibNode* mRelatedBusEquivalent;
+  // related_pin
+  const DotlibNode* mRelatedPin;
 
   // related_bus_pins
   const DotlibNode* mRelatedBusPins;
 
-  // related_pin
-  const DotlibNode* mRelatedPin;
+  // related_bus_equivalent
+  const DotlibNode* mRelatedBusEquivalent;
 
-  // slope_fall
-  const DotlibNode* mSlopeFall;
-
-  // slope_rise
-  const DotlibNode* mSlopeRise;
+  // rise_resistance
+  const DotlibNode* mRiseResistance;
 
   // timing_sense
   const DotlibNode* mTimingSense;
@@ -210,56 +193,71 @@ private:
   // when_end
   const DotlibNode* mWhenEnd;
 
-  // fall_delay_intercept
-  const DotlibNode* mFallDelayIntercept;
+  // fall_resistance
+  const DotlibNode* mFallResistance;
+
+  // intrinsic_rise
+  const DotlibNode* mIntrinsicRise;
+
+  // intrinsic_fall
+  const DotlibNode* mIntrinsicFall;
+
+  // slope_rise
+  const DotlibNode* mSlopeRise;
+
+  // slope_fall
+  const DotlibNode* mSlopeFall;
 
   // rise_delay_intercept
   const DotlibNode* mRiseDelayIntercept;
 
-  // fall_pin_resistance
-  const DotlibNode* mFallPinResistance;
+  // fall_delay_intercept
+  const DotlibNode* mFallDelayIntercept;
 
   // rise_pin_resistance
   const DotlibNode* mRisePinResistance;
 
+  // fall_pin_resistance
+  const DotlibNode* mFallPinResistance;
+
   // cell_degradation
   const DotlibNode* mCellDegradation;
-
-  // cell_fall
-  const DotlibNode* mCellFall;
 
   // cell_rise
   const DotlibNode* mCellRise;
 
-  // fall_constraint
-  const DotlibNode* mFallConstraint;
+  // cell_fall
+  const DotlibNode* mCellFall;
 
   // rise_constraint
   const DotlibNode* mRiseConstraint;
 
-  // fall_propagation
-  const DotlibNode* mFallPropagation;
+  // fall_constraint
+  const DotlibNode* mFallConstraint;
 
   // rise_propagation
   const DotlibNode* mRisePropagation;
 
-  // fall_transition
-  const DotlibNode* mFallTransition;
+  // fall_propagation
+  const DotlibNode* mFallPropagation;
 
   // rise_transition
   const DotlibNode* mRiseTransition;
 
-  // retaining_fall
-  const DotlibNode* mRetainingFall;
+  // fall_transition
+  const DotlibNode* mFallTransition;
 
   // retaining_rise
   const DotlibNode* mRetainingRise;
 
-  // retain_fall_slew
-  const DotlibNode* mRetainFallSlew;
+  // retaining_fall
+  const DotlibNode* mRetainingFall;
 
   // retain_rise_slew
   const DotlibNode* mRetainRiseSlew;
+
+  // retain_fall_slew
+  const DotlibNode* mRetainFallSlew;
 
 };
 

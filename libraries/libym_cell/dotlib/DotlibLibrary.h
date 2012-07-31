@@ -11,6 +11,7 @@
 
 #include "DotlibAttrMap.h"
 #include "ym_cell/CellLibrary.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -22,8 +23,6 @@ BEGIN_NAMESPACE_YM_DOTLIB
 class DotlibLibrary :
   public DotlibAttrMap
 {
-  friend class DotlibNode;
-
 public:
 
   /// @brief コンストラクタ
@@ -35,9 +34,9 @@ public:
 
 public:
 
-  /// @brief 内容を初期化する．
-  void
-  init();
+  /// @brief 内容を設定する．
+  bool
+  set_data(const DotlibNode* lib_node);
 
   /// @brief 名前を返す．
   ShString

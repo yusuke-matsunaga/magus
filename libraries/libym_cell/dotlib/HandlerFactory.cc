@@ -892,56 +892,87 @@ HandlerFactory::new_timing(GroupHandler* parent)
   DotlibHandler* simple = new_simple(handler, false);
   DotlibHandler* str_simple = new_string_simple(handler, false);
   DotlibHandler* flt_simple = new_float_simple(handler);
-  handler->reg_handler("edge_rate_sensitivity_f0", simple);
-  handler->reg_handler("edge_rate_sensitivity_f1", simple);
-  handler->reg_handler("edge_rate_sensitivity_r0", simple);
-  handler->reg_handler("edge_rate_sensitivity_r1", simple);
-  handler->reg_handler("fall_resistance",          flt_simple);
-  handler->reg_handler("intrinsic_fall",           flt_simple);
-  handler->reg_handler("intrinsic_rise",           flt_simple);
+
   handler->reg_handler("related_bus_equivalent",   str_simple);
   handler->reg_handler("related_bus_pins",         str_simple);
   handler->reg_handler("related_output_pin",       str_simple);
   handler->reg_handler("related_pin",              str_simple);
+
+  handler->reg_handler("timing_sense",             str_simple);
+  handler->reg_handler("timing_type",              str_simple);
+
+  handler->reg_handler("edge_rate_sensitivity_f0", simple);
+  handler->reg_handler("edge_rate_sensitivity_f1", simple);
+  handler->reg_handler("edge_rate_sensitivity_r0", simple);
+  handler->reg_handler("edge_rate_sensitivity_r1", simple);
+
   handler->reg_handler("rise_resistance",          flt_simple);
+  handler->reg_handler("fall_resistance",          flt_simple);
+  handler->reg_handler("intrinsic_rise",           flt_simple);
+  handler->reg_handler("intrinsic_fall",           flt_simple);
+
   handler->reg_handler("sdf_cond",                 simple);
   handler->reg_handler("sdf_cond_end",             simple);
   handler->reg_handler("sdf_cond_start",           simple);
   handler->reg_handler("sdf_edges",                simple);
+
   handler->reg_handler("slope_fall",               flt_simple);
   handler->reg_handler("slope_rise",               flt_simple);
-  handler->reg_handler("timing_sense",             str_simple);
-  handler->reg_handler("timing_type",              str_simple);
+
   handler->reg_handler("when",                     str_simple);
   handler->reg_handler("when_end",                 str_simple);
   handler->reg_handler("when_start",               str_simple);
 
   // complex attribute
   DotlibHandler* complex = new_complex(handler);
-  handler->reg_handler("fall_delay_intercept",     complex);
-  handler->reg_handler("fall_pin_resistance",      complex);
   handler->reg_handler("rise_delay_intercept",     complex);
+  handler->reg_handler("fall_delay_intercept",     complex);
   handler->reg_handler("rise_pin_resistance",      complex);
+  handler->reg_handler("fall_pin_resistance",      complex);
   handler->reg_handler("orders",                   complex);
   handler->reg_handler("coefs",                    complex);
 
   // group statements
-  handler->reg_handler("cell_degradation", new_group(handler));
-  handler->reg_handler("cell_fall", new_table(handler));
-  handler->reg_handler("cell_rise", new_table(handler));
-  handler->reg_handler("fall_constraint", new_table(handler));
-  handler->reg_handler("fall_propagation", new_table(handler));
-  handler->reg_handler("fall_transition", new_table(handler));
-  handler->reg_handler("noise_immunity_above_high", new_group(handler));
-  handler->reg_handler("noise_immunity_below_low", new_group(handler));
-  handler->reg_handler("noise_immunity_high", new_group(handler));
-  handler->reg_handler("noise_immunity_low", new_group(handler));
+  handler->reg_handler("cell_degradation",
+		       new_group(handler));
+
+  handler->reg_handler("cell_rise",
+		       new_table(handler));
+  handler->reg_handler("cell_fall",
+		       new_table(handler));
+
+  handler->reg_handler("rise_constraint",
+		       new_table(handler));
+  handler->reg_handler("fall_constraint",
+		       new_table(handler));
+
+  handler->reg_handler("rise_propagation",
+		       new_table(handler));
+  handler->reg_handler("fall_propagation",
+		       new_table(handler));
+
+  handler->reg_handler("rise_transition",
+		       new_table(handler));
+  handler->reg_handler("fall_transition",
+		       new_table(handler));
+
+  handler->reg_handler("noise_immunity_above_high",
+		       new_group(handler));
+  handler->reg_handler("noise_immunity_below_low",
+		       new_group(handler));
+  handler->reg_handler("noise_immunity_high",
+		       new_group(handler));
+  handler->reg_handler("noise_immunity_low",
+		       new_group(handler));
+
   handler->reg_handler("propogated_noise_height_above_high",
 		       new_group(handler));
   handler->reg_handler("propogated_noise_height_below_low",
 		       new_group(handler));
-  handler->reg_handler("propogated_noise_height_high", new_group(handler));
-  handler->reg_handler("propogated_noise_height_low", new_group(handler));
+  handler->reg_handler("propogated_noise_height_high",
+		       new_group(handler));
+  handler->reg_handler("propogated_noise_height_low",
+		       new_group(handler));
   handler->reg_handler("propogated_noise_peak_time_ratio_above_high",
 		       new_group(handler));
   handler->reg_handler("propogated_noise_peak_time_ratio__below_low",
@@ -954,18 +985,27 @@ HandlerFactory::new_timing(GroupHandler* parent)
 		       new_group(handler));
   handler->reg_handler("propogated_noise_width_below_low",
 		       new_group(handler));
-  handler->reg_handler("propogated_noise_width_high", new_group(handler));
-  handler->reg_handler("propogated_noise_width_low", new_group(handler));
-  handler->reg_handler("retaining_fall", new_group(handler));
-  handler->reg_handler("retaining_rise", new_group(handler));
-  handler->reg_handler("retain_fall_slew", new_group(handler));
-  handler->reg_handler("retain_rise_slew", new_group(handler));
-  handler->reg_handler("rise_constraint", new_table(handler));
-  handler->reg_handler("rise_propagation", new_table(handler));
-  handler->reg_handler("rise_transition", new_table(handler));
-  handler->reg_handler("steady_state_current_high", new_group(handler));
-  handler->reg_handler("steady_state_current_low", new_group(handler));
-  handler->reg_handler("steady_state_current_tristate", new_group(handler));
+  handler->reg_handler("propogated_noise_width_high",
+		       new_group(handler));
+  handler->reg_handler("propogated_noise_width_low",
+		       new_group(handler));
+
+  handler->reg_handler("retaining_rise",
+		       new_group(handler));
+  handler->reg_handler("retaining_fall",
+		       new_group(handler));
+
+  handler->reg_handler("retain_fall_slew",
+		       new_group(handler));
+  handler->reg_handler("retain_rise_slew",
+		       new_group(handler));
+
+  handler->reg_handler("steady_state_current_high",
+		       new_group(handler));
+  handler->reg_handler("steady_state_current_low",
+		       new_group(handler));
+  handler->reg_handler("steady_state_current_tristate",
+		       new_group(handler));
 
   return handler;
 }

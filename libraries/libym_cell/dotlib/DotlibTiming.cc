@@ -8,6 +8,7 @@
 
 
 #include "DotlibTiming.h"
+#include "DotlibAttr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -26,10 +27,12 @@ DotlibTiming::~DotlibTiming()
 {
 }
 
-// @brief 内容を初期化する．
-void
-DotlibTiming::init()
+// @brief 内容をセットする．
+bool
+DotlibTiming::set_data(const DotlibNode* timing_node)
 {
+  init();
+
   mFallResistance = NULL;
   mRiseResistance = NULL;
   mIntrinsicFall = NULL;
@@ -61,6 +64,171 @@ DotlibTiming::init()
   mRetainingRise = NULL;
   mRetainFallSlew = NULL;
   mRetainRiseSlew = NULL;
+
+  // 属性を内部のハッシュに登録する．
+  for (const DotlibAttr* attr = timing_node->attr_top();
+       attr; attr = attr->next()) {
+    ShString attr_name = attr->attr_name();
+    const DotlibNode* attr_value = attr->attr_value();
+    add(attr_name, attr_value);
+  }
+
+  // 'related_pin' を取り出す．
+  if ( !get_singleton_or_null("related_pin", mRelatedPin) ) {
+    return false;
+  }
+
+  // 'related_bus_pins' を取り出す．
+  if ( !get_singleton_or_null("related_bus_pins", mRelatedBusPins) ) {
+    return false;
+  }
+
+  // 'related_bus_equivalent' を取り出す．
+  if ( !get_singleton_or_null("related_bus_equivalent", mRelatedBusEquivalent) ) {
+    return false;
+  }
+
+  // 'timing_sense' を取り出す．
+  if ( !get_singleton_or_null("timing_sense", mTimingSense) ) {
+    return false;
+  }
+
+  // 'timing_type' を取り出す．
+  if ( !get_singleton_or_null("timing_type", mTimingType) ) {
+    return false;
+  }
+
+  // 'when' を取り出す．
+  if ( !get_singleton_or_null("when", mWhen) ) {
+    return false;
+  }
+
+  // 'when_start' を取り出す．
+  if ( !get_singleton_or_null("when_start", mWhenStart) ) {
+    return false;
+  }
+
+  // 'when_end' を取り出す．
+  if ( !get_singleton_or_null("when_end", mWhenEnd) ) {
+    return false;
+  }
+
+  // 'rise_resistance' を取り出す．
+  if ( !get_singleton_or_null("rise_resistance", mRiseResistance) ) {
+    return false;
+  }
+
+  // 'fall_resistance' を取り出す．
+  if ( !get_singleton_or_null("fall_resistance", mFallResistance) ) {
+    return false;
+  }
+
+  // 'intrinsic_rise' を取り出す．
+  if ( !get_singleton_or_null("intrinsic_rise", mIntrinsicRise) ) {
+    return false;
+  }
+
+  // 'intrinsic_fall' を取り出す．
+  if ( !get_singleton_or_null("intrinsic_fall", mIntrinsicFall) ) {
+    return false;
+  }
+
+  // 'slope_rise' を取り出す．
+  if ( !get_singleton_or_null("slope_rise", mSlopeRise) ) {
+    return false;
+  }
+
+  // 'slope_fall' を取り出す．
+  if ( !get_singleton_or_null("slope_fall", mSlopeFall) ) {
+    return false;
+  }
+
+  // 'rise_delay_intercept' を取り出す．
+  if ( !get_singleton_or_null("rise_delay_intercept", mRiseDelayIntercept) ) {
+    return false;
+  }
+
+  // 'fall_delay_intercept' を取り出す．
+  if ( !get_singleton_or_null("fall_delay_intercept", mFallDelayIntercept) ) {
+    return false;
+  }
+
+  // 'rise_pin_resistance' を取り出す．
+  if ( !get_singleton_or_null("rise_pin_resistance", mRisePinResistance) ) {
+    return false;
+  }
+
+  // 'fall_pin_resistance' を取り出す．
+  if ( !get_singleton_or_null("fall_pin_resistance", mFallPinResistance) ) {
+    return false;
+  }
+
+  // 'cell_degradation' を取り出す．
+  if ( !get_singleton_or_null("cell_degradation", mCellDegradation) ) {
+    return false;
+  }
+
+  // 'cell_rise' を取り出す．
+  if ( !get_singleton_or_null("cell_rise", mCellRise) ) {
+    return false;
+  }
+
+  // 'cell_fall' を取り出す．
+  if ( !get_singleton_or_null("cell_fall", mCellFall) ) {
+    return false;
+  }
+
+  // 'rise_constraint' を取り出す．
+  if ( !get_singleton_or_null("rise_constraint", mRiseConstraint) ) {
+    return false;
+  }
+
+  // 'fall_constraint' を取り出す．
+  if ( !get_singleton_or_null("fall_constraint", mFallConstraint) ) {
+    return false;
+  }
+
+  // 'rise_propagation' を取り出す．
+  if ( !get_singleton_or_null("rise_propagation", mRisePropagation) ) {
+    return false;
+  }
+
+  // 'fall_propagation' を取り出す．
+  if ( !get_singleton_or_null("fall_propagation", mFallPropagation) ) {
+    return false;
+  }
+
+  // 'rise_transition' を取り出す．
+  if ( !get_singleton_or_null("rise_transition", mRiseTransition) ) {
+    return false;
+  }
+
+  // 'fall_transition' を取り出す．
+  if ( !get_singleton_or_null("fall_transition", mFallTransition) ) {
+    return false;
+  }
+
+  // 'retaining_rise' を取り出す．
+  if ( !get_singleton_or_null("retaining_rise", mRetainingRise) ) {
+    return false;
+  }
+
+  // 'retaining_fall' を取り出す．
+  if ( !get_singleton_or_null("retaining_fall", mRetainingFall) ) {
+    return false;
+  }
+
+  // 'retain_rise_slew' を取り出す．
+  if ( !get_singleton_or_null("retain_rise_slew", mRetainRiseSlew) ) {
+    return false;
+  }
+
+  // 'retain_fall_slew' を取り出す．
+  if ( !get_singleton_or_null("retain_fall_slew", mRetainFallSlew) ) {
+    return false;
+  }
+
+  return true;
 }
 
 // @brief "fall_resistance" を返す．

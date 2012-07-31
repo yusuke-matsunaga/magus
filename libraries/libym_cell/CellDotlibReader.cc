@@ -22,6 +22,7 @@
 #include "dotlib/DotlibFF.h"
 #include "dotlib/DotlibLatch.h"
 #include "dotlib/DotlibPin.h"
+#include "dotlib/DotlibTiming.h"
 
 #include "ym_logic/LogExpr.h"
 #include "ym_logic/TvFunc.h"
@@ -101,7 +102,7 @@ gen_library(const DotlibNode* dt_library)
 {
   DotlibLibrary library_info;
 
-  if ( !dt_library->get_library_info(library_info) ) {
+  if ( !library_info.set_data(dt_library) ) {
     return NULL;
   }
 
@@ -188,7 +189,7 @@ gen_library(const DotlibNode* dt_library)
 
     // セル情報の読み出し
     DotlibCell cell_info;
-    if ( !dt_cell->get_cell_info(cell_info) ) {
+    if ( !cell_info.set_data(dt_cell) ) {
       continue;
     }
 
@@ -221,7 +222,7 @@ gen_library(const DotlibNode* dt_library)
 
 	// ピン情報の読み出し
 	DotlibPin& pin_info = pin_info_array[pin_id];
-	if ( !dt_pin->get_pin_info(pin_info) ) {
+	if ( !pin_info.set_data(dt_pin) ) {
 	  error = true;
 	  continue;
 	}
@@ -286,7 +287,7 @@ gen_library(const DotlibNode* dt_library)
     const DotlibNode* dt_ff = cell_info.ff();
     DotlibFF ff_info;
     if ( dt_ff != NULL ) {
-      if ( !dt_ff->get_ff_info(ff_info) ) {
+      if ( !ff_info.set_data(dt_ff) ) {
 	continue;
       }
       ShString var1 = ff_info.var1_name();
@@ -300,7 +301,7 @@ gen_library(const DotlibNode* dt_library)
     const DotlibNode* dt_latch = cell_info.latch();
     DotlibLatch latch_info;
     if ( dt_latch != NULL) {
-      if ( !dt_latch->get_latch_info(latch_info) ) {
+      if ( !latch_info.set_data(dt_latch) ) {
 	continue;
       }
       ShString var1 = latch_info.var1_name();
@@ -495,7 +496,6 @@ gen_library(const DotlibNode* dt_library)
       }
     }
 
-#if 0
     // タイミング情報の生成
     for (ymuint i = 0; i < npin; ++ i) {
       const DotlibPin& pin_info = pin_info_array[i];
@@ -504,11 +504,11 @@ gen_library(const DotlibNode* dt_library)
       case DotlibPin::kInout:
 	{
 	  const list<const DotlibNode*>& timing_list = pin_info.timing_list();
-	  for (list<const DotlibNode*>::cosnt_iterator p = timing_list.begin();
+	  for (list<const DotlibNode*>::const_iterator p = timing_list.begin();
 	       p != timing_list.end(); ++ p) {
-	    cosnt DotlibNode* dt_timing = *p;
-	    if ( !dt_timing->get_timing_info(timing_info) ) {
-	      error = true;
+	    const DotlibNode* dt_timing = *p;
+	    DotlibTiming timing_info;
+	    if ( !timing_info.set_data(dt_timing) ) {
 	      continue;
 	    }
 	  }
@@ -517,7 +517,6 @@ gen_library(const DotlibNode* dt_library)
 	break;
       }
     }
-#endif
 #if 0
     const Cell* cell = library->cell(cell_id);
     for (ymuint oid = 0; oid < no2; ++ oid) {
