@@ -164,6 +164,7 @@ private:
   ymuint32 mFloatNum;
   ymuint32 mStrNum;
   ymuint32 mVectNum;
+  ymuint32 mVectElemSize;
   ymuint32 mOprNum;
   ymuint32 mNotNum;
   ymuint32 mListNum;

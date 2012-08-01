@@ -22,21 +22,12 @@ BEGIN_NAMESPACE_YM_DOTLIB
 DotlibMgrImpl::DotlibMgrImpl() :
   mAlloc(4096)
 {
-  mIntNum = 0;
-  mFloatNum = 0;
-  mStrNum = 0;
-  mVectNum = 0;
-  mOprNum = 0;
-  mNotNum = 0;
-  mListNum = 0;
-  mGroupNum = 0;
-  mAttrNum = 0;
+  clear();
 }
 
 // @brief デストラクタ
 DotlibMgrImpl::~DotlibMgrImpl()
 {
-  clear();
 }
 
 // @brief 初期化する．
@@ -45,6 +36,17 @@ void
 DotlibMgrImpl::clear()
 {
   mAlloc.destroy();
+
+  mIntNum = 0;
+  mFloatNum = 0;
+  mStrNum = 0;
+  mVectNum = 0;
+  mVectElemSize = 0;
+  mOprNum = 0;
+  mNotNum = 0;
+  mListNum = 0;
+  mGroupNum = 0;
+  mAttrNum = 0;
 }
 
 // @brief 整数値を表す DotlibNode を生成する．
@@ -96,6 +98,7 @@ DotlibMgrImpl::new_vector(const vector<double>& value_list,
   ++ mVectNum;
   ymuint n = value_list.size();
   void* p = mAlloc.get_memory(sizeof(DotlibVector) + (n - 1) * sizeof(double));
+  mVectElemSize += (n - 1);
   DotlibNodeImpl* node = new (p) DotlibVector(value_list, loc);
   return node;
 }
@@ -267,6 +270,10 @@ DotlibMgrImpl::show_stats(ostream& s) const
     << " x " << setw(3) << sizeof(DotlibVector)
     << " = " << setw(10) << mVectNum * sizeof(DotlibVector) << endl
 
+    << "Vector Elements:    " << setw(7) << mVectElemSize
+    << " x " << setw(3) << sizeof(double)
+    << " = " << setw(10) << mVectElemSize * sizeof(double) << endl
+
     << "DotlibOpr:          " << setw(7) << mOprNum
     << " x " << setw(3) << sizeof(DotlibOpr)
     << " = " << setw(10) << mOprNum * sizeof(DotlibOpr) << endl
@@ -287,14 +294,14 @@ DotlibMgrImpl::show_stats(ostream& s) const
     << " x " << setw(3) << sizeof(DotlibAttr)
     << " = " << setw(10) << mAttrNum * sizeof(DotlibAttr) << endl
 
-    << "Total memory:                 = "
+    << "Total memory:                     = "
     << setw(10) << mAlloc.used_size() << endl
     << endl
 
-    << "Allocated memory:             = "
+    << "Allocated memory:                 = "
     << setw(10) << mAlloc.allocated_size() << endl
 
-    << "ShString:                     = "
+    << "ShString:                         = "
     << setw(10) << ShString::allocated_size() << endl;
 }
 
