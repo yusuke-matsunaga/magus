@@ -250,23 +250,29 @@ CiLutTemplate3D::index(ymuint32 var,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CiLut1D::CiLut1D(const CiLutTemplate1D* lut_template,
+CiLut1D::CiLut1D(const CellLutTemplate* lut_template,
+		 const vector<double>& value_array,
 		 const vector<double>& index_array) :
   mTemplate(lut_template)
 {
+  ymuint n = 0;
   if ( index_array.empty() ) {
-    ymuint32 n = mTemplate->index_num(0);
+    n = mTemplate->index_num(0);
     mIndexArray.resize(n);
     for (ymuint32 i = 0; i < n; ++ i) {
       mIndexArray[i] = mTemplate->index(0, i);
     }
   }
   else {
-    ymuint32 n = index_array.size();
+    n = index_array.size();
     mIndexArray.resize(n);
     for (ymuint32 i = 0; i < n; ++ i) {
       mIndexArray[i] = index_array[i];
     }
+  }
+  assert_cond( value_array.size() == n, __FILE__, __LINE__);
+  for (ymuint i = 0; i < n; ++ i) {
+    mValueArray[i] = value_array[i];
   }
 }
 
@@ -302,6 +308,201 @@ CiLut1D::value(const vector<ymuint32>& pos_array) const
 {
   assert_cond( pos_array.size() == 1, __FILE__, __LINE__);
   return mValueArray[pos_array[0]];
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス CiLut2D
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
+		 const vector<double>& value_array,
+		 const vector<double>& index_array1,
+		 const vector<double>& index_array2) :
+  mTemplate(lut_template)
+{
+  ymuint n1 = 0;
+  if ( index_array1.empty() ) {
+    n1 = mTemplate->index_num(0);
+    mIndexArray[0].resize(n1);
+    for (ymuint32 i = 0; i < n1; ++ i) {
+      mIndexArray[0][i] = mTemplate->index(0, i);
+    }
+  }
+  else {
+    n1 = index_array1.size();
+    mIndexArray[0].resize(n1);
+    for (ymuint32 i = 0; i < n1; ++ i) {
+      mIndexArray[0][i] = index_array1[i];
+    }
+  }
+
+  ymuint n2 = 0;
+  if ( index_array2.empty() ) {
+    n2 = mTemplate->index_num(1);
+    mIndexArray[1].resize(n2);
+    for (ymuint32 i = 0; i < n2; ++ i) {
+      mIndexArray[1][i] = mTemplate->index(1, i);
+    }
+  }
+  else {
+    n2 = index_array2.size();
+    mIndexArray[1].resize(n2);
+    for (ymuint32 i = 0; i < n2; ++ i) {
+      mIndexArray[1][i] = index_array2[i];
+    }
+  }
+
+  assert_cond( value_array.size() == n1 * n2, __FILE__, __LINE__);
+  for (ymuint i1 = 0; i1 < n1; ++ i1) {
+    for (ymuint i2 = 0; i2 < n2; ++ i2) {
+      ymuint i = i1 * n2 + i2;
+      mValueArray[i] = value_array[i];
+    }
+  }
+}
+
+// @brief デストラクタ
+CiLut2D::~CiLut2D()
+{
+}
+
+// @brief テンプレートの取得
+const CellLutTemplate*
+CiLut2D::lut_template() const
+{
+  return mTemplate;
+}
+
+// @brief インデックス値の取得
+// @param[in] var 変数番号 ( 0 <= var < dimension() )
+// @param[in] pos 位置番号 ( 0 <= pos < index_num(var) )
+double
+CiLut2D::index(ymuint32 var,
+	       ymuint32 pos) const
+{
+  assert_cond( var < 2, __FILE__, __LINE__);
+  assert_cond( pos < index_num(var), __FILE__, __LINE__);
+  return mIndexArray[var][pos];
+}
+
+// @brief 値の取得
+// @param[in] pos_array 格子点座標
+// @note pos_array のサイズは dimension() と同じ
+double
+CiLut2D::value(const vector<ymuint32>& pos_array) const
+{
+  assert_cond( pos_array.size() == 2, __FILE__, __LINE__);
+  ymuint i = pos_array[0] * index_num(1) + pos_array[1];
+  return mValueArray[i];
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス CiLut3D
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
+		 const vector<double>& value_array,
+		 const vector<double>& index_array1,
+		 const vector<double>& index_array2,
+		 const vector<double>& index_array3) :
+  mTemplate(lut_template)
+{
+  ymuint n1 = 0;
+  if ( index_array1.empty() ) {
+    n1 = mTemplate->index_num(0);
+    mIndexArray[0].resize(n1);
+    for (ymuint32 i = 0; i < n1; ++ i) {
+      mIndexArray[0][i] = mTemplate->index(0, i);
+    }
+  }
+  else {
+    n1 = index_array1.size();
+    mIndexArray[0].resize(n1);
+    for (ymuint32 i = 0; i < n1; ++ i) {
+      mIndexArray[0][i] = index_array1[i];
+    }
+  }
+
+  ymuint n2 = 0;
+  if ( index_array2.empty() ) {
+    n2 = mTemplate->index_num(1);
+    mIndexArray[1].resize(n2);
+    for (ymuint32 i = 0; i < n2; ++ i) {
+      mIndexArray[1][i] = mTemplate->index(1, i);
+    }
+  }
+  else {
+    n2 = index_array2.size();
+    mIndexArray[1].resize(n2);
+    for (ymuint32 i = 0; i < n2; ++ i) {
+      mIndexArray[1][i] = index_array2[i];
+    }
+  }
+
+  ymuint n3 = 0;
+  if ( index_array3.empty() ) {
+    n3 = mTemplate->index_num(2);
+    mIndexArray[2].resize(n3);
+    for (ymuint32 i = 0; i < n3; ++ i) {
+      mIndexArray[2][i] = mTemplate->index(2, i);
+    }
+  }
+  else {
+    n3 = index_array3.size();
+    mIndexArray[2].resize(n3);
+    for (ymuint32 i = 0; i < n3; ++ i) {
+      mIndexArray[2][i] = index_array3[i];
+    }
+  }
+
+  assert_cond( value_array.size() == n1 * n2 * n3, __FILE__, __LINE__);
+  for (ymuint i1 = 0; i1 < n1; ++ i1) {
+    for (ymuint i2 = 0; i2 < n2; ++ i2) {
+      for (ymuint i3 = 0; i3 < n3; ++ i3) {
+	ymuint i = ((i1 * n2) + i2) * n3 + i3;
+	mValueArray[i] = value_array[i];
+      }
+    }
+  }
+}
+
+// @brief デストラクタ
+CiLut3D::~CiLut3D()
+{
+}
+
+// @brief テンプレートの取得
+const CellLutTemplate*
+CiLut3D::lut_template() const
+{
+  return mTemplate;
+}
+
+// @brief インデックス値の取得
+// @param[in] var 変数番号 ( 0 <= var < dimension() )
+// @param[in] pos 位置番号 ( 0 <= pos < index_num(var) )
+double
+CiLut3D::index(ymuint32 var,
+	       ymuint32 pos) const
+{
+  assert_cond( var < 3, __FILE__, __LINE__);
+  assert_cond( pos < index_num(var), __FILE__, __LINE__);
+  return mIndexArray[var][pos];
+}
+
+// @brief 値の取得
+// @param[in] pos_array 格子点座標
+// @note pos_array のサイズは dimension() と同じ
+double
+CiLut3D::value(const vector<ymuint32>& pos_array) const
+{
+  assert_cond( pos_array.size() == 3, __FILE__, __LINE__);
+  ymuint i = ((pos_array[0] * index_num(1)) + pos_array[1]) * index_num(2) + pos_array[2];
+  return mValueArray[i];
 }
 
 END_NAMESPACE_YM_CELL

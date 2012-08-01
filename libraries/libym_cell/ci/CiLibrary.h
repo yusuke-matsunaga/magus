@@ -711,6 +711,84 @@ public:
 	     tCellTimingSense sense,
 	     CellTiming* timing);
 
+  /// @brief 1次元の LUT のテンプレートを作る．
+  /// @param[in] name 名前
+  /// @param[in] var_type1 変数型
+  /// @param[in] index_list1 インデックス値のリスト
+  virtual
+  CellLutTemplate*
+  new_lut_template1(const string& name,
+		    tCellVarType var_type1,
+		    const vector<double>& index_list1);
+
+  /// @brief 2次元の LUT のテンプレートを作る．
+  /// @param[in] name 名前
+  /// @param[in] var_type1 変数型
+  /// @param[in] index_list1 インデックス値のリスト
+  /// @param[in] var_type2 変数型
+  /// @param[in] index_list2 インデックス値のリスト
+  virtual
+  CellLutTemplate*
+  new_lut_template2(const string& name,
+		    tCellVarType var_type1,
+		    const vector<double>& index_list1,
+		    tCellVarType var_type2,
+		    const vector<double>& index_list2);
+
+  /// @brief 3次元の LUT のテンプレートを作る．
+  /// @param[in] name 名前
+  /// @param[in] var_type1 変数型
+  /// @param[in] index_list1 インデックス値のリスト
+  /// @param[in] var_type2 変数型
+  /// @param[in] index_list2 インデックス値のリスト
+  /// @param[in] var_type3 変数型
+  /// @param[in] index_list3 インデックス値のリスト
+  virtual
+  CellLutTemplate*
+  new_lut_template3(const string& name,
+		    tCellVarType var_type1,
+		    const vector<double>& index_list1,
+		    tCellVarType var_type2,
+		    const vector<double>& index_list2,
+		    tCellVarType var_type3,
+		    const vector<double>& index_list3);
+
+  /// @brief 1次元の LUT を作る．
+  /// @param[in] lut_template テンプレート
+  /// @param[in] value_array 値の配列
+  /// @param[in] index_array インデックス値のリスト
+  virtual
+  CellLut*
+  new_lut1(const CellLutTemplate* lut_template,
+	   const vector<double>& value_array,
+	   const vector<double>& index_array = vector<double>());
+
+  /// @brief 2次元の LUT を作る．
+  /// @param[in] lut_template テンプレート
+  /// @param[in] value_array 値の配列
+  /// @param[in] index_array1 インデックス値のリスト
+  /// @param[in] index_array2 インデックス値のリスト
+  virtual
+  CellLut*
+  new_lut2(const CellLutTemplate* lut_template,
+	   const vector<double>& value_array,
+	   const vector<double>& index_array1 = vector<double>(),
+	   const vector<double>& index_array2 = vector<double>());
+
+  /// @brief 3次元の LUT を作る．
+  /// @param[in] lut_template テンプレート
+  /// @param[in] value_array 値の配列
+  /// @param[in] index_array1 インデックス値のリスト
+  /// @param[in] index_array2 インデックス値のリスト
+  /// @param[in] index_array3 インデックス値のリスト
+  virtual
+  CellLut*
+  new_lut2(const CellLutTemplate* lut_template,
+	   const vector<double>& value_array,
+	   const vector<double>& index_array1 = vector<double>(),
+	   const vector<double>& index_array2 = vector<double>(),
+	   const vector<double>& index_array3 = vector<double>());
+
   /// @brief セルのグループ分けを行う．
   /// @note 論理セルのパタングラフも作成する．
   virtual

@@ -17,6 +17,7 @@
 #include "CiFsmCell.h"
 #include "CiPin.h"
 #include "CiTiming.h"
+#include "CiLut.h"
 
 #include "libcomp/LibComp.h"
 #include "libcomp/LcGroupMgr.h"
@@ -1119,6 +1120,116 @@ CiLibrary::set_timing(ymuint cell_id,
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
+}
+
+// @brief 1次元の LUT のテンプレートを作る．
+// @param[in] name 名前
+// @param[in] var_type1 変数型
+// @param[in] index_list1 インデックス値のリスト
+CellLutTemplate*
+CiLibrary::new_lut_template1(const string& name,
+			     tCellVarType var_type1,
+			     const vector<double>& index_list1)
+{
+  void* p = mAlloc.get_memory(sizeof(CiLutTemplate1D));
+  CellLutTemplate* tmpl = new (p) CiLutTemplate1D(ShString(name),
+						  var_type1, index_list1);
+  return tmpl;
+}
+
+// @brief 2次元の LUT のテンプレートを作る．
+// @param[in] name 名前
+// @param[in] var_type1 変数型
+// @param[in] index_list1 インデックス値のリスト
+// @param[in] var_type2 変数型
+// @param[in] index_list2 インデックス値のリスト
+CellLutTemplate*
+CiLibrary::new_lut_template2(const string& name,
+			     tCellVarType var_type1,
+			     const vector<double>& index_list1,
+			     tCellVarType var_type2,
+			     const vector<double>& index_list2)
+{
+  void* p = mAlloc.get_memory(sizeof(CiLutTemplate2D));
+  CellLutTemplate* tmpl = new (p) CiLutTemplate2D(ShString(name),
+						  var_type1, index_list1,
+						  var_type2, index_list2);
+  return tmpl;
+}
+
+// @brief 3次元の LUT のテンプレートを作る．
+// @param[in] name 名前
+// @param[in] var_type1 変数型
+// @param[in] index_list1 インデックス値のリスト
+// @param[in] var_type2 変数型
+// @param[in] index_list2 インデックス値のリスト
+// @param[in] var_type3 変数型
+// @param[in] index_list3 インデックス値のリスト
+CellLutTemplate*
+CiLibrary::new_lut_template3(const string& name,
+			     tCellVarType var_type1,
+			     const vector<double>& index_list1,
+			     tCellVarType var_type2,
+			     const vector<double>& index_list2,
+			     tCellVarType var_type3,
+			     const vector<double>& index_list3)
+{
+  void* p = mAlloc.get_memory(sizeof(CiLutTemplate3D));
+  CellLutTemplate* tmpl = new (p) CiLutTemplate3D(ShString(name),
+						  var_type1, index_list1,
+						  var_type2, index_list2,
+						  var_type3, index_list3);
+  return tmpl;
+}
+
+// @brief 1次元の LUT を作る．
+// @param[in] lut_template テンプレート
+// @param[in] value_array 値の配列
+// @param[in] index_array インデックス値のリスト
+CellLut*
+CiLibrary::new_lut1(const CellLutTemplate* lut_template,
+		    const vector<double>& value_array,
+		    const vector<double>& index_array)
+{
+  void* p = mAlloc.get_memory(sizeof(CiLut1D));
+  CellLut* lut = new (p) CiLut1D(lut_template, value_array, index_array);
+  return lut;
+}
+
+// @brief 2次元の LUT を作る．
+// @param[in] lut_template テンプレート
+// @param[in] value_array 値の配列
+// @param[in] index_array1 インデックス値のリスト
+// @param[in] index_array2 インデックス値のリスト
+CellLut*
+CiLibrary::new_lut2(const CellLutTemplate* lut_template,
+		    const vector<double>& value_array,
+		    const vector<double>& index_array1,
+		    const vector<double>& index_array2)
+{
+  void* p = mAlloc.get_memory(sizeof(CiLut2D));
+  CellLut* lut = new (p) CiLut2D(lut_template, value_array,
+				 index_array1, index_array2);
+  return lut;
+}
+
+// @brief 3次元の LUT を作る．
+// @param[in] lut_template テンプレート
+// @param[in] value_array 値の配列
+// @param[in] index_array1 インデックス値のリスト
+// @param[in] index_array2 インデックス値のリスト
+// @param[in] index_array3 インデックス値のリスト
+CellLut*
+CiLibrary::new_lut2(const CellLutTemplate* lut_template,
+		    const vector<double>& value_array,
+		    const vector<double>& index_array1,
+		    const vector<double>& index_array2,
+		    const vector<double>& index_array3)
+{
+  void* p = mAlloc.get_memory(sizeof(CiLut3D));
+  CellLut* lut = new (p) CiLut3D(lut_template, value_array,
+				 index_array1, index_array2, index_array3);
+  return lut;
 }
 
 // @brief セルのグループ分けを行う．
