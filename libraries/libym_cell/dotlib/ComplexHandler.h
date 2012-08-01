@@ -64,6 +64,11 @@ protected:
 	    DotlibNodeImpl* value,
 	    const FileRegion& end_loc);
 
+  /// @brief vector_mode で読み込むとき true を返す．
+  virtual
+  bool
+  vector_mode() const;
+
 };
 
 
@@ -106,21 +111,64 @@ protected:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class StrListComplexHandler ComplexHandler.h "ComplexHandler.h"
-/// @brief 複数の文字列型をとる complex attribute ハンドラ
+/// @class VectorComplexHandler ComplexHandler.h "ComplexHandler.h"
+/// @brief 1つのベクタ型をとる complex attribute ハンドラ
 //////////////////////////////////////////////////////////////////////
-class StrListComplexHandler :
+class VectorComplexHandler :
   public ComplexHandler
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parent 親のハンドラ
-  StrListComplexHandler(GroupHandler* parent);
+  VectorComplexHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
-  ~StrListComplexHandler();
+  ~VectorComplexHandler();
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // ComplexHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 値を読み込んだ時の処理
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value 値のリスト
+  /// @param[in] end_loc 右括弧の位置
+  virtual
+  bool
+  set_value(const ShString& attr_name,
+	    const FileRegion& attr_loc,
+	    DotlibNodeImpl* value,
+	    const FileRegion& end_loc);
+
+  /// @brief vector_mode で読み込むとき true を返す．
+  virtual
+  bool
+  vector_mode() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VectorListComplexHandler ComplexHandler.h "ComplexHandler.h"
+/// @brief ベクタのリストをとる complex attribute ハンドラ
+//////////////////////////////////////////////////////////////////////
+class VectorListComplexHandler :
+  public VectorComplexHandler
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] parent 親のハンドラ
+  VectorListComplexHandler(GroupHandler* parent);
+
+  /// @brief デストラクタ
+  virtual
+  ~VectorListComplexHandler();
 
 
 protected:

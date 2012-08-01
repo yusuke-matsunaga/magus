@@ -32,6 +32,8 @@ public:
     kFloat,
     /// @brief 文字列型の定数
     kString,
+    /// @brief 浮動小数点数ベクタ型の定数
+    kVector,
     /// @brief + 演算子
     kPlus,
     /// @brief - 演算子
@@ -86,6 +88,11 @@ public:
   bool
   is_string() const = 0;
 
+  /// @brief ベクタ型(kVector)の時に true を返す．
+  virtual
+  bool
+  is_vector() const = 0;
+
   /// @brief 演算子型(kPlus, kMinsu, kMult, kDiv)の時に true を返す．
   virtual
   bool
@@ -124,11 +131,18 @@ public:
   ShString
   string_value() const = 0;
 
-  /// @brief インデックスを取り出す．
-  /// @note is_string() == true で内容が数値のリストの時のみ意味を持つ．
+  /// @brief ベクタの要素数を返す．
+  /// @note is_vector() = true の時のみ意味を持つ．
   virtual
-  bool
-  index_value(vector<double>& value_list) const = 0;
+  ymuint
+  vector_size() const = 0;
+
+  /// @brief ベクタの要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < vector_size() )
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  double
+  vector_elem(ymuint pos) const = 0;
 
   /// @brief 第一オペランドを返す．
   /// @note is_opr() = true の時のみ意味を持つ．

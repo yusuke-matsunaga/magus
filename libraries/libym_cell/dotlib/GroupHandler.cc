@@ -48,7 +48,7 @@ GroupHandler::read_attr(const ShString& attr_name,
 			const FileRegion& attr_loc)
 {
   FileRegion dummy_loc;
-  DotlibNodeImpl* value = parse_complex(dummy_loc);
+  DotlibNodeImpl* value = parse_complex(false, dummy_loc);
   if ( value == NULL ) {
     return false;
   }

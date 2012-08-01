@@ -10,6 +10,8 @@
 #include "ym_cell/CellDotlibReader.h"
 
 #include "ym_cell/CellLibrary.h"
+#include "ym_cell/Cell.h"
+#include "ym_cell/CellPin.h"
 #include "ym_cell/CellArea.h"
 #include "ym_cell/CellCapacitance.h"
 #include "ym_cell/CellTime.h"
@@ -497,28 +499,56 @@ gen_library(const DotlibNode* dt_library)
     }
 
     // タイミング情報の生成
+    const Cell* cell = library->cell(cell_id);
     for (ymuint i = 0; i < npin; ++ i) {
+      const CellPin* opin = cell->pin(i);
+      if ( !opin->is_output() && !opin->is_inout() ) {
+	continue;
+      }
+      ymuint oid = opin->output_id();
       const DotlibPin& pin_info = pin_info_array[i];
-      switch ( pin_info.direction() ) {
-      case DotlibPin::kOutput:
-      case DotlibPin::kInout:
-	{
-	  const list<const DotlibNode*>& timing_list = pin_info.timing_list();
-	  for (list<const DotlibNode*>::const_iterator p = timing_list.begin();
-	       p != timing_list.end(); ++ p) {
-	    const DotlibNode* dt_timing = *p;
-	    DotlibTiming timing_info;
-	    if ( !timing_info.set_data(dt_timing) ) {
-	      continue;
-	    }
+      bool has_logic = cell->has_logic(oid);
+      TvFunc tv_function;
+      if ( has_logic ) {
+	LogExpr expr = cell->logic_expr(oid);
+	tv_function = expr.make_tv(ni2);
+      }
+      const list<const DotlibNode*>& timing_list = pin_info.timing_list();
+      for (list<const DotlibNode*>::const_iterator p = timing_list.begin();
+	   p != timing_list.end(); ++ p) {
+	const DotlibNode* dt_timing = *p;
+	DotlibTiming timing_info;
+	if ( !timing_info.set_data(dt_timing) ) {
+	  continue;
+	}
+	const CellPin* ipin = NULL;
+	if ( timing_info.related_pin() ) {
+	  ShString pin_name = timing_info.related_pin()->string_value();
+	  ipin = cell->pin((const char*)(pin_name));
+	  if ( ipin == NULL ) {
+	    ostringstream buf;
+	    buf << pin_name << ": no such pin";
+	    MsgMgr::put_msg(__FILE__, __LINE__,
+			    dt_timing->loc(),
+			    kMsgError,
+			    "DOTLIB_PARSER",
+			    buf.str());
+	    continue;
 	  }
 	}
-      default:
-	break;
+	else {
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  dt_timing->loc(),
+			  kMsgError,
+			  "DOTLIB_PARSER",
+			  "No 'related_pin' attribute.");
+	  continue;
+	}
+
       }
     }
+
 #if 0
-    const Cell* cell = library->cell(cell_id);
     for (ymuint oid = 0; oid < no2; ++ oid) {
       bool has_logic = cell->has_logic(oid);
       if ( has_logic ) {

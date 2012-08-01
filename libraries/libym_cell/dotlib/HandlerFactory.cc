@@ -379,7 +379,7 @@ HandlerFactory::new_template(GroupHandler* parent)
   handler->reg_handler("variable_3", str_simple);
 
   // complex attributes
-  DotlibHandler* index_handler = new Str1ComplexHandler(handler);
+  DotlibHandler* index_handler = new VectorComplexHandler(handler);
   handler->reg_handler("index_1",    index_handler);
   handler->reg_handler("index_2",    index_handler);
   handler->reg_handler("index_3",    index_handler);
@@ -678,8 +678,8 @@ HandlerFactory::new_power(GroupHandler* parent)
   // simple attributes
 
   // complex attribute
-  DotlibHandler* index_handler = new Str1ComplexHandler(handler);
-  DotlibHandler* value_handler = new StrListComplexHandler(handler);
+  DotlibHandler* index_handler = new VectorComplexHandler(handler);
+  DotlibHandler* value_handler = new VectorListComplexHandler(handler);
   DotlibHandler* complex = new ComplexHandler(handler);
   handler->reg_handler("index_1", index_handler);
   handler->reg_handler("index_2", index_handler);
@@ -1027,8 +1027,8 @@ HandlerFactory::new_table(GroupHandler* parent)
   // simple attributes
 
   // complex attribute
-  DotlibHandler* index_handler = new Str1ComplexHandler(handler);
-  DotlibHandler* value_handler = new StrListComplexHandler(handler);
+  DotlibHandler* index_handler = new VectorComplexHandler(handler);
+  DotlibHandler* value_handler = new VectorListComplexHandler(handler);
   handler->reg_handler("index_1", index_handler);
   handler->reg_handler("index_2", index_handler);
   handler->reg_handler("index_3", index_handler);

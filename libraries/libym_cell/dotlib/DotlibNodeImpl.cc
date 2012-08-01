@@ -86,6 +86,13 @@ DotlibNodeImpl::is_string() const
   return false;
 }
 
+// @brief ベクタ型(kVector)の時に true を返す．
+bool
+DotlibNodeImpl::is_vector() const
+{
+  return false;
+}
+
 // @brief 演算子型(kPlus, kMinsu, kMult, kDiv)の時に true を返す．
 bool
 DotlibNodeImpl::is_opr() const
@@ -134,13 +141,23 @@ DotlibNodeImpl::string_value() const
   return ShString();
 }
 
-// @brief インデックスを取り出す．
-// @note is_string() == true で内容が数値のリストの時のみ意味を持つ．
-bool
-DotlibNodeImpl::index_value(vector<double>& value_list) const
+// @brief ベクタの要素数を返す．
+// @note is_vector() = true の時のみ意味を持つ．
+ymuint
+DotlibNodeImpl::vector_size() const
 {
   assert_not_reached(__FILE__, __LINE__);
-  return false;
+  return 0;
+}
+
+// @brief ベクタの要素を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < vector_size() )
+// @note is_vector() = true の時のみ意味を持つ．
+double
+DotlibNodeImpl::vector_elem(ymuint pos) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return 0.0;
 }
 
 // @brief 第一オペランドを返す．
@@ -401,14 +418,6 @@ DotlibString::string_value() const
   return mValue;
 }
 
-// @brief インデックスを取り出す．
-// @note is_string() == true で内容が数値のリストの時のみ意味を持つ．
-bool
-DotlibString::index_value(vector<double>& value_list) const
-{
-  string tmp = mValue;
-}
-
 // @brief 内容をストリーム出力する．
 // @param[in] s 出力先のストリーム
 // @param[in] indent インデント量
@@ -417,6 +426,76 @@ DotlibString::dump(ostream& s,
 		   ymuint indent) const
 {
   dump_str(s, string_value());
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス DotlibVector
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] value_list 値のリスト
+// @param[in] loc ファイル上の位置
+DotlibVector::DotlibVector(const vector<double>& value_list,
+			   const FileRegion& loc) :
+  DotlibNodeBase(loc),
+  mNum(value_list.size())
+{
+  for (ymuint i = 0; i < mNum; ++ i) {
+    mBody[i] = value_list[i];
+  }
+}
+
+// @brief デストラクタ
+DotlibVector::~DotlibVector()
+{
+}
+
+// @brief 型を得る．
+DotlibNode::tType
+DotlibVector::type() const
+{
+  return kVector;
+}
+
+// @brief ベクタ型(kVector)の時に true を返す．
+bool
+DotlibVector::is_vector() const
+{
+  return true;
+}
+
+// @brief ベクタの要素数を返す．
+// @note is_vector() = true の時のみ意味を持つ．
+ymuint
+DotlibVector::vector_size() const
+{
+  return mNum;
+}
+
+// @brief ベクタの要素を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < vector_size() )
+// @note is_vector() = true の時のみ意味を持つ．
+double
+DotlibVector::vector_elem(ymuint pos) const
+{
+  return mBody[pos];
+}
+
+// @brief 内容をストリーム出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] indent インデント量
+void
+DotlibVector::dump(ostream& s,
+		   ymuint indent) const
+{
+  const char* comma = "";
+  s << "(";
+  for (ymuint i = 0; i < mNum; ++ i) {
+    s << comma << mBody[i];
+    comma = ", ";
+  }
+  s << ")";
 }
 
 

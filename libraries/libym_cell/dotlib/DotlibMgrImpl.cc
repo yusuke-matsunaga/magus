@@ -25,6 +25,7 @@ DotlibMgrImpl::DotlibMgrImpl() :
   mIntNum = 0;
   mFloatNum = 0;
   mStrNum = 0;
+  mVectNum = 0;
   mOprNum = 0;
   mNotNum = 0;
   mListNum = 0;
@@ -82,6 +83,20 @@ DotlibMgrImpl::new_string(ShString value,
   ++ mStrNum;
   void* p = mAlloc.get_memory(sizeof(DotlibString));
   DotlibNodeImpl* node = new (p) DotlibString(value, loc);
+  return node;
+}
+
+// @brief ベクタを表す DotlibNode を生成する．
+// @param[in] value_list 値のリスト
+// @param[in] loc ファイル上の位置
+DotlibNodeImpl*
+DotlibMgrImpl::new_vector(const vector<double>& value_list,
+			  const FileRegion& loc)
+{
+  ++ mVectNum;
+  ymuint n = value_list.size();
+  void* p = mAlloc.get_memory(sizeof(DotlibVector) + (n - 1) * sizeof(double));
+  DotlibNodeImpl* node = new (p) DotlibVector(value_list, loc);
   return node;
 }
 
@@ -247,6 +262,10 @@ DotlibMgrImpl::show_stats(ostream& s) const
     << "DotlibString:       " << setw(7) << mStrNum
     << " x " << setw(3) << sizeof(DotlibString)
     << " = " << setw(10) << mStrNum * sizeof(DotlibString) << endl
+
+    << "DotlibVector:       " << setw(7) << mVectNum
+    << " x " << setw(3) << sizeof(DotlibVector)
+    << " = " << setw(10) << mVectNum * sizeof(DotlibVector) << endl
 
     << "DotlibOpr:          " << setw(7) << mOprNum
     << " x " << setw(3) << sizeof(DotlibOpr)

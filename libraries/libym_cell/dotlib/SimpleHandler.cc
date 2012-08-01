@@ -77,7 +77,7 @@ SimpleHandler::read_value()
 {
   FileRegion loc;
   tTokenType value_type = parser().read_token(loc, mSymMode);
-  DotlibNodeImpl* value = new_value(value_type, loc);
+  DotlibNodeImpl* value = new_value(value_type, false, loc);
   return value;
 }
 

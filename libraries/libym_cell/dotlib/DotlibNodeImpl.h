@@ -54,6 +54,11 @@ public:
   bool
   is_string() const;
 
+  /// @brief ベクタ型(kVector)の時に true を返す．
+  virtual
+  bool
+  is_vector() const;
+
   /// @brief 演算子型(kPlus, kMinsu, kMult, kDiv)の時に true を返す．
   virtual
   bool
@@ -87,11 +92,18 @@ public:
   ShString
   string_value() const;
 
-  /// @brief インデックスを取り出す．
-  /// @note is_string() == true で内容が数値のリストの時のみ意味を持つ．
+  /// @brief ベクタの要素数を返す．
+  /// @note is_vector() = true の時のみ意味を持つ．
   virtual
-  bool
-  index_value(vector<double>& value_list) const;
+  ymuint
+  vector_size() const;
+
+  /// @brief ベクタの要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < vector_size() )
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  double
+  vector_elem(ymuint pos) const;
 
   /// @brief 第一オペランドを返す．
   /// @note is_opr() = true の時のみ意味を持つ．
@@ -358,12 +370,6 @@ public:
   ShString
   string_value() const;
 
-  /// @brief インデックスを取り出す．
-  /// @note is_string() == true で内容が数値のリストの時のみ意味を持つ．
-  virtual
-  bool
-  index_value(vector<double>& value_list) const;
-
   /// @brief 内容をストリーム出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] indent インデント量
@@ -380,6 +386,75 @@ private:
 
   // 値
   ShString mValue;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class DotlibVector DotlibNodeImpl.h "DotlibNodeImpl.h"
+/// @brief ベクタを表すクラス
+//////////////////////////////////////////////////////////////////////
+class DotlibVector :
+  public DotlibNodeBase
+{
+  friend class DotlibMgrImpl;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] value_list 値のリスト
+  /// @param[in] loc ファイル上の位置
+  DotlibVector(const vector<double>& value_list,
+	       const FileRegion& loc);
+
+  /// @brief デストラクタ
+  ~DotlibVector();
+
+
+public:
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief ベクタ型(kVector)の時に true を返す．
+  virtual
+  bool
+  is_vector() const;
+
+  /// @brief ベクタの要素数を返す．
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  ymuint
+  vector_size() const;
+
+  /// @brief ベクタの要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < vector_size() )
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  double
+  vector_elem(ymuint pos) const;
+
+  /// @brief 内容をストリーム出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] indent インデント量
+  virtual
+  void
+  dump(ostream& s,
+       ymuint indent = 0) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 要素数
+  ymuint32 mNum;
+
+  // ベクタの本体
+  double mBody[1];
 
 };
 

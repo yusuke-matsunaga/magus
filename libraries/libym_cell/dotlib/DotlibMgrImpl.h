@@ -60,6 +60,13 @@ public:
   new_string(ShString value,
 	     const FileRegion& loc);
 
+  /// @brief ベクタを表す DotlibNode を生成する．
+  /// @param[in] value_list 値のリスト
+  /// @param[in] loc ファイル上の位置
+  DotlibNodeImpl*
+  new_vector(const vector<double>& value_list,
+	     const FileRegion& loc);
+
   /// @brief + 演算子を表す DotlibNode を生成する．
   /// @param[in] opr1, opr2 オペランド
   DotlibNodeImpl*
@@ -156,6 +163,7 @@ private:
   ymuint32 mIntNum;
   ymuint32 mFloatNum;
   ymuint32 mStrNum;
+  ymuint32 mVectNum;
   ymuint32 mOprNum;
   ymuint32 mNotNum;
   ymuint32 mListNum;

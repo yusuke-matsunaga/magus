@@ -41,7 +41,7 @@ ComplexHandler::read_attr(const ShString& attr_name,
 			  const FileRegion& attr_loc)
 {
   FileRegion end_loc;
-  DotlibNodeImpl* value = parse_complex(end_loc);
+  DotlibNodeImpl* value = parse_complex(vector_mode(), end_loc);
   if ( value == NULL ) {
     return false;
   }
@@ -76,6 +76,13 @@ ComplexHandler::set_value(const ShString& attr_name,
   return parent()->add_attr(attr_name, value, loc);
 }
 
+// @brief vector_mode で読み込むとき true を返す．
+bool
+ComplexHandler::vector_mode() const
+{
+  return false;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス Str1ComplexHandler
@@ -84,7 +91,7 @@ ComplexHandler::set_value(const ShString& attr_name,
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 Str1ComplexHandler::Str1ComplexHandler(GroupHandler* parent) :
-ComplexHandler(parent)
+  ComplexHandler(parent)
 {
 }
 
@@ -128,18 +135,18 @@ Str1ComplexHandler::set_value(const ShString& attr_name,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス StrListComplexHandler
+// クラス VectorComplexHandler
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
-StrListComplexHandler::StrListComplexHandler(GroupHandler* parent) :
-ComplexHandler(parent)
+VectorComplexHandler::VectorComplexHandler(GroupHandler* parent) :
+  ComplexHandler(parent)
 {
 }
 
 // @brief デストラクタ
-StrListComplexHandler::~StrListComplexHandler()
+VectorComplexHandler::~VectorComplexHandler()
 {
 }
 
@@ -149,10 +156,58 @@ StrListComplexHandler::~StrListComplexHandler()
 // @param[in] value 値のリスト
 // @param[in] end_loc 右括弧の位置
 bool
-StrListComplexHandler::set_value(const ShString& attr_name,
-				 const FileRegion& attr_loc,
-				 DotlibNodeImpl* value,
-				 const FileRegion& end_loc)
+VectorComplexHandler::set_value(const ShString& attr_name,
+				const FileRegion& attr_loc,
+				DotlibNodeImpl* value,
+				const FileRegion& end_loc)
+{
+  assert_cond( value->is_list(), __FILE__, __LINE__ );
+  if ( value->list_size() != 1 ) {
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    value->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "Syntax error, one vector expected.");
+    return false;
+  }
+  assert_cond( value->list_elem(0)->is_vector(), __FILE__, __LINE__);
+  return ComplexHandler::set_value(attr_name, attr_loc, value, end_loc);
+}
+
+// @brief vector_mode で読み込むとき true を返す．
+bool
+VectorComplexHandler::vector_mode() const
+{
+  return true;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス VectorListComplexHandler
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] parent 親のハンドラ
+VectorListComplexHandler::VectorListComplexHandler(GroupHandler* parent) :
+  VectorComplexHandler(parent)
+{
+}
+
+// @brief デストラクタ
+VectorListComplexHandler::~VectorListComplexHandler()
+{
+}
+
+// @brief 値を読み込んだ時の処理
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
+// @param[in] value 値のリスト
+// @param[in] end_loc 右括弧の位置
+bool
+VectorListComplexHandler::set_value(const ShString& attr_name,
+				    const FileRegion& attr_loc,
+				    DotlibNodeImpl* value,
+				    const FileRegion& end_loc)
 {
   assert_cond( value->is_list(), __FILE__, __LINE__ );
   ymuint n = value->list_size();
@@ -161,19 +216,12 @@ StrListComplexHandler::set_value(const ShString& attr_name,
 		    value->loc(),
 		    kMsgError,
 		    "DOTLIB_PARSER",
-		    "Syntax error, one ore moare strings expected.");
+		    "Syntax error, one ore moare vectors expected.");
     return false;
   }
   for (ymuint i = 0; i < n; ++ i) {
     const DotlibNode* elem = value->list_elem(i);
-    if ( !elem->is_string() ) {
-      MsgMgr::put_msg(__FILE__, __LINE__,
-		      elem->loc(),
-		      kMsgError,
-		      "DOTLIB_PARSER",
-		      "Syntax error, a string expected.");
-      return false;
-    }
+    assert_cond( elem->is_vector(), __FILE__, __LINE__);
   }
 
   return ComplexHandler::set_value(attr_name, attr_loc, value, end_loc);
