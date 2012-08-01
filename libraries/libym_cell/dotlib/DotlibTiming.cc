@@ -9,6 +9,7 @@
 
 #include "DotlibTiming.h"
 #include "DotlibAttr.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -42,8 +43,8 @@ DotlibTiming::set_data(const DotlibNode* timing_node)
   mRelatedPin = NULL;
   mSlopeFall = NULL;
   mSlopeRise = NULL;
-  mTimingSense = NULL;
-  mTimingType = NULL;
+  mTimingSense = kCellNonUnate;
+  mTimingType = kCellTimingCombinational;
   mWhen = NULL;
   mWhenStart = NULL;
   mWhenEnd = NULL;
@@ -89,13 +90,145 @@ DotlibTiming::set_data(const DotlibNode* timing_node)
   }
 
   // 'timing_sense' を取り出す．
-  if ( !get_singleton_or_null("timing_sense", mTimingSense) ) {
+  const DotlibNode* ts_node = NULL;
+  if ( !get_singleton_or_null("timing_sense", ts_node) ) {
     return false;
+  }
+  if ( ts_node == NULL ) {
+    mTimingSense = kCellNonUnate;
+  }
+  else {
+    ShString tmp_str = ts_node->string_value();
+    if ( tmp_str == "positive_unate" ) {
+      mTimingSense = kCellPosiUnate;
+    }
+    else if ( tmp_str == "negative_unate" ) {
+      mTimingSense = kCellNegaUnate;
+    }
+    else if ( tmp_str == "non_unate" ) {
+      mTimingSense = kCellNonUnate;
+    }
+    else {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      ts_node->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error. Only 'positive_unate', 'negative_unate', or 'non_unate' are allowed here.");
+      return false;
+    }
   }
 
   // 'timing_type' を取り出す．
-  if ( !get_singleton_or_null("timing_type", mTimingType) ) {
+  const DotlibNode* tt_node = NULL;
+  if ( !get_singleton_or_null("timing_type", tt_node) ) {
     return false;
+  }
+  if ( tt_node == NULL ) {
+    mTimingType = kCellTimingCombinational;
+  }
+  else {
+    ShString tmp_str = tt_node->string_value();
+    if ( tmp_str == "combinational" ) {
+      mTimingType = kCellTimingCombinational;
+    }
+    else if ( tmp_str == "combinational_rise" ) {
+      mTimingType = kCellTimingCombinationalRise;
+    }
+    else if ( tmp_str == "combinational_fall" ) {
+      mTimingType = kCellTimingCombinationalFall;
+    }
+    else if ( tmp_str == "three_state_enable" ) {
+      mTimingType = kCellTimingThreeStateEnable;
+    }
+    else if ( tmp_str == "three_state_enable_rise" ) {
+      mTimingType = kCellTimingThreeStateEnableRise;
+    }
+    else if ( tmp_str == "three_state_enable_fall" ) {
+      mTimingType = kCellTimingThreeStateEnableFall;
+    }
+    else if ( tmp_str == "three_state_disable" ) {
+      mTimingType = kCellTimingThreeStateDisable;
+    }
+    else if ( tmp_str == "three_state_disable_rise" ) {
+      mTimingType = kCellTimingThreeStateDisableRise;
+    }
+    else if ( tmp_str == "three_state_disable_fall" ) {
+      mTimingType = kCellTimingThreeStateDisableFall;
+    }
+    else if ( tmp_str == "rising_edge" ) {
+      mTimingType = kCellTimingRisingEdge;
+    }
+    else if ( tmp_str == "falling_edge" ) {
+      mTimingType = kCellTimingFallingEdge;
+    }
+    else if ( tmp_str == "preset" ) {
+      mTimingType = kCellTimingPreset;
+    }
+    else if ( tmp_str == "clear" ) {
+      mTimingType = kCellTimingClear;
+    }
+    else if ( tmp_str == "hold_rising" ) {
+      mTimingType = kCellTimingHoldRising;
+    }
+    else if ( tmp_str == "hold_falling" ) {
+      mTimingType = kCellTimingHoldFalling;
+    }
+    else if ( tmp_str == "setup_rising" ) {
+      mTimingType = kCellTimingSetupRising;
+    }
+    else if ( tmp_str == "setup_falling" ) {
+      mTimingType = kCellTimingSetupFalling;
+    }
+    else if ( tmp_str == "recovery_rising" ) {
+      mTimingType = kCellTimingRecoveryRising;
+    }
+    else if ( tmp_str == "recovery_falling" ) {
+      mTimingType = kCellTimingRecoveryFalling;
+    }
+    else if ( tmp_str == "skew_rising" ) {
+      mTimingType = kCellTimingSkewRising;
+    }
+    else if ( tmp_str == "skew_falling" ) {
+      mTimingType = kCellTimingSkewFalling;
+    }
+    else if ( tmp_str == "removal_rising" ) {
+      mTimingType = kCellTimingRemovalRising;
+    }
+    else if ( tmp_str == "removal_falling" ) {
+      mTimingType = kCellTimingRemovalFalling;
+    }
+    else if ( tmp_str == "non_seq_setup_rising" ) {
+      mTimingType = kCellTimingNonSeqSetupRising;
+    }
+    else if ( tmp_str == "non_seq_setup_falling" ) {
+      mTimingType = kCellTimingNonSeqSetupFalling;
+    }
+    else if ( tmp_str == "non_seq_hold_rising" ) {
+      mTimingType = kCellTimingNonSeqHoldRising;
+    }
+    else if ( tmp_str == "non_seq_hold_falling" ) {
+      mTimingType = kCellTimingNonSeqHoldFalling;
+    }
+    else if ( tmp_str == "nochange_high_high" ) {
+      mTimingType = kCellTimingNochangeHighHigh;
+    }
+    else if ( tmp_str == "nochange_high_low" ) {
+      mTimingType = kCellTimingNochangeHighLow;
+    }
+    else if ( tmp_str == "nochange_low_high" ) {
+      mTimingType = kCellTimingNochangeLowHigh;
+    }
+    else if ( tmp_str == "nochange_low_low" ) {
+      mTimingType = kCellTimingNochangeLowLow;
+    }
+    else {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      ts_node->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error. Illegal string for timing type.");
+      return false;
+    }
   }
 
   // 'when' を取り出す．
@@ -295,14 +428,14 @@ DotlibTiming::slope_rise() const
 }
 
 // @brief "timing_sense" を返す．
-const DotlibNode*
+tCellTimingSense
 DotlibTiming::timing_sense() const
 {
   return mTimingSense;
 }
 
 // @brief "timing_type" を返す．
-const DotlibNode*
+tCellTimingType
 DotlibTiming::timing_type() const
 {
   return mTimingType;

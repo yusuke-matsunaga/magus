@@ -221,11 +221,11 @@ gen_library(const string& lib_name,
       CellResistance r_r(pt_pin->rise_fanout_delay()->num());
       CellTime f_i(pt_pin->fall_block_delay()->num());
       CellResistance f_r(pt_pin->fall_fanout_delay()->num());
-      CellTiming* timing = library->new_timing(i,
-					       kCellTimingCombinational,
-					       r_i, f_i,
-					       CellTime(0.0), CellTime(0.0),
-					       r_r, f_r);
+      CellTiming* timing = library->new_timing_generic(i,
+						       kCellTimingCombinational,
+						       r_i, f_i,
+						       CellTime(0.0), CellTime(0.0),
+						       r_r, f_r);
       if ( !redundant ) {
 	library->set_timing(cell_id, i, 0, sense, timing);
       }

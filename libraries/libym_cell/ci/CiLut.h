@@ -1,11 +1,11 @@
-#ifndef CELLLUTIMPL_H
-#define CELLLUTIMPL_H
+#ifndef CILUT_H
+#define CILUT_H
 
-/// @file　CellLutImpl.h
-/// @brief CellLutTemplate/CellLut のの実装クラスのヘッダファイル
+/// @file　CiLut.h
+/// @brief CiLut のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -16,20 +16,20 @@
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellLutTemplateBase CellLutImpl.h "CellLutImpl.h"
-/// @brief CellLutTemplate の(擬似)基底クラス
+/// @class CiLutTemplateBase CiLut.h "CiLut.h"
+/// @brief CiLutTemplate の(擬似)基底クラス
 //////////////////////////////////////////////////////////////////////
-class CellLutTemplateBase :
+class CiLutTemplateBase :
   public CellLutTemplate
 {
 protected:
 
   /// @brief コンストラクタ
-  CellLutTemplateBase(ShString name);
+  CiLutTemplateBase(ShString name);
 
   /// @brief デストラクタ
   virtual
-  ~CellLutTemplateBase();
+  ~CiLutTemplateBase();
 
 
 public:
@@ -54,24 +54,22 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellLutTemplate1D CellLutImpl.h "CellLutImpl.h"
+/// @class CiLutTemplate1D CiLut.h "CiLut.h"
 /// @brief 1次元のルックアップテーブルテンプレート
 //////////////////////////////////////////////////////////////////////
-class CellLutTemplate1D :
-  public CellLutTemplateBase
+class CiLutTemplate1D :
+  public CiLutTemplateBase
 {
-  friend class CellManip;
-
 private:
 
   /// @brief コンストラクタ
-  CellLutTemplate1D(ShString name,
-		    tCellVarType var_type,
-		    const vector<double>& index_array);
+  CiLutTemplate1D(ShString name,
+		  tCellVarType var_type,
+		  const vector<double>& index_array);
 
   /// @brief デストラクタ
   virtual
-  ~CellLutTemplate1D();
+  ~CiLutTemplate1D();
 
 
 public:
@@ -117,26 +115,26 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellLutTemplate2D CellLutImpl.h "CellLutImpl.h"
+/// @class CiLutTemplate2D CiLut.h "CiLut.h"
 /// @brief 2次元のルックアップテーブルテンプレート
 //////////////////////////////////////////////////////////////////////
-class CellLutTemplate2D :
-  public CellLutTemplateBase
+class CiLutTemplate2D :
+  public CiLutTemplateBase
 {
   friend class CellManip;
 
 private:
 
   /// @brief コンストラクタ
-  CellLutTemplate2D(ShString name,
-		    tCellVarType var1,
-		    const vector<double>& index_array1,
-		    tCellVarType var2,
-		    const vector<double>& index_array2);
+  CiLutTemplate2D(ShString name,
+		  tCellVarType var1,
+		  const vector<double>& index_array1,
+		  tCellVarType var2,
+		  const vector<double>& index_array2);
 
   /// @brief デストラクタ
   virtual
-  ~CellLutTemplate2D();
+  ~CiLutTemplate2D();
 
 
 public:
@@ -182,28 +180,28 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellLutTemplate3D CellLutImpl.h "CellLutImpl.h"
+/// @class CiLutTemplate3D CiLut.h "CiLut.h"
 /// @brief 3次元のルックアップテーブルテンプレート
 //////////////////////////////////////////////////////////////////////
-class CellLutTemplate3D :
-  public CellLutTemplateBase
+class CiLutTemplate3D :
+  public CiLutTemplateBase
 {
   friend class CellManip;
 
 private:
 
   /// @brief コンストラクタ
-  CellLutTemplate3D(ShString name,
-		    tCellVarType var1,
-		    const vector<double>& index_array1,
-		    tCellVarType var2,
-		    const vector<double>& index_array2,
-		    tCellVarType var3,
-		    const vector<double>& index_array3);
+  CiLutTemplate3D(ShString name,
+		  tCellVarType var1,
+		  const vector<double>& index_array1,
+		  tCellVarType var2,
+		  const vector<double>& index_array2,
+		  tCellVarType var3,
+		  const vector<double>& index_array3);
 
   /// @brief デストラクタ
   virtual
-  ~CellLutTemplate3D();
+  ~CiLutTemplate3D();
 
 
 public:
@@ -249,21 +247,21 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellLut1D CellLutImpl.h "CellLutImpl.h"
+/// @class CiLut1D CiLut.h "CiLut.h"
 /// @brief 1次元のルックアップテーブルを表すクラス
 //////////////////////////////////////////////////////////////////////
-class CellLut1D :
+class CiLut1D :
   public CellLut
 {
 public:
 
   /// @brief コンストラクタ
-  CellLut1D(const CellLutTemplate1D* lut_template,
-	    const vector<double>& index_array = vector<double>());
+  CiLut1D(const CiLutTemplate1D* lut_template,
+	  const vector<double>& index_array = vector<double>());
 
   /// @brief デストラクタ
   virtual
-  ~CellLut1D();
+  ~CiLut1D();
 
 
 public:
@@ -284,6 +282,13 @@ public:
   index(ymuint32 var,
 	ymuint32 pos) const;
 
+  /// @brief 値の取得
+  /// @param[in] pos_array 格子点座標
+  /// @note pos_array のサイズは dimension() と同じ
+  virtual
+  double
+  value(const vector<ymuint32>& pos_array) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -291,31 +296,34 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // テンプレート
-  const CellLutTemplate1D* mTemplate;
+  const CiLutTemplate1D* mTemplate;
 
   // インデックスの配列の配列
   vector<double> mIndexArray;
+
+  // 格子点の値の配列
+  vector<double> mValueArray;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellLut2D CellLutImpl.h "CellLutImpl.h"
+/// @class CiLut2D CiLut.h "CiLut.h"
 /// @brief 2次元のルックアップテーブルを表すクラス
 //////////////////////////////////////////////////////////////////////
-class CellLut2D :
+class CiLut2D :
   public CellLut
 {
 public:
 
   /// @brief コンストラクタ
-  CellLut2D(const CellLutTemplate2D* lut_template,
+  CiLut2D(const CiLutTemplate2D* lut_template,
 	    const vector<double>& index_array1 = vector<double>(),
 	    const vector<double>& index_array2 = vector<double>());
 
   /// @brief デストラクタ
   virtual
-  ~CellLut2D();
+  ~CiLut2D();
 
 
 public:
@@ -336,6 +344,13 @@ public:
   index(ymuint32 var,
 	ymuint32 pos) const;
 
+  /// @brief 値の取得
+  /// @param[in] pos_array 格子点座標
+  /// @note pos_array のサイズは dimension() と同じ
+  virtual
+  double
+  value(const vector<ymuint32>& pos_array) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -343,32 +358,35 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // テンプレート
-  const CellLutTemplate2D* mTemplate;
+  const CiLutTemplate2D* mTemplate;
 
   // インデックスの配列の配列
   vector<double> mIndexArray[2];
+
+  // 格子点の値の配列
+  vector<double> mValueArray;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellLut3D CellLutImpl.h "CellLutImpl.h"
+/// @class CiLut3D CiLut.h "CiLut.h"
 /// @brief 3次元のルックアップテーブルを表すクラス
 //////////////////////////////////////////////////////////////////////
-class CellLut3D :
+class CiLut3D :
   public CellLut
 {
 public:
 
   /// @brief コンストラクタ
-  CellLut3D(const CellLutTemplate3D* lut_template,
+  CiLut3D(const CiLutTemplate3D* lut_template,
 	    const vector<double>& index_array1 = vector<double>(),
 	    const vector<double>& index_array2 = vector<double>(),
 	    const vector<double>& index_array3 = vector<double>());
 
   /// @brief デストラクタ
   virtual
-  ~CellLut3D();
+  ~CiLut3D();
 
 
 public:
@@ -389,6 +407,13 @@ public:
   index(ymuint32 var,
 	ymuint32 pos) const;
 
+  /// @brief 値の取得
+  /// @param[in] pos_array 格子点座標
+  /// @note pos_array のサイズは dimension() と同じ
+  virtual
+  double
+  value(const vector<ymuint32>& pos_array) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -396,10 +421,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // テンプレート
-  const CellLutTemplate3D* mTemplate;
+  const CiLutTemplate3D* mTemplate;
 
   // インデックスの配列の配列
   vector<double> mIndexArray[3];
+
+  // 格子点の値の配列
+  vector<double> mValueArray;
 
 };
 

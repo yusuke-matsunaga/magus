@@ -10,32 +10,9 @@
 
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_cell/cell_type.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
-
-//////////////////////////////////////////////////////////////////////
-/// @brief ルックアップテーブルの変数の型
-//////////////////////////////////////////////////////////////////////
-enum tCellVarType {
-  kVarInputNetTransition,
-
-  kVarTotalOutputNetCapacitance,
-  kVarOutputNetLength,
-  kVarOutputNetWireCap,
-  kVarOutputNetPinCap,
-
-  kVarRelatedOutTotalOutputNetCapacitance,
-  kVarRelatedOutOutputNetLength,
-  kVarRelatedOutOutputNetWireCap,
-  kVarRelatedOutOutputNetPinCap,
-
-  kVarConstrainedPinTransition,
-
-  kVarRelatedPinTransition
-};
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class CellLutTemplate CellLut.h "ym_cell/CellLut.h"
@@ -136,6 +113,13 @@ public:
   double
   index(ymuint32 var,
 	ymuint32 pos) const = 0;
+
+  /// @brief 値の取得
+  /// @param[in] pos_array 格子点座標
+  /// @note pos_array のサイズは dimension() と同じ
+  virtual
+  double
+  value(const vector<ymuint32>& pos_array) const = 0;
 
 
 private:

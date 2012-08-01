@@ -380,10 +380,10 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CiTimingNonlinear1 CiTiming.h "CiTiming.h"
+/// @class CiTimingLut1 CiTiming.h "CiTiming.h"
 /// @brief CMOS非線形タイプの CellTiming の実装クラス
 //////////////////////////////////////////////////////////////////////
-class CiTimingNonlinear1 :
+class CiTimingLut1 :
   public CiTiming
 {
   friend class CiLibrary;
@@ -395,15 +395,17 @@ private:
   /// @param[in] timing_type タイミングの型
   /// @param[in] cell_rise 立ち上がりセル遅延テーブル
   /// @param[in] cell_fall 立ち下がりセル遅延テーブル
-  CiTimingNonlinear1(ymuint id,
-		     tCellTimingType timing_type,
-		     CellLut* cell_rise,
-		     CellLut* cell_fall);
+  CiTimingLut1(ymuint id,
+	       tCellTimingType timing_type,
+	       CellLut* cell_rise,
+	       CellLut* cell_fall,
+	       CellLut* rise_transition,
+	       CellLut* fall_transition);
 
 
   /// @brief デストラクタ
   virtual
-  ~CiTimingNonlinear1();
+  ~CiTimingLut1();
 
 
 public:
@@ -421,6 +423,16 @@ public:
   const CellLut*
   cell_fall() const;
 
+  /// @brief 立ち上がり遷移遅延テーブルの取得
+  virtual
+  const CellLut*
+  rise_transition() const;
+
+  /// @brief 立ち下がり遷移遅延テーブルの取得
+  virtual
+  const CellLut*
+  fall_transition() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -433,14 +445,20 @@ private:
   // 立ち下がりセル遅延テーブル
   const CellLut* mCellFall;
 
+  // 立ち上がり遷移遅延テーブル
+  const CellLut* mRiseTransition;
+
+  // 立ち下がり遷移遅延テーブル
+  const CellLut* mFallTransition;
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CiTimingNonlinear2 CiTiming.h "CiTiming.h"
+/// @class CiTimingLut2 CiTiming.h "CiTiming.h"
 /// @brief CMOS非線形タイプの CellTiming の実装クラス
 //////////////////////////////////////////////////////////////////////
-class CiTimingNonlinear2 :
+class CiTimingLut2 :
   public CiTiming
 {
   friend class CiLibrary;
@@ -454,17 +472,17 @@ private:
   /// @param[in] fall_transition 立ち下がり遷移遅延テーブル
   /// @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
   /// @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
-  CiTimingNonlinear2(ymuint id,
-		     tCellTimingType timing_type,
-		     CellLut* rise_transition,
-		     CellLut* fall_transition,
-		     CellLut* rise_propagation,
-		     CellLut* fall_propagation);
+  CiTimingLut2(ymuint id,
+	       tCellTimingType timing_type,
+	       CellLut* rise_transition,
+	       CellLut* fall_transition,
+	       CellLut* rise_propagation,
+	       CellLut* fall_propagation);
 
 
   /// @brief デストラクタ
   virtual
-  ~CiTimingNonlinear2();
+  ~CiTimingLut2();
 
 
 public:

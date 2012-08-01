@@ -988,14 +988,14 @@ CiLibrary::new_cell_internal(ymuint cell_id,
 // @param[in] rise_resistance 立ち上がり負荷依存係数
 // @param[in] fall_resistance 立ち下がり負荷依存係数
 CellTiming*
-CiLibrary::new_timing(ymuint id,
-		      tCellTimingType type,
-		      CellTime intrinsic_rise,
-		      CellTime intrinsic_fall,
-		      CellTime slope_rise,
-		      CellTime slope_fall,
-		      CellResistance rise_resistance,
-		      CellResistance fall_resistance)
+CiLibrary::new_timing_generic(ymuint id,
+			      tCellTimingType type,
+			      CellTime intrinsic_rise,
+			      CellTime intrinsic_fall,
+			      CellTime slope_rise,
+			      CellTime slope_fall,
+			      CellResistance rise_resistance,
+			      CellResistance fall_resistance)
 {
   void* p = mAlloc.get_memory(sizeof(CiTimingGeneric));
   CiTiming* timing = new (p) CiTimingGeneric(id, type,
@@ -1008,7 +1008,6 @@ CiLibrary::new_timing(ymuint id,
   return timing;
 }
 
-#if 0
 // @brief タイミング情報を作る(折れ線近似)．
 // @param[in] id ID番号
 // @param[in] timing_type タイミングの型
@@ -1017,14 +1016,14 @@ CiLibrary::new_timing(ymuint id,
 // @param[in] slope_rise 立ち上がりスロープ遅延
 // @param[in] slope_fall 立ち下がりスロープ遅延
 CellTiming*
-CiLibrary::new_timing(ymuint id,
-		      tCellTimingType timing_type,
-		      CellTime intrinsic_rise,
-		      CellTime intrinsic_fall,
-		      CellTime slope_rise,
-		      CellTime slope_fall,
-		      CellResistance rise_pin_resistance,
-		      CellResistance fall_pin_resistance)
+CiLibrary::new_timing_piecewise(ymuint id,
+				tCellTimingType timing_type,
+				CellTime intrinsic_rise,
+				CellTime intrinsic_fall,
+				CellTime slope_rise,
+				CellTime slope_fall,
+				CellResistance rise_pin_resistance,
+				CellResistance fall_pin_resistance)
 {
   void* p = mAlloc.get_memory(sizeof(CiTimingPiecewise));
   CiTiming* timing = new (p) CiTimingPiecewise(id, timing_type,
@@ -1036,7 +1035,6 @@ CiLibrary::new_timing(ymuint id,
 					       fall_pin_resistance);
   return timing;
 }
-#endif
 
 // @brief タイミング情報を作る(非線形タイプ1)．
 // @param[in] id ID番号
@@ -1044,15 +1042,19 @@ CiLibrary::new_timing(ymuint id,
 // @param[in] cell_rise 立ち上がりセル遅延テーブル
 // @param[in] cell_fall 立ち下がりセル遅延テーブル
 CellTiming*
-CiLibrary::new_timing(ymuint id,
-		      tCellTimingType timing_type,
-		      CellLut* cell_rise,
-		      CellLut* cell_fall)
+CiLibrary::new_timing_lut1(ymuint id,
+			   tCellTimingType timing_type,
+			   CellLut* cell_rise,
+			   CellLut* cell_fall,
+			   CellLut* rise_transition,
+			   CellLut* fall_transition)
 {
-  void* p = mAlloc.get_memory(sizeof(CiTimingNonlinear1));
-  CiTiming* timing = new (p) CiTimingNonlinear1(id, timing_type,
-						cell_rise,
-						cell_fall);
+  void* p = mAlloc.get_memory(sizeof(CiTimingLut1));
+  CiTiming* timing = new (p) CiTimingLut1(id, timing_type,
+					  cell_rise,
+					  cell_fall,
+					  rise_transition,
+					  fall_transition);
   return timing;
 }
 
@@ -1064,19 +1066,19 @@ CiLibrary::new_timing(ymuint id,
 // @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
 // @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
 CellTiming*
-CiLibrary::new_timing(ymuint id,
-		      tCellTimingType timing_type,
-		      CellLut* rise_transition,
-		      CellLut* fall_transition,
-		      CellLut* rise_propagation,
-		      CellLut* fall_propagation)
+CiLibrary::new_timing_lut2(ymuint id,
+			   tCellTimingType timing_type,
+			   CellLut* rise_transition,
+			   CellLut* fall_transition,
+			   CellLut* rise_propagation,
+			   CellLut* fall_propagation)
 {
-  void* p = mAlloc.get_memory(sizeof(CiTimingNonlinear2));
-  CiTiming* timing = new (p) CiTimingNonlinear2(id, timing_type,
-						rise_transition,
-						fall_transition,
-						rise_propagation,
-						fall_propagation);
+  void* p = mAlloc.get_memory(sizeof(CiTimingLut2));
+  CiTiming* timing = new (p) CiTimingLut2(id, timing_type,
+					  rise_transition,
+					  fall_transition,
+					  rise_propagation,
+					  fall_propagation);
   return timing;
 }
 
@@ -1679,8 +1681,8 @@ CiLibrary::restore(BinI& s)
 	>> s_f
 	>> r_r
 	>> f_r;
-      CellTiming* timing = new_timing(j, kCellTimingCombinational,
-				      i_r, i_f, s_r, s_f, r_r, f_r);
+      CellTiming* timing = new_timing_generic(j, kCellTimingCombinational,
+					      i_r, i_f, s_r, s_f, r_r, f_r);
       tmp_list[j] = timing;
     }
 

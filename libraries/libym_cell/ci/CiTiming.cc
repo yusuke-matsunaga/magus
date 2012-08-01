@@ -331,7 +331,7 @@ CiTimingPiecewise::fall_delay_intercept() const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス CiTimingNonlinear1
+// クラス CiTimingLut1
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
@@ -339,38 +339,58 @@ CiTimingPiecewise::fall_delay_intercept() const
 // @param[in] timing_type タイミングの型
 // @param[in] cell_rise 立ち上がりセル遅延テーブル
 // @param[in] cell_fall 立ち下がりセル遅延テーブル
-CiTimingNonlinear1::CiTimingNonlinear1(ymuint id,
-				       tCellTimingType timing_type,
-				       CellLut* cell_rise,
-				       CellLut* cell_fall) :
+// @param[in] rise_transition 立ち上がり遷移遅延テーブル
+// @param[in] fall_transition 立ち下がり遷移遅延テーブル
+CiTimingLut1::CiTimingLut1(ymuint id,
+			   tCellTimingType timing_type,
+			   CellLut* cell_rise,
+			   CellLut* cell_fall,
+			   CellLut* rise_transition,
+			   CellLut* fall_transition) :
   CiTiming(id, timing_type),
   mCellRise(cell_rise),
-  mCellFall(cell_fall)
+  mCellFall(cell_fall),
+  mRiseTransition(rise_transition),
+  mFallTransition(fall_transition)
 {
 }
 
 // @brief デストラクタ
-CiTimingNonlinear1::~CiTimingNonlinear1()
+CiTimingLut1::~CiTimingLut1()
 {
 }
 
 // @brief 立ち上がりセル遅延テーブルの取得
 const CellLut*
-CiTimingNonlinear1::cell_rise() const
+CiTimingLut1::cell_rise() const
 {
   return mCellRise;
 }
 
 // @brief 立ち下がりセル遅延テーブルの取得
 const CellLut*
-CiTimingNonlinear1::cell_fall() const
+CiTimingLut1::cell_fall() const
 {
   return mCellFall;
 }
 
+// @brief 立ち上がり遷移遅延テーブルの取得
+const CellLut*
+CiTimingLut1::rise_transition() const
+{
+  return mRiseTransition;
+}
+
+// @brief 立ち下がり遷移遅延テーブルの取得
+const CellLut*
+CiTimingLut1::fall_transition() const
+{
+  return mFallTransition;
+}
+
 
 //////////////////////////////////////////////////////////////////////
-// クラス CiTimingNonlinear2
+// クラス CiTimingLut2
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
@@ -380,12 +400,12 @@ CiTimingNonlinear1::cell_fall() const
 // @param[in] fall_transition 立ち下がり遷移遅延テーブル
 // @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
 // @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
-CiTimingNonlinear2::CiTimingNonlinear2(ymuint id,
-				       tCellTimingType timing_type,
-				       CellLut* rise_transition,
-				       CellLut* fall_transition,
-				       CellLut* rise_propagation,
-				       CellLut* fall_propagation) :
+CiTimingLut2::CiTimingLut2(ymuint id,
+			   tCellTimingType timing_type,
+			   CellLut* rise_transition,
+			   CellLut* fall_transition,
+			   CellLut* rise_propagation,
+			   CellLut* fall_propagation) :
   CiTiming(id, timing_type),
   mRiseTransition(rise_transition),
   mFallTransition(fall_transition),
@@ -395,34 +415,34 @@ CiTimingNonlinear2::CiTimingNonlinear2(ymuint id,
 }
 
 // @brief デストラクタ
-CiTimingNonlinear2::~CiTimingNonlinear2()
+CiTimingLut2::~CiTimingLut2()
 {
 }
 
 // @brief 立ち上がり遷移遅延テーブルの取得
 const CellLut*
-CiTimingNonlinear2::rise_transition() const
+CiTimingLut2::rise_transition() const
 {
   return mRiseTransition;
 }
 
 // @brief 立ち下がり遷移遅延テーブルの取得
 const CellLut*
-CiTimingNonlinear2::fall_transition() const
+CiTimingLut2::fall_transition() const
 {
   return mFallTransition;
 }
 
 // @brief 立ち上がり伝搬遅延テーブルの取得
 const CellLut*
-CiTimingNonlinear2::rise_propagation() const
+CiTimingLut2::rise_propagation() const
 {
   return mRisePropagation;
 }
 
 // @brief 立ち下がり伝搬遅延テーブルの取得
 const CellLut*
-CiTimingNonlinear2::fall_propagation() const
+CiTimingLut2::fall_propagation() const
 {
   return mFallPropagation;
 }

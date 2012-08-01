@@ -650,16 +650,15 @@ public:
   /// @param[in] fall_resistance 立ち下がり負荷依存係数
   virtual
   CellTiming*
-  new_timing(ymuint id,
-	     tCellTimingType type,
-	     CellTime intrinsic_rise,
-	     CellTime intrinsic_fall,
-	     CellTime slope_rise,
-	     CellTime slope_fall,
-	     CellResistance rise_resistance,
-	     CellResistance fall_resistance) = 0;
+  new_timing_generic(ymuint id,
+		     tCellTimingType type,
+		     CellTime intrinsic_rise,
+		     CellTime intrinsic_fall,
+		     CellTime slope_rise,
+		     CellTime slope_fall,
+		     CellResistance rise_resistance,
+		     CellResistance fall_resistance) = 0;
 
-#if 0
   /// @brief タイミング情報を作る(折れ線近似)．
   /// @param[in] id ID番号
   /// @param[in] timing_type タイミングの型
@@ -669,15 +668,14 @@ public:
   /// @param[in] slope_fall 立ち下がりスロープ遅延
   virtual
   CellTiming*
-  new_timing(ymuint id,
-	     tCellTimingType timing_type,
-	     CellTime intrinsic_rise,
-	     CellTime intrinsic_fall,
-	     CellTime slope_rise,
-	     CellTime slope_fall,
-	     CellResistance rise_pin_resistance,
-	     CellResistance fall_pin_resistance) = 0;
-#endif
+  new_timing_piecewise(ymuint id,
+		       tCellTimingType timing_type,
+		       CellTime intrinsic_rise,
+		       CellTime intrinsic_fall,
+		       CellTime slope_rise,
+		       CellTime slope_fall,
+		       CellResistance rise_pin_resistance,
+		       CellResistance fall_pin_resistance) = 0;
 
   /// @brief タイミング情報を作る(非線形タイプ1)．
   /// @param[in] id ID番号
@@ -686,10 +684,12 @@ public:
   /// @param[in] cell_fall 立ち下がりセル遅延テーブル
   virtual
   CellTiming*
-  new_timing(ymuint id,
-	     tCellTimingType timing_type,
-	     CellLut* cell_rise,
-	     CellLut* cell_fall) = 0;
+  new_timing_lut1(ymuint id,
+		  tCellTimingType timing_type,
+		  CellLut* cell_rise,
+		  CellLut* cell_fall,
+		  CellLut* rise_transition,
+		  CellLut* fall_transition) = 0;
 
   /// @brief タイミング情報を作る(非線形タイプ2)．
   /// @param[in] id ID番号
@@ -700,12 +700,12 @@ public:
   /// @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
   virtual
   CellTiming*
-  new_timing(ymuint id,
-	     tCellTimingType timing_type,
-	     CellLut* rise_transition,
-	     CellLut* fall_transition,
-	     CellLut* rise_propagation,
-	     CellLut* fall_propagation) = 0;
+  new_timing_lut2(ymuint id,
+		  tCellTimingType timing_type,
+		  CellLut* rise_transition,
+		  CellLut* fall_transition,
+		  CellLut* rise_propagation,
+		  CellLut* fall_propagation) = 0;
 
   /// @brief タイミング情報をセットする．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )

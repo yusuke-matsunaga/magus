@@ -49,6 +49,8 @@ libym_cell_ci_la_SOURCES = \
 	CiGroup.cc \
 	CiLibrary.h \
 	CiLibrary.cc \
+	CiLut.h \
+	CiLut.cc \
 	CiPatGraph.h \
 	CiPatGraph.cc \
 	CiPatMgr.h \

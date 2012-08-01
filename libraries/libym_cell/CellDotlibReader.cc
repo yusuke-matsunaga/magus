@@ -13,6 +13,7 @@
 #include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
 #include "ym_cell/CellArea.h"
+#include "ym_cell/CellResistance.h"
 #include "ym_cell/CellCapacitance.h"
 #include "ym_cell/CellTime.h"
 
@@ -499,6 +500,7 @@ gen_library(const DotlibNode* dt_library)
     }
 
     // タイミング情報の生成
+    ymuint tid = 0;
     const Cell* cell = library->cell(cell_id);
     for (ymuint i = 0; i < npin; ++ i) {
       const CellPin* opin = cell->pin(i);
@@ -545,6 +547,40 @@ gen_library(const DotlibNode* dt_library)
 	  continue;
 	}
 
+	CellTiming* timing = NULL;
+	tCellTimingType timing_type = timing_info.timing_type();
+	switch ( library->delay_model() ) {
+	case CellLibrary::kDelayGenericCmos:
+	  {
+	    CellTime intrinsic_rise(timing_info.intrinsic_rise()->float_value());
+	    CellTime intrinsic_fall(timing_info.intrinsic_fall()->float_value());
+	    CellTime slope_rise(timing_info.slope_rise()->float_value());
+	    CellTime slope_fall(timing_info.slope_fall()->float_value());
+	    CellResistance rise_res(timing_info.rise_resistance()->float_value());
+	    CellResistance fall_res(timing_info.fall_resistance()->float_value());
+	    timing = library->new_timing_generic(tid, timing_type,
+						 intrinsic_rise, intrinsic_fall,
+						 slope_rise, slope_fall,
+						 rise_res, fall_res);
+	  }
+	  break;
+
+	case CellLibrary::kDelayTableLookup:
+	  {
+
+	  }
+	  break;
+
+	case CellLibrary::kDelayPiecewiseCmos:
+	  break;
+
+	case CellLibrary::kDelayCmos2:
+	  break;
+
+	case CellLibrary::kDelayDcm:
+	  break;
+	}
+	++ tid;
       }
     }
 

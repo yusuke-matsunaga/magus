@@ -1,49 +1,49 @@
 
-/// @file CellLut.cc
-/// @brief CellLut の実装ファイル
+/// @file CiLut.cc
+/// @brief CiLut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CellLutImpl.h"
+#include "CiLut.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-// クラス CellLutTemplateBase
+// クラス CiLutTemplateBase
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CellLutTemplateBase::CellLutTemplateBase(ShString name) :
+CiLutTemplateBase::CiLutTemplateBase(ShString name) :
   mName(name)
 {
 }
 
 // @brief デストラクタ
-CellLutTemplateBase::~CellLutTemplateBase()
+CiLutTemplateBase::~CiLutTemplateBase()
 {
 }
 
 // @brief 名前の取得
 const char*
-CellLutTemplateBase::name() const
+CiLutTemplateBase::name() const
 {
   return mName;
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス CellLutTemplate1D
+// クラス CiLutTemplate1D
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CellLutTemplate1D::CellLutTemplate1D(ShString name,
-				     tCellVarType var_type,
-				     const vector<double>& index_array) :
-  CellLutTemplateBase(name),
+CiLutTemplate1D::CiLutTemplate1D(ShString name,
+				 tCellVarType var_type,
+				 const vector<double>& index_array) :
+  CiLutTemplateBase(name),
   mVarType(var_type),
   mIndexArray(index_array.size())
 {
@@ -54,13 +54,13 @@ CellLutTemplate1D::CellLutTemplate1D(ShString name,
 }
 
 // @brief デストラクタ
-CellLutTemplate1D::~CellLutTemplate1D()
+CiLutTemplate1D::~CiLutTemplate1D()
 {
 }
 
 // @brief 次元数の取得
 ymuint32
-CellLutTemplate1D::dimension() const
+CiLutTemplate1D::dimension() const
 {
   return 1;
 }
@@ -68,7 +68,7 @@ CellLutTemplate1D::dimension() const
 // @brief 変数型の取得
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 tCellVarType
-CellLutTemplate1D::variable_type(ymuint32 var) const
+CiLutTemplate1D::variable_type(ymuint32 var) const
 {
   assert_cond( var == 0, __FILE__, __LINE__);
   return mVarType;
@@ -77,7 +77,7 @@ CellLutTemplate1D::variable_type(ymuint32 var) const
 // @brief インデックス数の取得
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 ymuint32
-CellLutTemplate1D::index_num(ymuint32 var) const
+CiLutTemplate1D::index_num(ymuint32 var) const
 {
   assert_cond( var == 0, __FILE__, __LINE__);
   return mIndexArray.size();
@@ -87,8 +87,8 @@ CellLutTemplate1D::index_num(ymuint32 var) const
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 // @param[in] pos 位置番号 ( 0 <= pos < index_num(var) )
 double
-CellLutTemplate1D::index(ymuint32 var,
-			 ymuint32 pos) const
+CiLutTemplate1D::index(ymuint32 var,
+		       ymuint32 pos) const
 {
   assert_cond( var == 0, __FILE__, __LINE__);
   assert_cond( pos < index_num(0), __FILE__, __LINE__);
@@ -97,16 +97,16 @@ CellLutTemplate1D::index(ymuint32 var,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス CellLutTemplate2D
+// クラス CiLutTemplate2D
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CellLutTemplate2D::CellLutTemplate2D(ShString name,
-				     tCellVarType var1,
-				     const vector<double>& index_array1,
-				     tCellVarType var2,
-				     const vector<double>& index_array2) :
-  CellLutTemplateBase(name)
+CiLutTemplate2D::CiLutTemplate2D(ShString name,
+				 tCellVarType var1,
+				 const vector<double>& index_array1,
+				 tCellVarType var2,
+				 const vector<double>& index_array2) :
+  CiLutTemplateBase(name)
 {
   mVarType[0] = var1;
   ymuint32 n1 = index_array1.size();
@@ -124,13 +124,13 @@ CellLutTemplate2D::CellLutTemplate2D(ShString name,
 }
 
 // @brief デストラクタ
-CellLutTemplate2D::~CellLutTemplate2D()
+CiLutTemplate2D::~CiLutTemplate2D()
 {
 }
 
 // @brief 次元数の取得
 ymuint32
-CellLutTemplate2D::dimension() const
+CiLutTemplate2D::dimension() const
 {
   return 2;
 }
@@ -138,7 +138,7 @@ CellLutTemplate2D::dimension() const
 // @brief 変数型の取得
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 tCellVarType
-CellLutTemplate2D::variable_type(ymuint32 var) const
+CiLutTemplate2D::variable_type(ymuint32 var) const
 {
   assert_cond( var < 2 , __FILE__, __LINE__);
   return mVarType[var];
@@ -147,7 +147,7 @@ CellLutTemplate2D::variable_type(ymuint32 var) const
 // @brief インデックス数の取得
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 ymuint32
-CellLutTemplate2D::index_num(ymuint32 var) const
+CiLutTemplate2D::index_num(ymuint32 var) const
 {
   assert_cond( var < 2 , __FILE__, __LINE__);
   return mIndexArray[var].size();
@@ -157,7 +157,7 @@ CellLutTemplate2D::index_num(ymuint32 var) const
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 // @param[in] pos 位置番号 ( 0 <= pos < index_num(var) )
 double
-CellLutTemplate2D::index(ymuint32 var,
+CiLutTemplate2D::index(ymuint32 var,
 			 ymuint32 pos) const
 {
   assert_cond( var < 2 , __FILE__, __LINE__);
@@ -167,18 +167,18 @@ CellLutTemplate2D::index(ymuint32 var,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス CellLutTemplate3D
+// クラス CiLutTemplate3D
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CellLutTemplate3D::CellLutTemplate3D(ShString name,
-				     tCellVarType var1,
-				     const vector<double>& index_array1,
-				     tCellVarType var2,
-				     const vector<double>& index_array2,
-				     tCellVarType var3,
-				     const vector<double>& index_array3) :
-  CellLutTemplateBase(name)
+CiLutTemplate3D::CiLutTemplate3D(ShString name,
+				 tCellVarType var1,
+				 const vector<double>& index_array1,
+				 tCellVarType var2,
+				 const vector<double>& index_array2,
+				 tCellVarType var3,
+				 const vector<double>& index_array3) :
+  CiLutTemplateBase(name)
 {
   mVarType[0] = var1;
   ymuint32 n1 = index_array1.size();
@@ -203,13 +203,13 @@ CellLutTemplate3D::CellLutTemplate3D(ShString name,
 }
 
 // @brief デストラクタ
-CellLutTemplate3D::~CellLutTemplate3D()
+CiLutTemplate3D::~CiLutTemplate3D()
 {
 }
 
 // @brief 次元数の取得
 ymuint32
-CellLutTemplate3D::dimension() const
+CiLutTemplate3D::dimension() const
 {
   return 3;
 }
@@ -217,7 +217,7 @@ CellLutTemplate3D::dimension() const
 // @brief 変数型の取得
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 tCellVarType
-CellLutTemplate3D::variable_type(ymuint32 var) const
+CiLutTemplate3D::variable_type(ymuint32 var) const
 {
   assert_cond( var < 3 , __FILE__, __LINE__);
   return mVarType[var];
@@ -226,7 +226,7 @@ CellLutTemplate3D::variable_type(ymuint32 var) const
 // @brief インデックス数の取得
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 ymuint32
-CellLutTemplate3D::index_num(ymuint32 var) const
+CiLutTemplate3D::index_num(ymuint32 var) const
 {
   assert_cond( var < 3 , __FILE__, __LINE__);
   return mIndexArray[var].size();
@@ -236,7 +236,7 @@ CellLutTemplate3D::index_num(ymuint32 var) const
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 // @param[in] pos 位置番号 ( 0 <= pos < index_num(var) )
 double
-CellLutTemplate3D::index(ymuint32 var,
+CiLutTemplate3D::index(ymuint32 var,
 			 ymuint32 pos) const
 {
   assert_cond( var < 3 , __FILE__, __LINE__);
@@ -246,12 +246,12 @@ CellLutTemplate3D::index(ymuint32 var,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス CellLut1D
+// クラス CiLut1D
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CellLut1D::CellLut1D(const CellLutTemplate1D* lut_template,
-		     const vector<double>& index_array) :
+CiLut1D::CiLut1D(const CiLutTemplate1D* lut_template,
+		 const vector<double>& index_array) :
   mTemplate(lut_template)
 {
   if ( index_array.empty() ) {
@@ -271,13 +271,13 @@ CellLut1D::CellLut1D(const CellLutTemplate1D* lut_template,
 }
 
 // @brief デストラクタ
-CellLut1D::~CellLut1D()
+CiLut1D::~CiLut1D()
 {
 }
 
 // @brief テンプレートの取得
 const CellLutTemplate*
-CellLut1D::lut_template() const
+CiLut1D::lut_template() const
 {
   return mTemplate;
 }
@@ -286,14 +286,22 @@ CellLut1D::lut_template() const
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 // @param[in] pos 位置番号 ( 0 <= pos < index_num(var) )
 double
-CellLut1D::index(ymuint32 var,
-		 ymuint32 pos) const
+CiLut1D::index(ymuint32 var,
+	       ymuint32 pos) const
 {
   assert_cond( var < 1 , __FILE__, __LINE__);
   assert_cond( pos < mIndexArray.size() , __FILE__, __LINE__);
   return mIndexArray[pos];
 }
 
-
+// @brief 値の取得
+// @param[in] pos_array 格子点座標
+// @note pos_array のサイズは dimension() と同じ
+double
+CiLut1D::value(const vector<ymuint32>& pos_array) const
+{
+  assert_cond( pos_array.size() == 1, __FILE__, __LINE__);
+  return mValueArray[pos_array[0]];
+}
 
 END_NAMESPACE_YM_CELL

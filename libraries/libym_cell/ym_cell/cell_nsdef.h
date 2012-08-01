@@ -65,13 +65,13 @@ enum tCellTimingType {
   kCellTimingThreeStateDisableFall  = 8,
 
   kCellTimingRisingEdge             = 9,
-  ktimingFallingEdge            = 10,
+  kCellTimingFallingEdge            = 10,
 
   kCellTimingPreset                 = 11,
   kCellTimingClear                  = 12,
 
   kCellTimingHoldRising             = 13,
-  kCellTimingHaldFalling            = 14,
+  kCellTimingHoldFalling            = 14,
 
   kCellTimingSetupRising            = 15,
   kCellTimingSetupFalling           = 16,
@@ -94,6 +94,28 @@ enum tCellTimingType {
   kCellTimingNochangeHighLow        = 28,
   kCellTimingNochangeLowHigh        = 29,
   kCellTimingNochangeLowLow         = 30
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @brief ルックアップテーブルの変数の型
+//////////////////////////////////////////////////////////////////////
+enum tCellVarType {
+  kVarInputNetTransition,
+
+  kVarTotalOutputNetCapacitance,
+  kVarOutputNetLength,
+  kVarOutputNetWireCap,
+  kVarOutputNetPinCap,
+
+  kVarRelatedOutTotalOutputNetCapacitance,
+  kVarRelatedOutOutputNetLength,
+  kVarRelatedOutOutputNetWireCap,
+  kVarRelatedOutOutputNetPinCap,
+
+  kVarConstrainedPinTransition,
+
+  kVarRelatedPinTransition
 };
 
 
