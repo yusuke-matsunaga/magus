@@ -736,13 +736,14 @@ HandlerFactory::new_bundle(GroupHandler* parent)
   // simple attributes
   DotlibHandler* simple = new SimpleHandler(handler, false);
   DotlibHandler* flt_simple = new FloatSimpleHandler(handler);
+  DotlibHandler* func_handler = new FuncHandler(handler);
   handler->reg_handler("capacitance", flt_simple);
   handler->reg_handler("direction",   simple);
-  handler->reg_handler("function",    new FuncHandler(handler));
+  handler->reg_handler("function",    func_handler);
 
   // complex attributes
   DotlibHandler* complex = new ComplexHandler(handler);
-  handler->reg_handler("members", complex);
+  handler->reg_handler("members",     complex);
 
   // group statements
   handler->reg_handler("pin", new_pin(handler));
