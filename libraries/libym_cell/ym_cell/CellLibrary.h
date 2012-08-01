@@ -389,7 +389,15 @@ public:
   set_capacitive_load_unit(double unit,
 			   const string& ustr) = 0;
 
-  /// @brief 属性を設定する．
+  /// @brief 属性を設定する(浮動小数点型)
+  /// @param[in] attr_name 属性名
+  /// @param[in] value 値
+  virtual
+  void
+  set_attr(const string& attr_name,
+	   double value) = 0;
+
+  /// @brief 属性を設定する(文字列型)．
   /// @param[in] attr_name 属性名
   /// @param[in] value 値
   virtual

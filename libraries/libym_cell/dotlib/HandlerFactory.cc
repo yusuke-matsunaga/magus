@@ -41,10 +41,10 @@ HandlerFactory::new_library(DotlibParserImpl& parser)
   GroupHandler* handler = new Str1GroupHandler(parser);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
-  DotlibHandler* str_simple = new_string_simple(handler, false);
-  DotlibHandler* symstr_simple = new_string_simple(handler, true);
-  DotlibHandler* flt_simple = new_float_simple(handler);
+  DotlibHandler* simple = new SimpleHandler(handler, false);
+  DotlibHandler* str_simple = new StrSimpleHandler(handler, false);
+  DotlibHandler* symstr_simple = new StrSimpleHandler(handler, true);
+  DotlibHandler* flt_simple = new FloatSimpleHandler(handler);
 
   handler->reg_handler("bus_naming_style",                       str_simple);
   handler->reg_handler("comment",                                str_simple);
@@ -226,17 +226,17 @@ HandlerFactory::new_library(DotlibParserImpl& parser)
   handler->reg_handler("k_volt_wire_res",                        flt_simple);
 
   // complex attributes
-  DotlibHandler* complex = new_complex(handler);
-  DotlibHandler* str1_complex = new_str1_complex(handler);
-  DotlibHandler* unit_complex = new_unit_complex(handler);
-  DotlibHandler* define = new_define(handler);
+  DotlibHandler* complex = new ComplexHandler(handler);
+  DotlibHandler* str1_complex = new Str1ComplexHandler(handler);
+  DotlibHandler* unit_complex = new UnitComplexHandler(handler);
+  DotlibHandler* define = new DefineHandler(handler);
   handler->reg_handler("capacitive_load_unit",                   unit_complex);
   handler->reg_handler("default_part",                           complex);
   handler->reg_handler("define",                                 define);
   handler->reg_handler("define_cell_area",                       complex);
   handler->reg_handler("define_group",                           complex);
-  handler->reg_handler("library_features",                       complex);
-  handler->reg_handler("piece_define",                           complex);
+  handler->reg_handler("library_features",                       str1_complex);
+  handler->reg_handler("piece_define",                           str1_complex);
   handler->reg_handler("routing_layers",                         complex);
   handler->reg_handler("technology",                             str1_complex);
 
@@ -310,11 +310,11 @@ HandlerFactory::new_input_voltage(GroupHandler* parent)
   GroupHandler* handler = new Str1GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_expr_simple(handler);
-  handler->reg_handler("vil", simple);
-  handler->reg_handler("vih", simple);
-  handler->reg_handler("vimin", simple);
-  handler->reg_handler("vimax", simple);
+  DotlibHandler* expr_handler = new ExprHandler(handler);
+  handler->reg_handler("vil",   expr_handler);
+  handler->reg_handler("vih",   expr_handler);
+  handler->reg_handler("vimin", expr_handler);
+  handler->reg_handler("vimax", expr_handler);
 
   return handler;
 }
@@ -327,11 +327,11 @@ HandlerFactory::new_output_voltage(GroupHandler* parent)
   GroupHandler* handler = new Str1GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_expr_simple(handler);
-  handler->reg_handler("vol", simple);
-  handler->reg_handler("voh", simple);
-  handler->reg_handler("vomin", simple);
-  handler->reg_handler("vomax", simple);
+  DotlibHandler* expr_handler = new ExprHandler(handler);
+  handler->reg_handler("vol",   expr_handler);
+  handler->reg_handler("voh",   expr_handler);
+  handler->reg_handler("vomin", expr_handler);
+  handler->reg_handler("vomax", expr_handler);
 
   return handler;
 }
@@ -344,8 +344,9 @@ HandlerFactory::new_operating_conditions(GroupHandler* parent)
   GroupHandler* handler = new Str1GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
-  DotlibHandler* flt_simple = new_float_simple(handler);
+  DotlibHandler* simple = new SimpleHandler(handler, false);
+  DotlibHandler* str_simple = new StrSimpleHandler(handler, false);
+  DotlibHandler* flt_simple = new FloatSimpleHandler(handler);
   handler->reg_handler("calc_mode",   simple);
   handler->reg_handler("parameter1",  simple);
   handler->reg_handler("parameter2",  simple);
@@ -354,11 +355,11 @@ HandlerFactory::new_operating_conditions(GroupHandler* parent)
   handler->reg_handler("parameter5",  simple);
   handler->reg_handler("process",     flt_simple);
   handler->reg_handler("temperature", flt_simple);
-  handler->reg_handler("tree_type",   simple);
+  handler->reg_handler("tree_type",   str_simple);
   handler->reg_handler("voltage",     flt_simple);
 
   // complex attributes
-  DotlibHandler* complex = new_complex(handler);
+  DotlibHandler* complex = new ComplexHandler(handler);
   handler->reg_handler("power_rail", complex);
 
   return handler;
@@ -372,16 +373,16 @@ HandlerFactory::new_template(GroupHandler* parent)
   GroupHandler* handler = new Str1GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* str_simple = new_string_simple(handler, false);
+  DotlibHandler* str_simple = new StrSimpleHandler(handler, false);
   handler->reg_handler("variable_1", str_simple);
   handler->reg_handler("variable_2", str_simple);
   handler->reg_handler("variable_3", str_simple);
 
   // complex attributes
-  DotlibHandler* complex = new_complex(handler);
-  handler->reg_handler("index_1",    complex);
-  handler->reg_handler("index_2",    complex);
-  handler->reg_handler("index_3",    complex);
+  DotlibHandler* index_handler = new Str1ComplexHandler(handler);
+  handler->reg_handler("index_1",    index_handler);
+  handler->reg_handler("index_2",    index_handler);
+  handler->reg_handler("index_3",    index_handler);
 
   // group statements
   handler->reg_handler("domain", new_group(handler));
@@ -397,14 +398,14 @@ HandlerFactory::new_wire_load(GroupHandler* parent)
   GroupHandler* handler = new Str1GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* flt_simple = new_float_simple(handler);
+  DotlibHandler* flt_simple = new FloatSimpleHandler(handler);
   handler->reg_handler("area",        flt_simple);
   handler->reg_handler("capacitance", flt_simple);
   handler->reg_handler("resistance",  flt_simple);
   handler->reg_handler("slope",       flt_simple);
 
   // complex attributes
-  DotlibHandler* complex = new_complex(handler);
+  DotlibHandler* complex = new ComplexHandler(handler);
   handler->reg_handler("fanout_length", complex);
 
   return handler;
@@ -418,7 +419,7 @@ HandlerFactory::new_wire_load_selection(GroupHandler* parent)
   GroupHandler* handler = new GroupHandler(parent);
 
   // complex attributes
-  DotlibHandler* complex = new_complex(handler);
+  DotlibHandler* complex = new ComplexHandler(handler);
   handler->reg_handler("wire_load_from_area", complex);
 
   return handler;
@@ -432,7 +433,7 @@ HandlerFactory::new_wire_load_table(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // complex attributes
-  DotlibHandler* complex = new_complex(handler);
+  DotlibHandler* complex = new ComplexHandler(handler);
   handler->reg_handler("fanout_area",        complex);
   handler->reg_handler("fanout_capacitance", complex);
   handler->reg_handler("fanout_length",      complex);
@@ -449,9 +450,9 @@ HandlerFactory::new_cell(GroupHandler* parent)
   GroupHandler* handler = new Str1GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
-  DotlibHandler* str_simple = new_string_simple(handler, false);
-  DotlibHandler* flt_simple = new_float_simple(handler);
+  DotlibHandler* simple = new SimpleHandler(handler, false);
+  DotlibHandler* str_simple = new StrSimpleHandler(handler, false);
+  DotlibHandler* flt_simple = new FloatSimpleHandler(handler);
   handler->reg_handler("area",                         flt_simple);
   handler->reg_handler("auxiliary_pad_cell",           simple);
   handler->reg_handler("base_name",                    str_simple);
@@ -487,7 +488,7 @@ HandlerFactory::new_cell(GroupHandler* parent)
   handler->reg_handler("is_filler_cell",               simple);
 
   // complex attributes
-  DotlibHandler* complex = new_complex(handler);
+  DotlibHandler* complex = new ComplexHandler(handler);
   handler->reg_handler("pin_opposite",                 complex);
   handler->reg_handler("rail_connection",              complex);
   handler->reg_handler("power_supply_namestring",      complex);
@@ -527,11 +528,13 @@ HandlerFactory::new_leakage_power(GroupHandler* parent)
   GroupHandler* handler = new EmptyGroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new SimpleHandler(handler, false);
+  DotlibHandler* expr_handler = new StrSimpleHandler(handler, false);
+  DotlibHandler* flt_simple = new FloatSimpleHandler(handler);
   handler->reg_handler("power_level",    simple);
   handler->reg_handler("related_pg_pin", simple);
-  handler->reg_handler("when",           simple);
-  handler->reg_handler("value",          simple);
+  handler->reg_handler("when",           expr_handler);
+  handler->reg_handler("value",          flt_simple);
 
   return handler;
 }
@@ -571,7 +574,7 @@ HandlerFactory::new_ff(GroupHandler* parent)
   GroupHandler* handler = new Str2GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* str_simple = new_string_simple(handler, false);
+  DotlibHandler* str_simple = new StrSimpleHandler(handler, false);
   DotlibHandler* fhandler = new FuncHandler(handler);
   handler->reg_handler("clear",             fhandler);
   handler->reg_handler("clear_preset_var1", str_simple);
@@ -592,7 +595,7 @@ HandlerFactory::new_ff_bank(GroupHandler* parent)
   GroupHandler* handler = new Str2IntGroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* str_simple = new_string_simple(handler, false);
+  DotlibHandler* str_simple = new StrSimpleHandler(handler, false);
   DotlibHandler* fhandler = new FuncHandler(handler);
   handler->reg_handler("clear",             fhandler);
   handler->reg_handler("clear_preset_var1", str_simple);
@@ -613,7 +616,7 @@ HandlerFactory::new_latch(GroupHandler* parent)
   GroupHandler* handler = new Str2GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* str_simple = new_string_simple(handler, false);
+  DotlibHandler* str_simple = new StrSimpleHandler(handler, false);
   DotlibHandler* fhandler = new FuncHandler(handler);
   handler->reg_handler("clear",             fhandler);
   handler->reg_handler("clear_preset_var1", str_simple);
@@ -634,7 +637,7 @@ HandlerFactory::new_latch_bank(GroupHandler* parent)
   GroupHandler* handler = new Str2IntGroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* str_simple = new_string_simple(handler, false);
+  DotlibHandler* str_simple = new StrSimpleHandler(handler, false);
   DotlibHandler* fhandler = new FuncHandler(handler);
   handler->reg_handler("clear",             fhandler);
   handler->reg_handler("clear_preset_var1", str_simple);
@@ -654,12 +657,12 @@ HandlerFactory::new_cell_internal_power(GroupHandler* parent)
   GroupHandler* handler = new Str1GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new SimpleHandler(handler, false);
   handler->reg_handler("related_inputs", simple);
   handler->reg_handler("related_outputs", simple);
 
   // complex attribute
-  DotlibHandler* complex = new_complex(handler);
+  DotlibHandler* complex = new ComplexHandler(handler);
   handler->reg_handler("values", complex);
 
   return handler;
@@ -675,11 +678,14 @@ HandlerFactory::new_power(GroupHandler* parent)
   // simple attributes
 
   // complex attribute
-  DotlibHandler* complex = new_complex(handler);
-  handler->reg_handler("index_1", complex);
-  handler->reg_handler("index_2", complex);
-  handler->reg_handler("index_3", complex);
-  handler->reg_handler("values",  complex);
+  DotlibHandler* index_handler = new Str1ComplexHandler(handler);
+  DotlibHandler* value_handler = new StrListComplexHandler(handler);
+  DotlibHandler* complex = new ComplexHandler(handler);
+  handler->reg_handler("index_1", index_handler);
+  handler->reg_handler("index_2", index_handler);
+  handler->reg_handler("index_3", index_handler);
+  handler->reg_handler("values",  value_handler);
+
   handler->reg_handler("orders",  complex);
   handler->reg_handler("coefs",   complex);
 
@@ -697,7 +703,7 @@ HandlerFactory::new_statetable(GroupHandler* parent)
   GroupHandler* handler = new Str2GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_string_simple(handler, false);
+  DotlibHandler* simple = new StrSimpleHandler(handler, false);
   handler->reg_handler("table", simple);
 
   return handler;
@@ -711,7 +717,7 @@ HandlerFactory::new_bus(GroupHandler* parent)
   GroupHandler* handler = new Str1GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_string_simple(handler, false);
+  DotlibHandler* simple = new StrSimpleHandler(handler, false);
   handler->reg_handler("bus_type", simple);
 
   // group statements
@@ -728,14 +734,14 @@ HandlerFactory::new_bundle(GroupHandler* parent)
   GroupHandler* handler = new Str1GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
-  DotlibHandler* flt_simple = new_float_simple(handler);
+  DotlibHandler* simple = new SimpleHandler(handler, false);
+  DotlibHandler* flt_simple = new FloatSimpleHandler(handler);
   handler->reg_handler("capacitance", flt_simple);
   handler->reg_handler("direction",   simple);
   handler->reg_handler("function",    new FuncHandler(handler));
 
   // complex attributes
-  DotlibHandler* complex = new_complex(handler);
+  DotlibHandler* complex = new ComplexHandler(handler);
   handler->reg_handler("members", complex);
 
   // group statements
@@ -763,9 +769,10 @@ HandlerFactory::new_pin(GroupHandler* parent)
   GroupHandler* handler = new Str1GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
-  DotlibHandler* str_simple = new_string_simple(handler, false);
-  DotlibHandler* flt_simple = new_float_simple(handler);
+  DotlibHandler* simple = new SimpleHandler(handler, false);
+  DotlibHandler* str_simple = new StrSimpleHandler(handler, false);
+  DotlibHandler* flt_simple = new FloatSimpleHandler(handler);
+  DotlibHandler* func_handler = new FuncHandler(handler);
   handler->reg_handler("bit_width", simple);
   handler->reg_handler("capacitance",                         flt_simple);
   handler->reg_handler("clock",                               simple);
@@ -787,8 +794,7 @@ HandlerFactory::new_pin(GroupHandler* parent)
   handler->reg_handler("fall_time_before_threshold",          simple);
   handler->reg_handler("fanout_load",                         flt_simple);
   handler->reg_handler("fault_model",                         simple);
-  handler->reg_handler("function",
-		       new FuncHandler(handler));
+  handler->reg_handler("function",                            func_handler);
   handler->reg_handler("has_builtin_pad",                     simple);
   handler->reg_handler("hysteresis",                          simple);
   handler->reg_handler("input_map",                           simple);
@@ -832,7 +838,7 @@ HandlerFactory::new_pin(GroupHandler* parent)
   handler->reg_handler("x_function",                          simple);
 
   // complex attributes
-  DotlibHandler* complex = new_complex(handler);
+  DotlibHandler* complex = new ComplexHandler(handler);
   handler->reg_handler("fall_capacitance_range",              complex);
   handler->reg_handler("rise_capacitance_range",              complex);
 
@@ -860,7 +866,7 @@ HandlerFactory::new_internal_power(GroupHandler* parent)
   GroupHandler* handler = new EmptyGroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new SimpleHandler(handler, false);
   handler->reg_handler("equal_or_opposite_output", simple);
   handler->reg_handler("falling_together_group",   simple);
   handler->reg_handler("power_level",              simple);
@@ -889,9 +895,9 @@ HandlerFactory::new_timing(GroupHandler* parent)
   GroupHandler* handler = new EmptyGroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
-  DotlibHandler* str_simple = new_string_simple(handler, false);
-  DotlibHandler* flt_simple = new_float_simple(handler);
+  DotlibHandler* simple = new SimpleHandler(handler, false);
+  DotlibHandler* str_simple = new StrSimpleHandler(handler, false);
+  DotlibHandler* flt_simple = new FloatSimpleHandler(handler);
 
   handler->reg_handler("related_bus_equivalent",   str_simple);
   handler->reg_handler("related_bus_pins",         str_simple);
@@ -924,11 +930,12 @@ HandlerFactory::new_timing(GroupHandler* parent)
   handler->reg_handler("when_start",               str_simple);
 
   // complex attribute
-  DotlibHandler* complex = new_complex(handler);
-  handler->reg_handler("rise_delay_intercept",     complex);
-  handler->reg_handler("fall_delay_intercept",     complex);
-  handler->reg_handler("rise_pin_resistance",      complex);
-  handler->reg_handler("fall_pin_resistance",      complex);
+  DotlibHandler* complex = new ComplexHandler(handler);
+  DotlibHandler* pw_complex = new PwComplexHandler(handler);
+  handler->reg_handler("rise_delay_intercept",     pw_complex);
+  handler->reg_handler("fall_delay_intercept",     pw_complex);
+  handler->reg_handler("rise_pin_resistance",      pw_complex);
+  handler->reg_handler("fall_pin_resistance",      pw_complex);
   handler->reg_handler("orders",                   complex);
   handler->reg_handler("coefs",                    complex);
 
@@ -1020,11 +1027,12 @@ HandlerFactory::new_table(GroupHandler* parent)
   // simple attributes
 
   // complex attribute
-  DotlibHandler* complex = new_complex(handler);
-  handler->reg_handler("index_1", complex);
-  handler->reg_handler("index_2", complex);
-  handler->reg_handler("index_3", complex);
-  handler->reg_handler("values",  complex);
+  DotlibHandler* index_handler = new Str1ComplexHandler(handler);
+  DotlibHandler* value_handler = new StrListComplexHandler(handler);
+  handler->reg_handler("index_1", index_handler);
+  handler->reg_handler("index_2", index_handler);
+  handler->reg_handler("index_3", index_handler);
+  handler->reg_handler("values",  value_handler);
 
   // group statements
   handler->reg_handler("domain", new_group(handler));
@@ -1037,82 +1045,6 @@ GroupHandler*
 HandlerFactory::new_group(GroupHandler* parent)
 {
   return new GroupHandler(parent);
-}
-
-// @brief 汎用の complex attribute 用のハンドラを作る．
-// @param[in] parent 親のハンドラ
-DotlibHandler*
-HandlerFactory::new_complex(GroupHandler* parent)
-{
-  return new ComplexHandler(parent);
-}
-
-// @brief string1 complex attribute 用のハンドラを作る．
-// @param[in] parent 親のハンドラ
-DotlibHandler*
-HandlerFactory::new_str1_complex(GroupHandler* parent)
-{
-  return new Str1ComplexHandler(parent);
-}
-
-// @brief 単位指定用の complex attribute 用のハンドラを作る．
-// @param[in] parent 親のハンドラ
-DotlibHandler*
-HandlerFactory::new_unit_complex(GroupHandler* parent)
-{
-  return new UnitComplexHandler(parent);
-}
-
-// @brief define complex attribute 用のハンドラを作る．
-// @param[in] parent 親のハンドラ
-DotlibHandler*
-HandlerFactory::new_define(GroupHandler* parent)
-{
-  return new DefineHandler(parent);
-}
-
-// @brief 汎用の simple attribute 用のハンドラを作る．
-// @param[in] parent 親のハンドラ
-// @param[in] sym_mode シンボルモード
-DotlibHandler*
-HandlerFactory::new_simple(GroupHandler* parent,
-			   bool sym_mode)
-{
-  return new SimpleHandler(parent, sym_mode);
-}
-
-// @brief 文字列用の simple attribute 用のハンドラを作る．
-// @param[in] parent 親のハンドラ
-// @param[in] sym_mode シンボルモード
-DotlibHandler*
-HandlerFactory::new_string_simple(GroupHandler* parent,
-				  bool sym_mode)
-{
-  return new StrSimpleHandler(parent, sym_mode);
-}
-
-// @brief 整数の simple attribute 用のハンドラを作る．
-// @param[in] parent 親のハンドラ
-DotlibHandler*
-HandlerFactory::new_int_simple(GroupHandler* parent)
-{
-  return new IntSimpleHandler(parent);
-}
-
-// @brief 実数の simple attribute 用のハンドラを作る．
-// @param[in] parent 親のハンドラ
-DotlibHandler*
-HandlerFactory::new_float_simple(GroupHandler* parent)
-{
-  return new FloatSimpleHandler(parent);
-}
-
-// @brief 式の simple attribute 用のハンドラを作る．
-// @param[in] parent 親のハンドラ
-DotlibHandler*
-HandlerFactory::new_expr_simple(GroupHandler* parent)
-{
-  return new ExprHandler(parent);
 }
 
 END_NAMESPACE_YM_DOTLIB

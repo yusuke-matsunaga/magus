@@ -124,6 +124,12 @@ public:
   ShString
   string_value() const = 0;
 
+  /// @brief インデックスを取り出す．
+  /// @note is_string() == true で内容が数値のリストの時のみ意味を持つ．
+  virtual
+  bool
+  index_value(vector<double>& value_list) const = 0;
+
   /// @brief 第一オペランドを返す．
   /// @note is_opr() = true の時のみ意味を持つ．
   virtual

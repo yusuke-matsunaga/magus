@@ -134,6 +134,15 @@ DotlibNodeImpl::string_value() const
   return ShString();
 }
 
+// @brief インデックスを取り出す．
+// @note is_string() == true で内容が数値のリストの時のみ意味を持つ．
+bool
+DotlibNodeImpl::index_value(vector<double>& value_list) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
+}
+
 // @brief 第一オペランドを返す．
 // @note is_opr() = true の時のみ意味を持つ．
 const DotlibNode*
@@ -390,6 +399,14 @@ ShString
 DotlibString::string_value() const
 {
   return mValue;
+}
+
+// @brief インデックスを取り出す．
+// @note is_string() == true で内容が数値のリストの時のみ意味を持つ．
+bool
+DotlibString::index_value(vector<double>& value_list) const
+{
+  string tmp = mValue;
 }
 
 // @brief 内容をストリーム出力する．

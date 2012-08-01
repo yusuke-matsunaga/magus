@@ -87,6 +87,12 @@ public:
   ShString
   string_value() const;
 
+  /// @brief インデックスを取り出す．
+  /// @note is_string() == true で内容が数値のリストの時のみ意味を持つ．
+  virtual
+  bool
+  index_value(vector<double>& value_list) const;
+
   /// @brief 第一オペランドを返す．
   /// @note is_opr() = true の時のみ意味を持つ．
   virtual
@@ -351,6 +357,12 @@ public:
   virtual
   ShString
   string_value() const;
+
+  /// @brief インデックスを取り出す．
+  /// @note is_string() == true で内容が数値のリストの時のみ意味を持つ．
+  virtual
+  bool
+  index_value(vector<double>& value_list) const;
 
   /// @brief 内容をストリーム出力する．
   /// @param[in] s 出力先のストリーム

@@ -442,7 +442,74 @@ CiLibrary::set_capacitive_load_unit(double unit,
   mCapacitiveLoadUnitStr = ustr;
 }
 
-// @brief 属性を設定する．
+// @brief 属性を設定する(浮動小数点型)
+// @param[in] attr_name 属性名
+// @param[in] value 値
+void
+CiLibrary::set_attr(const string& attr_name,
+		    double value)
+{
+  if ( attr_name == "em_temp_degradation_factor" ) {
+  }
+  else if ( attr_name == "nom_process" ) {
+  }
+  else if ( attr_name == "nom_temperature" ) {
+  }
+  else if ( attr_name == "nom_voltage" ) {
+  }
+  else if ( attr_name == "default_cell_leakage_power" ) {
+  }
+  else if ( attr_name == "default_fall_delay_intercept" ) {
+  }
+  else if ( attr_name == "default_fall_pin_resistance" ) {
+  }
+  else if ( attr_name == "default_fanout_load" ) {
+  }
+  else if ( attr_name == "default_inout_pin_cap" ) {
+  }
+  else if ( attr_name == "default_inout_pin_fall_res" ) {
+  }
+  else if ( attr_name == "default_inout_pin_rise_res" ) {
+  }
+  else if ( attr_name == "default_inout_pin_cap" ) {
+  }
+  else if ( attr_name == "default_intrinsic_fall" ) {
+  }
+  else if ( attr_name == "default_intrinsic_rise" ) {
+  }
+  else if ( attr_name == "default_leakage_power_density" ) {
+  }
+  else if ( attr_name == "default_max_capacitance" ) {
+  }
+  else if ( attr_name == "default_max_fanout" ) {
+  }
+  else if ( attr_name == "default_max_transition" ) {
+  }
+  else if ( attr_name == "default_max_utilization" ) {
+  }
+  else if ( attr_name == "default_min_porosity" ) {
+  }
+  else if ( attr_name == "default_output_pin_cap" ) {
+  }
+  else if ( attr_name == "default_output_pin_fall_res" ) {
+  }
+  else if ( attr_name == "default_output_pin_rise_res" ) {
+  }
+  else if ( attr_name == "default_rise_delay_intercept" ) {
+  }
+  else if ( attr_name == "default_slope_fall" ) {
+  }
+  else if ( attr_name == "default_slope_rise" ) {
+  }
+  else if ( attr_name == "default_wire_load_area" ) {
+  }
+  else if ( attr_name == "default_wire_load_capacitance" ) {
+  }
+  else if ( attr_name == "default_wire_load_resistance" ) {
+  }
+}
+
+// @brief 属性を設定する(文字列型)．
 // @param[in] attr_name 属性名
 // @param[in] value 値
 void

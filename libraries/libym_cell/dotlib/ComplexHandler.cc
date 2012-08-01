@@ -128,6 +128,59 @@ Str1ComplexHandler::set_value(const ShString& attr_name,
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス StrListComplexHandler
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] parent 親のハンドラ
+StrListComplexHandler::StrListComplexHandler(GroupHandler* parent) :
+ComplexHandler(parent)
+{
+}
+
+// @brief デストラクタ
+StrListComplexHandler::~StrListComplexHandler()
+{
+}
+
+// @brief 値を読み込んだ時の処理
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
+// @param[in] value 値のリスト
+// @param[in] end_loc 右括弧の位置
+bool
+StrListComplexHandler::set_value(const ShString& attr_name,
+				 const FileRegion& attr_loc,
+				 DotlibNodeImpl* value,
+				 const FileRegion& end_loc)
+{
+  assert_cond( value->is_list(), __FILE__, __LINE__ );
+  ymuint n = value->list_size();
+  if ( n == 0 ) {
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    value->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "Syntax error, one ore moare strings expected.");
+    return false;
+  }
+  for (ymuint i = 0; i < n; ++ i) {
+    const DotlibNode* elem = value->list_elem(i);
+    if ( !elem->is_string() ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      elem->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error, a string expected.");
+      return false;
+    }
+  }
+
+  return ComplexHandler::set_value(attr_name, attr_loc, value, end_loc);
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス UnitComplexHandler
 //////////////////////////////////////////////////////////////////////
 
@@ -164,7 +217,7 @@ UnitComplexHandler::set_value(const ShString& attr_name,
     return false;
   }
   const DotlibNode* top = value->list_elem(0);
-  if ( !top->is_int() && !top->is_float() ) {
+  if ( !top->is_float() ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    top->loc(),
 		    kMsgError,
@@ -179,6 +232,65 @@ UnitComplexHandler::set_value(const ShString& attr_name,
 		    kMsgError,
 		    "DOTLIB_PARSER",
 		    "Syntax error, second element should be a string.");
+    return false;
+  }
+
+  return ComplexHandler::set_value(attr_name, attr_loc, value, end_loc);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス PwComplexHandler
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] parent 親のハンドラ
+PwComplexHandler::PwComplexHandler(GroupHandler* parent) :
+  ComplexHandler(parent)
+{
+}
+
+// @brief デストラクタ
+PwComplexHandler::~PwComplexHandler()
+{
+}
+
+// @brief 値を読み込んだ時の処理
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
+// @param[in] value 値のリスト
+// @param[in] end_loc 右括弧の位置
+bool
+PwComplexHandler::set_value(const ShString& attr_name,
+			    const FileRegion& attr_loc,
+			    DotlibNodeImpl* value,
+			    const FileRegion& end_loc)
+{
+  assert_cond( value->is_list(), __FILE__, __LINE__ );
+  if ( value->list_size() != 2 ) {
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    value->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "Syntax error, (integer, float) pair expected.");
+    return false;
+  }
+  const DotlibNode* top = value->list_elem(0);
+  if ( !top->is_int() ) {
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    top->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "Syntax error, first element should be an ID number.");
+    return false;
+  }
+  const DotlibNode* next = value->list_elem(1);
+  if ( !next->is_float() ) {
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    next->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "Syntax error, second element should be a float number.");
     return false;
   }
 
