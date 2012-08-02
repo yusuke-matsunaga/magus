@@ -70,6 +70,62 @@ display_lut(ostream& s,
     s << ")" << endl;
   }
 
+  if ( d == 1) {
+    s << "      Values = (";
+    ymuint n1 = lut->index_num(0);
+    vector<ymuint32> pos_array(1);
+    const char* comma = "";
+    for (ymuint i1 = 0; i1 < n1; ++ i1) {
+      pos_array[0] = i1;
+      s << comma << lut->value(pos_array);
+      comma = ", ";
+    }
+    s << ")" << endl;
+  }
+  else if ( d == 2 ) {
+    s << "      Values = (" << endl;
+    ymuint n1 = lut->index_num(0);
+    ymuint n2 = lut->index_num(1);
+    vector<ymuint32> pos_array(2);
+    for (ymuint i1 = 0; i1 < n1; ++ i1) {
+      s << "                (";
+      pos_array[0] = i1;
+      const char* comma = "";
+      for (ymuint i2 = 0; i2 < n2; ++ i2) {
+	pos_array[1] = i2;
+	s << comma << lut->value(pos_array);
+	comma = ", ";
+      }
+      s << ")" << endl;
+    }
+    s << "               )" << endl;
+  }
+  else if ( d == 3 ) {
+    s << "      Values = (" << endl;
+    ymuint n1 = lut->index_num(0);
+    ymuint n2 = lut->index_num(1);
+    ymuint n3 = lut->index_num(2);
+    vector<ymuint32> pos_array(3);
+    for (ymuint i1 = 0; i1 < n1; ++ i1) {
+      s << "                (";
+      pos_array[0] = i1;
+      const char* comma2 = "";
+      for (ymuint i2 = 0; i2 < n2; ++ i2) {
+	pos_array[1] = i2;
+	s << comma2 << "(";
+	const char* comma3 = "";
+	for (ymuint i3 = 0; i3 < n3; ++ i3) {
+	  pos_array[2] = i3;
+	  s << comma3 << lut->value(pos_array);
+	  comma3 = ", ";
+	}
+	s << ")";
+	comma2 = ", ";
+      }
+      s << ")" << endl;
+    }
+    s << "                )" << endl;
+  }
 }
 
 // タイミング情報を出力する．
@@ -106,14 +162,23 @@ display_timing(ostream& s,
       break;
 
     case CellLibrary::kDelayTableLookup:
-      display_lut(s, "Rise Transition", timing->rise_transition());
-      display_lut(s, "Fall Transition", timing->fall_transition());
       if ( timing->cell_rise() ) {
 	display_lut(s, "Cell Rise", timing->cell_rise());
+      }
+      if ( timing->rise_transition() ) {
+	display_lut(s, "Rise Transition", timing->rise_transition());
+      }
+      if ( timing->rise_propagation() ) {
+	display_lut(s, "Rise Propagation", timing->rise_propagation());
+      }
+
+      if ( timing->cell_fall() ) {
 	display_lut(s, "Cell Fall", timing->cell_fall());
       }
-      else {
-	display_lut(s, "Rise Propagation", timing->rise_propagation());
+      if ( timing->fall_transition() ) {
+	display_lut(s, "Fall Transition", timing->fall_transition());
+      }
+      if ( timing->fall_propagation() ) {
 	display_lut(s, "Fall Propagation", timing->fall_propagation());
       }
       break;

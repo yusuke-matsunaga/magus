@@ -691,57 +691,119 @@ gen_library(const DotlibNode* dt_library)
 	case CellLibrary::kDelayTableLookup:
 	  {
 	    const DotlibNode* cr_node = timing_info.cell_rise();
-	    const DotlibNode* cf_node = timing_info.cell_fall();
 	    const DotlibNode* rt_node = timing_info.rise_transition();
-	    const DotlibNode* ft_node = timing_info.fall_transition();
 	    const DotlibNode* rp_node = timing_info.rise_propagation();
-	    const DotlibNode* fp_node = timing_info.fall_propagation();
 
-	    if ( rt_node == NULL || ft_node == NULL ) {
+	    CellLut* cr_lut = NULL;
+	    CellLut* rt_lut = NULL;
+	    CellLut* rp_lut = NULL;
+	    if ( cr_node != NULL ) {
+	      if ( rp_node != NULL ) {
+		MsgMgr::put_msg(__FILE__, __LINE__,
+				dt_timing->loc(),
+				kMsgError,
+				"DOTLIB_PARSER",
+				"cell_rise and rise_propagation are mutually exclusive.");
+		continue;
+	      }
+	      if ( rt_node == NULL ) {
+		MsgMgr::put_msg(__FILE__, __LINE__,
+				dt_timing->loc(),
+				kMsgError,
+				"DOTLIB_PARSER",
+				"rise_transition is missing.");
+		continue;
+	      }
+	      cr_lut = gen_lut(cr_node, library);
+	      rt_lut = gen_lut(rt_node, library);
+	    }
+	    else if ( rp_node != NULL ) {
+	      if ( rt_node == NULL ) {
+		MsgMgr::put_msg(__FILE__, __LINE__,
+				dt_timing->loc(),
+				kMsgError,
+				"DOTLIB_PARSER",
+				"rise_transition is missing.");
+		continue;
+	      }
+	      rt_lut = gen_lut(rt_node, library);
+	      rp_lut = gen_lut(rp_node, library);
+	    }
+	    else if ( rt_node != NULL ) {
 	      MsgMgr::put_msg(__FILE__, __LINE__,
 			      dt_timing->loc(),
 			      kMsgError,
 			      "DOTLIB_PARSER",
-			      "rise_transiton and fall_transition are required");
-	      continue;
-	    }
-	    CellLut* rt_lut = gen_lut(rt_node, library);
-	    CellLut* ft_lut = gen_lut(ft_node, library);
-	    if ( rt_lut == NULL || ft_lut == NULL ) {
+			      "Either cell_rise or rise_propagation should be present.");
 	      continue;
 	    }
 
-	    if ( cr_node != NULL && cf_node != NULL ) {
-	      CellLut* cr_lut = gen_lut(cr_node, library);
-	      CellLut* cf_lut = gen_lut(cf_node, library);
-	      if ( cr_lut == NULL || cf_lut == NULL ) {
+	    const DotlibNode* cf_node = timing_info.cell_fall();
+	    const DotlibNode* ft_node = timing_info.fall_transition();
+	    const DotlibNode* fp_node = timing_info.fall_propagation();
+
+	    CellLut* cf_lut = NULL;
+	    CellLut* ft_lut = NULL;
+	    CellLut* fp_lut = NULL;
+	    if ( cf_node != NULL ) {
+	      if ( fp_node != NULL ) {
+		MsgMgr::put_msg(__FILE__, __LINE__,
+				dt_timing->loc(),
+				kMsgError,
+				"DOTLIB_PARSER",
+				"cell_fall and fall_propagation are mutually exclusive.");
 		continue;
 	      }
+	      if ( ft_node == NULL ) {
+		MsgMgr::put_msg(__FILE__, __LINE__,
+				dt_timing->loc(),
+				kMsgError,
+				"DOTLIB_PARSER",
+				"fall_transition is missing.");
+		continue;
+	      }
+	      cf_lut = gen_lut(cf_node, library);
+	      ft_lut = gen_lut(ft_node, library);
+	    }
+	    else if ( fp_node != NULL ) {
+	      if ( ft_node == NULL ) {
+		MsgMgr::put_msg(__FILE__, __LINE__,
+				dt_timing->loc(),
+				kMsgError,
+				"DOTLIB_PARSER",
+				"fall_transition is missing.");
+		continue;
+	      }
+	      ft_lut = gen_lut(ft_node, library);
+	      fp_lut = gen_lut(fp_node, library);
+	    }
+	    else if ( ft_node != NULL ) {
+	      MsgMgr::put_msg(__FILE__, __LINE__,
+			      dt_timing->loc(),
+			      kMsgError,
+			      "DOTLIB_PARSER",
+			      "Either cell_fall or fall_propagation should be present.");
+	      continue;
+	    }
 
+	    if ( cr_lut != NULL || cf_lut != NULL ) {
+	      if ( fp_lut != NULL ) {
+		MsgMgr::put_msg(__FILE__, __LINE__,
+				dt_timing->loc(),
+				kMsgError,
+				"DOTLIB_PARSER",
+				"cell_rise and fall_propagation are mutually exclusive.");
+		continue;
+	      }
 	      timing = library->new_timing_lut1(tid, timing_type,
 						cr_lut, cf_lut,
 						rt_lut, ft_lut);
 	    }
-	    else if ( rp_node != NULL && fp_node != NULL ) {
-	      CellLut* rp_lut = gen_lut(rp_node, library);
-	      CellLut* fp_lut = gen_lut(fp_node, library);
-	      if ( rp_lut == NULL || fp_lut == NULL ) {
-		continue;
-	      }
-
+	    else { // cr_lut == NULL && cf_lut == NULL
 	      timing = library->new_timing_lut2(tid, timing_type,
 						rt_lut, ft_lut,
 						rp_lut, fp_lut);
 	    }
-	    else {
-	      MsgMgr::put_msg(__FILE__, __LINE__,
-			      dt_timing->loc(),
-			      kMsgError,
-			      "DOTLIB_PARSER",
-			      "(cell_rise, cell_fall) or (rise_propagation, fall_propagation) are required");
-	      continue;
-	    }
-
 	  }
 	  break;
 
