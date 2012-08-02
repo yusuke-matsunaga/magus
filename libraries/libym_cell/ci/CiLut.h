@@ -19,17 +19,19 @@ BEGIN_NAMESPACE_YM_CELL
 /// @class CiLutTemplateBase CiLut.h "CiLut.h"
 /// @brief CiLutTemplate の(擬似)基底クラス
 //////////////////////////////////////////////////////////////////////
-class CiLutTemplateBase :
+class CiLutTemplate :
   public CellLutTemplate
 {
+  friend class CiLutHash;
+
 protected:
 
   /// @brief コンストラクタ
-  CiLutTemplateBase(ShString name);
+  CiLutTemplate(ShString name);
 
   /// @brief デストラクタ
   virtual
-  ~CiLutTemplateBase();
+  ~CiLutTemplate();
 
 
 public:
@@ -50,6 +52,9 @@ private:
   // 名前
   ShString mName;
 
+  // ハッシュ用のリンク
+  CiLutTemplate* mLink;
+
 };
 
 
@@ -58,7 +63,7 @@ private:
 /// @brief 1次元のルックアップテーブルテンプレート
 //////////////////////////////////////////////////////////////////////
 class CiLutTemplate1D :
-  public CiLutTemplateBase
+  public CiLutTemplate
 {
   friend class CiLibrary;
 
@@ -121,7 +126,7 @@ private:
 /// @brief 2次元のルックアップテーブルテンプレート
 //////////////////////////////////////////////////////////////////////
 class CiLutTemplate2D :
-  public CiLutTemplateBase
+  public CiLutTemplate
 {
   friend class CiLibrary;
 
@@ -186,7 +191,7 @@ private:
 /// @brief 3次元のルックアップテーブルテンプレート
 //////////////////////////////////////////////////////////////////////
 class CiLutTemplate3D :
-  public CiLutTemplateBase
+  public CiLutTemplate
 {
   friend class CiLibrary;
 

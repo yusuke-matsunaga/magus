@@ -79,7 +79,9 @@ libym_cell_dotlib_la_SOURCES = \
 	DotlibTiming.h \
 	DotlibTiming.cc \
 	DotlibTemplate.h \
-	DotlibTemplate.cc
+	DotlibTemplate.cc \
+	DotlibLut.h \
+	DotlibLut.cc
 
 libym_cell_dotlib_la_LDFLAGS =
 

@@ -819,7 +819,7 @@ public:
   /// @param[in] index_array3 インデックス値のリスト
   virtual
   CellLut*
-  new_lut2(const CellLutTemplate* lut_template,
+  new_lut3(const CellLutTemplate* lut_template,
 	   const vector<double>& value_array,
 	   const vector<double>& index_array1 = vector<double>(),
 	   const vector<double>& index_array2 = vector<double>(),

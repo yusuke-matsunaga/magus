@@ -1,11 +1,11 @@
-#ifndef CICELLHASH_H
-#define CICELLHASH_H
+#ifndef CILUTHASH_H
+#define CILUTHASH_H
 
-/// @file CiCellHash.h
-/// @brief CiCellHash のヘッダファイル
+/// @file CiLutHash.h
+/// @brief CiLutHash のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -16,36 +16,36 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
-class CiCell;
+class CiLutTemplate;
 
 //////////////////////////////////////////////////////////////////////
-/// @class CiCellHash CiCellHash.h "CiCellHash.h"
+/// @class CiLutHash CiLutHash.h "CiLutHash.h"
 /// @brief 名前をキーにした CiCell のハッシュ表
 //////////////////////////////////////////////////////////////////////
-class CiCellHash
+class CiLutHash
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリアロケータ
-  CiCellHash(Alloc& alloc);
+  CiLutHash(Alloc& alloc);
 
   /// @brief デストラクタ
-  ~CiCellHash();
+  ~CiLutHash();
 
 
 public:
 
-  /// @brief セルを追加する．
-  /// @param[in] cell 追加するセル
+  /// @brief テンプレートを追加する．
+  /// @param[in] templ 追加するテンプレート
   void
-  add(CiCell* cell);
+  add(CiLutTemplate* templ);
 
-  /// @brief セルを取り出す．
+  /// @brief テンプレートを取り出す．
   /// @param[in] name 名前
-  /// @return name という名前のセルを返す．
+  /// @return name という名前のテンプレートを返す．
   /// @note なければ NULL を返す．
-  CiCell*
+  CiLutTemplate*
   get(ShString name) const;
 
 
@@ -72,7 +72,7 @@ private:
   ymuint32 mSize;
 
   // ハッシュ表
-  CiCell** mTable;
+  CiLutTemplate** mTable;
 
   // ハッシュ表を拡大するしきい値
   ymuint32 mLimit;
@@ -84,4 +84,4 @@ private:
 
 END_NAMESPACE_YM_CELL
 
-#endif // CICELLHASH_H
+#endif // CILUTHASH_H

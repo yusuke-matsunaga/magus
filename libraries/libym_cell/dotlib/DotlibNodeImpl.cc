@@ -119,6 +119,8 @@ DotlibNodeImpl::is_group() const
 int
 DotlibNodeImpl::int_value() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return 0;
 }
@@ -128,6 +130,8 @@ DotlibNodeImpl::int_value() const
 double
 DotlibNodeImpl::float_value() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return 0.0;
 }
@@ -137,6 +141,8 @@ DotlibNodeImpl::float_value() const
 ShString
 DotlibNodeImpl::string_value() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return ShString();
 }
@@ -146,6 +152,8 @@ DotlibNodeImpl::string_value() const
 ymuint
 DotlibNodeImpl::vector_size() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return 0;
 }
@@ -156,6 +164,8 @@ DotlibNodeImpl::vector_size() const
 double
 DotlibNodeImpl::vector_elem(ymuint pos) const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return 0.0;
 }
@@ -166,6 +176,8 @@ DotlibNodeImpl::vector_elem(ymuint pos) const
 void
 DotlibNodeImpl::get_vector(vector<double>& vector) const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
 }
 
@@ -174,6 +186,8 @@ DotlibNodeImpl::get_vector(vector<double>& vector) const
 const DotlibNode*
 DotlibNodeImpl::opr1() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
@@ -183,6 +197,8 @@ DotlibNodeImpl::opr1() const
 const DotlibNode*
 DotlibNodeImpl::opr2() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
@@ -192,6 +208,8 @@ DotlibNodeImpl::opr2() const
 ymuint
 DotlibNodeImpl::list_size() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return 0;
 }
@@ -202,6 +220,8 @@ DotlibNodeImpl::list_size() const
 const DotlibNode*
 DotlibNodeImpl::list_elem(ymuint pos) const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
@@ -211,6 +231,8 @@ DotlibNodeImpl::list_elem(ymuint pos) const
 const DotlibNode*
 DotlibNodeImpl::group_value() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
@@ -220,6 +242,8 @@ DotlibNodeImpl::group_value() const
 const DotlibAttr*
 DotlibNodeImpl::attr_top() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
@@ -230,6 +254,8 @@ DotlibNodeImpl::attr_top() const
 void
 DotlibNodeImpl::add_node(DotlibNodeImpl* node)
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
 }
 
@@ -239,6 +265,8 @@ DotlibNodeImpl::add_node(DotlibNodeImpl* node)
 void
 DotlibNodeImpl::add_attr(DotlibAttr* attr)
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
 }
 

@@ -8,6 +8,7 @@
 
 
 #include "DotlibTemplate.h"
+#include "DotlibNode.h"
 #include "DotlibAttr.h"
 #include "ym_utils/MsgMgr.h"
 

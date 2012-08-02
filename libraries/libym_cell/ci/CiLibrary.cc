@@ -48,7 +48,9 @@ CellLibrary::new_obj()
 
 // @brief コンストラクタ
 CiLibrary::CiLibrary() :
-  mAlloc(4096)
+  mAlloc(4096),
+  mLutHash(mAlloc),
+  mCellHash(mAlloc)
 {
   mTechnology = kTechCmos;
   mDelayModel = kDelayGenericCmos;
@@ -188,8 +190,7 @@ CiLibrary::lu_table_template(ymuint pos) const
 const CellLutTemplate*
 CiLibrary::lu_table_template(const char* name) const
 {
-  // 未完
-  return NULL;
+  return mLutHash.get(ShString(name));
 }
 
 // @brief バスタイプの取得
@@ -569,7 +570,7 @@ CiLibrary::set_lu_table_template_num(ymuint num)
   assert_cond( mLutTemplateNum == 0, __FILE__, __LINE__);
   void* p = mAlloc.get_memory(sizeof(CellLutTemplate*) * num);
   mLutTemplateNum = num;
-  mLutTemplateArray = new (p) CellLutTemplate*[num];
+  mLutTemplateArray = new (p) CiLutTemplate*[num];
 }
 
 // @brief 1次元の LUT のテンプレートを作る．
@@ -585,9 +586,10 @@ CiLibrary::new_lut_template1(ymuint id,
 {
   assert_cond( id < lu_table_template_num(), __FILE__, __LINE__);
   void* p = mAlloc.get_memory(sizeof(CiLutTemplate1D));
-  CellLutTemplate* tmpl = new (p) CiLutTemplate1D(ShString(name),
-						  var_type1, index_list1);
+  CiLutTemplate* tmpl = new (p) CiLutTemplate1D(ShString(name),
+						var_type1, index_list1);
   mLutTemplateArray[id] = tmpl;
+  mLutHash.add(tmpl);
 }
 
 // @brief 2次元の LUT のテンプレートを作る．
@@ -607,10 +609,11 @@ CiLibrary::new_lut_template2(ymuint id,
 {
   assert_cond( id < lu_table_template_num(), __FILE__, __LINE__);
   void* p = mAlloc.get_memory(sizeof(CiLutTemplate2D));
-  CellLutTemplate* tmpl = new (p) CiLutTemplate2D(ShString(name),
+  CiLutTemplate* tmpl = new (p) CiLutTemplate2D(ShString(name),
 						  var_type1, index_list1,
 						  var_type2, index_list2);
   mLutTemplateArray[id] = tmpl;
+  mLutHash.add(tmpl);
 }
 
 // @brief 3次元の LUT のテンプレートを作る．
@@ -634,11 +637,12 @@ CiLibrary::new_lut_template3(ymuint id,
 {
   assert_cond( id < lu_table_template_num(), __FILE__, __LINE__);
   void* p = mAlloc.get_memory(sizeof(CiLutTemplate3D));
-  CellLutTemplate* tmpl = new (p) CiLutTemplate3D(ShString(name),
-						  var_type1, index_list1,
-						  var_type2, index_list2,
-						  var_type3, index_list3);
+  CiLutTemplate* tmpl = new (p) CiLutTemplate3D(ShString(name),
+						var_type1, index_list1,
+						var_type2, index_list2,
+						var_type3, index_list3);
   mLutTemplateArray[id] = tmpl;
+  mLutHash.add(tmpl);
 }
 
 // @brief セル数を設定する．
@@ -1256,7 +1260,7 @@ CiLibrary::new_lut2(const CellLutTemplate* lut_template,
 // @param[in] index_array2 インデックス値のリスト
 // @param[in] index_array3 インデックス値のリスト
 CellLut*
-CiLibrary::new_lut2(const CellLutTemplate* lut_template,
+CiLibrary::new_lut3(const CellLutTemplate* lut_template,
 		    const vector<double>& value_array,
 		    const vector<double>& index_array1,
 		    const vector<double>& index_array2,

@@ -16,6 +16,7 @@
 #include "ym_cell/CellResistance.h"
 #include "ym_cell/CellCapacitance.h"
 #include "ym_cell/CellTime.h"
+#include "ym_cell/CellLut.h"
 
 #include "dotlib/DotlibParser.h"
 #include "dotlib/DotlibMgr.h"
@@ -27,6 +28,7 @@
 #include "dotlib/DotlibPin.h"
 #include "dotlib/DotlibTiming.h"
 #include "dotlib/DotlibTemplate.h"
+#include "dotlib/DotlibLut.h"
 
 #include "ym_logic/LogExpr.h"
 #include "ym_logic/TvFunc.h"
@@ -34,7 +36,6 @@
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
-
 
 BEGIN_NONAMESPACE
 
@@ -95,6 +96,71 @@ dot2expr(const DotlibNode* node,
   }
   assert_not_reached(__FILE__, __LINE__);
   return LogExpr();
+}
+
+// LUT を読み込む．
+CellLut*
+gen_lut(const DotlibNode* lut_node,
+	CellLibrary* library)
+{
+  DotlibLut lut_info;
+  if ( !lut_info.set_data(lut_node) ) {
+    return NULL;
+  }
+  const char* name = lut_info.template_name();
+  const CellLutTemplate* templ = library->lu_table_template(name);
+  if ( templ == NULL ) {
+    ostringstream buf;
+    buf << lut_info.template_name()
+	<< ": No such lu_table template";
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    lut_node->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    buf.str());
+    return NULL;
+  }
+
+  ymuint d = templ->dimension();
+
+  vector<double> value_array;
+  ymuint n = lut_info.value_list()->list_size();
+  for (ymuint i = 0; i < n; ++ i) {
+    vector<double> tmp_array;
+    lut_info.value_list()->list_elem(i)->get_vector(tmp_array);
+    value_array.insert(value_array.end(), tmp_array.begin(), tmp_array.end());
+  }
+
+  vector<double> index1_array;
+  if ( lut_info.index_1() ) {
+    lut_info.index_1()->get_vector(index1_array);
+  }
+  vector<double> index2_array;
+  if ( d >= 2 && lut_info.index_2() ) {
+    lut_info.index_2()->get_vector(index2_array);
+  }
+  vector<double> index3_array;
+  if ( d >= 3 && lut_info.index_3() ) {
+    lut_info.index_3()->get_vector(index3_array);
+  }
+
+  CellLut* lut = NULL;
+  if ( d == 1 ) {
+    lut = library->new_lut1(templ, value_array,
+			    index1_array);
+  }
+  else if ( d == 2 ) {
+    lut = library->new_lut2(templ, value_array,
+			    index1_array,
+			    index2_array);
+  }
+  else if ( d == 3 ) {
+    lut = library->new_lut3(templ, value_array,
+			    index1_array,
+			    index2_array,
+			    index3_array);
+  }
+  return lut;
 }
 
 // @brief DotlibNode から CellLibrary を生成する．
@@ -182,7 +248,8 @@ gen_library(const DotlibNode* dt_library)
   }
 
   // 'lu_table_template' の設定
-  const list<const DotlibNode*>& dt_lut_template_list = library_info.lut_template_list();
+  const list<const DotlibNode*>& dt_lut_template_list =
+    library_info.lut_template_list();
   library->set_lu_table_template_num(dt_lut_template_list.size());
   ymuint templ_id = 0;
   for (list<const DotlibNode*>::const_iterator p = dt_lut_template_list.begin();
@@ -621,7 +688,19 @@ gen_library(const DotlibNode* dt_library)
 
 	case CellLibrary::kDelayTableLookup:
 	  {
-
+	    const DotlibNode* cr_node = timing_info.cell_rise();
+	    const DotlibNode* cf_node = timing_info.cell_fall();
+	    const DotlibNode* rt_node = timing_info.rise_transition();
+	    const DotlibNode* ft_node = timing_info.fall_transition();
+	    const DotlibNode* rp_node = timing_info.rise_propagation();
+	    const DotlibNode* fp_node = timing_info.fall_propagation();
+	    if ( cr_node != NULL && cf_node != NULL ) {
+	      CellLut* cr_lut = gen_lut(cr_node, library);
+	      CellLut* cf_lut = gen_lut(cf_node, library);
+	      if ( cr_lut == NULL || cf_lut == NULL ) {
+		continue;
+	      }
+	    }
 	  }
 	  break;
 

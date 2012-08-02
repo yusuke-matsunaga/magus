@@ -306,6 +306,10 @@ display_library(ostream& s,
   ymuint n = library.cell_num();
   for (ymuint i = 0; i < n; ++ i) {
     const Cell* cell = library.cell(i);
+    {
+      const Cell* cell1 = library.cell(cell->name());
+      assert_cond( cell1 == cell, __FILE__, __LINE__);
+    }
     // セル名とセルの種類を出力
     s << "Cell#" << cell->id() << " (" << cell->name() << ") : ";
     if ( cell->is_logic() ) {

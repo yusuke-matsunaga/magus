@@ -13,23 +13,24 @@
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-// クラス CiLutTemplateBase
+// クラス CiLutTemplate
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CiLutTemplateBase::CiLutTemplateBase(ShString name) :
+CiLutTemplate::CiLutTemplate(ShString name) :
   mName(name)
 {
+  mLink = NULL;
 }
 
 // @brief デストラクタ
-CiLutTemplateBase::~CiLutTemplateBase()
+CiLutTemplate::~CiLutTemplate()
 {
 }
 
 // @brief 名前の取得
 const char*
-CiLutTemplateBase::name() const
+CiLutTemplate::name() const
 {
   return mName;
 }
@@ -43,7 +44,7 @@ CiLutTemplateBase::name() const
 CiLutTemplate1D::CiLutTemplate1D(ShString name,
 				 tCellVarType var_type,
 				 const vector<double>& index_array) :
-  CiLutTemplateBase(name),
+  CiLutTemplate(name),
   mVarType(var_type),
   mIndexArray(index_array.size())
 {
@@ -106,7 +107,7 @@ CiLutTemplate2D::CiLutTemplate2D(ShString name,
 				 const vector<double>& index_array1,
 				 tCellVarType var2,
 				 const vector<double>& index_array2) :
-  CiLutTemplateBase(name)
+  CiLutTemplate(name)
 {
   mVarType[0] = var1;
   ymuint32 n1 = index_array1.size();
@@ -178,7 +179,7 @@ CiLutTemplate3D::CiLutTemplate3D(ShString name,
 				 const vector<double>& index_array2,
 				 tCellVarType var3,
 				 const vector<double>& index_array3) :
-  CiLutTemplateBase(name)
+  CiLutTemplate(name)
 {
   mVarType[0] = var1;
   ymuint32 n1 = index_array1.size();
@@ -271,6 +272,7 @@ CiLut1D::CiLut1D(const CellLutTemplate* lut_template,
     }
   }
   assert_cond( value_array.size() == n, __FILE__, __LINE__);
+  mValueArray.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
     mValueArray[i] = value_array[i];
   }
@@ -355,6 +357,7 @@ CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
   }
 
   assert_cond( value_array.size() == n1 * n2, __FILE__, __LINE__);
+  mValueArray.resize(n1 * n2);
   for (ymuint i1 = 0; i1 < n1; ++ i1) {
     for (ymuint i2 = 0; i2 < n2; ++ i2) {
       ymuint i = i1 * n2 + i2;
@@ -460,6 +463,7 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
   }
 
   assert_cond( value_array.size() == n1 * n2 * n3, __FILE__, __LINE__);
+  mValueArray.resize(n1 * n2 * n3);
   for (ymuint i1 = 0; i1 < n1; ++ i1) {
     for (ymuint i2 = 0; i2 < n2; ++ i2) {
       for (ymuint i3 = 0; i3 < n3; ++ i3) {
