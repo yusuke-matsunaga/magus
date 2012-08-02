@@ -25,13 +25,61 @@ BEGIN_NAMESPACE_YM_CELL
 
 BEGIN_NONAMESPACE
 
+// tCellVarType を出力する．
+ostream&
+operator<<(ostream& s,
+	   tCellVarType var_type)
+{
+  switch ( var_type ) {
+  case kVarInputNetTransition: s << "input_net_transition"; break;
+  case kVarTotalOutputNetCapacitance: s << "total_output_net_capacitance"; break;
+  case kVarOutputNetLength: s << "output_net_length"; break;
+  case kVarOutputNetWireCap: s << "output_net_wire_cap"; break;
+  case kVarOutputNetPinCap: s << "output_net_pin_cap"; break;
+  case kVarRelatedOutTotalOutputNetCapacitance: s << "related_out_total_output_net_capacitance"; break;
+  case kVarRelatedOutOutputNetLength: s << "related_out_output_net_length"; break;
+  case kVarRelatedOutOutputNetWireCap: s << "related_out_output_net_wire_cap"; break;
+  case kVarRelatedOutOutputNetPinCap: s << "related_out_output_net_pin_cap"; break;
+  case kVarConstrainedPinTransition: s << "constrained_pin_transition"; break;
+  case kVarRelatedPinTransition: s << "related_pin_transition"; break;
+  case kVarNone: s << "none"; break;
+  }
+  return s;
+}
+
+// LUT の情報を出力する．
+void
+display_lut(ostream& s,
+	    const char* label,
+	    const CellLut* lut)
+{
+  s << "    " << label << endl;
+  ymuint d = lut->dimension();
+  for (ymuint i = 0; i < d; ++ i) {
+    s << "      Variable_" << (i + 1) << " = " << lut->variable_type(i) << endl;
+  }
+  for (ymuint i = 0; i < d; ++ i) {
+    s << "      Index_" << (i + 1) << "    = ";
+    ymuint n = lut->index_num(i);
+    const char* comma = "";
+    s << "(";
+    for (ymuint j = 0; j < n; ++ j) {
+      s << comma << lut->index(i, j);
+      comma = ", ";
+    }
+    s << ")" << endl;
+  }
+
+}
+
 // タイミング情報を出力する．
 void
 display_timing(ostream& s,
 	       const Cell* cell,
 	       ymuint ipos,
 	       ymuint opos,
-	       tCellTimingSense sense)
+	       tCellTimingSense sense,
+	       CellLibrary::tDelayModel delay_model)
 {
   const CellTiming* timing = cell->timing(ipos, opos, sense);
   if ( timing ) {
@@ -48,11 +96,37 @@ display_timing(ostream& s,
     else {
       assert_not_reached(__FILE__, __LINE__);
     }
-    s << endl
-      << "    Rise Intrinsic  = " << timing->intrinsic_rise() << endl
-      << "    Rise Resistance = " << timing->rise_resistance() << endl
-      << "    Fall Intrinsic  = " << timing->intrinsic_fall() << endl
-      << "    Fall Resistance = " << timing->fall_resistance() << endl;
+    s << endl;
+    switch ( delay_model ) {
+    case CellLibrary::kDelayGenericCmos:
+      s << "    Rise Intrinsic  = " << timing->intrinsic_rise() << endl
+	<< "    Rise Resistance = " << timing->rise_resistance() << endl
+	<< "    Fall Intrinsic  = " << timing->intrinsic_fall() << endl
+	<< "    Fall Resistance = " << timing->fall_resistance() << endl;
+      break;
+
+    case CellLibrary::kDelayTableLookup:
+      display_lut(s, "Rise Transition", timing->rise_transition());
+      display_lut(s, "Fall Transition", timing->fall_transition());
+      if ( timing->cell_rise() ) {
+	display_lut(s, "Cell Rise", timing->cell_rise());
+	display_lut(s, "Cell Fall", timing->cell_fall());
+      }
+      else {
+	display_lut(s, "Rise Propagation", timing->rise_propagation());
+	display_lut(s, "Fall Propagation", timing->fall_propagation());
+      }
+      break;
+
+    case CellLibrary::kDelayPiecewiseCmos:
+      break;
+
+    case CellLibrary::kDelayCmos2:
+      break;
+
+    case CellLibrary::kDelayDcm:
+      break;
+    }
   }
 }
 
@@ -184,27 +258,6 @@ display_group(ostream& s,
     << endl;
 }
 
-ostream&
-operator<<(ostream& s,
-	   tCellVarType var_type)
-{
-  switch ( var_type ) {
-  case kVarInputNetTransition: s << "input_net_transition"; break;
-  case kVarTotalOutputNetCapacitance: s << "total_output_net_capacitance"; break;
-  case kVarOutputNetLength: s << "output_net_length"; break;
-  case kVarOutputNetWireCap: s << "output_net_wire_cap"; break;
-  case kVarOutputNetPinCap: s << "output_net_pin_cap"; break;
-  case kVarRelatedOutTotalOutputNetCapacitance: s << "related_out_total_output_net_capacitance"; break;
-  case kVarRelatedOutOutputNetLength: s << "related_out_output_net_length"; break;
-  case kVarRelatedOutOutputNetWireCap: s << "related_out_output_net_wire_cap"; break;
-  case kVarRelatedOutOutputNetPinCap: s << "related_out_output_net_pin_cap"; break;
-  case kVarConstrainedPinTransition: s << "constrained_pin_transition"; break;
-  case kVarRelatedPinTransition: s << "related_pin_transition"; break;
-  case kVarNone: s << "none"; break;
-  }
-  return s;
-}
-
 void
 display_index(ostream& s,
 	      const CellLutTemplate* templ,
@@ -239,8 +292,9 @@ display_library(ostream& s,
   s << endl;
 
   // 遅延モデル
+  CellLibrary::tDelayModel delay_model = library.delay_model();
   s << "  delay_model: ";
-  switch ( library.delay_model() ) {
+  switch ( delay_model ) {
   case CellLibrary::kDelayGenericCmos: s << "generic_cmos"; break;
   case CellLibrary::kDelayTableLookup: s << "table_lookup"; break;
   case CellLibrary::kDelayPiecewiseCmos: s << "piecewise_cmos"; break;
@@ -430,8 +484,8 @@ display_library(ostream& s,
     ymuint no2 = cell->output_num2();
     for (ymuint ipos = 0; ipos < ni2; ++ ipos) {
       for (ymuint opos = 0; opos < no2; ++ opos) {
-	display_timing(s, cell, ipos, opos, kCellPosiUnate);
-	display_timing(s, cell, ipos, opos, kCellNegaUnate);
+	display_timing(s, cell, ipos, opos, kCellPosiUnate, delay_model);
+	display_timing(s, cell, ipos, opos, kCellNegaUnate, delay_model);
       }
     }
     s << endl;

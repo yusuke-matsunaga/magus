@@ -645,6 +645,7 @@ gen_library(const DotlibNode* dt_library)
 	  continue;
 	}
 	const CellPin* ipin = NULL;
+	ymuint iid = 0;
 	if ( timing_info.related_pin() ) {
 	  ShString pin_name = timing_info.related_pin()->string_value();
 	  ipin = cell->pin((const char*)(pin_name));
@@ -658,6 +659,7 @@ gen_library(const DotlibNode* dt_library)
 			    buf.str());
 	    continue;
 	  }
+	  iid = ipin->input_id();
 	}
 	else {
 	  MsgMgr::put_msg(__FILE__, __LINE__,
@@ -694,13 +696,52 @@ gen_library(const DotlibNode* dt_library)
 	    const DotlibNode* ft_node = timing_info.fall_transition();
 	    const DotlibNode* rp_node = timing_info.rise_propagation();
 	    const DotlibNode* fp_node = timing_info.fall_propagation();
+
+	    if ( rt_node == NULL || ft_node == NULL ) {
+	      MsgMgr::put_msg(__FILE__, __LINE__,
+			      dt_timing->loc(),
+			      kMsgError,
+			      "DOTLIB_PARSER",
+			      "rise_transiton and fall_transition are required");
+	      continue;
+	    }
+	    CellLut* rt_lut = gen_lut(rt_node, library);
+	    CellLut* ft_lut = gen_lut(ft_node, library);
+	    if ( rt_lut == NULL || ft_lut == NULL ) {
+	      continue;
+	    }
+
 	    if ( cr_node != NULL && cf_node != NULL ) {
 	      CellLut* cr_lut = gen_lut(cr_node, library);
 	      CellLut* cf_lut = gen_lut(cf_node, library);
 	      if ( cr_lut == NULL || cf_lut == NULL ) {
 		continue;
 	      }
+
+	      timing = library->new_timing_lut1(tid, timing_type,
+						cr_lut, cf_lut,
+						rt_lut, ft_lut);
 	    }
+	    else if ( rp_node != NULL && fp_node != NULL ) {
+	      CellLut* rp_lut = gen_lut(rp_node, library);
+	      CellLut* fp_lut = gen_lut(fp_node, library);
+	      if ( rp_lut == NULL || fp_lut == NULL ) {
+		continue;
+	      }
+
+	      timing = library->new_timing_lut2(tid, timing_type,
+						rt_lut, ft_lut,
+						rp_lut, fp_lut);
+	    }
+	    else {
+	      MsgMgr::put_msg(__FILE__, __LINE__,
+			      dt_timing->loc(),
+			      kMsgError,
+			      "DOTLIB_PARSER",
+			      "(cell_rise, cell_fall) or (rise_propagation, fall_propagation) are required");
+	      continue;
+	    }
+
 	  }
 	  break;
 
@@ -712,6 +753,11 @@ gen_library(const DotlibNode* dt_library)
 
 	case CellLibrary::kDelayDcm:
 	  break;
+	}
+
+	if ( timing ) {
+	  tCellTimingSense timing_sense = timing_info.timing_sense();
+	  library->set_timing(cell_id, iid, oid, timing_sense, timing);
 	}
 	++ tid;
       }
