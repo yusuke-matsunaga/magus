@@ -95,6 +95,10 @@ public:
   const DotlibNode*
   voltage_unit() const;
 
+  /// @brief lu_table_template のリストを返す．
+  const list<const DotlibNode*>&
+  lut_template_list() const;
+
   /// @brief セル定義のリストを返す．
   const list<const DotlibNode*>&
   cell_list() const;
@@ -146,6 +150,9 @@ private:
 
   // "voltage_unit"
   const DotlibNode* mVoltageUnit;
+
+  // lu_table_template のリスト
+  list<const DotlibNode*> mLutTemplateList;
 
   // セル定義のリスト
   list<const DotlibNode*> mCellList;

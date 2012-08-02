@@ -105,6 +105,13 @@ public:
   double
   vector_elem(ymuint pos) const;
 
+  /// @brief ベクタの全体を取り出す．
+  /// @param[out] vector 結果を格納する変数
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  void
+  get_vector(vector<double>& vector) const;
+
   /// @brief 第一オペランドを返す．
   /// @note is_opr() = true の時のみ意味を持つ．
   virtual
@@ -435,6 +442,13 @@ public:
   virtual
   double
   vector_elem(ymuint pos) const;
+
+  /// @brief ベクタの全体を取り出す．
+  /// @param[out] vector 結果を格納する変数
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  void
+  get_vector(vector<double>& vector) const;
 
   /// @brief 内容をストリーム出力する．
   /// @param[in] s 出力先のストリーム

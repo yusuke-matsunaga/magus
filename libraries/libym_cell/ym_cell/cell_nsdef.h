@@ -115,7 +115,9 @@ enum tCellVarType {
 
   kVarConstrainedPinTransition,
 
-  kVarRelatedPinTransition
+  kVarRelatedPinTransition,
+
+  kVarNone
 };
 
 

@@ -7,8 +7,9 @@
 /// All rights reserved.
 
 
-#include "ym_cell/Cell.h"
 #include "ym_cell/CellLibrary.h"
+#include "ym_cell/Cell.h"
+#include "ym_cell/CellLut.h"
 #include "ym_cell/CellPin.h"
 #include "ym_cell/CellTiming.h"
 #include "ym_cell/CellClass.h"
@@ -183,6 +184,42 @@ display_group(ostream& s,
     << endl;
 }
 
+ostream&
+operator<<(ostream& s,
+	   tCellVarType var_type)
+{
+  switch ( var_type ) {
+  case kVarInputNetTransition: s << "input_net_transition"; break;
+  case kVarTotalOutputNetCapacitance: s << "total_output_net_capacitance"; break;
+  case kVarOutputNetLength: s << "output_net_length"; break;
+  case kVarOutputNetWireCap: s << "output_net_wire_cap"; break;
+  case kVarOutputNetPinCap: s << "output_net_pin_cap"; break;
+  case kVarRelatedOutTotalOutputNetCapacitance: s << "related_out_total_output_net_capacitance"; break;
+  case kVarRelatedOutOutputNetLength: s << "related_out_output_net_length"; break;
+  case kVarRelatedOutOutputNetWireCap: s << "related_out_output_net_wire_cap"; break;
+  case kVarRelatedOutOutputNetPinCap: s << "related_out_output_net_pin_cap"; break;
+  case kVarConstrainedPinTransition: s << "constrained_pin_transition"; break;
+  case kVarRelatedPinTransition: s << "related_pin_transition"; break;
+  case kVarNone: s << "none"; break;
+  }
+  return s;
+}
+
+void
+display_index(ostream& s,
+	      const CellLutTemplate* templ,
+	      ymuint var)
+{
+  ymuint n = templ->index_num(var);
+  s << "(";
+  const char* comma = "";
+  for (ymuint i = 0; i < n; ++ i) {
+    s << comma << templ->index(var, i);
+    comma = ", ";
+  }
+  s << ")";
+}
+
 END_NONAMESPACE
 
 void
@@ -243,6 +280,25 @@ display_library(ostream& s,
 
   // 電力単位
   s << "  leakage_power_unit: " << library.leakage_power_unit() << endl;
+
+  s << endl;
+
+  // lu_table_template
+  ymuint lut_template_num = library.lu_table_template_num();
+  for (ymuint i = 0; i < lut_template_num; ++ i) {
+    const CellLutTemplate* templ = library.lu_table_template(i);
+    s << "  lu_table_template(" << templ->name() << ")" << endl;
+    ymuint d = templ->dimension();
+    for (ymuint j = 0; j < d; ++ j) {
+      s << "    variable_" << (j + 1) << ": " << templ->variable_type(j) << endl;
+    }
+    for (ymuint j = 0; j < d; ++ j) {
+      s << "    index_" << (j + 1) << "   : ";
+      display_index(s, templ, j);
+      s << endl;
+    }
+    s << endl;
+  }
 
   s << endl;
 

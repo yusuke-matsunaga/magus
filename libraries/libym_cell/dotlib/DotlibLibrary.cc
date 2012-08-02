@@ -47,6 +47,7 @@ DotlibLibrary::set_data(const DotlibNode* lib_node)
   mTimeUnit = NULL;
   mVoltageUnit = NULL;
 
+  mLutTemplateList.clear();
   mCellList.clear();
 
   // ライブラリ名をを得る．
@@ -57,7 +58,10 @@ DotlibLibrary::set_data(const DotlibNode* lib_node)
        attr; attr = attr->next()) {
     ShString attr_name = attr->attr_name();
     const DotlibNode* attr_value = attr->attr_value();
-    if ( attr_name == "cell" ) {
+    if ( attr_name == "lu_table_template" ) {
+      mLutTemplateList.push_back(attr_value);
+    }
+    else if ( attr_name == "cell" ) {
       mCellList.push_back(attr_value);
     }
     else {
@@ -314,6 +318,13 @@ const DotlibNode*
 DotlibLibrary::voltage_unit() const
 {
   return mVoltageUnit;
+}
+
+// @brief lu_table_template のリストを返す．
+const list<const DotlibNode*>&
+DotlibLibrary::lut_template_list() const
+{
+  return mLutTemplateList;
 }
 
 // @brief セル定義のリストを返す．

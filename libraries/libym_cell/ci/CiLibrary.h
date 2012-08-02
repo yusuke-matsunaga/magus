@@ -132,6 +132,17 @@ public:
   string
   leakage_power_unit() const;
 
+  /// @brief 遅延テーブルのテンプレート数の取得
+  virtual
+  ymuint
+  lu_table_template_num() const;
+
+  /// @brief 遅延テーブルのテンプレートの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < lu_table_template_num() )
+  virtual
+  const CellLutTemplate*
+  lu_table_template(ymuint pos) const;
+
   /// @brief ルックアップテーブルのテンプレートの取得
   /// @param[in] name テンプレート名
   /// @note なければ NULL を返す．
@@ -391,6 +402,59 @@ public:
   void
   set_attr(const string& attr_name,
 	   const string& value);
+
+  /// @brief 遅延テーブルのテンプレート数を設定する．
+  virtual
+  void
+  set_lu_table_template_num(ymuint num);
+
+  /// @brief 1次元の LUT のテンプレートを作る．
+  /// @param[in] id ID 番号
+  /// @param[in] name 名前
+  /// @param[in] var_type1 変数型
+  /// @param[in] index_list1 インデックス値のリスト
+  virtual
+  void
+  new_lut_template1(ymuint id,
+		    const string& name,
+		    tCellVarType var_type1,
+		    const vector<double>& index_list1);
+
+  /// @brief 2次元の LUT のテンプレートを作る．
+  /// @param[in] id ID 番号
+  /// @param[in] name 名前
+  /// @param[in] var_type1 変数型
+  /// @param[in] index_list1 インデックス値のリスト
+  /// @param[in] var_type2 変数型
+  /// @param[in] index_list2 インデックス値のリスト
+  virtual
+  void
+  new_lut_template2(ymuint id,
+		    const string& name,
+		    tCellVarType var_type1,
+		    const vector<double>& index_list1,
+		    tCellVarType var_type2,
+		    const vector<double>& index_list2);
+
+  /// @brief 3次元の LUT のテンプレートを作る．
+  /// @param[in] id ID 番号
+  /// @param[in] name 名前
+  /// @param[in] var_type1 変数型
+  /// @param[in] index_list1 インデックス値のリスト
+  /// @param[in] var_type2 変数型
+  /// @param[in] index_list2 インデックス値のリスト
+  /// @param[in] var_type3 変数型
+  /// @param[in] index_list3 インデックス値のリスト
+  virtual
+  void
+  new_lut_template3(ymuint id,
+		    const string& name,
+		    tCellVarType var_type1,
+		    const vector<double>& index_list1,
+		    tCellVarType var_type2,
+		    const vector<double>& index_list2,
+		    tCellVarType var_type3,
+		    const vector<double>& index_list3);
 
   /// @brief セル数を設定する．
   /// @param[in] num 設定する値
@@ -711,48 +775,6 @@ public:
 	     tCellTimingSense sense,
 	     CellTiming* timing);
 
-  /// @brief 1次元の LUT のテンプレートを作る．
-  /// @param[in] name 名前
-  /// @param[in] var_type1 変数型
-  /// @param[in] index_list1 インデックス値のリスト
-  virtual
-  CellLutTemplate*
-  new_lut_template1(const string& name,
-		    tCellVarType var_type1,
-		    const vector<double>& index_list1);
-
-  /// @brief 2次元の LUT のテンプレートを作る．
-  /// @param[in] name 名前
-  /// @param[in] var_type1 変数型
-  /// @param[in] index_list1 インデックス値のリスト
-  /// @param[in] var_type2 変数型
-  /// @param[in] index_list2 インデックス値のリスト
-  virtual
-  CellLutTemplate*
-  new_lut_template2(const string& name,
-		    tCellVarType var_type1,
-		    const vector<double>& index_list1,
-		    tCellVarType var_type2,
-		    const vector<double>& index_list2);
-
-  /// @brief 3次元の LUT のテンプレートを作る．
-  /// @param[in] name 名前
-  /// @param[in] var_type1 変数型
-  /// @param[in] index_list1 インデックス値のリスト
-  /// @param[in] var_type2 変数型
-  /// @param[in] index_list2 インデックス値のリスト
-  /// @param[in] var_type3 変数型
-  /// @param[in] index_list3 インデックス値のリスト
-  virtual
-  CellLutTemplate*
-  new_lut_template3(const string& name,
-		    tCellVarType var_type1,
-		    const vector<double>& index_list1,
-		    tCellVarType var_type2,
-		    const vector<double>& index_list2,
-		    tCellVarType var_type3,
-		    const vector<double>& index_list3);
-
   /// @brief 1次元の LUT を作る．
   /// @param[in] lut_template テンプレート
   /// @param[in] value_array 値の配列
@@ -888,6 +910,12 @@ private:
 
   // 遅延モデル
   tDelayModel mDelayModel;
+
+  // 遅延テンプレート数
+  ymuint32 mLutTemplateNum;
+
+  // 遅延テンプレートの配列
+  CellLutTemplate** mLutTemplateArray;
 
   // セル数
   ymuint32 mCellNum;

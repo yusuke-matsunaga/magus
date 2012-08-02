@@ -26,6 +26,7 @@
 #include "dotlib/DotlibLatch.h"
 #include "dotlib/DotlibPin.h"
 #include "dotlib/DotlibTiming.h"
+#include "dotlib/DotlibTemplate.h"
 
 #include "ym_logic/LogExpr.h"
 #include "ym_logic/TvFunc.h"
@@ -178,6 +179,59 @@ gen_library(const DotlibNode* dt_library)
   if ( library_info.leakage_power_unit() ) {
     ShString value = library_info.leakage_power_unit()->string_value();
     library->set_attr("leakage_power_unit", value);
+  }
+
+  // 'lu_table_template' の設定
+  const list<const DotlibNode*>& dt_lut_template_list = library_info.lut_template_list();
+  library->set_lu_table_template_num(dt_lut_template_list.size());
+  ymuint templ_id = 0;
+  for (list<const DotlibNode*>::const_iterator p = dt_lut_template_list.begin();
+       p != dt_lut_template_list.end(); ++ p, ++ templ_id) {
+    DotlibTemplate templ_info;
+    if ( !templ_info.set_data(*p) ) {
+      return false;
+    }
+    ymuint d = templ_info.dimension();
+    switch ( d ) {
+    case 1:
+      {
+	vector<double> index_1;
+	templ_info.index_1()->get_vector(index_1);
+	library->new_lut_template1(templ_id, templ_info.name(),
+				   templ_info.variable_1(), index_1);
+      }
+      break;
+
+    case 2:
+      {
+	vector<double> index_1;
+	templ_info.index_1()->get_vector(index_1);
+	vector<double> index_2;
+	templ_info.index_2()->get_vector(index_2);
+	library->new_lut_template2(templ_id, templ_info.name(),
+				   templ_info.variable_1(), index_1,
+				   templ_info.variable_2(), index_2);
+      }
+      break;
+
+    case 3:
+      {
+	vector<double> index_1;
+	templ_info.index_1()->get_vector(index_1);
+	vector<double> index_2;
+	templ_info.index_2()->get_vector(index_2);
+	vector<double> index_3;
+	templ_info.index_3()->get_vector(index_3);
+	library->new_lut_template3(templ_id, templ_info.name(),
+				   templ_info.variable_1(), index_1,
+				   templ_info.variable_2(), index_2,
+				   templ_info.variable_3(), index_3);
+      }
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+    }
   }
 
   // セル数の設定

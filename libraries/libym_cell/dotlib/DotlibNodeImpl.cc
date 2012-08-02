@@ -160,6 +160,15 @@ DotlibNodeImpl::vector_elem(ymuint pos) const
   return 0.0;
 }
 
+// @brief ベクタの全体を取り出す．
+// @param[out] vector 結果を格納する変数
+// @note is_vector() = true の時のみ意味を持つ．
+void
+DotlibNodeImpl::get_vector(vector<double>& vector) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+}
+
 // @brief 第一オペランドを返す．
 // @note is_opr() = true の時のみ意味を持つ．
 const DotlibNode*
@@ -480,6 +489,19 @@ double
 DotlibVector::vector_elem(ymuint pos) const
 {
   return mBody[pos];
+}
+
+// @brief ベクタの全体を取り出す．
+// @param[out] vector 結果を格納する変数
+// @note is_vector() = true の時のみ意味を持つ．
+void
+DotlibVector::get_vector(vector<double>& vector) const
+{
+  vector.clear();
+  vector.resize(mNum);
+  for (ymuint i = 0; i < mNum; ++ i) {
+    vector[i] = mBody[i];
+  }
 }
 
 // @brief 内容をストリーム出力する．

@@ -144,6 +144,13 @@ public:
   double
   vector_elem(ymuint pos) const = 0;
 
+  /// @brief ベクタの全体を取り出す．
+  /// @param[out] vector 結果を格納する変数
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  void
+  get_vector(vector<double>& vector) const = 0;
+
   /// @brief 第一オペランドを返す．
   /// @note is_opr() = true の時のみ意味を持つ．
   virtual

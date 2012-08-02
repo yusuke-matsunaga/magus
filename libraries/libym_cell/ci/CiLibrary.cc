@@ -166,6 +166,22 @@ CiLibrary::leakage_power_unit() const
   return mLeakagePowerUnit;
 }
 
+// @brief 遅延テーブルのテンプレート数の取得
+ymuint
+CiLibrary::lu_table_template_num() const
+{
+  return mLutTemplateNum;
+}
+
+// @brief 遅延テーブルのテンプレートの取得
+// @param[in] pos 位置番号 ( 0 <= pos < lu_table_template_num() )
+const CellLutTemplate*
+CiLibrary::lu_table_template(ymuint pos) const
+{
+  assert_cond( pos < lu_table_template_num(), __FILE__, __LINE__);
+  return mLutTemplateArray[pos];
+}
+
 // @brief ルックアップテーブルのテンプレートの取得
 // @param[in] name テンプレート名
 // @note なければ NULL を返す．
@@ -546,11 +562,91 @@ CiLibrary::set_attr(const string& attr_name,
   }
 }
 
+// @brief 遅延テーブルのテンプレート数を設定する．
+void
+CiLibrary::set_lu_table_template_num(ymuint num)
+{
+  assert_cond( mLutTemplateNum == 0, __FILE__, __LINE__);
+  void* p = mAlloc.get_memory(sizeof(CellLutTemplate*) * num);
+  mLutTemplateNum = num;
+  mLutTemplateArray = new (p) CellLutTemplate*[num];
+}
+
+// @brief 1次元の LUT のテンプレートを作る．
+// @param[in] id ID 番号
+// @param[in] name 名前
+// @param[in] var_type1 変数型
+// @param[in] index_list1 インデックス値のリスト
+void
+CiLibrary::new_lut_template1(ymuint id,
+			     const string& name,
+			     tCellVarType var_type1,
+			     const vector<double>& index_list1)
+{
+  assert_cond( id < lu_table_template_num(), __FILE__, __LINE__);
+  void* p = mAlloc.get_memory(sizeof(CiLutTemplate1D));
+  CellLutTemplate* tmpl = new (p) CiLutTemplate1D(ShString(name),
+						  var_type1, index_list1);
+  mLutTemplateArray[id] = tmpl;
+}
+
+// @brief 2次元の LUT のテンプレートを作る．
+// @param[in] id ID 番号
+// @param[in] name 名前
+// @param[in] var_type1 変数型
+// @param[in] index_list1 インデックス値のリスト
+// @param[in] var_type2 変数型
+// @param[in] index_list2 インデックス値のリスト
+void
+CiLibrary::new_lut_template2(ymuint id,
+			     const string& name,
+			     tCellVarType var_type1,
+			     const vector<double>& index_list1,
+			     tCellVarType var_type2,
+			     const vector<double>& index_list2)
+{
+  assert_cond( id < lu_table_template_num(), __FILE__, __LINE__);
+  void* p = mAlloc.get_memory(sizeof(CiLutTemplate2D));
+  CellLutTemplate* tmpl = new (p) CiLutTemplate2D(ShString(name),
+						  var_type1, index_list1,
+						  var_type2, index_list2);
+  mLutTemplateArray[id] = tmpl;
+}
+
+// @brief 3次元の LUT のテンプレートを作る．
+// @param[in] id ID 番号
+// @param[in] name 名前
+// @param[in] var_type1 変数型
+// @param[in] index_list1 インデックス値のリスト
+// @param[in] var_type2 変数型
+// @param[in] index_list2 インデックス値のリスト
+// @param[in] var_type3 変数型
+// @param[in] index_list3 インデックス値のリスト
+void
+CiLibrary::new_lut_template3(ymuint id,
+			     const string& name,
+			     tCellVarType var_type1,
+			     const vector<double>& index_list1,
+			     tCellVarType var_type2,
+			     const vector<double>& index_list2,
+			     tCellVarType var_type3,
+			     const vector<double>& index_list3)
+{
+  assert_cond( id < lu_table_template_num(), __FILE__, __LINE__);
+  void* p = mAlloc.get_memory(sizeof(CiLutTemplate3D));
+  CellLutTemplate* tmpl = new (p) CiLutTemplate3D(ShString(name),
+						  var_type1, index_list1,
+						  var_type2, index_list2,
+						  var_type3, index_list3);
+  mLutTemplateArray[id] = tmpl;
+}
+
 // @brief セル数を設定する．
 // @param[in] num 設定する値
 void
 CiLibrary::set_cell_num(ymuint num)
 {
+  assert_cond( mCellNum == 0, __FILE__, __LINE__);
   mCellNum = num;
   void* p = mAlloc.get_memory(sizeof(CiCell*) * num);
   mCellArray = new (p) CiCell*[num];
@@ -1120,66 +1216,6 @@ CiLibrary::set_timing(ymuint cell_id,
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
-}
-
-// @brief 1次元の LUT のテンプレートを作る．
-// @param[in] name 名前
-// @param[in] var_type1 変数型
-// @param[in] index_list1 インデックス値のリスト
-CellLutTemplate*
-CiLibrary::new_lut_template1(const string& name,
-			     tCellVarType var_type1,
-			     const vector<double>& index_list1)
-{
-  void* p = mAlloc.get_memory(sizeof(CiLutTemplate1D));
-  CellLutTemplate* tmpl = new (p) CiLutTemplate1D(ShString(name),
-						  var_type1, index_list1);
-  return tmpl;
-}
-
-// @brief 2次元の LUT のテンプレートを作る．
-// @param[in] name 名前
-// @param[in] var_type1 変数型
-// @param[in] index_list1 インデックス値のリスト
-// @param[in] var_type2 変数型
-// @param[in] index_list2 インデックス値のリスト
-CellLutTemplate*
-CiLibrary::new_lut_template2(const string& name,
-			     tCellVarType var_type1,
-			     const vector<double>& index_list1,
-			     tCellVarType var_type2,
-			     const vector<double>& index_list2)
-{
-  void* p = mAlloc.get_memory(sizeof(CiLutTemplate2D));
-  CellLutTemplate* tmpl = new (p) CiLutTemplate2D(ShString(name),
-						  var_type1, index_list1,
-						  var_type2, index_list2);
-  return tmpl;
-}
-
-// @brief 3次元の LUT のテンプレートを作る．
-// @param[in] name 名前
-// @param[in] var_type1 変数型
-// @param[in] index_list1 インデックス値のリスト
-// @param[in] var_type2 変数型
-// @param[in] index_list2 インデックス値のリスト
-// @param[in] var_type3 変数型
-// @param[in] index_list3 インデックス値のリスト
-CellLutTemplate*
-CiLibrary::new_lut_template3(const string& name,
-			     tCellVarType var_type1,
-			     const vector<double>& index_list1,
-			     tCellVarType var_type2,
-			     const vector<double>& index_list2,
-			     tCellVarType var_type3,
-			     const vector<double>& index_list3)
-{
-  void* p = mAlloc.get_memory(sizeof(CiLutTemplate3D));
-  CellLutTemplate* tmpl = new (p) CiLutTemplate3D(ShString(name),
-						  var_type1, index_list1,
-						  var_type2, index_list2,
-						  var_type3, index_list3);
-  return tmpl;
 }
 
 // @brief 1次元の LUT を作る．
