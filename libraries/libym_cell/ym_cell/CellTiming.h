@@ -12,6 +12,7 @@
 #include "ym_cell/cell_nsdef.h"
 #include "ym_cell/CellTime.h"
 #include "ym_cell/CellResistance.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -46,6 +47,22 @@ public:
   virtual
   tCellTimingType
   type() const = 0;
+
+  /// @brief タイミングセンスの取得
+  virtual
+  tCellTimingSense
+  timing_sense() const = 0;
+
+  /// @brief タイミング条件式の取得
+  /// @note ない場合には定数1の式が返される．
+  virtual
+  LogExpr
+  timing_cond() const = 0;
+
+  /// @brief 次の要素の取得
+  virtual
+  const CellTiming*
+  next() const = 0;
 
 
 public:

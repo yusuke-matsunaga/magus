@@ -694,6 +694,8 @@ public:
   /// @brief タイミング情報を作る(ジェネリック遅延モデル)．
   /// @param[in] id ID番号
   /// @param[in] type タイミングの型
+  /// @param[in] timing_sense タイミングセンス
+  /// @param[in] cond タイミング条件を表す式
   /// @param[in] intrinsic_rise 立ち上がり固有遅延
   /// @param[in] intrinsic_fall 立ち下がり固有遅延
   /// @param[in] slope_rise 立ち上がりスロープ遅延
@@ -704,6 +706,8 @@ public:
   CellTiming*
   new_timing_generic(ymuint id,
 		     tCellTimingType type,
+		     tCellTimingSense timing_sense,
+		     const LogExpr& cond,
 		     CellTime intrinsic_rise,
 		     CellTime intrinsic_fall,
 		     CellTime slope_rise,
@@ -714,6 +718,8 @@ public:
   /// @brief タイミング情報を作る(折れ線近似)．
   /// @param[in] id ID番号
   /// @param[in] timing_type タイミングの型
+  /// @param[in] timing_sense タイミングセンス
+  /// @param[in] cond タイミング条件を表す式
   /// @param[in] intrinsic_rise 立ち上がり固有遅延
   /// @param[in] intrinsic_fall 立ち下がり固有遅延
   /// @param[in] slope_rise 立ち上がりスロープ遅延
@@ -722,6 +728,8 @@ public:
   CellTiming*
   new_timing_piecewise(ymuint id,
 		       tCellTimingType timing_type,
+		       tCellTimingSense timing_sense,
+		       const LogExpr& cond,
 		       CellTime intrinsic_rise,
 		       CellTime intrinsic_fall,
 		       CellTime slope_rise,
@@ -732,12 +740,16 @@ public:
   /// @brief タイミング情報を作る(非線形タイプ1)．
   /// @param[in] id ID番号
   /// @param[in] timing_type タイミングの型
+  /// @param[in] timing_sense タイミングセンス
+  /// @param[in] cond タイミング条件を表す式
   /// @param[in] cell_rise 立ち上がりセル遅延テーブル
   /// @param[in] cell_fall 立ち下がりセル遅延テーブル
   virtual
   CellTiming*
   new_timing_lut1(ymuint id,
 		  tCellTimingType timing_type,
+		  tCellTimingSense timing_sense,
+		  const LogExpr& cond,
 		  CellLut* cell_rise,
 		  CellLut* cell_fall,
 		  CellLut* rise_transition,
@@ -746,6 +758,8 @@ public:
   /// @brief タイミング情報を作る(非線形タイプ2)．
   /// @param[in] id ID番号
   /// @param[in] timing_type タイミングの型
+  /// @param[in] timing_sense タイミングセンス
+  /// @param[in] cond タイミング条件を表す式
   /// @param[in] rise_transition 立ち上がり遷移遅延テーブル
   /// @param[in] fall_transition 立ち下がり遷移遅延テーブル
   /// @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
@@ -754,6 +768,8 @@ public:
   CellTiming*
   new_timing_lut2(ymuint id,
 		  tCellTimingType timing_type,
+		  tCellTimingSense timing_sense,
+		  const LogExpr& cond,
 		  CellLut* rise_transition,
 		  CellLut* fall_transition,
 		  CellLut* rise_propagation,
@@ -763,7 +779,6 @@ public:
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
   /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
-  /// @param[in] sense タイミング条件
   /// @param[in] timing 設定するタイミング情報
   /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
   ///  + cell->output_num() を使う．
@@ -774,7 +789,6 @@ public:
   set_timing(ymuint cell_id,
 	     ymuint ipin_id,
 	     ymuint opin_id,
-	     tCellTimingSense sense,
 	     CellTiming* timing);
 
   /// @brief 1次元の LUT を作る．

@@ -529,11 +529,12 @@ HandlerFactory::new_leakage_power(GroupHandler* parent)
 
   // simple attributes
   DotlibHandler* simple = new SimpleHandler(handler, false);
-  DotlibHandler* expr_handler = new StrSimpleHandler(handler, false);
+  DotlibHandler* str_simple = new StrSimpleHandler(handler, false);
+  DotlibHandler* func_handler = new FuncHandler(handler);
   DotlibHandler* flt_simple = new FloatSimpleHandler(handler);
   handler->reg_handler("power_level",    simple);
-  handler->reg_handler("related_pg_pin", simple);
-  handler->reg_handler("when",           expr_handler);
+  handler->reg_handler("related_pg_pin", str_simple);
+  handler->reg_handler("when",           func_handler);
   handler->reg_handler("value",          flt_simple);
 
   return handler;
@@ -868,14 +869,16 @@ HandlerFactory::new_internal_power(GroupHandler* parent)
 
   // simple attributes
   DotlibHandler* simple = new SimpleHandler(handler, false);
+  DotlibHandler* str_simple = new StrSimpleHandler(handler, false);
+  DotlibHandler* func_handler = new FuncHandler(handler);
   handler->reg_handler("equal_or_opposite_output", simple);
   handler->reg_handler("falling_together_group",   simple);
   handler->reg_handler("power_level",              simple);
-  handler->reg_handler("related_pin",              simple);
+  handler->reg_handler("related_pin",              str_simple);
   handler->reg_handler("rising_together_group",    simple);
   handler->reg_handler("switching_interval",       simple);
   handler->reg_handler("switching_together_group", simple);
-  handler->reg_handler("when",                     simple);
+  handler->reg_handler("when",                     func_handler);
 
   // complex attribute
 
@@ -899,6 +902,7 @@ HandlerFactory::new_timing(GroupHandler* parent)
   DotlibHandler* simple = new SimpleHandler(handler, false);
   DotlibHandler* str_simple = new StrSimpleHandler(handler, false);
   DotlibHandler* flt_simple = new FloatSimpleHandler(handler);
+  DotlibHandler* func_handler = new FuncHandler(handler);
 
   handler->reg_handler("related_bus_equivalent",   str_simple);
   handler->reg_handler("related_bus_pins",         str_simple);
@@ -926,9 +930,9 @@ HandlerFactory::new_timing(GroupHandler* parent)
   handler->reg_handler("slope_fall",               flt_simple);
   handler->reg_handler("slope_rise",               flt_simple);
 
-  handler->reg_handler("when",                     str_simple);
-  handler->reg_handler("when_end",                 str_simple);
-  handler->reg_handler("when_start",               str_simple);
+  handler->reg_handler("when",                     func_handler);
+  handler->reg_handler("when_end",                 func_handler);
+  handler->reg_handler("when_start",               func_handler);
 
   // complex attribute
   DotlibHandler* complex = new ComplexHandler(handler);

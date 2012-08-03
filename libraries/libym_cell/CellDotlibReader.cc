@@ -672,6 +672,16 @@ gen_library(const DotlibNode* dt_library)
 
 	CellTiming* timing = NULL;
 	tCellTimingType timing_type = timing_info.timing_type();
+	tCellTimingSense timing_sense = timing_info.timing_sense();
+	const DotlibNode* when_node = timing_info.when();
+	LogExpr cond;
+	if ( when_node ) {
+	  cond = dot2expr(when_node, pin_map);
+	}
+	else {
+	  cond = LogExpr::make_one();
+	}
+
 	switch ( library->delay_model() ) {
 	case CellLibrary::kDelayGenericCmos:
 	  {
@@ -682,6 +692,7 @@ gen_library(const DotlibNode* dt_library)
 	    CellResistance rise_res(timing_info.rise_resistance()->float_value());
 	    CellResistance fall_res(timing_info.fall_resistance()->float_value());
 	    timing = library->new_timing_generic(tid, timing_type,
+						 timing_sense, cond,
 						 intrinsic_rise, intrinsic_fall,
 						 slope_rise, slope_fall,
 						 rise_res, fall_res);
@@ -796,11 +807,13 @@ gen_library(const DotlibNode* dt_library)
 		continue;
 	      }
 	      timing = library->new_timing_lut1(tid, timing_type,
+						timing_sense, cond,
 						cr_lut, cf_lut,
 						rt_lut, ft_lut);
 	    }
 	    else { // cr_lut == NULL && cf_lut == NULL
 	      timing = library->new_timing_lut2(tid, timing_type,
+						timing_sense, cond,
 						rt_lut, ft_lut,
 						rp_lut, fp_lut);
 	    }
@@ -818,8 +831,7 @@ gen_library(const DotlibNode* dt_library)
 	}
 
 	if ( timing ) {
-	  tCellTimingSense timing_sense = timing_info.timing_sense();
-	  library->set_timing(cell_id, iid, oid, timing_sense, timing);
+	  library->set_timing(cell_id, iid, oid, timing);
 	}
 	++ tid;
       }

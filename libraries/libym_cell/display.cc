@@ -153,6 +153,9 @@ display_timing(ostream& s,
       assert_not_reached(__FILE__, __LINE__);
     }
     s << endl;
+    if ( !timing->timing_cond().is_one() ) {
+      s << "    When            = " << timing->timing_cond() << endl;
+    }
     switch ( delay_model ) {
     case CellLibrary::kDelayGenericCmos:
       s << "    Rise Intrinsic  = " << timing->intrinsic_rise() << endl
