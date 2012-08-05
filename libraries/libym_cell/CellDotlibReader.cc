@@ -691,7 +691,7 @@ gen_library(const DotlibNode* dt_library)
 	    CellTime slope_fall(timing_info.slope_fall()->float_value());
 	    CellResistance rise_res(timing_info.rise_resistance()->float_value());
 	    CellResistance fall_res(timing_info.fall_resistance()->float_value());
-	    timing = library->new_timing_generic(tid, timing_type,
+	    timing = library->new_timing_generic(cell_id, iid, oid, timing_type,
 						 timing_sense, cond,
 						 intrinsic_rise, intrinsic_fall,
 						 slope_rise, slope_fall,
@@ -806,13 +806,13 @@ gen_library(const DotlibNode* dt_library)
 				"cell_rise and fall_propagation are mutually exclusive.");
 		continue;
 	      }
-	      timing = library->new_timing_lut1(tid, timing_type,
+	      timing = library->new_timing_lut1(cell_id, iid, oid, timing_type,
 						timing_sense, cond,
 						cr_lut, cf_lut,
 						rt_lut, ft_lut);
 	    }
 	    else { // cr_lut == NULL && cf_lut == NULL
-	      timing = library->new_timing_lut2(tid, timing_type,
+	      timing = library->new_timing_lut2(cell_id, iid, oid, timing_type,
 						timing_sense, cond,
 						rt_lut, ft_lut,
 						rp_lut, fp_lut);
@@ -830,9 +830,6 @@ gen_library(const DotlibNode* dt_library)
 	  break;
 	}
 
-	if ( timing ) {
-	  library->set_timing(cell_id, iid, oid, timing);
-	}
 	++ tid;
       }
     }

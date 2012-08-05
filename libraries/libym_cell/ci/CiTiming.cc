@@ -17,15 +17,12 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] id ID番号
 // @param[in] type タイミング条件の型
 // @param[in] timing_sense タイミングセンス
 // @param[in] cond タイミング条件を表す式
-CiTiming::CiTiming(ymuint id,
-		   tCellTimingType type,
+CiTiming::CiTiming(tCellTimingType type,
 		   tCellTimingSense timing_sense,
 		   const LogExpr& cond) :
-  mId(id),
   mPackedVal((type << 2) | timing_sense),
   mCond(cond)
 {
@@ -34,13 +31,6 @@ CiTiming::CiTiming(ymuint id,
 // @brief デストラクタ
 CiTiming::~CiTiming()
 {
-}
-
-// @brief ID番号を返す．
-ymuint
-CiTiming::id() const
-{
-  return mId;
 }
 
 // @brief 型の取得
@@ -190,7 +180,6 @@ CiTiming::cell_fall() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] id ID番号
 // @param[in] timing_type タイミングの型
 // @param[in] timing_sense タイミングセンス
 // @param[in] cond タイミング条件を表す式
@@ -198,15 +187,14 @@ CiTiming::cell_fall() const
 // @param[in] intrinsic_fall 立ち下がり固有遅延
 // @param[in] slope_rise 立ち上がりスロープ遅延
 // @param[in] slope_fall 立ち下がりスロープ遅延
-CiTimingGP::CiTimingGP(ymuint id,
-		       tCellTimingType timing_type,
+CiTimingGP::CiTimingGP(tCellTimingType timing_type,
 		       tCellTimingSense timing_sense,
 		       const LogExpr& cond,
 		       CellTime intrinsic_rise,
 		       CellTime intrinsic_fall,
 		       CellTime slope_rise,
 		       CellTime slope_fall) :
-  CiTiming(id, timing_type, timing_sense, cond),
+  CiTiming(timing_type, timing_sense, cond),
   mIntrinsicRise(intrinsic_rise),
   mIntrinsicFall(intrinsic_fall),
   mSlopeRise(slope_rise),
@@ -253,7 +241,6 @@ CiTimingGP::slope_fall() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] id ID番号
 // @param[in] timing_type タイミングの型
 // @param[in] timing_sense タイミングセンス
 // @param[in] cond タイミング条件を表す式
@@ -263,8 +250,7 @@ CiTimingGP::slope_fall() const
 // @param[in] slope_fall 立ち下がりスロープ遅延
 // @param[in] rise_resistance 立ち上がり遷移遅延パラメータ
 // @param[in] fall_resistance 立ち下がり遷移遅延パラメータ
-CiTimingGeneric::CiTimingGeneric(ymuint id,
-				 tCellTimingType timing_type,
+CiTimingGeneric::CiTimingGeneric(tCellTimingType timing_type,
 				 tCellTimingSense timing_sense,
 				 const LogExpr& cond,
 				 CellTime intrinsic_rise,
@@ -273,7 +259,7 @@ CiTimingGeneric::CiTimingGeneric(ymuint id,
 				 CellTime slope_fall,
 				 CellResistance rise_resistance,
 				 CellResistance fall_resistance) :
-  CiTimingGP(id, timing_type, timing_sense, cond,
+  CiTimingGP(timing_type, timing_sense, cond,
 	     intrinsic_rise, intrinsic_fall,
 	     slope_rise, slope_fall),
   mRiseResistance(rise_resistance),
@@ -307,7 +293,6 @@ CiTimingGeneric::fall_resistance() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] id ID番号
 // @param[in] timing_type タイミングの型
 // @param[in] timing_sense タイミングセンス
 // @param[in] cond タイミング条件を表す式
@@ -315,8 +300,7 @@ CiTimingGeneric::fall_resistance() const
 // @param[in] intrinsic_fall 立ち下がり固有遅延
 // @param[in] slope_rise 立ち上がりスロープ遅延
 // @param[in] slope_fall 立ち下がりスロープ遅延
-CiTimingPiecewise::CiTimingPiecewise(ymuint id,
-				     tCellTimingType timing_type,
+CiTimingPiecewise::CiTimingPiecewise(tCellTimingType timing_type,
 				     tCellTimingSense timing_sense,
 				     const LogExpr& cond,
 				     CellTime intrinsic_rise,
@@ -325,7 +309,7 @@ CiTimingPiecewise::CiTimingPiecewise(ymuint id,
 				     CellTime slope_fall,
 				     CellResistance rise_pin_resistance,
 				     CellResistance fall_pin_resistance) :
-  CiTimingGP(id, timing_type, timing_sense, cond,
+  CiTimingGP(timing_type, timing_sense, cond,
 	     intrinsic_rise, intrinsic_fall,
 	     slope_rise, slope_fall),
   mRisePinResistance(rise_pin_resistance),
@@ -374,7 +358,6 @@ CiTimingPiecewise::fall_delay_intercept() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] id ID番号
 // @param[in] timing_type タイミングの型
 // @param[in] timing_sense タイミングセンス
 // @param[in] cond タイミング条件を表す式
@@ -382,15 +365,14 @@ CiTimingPiecewise::fall_delay_intercept() const
 // @param[in] cell_fall 立ち下がりセル遅延テーブル
 // @param[in] rise_transition 立ち上がり遷移遅延テーブル
 // @param[in] fall_transition 立ち下がり遷移遅延テーブル
-CiTimingLut1::CiTimingLut1(ymuint id,
-			   tCellTimingType timing_type,
+CiTimingLut1::CiTimingLut1(tCellTimingType timing_type,
 			   tCellTimingSense timing_sense,
 			   const LogExpr& cond,
 			   CellLut* cell_rise,
 			   CellLut* cell_fall,
 			   CellLut* rise_transition,
 			   CellLut* fall_transition) :
-  CiTiming(id, timing_type, timing_sense, cond),
+  CiTiming(timing_type, timing_sense, cond),
   mCellRise(cell_rise),
   mCellFall(cell_fall),
   mRiseTransition(rise_transition),
@@ -437,7 +419,6 @@ CiTimingLut1::fall_transition() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] id ID番号
 // @param[in] timing_type タイミングの型
 // @param[in] timing_sense タイミングセンス
 // @param[in] cond タイミング条件を表す式
@@ -445,15 +426,14 @@ CiTimingLut1::fall_transition() const
 // @param[in] fall_transition 立ち下がり遷移遅延テーブル
 // @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
 // @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
-CiTimingLut2::CiTimingLut2(ymuint id,
-			   tCellTimingType timing_type,
+CiTimingLut2::CiTimingLut2(tCellTimingType timing_type,
 			   tCellTimingSense timing_sense,
 			   const LogExpr& cond,
 			   CellLut* rise_transition,
 			   CellLut* fall_transition,
 			   CellLut* rise_propagation,
 			   CellLut* fall_propagation) :
-  CiTiming(id, timing_type, timing_sense, cond),
+  CiTiming(timing_type, timing_sense, cond),
   mRiseTransition(rise_transition),
   mFallTransition(fall_transition),
   mRisePropagation(rise_propagation),

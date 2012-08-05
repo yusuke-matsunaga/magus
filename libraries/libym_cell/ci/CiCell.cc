@@ -93,7 +93,7 @@ CiCell::CiCell(CiLibrary* library,
   {
     ymuint n = ni2 * no2 * 2;
     void* s = alloc.get_memory(sizeof(const CiTiming*) * n);
-    mTimingArray = new (s) CellTiming*[n];
+    mTimingArray = new (s) CiTiming*[n];
     for (ymuint i = 0; i < n; ++ i) {
       mTimingArray[i] = NULL;
     }

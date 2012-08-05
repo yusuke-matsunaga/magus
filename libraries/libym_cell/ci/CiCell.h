@@ -427,7 +427,7 @@ private:
 
   // タイミング情報を格納する配列
   // サイズは(入力数＋入出力数) x (出力数+入出力ピン数)  x 2
-  CellTiming** mTimingArray;
+  CiTiming** mTimingArray;
 
   // セルグループ
   CellGroup* mCellGroup;

@@ -188,6 +188,10 @@ gen_library(const string& lib_name,
 	}
       }
 
+      if ( redundant ) {
+	continue;
+      }
+
       tCellTimingSense sense = kCellNonUnate;
       switch ( pt_pin->phase()->type() ) {
       case MislibNode::kNoninv:
@@ -221,15 +225,12 @@ gen_library(const string& lib_name,
       CellResistance r_r(pt_pin->rise_fanout_delay()->num());
       CellTime f_i(pt_pin->fall_block_delay()->num());
       CellResistance f_r(pt_pin->fall_fanout_delay()->num());
-      CellTiming* timing = library->new_timing_generic(i,
+      CellTiming* timing = library->new_timing_generic(cell_id, i, 0,
 						       kCellTimingCombinational,
 						       sense, LogExpr::make_one(),
 						       r_i, f_i,
 						       CellTime(0.0), CellTime(0.0),
 						       r_r, f_r);
-      if ( !redundant ) {
-	library->set_timing(cell_id, i, 0, timing);
-      }
     }
   }
 

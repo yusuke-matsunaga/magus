@@ -704,7 +704,9 @@ public:
 		    const string& name) = 0;
 
   /// @brief タイミング情報を作る(ジェネリック遅延モデル)．
-  /// @param[in] id ID番号
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+  /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
   /// @param[in] type タイミングの型
   /// @param[in] timing_sense タイミングセンス
   /// @param[in] cond タイミング条件を表す式
@@ -716,7 +718,9 @@ public:
   /// @param[in] fall_resistance 立ち下がり負荷依存係数
   virtual
   CellTiming*
-  new_timing_generic(ymuint id,
+  new_timing_generic(ymuint cell_id,
+		     ymuint ipin_id,
+		     ymuint opin_id,
 		     tCellTimingType type,
 		     tCellTimingSense timing_sense,
 		     const LogExpr& cond,
@@ -728,7 +732,9 @@ public:
 		     CellResistance fall_resistance) = 0;
 
   /// @brief タイミング情報を作る(折れ線近似)．
-  /// @param[in] id ID番号
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+  /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
   /// @param[in] timing_type タイミングの型
   /// @param[in] timing_sense タイミングセンス
   /// @param[in] cond タイミング条件を表す式
@@ -738,7 +744,9 @@ public:
   /// @param[in] slope_fall 立ち下がりスロープ遅延
   virtual
   CellTiming*
-  new_timing_piecewise(ymuint id,
+  new_timing_piecewise(ymuint cell_id,
+		       ymuint ipin_id,
+		       ymuint opin_id,
 		       tCellTimingType timing_type,
 		       tCellTimingSense timing_sense,
 		       const LogExpr& cond,
@@ -750,7 +758,9 @@ public:
 		       CellResistance fall_pin_resistance) = 0;
 
   /// @brief タイミング情報を作る(非線形タイプ1)．
-  /// @param[in] id ID番号
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+  /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
   /// @param[in] timing_type タイミングの型
   /// @param[in] timing_sense タイミングセンス
   /// @param[in] cond タイミング条件を表す式
@@ -760,7 +770,9 @@ public:
   /// @param[in] fall_transition 立ち下がり遷移遅延テーブル
   virtual
   CellTiming*
-  new_timing_lut1(ymuint id,
+  new_timing_lut1(ymuint cell_id,
+		  ymuint ipin_id,
+		  ymuint opin_id,
 		  tCellTimingType timing_type,
 		  tCellTimingSense timing_sense,
 		  const LogExpr& cond,
@@ -770,7 +782,9 @@ public:
 		  CellLut* fall_transition) = 0;
 
   /// @brief タイミング情報を作る(非線形タイプ2)．
-  /// @param[in] id ID番号
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+  /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
   /// @param[in] timing_type タイミングの型
   /// @param[in] timing_sense タイミングセンス
   /// @param[in] cond タイミング条件を表す式
@@ -780,7 +794,9 @@ public:
   /// @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
   virtual
   CellTiming*
-  new_timing_lut2(ymuint id,
+  new_timing_lut2(ymuint cell_id,
+		  ymuint ipin_id,
+		  ymuint opin_id,
 		  tCellTimingType timing_type,
 		  tCellTimingSense timing_sense,
 		  const LogExpr& cond,
@@ -788,22 +804,6 @@ public:
 		  CellLut* fall_transition,
 		  CellLut* rise_propagation,
 		  CellLut* fall_propagation) = 0;
-
-  /// @brief タイミング情報をセットする．
-  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-  /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
-  /// @param[in] timing 設定するタイミング情報
-  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->output_num() を使う．
-  /// @note ( *2 ) ipin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->input_num() を使う．
-  virtual
-  void
-  set_timing(ymuint cell_id,
-	     ymuint ipin_id,
-	     ymuint opin_id,
-	     CellTiming* timing) = 0;
 
   /// @brief 1次元の LUT を作る．
   /// @param[in] lut_template テンプレート

@@ -38,11 +38,6 @@ public:
   // 共通の属性
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ID番号を返す．
-  virtual
-  ymuint
-  id() const = 0;
-
   /// @brief 型の取得
   virtual
   tCellTimingType
