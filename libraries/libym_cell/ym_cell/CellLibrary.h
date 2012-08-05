@@ -717,7 +717,7 @@ public:
   /// @param[in] rise_resistance 立ち上がり負荷依存係数
   /// @param[in] fall_resistance 立ち下がり負荷依存係数
   virtual
-  CellTiming*
+  void
   new_timing_generic(ymuint cell_id,
 		     ymuint ipin_id,
 		     ymuint opin_id,
@@ -743,7 +743,7 @@ public:
   /// @param[in] slope_rise 立ち上がりスロープ遅延
   /// @param[in] slope_fall 立ち下がりスロープ遅延
   virtual
-  CellTiming*
+  void
   new_timing_piecewise(ymuint cell_id,
 		       ymuint ipin_id,
 		       ymuint opin_id,
@@ -769,7 +769,7 @@ public:
   /// @param[in] rise_transition 立ち上がり遷移遅延テーブル
   /// @param[in] fall_transition 立ち下がり遷移遅延テーブル
   virtual
-  CellTiming*
+  void
   new_timing_lut1(ymuint cell_id,
 		  ymuint ipin_id,
 		  ymuint opin_id,
@@ -793,7 +793,7 @@ public:
   /// @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
   /// @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
   virtual
-  CellTiming*
+  void
   new_timing_lut2(ymuint cell_id,
 		  ymuint ipin_id,
 		  ymuint opin_id,

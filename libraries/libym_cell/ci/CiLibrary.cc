@@ -1092,7 +1092,7 @@ CiLibrary::new_cell_internal(ymuint cell_id,
 // @param[in] slope_fall 立ち下がりスロープ遅延
 // @param[in] rise_resistance 立ち上がり負荷依存係数
 // @param[in] fall_resistance 立ち下がり負荷依存係数
-CellTiming*
+void
 CiLibrary::new_timing_generic(ymuint cell_id,
 			      ymuint ipin_id,
 			      ymuint opin_id,
@@ -1106,17 +1106,28 @@ CiLibrary::new_timing_generic(ymuint cell_id,
 			      CellResistance rise_resistance,
 			      CellResistance fall_resistance)
 {
-  void* p = mAlloc.get_memory(sizeof(CiTimingGeneric));
-  CiTiming* timing = new (p) CiTimingGeneric(type,
-					     timing_sense, cond,
-					     intrinsic_rise,
-					     intrinsic_fall,
-					     slope_rise,
-					     slope_fall,
-					     rise_resistance,
-					     fall_resistance);
-  set_timing(cell_id, ipin_id, opin_id, timing);
-  return timing;
+  bool non_unate = false;
+  if ( timing_sense == kCellNonUnate ) {
+    timing_sense = kCellPosiUnate;
+    non_unate = true;
+  }
+  for ( ; ; ) {
+    void* p = mAlloc.get_memory(sizeof(CiTimingGeneric));
+    CiTiming* timing = new (p) CiTimingGeneric(type,
+					       timing_sense, cond,
+					       intrinsic_rise,
+					       intrinsic_fall,
+					       slope_rise,
+					       slope_fall,
+					       rise_resistance,
+					       fall_resistance);
+    set_timing(cell_id, ipin_id, opin_id, timing);
+    if ( non_unate == false ) {
+      break;
+    }
+    non_unate = false;
+    timing_sense = kCellNegaUnate;
+  }
 }
 
 // @brief タイミング情報を作る(折れ線近似)．
@@ -1130,7 +1141,7 @@ CiLibrary::new_timing_generic(ymuint cell_id,
 // @param[in] intrinsic_fall 立ち下がり固有遅延
 // @param[in] slope_rise 立ち上がりスロープ遅延
 // @param[in] slope_fall 立ち下がりスロープ遅延
-CellTiming*
+void
 CiLibrary::new_timing_piecewise(ymuint cell_id,
 				ymuint ipin_id,
 				ymuint opin_id,
@@ -1144,17 +1155,28 @@ CiLibrary::new_timing_piecewise(ymuint cell_id,
 				CellResistance rise_pin_resistance,
 				CellResistance fall_pin_resistance)
 {
-  void* p = mAlloc.get_memory(sizeof(CiTimingPiecewise));
-  CiTiming* timing = new (p) CiTimingPiecewise(timing_type,
-					       timing_sense, cond,
-					       intrinsic_rise,
-					       intrinsic_fall,
-					       slope_rise,
-					       slope_fall,
-					       rise_pin_resistance,
-					       fall_pin_resistance);
-  set_timing(cell_id, ipin_id, opin_id, timing);
-  return timing;
+  bool non_unate = false;
+  if ( timing_sense == kCellNonUnate ) {
+    timing_sense = kCellPosiUnate;
+    non_unate = true;
+  }
+  for ( ; ; ) {
+    void* p = mAlloc.get_memory(sizeof(CiTimingPiecewise));
+    CiTiming* timing = new (p) CiTimingPiecewise(timing_type,
+						 timing_sense, cond,
+						 intrinsic_rise,
+						 intrinsic_fall,
+						 slope_rise,
+						 slope_fall,
+						 rise_pin_resistance,
+						 fall_pin_resistance);
+    set_timing(cell_id, ipin_id, opin_id, timing);
+    if ( non_unate == false ) {
+      break;
+    }
+    non_unate = false;
+    timing_sense = kCellNegaUnate;
+  }
 }
 
 // @brief タイミング情報を作る(非線形タイプ1)．
@@ -1166,7 +1188,7 @@ CiLibrary::new_timing_piecewise(ymuint cell_id,
 // @param[in] cond タイミング条件を表す式
 // @param[in] cell_rise 立ち上がりセル遅延テーブル
 // @param[in] cell_fall 立ち下がりセル遅延テーブル
-CellTiming*
+void
 CiLibrary::new_timing_lut1(ymuint cell_id,
 			   ymuint ipin_id,
 			   ymuint opin_id,
@@ -1178,15 +1200,26 @@ CiLibrary::new_timing_lut1(ymuint cell_id,
 			   CellLut* rise_transition,
 			   CellLut* fall_transition)
 {
-  void* p = mAlloc.get_memory(sizeof(CiTimingLut1));
-  CiTiming* timing = new (p) CiTimingLut1(timing_type,
-					  timing_sense, cond,
-					  cell_rise,
-					  cell_fall,
-					  rise_transition,
-					  fall_transition);
-  set_timing(cell_id, ipin_id, opin_id, timing);
-  return timing;
+  bool non_unate = false;
+  if ( timing_sense == kCellNonUnate ) {
+    timing_sense = kCellPosiUnate;
+    non_unate = true;
+  }
+  for ( ; ; ) {
+    void* p = mAlloc.get_memory(sizeof(CiTimingLut1));
+    CiTiming* timing = new (p) CiTimingLut1(timing_type,
+					    timing_sense, cond,
+					    cell_rise,
+					    cell_fall,
+					    rise_transition,
+					    fall_transition);
+    set_timing(cell_id, ipin_id, opin_id, timing);
+    if ( non_unate == false ) {
+      break;
+    }
+    non_unate = false;
+    timing_sense = kCellNegaUnate;
+  }
 }
 
 // @brief タイミング情報を作る(非線形タイプ2)．
@@ -1200,7 +1233,7 @@ CiLibrary::new_timing_lut1(ymuint cell_id,
 // @param[in] fall_transition 立ち下がり遷移遅延テーブル
 // @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
 // @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
-CellTiming*
+void
 CiLibrary::new_timing_lut2(ymuint cell_id,
 			   ymuint ipin_id,
 			   ymuint opin_id,
@@ -1212,15 +1245,26 @@ CiLibrary::new_timing_lut2(ymuint cell_id,
 			   CellLut* rise_propagation,
 			   CellLut* fall_propagation)
 {
-  void* p = mAlloc.get_memory(sizeof(CiTimingLut2));
-  CiTiming* timing = new (p) CiTimingLut2(timing_type,
-					  timing_sense, cond,
-					  rise_transition,
-					  fall_transition,
-					  rise_propagation,
-					  fall_propagation);
-  set_timing(cell_id, ipin_id, opin_id, timing);
-  return timing;
+  bool non_unate = false;
+  if ( timing_sense == kCellNonUnate ) {
+    timing_sense = kCellPosiUnate;
+    non_unate = true;
+  }
+  for ( ; ; ) {
+    void* p = mAlloc.get_memory(sizeof(CiTimingLut2));
+    CiTiming* timing = new (p) CiTimingLut2(timing_type,
+					    timing_sense, cond,
+					    rise_transition,
+					    fall_transition,
+					    rise_propagation,
+					    fall_propagation);
+    set_timing(cell_id, ipin_id, opin_id, timing);
+    if ( non_unate == false ) {
+      break;
+    }
+    non_unate = false;
+    timing_sense = kCellNegaUnate;
+  }
 }
 
 // @brief タイミング情報をセットする．
@@ -1241,26 +1285,25 @@ CiLibrary::set_timing(ymuint cell_id,
   CiCell* cell = mCellArray[cell_id];
 
   ymuint base = opin_id * cell->input_num2() + ipin_id;
+
+  CiTiming** pprev = NULL;
   switch ( timing->timing_sense() ) {
   case kCellPosiUnate:
-    timing->mNext = cell->mTimingArray[base + 0];
-    cell->mTimingArray[base + 0] = timing;
+    pprev = &cell->mTimingArray[base + 0];
     break;
 
   case kCellNegaUnate:
-    timing->mNext = cell->mTimingArray[base + 1];
-    cell->mTimingArray[base + 1] = timing;
-    break;
-
-  case kCellNonUnate:
-    timing->mNext = cell->mTimingArray[base + 0];
-    cell->mTimingArray[base + 0] = timing;
-    cell->mTimingArray[base + 1] = timing;
+    pprev = &cell->mTimingArray[base + 1];
     break;
 
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
+
+  cout << "set_timing" << endl;
+  for ( ; *pprev != NULL; pprev = &(*pprev)->mNext) ;
+  *pprev = timing;
+  cout << "set_timing end" << endl;
 }
 
 // @brief 1次元の LUT を作る．

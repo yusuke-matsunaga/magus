@@ -12,6 +12,7 @@
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
+#include "ym_cell/CellTiming.h"
 #include "ym_cell/CellArea.h"
 #include "ym_cell/CellResistance.h"
 #include "ym_cell/CellCapacitance.h"
@@ -621,7 +622,6 @@ gen_library(const DotlibNode* dt_library)
     }
 
     // タイミング情報の生成
-    ymuint tid = 0;
     const Cell* cell = library->cell(cell_id);
     for (ymuint i = 0; i < npin; ++ i) {
       const CellPin* opin = cell->pin(i);
@@ -670,7 +670,6 @@ gen_library(const DotlibNode* dt_library)
 	  continue;
 	}
 
-	CellTiming* timing = NULL;
 	tCellTimingType timing_type = timing_info.timing_type();
 	tCellTimingSense timing_sense = timing_info.timing_sense();
 	const DotlibNode* when_node = timing_info.when();
@@ -691,11 +690,11 @@ gen_library(const DotlibNode* dt_library)
 	    CellTime slope_fall(timing_info.slope_fall()->float_value());
 	    CellResistance rise_res(timing_info.rise_resistance()->float_value());
 	    CellResistance fall_res(timing_info.fall_resistance()->float_value());
-	    timing = library->new_timing_generic(cell_id, iid, oid, timing_type,
-						 timing_sense, cond,
-						 intrinsic_rise, intrinsic_fall,
-						 slope_rise, slope_fall,
-						 rise_res, fall_res);
+	    library->new_timing_generic(cell_id, iid, oid, timing_type,
+					timing_sense, cond,
+					intrinsic_rise, intrinsic_fall,
+					slope_rise, slope_fall,
+					rise_res, fall_res);
 	  }
 	  break;
 
@@ -806,16 +805,16 @@ gen_library(const DotlibNode* dt_library)
 				"cell_rise and fall_propagation are mutually exclusive.");
 		continue;
 	      }
-	      timing = library->new_timing_lut1(cell_id, iid, oid, timing_type,
-						timing_sense, cond,
-						cr_lut, cf_lut,
-						rt_lut, ft_lut);
+	      library->new_timing_lut1(cell_id, iid, oid, timing_type,
+				       timing_sense, cond,
+				       cr_lut, cf_lut,
+				       rt_lut, ft_lut);
 	    }
 	    else { // cr_lut == NULL && cf_lut == NULL
-	      timing = library->new_timing_lut2(cell_id, iid, oid, timing_type,
-						timing_sense, cond,
-						rt_lut, ft_lut,
-						rp_lut, fp_lut);
+	      library->new_timing_lut2(cell_id, iid, oid, timing_type,
+				       timing_sense, cond,
+				       rt_lut, ft_lut,
+				       rp_lut, fp_lut);
 	    }
 	  }
 	  break;
@@ -829,8 +828,6 @@ gen_library(const DotlibNode* dt_library)
 	case CellLibrary::kDelayDcm:
 	  break;
 	}
-
-	++ tid;
       }
     }
 

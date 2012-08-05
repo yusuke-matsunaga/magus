@@ -24,7 +24,8 @@ CiTiming::CiTiming(tCellTimingType type,
 		   tCellTimingSense timing_sense,
 		   const LogExpr& cond) :
   mPackedVal((type << 2) | timing_sense),
-  mCond(cond)
+  mCond(cond),
+  mNext(NULL)
 {
 }
 
