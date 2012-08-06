@@ -23,9 +23,83 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
-BEGIN_NONAMESPACE
+// @brief ストリーム出力演算子
+// @param[in] s 出力先のストリーム
+// @param[in] timing_sense タイミングセンス
+// @return s を返す．
+ostream&
+operator<<(ostream& s,
+	   tCellTimingSense timing_sense)
+{
+  switch ( timing_sense ) {
+  case kCellPosiUnate: s << "posi_unate"; break;
+  case kCellNegaUnate: s << "nega_unate"; break;
+  case kCellNonUnate:  s << "non_unate"; break;
+  default: assert_not_reached(__FILE__, __LINE__);
+  }
+  return s;
+}
 
-// tCellVarType を出力する．
+// @brief ストリーム出力演算子
+// @param[in] s 出力先のストリーム
+// @param[in] timing_type タイミング条件
+// @return s を返す．
+ostream&
+operator<<(ostream& s,
+	   tCellTimingType timing_type)
+{
+  switch ( timing_type ) {
+  case kCellTimingCombinational:         s << "combinational"; break;
+  case kCellTimingCombinationalRise:     s << "combinational_rise"; break;
+  case kCellTimingCombinationalFall:     s << "combinational_fall"; break;
+
+  case kCellTimingThreeStateEnable:      s << "three_state_enable"; break;
+  case kCellTimingThreeStateDisable:     s << "three_state_disable"; break;
+  case kCellTimingThreeStateEnableRise:  s << "three_state_enable_rise"; break;
+  case kCellTimingThreeStateEnableFall:  s << "three_state_enable_fall"; break;
+  case kCellTimingThreeStateDisableRise: s << "three_state_disable_rise"; break;
+  case kCellTimingThreeStateDisableFall: s << "three_state_disable_fall"; break;
+
+  case kCellTimingRisingEdge:            s << "rising_edge"; break;
+  case kCellTimingFallingEdge:           s << "falling_edge"; break;
+
+  case kCellTimingPreset:                s << "preset"; break;
+  case kCellTimingClear:                 s << "clear"; break;
+
+  case kCellTimingHoldRising:            s << "hold_rising"; break;
+  case kCellTimingHoldFalling:           s << "hold_falling"; break;
+
+  case kCellTimingSetupRising:           s << "setup_rising"; break;
+  case kCellTimingSetupFalling:          s << "setup_falling"; break;
+
+  case kCellTimingRecoveryRising:        s << "recover_rising"; break;
+  case kCellTimingRecoveryFalling:       s << "recover_falling"; break;
+
+  case kCellTimingSkewRising:            s << "skew_rising"; break;
+  case kCellTimingSkewFalling:           s << "skew_falling"; break;
+
+  case kCellTimingRemovalRising:         s << "removal_rising"; break;
+  case kCellTimingRemovalFalling:        s << "removal_falling"; break;
+
+  case kCellTimingNonSeqSetupRising:     s << "non_seq_setup_rising"; break;
+  case kCellTimingNonSeqSetupFalling:    s << "non_seq_setup_falling"; break;
+  case kCellTimingNonSeqHoldRising:      s << "non_seq_hold_rising"; break;
+  case kCellTimingNonSeqHoldFalling:     s << "non_seq_hold_falling"; break;
+
+  case kCellTimingNochangeHighHigh:      s << "nochange_high_high"; break;
+  case kCellTimingNochangeHighLow:       s << "nochange_high_low"; break;
+  case kCellTimingNochangeLowHigh:       s << "nochange_low_high"; break;
+  case kCellTimingNochangeLowLow:        s << "nochange_low_low"; break;
+
+  default: assert_not_reached(__FILE__, __LINE__);
+  }
+  return s;
+}
+
+// @brief ストリーム出力演算子
+// @param[in] s 出力先のストリーム
+// @param[in] var_type 変数の型
+// @return s を返す．
 ostream&
 operator<<(ostream& s,
 	   tCellVarType var_type)
@@ -43,9 +117,13 @@ operator<<(ostream& s,
   case kVarConstrainedPinTransition: s << "constrained_pin_transition"; break;
   case kVarRelatedPinTransition: s << "related_pin_transition"; break;
   case kVarNone: s << "none"; break;
+
+  default: assert_not_reached(__FILE__, __LINE__);
   }
   return s;
 }
+
+BEGIN_NONAMESPACE
 
 // LUT の情報を出力する．
 void

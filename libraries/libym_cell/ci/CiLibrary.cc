@@ -1284,26 +1284,17 @@ CiLibrary::set_timing(ymuint cell_id,
 {
   CiCell* cell = mCellArray[cell_id];
 
-  ymuint base = opin_id * cell->input_num2() + ipin_id;
-
-  CiTiming** pprev = NULL;
+  ymuint base = (opin_id * cell->input_num2() + ipin_id) * 2;
   switch ( timing->timing_sense() ) {
-  case kCellPosiUnate:
-    pprev = &cell->mTimingArray[base + 0];
-    break;
-
-  case kCellNegaUnate:
-    pprev = &cell->mTimingArray[base + 1];
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
+  case kCellPosiUnate: break;
+  case kCellNegaUnate: base += 1; break;
+  default: assert_not_reached(__FILE__, __LINE__);
   }
 
-  cout << "set_timing" << endl;
+  CiTiming** pprev = &cell->mTimingArray[base];
+
   for ( ; *pprev != NULL; pprev = &(*pprev)->mNext) ;
   *pprev = timing;
-  cout << "set_timing end" << endl;
 }
 
 // @brief 1次元の LUT を作る．

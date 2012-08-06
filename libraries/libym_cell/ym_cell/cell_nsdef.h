@@ -48,6 +48,14 @@ enum tCellTimingSense {
   kCellNonUnate  = 3
 };
 
+/// @brief ストリーム出力演算子
+/// @param[in] s 出力先のストリーム
+/// @param[in] timing_sense タイミングセンス
+/// @return s を返す．
+ostream&
+operator<<(ostream& s,
+	   tCellTimingSense timing_sense);
+
 
 /////////////////////////////////////////////////////////////////////
 /// @brief タイミング情報の型を表す列挙型
@@ -96,6 +104,14 @@ enum tCellTimingType {
   kCellTimingNochangeLowLow         = 30
 };
 
+/// @brief ストリーム出力演算子
+/// @param[in] s 出力先のストリーム
+/// @param[in] timing_type タイミング条件
+/// @return s を返す．
+ostream&
+operator<<(ostream& s,
+	   tCellTimingType timing_type);
+
 
 //////////////////////////////////////////////////////////////////////
 /// @brief ルックアップテーブルの変数の型
@@ -119,6 +135,14 @@ enum tCellVarType {
 
   kVarNone
 };
+
+/// @brief ストリーム出力演算子
+/// @param[in] s 出力先のストリーム
+/// @param[in] var_type 変数の型
+/// @return s を返す．
+ostream&
+operator<<(ostream& s,
+	   tCellVarType var_type);
 
 
 //////////////////////////////////////////////////////////////////////
