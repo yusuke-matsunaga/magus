@@ -323,12 +323,12 @@ gen_library(const DotlibNode* dt_library)
     const list<const DotlibNode*>& dt_pin_list = cell_info.pin_list();
     const list<const DotlibNode*>& dt_bus_list = cell_info.bus_list();
     const list<const DotlibNode*>& dt_bundle_list = cell_info.bundle_list();
-    ymuint npin = dt_pin_list.size();
+    ymuint npg = dt_pin_list.size();
     ymuint nbus = dt_bus_list.size();
     ymuint nbundle = dt_bundle_list.size();
 
     // ピン情報の配列
-    vector<DotlibPin> pin_info_array(npin);
+    vector<DotlibPin> pin_info_array(npg);
 
     // ピン名とピン番号の連想配列
     hash_map<ShString, ymuint> pin_map;
@@ -339,35 +339,36 @@ gen_library(const DotlibNode* dt_library)
     ymuint nio = 0;
     ymuint nit = 0;
     {
-      ymuint pin_id = 0;
+      ymuint pg_id = 0;
       bool error = false;
       for (list<const DotlibNode*>::const_iterator q = dt_pin_list.begin();
-	   q != dt_pin_list.end(); ++ q, ++ pin_id) {
+	   q != dt_pin_list.end(); ++ q, ++ pg_id) {
 	const DotlibNode* dt_pin = *q;
 
 	// ピン情報の読み出し
-	DotlibPin& pin_info = pin_info_array[pin_id];
+	DotlibPin& pin_info = pin_info_array[pg_id];
 	if ( !pin_info.set_data(dt_pin) ) {
 	  error = true;
 	  continue;
 	}
 
 	// 各タイプの個数のカウント
+	ymuint nn = pin_info.num();
 	switch ( pin_info.direction() ) {
 	case DotlibPin::kInput:
-	  ++ ni;
+	  ni += nn;
 	  break;
 
 	case DotlibPin::kOutput:
-	  ++ no;
+	  no += nn;
 	  break;
 
 	case DotlibPin::kInout:
-	  ++ nio;
+	  nio += nn;
 	  break;
 
 	case DotlibPin::kInternal:
-	  ++ nit;
+	  nit += nn;
 	  break;
 
 	default:
@@ -378,26 +379,31 @@ gen_library(const DotlibNode* dt_library)
       if ( error ) {
 	continue;
       }
-      assert_cond( pin_id == npin, __FILE__, __LINE__);
+      assert_cond( pg_id == npg, __FILE__, __LINE__);
     }
     ymuint ni2 = ni + nio;
+    ymuint npin = ni + no + nio + nit;
 
     // ピン名とピン番号の対応づけを行う．
     {
       ymuint ipos = 0;
       ymuint itpos = 0;
-      for (ymuint pin_id = 0; pin_id < npin; ++ pin_id) {
-	DotlibPin& pin_info = pin_info_array[pin_id];
+      for (ymuint pg_id = 0; pg_id < npg; ++ pg_id) {
+	DotlibPin& pin_info = pin_info_array[pg_id];
 	switch ( pin_info.direction() ) {
 	case DotlibPin::kInput:
 	case DotlibPin::kInout:
-	  pin_map.insert(make_pair(pin_info.name(), ipos));
-	  ++ ipos;
+	  for (ymuint i = 0; i < pin_info.num(); ++ i) {
+	    pin_map.insert(make_pair(pin_info.name(i), ipos));
+	    ++ ipos;
+	  }
 	  break;
 
 	case DotlibPin::kInternal:
-	  pin_map.insert(make_pair(pin_info.name(), itpos + ni2));
-	  ++ itpos;
+	  for (ymuint i = 0; i < pin_info.num(); ++ i) {
+	    pin_map.insert(make_pair(pin_info.name(i), itpos + ni2));
+	    ++ itpos;
+	  }
 	  break;
 
 	default:
@@ -447,11 +453,11 @@ gen_library(const DotlibNode* dt_library)
     output_array.reserve(no2);
     logic_array.reserve(no2);
     tristate_array.reserve(no2);
-    for (ymuint i = 0; i < npin; ++ i) {
-      DotlibPin& pin_info = pin_info_array[i];
+    for (ymuint pg_id = 0; pg_id < npg; ++ pg_id) {
+      DotlibPin& pin_info = pin_info_array[pg_id];
       switch ( pin_info.direction() ) {
       case DotlibPin::kOutput:
-	{
+	for (ymuint i = 0; i < pin_info.num(); ++ i) {
 	  const DotlibNode* func_node = pin_info.function();
 	  if ( func_node ) {
 	    LogExpr expr = dot2expr(func_node, pin_map);
@@ -474,7 +480,7 @@ gen_library(const DotlibNode* dt_library)
 	break;
 
       case DotlibPin::kInout:
-	{
+	for (ymuint i = 0; i < pin_info.num(); ++ i) {
 	  const DotlibNode* func_node = pin_info.function();
 	  if ( func_node ) {
 	    LogExpr expr = dot2expr(func_node, pin_map);
@@ -559,38 +565,46 @@ gen_library(const DotlibNode* dt_library)
     ymuint o_pos = 0;
     ymuint io_pos = 0;
     ymuint it_pos = 0;
-    for (ymuint i = 0; i < npin; ++ i) {
-      const DotlibPin& pin_info = pin_info_array[i];
+    ymuint pin_pos = 0;
+    for (ymuint pg_id = 0; pg_id < npg; ++ pg_id) {
+      const DotlibPin& pin_info = pin_info_array[pg_id];
       switch ( pin_info.direction() ) {
       case DotlibPin::kInput:
-	{ // 入力ピンの生成
+	// 入力ピンの生成
+	for (ymuint i = 0; i < pin_info.num(); ++ i) {
 	  CellCapacitance cap(pin_info.capacitance());
 	  CellCapacitance rise_cap(pin_info.rise_capacitance());
 	  CellCapacitance fall_cap(pin_info.fall_capacitance());
-	  library->new_cell_input(cell_id, i, i_pos, pin_info.name(),
+	  library->new_cell_input(cell_id, pos_id, i_pos,
+				  pin_info.name(i),
 				  cap, rise_cap, fall_cap);
+	  ++ pin_pos;
+	  ++ i_pos;
 	}
-	++ i_pos;
 	break;
 
       case DotlibPin::kOutput:
-	{ // 出力の生成
+	// 出力の生成
+	for (ymuint i = 0; i < pin_info.num(); ++ i) {
 	  CellCapacitance max_fanout(pin_info.max_fanout());
 	  CellCapacitance min_fanout (pin_info.min_fanout());
 	  CellCapacitance max_capacitance(pin_info.max_capacitance());
 	  CellCapacitance min_capacitance(pin_info.min_capacitance());
 	  CellTime max_transition(pin_info.max_transition());
 	  CellTime min_transition(pin_info.min_transition());
-	  library->new_cell_output(cell_id, i, o_pos, pin_info.name(),
+	  library->new_cell_output(cell_id, pin_pos, o_pos,
+				   pin_info.name(i),
 				   max_fanout, min_fanout,
 				   max_capacitance, min_capacitance,
 				   max_transition, min_transition);
+	  ++ pin_pos;
+	  ++ o_pos;
 	}
-	++ o_pos;
 	break;
 
       case DotlibPin::kInout:
-	{ // 入出力ピンの生成
+	// 入出力ピンの生成
+	for (ymuint i = 0; i < pin_info.num(); ++ i) {
 	  CellCapacitance cap(pin_info.capacitance());
 	  CellCapacitance rise_cap(pin_info.rise_capacitance());
 	  CellCapacitance fall_cap(pin_info.fall_capacitance());
@@ -602,18 +616,25 @@ gen_library(const DotlibNode* dt_library)
 	  CellTime min_transition(pin_info.min_transition());
 	  ymuint i_pos2 = io_pos + ni;
 	  ymuint o_pos2 = io_pos + no;
-	  library->new_cell_inout(cell_id, i, i_pos2, o_pos2, pin_info.name(),
+	  library->new_cell_inout(cell_id, pin_pos, i_pos2, o_pos2,
+				  pin_info.name(i),
 				  cap, rise_cap, fall_cap,
 				  max_fanout, min_fanout,
 				  max_capacitance, min_capacitance,
 				  max_transition, min_transition);
+	  ++ pin_pos;
+	  ++ io_pos;
 	}
-	++ io_pos;
 	break;
 
       case DotlibPin::kInternal:
-	library->new_cell_internal(cell_id, i, it_pos, pin_info.name());
-	++ it_pos;
+	// 内部ピンの生成
+	for (ymuint i = 0; i < pin_info.num(); ++ i) {
+	  library->new_cell_internal(cell_id, pin_pos, it_pos,
+				     pin_info.name(i));
+	  ++ pin_pos;
+	  ++ it_pos;
+	}
 	break;
 
       default:
@@ -623,19 +644,48 @@ gen_library(const DotlibNode* dt_library)
 
     // タイミング情報の生成
     const Cell* cell = library->cell(cell_id);
-    for (ymuint i = 0; i < npin; ++ i) {
+    ymuint timing_id = 0;
+    for (ymuint pg_id = 0; pg_id < npg; ++ pg_id) {
+      const DotlibPin& pin_info = pin_info_array[pg_id];
+      ymuint n = pin_info.num();
+      const list<const DotlibNode*>& timing_list = pin_info.timing_list();
+      for (list<const DotlibNode*>::const_iterator p = timing_list.begin();
+	   p != timing_list.end(); ++ p) {
+	const DotlibNode* dt_timing = *p;
+	DotlibTiming timing_info;
+	if ( !timing_info.set_data(dt_timing) ) {
+	  continue;
+	}
+
+	tCellTimingType timing_type = timing_info.timing_type();
+	tCellTimingSense timing_sense = timing_info.timing_sense();
+	const DotlibNode* when_node = timing_info.when();
+	LogExpr cond;
+	if ( when_node ) {
+	  cond = dot2expr(when_node, pin_map);
+	}
+	else {
+	  cond = LogExpr::make_one();
+	}
+
+
+      }
+    }
+
+#if 0
       const CellPin* opin = cell->pin(i);
       if ( !opin->is_output() && !opin->is_inout() ) {
 	continue;
       }
       ymuint oid = opin->output_id();
-      const DotlibPin& pin_info = pin_info_array[i];
       bool has_logic = cell->has_logic(oid);
       TvFunc tv_function;
       if ( has_logic ) {
 	LogExpr expr = cell->logic_expr(oid);
 	tv_function = expr.make_tv(ni2);
       }
+#endif
+
       const list<const DotlibNode*>& timing_list = pin_info.timing_list();
       for (list<const DotlibNode*>::const_iterator p = timing_list.begin();
 	   p != timing_list.end(); ++ p) {
@@ -668,17 +718,6 @@ gen_library(const DotlibNode* dt_library)
 			  "DOTLIB_PARSER",
 			  "No 'related_pin' attribute.");
 	  continue;
-	}
-
-	tCellTimingType timing_type = timing_info.timing_type();
-	tCellTimingSense timing_sense = timing_info.timing_sense();
-	const DotlibNode* when_node = timing_info.when();
-	LogExpr cond;
-	if ( when_node ) {
-	  cond = dot2expr(when_node, pin_map);
-	}
-	else {
-	  cond = LogExpr::make_one();
 	}
 
 	switch ( library->delay_model() ) {

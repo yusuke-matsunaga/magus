@@ -1079,12 +1079,23 @@ CiLibrary::new_cell_internal(ymuint cell_id,
   pin->mInternalId = internal_id;
 }
 
+// @brief タイミング情報の数を設定する．
+// @param[in] cell_id セル番号
+// @param[in] timing_num タイミング情報の数．
+void
+CiLibrary::set_timing_num(ymuint cell_id,
+			  ymuint timing_num)
+{
+  CiCell* cell = mCellArray[cell_id];
+  cell->mTimingNum = timing_num;
+  void* p = mAlloc.get_memory(sizeof(CiTiming*) * timing_num);
+  cell->mTimingArray = new (p) CiTiming*[timing_num];
+}
+
 // @brief タイミング情報を作る(ジェネリック遅延モデル)．
 // @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
-// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
+// @param[in] tid タイミングID ( 0 <= tid < cell->timing_num() )
 // @param[in] type タイミングの型
-// @param[in] timing_sense タイミングセンス
 // @param[in] cond タイミング条件を表す式
 // @param[in] intrinsic_rise 立ち上がり固有遅延
 // @param[in] intrinsic_fall 立ち下がり固有遅延
@@ -1094,10 +1105,8 @@ CiLibrary::new_cell_internal(ymuint cell_id,
 // @param[in] fall_resistance 立ち下がり負荷依存係数
 void
 CiLibrary::new_timing_generic(ymuint cell_id,
-			      ymuint ipin_id,
-			      ymuint opin_id,
+			      ymuint tid,
 			      tCellTimingType type,
-			      tCellTimingSense timing_sense,
 			      const LogExpr& cond,
 			      CellTime intrinsic_rise,
 			      CellTime intrinsic_fall,
@@ -1106,36 +1115,22 @@ CiLibrary::new_timing_generic(ymuint cell_id,
 			      CellResistance rise_resistance,
 			      CellResistance fall_resistance)
 {
-  bool non_unate = false;
-  if ( timing_sense == kCellNonUnate ) {
-    timing_sense = kCellPosiUnate;
-    non_unate = true;
-  }
-  for ( ; ; ) {
-    void* p = mAlloc.get_memory(sizeof(CiTimingGeneric));
-    CiTiming* timing = new (p) CiTimingGeneric(type,
-					       timing_sense, cond,
-					       intrinsic_rise,
-					       intrinsic_fall,
-					       slope_rise,
-					       slope_fall,
-					       rise_resistance,
-					       fall_resistance);
-    set_timing(cell_id, ipin_id, opin_id, timing);
-    if ( non_unate == false ) {
-      break;
-    }
-    non_unate = false;
-    timing_sense = kCellNegaUnate;
-  }
+  void* p = mAlloc.get_memory(sizeof(CiTimingGeneric));
+  CiTiming* timing = new (p) CiTimingGeneric(type, cond,
+					     intrinsic_rise,
+					     intrinsic_fall,
+					     slope_rise,
+					     slope_fall,
+					     rise_resistance,
+					     fall_resistance);
+  CiCell* cell = mCellArray[cell_id];
+  cell->mTimingArray[tid] = timing;
 }
 
 // @brief タイミング情報を作る(折れ線近似)．
 // @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
-// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
+// @param[in] tid タイミングID ( 0 <= tid < cell->timing_num() )
 // @param[in] timing_type タイミングの型
-// @param[in] timing_sense タイミングセンス
 // @param[in] cond タイミング条件を表す式
 // @param[in] intrinsic_rise 立ち上がり固有遅延
 // @param[in] intrinsic_fall 立ち下がり固有遅延
@@ -1143,10 +1138,8 @@ CiLibrary::new_timing_generic(ymuint cell_id,
 // @param[in] slope_fall 立ち下がりスロープ遅延
 void
 CiLibrary::new_timing_piecewise(ymuint cell_id,
-				ymuint ipin_id,
-				ymuint opin_id,
+				ymuint tid,
 				tCellTimingType timing_type,
-				tCellTimingSense timing_sense,
 				const LogExpr& cond,
 				CellTime intrinsic_rise,
 				CellTime intrinsic_fall,
@@ -1155,79 +1148,49 @@ CiLibrary::new_timing_piecewise(ymuint cell_id,
 				CellResistance rise_pin_resistance,
 				CellResistance fall_pin_resistance)
 {
-  bool non_unate = false;
-  if ( timing_sense == kCellNonUnate ) {
-    timing_sense = kCellPosiUnate;
-    non_unate = true;
-  }
-  for ( ; ; ) {
-    void* p = mAlloc.get_memory(sizeof(CiTimingPiecewise));
-    CiTiming* timing = new (p) CiTimingPiecewise(timing_type,
-						 timing_sense, cond,
-						 intrinsic_rise,
-						 intrinsic_fall,
-						 slope_rise,
-						 slope_fall,
-						 rise_pin_resistance,
-						 fall_pin_resistance);
-    set_timing(cell_id, ipin_id, opin_id, timing);
-    if ( non_unate == false ) {
-      break;
-    }
-    non_unate = false;
-    timing_sense = kCellNegaUnate;
-  }
+  void* p = mAlloc.get_memory(sizeof(CiTimingPiecewise));
+  CiTiming* timing = new (p) CiTimingPiecewise(timing_type, cond,
+					       intrinsic_rise,
+					       intrinsic_fall,
+					       slope_rise,
+					       slope_fall,
+					       rise_pin_resistance,
+					       fall_pin_resistance);
+  CiCell* cell = mCellArray[cell_id];
+  cell->mTimingArray[tid] = timing;
 }
 
 // @brief タイミング情報を作る(非線形タイプ1)．
 // @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
-// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
+// @param[in] tid タイミングID ( 0 <= tid < cell->timing_num() )
 // @param[in] timing_type タイミングの型
-// @param[in] timing_sense タイミングセンス
 // @param[in] cond タイミング条件を表す式
 // @param[in] cell_rise 立ち上がりセル遅延テーブル
 // @param[in] cell_fall 立ち下がりセル遅延テーブル
 void
 CiLibrary::new_timing_lut1(ymuint cell_id,
-			   ymuint ipin_id,
-			   ymuint opin_id,
+			   ymuint tid,
 			   tCellTimingType timing_type,
-			   tCellTimingSense timing_sense,
 			   const LogExpr& cond,
 			   CellLut* cell_rise,
 			   CellLut* cell_fall,
 			   CellLut* rise_transition,
 			   CellLut* fall_transition)
 {
-  bool non_unate = false;
-  if ( timing_sense == kCellNonUnate ) {
-    timing_sense = kCellPosiUnate;
-    non_unate = true;
-  }
-  for ( ; ; ) {
-    void* p = mAlloc.get_memory(sizeof(CiTimingLut1));
-    CiTiming* timing = new (p) CiTimingLut1(timing_type,
-					    timing_sense, cond,
-					    cell_rise,
-					    cell_fall,
-					    rise_transition,
-					    fall_transition);
-    set_timing(cell_id, ipin_id, opin_id, timing);
-    if ( non_unate == false ) {
-      break;
-    }
-    non_unate = false;
-    timing_sense = kCellNegaUnate;
-  }
+  void* p = mAlloc.get_memory(sizeof(CiTimingLut1));
+  CiTiming* timing = new (p) CiTimingLut1(timing_type, cond,
+					  cell_rise,
+					  cell_fall,
+					  rise_transition,
+					  fall_transition);
+  CiCell* cell = mCellArray[cell_id];
+  cell->mTimingArray[tid] = timing;
 }
 
 // @brief タイミング情報を作る(非線形タイプ2)．
 // @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
-// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
+// @param[in] tid タイミングID ( 0 <= tid < cell->timing_num() )
 // @param[in] timing_type タイミングの型
-// @param[in] timing_sense タイミングセンス
 // @param[in] cond タイミング条件を表す式
 // @param[in] rise_transition 立ち上がり遷移遅延テーブル
 // @param[in] fall_transition 立ち下がり遷移遅延テーブル
@@ -1235,42 +1198,29 @@ CiLibrary::new_timing_lut1(ymuint cell_id,
 // @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
 void
 CiLibrary::new_timing_lut2(ymuint cell_id,
-			   ymuint ipin_id,
-			   ymuint opin_id,
+			   ymuint tid,
 			   tCellTimingType timing_type,
-			   tCellTimingSense timing_sense,
 			   const LogExpr& cond,
 			   CellLut* rise_transition,
 			   CellLut* fall_transition,
 			   CellLut* rise_propagation,
 			   CellLut* fall_propagation)
 {
-  bool non_unate = false;
-  if ( timing_sense == kCellNonUnate ) {
-    timing_sense = kCellPosiUnate;
-    non_unate = true;
-  }
-  for ( ; ; ) {
-    void* p = mAlloc.get_memory(sizeof(CiTimingLut2));
-    CiTiming* timing = new (p) CiTimingLut2(timing_type,
-					    timing_sense, cond,
-					    rise_transition,
-					    fall_transition,
-					    rise_propagation,
-					    fall_propagation);
-    set_timing(cell_id, ipin_id, opin_id, timing);
-    if ( non_unate == false ) {
-      break;
-    }
-    non_unate = false;
-    timing_sense = kCellNegaUnate;
-  }
+  void* p = mAlloc.get_memory(sizeof(CiTimingLut2));
+  CiTiming* timing = new (p) CiTimingLut2(timing_type, cond,
+					  rise_transition,
+					  fall_transition,
+					  rise_propagation,
+					  fall_propagation);
+  CiCell* cell = mCellArray[cell_id];
+  cell->mTimingArray[tid] = timing;
 }
 
 // @brief タイミング情報をセットする．
 // @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
 // @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
 // @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
+// @param[in] timing_sense タイミングセンス
 // @param[in] timing_id 設定するタイミング情報の番号
 // @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
 //  + cell->output_num() を使う．
@@ -1280,18 +1230,19 @@ void
 CiLibrary::set_timing(ymuint cell_id,
 		      ymuint ipin_id,
 		      ymuint opin_id,
-		      CiTiming* timing)
+		      tCellTimingSense timing_sense,
+		      ymuint timing_id)
 {
   CiCell* cell = mCellArray[cell_id];
-
+  CiTiming* timing = cell->mTimingArray[timing_id];
   ymuint base = (opin_id * cell->input_num2() + ipin_id) * 2;
-  switch ( timing->timing_sense() ) {
+  switch ( timing_sense ) {
   case kCellPosiUnate: break;
   case kCellNegaUnate: base += 1; break;
   default: assert_not_reached(__FILE__, __LINE__);
   }
 
-  CiTiming** pprev = &cell->mTimingArray[base];
+  CiTiming** pprev = &cell->mTimingMap[base];
 
   for ( ; *pprev != NULL; pprev = &(*pprev)->mNext) ;
   *pprev = timing;

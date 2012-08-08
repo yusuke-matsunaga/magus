@@ -768,7 +768,7 @@ HandlerFactory::new_bundle(GroupHandler* parent)
 DotlibHandler*
 HandlerFactory::new_pin(GroupHandler* parent)
 {
-  GroupHandler* handler = new Str1GroupHandler(parent);
+  GroupHandler* handler = new GroupHandler(parent);
 
   // simple attributes
   DotlibHandler* simple = new SimpleHandler(handler, false);

@@ -54,9 +54,14 @@ public:
   bool
   set_data(const DotlibNode* pin_node);
 
+  /// @brief 名前のリストの要素数を返す．
+  ymuint
+  num() const;
+
   /// @brief 名前を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < num() )
   ShString
-  name() const;
+  name(ymuint pos) const;
 
   /// @brief "direction" を返す．
   tDirection
@@ -124,8 +129,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ピン名
-  ShString mName;
+  // ピン名のリスト
+  vector<ShString> mNameList;
 
   // "direction"
   tDirection mDirection;

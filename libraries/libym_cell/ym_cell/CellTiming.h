@@ -43,21 +43,11 @@ public:
   tCellTimingType
   type() const = 0;
 
-  /// @brief タイミングセンスの取得
-  virtual
-  tCellTimingSense
-  timing_sense() const = 0;
-
   /// @brief タイミング条件式の取得
   /// @note ない場合には定数1の式が返される．
   virtual
   LogExpr
   timing_cond() const = 0;
-
-  /// @brief 次の要素の取得
-  virtual
-  const CellTiming*
-  next() const = 0;
 
 
 public:

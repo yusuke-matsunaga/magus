@@ -23,6 +23,12 @@ class CiBus;
 class CiBundle;
 class CiTiming;
 
+struct CiTimingArray
+{
+  ymuint32 mNum;
+  CiTiming* mArray[1];
+};
+
 //////////////////////////////////////////////////////////////////////
 /// @class CiCell CiCell.h "CiCell.h"
 /// @brief Cell の実装クラス
@@ -219,17 +225,39 @@ public:
   // タイミング情報の取得
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief タイミング情報の数の取得
+  virtual
+  ymuint
+  timing_num() const;
+
+  /// @brief タイミング情報の取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < timing_num() )
+  virtual
+  const CellTiming*
+  timing(ymuint pos) const;
+
+  /// @brief 条件に合致するタイミング情報の数の取得
+  /// @param[in] ipos 開始ピン番号 ( 0 <= ipos < input_num2() )
+  /// @param[in] opos 終了ピン番号 ( 0 <= opos < output_num2() )
+  /// @param[in] timing_sense タイミング情報の摘要条件
+  virtual
+  ymuint
+  timing_num(ymuint ipos,
+	     ymuint opos,
+	     tCellTimingSense sense) const;
+
   /// @brief タイミング情報の取得
   /// @param[in] ipos 開始ピン番号
   /// @param[in] opos 終了ピン番号
   /// @param[in] timing_sense タイミング情報の摘要条件
+  /// @param[in] pos 位置番号 ( 0 <= pos < timing_num(ipos, opos, timing_sense) )
   /// @return 条件に合致するタイミング情報を返す．
-  /// @note なければ NULL を返す．
   virtual
   const CellTiming*
   timing(ymuint ipos,
 	 ymuint opos,
-	 tCellTimingSense sense) const;
+	 tCellTimingSense sense,
+	 ymuint pos) const;
 
 
 public:
@@ -437,9 +465,15 @@ private:
   // バンドルピンの配列
   CiBundle* mBundleArray;
 
+  // タイミング情報の数
+  ymuint32 mTimingNum;
+
   // タイミング情報を格納する配列
-  // サイズは(入力数＋入出力数) x (出力数+入出力ピン数)  x 2
   CiTiming** mTimingArray;
+
+  // 条件ごとのタイミング情報のリストの配列
+  // サイズは(入力数＋入出力数) x (出力数+入出力ピン数)  x 2
+  CiTimingList* mTimingList;
 
   // セルグループ
   CellGroup* mCellGroup;

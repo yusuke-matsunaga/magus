@@ -42,8 +42,23 @@ DotlibPin::set_data(const DotlibNode* pin_node)
 
   mTimingList.clear();
 
-  // 名前を設定する．
-  mName = pin_node->group_value()->get_string_from_value_list();
+  // 名前のリストを設定する．
+  const DotlibNode* list_node = pin_node->group_value();
+  ymuint n = list_node->list_size();
+  mNameList.clear();
+  mNameList.resize(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    const DotlibNode* str_node = list_node->list_elem(i);
+    if ( !str_node->is_string() ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      str_node->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error. string value expected");
+      return false;
+    }
+    mName[i] = str_node->string_value();
+  }
 
   // 属性のリストを作る．
   for (const DotlibAttr* attr = pin_node->attr_top();
@@ -229,11 +244,20 @@ DotlibPin::set_data(const DotlibNode* pin_node)
   return true;
 }
 
-// @brief 名前を返す．
-ShString
-DotlibPin::name() const
+// @brief 名前のリストの要素数を返す．
+ymuint
+DotlibPin::num() const
 {
-  return mName;
+  return mNameList.size();
+}
+
+// @brief 名前を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < num() )
+ShString
+DotlibPin::name(ymuint pos) const
+{
+  assert_cond( pos < num(), __FILE__, __LINE__);
+  return mNameList[pos];
 }
 
 // @brief "direction" を返す．
