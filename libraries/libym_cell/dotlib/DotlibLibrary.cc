@@ -35,7 +35,7 @@ DotlibLibrary::set_data(const DotlibNode* lib_node)
   init();
 
   mTechnology = CellLibrary::kTechCmos;
-  mDelayModel = CellLibrary::kDelayGenericCmos;
+  mDelayModel = kCellDelayGenericCmos;
   mBusNamingStyle = NULL;
   mComment = NULL;
   mDate = NULL;
@@ -97,23 +97,23 @@ DotlibLibrary::set_data(const DotlibNode* lib_node)
   if ( !get_singleton_or_null("delay_model", dm_node) ) {
     return false;
   }
-  CellLibrary::tDelayModel delay_model = CellLibrary::kDelayGenericCmos;
+  tCellDelayModel delay_model = kCellDelayGenericCmos;
   if ( dm_node != NULL ) {
     ShString value = dm_node->string_value();
     if ( value == "generic_cmos" ) {
-      delay_model = CellLibrary::kDelayGenericCmos;
+      delay_model = kCellDelayGenericCmos;
     }
     else if ( value == "table_lookup" ) {
-      delay_model = CellLibrary::kDelayTableLookup;
+      delay_model = kCellDelayTableLookup;
     }
     else if ( value == "piecewise_cmos" ) {
-      delay_model = CellLibrary::kDelayPiecewiseCmos;
+      delay_model = kCellDelayPiecewiseCmos;
     }
     else if ( value == "cmos2" ) {
-      delay_model = CellLibrary::kDelayCmos2;
+      delay_model = kCellDelayCmos2;
     }
     else if ( value == "dcm" ) {
-      delay_model = CellLibrary::kDelayDcm;
+      delay_model = kCellDelayDcm;
     }
     else {
       ostringstream buf;
@@ -237,7 +237,7 @@ DotlibLibrary::technology() const
 }
 
 // @brief "delay_model" を返す．
-CellLibrary::tDelayModel
+tCellDelayModel
 DotlibLibrary::delay_model() const
 {
   return mDelayModel;

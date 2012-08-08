@@ -47,7 +47,7 @@ public:
   technology() const;
 
   /// @brief "delay_model" を返す．
-  CellLibrary::tDelayModel
+  tCellDelayModel
   delay_model() const;
 
   /// @brief "bus_naming_style" を返す．
@@ -116,7 +116,7 @@ private:
   CellLibrary::tTechnology mTechnology;
 
   // "delay_model"
-  CellLibrary::tDelayModel mDelayModel;
+  tCellDelayModel mDelayModel;
 
   // "bus_naming_style"
   const DotlibNode* mBusNamingStyle;

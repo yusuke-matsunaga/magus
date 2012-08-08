@@ -25,6 +25,25 @@ BEGIN_NAMESPACE_YM_CELL
 
 // @brief ストリーム出力演算子
 // @param[in] s 出力先のストリーム
+// @param[in] delay_mode 遅延モード
+// @return s を返す．
+ostream&
+operator<<(ostream& s,
+	   tCellDelayModel delay_model)
+{
+  switch ( delay_model ) {
+  case kCellDelayGenericCmos:   s << "generic_cmos"; break;
+  case kCellDelayTableLookup:   s << "table_lookup"; break;
+  case kCellDelayPiecewiseCmos: s << "piecewise_cmos"; break;
+  case kCellDelayCmos2:         s << "cmos2"; break;
+  case kCellDelayDcm:           s << "dcm"; break;
+  default: assert_not_reached(__FILE__, __LINE__);
+  }
+  return s;
+}
+
+// @brief ストリーム出力演算子
+// @param[in] s 出力先のストリーム
 // @param[in] timing_sense タイミングセンス
 // @return s を返す．
 ostream&
@@ -213,7 +232,7 @@ display_timing(ostream& s,
 	       ymuint ipos,
 	       ymuint opos,
 	       tCellTimingSense sense,
-	       CellLibrary::tDelayModel delay_model)
+	       tCellDelayModel delay_model)
 {
   for (const CellTiming* timing = cell->timing(ipos, opos, sense);
        timing != NULL; timing = timing->next()) {
@@ -235,14 +254,14 @@ display_timing(ostream& s,
       s << "    When            = " << timing->timing_cond() << endl;
     }
     switch ( delay_model ) {
-    case CellLibrary::kDelayGenericCmos:
+    case kCellDelayGenericCmos:
       s << "    Rise Intrinsic  = " << timing->intrinsic_rise() << endl
 	<< "    Rise Resistance = " << timing->rise_resistance() << endl
 	<< "    Fall Intrinsic  = " << timing->intrinsic_fall() << endl
 	<< "    Fall Resistance = " << timing->fall_resistance() << endl;
       break;
 
-    case CellLibrary::kDelayTableLookup:
+    case kCellDelayTableLookup:
       if ( timing->cell_rise() ) {
 	display_lut(s, "Cell Rise", timing->cell_rise());
       }
@@ -264,13 +283,13 @@ display_timing(ostream& s,
       }
       break;
 
-    case CellLibrary::kDelayPiecewiseCmos:
+    case kCellDelayPiecewiseCmos:
       break;
 
-    case CellLibrary::kDelayCmos2:
+    case kCellDelayCmos2:
       break;
 
-    case CellLibrary::kDelayDcm:
+    case kCellDelayDcm:
       break;
     }
   }
@@ -438,17 +457,8 @@ display_library(ostream& s,
   s << endl;
 
   // 遅延モデル
-  CellLibrary::tDelayModel delay_model = library.delay_model();
-  s << "  delay_model: ";
-  switch ( delay_model ) {
-  case CellLibrary::kDelayGenericCmos: s << "generic_cmos"; break;
-  case CellLibrary::kDelayTableLookup: s << "table_lookup"; break;
-  case CellLibrary::kDelayPiecewiseCmos: s << "piecewise_cmos"; break;
-  case CellLibrary::kDelayCmos2: s << "cmos2"; break;
-  case CellLibrary::kDelayDcm:  s << "dcm"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
-  }
-  s << endl;
+  tCellDelayModel delay_model = library.delay_model();
+  s << "  delay_model: " << delay_model << endl;
 
   // バス命名規則
   s << "  bus_naming_style: " << library.bus_naming_style() << endl;

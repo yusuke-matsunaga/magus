@@ -182,39 +182,13 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 設定用の仮想関数
+  // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
-#if 0
-  /// @brief 出力ピン(入出力ピン)の関数を設定する．
-  /// @param[in] function 関数を表す論理式
-  virtual
+  /// @brief dump 用の共通情報を出力する．
   void
-  set_function(const LogExpr& function);
-#endif
+  dump_common(BinO& s) const;
 
-  /// @brief 出力ピン(入出力ピン)の three_state 条件を設定する．
-  /// @param[in] expr three_state 条件を表す論理式
-  virtual
-  void
-  set_three_state(const LogExpr& expr);
-
-#if 0
-  /// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
-  virtual
-  void
-  set_timing_array(const CellTiming** timing_array);
-
-  /// @brief 出力ピン(入出力ピン)のタイミング情報を設定する．
-  /// @param[in] pin_id 入力ピンのピン番号
-  /// @param[in] sense タイミング情報の適用条件
-  /// @param[in] timing 設定するタイミング情報
-  virtual
-  void
-  set_timing(ymuint pin_id,
-	     tTimingSense sense,
-	     const CellTiming* timing);
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -305,6 +279,18 @@ public:
   virtual
   CellCapacitance
   fall_capacitance() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(BinO& s) const;
 
 
 private:
@@ -439,22 +425,17 @@ private:
   void
   set_three_state(const LogExpr& three_state);
 
-#if 0
-  /// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
-  virtual
-  void
-  set_timing_array(const CellTiming** timing_array);
 
-  /// @brief 出力ピン(入出力ピン)のタイミング情報を設定する．
-  /// @param[in] pin_id 入力ピンのピン番号
-  /// @param[in] sense タイミング情報の適用条件
-  /// @param[in] timing 設定するタイミング情報
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
   virtual
   void
-  set_timing(ymuint pin_id,
-	     tTimingSense sense,
-	     const CellTiming* timing);
-#endif
+  dump(BinO& s) const;
 
 
 private:
@@ -547,6 +528,18 @@ public:
   bool
   is_output() const;
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(BinO& s) const;
+
 };
 
 
@@ -634,6 +627,18 @@ public:
   fall_capacitance() const;
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(BinO& s) const;
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -702,6 +707,18 @@ public:
   virtual
   ymuint
   internal_id() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(BinO& s) const;
 
 
 private:

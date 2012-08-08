@@ -31,16 +31,6 @@ public:
     kTechFpga
   };
 
-  //////////////////////////////////////////////////////////////////////
-  /// @brief 遅延モデルを表す列挙型
-  //////////////////////////////////////////////////////////////////////
-  enum tDelayModel {
-    kDelayGenericCmos,
-    kDelayTableLookup,
-    kDelayPiecewiseCmos,
-    kDelayCmos2,
-    kDelayDcm
-  };
 
 public:
 
@@ -78,14 +68,14 @@ public:
 
   /// @brief 遅延モデルの取得
   /// 返り値は
-  /// - kDelayGenericCmos
-  /// - kDelayTableLookup
-  /// - kDelayPiecewiseCmos
-  /// - kDelayCmos2
-  /// - kDelayDcm
+  /// - kCellDelayGenericCmos
+  /// - kCellDelayTableLookup
+  /// - kCellDelayPiecewiseCmos
+  /// - kCellDelayCmos2
+  /// - kCellDelayDcm
   /// のいずれか
   virtual
-  tDelayModel
+  tCellDelayModel
   delay_model() const = 0;
 
   /// @brief バス命名規則の取得
@@ -390,7 +380,7 @@ public:
   /// @param[in] delay_model 遅延モデル．
   virtual
   void
-  set_delay_model(tDelayModel delay_model) = 0;
+  set_delay_model(tCellDelayModel delay_model) = 0;
 
   /// @brief 'capacitive_load_unit' を設定する．
   /// @param[in] unit 単位

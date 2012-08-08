@@ -163,6 +163,18 @@ public:
   const CellLut*
   cell_fall() const = 0;
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(BinO& s) const = 0;
+
 };
 
 END_NAMESPACE_YM_CELL

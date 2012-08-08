@@ -69,12 +69,14 @@ public:
 
   /// @brief 遅延モデルの取得
   /// 返り値は
-  /// - kDelayGeneric
-  /// - kDelayPiecewise
-  /// - kDelayNonlinear
+  /// - kCellDelayGenericCmos
+  /// - kCellDelayPiecewiseCmos
+  /// - kCellDelayTableLookup
+  /// - kCellDelayCmos2
+  /// - kCellDelayDcm
   /// のいずれか
   virtual
-  tDelayModel
+  tCellDelayModel
   delay_model() const;
 
   /// @brief バス命名規則の取得
@@ -379,7 +381,7 @@ public:
   /// @param[in] delay_model 遅延モデル．
   virtual
   void
-  set_delay_model(tDelayModel delay_model);
+  set_delay_model(tCellDelayModel delay_model);
 
   /// @brief 'capacitive_load_unit' を設定する．
   /// @param[in] unit 単位
@@ -940,7 +942,7 @@ private:
   string mLeakagePowerUnit;
 
   // 遅延モデル
-  tDelayModel mDelayModel;
+  tCellDelayModel mDelayModel;
 
   // 遅延テンプレート数
   ymuint32 mLutTemplateNum;

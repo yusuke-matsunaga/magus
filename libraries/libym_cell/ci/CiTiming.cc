@@ -175,6 +175,19 @@ CiTiming::cell_fall() const
   return NULL;
 }
 
+// @brief 共通な情報をダンプする．
+// @param[in] s 出力先のストリーム
+// @param[in] type_id 型の ID
+void
+CiTiming::dump_common(BinO& s,
+		      ymuint8 type_id) const
+{
+  s << type_id
+    << static_cast<ymuint8>(timing->type())
+    << static_cast<ymuint8>(timing->timing_sense())
+    << timing->timing_cond();
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス CiTimingGB
@@ -288,6 +301,21 @@ CiTimingGeneric::fall_resistance() const
   return mFallResistance;
 }
 
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+CiTimingGeneric::dump(BinO& s) const
+{
+  dump_common(s, 0);
+
+  s << intrinsic_rise()
+    << intrinsic_fall()
+    << slope_rise()
+    << slope_fall()
+    << rise_resistance()
+    << fall_resistance();
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス CiTimingPiecewise
@@ -353,6 +381,19 @@ CiTimingPiecewise::fall_delay_intercept() const
   return CellTime(0.0);
 }
 
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+CiTimingPiecewise::dump(BinO& s) const
+{
+  dump_common(s, 1);
+
+  s << intrinsic_rise()
+    << intrinsic_fall()
+    << slope_rise()
+    << slope_fall();
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス CiTimingLut1
@@ -414,6 +455,19 @@ CiTimingLut1::fall_transition() const
   return mFallTransition;
 }
 
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+CiTimingLut1::dump(BinO& s) const
+{
+  dump_common(s, 2);
+
+  s << cell_rise()
+    << cell_fall()
+    << rise_transition()
+    << fall_transition();
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス CiTimingLut2
@@ -473,6 +527,19 @@ const CellLut*
 CiTimingLut2::fall_propagation() const
 {
   return mFallPropagation;
+}
+
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+CiTimingLut1::dump(BinO& s) const
+{
+  dump_common(s, 3);
+
+  s << rise_transition()
+    << fall_transition()
+    << rise_propagation()
+    << fall_propagation();
 }
 
 END_NAMESPACE_YM_CELL

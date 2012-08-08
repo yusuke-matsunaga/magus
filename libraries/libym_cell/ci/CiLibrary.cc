@@ -53,7 +53,7 @@ CiLibrary::CiLibrary() :
   mCellHash(mAlloc)
 {
   mTechnology = kTechCmos;
-  mDelayModel = kDelayGenericCmos;
+  mDelayModel = kCellDelayGenericCmos;
 }
 
 // @brief デストラクタ
@@ -77,13 +77,13 @@ CiLibrary::technology() const
 
 // @brief 遅延モデルの取得
 // 返り値は
-// - kDelayGenericCmos
-// - kDelayTableLookup
-// - kDelayPiecewiseCmos
-// - kDelayCmos2
-// - kDelayDcm
+// - kCellDelayGenericCmos
+// - kCellDelayTableLookup
+// - kCellDelayPiecewiseCmos
+// - kCellDelayCmos2
+// - kCellDelayDcm
 // のいずれか
-CellLibrary::tDelayModel
+tCellDelayModel
 CiLibrary::delay_model() const
 {
   return mDelayModel;
@@ -444,7 +444,7 @@ CiLibrary::set_technology(tTechnology technology)
 
 // @brief 遅延モデルを設定する．
 void
-CiLibrary::set_delay_model(tDelayModel delay_model)
+CiLibrary::set_delay_model(tCellDelayModel delay_model)
 {
   mDelayModel = delay_model;
 }
@@ -1486,185 +1486,7 @@ CiLibrary::dump(BinO& s) const
   ymuint32 nc = cell_num();
   s << nc;
   for (ymuint i = 0; i < nc; ++ i) {
-    const Cell* cell = this->cell(i);
-    ymuint8 tid = 0;
-    if ( cell->is_logic() ) {
-      tid = 0;
-    }
-    else if ( cell->is_ff() ) {
-      tid = 1;
-    }
-    else if ( cell->is_latch() ) {
-      tid = 2;
-    }
-    else if ( cell->is_fsm() ) {
-      tid = 3;
-    }
-    else {
-      // 無視？
-      assert_not_reached(__FILE__, __LINE__);
-    }
-    ymuint32 ni = cell->input_num();
-    ymuint32 no = cell->output_num();
-    ymuint32 nio = cell->inout_num();
-    ymuint32 nit = cell->internal_num();
-    ymuint32 nbus = cell->bus_num();
-    ymuint32 nbundle = cell->bundle_num();
-
-    s << tid
-      << cell->name()
-      << cell->area()
-      << ni
-      << no
-      << nio
-      << nit
-      << nbus
-      << nbundle;
-
-    ymuint no2 = no + nio;
-    for (ymuint opos = 0; opos < no2; ++ opos) {
-      s << cell->has_logic()
-	<< cell->logic_expr(opos)
-	<< cell->tristate_expr(opos);
-    }
-
-    if ( cell->is_ff() ) {
-      s << cell->next_state_expr()
-	<< cell->clock_expr()
-	<< cell->clock2_expr()
-	<< cell->clear_expr()
-	<< cell->preset_expr()
-	<< static_cast<ymuint8>(cell->clear_preset_var1())
-	<< static_cast<ymuint8>(cell->clear_preset_var2());
-    }
-    else if ( cell->is_latch() ) {
-      s << cell->data_in_expr()
-	<< cell->enable_expr()
-	<< cell->enable2_expr()
-	<< cell->clear_expr()
-	<< cell->preset_expr()
-	<< static_cast<ymuint8>(cell->clear_preset_var1())
-	<< static_cast<ymuint8>(cell->clear_preset_var2());
-    }
-
-    // 入力ピンのダンプ
-    for (ymuint32 ipin = 0; ipin < ni; ++ ipin) {
-      const CellPin* pin = cell->input(ipin);
-      s << pin->name()
-	<< pin->pin_id()
-	<< pin->capacitance()
-	<< pin->rise_capacitance()
-	<< pin->fall_capacitance();
-    }
-
-    // 出力ピンのダンプ
-    for (ymuint32 opin = 0; opin < no; ++ opin) {
-      const CellPin* pin = cell->output(opin);
-      s << pin->name()
-	<< pin->pin_id()
-	<< pin->max_fanout()
-	<< pin->min_fanout()
-	<< pin->max_capacitance()
-	<< pin->min_capacitance()
-	<< pin->max_transition()
-	<< pin->min_transition();
-    }
-
-    // 入出力ピンのダンプ
-    for (ymuint32 iopin = 0; iopin < nio; ++ iopin) {
-      const CellPin* pin = cell->output(iopin);
-      s << pin->name()
-	<< pin->pin_id()
-	<< pin->capacitance()
-	<< pin->rise_capacitance()
-	<< pin->fall_capacitance()
-	<< pin->max_fanout()
-	<< pin->min_fanout()
-	<< pin->max_capacitance()
-	<< pin->min_capacitance()
-	<< pin->max_transition()
-	<< pin->min_transition();
-    }
-
-    // 内部ピンのダンプ
-    for (ymuint32 itpin = 0; itpin < nit; ++ itpin) {
-      const CellPin* pin = cell->internal(itpin);
-      s << pin->name()
-	<< pin->pin_id();
-    }
-
-#if 0
-    // タイミング情報のID -> 通し番号のマップ
-    hash_map<ymuint32, ymuint32> timing_map;
-    // タイミング情報のリスト
-    vector<const CellTiming*> timing_list;
-    for (ymuint32 ipos = 0; ipos < ni + nio; ++ ipos) {
-      for (ymuint32 opos = 0; opos < no + nio; ++ opos) {
-	const CellTiming* timing_p = cell->timing(ipos, opos, kCellPosiUnate);
-	if ( timing_p ) {
-	  if ( timing_map.count(timing_p->id()) == 0 ) {
-	    ymuint pos = timing_list.size();
-	    timing_map.insert(make_pair(timing_p->id(), pos));
-	    timing_list.push_back(timing_p);
-	  }
-	}
-	const CellTiming* timing_n = cell->timing(ipos, opos, kCellNegaUnate);
-	if ( timing_n ) {
-	  if ( timing_map.count(timing_n->id()) == 0 ) {
-	    ymuint pos = timing_list.size();
-	    timing_map.insert(make_pair(timing_n->id(), pos));
-	    timing_list.push_back(timing_n);
-	  }
-	}
-      }
-    }
-
-    // タイミング情報のダンプ
-    ymuint32 nt = timing_list.size();
-    s << nt;
-    for (ymuint32 j = 0; j < nt; ++ j) {
-      const CellTiming* timing = timing_list[j];
-      s << timing->intrinsic_rise()
-	<< timing->intrinsic_fall()
-	<< timing->slope_rise()
-	<< timing->slope_fall()
-	<< timing->rise_resistance()
-	<< timing->fall_resistance();
-    }
-    for (ymuint32 ipin = 0; ipin < ni + nio; ++ ipin) {
-      for (ymuint32 opin = 0; opin < no + nio; ++ opin) {
-	const CellTiming* timing_p = cell->timing(ipin, opin, kCellPosiUnate);
-	if ( timing_p ) {
-	  hash_map<ymuint, ymuint32>::iterator p = timing_map.find(timing_p->id());
-	  assert_cond( p != timing_map.end(), __FILE__, __LINE__);
-	  s << static_cast<ymuint8>(1)
-	    << ipin
-	    << opin
-	    << p->second;
-	}
-	const CellTiming* timing_n = cell->timing(ipin, opin, kCellNegaUnate);
-	if ( timing_n ) {
-	  hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_n->id());
-	  assert_cond( p != timing_map.end(), __FILE__, __LINE__);
-	  s << static_cast<ymuint8>(2)
-	    << ipin
-	    << opin
-	    << p->second;
-	}
-      }
-    }
-    s << static_cast<ymuint8>(0);
-#else
-
-    // タイミング情報のダンプ
-    for (ymuint32 ipos = 0; ipos < ni + nio; ++ ipos) {
-      for (ymuint32 opos = 0; opos < no + nio; ++ opos) {
-	const CellTiming* timing_p = cell->timing(ipos, opos, kCellPosiUnate);
-
-	const CellTiming* timing_n = cell->timing(ipos, opos, kCellNegaUnate);
-      }
-    }
-#endif
+    cell(i)->dump(s);
   }
 
   // セルクラスの個数だけダンプする．

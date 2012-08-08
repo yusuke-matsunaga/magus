@@ -682,7 +682,7 @@ gen_library(const DotlibNode* dt_library)
 	}
 
 	switch ( library->delay_model() ) {
-	case CellLibrary::kDelayGenericCmos:
+	case kCellDelayGenericCmos:
 	  {
 	    CellTime intrinsic_rise(timing_info.intrinsic_rise()->float_value());
 	    CellTime intrinsic_fall(timing_info.intrinsic_fall()->float_value());
@@ -698,7 +698,7 @@ gen_library(const DotlibNode* dt_library)
 	  }
 	  break;
 
-	case CellLibrary::kDelayTableLookup:
+	case kCellDelayTableLookup:
 	  {
 	    const DotlibNode* cr_node = timing_info.cell_rise();
 	    const DotlibNode* rt_node = timing_info.rise_transition();
@@ -819,13 +819,13 @@ gen_library(const DotlibNode* dt_library)
 	  }
 	  break;
 
-	case CellLibrary::kDelayPiecewiseCmos:
+	case kCellDelayPiecewiseCmos:
 	  break;
 
-	case CellLibrary::kDelayCmos2:
+	case kCellDelayCmos2:
 	  break;
 
-	case CellLibrary::kDelayDcm:
+	case kCellDelayDcm:
 	  break;
 	}
       }
@@ -900,18 +900,6 @@ gen_library(const DotlibNode* dt_library)
 			  "DOTLIB_PARSER",
 			  buf.str());
 	  sense = sense_real;
-	}
-	CellTime r_i(pt_pin->rise_block_delay()->num());
-	CellResistance r_r(pt_pin->rise_fanout_delay()->num());
-	CellTime f_i(pt_pin->fall_block_delay()->num());
-	CellResistance f_r(pt_pin->fall_fanout_delay()->num());
-	CellTiming* timing = library->new_timing(i, kTimingCombinational,
-						 r_i, f_i,
-						 CellTime(0.0),
-						 CellTime(0.0),
-						 r_r, f_r);
-	if ( !redundant ) {
-	  library->set_cell_timing(cell, i, o_pos, sense, timing);
 	}
       }
     }
