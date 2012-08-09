@@ -870,20 +870,14 @@ private:
   add_cell(ymuint id,
 	   CiCell* cell);
 
-  /// @brief タイミング情報をセットする．
-  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-  /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
-  /// @param[in] timing 設定するタイミング情報
-  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->output_num() を使う．
-  /// @note ( *2 ) ipin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->input_num() を使う．
+  /// @brief LUT テンプレートを読み込む．
   void
-  set_timing(ymuint cell_id,
-	     ymuint ipin_id,
-	     ymuint opin_id,
-	     CiTiming* timing);
+  restore_lut_template(BinI& s,
+		       ymuint id);
+
+  /// @brief LUT を読み込む．
+  CellLut*
+  restore_lut(BinI& s);
 
 
 public:

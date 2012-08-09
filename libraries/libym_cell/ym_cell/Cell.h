@@ -359,7 +359,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const = 0;
+  dump(BinO& s) const;
 
 };
 

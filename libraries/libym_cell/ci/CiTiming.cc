@@ -8,9 +8,26 @@
 
 
 #include "CiTiming.h"
+#include "ym_cell/CellLut.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
+
+BEGIN_NONAMESPACE
+
+void
+dump_lut(BinO& s,
+	 const CellLut* lut)
+{
+  if ( lut ) {
+    lut->dump(s);
+  }
+  else {
+    s.write_str(0);
+  }
+}
+
+END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
 // クラス CiTiming
@@ -436,10 +453,10 @@ CiTimingLut1::dump(BinO& s) const
 {
   dump_common(s, 2);
 
-  s << cell_rise()
-    << cell_fall()
-    << rise_transition()
-    << fall_transition();
+  dump_lut(s, cell_rise());
+  dump_lut(s, cell_fall());
+  dump_lut(s, rise_transition());
+  dump_lut(s, fall_transition());
 }
 
 
@@ -508,10 +525,10 @@ CiTimingLut2::dump(BinO& s) const
 {
   dump_common(s, 3);
 
-  s << rise_transition()
-    << fall_transition()
-    << rise_propagation()
-    << fall_propagation();
+  dump_lut(s, rise_transition());
+  dump_lut(s, fall_transition());
+  dump_lut(s, rise_propagation());
+  dump_lut(s, fall_propagation());
 }
 
 END_NAMESPACE_YM_CELL

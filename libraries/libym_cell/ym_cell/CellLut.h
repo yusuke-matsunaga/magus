@@ -10,6 +10,7 @@
 
 
 #include "ym_cell/cell_nsdef.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -61,6 +62,18 @@ public:
   double
   index(ymuint32 var,
 	ymuint32 pos) const = 0;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(BinO& s) const;
 
 };
 
@@ -120,6 +133,18 @@ public:
   virtual
   double
   value(const vector<ymuint32>& pos_array) const = 0;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(BinO& s) const;
 
 
 private:

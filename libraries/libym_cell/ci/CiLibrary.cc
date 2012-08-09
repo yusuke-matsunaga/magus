@@ -1442,10 +1442,57 @@ CiLibrary::dump(BinO& s) const
   // 名前
   s << name();
 
+  // テクノロジ
+  s << static_cast<ymuint8>(technology());
+
+  // 遅延モデル
+  s << static_cast<ymuint8>(delay_model());
+
+  // バス命名規則
+  s << bus_naming_style();
+
+  // 日付情報
+  s << date();
+
+  // リビジョン情報
+  s << revision();
+
+  // コメント
+  s << comment();
+
+  // 時間単位
+  s << time_unit();
+
+  // 電圧単位
+  s << voltage_unit();
+
+  // 電流単位
+  s << current_unit();
+
+  // 抵抗単位
+  s << pulling_resistance_unit();
+
+  // 容量単位
+  s << capacitive_load_unit();
+
+  // 容量単位の文字列
+  s << capacitive_load_unit_str();
+
+  // 電力単位
+  s << leakage_power_unit();
+
+  // 遅延テーブルのテンプレート
+  ymuint32 ntempl = lu_table_template_num();
+  s << ntempl;
+  for (ymuint i = 0; i < ntempl; ++ i) {
+    lu_table_template(i)->dump(s);
+  }
+
   // セル数
   ymuint32 nc = cell_num();
   s << nc;
   for (ymuint i = 0; i < nc; ++ i) {
+    // セルの内容をダンプ
     cell(i)->dump(s);
   }
 
@@ -1488,6 +1535,76 @@ CiLibrary::restore(BinI& s)
   s >> name;
 
   set_name(name);
+
+  ymuint8 tmp1;
+  ymuint8 tmp2;
+  s >> tmp1
+    >> tmp2;
+  tTechnology technology = static_cast<tTechnology>(tmp1);
+  tCellDelayModel delay_model = static_cast<tCellDelayModel>(tmp2);
+
+  set_technology(technology);
+  set_delay_model(delay_model);
+
+  string bus_naming_style;
+  s >> bus_naming_style;
+
+  set_attr("bus_naming_style", bus_naming_style);
+
+  string date;
+  s >> date;
+
+  set_attr("date", date);
+
+
+  string revision;
+  s >> revision;
+
+  set_attr("revision", revision);
+
+  string comment;
+  s >> comment;
+
+  set_attr("comment", comment);
+
+  string time_unit;
+  s >> time_unit;
+
+  set_attr("time_unit", time_unit);
+
+  string voltage_unit;
+  s >> voltage_unit;
+
+  set_attr("voltage_unit", voltage_unit);
+
+  string current_unit;
+  s >> current_unit;
+
+  set_attr("current_unit", current_unit);
+
+  string pulling_resistance_unit;
+  s >> pulling_resistance_unit;
+
+  set_attr("pulling_resistance_unit", pulling_resistance_unit);
+
+  double capacitive_unit;
+  string capacitive_unit_str;
+  s >> capacitive_unit
+    >> capacitive_unit_str;
+
+  set_capacitive_load_unit(capacitive_unit, capacitive_unit_str);
+
+  string leakage_power_unit;
+  s >> leakage_power_unit;
+
+  set_attr("leakage_power_unit", leakage_power_unit);
+
+  ymuint32 lut_num;
+  s >> lut_num;
+  set_lu_table_template_num(lut_num);
+  for (ymuint i = 0; i < lut_num; ++ i) {
+    restore_lut_template(s, i);
+  }
 
   ymuint32 nc;
   s >> nc;
@@ -1606,7 +1723,7 @@ CiLibrary::restore(BinI& s)
     }
 
     // 入力ピンの設定
-    for (ymuint j = 0; j < ni; ++ j) {
+    for (ymuint iid = 0; iid < ni; ++ iid) {
       string name;
       ymuint32 pin_id;
       CellCapacitance cap;
@@ -1617,11 +1734,11 @@ CiLibrary::restore(BinI& s)
 	>> cap
 	>> r_cap
 	>> f_cap;
-      new_cell_input(cell_id, pin_id, j, name, cap, r_cap, f_cap);
+      new_cell_input(cell_id, pin_id, iid, name, cap, r_cap, f_cap);
     }
 
     // 出力ピンの設定
-    for (ymuint j = 0; j < no; ++ j) {
+    for (ymuint oid = 0; oid < no; ++ oid) {
       string name;
       ymuint32 pin_id;
       CellCapacitance max_f;
@@ -1638,14 +1755,14 @@ CiLibrary::restore(BinI& s)
 	>> min_c
 	>> max_t
 	>> min_t;
-      new_cell_output(cell_id, pin_id, j, name,
+      new_cell_output(cell_id, pin_id, oid, name,
 		      max_f, min_f,
 		      max_c, min_c,
 		      max_t, min_t);
     }
 
     // 入出力ピンの設定
-    for (ymuint j = 0; j < nio; ++ j) {
+    for (ymuint ioid = 0; ioid < nio; ++ ioid) {
       string name;
       ymuint32 pin_id;
       CellCapacitance cap;
@@ -1668,7 +1785,7 @@ CiLibrary::restore(BinI& s)
 	>> min_c
 	>> max_t
 	>> min_t;
-      new_cell_inout(cell_id, pin_id, j + ni, j + no, name,
+      new_cell_inout(cell_id, pin_id, ioid + ni, ioid + no, name,
 		     cap, r_cap, f_cap,
 		     max_f, min_f,
 		     max_c, min_c,
@@ -1676,58 +1793,135 @@ CiLibrary::restore(BinI& s)
     }
 
     // 内部ピンの設定
-    for (ymuint j = 0; j < nit; ++ j) {
+    for (ymuint itid = 0; itid < nit; ++ itid) {
       string name;
       ymuint32 pin_id;
       s >> name
 	>> pin_id;
-      new_cell_internal(cell_id, pin_id, j, name);
+      new_cell_internal(cell_id, pin_id, itid, name);
     }
 
     // タイミング情報の生成
     ymuint32 nt;
     s >> nt;
     vector<CellTiming*> tmp_list(nt);
-    for (ymuint j = 0; j < nt; ++ j) {
-      CellTime i_r;
-      CellTime i_f;
-      CellTime s_r;
-      CellTime s_f;
-      CellResistance r_r;
-      CellResistance f_r;
-      s >> i_r
-	>> i_f
-	>> s_r
-	>> s_f
-	>> r_r
-	>> f_r;
-#if 0
-      CellTiming* timing = new_timing_generic(j, kCellTimingCombinational,
-					      i_r, i_f, s_r, s_f, r_r, f_r);
-      tmp_list[j] = timing;
-#endif
-    }
+    for (ymuint tid = 0; tid < nt; ++ tid) {
+      ymuint8 ttype;
+      ymuint8 tmp;
+      LogExpr cond;
+      s >> ttype
+	>> tmp
+	>> cond;
+      tCellTimingType timing_type = static_cast<tCellTimingType>(tmp);
 
+      switch ( ttype ) {
+      case 0:
+	{
+	  CellTime i_r;
+	  CellTime i_f;
+	  CellTime s_r;
+	  CellTime s_f;
+	  CellResistance r_r;
+	  CellResistance f_r;
+	  s >> i_r
+	    >> i_f
+	    >> s_r
+	    >> s_f
+	    >> r_r
+	    >> f_r;
+	  new_timing_generic(cell_id, tid,
+			     timing_type,
+			     cond,
+			     i_r, i_f,
+			     s_r, s_f,
+			     r_r, f_r);
+	}
+	break;
+
+      case 1:
+	{
 #if 0
-    // タイミング情報の設定
-    for ( ; ; ) {
-      ymuint8 unate;
-      s >> unate;
-      if ( unate == 0 ) {
-	// エンドマーカー
+	  CellTime i_r;
+	  CellTime i_f;
+	  CellTime s_r;
+	  CellTime s_f;
+	  s >> i_r
+	    >> i_f
+	    >> s_r
+	    >> s_f;
+	  new_timing_piecewise(cell_id, tid,
+			       timing_type,
+			       cond,
+			       i_r, i_f,
+			       s_r, s_f);
+#endif
+	}
+	break;
+
+      case 2:
+	{
+	  CellLut* cell_rise = restore_lut(s);
+	  CellLut* cell_fall = restore_lut(s);
+	  CellLut* rise_transition = restore_lut(s);
+	  CellLut* fall_transition = restore_lut(s);
+	  new_timing_lut1(cell_id, tid,
+			  timing_type,
+			  cond,
+			  cell_rise,
+			  cell_fall,
+			  rise_transition,
+			  fall_transition);
+	}
+	break;
+
+      case 3:
+	{
+	  CellLut* rise_transition = restore_lut(s);
+	  CellLut* fall_transition = restore_lut(s);
+	  CellLut* rise_propagation = restore_lut(s);
+	  CellLut* fall_propagation = restore_lut(s);
+	  new_timing_lut1(cell_id, tid,
+			  timing_type,
+			  cond,
+			  rise_transition,
+			  fall_transition,
+			  rise_propagation,
+			  fall_propagation);
+	}
+	break;
+
+      default:
+	assert_not_reached(__FILE__, __LINE__);
 	break;
       }
-      ymuint32 ipin_id;
-      ymuint32 opin_id;
-      ymuint32 timing_id;
-      s >> ipin_id
-	>> opin_id
-	>> timing_id;
-      tCellTimingSense sense = ( unate == 1 ) ? kCellPosiUnate : kCellNegaUnate;
-      CellTiming* timing = tmp_list[timing_id];
-      set_timing(cell_id, ipin_id, opin_id, timing);
     }
-#endif
+
+    // タイミング情報の設定
+    for (ymuint ipos = 0; ipos < ni + nio; ++ ipos) {
+      for (ymuint opos = 0; opos < no + nio; ++ opos) {
+	ymuint32 np;
+	s >> np;
+	vector<ymuint> tid_list;
+	tid_list.reserve(np);
+	for (ymuint i = 0; i < np; ++ i) {
+	  ymuint32 tid;
+	  s >> tid;
+	  tid_list.push_back(tid);
+	}
+	set_timing(cell_id, ipos, opos, kCellPosiUnate, tid_list);
+
+	ymuint32 nn;
+	s >> nn;
+	tid_list.clear();
+	tid_list.reserve(nn);
+	for (ymuint i = 0; i < nn; ++ i) {
+	  ymuint32 tid;
+	  s >> tid;
+	  tid_list.push_back(tid);
+	}
+	set_timing(cell_id, ipos, opos, kCellNegaUnate, tid_list);
+      }
+    }
   }
 
   // セルクラス数とグループ数の取得
@@ -1785,6 +1979,231 @@ CiLibrary::get_pin(const CiCell* cell,
 		   ShString name)
 {
   return mPinHash.get(cell, name);
+}
+
+// @brief LUT テンプレートを読み込む．
+void
+CiLibrary::restore_lut_template(BinI& s,
+				ymuint id)
+{
+  string name;
+  ymuint8 d;
+  s >> name
+    >> d;
+  switch ( d ) {
+  case 1:
+    {
+      ymuint8 tmp;
+      s >> tmp;
+      tCellVarType var_type = static_cast<tCellVarType>(tmp);
+      ymuint8 n;
+      s >> n;
+      vector<double> index_array(n);
+      for (ymuint i = 0; i < n; ++ i) {
+	double val;
+	s >> val;
+	index_array[i] = val;
+      }
+
+      new_lut_template1(id, name,
+			var_type, index_array);
+    }
+    break;
+
+  case 2:
+    {
+      ymuint8 tmp1;
+      s >> tmp1;
+      tCellVarType var_type1 = static_cast<tCellVarType>(tmp1);
+      ymuint8 n1;
+      s >> n1;
+      vector<double> index_array1(n1);
+      for (ymuint i = 0; i < n1; ++ i) {
+	double val;
+	s >> val;
+	index_array1[i] = val;
+      }
+
+      ymuint8 tmp2;
+      s >> tmp2;
+      tCellVarType var_type2 = static_cast<tCellVarType>(tmp2);
+      ymuint8 n2;
+      s >> n2;
+      vector<double> index_array2(n2);
+      for (ymuint i = 0; i < n2; ++ i) {
+	double val;
+	s >> val;
+	index_array2[i] = val;
+      }
+
+      new_lut_template2(id, name,
+			var_type1, index_array1,
+			var_type2, index_array2);
+    }
+    break;
+
+  case 3:
+    {
+      ymuint8 tmp1;
+      s >> tmp1;
+      tCellVarType var_type1 = static_cast<tCellVarType>(tmp1);
+      ymuint8 n1;
+      s >> n1;
+      vector<double> index_array1(n1);
+      for (ymuint i = 0; i < n1; ++ i) {
+	double val;
+	s >> val;
+	index_array1[i] = val;
+      }
+
+      ymuint8 tmp2;
+      s >> tmp2;
+      tCellVarType var_type2 = static_cast<tCellVarType>(tmp2);
+      ymuint8 n2;
+      s >> n2;
+      vector<double> index_array2(n2);
+      for (ymuint i = 0; i < n2; ++ i) {
+	double val;
+	s >> val;
+	index_array2[i] = val;
+      }
+
+      ymuint8 tmp3;
+      s >> tmp3;
+      tCellVarType var_type3 = static_cast<tCellVarType>(tmp3);
+      ymuint8 n3;
+      s >> n3;
+      vector<double> index_array3(n3);
+      for (ymuint i = 0; i < n3; ++ i) {
+	double val;
+	s >> val;
+	index_array3[i] = val;
+      }
+
+      new_lut_template3(id, name,
+			var_type1, index_array1,
+			var_type2, index_array2,
+			var_type3, index_array3);
+    }
+    break;
+  }
+}
+
+// @brief LUT を読み込む．
+CellLut*
+CiLibrary::restore_lut(BinI& s)
+{
+  string template_name;
+  s >> template_name;
+  if ( template_name == string() ) {
+    return NULL;
+  }
+
+  string name;
+  s >> name;
+
+  const CellLutTemplate* templ = lu_table_template(template_name.c_str());
+  assert_cond( templ != NULL, __FILE__, __LINE__);
+
+  ymuint d = templ->dimension();
+  switch ( d ) {
+  case 1:
+    {
+      ymuint8 n;
+      s >> n;
+      vector<double> value_array(n);
+      vector<double> index_array(n);
+      for (ymuint i = 0; i < n; ++ i) {
+	double val;
+	s >> val;
+	index_array[i] = val;
+      }
+      for (ymuint i = 0; i < n; ++ i) {
+	double val;
+	s >> val;
+	value_array[i] = val;
+      }
+      return new_lut1(templ,
+		      value_array,
+		      index_array);
+    }
+
+  case 2:
+    {
+      ymuint8 n1;
+      ymuint8 n2;
+      s >> n1
+	>> n2;
+      ymuint n = n1 * n2;
+      vector<double> value_array(n);
+      vector<double> index_array1(n1);
+      vector<double> index_array2(n2);
+      for (ymuint i = 0; i < n1; ++ i) {
+	double val;
+	s >> val;
+	index_array1[i] = val;
+      }
+      for (ymuint i = 0; i < n2; ++ i) {
+	double val;
+	s >> val;
+	index_array2[i] = val;
+      }
+      for (ymuint i = 0; i < n; ++ i) {
+	double val;
+	s >> val;
+	value_array[i] = val;
+      }
+      return new_lut2(templ,
+		      value_array,
+		      index_array1,
+		      index_array2);
+    }
+
+  case 3:
+    {
+      ymuint8 n1;
+      ymuint8 n2;
+      ymuint8 n3;
+      s >> n1
+	>> n2
+	>> n3;
+      ymuint n = n1 * n2 * n3;
+      vector<double> value_array(n);
+      vector<double> index_array1(n1);
+      vector<double> index_array2(n2);
+      vector<double> index_array3(n3);
+      for (ymuint i = 0; i < n1; ++ i) {
+	double val;
+	s >> val;
+	index_array1[i] = val;
+      }
+      for (ymuint i = 0; i < n2; ++ i) {
+	double val;
+	s >> val;
+	index_array2[i] = val;
+      }
+      for (ymuint i = 0; i < n3; ++ i) {
+	double val;
+	s >> val;
+	index_array3[i] = val;
+      }
+      for (ymuint i = 0; i < n; ++ i) {
+	double val;
+	s >> val;
+	value_array[i] = val;
+      }
+      return new_lut3(templ,
+		      value_array,
+		      index_array1,
+		      index_array2,
+		      index_array3);
+    }
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+  return NULL;
 }
 
 END_NAMESPACE_YM_CELL
