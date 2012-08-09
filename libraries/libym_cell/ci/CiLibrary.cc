@@ -1242,14 +1242,19 @@ CiLibrary::set_timing(ymuint cell_id,
   }
 
   ymuint n = tid_list.size();
-  void* p = mAlloc.get_memory(sizeof(CiTimingArray) + sizeof(CiTiming*) * (n - 1));
-  CiTimingArray* tarray = new (p) CiTimingArray;
-  tarray->mNum = n;
-  for (ymuint i = 0; i < n; ++ i) {
-    ymuint tid = tid_list[i];
-    tarray->mArray[i] = cell->mTimingArray[tid];
+  if ( n == 0 ) {
+    cell->mTimingMap[base] = NULL;
   }
-  cell->mTimingMap[base] = tarray;
+  else {
+    void* p = mAlloc.get_memory(sizeof(CiTimingArray) + sizeof(CiTiming*) * (n - 1));
+    CiTimingArray* tarray = new (p) CiTimingArray;
+    tarray->mNum = n;
+    for (ymuint i = 0; i < n; ++ i) {
+      ymuint tid = tid_list[i];
+      tarray->mArray[i] = cell->mTimingArray[tid];
+    }
+    cell->mTimingMap[base] = tarray;
+  }
 }
 
 // @brief 1次元の LUT を作る．
