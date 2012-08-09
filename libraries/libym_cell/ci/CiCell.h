@@ -473,7 +473,7 @@ private:
 
   // 条件ごとのタイミング情報のリストの配列
   // サイズは(入力数＋入出力数) x (出力数+入出力ピン数)  x 2
-  CiTimingList* mTimingList;
+  CiTimingArray** mTimingMap;
 
   // セルグループ
   CellGroup* mCellGroup;

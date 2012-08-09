@@ -92,10 +92,10 @@ CiCell::CiCell(CiLibrary* library,
 
   {
     ymuint n = ni2 * no2 * 2;
-    void* s = alloc.get_memory(sizeof(const CiTiming*) * n);
-    mTimingArray = new (s) CiTiming*[n];
+    void* s = alloc.get_memory(sizeof(const CiTimingArray*) * n);
+    mTimingMap = new (s) CiTimingArray*[n];
     for (ymuint i = 0; i < n; ++ i) {
-      mTimingArray[i] = NULL;
+      mTimingMap[i] = NULL;
     }
   }
 
@@ -342,7 +342,10 @@ CiCell::timing_num(ymuint ipos,
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
-  return mTimingList[base].mNum;
+  if ( mTimingMap[base] == NULL ) {
+    return 0;
+  }
+  return mTimingMap[base]->mNum;
 }
 
 // @brief タイミング情報の取得
@@ -357,6 +360,7 @@ CiCell::timing(ymuint ipos,
 	       tCellTimingSense sense,
 	       ymuint pos) const
 {
+  assert_cond( pos < timing_num(ipos, opos, sense), __FILE__, __LINE__);
   ymuint base = (opos * input_num2() + ipos) * 2;
   switch ( sense ) {
   case kCellPosiUnate: base += 0; break;
@@ -364,7 +368,7 @@ CiCell::timing(ymuint ipos,
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
-  return mTimingList[base].mArray[pos];
+  return mTimingMap[base]->mArray[pos];
 }
 
 // @brief 属している CellGroup を返す．

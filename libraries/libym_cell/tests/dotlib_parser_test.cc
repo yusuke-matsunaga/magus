@@ -190,7 +190,12 @@ dotlibparser_test(int argc,
 	  if ( !pin_info.set_data(dt_pin) ) {
 	    continue;
 	  }
-	  cout << "    pin name = " << pin_info.name() << endl
+	  cout << "    pin name = ";
+	  ymuint np = pin_info.num();
+	  for (ymuint i = 0; i < np; ++ i) {
+	    cout << " " << pin_info.name(i);
+	  }
+	  cout << endl
 	       << "        direction = ";
 	  switch ( pin_info.direction() ) {
 	  case DotlibPin::kInput: cout << "input"; break;

@@ -575,7 +575,7 @@ gen_library(const DotlibNode* dt_library)
 	  CellCapacitance cap(pin_info.capacitance());
 	  CellCapacitance rise_cap(pin_info.rise_capacitance());
 	  CellCapacitance fall_cap(pin_info.fall_capacitance());
-	  library->new_cell_input(cell_id, pos_id, i_pos,
+	  library->new_cell_input(cell_id, pin_pos, i_pos,
 				  pin_info.name(i),
 				  cap, rise_cap, fall_cap);
 	  ++ pin_pos;
@@ -668,58 +668,6 @@ gen_library(const DotlibNode* dt_library)
 	  cond = LogExpr::make_one();
 	}
 
-
-      }
-    }
-
-#if 0
-      const CellPin* opin = cell->pin(i);
-      if ( !opin->is_output() && !opin->is_inout() ) {
-	continue;
-      }
-      ymuint oid = opin->output_id();
-      bool has_logic = cell->has_logic(oid);
-      TvFunc tv_function;
-      if ( has_logic ) {
-	LogExpr expr = cell->logic_expr(oid);
-	tv_function = expr.make_tv(ni2);
-      }
-#endif
-
-      const list<const DotlibNode*>& timing_list = pin_info.timing_list();
-      for (list<const DotlibNode*>::const_iterator p = timing_list.begin();
-	   p != timing_list.end(); ++ p) {
-	const DotlibNode* dt_timing = *p;
-	DotlibTiming timing_info;
-	if ( !timing_info.set_data(dt_timing) ) {
-	  continue;
-	}
-	const CellPin* ipin = NULL;
-	ymuint iid = 0;
-	if ( timing_info.related_pin() ) {
-	  ShString pin_name = timing_info.related_pin()->string_value();
-	  ipin = cell->pin((const char*)(pin_name));
-	  if ( ipin == NULL ) {
-	    ostringstream buf;
-	    buf << pin_name << ": no such pin";
-	    MsgMgr::put_msg(__FILE__, __LINE__,
-			    dt_timing->loc(),
-			    kMsgError,
-			    "DOTLIB_PARSER",
-			    buf.str());
-	    continue;
-	  }
-	  iid = ipin->input_id();
-	}
-	else {
-	  MsgMgr::put_msg(__FILE__, __LINE__,
-			  dt_timing->loc(),
-			  kMsgError,
-			  "DOTLIB_PARSER",
-			  "No 'related_pin' attribute.");
-	  continue;
-	}
-
 	switch ( library->delay_model() ) {
 	case kCellDelayGenericCmos:
 	  {
@@ -729,8 +677,8 @@ gen_library(const DotlibNode* dt_library)
 	    CellTime slope_fall(timing_info.slope_fall()->float_value());
 	    CellResistance rise_res(timing_info.rise_resistance()->float_value());
 	    CellResistance fall_res(timing_info.fall_resistance()->float_value());
-	    library->new_timing_generic(cell_id, iid, oid, timing_type,
-					timing_sense, cond,
+	    library->new_timing_generic(cell_id, timing_id,
+					timing_type, cond,
 					intrinsic_rise, intrinsic_fall,
 					slope_rise, slope_fall,
 					rise_res, fall_res);
@@ -844,14 +792,14 @@ gen_library(const DotlibNode* dt_library)
 				"cell_rise and fall_propagation are mutually exclusive.");
 		continue;
 	      }
-	      library->new_timing_lut1(cell_id, iid, oid, timing_type,
-				       timing_sense, cond,
+	      library->new_timing_lut1(cell_id, timing_id,
+				       timing_type, cond,
 				       cr_lut, cf_lut,
 				       rt_lut, ft_lut);
 	    }
 	    else { // cr_lut == NULL && cf_lut == NULL
-	      library->new_timing_lut2(cell_id, iid, oid, timing_type,
-				       timing_sense, cond,
+	      library->new_timing_lut2(cell_id, timing_id,
+				       timing_type, cond,
 				       rt_lut, ft_lut,
 				       rp_lut, fp_lut);
 	    }
@@ -867,8 +815,61 @@ gen_library(const DotlibNode* dt_library)
 	case kCellDelayDcm:
 	  break;
 	}
+
+	++ timing_id;
       }
     }
+
+#if 0
+      const CellPin* opin = cell->pin(i);
+      if ( !opin->is_output() && !opin->is_inout() ) {
+	continue;
+      }
+      ymuint oid = opin->output_id();
+      bool has_logic = cell->has_logic(oid);
+      TvFunc tv_function;
+      if ( has_logic ) {
+	LogExpr expr = cell->logic_expr(oid);
+	tv_function = expr.make_tv(ni2);
+      }
+#endif
+
+#if 0
+      const list<const DotlibNode*>& timing_list = pin_info.timing_list();
+      for (list<const DotlibNode*>::const_iterator p = timing_list.begin();
+	   p != timing_list.end(); ++ p) {
+	const DotlibNode* dt_timing = *p;
+	DotlibTiming timing_info;
+	if ( !timing_info.set_data(dt_timing) ) {
+	  continue;
+	}
+	const CellPin* ipin = NULL;
+	ymuint iid = 0;
+	if ( timing_info.related_pin() ) {
+	  ShString pin_name = timing_info.related_pin()->string_value();
+	  ipin = cell->pin((const char*)(pin_name));
+	  if ( ipin == NULL ) {
+	    ostringstream buf;
+	    buf << pin_name << ": no such pin";
+	    MsgMgr::put_msg(__FILE__, __LINE__,
+			    dt_timing->loc(),
+			    kMsgError,
+			    "DOTLIB_PARSER",
+			    buf.str());
+	    continue;
+	  }
+	  iid = ipin->input_id();
+	}
+	else {
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  dt_timing->loc(),
+			  kMsgError,
+			  "DOTLIB_PARSER",
+			  "No 'related_pin' attribute.");
+	  continue;
+	}
+      }
+#endif
 
 #if 0
     for (ymuint oid = 0; oid < no2; ++ oid) {

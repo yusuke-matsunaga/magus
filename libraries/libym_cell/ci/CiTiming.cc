@@ -166,9 +166,8 @@ CiTiming::dump_common(BinO& s,
 		      ymuint8 type_id) const
 {
   s << type_id
-    << static_cast<ymuint8>(timing->type())
-    << static_cast<ymuint8>(timing->timing_sense())
-    << timing->timing_cond();
+    << static_cast<ymuint8>(type())
+    << timing_cond();
 }
 
 
@@ -505,7 +504,7 @@ CiTimingLut2::fall_propagation() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiTimingLut1::dump(BinO& s) const
+CiTimingLut2::dump(BinO& s) const
 {
   dump_common(s, 3);
 

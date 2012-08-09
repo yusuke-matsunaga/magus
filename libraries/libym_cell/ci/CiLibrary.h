@@ -794,14 +794,14 @@ public:
   /// @param[in] input_id 入力ピンID
   /// @param[in] output_id 出力ピンID
   /// @param[in] timing_sense タイミングセンス
-  /// @param[in] tid タイミングID
+  /// @param[in] tid_list タイミングIDのリスト
   virtual
   void
   set_timing(ymuint cell_id,
 	     ymuint input_id,
 	     ymuint output_id,
 	     tCellTimingSense timing_sense,
-	     ymuint tid);
+	     const vector<ymuint>& tid_list);
 
   /// @brief 1次元の LUT を作る．
   /// @param[in] lut_template テンプレート

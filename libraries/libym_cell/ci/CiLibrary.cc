@@ -1221,7 +1221,7 @@ CiLibrary::new_timing_lut2(ymuint cell_id,
 // @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
 // @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
 // @param[in] timing_sense タイミングセンス
-// @param[in] timing_id 設定するタイミング情報の番号
+// @param[in] tid_list タイミングIDのリスト
 // @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
 //  + cell->output_num() を使う．
 // @note ( *2 ) ipin_id で入出力ピンを表す時には入出力ピン番号
@@ -1231,21 +1231,25 @@ CiLibrary::set_timing(ymuint cell_id,
 		      ymuint ipin_id,
 		      ymuint opin_id,
 		      tCellTimingSense timing_sense,
-		      ymuint timing_id)
+		      const vector<ymuint>& tid_list)
 {
   CiCell* cell = mCellArray[cell_id];
-  CiTiming* timing = cell->mTimingArray[timing_id];
   ymuint base = (opin_id * cell->input_num2() + ipin_id) * 2;
   switch ( timing_sense ) {
-  case kCellPosiUnate: break;
+  case kCellPosiUnate: base += 0; break;
   case kCellNegaUnate: base += 1; break;
   default: assert_not_reached(__FILE__, __LINE__);
   }
 
-  CiTiming** pprev = &cell->mTimingMap[base];
-
-  for ( ; *pprev != NULL; pprev = &(*pprev)->mNext) ;
-  *pprev = timing;
+  ymuint n = tid_list.size();
+  void* p = mAlloc.get_memory(sizeof(CiTimingArray) + sizeof(CiTiming*) * (n - 1));
+  CiTimingArray* tarray = new (p) CiTimingArray;
+  tarray->mNum = n;
+  for (ymuint i = 0; i < n; ++ i) {
+    ymuint tid = tid_list[i];
+    tarray->mArray[i] = cell->mTimingArray[tid];
+  }
+  cell->mTimingMap[base] = tarray;
 }
 
 // @brief 1次元の LUT を作る．

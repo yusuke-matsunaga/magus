@@ -57,7 +57,7 @@ DotlibPin::set_data(const DotlibNode* pin_node)
 		      "Syntax error. string value expected");
       return false;
     }
-    mName[i] = str_node->string_value();
+    mNameList[i] = str_node->string_value();
   }
 
   // 属性のリストを作る．

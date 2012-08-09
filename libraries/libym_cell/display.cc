@@ -234,8 +234,9 @@ display_timing(ostream& s,
 	       tCellTimingSense sense,
 	       tCellDelayModel delay_model)
 {
-  for (const CellTiming* timing = cell->timing(ipos, opos, sense);
-       timing != NULL; timing = timing->next()) {
+  ymuint n = cell->timing_num(ipos, opos, sense);
+  for (ymuint i = 0; i < n; ++ i) {
+    const CellTiming* timing = cell->timing(ipos, opos, sense, i);
     s << "  Timing:" << endl
       << "    Input Pin       = " << cell->input(ipos)->name() << endl
       << "    Output Pin      = " << cell->output(opos)->name() << endl
