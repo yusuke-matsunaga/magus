@@ -23,7 +23,7 @@ dump_lut(BinO& s,
     lut->dump(s);
   }
   else {
-    s.write_str(0);
+    s.write_str(string());
   }
 }
 

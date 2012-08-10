@@ -356,13 +356,11 @@ CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
     }
   }
 
-  assert_cond( value_array.size() == n1 * n2, __FILE__, __LINE__);
-  mValueArray.resize(n1 * n2);
-  for (ymuint i1 = 0; i1 < n1; ++ i1) {
-    for (ymuint i2 = 0; i2 < n2; ++ i2) {
-      ymuint i = i1 * n2 + i2;
-      mValueArray[i] = value_array[i];
-    }
+  ymuint n = n1 * n2;
+  assert_cond( value_array.size() == n, __FILE__, __LINE__);
+  mValueArray.resize(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    mValueArray[i] = value_array[i];
   }
 }
 
@@ -462,15 +460,11 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
     }
   }
 
-  assert_cond( value_array.size() == n1 * n2 * n3, __FILE__, __LINE__);
-  mValueArray.resize(n1 * n2 * n3);
-  for (ymuint i1 = 0; i1 < n1; ++ i1) {
-    for (ymuint i2 = 0; i2 < n2; ++ i2) {
-      for (ymuint i3 = 0; i3 < n3; ++ i3) {
-	ymuint i = ((i1 * n2) + i2) * n3 + i3;
-	mValueArray[i] = value_array[i];
-      }
-    }
+  ymuint n = n1 * n2 * n3;
+  assert_cond( value_array.size() == n, __FILE__, __LINE__);
+  mValueArray.resize(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    mValueArray[i] = value_array[i];
   }
 }
 

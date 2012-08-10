@@ -46,9 +46,10 @@ CellLut::dump(BinO& s) const
 {
   s << lut_template()->name()
     << name();
-  ymuint8 d = dimension();
+  ymuint d = dimension();
   for (ymuint i = 0; i < d; ++ i) {
-    ymuint n = index_num(i);
+    ymuint8 n = index_num(i);
+    s << n;
     for (ymuint j = 0; j < n; ++ j) {
       s << index(i, j);
     }
@@ -62,8 +63,9 @@ CellLut::dump(BinO& s) const
   for (ymuint v = 0; v < n; ++ v) {
     ymuint v0 = v;
     for (ymuint j = 0; j < d; ++ j) {
-      pos_array[j] = v0 % index_num(j);
-      v0 /= index_num(j);
+      ymuint var = d - j - 1;
+      pos_array[var] = v0 % index_num(var);
+      v0 /= index_num(var);
     }
     double val = value(pos_array);
     s << val;

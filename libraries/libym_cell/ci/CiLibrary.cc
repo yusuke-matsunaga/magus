@@ -1804,7 +1804,7 @@ CiLibrary::restore(BinI& s)
     // タイミング情報の生成
     ymuint32 nt;
     s >> nt;
-    vector<CellTiming*> tmp_list(nt);
+    set_timing_num(cell_id, nt);
     for (ymuint tid = 0; tid < nt; ++ tid) {
       ymuint8 ttype;
       ymuint8 tmp;
@@ -2111,13 +2111,14 @@ CiLibrary::restore_lut(BinI& s)
     {
       ymuint8 n;
       s >> n;
-      vector<double> value_array(n);
       vector<double> index_array(n);
       for (ymuint i = 0; i < n; ++ i) {
 	double val;
 	s >> val;
 	index_array[i] = val;
       }
+
+      vector<double> value_array(n);
       for (ymuint i = 0; i < n; ++ i) {
 	double val;
 	s >> val;
@@ -2131,23 +2132,25 @@ CiLibrary::restore_lut(BinI& s)
   case 2:
     {
       ymuint8 n1;
-      ymuint8 n2;
-      s >> n1
-	>> n2;
-      ymuint n = n1 * n2;
-      vector<double> value_array(n);
+      s >> n1;
       vector<double> index_array1(n1);
-      vector<double> index_array2(n2);
       for (ymuint i = 0; i < n1; ++ i) {
 	double val;
 	s >> val;
 	index_array1[i] = val;
       }
+
+      ymuint8 n2;
+      s >> n2;
+      vector<double> index_array2(n2);
       for (ymuint i = 0; i < n2; ++ i) {
 	double val;
 	s >> val;
 	index_array2[i] = val;
       }
+
+      ymuint n = n1 * n2;
+      vector<double> value_array(n);
       for (ymuint i = 0; i < n; ++ i) {
 	double val;
 	s >> val;
@@ -2162,36 +2165,40 @@ CiLibrary::restore_lut(BinI& s)
   case 3:
     {
       ymuint8 n1;
-      ymuint8 n2;
-      ymuint8 n3;
-      s >> n1
-	>> n2
-	>> n3;
-      ymuint n = n1 * n2 * n3;
-      vector<double> value_array(n);
+      s >> n1;
       vector<double> index_array1(n1);
-      vector<double> index_array2(n2);
-      vector<double> index_array3(n3);
       for (ymuint i = 0; i < n1; ++ i) {
 	double val;
 	s >> val;
 	index_array1[i] = val;
       }
+
+      ymuint8 n2;
+      s	>> n2;
+      vector<double> index_array2(n2);
       for (ymuint i = 0; i < n2; ++ i) {
 	double val;
 	s >> val;
 	index_array2[i] = val;
       }
+
+      ymuint8 n3;
+      s >> n3;
+      vector<double> index_array3(n3);
       for (ymuint i = 0; i < n3; ++ i) {
 	double val;
 	s >> val;
 	index_array3[i] = val;
       }
+
+      ymuint n = n1 * n2 * n3;
+      vector<double> value_array(n);
       for (ymuint i = 0; i < n; ++ i) {
 	double val;
 	s >> val;
 	value_array[i] = val;
       }
+
       return new_lut3(templ,
 		      value_array,
 		      index_array1,

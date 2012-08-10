@@ -508,8 +508,8 @@ CiInoutPin::CiInoutPin(CiCell* cell,
 		  max_capacitance, min_capacitance,
 		  max_transition, min_transition),
   mCapacitance(capacitance),
-  mRiseCapacitance(mRiseCapacitance),
-  mFallCapacitance(mFallCapacitance)
+  mRiseCapacitance(rise_capacitance),
+  mFallCapacitance(fall_capacitance)
 {
 }
 
