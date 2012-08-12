@@ -238,9 +238,10 @@ display_timing(ostream& s,
   for (ymuint i = 0; i < n; ++ i) {
     const CellTiming* timing = cell->timing(ipos, opos, sense, i);
     s << "  Timing:" << endl
-      << "    Input Pin       = " << cell->input(ipos)->name() << endl
-      << "    Output Pin      = " << cell->output(opos)->name() << endl
-      << "    Sense           = ";
+      << "    Type             = " << timing->type() << endl
+      << "    Input Pin        = " << cell->input(ipos)->name() << endl
+      << "    Output Pin       = " << cell->output(opos)->name() << endl
+      << "    Sense            = ";
     if ( sense == kCellPosiUnate ) {
       s << "positive unate";
     }
@@ -252,14 +253,14 @@ display_timing(ostream& s,
     }
     s << endl;
     if ( !timing->timing_cond().is_one() ) {
-      s << "    When            = " << timing->timing_cond() << endl;
+      s << "    When             = " << timing->timing_cond() << endl;
     }
     switch ( delay_model ) {
     case kCellDelayGenericCmos:
-      s << "    Rise Intrinsic  = " << timing->intrinsic_rise() << endl
-	<< "    Rise Resistance = " << timing->rise_resistance() << endl
-	<< "    Fall Intrinsic  = " << timing->intrinsic_fall() << endl
-	<< "    Fall Resistance = " << timing->fall_resistance() << endl;
+      s << "    Rise Intrinsic   = " << timing->intrinsic_rise() << endl
+	<< "    Rise Resistance  = " << timing->rise_resistance() << endl
+	<< "    Fall Intrinsic   = " << timing->intrinsic_fall() << endl
+	<< "    Fall Resistance  = " << timing->fall_resistance() << endl;
       break;
 
     case kCellDelayTableLookup:

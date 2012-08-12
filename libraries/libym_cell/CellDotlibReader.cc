@@ -937,11 +937,35 @@ gen_library(const DotlibNode* dt_library)
 	for (ymuint iid = 0; iid < ni2; ++ iid) {
 	  TvFunc p_func = tv_function.cofactor(VarId(iid), kPolPosi);
 	  TvFunc n_func = tv_function.cofactor(VarId(iid), kPolNega);
-	  if ( !has_logic || (~n_func && p_func) ) {
-	    library->set_timing(cell_id, iid, oid, kCellPosiUnate, tid_list[iid * 2 + 0]);
+
+	  const vector<ymuint>& tid_list_p = tid_list[iid * 2 + 0];
+	  if ( !tid_list_p.empty() ) {
+	    ymuint tid = tid_list_p[0];
+	    const CellTiming* timing = cell->timing(tid);
+	    bool depend = true;
+	    if ( timing->type() == kCellTimingCombinational ) {
+	      if ( has_logic && !(~n_func && p_func) ) {
+		depend = false;
+	      }
+	    }
+	    if ( depend ) {
+	      library->set_timing(cell_id, iid, oid, kCellPosiUnate, tid_list_p);
+	    }
 	  }
-	  if ( !has_logic || (~p_func && n_func) ) {
-	    library->set_timing(cell_id, iid, oid, kCellNegaUnate, tid_list[iid * 2 + 1]);
+
+	  const vector<ymuint>& tid_list_n = tid_list[iid * 2 + 1];
+	  if ( !tid_list_n.empty() ) {
+	    ymuint tid = tid_list_n[0];
+	    const CellTiming* timing = cell->timing(tid);
+	    bool depend = true;
+	    if ( timing->type() == kCellTimingCombinational ) {
+	      if ( has_logic && !(~p_func && n_func) ) {
+		depend = false;
+	      }
+	    }
+	    if ( depend ) {
+	      library->set_timing(cell_id, iid, oid, kCellNegaUnate, tid_list_n);
+	    }
 	  }
 	}
       }
