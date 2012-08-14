@@ -101,9 +101,9 @@ public:
   const CellLutTemplate*
   lut_template() const = 0;
 
-  /// @brief 名前の取得
+  /// @brief テンプレート名の取得
   const char*
-  name() const;
+  template_name() const;
 
   /// @brief 次元数の取得
   virtual
@@ -171,10 +171,10 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 名前の取得
+// @brief テンプレート名の取得
 inline
 const char*
-CellLut::name() const
+CellLut::template_name() const
 {
   return lut_template()->name();
 }

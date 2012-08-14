@@ -337,10 +337,34 @@ double
 CiLut1D::value(const vector<double>& val_array) const
 {
   assert_cond( val_array.size() == 1, __FILE__, __LINE__);
-  double val1 = val_array[0];
-  for (ymuint i = 0; i < index_num(0); ++ i) {
+  double val = val_array[0];
+  ymuint n = index_num(0) - 1;
 
+  // 単純な線形補間
+  ymuint idx_a;
+  ymuint idx_b;
+  if ( val <= mIndexArray[0] ) {
+    idx_a = 0;
   }
+  else if ( val >= mIndexArray[n - 1] ) {
+    idx_a = n - 1;
+  }
+  else {
+    for (idx_a = 0; idx_a < n; ++ idx_a) {
+      if ( val < mIndexArray[idx_a + 1] ) {
+	break;
+      }
+    }
+    assert_cond( val >= mIndexArray[idx_a], __FILE__, __LINE__);
+  }
+  idx_b = idx_a + 1;
+  double x0 = mIndexArray[idx_a];
+  double x1 = mIndexArray[idx_b];
+
+  double dx = (val - x0) / (x1 - x0);
+  double val_0 = mValueArray[idx_a];
+  double val_x = mValueArray[idx_b] - val_0;
+  return val_0 + val_x * dx;
 }
 
 
@@ -446,8 +470,72 @@ CiLut2D::grid_value(const vector<ymuint32>& pos_array) const
   ymuint pos2 = pos_array[1];
   assert_cond( pos1 < index_num(0), __FILE__, __LINE__);
   assert_cond( pos2 < index_num(1), __FILE__, __LINE__);
-  ymuint idx = pos1 * index_num(1) + pos2;
-  return mValueArray[idx];
+  return mValueArray[idx(pos1, pos2)];
+}
+
+// @brief 値の取得
+// @param[in] val_array 入力の値の配列
+// @note val_array のサイズは dimension() と同じ
+double
+CiLut2D::value(const vector<double>& val_array) const
+{
+  assert_cond( val_array.size() == 2, __FILE__, __LINE__);
+  double val1 = val_array[0];
+  ymuint n1 = index_num(0) - 1;
+
+  ymuint idx1_a;
+  ymuint idx1_b;
+  if ( val1 <= mIndexArray[0][0] ) {
+    idx1_a = 0;
+  }
+  else if ( val1 >= mIndexArray[0][n1 - 1] ) {
+    idx1_a = n1 - 1;
+  }
+  else {
+    for (idx1_a = 0; idx1_a < n1; ++ idx1_a) {
+      if ( val1 < mIndexArray[0][idx1_a + 1] ) {
+	break;
+      }
+    }
+    assert_cond( val1 >= mIndexArray[0][idx1_a], __FILE__, __LINE__);
+  }
+  idx1_b = idx1_a + 1;
+  double x0 = mIndexArray[0][idx1_a];
+  double x1 = mIndexArray[0][idx1_b];
+
+  double val2 = val_array[1];
+  ymuint n2 = index_num(1) - 1;
+  ymuint idx2_a;
+  ymuint idx2_b;
+  if ( val2 <= mIndexArray[1][0] ) {
+    idx2_a = 0;
+  }
+  else if ( val2 >= mIndexArray[1][n2 - 1] ) {
+    idx2_a = n2 - 1;
+  }
+  else {
+    for (idx2_a = 0; idx2_a < n2; ++ idx2_a) {
+      if ( val2 < mIndexArray[1][idx2_a + 1] ) {
+	break;
+      }
+    }
+    assert_cond( val2 >= mIndexArray[1][idx2_a], __FILE__, __LINE__);
+  }
+  idx2_b = idx2_a + 1;
+  double y0 = mIndexArray[1][idx2_a];
+  double y1 = mIndexArray[1][idx2_b];
+
+  // 単純な線形補間
+  double dx = (val1 - x0) / (x1 - x0);
+  double dy = (val2 - y0) / (y1 - y0);
+  double val_0 = mValueArray[idx(idx1_a, idx2_a)];
+  double val_x = mValueArray[idx(idx1_b, idx2_a)];
+  double val_y = mValueArray[idx(idx1_a, idx2_b)];
+  double val_xy = mValueArray[idx(idx1_b, idx2_b)];
+  double val_dx = val_x - val_0;
+  double val_dy = val_y - val_0;
+  double val_dxy = val_xy - val_x - val_y + val_0;
+  return val_0 + val_dx * dx + val_dy * dy + val_dxy * dx * dy;
 }
 
 
@@ -572,8 +660,104 @@ CiLut3D::grid_value(const vector<ymuint32>& pos_array) const
   assert_cond( pos1 < index_num(0), __FILE__, __LINE__);
   assert_cond( pos2 < index_num(1), __FILE__, __LINE__);
   assert_cond( pos3 < index_num(2), __FILE__, __LINE__);
-  ymuint idx = (pos1 * index_num(1) + pos2) * index_num(2) + pos3;
-  return mValueArray[idx];
+  return mValueArray[idx(pos1, pos2, pos3)];
+}
+
+// @brief 値の取得
+// @param[in] val_array 入力の値の配列
+// @note val_array のサイズは dimension() と同じ
+double
+CiLut3D::value(const vector<double>& val_array) const
+{
+  assert_cond( val_array.size() == 3, __FILE__, __LINE__);
+  double val1 = val_array[0];
+  ymuint n1 = index_num(0) - 1;
+  ymuint idx1_a;
+  ymuint idx1_b;
+  if ( val1 <= mIndexArray[0][0] ) {
+    idx1_a = 0;
+  }
+  else if ( val1 >= mIndexArray[0][n1 - 1] ) {
+    idx1_a = n1 - 1;
+  }
+  else {
+    for (idx1_a = 0; idx1_a < n1; ++ idx1_a) {
+      if ( val1 < mIndexArray[0][idx1_a + 1] ) {
+	break;
+      }
+    }
+    assert_cond( val1 >= mIndexArray[0][idx1_a], __FILE__, __LINE__);
+  }
+  idx1_b = idx1_a + 1;
+  double x0 = mIndexArray[0][idx1_a];
+  double x1 = mIndexArray[0][idx1_b];
+
+  double val2 = val_array[1];
+  ymuint n2 = index_num(1) - 1;
+  ymuint idx2_a;
+  ymuint idx2_b;
+  if ( val2 <= mIndexArray[1][0] ) {
+    idx2_a = 0;
+  }
+  else if ( val2 >= mIndexArray[1][n2 - 1] ) {
+    idx2_a = n2 - 1;
+  }
+  else {
+    for (idx2_a = 0; idx2_a < n2; ++ idx2_a) {
+      if ( val2 < mIndexArray[1][idx2_a + 1] ) {
+	break;
+      }
+    }
+    assert_cond( val2 >= mIndexArray[1][idx2_a], __FILE__, __LINE__);
+  }
+  idx2_b = idx2_a + 1;
+  double y0 = mIndexArray[1][idx2_a];
+  double y1 = mIndexArray[1][idx2_b];
+
+  double val3 = val_array[2];
+  ymuint n3 = index_num(2) - 1;
+  ymuint idx3_a;
+  ymuint idx3_b;
+  if ( val3 <= mIndexArray[2][0] ) {
+    idx3_a = 0;
+  }
+  else if ( val3 >= mIndexArray[2][n3 - 1] ) {
+    idx3_a = n3 - 1;
+  }
+  else {
+    for (idx3_a = 0; idx3_a < n3; ++ idx3_a) {
+      if ( val3 < mIndexArray[2][idx3_a + 1] ) {
+	break;
+      }
+    }
+    assert_cond( val3 >= mIndexArray[2][idx3_a], __FILE__, __LINE__);
+  }
+  idx3_b = idx3_a + 1;
+  double z0 = mIndexArray[2][idx3_a];
+  double z1 = mIndexArray[3][idx3_b];
+
+  // 単純な線形補間
+  double dx = (val1 - x0) / (x1 - x0);
+  double dy = (val2 - y0) / (y1 - y0);
+  double dz = (val3 - z0) / (z1 - z0);
+  double val_0 = mValueArray[idx(idx1_a, idx2_a, idx3_a)];
+  double val_x = mValueArray[idx(idx1_b, idx2_a, idx3_a)];
+  double val_y = mValueArray[idx(idx1_a, idx2_b, idx3_a)];
+  double val_z = mValueArray[idx(idx1_a, idx2_a, idx3_b)];
+  double val_xy = mValueArray[idx(idx1_b, idx2_b, idx3_a)];
+  double val_yz = mValueArray[idx(idx1_a, idx2_b, idx3_b)];
+  double val_zx = mValueArray[idx(idx1_b, idx2_a, idx3_b)];
+  double val_xyz = mValueArray[idx(idx1_b, idx2_b, idx3_b)];
+  double val_dx = val_x - val_0;
+  double val_dy = val_y - val_0;
+  double val_dz = val_z - val_0;
+  double val_dxy = val_xy - val_dx - val_dy;
+  double val_dyz = val_yz - val_dy - val_dz;
+  double val_dzx = val_zx - val_dz - val_dx;
+  double val_dxyz = val_xyz - val_xy - val_yz - val_zx + val_x + val_y + val_z - val_0;
+  return val_0 + val_dx * dx + val_dy * dy + val_dz * dz
+    + val_dxy * dx * dy + val_dyz * dy * dz + val_dzx * dz * dx
+    + val_dxyz * dx * dy * dz;
 }
 
 END_NAMESPACE_YM_CELL

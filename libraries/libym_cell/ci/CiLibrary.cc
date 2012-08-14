@@ -2099,9 +2099,6 @@ CiLibrary::restore_lut(BinI& s)
     return NULL;
   }
 
-  string name;
-  s >> name;
-
   const CellLutTemplate* templ = lu_table_template(template_name.c_str());
   assert_cond( templ != NULL, __FILE__, __LINE__);
 

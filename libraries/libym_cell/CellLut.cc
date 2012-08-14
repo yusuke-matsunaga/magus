@@ -44,8 +44,7 @@ CellLutTemplate::dump(BinO& s) const
 void
 CellLut::dump(BinO& s) const
 {
-  s << lut_template()->name()
-    << name();
+  s << template_name();
   ymuint d = dimension();
   for (ymuint i = 0; i < d; ++ i) {
     ymuint8 n = index_num(i);
