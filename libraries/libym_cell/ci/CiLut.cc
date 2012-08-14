@@ -290,6 +290,22 @@ CiLut1D::lut_template() const
   return mTemplate;
 }
 
+// @brief 次元数の取得
+ymuint32
+CiLut1D::dimension() const
+{
+  return 1;
+}
+
+// @brief インデックス数の取得
+// @param[in] var 変数番号 ( 0 <= var < dimension() )
+ymuint32
+CiLut1D::index_num(ymuint32 var) const
+{
+  assert_cond( var < 1 , __FILE__, __LINE__);
+  return mIndexArray.size();
+}
+
 // @brief インデックス値の取得
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 // @param[in] pos 位置番号 ( 0 <= pos < index_num(var) )
@@ -298,18 +314,33 @@ CiLut1D::index(ymuint32 var,
 	       ymuint32 pos) const
 {
   assert_cond( var < 1 , __FILE__, __LINE__);
-  assert_cond( pos < mIndexArray.size() , __FILE__, __LINE__);
+  assert_cond( pos < index_num(var) , __FILE__, __LINE__);
   return mIndexArray[pos];
 }
 
-// @brief 値の取得
+// @brief 格子点の値の取得
 // @param[in] pos_array 格子点座標
 // @note pos_array のサイズは dimension() と同じ
 double
-CiLut1D::value(const vector<ymuint32>& pos_array) const
+CiLut1D::grid_value(const vector<ymuint32>& pos_array) const
 {
   assert_cond( pos_array.size() == 1, __FILE__, __LINE__);
-  return mValueArray[pos_array[0]];
+  ymuint pos1 = pos_array[0];
+  assert_cond( pos1 < index_num(0), __FILE__, __LINE__);
+  return mValueArray[pos1];
+}
+
+// @brief 値の取得
+// @param[in] val_array 入力の値の配列
+// @note val_array のサイズは dimension() と同じ
+double
+CiLut1D::value(const vector<double>& val_array) const
+{
+  assert_cond( val_array.size() == 1, __FILE__, __LINE__);
+  double val1 = val_array[0];
+  for (ymuint i = 0; i < index_num(0); ++ i) {
+
+  }
 }
 
 
@@ -376,6 +407,22 @@ CiLut2D::lut_template() const
   return mTemplate;
 }
 
+// @brief 次元数の取得
+ymuint32
+CiLut2D::dimension() const
+{
+  return 2;
+}
+
+// @brief インデックス数の取得
+// @param[in] var 変数番号 ( 0 <= var < dimension() )
+ymuint32
+CiLut2D::index_num(ymuint32 var) const
+{
+  assert_cond( var < 2, __FILE__, __LINE__);
+  return mIndexArray[var].size();
+}
+
 // @brief インデックス値の取得
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 // @param[in] pos 位置番号 ( 0 <= pos < index_num(var) )
@@ -388,15 +435,19 @@ CiLut2D::index(ymuint32 var,
   return mIndexArray[var][pos];
 }
 
-// @brief 値の取得
+// @brief 格子点の値の取得
 // @param[in] pos_array 格子点座標
 // @note pos_array のサイズは dimension() と同じ
 double
-CiLut2D::value(const vector<ymuint32>& pos_array) const
+CiLut2D::grid_value(const vector<ymuint32>& pos_array) const
 {
   assert_cond( pos_array.size() == 2, __FILE__, __LINE__);
-  ymuint i = pos_array[0] * index_num(1) + pos_array[1];
-  return mValueArray[i];
+  ymuint pos1 = pos_array[0];
+  ymuint pos2 = pos_array[1];
+  assert_cond( pos1 < index_num(0), __FILE__, __LINE__);
+  assert_cond( pos2 < index_num(1), __FILE__, __LINE__);
+  ymuint idx = pos1 * index_num(1) + pos2;
+  return mValueArray[idx];
 }
 
 
@@ -480,6 +531,22 @@ CiLut3D::lut_template() const
   return mTemplate;
 }
 
+// @brief 次元数の取得
+ymuint32
+CiLut3D::dimension() const
+{
+  return 3;
+}
+
+// @brief インデックス数の取得
+// @param[in] var 変数番号 ( 0 <= var < dimension() )
+ymuint32
+CiLut3D::index_num(ymuint32 var) const
+{
+  assert_cond( var < 3, __FILE__, __LINE__);
+  return mIndexArray[var].size();
+}
+
 // @brief インデックス値の取得
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 // @param[in] pos 位置番号 ( 0 <= pos < index_num(var) )
@@ -492,15 +559,21 @@ CiLut3D::index(ymuint32 var,
   return mIndexArray[var][pos];
 }
 
-// @brief 値の取得
+// @brief 格子点の値の取得
 // @param[in] pos_array 格子点座標
 // @note pos_array のサイズは dimension() と同じ
 double
-CiLut3D::value(const vector<ymuint32>& pos_array) const
+CiLut3D::grid_value(const vector<ymuint32>& pos_array) const
 {
   assert_cond( pos_array.size() == 3, __FILE__, __LINE__);
-  ymuint i = ((pos_array[0] * index_num(1)) + pos_array[1]) * index_num(2) + pos_array[2];
-  return mValueArray[i];
+  ymuint pos1 = pos_array[0];
+  ymuint pos2 = pos_array[1];
+  ymuint pos3 = pos_array[2];
+  assert_cond( pos1 < index_num(0), __FILE__, __LINE__);
+  assert_cond( pos2 < index_num(1), __FILE__, __LINE__);
+  assert_cond( pos3 < index_num(2), __FILE__, __LINE__);
+  ymuint idx = (pos1 * index_num(1) + pos2) * index_num(2) + pos3;
+  return mValueArray[idx];
 }
 
 END_NAMESPACE_YM_CELL

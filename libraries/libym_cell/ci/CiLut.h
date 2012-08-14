@@ -287,6 +287,17 @@ public:
   const CellLutTemplate*
   lut_template() const;
 
+  /// @brief 次元数の取得
+  virtual
+  ymuint32
+  dimension() const;
+
+  /// @brief インデックス数の取得
+  /// @param[in] var 変数番号 ( 0 <= var < dimension() )
+  virtual
+  ymuint32
+  index_num(ymuint32 var) const;
+
   /// @brief インデックス値の取得
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
   /// @param[in] pos 位置番号 ( 0 <= pos < index_num(var) )
@@ -295,12 +306,19 @@ public:
   index(ymuint32 var,
 	ymuint32 pos) const;
 
-  /// @brief 値の取得
+  /// @brief 格子点の値の取得
   /// @param[in] pos_array 格子点座標
   /// @note pos_array のサイズは dimension() と同じ
   virtual
   double
-  value(const vector<ymuint32>& pos_array) const;
+  grid_value(const vector<ymuint32>& pos_array) const;
+
+  /// @brief 値の取得
+  /// @param[in] val_array 入力の値の配列
+  /// @note val_array のサイズは dimension() と同じ
+  virtual
+  double
+  value(const vector<double>& val_array) const;
 
 
 private:
@@ -352,6 +370,17 @@ public:
   const CellLutTemplate*
   lut_template() const;
 
+  /// @brief 次元数の取得
+  virtual
+  ymuint32
+  dimension() const;
+
+  /// @brief インデックス数の取得
+  /// @param[in] var 変数番号 ( 0 <= var < dimension() )
+  virtual
+  ymuint32
+  index_num(ymuint32 var) const;
+
   /// @brief インデックス値の取得
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
   /// @param[in] pos 位置番号 ( 0 <= pos < index_num(var) )
@@ -360,12 +389,19 @@ public:
   index(ymuint32 var,
 	ymuint32 pos) const;
 
-  /// @brief 値の取得
+  /// @brief 格子点の値の取得
   /// @param[in] pos_array 格子点座標
   /// @note pos_array のサイズは dimension() と同じ
   virtual
   double
-  value(const vector<ymuint32>& pos_array) const;
+  grid_value(const vector<ymuint32>& pos_array) const;
+
+  /// @brief 値の取得
+  /// @param[in] val_array 入力の値の配列
+  /// @note val_array のサイズは dimension() と同じ
+  virtual
+  double
+  value(const vector<double>& val_array) const;
 
 
 private:
@@ -418,6 +454,17 @@ public:
   const CellLutTemplate*
   lut_template() const;
 
+  /// @brief 次元数の取得
+  virtual
+  ymuint32
+  dimension() const;
+
+  /// @brief インデックス数の取得
+  /// @param[in] var 変数番号 ( 0 <= var < dimension() )
+  virtual
+  ymuint32
+  index_num(ymuint32 var) const;
+
   /// @brief インデックス値の取得
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
   /// @param[in] pos 位置番号 ( 0 <= pos < index_num(var) )
@@ -426,12 +473,19 @@ public:
   index(ymuint32 var,
 	ymuint32 pos) const;
 
-  /// @brief 値の取得
+  /// @brief 格子点の値の取得
   /// @param[in] pos_array 格子点座標
   /// @note pos_array のサイズは dimension() と同じ
   virtual
   double
-  value(const vector<ymuint32>& pos_array) const;
+  grid_value(const vector<ymuint32>& pos_array) const;
+
+  /// @brief 値の取得
+  /// @param[in] val_array 入力の値の配列
+  /// @note val_array のサイズは dimension() と同じ
+  virtual
+  double
+  value(const vector<double>& val_array) const;
 
 
 private:

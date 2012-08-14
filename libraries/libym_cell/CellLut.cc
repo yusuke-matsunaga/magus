@@ -67,7 +67,7 @@ CellLut::dump(BinO& s) const
       pos_array[var] = v0 % index_num(var);
       v0 /= index_num(var);
     }
-    double val = value(pos_array);
+    double val = grid_value(pos_array);
     s << val;
   }
 }

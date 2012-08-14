@@ -174,7 +174,7 @@ display_lut(ostream& s,
     const char* comma = "";
     for (ymuint i1 = 0; i1 < n1; ++ i1) {
       pos_array[0] = i1;
-      s << comma << lut->value(pos_array);
+      s << comma << lut->grid_value(pos_array);
       comma = ", ";
     }
     s << ")" << endl;
@@ -190,7 +190,7 @@ display_lut(ostream& s,
       const char* comma = "";
       for (ymuint i2 = 0; i2 < n2; ++ i2) {
 	pos_array[1] = i2;
-	s << comma << lut->value(pos_array);
+	s << comma << lut->grid_value(pos_array);
 	comma = ", ";
       }
       s << ")" << endl;
@@ -213,7 +213,7 @@ display_lut(ostream& s,
 	const char* comma3 = "";
 	for (ymuint i3 = 0; i3 < n3; ++ i3) {
 	  pos_array[2] = i3;
-	  s << comma3 << lut->value(pos_array);
+	  s << comma3 << lut->grid_value(pos_array);
 	  comma3 = ", ";
 	}
 	s << ")";
