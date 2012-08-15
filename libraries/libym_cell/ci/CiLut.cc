@@ -247,6 +247,54 @@ CiLutTemplate3D::index(ymuint32 var,
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス CiLut
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+CiLut::CiLut(const CellLutTemplate* lut_template) :
+  mTemplate(lut_template)
+{
+}
+
+// @brief デストラクタ
+CiLut::~CiLut()
+{
+}
+
+// @brief テンプレートの取得
+const CellLutTemplate*
+CiLut::lut_template() const
+{
+  return mTemplate;
+}
+
+// @brief val に対応する区間を求める．
+ymuint
+CiLut::search(double val,
+	      const vector<double>& index_array)
+{
+  ymuint n = index_array.size();
+
+  if ( val <= index_array[0] ) {
+    // 値が小さすぎる時は [0, 1] を返す．
+    return 0;
+  }
+  if ( val >= index_array[n - 1] ) {
+    // 値が大きすぎる時は [n - 2, n - 1] を返す．
+    return n - 2;
+  }
+  // 単純な線形探索を行う．
+  for (ymuint i = 0; i < n - 1; ++ i) {
+    if ( val < index_array[i + 1] ) {
+      return i;
+    }
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス CiLut1D
 //////////////////////////////////////////////////////////////////////
 
@@ -254,14 +302,14 @@ CiLutTemplate3D::index(ymuint32 var,
 CiLut1D::CiLut1D(const CellLutTemplate* lut_template,
 		 const vector<double>& value_array,
 		 const vector<double>& index_array) :
-  mTemplate(lut_template)
+  CiLut(lut_template)
 {
   ymuint n = 0;
   if ( index_array.empty() ) {
-    n = mTemplate->index_num(0);
+    n = index_num(0);
     mIndexArray.resize(n);
     for (ymuint32 i = 0; i < n; ++ i) {
-      mIndexArray[i] = mTemplate->index(0, i);
+      mIndexArray[i] = lut_template->index(0, i);
     }
   }
   else {
@@ -281,13 +329,6 @@ CiLut1D::CiLut1D(const CellLutTemplate* lut_template,
 // @brief デストラクタ
 CiLut1D::~CiLut1D()
 {
-}
-
-// @brief テンプレートの取得
-const CellLutTemplate*
-CiLut1D::lut_template() const
-{
-  return mTemplate;
 }
 
 // @brief 次元数の取得
@@ -337,34 +378,18 @@ double
 CiLut1D::value(const vector<double>& val_array) const
 {
   assert_cond( val_array.size() == 1, __FILE__, __LINE__);
-  double val = val_array[0];
-  ymuint n = index_num(0) - 1;
 
-  // 単純な線形補間
-  ymuint idx_a;
-  ymuint idx_b;
-  if ( val <= mIndexArray[0] ) {
-    idx_a = 0;
-  }
-  else if ( val >= mIndexArray[n - 1] ) {
-    idx_a = n - 1;
-  }
-  else {
-    for (idx_a = 0; idx_a < n; ++ idx_a) {
-      if ( val < mIndexArray[idx_a + 1] ) {
-	break;
-      }
-    }
-    assert_cond( val >= mIndexArray[idx_a], __FILE__, __LINE__);
-  }
-  idx_b = idx_a + 1;
+  double val = val_array[0];
+  ymuint idx_a = search(val, mIndexArray);
+  ymuint idx_b = idx_a + 1;
   double x0 = mIndexArray[idx_a];
   double x1 = mIndexArray[idx_b];
 
   double dx = (val - x0) / (x1 - x0);
   double val_0 = mValueArray[idx_a];
-  double val_x = mValueArray[idx_b] - val_0;
-  return val_0 + val_x * dx;
+  double val_x = mValueArray[idx_b];
+  double val_dx = val_x - val_0;
+  return val_0 + val_dx * dx;
 }
 
 
@@ -377,14 +402,14 @@ CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
 		 const vector<double>& value_array,
 		 const vector<double>& index_array1,
 		 const vector<double>& index_array2) :
-  mTemplate(lut_template)
+  CiLut(lut_template)
 {
   ymuint n1 = 0;
   if ( index_array1.empty() ) {
-    n1 = mTemplate->index_num(0);
+    n1 = index_num(0);
     mIndexArray[0].resize(n1);
     for (ymuint32 i = 0; i < n1; ++ i) {
-      mIndexArray[0][i] = mTemplate->index(0, i);
+      mIndexArray[0][i] = lut_template->index(0, i);
     }
   }
   else {
@@ -397,10 +422,10 @@ CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
 
   ymuint n2 = 0;
   if ( index_array2.empty() ) {
-    n2 = mTemplate->index_num(1);
+    n2 = index_num(1);
     mIndexArray[1].resize(n2);
     for (ymuint32 i = 0; i < n2; ++ i) {
-      mIndexArray[1][i] = mTemplate->index(1, i);
+      mIndexArray[1][i] = lut_template->index(1, i);
     }
   }
   else {
@@ -422,13 +447,6 @@ CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
 // @brief デストラクタ
 CiLut2D::~CiLut2D()
 {
-}
-
-// @brief テンプレートの取得
-const CellLutTemplate*
-CiLut2D::lut_template() const
-{
-  return mTemplate;
 }
 
 // @brief 次元数の取得
@@ -480,48 +498,16 @@ double
 CiLut2D::value(const vector<double>& val_array) const
 {
   assert_cond( val_array.size() == 2, __FILE__, __LINE__);
-  double val1 = val_array[0];
-  ymuint n1 = index_num(0) - 1;
 
-  ymuint idx1_a;
-  ymuint idx1_b;
-  if ( val1 <= mIndexArray[0][0] ) {
-    idx1_a = 0;
-  }
-  else if ( val1 >= mIndexArray[0][n1 - 1] ) {
-    idx1_a = n1 - 1;
-  }
-  else {
-    for (idx1_a = 0; idx1_a < n1; ++ idx1_a) {
-      if ( val1 < mIndexArray[0][idx1_a + 1] ) {
-	break;
-      }
-    }
-    assert_cond( val1 >= mIndexArray[0][idx1_a], __FILE__, __LINE__);
-  }
-  idx1_b = idx1_a + 1;
+  double val1 = val_array[0];
+  ymuint idx1_a = search(val1, mIndexArray[0]);
+  ymuint idx1_b = idx1_a + 1;
   double x0 = mIndexArray[0][idx1_a];
   double x1 = mIndexArray[0][idx1_b];
 
   double val2 = val_array[1];
-  ymuint n2 = index_num(1) - 1;
-  ymuint idx2_a;
-  ymuint idx2_b;
-  if ( val2 <= mIndexArray[1][0] ) {
-    idx2_a = 0;
-  }
-  else if ( val2 >= mIndexArray[1][n2 - 1] ) {
-    idx2_a = n2 - 1;
-  }
-  else {
-    for (idx2_a = 0; idx2_a < n2; ++ idx2_a) {
-      if ( val2 < mIndexArray[1][idx2_a + 1] ) {
-	break;
-      }
-    }
-    assert_cond( val2 >= mIndexArray[1][idx2_a], __FILE__, __LINE__);
-  }
-  idx2_b = idx2_a + 1;
+  ymuint idx2_a = search(val2, mIndexArray[1]);
+  ymuint idx2_b = idx2_a + 1;
   double y0 = mIndexArray[1][idx2_a];
   double y1 = mIndexArray[1][idx2_b];
 
@@ -535,6 +521,7 @@ CiLut2D::value(const vector<double>& val_array) const
   double val_dx = val_x - val_0;
   double val_dy = val_y - val_0;
   double val_dxy = val_xy - val_x - val_y + val_0;
+
   return val_0 + val_dx * dx + val_dy * dy + val_dxy * dx * dy;
 }
 
@@ -549,14 +536,14 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
 		 const vector<double>& index_array1,
 		 const vector<double>& index_array2,
 		 const vector<double>& index_array3) :
-  mTemplate(lut_template)
+  CiLut(lut_template)
 {
   ymuint n1 = 0;
   if ( index_array1.empty() ) {
-    n1 = mTemplate->index_num(0);
+    n1 = index_num(0);
     mIndexArray[0].resize(n1);
     for (ymuint32 i = 0; i < n1; ++ i) {
-      mIndexArray[0][i] = mTemplate->index(0, i);
+      mIndexArray[0][i] = lut_template->index(0, i);
     }
   }
   else {
@@ -569,10 +556,10 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
 
   ymuint n2 = 0;
   if ( index_array2.empty() ) {
-    n2 = mTemplate->index_num(1);
+    n2 = index_num(1);
     mIndexArray[1].resize(n2);
     for (ymuint32 i = 0; i < n2; ++ i) {
-      mIndexArray[1][i] = mTemplate->index(1, i);
+      mIndexArray[1][i] = lut_template->index(1, i);
     }
   }
   else {
@@ -585,10 +572,10 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
 
   ymuint n3 = 0;
   if ( index_array3.empty() ) {
-    n3 = mTemplate->index_num(2);
+    n3 = index_num(2);
     mIndexArray[2].resize(n3);
     for (ymuint32 i = 0; i < n3; ++ i) {
-      mIndexArray[2][i] = mTemplate->index(2, i);
+      mIndexArray[2][i] = lut_template->index(2, i);
     }
   }
   else {
@@ -610,13 +597,6 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
 // @brief デストラクタ
 CiLut3D::~CiLut3D()
 {
-}
-
-// @brief テンプレートの取得
-const CellLutTemplate*
-CiLut3D::lut_template() const
-{
-  return mTemplate;
 }
 
 // @brief 次元数の取得
@@ -671,68 +651,20 @@ CiLut3D::value(const vector<double>& val_array) const
 {
   assert_cond( val_array.size() == 3, __FILE__, __LINE__);
   double val1 = val_array[0];
-  ymuint n1 = index_num(0) - 1;
-  ymuint idx1_a;
-  ymuint idx1_b;
-  if ( val1 <= mIndexArray[0][0] ) {
-    idx1_a = 0;
-  }
-  else if ( val1 >= mIndexArray[0][n1 - 1] ) {
-    idx1_a = n1 - 1;
-  }
-  else {
-    for (idx1_a = 0; idx1_a < n1; ++ idx1_a) {
-      if ( val1 < mIndexArray[0][idx1_a + 1] ) {
-	break;
-      }
-    }
-    assert_cond( val1 >= mIndexArray[0][idx1_a], __FILE__, __LINE__);
-  }
-  idx1_b = idx1_a + 1;
+  ymuint idx1_a = search(val1, mIndexArray[0]);
+  ymuint idx1_b = idx1_a + 1;
   double x0 = mIndexArray[0][idx1_a];
   double x1 = mIndexArray[0][idx1_b];
 
   double val2 = val_array[1];
-  ymuint n2 = index_num(1) - 1;
-  ymuint idx2_a;
-  ymuint idx2_b;
-  if ( val2 <= mIndexArray[1][0] ) {
-    idx2_a = 0;
-  }
-  else if ( val2 >= mIndexArray[1][n2 - 1] ) {
-    idx2_a = n2 - 1;
-  }
-  else {
-    for (idx2_a = 0; idx2_a < n2; ++ idx2_a) {
-      if ( val2 < mIndexArray[1][idx2_a + 1] ) {
-	break;
-      }
-    }
-    assert_cond( val2 >= mIndexArray[1][idx2_a], __FILE__, __LINE__);
-  }
-  idx2_b = idx2_a + 1;
+  ymuint idx2_a = search(val2, mIndexArray[1]);
+  ymuint idx2_b = idx2_a + 1;
   double y0 = mIndexArray[1][idx2_a];
   double y1 = mIndexArray[1][idx2_b];
 
   double val3 = val_array[2];
-  ymuint n3 = index_num(2) - 1;
-  ymuint idx3_a;
-  ymuint idx3_b;
-  if ( val3 <= mIndexArray[2][0] ) {
-    idx3_a = 0;
-  }
-  else if ( val3 >= mIndexArray[2][n3 - 1] ) {
-    idx3_a = n3 - 1;
-  }
-  else {
-    for (idx3_a = 0; idx3_a < n3; ++ idx3_a) {
-      if ( val3 < mIndexArray[2][idx3_a + 1] ) {
-	break;
-      }
-    }
-    assert_cond( val3 >= mIndexArray[2][idx3_a], __FILE__, __LINE__);
-  }
-  idx3_b = idx3_a + 1;
+  ymuint idx3_a = search(val3, mIndexArray[2]);
+  ymuint idx3_b = idx3_a + 1;
   double z0 = mIndexArray[2][idx3_a];
   double z1 = mIndexArray[3][idx3_b];
 

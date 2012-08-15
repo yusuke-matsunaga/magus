@@ -16,7 +16,8 @@
 #include "ym_cell/CellLut.h"
 
 
-#define ERROR_EPSILON 1.0e-10
+//#define ERROR_EPSILON 1.0e-10
+#define ERROR_EPSILON DBL_EPSILON * 10
 
 BEGIN_NAMESPACE_YM_CELL
 
@@ -36,6 +37,11 @@ test_lut1(const CellLut* lut)
     double val = lut->value(val_array);
     double delta = fabs(ref_val - val) / ref_val;
     if ( delta > ERROR_EPSILON ) {
+      cout << "Error ref_val != val" << endl
+	   << "  idx     = " << i << endl
+	   << "  ref_val = " << ref_val << endl
+	   << "  val     = " << val << endl
+	   << "  delta   = " << delta << endl;
       if ( !disp_lut ) {
 	disp_lut = true;
 	cout << "index = ";
@@ -51,11 +57,6 @@ test_lut1(const CellLut* lut)
 	}
 	cout << endl;
       }
-      cout << "Error ref_val != val" << endl
-	   << "  idx     = " << i << endl
-	   << "  ref_val = " << ref_val << endl
-	   << "  val     = " << val << endl
-	   << "  delta   = " << delta << endl;
       error = true;
     }
   }
@@ -80,8 +81,13 @@ test_lut2(const CellLut* lut)
       val_array[1] = lut->index(1, j);
       double ref_val = lut->grid_value(pos_array);
       double val = lut->value(val_array);
-      double delta = fabs(ref_val - val) / ref_val;
+      double delta = fabs(ref_val - val);
       if ( delta > ERROR_EPSILON ) {
+	cout << "Error ref_val != val" << endl
+	     << "  idx     = " << i << ", " << j << endl
+	     << "  ref_val = " << ref_val << endl
+	     << "  val     = " << val << endl
+	     << "  delta   = " << delta << endl;
 	if ( !disp_lut ) {
 	  disp_lut = true;
 	  cout << "index_1 = ";
@@ -106,11 +112,7 @@ test_lut2(const CellLut* lut)
 	  }
 	  cout << endl;
 	}
-	cout << "Error ref_val != val" << endl
-	     << "  idx     = " << i << ", " << j << endl
-	     << "  ref_val = " << ref_val << endl
-	     << "  val     = " << val << endl
-	     << "  delta   = " << delta << endl;
+	cout << endl;
 	error = true;
       }
     }
