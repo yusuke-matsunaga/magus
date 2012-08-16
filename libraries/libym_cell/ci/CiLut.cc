@@ -324,6 +324,15 @@ CiLut1D::CiLut1D(const CellLutTemplate* lut_template,
   for (ymuint i = 0; i < n; ++ i) {
     mValueArray[i] = value_array[i];
   }
+
+  mDataArray.resize(n - 1);
+  for (ymuint i = 0; i < n - 1; ++ i) {
+    Data& data = mDataArray[i];
+    data.mIndexBase = mIndexArray[i];
+    data.mIndexWidth = mIndexArray[i + 1] - mIndexArray[i];
+    data.mBase = mValueArray[i];
+    data.mCoef = mValueArray[i + 1] - mValueArray[i];
+  }
 }
 
 // @brief デストラクタ
@@ -380,6 +389,8 @@ CiLut1D::value(const vector<double>& val_array) const
   assert_cond( val_array.size() == 1, __FILE__, __LINE__);
 
   double val = val_array[0];
+
+#if 0
   ymuint idx_a = search(val, mIndexArray);
   ymuint idx_b = idx_a + 1;
   double x0 = mIndexArray[idx_a];
@@ -390,6 +401,18 @@ CiLut1D::value(const vector<double>& val_array) const
   double val_x = mValueArray[idx_b];
   double val_dx = val_x - val_0;
   return val_0 + val_dx * dx;
+#else
+  ymuint idx = search(val, mIndexArray);
+  return mDataArray[idx].calc(val);
+#endif
+}
+
+// @brief 値を計算する．
+double
+CiLut1D::Data::calc(double val) const
+{
+  double dx = (val - mIndexBase) / mIndexWidth;
+  return mBase + mCoef * dx;
 }
 
 
@@ -441,6 +464,26 @@ CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
   mValueArray.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
     mValueArray[i] = value_array[i];
+  }
+
+  ymuint nd = (n1 - 1) * (n2 - 1);
+  mDataArray.resize(nd);
+  for (ymuint i1 = 0; i1 < n1 - 1; ++ i1) {
+    for (ymuint i2 = 0; i2 < n2 - 1; ++ i2) {
+      Data& data = mDataArray[i1 * (n2 - 1) + i2];
+      data.mIndexBase[0] = mIndexArray[0][i1];
+      data.mIndexBase[1] = mIndexArray[1][i2];
+      data.mIndexWidth[0] = mIndexArray[0][i1 + 1] - mIndexArray[0][i1];
+      data.mIndexWidth[1] = mIndexArray[1][i2 + 1] - mIndexArray[1][i2];
+      double val00 = mValueArray[idx(i1, i2)];
+      double val10 = mValueArray[idx(i1 + 1, i2)];
+      double val01 = mValueArray[idx(i1, i2 + 1)];
+      double val11 = mValueArray[idx(i1 + 1, i2 + 2)];
+      data.mBase = val00;
+      data.mCoef1[0] = val10 - val00;
+      data.mCoef1[1] = val01 - val00;
+      data.mCoef2 = val11 - val10 - val01 + val00;
+    }
   }
 }
 
@@ -522,7 +565,35 @@ CiLut2D::value(const vector<double>& val_array) const
   double val_dy = val_y - val_0;
   double val_dxy = val_xy - val_x - val_y + val_0;
 
-  return val_0 + val_dx * dx + val_dy * dy + val_dxy * dx * dy;
+  double tmp = val_0 + val_dx * dx + val_dy * dy + val_dxy * dx * dy;
+
+  ymuint idx = idx1_a * (index_num(1) - 1) + idx2_b;
+  double tmp2 = mDataArray[idx].calc(val1, val2);
+
+  if ( tmp != tmp2 ) {
+    cout << "Error " << endl;
+    cout << "tmp  = " << tmp << endl
+	 << "tmp2 = " << tmp2 << endl;
+    cout << "val_0 = " << val_0 << endl
+	 << "mBase = " << mDataArray[idx].mBase << endl
+	 << "val_dx    = " << val_dx << endl
+	 << "mCoef1[0] = " << mDataArray[idx].mCoef1[0] << endl
+	 << "val_dy    = " << val_dy << endl
+	 << "mCoef1[1] = " << mDataArray[idx].mCoef1[1] << endl
+	 << "val_dxy   = " << val_dxy << endl
+	 << "mCoef2    = " << mDataArray[idx].mCoef2 << endl;
+  }
+  return tmp2;
+}
+
+// @brief 値を計算する．
+double
+CiLut2D::Data::calc(double val1,
+		    double val2) const
+{
+  double dx = (val1 - mIndexBase[0]) / mIndexWidth[0];
+  double dy = (val2 - mIndexBase[1]) / mIndexWidth[1];
+  return mBase + mCoef1[0] * dx + mCoef1[1] * dy + mCoef2 * dx * dy;
 }
 
 
