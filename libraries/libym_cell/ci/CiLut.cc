@@ -533,12 +533,14 @@ CiLut2D::value(const vector<double>& val_array) const
   double dy0 = (val2 - y0) / wy;
   double dy1 = (y1 - val2) / wy;
   double val_00 = mValueArray[idx(idx1_a, idx2_a)];
-  double val_10 = mValueArray[idx(idx1_b, idx2_a)];
   double val_01 = mValueArray[idx(idx1_a, idx2_b)];
+  double val_10 = mValueArray[idx(idx1_b, idx2_a)];
   double val_11 = mValueArray[idx(idx1_b, idx2_b)];
 
-  return dx1 * dy1 * val_00 + dx0 * dy1 * val_10 +
-         dx1 * dy0 * val_01 + dx0 * dy0 * val_11;
+  return dx1 * dy1 * val_00 +
+         dx1 * dy0 * val_01 +
+         dx0 * dy1 * val_10 +
+         dx0 * dy0 * val_11;
 }
 
 
@@ -707,21 +709,21 @@ CiLut3D::value(const vector<double>& val_array) const
   double dz0 = (val3 - z0) / wz;
   double dz1 = (z1 - val3) / wz;
   double val_000 = mValueArray[idx(idx1_a, idx2_a, idx3_a)];
-  double val_100 = mValueArray[idx(idx1_b, idx2_a, idx3_a)];
-  double val_010 = mValueArray[idx(idx1_a, idx2_b, idx3_a)];
   double val_001 = mValueArray[idx(idx1_a, idx2_a, idx3_b)];
-  double val_110 = mValueArray[idx(idx1_b, idx2_b, idx3_a)];
+  double val_010 = mValueArray[idx(idx1_a, idx2_b, idx3_a)];
   double val_011 = mValueArray[idx(idx1_a, idx2_b, idx3_b)];
+  double val_100 = mValueArray[idx(idx1_b, idx2_a, idx3_a)];
   double val_101 = mValueArray[idx(idx1_b, idx2_a, idx3_b)];
+  double val_110 = mValueArray[idx(idx1_b, idx2_b, idx3_a)];
   double val_111 = mValueArray[idx(idx1_b, idx2_b, idx3_b)];
 
   return dx1 * dy1 * dz1 * val_000 +
-         dx0 * dy1 * dz1 * val_100 +
-         dx1 * dy0 * dz1 * val_010 +
          dx1 * dy1 * dz0 * val_001 +
-         dx0 * dy0 * dz1 * val_110 +
+         dx1 * dy0 * dz1 * val_010 +
          dx1 * dy0 * dz0 * val_011 +
+         dx0 * dy1 * dz1 * val_100 +
          dx0 * dy1 * dz0 * val_101 +
+         dx0 * dy0 * dz1 * val_110 +
          dx0 * dy0 * dz0 * val_111;
 }
 
