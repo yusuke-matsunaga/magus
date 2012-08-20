@@ -371,44 +371,17 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 計算用のデータ構造
-  struct Data
-  {
-
-    /// @brief 値を計算する．
-    double
-    calc(double val) const;
-
-    /// @brief インデックスのベース値
-    double mIndexBase;
-
-    /// @brief インデックスの区間幅
-    double mIndexWidth;
-
-    /// @brief ベース値
-    double mBase;
-
-    /// @brief 係数
-    double mCoef;
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // インデックスの配列の配列
+  // インデックスの配列
   vector<double> mIndexArray;
+
+  // インデックスの間隔の配列
+  vector<double> mIndexWidthArray;
 
   // 格子点の値の配列
   vector<double> mValueArray;
-
-  // 計算用のデータ配列
-  vector<Data> mDataArray;
 
 };
 
@@ -489,38 +462,6 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 計算用のデータ構造
-  struct Data
-  {
-
-    /// @brief 値を計算する．
-    double
-    calc(double val1,
-	 double val2) const;
-
-    /// @brief インデックスのベース値
-    double mIndexBase[2];
-
-    /// @brief インデックスの区間幅
-    double mIndexWidth[2];
-
-    /// @brief ベース値
-    double mBase;
-
-    /// @brief 1次係数
-    double mCoef1[2];
-
-    /// @brief 2次係数
-    double mCoef2;
-
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -530,11 +471,11 @@ private:
   // インデックスの配列の配列
   vector<double> mIndexArray[2];
 
+  // インデックスの間隔の配列
+  vector<double> mIndexWidthArray[2];
+
   // 格子点の値の配列
   vector<double> mValueArray;
-
-  // 計算用のデータ配列
-  vector<Data> mDataArray;
 
 };
 
@@ -626,6 +567,9 @@ private:
 
   // インデックスの配列の配列
   vector<double> mIndexArray[3];
+
+  // インデックスの間隔の配列
+  vector<double> mIndexWidthArray[3];
 
   // 格子点の値の配列
   vector<double> mValueArray;

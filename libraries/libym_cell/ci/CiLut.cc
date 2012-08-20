@@ -319,19 +319,15 @@ CiLut1D::CiLut1D(const CellLutTemplate* lut_template,
       mIndexArray[i] = index_array[i];
     }
   }
+  mIndexWidthArray.resize(n - 1);
+  for (ymuint i = 0; i < n - 1; ++ i) {
+    mIndexWidthArray[i] = mIndexArray[i + 1] - mIndexArray[i];
+  }
+
   assert_cond( value_array.size() == n, __FILE__, __LINE__);
   mValueArray.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
     mValueArray[i] = value_array[i];
-  }
-
-  mDataArray.resize(n - 1);
-  for (ymuint i = 0; i < n - 1; ++ i) {
-    Data& data = mDataArray[i];
-    data.mIndexBase = mIndexArray[i];
-    data.mIndexWidth = mIndexArray[i + 1] - mIndexArray[i];
-    data.mBase = mValueArray[i];
-    data.mCoef = mValueArray[i + 1] - mValueArray[i];
   }
 }
 
@@ -390,29 +386,16 @@ CiLut1D::value(const vector<double>& val_array) const
 
   double val = val_array[0];
 
-#if 0
   ymuint idx_a = search(val, mIndexArray);
   ymuint idx_b = idx_a + 1;
   double x0 = mIndexArray[idx_a];
   double x1 = mIndexArray[idx_b];
-
-  double dx = (val - x0) / (x1 - x0);
+  double w  = mIndexWidthArray[idx_a];
+  double dx0 = (val - x0) / w;
+  double dx1 = (x1 - val) / w;
   double val_0 = mValueArray[idx_a];
-  double val_x = mValueArray[idx_b];
-  double val_dx = val_x - val_0;
-  return val_0 + val_dx * dx;
-#else
-  ymuint idx = search(val, mIndexArray);
-  return mDataArray[idx].calc(val);
-#endif
-}
-
-// @brief 値を計算する．
-double
-CiLut1D::Data::calc(double val) const
-{
-  double dx = (val - mIndexBase) / mIndexWidth;
-  return mBase + mCoef * dx;
+  double val_1 = mValueArray[idx_b];
+  return val_0 * dx1 + val_1 * dx0;
 }
 
 
@@ -442,6 +425,10 @@ CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
       mIndexArray[0][i] = index_array1[i];
     }
   }
+  mIndexWidthArray[0].resize(n1 - 1);
+  for (ymuint i = 0; i < n1 - 1; ++ i) {
+    mIndexWidthArray[0][i] = mIndexArray[0][i + 1] - mIndexArray[0][i];
+  }
 
   ymuint n2 = 0;
   if ( index_array2.empty() ) {
@@ -458,32 +445,16 @@ CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
       mIndexArray[1][i] = index_array2[i];
     }
   }
+  mIndexWidthArray[1].resize(n2 - 1);
+  for (ymuint i = 0; i < n2 - 1; ++ i) {
+    mIndexWidthArray[1][i] = mIndexArray[1][i + 1] - mIndexArray[1][i];
+  }
 
   ymuint n = n1 * n2;
   assert_cond( value_array.size() == n, __FILE__, __LINE__);
   mValueArray.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
     mValueArray[i] = value_array[i];
-  }
-
-  ymuint nd = (n1 - 1) * (n2 - 1);
-  mDataArray.resize(nd);
-  for (ymuint i1 = 0; i1 < n1 - 1; ++ i1) {
-    for (ymuint i2 = 0; i2 < n2 - 1; ++ i2) {
-      Data& data = mDataArray[i1 * (n2 - 1) + i2];
-      data.mIndexBase[0] = mIndexArray[0][i1];
-      data.mIndexBase[1] = mIndexArray[1][i2];
-      data.mIndexWidth[0] = mIndexArray[0][i1 + 1] - mIndexArray[0][i1];
-      data.mIndexWidth[1] = mIndexArray[1][i2 + 1] - mIndexArray[1][i2];
-      double val00 = mValueArray[idx(i1, i2)];
-      double val10 = mValueArray[idx(i1 + 1, i2)];
-      double val01 = mValueArray[idx(i1, i2 + 1)];
-      double val11 = mValueArray[idx(i1 + 1, i2 + 2)];
-      data.mBase = val00;
-      data.mCoef1[0] = val10 - val00;
-      data.mCoef1[1] = val01 - val00;
-      data.mCoef2 = val11 - val10 - val01 + val00;
-    }
   }
 }
 
@@ -555,45 +526,19 @@ CiLut2D::value(const vector<double>& val_array) const
   double y1 = mIndexArray[1][idx2_b];
 
   // 単純な線形補間
-  double dx = (val1 - x0) / (x1 - x0);
-  double dy = (val2 - y0) / (y1 - y0);
-  double val_0 = mValueArray[idx(idx1_a, idx2_a)];
-  double val_x = mValueArray[idx(idx1_b, idx2_a)];
-  double val_y = mValueArray[idx(idx1_a, idx2_b)];
-  double val_xy = mValueArray[idx(idx1_b, idx2_b)];
-  double val_dx = val_x - val_0;
-  double val_dy = val_y - val_0;
-  double val_dxy = val_xy - val_x - val_y + val_0;
+  double wx  = mIndexWidthArray[0][idx1_a];
+  double dx0 = (val1 - x0) / wx;
+  double dx1 = (x1 - val1) / wx;
+  double wy  = mIndexWidthArray[1][idx2_a];
+  double dy0 = (val2 - y0) / wy;
+  double dy1 = (y1 - val2) / wy;
+  double val_00 = mValueArray[idx(idx1_a, idx2_a)];
+  double val_10 = mValueArray[idx(idx1_b, idx2_a)];
+  double val_01 = mValueArray[idx(idx1_a, idx2_b)];
+  double val_11 = mValueArray[idx(idx1_b, idx2_b)];
 
-  double tmp = val_0 + val_dx * dx + val_dy * dy + val_dxy * dx * dy;
-
-  ymuint idx = idx1_a * (index_num(1) - 1) + idx2_b;
-  double tmp2 = mDataArray[idx].calc(val1, val2);
-
-  if ( tmp != tmp2 ) {
-    cout << "Error " << endl;
-    cout << "tmp  = " << tmp << endl
-	 << "tmp2 = " << tmp2 << endl;
-    cout << "val_0 = " << val_0 << endl
-	 << "mBase = " << mDataArray[idx].mBase << endl
-	 << "val_dx    = " << val_dx << endl
-	 << "mCoef1[0] = " << mDataArray[idx].mCoef1[0] << endl
-	 << "val_dy    = " << val_dy << endl
-	 << "mCoef1[1] = " << mDataArray[idx].mCoef1[1] << endl
-	 << "val_dxy   = " << val_dxy << endl
-	 << "mCoef2    = " << mDataArray[idx].mCoef2 << endl;
-  }
-  return tmp2;
-}
-
-// @brief 値を計算する．
-double
-CiLut2D::Data::calc(double val1,
-		    double val2) const
-{
-  double dx = (val1 - mIndexBase[0]) / mIndexWidth[0];
-  double dy = (val2 - mIndexBase[1]) / mIndexWidth[1];
-  return mBase + mCoef1[0] * dx + mCoef1[1] * dy + mCoef2 * dx * dy;
+  return dx1 * dy1 * val_00 + dx0 * dy1 * val_10 +
+         dx1 * dy0 * val_01 + dx0 * dy0 * val_11;
 }
 
 
@@ -624,6 +569,10 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
       mIndexArray[0][i] = index_array1[i];
     }
   }
+  mIndexWidthArray[0].resize(n1 - 1);
+  for (ymuint i = 0; i < n1 - 1; ++ i) {
+    mIndexWidthArray[0][i] = mIndexArray[0][i + 1] - mIndexArray[0][i];
+  }
 
   ymuint n2 = 0;
   if ( index_array2.empty() ) {
@@ -640,6 +589,10 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
       mIndexArray[1][i] = index_array2[i];
     }
   }
+  mIndexWidthArray[1].resize(n2 - 1);
+  for (ymuint i = 0; i < n2 - 1; ++ i) {
+    mIndexWidthArray[1][i] = mIndexArray[1][i + 1] - mIndexArray[1][i];
+  }
 
   ymuint n3 = 0;
   if ( index_array3.empty() ) {
@@ -655,6 +608,10 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
     for (ymuint32 i = 0; i < n3; ++ i) {
       mIndexArray[2][i] = index_array3[i];
     }
+  }
+  mIndexWidthArray[2].resize(n3 - 1);
+  for (ymuint i = 0; i < n3 - 1; ++ i) {
+    mIndexWidthArray[2][i] = mIndexArray[2][i + 1] - mIndexArray[2][i];
   }
 
   ymuint n = n1 * n2 * n3;
@@ -740,27 +697,32 @@ CiLut3D::value(const vector<double>& val_array) const
   double z1 = mIndexArray[3][idx3_b];
 
   // 単純な線形補間
-  double dx = (val1 - x0) / (x1 - x0);
-  double dy = (val2 - y0) / (y1 - y0);
-  double dz = (val3 - z0) / (z1 - z0);
-  double val_0 = mValueArray[idx(idx1_a, idx2_a, idx3_a)];
-  double val_x = mValueArray[idx(idx1_b, idx2_a, idx3_a)];
-  double val_y = mValueArray[idx(idx1_a, idx2_b, idx3_a)];
-  double val_z = mValueArray[idx(idx1_a, idx2_a, idx3_b)];
-  double val_xy = mValueArray[idx(idx1_b, idx2_b, idx3_a)];
-  double val_yz = mValueArray[idx(idx1_a, idx2_b, idx3_b)];
-  double val_zx = mValueArray[idx(idx1_b, idx2_a, idx3_b)];
-  double val_xyz = mValueArray[idx(idx1_b, idx2_b, idx3_b)];
-  double val_dx = val_x - val_0;
-  double val_dy = val_y - val_0;
-  double val_dz = val_z - val_0;
-  double val_dxy = val_xy - val_dx - val_dy;
-  double val_dyz = val_yz - val_dy - val_dz;
-  double val_dzx = val_zx - val_dz - val_dx;
-  double val_dxyz = val_xyz - val_xy - val_yz - val_zx + val_x + val_y + val_z - val_0;
-  return val_0 + val_dx * dx + val_dy * dy + val_dz * dz
-    + val_dxy * dx * dy + val_dyz * dy * dz + val_dzx * dz * dx
-    + val_dxyz * dx * dy * dz;
+  double wx  = mIndexWidthArray[0][idx1_a];
+  double dx0 = (val1 - x0) / wx;
+  double dx1 = (x1 - val1) / wx;
+  double wy  = mIndexWidthArray[1][idx2_a];
+  double dy0 = (val2 - y0) / wy;
+  double dy1 = (y1 - val2) / wy;
+  double wz  = mIndexWidthArray[2][idx3_a];
+  double dz0 = (val3 - z0) / wz;
+  double dz1 = (z1 - val3) / wz;
+  double val_000 = mValueArray[idx(idx1_a, idx2_a, idx3_a)];
+  double val_100 = mValueArray[idx(idx1_b, idx2_a, idx3_a)];
+  double val_010 = mValueArray[idx(idx1_a, idx2_b, idx3_a)];
+  double val_001 = mValueArray[idx(idx1_a, idx2_a, idx3_b)];
+  double val_110 = mValueArray[idx(idx1_b, idx2_b, idx3_a)];
+  double val_011 = mValueArray[idx(idx1_a, idx2_b, idx3_b)];
+  double val_101 = mValueArray[idx(idx1_b, idx2_a, idx3_b)];
+  double val_111 = mValueArray[idx(idx1_b, idx2_b, idx3_b)];
+
+  return dx1 * dy1 * dz1 * val_000 +
+         dx0 * dy1 * dz1 * val_100 +
+         dx1 * dy0 * dz1 * val_010 +
+         dx1 * dy1 * dz0 * val_001 +
+         dx0 * dy0 * dz1 * val_110 +
+         dx1 * dy0 * dz0 * val_011 +
+         dx0 * dy1 * dz0 * val_101 +
+         dx0 * dy0 * dz0 * val_111;
 }
 
 END_NAMESPACE_YM_CELL
