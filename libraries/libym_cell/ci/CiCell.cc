@@ -92,10 +92,10 @@ CiCell::CiCell(CiLibrary* library,
 
   {
     ymuint n = ni2 * no2 * 2;
-    void* s = alloc.get_memory(sizeof(const CiTiming*) * n);
-    mTimingArray = new (s) CellTiming*[n];
+    void* s = alloc.get_memory(sizeof(const CiTimingArray*) * n);
+    mTimingMap = new (s) CiTimingArray*[n];
     for (ymuint i = 0; i < n; ++ i) {
-      mTimingArray[i] = NULL;
+      mTimingMap[i] = NULL;
     }
   }
 
@@ -310,29 +310,65 @@ CiCell::bundle(const string& name) const
   return NULL;
 }
 
+// @brief タイミング情報の数の取得
+ymuint
+CiCell::timing_num() const
+{
+  return mTimingNum;
+}
+
+// @brief タイミング情報の取得
+// @param[in] pos 位置番号 ( 0 <= pos < timing_num() )
+const CellTiming*
+CiCell::timing(ymuint pos) const
+{
+  assert_cond( pos < timing_num(), __FILE__, __LINE__);
+  return mTimingArray[pos];
+}
+
+// @brief 条件に合致するタイミング情報の数の取得
+// @param[in] ipos 開始ピン番号 ( 0 <= ipos < input_num2() )
+// @param[in] opos 終了ピン番号 ( 0 <= opos < output_num2() )
+// @param[in] timing_sense タイミング情報の摘要条件
+ymuint
+CiCell::timing_num(ymuint ipos,
+		   ymuint opos,
+		   tCellTimingSense sense) const
+{
+  ymuint base = (opos * input_num2() + ipos) * 2;
+  switch ( sense ) {
+  case kCellPosiUnate: base += 0; break;
+  case kCellNegaUnate: base += 1; break;
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+  }
+  if ( mTimingMap[base] == NULL ) {
+    return 0;
+  }
+  return mTimingMap[base]->mNum;
+}
+
 // @brief タイミング情報の取得
 // @param[in] ipos 開始ピン番号
 // @param[in] opos 終了ピン番号
 // @param[in] timing_sense タイミング情報の摘要条件
+// @param[in] pos 位置番号 ( 0 <= pos < timing_num(ipos, opos, timing_sense) )
 // @return 条件に合致するタイミング情報を返す．
-// @note なければ NULL を返す．
 const CellTiming*
 CiCell::timing(ymuint ipos,
 	       ymuint opos,
-	       tCellTimingSense sense) const
+	       tCellTimingSense sense,
+	       ymuint pos) const
 {
-  ymuint base = opos * input_num2() + ipos;
+  assert_cond( pos < timing_num(ipos, opos, sense), __FILE__, __LINE__);
+  ymuint base = (opos * input_num2() + ipos) * 2;
   switch ( sense ) {
-  case kCellPosiUnate:
-    return mTimingArray[base + 0];
-
-  case kCellNegaUnate:
-    return mTimingArray[base + 1];
-
+  case kCellPosiUnate: base += 0; break;
+  case kCellNegaUnate: base += 1; break;
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
-  return NULL;
+  return mTimingMap[base]->mArray[pos];
 }
 
 // @brief 属している CellGroup を返す．

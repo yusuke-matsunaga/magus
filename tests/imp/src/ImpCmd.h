@@ -194,6 +194,34 @@ protected:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class PrintConstCmd ImpCmd.h "ImpCmd.h"
+/// @brief 定数ノードを出力するコマンド
+//////////////////////////////////////////////////////////////////////
+class PrintConstCmd :
+  public ImpCmd
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] imp_data 共通のデータ
+  PrintConstCmd(ImpData* imp_data);
+
+  /// @brief デストラクタ
+  virtual
+  ~PrintConstCmd();
+
+
+protected:
+
+  /// @brief コマンドを実行する仮想関数
+  virtual
+  int
+  cmd_proc(TclObjVector& objv);
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class PrintCmd ImpCmd.h "ImpCmd.h"
 /// @brief ネットワークを出力するコマンド
 //////////////////////////////////////////////////////////////////////

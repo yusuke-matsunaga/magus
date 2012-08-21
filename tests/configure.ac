@@ -14,7 +14,7 @@ AC_INIT([ymtools-tests], [1.0],
 AC_PREREQ(2.57)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2006-2011 Yusuke Matsunaga
+Copyright (C) 2006-2012 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
@@ -150,9 +150,10 @@ AC_CONFIG_FILES([
 	imp/src/libym_imp/Makefile
 	imp/src/bb/Makefile
 	imp/src/bb/include/Makefile
-	imp/src/bb/src/Makefile
-	imp/src/bb/src/parser/Makefile
-	imp/src/bb/src/pt/Makefile
+	imp/src/bb/parser/Makefile
+	imp/src/bb/pt/Makefile
+	genaig/Makefile
+	lrw/Makefile
 	])
 
 

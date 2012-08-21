@@ -40,6 +40,26 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
+/// @brief 遅延モデルを表す列挙型
+//////////////////////////////////////////////////////////////////////
+enum tCellDelayModel {
+  kCellDelayGenericCmos,
+  kCellDelayTableLookup,
+  kCellDelayPiecewiseCmos,
+  kCellDelayCmos2,
+  kCellDelayDcm
+};
+
+/// @brief ストリーム出力演算子
+/// @param[in] s 出力先のストリーム
+/// @param[in] delay_mode 遅延モード
+/// @return s を返す．
+ostream&
+operator<<(ostream& s,
+	   tCellDelayModel delay_model);
+
+
+//////////////////////////////////////////////////////////////////////
 /// @brief タイミングの条件を表す列挙型
 //////////////////////////////////////////////////////////////////////
 enum tCellTimingSense {
@@ -47,6 +67,14 @@ enum tCellTimingSense {
   kCellNegaUnate = 2,
   kCellNonUnate  = 3
 };
+
+/// @brief ストリーム出力演算子
+/// @param[in] s 出力先のストリーム
+/// @param[in] timing_sense タイミングセンス
+/// @return s を返す．
+ostream&
+operator<<(ostream& s,
+	   tCellTimingSense timing_sense);
 
 
 /////////////////////////////////////////////////////////////////////
@@ -65,13 +93,13 @@ enum tCellTimingType {
   kCellTimingThreeStateDisableFall  = 8,
 
   kCellTimingRisingEdge             = 9,
-  ktimingFallingEdge            = 10,
+  kCellTimingFallingEdge            = 10,
 
   kCellTimingPreset                 = 11,
   kCellTimingClear                  = 12,
 
   kCellTimingHoldRising             = 13,
-  kCellTimingHaldFalling            = 14,
+  kCellTimingHoldFalling            = 14,
 
   kCellTimingSetupRising            = 15,
   kCellTimingSetupFalling           = 16,
@@ -95,6 +123,46 @@ enum tCellTimingType {
   kCellTimingNochangeLowHigh        = 29,
   kCellTimingNochangeLowLow         = 30
 };
+
+/// @brief ストリーム出力演算子
+/// @param[in] s 出力先のストリーム
+/// @param[in] timing_type タイミング条件
+/// @return s を返す．
+ostream&
+operator<<(ostream& s,
+	   tCellTimingType timing_type);
+
+
+//////////////////////////////////////////////////////////////////////
+/// @brief ルックアップテーブルの変数の型
+//////////////////////////////////////////////////////////////////////
+enum tCellVarType {
+  kVarInputNetTransition,
+
+  kVarTotalOutputNetCapacitance,
+  kVarOutputNetLength,
+  kVarOutputNetWireCap,
+  kVarOutputNetPinCap,
+
+  kVarRelatedOutTotalOutputNetCapacitance,
+  kVarRelatedOutOutputNetLength,
+  kVarRelatedOutOutputNetWireCap,
+  kVarRelatedOutOutputNetPinCap,
+
+  kVarConstrainedPinTransition,
+
+  kVarRelatedPinTransition,
+
+  kVarNone
+};
+
+/// @brief ストリーム出力演算子
+/// @param[in] s 出力先のストリーム
+/// @param[in] var_type 変数の型
+/// @return s を返す．
+ostream&
+operator<<(ostream& s,
+	   tCellVarType var_type);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -142,6 +210,75 @@ class CellPatGraph;
 END_NAMESPACE_YM_CELL
 
 BEGIN_NAMESPACE_YM
+
+using nsCell::tCellDelayModel;
+using nsCell::kCellDelayGenericCmos;
+using nsCell::kCellDelayTableLookup;
+using nsCell::kCellDelayPiecewiseCmos;
+using nsCell::kCellDelayCmos2;
+using nsCell::kCellDelayDcm;
+
+using nsCell::tCellTimingSense;
+using nsCell::kCellPosiUnate;
+using nsCell::kCellNegaUnate;
+using nsCell::kCellNonUnate;
+
+using nsCell::tCellTimingType;
+using nsCell::kCellTimingCombinational;
+using nsCell::kCellTimingCombinationalRise;
+using nsCell::kCellTimingCombinationalFall;
+
+using nsCell::kCellTimingThreeStateEnable;
+using nsCell::kCellTimingThreeStateDisable;
+using nsCell::kCellTimingThreeStateEnableRise;
+using nsCell::kCellTimingThreeStateEnableFall;
+using nsCell::kCellTimingThreeStateDisableRise;
+using nsCell::kCellTimingThreeStateDisableFall;
+
+using nsCell::kCellTimingRisingEdge;
+using nsCell::kCellTimingFallingEdge;
+
+using nsCell::kCellTimingPreset;
+using nsCell::kCellTimingClear;
+
+using nsCell::kCellTimingHoldRising;
+using nsCell::kCellTimingHoldFalling;
+
+using nsCell::kCellTimingSetupRising;
+using nsCell::kCellTimingSetupFalling;
+
+using nsCell::kCellTimingRecoveryRising;
+using nsCell::kCellTimingRecoveryFalling;
+
+using nsCell::kCellTimingSkewRising;
+using nsCell::kCellTimingSkewFalling;
+
+using nsCell::kCellTimingRemovalRising;
+using nsCell::kCellTimingRemovalFalling;
+
+using nsCell::kCellTimingNonSeqSetupRising;
+using nsCell::kCellTimingNonSeqSetupFalling;
+using nsCell::kCellTimingNonSeqHoldRising;
+using nsCell::kCellTimingNonSeqHoldFalling;
+
+using nsCell::kCellTimingNochangeHighHigh;
+using nsCell::kCellTimingNochangeHighLow;
+using nsCell::kCellTimingNochangeLowHigh;
+using nsCell::kCellTimingNochangeLowLow;
+
+using nsCell::tCellVarType;
+using nsCell::kVarInputNetTransition;
+using nsCell::kVarTotalOutputNetCapacitance;
+using nsCell::kVarOutputNetLength;
+using nsCell::kVarOutputNetWireCap;
+using nsCell::kVarOutputNetPinCap;
+using nsCell::kVarRelatedOutTotalOutputNetCapacitance;
+using nsCell::kVarRelatedOutOutputNetLength;
+using nsCell::kVarRelatedOutOutputNetWireCap;
+using nsCell::kVarRelatedOutOutputNetPinCap;
+using nsCell::kVarConstrainedPinTransition;
+using nsCell::kVarRelatedPinTransition;
+using nsCell::kVarNone;
 
 using nsCell::CellArea;
 using nsCell::CellTime;

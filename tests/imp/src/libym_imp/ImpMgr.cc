@@ -8,9 +8,10 @@
 
 
 #include "ImpMgr.h"
-#include "ym_networks/BdnNode.h"
 #include "ImpInput.h"
 #include "ImpAnd.h"
+#include "ImpRec.h"
+#include "ym_networks/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -41,7 +42,6 @@ ImpMgr::clear()
   mInputArray.clear();
   mNodeList.clear();
   mNodeArray.clear();
-  mConstArray.clear();
   mBNodeMap.clear();
   mChgStack.clear();
 }
@@ -330,7 +330,6 @@ void
 ImpMgr::set_const(ymuint id,
 		  ymuint val)
 {
-  mConstArray[id] = (val << 1) | 1U;
   ImpNode* node = this->node(id);
   node->set_const(*this, val);
 }
@@ -341,43 +340,41 @@ ImpMgr::reg_node(ImpNode* node)
 {
   node->mId = mNodeArray.size();
   mNodeArray.push_back(node);
-  mConstArray.push_back(0U);
   node->mListIter = mUnodeList.end();
 }
 
 // @brief ノードに値を設定し含意操作を行う．
 // @param[in] node ノード
 // @param[in] val 設定する値 ( 0 or 1 )
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 bool
 ImpMgr::assert(ImpNode* node,
 	       ymuint val,
-	       vector<ImpVal>& imp_list)
+	       ImpRec& rec)
 {
-  mSrcId = node->id();
+  rec.set_src(node, val);
   mMarkerStack.push_back(mChgStack.size());
   if ( val == 0 ) {
-    return bwd_prop0(node, NULL, imp_list);
+    return bwd_prop0(node, NULL, rec);
   }
   else {
-    return bwd_prop1(node, NULL, imp_list);
+    return bwd_prop1(node, NULL, rec);
   }
 }
 
 // @brief ノードのファンアウト先に0を伝搬する．
 // @param[in] node ノード
 // @param[in] from 後方含意の場合の含意元のノード
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fanout_prop0(ImpNode* node,
 		     ImpNode* from,
-		     vector<ImpVal>& imp_list)
+		     ImpRec& rec)
 {
-  if ( node->id() != mSrcId ) {
-    imp_list.push_back(ImpVal(node->id(), 0));
-  }
+  rec.record(node, 0);
+
   const vector<ImpEdge*>& fo_list = node->fanout_list();
   for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
@@ -389,18 +386,18 @@ ImpMgr::fanout_prop0(ImpNode* node,
     bool stat;
     if ( e->src_inv() ) {
       if ( e->dst_pos() == 0 ) {
-	stat = node->fwd0_imp1(*this, imp_list);
+	stat = node->fwd0_imp1(*this, rec);
       }
       else {
-	stat = node->fwd1_imp1(*this, imp_list);
+	stat = node->fwd1_imp1(*this, rec);
       }
     }
     else {
       if ( e->dst_pos() == 0 ) {
-	stat = node->fwd0_imp0(*this, imp_list);
+	stat = node->fwd0_imp0(*this, rec);
       }
       else {
-	stat = node->fwd1_imp0(*this, imp_list);
+	stat = node->fwd1_imp0(*this, rec);
       }
     }
     if ( !stat ) {
@@ -413,17 +410,16 @@ ImpMgr::fanout_prop0(ImpNode* node,
 // @brief ノードのファンアウト先に1を伝搬する．
 // @param[in] node ノード
 // @param[in] from 後方含意の場合の含意元のノード
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fanout_prop1(ImpNode* node,
 		     ImpNode* from,
-		     vector<ImpVal>& imp_list)
+		     ImpRec& rec)
 {
-  if ( node->id() != mSrcId ) {
-    imp_list.push_back(ImpVal(node->id(), 1));
-  }
+  rec.record(node, 1);
+
   const vector<ImpEdge*>& fo_list = node->fanout_list();
   for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
@@ -435,18 +431,18 @@ ImpMgr::fanout_prop1(ImpNode* node,
     bool stat;
     if ( e->src_inv() ) {
       if ( e->dst_pos() == 0 ) {
-	stat = node->fwd0_imp0(*this, imp_list);
+	stat = node->fwd0_imp0(*this, rec);
       }
       else {
-	stat = node->fwd1_imp0(*this, imp_list);
+	stat = node->fwd1_imp0(*this, rec);
       }
     }
     else {
       if ( e->dst_pos() == 0 ) {
-	stat = node->fwd0_imp1(*this, imp_list);
+	stat = node->fwd0_imp1(*this, rec);
       }
       else {
-	stat = node->fwd1_imp1(*this, imp_list);
+	stat = node->fwd1_imp1(*this, rec);
       }
     }
     if ( !stat ) {
@@ -458,94 +454,94 @@ ImpMgr::fanout_prop1(ImpNode* node,
 
 // @brief ノードのファンイン0に0を伝搬する．
 // @param[in] node ノード
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fanin0_prop0(ImpNode* node,
-		     vector<ImpVal>& imp_list)
+		     ImpRec& rec)
 {
   const ImpEdge& e = node->fanin0();
   ImpNode* dst_node = e.src_node();
   if ( e.src_inv() ) {
-    return bwd_prop1(dst_node, node, imp_list);
+    return bwd_prop1(dst_node, node, rec);
   }
   else {
-    return bwd_prop0(dst_node, node, imp_list);
+    return bwd_prop0(dst_node, node, rec);
   }
 }
 
 // @brief ノードのファンイン0に1を伝搬する．
 // @param[in] node ノード
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fanin0_prop1(ImpNode* node,
-		     vector<ImpVal>& imp_list)
+		     ImpRec& rec)
 {
   const ImpEdge& e = node->fanin0();
   ImpNode* dst_node = e.src_node();
   if ( e.src_inv() ) {
-    return bwd_prop0(dst_node, node, imp_list);
+    return bwd_prop0(dst_node, node, rec);
   }
   else {
-    return bwd_prop1(dst_node, node, imp_list);
+    return bwd_prop1(dst_node, node, rec);
   }
 }
 
 // @brief ノードのファンイン1に0を伝搬する．
 // @param[in] node ノード
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fanin1_prop0(ImpNode* node,
-		     vector<ImpVal>& imp_list)
+		     ImpRec& rec)
 {
   const ImpEdge& e = node->fanin1();
   ImpNode* dst_node = e.src_node();
   if ( e.src_inv() ) {
-    return bwd_prop1(dst_node, node, imp_list);
+    return bwd_prop1(dst_node, node, rec);
   }
   else {
-    return bwd_prop0(dst_node, node, imp_list);
+    return bwd_prop0(dst_node, node, rec);
   }
 }
 
 // @brief ノードのファンイン1に1を伝搬する．
 // @param[in] node ノード
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::fanin1_prop1(ImpNode* node,
-		     vector<ImpVal>& imp_list)
+		     ImpRec& rec)
 {
   const ImpEdge& e = node->fanin1();
   ImpNode* dst_node = e.src_node();
   if ( e.src_inv() ) {
-    return bwd_prop0(dst_node, node, imp_list);
+    return bwd_prop0(dst_node, node, rec);
   }
   else {
-    return bwd_prop1(dst_node, node, imp_list);
+    return bwd_prop1(dst_node, node, rec);
   }
 }
 
 // @brief ノードに後方含意で0を割り当てる．
 // @param[in] node ノード
 // @param[in] from_node 含意元のノード
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::bwd_prop0(ImpNode* node,
 		  ImpNode* from_node,
-		  vector<ImpVal>& imp_list)
+		  ImpRec& rec)
 {
-  bool stat = node->bwd_imp0(*this, imp_list);
+  bool stat = node->bwd_imp0(*this, rec);
   if ( stat ) {
-    stat = fanout_prop0(node, from_node, imp_list);
+    stat = fanout_prop0(node, from_node, rec);
   }
   return stat;
 }
@@ -553,17 +549,17 @@ ImpMgr::bwd_prop0(ImpNode* node,
 // @brief ノードに後方含意で1を割り当てる．
 // @param[in] node ノード
 // @param[in] from_node 含意元のノード
-// @param[out] imp_list 含意の結果を格納するリスト
+// @param[in] rec 含意を記録するオブジェクト
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
 ImpMgr::bwd_prop1(ImpNode* node,
 		  ImpNode* from_node,
-		  vector<ImpVal>& imp_list)
+		  ImpRec& rec)
 {
-  bool stat = node->bwd_imp1(*this, imp_list);
+  bool stat = node->bwd_imp1(*this, rec);
   if ( stat ) {
-    stat = fanout_prop1(node, from_node, imp_list);
+    stat = fanout_prop1(node, from_node, rec);
   }
   return stat;
 }

@@ -11,8 +11,7 @@
 #include "ImpMgr.h"
 #include "ImpInfo.h"
 #include "ImpVal.h"
-
-#include "ym_networks/BdnMgr.h"
+#include "ImpListRec2.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -45,40 +44,18 @@ ContraImp::learning(ImpMgr& imp_mgr,
   // まず direct_imp の情報を imp_list_array にコピーする．
   // 同時に対偶も imp_list_array に追加する．
   vector<vector<ImpVal> > imp_list_array(n * 2);
+  ImpListRec2 rec(imp_list_array);
   for (ymuint src_id = 0; src_id < n; ++ src_id) {
     ImpNode* node = imp_mgr.node(src_id);
 
-    // node に 0 を割り当てる．
-    vector<ImpVal>& imp_list0 = imp_list_array[src_id * 2 + 0];
-    bool ok0 = imp_mgr.assert(node, 0, imp_list0);
-    if ( !ok0 ) {
-      imp_list0.clear();
-      // 単一の割り当てで矛盾が起こった．
-      // node は 1 固定
-      imp_mgr.set_const(src_id, 1);
-    }
-    imp_mgr.backtrack();
-
-    // node に 1 を割り当てる．
-    vector<ImpVal>& imp_list1 = imp_list_array[src_id * 2 + 1];
-    bool ok1 = imp_mgr.assert(node, 1, imp_list1);
-    if ( !ok1 ) {
-      imp_list1.clear();
-      // 単一の割り当てで矛盾が起こった．
-      // node は 0 固定
-      imp_mgr.set_const(src_id, 0);
-    }
-    imp_mgr.backtrack();
-
-    if ( !imp_mgr.is_const(src_id) ) {
-      for (ymuint src_val = 0; src_val <= 1; ++ src_val) {
-	const vector<ImpVal>& imp_list = imp_list_array[src_id * 2 + src_val];
-	for (vector<ImpVal>::const_iterator p = imp_list.begin();
-	     p != imp_list.end(); ++ p) {
-	  ymuint dst_id = p->id();
-	  ymuint dst_val = p->val();
-	  imp_list_array[dst_id * 2 + (dst_val ^ 1)].push_back(ImpVal(src_id, src_val ^ 1));
-	}
+    for (ymuint val = 0; val < 2; ++ val) {
+      // node に val を割り当てる．
+      bool ok = imp_mgr.assert(node, val, rec);
+      imp_mgr.backtrack();
+      if ( !ok ) {
+	// 単一の割り当てで矛盾が起こった．
+	// node は val ^ 1 固定
+	imp_mgr.set_const(src_id, val ^ 1);
       }
     }
   }

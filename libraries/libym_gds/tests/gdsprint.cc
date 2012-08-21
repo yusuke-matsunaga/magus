@@ -3,15 +3,11 @@
 /// @brief GDS-II ファイルダンププログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: gdsprint.cc 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_gds/GdsScanner.h"
-#include "ym_gds/GdsRecMgr.h"
-#include "ym_gds/GdsRecord.h"
 #include "ym_gds/GdsDumper.h"
 #include "ym_gds/Msg.h"
 
@@ -22,20 +18,29 @@ main(int argc,
   using namespace std;
   using namespace nsYm::nsGds;
 
-  GdsRecMgr mgr;
-  GdsScanner scanner(cin, mgr);
+  if ( argc != 2 ) {
+    cerr << "USAGE: " << argv[0] << " <gds2 filename>" << endl;
+    return 1;
+  }
+
+  GdsScanner scanner;
   GdsDumper dumper(cout);
-  
+
+  if ( !scanner.open_file(argv[1]) ) {
+    cerr << argv[1] << ": No such file" << endl;
+    return 2;
+  }
+
   MsgMgr& msgmgr = MsgMgr::the_mgr();
   tMsgMask msgmask = kMsgMaskError | kMsgMaskWarning;
   TestMsgHandler* tmh = new TestMsgHandler(msgmask);
   msgmgr.reg_handler(tmh);
 
-  GdsRecord* rec;
-  while ( (rec = scanner.read_rec()) ) {
-    dumper(*rec);
-    mgr.free_rec(rec);
+  while ( scanner.read_rec() ) {
+    dumper(scanner);
   }
+
+  scanner.close_file();
 
   return 0;
 }

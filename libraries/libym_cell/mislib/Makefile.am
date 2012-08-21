@@ -7,10 +7,13 @@
 
 SUBDIRS =
 
-YFLAGS = -d -v
+AM_YFLAGS = -d -v
 
 CLEANFILES = \
-	mislib_grammer.cc mislib_grammer.h y.output mislib_grammer.output
+	mislib_grammer.cc \
+	mislib_grammer.hh \
+	y.output \
+	mislib_grammer.output
 
 MAINTAINERCLEANFILES = Makefile.in
 

@@ -18,7 +18,9 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CiCellHash::CiCellHash() :
+// @param[in] alloc メモリアロケータ
+CiCellHash::CiCellHash(Alloc& alloc) :
+  mAlloc(alloc),
   mSize(0),
   mTable(NULL),
   mLimit(0),
@@ -52,7 +54,7 @@ CiCellHash::add(CiCell* cell)
 	mTable[pos] = tmp;
       }
     }
-    delete [] old_table;
+    mAlloc.put_memory(sizeof(CiCell*) * old_size, old_table);
   }
 
   ymuint pos = cell->mName.hash() % mSize;
@@ -84,7 +86,8 @@ CiCellHash::alloc_table(ymuint req_size)
 {
   mSize = req_size;
   mLimit = static_cast<ymuint>(mSize * 1.8);
-  mTable = new CiCell*[mSize];
+  void* p = mAlloc.get_memory(sizeof(CiCell*) * mSize);
+  mTable = new (p) CiCell*[mSize];
   for (ymuint i = 0; i < mSize; ++ i) {
     mTable[i] = NULL;
   }

@@ -160,6 +160,9 @@ private:
   // パタングラフを管理するオブジェクト
   LcPatMgr mPatMgr;
 
+  // Mux4 のクラス番号
+  ymuint32 mMux4Id;
+
 };
 
 END_NAMESPACE_YM_CELL_LIBCOMP

@@ -188,22 +188,12 @@ CiPin::internal_id() const
   return 0;
 }
 
-#if 0
-// @brief 出力ピン(入出力ピン)の関数を設定する．
-// @param[in] function 関数を表す論理式
+// @brief dump 用の共通情報を出力する．
 void
-CiPin::set_function(const LogExpr& function)
+CiPin::dump_common(BinO& s) const
 {
-  assert_not_reached(__FILE__, __LINE__);
-}
-#endif
-
-// @brief 出力ピン(入出力ピン)の three_state 条件を設定する．
-// @param[in] expr three_state 条件を表す論理式
-void
-CiPin::set_three_state(const LogExpr& expr)
-{
-  assert_not_reached(__FILE__, __LINE__);
+  s << name()
+    << pin_id();
 }
 
 
@@ -275,6 +265,18 @@ CellCapacitance
 CiInputPin::fall_capacitance() const
 {
   return mFallCapacitance;
+}
+
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+CiInputPin::dump(BinO& s) const
+{
+  dump_common(s);
+
+  s << capacitance()
+    << rise_capacitance()
+    << fall_capacitance();
 }
 
 
@@ -393,24 +395,6 @@ CiOutputPinBase::min_transition() const
   return mMinTransition;
 }
 
-#if 0
-// @brief タイミング情報の取得
-// @param[in] ipos 開始ピン番号
-// @param[in] timing_sense タイミング情報の摘要条件
-// @return 条件に合致するタイミング情報を返す．
-// @note なければ NULL を返す．
-const CellTiming*
-CiOutputPinBase::timing(ymuint ipos,
-			tTimingSense sense) const
-{
-  ymuint offset = 0;
-  if ( sense == kSenseNegaUnate ) {
-    offset = 1;
-  }
-  return mTimingArray[ipos * 2 + offset];
-}
-#endif
-
 // @brief 出力ピン(入出力ピン)の関数を設定する．
 // @param[in] function 関数を表す論理式
 void
@@ -427,15 +411,6 @@ CiOutputPinBase::set_three_state(const LogExpr& three_state)
   mHasFunction |= 2U;
   mThreeState = three_state;
 }
-
-#if 0
-// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
-void
-CiOutputPinBase::set_timing_array(const CellTiming** timing_array)
-{
-  mTimingArray = timing_array;
-}
-#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -485,6 +460,21 @@ CiOutputPin::is_output() const
   return true;
 }
 
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+CiOutputPin::dump(BinO& s) const
+{
+  dump_common(s);
+
+  s << max_fanout()
+    << min_fanout()
+    << max_capacitance()
+    << min_capacitance()
+    << max_transition()
+    << min_transition();
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス CiInoutPin
@@ -518,8 +508,8 @@ CiInoutPin::CiInoutPin(CiCell* cell,
 		  max_capacitance, min_capacitance,
 		  max_transition, min_transition),
   mCapacitance(capacitance),
-  mRiseCapacitance(mRiseCapacitance),
-  mFallCapacitance(mFallCapacitance)
+  mRiseCapacitance(rise_capacitance),
+  mFallCapacitance(fall_capacitance)
 {
 }
 
@@ -571,6 +561,24 @@ CiInoutPin::fall_capacitance() const
   return mFallCapacitance;
 }
 
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+CiInoutPin::dump(BinO& s) const
+{
+  dump_common(s);
+
+  s << capacitance()
+    << rise_capacitance()
+    << fall_capacitance()
+    << max_fanout()
+    << min_fanout()
+    << max_capacitance()
+    << min_capacitance()
+    << max_transition()
+    << min_transition();
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス CiInternalPin
@@ -610,6 +618,16 @@ ymuint
 CiInternalPin::internal_id() const
 {
   return mInternalId;
+}
+
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+CiInternalPin::dump(BinO& s) const
+{
+  dump_common(s);
+
+  s << internal_id();
 }
 
 END_NAMESPACE_YM_CELL

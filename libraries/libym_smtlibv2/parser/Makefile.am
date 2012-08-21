@@ -20,7 +20,8 @@ noinst_LTLIBRARIES = \
 ## libym_smt_parser.la
 ############################################################
 libym_smt_parser_la_SOURCES = \
-	SmtLibLex.cc \
+	SmtLibScanner.h \
+	SmtLibScanner.cc \
 	SmtLibNodeImpl.h \
 	SmtLibNodeImpl.cc \
 	SmtLibParser.h \

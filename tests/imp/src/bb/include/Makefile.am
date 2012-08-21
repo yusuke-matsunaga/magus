@@ -9,7 +9,7 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	bb_nsdef.h \
 	Assign.h \
-	Parser.h \
+	Driver.h \
 	PtMgr.h \
 	PtNode.h \
 	Var.h

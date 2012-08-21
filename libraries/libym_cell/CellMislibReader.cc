@@ -152,6 +152,43 @@ gen_library(const string& lib_name,
 			     CellTime::infty(),
 			     CellTime(0.0));
 
+    // タイミング情報の生成
+    vector<ymuint> tid_array(ni);
+    if ( ipin_list->type() == MislibNode::kList ) {
+      library->set_timing_num(cell_id, ni);
+      for (ymuint i = 0; i < ni; ++ i) {
+	const MislibNode* pt_pin = ipin_array[i];
+	CellTime r_i(pt_pin->rise_block_delay()->num());
+	CellResistance r_r(pt_pin->rise_fanout_delay()->num());
+	CellTime f_i(pt_pin->fall_block_delay()->num());
+	CellResistance f_r(pt_pin->fall_fanout_delay()->num());
+	library->new_timing_generic(cell_id, i,
+				    kCellTimingCombinational,
+				    LogExpr::make_one(),
+				    r_i, f_i,
+				    CellTime(0.0), CellTime(0.0),
+				    r_r, f_r);
+	tid_array[i] = i;
+      }
+    }
+    else { // ipin_list->type() == MislibNode::kPin
+      library->set_timing_num(cell_id, 1);
+      const MislibNode* pt_pin = ipin_list;
+      CellTime r_i(pt_pin->rise_block_delay()->num());
+      CellResistance r_r(pt_pin->rise_fanout_delay()->num());
+      CellTime f_i(pt_pin->fall_block_delay()->num());
+      CellResistance f_r(pt_pin->fall_fanout_delay()->num());
+      library->new_timing_generic(cell_id, 0,
+				  kCellTimingCombinational,
+				  LogExpr::make_one(),
+				  r_i, f_i,
+				  CellTime(0.0), CellTime(0.0),
+				  r_r, f_r);
+      for (ymuint i = 0; i < ni; ++ i) {
+	tid_array[i] = 0;
+      }
+    }
+
     TvFunc tv_function = function.make_tv(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       // タイミング情報の設定
@@ -188,6 +225,10 @@ gen_library(const string& lib_name,
 	}
       }
 
+      if ( redundant ) {
+	continue;
+      }
+
       tCellTimingSense sense = kCellNonUnate;
       switch ( pt_pin->phase()->type() ) {
       case MislibNode::kNoninv:
@@ -217,17 +258,15 @@ gen_library(const string& lib_name,
 			buf.str());
 	sense = sense_real;
       }
-      CellTime r_i(pt_pin->rise_block_delay()->num());
-      CellResistance r_r(pt_pin->rise_fanout_delay()->num());
-      CellTime f_i(pt_pin->fall_block_delay()->num());
-      CellResistance f_r(pt_pin->fall_fanout_delay()->num());
-      CellTiming* timing = library->new_timing(i,
-					       kCellTimingCombinational,
-					       r_i, f_i,
-					       CellTime(0.0), CellTime(0.0),
-					       r_r, f_r);
-      if ( !redundant ) {
-	library->set_timing(cell_id, i, 0, sense, timing);
+      if ( sense == kCellNonUnate ) {
+	library->set_timing(cell_id, i, 0, kCellPosiUnate,
+			    vector<ymuint>(1, tid_array[i]));
+	library->set_timing(cell_id, i, 0, kCellNegaUnate,
+			    vector<ymuint>(1, tid_array[i]));
+      }
+      else {
+	library->set_timing(cell_id, i, 0, sense,
+			    vector<ymuint>(1, tid_array[i]));
       }
     }
   }

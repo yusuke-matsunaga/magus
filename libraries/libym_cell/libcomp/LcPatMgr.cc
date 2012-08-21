@@ -17,90 +17,7 @@
 
 
 BEGIN_NONAMESPACE
-
-// 3入力の分解パタン
-const ymuint n_pat3 = 2;
-int pat3[n_pat3][5] = {
-	{ -1, 0, -1, 1, 2 },
-	{ -1, -1, 0, 1, 2 }
-};
-
-// 4入力の分解パタン
-const ymuint n_pat4 = 5;
-int pat4[n_pat4][7] = {
-	{ -1, 0, -1, 1, -1, 2, 3 },
-	{ -1, 0, -1, -1, 1, 2, 3 },
-	{ -1, -1, 0, 1, -1, 2, 3 },
-	{ -1, -1, 0, -1, 1, 2, 3 },
-	{ -1, -1, -1, 0, 1, 2, 3 }
-};
-
-// 5入力の分解パタン
-const ymuint n_pat5 = 14;
-int pat5[n_pat5][9] = {
-	{ -1, 0, -1, 1, -1, 2, -1, 3, 4 },
-	{ -1, 0, -1, 1, -1, -1, 2, 3, 4 },
-	{ -1, 0, -1, -1, 1, 2, -1, 3, 4 },
-	{ -1, 0, -1, -1, 1, -1, 2, 3, 4 },
-	{ -1, 0, -1, -1, -1, 1, 2, 3, 4 },
-	{ -1, -1, 0, 1, -1, 2, -1, 3, 4 },
-	{ -1, -1, 0, 1, -1, -1, 2, 3, 4 },
-	{ -1, -1, 0, -1, 1, 2, -1, 3, 4 },
-	{ -1, -1, -1, 0, 1, 2, -1, 3, 4 },
-	{ -1, -1, 0, -1, 1, -1, 2, 3, 4 },
-	{ -1, -1, 0, -1, -1, 1, 2, 3, 4 },
-	{ -1, -1, -1, 0, 1, -1, 2, 3, 4 },
-	{ -1, -1, -1, 0, -1, 1, 2, 3, 4 },
-	{ -1, -1, -1, -1, 0, 1, 2, 3, 4 }
-};
-
-// 6入力の分解パタン
-const ymuint n_pat6 = 42;
-int pat6[n_pat6][11] = {
-	{ -1, 0, -1, 1, -1, 2, -1, 3, -1, 4, 5 },
-	{ -1, 0, -1, 1, -1, 2, -1, -1, 3, 4, 5 },
-	{ -1, 0, -1, 1, -1, -1, 2, 3, -1, 4, 5 },
-	{ -1, 0, -1, 1, -1, -1, 2, -1, 3, 4, 5 },
-	{ -1, 0, -1, 1, -1, -1, -1, 2, 3, 4, 5 },
-	{ -1, 0, -1, -1, 1, 2, -1, 3, -1, 4, 5 },
-	{ -1, 0, -1, -1, 1, 2, -1, -1, 3, 4, 5 },
-	{ -1, 0, -1, -1, 1, -1, 2, 3, -1, 4, 5 },
-	{ -1, 0, -1, -1, -1, 1, 2, 3, -1, 4, 5 },
-	{ -1, 0, -1, -1, 1, -1, 2, -1, 3, 4, 5 },
-	{ -1, 0, -1, -1, 1, -1, -1, 2, 3, 4, 5 },
-	{ -1, 0, -1, -1, -1, 1, 2, -1, 3, 4, 5 },
-	{ -1, 0, -1, -1, -1, 1, -1, 2, 3, 4, 5 },
-	{ -1, 0, -1, -1, -1, -1, 1, 2, 3, 4, 5 },
-	{ -1, -1, 0, 1, -1, 2, -1, 3, -1, 4, 5 },
-	{ -1, -1, 0, 1, -1, 2, -1, -1, 3, 4, 5 },
-	{ -1, -1, 0, 1, -1, -1, 2, 3, -1, 4, 5 },
-	{ -1, -1, 0, 1, -1, -1, 2, -1, 3, 4, 5 },
-	{ -1, -1, 0, 1, -1, -1, -1, 2, 3, 4, 5 },
-	{ -1, -1, 0, -1, 1, 2, -1, 3, -1, 4, 5 },
-	{ -1, -1, 0, -1, 1, 2, -1, -1, 3, 4, 5 },
-	{ -1, -1, -1, 0, 1, 2, -1, 3, -1, 4, 5 },
-	{ -1, -1, -1, 0, 1, 2, -1, -1, 3, 4, 5 },
-	{ -1, -1, 0, -1, 1, -1, 2, 3, -1, 4, 5 },
-	{ -1, -1, 0, -1, -1, 1, 2, 3, -1, 4, 5 },
-	{ -1, -1, -1, 0, 1, -1, 2, 3, -1, 4, 5 },
-	{ -1, -1, -1, 0, -1, 1, 2, 3, -1, 4, 5 },
-	{ -1, -1, -1, -1, 0, 1, 2, 3, -1, 4, 5 },
-	{ -1, -1, 0, -1, 1, -1, 2, -1, 3, 4, 5 },
-	{ -1, -1, 0, -1, 1, -1, -1, 2, 3, 4, 5 },
-	{ -1, -1, 0, -1, -1, 1, 2, -1, 3, 4, 5 },
-	{ -1, -1, 0, -1, -1, 1, -1, 2, 3, 4, 5 },
-	{ -1, -1, 0, -1, -1, -1, 1, 2, 3, 4, 5 },
-	{ -1, -1, -1, 0, 1, -1, 2, -1, 3, 4, 5 },
-	{ -1, -1, -1, 0, 1, -1, -1, 2, 3, 4, 5 },
-	{ -1, -1, -1, 0, -1, 1, 2, -1, 3, 4, 5 },
-	{ -1, -1, -1, -1, 0, 1, 2, -1, 3, 4, 5 },
-	{ -1, -1, -1, 0, -1, 1, -1, 2, 3, 4, 5 },
-	{ -1, -1, -1, 0, -1, -1, 1, 2, 3, 4, 5 },
-	{ -1, -1, -1, -1, 0, 1, -1, 2, 3, 4, 5 },
-	{ -1, -1, -1, -1, 0, -1, 1, 2, 3, 4, 5 },
-	{ -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5 }
-};
-
+#include "lcpat_table"
 END_NONAMESPACE
 
 
@@ -186,33 +103,127 @@ void
 LcPatMgr::reg_pat(const LogExpr& expr,
 		  ymuint rep_id)
 {
+  if ( mExprList.size() <= rep_id ) {
+    mExprList.resize(rep_id + 1, vector<LogExpr>());
+  }
+
+  { // 同じ論理式を処理済みならなにもしない．
+    vector<LogExpr>& expr_list = mExprList[rep_id];
+    for (vector<LogExpr>::iterator p = expr_list.begin();
+	 p != expr_list.end(); ++ p) {
+      const LogExpr& expr1 = *p;
+      if ( check_equivalent(expr, expr1) ) {
+	return;
+      }
+    }
+    // 論理式を登録しておく．
+    expr_list.push_back(expr);
+  }
+
   vector<LcPatHandle> tmp_pat_list;
   pg_sub(expr, tmp_pat_list);
 
   // 重複チェック
-  // 今は2乗オーダーのバカなアルゴリズムを使っている．
+  hash_set<string> pg_hash;
+  ymuint n = mPatList.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    if ( mRepList[i] != rep_id ) continue;
+    LcPatHandle pat1 = mPatList[i];
+    LcPatNode* node1 = pat1.node();
+    bool inv1 = pat1.inv();
+    string signature1 = node1->signature();
+    if ( inv1 ) {
+      signature1 = "~" + signature1;
+    }
+    pg_hash.insert(signature1);
+  }
+
   for (vector<LcPatHandle>::iterator p = tmp_pat_list.begin();
        p != tmp_pat_list.end(); ++ p) {
     LcPatHandle pat1 = *p;
-    bool found = false;
-    ymuint n = mPatList.size();
-    for (ymuint i = 0; i < n; ++ i) {
-      if ( mRepList[i] != rep_id ) continue;
-      LcPatHandle pat2 = mPatList[i];
-      if ( pat1.inv() == pat2.inv() &&
-	   check_isomorphic(pat1.node(), pat2.node()) ) {
-	found = true;
-	break;
-      }
+    LcPatNode* node1 = pat1.node();
+    bool inv1 = pat1.inv();
+    string signature2 = node1->signature();
+    if ( inv1 ) {
+      signature2 = "~" + signature2;
     }
-    if ( !found ) {
+    if ( pg_hash.find(signature2) == pg_hash.end() ) {
       // pat1 を登録する．
       mPatList.push_back(pat1);
       mRepList.push_back(rep_id);
-      pat1.node()->set_locked();
+      node1->set_locked();
     }
   }
+
   sweep();
+}
+
+// @brief 2つの論理式が同形かどうか調べる．
+bool
+LcPatMgr::check_equivalent(const LogExpr& expr1,
+			   const LogExpr& expr2)
+{
+  if ( expr1.is_zero() ) {
+    if ( expr2.is_zero() ) {
+      return true;
+    }
+    return false;
+  }
+  if ( expr1.is_one() ) {
+    if ( expr2.is_one() ) {
+      return true;
+    }
+    return false;
+  }
+  if ( expr2.is_constant() ) {
+    return false;
+  }
+
+  if ( expr1.is_posiliteral() ) {
+    if ( expr2.is_posiliteral() && expr1.varid() == expr2.varid() ) {
+      return true;
+    }
+    return false;
+  }
+  if ( expr1.is_negaliteral() ) {
+    if ( expr2.is_negaliteral() && expr1.varid() == expr2.varid() ) {
+      return true;
+    }
+    return false;
+  }
+  if ( expr2.is_literal() ) {
+    return false;
+  }
+
+  ymuint n = expr1.child_num();
+  if ( expr2.child_num() != n ) {
+    return false;
+  }
+
+  if ( expr1.is_and() && !expr2.is_and() ) {
+    return false;
+  }
+  if ( expr1.is_or() && !expr2.is_or() ) {
+    return false;
+  }
+  if ( expr1.is_xor() && !expr2.is_xor() ) {
+    return false;
+  }
+
+  PermGen pg(n, n);
+  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+    bool match = true;
+    for (ymuint i = 0; i < n; ++ i) {
+      if ( !check_equivalent(expr1.child(i), expr2.child(p(i))) ) {
+	match = false;
+	break;
+      }
+    }
+    if ( match ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // @brief 使われていないパタンとノードを削除してID番号を詰める．
@@ -279,28 +290,36 @@ LcPatMgr::pg_sub(const LogExpr& expr,
   }
   else {
     ymuint n = expr.child_num();
+    // ファンインの式に対するパタングラフを求める．
     vector<vector<LcPatHandle> > input_pg_list(n);
     vector<pair<ymuint, ymuint> > nk_array(n);
     for (ymuint i = 0; i < n; ++ i) {
       pg_sub(expr.child(i), input_pg_list[i]);
       nk_array[i] = make_pair(input_pg_list[i].size(), 1);
     }
+
+    hash_set<string> pg_hash;
     // ファンインのパタンの組み合わせを列挙するオブジェクト
     MultiCombiGen mcg(nk_array);
-    vector<LcPatHandle> input(n);
     for (MultiCombiGen::iterator p = mcg.begin(); !p.is_end(); ++ p) {
+      vector<LcPatHandle> tmp_input(n);
+      for (ymuint i = 0; i < n; ++ i) {
+	tmp_input[i] = input_pg_list[i][p(i, 0)];
+      }
+
       // 入力の順列を列挙するオブジェクト
       PermGen pg(n, n);
+      vector<LcPatHandle> input(n);
       for (PermGen::iterator q = pg.begin(); !q.is_end(); ++ q) {
 	for (ymuint i = 0; i < n; ++ i) {
 	  ymuint j = q(i);
-	  input[j] = input_pg_list[i][p(i, 0)];
+	  input[j] = tmp_input[i];
 	}
 	switch ( n ) {
 	case 2:
 	  {
 	    LcPatHandle handle = make_node(expr, input[0], input[1]);
-	    add_pg_list(pg_list, handle);
+	    add_pg_list(pg_list, pg_hash, handle);
 	  }
 	  break;
 
@@ -308,7 +327,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	  for (ymuint i = 0; i < n_pat3; ++ i) {
 	    ymuint pos = 0;
 	    LcPatHandle handle = make_bintree(expr, input, pat3[i], pos);
-	    add_pg_list(pg_list, handle);
+	    add_pg_list(pg_list, pg_hash, handle);
 	  }
 	  break;
 
@@ -316,7 +335,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	  for (ymuint i = 0; i < n_pat4; ++ i) {
 	    ymuint pos = 0;
 	    LcPatHandle handle = make_bintree(expr, input, pat4[i], pos);
-	    add_pg_list(pg_list, handle);
+	    add_pg_list(pg_list, pg_hash, handle);
 	  }
 	  break;
 
@@ -324,7 +343,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	  for (ymuint i = 0; i < n_pat5; ++ i) {
 	    ymuint pos = 0;
 	    LcPatHandle handle = make_bintree(expr, input, pat5[i], pos);
-	    add_pg_list(pg_list, handle);
+	    add_pg_list(pg_list, pg_hash, handle);
 	  }
 	  break;
 
@@ -332,7 +351,23 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	  for (ymuint i = 0; i < n_pat6; ++ i) {
 	    ymuint pos = 0;
 	    LcPatHandle handle = make_bintree(expr, input, pat6[i], pos);
-	    add_pg_list(pg_list, handle);
+	    add_pg_list(pg_list, pg_hash, handle);
+	  }
+	  break;
+
+	case 7:
+	  for (ymuint i = 0; i < n_pat7; ++ i) {
+	    ymuint pos = 0;
+	    LcPatHandle handle = make_bintree(expr, input, pat7[i], pos);
+	    add_pg_list(pg_list, pg_hash, handle);
+	  }
+	  break;
+
+	case 8:
+	  for (ymuint i = 0; i < n_pat8; ++ i) {
+	    ymuint pos = 0;
+	    LcPatHandle handle = make_bintree(expr, input, pat8[i], pos);
+	    add_pg_list(pg_list, pg_hash, handle);
 	  }
 	  break;
 
@@ -349,84 +384,24 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 // ただし，同形のパタンがすでにある場合には追加しない．
 void
 LcPatMgr::add_pg_list(vector<LcPatHandle>& pg_list,
+		      hash_set<string>& pg_hash,
 		      LcPatHandle new_handle)
 {
-  for (vector<LcPatHandle>::iterator p = pg_list.begin();
-       p != pg_list.end(); ++ p) {
-    LcPatHandle h = *p;
-    // 根に反転属性はないと思ったけど念のため
-    if ( h.inv() != new_handle.inv() ) continue;
-    if ( check_isomorphic(h.node(), new_handle.node()) ) {
-      // 同形のパタンが存在した．
-      return;
-    }
+  string signature = new_handle.node()->signature();
+  if ( new_handle.inv() ) {
+    signature = "~" + signature;
   }
-  // なかったので追加する．
-  pg_list.push_back(new_handle);
-}
-
-// @relates LcPatNode
-// @brief 同形か調べる．
-// @param[in] node1, node2 根のノード
-bool
-LcPatMgr::check_isomorphic(const LcPatNode* node1,
-			   const LcPatNode* node2)
-{
-  if ( node1 == node2 ) {
-    return true;
+  if ( pg_hash.find(signature) == pg_hash.end() ) {
+    pg_hash.insert(signature);
+    pg_list.push_back(new_handle);
   }
-  if ( node1->is_input() ) {
-    // node1 が入力で node2 が入力でなかったら異なる．
-    return node2->is_input();
-  }
-  if ( node2->is_input() ) {
-    // ここに来ているということは node1 が入力でない．
-    return false;
-  }
-  if ( node1->is_and() ) {
-    if ( !node2->is_and() ) {
-      // node1 が AND で node2 が XOR
-      return false;
-    }
-  }
-  else if ( node2->is_and() ) {
-    // ここに来ているということは node1 は XOR
-    return false;
-  }
-  if ( node1->fanin_inv(0) != node2->fanin_inv(0) ||
-       node1->fanin_inv(1) != node2->fanin_inv(1) ) {
-    // ファンイン極性が異なる．
-    return false;
-  }
-  if ( !check_isomorphic(node1->fanin(0), node2->fanin(0)) ) {
-    return false;
-  }
-  if ( !check_isomorphic(node1->fanin(1), node2->fanin(1)) ) {
-    return false;
-  }
-  return true;
-}
-
-// @brief 入力ノードを作る．
-// @param[in] var 入力変数
-// @note 既にあるときはそれを返す．
-LcPatNode*
-LcPatMgr::make_input(VarId var)
-{
-  ymuint id = var.val();
-  while ( mInputList.size() <= id ) {
-    LcPatNode* node = new_node();
-    ymuint id1 = mInputList.size();
-    node->set_input(id1);
-    mInputList.push_back(node);
-  }
-  LcPatNode* node = mInputList[id];
-  assert_cond( node != NULL, __FILE__, __LINE__);
-
-  return node;
 }
 
 // @brief テンプレートにしたがって2分木を作る．
+// @param[in] expr 論理式 (演算の種類を表すのに用いる)
+// @param[in] input 入力の配列
+// @param[in] pat 2分木の形を表す配列
+// @param[inout] pos pat[] 中の位置を示す変数
 LcPatHandle
 LcPatMgr::make_bintree(const LogExpr& expr,
 		       const vector<LcPatHandle>& input,
@@ -448,7 +423,30 @@ LcPatMgr::make_bintree(const LogExpr& expr,
   }
 }
 
+// @brief 入力ノードを作る．
+// @param[in] var 入力変数
+// @note 既にあるときはそれを返す．
+LcPatNode*
+LcPatMgr::make_input(VarId var)
+{
+  ymuint id = var.val();
+  while ( mInputList.size() <= id ) {
+    LcPatNode* node = new_node();
+    ymuint id1 = mInputList.size();
+    node->set_input(id1);
+    mInputList.push_back(node);
+  }
+  LcPatNode* node = mInputList[id];
+  assert_cond( node != NULL, __FILE__, __LINE__);
+
+  node->mSignature = "0";
+
+  return node;
+}
+
 // @brief 論理式の種類に応じてノードを作る．
+// @param[in] expr 論理式 (演算の種類を表すのに用いる)
+// @param[in] l_handle, r_handle 左右の子供のパタン
 LcPatHandle
 LcPatMgr::make_node(const LogExpr& expr,
 		    LcPatHandle l_handle,
@@ -503,6 +501,10 @@ LcPatMgr::make_node(const LogExpr& expr,
   node->mType = type;
   node->mFanin[0] = l_node;
   node->mFanin[1] = r_node;
+
+  ostringstream buf;
+  buf << type << l_node->mSignature << r_node->mSignature;
+  node->mSignature = buf.str();
 
   // ハッシュ表に登録する．
   if ( node_num() >= mNextLimit ) {

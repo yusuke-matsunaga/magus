@@ -28,7 +28,6 @@ AM_CPPFLAGS = \
 
 noinst_PROGRAMS = \
 	genpat \
-	genpat2 \
 	enum_pat3
 
 genpat_SOURCES = \
@@ -38,11 +37,6 @@ genpat_SOURCES = \
 
 genpat_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
-
-genpat2_SOURCES = \
-	genpat2.cc
-
-genpat2_LDADD =
 
 enum_pat3_SOURCES = \
 	enum_pat3.cc

@@ -6,8 +6,13 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	gds_nsdef.h \
-	Msg.h \
-	GdsRecMgr.h \
-	GdsRecord.h \
+	GdsACL.h \
+	GdsColRow.h \
+	GdsDate.h \
+	GdsDumper.h \
+	GdsParser.h \
 	GdsScanner.h \
-	GdsDumper.h
+	GdsString.h \
+	GdsUnits.h \
+	GdsXY.h \
+	Msg.h

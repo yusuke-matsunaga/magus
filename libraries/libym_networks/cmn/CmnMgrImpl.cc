@@ -406,12 +406,18 @@ CmnMgrImpl::new_dff(const CmnDffCell* cell,
     dff->mClear = clear;
     reg_output(clear);
   }
+  else {
+    dff->mClear = NULL;
+  }
 
   if ( cell->has_preset() ) {
     p = mAlloc.get_memory(sizeof(CmnNodeDffPreset));
     CmnNode* preset = new (p) CmnNodeDffPreset(dff);
     dff->mPreset = preset;
     reg_output(preset);
+  }
+  else {
+    dff->mPreset = NULL;
   }
 
   return dff;

@@ -8,6 +8,8 @@
 
 
 #include "DotlibFL.h"
+#include "DotlibAttr.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -19,7 +21,6 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @brief コンストラクタ
 DotlibFL::DotlibFL()
 {
-  init();
 }
 
 // @brief デストラクタ
@@ -28,16 +29,103 @@ DotlibFL::~DotlibFL()
 }
 
 // @brief 内容を初期化する．
-void
-DotlibFL::init()
+bool
+DotlibFL::set_data(const DotlibNode* fl_node)
 {
-  DotlibAttrMap::init();
+  init();
 
   mClear = NULL;
   mPreset = NULL;
 
   mClearPresetVar1 = 0;
   mClearPresetVar2 = 0;
+
+  // 状態変数名を得る．
+  if ( !fl_node->group_value()->get_string_pair(mVar1, mVar2) ) {
+    return false;
+  }
+
+  // 属性のリストを作る．
+  for (const DotlibAttr* attr = fl_node->attr_top();
+       attr; attr = attr->next()) {
+    ShString attr_name = attr->attr_name();
+    const DotlibNode* attr_value = attr->attr_value();
+    add(attr_name, attr_value);
+  }
+
+  // clear を取り出す．
+  if ( !get_singleton_or_null("clear", mClear) ) {
+    return false;
+  }
+
+  // preset を取り出す．
+  if ( !get_singleton_or_null("preset", mPreset) ) {
+    return false;
+  }
+
+  // clear_preset_var1 を取り出す．
+  const DotlibNode* tmp_node1 = NULL;
+  if ( !get_singleton_or_null("clear_preset_var1", tmp_node1) ) {
+    return false;
+  }
+  if ( tmp_node1 ) {
+    if ( !tmp_node1->is_string() ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tmp_node1->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "String value is expected.");
+      return false;
+    }
+    ShString str = tmp_node1->string_value();
+    if ( str == "L" || str == "l" ) {
+      mClearPresetVar1 = 0;
+    }
+    else if ( str == "H" || str == "h" ) {
+      mClearPresetVar1 = 1;
+    }
+    else {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tmp_node1->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error. \"L\" or \"H\" is expected.");
+      return false;
+    }
+  }
+
+  // clear_preset_var2 を取り出す．
+  const DotlibNode* tmp_node2 = NULL;
+  if ( !get_singleton_or_null("clear_preset_var2", tmp_node2) ) {
+    return false;
+  }
+  if ( tmp_node2 ) {
+    if ( !tmp_node2->is_string() ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tmp_node2->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "String value is expected.");
+      return false;
+    }
+    ShString str = tmp_node2->string_value();
+    if ( str == "L" || str == "l" ) {
+      mClearPresetVar2 = 0;
+    }
+    else if ( str == "H" || str == "h" ) {
+      mClearPresetVar2 = 1;
+    }
+    else {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tmp_node2->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error. \"L\" or \"H\" is expected.");
+      return false;
+    }
+  }
+
+  return true;
 }
 
 // @brief var1 の名前を返す．
@@ -83,4 +171,3 @@ DotlibFL::clear_preset_var2() const
 }
 
 END_NAMESPACE_YM_DOTLIB
-

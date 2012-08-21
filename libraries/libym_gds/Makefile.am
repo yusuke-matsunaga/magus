@@ -7,10 +7,13 @@ SUBDIRS = \
 	. \
 	tests
 
-YFLAGS = -d -v
+AM_YFLAGS = -d -v
 
 CLEANFILES = \
-	GdsParser.cc GdsParser.h y.output GdsParser.output
+	gds_grammer.cc \
+	gds_grammer.hh \
+	y.output \
+	gds_grammer.output
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -31,16 +34,15 @@ libym_gds_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_gds_la_SOURCES = \
+	gds_grammer.yy \
 	Msg.cc \
-	GdsParser.yy \
+	GdsDumper.cc \
+	GdsParser.cc \
 	GdsRecTable.h \
 	GdsRecTable.cc \
 	GdsRecMgr.cc \
 	GdsRecord.cc \
-	GdsData.h \
-	GdsData.cc \
-	GdsScanner.cc \
-	GdsDumper.cc
+	GdsScanner.cc
 
 libym_gds_la_LIBADD =
 #	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

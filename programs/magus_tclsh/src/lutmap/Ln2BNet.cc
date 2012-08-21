@@ -3,9 +3,7 @@
 /// @brief Ln2BNet の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: lut2bnet.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -35,8 +33,21 @@ Ln2BNet::operator()(const LnGraph& src_network,
   const LnNodeList& input_list = src_network.input_list();
   for (LnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
-    LnNode* src_node = *p;
-    BNode* dst_node = manip.new_input(string());
+    const LnNode* src_node = *p;
+    string name;
+    const LnPort* port = src_network.port(src_node);
+    if ( port ) {
+      if ( port->bit_width() == 1 ) {
+	name = port->name();
+      }
+      else {
+	// 手抜き
+	ostringstream buf;
+	buf << port->name() << "[" << src_network.port_pos(src_node) << "]";
+	name = buf.str();
+      }
+    }
+    BNode* dst_node = manip.new_input(name);
     node_assoc[src_node->id()] = dst_node;
   }
 
@@ -102,7 +113,21 @@ Ln2BNet::operator()(const LnGraph& src_network,
     LnNode* inode = onode->fanin(0);
     BNode* dst_inode = node_assoc[inode->id()];
     assert_cond(dst_inode, __FILE__, __LINE__);
-    BNode* dst_onode = manip.new_output(string());
+
+    string name;
+    const LnPort* port = src_network.port(onode);
+    if ( port ) {
+      if ( port->bit_width() == 1 ) {
+	name = port->name();
+      }
+      else {
+	// 手抜き
+	ostringstream buf;
+	buf << port->name() << "[" << src_network.port_pos(onode) << "]";
+	name = buf.str();
+      }
+    }
+    BNode* dst_onode = manip.new_output(name);
     bool stat = manip.change_output(dst_onode, dst_inode);
     assert_cond(stat, __FILE__, __LINE__);
   }

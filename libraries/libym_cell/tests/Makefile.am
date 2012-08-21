@@ -43,7 +43,8 @@ bin_PROGRAMS = \
 	dotlib_reader_test \
 	dump_restore_test \
 	cell_mgr_test \
-	cell_dump_test
+	cell_dump_test \
+	luttest
 
 mislib_parser_test_SOURCES = \
 	mislib_parser_test.cc
@@ -69,6 +70,15 @@ dotlib_reader_test_SOURCES = \
 dotlib_reader_test_LDFLAGS =
 
 dotlib_reader_test_LDADD = \
+	$(YM_CELL)
+
+
+luttest_SOURCES = \
+	luttest.cc
+
+luttest_LDFLAGS =
+
+luttest_LDADD = \
 	$(YM_CELL)
 
 

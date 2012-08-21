@@ -39,6 +39,8 @@ void prompt();
 
 %}
 
+
+// トークンの定義
 %token NUMBER
 %token TRUE
 %token FALSE

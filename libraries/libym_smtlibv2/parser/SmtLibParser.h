@@ -14,10 +14,10 @@
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/FileRegion.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
 #include "ym_utils/ShString.h"
 
-#include "SmtLibLex.h"
+#include "SmtLibScanner.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -46,10 +46,6 @@ public:
   void
   read(const string& filename);
 
-  /// @brief メッセージマネージャの取得
-  MsgMgr&
-  msg_mgr();
-
   /// @brief 今までに生成したすべてのオブジェクトを解放する．
   void
   clear();
@@ -62,58 +58,61 @@ private:
 
   /// @brief S式の読み込みを行う．
   /// @param[out] node 読み込んだ S式を格納するノード
+  /// @param[out] loc S式のファイル上の位置
   /// @return トークンの型を返す．
+  /// @note node は NULL の場合もある．
   tTokenType
-  read_sexp(SmtLibNode*& node);
+  read_sexp(SmtLibNode*& node,
+	    FileRegion& loc);
 
   /// @brief NUM タイプのノードを生成する．
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibNode*
   new_num(const FileRegion& loc,
-	  StrId val);
+	  const ShString& val);
 
   /// @brief DEC タイプのノードを生成する．
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibNode*
   new_dec(const FileRegion& loc,
-	  StrId val);
+	  const ShString& val);
 
   /// @brief HEX タイプのノードを生成する．
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibNode*
   new_hex(const FileRegion& loc,
-	  StrId val);
+	  const ShString& val);
 
   /// @brief BIN タイプのノードを生成する．
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibNode*
   new_bin(const FileRegion& loc,
-	  StrId val);
+	  const ShString& val);
 
   /// @brief STRING タイプのノードを生成する．
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibNode*
   new_string(const FileRegion& loc,
-	     StrId val);
+	     const ShString& val);
 
   /// @brief SYMBOL タイプのノードを生成する．
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibNode*
   new_symbol(const FileRegion& loc,
-	     StrId val);
+	     const ShString& val);
 
   /// @brief KEYWORD タイプのノードを生成する．
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibNode*
   new_keyword(const FileRegion& loc,
-	      StrId val);
+	      const ShString& val);
 
   /// @brief LIST タイプのノードを生成する．
   /// @param[in] loc ファイル上の位置
@@ -144,28 +143,12 @@ private:
   SimpleAlloc mAlloc;
 
   // 字句解析器
-  SmtLibLex mLex;
-
-  // メッセージハンドラの管理者
-  MsgMgr mMsgMgr;
+  SmtLibScanner mScanner;
 
   // 読み込み時のエラーの有無を示すフラグ
   bool mError;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief メッセージマネージャの取得
-inline
-MsgMgr&
-SmtLibParser::msg_mgr()
-{
-  return mMsgMgr;
-}
 
 END_NAMESPACE_YM_SMTLIBV2
 

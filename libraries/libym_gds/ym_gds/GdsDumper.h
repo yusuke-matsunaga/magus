@@ -2,10 +2,10 @@
 #define YM_GDS_GDSDUMPER_H
 
 /// @file ym_gds/GdsDumper.h
-/// @brief GDS-II ファイルの内容をダンプするためのクラス
+/// @brief GdsDumper のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -31,6 +31,7 @@ public:
   /// @brief デストラクタ
   ~GdsDumper();
 
+
 public:
 
   /// @brief record の内容を出力する．
@@ -38,76 +39,175 @@ public:
   void
   operator()(const GdsRecord& record);
 
+  /// @brief 直前に読み込んだ record の内容を出力する．
+  /// @param[in] scanner 字句解析器
+  void
+  operator()(const GdsScanner& scanner);
+
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いる下請け関数
+  //////////////////////////////////////////////////////////////////////
 
-  // HEADER の出力
+  /// @brief record の共通部分の出力
+  /// @param[in] data データ
+  /// @param[in] offset オフセット
+  /// @param[in] size サイズ
+  /// @param[in] rtype レコードの型
+  /// @param[in] dtype レコードのデータ型
+  /// @param[in] data データ
   void
-  dump_HEADER(const GdsRecord& record);
+  dump_common(ymuint32 offset,
+	      ymuint32 size,
+	      tGdsRtype rtype,
+	      tGdsDtype dtype,
+	      const ymuint8 data[]);
 
-  // BGNLIB の出力
+  /// @brief HEADER の出力
+  /// @param[in] data データ
   void
-  dump_BGNLIB(const GdsRecord& record);
+  dump_HEADER(const ymuint8 data[]);
 
-  // UNITS の出力
+  /// @brief BGNLIB の出力
+  /// @param[in] data データ
   void
-  dump_UNITS(const GdsRecord& record);
+  dump_BGNLIB(const ymuint8 data[]);
 
-  // BGNSTR の出力
+  /// @brief UNITS の出力
+  /// @param[in] data データ
   void
-  dump_BGNSTR(const GdsRecord& record);
+  dump_UNITS(const ymuint8 data[]);
 
-  // XY の出力
+  /// @brief BGNSTR の出力
+  /// @param[in] data データ
   void
-  dump_XY(const GdsRecord& record);
+  dump_BGNSTR(const ymuint8 data[]);
 
-  // COLROW の出力
+  /// @brief XY の出力
+  /// @param[in] data データ
+  /// @param[in] dsize データサイズ
   void
-  dump_COLROW(const GdsRecord& record);
+  dump_XY(const ymuint8 data[],
+	  ymuint dsize);
 
-  // PRESENTATION の出力
+  /// @brief COLROW の出力
+  /// @param[in] data データ
   void
-  dump_PRESENTATION(const GdsRecord& record);
+  dump_COLROW(const ymuint8 data[]);
 
-  // STRANS の出力
+  /// @brief PRESENTATION の出力
+  /// @param[in] data データ
   void
-  dump_STRANS(const GdsRecord& record);
+  dump_PRESENTATION(const ymuint8 data[]);
 
-  // ELFLAGS の出力
+  /// @brief STRANS の出力
+  /// @param[in] data データ
   void
-  dump_ELFLAGS(const GdsRecord& record);
+  dump_STRANS(const ymuint8 data[]);
 
-  // LIBSECUR の出力
+  /// @brief ELFLAGS の出力
+  /// @param[in] data データ
   void
-  dump_LIBSECUR(const GdsRecord& record);
+  dump_ELFLAGS(const ymuint8 data[]);
 
-  // data type が 2 byte integer 一つの場合の出力
+  /// @brief LIBSECUR の出力
+  /// @param[in] data データ
   void
-  dump_2int(const GdsRecord& record);
+  dump_LIBSECUR(const ymuint8 data[],
+		ymuint dsize);
 
-  // data type が 4 byte integer 一つの場合の出力
+  /// @brief PATHTYPE の出力
+  /// @param[in] data データ
   void
-  dump_4int(const GdsRecord& record);
+  dump_PATHTYPE(const ymuint8 data[]);
 
-  // data type が 8 byte real 一つの場合の出力
+  /// @brief data type が 2 byte integer 一つの場合の出力
+  /// @param[in] data データ
   void
-  dump_8real(const GdsRecord& record, bool s_form);
+  dump_2int(const ymuint8 data[]);
 
-  // data type が ASCII String の場合の出力
+  /// @brief data type が 4 byte integer 一つの場合の出力
+  /// @param[in] data データ
   void
-  dump_string(const GdsRecord& record);
+  dump_4int(const ymuint8 data[]);
 
-  // 時刻のデータを出力する．
+  /// @brief data type が 8 byte real 一つの場合の出力
+  /// @param[in] data データ
+  /// @param[in] s_form 科学形式で出力する時 true にするフラグ
   void
-  dump_date(int buf[]);
+  dump_8real(const ymuint8 data[],
+	     bool s_form);
 
-  // 2桁の整数を0つきで出力する．
+  /// @brief data type が ASCII String の場合の出力
+  /// @param[in] data データ
+  /// @param[in] dsize データ長
   void
-  dump_2digit(int num);
+  dump_string(const ymuint8 data[],
+	      ymuint dsize);
 
-  // 1バイトのデータを出力する．
+  /// @brief 時刻のデータを出力する．
   void
-  dump_byte(tGdsByte byte);
+  dump_date(ymuint16 buf[]);
+
+  /// @brief 2桁の整数を0つきで出力する．
+  void
+  dump_2digit(ymuint num);
+
+  /// @brief 1バイトのデータを出力する．
+  void
+  dump_byte(ymuint8 byte);
+
+  /// @brief data を 2バイト整数の配列とみなして pos 番めの要素を返す．
+  /// @param[in] data データ
+  /// @param[in] pos 位置
+  static
+  ymint16
+  conv_2byte_int(const ymuint8 data[],
+		 ymuint pos);
+
+  /// @brief pos 番目の 4バイトのデータを符号つき数(2の補数表現)に変換する．
+  /// @param[in] data データ
+  /// @param[in] pos 位置
+  static
+  ymint32
+  conv_4byte_int(const ymuint8 data[],
+		 ymuint32 pos);
+
+  /// @brief pos 番目の 4バイトのデータを浮動小数点数に変換する．
+  /// @param[in] data データ
+  /// @param[in] pos 位置
+  static
+  double
+  conv_4byte_real(const ymuint8 data[],
+		  ymuint32 pos);
+
+  /// @brief pos 番目の 8バイトのデータを浮動小数点数に変換する．
+  /// @param[in] data データ
+  /// @param[in] pos 位置
+  static
+  double
+  conv_8byte_real(const ymuint8 data[],
+		  ymuint32 pos);
+
+  /// @brief データを文字列に変換する．
+  /// @param[in] data データ
+  /// @param[in] n データサイズ
+  static
+  string
+  conv_string(const ymuint8 data[],
+	      ymuint32 n);
+
+  /// @brief データを BitArray に変換する．
+  /// @param[in] data データ
+  /// @param[in] base 開始位置(ビット)
+  /// @param[in] width ビット幅
+  /// @note 単位はバイトではなくビット
+  static
+  ymuint
+  conv_bitarray(const ymuint8 data[],
+		ymuint base,
+		ymuint width);
 
 
 private:

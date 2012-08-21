@@ -21,8 +21,6 @@ BEGIN_NAMESPACE_YM_DOTLIB
 class DotlibLatch :
   public DotlibFL
 {
-  friend class DotlibNode;
-
 public:
 
   /// @brief コンストラクタ
@@ -35,8 +33,8 @@ public:
 public:
 
   /// @brief 内容を初期化する．
-  void
-  init();
+  bool
+  set_data(const DotlibNode* latch_node);
 
   /// @brief "data_in" を返す．
   const DotlibNode*

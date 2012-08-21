@@ -21,8 +21,6 @@ BEGIN_NAMESPACE_YM_DOTLIB
 class DotlibFF :
   public DotlibFL
 {
-  friend class DotlibNode;
-
 public:
 
   /// @brief コンストラクタ
@@ -35,8 +33,8 @@ public:
 public:
 
   /// @brief 内容を初期化する．
-  void
-  init();
+  bool
+  set_data(const DotlibNode* ff_node);
 
   /// @brief "next_state" を返す．
   const DotlibNode*

@@ -22,8 +22,6 @@ BEGIN_NAMESPACE_YM_DOTLIB
 //////////////////////////////////////////////////////////////////////
 class DotlibAttrMap
 {
-  friend class DotlibNode;
-
 public:
 
   /// @brief コンストラクタ
@@ -31,10 +29,6 @@ public:
 
   /// @brief デストラクタ
   ~DotlibAttrMap();
-
-  /// @brief 内容を初期化する．
-  void
-  init();
 
 
 public:
@@ -76,6 +70,10 @@ protected:
   //////////////////////////////////////////////////////////////////////
   // DotlibNode から用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容を初期化する．
+  void
+  init();
 
   /// @brief 値を追加する．
   /// @param[in] name 属性名

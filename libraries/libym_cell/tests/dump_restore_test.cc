@@ -70,7 +70,14 @@ main(int argc,
     cerr << filename << ": Error in reading library" << endl;
     return 1;
   }
-  display_library(cout, *library);
+  ofstream os1;
+  os1.open("dump1.cell", ios::binary);
+  if ( !os1 ) {
+    cerr << "Could not create " << "dump1.cell" << endl;
+    return 2;
+  }
+  display_library(os1, *library);
+  os1.close();
 
   const char* datafile = "patdata.bin";
   {
@@ -99,7 +106,14 @@ main(int argc,
     CellLibrary* library2 = CellLibrary::new_obj();
     library2->restore(bis);
 
-    display_library(cout, *library2);
+    ofstream os2;
+    os2.open("dump2.cell", ios::binary);
+    if ( !os2 ) {
+      cerr << "Could not create " << "dump2.cell" << endl;
+      return 2;
+    }
+    display_library(os2, *library2);
+    os2.close();
   }
 
   return 0;

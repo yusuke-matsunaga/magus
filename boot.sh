@@ -107,83 +107,32 @@ BASEDIR=`cd $basedir; pwd`
 # プログラム名の設定
 set_program
 
-# 必要な変数の設定
-AUTOGEN_COMMON="./autogen.common"
-
 # サブモジュールのディレクトリ名
-#SUBMODULE=`cat $BASEDIR/modules`
-SUBMODULE=\
-"libraries/libym_utils \
- libraries/libym_logic \
- libraries/libym_smtlibv2 \
- libraries/libym_mincov \
- libraries/libym_cell \
- libraries/libym_verilog \
- libraries/libym_networks \
- libraries/libym_gds \
- libraries/libym_cec \
- libraries/libym_techmap \
- libraries/libym_seal \
- libraries/libym_tclpp \
- libraries/libym_ymsh \
- tests \
- programs/magus_tclsh \
- programs/atpg \
- programs/matpg \
- programs/seal"
+SUBMODULE=`cat $BASEDIR/etc/modules`
 
 # 第1引数に応じた処理を行う．
-case "$1" in
-  ""|boot)
-    case $# in
-      0|1)
-	clean_config $BASEDIR/config
-	clean $BASEDIR
-	clean $BASEDIR/include
-	for module in $SUBMODULE; do
-	    clean_config $BASEDIR/$module
-	    clean $BASEDIR/$module
-	done
-        boot $BASEDIR
-	boot $BASEDIR/include
-	for module in $SUBMODULE; do
-	    boot $BASEDIR/$module
-	done
-        ;;
-      2)
-	clean_config $2
-	clean $2
-        boot $2
-        ;;
-      *) usage;;
-    esac
-    ;;
-  clean)
-    case $# in
-      1)
-        clean_config $BASEDIR/config
-	clean $BASEDIR
-	clean $BASEDIR/include
-	for module in $SUBMODULE; do
-	    clean_config $BASEDIR/$module
-	    clean $BASEDIR/$module
-	done
-	;;
-      2)
-        clean_config $2
-	clean $2
-	;;
-      *) usage;;
-    esac
-    ;;
-  autogen)
-    case $# in
-      3|4)
-	mk_autogen $BASEDIR $2 $3 $4
-	;;
-      *) usage;;
-    esac
-    ;;
-  debug) display_version ;;
-  *) usage;;
-esac
+ case $# in
+     0)
+	 clean_config $BASEDIR/config
+	 clean $BASEDIR
+	 clean $BASEDIR/include
+	 for module in $SUBMODULE; do
+	     clean_config $BASEDIR/$module
+	     clean $BASEDIR/$module
+	 done
+         boot $BASEDIR
+	 boot $BASEDIR/include
+	 for module in $SUBMODULE; do
+	     boot $BASEDIR/$module
+	 done
+         ;;
+     1)
+	 clean_config $1
+	 clean $1
+         boot $1
+         ;;
+     *)
+	 echo "Usage: $0 [<module-name>] : (re)generating configure script"
+	 exit 255
+	 ;;
+ esac

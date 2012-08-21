@@ -12,87 +12,6 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-#if 0
-//////////////////////////////////////////////////////////////////////
-// クラス VlwIO
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] s 出力ストリーム
-VlwIO::VlwIO(VlWriter& writer) :
-  VlwBase(writer)
-{
-}
-
-// @brief デストラクタ
-VlwIO::~VlwIO()
-{
-}
-
-// @brief 要素を出力する．
-// @param[in] name 名前
-void
-VlwIO::put_elem(const char* name)
-{
-  put_comma();
-  put_idstr(name);
-}
-
-// @brief 要素を出力する．
-// @param[in] name 名前
-void
-VlwIO::put_elem(const string& name)
-{
-  put_comma();
-  put_idstr(name);
-}
-
-// @brief 要素を出力する(範囲付き)
-// @param[in] name 名前
-// @param[in] lsb LSB
-// @param[in] msb MSB
-void
-VlwIO::put_elem(const char* name,
-		int lsb,
-		int msb)
-{
-  put_comma();
-  put_idstr(name);
-  put_str("[");
-  put_num(lsb);
-  put_str(":");
-  put_num(msb);
-  put_str("]");
-}
-
-// @brief 要素を出力する(範囲付き)
-// @param[in] name 名前
-// @param[in] lsb LSB
-// @param[in] msb MSB
-void
-VlwIO::put_elem(const string& name,
-		int lsb,
-		int msb)
-{
-  put_comma();
-  put_idstr(name);
-  put_str("[");
-  put_num(lsb);
-  put_str(":");
-  put_num(msb);
-  put_str("]");
-}
-
-// @brief カンマを出力する．
-// @note 初回は出力しない．
-void
-VlwIO::put_comma()
-{
-  put_str(mComma);
-  mComma = ", ";
-}
-#endif
-
 //////////////////////////////////////////////////////////////////////
 // クラス VlwInput
 //////////////////////////////////////////////////////////////////////
@@ -103,6 +22,18 @@ VlwInput::VlwInput(VlWriter& writer) :
   VlwBase(writer)
 {
   writer.begin_input();
+}
+
+// @brief コンストラクタ
+// @param[in] writer 出力用オブジェクト
+// @param[in] msb 範囲の MSB
+// @param[in] lsb 範囲の LSB
+VlwInput::VlwInput(VlWriter& writer,
+		   int msb,
+		   int lsb) :
+  VlwBase(writer)
+{
+  writer.begin_input(msb, lsb);
 }
 
 // @brief デストラクタ
@@ -124,6 +55,19 @@ VlwOutput::VlwOutput(VlWriter& writer) :
   writer.begin_output();
 }
 
+// @brief コンストラクタ
+// @param[in] writer 出力用オブジェクト
+// @param[in] msb 範囲の MSB
+// @param[in] lsb 範囲の LSB
+VlwOutput::VlwOutput(VlWriter& writer,
+		     int msb,
+		     int lsb) :
+  VlwBase(writer)
+{
+  writer.begin_output(msb, lsb);
+}
+
+
 // @brief デストラクタ
 VlwOutput::~VlwOutput()
 {
@@ -141,6 +85,18 @@ VlwInout::VlwInout(VlWriter& writer) :
   VlwBase(writer)
 {
   writer.begin_inout();
+}
+
+// @brief コンストラクタ
+// @param[in] writer 出力用オブジェクト
+// @param[in] msb 範囲の MSB
+// @param[in] lsb 範囲の LSB
+VlwInout::VlwInout(VlWriter& writer,
+		   int msb,
+		   int lsb) :
+  VlwBase(writer)
+{
+  writer.begin_input(msb, lsb);
 }
 
 // @brief デストラクタ
@@ -162,6 +118,18 @@ VlwWire::VlwWire(VlWriter& writer) :
   writer.begin_wire();
 }
 
+// @brief コンストラクタ
+// @param[in] writer 出力用オブジェクト
+// @param[in] msb 範囲の MSB
+// @param[in] lsb 範囲の LSB
+VlwWire::VlwWire(VlWriter& writer,
+		 int msb,
+		 int lsb) :
+  VlwBase(writer)
+{
+  writer.begin_wire(msb, lsb);
+}
+
 // @brief デストラクタ
 VlwWire::~VlwWire()
 {
@@ -179,6 +147,18 @@ VlwReg::VlwReg(VlWriter& writer) :
   VlwBase(writer)
 {
   writer.begin_reg();
+}
+
+// @brief コンストラクタ
+// @param[in] writer 出力用オブジェクト
+// @param[in] msb 範囲の MSB
+// @param[in] lsb 範囲の LSB
+VlwReg::VlwReg(VlWriter& writer,
+	       int msb,
+	       int lsb) :
+  VlwBase(writer)
+{
+  writer.begin_reg(msb, lsb);
 }
 
 // @brief デストラクタ

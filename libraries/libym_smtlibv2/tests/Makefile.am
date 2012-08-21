@@ -38,7 +38,8 @@ lextest_SOURCES = \
 	lextest.cc
 
 lextest_LDADD = \
-	../parser/libym_smt_parser.la
+	../parser/libym_smt_parser.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 lextest_CXXFLAGS = \
 	-I$(top_srcdir)/parser \
@@ -52,7 +53,8 @@ parsertest_SOURCES = \
 	parsertest.cc
 
 parsertest_LDADD = \
-	../parser/libym_smt_parser.la
+	../parser/libym_smt_parser.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 parsertest_CXXFLAGS = \
 	-I$(top_srcdir)/parser \

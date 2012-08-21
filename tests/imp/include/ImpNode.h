@@ -20,6 +20,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 
 class ImpNode;
 class ImpMgr;
+class ImpRec;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ImpNodeHandle ImpNode.h "ImpNode.h"
@@ -203,7 +204,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 内容を取り出す関数
+  // 構造情報を取り出す関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID 番号を返す．
@@ -231,11 +232,6 @@ public:
   /// @brief ファンアウトの枝のリストを返す．
   const vector<ImpEdge*>&
   fanout_list() const;
-
-  /// @brief 出力値を返す．
-  virtual
-  Bool3
-  val() const = 0;
 
 
 public:
@@ -272,6 +268,23 @@ public:
   ymuint32
   cur_state() const = 0;
 
+  /// @brief 出力値を返す．
+  virtual
+  Bool3
+  val() const = 0;
+
+  /// @brief 定数0に縮退していたら true を返す．
+  bool
+  is_const0() const;
+
+  /// @brief 定数1に縮退していたら true を返す．
+  bool
+  is_const1() const;
+
+  /// @brief 定数に縮退していたら true を返す．
+  bool
+  is_const() const;
+
   /// @brief 状態を元にもどす．
   virtual
   void
@@ -296,51 +309,51 @@ public:
 
   /// @brief ファンイン0を0にする．
   /// @param[in] mgr ImMgr
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   virtual
   bool
   fwd0_imp0(ImpMgr& mgr,
-	    vector<ImpVal>& imp_list) = 0;
+	    ImpRec& rec) = 0;
 
   /// @brief ファンイン0を1にする．
   /// @param[in] mgr ImMgr
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   virtual
   bool
   fwd0_imp1(ImpMgr& mgr,
-	    vector<ImpVal>& imp_list) = 0;
+	    ImpRec& rec) = 0;
 
   /// @brief ファンイン1を0にする．
   /// @param[in] mgr ImMgr
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   virtual
   bool
   fwd1_imp0(ImpMgr& mgr,
-	    vector<ImpVal>& imp_list) = 0;
+	    ImpRec& rec) = 0;
 
   /// @brief ファンイン1を1にする．
   /// @param[in] mgr ImMgr
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   virtual
   bool
   fwd1_imp1(ImpMgr& mgr,
-	    vector<ImpVal>& imp_list) = 0;
+	    ImpRec& rec) = 0;
 
   /// @brief 出力を0にする．
   /// @param[in] mgr ImMgr
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   virtual
   bool
   bwd_imp0(ImpMgr& mgr,
-	   vector<ImpVal>& imp_list) = 0;
+	   ImpRec& rec) = 0;
 
   /// @brief 出力を1にする．
   /// @param[in] mgr ImMgr
-  /// @param[out] imp_list 含意の結果を格納するリスト
+  /// @param[in] rec 含意を記録するオブジェクト
   virtual
   bool
   bwd_imp1(ImpMgr& mgr,
-	   vector<ImpVal>& imp_list) = 0;;
+	   ImpRec& rec) = 0;
 
 
 public:
@@ -425,6 +438,12 @@ private:
 
   // ファンアウトの枝のリスト
   vector<ImpEdge*> mFanouts;
+
+  // 定数縮退の情報
+  // 0: なし
+  // 1: 0縮退
+  // 2: 1縮退
+  ymuint8 mConstState;
 
   // ビットベクタ値
   ymuint64 mBitVal;
@@ -670,6 +689,30 @@ void
 ImpNode::set_bitval(ymuint64 bitval)
 {
   mBitVal = bitval;
+}
+
+// @brief 定数0に縮退していたら true を返す．
+inline
+bool
+ImpNode::is_const0() const
+{
+  return mConstState == 1;
+}
+
+// @brief 定数1に縮退していたら true を返す．
+inline
+bool
+ImpNode::is_const1() const
+{
+  return mConstState == 2;
+}
+
+// @brief 定数に縮退していたら true を返す．
+inline
+bool
+ImpNode::is_const() const
+{
+  return mConstState != 0;
 }
 
 END_NAMESPACE_YM_NETWORKS

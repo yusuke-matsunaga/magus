@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 class PuHierName;
 
-#include "verilog_grammer.h"
+#include "verilog_grammer.hh"
 
 END_NAMESPACE_YM_VERILOG
 

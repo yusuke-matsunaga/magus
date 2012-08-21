@@ -51,11 +51,13 @@ DotlibHandler::node()
 }
 
 // @brief group attribute 用のパースを行う．
+// @param[in] vector_mode ベクタモードの時 true にするフラグ
 // @param[out] end_loc 右括弧の位置を格納する変数
 // @return 読み込んだ値(リスト)を返す．
 // @note エラーが起きたら NULL を返す．
 DotlibNodeImpl*
-DotlibHandler::parse_complex(FileRegion& end_loc)
+DotlibHandler::parse_complex(bool vector_mode,
+			     FileRegion& end_loc)
 {
   if ( !expect(LP) ) {
     return NULL;
@@ -66,7 +68,7 @@ DotlibHandler::parse_complex(FileRegion& end_loc)
   tTokenType type = parser().read_token(loc);
   if ( type != RP ) {
     for ( ; ; ) {
-      DotlibNodeImpl* value = new_value(type, loc);
+      DotlibNodeImpl* value = new_value(type, vector_mode, loc);
       if ( value == NULL ) {
 	return NULL;
       }
@@ -94,25 +96,56 @@ DotlibHandler::parse_complex(FileRegion& end_loc)
 }
 
 // @brief DotlibNode を生成する．
+// @param[in] vector_mode ベクタモードの時 true にするフラグ
 // @param[in] type 型
 // @param[in] loc ファイル上の位置情報
 // @note 残りの情報は parser() からとってくる．
 DotlibNodeImpl*
 DotlibHandler::new_value(tTokenType type,
+			 bool vector_mode,
 			 const FileRegion& loc)
 {
   switch ( type ) {
   case INT_NUM:
     return mgr()->new_int(parser().cur_int(), loc);
-    break;
 
   case FLOAT_NUM:
     return mgr()->new_float(parser().cur_float(), loc);
-    break;
 
   case SYMBOL:
-    return mgr()->new_string(ShString(parser().cur_string()), loc);
-    break;
+    if ( vector_mode ) {
+      const char* tmp_str = parser().cur_string();
+      vector<double> value_list;
+      string buf;
+      char c = '\0';
+      for (const char* s = tmp_str; (c = *s) ; ++ s) {
+	if ( isspace(c) ) {
+	  continue;
+	}
+	else if ( c == ',' ) {
+	  if ( buf.size() == 0 ) {
+	    MsgMgr::put_msg(__FILE__, __LINE__,
+			    loc,
+			    kMsgError,
+			    "DOTLIB_PARSER",
+			    "Syntax error. Null element.");
+	    return NULL;
+	  }
+	  value_list.push_back(strtod(buf.c_str(), NULL));
+	  buf.clear();
+	}
+	else {
+	  buf += c;
+	}
+      }
+      if ( buf.size() > 0 ) {
+	value_list.push_back(strtod(buf.c_str(), NULL));
+      }
+      return mgr()->new_vector(value_list, loc);
+    }
+    else {
+      return mgr()->new_string(ShString(parser().cur_string()), loc);
+    }
 
   default:
     break;

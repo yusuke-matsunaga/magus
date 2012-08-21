@@ -12,9 +12,8 @@
 #include "ImpInfo.h"
 #include "ImpHash.h"
 #include "ImpMgr.h"
-#include "StrImp.h"
+#include "ImpListRec.h"
 #include "ym_logic/SatSolver.h"
-#include "ym_utils/MFSet.h"
 #include "ym_utils/RandGen.h"
 #include "ym_utils/StopWatch.h"
 
@@ -97,21 +96,38 @@ count_list(const vector<list<ImpDst> >& cand_info)
 
 void
 mark_tfi(ImpNode* node,
-	 vector<bool>& mark,
-	 vector<ymuint>& input_list)
+	 vector<bool>& mark)
 {
   if ( mark[node->id()] ) {
     return;
   }
   mark[node->id()] = true;
 
-  if ( node->is_input() ) {
-    input_list.push_back(node->id());
+  if ( node->is_and() ) {
+    mark_tfi(node->fanin0().src_node(), mark);
+    mark_tfi(node->fanin1().src_node(), mark);
   }
-  else {
-    mark_tfi(node->fanin0().src_node(), mark, input_list);
-    mark_tfi(node->fanin1().src_node(), mark, input_list);
+}
+
+bool
+mark_tfi2(ImpNode* node,
+	  vector<bool>& mark,
+	  const vector<bool>& ref_mark)
+{
+  if ( mark[node->id()] ) {
+    return false;
   }
+  mark[node->id()] = true;
+
+  if ( ref_mark[node->id()] ) {
+    return true;
+  }
+
+  if ( node->is_and() ) {
+    return mark_tfi2(node->fanin0().src_node(), mark, ref_mark) ||
+      mark_tfi2(node->fanin1().src_node(), mark, ref_mark);
+  }
+  return false;
 }
 
 bool
@@ -184,45 +200,13 @@ justify(ImpMgr& imp_mgr,
 
   ImpNode* unode0 = unode_list[0];
   ymuint np = unode0->justification_num();
-#if 0
-  bool has_x = false;
   bool sat = false;
   for (ymuint i = 0; i < np && !sat; ++ i) {
     ImpDst imp = unode0->get_justification(i);
     ImpNode* node = imp.node();
     ymuint val = imp.val();
-    vector<ImpDst> imp_list;
-    bool stat1 = imp_mgr.assert(node, val, imp_list);
-    if ( stat1 ) {
-      if ( depth > 0 ) {
-	Bool3 stat2 = justify(imp_mgr, depth - 1);
-	if ( stat2 == kB3True ) {
-	  sat = true;
-	}
-	if ( stat2 == kB3X ) {
-	  has_x = true;
-	}
-      }
-      else {
-	has_x = true;
-      }
-    }
+    bool stat1 = imp_mgr.assert(node, val);
     imp_mgr.backtrack();
-  }
-  if ( has_x ) {
-    return kB3X;
-  }
-  else {
-    return kB3False;
-  }
-#else
-  bool sat = false;
-  for (ymuint i = 0; i < np && !sat; ++ i) {
-    ImpDst imp = unode0->get_justification(i);
-    ImpNode* node = imp.node();
-    ymuint val = imp.val();
-    vector<ImpVal> imp_list;
-    bool stat1 = imp_mgr.assert(node, val, imp_list);
     if ( stat1 ) {
       if ( depth > 0 ) {
 	Bool3 stat2 = justify(imp_mgr, depth - 1);
@@ -231,7 +215,6 @@ justify(ImpMgr& imp_mgr,
 	}
       }
     }
-    imp_mgr.backtrack();
     if ( stat1 ) {
       break;
     }
@@ -242,7 +225,6 @@ justify(ImpMgr& imp_mgr,
   else {
     return kB3X;
   }
-#endif
 }
 
 Bool3
@@ -252,13 +234,12 @@ str_sat(ImpMgr& imp_mgr,
 	ImpNode* node2,
 	ymuint val2)
 {
-  vector<ImpVal> imp_list;
-  bool stat1 = imp_mgr.assert(node1, val1, imp_list);
+  bool stat1 = imp_mgr.assert(node1, val1);
   if ( stat1 == false ) {
     imp_mgr.backtrack();
     return kB3False;
   }
-  bool stat2 = imp_mgr.assert(node2, val2, imp_list);
+  bool stat2 = imp_mgr.assert(node2, val2);
   if ( stat2 == false ) {
     imp_mgr.backtrack();
     imp_mgr.backtrack();
@@ -304,6 +285,35 @@ SatImp::learning(ImpMgr& imp_mgr,
 
   vector<vector<ImpVal> > imp_list_array(n * 2);
 
+  // 直接含意と対偶の含意をコピーしておく
+  for (ymuint src_id = 0; src_id < n; ++ src_id) {
+    ImpNode* node = imp_mgr.node(src_id);
+
+    for (ymuint src_val = 0; src_val < 2; ++ src_val) {
+      // node に src_val を割り当てる．
+      vector<ImpVal> imp_list;
+      ImpListRec rec(imp_list);
+      bool ok = imp_mgr.assert(node, src_val, rec);
+      imp_mgr.backtrack();
+      if ( ok ) {
+	for (vector<ImpVal>::const_iterator p = imp_list.begin();
+	     p != imp_list.end(); ++ p) {
+	  ymuint dst_id = p->id();
+	  ymuint dst_val = p->val();
+	  put(src_id, src_val, dst_id, dst_val, imp_hash, imp_list_array);
+	}
+      }
+      else {
+	// 単一の割り当てで矛盾が起こった．
+	// node は src_val ^ 1 固定
+	imp_mgr.set_const(src_id, src_val ^ 1);
+      }
+    }
+  }
+
+  cerr << "Phase0 end" << timer.time() << endl;
+
+#if 0
   // 各ノードから到達可能な入力ノードのリストを求める．
   vector<vector<ymuint> > input_list_array(n);
   for (ymuint i = 0; i < n; ++ i) {
@@ -313,56 +323,21 @@ SatImp::learning(ImpMgr& imp_mgr,
     mark_tfi(node0, tfi_mark, input_list_array[i]);
     sort(input_list_array[i].begin(), input_list_array[i].end());
   }
-
-  // 直接含意と対偶の含意をコピーしておく
-  for (ymuint src_id = 0; src_id < n; ++ src_id) {
-    ImpNode* node = imp_mgr.node(src_id);
-
-    // node に 0 を割り当てる．
-    vector<ImpVal> imp_list0;
-    bool ok0 = imp_mgr.assert(node, 0, imp_list0);
-    if ( !ok0 ) {
-      imp_list0.clear();
-      // 単一の割り当てで矛盾が起こった．
-      // node は 1 固定
-      imp_mgr.set_const(src_id, 1);
-    }
-    imp_mgr.backtrack();
-
-    // node に 1 を割り当てる．
-    vector<ImpVal> imp_list1;
-    bool ok1 = imp_mgr.assert(node, 1, imp_list1);
-    if ( !ok1 ) {
-      imp_list1.clear();
-      // 単一の割り当てで矛盾が起こった．
-      // node は 0 固定
-      imp_mgr.set_const(src_id, 0);
-    }
-    imp_mgr.backtrack();
-
-    if ( !imp_mgr.is_const(src_id) ) {
-      for (ymuint src_val = 0; src_val < 2; ++ src_val) {
-	const vector<ImpVal>& imp_list = (src_val == 0) ? imp_list0 : imp_list1;
-	for (vector<ImpVal>::const_iterator p = imp_list.begin();
-	     p != imp_list.end(); ++ p) {
-	  ymuint dst_id = p->id();
-	  ymuint dst_val = p->val();
-	  put(src_id, src_val, dst_id, dst_val, imp_hash, imp_list_array);
-	}
-      }
-    }
-  }
+#endif
 
   // シミュレーションでフィルタリングして残った候補を
   // SAT で調べる．
   imp_mgr.random_sim();
   vector<list<ImpDst> > cand_info(n * 2);
-  for (ymuint i = 1; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     if ( imp_mgr.is_const(i) ) {
       continue;
     }
 
     ImpNode* node0 = imp_mgr.node(i);
+
+    vector<bool> tfi_mark(n, false);
+    mark_tfi(node0, tfi_mark);
 
     ymuint64 val0 = node0->bitval();
 
@@ -373,7 +348,8 @@ SatImp::learning(ImpMgr& imp_mgr,
 
       ImpNode* node1 = imp_mgr.node(j);
 
-      if ( !check_intersect(input_list_array[i], input_list_array[j]) ) {
+      vector<bool> tfi_mark2(n, false);
+      if ( !mark_tfi2(node0, tfi_mark2, tfi_mark) ) {
 	continue;
       }
       ymuint64 val1 = node1->bitval();

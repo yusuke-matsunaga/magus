@@ -1,7 +1,7 @@
 #ifndef YM_DOTLIB_DOTLIBPIN_H
 #define YM_DOTLIB_DOTLIBPIN_H
 
-/// @file ym_dotlib/DotlibPin.h
+/// @file dotlib/DotlibPin.h
 /// @brief DotlibPin のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -21,8 +21,6 @@ BEGIN_NAMESPACE_YM_DOTLIB
 class DotlibPin :
   public DotlibAttrMap
 {
-  friend class DotlibNode;
-
 public:
   //////////////////////////////////////////////////////////////////////
   // 列挙型の定義
@@ -52,13 +50,18 @@ public:
 
 public:
 
-  /// @brief 内容を初期化する．
-  void
-  init();
+  /// @brief 内容をセットする．
+  bool
+  set_data(const DotlibNode* pin_node);
+
+  /// @brief 名前のリストの要素数を返す．
+  ymuint
+  num() const;
 
   /// @brief 名前を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < num() )
   ShString
-  name() const;
+  name(ymuint pos) const;
 
   /// @brief "direction" を返す．
   tDirection
@@ -126,8 +129,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ピン名
-  ShString mName;
+  // ピン名のリスト
+  vector<ShString> mNameList;
 
   // "direction"
   tDirection mDirection;

@@ -27,7 +27,8 @@ class CiCellHash
 public:
 
   /// @brief コンストラクタ
-  CiCellHash();
+  /// @param[in] alloc メモリアロケータ
+  CiCellHash(Alloc& alloc);
 
   /// @brief デストラクタ
   ~CiCellHash();
@@ -63,6 +64,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // メモリアロケータ
+  Alloc& mAlloc;
 
   // テーブルサイズ
   ymuint32 mSize;

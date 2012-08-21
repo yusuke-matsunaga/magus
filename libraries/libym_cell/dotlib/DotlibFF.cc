@@ -8,6 +8,8 @@
 
 
 #include "DotlibFF.h"
+#include "DotlibAttr.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -19,7 +21,6 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @brief コンストラクタ
 DotlibFF::DotlibFF()
 {
-  init();
 }
 
 // @brief デストラクタ
@@ -28,14 +29,33 @@ DotlibFF::~DotlibFF()
 }
 
 // @brief 内容を初期化する．
-void
-DotlibFF::init()
+bool
+DotlibFF::set_data(const DotlibNode* ff_node)
 {
-  DotlibFL::init();
+  if ( !DotlibFL::set_data(ff_node) ) {
+    return false;
+  }
 
   mNextState = NULL;
   mClockedOn = NULL;
   mClockedOnAlso = NULL;
+
+  // next_state を取り出す．
+  if ( !get_singleton("next_state", ff_node->loc(), mNextState) ) {
+    return false;
+  }
+
+  // clocked_on を取り出す．
+  if ( !get_singleton("clocked_on", ff_node->loc(), mClockedOn) ) {
+    return false;
+  }
+
+  // clocked_on_also を取り出す．
+  if ( !get_singleton_or_null("clocked_on_also", mClockedOnAlso) ) {
+    return false;
+  }
+
+  return true;
 }
 
 // @brief "next_state" を返す．

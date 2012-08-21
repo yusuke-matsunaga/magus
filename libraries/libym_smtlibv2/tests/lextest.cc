@@ -7,22 +7,22 @@
 /// All rights reserved.
 
 
-#include "SmtLibLex.h"
+#include "SmtLibScanner.h"
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-#include "smtlib_grammer.h"
 
 
 void
 lextest(const string& filename)
 {
-  MsgMgr msg_mgr;
   MsgHandler* handler = new StreamMsgHandler(&cerr);
-  msg_mgr.reg_handler(handler);
+  MsgMgr::reg_handler(handler);
 
-  SmtLibLex lex(msg_mgr);
+  SmtLibScanner lex;
 
   if ( !lex.open_file(filename) ) {
     cerr << "Counld not open " << filename << endl;
@@ -30,47 +30,66 @@ lextest(const string& filename)
   }
 
   for ( ; ; ) {
-    int tok = lex.read_token();
-    if ( tok == EOF ) {
+    FileRegion loc;
+    tTokenType tok = lex.read_token(loc);
+    if ( tok == kEofToken ) {
       break;
     }
+    cout << "loc = " << loc << endl;
     switch ( tok ) {
-    case NUM:
+    case kNumToken:
       cout << "NUM:     " << lex.cur_string() << endl;
       break;
 
-    case DEC:
+    case kDecToken:
       cout << "DEC:     " << lex.cur_string() << endl;
       break;
 
-    case BIN:
+    case kBinToken:
       cout << "BIN:     " << lex.cur_string() << endl;
       break;
 
-    case HEX:
+    case kHexToken:
       cout << "HEX:     " << lex.cur_string() << endl;
       break;
 
-    case STRING:
+    case kStringToken:
       cout << "STRING:  " << lex.cur_string() << endl;
       break;
 
-    case SYMBOL:
+    case kSymbolToken:
       cout << "SYMBOL:  " << lex.cur_string() << endl;
       break;
 
-    case KEYWORD:
+    case kKeywordToken:
       cout << "KEYWORD: " << lex.cur_string() << endl;
       break;
 
-    case ERROR:
+    case kLpToken:
+      cout << "(" << endl;
+      break;
+
+    case kRpToken:
+      cout << ")" << endl;
+      break;
+
+    case kNlToken:
+      cout << "NL" << endl;
+      break;
+
+    case kErrorToken:
       cout << "ERROR" << endl;
       break;
 
     default:
-      cout << "CHAR:    " << static_cast<char>(tok) << endl;
+      cout << "CHAR:    ";
+      if ( isprint(tok) ) {
+	cout << static_cast<char>(tok);
+      }
+      cout << "(#" << tok << ")" << endl;
       break;
     }
+    cout << endl;
   }
 }
 
