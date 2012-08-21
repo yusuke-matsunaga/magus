@@ -268,6 +268,11 @@ public:
   ymuint32
   cur_state() const = 0;
 
+  /// @brief 状態を表す文字列を返す．
+  virtual
+  string
+  cur_state_str() const = 0;
+
   /// @brief 出力値を返す．
   virtual
   Bool3
@@ -288,7 +293,8 @@ public:
   /// @brief 状態を元にもどす．
   virtual
   void
-  restore(ymuint32 val) = 0;
+  restore(ImpMgr& mgr,
+	  ymuint32 val) = 0;
 
   /// @brief unjustified ノードの時 true を返す．
   virtual

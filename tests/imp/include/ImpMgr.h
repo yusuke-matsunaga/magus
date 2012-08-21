@@ -258,7 +258,7 @@ public:
 
   /// @brief unjustified ノードを得る．
   void
-  get_unodelist(vector<ImpNode*>& unode_list);
+  get_unodelist(vector<ImpNode*>& unode_list) const;
 
   /// @brief ノードが unjustified になったときの処理を行なう．
   void

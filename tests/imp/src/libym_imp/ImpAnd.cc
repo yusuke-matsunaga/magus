@@ -10,6 +10,8 @@
 #include "ImpAnd.h"
 #include "ImpMgr.h"
 
+#define DEBUG_CHANGE_VALUE 0
+
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
@@ -24,7 +26,7 @@ ImpAnd::ImpAnd(ImpNodeHandle handle0,
 	       ImpNodeHandle handle1) :
   ImpNode(handle0, handle1)
 {
-  clear();
+  mState = kStXX_X;
 }
 
 // @brief デストラクタ
@@ -86,6 +88,7 @@ ImpAnd::calc_bitval()
 void
 ImpAnd::clear()
 {
+  cout << "node#" << id() << " clear" << endl;
   mState = kStXX_X;
 }
 
@@ -96,11 +99,34 @@ ImpAnd::cur_state() const
   return static_cast<ymuint32>(mState);
 }
 
+// @brief 状態を表す文字列を返す．
+string
+ImpAnd::cur_state_str() const
+{
+  switch ( mState ) {
+  case kStXX_X: return "XX:X";
+  case kSt1X_X: return "1X:X";
+  case kStX1_X: return "X1:X";
+  case kStXX_0: return "XX:0";
+  case kStX0_0: return "X0:0";
+  case kSt0X_0: return "0X:0";
+  case kSt00_0: return "00:0";
+  case kSt10_0: return "10:0";
+  case kSt01_0: return "01:0";
+  case kSt11_1: return "11:1";
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+  return "";
+}
+
 // @brief 状態を元にもどす．
 void
-ImpAnd::restore(ymuint32 val)
+ImpAnd::restore(ImpMgr& mgr,
+		ymuint32 val)
 {
-  mState = static_cast<tState>(val);
+  change_value(mgr, static_cast<tState>(val), false);
 }
 
 // @brief unjustified ノードの時 true を返す．
@@ -218,13 +244,11 @@ ImpAnd::fwd0_imp0(ImpMgr& mgr,
 
   case kStX1_X: // X1:X -> 01:0
     change_value(mgr, kSt01_0);
-    mgr.reset_unjustified(this);
     // ファンアウト先に0を伝搬する．
     return mgr.fanout_prop0(this, NULL, rec);
 
   case kStXX_0: // XX:0 -> 0X:0
     change_value(mgr, kSt0X_0);
-    mgr.reset_unjustified(this);
     break;
 
   case kStX0_0: // X0:0 -> 00:0
@@ -258,18 +282,15 @@ ImpAnd::fwd0_imp1(ImpMgr& mgr,
   switch ( mState ) {
   case kStXX_X: // XX:X -> 1X:X
     change_value(mgr, kSt1X_X);
-    mgr.set_unjustified(this);
     break;
 
   case kStX1_X: // X1:X -> 11:1
     change_value(mgr, kSt11_1);
-    mgr.reset_unjustified(this);
     // ファンアウト先に1を伝搬する．
     return mgr.fanout_prop1(this, NULL, rec);
 
   case kStXX_0: // XX:0 -> 10:0
     change_value(mgr, kSt10_0);
-    mgr.reset_unjustified(this);
     // ファンイン1に0を伝搬する．
     return mgr.fanin1_prop0(this, rec);
 
@@ -309,7 +330,6 @@ ImpAnd::fwd1_imp0(ImpMgr& mgr,
 
   case kSt1X_X: // 1X:X -> 10:0
     change_value(mgr, kSt10_0);
-    mgr.reset_unjustified(this);
     // ファンアウト先に0を伝搬する．
     return mgr.fanout_prop0(this, NULL, rec);
 
@@ -319,7 +339,6 @@ ImpAnd::fwd1_imp0(ImpMgr& mgr,
 
   case kStXX_0: // XX:0 -> X0:0
     change_value(mgr, kStX0_0);
-    mgr.reset_unjustified(this);
     break;
 
   case kStX1_X: // illegal
@@ -349,18 +368,15 @@ ImpAnd::fwd1_imp1(ImpMgr& mgr,
   switch ( mState ) {
   case kStXX_X: // XX:X -> X1:X
     change_value(mgr, kStX1_X);
-    mgr.set_unjustified(this);
     break;
 
   case kSt1X_X: // 1X:X -> 11:1
     change_value(mgr, kSt11_1);
-    mgr.reset_unjustified(this);
     // ファンアウト先に1を伝搬する．
     return mgr.fanout_prop1(this, NULL, rec);
 
   case kStXX_0: // XX:0 -> 01:0
     change_value(mgr, kSt01_0);
-    mgr.reset_unjustified(this);
     // ファンイン0に0を伝搬する．
     return mgr.fanin0_prop0(this, rec);
 
@@ -395,18 +411,15 @@ ImpAnd::bwd_imp0(ImpMgr& mgr,
   switch ( mState ) {
   case kStXX_X: // XX:X -> XX:0
     change_value(mgr, kStXX_0);
-    mgr.set_unjustified(this);
     break;
 
   case kSt1X_X: // 1X:X -> 10:0
     change_value(mgr, kSt10_0);
-    mgr.reset_unjustified(this);
     // ファンイン1に0を伝搬する．
     return mgr.fanin1_prop0(this, rec);
 
   case kStX1_X: // X1:X -> 01:0
     change_value(mgr, kSt01_0);
-    mgr.reset_unjustified(this);
     // ファンイン0に0を伝搬する．
     return mgr.fanin0_prop0(this, rec);
 
@@ -444,13 +457,11 @@ ImpAnd::bwd_imp1(ImpMgr& mgr,
 
   case kSt1X_X: // 1X:X -> 11:1
     change_value(mgr, kSt11_1);
-    mgr.reset_unjustified(this);
     // ファンイン1に1を伝搬する．
     return mgr.fanin1_prop1(this, rec);
 
   case kStX1_X: // X1:X -> 11:1
     change_value(mgr, kSt11_1);
-    mgr.reset_unjustified(this);
     // ファンイン0に1を伝搬する．
     return mgr.fanin0_prop1(this, rec);
 
@@ -723,119 +734,26 @@ ImpAnd::prop_const(ImpMgr& mgr,
 		   ymuint val,
 		   ymuint ipos)
 {
-#if 0
-  switch ( mState ) {
-  case kStXX_X:
-    if ( val == 0 ) {
-      cout << "Node#" << id() << " is const0" << endl;
-      mgr.set_const(id(), 0);
-    }
-    break;
-
-  case kStX1_X:
-    if ( ipos == 0 ) {
-      if ( val == 0 ) {
-	cout << "Node#" << id() << " is const0" << endl;
-	mgr.set_const(id(), 0);
-      }
-      else {
-	cout << "Node#" << id() << " is const1" << endl;
-	mgr.set_const(id(), 1);
-      }
-    }
-    else {
-      assert_cond( val == 1, __FILE__, __LINE__);
-    }
-    break;
-
-  case kSt1X_X:
-    if ( ipos == 0 ) {
-      assert_cond( val == 1, __FILE__, __LINE__);
-    }
-    else {
-      if ( val == 0 ) {
-	cout << "Node#" << id() << " is const0" << endl;
-	mgr.set_const(id(), 0);
-      }
-      else {
-	cout << "Node#" << id() << " is const1" << endl;
-	mgr.set_const(id(), 1);
-      }
-    }
-    break;
-
-  case kStXX_0:
-    break;
-
-  case kStX0_0:
-    if ( ipos == 0 ) {
-      // どうでもいい
-    }
-    else {
-      assert_cond( val == 0, __FILE__, __LINE__);
-    }
-    break;
-
-  case kSt0X_0:
-    if ( ipos == 0 ) {
-      assert_cond( val == 0, __FILE__, __LINE__);
-    }
-    else {
-      // どうでもいい
-    }
-    break;
-
-  case kSt00_0:
-    assert_cond( val == 0, __FILE__, __LINE__);
-    break;
-
-  case kSt01_0:
-    if ( ipos == 0 ) {
-      assert_cond( val == 0, __FILE__, __LINE__);
-    }
-    else {
-      assert_cond( val == 1, __FILE__, __LINE__);
-    }
-    break;
-
-  case kSt10_0:
-    if ( ipos == 0 ) {
-      assert_cond( val == 1, __FILE__, __LINE__);
-    }
-    else {
-      assert_cond( val == 0, __FILE__, __LINE__);
-    }
-    break;
-
-  case kSt11_1:
-    assert_cond( val == 1, __FILE__, __LINE__);
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
-  }
-#else
   switch ( mState ) {
   case kStXX_X:
     if ( ipos == 0 ) {
       if ( val == 0 ) {
-	mState = kSt0X_0;
+	change_value(mgr, kSt0X_0, false);
 	cout << "Node#" << id() << " is const0" << endl;
 	set_const(mgr, 0);
       }
       else {
-	mState = kSt1X_X;
+	change_value(mgr, kSt1X_X, false);
       }
     }
     else {
       if ( val == 0 ) {
-	mState = kStX0_0;
+	change_value(mgr, kStX0_0, false);
 	cout << "Node#" << id() << " is const0" << endl;
 	set_const(mgr, 0);
       }
       else {
-	mState = kStX1_X;
+	change_value(mgr, kStX1_X, false);
       }
     }
     break;
@@ -843,12 +761,12 @@ ImpAnd::prop_const(ImpMgr& mgr,
   case kStX1_X:
     if ( ipos == 0 ) {
       if ( val == 0 ) {
-	mState = kSt01_0;
+	change_value(mgr, kSt01_0, false);
 	cout << "Node#" << id() << " is const0" << endl;
 	set_const(mgr, 0);
       }
       else {
-	mState = kSt11_1;
+	change_value(mgr, kSt11_1, false);
 	cout << "Node#" << id() << " is const1" << endl;
 	set_const(mgr, 1);
       }
@@ -864,12 +782,12 @@ ImpAnd::prop_const(ImpMgr& mgr,
     }
     else {
       if ( val == 0 ) {
-	mState = kSt10_0;
+	change_value(mgr, kSt10_0, false);
 	cout << "Node#" << id() << " is const0" << endl;
 	set_const(mgr, 0);
       }
       else {
-	mState = kSt11_1;
+	change_value(mgr, kSt11_1, false);
 	cout << "Node#" << id() << " is const1" << endl;
 	set_const(mgr, 1);
       }
@@ -879,18 +797,18 @@ ImpAnd::prop_const(ImpMgr& mgr,
   case kStXX_0:
     if ( ipos == 0 ) {
       if ( val == 0 ) {
-	mState = kSt0X_0;
+	change_value(mgr, kSt0X_0, false);
       }
       else {
-	mState = kSt10_0;
+	change_value(mgr, kSt10_0, false);
       }
     }
     else {
       if ( val == 0 ) {
-	mState = kStX0_0;
+	change_value(mgr, kStX0_0, false);
       }
       else {
-	mState = kSt01_0;
+	change_value(mgr, kSt01_0, false);
       }
     }
     break;
@@ -943,7 +861,6 @@ ImpAnd::prop_const(ImpMgr& mgr,
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
-#endif
 }
 
 // @brief 値を変える．
@@ -951,10 +868,35 @@ ImpAnd::prop_const(ImpMgr& mgr,
 // @param[in] val 値
 void
 ImpAnd::change_value(ImpMgr& mgr,
-		     tState val)
+		     tState val,
+		     bool record)
 {
-  mgr.save_value(this, static_cast<ymuint32>(mState));
+  if ( record ) {
+    mgr.save_value(this, static_cast<ymuint32>(mState));
+  }
+
+  bool pre = is_unjustified();
+
+#if DEBUG_CHANGE_VALUE
+  string pre_str = cur_state_str();
+#endif
+
   mState = val;
+
+#if DEBUG_CHANGE_VALUE
+  string post_str = cur_state_str();
+  cout << "node#" << id() << ": " << pre_str << " -> " << post_str << endl;
+#endif
+
+  bool post = is_unjustified();
+  if ( pre ^ post ) {
+    if ( post ) {
+      mgr.set_unjustified(this);
+    }
+    else {
+      mgr.reset_unjustified(this);
+    }
+  }
 }
 
 END_NAMESPACE_YM_NETWORKS

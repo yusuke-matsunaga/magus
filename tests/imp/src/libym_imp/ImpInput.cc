@@ -79,9 +79,26 @@ ImpInput::cur_state() const
   return static_cast<ymuint32>(mState);
 }
 
+// @brief 状態を表す文字列を返す．
+string
+ImpInput::cur_state_str() const
+{
+  switch ( mState ) {
+  case kStX: return "X";
+  case kSt0: return "0";
+  case kSt1: return "1";
+  default:
+    cout << "mState = " << mState << endl;
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+  return "";
+}
+
 // @brief 状態を元にもどす．
 void
-ImpInput::restore(ymuint32 val)
+ImpInput::restore(ImpMgr& mgr,
+		  ymuint32 val)
 {
   mState = static_cast<tState>(val);
 }

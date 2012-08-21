@@ -592,17 +592,7 @@ ImpMgr::backtrack()
     -- i;
     NodeChg& nc = mChgStack[i];
     ImpNode* node = nc.mNode;
-    node->restore(nc.mState);
-    if ( node->is_unjustified() ) {
-      if ( node->mListIter == mUnodeList.end() ) {
-	set_unjustified(node);
-      }
-    }
-    else {
-      if ( node->mListIter != mUnodeList.end() ) {
-	reset_unjustified(node);
-      }
-    }
+    node->restore(*this, nc.mState);
   }
   mChgStack.erase(mChgStack.begin() + pos, mChgStack.end());
 }
@@ -807,7 +797,7 @@ ImpMgr::bwd_prop1(ImpNode* node,
 
 // @brief unjustified ノードを得る．
 void
-ImpMgr::get_unodelist(vector<ImpNode*>& unode_list)
+ImpMgr::get_unodelist(vector<ImpNode*>& unode_list) const
 {
   unode_list.clear();
   unode_list.reserve(mUnodeList.size());
@@ -840,7 +830,7 @@ ImpMgr::get_unodelist(vector<ImpNode*>& unode_list)
   if ( error ) {
     cout << "Error in ImpMgr::get_unode_list()" << endl;
     cout << "mUnodeList";
-    for (list<ImpNode*>::iterator p = mUnodeList.begin();
+    for (list<ImpNode*>::const_iterator p = mUnodeList.begin();
 	 p != mUnodeList.end(); ++ p) {
       cout << " " << (*p)->id();
     }
@@ -860,22 +850,18 @@ ImpMgr::get_unodelist(vector<ImpNode*>& unode_list)
 void
 ImpMgr::set_unjustified(ImpNode* node)
 {
-#if 1
   assert_cond( node->mListIter == mUnodeList.end(), __FILE__, __LINE__);
   mUnodeList.push_back(node);
   node->mListIter = mUnodeList.end();
   -- node->mListIter;
-#endif
 }
 
 // @brief ノードが unjustified でなくなったときの処理を行なう．
 void
 ImpMgr::reset_unjustified(ImpNode* node)
 {
-#if 1
   mUnodeList.erase(node->mListIter);
   node->mListIter = mUnodeList.end();
-#endif
 }
 
 // @brief ラーニング結果を各ノードに設定する．
