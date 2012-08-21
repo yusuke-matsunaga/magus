@@ -11,9 +11,31 @@ CLEANFILES =
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_PROGRAMS = \
-	imp
+	imp \
+	impsh
 
 imp_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/imp/include \
+	-I$(top_srcdir)/imp/src/libym_imp \
+	@GMP_INCLUDES@
+
+imp_SOURCES = \
+	imp.cc
+
+imp_LDADD = \
+	libym_imp/libym_imp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(POPT_LIBS) \
+	$(GMP_LIBS)
+
+imp_LDFLAGS =
+
+
+impsh_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/imp/include \
@@ -21,12 +43,12 @@ imp_CPPFLAGS = \
 	@TCL_INCLUDES@ \
 	@GMP_INCLUDES@
 
-imp_SOURCES = \
+impsh_SOURCES = \
 	ImpCmd.h \
 	ImpCmd.cc \
 	tclAppInit.cc
 
-imp_LDADD = \
+impsh_LDADD = \
 	libym_imp/libym_imp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
@@ -37,4 +59,4 @@ imp_LDADD = \
 	$(POPT_LIBS) \
 	$(GMP_LIBS)
 
-imp_LDFLAGS =
+impsh_LDFLAGS =

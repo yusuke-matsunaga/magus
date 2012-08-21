@@ -860,7 +860,7 @@ ImpMgr::get_unodelist(vector<ImpNode*>& unode_list)
 void
 ImpMgr::set_unjustified(ImpNode* node)
 {
-#if 0
+#if 1
   assert_cond( node->mListIter == mUnodeList.end(), __FILE__, __LINE__);
   mUnodeList.push_back(node);
   node->mListIter = mUnodeList.end();
@@ -872,7 +872,7 @@ ImpMgr::set_unjustified(ImpNode* node)
 void
 ImpMgr::reset_unjustified(ImpNode* node)
 {
-#if 0
+#if 1
   mUnodeList.erase(node->mListIter);
   node->mListIter = mUnodeList.end();
 #endif
