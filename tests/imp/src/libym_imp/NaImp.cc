@@ -49,6 +49,7 @@ NaImp::NaImp()
 {
   mUseDI = true;
   mUseContra = true;
+  mUseCapMerge2 = true;
 }
 
 // @brief デストラクタ
@@ -69,6 +70,14 @@ NaImp::use_contra(bool use)
 {
   mUseContra = use;
 }
+
+// @brief cap_merge2 を用いるかどうかのフラグをセットする．
+void
+NaImp::use_cap_merge2(bool use)
+{
+  mUseCapMerge2 = use;
+}
+
 
 // @brief ネットワーク中の間接含意を求める．
 // @param[in] imp_mgr マネージャ
@@ -268,7 +277,12 @@ NaImp::learning(ImpMgr& imp_mgr,
 	    ymuint old_num = dst_list.num();
 	    if ( src1_list.changed() ||
 		 src2_list.changed() ) {
-	      dst_list.cap_merge(src1_list, src2_list);
+	      if ( mUseCapMerge2 ) {
+		dst_list.cap_merge2(src1_list, src2_list);
+	      }
+	      else {
+		dst_list.cap_merge(src1_list, src2_list);
+	      }
 	    }
 	    ymuint delta1 = dst_list.num() - old_num;
 	    if ( delta1 > 0 ) {
@@ -372,7 +386,12 @@ NaImp::learning(ImpMgr& imp_mgr,
 	    ymuint old_num = dst_list.num();
 	    if ( src1_list.changed() ||
 		 src2_list.changed() ) {
-	      dst_list.cap_merge(src1_list, src2_list);
+	      if ( mUseCapMerge2 ) {
+		dst_list.cap_merge2(src1_list, src2_list);
+	      }
+	      else {
+		dst_list.cap_merge(src1_list, src2_list);
+	      }
 	    }
 	    ymuint delta1 = dst_list.num() - old_num;
 	    if ( delta1 > 0 ) {

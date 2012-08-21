@@ -47,6 +47,8 @@ imp(const string& filename,
     bool blif,
     bool iscas89,
     const string& method_str,
+    bool do_sat,
+    bool do_recur,
     ymuint level)
 {
   MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
@@ -118,10 +120,10 @@ imp(const string& filename,
     timer.start();
     NaImp naimp;
     ImpInfo na_imp;
-#if 1
+
     naimp.learning(imp_mgr, na_imp);
     //na_imp.make_closure();
-#endif
+
     timer.stop();
     USTime na_time = timer.time();
 
@@ -132,10 +134,10 @@ imp(const string& filename,
     if ( level > 0 ) {
       rlimp.set_learning_level(level);
     }
-#if 1
-    rlimp.learning(imp_mgr, rl_imp);
-    //rl_imp.make_closure();
-#endif
+    if ( do_recur ) {
+      rlimp.learning(imp_mgr, rl_imp);
+      //rl_imp.make_closure();
+    }
     timer.stop();
     USTime rl_time = timer.time();
 
@@ -152,23 +154,22 @@ imp(const string& filename,
     timer.start();
     SatImp satimp;
     ImpInfo sat_imp;
-#if 1
-    satimp.learning(imp_mgr, sat_imp);
-#endif
+    if ( do_sat ) {
+      satimp.learning(imp_mgr, sat_imp);
+    }
     timer.stop();
     USTime sat_time = timer.time();
 
-#if 0
     timer.reset();
     timer.start();
-    NaImp2 naimp2;
+    NaImp naimp2;
     ImpInfo na_imp2;
-#if 1
+    naimp2.use_cap_merge2(false);
+
     naimp2.learning(imp_mgr, na_imp2);
-#endif
+
     timer.stop();
     USTime na_time2 = timer.time();
-#endif
 
     ymuint and_node = 0;
     ymuint xor_node = 0;
@@ -207,10 +208,8 @@ imp(const string& filename,
 	 << ": " << rl_time << endl
 	 << "Naive Implications:              " << setw(10) << na_imp.imp_num(imp_mgr)
 	 << ": " << na_time << endl
-#if 0
 	 << "Naive Implications(2):           " << setw(10) << na_imp2.imp_num(imp_mgr)
 	 << ": " << na_time2 << endl
-#endif
 	 << "Complete Implications:           " << setw(10) << sat_imp.imp_num(imp_mgr)
 	 << ": " << sat_time << endl;
   }
@@ -258,6 +257,8 @@ main(int argc,
   const char* method_str = "bottom_up";
   bool blif = false;
   bool iscas = false;
+  bool do_sat = false;
+  bool do_recur = false;
   ymuint level = 0;
 
   // オプション解析用のデータ
@@ -277,6 +278,18 @@ main(int argc,
 
     { "iscas89", '\0', POPT_ARG_NONE, NULL, 0x101,
       "iscas89 mode", NULL },
+
+    { "sat", '\0', POPT_ARG_NONE, NULL, 0x200,
+      "do sat-learning", NULL},
+
+    { "no-sat", '\0', POPT_ARG_NONE, NULL, 0x201,
+      "without sat-learning", NULL},
+
+    { "recursive", '\0', POPT_ARG_NONE, NULL, 0x210,
+      "do recursive-learning", NULL},
+
+    { "no-recursive", '\0', POPT_ARG_NONE, NULL, 0x211,
+      "without recursive-learning", NULL},
 
     { "level", 'l', POPT_ARG_INT, &level, 0,
       "specify recursive learning level", "<level>" },
@@ -309,6 +322,18 @@ main(int argc,
     else if ( rc == 0x101 ) {
       iscas = true;
     }
+    else if ( rc == 0x200 ) {
+      do_sat = true;
+    }
+    else if ( rc == 0x201 ) {
+      do_sat = false;
+    }
+    else if ( rc == 0x210 ) {
+      do_recur = true;
+    }
+    else if ( rc == 0x211 ) {
+      do_recur = false;
+    }
   }
 
   if ( !blif && !iscas ) {
@@ -323,7 +348,7 @@ main(int argc,
   }
 
   string filename(str);
-  imp(filename, blif, iscas, method_str, level);
+  imp(filename, blif, iscas, method_str, do_sat, do_recur, level);
 
   return 0;
 }

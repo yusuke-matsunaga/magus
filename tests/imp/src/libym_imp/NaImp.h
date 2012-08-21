@@ -39,6 +39,10 @@ public:
   void
   use_contra(bool use);
 
+  /// @brief cap_merge2 を用いるかどうかのフラグをセットする．
+  void
+  use_cap_merge2(bool use);
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -64,6 +68,9 @@ private:
 
   // 対偶の関係を用いるかどうかのフラグ
   bool mUseContra;
+
+  // cap_merge2 を用いるかどうかのフラグ
+  bool mUseCapMerge2;
 
 };
 
