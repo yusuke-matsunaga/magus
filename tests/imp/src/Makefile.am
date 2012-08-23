@@ -2,7 +2,7 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS = libym_imp bb .
+SUBDIRS = libym_imp bb libym_cec .
 
 EXTRA_DIST =
 

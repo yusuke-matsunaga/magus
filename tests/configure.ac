@@ -148,6 +148,7 @@ AC_CONFIG_FILES([
 	imp/include/Makefile
 	imp/src/Makefile
 	imp/src/libym_imp/Makefile
+	imp/src/libym_cec/Makefile
 	imp/src/bb/Makefile
 	imp/src/bb/include/Makefile
 	imp/src/bb/parser/Makefile
