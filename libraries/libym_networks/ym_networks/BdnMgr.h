@@ -108,6 +108,10 @@ public:
   ymuint
   max_node_id() const;
 
+  /// @brief ID 番号をキーにノードを取り出す．
+  const BdnNode*
+  node(ymuint id) const;
+
   /// @brief 入力ノード数の取得
   /// @return 入力ノード数を返す．
   ymuint

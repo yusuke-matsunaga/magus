@@ -141,6 +141,13 @@ BdnMgr::max_node_id() const
   return mImpl->max_node_id();
 }
 
+// @brief ID 番号をキーにノードを取り出す．
+const BdnNode*
+BdnMgr::node(ymuint id) const
+{
+  return mImpl->node(id);
+}
+
 // @brief 入力ノード数の取得
 // @return 入力ノード数を返す．
 ymuint
