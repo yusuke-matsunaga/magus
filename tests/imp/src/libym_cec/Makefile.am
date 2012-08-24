@@ -24,4 +24,5 @@ libym_cec_la_SOURCES = \
 	CecHash.h \
 	CecMgr.h \
 	CecMgr.cc \
-	CecNode.h
+	CecNode.h \
+	check_ceq.cc

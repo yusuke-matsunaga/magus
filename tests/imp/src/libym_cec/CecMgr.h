@@ -29,12 +29,10 @@ class CecMgr
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] pat_size 初期パタンのサイズ
   /// @param[in] sat_type SAT-solver の種類を表す文字列
   /// @param[in] sat_opt SAT-solver に渡すオプション文字列
   /// @param[in] sat_log ログの出力用ストリーム
-  CecMgr(ymuint pat_size,
-	 const string& sat_type,
+  CecMgr(const string& sat_type,
 	 const string& sat_opt,
 	 ostream* sat_log);
 
@@ -84,6 +82,12 @@ public:
   CecHandle
   make_and(CecHandle handle1,
 	   CecHandle handle2);
+
+  /// @brief 2つのノードの OR を取る．
+  /// @param[in] handle1, handle2 入力の FRAIG ハンドル
+  CecHandle
+  make_or(CecHandle handle1,
+	  CecHandle handle2);
 
   /// @brief 2つのハンドルが等価かどうか調べる．
   Bool3
@@ -301,6 +305,16 @@ CecNode*
 CecMgr::node(ymuint pos) const
 {
   return mAllNodes[pos];
+}
+
+// @brief 2つのノードの OR を取る．
+// @param[in] handle1, handle2 入力の FRAIG ハンドル
+inline
+CecHandle
+CecMgr::make_or(CecHandle handle1,
+		CecHandle handle2)
+{
+  return ~make_and(~handle1, ~handle2);
 }
 
 // CecNode のハッシュ関数

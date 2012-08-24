@@ -174,16 +174,14 @@ CecHash::alloc_table(ymuint req_size)
 
 
 //////////////////////////////////////////////////////////////////////
-// FraigMgr の実装クラス
+// CecMgr の実装クラス
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pat_size 初期パタンのサイズ
 // @param[in] sat_type SAT-solver の種類を表す文字列
 // @param[in] sat_opt SAT-solver に渡すオプション文字列
 // @param[in] sat_log ログの出力用ストリーム
-CecMgr::CecMgr(ymuint pat_size,
-	       const string& sat_type,
+CecMgr::CecMgr(const string& sat_type,
 	       const string& sat_opt,
 	       ostream* sat_log) :
   mAlloc(4096),
@@ -192,8 +190,7 @@ CecMgr::CecMgr(ymuint pat_size,
   mSimTime(0.0),
   mOutP(sat_log),
   mLogLevel(0),
-  mLogStream(new ofstream("/dev/null")),
-  mLoopLimit(1000)
+  mLogStream(new ofstream("/dev/null"))
 {
 }
 
