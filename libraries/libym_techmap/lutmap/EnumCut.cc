@@ -86,9 +86,9 @@ EnumCut::operator()(const BdnMgr& sbjgraph,
   }
 
   // 入力側から内部ノード用のクラスタを作る．
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   sbjgraph.sort(node_list);
-  for (vector<BdnNode*>::const_iterator p = node_list.begin();
+  for (vector<const BdnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const BdnNode* node = *p;
     assert_cond( node->is_logic(), __FILE__, __LINE__);

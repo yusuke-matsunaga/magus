@@ -10,7 +10,7 @@
 
 
 #include "ymtools.h"
-#include "ym_networks/BNetwork.h"
+#include "ym_networks/BdnMgr.h"
 #include "ym_logic/Bool3.h"
 
 
@@ -28,8 +28,8 @@ BEGIN_NAMESPACE_YM_CEC
 
 /// @brief 組み合わせ回路の等価検証を行う関数
 void
-check_ceq(const BNetwork& src_network1,
-	  const BNetwork& src_network2,
+check_ceq(const BdnMgr& src_network1,
+	  const BdnMgr& src_network2,
 	  const vector<pair<ymuint32, ymuint32> >& iassoc,
 	  const vector<pair<ymuint32, ymuint32> >& oassoc,
 	  ymint log_level,
@@ -39,6 +39,20 @@ check_ceq(const BNetwork& src_network1,
 	  ostream* sat_out,
 	  ymuint sigsize,
 	  vector<Bool3>& stats);
+
+/// @brief 組み合わせ回路の等価検証を行う関数
+void
+check_ceq2(const BdnMgr& src_network1,
+	   const BdnMgr& src_network2,
+	   const vector<pair<ymuint32, ymuint32> >& iassoc,
+	   const vector<pair<ymuint32, ymuint32> >& oassoc,
+	   ymint log_level,
+	   ostream* log_out,
+	   const string& sat_type,
+	   const string& sat_option,
+	   ostream* sat_out,
+	   ymuint sigsize,
+	   vector<Bool3>& stats);
 
 END_NAMESPACE_YM_CEC
 

@@ -6,7 +6,7 @@
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "EnumCut.h"
+#include "EnumCut2.h"
 
 #include "RwtMgr.h"
 #include "RwtPat.h"
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 /// @brief local rewrting を行うための EnumCutOp
 //////////////////////////////////////////////////////////////////////
 class RwtOp :
-  public EnumCutOp
+  public EnumCutOp2
 {
 public:
 
@@ -65,7 +65,7 @@ public:
   /// @brief 処理の最後に呼ばれる関数
   virtual
   void
-  all_end(const BdnMgr& sbjgraph,
+  all_end(BdnMgr& sbjgraph,
 	  ymuint limit);
 
 

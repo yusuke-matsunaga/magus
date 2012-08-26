@@ -123,18 +123,18 @@ BdnMgrImpl::copy(const BdnMgr& src)
   }
 
   // 論理ノードの生成
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   src.sort(node_list);
   ymuint nl = node_list.size();
   for (ymuint i = 0; i < nl; ++ i) {
-    BdnNode* src_node = node_list[i];
+    const BdnNode* src_node = node_list[i];
 
-    BdnNode* src_inode0 = src_node->fanin0();
+    const BdnNode* src_inode0 = src_node->fanin0();
     BdnNode* input0 = nodemap[src_inode0->id()];
     assert_cond(input0, __FILE__, __LINE__);
     bool inv0 = src_node->fanin0_inv();
 
-    BdnNode* src_inode1 = src_node->fanin1();
+    const BdnNode* src_inode1 = src_node->fanin1();
     BdnNode* input1 = nodemap[src_inode1->id()];
     assert_cond(input1, __FILE__, __LINE__);
     bool inv1 = src_node->fanin1_inv();
@@ -188,6 +188,60 @@ BEGIN_NONAMESPACE
 // node のファンアウトのうち，すべてのファンインがマークされている
 // ノードを node_list に追加する．
 void
+sort_sub(const BdnNode* node,
+	 vector<bool>& marks,
+	 vector<const BdnNode*>& node_list)
+{
+  const BdnFanoutList& fo_list = node->fanout_list();
+  for (BdnFanoutList::const_iterator p = fo_list.begin();
+       p != fo_list.end(); ++ p) {
+    const BdnEdge* e = *p;
+    const BdnNode* onode = e->to();
+    if ( !marks[onode->id()] && onode->is_logic() &&
+	 marks[onode->fanin0()->id()] &&
+	 marks[onode->fanin1()->id()] ) {
+      marks[onode->id()] = true;
+      node_list.push_back(onode);
+    }
+  }
+}
+
+END_NONAMESPACE
+
+// @brief ソートされたノードのリストを得る．
+void
+BdnMgrImpl::sort(vector<const BdnNode*>& node_list) const
+{
+  node_list.clear();
+  node_list.reserve(lnode_num());
+
+  // 処理済みの印を表す配列
+  ymuint n = max_node_id();
+  vector<bool> marks(n, false);
+
+  // 外部入力のみをファンインにするノードを node_list に追加する．
+  for (BdnNodeList::const_iterator p = mInputList.begin();
+       p != mInputList.end(); ++ p) {
+    const BdnNode* node = *p;
+    marks[node->id()] = true;
+    sort_sub(node, marks, node_list);
+  }
+  // node_list のノードを一つずつとりだし，ファンアウトが node_list
+  // に積めるかチェックする．
+  for (ymuint rpos = 0; rpos < node_list.size(); ++ rpos) {
+    const BdnNode* node = node_list[rpos];
+    sort_sub(node, marks, node_list);
+  }
+  // うまくいっていれば全ての論理ノードが node_list に入っているはず．
+  assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
+}
+
+BEGIN_NONAMESPACE
+
+// sort() の下請け関数
+// node のファンアウトのうち，すべてのファンインがマークされている
+// ノードを node_list に追加する．
+void
 sort_sub(BdnNode* node,
 	 vector<bool>& marks,
 	 vector<BdnNode*>& node_list)
@@ -210,7 +264,7 @@ END_NONAMESPACE
 
 // @brief ソートされたノードのリストを得る．
 void
-BdnMgrImpl::sort(vector<BdnNode*>& node_list) const
+BdnMgrImpl::_sort(vector<BdnNode*>& node_list)
 {
   node_list.clear();
   node_list.reserve(lnode_num());
@@ -220,7 +274,7 @@ BdnMgrImpl::sort(vector<BdnNode*>& node_list) const
   vector<bool> marks(n, false);
 
   // 外部入力のみをファンインにするノードを node_list に追加する．
-  for (BdnNodeList::const_iterator p = mInputList.begin();
+  for (BdnNodeList::iterator p = mInputList.begin();
        p != mInputList.end(); ++ p) {
     BdnNode* node = *p;
     marks[node->id()] = true;
@@ -242,9 +296,9 @@ BEGIN_NONAMESPACE
 // rsort() の下請け関数
 // node のすべてのファンアウトがマークされていたら node_list に積む．
 void
-rsort_sub(BdnNode* node,
+rsort_sub(const BdnNode* node,
 	  vector<bool>& marks,
-	  vector<BdnNode*>& node_list)
+	  vector<const BdnNode*>& node_list)
 {
   if ( node == NULL ||
        !node->is_logic() ||
@@ -253,8 +307,8 @@ rsort_sub(BdnNode* node,
   const BdnFanoutList& fo_list = node->fanout_list();
   for (BdnFanoutList::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
-    BdnEdge* e = *p;
-    BdnNode* onode = e->to();
+    const BdnEdge* e = *p;
+    const BdnNode* onode = e->to();
     if ( !marks[onode->id()] ) {
       return;
     }
@@ -267,7 +321,7 @@ END_NONAMESPACE
 
 // @brief 逆順でソートされたノードのリストを得る．
 void
-BdnMgrImpl::rsort(vector<BdnNode*>& node_list) const
+BdnMgrImpl::rsort(vector<const BdnNode*>& node_list) const
 {
   node_list.clear();
   node_list.reserve(lnode_num());
@@ -279,15 +333,15 @@ BdnMgrImpl::rsort(vector<BdnNode*>& node_list) const
   // 外部出力のみをファンアウトにするノードを node_list に追加する．
   for (BdnNodeList::const_iterator p = mOutputList.begin();
        p != mOutputList.end(); ++ p) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
     marks[node->id()] = true;
-    BdnNode* inode = node->output_fanin();
+    const BdnNode* inode = node->output_fanin();
     rsort_sub(inode, marks, node_list);
   }
 
   // node_list からノードを取り出し，同様の処理を行う．
   for (ymuint rpos = 0; rpos < node_list.size(); ++ rpos) {
-    BdnNode* node = node_list[rpos];
+    const BdnNode* node = node_list[rpos];
     rsort_sub(node->fanin0(), marks, node_list);
     rsort_sub(node->fanin1(), marks, node_list);
   }
@@ -946,8 +1000,8 @@ BdnMgrImpl::cannonicalize(bool is_xor,
 // @param[in] inode2 2番めのノード
 BdnNode*
 BdnMgrImpl::find_node(ymuint fcode,
-		      BdnNode* inode1,
-		      BdnNode* inode2)
+		      const BdnNode* inode1,
+		      const BdnNode* inode2) const
 {
   ymuint idx = hash_func(fcode, inode1, inode2) % mHashSize;
   for (BdnNode* node1 = mHashTable[idx]; node1; node1 = node1->mLink) {
@@ -1022,14 +1076,14 @@ BdnMgrImpl::level() const
       node->mLevel = 0U;
     }
 
-    vector<BdnNode*> node_list;
+    vector<const BdnNode*> node_list;
     sort(node_list);
-    for (vector<BdnNode*>::const_iterator p = node_list.begin();
+    for (vector<const BdnNode*>::const_iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
-      BdnNode* node = *p;
-      BdnNode* inode0 = node->fanin0();
+      const BdnNode* node = *p;
+      const BdnNode* inode0 = node->fanin0();
       ymuint l = inode0->mLevel;
-      BdnNode* inode1 = node->fanin1();
+      const BdnNode* inode1 = node->fanin1();
       ymuint l1 = inode1->mLevel;
       if ( l < l1 ) {
 	l = l1;
@@ -1040,8 +1094,8 @@ BdnMgrImpl::level() const
     ymuint max_l = 0;
     for (BdnNodeList::const_iterator p = mOutputList.begin();
 	 p != mOutputList.end(); ++ p) {
-      BdnNode* node = *p;
-      BdnNode* inode = node->fanin0();
+      const BdnNode* node = *p;
+      const BdnNode* inode = node->fanin0();
       if ( inode ) {
 	ymuint l1 = inode->mLevel;
 	if ( max_l < l1 ) {

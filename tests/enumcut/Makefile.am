@@ -31,6 +31,8 @@ enumcut_SOURCES = \
 	enumcut.cc \
 	EnumCut.h \
 	EnumCut.cc \
+	EnumCut2.h \
+	EnumCut2.cc \
 	BottomUp.h \
 	BottomUp.cc \
 	TopDown.h \

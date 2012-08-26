@@ -40,7 +40,7 @@ TopDown::~TopDown()
 void
 TopDown::operator()(BdnMgr& network,
 		    ymuint limit,
-		    EnumCutOp* op)
+		    EnumCutOp2* op)
 {
   mOp = op;
 
@@ -84,7 +84,7 @@ TopDown::operator()(BdnMgr& network,
 
   // 入力側からのトポロジカル順に内部ノードのカットを列挙する．
   vector<BdnNode*> node_list;
-  network.sort(node_list);
+  network._sort(node_list);
   for (vector<BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     BdnNode* node = *p;

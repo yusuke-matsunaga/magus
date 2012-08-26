@@ -45,26 +45,26 @@ public:
   /// @param[in] mode カット列挙モード
   virtual
   void
-  all_init(BdnMgr& sbjgraph,
+  all_init(const BdnMgr& sbjgraph,
 	   ymuint limit);
 
   /// @brief node を根とするカットを列挙する直前に呼ばれる関数
   /// @param[in] node 根のノード
   virtual
   void
-  node_init(BdnNode* node);
+  node_init(const BdnNode* node);
 
   virtual
   void
-  found_cut(BdnNode* root,
+  found_cut(const BdnNode* root,
 	    ymuint ni,
-	    BdnNode** inputs);
+	    const BdnNode** inputs);
 
   /// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
   /// @param[in] node 根のノード
   virtual
   void
-  node_end(BdnNode* node);
+  node_end(const BdnNode* node);
 
   /// @brief 処理の最後に呼ばれる関数
   virtual
@@ -79,7 +79,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 現在処理中のノード
-  BdnNode* mCurNode;
+  const BdnNode* mCurNode;
 
   // 現在処理中のノード番号
   ymuint32 mCurPos;
@@ -97,7 +97,7 @@ private:
 // @param[in] limit カットサイズ
 // @param[in] mode カット列挙モード
 void
-SimpleOp::all_init(BdnMgr& sbjgraph,
+SimpleOp::all_init(const BdnMgr& sbjgraph,
 		   ymuint limit)
 {
   mCurPos = 0;
@@ -107,7 +107,7 @@ SimpleOp::all_init(BdnMgr& sbjgraph,
 // @brief node を根とするカットを列挙する直前に呼ばれる関数
 // @param[in] node 根のノード
 void
-SimpleOp::node_init(BdnNode* node)
+SimpleOp::node_init(const BdnNode* node)
 {
   mNcCur = 0;
   mCurNode = node;
@@ -117,9 +117,9 @@ SimpleOp::node_init(BdnNode* node)
 }
 
 void
-SimpleOp::found_cut(BdnNode* root,
+SimpleOp::found_cut(const BdnNode* root,
 		    ymuint ni,
-		    BdnNode** inputs)
+		    const BdnNode** inputs)
 {
   ++ mNcCur;
 
@@ -135,7 +135,7 @@ SimpleOp::found_cut(BdnNode* root,
 // @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
 // @param[in] node 根のノード
 void
-SimpleOp::node_end(BdnNode* node)
+SimpleOp::node_end(const BdnNode* node)
 {
   assert_cond( node == mCurNode, __FILE__, __LINE__);
   ++ mCurPos;
@@ -190,11 +190,13 @@ enumcut(const string& filename,
 
     enumcut(network, cut_size, &op);
   }
+#if 0
   else if ( method_str == "top_down" ) {
     TopDown enumcut;
 
     enumcut(network, cut_size, &op);
   }
+#endif
   else if ( method_str == "zdd" ) {
     ZddMgr mgr("zddmgr");
     ZddImp enumcut(mgr);

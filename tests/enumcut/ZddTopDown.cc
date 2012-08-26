@@ -47,7 +47,7 @@ ZddTopDown::operator()(BdnMgr& network,
   const BdnNodeList& input_list = network.input_list();
   for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
     NodeTemp& nt = mNodeTemp[node->id()];
 
     Zdd cut = mMgr.make_base();
@@ -63,15 +63,15 @@ ZddTopDown::operator()(BdnMgr& network,
     cout << endl;
   }
 
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   network.sort(node_list);
-  for (vector<BdnNode*>::iterator p = node_list.begin();
+  for (vector<const BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
     NodeTemp& nt = mNodeTemp[node->id()];
 
-    BdnNode* node0 = node->fanin(0);
-    BdnNode* node1 = node->fanin(1);
+    const BdnNode* node0 = node->fanin(0);
+    const BdnNode* node1 = node->fanin(1);
 
     NodeTemp& nt0 = mNodeTemp[node0->id()];
     NodeTemp& nt1 = mNodeTemp[node1->id()];
@@ -115,7 +115,7 @@ ZddTopDown::operator()(BdnMgr& network,
 }
 
 Zdd
-ZddTopDown::dfs(BdnNode* node,
+ZddTopDown::dfs(const BdnNode* node,
 		const Zdd& cut)
 {
   if ( mNodeTemp[node->id()].mMark == 0 ||
@@ -124,8 +124,8 @@ ZddTopDown::dfs(BdnNode* node,
   }
   mNodeTemp[node->id()].mMark = 0;
 
-  BdnNode* node0 = node->fanin0();
-  BdnNode* node1 = node->fanin1();
+  const BdnNode* node0 = node->fanin0();
+  const BdnNode* node1 = node->fanin1();
 
   // cut 中の node を node0 と node1 に置き換える．
   VarId vid(node->id());

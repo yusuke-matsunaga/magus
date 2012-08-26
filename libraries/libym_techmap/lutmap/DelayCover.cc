@@ -104,9 +104,9 @@ DelayCover::record_cuts(const BdnMgr& sbjgraph,
   }
 
   // 各ノードごとにカットを記録
-  vector<BdnNode*> snode_list;
+  vector<const BdnNode*> snode_list;
   sbjgraph.sort(snode_list);
-  for (vector<BdnNode*>::const_iterator p = snode_list.begin();
+  for (vector<const BdnNode*>::const_iterator p = snode_list.begin();
        p != snode_list.end(); ++ p) {
     const BdnNode* node = *p;
     record(node);
@@ -140,7 +140,7 @@ DelayCover::record_cuts(const BdnMgr& sbjgraph,
   }
 
   // 要求された段数制約を満たす中でコスト最小の解を選ぶ．
-  for (vector<BdnNode*>::reverse_iterator p = snode_list.rbegin();
+  for (vector<const BdnNode*>::reverse_iterator p = snode_list.rbegin();
        p != snode_list.rend(); ++ p) {
     const BdnNode* node = *p;
     select(node, maprec);

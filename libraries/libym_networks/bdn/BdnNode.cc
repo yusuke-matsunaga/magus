@@ -11,6 +11,8 @@
 #include "ym_networks/BdnPort.h"
 #include "ym_networks/BdnDff.h"
 #include "ym_networks/BdnLatch.h"
+#include "ym_networks/BdnNodeHandle.h"
+#include "ym_networks/BdnConstNodeHandle.h"
 #include "BdnAuxData.h"
 
 
@@ -169,6 +171,66 @@ const BdnLatch*
 BdnNode::latch() const
 {
   return mAuxData->latch();
+}
+
+// @brief ファンインのハンドルを得る．
+BdnConstNodeHandle
+BdnNode::output_fanin_handle() const
+{
+  return BdnConstNodeHandle(output_fanin(), output_fanin_inv());
+}
+
+// @brief ファンインのハンドルを得る．
+BdnNodeHandle
+BdnNode::output_fanin_handle()
+{
+  return BdnNodeHandle(output_fanin(), output_fanin_inv());
+}
+
+// @brief ファンインのハンドルを得る．
+// @param[in] pos 入力番号(0 or 1)
+// @return pos 番めのファンインのハンドルを返す．
+BdnConstNodeHandle
+BdnNode::fanin_handle(ymuint pos) const
+{
+  return BdnConstNodeHandle(fanin(pos), fanin_inv(pos));
+}
+
+// @brief ファンインのハンドルを得る．
+// @param[in] pos 入力番号(0 or 1)
+// @return pos 番めのファンインのハンドルを返す．
+BdnNodeHandle
+BdnNode::fanin_handle(ymuint pos)
+{
+  return BdnNodeHandle(fanin(pos), fanin_inv(pos));
+}
+
+// @brief ファンイン0のハンドルを得る．
+BdnConstNodeHandle
+BdnNode::fanin0_handle() const
+{
+  return BdnConstNodeHandle(fanin0(), fanin0_inv());
+}
+
+// @brief ファンイン0のハンドルを得る．
+BdnNodeHandle
+BdnNode::fanin0_handle()
+{
+  return BdnNodeHandle(fanin0(), fanin0_inv());
+}
+
+// @brief ファンイン0のハンドルを得る．
+BdnConstNodeHandle
+BdnNode::fanin1_handle() const
+{
+  return BdnConstNodeHandle(fanin1(), fanin1_inv());
+}
+
+// @brief ファンイン0のハンドルを得る．
+BdnNodeHandle
+BdnNode::fanin1_handle()
+{
+  return BdnNodeHandle(fanin1(), fanin1_inv());
 }
 
 

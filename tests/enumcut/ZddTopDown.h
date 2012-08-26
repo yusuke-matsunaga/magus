@@ -45,7 +45,7 @@ public:
 private:
 
   Zdd
-  dfs(BdnNode* node,
+  dfs(const BdnNode* node,
       const Zdd& cut);
 
 

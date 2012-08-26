@@ -139,7 +139,7 @@ RwtOp::found_cut(BdnNode* root,
 	  if ( mNetwork->find_and(inode0, inode1, onode) ) {
 	    node_map[pat_node->id()] = onode;
 	    pat_mark[pat_node->id()] = true;
-	    BdnNode* on = onode.node();
+	    const BdnNode* on = onode.node();
 	    mNodeInfo[on->id()].mMark = 2U;
 	  }
 	}
@@ -148,7 +148,7 @@ RwtOp::found_cut(BdnNode* root,
 	  if ( mNetwork->find_xor(inode0, inode1, onode) ) {
 	    node_map[pat_node->id()] = onode;
 	    pat_mark[pat_node->id()] = true;
-	    BdnNode* on = onode.node();
+	    const BdnNode* on = onode.node();
 	    mNodeInfo[on->id()].mMark = 2U;
 	  }
 	}
@@ -247,7 +247,7 @@ RwtOp::count_node(BdnNode* node)
   for (BdnFanoutList::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
     BdnEdge* edge = *p;
-    BdnNode* to = edge->to();
+    const BdnNode* to = edge->to();
     if ( (mNodeInfo[to->id()].mMark & 1U) == 0 ) {
       // このノードは削除できない．
       return 0;
@@ -275,7 +275,7 @@ RwtOp::node_end(BdnNode* node)
 
 // @brief 処理の最後に呼ばれる関数
 void
-RwtOp::all_end(const BdnMgr& sbjgraph,
+RwtOp::all_end(BdnMgr& sbjgraph,
 	       ymuint limit)
 {
 }

@@ -46,10 +46,10 @@ LsimBdd::set_network(const BdnMgr& bdn)
     bddmap[node->id()] = bdd;
   }
 
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   bdn.sort(node_list);
   id = 0;
-  for (vector<BdnNode*>::const_iterator p = node_list.begin();
+  for (vector<const BdnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const BdnNode* node = *p;
     ++ id;

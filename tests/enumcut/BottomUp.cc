@@ -29,7 +29,7 @@ BottomUp::~BottomUp()
 // @param[in] network 対象のネットワーク
 // @param[in] limit カットサイズの制限
 void
-BottomUp::operator()(BdnMgr& network,
+BottomUp::operator()(const BdnMgr& network,
 		     ymuint limit,
 		     EnumCutOp* op)
 {
@@ -44,53 +44,53 @@ BottomUp::operator()(BdnMgr& network,
     mNodeInfo[i].mMark2 = 0U;
   }
 
-  mTmpInputs = new BdnNode*[limit];
+  mTmpInputs = new const BdnNode*[limit];
 
   const BdnNodeList& input_list = network.input_list();
   for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
 
     op->node_init(node);
 
-    list<vector<BdnNode*> >& cut_list = mNodeInfo[node->id()].mCutList;
-    cut_list.push_back(vector<BdnNode*>(1, node));
+    list<vector<const BdnNode*> >& cut_list = mNodeInfo[node->id()].mCutList;
+    cut_list.push_back(vector<const BdnNode*>(1, node));
 
     op->found_cut(node, 0, NULL);
 
     op->node_end(node);
   }
 
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   network.sort(node_list);
-  for (vector<BdnNode*>::iterator p = node_list.begin();
+  for (vector<const BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
 
     op->node_init(node);
     NodeInfo& node_info = mNodeInfo[node->id()];
 
-    BdnNode* node0 = node->fanin(0);
-    BdnNode* node1 = node->fanin(1);
+    const BdnNode* node0 = node->fanin(0);
+    const BdnNode* node1 = node->fanin(1);
     NodeInfo& node_info0 = mNodeInfo[node0->id()];
     NodeInfo& node_info1 = mNodeInfo[node1->id()];
-    const list<vector<BdnNode*> >& cut_list0 = node_info0.mCutList;
-    const list<vector<BdnNode*> >& cut_list1 = node_info1.mCutList;
-    list<vector<BdnNode*> >& cut_list = node_info.mCutList;
-    for (list<vector<BdnNode*> >::const_iterator p = cut_list0.begin();
+    const list<vector<const BdnNode*> >& cut_list0 = node_info0.mCutList;
+    const list<vector<const BdnNode*> >& cut_list1 = node_info1.mCutList;
+    list<vector<const BdnNode*> >& cut_list = node_info.mCutList;
+    for (list<vector<const BdnNode*> >::const_iterator p = cut_list0.begin();
 	 p != cut_list0.end(); ++ p) {
-      const vector<BdnNode*>& cut0 = *p;
-      for (vector<BdnNode*>::const_iterator s = cut0.begin();
+      const vector<const BdnNode*>& cut0 = *p;
+      for (vector<const BdnNode*>::const_iterator s = cut0.begin();
 	   s != cut0.end(); ++ s) {
 	ymuint id = (*s)->id();
 	mNodeInfo[id].mMark1 = 2;
       }
       mark_cut1(node0);
-      for (list<vector<BdnNode*> >::const_iterator q = cut_list1.begin();
+      for (list<vector<const BdnNode*> >::const_iterator q = cut_list1.begin();
 	   q != cut_list1.end(); ++ q) {
-	const vector<BdnNode*>& cut1 = *q;
+	const vector<const BdnNode*>& cut1 = *q;
 
-	for (vector<BdnNode*>::const_iterator s = cut1.begin();
+	for (vector<const BdnNode*>::const_iterator s = cut1.begin();
 	     s != cut1.end(); ++ s) {
 	  ymuint id = (*s)->id();
 	  if ( mNodeInfo[id].mMark1 == 1 ) {
@@ -98,14 +98,14 @@ BottomUp::operator()(BdnMgr& network,
 	  }
 	}
 
-	for (vector<BdnNode*>::const_iterator s = cut1.begin();
+	for (vector<const BdnNode*>::const_iterator s = cut1.begin();
 	     s != cut1.end(); ++ s) {
 	  ymuint id = (*s)->id();
 	  mNodeInfo[id].mMark2 = 2;
 	}
 	mark_cut2(node1);
 
-	for (vector<BdnNode*>::const_iterator s = cut0.begin();
+	for (vector<const BdnNode*>::const_iterator s = cut0.begin();
 	     s != cut0.end(); ++ s) {
 	  ymuint id = (*s)->id();
 	  if ( mNodeInfo[id].mMark2 == 1 ) {
@@ -115,11 +115,11 @@ BottomUp::operator()(BdnMgr& network,
 
 	mInputNum = 0;
 	{
-	  vector<BdnNode*>::const_iterator r1 = cut0.begin();
-	  vector<BdnNode*>::const_iterator r2 = cut1.begin();
+	  vector<const BdnNode*>::const_iterator r1 = cut0.begin();
+	  vector<const BdnNode*>::const_iterator r2 = cut1.begin();
 	  while ( r1 != cut0.end() && r2 != cut1.end() ) {
-	    BdnNode* node1 = *r1;
-	    BdnNode* node2 = *r2;
+	    const BdnNode* node1 = *r1;
+	    const BdnNode* node2 = *r2;
 	    ymuint id1 = node1->id();
 	    ymuint id2 = node2->id();
 	    if ( id1 < id2 ) {
@@ -163,7 +163,7 @@ BottomUp::operator()(BdnMgr& network,
 	    ++ mInputNum;
 	  }
 
-	  vector<BdnNode*> new_list(mInputNum);
+	  vector<const BdnNode*> new_list(mInputNum);
 	  for (ymuint i = 0; i < mInputNum; ++ i) {
 	    new_list[i] = mTmpInputs[i];
 	  }
@@ -176,7 +176,7 @@ BottomUp::operator()(BdnMgr& network,
       }
       clear_cut1(node0);
     }
-    cut_list.push_back(vector<BdnNode*>(1, node));
+    cut_list.push_back(vector<const BdnNode*>(1, node));
     op->found_cut(node, 0, NULL);
 
     op->node_end(node);
@@ -189,7 +189,7 @@ BottomUp::operator()(BdnMgr& network,
 }
 
 void
-BottomUp::mark_cut1(BdnNode* node)
+BottomUp::mark_cut1(const BdnNode* node)
 {
   ymuint8& mark = mNodeInfo[node->id()].mMark1;
 
@@ -204,7 +204,7 @@ BottomUp::mark_cut1(BdnNode* node)
 }
 
 void
-BottomUp::clear_cut1(BdnNode* node)
+BottomUp::clear_cut1(const BdnNode* node)
 {
   ymuint8& mark = mNodeInfo[node->id()].mMark1;
 
@@ -221,7 +221,7 @@ BottomUp::clear_cut1(BdnNode* node)
 }
 
 void
-BottomUp::mark_cut2(BdnNode* node)
+BottomUp::mark_cut2(const BdnNode* node)
 {
   ymuint8& mark = mNodeInfo[node->id()].mMark2;
 
@@ -236,7 +236,7 @@ BottomUp::mark_cut2(BdnNode* node)
 }
 
 void
-BottomUp::clear_cut2(BdnNode* node)
+BottomUp::clear_cut2(const BdnNode* node)
 {
   ymuint8& mark = mNodeInfo[node->id()].mMark2;
 

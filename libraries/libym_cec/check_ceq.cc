@@ -3,9 +3,7 @@
 /// @brief 組み合わせ回路の検証を行う関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: check_equiv.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,6 +15,15 @@
 
 
 BEGIN_NAMESPACE_YM_CEC
+
+extern
+void
+make_miter(BdnMgr& bdn_mgr,
+	   const BdnMgr& src_network1,
+	   const BdnMgr& src_network2,
+	   const vector<pair<ymuint32, ymuint32> >& iassoc,
+	   const vector<pair<ymuint32, ymuint32> >& oassoc,
+	   vector<pair<BdnNodeHandle, BdnNodeHandle> >& comp_pairs);
 
 BEGIN_NONAMESPACE
 
@@ -42,6 +49,8 @@ operator<<(ostream& s,
   }
   return s;
 }
+
+#if 0
 
 /// @brief 論理式を BDN に変換する．
 BdnNodeHandle
@@ -86,8 +95,8 @@ make_logic(const LogExpr& func,
 // @param[out] comp_pairs 比較対象の AigHandle のペアの配列．
 void
 make_miter(BdnMgr& bdn_mgr,
-	   const BNetwork& src_network1,
-	   const BNetwork& src_network2,
+	   const BdnMgr& src_network1,
+	   const BdnMgr& src_network2,
 	   const vector<pair<ymuint, ymuint> >& iassoc,
 	   const vector<pair<ymuint, ymuint> >& oassoc,
 	   vector<pair<BdnNodeHandle, BdnNodeHandle> >& comp_pairs)
@@ -116,8 +125,8 @@ make_miter(BdnMgr& bdn_mgr,
     bdn_array1[p->first] = anode;
     bdn_array2[p->second] = anode;
     if ( debug ) {
-      BNode* bnode1 = src_network1.node(p->first);
-      BNode* bnode2 = src_network2.node(p->second);
+      BdnNode* bnode1 = src_network1.node(p->first);
+      BdnNode* bnode2 = src_network2.node(p->second);
       cout << endl
 	   << bnode1->name() << "@network1 = " << anode << endl
 	   << bnode2->name() << "@network2 = " << anode << endl;
@@ -126,15 +135,15 @@ make_miter(BdnMgr& bdn_mgr,
 
   // 内部のノード用の BDN ノードを作る．
   for (ymuint i = 0; i < 2; ++ i) {
-    const BNetwork& network = (i == 0) ? src_network1 : src_network2;
+    const BdnMgr& network = (i == 0) ? src_network1 : src_network2;
     vector<BdnNodeHandle>& bdn_array = (i == 0) ? bdn_array1 : bdn_array2;
     // 内部ノードを作る．
     // まず入力からのトポロジカル順にソートし buff に入れる．
-    BNodeVector node_list;
+    BdnNodeVector node_list;
     network.tsort(node_list);
     ymuint nv = network.logic_node_num();
     for (ymuint j = 0; j < nv; ++ j) {
-      BNode* bnode = node_list[j];
+      BdnNode* bnode = node_list[j];
       ymuint ni = bnode->ni();
       vector<BdnNodeHandle> ianodes(ni);
       for (ymuint pos = 0; pos < ni; ++ pos) {
@@ -164,9 +173,9 @@ make_miter(BdnMgr& bdn_mgr,
   ymuint oid = 0;
   for (vector<pair<ymuint, ymuint> >::const_iterator p = oassoc.begin();
        p != oassoc.end(); ++ p) {
-    BNode* onode1 = src_network1.node(p->first);
+    BdnNode* onode1 = src_network1.node(p->first);
     BdnNodeHandle ainode1 = bdn_array1[onode1->fanin(0)->id()];
-    BNode* onode2 = src_network2.node(p->second);
+    BdnNode* onode2 = src_network2.node(p->second);
     BdnNodeHandle ainode2 = bdn_array2[onode2->fanin(0)->id()];
     if ( debug ) {
       cout << "Output#" << oid << ": " << endl
@@ -179,6 +188,9 @@ make_miter(BdnMgr& bdn_mgr,
     ++ oid;
   }
 }
+
+#endif
+
 
 // @brief handle の TFI を作る．
 FraigHandle
@@ -225,10 +237,11 @@ make_tficone(BdnNodeHandle handle,
 
 END_NONAMESPACE
 
+
 // 新しい関数
 void
-check_ceq(const BNetwork& src_network1,
-	  const BNetwork& src_network2,
+check_ceq(const BdnMgr& src_network1,
+	  const BdnMgr& src_network2,
 	  const vector<pair<ymuint32, ymuint32> >& iassoc,
 	  const vector<pair<ymuint32, ymuint32> >& oassoc,
 	  ymint log_level,

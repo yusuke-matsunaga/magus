@@ -161,13 +161,19 @@ public:
   /// @param[out] node_list ノードのリストの格納先
   /// @note 入力ノードと出力ノード，ラッチノードは含まない．
   void
-  sort(vector<BdnNode*>& node_list) const;
+  sort(vector<const BdnNode*>& node_list) const;
+
+  /// @brief ソートされた論理ノードのリストを得る．
+  /// @param[out] node_list ノードのリストの格納先
+  /// @note 入力ノードと出力ノード，ラッチノードは含まない．
+  void
+  _sort(vector<BdnNode*>& node_list) const;
 
   /// @brief 逆順でソートされた論理ノードのリストを得る．
   /// @param[out] node_list ノードのリストの格納先
   /// @note 入力ノードと出力ノード，ラッチノードは含まない．
   void
-  rsort(vector<BdnNode*>& node_list) const;
+  rsort(vector<const BdnNode*>& node_list) const;
 
   /// @brief 最大段数を求める．
   /// @note 段数とは入力ノードから出力ノードへ至る経路中の論理ノードの数

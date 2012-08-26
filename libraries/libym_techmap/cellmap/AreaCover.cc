@@ -203,9 +203,9 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
   // 論理ノードのコストを入力側から計算
   PatMatcher pat_match(cell_library);
   ymuint np = cell_library.pat_num();
-  vector<BdnNode*> snode_list;
+  vector<const BdnNode*> snode_list;
   sbjgraph.sort(snode_list);
-  for (vector<BdnNode*>::const_iterator p = snode_list.begin();
+  for (vector<const BdnNode*>::const_iterator p = snode_list.begin();
        p != snode_list.end(); ++ p) {
     const BdnNode* node = *p;
     if ( debug ) {

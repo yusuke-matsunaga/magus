@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "EnumCut.h"
+#include "EnumCut2.h"
 #include "ym_networks/BdnNode.h"
 
 
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 /// @brief トップダウンのカット列挙を行うクラス
 //////////////////////////////////////////////////////////////////////
 class TopDown :
-  public EnumCut
+  public EnumCut2
 {
 public:
 
@@ -41,7 +41,7 @@ public:
   void
   operator()(BdnMgr& network,
 	     ymuint limit,
-	     EnumCutOp* op);
+	     EnumCutOp2* op);
 
 
 private:
@@ -279,7 +279,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // カットが見つかったときの処理を行うファンクター
-  EnumCutOp* mOp;
+  EnumCutOp2* mOp;
 
   // カットサイズの制限値
   ymuint32 mLimit;
@@ -694,4 +694,5 @@ TopDown::set_input(BdnNode* node)
 }
 
 END_NAMESPACE_YM_NETWORKS
+
 #endif // TOPDOWN_H

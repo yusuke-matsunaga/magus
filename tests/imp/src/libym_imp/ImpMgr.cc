@@ -120,12 +120,12 @@ ImpMgr::set(const BdnMgr& src_network)
   mBNodeMap.set_bnode_size(n);
 
   // node_list に src_network のノードをトポロジカル順に並べる．
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   src_network.sort(node_list);
 
   // 各ノードのファンアウト数を数える．
   vector<ymuint> fo_count(n, 0);
-  for (vector<BdnNode*>::iterator p = node_list.begin();
+  for (vector<const BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const BdnNode* bnode = *p;
     for (ymuint i = 0; i < 2; ++ i) {
@@ -147,7 +147,7 @@ ImpMgr::set(const BdnMgr& src_network)
   }
 
   // 論理ノードを作る．
-  for (vector<BdnNode*>::const_iterator p = node_list.begin();
+  for (vector<const BdnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const BdnNode* bnode = *p;
     ymuint id = bnode->id();

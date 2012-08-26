@@ -296,6 +296,15 @@ public:
   bool
   output_fanin_inv() const;
 
+  /// @brief ファンインのハンドルを得る．
+  BdnConstNodeHandle
+  output_fanin_handle() const;
+
+  /// @brief ファンインのハンドルを得る．
+  BdnNodeHandle
+  output_fanin_handle();
+
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -332,10 +341,30 @@ public:
   bool
   fanin_inv(ymuint pos) const;
 
+  /// @brief ファンインのハンドルを得る．
+  /// @param[in] pos 入力番号(0 or 1)
+  /// @return pos 番めのファンインのハンドルを返す．
+  BdnConstNodeHandle
+  fanin_handle(ymuint pos) const;
+
+  /// @brief ファンインのハンドルを得る．
+  /// @param[in] pos 入力番号(0 or 1)
+  /// @return pos 番めのファンインのハンドルを返す．
+  BdnNodeHandle
+  fanin_handle(ymuint pos);
+
   /// @brief ファンイン0のノードを得る．
   /// @return 0番めのファンインのノード
   const BdnNode*
   fanin0() const;
+
+  /// @brief ファンイン0のハンドルを得る．
+  BdnConstNodeHandle
+  fanin0_handle() const;
+
+  /// @brief ファンイン0のハンドルを得る．
+  BdnNodeHandle
+  fanin0_handle();
 
   /// @brief ファンイン0のノードを得る．
   /// @return 0番めのファンインのノード
@@ -361,6 +390,14 @@ public:
   /// @brief ファンイン1の反転属性を得る．
   bool
   fanin1_inv() const;
+
+  /// @brief ファンイン1のハンドルを得る．
+  BdnConstNodeHandle
+  fanin1_handle() const;
+
+  /// @brief ファンイン1のハンドルを得る．
+  BdnNodeHandle
+  fanin1_handle();
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -428,6 +465,7 @@ private:
   BdnNode* mLink;
 
   // レベル
+  mutable
   ymuint32 mLevel;
 
   // 補助的な情報を持つオブジェクト

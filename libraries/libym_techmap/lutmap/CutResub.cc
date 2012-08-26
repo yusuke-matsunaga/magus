@@ -57,7 +57,7 @@ CutResub::operator()(const BdnMgr& sbjgraph,
   mLQ.init(max_size);
   mRQ.init(max_size);
 
-  vector<BdnNode*> snode_list;
+  vector<const BdnNode*> snode_list;
   sbjgraph.sort(snode_list);
 
   // 外部入力ノードの対応付けを行う．
@@ -88,7 +88,7 @@ CutResub::operator()(const BdnMgr& sbjgraph,
     vector<CrNode*> root_list;
     root_list.reserve(sbjgraph.max_node_id());
     ymuint max_level = 0;
-    for (vector<BdnNode*>::const_iterator p = snode_list.begin();
+    for (vector<const BdnNode*>::const_iterator p = snode_list.begin();
 	 p != snode_list.end(); ++ p) {
       const BdnNode* node = *p;
       CrNode* crnode = mNodeArray[node->id()];
@@ -182,7 +182,7 @@ CutResub::operator()(const BdnMgr& sbjgraph,
 #if 0
     for ( ; ; ) {
       bool changed = false;
-      for (vector<BdnNode*>::const_reverse_iterator p = snode_list.rbegin();
+      for (vector<const BdnNode*>::const_reverse_iterator p = snode_list.rbegin();
 	   p != snode_list.rend(); ++ p) {
 	const BdnNode* node = *p;
 	CrNode* crnode = mNodeArray[node->id()];
