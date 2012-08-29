@@ -23,24 +23,6 @@
 #define DEBUG_OUTPUTS 1
 
 
-BEGIN_NAMESPACE_YM_CEC
-
-extern
-void
-check_ceq(const BdnMgr& src_network1,
-	  const BdnMgr& src_network2,
-	  const vector<pair<ymuint32, ymuint32> >& iassoc,
-	  const vector<pair<ymuint32, ymuint32> >& oassoc,
-	  ymint log_level,
-	  ostream* log_out,
-	  const string& sat_type,
-	  const string& sat_option,
-	  ostream* sat_out,
-	  ymuint sigsize,
-	  vector<Bool3>& stats);
-
-END_NAMESPACE_YM_CEC
-
 BEGIN_NAMESPACE_MAGUS
 
 BEGIN_NONAMESPACE
@@ -536,6 +518,12 @@ EquivCmd::cmd_proc(TclObjVector& objv)
 	  cout << "Node#" << node1->id() << "@network1 and "
 	       << "Node#" << node2->id() << "@network2 are not equivalent" << endl;
 	}
+	else if ( comp_stats[i] == kB3X ) {
+	  const BdnNode* node1 = *o1;
+	  const BdnNode* node2 = *o2;
+	  cout << "Node#" << node1->id() << "@network1 and "
+	       << "Node#" << node2->id() << "@network2 are unknown" << endl;
+	}
       }
     }
 #endif
@@ -639,6 +627,12 @@ EquivCmd2::cmd_proc(TclObjVector& objv)
 	  const BdnNode* node2 = *o2;
 	  cout << "Node#" << node1->id() << "@network1 and "
 	       << "Node#" << node2->id() << "@network2 are not equivalent" << endl;
+	}
+	else if ( comp_stats[i] == kB3X ) {
+	  const BdnNode* node1 = *o1;
+	  const BdnNode* node2 = *o2;
+	  cout << "Node#" << node1->id() << "@network1 and "
+	       << "Node#" << node2->id() << "@network2 are unknown" << endl;
 	}
       }
     }

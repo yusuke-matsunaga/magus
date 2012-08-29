@@ -112,6 +112,9 @@ check_ceq2(const BdnMgr& src_network1,
   ymuint no = src_network1.output_num();
   stats.resize(no);
   for (ymuint i = 0; i < no; ++ i) {
+    if ( log_level > 2 ) {
+      (*log_out) << "Checking Output#" << (i + 1) << " / " << no << endl;
+    }
     BdnNodeHandle handle1 = comp_pairs[i].first;
     BdnNodeHandle handle2 = comp_pairs[i].second;
     if ( handle1 == handle2 ) {
