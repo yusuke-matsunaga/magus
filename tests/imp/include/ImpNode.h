@@ -194,16 +194,6 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 内容を設定する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ファンアウト数を設定する．
-  void
-  set_nfo(ymuint n);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
   // 構造情報を取り出す関数
   //////////////////////////////////////////////////////////////////////
 
@@ -229,9 +219,14 @@ public:
   const ImpEdge&
   fanin1() const;
 
-  /// @brief ファンアウトの枝のリストを返す．
-  const vector<ImpEdge*>&
-  fanout_list() const;
+  /// @brief ファンアウト数を返す．
+  ymuint
+  fanout_num() const;
+
+  /// @brief ファンアウトを返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < fanout_num() )
+  const ImpEdge&
+  fanout(ymuint pos) const;
 
 
 public:
@@ -361,6 +356,86 @@ public:
   bwd_imp1(ImpMgr& mgr,
 	   ImpRec& rec) = 0;
 
+  /// @brief ノードに後方含意で0を割り当てる．
+  /// @param[in] mgr ImMgr
+  /// @param[in] from_node 含意元のノード
+  /// @param[in] rec 含意を記録するオブジェクト
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  bwd_prop0(ImpMgr& mgr,
+	    ImpNode* from_node,
+	    ImpRec& rec);
+
+  /// @brief ノードに後方含意で1を割り当てる．
+  /// @param[in] mgr ImMgr
+  /// @param[in] from_node 含意元のノード
+  /// @param[in] rec 含意を記録するオブジェクト
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  bwd_prop1(ImpMgr& mgr,
+	    ImpNode* from_node,
+	    ImpRec& rec);
+
+  /// @brief ファンアウト先に0を伝搬する．
+  /// @param[in] mgr ImMgr
+  /// @param[in] from 後方含意の場合の含意元のノード
+  /// @param[in] rec 含意を記録するオブジェクト
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanout_prop0(ImpMgr& mgr,
+	       ImpNode* from,
+	       ImpRec& rec);
+
+  /// @brief ノードのファンアウト先に1を伝搬する．
+  /// @param[in] mgr ImMgr
+  /// @param[in] from 後方含意の場合の含意元のノード
+  /// @param[in] rec 含意を記録するオブジェクト
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanout_prop1(ImpMgr& mgr,
+	       ImpNode* from,
+	       ImpRec& rec);
+
+  /// @brief ノードのファンイン0に0を伝搬する．
+  /// @param[in] mgr ImMgr
+  /// @param[in] rec 含意を記録するオブジェクト
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanin0_prop0(ImpMgr& mgr,
+	       ImpRec& rec);
+
+  /// @brief ノードのファンイン0に1を伝搬する．
+  /// @param[in] mgr ImMgr
+  /// @param[in] rec 含意を記録するオブジェクト
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanin0_prop1(ImpMgr& mgr,
+	       ImpRec& rec);
+
+  /// @brief ノードのファンイン1に0を伝搬する．
+  /// @param[in] mgr ImMgr
+  /// @param[in] rec 含意を記録するオブジェクト
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanin1_prop0(ImpMgr& mgr,
+	       ImpRec& rec);
+
+  /// @brief ノードのファンイン1に1を伝搬する．
+  /// @param[in] mgr ImMgr
+  /// @param[in] rec 含意を記録するオブジェクト
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanin1_prop1(ImpMgr& mgr,
+	       ImpRec& rec);
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -403,6 +478,72 @@ public:
   bool
   bwd_imp1(ImpMgr& mgr) = 0;
 
+  /// @brief ノードに後方含意で0を割り当てる．
+  /// @param[in] mgr ImMgr
+  /// @param[in] from_node 含意元のノード
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  bwd_prop0(ImpMgr& mgr,
+	    ImpNode* from_node);
+
+  /// @brief ノードに後方含意で1を割り当てる．
+  /// @param[in] mgr ImMgr
+  /// @param[in] from_node 含意元のノード
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  bwd_prop1(ImpMgr& mgr,
+	    ImpNode* from_node);
+
+  /// @brief ノードのファンアウト先に0を伝搬する．
+  /// @param[in] mgr ImpMgr
+  /// @param[in] from 後方含意の場合の含意元のノード
+  /// @param[in] rec 含意を記録するオブジェクト
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanout_prop0(ImpMgr& mgr,
+	       ImpNode* from);
+
+  /// @brief ノードのファンアウト先に1を伝搬する．
+  /// @param[in] mgr ImpMgr
+  /// @param[in] from 後方含意の場合の含意元のノード
+  /// @param[in] rec 含意を記録するオブジェクト
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanout_prop1(ImpMgr& mgr,
+	       ImpNode* from);
+
+  /// @brief ノードのファンイン0に0を伝搬する．
+  /// @param[in] mgr ImpMgr
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanin0_prop0(ImpMgr& mgr);
+
+  /// @brief ノードのファンイン0に1を伝搬する．
+  /// @param[in] mgr ImpMgr
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanin0_prop1(ImpMgr& mgr);
+
+  /// @brief ノードのファンイン1に0を伝搬する．
+  /// @param[in] mgr ImpMgr
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanin1_prop0(ImpMgr& mgr);
+
+  /// @brief ノードのファンイン1に1を伝搬する．
+  /// @param[in] mgr ImpMgr
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanin1_prop1(ImpMgr& mgr);
+
   /// @brief 定数に設定する．
   /// @param[in] mgr ImMgr
   /// @param[in] val 値
@@ -442,8 +583,11 @@ private:
   // ファンインの枝
   ImpEdge mFanins[2];
 
+  // ファンアウト数
+  ymuint32 mFoNum;
+
   // ファンアウトの枝のリスト
-  vector<ImpEdge*> mFanouts;
+  ImpEdge** mFanouts;
 
   // 定数縮退の情報
   // 0: なし
@@ -641,14 +785,6 @@ ImpEdge::dst_pos() const
   return static_cast<ymuint>(mDstInfo & 1UL);
 }
 
-// @brief ファンアウト数を設定する．
-inline
-void
-ImpNode::set_nfo(ymuint n)
-{
-  mFanouts.reserve(n);
-}
-
 // @brief ID 番号を返す．
 inline
 ymuint
@@ -673,12 +809,21 @@ ImpNode::fanin1() const
   return mFanins[1];
 }
 
-// @brief ファンアウトの枝のリストを返す．
+// @brief ファンアウト数を返す．
 inline
-const vector<ImpEdge*>&
-ImpNode::fanout_list() const
+ymuint
+ImpNode::fanout_num() const
 {
-  return mFanouts;
+  return mFoNum;
+}
+
+// @brief ファンアウトを返す．
+// @param[in] pos 位置番号 ( 0 <= pos < fanout_num() )
+inline
+const ImpEdge&
+ImpNode::fanout(ymuint pos) const
+{
+  return *mFanouts[pos];
 }
 
 // @brief ビットベクタ値を返す．

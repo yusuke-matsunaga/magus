@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_CEC
 
 BEGIN_NONAMESPACE
 
-bool debug = true;
+bool debug = false;
 
 ostream&
 operator<<(ostream& s,

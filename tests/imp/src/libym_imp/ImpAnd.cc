@@ -240,12 +240,12 @@ ImpAnd::fwd0_imp0(ImpMgr& mgr,
   case kStXX_X: // XX:X -> 0X:0
     change_value(mgr, kSt0X_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, NULL, rec);
+    return fanout_prop0(mgr, NULL, rec);
 
   case kStX1_X: // X1:X -> 01:0
     change_value(mgr, kSt01_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, NULL, rec);
+    return fanout_prop0(mgr, NULL, rec);
 
   case kStXX_0: // XX:0 -> 0X:0
     change_value(mgr, kSt0X_0);
@@ -287,12 +287,12 @@ ImpAnd::fwd0_imp1(ImpMgr& mgr,
   case kStX1_X: // X1:X -> 11:1
     change_value(mgr, kSt11_1);
     // ファンアウト先に1を伝搬する．
-    return mgr.fanout_prop1(this, NULL, rec);
+    return fanout_prop1(mgr, NULL, rec);
 
   case kStXX_0: // XX:0 -> 10:0
     change_value(mgr, kSt10_0);
     // ファンイン1に0を伝搬する．
-    return mgr.fanin1_prop0(this, rec);
+    return fanin1_prop0(mgr, rec);
 
   case kStX0_0: // X0:0 -> 10:0
     change_value(mgr, kSt10_0);
@@ -326,12 +326,12 @@ ImpAnd::fwd1_imp0(ImpMgr& mgr,
   case kStXX_X: // XX:X -> X0:0
     change_value(mgr, kStX0_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, NULL, rec);
+    return fanout_prop0(mgr, NULL, rec);
 
   case kSt1X_X: // 1X:X -> 10:0
     change_value(mgr, kSt10_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, NULL, rec);
+    return fanout_prop0(mgr, NULL, rec);
 
   case kSt0X_0: // 0X:0 -> 00:0
     change_value(mgr, kSt00_0);
@@ -373,12 +373,12 @@ ImpAnd::fwd1_imp1(ImpMgr& mgr,
   case kSt1X_X: // 1X:X -> 11:1
     change_value(mgr, kSt11_1);
     // ファンアウト先に1を伝搬する．
-    return mgr.fanout_prop1(this, NULL, rec);
+    return fanout_prop1(mgr, NULL, rec);
 
   case kStXX_0: // XX:0 -> 01:0
     change_value(mgr, kSt01_0);
     // ファンイン0に0を伝搬する．
-    return mgr.fanin0_prop0(this, rec);
+    return fanin0_prop0(mgr, rec);
 
   case kSt0X_0: // 0X:0 -> 01:0
     change_value(mgr, kSt01_0);
@@ -416,12 +416,12 @@ ImpAnd::bwd_imp0(ImpMgr& mgr,
   case kSt1X_X: // 1X:X -> 10:0
     change_value(mgr, kSt10_0);
     // ファンイン1に0を伝搬する．
-    return mgr.fanin1_prop0(this, rec);
+    return fanin1_prop0(mgr, rec);
 
   case kStX1_X: // X1:X -> 01:0
     change_value(mgr, kSt01_0);
     // ファンイン0に0を伝搬する．
-    return mgr.fanin0_prop0(this, rec);
+    return fanin0_prop0(mgr, rec);
 
   case kStXX_0: // no change
   case kStX0_0: // no change
@@ -453,17 +453,17 @@ ImpAnd::bwd_imp1(ImpMgr& mgr,
     change_value(mgr, kSt11_1);
     // ファンイン0に1を伝搬する．
     // ファンイン1に1を伝搬する．
-    return mgr.fanin0_prop1(this, rec) && mgr.fanin1_prop1(this, rec);
+    return fanin0_prop1(mgr, rec) && fanin1_prop1(mgr, rec);
 
   case kSt1X_X: // 1X:X -> 11:1
     change_value(mgr, kSt11_1);
     // ファンイン1に1を伝搬する．
-    return mgr.fanin1_prop1(this, rec);
+    return fanin1_prop1(mgr, rec);
 
   case kStX1_X: // X1:X -> 11:1
     change_value(mgr, kSt11_1);
     // ファンイン0に1を伝搬する．
-    return mgr.fanin0_prop1(this, rec);
+    return fanin0_prop1(mgr, rec);
 
   case kStXX_0: // illegal
   case kStX0_0: // illegal
@@ -492,12 +492,12 @@ ImpAnd::fwd0_imp0(ImpMgr& mgr)
   case kStXX_X: // XX:X -> 0X:0
     change_value(mgr, kSt0X_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, NULL);
+    return fanout_prop0(mgr, NULL);
 
   case kStX1_X: // X1:X -> 01:0
     change_value(mgr, kSt01_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, NULL);
+    return fanout_prop0(mgr, NULL);
 
   case kStXX_0: // XX:0 -> 0X:0
     change_value(mgr, kSt0X_0);
@@ -537,12 +537,12 @@ ImpAnd::fwd0_imp1(ImpMgr& mgr)
   case kStX1_X: // X1:X -> 11:1
     change_value(mgr, kSt11_1);
     // ファンアウト先に1を伝搬する．
-    return mgr.fanout_prop1(this, NULL);
+    return fanout_prop1(mgr, NULL);
 
   case kStXX_0: // XX:0 -> 10:0
     change_value(mgr, kSt10_0);
     // ファンイン1に0を伝搬する．
-    return mgr.fanin1_prop0(this);
+    return fanin1_prop0(mgr);
 
   case kStX0_0: // X0:0 -> 10:0
     change_value(mgr, kSt10_0);
@@ -574,12 +574,12 @@ ImpAnd::fwd1_imp0(ImpMgr& mgr)
   case kStXX_X: // XX:X -> X0:0
     change_value(mgr, kStX0_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, NULL);
+    return fanout_prop0(mgr, NULL);
 
   case kSt1X_X: // 1X:X -> 10:0
     change_value(mgr, kSt10_0);
     // ファンアウト先に0を伝搬する．
-    return mgr.fanout_prop0(this, NULL);
+    return fanout_prop0(mgr, NULL);
 
   case kSt0X_0: // 0X:0 -> 00:0
     change_value(mgr, kSt00_0);
@@ -619,12 +619,12 @@ ImpAnd::fwd1_imp1(ImpMgr& mgr)
   case kSt1X_X: // 1X:X -> 11:1
     change_value(mgr, kSt11_1);
     // ファンアウト先に1を伝搬する．
-    return mgr.fanout_prop1(this, NULL);
+    return fanout_prop1(mgr, NULL);
 
   case kStXX_0: // XX:0 -> 01:0
     change_value(mgr, kSt01_0);
     // ファンイン0に0を伝搬する．
-    return mgr.fanin0_prop0(this);
+    return fanin0_prop0(mgr);
 
   case kSt0X_0: // 0X:0 -> 01:0
     change_value(mgr, kSt01_0);
@@ -660,12 +660,12 @@ ImpAnd::bwd_imp0(ImpMgr& mgr)
   case kSt1X_X: // 1X:X -> 10:0
     change_value(mgr, kSt10_0);
     // ファンイン1に0を伝搬する．
-    return mgr.fanin1_prop0(this);
+    return fanin1_prop0(mgr);
 
   case kStX1_X: // X1:X -> 01:0
     change_value(mgr, kSt01_0);
     // ファンイン0に0を伝搬する．
-    return mgr.fanin0_prop0(this);
+    return fanin0_prop0(mgr);
 
   case kStXX_0: // no change
   case kStX0_0: // no change
@@ -695,17 +695,17 @@ ImpAnd::bwd_imp1(ImpMgr& mgr)
     change_value(mgr, kSt11_1);
     // ファンイン0に1を伝搬する．
     // ファンイン1に1を伝搬する．
-    return mgr.fanin0_prop1(this) && mgr.fanin1_prop1(this);
+    return fanin0_prop1(mgr) && fanin1_prop1(mgr);
 
   case kSt1X_X: // 1X:X -> 11:1
     change_value(mgr, kSt11_1);
     // ファンイン1に1を伝搬する．
-    return mgr.fanin1_prop1(this);
+    return fanin1_prop1(mgr);
 
   case kStX1_X: // X1:X -> 11:1
     change_value(mgr, kSt11_1);
     // ファンイン0に1を伝搬する．
-    return mgr.fanin0_prop1(this);
+    return fanin0_prop1(mgr);
 
   case kStXX_0: // illegal
   case kStX0_0: // illegal
@@ -860,42 +860,6 @@ ImpAnd::prop_const(ImpMgr& mgr,
   default:
     assert_not_reached(__FILE__, __LINE__);
     break;
-  }
-}
-
-// @brief 値を変える．
-// @param[in] mgr ImpMgr
-// @param[in] val 値
-void
-ImpAnd::change_value(ImpMgr& mgr,
-		     tState val,
-		     bool record)
-{
-  if ( record ) {
-    mgr.save_value(this, static_cast<ymuint32>(mState));
-  }
-
-  bool pre = is_unjustified();
-
-#if DEBUG_CHANGE_VALUE
-  string pre_str = cur_state_str();
-#endif
-
-  mState = val;
-
-#if DEBUG_CHANGE_VALUE
-  string post_str = cur_state_str();
-  cout << "node#" << id() << ": " << pre_str << " -> " << post_str << endl;
-#endif
-
-  bool post = is_unjustified();
-  if ( pre ^ post ) {
-    if ( post ) {
-      mgr.set_unjustified(this);
-    }
-    else {
-      mgr.reset_unjustified(this);
-    }
   }
 }
 

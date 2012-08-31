@@ -46,6 +46,9 @@ void
 imp(const string& filename,
     bool blif,
     bool iscas89,
+    bool do_direct,
+    bool do_const,
+    bool do_contra,
     bool do_naimp,
     bool do_naimp2,
     bool do_sat,
@@ -85,16 +88,32 @@ imp(const string& filename,
   timer.start();
   StrImp strimp;
   ImpInfo direct_imp;
-  strimp.learning(imp_mgr, direct_imp);
+
+  if ( do_direct ) {
+    strimp.learning(imp_mgr, direct_imp);
+  }
   timer.stop();
   USTime direct_time = timer.time();
 
   timer.reset();
   timer.start();
+  ConstImp constimp;
+  if ( do_const ) {
+    constimp.learning(imp_mgr);
+  }
+  timer.stop();
+  USTime const_time = timer.time();
+
+  timer.reset();
+  timer.start();
   ContraImp contraimp;
   ImpInfo contra_imp;
-  contraimp.learning(imp_mgr, contra_imp);
-  //contra_imp.make_closure();
+
+  if ( do_contra ) {
+    contraimp.learning(imp_mgr, contra_imp);
+    //contra_imp.make_closure();
+  }
+
   timer.stop();
   USTime contra_time = timer.time();
 
@@ -137,15 +156,6 @@ imp(const string& filename,
   }
   timer.stop();
   USTime rl_time = timer.time();
-
-  timer.reset();
-  timer.start();
-  ConstImp constimp;
-#if 0
-  constimp.learning(imp_mgr);
-#endif
-  timer.stop();
-  USTime const_time = timer.time();
 
   timer.reset();
   timer.start();
@@ -212,6 +222,9 @@ main(int argc,
 
   bool blif = false;
   bool iscas = false;
+  bool do_direct = false;
+  bool do_const = false;
+  bool do_contra = false;
   bool do_naimp = false;
   bool do_naimp2 = false;
   bool do_sat = false;
@@ -232,6 +245,18 @@ main(int argc,
 
     { "iscas89", '\0', POPT_ARG_NONE, NULL, 0x101,
       "iscas89 mode", NULL },
+
+    { "direct", '\0', POPT_ARG_NONE, NULL, 0x130,
+      "do direct implication", NULL},
+
+    { "no-direct", '\0', POPT_ARG_NONE, NULL, 0x131,
+      "without direct implication", NULL},
+
+    { "contra", '\0', POPT_ARG_NONE, NULL, 0x140,
+      "do contraposition learning", NULL},
+
+    { "no-contra", '\0', POPT_ARG_NONE, NULL, 0x141,
+      "without contraposition learning", NULL},
 
     { "naive", '\0', POPT_ARG_NONE, NULL, 0x150,
       "do naive-learning", NULL},
@@ -288,6 +313,18 @@ main(int argc,
     else if ( rc == 0x101 ) {
       iscas = true;
     }
+    else if ( rc == 0x130 ) {
+      do_direct = true;
+    }
+    else if ( rc == 0x131 ) {
+      do_direct = false;
+    }
+    else if ( rc == 0x140 ) {
+      do_contra = true;
+    }
+    else if ( rc == 0x141 ) {
+      do_contra = false;
+    }
     else if ( rc == 0x150 ) {
       do_naimp = true;
     }
@@ -326,7 +363,8 @@ main(int argc,
   }
 
   string filename(str);
-  imp(filename, blif, iscas, do_naimp, do_naimp2, do_sat, do_recur, level);
+  imp(filename, blif, iscas,
+      do_direct, do_const, do_contra, do_naimp, do_naimp2, do_sat, do_recur, level);
 
   return 0;
 }

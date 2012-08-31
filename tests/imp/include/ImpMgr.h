@@ -176,86 +176,6 @@ public:
 	 ymuint val,
 	 ImpRec& rec);
 
-  /// @brief ノードのファンアウト先に0を伝搬する．
-  /// @param[in] node ノード
-  /// @param[in] from 後方含意の場合の含意元のノード
-  /// @param[in] rec 含意を記録するオブジェクト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanout_prop0(ImpNode* node,
-	       ImpNode* from,
-	       ImpRec& rec);
-
-  /// @brief ノードのファンアウト先に1を伝搬する．
-  /// @param[in] node ノード
-  /// @param[in] from 後方含意の場合の含意元のノード
-  /// @param[in] rec 含意を記録するオブジェクト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanout_prop1(ImpNode* node,
-	       ImpNode* from,
-	       ImpRec& rec);
-
-  /// @brief ノードのファンイン0に0を伝搬する．
-  /// @param[in] node ノード
-  /// @param[in] rec 含意を記録するオブジェクト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanin0_prop0(ImpNode* node,
-	       ImpRec& rec);
-
-  /// @brief ノードのファンイン0に1を伝搬する．
-  /// @param[in] node ノード
-  /// @param[in] rec 含意を記録するオブジェクト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanin0_prop1(ImpNode* node,
-	       ImpRec& rec);
-
-  /// @brief ノードのファンイン1に0を伝搬する．
-  /// @param[in] node ノード
-  /// @param[in] rec 含意を記録するオブジェクト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanin1_prop0(ImpNode* node,
-	       ImpRec& rec);
-
-  /// @brief ノードのファンイン1に1を伝搬する．
-  /// @param[in] node ノード
-  /// @param[in] rec 含意を記録するオブジェクト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanin1_prop1(ImpNode* node,
-	       ImpRec& rec);
-
-  /// @brief ノードに後方含意で0を割り当てる．
-  /// @param[in] node ノード
-  /// @param[in] from_node 含意元のノード
-  /// @param[in] rec 含意を記録するオブジェクト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  bwd_prop0(ImpNode* node,
-	    ImpNode* from_node,
-	    ImpRec& rec);
-
-  /// @brief ノードに後方含意で1を割り当てる．
-  /// @param[in] node ノード
-  /// @param[in] from_node 含意元のノード
-  /// @param[in] rec 含意を記録するオブジェクト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  bwd_prop1(ImpNode* node,
-	    ImpNode* from_node,
-	    ImpRec& rec);
-
   /// @brief unjustified ノードを得る．
   void
   get_unodelist(vector<ImpNode*>& unode_list) const;
@@ -300,52 +220,6 @@ public:
   save_value(ImpNode* node,
 	     ymuint32 old_state);
 
-  /// @brief ノードのファンアウト先に0を伝搬する．
-  /// @param[in] node ノード
-  /// @param[in] from 後方含意の場合の含意元のノード
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanout_prop0(ImpNode* node,
-	       ImpNode* from);
-
-  /// @brief ノードのファンアウト先に1を伝搬する．
-  /// @param[in] node ノード
-  /// @param[in] from 後方含意の場合の含意元のノード
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanout_prop1(ImpNode* node,
-	       ImpNode* from);
-
-  /// @brief ノードのファンイン0に0を伝搬する．
-  /// @param[in] node ノード
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanin0_prop0(ImpNode* node);
-
-  /// @brief ノードのファンイン0に1を伝搬する．
-  /// @param[in] node ノード
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanin0_prop1(ImpNode* node);
-
-  /// @brief ノードのファンイン1に0を伝搬する．
-  /// @param[in] node ノード
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanin1_prop0(ImpNode* node);
-
-  /// @brief ノードのファンイン1に1を伝搬する．
-  /// @param[in] node ノード
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanin1_prop1(ImpNode* node);
-
   /// @brief ノードに後方含意で0を割り当てる．
   /// @param[in] node ノード
   /// @param[in] from_node 含意元のノード
@@ -379,6 +253,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 各ノードのファンアウト情報を設定する．
+  void
+  make_fanouts();
 
   /// @brief ノードに BNode-ID を割り当てる．
   void

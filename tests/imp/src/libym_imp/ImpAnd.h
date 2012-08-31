@@ -10,6 +10,7 @@
 
 
 #include "ImpNode.h"
+#include "ImpMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -276,6 +277,51 @@ private:
   tState mState;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 値を変える．
+// @param[in] mgr ImpMgr
+// @param[in] val 値
+inline
+void
+ImpAnd::change_value(ImpMgr& mgr,
+		     tState val,
+		     bool record)
+{
+  if ( record ) {
+    mgr.save_value(this, static_cast<ymuint32>(mState));
+  }
+
+#if 0
+  bool pre = is_unjustified();
+#endif
+#if DEBUG_CHANGE_VALUE
+  string pre_str = cur_state_str();
+#endif
+
+  mState = val;
+
+#if DEBUG_CHANGE_VALUE
+  string post_str = cur_state_str();
+  cout << "node#" << id() << ": " << pre_str << " -> " << post_str << endl;
+#endif
+
+#if 0
+  bool post = is_unjustified();
+  if ( pre ^ post ) {
+    if ( post ) {
+      mgr.set_unjustified(this);
+    }
+    else {
+      mgr.reset_unjustified(this);
+    }
+  }
+#endif
+}
 
 END_NAMESPACE_YM_NETWORKS
 
