@@ -25,12 +25,11 @@ libym_blif_la_SOURCES = \
 	BlifDic.cc \
 	BlifScanner.h \
 	BlifScanner.cc \
+	IdCell.h \
 	IdHash.h \
 	IdHash.cc \
 	BlifParser.h \
 	BlifParser.cc \
-	BlifParserImpl.h \
-	BlifParserImpl.cc \
 	BlifHandler.h \
 	BlifHandler.cc \
 	BlifNetwork.cc \

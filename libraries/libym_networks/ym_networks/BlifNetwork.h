@@ -15,6 +15,8 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
+class BlifNetworkImpl;
+
 //////////////////////////////////////////////////////////////////////
 /// @class BlifNetwork BlifNetwork.h "ym_networks/BlifNetwork.h"
 /// @ingroup BlifGroup

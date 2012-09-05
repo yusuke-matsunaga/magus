@@ -31,13 +31,8 @@ END_NAMESPACE_YM_NETWORKS
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 // クラスの前方宣言
-class BlifHandler;
-class BlifParser;
-class BlifParserImpl;
 class BlifNetwork;
 class BlifNode;
-class BlifNetworkReader;
-class BlifNetworkImpl;
 
 END_NAMESPACE_YM_NETWORKS_BLIF
 
@@ -45,7 +40,6 @@ BEGIN_NAMESPACE_YM
 
 using nsNetworks::nsBlif::BlifNode;
 using nsNetworks::nsBlif::BlifNetwork;
-using nsNetworks::nsBlif::BlifNetworkReader;
 
 END_NAMESPACE_YM
 

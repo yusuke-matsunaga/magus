@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 /// @class BlifNode BlifNode.h "ym_networks/BlifNode.h"
 /// @ingroup BlifGroup
 /// @brief blif ファイルの表すネットワークのノード
-/// @sa BlifNetworks
+/// @sa BlifNetwork
 //////////////////////////////////////////////////////////////////////
 class BlifNode
 {
@@ -33,8 +33,10 @@ public:
     kUndef,
     /// @brief 外部入力
     kInput,
-    /// @brief 論理
+    /// @brief 論理(カバー)
     kLogic,
+    /// @brief ゲート(セル)
+    kGate,
     /// @brief ラッチ
     kLatch
   };

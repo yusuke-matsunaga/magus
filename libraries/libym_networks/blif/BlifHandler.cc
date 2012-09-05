@@ -8,7 +8,7 @@
 
 
 #include "BlifHandler.h"
-#include "BlifParserImpl.h"
+#include "BlifParser.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF

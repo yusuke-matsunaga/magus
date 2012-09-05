@@ -15,6 +15,8 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
+class BlifNetworkImpl;
+
 //////////////////////////////////////////////////////////////////////
 /// @class BlifNetworkHandler BlifNetworkHandler.h
 /// @brief BlifNetwork 用の BlifHandler

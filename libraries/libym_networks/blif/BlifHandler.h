@@ -16,6 +16,8 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
+class BlifParser;
+
 //////////////////////////////////////////////////////////////////////
 /// @class BlifHandler BlifHandler.h "BlifHandler.h"
 /// @ingroup BlifGroup
@@ -26,7 +28,7 @@ BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 //////////////////////////////////////////////////////////////////////
 class BlifHandler
 {
-  friend class BlifParserImpl;
+  friend class BlifParser;
 
 protected:
 
@@ -165,7 +167,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // パーサー本体
-  BlifParserImpl* mParser;
+  BlifParser* mParser;
 
 };
 
