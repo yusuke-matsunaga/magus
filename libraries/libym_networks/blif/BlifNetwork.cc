@@ -3,179 +3,125 @@
 /// @brief BlifNetwork の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BlifNetwork.h"
+#include "ym_networks/BlifNetwork.h"
+#include "BlifNetworkImpl.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
-
-//////////////////////////////////////////////////////////////////////
-// BlifNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] id ID 番号
-BlifNode::BlifNode(ymuint32 id) :
-  mId(id),
-  mType(kUndef),
-  mNi(0),
-  mFanins(NULL),
-  mNc(0),
-  mCover(NULL)
-{
-}
-
-// @brief デストラクタ
-BlifNode::~BlifNode()
-{
-}
-
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 //////////////////////////////////////////////////////////////////////
-// BlifNetwork
+// クラス BlifNetwork
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 BlifNetwork::BlifNetwork() :
-  mAlloc(4096)
+  mImpl(new BlifNetworkImpl)
 {
 }
 
 // @brief デストラクタ
 BlifNetwork::~BlifNetwork()
 {
+  delete mImpl;
 }
 
-// @brief 内容をクリアする．
-void
-BlifNetwork::clear()
+// @brief model 名を得る．
+string
+BlifNetwork::name() const
 {
-  mName = string();
-  mNodeArray.clear();
-  mPIArray.clear();
-  mPOArray.clear();
-  mFFArray.clear();
-  mLogicArray.clear();
+  return mImpl->name();
 }
 
-// @brief ノードを取り出す．
-// @param[in] id ID 番号
-// @note なければ作成する．
-BlifNode*
-BlifNetwork::get_node(ymuint32 id)
+// @brief ノードの ID 番号の最大値 + 1 を求める．
+ymuint32
+BlifNetwork::max_node_id() const
 {
-  ymuint32 n = mNodeArray.size();
-  while ( n <= id ) {
-    mNodeArray.push_back(NULL);
-    ++ n;
-  }
-
-  BlifNode* node = mNodeArray[id];
-  if ( node == NULL ) {
-    void* p = mAlloc.get_memory(sizeof(BlifNode));
-    node = new (p) BlifNode(id);
-    mNodeArray[id] = node;
-  }
-  return node;
+  return mImpl->max_node_id();
 }
 
-// @brief ノード名を設定する．
-// @param[in] node 対象のノード
-// @param[in] name 名前
-void
-BlifNetwork::set_node_name(BlifNode* node,
-			   const char* name)
+// @brief ID 番号からノードを得る．
+// @param[in] id ID 番号 ( 0 <= id < max_node_id() )
+// @note 使われていない ID の場合には NULL が返される．
+const BlifNode*
+BlifNetwork::node(ymuint32 id) const
 {
-  ymuint32 l = strlen(name);
-  void* p = mAlloc.get_memory(l + 1);
-  char* buff = new (p) char[l + 1];
-  node->mName = buff;
-  while ( (*buff ++ = *name ++) ) ;
+  return mImpl->node(id);
 }
 
-// @brief ノードを外部入力に設定する．
-// @note 既に他の型に設定されていたら false を返す．
+// @brief 外部入力数を得る．
+ymuint32
+BlifNetwork::pi_num() const
+{
+  return mImpl->pi_num();
+}
+
+// @brief 外部入力を得る．
+// @param[in] pos 位置番号 ( 0 <= pos < npi() )
+const BlifNode*
+BlifNetwork::pi(ymuint32 pos) const
+{
+  return mImpl->pi(pos);
+}
+
+// @brief 外部出力数を得る．
+ymuint32
+BlifNetwork::po_num() const
+{
+  return mImpl->po_num();
+}
+
+// @brief 外部出力を得る．
+// @param[in] pos 位置番号 ( 0 <= pos < npo() )
+const BlifNode*
+BlifNetwork::po(ymuint32 pos) const
+{
+  return mImpl->po(pos);
+}
+
+// @brief ラッチ数を得る．
+ymuint32
+BlifNetwork::ff_num() const
+{
+  return mImpl->ff_num();
+}
+
+// @brief ラッチを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < nff() )
+const BlifNode*
+BlifNetwork::ff(ymuint32 pos) const
+{
+  return mImpl->ff(pos);
+}
+
+// @brief 論理ノード数を得る．
+ymuint32
+BlifNetwork::logic_num() const
+{
+  return mImpl->logic_num();
+}
+
+// @brief 論理ノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < nlogic() )
+const BlifNode*
+BlifNetwork::logic(ymuint32 pos) const
+{
+  return mImpl->logic(pos);
+}
+
+// @brief blif 形式のファイルを読み込む．
+// @param[in] filename ファイル名
+// @param[in] cell_library セルライブラリ
+// @retval true 正常に読み込めた
+// @retval false 読み込み中にエラーが起こった．
 bool
-BlifNetwork::set_input_type(BlifNode* node)
+BlifNetwork::read_blif(const string& filename,
+		       const CellLibrary* cell_library)
 {
-  if ( node->mType != BlifNode::kUndef ) {
-    return false;
-  }
-  node->mType = BlifNode::kInput;
-  mPIArray.push_back(node);
-  return true;
-}
-
-// @brief ノードを論理ノードに設定する．
-// @param[in] ni ファンイン数
-// @param[in] nc キューブ数
-// @param[in] cover_pat 全キューブのパタンをつなげたもの
-// @param[in] opat 出力のパタン
-// @note 既に他の型に設定されていたら false を返す．
-bool
-BlifNetwork::set_logic_type(BlifNode* node,
-			    ymuint32 ni,
-			    ymuint32 nc,
-			    const char* cover_pat,
-			    char opat)
-{
-  if ( node->mType != BlifNode::kUndef ) {
-    return false;
-  }
-  node->mType = BlifNode::kLogic;
-  alloc_fanin(node, ni);
-  node->mNc = nc;
-
-  if ( ni > 0 ) {
-    ymuint32 size = nc * ni;
-    void* p = mAlloc.get_memory(size);
-    char* buff = new (p) char[size];
-    node->mCover = buff;
-    while ( size -- > 0 ) {
-      *buff ++ = *cover_pat ++;
-    }
-  }
-  else {
-    node->mCover = NULL;
-  }
-  node->mOpat = opat;
-
-  mLogicArray.push_back(node);
-  return true;
-}
-
-// @brief ノードをラッチノードに設定する．
-// @param[in] rval リセット値 ( '0', '1', ' ' のいづれか )
-// @note 既に他の型に設定されていたら false を返す．
-bool
-BlifNetwork::set_latch_type(BlifNode* node,
-			    char rval)
-{
-  if ( node->mType != BlifNode::kUndef ) {
-    return false;
-  }
-  node->mType = BlifNode::kLatch;
-  alloc_fanin(node, 1);
-
-  node->mOpat = rval;
-
-  mFFArray.push_back(node);
-  return true;
-}
-
-// @brief BlifNode のファンイン領域を確保する．
-// @param[in] node 対象のノード
-// @param[in] ni ファンイン数
-void
-BlifNetwork::alloc_fanin(BlifNode* node,
-			 ymuint32 ni)
-{
-  node->mNi = ni;
-  void* q = mAlloc.get_memory(sizeof(BlifNode*) * ni);
-  node->mFanins = new (q) BlifNode*[ni];
+  return mImpl->read_blif(filename, cell_library);
 }
 
 // @brief 内容を blif 形式で出力する．
@@ -183,51 +129,8 @@ BlifNetwork::alloc_fanin(BlifNode* node,
 void
 BlifNetwork::write_blif(ostream& s) const
 {
-  s << ".model " << name() << endl;
-  for (vector<BlifNode*>::const_iterator p = mPIArray.begin();
-       p != mPIArray.end(); ++ p) {
-    const BlifNode* node = *p;
-    s << ".inputs " << node->name() << endl;
-  }
-  for (vector<BlifNode*>::const_iterator p = mPOArray.begin();
-       p != mPOArray.end(); ++ p) {
-    const BlifNode* node = *p;
-    s << ".outputs " << node->name() << endl;
-  }
-  for (vector<BlifNode*>::const_iterator p = mFFArray.begin();
-       p != mFFArray.end(); ++ p) {
-    const BlifNode* node = *p;
-    const BlifNode* inode = node->fanin(0);
-    s << ".latch " << inode->name() << " " << node->name();
-    if ( node->opat() != ' ' ) {
-      s << node->opat();
-    }
-    s << endl;
-  }
-  for (vector<BlifNode*>::const_iterator p = mLogicArray.begin();
-       p != mLogicArray.end(); ++ p) {
-    const BlifNode* node = *p;
-    s << ".names";
-    ymuint32 ni = node->ni();
-    for (ymuint32 i = 0; i < ni; ++ i) {
-      const BlifNode* inode = node->fanin(i);
-      s << " " << inode->name();
-    }
-    s << " " << node->name() << endl;
-    ymuint32 nc = node->nc();
-    if ( ni > 0 ) {
-      for (ymuint32 c = 0; c < nc; ++ c) {
-	for (ymuint32 i = 0; i < ni; ++ i) {
-	  s << node->cube_pat(c, i);
-	}
-	s << " " << node->opat() << endl;
-      }
-    }
-    else if ( nc == 1 ) {
-      s << node->opat();
-    }
-  }
-  s << ".end" << endl;
+  mImpl->write_blif(s);
 }
 
-END_NAMESPACE_YM_BLIF
+
+END_NAMESPACE_YM_NETWORKS_BLIF

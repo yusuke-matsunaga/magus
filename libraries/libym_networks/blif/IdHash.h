@@ -5,16 +5,16 @@
 /// @brief IdHash のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "blif_nsdef.h"
+#include "ym_networks/blif_nsdef.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/SimpleAlloc.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 //////////////////////////////////////////////////////////////////////
 /// @class IdCell IdHash.h "IdHash.h"
@@ -352,6 +352,6 @@ IdHash::def_loc(ymuint32 id) const
   return cell(id)->def_loc();
 }
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF
 
 #endif // IDHASH_H

@@ -1,25 +1,25 @@
-#ifndef BLIFNETWORKREADER_H
-#define BLIFNETWORKREADER_H
+#ifndef YM_NETWORKS_BLIFNETWORKREADER_H
+#define YM_NETWORKS_BLIFNETWORKREADER_H
 
-/// @file BlifNetwork.h
-/// @brief BlifNetwork のヘッダファイル
+/// @file ym_networks/BlifNetworkReader.h
+/// @brief BlifNetworkReader のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "blif_nsdef.h"
-#include "BlifParser.h"
+#include "ym_networks/blif_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
+class BlifParser;
 class BlifNetworkHandler;
 
 //////////////////////////////////////////////////////////////////////
-/// @class BlifNetworkReader BlifNetwork.h "BlifNetwork.h"
+/// @class BlifNetworkReader BlifNetworkReader.h "ym_networks/BlifNetworkReader.h"
 /// @ingroup BlifGroup
 /// @brief blif 形式のファイルを読み込んで BlifNetwork に設定するクラス
 /// @sa BlifNetwork
@@ -55,13 +55,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // blif パーサー
-  BlifParser mParser;
+  BlifParser* mParser;
 
   // ハンドラ
   BlifNetworkHandler* mHandler;
 
 };
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF
 
 #endif // BLIFNETWORKREADER_H

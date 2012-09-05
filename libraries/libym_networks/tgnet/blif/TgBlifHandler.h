@@ -14,7 +14,7 @@
 #include "ym_logic/LogExpr.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 //////////////////////////////////////////////////////////////////////
 /// @class TgBlifHandler TgBlifHandler.h
@@ -184,6 +184,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF
 
 #endif // TGBLIFHANDLER_H

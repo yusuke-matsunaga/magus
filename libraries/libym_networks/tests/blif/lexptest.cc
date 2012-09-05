@@ -14,7 +14,7 @@
 #include "ym_logic/LogExpr.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 //////////////////////////////////////////////////////////////////////
 /// @class TestBlifHandler parsertest.cc
@@ -334,7 +334,7 @@ TestBlifHandler::error_exit()
 {
 }
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF
 
 
 int

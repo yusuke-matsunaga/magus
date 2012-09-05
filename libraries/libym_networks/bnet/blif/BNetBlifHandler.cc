@@ -16,7 +16,7 @@
 #include "ym_utils/MsgMgr.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 // @brief コンストラクタ
 BNetBlifHandler::BNetBlifHandler() :
@@ -269,4 +269,4 @@ BNetBlifHandler::resize(ymuint32 id)
   }
 }
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF

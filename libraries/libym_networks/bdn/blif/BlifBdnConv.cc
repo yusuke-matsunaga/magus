@@ -14,10 +14,11 @@
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/BdnNodeHandle.h"
 #include "ym_networks/BdnDff.h"
-#include "BlifNetwork.h"
+#include "ym_networks/BlifNetwork.h"
+#include "ym_networks/BlifNode.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 // @brief コンストラクタ
 BlifBdnConv::BlifBdnConv()
@@ -51,7 +52,7 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
   mNetwork->set_name(blif_network.name());
 
   // 外部入力ノードの生成
-  ymuint npi = blif_network.npi();
+  ymuint npi = blif_network.pi_num();
   for (ymuint i = 0; i < npi; ++ i) {
     const BlifNode* blif_node = blif_network.pi(i);
     BdnPort* port = mNetwork->new_input_port(blif_node->name(), 1);
@@ -60,7 +61,7 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
   }
 
   // D-FFの生成
-  ymuint nff = blif_network.nff();
+  ymuint nff = blif_network.ff_num();
   vector<BdnDff*> dff_array(nff);
   BdnNodeHandle clock_h;
   BdnNodeHandle clear_h;
@@ -121,7 +122,7 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
   }
 
   // 外部出力に用いられているノードを再帰的に生成
-  ymuint npo = blif_network.npo();
+  ymuint npo = blif_network.po_num();
   for (ymuint i = 0; i < npo; ++ i) {
     const BlifNode* blif_node = blif_network.po(i);
     BdnPort* port = mNetwork->new_output_port(blif_node->name(), 1);
@@ -149,13 +150,13 @@ BlifBdnConv::make_node(const BlifNode* blif_node)
   BdnNodeHandle node_handle;
   if ( !get_node(blif_node, node_handle) ) {
     assert_cond( blif_node->type() == BlifNode::kLogic, __FILE__, __LINE__);
-    ymuint ni = blif_node->ni();
+    ymuint ni = blif_node->fanin_num();
     vector<BdnNodeHandle> fanins(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       fanins[i] = make_node(blif_node->fanin(i));
     }
 
-    ymuint nc = blif_node->nc();
+    ymuint nc = blif_node->cube_num();
     if ( blif_node->opat() == '1' ) {
       vector<BdnNodeHandle> or_leaves;
       or_leaves.reserve(nc);
@@ -238,4 +239,4 @@ BlifBdnConv::put_node(const BlifNode* blif_node,
   mNodeFlag[id] = true;
 }
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF

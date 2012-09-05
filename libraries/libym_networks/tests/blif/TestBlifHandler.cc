@@ -13,7 +13,7 @@
 #include "ym_utils/FileRegion.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 // @brief コンストラクタ
 TestBlifHandler::TestBlifHandler(ostream* streamptr) :
@@ -151,4 +151,4 @@ TestBlifHandler::error_exit()
   (*mStreamPtr) << "error_exit" << endl;
 }
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF

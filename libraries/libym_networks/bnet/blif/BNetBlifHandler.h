@@ -15,7 +15,7 @@
 #include "BlifHandler.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetBlifHandler read_blif.cc
@@ -175,6 +175,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF
 
 #endif // BNETBLIFHANDLER_H

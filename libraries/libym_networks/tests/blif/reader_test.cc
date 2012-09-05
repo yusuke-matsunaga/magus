@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "BlifNetwork.h"
-#include "BlifNetworkReader.h"
+#include "ym_networks/BlifNetwork.h"
+//#include "ym_networks/BlifNetworkReader.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
@@ -30,11 +30,10 @@ main(int argc,
   try {
     StreamMsgHandler* msg_handler = new StreamMsgHandler(&cerr);
     MsgMgr::reg_handler(msg_handler);
-    BlifNetworkReader read;
 
     BlifNetwork network;
 
-    if ( !read(filename, network) ) {
+    if ( !network.read_blif(filename) ) {
       cerr << "Error in reading " << filename << endl;
       return 4;
     }

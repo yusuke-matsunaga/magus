@@ -1,150 +1,38 @@
-#ifndef BLIFNETWORK_H
-#define BLIFNETWORK_H
+#ifndef BLIFNETWORKIMPL_H
+#define BLIFNETWORKIMPL_H
 
-/// @file BlifNetwork.h
-/// @brief BlifNetwork のヘッダファイル
+/// @file BlifNetworkImpl.h
+/// @brief BlifNetworkImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "blif_nsdef.h"
+#include "ym_networks/blif_nsdef.h"
+#include "ym_cell/cell_nsdef.h"
 #include "ym_utils/SimpleAlloc.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 class BlifNetworkHandler;
 
 //////////////////////////////////////////////////////////////////////
-/// @class BlifNode BlifNetwork.h "BlifNetwork.h"
-/// @ingroup BlifGroup
-/// @brief blif ファイルの表すネットワークのノード
-/// @sa BlifParser
+/// @class BlifNetworkImpl BlifNetworkImpl.h "BlifNetworkImpl.h"
+/// @brief BlifNetwork の実装クラス
 //////////////////////////////////////////////////////////////////////
-class BlifNode
-{
-  friend class BlifNetwork;
-  friend class BlifNetworkHandler;
-
-public:
-
-  /// @brief ノードの種類
-  enum tType {
-    /// @brief 未定義
-    kUndef,
-    /// @brief 外部入力
-    kInput,
-    /// @brief 論理
-    kLogic,
-    /// @brief ラッチ
-    kLatch
-  };
-
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] id ID 番号
-  BlifNode(ymuint32 id);
-
-  /// @brief デストラクタ
-  ~BlifNode();
-
-
-public:
-
-  /// @brief ID を返す．
-  ymuint32
-  id() const;
-
-  /// @brief 名前を返す．
-  const char*
-  name() const;
-
-  /// @brief 型を返す．
-  tType
-  type() const;
-
-  /// @brief ファンイン数を得る．
-  ymuint32
-  ni() const;
-
-  /// @brief ファンインを求める．
-  /// @param[in] pos 入力位置 ( 0 <= pos < ni() )
-  const BlifNode*
-  fanin(ymuint32 pos) const;
-
-  /// @brief カバーのキューブ数を得る．
-  ymuint32
-  nc() const;
-
-  /// @brief 入力キューブのパタンを得る．
-  /// @param[in] c_pos キューブの位置 ( 0 <= c_pos < nc() )
-  /// @param[in] i_pos 入力位置 ( 0 <= i_pos < ni() )
-  char
-  cube_pat(ymuint32 c_pos,
-	   ymuint32 i_pos) const;
-
-  /// @brief 出力キューブを表すパタンを得る．
-  char
-  opat() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  // ここのメモリ領域はすべて BlifNetwork::mAlloc が管理する．
-  //////////////////////////////////////////////////////////////////////
-
-  // ID 番号
-  ymuint32 mId;
-
-  // 名前
-  const char* mName;
-
-  // 型
-  tType mType;
-
-  // ファンイン数
-  ymuint32 mNi;
-
-  // ファンインの配列
-  BlifNode** mFanins;
-
-  // キューブ数
-  ymuint32 mNc;
-
-  // カバーを表す文字の配列
-  // 中身は '0', '1', '-' のいづれか
-  // サイズは ni() * nc()
-  // end-of-string マーカはないので注意
-  const char* mCover;
-
-  // 出力キューブを表す文字　'0' or '1'
-  char mOpat;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class BlifNetwork BlifNetwork.h "BlifNetwork.h"
-/// @ingroup BlifGroup
-/// @brief blif ファイルの表しているネットワーク
-/// @sa BlifNetworkReader
-//////////////////////////////////////////////////////////////////////
-class BlifNetwork
+class BlifNetworkImpl
 {
   friend class BlifNetworkHandler;
 
 public:
 
   /// @brief コンストラクタ
-  BlifNetwork();
+  BlifNetworkImpl();
 
   /// @brief デストラクタ
-  ~BlifNetwork();
+  ~BlifNetworkImpl();
 
 
 public:
@@ -165,7 +53,7 @@ public:
 
   /// @brief 外部入力数を得る．
   ymuint32
-  npi() const;
+  pi_num() const;
 
   /// @brief 外部入力を得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < npi() )
@@ -174,7 +62,7 @@ public:
 
   /// @brief 外部出力数を得る．
   ymuint32
-  npo() const;
+  po_num() const;
 
   /// @brief 外部出力を得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < npo() )
@@ -183,7 +71,7 @@ public:
 
   /// @brief ラッチ数を得る．
   ymuint32
-  nff() const;
+  ff_num() const;
 
   /// @brief ラッチを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < nff() )
@@ -192,12 +80,27 @@ public:
 
   /// @brief 論理ノード数を得る．
   ymuint32
-  nlogic() const;
+  logic_num() const;
 
   /// @brief 論理ノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < nlogic() )
   const BlifNode*
   logic(ymuint32 pos) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // blif 形式のファイルとの間で入出力を行なう関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief blif 形式のファイルを読み込む．
+  /// @param[in] filename ファイル名
+  /// @param[in] cell_library セルライブラリ
+  /// @retval true 正常に読み込めた
+  /// @retval false 読み込み中にエラーが起こった．
+  bool
+  read_blif(const string& filename,
+	    const CellLibrary* cell_library = NULL);
 
   /// @brief 内容を blif 形式で出力する．
   /// @param[in] s 出力先のストリーム
@@ -294,86 +197,13 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-// BlifNode のインライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief ID を返す．
-inline
-ymuint32
-BlifNode::id() const
-{
-  return mId;
-}
-
-// @brief 名前を返す．
-inline
-const char*
-BlifNode::name() const
-{
-  return mName;
-}
-
-// @brief 型を返す．
-inline
-BlifNode::tType
-BlifNode::type() const
-{
-  return mType;
-}
-
-// @brief ファンイン数を得る．
-inline
-ymuint32
-BlifNode::ni() const
-{
-  return mNi;
-}
-
-// @brief ファンインを求める．
-// @param[in] pos 入力位置 ( 0 <= pos < ni() )
-inline
-const BlifNode*
-BlifNode::fanin(ymuint32 pos) const
-{
-  return mFanins[pos];
-}
-
-// @brief カバーのキューブ数を得る．
-inline
-ymuint32
-BlifNode::nc() const
-{
-  return mNc;
-}
-
-// @brief 入力キューブのパタンを得る．
-// @param[in] c_pos キューブの位置 ( 0 <= c_pos < nc() )
-// @param[in] i_pos 入力位置 ( 0 <= i_pos < ni() )
-inline
-char
-BlifNode::cube_pat(ymuint32 c_pos,
-		   ymuint32 i_pos) const
-{
-  return mCover[c_pos * ni() + i_pos];
-}
-
-// @brief 出力キューブを表すパタンを得る．
-inline
-char
-BlifNode::opat() const
-{
-  return mOpat;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-//  BlifNetwork のインライン関数の定義
+//  BlifNetworkImpl のインライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
 // @brief model 名を得る．
 inline
 string
-BlifNetwork::name() const
+BlifNetworkImpl::name() const
 {
   return mName;
 }
@@ -381,7 +211,7 @@ BlifNetwork::name() const
 // @brief ノードの ID 番号の最大値 + 1 を求める．
 inline
 ymuint32
-BlifNetwork::max_node_id() const
+BlifNetworkImpl::max_node_id() const
 {
   return mNodeArray.size();
 }
@@ -391,7 +221,7 @@ BlifNetwork::max_node_id() const
 // @note 使われていない ID の場合には NULL が返される．
 inline
 const BlifNode*
-BlifNetwork::node(ymuint32 id) const
+BlifNetworkImpl::node(ymuint32 id) const
 {
   return mNodeArray[id];
 }
@@ -399,7 +229,7 @@ BlifNetwork::node(ymuint32 id) const
 // @brief 外部入力数を得る．
 inline
 ymuint32
-BlifNetwork::npi() const
+BlifNetworkImpl::pi_num() const
 {
   return mPIArray.size();
 }
@@ -408,7 +238,7 @@ BlifNetwork::npi() const
 // @param[in] pos 位置番号 ( 0 <= pos < npi() )
 inline
 const BlifNode*
-BlifNetwork::pi(ymuint32 pos) const
+BlifNetworkImpl::pi(ymuint32 pos) const
 {
   return mPIArray[pos];
 }
@@ -416,7 +246,7 @@ BlifNetwork::pi(ymuint32 pos) const
 // @brief 外部出力数を得る．
 inline
 ymuint32
-BlifNetwork::npo() const
+BlifNetworkImpl::po_num() const
 {
   return mPOArray.size();
 }
@@ -425,7 +255,7 @@ BlifNetwork::npo() const
 // @param[in] pos 位置番号 ( 0 <= pos < npo() )
 inline
 const BlifNode*
-BlifNetwork::po(ymuint32 pos) const
+BlifNetworkImpl::po(ymuint32 pos) const
 {
   return mPOArray[pos];
 }
@@ -433,7 +263,7 @@ BlifNetwork::po(ymuint32 pos) const
 // @brief ラッチ数を得る．
 inline
 ymuint32
-BlifNetwork::nff() const
+BlifNetworkImpl::ff_num() const
 {
   return mFFArray.size();
 }
@@ -442,7 +272,7 @@ BlifNetwork::nff() const
 // @param[in] pos 位置番号 ( 0 <= pos < nff() )
 inline
 const BlifNode*
-BlifNetwork::ff(ymuint32 pos) const
+BlifNetworkImpl::ff(ymuint32 pos) const
 {
   return mFFArray[pos];
 }
@@ -450,7 +280,7 @@ BlifNetwork::ff(ymuint32 pos) const
 // @brief 論理ノード数を得る．
 inline
 ymuint32
-BlifNetwork::nlogic() const
+BlifNetworkImpl::logic_num() const
 {
   return mLogicArray.size();
 }
@@ -460,11 +290,11 @@ BlifNetwork::nlogic() const
 // @note 論理ノードはトポロジカル順に整列している．
 inline
 const BlifNode*
-BlifNetwork::logic(ymuint32 pos) const
+BlifNetworkImpl::logic(ymuint32 pos) const
 {
   return mLogicArray[pos];
 }
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF
 
-#endif // BLIFNETWORK_H
+#endif // BLIFNETWORKIMPL_H

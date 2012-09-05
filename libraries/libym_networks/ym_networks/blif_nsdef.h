@@ -1,11 +1,11 @@
-#ifndef BLIF_NSDEF_H
-#define BLIF_NSDEF_H
+#ifndef YM_NETWORKS_BLIF_NSDEF_H
+#define YM_NETWORKS_BLIF_NSDEF_H
 
-/// @file blif_nsdef.h
+/// @file ym_networks/blif_nsdef.h
 /// @brief nsBlif の名前空間の定義
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup BlifGroup BLIF パーサ
@@ -18,16 +18,17 @@
 
 
 /// @brief blif 用の名前空間の開始
-#define BEGIN_NAMESPACE_YM_BLIF \
+#define BEGIN_NAMESPACE_YM_NETWORKS_BLIF \
 BEGIN_NAMESPACE_YM_NETWORKS \
 BEGIN_NAMESPACE(nsBlif)
 
 /// @brief blif 用の名前空間の終了
-#define END_NAMESPACE_YM_BLIF \
+#define END_NAMESPACE_YM_NETWORKS_BLIF \
 END_NAMESPACE(nsBlif) \
 END_NAMESPACE_YM_NETWORKS
 
-BEGIN_NAMESPACE_YM_BLIF
+
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 // クラスの前方宣言
 class BlifHandler;
@@ -36,7 +37,16 @@ class BlifParserImpl;
 class BlifNetwork;
 class BlifNode;
 class BlifNetworkReader;
+class BlifNetworkImpl;
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF
 
-#endif // BLIF_NSDEF_H
+BEGIN_NAMESPACE_YM
+
+using nsNetworks::nsBlif::BlifNode;
+using nsNetworks::nsBlif::BlifNetwork;
+using nsNetworks::nsBlif::BlifNetworkReader;
+
+END_NAMESPACE_YM
+
+#endif // YM_NETWORKS_BLIF_NSDEF_H

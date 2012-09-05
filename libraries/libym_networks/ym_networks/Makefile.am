@@ -6,11 +6,14 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	networks_nsdef.h \
+	blif_nsdef.h \
 	bdn.h \
 	bnet.h \
 	cmn.h \
 	mvn.h \
 	tgnet.h \
+	BlifNetwork.h \
+	BlifNode.h \
 	BdnBlifWriter.h \
 	BdnDff.h \
 	BdnDumper.h \

@@ -12,7 +12,7 @@
 #include "BlifHandler.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 //////////////////////////////////////////////////////////////////////
 /// @class TestBlifHandler TestBlifHandler.h
@@ -137,6 +137,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF
 
 #endif // TESTBLIFHANLDER_H

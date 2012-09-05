@@ -3,15 +3,16 @@
 /// @brief BlifNetworkHandler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "BlifNetworkHandler.h"
-#include "BlifNetwork.h"
+#include "BlifNetworkImpl.h"
+#include "ym_networks/BlifNode.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 // @brief コンストラクタ
 BlifNetworkHandler::BlifNetworkHandler() :
@@ -24,13 +25,11 @@ BlifNetworkHandler::~BlifNetworkHandler()
 {
 }
 
-// @brief 読み込む対象のネットワークとセルライブラリを設定する．
+// @brief 読み込む対象のネットワークを設定する．
 void
-BlifNetworkHandler::set(BlifNetwork* network,
-			const CellLibrary* cell_library)
+BlifNetworkHandler::set(BlifNetworkImpl* network)
 {
   mNetwork = network;
-  mCellLibrary = cell_library;
 }
 
 // @brief 初期化
@@ -159,4 +158,4 @@ BlifNetworkHandler::error_exit()
   mNetwork->clear();
 }
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF

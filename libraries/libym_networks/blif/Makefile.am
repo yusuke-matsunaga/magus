@@ -21,7 +21,6 @@ libym_blif_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_blif_la_SOURCES = \
-	blif_nsdef.h \
 	BlifDic.h \
 	BlifDic.cc \
 	BlifScanner.h \
@@ -34,12 +33,11 @@ libym_blif_la_SOURCES = \
 	BlifParserImpl.cc \
 	BlifHandler.h \
 	BlifHandler.cc \
-	BlifNetwork.h \
 	BlifNetwork.cc \
+	BlifNetworkImpl.h \
+	BlifNetworkImpl.cc \
 	BlifNetworkHandler.h \
-	BlifNetworkHandler.cc \
-	BlifNetworkReader.h \
-	BlifNetworkReader.cc
+	BlifNetworkHandler.cc
 
 libym_blif_la_LIBADD =
 
