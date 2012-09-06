@@ -11,6 +11,8 @@
 #include "BlifNodeImpl.h"
 #include "BlifParser.h"
 #include "BlifNetworkHandler.h"
+#include "ym_cell/Cell.h"
+#include "ym_cell/CellPin.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF
@@ -113,6 +115,37 @@ BlifNetworkImpl::new_logic(ymuint32 node_id,
   set_node(node_id, node);
 
   mLogicArray.push_back(node);
+}
+
+// @brief ゲートノードを生成する．
+// @param[in] node_id ノードID
+// @param[in] node_name ノード名
+// @param[in] inode_id_array ファンインのID番号の配列
+// @param[in] cell セルへのポインタ
+void
+BlifNetworkImpl::new_gate(ymuint32 node_id,
+			  const char* node_name,
+			  const vector<ymuint32>& inode_id_array,
+			  const Cell* cell)
+{
+  const char* new_node_name = alloc_string(node_name);
+
+  ymuint ni = inode_id_array.size();
+  ymuint32* fanins = NULL;
+  if ( ni > 0 ) {
+    void* q = mAlloc.get_memory(sizeof(ymuint32) * ni);
+    fanins = new (q) ymuint32[ni];
+    for (ymuint i = 0; i < ni; ++ i) {
+      fanins[i] = inode_id_array[i];
+    }
+  }
+
+  void* p = mAlloc.get_memory(sizeof(BlifGateNode));
+  BlifNode* node = new (p) BlifGateNode(node_id, new_node_name, ni, fanins, cell);
+
+  set_node(node_id, node);
+
+  mGateArray.push_back(node);
 }
 
 // @brief ラッチノードを生成する．
@@ -232,6 +265,23 @@ BlifNetworkImpl::write_blif(ostream& s) const
     else if ( nc == 1 ) {
       s << node->opat();
     }
+  }
+  for (vector<BlifNode*>::const_iterator p = mGateArray.begin();
+       p != mGateArray.end(); ++ p) {
+    const BlifNode* node = *p;
+    ymuint32 ni = node->fanin_num();
+    const Cell* cell = node->cell();
+    assert_cond( ni == cell->input_num(), __FILE__, __LINE__);
+    assert_cond( cell->output_num() == 1, __FILE__, __LINE__);
+    assert_cond( cell->inout_num() == 0, __FILE__, __LINE__);
+    s << ".gate " << cell->name();
+    for (ymuint32 i = 0; i < ni; ++ i) {
+      const CellPin* ipin = cell->input(i);
+      const BlifNode* inode = this->node(node->fanin_id(i));
+      s << " " << ipin->name() << "=" << inode->name();
+    }
+    const CellPin* opin = cell->output(0);
+    s << " " << opin->name() << "=" << node->name() << endl;
   }
   s << ".end" << endl;
 }

@@ -112,6 +112,21 @@ BlifNetwork::logic(ymuint32 pos) const
   return mImpl->logic(pos);
 }
 
+// @brief ゲートノード数を得る．
+ymuint32
+BlifNetwork::gate_num() const
+{
+  return mImpl->gate_num();
+}
+
+// @brief ゲートノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < logic_num() )
+const BlifNode*
+BlifNetwork::gate(ymuint32 pos) const
+{
+  return mImpl->gate(pos);
+}
+
 // @brief blif 形式のファイルを読み込む．
 // @param[in] filename ファイル名
 // @param[in] cell_library セルライブラリ

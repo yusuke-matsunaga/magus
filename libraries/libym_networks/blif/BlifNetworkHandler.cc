@@ -110,6 +110,8 @@ BlifNetworkHandler::gate(ymuint32 onode_id,
 			 const vector<ymuint32>& inode_id_array,
 			 const Cell* cell)
 {
+  mNetwork->new_gate(onode_id, id2str(onode_id), inode_id_array, cell);
+
   return true;
 }
 

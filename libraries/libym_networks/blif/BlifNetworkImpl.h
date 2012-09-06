@@ -94,6 +94,15 @@ public:
   const BlifNode*
   logic(ymuint32 pos) const;
 
+  /// @brief ゲートノード数を得る．
+  ymuint32
+  gate_num() const;
+
+  /// @brief ゲートノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < logic_num() )
+  const BlifNode*
+  gate(ymuint32 pos) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -140,6 +149,17 @@ private:
   void
   new_output(ymuint32 node_id);
 
+  /// @brief ラッチノードを生成する．
+  /// @param[in] node_id ノードID
+  /// @param[in] node_name ノード名
+  /// @param[in] inode_id ファンインのID番号
+  /// @param[in] rval リセット値 ( '0', '1', ' ' のいずれか )
+  void
+  new_latch(ymuint32 node_id,
+	    const char* node_name,
+	    ymuint32 inode_id,
+	    char rval);
+
   /// @brief 論理ノードを生成する．
   /// @param[in] node_id ノードID
   /// @param[in] node_name ノード名
@@ -155,16 +175,16 @@ private:
 	    const char* cover_pat,
 	    char opat);
 
-  /// @brief ラッチノードを生成する．
+  /// @brief ゲートノードを生成する．
   /// @param[in] node_id ノードID
   /// @param[in] node_name ノード名
-  /// @param[in] inode_id ファンインのID番号
-  /// @param[in] rval リセット値 ( '0', '1', ' ' のいずれか )
+  /// @param[in] inode_id_array ファンインのID番号の配列
+  /// @param[in] cell セルへのポインタ
   void
-  new_latch(ymuint32 node_id,
-	    const char* node_name,
-	    ymuint32 inode_id,
-	    char rval);
+  new_gate(ymuint32 node_id,
+	   const char* node_name,
+	   const vector<ymuint32>& inode_id_array,
+	   const Cell* cell);
 
   /// @brief ノードをセットする．
   /// @param[in] node_id ノードID
@@ -200,11 +220,14 @@ private:
   // 外部出力ノードのIDの配列
   vector<ymuint32> mPOArray;
 
-  // ラッチのIDの配列
+  // ラッチノードの配列
   vector<BlifNode*> mFFArray;
 
-  // 論理ノードのIDの配列
+  // 論理ノードの配列
   vector<BlifNode*> mLogicArray;
+
+  // ゲートノードの配列
+  vector<BlifNode*> mGateArray;
 
 };
 
@@ -236,6 +259,7 @@ inline
 const BlifNode*
 BlifNetworkImpl::node(ymuint32 id) const
 {
+  assert_cond( id < max_node_id(), __FILE__, __LINE__);
   return mNodeArray[id];
 }
 
@@ -253,6 +277,7 @@ inline
 const BlifNode*
 BlifNetworkImpl::pi(ymuint32 pos) const
 {
+  assert_cond( pos < pi_num(), __FILE__, __LINE__);
   return mPIArray[pos];
 }
 
@@ -270,6 +295,7 @@ inline
 const BlifNode*
 BlifNetworkImpl::po(ymuint32 pos) const
 {
+  assert_cond( pos < po_num(), __FILE__, __LINE__);
   return node(mPOArray[pos]);
 }
 
@@ -287,6 +313,7 @@ inline
 const BlifNode*
 BlifNetworkImpl::ff(ymuint32 pos) const
 {
+  assert_cond( pos < ff_num(), __FILE__, __LINE__);
   return mFFArray[pos];
 }
 
@@ -305,7 +332,26 @@ inline
 const BlifNode*
 BlifNetworkImpl::logic(ymuint32 pos) const
 {
+  assert_cond( pos < logic_num(), __FILE__, __LINE__);
   return mLogicArray[pos];
+}
+
+// @brief ゲートノード数を得る．
+inline
+ymuint32
+BlifNetworkImpl::gate_num() const
+{
+  return mGateArray.size();
+}
+
+// @brief ゲートノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < logic_num() )
+inline
+const BlifNode*
+BlifNetworkImpl::gate(ymuint32 pos) const
+{
+  assert_cond( pos < gate_num(), __FILE__, __LINE__);
+  return mGateArray[pos];
 }
 
 END_NAMESPACE_YM_NETWORKS_BLIF

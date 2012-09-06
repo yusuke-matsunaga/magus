@@ -89,6 +89,15 @@ public:
   const BlifNode*
   logic(ymuint32 pos) const;
 
+  /// @brief ゲートノード数を得る．
+  ymuint32
+  gate_num() const;
+
+  /// @brief ゲートノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < logic_num() )
+  const BlifNode*
+  gate(ymuint32 pos) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////

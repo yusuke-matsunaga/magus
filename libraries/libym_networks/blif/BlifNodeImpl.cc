@@ -235,7 +235,6 @@ BlifLogicNode::write_blif(ostream& s) const
 {
 }
 
-
 // @brief カバーのキューブ数を得る．
 ymuint32
 BlifLogicNode::cube_num() const
@@ -262,6 +261,53 @@ char
 BlifLogicNode::opat() const
 {
   return mOpat;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス BlifGateNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] id ID番号
+// @param[in] name ノード名
+// @param[in] ni ファンイン数
+// @param[in] fanins ファンインのID番号の配列
+/// @param[in] cell セルへのポインタ
+BlifGateNode::BlifGateNode(ymuint32 id,
+			   const char* name,
+			   ymuint32 ni,
+			   const ymuint32* fanins,
+			   const Cell* cell) :
+  BlifNodeImpl2(id, name, ni, fanins),
+  mCell(cell)
+{
+}
+
+// @brief デストラクタ
+BlifGateNode::~BlifGateNode()
+{
+}
+
+// @brief 型を返す．
+BlifNode::tType
+BlifGateNode::type() const
+{
+  return kGate;
+}
+
+// @brief 内容を blif 形式で出力する．
+// @param[in] s 出力先のストリーム
+void
+BlifGateNode::write_blif(ostream& s) const
+{
+}
+
+// @brief セルを返す．
+const Cell*
+BlifGateNode::cell() const
+{
+  return mCell;
 }
 
 
