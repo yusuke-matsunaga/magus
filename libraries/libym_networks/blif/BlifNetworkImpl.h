@@ -27,6 +27,9 @@ class BlifNetworkImpl
   friend class BlifNetworkHandler;
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ/デストラクタ
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
   BlifNetworkImpl();
@@ -36,9 +39,13 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  // ほとんど BlifNetwork と同じインターフェイスを持つ．
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief model 名を得る．
-  string
+  const char*
   name() const;
 
   /// @brief ノードの ID 番号の最大値 + 1 を求める．
@@ -56,7 +63,7 @@ public:
   pi_num() const;
 
   /// @brief 外部入力を得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < npi() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < pi_num() )
   const BlifNode*
   pi(ymuint32 pos) const;
 
@@ -65,7 +72,7 @@ public:
   po_num() const;
 
   /// @brief 外部出力を得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < npo() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < po_num() )
   const BlifNode*
   po(ymuint32 pos) const;
 
@@ -74,7 +81,7 @@ public:
   ff_num() const;
 
   /// @brief ラッチを得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < nff() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < ff_num() )
   const BlifNode*
   ff(ymuint32 pos) const;
 
@@ -83,7 +90,7 @@ public:
   logic_num() const;
 
   /// @brief 論理ノードを得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < nlogic() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < logic_num() )
   const BlifNode*
   logic(ymuint32 pos) const;
 
@@ -110,60 +117,65 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // BlifNetworkReader のみが用いる関数
+  // BlifNetworkHandler のみが用いる関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 内容をクリアする．
   void
   clear();
 
-  /// @brief ノードを取り出す．
-  /// @param[in] id ID 番号
-  /// @note なければ作成する．
-  BlifNode*
-  get_node(ymuint32 id);
-
-  /// @brief ノード名を設定する．
-  /// @param[in] node 対象のノード
-  /// @param[in] name 名前
+  /// @brief .model 名の設定
   void
-  set_node_name(BlifNode* node,
-		const char* name);
+  set_model(const char* name);
 
-  /// @brief ノードを外部入力に設定する．
-  /// @param[in] node 対象のノード
-  /// @note 既に他の型に設定されていたら false を返す．
-  bool
-  set_input_type(BlifNode* node);
+  /// @brief 外部入力ノードを生成する．
+  /// @param[in] node_id ノードID
+  /// @param[in] node_name ノード名
+  void
+  new_input(ymuint32 node_id,
+	    const char* node_name);
 
-  /// @brief ノードを論理ノードに設定する．
-  /// @param[in] node 対象のノード
-  /// @param[in] ni ファンイン数
+  /// @brief 外部出力ノードの番号を登録する．
+  /// @param[in] node_id ノードID
+  void
+  new_output(ymuint32 node_id);
+
+  /// @brief 論理ノードを生成する．
+  /// @param[in] node_id ノードID
+  /// @param[in] node_name ノード名
+  /// @param[in] inode_id_array ファンインのID番号の配列
   /// @param[in] nc キューブ数
   /// @param[in] cover_pat 全キューブのパタンをつなげたもの
   /// @param[in] opat 出力のパタン
-  /// @note 既に他の型に設定されていたら false を返す．
-  bool
-  set_logic_type(BlifNode* node,
-		 ymuint32 ni,
-		 ymuint32 nc,
-		 const char* cover_pat,
-		 char opat);
-
-  /// @brief ノードをラッチノードに設定する．
-  /// @param[in] node 対象のノード
-  /// @param[in] rval リセット値 ( '0', '1', ' ' のいづれか )
-  /// @note 既に他の型に設定されていたら false を返す．
-  bool
-  set_latch_type(BlifNode* node,
-		 char rval);
-
-  /// @brief BlifNode のファンイン領域を確保する．
-  /// @param[in] node 対象のノード
-  /// @param[in] ni ファンイン数
   void
-  alloc_fanin(BlifNode* node,
-	      ymuint32 ni);
+  new_logic(ymuint32 node_id,
+	    const char* node_name,
+	    const vector<ymuint32>& inode_id_array,
+	    ymuint32 nc,
+	    const char* cover_pat,
+	    char opat);
+
+  /// @brief ラッチノードを生成する．
+  /// @param[in] node_id ノードID
+  /// @param[in] node_name ノード名
+  /// @param[in] inode_id ファンインのID番号
+  /// @param[in] rval リセット値 ( '0', '1', ' ' のいずれか )
+  void
+  new_latch(ymuint32 node_id,
+	    const char* node_name,
+	    ymuint32 inode_id,
+	    char rval);
+
+  /// @brief ノードをセットする．
+  /// @param[in] node_id ノードID
+  /// @param[in] node 対象のノード
+  void
+  set_node(ymuint32 node_id,
+	   BlifNode* ndoe);
+
+  /// @brief 文字列領域を確保する．
+  const char*
+  alloc_string(const char* src_str);
 
 
 private:
@@ -175,7 +187,8 @@ private:
   SimpleAlloc mAlloc;
 
   // 名前 (.model)
-  string mName;
+  // 領域は mAlloc で確保する．
+  const char* mName;
 
   // ID をキーにしてノードを収めた配列
   // ID は穴が空いているかもしれない．
@@ -184,13 +197,13 @@ private:
   // 外部入力の配列
   vector<BlifNode*> mPIArray;
 
-  // 外部出力の配列
-  vector<BlifNode*> mPOArray;
+  // 外部出力ノードのIDの配列
+  vector<ymuint32> mPOArray;
 
-  // ラッチの配列
+  // ラッチのIDの配列
   vector<BlifNode*> mFFArray;
 
-  // 論理ノードの配列
+  // 論理ノードのIDの配列
   vector<BlifNode*> mLogicArray;
 
 };
@@ -202,7 +215,7 @@ private:
 
 // @brief model 名を得る．
 inline
-string
+const char*
 BlifNetworkImpl::name() const
 {
   return mName;
@@ -235,7 +248,7 @@ BlifNetworkImpl::pi_num() const
 }
 
 // @brief 外部入力を得る．
-// @param[in] pos 位置番号 ( 0 <= pos < npi() )
+// @param[in] pos 位置番号 ( 0 <= pos < pi_num() )
 inline
 const BlifNode*
 BlifNetworkImpl::pi(ymuint32 pos) const
@@ -252,12 +265,12 @@ BlifNetworkImpl::po_num() const
 }
 
 // @brief 外部出力を得る．
-// @param[in] pos 位置番号 ( 0 <= pos < npo() )
+// @param[in] pos 位置番号 ( 0 <= pos < po_num() )
 inline
 const BlifNode*
 BlifNetworkImpl::po(ymuint32 pos) const
 {
-  return mPOArray[pos];
+  return node(mPOArray[pos]);
 }
 
 // @brief ラッチ数を得る．
@@ -269,7 +282,7 @@ BlifNetworkImpl::ff_num() const
 }
 
 // @brief ラッチを得る．
-// @param[in] pos 位置番号 ( 0 <= pos < nff() )
+// @param[in] pos 位置番号 ( 0 <= pos < ff_num() )
 inline
 const BlifNode*
 BlifNetworkImpl::ff(ymuint32 pos) const
@@ -286,7 +299,7 @@ BlifNetworkImpl::logic_num() const
 }
 
 // @brief 論理ノードを得る．
-// @param[in] pos 位置番号 ( 0 <= pos < nlogic() )
+// @param[in] pos 位置番号 ( 0 <= pos < logic_num() )
 // @note 論理ノードはトポロジカル順に整列している．
 inline
 const BlifNode*

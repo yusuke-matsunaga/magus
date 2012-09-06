@@ -17,20 +17,20 @@
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 //////////////////////////////////////////////////////////////////////
-/// @class TestBlifHandler parsertest.cc
+/// @class LexpTestHandler parsertest.cc
 /// @brief テスト用の BlifHandler
 //////////////////////////////////////////////////////////////////////
-class TestBlifHandler :
+class LexpTestHandler :
   public BlifHandler
 {
 public:
 
   /// @brief コンストラクタ
-  TestBlifHandler();
+  LexpTestHandler();
 
   /// @brief デストラクタ
   virtual
-  ~TestBlifHandler();
+  ~LexpTestHandler();
 
 
 public:
@@ -71,7 +71,8 @@ public:
   outputs_elem(ymuint32 name_id);
 
   /// @brief .names 文の処理
-  /// @param[in] name_id_array 各識別子のID番号の配列
+  /// @param[in] onode_id ノード名のID番号
+  /// @param[in] inode_id_array ファンイン各のID番号の配列
   /// @param[in] nc キューブ数
   /// @param[in] cover_pat 入力カバーを表す文字列
   /// @param[in] opat 出力の極性
@@ -82,34 +83,35 @@ public:
   /// @note opat は '0' か '1' のどちらか
   virtual
   bool
-  names(const vector<ymuint32>& name_id_array,
+  names(ymuint32 onode_id,
+	const vector<ymuint32>& inode_id_array,
 	ymuint32 nc,
 	const char* cover_pat,
 	char opat);
 
   /// @brief .gate 文の処理
-  /// @param[in] cell セル
   /// @param[in] onode_id 出力ノードのID番号
+  /// @param[in] cell セル
   /// @param[in] inode_id_array 入力ノードのID番号の配列
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
-  gate(const Cell* cell,
-       ymuint32 onode_id,
-       const vector<ymuint32>& inode_id_array);
+  gate(ymuint32 onode_id,
+       const vector<ymuint32>& inode_id_array,
+       const Cell* cell);
 
   /// @brief .latch 文の処理
-  /// @param[in] name1_id 最初の識別子のID番号
-  /// @param[in] name2_id 次の識別子のID番号
+  /// @param[in] onode_id 出力ノードのID番号
+  /// @param[in] inode_id 入力ノードのID番号
   /// @param[in] loc4 リセット値の位置情報
   /// @param[in] rval リセット時の値('0'/'1') 未定義なら ' '
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
-  latch(ymuint32 name1_id,
-	ymuint32 name2_id,
+  latch(ymuint32 onode_id,
+	ymuint32 inode_id,
 	const FileRegion& loc4,
 	char rval);
 
@@ -149,14 +151,14 @@ private:
 
 
 // @brief コンストラクタ
-TestBlifHandler::TestBlifHandler()
+LexpTestHandler::LexpTestHandler()
 {
   mCount = 0;
   mPage = NULL;
 }
 
 // @brief デストラクタ
-TestBlifHandler::~TestBlifHandler()
+LexpTestHandler::~LexpTestHandler()
 {
   for (list<LogExpr*>::iterator p = mPageList.begin();
        p != mPageList.end(); ++ p) {
@@ -169,7 +171,7 @@ TestBlifHandler::~TestBlifHandler()
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-TestBlifHandler::init()
+LexpTestHandler::init()
 {
   return true;
 }
@@ -181,7 +183,7 @@ TestBlifHandler::init()
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-TestBlifHandler::model(const FileRegion& loc1,
+LexpTestHandler::model(const FileRegion& loc1,
 		       const FileRegion& loc2,
 		       const char* name)
 {
@@ -193,7 +195,7 @@ TestBlifHandler::model(const FileRegion& loc1,
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-TestBlifHandler::inputs_elem(ymuint32 name_id)
+LexpTestHandler::inputs_elem(ymuint32 name_id)
 {
   return true;
 }
@@ -203,13 +205,14 @@ TestBlifHandler::inputs_elem(ymuint32 name_id)
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-TestBlifHandler::outputs_elem(ymuint32 name_id)
+LexpTestHandler::outputs_elem(ymuint32 name_id)
 {
   return true;
 }
 
 // @brief .names 文の処理
-// @param[in] name_id_array 各識別子のID番号の配列
+// @param[in] onode_id ノード名のID番号
+// @param[in] inode_id_array ファンイン各のID番号の配列
 // @param[in] nc キューブ数
 // @param[in] cover_pat 入力カバーを表す文字列
 // @param[in] opat 出力の極性
@@ -219,12 +222,13 @@ TestBlifHandler::outputs_elem(ymuint32 name_id)
 // 各要素のとりうる値は '0', '1', '-' を表す．
 // @note opat は '0' か '1' のどちらか
 bool
-TestBlifHandler::names(const vector<ymuint32>& name_id_array,
+LexpTestHandler::names(ymuint32 onode_id,
+		       const vector<ymuint32>& inode_id_array,
 		       ymuint32 nc,
 		       const char* cover_pat,
 		       char opat)
 {
-  ymuint32 ni = name_id_array.size() - 1;
+  ymuint32 ni = inode_id_array.size();
   LogExpr expr;
   if ( opat == '1' ) {
     vector<LogExpr> or_expr;
@@ -283,29 +287,29 @@ TestBlifHandler::names(const vector<ymuint32>& name_id_array,
 }
 
 // @brief .gate 文の処理
-// @param[in] cell セル
 // @param[in] onode_id 出力ノードのID番号
+// @param[in] cell セル
 // @param[in] inode_id_array 入力ノードのID番号の配列
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-TestBlifHandler::gate(const Cell* cell,
-		      ymuint32 onode_id,
-		      const vector<ymuint32>& inode_id_array)
+LexpTestHandler::gate(ymuint32 onode_id,
+		      const vector<ymuint32>& inode_id_array,
+		      const Cell* cell)
 {
   return true;
 }
 
 // @brief .latch 文の処理
-// @param[in] name1_id 最初の識別子のID番号
-// @param[in] name2_id 次の識別子のID番号
+// @param[in] onode_id 出力ノードのID番号
+// @param[in] inode_id 入力ノードのID番号
 // @param[in] loc4 リセット値の位置情報
 // @param[in] rval リセット時の値('0'/'1') 未定義なら ' '
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-TestBlifHandler::latch(ymuint32 name1_id,
-		       ymuint32 name2_id,
+LexpTestHandler::latch(ymuint32 onode_id,
+		       ymuint32 inode_id,
 		       const FileRegion& loc4,
 		       char rval)
 {
@@ -317,20 +321,20 @@ TestBlifHandler::latch(ymuint32 name1_id,
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-TestBlifHandler::end(const FileRegion& loc)
+LexpTestHandler::end(const FileRegion& loc)
 {
   return true;
 }
 
 // @brief 通常終了時の処理
 void
-TestBlifHandler::normal_exit()
+LexpTestHandler::normal_exit()
 {
 }
 
 // @brief エラー終了時の処理
 void
-TestBlifHandler::error_exit()
+LexpTestHandler::error_exit()
 {
 }
 
@@ -357,7 +361,7 @@ main(int argc,
     for (size_t i = 0; i < 10; ++ i) {
       BlifParser parser;
       {
-	TestBlifHandler* handler = new TestBlifHandler;
+	LexpTestHandler* handler = new LexpTestHandler;
 	parser.add_handler(handler);
 	StreamMsgHandler* msg_handler = new StreamMsgHandler(&cerr);
 	MsgMgr::reg_handler(msg_handler);

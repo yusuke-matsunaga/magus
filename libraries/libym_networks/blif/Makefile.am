@@ -36,7 +36,9 @@ libym_blif_la_SOURCES = \
 	BlifNetworkImpl.h \
 	BlifNetworkImpl.cc \
 	BlifNetworkHandler.h \
-	BlifNetworkHandler.cc
+	BlifNetworkHandler.cc \
+	BlifNodeImpl.h \
+	BlifNodeImpl.cc
 
 libym_blif_la_LIBADD =
 

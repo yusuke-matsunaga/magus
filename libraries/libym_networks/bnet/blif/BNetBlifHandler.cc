@@ -91,7 +91,8 @@ BNetBlifHandler::outputs_elem(ymuint32 name_id)
 }
 
 // @brief .names 文の処理
-// @param[in] name_id_array 各識別子のID番号の配列
+// @param[in] onode_id 出力ノードのID番号
+// @param[in] inode_id_array 各識別子のID番号の配列
 // @param[in] nc キューブ数
 // @param[in] cover_pat 入力カバーを表す文字列
 // @param[in] opat 出力の極性
@@ -101,14 +102,15 @@ BNetBlifHandler::outputs_elem(ymuint32 name_id)
 // 各要素のとりうる値は '0', '1', '-' を表す．
 // @note opat は '0' か '1' のどちらか
 bool
-BNetBlifHandler::names(const vector<ymuint32>& name_id_array,
+BNetBlifHandler::names(ymuint32 onode_id,
+		       const vector<ymuint32>& inode_id_array,
 		       ymuint32 nc,
 		       const char* cover_pat,
 		       char opat)
 {
-  size_t ni = name_id_array.size();
-  -- ni;
-  BNode* node = get_node(name_id_array[ni]);
+  BNode* node = get_node(onode_id);
+
+  ymuint ni = inode_id_array.size();
 
   LogExpr expr;
   if ( opat == '1' ) {
@@ -159,7 +161,7 @@ BNetBlifHandler::names(const vector<ymuint32>& name_id_array,
   }
   BNodeVector fanins(ni);
   for (ymuint i = 0; i < ni; ++ i) {
-    BNode* inode = get_node(name_id_array[i]);
+    BNode* inode = get_node(inode_id_array[i]);
     fanins[i] = inode;
   }
   bool stat = mManip->change_logic(node, expr, fanins);
@@ -167,15 +169,15 @@ BNetBlifHandler::names(const vector<ymuint32>& name_id_array,
 }
 
 // @brief .gate 文の処理
-// @param[in] cell セル
 // @param[in] onode_id 出力ノードのID番号
 // @param[in] inode_id_array 入力ノードのID番号の配列
+// @param[in] cell セル
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-BNetBlifHandler::gate(const Cell* cell,
-		      ymuint32 onode_id,
-		      const vector<ymuint32>& inode_id_array)
+BNetBlifHandler::gate(ymuint32 onode_id,
+		      const vector<ymuint32>& inode_id_array,
+		      const Cell* cell)
 {
   LogExpr expr = cell->logic_expr(0);
   BNode* onode = get_node(onode_id);
@@ -189,20 +191,20 @@ BNetBlifHandler::gate(const Cell* cell,
 }
 
 // @brief .latch 文中の本体の処理
-// @param[in] name1_id 最初の文字列
-// @param[in] name2_id 次の文字列
+// @param[in] onode_id 出力ノードのID番号
+// @param[in] inode_id_array 入力ノードのID番号の配列
 // @param[in] loc4 リセット値の位置情報
 // @param[in] rval リセット時の値 ('0'/'1') 未定義なら ' '
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-BNetBlifHandler::latch(ymuint32 name1_id,
-		       ymuint32 name2_id,
+BNetBlifHandler::latch(ymuint32 onode_id,
+		       ymuint32 inode_id,
 		       const FileRegion& loc4,
 		       char rval)
 {
-  BNode* inode = get_node(name1_id);
-  BNode* node = get_node(name2_id);
+  BNode* node = get_node(onode_id);
+  BNode* inode = get_node(inode_id);
   int rv = 0;
   switch ( rval ) {
   case '0': rv = 0; break;

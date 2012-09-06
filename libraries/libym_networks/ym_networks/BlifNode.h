@@ -10,6 +10,7 @@
 
 
 #include "ym_networks/blif_nsdef.h"
+#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF
@@ -22,15 +23,10 @@ BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 //////////////////////////////////////////////////////////////////////
 class BlifNode
 {
-  friend class BlifNetworkImpl;
-  friend class BlifNetworkHandler;
-
 public:
 
   /// @brief ノードの種類
   enum tType {
-    /// @brief 未定義
-    kUndef,
     /// @brief 外部入力
     kInput,
     /// @brief 論理(カバー)
@@ -42,167 +38,116 @@ public:
   };
 
 
-private:
+public:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ/デストラクタ
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  /// @param[in] id ID 番号
-  BlifNode(ymuint32 id);
+  BlifNode() { }
 
   /// @brief デストラクタ
-  ~BlifNode();
+  virtual
+  ~BlifNode() { }
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
+  // 全タイプ共通の外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ID を返す．
+  /// @brief ノードID を返す．
+  virtual
   ymuint32
-  id() const;
+  id() const = 0;
 
   /// @brief 名前を返す．
+  virtual
   const char*
-  name() const;
+  name() const = 0;
 
   /// @brief 型を返す．
+  virtual
   tType
-  type() const;
+  type() const = 0;
+
+  /// @brief 内容を blif 形式で出力する．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  write_blif(ostream& s) const = 0;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 論理タイプ/ゲートタイプに共通の外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief ファンイン数を得る．
+  virtual
   ymuint32
-  fanin_num() const;
+  fanin_num() const = 0;
 
-  /// @brief ファンインを求める．
+  /// @brief ファンインのノードIDを返す．
   /// @param[in] pos 入力位置 ( 0 <= pos < ni() )
-  const BlifNode*
-  fanin(ymuint32 pos) const;
+  virtual
+  ymuint32
+  fanin_id(ymuint32 pos) const = 0;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 論理タイプの外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief カバーのキューブ数を得る．
+  virtual
   ymuint32
-  cube_num() const;
+  cube_num() const = 0;
 
   /// @brief 入力キューブのパタンを得る．
   /// @param[in] c_pos キューブの位置 ( 0 <= c_pos < nc() )
   /// @param[in] i_pos 入力位置 ( 0 <= i_pos < ni() )
   /// @note 意味のあるパタンは '0' '1' '-'
+  virtual
   char
   cube_pat(ymuint32 c_pos,
-	   ymuint32 i_pos) const;
+	   ymuint32 i_pos) const = 0;
 
   /// @brief 出力キューブを表すパタンを得る．
   /// @note 意味のあるパタンは '0' '1'
+  virtual
   char
-  opat() const;
+  opat() const = 0;
 
 
-private:
+public:
   //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  // ここのメモリ領域はすべて BlifNetwork::mAlloc が管理する．
+  // ゲートタイプの外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  // ID 番号
-  ymuint32 mId;
+  /// @brief セルを返す．
+  virtual
+  const Cell*
+  cell() const = 0;
 
-  // 名前
-  const char* mName;
 
-  // 型
-  tType mType;
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ラッチタイプの外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
-  // ファンイン数
-  ymuint32 mFaninNum;
+  /// @brief 入力ノードのID番号を返す．
+  virtual
+  ymuint32
+  inode_id() const = 0;
 
-  // ファンインの配列
-  BlifNode** mFanins;
-
-  // キューブ数
-  ymuint32 mCubeNum;
-
-  // カバーを表す文字の配列
-  // 中身は '0', '1', '-' のいづれか
-  // サイズは ni() * nc()
-  // end-of-string マーカはないので注意
-  const char* mCover;
-
-  // 出力キューブを表す文字　'0' or '1'
-  char mOpat;
+  /// @brief リセット値を返す．
+  virtual
+  char
+  reset_val() const = 0;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// BlifNode のインライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief ID を返す．
-inline
-ymuint32
-BlifNode::id() const
-{
-  return mId;
-}
-
-// @brief 名前を返す．
-inline
-const char*
-BlifNode::name() const
-{
-  return mName;
-}
-
-// @brief 型を返す．
-inline
-BlifNode::tType
-BlifNode::type() const
-{
-  return mType;
-}
-
-// @brief ファンイン数を得る．
-inline
-ymuint32
-BlifNode::fanin_num() const
-{
-  return mFaninNum;
-}
-
-// @brief ファンインを求める．
-// @param[in] pos 入力位置 ( 0 <= pos < ni() )
-inline
-const BlifNode*
-BlifNode::fanin(ymuint32 pos) const
-{
-  return mFanins[pos];
-}
-
-// @brief カバーのキューブ数を得る．
-inline
-ymuint32
-BlifNode::cube_num() const
-{
-  return mCubeNum;
-}
-
-// @brief 入力キューブのパタンを得る．
-// @param[in] c_pos キューブの位置 ( 0 <= c_pos < nc() )
-// @param[in] i_pos 入力位置 ( 0 <= i_pos < ni() )
-inline
-char
-BlifNode::cube_pat(ymuint32 c_pos,
-		   ymuint32 i_pos) const
-{
-  return mCover[c_pos * fanin_num() + i_pos];
-}
-
-// @brief 出力キューブを表すパタンを得る．
-inline
-char
-BlifNode::opat() const
-{
-  return mOpat;
-}
 
 END_NAMESPACE_YM_NETWORKS_BLIF
 

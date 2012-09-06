@@ -127,14 +127,14 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
     const BlifNode* blif_node = blif_network.po(i);
     BdnPort* port = mNetwork->new_output_port(blif_node->name(), 1);
     BdnNode* node = port->_output(0);
-    BdnNodeHandle inode_h = make_node(blif_node);
+    BdnNodeHandle inode_h = make_node(blif_network, blif_node->id());
     mNetwork->change_output_fanin(node, inode_h);
   }
 
   // D-FFに用いられているノードを再帰的に生成
   for (ymuint i = 0; i < nff; ++ i) {
     const BlifNode* blif_node = blif_network.ff(i);
-    BdnNodeHandle inode_h = make_node(blif_node->fanin(0));
+    BdnNodeHandle inode_h = make_node(blif_network, blif_node->inode_id());
     BdnDff* dff = dff_array[i];
     BdnNode* dff_input = dff->_input();
     mNetwork->change_output_fanin(dff_input, inode_h);
@@ -145,15 +145,17 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
 
 // blif_node に対応するノードを作る．
 BdnNodeHandle
-BlifBdnConv::make_node(const BlifNode* blif_node)
+BlifBdnConv::make_node(const BlifNetwork& blif_network,
+		       ymuint node_id)
 {
+  const BlifNode* blif_node = blif_network.node(node_id);
   BdnNodeHandle node_handle;
   if ( !get_node(blif_node, node_handle) ) {
     assert_cond( blif_node->type() == BlifNode::kLogic, __FILE__, __LINE__);
     ymuint ni = blif_node->fanin_num();
     vector<BdnNodeHandle> fanins(ni);
     for (ymuint i = 0; i < ni; ++ i) {
-      fanins[i] = make_node(blif_node->fanin(i));
+      fanins[i] = make_node(blif_network, blif_node->fanin_id(i));
     }
 
     ymuint nc = blif_node->cube_num();

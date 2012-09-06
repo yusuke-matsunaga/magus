@@ -377,7 +377,7 @@ BlifParser::read(const string& filename,
       goto ST_NAMES;
     }
     if ( tk == kTokenNL ) {
-      size_t n = mNameArray.size();
+      ymuint n = mNameArray.size();
       if ( n == 0 ) {
 	// 名前が1つもない場合
 	MsgMgr::put_msg(__FILE__, __LINE__, loc,
@@ -459,7 +459,7 @@ BlifParser::read(const string& filename,
       }
       ymuint n = mName1.size();
       mCoverPat.reserve(mCoverPat.size() + n);
-      for (size_t i = 0; i < n; ++ i) {
+      for (ymuint i = 0; i < n; ++ i) {
 	char c = mName1[i];
 	if ( c == '1' ) {
 	  mCoverPat.put_char('1');
@@ -524,8 +524,9 @@ BlifParser::read(const string& filename,
 
  ST_NAMES_END:
   {
-    size_t n = mNameArray.size();
-    IdCell* cell = mNameArray[n - 1];
+    ymuint n = mNameArray.size();
+    ymuint ni = n - 1;
+    IdCell* cell = mNameArray[ni];
     if ( cell->is_defined() ) {
       // 二重定義
       ostringstream buf;
@@ -537,14 +538,15 @@ BlifParser::read(const string& filename,
       goto ST_ERROR_EXIT;
     }
     cell->set_defined();
+    ymuint oid = cell->id();
     mIdArray.clear();
-    for (size_t i = 0; i < n; ++ i) {
+    for (ymuint i = 0; i < ni ; ++ i) {
       mIdArray.push_back(mNameArray[i]->id());
     }
     for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	 p != mHandlerList.end(); ++ p) {
       BlifHandler* handler = *p;
-      if ( !handler->names(mIdArray, mNc, mCoverPat.c_str(), mOpat) ) {
+      if ( !handler->names(oid, mIdArray, mNc, mCoverPat.c_str(), mOpat) ) {
 	stat = false;
       }
     }
@@ -679,7 +681,7 @@ BlifParser::read(const string& filename,
       for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	   p != mHandlerList.end(); ++ p) {
 	BlifHandler* handler = *p;
-	if ( !handler->gate(mCell, onode_id, mIdArray) ) {
+	if ( !handler->gate(onode_id, mIdArray, mCell) ) {
 	  stat = false;
 	}
       }
@@ -749,7 +751,7 @@ BlifParser::read(const string& filename,
       for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	   p != mHandlerList.end(); ++ p) {
 	BlifHandler* handler = *p;
-	if ( !handler->latch(cell1->id(), cell2->id(),
+	if ( !handler->latch(cell2->id(), cell1->id(),
 			     loc4, rval) ) {
 	  stat = false;
 	}
@@ -828,8 +830,8 @@ BlifParser::read(const string& filename,
 
  ST_NORMAL_EXIT:
   {
-    size_t n = mIdHash.num();
-    for (size_t i = 0; i < n; ++ i) {
+    ymuint n = mIdHash.num();
+    for (ymuint i = 0; i < n; ++ i) {
       IdCell* cell = mIdHash.cell(i);
       if ( !cell->is_defined() ) {
 	ostringstream buf;

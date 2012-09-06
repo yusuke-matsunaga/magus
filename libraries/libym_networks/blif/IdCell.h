@@ -76,6 +76,10 @@ public:
   bool
   is_output() const;
 
+  /// @brief ファンインの識別子の配列を得る．
+  const vector<ymuint32>&
+  inode_id_array() const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
