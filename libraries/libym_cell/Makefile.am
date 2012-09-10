@@ -33,10 +33,6 @@ libym_cell_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_cell_la_SOURCES = \
-	Cell.cc \
-	CellLut.cc \
-	CellDotlibReader.cc \
-	CellMislibReader.cc \
 	CellFFInfo.cc \
 	CellLatchInfo.cc \
 	display.cc

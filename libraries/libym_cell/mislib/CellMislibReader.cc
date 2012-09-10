@@ -16,9 +16,9 @@
 #include "ym_cell/CellTime.h"
 #include "ym_cell/CellTiming.h"
 
-#include "mislib/MislibParser.h"
-#include "mislib/MislibMgr.h"
-#include "mislib/MislibNode.h"
+#include "MislibParser.h"
+#include "MislibMgr.h"
+#include "MislibNode.h"
 
 #include "ym_logic/LogExpr.h"
 #include "ym_logic/TvFunc.h"

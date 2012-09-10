@@ -44,6 +44,18 @@ public:
   name() const;
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(BinO& s) const;
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -284,6 +296,35 @@ public:
   virtual
   const CellLutTemplate*
   lut_template() const;
+
+  /// @brief テンプレート名の取得
+  virtual
+  const char*
+  template_name() const;
+
+  /// @brief 変数型の取得
+  /// @param[in] var 変数番号 ( 0 <= var < dimension() )
+  virtual
+  tCellVarType
+  variable_type(ymuint32 var) const;
+
+  /// @brief インデックス数の取得
+  /// @param[in] var 変数番号 ( 0 <= var < dimension() )
+  virtual
+  ymuint32
+  index_num(ymuint32 var) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(BinO& s) const;
 
 
 protected:

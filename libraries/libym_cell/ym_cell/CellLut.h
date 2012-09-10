@@ -73,7 +73,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(BinO& s) const = 0;
 
 };
 
@@ -102,8 +102,9 @@ public:
   lut_template() const = 0;
 
   /// @brief テンプレート名の取得
+  virtual
   const char*
-  template_name() const;
+  template_name() const = 0;
 
   /// @brief 次元数の取得
   virtual
@@ -112,8 +113,9 @@ public:
 
   /// @brief 変数型の取得
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
+  virtual
   tCellVarType
-  variable_type(ymuint32 var) const;
+  variable_type(ymuint32 var) const = 0;
 
   /// @brief インデックス数の取得
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
@@ -153,49 +155,9 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // テンプレート
-  const CellLutTemplate* mTemplate;
+  dump(BinO& s) const = 0;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief テンプレート名の取得
-inline
-const char*
-CellLut::template_name() const
-{
-  return lut_template()->name();
-}
-
-// @brief 変数型の取得
-// @param[in] var 変数番号 ( 0 <= var < dimension() )
-inline
-tCellVarType
-CellLut::variable_type(ymuint32 var) const
-{
-  return lut_template()->variable_type(var);
-}
-
-// @brief インデックス数の取得
-// @param[in] var 変数番号 ( 0 <= var < dimension() )
-inline
-ymuint32
-CellLut::index_num(ymuint32 var) const
-{
-  return lut_template()->index_num(var);
-}
 
 END_NAMESPACE_YM_CELL
 

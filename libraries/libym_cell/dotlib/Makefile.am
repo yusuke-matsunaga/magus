@@ -26,6 +26,7 @@ libym_cell_dotlib_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_cell_dotlib_la_SOURCES = \
+	CellDotlibReader.cc \
 	dotlib_nsdef.h \
 	dotlib_int.h \
 	DotlibParser.h \
