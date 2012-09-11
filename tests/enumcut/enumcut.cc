@@ -35,7 +35,7 @@
 BEGIN_NAMESPACE_YM_NETWORKS
 
 class SimpleOp :
-  public EnumCutOp
+  public EnumCutOp2
 {
 public:
 
@@ -45,31 +45,31 @@ public:
   /// @param[in] mode カット列挙モード
   virtual
   void
-  all_init(const BdnMgr& sbjgraph,
+  all_init(BdnMgr& sbjgraph,
 	   ymuint limit);
 
   /// @brief node を根とするカットを列挙する直前に呼ばれる関数
   /// @param[in] node 根のノード
   virtual
   void
-  node_init(const BdnNode* node);
+  node_init(BdnNode* node);
 
   virtual
   void
-  found_cut(const BdnNode* root,
+  found_cut(BdnNode* root,
 	    ymuint ni,
-	    const BdnNode** inputs);
+	    BdnNode** inputs);
 
   /// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
   /// @param[in] node 根のノード
   virtual
   void
-  node_end(const BdnNode* node);
+  node_end(BdnNode* node);
 
   /// @brief 処理の最後に呼ばれる関数
   virtual
   void
-  all_end(const BdnMgr& sbjgraph,
+  all_end(BdnMgr& sbjgraph,
 	  ymuint limit);
 
 
@@ -79,7 +79,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 現在処理中のノード
-  const BdnNode* mCurNode;
+  BdnNode* mCurNode;
 
   // 現在処理中のノード番号
   ymuint32 mCurPos;
@@ -97,7 +97,7 @@ private:
 // @param[in] limit カットサイズ
 // @param[in] mode カット列挙モード
 void
-SimpleOp::all_init(const BdnMgr& sbjgraph,
+SimpleOp::all_init(BdnMgr& sbjgraph,
 		   ymuint limit)
 {
   mCurPos = 0;
@@ -107,7 +107,7 @@ SimpleOp::all_init(const BdnMgr& sbjgraph,
 // @brief node を根とするカットを列挙する直前に呼ばれる関数
 // @param[in] node 根のノード
 void
-SimpleOp::node_init(const BdnNode* node)
+SimpleOp::node_init(BdnNode* node)
 {
   mNcCur = 0;
   mCurNode = node;
@@ -117,9 +117,9 @@ SimpleOp::node_init(const BdnNode* node)
 }
 
 void
-SimpleOp::found_cut(const BdnNode* root,
+SimpleOp::found_cut(BdnNode* root,
 		    ymuint ni,
-		    const BdnNode** inputs)
+		    BdnNode** inputs)
 {
   ++ mNcCur;
 
@@ -135,7 +135,7 @@ SimpleOp::found_cut(const BdnNode* root,
 // @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
 // @param[in] node 根のノード
 void
-SimpleOp::node_end(const BdnNode* node)
+SimpleOp::node_end(BdnNode* node)
 {
   assert_cond( node == mCurNode, __FILE__, __LINE__);
   ++ mCurPos;
@@ -149,7 +149,7 @@ SimpleOp::node_end(const BdnNode* node)
 
 // @brief 処理の最後に呼ばれる関数
 void
-SimpleOp::all_end(const BdnMgr& sbjgraph,
+SimpleOp::all_end(BdnMgr& sbjgraph,
 		  ymuint limit)
 {
   cout << "Total " << mNcAll << " cuts" << endl;
@@ -190,13 +190,11 @@ enumcut(const string& filename,
 
     enumcut(network, cut_size, &op);
   }
-#if 0
   else if ( method_str == "top_down" ) {
     TopDown enumcut;
 
     enumcut(network, cut_size, &op);
   }
-#endif
   else if ( method_str == "zdd" ) {
     ZddMgr mgr("zddmgr");
     ZddImp enumcut(mgr);

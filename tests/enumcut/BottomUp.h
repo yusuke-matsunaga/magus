@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "EnumCut.h"
+#include "EnumCut2.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 /// @brief ボトムアップのカット列挙を行うクラス
 //////////////////////////////////////////////////////////////////////
 class BottomUp :
-  public EnumCut
+  public EnumCut2
 {
 public:
 
@@ -38,9 +38,9 @@ public:
   /// @param[in] limit カットサイズの制限
   virtual
   void
-  operator()(const BdnMgr& network,
+  operator()(BdnMgr& network,
 	     ymuint limit,
-	     EnumCutOp* op);
+	     EnumCutOp2* op);
 
 
 private:
@@ -49,16 +49,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   void
-  mark_cut1(const BdnNode* node);
+  mark_cut1(BdnNode* node);
 
   void
-  clear_cut1(const BdnNode* node);
+  clear_cut1(BdnNode* node);
 
   void
-  mark_cut2(const BdnNode* node);
+  mark_cut2(BdnNode* node);
 
   void
-  clear_cut2(const BdnNode* node);
+  clear_cut2(BdnNode* node);
 
 
 private:
@@ -69,7 +69,7 @@ private:
   struct NodeInfo
   {
     // カットのリスト
-    list<vector<const BdnNode*> > mCutList;
+    list<vector<BdnNode*> > mCutList;
 
     // マーク1
     ymuint8 mMark1;
@@ -89,7 +89,7 @@ private:
   vector<NodeInfo> mNodeInfo;
 
   // カットの入力を保持する作業領域
-  const BdnNode** mTmpInputs;
+  BdnNode** mTmpInputs;
 
   // mTmpInputs の要素数
   ymuint32 mInputNum;
