@@ -20,8 +20,11 @@ TESTS =
 noinst_PROGRAMS = \
 	init_table \
 	enumcut \
+	recordcut \
 	lr
 
+
+# enumcut
 enumcut_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
@@ -52,6 +55,33 @@ enumcut_LDADD = \
 
 enumcut_LDFLAGS =
 
+# recordcut
+recordcut_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	@POPT_INCLUDES@
+
+recordcut_SOURCES = \
+	recordcut.cc \
+	Cut.h \
+	CutHash.h \
+	CutHash.cc \
+	CutMgr.h \
+	CutMgr.cc \
+	EnumCut.h \
+	EnumCut.cc \
+	TopDown.h \
+	TopDown.cc
+
+recordcut_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	@POPT_LIBS@
+
+recordcut_LDFLAGS =
+
+# lr
 lr_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
@@ -68,10 +98,8 @@ lr_SOURCES = \
 	set_abc_table.cc \
 	EnumCut.h \
 	EnumCut.cc \
-	BottomUp.h \
-	BottomUp.cc \
-	TopDown.h \
-	TopDown.cc \
+	TopDown2.h \
+	TopDown2.cc \
 	RwtOp.h \
 	RwtOp.cc \
 	lr.cc

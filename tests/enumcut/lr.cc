@@ -19,8 +19,7 @@
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/BdnDumper.h"
 
-#include "TopDown.h"
-#include "BottomUp.h"
+#include "TopDown2.h"
 
 #include "RwtOp.h"
 
@@ -68,7 +67,7 @@ void
 lr(BdnMgr& network,
    RwtMgr& rwt_mgr)
 {
-  TopDown enumcut;
+  TopDown2 enumcut;
 
   RwtOp op(rwt_mgr);
 
