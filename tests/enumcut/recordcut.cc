@@ -150,8 +150,8 @@ main(int argc,
 
   bool blif = false;
   bool iscas = false;
-  int max_cut_size = 4;
-  int min_cut_size = 4;
+  int max_cut_size = -1;
+  int min_cut_size = -1;
 
   // オプション解析用のデータ
   const struct poptOption options[] = {
@@ -201,6 +201,22 @@ main(int argc,
     }
     else if ( rc == 0x101 ) {
       iscas = true;
+    }
+  }
+
+  if ( max_cut_size == -1 ) {
+    if ( min_cut_size == -1 ) {
+      max_cut_size = 4;
+      min_cut_size = 4;
+      cerr << "Both min_cut_size and max_cut_size are not specified. '4' is assumed" << endl;
+    }
+    else {
+      max_cut_size = min_cut_size;
+    }
+  }
+  else {
+    if ( min_cut_size == -1 ) {
+      min_cut_size = max_cut_size;
     }
   }
 
