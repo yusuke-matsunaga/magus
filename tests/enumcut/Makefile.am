@@ -70,6 +70,8 @@ recordcut_SOURCES = \
 	CutMgr.cc \
 	EnumCut.h \
 	EnumCut.cc \
+	FuncRec.h \
+	FuncRec.cc \
 	TopDown.h \
 	TopDown.cc
 

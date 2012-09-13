@@ -19,6 +19,7 @@
 #include "ym_networks/BdnNode.h"
 
 #include "TopDown.h"
+#include "FuncRec.h"
 #include "CutMgr.h"
 #include "Cut.h"
 
@@ -200,13 +201,12 @@ enumcut(const string& filename,
     }
   }
 
-  CutMgr cut_mgr;
-
-  RecOp op(cut_mgr);
+  FuncRec op;
   TopDown enumcut;
 
   enumcut(network, cut_size, &op);
 
+#if 0
   const list<Cut*>& cut_list = cut_mgr.cut_list();
   cout << "Total " << cut_list.size() << " unique cuts" << endl;
 
@@ -235,6 +235,7 @@ enumcut(const string& filename,
     cut_mgr2.restore(bis);
   }
   cout << "cut_mgr2:: total " << cut_mgr2.cut_list().size() << " unique cuts" << endl;
+#endif
 }
 
 END_NAMESPACE_YM_NETWORKS
@@ -315,4 +316,3 @@ main(int argc,
 
   return 0;
 }
-

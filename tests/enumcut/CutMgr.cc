@@ -138,6 +138,7 @@ CutMgr::new_cut(const BdnNode* root,
   }
   mAllFunc.insert(f);
 
+#if 0
   NpnMap cmap;
   mNpnMgr.cannonical(f, cmap);
 
@@ -147,7 +148,8 @@ CutMgr::new_cut(const BdnNode* root,
     return NULL;
   }
   mRepFunc.insert(frep);
-
+#endif
+#if 0
   // AIG を作る．
   hash_map<ymuint, Aig> aig_map;
   for (ymuint i = 0; i < ni; ++ i) {
@@ -156,6 +158,9 @@ CutMgr::new_cut(const BdnNode* root,
     aig_map.insert(make_pair(node->id(), aig));
   }
   Aig aig = make_aig(root, mAigMgr, aig_map);
+#else
+  Aig aig;
+#endif
 
   Cut* cut = new Cut(f, aig);
 
