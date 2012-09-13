@@ -78,6 +78,8 @@ FuncMgr::reg_func(TvFunc f)
   pos = f.hash() % mTableSize;
   data->mLink = mTable[pos];
   mTable[pos] = data;
+
+  ++ mNum;
 }
 
 // @brief 関数のリストを取り出す．

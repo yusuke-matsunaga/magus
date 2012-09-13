@@ -20,6 +20,7 @@ TESTS =
 noinst_PROGRAMS = \
 	init_table \
 	enumcut \
+	rec \
 	recordcut \
 	lr
 
@@ -54,6 +55,36 @@ enumcut_LDADD = \
 	@POPT_LIBS@
 
 enumcut_LDFLAGS =
+
+# rec
+rec_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	$(TCLRL_INCLUDES) \
+	$(TCL_INCLUDES)
+
+rec_SOURCES = \
+	EnumCut.h \
+	EnumCut.cc \
+	FuncMgr.h \
+	FuncMgr.cc \
+	FuncRec.h \
+	FuncRec.cc \
+	TopDown.h \
+	TopDown.cc \
+	RecCmd.h \
+	RecCmd.cc \
+	tclAppInit.cc
+
+rec_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(YM_LIBS_LIBTCLREADLINE) \
+	$(TCL_LDADD)
+
+rec_LDFLAGS =
 
 # recordcut
 recordcut_CPPFLAGS = \
