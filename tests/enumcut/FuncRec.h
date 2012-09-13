@@ -11,10 +11,11 @@
 
 #include "ym_networks/bdn.h"
 #include "EnumCut.h"
-#include "ym_logic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
+
+class FuncMgr;
 
 //////////////////////////////////////////////////////////////////////
 /// @class FuncRec FuncRec.h "FuncRec.h"
@@ -26,7 +27,12 @@ class FuncRec :
 public:
 
   /// @brief コンストラクタ
-  FuncRec();
+  /// @param[in] func_mgr FuncMgr
+  FuncRec(FuncMgr& func_mgr);
+
+  /// @brief デストラクタ
+  virtual
+  ~FuncRec();
 
 
 public:
@@ -37,6 +43,10 @@ public:
   /// @brief 最小カットサイズを設定する．
   void
   set_min_size(ymuint size);
+
+  /// @brief デバッグレベルを設定する．
+  void
+  set_debug_level(ymuint level);
 
 
 public:
@@ -83,6 +93,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 関数を管理するオブジェクト
+  FuncMgr& mFuncMgr;
+
   // 現在処理中のノード
   const BdnNode* mCurNode;
 
@@ -98,11 +111,8 @@ private:
   // 最小カットサイズ
   ymuint32 mMinSize;
 
-  // 関数のハッシュ表
-  hash_set<TvFunc> mFuncHash;
-
-  // 関数の数
-  ymuint32 mNf;
+  // デバッグレベル
+  ymuint32 mDebugLevel;
 
 };
 

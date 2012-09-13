@@ -9,6 +9,7 @@
 
 #include "FuncRec.h"
 #include "ym_networks/BdnNode.h"
+#include "FuncMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -19,9 +20,17 @@ BEGIN_NAMESPACE_YM_NETWORKS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-FuncRec::FuncRec()
+// @param[in] func_mgr FuncMgr
+FuncRec::FuncRec(FuncMgr& func_mgr) :
+  mFuncMgr(func_mgr)
 {
   mMinSize = 1;
+  mDebugLevel = 0;
+}
+
+// @brief デストラクタ
+FuncRec::~FuncRec()
+{
 }
 
 // @brief 最小カットサイズを設定する．
@@ -31,6 +40,13 @@ FuncRec::set_min_size(ymuint size)
   if ( size > 0 ) {
     mMinSize = size;
   }
+}
+
+// @brief デバッグレベルを設定する．
+void
+FuncRec::set_debug_level(ymuint level)
+{
+  mDebugLevel = level;
 }
 
 // @brief 処理の最初に呼ばれる関数
@@ -43,7 +59,6 @@ FuncRec::all_init(const BdnMgr& sbjgraph,
 {
   mCurPos = 0;
   mNcAll = 0;
-  mNf = 0;
 }
 
 // @brief node を根とするカットを列挙する直前に呼ばれる関数
@@ -53,9 +68,10 @@ FuncRec::node_init(const BdnNode* node)
 {
   mNcCur = 0;
   mCurNode = node;
-#if 1
-  cout << "#" << mCurPos << ": Node#" << node->id() << endl;
-#endif
+
+  if ( mDebugLevel > 0 ) {
+    cout << "#" << mCurPos << ": Node#" << node->id() << endl;
+  }
 }
 
 
@@ -129,18 +145,15 @@ FuncRec::found_cut(const BdnNode* root,
 
   TvFunc f = cut_to_func(root, ni, inputs);
 
-  if ( mFuncHash.count(f) == 0 ) {
-    mFuncHash.insert(f);
-    ++ mNf;
-  }
+  mFuncMgr.reg_func(f);
 
-#if 0
-  cout << "found_cut(" << root->id() << ", {";
-  for (ymuint i = 0; i < ni; ++ i) {
-    cout << " " << inputs[i]->id();
+  if ( mDebugLevel > 1 ) {
+    cout << "found_cut(" << root->id() << ", {";
+    for (ymuint i = 0; i < ni; ++ i) {
+      cout << " " << inputs[i]->id();
+    }
+    cout << "}" << endl;
   }
-  cout << "}" << endl;
-#endif
 }
 
 // @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
@@ -152,10 +165,10 @@ FuncRec::node_end(const BdnNode* node)
   ++ mCurPos;
   mNcAll += mNcCur;
 
-#if 1
-  cout << "    " << mNcCur << " cuts" << endl
-       << endl;
-#endif
+  if ( mDebugLevel > 0 ) {
+    cout << "    " << mNcCur << " cuts" << endl
+	 << endl;
+  }
 }
 
 // @brief 処理の最後に呼ばれる関数
@@ -163,8 +176,9 @@ void
 FuncRec::all_end(const BdnMgr& sbjgraph,
 		 ymuint limit)
 {
-  cout << "Total " << setw(12) << mNcAll << " cuts" << endl
-       << "      " << setw(12) << mNf << " functions" << endl;
+  if ( mDebugLevel > 0 ) {
+    cout << "Total " << setw(12) << mNcAll << " cuts" << endl;
+  }
 }
 
 END_NAMESPACE_YM_NETWORKS

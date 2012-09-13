@@ -19,9 +19,8 @@
 #include "ym_networks/BdnNode.h"
 
 #include "TopDown.h"
+#include "FuncMgr.h"
 #include "FuncRec.h"
-#include "CutMgr.h"
-#include "Cut.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -31,155 +30,13 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-
-//////////////////////////////////////////////////////////////////////
-// カットを記録するためのクラス
-//////////////////////////////////////////////////////////////////////
-class RecOp :
-  public EnumCutOp
-{
-public:
-
-  /// @brief コンストラクタ
-  RecOp(CutMgr& cut_mgr);
-
-
-public:
-
-  /// @brief 処理の最初に呼ばれる関数
-  /// @param[in] sbjgraph 対象のサブジェクトグラフ
-  /// @param[in] limit カットサイズ
-  /// @param[in] mode カット列挙モード
-  virtual
-  void
-  all_init(const BdnMgr& sbjgraph,
-	   ymuint limit);
-
-  /// @brief node を根とするカットを列挙する直前に呼ばれる関数
-  /// @param[in] node 根のノード
-  virtual
-  void
-  node_init(const BdnNode* node);
-
-  virtual
-  void
-  found_cut(const BdnNode* root,
-	    ymuint ni,
-	    const BdnNode** inputs);
-
-  /// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
-  /// @param[in] node 根のノード
-  virtual
-  void
-  node_end(const BdnNode* node);
-
-  /// @brief 処理の最後に呼ばれる関数
-  virtual
-  void
-  all_end(const BdnMgr& sbjgraph,
-	  ymuint limit);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // カットを記録するオブジェクト
-  CutMgr& mCutMgr;
-
-  // 現在処理中のノード
-  const BdnNode* mCurNode;
-
-  // 現在処理中のノード番号
-  ymuint32 mCurPos;
-
-  // 現在のカット数
-  ymuint32 mNcCur;
-
-  // 全カット数
-  ymuint32 mNcAll;
-
-};
-
-// @brief コンストラクタ
-RecOp::RecOp(CutMgr& cut_mgr) :
-  mCutMgr(cut_mgr)
-{
-}
-
-// @brief 処理の最初に呼ばれる関数
-// @param[in] sbjgraph 対象のサブジェクトグラフ
-// @param[in] limit カットサイズ
-// @param[in] mode カット列挙モード
 void
-RecOp::all_init(const BdnMgr& sbjgraph,
-		ymuint limit)
-{
-  mCurPos = 0;
-  mNcAll = 0;
-}
-
-// @brief node を根とするカットを列挙する直前に呼ばれる関数
-// @param[in] node 根のノード
-void
-RecOp::node_init(const BdnNode* node)
-{
-  mNcCur = 0;
-  mCurNode = node;
-#if 1
-  cout << "#" << mCurPos << ": Node#" << node->id() << endl;
-#endif
-}
-
-void
-RecOp::found_cut(const BdnNode* root,
-		 ymuint ni,
-		 const BdnNode** inputs)
-{
-  ++ mNcCur;
-
-  if ( ni >= 5 ) {
-    mCutMgr.new_cut(root, ni, inputs);
-  }
-#if 0
-  cout << "found_cut(" << root->id() << ", {";
-  for (ymuint i = 0; i < ni; ++ i) {
-    cout << " " << inputs[i]->id();
-  }
-  cout << "}" << endl;
-#endif
-}
-
-// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
-// @param[in] node 根のノード
-void
-RecOp::node_end(const BdnNode* node)
-{
-  assert_cond( node == mCurNode, __FILE__, __LINE__);
-  ++ mCurPos;
-  mNcAll += mNcCur;
-
-#if 1
-  cout << "    " << mNcCur << " cuts" << endl
-       << endl;
-#endif
-}
-
-// @brief 処理の最後に呼ばれる関数
-void
-RecOp::all_end(const BdnMgr& sbjgraph,
-	       ymuint limit)
-{
-  cout << "Total " << mNcAll << " cuts" << endl;
-}
-
-
-void
-enumcut(const string& filename,
-	bool blif,
-	bool iscas89,
-	ymuint cut_size)
+rec_func(FuncMgr& func_mgr,
+	 const string& filename,
+	 bool blif,
+	 bool iscas89,
+	 ymuint min_cut_size,
+	 ymuint max_cut_size)
 {
   MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
   MsgMgr::reg_handler(msg_handler);
@@ -201,10 +58,23 @@ enumcut(const string& filename,
     }
   }
 
-  FuncRec op;
+  FuncRec op(func_mgr);
   TopDown enumcut;
 
-  enumcut(network, cut_size, &op);
+  op.set_min_size(min_cut_size);
+  op.set_debug_level(1);
+
+  enumcut(network, max_cut_size, &op);
+
+  vector<TvFunc> func_list;
+  func_mgr.func_list(func_list);
+
+  cout << "Total " << setw(12) << func_list.size() << " functions" << endl;
+  for (ymuint i = min_cut_size; i <= max_cut_size; ++ i) {
+    vector<TvFunc> func_list;
+    func_mgr.func_list(i, func_list);
+    cout << "Total " << setw(12) << func_list.size() << " " << setw(2) << i << " input functions" << endl;
+  }
 
 #if 0
   const list<Cut*>& cut_list = cut_mgr.cut_list();
@@ -238,6 +108,36 @@ enumcut(const string& filename,
 #endif
 }
 
+void
+dump_func(FuncMgr& func_mgr,
+	  const char* filename)
+{
+  ofstream os;
+  os.open(filename, ios::binary);
+  if ( !os ) {
+    cerr << "Could not create " << filename << endl;
+    return;
+  }
+  BinOStream bos(os);
+
+  func_mgr.dump(bos);
+}
+
+void
+restore_func(FuncMgr& func_mgr,
+	     const char* filename)
+{
+  ifstream is;
+  is.open(filename, ios::binary);
+  if ( !is ) {
+    cerr << "Could not create " << filename << endl;
+    return;
+  }
+  BinIStream bis(is);
+
+  func_mgr.restore(bis);
+}
+
 END_NAMESPACE_YM_NETWORKS
 
 
@@ -250,7 +150,8 @@ main(int argc,
 
   bool blif = false;
   bool iscas = false;
-  int cut_size = 4;
+  int max_cut_size = 4;
+  int min_cut_size = 4;
 
   // オプション解析用のデータ
   const struct poptOption options[] = {
@@ -267,8 +168,11 @@ main(int argc,
     { "iscas89", '\0', POPT_ARG_NONE, NULL, 0x101,
       "iscas89 mode", NULL },
 
-    { "cut_size", 'c', POPT_ARG_INT, &cut_size, 0,
-      "specify cut size", NULL },
+    { "max_cut_size", 'C', POPT_ARG_INT, &max_cut_size, 0,
+      "specify maximum cut size", NULL },
+
+    { "min_cut_size", 'c', POPT_ARG_INT, &min_cut_size, 0,
+      "specify minimum cut size", NULL },
 
     POPT_AUTOHELP
 
@@ -311,8 +215,10 @@ main(int argc,
     return 2;
   }
 
+  FuncMgr func_mgr;
+
   string filename(str);
-  enumcut(filename, blif, iscas, cut_size);
+  rec_func(func_mgr, filename, blif, iscas, min_cut_size, max_cut_size);
 
   return 0;
 }
