@@ -70,6 +70,46 @@ ReadCmd::~ReadCmd()
 {
 }
 
+// @brief カット列挙を行い関数の登録を行う．
+// @param[in] network 対象のネットワーク
+int
+ReadCmd::record(const BdnMgr& network)
+{
+  ymuint min_cut_size = 0;
+  ymuint max_cut_size = 0;
+
+  if ( mMinCutSize->is_specified() ) {
+    min_cut_size = mMinCutSize->val();
+  }
+  if ( mMaxCutSize->is_specified() ) {
+    max_cut_size = mMaxCutSize->val();
+  }
+  if ( min_cut_size == 0 ) {
+    if ( max_cut_size == 0 ) {
+      min_cut_size = 4;
+      max_cut_size = 4;
+    }
+    else {
+      min_cut_size = max_cut_size;
+    }
+  }
+  else {
+    if ( max_cut_size == 0 ) {
+      max_cut_size = min_cut_size;
+    }
+  }
+
+  FuncRec op(mgr());
+  TopDown enumcut;
+
+  op.set_min_size(min_cut_size);
+  op.set_debug_level(1);
+
+  enumcut(network, max_cut_size, &op);
+
+  return TCL_OK;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス ReadBlifCmd
@@ -124,40 +164,9 @@ ReadBlifCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  ymuint min_cut_size = 0;
-  ymuint max_cut_size = 0;
+  int cmd_ok = record(bdn_network);
 
-  if ( mMinCutSize->is_specified() ) {
-    min_cut_size = mMinCutSize->val();
-  }
-  if ( mMaxCutSize->is_specified() ) {
-    max_cut_size = mMaxCutSize->val();
-  }
-  if ( min_cut_size == 0 ) {
-    if ( max_cut_size == 0 ) {
-      min_cut_size = 4;
-      max_cut_size = 4;
-    }
-    else {
-      min_cut_size = max_cut_size;
-    }
-  }
-  else {
-    if ( max_cut_size == 0 ) {
-      max_cut_size = min_cut_size;
-    }
-  }
-
-  FuncRec op(mgr());
-  TopDown enumcut;
-
-  op.set_min_size(min_cut_size);
-  op.set_debug_level(1);
-
-  enumcut(bdn_network, max_cut_size, &op);
-
-
-  return TCL_OK;
+  return cmd_ok;
 }
 
 
@@ -214,39 +223,9 @@ ReadIscas89Cmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  ymuint min_cut_size = 0;
-  ymuint max_cut_size = 0;
+  int cmd_ok = record(bdn_network);
 
-  if ( mMinCutSize->is_specified() ) {
-    min_cut_size = mMinCutSize->val();
-  }
-  if ( mMaxCutSize->is_specified() ) {
-    max_cut_size = mMaxCutSize->val();
-  }
-  if ( min_cut_size == 0 ) {
-    if ( max_cut_size == 0 ) {
-      min_cut_size = 4;
-      max_cut_size = 4;
-    }
-    else {
-      min_cut_size = max_cut_size;
-    }
-  }
-  else {
-    if ( max_cut_size == 0 ) {
-      max_cut_size = min_cut_size;
-    }
-  }
-
-  FuncRec op(mgr());
-  TopDown enumcut;
-
-  op.set_min_size(min_cut_size);
-  op.set_debug_level(1);
-
-  enumcut(bdn_network, max_cut_size, &op);
-
-  return TCL_OK;
+  return cmd_ok;
 }
 
 
@@ -483,4 +462,3 @@ rec_init(Tcl_Interp* interp)
   // 正常終了
   return TCL_OK;
 }
-
