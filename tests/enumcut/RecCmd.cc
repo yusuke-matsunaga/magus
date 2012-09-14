@@ -16,6 +16,8 @@
 #include "ym_tclpp/TclObjMsgHandler.h"
 #include "ym_tclpp/TclPopt.h"
 
+#include "ym_logic/NpnMgr.h"
+
 #include "TopDown.h"
 #include "FuncMgr.h"
 #include "FuncRec.h"
@@ -285,6 +287,61 @@ DumpCmd::cmd_proc(TclObjVector& objv)
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス DumpRepCmd
+//////////////////////////////////////////////////////////////////////
+
+
+// @brief コンストラクタ
+// @param[in] func_mgr FuncMgr
+DumpRepCmd::DumpRepCmd(FuncMgr& func_mgr) :
+  RecCmd(func_mgr)
+{
+}
+
+// @brief デストラクタ
+DumpRepCmd::~DumpRepCmd()
+{
+}
+
+// @brief コマンドを実行する仮想関数
+int
+DumpRepCmd::cmd_proc(TclObjVector& objv)
+{
+  ymuint objc = objv.size();
+
+  // このコマンドはファイル名を引数としてとる．
+  if ( objc != 2 ) {
+    print_usage();
+    return TCL_ERROR;
+  }
+
+  // コマンド行を解析してファイル名を取って来て，ファイルを開く
+  string file_name = objv[1];
+  // ファイル名の展開を行う．
+  string ex_file_name;
+  bool stat = tilde_subst(file_name, ex_file_name);
+  if ( !stat ) {
+    // ファイル名文字列の中に誤りがあった．
+    return TCL_ERROR;
+  }
+
+  ofstream os;
+  os.open(ex_file_name.c_str(), ios::binary);
+  if ( !os ) {
+    TclObj emsg;
+    emsg << "Could not create " << file_name;
+    set_result(emsg);
+    return TCL_ERROR;
+  }
+  BinOStream bos(os);
+
+  mgr().dump_rep(bos);
+
+  return TCL_OK;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス RestoreCmd
 //////////////////////////////////////////////////////////////////////
 
@@ -383,8 +440,6 @@ PrintCmd::cmd_proc(TclObjVector& objv)
   vector<TvFunc> func_list;
   mgr().func_list(func_list);
 
-  *osp << "Total " << setw(12) << func_list.size() << " functions" << endl;
-
   ymuint min_n = 0;
   ymuint max_n = 0;
   for (vector<TvFunc>::const_iterator p = func_list.begin();
@@ -399,11 +454,42 @@ PrintCmd::cmd_proc(TclObjVector& objv)
     }
   }
 
+#if 0
+  NpnMgr npn_mgr;
+
+  ymuint nfall = 0;
+  ymuint nrall = 0;
+  for (ymuint i = min_n; i <= max_n; ++ i) {
+    vector<TvFunc> func_list;
+    mgr().func_list(i, func_list);
+    hash_set<TvFunc> rep_hash;
+    ymuint nrep = 0;
+    for (vector<TvFunc>::const_iterator p = func_list.begin();
+	 p != func_list.end(); ++ p) {
+      const TvFunc& f = *p;
+      NpnMap cmap;
+      npn_mgr.cannonical(f, cmap);
+      TvFunc rep = f.xform(cmap);
+      if ( rep_hash.count(rep) == 0 ) {
+	rep_hash.insert(rep);
+	++ nrep;
+      }
+    }
+    *osp << "Total " << setw(12) << func_list.size() << " " << setw(2) << i << " input functions"
+	 << "      " << setw(10) << nrep << " representative functions" << endl;
+    nfall += func_list.size();
+    nrall += nrep;
+  }
+  *osp << "Total " << setw(12) << nfall << "          functions"
+       << "      " << setw(10) << nrall << " representative functions" << endl;
+#else
   for (ymuint i = min_n; i <= max_n; ++ i) {
     vector<TvFunc> func_list;
     mgr().func_list(i, func_list);
     *osp << "Total " << setw(12) << func_list.size() << " " << setw(2) << i << " input functions" << endl;
   }
+  *osp << "Total " << setw(12) << func_list.size() << "          functions" << endl;
+#endif
 
   return TCL_OK;
 }
@@ -439,6 +525,7 @@ rec_init(Tcl_Interp* interp)
   TclCmdBinder1<ReadBlifCmd, FuncMgr&>::reg(interp, func_mgr, "rec::read_blif");
   TclCmdBinder1<ReadIscas89Cmd, FuncMgr&>::reg(interp, func_mgr, "rec::read_iscas89");
   TclCmdBinder1<DumpCmd, FuncMgr&>::reg(interp, func_mgr, "rec::dump");
+  TclCmdBinder1<DumpRepCmd, FuncMgr&>::reg(interp, func_mgr, "rec::dump_rep");
   TclCmdBinder1<RestoreCmd, FuncMgr&>::reg(interp, func_mgr, "rec::restore");
   TclCmdBinder1<PrintCmd, FuncMgr&>::reg(interp, func_mgr, "rec::print");
 
@@ -453,6 +540,7 @@ rec_init(Tcl_Interp* interp)
     "proc complete(read_blif) { t s e l p m } { return \"\" }\n"
     "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
     "proc complete(dump) { t s e l p m } { return \"\" }\n"
+    "proc complete(dump_rep) { t s e l p m } { return \"\" }\n"
     "proc complete(restore) { t s e l p m } { return \"\" }\n"
     "proc complete(print) { t s e l p m } { return \"\" }\n"
     "}\n"

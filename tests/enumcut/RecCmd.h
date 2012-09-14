@@ -181,6 +181,34 @@ protected:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class DumpRepCmd RecCmd.h "RecCmd.h"
+/// @brief ダンプコマンド
+//////////////////////////////////////////////////////////////////////
+class DumpRepCmd :
+  public RecCmd
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] func_mgr FuncMgr
+  DumpRepCmd(FuncMgr& func_mgr);
+
+  /// @brief デストラクタ
+  virtual
+  ~DumpRepCmd();
+
+
+protected:
+
+  /// @brief コマンドを実行する仮想関数
+  virtual
+  int
+  cmd_proc(TclObjVector& objv);
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class RestoreCmd RecCmd.h "RecCmd.h"
 /// @brief リストアコマンド
 //////////////////////////////////////////////////////////////////////

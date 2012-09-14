@@ -8,6 +8,7 @@
 
 
 #include "FuncMgr.h"
+#include "ym_logic/NpnMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -124,6 +125,34 @@ FuncMgr::dump(BinO& s) const
     for (FuncData* data = mTable[i]; data; data = data->mLink) {
       s << data->mFunc;
     }
+  }
+}
+
+// @brief 代表関数のみをバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+FuncMgr::dump_rep(BinO& s) const
+{
+  NpnMgr npn_mgr;
+  hash_set<TvFunc> rep_hash;
+  for (ymuint i = 0; i < mTableSize; ++ i) {
+    for (FuncData* data = mTable[i]; data; data = data->mLink) {
+      const TvFunc& f = data->mFunc;
+      NpnMap cmap;
+      npn_mgr.cannonical(f, cmap);
+      TvFunc rep = f.xform(cmap);
+      if ( rep_hash.count(rep) == 0 ) {
+	rep_hash.insert(rep);
+      }
+    }
+  }
+
+  ymuint32 n = rep_hash.size();
+  s << n;
+  for (hash_set<TvFunc>::iterator p = rep_hash.begin();
+       p != rep_hash.end(); ++ p) {
+    const TvFunc& f = *p;
+    s << f;
   }
 }
 

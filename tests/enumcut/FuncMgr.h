@@ -65,6 +65,11 @@ public:
   void
   dump(BinO& s) const;
 
+  /// @brief 代表関数のみをバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  void
+  dump_rep(BinO& s) const;
+
   /// @brief バイナリダンプされたファイルを読み込む．
   void
   restore(BinI& s);
