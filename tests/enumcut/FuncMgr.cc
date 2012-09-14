@@ -45,7 +45,7 @@ FuncMgr::clear()
 // @brief 関数を登録する．
 // @note すでに登録されていたらなにもしない．
 void
-FuncMgr::reg_func(TvFunc f)
+FuncMgr::reg_func(const TvFunc& f)
 {
   ymuint32 pos = f.hash() % mTableSize;
   for (FuncData* data = mTable[pos]; data; data = data->mLink) {
@@ -71,15 +71,7 @@ FuncMgr::reg_func(TvFunc f)
     }
   }
 
-  FuncData* data = new FuncData;
-  data->mFunc = f;
-
-  // テーブルに追加する．
-  pos = f.hash() % mTableSize;
-  data->mLink = mTable[pos];
-  mTable[pos] = data;
-
-  ++ mNum;
+  new_data(f);
 }
 
 // @brief 関数のリストを取り出す．
@@ -142,11 +134,35 @@ FuncMgr::restore(BinI& s)
   clear();
   ymuint32 n;
   s >> n;
+
+  ymuint new_size = mTableSize;
+  while ( new_size <= n ) {
+    new_size <<= 1;
+  }
+  if ( new_size > mTableSize ) {
+    alloc_table(new_size);
+  }
+
   for (ymuint i = 0; i < n; ++ i) {
     TvFunc f;
     s >> f;
-    reg_func(f);
+    new_data(f);
   }
+}
+
+// @brief 新しい FuncData を作り登録する．
+void
+FuncMgr::new_data(const TvFunc& f)
+{
+  FuncData* data = new FuncData;
+  data->mFunc = f;
+
+  // テーブルに追加する．
+  ymuint pos = f.hash() % mTableSize;
+  data->mLink = mTable[pos];
+  mTable[pos] = data;
+
+  ++ mNum;
 }
 
 // ハッシュ表を拡大する．

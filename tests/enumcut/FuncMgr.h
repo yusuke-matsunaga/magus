@@ -43,7 +43,7 @@ public:
   /// @brief 関数を登録する．
   /// @note すでに登録されていたらなにもしない．
   void
-  reg_func(TvFunc f);
+  reg_func(const TvFunc& f);
 
   /// @brief 関数のリストを取り出す．
   void
@@ -75,7 +75,11 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  // ハッシュ表を拡大する．
+  /// @brief 新しい FuncData を作り登録する．
+  void
+  new_data(const TvFunc& f);
+
+  /// @brief ハッシュ表を拡大する．
   void
   alloc_table(ymuint32 new_size);
 
