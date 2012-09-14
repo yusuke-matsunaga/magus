@@ -273,6 +273,7 @@ DumpCmd::cmd_proc(TclObjVector& objv)
   if ( !os ) {
     TclObj emsg;
     emsg << "Could not create " << file_name;
+    set_result(emsg);
     return TCL_ERROR;
   }
   BinOStream bos(os);
@@ -326,6 +327,7 @@ RestoreCmd::cmd_proc(TclObjVector& objv)
   if ( !is ) {
     TclObj emsg;
     emsg << "Could not open " << file_name;
+    set_result(emsg);
     return TCL_ERROR;
   }
   BinIStream bis(is);
