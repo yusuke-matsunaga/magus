@@ -66,4 +66,12 @@ GbmNodeImpl::is_lut() const
   return false;
 }
 
+// @brief LUTノードの時に真理値変数のベース値を返す．
+ymuint
+GbmNodeImpl::tv_base() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
+}
+
 END_NAMESPACE_YM_GBM

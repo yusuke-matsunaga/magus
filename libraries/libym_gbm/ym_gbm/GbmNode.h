@@ -75,6 +75,11 @@ public:
   GbmNodeHandle
   fanin(ymuint pos) const = 0;
 
+  /// @brief LUTノードの時に真理値変数のベース値を返す．
+  virtual
+  ymuint
+  tv_base() const = 0;
+
 };
 
 END_NAMESPACE_YM_GBM

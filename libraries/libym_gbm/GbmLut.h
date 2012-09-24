@@ -27,10 +27,12 @@ public:
   /// @param[in] id ID番号
   /// @param[in] vid 変数番号
   /// @param[in] inputs 入力のハンドルのリスト
+  /// @param[in] tv_base 真理値変数のベース値
   /// @param[in] tv_list 真理値ベクタの変数番号のリスト
   GbmLut(ymuint id,
 	 VarId vid,
 	 const vector<GbmNodeHandle>& inputs,
+	 ymuint tv_base,
 	 const vector<VarId>& tv_list);
 
   /// @brief デストラクタ
@@ -61,6 +63,11 @@ public:
   GbmNodeHandle
   fanin(ymuint pos) const;
 
+  /// @brief LUTノードの時に真理値変数のベース値を返す．
+  virtual
+  ymuint
+  tv_base() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -69,6 +76,9 @@ private:
 
   // ファンインのハンドル
   vector<GbmNodeHandle> mFanins;
+
+  // 真理値変数のベース値
+  ymuint32 mTvBase;
 
   // 真理値ベクタの変数番号
   vector<VarId> mTvList;

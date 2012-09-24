@@ -12,6 +12,7 @@
 #include "ym_gbm/gbm_nsdef.h"
 #include "ym_gbm/GbmNodeHandle.h"
 #include "ym_logic/SatSolver.h"
+#include "ym_logic/Bool3.h"
 
 
 BEGIN_NAMESPACE_YM_GBM
@@ -86,6 +87,15 @@ public:
   GbmNodeHandle
   new_lut(const vector<GbmNodeHandle>& inputs);
 
+  /// @brief Boolean Matching を解く．
+  /// @param[in] lhs 左辺のハンドル
+  /// @param[in] rhs 右辺のハンドル
+  /// @param[out] model 真理値変数の割り当て結果
+  Bool3
+  solve(GbmNodeHandle lhs,
+	GbmNodeHandle rhs,
+	vector<Bool3>& model);
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -155,6 +165,9 @@ private:
 
   // LUTノードを格納するベクタ
   vector<GbmNode*> mLutList;
+
+  // 真理値変数のベース値
+  ymuint32 mTvBase;
 
 };
 

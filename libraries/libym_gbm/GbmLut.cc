@@ -20,13 +20,16 @@ BEGIN_NAMESPACE_YM_GBM
 // @param[in] id ID番号
 // @param[in] vid 変数番号
 // @param[in] inputs 入力のハンドルのリスト
+// @param[in] tv_base 真理値変数のベース値
 // @param[in] tv_list 真理値ベクタの変数番号のリスト
 GbmLut::GbmLut(ymuint id,
 	       VarId vid,
 	       const vector<GbmNodeHandle>& inputs,
+	       ymuint tv_base,
 	       const vector<VarId>& tv_list) :
   GbmNodeImpl(id, vid),
   mFanins(inputs),
+  mTvBase(tv_base),
   mTvList(tv_list)
 {
 }
@@ -60,5 +63,13 @@ GbmLut::fanin(ymuint pos) const
   assert_cond( pos < fanin_num(), __FILE__, __LINE__);
   return mFanins[pos];
 }
+
+// @brief LUTノードの時に真理値変数のベース値を返す．
+ymuint
+GbmLut::tv_base() const
+{
+  return mTvBase;
+}
+
 
 END_NAMESPACE_YM_GBM

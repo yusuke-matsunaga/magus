@@ -64,6 +64,11 @@ public:
   bool
   is_lut() const;
 
+  /// @brief LUTノードの時に真理値変数のベース値を返す．
+  virtual
+  ymuint
+  tv_base() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

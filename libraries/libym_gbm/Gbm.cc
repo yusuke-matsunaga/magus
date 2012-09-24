@@ -29,6 +29,7 @@ Gbm::Gbm(const string& sat_type,
 	 ostream* sat_log) :
   mSolver(sat_type, sat_opt, sat_log)
 {
+  mTvBase = 0;
 }
 
 // @brief デストラクタ
@@ -99,7 +100,8 @@ Gbm::new_lut(const vector<GbmNodeHandle>& inputs)
   for (ymuint i = 0; i < ni_exp; ++ i) {
     v_array[i] = mSolver.new_var();
   }
-  GbmNode* node = new GbmLut(id, vid, inputs, v_array);
+  GbmNode* node = new GbmLut(id, vid, inputs, mTvBase, v_array);
+  mTvBase += ni_exp;
 
   mNodeList.push_back(node);
   mLutList.push_back(node);
@@ -124,6 +126,193 @@ Gbm::new_lut(const vector<GbmNodeHandle>& inputs)
   }
 
   return GbmNodeHandle(id, false);
+}
+
+// @brief 全ノード数を返す．
+// @note ノードIDの最大値 + 1 と一致する．
+ymuint
+Gbm::node_num() const
+{
+  return mNodeList.size();
+}
+
+// @brief ノードを返す．
+// @param[in] id ID番号 ( 0 <= id < node_num() )
+const GbmNode*
+Gbm::node(ymuint id) const
+{
+  assert_cond( id < node_num(), __FILE__, __LINE__);
+  return mNodeList[id];
+}
+
+// @brief 外部入力数を返す．
+ymuint
+Gbm::input_num() const
+{
+  return mInputList.size();
+}
+
+// @brief 外部入力ノードを返す．
+// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+const GbmNode*
+Gbm::input_node(ymuint pos) const
+{
+  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  return mInputList[pos];
+}
+
+// @brief ANDノード数を返す．
+ymuint
+Gbm::and_num() const
+{
+  return mAndList.size();
+}
+
+// @brief ANDノードを返す．
+// @param[in] pos 位置番号 ( 0 <= pos < and_num() )
+const GbmNode*
+Gbm::and_node(ymuint pos) const
+{
+  assert_cond( pos < and_num(), __FILE__, __LINE__);
+  return mAndList[pos];
+}
+
+// @brief LUTノード数を返す．
+ymuint
+Gbm::lut_num() const
+{
+  return mLutList.size();
+}
+
+// @brief LUTノードを返す．
+// @param[in] pos 位置番号 ( 0 <= pos < lut_num() )
+const GbmNode*
+Gbm::lut_node(ymuint pos) const
+{
+  assert_cond( pos < lut_num(), __FILE__, __LINE__);
+  return mLutList[pos];
+}
+
+// @brief Boolean Matching を解く．
+// @param[in] lhs 左辺のハンドル
+// @param[in] rhs 右辺のハンドル
+// @param[out] model 真理値変数の割り当て結果
+Bool3
+Gbm::solve(GbmNodeHandle lhs,
+	   GbmNodeHandle rhs,
+	   vector<Bool3>& model)
+{
+  ymuint nv = node_num() + mTvBase;
+  ymuint nc = 0;
+  for (vector<GbmNode*>::iterator p = mNodeList.begin();
+       p != mNodeList.end(); ++ p) {
+    GbmNode* node = *p;
+    if ( node->is_and() ) {
+      nc += 3;
+    }
+    else if ( node->is_lut() ) {
+      ymuint ni = node->fanin_num();
+      nc += (1U << ni) * 2;
+    }
+  }
+  nc += 2;
+
+  cout << "p cnf " << nv << " " << nc << endl;
+
+  cout << "e ";
+  for (vector<GbmNode*>::iterator p = mLutList.begin();
+       p != mLutList.end(); ++ p) {
+    GbmNode* node = *p;
+    ymuint base = node->tv_base() + node_num();
+    ymuint ni = node->fanin_num();
+    ymuint ni_exp = 1U << ni;
+    for (ymuint i = 0; i < ni_exp; ++ i) {
+      cout << " " << (base + i + 1);
+    }
+  }
+  cout << " 0" << endl;
+
+  cout << "a ";
+  for (vector<GbmNode*>::iterator p = mInputList.begin();
+       p != mInputList.end(); ++ p) {
+    GbmNode* node = *p;
+    cout << " " << (node->id() + 1);
+  }
+  cout << " 0" << endl;
+
+  cout << "e ";
+  for (vector<GbmNode*>::iterator p = mAndList.begin();
+       p != mAndList.end(); ++ p) {
+    GbmNode* node = *p;
+    cout << " " << (node->id() + 1);
+  }
+  for (vector<GbmNode*>::iterator p = mLutList.begin();
+       p != mLutList.end(); ++ p) {
+    GbmNode* node = *p;
+    cout << " " << (node->id() + 1);
+  }
+  cout << " 0" << endl;
+
+  for (vector<GbmNode*>::iterator p = mAndList.begin();
+       p != mAndList.end(); ++ p) {
+    GbmNode* node = *p;
+    int oid = node->id() + 1;
+
+    GbmNodeHandle i0 = node->fanin(0);
+    int iid0 = i0.id() + 1;
+    if ( i0.inv() ) {
+      iid0 = -iid0;
+    }
+
+    GbmNodeHandle i1 = node->fanin(1);
+    int iid1 = i1.id() + 1;
+    if ( i1.inv() ) {
+      iid1 = -iid1;
+    }
+
+    cout << -iid0 << " " << -iid1 << " " << oid << " 0" << endl
+	 <<  iid0 << " " << -oid << " 0" << endl
+	 <<  iid1 << " " << -oid << " 0" << endl;
+  }
+  for (vector<GbmNode*>::iterator p = mLutList.begin();
+       p != mLutList.end(); ++ p) {
+    GbmNode* node = *p;
+    int oid = node->id() + 1;
+    ymuint ni = node->fanin_num();
+    ymuint ni_exp = 1U << ni;
+    vector<int> iid_array(ni);
+    for (ymuint i = 0; i < ni; ++ i) {
+      GbmNodeHandle ihandle = node->fanin(i);
+      int iid = ihandle.id() + 1;
+      if ( ihandle.inv() ) {
+	iid = -iid;
+      }
+      iid_array[i] = iid;
+    }
+    ymuint tv_base = node->tv_base();
+    for (ymuint j = 0; j < ni_exp; ++ j) {
+      for (ymuint i = 0; i < ni; ++ i) {
+	int iid = iid_array[i];
+	if ( (j & (1U << i)) == 0U ) {
+	  iid = -iid;
+	}
+	cout << " " << -iid;
+      }
+      int tv = tv_base + j + node_num() + 1;
+      cout << " " << tv << " " << -oid << " 0" << endl;
+
+      for (ymuint i = 0; i < ni; ++ i) {
+	int iid = iid_array[i];
+	if ( (j & (1U << i)) == 0U ) {
+	  iid = -iid;
+	}
+	cout << " " << -iid;
+      }
+      cout << " " << -tv << " " << oid << " 0" << endl;
+    }
+  }
+
+  return kB3True;
 }
 
 END_NAMESPACE_YM_GBM

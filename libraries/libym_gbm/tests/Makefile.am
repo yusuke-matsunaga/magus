@@ -16,4 +16,19 @@ TESTS_ENVIRONMENT = \
 
 TESTS =
 
-noinst_PROGRAMS =
+noinst_PROGRAMS = \
+	gbm_test
+
+gbm_test_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+gbm_test_SOURCES = \
+	gbm_test.cc
+
+gbm_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_gbm/libym_gbm.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+gbm_test_LDFLAGS =
