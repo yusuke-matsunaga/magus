@@ -54,6 +54,14 @@ CiLibrary::CiLibrary() :
 {
   mTechnology = kTechCmos;
   mDelayModel = kCellDelayGenericCmos;
+  mLutTemplateNum = 0;
+  mLutTemplateArray = NULL;
+  mCellNum = 0;
+  mCellArray = NULL;
+  mGroupNum = 0;
+  mGroupArray = NULL;
+  mClassNum = 0;
+  mClassArray = NULL;
 }
 
 // @brief デストラクタ
