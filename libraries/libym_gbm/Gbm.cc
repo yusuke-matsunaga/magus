@@ -194,12 +194,10 @@ Gbm::lut_node(ymuint pos) const
 }
 
 // @brief Boolean Matching を解く．
-// @param[in] lhs 左辺のハンドル
-// @param[in] rhs 右辺のハンドル
+// @param[in] sat_var 1にする変数
 // @param[out] model 真理値変数の割り当て結果
 Bool3
-Gbm::solve(GbmNodeHandle lhs,
-	   GbmNodeHandle rhs,
+Gbm::solve(GbmNodeHandle sat_var,
 	   vector<Bool3>& model)
 {
   ymuint nv = node_num() + mTvBase;
