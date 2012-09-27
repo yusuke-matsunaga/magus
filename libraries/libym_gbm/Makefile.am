@@ -4,6 +4,7 @@
 
 SUBDIRS = \
 	ym_gbm \
+	pylib \
 	. \
 	tests
 
