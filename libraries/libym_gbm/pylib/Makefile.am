@@ -10,8 +10,9 @@ noinst_LTLIBRARIES = libym_gbmpy.la
 ############################################################
 
 libym_gbmpy_la_CPPFLAGS = \
-	$(PYTHON_CPPFLAGS) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	$(PYTHON_CPPFLAGS)
 
 libym_gbmpy_la_SOURCES = \
 	gbmpy.h \

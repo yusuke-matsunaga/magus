@@ -18,7 +18,7 @@
 //////////////////////////////////////////////////////////////////////
 
 /// @brief gbmpy 用の名前空間の開始
-#define BEGIN_NAMESPACE_GMBPY			\
+#define BEGIN_NAMESPACE_GBMPY			\
   BEGIN_NAMESPACE_YM_GBM			\
   BEGIN_NAMESPACE(nsPy)
 
@@ -28,7 +28,7 @@
   END_NAMESPACE_YM_GBM
 
 
-BEGIN_NAMESPACE_GBM
+BEGIN_NAMESPACE_GBMPY
 
 /// @brief エラー用のオブジェクト
 extern
@@ -142,6 +142,6 @@ extern
 PyObject*
 conv_to_pyobject(GbmNodeHandle handle);
 
-END_NAMESPACE_GBM
+END_NAMESPACE_GBMPY
 
 #endif // GBMPY_H
