@@ -143,4 +143,20 @@ covn_from_pyobject(PyObject* obj,
   return true;
 }
 
+// @brief GbmNode から PyObject を生成する．
+// @param[in] node GbmNode
+PyObject*
+conv_to_pyobject(GbmNode* node)
+{
+  GbmNodeObject* obj = GbmNode_new(&GbmNodeType);
+  if ( obj == NULL ) {
+    return NULL;
+  }
+
+  obj->mNode = node;
+
+  Py_INCREF(obj);
+  return (PyObject*)obj;
+}
+
 END_NAMESPACE_GBMPY
