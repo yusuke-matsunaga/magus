@@ -8,6 +8,7 @@ libraries/libym_networks
 libraries/libym_gds
 libraries/libym_cec
 libraries/libym_techmap
+libraries/libym_gbm
 libraries/libym_seal
 libraries/libym_tclpp
 libraries/libym_ymsh
