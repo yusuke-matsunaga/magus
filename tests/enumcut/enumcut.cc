@@ -190,11 +190,13 @@ enumcut(const string& filename,
 
     enumcut(network, cut_size, &op);
   }
+#if 0
   else if ( method_str == "top_down" ) {
     TopDown enumcut;
 
     enumcut(network, cut_size, &op);
   }
+#endif
   else if ( method_str == "zdd" ) {
     ZddMgr mgr("zddmgr");
     ZddImp enumcut(mgr);
