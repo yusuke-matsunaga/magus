@@ -12,6 +12,7 @@ SUBDIRS = \
 	cnfdd \
 	sat \
 	aig \
+	pylib \
 	. \
 	tests
 
