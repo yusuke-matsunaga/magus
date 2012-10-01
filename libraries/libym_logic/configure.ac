@@ -93,6 +93,9 @@ YM_CHECK_TCL
 # Check for tclreadline
 YM_CHECK_TCLREADLINE
 
+# Check for Python
+YM_CHECK_PYTHON
+
 AC_CACHE_SAVE
 
 

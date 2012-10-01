@@ -49,8 +49,6 @@ BEGIN_NAMESPACE_YM_BDD
 class Bdd;
 class BddMgr;
 class BddMgrParam;
-class BddMgrImpl;
-class BddEdge;
 class BddVarSet;
 class BddLitSet;
 class BddVector;
@@ -59,16 +57,6 @@ class BddList;
 //////////////////////////////////////////////////////////////////////
 /// @name 型名の定義
 /// @{
-
-#if 0
-/// @brief BDD のベクタ
-/// @ingroup Bdd
-typedef vector<Bdd> BddVector;
-
-/// @brief BDD のリスト
-/// @ingroup Bdd
-typedef list<Bdd> BddList;
-#endif
 
 /// @brief 変数番号をキートして BDD を値とする連想配列
 /// @ingroup Bdd

@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM_BDD
 
+class BddMgrImpl;
+
 //////////////////////////////////////////////////////////////////////
 /// @class CompTbl CompTbl.h "CompTbl.h"
 /// @brief 演算結果テーブルの基本クラス

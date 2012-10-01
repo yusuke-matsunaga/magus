@@ -20,6 +20,8 @@
 
 BEGIN_NAMESPACE_YM_BDD
 
+class BddMgrImpl;
+
 //////////////////////////////////////////////////////////////////////
 /// @class BddMgrParam BddMgr.h "ym_logic/BddMgr.h"
 /// @ingroup Bdd
