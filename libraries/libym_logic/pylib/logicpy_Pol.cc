@@ -66,21 +66,26 @@ Pol_init(PolObject* self,
 	 PyObject* args)
 {
   char* str = NULL;
-  if ( !PyArg_ParseTuple(args, "s", &str) ) {
+  if ( !PyArg_ParseTuple(args, "|s", &str) ) {
     return -1;
   }
 
-  if ( strcmp(str, "positive") == 0 ) {
-    self->mPol = kPolPosi;
-  }
-  else if ( strcmp(str, "negative") == 0 ) {
-    self->mPol = kPolNega;
+  if ( str != NULL ) {
+    if ( strcmp(str, "positive") == 0 ) {
+      self->mPol = kPolPosi;
+    }
+    else if ( strcmp(str, "negative") == 0 ) {
+      self->mPol = kPolNega;
+    }
+    else {
+      ostringstream buf;
+      buf << "\"" << str << "\": illegal string for polarity initializer";
+      PyErr_SetString(ErrorObject, buf.str().c_str());
+      return -1;
+    }
   }
   else {
-    ostringstream buf;
-    buf << str << ": illegal string for polarity initializer";
-    PyErr_SetString(ErrorObject, buf.str().c_str());
-    return -1;
+    self->mPol = kPolPosi;
   }
 
   return 0;

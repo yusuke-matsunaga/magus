@@ -42,11 +42,11 @@ logic_init()
     return;
   }
 
-#if 0
   if ( PyType_Ready(&LiteralType) < 0 ) {
     return;
   }
 
+#if 0
   if ( PyType_Ready(&LogExprType) < 0 ) {
     return;
   }
@@ -99,10 +99,10 @@ logic_init()
   // Pol オブジェクトタイプの登録
   PyModule_AddObject(m, "Pol", (PyObject*)&PolType);
 
-#if 0
   // Literal オブジェクトタイプの登録
   PyModule_AddObject(m, "Literal", (PyObject*)&LiteralType);
 
+#if 0
   // LogExpr オブジェクトタイプの登録
   PyModule_AddObject(m, "LogExpr", (PyObject*)&LogExprType);
 
