@@ -25,8 +25,8 @@ struct VarIdObject
   // Python のお約束
   PyObject_HEAD
 
-  // VarId の本体
-  VarId mVarId;
+  // VarId の値
+  ymuint32 mVal;
 
 };
 
@@ -44,16 +44,33 @@ VarId_new(PyTypeObject* type)
     return NULL;
   }
 
-  // VarId 自体の生成は自動的に行われる．
+  // mVal の生成は自動的に行われる．
 
   return self;
+}
+
+// 比較関数
+int
+VarId_compare(VarIdObject* left,
+	      VarIdObject* right)
+{
+  int diff = left->mVal - right->mVal;
+  if ( diff < 0 ) {
+    return -1;
+  }
+  else if ( diff == 0 ) {
+    return 0;
+  }
+  else {
+    return 1;
+  }
 }
 
 // VarIdObject を開放する関数
 void
 VarId_dealloc(VarIdObject* self)
 {
-  // VarId は開放の必要がない．
+  // mVal は開放の必要がない．
 
   PyObject_Del(self);
 }
@@ -63,7 +80,8 @@ int
 VarId_init(VarIdObject* self,
 	   PyObject* args)
 {
-  // なにもしない．
+  self->mVal = 0;
+
   return 0;
 }
 
@@ -72,7 +90,7 @@ PyObject*
 VarId_str(VarIdObject* self)
 {
   ostringstream buf;
-  buf << "V#" << self->mVarId.val();
+  buf << "V#" << self->mVal;
   return Py_BuildValue("s", buf.str().c_str());
 }
 
@@ -80,13 +98,31 @@ VarId_str(VarIdObject* self)
 PyObject*
 VarId_val(VarIdObject* self)
 {
-  return Py_BuildValue("I", self->mVarId.val());
+  return Py_BuildValue("I", self->mVal);
+}
+
+// set 関数
+PyObject*
+VarId_set(VarIdObject* self,
+	  PyObject* args)
+{
+  ymuint32 val;
+  if ( !PyArg_ParseTuple(args, "I", &val) ) {
+    return NULL;
+  }
+
+  self->mVal = val;
+
+  Py_INCREF(Py_None);
+  return Py_None;
 }
 
 // VarIdObject のメソッドテーブル
 PyMethodDef VarId_methods[] = {
   {"val", (PyCFunction)VarId_val, METH_NOARGS,
    PyDoc_STR("return VarId::val()")},
+  {"set", (PyCFunction)VarId_val, METH_VARARGS,
+   PyDoc_STR("set VarId::val()")},
   { NULL, NULL, 0, NULL }
 };
 
@@ -98,7 +134,7 @@ PyTypeObject VarIdType = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "logicpy.VarId",            /*tp_name*/
+  "logic.VarId",              /*tp_name*/
   sizeof(VarIdObject),        /*tp_basicsize*/
   0,                          /*tp_itemsize*/
   /* methods */
@@ -106,7 +142,7 @@ PyTypeObject VarIdType = {
   0,                          /*tp_print*/
   0,                          /*tp_getattr*/
   0,                          /*tp_setattr*/
-  0,                          /*tp_compare*/
+  (cmpfunc)VarId_compare,     /*tp_compare*/
   0,                          /*tp_repr*/
   0,                          /*tp_as_number*/
   0,                          /*tp_as_sequence*/
@@ -157,7 +193,7 @@ conv_from_pyobject(PyObject* py_obj,
   // 強制的にキャスト
   VarIdObject* varid_obj = (VarIdObject*)py_obj;
 
-  obj = varid_obj->mVarId;
+  obj = VarId(varid_obj->mVal);
 
   return true;
 }
@@ -172,7 +208,7 @@ conv_to_pyobject(VarId obj)
     return NULL;
   }
 
-  varid_obj->mVarId = obj;
+  varid_obj->mVal = obj.val();
 
   Py_INCREF(varid_obj);
   return (PyObject*)varid_obj;

@@ -146,6 +146,7 @@ AC_CONFIG_FILES([tests/cnfdd/Makefile])
 AC_CONFIG_FILES([tests/npn/Makefile])
 AC_CONFIG_FILES([tests/sat/Makefile])
 AC_CONFIG_FILES([tests/aig/Makefile])
+AC_CONFIG_FILES([tests/pylib/Makefile])
 
 
 # ===================================================================

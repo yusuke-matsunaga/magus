@@ -3,19 +3,19 @@
 SUBDIRS =
 
 
-noinst_LTLIBRARIES = libym_logicpy.la
+noinst_LTLIBRARIES = libym_logic_pylib.la
 
 ############################################################
-## libym_logicpy.la
+## libym_logic_pylib.la
 ############################################################
 
-libym_logicpy_la_CPPFLAGS = \
+libym_logic_pylib_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	$(GMP_INCLUDES) \
 	$(PYTHON_CPPFLAGS)
 
-libym_logicpy_la_SOURCES = \
+libym_logic_pylib_la_SOURCES = \
 	logicpy.h \
 	logicpy_init.cc \
 	logicpy_VarId.cc \
@@ -28,7 +28,7 @@ libym_logicpy_la_SOURCES = \
 	logicpy_Aig.cc \
 	logicpy_SatSolver.cc
 
-libym_logicpy_la_LIBADD =
+libym_logic_pylib_la_LIBADD =
 
-libym_logicpy_la_LDFLAGS = \
+libym_logic_pylib_la_LDFLAGS = \
 	$(PYTHON_LDFLAGS)

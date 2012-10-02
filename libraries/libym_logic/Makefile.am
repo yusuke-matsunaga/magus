@@ -40,7 +40,8 @@ libym_logic_la_LIBADD = \
 	zdd/libym_logic_zdd.la \
 	cnfdd/libym_logic_cnfdd.la \
 	sat/libym_logic_sat.la \
-	aig/libym_logic_aig.la
+	aig/libym_logic_aig.la \
+	pylib/libym_logic_pylib.la
 
 libym_logic_la_LDFLAGS = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
