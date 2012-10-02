@@ -80,7 +80,12 @@ int
 VarId_init(VarIdObject* self,
 	   PyObject* args)
 {
-  self->mVal = 0;
+  ymuint32 val;
+  if ( !PyArg_ParseTuple(args, "I", &val) ) {
+    return NULL;
+  }
+
+  self->mVal = val;
 
   return 0;
 }
@@ -121,7 +126,7 @@ VarId_set(VarIdObject* self,
 PyMethodDef VarId_methods[] = {
   {"val", (PyCFunction)VarId_val, METH_NOARGS,
    PyDoc_STR("return VarId::val()")},
-  {"set", (PyCFunction)VarId_val, METH_VARARGS,
+  {"set", (PyCFunction)VarId_set, METH_VARARGS,
    PyDoc_STR("set VarId::val()")},
   { NULL, NULL, 0, NULL }
 };
