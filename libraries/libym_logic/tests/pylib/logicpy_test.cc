@@ -9,12 +9,14 @@
 
 #include "logicpy.h"
 
+extern "C" {
+  void logic_init();
+}
 
 int
 main(int argc,
      char** argv)
 {
-  extern void logic_init();
 
   // プログラム名をセットする．
   Py_SetProgramName(argv[0]);

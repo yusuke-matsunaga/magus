@@ -38,6 +38,7 @@ logic_init()
     return;
   }
 
+#if 0
   if ( PyType_Ready(&PolType) < 0 ) {
     return;
   }
@@ -69,6 +70,7 @@ logic_init()
   if ( PyType_Ready(&SatSolverType) < 0 ) {
     return;
   }
+#endif
 
   // モジュールオブジェクトの生成
   PyDoc_STRVAR(module_doc,
@@ -94,6 +96,7 @@ logic_init()
   // VarId オブジェクトタイプの登録
   PyModule_AddObject(m, "VarId", (PyObject*)&VarIdType);
 
+#if 0
   // Pol オブジェクトタイプの登録
   PyModule_AddObject(m, "Pol", (PyObject*)&PolType);
 
@@ -117,5 +120,5 @@ logic_init()
 
   // SatSolver オブジェクトタイプの登録
   PyModule_AddObject(m, "SatSolver", (PyObject*)&SatSolverType);
-
+#endif
 }
