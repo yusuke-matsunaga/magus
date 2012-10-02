@@ -38,11 +38,11 @@ logic_init()
     return;
   }
 
-#if 0
   if ( PyType_Ready(&PolType) < 0 ) {
     return;
   }
 
+#if 0
   if ( PyType_Ready(&LiteralType) < 0 ) {
     return;
   }
@@ -96,10 +96,10 @@ logic_init()
   // VarId オブジェクトタイプの登録
   PyModule_AddObject(m, "VarId", (PyObject*)&VarIdType);
 
-#if 0
   // Pol オブジェクトタイプの登録
   PyModule_AddObject(m, "Pol", (PyObject*)&PolType);
 
+#if 0
   // Literal オブジェクトタイプの登録
   PyModule_AddObject(m, "Literal", (PyObject*)&LiteralType);
 
