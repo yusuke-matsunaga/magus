@@ -105,18 +105,18 @@ Pol_str(PolObject* self)
   return Py_BuildValue("s", str);
 }
 
-// new_positive 関数
+// make_positive 関数
 PyObject*
-Pol_new_positive(PyTypeObject* type_obj,
-		 PyObject* args)
+Pol_make_positive(PyTypeObject* type_obj,
+		  PyObject* args)
 {
   return conv_to_pyobject(kPolPosi);
 }
 
-// new_negative 関数
+// make_negative 関数
 PyObject*
-Pol_new_negative(PyTypeObject* type_obj,
-		 PyObject* args)
+Pol_make_negative(PyTypeObject* type_obj,
+		  PyObject* args)
 {
   return conv_to_pyobject(kPolNega);
 }
@@ -124,7 +124,7 @@ Pol_new_negative(PyTypeObject* type_obj,
 // is_positive 関数
 PyObject*
 Pol_is_positive(PolObject* self,
-		 PyObject* args)
+		PyObject* args)
 {
   bool v = (self->mPol == kPolPosi);
   return Py_BuildValue("i", v);
@@ -133,7 +133,7 @@ Pol_is_positive(PolObject* self,
 // is_negative 関数
 PyObject*
 Pol_is_negative(PolObject* self,
-		 PyObject* args)
+		PyObject* args)
 {
   bool v = (self->mPol == kPolNega);
   return Py_BuildValue("i", v);
@@ -149,9 +149,9 @@ Pol_alternate(PolObject* self,
 
 // PolObject のメソッドテーブル
 PyMethodDef Pol_methods[] = {
-  {"new_positive", (PyCFunction)Pol_new_positive, METH_STATIC | METH_NOARGS,
+  {"make_positive", (PyCFunction)Pol_make_positive, METH_STATIC | METH_NOARGS,
    PyDoc_STR("make positive polarity")},
-  {"new_negative", (PyCFunction)Pol_new_negative, METH_STATIC | METH_NOARGS,
+  {"make_negative", (PyCFunction)Pol_make_negative, METH_STATIC | METH_NOARGS,
    PyDoc_STR("make negative polarity")},
   {"is_positive", (PyCFunction)Pol_is_positive, METH_NOARGS,
    PyDoc_STR("check if positive")},
