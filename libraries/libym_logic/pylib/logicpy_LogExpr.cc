@@ -110,19 +110,41 @@ LogExpr_make_one(PyTypeObject* type_obj,
 }
 
 // make_literal 関数
-// LiteralType のオブジェクトを一つ引数にとる．
+// LiteralType のオブジェクトを一つか VarId と Pol を引数にとる．
 PyObject*
 LogExpr_make_literal(PyTypeObject* type_obj,
 		     PyObject* args)
 {
-  PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &LiteralType, &obj) ) {
+  PyObject* obj1 = NULL;
+  PyObject* obj2 = NULL;
+  if ( !PyArg_ParseTuple(args, "O|O", &obj1, &obj2) ) {
     return NULL;
   }
+
   Literal lit;
-  if ( !conv_from_pyobject(obj, lit) ) {
-    return NULL;
+  if ( obj2 != NULL ) {
+    // obj1 は VarId, obj2 は Pol でなければならない．
+    VarId vid;
+    if ( !conv_from_pyobject(obj1, vid) ) {
+      PyErr_SetString(ErrorObject, "must be logic.VarId");
+      return NULL;
+    }
+    tPol pol;
+    if ( !conv_from_pyobject(obj2, pol) ) {
+      PyErr_SetString(ErrorObject, "must be logic.Pol");
+      return NULL;
+    }
+    lit.set(vid, pol);
   }
+  else if ( !conv_from_pyobject(obj1, lit) ) {
+    VarId vid;
+    if ( !conv_from_pyobject(obj1, vid) ) {
+      PyErr_SetString(ErrorObject, "must be logic.Literal or logic.VarId");
+      return NULL;
+    }
+    lit.set(vid, kPolPosi);
+  }
+
   return conv_to_pyobject(LogExpr::make_literal(lit));
 }
 
@@ -696,7 +718,7 @@ PyMethodDef LogExpr_methods[] = {
    PyDoc_STR("return true if the root is OR (NONE)")},
   {"is_xor", (PyCFunction)LogExpr_is_xor, METH_NOARGS,
    PyDoc_STR("return true if the root is XOR (NONE)")},
-  {"is_op", (PyCFunction)LogExpr_is_and, METH_NOARGS,
+  {"is_op", (PyCFunction)LogExpr_is_op, METH_NOARGS,
    PyDoc_STR("return true if the root is OP (NONE)")},
   {"child_num", (PyCFunction)LogExpr_child_num, METH_NOARGS,
    PyDoc_STR("return the number of children (NONE)")},
