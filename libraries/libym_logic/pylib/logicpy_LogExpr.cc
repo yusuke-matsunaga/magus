@@ -407,6 +407,245 @@ LogExpr_eval(LogExprObject* self,
   return Py_BuildValue("k", val);
 }
 
+// is_zero 関数
+PyObject*
+LogExpr_is_zero(LogExprObject* self,
+		PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_zero());
+}
+
+// is_one 関数
+PyObject*
+LogExpr_is_one(LogExprObject* self,
+	       PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_one());
+}
+
+// is_constant 関数
+PyObject*
+LogExpr_is_constant(LogExprObject* self,
+		    PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_constant());
+}
+
+// is_posiliteral 関数
+PyObject*
+LogExpr_is_posiliteral(LogExprObject* self,
+		       PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_posiliteral());
+}
+
+// is_negaliteral 関数
+PyObject*
+LogExpr_is_negaliteral(LogExprObject* self,
+		       PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_negaliteral());
+}
+
+// is_literal 関数
+PyObject*
+LogExpr_is_literal(LogExprObject* self,
+		       PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_literal());
+}
+
+// varid 関数
+PyObject*
+LogExpr_varid(LogExprObject* self,
+	      PyObject* args)
+{
+  return conv_to_pyobject(self->mLogExpr->varid());
+}
+
+// is_and 関数
+PyObject*
+LogExpr_is_and(LogExprObject* self,
+	       PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_and());
+}
+
+// is_or 関数
+PyObject*
+LogExpr_is_or(LogExprObject* self,
+	      PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_or());
+}
+
+// is_xor 関数
+PyObject*
+LogExpr_is_xor(LogExprObject* self,
+	       PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_xor());
+}
+
+// is_op 関数
+PyObject*
+LogExpr_is_op(LogExprObject* self,
+	      PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_op());
+}
+
+// child_num 関数
+PyObject*
+LogExpr_child_num(LogExprObject* self,
+		  PyObject* args)
+{
+  return Py_BuildValue("k", self->mLogExpr->child_num());
+}
+
+// child 関数
+// 符号なし整数を一つ引数としてとる．
+PyObject*
+LogExpr_child(LogExprObject* self,
+	      PyObject* args)
+{
+  ymuint pos;
+  if ( !PyArg_ParseTuple(args, "k", &pos) ) {
+    return NULL;
+  }
+  LogExpr child = self->mLogExpr->child(pos);
+
+  return conv_to_pyobject(child);
+}
+
+// is_simple 関数
+PyObject*
+LogExpr_is_simple(LogExprObject* self,
+		  PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_simple());
+}
+
+// is_simple_and 関数
+PyObject*
+LogExpr_is_simple_and(LogExprObject* self,
+		      PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_simple_and());
+}
+
+// is_simple_or 関数
+PyObject*
+LogExpr_is_simple_or(LogExprObject* self,
+		     PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_simple_or());
+}
+
+// is_simple_xor 関数
+PyObject*
+LogExpr_is_simple_xor(LogExprObject* self,
+		      PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_simple_xor());
+}
+
+// is_sop 関数
+PyObject*
+LogExpr_is_sop(LogExprObject* self,
+	       PyObject* args)
+{
+  return Py_BuildValue("b", self->mLogExpr->is_sop());
+}
+
+// litnum 関数
+// VarId と Pol を引数にとる．
+// どちらも省略可能
+PyObject*
+LogExpr_litnum(LogExprObject* self,
+	       PyObject* args)
+{
+  PyObject* obj1 = NULL;
+  PyObject* obj2 = NULL;
+  if ( !PyArg_ParseTuple(args, "|O!O!", &VarIdType, &obj1, &PolType, &obj2) ) {
+    return NULL;
+  }
+  ymuint litnum = 0;
+  if ( obj1 != NULL ) {
+    VarId varid;
+    if ( !conv_from_pyobject(obj1, varid) ) {
+      return NULL;
+    }
+    if ( obj2 != NULL ) {
+      tPol pol;
+      if ( !conv_from_pyobject(obj2, pol) ) {
+	return NULL;
+      }
+      litnum = self->mLogExpr->litnum(varid, pol);
+    }
+    else {
+      litnum = self->mLogExpr->litnum(varid);
+    }
+  }
+  else {
+    litnum = self->mLogExpr->litnum();
+  }
+
+  return Py_BuildValue("k", litnum);
+}
+
+// input_size 関数
+PyObject*
+LogExpr_input_size(LogExprObject* self,
+		   PyObject* args)
+{
+  return Py_BuildValue("k", self->mLogExpr->input_size());
+}
+
+// sop_cubenum 関数
+PyObject*
+LogExpr_sop_cubenum(LogExprObject* self,
+		    PyObject* args)
+{
+  return Py_BuildValue("k", self->mLogExpr->sop_cubenum());
+}
+
+// sop_litnum 関数
+// VarId と Pol を引数にとる．
+// どちらも省略可能
+PyObject*
+LogExpr_sop_litnum(LogExprObject* self,
+		   PyObject* args)
+{
+  PyObject* obj1 = NULL;
+  PyObject* obj2 = NULL;
+  if ( !PyArg_ParseTuple(args, "|O!O!", &VarIdType, &obj1, &PolType, &obj2) ) {
+    return NULL;
+  }
+  ymuint litnum = 0;
+  if ( obj1 != NULL ) {
+    VarId varid;
+    if ( !conv_from_pyobject(obj1, varid) ) {
+      return NULL;
+    }
+    if ( obj2 != NULL ) {
+      tPol pol;
+      if ( !conv_from_pyobject(obj2, pol) ) {
+	return NULL;
+      }
+      litnum = self->mLogExpr->sop_litnum(varid, pol);
+    }
+    else {
+      litnum = self->mLogExpr->sop_litnum(varid);
+    }
+  }
+  else {
+    litnum = self->mLogExpr->sop_litnum();
+  }
+
+  return Py_BuildValue("k", litnum);
+}
+
 // LogExprObject のメソッドテーブル
 PyMethodDef LogExpr_methods[] = {
   {"make_zero", (PyCFunction)LogExpr_make_zero, METH_STATIC | METH_NOARGS,
@@ -425,7 +664,7 @@ PyMethodDef LogExpr_methods[] = {
    PyDoc_STR("make or (Tuple of LogExpr)")},
   {"make_xor", (PyCFunction)LogExpr_make_xor, METH_STATIC | METH_VARARGS,
    PyDoc_STR("make xor (Tuple of LogExpr)")},
-  {"not", (PyCFunction)LogExpr_not, METH_NOARGS,
+  {"invert", (PyCFunction)LogExpr_not, METH_NOARGS,
    PyDoc_STR("return ~self (NONE)")},
   {"compose", (PyCFunction)LogExpr_compose, METH_VARARGS,
    PyDoc_STR("compose(vid, sub_expr) (VarId, LogExpr)")},
@@ -437,6 +676,50 @@ PyMethodDef LogExpr_methods[] = {
    PyDoc_STR("simplify (NONE)")},
   {"eval", (PyCFunction)LogExpr_eval, METH_VARARGS,
    PyDoc_STR("evaluate bitvector ( tuple of ulong, ulong )")},
+  {"is_zero", (PyCFunction)LogExpr_is_zero, METH_NOARGS,
+   PyDoc_STR("return true if constant 0 (NONE)")},
+  {"is_one", (PyCFunction)LogExpr_is_one, METH_NOARGS,
+   PyDoc_STR("return true if constant 1 (NONE)")},
+  {"is_constant", (PyCFunction)LogExpr_is_constant, METH_NOARGS,
+   PyDoc_STR("return true if constant (NONE)")},
+  {"is_posiliteral", (PyCFunction)LogExpr_is_posiliteral, METH_NOARGS,
+   PyDoc_STR("return true if positive literal (NONE)")},
+  {"is_negaliteral", (PyCFunction)LogExpr_is_posiliteral, METH_NOARGS,
+   PyDoc_STR("return true if negative literal (NONE)")},
+  {"is_literal", (PyCFunction)LogExpr_is_posiliteral, METH_NOARGS,
+   PyDoc_STR("return true if literal (NONE)")},
+  {"varid", (PyCFunction)LogExpr_varid, METH_NOARGS,
+   PyDoc_STR("return VarId (NONE)")},
+  {"is_and", (PyCFunction)LogExpr_is_and, METH_NOARGS,
+   PyDoc_STR("return true if the root is AND (NONE)")},
+  {"is_or", (PyCFunction)LogExpr_is_or, METH_NOARGS,
+   PyDoc_STR("return true if the root is OR (NONE)")},
+  {"is_xor", (PyCFunction)LogExpr_is_xor, METH_NOARGS,
+   PyDoc_STR("return true if the root is XOR (NONE)")},
+  {"is_op", (PyCFunction)LogExpr_is_and, METH_NOARGS,
+   PyDoc_STR("return true if the root is OP (NONE)")},
+  {"child_num", (PyCFunction)LogExpr_child_num, METH_NOARGS,
+   PyDoc_STR("return the number of children (NONE)")},
+  {"child", (PyCFunction)LogExpr_child, METH_VARARGS,
+   PyDoc_STR("return the n'th child (uint)")},
+  {"is_simple", (PyCFunction)LogExpr_is_simple, METH_NOARGS,
+   PyDoc_STR("return true if simple expression (NONE)")},
+  {"is_simple_and", (PyCFunction)LogExpr_is_simple_and, METH_NOARGS,
+   PyDoc_STR("return true if simple AND expression (NONE)")},
+  {"is_simple_or", (PyCFunction)LogExpr_is_simple_or, METH_NOARGS,
+   PyDoc_STR("return true if simple OR expression (NONE)")},
+  {"is_simple_xor", (PyCFunction)LogExpr_is_simple_xor, METH_NOARGS,
+   PyDoc_STR("return true if simple XOR expression (NONE)")},
+  {"is_sop", (PyCFunction)LogExpr_is_sop, METH_NOARGS,
+   PyDoc_STR("return true if SOP expression (NONE)")},
+  {"litnum", (PyCFunction)LogExpr_litnum, METH_VARARGS,
+   PyDoc_STR("return the number of literals ( ?VarId, ?Pol)")},
+  {"input_size", (PyCFunction)LogExpr_input_size, METH_NOARGS,
+   PyDoc_STR("return the maximum number of input variables (NONE)")},
+  {"sop_cubenum", (PyCFunction)LogExpr_sop_cubenum, METH_NOARGS,
+   PyDoc_STR("return the number of cubes in SOP form (NONE)")},
+  {"sop_litnum", (PyCFunction)LogExpr_sop_cubenum, METH_VARARGS,
+   PyDoc_STR("return the number of literals in SOP form ( ?VarId, ?Pol )")},
   {NULL, NULL, 0, NULL}
 };
 

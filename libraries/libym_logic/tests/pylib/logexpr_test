@@ -1,0 +1,67 @@
+# -*- coding:utf-8 -*-
+
+import logic
+
+
+# LogExpr オブジェクトのメンバ関数のテスト
+def logexpr_check(expr, name) :
+    print ""
+    print "logexpr_check(%s, %s)" % (expr, name)
+    print " is_zero()        => %s" % expr.is_zero()
+    print " is_one()         => %s" % expr.is_one()
+    print " is_constant()    => %s" % expr.is_constant()
+    print " is_posiliteral() => %s" % expr.is_posiliteral()
+    print " is_negaliteral() => %s" % expr.is_negaliteral()
+    print " is_literal()     => %s" % expr.is_literal()
+    print " is_and()         => %s" % expr.is_and()
+    print " is_or()          => %s" % expr.is_or()
+    print " is_xor()         => %s" % expr.is_xor()
+    print " is_op()          => %s" % expr.is_op()
+    print " is_simple()      => %s" % expr.is_simple()
+    print " is_simple_and()  => %s" % expr.is_simple_and()
+    print " is_simple_or()   => %s" % expr.is_simple_or()
+    print " is_simple_xor()  => %s" % expr.is_simple_xor()
+    print " is_sop()         => %s" % expr.is_sop()
+    print " input_size()     => %s" % expr.input_size()
+    print " litnum()         => %s" % expr.litnum()
+
+    n = expr.input_size()
+    for i in range(n) :
+        vid = logic.VarId(i)
+        print " litnum(%s)      => %s" % (vid, expr.litnum(vid))
+
+    pols = [logic.Pol.make_positive(),
+            logic.Pol.make_negative()]
+    for i in range(n) :
+        vid = logic.VarId(i)
+        for pol in pols:
+            print " litnum(%s, %s) => %s" % (vid, pol, expr.litnum(vid, pol))
+
+    print " sop_cubenum()    => %s" % expr.sop_cubenum()
+    print " sop_litnum()     => %s" % expr.sop_litnum()
+
+    for i in range(n) :
+        vid = logic.VarId(i)
+        print " sop_litnum(%s)      => %s" % (vid, expr.sop_litnum(vid))
+
+    pols = [logic.Pol.make_positive(),
+            logic.Pol.make_negative()]
+    for i in range(n) :
+        vid = logic.VarId(i)
+        for pol in pols:
+            print " sop_litnum(%s, %s) => %s" % (vid, pol, expr.sop_litnum(vid, pol))
+
+
+# オブジェクトの生成
+c0 = logic.LogExpr.make_zero()
+c1 = logic.LogExpr.make_one()
+expr0 = logic.LogExpr("0 + ~1 & 3")
+expr1 = logic.LogExpr("0 * 1 * ~2")
+
+# 内容の表示 & チェック
+logexpr_check(c0, "zero")
+logexpr_check(c1, "one")
+logexpr_check(expr0, "0 + ~1 & 3")
+logexpr_check(expr1, "0 * 1 * ~2")
+logexpr_check(expr0.invert(), "expr0.invert()")
+logexpr_check(expr1.invert(), "expr1.invert()")
