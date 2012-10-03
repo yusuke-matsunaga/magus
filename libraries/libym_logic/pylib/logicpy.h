@@ -317,12 +317,6 @@ extern
 PyObject*
 conv_to_pyobject(const LogExpr& obj);
 
-/// @brief BddMgr から PyObject を生成する．
-/// @param[in] obj BddMgr オブジェクト
-extern
-PyObject*
-conv_to_pyobject(const BddMgr& obj);
-
 /// @brief Bdd から PyObject を生成する．
 /// @param[in] obj Bdd オブジェクト
 extern
