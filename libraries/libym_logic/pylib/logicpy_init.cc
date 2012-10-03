@@ -50,7 +50,6 @@ logic_init()
     return;
   }
 
-#if 0
   if ( PyType_Ready(&BddMgrType) < 0 ) {
     return;
   }
@@ -59,6 +58,7 @@ logic_init()
     return;
   }
 
+#if 0
   if ( PyType_Ready(&AigMgrType) < 0 ) {
     return;
   }
@@ -105,13 +105,13 @@ logic_init()
   // LogExpr オブジェクトタイプの登録
   PyModule_AddObject(m, "LogExpr", (PyObject*)&LogExprType);
 
-#if 0
   // BddMgr オブジェクトタイプの登録
   PyModule_AddObject(m, "BddMgr", (PyObject*)&BddMgrType);
 
   // Bdd オブジェクトタイプの登録
   PyModule_AddObject(m, "Bdd", (PyObject*)&BddType);
 
+#if 0
   // AigMgr オブジェクトタイプの登録
   PyModule_AddObject(m, "AigMgr", (PyObject*)&AigMgrType);
 

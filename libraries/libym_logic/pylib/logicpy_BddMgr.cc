@@ -551,12 +551,12 @@ PyTypeObject BddMgrType = {
 
 // @brief PyObject から BddMgr を取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] obj BddMgr を格納する変数
+// @param[out] obj_p BddMgr を格納する変数
 // @retval true 変換が成功した．
 // @retval false 変換が失敗した．py_obj が BddMgrObject ではなかった．
 bool
 conv_from_pyobject(PyObject* py_obj,
-		   BddMgr& obj)
+		   BddMgr* obj_p)
 {
   // 型のチェック
   if ( !BddMgrObject_Check(py_obj) ) {
@@ -566,7 +566,7 @@ conv_from_pyobject(PyObject* py_obj,
   // 強制的にキャスト
   BddMgrObject* bddmgr_obj = (BddMgrObject*)py_obj;
 
-  obj = *(bddmgr_obj->mMgr);
+  obj_p = bddmgr_obj->mMgr;
 
   return true;
 }

@@ -246,7 +246,7 @@ conv_from_pyobject(PyObject* py_obj,
 extern
 bool
 conv_from_pyobject(PyObject* py_obj,
-		   BddMgr& obj);
+		   BddMgr* obj_p);
 
 /// @brief PyObject から Bdd を取り出す．
 /// @param[in] py_obj Python オブジェクト
