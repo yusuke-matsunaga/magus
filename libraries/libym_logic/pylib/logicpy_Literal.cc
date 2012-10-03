@@ -66,27 +66,32 @@ Literal_compare(LiteralObject* left,
   if ( left->mLiteral < right->mLiteral ) {
     return -1;
   }
-  else if ( left->mLiteral > right->mLiteral ) {
+  if ( left->mLiteral > right->mLiteral ) {
     return 1;
   }
-  else {
-    return 0;
-  }
+  return 0;
 }
 
 // 初期化関数
+// VarId と Pol を引数にとりうる．
+// 省略された場合には 0 番の kPolPosi で初期化される．
 int
 Literal_init(LiteralObject* self,
 	     PyObject* args)
 {
   PyObject* vobj = NULL;
   PyObject* pobj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!|O!", &VarIdType, &vobj, &PolType, &pobj) ) {
+  if ( !PyArg_ParseTuple(args, "|O!O!", &VarIdType, &vobj, &PolType, &pobj) ) {
     return -1;
   }
   VarId vid;
-  if ( !conv_from_pyobject(vobj, vid) ) {
-    return -1;
+  if ( vobj != NULL ) {
+    if ( !conv_from_pyobject(vobj, vid) ) {
+      return -1;
+    }
+  }
+  else {
+    vid = VarId(0);
   }
 
   tPol pol = kPolPosi;
@@ -116,6 +121,13 @@ Literal_str(LiteralObject* self)
   return Py_BuildValue("s", buf.str().c_str());
 }
 
+// hash 関数
+long
+Literal_hash(LiteralObject* self)
+{
+  return self->mLiteral.hash();
+}
+
 // varid 関数
 PyObject*
 Literal_varid(LiteralObject* self)
@@ -133,6 +145,8 @@ Literal_pol(LiteralObject* self)
 }
 
 // set 関数
+// VarId と Pol を引数にとる．
+// Pol は省略可能で省略時には kPolPosi が仮定される．
 PyObject*
 Literal_set(LiteralObject* self,
 	    PyObject* args)
@@ -160,6 +174,35 @@ Literal_set(LiteralObject* self,
   return Py_None;
 }
 
+// negate 関数
+// 極性が逆のリテラルを返す．
+PyObject*
+Literal_negate(LiteralObject* self)
+{
+  return conv_to_pyobject(~self->mLiteral);
+}
+
+// make_positive 関数
+PyObject*
+Literal_make_positive(LiteralObject* self)
+{
+  return conv_to_pyobject(self->mLiteral.make_positive());
+}
+
+// make_negative 関数
+PyObject*
+Literal_make_negative(LiteralObject* self)
+{
+  return conv_to_pyobject(self->mLiteral.make_negative());
+}
+
+// index 関数
+PyObject*
+Literal_index(LiteralObject* self)
+{
+  return Py_BuildValue("I", self->mLiteral.index());
+}
+
 // LiteralObject のメソッドテーブル
 PyMethodDef Literal_methods[] = {
   {"varid", (PyCFunction)Literal_varid, METH_NOARGS,
@@ -168,6 +211,14 @@ PyMethodDef Literal_methods[] = {
    PyDoc_STR("return Literal::pol()")},
   {"set", (PyCFunction)Literal_set, METH_VARARGS,
    PyDoc_STR("set Literal")},
+  {"negate", (PyCFunction)Literal_negate, METH_NOARGS,
+   PyDoc_STR("return negated Literal")},
+  {"make_positive", (PyCFunction)Literal_make_positive, METH_NOARGS,
+   PyDoc_STR("return positive Literal")},
+  {"make_negative", (PyCFunction)Literal_make_negative, METH_NOARGS,
+   PyDoc_STR("return negative Literal")},
+  {"index", (PyCFunction)Literal_index, METH_NOARGS,
+   PyDoc_STR("return Literal::index()")},
   {NULL, NULL, 0, NULL}
 };
 
@@ -192,7 +243,7 @@ PyTypeObject LiteralType = {
   0,                          /*tp_as_number*/
   0,                          /*tp_as_sequence*/
   0,                          /*tp_as_mapping*/
-  0,                          /*tp_hash*/
+  (hashfunc)Literal_hash,     /*tp_hash*/
   0,                          /*tp_call*/
   (reprfunc)Literal_str,      /*tp_str*/
   0,                          /*tp_getattro*/

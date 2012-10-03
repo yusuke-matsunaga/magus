@@ -1,0 +1,42 @@
+# -*- coding:utf-8 -*-
+
+import logic
+
+
+# Pol オブジェクトのテスト関数
+def pol_check(pol, name) :
+
+   print ""
+   print "pol_check(%s)" % name, pol
+
+   if pol.is_positive() :
+      print "%s.is_positive()" % name
+   else :
+      print "! %s.is_positive()" % name
+
+   if pol.is_negative() :
+      print "%s.is_negative()" % name
+   else :
+      print "! %s.is_negative()" % name
+
+
+pol0 = logic.Pol()
+pol_check(pol0, "logic.Pol()")
+
+pol1 = logic.Pol("positive")
+pol_check(pol1, "logic.Pol(\"positive\")")
+
+pol2 = logic.Pol("negative")
+pol_check(pol2, "logic.Pol(\"negative\")")
+
+pol3 = logic.Pol.make_positive()
+pol_check(pol3, "logic.Pol.make_positive()")
+
+pol3 = logic.Pol.make_negative()
+pol_check(pol3, "logic.Pol.make_negative()")
+
+pol1_alt = pol1.alternate()
+pol_check(pol1_alt, "pol1.alternate()")
+
+pol2_alt = pol2.alternate()
+pol_check(pol2_alt, "pol2.alternate()")

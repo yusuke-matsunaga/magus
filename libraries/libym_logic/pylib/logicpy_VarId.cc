@@ -58,12 +58,10 @@ VarId_compare(VarIdObject* left,
   if ( diff < 0 ) {
     return -1;
   }
-  else if ( diff == 0 ) {
+  if ( diff == 0 ) {
     return 0;
   }
-  else {
-    return 1;
-  }
+  return 1;
 }
 
 // VarIdObject を開放する関数
@@ -76,12 +74,14 @@ VarId_dealloc(VarIdObject* self)
 }
 
 // 初期化関数
+// 符号なし整数を引数にとりうる．
+// 引数がなければ 0 で初期化される．
 int
 VarId_init(VarIdObject* self,
 	   PyObject* args)
 {
-  ymuint32 val;
-  if ( !PyArg_ParseTuple(args, "I", &val) ) {
+  ymuint32 val = 0;
+  if ( !PyArg_ParseTuple(args, "|I", &val) ) {
     return NULL;
   }
 
@@ -99,6 +99,13 @@ VarId_str(VarIdObject* self)
   return Py_BuildValue("s", buf.str().c_str());
 }
 
+// hash 関数
+long
+VarId_hash(VarIdObject* self)
+{
+  return self->mVal;
+}
+
 // val 関数
 PyObject*
 VarId_val(VarIdObject* self)
@@ -107,6 +114,7 @@ VarId_val(VarIdObject* self)
 }
 
 // set 関数
+// 符号なし整数を引数にとる．
 PyObject*
 VarId_set(VarIdObject* self,
 	  PyObject* args)
@@ -152,7 +160,7 @@ PyTypeObject VarIdType = {
   0,                          /*tp_as_number*/
   0,                          /*tp_as_sequence*/
   0,                          /*tp_as_mapping*/
-  0,                          /*tp_hash*/
+  (hashfunc)VarId_hash,       /*tp_hash*/
   0,                          /*tp_call*/
   (reprfunc)VarId_str,        /*tp_str*/
   0,                          /*tp_getattro*/

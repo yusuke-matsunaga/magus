@@ -61,6 +61,8 @@ Pol_dealloc(PolObject* self)
 }
 
 // 初期化関数
+// "positive" か "negative" の文字列を引数にとりうる．
+// 引数がなければ kPolPosi に初期化される．
 int
 Pol_init(PolObject* self,
 	 PyObject* args)

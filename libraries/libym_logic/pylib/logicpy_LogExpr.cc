@@ -92,6 +92,7 @@ LogExpr_str(LogExprObject* self)
 }
 
 // make_zero 関数
+// 引数をとらない．
 PyObject*
 LogExpr_make_zero(PyTypeObject* type_obj,
 		  PyObject* args)
@@ -100,6 +101,7 @@ LogExpr_make_zero(PyTypeObject* type_obj,
 }
 
 // make_one 関数
+// 引数をとらない．
 PyObject*
 LogExpr_make_one(PyTypeObject* type_obj,
 		 PyObject* args)
@@ -108,6 +110,7 @@ LogExpr_make_one(PyTypeObject* type_obj,
 }
 
 // make_literal 関数
+// LiteralType のオブジェクトを一つ引数にとる．
 PyObject*
 LogExpr_make_literal(PyTypeObject* type_obj,
 		     PyObject* args)
@@ -124,6 +127,7 @@ LogExpr_make_literal(PyTypeObject* type_obj,
 }
 
 // make_posiliteral 関数
+// VarIdType のオブジェクトを一つ引数にとる．
 PyObject*
 LogExpr_make_posiliteral(PyTypeObject* type_obj,
 			 PyObject* args)
@@ -140,6 +144,7 @@ LogExpr_make_posiliteral(PyTypeObject* type_obj,
 }
 
 // make_negaliteral 関数
+// VarIdType のオブジェクトを一つ引数にとる．
 PyObject*
 LogExpr_make_negaliteral(PyTypeObject* type_obj,
 			 PyObject* args)
@@ -156,6 +161,7 @@ LogExpr_make_negaliteral(PyTypeObject* type_obj,
 }
 
 // make_and 関数
+// LogExprType のオブジェクトのタプルを一つ引数にとる．
 PyObject*
 LogExpr_make_and(PyTypeObject* type_obj,
 		 PyObject* args)
@@ -183,6 +189,7 @@ LogExpr_make_and(PyTypeObject* type_obj,
 }
 
 // make_or 関数
+// LogExprType のオブジェクトのタプルを一つ引数にとる．
 PyObject*
 LogExpr_make_or(PyTypeObject* type_obj,
 		PyObject* args)
@@ -210,6 +217,7 @@ LogExpr_make_or(PyTypeObject* type_obj,
 }
 
 // make_xor 関数
+// LogExprType のオブジェクトのタプルを一つ引数にとる．
 PyObject*
 LogExpr_make_xor(PyTypeObject* type_obj,
 		 PyObject* args)
@@ -237,11 +245,166 @@ LogExpr_make_xor(PyTypeObject* type_obj,
 }
 
 // not 関数
+// 引数をとらない．
 PyObject*
 LogExpr_not(LogExprObject* self,
 	    PyObject* args)
 {
   return conv_to_pyobject(~(*self->mLogExpr));
+}
+
+// compose 関数
+// VarIdType と LogExprType のオブジェクトを引数にとる．
+PyObject*
+LogExpr_compose(LogExprObject* self,
+		PyObject* args)
+{
+  PyObject* obj1 = NULL;
+  PyObject* obj2 = NULL;
+  if ( !PyArg_ParseTuple(args, "O!O!", &VarIdType, &obj1, &LogExprType, &obj2) ) {
+    return NULL;
+  }
+  VarId vid;
+  if ( !conv_from_pyobject(obj1, vid) ) {
+    return NULL;
+  }
+  LogExpr sub_expr;
+  if ( !conv_from_pyobject(obj2, sub_expr) ) {
+    return NULL;
+  }
+
+  return conv_to_pyobject(self->mLogExpr->compose(vid, sub_expr));
+}
+
+// multi_compose 関数
+// VarIdType:LogExpr の連想配列を引数にとる．
+PyObject*
+LogExpr_multi_compose(LogExprObject* self,
+		      PyObject* args)
+{
+  PyObject* obj = NULL;
+  if ( !PyArg_ParseTuple(args, "O!", &PyDict_Type, &obj) ) {
+    return NULL;
+  }
+
+  VarLogExprMap comp_map;
+  PyObject* item_list = PyDict_Items(obj);
+  ymuint n = PyList_GET_SIZE(item_list);
+  for (ymuint i = 0; i < n; ++ i) {
+    PyObject* item = PyList_GET_ITEM(item_list, i);
+    if ( !PyTuple_Check(item) || PyTuple_GET_SIZE(item) != 2 ) {
+      PyErr_SetString(ErrorObject, "A dictionary of (VarId, LogExpr) is expected");
+      return NULL;
+    }
+    PyObject* vid_obj = PyTuple_GET_ITEM(item, 0);
+    if ( !VarIdObject_Check(vid_obj) ) {
+      PyErr_SetString(ErrorObject, "A dictionary of (VarId, LogExpr) is expected");
+      return NULL;
+    }
+    VarId vid;
+    if ( !conv_from_pyobject(vid_obj, vid) ) {
+      return NULL;
+    }
+
+    PyObject* sub_obj = PyTuple_GET_ITEM(item, 1);
+    if ( !LogExprObject_Check(sub_obj) ) {
+      PyErr_SetString(ErrorObject, "A dictionary of (VarId, LogExpr) is expected");
+      return NULL;
+    }
+    LogExpr sub_expr;
+    if ( !conv_from_pyobject(sub_obj, sub_expr) ) {
+      return NULL;
+    }
+    comp_map.insert(make_pair(vid, sub_expr));
+  }
+
+  return conv_to_pyobject(self->mLogExpr->compose(comp_map));
+}
+
+// remap_var 関数
+// VarIdType:VarIdType の連想配列を引数にとる．
+PyObject*
+LogExpr_remap_var(LogExprObject* self,
+		  PyObject* args)
+{
+  PyObject* obj = NULL;
+  if ( !PyArg_ParseTuple(args, "O!", &PyDict_Type, &obj) ) {
+    return NULL;
+  }
+
+  VarVarMap var_map;
+  PyObject* item_list = PyDict_Items(obj);
+  ymuint n = PyList_GET_SIZE(item_list);
+  for (ymuint i = 0; i < n; ++ i) {
+    PyObject* item = PyList_GET_ITEM(item_list, i);
+    if ( !PyTuple_Check(item) || PyTuple_GET_SIZE(item) != 2 ) {
+      PyErr_SetString(ErrorObject, "A dictionary of (VarId, VarId) is expected");
+      return NULL;
+    }
+    PyObject* vid_obj = PyTuple_GET_ITEM(item, 0);
+    if ( !VarIdObject_Check(vid_obj) ) {
+      PyErr_SetString(ErrorObject, "A dictionary of (VarId, VarId) is expected");
+      return NULL;
+    }
+    VarId vid;
+    if ( !conv_from_pyobject(vid_obj, vid) ) {
+      return NULL;
+    }
+
+    PyObject* new_vid_obj = PyTuple_GET_ITEM(item, 1);
+    if ( !VarIdObject_Check(new_vid_obj) ) {
+      PyErr_SetString(ErrorObject, "A dictionary of (VarId, VarId) is expected");
+      return NULL;
+    }
+    VarId new_vid;
+    if ( !conv_from_pyobject(new_vid_obj, new_vid) ) {
+      return NULL;
+    }
+    var_map.insert(make_pair(vid, new_vid));
+  }
+
+  return conv_to_pyobject(self->mLogExpr->remap_var(var_map));
+}
+
+// simplify 関数
+// 引数をとらない．
+// 返り値もない．
+PyObject*
+LogExpr_simplify(LogExprObject* self,
+		 PyObject* args)
+{
+  self->mLogExpr->simplify();
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+// eval 関数
+// 入力値を表す ulong のタプルとマスクを表す ulong を引数にとる．
+// マスクが省略された場合は All 1 を仮定する．
+// 評価結果の ulong を返す．
+PyObject*
+LogExpr_eval(LogExprObject* self,
+	     PyObject* args)
+{
+  PyObject* obj1 = NULL;
+  ymulong mask = ~0UL;
+  if ( !PyArg_ParseTuple(args, "O!|k", &PyTuple_Type, &obj1, &mask) ) {
+    return NULL;
+  }
+  ymuint n = PyTuple_GET_SIZE(obj1);
+  vector<ymulong> vals(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    PyObject* val_obj = PyTuple_GET_ITEM(obj1, i);
+    ymulong val;
+    if ( !PyArg_ParseTuple(val_obj, "k", &val) ) {
+      return NULL;
+    }
+    vals[i] = val;
+  }
+  ymulong val = self->mLogExpr->eval(vals, mask);
+
+  return Py_BuildValue("k", val);
 }
 
 // LogExprObject のメソッドテーブル
@@ -259,9 +422,21 @@ PyMethodDef LogExpr_methods[] = {
   {"make_and", (PyCFunction)LogExpr_make_and, METH_STATIC | METH_VARARGS,
    PyDoc_STR("make and (Tuple of LogExpr)")},
   {"make_or", (PyCFunction)LogExpr_make_or, METH_STATIC | METH_VARARGS,
-   PyDoc_STR("make and (Tuple of LogExpr)")},
+   PyDoc_STR("make or (Tuple of LogExpr)")},
   {"make_xor", (PyCFunction)LogExpr_make_xor, METH_STATIC | METH_VARARGS,
-   PyDoc_STR("make and (Tuple of LogExpr)")},
+   PyDoc_STR("make xor (Tuple of LogExpr)")},
+  {"not", (PyCFunction)LogExpr_not, METH_NOARGS,
+   PyDoc_STR("return ~self (NONE)")},
+  {"compose", (PyCFunction)LogExpr_compose, METH_VARARGS,
+   PyDoc_STR("compose(vid, sub_expr) (VarId, LogExpr)")},
+  {"multi_compose", (PyCFunction)LogExpr_multi_compose, METH_VARARGS,
+   PyDoc_STR("multi_compose( dictionay of (VarId, sub_expr) )")},
+  {"remap_var", (PyCFunction)LogExpr_remap_var, METH_VARARGS,
+   PyDoc_STR("remap variables( dictionay of (VarId, VarId) )")},
+  {"simplify", (PyCFunction)LogExpr_simplify, METH_NOARGS,
+   PyDoc_STR("simplify (NONE)")},
+  {"eval", (PyCFunction)LogExpr_eval, METH_VARARGS,
+   PyDoc_STR("evaluate bitvector ( tuple of ulong, ulong )")},
   {NULL, NULL, 0, NULL}
 };
 
