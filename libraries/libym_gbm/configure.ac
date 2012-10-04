@@ -69,6 +69,12 @@ AC_TYPE_SIZE_T
 
 
 # ===================================================================
+# Check for Python environment
+# ===================================================================
+YM_CHECK_PYTHON
+
+
+# ===================================================================
 # Check for C++ language
 # ===================================================================
 AC_LANG_CPLUSPLUS
@@ -89,6 +95,7 @@ AC_SUBST([YMTOOLS_BUILDDIR])
 # ===================================================================
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([ym_gbm/Makefile])
+AC_CONFIG_FILES([pylib/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 
 

@@ -35,4 +35,12 @@ using nsGbm::Gbm;
 
 END_NAMESPACE_YM
 
+BEGIN_EXTERN_C
+
+// Python 用 gbm モジュールの初期化関数
+void
+gbmpy_init();
+
+END_EXTERN_C
+
 #endif // GBM_NSDEF_H

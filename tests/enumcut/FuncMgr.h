@@ -45,6 +45,11 @@ public:
   void
   reg_func(const TvFunc& f);
 
+  /// @brief マージする．
+  /// @param[in] src マージする他のマネージャ
+  void
+  merge(const FuncMgr& src);
+
   /// @brief 関数のリストを取り出す．
   void
   func_list(vector<TvFunc>& func_list) const;

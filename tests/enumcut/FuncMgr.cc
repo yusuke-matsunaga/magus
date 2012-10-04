@@ -75,6 +75,18 @@ FuncMgr::reg_func(const TvFunc& f)
   new_data(f);
 }
 
+// @brief マージする．
+// @param[in] src マージする他のマネージャ
+void
+FuncMgr::merge(const FuncMgr& src)
+{
+  for (ymuint i = 0; i < src.mTableSize; ++ i) {
+    for (FuncData* data = src.mTable[i]; data; data = data->mLink) {
+      reg_func(data->mFunc);
+    }
+  }
+}
+
 // @brief 関数のリストを取り出す．
 void
 FuncMgr::func_list(vector<TvFunc>& func_list) const

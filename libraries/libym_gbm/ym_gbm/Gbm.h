@@ -88,12 +88,10 @@ public:
   new_lut(const vector<GbmNodeHandle>& inputs);
 
   /// @brief Boolean Matching を解く．
-  /// @param[in] lhs 左辺のハンドル
-  /// @param[in] rhs 右辺のハンドル
+  /// @param[in] sat_var 1にする変数
   /// @param[out] model 真理値変数の割り当て結果
   Bool3
-  solve(GbmNodeHandle lhs,
-	GbmNodeHandle rhs,
+  solve(GbmNodeHandle sat_var,
 	vector<Bool3>& model);
 
 
