@@ -556,7 +556,17 @@ Bdd_onepath(BddObject* self,
 	    PyObject* args)
 {
   BddLitSet bdd_litset = self->mBdd->onepath();
-  // これを Literal のタプルに変換
+  ymuint n = bdd_litset.size();
+  PyObject* ans_list = PyList_New(n);
+  ymuint i = 0;
+  for (BddLitSet::iterator p = bdd_litset.begin();
+       p != bdd_litset.end(); ++ p, ++ i) {
+    Literal lit = *p;
+    PyObject* obj = conv_to_pyobject(lit);
+    PyList_SetItem(ans_list, i, obj);
+  }
+
+  return ans_list;
 }
 
 // shortest_onepath 関数
@@ -565,7 +575,17 @@ Bdd_shortest_onepath(BddObject* self,
 		     PyObject* args)
 {
   BddLitSet bdd_litset = self->mBdd->shortest_onepath();
-  // これを Literal のタプルに変換
+  ymuint n = bdd_litset.size();
+  PyObject* ans_list = PyList_New(n);
+  ymuint i = 0;
+  for (BddLitSet::iterator p = bdd_litset.begin();
+       p != bdd_litset.end(); ++ p, ++ i) {
+    Literal lit = *p;
+    PyObject* obj = conv_to_pyobject(lit);
+    PyList_SetItem(ans_list, i, obj);
+  }
+
+  return ans_list;
 }
 
 // shortest_onpath_len 関数
@@ -581,6 +601,17 @@ PyObject*
 Bdd_support(BddObject* self,
 	    PyObject* args)
 {
+  VarVector sup;
+  self->mBdd->support(sup);
+  ymuint n = sup.size();
+  PyObject* ans_list = PyList_New(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    VarId vid = sup[i];
+    PyObject* obj = conv_to_pyobject(vid);
+    PyList_SetItem(ans_list, i, obj);
+  }
+
+  return ans_list;
 }
 
 // print 関数
@@ -588,6 +619,11 @@ PyObject*
 Bdd_print(BddObject* self,
 	  PyObject* args)
 {
+  // 手抜き
+  self->mBdd->print(cout);
+
+  Py_INCREF(Py_None);
+  return Py_None;
 }
 
 // BddObject のメソッドテーブル
@@ -596,10 +632,72 @@ PyMethodDef Bdd_methods[] = {
    PyDoc_STR("check if constant 0 (NONE)")},
   {"is_one", (PyCFunction)Bdd_is_one, METH_NOARGS,
    PyDoc_STR("check if constant 1 (NONE)")},
+  {"is_const", (PyCFunction)Bdd_is_const, METH_NOARGS,
+   PyDoc_STR("check if constant (NONE)")},
   {"is_overflow", (PyCFunction)Bdd_is_overflow, METH_NOARGS,
    PyDoc_STR("check if overflow (NONE)")},
   {"is_error", (PyCFunction)Bdd_is_error, METH_NOARGS,
    PyDoc_STR("check if error (NONE)")},
+  {"is_invalid", (PyCFunction)Bdd_is_invalid, METH_NOARGS,
+   PyDoc_STR("check if invalide (overflow or error) (NONE)")},
+  {"is_leaf", (PyCFunction)Bdd_is_leaf, METH_NOARGS,
+   PyDoc_STR("check if leaf (NONE)")},
+  {"is_posi_cube", (PyCFunction)Bdd_is_posi_cube, METH_NOARGS,
+   PyDoc_STR("check if representing a potivie cube function (NONE)")},
+  {"is_cube", (PyCFunction)Bdd_is_cube, METH_NOARGS,
+   PyDoc_STR("check if representing a cube function (NONE)")},
+  {"check_symmetry", (PyCFunction)Bdd_check_symmetry, METH_VARARGS,
+   PyDoc_STR("check symmetry (VarId, VarId, ?Pol)")},
+  {"set_zero", (PyCFunction)Bdd_set_zero, METH_NOARGS,
+   PyDoc_STR("set constant 0 (NONE)")},
+  {"set_one", (PyCFunction)Bdd_set_one, METH_NOARGS,
+   PyDoc_STR("set constant 1 (NONE)")},
+  {"set_overflow", (PyCFunction)Bdd_set_overflow, METH_NOARGS,
+   PyDoc_STR("set overflow (NONE)")},
+  {"set_error", (PyCFunction)Bdd_set_error, METH_NOARGS,
+   PyDoc_STR("set error (NONE)")},
+  {"invert", (PyCFunction)Bdd_invert, METH_NOARGS,
+   PyDoc_STR("return inverted function (NONE)")},
+  {"root_decomp", (PyCFunction)Bdd_root_decomp, METH_NOARGS,
+   PyDoc_STR("decompose on root node (NONE)")},
+  {"root_var", (PyCFunction)Bdd_root_var, METH_NOARGS,
+   PyDoc_STR("return root variable (NONE)")},
+  {"edge0", (PyCFunction)Bdd_edge0, METH_NOARGS,
+   PyDoc_STR("return root's edge0 function (NONE)")},
+  {"edge1", (PyCFunction)Bdd_edge1, METH_NOARGS,
+   PyDoc_STR("return root's edge1 function (NONE)")},
+  {"cofactor", (PyCFunction)Bdd_cofactor, METH_VARARGS,
+   PyDoc_STR("return cofactor (VarId, Pol)")},
+  {"xor_moment", (PyCFunction)Bdd_xor_moment, METH_VARARGS,
+   PyDoc_STR("return XOR mement coefficient (VarId)")},
+  {"SCC", (PyCFunction)Bdd_SCC, METH_NOARGS,
+   PyDoc_STR("return the smallest cube containg F (SCC(F)) (NONE)")},
+  {"compose", (PyCFunction)Bdd_compose, METH_VARARGS,
+   PyDoc_STR("do composition operation (VarId, Bdd)")},
+  {"multi_compose", (PyCFunction)Bdd_multi_compose, METH_VARARGS,
+   PyDoc_STR("do multi-variable composition operation (dictionary of (VarId: Bdd))")},
+  {"remap_var", (PyCFunction)Bdd_remap_var, METH_VARARGS,
+   PyDoc_STR("do remapping variables (dictionary of (VarId : VarId))")},
+  {"esmooth", (PyCFunction)Bdd_esmooth, METH_VARARGS,
+   PyDoc_STR("do existential smoothing (list of VarId)")},
+  {"asmooth", (PyCFunction)Bdd_asmooth, METH_VARARGS,
+   PyDoc_STR("do universal (all) smoothing (list of VarId)")},
+  {"push_down", (PyCFunction)Bdd_push_down, METH_VARARGS,
+   PyDoc_STR("do push-down operation (uint, uint, ?Pol)")},
+  {"sop", (PyCFunction)Bdd_sop, METH_NOARGS,
+   PyDoc_STR("return SOP expression (NONE)")},
+  {"node_count", (PyCFunction)Bdd_node_count, METH_NOARGS,
+   PyDoc_STR("return node count (NONE)")},
+  {"onepath", (PyCFunction)Bdd_onepath, METH_NOARGS,
+   PyDoc_STR("return one-path (NONE)")},
+  {"shortest_onepath", (PyCFunction)Bdd_shortest_onepath, METH_NOARGS,
+   PyDoc_STR("return the shortest path (NONE)")},
+  {"shortest_onepath_len", (PyCFunction)Bdd_shortest_onepath_len, METH_NOARGS,
+   PyDoc_STR("return the length of the shortest path (NONE)")},
+  {"support", (PyCFunction)Bdd_onepath, METH_NOARGS,
+   PyDoc_STR("return the support set (NONE)")},
+  {"print", (PyCFunction)Bdd_print, METH_NOARGS,
+   PyDoc_STR("print out the contents (NONE)")},
   {NULL, NULL, 0, NULL}
 };
 
