@@ -323,12 +323,6 @@ extern
 PyObject*
 conv_to_pyobject(const Bdd& obj);
 
-/// @brief AigMgr から PyObject を生成する．
-/// @param[in] obj AigMgr オブジェクト
-extern
-PyObject*
-conv_to_pyobject(const AigMgr& obj);
-
 /// @brief Aig から PyObject を生成する．
 /// @param[in] obj Aig オブジェクト
 extern

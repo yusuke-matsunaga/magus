@@ -42,24 +42,9 @@ public:
   ymuint
   input_num() const;
 
-#if 0
-  /// @brief 入力ノードを取り出す．
-  /// @param[in] id 入力番号
-  const AigNode*
-  input_node(VarId id) const;
-#endif
-
   /// @brief ノード数を得る．
   ymuint
   node_num() const;
-
-#if 0
-  /// @brief ノードを取り出す．
-  /// @param[in] pos ノード番号 ( 0 <= pos < node_num() )
-  /// @note ANDノードの他に入力ノードも含まれる．
-  const AigNode*
-  node(ymuint pos) const;
-#endif
 
   /// @brief 内容を出力する．
   /// @param[in] s 出力先のストリーム
