@@ -18,6 +18,7 @@ libym_logic_pylib_la_CPPFLAGS = \
 libym_logic_pylib_la_SOURCES = \
 	logicpy.h \
 	logicpy_init.cc \
+	logicpy_Bool3.cc \
 	logicpy_VarId.cc \
 	logicpy_Pol.cc \
 	logicpy_Literal.cc \

@@ -11,7 +11,7 @@
 // logicpy モジュール
 //////////////////////////////////////////////////////////////////////
 
-#include "logicpy.h"
+#include "ym_logic/logicpy.h"
 
 
 BEGIN_NAMESPACE_LOGICPY
@@ -19,10 +19,15 @@ BEGIN_NAMESPACE_LOGICPY
 // エラー用のオブジェクト
 PyObject* ErrorObject = NULL;
 
+
+BEGIN_NONAMESPACE
+
 // メソッドテーブル
 PyMethodDef logic_methods[] = {
   {NULL, NULL}
 };
+
+END_NONAMESPACE
 
 END_NAMESPACE_LOGICPY
 
@@ -33,6 +38,10 @@ logic_init()
   using namespace nsYm::nsLogicpy;
 
   PyObject* m;
+
+  if ( PyType_Ready(&Bool3Type) < 0 ) {
+    return;
+  }
 
   if ( PyType_Ready(&VarIdType) < 0 ) {
     return;
@@ -58,7 +67,6 @@ logic_init()
     return;
   }
 
-#if 0
   if ( PyType_Ready(&AigMgrType) < 0 ) {
     return;
   }
@@ -70,7 +78,6 @@ logic_init()
   if ( PyType_Ready(&SatSolverType) < 0 ) {
     return;
   }
-#endif
 
   // モジュールオブジェクトの生成
   PyDoc_STRVAR(module_doc,
@@ -90,8 +97,12 @@ logic_init()
     }
   }
   Py_INCREF(ErrorObject);
+
   // logic モジュールに追加
   PyModule_AddObject(m, "error", ErrorObject);
+
+  // Bool3 オブジェクトタイプの登録
+  PyModule_AddObject(m, "Bool3", (PyObject*)&Bool3Type);
 
   // VarId オブジェクトタイプの登録
   PyModule_AddObject(m, "VarId", (PyObject*)&VarIdType);
@@ -111,7 +122,6 @@ logic_init()
   // Bdd オブジェクトタイプの登録
   PyModule_AddObject(m, "Bdd", (PyObject*)&BddType);
 
-#if 0
   // AigMgr オブジェクトタイプの登録
   PyModule_AddObject(m, "AigMgr", (PyObject*)&AigMgrType);
 
@@ -120,5 +130,5 @@ logic_init()
 
   // SatSolver オブジェクトタイプの登録
   PyModule_AddObject(m, "SatSolver", (PyObject*)&SatSolverType);
-#endif
+
 }

@@ -41,6 +41,7 @@ noinst_HEADERS = \
 	bdd_nsdef.h \
 	cnfdd_nsdef.h \
 	lexp_nsdef.h \
+	logicpy.h \
 	npn_nsdef.h \
 	sat_nsdef.h \
 	zdd_nsdef.h

@@ -1,7 +1,7 @@
-#ifndef LOGICPY_H
-#define LOGICPY_H
+#ifndef YM_LOGIC_LOGICPY_H
+#define YM_LOGIC_LOGICPY_H
 
-/// @file logicpy.h
+/// @file ym_logic/logicpy.h
 /// @brief libym_logic の Python 用の拡張モジュールの定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -13,6 +13,7 @@
 
 
 #include "Python.h"
+#include "ym_logic/Bool3.h"
 #include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
 #include "ym_logic/Literal.h"
@@ -52,6 +53,10 @@ PyObject* ErrorObject;
 //////////////////////////////////////////////////////////////////////
 // 型を表すタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
+
+/// @brief Bool3 を表す型
+extern
+PyTypeObject Bool3Type;
 
 /// @brief VarId を表す型
 extern
@@ -93,6 +98,17 @@ PyTypeObject SatSolverType;
 //////////////////////////////////////////////////////////////////////
 // 型をチェックする関数
 //////////////////////////////////////////////////////////////////////
+
+/// @brief Bool3Type の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が Bool3Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+Bool3Object_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &Bool3Type;
+}
 
 /// @brief VarIdType の型チェック
 /// @param[in] obj Python オブジェクト
@@ -198,6 +214,16 @@ SatSolverObject_Check(PyObject* obj)
 // PyObject からの型変換
 //////////////////////////////////////////////////////////////////////
 
+/// @brief PyObject から Bool3 を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] obj Bool3 を格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した．py_obj が Bool3Object ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   Bool3& obj);
+
 /// @brief PyObject から VarId を取り出す．
 /// @param[in] py_obj Python オブジェクト
 /// @param[out] obj VarId を格納する変数
@@ -266,7 +292,7 @@ conv_from_pyobject(PyObject* py_obj,
 extern
 bool
 conv_from_pyobject(PyObject* py_obj,
-		   AigMgr& obj);
+		   AigMgr* obj);
 
 /// @brief PyObject から Aig を取り出す．
 /// @param[in] py_obj Python オブジェクト
@@ -286,12 +312,18 @@ conv_from_pyobject(PyObject* py_obj,
 extern
 bool
 conv_from_pyobject(PyObject* py_obj,
-		   SatSolver& obj);
+		   SatSolver* obj);
 
 
 //////////////////////////////////////////////////////////////////////
 // PyObject への型変換
 //////////////////////////////////////////////////////////////////////
+
+/// @brief Bool3 から PyObject を生成する．
+/// @param[in] obj Bool3 オブジェクト
+extern
+PyObject*
+conv_to_pyobject(Bool3 obj);
 
 /// @brief VarId から PyObject を生成する．
 /// @param[in] obj VarId オブジェクト
@@ -337,4 +369,16 @@ conv_to_pyobject(SatSolver obj);
 
 END_NAMESPACE_LOGICPY
 
-#endif // LOGICPY_H
+
+//////////////////////////////////////////////////////////////////////
+// 初期化関数
+//////////////////////////////////////////////////////////////////////
+
+BEGIN_EXTERN_C
+
+void
+logic_init();
+
+END_EXTERN_C
+
+#endif // YM_LOGIC_LOGICPY_H
