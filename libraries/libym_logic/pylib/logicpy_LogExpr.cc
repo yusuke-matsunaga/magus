@@ -188,15 +188,10 @@ PyObject*
 LogExpr_make_and(PyTypeObject* type_obj,
 		 PyObject* args)
 {
-  PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &PyTuple_Type, &obj) ) {
-    return NULL;
-  }
-
-  ymuint n = PyTuple_GET_SIZE(obj);
+  ymuint n = PyTuple_GET_SIZE(args);
   LogExprVector child_list(n);
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* chd_obj = PyTuple_GET_ITEM(obj, i);
+    PyObject* chd_obj = PyTuple_GET_ITEM(args, i);
     if ( !LogExprObject_Check(chd_obj) ) {
       PyErr_SetString(ErrorObject, "LogExprObject is expected");
       return NULL;
@@ -216,15 +211,10 @@ PyObject*
 LogExpr_make_or(PyTypeObject* type_obj,
 		PyObject* args)
 {
-  PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &PyTuple_Type, &obj) ) {
-    return NULL;
-  }
-
-  ymuint n = PyTuple_GET_SIZE(obj);
+  ymuint n = PyTuple_GET_SIZE(args);
   LogExprVector child_list(n);
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* chd_obj = PyTuple_GET_ITEM(obj, i);
+    PyObject* chd_obj = PyTuple_GET_ITEM(args, i);
     if ( !LogExprObject_Check(chd_obj) ) {
       PyErr_SetString(ErrorObject, "LogExprObject is expected");
       return NULL;
@@ -244,15 +234,10 @@ PyObject*
 LogExpr_make_xor(PyTypeObject* type_obj,
 		 PyObject* args)
 {
-  PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &PyTuple_Type, &obj) ) {
-    return NULL;
-  }
-
-  ymuint n = PyTuple_GET_SIZE(obj);
+  ymuint n = PyTuple_GET_SIZE(args);
   LogExprVector child_list(n);
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* chd_obj = PyTuple_GET_ITEM(obj, i);
+    PyObject* chd_obj = PyTuple_GET_ITEM(args, i);
     if ( !LogExprObject_Check(chd_obj) ) {
       PyErr_SetString(ErrorObject, "LogExprObject is expected");
       return NULL;
@@ -314,25 +299,17 @@ LogExpr_multi_compose(LogExprObject* self,
   ymuint n = PyList_GET_SIZE(item_list);
   for (ymuint i = 0; i < n; ++ i) {
     PyObject* item = PyList_GET_ITEM(item_list, i);
-    if ( !PyTuple_Check(item) || PyTuple_GET_SIZE(item) != 2 ) {
-      PyErr_SetString(ErrorObject, "A dictionary of (VarId, LogExpr) is expected");
+    PyObject* vid_obj = NULL;
+    PyObject* sub_obj = NULL;
+    if ( !PyArg_ParseTuple(item, "O!O!", &VarIdType, &vid_obj, &LogExprType, &sub_obj) ) {
       return NULL;
     }
-    PyObject* vid_obj = PyTuple_GET_ITEM(item, 0);
-    if ( !VarIdObject_Check(vid_obj) ) {
-      PyErr_SetString(ErrorObject, "A dictionary of (VarId, LogExpr) is expected");
-      return NULL;
-    }
+
     VarId vid;
     if ( !conv_from_pyobject(vid_obj, vid) ) {
       return NULL;
     }
 
-    PyObject* sub_obj = PyTuple_GET_ITEM(item, 1);
-    if ( !LogExprObject_Check(sub_obj) ) {
-      PyErr_SetString(ErrorObject, "A dictionary of (VarId, LogExpr) is expected");
-      return NULL;
-    }
     LogExpr sub_expr;
     if ( !conv_from_pyobject(sub_obj, sub_expr) ) {
       return NULL;
@@ -359,27 +336,19 @@ LogExpr_remap_var(LogExprObject* self,
   ymuint n = PyList_GET_SIZE(item_list);
   for (ymuint i = 0; i < n; ++ i) {
     PyObject* item = PyList_GET_ITEM(item_list, i);
-    if ( !PyTuple_Check(item) || PyTuple_GET_SIZE(item) != 2 ) {
-      PyErr_SetString(ErrorObject, "A dictionary of (VarId, VarId) is expected");
-      return NULL;
-    }
-    PyObject* vid_obj = PyTuple_GET_ITEM(item, 0);
-    if ( !VarIdObject_Check(vid_obj) ) {
-      PyErr_SetString(ErrorObject, "A dictionary of (VarId, VarId) is expected");
-      return NULL;
-    }
-    VarId vid;
-    if ( !conv_from_pyobject(vid_obj, vid) ) {
+    PyObject* obj1 = NULL;
+    PyObject* obj2 = NULL;
+    if ( !PyArg_ParseTuple(item, "O!O!", &VarIdType, &obj1, &VarIdType, &obj2) ) {
       return NULL;
     }
 
-    PyObject* new_vid_obj = PyTuple_GET_ITEM(item, 1);
-    if ( !VarIdObject_Check(new_vid_obj) ) {
-      PyErr_SetString(ErrorObject, "A dictionary of (VarId, VarId) is expected");
+    VarId vid;
+    if ( !conv_from_pyobject(obj1, vid) ) {
       return NULL;
     }
+
     VarId new_vid;
-    if ( !conv_from_pyobject(new_vid_obj, new_vid) ) {
+    if ( !conv_from_pyobject(obj2, new_vid) ) {
       return NULL;
     }
     var_map.insert(make_pair(vid, new_vid));
@@ -538,6 +507,22 @@ LogExpr_child(LogExprObject* self,
   LogExpr child = self->mLogExpr->child(pos);
 
   return conv_to_pyobject(child);
+}
+
+// child_list 関数
+PyObject*
+LogExpr_child_list(LogExprObject* self,
+		   PyObject* args)
+{
+  ymuint n = self->mLogExpr->child_num();
+  PyObject* ans_list = PyList_New(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    LogExpr child = self->mLogExpr->child(i);
+    PyObject* obj = conv_to_pyobject(child);
+    PyList_SetItem(ans_list, i, obj);
+  }
+
+  return ans_list;
 }
 
 // is_simple 関数
@@ -724,6 +709,8 @@ PyMethodDef LogExpr_methods[] = {
    PyDoc_STR("return the number of children (NONE)")},
   {"child", (PyCFunction)LogExpr_child, METH_VARARGS,
    PyDoc_STR("return the n'th child (uint)")},
+  {"child_list", (PyCFunction)LogExpr_child_list, METH_NOARGS,
+   PyDoc_STR("return the children list (NONE)")},
   {"is_simple", (PyCFunction)LogExpr_is_simple, METH_NOARGS,
    PyDoc_STR("return true if simple expression (NONE)")},
   {"is_simple_and", (PyCFunction)LogExpr_is_simple_and, METH_NOARGS,

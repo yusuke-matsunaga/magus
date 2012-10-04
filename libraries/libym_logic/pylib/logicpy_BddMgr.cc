@@ -128,7 +128,7 @@ BddMgr_make_error(BddMgrObject* self,
 }
 
 // make_literal 関数
-// Literal か VarId か (VarId, Pol) を引数にとる．
+// Literal か (VarId, Pol) を引数にとる．
 PyObject*
 BddMgr_make_literal(BddMgrObject* self,
 		    PyObject* args)
@@ -155,12 +155,8 @@ BddMgr_make_literal(BddMgrObject* self,
     lit.set(vid, pol);
   }
   else if ( !conv_from_pyobject(obj1, lit) ) {
-    VarId vid;
-    if ( !conv_from_pyobject(obj1, vid) ) {
-      PyErr_SetString(ErrorObject, "must be logic.Literal or logic.VarId");
-      return NULL;
-    }
-    lit.set(vid, kPolPosi);
+    PyErr_SetString(ErrorObject, "must be logic.Literal");
+    return NULL;
   }
 
   return conv_to_pyobject(self->mMgr->make_literal(lit));

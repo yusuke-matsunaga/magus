@@ -60,6 +60,14 @@ def logexpr_check(expr, name) :
             sub = expr.child(i)
             print " child(%d)                  => %s" % (i, sub)
 
+        clist = expr.child_list()
+        print " child_list                => [",
+        comma = ""
+        for child in clist :
+            print "%s%s" % (comma, child),
+            comma = ", "
+        print "]"
+
 # オブジェクトの生成
 c0 = logic.LogExpr.make_zero()
 c1 = logic.LogExpr.make_one()
@@ -76,8 +84,9 @@ expr0 = logic.LogExpr("0 + ~1 & 3")
 expr1 = logic.LogExpr("0 * 1 * ~2")
 expr2 = logic.LogExpr("0 + 2")
 
-expr3 = logic.LogExpr.make_and((l0, l1))
-expr4 = logic.LogExpr.make_xor((l0, l1))
+expr3 = logic.LogExpr.make_and(l0, l1)
+expr4 = logic.LogExpr.make_or(l0, l1)
+expr5 = logic.LogExpr.make_xor(l0, l1)
 
 # 内容の表示 & チェック
 logexpr_check(c0, "zero")
@@ -92,8 +101,9 @@ logexpr_check(expr1, "0 * 1 * ~2")
 logexpr_check(expr0.invert(), "expr0.invert()")
 logexpr_check(expr1.invert(), "expr1.invert()")
 logexpr_check(expr2, "0 + 2")
-logexpr_check(expr3, "make_and((l0, l1))")
-logexpr_check(expr4, "make_xor((l0, l1))")
+logexpr_check(expr3, "make_and(l0, l1)")
+logexpr_check(expr4, "make_or(l0, l1)")
+logexpr_check(expr5, "make_xor(l0, l1)")
 
 # compose のテスト
 expr10 = logic.LogExpr("0 * 1 + ~2")

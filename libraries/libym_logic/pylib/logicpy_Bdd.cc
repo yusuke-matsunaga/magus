@@ -291,13 +291,42 @@ Bdd_edge1(BddObject* self,
 }
 
 // cofactor 関数
+// Literal か (VarId, Pol) を引数にとる．
 PyObject*
 Bdd_cofactor(BddObject* self,
 	     PyObject* args)
 {
+  PyObject* obj1 = NULL;
+  PyObject* obj2 = NULL;
+  if ( !PyArg_ParseTuple(args, "O|O", &obj1, &obj2) ) {
+    return NULL;
+  }
+
+  Literal lit;
+  if ( obj2 != NULL ) {
+    // obj1 は VarId, obj2 は Pol でなければならない．
+    VarId vid;
+    if ( !conv_from_pyobject(obj1, vid) ) {
+      PyErr_SetString(ErrorObject, "must be logic.VarId");
+      return NULL;
+    }
+    tPol pol;
+    if ( !conv_from_pyobject(obj2, pol) ) {
+      PyErr_SetString(ErrorObject, "must be logic.Pol");
+      return NULL;
+    }
+    lit.set(vid, pol);
+  }
+  else if ( !conv_from_pyobject(obj1, lit) ) {
+    PyErr_SetString(ErrorObject, "must be logic.Literal");
+    return NULL;
+  }
+
+  return conv_to_pyobject(self->mBdd->cofactor(lit));
 }
 
 // xor_moment 関数
+// VarId を引数にとる．
 PyObject*
 Bdd_xor_moment(BddObject* self,
 	       PyObject* args)
@@ -352,6 +381,35 @@ PyObject*
 Bdd_multi_compose(BddObject* self,
 		  PyObject* args)
 {
+  PyObject* obj = NULL;
+  if ( !PyArg_ParseTuple(args, "O!", &PyDict_Type, &obj) ) {
+    return NULL;
+  }
+
+  VarBddMap comp_map;
+  PyObject* item_list = PyDict_Items(obj);
+  ymuint n = PyList_GET_SIZE(item_list);
+  for (ymuint i = 0; i < n; ++ i) {
+    PyObject* item = PyList_GET_ITEM(item_list, i);
+    PyObject* vid_obj = NULL;
+    PyObject* sub_obj = NULL;
+    if ( !PyArg_ParseTuple(item, "O!O!", &VarIdType, &vid_obj, &BddType, &sub_obj) ) {
+      return NULL;
+    }
+
+    VarId vid;
+    if ( !conv_from_pyobject(vid_obj, vid) ) {
+      return NULL;
+    }
+
+    Bdd sub_func;
+    if ( !conv_from_pyobject(sub_obj, sub_func) ) {
+      return NULL;
+    }
+    comp_map.insert(make_pair(vid, sub_func));
+  }
+
+  return conv_to_pyobject(self->mBdd->compose(comp_map));
 
 }
 
@@ -360,6 +418,35 @@ PyObject*
 Bdd_remap_var(BddObject* self,
 	      PyObject* args)
 {
+  PyObject* obj = NULL;
+  if ( !PyArg_ParseTuple(args, "O!", &PyDict_Type, &obj) ) {
+    return NULL;
+  }
+
+  VarVarMap var_map;
+  PyObject* item_list = PyDict_Items(obj);
+  ymuint n = PyList_GET_SIZE(item_list);
+  for (ymuint i = 0; i < n; ++ i) {
+    PyObject* item = PyList_GET_ITEM(item_list, i);
+    PyObject* obj1 = NULL;
+    PyObject* obj2 = NULL;
+    if ( !PyArg_ParseTuple(item, "O!O!", &VarIdType, &obj1, &VarIdType, &obj2) ) {
+      return NULL;
+    }
+
+    VarId vid;
+    if ( !conv_from_pyobject(obj1, vid) ) {
+      return NULL;
+    }
+
+    VarId new_vid;
+    if ( !conv_from_pyobject(obj2, new_vid) ) {
+      return NULL;
+    }
+    var_map.insert(make_pair(vid, new_vid));
+  }
+
+  return conv_to_pyobject(self->mBdd->remap_var(var_map));
 }
 
 // esmooth 関数
@@ -367,6 +454,41 @@ PyObject*
 Bdd_esmooth(BddObject* self,
 	    PyObject* args)
 {
+  BddVarSet vset;
+  if ( PyTuple_GET_SIZE(args) == 1 && PyList_Check(PyTuple_GET_ITEM(args, 0)) ) {
+    PyObject* list_obj = PyTuple_GEtITEM(args, 0);
+    ymuint n = PyList_GET_SIZE(list_obj);
+    for (ymuint i = 0; i < n; ++ i) {
+      PyObject* obj = PyList_GET_ITEM(list_obj, i);
+      PyObject* vid_obj = NULL;
+      if ( !PyArg_ParseTuple(obj, "O!", &VarIdType, &vid_obj) ) {
+	return NULL;
+      }
+
+      VarId vid;
+      if ( !conv_from_pyobject(vid_obj, vid) ) {
+	return NULL;
+      }
+    }
+  }
+  else {
+    ymuint n = PyTuple_GET_SIZE(args);
+    for (ymuint i = 0; i < n; ++ i) {
+      PyObject* obj = PyTuple_GET_ITEM(args, i);
+      PyObject* vid_obj = NULL;
+      if ( !PyArg_ParseTuple(obj, "O!", &VarIdType, &vid_obj) ) {
+	return NULL;
+      }
+
+      VarId vid;
+      if ( !conv_from_pyobject(vid_obj, vid) ) {
+	return NULL;
+      }
+
+    }
+  }
+
+  return conv_to_pyobject(self->mBdd->esmooth(vset));
 }
 
 // asmooth 関数
