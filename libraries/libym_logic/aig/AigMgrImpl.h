@@ -95,6 +95,11 @@ private:
 	      ymuint& size,
 	      ymuint& limit);
 
+  /// @brief AigNode* と bool をパックする．
+  static
+  ympuint
+  pack(AigNode* node,
+       bool inv);
 
   /// @brief AigNode のハッシュ関数
   static
@@ -177,7 +182,7 @@ inline
 Aig
 AigMgrImpl::make_zero()
 {
-  return Aig(NULL, false);
+  return Aig(pack(NULL, false));
 }
 
 // @brief 定数1関数をつくる．
@@ -185,7 +190,16 @@ inline
 Aig
 AigMgrImpl::make_one()
 {
-  return Aig(NULL, true);
+  return Aig(pack(NULL, true));
+}
+
+// @brief AigNode* と bool をパックする．
+inline
+ympuint
+AigMgrImpl::pack(AigNode* node,
+		 bool inv)
+{
+  return reinterpret_cast<ympuint>(node) | inv;
 }
 
 // AigNode のハッシュ関数

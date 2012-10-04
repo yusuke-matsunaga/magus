@@ -12,6 +12,17 @@
 
 BEGIN_NAMESPACE_YM_AIG
 
+BEGIN_NONAMESPACE
+
+inline
+AigNode*
+unpack_node(ympuint pack)
+{
+  return reinterpret_cast<AigNode*>(pack & ~1UL);
+}
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス Aig
 //////////////////////////////////////////////////////////////////////
@@ -20,7 +31,7 @@ BEGIN_NAMESPACE_YM_AIG
 ymuint
 Aig::node_id() const
 {
-  AigNode* aignode = node();
+  AigNode* aignode = unpack_node(mPackedData);
   if ( aignode ) {
     return aignode->node_id();
   }
@@ -33,7 +44,7 @@ Aig::node_id() const
 bool
 Aig::is_input() const
 {
-  AigNode* aignode = node();
+  AigNode* aignode = unpack_node(mPackedData);
   return aignode != NULL && aignode->is_input();
 }
 
@@ -42,7 +53,7 @@ Aig::is_input() const
 VarId
 Aig::input_id() const
 {
-  AigNode* aignode = node();
+  AigNode* aignode = unpack_node(mPackedData);
   if ( aignode ) {
     return aignode->input_id();
   }
@@ -55,7 +66,7 @@ Aig::input_id() const
 bool
 Aig::is_and() const
 {
-  AigNode* aignode = node();
+  AigNode* aignode = unpack_node(mPackedData);
   return aignode != NULL && aignode->is_and();
 }
 
@@ -65,7 +76,7 @@ Aig::is_and() const
 Aig
 Aig::fanin(ymuint pos) const
 {
-  AigNode* aignode = node();
+  AigNode* aignode = unpack_node(mPackedData);
   if ( aignode ) {
     return aignode->fanin(pos);
   }
@@ -79,7 +90,7 @@ Aig::fanin(ymuint pos) const
 Aig
 Aig::fanin0() const
 {
-  AigNode* aignode = node();
+  AigNode* aignode = unpack_node(mPackedData);
   if ( aignode ) {
     return aignode->fanin0();
   }
@@ -93,7 +104,7 @@ Aig::fanin0() const
 Aig
 Aig::fanin1() const
 {
-  AigNode* aignode = node();
+  AigNode* aignode = unpack_node(mPackedData);
   if ( aignode ) {
     return aignode->fanin1();
   }
@@ -109,21 +120,17 @@ ostream&
 operator<<(ostream& s,
 	   Aig src)
 {
-  bool inv = src.inv();
-  AigNode* node = src.node();
-  if ( node ) {
-    if ( inv ) {
-      s << "~";
-    }
-    s << node->node_id();
+  if ( src.is_zero() ) {
+    s << "CONST0";
+  }
+  else if ( src.is_one() ) {
+    s << "CONST1";
   }
   else {
-    if ( inv ) {
-      s << "CONST1";
+    if ( src.inv() ) {
+      s << "~";
     }
-    else {
-      s << "CONST0";
-    }
+    s << src.node_id();
   }
   return s;
 }

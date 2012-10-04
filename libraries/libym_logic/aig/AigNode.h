@@ -60,7 +60,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ファンインに関する情報を得る関数
   //////////////////////////////////////////////////////////////////////
-
+#if 0
   /// @brief pos で指示されたファンインのノードを得る．
   /// @note pos は 0 か 1 でなければならない．
   AigNode*
@@ -73,6 +73,7 @@ public:
   /// @brief fanin1 のノードを得る．
   AigNode*
   fanin1_node() const;
+#endif
 
   /// @brief pos で指示されたファンインの極性を得る．
   /// @note pos は 0 か 1 でなければならない．
@@ -186,6 +187,7 @@ AigNode::input_id() const
   return VarId(mFanins[0].mPackedData);
 }
 
+#if 0
 // pos で指示されたファンインのノードを得る．
 // pos は 0 か 1 でなければならない．
 inline
@@ -210,6 +212,7 @@ AigNode::fanin1_node() const
 {
   return mFanins[1].node();
 }
+#endif
 
 // pos で指示されたファンインの極性を得る．
 // pos は 0 か 1 でなければならない．
