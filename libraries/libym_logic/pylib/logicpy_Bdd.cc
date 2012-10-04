@@ -10,6 +10,7 @@
 #include "logicpy.h"
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddLitSet.h"
+#include "ym_logic/BddVarSet.h"
 
 
 BEGIN_NAMESPACE_LOGICPY
@@ -454,9 +455,9 @@ PyObject*
 Bdd_esmooth(BddObject* self,
 	    PyObject* args)
 {
-  BddVarSet vset;
+  BddVarSet vset(*self->mBdd);
   if ( PyTuple_GET_SIZE(args) == 1 && PyList_Check(PyTuple_GET_ITEM(args, 0)) ) {
-    PyObject* list_obj = PyTuple_GEtITEM(args, 0);
+    PyObject* list_obj = PyTuple_GET_ITEM(args, 0);
     ymuint n = PyList_GET_SIZE(list_obj);
     for (ymuint i = 0; i < n; ++ i) {
       PyObject* obj = PyList_GET_ITEM(list_obj, i);
