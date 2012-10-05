@@ -1,17 +1,13 @@
 
-/// @file logicpy_test.cc
-/// @brief logicpy のテストプログラム
+/// @file pylogic_test.cc
+/// @brief pylogic のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "logicpy.h"
-
-extern "C" {
-  void logic_init();
-}
+#include "ym_logic/pylogic.h"
 
 int
 main(int argc,
@@ -24,7 +20,7 @@ main(int argc,
   // Python インタプリタを初期化する．
   Py_Initialize();
 
-  // logicpy モジュールを初期化する．
+  // pylogic モジュールを初期化する．
   logic_init();
 
   int stat = Py_Main(argc, argv);

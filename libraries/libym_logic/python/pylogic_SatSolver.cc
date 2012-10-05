@@ -1,5 +1,5 @@
 
-/// @file logicpy_SatSolver.cc
+/// @file pylogic_SatSolver.cc
 /// @brief SatSolver の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,12 +7,12 @@
 /// All rights reserved.
 
 
-#include "logicpy.h"
+#include "ym_logic/pylogic.h"
 #include "ym_logic/SatSolver.h"
 #include "ym_logic/SatStats.h"
 
 
-BEGIN_NAMESPACE_LOGICPY
+BEGIN_NAMESPACE_YM_PYTHON
 
 BEGIN_NONAMESPACE
 
@@ -389,4 +389,4 @@ conv_from_pyobject(PyObject* py_obj,
   return true;
 }
 
-END_NAMESPACE_LOGICPY
+END_NAMESPACE_YM_PYTHON

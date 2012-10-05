@@ -22,9 +22,11 @@ noinst_HEADERS = \
 	MFSet.h \
 	MsgHandler.h \
 	MsgMgr.h \
+	MStopWatch.h \
 	NameMgr.h \
 	RandGen.h \
 	RefCount.h \
+	USTime.h \
 	ShString.h \
 	StopWatch.h \
 	StrBuff.h \

@@ -10,6 +10,6 @@ SUBDIRS = \
 	npn \
 	sat \
 	aig \
-	pylib
+	python
 
 MAINTAINERCLEANFILES = Makefile.in

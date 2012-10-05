@@ -1,5 +1,5 @@
 
-/// @file logicpy_LogExpr.cc
+/// @file pylogic_LogExpr.cc
 /// @brief LogExpr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "logicpy.h"
+#include "ym_logic/pylogic.h"
 #include "ym_logic/LogExpr.h"
 
 
-BEGIN_NAMESPACE_LOGICPY
+BEGIN_NAMESPACE_YM_PYTHON
 
 BEGIN_NONAMESPACE
 
@@ -820,4 +820,4 @@ conv_to_pyobject(const LogExpr& obj)
   return (PyObject*)logexpr_obj;
 }
 
-END_NAMESPACE_LOGICPY
+END_NAMESPACE_YM_PYTHON

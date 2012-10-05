@@ -1,5 +1,5 @@
 
-/// @file logicpy_VarId.cc
+/// @file pylogic_VarId.cc
 /// @brief VarId の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "logicpy.h"
+#include "ym_logic/pylogic.h"
 #include "ym_logic/VarId.h"
 
 
-BEGIN_NAMESPACE_LOGICPY
+BEGIN_NAMESPACE_YM_PYTHON
 
 BEGIN_NONAMESPACE
 
@@ -49,21 +49,6 @@ VarId_new(PyTypeObject* type)
   return self;
 }
 
-// 比較関数
-int
-VarId_compare(VarIdObject* left,
-	      VarIdObject* right)
-{
-  int diff = left->mVal - right->mVal;
-  if ( diff < 0 ) {
-    return -1;
-  }
-  if ( diff == 0 ) {
-    return 0;
-  }
-  return 1;
-}
-
 // VarIdObject を開放する関数
 void
 VarId_dealloc(VarIdObject* self)
@@ -88,6 +73,21 @@ VarId_init(VarIdObject* self,
   self->mVal = val;
 
   return 0;
+}
+
+// 比較関数
+int
+VarId_compare(VarIdObject* left,
+	      VarIdObject* right)
+{
+  int diff = left->mVal - right->mVal;
+  if ( diff < 0 ) {
+    return -1;
+  }
+  if ( diff == 0 ) {
+    return 0;
+  }
+  return 1;
 }
 
 // str 関数
@@ -227,4 +227,4 @@ conv_to_pyobject(VarId obj)
   return (PyObject*)varid_obj;
 }
 
-END_NAMESPACE_LOGICPY
+END_NAMESPACE_YM_PYTHON

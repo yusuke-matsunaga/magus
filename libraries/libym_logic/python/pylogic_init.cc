@@ -1,5 +1,5 @@
 
-/// @file logicpy_init.cc
+/// @file pylogic_init.cc
 /// @brief libym_logic の Python 用拡張モジュールの初期化
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -8,17 +8,13 @@
 
 
 //////////////////////////////////////////////////////////////////////
-// logicpy モジュール
+// pylogic モジュール
 //////////////////////////////////////////////////////////////////////
 
-#include "ym_logic/logicpy.h"
+#include "ym_logic/pylogic.h"
 
 
-BEGIN_NAMESPACE_LOGICPY
-
-// エラー用のオブジェクト
-PyObject* ErrorObject = NULL;
-
+BEGIN_NAMESPACE_YM_PYTHON
 
 BEGIN_NONAMESPACE
 
@@ -29,13 +25,13 @@ PyMethodDef logic_methods[] = {
 
 END_NONAMESPACE
 
-END_NAMESPACE_LOGICPY
+END_NAMESPACE_YM_PYTHON
 
 
 PyMODINIT_FUNC
 logic_init()
 {
-  using namespace nsYm::nsLogicpy;
+  using namespace nsYm::nsPython;
 
   PyObject* m;
 
@@ -87,6 +83,7 @@ logic_init()
     return;
   }
 
+#if 0
   // エラーオブジェクトの生成
   if ( ErrorObject == NULL ) {
     // PyErr_NewException の第1引数は char* なので変数を用意する．
@@ -97,6 +94,7 @@ logic_init()
     }
   }
   Py_INCREF(ErrorObject);
+#endif
 
   // logic モジュールに追加
   PyModule_AddObject(m, "error", ErrorObject);

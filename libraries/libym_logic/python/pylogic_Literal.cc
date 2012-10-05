@@ -1,5 +1,5 @@
 
-/// @file logicpy_Literal.cc
+/// @file pylogic_Literal.cc
 /// @brief Literal の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "logicpy.h"
+#include "ym_logic/pylogic.h"
 #include "ym_logic/Literal.h"
 
 
-BEGIN_NAMESPACE_LOGICPY
+BEGIN_NAMESPACE_YM_PYTHON
 
 BEGIN_NONAMESPACE
 
@@ -310,4 +310,4 @@ conv_to_pyobject(Literal obj)
   return (PyObject*)literal_obj;
 }
 
-END_NAMESPACE_LOGICPY
+END_NAMESPACE_YM_PYTHON

@@ -1,5 +1,5 @@
-#ifndef YM_LOGIC_LOGICPY_H
-#define YM_LOGIC_LOGICPY_H
+#ifndef YM_LOGIC_PYLOGIC_H
+#define YM_LOGIC_PYLOGIC_H
 
 /// @file ym_logic/logicpy.h
 /// @brief libym_logic の Python 用の拡張モジュールの定義ファイル
@@ -8,11 +8,8 @@
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
-/// 基本的にこのファイルはローカルなのでユーザーが参照することはない．
-/// 内部でよく用いる定義がまとめてあるだけ．
 
-
-#include "Python.h"
+#include "ympython.h"
 #include "ym_logic/Bool3.h"
 #include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
@@ -23,32 +20,7 @@
 #include "ym_logic/sat_nsdef.h"
 
 
-//////////////////////////////////////////////////////////////////////
-// 名前空間の定義
-//////////////////////////////////////////////////////////////////////
-
-/// @brief logicpy 用の名前空間の開始
-#define BEGIN_NAMESPACE_LOGICPY			\
-  BEGIN_NAMESPACE_YM \
-  BEGIN_NAMESPACE(nsLogicpy)
-
-/// @brief logicpy 用の名前空間の終了
-#define END_NAMESPACE_LOGICPY			\
-  END_NAMESPACE(nsLogicpy)			\
-  END_NAMESPACE_YM
-
-
-BEGIN_NAMESPACE_LOGICPY
-
-
-//////////////////////////////////////////////////////////////////////
-// 共通のオブジェクトの宣言
-//////////////////////////////////////////////////////////////////////
-
-/// @brief エラー用のオブジェクト
-extern
-PyObject* ErrorObject;
-
+BEGIN_NAMESPACE_YM_PYTHON
 
 //////////////////////////////////////////////////////////////////////
 // 型を表すタイプオブジェクト
@@ -367,7 +339,7 @@ extern
 PyObject*
 conv_to_pyobject(SatSolver obj);
 
-END_NAMESPACE_LOGICPY
+END_NAMESPACE_YM_PYTHON
 
 
 //////////////////////////////////////////////////////////////////////
@@ -381,4 +353,4 @@ logic_init();
 
 END_EXTERN_C
 
-#endif // YM_LOGIC_LOGICPY_H
+#endif // YM_LOGIC_PYLOGIC_H

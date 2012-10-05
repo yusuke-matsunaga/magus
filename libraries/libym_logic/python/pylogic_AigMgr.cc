@@ -1,5 +1,5 @@
 
-/// @file logicpy_AigMgr.cc
+/// @file pylogic_AigMgr.cc
 /// @brief AigMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "logicpy.h"
+#include "ym_logic/pylogic.h"
 #include "ym_logic/AigMgr.h"
 
 
-BEGIN_NAMESPACE_LOGICPY
+BEGIN_NAMESPACE_YM_PYTHON
 
 BEGIN_NONAMESPACE
 
@@ -443,4 +443,4 @@ conv_from_pyobject(PyObject* py_obj,
   return true;
 }
 
-END_NAMESPACE_LOGICPY
+END_NAMESPACE_YM_PYTHON

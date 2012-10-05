@@ -12,7 +12,7 @@ SUBDIRS = \
 	cnfdd \
 	sat \
 	aig \
-	pylib \
+	python \
 	. \
 	tests
 
@@ -41,7 +41,7 @@ libym_logic_la_LIBADD = \
 	cnfdd/libym_logic_cnfdd.la \
 	sat/libym_logic_sat.la \
 	aig/libym_logic_aig.la \
-	pylib/libym_logic_pylib.la
+	python/libym_logic_python.la
 
 libym_logic_la_LDFLAGS = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

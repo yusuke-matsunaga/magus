@@ -1,5 +1,5 @@
 
-/// @file logicpy_BddMgr.cc
+/// @file pylogic_BddMgr.cc
 /// @brief BddMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,12 +7,12 @@
 /// All rights reserved.
 
 
-#include "logicpy.h"
+#include "ym_logic/pylogic.h"
 #include "ym_logic/BddMgr.h"
 #include "ym_logic/Bdd.h"
 
 
-BEGIN_NAMESPACE_LOGICPY
+BEGIN_NAMESPACE_YM_PYTHON
 
 BEGIN_NONAMESPACE
 
@@ -567,4 +567,4 @@ conv_from_pyobject(PyObject* py_obj,
   return true;
 }
 
-END_NAMESPACE_LOGICPY
+END_NAMESPACE_YM_PYTHON

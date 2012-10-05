@@ -7,7 +7,9 @@
 /// All rights reserved.
 
 
+#include "ym_utils/USTime.h"
 #include "ym_utils/StopWatch.h"
+#include "ym_utils/MStopWatch.h"
 
 #if HAVE_GETRUSAGE
 #  include <sys/resource.h>
@@ -22,44 +24,20 @@
 
 BEGIN_NAMESPACE_YM
 
-// 時間をとってくる関数
-USTime
-StopWatch::cur_time()
-{
-  double u, s, r;
-#if HAVE_GETRUSAGE
-  struct rusage ru;
-  getrusage(RUSAGE_SELF, &ru);
-  u = xchg(ru.ru_utime);
-  s = xchg(ru.ru_stime);
-#elif HAVE_TIMES
-  struct tms buffer;
-  (void) times(&buffer);
-  u = (double)buffer.tms_utime * 1000.0 * 1000.0 / (double)CLK_TCK;
-  s = (double)buffer.tms.stime * 1000.0 * 1000.0 / (double)CLK_TCK;
-#else
-# error "neither getrusage() nor times() are found"
-#endif
-  struct timeval tv;
-  (void) gettimeofday(&tv, NULL);
-  // オーバーフローさせないためのオフセット
-  const int kRTimeOffset = ((2000 - 1970)*365+(2000-1969)/4)*24*3600;
-  tv.tv_sec -= kRTimeOffset;
-  r = xchg(tv);
-  return USTime(u, s, r);
-}
 
-// timeval構造体をdoubleに変換する関数
-double
-StopWatch::xchg(struct timeval& tv)
-{
-  return (double)tv.tv_sec * 1000.0 * 1000.0 + (double)tv.tv_usec;
-}
+//////////////////////////////////////////////////////////////////////
+// クラス StopWatch
+//////////////////////////////////////////////////////////////////////
 
 // コンストラクタ．実はリセット
 StopWatch::StopWatch()
 {
   reset();
+}
+
+// @brief デストラクタ
+StopWatch::~StopWatch()
+{
 }
 
 // ”リセット”
@@ -108,18 +86,64 @@ StopWatch::time() const
   return ans;
 }
 
+// 時間をとってくる関数
+USTime
+StopWatch::cur_time()
+{
+  double u, s, r;
+#if HAVE_GETRUSAGE
+  struct rusage ru;
+  getrusage(RUSAGE_SELF, &ru);
+  u = xchg(ru.ru_utime);
+  s = xchg(ru.ru_stime);
+#elif HAVE_TIMES
+  struct tms buffer;
+  (void) times(&buffer);
+  u = (double)buffer.tms_utime * 1000.0 * 1000.0 / (double)CLK_TCK;
+  s = (double)buffer.tms.stime * 1000.0 * 1000.0 / (double)CLK_TCK;
+#else
+# error "neither getrusage() nor times() are found"
+#endif
+  struct timeval tv;
+  (void) gettimeofday(&tv, NULL);
+  // オーバーフローさせないためのオフセット
+  const int kRTimeOffset = ((2000 - 1970)*365+(2000-1969)/4)*24*3600;
+  tv.tv_sec -= kRTimeOffset;
+  r = xchg(tv);
+  return USTime(u, s, r);
+}
+
+// timeval構造体をdoubleに変換する関数
+double
+StopWatch::xchg(struct timeval& tv)
+{
+  return (double)tv.tv_sec * 1000.0 * 1000.0 + (double)tv.tv_usec;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス MStopWatch
+//////////////////////////////////////////////////////////////////////
+
+
 // コンストラクタ，時計の数と最初にアクティブな時計番号
 MStopWatch::MStopWatch(ymuint n,
 		       ymuint id) :
   mNum(n),
   mCur(id),
-  mWarray(n)
+  mWarray(new StopWatch[n])
 {
   // 範囲外の場合は補正する．
   if ( mCur >= mNum ) {
     mCur = 0;
   }
   mWarray[mCur].start();
+}
+
+// @brief デストラクタ
+MStopWatch::~MStopWatch()
+{
+  delete [] mWarray;
 }
 
 // アクティブな時計を切替える．昔の時計番号を返す

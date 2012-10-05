@@ -23,20 +23,19 @@ distclean-local:
 	-rm -rf $(testsubdir)
 
 noinst_PROGRAMS = \
-	logicpy_test
+	pylogic_test
 
-logicpy_test_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/pylib \
+pylogic_test_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	$(PYTHON_CPPFLAGS)
 
-logicpy_test_SOURCES = \
-	logicpy_test.cc
+pylogic_test_SOURCES = \
+	pylogic_test.cc
 
-logicpy_test_LDADD = \
+pylogic_test_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
         $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-logicpy_test_LDFLAGS = \
+pylogic_test_LDFLAGS = \
 	$(PYTHON_LDFLAGS)

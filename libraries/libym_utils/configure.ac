@@ -90,6 +90,16 @@ AC_CHECK_FUNCS([getcwd gettimeofday strtod])
 
 
 # ===================================================================
+# Checks for other packages
+# ===================================================================
+
+# Check for Python
+YM_CHECK_PYTHON
+
+AC_CACHE_SAVE
+
+
+# ===================================================================
 # Check for C++ language
 # ===================================================================
 AC_LANG_CPLUSPLUS
@@ -121,6 +131,7 @@ AC_SUBST([YM_EXTRA_LIBADD])
 # ===================================================================
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([ym_utils/Makefile])
+AC_CONFIG_FILES([python/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 
 

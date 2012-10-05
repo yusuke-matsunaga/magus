@@ -1,5 +1,5 @@
 
-/// @file logicpy_Pol.cc
+/// @file pylogic_Pol.cc
 /// @brief tPol の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "logicpy.h"
+#include "ym_logic/pylogic.h"
 #include "ym_logic/Pol.h"
 
 
-BEGIN_NAMESPACE_LOGICPY
+BEGIN_NAMESPACE_YM_PYTHON
 
 BEGIN_NONAMESPACE
 
@@ -252,4 +252,4 @@ conv_to_pyobject(tPol obj)
   return (PyObject*)pol_obj;
 }
 
-END_NAMESPACE_LOGICPY
+END_NAMESPACE_YM_PYTHON

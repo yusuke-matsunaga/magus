@@ -1,5 +1,5 @@
 
-/// @file logicpy_Bool3.cc
+/// @file pylogic_Bool3.cc
 /// @brief Bool3 の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "logicpy.h"
+#include "ym_logic/pylogic.h"
 #include "ym_logic/Bool3.h"
 
 
-BEGIN_NAMESPACE_LOGICPY
+BEGIN_NAMESPACE_YM_PYTHON
 
 BEGIN_NONAMESPACE
 
@@ -271,4 +271,4 @@ conv_to_pyobject(Bool3 obj)
   return (PyObject*)bool3_obj;
 }
 
-END_NAMESPACE_LOGICPY
+END_NAMESPACE_YM_PYTHON

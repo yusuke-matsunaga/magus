@@ -137,7 +137,7 @@ AC_CONFIG_FILES([sat/ymsat/Makefile])
 AC_CONFIG_FILES([sat/MiniSat/Makefile])
 AC_CONFIG_FILES([sat/dimacs/Makefile])
 AC_CONFIG_FILES([aig/Makefile])
-AC_CONFIG_FILES([pylib/Makefile])
+AC_CONFIG_FILES([python/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([tests/expr/Makefile])
 AC_CONFIG_FILES([tests/bdd/Makefile])
@@ -146,7 +146,7 @@ AC_CONFIG_FILES([tests/cnfdd/Makefile])
 AC_CONFIG_FILES([tests/npn/Makefile])
 AC_CONFIG_FILES([tests/sat/Makefile])
 AC_CONFIG_FILES([tests/aig/Makefile])
-AC_CONFIG_FILES([tests/pylib/Makefile])
+AC_CONFIG_FILES([tests/python/Makefile])
 
 
 # ===================================================================

@@ -1,5 +1,5 @@
 
-/// @file logicpy_Bdd.cc
+/// @file pylogic_Bdd.cc
 /// @brief Bdd の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,13 +7,13 @@
 /// All rights reserved.
 
 
-#include "logicpy.h"
+#include "ym_logic/pylogic.h"
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddLitSet.h"
 #include "ym_logic/BddVarSet.h"
 
 
-BEGIN_NAMESPACE_LOGICPY
+BEGIN_NAMESPACE_YM_PYTHON
 
 BEGIN_NONAMESPACE
 
@@ -788,4 +788,4 @@ conv_to_pyobject(const Bdd& obj)
   return (PyObject*)bdd_obj;
 }
 
-END_NAMESPACE_LOGICPY
+END_NAMESPACE_YM_PYTHON
