@@ -2,6 +2,9 @@
 
 ## $Id: Makefile.am 1978 2009-02-06 12:29:16Z matsunaga $
 
+SUBDIRS = \
+	. \
+	$(YM_EXTRA_SUBDIRS)
 
 EXTRA_DIST = local_defs $(TESTS)
 

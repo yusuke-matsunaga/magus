@@ -64,7 +64,7 @@ RandGen_init(RandGenObject* self,
 	     PyObject* args)
 {
   ymuint32 s = 0;
-  if ( !PyArg_ParseTuple(args, "!k", &s) ) {
+  if ( !PyArg_ParseTuple(args, "|k", &s) ) {
     return -1;
   }
 

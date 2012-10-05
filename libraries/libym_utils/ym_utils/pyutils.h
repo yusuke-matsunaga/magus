@@ -150,14 +150,28 @@ conv_from_pyobject(PyObject* py_obj,
 /// @param[in] obj USTime オブジェクト
 extern
 PyObject*
-conv_to_pyobject(USTime obj);
+conv_to_pyobject(const USTime& obj);
 
+#if 0
 /// @brief StopWatch から PyObject を生成する．
 /// @param[in] obj StopWatch オブジェクト
 extern
 PyObject*
 conv_to_pyobject(StopWatch obj);
+#endif
 
 END_NAMESPACE_YM_PYTHON
+
+
+//////////////////////////////////////////////////////////////////////
+// 初期化関数
+//////////////////////////////////////////////////////////////////////
+
+BEGIN_EXTERN_C
+
+void
+utils_init();
+
+END_EXTERN_C
 
 #endif // YM_UTILS_PYUTILS_H

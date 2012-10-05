@@ -5,7 +5,6 @@
 
 SUBDIRS = \
 	ym_utils \
-	python \
 	$(YM_EXTRA_SUBDIRS) \
 	. \
 	tests
@@ -62,7 +61,6 @@ libym_utils_la_SOURCES = \
 	random.cc
 
 libym_utils_la_LIBADD = \
-	python/libym_utils_python.la \
 	$(YM_EXTRA_LIBADD)
 
 libym_utils_la_LDFLAGS =

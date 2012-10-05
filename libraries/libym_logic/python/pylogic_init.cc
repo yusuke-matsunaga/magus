@@ -33,8 +33,7 @@ logic_init()
 {
   using namespace nsYm::nsPython;
 
-  PyObject* m;
-
+  // タイプオブジェクトの初期化
   if ( PyType_Ready(&Bool3Type) < 0 ) {
     return;
   }
@@ -78,7 +77,7 @@ logic_init()
   // モジュールオブジェクトの生成
   PyDoc_STRVAR(module_doc,
 	       "Module for libym_logic");
-  m = Py_InitModule3("logic", logic_methods, module_doc);
+  PyObject* m = Py_InitModule3("logic", logic_methods, module_doc);
   if ( m == NULL ) {
     return;
   }
@@ -94,10 +93,10 @@ logic_init()
     }
   }
   Py_INCREF(ErrorObject);
-#endif
 
   // logic モジュールに追加
   PyModule_AddObject(m, "error", ErrorObject);
+#endif
 
   // Bool3 オブジェクトタイプの登録
   PyModule_AddObject(m, "Bool3", (PyObject*)&Bool3Type);
