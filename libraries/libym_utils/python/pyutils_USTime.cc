@@ -183,6 +183,51 @@ USTime_sub(PyObject* left,
   return conv_to_pyobject(time1 - time2);
 }
 
+// inplace add 関数
+PyObject*
+USTime_add2(PyObject* left,
+	    PyObject* right)
+{
+  if ( !USTimeObject_Check(left) ) {
+    // TODO: エラーメッセージを作る．
+    return NULL;
+  }
+  USTimeObject* obj1 = (USTimeObject*)left;
+
+  USTime time2;
+  if ( !conv_from_pyobject(right, time2) ) {
+    // TODO: エラーメッセージを作る．
+    return NULL;
+  }
+
+  obj1->mTime += time2;
+
+  Py_INCREF(left);
+  return left;
+}
+
+// inplace sub 関数
+PyObject*
+USTime_sub2(PyObject* left,
+	    PyObject* right)
+{
+  if ( !USTimeObject_Check(left) ) {
+    // TODO: エラーメッセージを作る．
+    return NULL;
+  }
+  USTimeObject* obj1 = (USTimeObject*)left;
+
+  USTime time2;
+  if ( !conv_from_pyobject(right, time2) ) {
+    return NULL;
+  }
+
+  obj1->mTime -= time2;
+
+  Py_INCREF(left);
+  return left;
+}
+
 // USTimeObject のメソッドテーブル
 PyMethodDef USTime_methods[] = {
   {"set", (PyCFunction)USTime_set, METH_VARARGS,
@@ -229,8 +274,8 @@ PyNumberMethods USTime_nbmethods = {
   (unaryfunc)0,                // nb_hex
 
   // Added in release 2.0
-  (binaryfunc)0,               // nb_inplace_add
-  (binaryfunc)0,               // nb_inplace_subtract
+  (binaryfunc)USTime_add2,     // nb_inplace_add
+  (binaryfunc)USTime_add2,     // nb_inplace_subtract
   (binaryfunc)0,               // nb_inplace_multiply
   (binaryfunc)0,               // nb_inplace_divide
   (binaryfunc)0,               // nb_inplace_remainder
