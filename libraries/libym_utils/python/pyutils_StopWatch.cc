@@ -129,7 +129,7 @@ PyTypeObject StopWatchType = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "logic.StopWatch",            /*tp_name*/
+  "utils.StopWatch",            /*tp_name*/
   sizeof(StopWatchObject),      /*tp_basicsize*/
   0,                          /*tp_itemsize*/
   /* methods */

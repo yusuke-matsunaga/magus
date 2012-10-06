@@ -43,6 +43,11 @@ PyObject* ErrorObject;
 // PyObject への型変換
 //////////////////////////////////////////////////////////////////////
 
+/// @brief bool から PyObject を生成する．
+extern
+PyObject*
+conv_to_pyobject(bool val);
+
 /// @brief ymint8 から PyObject を生成する．
 extern
 PyObject*

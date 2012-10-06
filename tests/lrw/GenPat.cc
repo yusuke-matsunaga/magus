@@ -175,10 +175,11 @@ GenPat::operator()(ymuint slack)
       mMgr.dump_handle(cout, handle_list);
       cout << endl;
     }
+#if 0
     if ( level == 4 ) {
       exit(0);
     }
-
+#endif
     const vector<GpHandle>& src_list1 = mRepList[level];
     ymuint n1 = src_list1.size();
     cout << "  " << n1 << " true seed patterns" << endl;

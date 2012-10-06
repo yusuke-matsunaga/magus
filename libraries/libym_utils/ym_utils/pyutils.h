@@ -10,6 +10,7 @@
 
 
 #include "ympython.h"
+#include "ym_utils/FileInfo.h"
 #include "ym_utils/USTime.h"
 #include "ym_utils/StopWatch.h"
 #include "ym_utils/RandGen.h"
@@ -20,6 +21,14 @@ BEGIN_NAMESPACE_YM_PYTHON
 //////////////////////////////////////////////////////////////////////
 // 型を表すタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
+
+/// @brief FileInfo を表す型
+extern
+PyTypeObject FileInfoType;
+
+/// @brief FileLoc を表す型
+extern
+PyTypeObject FileLocType;
 
 /// @brief USTime を表す型
 extern
@@ -49,6 +58,28 @@ PyTypeObject RandCombiGenType;
 //////////////////////////////////////////////////////////////////////
 // 型をチェックする関数
 //////////////////////////////////////////////////////////////////////
+
+/// @brief FileInfoType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が FileInfoType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+FileInfoObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &FileInfoType;
+}
+
+/// @brief FileLocType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が FileLocType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+FileLocObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &FileLocType;
+}
 
 /// @brief USTimeType の型チェック
 /// @param[in] obj Python オブジェクト
@@ -121,6 +152,26 @@ RandCombiGenObject_Check(PyObject* obj)
 // PyObject からの型変換
 //////////////////////////////////////////////////////////////////////
 
+/// @brief PyObject から FileInfo を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] obj FileInfo を格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した． py_obj が FileInfoObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   FileInfo& obj);
+
+/// @brief PyObject から FileLoc を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] obj FileLoc を格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した． py_obj が FileLocObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   FileLoc& obj);
+
 /// @brief PyObject から USTime を取り出す．
 /// @param[in] py_obj Python オブジェクト
 /// @param[out] obj USTime を格納する変数
@@ -145,6 +196,18 @@ conv_from_pyobject(PyObject* py_obj,
 //////////////////////////////////////////////////////////////////////
 // PyObject への型変換
 //////////////////////////////////////////////////////////////////////
+
+/// @brief FileInfo から PyObject を生成する．
+/// @param[in] obj FileInfo オブジェクト
+extern
+PyObject*
+conv_to_pyobject(const FileInfo& obj);
+
+/// @brief FileLoc から PyObject を生成する．
+/// @param[in] obj FileLoc オブジェクト
+extern
+PyObject*
+conv_to_pyobject(const FileLoc& obj);
 
 /// @brief USTime から PyObject を生成する．
 /// @param[in] obj USTime オブジェクト

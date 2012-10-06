@@ -14,6 +14,20 @@ BEGIN_NAMESPACE_YM_PYTHON
 
 PyObject* ErrorObject;
 
+/// @brief bool から PyObject を生成する．
+PyObject*
+conv_to_pyobject(bool val)
+{
+  if ( val ) {
+    Py_INCREF(Py_True);
+    return Py_True;
+  }
+  else {
+    Py_INCREF(Py_False);
+    return Py_False;
+  }
+}
+
 // @brief ymint8 から PyObject を生成する．
 PyObject*
 conv_to_pyobject(ymint8 val)

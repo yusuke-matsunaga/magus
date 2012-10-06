@@ -36,6 +36,10 @@ utils_init()
   // タイプオブジェクトの初期化
   //////////////////////////////////////////////////////////////////////
 
+  if ( PyType_Ready(&FileInfoType) < 0 ) {
+    return;
+  }
+
   if ( PyType_Ready(&USTimeType) < 0 ) {
     return;
   }
@@ -75,6 +79,8 @@ utils_init()
   //////////////////////////////////////////////////////////////////////
   // タイプオブジェクトの登録
   //////////////////////////////////////////////////////////////////////
+
+  PyModule_AddObject(m, "FileInfo", (PyObject*)&FileInfoType);
 
   PyModule_AddObject(m, "USTime", (PyObject*)&USTimeType);
 
