@@ -118,7 +118,7 @@ Literal_str(LiteralObject* self)
     buf << "~";
   }
   buf << "V" << vid.val();
-  return Py_BuildValue("s", buf.str().c_str());
+  return conv_to_pyobject(buf.str());
 }
 
 // hash 関数
@@ -200,7 +200,7 @@ Literal_make_negative(LiteralObject* self)
 PyObject*
 Literal_index(LiteralObject* self)
 {
-  return Py_BuildValue("I", self->mLiteral.index());
+  return conv_to_pyobject(self->mLiteral.index());
 }
 
 // LiteralObject のメソッドテーブル

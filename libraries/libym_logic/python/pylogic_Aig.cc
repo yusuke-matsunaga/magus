@@ -97,7 +97,7 @@ PyObject*
 Aig_node_id(AigObject* self,
 	    PyObject* args)
 {
-  return Py_BuildValue("k", self->mAig.node_id());
+  return conv_to_pyobject(self->mAig.node_id());
 }
 
 // inv 関数
@@ -105,7 +105,7 @@ PyObject*
 Aig_inv(AigObject* self,
 	PyObject* args)
 {
-  return Py_BuildValue("b", self->mAig.inv());
+  return conv_to_pyobject(self->mAig.inv());
 }
 
 // is_zero 関数
@@ -113,7 +113,7 @@ PyObject*
 Aig_is_zero(AigObject* self,
 	    PyObject* args)
 {
-  return Py_BuildValue("b", self->mAig.is_zero());
+  return conv_to_pyobject(self->mAig.is_zero());
 }
 
 // is_one 関数
@@ -121,7 +121,7 @@ PyObject*
 Aig_is_one(AigObject* self,
 	   PyObject* args)
 {
-  return Py_BuildValue("b", self->mAig.is_one());
+  return conv_to_pyobject(self->mAig.is_one());
 }
 
 // is_const 関数
@@ -129,7 +129,7 @@ PyObject*
 Aig_is_const(AigObject* self,
 	     PyObject* args)
 {
-  return Py_BuildValue("b", self->mAig.is_const());
+  return conv_to_pyobject(self->mAig.is_const());
 }
 
 // is_input 関数
@@ -137,7 +137,7 @@ PyObject*
 Aig_is_input(AigObject* self,
 	     PyObject* args)
 {
-  return Py_BuildValue("b", self->mAig.is_input());
+  return conv_to_pyobject(self->mAig.is_input());
 }
 
 // input_id 関数
@@ -153,7 +153,7 @@ PyObject*
 Aig_is_and(AigObject* self,
 	   PyObject* args)
 {
-  return Py_BuildValue("b", self->mAig.is_and());
+  return conv_to_pyobject(self->mAig.is_and());
 }
 
 // fanin 関数

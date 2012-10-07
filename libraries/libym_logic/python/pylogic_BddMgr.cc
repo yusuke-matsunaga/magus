@@ -352,7 +352,7 @@ BddMgr_new_var(BddMgrObject* self,
   }
 
   bool stat = self->mMgr->new_var(vid);
-  return Py_BuildValue("b", stat);
+  return conv_to_pyobject(stat);
 }
 
 // var_list 関数
@@ -391,7 +391,7 @@ BddMgr_level(BddMgrObject* self,
     return NULL;
   }
 
-  return Py_BuildValue("k", self->mMgr->level(vid));
+  return conv_to_pyobject(self->mMgr->level(vid));
 }
 
 // varid 関数
@@ -451,7 +451,7 @@ PyObject*
 BddMgr_name(BddMgrObject* self,
 	    PyObject* args)
 {
-  return Py_BuildValue("s", self->mMgr->name().c_str());
+  return conv_to_pyobject(self->mMgr->name());
 }
 
 // BddMgrObject のメソッドテーブル

@@ -102,7 +102,7 @@ PyObject*
 Bdd_is_zero(BddObject* self,
 	    PyObject* args)
 {
-  return Py_BuildValue("b", self->mBdd->is_zero());
+  return conv_to_pyobject(self->mBdd->is_zero());
 }
 
 // is_one 関数
@@ -110,7 +110,7 @@ PyObject*
 Bdd_is_one(BddObject* self,
 	   PyObject* args)
 {
-  return Py_BuildValue("b", self->mBdd->is_one());
+  return conv_to_pyobject(self->mBdd->is_one());
 }
 
 // is_const 関数
@@ -118,7 +118,7 @@ PyObject*
 Bdd_is_const(BddObject* self,
 	     PyObject* args)
 {
-  return Py_BuildValue("b", self->mBdd->is_const());
+  return conv_to_pyobject(self->mBdd->is_const());
 }
 
 // is_overflow 関数
@@ -126,7 +126,7 @@ PyObject*
 Bdd_is_overflow(BddObject* self,
 		PyObject* args)
 {
-  return Py_BuildValue("b", self->mBdd->is_overflow());
+  return conv_to_pyobject(self->mBdd->is_overflow());
 }
 
 // is_error 関数
@@ -134,7 +134,7 @@ PyObject*
 Bdd_is_error(BddObject* self,
 	     PyObject* args)
 {
-  return Py_BuildValue("b", self->mBdd->is_error());
+  return conv_to_pyobject(self->mBdd->is_error());
 }
 
 // is_invalid 関数
@@ -142,7 +142,7 @@ PyObject*
 Bdd_is_invalid(BddObject* self,
 	       PyObject* args)
 {
-  return Py_BuildValue("b", self->mBdd->is_invalid());
+  return conv_to_pyobject(self->mBdd->is_invalid());
 }
 
 // is_leaf 関数
@@ -150,7 +150,7 @@ PyObject*
 Bdd_is_leaf(BddObject* self,
 	    PyObject* args)
 {
-  return Py_BuildValue("b", self->mBdd->is_leaf());
+  return conv_to_pyobject(self->mBdd->is_leaf());
 }
 
 // is_posi_cube 関数
@@ -158,7 +158,7 @@ PyObject*
 Bdd_is_posi_cube(BddObject* self,
 		 PyObject* args)
 {
-  return Py_BuildValue("b", self->mBdd->is_posi_cube());
+  return conv_to_pyobject(self->mBdd->is_posi_cube());
 }
 
 // is_cube 関数
@@ -166,7 +166,7 @@ PyObject*
 Bdd_is_cube(BddObject* self,
 	    PyObject* args)
 {
-  return Py_BuildValue("b", self->mBdd->is_cube());
+  return conv_to_pyobject(self->mBdd->is_cube());
 }
 
 // check_symmetry 関数
@@ -198,7 +198,7 @@ Bdd_check_symmetry(BddObject* self,
     }
   }
 
-  return Py_BuildValue("b", self->mBdd->check_symmetry(vid1, vid2, pol));
+  return conv_to_pyobject(self->mBdd->check_symmetry(vid1, vid2, pol));
 }
 
 // set_zero 関数
@@ -534,7 +534,7 @@ PyObject*
 Bdd_node_count(BddObject* self,
 	       PyObject* args)
 {
-  return Py_BuildValue("K", self->mBdd->node_count());
+  return conv_to_pyobject(self->mBdd->node_count());
 }
 
 // density 関数
@@ -547,7 +547,7 @@ Bdd_density(BddObject* self,
     return NULL;
   }
 
-  return Py_BuildValue("d", self->mBdd->density(nvar));
+  return conv_to_pyobject(self->mBdd->density(nvar));
 }
 
 // onepath 関数
@@ -593,7 +593,7 @@ PyObject*
 Bdd_shortest_onepath_len(BddObject* self,
 			 PyObject* args)
 {
-  return Py_BuildValue("k", self->mBdd->shortest_onepath_len());
+  return conv_to_pyobject(self->mBdd->shortest_onepath_len());
 }
 
 // support 関数

@@ -96,7 +96,7 @@ VarId_str(VarIdObject* self)
 {
   ostringstream buf;
   buf << "V#" << self->mVal;
-  return Py_BuildValue("s", buf.str().c_str());
+  return conv_to_pyobject(buf.str());
 }
 
 // hash 関数
@@ -110,7 +110,7 @@ VarId_hash(VarIdObject* self)
 PyObject*
 VarId_val(VarIdObject* self)
 {
-  return Py_BuildValue("I", self->mVal);
+  return conv_to_pyobject(self->mVal);
 }
 
 // set 関数

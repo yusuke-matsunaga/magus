@@ -98,7 +98,7 @@ PyObject*
 SatSolver_sane(SatSolverObject* self,
 	       PyObject* args)
 {
-  return Py_BuildValue("b", self->mSolver->sane());
+  return conv_to_pyobject(self->mSolver->sane());
 }
 
 // new_var 関数
@@ -200,14 +200,14 @@ inline
 PyObject*
 conv_to_pyobject(ymuint val)
 {
-  return Py_BuildValue("k", val);
+  return conv_to_pyobject(val);
 }
 
 inline
 PyObject*
 conv_to_pyobject(ymuint64 val)
 {
-  return Py_BuildValue("K", val);
+  return conv_to_pyobject(val);
 }
 
 END_NONAMESPACE
@@ -243,7 +243,7 @@ PyObject*
 SatSolver_variable_num(SatSolverObject* self,
 		       PyObject* args)
 {
-  return Py_BuildValue("k", self->mSolver->variable_num());
+  return conv_to_pyobject(self->mSolver->variable_num());
 }
 
 // clause_num 関数
@@ -251,7 +251,7 @@ PyObject*
 SatSolver_clause_num(SatSolverObject* self,
 		     PyObject* args)
 {
-  return Py_BuildValue("k", self->mSolver->clause_num());
+  return conv_to_pyobject(self->mSolver->clause_num());
 }
 
 // literal_num 関数
@@ -259,7 +259,7 @@ PyObject*
 SatSolver_literal_num(SatSolverObject* self,
 		      PyObject* args)
 {
-  return Py_BuildValue("k", self->mSolver->literal_num());
+  return conv_to_pyobject(self->mSolver->literal_num());
 }
 
 // set_max_conflict 関数
@@ -272,7 +272,7 @@ SatSolver_set_max_conflict(SatSolverObject* self,
     return NULL;
   }
 
-  return Py_BuildValue("K", self->mSolver->set_max_conflict(val));
+  return conv_to_pyobject(self->mSolver->set_max_conflict(val));
 }
 
 // timer_on 関数

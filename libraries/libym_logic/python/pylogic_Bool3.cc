@@ -106,7 +106,7 @@ Bool3_str(Bool3Object* self)
   case kB3False: str = "False"; break;
   case kB3X:     str = "X"; break;
   }
-  return Py_BuildValue("s", str);
+  return conv_to_pyobject(str);
 }
 
 // is_true 関数
@@ -114,7 +114,7 @@ PyObject*
 Bool3_is_true(Bool3Object* self,
 	      PyObject* args)
 {
-  return Py_BuildValue("b", self->mVal == kB3True);
+  return conv_to_pyobject(self->mVal == kB3True);
 }
 
 // is_false 関数
@@ -122,7 +122,7 @@ PyObject*
 Bool3_is_false(Bool3Object* self,
 	       PyObject* args)
 {
-  return Py_BuildValue("b", self->mVal == kB3False);
+  return conv_to_pyobject(self->mVal == kB3False);
 }
 
 // is_x 関数
@@ -130,7 +130,7 @@ PyObject*
 Bool3_is_x(Bool3Object* self,
 	   PyObject* args)
 {
-  return Py_BuildValue("b", self->mVal == kB3X);
+  return conv_to_pyobject(self->mVal == kB3X);
 }
 
 // set_true 関数

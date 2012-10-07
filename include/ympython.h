@@ -98,6 +98,16 @@ extern
 PyObject*
 conv_to_pyobject(double val);
 
+/// @brief const char* から PyObject を生成する．
+extern
+PyObject*
+conv_to_pyobject(const char* val);
+
+/// @brief string から PyObject を生成する．
+extern
+PyObject*
+conv_to_pyobject(const string& val);
+
 END_NAMESPACE_YM_PYTHON
 
 

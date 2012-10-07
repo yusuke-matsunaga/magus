@@ -104,7 +104,7 @@ Pol_str(PolObject* self)
   else {
     str = "negative";
   }
-  return Py_BuildValue("s", str);
+  return conv_to_pyobject(str);
 }
 
 // make_positive 関数
@@ -129,7 +129,7 @@ Pol_is_positive(PolObject* self,
 		PyObject* args)
 {
   bool v = (self->mPol == kPolPosi);
-  return Py_BuildValue("i", v);
+  return conv_to_pyobject(v);
 }
 
 // is_negative 関数
@@ -138,7 +138,7 @@ Pol_is_negative(PolObject* self,
 		PyObject* args)
 {
   bool v = (self->mPol == kPolNega);
-  return Py_BuildValue("i", v);
+  return conv_to_pyobject(v);
 }
 
 // alternate 関数

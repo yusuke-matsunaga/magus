@@ -74,7 +74,7 @@ PyObject*
 AigMgr_input_num(AigMgrObject* self,
 		 PyObject* args)
 {
-  return Py_BuildValue("k", self->mMgr->input_num());
+  return conv_to_pyobject(self->mMgr->input_num());
 }
 
 // node_num 関数
@@ -82,7 +82,7 @@ PyObject*
 AigMgr_node_num(AigMgrObject* self,
 		PyObject* args)
 {
-  return Py_BuildValue("k", self->mMgr->node_num());
+  return conv_to_pyobject(self->mMgr->node_num());
 }
 
 // print_handles 関数

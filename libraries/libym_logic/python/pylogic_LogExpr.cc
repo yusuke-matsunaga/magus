@@ -88,7 +88,7 @@ LogExpr_str(LogExprObject* self)
 {
   ostringstream buf;
   buf << *self->mLogExpr;
-  return Py_BuildValue("s", buf.str().c_str());
+  return conv_to_pyobject(buf.str());
 }
 
 // make_zero 関数
@@ -301,7 +301,9 @@ LogExpr_multi_compose(LogExprObject* self,
     PyObject* item = PyList_GET_ITEM(item_list, i);
     PyObject* vid_obj = NULL;
     PyObject* sub_obj = NULL;
-    if ( !PyArg_ParseTuple(item, "O!O!", &VarIdType, &vid_obj, &LogExprType, &sub_obj) ) {
+    if ( !PyArg_ParseTuple(item, "O!O!",
+			   &VarIdType, &vid_obj,
+			   &LogExprType, &sub_obj) ) {
       return NULL;
     }
 
@@ -338,7 +340,9 @@ LogExpr_remap_var(LogExprObject* self,
     PyObject* item = PyList_GET_ITEM(item_list, i);
     PyObject* obj1 = NULL;
     PyObject* obj2 = NULL;
-    if ( !PyArg_ParseTuple(item, "O!O!", &VarIdType, &obj1, &VarIdType, &obj2) ) {
+    if ( !PyArg_ParseTuple(item, "O!O!",
+			   &VarIdType, &obj1,
+			   &VarIdType, &obj2) ) {
       return NULL;
     }
 
@@ -395,7 +399,7 @@ LogExpr_eval(LogExprObject* self,
   }
   ymulong val = self->mLogExpr->eval(vals, mask);
 
-  return Py_BuildValue("k", val);
+  return conv_to_pyobject(val);
 }
 
 // is_zero 関数
@@ -403,7 +407,7 @@ PyObject*
 LogExpr_is_zero(LogExprObject* self,
 		PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_zero());
+  return conv_to_pyobject(self->mLogExpr->is_zero());
 }
 
 // is_one 関数
@@ -411,7 +415,7 @@ PyObject*
 LogExpr_is_one(LogExprObject* self,
 	       PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_one());
+  return conv_to_pyobject(self->mLogExpr->is_one());
 }
 
 // is_constant 関数
@@ -419,7 +423,7 @@ PyObject*
 LogExpr_is_constant(LogExprObject* self,
 		    PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_constant());
+  return conv_to_pyobject(self->mLogExpr->is_constant());
 }
 
 // is_posiliteral 関数
@@ -427,7 +431,7 @@ PyObject*
 LogExpr_is_posiliteral(LogExprObject* self,
 		       PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_posiliteral());
+  return conv_to_pyobject(self->mLogExpr->is_posiliteral());
 }
 
 // is_negaliteral 関数
@@ -435,7 +439,7 @@ PyObject*
 LogExpr_is_negaliteral(LogExprObject* self,
 		       PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_negaliteral());
+  return conv_to_pyobject(self->mLogExpr->is_negaliteral());
 }
 
 // is_literal 関数
@@ -443,7 +447,7 @@ PyObject*
 LogExpr_is_literal(LogExprObject* self,
 		       PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_literal());
+  return conv_to_pyobject(self->mLogExpr->is_literal());
 }
 
 // varid 関数
@@ -459,7 +463,7 @@ PyObject*
 LogExpr_is_and(LogExprObject* self,
 	       PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_and());
+  return conv_to_pyobject(self->mLogExpr->is_and());
 }
 
 // is_or 関数
@@ -467,7 +471,7 @@ PyObject*
 LogExpr_is_or(LogExprObject* self,
 	      PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_or());
+  return conv_to_pyobject(self->mLogExpr->is_or());
 }
 
 // is_xor 関数
@@ -475,7 +479,7 @@ PyObject*
 LogExpr_is_xor(LogExprObject* self,
 	       PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_xor());
+  return conv_to_pyobject(self->mLogExpr->is_xor());
 }
 
 // is_op 関数
@@ -483,7 +487,7 @@ PyObject*
 LogExpr_is_op(LogExprObject* self,
 	      PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_op());
+  return conv_to_pyobject(self->mLogExpr->is_op());
 }
 
 // child_num 関数
@@ -491,7 +495,7 @@ PyObject*
 LogExpr_child_num(LogExprObject* self,
 		  PyObject* args)
 {
-  return Py_BuildValue("k", self->mLogExpr->child_num());
+  return conv_to_pyobject(self->mLogExpr->child_num());
 }
 
 // child 関数
@@ -530,7 +534,7 @@ PyObject*
 LogExpr_is_simple(LogExprObject* self,
 		  PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_simple());
+  return conv_to_pyobject(self->mLogExpr->is_simple());
 }
 
 // is_simple_and 関数
@@ -538,7 +542,7 @@ PyObject*
 LogExpr_is_simple_and(LogExprObject* self,
 		      PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_simple_and());
+  return conv_to_pyobject(self->mLogExpr->is_simple_and());
 }
 
 // is_simple_or 関数
@@ -546,7 +550,7 @@ PyObject*
 LogExpr_is_simple_or(LogExprObject* self,
 		     PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_simple_or());
+  return conv_to_pyobject(self->mLogExpr->is_simple_or());
 }
 
 // is_simple_xor 関数
@@ -554,7 +558,7 @@ PyObject*
 LogExpr_is_simple_xor(LogExprObject* self,
 		      PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_simple_xor());
+  return conv_to_pyobject(self->mLogExpr->is_simple_xor());
 }
 
 // is_sop 関数
@@ -562,7 +566,7 @@ PyObject*
 LogExpr_is_sop(LogExprObject* self,
 	       PyObject* args)
 {
-  return Py_BuildValue("b", self->mLogExpr->is_sop());
+  return conv_to_pyobject(self->mLogExpr->is_sop());
 }
 
 // litnum 関数
@@ -574,7 +578,9 @@ LogExpr_litnum(LogExprObject* self,
 {
   PyObject* obj1 = NULL;
   PyObject* obj2 = NULL;
-  if ( !PyArg_ParseTuple(args, "|O!O!", &VarIdType, &obj1, &PolType, &obj2) ) {
+  if ( !PyArg_ParseTuple(args, "|O!O!",
+			 &VarIdType, &obj1,
+			 &PolType, &obj2) ) {
     return NULL;
   }
   ymuint litnum = 0;
@@ -598,7 +604,7 @@ LogExpr_litnum(LogExprObject* self,
     litnum = self->mLogExpr->litnum();
   }
 
-  return Py_BuildValue("k", litnum);
+  return conv_to_pyobject(litnum);
 }
 
 // input_size 関数
@@ -606,7 +612,7 @@ PyObject*
 LogExpr_input_size(LogExprObject* self,
 		   PyObject* args)
 {
-  return Py_BuildValue("k", self->mLogExpr->input_size());
+  return conv_to_pyobject(self->mLogExpr->input_size());
 }
 
 // sop_cubenum 関数
@@ -614,7 +620,7 @@ PyObject*
 LogExpr_sop_cubenum(LogExprObject* self,
 		    PyObject* args)
 {
-  return Py_BuildValue("k", self->mLogExpr->sop_cubenum());
+  return conv_to_pyobject(self->mLogExpr->sop_cubenum());
 }
 
 // sop_litnum 関数
@@ -650,7 +656,7 @@ LogExpr_sop_litnum(LogExprObject* self,
     litnum = self->mLogExpr->sop_litnum();
   }
 
-  return Py_BuildValue("k", litnum);
+  return conv_to_pyobject(litnum);
 }
 
 // LogExprObject のメソッドテーブル
