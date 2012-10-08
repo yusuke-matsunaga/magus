@@ -10,6 +10,7 @@
 #include "ym_networks/BNetDecomp.h"
 #include "ym_networks/BNetManip.h"
 #include "ym_utils/HeapTree.h"
+#include "ym_utils/RandPermGen.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BNET

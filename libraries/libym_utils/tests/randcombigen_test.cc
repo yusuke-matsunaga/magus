@@ -3,6 +3,7 @@
 // RandCombiGen のテスト
 
 
+#include "ym_utils/RandCombiGen.h"
 #include "ym_utils/RandGen.h"
 
 
@@ -11,7 +12,7 @@ main(int argc,
      char** argv)
 {
   using namespace nsYm;
-  
+
   if ( argc != 3 ) {
     cerr << "USAGE: " << argv[0] << " <#elem> <#select>" << endl;
     return -1;
@@ -23,11 +24,11 @@ main(int argc,
 	 << endl;
     return -2;
   }
-  
+
   try {
     RandGen rg;
     RandCombiGen rcg(n, k);
-    
+
     for (size_t i = 0; i < 1000; ++ i) {
       rcg.generate(rg);
       for (size_t j = 0; j < k; ++ j) {

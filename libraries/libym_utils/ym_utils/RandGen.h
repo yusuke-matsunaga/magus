@@ -14,7 +14,6 @@
 
 BEGIN_NAMESPACE_YM
 
-
 //////////////////////////////////////////////////////////////////////
 /// @class RandGen RandGen.h "ym_utils/RandGen.h"
 /// @ingroup YmUtils
@@ -167,109 +166,6 @@ private:
 
   // 状態ベクタのインデックス
   ymuint32 mIdx;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class RandPermGen RandGen.h "ym_utils/RandGen.h"
-/// @brief ランダムな順列を作るクラス
-//////////////////////////////////////////////////////////////////////
-class RandPermGen
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] n 要素数
-  RandPermGen(ymuint n);
-
-  /// @brief デストラクタ
-  ~RandPermGen();
-
-
-public:
-
-  /// @brief 要素数を返す．
-  ymuint
-  num() const;
-
-  /// @brief ランダムな順列を生成する．
-  /// @param[in] randgen 乱数発生器
-  void
-  generate(RandGen& randgen);
-
-  /// @brief 順列の要素を取り出す．
-  /// @param[in] pos 要素の位置番号 ( 0 <= pos < num() )
-  ymuint32
-  elem(ymuint pos) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 要素数
-  ymuint32 mNum;
-
-  // 現在の順列
-  ymuint32* mArray;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class RandCombiGen RandGen.h "ym_utils/RandGen.h"
-/// @brief ランダムな組み合わせを作るクラス
-//////////////////////////////////////////////////////////////////////
-class RandCombiGen
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] n 全要素数
-  /// @param[in] k 組み合わせの要素数
-  RandCombiGen(ymuint n,
-	       ymuint k);
-
-  /// @brief デストラクタ
-  ~RandCombiGen();
-
-
-public:
-
-  /// @brief 全要素数を返す．
-  ymuint
-  num() const;
-
-  /// @brief 組み合わせの要素数を返す．
-  ymuint
-  combi_num() const;
-
-  /// @brief ランダムな組み合わせを生成する．
-  /// @param[in] randgen 乱数発生器
-  void
-  generate(RandGen& randgen);
-
-  /// @brief 組み合わせの要素を取り出す．
-  /// @param[in] pos 要素の位置番号 ( 0 <= pos < combi_num() )
-  ymuint32
-  elem(ymuint pos) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 要素数
-  ymuint32 mNum;
-
-  // 組み合わせの要素数
-  ymuint32 mCombiNum;
-
-  // 現在の順列
-  ymuint32* mArray;
 
 };
 

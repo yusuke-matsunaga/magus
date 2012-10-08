@@ -25,6 +25,8 @@ noinst_HEADERS = \
 	MStopWatch.h \
 	NameMgr.h \
 	RandGen.h \
+	RandCombiGen.h \
+	RandPermGen.h \
 	RefCount.h \
 	USTime.h \
 	ShString.h \
