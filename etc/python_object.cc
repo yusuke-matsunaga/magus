@@ -44,14 +44,14 @@ struct @FOO@Object
   }
 
   // @FOO@ の生成を行なう．
-  mBody = new @FOO@();
+  self->mBody = new @FOO@();
 
   return self;
 }
 
 // @FOO@Object を開放する関数
 void
-@FOO@_dealloc(USTimeObject* self)
+@FOO@_dealloc(@FOO@Object* self)
 {
   // @FOO@ の開放を行なう．
   delete self->mBody;
@@ -159,7 +159,7 @@ PySequenceMethods @FOO@_sqmethods = {
 
 
 //////////////////////////////////////////////////////////////////////
-// @FOO@Object のバッファ伯父ぇ区と構造体の定義
+// @FOO@Object のバッファオブジェクト構造体の定義
 //////////////////////////////////////////////////////////////////////
 PyBufferProcs @FOO@_bfprocs = {
   (getreadbufferproc)0,        // bf_getreadbuffer
@@ -192,7 +192,6 @@ PyMethodDef @FOO@_methods[] = {
 };
 
 END_NONAMESPACE
-
 
 
 //////////////////////////////////////////////////////////////////////
@@ -279,6 +278,11 @@ PyTypeObject @FOO@Type = {
   (PyObject*)0,                 // tp_subclasses
   (PyObject*)0                  // tp_weaklist
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// PyObject と @FOO@ の間の変換関数
+//////////////////////////////////////////////////////////////////////
 
 // @brief PyObject から @FOO@ を取り出す．
 // @param[in] py_obj Python オブジェクト
