@@ -94,7 +94,7 @@ FileLoc_str(FileLocObject* self)
 {
   ostringstream buf;
   buf << self->mFileLoc;
-  return Py_BuildValue("s", buf.str().c_str());
+  return conv_to_pyobject(buf.str());
 }
 
 // is_valid 関数

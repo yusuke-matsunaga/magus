@@ -77,7 +77,7 @@ USTime_str(USTimeObject* self)
 {
   ostringstream buf;
   buf << self->mTime;
-  return Py_BuildValue("s", buf.str().c_str());
+  return conv_to_pyobject(buf.str());
 }
 // set 関数
 PyObject*
