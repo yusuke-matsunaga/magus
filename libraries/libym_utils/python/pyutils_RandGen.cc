@@ -236,4 +236,31 @@ PyTypeObject RandGenType = {
   0,                           // tp_is_gc
 };
 
+
+//////////////////////////////////////////////////////////////////////
+// PyObject と RandGen の間の変換関数
+//////////////////////////////////////////////////////////////////////
+
+// @brief PyObject から RandGen を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @param[out] obj RandGen を格納する変数
+// @retval true 変換が成功した．
+// @retval false 変換が失敗した． py_obj が RandGenObject ではなかった．
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   RandGen*& obj)
+{
+  // 型のチェック
+  if ( !RandGenObject_Check(py_obj) ) {
+    return false;
+  }
+
+  // 強制的にキャスト
+  RandGenObject* my_obj = (RandGenObject*)py_obj;
+
+  obj = my_obj->mRandGen;
+
+  return true;
+}
+
 END_NAMESPACE_YM_PYTHON
