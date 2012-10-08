@@ -156,7 +156,10 @@ FileLoc_column(FileLocObject* self,
   return conv_to_pyobject(self->mFileLoc.column());
 }
 
+
+//////////////////////////////////////////////////////////////////////
 // FileLocObject のメソッドテーブル
+//////////////////////////////////////////////////////////////////////
 PyMethodDef FileLoc_methods[] = {
   {"is_valid", (PyCFunction)FileLoc_is_valid, METH_NOARGS,
    PyDoc_STR("return true if valid (NONE)")},
@@ -176,52 +179,60 @@ PyMethodDef FileLoc_methods[] = {
 END_NONAMESPACE
 
 
+
+//////////////////////////////////////////////////////////////////////
 // FileLocObject 用のタイプオブジェクト
+//////////////////////////////////////////////////////////////////////
 PyTypeObject FileLocType = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "utils.FileLoc",            /*tp_name*/
-  sizeof(FileLocObject),      /*tp_basicsize*/
-  0,                          /*tp_itemsize*/
+  "utils.FileLoc",             // tp_name
+  sizeof(FileLocObject),       // tp_basicsize
+  0,                           // tp_itemsize
   /* methods */
-  (destructor)FileLoc_dealloc,    /*tp_dealloc*/
-  0,                          /*tp_print*/
-  0,                          /*tp_getattr*/
-  0,                          /*tp_setattr*/
-  0,                          /*tp_compare*/
-  0,                          /*tp_repr*/
-  0,                          /*tp_as_number*/
-  0,                          /*tp_as_sequence*/
-  0,                          /*tp_as_mapping*/
-  0,                          /*tp_hash*/
-  0,                          /*tp_call*/
-  (reprfunc)FileLoc_str,     /*tp_str*/
-  0,                          /*tp_getattro*/
-  0,                          /*tp_setattro*/
-  0,                          /*tp_as_buffer*/
-  Py_TPFLAGS_DEFAULT,         /*tp_flags*/
-  "file location",            /*tp_doc*/
-  0,                          /*tp_traverse*/
-  0,                          /*tp_clear*/
-  0,                          /*tp_richcompare*/
-  0,                          /*tp_weaklistoffset*/
-  0,                          /*tp_iter*/
-  0,                          /*tp_iternext*/
-  FileLoc_methods,           /*tp_methods*/
-  0,                          /*tp_members*/
-  0,                          /*tp_getset*/
-  0,                          /*tp_base*/
-  0,                          /*tp_dict*/
-  0,                          /*tp_descr_get*/
-  0,                          /*tp_descr_set*/
-  0,                          /*tp_dictoffset*/
-  (initproc)FileLoc_init,    /*tp_init*/
-  0,                          /*tp_alloc*/
-  (newfunc)FileLoc_new,      /*tp_new*/
-  0,                          /*tp_free*/
-  0,                          /*tp_is_gc*/
+  (destructor)FileLoc_dealloc, // tp_dealloc
+  0,                           // tp_print
+  0,                           // tp_getattr
+  0,                           // tp_setattr
+  0,                           // tp_compare
+  0,                           // tp_repr
+  0,                           // tp_as_number
+  0,                           // tp_as_sequence
+  0,                           // tp_as_mapping
+  0,                           // tp_hash
+  0,                           // tp_call
+  (reprfunc)FileLoc_str,       // tp_str
+  0,                           // tp_getattro
+  0,                           // tp_setattro
+  0,                           // tp_as_buffer
+  Py_TPFLAGS_DEFAULT,          // tp_flags
+  "file location",             // tp_doc
+  0,                           // tp_traverse
+  0,                           // tp_clear
+  0,                           // tp_richcompare
+  0,                           // tp_weaklistoffset
+  0,                           // tp_iter
+  0,                           // tp_iternext
+  FileLoc_methods,             // tp_methods
+  0,                           // tp_members
+  0,                           // tp_getset
+  0,                           // tp_base
+  0,                           // tp_dict
+  0,                           // tp_descr_get
+  0,                           // tp_descr_set
+  0,                           // tp_dictoffset
+  (initproc)FileLoc_init,      // tp_init
+  0,                           // tp_alloc
+  (newfunc)FileLoc_new,        // tp_new
+  0,                           // tp_free
+  0,                           // tp_is_gc
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// PyObject と FileLoc 間の変換関数
+//////////////////////////////////////////////////////////////////////
 
 // @brief PyObject から FileLoc を取り出す．
 // @param[in] py_obj Python オブジェクト

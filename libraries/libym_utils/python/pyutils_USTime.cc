@@ -59,6 +59,10 @@ int
 USTime_init(USTimeObject* self,
 	    PyObject* args)
 {
+  // 引数の形式は
+  // - ()
+  // - (double, double, double)
+  // ただし， (double) (double, double) でも受け付けてしまう．
   double u = 0.0;
   double s = 0.0;
   double r = 0.0;
@@ -79,6 +83,7 @@ USTime_str(USTimeObject* self)
   buf << self->mTime;
   return conv_to_pyobject(buf.str());
 }
+
 // set 関数
 PyObject*
 USTime_set(USTimeObject* self,
@@ -228,26 +233,10 @@ USTime_sub2(PyObject* left,
   return left;
 }
 
-// USTimeObject のメソッドテーブル
-PyMethodDef USTime_methods[] = {
-  {"set", (PyCFunction)USTime_set, METH_VARARGS,
-   PyDoc_STR("set time (double, double, double)")},
-  {"usr_time_usec", (PyCFunction)USTime_usr_time_usec, METH_NOARGS,
-   PyDoc_STR("return user-time in usec (NONE)")},
-  {"sys_time_usec", (PyCFunction)USTime_sys_time_usec, METH_NOARGS,
-   PyDoc_STR("return system-time in usec (NONE)")},
-  {"real_time_usec", (PyCFunction)USTime_real_time_usec, METH_NOARGS,
-   PyDoc_STR("return real-time in usec (NONE)")},
-  {"usr_time", (PyCFunction)USTime_usr_time, METH_NOARGS,
-   PyDoc_STR("return user-time in sec (NONE)")},
-  {"sys_time", (PyCFunction)USTime_sys_time, METH_NOARGS,
-   PyDoc_STR("return system-time in sec (NONE)")},
-  {"real_time", (PyCFunction)USTime_real_time, METH_NOARGS,
-   PyDoc_STR("return real-time in sec (NONE)")},
-  {NULL, NULL, 0, NULL}
-};
 
+//////////////////////////////////////////////////////////////////////
 // USTimeObject の NumberMethod テーブル
+//////////////////////////////////////////////////////////////////////
 PyNumberMethods USTime_nbmethods = {
   (binaryfunc)USTime_add,      // nb_add
   (binaryfunc)USTime_sub,      // nb_subtract
@@ -296,10 +285,34 @@ PyNumberMethods USTime_nbmethods = {
   (unaryfunc)0                 // nb_index
 };
 
+
+//////////////////////////////////////////////////////////////////////
+// USTimeObject のメソッドテーブル
+//////////////////////////////////////////////////////////////////////
+PyMethodDef USTime_methods[] = {
+  {"set", (PyCFunction)USTime_set, METH_VARARGS,
+   PyDoc_STR("set time (double, double, double)")},
+  {"usr_time_usec", (PyCFunction)USTime_usr_time_usec, METH_NOARGS,
+   PyDoc_STR("return user-time in usec (NONE)")},
+  {"sys_time_usec", (PyCFunction)USTime_sys_time_usec, METH_NOARGS,
+   PyDoc_STR("return system-time in usec (NONE)")},
+  {"real_time_usec", (PyCFunction)USTime_real_time_usec, METH_NOARGS,
+   PyDoc_STR("return real-time in usec (NONE)")},
+  {"usr_time", (PyCFunction)USTime_usr_time, METH_NOARGS,
+   PyDoc_STR("return user-time in sec (NONE)")},
+  {"sys_time", (PyCFunction)USTime_sys_time, METH_NOARGS,
+   PyDoc_STR("return system-time in sec (NONE)")},
+  {"real_time", (PyCFunction)USTime_real_time, METH_NOARGS,
+   PyDoc_STR("return real-time in sec (NONE)")},
+  {NULL, NULL, 0, NULL}
+};
+
 END_NONAMESPACE
 
 
+//////////////////////////////////////////////////////////////////////
 // USTimeObject 用のタイプオブジェクト
+//////////////////////////////////////////////////////////////////////
 PyTypeObject USTimeType = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
@@ -345,6 +358,11 @@ PyTypeObject USTimeType = {
   0,                          /*tp_free*/
   0,                          /*tp_is_gc*/
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// PyObject と USTime 間の変換関数
+//////////////////////////////////////////////////////////////////////
 
 // @brief PyObject から USTime を取り出す．
 // @param[in] py_obj Python オブジェクト

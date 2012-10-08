@@ -141,7 +141,10 @@ RandGen_res53(RandGenObject* self,
   return conv_to_pyobject(self->mRandGen->res53());
 }
 
+
+//////////////////////////////////////////////////////////////////////
 // RandGenObject のメソッドテーブル
+//////////////////////////////////////////////////////////////////////
 PyMethodDef RandGen_methods[] = {
   {"init_by_array", (PyCFunction)RandGen_init_by_array, METH_VARARGS,
    PyDoc_STR("initialize by array (sequence of uint)")},
@@ -165,51 +168,54 @@ PyMethodDef RandGen_methods[] = {
 END_NONAMESPACE
 
 
+
+//////////////////////////////////////////////////////////////////////
 // RandGenObject 用のタイプオブジェクト
+//////////////////////////////////////////////////////////////////////
 PyTypeObject RandGenType = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "logic.RandGen",            /*tp_name*/
-  sizeof(RandGenObject),      /*tp_basicsize*/
-  0,                          /*tp_itemsize*/
+  "utils.RandGen",             // tp_name
+  sizeof(RandGenObject),       // tp_basicsize
+  0,                           // tp_itemsize
   /* methods */
-  (destructor)RandGen_dealloc,    /*tp_dealloc*/
-  0,                          /*tp_print*/
-  0,                          /*tp_getattr*/
-  0,                          /*tp_setattr*/
-  0,                          /*tp_compare*/
-  0,                          /*tp_repr*/
-  0,                          /*tp_as_number*/
-  0,                          /*tp_as_sequence*/
-  0,                          /*tp_as_mapping*/
-  0,                          /*tp_hash*/
-  0,                          /*tp_call*/
-  0,                          /*tp_str*/
-  0,                          /*tp_getattro*/
-  0,                          /*tp_setattro*/
-  0,                          /*tp_as_buffer*/
-  Py_TPFLAGS_DEFAULT,         /*tp_flags*/
-  "random number generator",  /*tp_doc*/
-  0,                          /*tp_traverse*/
-  0,                          /*tp_clear*/
-  0,                          /*tp_richcompare*/
-  0,                          /*tp_weaklistoffset*/
-  0,                          /*tp_iter*/
-  0,                          /*tp_iternext*/
-  RandGen_methods,                /*tp_methods*/
-  0,                          /*tp_members*/
-  0,                          /*tp_getset*/
-  0,                          /*tp_base*/
-  0,                          /*tp_dict*/
-  0,                          /*tp_descr_get*/
-  0,                          /*tp_descr_set*/
-  0,                          /*tp_dictoffset*/
-  (initproc)RandGen_init,         /*tp_init*/
-  0,                          /*tp_alloc*/
-  (newfunc)RandGen_new,           /*tp_new*/
-  0,                          /*tp_free*/
-  0,                          /*tp_is_gc*/
+  (destructor)RandGen_dealloc, // tp_dealloc
+  0,                           // tp_print
+  0,                           // tp_getattr
+  0,                           // tp_setattr
+  0,                           // tp_compare
+  0,                           // tp_repr
+  0,                           // tp_as_number
+  0,                           // tp_as_sequence
+  0,                           // tp_as_mapping
+  0,                           // tp_hash
+  0,                           // tp_call
+  0,                           // tp_str
+  0,                           // tp_getattro
+  0,                           // tp_setattro
+  0,                           // tp_as_buffer
+  Py_TPFLAGS_DEFAULT,          // tp_flags
+  "random number generator",   // tp_doc
+  0,                           // tp_traverse
+  0,                           // tp_clear
+  0,                           // tp_richcompare
+  0,                           // tp_weaklistoffset
+  0,                           // tp_iter
+  0,                           // tp_iternext
+  RandGen_methods,             // tp_methods
+  0,                           // tp_members
+  0,                           // tp_getset
+  0,                           // tp_base
+  0,                           // tp_dict
+  0,                           // tp_descr_get
+  0,                           // tp_descr_set
+  0,                           // tp_dictoffset
+  (initproc)RandGen_init,      // tp_init
+  0,                           // tp_alloc
+  (newfunc)RandGen_new,        // tp_new
+  0,                           // tp_free
+  0,                           // tp_is_gc
 };
 
 END_NAMESPACE_YM_PYTHON
