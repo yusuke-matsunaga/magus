@@ -34,7 +34,9 @@ pylogic_test_SOURCES = \
 	pylogic_test.cc
 
 pylogic_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/python/libym_logic_python.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+        $(YMTOOLS_BUILDDIR)/libraries/libym_utils/python/libym_utils_python.la \
         $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 pylogic_test_LDFLAGS = \

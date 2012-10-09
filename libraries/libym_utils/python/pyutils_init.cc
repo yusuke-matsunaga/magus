@@ -43,6 +43,22 @@ utils_init()
     return;
   }
 
+  if ( PyType_Ready(&FileLocType) < 0 ) {
+    return;
+  }
+
+  if ( PyType_Ready(&FileRegionType) < 0 ) {
+    return;
+  }
+
+  if ( PyType_Ready(&MsgTypeType) < 0 ) {
+    return;
+  }
+
+  if ( PyType_Ready(&MsgHandlerType) < 0 ) {
+    return;
+  }
+
   if ( PyType_Ready(&USTimeType) < 0 ) {
     return;
   }
@@ -84,6 +100,14 @@ utils_init()
   //////////////////////////////////////////////////////////////////////
 
   PyModule_AddObject(m, "FileInfo", (PyObject*)&FileInfoType);
+
+  PyModule_AddObject(m, "FileLoc", (PyObject*)&FileLocType);
+
+  PyModule_AddObject(m, "FileRegion", (PyObject*)&FileRegionType);
+
+  PyModule_AddObject(m, "MsgType", (PyObject*)&MsgTypeType);
+
+  PyModule_AddObject(m, "MsgHandler", (PyObject*)&MsgHandlerType);
 
   PyModule_AddObject(m, "USTime", (PyObject*)&USTimeType);
 

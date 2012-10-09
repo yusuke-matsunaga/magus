@@ -44,6 +44,7 @@ pyutils_test_SOURCES = \
 	pyutils_test.cc
 
 pyutils_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/python/libym_utils_python.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 pyutils_test_LDFLAGS = \

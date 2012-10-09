@@ -126,7 +126,6 @@ fi
 
 if test "$ym_have_python" = 1; then
    YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS python"
-   YM_EXTRA_LIBADD="$YM_EXTRA_LIBADD python/libym_utils_python.la"
    AC_CONFIG_FILES([python/Makefile])
    AC_CONFIG_FILES([tests/python/Makefile])
 fi

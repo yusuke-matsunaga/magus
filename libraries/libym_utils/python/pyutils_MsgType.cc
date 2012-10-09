@@ -35,6 +35,18 @@ struct MsgTypeObject
 // Python 用のメソッド関数定義
 //////////////////////////////////////////////////////////////////////
 
+// MsgTypeObject の生成関数
+MsgTypeObject*
+MsgType_new(PyTypeObject* type)
+{
+  MsgTypeObject* self = PyObject_New(MsgTypeObject, type);
+  if ( self == NULL ) {
+    return NULL;
+  }
+
+  return self;
+}
+
 // str 関数
 PyObject*
 MsgType_str(MsgTypeObject* self)
@@ -154,7 +166,7 @@ PyTypeObject MsgTypeType = {
   (long)0,                        // tp_dictoffset
   (initproc)0,                    // tp_init
   (allocfunc)0,                   // tp_alloc
-  (newfunc)0,                     // tp_new
+  (newfunc)MsgType_new,           // tp_new
   (freefunc)0,                    // tp_free
   (inquiry)0,                     // tp_is_gc
 
@@ -215,25 +227,47 @@ PyObject* Py_kMsgDebug;
 
 BEGIN_NONAMESPACE
 
-// MsgTypeObject の生成関数
-PyObject*
-MsgType_new(tMsgType type,
-	    PyObject* m,
+// Py_kMsgError の実体
+MsgTypeObject Py_kMsgErrorStruct = {
+  PyObject_HEAD_INIT(&MsgTypeType)
+  kMsgError
+};
+
+// Py_kMsgWarning の実体
+MsgTypeObject Py_kMsgWarningStruct = {
+  PyObject_HEAD_INIT(&MsgTypeType)
+  kMsgWarning
+};
+
+// Py_kMsgFailure の実体
+MsgTypeObject Py_kMsgFailureStruct = {
+  PyObject_HEAD_INIT(&MsgTypeType)
+  kMsgFailure
+};
+
+// Py_kMsgInfo の実体
+MsgTypeObject Py_kMsgInfoStruct = {
+  PyObject_HEAD_INIT(&MsgTypeType)
+  kMsgInfo
+};
+
+// Py_kMsgDebug の実体
+MsgTypeObject Py_kMsgDebugStruct = {
+  PyObject_HEAD_INIT(&MsgTypeType)
+  kMsgDebug
+};
+
+// MsgType の定数を設定する関数
+inline
+void
+MsgType_set(MsgTypeObject& msg_obj,
+	    PyObject*& py_obj,
+	    PyObject* module,
 	    const char* name)
 {
-  MsgTypeObject* self = PyObject_New(MsgTypeObject, &MsgTypeType);
-  if ( self == NULL ) {
-    return NULL;
-  }
-
-  self->mType = type;
-
-  Py_INCREF(self);
-  PyObject* obj = (PyObject*)self;
-
-  PyModule_AddObject(m, name, obj);
-
-  return obj;
+  py_obj = (PyObject*)&msg_obj;
+  Py_XINCREF(py_obj);
+  PyModule_AddObject(module, name, py_obj);
 }
 
 END_NONAMESPACE
@@ -241,11 +275,11 @@ END_NONAMESPACE
 void
 MsgType_initialize(PyObject* m)
 {
-  Py_kMsgError = MsgType_new(kMsgError, m, "kMsgError");
-  Py_kMsgWarning = MsgType_new(kMsgWarning, m, "kMsgWarning");
-  Py_kMsgFailure = MsgType_new(kMsgFailure, m, "kMsgFailure");
-  Py_kMsgInfo = MsgType_new(kMsgInfo, m, "kMsgInfo");
-  Py_kMsgDebug = MsgType_new(kMsgDebug, m, "kMsgDebug");
+  MsgType_set(Py_kMsgErrorStruct,   Py_kMsgError,   m, "kMsgError");
+  MsgType_set(Py_kMsgWarningStruct, Py_kMsgWarning, m, "kMsgWarning");
+  MsgType_set(Py_kMsgFailureStruct, Py_kMsgFailure, m, "kMsgFailure");
+  MsgType_set(Py_kMsgInfoStruct,    Py_kMsgInfo,    m, "kMsgInfo");
+  MsgType_set(Py_kMsgDebugStruct,   Py_kMsgDebug,   m, "kMsgDebug");
 }
 
 END_NAMESPACE_YM_PYTHON

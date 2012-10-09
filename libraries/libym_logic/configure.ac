@@ -94,7 +94,7 @@ YM_CHECK_TCL
 YM_CHECK_TCLREADLINE
 
 # Check for Python
-YM_CHECK_PYTHON
+YM_CHECK_PYTHON([ym_have_python=1], [ym_have_python=0])
 
 AC_CACHE_SAVE
 
@@ -113,6 +113,18 @@ YMTOOLS_SRCDIR="\$(top_srcdir)/../.."
 YMTOOLS_BUILDDIR="\$(top_builddir)/../.."
 AC_SUBST([YMTOOLS_SRCDIR])
 AC_SUBST([YMTOOLS_BUILDDIR])
+
+YM_EXTRA_SUBDIRS=""
+YM_EXTRA_LIBADD=""
+
+if test "$ym_have_python" = 1; then
+   YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS python"
+   AC_CONFIG_FILES([python/Makefile])
+   AC_CONFIG_FILES([tests/python/Makefile])
+fi
+
+AC_SUBST([YM_EXTRA_SUBDIRS])
+AC_SUBST([YM_EXTRA_LIBADD])
 
 
 # ===================================================================
@@ -137,7 +149,6 @@ AC_CONFIG_FILES([sat/ymsat/Makefile])
 AC_CONFIG_FILES([sat/MiniSat/Makefile])
 AC_CONFIG_FILES([sat/dimacs/Makefile])
 AC_CONFIG_FILES([aig/Makefile])
-AC_CONFIG_FILES([python/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([tests/expr/Makefile])
 AC_CONFIG_FILES([tests/bdd/Makefile])
@@ -146,7 +157,6 @@ AC_CONFIG_FILES([tests/cnfdd/Makefile])
 AC_CONFIG_FILES([tests/npn/Makefile])
 AC_CONFIG_FILES([tests/sat/Makefile])
 AC_CONFIG_FILES([tests/aig/Makefile])
-AC_CONFIG_FILES([tests/python/Makefile])
 
 
 # ===================================================================
