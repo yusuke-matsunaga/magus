@@ -75,7 +75,6 @@ utils_init()
     return;
   }
 
-#if 0
   if ( PyType_Ready(&RandPermGenType) < 0 ) {
     return;
   }
@@ -83,7 +82,7 @@ utils_init()
   if ( PyType_Ready(&RandCombiGenType) < 0 ) {
     return;
   }
-#endif
+
 
   //////////////////////////////////////////////////////////////////////
   // モジュールオブジェクトの生成
@@ -117,11 +116,9 @@ utils_init()
 
   PyModule_AddObject(m, "RandGen", (PyObject*)&RandGenType);
 
-#if 0
   PyModule_AddObject(m, "RandPermGen", (PyObject*)&RandPermGenType);
 
   PyModule_AddObject(m, "RandCombiGen", (PyObject*)&RandCombiGenType);
-#endif
 
 
   //////////////////////////////////////////////////////////////////////
