@@ -127,7 +127,6 @@ PyMethodDef StopWatch_methods[] = {
 END_NONAMESPACE
 
 
-
 //////////////////////////////////////////////////////////////////////
 // StopWatchObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
@@ -176,5 +175,28 @@ PyTypeObject StopWatchType = {
   0,                             // tp_free
   0,                             // tp_is_gc
 };
+
+
+// @brief PyObject から StopWatch を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @param[out] p_obj StopWatch のポインタを格納する変数
+// @retval true 変換が成功した．
+// @retval false 変換が失敗した． py_obj が StopWatchObject ではなかった．
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   StopWatch*& p_obj)
+{
+  // 型のチェック
+  if ( !StopWatchObject_Check(py_obj) ) {
+    return false;
+  }
+
+  // 強制的にキャスト
+  StopWatchObject* my_obj = (StopWatchObject*)py_obj;
+
+  p_obj = &my_obj->mStopWatch;
+
+  return true;
+}
 
 END_NAMESPACE_YM_PYTHON

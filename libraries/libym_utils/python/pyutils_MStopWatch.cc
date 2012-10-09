@@ -181,4 +181,28 @@ PyTypeObject MStopWatchType = {
   0,                              // tp_is_gc
 };
 
+
+// @brief PyObject から MStopWatch を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @param[out] p_obj MStopWatch のポインタを格納する変数
+// @retval true 変換が成功した．
+// @retval false 変換が失敗した． py_obj が MStopWatchObject ではなかった．
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   MStopWatch*& p_obj)
+{
+  // 型のチェック
+  if ( !MStopWatchObject_Check(py_obj) ) {
+    return false;
+  }
+
+  // 強制的にキャスト
+  MStopWatchObject* my_obj = (MStopWatchObject*)py_obj;
+
+  p_obj = my_obj->mMStopWatch;
+
+  return true;
+}
+
+
 END_NAMESPACE_YM_PYTHON

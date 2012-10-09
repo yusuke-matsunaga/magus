@@ -13,34 +13,8 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// CombiGen と PermGen に共通な属性を表す基底クラス
+// クラス GenBase
 //////////////////////////////////////////////////////////////////////
-
-// 空のコンストラクタ
-GenBase::iterator::iterator() :
-  mElem(0),
-  mParent(NULL)
-{
-}
-
-// コンストラクタ
-// 継承クラスが用いる．
-GenBase::iterator::iterator(const GenBase* parent) :
-  mElem(parent->k()),
-  mParent(parent)
-{
-  for (ymuint i = 0; i < mParent->k(); ++ i) {
-    mElem[i] = i;
-  }
-}
-
-// 内容をコピーする関数
-void
-GenBase::iterator::copy(const iterator& src)
-{
-  mElem = src.mElem;
-  mParent = src.mParent;
-}
 
 // コンストラクタ
 // 全要素数 n と選択する要素数 k を必ず指定する．
@@ -58,65 +32,44 @@ GenBase::~GenBase()
 
 
 //////////////////////////////////////////////////////////////////////
-// 組み合わせ生成器を表すクラス
+// クラス GenIterator
 //////////////////////////////////////////////////////////////////////
 
 // 空のコンストラクタ
-CombiGen::iterator::iterator()
+GenIterator::GenIterator() :
+  mElem(0),
+  mParent(NULL)
 {
 }
 
 // コンストラクタ
-// CombiGen が用いる．
-CombiGen::iterator::iterator(const CombiGen* parent) :
-  GenBase::iterator(parent)
+// 継承クラスが用いる．
+GenIterator::GenIterator(const GenBase* parent) :
+  mElem(parent->k()),
+  mParent(parent)
 {
-}
-
-// コピーコンストラクタ
-CombiGen::iterator::iterator(const iterator& src)
-{
-  copy(src);
-}
-
-// 代入演算子
-const CombiGen::iterator&
-CombiGen::iterator::operator=(const iterator& src)
-{
-  copy(src);
-  return *this;
-}
-
-// 次の要素を求める．
-CombiGen::iterator
-CombiGen::iterator::operator++()
-{
-  if ( elem(k() - 1) < n() ) {
-    next(k() - 1);
+  for (ymuint i = 0; i < mParent->k(); ++ i) {
+    mElem[i] = i;
   }
-  return *this;
 }
 
-// 末尾の時に true を返す．
-bool
-CombiGen::iterator::is_end() const
+// @brief デストラクタ
+GenIterator::~GenIterator()
 {
-  // 末尾の時には範囲外の値(= n())を持っている．
-  return elem(k() - 1) == n();
 }
 
-// operator++() のサブルーティン
+// 内容をコピーする関数
 void
-CombiGen::iterator::next(ymuint pos)
+GenIterator::copy(const GenIterator& src)
 {
-  ++ elem(pos);
-  if ( elem(pos) == n() - k() + pos + 1) {
-    if ( pos > 0 ) {
-      next(pos - 1);
-      elem(pos) = elem(pos - 1) + 1;
-    }
-  }
+  mElem = src.mElem;
+  mParent = src.mParent;
 }
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス CombiGen
+//////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
 // 全要素数 n と選択する要素数 k を必ず指定する．
@@ -132,7 +85,7 @@ CombiGen::~CombiGen()
 }
 
 // 最初の組み合わせを取り出す．
-CombiGen::iterator
+CombiGenIterator
 CombiGen::begin()
 {
   return iterator(this);
@@ -140,38 +93,125 @@ CombiGen::begin()
 
 
 //////////////////////////////////////////////////////////////////////
-// 順列生成器を表すクラス
+// クラス CombiGenIterator
 //////////////////////////////////////////////////////////////////////
 
 // 空のコンストラクタ
-PermGen::iterator::iterator()
+CombiGenIterator::CombiGenIterator()
 {
 }
 
 // コンストラクタ
-// PermGen が用いる．
-PermGen::iterator::iterator(const PermGen* parent) :
-  GenBase::iterator(parent)
+// CombiGen が用いる．
+CombiGenIterator::CombiGenIterator(const CombiGen* parent) :
+  GenIterator(parent)
 {
 }
 
 // コピーコンストラクタ
-PermGen::iterator::iterator(const iterator& src)
+CombiGenIterator::CombiGenIterator(const CombiGenIterator& src)
 {
   copy(src);
 }
 
 // 代入演算子
-const PermGen::iterator&
-PermGen::iterator::operator=(const iterator& src)
+const CombiGenIterator&
+CombiGenIterator::operator=(const CombiGenIterator& src)
 {
   copy(src);
   return *this;
 }
 
 // 次の要素を求める．
-PermGen::iterator
-PermGen::iterator::operator++()
+CombiGenIterator
+CombiGenIterator::operator++()
+{
+  if ( elem(k() - 1) < n() ) {
+    next(k() - 1);
+  }
+  return *this;
+}
+
+// 末尾の時に true を返す．
+bool
+CombiGenIterator::is_end() const
+{
+  // 末尾の時には範囲外の値(= n())を持っている．
+  return elem(k() - 1) == n();
+}
+
+// operator++() のサブルーティン
+void
+CombiGenIterator::next(ymuint pos)
+{
+  ++ elem(pos);
+  if ( elem(pos) == n() - k() + pos + 1) {
+    if ( pos > 0 ) {
+      next(pos - 1);
+      elem(pos) = elem(pos - 1) + 1;
+    }
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス PermGen
+//////////////////////////////////////////////////////////////////////
+
+// コンストラクタ
+// 全要素数 n と選択する要素数 k を必ず指定する．
+PermGen::PermGen(ymuint n,
+		 ymuint k) :
+  GenBase(n, k)
+{
+}
+
+// デストラクタ
+PermGen::~PermGen()
+{
+}
+
+// 最初の組み合わせを取り出す．
+PermGenIterator
+PermGen::begin()
+{
+  return iterator(this);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス PermGenIterator
+//////////////////////////////////////////////////////////////////////
+
+// 空のコンストラクタ
+PermGenIterator::PermGenIterator()
+{
+}
+
+// コンストラクタ
+// PermGen が用いる．
+PermGenIterator::PermGenIterator(const PermGen* parent) :
+  GenIterator(parent)
+{
+}
+
+// コピーコンストラクタ
+PermGenIterator::PermGenIterator(const PermGenIterator& src)
+{
+  copy(src);
+}
+
+// 代入演算子
+const PermGenIterator&
+PermGenIterator::operator=(const PermGenIterator& src)
+{
+  copy(src);
+  return *this;
+}
+
+// 次の要素を求める．
+PermGenIterator
+PermGenIterator::operator++()
 {
   vector<int> bitmap(n());
   for (ymuint i = 0; i < n(); ++ i) {
@@ -213,118 +253,15 @@ PermGen::iterator::operator++()
 
 // 末尾の時に true を返す．
 bool
-PermGen::iterator::is_end() const
+PermGenIterator::is_end() const
 {
   return elem(0) == n();
 }
 
-// コンストラクタ
-// 全要素数 n と選択する要素数 k を必ず指定する．
-PermGen::PermGen(ymuint n,
-		 ymuint k) :
-  GenBase(n, k)
-{
-}
-
-// デストラクタ
-PermGen::~PermGen()
-{
-}
-
-// 最初の組み合わせを取り出す．
-PermGen::iterator
-PermGen::begin()
-{
-  return iterator(this);
-}
-
 
 //////////////////////////////////////////////////////////////////////
-// 複数の要素のグループの組み合わせ生成器を表すクラス
+// クラス MultiGenBase
 //////////////////////////////////////////////////////////////////////
-
-// 空のコンストラクタ
-MultiGenBase::iterator::iterator() :
-  mElemArray(0),
-  mParent(NULL)
-{
-}
-
-// コンストラクタ
-// 継承クラスが用いる．
-MultiGenBase::iterator::iterator(const MultiGenBase* parent) :
-  mElemArray(parent->ngrp()),
-  mParent(parent)
-{
-  ymuint ngrp = parent->ngrp();
-  for (ymuint g = 0; g < ngrp; ++ g) {
-    mElemArray[g] = new vector<ymuint>(k(g));
-    init(g);
-  }
-}
-
-// コピーする．
-void
-MultiGenBase::iterator::copy(const iterator& src)
-{
-  if ( this != &src ) {
-    free();
-    mParent = src.mParent;
-    if ( mParent ) {
-      ymuint ngrp = mParent->ngrp();
-      mElemArray.resize(ngrp);
-      for (ymuint g = 0; g < ngrp; ++ g) {
-	mElemArray[g] = new vector<ymuint>(k(g));
-	elem(g) = src.elem(g);
-      }
-    }
-    else {
-      mElemArray.resize(0);
-    }
-  }
-}
-
-// デストラクタ
-MultiGenBase::iterator::~iterator()
-{
-  free();
-}
-
-// grp 番目のグループの要素配列を初期化する．
-void
-MultiGenBase::iterator::init(ymuint grp)
-{
-  for (ymuint i = 0; i < k(grp); ++ i) {
-    elem(grp)[i] = i;
-  }
-}
-
-// grp 番目のグループの要素配列を得る．
-vector<ymuint>&
-MultiGenBase::iterator::elem(ymuint g)
-{
-  assert_cond(mElemArray[g], __FILE__, __LINE__);
-  return *mElemArray[g];
-}
-
-// grp 番目のグループの要素配列を得る．
-// こちらは const 版
-const vector<ymuint>&
-MultiGenBase::iterator::elem(ymuint g) const
-{
-  return *mElemArray[g];
-}
-
-// 確保したメモリを解放する
-void
-MultiGenBase::iterator::free()
-{
-  ymuint n = mElemArray.size();
-  for (ymuint g = 0; g < n; ++ g) {
-    delete mElemArray[g];
-    mElemArray[g] = NULL;
-  }
-}
 
 // コンストラクタ
 // 全要素数 n と選択する要素数 k のベクタを指定する．
@@ -340,40 +277,152 @@ MultiGenBase::~MultiGenBase()
 
 
 //////////////////////////////////////////////////////////////////////
-// 複数の要素のグループの組み合わせ生成器を表すクラス
+// クラス MultiGenIterator
 //////////////////////////////////////////////////////////////////////
 
 // 空のコンストラクタ
-MultiCombiGen::iterator::iterator()
+MultiGenIterator::MultiGenIterator() :
+  mElemArray(0),
+  mParent(NULL)
+{
+}
+
+// コンストラクタ
+// 継承クラスが用いる．
+MultiGenIterator::MultiGenIterator(const MultiGenBase* parent) :
+  mElemArray(parent->group_num()),
+  mParent(parent)
+{
+  ymuint group_num = parent->group_num();
+  for (ymuint g = 0; g < group_num; ++ g) {
+    mElemArray[g] = new vector<ymuint>(k(g));
+    init(g);
+  }
+}
+
+// コピーする．
+void
+MultiGenIterator::copy(const MultiGenIterator& src)
+{
+  if ( this != &src ) {
+    free();
+    mParent = src.mParent;
+    if ( mParent ) {
+      ymuint group_num = mParent->group_num();
+      mElemArray.resize(group_num);
+      for (ymuint g = 0; g < group_num; ++ g) {
+	mElemArray[g] = new vector<ymuint>(k(g));
+	elem(g) = src.elem(g);
+      }
+    }
+    else {
+      mElemArray.resize(0);
+    }
+  }
+}
+
+// デストラクタ
+MultiGenIterator::~MultiGenIterator()
+{
+  free();
+}
+
+// grp 番目のグループの要素配列を初期化する．
+void
+MultiGenIterator::init(ymuint grp)
+{
+  for (ymuint i = 0; i < k(grp); ++ i) {
+    elem(grp)[i] = i;
+  }
+}
+
+// grp 番目のグループの要素配列を得る．
+vector<ymuint>&
+MultiGenIterator::elem(ymuint g)
+{
+  assert_cond(mElemArray[g], __FILE__, __LINE__);
+  return *mElemArray[g];
+}
+
+// grp 番目のグループの要素配列を得る．
+// こちらは const 版
+const vector<ymuint>&
+MultiGenIterator::elem(ymuint g) const
+{
+  return *mElemArray[g];
+}
+
+// 確保したメモリを解放する
+void
+MultiGenIterator::free()
+{
+  ymuint n = mElemArray.size();
+  for (ymuint g = 0; g < n; ++ g) {
+    delete mElemArray[g];
+    mElemArray[g] = NULL;
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス MutlCombiGen
+//////////////////////////////////////////////////////////////////////
+
+// コンストラクタ
+// 全要素数 n と選択する要素数 k のベクタを指定する．
+MultiCombiGen::MultiCombiGen(const vector<pair<ymuint, ymuint> >& nk_array) :
+  MultiGenBase(nk_array)
+{
+}
+
+// デストラクタ
+MultiCombiGen::~MultiCombiGen()
+{
+}
+
+// 最初の組み合わせを取り出す．
+MultiCombiGenIterator
+MultiCombiGen::begin()
+{
+  return iterator(this);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス MultiCombiGenIterator
+//////////////////////////////////////////////////////////////////////
+
+// 空のコンストラクタ
+MultiCombiGenIterator::MultiCombiGenIterator()
 {
 }
 
 // コンストラクタ
 // MultiCombiGen が用いる．
-MultiCombiGen::iterator::iterator(const MultiCombiGen* parent) :
-  MultiGenBase::iterator(parent)
+MultiCombiGenIterator::MultiCombiGenIterator(const MultiCombiGen* parent) :
+  MultiGenIterator(parent)
 {
 }
 
 // コピーコンストラクタ
-MultiCombiGen::iterator::iterator(const iterator& src)
+MultiCombiGenIterator::MultiCombiGenIterator(const MultiCombiGenIterator& src)
 {
   copy(src);
 }
 
 // 代入演算子
-const MultiCombiGen::iterator&
-MultiCombiGen::iterator::operator=(const iterator& src)
+const MultiCombiGenIterator&
+MultiCombiGenIterator::operator=(const MultiCombiGenIterator& src)
 {
   copy(src);
   return *this;
 }
 
 // 次の要素を求める．
-MultiCombiGen::iterator
-MultiCombiGen::iterator::operator++()
+MultiCombiGenIterator
+MultiCombiGenIterator::operator++()
 {
-  for (ymuint g = ngrp(); g -- > 0; ) {
+  for (ymuint g = group_num(); g -- > 0; ) {
     if ( !is_end_sub(g) ) {
       next(g, k(g) - 1);
     }
@@ -390,15 +439,15 @@ MultiCombiGen::iterator::operator++()
 
 // 末尾の時に true を返す．
 bool
-MultiCombiGen::iterator::is_end() const
+MultiCombiGenIterator::is_end() const
 {
   return is_end_sub(0);
 }
 
 // operator++() のサブルーティン
 void
-MultiCombiGen::iterator::next(ymuint g,
-			      ymuint pos)
+MultiCombiGenIterator::next(ymuint g,
+			    ymuint pos)
 {
   ++ elem(g)[pos];
   if ( elem(g)[pos] == n(g) - k(g) + pos + 1) {
@@ -411,66 +460,71 @@ MultiCombiGen::iterator::next(ymuint g,
 
 // grp 番目のグループが終了状態の時 true を返す．
 bool
-MultiCombiGen::iterator::is_end_sub(ymuint grp) const
+MultiCombiGenIterator::is_end_sub(ymuint grp) const
 {
   return elem(grp)[k(grp) - 1] == n(grp);
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// クラス MultiPermGen
+//////////////////////////////////////////////////////////////////////
+
 // コンストラクタ
 // 全要素数 n と選択する要素数 k のベクタを指定する．
-MultiCombiGen::MultiCombiGen(const vector<pair<ymuint, ymuint> >& nk_array) :
+MultiPermGen::MultiPermGen(const vector<pair<ymuint, ymuint> >& nk_array) :
   MultiGenBase(nk_array)
 {
 }
 
 // デストラクタ
-MultiCombiGen::~MultiCombiGen()
+MultiPermGen::~MultiPermGen()
 {
 }
 
 // 最初の組み合わせを取り出す．
-MultiCombiGen::iterator
-MultiCombiGen::begin()
+MultiPermGenIterator
+MultiPermGen::begin()
 {
   return iterator(this);
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// 複数の要素のグループの組み合わせ生成器を表すクラス
+// クラス MultiPermGenIterator
 //////////////////////////////////////////////////////////////////////
 
 // 空のコンストラクタ
-MultiPermGen::iterator::iterator()
+MultiPermGenIterator::MultiPermGenIterator()
 {
 }
 
 // コンストラクタ
 // MultiPermGen が用いる．
-MultiPermGen::iterator::iterator(const MultiPermGen* parent) :
-  MultiGenBase::iterator(parent)
+MultiPermGenIterator::MultiPermGenIterator(const MultiPermGen* parent) :
+  MultiGenIterator(parent)
 {
 }
 
 // コピーコンストラクタ
-MultiPermGen::iterator::iterator(const iterator& src)
+MultiPermGenIterator::MultiPermGenIterator(const MultiPermGenIterator& src)
 {
   copy(src);
 }
 
 // 代入演算子
-const MultiPermGen::iterator&
-MultiPermGen::iterator::operator=(const iterator& src)
+const MultiPermGenIterator&
+MultiPermGenIterator::operator=(const MultiPermGenIterator& src)
 {
   copy(src);
   return *this;
 }
 
 // 次の要素を求める．
-MultiPermGen::iterator
-MultiPermGen::iterator::operator++()
+MultiPermGenIterator
+MultiPermGenIterator::operator++()
 {
-  for (ymuint g = ngrp(); g -- > 0; ) {
+  for (ymuint g = group_num(); g -- > 0; ) {
     vector<int> bitmap(n(g));
     for (ymuint i = 0; i < n(g); ++ i) {
       bitmap[i] = 0;
@@ -518,35 +572,16 @@ MultiPermGen::iterator::operator++()
 
 // 末尾の時に true を返す．
 bool
-MultiPermGen::iterator::is_end() const
+MultiPermGenIterator::is_end() const
 {
   return is_end_sub(0);
 }
 
 // grp 番目のグループが終了状態の時 true を返す．
 bool
-MultiPermGen::iterator::is_end_sub(ymuint grp) const
+MultiPermGenIterator::is_end_sub(ymuint grp) const
 {
   return elem(grp)[0] == n(grp);
-}
-
-// コンストラクタ
-// 全要素数 n と選択する要素数 k のベクタを指定する．
-MultiPermGen::MultiPermGen(const vector<pair<ymuint, ymuint> >& nk_array) :
-  MultiGenBase(nk_array)
-{
-}
-
-// デストラクタ
-MultiPermGen::~MultiPermGen()
-{
-}
-
-// 最初の組み合わせを取り出す．
-MultiPermGen::iterator
-MultiPermGen::begin()
-{
-  return iterator(this);
 }
 
 END_NAMESPACE_YM

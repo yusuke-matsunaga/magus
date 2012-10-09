@@ -10,11 +10,20 @@
 
 
 #include "ympython.h"
-#include "ym_utils/FileInfo.h"
-#include "ym_utils/USTime.h"
-#include "ym_utils/StopWatch.h"
-#include "ym_utils/RandGen.h"
 
+
+BEGIN_NAMESPACE_YM
+
+class FileInfo;
+class FileLoc;
+class RandGen;
+class RandCombiGen;
+class RandPermGen;
+class StopWatch;
+class MStopWatch;
+class USTime;
+
+END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_PYTHON
 
@@ -184,23 +193,33 @@ conv_from_pyobject(PyObject* py_obj,
 
 /// @brief PyObject から StopWatch を取り出す．
 /// @param[in] py_obj Python オブジェクト
-/// @param[out] obj StopWatch を格納する変数
+/// @param[out] p_obj StopWatch のポインタを格納する変数
 /// @retval true 変換が成功した．
 /// @retval false 変換が失敗した． py_obj が StopWatchObject ではなかった．
 extern
 bool
 conv_from_pyobject(PyObject* py_obj,
-		   StopWatch& obj);
+		   StopWatch*& p_obj);
+
+/// @brief PyObject から MStopWatch を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] p_obj MStopWatch のポインタを格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した． py_obj が MStopWatchObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   MStopWatch*& p_obj);
 
 /// @brief PyObject から RandGen を取り出す．
 /// @param[in] py_obj Python オブジェクト
-/// @param[out] obj RandGen を格納する変数
+/// @param[out] p_obj RandGen のポインタを格納する変数
 /// @retval true 変換が成功した．
 /// @retval false 変換が失敗した． py_obj が RandGenObject ではなかった．
 extern
 bool
 conv_from_pyobject(PyObject* py_obj,
-		   RandGen*& obj);
+		   RandGen*& p_obj);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -225,13 +244,6 @@ extern
 PyObject*
 conv_to_pyobject(const USTime& obj);
 
-#if 0
-/// @brief StopWatch から PyObject を生成する．
-/// @param[in] obj StopWatch オブジェクト
-extern
-PyObject*
-conv_to_pyobject(StopWatch obj);
-#endif
 
 END_NAMESPACE_YM_PYTHON
 
