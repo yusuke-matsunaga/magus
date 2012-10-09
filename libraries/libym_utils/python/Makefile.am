@@ -19,6 +19,10 @@ libym_utils_python_la_SOURCES = \
 	pyutils_init.cc \
 	pyutils_FileInfo.cc \
 	pyutils_FileLoc.cc \
+	pyutils_MsgType.cc \
+	pyutils_MsgHandler.cc \
+	PyMsgHandler.h \
+	PyMsgHandler.cc \
 	pyutils_USTime.cc \
 	pyutils_StopWatch.cc \
 	pyutils_MStopWatch.cc \

@@ -24,6 +24,9 @@ PyMethodDef utils_methods[] = {
 
 END_NONAMESPACE
 
+void
+MsgType_initialize(PyObject* module);
+
 END_NAMESPACE_YM_PYTHON
 
 
@@ -95,4 +98,12 @@ utils_init()
 
   PyModule_AddObject(m, "RandCombiGen", (PyObject*)&RandCombiGenType);
 #endif
+
+
+  //////////////////////////////////////////////////////////////////////
+  // MsgTypeObject の定数オブジェクトの生成と登録
+  //////////////////////////////////////////////////////////////////////
+
+  MsgType_initialize(m);
+
 }

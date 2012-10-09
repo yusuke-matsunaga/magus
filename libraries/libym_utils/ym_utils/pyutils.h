@@ -10,12 +10,14 @@
 
 
 #include "ympython.h"
+#include "ym_utils/msg_type.h"
 
 
 BEGIN_NAMESPACE_YM
 
 class FileInfo;
 class FileLoc;
+class FileRegion;
 class RandGen;
 class RandCombiGen;
 class RandPermGen;
@@ -38,6 +40,38 @@ PyTypeObject FileInfoType;
 /// @brief FileLoc を表す型
 extern
 PyTypeObject FileLocType;
+
+/// @brief FileRegion を表す型
+extern
+PyTypeObject FileRegionType;
+
+/// @brief MsgType を表す型
+extern
+PyTypeObject MsgTypeType;
+
+/// @brief kMsgError を表すオブジェクト
+extern
+PyObject* Py_kMsgError;
+
+/// @brief kMsgWarning を表すオブジェクト
+extern
+PyObject* Py_kMsgWarning;
+
+/// @brief kMsgFailure を表すオブジェクト
+extern
+PyObject* Py_kMsgFailure;
+
+/// @brief kMsgInfo を表すオブジェクト
+extern
+PyObject* Py_kMsgInfo;
+
+/// @brief kMsgDebug を表すオブジェクト
+extern
+PyObject* Py_kMsgDebug;
+
+/// @brief MsgHandler を表す型
+extern
+PyTypeObject MsgHandlerType;
 
 /// @brief USTime を表す型
 extern
@@ -88,6 +122,39 @@ bool
 FileLocObject_Check(PyObject* obj)
 {
   return Py_TYPE(obj) == &FileLocType;
+}
+
+/// @brief FileRegionType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が FileRegionType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+FileRegionObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &FileRegionType;
+}
+
+/// @brief MsgTypeType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が MsgTypeType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+MsgTypeObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &MsgTypeType;
+}
+
+/// @brief MsgHandlerType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が MsgHandlerType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+MsgHandlerObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &MsgHandlerType;
 }
 
 /// @brief USTimeType の型チェック
@@ -181,6 +248,26 @@ bool
 conv_from_pyobject(PyObject* py_obj,
 		   FileLoc& obj);
 
+/// @brief PyObject から FileRegion を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] obj FileRegion を格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した． py_obj が FileRegionObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   FileRegion& obj);
+
+/// @brief PyObject から tMsgType を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] obj MsgType を格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した． py_obj が MsgTypeObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   tMsgType& obj);
+
 /// @brief PyObject から USTime を取り出す．
 /// @param[in] py_obj Python オブジェクト
 /// @param[out] obj USTime を格納する変数
@@ -237,6 +324,18 @@ conv_to_pyobject(const FileInfo& obj);
 extern
 PyObject*
 conv_to_pyobject(const FileLoc& obj);
+
+/// @brief FileRegion から PyObject を生成する．
+/// @param[in] obj FileRegion オブジェクト
+extern
+PyObject*
+conv_to_pyobject(const FileRegion& obj);
+
+/// @brief tMsgType から PyObject を生成する．
+/// @param[in] obj tMsgType オブジェクト
+extern
+PyObject*
+conv_to_pyobject(tMsgType obj);
 
 /// @brief USTime から PyObject を生成する．
 /// @param[in] obj USTime オブジェクト
