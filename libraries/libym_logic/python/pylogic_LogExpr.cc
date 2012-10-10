@@ -181,6 +181,60 @@ LogExpr_iand(PyObject* left,
   return NULL;
 }
 
+// inplace xor 関数
+PyObject*
+LogExpr_ixor(PyObject* left,
+	     PyObject* right)
+{
+  if ( LogExprObject_Check(left) && LogExprObject_Check(right) ) {
+    LogExprObject* self = (LogExprObject*)left;
+    LogExpr expr2;
+    if ( !conv_from_pyobject(right, expr2) ) {
+      return NULL;
+    }
+    *self->mLogExpr ^= expr2;
+    Py_INCREF(self);
+    return (PyObject*)self;
+  }
+  PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
+  return NULL;
+}
+
+// inplace or 関数
+PyObject*
+LogExpr_ior(PyObject* left,
+	    PyObject* right)
+{
+  if ( LogExprObject_Check(left) && LogExprObject_Check(right) ) {
+    LogExprObject* self = (LogExprObject*)left;
+    LogExpr expr2;
+    if ( !conv_from_pyobject(right, expr2) ) {
+      return NULL;
+    }
+    *self->mLogExpr |= expr2;
+    Py_INCREF(self);
+    return (PyObject*)self;
+  }
+  PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
+  return NULL;
+}
+
+// make_zero 関数
+PyObject*
+LogExpr_make_zero(LogExprObject* self,
+		  PyObject* args)
+{
+  return conv_to_pyobject(LogExpr::make_zero());
+}
+
+// make_one 関数
+PyObject*
+LogExpr_make_one(LogExprObject* self,
+		 PyObject* args)
+{
+  return conv_to_pyobject(LogExpr::make_one());
+}
+
 // make_literal 関数
 // LiteralType のオブジェクトを一つか VarId と Pol を引数にとる．
 PyObject*
@@ -764,7 +818,7 @@ PyNumberMethods LogExpr_nbmethods = {
   (unaryfunc)0,                // nb_hex
 
   // Added in release 2.0
-  (binaryfunc)LogExpr_iand,    // nb_inplace_add
+  (binaryfunc)0,               // nb_inplace_add
   (binaryfunc)0,               // nb_inplace_subtract
   (binaryfunc)0,               // nb_inplace_multiply
   (binaryfunc)0,               // nb_inplace_divide
@@ -772,9 +826,9 @@ PyNumberMethods LogExpr_nbmethods = {
   (ternaryfunc)0,              // nb_inplace_power
   (binaryfunc)0,               // nb_inplace_lshift
   (binaryfunc)0,               // nb_inplace_rshift
-  (binaryfunc)0,               // nb_inplace_and
-  (binaryfunc)0,               // nb_inplace_xor
-  (binaryfunc)0,               // nb_inplace_or
+  (binaryfunc)LogExpr_iand,    // nb_inplace_and
+  (binaryfunc)LogExpr_ixor,    // nb_inplace_xor
+  (binaryfunc)LogExpr_ior,     // nb_inplace_or
 
   // Added in release 2.2
   (binaryfunc)0,               // nb_floor_divide
@@ -789,6 +843,10 @@ PyNumberMethods LogExpr_nbmethods = {
 
 // LogExprObject のメソッドテーブル
 PyMethodDef LogExpr_methods[] = {
+  {"make_zero", (PyCFunction)LogExpr_make_zero, METH_STATIC | METH_NOARGS,
+   PyDoc_STR("make constant 0 (NONE)")},
+  {"make_one", (PyCFunction)LogExpr_make_one, METH_STATIC | METH_NOARGS,
+   PyDoc_STR("make constant 1 (NONE)")},
   {"make_literal", (PyCFunction)LogExpr_make_literal, METH_STATIC | METH_VARARGS,
    PyDoc_STR("make literal (Literal)")},
   {"make_posiliteral", (PyCFunction)LogExpr_make_posiliteral, METH_STATIC | METH_VARARGS,
