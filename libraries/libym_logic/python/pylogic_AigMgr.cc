@@ -428,7 +428,7 @@ PyTypeObject AigMgrType = {
 // @retval false 変換が失敗した．py_obj が PolObject ではなかった．
 bool
 conv_from_pyobject(PyObject* py_obj,
-		   AigMgr& obj)
+		   AigMgr*& p_obj)
 {
   // 型のチェック
   if ( !AigMgrObject_Check(py_obj) ) {
@@ -438,7 +438,7 @@ conv_from_pyobject(PyObject* py_obj,
   // 強制的にキャスト
   AigMgrObject* aigmgr_obj = (AigMgrObject*)py_obj;
 
-  obj = *(aigmgr_obj->mMgr);
+  p_obj = aigmgr_obj->mMgr;
 
   return true;
 }

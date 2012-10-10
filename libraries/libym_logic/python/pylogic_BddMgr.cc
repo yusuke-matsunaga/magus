@@ -261,7 +261,7 @@ BddMgr_tvec_to_bdd(BddMgrObject* self,
   for (ymuint i = 0; i < nv; ++ i) {
     PyObject* var_obj = PyTuple_GET_ITEM(obj2, i);
     VarId var;
-    if ( !PyArg_ParseTuple(args, "O!", &VarIdType, &var) ) {
+    if ( !PyArg_ParseTuple(var_obj, "O!", &VarIdType, &var) ) {
       return NULL;
     }
     vars[i] = var;
@@ -552,7 +552,7 @@ PyTypeObject BddMgrType = {
 // @retval false 変換が失敗した．py_obj が BddMgrObject ではなかった．
 bool
 conv_from_pyobject(PyObject* py_obj,
-		   BddMgr* obj_p)
+		   BddMgr*& obj_p)
 {
   // 型のチェック
   if ( !BddMgrObject_Check(py_obj) ) {

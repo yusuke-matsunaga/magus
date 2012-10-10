@@ -97,6 +97,108 @@ Bdd_hash(BddObject* self)
   return self->mBdd->hash();
 }
 
+// inv 演算
+PyObject*
+Bdd_inv(PyObject* left)
+{
+  if ( BddObject_Check(left) ) {
+    BddObject* obj1 = (BddObject*)left;
+    return conv_to_pyobject(~(*obj1->mBdd));
+  }
+  PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+  return NULL;
+}
+
+// and 演算
+PyObject*
+Bdd_and(PyObject* left,
+	PyObject* right)
+{
+  if ( BddObject_Check(left) && BddObject_Check(right) ) {
+    BddObject* obj1 = (BddObject*)left;
+    BddObject* obj2 = (BddObject*)right;
+    return conv_to_pyobject(*obj1->mBdd & *obj2->mBdd);
+  }
+  PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+  return NULL;
+}
+
+// or 演算
+PyObject*
+Bdd_or(PyObject* left,
+       PyObject* right)
+{
+  if ( BddObject_Check(left) && BddObject_Check(right) ) {
+    BddObject* obj1 = (BddObject*)left;
+    BddObject* obj2 = (BddObject*)right;
+    return conv_to_pyobject(*obj1->mBdd | *obj2->mBdd);
+  }
+  PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+  return NULL;
+}
+
+// xor 演算
+PyObject*
+Bdd_xor(PyObject* left,
+	PyObject* right)
+{
+  if ( BddObject_Check(left) && BddObject_Check(right) ) {
+    BddObject* obj1 = (BddObject*)left;
+    BddObject* obj2 = (BddObject*)right;
+    return conv_to_pyobject(*obj1->mBdd ^ *obj2->mBdd);
+  }
+  PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+  return NULL;
+}
+
+// inplace and 演算
+PyObject*
+Bdd_iand(PyObject* left,
+	 PyObject* right)
+{
+  if ( BddObject_Check(left) && BddObject_Check(right) ) {
+    BddObject* obj1 = (BddObject*)left;
+    BddObject* obj2 = (BddObject*)right;
+    *obj1->mBdd &= *obj2->mBdd;
+    Py_INCREF(left);
+    return left;
+  }
+  PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+  return NULL;
+}
+
+// inplace xor 演算
+PyObject*
+Bdd_ixor(PyObject* left,
+	 PyObject* right)
+{
+  if ( BddObject_Check(left) && BddObject_Check(right) ) {
+    BddObject* obj1 = (BddObject*)left;
+    BddObject* obj2 = (BddObject*)right;
+    *obj1->mBdd ^= *obj2->mBdd;
+    Py_INCREF(left);
+    return left;
+  }
+  PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+  return NULL;
+}
+
+// inplace or 演算
+PyObject*
+Bdd_ior(PyObject* left,
+	PyObject* right)
+{
+  if ( BddObject_Check(left) && BddObject_Check(right) ) {
+    BddObject* obj1 = (BddObject*)left;
+    BddObject* obj2 = (BddObject*)right;
+    *obj1->mBdd |= *obj2->mBdd;
+    Py_INCREF(left);
+    return left;
+  }
+  PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+  return NULL;
+}
+
 // is_zero 関数
 PyObject*
 Bdd_is_zero(BddObject* self,
@@ -626,7 +728,62 @@ Bdd_print(BddObject* self,
   return Py_None;
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// BddObject の NumberMethods 構造体の定義
+//////////////////////////////////////////////////////////////////////
+PyNumberMethods Bdd_nbmethods = {
+  (binaryfunc)0,               // nb_add
+  (binaryfunc)0,               // nb_subtract
+  (binaryfunc)0,               // nb_multiply
+  (binaryfunc)0,               // nb_divide
+  (binaryfunc)0,               // nb_remainder
+  (binaryfunc)0,               // nb_divmod
+  (ternaryfunc)0,              // nb_power
+  (unaryfunc)0,                // nb_negative
+  (unaryfunc)0,                // nb_positive
+  (unaryfunc)0,                // nb_absolute
+  (inquiry)0,                  // nb_nonzero
+  (unaryfunc)Bdd_inv,          // nb_invert
+  (binaryfunc)0,               // nb_lshift
+  (binaryfunc)0,               // nb_rshift
+  (binaryfunc)Bdd_and,         // nb_and
+  (binaryfunc)Bdd_xor,         // nb_xor
+  (binaryfunc)Bdd_or,          // nb_or
+  (coercion)0,                 // nb_coerce
+  (unaryfunc)0,                // nb_int
+  (unaryfunc)0,                // nb_long
+  (unaryfunc)0,                // nb_float
+  (unaryfunc)0,                // nb_oct
+  (unaryfunc)0,                // nb_hex
+
+  // Added in release 2.0
+  (binaryfunc)0,               // nb_inplace_add
+  (binaryfunc)0,               // nb_inplace_subtract
+  (binaryfunc)0,               // nb_inplace_multiply
+  (binaryfunc)0,               // nb_inplace_divide
+  (binaryfunc)0,               // nb_inplace_remainder
+  (ternaryfunc)0,              // nb_inplace_power
+  (binaryfunc)0,               // nb_inplace_lshift
+  (binaryfunc)0,               // nb_inplace_rshift
+  (binaryfunc)Bdd_iand,        // nb_inplace_and
+  (binaryfunc)Bdd_ixor,        // nb_inplace_xor
+  (binaryfunc)Bdd_ior,         // nb_inplace_or
+
+  // Added in release 2.2
+  (binaryfunc)0,               // nb_floor_divide
+  (binaryfunc)0,               // nb_true_divide
+  (binaryfunc)0,               // nb_inplace_floor_divide
+  (binaryfunc)0,               // nb_inplace_true_divide
+
+  // Added in release 2.5
+  (unaryfunc)0                 // nb_index
+};
+
+
+//////////////////////////////////////////////////////////////////////
 // BddObject のメソッドテーブル
+//////////////////////////////////////////////////////////////////////
 PyMethodDef Bdd_methods[] = {
   {"is_zero", (PyCFunction)Bdd_is_zero, METH_NOARGS,
    PyDoc_STR("check if constant 0 (NONE)")},
@@ -718,7 +875,7 @@ PyTypeObject BddType = {
   0,                          /*tp_setattr*/
   0,                          /*tp_compare*/
   0,                          /*tp_repr*/
-  0,                          /*tp_as_number*/
+  &Bdd_nbmethods,             /*tp_as_number*/
   0,                          /*tp_as_sequence*/
   0,                          /*tp_as_mapping*/
   (hashfunc)Bdd_hash,         /*tp_hash*/

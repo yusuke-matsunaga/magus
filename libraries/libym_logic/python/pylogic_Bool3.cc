@@ -370,7 +370,7 @@ Bool3_FromString(const char* str)
 PyObject*
 Bool3_FromLong(ymlong val)
 {
-  Bool3 b3val = b3val ? kB3True : kB3False;
+  Bool3 b3val = val ? kB3True : kB3False;
   return conv_to_pyobject(b3val);
 }
 

@@ -272,7 +272,7 @@ conv_from_pyobject(PyObject* py_obj,
 extern
 bool
 conv_from_pyobject(PyObject* py_obj,
-		   BddMgr* obj_p);
+		   BddMgr*& obj_p);
 
 /// @brief PyObject から Bdd を取り出す．
 /// @param[in] py_obj Python オブジェクト
@@ -292,7 +292,7 @@ conv_from_pyobject(PyObject* py_obj,
 extern
 bool
 conv_from_pyobject(PyObject* py_obj,
-		   AigMgr* obj);
+		   AigMgr*& obj);
 
 /// @brief PyObject から Aig を取り出す．
 /// @param[in] py_obj Python オブジェクト
