@@ -297,8 +297,11 @@ Pol_FromString(const char* str)
   else {
     PyErr_SetString(PyExc_ValueError,
 		    "parameter must be \"positive\" or \"negative\"");
+    delete [] buf;
     return NULL;
   }
+
+  delete [] buf;
 
   return conv_to_pyobject(pol);
 }

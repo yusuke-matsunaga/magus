@@ -26,6 +26,9 @@ PyMethodDef logic_methods[] = {
 END_NONAMESPACE
 
 void
+Bool3_initialize(PyObject* m);
+
+void
 Pol_initialize(PyObject* m);
 
 END_NAMESPACE_YM_PYTHON
@@ -130,6 +133,8 @@ logic_init()
 
   // SatSolver オブジェクトタイプの登録
   PyModule_AddObject(m, "SatSolver", (PyObject*)&SatSolverType);
+
+  Bool3_initialize(m);
 
   Pol_initialize(m);
 }
