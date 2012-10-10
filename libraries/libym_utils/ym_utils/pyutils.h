@@ -343,6 +343,16 @@ extern
 PyObject*
 conv_to_pyobject(const USTime& obj);
 
+/// @brief 文字列から MsgTypeObject を生成する．
+extern
+PyObject*
+MsgType_FromString(const char* str);
+
+/// @brief long から MsgTypeObject を生成する．
+extern
+PyObject*
+MsgType_FromLong(ymlong val);
+
 
 END_NAMESPACE_YM_PYTHON
 

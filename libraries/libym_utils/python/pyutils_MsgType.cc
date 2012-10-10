@@ -36,15 +36,71 @@ struct MsgTypeObject
 //////////////////////////////////////////////////////////////////////
 
 // MsgTypeObject の生成関数
+// 実際には存在しているオブジェクトを返すだけ．
 MsgTypeObject*
-MsgType_new(PyTypeObject* type)
+MsgType_new(PyTypeObject* type,
+	    PyObject* args)
 {
-  MsgTypeObject* self = PyObject_New(MsgTypeObject, type);
-  if ( self == NULL ) {
-    return NULL;
+  // 引数は
+  // - ()
+  // - (str)  {error|warning|failure|info|debug}
+  // - (uint) {1-5}
+  ymuint n = PyTuple_GET_SIZE(args);
+  if ( n == 0 ) {
+    // デフォルトは kMsgError
+    Py_INCREF(Py_kMsgError);
+    return (MsgTypeObject*)Py_kMsgError;
+  }
+  if ( n == 1 ) {
+    PyObject* obj = PyTuple_GET_ITEM(args, 0);
+    if ( PyString_Check(obj) ) {
+      char* str = PyString_AsString(obj);
+      return (MsgTypeObject*)MsgType_FromString(str);
+    }
+    if ( PyInt_Check(obj) ) {
+      ymlong val = PyInt_AS_LONG(obj);
+      return (MsgTypeObject*)MsgType_FromLong(val);
+    }
   }
 
-  return self;
+  PyErr_SetString(PyExc_TypeError, "string or unsigned int is expected");
+  return NULL;
+}
+
+// repr 用の文字列オブジェクト
+PyObject* Py_kMsgErrorString = NULL;
+PyObject* Py_kMsgWarningString = NULL;
+PyObject* Py_kMsgFailureString = NULL;
+PyObject* Py_kMsgInfoString = NULL;
+PyObject* Py_kMsgDebugString = NULL;
+
+// 文字列用オブジェクトが生成されていなければ生成する．
+inline
+PyObject*
+new_string(const char* str,
+	   PyObject*& py_obj)
+{
+  if ( py_obj == NULL ) {
+    py_obj = PyString_InternFromString(str);
+  }
+  Py_INCREF(py_obj);
+  return py_obj;
+}
+
+// repr 関数
+PyObject*
+MsgType_repr(MsgTypeObject* self)
+{
+  switch ( self->mType ) {
+  case kMsgError:   return new_string("error",   Py_kMsgErrorString);
+  case kMsgWarning: return new_string("warning", Py_kMsgWarningString);
+  case kMsgFailure: return new_string("failure", Py_kMsgFailureString);
+  case kMsgInfo:    return new_string("info",    Py_kMsgInfoString);
+  case kMsgDebug:   return new_string("debug",   Py_kMsgDebugString);
+  default: break;
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
 }
 
 // str 関数
@@ -56,9 +112,9 @@ MsgType_str(MsgTypeObject* self)
   return conv_to_pyobject(buf.str());
 }
 
-// to_uint 関数
+// bitmask 関数
 PyObject*
-MsgType_to_uint(MsgTypeObject* self,
+MsgType_bitmask(MsgTypeObject* self,
 		PyObject* args)
 {
   ymuint32 val = (1U << static_cast<ymuint32>(self->mType));
@@ -84,8 +140,8 @@ PyMethodDef MsgType_methods[] = {
   //  - METH_CLASS
   //  - METH_STATIC
   //  - METH_COEXIST
-  {"to_uint", (PyCFunction)MsgType_to_uint, METH_NOARGS,
-   PyDoc_STR("convert to unsigned int (NONE)")},
+  {"bitmask", (PyCFunction)MsgType_bitmask, METH_NOARGS,
+   PyDoc_STR("convert to bitmask (NONE)")},
   {NULL, NULL, 0, NULL} // end-marker
 };
 
@@ -110,7 +166,7 @@ PyTypeObject MsgTypeType = {
   (getattrfunc)0,                 // tp_getattr
   (setattrfunc)0,                 // tp_setattr
   (cmpfunc)0,                     // tp_compare
-  (reprfunc)0,                    // tp_repr
+  (reprfunc)MsgType_repr,         // tp_repr
 
   // Method suites for standard classes
   0,                              // tp_as_number
@@ -181,6 +237,76 @@ PyTypeObject MsgTypeType = {
 //////////////////////////////////////////////////////////////////////
 // PyObject と MsgType の間の変換関数
 //////////////////////////////////////////////////////////////////////
+
+// 文字列からの変換関数
+PyObject*
+MsgType_FromString(const char* str)
+{
+  if ( str == NULL ) {
+    PyErr_SetString(PyExc_ValueError,
+		    "NULL pointer is not allowed here");
+    return NULL;
+  }
+
+  // 小文字に変換する．
+  // 効率が悪いけど元の文字列を変更したくないので
+  // 新たな領域を確保する．
+  ymuint n = strlen(str);
+  char* buf = new char[n + 1];
+  for (ymuint i = 0; i < n; ++ i) {
+    buf[i] = tolower(str[i]);
+  }
+  buf[n] = '\0';
+
+  PyObject* result = NULL;
+  if ( strcmp(buf, "error") == 0 ) {
+    result = Py_kMsgError;
+  }
+  else if ( strcmp(buf, "warning") == 0 ) {
+    result = Py_kMsgWarning;
+  }
+  else if ( strcmp(buf, "failure") == 0 ) {
+    result = Py_kMsgFailure;
+  }
+  else if ( strcmp(buf, "info") == 0 ) {
+    result = Py_kMsgInfo;
+  }
+  else if ( strcmp(buf, "debug") == 0 ) {
+    result = Py_kMsgDebug;
+  }
+  else {
+    PyErr_SetString(PyExc_ValueError,
+		    "parameter must be error|warning|failure|info|debug");
+    delete [] buf;
+    return NULL;
+  }
+
+  delete [] buf;
+
+  Py_INCREF(result);
+  return result;
+}
+
+// long からの変換関数
+PyObject*
+MsgType_FromLong(long val)
+{
+  PyObject* result = NULL;
+  switch ( val ) {
+  case 1: result = Py_kMsgError; break;
+  case 2: result = Py_kMsgWarning; break;
+  case 3: result = Py_kMsgFailure; break;
+  case 4: result = Py_kMsgInfo; break;
+  case 5: result = Py_kMsgDebug; break;
+  default:
+    PyErr_SetString(PyExc_ValueError,
+		    "parameter must be in range of [1 ... 5]");
+    return NULL;
+  }
+
+  Py_INCREF(result);
+  return result;
+}
 
 // @brief PyObject から MsgType を取り出す．
 // @param[in] py_obj Python オブジェクト
