@@ -122,8 +122,6 @@ Pol_inv(PyObject* obj)
   return conv_to_pyobject(~pol_obj->mPol);
 }
 
-END_NONAMESPACE
-
 
 //////////////////////////////////////////////////////////////////////
 // PolObject の NumberMethods 構造体の定義
@@ -175,6 +173,8 @@ PyNumberMethods Pol_nbmethods = {
   // Added in release 2.5
   (unaryfunc)0                 // nb_index
 };
+
+END_NONAMESPACE
 
 
 // PolObject 用のタイプオブジェクト
@@ -348,9 +348,14 @@ Pol_set(PolObject& pol_obj,
 END_NONAMESPACE
 
 
+// PolObject 関係の初期化を行う．
 void
-Pol_initialize(PyObject* m)
+PolObject_init(PyObject* m)
 {
+  // Pol オブジェクトタイプの登録
+  PyModule_AddObject(m, "Pol", (PyObject*)&PolType);
+
+  // 定数オブジェクトの登録
   Pol_set(Py_kPolPosiStruct, Py_kPolPosi, m, "kPolPosi");
   Pol_set(Py_kPolNegaStruct, Py_kPolNega, m, "kPolNega");
 }

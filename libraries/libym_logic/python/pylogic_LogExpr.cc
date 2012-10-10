@@ -74,7 +74,7 @@ LogExpr_init(LogExprObject* self,
     istringstream is(str);
     string err_s;
     if ( !self->mLogExpr->read_from_stream(is, err_s) ) {
-      PyErr_SetString(ErrorObject, err_s.c_str());
+      PyErr_SetString(PyExc_ValueError, err_s.c_str());
       return -1;
     }
   }
@@ -91,22 +91,94 @@ LogExpr_str(LogExprObject* self)
   return conv_to_pyobject(buf.str());
 }
 
-// make_zero 関数
-// 引数をとらない．
+// inv 関数
 PyObject*
-LogExpr_make_zero(PyTypeObject* type_obj,
-		  PyObject* args)
+LogExpr_inv(PyObject* left)
 {
-  return conv_to_pyobject(LogExpr::make_zero());
+  LogExpr expr;
+  if ( !conv_from_pyobject(left, expr) ) {
+    return NULL;
+  }
+  return conv_to_pyobject(~expr);
 }
 
-// make_one 関数
-// 引数をとらない．
+// and 関数
 PyObject*
-LogExpr_make_one(PyTypeObject* type_obj,
-		 PyObject* args)
+LogExpr_and(PyObject* left,
+	    PyObject* right)
 {
-  return conv_to_pyobject(LogExpr::make_one());
+  if ( LogExprObject_Check(left) && LogExprObject_Check(right) ) {
+    LogExpr expr1;
+    LogExpr expr2;
+    if ( !conv_from_pyobject(left, expr1) ) {
+      return NULL;
+    }
+    if ( !conv_from_pyobject(right, expr2) ) {
+      return NULL;
+    }
+    return conv_to_pyobject(expr1 & expr2);
+  }
+  PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
+  return NULL;
+}
+
+// or 関数
+PyObject*
+LogExpr_or(PyObject* left,
+	   PyObject* right)
+{
+  if ( LogExprObject_Check(left) && LogExprObject_Check(right) ) {
+    LogExpr expr1;
+    LogExpr expr2;
+    if ( !conv_from_pyobject(left, expr1) ) {
+      return NULL;
+    }
+    if ( !conv_from_pyobject(right, expr2) ) {
+      return NULL;
+    }
+    return conv_to_pyobject(expr1 | expr2);
+  }
+  PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
+  return NULL;
+}
+
+// xor 関数
+PyObject*
+LogExpr_xor(PyObject* left,
+	    PyObject* right)
+{
+  if ( LogExprObject_Check(left) && LogExprObject_Check(right) ) {
+    LogExpr expr1;
+    LogExpr expr2;
+    if ( !conv_from_pyobject(left, expr1) ) {
+      return NULL;
+    }
+    if ( !conv_from_pyobject(right, expr2) ) {
+      return NULL;
+    }
+    return conv_to_pyobject(expr1 ^ expr2);
+  }
+  PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
+  return NULL;
+}
+
+// inplace and 関数
+PyObject*
+LogExpr_iand(PyObject* left,
+	     PyObject* right)
+{
+  if ( LogExprObject_Check(left) && LogExprObject_Check(right) ) {
+    LogExprObject* self = (LogExprObject*)left;
+    LogExpr expr2;
+    if ( !conv_from_pyobject(right, expr2) ) {
+      return NULL;
+    }
+    *self->mLogExpr &= expr2;
+    Py_INCREF(self);
+    return (PyObject*)self;
+  }
+  PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
+  return NULL;
 }
 
 // make_literal 関数
@@ -126,12 +198,12 @@ LogExpr_make_literal(PyTypeObject* type_obj,
     // obj1 は VarId, obj2 は Pol でなければならない．
     VarId vid;
     if ( !conv_from_pyobject(obj1, vid) ) {
-      PyErr_SetString(ErrorObject, "must be logic.VarId");
+      PyErr_SetString(PyExc_TypeError, "parameter must be logic.VarId");
       return NULL;
     }
     tPol pol;
     if ( !conv_from_pyobject(obj2, pol) ) {
-      PyErr_SetString(ErrorObject, "must be logic.Pol");
+      PyErr_SetString(PyExc_TypeError, "parameter must be logic.Pol");
       return NULL;
     }
     lit.set(vid, pol);
@@ -139,7 +211,7 @@ LogExpr_make_literal(PyTypeObject* type_obj,
   else if ( !conv_from_pyobject(obj1, lit) ) {
     VarId vid;
     if ( !conv_from_pyobject(obj1, vid) ) {
-      PyErr_SetString(ErrorObject, "must be logic.Literal or logic.VarId");
+      PyErr_SetString(PyExc_TypeError, "parameter must be logic.Literal or logic.VarId");
       return NULL;
     }
     lit.set(vid, kPolPosi);
@@ -188,12 +260,16 @@ PyObject*
 LogExpr_make_and(PyTypeObject* type_obj,
 		 PyObject* args)
 {
-  ymuint n = PyTuple_GET_SIZE(args);
+  PyObject* arg_list = NULL;
+  if ( !PyArg_ParseTuple(args, "O!", &PyList_Type, &arg_list) ) {
+    return NULL;
+  }
+  ymuint n = PyList_GET_SIZE(arg_list);
   LogExprVector child_list(n);
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* chd_obj = PyTuple_GET_ITEM(args, i);
+    PyObject* chd_obj = PyList_GET_ITEM(arg_list, i);
     if ( !LogExprObject_Check(chd_obj) ) {
-      PyErr_SetString(ErrorObject, "LogExprObject is expected");
+      PyErr_SetString(PyExc_TypeError, "LogExprObject is expected");
       return NULL;
     }
     LogExpr chd_expr;
@@ -211,12 +287,16 @@ PyObject*
 LogExpr_make_or(PyTypeObject* type_obj,
 		PyObject* args)
 {
-  ymuint n = PyTuple_GET_SIZE(args);
+  PyObject* arg_list = NULL;
+  if ( !PyArg_ParseTuple(args, "O!", &PyList_Type, &arg_list) ) {
+    return NULL;
+  }
+  ymuint n = PyList_GET_SIZE(arg_list);
   LogExprVector child_list(n);
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* chd_obj = PyTuple_GET_ITEM(args, i);
+    PyObject* chd_obj = PyList_GET_ITEM(arg_list, i);
     if ( !LogExprObject_Check(chd_obj) ) {
-      PyErr_SetString(ErrorObject, "LogExprObject is expected");
+      PyErr_SetString(PyExc_TypeError, "LogExprObject is expected");
       return NULL;
     }
     LogExpr chd_expr;
@@ -234,10 +314,14 @@ PyObject*
 LogExpr_make_xor(PyTypeObject* type_obj,
 		 PyObject* args)
 {
-  ymuint n = PyTuple_GET_SIZE(args);
+  PyObject* arg_list = NULL;
+  if ( !PyArg_ParseTuple(args, "O!", &PyList_Type, &arg_list) ) {
+    return NULL;
+  }
+  ymuint n = PyList_GET_SIZE(arg_list);
   LogExprVector child_list(n);
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* chd_obj = PyTuple_GET_ITEM(args, i);
+    PyObject* chd_obj = PyList_GET_ITEM(arg_list, i);
     if ( !LogExprObject_Check(chd_obj) ) {
       PyErr_SetString(ErrorObject, "LogExprObject is expected");
       return NULL;
@@ -249,15 +333,6 @@ LogExpr_make_xor(PyTypeObject* type_obj,
     child_list[i] = chd_expr;
   }
   return conv_to_pyobject(LogExpr::make_xor(child_list));
-}
-
-// not 関数
-// 引数をとらない．
-PyObject*
-LogExpr_not(LogExprObject* self,
-	    PyObject* args)
-{
-  return conv_to_pyobject(~(*self->mLogExpr));
 }
 
 // compose 関数
@@ -659,12 +734,61 @@ LogExpr_sop_litnum(LogExprObject* self,
   return conv_to_pyobject(litnum);
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// LogExprObject の NumberMethods 構造体の定義
+//////////////////////////////////////////////////////////////////////
+PyNumberMethods LogExpr_nbmethods = {
+  (binaryfunc)0,               // nb_add
+  (binaryfunc)0,               // nb_subtract
+  (binaryfunc)0,               // nb_multiply
+  (binaryfunc)0,               // nb_divide
+  (binaryfunc)0,               // nb_remainder
+  (binaryfunc)0,               // nb_divmod
+  (ternaryfunc)0,              // nb_power
+  (unaryfunc)0,                // nb_negative
+  (unaryfunc)0,                // nb_positive
+  (unaryfunc)0,                // nb_absolute
+  (inquiry)0,                  // nb_nonzero
+  (unaryfunc)LogExpr_inv,      // nb_invert
+  (binaryfunc)0,               // nb_lshift
+  (binaryfunc)0,               // nb_rshift
+  (binaryfunc)LogExpr_and,     // nb_and
+  (binaryfunc)LogExpr_xor,     // nb_xor
+  (binaryfunc)LogExpr_or,      // nb_or
+  (coercion)0,                 // nb_coerce
+  (unaryfunc)0,                // nb_int
+  (unaryfunc)0,                // nb_long
+  (unaryfunc)0,                // nb_float
+  (unaryfunc)0,                // nb_oct
+  (unaryfunc)0,                // nb_hex
+
+  // Added in release 2.0
+  (binaryfunc)LogExpr_iand,    // nb_inplace_add
+  (binaryfunc)0,               // nb_inplace_subtract
+  (binaryfunc)0,               // nb_inplace_multiply
+  (binaryfunc)0,               // nb_inplace_divide
+  (binaryfunc)0,               // nb_inplace_remainder
+  (ternaryfunc)0,              // nb_inplace_power
+  (binaryfunc)0,               // nb_inplace_lshift
+  (binaryfunc)0,               // nb_inplace_rshift
+  (binaryfunc)0,               // nb_inplace_and
+  (binaryfunc)0,               // nb_inplace_xor
+  (binaryfunc)0,               // nb_inplace_or
+
+  // Added in release 2.2
+  (binaryfunc)0,               // nb_floor_divide
+  (binaryfunc)0,               // nb_true_divide
+  (binaryfunc)0,               // nb_inplace_floor_divide
+  (binaryfunc)0,               // nb_inplace_true_divide
+
+  // Added in release 2.5
+  (unaryfunc)0                 // nb_index
+};
+
+
 // LogExprObject のメソッドテーブル
 PyMethodDef LogExpr_methods[] = {
-  {"make_zero", (PyCFunction)LogExpr_make_zero, METH_STATIC | METH_NOARGS,
-   PyDoc_STR("make constant zero (NONE)")},
-  {"make_one", (PyCFunction)LogExpr_make_one, METH_STATIC | METH_NOARGS,
-   PyDoc_STR("make constant one (NONE)")},
   {"make_literal", (PyCFunction)LogExpr_make_literal, METH_STATIC | METH_VARARGS,
    PyDoc_STR("make literal (Literal)")},
   {"make_posiliteral", (PyCFunction)LogExpr_make_posiliteral, METH_STATIC | METH_VARARGS,
@@ -672,13 +796,11 @@ PyMethodDef LogExpr_methods[] = {
   {"make_negaliteral", (PyCFunction)LogExpr_make_negaliteral, METH_STATIC | METH_VARARGS,
    PyDoc_STR("make negative literal (VarId)")},
   {"make_and", (PyCFunction)LogExpr_make_and, METH_STATIC | METH_VARARGS,
-   PyDoc_STR("make and (Tuple of LogExpr)")},
+   PyDoc_STR("make and (list of LogExpr)")},
   {"make_or", (PyCFunction)LogExpr_make_or, METH_STATIC | METH_VARARGS,
-   PyDoc_STR("make or (Tuple of LogExpr)")},
+   PyDoc_STR("make or (list of LogExpr)")},
   {"make_xor", (PyCFunction)LogExpr_make_xor, METH_STATIC | METH_VARARGS,
-   PyDoc_STR("make xor (Tuple of LogExpr)")},
-  {"invert", (PyCFunction)LogExpr_not, METH_NOARGS,
-   PyDoc_STR("return ~self (NONE)")},
+   PyDoc_STR("make xor (list of LogExpr)")},
   {"compose", (PyCFunction)LogExpr_compose, METH_VARARGS,
    PyDoc_STR("compose(vid, sub_expr) (VarId, LogExpr)")},
   {"multi_compose", (PyCFunction)LogExpr_multi_compose, METH_VARARGS,
@@ -756,7 +878,7 @@ PyTypeObject LogExprType = {
   0,                          /*tp_setattr*/
   0,                          /*tp_compare*/
   0,                          /*tp_repr*/
-  0,                          /*tp_as_number*/
+  &LogExpr_nbmethods,            /*tp_as_number*/
   0,                          /*tp_as_sequence*/
   0,                          /*tp_as_mapping*/
   0,                          /*tp_hash*/

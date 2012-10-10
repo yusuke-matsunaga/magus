@@ -26,10 +26,10 @@ PyMethodDef logic_methods[] = {
 END_NONAMESPACE
 
 void
-Bool3_initialize(PyObject* m);
+Bool3Object_init(PyObject* m);
 
 void
-Pol_initialize(PyObject* m);
+PolObject_init(PyObject* m);
 
 END_NAMESPACE_YM_PYTHON
 
@@ -104,14 +104,14 @@ logic_init()
   PyModule_AddObject(m, "error", ErrorObject);
 #endif
 
-  // Bool3 オブジェクトタイプの登録
-  PyModule_AddObject(m, "Bool3", (PyObject*)&Bool3Type);
+  // Bool3Object 関係の初期化
+  Bool3Object_init(m);
+
+  // PolObject 関係の初期化
+  PolObject_init(m);
 
   // VarId オブジェクトタイプの登録
   PyModule_AddObject(m, "VarId", (PyObject*)&VarIdType);
-
-  // Pol オブジェクトタイプの登録
-  PyModule_AddObject(m, "Pol", (PyObject*)&PolType);
 
   // Literal オブジェクトタイプの登録
   PyModule_AddObject(m, "Literal", (PyObject*)&LiteralType);
@@ -134,7 +134,4 @@ logic_init()
   // SatSolver オブジェクトタイプの登録
   PyModule_AddObject(m, "SatSolver", (PyObject*)&SatSolverType);
 
-  Bool3_initialize(m);
-
-  Pol_initialize(m);
 }

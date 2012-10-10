@@ -425,9 +425,14 @@ Bool3_set(Bool3Object& b3_obj,
 END_NONAMESPACE
 
 
+// Bool3Object 関係の初期化
 void
-Bool3_initialize(PyObject* m)
+Bool3Object_init(PyObject* m)
 {
+  // Bool3 オブジェクトタイプの登録
+  PyModule_AddObject(m, "Bool3", (PyObject*)&Bool3Type);
+
+  // 定数オブジェクトの登録
   Bool3_set(Py_kB3TrueStruct,  Py_kB3True,  m, "kB3True");
   Bool3_set(Py_kB3FalseStruct, Py_kB3False, m, "kB3False");
   Bool3_set(Py_kB3XStruct,     Py_kB3X,     m, "kB3X");

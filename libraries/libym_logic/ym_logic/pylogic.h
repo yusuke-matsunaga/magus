@@ -66,6 +66,14 @@ PyTypeObject LiteralType;
 extern
 PyTypeObject LogExprType;
 
+/// @brief 定数0の式
+extern
+PyObject* Py_kLogExprConst0;
+
+/// @brief 定数1の式
+extern
+PyObject* Py_kLogExprConst1;
+
 /// @brief BddMgr を表す型
 extern
 PyTypeObject BddMgrType;
