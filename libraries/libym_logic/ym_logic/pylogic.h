@@ -38,6 +38,14 @@ PyTypeObject VarIdType;
 extern
 PyTypeObject PolType;
 
+/// @brief kPolPosi を表すオブジェクト
+extern
+PyObject* Py_kPolPosi;
+
+/// @brief kPolNega を表すオブジェクト
+extern
+PyObject* Py_kPolNega;
+
 /// @brief Literal を表す型
 extern
 PyTypeObject LiteralType;
@@ -338,6 +346,12 @@ conv_to_pyobject(const Aig& obj);
 extern
 PyObject*
 conv_to_pyobject(SatSolver obj);
+
+/// @brief 文字列からの変換関数
+/// @param[in] str 極性を表す文字列("positive"|"negative")
+/// @note 不正な文字列が与えられた場合には NULL を返す．
+PyObject*
+Pol_FromString(const char* str);
 
 END_NAMESPACE_YM_PYTHON
 

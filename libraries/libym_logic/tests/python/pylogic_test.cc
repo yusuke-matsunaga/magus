@@ -7,6 +7,7 @@
 /// All rights reserved.
 
 
+#include "ym_utils/pyutils.h"
 #include "ym_logic/pylogic.h"
 
 int
@@ -19,6 +20,9 @@ main(int argc,
 
   // Python インタプリタを初期化する．
   Py_Initialize();
+
+  // pyutils モジュールを初期化する．
+  utils_init();
 
   // pylogic モジュールを初期化する．
   logic_init();

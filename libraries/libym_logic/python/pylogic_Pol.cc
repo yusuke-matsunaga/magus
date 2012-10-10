@@ -36,28 +36,19 @@ struct PolObject
 //////////////////////////////////////////////////////////////////////
 
 // PolObject の生成関数
+// 実際には既存のオブジェクトを返す．
 PolObject*
-Pol_new(PyTypeObject* type)
+Pol_new(PyTypeObject* type,
+	PyObject* args)
 {
-  PolObject* self = PyObject_New(PolObject, type);
-  if ( self == NULL ) {
+  // 引数は
+  // - ()
+  // - (str) {positive|negative}
+  const char* str = "positive";
+  if ( !PyArg_ParseTuple(args, "|s", &str) ) {
     return NULL;
   }
-
-  // mPol は生成されている．
-  // とりあえず初期化しておく
-  self->mPol = kPolPosi;
-
-  return self;
-}
-
-// PolObject を開放する関数
-void
-Pol_dealloc(PolObject* self)
-{
-  // mPol は開放の必要がない．
-
-  PyObject_Del(self);
+  return (PolObject*)Pol_FromString(str);
 }
 
 // 初期化関数
@@ -93,78 +84,97 @@ Pol_init(PolObject* self,
   return 0;
 }
 
-// str 関数
+// repr 用の文字列オブジェクト
+PyObject* Py_kPolPosiString = NULL;
+PyObject* Py_kPolNegaString = NULL;
+
+// 文字列用オブジェクトが生成されていなければ生成する．
+inline
 PyObject*
-Pol_str(PolObject* self)
+new_string(const char* str,
+	   PyObject*& py_obj)
 {
-  const char* str = NULL;
+  if ( py_obj == NULL ) {
+    py_obj = PyString_InternFromString(str);
+  }
+  Py_INCREF(py_obj);
+  return py_obj;
+}
+// repr 関数
+PyObject*
+Pol_repr(PolObject* self)
+{
   if ( self->mPol == kPolPosi ) {
-    str = "positive";
+    return new_string("positive", Py_kPolPosiString);
   }
   else {
-    str = "negative";
+    return new_string("negative", Py_kPolNegaString);
   }
-  return conv_to_pyobject(str);
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
 }
 
-// make_positive 関数
+// invert 関数
 PyObject*
-Pol_make_positive(PyTypeObject* type_obj,
-		  PyObject* args)
+Pol_inv(PyObject* obj)
 {
-  return conv_to_pyobject(kPolPosi);
+  PolObject* pol_obj = (PolObject*)obj;
+  return conv_to_pyobject(~pol_obj->mPol);
 }
-
-// make_negative 関数
-PyObject*
-Pol_make_negative(PyTypeObject* type_obj,
-		  PyObject* args)
-{
-  return conv_to_pyobject(kPolNega);
-}
-
-// is_positive 関数
-PyObject*
-Pol_is_positive(PolObject* self,
-		PyObject* args)
-{
-  bool v = (self->mPol == kPolPosi);
-  return conv_to_pyobject(v);
-}
-
-// is_negative 関数
-PyObject*
-Pol_is_negative(PolObject* self,
-		PyObject* args)
-{
-  bool v = (self->mPol == kPolNega);
-  return conv_to_pyobject(v);
-}
-
-// alternate 関数
-PyObject*
-Pol_alternate(PolObject* self,
-	      PyObject* args)
-{
-  return conv_to_pyobject(~self->mPol);
-}
-
-// PolObject のメソッドテーブル
-PyMethodDef Pol_methods[] = {
-  {"make_positive", (PyCFunction)Pol_make_positive, METH_STATIC | METH_NOARGS,
-   PyDoc_STR("make positive polarity")},
-  {"make_negative", (PyCFunction)Pol_make_negative, METH_STATIC | METH_NOARGS,
-   PyDoc_STR("make negative polarity")},
-  {"is_positive", (PyCFunction)Pol_is_positive, METH_NOARGS,
-   PyDoc_STR("check if positive")},
-  {"is_negative", (PyCFunction)Pol_is_negative, METH_NOARGS,
-   PyDoc_STR("check if negative")},
-  {"alternate", (PyCFunction)Pol_alternate, METH_NOARGS,
-   PyDoc_STR("alternate")},
-  {NULL, NULL, 0, NULL}
-};
 
 END_NONAMESPACE
+
+
+//////////////////////////////////////////////////////////////////////
+// PolObject の NumberMethods 構造体の定義
+//////////////////////////////////////////////////////////////////////
+PyNumberMethods Pol_nbmethods = {
+  (binaryfunc)0,               // nb_add
+  (binaryfunc)0,               // nb_subtract
+  (binaryfunc)0,               // nb_multiply
+  (binaryfunc)0,               // nb_divide
+  (binaryfunc)0,               // nb_remainder
+  (binaryfunc)0,               // nb_divmod
+  (ternaryfunc)0,              // nb_power
+  (unaryfunc)0,                // nb_negative
+  (unaryfunc)0,                // nb_positive
+  (unaryfunc)0,                // nb_absolute
+  (inquiry)0,                  // nb_nonzero
+  (unaryfunc)Pol_inv,          // nb_invert
+  (binaryfunc)0,               // nb_lshift
+  (binaryfunc)0,               // nb_rshift
+  (binaryfunc)0,               // nb_and
+  (binaryfunc)0,               // nb_xor
+  (binaryfunc)0,               // nb_or
+  (coercion)0,                 // nb_coerce
+  (unaryfunc)0,                // nb_int
+  (unaryfunc)0,                // nb_long
+  (unaryfunc)0,                // nb_float
+  (unaryfunc)0,                // nb_oct
+  (unaryfunc)0,                // nb_hex
+
+  // Added in release 2.0
+  (binaryfunc)0,               // nb_inplace_add
+  (binaryfunc)0,               // nb_inplace_subtract
+  (binaryfunc)0,               // nb_inplace_multiply
+  (binaryfunc)0,               // nb_inplace_divide
+  (binaryfunc)0,               // nb_inplace_remainder
+  (ternaryfunc)0,              // nb_inplace_power
+  (binaryfunc)0,               // nb_inplace_lshift
+  (binaryfunc)0,               // nb_inplace_rshift
+  (binaryfunc)0,               // nb_inplace_and
+  (binaryfunc)0,               // nb_inplace_xor
+  (binaryfunc)0,               // nb_inplace_or
+
+  // Added in release 2.2
+  (binaryfunc)0,               // nb_floor_divide
+  (binaryfunc)0,               // nb_true_divide
+  (binaryfunc)0,               // nb_inplace_floor_divide
+  (binaryfunc)0,               // nb_inplace_true_divide
+
+  // Added in release 2.5
+  (unaryfunc)0                 // nb_index
+};
 
 
 // PolObject 用のタイプオブジェクト
@@ -176,18 +186,18 @@ PyTypeObject PolType = {
   sizeof(PolObject),          /*tp_basicsize*/
   0,                          /*tp_itemsize*/
   /* methods */
-  (destructor)Pol_dealloc,    /*tp_dealloc*/
+  0,                          /*tp_dealloc*/
   0,                          /*tp_print*/
   0,                          /*tp_getattr*/
   0,                          /*tp_setattr*/
   0,                          /*tp_compare*/
-  0,                          /*tp_repr*/
-  0,                          /*tp_as_number*/
+  (reprfunc)Pol_repr,         /*tp_repr*/
+  &Pol_nbmethods,             /*tp_as_number*/
   0,                          /*tp_as_sequence*/
   0,                          /*tp_as_mapping*/
   0,                          /*tp_hash*/
   0,                          /*tp_call*/
-  (reprfunc)Pol_str,          /*tp_str*/
+  0,                          /*tp_str*/
   0,                          /*tp_getattro*/
   0,                          /*tp_setattro*/
   0,                          /*tp_as_buffer*/
@@ -199,7 +209,7 @@ PyTypeObject PolType = {
   0,                          /*tp_weaklistoffset*/
   0,                          /*tp_iter*/
   0,                          /*tp_iternext*/
-  Pol_methods,                /*tp_methods*/
+  0,                          /*tp_methods*/
   0,                          /*tp_members*/
   0,                          /*tp_getset*/
   0,                          /*tp_base*/
@@ -207,12 +217,17 @@ PyTypeObject PolType = {
   0,                          /*tp_descr_get*/
   0,                          /*tp_descr_set*/
   0,                          /*tp_dictoffset*/
-  (initproc)Pol_init,         /*tp_init*/
+  0,                          /*tp_init*/
   0,                          /*tp_alloc*/
   (newfunc)Pol_new,           /*tp_new*/
   0,                          /*tp_free*/
   0,                          /*tp_is_gc*/
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// PyObject と tPol の間の変換関数
+//////////////////////////////////////////////////////////////////////
 
 // @brief PyObject から tPol を取り出す．
 // @param[in] py_obj Python オブジェクト
@@ -241,15 +256,100 @@ conv_from_pyobject(PyObject* py_obj,
 PyObject*
 conv_to_pyobject(tPol obj)
 {
-  PolObject* pol_obj = Pol_new(&PolType);
-  if ( pol_obj == NULL ) {
+  PyObject* result = NULL;
+  if ( obj == kPolPosi ) {
+    result = Py_kPolPosi;
+  }
+  else {
+    result = Py_kPolNega;
+  }
+  Py_INCREF(result);
+  return result;
+}
+
+// 文字列からの変換関数
+PyObject*
+Pol_FromString(const char* str)
+{
+  if ( str == NULL ) {
+    PyErr_SetString(PyExc_ValueError,
+		    "NULL pointer is not allowed here");
     return NULL;
   }
 
-  pol_obj->mPol = obj;
+  // 小文字に変換する．
+  // 効率が悪いけど元の文字列を変更したくないので
+  // 新たな領域を確保する．
+  ymuint n = strlen(str);
+  char* buf = new char[n + 1];
+  for (ymuint i = 0; i < n; ++ i) {
+    buf[i] = tolower(str[i]);
+  }
+  buf[n] = '\0';
 
-  Py_INCREF(pol_obj);
-  return (PyObject*)pol_obj;
+  tPol pol;
+  if ( strcmp(buf, "positive") == 0 ) {
+    pol = kPolPosi;
+  }
+  else if ( strcmp(buf, "negative") == 0 ) {
+    pol = kPolNega;
+  }
+  else {
+    PyErr_SetString(PyExc_ValueError,
+		    "parameter must be \"positive\" or \"negative\"");
+    return NULL;
+  }
+
+  return conv_to_pyobject(pol);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// PolObject の外部変数
+//////////////////////////////////////////////////////////////////////
+
+// @brief kPolPosi を表すオブジェクト
+PyObject* Py_kPolPosi = NULL;
+
+// @brief kPolNega を表すオブジェクト
+PyObject* Py_kPolNega = NULL;
+
+
+BEGIN_NONAMESPACE
+
+// Py_kPolPosi の本体
+PolObject Py_kPolPosiStruct = {
+  PyObject_HEAD_INIT(&PolType)
+  kPolPosi
+};
+
+// Py_kPolNega の本体
+PolObject Py_kPolNegaStruct = {
+  PyObject_HEAD_INIT(&PolType)
+  kPolNega
+};
+
+// Pol の定数を設定する関数
+inline
+void
+Pol_set(PolObject& pol_obj,
+	PyObject*& py_obj,
+	PyObject* module,
+	const char* name)
+{
+  py_obj = (PyObject*)&pol_obj;
+  Py_XINCREF(py_obj);
+  PyModule_AddObject(module, name, py_obj);
+}
+
+END_NONAMESPACE
+
+
+void
+Pol_initialize(PyObject* m)
+{
+  Pol_set(Py_kPolPosiStruct, Py_kPolPosi, m, "kPolPosi");
+  Pol_set(Py_kPolNegaStruct, Py_kPolNega, m, "kPolNega");
 }
 
 END_NAMESPACE_YM_PYTHON

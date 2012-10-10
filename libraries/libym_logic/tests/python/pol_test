@@ -9,16 +9,19 @@ def pol_check(pol, name) :
    print ""
    print "pol_check(%s)" % name, pol
 
-   if pol.is_positive() :
-      print "%s.is_positive()" % name
+   if pol == logic.kPolPosi :
+      print "%s == kPolPosi" % name
    else :
-      print "! %s.is_positive()" % name
+      print "%s != kPolPosi" % name
 
-   if pol.is_negative() :
-      print "%s.is_negative()" % name
+   if pol == logic.kPolNega :
+      print "%s == kPolNega" % name
    else :
-      print "! %s.is_negative()" % name
+      print "%s != kPolNega" % name
 
+pol_check(logic.kPolPosi, "logic.kPolPosi")
+
+pol_check(logic.kPolNega, "logic.kPolNega")
 
 pol0 = logic.Pol()
 pol_check(pol0, "logic.Pol()")
@@ -29,14 +32,8 @@ pol_check(pol1, "logic.Pol(\"positive\")")
 pol2 = logic.Pol("negative")
 pol_check(pol2, "logic.Pol(\"negative\")")
 
-pol3 = logic.Pol.make_positive()
-pol_check(pol3, "logic.Pol.make_positive()")
+pol1_alt = ~pol1
+pol_check(pol1_alt, "~pol1")
 
-pol3 = logic.Pol.make_negative()
-pol_check(pol3, "logic.Pol.make_negative()")
-
-pol1_alt = pol1.alternate()
-pol_check(pol1_alt, "pol1.alternate()")
-
-pol2_alt = pol2.alternate()
-pol_check(pol2_alt, "pol2.alternate()")
+pol2_alt = ~pol2
+pol_check(pol2_alt, "~pol2")
