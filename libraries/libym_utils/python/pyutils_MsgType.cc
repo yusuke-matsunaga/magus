@@ -413,6 +413,11 @@ new_string(const char* str)
 void
 MsgTypeObject_init(PyObject* m)
 {
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&MsgTypeType) < 0 ) {
+    return;
+  }
+
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "MsgType", (PyObject*)&MsgTypeType);
 

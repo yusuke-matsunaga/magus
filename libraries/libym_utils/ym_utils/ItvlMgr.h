@@ -5,7 +5,7 @@
 /// @brief ItvlMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -58,10 +58,24 @@ public:
   void
   erase(int d);
 
+  /// @brief [d1, d2] を使用可能な区間から削除する．
+  /// @param[in] d1 区間の開始点
+  /// @param[in] d2 区間の終了点
+  void
+  erase(int d1,
+	int d2);
+
   /// @brief d を使用可能な区間に追加する．
   /// @param[in] d 使用可能となった要素
   void
   add(int d);
+
+  /// @brief [d1, d2] を使用可能な区間に追加する．
+  /// @param[in] d1 区間の開始点
+  /// @param[in] d2 区間の終了点
+  void
+  add(int d1,
+      int d2);
 
   /// @brief [d1, d2] が使用可能な区間かどうか調べる．
   /// @param[in] d1 区間の開始点
@@ -83,20 +97,6 @@ public:
   /// @retval -1 全区間が未使用の場合
   int
   max_id() const;
-
-  /// @brief [d1, d2] を使用可能な区間から削除する．
-  /// @param[in] d1 区間の開始点
-  /// @param[in] d2 区間の終了点
-  void
-  erase(int d1,
-	int d2);
-
-  /// @brief [d1, d2] を使用可能な区間に追加する．
-  /// @param[in] d1 区間の開始点
-  /// @param[in] d2 区間の終了点
-  void
-  add(int d1,
-      int d2);
 
   /// @brief 内部構造が正しいかチェックする．
   /// @note おかしい時は例外を投げる．

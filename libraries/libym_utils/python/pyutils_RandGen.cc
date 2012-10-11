@@ -266,6 +266,11 @@ conv_from_pyobject(PyObject* py_obj,
 void
 RandGenObject_init(PyObject* m)
 {
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&RandGenType) < 0 ) {
+    return;
+  }
+
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "RandGen", (PyObject*)&RandGenType);
 }

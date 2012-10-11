@@ -419,6 +419,11 @@ USTime_FromUSTime(const USTime& obj)
 void
 USTimeObject_init(PyObject* m)
 {
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&USTimeType) < 0 ) {
+    return;
+  }
+
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "USTime", (PyObject*)&USTimeType);
 }

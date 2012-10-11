@@ -60,6 +60,9 @@ RandPermGenObject_init(PyObject* module);
 void
 RandCombiGenObject_init(PyObject* module);
 
+void
+ItvlMgrObject_init(PyObject* module);
+
 END_NAMESPACE_YM_PYTHON
 
 
@@ -67,55 +70,6 @@ PyMODINIT_FUNC
 utils_init()
 {
   using namespace nsYm::nsPython;
-
-  //////////////////////////////////////////////////////////////////////
-  // タイプオブジェクトの初期化
-  //////////////////////////////////////////////////////////////////////
-
-  if ( PyType_Ready(&FileInfoType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&FileLocType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&FileRegionType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&MsgTypeType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&MsgMgrType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&USTimeType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&StopWatchType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&MStopWatchType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&RandGenType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&RandPermGenType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&RandCombiGenType) < 0 ) {
-    return;
-  }
-
 
   //////////////////////////////////////////////////////////////////////
   // モジュールオブジェクトの生成
@@ -154,5 +108,7 @@ utils_init()
   RandPermGenObject_init(m);
 
   RandCombiGenObject_init(m);
+
+  ItvlMgrObject_init(m);
 
 }

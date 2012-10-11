@@ -256,6 +256,11 @@ PyTypeObject RandCombiGenType = {
 void
 RandCombiGenObject_init(PyObject* m)
 {
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&RandCombiGenType) < 0 ) {
+    return;
+  }
+
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "RandCombiGen", (PyObject*)&RandCombiGenType);
 }

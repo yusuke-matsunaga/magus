@@ -268,6 +268,11 @@ FileInfo_FromFileInfo(const FileInfo& obj)
 void
 FileInfoObject_init(PyObject* m)
 {
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&FileInfoType) < 0 ) {
+    return;
+  }
+
   // タイプオブジェクトの登録を行う．
   PyModule_AddObject(m, "FileInfo", (PyObject*)&FileInfoType);
 }

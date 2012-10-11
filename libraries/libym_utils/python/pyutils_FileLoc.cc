@@ -276,6 +276,11 @@ FileLoc_FromFileLoc(const FileLoc& obj)
 void
 FileLocObject_init(PyObject* m)
 {
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&FileLocType) < 0 ) {
+    return;
+  }
+
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "FileLoc", (PyObject*)&FileLocType);
 }

@@ -203,6 +203,11 @@ conv_from_pyobject(PyObject* py_obj,
 void
 StopWatchObject_init(PyObject* m)
 {
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&StopWatchType) < 0 ) {
+    return;
+  }
+
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "StopWatch", (PyObject*)&StopWatchType);
 }

@@ -291,6 +291,11 @@ PyTypeObject MsgMgrType = {
 void
 MsgMgrObject_init(PyObject* m)
 {
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&MsgMgrType) < 0 ) {
+    return;
+  }
+
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "MsgMgr", (PyObject*)&MsgMgrType);
 }

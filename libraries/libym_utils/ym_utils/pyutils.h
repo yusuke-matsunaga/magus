@@ -25,6 +25,7 @@ class StopWatch;
 class MStopWatch;
 class USTime;
 class MFSet;
+class ItvlMgr;
 
 END_NAMESPACE_YM
 
@@ -101,6 +102,10 @@ PyTypeObject RandCombiGenType;
 /// @brief MFSet を表す型
 extern
 PyTypeObject MFSetType;
+
+/// @brief ItvlMgr を表す型
+extern
+PyTypeObject ItvlMgrType;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -239,6 +244,17 @@ MFSetObject_Check(PyObject* obj)
   return Py_TYPE(obj) == &MFSetType;
 }
 
+/// @brief ItvlMgrType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が ItvlMgrType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+ItvlMgrObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &ItvlMgrType;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // PyObject からの型変換
@@ -333,6 +349,15 @@ extern
 bool
 conv_from_pyobject(PyObject* py_obj,
 		   MFSet*& p_obj);
+
+/// @brief PyObject から ItvlMgr を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] obj ItvlMgr を格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した．py_obj が ItvlMgrObject ではなかった．
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   ItvlMgr*& p_obj);
 
 
 //////////////////////////////////////////////////////////////////////

@@ -379,6 +379,11 @@ FileRegion_FromFileRegion(const FileRegion& obj)
 void
 FileRegionObject_init(PyObject* m)
 {
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&FileRegionType) < 0 ) {
+    return;
+  }
+
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "FileRegion", (PyObject*)&FileRegionType);
 }
