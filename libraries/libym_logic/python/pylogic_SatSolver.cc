@@ -10,6 +10,7 @@
 #include "ym_logic/pylogic.h"
 #include "ym_logic/SatSolver.h"
 #include "ym_logic/SatStats.h"
+#include "PySatMsgHandler.h"
 #include "ym_utils/pyutils.h"
 
 
@@ -259,6 +260,31 @@ SatSolver_set_max_conflict(SatSolverObject* self,
   return conv_to_pyobject(self->mSolver->set_max_conflict(val));
 }
 
+// reg_mesg_handler 関数
+PyObject*
+SatSolver_reg_msg_handler(SatSolverObject* self,
+			  PyObject* args)
+{
+  PyObject* obj = NULL;
+  if ( !PyArg_ParseTuple(args, "O", &obj) ) {
+    return NULL;
+  }
+  if ( !PyCallable_Check(obj) ) {
+    PyErr_SetString(PyExc_TypeError, "parameter must be callable");
+    return NULL;
+  }
+
+  PySatMsgHandler* handler = new PySatMsgHandler(obj);
+  if ( handler == NULL ) {
+    return NULL;
+  }
+
+  self->mSolver->reg_msg_handler(handler);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 // timer_on 関数
 PyObject*
 SatSolver_timer_on(SatSolverObject* self,
@@ -294,9 +320,11 @@ PyMethodDef SatSolver_methods[] = {
    PyDoc_STR("return the number of clauses. (NONE)")},
   {"literal_num", (PyCFunction)SatSolver_literal_num, METH_NOARGS,
    PyDoc_STR("return the number of literals. (NONE)")},
-  {"set_max_conflict", (PyCFunction)SatSolver_set_max_conflict, METH_NOARGS,
+  {"set_max_conflict", (PyCFunction)SatSolver_set_max_conflict, METH_VARARGS,
    PyDoc_STR("set the maximum conflict limit. (ulonglong)")},
-  {"timer_on", (PyCFunction)SatSolver_timer_on, METH_NOARGS,
+  {"reg_msg_handler", (PyCFunction)SatSolver_reg_msg_handler, METH_VARARGS,
+   PyDoc_STR("register message handler callback (MsgHandler)")},
+  {"timer_on", (PyCFunction)SatSolver_timer_on, METH_VARARGS,
    PyDoc_STR("enable timer (Bool)")},
   {NULL, NULL, 0, NULL}
 };

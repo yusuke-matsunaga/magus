@@ -263,6 +263,27 @@ PyTypeObject MsgHandlerType = {
 };
 
 
+// @brief PyObject から MsgHandler を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @param[out] p_obj MsgHandler のポインタを格納する変数
+// @retval true 変換が成功した．
+// @retval false 変換が失敗した． py_obj が MsgHandlerObject ではなかった．
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   MsgHandler*& p_obj)
+{
+  if ( !MsgHandlerObject_Check(py_obj) ) {
+    return false;
+  }
+
+  // 強制的にキャスト
+  MsgHandlerObject* mh_obj = (MsgHandlerObject*)py_obj;
+
+  p_obj = mh_obj->mBody;
+
+  return true;
+}
+
 // MsgHandlerObject 関係の初期化を行う．
 void
 MsgHandlerObject_init(PyObject* m)

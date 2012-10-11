@@ -26,7 +26,9 @@ libym_logic_python_la_SOURCES = \
 	pylogic_Bdd.cc \
 	pylogic_AigMgr.cc \
 	pylogic_Aig.cc \
-	pylogic_SatSolver.cc
+	pylogic_SatSolver.cc \
+	PySatMsgHandler.h \
+	PySatMsgHandler.cc
 
 libym_logic_python_la_LIBADD =
 

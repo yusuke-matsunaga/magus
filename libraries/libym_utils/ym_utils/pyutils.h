@@ -24,6 +24,7 @@ class RandPermGen;
 class StopWatch;
 class MStopWatch;
 class USTime;
+class MsgHandler;
 
 END_NAMESPACE_YM
 
@@ -267,6 +268,16 @@ extern
 bool
 conv_from_pyobject(PyObject* py_obj,
 		   tMsgType& obj);
+
+/// @brief PyObject から MsgHandler を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] p_obj MsgHandler のポインタを格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した． py_obj が MsgHandlerObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   MsgHandler*& p_obj);
 
 /// @brief PyObject から USTime を取り出す．
 /// @param[in] py_obj Python オブジェクト

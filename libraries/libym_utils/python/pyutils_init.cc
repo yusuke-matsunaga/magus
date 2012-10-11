@@ -52,10 +52,10 @@ void
 RandGenObject_init(PyObject* module);
 
 void
-RandGenPermObject_init(PyObject* module);
+RandPermGenObject_init(PyObject* module);
 
 void
-RandGenCombiObject_init(PyObject* module);
+RandCombiGenObject_init(PyObject* module);
 
 END_NAMESPACE_YM_PYTHON
 
