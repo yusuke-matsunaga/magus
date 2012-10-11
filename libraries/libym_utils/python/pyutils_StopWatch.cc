@@ -105,7 +105,7 @@ PyObject*
 StopWatch_time(StopWatchObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mStopWatch.time());
+  return USTime_FromUSTime(self->mStopWatch.time());
 }
 
 
@@ -197,6 +197,14 @@ conv_from_pyobject(PyObject* py_obj,
   p_obj = &my_obj->mStopWatch;
 
   return true;
+}
+
+// StopWatchObject 関係の初期化を行う．
+void
+StopWatchObject_init(PyObject* m)
+{
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "StopWatch", (PyObject*)&StopWatchType);
 }
 
 END_NAMESPACE_YM_PYTHON

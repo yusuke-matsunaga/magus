@@ -216,7 +216,7 @@ PyTypeObject MsgHandlerType = {
   Py_TPFLAGS_DEFAULT,                // tp_flags
 
   // Documentation string
-  "documentation string",            // tp_doc
+  "Message Handler",                 // tp_doc
 
   // Assigned meaning in release 2.0
 
@@ -261,5 +261,14 @@ PyTypeObject MsgHandlerType = {
   (PyObject*)0,                      // tp_subclasses
   (PyObject*)0                       // tp_weaklist
 };
+
+
+// MsgHandlerObject 関係の初期化を行う．
+void
+MsgHandlerObject_init(PyObject* m)
+{
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "MsgHandler", (PyObject*)&MsgHandlerType);
+}
 
 END_NAMESPACE_YM_PYTHON

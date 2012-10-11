@@ -186,7 +186,6 @@ PyMethodDef RandGen_methods[] = {
 END_NONAMESPACE
 
 
-
 //////////////////////////////////////////////////////////////////////
 // RandGenObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
@@ -261,6 +260,14 @@ conv_from_pyobject(PyObject* py_obj,
   obj = my_obj->mRandGen;
 
   return true;
+}
+
+// RandGenObject 関係の初期化を行う．
+void
+RandGenObject_init(PyObject* m)
+{
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "RandGen", (PyObject*)&RandGenType);
 }
 
 END_NAMESPACE_YM_PYTHON

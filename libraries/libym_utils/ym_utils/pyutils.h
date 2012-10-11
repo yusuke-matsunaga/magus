@@ -313,35 +313,29 @@ conv_from_pyobject(PyObject* py_obj,
 // PyObject への型変換
 //////////////////////////////////////////////////////////////////////
 
-/// @brief FileInfo から PyObject を生成する．
+/// @brief FileInfo から FileInfoObject を生成する．
 /// @param[in] obj FileInfo オブジェクト
 extern
 PyObject*
-conv_to_pyobject(const FileInfo& obj);
+FileInfo_FromFileInfo(const FileInfo& obj);
 
-/// @brief FileLoc から PyObject を生成する．
+/// @brief FileLoc から FileLocObject を生成する．
 /// @param[in] obj FileLoc オブジェクト
 extern
 PyObject*
-conv_to_pyobject(const FileLoc& obj);
+FileLoc_FromFileLoc(const FileLoc& obj);
 
-/// @brief FileRegion から PyObject を生成する．
+/// @brief FileRegion から FileRegionObject を生成する．
 /// @param[in] obj FileRegion オブジェクト
 extern
 PyObject*
-conv_to_pyobject(const FileRegion& obj);
+FileRegion_FromFileRegion(const FileRegion& obj);
 
 /// @brief tMsgType から PyObject を生成する．
 /// @param[in] obj tMsgType オブジェクト
 extern
 PyObject*
-conv_to_pyobject(tMsgType obj);
-
-/// @brief USTime から PyObject を生成する．
-/// @param[in] obj USTime オブジェクト
-extern
-PyObject*
-conv_to_pyobject(const USTime& obj);
+MsgType_FromMsgType(tMsgType obj);
 
 /// @brief 文字列から MsgTypeObject を生成する．
 extern
@@ -352,6 +346,12 @@ MsgType_FromString(const char* str);
 extern
 PyObject*
 MsgType_FromLong(ymlong val);
+
+/// @brief USTime から USTimeObject を生成する．
+/// @param[in] obj USTime オブジェクト
+extern
+PyObject*
+USTime_FromUSTime(const USTime& obj);
 
 
 END_NAMESPACE_YM_PYTHON

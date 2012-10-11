@@ -194,7 +194,7 @@ PyObject*
 FileRegion_start_loc(FileRegionObject* self,
 		     PyObject* args)
 {
-  return conv_to_pyobject(self->mFileRegion.start_loc());
+  return FileLoc_FromFileLoc(self->mFileRegion.start_loc());
 }
 
 // start_file_info 関数
@@ -202,7 +202,7 @@ PyObject*
 FileRegion_start_file_info(FileRegionObject* self,
 			   PyObject* args)
 {
-  return conv_to_pyobject(self->mFileRegion.start_file_info());
+  return FileInfo_FromFileInfo(self->mFileRegion.start_file_info());
 }
 
 // start_line 関数
@@ -226,7 +226,7 @@ PyObject*
 FileRegion_end_loc(FileRegionObject* self,
 		   PyObject* args)
 {
-  return conv_to_pyobject(self->mFileRegion.end_loc());
+  return FileLoc_FromFileLoc(self->mFileRegion.end_loc());
 }
 
 // end_file_info 関数
@@ -234,7 +234,7 @@ PyObject*
 FileRegion_end_file_info(FileRegionObject* self,
 			 PyObject* args)
 {
-  return conv_to_pyobject(self->mFileRegion.end_file_info());
+  return FileInfo_FromFileInfo(self->mFileRegion.end_file_info());
 }
 
 // end_line 関数
@@ -359,10 +359,10 @@ conv_from_pyobject(PyObject* py_obj,
   return true;
 }
 
-// @brief FileRegion から PyObject を生成する．
+// @brief FileRegion から FileRegionObject を生成する．
 // @param[in] obj FileRegion オブジェクト
 PyObject*
-conv_to_pyobject(const FileRegion& obj)
+FileRegion_FromFileRegion(const FileRegion& obj)
 {
   FileRegionObject* py_obj = FileRegion_new(&FileRegionType);
   if ( py_obj == NULL ) {
@@ -373,6 +373,14 @@ conv_to_pyobject(const FileRegion& obj)
 
   Py_INCREF(py_obj);
   return (PyObject*)py_obj;
+}
+
+// FileRegionObject 関係の初期化を行う．
+void
+FileRegionObject_init(PyObject* m)
+{
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "FileRegion", (PyObject*)&FileRegionType);
 }
 
 END_NAMESPACE_YM_PYTHON

@@ -13,6 +13,27 @@
 
 BEGIN_NAMESPACE_YM_PYTHON
 
+
+//////////////////////////////////////////////////////////////////////
+// MsgTypeObject の外部変数
+//////////////////////////////////////////////////////////////////////
+
+// @brief kMsgError を表すオブジェクト
+PyObject* Py_kMsgError;
+
+// @brief kMsgWarning を表すオブジェクト
+PyObject* Py_kMsgWarning;
+
+// @brief kMsgFailure を表すオブジェクト
+PyObject* Py_kMsgFailure;
+
+// @brief kMsgInfo を表すオブジェクト
+PyObject* Py_kMsgInfo;
+
+// @brief kMsgDebug を表すオブジェクト
+PyObject* Py_kMsgDebug;
+
+
 BEGIN_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
@@ -29,6 +50,43 @@ struct MsgTypeObject
   tMsgType mType;
 
 };
+
+// Py_kMsgError の実体
+MsgTypeObject Py_kMsgErrorStruct = {
+  PyObject_HEAD_INIT(&MsgTypeType)
+  kMsgError
+};
+
+// Py_kMsgWarning の実体
+MsgTypeObject Py_kMsgWarningStruct = {
+  PyObject_HEAD_INIT(&MsgTypeType)
+  kMsgWarning
+};
+
+// Py_kMsgFailure の実体
+MsgTypeObject Py_kMsgFailureStruct = {
+  PyObject_HEAD_INIT(&MsgTypeType)
+  kMsgFailure
+};
+
+// Py_kMsgInfo の実体
+MsgTypeObject Py_kMsgInfoStruct = {
+  PyObject_HEAD_INIT(&MsgTypeType)
+  kMsgInfo
+};
+
+// Py_kMsgDebug の実体
+MsgTypeObject Py_kMsgDebugStruct = {
+  PyObject_HEAD_INIT(&MsgTypeType)
+  kMsgDebug
+};
+
+// repr 用の文字列オブジェクト
+PyObject* Py_kMsgErrorString = NULL;
+PyObject* Py_kMsgWarningString = NULL;
+PyObject* Py_kMsgFailureString = NULL;
+PyObject* Py_kMsgInfoString = NULL;
+PyObject* Py_kMsgDebugString = NULL;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -67,36 +125,16 @@ MsgType_new(PyTypeObject* type,
   return NULL;
 }
 
-// repr 用の文字列オブジェクト
-PyObject* Py_kMsgErrorString = NULL;
-PyObject* Py_kMsgWarningString = NULL;
-PyObject* Py_kMsgFailureString = NULL;
-PyObject* Py_kMsgInfoString = NULL;
-PyObject* Py_kMsgDebugString = NULL;
-
-// 文字列用オブジェクトが生成されていなければ生成する．
-inline
-PyObject*
-new_string(const char* str,
-	   PyObject*& py_obj)
-{
-  if ( py_obj == NULL ) {
-    py_obj = PyString_InternFromString(str);
-  }
-  Py_INCREF(py_obj);
-  return py_obj;
-}
-
 // repr 関数
 PyObject*
 MsgType_repr(MsgTypeObject* self)
 {
   switch ( self->mType ) {
-  case kMsgError:   return new_string("error",   Py_kMsgErrorString);
-  case kMsgWarning: return new_string("warning", Py_kMsgWarningString);
-  case kMsgFailure: return new_string("failure", Py_kMsgFailureString);
-  case kMsgInfo:    return new_string("info",    Py_kMsgInfoString);
-  case kMsgDebug:   return new_string("debug",   Py_kMsgDebugString);
+  case kMsgError:   return Py_kMsgErrorString;
+  case kMsgWarning: return Py_kMsgWarningString;
+  case kMsgFailure: return Py_kMsgFailureString;
+  case kMsgInfo:    return Py_kMsgInfoString;
+  case kMsgDebug:   return Py_kMsgDebugString;
   default: break;
   }
   assert_not_reached(__FILE__, __LINE__);
@@ -238,6 +276,24 @@ PyTypeObject MsgTypeType = {
 // PyObject と MsgType の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
+// tMsgType からの変換関数
+PyObject*
+MsgType_FromMsgType(tMsgType type)
+{
+  PyObject* result = NULL;
+  switch ( type ) {
+  case kMsgError:   result = Py_kMsgError; break;
+  case kMsgWarning: result = Py_kMsgWarning; break;
+  case kMsgFailure: result = Py_kMsgFailure; break;
+  case kMsgInfo:    result = Py_kMsgInfo; break;
+  case kMsgDebug:   result = Py_kMsgDebug; break;
+  default: assert_not_reached(__FILE__, __LINE__);
+  }
+
+  Py_INCREF(result);
+  return result;
+}
+
 // 文字列からの変換関数
 PyObject*
 MsgType_FromString(const char* str)
@@ -330,59 +386,6 @@ conv_from_pyobject(PyObject* py_obj,
   return true;
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// MsgTypeObject の外部変数
-//////////////////////////////////////////////////////////////////////
-
-// @brief kMsgError を表すオブジェクト
-PyObject* Py_kMsgError;
-
-// @brief kMsgWarning を表すオブジェクト
-PyObject* Py_kMsgWarning;
-
-// @brief kMsgFailure を表すオブジェクト
-PyObject* Py_kMsgFailure;
-
-// @brief kMsgInfo を表すオブジェクト
-PyObject* Py_kMsgInfo;
-
-// @brief kMsgDebug を表すオブジェクト
-PyObject* Py_kMsgDebug;
-
-
-BEGIN_NONAMESPACE
-
-// Py_kMsgError の実体
-MsgTypeObject Py_kMsgErrorStruct = {
-  PyObject_HEAD_INIT(&MsgTypeType)
-  kMsgError
-};
-
-// Py_kMsgWarning の実体
-MsgTypeObject Py_kMsgWarningStruct = {
-  PyObject_HEAD_INIT(&MsgTypeType)
-  kMsgWarning
-};
-
-// Py_kMsgFailure の実体
-MsgTypeObject Py_kMsgFailureStruct = {
-  PyObject_HEAD_INIT(&MsgTypeType)
-  kMsgFailure
-};
-
-// Py_kMsgInfo の実体
-MsgTypeObject Py_kMsgInfoStruct = {
-  PyObject_HEAD_INIT(&MsgTypeType)
-  kMsgInfo
-};
-
-// Py_kMsgDebug の実体
-MsgTypeObject Py_kMsgDebugStruct = {
-  PyObject_HEAD_INIT(&MsgTypeType)
-  kMsgDebug
-};
-
 // MsgType の定数を設定する関数
 inline
 void
@@ -396,16 +399,36 @@ MsgType_set(MsgTypeObject& msg_obj,
   PyModule_AddObject(module, name, py_obj);
 }
 
-END_NONAMESPACE
-
-void
-MsgType_initialize(PyObject* m)
+// 文字列用オブジェクトの生成を行う．
+inline
+PyObject*
+new_string(const char* str)
 {
+  PyObject* py_obj = PyString_InternFromString(str);
+  Py_INCREF(py_obj);
+  return py_obj;
+}
+
+// MsgTypeObject 関係の初期化を行う．
+void
+MsgTypeObject_init(PyObject* m)
+{
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "MsgType", (PyObject*)&MsgTypeType);
+
+  // 定数オブジェクトの生成と登録
   MsgType_set(Py_kMsgErrorStruct,   Py_kMsgError,   m, "kMsgError");
   MsgType_set(Py_kMsgWarningStruct, Py_kMsgWarning, m, "kMsgWarning");
   MsgType_set(Py_kMsgFailureStruct, Py_kMsgFailure, m, "kMsgFailure");
   MsgType_set(Py_kMsgInfoStruct,    Py_kMsgInfo,    m, "kMsgInfo");
   MsgType_set(Py_kMsgDebugStruct,   Py_kMsgDebug,   m, "kMsgDebug");
+
+  // 定数オブジェクト用の文字列オブジェクトの生成
+  Py_kMsgErrorString   = new_string("error");
+  Py_kMsgWarningString = new_string("warning");
+  Py_kMsgFailureString = new_string("failure");
+  Py_kMsgInfoString    = new_string("info");
+  Py_kMsgDebugString   = new_string("debug");
 }
 
 END_NAMESPACE_YM_PYTHON

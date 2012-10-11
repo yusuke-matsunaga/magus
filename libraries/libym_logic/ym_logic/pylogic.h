@@ -306,13 +306,13 @@ conv_from_pyobject(PyObject* py_obj,
 
 /// @brief PyObject から SatSolver を取り出す．
 /// @param[in] py_obj Python オブジェクト
-/// @param[out] obj SatSolver を格納する変数
+/// @param[out] p_obj SatSolver のポインタを格納する変数
 /// @retval true 変換が成功した．
 /// @retval false 変換が失敗した．py_obj が SatSolverObject ではなかった．
 extern
 bool
 conv_from_pyobject(PyObject* py_obj,
-		   SatSolver* obj);
+		   SatSolver*& p_obj);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -360,12 +360,6 @@ conv_to_pyobject(const Bdd& obj);
 extern
 PyObject*
 conv_to_pyobject(const Aig& obj);
-
-/// @brief SatSolver から PyObject を生成する．
-/// @param[in] obj SatSolver オブジェクト
-extern
-PyObject*
-conv_to_pyobject(SatSolver obj);
 
 /// @brief 文字列から Bool3Object への変換関数
 /// @param[in] str 値を表す文字列("true"|"false"|"x")

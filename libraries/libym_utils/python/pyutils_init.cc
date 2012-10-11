@@ -25,7 +25,37 @@ PyMethodDef utils_methods[] = {
 END_NONAMESPACE
 
 void
-MsgType_initialize(PyObject* module);
+FileInfoObject_init(PyObject* module);
+
+void
+FileLocObject_init(PyObject* module);
+
+void
+FileRegionObject_init(PyObject* module);
+
+void
+USTimeObject_init(PyObject* module);
+
+void
+StopWatchObject_init(PyObject* module);
+
+void
+MStopWatchObject_init(PyObject* module);
+
+void
+MsgTypeObject_init(PyObject* module);
+
+void
+MsgHandlerObject_init(PyObject* module);
+
+void
+RandGenObject_init(PyObject* module);
+
+void
+RandGenPermObject_init(PyObject* module);
+
+void
+RandGenCombiObject_init(PyObject* module);
 
 END_NAMESPACE_YM_PYTHON
 
@@ -98,33 +128,26 @@ utils_init()
   // タイプオブジェクトの登録
   //////////////////////////////////////////////////////////////////////
 
-  PyModule_AddObject(m, "FileInfo", (PyObject*)&FileInfoType);
+  FileInfoObject_init(m);
 
-  PyModule_AddObject(m, "FileLoc", (PyObject*)&FileLocType);
+  FileLocObject_init(m);
 
-  PyModule_AddObject(m, "FileRegion", (PyObject*)&FileRegionType);
+  FileRegionObject_init(m);
 
-  PyModule_AddObject(m, "MsgType", (PyObject*)&MsgTypeType);
+  MsgTypeObject_init(m);
 
-  PyModule_AddObject(m, "MsgHandler", (PyObject*)&MsgHandlerType);
+  MsgHandlerObject_init(m);
 
-  PyModule_AddObject(m, "USTime", (PyObject*)&USTimeType);
+  USTimeObject_init(m);
 
-  PyModule_AddObject(m, "StopWatch", (PyObject*)&StopWatchType);
+  StopWatchObject_init(m);
 
-  PyModule_AddObject(m, "MStopWatch", (PyObject*)&StopWatchType);
+  MStopWatchObject_init(m);
 
-  PyModule_AddObject(m, "RandGen", (PyObject*)&RandGenType);
+  RandGenObject_init(m);
 
-  PyModule_AddObject(m, "RandPermGen", (PyObject*)&RandPermGenType);
+  RandPermGenObject_init(m);
 
-  PyModule_AddObject(m, "RandCombiGen", (PyObject*)&RandCombiGenType);
-
-
-  //////////////////////////////////////////////////////////////////////
-  // MsgTypeObject の定数オブジェクトの生成と登録
-  //////////////////////////////////////////////////////////////////////
-
-  MsgType_initialize(m);
+  RandCombiGenObject_init(m);
 
 }

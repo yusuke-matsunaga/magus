@@ -241,4 +241,13 @@ PyTypeObject RandPermGenType = {
   (PyObject*)0                        // tp_weaklist
 };
 
+
+// RandPermGenObject 関係の初期化を行う．
+void
+RandPermGenObject_init(PyObject* m)
+{
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "RandPermGen", (PyObject*)&RandPermGenType);
+}
+
 END_NAMESPACE_YM_PYTHON

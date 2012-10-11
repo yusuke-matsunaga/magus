@@ -252,4 +252,12 @@ PyTypeObject RandCombiGenType = {
   (PyObject*)0                         // tp_weaklist
 };
 
+// RandCombiGenObject 関係の初期化を行う．
+void
+RandCombiGenObject_init(PyObject* m)
+{
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "RandCombiGen", (PyObject*)&RandCombiGenType);
+}
+
 END_NAMESPACE_YM_PYTHON

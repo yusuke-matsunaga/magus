@@ -49,7 +49,7 @@ PyMsgHandler::put_msg(const char* src_file,
     return;
   }
 
-  PyObject* loc_obj = conv_to_pyobject(loc);
+  PyObject* loc_obj = FileRegion_FromFileRegion(loc);
   PyObject* args = Py_BuildValue("(siOkss)",
 				 src_file, src_line,
 				 loc_obj, type,

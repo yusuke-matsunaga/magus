@@ -10,6 +10,7 @@
 #include "ym_logic/pylogic.h"
 #include "ym_logic/SatSolver.h"
 #include "ym_logic/SatStats.h"
+#include "ym_utils/pyutils.h"
 
 
 BEGIN_NAMESPACE_YM_PYTHON
@@ -194,24 +195,6 @@ SatSolver_solve(SatSolverObject* self,
 }
 
 
-BEGIN_NONAMESPACE
-
-inline
-PyObject*
-conv_to_pyobject(ymuint val)
-{
-  return conv_to_pyobject(val);
-}
-
-inline
-PyObject*
-conv_to_pyobject(ymuint64 val)
-{
-  return conv_to_pyobject(val);
-}
-
-END_NONAMESPACE
-
 // get_stats 関数
 PyObject*
 SatSolver_get_stats(SatSolverObject* self,
@@ -223,17 +206,18 @@ SatSolver_get_stats(SatSolverObject* self,
   // 結果を Python の dictionary に格納する．
   PyObject* dict_obj = PyDict_New();
 
-  PyDict_SetItemString(dict_obj, "restart", conv_to_pyobject(stats.mRestart));
-  PyDict_SetItemString(dict_obj, "variable_num", conv_to_pyobject(stats.mVarNum));
-  PyDict_SetItemString(dict_obj, "constr_clause_num", conv_to_pyobject(stats.mConstrClauseNum));
+  PyDict_SetItemString(dict_obj, "restart",            conv_to_pyobject(stats.mRestart));
+  PyDict_SetItemString(dict_obj, "variable_num",       conv_to_pyobject(stats.mVarNum));
+  PyDict_SetItemString(dict_obj, "constr_clause_num",  conv_to_pyobject(stats.mConstrClauseNum));
   PyDict_SetItemString(dict_obj, "constr_literal_num", conv_to_pyobject(stats.mConstrLitNum));
-  PyDict_SetItemString(dict_obj, "learnt_clause_num", conv_to_pyobject(stats.mLearntClauseNum));
+  PyDict_SetItemString(dict_obj, "learnt_clause_num",  conv_to_pyobject(stats.mLearntClauseNum));
   PyDict_SetItemString(dict_obj, "learnt_literal_num", conv_to_pyobject(stats.mLearntLitNum));
-  PyDict_SetItemString(dict_obj, "conflict_num", conv_to_pyobject(stats.mConflictNum));
-  PyDict_SetItemString(dict_obj, "decision_num", conv_to_pyobject(stats.mDecisionNum));
-  PyDict_SetItemString(dict_obj, "propagation_num", conv_to_pyobject(stats.mPropagationNum));
-  PyDict_SetItemString(dict_obj, "conflict_limit", conv_to_pyobject(stats.mConflictLimit));
-  PyDict_SetItemString(dict_obj, "learnt_limit", conv_to_pyobject(stats.mLearntLimit));
+  PyDict_SetItemString(dict_obj, "conflict_num",       conv_to_pyobject(stats.mConflictNum));
+  PyDict_SetItemString(dict_obj, "decision_num",       conv_to_pyobject(stats.mDecisionNum));
+  PyDict_SetItemString(dict_obj, "propagation_num",    conv_to_pyobject(stats.mPropagationNum));
+  PyDict_SetItemString(dict_obj, "conflict_limit",     conv_to_pyobject(stats.mConflictLimit));
+  PyDict_SetItemString(dict_obj, "learnt_limit",       conv_to_pyobject(stats.mLearntLimit));
+  PyDict_SetItemString(dict_obj, "time",               USTime_FromUSTime(stats.mTime));
 
   return dict_obj;
 }
@@ -345,7 +329,7 @@ PyTypeObject SatSolverType = {
   0,                          /*tp_setattro*/
   0,                          /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT,         /*tp_flags*/
-  "BDD manager",              /*tp_doc*/
+  "SAT Solver",               /*tp_doc*/
   0,                          /*tp_traverse*/
   0,                          /*tp_clear*/
   0,                          /*tp_richcompare*/
@@ -369,12 +353,12 @@ PyTypeObject SatSolverType = {
 
 // @brief PyObject から SatSolver を取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] obj_p SatSolver を格納する変数
+// @param[out] p_obj SatSolver のポインタを格納する変数
 // @retval true 変換が成功した．
 // @retval false 変換が失敗した．py_obj が SatSolverObject ではなかった．
 bool
 conv_from_pyobject(PyObject* py_obj,
-		   SatSolver* obj_p)
+		   SatSolver*& p_obj)
 {
   // 型のチェック
   if ( !SatSolverObject_Check(py_obj) ) {
@@ -384,7 +368,7 @@ conv_from_pyobject(PyObject* py_obj,
   // 強制的にキャスト
   SatSolverObject* satsolver_obj = (SatSolverObject*)py_obj;
 
-  obj_p = satsolver_obj->mSolver;
+  p_obj = satsolver_obj->mSolver;
 
   return true;
 }

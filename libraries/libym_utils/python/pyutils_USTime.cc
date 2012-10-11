@@ -75,6 +75,19 @@ USTime_init(USTimeObject* self,
   return 0;
 }
 
+// repr 関数
+PyObject*
+USTime_repr(USTimeObject* self)
+{
+  ostringstream buf;
+  buf << self->mTime.usr_time_usec()
+      << ", "
+      << self->mTime.sys_time_usec()
+      << ", "
+      << self->mTime.real_time_usec();
+  return conv_to_pyobject(buf.str());
+}
+
 // str 関数
 PyObject*
 USTime_str(USTimeObject* self)
@@ -102,18 +115,18 @@ USTime_set(USTimeObject* self,
   return Py_None;
 }
 
-// usr_time_usec 関数
+// user_time_usec 関数
 PyObject*
-USTime_usr_time_usec(USTimeObject* self,
-		     PyObject* args)
+USTime_user_time_usec(USTimeObject* self,
+		      PyObject* args)
 {
   return conv_to_pyobject(self->mTime.usr_time_usec());
 }
 
-// sys_time_usec 関数
+// system_time_usec 関数
 PyObject*
-USTime_sys_time_usec(USTimeObject* self,
-		     PyObject* args)
+USTime_system_time_usec(USTimeObject* self,
+			PyObject* args)
 {
   return conv_to_pyobject(self->mTime.sys_time_usec());
 }
@@ -126,18 +139,18 @@ USTime_real_time_usec(USTimeObject* self,
   return conv_to_pyobject(self->mTime.real_time_usec());
 }
 
-// usr_time 関数
+// user_time 関数
 PyObject*
-USTime_usr_time(USTimeObject* self,
-		PyObject* args)
+USTime_user_time(USTimeObject* self,
+		 PyObject* args)
 {
   return conv_to_pyobject(self->mTime.usr_time());
 }
 
-// sys_time 関数
+// system_time 関数
 PyObject*
-USTime_sys_time(USTimeObject* self,
-		PyObject* args)
+USTime_system_time(USTimeObject* self,
+		   PyObject* args)
 {
   return conv_to_pyobject(self->mTime.sys_time());
 }
@@ -167,7 +180,7 @@ USTime_add(PyObject* left,
     return NULL;
   }
 
-  return conv_to_pyobject(time1 + time2);
+  return USTime_FromUSTime(time1 + time2);
 }
 
 // sub 関数
@@ -185,12 +198,12 @@ USTime_sub(PyObject* left,
     return NULL;
   }
 
-  return conv_to_pyobject(time1 - time2);
+  return USTime_FromUSTime(time1 - time2);
 }
 
 // inplace add 関数
 PyObject*
-USTime_add2(PyObject* left,
+USTime_iadd(PyObject* left,
 	    PyObject* right)
 {
   if ( !USTimeObject_Check(left) ) {
@@ -213,7 +226,7 @@ USTime_add2(PyObject* left,
 
 // inplace sub 関数
 PyObject*
-USTime_sub2(PyObject* left,
+USTime_isub(PyObject* left,
 	    PyObject* right)
 {
   if ( !USTimeObject_Check(left) ) {
@@ -263,8 +276,8 @@ PyNumberMethods USTime_nbmethods = {
   (unaryfunc)0,                // nb_hex
 
   // Added in release 2.0
-  (binaryfunc)USTime_add2,     // nb_inplace_add
-  (binaryfunc)USTime_add2,     // nb_inplace_subtract
+  (binaryfunc)USTime_iadd,     // nb_inplace_add
+  (binaryfunc)USTime_isub,     // nb_inplace_subtract
   (binaryfunc)0,               // nb_inplace_multiply
   (binaryfunc)0,               // nb_inplace_divide
   (binaryfunc)0,               // nb_inplace_remainder
@@ -292,15 +305,15 @@ PyNumberMethods USTime_nbmethods = {
 PyMethodDef USTime_methods[] = {
   {"set", (PyCFunction)USTime_set, METH_VARARGS,
    PyDoc_STR("set time (double, double, double)")},
-  {"usr_time_usec", (PyCFunction)USTime_usr_time_usec, METH_NOARGS,
+  {"user_time_usec", (PyCFunction)USTime_user_time_usec, METH_NOARGS,
    PyDoc_STR("return user-time in usec (NONE)")},
-  {"sys_time_usec", (PyCFunction)USTime_sys_time_usec, METH_NOARGS,
+  {"system_time_usec", (PyCFunction)USTime_system_time_usec, METH_NOARGS,
    PyDoc_STR("return system-time in usec (NONE)")},
   {"real_time_usec", (PyCFunction)USTime_real_time_usec, METH_NOARGS,
    PyDoc_STR("return real-time in usec (NONE)")},
-  {"usr_time", (PyCFunction)USTime_usr_time, METH_NOARGS,
+  {"user_time", (PyCFunction)USTime_user_time, METH_NOARGS,
    PyDoc_STR("return user-time in sec (NONE)")},
-  {"sys_time", (PyCFunction)USTime_sys_time, METH_NOARGS,
+  {"system_time", (PyCFunction)USTime_system_time, METH_NOARGS,
    PyDoc_STR("return system-time in sec (NONE)")},
   {"real_time", (PyCFunction)USTime_real_time, METH_NOARGS,
    PyDoc_STR("return real-time in sec (NONE)")},
@@ -326,7 +339,7 @@ PyTypeObject USTimeType = {
   0,                          /*tp_getattr*/
   0,                          /*tp_setattr*/
   0,                          /*tp_compare*/
-  0,                          /*tp_repr*/
+  (reprfunc)USTime_repr,      /*tp_repr*/
   &USTime_nbmethods,          /*tp_as_number*/
   0,                          /*tp_as_sequence*/
   0,                          /*tp_as_mapping*/
@@ -386,10 +399,10 @@ conv_from_pyobject(PyObject* py_obj,
   return true;
 }
 
-// @brief USTime から PyObject を生成する．
+// @brief USTime から USTimeObject を生成する．
 // @param[in] obj USTime オブジェクト
 PyObject*
-conv_to_pyobject(const USTime& obj)
+USTime_FromUSTime(const USTime& obj)
 {
   USTimeObject* py_obj = USTime_new(&USTimeType);
   if ( py_obj == NULL ) {
@@ -400,6 +413,14 @@ conv_to_pyobject(const USTime& obj)
 
   Py_INCREF(py_obj);
   return (PyObject*)py_obj;
+}
+
+// USTimeObject 関係の初期化を行う．
+void
+USTimeObject_init(PyObject* m)
+{
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "USTime", (PyObject*)&USTimeType);
 }
 
 END_NAMESPACE_YM_PYTHON

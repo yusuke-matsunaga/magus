@@ -100,7 +100,7 @@ FileLoc_str(FileLocObject* self)
 // is_valid 関数
 PyObject*
 FileLoc_is_valid(FileLocObject* self,
-		  PyObject* args)
+		 PyObject* args)
 {
   return conv_to_pyobject(self->mFileLoc.is_valid());
 }
@@ -108,7 +108,7 @@ FileLoc_is_valid(FileLocObject* self,
 // filename 関数
 PyObject*
 FileLoc_filename(FileLocObject* self,
-		  PyObject* args)
+		 PyObject* args)
 {
   return conv_to_pyobject(self->mFileLoc.filename());
 }
@@ -116,15 +116,15 @@ FileLoc_filename(FileLocObject* self,
 // parent_loc 関数
 PyObject*
 FileLoc_parent_loc(FileLocObject* self,
-		    PyObject* args)
+		   PyObject* args)
 {
-  return conv_to_pyobject(self->mFileLoc.parent_loc());
+  return FileLoc_FromFileLoc(self->mFileLoc.parent_loc());
 }
 
 // parent_loc_list 関数
 PyObject*
 FileLoc_parent_loc_list(FileLocObject* self,
-			 PyObject* args)
+			PyObject* args)
 {
   // FileLocObject のリストを返す．
   list<FileLoc> loc_list;
@@ -134,7 +134,7 @@ FileLoc_parent_loc_list(FileLocObject* self,
   ymuint i = 0;
   for (list<FileLoc>::iterator p = loc_list.begin();
        p != loc_list.end(); ++ p, ++ i) {
-    PyObject* obj = conv_to_pyobject(*p);
+    PyObject* obj = FileLoc_FromFileLoc(*p);
     PyList_SetItem(obj, i, obj);
   }
   return ans_list;
@@ -259,7 +259,7 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief FileLoc から PyObject を生成する．
 // @param[in] obj FileLoc オブジェクト
 PyObject*
-conv_to_pyobject(const FileLoc& obj)
+FileLoc_FromFileLoc(const FileLoc& obj)
 {
   FileLocObject* py_obj = FileLoc_new(&FileLocType);
   if ( py_obj == NULL ) {
@@ -270,6 +270,14 @@ conv_to_pyobject(const FileLoc& obj)
 
   Py_INCREF(py_obj);
   return (PyObject*)py_obj;
+}
+
+// FileLocObject 関係の初期化を行う．
+void
+FileLocObject_init(PyObject* m)
+{
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "FileLoc", (PyObject*)&FileLocType);
 }
 
 END_NAMESPACE_YM_PYTHON

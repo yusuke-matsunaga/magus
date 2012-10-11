@@ -131,7 +131,7 @@ PyObject*
 FileInfo_parent_loc(FileInfoObject* self,
 		    PyObject* args)
 {
-  return conv_to_pyobject(self->mFileInfo.parent_loc());
+  return FileLoc_FromFileLoc(self->mFileInfo.parent_loc());
 }
 
 // parent_loc_list 関数
@@ -147,7 +147,7 @@ FileInfo_parent_loc_list(FileInfoObject* self,
   ymuint i = 0;
   for (list<FileLoc>::iterator p = loc_list.begin();
        p != loc_list.end(); ++ p, ++ i) {
-    PyObject* obj = conv_to_pyobject(*p);
+    PyObject* obj = FileLoc_FromFileLoc(*p);
     PyList_SetItem(obj, i, obj);
   }
   return ans_list;
@@ -251,7 +251,7 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief FileInfo から PyObject を生成する．
 // @param[in] obj FileInfo オブジェクト
 PyObject*
-conv_to_pyobject(const FileInfo& obj)
+FileInfo_FromFileInfo(const FileInfo& obj)
 {
   FileInfoObject* py_obj = FileInfo_new(&FileInfoType);
   if ( py_obj == NULL ) {
@@ -262,6 +262,14 @@ conv_to_pyobject(const FileInfo& obj)
 
   Py_INCREF(py_obj);
   return (PyObject*)py_obj;
+}
+
+// FileInfoObject 関係の初期化を行う．
+void
+FileInfoObject_init(PyObject* m)
+{
+  // タイプオブジェクトの登録を行う．
+  PyModule_AddObject(m, "FileInfo", (PyObject*)&FileInfoType);
 }
 
 END_NAMESPACE_YM_PYTHON
