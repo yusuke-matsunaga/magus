@@ -25,8 +25,10 @@ class PyMsgHandler :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] obj Python の関数オブジェクト
   /// @param[in] mask メッセージマスク
-  PyMsgHandler(ymuint32 mask = kMaskAll);
+  PyMsgHandler(PyObject* obj,
+	       ymuint32 mask = kMaskAll);
 
   /// @brief デストラクタ
   virtual
@@ -53,18 +55,6 @@ public:
 	  tMsgType type,
 	  const char* label,
 	  const char* body);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // コールバック関数の設定用関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief コールバック関数を設定する．
-  /// @param[in] funcobj 設定する関数オブジェクト
-  /// @retrun 元の関数オブジェクトを返す．
-  PyObject*
-  set_callback(PyObject* funcobj);
 
 
 private:

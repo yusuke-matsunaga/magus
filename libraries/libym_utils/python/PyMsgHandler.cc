@@ -18,11 +18,14 @@ BEGIN_NAMESPACE_YM_PYTHON
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] obj Python の関数オブジェクト
 // @param[in] mask メッセージマスク
-PyMsgHandler::PyMsgHandler(ymuint32 mask) :
+PyMsgHandler::PyMsgHandler(PyObject* obj,
+			   ymuint32 mask) :
   MsgHandler(mask),
-  mFuncObj(NULL)
+  mFuncObj(obj)
 {
+  assert_cond( PyCallable_Check(obj), __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -66,23 +69,6 @@ PyMsgHandler::put_msg(const char* src_file,
     // どちらにせよ結果は使わない．
     Py_DECREF(result);
   }
-}
-
-// @brief コールバック関数を設定する．
-// @param[in] funcobj 設定する関数オブジェクト
-// @retrun 元の関数オブジェクトを返す．
-PyObject*
-PyMsgHandler::set_callback(PyObject* funcobj)
-{
-  PyObject* old_obj = mFuncObj;
-  mFuncObj = funcobj;
-
-  // old_obj は NULL の場合もあるので XDECREF を使う．
-  Py_XDECREF(old_obj);
-  // funcobj も NULL の場合があるので XINCREF を使う．
-  Py_XINCREF(funcobj);
-
-  return old_obj;
 }
 
 END_NAMESPACE_YM_PYTHON

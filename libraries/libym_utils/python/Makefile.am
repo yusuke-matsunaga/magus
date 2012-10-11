@@ -20,8 +20,9 @@ libym_utils_python_la_SOURCES = \
 	pyutils_FileInfo.cc \
 	pyutils_FileLoc.cc \
 	pyutils_FileRegion.cc \
+	pyutils_MFSet.cc \
 	pyutils_MsgType.cc \
-	pyutils_MsgHandler.cc \
+	pyutils_MsgMgr.cc \
 	PyMsgHandler.h \
 	PyMsgHandler.cc \
 	pyutils_USTime.cc \

@@ -40,13 +40,16 @@ void
 StopWatchObject_init(PyObject* module);
 
 void
+MFSetObject_init(PyObject* module);
+
+void
 MStopWatchObject_init(PyObject* module);
 
 void
 MsgTypeObject_init(PyObject* module);
 
 void
-MsgHandlerObject_init(PyObject* module);
+MsgMgrObject_init(PyObject* module);
 
 void
 RandGenObject_init(PyObject* module);
@@ -85,7 +88,7 @@ utils_init()
     return;
   }
 
-  if ( PyType_Ready(&MsgHandlerType) < 0 ) {
+  if ( PyType_Ready(&MsgMgrType) < 0 ) {
     return;
   }
 
@@ -134,9 +137,11 @@ utils_init()
 
   FileRegionObject_init(m);
 
+  MFSetObject_init(m);
+
   MsgTypeObject_init(m);
 
-  MsgHandlerObject_init(m);
+  MsgMgrObject_init(m);
 
   USTimeObject_init(m);
 

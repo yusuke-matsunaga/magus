@@ -24,7 +24,7 @@ class RandPermGen;
 class StopWatch;
 class MStopWatch;
 class USTime;
-class MsgHandler;
+class MFSet;
 
 END_NAMESPACE_YM
 
@@ -70,9 +70,9 @@ PyObject* Py_kMsgInfo;
 extern
 PyObject* Py_kMsgDebug;
 
-/// @brief MsgHandler を表す型
+/// @brief MsgMgr を表す型
 extern
-PyTypeObject MsgHandlerType;
+PyTypeObject MsgMgrType;
 
 /// @brief USTime を表す型
 extern
@@ -97,6 +97,10 @@ PyTypeObject RandPermGenType;
 /// @brief RandCombiGen を表す型
 extern
 PyTypeObject RandCombiGenType;
+
+/// @brief MFSet を表す型
+extern
+PyTypeObject MFSetType;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -147,15 +151,15 @@ MsgTypeObject_Check(PyObject* obj)
   return Py_TYPE(obj) == &MsgTypeType;
 }
 
-/// @brief MsgHandlerType の型チェック
+/// @brief MsgMgrType の型チェック
 /// @param[in] obj Python オブジェクト
-/// @retval true obj が MsgHandlerType だった．
+/// @retval true obj が MsgMgrType だった．
 /// @retval false obj が他の型だった．
 inline
 bool
-MsgHandlerObject_Check(PyObject* obj)
+MsgMgrObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &MsgHandlerType;
+  return Py_TYPE(obj) == &MsgMgrType;
 }
 
 /// @brief USTimeType の型チェック
@@ -224,6 +228,17 @@ RandCombiGenObject_Check(PyObject* obj)
   return Py_TYPE(obj) == &RandCombiGenType;
 }
 
+/// @brief MFSetType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が MFSetType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+MFSetObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &MFSetType;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // PyObject からの型変換
@@ -269,16 +284,6 @@ bool
 conv_from_pyobject(PyObject* py_obj,
 		   tMsgType& obj);
 
-/// @brief PyObject から MsgHandler を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] p_obj MsgHandler のポインタを格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した． py_obj が MsgHandlerObject ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   MsgHandler*& p_obj);
-
 /// @brief PyObject から USTime を取り出す．
 /// @param[in] py_obj Python オブジェクト
 /// @param[out] obj USTime を格納する変数
@@ -318,6 +323,16 @@ extern
 bool
 conv_from_pyobject(PyObject* py_obj,
 		   RandGen*& p_obj);
+
+/// @brief PyObject から MFSet を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] p_obj MFSet のポインタを格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した． py_obj が MFSetObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   MFSet*& p_obj);
 
 
 //////////////////////////////////////////////////////////////////////
