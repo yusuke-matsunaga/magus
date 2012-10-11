@@ -24,6 +24,7 @@ libym_utils_python_la_SOURCES = \
 	pyutils_MFSet.cc \
 	pyutils_MsgType.cc \
 	pyutils_MsgMgr.cc \
+	pyutils_NameMgr.cc \
 	PyMsgHandler.h \
 	PyMsgHandler.cc \
 	pyutils_USTime.cc \

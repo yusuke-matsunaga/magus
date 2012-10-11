@@ -63,6 +63,9 @@ RandCombiGenObject_init(PyObject* module);
 void
 ItvlMgrObject_init(PyObject* module);
 
+void
+NameMgrObject_init(PyObject* module);
+
 END_NAMESPACE_YM_PYTHON
 
 
@@ -110,5 +113,7 @@ utils_init()
   RandCombiGenObject_init(m);
 
   ItvlMgrObject_init(m);
+
+  NameMgrObject_init(m);
 
 }

@@ -26,6 +26,7 @@ class MStopWatch;
 class USTime;
 class MFSet;
 class ItvlMgr;
+class NameMgr;
 
 END_NAMESPACE_YM
 
@@ -106,6 +107,10 @@ PyTypeObject MFSetType;
 /// @brief ItvlMgr を表す型
 extern
 PyTypeObject ItvlMgrType;
+
+/// @brief NameMgr を表す型
+extern
+PyTypeObject NameMgrType;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -255,6 +260,17 @@ ItvlMgrObject_Check(PyObject* obj)
   return Py_TYPE(obj) == &ItvlMgrType;
 }
 
+/// @brief NameMgrType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が NameMgrType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+NameMgrObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &NameMgrType;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // PyObject からの型変換
@@ -358,6 +374,15 @@ conv_from_pyobject(PyObject* py_obj,
 bool
 conv_from_pyobject(PyObject* py_obj,
 		   ItvlMgr*& p_obj);
+
+/// @brief PyObject から NameMgr を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] obj NameMgr を格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した．py_obj が NameMgrObject ではなかった．
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   NameMgr*& p_obj);
 
 
 //////////////////////////////////////////////////////////////////////
