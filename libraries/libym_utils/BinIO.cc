@@ -7,7 +7,8 @@
 /// All rights reserved.
 
 
-#include "ym_utils/BinIO.h"
+#include "ym_utils/BinI.h"
+#include "ym_utils/BinO.h"
 
 
 BEGIN_NAMESPACE_YM

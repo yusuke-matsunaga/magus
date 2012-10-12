@@ -10,7 +10,8 @@
 
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/BinI.h"
+#include "ym_utils/BinO.h"
 #include "ym_utils/Alloc.h"
 #include "libcomp/libcomp_nsdef.h"
 

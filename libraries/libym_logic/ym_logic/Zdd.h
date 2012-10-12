@@ -12,7 +12,8 @@
 
 #include "ym_logic/zdd_nsdef.h"
 #include "ym_logic/VarId.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/BinI.h"
+#include "ym_utils/BinO.h"
 #include "gmpxx.h"
 
 

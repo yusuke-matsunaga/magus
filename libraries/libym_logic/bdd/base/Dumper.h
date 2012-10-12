@@ -11,7 +11,7 @@
 
 #include "BddMgrImpl.h"
 #include "IdMgr.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/BinO.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

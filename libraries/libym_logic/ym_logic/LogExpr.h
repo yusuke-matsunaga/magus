@@ -11,7 +11,8 @@
 
 #include "ym_logic/lexp_nsdef.h"
 #include "ym_logic/Literal.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/BinI.h"
+#include "ym_utils/BinO.h"
 
 
 BEGIN_NAMESPACE_YM

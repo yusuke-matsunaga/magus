@@ -11,7 +11,6 @@
 
 #include "libcomp_nsdef.h"
 #include "ym_logic/lexp_nsdef.h"
-#include "ym_utils/BinIO.h"
 #include "ym_utils/UnitAlloc.h"
 
 

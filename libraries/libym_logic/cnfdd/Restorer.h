@@ -10,7 +10,7 @@
 
 
 #include "CNFddMgrImpl.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/BinI.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD

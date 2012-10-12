@@ -9,7 +9,6 @@
 
 #include "CiPatMgr.h"
 #include "CiPatGraph.h"
-#include "ym_utils/BinIO.h"
 #include "libcomp/LcPatMgr.h"
 #include "libcomp/LcPatNode.h"
 #include "libcomp/LcPatHandle.h"

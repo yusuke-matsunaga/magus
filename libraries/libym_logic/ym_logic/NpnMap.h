@@ -14,7 +14,8 @@
 #include "ym_logic/Pol.h"
 #include "ym_logic/NpnVmap.h"
 #include "ym_logic/TvFunc.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/BinI.h"
+#include "ym_utils/BinO.h"
 
 
 BEGIN_NAMESPACE_YM_NPN

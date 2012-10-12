@@ -13,7 +13,6 @@
 
 #include "ym_logic/LogExpr.h"
 #include "ym_utils/Generator.h"
-#include "ym_utils/BinIO.h"
 
 
 BEGIN_NONAMESPACE
@@ -582,69 +581,6 @@ LcPatMgr::hash_func(ymuint type,
   return type + l * 5 + r;
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// dump() 関係の関数
-//////////////////////////////////////////////////////////////////////
-#if 0
-// @brief 内容をバイナリダンプする．
-// @param[in] s 出力先のストリーム
-void
-LcPatMgr::dump(BinO& bos) const
-{
-  // パタンノードの情報をダンプする．
-  ymuint32 nn = node_num();
-  bos << nn;
-  for (ymuint i = 0; i < nn; ++ i) {
-    LcPatNode* node = this->node(i);
-    ymuint32 v = 0U;
-    if ( node->is_input() ) {
-      v = kCellPatInput | (node->input_id() << 2);
-    }
-    else if ( node->is_and() ) {
-      v = kCellPatAnd;
-    }
-    else if ( node->is_xor() ) {
-      v = kCellPatXor;
-    }
-    bos << v
-	<< encode_edge(node, 0)
-	<< encode_edge(node, 1);
-  }
-
-  // パタンの情報をダンプする．
-  ymuint32 np = pat_num();
-  bos << np;
-  for (ymuint i = 0; i < np; ++ i) {
-    vector<ymuint> val_list;
-    ymuint32 v = pat_node_list(i, val_list);
-    ymuint32 ne = val_list.size();
-    bos << static_cast<ymuint32>(rep_id(i))
-	<< v
-	<< ne;
-    for (ymuint j = 0; j < ne; ++ j) {
-      bos << static_cast<ymuint32>(val_list[j]);
-    }
-  }
-}
-
-// @brief 枝の情報をエンコードする．
-// @param[in] node 親のノード
-// @param[in] fanin_pos ファンイン番号
-ymuint32
-LcPatMgr::encode_edge(LcPatNode* node,
-		      ymuint fanin_pos)
-{
-  ymuint32 v = 0U;
-  if ( !node->is_input() ) {
-    v = node->fanin(fanin_pos)->id() * 2;
-    if ( node->fanin_inv(fanin_pos) ) {
-      v |= 1U;
-    }
-  }
-  return v;
-}
-#endif
 
 BEGIN_NONAMESPACE
 

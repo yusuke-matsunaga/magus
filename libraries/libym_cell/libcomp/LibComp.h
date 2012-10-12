@@ -15,8 +15,6 @@
 #include "LcLatchMgr.h"
 #include "LcPatMgr.h"
 
-#include "ym_utils/BinIO.h"
-
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 

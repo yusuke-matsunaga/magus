@@ -13,6 +13,7 @@
 #include "ym_logic/LogExpr.h"
 #include "ym_utils/ShString.h"
 #include "ym_utils/Alloc.h"
+#include "ym_utils/BinO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

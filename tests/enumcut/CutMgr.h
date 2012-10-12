@@ -13,7 +13,8 @@
 #include "ym_logic/AigMgr.h"
 #include "ym_logic/TvFunc.h"
 #include "ym_logic/NpnMgr.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/BinI.h"
+#include "ym_utils/BinO.h"
 #include "CutHash.h"
 
 

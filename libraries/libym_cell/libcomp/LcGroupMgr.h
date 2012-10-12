@@ -11,7 +11,6 @@
 
 #include "libcomp_nsdef.h"
 #include "ym_logic/TvFuncM.h"
-#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP

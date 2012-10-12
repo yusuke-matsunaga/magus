@@ -9,7 +9,7 @@
 
 #include "RestoreLibrary.h"
 #include "ym_cell/CellLibrary.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/BinI.h"
 
 
 BEGIN_NAMESPACE_MAGUS
