@@ -9,6 +9,7 @@
 
 #include "ym_utils/BinI.h"
 #include "ym_utils/BinO.h"
+#include <fcntl.h>
 
 
 BEGIN_NAMESPACE_YM
@@ -111,6 +112,88 @@ BinO::write_str(const char* val)
   else {
     write_64(0);
   }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス FileBinO
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] filename ファイル名
+FileBinO::FileBinO(const char* filename)
+{
+  mFd = open(filename, O_WRONLY | O_CREAT | O_TRUNC);
+  mPos = 0;
+}
+
+// @brief コンストラクタ
+// @param[in] filename ファイル名
+FileBinO::FileBinO(const string& filename)
+{
+  mFd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC);
+  mPos = 0;
+}
+
+// @brief デストラクタ
+FileBinO::~FileBinO()
+{
+  close();
+}
+
+// @brief 書き込み可能なら true を返す．
+bool
+FileBinO::ok() const
+{
+  return mFd >= 0;
+}
+
+// @brief ファイルを閉じる．
+// @note 以降の書き込みは行われない．
+void
+FileBinO::close()
+{
+  if ( mFd >= 0 ) {
+    if ( mPos > 0 ) {
+      ::write(mFd, reinterpret_cast<void*>(mBuff), mPos);
+    }
+    ::close(mFd);
+  }
+  mFd = -1;
+}
+
+// @brief データを書き出す．
+// @param[in] n データサイズ
+// @param[in] buff データを収めた領域のアドレス
+// @return 実際に書き出した量を返す．
+ymuint
+FileBinO::write(ymuint64 n,
+		const ymuint8* buff)
+{
+  if ( mFd < 0 ) {
+    return 0;
+  }
+
+  ymuint count = 0;
+  while ( n > 0 ) {
+    if ( mPos + n < BUFF_SIZE ) {
+      memcpy(reinterpret_cast<void*>(mBuff + mPos), reinterpret_cast<const void*>(buff), n);
+      mPos += n;
+      count += n;
+      break;
+    }
+    else {
+      ymuint n1 = BUFF_SIZE - mPos;
+      memcpy(reinterpret_cast<void*>(mBuff + mPos), reinterpret_cast<const void*>(buff), n1);
+      ::write(mFd, reinterpret_cast<void*>(mBuff), BUFF_SIZE);
+      mPos = 0;
+      count += n1;
+      buff += n1;
+      n -= n1;
+    }
+  }
+
+  return count;
 }
 
 
