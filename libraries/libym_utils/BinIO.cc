@@ -169,7 +169,7 @@ FileBinO::open(const char* filename)
 {
   close();
   mFd = ::open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-  mPos = BUFF_SIZE;
+  mPos = 0;
 }
 
 // @brief ファイルを開く
@@ -208,10 +208,6 @@ FileBinO::write(ymuint64 n,
 
   ymuint count = 0;
   for ( ; ; ) {
-    if ( mPos == BUFF_SIZE ) {
-      ::write(mFd, reinterpret_cast<void*>(mBuff), BUFF_SIZE);
-      mPos = 0;
-    }
     ymuint n1 = n;
     if ( mPos + n1 > BUFF_SIZE ) {
       n1 = BUFF_SIZE - mPos;
@@ -219,6 +215,10 @@ FileBinO::write(ymuint64 n,
     memcpy(reinterpret_cast<void*>(mBuff + mPos), reinterpret_cast<const void*>(buff), n1);
     mPos += n1;
     count += n1;
+    if ( mPos == BUFF_SIZE ) {
+      ::write(mFd, reinterpret_cast<void*>(mBuff), BUFF_SIZE);
+      mPos = 0;
+    }
     if ( count == n ) {
       break;
     }
