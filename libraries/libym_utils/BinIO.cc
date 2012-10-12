@@ -8,7 +8,13 @@
 
 
 #include "ym_utils/BinI.h"
+#include "ym_utils/FileBinI.h"
+#include "ym_utils/StreamBinI.h"
+
 #include "ym_utils/BinO.h"
+#include "ym_utils/FileBinO.h"
+#include "ym_utils/StreamBinO.h"
+
 #include <fcntl.h>
 
 
@@ -119,20 +125,29 @@ BinO::write_str(const char* val)
 // クラス FileBinO
 //////////////////////////////////////////////////////////////////////
 
+// @brief 空のコンストラクタ
+FileBinO::FileBinO()
+{
+  mFd = -1;
+  mPos = 0;
+}
+
 // @brief コンストラクタ
 // @param[in] filename ファイル名
 FileBinO::FileBinO(const char* filename)
 {
-  mFd = open(filename, O_WRONLY | O_CREAT | O_TRUNC);
+  mFd = -1;
   mPos = 0;
+  open(filename);
 }
 
 // @brief コンストラクタ
 // @param[in] filename ファイル名
 FileBinO::FileBinO(const string& filename)
 {
-  mFd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC);
+  mFd = -1;
   mPos = 0;
+  open(filename);
 }
 
 // @brief デストラクタ
@@ -142,10 +157,27 @@ FileBinO::~FileBinO()
 }
 
 // @brief 書き込み可能なら true を返す．
-bool
-FileBinO::ok() const
+FileBinO::operator bool() const
 {
   return mFd >= 0;
+}
+
+// @brief ファイルを開く
+// @param[in] filename ファイル名
+void
+FileBinO::open(const char* filename)
+{
+  close();
+  mFd = ::open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+  mPos = BUFF_SIZE;
+}
+
+// @brief ファイルを開く
+// @param[in] filename ファイル名
+void
+FileBinO::open(const string& filename)
+{
+  open(filename.c_str());
 }
 
 // @brief ファイルを閉じる．
@@ -175,22 +207,23 @@ FileBinO::write(ymuint64 n,
   }
 
   ymuint count = 0;
-  while ( n > 0 ) {
-    if ( mPos + n < BUFF_SIZE ) {
-      memcpy(reinterpret_cast<void*>(mBuff + mPos), reinterpret_cast<const void*>(buff), n);
-      mPos += n;
-      count += n;
-      break;
-    }
-    else {
-      ymuint n1 = BUFF_SIZE - mPos;
-      memcpy(reinterpret_cast<void*>(mBuff + mPos), reinterpret_cast<const void*>(buff), n1);
+  for ( ; ; ) {
+    if ( mPos == BUFF_SIZE ) {
       ::write(mFd, reinterpret_cast<void*>(mBuff), BUFF_SIZE);
       mPos = 0;
-      count += n1;
-      buff += n1;
-      n -= n1;
     }
+    ymuint n1 = n;
+    if ( mPos + n1 > BUFF_SIZE ) {
+      n1 = BUFF_SIZE - mPos;
+    }
+    memcpy(reinterpret_cast<void*>(mBuff + mPos), reinterpret_cast<const void*>(buff), n1);
+    mPos += n1;
+    count += n1;
+    if ( count == n ) {
+      break;
+    }
+    buff += n1;
+    n -= n1;
   }
 
   return count;
@@ -198,18 +231,18 @@ FileBinO::write(ymuint64 n,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス BinOStream
+// クラス StreamBinO
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] s 出力先のストリーム
-BinOStream::BinOStream(ostream& s) :
+StreamBinO::StreamBinO(ostream& s) :
   mS(s)
 {
 }
 
 // @brief デストラクタ
-BinOStream::~BinOStream()
+StreamBinO::~StreamBinO()
 {
 }
 
@@ -218,7 +251,7 @@ BinOStream::~BinOStream()
 // @param[in] buff データを収めた領域のアドレス
 // @return 実際に書き出した量を返す．
 ymuint
-BinOStream::write(ymuint64 n,
+StreamBinO::write(ymuint64 n,
 		  const ymuint8* buff)
 {
   mS.write(reinterpret_cast<const char*>(buff), n);
@@ -324,18 +357,124 @@ BinI::read_str()
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス BinIStream
+// クラス FileBinI
+//////////////////////////////////////////////////////////////////////
+
+// @brief 空のコンストラクタ
+FileBinI::FileBinI()
+{
+  mFd = -1;
+  mPos = 0;
+}
+
+// @brief コンストラクタ
+// @param[in] filename ファイル名
+FileBinI::FileBinI(const char* filename)
+{
+  mFd = -1;
+  mPos = 0;
+  open(filename);
+}
+
+// @brief コンストラクタ
+// @param[in] filename ファイル名
+FileBinI::FileBinI(const string& filename)
+{
+  mFd = -1;
+  mPos = 0;
+  open(filename);
+}
+
+// @brief デストラクタ
+FileBinI::~FileBinI()
+{
+  close();
+}
+
+// @brief 読み出し可能なら true を返す．
+FileBinI::operator bool() const
+{
+  return mFd >= 0;
+}
+
+// @brief ファイルを開く
+// @param[in] filename ファイル名
+void
+FileBinI::open(const char* filename)
+{
+  close();
+  mFd = ::open(filename, O_RDONLY);
+  mPos = BUFF_SIZE;
+}
+
+// @brief ファイルを開く
+// @param[in] filename ファイル名
+void
+FileBinI::open(const string& filename)
+{
+  open(filename.c_str());
+}
+
+// @brief ファイルを閉じる．
+// @note 以降の読み出しは行われない．
+void
+FileBinI::close()
+{
+  if ( mFd >= 0 ) {
+    ::close(mFd);
+  }
+  mFd =-1;
+}
+
+// @brief データを読み込む．
+// @param[in] n 読み込むデータサイズ
+// @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
+// @return 実際に読み込んだ量を返す．
+ymuint
+FileBinI::read(ymuint64 n,
+	       ymuint8* buff)
+{
+  if ( mFd < 0 ) {
+    return 0;
+  }
+
+  ymuint count = 0;
+  for ( ; ; ) {
+    if ( mPos == BUFF_SIZE ) {
+      ::read(mFd, reinterpret_cast<void*>(mBuff), BUFF_SIZE);
+      mPos = 0;
+    }
+    ymuint n1 = n;
+    if ( mPos + n1 > BUFF_SIZE ) {
+      n1 = BUFF_SIZE - mPos;
+    }
+    memcpy(reinterpret_cast<void*>(buff), reinterpret_cast<void*>(mBuff + mPos), n1);
+    mPos += n1;
+    count += n1;
+    if ( count == n ) {
+      break;
+    }
+    buff += n1;
+    n -= n1;
+  }
+
+  return count;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス StreamBinI
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] s 入力ストリーム
-BinIStream::BinIStream(istream& s) :
+StreamBinI::StreamBinI(istream& s) :
   mS(s)
 {
 }
 
 // @brief デストラクタ
-BinIStream::~BinIStream()
+StreamBinI::~StreamBinI()
 {
 }
 
@@ -344,7 +483,7 @@ BinIStream::~BinIStream()
 // @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
 // @return 実際に読み込んだ量を返す．
 ymuint
-BinIStream::read(ymuint64 n,
+StreamBinI::read(ymuint64 n,
 		 ymuint8* buff)
 {
   mS.read(reinterpret_cast<char*>(buff), n);

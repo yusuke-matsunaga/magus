@@ -9,7 +9,7 @@
 
 #include "DumpLibrary.h"
 #include "ym_cell/CellLibrary.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/FileBinO.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -37,14 +37,23 @@ DumpLibrary::cmd_proc(TclObjVector& objv)
   }
 
   string dst_filename = objv[1];
-  ofstream os;
-  if ( !open_ofile(os, dst_filename, ios::binary) ) {
-    // エラーメッセージは open_ofile() がセットしている．
+  // ファイル名の '~' 置換を行なう．
+  string ex_name;
+  bool stat = tilde_subst(dst_filename, ex_name);
+  if ( !stat ) {
+    // ファイル名文字列の中に誤り
     return TCL_ERROR;
   }
-  BinOStream bos(os);
+  FileBinO bo(ex_name);
+  if ( !bo ) {
+    // 開けなかった．
+    TclObj errmsg;
+    errmsg << ex_name << ": " << posix_error();
+    set_result(errmsg);
+    return TCL_ERROR;
+  }
 
-  cur_cell_library()->dump(bos);
+  cur_cell_library()->dump(bo);
 
   return TCL_OK;
 }

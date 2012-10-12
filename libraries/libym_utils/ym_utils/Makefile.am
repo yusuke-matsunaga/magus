@@ -13,6 +13,8 @@ noinst_HEADERS = \
 	BinO.h \
 	DlList.h \
 	File.h \
+	FileBinI.h \
+	FileBinO.h \
 	FileInfo.h \
 	FileLoc.h \
 	FileRegion.h \
@@ -33,5 +35,7 @@ noinst_HEADERS = \
 	ShString.h \
 	StopWatch.h \
 	StrBuff.h \
+	StreamBinI.h \
+	StreamBinO.h \
 	msg_type.h \
 	random.h

@@ -35,6 +35,7 @@ main(int argc,
 
   mgr.print(cout);
 
+#if 0
   ostringstream buf;
   BinOStream bos(buf);
   mgr.dump(bos);
@@ -50,6 +51,7 @@ main(int argc,
     }
   }
   cout << endl;
+#endif
 
   return 0;
 }

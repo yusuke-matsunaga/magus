@@ -27,6 +27,9 @@
 
 #include "ym_utils/StopWatch.h"
 
+#include "ym_utils/FileBinI.h"
+#include "ym_utils/FileBinO.h"
+
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
@@ -112,30 +115,26 @@ void
 dump_func(FuncMgr& func_mgr,
 	  const char* filename)
 {
-  ofstream os;
-  os.open(filename, ios::binary);
-  if ( !os ) {
+  FileBinO bo(filename);
+  if ( !bo ) {
     cerr << "Could not create " << filename << endl;
     return;
   }
-  BinOStream bos(os);
 
-  func_mgr.dump(bos);
+  func_mgr.dump(bo);
 }
 
 void
 restore_func(FuncMgr& func_mgr,
 	     const char* filename)
 {
-  ifstream is;
-  is.open(filename, ios::binary);
-  if ( !is ) {
+  FileBinI bi(filename);
+  if ( !bi ) {
     cerr << "Could not create " << filename << endl;
     return;
   }
-  BinIStream bis(is);
 
-  func_mgr.restore(bis);
+  func_mgr.restore(bi);
 }
 
 END_NAMESPACE_YM_NETWORKS

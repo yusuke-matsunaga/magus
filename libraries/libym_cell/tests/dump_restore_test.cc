@@ -11,6 +11,9 @@
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
 
+#include "ym_utils/FileBinI.h"
+#include "ym_utils/FileBinO.h"
+
 
 BEGIN_NAMESPACE_YM
 
@@ -81,30 +84,25 @@ main(int argc,
 
   const char* datafile = "patdata.bin";
   {
-    ofstream os;
-    os.open(datafile, ios::binary);
-    if ( !os ) {
+    FileBinO bo(datafile);
+    if ( !bo ) {
       // エラー
       cerr << "Could not create " << datafile << endl;
       return 2;
     }
-    BinOStream bos(os);
-
-    library->dump(bos);
+    library->dump(bo);
   }
 
   {
-    ifstream is;
-    is.open(datafile, ios::binary);
-    if ( !is ) {
+    FileBinI bi(datafile);
+    if ( !bi ) {
       // エラー
       cerr << "Could not open " << datafile << endl;
       return 3;
     }
-    BinIStream bis(is);
 
     CellLibrary* library2 = CellLibrary::new_obj();
-    library2->restore(bis);
+    library2->restore(bi);
 
     ofstream os2;
     os2.open("dump2.cell", ios::binary);

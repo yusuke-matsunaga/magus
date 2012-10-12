@@ -18,6 +18,9 @@
 
 #include "ym_logic/NpnMgr.h"
 
+#include "ym_utils/FileBinI.h"
+#include "ym_utils/FileBinO.h"
+
 #include "TopDown.h"
 #include "FuncMgr.h"
 #include "FuncRec.h"
@@ -270,17 +273,15 @@ DumpCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  ofstream os;
-  os.open(ex_file_name.c_str(), ios::binary);
-  if ( !os ) {
+  FileBinO bo(ex_file_name);
+  if ( !bo ) {
     TclObj emsg;
     emsg << "Could not create " << file_name;
     set_result(emsg);
     return TCL_ERROR;
   }
-  BinOStream bos(os);
 
-  mgr().dump(bos);
+  mgr().dump(bo);
 
   return TCL_OK;
 }
@@ -325,17 +326,15 @@ DumpRepCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  ofstream os;
-  os.open(ex_file_name.c_str(), ios::binary);
-  if ( !os ) {
+  FileBinO bo(ex_file_name);
+  if ( !bo ) {
     TclObj emsg;
     emsg << "Could not create " << file_name;
     set_result(emsg);
     return TCL_ERROR;
   }
-  BinOStream bos(os);
 
-  mgr().dump_rep(bos);
+  mgr().dump_rep(bo);
 
   return TCL_OK;
 }
@@ -379,17 +378,15 @@ RestoreCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  ifstream is;
-  is.open(ex_file_name.c_str(), ios::binary);
-  if ( !is ) {
+  FileBinI bi(ex_file_name);
+  if ( !bi ) {
     TclObj emsg;
     emsg << "Could not open " << file_name;
     set_result(emsg);
     return TCL_ERROR;
   }
-  BinIStream bis(is);
 
-  mgr().restore(bis);
+  mgr().restore(bi);
 
   return TCL_OK;
 }

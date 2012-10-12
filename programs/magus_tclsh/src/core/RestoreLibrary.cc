@@ -9,7 +9,7 @@
 
 #include "RestoreLibrary.h"
 #include "ym_cell/CellLibrary.h"
-#include "ym_utils/BinI.h"
+#include "ym_utils/FileBinI.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -35,18 +35,16 @@ RestoreLibrary::~RestoreLibrary()
 const CellLibrary*
 RestoreLibrary::read_library(const string& filename)
 {
-  ifstream ifs;
-  ifs.open(filename.c_str(), ios::binary);
-  if ( !ifs ) {
+  FileBinI bi(filename);
+  if ( !bi ) {
     TclObj emsg;
     emsg << "Could not open " << filename;
     set_result(emsg);
     return NULL;
   }
-  BinIStream bis(ifs);
 
   CellLibrary* library = CellLibrary::new_obj();
-  library->restore(bis);
+  library->restore(bi);
   return library;
 }
 
