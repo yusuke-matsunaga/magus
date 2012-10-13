@@ -99,7 +99,7 @@ FileBinO_open(FileBinOObject* self,
 {
   char* filename = NULL;
   if ( !PyArg_ParseTuple(args, "s", &filename) ) {
-    return -1;
+    return NULL;
   }
 
   self->mBody.open(filename);
@@ -125,7 +125,7 @@ FileBinO_write_8(FileBinOObject* self,
 		 PyObject* args)
 {
   ymuint8 val;
-  if ( !PyArg_ParseTuple(args, "k", &val) ) {
+  if ( !PyArg_ParseTuple(args, "b", &val) ) {
     return NULL;
   }
 
@@ -141,7 +141,7 @@ FileBinO_write_16(FileBinOObject* self,
 		  PyObject* args)
 {
   ymuint16 val;
-  if ( !PyArg_ParseTuple(args, "k", &val) ) {
+  if ( !PyArg_ParseTuple(args, "H", &val) ) {
     return NULL;
   }
 
@@ -217,15 +217,15 @@ FileBinO_write_double(FileBinOObject* self,
 
 // write_str 関数
 PyObject*
-FileBinO_write_8(FileBinOObject* self,
-		 PyObject* args)
+FileBinO_write_str(FileBinOObject* self,
+		   PyObject* args)
 {
   char* str;
-  if ( !PyArg_ParseTuple(args, "s", &val) ) {
+  if ( !PyArg_ParseTuple(args, "s", &str) ) {
     return NULL;
   }
 
-  self->mBody.write_str(val);
+  self->mBody.write_str(str);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -256,6 +256,20 @@ PyMethodDef FileBinO_methods[] = {
    PyDoc_STR("open file (str)")},
   {"close", (PyCFunction)FileBinO_close, METH_NOARGS,
    PyDoc_STR("close file (NONE)")},
+  {"write_8", (PyCFunction)FileBinO_write_8, METH_VARARGS,
+   PyDoc_STR("write 8bit data (uint)")},
+  {"write_16", (PyCFunction)FileBinO_write_16, METH_VARARGS,
+   PyDoc_STR("write 16bit data (uint)")},
+  {"write_32", (PyCFunction)FileBinO_write_32, METH_VARARGS,
+   PyDoc_STR("write 32bit data (uint)")},
+  {"write_64", (PyCFunction)FileBinO_write_64, METH_VARARGS,
+   PyDoc_STR("write 64bit data (uint)")},
+  {"write_float", (PyCFunction)FileBinO_write_float, METH_VARARGS,
+   PyDoc_STR("write float data (uint)")},
+  {"write_double", (PyCFunction)FileBinO_write_double, METH_VARARGS,
+   PyDoc_STR("write double data (uint)")},
+  {"write_str", (PyCFunction)FileBinO_write_str, METH_VARARGS,
+   PyDoc_STR("write string data (uint)")},
   {NULL, NULL, 0, NULL} // end-marker
 };
 
@@ -354,12 +368,12 @@ PyTypeObject FileBinOType = {
 
 // @brief PyObject から FileBinO を取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] obj FileBinO を格納する変数
+// @param[out] p_obj FileBinO のポインタを格納する変数
 // @retval true 変換が成功した．
 // @retval false 変換が失敗した．py_obj が FileBinOObject ではなかった．
 bool
 conv_from_pyobject(PyObject* py_obj,
-		   FileBinO& obj)
+		   FileBinO*& p_obj)
 {
   // 型のチェック
   if ( !FileBinOObject_Check(py_obj) ) {
@@ -369,7 +383,7 @@ conv_from_pyobject(PyObject* py_obj,
   // 強制的にキャスト
   FileBinOObject* my_obj = (FileBinOObject*)py_obj;
 
-  obj = *my_obj->mBody;
+  p_obj = &my_obj->mBody;
 
   return true;
 }

@@ -66,6 +66,12 @@ ItvlMgrObject_init(PyObject* module);
 void
 NameMgrObject_init(PyObject* module);
 
+void
+FileBinIObject_init(PyObject* module);
+
+void
+FileBinOObject_init(PyObject* module);
+
 END_NAMESPACE_YM_PYTHON
 
 
@@ -115,5 +121,9 @@ utils_init()
   ItvlMgrObject_init(m);
 
   NameMgrObject_init(m);
+
+  FileBinIObject_init(m);
+
+  FileBinOObject_init(m);
 
 }

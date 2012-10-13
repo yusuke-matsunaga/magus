@@ -17,6 +17,8 @@ libym_utils_python_la_CPPFLAGS = \
 libym_utils_python_la_SOURCES = \
 	ympython.cc \
 	pyutils_init.cc \
+	pyutils_FileBinI.cc \
+	pyutils_FileBinO.cc \
 	pyutils_FileInfo.cc \
 	pyutils_FileLoc.cc \
 	pyutils_FileRegion.cc \
