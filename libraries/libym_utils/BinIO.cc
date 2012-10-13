@@ -207,23 +207,28 @@ FileBinO::write(ymuint64 n,
   }
 
   ymuint count = 0;
-  for ( ; ; ) {
+  while ( n > 0 ) {
+    // 一度に書き込める最大のサイズを n1 に入れる．
     ymuint n1 = n;
     if ( mPos + n1 > BUFF_SIZE ) {
+      // バッファサイズの関係でこれだけしか書けない．
       n1 = BUFF_SIZE - mPos;
     }
+
+    // mBuff に転送する．
     memcpy(reinterpret_cast<void*>(mBuff + mPos), reinterpret_cast<const void*>(buff), n1);
+
+    // 諸元を更新する．
     mPos += n1;
     count += n1;
+    buff += n1;
+    n -= n1;
+
     if ( mPos == BUFF_SIZE ) {
+      // バッファが満杯になったので実際の書き込みを行う．
       ::write(mFd, reinterpret_cast<void*>(mBuff), BUFF_SIZE);
       mPos = 0;
     }
-    if ( count == n ) {
-      break;
-    }
-    buff += n1;
-    n -= n1;
   }
 
   return count;
@@ -439,21 +444,26 @@ FileBinI::read(ymuint64 n,
   }
 
   ymuint count = 0;
-  for ( ; ; ) {
+  while ( n > 0 ) {
     if ( mPos == BUFF_SIZE ) {
+      // バッファが空なら読み込む
       ::read(mFd, reinterpret_cast<void*>(mBuff), BUFF_SIZE);
       mPos = 0;
     }
+
+    // 一度に読み出せる最大の数を n1 に入れる．
     ymuint n1 = n;
     if ( mPos + n1 > BUFF_SIZE ) {
+      // バッファサイズの関係でこれしか読み出せない．
       n1 = BUFF_SIZE - mPos;
     }
+
+    // buff に転送する．
     memcpy(reinterpret_cast<void*>(buff), reinterpret_cast<void*>(mBuff + mPos), n1);
+
+    // 諸元を更新する．
     mPos += n1;
     count += n1;
-    if ( count == n ) {
-      break;
-    }
     buff += n1;
     n -= n1;
   }
