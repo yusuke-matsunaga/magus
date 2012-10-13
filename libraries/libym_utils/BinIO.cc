@@ -15,6 +15,9 @@
 #include "ym_utils/FileBinO.h"
 #include "ym_utils/StreamBinO.h"
 
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/FileRegion.h"
+
 #include <fcntl.h>
 
 
@@ -31,6 +34,24 @@ END_NONAMESPACE
 // クラス BinO
 //////////////////////////////////////////////////////////////////////
 
+// @brief write() を読み出して結果をチェックする．
+inline
+void
+BinO::_write(ymuint64 n,
+	     const ymuint8* buff)
+{
+  ymuint64 ret = write(n, buff);
+  if ( ret != n ) {
+    ostringstream buf;
+    buf << "BinO::write(" << n << ") failed. wrote " << ret << " bytes.";
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    FileRegion(),
+		    kMsgFailure,
+		    "BinO",
+		    buf.str());
+  }
+}
+
 // @brief 1バイトの書き込み
 // @param[in] s 出力先のストリーム
 // @param[in] val 値
@@ -38,7 +59,7 @@ void
 BinO::write_8(ymuint8 val)
 {
   buff[0] = val & 255U;
-  write(1, buff);
+  _write(1, buff);
 }
 
 // @brief 2バイトの書き込み
@@ -49,7 +70,7 @@ BinO::write_16(ymuint16 val)
 {
   buff[0] = val & 255U; val >>= 8;
   buff[1] = val & 255U;
-  write(2, buff);
+  _write(2, buff);
 }
 
 // @brief 4バイトの書き込み
@@ -62,7 +83,7 @@ BinO::write_32(ymuint32 val)
   buff[1] = val & 255U; val >>= 8;
   buff[2] = val & 255U; val >>= 8;
   buff[3] = val & 255U;
-  write(4, buff);
+  _write(4, buff);
 }
 
 // @brief 8バイトの書き込み
@@ -79,7 +100,7 @@ BinO::write_64(ymuint64 val)
   buff[5] = val & 255U; val >>= 8;
   buff[6] = val & 255U; val >>= 8;
   buff[7] = val & 255U;
-  write(8, buff);
+  _write(8, buff);
 }
 
 // @brief 単精度浮動小数点数の書き込み
@@ -90,7 +111,7 @@ BinO::write_float(float val)
 {
   // かなり強引
   *(reinterpret_cast<float*>(buff)) = val;
-  write(sizeof(float), buff);
+  _write(sizeof(float), buff);
 }
 
 // @brief 倍精度浮動小数点数の書き込み
@@ -101,7 +122,7 @@ BinO::write_double(double val)
 {
   // かなり強引
   *(reinterpret_cast<double*>(buff)) = val;
-  write(sizeof(double), buff);
+  _write(sizeof(double), buff);
 }
 
 // @brief 文字列の書き込み
@@ -113,7 +134,7 @@ BinO::write_str(const char* val)
   if ( val ) {
     ymuint64 l = strlen(val);
     write_64(l);
-    write(l, reinterpret_cast<const ymuint8*>(val));
+    _write(l, reinterpret_cast<const ymuint8*>(val));
   }
   else {
     write_64(0);
@@ -198,7 +219,7 @@ FileBinO::close()
 // @param[in] n データサイズ
 // @param[in] buff データを収めた領域のアドレス
 // @return 実際に書き出した量を返す．
-ymuint
+ymuint64
 FileBinO::write(ymuint64 n,
 		const ymuint8* buff)
 {
@@ -206,10 +227,10 @@ FileBinO::write(ymuint64 n,
     return 0;
   }
 
-  ymuint count = 0;
+  ymuint64 count = 0;
   while ( n > 0 ) {
     // 一度に書き込める最大のサイズを n1 に入れる．
-    ymuint n1 = n;
+    ymuint64 n1 = n;
     if ( mPos + n1 > BUFF_SIZE ) {
       // バッファサイズの関係でこれだけしか書けない．
       n1 = BUFF_SIZE - mPos;
@@ -255,7 +276,7 @@ StreamBinO::~StreamBinO()
 // @param[in] n データサイズ
 // @param[in] buff データを収めた領域のアドレス
 // @return 実際に書き出した量を返す．
-ymuint
+ymuint64
 StreamBinO::write(ymuint64 n,
 		  const ymuint8* buff)
 {
@@ -268,12 +289,29 @@ StreamBinO::write(ymuint64 n,
 // クラス BinI
 //////////////////////////////////////////////////////////////////////
 
+// @brief read() を呼び出して結果をチェックする．
+void
+BinI::_read(ymuint64 n,
+	    ymuint8* buff)
+{
+  ymuint64 ret = read(n, buff);
+  if ( ret != n ) {
+    ostringstream buf;
+    buf << "BinI::read(" << n << ") failed. read " << ret << " bytes.";
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    FileRegion(),
+		    kMsgFailure,
+		    "BinI",
+		    buf.str());
+  }
+}
+
 // @brief 1バイトの読み出し
 // @param[in] s 入力元のストリーム
 ymuint8
 BinI::read_8()
 {
-  read(1, buff);
+  _read(1, buff);
   return buff[0];
 }
 
@@ -282,7 +320,7 @@ BinI::read_8()
 ymuint16
 BinI::read_16()
 {
-  read(2, buff);
+  _read(2, buff);
   ymuint16 val =
     (static_cast<ymuint16>(buff[0]) <<  0) |
     (static_cast<ymuint16>(buff[1]) <<  8);
@@ -294,7 +332,7 @@ BinI::read_16()
 ymuint32
 BinI::read_32()
 {
-  read(4, buff);
+  _read(4, buff);
   ymuint32 val =
     (static_cast<ymuint32>(buff[0]) <<  0) |
     (static_cast<ymuint32>(buff[1]) <<  8) |
@@ -308,7 +346,7 @@ BinI::read_32()
 ymuint64
 BinI::read_64()
 {
-  read(8, buff);
+  _read(8, buff);
   ymuint64 val =
     (static_cast<ymuint64>(buff[0]) <<  0) |
     (static_cast<ymuint64>(buff[1]) <<  8) |
@@ -327,7 +365,7 @@ float
 BinI::read_float()
 {
   // かなり強引
-  read(sizeof(float), buff);
+  _read(sizeof(float), buff);
   return *(reinterpret_cast<float*>(buff));
 }
 
@@ -337,7 +375,7 @@ double
 BinI::read_double()
 {
   // かなり強引
-  read(sizeof(double), buff);
+  _read(sizeof(double), buff);
   return *(reinterpret_cast<double*>(buff));
 }
 
@@ -349,7 +387,7 @@ BinI::read_str()
   ymuint64 l = read_64();
   if ( l > 0 ) {
     ymuint8* strbuf = new ymuint8[l + 1];
-    read(l, strbuf);
+    _read(l, strbuf);
     strbuf[l] = '\0';
     string ans(reinterpret_cast<char*>(strbuf));
     delete [] strbuf;
@@ -435,7 +473,7 @@ FileBinI::close()
 // @param[in] n 読み込むデータサイズ
 // @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
 // @return 実際に読み込んだ量を返す．
-ymuint
+ymuint64
 FileBinI::read(ymuint64 n,
 	       ymuint8* buff)
 {
@@ -443,7 +481,7 @@ FileBinI::read(ymuint64 n,
     return 0;
   }
 
-  ymuint count = 0;
+  ymuint64 count = 0;
   while ( n > 0 ) {
     if ( mPos == BUFF_SIZE ) {
       // バッファが空なら読み込む
@@ -452,7 +490,7 @@ FileBinI::read(ymuint64 n,
     }
 
     // 一度に読み出せる最大の数を n1 に入れる．
-    ymuint n1 = n;
+    ymuint64 n1 = n;
     if ( mPos + n1 > BUFF_SIZE ) {
       // バッファサイズの関係でこれしか読み出せない．
       n1 = BUFF_SIZE - mPos;
@@ -492,7 +530,7 @@ StreamBinI::~StreamBinI()
 // @param[in] n 読み込むデータサイズ
 // @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
 // @return 実際に読み込んだ量を返す．
-ymuint
+ymuint64
 StreamBinI::read(ymuint64 n,
 		 ymuint8* buff)
 {

@@ -74,7 +74,7 @@ public:
   /// @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
   /// @return 実際に読み込んだ量を返す．
   virtual
-  ymuint
+  ymuint64
   read(ymuint64 n,
        ymuint8* buff);
 
@@ -85,7 +85,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   static
-  const ymuint BUFF_SIZE = 4096;
+  const ymuint16 BUFF_SIZE = 4096;
 
 
 private:

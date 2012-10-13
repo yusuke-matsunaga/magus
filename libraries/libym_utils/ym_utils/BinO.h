@@ -87,9 +87,20 @@ public:
   /// @param[in] buff データを収めた領域のアドレス
   /// @return 実際に書き出した量を返す．
   virtual
-  ymuint
+  ymuint64
   write(ymuint64 n,
 	const ymuint8* buff) = 0;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief write() を読み出して結果をチェックする．
+  void
+  _write(ymuint64 n,
+	 const ymuint8* buff);
 
 };
 
