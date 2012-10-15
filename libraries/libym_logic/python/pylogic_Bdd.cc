@@ -8,9 +8,12 @@
 
 
 #include "ym_logic/pylogic.h"
+#include "ym_utils/pyutils.h"
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddLitSet.h"
 #include "ym_logic/BddVarSet.h"
+#include "ym_utils/FileBinI.h"
+#include "ym_utils/FileBinO.h"
 
 
 BEGIN_NAMESPACE_YM_PYTHON
@@ -728,6 +731,48 @@ Bdd_print(BddObject* self,
   return Py_None;
 }
 
+// dump 関数
+PyObject*
+Bdd_dump(BddObject* self,
+	 PyObject* args)
+{
+  PyObject* obj;
+  if ( !PyArg_ParseTuple(args, "O!", &FileBinOType, &obj) ) {
+    return NULL;
+  }
+
+  FileBinO* bp;
+  if ( !conv_from_pyobject(obj, bp) ) {
+    return NULL;
+  }
+
+  self->mBdd->dump(*bp);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+// restore 関数
+PyObject*
+Bdd_restore(BddObject* self,
+	    PyObject* args)
+{
+  PyObject* obj;
+  if ( !PyArg_ParseTuple(args, "O!", &FileBinIType, &obj) ) {
+    return NULL;
+  }
+
+  FileBinI* bp;
+  if ( !conv_from_pyobject(obj, bp) ) {
+    return NULL;
+  }
+
+  self->mBdd->restore(*bp);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // BddObject の NumberMethods 構造体の定義
@@ -855,6 +900,10 @@ PyMethodDef Bdd_methods[] = {
    PyDoc_STR("return the support set (NONE)")},
   {"print", (PyCFunction)Bdd_print, METH_NOARGS,
    PyDoc_STR("print out the contents (NONE)")},
+  {"dump", (PyCFunction)Bdd_dump, METH_VARARGS,
+   PyDoc_STR("dump (FileBinO)")},
+  {"restore", (PyCFunction)Bdd_restore, METH_VARARGS,
+   PyDoc_STR("restore (FileBinI)")},
   {NULL, NULL, 0, NULL}
 };
 
