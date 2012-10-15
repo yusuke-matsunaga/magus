@@ -9,6 +9,8 @@
 
 #include "ym_utils/pyutils.h"
 #include "ym_utils/ItvlMgr.h"
+#include "ym_utils/FileBinI.h"
+#include "ym_utils/FileBinO.h"
 
 
 BEGIN_NAMESPACE_YM_PYTHON
@@ -155,6 +157,48 @@ ItvlMgr_max_id(ItvlMgrObject* self,
   return conv_to_pyobject(self->mBody->max_id());
 }
 
+// dump 関数
+PyObject*
+ItvlMgr_dump(ItvlMgrObject* self,
+	     PyObject* args)
+{
+  PyObject* obj;
+  if ( !PyArg_ParseTuple(args, "O!", &FileBinOType, &obj) ) {
+    return NULL;
+  }
+
+  FileBinO* bp;
+  if ( !conv_from_pyobject(obj, bp) ) {
+    return NULL;
+  }
+
+  self->mBody->dump(*bp);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+// restore 関数
+PyObject*
+ItvlMgr_restore(ItvlMgrObject* self,
+		PyObject* args)
+{
+  PyObject* obj;
+  if ( !PyArg_ParseTuple(args, "O!", &FileBinIType, &obj) ) {
+    return NULL;
+  }
+
+  FileBinI* bp;
+  if ( !conv_from_pyobject(obj, bp) ) {
+    return NULL;
+  }
+
+  self->mBody->restore(*bp);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // ItvlMgrObject のメソッドテーブル
@@ -188,6 +232,10 @@ PyMethodDef ItvlMgr_methods[] = {
    PyDoc_STR("return the minimum number (NONE)")},
   {"max_id", (PyCFunction)ItvlMgr_max_id, METH_NOARGS,
    PyDoc_STR("return the maximum number (NONE)")},
+  {"dump", (PyCFunction)ItvlMgr_dump, METH_VARARGS,
+   PyDoc_STR("dump (FileBinO)")},
+  {"restore", (PyCFunction)ItvlMgr_restore, METH_VARARGS,
+   PyDoc_STR("restore (FileBinI)")},
   {NULL, NULL, 0, NULL} // end-marker
 };
 
