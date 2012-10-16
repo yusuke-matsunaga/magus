@@ -81,7 +81,7 @@ PyObject*
 Aig_negate(AigObject* self,
 	   PyObject* args)
 {
-  return conv_to_pyobject(~self->mAig);
+  return Aig_FromAig(~self->mAig);
 }
 
 // normalize 関数
@@ -89,7 +89,7 @@ PyObject*
 Aig_normalize(AigObject* self,
 	      PyObject* args)
 {
-  return conv_to_pyobject(self->mAig.normalize());
+  return Aig_FromAig(self->mAig.normalize());
 }
 
 // node_id 関数
@@ -145,7 +145,7 @@ PyObject*
 Aig_input_id(AigObject* self,
 	     PyObject* args)
 {
-  return conv_to_pyobject(self->mAig.input_id());
+  return VarId_FromVarId(self->mAig.input_id());
 }
 
 // is_and 関数
@@ -166,7 +166,7 @@ Aig_fanin(AigObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mAig.fanin(pos));
+  return Aig_FromAig(self->mAig.fanin(pos));
 }
 
 // fanin0 関数
@@ -174,7 +174,7 @@ PyObject*
 Aig_fanin0(AigObject* self,
 	   PyObject* args)
 {
-  return conv_to_pyobject(self->mAig.fanin0());
+  return Aig_FromAig(self->mAig.fanin0());
 }
 
 // fanin1 関数
@@ -182,7 +182,7 @@ PyObject*
 Aig_fanin1(AigObject* self,
 	   PyObject* args)
 {
-  return conv_to_pyobject(self->mAig.fanin1());
+  return Aig_FromAig(self->mAig.fanin1());
 }
 
 
@@ -292,7 +292,7 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief Aig から PyObject を生成する．
 // @param[in] obj Aig オブジェクト
 PyObject*
-conv_to_pyobject(const Aig& obj)
+Aig_FromAig(const Aig& obj)
 {
   AigObject* aig_obj = Aig_new(&AigType);
   if ( aig_obj == NULL ) {
@@ -303,6 +303,19 @@ conv_to_pyobject(const Aig& obj)
 
   Py_INCREF(aig_obj);
   return (PyObject*)aig_obj;
+}
+
+// AigObject 関係の初期化を行う．
+void
+AigObject_init(PyObject* m)
+{
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&AigType) < 0 ) {
+    return;
+  }
+
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "Aig", (PyObject*)&AigType);
 }
 
 END_NAMESPACE_YM_PYTHON

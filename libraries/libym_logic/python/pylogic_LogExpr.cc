@@ -99,7 +99,7 @@ LogExpr_inv(PyObject* left)
   if ( !conv_from_pyobject(left, expr) ) {
     return NULL;
   }
-  return conv_to_pyobject(~expr);
+  return LogExpr_FromLogExpr(~expr);
 }
 
 // and 関数
@@ -116,7 +116,7 @@ LogExpr_and(PyObject* left,
     if ( !conv_from_pyobject(right, expr2) ) {
       return NULL;
     }
-    return conv_to_pyobject(expr1 & expr2);
+    return LogExpr_FromLogExpr(expr1 & expr2);
   }
   PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
   return NULL;
@@ -136,7 +136,7 @@ LogExpr_or(PyObject* left,
     if ( !conv_from_pyobject(right, expr2) ) {
       return NULL;
     }
-    return conv_to_pyobject(expr1 | expr2);
+    return LogExpr_FromLogExpr(expr1 | expr2);
   }
   PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
   return NULL;
@@ -156,7 +156,7 @@ LogExpr_xor(PyObject* left,
     if ( !conv_from_pyobject(right, expr2) ) {
       return NULL;
     }
-    return conv_to_pyobject(expr1 ^ expr2);
+    return LogExpr_FromLogExpr(expr1 ^ expr2);
   }
   PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
   return NULL;
@@ -224,7 +224,7 @@ PyObject*
 LogExpr_make_zero(LogExprObject* self,
 		  PyObject* args)
 {
-  return conv_to_pyobject(LogExpr::make_zero());
+  return LogExpr_FromLogExpr(LogExpr::make_zero());
 }
 
 // make_one 関数
@@ -232,7 +232,7 @@ PyObject*
 LogExpr_make_one(LogExprObject* self,
 		 PyObject* args)
 {
-  return conv_to_pyobject(LogExpr::make_one());
+  return LogExpr_FromLogExpr(LogExpr::make_one());
 }
 
 // make_literal 関数
@@ -271,7 +271,7 @@ LogExpr_make_literal(PyTypeObject* type_obj,
     lit.set(vid, kPolPosi);
   }
 
-  return conv_to_pyobject(LogExpr::make_literal(lit));
+  return LogExpr_FromLogExpr(LogExpr::make_literal(lit));
 }
 
 // make_posiliteral 関数
@@ -288,7 +288,7 @@ LogExpr_make_posiliteral(PyTypeObject* type_obj,
   if ( !conv_from_pyobject(obj, vid) ) {
     return NULL;
   }
-  return conv_to_pyobject(LogExpr::make_posiliteral(vid));
+  return LogExpr_FromLogExpr(LogExpr::make_posiliteral(vid));
 }
 
 // make_negaliteral 関数
@@ -305,7 +305,7 @@ LogExpr_make_negaliteral(PyTypeObject* type_obj,
   if ( !conv_from_pyobject(obj, vid) ) {
     return NULL;
   }
-  return conv_to_pyobject(LogExpr::make_negaliteral(vid));
+  return LogExpr_FromLogExpr(LogExpr::make_negaliteral(vid));
 }
 
 // make_and 関数
@@ -332,7 +332,7 @@ LogExpr_make_and(PyTypeObject* type_obj,
     }
     child_list[i] = chd_expr;
   }
-  return conv_to_pyobject(LogExpr::make_and(child_list));
+  return LogExpr_FromLogExpr(LogExpr::make_and(child_list));
 }
 
 // make_or 関数
@@ -359,7 +359,7 @@ LogExpr_make_or(PyTypeObject* type_obj,
     }
     child_list[i] = chd_expr;
   }
-  return conv_to_pyobject(LogExpr::make_or(child_list));
+  return LogExpr_FromLogExpr(LogExpr::make_or(child_list));
 }
 
 // make_xor 関数
@@ -386,7 +386,7 @@ LogExpr_make_xor(PyTypeObject* type_obj,
     }
     child_list[i] = chd_expr;
   }
-  return conv_to_pyobject(LogExpr::make_xor(child_list));
+  return LogExpr_FromLogExpr(LogExpr::make_xor(child_list));
 }
 
 // compose 関数
@@ -409,7 +409,7 @@ LogExpr_compose(LogExprObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mLogExpr->compose(vid, sub_expr));
+  return LogExpr_FromLogExpr(self->mLogExpr->compose(vid, sub_expr));
 }
 
 // multi_compose 関数
@@ -448,7 +448,7 @@ LogExpr_multi_compose(LogExprObject* self,
     comp_map.insert(make_pair(vid, sub_expr));
   }
 
-  return conv_to_pyobject(self->mLogExpr->compose(comp_map));
+  return LogExpr_FromLogExpr(self->mLogExpr->compose(comp_map));
 }
 
 // remap_var 関数
@@ -487,7 +487,7 @@ LogExpr_remap_var(LogExprObject* self,
     var_map.insert(make_pair(vid, new_vid));
   }
 
-  return conv_to_pyobject(self->mLogExpr->remap_var(var_map));
+  return LogExpr_FromLogExpr(self->mLogExpr->remap_var(var_map));
 }
 
 // simplify 関数
@@ -584,7 +584,7 @@ PyObject*
 LogExpr_varid(LogExprObject* self,
 	      PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->varid());
+  return VarId_FromVarId(self->mLogExpr->varid());
 }
 
 // is_and 関数
@@ -639,7 +639,7 @@ LogExpr_child(LogExprObject* self,
   }
   LogExpr child = self->mLogExpr->child(pos);
 
-  return conv_to_pyobject(child);
+  return LogExpr_FromLogExpr(child);
 }
 
 // child_list 関数
@@ -651,7 +651,7 @@ LogExpr_child_list(LogExprObject* self,
   PyObject* ans_list = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
     LogExpr child = self->mLogExpr->child(i);
-    PyObject* obj = conv_to_pyobject(child);
+    PyObject* obj = LogExpr_FromLogExpr(child);
     PyList_SetItem(ans_list, i, obj);
   }
 
@@ -993,7 +993,7 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief LogExpr から PyObject を生成する．
 // @param[in] obj LogExpr オブジェクト
 PyObject*
-conv_to_pyobject(const LogExpr& obj)
+LogExpr_FromLogExpr(const LogExpr& obj)
 {
   LogExprObject* logexpr_obj = LogExpr_new(&LogExprType);
   if ( logexpr_obj == NULL ) {
@@ -1004,6 +1004,19 @@ conv_to_pyobject(const LogExpr& obj)
 
   Py_INCREF(logexpr_obj);
   return (PyObject*)logexpr_obj;
+}
+
+// LogExprObject 関係の初期化
+void
+LogExprObject_init(PyObject* m)
+{
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&LogExprType) < 0 ) {
+    return;
+  }
+
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "LogExpr", (PyObject*)&LogExprType);
 }
 
 END_NAMESPACE_YM_PYTHON

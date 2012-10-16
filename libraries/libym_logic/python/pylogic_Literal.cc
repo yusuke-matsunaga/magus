@@ -133,7 +133,7 @@ PyObject*
 Literal_varid(LiteralObject* self)
 {
   VarId vid = self->mLiteral.varid();
-  return conv_to_pyobject(vid);
+  return VarId_FromVarId(vid);
 }
 
 // pol 関数
@@ -179,21 +179,21 @@ Literal_set(LiteralObject* self,
 PyObject*
 Literal_negate(LiteralObject* self)
 {
-  return conv_to_pyobject(~self->mLiteral);
+  return Literal_FromLiteral(~self->mLiteral);
 }
 
 // make_positive 関数
 PyObject*
 Literal_make_positive(LiteralObject* self)
 {
-  return conv_to_pyobject(self->mLiteral.make_positive());
+  return Literal_FromLiteral(self->mLiteral.make_positive());
 }
 
 // make_negative 関数
 PyObject*
 Literal_make_negative(LiteralObject* self)
 {
-  return conv_to_pyobject(self->mLiteral.make_negative());
+  return Literal_FromLiteral(self->mLiteral.make_negative());
 }
 
 // index 関数
@@ -297,7 +297,7 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief Literal から PyObject を生成する．
 // @param[in] obj Literal オブジェクト
 PyObject*
-conv_to_pyobject(Literal obj)
+Literal_FromLiteral(Literal obj)
 {
   LiteralObject* literal_obj = Literal_new(&LiteralType);
   if ( literal_obj == NULL ) {
@@ -308,6 +308,19 @@ conv_to_pyobject(Literal obj)
 
   Py_INCREF(literal_obj);
   return (PyObject*)literal_obj;
+}
+
+// LiteralObject 関係の初期化を行う．
+void
+LiteralObject_init(PyObject* m)
+{
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&LiteralType) < 0 ) {
+    return;
+  }
+
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "Literal", (PyObject*)&LiteralType);
 }
 
 END_NAMESPACE_YM_PYTHON

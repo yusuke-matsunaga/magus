@@ -13,6 +13,20 @@
 
 BEGIN_NAMESPACE_YM_PYTHON
 
+//////////////////////////////////////////////////////////////////////
+// Bool3Object の外部変数
+//////////////////////////////////////////////////////////////////////
+
+// @brief kB3True を表すオブジェクト
+PyObject* Py_kB3True = NULL;
+
+// @brief kB3False を表すオブジェクト
+PyObject* Py_kB3False = NULL;
+
+// @brief kB3X を表すオブジェクト
+PyObject* Py_kB3X = NULL;
+
+
 BEGIN_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
@@ -28,6 +42,25 @@ struct Bool3Object
   // Bool3 本体
   Bool3 mVal;
 
+};
+
+
+// Py_kB3True の本体
+Bool3Object Py_kB3TrueStruct = {
+  PyObject_HEAD_INIT(&Bool3Type)
+  kB3True
+};
+
+// Py_kB3False の本体
+Bool3Object Py_kB3FalseStruct = {
+  PyObject_HEAD_INIT(&Bool3Type)
+  kB3False
+};
+
+// Py_kB3X の本体
+Bool3Object Py_kB3XStruct = {
+  PyObject_HEAD_INIT(&Bool3Type)
+  kB3X
 };
 
 
@@ -375,39 +408,7 @@ Bool3_FromLong(ymlong val)
 }
 
 
-//////////////////////////////////////////////////////////////////////
-// Bool3Object の外部変数
-//////////////////////////////////////////////////////////////////////
-
-// @brief kB3True を表すオブジェクト
-PyObject* Py_kB3True = NULL;
-
-// @brief kB3False を表すオブジェクト
-PyObject* Py_kB3False = NULL;
-
-// @brief kB3X を表すオブジェクト
-PyObject* Py_kB3X = NULL;
-
-
 BEGIN_NONAMESPACE
-
-// Py_kB3True の本体
-Bool3Object Py_kB3TrueStruct = {
-  PyObject_HEAD_INIT(&Bool3Type)
-  kB3True
-};
-
-// Py_kB3False の本体
-Bool3Object Py_kB3FalseStruct = {
-  PyObject_HEAD_INIT(&Bool3Type)
-  kB3False
-};
-
-// Py_kB3X の本体
-Bool3Object Py_kB3XStruct = {
-  PyObject_HEAD_INIT(&Bool3Type)
-  kB3X
-};
 
 // Bool3 の定数を設定する関数
 inline
@@ -429,7 +430,12 @@ END_NONAMESPACE
 void
 Bool3Object_init(PyObject* m)
 {
-  // Bool3 オブジェクトタイプの登録
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&Bool3Type) < 0 ) {
+    return;
+  }
+
+  // タイプオブジェクトの登録
   PyModule_AddObject(m, "Bool3", (PyObject*)&Bool3Type);
 
   // 定数オブジェクトの登録

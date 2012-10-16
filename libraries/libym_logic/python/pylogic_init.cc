@@ -31,6 +31,30 @@ Bool3Object_init(PyObject* m);
 void
 PolObject_init(PyObject* m);
 
+void
+VarIdObject_init(PyObject* m);
+
+void
+LiteralObject_init(PyObject* m);
+
+void
+LogExprObject_init(PyObject* m);
+
+void
+BddObject_init(PyObject* m);
+
+void
+BddMgrObject_init(PyObject* m);
+
+void
+AigObject_init(PyObject* m);
+
+void
+AigMgrObject_init(PyObject* m);
+
+void
+SatSolverObject_init(PyObject* m);
+
 END_NAMESPACE_YM_PYTHON
 
 
@@ -38,47 +62,6 @@ PyMODINIT_FUNC
 logic_init()
 {
   using namespace nsYm::nsPython;
-
-  // タイプオブジェクトの初期化
-  if ( PyType_Ready(&Bool3Type) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&VarIdType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&PolType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&LiteralType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&LogExprType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&BddMgrType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&BddType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&AigMgrType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&AigType) < 0 ) {
-    return;
-  }
-
-  if ( PyType_Ready(&SatSolverType) < 0 ) {
-    return;
-  }
 
   // モジュールオブジェクトの生成
   PyDoc_STRVAR(module_doc,
@@ -110,28 +93,28 @@ logic_init()
   // PolObject 関係の初期化
   PolObject_init(m);
 
-  // VarId オブジェクトタイプの登録
-  PyModule_AddObject(m, "VarId", (PyObject*)&VarIdType);
+  // VarIdObject 関係の初期化
+  VarIdObject_init(m);
 
-  // Literal オブジェクトタイプの登録
-  PyModule_AddObject(m, "Literal", (PyObject*)&LiteralType);
+  // LiteralObject 関係の初期化
+  LiteralObject_init(m);
 
-  // LogExpr オブジェクトタイプの登録
-  PyModule_AddObject(m, "LogExpr", (PyObject*)&LogExprType);
+  // LogExprObject 関係の初期化
+  LogExprObject_init(m);
 
-  // BddMgr オブジェクトタイプの登録
-  PyModule_AddObject(m, "BddMgr", (PyObject*)&BddMgrType);
+  // BddMgrObject 関係の初期化
+  BddMgrObject_init(m);
 
-  // Bdd オブジェクトタイプの登録
-  PyModule_AddObject(m, "Bdd", (PyObject*)&BddType);
+  // BddObject 関係の初期化
+  BddObject_init(m);
 
-  // AigMgr オブジェクトタイプの登録
-  PyModule_AddObject(m, "AigMgr", (PyObject*)&AigMgrType);
+  // AigMgrObject 関係の初期化
+  AigMgrObject_init(m);
 
-  // Aig オブジェクトタイプの登録
-  PyModule_AddObject(m, "Aig", (PyObject*)&AigType);
+  // AigObject 関係の初期化
+  AigObject_init(m);
 
-  // SatSolver オブジェクトタイプの登録
-  PyModule_AddObject(m, "SatSolver", (PyObject*)&SatSolverType);
+  // SatSolverObject 関係の初期化
+  SatSolverObject_init(m);
 
 }

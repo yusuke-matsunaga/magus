@@ -97,7 +97,7 @@ PyObject*
 BddMgr_make_zero(BddMgrObject* self,
 		 PyObject* args)
 {
-  return conv_to_pyobject(self->mMgr->make_zero());
+  return Bdd_FromBdd(self->mMgr->make_zero());
 }
 
 // make_one 関数
@@ -106,7 +106,7 @@ PyObject*
 BddMgr_make_one(BddMgrObject* self,
 		PyObject* args)
 {
-  return conv_to_pyobject(self->mMgr->make_one());
+  return Bdd_FromBdd(self->mMgr->make_one());
 }
 
 // make_overflow 関数
@@ -115,7 +115,7 @@ PyObject*
 BddMgr_make_overflow(BddMgrObject* self,
 		     PyObject* args)
 {
-  return conv_to_pyobject(self->mMgr->make_overflow());
+  return Bdd_FromBdd(self->mMgr->make_overflow());
 }
 
 // make_error 関数
@@ -124,7 +124,7 @@ PyObject*
 BddMgr_make_error(BddMgrObject* self,
 		  PyObject* args)
 {
-  return conv_to_pyobject(self->mMgr->make_error());
+  return Bdd_FromBdd(self->mMgr->make_error());
 }
 
 // make_literal 関数
@@ -159,7 +159,7 @@ BddMgr_make_literal(BddMgrObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mMgr->make_literal(lit));
+  return Bdd_FromBdd(self->mMgr->make_literal(lit));
 }
 
 // make_posiliteral 関数
@@ -177,7 +177,7 @@ BddMgr_make_posiliteral(BddMgrObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mMgr->make_posiliteral(vid));
+  return Bdd_FromBdd(self->mMgr->make_posiliteral(vid));
 }
 
 // make_negaliteral 関数
@@ -195,7 +195,7 @@ BddMgr_make_negaliteral(BddMgrObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mMgr->make_negaliteral(vid));
+  return Bdd_FromBdd(self->mMgr->make_negaliteral(vid));
 }
 
 // make_bdd 関数
@@ -226,7 +226,7 @@ BddMgr_make_bdd(BddMgrObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mMgr->make_bdd(vid, bdd0, bdd1));
+  return Bdd_FromBdd(self->mMgr->make_bdd(vid, bdd0, bdd1));
 }
 
 // tvec_to_bdd 関数
@@ -267,7 +267,7 @@ BddMgr_tvec_to_bdd(BddMgrObject* self,
     vars[i] = var;
   }
 
-  return conv_to_pyobject(self->mMgr->tvec_to_bdd(vec, vars));
+  return Bdd_FromBdd(self->mMgr->tvec_to_bdd(vec, vars));
 }
 
 // expr_to_bdd 関数
@@ -319,7 +319,7 @@ BddMgr_expr_to_bdd(BddMgrObject* self,
     }
   }
 
-  return conv_to_pyobject(self->mMgr->expr_to_bdd(expr, varmap));
+  return Bdd_FromBdd(self->mMgr->expr_to_bdd(expr, varmap));
 }
 
 // make_thfunc 関数
@@ -333,7 +333,7 @@ BddMgr_make_thfunc(BddMgrObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mMgr->make_thfunc(n, th));
+  return Bdd_FromBdd(self->mMgr->make_thfunc(n, th));
 }
 
 // new_var 関数
@@ -369,7 +369,7 @@ BddMgr_var_list(BddMgrObject* self,
   for (list<VarId>::iterator p = vlist.begin();
        p != vlist.end(); ++ p, ++ i) {
     VarId vid = *p;
-    PyObject* obj = conv_to_pyobject(vid);
+    PyObject* obj = VarId_FromVarId(vid);
     PyList_SetItem(ans_list, i, obj);
   }
 
@@ -405,7 +405,7 @@ BddMgr_varid(BddMgrObject* self,
   }
 
   VarId vid = self->mMgr->varid(level);
-  return conv_to_pyobject(vid);
+  return VarId_FromVarId(vid);
 }
 
 // enable_gc 関数
@@ -565,6 +565,19 @@ conv_from_pyobject(PyObject* py_obj,
   obj_p = bddmgr_obj->mMgr;
 
   return true;
+}
+
+// BddMgrObject 関係の初期化を行う．
+void
+BddMgrObject_init(PyObject* m)
+{
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&BddMgrType) < 0 ) {
+    return;
+  }
+
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "BddMgr", (PyObject*)&BddMgrType);
 }
 
 END_NAMESPACE_YM_PYTHON

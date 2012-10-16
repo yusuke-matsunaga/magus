@@ -214,7 +214,7 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief VarId から PyObject を生成する．
 // @param[in] obj VarId オブジェクト
 PyObject*
-conv_to_pyobject(VarId obj)
+VarId_FromVarId(VarId obj)
 {
   VarIdObject* varid_obj = VarId_new(&VarIdType);
   if ( varid_obj == NULL ) {
@@ -225,6 +225,20 @@ conv_to_pyobject(VarId obj)
 
   Py_INCREF(varid_obj);
   return (PyObject*)varid_obj;
+}
+
+
+// VarIdObject 関係の初期化を行う．
+void
+VarIdObject_init(PyObject* m)
+{
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&VarIdType) < 0 ) {
+    return;
+  }
+
+  // タイプオブジェクトの生成
+  PyModule_AddObject(m, "VarId", (PyObject*)&VarIdType);
 }
 
 END_NAMESPACE_YM_PYTHON

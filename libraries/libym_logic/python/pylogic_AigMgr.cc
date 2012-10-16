@@ -98,7 +98,7 @@ PyObject*
 AigMgr_make_zero(AigMgrObject* self,
 		 PyObject* args)
 {
-  return conv_to_pyobject(self->mMgr->make_zero());
+  return Aig_FromAig(self->mMgr->make_zero());
 }
 
 // make_one 関数
@@ -106,7 +106,7 @@ PyObject*
 AigMgr_make_one(AigMgrObject* self,
 		PyObject* args)
 {
-  return conv_to_pyobject(self->mMgr->make_one());
+  return Aig_FromAig(self->mMgr->make_one());
 }
 
 // make_input 関数
@@ -124,7 +124,7 @@ AigMgr_make_input(AigMgrObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mMgr->make_input(vid));
+  return Aig_FromAig(self->mMgr->make_input(vid));
 }
 
 // make_not 関数
@@ -142,7 +142,7 @@ AigMgr_make_not(AigMgrObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mMgr->make_not(aig));
+  return Aig_FromAig(self->mMgr->make_not(aig));
 }
 
 BEGIN_NONAMESPACE
@@ -197,7 +197,7 @@ AigMgr_make_and(AigMgrObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mMgr->make_and(aig_list));
+  return Aig_FromAig(self->mMgr->make_and(aig_list));
 }
 
 // make_nand 関数
@@ -210,7 +210,7 @@ AigMgr_make_nand(AigMgrObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mMgr->make_nand(aig_list));
+  return Aig_FromAig(self->mMgr->make_nand(aig_list));
 }
 
 // make_or 関数
@@ -223,7 +223,7 @@ AigMgr_make_or(AigMgrObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mMgr->make_or(aig_list));
+  return Aig_FromAig(self->mMgr->make_or(aig_list));
 }
 
 // make_nor 関数
@@ -236,7 +236,7 @@ AigMgr_make_nor(AigMgrObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mMgr->make_nor(aig_list));
+  return Aig_FromAig(self->mMgr->make_nor(aig_list));
 }
 
 // make_xor 関数
@@ -249,7 +249,7 @@ AigMgr_make_xor(AigMgrObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mMgr->make_xor(aig_list));
+  return Aig_FromAig(self->mMgr->make_xor(aig_list));
 }
 
 // make_xnor 関数
@@ -262,7 +262,7 @@ AigMgr_make_xnor(AigMgrObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mMgr->make_xnor(aig_list));
+  return Aig_FromAig(self->mMgr->make_xnor(aig_list));
 }
 
 // make_logic 関数
@@ -305,7 +305,7 @@ AigMgr_make_logic(AigMgrObject* self,
     input_map.insert(make_pair(vid, aig));
   }
 
-  return conv_to_pyobject(self->mMgr->make_logic(expr, input_map));
+  return Aig_FromAig(self->mMgr->make_logic(expr, input_map));
 }
 
 // make_cofactor 関数
@@ -335,7 +335,7 @@ AigMgr_make_cofactor(AigMgrObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mMgr->make_cofactor(aig, vid, pol));
+  return Aig_FromAig(self->mMgr->make_cofactor(aig, vid, pol));
 }
 
 // AigMgrObject のメソッドテーブル
@@ -441,6 +441,19 @@ conv_from_pyobject(PyObject* py_obj,
   p_obj = aigmgr_obj->mMgr;
 
   return true;
+}
+
+// AigMgrObject 関係の初期化を行う．
+void
+AigMgrObject_init(PyObject* m)
+{
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&AigMgrType) < 0 ) {
+    return;
+  }
+
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "AigMgr", (PyObject*)&AigMgrType);
 }
 
 END_NAMESPACE_YM_PYTHON

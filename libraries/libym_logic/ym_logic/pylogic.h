@@ -323,43 +323,7 @@ conv_from_pyobject(PyObject* py_obj,
 /// @param[in] obj Bool3 オブジェクト
 extern
 PyObject*
-conv_to_pyobject(Bool3 obj);
-
-/// @brief VarId から PyObject を生成する．
-/// @param[in] obj VarId オブジェクト
-extern
-PyObject*
-conv_to_pyobject(VarId obj);
-
-/// @brief tPol から PyObject を生成する．
-/// @param[in] obj tPol オブジェクト
-extern
-PyObject*
-conv_to_pyobject(tPol obj);
-
-/// @brief Literal から PyObject を生成する．
-/// @param[in] obj Literal オブジェクト
-extern
-PyObject*
-conv_to_pyobject(Literal obj);
-
-/// @brief LogExpr から PyObject を生成する．
-/// @param[in] obj LogExpr オブジェクト
-extern
-PyObject*
-conv_to_pyobject(const LogExpr& obj);
-
-/// @brief Bdd から PyObject を生成する．
-/// @param[in] obj Bdd オブジェクト
-extern
-PyObject*
-conv_to_pyobject(const Bdd& obj);
-
-/// @brief Aig から PyObject を生成する．
-/// @param[in] obj Aig オブジェクト
-extern
-PyObject*
-conv_to_pyobject(const Aig& obj);
+Bool3_FromBool3(Bool3 obj);
 
 /// @brief 文字列から Bool3Object への変換関数
 /// @param[in] str 値を表す文字列("true"|"false"|"x")
@@ -373,11 +337,47 @@ Bool3_FromString(const char* str);
 PyObject*
 Bool3_FromLong(ymlong val);
 
+/// @brief VarId から PyObject を生成する．
+/// @param[in] obj VarId オブジェクト
+extern
+PyObject*
+VarId_FromVarId(VarId obj);
+
+/// @brief tPol から PyObject を生成する．
+/// @param[in] obj tPol オブジェクト
+extern
+PyObject*
+Pol_FromPol(tPol obj);
+
 /// @brief 文字列から PolObject への変換関数
 /// @param[in] str 極性を表す文字列("positive"|"negative")
 /// @note 不正な文字列が与えられた場合には NULL を返す．
 PyObject*
 Pol_FromString(const char* str);
+
+/// @brief Literal から PyObject を生成する．
+/// @param[in] obj Literal オブジェクト
+extern
+PyObject*
+Literal_FromLiteral(Literal obj);
+
+/// @brief LogExpr から PyObject を生成する．
+/// @param[in] obj LogExpr オブジェクト
+extern
+PyObject*
+LogExpr_FromLogExpr(const LogExpr& obj);
+
+/// @brief Bdd から PyObject を生成する．
+/// @param[in] obj Bdd オブジェクト
+extern
+PyObject*
+Bdd_FromBdd(const Bdd& obj);
+
+/// @brief Aig から PyObject を生成する．
+/// @param[in] obj Aig オブジェクト
+extern
+PyObject*
+Aig_FromAig(const Aig& obj);
 
 END_NAMESPACE_YM_PYTHON
 

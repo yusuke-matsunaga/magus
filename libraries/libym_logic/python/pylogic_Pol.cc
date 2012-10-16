@@ -352,7 +352,12 @@ END_NONAMESPACE
 void
 PolObject_init(PyObject* m)
 {
-  // Pol オブジェクトタイプの登録
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&PolType) < 0 ) {
+    return;
+  }
+
+  // タイプオブジェクトの登録
   PyModule_AddObject(m, "Pol", (PyObject*)&PolType);
 
   // 定数オブジェクトの登録

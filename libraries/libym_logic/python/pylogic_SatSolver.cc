@@ -108,7 +108,7 @@ PyObject*
 SatSolver_new_var(SatSolverObject* self,
 		  PyObject* args)
 {
-  return conv_to_pyobject(self->mSolver->new_var());
+  return VarId_FromVarId(self->mSolver->new_var());
 }
 
 // add_clause 関数
@@ -399,6 +399,19 @@ conv_from_pyobject(PyObject* py_obj,
   p_obj = satsolver_obj->mSolver;
 
   return true;
+}
+
+// SatSolverObject 関係の初期化を行う．
+void
+SatSolverObject_init(PyObject* m)
+{
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&SatSolverType) < 0 ) {
+    return;
+  }
+
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "SatSolver", (PyObject*)&SatSolverType);
 }
 
 END_NAMESPACE_YM_PYTHON
