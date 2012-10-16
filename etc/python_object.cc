@@ -1,5 +1,5 @@
 
-/// @file
+/// @file pyutils_@FOO@.cc
 /// @brief @FOO@ の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -8,6 +8,7 @@
 
 
 #include "ym_utils/pyutils.h"
+#include "ym_utils/@FOO@.h"
 
 
 BEGIN_NAMESPACE_YM_PYTHON
@@ -320,6 +321,19 @@ conv_to_pyobject(const @FOO@& obj)
 
   Py_INCREF(py_obj);
   return (PyObject*)py_obj;
+}
+
+// @FOO@Object 関係の初期化を行う．
+void
+@FOO@Object_init(PyObject* m)
+{
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&@FOO@Type) < 0 ) {
+    return NULL;
+  }
+
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "@FOO@", (PyObject*)&@FOO@Type);
 }
 
 END_NAMESPACE_YM_PYTHON
