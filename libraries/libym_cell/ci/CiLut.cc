@@ -379,7 +379,7 @@ CiLut1D::CiLut1D(const CellLutTemplate* lut_template,
 {
   ymuint n = 0;
   if ( index_array.empty() ) {
-    n = index_num(0);
+    n = lut_template->index_num(0);
     mIndexArray.resize(n);
     for (ymuint32 i = 0; i < n; ++ i) {
       mIndexArray[i] = lut_template->index(0, i);
@@ -392,6 +392,7 @@ CiLut1D::CiLut1D(const CellLutTemplate* lut_template,
       mIndexArray[i] = index_array[i];
     }
   }
+  assert_cond( n != 0, __FILE__, __LINE__);
   mIndexWidthArray.resize(n - 1);
   for (ymuint i = 0; i < n - 1; ++ i) {
     mIndexWidthArray[i] = mIndexArray[i + 1] - mIndexArray[i];
@@ -485,7 +486,7 @@ CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
 {
   ymuint n1 = 0;
   if ( index_array1.empty() ) {
-    n1 = index_num(0);
+    n1 = lut_template->index_num(0);
     mIndexArray[0].resize(n1);
     for (ymuint32 i = 0; i < n1; ++ i) {
       mIndexArray[0][i] = lut_template->index(0, i);
@@ -498,6 +499,7 @@ CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
       mIndexArray[0][i] = index_array1[i];
     }
   }
+  assert_cond( n1 != 0, __FILE__, __LINE__);
   mIndexWidthArray[0].resize(n1 - 1);
   for (ymuint i = 0; i < n1 - 1; ++ i) {
     mIndexWidthArray[0][i] = mIndexArray[0][i + 1] - mIndexArray[0][i];
@@ -505,7 +507,7 @@ CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
 
   ymuint n2 = 0;
   if ( index_array2.empty() ) {
-    n2 = index_num(1);
+    n2 = lut_template->index_num(1);
     mIndexArray[1].resize(n2);
     for (ymuint32 i = 0; i < n2; ++ i) {
       mIndexArray[1][i] = lut_template->index(1, i);
@@ -518,6 +520,7 @@ CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
       mIndexArray[1][i] = index_array2[i];
     }
   }
+  assert_cond( n2 != 0, __FILE__, __LINE__);
   mIndexWidthArray[1].resize(n2 - 1);
   for (ymuint i = 0; i < n2 - 1; ++ i) {
     mIndexWidthArray[1][i] = mIndexArray[1][i + 1] - mIndexArray[1][i];
@@ -629,7 +632,7 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
 {
   ymuint n1 = 0;
   if ( index_array1.empty() ) {
-    n1 = index_num(0);
+    n1 = lut_template->index_num(0);
     mIndexArray[0].resize(n1);
     for (ymuint32 i = 0; i < n1; ++ i) {
       mIndexArray[0][i] = lut_template->index(0, i);
@@ -642,6 +645,7 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
       mIndexArray[0][i] = index_array1[i];
     }
   }
+  assert_cond( n1 != 0, __FILE__, __LINE__);
   mIndexWidthArray[0].resize(n1 - 1);
   for (ymuint i = 0; i < n1 - 1; ++ i) {
     mIndexWidthArray[0][i] = mIndexArray[0][i + 1] - mIndexArray[0][i];
@@ -649,7 +653,7 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
 
   ymuint n2 = 0;
   if ( index_array2.empty() ) {
-    n2 = index_num(1);
+    n2 = lut_template->index_num(1);
     mIndexArray[1].resize(n2);
     for (ymuint32 i = 0; i < n2; ++ i) {
       mIndexArray[1][i] = lut_template->index(1, i);
@@ -662,6 +666,7 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
       mIndexArray[1][i] = index_array2[i];
     }
   }
+  assert_cond( n2 != 0, __FILE__, __LINE__);
   mIndexWidthArray[1].resize(n2 - 1);
   for (ymuint i = 0; i < n2 - 1; ++ i) {
     mIndexWidthArray[1][i] = mIndexArray[1][i + 1] - mIndexArray[1][i];
@@ -669,7 +674,7 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
 
   ymuint n3 = 0;
   if ( index_array3.empty() ) {
-    n3 = index_num(2);
+    n3 = lut_template->index_num(2);
     mIndexArray[2].resize(n3);
     for (ymuint32 i = 0; i < n3; ++ i) {
       mIndexArray[2][i] = lut_template->index(2, i);
@@ -682,6 +687,7 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
       mIndexArray[2][i] = index_array3[i];
     }
   }
+  assert_cond( n3 != 0, __FILE__, __LINE__);
   mIndexWidthArray[2].resize(n3 - 1);
   for (ymuint i = 0; i < n3 - 1; ++ i) {
     mIndexWidthArray[2][i] = mIndexArray[2][i + 1] - mIndexArray[2][i];
