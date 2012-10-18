@@ -18,7 +18,8 @@ libym_cell_python_la_SOURCES = \
 	pycell_init.cc \
 	pycell_CellArea.cc \
 	pycell_CellCapacitance.cc \
-	pycell_CellTime.cc
+	pycell_CellTime.cc \
+	pycell_CellLibrary.cc
 
 libym_cell_python_la_LIBADD =
 

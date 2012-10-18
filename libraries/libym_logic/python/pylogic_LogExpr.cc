@@ -221,7 +221,7 @@ LogExpr_ior(PyObject* left,
 
 // make_zero 関数
 PyObject*
-LogExpr_make_zero(LogExprObject* self,
+LogExpr_make_zero(PyTypeObject* type_obj,
 		  PyObject* args)
 {
   return LogExpr_FromLogExpr(LogExpr::make_zero());
@@ -229,7 +229,7 @@ LogExpr_make_zero(LogExprObject* self,
 
 // make_one 関数
 PyObject*
-LogExpr_make_one(LogExprObject* self,
+LogExpr_make_one(PyTypeObject* type_obj,
 		 PyObject* args)
 {
   return LogExpr_FromLogExpr(LogExpr::make_one());
@@ -849,9 +849,11 @@ PyMethodDef LogExpr_methods[] = {
    PyDoc_STR("make constant 1 (NONE)")},
   {"make_literal", (PyCFunction)LogExpr_make_literal, METH_STATIC | METH_VARARGS,
    PyDoc_STR("make literal (Literal)")},
-  {"make_posiliteral", (PyCFunction)LogExpr_make_posiliteral, METH_STATIC | METH_VARARGS,
+  {"make_posiliteral", (PyCFunction)LogExpr_make_posiliteral,
+   METH_STATIC | METH_VARARGS,
    PyDoc_STR("make positive literal (VarId)")},
-  {"make_negaliteral", (PyCFunction)LogExpr_make_negaliteral, METH_STATIC | METH_VARARGS,
+  {"make_negaliteral", (PyCFunction)LogExpr_make_negaliteral,
+   METH_STATIC | METH_VARARGS,
    PyDoc_STR("make negative literal (VarId)")},
   {"make_and", (PyCFunction)LogExpr_make_and, METH_STATIC | METH_VARARGS,
    PyDoc_STR("make and (list of LogExpr)")},

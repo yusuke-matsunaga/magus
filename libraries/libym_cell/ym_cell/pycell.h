@@ -11,6 +11,12 @@
 
 #include "ympython.h"
 #include "ym_cell/CellArea.h"
+#include "ym_cell/CellCapacitance.h"
+#include "ym_cell/CellTime.h"
+#include "ym_cell/CellLut.h"
+#include "ym_cell/Cell.h"
+#include "ym_cell/CellGroup.h"
+#include "ym_cell/CellClass.h"
 
 
 BEGIN_NAMESPACE_YM_PYTHON
@@ -27,7 +33,6 @@ PyTypeObject CellAreaType;
 extern
 PyObject* Py_kCellAreaInf;
 
-
 /// @brief CellCapacitance を表す型
 extern
 PyTypeObject CellCapacitanceType;
@@ -36,7 +41,6 @@ PyTypeObject CellCapacitanceType;
 extern
 PyObject* Py_kCellCapacitanceInf;
 
-
 /// @brief CellTime を表す型
 extern
 PyTypeObject CellTimeType;
@@ -44,6 +48,30 @@ PyTypeObject CellTimeType;
 /// @brief CellTime の無限大定数を表すオブジェクト
 extern
 PyObject* Py_kCellTimeInf;
+
+/// @brief CellLutTemplate を表す型
+extern
+PyTypeObject CellLutTemplateType;
+
+/// @brief CellLut を表す型
+extern
+PyTypeObject CellLutType;
+
+/// @brief Cell を表す型
+extern
+PyTypeObject CellType;
+
+/// @brief CellGroup を表す型
+extern
+PyTypeObject CellGroupType;
+
+/// @brief CellClass を表す型
+extern
+PyTypeObject CellClassType;
+
+/// @brief CellLibrary を表す型
+extern
+PyTypeObject CellLibraryType;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -83,6 +111,72 @@ CellTimeObject_Check(PyObject* obj)
   return Py_TYPE(obj) == &CellTimeType;
 }
 
+/// @brief CellLutTemplateType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が CellLutTemplateType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+CellLutTempalteObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &CellLutTemplateType;
+}
+
+/// @brief CellLutType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が CellLutType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+CellLutObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &CellLutType;
+}
+
+/// @brief CellType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が CellType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+CellObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &CellType;
+}
+
+/// @brief CellGroupType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が CellGroupType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+CellGroupObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &CellGroupType;
+}
+
+/// @brief CellClassType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が CellClassType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+CellClassObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &CellClassType;
+}
+
+/// @brief CellLibraryType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が CellLibraryType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+CellLibraryObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &CellLibraryType;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // PyObject からの型変換
@@ -117,6 +211,66 @@ extern
 bool
 conv_from_pyobject(PyObject* py_obj,
 		   CellTime& obj);
+
+/// @brief PyObject から CellLutTemplate を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] p_obj CellLutTemplate のポインタを格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した．py_obj が CellLutTemplateObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   const CellLutTemplate*& p_obj);
+
+/// @brief PyObject から CellLut を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] p_obj CellLut のポインタを格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した．py_obj が CellLutObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   const CellLut*& p_obj);
+
+/// @brief PyObject から Cell を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] p_obj Cell のポインタを格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した．py_obj が CellObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   const Cell*& p_obj);
+
+/// @brief PyObject から CellGroup を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] p_obj CellGroup のポインタを格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した．py_obj が CellGroupObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   const CellGroup*& p_obj);
+
+/// @brief PyObject から CellClass を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] obj CellClass のポインタを格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した．py_obj が CellClassObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   const CellClass*& p_obj);
+
+/// @brief PyObject から CellLibrary を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] p_obj CellLibrary のポインタを格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した．py_obj が CellLibraryObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   const CellLibrary*& p_obj);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -158,6 +312,43 @@ CellTime_FromCellTime(const CellTime& obj);
 extern
 PyObject*
 CellTime_FromDouble(double val);
+
+/// @brief CellLutTemplate から CellLutTemplateObject を生成する．
+/// @param[in] lut_template LUTテンプレート
+extern
+PyObject*
+CellLutTemplate_FromCellLutTemplate(const CellLutTemplate* lut_template);
+
+/// @brief CellLut から CellLutObject を生成する．
+/// @param[in] lut LUT
+extern
+PyObject*
+CellLut_FromCellLut(const CellLut* lut);
+
+/// @brief Cell から CellObject を生成する．
+/// @param[in] cell セル
+extern
+PyObject*
+Cell_FromCell(const Cell* cell);
+
+/// @brief CellGroup から CellGroupObject を生成する．
+/// @param[in] group グループ
+extern
+PyObject*
+CellGroup_FromCellGroup(const CellGroup* group);
+
+/// @brief CellClass から CellClassObject を生成する．
+/// @param[in] cell_class セルクラス
+extern
+PyObject*
+CellClass_FromCellClass(const CellClass* cell_class);
+
+/// @brief CellLibrary から CellLibraryObject を生成する．
+/// @param[in] cell_class セルクラス
+extern
+PyObject*
+CellLibrary_FromCellLibrary(const CellLibrary* cell_class);
+
 
 END_NAMESPACE_YM_PYTHON
 

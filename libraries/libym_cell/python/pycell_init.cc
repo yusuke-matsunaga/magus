@@ -35,6 +35,9 @@ CellCapacitanceObject_init(PyObject* m);
 void
 CellTimeObject_init(PyObject* m);
 
+void
+CellLibraryObject_init(PyObject* m);
+
 END_NAMESPACE_YM_PYTHON
 
 
@@ -59,4 +62,8 @@ cell_init()
 
   // CellTimeObject 関係の初期化
   CellTimeObject_init(m);
+
+  // CellLibraryObject 関係の初期化
+  CellLibraryObject_init(m);
+
 }

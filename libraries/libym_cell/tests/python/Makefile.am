@@ -36,6 +36,8 @@ pycell_test_SOURCES = \
 pycell_test_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/python/libym_cell_python.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/python/libym_logic_python.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
         $(YMTOOLS_BUILDDIR)/libraries/libym_utils/python/libym_utils_python.la \
         $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 

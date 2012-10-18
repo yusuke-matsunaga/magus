@@ -9,11 +9,30 @@
 
 #include "ym_cell/pycell.h"
 #include "ym_cell/CellLibrary.h"
+#include "ym_cell/CellDotlibReader.h"
+#include "ym_cell/CellMislibReader.h"
+#include "ym_cell/CellBus.h"
+#include "ym_utils/pyutils.h"
+#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileBinI.h"
 
 
 BEGIN_NAMESPACE_YM_PYTHON
 
 BEGIN_NONAMESPACE
+
+//////////////////////////////////////////////////////////////////////
+// 文字列オブジェクト
+//////////////////////////////////////////////////////////////////////
+
+PyObject* Py_kTechCmos;
+PyObject* Py_kTechFpga;
+PyObject* Py_kDelayGenericCmos;
+PyObject* Py_kDelayTableLookup;
+PyObject* Py_kDelayPiecewiseCmos;
+PyObject* Py_kDelayCmos2;
+PyObject* Py_kDelayDcm;
+
 
 //////////////////////////////////////////////////////////////////////
 // Python 用の構造体定義
@@ -26,7 +45,7 @@ struct CellLibraryObject
   PyObject_HEAD
 
   // CellLibrary の本体
-  CellLibrary* mBody;
+  const CellLibrary* mBody;
 
 };
 
@@ -45,7 +64,7 @@ CellLibrary_new(PyTypeObject* type)
   }
 
   // CellLibrary の生成を行なう．
-  self->mBody = CellLibrary::new_obj();
+  //self->mBody = CellLibrary::new_obj();
 
   return self;
 }
@@ -102,11 +121,11 @@ CellLibrary_delay_model(CellLibraryObject* self,
 {
   PyObject* result = NULL;
   switch ( self->mBody->delay_model() ) {
-  case CellLibrary::kCellDelayGenericCmos:   result = Py_kDelayGenericCmos; break;
-  case CellLibrary::kCellDelayTableLookup:   result = Py_kDelayTableLookup; break;
-  case CellLibrary::kCellDelayPiecewiseCmos: result = Py_kDelayPiecewiseCmos; break;
-  case CellLibrary::kCellDelayCmos2:         result = Py_kDelayCmos2; break;
-  case CellLibrary::kCellDelayDcm:           result = Py_kDelayDcm; break;
+  case kCellDelayGenericCmos:   result = Py_kDelayGenericCmos; break;
+  case kCellDelayTableLookup:   result = Py_kDelayTableLookup; break;
+  case kCellDelayPiecewiseCmos: result = Py_kDelayPiecewiseCmos; break;
+  case kCellDelayCmos2:         result = Py_kDelayCmos2; break;
+  case kCellDelayDcm:           result = Py_kDelayDcm; break;
   default: assert_not_reached(__FILE__, __LINE__);
   }
   Py_INCREF(result);
@@ -115,8 +134,8 @@ CellLibrary_delay_model(CellLibraryObject* self,
 
 // bus_naming_style 関数
 PyObject*
-CellLibrary_bus_naming_stle(CellLibraryObject* self,
-			    PyObject* args)
+CellLibrary_bus_naming_style(CellLibraryObject* self,
+			     PyObject* args)
 {
   return conv_to_pyobject(self->mBody->bus_naming_style());
 }
@@ -172,7 +191,7 @@ CellLibrary_current_unit(CellLibraryObject* self,
 // pulling_resistance_unit 関数
 PyObject*
 CellLibrary_pulling_resistance_unit(CellLibraryObject* self,
-				    oPyObject* args)
+				    PyObject* args)
 {
   return conv_to_pyobject(self->mBody->pulling_resistance_unit());
 }
@@ -184,7 +203,7 @@ CellLibrary_capacitive_load_unit(CellLibraryObject* self,
 {
   double unit_val = self->mBody->capacitive_load_unit();
   string unit_str = self->mBody->capacitive_load_unit_str();
-  return Py_BuildValue("(ds)", unit_val, unit_str);
+  return Py_BuildValue("(ds)", unit_val, unit_str.c_str());
 }
 
 // leakage_power_unit 関数
@@ -236,7 +255,12 @@ PyObject*
 CellLibrary_bus_type(CellLibraryObject* self,
 		     PyObject* args)
 {
-  const CellBusType* bus_type = self->mBody->bus_type();
+  char* name;
+  if ( !PyArg_ParseTuple(args, "s", &name) ) {
+    return NULL;
+  }
+
+  const CellBusType* bus_type = self->mBody->bus_type(name);
   if ( bus_type != NULL ) {
     return conv_to_pyobject(bus_type);
   }
@@ -321,13 +345,86 @@ CellLibrary_const0_func(CellLibraryObject* self,
   return CellGroup_FromCellGroup(group);
 }
 
-// dump 関数
+// read_dotlib 関数
 PyObject*
-CellLibrary_dump(CellLibraryObject* slef,
-		 PyObject* args)
+CellLibrary_read_dotlib(PyTypeObject* type_obj,
+			PyObject* args)
 {
+  char* filename;
+  if ( !PyArg_ParseTuple(args, "s", &filename) ) {
+    return NULL;
+  }
+
+  CellLibraryObject* self = PyObject_New(CellLibraryObject, type_obj);
+  if ( self == NULL ) {
+    return NULL;
+  }
+
+  CellDotlibReader read;
+  self->mBody = read(filename);
+
+  return (PyObject*)self;
 }
 
+// read_mislib 関数
+PyObject*
+CellLibrary_read_mislib(PyTypeObject* type_obj,
+			PyObject* args)
+{
+  char* filename;
+  if ( !PyArg_ParseTuple(args, "s", &filename) ) {
+    return NULL;
+  }
+
+  CellLibraryObject* self = PyObject_New(CellLibraryObject, type_obj);
+  if ( self == NULL ) {
+    return NULL;
+  }
+
+  CellMislibReader read;
+  self->mBody = read(filename);
+
+  return (PyObject*)self;
+}
+
+// dump 関数
+PyObject*
+CellLibrary_dump(CellLibraryObject* self,
+		 PyObject* args)
+{
+  FileBinO* bp = parse_FileBinO(args);
+  if ( bp == NULL ) {
+    return NULL;
+  }
+
+  self->mBody->dump(*bp);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+// restore 関数
+PyObject*
+CellLibrary_restore(PyTypeObject* type_obj,
+		    PyObject* args)
+{
+  FileBinI* bp = parse_FileBinI(args);
+  if ( bp == NULL ) {
+    return NULL;
+  }
+
+  CellLibraryObject* self = PyObject_New(CellLibraryObject, type_obj);
+  if ( self == NULL ) {
+    return NULL;
+  }
+
+  CellLibrary* library = CellLibrary::new_obj();
+  library->restore(*bp);
+
+  self->mBody = library;
+
+  return (PyObject*)self;
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -379,9 +476,9 @@ PyMethodDef CellLibrary_methods[] = {
   {"lu_table_template", (PyCFunction)CellLibrary_lu_table_template, METH_VARARGS,
    PyDoc_STR("return lu_table_template (str)")},
   {"lu_table_template_lsit", (PyCFunction)CellLibrary_lu_table_template_list,
-   METH_NORARGS,
+   METH_NOARGS,
    PyDoc_STR("return list of lu_table_template (NONE)")},
-  {"bus_type", (PyCFunction)CellLibrary_bus_type, METH_NOARGS,
+  {"bus_type", (PyCFunction)CellLibrary_bus_type, METH_VARARGS,
    PyDoc_STR("return bus type of the library (NONE)")},
   {"cell", (PyCFunction)CellLibrary_cell, METH_VARARGS,
    PyDoc_STR("return cell (str)")},
@@ -391,9 +488,13 @@ PyMethodDef CellLibrary_methods[] = {
    PyDoc_STR("return list of cell group (NONE)")},
   {"npn_class_list", (PyCFunction)CellLibrary_npn_class_list, METH_NOARGS,
    PyDoc_STR("return list of cell class (NONE)")},
+  {"read_dotlib", (PyCFunction)CellLibrary_read_dotlib, METH_STATIC | METH_VARARGS,
+   PyDoc_STR("read '.lib'(liberty) file (str)")},
+  {"read_mislib", (PyCFunction)CellLibrary_read_mislib, METH_STATIC | METH_VARARGS,
+   PyDoc_STR("read mislib(genlib) file (str)")},
   {"dump", (PyCFunction)CellLibrary_dump, METH_VARARGS,
    PyDoc_STR("dump (FileBinO)")},
-  {"restore", (PyCFunction)CellLibrary_restore, METH_CLASS | METH_VARARGS,
+  {"restore", (PyCFunction)CellLibrary_restore, METH_STATIC | METH_VARARGS,
    PyDoc_STR("restore (FileBinI)")},
   {NULL, NULL, 0, NULL} // end-marker
 };
@@ -466,8 +567,8 @@ PyTypeObject CellLibraryType = {
 
   // Attribute descriptor and subclassing stuff
   CellLibrary_methods,                // tp_methods
-  CellLibrary_members,                // tp_members
-  CellLibrary_getset,                 // tp_getset
+  0,                                  // tp_members
+  0,                                  // tp_getset
   (struct _typeobject*)0,             // tp_base
   (PyObject*)0,                       // tp_dict
   (descrgetfunc)0,                    // tp_descr_get
@@ -498,7 +599,7 @@ PyTypeObject CellLibraryType = {
 // @retval false 変換が失敗した．py_obj が CellLibraryObject ではなかった．
 bool
 conv_from_pyobject(PyObject* py_obj,
-		   CellLibrary*& p_obj)
+		   const CellLibrary*& p_obj)
 {
   // 型のチェック
   if ( !CellLibraryObject_Check(py_obj) ) {
@@ -513,17 +614,40 @@ conv_from_pyobject(PyObject* py_obj,
   return true;
 }
 
+
+BEGIN_NONAMESPACE
+
+inline
+PyObject*
+new_string(const char* str)
+{
+  PyObject* py_obj = PyString_InternFromString(str);
+  Py_INCREF(py_obj);
+  return py_obj;
+}
+
+END_NONAMESPACE
+
+
 // CellLibraryObject 関係の初期化を行う．
 void
 CellLibraryObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
   if ( PyType_Ready(&CellLibraryType) < 0 ) {
-    return NULL;
+    return;
   }
 
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "CellLibrary", (PyObject*)&CellLibraryType);
+
+  Py_kTechCmos           = new_string("cmos");
+  Py_kTechFpga           = new_string("fpga");
+  Py_kDelayGenericCmos   = new_string("generic cmos");
+  Py_kDelayTableLookup   = new_string("table lookup");
+  Py_kDelayPiecewiseCmos = new_string("piecewise cmos");
+  Py_kDelayCmos2         = new_string("cmos2");
+  Py_kDelayDcm           = new_string("dcm");
 }
 
 END_NAMESPACE_YM_PYTHON
