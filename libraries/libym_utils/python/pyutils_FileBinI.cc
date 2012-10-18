@@ -339,6 +339,26 @@ conv_from_pyobject(PyObject* py_obj,
   return true;
 }
 
+// @brief 引数をパースして FileBinI を取り出す．
+// @param[in] args 引数オブジェクト
+// @return FileBinI のポインタを返す．
+// @note エラーが起きたら NULL を返す．
+FileBinI*
+parse_FileBinI(PyObject* args)
+{
+  PyObject* obj;
+  if ( !PyArg_ParseTuple(args, "O!", &FileBinIType, &obj) ) {
+    return NULL;
+  }
+
+  FileBinI* bp;
+  if ( !conv_from_pyobject(obj, bp) ) {
+    return NULL;
+  }
+
+  return bp;
+}
+
 // FileBinIObject 関係の初期化を行う．
 void
 FileBinIObject_init(PyObject* m)

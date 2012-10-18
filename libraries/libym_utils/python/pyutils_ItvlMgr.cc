@@ -162,13 +162,8 @@ PyObject*
 ItvlMgr_dump(ItvlMgrObject* self,
 	     PyObject* args)
 {
-  PyObject* obj;
-  if ( !PyArg_ParseTuple(args, "O!", &FileBinOType, &obj) ) {
-    return NULL;
-  }
-
-  FileBinO* bp;
-  if ( !conv_from_pyobject(obj, bp) ) {
+  FileBinO* bp = parse_FileBinO(args);
+  if ( bp == NULL ) {
     return NULL;
   }
 
@@ -183,13 +178,8 @@ PyObject*
 ItvlMgr_restore(ItvlMgrObject* self,
 		PyObject* args)
 {
-  PyObject* obj;
-  if ( !PyArg_ParseTuple(args, "O!", &FileBinIType, &obj) ) {
-    return NULL;
-  }
-
-  FileBinI* bp;
-  if ( !conv_from_pyobject(obj, bp) ) {
+  FileBinI* bp = parse_FileBinI(args);
+  if ( bp == NULL ) {
     return NULL;
   }
 

@@ -13,6 +13,17 @@
 
 BEGIN_NAMESPACE_YM_PYTHON
 
+//////////////////////////////////////////////////////////////////////
+// PolObject の外部変数
+//////////////////////////////////////////////////////////////////////
+
+// @brief kPolPosi を表すオブジェクト
+PyObject* Py_kPolPosi = NULL;
+
+// @brief kPolNega を表すオブジェクト
+PyObject* Py_kPolNega = NULL;
+
+
 BEGIN_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
@@ -29,6 +40,22 @@ struct PolObject
   tPol mPol;
 
 };
+
+// Py_kPolPosi の本体
+PolObject Py_kPolPosiStruct = {
+  PyObject_HEAD_INIT(&PolType)
+  kPolPosi
+};
+
+// Py_kPolNega の本体
+PolObject Py_kPolNegaStruct = {
+  PyObject_HEAD_INIT(&PolType)
+  kPolNega
+};
+
+// repr 用の文字列オブジェクト
+PyObject* Py_kPolPosiString = NULL;
+PyObject* Py_kPolNegaString = NULL;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -84,34 +111,22 @@ Pol_init(PolObject* self,
   return 0;
 }
 
-// repr 用の文字列オブジェクト
-PyObject* Py_kPolPosiString = NULL;
-PyObject* Py_kPolNegaString = NULL;
-
-// 文字列用オブジェクトが生成されていなければ生成する．
-inline
-PyObject*
-new_string(const char* str,
-	   PyObject*& py_obj)
-{
-  if ( py_obj == NULL ) {
-    py_obj = PyString_InternFromString(str);
-  }
-  Py_INCREF(py_obj);
-  return py_obj;
-}
 // repr 関数
 PyObject*
 Pol_repr(PolObject* self)
 {
+  PyObject* result = NULL;
   if ( self->mPol == kPolPosi ) {
-    return new_string("positive", Py_kPolPosiString);
+    result = Py_kPolPosiString;
+  }
+  else if ( self->mPol == kPolNega ) {
+    result = Py_kPolNegaString;
   }
   else {
-    return new_string("negative", Py_kPolNegaString);
+    assert_not_reached(__FILE__, __LINE__);
   }
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
+  Py_INCREF(result);
+  return result;
 }
 
 // invert 関数
@@ -119,7 +134,7 @@ PyObject*
 Pol_inv(PyObject* obj)
 {
   PolObject* pol_obj = (PolObject*)obj;
-  return conv_to_pyobject(~pol_obj->mPol);
+  return Pol_FromPol(~pol_obj->mPol);
 }
 
 
@@ -254,7 +269,7 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief tPol から PyObject を生成する．
 // @param[in] obj tPol オブジェクト
 PyObject*
-conv_to_pyobject(tPol obj)
+Pol_FromPol(tPol obj)
 {
   PyObject* result = NULL;
   if ( obj == kPolPosi ) {
@@ -307,30 +322,7 @@ Pol_FromString(const char* str)
 }
 
 
-//////////////////////////////////////////////////////////////////////
-// PolObject の外部変数
-//////////////////////////////////////////////////////////////////////
-
-// @brief kPolPosi を表すオブジェクト
-PyObject* Py_kPolPosi = NULL;
-
-// @brief kPolNega を表すオブジェクト
-PyObject* Py_kPolNega = NULL;
-
-
 BEGIN_NONAMESPACE
-
-// Py_kPolPosi の本体
-PolObject Py_kPolPosiStruct = {
-  PyObject_HEAD_INIT(&PolType)
-  kPolPosi
-};
-
-// Py_kPolNega の本体
-PolObject Py_kPolNegaStruct = {
-  PyObject_HEAD_INIT(&PolType)
-  kPolNega
-};
 
 // Pol の定数を設定する関数
 inline
@@ -343,6 +335,16 @@ Pol_set(PolObject& pol_obj,
   py_obj = (PyObject*)&pol_obj;
   Py_XINCREF(py_obj);
   PyModule_AddObject(module, name, py_obj);
+}
+
+// 文字列用オブジェクトを生成する．
+inline
+PyObject*
+new_string(const char* str)
+{
+  PyObject* py_obj = PyString_InternFromString(str);
+  Py_INCREF(py_obj);
+  return py_obj;
 }
 
 END_NONAMESPACE
@@ -363,6 +365,10 @@ PolObject_init(PyObject* m)
   // 定数オブジェクトの登録
   Pol_set(Py_kPolPosiStruct, Py_kPolPosi, m, "kPolPosi");
   Pol_set(Py_kPolNegaStruct, Py_kPolNega, m, "kPolNega");
+
+  // 定数オブジェクト用の文字列オブジェクトの生成
+  Py_kPolPosiString = new_string("positive");
+  Py_kPolNegaString = new_string("negative");
 }
 
 END_NAMESPACE_YM_PYTHON

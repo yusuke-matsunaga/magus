@@ -10,6 +10,6 @@ SUBDIRS = \
 	npn \
 	sat \
 	aig \
-	python
+	$(YM_EXTRA_SUBDIRS)
 
 MAINTAINERCLEANFILES = Makefile.in

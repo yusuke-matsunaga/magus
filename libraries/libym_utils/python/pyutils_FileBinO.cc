@@ -388,6 +388,27 @@ conv_from_pyobject(PyObject* py_obj,
   return true;
 }
 
+// @brief 引数をパースして FileBinO を取り出す．
+// @param[in] args 引数オブジェクト
+// @return FileBinO のポインタを返す．
+// @note エラーが起きたら NULL を返す．
+FileBinO*
+parse_FileBinO(PyObject* args)
+{
+  PyObject* obj;
+  if ( !PyArg_ParseTuple(args, "O!", &FileBinOType, &obj) ) {
+    return NULL;
+  }
+
+  FileBinO* bp;
+  if ( !conv_from_pyobject(obj, bp) ) {
+    return NULL;
+  }
+
+  return bp;
+}
+
+
 // FileBinOObject 関係の初期化を行う．
 void
 FileBinOObject_init(PyObject* m)

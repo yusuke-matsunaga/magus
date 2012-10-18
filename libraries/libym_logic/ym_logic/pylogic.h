@@ -1,7 +1,7 @@
 #ifndef YM_LOGIC_PYLOGIC_H
 #define YM_LOGIC_PYLOGIC_H
 
-/// @file ym_logic/logicpy.h
+/// @file ym_logic/pylogic.h
 /// @brief libym_logic の Python 用の拡張モジュールの定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

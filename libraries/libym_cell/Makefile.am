@@ -11,6 +11,7 @@ SUBDIRS = \
 	mislib \
 	dotlib \
 	libcomp \
+	$(YM_EXTRA_SUBDIRS) \
 	. \
 	tests
 

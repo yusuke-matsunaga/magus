@@ -480,6 +480,27 @@ PyObject*
 USTime_FromUSTime(const USTime& obj);
 
 
+//////////////////////////////////////////////////////////////////////
+// 引数のパース用便利関数
+//////////////////////////////////////////////////////////////////////
+
+/// @brief 引数をパースして FileBinO を取り出す．
+/// @param[in] args 引数オブジェクト
+/// @return FileBinO のポインタを返す．
+/// @note エラーが起きたら NULL を返す．
+extern
+FileBinO*
+parse_FileBinO(PyObject* args);
+
+/// @brief 引数をパースして FileBinI を取り出す．
+/// @param[in] args 引数オブジェクト
+/// @return FileBinI のポインタを返す．
+/// @note エラーが起きたら NULL を返す．
+extern
+FileBinI*
+parse_FileBinI(PyObject* args);
+
+
 END_NAMESPACE_YM_PYTHON
 
 
