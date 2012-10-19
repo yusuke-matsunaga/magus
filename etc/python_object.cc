@@ -1,5 +1,5 @@
 
-/// @file pyutils_@FOO@.cc
+/// @file py@BAR@_@FOO@.cc
 /// @brief @FOO@ の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "ym_utils/pyutils.h"
-#include "ym_utils/@FOO@.h"
+#include "ym_@BAR@/py@BAR@.h"
+#include "ym_@BAR@/@FOO@.h"
 
 
 BEGIN_NAMESPACE_YM_PYTHON
@@ -202,7 +202,7 @@ PyTypeObject @FOO@Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "@FOO@",                      // tp_name
+  "@BAR@.@FOO@",                // tp_name
   sizeof(@FOO@Object),          // tp_basicsize
   (int)0,                       // tp_itemsize
 
@@ -329,7 +329,7 @@ void
 {
   // タイプオブジェクトの初期化
   if ( PyType_Ready(&@FOO@Type) < 0 ) {
-    return NULL;
+    return;
   }
 
   // タイプオブジェクトの登録

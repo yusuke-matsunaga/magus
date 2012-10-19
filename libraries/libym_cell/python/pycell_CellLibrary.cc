@@ -15,6 +15,7 @@
 #include "ym_utils/pyutils.h"
 #include "ym_utils/FileBinO.h"
 #include "ym_utils/FileBinI.h"
+#include "PyLibrary.h"
 
 
 BEGIN_NAMESPACE_YM_PYTHON
@@ -47,6 +48,9 @@ struct CellLibraryObject
   // CellLibrary の本体
   const CellLibrary* mBody;
 
+  // PyLibrary
+  PyLibrary* mLibrary;
+
 };
 
 
@@ -65,6 +69,7 @@ CellLibrary_new(PyTypeObject* type)
 
   // CellLibrary の生成を行なう．
   //self->mBody = CellLibrary::new_obj();
+  self->mLibrary = new PyLibrary();
 
   return self;
 }
@@ -73,6 +78,8 @@ CellLibrary_new(PyTypeObject* type)
 void
 CellLibrary_dealloc(CellLibraryObject* self)
 {
+  delete self->mLibrary;
+
   // CellLibrary の開放を行なう．
   delete self->mBody;
 
@@ -232,7 +239,7 @@ CellLibrary_lu_table_template(CellLibraryObject* self,
     return NULL;
   }
 
-  return CellLutTemplate_FromCellLutTemplate(lut_tmpl);
+  return self->mLibrary->get_CellLutTemplate(lut_tmpl);
 }
 
 // lut_table_template_list 関数
@@ -244,7 +251,7 @@ CellLibrary_lu_table_template_list(CellLibraryObject* self,
   PyObject* list_obj = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
     const CellLutTemplate* lut_tmpl = self->mBody->lu_table_template(i);
-    PyObject* obj1 = CellLutTemplate_FromCellLutTemplate(lut_tmpl);
+    PyObject* obj1 = self->mLibrary->get_CellLutTemplate(lut_tmpl);
     PyList_SetItem(list_obj, i, obj1);
   }
   return list_obj;
@@ -288,7 +295,7 @@ CellLibrary_cell(CellLibraryObject* self,
     return NULL;
   }
 
-  return Cell_FromCell(cell);
+  return self->mLibrary->get_Cell(cell);
 }
 
 // cell_list 関数
@@ -300,7 +307,7 @@ CellLibrary_cell_list(CellLibraryObject* self,
   PyObject* list_obj = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
     const Cell* cell = self->mBody->cell(i);
-    PyObject* obj1 = Cell_FromCell(cell);
+    PyObject* obj1 = self->mLibrary->get_Cell(cell);
     PyList_SetItem(list_obj, i, obj1);
   }
   return list_obj;
@@ -315,7 +322,7 @@ CellLibrary_group_list(CellLibraryObject* self,
   PyObject* list_obj = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
     const CellGroup* group = self->mBody->group(i);
-    PyObject* obj1 = CellGroup_FromCellGroup(group);
+    PyObject* obj1 = self->mLibrary->get_CellGroup(group);
     PyList_SetItem(list_obj, i, obj1);
   }
   return list_obj;
@@ -330,7 +337,7 @@ CellLibrary_npn_class_list(CellLibraryObject* self,
   PyObject* list_obj = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
     const CellClass* npn_class = self->mBody->npn_class(i);
-    PyObject* obj1 = CellClass_FromCellClass(npn_class);
+    PyObject* obj1 = self->mLibrary->get_CellClass(npn_class);
     PyList_SetItem(list_obj, i, obj1);
   }
   return list_obj;
@@ -342,7 +349,7 @@ CellLibrary_const0_func(CellLibraryObject* self,
 			PyObject* args)
 {
   const CellGroup* group = self->mBody->const0_func();
-  return CellGroup_FromCellGroup(group);
+  return self->mLibrary->get_CellGroup(group);
 }
 
 // read_dotlib 関数

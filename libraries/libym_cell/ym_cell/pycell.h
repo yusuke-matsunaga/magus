@@ -61,6 +61,10 @@ PyTypeObject CellLutType;
 extern
 PyTypeObject CellType;
 
+/// @breif CellPin を表す型
+extern
+PyTypeObject CellPinType;
+
 /// @brief CellGroup を表す型
 extern
 PyTypeObject CellGroupType;
@@ -142,6 +146,17 @@ bool
 CellObject_Check(PyObject* obj)
 {
   return Py_TYPE(obj) == &CellType;
+}
+
+/// @brief CellPinType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が CellPinType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+CellPinObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &CellPinType;
 }
 
 /// @brief CellGroupType の型チェック
