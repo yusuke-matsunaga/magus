@@ -9,6 +9,7 @@
 
 #include "ym_cell/pycell.h"
 #include "ym_cell/Cell.h"
+#include "PyCell.h"
 
 
 BEGIN_NAMESPACE_YM_PYTHON
@@ -28,13 +29,10 @@ struct CellObject
   // Cell の本体
   const Cell* mBody;
 
-};
+  // PyCell
+  PyCell* mCell;
 
-PyObject*
-CellPinObject_FromPin(CellObject* cell_obj,
-		      const CellPin* pin)
-{
-}
+};
 
 
 //////////////////////////////////////////////////////////////////////
@@ -50,6 +48,8 @@ Cell_new(PyTypeObject* type)
     return NULL;
   }
 
+  self->mCell = new PyCell();
+
   return self;
 }
 
@@ -57,6 +57,7 @@ Cell_new(PyTypeObject* type)
 void
 Cell_dealloc(CellObject* self)
 {
+  delete self->mCell;
 
   PyObject_Del(self);
 }
@@ -101,7 +102,7 @@ Cell_pin(CellObject* self,
     return NULL;
   }
 
-  return CellPinObject_FromPin(self, pin);
+  return self->mCell->get_CellPin(pin);
 }
 
 // pin_list 関数
@@ -113,7 +114,7 @@ Cell_pin_list(CellObject* self,
   PyObject* pin_list = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
     const CellPin* pin = self->mBody->pin(i);
-    PyObject* obj = CellPinObject_FromPin(self, pin);
+    PyObject* obj = self->mCell->get_CellPin(pin);
     PyList_SetItem(pin_list, i, obj);
   }
   return pin_list;
@@ -128,12 +129,11 @@ Cell_input_pin_list(CellObject* self,
   PyObject* pin_list = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
     const CellPin* pin = self->mBody->input(i);
-    PyObject* obj = CellPinObject_FromPin(self, pin);
+    PyObject* obj = self->mCell->get_CellPin(pin);
     PyList_SetItem(pin_list, i, obj);
   }
   return pin_list;
 }
-
 
 
 //////////////////////////////////////////////////////////////////////

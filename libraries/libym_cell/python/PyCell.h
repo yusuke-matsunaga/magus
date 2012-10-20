@@ -1,8 +1,8 @@
-#ifndef PYLIBRARY_H
-#define PYLIBRARY_H
+#ifndef PYCELL_H
+#define PYCELL_H
 
-/// @file PyLibrary.h
-/// @brief PyLibrary のヘッダファイル
+/// @file PyCell.h
+/// @brief PyCell のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
@@ -16,39 +16,25 @@
 BEGIN_NAMESPACE_YM_PYTHON
 
 //////////////////////////////////////////////////////////////////////
-/// @class PyLibrary PyLibrary.h "PyLibrary.h"
-/// @brief CellLibraryObject のための補助的なクラス
+/// @class PyCell PyCell.h "Pycell.h"
+/// @brief CellObject のための補助的なクラス
 //////////////////////////////////////////////////////////////////////
-class PyLibrary
+class PyCell
 {
 public:
 
   /// @brief コンストラクタ
-  PyLibrary();
+  PyCell();
 
   /// @brief デストラクタ
-  ~PyLibrary();
+  ~PyCell();
 
 
 public:
 
-  /// @brief Cell のポインタから CellObject を得る．
+  /// @brief CellPin のポインタから CellPinObject を得る．
   PyObject*
-  get_Cell(const Cell* cell);
-
-  /// @brief CellGroup のポインタから CellGroupObject を得る．
-  PyObject*
-  get_CellGroup(const CellGroup* cell_group);
-
-  /// @brief CellClass のポインタから CellClassObject を得る．
-  PyObject*
-  get_CellClass(const CellClass* cell_class);
-
-  /// @brief CellLutTemplate のポインタから CellLutTemplateObject を得る．
-  PyObject*
-  get_CellLutTemplate(const CellLutTemplate* cell_lut_template);
-
-  /// @brief Cell
+  get_CellPin(const CellPin* pin);
 
 
 private:
@@ -57,7 +43,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ympuint から PyObject* を返す．
-  /// @note なければエラーとなる．
+  /// @note なければ NULL となる．
   PyObject*
   get_obj(ympuint ptr);
 
@@ -74,4 +60,4 @@ private:
 
 END_NAMESPACE_YM_PYTHON
 
-#endif // PYLIBRARY_H
+#endif // PYCELL_H

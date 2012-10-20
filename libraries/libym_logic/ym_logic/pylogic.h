@@ -14,6 +14,7 @@
 #include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
 #include "ym_logic/Literal.h"
+#include "ym_logic/TvFunc.h"
 #include "ym_logic/lexp_nsdef.h"
 #include "ym_logic/bdd_nsdef.h"
 #include "ym_logic/aig_nsdef.h"
@@ -61,6 +62,10 @@ PyObject* Py_kPolNega;
 /// @brief Literal を表す型
 extern
 PyTypeObject LiteralType;
+
+/// @brief TvFunc を表す型
+extern
+PyTypeObject TvFuncType;
 
 /// @brief LogExpr を表す型
 extern
@@ -141,6 +146,17 @@ bool
 LiteralObject_Check(PyObject* obj)
 {
   return Py_TYPE(obj) == &LiteralType;
+}
+
+/// @brief TvFuncType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が TvFuncType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+TvFuncObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &TvFuncType;
 }
 
 /// @brief LogExprType の型チェック
@@ -254,6 +270,16 @@ bool
 conv_from_pyobject(PyObject* py_obj,
 		   Literal& obj);
 
+/// @brief PyObject から TvFunc を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] obj TvFunc を格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した．py_obj が TvFuncObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   TvFunc& obj);
+
 /// @brief PyObject から LogExpr を取り出す．
 /// @param[in] py_obj Python オブジェクト
 /// @param[out] obj LogExpr を格納する変数
@@ -360,6 +386,12 @@ Pol_FromString(const char* str);
 extern
 PyObject*
 Literal_FromLiteral(Literal obj);
+
+/// @brief TvFunc から PyObject を生成する．
+/// @param[in] obj TvFunc オブジェクト
+extern
+PyObject*
+TvFunc_FromTvFunc(const TvFunc& obj);
 
 /// @brief LogExpr から PyObject を生成する．
 /// @param[in] obj LogExpr オブジェクト

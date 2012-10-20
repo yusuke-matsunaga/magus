@@ -23,6 +23,8 @@ libym_cell_python_la_SOURCES = \
 	pycell_CellGroup.cc \
 	pycell_CellClass.cc \
 	pycell_CellLibrary.cc \
+	PyCell.h \
+	PyCell.cc \
 	PyLibrary.h \
 	PyLibrary.cc
 

@@ -38,6 +38,9 @@ void
 LiteralObject_init(PyObject* m);
 
 void
+TvFuncObject_init(PyObject* m);
+
+void
 LogExprObject_init(PyObject* m);
 
 void
@@ -98,6 +101,9 @@ logic_init()
 
   // LiteralObject 関係の初期化
   LiteralObject_init(m);
+
+  // TvFuncObject 関係の初期化
+  TvFuncObject_init(m);
 
   // LogExprObject 関係の初期化
   LogExprObject_init(m);

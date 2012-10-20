@@ -21,6 +21,7 @@ libym_logic_python_la_SOURCES = \
 	pylogic_VarId.cc \
 	pylogic_Pol.cc \
 	pylogic_Literal.cc \
+	pylogic_TvFunc.cc \
 	pylogic_LogExpr.cc \
 	pylogic_BddMgr.cc \
 	pylogic_Bdd.cc \

@@ -30,28 +30,38 @@ PyLibrary::~PyLibrary()
 PyObject*
 PyLibrary::get_Cell(const Cell* cell)
 {
-  return NULL;
+  return get_obj(reinterpret_cast<ympuint>(cell));
 }
 
 // @brief CellGroup のポインタから CellGroupObject を得る．
 PyObject*
 PyLibrary::get_CellGroup(const CellGroup* cell_group)
 {
-  return NULL;
+  return get_obj(reinterpret_cast<ympuint>(cell_group));
 }
 
 // @brief CellClass のポインタから CellClassObject を得る．
 PyObject*
 PyLibrary::get_CellClass(const CellClass* cell_class)
 {
-  return NULL;
+  return get_obj(reinterpret_cast<ympuint>(cell_class));
 }
 
 // @brief CellLutTemplate のポインタから CellLutTemplateObject を得る．
 PyObject*
 PyLibrary::get_CellLutTemplate(const CellLutTemplate* cell_lut_template)
 {
-  return NULL;
+  return get_obj(reinterpret_cast<ympuint>(cell_lut_template));
+}
+
+// @brief ympuint から PyObject* を返す．
+// @note なければエラーとなる．
+PyObject*
+PyLibrary::get_obj(ympuint ptr)
+{
+  hash_map<ympuint, PyObject*>::iterator p = mObjMap.find(ptr);
+  assert_cond( p != mObjMap.end(), __FILE__, __LINE__);
+  return p->second;
 }
 
 END_NAMESPACE_YM_PYTHON
