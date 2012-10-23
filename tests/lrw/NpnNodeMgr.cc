@@ -146,7 +146,7 @@ NpnNodeMgr::make_and(NpnHandle fanin0,
     return fanin1;
   }
 
-#if 1
+#if 0
   // func がNPN同値類の代表関数になるように正規化する．
   const Npn4Cannon& npn_cannon = npn4cannon[func];
   ymuint16 c_func = npn_cannon.mFunc;
@@ -191,7 +191,8 @@ NpnNodeMgr::make_and(NpnHandle fanin0,
   NpnXform xf1 = fanin1.npn_xform();
   NpnXform ixf0 = inverse(xf0);
   NpnXform cxf1 = xf1 * ixf0;
-  NpnHandle ohandle = new_node(false,
+  NpnHandle ohandle = new_node(false, func, false, fanin0, fanin1);
+  return ohandle * ixf0;
 #endif
 }
 
@@ -235,6 +236,7 @@ NpnNodeMgr::make_xor(NpnHandle fanin0,
     return fanin1;
   }
 
+#if 0
   // func がNPN同値類の代表関数になるように正規化する．
   const Npn4Cannon& npn_cannon = npn4cannon[func];
   ymuint16 c_func = npn_cannon.mFunc;
@@ -254,6 +256,44 @@ NpnNodeMgr::make_xor(NpnHandle fanin0,
   NpnHandle ohandle = new_node(true, c_func, oinv, c_fanin0, c_fanin1);
 
   return ohandle * inv_xf;
+#else
+  bool inv0 = fanin0.oinv();
+  bool inv1 = fanin1.oinv();
+  bool oinv = inv0 ^ inv1;
+  if ( inv0 ) {
+    fanin0 = ~fanin0;
+  }
+  if ( inv1 ) {
+    fanin1 = ~fanin1;
+  }
+
+  ymuint node0 = fanin0.node_id();
+  ymuint node1 = fanin1.node_id();
+  if ( node0 > node1 ) {
+    NpnHandle tmp = fanin0;
+    fanin0 = fanin1;
+    fanin1 = tmp;
+  }
+  else if ( node0 == node1 ) {
+    NpnXform xf0 = fanin0.npn_xform();
+    NpnXform xf1 = fanin1.npn_xform();
+    NpnXform ixf0 = inverse(xf0);
+    NpnXform ixf1 = inverse(xf1);
+    NpnXform a = xf1 * ixf0;
+    NpnXform b = xf0 * ixf1;
+    if ( a > b ) {
+      NpnHandle tmp = fanin0;
+      fanin0 = fanin1;
+      fanin1 = tmp;
+    }
+  }
+  NpnXform xf0 = fanin0.npn_xform();
+  NpnXform xf1 = fanin1.npn_xform();
+  NpnXform ixf0 = inverse(xf0);
+  NpnXform cxf1 = xf1 * ixf0;
+  NpnHandle ohandle = new_node(true, func, oinv, fanin0, fanin1);
+  return ohandle * ixf0;
+#endif
 }
 
 // @brief ハンドルの表す関数を返す．
@@ -341,13 +381,14 @@ END_NONAMESPACE
 // @note おなじノードが既に存在していたらそのノードを返す．
 NpnHandle
 NpnNodeMgr::new_node(bool is_xor,
-		     ymuint16 c_func,
-		     bool c_oinv,
+		     ymuint16 func,
+		     bool oinv,
 		     NpnHandle fanin0,
 		     NpnHandle fanin1)
 {
   bool debug = false;
 
+#if 0
   NpnHandle orig_fanin0 = fanin0;
   NpnHandle orig_fanin1 = fanin1;
   NpnXform oxf;
@@ -882,6 +923,12 @@ NpnNodeMgr::new_node(bool is_xor,
     }
     assert_cond( func == tmp_func, __FILE__, __LINE__);
   }
+#else
+  NpnXform oxf;
+  if ( oinv ) {
+    oxf.flip_oinv();
+  }
+#endif
 
   ymuint type_pat = is_xor ? 3U : 2U;
   ymuint pos = hash_func(fanin0, fanin1, is_xor);

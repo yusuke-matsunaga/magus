@@ -137,12 +137,16 @@ GenPat2::operator()(ymuint slack)
 
     sort(flist.begin(), flist.end());
     for (vector<ymuint16>::iterator p = flist.begin(); p != flist.end(); ++ p) {
+#if 0
       hash_map<ymuint16, vector<NpnHandle> >::iterator q = pat_list.find(*p);
       assert_cond( q != pat_list.end(), __FILE__, __LINE__);
       vector<NpnHandle>& handle_list = q->second;
+#endif
       cout << "Function: " << setw(4) << setfill('0') << hex << *p << dec << endl;
+#if 0
       mMgr.dump_handle(cout, handle_list);
       cout << endl;
+#endif
     }
     if ( true && level == 4 ) {
       exit(0);
