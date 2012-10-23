@@ -146,6 +146,7 @@ NpnNodeMgr::make_and(NpnHandle fanin0,
     return fanin1;
   }
 
+#if 1
   // func がNPN同値類の代表関数になるように正規化する．
   const Npn4Cannon& npn_cannon = npn4cannon[func];
   ymuint16 c_func = npn_cannon.mFunc;
@@ -165,6 +166,33 @@ NpnNodeMgr::make_and(NpnHandle fanin0,
   NpnHandle ohandle = new_node(false, c_func, oinv, c_fanin0, c_fanin1);
 
   return ohandle * inv_xf;
+#else
+  ymuint node0 = fanin0.node_id();
+  ymuint node1 = fanin1.node_id();
+  if ( node0 > node1 ) {
+    NpnHandle tmp = fanin0;
+    fanin0 = fanin1;
+    fanin1 = tmp;
+  }
+  else if ( node0 == node1 ) {
+    NpnXform xf0 = fanin0.npn_xform();
+    NpnXform xf1 = fanin1.npn_xform();
+    NpnXform ixf0 = inverse(xf0);
+    NpnXform ixf1 = inverse(xf1);
+    NpnXform a = xf1 * ixf0;
+    NpnXform b = xf0 * ixf1;
+    if ( a > b ) {
+      NpnHandle tmp = fanin0;
+      fanin0 = fanin1;
+      fanin1 = tmp;
+    }
+  }
+  NpnXform xf0 = fanin0.npn_xform();
+  NpnXform xf1 = fanin1.npn_xform();
+  NpnXform ixf0 = inverse(xf0);
+  NpnXform cxf1 = xf1 * ixf0;
+  NpnHandle ohandle = new_node(false,
+#endif
 }
 
 // @brief ORノードを生成する．
