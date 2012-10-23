@@ -71,8 +71,14 @@ AreaCover::operator()(const BdnMgr& sbjgraph,
   record_cuts(sbjgraph, cell_library, maprec);
 
   // maprec の情報から mapnetwork を生成する．
-  const Cell* c0_cell = cell_library.const0_func()->cell(0);
-  const Cell* c1_cell = cell_library.const1_func()->cell(0);
+  const Cell* c0_cell = NULL;
+  if ( cell_library.const0_func()->cell_num() > 0 ) {
+    c0_cell = cell_library.const0_func()->cell(0);
+  }
+  const Cell* c1_cell = NULL;
+  if ( cell_library.const1_func()->cell_num() > 0 ) {
+    c1_cell = cell_library.const1_func()->cell(0);
+  }
   maprec.gen_mapgraph(sbjgraph, c0_cell, c1_cell, mapnetwork);
 }
 
