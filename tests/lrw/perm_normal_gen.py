@@ -78,7 +78,7 @@ for perm in perm_list :
     perm_map[perm] = id
     id = id + 1
 
-debug = 0
+debug = 1
 
 for perm in perm_list :
     line = ""

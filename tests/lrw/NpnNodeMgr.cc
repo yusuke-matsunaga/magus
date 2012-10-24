@@ -77,7 +77,7 @@ NpnNodeMgr::NpnNodeMgr() :
   // 入力ノードの生成
   mInputNode = alloc_node();
   mInputNode->mId |= 1U;
-  mInputNode->mFunc = 0xaaaa;
+  mInputNode->mFunc = 0xAAAAU;
   mInputNode->mSupport = 1U;
   mInputNode->mSlink = NULL;
   assert_cond( mInputNode->id() == 1, __FILE__, __LINE__);
@@ -355,7 +355,7 @@ NpnNodeMgr::new_node(bool is_xor,
 		     NpnHandle fanin0,
 		     NpnHandle fanin1)
 {
-  bool debug = true;
+  bool debug = false;
 
 #if 0
   NpnHandle orig_fanin0 = fanin0;
@@ -893,26 +893,93 @@ NpnNodeMgr::new_node(bool is_xor,
     assert_cond( func == tmp_func, __FILE__, __LINE__);
   }
 #else
-  {
-    cout << "new_node" << endl;
+  if ( debug ) {
+    cout << endl;
+    cout << "new_node(";
+    if ( is_xor ) {
+      cout << "XOR";
+    }
+    else {
+      cout << "AND";
+    }
+    cout << ")" << endl;
     vector<NpnHandle> handle_list;
     handle_list.push_back(fanin0);
     handle_list.push_back(fanin1);
     dump_handle(cout, handle_list);
     cout << endl;
+    cout << "func0 = ";
+    print_func(cout, this->func(fanin0));
+    cout << endl;
+    cout << "func1 = ";
+    print_func(cout, this->func(fanin1));
+    cout << endl;
+    if ( is_xor ) {
+      cout << "func0 ^ fnc1 = ";
+      print_func(cout, this->func(fanin0) ^ this->func(fanin1));
+      cout << endl;
+    }
+    else {
+      cout << "func0 & fnc1 = ";
+      print_func(cout, this->func(fanin0) & this->func(fanin1));
+      cout << endl;
+    }
   }
   // 準正規形にする．
   const Npn4Cannon& npn_normal = npn4norm[c_func];
-  ymuint func = npn_normal.mFunc;
+  ymuint nfunc = npn_normal.mFunc;
   NpnXform xf(npn_normal.mPerm);
   fanin0 = xform_handle(fanin0, xf);
   fanin1 = xform_handle(fanin1, xf);
-  cout << "original func   = " << setw(4) << setfill('0') << hex << c_func << dec << endl
-       << "xform           = " << xf << endl
-       << "normalized func = " << setw(4) << setfill('0') << hex << func << dec << endl
-       << "fanin0          = " << fanin0 << endl
-       << "fanin1          = " << fanin1 << endl
-       << endl;
+
+  if ( debug ) {
+    cout << endl;
+    cout << "normalize" << endl;
+    cout << "original func   = ";
+    print_func(cout, c_func);
+    cout << endl
+	 << "xform           = " << xf << endl
+	 << "normalized func = ";
+    print_func(cout, nfunc);
+    cout << endl
+	 << "fanin0          = " << fanin0 << endl
+	 << "fanin1          = " << fanin1 << endl
+	 << endl;
+  }
+
+  if ( debug ) {
+    ymuint func2 = 0U;
+    ymuint func0 = this->func(fanin0);
+    ymuint func1 = this->func(fanin1);
+    if ( is_xor ) {
+      func2 = func0 ^ func1;
+    }
+    else {
+      func2 = func0 & func1;
+    }
+    if ( c_oinv ) {
+      func2 ^= 0xFFFFU;
+    }
+    ymuint new_func2 = xform(func2, inverse(xf));
+    if ( new_func2 != c_func ) {
+      cout << "func0 = ";
+      print_func(cout, func0);
+      cout << endl;
+      cout << "func1 = ";
+      print_func(cout, func1);
+      cout << endl;
+      cout << "original func2 = ";
+      print_func(cout, func2);
+      cout << endl;
+      cout << "new func2 = ";
+      print_func(cout, new_func2);
+      cout << endl;
+      cout << "c_func = ";
+      print_func(cout, c_func);
+      cout << endl;
+    }
+    assert_cond( new_func2 == c_func, __FILE__, __LINE__);
+  }
 
   ymuint node0 = fanin0.node_id();
   ymuint node1 = fanin1.node_id();
@@ -935,7 +1002,9 @@ NpnNodeMgr::new_node(bool is_xor,
     }
   }
   NpnXform xf0 = fanin0.npn_xform();
-  NpnXform xf1 = fanin1.npn_xform();
+  if ( xf0.output_inv() ) {
+    xf0.flip_oinv();
+  }
   NpnXform ixf0 = inverse(xf0);
   fanin0 = xform_handle(fanin0, ixf0);
   fanin1 = xform_handle(fanin1, ixf0);
@@ -944,43 +1013,67 @@ NpnNodeMgr::new_node(bool is_xor,
   if ( c_oinv ) {
     oxf.flip_oinv();
   }
+
+  if ( debug ) {
+    cout << endl;
+    cout << "after normalize2" << endl;
+    cout << "fanin0 = " << fanin0 << endl
+	 << "fanin1 = " << fanin1 << endl
+	 << "oxf    = " << oxf << endl
+	 << "xf0    = " << xf0 << endl
+	 << "ixf0   = " << ixf0 << endl;
+  }
 #endif
 
   ymuint type_pat = is_xor ? 3U : 2U;
   ymuint pos = hash_func(fanin0, fanin1, is_xor);
   ymuint idx = pos % mHashSize;
-  for (NpnNode* node = mHashTable[idx]; node; node = node->mSlink) {
+  NpnNode* node = NULL;
+  for (node = mHashTable[idx]; node; node = node->mSlink) {
     if ( node->mFanin[0] == fanin0 &&
 	 node->mFanin[1] == fanin1 &&
 	 (node->mId & 3U) == type_pat ) {
-      if ( debug ) {
-	cout << "node->id() = " << node->id()
-	     << ", xf = " << oxf << endl
-	     << "=====<<new_node end>>======================================" << endl;
-      }
-      return NpnHandle(node->id(), oxf);
+      break;
     }
   }
-  NpnNode* node = alloc_node();
-  node->mId |= type_pat;
-  node->mFunc = func;
-  node->mSupport = support(func);
-  node->mFanin[0] = fanin0;
-  node->mFanin[1] = fanin1;
+  if ( node == NULL ) {
+    ymuint func0 = func(fanin0);
+    ymuint func1 = func(fanin1);
+    ymuint node_func = (is_xor) ? func0 ^ func1 : func0 & func1;
+    node = alloc_node();
+    node->mId |= type_pat;
+    node->mFunc = node_func;
+    node->mSupport = support(node_func);
+    node->mFanin[0] = fanin0;
+    node->mFanin[1] = fanin1;
 
-  // ハッシュ表に登録する．
-  if ( mAndList.size() >= mNextLimit ) {
-    alloc_table(mHashSize * 2);
-    // サイズが変わったのでインデックスを再計算する．
-    idx = pos % mHashSize;
+    // ハッシュ表に登録する．
+    if ( mAndList.size() >= mNextLimit ) {
+      alloc_table(mHashSize * 2);
+      // サイズが変わったのでインデックスを再計算する．
+      idx = pos % mHashSize;
+    }
+    node->mSlink = mHashTable[idx];
+    mHashTable[idx] = node;
+    mAndList.push_back(node);
   }
-  node->mSlink = mHashTable[idx];
-  mHashTable[idx] = node;
-  mAndList.push_back(node);
+
+  if ( debug ) {
+    NpnHandle handle(node->id(), oxf);
+    ymuint func1 = this->func(handle);
+    cout << "func1 = ";
+    print_func(cout, func1);
+    cout << endl;
+    cout << "c_func = ";
+    print_func(cout, c_func);
+    cout << endl;
+    assert_cond( c_func == func1, __FILE__, __LINE__);
+  }
 
   if ( debug ) {
     cout << "node->id() = " << node->id()
-	 << ", xf = " << oxf << endl;
+	 << ", xf = " << oxf << endl
+	 << "support = " << static_cast<ymuint>(node->mSupport) << endl;
     dump_handle(cout, NpnHandle(node->id(), oxf));
     cout << "=====<<new_node end>>======================================" << endl;
   }
@@ -1053,7 +1146,7 @@ NpnNodeMgr::xform_handle(NpnHandle handle,
 			 NpnXform xf) const
 {
   ymuint id = handle.node_id();
-  NpnXform new_xf;
+  NpnXform new_xf = handle.npn_xform();
   new_xf *= xf;
   NpnNode* node = this->node(id);
   ymuint sup = node->support();

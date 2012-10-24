@@ -129,13 +129,18 @@ NpnXform::normalize(ymuint sup)
 
   ymuint polsmask = 0U;
   switch ( sup ) {
-  case 0: polsmask = 0x0U; break;
-  case 1: polsmask = 0x1U; break;
-  case 2: polsmask = 0x3U; break;
-  case 3: polsmask = 0x7U; break;
-  case 4: polsmask = 0xFU; break;
+  case 0: polsmask = 0x01U; break;
+  case 1: polsmask = 0x03U; break;
+  case 2: polsmask = 0x07U; break;
+  case 3: polsmask = 0x0FU; break;
+  case 4: polsmask = 0x1FU; break;
   }
   ymuint pols = get_pols() & polsmask;
+  if ( sup == 1 ) {
+    if ( pols == 0x3U ) {
+      pols = 0x00U;
+    }
+  }
   mData = (perm << 5) | pols;
   return *this;
 }
