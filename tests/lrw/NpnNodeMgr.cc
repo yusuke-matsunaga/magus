@@ -36,6 +36,11 @@ ymuint16 npn4perm[] = {
 #include "npn4perm.h"
 };
 
+// 4入力の準正規形関数への変換を表す配列
+Npn4Cannon npn4norm[] = {
+#include "npn4norm.h"
+};
+
 void
 print_func(ostream& s,
 	   ymuint16 func)
@@ -167,32 +172,7 @@ NpnNodeMgr::make_and(NpnHandle fanin0,
 
   return ohandle * inv_xf;
 #else
-  ymuint node0 = fanin0.node_id();
-  ymuint node1 = fanin1.node_id();
-  if ( node0 > node1 ) {
-    NpnHandle tmp = fanin0;
-    fanin0 = fanin1;
-    fanin1 = tmp;
-  }
-  else if ( node0 == node1 ) {
-    NpnXform xf0 = fanin0.npn_xform();
-    NpnXform xf1 = fanin1.npn_xform();
-    NpnXform ixf0 = inverse(xf0);
-    NpnXform ixf1 = inverse(xf1);
-    NpnXform a = xf1 * ixf0;
-    NpnXform b = xf0 * ixf1;
-    if ( a > b ) {
-      NpnHandle tmp = fanin0;
-      fanin0 = fanin1;
-      fanin1 = tmp;
-    }
-  }
-  NpnXform xf0 = fanin0.npn_xform();
-  NpnXform xf1 = fanin1.npn_xform();
-  NpnXform ixf0 = inverse(xf0);
-  NpnXform cxf1 = xf1 * ixf0;
-  NpnHandle ohandle = new_node(false, func, false, fanin0, fanin1);
-  return ohandle * ixf0;
+  return new_node(false, func, false, fanin0, fanin1);
 #endif
 }
 
@@ -267,32 +247,7 @@ NpnNodeMgr::make_xor(NpnHandle fanin0,
     fanin1 = ~fanin1;
   }
 
-  ymuint node0 = fanin0.node_id();
-  ymuint node1 = fanin1.node_id();
-  if ( node0 > node1 ) {
-    NpnHandle tmp = fanin0;
-    fanin0 = fanin1;
-    fanin1 = tmp;
-  }
-  else if ( node0 == node1 ) {
-    NpnXform xf0 = fanin0.npn_xform();
-    NpnXform xf1 = fanin1.npn_xform();
-    NpnXform ixf0 = inverse(xf0);
-    NpnXform ixf1 = inverse(xf1);
-    NpnXform a = xf1 * ixf0;
-    NpnXform b = xf0 * ixf1;
-    if ( a > b ) {
-      NpnHandle tmp = fanin0;
-      fanin0 = fanin1;
-      fanin1 = tmp;
-    }
-  }
-  NpnXform xf0 = fanin0.npn_xform();
-  NpnXform xf1 = fanin1.npn_xform();
-  NpnXform ixf0 = inverse(xf0);
-  NpnXform cxf1 = xf1 * ixf0;
-  NpnHandle ohandle = new_node(true, func, oinv, fanin0, fanin1);
-  return ohandle * ixf0;
+  return new_node(true, func, oinv, fanin0, fanin1);
 #endif
 }
 
@@ -381,8 +336,8 @@ END_NONAMESPACE
 // @note おなじノードが既に存在していたらそのノードを返す．
 NpnHandle
 NpnNodeMgr::new_node(bool is_xor,
-		     ymuint16 func,
-		     bool oinv,
+		     ymuint16 c_func,
+		     bool c_oinv,
 		     NpnHandle fanin0,
 		     NpnHandle fanin1)
 {
@@ -924,8 +879,55 @@ NpnNodeMgr::new_node(bool is_xor,
     assert_cond( func == tmp_func, __FILE__, __LINE__);
   }
 #else
-  NpnXform oxf;
-  if ( oinv ) {
+  {
+    cout << "new_node" << endl;
+    vector<NpnHandle> handle_list;
+    handle_list.push_back(fanin0);
+    handle_list.push_back(fanin1);
+    dump_handle(cout, handle_list);
+    cout << endl;
+  }
+  // 準正規形にする．
+  const Npn4Cannon& npn_normal = npn4norm[c_func];
+  ymuint func = npn_normal.mFunc;
+  NpnXform xf(npn_normal.mPerm);
+  fanin0 = fanin0 * xf;
+  fanin1 = fanin1 * xf;
+  cout << "original func   = " << setw(4) << setfill('0') << hex << c_func << dec << endl
+       << "xform           = " << xf << endl
+       << "normalized func = " << setw(4) << setfill('0') << hex << func << dec << endl
+       << "fanin0          = " << fanin0 << endl
+       << "fanin1          = " << fanin1 << endl
+       << endl;
+
+  ymuint node0 = fanin0.node_id();
+  ymuint node1 = fanin1.node_id();
+  if ( node0 > node1 ) {
+    NpnHandle tmp = fanin0;
+    fanin0 = fanin1;
+    fanin1 = tmp;
+  }
+  else if ( node0 == node1 ) {
+    NpnXform xf0 = fanin0.npn_xform();
+    NpnXform xf1 = fanin1.npn_xform();
+    NpnXform ixf0 = inverse(xf0);
+    NpnXform ixf1 = inverse(xf1);
+    NpnXform a = xf1 * ixf0;
+    NpnXform b = xf0 * ixf1;
+    if ( a > b ) {
+      NpnHandle tmp = fanin0;
+      fanin0 = fanin1;
+      fanin1 = tmp;
+    }
+  }
+  NpnXform xf0 = fanin0.npn_xform();
+  NpnXform xf1 = fanin1.npn_xform();
+  NpnXform ixf0 = inverse(xf0);
+  fanin0 = fanin0 * ixf0;
+  fanin1 = fanin1 * ixf0;
+
+  NpnXform oxf = xf0 * inverse(xf);
+  if ( c_oinv ) {
     oxf.flip_oinv();
   }
 #endif

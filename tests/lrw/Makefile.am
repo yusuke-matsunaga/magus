@@ -37,6 +37,7 @@ noinst_PROGRAMS = \
 	npntest \
 	npnnodemgr_test \
 	genpat \
+	normalize \
 	lrw
 
 npngen_SOURCES = \
@@ -49,6 +50,11 @@ npngen_LDADD = \
 
 cannonical_SOURCES = \
 	cannonical.cc \
+	NpnXform.h \
+	NpnXform.cc
+
+normalize_SOURCES = \
+	normalize.cc \
 	NpnXform.h \
 	NpnXform.cc
 
