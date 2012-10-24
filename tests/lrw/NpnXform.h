@@ -106,6 +106,10 @@ public:
   operator*(NpnXform left,
 	    NpnXform right);
 
+  /// @brief 合成する．
+  const NpnXform&
+  operator*=(NpnXform right);
+
   /// @brief 逆変換を求める．
   friend
   NpnXform
@@ -246,6 +250,15 @@ void
 NpnXform::flip_oinv()
 {
   mData ^= 1U;
+}
+
+// @brief 合成する．
+inline
+NpnXform
+operator*(NpnXform left,
+	  NpnXform right)
+{
+  return NpnXform(left).operator*=(right);
 }
 
 // @brief 等価比較

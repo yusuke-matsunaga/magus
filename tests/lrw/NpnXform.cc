@@ -96,17 +96,16 @@ NpnXform::xchg2()
 }
 
 // @brief 合成する．
-NpnXform
-operator*(NpnXform left,
-	  NpnXform right)
+const NpnXform&
+NpnXform::operator*=(NpnXform right)
 {
-  ymuint l_perm = (left.mData >> 5) & 31U;
+  ymuint l_perm = (mData >> 5) & 31U;
   ymuint r_perm = (right.mData >> 5) & 31U;
   ymuint c_perm = comp_table[l_perm * 24 + r_perm];
-  ymuint l_pols = left.mData & 31U;
+  ymuint l_pols = mData & 31U;
   ymuint r_pols = right.mData & 31U;
   ymuint c_pols = l_pols ^ inv_nperm_table[r_pols * 24 + l_perm];
-  return NpnXform(c_perm, c_pols);
+  mData = (c_perm << 5) | c_pols;
 }
 
 // @brief 逆変換を求める．

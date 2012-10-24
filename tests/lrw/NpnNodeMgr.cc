@@ -69,7 +69,6 @@ NpnNodeMgr::NpnNodeMgr() :
 
   // 定数ノードの生成
   mConstNode = alloc_node();
-  mConstNode->mVolume = 0U;
   mConstNode->mFunc = 0x0000U;
   mConstNode->mSupport = 0U;
   mConstNode->mSlink = NULL;
@@ -78,7 +77,6 @@ NpnNodeMgr::NpnNodeMgr() :
   // 入力ノードの生成
   mInputNode = alloc_node();
   mInputNode->mId |= 1U;
-  mInputNode->mVolume = 0U;
   mInputNode->mFunc = 0xaaaa;
   mInputNode->mSupport = 0x1U;
   mInputNode->mSlink = NULL;
@@ -341,7 +339,7 @@ NpnNodeMgr::new_node(bool is_xor,
 		     NpnHandle fanin0,
 		     NpnHandle fanin1)
 {
-  bool debug = false;
+  bool debug = true;
 
 #if 0
   NpnHandle orig_fanin0 = fanin0;
