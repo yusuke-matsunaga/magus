@@ -78,7 +78,7 @@ NpnNodeMgr::NpnNodeMgr() :
   mInputNode = alloc_node();
   mInputNode->mId |= 1U;
   mInputNode->mFunc = 0xaaaa;
-  mInputNode->mSupport = 0x1U;
+  mInputNode->mSupport = 1U;
   mInputNode->mSlink = NULL;
   assert_cond( mInputNode->id() == 1, __FILE__, __LINE__);
 }
@@ -264,37 +264,53 @@ ymuint
 support(ymuint16 func)
 {
   // 数が少ないので個別にやる．
-  ymuint ans = 0U;
+  ymuint vec = 0U;
 
   // 0 番めの変数
   ymuint16 c0_0 = func & 0x5555U;
   ymuint16 c0_1 = (func & 0xaaaaU) >> 1;
   if ( c0_0 != c0_1 ) {
-    ans |= 1U;
+    vec |= 1U;
   }
 
   // 1 番めの変数
   ymuint16 c1_0 = func & 0x3333U;
   ymuint16 c1_1 = (func & 0xccccU) >> 2;
   if ( c1_0 != c1_1 ) {
-    ans |= 2U;
+    vec |= 2U;
   }
 
   // 2 番めの変数
   ymuint16 c2_0 = func & 0x0f0fU;
   ymuint16 c2_1 = (func & 0xf0f0U) >> 4;
   if ( c2_0 != c2_1 ) {
-    ans |= 4U;
+    vec |= 4U;
   }
 
   // 3 番めの変数
   ymuint16 c3_0 = func & 0x00ffU;
   ymuint16 c3_1 = (func & 0xff00U) >> 8;
   if ( c3_0 != c3_1 ) {
-    ans |= 8;
+    vec |= 8;
   }
 
-  return ans;
+  if ( vec == 0U ) {
+    return 0;
+  }
+  if ( vec == 1U ) {
+    return 1;
+  }
+  if ( vec == 3U ) {
+    return 2;
+  }
+  if ( vec == 7U ) {
+    return 3;
+  }
+  if ( vec == 15U ) {
+    return 4;
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
 }
 
 void
@@ -599,8 +615,8 @@ NpnNodeMgr::new_node(bool is_xor,
 	oinv = true;
 	xf.flip_oinv();
       }
-      ymuint16 tmp_func0 = xform(func0, xf);
-      ymuint16 tmp_func1 = xform(func1, xf);
+      ymuint16 tmp_func0 = xform_handle(func0, xf);
+      ymuint16 tmp_func1 = xform_handle(func1, xf);
       if ( min_f0 > tmp_func0 ) {
 	min_f0 = tmp_func0;
 	xf1 = xf;
@@ -889,8 +905,8 @@ NpnNodeMgr::new_node(bool is_xor,
   const Npn4Cannon& npn_normal = npn4norm[c_func];
   ymuint func = npn_normal.mFunc;
   NpnXform xf(npn_normal.mPerm);
-  fanin0 = fanin0 * xf;
-  fanin1 = fanin1 * xf;
+  fanin0 = xform_handle(fanin0, xf);
+  fanin1 = xform_handle(fanin1, xf);
   cout << "original func   = " << setw(4) << setfill('0') << hex << c_func << dec << endl
        << "xform           = " << xf << endl
        << "normalized func = " << setw(4) << setfill('0') << hex << func << dec << endl
@@ -921,8 +937,8 @@ NpnNodeMgr::new_node(bool is_xor,
   NpnXform xf0 = fanin0.npn_xform();
   NpnXform xf1 = fanin1.npn_xform();
   NpnXform ixf0 = inverse(xf0);
-  fanin0 = fanin0 * ixf0;
-  fanin1 = fanin1 * ixf0;
+  fanin0 = xform_handle(fanin0, ixf0);
+  fanin1 = xform_handle(fanin1, ixf0);
 
   NpnXform oxf = xf0 * inverse(xf);
   if ( c_oinv ) {
@@ -1031,6 +1047,20 @@ NpnNodeMgr::make_list(ymuint id0,
   handle_list.erase(h_end, handle_list.end());
 }
 
+// @brief NpnHandle に NPN 変換を施す．
+NpnHandle
+NpnNodeMgr::xform_handle(NpnHandle handle,
+			 NpnXform xf) const
+{
+  ymuint id = handle.node_id();
+  NpnXform new_xf;
+  new_xf *= xf;
+  NpnNode* node = this->node(id);
+  ymuint sup = node->support();
+  new_xf.normalize(sup);
+  return NpnHandle(id, new_xf);
+}
+
 void
 NpnNodeMgr::mark1(NpnHandle handle,
 		  hash_set<ymuint32>& node_hash)
@@ -1088,11 +1118,11 @@ NpnNodeMgr::mark3(ymuint id0,
 
   NpnXform xf = handle.npn_xform();
   NpnNode* node = this->node(id);
-  NpnHandle handle0 = cannonical(node->fanin0() * xf);
+  NpnHandle handle0 = cannonical(xform_handle(node->fanin0(), xf));
   if ( handle0.oinv() ) {
     handle0 = ~handle0;
   }
-  NpnHandle handle1 = cannonical(node->fanin1() * xf);
+  NpnHandle handle1 = cannonical(xform_handle(node->fanin1(), xf));
   if ( handle1.oinv() ) {
     handle1 = ~handle1;
   }
@@ -1135,11 +1165,11 @@ NpnNodeMgr::check_compat(NpnXform xf0,
   for (vector<NpnHandle>::const_iterator p = eq_list.begin();
        p != eq_list.end(); ++ p) {
     NpnHandle h = *p;
-    NpnHandle h0 = cannonical(h * xf0);
+    NpnHandle h0 = cannonical(xform_handle(h, xf0));
     if ( h0.oinv() ) {
       h0 = ~h0;
     }
-    NpnHandle h1 = cannonical(h * xf1);
+    NpnHandle h1 = cannonical(xform_handle(h, xf1));
     if ( h1.oinv() ) {
       h1 = ~h1;
     }
@@ -1163,8 +1193,8 @@ NpnNodeMgr::check_compat(NpnXform xf0,
        p != neq_list.end(); ++ p) {
     NpnHandle h0 = p->first;
     NpnHandle h1 = p->second;
-    h0 = cannonical(h0 * xf0);
-    h1 = cannonical(h1 * xf1);
+    h0 = cannonical(xform_handle(h0, xf0));
+    h1 = cannonical(xform_handle(h1, xf1));
     if ( h0.oinv() ) {
       h0 = ~h0;
     }
@@ -1186,15 +1216,15 @@ NpnNodeMgr::check_compat(NpnXform xf0,
   }
   for (vector<pair<NpnHandle, NpnHandle> >::const_iterator p = symeq0_list.begin();
        p != symeq0_list.end(); ++ p) {
-    NpnHandle h0 = cannonical(p->first * xf0);
+    NpnHandle h0 = cannonical(xform_handle(p->first, xf0));
     if ( h0.oinv() ) {
       h0 = ~h0;
     }
-    NpnHandle h1 = cannonical(p->second * xf0);
+    NpnHandle h1 = cannonical(xform_handle(p->second, xf0));
     if ( h1.oinv() ) {
       h1 = ~h1;
     }
-    NpnHandle h2 = cannonical(p->first * xf1);
+    NpnHandle h2 = cannonical(xform_handle(p->first, xf1));
     if ( h2.oinv() ) {
       h2 = ~h1;
     }
@@ -1204,15 +1234,15 @@ NpnNodeMgr::check_compat(NpnXform xf0,
   }
   for (vector<pair<NpnHandle, NpnHandle> >::const_iterator p = symeq1_list.begin();
        p != symeq1_list.end(); ++ p) {
-    NpnHandle h0 = cannonical(p->first * xf1);
+    NpnHandle h0 = cannonical(xform_handle(p->first, xf1));
     if ( h0.oinv() ) {
       h0 = ~h0;
     }
-    NpnHandle h1 = cannonical(p->second * xf1);
+    NpnHandle h1 = cannonical(xform_handle(p->second, xf1));
     if ( h1.oinv() ) {
       h1 = ~h1;
     }
-    NpnHandle h2 = cannonical(p->first * xf0);
+    NpnHandle h2 = cannonical(xform_handle(p->first, xf0));
     if ( h2.oinv() ) {
       h2 = ~h1;
     }
@@ -1227,19 +1257,19 @@ NpnNodeMgr::check_compat(NpnXform xf0,
     ++ p;
     NpnHandle h2 = p->first;
     NpnHandle h3 = p->second;
-    h0 = cannonical(h0 * xf0);
+    h0 = cannonical(xform_handle(h0, xf0));
     if ( h0.oinv() ) {
       h0 = ~h0;
     }
-    h1 = cannonical(h1 * xf0);
+    h1 = cannonical(xform_handle(h1, xf0));
     if ( h1.oinv() ) {
       h1 = ~h1;
     }
-    h2 = cannonical(h2 * xf1);
+    h2 = cannonical(xform_handle(h2, xf1));
     if ( h2.oinv() ) {
       h2 = ~h2;
     }
-    h3 = cannonical(h3 * xf1);
+    h3 = cannonical(xform_handle(h3, xf1));
     if ( h3.oinv() ) {
       h3 = ~h3;
     }
@@ -1276,8 +1306,8 @@ NpnNodeMgr::cannonical(NpnHandle src)
 	cxf1.flip_oinv();
 	oinv = true;
       }
-      NpnHandle xfanin0 = fanin0 * cxf1;
-      NpnHandle xfanin1 = fanin1 * cxf1;
+      NpnHandle xfanin0 = xform_handle(fanin0, cxf1);
+      NpnHandle xfanin1 = xform_handle(fanin1, cxf1);
       if ( fanin0.oinv() == fanin1.oinv() && xfanin0 > xfanin1 ) {
 	// fanin0 と fanin1 を交換する効果を持つように cxf を細工する．
 	NpnXform xf0 = fanin0.npn_xform();
@@ -1286,7 +1316,7 @@ NpnNodeMgr::cannonical(NpnHandle src)
 	NpnXform xf1inv = inverse(xf1);
 	NpnXform cxfalt = xf0inv * xf1 * cxf1;
 	NpnXform cxfalt2 = xf1inv * xf0 * cxf1;
-	if ( fanin0 * cxfalt != xfanin1 ) {
+	if ( xform_handle(fanin0, cxfalt) != xfanin1 ) {
 	  cout << "cxf1: " << cxf1 << endl
 	       << "xf0: " << xf0 << endl
 	       << "xf1: " << xf1 << endl
@@ -1298,11 +1328,11 @@ NpnNodeMgr::cannonical(NpnHandle src)
 	       << "xfanin1: " << xfanin1 << endl
 	       << "cxfalt: " << cxfalt << endl
 	       << "cxfalt2: " << cxfalt2 << endl
-	       << "fanin0 * cxfalt: " << fanin0 * cxfalt << endl
-	       << "fanin1 * cxfalt: " << fanin1 * cxfalt << endl
+	       << "fanin0 * cxfalt: " << xform_handle(fanin0, cxfalt) << endl
+	       << "fanin1 * cxfalt: " << xform_handle(fanin1, cxfalt) << endl
 	       << "xfanin1: " << xfanin1 << endl;
 	}
-	if ( fanin1 * cxfalt != xfanin0 ) {
+	if ( xform_handle(fanin1, cxfalt) != xfanin0 ) {
 	  cout << "cxf1: " << cxf1 << endl
 	       << "xf0: " << xf0 << endl
 	       << "xf1: " << xf1 << endl
@@ -1314,12 +1344,12 @@ NpnNodeMgr::cannonical(NpnHandle src)
 	       << "xfanin1: " << xfanin1 << endl
 	       << "cxfalt: " << cxfalt << endl
 	       << "cxfalt2: " << cxfalt2 << endl
-	       << "fanin0 * cxfalt: " << fanin0 * cxfalt << endl
-	       << "fanin1 * cxfalt: " << fanin1 * cxfalt << endl
+	       << "fanin0 * cxfalt: " << xform_handle(fanin0, cxfalt) << endl
+	       << "fanin1 * cxfalt: " << xform_handle(fanin1, cxfalt) << endl
 	       << "xfanin0: " << xfanin0 << endl;
 	}
-	assert_cond( fanin0 * cxfalt == xfanin1, __FILE__, __LINE__);
-	assert_cond( fanin1 * cxfalt == xfanin0, __FILE__, __LINE__);
+	assert_cond( xform_handle(fanin0, cxfalt) == xfanin1, __FILE__, __LINE__);
+	assert_cond( xform_handle(fanin1, cxfalt) == xfanin0, __FILE__, __LINE__);
 	xf = cxfalt;
 	if ( oinv ) {
 	  xf.flip_oinv();
@@ -1417,8 +1447,8 @@ NpnNodeMgr::count_sub(NpnHandle handle,
   hash1.insert(sig);
 
   ymuint ans = 1;
-  ans += count_sub(node->fanin0() * xf0, hash1);
-  ans += count_sub(node->fanin1() * xf0, hash1);
+  ans += count_sub(xform_handle(node->fanin0(), xf0), hash1);
+  ans += count_sub(xform_handle(node->fanin1(), xf0), hash1);
   return ans;
 }
 
@@ -1553,8 +1583,8 @@ NpnNodeMgr::dh2_sub(ostream& s,
   node_hash.insert(sig);
 
   if ( node->is_logic() ) {
-    dh2_sub(s, node->fanin0() * xf0, node_hash);
-    dh2_sub(s, node->fanin1() * xf0, node_hash);
+    dh2_sub(s, xform_handle(node->fanin0(), xf0), node_hash);
+    dh2_sub(s, xform_handle(node->fanin1(), xf0), node_hash);
   }
 
   s << rep_handle << ": ";
@@ -1581,9 +1611,9 @@ NpnNodeMgr::dh2_sub(ostream& s,
       s << "XOR";
     }
     s << "( "
-      << (node->fanin0() * xf0)
+      << xform_handle(node->fanin0(), xf0)
       << " , "
-      << (node->fanin1() * xf0)
+      << xform_handle(node->fanin1(), xf0)
       << " )" << endl;
   }
 }

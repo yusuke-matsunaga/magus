@@ -68,12 +68,6 @@ public:
   NpnHandle
   operator~() const;
 
-  /// @brief NPN変換を施す．
-  /// @param[in] xf 変換
-  /// @return 結果を返す．
-  NpnHandle
-  operator*(NpnXform xf) const;
-
   /// @brief 等価比較
   friend
   bool
@@ -217,19 +211,6 @@ NpnHandle
 NpnHandle::operator~() const
 {
   return NpnHandle(mData ^ 1U);
-}
-
-// @brief NPN変換を施す．
-// @param[in] xf 変換
-// @return 結果を返す．
-inline
-NpnHandle
-NpnHandle::operator*(NpnXform xf) const
-{
-  ymuint id = node_id();
-  NpnXform xf0 = npn_xform();
-  xf0 *= xf;
-  return NpnHandle(id, xf0);
 }
 
 // @brief ハッシュ用の値を返す．

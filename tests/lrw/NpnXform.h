@@ -111,11 +111,11 @@ public:
   operator*=(NpnXform right);
 
   /// @brief 正規化する．
-  /// @param[in] supvect サポートベクタ
+  /// @param[in] sup サポート数
   /// @return 正規化後の自分自身を返す．
   /// @note サポートに含まれていない変数の変換を消去する．
   const NpnXform&
-  normalize(ymuint supvect);
+  normalize(ymuint sup);
 
   /// @brief 逆変換を求める．
   friend

@@ -36,6 +36,7 @@ Npn4Cannon npn4cannon[] = {
 #include "npn4cannon.h"
 };
 
+// 関数を16進表記で出力する関数
 void
 print_func(ostream& s,
 	   ymuint16 func)
@@ -99,6 +100,7 @@ GenPat2::operator()(ymuint slack)
 
   // レベル0のパタンを作る．
   {
+    // レベル0は入力ノードのみ
     NpnHandle ih = mMgr.make_input(0);
     add_cand(ih, 0);
   }
@@ -111,6 +113,7 @@ GenPat2::operator()(ymuint slack)
 	 << "   remain_rep = " << mRemainRep << endl;
     max_level = level;
 
+    // mNpnNodeList と mRepList のサイズを調整しておく．
     while ( mNpnNodeList.size() <= level ) {
       mNpnNodeList.push_back(vector<NpnHandle>());
     }
@@ -120,6 +123,7 @@ GenPat2::operator()(ymuint slack)
 
     ymuint n = mCandListArray[level].size();
     cout << "  " << n << " seed patterns" << endl;
+
     hash_map<ymuint16, vector<NpnHandle> > pat_list;
     vector<ymuint16> flist;
     for (ymuint i = 0; i < n; ++ i) {
@@ -128,11 +132,16 @@ GenPat2::operator()(ymuint slack)
       if ( mFuncLevel[func] + mSlack < level ) {
 	continue;
       }
-      mRepList[level].push_back(handle);
-      if ( pat_list.count(func) == 0 ) {
-	flist.push_back(func);
+
+      NpnXform xf(npn4cannon[mMgr.func(handle)].mPerm);
+      NpnHandle chandle = mMgr.xform_handle(handle, xf);
+      ymuint16 cfunc = mMgr.func(chandle);
+
+      mRepList[level].push_back(chandle);
+      if ( pat_list.count(cfunc) == 0 ) {
+	flist.push_back(cfunc);
       }
-      pat_list[func].push_back(handle);
+      pat_list[cfunc].push_back(chandle);
     }
 
     sort(flist.begin(), flist.end());
@@ -177,6 +186,7 @@ GenPat2::operator()(ymuint slack)
       mCountHash.clear();
       ymuint level_base = count1(handle1);
 
+      // handle1 とレベル l のパタンのペアから新たなパタンを作る．
       for (ymuint l = 0; l < level; ++ l) {
 	const vector<NpnHandle>& src_list2 = mNpnNodeList[l];
 	ymuint n2 = src_list2.size();
@@ -190,14 +200,15 @@ GenPat2::operator()(ymuint slack)
 	}
       }
 
+      // handle1 とレベル level のパタンのペアから新たなパタンを作る．
       const vector<NpnHandle>& src_list2 = mNpnNodeList[level];
       ymuint n2 = src_list2.size();
       for (ymuint j = 0; j < n2; ++ j) {
+	NpnHandle handle2 = src_list2[j];
 	if ( 0 ) {
 	  cout << "L#" << level << ": " << j << " / " << n2
 	       << " | " << i << " / " << n1 << endl;
 	}
-	NpnHandle handle2 = src_list2[j];
 	compose(handle1, handle2, level_base);
       }
     }
@@ -260,14 +271,13 @@ GenPat2::npn_expand(NpnHandle handle,
   for (vector<FuncXform>::const_iterator q = xf_list.begin();
        q != xf_list.end(); ++ q) {
     const FuncXform& xform = *q;
-    NpnHandle handle1 = handle * xform.mXf;
+    NpnHandle handle1 = mMgr.xform_handle(handle, xform.mXf);
     add_pat(handle1, level);
   }
 }
 
 // @brief パタンを登録する．
-// @param[in] fv 関数ベクタ
-// @param[in] aig AIG
+// @param[in] handle ハンドル
 // @param[in] level レベル
 void
 GenPat2::add_pat(NpnHandle handle,
@@ -275,6 +285,7 @@ GenPat2::add_pat(NpnHandle handle,
 {
   ymuint16 fv = mMgr.func(handle);
   if ( mFuncArray[fv].empty() ) {
+    // この関数の初めてのパタンだった．
     mFuncLevel[fv] = level;
     -- mRemainFunc;
     if ( mNpnHash.count(fv) > 0 ) {
@@ -282,11 +293,14 @@ GenPat2::add_pat(NpnHandle handle,
     }
   }
   else if ( mFuncLevel[fv] > level ) {
+    // 最小レベルを更新する．
     mFuncLevel[fv] = level;
   }
 
+  // fv のパタンとして handle を追加
   mFuncArray[fv].push_back(handle);
 
+  // レベル level のパタンとして handle を追加
   mNpnNodeList[level].push_back(handle);
 }
 
@@ -333,7 +347,7 @@ support(ymuint16 func)
 END_NONAMESPACE
 
 // @brief 2つのノードから新しいパタンを作る．
-// @note 具体的には aig1 & aig2 と ~aig & aig
+// @note 具体的には aig1 & aig2 と aig | aig と aig ^ aig
 void
 GenPat2::compose(NpnHandle handle1,
 		 NpnHandle handle2,
@@ -414,7 +428,7 @@ GenPat2::add_pair(NpnHandle handle,
 		  ymuint level)
 {
   NpnXform xf(npn4cannon[mMgr.func(handle)].mPerm);
-  NpnHandle chandle = handle * xf;
+  NpnHandle chandle = mMgr.xform_handle(handle, xf);
   ymuint id = chandle.node_id();
   if ( mNpnHandleHash.count(id) == 0 ) {
     mNpnHandleHash.insert(id);
@@ -457,8 +471,8 @@ GenPat2::count1(NpnHandle handle)
   mCountHash.insert(sig);
 
   ymuint ans = 1;
-  ans += count1(node->fanin0() * xf0);
-  ans += count1(node->fanin1() * xf0);
+  ans += count1(mMgr.xform_handle(node->fanin0(), xf0));
+  ans += count1(mMgr.xform_handle(node->fanin1(), xf0));
   return ans;
 }
 
@@ -492,8 +506,8 @@ GenPat2::count2_sub(NpnHandle handle,
   hash.insert(sig);
 
   ymuint ans = 1;
-  ans += count2_sub(node->fanin0() * xf0, hash);
-  ans += count2_sub(node->fanin1() * xf0, hash);
+  ans += count2_sub(mMgr.xform_handle(node->fanin0(), xf0), hash);
+  ans += count2_sub(mMgr.xform_handle(node->fanin1(), xf0), hash);
   return ans;
 }
 
@@ -554,6 +568,7 @@ GenPat2::init_npn4rep()
   for (ymuint i = 0; npn4rep[i] != 0xFFFF; ++ i) {
     ymuint32 fv = npn4rep[i];
 
+    // fv の NPN 同値類の重複のない変換のリストを作る．
     vector<FuncXform> tmp_list;
     hash_set<ymuint32> func_hash;
     for (ymuint p = 0; p < 768; ++ p) {

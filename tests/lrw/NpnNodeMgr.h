@@ -93,6 +93,11 @@ public:
   ymuint
   count(NpnHandle handle) const;
 
+  /// @brief NpnHandle に NPN 変換を施す．
+  NpnHandle
+  xform_handle(NpnHandle handle,
+	       NpnXform xf) const;
+
   /// @brief ハンドルとその子供の内容を出力する．
   void
   dump_handle(ostream& s,
