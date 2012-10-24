@@ -110,6 +110,13 @@ public:
   const NpnXform&
   operator*=(NpnXform right);
 
+  /// @brief 正規化する．
+  /// @param[in] supvect サポートベクタ
+  /// @return 正規化後の自分自身を返す．
+  /// @note サポートに含まれていない変数の変換を消去する．
+  const NpnXform&
+  normalize(ymuint supvect);
+
   /// @brief 逆変換を求める．
   friend
   NpnXform
@@ -126,6 +133,20 @@ public:
   bool
   operator<(NpnXform left,
 	    NpnXform right);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 順列番号を取り出す．
+  ymuint
+  get_perm() const;
+
+  /// @brief 極性ベクタを取り出す．
+  ymuint
+  get_pols() const;
 
 
 private:
@@ -319,6 +340,22 @@ operator>=(NpnXform left,
 	   NpnXform right)
 {
   return !operator<(left, right);
+}
+
+// @brief 順列番号を取り出す．
+inline
+ymuint
+NpnXform::get_perm() const
+{
+  return (mData >> 5) & 31U;
+}
+
+// @brief 極性ベクタを取り出す．
+inline
+ymuint
+NpnXform::get_pols() const
+{
+  return mData & 31U;
 }
 
 END_NAMESPACE_YM

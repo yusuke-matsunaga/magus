@@ -229,7 +229,7 @@ NpnHandle::operator*(NpnXform xf) const
   ymuint id = node_id();
   NpnXform xf0 = npn_xform();
   xf0 *= xf;
-  return NpnHandle(id, xf0 * xf);
+  return NpnHandle(id, xf0);
 }
 
 // @brief ハッシュ用の値を返す．

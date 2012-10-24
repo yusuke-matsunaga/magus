@@ -100,6 +100,7 @@ npnnodemgr_test_LDADD = \
 genpat_SOURCES = \
 	NpnXform.h \
 	NpnXform.cc \
+	NpnHandle.h \
 	NpnNode.h \
 	NpnNodeMgr.h \
 	NpnNodeMgr.cc \
@@ -110,7 +111,12 @@ genpat_SOURCES = \
 	GpMgr.h \
 	GpMgr.cc \
 	GpNode.h \
-	genpat.cc
+	genpat.cc \
+	npn4cannon.h \
+	npn4ident.h \
+	npn4norm.h \
+	npn4perm.h \
+	npn4rep.h
 
 genpat_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \

@@ -29,6 +29,11 @@ ymuint8 inv_table[24] = {
 #include "inv_table"
 };
 
+// 順列のみの正規化テーブル
+ymuint8 perm_normal_table[24 * 4] = {
+#include "perm_normal_table"
+};
+
 // 入出力の反転ビットの変換テーブル
 ymuint8 nperm_table[32 * 24] = {
 #include "nperm_table"
@@ -58,7 +63,7 @@ END_NONAMESPACE
 ymuint
 NpnXform::input_perm(ymuint pos) const
 {
-  ymuint pid = (mData >> 5) & 31U;
+  ymuint pid = get_perm();
   return perm_table[pid][pos];
 }
 
@@ -66,8 +71,8 @@ NpnXform::input_perm(ymuint pos) const
 NpnXform
 NpnXform::rep(ymuint8 sup) const
 {
-  ymuint perm = (mData >> 5) & 31U;
-  ymuint pols = mData & 31U;
+  ymuint perm = get_perm();
+  ymuint pols = get_pols();
   ymuint rep_perm = rep_perm_table[perm][sup];
   ymuint rep_pols = pols & ((sup << 1) | 1U);
 
@@ -84,8 +89,8 @@ NpnXform::rep(ymuint8 sup) const
 void
 NpnXform::xchg2()
 {
-  ymuint perm = (mData >> 5) & 31U;
-  ymuint pols = mData & 31U;
+  ymuint perm = get_perm();
+  ymuint pols = get_pols();
   ymuint xperm = xchg2_table[perm];
   ymuint pols0 = pols & 2U;
   ymuint pols1 = pols & 4U;
@@ -99,21 +104,48 @@ NpnXform::xchg2()
 const NpnXform&
 NpnXform::operator*=(NpnXform right)
 {
-  ymuint l_perm = (mData >> 5) & 31U;
-  ymuint r_perm = (right.mData >> 5) & 31U;
+  ymuint l_perm = get_perm();
+  ymuint r_perm = right.get_perm();
   ymuint c_perm = comp_table[l_perm * 24 + r_perm];
-  ymuint l_pols = mData & 31U;
-  ymuint r_pols = right.mData & 31U;
+  ymuint l_pols = get_pols();
+  ymuint r_pols = right.get_pols();
   ymuint c_pols = l_pols ^ inv_nperm_table[r_pols * 24 + l_perm];
   mData = (c_perm << 5) | c_pols;
+  return *this;
+}
+
+// @brief 正規化する．
+// @param[in] sup サポート数
+// @return 正規化後の自分自身を返す．
+// @note サポートに含まれていない変数の変換を消去する．
+const NpnXform&
+NpnXform::normalize(ymuint sup)
+{
+  ymuint supidx = sup;
+  if ( supidx == 4 ) {
+    supidx = 3;
+  }
+  ymuint perm = perm_normal_table[get_perm() * 4 + supidx];
+
+  ymuint polsmask = 0U;
+  switch ( sup ) {
+  case 0: polsmask = 0x0U; break;
+  case 1: polsmask = 0x1U; break;
+  case 2: polsmask = 0x3U; break;
+  case 3: polsmask = 0x7U; break;
+  case 4: polsmask = 0xFU; break;
+  }
+  ymuint pols = get_pols() & polsmask;
+  mData = (perm << 5) | pols;
+  return *this;
 }
 
 // @brief 逆変換を求める．
 NpnXform
 inverse(NpnXform left)
 {
-  ymuint l_perm = (left.mData >> 5) & 31U;
-  ymuint l_pols = left.mData & 31U;
+  ymuint l_perm = left.get_perm();
+  ymuint l_pols = left.get_pols();
   ymuint i_perm = inv_table[l_perm];
   ymuint i_pols = nperm_table[l_pols * 24 + l_perm];
   return NpnXform(i_perm, i_pols);
