@@ -355,7 +355,7 @@ NpnNodeMgr::new_node(bool is_xor,
 		     NpnHandle fanin0,
 		     NpnHandle fanin1)
 {
-  bool debug = true;
+  bool debug = false;
 
   if ( debug ) {
     cout << endl;
@@ -396,50 +396,6 @@ NpnNodeMgr::new_node(bool is_xor,
   NpnXform xf(npn_normal.mPerm);
   fanin0 = xform_handle(fanin0, xf);
   fanin1 = xform_handle(fanin1, xf);
-
-  // fanin0 の同位体変換のうちシグネチャが最小のものを求める．
-  if ( 1 ) {
-    ymuint16 func0 = func(fanin0);
-    const Npn4Cannon& npn_cannon = npn4cannon[func0];
-    ymuint16 c_func0 = npn_cannon.mFunc;
-    assert_cond( mIdentList.count(c_func0) > 0, __FILE__, __LINE__);
-    NpnXform cxf0 = NpnXform(npn_cannon.mPerm);
-    NpnXform inv_cxf0 = inverse(cxf0);
-    const vector<NpnXform>& ident_list0 = mIdentList[c_func0];
-    NpnHandle min_fanin0 = fanin0;
-    for (vector<NpnXform>::const_iterator p = ident_list0.begin();
-	 p != ident_list0.end(); ++ p) {
-      // ident_list0 は c_func0 のものなので cxf0 と inv_cxf0 でサンドイッチにする．
-      NpnXform xf = cxf0 * (*p) * inv_cxf0;
-      NpnHandle new_fanin0 = xform_handle(fanin0, xf);
-      if ( min_fanin0 > new_fanin0 ) {
-	min_fanin0 = new_fanin0;
-      }
-    }
-    fanin0 = min_fanin0;
-  }
-
-  // fanin1 の同位体変換のうちシグネチャが最小のものを求める．
-  if ( 1 ) {
-    ymuint16 func1 = func(fanin1);
-    const Npn4Cannon& npn_cannon = npn4cannon[func1];
-    ymuint16 c_func1 = npn_cannon.mFunc;
-    assert_cond( mIdentList.count(c_func1) > 0, __FILE__, __LINE__);
-    NpnXform cxf1 = NpnXform(npn_cannon.mPerm);
-    NpnXform inv_cxf1 = inverse(cxf1);
-    const vector<NpnXform>& ident_list1 = mIdentList[c_func1];
-    NpnHandle min_fanin1 = fanin1;
-    for (vector<NpnXform>::const_iterator p = ident_list1.begin();
-	 p != ident_list1.end(); ++ p) {
-      // ident_list1 は c_func1 のものなので cxf1 と inv_cxf1 でサンドイッチにする．
-      NpnXform xf = cxf1 * (*p) * inv_cxf1;
-      NpnHandle new_fanin1 = xform_handle(fanin1, xf);
-      if ( min_fanin1 > new_fanin1 ) {
-	min_fanin1 = new_fanin1;
-      }
-    }
-    fanin1 = min_fanin1;
-  }
 
   if ( debug ) {
     cout << endl;
@@ -500,7 +456,13 @@ NpnNodeMgr::new_node(bool is_xor,
   }
   else if ( node0 == node1 ) {
     NpnXform xf0 = fanin0.npn_xform();
+    if ( xf0.output_inv() ) {
+      xf0.flip_oinv();
+    }
     NpnXform xf1 = fanin1.npn_xform();
+    if ( xf1.output_inv() ) {
+      xf1.flip_oinv();
+    }
     NpnXform ixf0 = inverse(xf0);
     NpnXform ixf1 = inverse(xf1);
     NpnXform a = xf1 * ixf0;
@@ -519,19 +481,80 @@ NpnNodeMgr::new_node(bool is_xor,
   fanin0 = xform_handle(fanin0, ixf0);
   fanin1 = xform_handle(fanin1, ixf0);
 
+  if ( debug ) {
+    ymuint func0 = func(fanin0);
+    ymuint func1 = func(fanin1);
+    ymuint tmp_func = (is_xor) ? func0 ^ func1 : func0 & func1;
+    NpnXform tmp_xf = xf0;
+    if ( c_oinv ) {
+      tmp_xf.flip_oinv();
+    }
+    tmp_func = xform(tmp_func, tmp_xf);
+    cout << endl;
+    cout << "after normalize2" << endl;
+    cout << "fanin0 = " << fanin0 << endl
+	 << "fanin1 = " << fanin1 << endl
+	 << "xf0    = " << xf0 << endl
+	 << "ixf0   = " << ixf0 << endl;
+    cout << "tmp_func = ";
+    print_func(cout, tmp_func);
+    cout << endl;
+    if ( tmp_func != nfunc ) {
+      abort();
+    }
+  }
+
+  ymuint sup0 = support_vec(func(fanin0));
+  ymuint sup1 = support_vec(func(fanin1));
+  NpnXform xf1 = fanin1.npn_xform();
+  NpnXform xfd;
+  bool changed = false;
+  for (ymuint i = 0; i < 4; ++ i) {
+    ymuint mask = 1U << i;
+    if ( (sup0 & mask) == 0U && (sup1 & mask) != 0U ) {
+      // i は fanin1 のみに現れる変数
+      ymuint src_i = 0;
+      for ( ; src_i < 4; ++ src_i) {
+	if ( xf1.input_perm(src_i) == i ) {
+	  break;
+	}
+      }
+      // i の元の番号は src_i
+      if ( xf1.input_inv(src_i) ) {
+	xfd.flip_iinv(i);
+	changed = true;
+      }
+    }
+  }
+  if ( changed ) {
+    fanin1 = xform_handle(fanin1, xfd);
+    xf0 = inverse(xfd) * xf0;
+  }
+
   NpnXform oxf = xf0 * inverse(xf);
   if ( c_oinv ) {
     oxf.flip_oinv();
   }
 
   if ( debug ) {
-    cout << endl;
-    cout << "after normalize2" << endl;
+    ymuint func0 = func(fanin0);
+    ymuint func1 = func(fanin1);
+    ymuint tmp_func = (is_xor) ? func0 ^ func1 : func0 & func1;
+    NpnXform tmp_xf = xf0;
+    if ( c_oinv ) {
+      tmp_xf.flip_oinv();
+    }
+    tmp_func = xform(tmp_func, tmp_xf);
+    cout << "after normalize3" << endl;
     cout << "fanin0 = " << fanin0 << endl
 	 << "fanin1 = " << fanin1 << endl
-	 << "oxf    = " << oxf << endl
-	 << "xf0    = " << xf0 << endl
-	 << "ixf0   = " << ixf0 << endl;
+	 << "xf0    = " << tmp_xf << endl;
+    cout << "tmp_func = ";
+    print_func(cout, tmp_func);
+    cout << endl;
+    if ( tmp_func != nfunc ) {
+      abort();
+    }
   }
 
   // Phase3: XOR にまつわる極性の正規化

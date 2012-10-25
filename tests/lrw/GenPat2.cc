@@ -157,7 +157,7 @@ GenPat2::operator()(ymuint slack)
       cout << endl;
 #endif
     }
-    if ( true && level == 4 ) {
+    if ( false && level == 4 ) {
       exit(0);
     }
 

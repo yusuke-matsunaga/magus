@@ -310,11 +310,17 @@ normalize4(ymuint16 func,
   }
 
   bool neg[4];
+#if 0
   neg[0] = static_cast<bool>((negvec >> 0) & 1U);
   neg[1] = static_cast<bool>((negvec >> 1) & 1U);
   neg[2] = static_cast<bool>((negvec >> 2) & 1U);
   neg[3] = static_cast<bool>((negvec >> 3) & 1U);
-
+#else
+  neg[0] = false;
+  neg[1] = false;
+  neg[2] = false;
+  neg[3] = false;
+#endif
 
 
   // ベタなやり方
@@ -335,7 +341,7 @@ normalize4(ymuint16 func,
 	 xf.input_inv(3) == neg[3] ) {
       cperm = perm_data;
       ymuint16 fv1 = xform_func4(func, perm_data);
-      assert_cond( is_normal(fv1), __FILE__, __LINE__ );
+      //assert_cond( is_normal(fv1), __FILE__, __LINE__ );
       return fv1;
     }
   }
