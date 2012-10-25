@@ -79,6 +79,10 @@ public:
   // 内容を設定する関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 入力の反転属性を反転させる．
+  void
+  flip_iinv(ymuint pos);
+
   /// @brief 出力の反転属性を反転させる．
   void
   flip_oinv();
@@ -263,6 +267,14 @@ ymuint
 NpnXform::data() const
 {
   return mData;
+}
+
+// @brief 入力の反転属性を反転させる．
+inline
+void
+NpnXform::flip_iinv(ymuint pos)
+{
+  mData ^= (1U << (pos + 1));
 }
 
 // @brief 出力の反転属性を反転させる．

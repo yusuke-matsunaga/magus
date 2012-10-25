@@ -407,17 +407,29 @@ GenPat2::compose(NpnHandle handle1,
 
   if ( valid1 && (mFuncLevel[fv3] + mSlack) >= level ) {
     NpnHandle handle = mMgr.make_and(handle1, handle2);
-    add_pair(handle, level);
+    ymuint level1 = mMgr.count(handle);
+    if ( level1 == level ) {
+      assert_cond( level1 == level, __FILE__, __LINE__);
+      add_pair(handle, level);
+    }
   }
 
   if ( valid2 && (mFuncLevel[fv4] + mSlack) >= level ) {
     NpnHandle handle = mMgr.make_or(handle1, handle2);
-    add_pair(handle, level);
+    ymuint level1 = mMgr.count(handle);
+    if ( level1 == level ) {
+      assert_cond( level1 == level, __FILE__, __LINE__);
+      add_pair(handle, level);
+    }
   }
 
   if ( valid3 && (mFuncLevel[fv5] + mSlack) >= level ) {
     NpnHandle handle = mMgr.make_xor(handle1, handle2);
-    add_pair(handle, level);
+    ymuint level1 = mMgr.count(handle);
+    if ( level1 == level ) {
+      assert_cond( level1 == level, __FILE__, __LINE__);
+      add_pair(handle, level);
+    }
   }
 }
 
@@ -460,19 +472,19 @@ GenPat2::count1(NpnHandle handle)
   }
 
   NpnXform xf = handle.npn_xform();
-  NpnXform xf0 = xf.rep(node->support());
-  if ( xf0.output_inv() ) {
-    xf0.flip_oinv();
+  //NpnXform xf0 = xf.rep(node->support());
+  if ( xf.output_inv() ) {
+    xf.flip_oinv();
   }
-  ymuint sig = (node->id() << 10) | xf0.data();
+  ymuint sig = (node->id() << 10) | xf.data();
   if ( mCountHash.count(sig) > 0 ) {
     return 0;
   }
   mCountHash.insert(sig);
 
   ymuint ans = 1;
-  ans += count1(mMgr.xform_handle(node->fanin0(), xf0));
-  ans += count1(mMgr.xform_handle(node->fanin1(), xf0));
+  ans += count1(mMgr.xform_handle(node->fanin0(), xf));
+  ans += count1(mMgr.xform_handle(node->fanin1(), xf));
   return ans;
 }
 
@@ -495,19 +507,19 @@ GenPat2::count2_sub(NpnHandle handle,
   }
 
   NpnXform xf = handle.npn_xform();
-  NpnXform xf0 = xf.rep(node->support());
-  if ( xf0.output_inv() ) {
-    xf0.flip_oinv();
+  //NpnXform xf0 = xf.rep(node->support());
+  if ( xf.output_inv() ) {
+    xf.flip_oinv();
   }
-  ymuint sig = (node->id() << 10) | xf0.data();
+  ymuint sig = (node->id() << 10) | xf.data();
   if ( mCountHash.count(sig) > 0 || hash.count(sig) > 0 ) {
     return 0;
   }
   hash.insert(sig);
 
   ymuint ans = 1;
-  ans += count2_sub(mMgr.xform_handle(node->fanin0(), xf0), hash);
-  ans += count2_sub(mMgr.xform_handle(node->fanin1(), xf0), hash);
+  ans += count2_sub(mMgr.xform_handle(node->fanin0(), xf), hash);
+  ans += count2_sub(mMgr.xform_handle(node->fanin1(), xf), hash);
   return ans;
 }
 

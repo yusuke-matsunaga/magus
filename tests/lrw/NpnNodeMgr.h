@@ -89,14 +89,14 @@ public:
   ymuint16
   func(NpnHandle handle) const;
 
-  /// @brief 展開したノード数を仮想的に返す．
-  ymuint
-  count(NpnHandle handle) const;
-
   /// @brief NpnHandle に NPN 変換を施す．
   NpnHandle
   xform_handle(NpnHandle handle,
 	       NpnXform xf) const;
+
+  /// @brief 展開したノード数を仮想的に返す．
+  ymuint
+  count(NpnHandle handle) const;
 
   /// @brief ハンドルとその子供の内容を出力する．
   void
@@ -128,46 +128,6 @@ private:
   void
   make_ident_list();
 
-  /// @brief 共通なノードを求めるための下請け関数
-  void
-  mark1(NpnHandle handle,
-	hash_set<ymuint32>& node_hash);
-
-  /// @brief 共通なノードを求めるための下請け関数
-  void
-  mark2(NpnHandle handle,
-	hash_set<ymuint32>& node_hash,
-	hash_set<ymuint32>& node_hash2,
-	vector<ymuint32>& node_list);
-
-  /// @brief 共通なノードを求めるための下請け関数
-  void
-  mark3(ymuint id0,
-	NpnHandle handle,
-	hash_set<ymuint32>& handle_hash,
-	vector<NpnHandle>& handle_list,
-	vector<pair<NpnHandle, NpnHandle> >& sym_list);
-
-  void
-  make_list(ymuint id0,
-	    NpnHandle handle,
-	    vector<NpnHandle>& handle_list,
-	    vector<pair<NpnHandle, NpnHandle> >& sym_list);
-
-  /// @brief 2つのNPN変換が両立するか調べる．
-  bool
-  check_compat(NpnXform xf0,
-	       NpnXform xf1,
-	       const vector<NpnHandle>& eq_list,
-	       const vector<pair<NpnHandle, NpnHandle> >& neq_list,
-	       const vector<pair<NpnHandle, NpnHandle> >& symeq0_list,
-	       const vector<pair<NpnHandle, NpnHandle> >& symeq1_list,
-	       const vector<pair<NpnHandle, NpnHandle> >& ssymeq_list);
-
-  /// @brief 枝を正規化する．
-  NpnHandle
-  cannonical(NpnHandle src);
-
   /// @brief 新しいノードを登録する関数
   /// @param[in] is_xor XOR ノードの時 true にするフラグ
   /// @param[in] func 関数ベクタ
@@ -180,6 +140,11 @@ private:
 	   bool oinv,
 	   NpnHandle fanin0,
 	   NpnHandle fanin1);
+
+  /// @brief fanin から入力 ipos までがすべて XOR ノードの時 true を返す．
+  bool
+  check_xor(NpnHandle fanin,
+	    ymuint ipos) const;
 
   /// @brief ノードを生成する関数
   NpnNode*
