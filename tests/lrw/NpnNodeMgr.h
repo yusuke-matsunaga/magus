@@ -141,10 +141,28 @@ private:
 	   NpnHandle fanin0,
 	   NpnHandle fanin1);
 
-  /// @brief fanin から入力 ipos までがすべて XOR ノードの時 true を返す．
-  bool
-  check_xor(NpnHandle fanin,
-	    ymuint ipos) const;
+  /// @brief ファンインを正規化する．
+  void
+  normalize(NpnHandle fanin0,
+	    NpnHandle fanin1,
+	    NpnHandle& new_fanin0,
+	    NpnHandle& new_fanin1,
+	    NpnXform& oxf,
+	    bool is_xor);
+
+  /// @brief 関数を求める．
+  ymuint
+  calc_func(bool is_xor,
+	    NpnHandle fanin0,
+	    NpnHandle fanin1,
+	    NpnXform oxf);
+
+  /// @brief 関数を求める．
+  ymuint
+  calc_func(bool is_xor,
+	    NpnHandle fanin0,
+	    NpnHandle fanin1,
+	    bool oinv);
 
   /// @brief ノードを生成する関数
   NpnNode*
