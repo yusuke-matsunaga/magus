@@ -392,4 +392,11 @@ GpMgr::alloc_table(ymuint req_size)
   mNextLimit = static_cast<ymuint32>(mHashSize * 1.8);
 }
 
+// @brief 全ノード数を返す．
+ymuint
+GpMgr::node_num() const
+{
+  return mNodeList.size();
+}
+
 END_NAMESPACE_YM

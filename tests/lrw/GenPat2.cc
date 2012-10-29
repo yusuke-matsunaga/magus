@@ -9,6 +9,7 @@
 
 #include "GenPat2.h"
 #include "NpnNode.h"
+#include "ym_utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -69,6 +70,9 @@ GenPat2::~GenPat2()
 void
 GenPat2::operator()(ymuint slack)
 {
+  StopWatch timer;
+  timer.start();
+
   init_npn4rep();
 
   mNpnNodeList.clear();
@@ -252,9 +256,13 @@ GenPat2::operator()(ymuint slack)
     mMgr.dump_handle(cout, handle_list);
   }
 
+  timer.stop();
+  USTime time = timer.time();
   cout << "# # of compose = " << n_compose << endl
        << "# level over = " << level_over << endl
        << "# duplicate aig = " << duplicate_aig << endl;
+  cout << "# of nodes      = " << mMgr.node_num() << endl
+       << "CPU time        = " << time << endl;
 }
 
 // @brief NPN同値類を求める．
@@ -362,6 +370,19 @@ GenPat2::compose(NpnHandle handle1,
   ymuint32 fv5 = fv1 ^ fv2;
 
   ymuint sup0 = support(fv1) | support(fv2);
+  switch ( sup0 ) {
+  case 0x02: // 0010
+  case 0x04: // 0100
+  case 0x05: // 0101
+  case 0x06: // 0110
+  case 0x08: // 1000
+  case 0x09: // 1001
+  case 0x0A: // 1010
+  case 0x0B: // 1011
+  case 0x0C: // 1100
+  case 0x0D: // 1101
+    return;
+  }
 
   ymuint sup3 = support(fv3);
   bool valid1 = true;

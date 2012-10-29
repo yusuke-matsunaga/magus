@@ -118,6 +118,10 @@ public:
   dump_handle2(ostream& s,
 	       const vector<NpnHandle>& handle_list) const;
 
+  /// @brief 全ノード数を返す．
+  ymuint
+  node_num() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -241,6 +245,14 @@ NpnNode*
 NpnNodeMgr::node(ymuint id) const
 {
   return mNodeList[id];
+}
+
+// @brief 全ノード数を返す．
+inline
+ymuint
+NpnNodeMgr::node_num() const
+{
+  return mNodeList.size();
 }
 
 END_NAMESPACE_YM

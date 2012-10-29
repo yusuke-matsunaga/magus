@@ -24,7 +24,7 @@ class NpnHandle
   friend class NpnNode;
   friend class NpnNodeMgr;
 
-private:
+public:
 
   /// @brief コンストラクタ
   NpnHandle();

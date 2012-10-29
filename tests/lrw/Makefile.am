@@ -68,7 +68,14 @@ read_table_SOURCES = \
 	abc_data.cc \
 	RwtMgr.h \
 	RwtMgr.cc \
-	RwtNode.h
+	RwtNode.h \
+	NpnNodeMgr.h \
+	NpnNodeMgr.cc \
+	NppHandle.h \
+	NpnNode.h \
+	NpnXform.h \
+	NpnXform.cc
+
 
 read_table_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

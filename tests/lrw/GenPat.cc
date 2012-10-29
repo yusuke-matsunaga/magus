@@ -9,6 +9,7 @@
 
 #include "GenPat.h"
 #include "GpNode.h"
+#include "ym_utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -99,6 +100,9 @@ GenPat::~GenPat()
 void
 GenPat::operator()(ymuint slack)
 {
+  StopWatch timer;
+  timer.start();
+
   init_npn4rep();
 
   mGpList.clear();
@@ -272,9 +276,13 @@ GenPat::operator()(ymuint slack)
     mMgr.dump_handle(cout, handle_list);
   }
 
-  cout << "# # of compose = " << n_compose << endl
-       << "# level over = " << level_over << endl
+  timer.stop();
+  USTime time = timer.time();
+  cout << "# # of compose  = " << n_compose << endl
+       << "# level over    = " << level_over << endl
        << "# duplicate aig = " << duplicate_aig << endl;
+  cout << "# of nodes      = " << mMgr.node_num() << endl
+       << "CPU time        = " << time << endl;
 }
 
 // @brief NPN同値類を求める．

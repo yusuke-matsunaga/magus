@@ -41,6 +41,15 @@ public:
   RwtNode*
   find_node(ymuint16 func) const;
 
+  /// @brief ノード数を得る．
+  ymuint
+  node_num() const;
+
+  /// @brief ノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < node_num() )
+  RwtNode*
+  node(ymuint pos) const;
+
   /// @brief 内容をダンプする．
   void
   dump(ostream& s) const;
