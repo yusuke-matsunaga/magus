@@ -601,20 +601,21 @@ NpnNodeMgr::normalize(NpnHandle fanin0,
   ymuint ofunc = calc_func(is_xor, fanin0, fanin1, NpnXform());
 
   ymuint func0 = func(fanin0);
-  const Npn4Cannon& npn_cannon = npn4cannon[func0];
-  ymuint c_func0 = npn_cannon.mFunc;
-  NpnXform cxf(npn_cannon.mPerm);
+  const Npn4Cannon& npn_cannon0 = npn4cannon[func0];
+  ymuint c_func0 = npn_cannon0.mFunc;
+  NpnXform cxf0(npn_cannon0.mPerm);
   hash_map<ymuint16, vector<NpnXform> >::const_iterator p;
   p = mIdentList.find(c_func0);
   assert_cond( p != mIdentList.end(), __FILE__, __LINE__);
-  const vector<NpnXform>& ident_list = p->second;
+  const vector<NpnXform>& ident0_list = p->second;
+
   bool first = true;
   NpnHandle min_fanin0 = fanin0; // ダミー
   NpnHandle min_fanin1 = fanin1; // ダミー
   NpnXform min_oxf;
-  for (vector<NpnXform>::const_iterator q = ident_list.begin();
-       q != ident_list.end(); ++ q) {
-    NpnXform xf = cxf * (*q) * inverse(cxf);
+  for (vector<NpnXform>::const_iterator q = ident0_list.begin();
+       q != ident0_list.end(); ++ q) {
+    NpnXform xf = cxf0 * (*q) * inverse(cxf0);
     if ( xf.output_inv() ) {
       continue;
     }
