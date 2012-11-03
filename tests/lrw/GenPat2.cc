@@ -243,7 +243,8 @@ GenPat2::operator()(ymuint slack)
       }
       cout << "Function#" << hex << setw(4) << setfill('0')
 	   << i << dec << ": "
-	   << "Level " << mFuncLevel[i] << ": ";
+	   << "Level " << mFuncLevel[i] << ": " << endl;
+#if 0
       for (vector<NpnHandle>::iterator p = mFuncArray[i].begin();
 	   p != mFuncArray[i].end(); ++ p) {
 	NpnHandle handle = *p;
@@ -252,8 +253,11 @@ GenPat2::operator()(ymuint slack)
 	handle_list.push_back(handle);
       }
       cout << endl;
+#endif
     }
+#if 0
     mMgr.dump_handle(cout, handle_list);
+#endif
   }
 
   timer.stop();

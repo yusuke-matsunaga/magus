@@ -635,11 +635,17 @@ NpnNodeMgr::normalize(NpnHandle fanin0,
   for (vector<NpnXform>::const_iterator q = ident0_list.begin();
        q != ident0_list.end(); ++ q) {
     NpnXform xf = cxf0 * (*q) * inverse(cxf0);
-    if ( xf.output_inv() ) {
-      continue;
-    }
 
     NpnHandle tmp_fanin0 = fanin0;
+
+    if ( xf.output_inv() ) {
+      if ( !fanin0.oinv() ) {
+	continue;
+      }
+      tmp_fanin0 = ~tmp_fanin0;
+      xf.flip_oinv();
+    }
+
     NpnHandle tmp_fanin1 = xform_handle(fanin1, xf);
 
     if ( debug ) {
@@ -943,29 +949,40 @@ NpnNodeMgr::normalize(NpnHandle fanin0,
 
 	if ( debug ) {
 	  ymuint tmp_func = calc_func(is_xor, tmp_fanin0, tmp2_fanin1, tmp2_oxf);
-
-	  cout << "Phase-3:" << endl
-	       << "xf1        = " << xf1 << endl
-	       << "tmp_oxf    = " << tmp2_oxf << endl
-	       << "tmp_fanin0 = " << tmp_fanin0 << endl
-	       << "tmp_fanin1 = " << tmp2_fanin1 << endl
-	       << "tmp_func   = ";
-	  print_func(cout, tmp_func);
-	  cout << endl;
 	  if ( tmp_func != ofunc ) {
+	    cout << "Phase-3:" << endl
+		 << "xf1        = " << xf1 << endl
+		 << "tmp_oxf    = " << tmp2_oxf << endl
+		 << "tmp_fanin0 = " << tmp_fanin0 << endl
+		 << "tmp_fanin1 = " << tmp2_fanin1 << endl
+		 << "tmp_func   = ";
+	    print_func(cout, tmp_func);
+	    cout << endl;
 	    abort();
 	  }
 	}
       }
 
-      if ( first || min_fanin1 > tmp2_fanin1 ) {
+      if ( debug ) {
+	cout << "Phase-4:" << endl
+	     << "tmp_oxf    = " << tmp2_oxf << endl
+	     << "tmp_fanin0 = " << tmp_fanin0 << endl
+	     << "tmp_fanin1 = " << tmp2_fanin1 << endl
+	     << endl
+	     << "min_oxf    = " << min_oxf << endl
+	     << "min_fanin0 = " << min_fanin0 << endl
+	     << "min_fanin1 = " << min_fanin1 << endl
+	     << endl;
+      }
+
+      if ( first || min_fanin0 > tmp_fanin0 || min_fanin0 == min_fanin0 && min_fanin1 > tmp2_fanin1 ) {
+	first = false;
 	min_fanin0 = tmp_fanin0;
 	min_fanin1 = tmp2_fanin1;
 	min_oxf = tmp2_oxf;
       }
-      first = false;
-    }
 #endif
+    }
   }
 
   new_fanin0 = min_fanin0;
@@ -1195,7 +1212,7 @@ NpnNodeMgr::make_ident_list()
 
   for (ymuint i = 0; npn4rep[i] != 0xFFFF; ++ i) {
     ymuint16 func = npn4rep[i];
-    ymuint8 sup = support(func);
+    ymuint8 sup = support_vec(func);
     for (vector<NpnXform>::iterator p = perm_list.begin();
 	 p != perm_list.end(); ++ p) {
       NpnXform xf = *p;
