@@ -117,7 +117,7 @@ GenPat2::operator()(ymuint slack)
 	 << "   remain_rep = " << mRemainRep << endl;
     max_level = level;
 
-    // mNpnNodeList と mRepList のサイズを調整しておく．
+    // mNpnNodeList のサイズを調整しておく．
     while ( mNpnNodeList.size() <= level ) {
       mNpnNodeList.push_back(vector<NpnHandle>());
     }
@@ -127,56 +127,40 @@ GenPat2::operator()(ymuint slack)
 
     ymuint n = mCandListArray[level].size();
     cout << "  " << n << " seed patterns" << endl;
-
-    hash_map<ymuint16, vector<NpnHandle> > pat_list;
-    vector<ymuint16> flist;
     for (ymuint i = 0; i < n; ++ i) {
       NpnHandle handle = mCandListArray[level][i];
       ymuint16 func = mMgr.func(handle);
-      if ( mFuncLevel[func] + mSlack < level ) {
-	continue;
+      if ( mFuncLevel[func] + mSlack >= level ) {
+	mRepList[level].push_back(handle);
+	npn_expand(handle, func, level);
       }
-
-      NpnXform xf(npn4cannon[mMgr.func(handle)].mPerm);
-      NpnHandle chandle = mMgr.xform_handle(handle, xf);
-      ymuint16 cfunc = mMgr.func(chandle);
-
-      mRepList[level].push_back(chandle);
-      if ( pat_list.count(cfunc) == 0 ) {
-	flist.push_back(cfunc);
-      }
-      pat_list[cfunc].push_back(chandle);
     }
-
-    sort(flist.begin(), flist.end());
-    for (vector<ymuint16>::iterator p = flist.begin(); p != flist.end(); ++ p) {
-#if 1
-      hash_map<ymuint16, vector<NpnHandle> >::iterator q = pat_list.find(*p);
-      assert_cond( q != pat_list.end(), __FILE__, __LINE__);
-      vector<NpnHandle>& handle_list = q->second;
-#endif
-      cout << "Function: " << setw(4) << setfill('0') << hex << *p << dec << endl;
-#if 1
-      mMgr.dump_handle(cout, handle_list);
-      cout << endl;
-#endif
-    }
-    if ( false && level == 4 ) {
-      exit(0);
-    }
+    cout << "  expand " << mNpnNodeList[level].size() << " patterns" << endl;
 
     const vector<NpnHandle>& src_list1 = mRepList[level];
     ymuint n1 = src_list1.size();
-    cout << "  " << n1 << " true seed patterns" << endl;
+
+    hash_map<ymuint16, vector<NpnHandle> > pat_list;
+    vector<ymuint16> flist;
     for (ymuint i = 0; i < n1; ++ i) {
       NpnHandle handle = src_list1[i];
-      if ( 0 ) {
-	mMgr.dump_handle(cout, handle);
-	cout << endl;
+      ymuint16 func = mMgr.func(handle);
+      if ( mFuncLevel[func] + mSlack >= level ) {
+	if ( pat_list.count(func) == 0 ) {
+	  flist.push_back(func);
+	}
+	pat_list[func].push_back(handle);
       }
-      npn_expand(handle, level);
     }
-    cout << "  expand " << mNpnNodeList[level].size() << " patterns" << endl;
+    sort(flist.begin(), flist.end());
+    for (vector<ymuint16>::iterator p = flist.begin(); p != flist.end(); ++ p) {
+      hash_map<ymuint16, vector<NpnHandle> >::iterator q = pat_list.find(*p);
+      assert_cond( q != pat_list.end(), __FILE__, __LINE__);
+      vector<NpnHandle>& handle_list = q->second;
+      cout << "Function: " << setw(4) << setfill('0') << hex << *p << dec << endl;
+      mMgr.dump_handle(cout, handle_list);
+      cout << endl;
+    }
 
     if ( mRemainFunc == 0 ) {
       cout << "All functions has its patterns" << endl;
@@ -191,7 +175,7 @@ GenPat2::operator()(ymuint slack)
       ymuint level_base = count1(handle1);
 
       // handle1 とレベル l のパタンのペアから新たなパタンを作る．
-      for (ymuint l = 0; l < level; ++ l) {
+      for (ymuint l = 0; l <= level; ++ l) {
 	const vector<NpnHandle>& src_list2 = mNpnNodeList[l];
 	ymuint n2 = src_list2.size();
 	for (ymuint j = 0; j < n2; ++ j) {
@@ -202,18 +186,6 @@ GenPat2::operator()(ymuint slack)
 	  }
 	  compose(handle1, handle2, level_base);
 	}
-      }
-
-      // handle1 とレベル level のパタンのペアから新たなパタンを作る．
-      const vector<NpnHandle>& src_list2 = mNpnNodeList[level];
-      ymuint n2 = src_list2.size();
-      for (ymuint j = 0; j < n2; ++ j) {
-	NpnHandle handle2 = src_list2[j];
-	if ( 0 ) {
-	  cout << "L#" << level << ": " << j << " / " << n2
-	       << " | " << i << " / " << n1 << endl;
-	}
-	compose(handle1, handle2, level_base);
       }
     }
   }
@@ -274,10 +246,11 @@ GenPat2::operator()(ymuint slack)
 // @param[in] level レベル
 void
 GenPat2::npn_expand(NpnHandle handle,
+		    ymuint16 func,
 		    ymuint32 level)
 {
   hash_map<ymuint32, vector<FuncXform> >::const_iterator p;
-  p = mNpnHash.find(mMgr.func(handle));
+  p = mNpnHash.find(func);
   assert_cond( p != mNpnHash.end(), __FILE__, __LINE__);
   const vector<FuncXform>& xf_list = p->second;
   for (vector<FuncXform>::const_iterator q = xf_list.begin();

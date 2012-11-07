@@ -49,6 +49,7 @@ private:
   /// @param[in] level レベル
   void
   npn_expand(NpnHandle handle,
+	     ymuint16 func,
 	     ymuint32 level);
 
   /// @brief パタンを登録する．

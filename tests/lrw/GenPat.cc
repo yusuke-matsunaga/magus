@@ -155,21 +155,31 @@ GenPat::operator()(ymuint slack)
 
     ymuint n = mCandListArray[level].size();
     cout << "  " << n << " seed patterns" << endl;
-    hash_map<ymuint16, vector<GpHandle> > pat_list;
-    vector<ymuint16> flist;
     for (ymuint i = 0; i < n; ++ i) {
       GpHandle handle = mCandListArray[level][i];
       ymuint16 func = handle.func();
-      if ( mFuncLevel[func] + mSlack < level ) {
-	continue;
+      if ( mFuncLevel[func] + mSlack >= level ) {
+	mRepList[level].push_back(handle);
+	npn_expand(handle, level);
       }
-      mRepList[level].push_back(handle);
-      if ( pat_list.count(func) == 0 ) {
-	flist.push_back(func);
-      }
-      pat_list[func].push_back(handle);
     }
+    cout << "  expand " << mGpList[level].size() << " patterns" << endl;
 
+    const vector<GpHandle>& src_list1 = mRepList[level];
+    ymuint n1 = src_list1.size();
+
+    hash_map<ymuint16, vector<GpHandle> > pat_list;
+    vector<ymuint16> flist;
+    for (ymuint i = 0; i < n1; ++ i) {
+      GpHandle handle = src_list1[i];
+      ymuint16 func = handle.func();
+      if ( mFuncLevel[func] + mSlack >= level ) {
+	if ( pat_list.count(func) == 0 ) {
+	  flist.push_back(func);
+	}
+	pat_list[func].push_back(handle);
+      }
+    }
     sort(flist.begin(), flist.end());
     for (vector<ymuint16>::iterator p = flist.begin(); p != flist.end(); ++ p) {
       hash_map<ymuint16, vector<GpHandle> >::iterator q = pat_list.find(*p);
@@ -179,23 +189,6 @@ GenPat::operator()(ymuint slack)
       mMgr.dump_handle(cout, handle_list);
       cout << endl;
     }
-#if 0
-    if ( level == 4 ) {
-      exit(0);
-    }
-#endif
-    const vector<GpHandle>& src_list1 = mRepList[level];
-    ymuint n1 = src_list1.size();
-    cout << "  " << n1 << " true seed patterns" << endl;
-    for (ymuint i = 0; i < n1; ++ i) {
-      GpHandle handle = src_list1[i];
-      if ( 0 ) {
-	mMgr.dump_handle(cout, handle);
-	cout << endl;
-      }
-      npn_expand(handle, level);
-    }
-    cout << "  expand " << mGpList[level].size() << " patterns" << endl;
 
     if ( mRemainFunc == 0 ) {
       cout << "All functions has its patterns" << endl;
@@ -418,6 +411,10 @@ GenPat::add_pair(GpHandle handle,
   NpnXform xf(npn4cannon[handle.func()].mPerm);
   GpHandle chandle = xform4(handle, xf);
 
+  while ( mCandListArray.size() <= level ) {
+    mCandListArray.push_back(vector<GpHandle>());
+  }
+
   GpNode* node = chandle.node();
   if ( mGpHash.count(node->id()) == 0 ) {
     mGpHash.insert(node->id());
@@ -433,9 +430,6 @@ void
 GenPat::add_cand(GpHandle handle,
 		 ymuint level)
 {
-  while ( mCandListArray.size() <= level ) {
-    mCandListArray.push_back(vector<GpHandle>());
-  }
   mCandListArray[level].push_back(handle);
 }
 
