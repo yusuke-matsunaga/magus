@@ -30,7 +30,7 @@ ymuint8 inv_table[24] = {
 };
 
 // 順列のみの正規化テーブル
-ymuint8 perm_normal_table[24 * 4] = {
+ymuint8 perm_normal_table[24][16] = {
 #include "perm_normal_table"
 };
 
@@ -42,11 +42,6 @@ ymuint8 nperm_table[32 * 24] = {
 // 入出力の反転ビットの逆変換テーブル
 ymuint8 inv_nperm_table[32 * 24] = {
 #include "inv_nperm_table"
-};
-
-// サポートごとの代表変換テーブル
-ymuint8 rep_perm_table[24][16] = {
-#include "rep_perm_table"
 };
 
 // 0 番めと 1 番めの順番を入れ替えるテーブル
@@ -65,24 +60,6 @@ NpnXform::input_perm(ymuint pos) const
 {
   ymuint pid = get_perm();
   return perm_table[pid][pos];
-}
-
-// @brief 与えられた関数のサポートに関する同値類の代表変換を求める．
-NpnXform
-NpnXform::rep(ymuint8 sup) const
-{
-  ymuint perm = get_perm();
-  ymuint pols = get_pols();
-  ymuint rep_perm = rep_perm_table[perm][sup];
-  ymuint rep_pols = pols & ((sup << 1) | 1U);
-
-  // 特別な場合の処理
-  // 入力ノードの場合，入力の反転属性を出力に付け替える．
-  if ( sup == 1U && rep_pols & 2U ) {
-    rep_pols ^= 3U;
-  }
-
-  return NpnXform(rep_perm, rep_pols);
 }
 
 // @brief 0 番めと 1番めを取り替える．
@@ -115,30 +92,33 @@ NpnXform::operator*=(NpnXform right)
 }
 
 // @brief 正規化する．
-// @param[in] sup サポート数
+// @param[in] sup_vec サポートベクタ
 // @return 正規化後の自分自身を返す．
 // @note サポートに含まれていない変数の変換を消去する．
 const NpnXform&
-NpnXform::normalize(ymuint sup)
+NpnXform::normalize(ymuint sup_vec)
 {
-  ymuint supidx = sup;
-  if ( supidx == 4 ) {
-    supidx = 3;
-  }
-  ymuint perm = perm_normal_table[get_perm() * 4 + supidx];
+  ymuint perm = perm_normal_table[get_perm()][sup_vec];
 
-  ymuint polsmask = 0U;
-  switch ( sup ) {
-  case 0: polsmask = 0x01U; break;
-  case 1: polsmask = 0x03U; break;
-  case 2: polsmask = 0x07U; break;
-  case 3: polsmask = 0x0FU; break;
-  case 4: polsmask = 0x1FU; break;
-  }
-  ymuint pols = get_pols() & polsmask;
-  if ( sup == 1 ) {
-    if ( pols == 0x3U ) {
-      pols = 0x00U;
+  ymuint pols = get_pols() & ((sup_vec << 1) | 1U);
+  // single literal で出力が反転している場合は入力の反転にする．
+  if ( pols & 0x1U ) {
+    switch ( sup_vec ) {
+    case 0x1U:
+      pols ^= 0x3U;
+      break;
+
+    case 0x2U:
+      pols ^= 0x5U;
+      break;
+
+    case 0x4U:
+      pols ^= 0x9U;
+      break;
+
+    case 0x8U:
+      pols ^= 0x11U;
+      break;
     }
   }
   mData = (perm << 5) | pols;

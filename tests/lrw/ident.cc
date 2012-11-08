@@ -23,11 +23,6 @@ ymuint16 npn4perm[] = {
 #include "npn4perm.h"
 };
 
-// サポートごとの代表変換テーブル
-ymuint8 rep_perm_table[24][16] = {
-#include "rep_perm_table"
-};
-
 
 // 関数のサポートを求める．
 ymuint
@@ -117,6 +112,7 @@ xform_func4(ymuint16 fv,
   return ans;
 }
 
+// 同位体変換を求める．
 void
 get_ident(ymuint16 func,
 	  vector<ymuint16>& ident_list)
@@ -126,6 +122,7 @@ get_ident(ymuint16 func,
     ymuint16 perm_data = npn4perm[p];
     NpnXform xf(perm_data);
     if ( xf.rep(sup) != xf ) {
+      // 代表変換でなければスキップする．
       continue;
     }
     ymuint16 func1 = xform(func, xf);

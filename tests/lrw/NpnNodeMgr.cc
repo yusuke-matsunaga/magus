@@ -49,6 +49,21 @@ print_func(ostream& s,
   s << hex << setw(4) << setfill('0') << func << dec << endl;
 }
 
+// サポート数をサポートベクタに変換する．
+ymuint
+sup_to_vect(ymuint sup)
+{
+  switch ( sup ) {
+  case 0: return 0x0U;
+  case 1: return 0x1U;
+  case 2: return 0x3U;
+  case 3: return 0x7U;
+  case 4: return 0xFU;
+  default: assert_not_reached(__FILE__, __LINE__);
+  }
+  return 0U;
+}
+
 END_NONAMESPACE
 
 
@@ -79,6 +94,7 @@ NpnNodeMgr::NpnNodeMgr() :
   mInputNode->mFunc = 0xAAAAU;
   mInputNode->mSupport = 1U;
   mInputNode->mSlink = NULL;
+  mInputNode->mIdentList.push_back(NpnXform());
   assert_cond( mInputNode->id() == 1, __FILE__, __LINE__);
 }
 
@@ -548,6 +564,7 @@ NpnNodeMgr::new_node(bool is_xor,
     }
   }
   if ( node == NULL ) {
+    // 新しいノードを作る．
     ymuint node_func = calc_func(is_xor, fanin0, fanin1, false);
     node = alloc_node();
     node->mId |= type_pat;
@@ -565,6 +582,42 @@ NpnNodeMgr::new_node(bool is_xor,
     node->mSlink = mHashTable[idx];
     mHashTable[idx] = node;
     mAndList.push_back(node);
+
+#if 0
+    // 同位体変換リストを作る．
+    NpnNode* node1 = this->node(fanin0.node_id());
+    NpnNode* node2 = this->node(fanin1.node_id());
+    const vector<NpnXform>& ident_list1 = node1->ident_list();
+    const vector<NpnXform>& ident_list2 = node2->ident_list();
+    NpnXform xf1 = fanin0.npn_xform();
+    NpnXform xf2 = fanin1.npn_xform();
+
+    for (vector<NpnXform>::const_iterator p1 = ident_list1.begin();
+	 p1 != ident_list1.end(); ++ p1) {
+      NpnXform ixf1 = inverse(xf1) * (*p1) * xf1;
+      for (vector<NpnXform>::const_iterator p2 = ident_list2.begin();
+	   p2 != ident_list2.end(); ++ p2) {
+	NpnXform ixf2 = inverse(xf2) * (*p2) * xf2;
+	if ( check_compat(ixf1, ixf2) ) {
+	  NpnXform ixf = merge(ixf1, ixf2);
+	  node->mIdentList.push_back(ixf);
+	}
+      }
+    }
+
+    if ( node1 == node2 ) {
+      NpnXform ixf1 = inverse(xf1) * xf2;
+      NpnXform ixf2 = inverse(xf2) * xf1;
+      if ( check_compat(ixf1, ixf2) ) {
+	NpnXform ixf = merge(ixf1, ixf2);
+	ymuint n = node->mIdentList.size();
+	for (ymuint i = 0; i < n; ++ i) {
+	  NpnXform xf = node->mIdentList[i];
+	  node->mIdentList.push_back(xf * ixf);
+	}
+      }
+    }
+#endif
   }
 
   if ( debug ) {
@@ -834,7 +887,8 @@ NpnNodeMgr::xform_handle(NpnHandle handle,
   new_xf *= xf;
   NpnNode* node = this->node(id);
   ymuint sup = node->support();
-  new_xf.normalize(sup);
+  ymuint sup_vec = sup_to_vect(sup);
+  new_xf.normalize(sup_vec);
   return NpnHandle(id, new_xf);
 }
 
@@ -849,17 +903,16 @@ NpnNodeMgr::make_ident_list()
 
   for (ymuint i = 0; npn4rep[i] != 0xFFFF; ++ i) {
     ymuint16 func = npn4rep[i];
-    ymuint8 sup = support_vec(func);
+    ymuint8 sup_vec = support_vec(func);
     for (vector<NpnXform>::iterator p = perm_list.begin();
 	 p != perm_list.end(); ++ p) {
       NpnXform xf = *p;
-      NpnXform xcf = xf.rep(sup);
-      if ( xcf != xf ) {
-	continue;
-      }
-      ymuint16 func1 = xform(func, xf);
-      if ( func1 == func ) {
-	mIdentList[func].push_back(xf);
+      NpnXform xcf = xf.rep(sup_vec);
+      if ( xcf == xf ) {
+	ymuint16 func1 = xform(func, xf);
+	if ( func1 == func ) {
+	  mIdentList[func].push_back(xf);
+	}
       }
     }
   }
@@ -1023,7 +1076,7 @@ NpnNodeMgr::dh2_sub(ostream& s,
   ymuint id = handle.node_id();
   NpnNode* node = mNodeList[id];
   NpnXform xf = handle.npn_xform();
-  NpnXform xf0 = xf.rep(node->support());
+  NpnXform xf0 = xf.rep(sup_to_vect(node->support()));
   NpnHandle rep_handle(id, xf0);
   ymuint sig = rep_handle.hash();
   if ( node_hash.count(sig) > 0 ) {

@@ -73,6 +73,10 @@ public:
   NpnHandle
   fanin1() const;
 
+  /// @brief 同位体変換のリストを返す．
+  const vector<NpnXform>&
+  ident_list() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -83,13 +87,17 @@ private:
   ymuint32 mId;
 
   // サポート数
+  // 常に0番から詰めるためビットベクタではなくサポート数
   ymuint8 mSupport;
 
   // このノードが表している関数ベクタ
   ymuint16 mFunc;
 
-  // ファンイン
+  // ファンインのハンドル
   NpnHandle mFanin[2];
+
+  // 同位体変換のリスト
+  vector<NpnXform> mIdentList;
 
   // 構造ハッシュ用のリンク
   NpnNode* mSlink;
@@ -187,6 +195,14 @@ NpnHandle
 NpnNode::fanin1() const
 {
   return mFanin[1];
+}
+
+// @brief 同位体変換のリストを返す．
+inline
+const vector<NpnXform>&
+NpnNode::ident_list() const
+{
+  return mIdentList;
 }
 
 END_NAMESPACE_YM

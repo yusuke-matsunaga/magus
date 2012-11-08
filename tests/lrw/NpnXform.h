@@ -17,6 +17,14 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 /// @class NpnXform NpnXform.h "NpnXform.h"
 /// @brief NPN 変換を表すクラス(4入力限定)
+///
+/// 順列は全部で (4 x 3 x 2 x 1) = 24通りしかないので
+/// 0 - 23 までのIDに対応付ける．
+/// そのため順列同士の演算はすべて表引きで行なう．
+/// 符号化は以下の通り
+/// - 0      bit目: 出力の反転
+/// - 1 -  4 bit目: 入力の反転
+/// - 5 - 10 bit目: 順列
 //////////////////////////////////////////////////////////////////////
 class NpnXform
 {
@@ -61,8 +69,11 @@ public:
   output_inv() const;
 
   /// @brief 与えられた関数のサポートに関する同値類の代表変換を求める．
+  /// @param[in] sup_vec サポートベクタ
+  /// @return 正規化後の自分自身を返す．
+  /// @note サポートに含まれていない変数の変換を消去する．
   NpnXform
-  rep(ymuint8 sup) const;
+  rep(ymuint8 sup_vec) const;
 
   /// @brief 0 番めと 1番めを取り替える．
   void
@@ -368,6 +379,17 @@ ymuint
 NpnXform::get_pols() const
 {
   return mData & 31U;
+}
+
+// @brief 与えられた関数のサポートに関する同値類の代表変換を求める．
+// @param[in] sup_vec サポートベクタ
+// @return 正規化後の自分自身を返す．
+// @note サポートに含まれていない変数の変換を消去する．
+inline
+NpnXform
+NpnXform::rep(ymuint8 sup_vec) const
+{
+  return NpnXform(*this).normalize(sup_vec);
 }
 
 END_NAMESPACE_YM
