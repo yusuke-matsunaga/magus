@@ -128,46 +128,6 @@ inv_nperm_table_gen()
   }
 }
 
-bool
-is_equal(ymuint8* perm0,
-	 ymuint8* perm1,
-	 ymuint8 sup)
-{
-  for (ymuint i = 0; i < 4; ++ i) {
-    if ( sup & (1U << i) ) {
-      if ( perm0[i] != perm1[i] ) {
-	return false;
-      }
-    }
-  }
-  return true;
-}
-
-void
-rep_perm_table_gen()
-{
-  for (ymuint i = 0; i < 24; ++ i) {
-    ymuint8* perm0 = perm_table[i];
-    cout << "  {";
-    const char* comma = "";
-    for (ymuint sup = 0U; sup < 16U; ++ sup) {
-      for (ymuint j = 0; j < 24; ++ j) {
-	ymuint8* perm1 = perm_table[j];
-	if ( is_equal(perm0, perm1, sup) ) {
-	  cout << comma << j;
-	  comma = ", ";
-	  break;
-	}
-      }
-    }
-    cout << "}";
-    if ( i < 23 ) {
-      cout << ",";
-    }
-    cout << endl;
-  }
-}
-
 void
 xchg2_table_gen()
 {
@@ -230,9 +190,6 @@ main(int argc,
   }
   else if ( strcmp(tblname, "inv_nperm") == 0 ) {
     nsYm::inv_nperm_table_gen();
-  }
-  else if ( strcmp(tblname, "rep_perm") == 0 ) {
-    nsYm::rep_perm_table_gen();
   }
   else if ( strcmp(tblname, "xchg2") == 0 ) {
     nsYm::xchg2_table_gen();
