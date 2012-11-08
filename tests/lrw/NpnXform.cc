@@ -44,11 +44,6 @@ ymuint8 inv_nperm_table[32 * 24] = {
 #include "inv_nperm_table"
 };
 
-// 0 番めと 1 番めの順番を入れ替えるテーブル
-ymuint8 xchg2_table[24] = {
-#include "xchg2_table"
-};
-
 END_NONAMESPACE
 
 
@@ -60,21 +55,6 @@ NpnXform::input_perm(ymuint pos) const
 {
   ymuint pid = get_perm();
   return perm_table[pid][pos];
-}
-
-// @brief 0 番めと 1番めを取り替える．
-void
-NpnXform::xchg2()
-{
-  ymuint perm = get_perm();
-  ymuint pols = get_pols();
-  ymuint xperm = xchg2_table[perm];
-  ymuint pols0 = pols & 2U;
-  ymuint pols1 = pols & 4U;
-  ymuint xpols = pols & ~6U;
-  xpols |= pols0 << 1;
-  xpols |= pols1 >> 1;
-  mData = (xperm << 5) | xpols;
 }
 
 // @brief 合成する．

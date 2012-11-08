@@ -129,39 +129,6 @@ inv_nperm_table_gen()
 }
 
 void
-xchg2_table_gen()
-{
-  const char* comma = "";
-  for (ymuint i = 0; i < 24; ++ i) {
-    ymuint8* perm0 = perm_table[i];
-    ymuint i2 = i;
-    if ( perm0[0] > perm0[1] ) {
-      for (ymuint j = 0; j < 24; ++ j) {
-	ymuint8* perm1 = perm_table[j];
-	if ( perm1[0] == perm0[1] &&
-	     perm1[1] == perm0[0] &&
-	     perm1[2] == perm0[2] &&
-	     perm1[3] == perm0[3] ) {
-	  i2 = j;
-	  break;
-	}
-      }
-    }
-    if ( 0 ) {
-      cout << i << ": "
-	   << static_cast<int>(perm0[0]) << " "
-	   << static_cast<int>(perm0[1]) << " "
-	   << static_cast<int>(perm0[2]) << " "
-	   << static_cast<int>(perm0[3]) << endl;
-      cout << "  ==> " << i2 << endl;
-    }
-    cout << comma << i2;
-    comma = ", ";
-  }
-  cout << endl;
-}
-
-void
 usage(const char* progname)
 {
   cerr << "Usage: " << progname << " tblname" << endl;
@@ -190,9 +157,6 @@ main(int argc,
   }
   else if ( strcmp(tblname, "inv_nperm") == 0 ) {
     nsYm::inv_nperm_table_gen();
-  }
-  else if ( strcmp(tblname, "xchg2") == 0 ) {
-    nsYm::xchg2_table_gen();
   }
   else {
     nsYm::usage(argv[0]);
