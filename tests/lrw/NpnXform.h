@@ -121,6 +121,13 @@ public:
   const NpnXform&
   operator*=(NpnXform right);
 
+  /// @brief サポートベクタに対する変換
+  /// @note といっても ymuint なのでちょっと危険
+  friend
+  ymuint
+  operator*(ymuint sup_vec,
+	    NpnXform xform);
+
   /// @brief 正規化する．
   /// @param[in] sup サポート数
   /// @return 正規化後の自分自身を返す．
@@ -132,6 +139,15 @@ public:
   friend
   NpnXform
   inverse(NpnXform left);
+
+  /// @brief マージする．
+  friend
+  bool
+  merge(NpnXform left,
+	ymuint left_sup,
+	NpnXform right,
+	ymuint right_sup,
+	NpnXform& result);
 
   /// @brief 等価比較
   friend

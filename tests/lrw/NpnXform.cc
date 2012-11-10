@@ -116,6 +116,83 @@ inverse(NpnXform left)
   return NpnXform(i_perm, i_pols);
 }
 
+// @brief マージする．
+bool
+merge(NpnXform left,
+      ymuint left_sup,
+      NpnXform right,
+      ymuint right_sup,
+      NpnXform& result)
+{
+  if ( left.output_inv() != right.output_inv() ) {
+    return false;
+  }
+  bool oinv = left.output_inv();
+  ymuint perm[4];
+  ymuint pols = oinv ? 1U : 0U;
+  bool used[4] = { false, false, false, false };
+  for (ymuint i = 0; i < 4; ++ i) {
+    ymuint lpos = left.input_perm(i);
+    bool linv = left.input_inv(i);
+    ymuint rpos = right.input_perm(i);
+    bool rinv = right.input_inv(i);
+    ymuint mask = 1U << i;
+    if ( left_sup & mask ) {
+      if ( right_sup & mask ) {
+	if ( lpos != rpos || linv != rinv ) {
+	  return false;
+	}
+      }
+      perm[i] = lpos;
+      if ( linv ) {
+	pols |= (1U << (i + 1));
+      }
+      used[lpos] = true;
+    }
+    else if ( right_sup & mask ) {
+      perm[i] = rpos;
+      if ( rinv ) {
+	pols |= (1U << (i + 1));
+      }
+      used[rpos] = true;
+    }
+  }
+  ymuint next_used = 0;
+  ymuint sup = left_sup | right_sup;
+  for (ymuint i = 0; i < 4; ++ i) {
+    if ( (sup & (1U << i)) != 0U ) {
+      continue;
+    }
+    for (ymuint j = next_used; j < 4; ++ j) {
+      if ( used[j] == false ) {
+	perm[i] = j;
+	used[j] = true;
+	next_used = j + 1;
+	break;
+      }
+    }
+  }
+  ymuint pid = NpnXform::perm_id(perm);
+  result = NpnXform(pid, pols);
+  return true;
+}
+
+// @brief サポートベクタに対する変換
+// @note といっても ymuint なのでちょっと危険
+ymuint
+operator*(ymuint sup_vec,
+	  NpnXform xform)
+{
+  ymuint result = 0U;
+  for (ymuint i = 0; i < 4; ++ i) {
+    if ( sup_vec & (1U << i) ) {
+      ymuint tgt = xform.input_perm(i);
+      result |= (1U << tgt);
+    }
+  }
+  return result;
+}
+
 // @brief 入力の順列から順列番号を得る．
 ymuint
 NpnXform::perm_id(ymuint perm[])
@@ -128,6 +205,11 @@ NpnXform::perm_id(ymuint perm[])
       return pid;
     }
   }
+  cout << "illegal permutation: "
+       << perm[0] << ", "
+       << perm[1] << ", "
+       << perm[2] << ", "
+       << perm[3] << endl;
   assert_not_reached(__FILE__, __LINE__);
   return 0;
 }

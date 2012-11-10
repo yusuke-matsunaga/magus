@@ -41,9 +41,9 @@ public:
   ymuint16
   func() const;
 
-  /// @brief このノードが表す関数のサポート数を返す．
+  /// @brief このノードが表す関数のサポートベクタを返す．
   ymuint
-  support() const;
+  sup_vect() const;
 
   /// @brief 定数ノードの時 true を返す．
   bool
@@ -86,9 +86,8 @@ private:
   // ID番号 + ノードタイプ(下位2ビット)
   ymuint32 mId;
 
-  // サポート数
-  // 常に0番から詰めるためビットベクタではなくサポート数
-  ymuint8 mSupport;
+  // サポートベクタ
+  ymuint8 mSupVect;
 
   // このノードが表している関数ベクタ
   ymuint16 mFunc;
@@ -133,12 +132,12 @@ NpnNode::func() const
   return mFunc;
 }
 
-// @brief このノードが表す関数のサポートを返す．
+// @brief このノードが表す関数のサポートベクタを返す．
 inline
 ymuint
-NpnNode::support() const
+NpnNode::sup_vect() const
 {
-  return mSupport;
+  return mSupVect;
 }
 
 // @brief 定数ノードの時 true を返す．
