@@ -70,6 +70,7 @@ NpnNodeMgr::NpnNodeMgr() :
   mConstNode = alloc_node();
   mConstNode->mFunc = 0x0000U;
   mConstNode->mSupVect = 0U;
+  mConstNode->mXorSupVect = 0U;
   mConstNode->mSlink = NULL;
   assert_cond( mConstNode->id() == 0, __FILE__, __LINE__);
 
@@ -78,6 +79,7 @@ NpnNodeMgr::NpnNodeMgr() :
   mInputNode->mId |= 1U;
   mInputNode->mFunc = 0xAAAAU;
   mInputNode->mSupVect = 1U;
+  mInputNode->mXorSupVect = 1U;
   mInputNode->mSlink = NULL;
   mInputNode->mIdentList.push_back(NpnXform());
   assert_cond( mInputNode->id() == 1, __FILE__, __LINE__);
@@ -552,11 +554,30 @@ NpnNodeMgr::new_node(bool is_xor,
   }
   if ( node == NULL ) {
     // 新しいノードを作る．
+    NpnXform xf1 = fanin0.npn_xform();
+    NpnXform xf2 = fanin1.npn_xform();
+    NpnNode* node1 = this->node(fanin0.node_id());
+    NpnNode* node2 = this->node(fanin1.node_id());
+    ymuint sup_vec1 = node1->sup_vect() * xf1;
+    ymuint sup_vec2 = node2->sup_vect() * xf2;
+
     ymuint node_func = calc_func(is_xor, fanin0, fanin1, false);
     node = alloc_node();
     node->mId |= type_pat;
     node->mFunc = node_func;
-    node->mSupVect = support_vec(node_func);
+    node->mSupVect = sup_vec1 | sup_vec2;
+    if ( is_xor ) {
+      ymuint xsup_vec1 = node1->xorsup_vect() * xf1;
+      ymuint xsup_vec2 = node2->xorsup_vect() * xf2;
+      ymuint tmp1 = xsup_vec1 & ~sup_vec2;
+      ymuint tmp2 = xsup_vec2 & ~sup_vec1;
+      ymuint tmp3 = xsup_vec1 & xsup_vec2;
+      node->mXorSupVect = tmp1 | tmp2 | tmp3;
+    }
+    else {
+      node->mXorSupVect = 0U;
+    }
+
     node->mFanin[0] = fanin0;
     node->mFanin[1] = fanin1;
 
@@ -571,14 +592,8 @@ NpnNodeMgr::new_node(bool is_xor,
     mAndList.push_back(node);
 
     // 同位体変換リストを作る．
-    NpnNode* node1 = this->node(fanin0.node_id());
-    NpnNode* node2 = this->node(fanin1.node_id());
     const vector<NpnXform>& ident_list1 = node1->ident_list();
     const vector<NpnXform>& ident_list2 = node2->ident_list();
-    NpnXform xf1 = fanin0.npn_xform();
-    NpnXform xf2 = fanin1.npn_xform();
-    ymuint sup_vec1 = node1->sup_vect() * xf1;
-    ymuint sup_vec2 = node2->sup_vect() * xf2;
 
     if ( debug > 2 ) {
       cout << "make ident list" << endl
@@ -723,6 +738,7 @@ NpnNodeMgr::normalize(NpnHandle fanin0,
 
     NpnHandle tmp_fanin0 = fanin0;
 
+#if 0
     if ( xf.output_inv() ) {
       if ( !fanin0.oinv() ) {
 	continue;
@@ -730,6 +746,9 @@ NpnNodeMgr::normalize(NpnHandle fanin0,
       tmp_fanin0 = ~tmp_fanin0;
       xf.flip_oinv();
     }
+#else
+    assert_cond( !xf.output_inv(), __FILE__, __LINE__);
+#endif
 
     NpnHandle tmp_fanin1 = xform_handle(fanin1, xf);
 

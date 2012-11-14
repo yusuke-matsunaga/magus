@@ -45,6 +45,10 @@ public:
   ymuint
   sup_vect() const;
 
+  /// @brief このノードが表す関数の XOR サポートベクタを返す．
+  ymuint
+  xorsup_vect() const;
+
   /// @brief 定数ノードの時 true を返す．
   bool
   is_const() const;
@@ -88,6 +92,9 @@ private:
 
   // サポートベクタ
   ymuint8 mSupVect;
+
+  // XORサポートベクタ
+  ymuint8 mXorSupVect;
 
   // このノードが表している関数ベクタ
   ymuint16 mFunc;
@@ -138,6 +145,14 @@ ymuint
 NpnNode::sup_vect() const
 {
   return mSupVect;
+}
+
+// @brief このノードが表す関数の XOR サポートベクタを返す．
+inline
+ymuint
+NpnNode::xorsup_vect() const
+{
+  return mXorSupVect;
 }
 
 // @brief 定数ノードの時 true を返す．
