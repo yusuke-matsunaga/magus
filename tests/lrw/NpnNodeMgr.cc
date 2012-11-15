@@ -251,6 +251,44 @@ support_vec(ymuint16 func)
   return vec;
 }
 
+// 関数のXORサポートを求める．
+ymuint
+xorsup_vec(ymuint16 func)
+{
+  // 数が少ないので個別にやる．
+  ymuint vec = 0U;
+
+  // 0 番めの変数
+  ymuint16 c0_0 = func & 0x5555U;
+  ymuint16 c0_1 = (func & 0xaaaaU) >> 1;
+  if ( (c0_0 ^ c0_1) == 0x5555U ) {
+    vec |= 1U;
+  }
+
+  // 1 番めの変数
+  ymuint16 c1_0 = func & 0x3333U;
+  ymuint16 c1_1 = (func & 0xccccU) >> 2;
+  if ( (c1_0 ^ c1_1) == 0x3333U ) {
+    vec |= 2U;
+  }
+
+  // 2 番めの変数
+  ymuint16 c2_0 = func & 0x0f0fU;
+  ymuint16 c2_1 = (func & 0xf0f0U) >> 4;
+  if ( (c2_0 ^ c2_1) == 0x0F0FU ) {
+    vec |= 4U;
+  }
+
+  // 3 番めの変数
+  ymuint16 c3_0 = func & 0x00ffU;
+  ymuint16 c3_1 = (func & 0xff00U) >> 8;
+  if ( (c3_0 ^ c3_1) == 0x00FFU ) {
+    vec |= 8;
+  }
+
+  return vec;
+}
+
 // 関数のサポートを求める．
 ymuint
 support(ymuint16 func)
@@ -576,6 +614,20 @@ NpnNodeMgr::new_node(bool is_xor,
     }
     else {
       node->mXorSupVect = 0U;
+    }
+    {
+      ymuint xsup_vec1 = node1->xorsup_vect() * xf1;
+      ymuint xsup_vec2 = node2->xorsup_vect() * xf2;
+      ymuint16 xorsup = xorsup_vec(node_func);
+      if ( node->mXorSupVect != xorsup ) {
+	cout << "sup_vec1          = " << hex << sup_vec1 << dec << endl
+	     << "sup_vec2          = " << hex << sup_vec2 << dec << endl
+	     << "xsup_vec1         = " << hex << xsup_vec1 << dec << endl
+	     << "xsup_vec2         = " << hex << xsup_vec2 << dec << endl
+	     << "node->mXorSupVect = " << hex << static_cast<ymuint>(node->mXorSupVect) << endl
+	     << "xorsup            = " << hex << xorsup << endl;
+      }
+      assert_cond( node->mXorSupVect == xorsup, __FILE__, __LINE__);
     }
 
     node->mFanin[0] = fanin0;
