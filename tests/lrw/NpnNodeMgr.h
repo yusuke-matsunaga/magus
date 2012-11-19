@@ -148,10 +148,6 @@ private:
 	    NpnXform& oxf,
 	    bool is_xor);
 
-  /// @brief XORサポートの極性を正規化する．
-  NpnHandle
-  xorsup_normalize(NpnHandle fanin);
-
   /// @brief 関数を求める．
   ymuint
   calc_func(bool is_xor,

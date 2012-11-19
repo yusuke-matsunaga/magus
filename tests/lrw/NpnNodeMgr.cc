@@ -165,44 +165,6 @@ NpnNodeMgr::handle_func(NpnHandle handle) const
 
 BEGIN_NONAMESPACE
 
-// 関数のサポートを求める．
-ymuint
-support_vec(ymuint16 func)
-{
-  // 数が少ないので個別にやる．
-  ymuint vec = 0U;
-
-  // 0 番めの変数
-  ymuint16 c0_0 = func & 0x5555U;
-  ymuint16 c0_1 = (func & 0xaaaaU) >> 1;
-  if ( c0_0 != c0_1 ) {
-    vec |= 1U;
-  }
-
-  // 1 番めの変数
-  ymuint16 c1_0 = func & 0x3333U;
-  ymuint16 c1_1 = (func & 0xccccU) >> 2;
-  if ( c1_0 != c1_1 ) {
-    vec |= 2U;
-  }
-
-  // 2 番めの変数
-  ymuint16 c2_0 = func & 0x0f0fU;
-  ymuint16 c2_1 = (func & 0xf0f0U) >> 4;
-  if ( c2_0 != c2_1 ) {
-    vec |= 4U;
-  }
-
-  // 3 番めの変数
-  ymuint16 c3_0 = func & 0x00ffU;
-  ymuint16 c3_1 = (func & 0xff00U) >> 8;
-  if ( c3_0 != c3_1 ) {
-    vec |= 8;
-  }
-
-  return vec;
-}
-
 // 関数のXORサポートを求める．
 ymuint
 xorsup_vec(ymuint16 func)
@@ -239,110 +201,6 @@ xorsup_vec(ymuint16 func)
   }
 
   return vec;
-}
-
-// 関数のサポートを求める．
-ymuint
-support(ymuint16 func)
-{
-  ymuint vec = support_vec(func);
-
-  if ( vec == 0U ) {
-    return 0;
-  }
-  if ( vec == 1U ) {
-    return 1;
-  }
-  if ( vec == 3U ) {
-    return 2;
-  }
-  if ( vec == 7U ) {
-    return 3;
-  }
-  if ( vec == 15U ) {
-    return 4;
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  return 0;
-}
-
-// 関数のコファクターを求める．
-ymuint
-cofactor0(ymuint func,
-	  ymuint pos)
-{
-  switch ( pos ) {
-  case 0:
-    {
-      ymuint tmp = func & 0x5555U;
-      return tmp | (tmp << 1);
-    }
-
-  case 1:
-    {
-      ymuint tmp = func & 0x3333U;
-      return tmp | (tmp << 2);
-    }
-
-  case 2:
-    {
-      ymuint tmp = func & 0x0F0FU;
-      return tmp | (tmp << 4);
-    }
-
-  case 3:
-    {
-      ymuint tmp = func & 0x00FFU;
-      return tmp | (tmp << 8);
-    }
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  return 0U;
-}
-
-// 関数のコファクターを求める．
-ymuint
-cofactor1(ymuint func,
-	  ymuint pos)
-{
-  switch ( pos ) {
-  case 0:
-    {
-      ymuint tmp = func & 0xAAAAU;
-      return tmp | (tmp >> 1);
-    }
-
-  case 1:
-    {
-      ymuint tmp = func & 0xCCCCU;
-      return tmp | (tmp >> 2);
-    }
-
-  case 2:
-    {
-      ymuint tmp = func & 0xF0F0U;
-      return tmp | (tmp >> 4);
-    }
-
-  case 3:
-    {
-      ymuint tmp = func & 0xFF00U;
-      return tmp | (tmp >> 8);
-    }
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  return 0U;
-}
-
-// func が i で XOR 分解できるとき true を返す．
-inline
-bool
-check_xor_decomp(ymuint func,
-		 ymuint i)
-{
-  ymuint c0 = cofactor0(func, i);
-  ymuint c1 = cofactor1(func, i);
-  return (c0 ^ 0XFFFF) == c1;
 }
 
 // vect の中の最小要素を返す．
@@ -1009,37 +867,6 @@ NpnNodeMgr::normalize(NpnHandle fanin0,
     print_func(cout, new_func);
     cout << endl;
   }
-}
-
-// @brief XORサポートの極性を正規化する．
-NpnHandle
-NpnNodeMgr::xorsup_normalize(NpnHandle fanin)
-{
-  NpnXform xf = fanin.npn_xform();
-  ymuint id = fanin.node_id();
-  NpnNode* node = this->node(id);
-  ymuint xorsup = node->xorsup_vect();
-  bool parity = false;
-  for (ymuint i = 0; i < 4; ++ i) {
-    if ( (xorsup & (1U << i)) && xf.input_inv(i) ) {
-      parity = !parity;
-      xf.flip_iinv(i);
-    }
-  }
-  if ( parity ) {
-    xf.flip_oinv();
-  }
-  NpnHandle result(id, xf);
-#if 0
-  if ( handle_func(fanin) != handle_func(result) ) {
-    cout << "fanin  = " << fanin << endl
-	 << "result = " << result << endl
-	 << "xorsup = " << xorsup << endl
-	 << "parity = " << parity << endl;
-    abort();
-  }
-#endif
-  return result;
 }
 
 // 関数を求める．
