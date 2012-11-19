@@ -125,7 +125,7 @@ get_ident(ymuint16 func,
       // 代表変換でなければスキップする．
       continue;
     }
-    ymuint16 func1 = xform(func, xf);
+    ymuint16 func1 = xform_func(func, xf);
     if ( func1 == func ) {
       ident_list.push_back(perm_data);
     }

@@ -79,28 +79,7 @@ const NpnXform&
 NpnXform::normalize(ymuint sup_vec)
 {
   ymuint perm = perm_normal_table[get_perm()][sup_vec];
-
   ymuint pols = get_pols() & ((sup_vec << 1) | 1U);
-  // single literal で出力が反転している場合は入力の反転にする．
-  if ( pols & 0x1U ) {
-    switch ( sup_vec ) {
-    case 0x1U:
-      pols ^= 0x3U;
-      break;
-
-    case 0x2U:
-      pols ^= 0x5U;
-      break;
-
-    case 0x4U:
-      pols ^= 0x9U;
-      break;
-
-    case 0x8U:
-      pols ^= 0x11U;
-      break;
-    }
-  }
   mData = (perm << 5) | pols;
   return *this;
 }
@@ -216,8 +195,8 @@ NpnXform::perm_id(ymuint perm[])
 
 // @brief 関数ベクタを変換する．
 ymuint16
-xform(ymuint16 func,
-      NpnXform xf)
+xform_func(ymuint16 func,
+	   NpnXform xf)
 {
   ymuint16 ans = 0U;
   for (ymuint p = 0; p < 16; ++ p) {

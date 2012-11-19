@@ -106,7 +106,7 @@ GenPat2::operator()(ymuint slack)
   {
     // レベル0は入力ノードのみ
     NpnHandle ih = mMgr.make_input(0);
-    add_cand(ih, 0);
+    add_cand(ih, 0xAAAAU, 0);
   }
 
   // レベル1以上のパタンを作る．
@@ -119,32 +119,32 @@ GenPat2::operator()(ymuint slack)
 
     // mNpnNodeList のサイズを調整しておく．
     while ( mNpnNodeList.size() <= level ) {
-      mNpnNodeList.push_back(vector<NpnHandle>());
+      mNpnNodeList.push_back(vector<NpnHF>());
     }
     while ( mRepList.size() <= level ) {
-      mRepList.push_back(vector<NpnHandle>());
+      mRepList.push_back(vector<NpnHF>());
     }
 
     ymuint n = mCandListArray[level].size();
     cout << "  " << n << " seed patterns" << endl;
     for (ymuint i = 0; i < n; ++ i) {
-      NpnHandle handle = mCandListArray[level][i];
-      ymuint16 func = mMgr.func(handle);
+      NpnHandle handle = mCandListArray[level][i].mHandle;
+      ymuint16 func = mCandListArray[level][i].mFunc;
       if ( mFuncLevel[func] + mSlack >= level ) {
-	mRepList[level].push_back(handle);
+	mRepList[level].push_back(NpnHF(handle, func));
 	npn_expand(handle, func, level);
       }
     }
     cout << "  expand " << mNpnNodeList[level].size() << " patterns" << endl;
 
-    const vector<NpnHandle>& src_list1 = mRepList[level];
+    const vector<NpnHF>& src_list1 = mRepList[level];
     ymuint n1 = src_list1.size();
 
     hash_map<ymuint16, vector<NpnHandle> > pat_list;
     vector<ymuint16> flist;
     for (ymuint i = 0; i < n1; ++ i) {
-      NpnHandle handle = src_list1[i];
-      ymuint16 func = mMgr.func(handle);
+      NpnHandle handle = src_list1[i].mHandle;
+      ymuint16 func = src_list1[i].mFunc;
       if ( mFuncLevel[func] + mSlack >= level ) {
 	if ( pat_list.count(func) == 0 ) {
 	  flist.push_back(func);
@@ -169,22 +169,24 @@ GenPat2::operator()(ymuint slack)
 
     // level の代表パタンと他のパタンとの対を作る．
     for (ymuint i = 0; i < n1; ++ i) {
-      NpnHandle handle1 = src_list1[i];
+      NpnHandle handle1 = src_list1[i].mHandle;
+      ymuint16 func1 = src_list1[i].mFunc;
 
       mCountHash.clear();
       ymuint level_base = count1(handle1);
 
       // handle1 とレベル l のパタンのペアから新たなパタンを作る．
       for (ymuint l = 0; l <= level; ++ l) {
-	const vector<NpnHandle>& src_list2 = mNpnNodeList[l];
+	const vector<NpnHF>& src_list2 = mNpnNodeList[l];
 	ymuint n2 = src_list2.size();
 	for (ymuint j = 0; j < n2; ++ j) {
-	  NpnHandle handle2 = src_list2[j];
+	  NpnHandle handle2 = src_list2[j].mHandle;
+	  ymuint16 func2 = src_list2[j].mFunc;
 	  if ( 0 ) {
 	    cout << "L#" << l << ": " << j << " / " << n2
 		 << " | " << i << " / " << n1 << endl;
 	  }
-	  compose(handle1, handle2, level_base);
+	  compose(handle1, func1, handle2, func2, level_base);
 	}
       }
     }
@@ -268,7 +270,7 @@ void
 GenPat2::add_pat(NpnHandle handle,
 		 ymuint32 level)
 {
-  ymuint16 fv = mMgr.func(handle);
+  ymuint16 fv = mMgr.handle_func(handle);
   if ( mFuncArray[fv].empty() ) {
     // この関数の初めてのパタンだった．
     mFuncLevel[fv] = level;
@@ -286,7 +288,7 @@ GenPat2::add_pat(NpnHandle handle,
   mFuncArray[fv].push_back(handle);
 
   // レベル level のパタンとして handle を追加
-  mNpnNodeList[level].push_back(handle);
+  mNpnNodeList[level].push_back(NpnHF(handle, fv));
 }
 
 BEGIN_NONAMESPACE
@@ -335,13 +337,13 @@ END_NONAMESPACE
 // @note 具体的には aig1 & aig2 と aig | aig と aig ^ aig
 void
 GenPat2::compose(NpnHandle handle1,
+		 ymuint16 fv1,
 		 NpnHandle handle2,
+		 ymuint16 fv2,
 		 ymuint level_base)
 {
   ++ n_compose;
 
-  ymuint32 fv1 = mMgr.func(handle1);
-  ymuint32 fv2 = mMgr.func(handle2);
   ymuint32 fv3 = fv1 & fv2;
   ymuint32 fv4 = fv1 | fv2;
   ymuint32 fv5 = fv1 ^ fv2;
@@ -408,7 +410,7 @@ GenPat2::compose(NpnHandle handle1,
     ymuint level1 = mMgr.count(handle);
     if ( level1 == level ) {
       assert_cond( level1 == level, __FILE__, __LINE__);
-      add_pair(handle, level);
+      add_pair(handle, fv3, level);
     }
   }
 
@@ -417,7 +419,7 @@ GenPat2::compose(NpnHandle handle1,
     ymuint level1 = mMgr.count(handle);
     if ( level1 == level ) {
       assert_cond( level1 == level, __FILE__, __LINE__);
-      add_pair(handle, level);
+      add_pair(handle, fv4, level);
     }
   }
 
@@ -426,7 +428,7 @@ GenPat2::compose(NpnHandle handle1,
     ymuint level1 = mMgr.count(handle);
     if ( level1 == level ) {
       assert_cond( level1 == level, __FILE__, __LINE__);
-      add_pair(handle, level);
+      add_pair(handle, fv5, level);
     }
   }
 }
@@ -435,29 +437,75 @@ GenPat2::compose(NpnHandle handle1,
 // @note 結果は mCandListArray に追加される．
 void
 GenPat2::add_pair(NpnHandle handle,
+		  ymuint16 func,
 		  ymuint level)
 {
-  NpnXform xf(npn4cannon[mMgr.func(handle)].mPerm);
+  NpnXform xf(npn4cannon[func].mPerm);
   NpnHandle chandle = mMgr.xform_handle(handle, xf);
-  ymuint id = chandle.node_id();
-  if ( mNpnHandleHash.count(id) == 0 ) {
-    mNpnHandleHash.insert(id);
-    add_cand(chandle, level);
+  ymuint16 cfunc = npn4cannon[func].mFunc;
+#if 1
+#if 0
+  {
+    NpnNode* node = mMgr.node(chandle.node_id());
+    ymuint xorsup = node->xorsup_vect();
+    NpnXform oxf = chandle.npn_xform();
+    NpnXform min_oxf = oxf;
+    const vector<NpnXform>& ident_list = node->ident_list();
+    for (vector<NpnXform>::const_iterator p = ident_list.begin();
+	 p != ident_list.end(); ++ p) {
+      NpnXform tmp_oxf = (*p) * oxf;
+      bool parity = false;
+      for (ymuint i = 0; i < 4; ++ i) {
+	if ( tmp_oxf.input_inv(i) && (xorsup & (1U << i)) ) {
+	  tmp_oxf.flip_iinv(i);
+	  parity = !parity;
+	}
+      }
+      if ( parity ) {
+	tmp_oxf.flip_oinv();
+      }
+      if ( min_oxf > tmp_oxf ) {
+	min_oxf = tmp_oxf;
+      }
+    }
+    chandle.set(node->id(), min_oxf);
+  }
+  if ( mNpnHandleHash.count(chandle) == 0 ) {
+    mNpnHandleHash.insert(chandle);
+    add_cand(chandle, cfunc, level);
   }
   else {
     ++ duplicate_aig;
   }
+#else
+  NpnHandle hhandle(chandle.node_id(), NpnXform());
+  if ( mNpnHandleHash.count(hhandle) == 0 ) {
+    mNpnHandleHash.insert(hhandle);
+    add_cand(chandle, cfunc, level);
+  }
+#endif
+#else
+  ymuint id = chandle.node_id();
+  if ( mNpnHandleHash.count(id) == 0 ) {
+    mNpnHandleHash.insert(id);
+    add_cand(chandle, cfunc, level);
+  }
+  else {
+    ++ duplicate_aig;
+  }
+#endif
 }
 
 // @brief 候補のリストに追加する．
 void
 GenPat2::add_cand(NpnHandle handle,
+		  ymuint16 func,
 		  ymuint level)
 {
   while ( mCandListArray.size() <= level ) {
-    mCandListArray.push_back(vector<NpnHandle>());
+    mCandListArray.push_back(vector<NpnHF>());
   }
-  mCandListArray[level].push_back(handle);
+  mCandListArray[level].push_back(NpnHF(handle, func));
 }
 
 // @brief handle の子供に印をつけてノード数を数える．
@@ -470,11 +518,8 @@ GenPat2::count1(NpnHandle handle)
   }
 
   NpnXform xf = handle.npn_xform();
-  //NpnXform xf0 = xf.rep(node->support());
-  if ( xf.output_inv() ) {
-    xf.flip_oinv();
-  }
-  ymuint sig = (node->id() << 10) | xf.data();
+  handle.flip_oinv();
+  ymuint sig = handle.hash();
   if ( mCountHash.count(sig) > 0 ) {
     return 0;
   }
@@ -505,11 +550,8 @@ GenPat2::count2_sub(NpnHandle handle,
   }
 
   NpnXform xf = handle.npn_xform();
-  //NpnXform xf0 = xf.rep(node->support());
-  if ( xf.output_inv() ) {
-    xf.flip_oinv();
-  }
-  ymuint sig = (node->id() << 10) | xf.data();
+  handle.flip_oinv();
+  ymuint sig = handle.hash();
   if ( mCountHash.count(sig) > 0 || hash.count(sig) > 0 ) {
     return 0;
   }

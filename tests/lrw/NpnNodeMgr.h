@@ -87,7 +87,7 @@ public:
 
   /// @brief ハンドルの表す関数を返す．
   ymuint16
-  func(NpnHandle handle) const;
+  handle_func(NpnHandle handle) const;
 
   /// @brief NpnHandle に NPN 変換を施す．
   NpnHandle
@@ -128,19 +128,13 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief mIdentList を設定する．
-  void
-  make_ident_list();
-
   /// @brief 新しいノードを登録する関数
   /// @param[in] is_xor XOR ノードの時 true にするフラグ
-  /// @param[in] func 関数ベクタ
   /// @param[in] oinv 出力の極性
   /// @param[in] fanin0, fanin1 ファンインのハンドル
   /// @note おなじノードが既に存在していたらそのノードを返す．
   NpnHandle
   new_node(bool is_xor,
-	   ymuint16 func,
 	   bool oinv,
 	   NpnHandle fanin0,
 	   NpnHandle fanin1);
@@ -153,6 +147,10 @@ private:
 	    NpnHandle& new_fanin1,
 	    NpnXform& oxf,
 	    bool is_xor);
+
+  /// @brief XORサポートの極性を正規化する．
+  NpnHandle
+  xorsup_normalize(NpnHandle fanin);
 
   /// @brief 関数を求める．
   ymuint
@@ -228,9 +226,6 @@ private:
 
   // mHashTable を拡大する目安
   ymuint32 mNextLimit;
-
-  // 恒等変換のリスト
-  hash_map<ymuint16, vector<NpnXform> > mIdentList;
 
 };
 

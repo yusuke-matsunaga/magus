@@ -60,6 +60,10 @@ public:
   bool
   oinv() const;
 
+  /// @brief 出力を反転させる．
+  void
+  flip_oinv();
+
   /// @brief ハッシュ用の値を返す．
   ymuint
   hash() const;
@@ -205,6 +209,14 @@ NpnHandle::oinv() const
   return static_cast<bool>(mData & 1U);
 }
 
+// @brief 出力を反転させる．
+inline
+void
+NpnHandle::flip_oinv()
+{
+  mData ^= 1U;
+}
+
 // @brief 出力を反転したハンドルを返す．
 inline
 NpnHandle
@@ -288,5 +300,20 @@ operator<<(ostream& s,
 }
 
 END_NAMESPACE_YM
+
+BEGIN_NAMESPACE_HASH
+
+// NpnHandle をキーにした関数クラスの定義
+template <>
+struct hash<nsYm::NpnHandle>
+{
+  ymuint
+  operator()(nsYm::NpnHandle handle) const
+  {
+    return handle.hash();
+  }
+};
+
+END_NAMESPACE_HASH
 
 #endif // NPNHANDLE_H

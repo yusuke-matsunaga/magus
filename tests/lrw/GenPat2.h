@@ -12,10 +12,26 @@
 #include "ymtools.h"
 #include "NpnNodeMgr.h"
 #include "NpnXform.h"
+#include "NpnHandle.h"
 #include "FuncXform.h"
 
 
 BEGIN_NAMESPACE_YM
+
+struct NpnHF
+{
+  NpnHF() { }
+
+  NpnHF(NpnHandle handle,
+	ymuint16 func) :
+    mHandle(handle),
+    mFunc(func)
+  {
+  }
+
+  NpnHandle mHandle;
+  ymuint16 mFunc;
+};
 
 //////////////////////////////////////////////////////////////////////
 /// @class GenPat2 GenPat2.h "GenPat2.h"
@@ -64,18 +80,22 @@ private:
   /// @note 具体的には aig1 & aig2 と ~aig & aig
   void
   compose(NpnHandle handle1,
+	  ymuint16 func1,
 	  NpnHandle handle2,
+	  ymuint16 func2,
 	  ymuint level_base);
 
   /// @brief ノードの対を登録する．
   /// @note 結果は mCandListArray に追加される．
   void
   add_pair(NpnHandle handle,
+	   ymuint16 func,
 	   ymuint level);
 
   /// @brief 候補のリストに追加する．
   void
   add_cand(NpnHandle handle,
+	   ymuint16 func,
 	   ymuint level);
 
   /// @brief handle の子供に印をつけてノード数を数える．
@@ -123,13 +143,13 @@ private:
   ymuint32 mRemainRep;
 
   // レベルごとの NpnHandle のリスト
-  vector<vector<NpnHandle> > mNpnNodeList;
+  vector<vector<NpnHF> > mNpnNodeList;
 
   // レベルごとの代表関数の NpnHandle のリスト
-  vector<vector<NpnHandle> > mRepList;
+  vector<vector<NpnHF> > mRepList;
 
   // NpnHandle の候補のリスト
-  vector<vector<NpnHandle> > mCandListArray;
+  vector<vector<NpnHF> > mCandListArray;
 
   // 関数ごとのパタンのリストを記録する配列
   vector<vector<NpnHandle> > mFuncArray;
@@ -141,7 +161,7 @@ private:
   ymuint32 mSlack;
 
   // 登録されている NpnHandle のハッシュ
-  hash_set<ymuint32> mNpnHandleHash;
+  hash_set<NpnHandle> mNpnHandleHash;
 
   // count 用の AIG のハッシュ
   hash_set<ymuint32> mCountHash;

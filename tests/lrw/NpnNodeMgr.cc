@@ -21,24 +21,9 @@ struct Npn4Cannon
   ymuint16 mPerm;
 };
 
-// 4入力のNPN同値類の代表関数への変換を表す配列
-Npn4Cannon npn4cannon[] = {
-#include "npn4cannon.h"
-};
-
 // 4入力の準正規形関数への変換を表す配列
 Npn4Cannon npn4norm[] = {
 #include "npn4norm.h"
-};
-
-// 4入力のNPN同値類代表関数
-ymuint32 npn4rep[] = {
-#include "npn4rep.h"
-};
-
-// 4入力のNPN変換を表す配列
-ymuint16 npn4perm[] = {
-#include "npn4perm.h"
 };
 
 // 関数を表示する．
@@ -63,8 +48,6 @@ NpnNodeMgr::NpnNodeMgr() :
   mHashSize(0)
 {
   alloc_table(1024);
-
-  make_ident_list();
 
   // 定数ノードの生成
   mConstNode = alloc_node();
@@ -132,21 +115,7 @@ NpnHandle
 NpnNodeMgr::make_and(NpnHandle fanin0,
 		     NpnHandle fanin1)
 {
-  ymuint16 func0 = func(fanin0);
-  ymuint16 func1 = func(fanin1);
-  ymuint16 func = func0 & func1;
-  // トリビアルな場合の処理
-  if ( func == 0U ) {
-    return make_const0();
-  }
-  if ( func == func0 ) {
-    return fanin0;
-  }
-  if ( func == func1 ) {
-    return fanin1;
-  }
-
-  return new_node(false, func, false, fanin0, fanin1);
+  return new_node(false, false, fanin0, fanin1);
 }
 
 // @brief ORノードを生成する．
@@ -172,23 +141,6 @@ NpnHandle
 NpnNodeMgr::make_xor(NpnHandle fanin0,
 		     NpnHandle fanin1)
 {
-  ymuint16 func0 = func(fanin0);
-  ymuint16 func1 = func(fanin1);
-  ymuint16 func = func0 ^ func1;
-  // トリビアルな場合の処理
-  if ( func == 0U ) {
-    return make_const0();
-  }
-  if ( func == 0xFFFFU ) {
-    return make_const1();
-  }
-  if ( func == func0 ) {
-    return fanin0;
-  }
-  if ( func == func1 ) {
-    return fanin1;
-  }
-
   bool inv0 = fanin0.oinv();
   bool inv1 = fanin1.oinv();
   bool oinv = inv0 ^ inv1;
@@ -199,15 +151,15 @@ NpnNodeMgr::make_xor(NpnHandle fanin0,
     fanin1 = ~fanin1;
   }
 
-  return new_node(true, func, oinv, fanin0, fanin1);
+  return new_node(true, oinv, fanin0, fanin1);
 }
 
 // @brief ハンドルの表す関数を返す．
 ymuint16
-NpnNodeMgr::func(NpnHandle handle) const
+NpnNodeMgr::handle_func(NpnHandle handle) const
 {
   NpnNode* node = mNodeList[handle.node_id()];
-  return xform(node->func(), handle.npn_xform());
+  return xform_func(node->func(), handle.npn_xform());
 }
 
 
@@ -393,23 +345,35 @@ check_xor_decomp(ymuint func,
   return (c0 ^ 0XFFFF) == c1;
 }
 
+// vect の中の最小要素を返す．
+inline
+ymuint
+first_pos(ymuint vect)
+{
+  for (ymuint i = 0; i < 4; ++ i) {
+    if ( vect & (1U << i) ){
+      return i;
+    }
+  }
+  return 0xFFFFU;
+}
+
 END_NONAMESPACE
 
 
 // @brief 新しいノードを登録する関数
 // @param[in] is_xor XOR ノードの時 true にするフラグ
-// @param[in] o_func 関数ベクタ
 // @param[in] oinv 出力の極性
 // @param[in] fanin0, fanin1 ファンインのハンドル
 // @note おなじノードが既に存在していたらそのノードを返す．
 NpnHandle
 NpnNodeMgr::new_node(bool is_xor,
-		     ymuint16 o_func,
 		     bool oinv,
 		     NpnHandle fanin0,
 		     NpnHandle fanin1)
 {
-  ymint debug = 3;
+  ymint debug = 0;
+  ymuint o_func = 0;
 
   if ( debug > 0 ) {
     cout << endl;
@@ -432,14 +396,14 @@ NpnNodeMgr::new_node(bool is_xor,
 
     if ( debug > 1 ) {
       cout << "func0  = ";
-      print_func(cout, func(fanin0));
+      print_func(cout, handle_func(fanin0));
 
       cout << "func1  = ";
-      print_func(cout, func(fanin1));
+      print_func(cout, handle_func(fanin1));
 
       cout << "result = ";
-      ymuint result_func = calc_func(is_xor, fanin0, fanin1, oinv);
-      print_func(cout, result_func);
+      o_func = calc_func(is_xor, fanin0, fanin1, oinv);
+      print_func(cout, o_func);
     }
   }
 
@@ -471,10 +435,10 @@ NpnNodeMgr::new_node(bool is_xor,
     ymuint new_func2 = calc_func(is_xor, fanin0, fanin1, post_oxf);
     if ( new_func2 != o_func ) {
       cout << "func0 = ";
-      ymuint func0 = func(fanin0);
+      ymuint func0 = handle_func(fanin0);
       print_func(cout, func0);
       cout << "func1 = ";
-      ymuint func1 = func(fanin1);
+      ymuint func1 = handle_func(fanin1);
       print_func(cout, func1);
       cout << "new func2 = ";
       print_func(cout, new_func2);
@@ -616,6 +580,7 @@ NpnNodeMgr::new_node(bool is_xor,
       node->mXorSupVect = 0U;
     }
     {
+#if 0
       ymuint xsup_vec1 = node1->xorsup_vect() * xf1;
       ymuint xsup_vec2 = node2->xorsup_vect() * xf2;
       ymuint16 xorsup = xorsup_vec(node_func);
@@ -628,6 +593,7 @@ NpnNodeMgr::new_node(bool is_xor,
 	     << "xorsup            = " << hex << xorsup << endl;
       }
       assert_cond( node->mXorSupVect == xorsup, __FILE__, __LINE__);
+#endif
     }
 
     node->mFanin[0] = fanin0;
@@ -675,7 +641,7 @@ NpnNodeMgr::new_node(bool is_xor,
 	    cout << ixf << endl;
 	    // 構造に対する同位体変換だから必ず
 	    // 関数に対しても同位体変換でなければならない．
-	    ymuint tmp_func = xform(node_func, ixf);
+	    ymuint tmp_func = xform_func(node_func, ixf);
 	    assert_cond( tmp_func == node_func, __FILE__, __LINE__);
 	  }
 	}
@@ -698,7 +664,7 @@ NpnNodeMgr::new_node(bool is_xor,
 	    cout << xf << endl;
 	    // 構造に対する同位体変換だから必ず
 	    // 関数に対しても同位体変換でなければならない．
-	    ymuint tmp_func = xform(node_func, xf);
+	    ymuint tmp_func = xform_func(node_func, xf);
 	    assert_cond( tmp_func == node_func, __FILE__, __LINE__);
 	  }
 	}
@@ -711,7 +677,7 @@ NpnNodeMgr::new_node(bool is_xor,
 
   if ( debug > 0 ) {
     NpnHandle handle(node->id(), oxf);
-    ymuint func1 = func(handle);
+    ymuint func1 = handle_func(handle);
     if ( o_func != func1 ) {
       cout << "handle_func = ";
       print_func(cout, func1);
@@ -743,34 +709,22 @@ NpnNodeMgr::normalize(NpnHandle fanin0,
 		      NpnXform& oxf,
 		      bool is_xor)
 {
-  bool debug = true;
+  bool debug = false;
+  ymuint ofunc = 0;
 
   if ( debug ) {
     cout << "normalize" << endl
 	 << " fanin0 = " << fanin0 << endl
 	 << " fanin1 = " << fanin1 << endl;
-  }
+    ofunc = calc_func(is_xor, fanin0, fanin1, NpnXform());
+ }
 
-  ymuint ofunc = calc_func(is_xor, fanin0, fanin1, NpnXform());
-
-#if 0
-  // fanin0 の論理関数に対する同位体変換のリストを求める．
-  ymuint func0 = func(fanin0);
-  const Npn4Cannon& npn_cannon0 = npn4cannon[func0];
-  ymuint c_func0 = npn_cannon0.mFunc;
-  NpnXform cxf0(npn_cannon0.mPerm);
-  hash_map<ymuint16, vector<NpnXform> >::const_iterator p;
-  p = mIdentList.find(c_func0);
-  assert_cond( p != mIdentList.end(), __FILE__, __LINE__);
-  const vector<NpnXform>& ident0_list = p->second;
-#else
   // fanin0 に対する同位体変換のリストを求める．
   NpnNode* node0 = node(fanin0.node_id());
   const vector<NpnXform>& ident0_list = node0->ident_list();
   // fanin1 に対する同位体変換のリストを求める．
   NpnNode* node1 = node(fanin1.node_id());
   const vector<NpnXform>& ident1_list = node1->ident_list();
-#endif
 
   // 最終結果を保持しておく変数
   bool first = true;
@@ -781,26 +735,10 @@ NpnNodeMgr::normalize(NpnHandle fanin0,
   // 個々の同位体変換を適用する．
   for (vector<NpnXform>::const_iterator q = ident0_list.begin();
        q != ident0_list.end(); ++ q) {
-#if 0
-    NpnXform xf = cxf0 * (*q) * inverse(cxf0);
-#else
     NpnXform tmp_xf0 = fanin0.npn_xform();
     NpnXform xf = inverse(tmp_xf0) * (*q) * tmp_xf0;
-#endif
 
     NpnHandle tmp_fanin0 = fanin0;
-
-#if 0
-    if ( xf.output_inv() ) {
-      if ( !fanin0.oinv() ) {
-	continue;
-      }
-      tmp_fanin0 = ~tmp_fanin0;
-      xf.flip_oinv();
-    }
-#else
-    assert_cond( !xf.output_inv(), __FILE__, __LINE__);
-#endif
 
     NpnHandle tmp_fanin1 = xform_handle(fanin1, xf);
 
@@ -819,9 +757,9 @@ NpnNodeMgr::normalize(NpnHandle fanin0,
     }
 
     // Phase-1: fanin0 の変換が恒等変換になるように調節する．
-    //          出力の反転属性は動かせないので外しておく．
     NpnXform xf0 = tmp_fanin0.npn_xform();
     if ( xf0.output_inv() ) {
+      // 出力の反転属性は動かせないので外しておく．
       xf0.flip_oinv();
     }
     NpnXform ixf0 = inverse(xf0);
@@ -844,36 +782,35 @@ NpnNodeMgr::normalize(NpnHandle fanin0,
     }
 
     // Phase-2: tmp_fanin1 の同位体変換のうち最小のものを求める．
-    ymuint sup0 = support_vec(func(tmp_fanin0));
-#if 0
-    ymuint tmp_func1 = func(tmp_fanin1);
-    const Npn4Cannon& npn_cannon1 = npn4cannon[tmp_func1];
-    ymuint c_func1 = npn_cannon1.mFunc;
-    NpnXform cxf1(npn_cannon1.mPerm);
-    hash_map<ymuint16, vector<NpnXform> >::const_iterator p1;
-    p1 = mIdentList.find(c_func1);
-    assert_cond( p1 != mIdentList.end(), __FILE__, __LINE__);
-    const vector<NpnXform>& ident1_list = p1->second;
-#endif
     for (vector<NpnXform>::const_iterator q1 = ident1_list.begin();
 	 q1 != ident1_list.end(); ++ q1) {
-#if 0
-      NpnXform xf1 = cxf1 * (*q1) * inverse(cxf1);
-#else
       NpnXform tmp_xf1 = tmp_fanin1.npn_xform();
       NpnXform xf1 = inverse(tmp_xf1) * (*q1) * tmp_xf1;
-#endif
 
+      NpnHandle tmp2_fanin0 = tmp_fanin0;
       NpnHandle tmp2_fanin1 = xform_handle(tmp_fanin1, xf1);
+      NpnXform tmp2_oxf = tmp_oxf;
+
+      {
+	if ( tmp2_fanin1.oinv() ) {
+	  NpnXform tmp2_xf1 = tmp2_fanin1.npn_xform();
+	  ymuint xorsup = node1->xorsup_vect();
+	  if ( xorsup ) {
+	    tmp2_xf1.flip_iinv(first_pos(xorsup));
+	    tmp2_xf1.flip_oinv();
+	    tmp2_fanin1.set(node1->id(), tmp2_xf1);
+	  }
+	}
+      }
 
       if ( debug ) {
-	ymuint tmp_func = calc_func(is_xor, tmp_fanin0, tmp2_fanin1, tmp_oxf);
+	ymuint tmp_func = calc_func(is_xor, tmp2_fanin0, tmp2_fanin1, tmp2_oxf);
 	cout << "Phase-2:" << endl
-	     << "xf1        = " << xf1 << endl
-	     << "tmp_oxf    = " << tmp_oxf << endl
-	     << "tmp_fanin0 = " << tmp_fanin0 << endl
-	     << "tmp_fanin1 = " << tmp2_fanin1 << endl
-	     << "tmp_func   = ";
+	     << "xf1         = " << xf1 << endl
+	     << "tmp2_oxf    = " << tmp2_oxf << endl
+	     << "tmp2_fanin0 = " << tmp2_fanin0 << endl
+	     << "tmp2_fanin1 = " << tmp2_fanin1 << endl
+	     << "tmp_func    = ";
 	print_func(cout, tmp_func);
 	cout << endl;
 	if ( tmp_func != ofunc ) {
@@ -881,65 +818,179 @@ NpnNodeMgr::normalize(NpnHandle fanin0,
 	}
       }
 
-      // tmp2_fanin1 の変数のうち，tmp_fanin0 に現れない変数の反転属性を削除する．
-      NpnXform tmp2_xf1 = tmp2_fanin1.npn_xform();
-      NpnXform xfd;
-      bool changed = false;
-      for (ymuint i = 0; i < 4; ++ i) {
-	ymuint mask = 1U << i;
-	if ( (sup0 & mask) == 0U ) {
-	  // i は fanin0 に現れない変数
-	  ymuint src_i = 0;
-	  for ( ; src_i < 4; ++ src_i) {
-	    if ( tmp2_xf1.input_perm(src_i) == i ) {
-	      break;
+      // Phase-3: tmp2_fanin1 の変数のうち，tmp_fanin0 に現れない変数
+      //          の反転属性を削除する．
+      NpnHandle tmp3_fanin0 = tmp2_fanin0;
+      NpnHandle tmp3_fanin1 = tmp2_fanin1;
+      NpnXform tmp3_oxf = tmp2_oxf;
+      {
+	NpnXform tmp_xf1 = tmp3_fanin1.npn_xform();
+	NpnXform xfd;
+	bool changed = false;
+	ymuint sup0 = node0->sup_vect() * inverse(tmp_xf1);
+	ymuint xorsup = node1->xorsup_vect();
+	ymuint tmp_a = xorsup & ~sup0;
+	NpnXform xfd1;
+	for (ymuint i = 0; i < 4; ++ i) {
+	  if ( tmp_xf1.input_inv(i) ) {
+	    ymuint mask = (1U << i);
+	    ymuint dst_i = tmp_xf1.input_perm(i);
+	    if ( (sup0 & mask) == 0U ) {
+	      // dst_i は fanin0 に現れない．
+	      xfd.flip_iinv(dst_i);
+	      xfd1.flip_iinv(dst_i);
+	      changed = true;
+	    }
+	    else if ( (xorsup & mask) != 0U && tmp_a != 0U ) {
+	      // dst_i で XOR 分解可能で
+	      // ほかに XOR 分解可能でかつ fanin0 に現れない変数がある．
+	      ymuint dst_j = tmp_xf1.input_perm(first_pos(tmp_a));
+	      xfd.flip_iinv(dst_j);
+	      xfd1.flip_iinv(dst_i);
+	      changed = true;
 	    }
 	  }
-	  // i の元の番号は src_i
-	  if ( tmp2_xf1.input_inv(src_i) ) {
-	    xfd.flip_iinv(i);
-	    changed = true;
-	  }
 	}
-      }
-      NpnXform tmp2_oxf = tmp_oxf;
-      if ( changed ) {
-	tmp2_fanin1 = xform_handle(tmp2_fanin1, xfd);
-	tmp2_oxf = inverse(xfd) * tmp_oxf;
+	if ( changed ) {
+	  tmp3_fanin1 = xform_handle(tmp3_fanin1, xfd1);
+	  tmp3_oxf = xfd * tmp3_oxf;
+	}
 
 	if ( debug ) {
-	  ymuint tmp_func = calc_func(is_xor, tmp_fanin0, tmp2_fanin1, tmp2_oxf);
+	  ymuint tmp_func = calc_func(is_xor, tmp3_fanin0, tmp3_fanin1, tmp3_oxf);
+	  cout << "Phase-3:" << endl
+	       << "tmp3_oxf    = " << tmp3_oxf << endl
+	       << "tmp3_fanin0 = " << tmp3_fanin0 << endl
+	       << "tmp3_fanin1 = " << tmp3_fanin1 << endl
+		 << "tmp_func  = ";
+	  print_func(cout, tmp_func);
+	  cout << endl;
 	  if ( tmp_func != ofunc ) {
-	    cout << "Phase-3:" << endl
-		 << "xf1        = " << xf1 << endl
-		 << "tmp_oxf    = " << tmp2_oxf << endl
-		 << "tmp_fanin0 = " << tmp_fanin0 << endl
-		 << "tmp_fanin1 = " << tmp2_fanin1 << endl
-		 << "tmp_func   = ";
-	    print_func(cout, tmp_func);
-	    cout << endl;
 	    abort();
 	  }
 	}
       }
 
+      // Phase-4: tmp4_fanin0 と tmp4_fanin1 の出力の反転属性の正規化を行なう．
+      // 結果は tmp4_oxf に反映される．
+      NpnHandle tmp4_fanin0 = tmp3_fanin0;
+      NpnHandle tmp4_fanin1 = tmp3_fanin1;
+      NpnXform tmp4_oxf = tmp3_oxf;
+      {
+	NpnXform tmp_xf0 = tmp4_fanin0.npn_xform();
+	NpnXform tmp_xf1 = tmp4_fanin1.npn_xform();
+	ymuint sup0 = node0->sup_vect();
+	ymuint sup1 = node1->sup_vect() * tmp_xf1;
+	ymuint xorsup0 = node0->xorsup_vect();
+	ymuint xorsup1 = node1->xorsup_vect() * tmp_xf1;
+	ymuint tmp_a = xorsup0 & ~sup1;
+	ymuint tmp_b = xorsup1 & ~sup0;
+	ymuint tmp_c = xorsup0 & xorsup1;
+	if ( tmp_xf0.output_inv() ) {
+	  if ( tmp_xf1.output_inv() ) {
+	    // case 11: tmp4_fanin0 と tmp4_fanin1 の出力が両方反転している．
+	    NpnXform tmp5_oxf = tmp4_oxf;
+	    bool tmp5_valid = false;
+	    if ( tmp_a != 0U && tmp_b != 0U ) {
+	      tmp5_oxf.flip_iinv(first_pos(tmp_a));
+	      tmp5_oxf.flip_iinv(first_pos(tmp_b));
+	      tmp5_valid = true;
+	    }
+	    NpnXform tmp6_oxf = tmp4_oxf;
+	    bool tmp6_valid = false;
+	    if ( tmp_c ) {
+	      tmp6_oxf.flip_iinv(first_pos(tmp_c));
+	      tmp6_valid = true;
+	    }
+	    if ( tmp5_valid ) {
+	      if ( tmp6_valid ) {
+		if ( tmp5_oxf < tmp6_oxf ) {
+		  tmp4_oxf = tmp5_oxf;
+		}
+		else {
+		  tmp4_oxf = tmp6_oxf;
+		}
+	      }
+	      else {
+		tmp4_oxf = tmp5_oxf;
+	      }
+	    }
+	    else if ( tmp6_valid ) {
+	      tmp4_oxf = tmp6_oxf;
+	    }
+	    if ( tmp5_valid || tmp6_valid ) {
+	      tmp4_fanin0.flip_oinv();
+	      tmp4_fanin1.flip_oinv();
+	    }
+	    else if ( tmp_a ) {
+	      tmp4_oxf.flip_iinv(first_pos(tmp_a));
+	      tmp4_fanin0.flip_oinv();
+	    }
+	    else if ( tmp_b ) {
+	      tmp4_oxf.flip_iinv(first_pos(tmp_b));
+	      tmp4_fanin1.flip_oinv();
+	    }
+	  }
+	  else {
+	    // case 10: tmp4_fanin0 の出力が反転している．
+	    if ( tmp_a ) {
+	      tmp4_oxf.flip_iinv(first_pos(tmp_a));
+	      tmp4_fanin0.flip_oinv();
+	    }
+	    else if ( tmp_c ) {
+	      if ( tmp_b ) {
+		tmp4_oxf.flip_iinv(first_pos(tmp_b));
+		tmp4_oxf.flip_iinv(first_pos(tmp_c));
+		tmp4_fanin0.flip_oinv();
+	      }
+	      else {
+		tmp4_oxf.flip_iinv(first_pos(tmp_c));
+		tmp4_fanin0.flip_oinv();
+		tmp4_fanin1.flip_oinv();
+	      }
+	    }
+	  }
+	}
+	else if ( tmp_xf1.output_inv() ) {
+	  // case 01: tmp4_fanin1 の出力が反転している．
+	  if ( tmp_b ) {
+	    tmp4_oxf.flip_iinv(first_pos(tmp_b));
+	    tmp4_fanin1.flip_oinv();
+	  }
+	  else if ( tmp_a != 0U && tmp_c != 0U ) {
+	    tmp4_oxf.flip_iinv(first_pos(tmp_a));
+	    tmp4_oxf.flip_iinv(first_pos(tmp_c));
+	    tmp4_fanin1.flip_oinv();
+	  }
+	}
+      }
+
       if ( debug ) {
+	ymuint tmp_func = calc_func(is_xor, tmp4_fanin0, tmp4_fanin1, tmp4_oxf);
 	cout << "Phase-4:" << endl
-	     << "tmp_oxf    = " << tmp2_oxf << endl
-	     << "tmp_fanin0 = " << tmp_fanin0 << endl
-	     << "tmp_fanin1 = " << tmp2_fanin1 << endl
+	     << "tmp4_oxf    = " << tmp4_oxf << endl
+	     << "tmp4_fanin0 = " << tmp4_fanin0 << endl
+	     << "tmp4_fanin1 = " << tmp4_fanin1 << endl
 	     << endl
 	     << "min_oxf    = " << min_oxf << endl
 	     << "min_fanin0 = " << min_fanin0 << endl
 	     << "min_fanin1 = " << min_fanin1 << endl
+	     << "tmp_func = ";
+	print_func(cout, tmp_func);
+	cout << endl
 	     << endl;
+	if ( tmp_func != ofunc ) {
+	  abort();
+	}
       }
 
-      if ( first || min_fanin0 > tmp_fanin0 || min_fanin0 == min_fanin0 && min_fanin1 > tmp2_fanin1 ) {
+      if ( first ||
+	   min_fanin0 > tmp4_fanin0 ||
+	   min_fanin0 == min_fanin0 && min_fanin1 > tmp4_fanin1 ) {
 	first = false;
-	min_fanin0 = tmp_fanin0;
-	min_fanin1 = tmp2_fanin1;
-	min_oxf = tmp2_oxf;
+	min_fanin0 = tmp4_fanin0;
+	min_fanin1 = tmp4_fanin1;
+	min_oxf = tmp4_oxf;
       }
     }
   }
@@ -960,6 +1011,37 @@ NpnNodeMgr::normalize(NpnHandle fanin0,
   }
 }
 
+// @brief XORサポートの極性を正規化する．
+NpnHandle
+NpnNodeMgr::xorsup_normalize(NpnHandle fanin)
+{
+  NpnXform xf = fanin.npn_xform();
+  ymuint id = fanin.node_id();
+  NpnNode* node = this->node(id);
+  ymuint xorsup = node->xorsup_vect();
+  bool parity = false;
+  for (ymuint i = 0; i < 4; ++ i) {
+    if ( (xorsup & (1U << i)) && xf.input_inv(i) ) {
+      parity = !parity;
+      xf.flip_iinv(i);
+    }
+  }
+  if ( parity ) {
+    xf.flip_oinv();
+  }
+  NpnHandle result(id, xf);
+#if 0
+  if ( handle_func(fanin) != handle_func(result) ) {
+    cout << "fanin  = " << fanin << endl
+	 << "result = " << result << endl
+	 << "xorsup = " << xorsup << endl
+	 << "parity = " << parity << endl;
+    abort();
+  }
+#endif
+  return result;
+}
+
 // 関数を求める．
 ymuint
 NpnNodeMgr::calc_func(bool is_xor,
@@ -967,10 +1049,10 @@ NpnNodeMgr::calc_func(bool is_xor,
 		      NpnHandle fanin1,
 		      NpnXform oxf)
 {
-  ymuint func0 = func(fanin0);
-  ymuint func1 = func(fanin1);
+  ymuint func0 = handle_func(fanin0);
+  ymuint func1 = handle_func(fanin1);
   ymuint result_func = (is_xor) ? func0 ^ func1 : func0 & func1;
-  return xform(result_func, oxf);
+  return xform_func(result_func, oxf);
 }
 
 // @brief 関数を求める．
@@ -999,32 +1081,6 @@ NpnNodeMgr::xform_handle(NpnHandle handle,
   ymuint sup_vec = node->sup_vect();
   new_xf.normalize(sup_vec);
   return NpnHandle(id, new_xf);
-}
-
-// @brief mIdentList を設定する．
-void
-NpnNodeMgr::make_ident_list()
-{
-  vector<NpnXform> perm_list;
-  for (ymuint p = 0; p < 768; ++ p) {
-    perm_list.push_back(NpnXform(npn4perm[p]));
-  }
-
-  for (ymuint i = 0; npn4rep[i] != 0xFFFF; ++ i) {
-    ymuint16 func = npn4rep[i];
-    ymuint8 sup_vec = support_vec(func);
-    for (vector<NpnXform>::iterator p = perm_list.begin();
-	 p != perm_list.end(); ++ p) {
-      NpnXform xf = *p;
-      NpnXform xcf = xf.rep(sup_vec);
-      if ( xcf == xf ) {
-	ymuint16 func1 = xform(func, xf);
-	if ( func1 == func ) {
-	  mIdentList[func].push_back(xf);
-	}
-      }
-    }
-  }
 }
 
 // @brief 展開したノード数を仮想的に返す．

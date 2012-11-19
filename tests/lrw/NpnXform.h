@@ -225,8 +225,8 @@ operator>=(NpnXform left,
 /// @brief 関数ベクタを変換する．
 /// @param[in] left, right オペランド
 ymuint16
-xform(ymuint16 func,
-      NpnXform xf);
+xform_func(ymuint16 func,
+	   NpnXform xf);
 
 /// @brief 内容を表示する．
 /// @param[in] left, right オペランド
