@@ -928,17 +928,26 @@ NpnNodeMgr::count_sub(NpnHandle handle,
     return 0;
   }
 
-  NpnXform xf = handle.npn_xform();
-  if ( xf.output_inv() ) {
-    xf.flip_oinv();
+  if ( handle.oinv() ) {
+    handle.flip_oinv();
   }
-  NpnHandle rep_handle(node->id(), xf);
-  ymuint sig = rep_handle.hash();
+#if 0
+  if ( node->is_xor() ) {
+    ymuint xorsup = node->xorsup_vect();
+    for (ymuint i = 0; i < 4; ++ i) {
+      if ( handle.iinv(i) && (xorsup & (1U << i)) ) {
+	handle.flip_iinv(i);
+      }
+    }
+  }
+#endif
+  ymuint sig = handle.hash();
   if ( hash1.count(sig) > 0 ) {
     return 0;
   }
   hash1.insert(sig);
 
+  NpnXform xf = handle.npn_xform();
   ymuint ans = 1;
   ans += count_sub(xform_handle(node->fanin0(), xf), hash1);
   ans += count_sub(xform_handle(node->fanin1(), xf), hash1);

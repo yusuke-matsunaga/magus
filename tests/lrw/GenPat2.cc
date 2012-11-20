@@ -344,10 +344,6 @@ GenPat2::compose(NpnHandle handle1,
 {
   ++ n_compose;
 
-  ymuint32 fv3 = fv1 & fv2;
-  ymuint32 fv4 = fv1 | fv2;
-  ymuint32 fv5 = fv1 ^ fv2;
-
   ymuint sup0 = support(fv1) | support(fv2);
   switch ( sup0 ) {
   case 0x02: // 0010
@@ -363,6 +359,7 @@ GenPat2::compose(NpnHandle handle1,
     return;
   }
 
+  ymuint32 fv3 = fv1 & fv2;
   ymuint sup3 = support(fv3);
   bool valid1 = true;
   if ( sup3 != sup0 ) {
@@ -375,6 +372,7 @@ GenPat2::compose(NpnHandle handle1,
     valid1 = false;
   }
 
+  ymuint32 fv4 = fv1 | fv2;
   ymuint sup4 = support(fv4);
   bool valid2 = true;
   if ( sup4 != sup0 ) {
@@ -387,6 +385,7 @@ GenPat2::compose(NpnHandle handle1,
     valid2 = false;
   }
 
+  ymuint32 fv5 = fv1 ^ fv2;
   ymuint sup5 = support(fv5);
   bool valid3 = true;
   if ( sup5 != sup0 ) {
@@ -408,28 +407,73 @@ GenPat2::compose(NpnHandle handle1,
   if ( valid1 && (mFuncLevel[fv3] + mSlack) >= level ) {
     NpnHandle handle = mMgr.make_and(handle1, handle2);
     ymuint level1 = mMgr.count(handle);
-    if ( level1 == level ) {
-      assert_cond( level1 == level, __FILE__, __LINE__);
-      add_pair(handle, fv3, level);
+#if 0
+    if ( level1 != level ) {
+      cout << "level = " << level << endl
+	   << "level1 = " << level1 << endl
+	   << "handle1" << endl;
+      mMgr.dump_handle(cout, handle1);
+      cout << "handle2" << endl;
+      mMgr.dump_handle(cout, handle2);
+      cout << "result" << endl;
+      mMgr.dump_handle(cout, handle);
+      cout << endl;
     }
+    assert_cond( level1 == level, __FILE__, __LINE__);
+    add_pair(handle, fv3, level);
+#else
+    if ( mFuncLevel[fv3] + mSlack >= level1 ) {
+      add_pair(handle, fv3, level1);
+    }
+#endif
   }
 
   if ( valid2 && (mFuncLevel[fv4] + mSlack) >= level ) {
     NpnHandle handle = mMgr.make_or(handle1, handle2);
     ymuint level1 = mMgr.count(handle);
-    if ( level1 == level ) {
-      assert_cond( level1 == level, __FILE__, __LINE__);
-      add_pair(handle, fv4, level);
+#if 0
+    if ( level1 != level ) {
+      cout << "level = " << level << endl
+	   << "level1 = " << level1 << endl
+	   << "handle1" << endl;
+      mMgr.dump_handle(cout, handle1);
+      cout << "handle2" << endl;
+      mMgr.dump_handle(cout, handle2);
+      cout << "result" << endl;
+      mMgr.dump_handle(cout, handle);
+      cout << endl;
     }
+    assert_cond( level1 == level, __FILE__, __LINE__);
+    add_pair(handle, fv4, level);
+#else
+    if ( mFuncLevel[fv4] + mSlack >= level1 ) {
+      add_pair(handle, fv4, level1);
+    }
+#endif
   }
 
   if ( valid3 && (mFuncLevel[fv5] + mSlack) >= level ) {
     NpnHandle handle = mMgr.make_xor(handle1, handle2);
     ymuint level1 = mMgr.count(handle);
-    if ( level1 == level ) {
-      assert_cond( level1 == level, __FILE__, __LINE__);
-      add_pair(handle, fv5, level);
+#if 0
+    if ( level1 != level ) {
+      cout << "level = " << level << endl
+	   << "level1 = " << level1 << endl
+	   << "handle1" << endl;
+      mMgr.dump_handle(cout, handle1);
+      cout << "handle2" << endl;
+      mMgr.dump_handle(cout, handle2);
+      cout << "result" << endl;
+      mMgr.dump_handle(cout, handle);
+      cout << endl;
     }
+    assert_cond( level1 == level, __FILE__, __LINE__);
+    add_pair(handle, fv5, level);
+#else
+    if ( mFuncLevel[fv5] + mSlack >= level1 ) {
+      add_pair(handle, fv5, level1);
+    }
+#endif
   }
 }
 
@@ -517,14 +561,24 @@ GenPat2::count1(NpnHandle handle)
     return 0;
   }
 
-  NpnXform xf = handle.npn_xform();
-  handle.flip_oinv();
+  if ( handle.oinv() ) {
+    handle.flip_oinv();
+  }
+  if ( node->is_xor() ) {
+    ymuint xorsup = node->xorsup_vect();
+    for (ymuint i = 0; i < 4; ++ i) {
+      if ( handle.iinv(i) && (xorsup & (1U << i)) ) {
+	handle.flip_iinv(i);
+      }
+    }
+  }
   ymuint sig = handle.hash();
   if ( mCountHash.count(sig) > 0 ) {
     return 0;
   }
   mCountHash.insert(sig);
 
+  NpnXform xf = handle.npn_xform();
   ymuint ans = 1;
   ans += count1(mMgr.xform_handle(node->fanin0(), xf));
   ans += count1(mMgr.xform_handle(node->fanin1(), xf));
@@ -549,14 +603,26 @@ GenPat2::count2_sub(NpnHandle handle,
     return 0;
   }
 
-  NpnXform xf = handle.npn_xform();
-  handle.flip_oinv();
+  if ( handle.oinv() ) {
+    handle.flip_oinv();
+  }
+#if 0
+  if ( node->is_xor() ) {
+    ymuint xorsup = node->xorsup_vect();
+    for (ymuint i = 0; i < 4; ++ i) {
+      if ( handle.iinv(i) && (xorsup & (1U << i)) ) {
+	handle.flip_iinv(i);
+      }
+    }
+  }
+#endif
   ymuint sig = handle.hash();
   if ( mCountHash.count(sig) > 0 || hash.count(sig) > 0 ) {
     return 0;
   }
   hash.insert(sig);
 
+  NpnXform xf = handle.npn_xform();
   ymuint ans = 1;
   ans += count2_sub(mMgr.xform_handle(node->fanin0(), xf), hash);
   ans += count2_sub(mMgr.xform_handle(node->fanin1(), xf), hash);

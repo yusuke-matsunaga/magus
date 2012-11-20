@@ -60,9 +60,17 @@ public:
   bool
   oinv() const;
 
+  /// @brief 入力の反転属性を得る．
+  bool
+  iinv(ymuint pos) const;
+
   /// @brief 出力を反転させる．
   void
   flip_oinv();
+
+  /// @brief 入力を反転させる．
+  void
+  flip_iinv(ymuint pos);
 
   /// @brief ハッシュ用の値を返す．
   ymuint
@@ -209,12 +217,28 @@ NpnHandle::oinv() const
   return static_cast<bool>(mData & 1U);
 }
 
+// @brief 入力の反転属性を得る．
+inline
+bool
+NpnHandle::iinv(ymuint pos) const
+{
+  return static_cast<bool>((mData >> (pos + 1)) & 1U);
+}
+
 // @brief 出力を反転させる．
 inline
 void
 NpnHandle::flip_oinv()
 {
   mData ^= 1U;
+}
+
+// @brief 入力を反転させる．
+inline
+void
+NpnHandle::flip_iinv(ymuint pos)
+{
+  mData ^= (2U << pos);
 }
 
 // @brief 出力を反転したハンドルを返す．
