@@ -9,6 +9,7 @@
 
 #include "MislibLex.h"
 #include "ym_utils/MsgMgr.h"
+#include "MislibParserImpl.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB
