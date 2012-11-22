@@ -14,6 +14,9 @@
 
 BEGIN_NAMESPACE_YM_MISLIB
 
+// mislib_grammer.hh 中で 必要になる(bison-2.6)
+class MislibParserImpl;
+
 #include "mislib_grammer.hh"
 
 
