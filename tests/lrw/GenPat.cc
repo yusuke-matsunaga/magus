@@ -8,7 +8,6 @@
 
 
 #include "GenPat.h"
-#include "GpNode.h"
 #include "ym_utils/StopWatch.h"
 
 

@@ -7,6 +7,7 @@
 
 
 #include "ymtools.h"
+#include "GpNode.h"
 
 
 BEGIN_NAMESPACE_YM

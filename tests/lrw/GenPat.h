@@ -11,11 +11,20 @@
 
 #include "ymtools.h"
 #include "GpMgr.h"
+#include "GpNode.h"
 #include "NpnXform.h"
 #include "FuncXform.h"
 
 
 BEGIN_NAMESPACE_YM
+
+struct GpPair
+{
+  GpHandle mHandle1;
+  GpHandle mHandle2;
+  bool mXor;
+};
+
 
 //////////////////////////////////////////////////////////////////////
 /// @class GenPat GenPat.h "GenPat.h"
@@ -136,6 +145,9 @@ private:
 
   // レベルごとの代表関数の GpHandle のリスト
   vector<vector<GpHandle> > mRepList;
+
+  // レベルごとの候補ペアのリスト
+  vector<vector<GpPair> > mCandPairListArray;
 
   // GpHandle の候補のリスト
   vector<vector<GpHandle> > mCandListArray;

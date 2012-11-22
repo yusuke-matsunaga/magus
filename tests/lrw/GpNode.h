@@ -1,3 +1,6 @@
+#ifndef GPNODE_H
+#define GPNODE_H
+
 /// @file GpNode.h
 /// @brief GpNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
@@ -496,3 +499,5 @@ GpNode::inv1() const
 }
 
 END_NAMESPACE_YM
+
+#endif // GPNODE_H
