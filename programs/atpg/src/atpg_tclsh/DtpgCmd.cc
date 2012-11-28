@@ -58,7 +58,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   using nsDtpgCl::kDynNone;
   using nsDtpgCl::kDynOnce;
   using nsDtpgCl::kDynAlways;
-  
+
   size_t objc = objv.size();
   if ( objc != 1 ) {
     print_usage();
@@ -70,7 +70,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     int verbose_level = mPoptVerbose->val();
     mDtpg.set_verbose_level(verbose_level);
   }
-  
+
   // SAT mode の設定
   if ( mPoptSat->is_specified() ) {
     mDtpg.set_sat(true);
@@ -84,7 +84,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     mDtpg.set_sat(true);
     mDtpg.set_sat_mode(2);
   }
-  
+
   // fsim_mode の設定
   tSimMode fsim_mode = kSimPpsfp;
   if ( mPoptFsim->is_specified() ) {
@@ -127,7 +127,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   // scoping option の設定
   bool scoping = mPoptScope->is_specified();
   mDtpg.set_scoping(scoping);
-  
+
   // backtrack limit の設定
   if ( mPoptBacktrack->is_specified() ) {
     int btnum = mPoptBacktrack->val();
@@ -136,12 +136,12 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   else {
     mDtpg.set_default_backtrack_limit();
   }
-  
+
   bool print_stats = mPoptPrintStats->is_specified();
-  
+
   // GO!
   mDtpg(fsim_mode);
-  
+
   after_update_faults();
 
   if ( print_stats ) {
@@ -161,7 +161,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 	 << ": # of total backtracks" << endl
 	 << stats.time() << endl;
   }
-  
+
   return TCL_OK;
 }
 
