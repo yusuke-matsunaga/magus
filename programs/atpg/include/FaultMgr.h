@@ -1,11 +1,11 @@
-#ifndef BASE_FAULTMGR_H
-#define BASE_FAULTMGR_H
+#ifndef FAULTMGR_H
+#define FAULTMGR_H
 
-/// @file src/base/FaultMgr.h
+/// @file FaultMgr.h
 /// @brief FaultMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "atpg_nsdef.h"
@@ -337,4 +337,4 @@ FaultMgr::add_ifault(const TgNode* node,
 
 END_NAMESPACE_YM_ATPG
 
-#endif // ATPG_FAULTMGR_H
+#endif // FAULTMGR_H

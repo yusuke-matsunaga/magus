@@ -40,7 +40,7 @@ Network::Network() :
 Network::~Network()
 {
   clear();
-  
+
   for (list<GateSa*>::iterator p = mSa0List.begin();
        p != mSa0List.end(); ++ p) {
     delete *p;
@@ -61,10 +61,13 @@ Network::clear()
        p != mGateList.end(); ++ p) {
     delete *p;
   }
-  mNpi = 0;
+  mGateList.clear();
   mOutputList.clear();
+  mNpi = 0;
   mActGateList.clear();
   mGateMap.clear();
+  mSa0List.clear();
+  mSa1List.clear();
 }
 
 // @brief 内容を設定する．
@@ -84,11 +87,11 @@ Network::set(const TgNetwork& tgnetwork)
   mGateList.reserve(ngate);
   mActGateList.reserve(ngate);
   mOutputList.resize(npo);
-  
+
   mNpi = npi;
   ymuint max_id = tgnetwork.node_num();
   mGateMap.resize(max_id);
-  
+
   // 入力の生成
   for (ymuint i = 0; i < npi; ++ i) {
     const TgNode* node = tgnetwork.input(i);
@@ -129,7 +132,7 @@ Network::set(const TgNetwork& tgnetwork)
     gate->init_fogate(gate->mNo);
     gate->mNo = 0;
   }
-  
+
   // ファンアウトの接続
   for (ymuint i = npi; i < ngate; ++ i) {
     Gate* gate = mGateList[i];
@@ -140,7 +143,7 @@ Network::set(const TgNetwork& tgnetwork)
       ++ igate->mNo;
     }
   }
-  
+
   // FFR の根 (fanout stem) を求める．
   for (int i = ngate; -- i >= 0; ) {
     Gate* gate = mGateList[i];
@@ -151,7 +154,7 @@ Network::set(const TgNetwork& tgnetwork)
       gate->set_fos(gate);
     }
   }
-  
+
   // レベルを計算する．
   for (ymuint i = 0; i < ngate; ++ i) {
     Gate* gate = mGateList[i];
@@ -191,17 +194,17 @@ Network::set(const TgNetwork& tgnetwork)
       gate->mMinLevel = level;
     }
   }
-  
+
   // 等価ゲートを求める．
   set_eq_gate();
-  
+
   // basis node の計算
   calc_basis();
-  
+
   // testability measure の計算
   t_analyze();
 }
-  
+
 // @brief ゲートを生成する．
 // @param[in] node オリジナルのノード
 // @param[in] input_id 入力番号
@@ -376,7 +379,7 @@ Network::calc_basis()
 {
   vector<Gate*> dom_array(ngate());
   vector<Gate*> di_array(ngate());
-  
+
   // 各ゲートの dominator を求める．
   for (int i = ngate(); -- i >= 0; ) {
     Gate* gate = mGateList[i];
@@ -394,7 +397,7 @@ Network::calc_basis()
     dom_array[gate->id()] = d;
   }
 
-  // 各ゲートのファンインの dominator の共通部分を求める． 
+  // 各ゲートのファンインの dominator の共通部分を求める．
   for (ymuint i = 0; i < ngate(); ++ i) {
     Gate* gate = mGateList[i];
     ymuint ni = gate->nfi();
@@ -459,7 +462,7 @@ Network::activate_tfitfo(Gate* pivot)
   if ( !reached ) {
     return false;
   }
-  
+
   mActGateList.clear();
   for (Gate* gate; (gate = lvlq.get_from_top());  ) {
     ymuint k = 0;
@@ -676,10 +679,10 @@ Network::new_fault(Val3 fval)
   f_gate->mState = 0;
   f_gate->clr_flag();
   f_gate->set_fj();
-  
+
   return f_gate;
 }
-  
+
 // @brief 故障ノードを削除する．
 void
 Network::delete_fault(GateSa* f_gate)

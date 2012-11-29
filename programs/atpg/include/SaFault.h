@@ -1,18 +1,16 @@
-#ifndef BASE_SAFAULT_H
-#define BASE_SAFAULT_H
+#ifndef SAFAULT_H
+#define SAFAULT_H
 
 /// @file src/base/SaFault.h
 /// @brief SaFault のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: SaFault.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2007, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "atpg_nsdef.h"
 #include "Val3.h"
-#include <ym_networks/tgnet.h>
+#include "ym_networks/tgnet.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG
@@ -43,7 +41,7 @@ enum FaultStatus {
 class Finfo
 {
   friend class FaultMgr;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -58,7 +56,7 @@ public:
   /// @brief 検出パタン数を返す．
   ymuint
   pat_num() const;
-  
+
   /// @brief 検出パタンを返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < pat_num() )
   TestVector*
@@ -67,11 +65,11 @@ public:
   /// @brief 代表故障を返す．
   SaFault*
   rep() const;
-  
+
   /// @brief 等価な故障のリストを返す．
   const vector<SaFault*>&
   eq_faults() const;
-  
+
   /// @brief 状態を返す．
   FaultStatus
   status() const;
@@ -81,11 +79,11 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内容を書き換えるメソッド
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 検出パタンをクリアする．
   void
   clear_testpat();
-  
+
   /// @brief 検出パタンを追加する．
   void
   add_testpat(TestVector* testpat);
@@ -95,16 +93,16 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 検出したパタンのリスト
   vector<TestVector*> mPatList;
 
   // 等価故障のリスト
   vector<SaFault*> mEqFaults;
-  
+
   // 状態
   FaultStatus mStatus;
-  
+
 };
 
 
@@ -140,11 +138,11 @@ public:
   /// @brief 対象のゲートを返す．
   const TgNode*
   node() const;
-  
+
   /// @brief 故障の入力側のゲートを返す．
   const TgNode*
   source_node() const;
-  
+
   /// @brief 入力の故障の時 true を返す．
   bool
   is_input_fault() const;
@@ -161,11 +159,11 @@ public:
   /// @note 返す値は 0 か 1
   int
   val() const;
-  
+
   /// @brief 故障値を3値型で返す．
   Val3
   val3() const;
-  
+
   /// @brief 故障の内容を表す文字列を返す．
   string
   str() const;
@@ -173,21 +171,21 @@ public:
   /// @brief 代表故障を返す．
   SaFault*
   rep() const;
-  
+
   /// @brief 状態を返す．
   FaultStatus
   status() const;
-  
+
   /// @brief 検出パタン数を返す．
   ymuint
   pat_num() const;
-  
+
   /// @brief 検出パタンを返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < pat_num() )
   TestVector*
   pat(ymuint pos = 0) const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -201,7 +199,7 @@ private:
 
   // 等価故障グループに共通の情報
   Finfo* mFinfo;
-  
+
 };
 
 /// @relates SaFault
@@ -237,7 +235,7 @@ Finfo::pat_num() const
 {
   return mPatList.size();
 }
-  
+
 // @brief 検出パタンを返す．
 // @param[in] pos 位置番号 ( 0 <= pos < det_num() )
 inline
@@ -246,7 +244,7 @@ Finfo::pat(ymuint pos) const
 {
   return mPatList[pos];
 }
-    
+
 // @brief 検出パタンをクリアする．
 inline
 void
@@ -278,7 +276,7 @@ Finfo::eq_faults() const
 {
   return mEqFaults;
 }
-  
+
 // @brief 状態を返す．
 inline
 FaultStatus
@@ -327,7 +325,7 @@ SaFault::val() const
 {
   return static_cast<int>(mPosVal & 1UL);
 }
-  
+
 // @brief 故障値を3値型で返す．
 inline
 Val3
@@ -376,4 +374,4 @@ SaFault::pat(ymuint pos) const
 
 END_NAMESPACE_YM_ATPG
 
-#endif // ATPG_SAFAULT_H
+#endif // SAFAULT_H

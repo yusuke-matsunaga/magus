@@ -1,19 +1,17 @@
-#ifndef BASE_TESTVECTOR_H
-#define BASE_TESTVECTOR_H
+#ifndef TESTVECTOR_H
+#define TESTVECTOR_H
 
-/// @file src/base/TestVectort.h
+/// @file TestVectort.h
 /// @brief TestVector のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: TestVector.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "atpg_nsdef.h"
 #include "Val3.h"
 #include "PackedVal.h"
-#include <ym_utils/RandGen.h>
+#include "ym_utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG
@@ -28,42 +26,54 @@ class SaFault;
 class TestVector
 {
   friend class TvMgr;
-  
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 値を取り出す関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 入力数を得る．
   ymuint
   ni() const;
 
   /// @brief pos 番めの値を得る．
+  /// @param[in] pos 入力の位置番号
   Val3
   val3(ymuint pos) const;
 
   /// @brief このパタンで検出した故障のリストを返す．
   const list<SaFault*>&
   det_faults() const;
-  
+
   /// @brief 内容を BIN 形式で出力する．
+  /// @param[in] s 出力先のストリーム
   void
   dump_bin(ostream& s) const;
-  
+
   /// @brief 内容を HEX 形式で出力する．
   /// @note X を含む場合の出力は不定
+  /// @param[in] s 出力先のストリーム
   void
   dump_hex(ostream& s) const;
-  
-  // 暫定的に用意する関数
+
+  /// @brief 暫定的に用意する関数
+  /// @param[in] fp ファイルポインタ
   void
   dump(FILE* fp) const;
 
-  
+
 public:
-  
+  //////////////////////////////////////////////////////////////////////
+  // 値を設定する関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief すべて未定(X) で初期化する．
   void
   init();
-  
+
   /// @breif pos 番めの値を設定する．
+  /// @param[in] pos 入力の位置番号
+  /// @param[in] val 値
   void
   set_val(ymuint pos,
 	  Val3 val);
@@ -81,40 +91,47 @@ public:
   /// @note 結果はかならず 0 か 1 になる．(Xは含まれない)
   void
   set_from_random(RandGen& randgen);
-  
+
   /// @brief テストベクタをコピーする．
   /// @param[in] src コピー元のテストベクタ
   /// @note X の部分はコピーしない．
   void
   copy(const TestVector& src);
-  
+
   /// @brief このパタンで検出した故障を追加する．
+  /// @param[in] fault 追加する故障
   void
   add_fault(SaFault* fault);
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる便利関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief ブロック数を返す．
+  /// @param[in] ni 入力数
   static
   ymuint
   block_num(ymuint ni);
 
   /// @brief HEX文字列の長さを返す．
+  /// @param[in] ni 入力数
   static
   ymuint
   hex_length(ymuint ni);
-  
+
   // 入力位置からブロック番号を得る．
+  /// @param[in] ipos 入力の位置番号
   static
   ymuint
   block_idx(ymuint ipos);
 
   // 入力位置からシフト量を得る．
+  /// @param[in] ipos 入力の位置番号
   static
   ymuint
   shift_num(ymuint ipos);
-
 
 
 private:
@@ -124,13 +141,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  /// @param[in] 入力数を指定する．
+  /// @param[in] ni 入力数
   explicit
   TestVector(ymuint ni);
-  
+
   /// @brief デストラクタ
   ~TestVector();
-  
+
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のソース
   TestVector(const TestVector& src);
@@ -140,12 +157,12 @@ private:
   const TestVector&
   operator=(const TestVector& src);
 
-  
+
 public:
-  
+
   // 暫定的に用意するメンバ
   int det_count;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -153,15 +170,15 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入力数
-  ymuint mNi;
-  
+  ymuint32 mNi;
+
   // このパタンで検出した故障のリスト
   list<SaFault*> mDetFaults;
-  
+
   // ベクタ本体(ただしサイズは可変)
   PackedVal mPat[1];
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // このクラスに固有の定数
@@ -169,17 +186,21 @@ private:
 
   // 1ワードあたりのHEX文字数
   static
-  const ymuint HPW = kPvBitLen / 4;
-  
+  const ymuint32 HPW = kPvBitLen / 4;
+
 };
 
 
 /// @brief 内容を出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] tv テストベクタ
 ostream&
 operator<<(ostream& s,
 	   const TestVector& tv);
 
 /// @brief 内容を出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] tvp テストベクタへのポインタ
 ostream&
 operator<<(ostream& s,
 	   const TestVector* tvp);
@@ -304,4 +325,4 @@ operator<<(ostream& s,
 
 END_NAMESPACE_YM_ATPG
 
-#endif // ATPG_TESTVECTOR_H
+#endif // TESTVECTOR_H
