@@ -64,7 +64,7 @@ ym_libym_gds_enable=0
 ym_libym_cec_enable=1
 ym_libym_techmap_enable=1
 ym_libym_gbm_enable=0
-ym_libym_seal_enable=0
+ym_libym_seal_enable=1
 ym_libym_tclpp_enable=1
 ym_libym_ymsh_enable=0
 
