@@ -39,10 +39,10 @@ BEGIN_NONAMESPACE
 /// @param[in] output 出力リテラル
 /// @param[in] inputs 入力リテラル
 void
-make_cnf(SatSolver& solver,
-	 tTgGateType type,
-	 Literal output,
-	 const vector<Literal>& inputs)
+make_cnf_from_type(SatSolver& solver,
+		   tTgGateType type,
+		   Literal output,
+		   const vector<Literal>& inputs)
 {
   switch ( type ) {
   case kTgUndef:
@@ -187,10 +187,10 @@ make_cnf(SatSolver& solver,
 /// @param[in] output 出力リテラル
 /// @param[in] inputs 入力リテラル
 void
-make_cnf(SatSolver& solver,
-	 const LogExpr& lexp,
-	 Literal output,
-	 const vector<Literal>& inputs)
+make_cnf_from_lexp(SatSolver& solver,
+		   const LogExpr& lexp,
+		   Literal output,
+		   const vector<Literal>& inputs)
 {
   if ( lexp.is_constant() || lexp.is_literal() ) {
     assert_not_reached(__FILE__, __LINE__);
@@ -210,7 +210,7 @@ make_cnf(SatSolver& solver,
     else {
       VarId new_varid = solver.new_var();
       local_inputs[i] = Literal(new_varid, kPolPosi);
-      make_cnf(solver, lexp1, local_inputs[i], inputs);
+      make_cnf_from_lexp(solver, lexp1, local_inputs[i], inputs);
     }
   }
   vector<Literal> tmp(nc + 1);
@@ -255,6 +255,28 @@ make_cnf(SatSolver& solver,
       }
       solver.add_clause(tmp);
     }
+  }
+}
+
+/// @brief ノードの入出力の関係を表す CNF クローズを生成する．
+/// @param[in] solver SAT ソルバ
+/// @param[in] node TgNode
+/// @param[in] network TgNetwork
+/// @param[in] output 出力リテラル
+/// @param[in] inputs 入力リテラル
+void
+make_cnf(SatSolver& solver,
+	 const TgNode* node,
+	 const TgNetwork& network,
+	 Literal output,
+	 const vector<Literal>& inputs)
+{
+  if ( node->is_cplx_logic() ) {
+    LogExpr lexp = network.get_lexp(node);
+    make_cnf_from_lexp(solver, lexp, output, inputs);
+  }
+  else {
+    make_cnf_from_type(solver, node->type(), output, inputs);
   }
 }
 
@@ -342,7 +364,7 @@ DtpgSat::run(const TgNetwork& network,
     break;
 
   case 2:
-    type = "minista";
+    type = "minisat";
     break;
 
   default:
@@ -378,13 +400,7 @@ DtpgSat::run(const TgNetwork& network,
       inputs[j] = Literal(gvar(inode), kPolPosi);
     }
     Literal output(gvar(node), kPolPosi);
-    if ( node->is_cplx_logic() ) {
-      LogExpr lexp = network.get_lexp(node);
-      make_cnf(solver, lexp, output, inputs);
-    }
-    else {
-      make_cnf(solver, node->type(), output, inputs);
-    }
+    make_cnf(solver, node, network, output, inputs);
   }
   for (ymuint i = 0; i < npo; ++ i) {
     const TgNode* node = network.output(i);
@@ -411,20 +427,14 @@ DtpgSat::run(const TgNetwork& network,
 	inputs[i] = Literal(gvar(inode), kPolPosi);
       }
     }
-    Literal output(fvar(fnode), kPolPosi);
-    if ( fnode->is_cplx_logic() ) {
-      LogExpr lexp = network.get_lexp(fnode);
-      make_cnf(solver, lexp, output, inputs);
-    }
-    else {
-      make_cnf(solver, fnode->type(), output, inputs);
-    }
-    Literal dlit(dvar(fnode), kPolPosi);
     Literal glit(gvar(fnode), kPolPosi);
-    solver.add_clause(~glit, ~output, ~dlit);
-    solver.add_clause(~glit,  output,  dlit);
-    solver.add_clause( glit, ~output,  dlit);
-    solver.add_clause( glit,  output, ~dlit);
+    Literal flit(fvar(fnode), kPolPosi);
+    Literal dlit(dvar(fnode), kPolPosi);
+    make_cnf(solver, fnode, network, flit, inputs);
+    solver.add_clause(~glit, ~flit, ~dlit);
+    solver.add_clause(~glit,  flit,  dlit);
+    solver.add_clause( glit, ~flit,  dlit);
+    solver.add_clause( glit,  flit, ~dlit);
   }
 
   // mark の付いていないノードは正常回路，付いているノードは故障回路
@@ -444,20 +454,14 @@ DtpgSat::run(const TgNetwork& network,
 	inputs[j] = Literal(gvar(inode), kPolPosi);
       }
     }
-    Literal output(fvar(node), kPolPosi);
-    if ( node->is_cplx_logic() ) {
-      LogExpr lexp = network.get_lexp(node);
-      make_cnf(solver, lexp, output, inputs);
-    }
-    else {
-      make_cnf(solver, node->type(), output, inputs);
-    }
     Literal glit(gvar(node), kPolPosi);
+    Literal flit(fvar(node), kPolPosi);
     Literal dlit(dvar(node), kPolPosi);
-    solver.add_clause(~glit, ~output, ~dlit);
-    solver.add_clause(~glit,  output,  dlit);
-    solver.add_clause( glit, ~output,  dlit);
-    solver.add_clause( glit,  output, ~dlit);
+    make_cnf(solver, node, network, flit, inputs);
+    solver.add_clause(~glit, ~flit, ~dlit);
+    solver.add_clause(~glit,  flit,  dlit);
+    solver.add_clause( glit, ~flit,  dlit);
+    solver.add_clause( glit,  flit, ~dlit);
     if ( node->is_output() ) {
       odiff.push_back(dlit);
     }

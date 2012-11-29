@@ -40,15 +40,6 @@ Network::Network() :
 Network::~Network()
 {
   clear();
-
-  for (list<GateSa*>::iterator p = mSa0List.begin();
-       p != mSa0List.end(); ++ p) {
-    delete *p;
-  }
-  for (list<GateSa*>::iterator p = mSa1List.begin();
-       p != mSa1List.end(); ++ p) {
-    delete *p;
-  }
 }
 
 
@@ -66,6 +57,15 @@ Network::clear()
   mNpi = 0;
   mActGateList.clear();
   mGateMap.clear();
+
+  for (list<GateSa*>::iterator p = mSa0List.begin();
+       p != mSa0List.end(); ++ p) {
+    delete *p;
+  }
+  for (list<GateSa*>::iterator p = mSa1List.begin();
+       p != mSa1List.end(); ++ p) {
+    delete *p;
+  }
   mSa0List.clear();
   mSa1List.clear();
 }

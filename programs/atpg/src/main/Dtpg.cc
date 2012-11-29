@@ -518,7 +518,7 @@ DtpgStats::call_count() const
 }
 
 // @brief バックトラック数を得る．
-ymuint
+ymuint64
 DtpgStats::backtrack_count() const
 {
   return mBtNum;

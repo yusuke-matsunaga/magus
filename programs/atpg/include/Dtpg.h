@@ -1,14 +1,14 @@
-#ifndef MAIN_DTPG_H
-#define MAIN_DTPG_H
+#ifndef DTPG_H
+#define DTPG_H
 
-/// @file src/main/Dtpg.h
+/// @file Dtpg.h
 /// @brief Dtpg のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: Dtpg.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -57,46 +57,46 @@ public:
   /// @brief 生成したパタン数を得る．
   ymuint
   generated_patterns() const;
-  
+
   /// @brief 起動回数を得る．
   ymuint
   call_count() const;
-  
+
   /// @brief バックトラック数を得る．
-  ymuint
+  ymuint64
   backtrack_count() const;
 
   /// @brief 計算時間を得る．
   USTime
   time() const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // 検出した故障数
-  ymuint mDetectNum;
+  ymuint32 mDetectNum;
 
   // 検出不能な故障数
-  ymuint mUntestNum;
+  ymuint32 mUntestNum;
 
   // アボート故障数
-  ymuint mAbortNum;
-  
+  ymuint32 mAbortNum;
+
   // パタン数
-  ymuint mPatNum;
+  ymuint32 mPatNum;
 
   // 起動回数
-  ymuint mDtpgNum;
-  
+  ymuint32 mDtpgNum;
+
   // バックトラック数
-  ymuint mBtNum;
-  
+  ymuint64 mBtNum;
+
   // 計算時間
   USTime mTime;
-  
+
 };
 
 
@@ -115,20 +115,20 @@ public:
   /// @brief デストラクタ
   virtual
   ~Dtpg();
-  
-  
+
+
 public:
 
   /// @brief 未検出の故障に対してテストパタン生成を行う．
   /// @param[in] sim_mode シミュレーションモード
   void
   operator()(tSimMode sim_mode);
-  
+
   /// @brief 直前の実行結果を返す．
   const DtpgStats&
   stats() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // バックトラック制限数に関するアクセス関数
@@ -146,7 +146,7 @@ public:
   /// @brief デフォルトのバックトラック制限数を設定する．
   void
   set_default_backtrack_limit();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -161,60 +161,60 @@ public:
   /// @param[in] us_mode 設定する Unique Sensitization モードの値
   void
   set_us_mode(ymuint us_mode);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // バックトラック数に関するアクセス関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief バックトラック数のカウンタをクリアする．
   void
   clear_backtrack_count();
-  
+
   /// @brief 今までのバックトラック数の総和を返す．
   ymuint
   total_backtrack_count() const;
-  
+
   /// @brief verbose level を設定する．
   void
   set_verbose_level(ymuint vlevel);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // dynamic implication のモードに関するアクセス関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief dynamic implication のモードを設定する．
   void
   set_dyn_mode(nsDtpgCl::tDynMode dyn_mode);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // SAT に関する制御
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief SAT モードの制御を行う．
   void
   set_sat(bool flag);
-  
+
   /// @brief SAT エンジンの指定を行う．
   void
   set_sat_mode(int mode);
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // scoping に関する制御
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief スコーピングの制御を行う．
   void
   set_scoping(bool flag);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
@@ -229,15 +229,15 @@ private:
   /// @param[in] sim_mode シミュレーションモード
   void
   dtpg2(tSimMode sim_mode);
-  
+
   void
   pat_gen_sub(tSimMode sim_mode);
-  
+
   /// @brief f に対するテストパタン生成を行う．
   /// @return パタンを返す．
   TestVector*
   dtpg_sub(SaFault* f);
-  
+
   /// @brief f に対するテストパタン生成を行う．
   /// @return パタンを返す．
   TestVector*
@@ -254,19 +254,19 @@ private:
 
   // スコーピングフラグ
   bool mScoping;
-  
+
   // 構造に基づいてテストパタン生成を行うクラス
   DtpgCl* mDtpgCl;
 
   // SAT を用いてテストパタン生成を行うクラス
   DtpgSat* mDtpgSat;
-  
+
   // dynamic implication モード
   nsDtpgCl::tDynMode mDynMode;
-  
+
   // テストベクタのバッファ
   TvBuff mTvBuff;
-  
+
   // 対象の故障を保持するリスト
   vector<SaFault*> mCurFaults;
 
@@ -281,10 +281,10 @@ private:
 
   // 故障選択用の乱数生成器
   RandGen mFselGen;
-  
+
   // 実行結果
   DtpgStats mStats;
-  
+
 };
 
 END_NAMESPACE_YM_ATPG
