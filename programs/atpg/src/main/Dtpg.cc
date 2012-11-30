@@ -357,12 +357,10 @@ Dtpg::dtpg_sub(SaFault* f)
   }
 
   fmgr.set_status(f, kFsDetected);
-  //fmgr.set_detected(f, cur_tv);
   for (vector<SaFault*>::iterator p = mDetFaults.begin();
        p != mDetFaults.end(); ++ p) {
     SaFault* f = *p;
     fmgr.set_status(f, kFsDetected);
-    //fmgr.set_detected(f, cur_tv);
   }
 
   return cur_tv;

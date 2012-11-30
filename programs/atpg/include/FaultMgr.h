@@ -79,6 +79,22 @@ public:
   ymuint
   untest_num() const;
 
+  /// @brief 出力の故障を取り出す．
+  /// @param[in] node 対象のノード
+  /// @param[in] val 縮退している値
+  SaFault*
+  find_ofault(const TgNode* node,
+	      int val);
+
+  /// @brief 入力の故障を取り出す．
+  /// @param[in] node 対象のノード
+  /// @param[in] pos 入力の故障の時に入力番号を表す
+  /// @param[in] val 縮退している値
+  SaFault*
+  find_ifault(const TgNode* node,
+	      ymuint pos,
+	      int val);
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -142,22 +158,6 @@ private:
 	    bool is_output,
 	    ymuint pos,
 	    int val);
-
-  /// @brief 出力の故障を取り出す．
-  /// @param[in] node 対象のノード
-  /// @param[in] val 縮退している値
-  SaFault*
-  find_ofault(const TgNode* node,
-	      int val);
-
-  /// @brief 入力の故障を取り出す．
-  /// @param[in] node 対象のノード
-  /// @param[in] pos 入力の故障の時に入力番号を表す
-  /// @param[in] val 縮退している値
-  SaFault*
-  find_ifault(const TgNode* node,
-	      ymuint pos,
-	      int val);
 
   /// @brief 故障を追加する．
   /// @param[in] node 対象のノード

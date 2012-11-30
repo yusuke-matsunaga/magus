@@ -59,7 +59,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   using nsDtpgCl::kDynOnce;
   using nsDtpgCl::kDynAlways;
 
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
   if ( objc != 1 ) {
     print_usage();
     return TCL_ERROR;
