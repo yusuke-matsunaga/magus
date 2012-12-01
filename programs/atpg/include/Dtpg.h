@@ -241,7 +241,7 @@ private:
   /// @brief f に対するテストパタン生成を行う．
   /// @return パタンを返す．
   TestVector*
-  dtpg2_sub(SaFault* f);
+  dtpg_sat(SaFault* f);
 
 
 private:
