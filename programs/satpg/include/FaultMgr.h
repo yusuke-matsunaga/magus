@@ -95,6 +95,10 @@ public:
 	      ymuint pos,
 	      int val);
 
+  /// @brief 同じ箇所で反対の故障値を持つ故障を返す．
+  SaFault*
+  find_alt_fault(SaFault* f);
+
 
 public:
   //////////////////////////////////////////////////////////////////////

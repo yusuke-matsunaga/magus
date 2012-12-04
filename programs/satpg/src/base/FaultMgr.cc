@@ -298,6 +298,18 @@ FaultMgr::find_ifault(const TgNode* node,
   return f;
 }
 
+// @brief 同じ箇所で反対の故障値を持つ故障を返す．
+SaFault*
+FaultMgr::find_alt_fault(SaFault* f)
+{
+  const TgNode* fnode = f->node();
+  Fnode& fnode = mFnodeArray[node->gid()];
+  if ( f->is_input_fault() ) {
+  }
+  else {
+  }
+}
+
 // @brief 故障を追加する．
 SaFault*
 FaultMgr::add_fault(const TgNode* node,
