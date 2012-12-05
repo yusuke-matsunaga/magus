@@ -67,6 +67,9 @@ private:
   // ffr オプションの解析用オブジェクト
   TclPopt* mPoptFFR;
 
+  // mffc オプションの解析用オブジェクト
+  TclPopt* mPoptMFFC;
+
 };
 
 END_NAMESPACE_YM_SATPG

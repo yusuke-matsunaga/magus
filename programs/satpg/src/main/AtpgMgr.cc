@@ -392,6 +392,30 @@ check_fos(const TgNode* node)
   return false;
 }
 
+const TgNode*
+merge(const TgNode* node1,
+      const TgNode* node2,
+      const vector<const TgNode*>& mffc_root,
+      const vector<ymuint>& tid)
+{
+  for ( ; ; ) {
+    if ( node1 == node2 ) {
+      return node1;
+    }
+    if ( node1 == NULL || node2 == NULL ) {
+      return NULL;
+    }
+    ymuint id1 = tid[node1->gid()];
+    ymuint id2 = tid[node2->gid()];
+    if ( id1 > id2 ) {
+      node1 = mffc_root[node1->gid()];
+    }
+    else if ( id1 < id2 ) {
+      node2 = mffc_root[node2->gid()];
+    }
+  }
+}
+
 END_NONAMESPACE
 
 // @brief ネットワークをセットした後に呼ぶ関数
@@ -406,10 +430,15 @@ AtpgMgr::after_set_network()
   ymuint nl = mNetwork.logic_num();
   ymuint n = mNetwork.node_num();
 
+
+
+  //////////////////////////////////////////////////////////////////////
+  // FFR を作成する．
+  //////////////////////////////////////////////////////////////////////
+
   vector<ymuint> root_id(n);
   vector<TgFFR*> ffr_array(n);
 
-  // FFR を作成する．
   ymuint nffr = 0;
   for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* node = mNetwork.sorted_logic(nl - i - 1);
@@ -458,6 +487,104 @@ AtpgMgr::after_set_network()
     TgFFR* ffr = ffr_array[rid];
     assert_cond( ffr != NULL, __FILE__, __LINE__);
     ffr->mNodeList.push_back(node);
+  }
+
+
+  //////////////////////////////////////////////////////////////////////
+  // MFFC を作成する
+  //////////////////////////////////////////////////////////////////////
+
+  vector<ymuint> tid(n);
+  for (ymuint i = 0; i < nl; ++ i) {
+    const TgNode* node = mNetwork.sorted_logic(nl - i - 1);
+    ymuint gid = node->gid();
+    tid[gid] = i;
+  }
+
+  vector<const TgNode*> mffc_root(n, NULL);
+  vector<TgFFR*> mffc_array(n);
+  ymuint nmffc = 0;
+  for (ymuint i = 0; i < nl; ++ i) {
+    const TgNode* node = mNetwork.sorted_logic(nl - i - 1);
+    ymuint gid = node->gid();
+    if ( check_fos(node) ) {
+      ymuint nfo = node->fanout_num();
+      const TgNode* tmp_root = mffc_root[node->fanout(0)->gid()];
+      for (ymuint i = 1; i < nfo; ++ i) {
+	const TgNode* tmp_root1 = mffc_root[node->fanout(i)->gid()];
+	tmp_root = merge(tmp_root, tmp_root1, mffc_root, tid);
+	if ( tmp_root == NULL ) {
+	  break;
+	}
+      }
+      mffc_root[gid] = tmp_root;
+      if ( tmp_root == NULL ) {
+	TgFFR* mffc = new TgFFR;
+	mffc_array[gid] = mffc;
+	mMFFCList.push_back(mffc);
+	mffc->mRoot = node;
+	++ nmffc;
+      }
+    }
+    else {
+      const TgNode* fonode = node->fanout(0);
+      const TgNode* root = mffc_root[fonode->gid()];
+      if ( root == NULL ) {
+	root = fonode;
+      }
+      mffc_root[gid] = root;
+    }
+  }
+  for (ymuint i = 0; i < ni; ++ i) {
+    const TgNode* node = mNetwork.input(i);
+    ymuint gid = node->gid();
+    if ( check_fos(node) ) {
+      ymuint nfo = node->fanout_num();
+      const TgNode* tmp_root = mffc_root[node->fanout(0)->gid()];
+      for (ymuint i = 1; i < nfo; ++ i) {
+	const TgNode* tmp_root1 = mffc_root[node->fanout(i)->gid()];
+	tmp_root = merge(tmp_root, tmp_root1, mffc_root, tid);
+	if ( tmp_root == NULL ) {
+	  break;
+	}
+      }
+      mffc_root[gid] = tmp_root;
+      if ( tmp_root == NULL ) {
+	TgFFR* mffc = new TgFFR;
+	mffc_array[gid] = mffc;
+	mMFFCList.push_back(mffc);
+	mffc->mRoot = node;
+	++ nmffc;
+      }
+    }
+    else {
+      const TgNode* fonode = node->fanout(0);
+      const TgNode* root = mffc_root[fonode->gid()];
+      if ( root == NULL ) {
+	root = fonode;
+      }
+      mffc_root[gid] = root;
+    }
+  }
+
+  // 入力からのトポロジカル順にMFFC内のノードリストを作る．
+  for (ymuint i = 0; i < ni; ++ i) {
+    const TgNode* node = mNetwork.input(i);
+    TgFFR* mffc = mffc_array[node->gid()];
+    if ( mffc == NULL ) {
+      mffc = mffc_array[mffc_root[node->gid()]->gid()];
+    }
+    assert_cond( mffc != NULL, __FILE__, __LINE__);
+    mffc->mNodeList.push_back(node);
+  }
+  for (ymuint i = 0; i < nl; ++ i) {
+    const TgNode* node = mNetwork.sorted_logic(i);
+    TgFFR* mffc = mffc_array[node->gid()];
+    if ( mffc == NULL ) {
+      mffc = mffc_array[mffc_root[node->gid()]->gid()];
+    }
+    assert_cond( mffc != NULL, __FILE__, __LINE__);
+    mffc->mNodeList.push_back(node);
   }
 
   mTvMgr.init(ni);

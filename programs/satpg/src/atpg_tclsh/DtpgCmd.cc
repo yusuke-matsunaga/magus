@@ -64,8 +64,10 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			  "dual mode");
   mPoptFFR = new TclPopt(this, "ffr",
 			  "FFR mode");
+  mPoptMFFC = new TclPopt(this, "mffc",
+			  "MFFC mode");
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptSatRec);
-  new_popt_group(mPoptDual, mPoptFFR);
+  new_popt_group(mPoptDual, mPoptFFR, mPoptMFFC);
 }
 
 // @brief デストラクタ
@@ -136,6 +138,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   bool dual_mode = mPoptDual->is_specified();
   bool ffr_mode = mPoptFFR->is_specified();
+  bool mffc_mode = mPoptMFFC->is_specified();
 
   FaultMgr& fmgr = mgr()._fault_mgr();
   const vector<SaFault*>& flist = fmgr.remain_list();
@@ -149,6 +152,52 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     const vector<TgFFR*>& ffr_list = mgr()._ffr_list();
     for (vector<TgFFR*>::const_iterator p = ffr_list.begin();
 	 p != ffr_list.end(); ++ p) {
+      TgFFR* ffr = *p;
+
+      const vector<const TgNode*>& node_list = ffr->node_list();
+      vector<SaFault*> flist;
+      for (vector<const TgNode*>::const_iterator q = node_list.begin();
+	   q != node_list.end(); ++ q) {
+	const TgNode* node = *q;
+	SaFault* fo0 = fmgr.find_ofault(node, 0);
+	if ( fo0->rep() == fo0 && fo0->status() == kFsUndetected ) {
+	  flist.push_back(fo0);
+	}
+	SaFault* fo1 = fmgr.find_ofault(node, 1);
+	if ( fo1->rep() == fo1 && fo1->status() == kFsUndetected ) {
+	  flist.push_back(fo1);
+	}
+	ymuint ni = node->ni();
+	for (ymuint i = 0; i < ni; ++ i) {
+	  SaFault* fi0 = fmgr.find_ifault(node, i, 0);
+	  if ( fi0->rep() == fi0 && fi0->status() == kFsUndetected ) {
+	    flist.push_back(fi0);
+	  }
+	  SaFault* fi1 = fmgr.find_ifault(node, i, 1);
+	  if ( fi1->rep() == fi1 && fi1->status() == kFsUndetected ) {
+	    flist.push_back(fi1);
+	  }
+	}
+      }
+      ymuint nf = flist.size();
+      vector<TestVector*> tv_list1(nf);
+      vector<tStat> stat_list(nf);
+      for (ymuint i = 0; i < nf; ++ i) {
+	tv_list1[i] = tvmgr.new_vector();
+      }
+
+      mgr().dtpg_ffr(ffr, flist, tv_list1, stat_list);
+
+      for (ymuint i = 0; i < nf; ++ i) {
+	update_stat(stat_list[i], fmgr, flist[i], tv_list1[i], tv_list, tvmgr);
+	tvmgr.delete_vector(tv_list1[i]);
+      }
+    }
+  }
+  else if ( mffc_mode ) {
+    const vector<TgFFR*>& mffc_list = mgr()._mffc_list();
+    for (vector<TgFFR*>::const_iterator p = mffc_list.begin();
+	 p != mffc_list.end(); ++ p) {
       TgFFR* ffr = *p;
 
       const vector<const TgNode*>& node_list = ffr->node_list();

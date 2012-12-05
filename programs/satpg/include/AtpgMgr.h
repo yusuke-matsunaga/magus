@@ -53,6 +53,10 @@ public:
   const vector<TgFFR*>&
   _ffr_list();
 
+  /// @brief MFFC のリストを取り出す．
+  const vector<TgFFR*>&
+  _mffc_list();
+
   /// @brief FaultMgr を取り出す．
   FaultMgr&
   _fault_mgr();
@@ -262,6 +266,9 @@ private:
   // FFR のリスト
   vector<TgFFR*> mFFRList;
 
+  // MFFC のリスト
+  vector<TgFFR*> mMFFCList;
+
   // 故障リスト
   FaultMgr mFaultMgr;
 
@@ -307,6 +314,14 @@ const vector<TgFFR*>&
 AtpgMgr::_ffr_list()
 {
   return mFFRList;
+}
+
+// @brief MFFC のリストを取り出す．
+inline
+const vector<TgFFR*>&
+AtpgMgr::_mffc_list()
+{
+  return mMFFCList;
 }
 
 // @brief FaultMgr を取り出す．

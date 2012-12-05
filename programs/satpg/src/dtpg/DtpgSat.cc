@@ -796,6 +796,9 @@ DtpgSat::make_cnf(SatSolver& solver,
   // 故障回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
 
+  Literal glit(gvar(fnode), kPolPosi);
+  Literal flit(fvar(fnode), kPolPosi);
+  Literal dlit(dvar(fnode), kPolPosi);
   if ( is_input_fault ) {
     ymuint ni = fnode->ni();
     vector<Literal> inputs(ni);
@@ -808,15 +811,12 @@ DtpgSat::make_cnf(SatSolver& solver,
 	inputs[i] = Literal(gvar(inode), kPolPosi);
       }
     }
-    Literal glit(gvar(fnode), kPolPosi);
-    Literal flit(fvar(fnode), kPolPosi);
-    Literal dlit(dvar(fnode), kPolPosi);
     make_node_cnf(solver, fnode, network, flit, inputs);
-    solver.add_clause(~glit, ~flit, ~dlit);
-    solver.add_clause(~glit,  flit,  dlit);
-    solver.add_clause( glit, ~flit,  dlit);
-    solver.add_clause( glit,  flit, ~dlit);
   }
+  solver.add_clause(~glit, ~flit, ~dlit);
+  solver.add_clause(~glit,  flit,  dlit);
+  solver.add_clause( glit, ~flit,  dlit);
+  solver.add_clause( glit,  flit, ~dlit);
 
   // mark の付いていないノードは正常回路，付いているノードは故障回路
   // を用いて CNF を作る．
