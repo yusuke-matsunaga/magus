@@ -239,12 +239,16 @@ AtpgMgr::dtpg_single(const TgNode* fnode,
 		     int fval,
 		     TestVector* tv)
 {
+#if 0
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_SAT);
+#endif
 
   tStat stat = mDtpg->dtpg_single(_network(), fnode, false, 0, fnode, fval, tv);
 
+#if 0
   mTimer.change(old_id);
+#endif
 
   return stat;
 }
@@ -265,12 +269,16 @@ AtpgMgr::dtpg_single(const TgNode* fnode,
 		     int fval,
 		     TestVector* tv)
 {
+#if 0
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_SAT);
+#endif
 
   tStat stat = mDtpg->dtpg_single(_network(), fnode, true, ipos, fsrc, fval, tv);
 
+#if 0
   mTimer.change(old_id);
+#endif
 
   return stat;
 }
@@ -285,12 +293,16 @@ pair<tStat, tStat>
 AtpgMgr::dtpg_dual(const TgNode* fnode,
 		   TestVector* tv[])
 {
+#if 0
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_SAT);
+#endif
 
   pair<tStat, tStat> stats = mDtpg->dtpg_dual(_network(), fnode, false, 0, fnode, tv);
 
+#if 0
   mTimer.change(old_id);
+#endif
 
   return stats;
 }
@@ -309,12 +321,16 @@ AtpgMgr::dtpg_dual(const TgNode* fnode,
 		   const TgNode* fsrc,
 		   TestVector* tv[])
 {
+#if 0
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_SAT);
+#endif
 
   pair<tStat, tStat> stats = mDtpg->dtpg_dual(_network(), fnode, true, ipos, fsrc, tv);
 
+#if 0
   mTimer.change(old_id);
+#endif
 
   return stats;
 }
@@ -331,12 +347,16 @@ AtpgMgr::dtpg_ffr(const TgFFR* ffr,
 		  vector<TestVector*>& tv_list,
 		  vector<tStat>& stat_list)
 {
+#if 0
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_SAT);
+#endif
 
   mDtpg->dtpg_ffr(_network(), ffr, flist, tv_list, stat_list);
 
+#if 0
   mTimer.change(old_id);
+#endif
 }
 
 // @brief 直前の実行結果を得る．
