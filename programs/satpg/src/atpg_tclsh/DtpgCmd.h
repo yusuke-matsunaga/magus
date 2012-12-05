@@ -49,10 +49,10 @@ private:
   // sat モードオプションの解析用オブジェクト
   TclPopt* mPoptSat;
 
-  // satrec モードオプションの解析様オブジェクト
+  // satrec モードオプションの解析用オブジェクト
   TclPopt* mPoptSatRec;
 
-  // minisat モードオプションの解析様オブジェクト
+  // minisat モードオプションの解析用オブジェクト
   TclPopt* mPoptMiniSat;
 
   // fsim モードオプションの解析用オブジェクト
@@ -60,6 +60,12 @@ private:
 
   // print_stats オプションの解析用オブジェクト
   TclPopt* mPoptPrintStats;
+
+  // dual オプションの解析用オブジェクト
+  TclPopt* mPoptDual;
+
+  // ffr オプションの解析用オブジェクト
+  TclPopt* mPoptFFR;
 
 };
 

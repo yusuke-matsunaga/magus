@@ -8,15 +8,13 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	satpg_nsdef.h \
-	AtpgFunctor.h \
 	AtpgMgr.h \
-	Dtpg.h \
 	FaultMgr.h \
-	ModBase.h \
 	PackedVal.h \
 	PackedVal3.h \
 	Rtpg.h \
 	SaFault.h \
+	TgFFR.h \
 	TestVector.h
 	TvBuff.h \
 	TvMgr.h \

@@ -96,7 +96,7 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
   ymuint nl = network.logic_num();
   ymuint nn = network.node_num();
 
-  mFnodeArray.resize(network.node_num());
+  mFnodeArray.resize(nn);
 
   // 全部の故障を生成する．
   for (ymuint i = 0; i < nn; ++ i) {
@@ -302,11 +302,15 @@ FaultMgr::find_ifault(const TgNode* node,
 SaFault*
 FaultMgr::find_alt_fault(SaFault* f)
 {
-  const TgNode* fnode = f->node();
+  const TgNode* node = f->node();
+  int fval = f->val() ^ 1;
   Fnode& fnode = mFnodeArray[node->gid()];
   if ( f->is_input_fault() ) {
+    ymuint pos = f->pos();
+    return fnode.mIfaults[pos * 2 + fval];
   }
   else {
+    return fnode.mOfault[fval];
   }
 }
 

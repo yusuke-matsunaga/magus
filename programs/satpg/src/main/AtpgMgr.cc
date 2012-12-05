@@ -320,13 +320,13 @@ AtpgMgr::dtpg_dual(const TgNode* fnode,
 }
 
 // @brief FFR 内の故障に対してテストパタン生成を行なう．
-// @param[in] root FFR の根のノード
+// @param[in] ffr FFR を表すクラス
 // @param[in] flist 故障リスト
 // @param[in] tv_list 生成したパタンを入れるベクタ
 // @param[in] stat_list 結果を入れるベクタ
 // @note flist の故障は必ず root が dominator となっていなければならない．
 void
-AtpgMgr::dtpg_ffr(const TgNode* root,
+AtpgMgr::dtpg_ffr(const TgFFR* ffr,
 		  const vector<SaFault*>& flist,
 		  vector<TestVector*>& tv_list,
 		  vector<tStat>& stat_list)
@@ -334,7 +334,7 @@ AtpgMgr::dtpg_ffr(const TgNode* root,
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_SAT);
 
-  mDtpg->dtpg_ffr(_network(), root, flist, tv_list, stat_list);
+  mDtpg->dtpg_ffr(_network(), ffr, flist, tv_list, stat_list);
 
   mTimer.change(old_id);
 }
@@ -381,14 +381,85 @@ AtpgMgr::misc_time() const
   return mTimer.time(TM_MISC);
 }
 
+BEGIN_NONAMESPACE
+
+bool
+check_fos(const TgNode* node)
+{
+  if ( node->fanout_num() > 1 || node->fanout(0)->is_output() ) {
+    return true;
+  }
+  return false;
+}
+
+END_NONAMESPACE
+
 // @brief ネットワークをセットした後に呼ぶ関数
 void
 AtpgMgr::after_set_network()
 {
+  mFFRList.clear();
   mFaultMgr.clear();
   mTvMgr.clear();
 
   ymuint ni = mNetwork.input_num2();
+  ymuint nl = mNetwork.logic_num();
+  ymuint n = mNetwork.node_num();
+
+  vector<ymuint> root_id(n);
+  vector<TgFFR*> ffr_array(n);
+
+  // FFR を作成する．
+  ymuint nffr = 0;
+  for (ymuint i = 0; i < nl; ++ i) {
+    const TgNode* node = mNetwork.sorted_logic(nl - i - 1);
+    ymuint gid = node->gid();
+    if ( check_fos(node) ) {
+      root_id[gid] = gid;
+      TgFFR* ffr = new TgFFR;
+      ffr_array[gid] = ffr;
+      mFFRList.push_back(ffr);
+      ffr->mRoot = node;
+      ++ nffr;
+    }
+    else {
+      ymuint rid = root_id[node->fanout(0)->gid()];
+      root_id[gid] = rid;
+    }
+  }
+  for (ymuint i = 0; i < ni; ++ i) {
+    const TgNode* node = mNetwork.input(i);
+    ymuint gid = node->gid();
+    if ( check_fos(node) ) {
+      root_id[gid] = gid;
+      TgFFR* ffr = new TgFFR;
+      ffr_array[gid] = ffr;
+      mFFRList.push_back(ffr);
+      ffr->mRoot = node;
+      ++ nffr;
+    }
+    else {
+      ymuint rid = root_id[node->fanout(0)->gid()];
+      root_id[gid] = rid;
+    }
+  }
+
+  // 入力からのトポロジカル順にFFR内のノードリストを作る．
+  for (ymuint i = 0; i < ni; ++ i) {
+    const TgNode* node = mNetwork.input(i);
+    ymuint rid = root_id[node->gid()];
+    TgFFR* ffr = ffr_array[rid];
+    assert_cond( ffr != NULL, __FILE__, __LINE__);
+    ffr->mNodeList.push_back(node);
+  }
+  for (ymuint i = 0; i < nl; ++ i) {
+    const TgNode* node = mNetwork.sorted_logic(i);
+    ymuint rid = root_id[node->gid()];
+    TgFFR* ffr = ffr_array[rid];
+    assert_cond( ffr != NULL, __FILE__, __LINE__);
+    ffr->mNodeList.push_back(node);
+  }
+
   mTvMgr.init(ni);
 
   mNtwkBindMgr.prop_event(mNetwork);

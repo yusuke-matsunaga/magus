@@ -13,6 +13,7 @@
 #include "satpg_nsdef.h"
 #include "FaultMgr.h"
 #include "TvMgr.h"
+#include "TgFFR.h"
 #include "fsim_nsdef.h"
 #include "dtpg_nsdef.h"
 #include "ym_logic/SatSolver.h"
@@ -47,6 +48,10 @@ public:
   /// @brief TgNetwork を取り出す．
   const TgNetwork&
   _network();
+
+  /// @brief FFR のリストを取り出す．
+  const vector<TgFFR*>&
+  _ffr_list();
 
   /// @brief FaultMgr を取り出す．
   FaultMgr&
@@ -176,13 +181,13 @@ public:
 	    TestVector* tv[]);
 
   /// @brief FFR 内の故障に対してテストパタン生成を行なう．
-  /// @param[in] root FFR の根のノード
+  /// @param[in] ffr FFR を表すクラス
   /// @param[in] flist 故障リスト
   /// @param[in] tv_list 生成したパタンを入れるベクタ
   /// @param[in] stat_list 結果を入れるベクタ
   /// @note flist の故障は必ず root が dominator となっていなければならない．
   void
-  dtpg_ffr(const TgNode* root,
+  dtpg_ffr(const TgFFR* ffr,
 	   const vector<SaFault*>& flist,
 	   vector<TestVector*>& tv_list,
 	   vector<tStat>& stat_list);
@@ -254,6 +259,9 @@ private:
   // 対象のネットワーク
   TgNetwork mNetwork;
 
+  // FFR のリスト
+  vector<TgFFR*> mFFRList;
+
   // 故障リスト
   FaultMgr mFaultMgr;
 
@@ -291,6 +299,14 @@ const TgNetwork&
 AtpgMgr::_network()
 {
   return mNetwork;
+}
+
+// @brief FFR のリストを取り出す．
+inline
+const vector<TgFFR*>&
+AtpgMgr::_ffr_list()
+{
+  return mFFRList;
 }
 
 // @brief FaultMgr を取り出す．

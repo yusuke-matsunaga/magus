@@ -21,6 +21,7 @@ BEGIN_NAMESPACE_YM_SATPG
 
 class SaFault;
 class TestVector;
+class TgFFR;
 
 END_NAMESPACE_YM_SATPG
 
@@ -99,14 +100,14 @@ public:
 
   /// @brief FFR 内の故障に対してテストパタン生成を行なう．
   /// @param[in] network 対象の回路
-  /// @param[in] root FFR の根のノード
+  /// @param[in] ffr FFR を表すクラス
   /// @param[in] flist 故障リスト
   /// @param[in] tv_list 生成したパタンを入れるベクタ
   /// @param[in] stat_list 結果を入れるベクタ
   /// @note flist の故障は必ず root が dominator となっていなければならない．
   void
   dtpg_ffr(const TgNetwork& network,
-	   const TgNode* root,
+	   const TgFFR* ffr,
 	   const vector<SaFault*>& flist,
 	   vector<TestVector*>& tv_list,
 	   vector<tStat>& stat_list);
@@ -126,6 +127,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief mVarMap を初期化する．
+  void
+  init_varmap(const TgNetwork& network);
 
   /// @brief 同じ位置の故障に対する CNF を作る．
   void

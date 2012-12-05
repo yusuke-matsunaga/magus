@@ -15,6 +15,31 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+BEGIN_NONAMESPACE
+
+void
+update_stat(tStat stat,
+	    FaultMgr& fmgr,
+	    SaFault* f,
+	    TestVector* tv,
+	    vector<TestVector*>& tv_list,
+	    TvMgr& tvmgr)
+{
+  if ( stat == kUntest ) {
+    // 検出不能
+    fmgr.set_status(f, kFsUntestable);
+  }
+  else if ( stat == kDetect ) {
+    // 検出
+    fmgr.set_status(f, kFsDetected);
+    TestVector* tmp_tv = tvmgr.new_vector();
+    tmp_tv->copy(*tv);
+    tv_list.push_back(tmp_tv);
+  }
+}
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // テストパタン生成を行うコマンド
 //////////////////////////////////////////////////////////////////////
@@ -35,7 +60,12 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			     "specify FSIM mode (none, single, ppsfp)");
   mPoptPrintStats = new TclPopt(this, "print_stats",
 				"print statistics");
+  mPoptDual = new TclPopt(this, "dual",
+			  "dual mode");
+  mPoptFFR = new TclPopt(this, "ffr",
+			  "FFR mode");
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptSatRec);
+  new_popt_group(mPoptDual, mPoptFFR);
 }
 
 // @brief デストラクタ
@@ -104,45 +134,114 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   bool print_stats = mPoptPrintStats->is_specified();
 
-  // GO!
-  //mDtpg(fsim_mode);
+  bool dual_mode = mPoptDual->is_specified();
+  bool ffr_mode = mPoptFFR->is_specified();
+
   FaultMgr& fmgr = mgr()._fault_mgr();
   const vector<SaFault*>& flist = fmgr.remain_list();
   TvMgr& tvmgr = mgr()._tv_mgr();
   TestVector* tmp_tv = tvmgr.new_vector();
+  TestVector* tmp_tv1 = tvmgr.new_vector();
+  TestVector* tmp_tv2[2] = {tmp_tv, tmp_tv1};
   vector<TestVector*>& tv_list = mgr()._tv_list();
 
-  vector<SaFault*> cur_flist(flist.begin(), flist.end());
-  for (vector<SaFault*>::const_iterator p = cur_flist.begin();
-       p != cur_flist.end(); ++ p) {
-    SaFault* f = *p;
-    if ( f->status() != kFsUndetected ) {
-      continue;
-    }
+  if ( ffr_mode ) {
+    const vector<TgFFR*>& ffr_list = mgr()._ffr_list();
+    for (vector<TgFFR*>::const_iterator p = ffr_list.begin();
+	 p != ffr_list.end(); ++ p) {
+      TgFFR* ffr = *p;
 
-    const TgNode* fnode = f->node();
-    tStat stat;
-    if ( f->is_input_fault() ) {
-      ymuint pos = f->pos();
-      const TgNode* fsrc = fnode->fanin(pos);
-      stat = mgr().dtpg_single(fnode, pos, fsrc, f->val(), tmp_tv);
+      const vector<const TgNode*>& node_list = ffr->node_list();
+      vector<SaFault*> flist;
+      for (vector<const TgNode*>::const_iterator q = node_list.begin();
+	   q != node_list.end(); ++ q) {
+	const TgNode* node = *q;
+	SaFault* fo0 = fmgr.find_ofault(node, 0);
+	if ( fo0->rep() == fo0 && fo0->status() == kFsUndetected ) {
+	  flist.push_back(fo0);
+	}
+	SaFault* fo1 = fmgr.find_ofault(node, 1);
+	if ( fo1->rep() == fo1 && fo1->status() == kFsUndetected ) {
+	  flist.push_back(fo1);
+	}
+	ymuint ni = node->ni();
+	for (ymuint i = 0; i < ni; ++ i) {
+	  SaFault* fi0 = fmgr.find_ifault(node, i, 0);
+	  if ( fi0->rep() == fi0 && fi0->status() == kFsUndetected ) {
+	    flist.push_back(fi0);
+	  }
+	  SaFault* fi1 = fmgr.find_ifault(node, i, 1);
+	  if ( fi1->rep() == fi1 && fi1->status() == kFsUndetected ) {
+	    flist.push_back(fi1);
+	  }
+	}
+      }
+      ymuint nf = flist.size();
+      vector<TestVector*> tv_list1(nf);
+      vector<tStat> stat_list(nf);
+      for (ymuint i = 0; i < nf; ++ i) {
+	tv_list1[i] = tvmgr.new_vector();
+      }
+
+      mgr().dtpg_ffr(ffr, flist, tv_list1, stat_list);
+
+      for (ymuint i = 0; i < nf; ++ i) {
+	update_stat(stat_list[i], fmgr, flist[i], tv_list1[i], tv_list, tvmgr);
+	tvmgr.delete_vector(tv_list1[i]);
+      }
     }
-    else {
-      stat = mgr().dtpg_single(fnode, f->val(), tmp_tv);
-    }
-    if ( stat == kUntest ) {
-      // 検出不能
-      fmgr.set_status(f, kFsUntestable);
-    }
-    else if ( stat == kDetect ) {
-      // 検出
-      fmgr.set_status(f, kFsDetected);
-      tv_list.push_back(tmp_tv);
-      tmp_tv = tvmgr.new_vector();
+  }
+  else {
+    vector<SaFault*> cur_flist(flist.begin(), flist.end());
+    for (vector<SaFault*>::const_iterator p = cur_flist.begin();
+	 p != cur_flist.end(); ++ p) {
+      SaFault* f = *p;
+      if ( f->status() != kFsUndetected ) {
+	continue;
+      }
+
+      const TgNode* fnode = f->node();
+      SaFault* alt_f = fmgr.find_alt_fault(f);
+      if ( dual_mode && alt_f->status() == kFsUndetected ) {
+	pair<tStat, tStat> stats;
+	if ( f->is_input_fault() ) {
+	  ymuint pos = f->pos();
+	  const TgNode* fsrc = fnode->fanin(pos);
+	  stats = mgr().dtpg_dual(fnode, pos, fsrc, tmp_tv2);
+	}
+	else {
+	  stats = mgr().dtpg_dual(fnode, tmp_tv2);
+	}
+	SaFault* f0;
+	SaFault* f1;
+	if ( f->val() == 0 ) {
+	  f0 = f;
+	  f1 = alt_f;
+	}
+	else {
+	  f0 = alt_f;
+	  f1 = f;
+	}
+	update_stat(stats.first, fmgr, f0, tmp_tv2[0], tv_list, tvmgr);
+	update_stat(stats.second, fmgr, f1, tmp_tv2[1], tv_list, tvmgr);
+      }
+      else {
+	tStat stat;
+	if ( f->is_input_fault() ) {
+	  ymuint pos = f->pos();
+	  const TgNode* fsrc = fnode->fanin(pos);
+	  stat = mgr().dtpg_single(fnode, pos, fsrc, f->val(), tmp_tv);
+	}
+	else {
+	  stat = mgr().dtpg_single(fnode, f->val(), tmp_tv);
+	}
+	update_stat(stat, fmgr, f, tmp_tv, tv_list, tvmgr);
+      }
     }
   }
 
   tvmgr.delete_vector(tmp_tv);
+  tvmgr.delete_vector(tmp_tv1);
 
   fmgr.update();
   after_update_faults();
