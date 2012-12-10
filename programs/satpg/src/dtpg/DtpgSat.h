@@ -11,21 +11,24 @@
 
 
 #include "dtpg_nsdef.h"
-#include "ym_networks/tgnet.h"
-#include "ym_networks/TgNode.h"
-#include "ym_logic/VarId.h"
+#include "DtpgNetwork.h"
+#include "DtpgNode.h"
+#include "ym_logic/Bool3.h"
+#include "ym_logic/Literal.h"
 #include "ym_logic/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
-class SaFault;
+class TvMgr;
 class TestVector;
-class TgFFR;
+class SaFault;
 
 END_NAMESPACE_YM_SATPG
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
+
+class DtpgFFR;
 
 //////////////////////////////////////////////////////////////////////
 /// @class DtpgSat DtpgSat.h "DtpgSat.h"
@@ -48,150 +51,189 @@ public:
   // パタン生成を行う関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 一つの故障に対してテストパタン生成を行う．
-  /// @param[in] network 対象の回路
-  /// @param[in] f 対象の故障
-  /// @param[out] tv 生成したパタンを入れるベクタ
-  /// @retval kDetect パタン生成が成功した．
-  /// @retval kUntest テスト不能故障だった．
-  /// @retval kAbort アボートした．
-  tStat
-  run(const TgNetwork& network,
-      SaFault* f,
-      TestVector* tv);
-
-  /// @brief 一つの故障に対してテストパタン生成を行なう．
-  /// @param[in] network 対象の回路
-  /// @param[in] fnode 故障ノード
-  /// @param[in] is_input_fault 入力の故障の時 true
-  /// @param[in] ipos 故障の入力位置
-  /// @param[in] fsrc 故障ノードの入力
-  /// @param[in] fval 故障値
-  /// @param[in] tv 生成したパタンを入れるベクタ
-  /// @retval kDetect パタン生成が成功した．
-  /// @retval kUntest テスト不能故障だった．
-  /// @retval kAbort アボートした．
-  tStat
-  dtpg_single(const TgNetwork& network,
-	      const TgNode* fnode,
-	      bool is_input_fault,
-	      ymuint ipos,
-	      const TgNode* fsrc,
-	      int fval,
-	      TestVector* tv);
-
-  /// @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
-  /// @param[in] network 対象の回路
-  /// @param[in] fnode 故障ノード
-  /// @param[in] is_input_fault 入力の故障の時 true
-  /// @param[in] ipos 故障の入力位置
-  /// @param[in] fsrc 故障ノードの入力
-  /// @param[in] tv 生成したパタンを入れるベクタ
-  /// @retval kDetect パタン生成が成功した．
-  /// @retval kUntest テスト不能故障だった．
-  /// @retval kAbort アボートした．
-  pair<tStat, tStat>
-  dtpg_dual(const TgNetwork& network,
-	    const TgNode* fnode,
-	    bool is_input_fault,
-	    ymuint ipos,
-	    const TgNode* fsrc,
-	    TestVector* tv[]);
-
-  /// @brief FFR 内の故障に対してテストパタン生成を行なう．
-  /// @param[in] network 対象の回路
-  /// @param[in] ffr FFR を表すクラス
-  /// @param[in] flist 故障リスト
-  /// @param[in] tv_list 生成したパタンを入れるベクタ
-  /// @param[in] stat_list 結果を入れるベクタ
-  /// @note flist の故障は必ず root が dominator となっていなければならない．
-  void
-  dtpg_ffr(const TgNetwork& network,
-	   const TgFFR* ffr,
-	   const vector<SaFault*>& flist,
-	   vector<TestVector*>& tv_list,
-	   vector<tStat>& stat_list);
-
-  /// @brief 直前の実行結果を得る．
-  const SatStats&
-  stats() const;
-
   /// @brief 使用する SAT エンジンを指定する．
   void
   set_mode(const string& type = string(),
 	   const string& option = string(),
 	   ostream* outp = NULL);
 
+  /// @brief 回路と故障リストを設定する．
+  /// @param[in] tgnetwork 対象のネットワーク
+  /// @param[in] fault_list 故障リスト
+  void
+  set_network(const TgNetwork& tgnetwork,
+	      const vector<SaFault*>& fault_list);
+
+  /// @brief single モードでテスト生成を行なう．
+  /// @param[in] tvmgr テストベクタの管理用オブジェクト
+  /// @param[out] d_list 検出された故障のリスト
+  /// @param[out] u_list 検出不能と判定された故障のリスト
+  void
+  dtpg_single(TvMgr& tvmgr,
+	      vector<SaFault*>& d_list,
+	      vector<SaFault*>& u_list);
+
+  /// @brief dual モードでテスト生成を行なう．
+  /// @param[in] tvmgr テストベクタの管理用オブジェクト
+  /// @param[out] d_list 検出された故障のリスト
+  /// @param[out] u_list 検出不能と判定された故障のリスト
+  void
+  dtpg_dual(TvMgr& tvmgr,
+	    vector<SaFault*>& d_list,
+	    vector<SaFault*>& u_list);
+
+  /// @brief ffr モードでテスト生成を行なう．
+  /// @param[in] tvmgr テストベクタの管理用オブジェクト
+  /// @param[out] d_list 検出された故障のリスト
+  /// @param[out] u_list 検出不能と判定された故障のリスト
+  void
+  dtpg_ffr(TvMgr& tvmgr,
+	   vector<SaFault*>& d_list,
+	   vector<SaFault*>& u_list);
+
+  /// @brief mffc モードでテスト生成を行なう．
+  /// @param[in] tvmgr テストベクタの管理用オブジェクト
+  /// @param[out] d_list 検出された故障のリスト
+  /// @param[out] u_list 検出不能と判定された故障のリスト
+  void
+  dtpg_mffc(TvMgr& tvmgr,
+	    vector<SaFault*>& d_list,
+	    vector<SaFault*>& u_list);
+
+  /// @brief all モードでテスト生成を行なう．
+  /// @param[in] tvmgr テストベクタの管理用オブジェクト
+  /// @param[out] d_list 検出された故障のリスト
+  /// @param[out] u_list 検出不能と判定された故障のリスト
+  void
+  dtpg_all(TvMgr& tvmgr,
+	   vector<SaFault*>& d_list,
+	   vector<SaFault*>& u_list);
+
+  /// @brief single モードでテスト生成を行なう．
+  /// @param[in] tvmgr テストベクタの管理用オブジェクト
+  /// @param[out] d_list 検出された故障のリスト
+  /// @param[out] u_list 検出不能と判定された故障のリスト
+  void
+  dtpg_single_posplit(ymuint po_pos,
+		      TvMgr& tvmgr,
+		      vector<SaFault*>& d_list,
+		      vector<SaFault*>& u_list);
+
+  /// @brief dual モードでテスト生成を行なう．
+  /// @param[in] tvmgr テストベクタの管理用オブジェクト
+  /// @param[out] d_list 検出された故障のリスト
+  /// @param[out] u_list 検出不能と判定された故障のリスト
+  void
+  dtpg_dual_posplit(ymuint po_pos,
+		    TvMgr& tvmgr,
+		    vector<SaFault*>& d_list,
+		    vector<SaFault*>& u_list);
+
+  /// @brief ffr モードでテスト生成を行なう．
+  /// @param[in] tvmgr テストベクタの管理用オブジェクト
+  /// @param[out] d_list 検出された故障のリスト
+  /// @param[out] u_list 検出不能と判定された故障のリスト
+  void
+  dtpg_ffr_posplit(ymuint po_pos,
+		   TvMgr& tvmgr,
+		   vector<SaFault*>& d_list,
+		   vector<SaFault*>& u_list);
+
+  /// @brief mffc モードでテスト生成を行なう．
+  /// @param[in] tvmgr テストベクタの管理用オブジェクト
+  /// @param[out] d_list 検出された故障のリスト
+  /// @param[out] u_list 検出不能と判定された故障のリスト
+  void
+  dtpg_mffc_posplit(ymuint po_pos,
+		    TvMgr& tvmgr,
+		    vector<SaFault*>& d_list,
+		    vector<SaFault*>& u_list);
+
+  /// @brief all モードでテスト生成を行なう．
+  /// @param[in] tvmgr テストベクタの管理用オブジェクト
+  /// @param[out] d_list 検出された故障のリスト
+  /// @param[out] u_list 検出不能と判定された故障のリスト
+  void
+  dtpg_all_posplit(ymuint po_pos,
+		   TvMgr& tvmgr,
+		   vector<SaFault*>& d_list,
+		   vector<SaFault*>& u_list);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 下請け関数
+  // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief mVarMap を初期化する．
+  /// @brief 一つの故障に対してテストパタン生成を行なう．
+  /// @param[in] f 故障ノード
+  /// @param[in] tvmgr テストベクタの管理用オブジェクト
   void
-  init_varmap(const TgNetwork& network);
+  single_mode(DtpgFault* f,
+	      TvMgr& tvmgr,
+	      vector<SaFault*>& d_list,
+	      vector<SaFault*>& u_list);
 
-  /// @brief 同じ位置の故障に対する CNF を作る．
+  /// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
+  /// @param[in] f0 0縮退故障
+  /// @param[in] f1 1縮退故障
+  /// @param[in] tvmgr テストベクタの管理用オブジェクト
   void
-  make_cnf(SatSolver& solver,
-	   const TgNetwork& network,
-	   const TgNode* fnode,
-	   bool is_input_fault,
-	   ymuint ipos,
-	   const TgNode* fsrc);
+  dual_mode(DtpgFault* f0,
+	    DtpgFault* f1,
+	    TvMgr& tvmgr,
+	    vector<SaFault*>& d_list,
+	    vector<SaFault*>& u_list);
 
-  enum Mark {
-    kNone,
-    kTFO,
-    kTFI
-  };
+  /// @brief FFR 内の故障に対してテストパタン生成を行なう．
+  /// @param[in] ffr FFR を表すクラス
+  /// @param[in] tvmgr テストベクタの管理用オブジェクト
+  /// @param[in] stat_list 結果を入れるベクタ
+  /// @note flist の故障は必ず root が dominator となっていなければならない．
+  void
+  ffr_mode(DtpgFFR* ffr,
+	   TvMgr& tvmgr,
+	   vector<SaFault*>& d_list,
+	   vector<SaFault*>& u_list);
 
-  /// @brief マークを得る．
-  Mark&
-  mark(const TgNode* node);
+  /// @brief fnode の故障が伝搬する条件を表す CNF を作る．
+  /// @param[in] solver SAT ソルバ
+  /// @param[in] fnode 対象のノード
+  /// @return fnode が外部出力に至る経路を持つとき true を返す．
+  bool
+  make_prop_cnf(SatSolver& solver,
+		DtpgNode* fnode);
 
-  /// @brief 正常回路の変数番号を得る．
-  VarId
-  gvar(const TgNode* node);
+  /// @brief 入力に故障を持つノードの CNF を作る．
+  /// @param[in] solver SAT ソルバ
+  /// @param[in] fnode 対象のノード
+  /// @param[in] ipos 故障のある入力の番号
+  void
+  make_ifault_cnf(SatSolver& solver,
+		  DtpgNode* fnode,
+		  ymuint ipos);
 
-  /// @brief 故障回路の変数番号を得る．
-  VarId
-  fvar(const TgNode* node);
+  /// @brief ノードの入出力の関係を表す CNF を作る．
+  /// @param[in] solver SAT ソルバ
+  /// @param[in] node 対象のノード
+  /// @param[in] olit 出力のリテラル
+  /// @param[in] ilit 入力のリテラルの配列
+  void
+  make_node_cnf(SatSolver& solver,
+		DtpgNode* node,
+		Literal olit,
+		const vector<Literal>& ilits);
 
-  /// @brief 故障差の変数番号を得る．
-  VarId
-  dvar(const TgNode* node);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で使うデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  struct Var
-  {
-    // マーク
-    Mark mMark;
-
-    // 正常回路の変数番号
-    VarId mGid;
-
-    // 故障回路の変数番号
-    VarId mFid;
-
-    // 故障差の変数番号
-    VarId mDid;
-  };
+  /// @brief SAT の結果からテストベクタを作る．
+  void
+  set_tv(const vector<Bool3>& model,
+	 TestVector* tv);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 変数番号の割り当て表
-  vector<Var> mVarMap;
 
   // 直前の SAT の実行結果
   SatStats mStats;
@@ -205,46 +247,10 @@ private:
   // SAT solver の記録用ストリーム
   ostream* mOutP;
 
+  // 対象の回路
+  DtpgNetwork* mNetwork;
+
 };
-
-
-// @brief マークを得る．
-inline
-DtpgSat::Mark&
-DtpgSat::mark(const TgNode* node)
-{
-  return mVarMap[node->gid()].mMark;
-}
-
-// @brief 正常回路の変数番号を得る．
-inline
-VarId
-DtpgSat::gvar(const TgNode* node)
-{
-  Var& var = mVarMap[node->gid()];
-  assert_cond(var.mMark != kNone, __FILE__, __LINE__);
-  return var.mGid;
-}
-
-// @brief 故障回路の変数番号を得る．
-inline
-VarId
-DtpgSat::fvar(const TgNode* node)
-{
-  Var& var = mVarMap[node->gid()];
-  assert_cond(var.mMark != kNone, __FILE__, __LINE__);
-  return var.mFid;
-}
-
-// @brief 故障差の変数番号を得る．
-inline
-VarId
-DtpgSat::dvar(const TgNode* node)
-{
-  Var& var = mVarMap[node->gid()];
-  assert_cond(var.mMark == kTFO, __FILE__, __LINE__);
-  return var.mDid;
-}
 
 END_NAMESPACE_YM_SATPG_DTPG
 

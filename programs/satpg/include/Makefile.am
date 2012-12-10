@@ -14,7 +14,6 @@ noinst_HEADERS = \
 	PackedVal3.h \
 	Rtpg.h \
 	SaFault.h \
-	TgFFR.h \
 	TestVector.h
 	TvBuff.h \
 	TvMgr.h \

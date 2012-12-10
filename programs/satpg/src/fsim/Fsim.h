@@ -53,12 +53,8 @@ public:
 
   /// @brief ネットワークをセットする．
   void
-  set_network(const TgNetwork& network);
-
-  /// @brief 対象の故障をセットする
-  /// @param[in] flist 対象の故障リスト
-  void
-  set_faults(const vector<SaFault*>& flist);
+  set_network(const TgNetwork& network,
+	      const vector<SaFault*>& flist);
 
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv テストベクタ

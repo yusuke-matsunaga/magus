@@ -60,7 +60,8 @@ Fsim::~Fsim()
 
 // @brief ネットワークをセットする関数
 void
-Fsim::set_network(const TgNetwork& network)
+Fsim::set_network(const TgNetwork& network,
+		  const vector<SaFault*>& flist)
 {
   clear();
 
@@ -229,13 +230,12 @@ Fsim::set_network(const TgNetwork& network)
     }
   }
   mEventQ.init(max_level);
-}
 
-// @brief 対象の故障をセットする
-// @param[in] flist 対象の故障リスト
-void
-Fsim::set_faults(const vector<SaFault*>& flist)
-{
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障リストの設定
+  //////////////////////////////////////////////////////////////////////
+
   clear_faults();
 
   ymuint n = flist.size();

@@ -8,12 +8,15 @@
 
 
 #include "DtpgSat.h"
-#include "ym_networks/TgNetwork.h"
-#include "ym_networks/TgNode.h"
-#include "TgFFR.h"
-#include "SaFault.h"
+#include "DtpgNetwork.h"
+#include "DtpgNode.h"
+#include "DtpgFFR.h"
+#include "DtpgFault.h"
+#include "TvMgr.h"
 #include "TestVector.h"
 #include "ym_logic/SatSolver.h"
+#include "ym_logic/LogExpr.h"
+#include "ym_networks/TgNetwork.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
@@ -21,11 +24,24 @@ BEGIN_NAMESPACE_YM_SATPG_DTPG
 // @brief コンストラクタ
 DtpgSat::DtpgSat()
 {
+  mNetwork = NULL;
 }
 
 // @brief デストラクタ
 DtpgSat::~DtpgSat()
 {
+  delete mNetwork;
+}
+
+// @brief 回路と故障リストを設定する．
+// @param[in] tgnetwork 対象のネットワーク
+// @param[in] fault_list 故障リスト
+void
+DtpgSat::set_network(const TgNetwork& tgnetwork,
+		     const vector<SaFault*>& fault_list)
+{
+  delete mNetwork;
+  mNetwork = new DtpgNetwork(tgnetwork, fault_list);
 }
 
 
@@ -72,8 +88,10 @@ make_cnf_from_type(SatSolver& solver,
 {
   switch ( type ) {
   case kTgUndef:
-  case kTgInput:
     assert_not_reached(__FILE__, __LINE__);
+    break;
+
+  case kTgInput:
     break;
 
   case kTgOutput:
@@ -284,597 +302,277 @@ make_cnf_from_lexp(SatSolver& solver,
   }
 }
 
-/// @brief ノードの入出力の関係を表す CNF クローズを生成する．
-/// @param[in] solver SAT ソルバ
-/// @param[in] node TgNode
-/// @param[in] network TgNetwork
-/// @param[in] output 出力リテラル
-/// @param[in] inputs 入力リテラル
-void
-make_node_cnf(SatSolver& solver,
-	      const TgNode* node,
-	      const TgNetwork& network,
-	      Literal output,
-	      const vector<Literal>& inputs)
-{
-  if ( node->is_cplx_logic() ) {
-    LogExpr lexp = network.get_lexp(node);
-    make_cnf_from_lexp(solver, lexp, output, inputs);
-  }
-  else {
-    make_cnf_from_type(solver, node->type(), output, inputs);
-  }
-}
-
 END_NONAMESPACE
 
 
-// 故障 f に対するテストパタン生成を行う．
-tStat
-DtpgSat::run(const TgNetwork& network,
-	     SaFault* f,
-	     TestVector* tv)
+// @brief 一つの故障に対してテストパタン生成を行なう．
+// @param[in] tvmgr テストベクタの管理用オブジェクト
+// @param[out] d_list 検出された故障のリスト
+// @param[out] u_list 検出不能と判定された故障のリスト
+void
+DtpgSat::dtpg_single(TvMgr& tvmgr,
+		     vector<SaFault*>& d_list,
+		     vector<SaFault*>& u_list)
 {
-  const TgNode* fnode = f->node();
-  const TgNode* fsrc = fnode;
-  bool is_input_fault = f->is_input_fault();
-  if ( is_input_fault ) {
-    fsrc = fnode->fanin(f->pos());
+  mNetwork->activate_all();
+  const vector<DtpgFault*>& flist = mNetwork->fault_list();
+  for (vector<DtpgFault*>::const_iterator p = flist.begin();
+       p != flist.end(); ++ p) {
+    DtpgFault* f = *p;
+    if ( f->safault()->status() != kFsDetected ) {
+      single_mode(f, tvmgr, d_list, u_list);
+    }
   }
+}
 
-  return dtpg_single(network, fnode, is_input_fault, f->pos(), fsrc, f->val(), tv);
+// @brief dual モードでテスト生成を行なう．
+// @param[in] tvmgr テストベクタの管理用オブジェクト
+// @param[out] d_list 検出された故障のリスト
+// @param[out] u_list 検出不能と判定された故障のリスト
+void
+DtpgSat::dtpg_dual(TvMgr& tvmgr,
+		   vector<SaFault*>& d_list,
+		   vector<SaFault*>& u_list)
+{
+  mNetwork->activate_all();
+  ymuint nn = mNetwork->node_num();
+  for (ymuint i = 0; i < nn; ++ i) {
+    DtpgNode* node = mNetwork->node(i);
+    DtpgFault* f0 = node->output_fault(0);
+    DtpgFault* f1 = node->output_fault(1);
+    if ( f0 != NULL && f0->safault()->status() == kFsDetected ) {
+      f0 = NULL;
+    }
+    if ( f1 != NULL && f1->safault()->status() == kFsDetected ) {
+      f1 = NULL;
+    }
+    if ( f0 != NULL && f1 != NULL ) {
+      dual_mode(f0, f1, tvmgr, d_list, u_list);
+    }
+    else if ( f0 != NULL ) {
+      single_mode(f0, tvmgr, d_list, u_list);
+    }
+    else if ( f1 != NULL ) {
+      single_mode(f1, tvmgr, d_list, u_list);
+    }
+    ymuint ni = node->fanin_num();
+    for (ymuint j = 0; j < ni; ++ j) {
+      DtpgFault* f0 = node->input_fault(0, j);
+      DtpgFault* f1 = node->input_fault(1, j);
+      if ( f0 != NULL && f0->safault()->status() == kFsDetected ) {
+	f0 = NULL;
+      }
+      if ( f1 != NULL && f1->safault()->status() == kFsDetected ) {
+	f1 = NULL;
+      }
+      if ( f0 != NULL && f1 != NULL ) {
+	dual_mode(f0, f1, tvmgr, d_list, u_list);
+      }
+      else if ( f0 != NULL ) {
+	single_mode(f0, tvmgr, d_list, u_list);
+      }
+      else if ( f1 != NULL ) {
+	single_mode(f1, tvmgr, d_list, u_list);
+      }
+    }
+  }
+}
+
+// @brief ffr モードでテスト生成を行なう．
+// @param[in] tvmgr テストベクタの管理用オブジェクト
+// @param[out] d_list 検出された故障のリスト
+// @param[out] u_list 検出不能と判定された故障のリスト
+void
+DtpgSat::dtpg_ffr(TvMgr& tvmgr,
+		  vector<SaFault*>& d_list,
+		  vector<SaFault*>& u_list)
+{
+  mNetwork->activate_all();
+  vector<DtpgFFR*> ffr_list;
+  mNetwork->get_ffr_list(ffr_list);
+  for (vector<DtpgFFR*>::const_iterator p = ffr_list.begin();
+       p != ffr_list.end(); ++ p) {
+    DtpgFFR* ffr = *p;
+    ffr_mode(ffr, tvmgr, d_list, u_list);
+  }
+}
+
+// @brief mffc モードでテスト生成を行なう．
+// @param[in] tvmgr テストベクタの管理用オブジェクト
+// @param[out] d_list 検出された故障のリスト
+// @param[out] u_list 検出不能と判定された故障のリスト
+void
+DtpgSat::dtpg_mffc(TvMgr& tvmgr,
+		   vector<SaFault*>& d_list,
+		   vector<SaFault*>& u_list)
+{
+  mNetwork->activate_all();
+  vector<DtpgFFR*> mffc_list;
+  mNetwork->get_mffc_list(mffc_list);
+  for (vector<DtpgFFR*>::const_iterator p = mffc_list.begin();
+       p != mffc_list.end(); ++ p) {
+    DtpgFFR* ffr = *p;
+    ffr_mode(ffr, tvmgr, d_list, u_list);
+  }
+}
+
+// @brief all モードでテスト生成を行なう．
+// @param[in] tvmgr テストベクタの管理用オブジェクト
+// @param[out] d_list 検出された故障のリスト
+// @param[out] u_list 検出不能と判定された故障のリスト
+void
+DtpgSat::dtpg_all(TvMgr& tvmgr,
+		  vector<SaFault*>& d_list,
+		  vector<SaFault*>& u_list)
+{
+#if 0
+  mNetwork->activate_all();
+  vector<DtpgFFR*> mffc_list;
+  mNetwork->get_mffc_list(mffc_list);
+  for (vector<DtpgFFR*>::const_iterator p = mffc_list.begin();
+       p != mffc_list.end(); ++ p) {
+    DtpgFFR* ffr = *p;
+    ffr_mode(ffr, tvmgr, d_list, u_list);
+  }
+#endif
 }
 
 // @brief 一つの故障に対してテストパタン生成を行なう．
-// @param[in] network 対象の回路
-// @param[in] fnode 故障ノード
-// @param[in] is_input_fault 出力の故障の時 true
-// @param[in] ipos 故障の入力位置
-// @param[in] fsrc 故障ノードの入力
-// @param[in] fval 故障値
-// @param[in] tv 生成したパタンを入れるベクタ
-// @retval kDetect パタン生成が成功した．
-// @retval kUntest テスト不能故障だった．
-// @retval kAbort アボートした．
-tStat
-DtpgSat::dtpg_single(const TgNetwork& network,
-		     const TgNode* fnode,
-		     bool is_input_fault,
-		     ymuint ipos,
-		     const TgNode* fsrc,
-		     int fval,
-		     TestVector* tv)
-{
-  SatSolver solver(mType, mOption, mOutP);
-
-  init_varmap(network);
-
-  make_cnf(solver, network, fnode, is_input_fault, ipos, fsrc);
-
-  vector<Literal> assumptions(2);
-  if ( fval ) {
-    assumptions[0] = Literal(gvar(fsrc), kPolNega);
-    assumptions[1] = Literal(fvar(fsrc), kPolPosi);
-  }
-  else {
-    assumptions[0] = Literal(gvar(fsrc), kPolPosi);
-    assumptions[1] = Literal(fvar(fsrc), kPolNega);
-  }
-
-  vector<Bool3> model;
-  Bool3 stat = solver.solve(assumptions, model);
-  tStat ans = kAbort;
-  if ( stat == kB3True ) {
-    tv->init();
-    ymuint npi = network.input_num2();
-    for (ymuint i = 0; i < npi; ++ i) {
-      const TgNode* node = network.input(i);
-      if ( mark(node) != kNone ) {
-	VarId idx = gvar(node);
-	if ( model[idx.val()] == kB3True ) {
-	  tv->set_val(i, kVal1);
-	}
-	else {
-	  tv->set_val(i, kVal0);
-	}
-      }
-    }
-    ans = kDetect;
-  }
-  else if ( stat == kB3False ) {
-    ans = kUntest;
-  }
-
-  solver.get_stats(mStats);
-
-  return ans;
-}
-
-// @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
-// @param[in] network 対象の回路
-// @param[in] fnode 故障ノード
-// @param[in] is_input_fault 入力の故障の時 true
-// @param[in] ipos 故障の入力位置
-// @param[in] fsrc 故障ノードの入力
-// @param[in] tv 生成したパタンを入れるベクタ
-// @retval kDetect パタン生成が成功した．
-// @retval kUntest テスト不能故障だった．
-// @retval kAbort アボートした．
-pair<tStat, tStat>
-DtpgSat::dtpg_dual(const TgNetwork& network,
-		   const TgNode* fnode,
-		   bool is_input_fault,
-		   ymuint ipos,
-		   const TgNode* fsrc,
-		   TestVector* tv[])
-{
-  SatSolver solver(mType, mOption, mOutP);
-
-  init_varmap(network);
-
-  make_cnf(solver, network, fnode, is_input_fault, ipos, fsrc);
-
-  tStat ans[2];
-  for (ymuint fval = 0; fval < 2; ++ fval ) {
-    vector<Literal> assumptions(2);
-    if ( fval ) {
-      assumptions[0] = Literal(gvar(fsrc), kPolNega);
-      assumptions[1] = Literal(fvar(fsrc), kPolPosi);
-    }
-    else {
-      assumptions[0] = Literal(gvar(fsrc), kPolPosi);
-      assumptions[1] = Literal(fvar(fsrc), kPolNega);
-    }
-
-    vector<Bool3> model;
-    Bool3 stat = solver.solve(assumptions, model);
-    ans[fval] = kAbort;
-    if ( stat == kB3True ) {
-      tv[fval]->init();
-      ymuint npi = network.input_num2();
-      for (ymuint i = 0; i < npi; ++ i) {
-	const TgNode* node = network.input(i);
-	if ( mark(node) != kNone ) {
-	  VarId idx = gvar(node);
-	  if ( model[idx.val()] == kB3True ) {
-	    tv[fval]->set_val(i, kVal1);
-	  }
-	  else {
-	    tv[fval]->set_val(i, kVal0);
-	  }
-	}
-      }
-      ans[fval] = kDetect;
-    }
-    else if ( stat == kB3False ) {
-      ans[fval] = kUntest;
-    }
-  }
-  solver.get_stats(mStats);
-
-  return make_pair(ans[0], ans[1]);
-}
-
-BEGIN_NONAMESPACE
-
-struct NodeFaults
-{
-  NodeFaults(ymuint ni = 0)
-  {
-    mInputs[0].resize(ni);
-    mInputs[1].resize(ni);
-  }
-
-  ymuint mOutput[2];
-  vector<ymuint> mInputs[2];
-};
-
-END_NONAMESPACE
-
-// @brief FFR 内の故障に対してテストパタン生成を行なう．
-// @param[in] network 対象の回路
-// @param[in] ffr FFR を表すクラス
-// @param[in] flist 故障リスト
-// @param[in] tv_list 生成したパタンを入れるベクタ
-// @param[in] stat_list 結果を入れるベクタ
-// @note flist の故障は必ず root が dominator となっていなければならない．
+// @param[in] tvmgr テストベクタの管理用オブジェクト
+// @param[out] d_list 検出された故障のリスト
+// @param[out] u_list 検出不能と判定された故障のリスト
 void
-DtpgSat::dtpg_ffr(const TgNetwork& network,
-		  const TgFFR* ffr,
-		  const vector<SaFault*>& flist,
-		  vector<TestVector*>& tv_list,
-		  vector<tStat>& stat_list)
+DtpgSat::dtpg_single_posplit(ymuint po_pos,
+			     TvMgr& tvmgr,
+			     vector<SaFault*>& d_list,
+			     vector<SaFault*>& u_list)
 {
-  SatSolver solver(mType, mOption, mOutP);
-
-  init_varmap(network);
-
-  const TgNode* root = ffr->root();
-
-  make_cnf(solver, network, root, false, 0, root);
-
-  ymuint nf = flist.size();
-
-  hash_set<ymuint> fmark;
-  for (ymuint i = 0; i < nf; ++ i) {
-    SaFault* f = flist[i];
-    const TgNode* node = f->node();
-    fmark.insert(node->gid());
-  }
-
-  // 故障回路用の変数を割り当てる．
-  const vector<const TgNode*>& node_list = ffr->node_list();
-  hash_map<ymuint, NodeFaults> fmap;
-  for (vector<const TgNode*>::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    const TgNode* node = *p;
-    ymuint ni = node->ni();
-    bool found = false;
-    for (ymuint i = 0; i < ni; ++ i) {
-      const TgNode* inode = node->fanin(i);
-      if ( fmark.count(inode->gid()) > 0 ) {
-	found = true;
-	break;
-      }
-    }
-    if ( found ) {
-      fmark.insert(node->gid());
-    }
-
-    if ( node != root ) {
-      Var& var = mVarMap[node->gid()];
-      if ( fmark.count(node->gid()) > 0 ) {
-	var.mFid = solver.new_var();
-      }
-    }
-
-    fmap.insert(make_pair(node->gid(), NodeFaults(ni)));
-    NodeFaults& faults = fmap[node->gid()];
-    faults.mOutput[0] = nf;
-    faults.mOutput[1] = nf;
-    for (ymuint i = 0; i < ni; ++ i) {
-      faults.mInputs[0][i] = nf;
-      faults.mInputs[1][i] = nf;
+  const vector<DtpgFault*>& flist = mNetwork->fault_list();
+  mNetwork->activate_po(po_pos);
+  for (vector<DtpgFault*>::const_iterator p = flist.begin();
+       p != flist.end(); ++ p) {
+    DtpgFault* f = *p;
+    if ( f->safault()->status() != kFsDetected && f->node()->is_active() ) {
+      single_mode(f, tvmgr, d_list, u_list);
     }
   }
-
-  vector<VarId> flt_var(nf);
-  vector<VarId> tmp_var(nf);
-  for (ymuint i = 0; i < nf; ++ i) {
-    flt_var[i] = solver.new_var();
-    tmp_var[i] = solver.new_var();
-    SaFault* f = flist[i];
-    const TgNode* fnode = f->node();
-    hash_map<ymuint, NodeFaults>::iterator p = fmap.find(fnode->gid());
-    assert_cond( p != fmap.end(), __FILE__, __LINE__);
-    NodeFaults& faults = p->second;
-
-    if ( f->is_input_fault() ) {
-      ymuint pos = f->pos();
-      if ( f->val() == 0 ) {
-	faults.mInputs[0][pos] = i;
-      }
-      else {
-	faults.mInputs[1][pos] = i;
-      }
-    }
-    else {
-      if ( f->val() == 0 ) {
-	faults.mOutput[0] = i;
-      }
-      else {
-	faults.mOutput[1] = i;
-      }
-    }
-  }
-
-  // FFR 内の故障回路を作る．
-  for (vector<const TgNode*>::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    const TgNode* node = *p;
-    if ( fmark.count(node->gid()) == 0 ) {
-      continue;
-    }
-
-    hash_map<ymuint, NodeFaults>::iterator q = fmap.find(node->gid());
-    assert_cond( q != fmap.end(), __FILE__, __LINE__);
-    NodeFaults& faults = q->second;
-
-    ymuint ni = node->ni();
-    vector<Literal> inputs(ni);
-    for (ymuint i = 0; i < ni; ++ i) {
-      const TgNode* inode = node->fanin(i);
-      VarId fvar;
-      if ( fmark.count(inode->gid()) > 0 ) {
-	fvar = mVarMap[inode->gid()].mFid;
-      }
-      else {
-	fvar = mVarMap[inode->gid()].mGid;
-      }
-      ymuint f0id = faults.mInputs[0][i];
-      if ( f0id < nf ) {
-	make_cnf_and(solver, flt_var[f0id], fvar, tmp_var[f0id]);
-	fvar = tmp_var[f0id];
-      }
-      ymuint f1id = faults.mInputs[1][i];
-      if ( f1id < nf ) {
-	make_cnf_or(solver, flt_var[f1id], fvar, tmp_var[f1id]);
-	fvar = tmp_var[f1id];
-      }
-      inputs[i] = Literal(fvar, kPolPosi);
-    }
-    VarId fvar = mVarMap[node->gid()].mFid;
-
-    ymuint f1id = faults.mOutput[1];
-    if ( f1id < nf ) {
-      make_cnf_or(solver, flt_var[f1id], tmp_var[f1id], fvar);
-      fvar = tmp_var[f1id];
-    }
-
-    ymuint f0id = faults.mOutput[0];
-    if ( f0id < nf ) {
-      make_cnf_and(solver, flt_var[f0id], tmp_var[f0id], fvar);
-      fvar = tmp_var[f0id];
-    }
-
-    if ( !node->is_input() ) {
-      make_node_cnf(solver, node, network, Literal(fvar, kPolPosi), inputs);
-    }
-  }
-
-  // 個々の故障に対するテスト生成を行なう．
-  for (ymuint i = 0; i < nf; ++ i) {
-    vector<Literal> assumptions(nf + 1);
-    for (ymuint j = 0; j < nf; ++ j) {
-      if ( j != i ) {
-	assumptions[j] = Literal(flt_var[j], kPolNega);
-      }
-      else {
-	assumptions[j] = Literal(flt_var[j], kPolPosi);
-      }
-    }
-
-    SaFault* f = flist[i];
-    const TgNode* fnode = f->node();
-    if ( f->is_input_fault() ) {
-      fnode = fnode->fanin(f->pos());
-    }
-    tPol pol = (f->val() == 0) ? kPolPosi : kPolNega;
-    assumptions[nf] = Literal(gvar(fnode), pol);
-
-    vector<Bool3> model;
-    Bool3 stat = solver.solve(assumptions, model);
-    if ( stat == kB3True ) {
-      TestVector* tv = tv_list[i];
-      tv->init();
-      ymuint npi = network.input_num2();
-      for (ymuint j = 0; j < npi; ++ j) {
-	const TgNode* node = network.input(j);
-	if ( mark(node) != kNone ) {
-	  VarId idx = gvar(node);
-	  if ( model[idx.val()] == kB3True ) {
-	    tv->set_val(j, kVal1);
-	  }
-	  else {
-	    tv->set_val(j, kVal0);
-	  }
-	}
-      }
-      stat_list[i] = kDetect;
-    }
-    else if ( stat == kB3False ) {
-      stat_list[i] = kUntest;
-    }
-    else {
-      stat_list[i] = kAbort;
-    }
-  }
+  mNetwork->activate_all();
 }
 
-// @brief mVarMap を初期化する．
+// @brief dual モードでテスト生成を行なう．
+// @param[in] tvmgr テストベクタの管理用オブジェクト
+// @param[out] d_list 検出された故障のリスト
+// @param[out] u_list 検出不能と判定された故障のリスト
 void
-DtpgSat::init_varmap(const TgNetwork& network)
+DtpgSat::dtpg_dual_posplit(ymuint po_pos,
+			   TvMgr& tvmgr,
+			   vector<SaFault*>& d_list,
+			   vector<SaFault*>& u_list)
 {
-  ymuint n = network.node_num();
-
-  mVarMap.clear();
-  mVarMap.resize(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    mVarMap[i].mMark = kNone;
-  }
-}
-
-// @brief 同じ位置の故障に対する CNF を作る．
-void
-DtpgSat::make_cnf(SatSolver& solver,
-		  const TgNetwork& network,
-		  const TgNode* fnode,
-		  bool is_input_fault,
-		  ymuint ipos,
-		  const TgNode* fsrc)
-{
-  ymuint n = network.node_num();
-  ymuint nl = network.logic_num();
-  ymuint npo = network.output_num2();
-
-  // まず fnode の TFO にマークをつける．
-  // 同時にマークの付いたノードは queue につまれる．
-  vector<const TgNode*> queue;
-  queue.reserve(n);
-  mark(fnode) = kTFO;
-  queue.push_back(fnode);
-  {
-    ymuint rpos = 0;
-    while ( rpos < queue.size() ) {
-      const TgNode* node = queue[rpos];
-      ++ rpos;
-      ymuint nfo = node->fanout_num();
-      for (ymuint i = 0; i < nfo; ++ i) {
-	const TgNode* onode = node->fanout(i);
-	if ( mark(onode) == kNone ) {
-	  mark(onode) = kTFO;
-	  queue.push_back(onode);
-	}
-      }
+  mNetwork->activate_po(po_pos);
+  ymuint nn = mNetwork->active_node_num();
+  for (ymuint i = 0; i < nn; ++ i) {
+    DtpgNode* node = mNetwork->active_node(i);
+    DtpgFault* f0 = node->output_fault(0);
+    DtpgFault* f1 = node->output_fault(1);
+    if ( f0 != NULL && f0->safault()->status() == kFsDetected ) {
+      f0 = NULL;
     }
-
-    // マークの付いたノードの TFI に別のマークをつける．
-    vector<const TgNode*> queue2;
-    for (ymuint rpos = 0; rpos < queue.size(); ++ rpos) {
-      const TgNode* node = queue[rpos];
-      ymuint ni = node->ni();
-      for (ymuint i = 0; i < ni; ++ i) {
-	const TgNode* inode = node->fanin(i);
-	if ( mark(inode) == kNone ) {
-	  // マークの付いていないファンインがあった．
-	  mark(inode) = kTFI;
-	  queue2.push_back(inode);
-	}
-      }
+    if ( f1 != NULL && f1->safault()->status() == kFsDetected ) {
+      f1 = NULL;
     }
-    for (ymuint rpos2 = 0; rpos2 < queue2.size(); ++ rpos2) {
-      const TgNode* node = queue2[rpos2];
-      ymuint ni = node->ni();
-      for (ymuint i = 0; i < ni; ++ i) {
-	const TgNode* inode = node->fanin(i);
-	if ( mark(inode) == kNone ) {
-	  // マークの付いていないファンインがあった．
-	  mark(inode) = kTFI;
-	  queue2.push_back(inode);
-	}
-      }
+    if ( f0 != NULL && f1 != NULL ) {
+      dual_mode(f0, f1, tvmgr, d_list, u_list);
     }
-  }
-  // 以降は kTFO か kTFI マークのついたノードのみを対象とする．
-
-  // 変数の生成 (glit, flit, dlit の3つを作る)
-  // ちょっと分かりにくいが fsrc は普通のゲートにも
-  // ファンアウトしているので kTFO マークは付かない．
-  // ただし故障ゲートにファンアウトしているブランチの値
-  // は故障値なので mFid を持つ．
-  for (ymuint i = 0; i < n; ++ i) {
-    const TgNode* node = network.node(i);
-    Var& var = mVarMap[node->gid()];
-    if ( var.mMark != kNone ) {
-      var.mGid = solver.new_var();
-      if ( node == fsrc || var.mMark == kTFO ) {
-	var.mFid = solver.new_var();
-	var.mDid = solver.new_var();
-      }
+    else if ( f0 != NULL ) {
+      single_mode(f0, tvmgr, d_list, u_list);
     }
-  }
-
-
-  //////////////////////////////////////////////////////////////////////
-  // 正常回路の CNF を生成
-  //////////////////////////////////////////////////////////////////////
-
-  for (ymuint i = 0; i < nl; ++ i) {
-    const TgNode* node = network.sorted_logic(i);
-    if ( mark(node) == kNone ) continue;
-    ymuint ni = node->ni();
-    vector<Literal> inputs(ni);
+    else if ( f1 != NULL ) {
+      single_mode(f1, tvmgr, d_list, u_list);
+    }
+    ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
-      const TgNode* inode = node->fanin(j);
-      inputs[j] = Literal(gvar(inode), kPolPosi);
-    }
-    Literal output(gvar(node), kPolPosi);
-    make_node_cnf(solver, node, network, output, inputs);
-  }
-  for (ymuint i = 0; i < npo; ++ i) {
-    const TgNode* node = network.output(i);
-    if ( mark(node) == kNone ) continue;
-    const TgNode* inode = node->fanin(0);
-    Literal input(gvar(inode), kPolPosi);
-    Literal output(gvar(node), kPolPosi);
-    solver.add_clause(~input,  output);
-    solver.add_clause( input, ~output);
-  }
-
-
-  //////////////////////////////////////////////////////////////////////
-  // 故障回路の CNF を生成
-  //////////////////////////////////////////////////////////////////////
-
-  Literal glit(gvar(fnode), kPolPosi);
-  Literal flit(fvar(fnode), kPolPosi);
-  Literal dlit(dvar(fnode), kPolPosi);
-  if ( is_input_fault ) {
-    ymuint ni = fnode->ni();
-    vector<Literal> inputs(ni);
-    for (ymuint i = 0; i < ni; ++ i) {
-      const TgNode* inode = fnode->fanin(i);
-      if ( i == ipos ) {
-	inputs[i] = Literal(fvar(inode), kPolPosi);
+      DtpgFault* f0 = node->input_fault(0, j);
+      DtpgFault* f1 = node->input_fault(1, j);
+      if ( f0 != NULL && f0->safault()->status() == kFsDetected ) {
+	f0 = NULL;
       }
-      else {
-	inputs[i] = Literal(gvar(inode), kPolPosi);
+      if ( f1 != NULL && f1->safault()->status() == kFsDetected ) {
+	f1 = NULL;
+      }
+      if ( f0 != NULL && f1 != NULL ) {
+	dual_mode(f0, f1, tvmgr, d_list, u_list);
+      }
+      else if ( f0 != NULL ) {
+	single_mode(f0, tvmgr, d_list, u_list);
+      }
+      else if ( f1 != NULL ) {
+	single_mode(f1, tvmgr, d_list, u_list);
       }
     }
-    make_node_cnf(solver, fnode, network, flit, inputs);
   }
-  solver.add_clause(~glit, ~flit, ~dlit);
-  solver.add_clause(~glit,  flit,  dlit);
-  solver.add_clause( glit, ~flit,  dlit);
-  solver.add_clause( glit,  flit, ~dlit);
-
-  // mark の付いていないノードは正常回路，付いているノードは故障回路
-  // を用いて CNF を作る．
-  vector<Literal> odiff;
-  odiff.reserve(npo);
-  for (ymuint i = 1; i < queue.size(); ++ i) {
-    const TgNode* node = queue[i];
-    ymuint ni = node->ni();
-
-    Literal glit(gvar(node), kPolPosi);
-    Literal flit(fvar(node), kPolPosi);
-    Literal dlit(dvar(node), kPolPosi);
-
-    // 入力のリテラル
-    vector<Literal> inputs(ni);
-
-    // dlit が 1 の時，入力のノードの dlit も1でなければならない．
-    vector<Literal> dep;
-    dep.reserve(ni + 1);
-    dep.push_back(~dlit);
-
-    for (ymuint j = 0; j < ni; ++ j) {
-      const TgNode* inode = node->fanin(j);
-      if ( mark(inode) == kTFO ) {
-	inputs[j] = Literal(fvar(inode), kPolPosi);
-	dep.push_back(Literal(dvar(inode), kPolPosi));
-      }
-      else {
-	inputs[j] = Literal(gvar(inode), kPolPosi);
-      }
-    }
-
-    // node の入力と出力の関係の clause を追加する．
-    make_node_cnf(solver, node, network, flit, inputs);
-
-    // XOR(glit, flit, dlit) を追加する．
-    // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-    solver.add_clause(~glit, ~flit, ~dlit);
-    solver.add_clause(~glit,  flit,  dlit);
-    solver.add_clause( glit, ~flit,  dlit);
-    solver.add_clause( glit,  flit, ~dlit);
-
-    solver.add_clause(dep);
-
-    // node が出力の時には odiff に追加しておく．
-    if ( node->is_output() ) {
-      odiff.push_back(dlit);
-    }
-  }
-  // 出力のうち，最低1つは故障差が伝搬しなければならない．
-  solver.add_clause(odiff);
 }
 
-// @brief 直前の実行結果を得る．
-const SatStats&
-DtpgSat::stats() const
+// @brief ffr モードでテスト生成を行なう．
+// @param[in] tvmgr テストベクタの管理用オブジェクト
+// @param[out] d_list 検出された故障のリスト
+// @param[out] u_list 検出不能と判定された故障のリスト
+void
+DtpgSat::dtpg_ffr_posplit(ymuint po_pos,
+			  TvMgr& tvmgr,
+			  vector<SaFault*>& d_list,
+			  vector<SaFault*>& u_list)
 {
-  return mStats;
+  mNetwork->activate_po(po_pos);
+  vector<DtpgFFR*> ffr_list;
+  mNetwork->get_ffr_list(ffr_list);
+  for (vector<DtpgFFR*>::const_iterator p = ffr_list.begin();
+       p != ffr_list.end(); ++ p) {
+    DtpgFFR* ffr = *p;
+    ffr_mode(ffr, tvmgr, d_list, u_list);
+  }
+}
+
+// @brief mffc モードでテスト生成を行なう．
+// @param[in] tvmgr テストベクタの管理用オブジェクト
+// @param[out] d_list 検出された故障のリスト
+// @param[out] u_list 検出不能と判定された故障のリスト
+void
+DtpgSat::dtpg_mffc_posplit(ymuint po_pos,
+			   TvMgr& tvmgr,
+			   vector<SaFault*>& d_list,
+			   vector<SaFault*>& u_list)
+{
+  mNetwork->activate_po(po_pos);
+  vector<DtpgFFR*> mffc_list;
+  mNetwork->get_mffc_list(mffc_list);
+  for (vector<DtpgFFR*>::const_iterator p = mffc_list.begin();
+       p != mffc_list.end(); ++ p) {
+    DtpgFFR* ffr = *p;
+    ffr_mode(ffr, tvmgr, d_list, u_list);
+  }
+}
+
+// @brief all モードでテスト生成を行なう．
+// @param[in] tvmgr テストベクタの管理用オブジェクト
+// @param[out] d_list 検出された故障のリスト
+// @param[out] u_list 検出不能と判定された故障のリスト
+void
+DtpgSat::dtpg_all_posplit(ymuint po_pos,
+			  TvMgr& tvmgr,
+			  vector<SaFault*>& d_list,
+			  vector<SaFault*>& u_list)
+{
+#if 0
+  mNetwork->activate_po(po_pos);
+  vector<DtpgFFR*> ffr_list;
+  mNetwork->get_ffr_list(ffr_list);
+  for (vector<DtpgFFR*>::const_iterator p = ffr_list.begin();
+       p != ffr_list.end(); ++ p) {
+    DtpgFFR* ffr = *p;
+    ffr_mode(ffr, tvmgr, d_list, u_list);
+  }
+#endif
 }
 
 // @brief 使用する SAT エンジンを指定する．
@@ -886,6 +584,487 @@ DtpgSat::set_mode(const string& type,
   mType = type;
   mOption = option;
   mOutP = outp;
+}
+
+// @brief 一つの故障に対してテストパタン生成を行なう．
+// @param[in] f 故障ノード
+// @param[in] tvmgr テストベクタの管理用オブジェクト
+void
+DtpgSat::single_mode(DtpgFault* f,
+		     TvMgr& tvmgr,
+		     vector<SaFault*>& d_list,
+		     vector<SaFault*>& u_list)
+{
+  SatSolver solver(mType, mOption, mOutP);
+
+  DtpgNode* fnode = f->node();
+  DtpgNode* fsrc = fnode;
+
+  if ( make_prop_cnf(solver, fnode) ) {
+    if ( f->is_input_fault() ) {
+      ymuint ipos = f->pos();
+      make_ifault_cnf(solver, fnode, ipos);
+      fsrc = fnode->fanin(ipos);
+    }
+
+    vector<Literal> assumptions(2);
+    if ( f->val() ) {
+      assumptions[0] = Literal(fsrc->gvar(), kPolNega);
+      assumptions[1] = Literal(fsrc->fvar(), kPolPosi);
+    }
+    else {
+      assumptions[0] = Literal(fsrc->gvar(), kPolPosi);
+      assumptions[1] = Literal(fsrc->fvar(), kPolNega);
+    }
+
+    vector<Bool3> model;
+    Bool3 stat = solver.solve(assumptions, model);
+    if ( stat == kB3True ) {
+      TestVector* tv = tvmgr.new_vector();
+      set_tv(model, tv);
+      d_list.push_back(f->safault());
+    }
+    else if ( stat == kB3False ) {
+      u_list.push_back(f->safault());
+    }
+  }
+  else {
+    u_list.push_back(f->safault());
+  }
+}
+
+// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
+// @param[in] f0 0縮退故障
+// @param[in] f1 1縮退故障
+// @param[in] tvmgr テストベクタの管理用オブジェクト
+void
+DtpgSat::dual_mode(DtpgFault* f0,
+		   DtpgFault* f1,
+		   TvMgr& tvmgr,
+		   vector<SaFault*>& d_list,
+		   vector<SaFault*>& u_list)
+{
+  SatSolver solver(mType, mOption, mOutP);
+
+  DtpgNode* fnode = f0->node();
+  DtpgNode* fsrc = fnode;
+
+  if ( make_prop_cnf(solver, fnode) ) {
+    if ( f0->is_input_fault() ) {
+      ymuint ipos = f0->pos();
+      make_ifault_cnf(solver, fnode, ipos);
+      fsrc = f0->source_node();
+    }
+
+    DtpgFault* f[2] = { f0, f1 };
+    for (int fval = 0; fval < 2; ++ fval) {
+      vector<Literal> assumptions(2);
+      if ( fval ) {
+	assumptions[0] = Literal(fsrc->gvar(), kPolNega);
+	assumptions[1] = Literal(fsrc->fvar(), kPolPosi);
+      }
+      else {
+	assumptions[0] = Literal(fsrc->gvar(), kPolPosi);
+	assumptions[1] = Literal(fsrc->fvar(), kPolNega);
+      }
+
+      vector<Bool3> model;
+      Bool3 stat = solver.solve(assumptions, model);
+      if ( stat == kB3True ) {
+	TestVector* tv = tvmgr.new_vector();
+	set_tv(model, tv);
+	d_list.push_back(f[fval]->safault());
+      }
+      else if ( stat == kB3False ) {
+	u_list.push_back(f[fval]->safault());
+      }
+    }
+  }
+  else {
+    u_list.push_back(f0->safault());
+    u_list.push_back(f1->safault());
+  }
+}
+
+// @brief FFR 内の故障に対してテストパタン生成を行なう．
+// @param[in] ffr FFR を表すクラス
+// @param[in] tvmgr テストベクタの管理用オブジェクト
+// @note flist の故障は必ず root が dominator となっていなければならない．
+void
+DtpgSat::ffr_mode(DtpgFFR* ffr,
+		  TvMgr& tvmgr,
+		  vector<SaFault*>& d_list,
+		  vector<SaFault*>& u_list)
+{
+  vector<DtpgFault*> flist;
+  hash_set<ymuint> fmark;
+  hash_map<ymuint, ymuint> fmap;
+  const vector<DtpgNode*>& node_list = ffr->node_list();
+  for (vector<DtpgNode*>::const_iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    bool found = false;
+    for (int val = 0; val < 2; ++ val) {
+      DtpgFault* f = node->output_fault(val);
+      if ( f != NULL && f->safault()->status() != kFsDetected ) {
+	flist.push_back(f);
+	found = true;
+      }
+    }
+    ymuint ni = node->fanin_num();
+    for (ymuint i = 0; i < ni; ++ i) {
+      for (int val = 0; val < 2; ++ val) {
+	DtpgFault* f = node->input_fault(val, i);
+	if ( f != NULL && f->safault()->status() != kFsDetected ) {
+	  flist.push_back(f);
+	  found = true;
+	}
+      }
+      DtpgNode* inode = node->fanin(i);
+      if ( fmark.count(inode->id()) > 0 ) {
+	found = true;
+      }
+    }
+    if ( found ) {
+      fmark.insert(node->id());
+    }
+  }
+
+  ymuint nf = flist.size();
+  for (ymuint i = 0; i < nf; ++ i) {
+    DtpgFault* f = flist[i];
+    fmap.insert(make_pair(f->id(), i));
+  }
+
+  DtpgNode* root = ffr->root();
+
+  SatSolver solver(mType, mOption, mOutP);
+
+  if ( make_prop_cnf(solver, root) ) {
+
+    // 故障回路用の変数を割り当てる．
+    for (vector<DtpgNode*>::const_iterator p = node_list.begin();
+	 p != node_list.end(); ++ p) {
+      DtpgNode* node = *p;
+      if ( (node != root) && (fmark.count(node->id()) > 0) ) {
+	if ( node->is_input() ) {
+	  node->set_fvar(node->gvar());
+	}
+	else {
+	  node->set_fvar(solver.new_var());
+	}
+      }
+    }
+
+    vector<VarId> flt_var(nf);
+    vector<VarId> tmp_var(nf);
+    for (ymuint i = 0; i < nf; ++ i) {
+      flt_var[i] = solver.new_var();
+      tmp_var[i] = solver.new_var();
+    }
+
+    // FFR 内の故障回路を作る．
+    for (vector<DtpgNode*>::const_iterator p = node_list.begin();
+	 p != node_list.end(); ++ p) {
+      DtpgNode* node = *p;
+      if ( fmark.count(node->id()) == 0 ) {
+	continue;
+      }
+
+      ymuint ni = node->fanin_num();
+      vector<Literal> inputs(ni);
+      for (ymuint i = 0; i < ni; ++ i) {
+	DtpgNode* inode = node->fanin(i);
+	VarId fvar;
+	if ( fmark.count(inode->id()) > 0 && !inode->is_input() ) {
+	  fvar = inode->fvar();
+	}
+	else {
+	  fvar = inode->gvar();
+	}
+	for (ymint val = 0; val < 2; ++ val) {
+	  DtpgFault* f = node->input_fault(val, i);
+	  if ( f != NULL && f->safault()->status() != kFsDetected ) {
+	    hash_map<ymuint, ymuint>::iterator p = fmap.find(f->id());
+	    assert_cond( p != fmap.end(), __FILE__, __LINE__);
+	    ymuint fid = p->second;
+	    if ( val == 0 ) {
+	      make_cnf_and(solver, flt_var[fid], fvar, tmp_var[fid]);
+	    }
+	    else {
+	      make_cnf_or(solver, flt_var[fid], fvar, tmp_var[fid]);
+	    }
+	    fvar = tmp_var[fid];
+	  }
+	}
+	inputs[i] = Literal(fvar, kPolPosi);
+      }
+
+      VarId fvar = node->fvar();
+      for (ymint val = 0; val < 2; ++ val) {
+	DtpgFault* f = node->output_fault(val);
+	if ( f != NULL && f->safault()->status() != kFsDetected ) {
+	  hash_map<ymuint, ymuint>::iterator p = fmap.find(f->id());
+	  assert_cond( p != fmap.end(), __FILE__, __LINE__);
+	  ymuint fid = p->second;
+	  if ( val == 0 ) {
+	    make_cnf_and(solver, flt_var[fid], tmp_var[fid], fvar);
+	  }
+	  else {
+	    make_cnf_or(solver, flt_var[fid], tmp_var[fid], fvar);
+	  }
+	  fvar = tmp_var[fid];
+	}
+      }
+
+      if ( !node->is_input() ) {
+	Literal flit(fvar, kPolPosi);
+	make_node_cnf(solver, node, flit, inputs);
+      }
+    }
+
+    // 個々の故障に対するテスト生成を行なう．
+    for (ymuint i = 0; i < nf; ++ i) {
+      vector<Literal> assumptions(nf + 1);
+      for (ymuint j = 0; j < nf; ++ j) {
+	if ( j != i ) {
+	  assumptions[j] = Literal(flt_var[j], kPolNega);
+	}
+	else {
+	  assumptions[j] = Literal(flt_var[j], kPolPosi);
+	}
+      }
+
+      DtpgFault* f = flist[i];
+      DtpgNode* fnode = f->node();
+      if ( f->is_input_fault() ) {
+	fnode = f->source_node();
+      }
+      tPol pol = (f->val() == 0) ? kPolPosi : kPolNega;
+      assumptions[nf] = Literal(fnode->gvar(), pol);
+      vector<Bool3> model;
+      Bool3 stat = solver.solve(assumptions, model);
+      if ( stat == kB3True ) {
+	TestVector* tv = tvmgr.new_vector();
+	set_tv(model, tv);
+	d_list.push_back(f->safault());
+      }
+      else if ( stat == kB3False ) {
+	u_list.push_back(f->safault());
+      }
+    }
+  }
+  else {
+    for (ymuint i = 0; i < nf; ++ i) {
+      DtpgFault* f = flist[i];
+      u_list.push_back(f->safault());
+    }
+  }
+}
+
+// @brief fnode の故障が伝搬する条件を表す CNF を作る．
+bool
+DtpgSat::make_prop_cnf(SatSolver& solver,
+		       DtpgNode* fnode)
+{
+  vector<DtpgNode*> tfo_list;
+  vector<DtpgNode*> tfi_list;
+  mNetwork->mark_tfo_tfi(fnode, tfo_list, tfi_list);
+
+  // 以降は kTFO か kTFI マークのついたノードのみを対象とする．
+
+  // TFO マークのついたノード用の変数の生成 (glit, flit, dlit の3つを作る)
+  for (vector<DtpgNode*>::iterator p = tfo_list.begin();
+       p != tfo_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    node->set_gvar(solver.new_var());
+    node->set_fvar(solver.new_var());
+    node->set_dvar(solver.new_var());
+  }
+  // TFI マークのついたノード用の変数の生成 (glit のみを作る)
+  for (vector<DtpgNode*>::iterator p = tfi_list.begin();
+       p != tfi_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    node->set_gvar(solver.new_var());
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 正常回路の CNF を生成
+  //////////////////////////////////////////////////////////////////////
+
+  for (vector<DtpgNode*>::iterator p = tfi_list.begin();
+       p != tfi_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    ymuint ni = node->fanin_num();
+    vector<Literal> inputs(ni);
+    for (ymuint i = 0; i < ni; ++ i) {
+      DtpgNode* inode = node->fanin(i);
+      inputs[i] = Literal(inode->gvar(), kPolPosi);
+    }
+    Literal output(node->gvar(), kPolPosi);
+    make_node_cnf(solver, node, output, inputs);
+  }
+  for (vector<DtpgNode*>::iterator p = tfo_list.begin();
+       p != tfo_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    ymuint ni = node->fanin_num();
+    vector<Literal> inputs(ni);
+    for (ymuint i = 0; i < ni; ++ i) {
+      DtpgNode* inode = node->fanin(i);
+      inputs[i] = Literal(inode->gvar(), kPolPosi);
+    }
+    Literal output(node->gvar(), kPolPosi);
+    make_node_cnf(solver, node, output, inputs);
+  }
+
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障回路の CNF を生成
+  //////////////////////////////////////////////////////////////////////
+  vector<Literal> odiff;
+  odiff.reserve(mNetwork->output_num2());
+
+  // mark の付いていないノードは正常回路，付いているノードは故障回路
+  // を用いて CNF を作る．
+  for (ymuint i = 0; i < tfo_list.size(); ++ i) {
+    DtpgNode* node = tfo_list[i];
+
+    Literal glit(node->gvar(), kPolPosi);
+    Literal flit(node->fvar(), kPolPosi);
+    Literal dlit(node->dvar(), kPolPosi);
+
+    // XOR(glit, flit, dlit) を追加する．
+    // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
+    solver.add_clause(~glit, ~flit, ~dlit);
+    solver.add_clause(~glit,  flit,  dlit);
+    solver.add_clause( glit, ~flit,  dlit);
+    solver.add_clause( glit,  flit, ~dlit);
+
+    // node が出力の時には odiff に追加しておく．
+    if ( node->is_output() ) {
+      odiff.push_back(dlit);
+    }
+
+    if ( node == fnode ) {
+      continue;
+    }
+
+    // 入力のリテラル
+    ymuint ni = node->fanin_num();
+    vector<Literal> inputs(ni);
+
+    // dlit が 1 の時，入力のノードの dlit も1でなければならない．
+    vector<Literal> dep;
+    dep.reserve(ni + 1);
+    dep.push_back(~dlit);
+
+    for (ymuint j = 0; j < ni; ++ j) {
+      DtpgNode* inode = node->fanin(j);
+      if ( inode->mark() == DtpgNode::kTFO ) {
+	inputs[j] = Literal(inode->fvar(), kPolPosi);
+	dep.push_back(Literal(inode->dvar(), kPolPosi));
+      }
+      else {
+	inputs[j] = Literal(inode->gvar(), kPolPosi);
+      }
+    }
+
+    // node の入力と出力の関係の clause を追加する．
+    make_node_cnf(solver, node, flit, inputs);
+
+    solver.add_clause(dep);
+  }
+
+  // 出力のうち，最低1つは故障差が伝搬しなければならない．
+  if ( odiff.empty() ) {
+    return false;
+  }
+
+  solver.add_clause(odiff);
+
+  return true;
+}
+
+// @brief 入力に故障を持つノードの CNF を作る．
+// @param[in] solver SAT ソルバ
+// @param[in] fnode 対象のノード
+// @param[in] ipos 故障のある入力の番号
+void
+DtpgSat::make_ifault_cnf(SatSolver& solver,
+			 DtpgNode* fnode,
+			 ymuint ipos)
+{
+  DtpgNode* fsrc = fnode->fanin(ipos);
+  fsrc->set_fvar(solver.new_var());
+  fsrc->set_dvar(solver.new_var());
+
+  ymuint ni = fnode->fanin_num();
+  vector<Literal> inputs(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    DtpgNode* inode = fnode->fanin(i);
+    if ( i == ipos ) {
+      inputs[i] = Literal(inode->fvar(), kPolPosi);
+    }
+    else {
+      inputs[i] = Literal(inode->gvar(), kPolPosi);
+    }
+  }
+
+  Literal glit(fnode->gvar(), kPolPosi);
+  Literal flit(fnode->fvar(), kPolPosi);
+  Literal dlit(fnode->dvar(), kPolPosi);
+
+  // XOR(glit, flit, dlit) を追加する．
+  // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
+  solver.add_clause(~glit, ~flit, ~dlit);
+  solver.add_clause(~glit,  flit,  dlit);
+  solver.add_clause( glit, ~flit,  dlit);
+  solver.add_clause( glit,  flit, ~dlit);
+
+  vector<Literal> dep(2);
+  dep[0] = ~dlit;
+  dep[1] = Literal(fsrc->dvar(), kPolPosi);
+  solver.add_clause(dep);
+
+  make_node_cnf(solver, fnode, flit, inputs);
+}
+
+// @brief ノードの入出力の関係を表す CNF を作る．
+void
+DtpgSat::make_node_cnf(SatSolver& solver,
+		       DtpgNode* node,
+		       Literal olit,
+		       const vector<Literal>& ilits)
+{
+  if ( node->is_cplx_logic() ) {
+    LogExpr lexp = mNetwork->tgnetwork().get_lexp(node->tgnode());
+    make_cnf_from_lexp(solver, lexp, olit, ilits);
+  }
+  else {
+    make_cnf_from_type(solver, node->type(), olit, ilits);
+  }
+}
+
+// @brief SAT の結果からテストベクタを作る．
+void
+DtpgSat::set_tv(const vector<Bool3>& model,
+		TestVector* tv)
+{
+  tv->init();
+  ymuint npi = mNetwork->input_num2();
+  for (ymuint i = 0; i < npi; ++ i) {
+    DtpgNode* node = mNetwork->input(i);
+    if ( node->mark() != DtpgNode::kNone ) {
+      VarId idx = node->gvar();
+      // 今のところ model には 0 か 1 しか設定されていないはず．
+      if ( model[idx.val()] == kB3True ) {
+	tv->set_val(i, kVal1);
+      }
+      else if ( model[idx.val()] == kB3False ) {
+	tv->set_val(i, kVal0);
+      }
+    }
+  }
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

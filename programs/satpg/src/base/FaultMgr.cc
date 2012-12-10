@@ -58,7 +58,11 @@ inline
 bool
 check_fos(const TgNode* node)
 {
-  if ( node->fanout_num() > 1 ) {
+  ymuint nfo = node->fanout_num();
+  if ( nfo == 0 ) {
+    return false;
+  }
+  if ( nfo > 1 ) {
     return true;
   }
   if ( node->fanout(0)->is_output() ) {

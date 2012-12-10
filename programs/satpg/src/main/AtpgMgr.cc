@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_SATPG
 // クラス FsimNetBinder
 //////////////////////////////////////////////////////////////////////
 class FsimNetBinder :
-  public T1Binder<const TgNetwork&>
+  public T2Binder<const TgNetwork&, const vector<SaFault*>&>
 {
 public:
 
@@ -32,7 +32,8 @@ public:
   /// @brief イベント処理関数
   virtual
   void
-  event_proc(const TgNetwork& network);
+  event_proc(const TgNetwork& network,
+	     const vector<SaFault*>& fault_list);
 
 
 private:
@@ -54,9 +55,10 @@ FsimNetBinder::FsimNetBinder(Fsim* fsim) :
 
 // @brief イベント処理関数
 void
-FsimNetBinder::event_proc(const TgNetwork& network)
+FsimNetBinder::event_proc(const TgNetwork& network,
+			  const vector<SaFault*>& fault_list)
 {
-  mFsim->set_network(network);
+  mFsim->set_network(network, fault_list);
 }
 
 
@@ -228,142 +230,202 @@ AtpgMgr::set_dtpg_mode(const string& type,
 }
 
 // @brief 一つの故障に対してテストパタン生成を行なう．
-// @param[in] fnode 故障ノード
-// @param[in] fval 故障値
-// @param[in] tv 生成したパタンを入れるベクタ
-// @retval kDetect パタン生成が成功した．
-// @retval kUntest テスト不能故障だった．
-// @retval kAbort アボートした．
-tStat
-AtpgMgr::dtpg_single(const TgNode* fnode,
-		     int fval,
-		     TestVector* tv)
+void
+AtpgMgr::dtpg_single()
 {
-#if 0
+
   ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_SAT);
-#endif
+  mTimer.change(TM_DTPG);
 
-  tStat stat = mDtpg->dtpg_single(_network(), fnode, false, 0, fnode, fval, tv);
+  vector<SaFault*> d_list;
+  vector<SaFault*> u_list;
+  mDtpg->dtpg_single(mTvMgr, d_list, u_list);
 
-#if 0
+  update_faults(d_list, u_list);
+
   mTimer.change(old_id);
-#endif
-
-  return stat;
-}
-
-// @brief 一つの故障に対してテストパタン生成を行なう．
-// @param[in] fnode 故障ノード
-// @param[in] ipos 故障の入力位置
-// @param[in] fsrc 故障ノードの入力
-// @param[in] fval 故障値
-// @param[in] tv 生成したパタンを入れるベクタ
-// @retval kDetect パタン生成が成功した．
-// @retval kUntest テスト不能故障だった．
-// @retval kAbort アボートした．
-tStat
-AtpgMgr::dtpg_single(const TgNode* fnode,
-		     ymuint ipos,
-		     const TgNode* fsrc,
-		     int fval,
-		     TestVector* tv)
-{
-#if 0
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_SAT);
-#endif
-
-  tStat stat = mDtpg->dtpg_single(_network(), fnode, true, ipos, fsrc, fval, tv);
-
-#if 0
-  mTimer.change(old_id);
-#endif
-
-  return stat;
 }
 
 // @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
-// @param[in] fnode 故障ノード
-// @param[in] tv 生成したパタンを入れるベクタ
-// @retval kDetect パタン生成が成功した．
-// @retval kUntest テスト不能故障だった．
-// @retval kAbort アボートした．
-pair<tStat, tStat>
-AtpgMgr::dtpg_dual(const TgNode* fnode,
-		   TestVector* tv[])
+void
+AtpgMgr::dtpg_dual()
 {
-#if 0
   ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_SAT);
-#endif
+  mTimer.change(TM_DTPG);
 
-  pair<tStat, tStat> stats = mDtpg->dtpg_dual(_network(), fnode, false, 0, fnode, tv);
+  vector<SaFault*> d_list;
+  vector<SaFault*> u_list;
+  mDtpg->dtpg_dual(mTvMgr, d_list, u_list);
 
-#if 0
+  update_faults(d_list, u_list);
+
   mTimer.change(old_id);
-#endif
-
-  return stats;
-}
-
-// @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
-// @param[in] fnode 故障ノード
-// @param[in] ipos 故障の入力位置
-// @param[in] fsrc 故障ノードの入力
-// @param[in] tv 生成したパタンを入れるベクタ
-// @retval kDetect パタン生成が成功した．
-// @retval kUntest テスト不能故障だった．
-// @retval kAbort アボートした．
-pair<tStat, tStat>
-AtpgMgr::dtpg_dual(const TgNode* fnode,
-		   ymuint ipos,
-		   const TgNode* fsrc,
-		   TestVector* tv[])
-{
-#if 0
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_SAT);
-#endif
-
-  pair<tStat, tStat> stats = mDtpg->dtpg_dual(_network(), fnode, true, ipos, fsrc, tv);
-
-#if 0
-  mTimer.change(old_id);
-#endif
-
-  return stats;
 }
 
 // @brief FFR 内の故障に対してテストパタン生成を行なう．
-// @param[in] ffr FFR を表すクラス
-// @param[in] flist 故障リスト
-// @param[in] tv_list 生成したパタンを入れるベクタ
-// @param[in] stat_list 結果を入れるベクタ
-// @note flist の故障は必ず root が dominator となっていなければならない．
 void
-AtpgMgr::dtpg_ffr(const TgFFR* ffr,
-		  const vector<SaFault*>& flist,
-		  vector<TestVector*>& tv_list,
-		  vector<tStat>& stat_list)
+AtpgMgr::dtpg_ffr()
 {
-#if 0
   ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_SAT);
-#endif
+  mTimer.change(TM_DTPG);
 
-  mDtpg->dtpg_ffr(_network(), ffr, flist, tv_list, stat_list);
+  vector<SaFault*> d_list;
+  vector<SaFault*> u_list;
+  mDtpg->dtpg_ffr(mTvMgr, d_list, u_list);
 
-#if 0
+  update_faults(d_list, u_list);
+
   mTimer.change(old_id);
-#endif
 }
 
-// @brief 直前の実行結果を得る．
-const SatStats&
-AtpgMgr::dtpg_stats() const
+// @brief MFFC 内の故障に対してテストパタン生成を行なう．
+void
+AtpgMgr::dtpg_mffc()
 {
-  return mDtpg->stats();
+  ymuint old_id = mTimer.cur_id();
+  mTimer.change(TM_DTPG);
+
+  vector<SaFault*> d_list;
+  vector<SaFault*> u_list;
+  mDtpg->dtpg_mffc(mTvMgr, d_list, u_list);
+
+  update_faults(d_list, u_list);
+
+  mTimer.change(old_id);
+}
+
+// @brief 全ての故障に対してテストパタン生成を行なう．
+void
+AtpgMgr::dtpg_all()
+{
+  ymuint old_id = mTimer.cur_id();
+  mTimer.change(TM_DTPG);
+
+  vector<SaFault*> d_list;
+  vector<SaFault*> u_list;
+  mDtpg->dtpg_all(mTvMgr, d_list, u_list);
+
+  update_faults(d_list, u_list);
+
+  mTimer.change(old_id);
+}
+
+// @brief 一つの故障に対してテストパタン生成を行なう．
+void
+AtpgMgr::dtpg_single_posplit()
+{
+  ymuint old_id = mTimer.cur_id();
+  mTimer.change(TM_DTPG);
+
+  ymuint no = _network().output_num2();
+  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+    vector<SaFault*> d_list;
+    vector<SaFault*> u_list;
+    mDtpg->dtpg_single_posplit(po_pos, mTvMgr, d_list, u_list);
+    update_faults(d_list, vector<SaFault*>());
+  }
+  vector<SaFault*> d_list;
+  vector<SaFault*> u_list;
+  mDtpg->dtpg_single(mTvMgr, d_list, u_list);
+  update_faults(d_list, u_list);
+
+  mTimer.change(old_id);
+}
+
+// @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
+void
+AtpgMgr::dtpg_dual_posplit()
+{
+  ymuint old_id = mTimer.cur_id();
+  mTimer.change(TM_DTPG);
+
+  ymuint no = _network().output_num2();
+  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+    vector<SaFault*> d_list;
+    vector<SaFault*> u_list;
+    mDtpg->dtpg_dual_posplit(po_pos, mTvMgr, d_list, u_list);
+
+    update_faults(d_list, vector<SaFault*>());
+  }
+  vector<SaFault*> d_list;
+  vector<SaFault*> u_list;
+  mDtpg->dtpg_dual(mTvMgr, d_list, u_list);
+
+  update_faults(d_list, u_list);
+
+  mTimer.change(old_id);
+}
+
+// @brief FFR 内の故障に対してテストパタン生成を行なう．
+void
+AtpgMgr::dtpg_ffr_posplit()
+{
+  ymuint old_id = mTimer.cur_id();
+  mTimer.change(TM_DTPG);
+
+  ymuint no = _network().output_num2();
+  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+    vector<SaFault*> d_list;
+    vector<SaFault*> u_list;
+    mDtpg->dtpg_ffr_posplit(po_pos, mTvMgr, d_list, u_list);
+
+    update_faults(d_list, vector<SaFault*>());
+  }
+  vector<SaFault*> d_list;
+  vector<SaFault*> u_list;
+  mDtpg->dtpg_ffr(mTvMgr, d_list, u_list);
+
+  update_faults(d_list, u_list);
+
+  mTimer.change(old_id);
+}
+
+// @brief MFFC 内の故障に対してテストパタン生成を行なう．
+void
+AtpgMgr::dtpg_mffc_posplit()
+{
+  ymuint old_id = mTimer.cur_id();
+  mTimer.change(TM_DTPG);
+
+  ymuint no = _network().output_num2();
+  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+    vector<SaFault*> d_list;
+    vector<SaFault*> u_list;
+    mDtpg->dtpg_mffc_posplit(po_pos, mTvMgr, d_list, u_list);
+
+    update_faults(d_list, vector<SaFault*>());
+  }
+  vector<SaFault*> d_list;
+  vector<SaFault*> u_list;
+  mDtpg->dtpg_mffc(mTvMgr, d_list, u_list);
+
+  update_faults(d_list, u_list);
+
+  mTimer.change(old_id);
+}
+
+// @brief 全ての故障に対してテストパタン生成を行なう．
+void
+AtpgMgr::dtpg_all_posplit()
+{
+  ymuint old_id = mTimer.cur_id();
+  mTimer.change(TM_DTPG);
+
+  ymuint no = _network().output_num2();
+  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+    vector<SaFault*> d_list;
+    vector<SaFault*> u_list;
+    mDtpg->dtpg_all_posplit(po_pos, mTvMgr, d_list, u_list);
+
+    update_faults(d_list, vector<SaFault*>());
+  }
+  vector<SaFault*> d_list;
+  vector<SaFault*> u_list;
+  mDtpg->dtpg_all(mTvMgr, d_list, u_list);
+
+  update_faults(d_list, u_list);
+
+  mTimer.change(old_id);
 }
 
 // @brief ファイル読み込みに関わる時間を得る．
@@ -401,215 +463,41 @@ AtpgMgr::misc_time() const
   return mTimer.time(TM_MISC);
 }
 
-BEGIN_NONAMESPACE
-
-bool
-check_fos(const TgNode* node)
+// @brief 故障リストの更新を行なう．
+// @param[in] d_list 検出された故障のリスト
+// @param[in] u_list 検出不能と判定された故障のリスト
+void
+AtpgMgr::update_faults(const vector<SaFault*>& d_list,
+		       const vector<SaFault*>& u_list)
 {
-  if ( node->fanout_num() > 1 || node->fanout(0)->is_output() ) {
-    return true;
+  for (vector<SaFault*>::const_iterator p = d_list.begin();
+       p != d_list.end(); ++ p) {
+    SaFault* f = *p;
+    mFaultMgr.set_status(f, kFsDetected);
   }
-  return false;
-}
-
-const TgNode*
-merge(const TgNode* node1,
-      const TgNode* node2,
-      const vector<const TgNode*>& mffc_root,
-      const vector<ymuint>& tid)
-{
-  for ( ; ; ) {
-    if ( node1 == node2 ) {
-      return node1;
-    }
-    if ( node1 == NULL || node2 == NULL ) {
-      return NULL;
-    }
-    ymuint id1 = tid[node1->gid()];
-    ymuint id2 = tid[node2->gid()];
-    if ( id1 > id2 ) {
-      node1 = mffc_root[node1->gid()];
-    }
-    else if ( id1 < id2 ) {
-      node2 = mffc_root[node2->gid()];
-    }
+  for (vector<SaFault*>::const_iterator p = u_list.begin();
+       p != u_list.end(); ++ p) {
+    SaFault* f = *p;
+    mFaultMgr.set_status(f, kFsUntestable);
   }
-}
 
-END_NONAMESPACE
+  mFaultMgr.update();
+  after_update_faults();
+}
 
 // @brief ネットワークをセットした後に呼ぶ関数
 void
 AtpgMgr::after_set_network()
 {
-  mFFRList.clear();
   mFaultMgr.clear();
+  mFaultMgr.set_ssa_fault(mNetwork);
+
   mTvMgr.clear();
+  mTvMgr.init(mNetwork.input_num2());
 
-  ymuint ni = mNetwork.input_num2();
-  ymuint nl = mNetwork.logic_num();
-  ymuint n = mNetwork.node_num();
+  mDtpg->set_network(mNetwork, mFaultMgr.remain_list());
 
-
-
-  //////////////////////////////////////////////////////////////////////
-  // FFR を作成する．
-  //////////////////////////////////////////////////////////////////////
-
-  vector<ymuint> root_id(n);
-  vector<TgFFR*> ffr_array(n);
-
-  ymuint nffr = 0;
-  for (ymuint i = 0; i < nl; ++ i) {
-    const TgNode* node = mNetwork.sorted_logic(nl - i - 1);
-    ymuint gid = node->gid();
-    if ( check_fos(node) ) {
-      root_id[gid] = gid;
-      TgFFR* ffr = new TgFFR;
-      ffr_array[gid] = ffr;
-      mFFRList.push_back(ffr);
-      ffr->mRoot = node;
-      ++ nffr;
-    }
-    else {
-      ymuint rid = root_id[node->fanout(0)->gid()];
-      root_id[gid] = rid;
-    }
-  }
-  for (ymuint i = 0; i < ni; ++ i) {
-    const TgNode* node = mNetwork.input(i);
-    ymuint gid = node->gid();
-    if ( check_fos(node) ) {
-      root_id[gid] = gid;
-      TgFFR* ffr = new TgFFR;
-      ffr_array[gid] = ffr;
-      mFFRList.push_back(ffr);
-      ffr->mRoot = node;
-      ++ nffr;
-    }
-    else {
-      ymuint rid = root_id[node->fanout(0)->gid()];
-      root_id[gid] = rid;
-    }
-  }
-
-  // 入力からのトポロジカル順にFFR内のノードリストを作る．
-  for (ymuint i = 0; i < ni; ++ i) {
-    const TgNode* node = mNetwork.input(i);
-    ymuint rid = root_id[node->gid()];
-    TgFFR* ffr = ffr_array[rid];
-    assert_cond( ffr != NULL, __FILE__, __LINE__);
-    ffr->mNodeList.push_back(node);
-  }
-  for (ymuint i = 0; i < nl; ++ i) {
-    const TgNode* node = mNetwork.sorted_logic(i);
-    ymuint rid = root_id[node->gid()];
-    TgFFR* ffr = ffr_array[rid];
-    assert_cond( ffr != NULL, __FILE__, __LINE__);
-    ffr->mNodeList.push_back(node);
-  }
-
-
-  //////////////////////////////////////////////////////////////////////
-  // MFFC を作成する
-  //////////////////////////////////////////////////////////////////////
-
-  vector<ymuint> tid(n);
-  for (ymuint i = 0; i < nl; ++ i) {
-    const TgNode* node = mNetwork.sorted_logic(nl - i - 1);
-    ymuint gid = node->gid();
-    tid[gid] = i;
-  }
-
-  vector<const TgNode*> mffc_root(n, NULL);
-  vector<TgFFR*> mffc_array(n);
-  ymuint nmffc = 0;
-  for (ymuint i = 0; i < nl; ++ i) {
-    const TgNode* node = mNetwork.sorted_logic(nl - i - 1);
-    ymuint gid = node->gid();
-    if ( check_fos(node) ) {
-      ymuint nfo = node->fanout_num();
-      const TgNode* tmp_root = mffc_root[node->fanout(0)->gid()];
-      for (ymuint i = 1; i < nfo; ++ i) {
-	const TgNode* tmp_root1 = mffc_root[node->fanout(i)->gid()];
-	tmp_root = merge(tmp_root, tmp_root1, mffc_root, tid);
-	if ( tmp_root == NULL ) {
-	  break;
-	}
-      }
-      mffc_root[gid] = tmp_root;
-      if ( tmp_root == NULL ) {
-	TgFFR* mffc = new TgFFR;
-	mffc_array[gid] = mffc;
-	mMFFCList.push_back(mffc);
-	mffc->mRoot = node;
-	++ nmffc;
-      }
-    }
-    else {
-      const TgNode* fonode = node->fanout(0);
-      const TgNode* root = mffc_root[fonode->gid()];
-      if ( root == NULL ) {
-	root = fonode;
-      }
-      mffc_root[gid] = root;
-    }
-  }
-  for (ymuint i = 0; i < ni; ++ i) {
-    const TgNode* node = mNetwork.input(i);
-    ymuint gid = node->gid();
-    if ( check_fos(node) ) {
-      ymuint nfo = node->fanout_num();
-      const TgNode* tmp_root = mffc_root[node->fanout(0)->gid()];
-      for (ymuint i = 1; i < nfo; ++ i) {
-	const TgNode* tmp_root1 = mffc_root[node->fanout(i)->gid()];
-	tmp_root = merge(tmp_root, tmp_root1, mffc_root, tid);
-	if ( tmp_root == NULL ) {
-	  break;
-	}
-      }
-      mffc_root[gid] = tmp_root;
-      if ( tmp_root == NULL ) {
-	TgFFR* mffc = new TgFFR;
-	mffc_array[gid] = mffc;
-	mMFFCList.push_back(mffc);
-	mffc->mRoot = node;
-	++ nmffc;
-      }
-    }
-    else {
-      const TgNode* fonode = node->fanout(0);
-      const TgNode* root = mffc_root[fonode->gid()];
-      if ( root == NULL ) {
-	root = fonode;
-      }
-      mffc_root[gid] = root;
-    }
-  }
-
-  // 入力からのトポロジカル順にMFFC内のノードリストを作る．
-  for (ymuint i = 0; i < ni; ++ i) {
-    const TgNode* node = mNetwork.input(i);
-    TgFFR* mffc = mffc_array[node->gid()];
-    if ( mffc == NULL ) {
-      mffc = mffc_array[mffc_root[node->gid()]->gid()];
-    }
-    assert_cond( mffc != NULL, __FILE__, __LINE__);
-    mffc->mNodeList.push_back(node);
-  }
-  for (ymuint i = 0; i < nl; ++ i) {
-    const TgNode* node = mNetwork.sorted_logic(i);
-    TgFFR* mffc = mffc_array[node->gid()];
-    if ( mffc == NULL ) {
-      mffc = mffc_array[mffc_root[node->gid()]->gid()];
-    }
-    assert_cond( mffc != NULL, __FILE__, __LINE__);
-    mffc->mNodeList.push_back(node);
-  }
-
-  mTvMgr.init(ni);
-
-  mNtwkBindMgr.prop_event(mNetwork);
+  mNtwkBindMgr.prop_event(mNetwork, mFaultMgr.remain_list());
 }
 
 // @brief 故障リストが変更された時に呼ばれる関数

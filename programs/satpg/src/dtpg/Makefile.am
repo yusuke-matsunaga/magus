@@ -15,6 +15,11 @@ libatpg_dtpg_la_CPPFLAGS = \
 	-I$(top_srcdir)/include
 
 libatpg_dtpg_la_SOURCES = \
+	DtpgNode.h \
+	DtpgFault.h \
+	DtpgFFR.h \
+	DtpgNetwork.h \
+	DtpgNetwork.cc \
 	DtpgSat.h \
 	DtpgSat.cc
 

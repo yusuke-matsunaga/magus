@@ -1,39 +1,41 @@
-#ifndef TGFFR_H
-#define TGFFR_H
+#ifndef DTPGFFR_H
+#define DTPGFFR_H
 
-/// @file TgFFR.h
-/// @brief TgFFR のヘッダファイル
+/// @file DtpgFFR.h
+/// @brief DtpgFFR のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "satpg_nsdef.h"
+#include "dtpg_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG
+BEGIN_NAMESPACE_YM_SATPG_DTPG
+
+class DtpgFault;
 
 //////////////////////////////////////////////////////////////////////
-/// @class TgFFR TgFFR.h "TgFFR.h"
-/// @brief TgNetwork の FFR を表すクラス
+/// @class DtpgFFR DtpgFFR.h "DtpgFFR.h"
+/// @brief DtpgNetwork の FFR を表すクラス
 //////////////////////////////////////////////////////////////////////
-class TgFFR
+class DtpgFFR
 {
-  friend class AtpgMgr;
+  friend class DtpgNetwork;
 
 public:
 
   /// @brief 根のノードを取り出す．
-  const TgNode*
+  DtpgNode*
   root() const;
 
   /// @brief ノードのリストを返す．
-  const vector<const TgNode*>&
+  const vector<DtpgNode*>&
   node_list() const;
 
   /// @brief 故障のリストを返す．
-  const vector<SaFault*>&
+  const vector<DtpgFault*>&
   fault_list() const;
 
 
@@ -43,14 +45,14 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 根のノード
-  const TgNode* mRoot;
+  DtpgNode* mRoot;
 
   // FFR のノードのリスト
   // mRoot も含む．
-  vector<const TgNode*> mNodeList;
+  vector<DtpgNode*> mNodeList;
 
   // FFR 内の故障のリスト
-  vector<SaFault*> mFaultList;
+  vector<DtpgFault*> mFaultList;
 
 };
 
@@ -61,28 +63,28 @@ private:
 
 // @brief 根のノードを取り出す．
 inline
-const TgNode*
-TgFFR::root() const
+DtpgNode*
+DtpgFFR::root() const
 {
   return mRoot;
 }
 
 // @brief ノードのリストを返す．
 inline
-const vector<const TgNode*>&
-TgFFR::node_list() const
+const vector<DtpgNode*>&
+DtpgFFR::node_list() const
 {
   return mNodeList;
 }
 
 // @brief 故障のリストを返す．
 inline
-const vector<SaFault*>&
-TgFFR::fault_list() const
+const vector<DtpgFault*>&
+DtpgFFR::fault_list() const
 {
   return mFaultList;
 }
 
-END_NAMESPACE_YM_SATPG
+END_NAMESPACE_YM_SATPG_DTPG
 
-#endif // TGFFR_H
+#endif // DTPGFFR_H

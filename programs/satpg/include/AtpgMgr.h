@@ -13,7 +13,6 @@
 #include "satpg_nsdef.h"
 #include "FaultMgr.h"
 #include "TvMgr.h"
-#include "TgFFR.h"
 #include "fsim_nsdef.h"
 #include "dtpg_nsdef.h"
 #include "ym_logic/SatSolver.h"
@@ -48,14 +47,6 @@ public:
   /// @brief TgNetwork を取り出す．
   const TgNetwork&
   _network();
-
-  /// @brief FFR のリストを取り出す．
-  const vector<TgFFR*>&
-  _ffr_list();
-
-  /// @brief MFFC のリストを取り出す．
-  const vector<TgFFR*>&
-  _mffc_list();
 
   /// @brief FaultMgr を取り出す．
   FaultMgr&
@@ -133,72 +124,44 @@ public:
 		ostream* outp = NULL);
 
   /// @brief 一つの故障に対してテストパタン生成を行なう．
-  /// @param[in] fnode 故障ノード
-  /// @param[in] fval 故障値
-  /// @param[in] tv 生成したパタンを入れるベクタ
-  /// @retval kDetect パタン生成が成功した．
-  /// @retval kUntest テスト不能故障だった．
-  /// @retval kAbort アボートした．
-  tStat
-  dtpg_single(const TgNode* fnode,
-	      int fval,
-	      TestVector* tv);
-
-  /// @brief 一つの故障に対してテストパタン生成を行なう．
-  /// @param[in] fnode 故障ノード
-  /// @param[in] ipos 故障の入力位置
-  /// @param[in] fsrc 故障ノードの入力
-  /// @param[in] fval 故障値
-  /// @param[in] tv 生成したパタンを入れるベクタ
-  /// @retval kDetect パタン生成が成功した．
-  /// @retval kUntest テスト不能故障だった．
-  /// @retval kAbort アボートした．
-  tStat
-  dtpg_single(const TgNode* fnode,
-	      ymuint ipos,
-	      const TgNode* fsrc,
-	      int fval,
-	      TestVector* tv);
+  void
+  dtpg_single();
 
   /// @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
-  /// @param[in] fnode 故障ノード
-  /// @param[in] tv 生成したパタンを入れるベクタ
-  /// @retval kDetect パタン生成が成功した．
-  /// @retval kUntest テスト不能故障だった．
-  /// @retval kAbort アボートした．
-  pair<tStat, tStat>
-  dtpg_dual(const TgNode* fnode,
-	    TestVector* tv[]);
-
-  /// @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
-  /// @param[in] fnode 故障ノード
-  /// @param[in] ipos 故障の入力位置
-  /// @param[in] fsrc 故障ノードの入力
-  /// @param[in] tv 生成したパタンを入れるベクタ
-  /// @retval kDetect パタン生成が成功した．
-  /// @retval kUntest テスト不能故障だった．
-  /// @retval kAbort アボートした．
-  pair<tStat, tStat>
-  dtpg_dual(const TgNode* fnode,
-	    ymuint ipos,
-	    const TgNode* fsrc,
-	    TestVector* tv[]);
+  void
+  dtpg_dual();
 
   /// @brief FFR 内の故障に対してテストパタン生成を行なう．
-  /// @param[in] ffr FFR を表すクラス
-  /// @param[in] flist 故障リスト
-  /// @param[in] tv_list 生成したパタンを入れるベクタ
-  /// @param[in] stat_list 結果を入れるベクタ
-  /// @note flist の故障は必ず root が dominator となっていなければならない．
   void
-  dtpg_ffr(const TgFFR* ffr,
-	   const vector<SaFault*>& flist,
-	   vector<TestVector*>& tv_list,
-	   vector<tStat>& stat_list);
+  dtpg_ffr();
 
-  /// @brief 直前の実行結果を得る．
-  const SatStats&
-  dtpg_stats() const;
+  /// @brief MFFC 内の故障に対してテストパタン生成を行なう．
+  void
+  dtpg_mffc();
+
+  /// @brief 全ての故障に対してテストパタン生成を行なう．
+  void
+  dtpg_all();
+
+  /// @brief 一つの故障に対してテストパタン生成を行なう．
+  void
+  dtpg_single_posplit();
+
+  /// @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
+  void
+  dtpg_dual_posplit();
+
+  /// @brief FFR 内の故障に対してテストパタン生成を行なう．
+  void
+  dtpg_ffr_posplit();
+
+  /// @brief MFFC 内の故障に対してテストパタン生成を行なう．
+  void
+  dtpg_mffc_posplit();
+
+  /// @brief 全ての故障に対してテストパタン生成を行なう．
+  void
+  dtpg_all_posplit();
 
 
 public:
@@ -208,7 +171,7 @@ public:
 
   /// @brief ネットワークの変更に関するハンドラを登録する．
   void
-  reg_network_handler(T1Binder<const TgNetwork&>* handler);
+  reg_network_handler(T2Binder<const TgNetwork&, const vector<SaFault*>&>* handler);
 
   /// @brief 故障リストの変更に関するハンドラを登録する．
   void
@@ -246,6 +209,13 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 故障リストの更新を行なう．
+  /// @param[in] d_list 検出された故障のリスト
+  /// @param[in] u_list 検出不能と判定された故障のリスト
+  void
+  update_faults(const vector<SaFault*>& d_list,
+		const vector<SaFault*>& u_list);
+
   /// @brief ネットワークが変更された時に呼ばれる関数
   void
   after_set_network();
@@ -263,12 +233,6 @@ private:
   // 対象のネットワーク
   TgNetwork mNetwork;
 
-  // FFR のリスト
-  vector<TgFFR*> mFFRList;
-
-  // MFFC のリスト
-  vector<TgFFR*> mMFFCList;
-
   // 故障リスト
   FaultMgr mFaultMgr;
 
@@ -281,11 +245,11 @@ private:
   // 故障シミュレータ
   Fsim* mFsim;
 
-  // DtpgSat
+  // テストパタン生成器
   DtpgSat* mDtpg;
 
   // ネットワークが変更された時に呼ばれるイベントハンドラ
-  T1BindMgr<const TgNetwork&> mNtwkBindMgr;
+  T2BindMgr<const TgNetwork&, const vector<SaFault*>&> mNtwkBindMgr;
 
   // 故障リストが変更された時に呼ばれるイベントハンドラ
   T1BindMgr<const vector<SaFault*>& > mFaultBindMgr;
@@ -306,22 +270,6 @@ const TgNetwork&
 AtpgMgr::_network()
 {
   return mNetwork;
-}
-
-// @brief FFR のリストを取り出す．
-inline
-const vector<TgFFR*>&
-AtpgMgr::_ffr_list()
-{
-  return mFFRList;
-}
-
-// @brief MFFC のリストを取り出す．
-inline
-const vector<TgFFR*>&
-AtpgMgr::_mffc_list()
-{
-  return mMFFCList;
 }
 
 // @brief FaultMgr を取り出す．
@@ -351,7 +299,7 @@ AtpgMgr::_tv_list()
 // @brief ネットワークの変更に関するハンドラを登録する．
 inline
 void
-AtpgMgr::reg_network_handler(T1Binder<const TgNetwork&>* handler)
+AtpgMgr::reg_network_handler(T2Binder<const TgNetwork&, const vector<SaFault*>&>* handler)
 {
   mNtwkBindMgr.reg_binder(handler);
 }
