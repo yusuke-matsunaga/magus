@@ -82,6 +82,14 @@ public:
   ymuint
   id() const;
 
+  /// @brief 外部入力タイプの時に入力番号を返す．
+  ymuint
+  input_id() const;
+
+  /// @brief 外部出力タイプの時に出力番号を返す．
+  ymuint
+  output_id() const;
+
   /// @brief ファンイン数を得る．
   ymuint
   fanin_num() const;
@@ -303,6 +311,22 @@ ymuint
 DtpgNode::id() const
 {
   return mId;
+}
+
+// @brief 外部入力タイプの時に入力番号を返す．
+inline
+ymuint
+DtpgNode::input_id() const
+{
+  return mTgNode->lid();
+}
+
+// @brief 外部出力タイプの時に出力番号を返す．
+inline
+ymuint
+DtpgNode::output_id() const
+{
+  return mTgNode->lid();
 }
 
 // @brief ファンイン数を得る．

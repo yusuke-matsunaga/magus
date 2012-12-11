@@ -34,10 +34,6 @@ public:
   const vector<DtpgNode*>&
   node_list() const;
 
-  /// @brief 故障のリストを返す．
-  const vector<DtpgFault*>&
-  fault_list() const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -50,9 +46,6 @@ private:
   // FFR のノードのリスト
   // mRoot も含む．
   vector<DtpgNode*> mNodeList;
-
-  // FFR 内の故障のリスト
-  vector<DtpgFault*> mFaultList;
 
 };
 
@@ -75,14 +68,6 @@ const vector<DtpgNode*>&
 DtpgFFR::node_list() const
 {
   return mNodeList;
-}
-
-// @brief 故障のリストを返す．
-inline
-const vector<DtpgFault*>&
-DtpgFFR::fault_list() const
-{
-  return mFaultList;
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

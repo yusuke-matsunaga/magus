@@ -159,6 +159,14 @@ public:
 		   vector<SaFault*>& d_list,
 		   vector<SaFault*>& u_list);
 
+  /// @brief StatList をクリアする．
+  void
+  clear_stats_list();
+
+  /// @brief StatList を得る．
+  const vector<SatStats>&
+  stats_list() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -199,10 +207,11 @@ private:
   /// @brief fnode の故障が伝搬する条件を表す CNF を作る．
   /// @param[in] solver SAT ソルバ
   /// @param[in] fnode 対象のノード
-  /// @return fnode が外部出力に至る経路を持つとき true を返す．
-  bool
+  /// @param[out] input_list 関係する外部入力ノードを納めるリスト
+  void
   make_prop_cnf(SatSolver& solver,
-		DtpgNode* fnode);
+		DtpgNode* fnode,
+		vector<DtpgNode*>& input_list);
 
   /// @brief 入力に故障を持つノードの CNF を作る．
   /// @param[in] solver SAT ソルバ
@@ -227,6 +236,7 @@ private:
   /// @brief SAT の結果からテストベクタを作る．
   void
   set_tv(const vector<Bool3>& model,
+	 const vector<DtpgNode*>& input_list,
 	 TestVector* tv);
 
 
@@ -249,6 +259,9 @@ private:
 
   // 対象の回路
   DtpgNetwork* mNetwork;
+
+  // SatStats のリスト
+  vector<SatStats> mStatsList;
 
 };
 

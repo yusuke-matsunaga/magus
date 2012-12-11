@@ -114,10 +114,6 @@ public:
   void
   get_mffc_list(vector<DtpgFFR*>& mffc_list);
 
-  /// @brief ノードのマークをクリアする．
-  void
-  clear_node_mark();
-
   /// @brief fnode の TFO の TFI にマークをつける．
   /// @param[in] fnode 起点となるノード
   /// @param[in] tfo_list TFO ノードを入れるリスト
@@ -127,6 +123,11 @@ public:
   mark_tfo_tfi(DtpgNode* fnode,
 	       vector<DtpgNode*>& tfo_list,
 	       vector<DtpgNode*>& tfi_list);
+
+  /// @brief ノードのマークをクリアする．
+  void
+  clear_node_mark(const vector<DtpgNode*>& tfo_list,
+		  const vector<DtpgNode*>& tfi_list);
 
 
 private:

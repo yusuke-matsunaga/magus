@@ -102,7 +102,8 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
 
   // 故障リストを作る．
   ymuint nf = fault_list.size();
-  mFaultChunk = new DtpgFault[nf];
+  void* p = mAlloc.get_memory(sizeof(DtpgFault) * nf);
+  mFaultChunk = new (p) DtpgFault[nf];
   mFaultList.reserve(nf);
   for (ymuint i = 0; i < nf; ++ i) {
     SaFault* f = fault_list[i];
@@ -375,15 +376,6 @@ DtpgNetwork::get_mffc_list(vector<DtpgFFR*>& mffc_list)
   cout << "#MFFC = " << mffc_list.size() << endl;
 }
 
-// @brief ノードのマークをクリアする．
-void
-DtpgNetwork::clear_node_mark()
-{
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
-    mNodeArray[i].set_mark(DtpgNode::kNone);
-  }
-}
-
 // @brief fnode の TFO の TFI にマークをつける．
 // @param[in] fnode 起点となるノード
 // @param[in] tfo_list TFO ノードを入れるリスト
@@ -393,12 +385,10 @@ DtpgNetwork::mark_tfo_tfi(DtpgNode* fnode,
 			  vector<DtpgNode*>& tfo_list,
 			  vector<DtpgNode*>& tfi_list)
 {
-  clear_node_mark();
-
   // まず fnode の TFO にマークをつける．
   // 同時にマークの付いたノードは tfo_list につまれる．
   tfo_list.clear();
-  tfo_list.reserve(mNodeNum);
+  tfo_list.reserve(mActNodeNum);
   tfo_list.push_back(fnode);
   fnode->set_mark(DtpgNode::kTFO);
   for (ymuint rpos = 0; rpos < tfo_list.size(); ++ rpos) {
@@ -415,7 +405,7 @@ DtpgNetwork::mark_tfo_tfi(DtpgNode* fnode,
 
   // TFO マークの付いたノードの TFI に別のマークをつける．
   tfi_list.clear();
-  tfi_list.reserve(mNodeNum);
+  tfi_list.reserve(mActNodeNum);
   for (ymuint rpos = 0; rpos < tfo_list.size(); ++ rpos) {
     DtpgNode* node = tfo_list[rpos];
     ymuint ni = node->fanin_num();
@@ -439,6 +429,23 @@ DtpgNetwork::mark_tfo_tfi(DtpgNode* fnode,
 	inode->set_mark(DtpgNode::kTFI);
       }
     }
+  }
+}
+
+// @brief ノードのマークをクリアする．
+void
+DtpgNetwork::clear_node_mark(const vector<DtpgNode*>& tfo_list,
+			     const vector<DtpgNode*>& tfi_list)
+{
+  for (vector<DtpgNode*>::const_iterator p = tfo_list.begin();
+       p != tfo_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    node->set_mark(DtpgNode::kNone);
+  }
+  for (vector<DtpgNode*>::const_iterator p = tfi_list.begin();
+       p != tfi_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    node->set_mark(DtpgNode::kNone);
   }
 }
 
