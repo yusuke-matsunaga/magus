@@ -220,16 +220,35 @@ DtpgNetwork::activate_po(ymuint pos)
 void
 DtpgNetwork::activate_all()
 {
-  mActNodeNum = mNodeNum;
+  // といっても PO に到達できないノードは除外する．
+
+  vector<bool> mark(mNodeNum, false);
+
+  for (ymuint i = 0; i < mOutputNum + mFFNum; ++ i) {
+    dfs(output(i), mark);
+  }
+
+  mActNodeNum = 0;
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     DtpgNode* node = &mNodeArray[i];
-    node->set_active();
-    mActNodeArray[i] = node;
-    ymuint nfo = node->mFanoutNum;
-    node->mActFanoutNum = nfo;
-    for (ymuint i = 0; i < nfo; ++ i) {
-      node->mActFanouts[i] = node->mFanouts[i];
+    if ( !mark[i] ) {
+      node->clear_active();
+      continue;
     }
+    node->set_active();
+    mActNodeArray[mActNodeNum] = node;
+    ++ mActNodeNum;
+
+    ymuint nfo = node->fanout_num();
+    ymuint act_nfo = 0;
+    for (ymuint i = 0; i < nfo; ++ i) {
+      DtpgNode* onode = node->fanout(i);
+      if ( mark[onode->id()] ) {
+	node->mActFanouts[act_nfo] = onode;
+	++ act_nfo;
+      }
+    }
+    node->mActFanoutNum = act_nfo;
   }
 }
 
