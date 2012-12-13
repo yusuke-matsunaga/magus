@@ -853,7 +853,6 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
       tPol pol = (j == i) ? kPolPosi : kPolNega;
       assumptions.push_back(Literal(flt_var[j], pol));
     }
-#if 0
     for (DtpgNode* node = f->node(); ; node = node->active_fanout(0)) {
       Literal dlit(node->dvar(), kPolPosi);
       assumptions.push_back(dlit);
@@ -861,7 +860,6 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
 	break;
       }
     }
-#endif
     DtpgNode* fnode = f->node();
     if ( f->is_input_fault() ) {
       fnode = f->source_node();
