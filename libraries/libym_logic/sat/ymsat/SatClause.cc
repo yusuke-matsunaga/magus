@@ -21,14 +21,16 @@ BEGIN_NAMESPACE_YM_SAT
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] lits リテラルのリスト
-SatClause::SatClause(const vector<Literal>& lits,
+// @param[in] lit_num リテラル数
+// @param[in] lits リテラルの配列
+// @param[in] learnt 学習節の場合 true
+SatClause::SatClause(ymuint lit_num,
+		     Literal* lits,
 		     bool learnt)
 {
-  size_t n = lits.size();
-  mSizeLearnt = (n << 1) | static_cast<ymuint>(learnt);
+  mSizeLearnt = (lit_num << 1) | static_cast<ymuint>(learnt);
   mActivity = 0.0;
-  for (size_t i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < lit_num; ++ i) {
     mLits[i] = lits[i];
   }
 }
@@ -43,22 +45,21 @@ ostream&
 operator<<(ostream& s,
 	   const SatClause& c)
 {
-  if ( c.size() == 2 ) {
+  ymuint n = c.lit_num();
+  if ( n == 2 ) {
     s << "(" << c.lit(0) << " + " << c.lit(1) << ")";
-    //s << ~c.lit(1);
   }
   else {
     // 一旦 vector に入れてソートする．
-    size_t n = c.size();
     vector<Literal> tmp(n);
-    for (size_t i = 0; i < n; ++ i) {
+    for (ymuint i = 0; i < n; ++ i) {
       tmp[i] = c.lit(i);
     }
     sort(tmp.begin() + 1, tmp.end());
 
     s << "(";
     const char* plus = "";
-    for (size_t i = 0; i < n; ++ i) {
+    for (ymuint i = 0; i < n; ++ i) {
       s << plus << tmp[i];
       plus = " + ";
     }

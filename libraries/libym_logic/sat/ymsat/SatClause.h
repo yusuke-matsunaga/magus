@@ -36,10 +36,11 @@ class SatClause
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] lits リテラルのリスト
+  /// @param[in] lit_num リテラル数
+  /// @param[in] lits リテラルの配列
   /// @param[in] learnt 学習節の場合 true
-  explicit
-  SatClause(const vector<Literal>& lits,
+  SatClause(ymuint lit_num,
+	    Literal* lits,
 	    bool learnt);
 
   /// @brief デストラクタ
@@ -47,10 +48,13 @@ private:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief リテラル数の取得
   ymuint
-  size() const;
+  lit_num() const;
 
   /// @brief リテラルのアクセス
   /// @param[in] pos リテラルの位置
@@ -110,7 +114,7 @@ operator<<(ostream& s,
 // @brief リテラル数の取得
 inline
 ymuint
-SatClause::size() const
+SatClause::lit_num() const
 {
   return (mSizeLearnt >> 1);
 }

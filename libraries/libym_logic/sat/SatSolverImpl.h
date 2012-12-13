@@ -53,6 +53,14 @@ public:
   void
   add_clause(const vector<Literal>& lits) = 0;
 
+  /// @brief 節を追加する．
+  /// @param[in] lit_num リテラル数
+  /// @param[in] lits リテラルの配列
+  virtual
+  void
+  add_clause(ymuint lit_num,
+	     Literal* lits) = 0;
+
   /// @brief SAT 問題を解く．
   /// @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
   /// @param[out] model 充足するときの値の割り当てを格納する配列．

@@ -89,7 +89,10 @@ YmSat::YmSat(SatAnalyzer* analyzer) :
 {
   mAnalyzer->set_solver(this);
 
-  mTmpBinClause = new_clause(vector<Literal>(2));
+  mTmpLitsSize = 1024;
+  mTmpLits = new Literal[mTmpLitsSize];
+
+  mTmpBinClause = new_clause(2);
 
   mRestart = 0;
 
@@ -107,6 +110,7 @@ YmSat::~YmSat()
   delete [] mActivity;
   delete [] mWatcherList;
   delete [] mHeap;
+  delete [] mTmpLits;
 }
 
 // @brief 正しい状態のときに true を返す．
@@ -192,6 +196,51 @@ YmSat::expand_var()
 void
 YmSat::add_clause(const vector<Literal>& lits)
 {
+  ymuint n = lits.size();
+  alloc_lits(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    mTmpLits[i] = lits[i];
+  }
+  add_clause_sub(n);
+}
+
+// @brief 節を追加する．
+// @param[in] lit_num リテラル数
+// @param[in] lits リテラルの配列
+void
+YmSat::add_clause(ymuint lit_num,
+		  Literal* lits)
+{
+  alloc_lits(lit_num);
+  for (ymuint i = 0; i < lit_num; ++ i) {
+    mTmpLits[i] = lits[i];
+  }
+  add_clause_sub(lit_num);
+}
+
+BEGIN_NONAMESPACE
+
+void
+sort(ymuint lit_num,
+     Literal* lits)
+{
+  for (ymuint i = 1; i < lit_num; ++ i) {
+    for (ymuint j = i; j > 0; -- j) {
+      if ( lits[j] < lits[j - 1] ) {
+	Literal tmp = lits[j];
+	lits[j] = lits[j - 1];
+	lits[j - 1] = tmp;
+      }
+    }
+  }
+}
+
+END_NONAMESPACE
+
+// @brief add_clause() の下請け関数
+void
+YmSat::add_clause_sub(ymuint lit_num)
+{
   if ( decision_level() != 0 ) {
     // エラー
     cout << "Error![YmSat]: decision_level() != 0" << endl;
@@ -204,19 +253,18 @@ YmSat::add_clause(const vector<Literal>& lits)
   }
 
   // operator<(Literal, Literal) を使ったソート
-  mAcTmp = lits;
-  sort(mAcTmp.begin(), mAcTmp.end());
+  //sort(lits.begin(), lits.end());
+  sort(lit_num, mTmpLits);
 
   alloc_var();
 
   // - 重複したリテラルの除去
   // - false literal の除去
   // - true literal を持つかどうかのチェック
-  vector<Literal>::iterator wp = mAcTmp.begin();
-  for (vector<Literal>::const_iterator rp = mAcTmp.begin();
-       rp != mAcTmp.end(); ++ rp) {
-    Literal l = *rp;
-    if ( wp != mAcTmp.begin() && *(wp - 1) == l ) {
+  ymuint wpos = 0;
+  for (ymuint rpos = 0; rpos < lit_num; ++ rpos) {
+    Literal l = mTmpLits[rpos];
+    if ( wpos != 0 && mTmpLits[wpos - 1] == l ) {
       // 重複している．
       continue;
     }
@@ -236,22 +284,21 @@ YmSat::add_clause(const vector<Literal>& lits)
       return;
     }
     // 追加する．
-    *wp = l;
-    ++ wp;
+    mTmpLits[wpos] = l;
+    ++ wpos;
   }
-  mAcTmp.erase(wp, mAcTmp.end());
+  lit_num = wpos;
 
-  ymuint n = mAcTmp.size();
-  mConstrLitNum += n;
+  mConstrLitNum += lit_num;
 
-  if ( n == 0 ) {
+  if ( lit_num == 0 ) {
     // empty clause があったら unsat
     mSane = false;
     return;
   }
 
-  Literal l0 = mAcTmp[0];
-  if ( n == 1 ) {
+  Literal l0 = mTmpLits[0];
+  if ( lit_num == 1 ) {
     // unit clause があったら値の割り当てを行う．
     bool stat = check_and_assign(l0);
     if ( debug & debug_assign ) {
@@ -269,9 +316,9 @@ YmSat::add_clause(const vector<Literal>& lits)
     return;
   }
 
-  Literal l1 = mAcTmp[1];
+  Literal l1 = mTmpLits[1];
 
-  if ( n == 2 ) {
+  if ( lit_num == 2 ) {
     // watcher-list の設定
     add_watcher(~l0, SatReason(l1));
     add_watcher(~l1, SatReason(l0));
@@ -279,7 +326,7 @@ YmSat::add_clause(const vector<Literal>& lits)
   }
   else {
     // 節の生成
-    SatClause* clause = new_clause(mAcTmp);
+    SatClause* clause = new_clause(lit_num, mTmpLits);
     mConstrClause.push_back(clause);
 
     // watcher-list の設定
@@ -332,7 +379,11 @@ YmSat::add_learnt_clause(const vector<Literal>& lits)
   }
   else {
     // 節の生成
-    SatClause* clause = new_clause(lits, true);
+    alloc_lits(n);
+    for (ymuint i = 0; i < n; ++ i) {
+      mTmpLits[i] = lits[i];
+    }
+    SatClause* clause = new_clause(n, true);
     mLearntClause.push_back(clause);
     reason = SatReason(clause);
 
@@ -401,7 +452,7 @@ YmSat::scan_watcher()
 void
 YmSat::reorder_clause(SatClause* c)
 {
-  ymuint lit_num = c->size();
+  ymuint lit_num = c->lit_num();
   if ( lit_num == 2 ) {
     return;
   }
@@ -823,7 +874,7 @@ YmSat::implication()
 	  // この時，替わりのリテラルが未定かすでに充足しているかどうか
 	  // は問題でない．
 	  bool found = false;
-	  int n = c.size();
+	  int n = c.lit_num();
 	  for (int i = 2; i < n; ++ i) {
 	    Literal l2 = c.lit(i);
 	    if ( eval(l2) != kB3False ) {
@@ -961,7 +1012,7 @@ public:
   operator()(SatClause* a,
 	     SatClause* b)
   {
-    return a->size() > 2 && (b->size() == 2 || a->activity() < b->activity() );
+    return a->lit_num() > 2 && (b->lit_num() == 2 || a->activity() < b->activity() );
   }
 };
 END_NONAMESPACE
@@ -981,7 +1032,7 @@ YmSat::reduceDB()
   vector<SatClause*>::iterator wpos = mLearntClause.begin();
   for (ymuint i = 0; i < n2; ++ i) {
     SatClause* clause = mLearntClause[i];
-    if ( clause->size() > 2 && !is_locked(clause) ) {
+    if ( clause->lit_num() > 2 && !is_locked(clause) ) {
       delete_clause(clause);
     }
     else {
@@ -991,7 +1042,7 @@ YmSat::reduceDB()
   }
   for (ymuint i = n2; i < n; ++ i) {
     SatClause* clause = mLearntClause[i];
-    if ( clause->size() > 2 && !is_locked(clause) &&
+    if ( clause->lit_num() > 2 && !is_locked(clause) &&
 	 clause->activity() < abs_limit ) {
       delete_clause(clause);
     }
@@ -1007,13 +1058,26 @@ YmSat::reduceDB()
 
 // 新しい節を生成する．
 SatClause*
-YmSat::new_clause(const vector<Literal>& lits,
-			  bool learnt)
+YmSat::new_clause(ymuint lit_num,
+		  bool learnt)
 {
-  ymuint n = lits.size();
-  ymuint size = sizeof(SatClause) + sizeof(Literal) * (n - 1);
-  void* tmp = mAlloc.get_memory(size);
-  return new (tmp) SatClause(lits, learnt);
+  ymuint size = sizeof(SatClause) + sizeof(Literal) * (lit_num - 1);
+  void* p = mAlloc.get_memory(size);
+  return new (p) SatClause(lit_num, mTmpLits, learnt);
+}
+
+// @brief mTmpLits を確保する．
+void
+YmSat::alloc_lits(ymuint lit_num)
+{
+  ymuint old_size = mTmpLitsSize;
+  while ( mTmpLitsSize <= lit_num ) {
+    mTmpLitsSize <<= 1;
+  }
+  if ( old_size < mTmpLitsSize ) {
+    delete [] mTmpLits;
+    mTmpLits = new Literal[mTmpLitsSize];
+  }
 }
 
 // 節を捨てる．
@@ -1037,13 +1101,13 @@ YmSat::delete_clause(SatClause* clause)
     wlist.erase(wpos);
   }
   if ( clause->is_learnt() ) {
-    mLearntLitNum -= clause->size();
+    mLearntLitNum -= clause->lit_num();
   }
   else {
-    mConstrLitNum -= clause->size();
+    mConstrLitNum -= clause->lit_num();
   }
 
-  ymuint size = sizeof(SatClause) + sizeof(Literal) * (clause->size() - 1);
+  ymuint size = sizeof(SatClause) + sizeof(Literal) * (clause->lit_num() - 1);
   mAlloc.put_memory(size, static_cast<void*>(clause));
 }
 

@@ -71,6 +71,21 @@ public:
 	     Literal lit2,
 	     Literal lit3);
 
+  /// @brief 4項の節を追加する．
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3,
+	     Literal lit4);
+
+  /// @brief 5項の節を追加する．
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3,
+	     Literal lit4,
+	     Literal lit5);
+
   /// @brief SAT 問題を解く．
   /// @param[out] model 充足するときの値の割り当てを格納する配列．
   /// @retval kB3True  充足した．

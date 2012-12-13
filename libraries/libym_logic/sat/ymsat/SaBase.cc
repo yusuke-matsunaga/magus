@@ -42,19 +42,19 @@ SaBase::alloc_var(ymuint size)
 void
 SaBase::simplify(vector<Literal>& learnt)
 {
-  size_t nl = learnt.size();
+  ymuint nl = learnt.size();
 
   // learnt に含まれているリテラルのレベルのビットマップ
   // ただし 64 のモジュロをとっている．
   ymuint64 lmask = 0UL;
-  for (size_t i = 0; i < nl; ++ i) {
+  for (ymuint i = 0; i < nl; ++ i) {
     Literal p = learnt[i];
     int level = decision_level(p.varid());
     lmask |= (1UL << (level & 63));
   }
 
-  size_t wpos = 0;
-  for (size_t i = 0; i < nl; ++ i) {
+  ymuint wpos = 0;
+  for (ymuint i = 0; i < nl; ++ i) {
     Literal p = learnt[i];
     VarId var = p.varid();
     mClearQueue2.clear();
@@ -100,8 +100,8 @@ SaBase::check_recur(VarId varid,
 
   if ( r.is_clause() ) {
     SatClause& clause = r.clause();
-    size_t n = clause.size();
-    for (size_t i = 1; i < n; ++ i) {
+    ymuint n = clause.lit_num();
+    for (ymuint i = 1; i < n; ++ i) {
       Literal q = clause.lit(i);
       VarId var1 = q.varid();
       if ( !get_mark(var1) && decision_level(var1) > 0 ) {
@@ -132,14 +132,14 @@ SaBase::check_recur(VarId varid,
 int
 SaBase::reorder(vector<Literal>& learnt)
 {
-  size_t n = learnt.size();
+  ymuint n = learnt.size();
   if ( n < 2 ) {
     return 0;
   }
   Literal lit1 = learnt[1];
   int level = decision_level(lit1.varid());
-  size_t pos = 1;
-  for (size_t i = 2; i < n; ++ i) {
+  ymuint pos = 1;
+  for (ymuint i = 2; i < n; ++ i) {
     Literal lit2 = learnt[i];
     int level2 = decision_level(lit2.varid());
     if ( level < level2 ) {

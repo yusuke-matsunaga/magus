@@ -102,6 +102,14 @@ public:
   void
   add_clause(const vector<Literal>& lits);
 
+  /// @brief 節を追加する．
+  /// @param[in] lit_num リテラル数
+  /// @param[in] lits リテラルの配列
+  virtual
+  void
+  add_clause(ymuint lit_num,
+	     Literal* lits);
+
   /// @brief SAT 問題を解く．
   /// @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
   /// @param[out] model 充足するときの値の割り当てを格納する配列．
@@ -205,12 +213,21 @@ private:
   void
   add_learnt_clause(const vector<Literal>& lits);
 
+  /// @brief add_clause() の下請け関数
+  void
+  add_clause_sub(ymuint lit_num);
+
   /// @brief 新しい節を生成する．
-  /// @param[in] lits 節を構成するリテラルのリスト
+  /// @param[in] lit_num リテラル数
   /// @param[in] learnt 学習節のとき true とするフラグ
+  /// @note リテラルは mTmpLits に格納されている．
   SatClause*
-  new_clause(const vector<Literal>& lits,
+  new_clause(ymuint lit_num,
 	     bool learnt = false);
+
+  /// @brief mTmpLits を確保する．
+  void
+  alloc_lits(ymuint lit_num);
 
   /// @brief 節を削除する．
   /// @param[in] clause 削除する節
@@ -507,8 +524,11 @@ private:
   // メッセージハンドラのリスト
   list<SatMsgHandler*> mMsgHandlerList;
 
-  // add_clause 用の作業領域
-  vector<Literal> mAcTmp;
+  // add_clause で一時的に利用するリテラル配列
+  Literal* mTmpLits;
+
+  // mTmpLits のサイズ
+  ymuint32 mTmpLitsSize;
 
 };
 

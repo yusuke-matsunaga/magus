@@ -42,8 +42,8 @@ SaSimple::capture(SatReason creason,
 		  vector<Literal>& learnt)
 {
   Literal p;
-  size_t c = 0;
-  size_t last = last_assign();
+  ymuint c = 0;
+  ymuint last = last_assign();
   for ( ; ; ) {
     if ( creason.is_clause() ) {
       SatClause& cclause = creason.clause();
@@ -55,8 +55,8 @@ SaSimple::capture(SatReason creason,
 
       // conflict 節に含まれるリテラルが以前の decision level
       // で割り当てられていたら学習節に加える．
-      size_t n = cclause.size();
-      for (size_t i = 0; i < n; ++ i) {
+      ymuint n = cclause.lit_num();
+      for (ymuint i = 0; i < n; ++ i) {
 	Literal q = cclause.lit(i);
 	if ( q == p ) {
 	  continue;
@@ -113,8 +113,8 @@ SaSimple::capture(SatReason creason,
   // もっともレベルの高いリテラルを先頭に持ってくる．
   Literal l0 = learnt[0];
   int level = decision_level(l0.varid());
-  size_t max_pos = 0;
-  for (size_t i = 1; i < learnt.size(); ++ i) {
+  ymuint max_pos = 0;
+  for (ymuint i = 1; i < learnt.size(); ++ i) {
     Literal l1 = learnt[i];
     int level1 = decision_level(l1.varid());
     if ( level < level1 ) {

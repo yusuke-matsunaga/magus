@@ -48,9 +48,9 @@ SaUIP1::capture(SatReason creason,
   learnt.clear();
   learnt.push_back(Literal()); // place holder
 
-  size_t first_pos = 0;
-  size_t count = 0;
-  size_t last = last_assign();
+  ymuint first_pos = 0;
+  ymuint count = 0;
+  ymuint last = last_assign();
   for ( ; ; ) {
     if ( creason.is_clause() ) {
       SatClause& cclause = creason.clause();
@@ -64,8 +64,8 @@ SaUIP1::capture(SatReason creason,
       // で割り当てられていたら学習節に加える．
       // 現在の decision level なら count を増やすだけ．
       // あとで mAssignList をたどれば該当のリテラルは捜し出せる．
-      size_t n = cclause.size();
-      for (size_t i = first_pos; i < n; ++ i) {
+      ymuint n = cclause.lit_num();
+      for (ymuint i = first_pos; i < n; ++ i) {
 	Literal q = cclause.lit(i);
 	VarId var = q.varid();
 	int var_level = decision_level(var);
