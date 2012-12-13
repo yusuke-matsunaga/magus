@@ -86,6 +86,7 @@ make_cnf_from_type(SatSolver& solver,
 		   Literal output,
 		   const vector<Literal>& inputs)
 {
+  ymuint ni = inputs.size();
   switch ( type ) {
   case kTgUndef:
     assert_not_reached(__FILE__, __LINE__);
@@ -106,68 +107,133 @@ make_cnf_from_type(SatSolver& solver,
     break;
 
   case kTgAnd:
-    {
-      ymuint ni = inputs.size();
-      vector<Literal> tmp(ni + 1);
-      for (ymuint i = 0; i < ni; ++ i) {
-	tmp[i] = ~inputs[i];
+    switch ( ni ) {
+    case 2:
+      solver.add_clause(~inputs[0], ~inputs[1], output);
+      break;
+
+    case 3:
+      solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], output);
+      break;
+
+    case 4:
+      solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~inputs[3], output);
+      break;
+
+    default:
+      {
+	vector<Literal> tmp(ni + 1);
+	for (ymuint i = 0; i < ni; ++ i) {
+	  tmp[i] = ~inputs[i];
+	}
+	tmp[ni] = output;
+	solver.add_clause(tmp);
       }
-      tmp[ni] = output;
-      solver.add_clause(tmp);
-      for (ymuint i = 0; i < ni; ++ i) {
-	solver.add_clause(inputs[i], ~output);
-      }
+      break;
+    }
+    for (ymuint i = 0; i < ni; ++ i) {
+      solver.add_clause(inputs[i], ~output);
     }
     break;
 
   case kTgNand:
-    {
-      ymuint ni = inputs.size();
-      vector<Literal> tmp(ni + 1);
-      for (ymuint i = 0; i < ni; ++ i) {
-	tmp[i] = ~inputs[i];
+    switch ( ni ) {
+    case 2:
+      solver.add_clause(~inputs[0], ~inputs[1], ~output);
+      break;
+
+    case 3:
+      solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~output);
+      break;
+
+    case 4:
+      solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~inputs[3], ~output);
+      break;
+
+    default:
+      {
+	vector<Literal> tmp(ni + 1);
+	for (ymuint i = 0; i < ni; ++ i) {
+	  tmp[i] = ~inputs[i];
+	}
+	tmp[ni] = ~output;
+	solver.add_clause(tmp);
       }
-      tmp[ni] = ~output;
-      solver.add_clause(tmp);
-      for (ymuint i = 0; i < ni; ++ i) {
-	solver.add_clause(inputs[i], output);
-      }
+      break;
+    }
+    for (ymuint i = 0; i < ni; ++ i) {
+      solver.add_clause(inputs[i], output);
     }
     break;
 
   case kTgOr:
-    {
-      ymuint ni = inputs.size();
-      vector<Literal> tmp(ni + 1);
-      for (ymuint i = 0; i < ni; ++ i) {
-	tmp[i] = inputs[i];
+    switch ( ni ) {
+    case 2:
+      solver.add_clause(inputs[0], inputs[1], ~output);
+      break;
+
+    case 3:
+      solver.add_clause(inputs[0], inputs[1], inputs[2], ~output);
+      break;
+
+    case 4:
+      solver.add_clause(inputs[0], inputs[1], inputs[2], inputs[3], ~output);
+      break;
+
+    default:
+      {
+	vector<Literal> tmp(ni + 1);
+	for (ymuint i = 0; i < ni; ++ i) {
+	  tmp[i] = inputs[i];
+	}
+	tmp[ni] = ~output;
+	solver.add_clause(tmp);
       }
-      tmp[ni] = ~output;
-      solver.add_clause(tmp);
-      for (ymuint i = 0; i < ni; ++ i) {
-	solver.add_clause(~inputs[i], output);
-      }
+      break;
+    }
+    for (ymuint i = 0; i < ni; ++ i) {
+      solver.add_clause(~inputs[i], output);
     }
     break;
 
   case kTgNor:
-    {
-      ymuint ni = inputs.size();
-      vector<Literal> tmp(ni + 1);
-      for (ymuint i = 0; i < ni; ++ i) {
-	tmp[i] = inputs[i];
+    switch ( ni ) {
+    case 2:
+      solver.add_clause(inputs[0], inputs[1], output);
+      break;
+
+    case 3:
+      solver.add_clause(inputs[0], inputs[1], inputs[2], output);
+      break;
+
+    case 4:
+      solver.add_clause(inputs[0], inputs[1], inputs[2], inputs[3], output);
+      break;
+
+    default:
+      {
+	vector<Literal> tmp(ni + 1);
+	for (ymuint i = 0; i < ni; ++ i) {
+	  tmp[i] = inputs[i];
+	}
+	tmp[ni] = output;
+	solver.add_clause(tmp);
       }
-      tmp[ni] = output;
-      solver.add_clause(tmp);
-      for (ymuint i = 0; i < ni; ++ i) {
-	solver.add_clause(~inputs[i], ~output);
-      }
+      break;
+    }
+    for (ymuint i = 0; i < ni; ++ i) {
+      solver.add_clause(~inputs[i], ~output);
     }
     break;
 
   case kTgXor:
-    {
-      ymuint ni = inputs.size();
+    if ( ni == 2 ) {
+      solver.add_clause(~inputs[0],  inputs[1],  output);
+      solver.add_clause( inputs[0], ~inputs[1],  output);
+      solver.add_clause( inputs[0],  inputs[1], ~output);
+      solver.add_clause(~inputs[0], ~inputs[1], ~output);
+    }
+    else {
       vector<Literal> tmp(ni + 1);
       ymuint nip = (1U << ni);
       for (ymuint p = 0; p < nip; ++ p) {
@@ -193,8 +259,13 @@ make_cnf_from_type(SatSolver& solver,
     break;
 
   case kTgXnor:
-    {
-      ymuint ni = inputs.size();
+    if ( ni == 2 ) {
+      solver.add_clause(~inputs[0],  inputs[1], ~output);
+      solver.add_clause( inputs[0], ~inputs[1], ~output);
+      solver.add_clause( inputs[0],  inputs[1],  output);
+      solver.add_clause(~inputs[0], ~inputs[1],  output);
+    }
+    else {
       vector<Literal> tmp(ni + 1);
       ymuint nip = (1U << ni);
       for (ymuint p = 0; p < nip; ++ p) {
@@ -621,13 +692,19 @@ DtpgSat::single_mode(DtpgFault* f,
   }
 
   vector<Bool3> model;
+#if 1
   Bool3 ans = solver.solve(assumptions, model);
+#else
+  Bool3 ans = kB3True;
+#endif
   SatStats sat_stat;
   solver.get_stats(sat_stat);
   //mStatsList.push_back(sat_stat);
   if ( ans == kB3True ) {
+#if 0
     TestVector* tv = tvmgr.new_vector();
     set_tv(model, input_list, tv);
+#endif
     d_list.push_back(f->safault());
   }
   else if ( ans == kB3False ) {
@@ -674,13 +751,19 @@ DtpgSat::dual_mode(DtpgFault* f0,
     }
 
     vector<Bool3> model;
+#if 1
     Bool3 ans = solver.solve(assumptions, model);
+#else
+    Bool3 ans = kB3True;
+#endif
     SatStats sat_stat;
     solver.get_stats(sat_stat);
     //mStatsList.push_back(sat_stat);
     if ( ans == kB3True ) {
+#if 0
       TestVector* tv = tvmgr.new_vector();
       set_tv(model, input_list, tv);
+#endif
       d_list.push_back(f[fval]->safault());
     }
     else if ( ans == kB3False ) {
@@ -867,13 +950,19 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
     tPol pol = (f->val() == 0) ? kPolPosi : kPolNega;
     assumptions.push_back(Literal(fnode->gvar(), pol));
     vector<Bool3> model;
+#if 1
     Bool3 ans = solver.solve(assumptions, model);
+#else
+    Bool3 ans = kB3True;
+#endif
     SatStats sat_stat;
     solver.get_stats(sat_stat);
     //mStatsList.push_back(sat_stat);
     if ( ans == kB3True ) {
+#if 0
       TestVector* tv = tvmgr.new_vector();
       set_tv(model, input_list, tv);
+#endif
       d_list.push_back(f->safault());
     }
     else if ( ans == kB3False ) {
