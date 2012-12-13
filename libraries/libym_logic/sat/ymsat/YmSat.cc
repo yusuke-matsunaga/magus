@@ -359,6 +359,134 @@ YmSat::add_watcher(Literal watch_lit,
   watcher_list(watch_lit).add(Watcher(reason));
 }
 
+// @brief watcher を削除する．
+// @param[in] watch_lit リテラル
+// @param[in] reason 理由
+void
+YmSat::del_watcher(Literal watch_lit,
+		   SatReason reason)
+{
+  WatcherList& wlist = watcher_list(watch_lit);
+  ymuint n = wlist.num();
+  ymuint wpos = 0;
+  for (ymuint rpos = 0; rpos < n; ++ rpos) {
+    Watcher w = wlist.elem(rpos);
+    if ( w != Watcher(reason) ) {
+      wlist.set_elem(wpos, w);
+      ++ wpos;
+    }
+  }
+  wlist.erase(wpos);
+}
+
+// watcher list を整理する．
+// 具体的にはすでに充足している節に対して，
+// 充足しているリテラルを watcher に付け替える．
+void
+YmSat::scan_watcher()
+{
+  for (vector<SatClause*>::iterator p = mConstrClause.begin();
+       p != mConstrClause.end(); ++ p) {
+    SatClause* c = *p;
+    reorder_clause(c);
+  }
+  for (vector<SatClause*>::iterator p = mLearntClause.begin();
+       p != mLearntClause.end(); ++ p) {
+    SatClause* c = *p;
+    reorder_clause(c);
+  }
+}
+
+// 充足しているリテラルを0番め1番めにもってくる．
+void
+YmSat::reorder_clause(SatClause* c)
+{
+  ymuint lit_num = c->size();
+  if ( lit_num == 2 ) {
+    return;
+  }
+
+  ymuint ns = 0;
+
+  // 最初に見つかった充足リテラルの位置
+  ymuint pos0 = lit_num;
+  // 2番めに見つかった充足リテラルの位置
+  ymuint pos1 = lit_num;
+  for (ymuint i = 0; i < lit_num; ++ i) {
+    Literal l = c->lit(i);
+    if ( eval(l) != kB3True ) {
+      continue;
+    }
+    if ( ns == 0 ) {
+      pos0 = i;
+    }
+    else if ( ns == 1 ) {
+      pos1 = i;
+      // 充足リテラルが2個見つかったらあとはどうでもよい．
+      break;
+    }
+    ++ ns;
+  }
+
+  if ( ns == 0 ) {
+    return;
+  }
+
+  if ( ns == 1 ) {
+    if ( pos0 < 2 ) {
+      // 移動の必要無し
+      return;
+    }
+    // 0 番めと pos0 番めのリテラルを入れ替える．
+    Literal l0 = c->lit0();
+    Literal l2 = c->lit(pos0);
+    c->lit0() = l2;
+    c->lit(pos0) = l0;
+    del_watcher(~l0, SatReason(c));
+    add_watcher(~l2, SatReason(c));
+  }
+  else { // ns == 2
+    if ( pos1 == 1 ) {
+      // 移動の必要無し
+      return;
+    }
+    if ( pos0 == 0 ) {
+      // 1番めと pos1 番めのリテラルを入れ替える．
+      Literal l1 = c->lit1();
+      Literal l2 = c->lit(pos1);
+      c->lit1() = l2;
+      c->lit(pos1) = l1;
+      del_watcher(~l1, SatReason(c));
+      add_watcher(~l2, SatReason(c));
+    }
+    else if ( pos0 == 1 ) {
+      // 0番めと pos1 番めのリテラルを入れ替える．
+      Literal l0 = c->lit0();
+      Literal l2 = c->lit(pos1);
+      c->lit0() = l2;
+      c->lit(pos1) = l0;
+      del_watcher(~l0, SatReason(c));
+      add_watcher(~l2, SatReason(c));
+    }
+    else {
+      // 0番めとpos0番めのリテラルを入れ替える．
+      Literal l0 = c->lit0();
+      Literal l2 = c->lit(pos0);
+      c->lit0() = l2;
+      c->lit(pos0) = l0;
+      del_watcher(~l0, SatReason(c));
+      add_watcher(~l2, SatReason(c));
+
+      // 1番めと pos1 番めのリテラルを入れ替える．
+      Literal l1 = c->lit1();
+      Literal l3 = c->lit(pos1);
+      c->lit1() = l3;
+      c->lit(pos1) = l1;
+      del_watcher(~l1, SatReason(c));
+      add_watcher(~l3, SatReason(c));
+    }
+  }
+}
 
 // @brief SAT 問題を解く．
 // @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
@@ -435,6 +563,10 @@ YmSat::solve(const vector<Literal>& assumptions,
       return kB3False;
     }
   }
+
+  // 充足している節に対して watch literal の付け替えを行なう．
+  scan_watcher();
+
   // 以降，現在のレベルが基底レベルとなる．
   mRootLevel = decision_level();
   if ( debug & (debug_assign | debug_decision) ) {

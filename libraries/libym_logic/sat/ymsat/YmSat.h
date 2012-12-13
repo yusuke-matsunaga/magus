@@ -159,114 +159,150 @@ private:
   // 実装用のプライベート関数
   //////////////////////////////////////////////////////////////////////
 
-  // 探索を行う本体の関数
+  /// @brief 探索を行う本体の関数
   Bool3
   search();
 
-  // 割当てキューに基づいて implication を行う．
+  /// @brief 割当てキューに基づいて implication を行う．
   SatReason
   implication();
 
-  // level までバックトラックする
+  /// @brief level までバックトラックする
+  /// @param[in] level バックトラックするレベル
   void
   backtrack(int level);
 
-  // 次の割り当てを選ぶ．
-  // 割り当てられる変数がない場合には kLiteralX を返す．
+  /// @brief 次の割り当てを選ぶ．
+  /// @note 割り当てられる変数がない場合には kLiteralX を返す．
   Literal
   next_decision();
 
-  // 値の割当てか可能かチェックする．
-  // 矛盾が起きたら false を返す．
+  /// @brief 値の割当てか可能かチェックする．
+  /// @param[in] lit 割り当てるリテラル
+  /// @return 矛盾が起きたら false を返す．
   bool
   check_and_assign(Literal lit);
 
-  // 値の割当てを行う．
-  // 実際にはキューに積む．
-  // 矛盾が起きたら false を返す．
+  /// @brief 値の割当てを行う．
+  /// @param[in] lit 割り当てるリテラル
+  /// @param[in] reason 割り当ての理由
+  /// @note 実際にはキューに積む．
+  /// @return 矛盾が起きたら false を返す．
   void
   assign(Literal lit,
 	 SatReason reason = SatReason());
 
-  // CNF を簡単化する．
+  /// @brief CNF を簡単化する．
   void
   simplifyDB();
 
-  // 使われていない学習節を削除する．
+  /// @brief 使われていない学習節を削除する．
   void
   reduceDB();
 
-  // 学習節を追加する．
+  /// @brief 学習節を追加する．
+  /// @param[in] lits 追加する節を構成するリテラルのリスト
   void
   add_learnt_clause(const vector<Literal>& lits);
 
-  // 新しい節を生成する．
+  /// @brief 新しい節を生成する．
+  /// @param[in] lits 節を構成するリテラルのリスト
+  /// @param[in] learnt 学習節のとき true とするフラグ
   SatClause*
   new_clause(const vector<Literal>& lits,
 	     bool learnt = false);
 
-  // 節を削除する．
+  /// @brief 節を削除する．
+  /// @param[in] clause 削除する節
   void
   delete_clause(SatClause* clause);
 
-  // watcher list を得る．
+  /// @brief watcher list を得る．
+  /// @param[in] lit リテラル
   WatcherList&
   watcher_list(Literal lit);
 
-  // Watcher を追加する．
+  /// @brief Watcher を追加する．
+  /// @param[in] watch_lit リテラル
+  /// @param[in] reason 理由
   void
   add_watcher(Literal watch_lit,
 	      SatReason reason);
 
-  // 変数の評価を行う．
+  /// @brief watcher を削除する．
+  /// @param[in] watch_lit リテラル
+  /// @param[in] reason 理由
+  void
+  del_watcher(Literal watch_lit,
+	      SatReason reason);
+
+  /// @brief watcher list を整理する．
+  /// 具体的にはすでに充足している節に対して，
+  /// 充足しているリテラルを watcher に付け替える．
+  void
+  scan_watcher();
+
+  /// @brief 充足しているリテラルを0番め1番めにもってくる．
+  /// @param[in] c 対象の節
+  void
+  reorder_clause(SatClause* c);
+
+  /// @brief 変数の評価を行う．
+  /// @param[in] id 変数番号
   Bool3
   eval(VarId id) const;
 
-  // literal の評価を行う．
+  /// @brief literal の評価を行う．
+  /// @param[in] l リテラル
   Bool3
   eval(Literal l) const;
 
-  // 現在の decision level を返す．
+  /// @brief 現在の decision level を返す．
   int
   decision_level() const;
 
-  // 変数の decision level を返す．
+  /// @brief 変数の decision level を返す．
+  /// @param[in] varid 変数番号
   int
   decision_level(VarId varid) const;
 
-  // 変数の割り当て理由を返す．
+  /// @brief 変数の割り当て理由を返す．
+  /// @param[in] varid 変数番号
   SatReason
   reason(VarId varid) const;
 
-  // 学習節が使われているか調べる．
+  /// @brief 学習節が使われているか調べる．
+  /// @param[in] clause 対象の節
   bool
   is_locked(SatClause* clause) const;
 
-  // 変数のアクティビティを増加させる．
+  /// @brief 変数のアクティビティを増加させる．
+  /// @param[in] var 変数番号
   void
   bump_var_activity(VarId var);
 
-  // 変数のアクティビティを定率で減少させる．
+  /// @brief 変数のアクティビティを定率で減少させる．
   void
   decay_var_activity();
 
-  // リスタート時の変数のアクティビティの低減率
+  /// @brief リスタート時の変数のアクティビティの低減率
   void
   decay_var_activity2();
 
-  // 学習節のアクティビティを増加させる．
+  /// @brief 学習節のアクティビティを増加させる．
+  /// @param[in] clause 対象の学習節
   void
   bump_clause_activity(SatClause* clause);
 
-  // 学習節のアクティビティを定率で減少させる．
+  /// @brief 学習節のアクティビティを定率で減少させる．
   void
   decay_clause_activity();
 
-  // 実際に変数に関するデータ構造を生成する．
+  /// @brief 実際に変数に関するデータ構造を生成する．
   void
   alloc_var();
 
-  // 変数に関する配列を拡張する．
+  /// @brief 変数に関する配列を拡張する．
   void
   expand_var();
 
@@ -300,35 +336,44 @@ private:
   heap_pop_top();
 
   /// @brief 引数の位置にある要素を適当な位置まで沈めてゆく
+  /// @param[in] pos 対象の要素の位置
   void
   heap_move_down(ymuint pos);
 
   /// @brief 引数の位置にある要素を適当な位置まで上げてゆく
+  /// @param[in] vindex 対象の変数番号
   void
   heap_move_up(ymuint vindex);
 
   /// @brief 変数を配列にセットする．
+  /// @param[in] vindex 対象の変数番号
+  /// @param[in] pos 位置
   /// @note mHeap と mHeapPos の一貫性を保つためにはこの関数を使うこと．
   void
   heap_set(ymuint vindex,
 	   ymuint pos);
 
   /// @brief 左の子供の位置を計算する
+  /// @param[in] pos 親の位置
   static
   ymuint
   heap_left(ymuint pos);
 
   /// @brief 右の子供の位置を計算する．
+  /// @param[in] pos 親の位置
   static
   ymuint
   heap_right(ymuint pos);
 
   /// @brief 親の位置を計算する．
+  /// @param[in] pos 子供の位置
+  /// @note 左の子供でも右の子供でも同じ
   static
   ymuint
   heap_parent(ymuint pos);
 
   /// @brief 内容を出力する
+  /// @param[in] s 出力先のストリーム
   void
   heap_dump(ostream& s) const;
 
@@ -363,21 +408,27 @@ private:
   ymuint32 mVarSize;
 
   // 値の配列
+  // サイズは mVarSize
   Bool3* mVal;
 
   // 値が割り当てられたときのレベルの配列
+  // サイズは mVarSize
   int* mDecisionLevel;
 
   // 値が割り当てられた理由の配列
+  // サイズは mVarSize
   SatReason* mReason;
 
   // ヒープ上の位置の配列
+  // サイズは mVarSize
   ymint32* mHeapPos;
 
   // アクティビティ
+  // サイズは mVarSize
   double* mActivity;
 
-  // watcher list
+  // watcher list の配列
+  // サイズは mVarSize * 2
   WatcherList* mWatcherList;
 
   // ヒープ用の配列

@@ -59,6 +59,7 @@ public:
 public:
 
   /// @brief 要素を追加する．
+  /// @param[in] elem 追加する要素
   void
   add(Watcher elem);
 
@@ -67,27 +68,36 @@ public:
   num() const;
 
   /// @brief pos 番目の要素を返す．
+  /// @param[in] pos 位置
   Watcher
   elem(ymuint pos) const;
 
   /// @brief pos 番目の要素を設定する．
+  /// @param[in] pos 位置
+  /// @param[in] elem 要素
   void
   set_elem(ymuint pos,
 	   Watcher elem);
 
   /// @brief 要素を切り詰める．
+  /// @param[in] num 切り詰めるサイズ
   void
   erase(ymuint num);
 
   /// @brief from の内容を移す．
+  /// @param[in] from もとのリスト
   /// @note from は空になる．
   void
   move(WatcherList& from);
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 配列を拡張する．
+  /// @param[in] req_size 拡張するサイズ
   void
   expand(ymuint req_size);
 
