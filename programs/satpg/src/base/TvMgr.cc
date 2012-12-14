@@ -16,7 +16,7 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
 TvMgr::TvMgr() :
-  mAlloc(4096),
+  mAlloc(NULL),
   mNi(0)
 {
 }
@@ -31,10 +31,10 @@ TvMgr::~TvMgr()
 void
 TvMgr::clear()
 {
-  if ( mNi > 0 ) {
-    mAlloc.destroy();
+  if ( mAlloc != NULL ) {
+    delete mAlloc;
+    mAlloc = NULL;
     mNi = 0;
-    mAvail.clear();
   }
 }
 
@@ -50,6 +50,10 @@ TvMgr::init(ymuint ni)
     // 0 だとヤバい
     mNi = 1;
   }
+
+  ymuint nb = TestVector::block_num(mNi);
+  ymuint size = sizeof(TestVector) + kPvBitLen * (nb - 1);
+  mAlloc = new UnitAlloc(size, 1024);
 }
 
 // @brief 新しいパタンを生成する．
@@ -58,15 +62,9 @@ TvMgr::init(ymuint ni)
 TestVector*
 TvMgr::new_vector()
 {
-  if ( !mAvail.empty() ) {
-    TestVector* tv = mAvail.back();
-    mAvail.pop_back();
-    return tv;
-  }
-
   ymuint nb = TestVector::block_num(mNi);
   ymuint size = sizeof(TestVector) + kPvBitLen * (nb - 1);
-  void* p = mAlloc.get_memory(size);
+  void* p = mAlloc->get_memory(size);
   TestVector* tv = new (p) TestVector(mNi);
 
   // X に初期化しておく．
@@ -81,7 +79,9 @@ TvMgr::new_vector()
 void
 TvMgr::delete_vector(TestVector* tv)
 {
-  mAvail.push_back(tv);
+  ymuint nb = TestVector::block_num(mNi);
+  ymuint size = sizeof(TestVector) + kPvBitLen * (nb - 1);
+  mAlloc->put_memory(size, (void*)tv);
 }
 
 END_NAMESPACE_YM_SATPG

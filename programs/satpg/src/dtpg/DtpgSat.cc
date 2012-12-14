@@ -701,10 +701,8 @@ DtpgSat::single_mode(DtpgFault* f,
   solver.get_stats(sat_stat);
   //mStatsList.push_back(sat_stat);
   if ( ans == kB3True ) {
-#if 0
     TestVector* tv = tvmgr.new_vector();
     set_tv(model, input_list, tv);
-#endif
     d_list.push_back(f->safault());
   }
   else if ( ans == kB3False ) {
@@ -760,10 +758,8 @@ DtpgSat::dual_mode(DtpgFault* f0,
     solver.get_stats(sat_stat);
     //mStatsList.push_back(sat_stat);
     if ( ans == kB3True ) {
-#if 0
       TestVector* tv = tvmgr.new_vector();
       set_tv(model, input_list, tv);
-#endif
       d_list.push_back(f[fval]->safault());
     }
     else if ( ans == kB3False ) {
@@ -959,10 +955,8 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
     solver.get_stats(sat_stat);
     //mStatsList.push_back(sat_stat);
     if ( ans == kB3True ) {
-#if 0
       TestVector* tv = tvmgr.new_vector();
       set_tv(model, input_list, tv);
-#endif
       d_list.push_back(f->safault());
     }
     else if ( ans == kB3False ) {

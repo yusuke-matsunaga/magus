@@ -10,7 +10,7 @@
 
 #include "satpg_nsdef.h"
 #include "TestVector.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "ym_utils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -71,13 +71,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // テストベクタのメモリ確保用のアロケータ
-  SimpleAlloc mAlloc;
+  UnitAlloc* mAlloc;
 
   // テストベクタの入力数
   ymuint32 mNi;
-
-  // 未使用のテストベクタをつないでおくリスト
-  list<TestVector*> mAvail;
 
 };
 
