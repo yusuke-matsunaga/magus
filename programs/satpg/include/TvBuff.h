@@ -12,7 +12,6 @@
 
 
 #include "satpg_nsdef.h"
-#include "fsim_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
