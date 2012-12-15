@@ -59,11 +59,187 @@ FsimX::~FsimX()
   clear();
 }
 
-// @brief 対象の故障をセットする
-// @param[in] flist 対象の故障リスト
+// @brief ネットワークをセットする．
 void
-FsimX::set_faults(const vector<SaFault*>& flist)
+FsimX::set_network(const TgNetwork& network,
+		   const vector<SaFault*>& flist)
 {
+  clear();
+
+  mNetwork = &network;
+
+  ymuint nn = mNetwork->node_num();
+  ymuint ni = mNetwork->input_num2();
+  ymuint no = mNetwork->output_num2();
+  ymuint nl = mNetwork->logic_num();
+
+  // SimNode の生成
+  // 対応付けを行うマップの初期化
+  mSimMap.resize(nn);
+  mEdgeMap.resize(nn);
+  mInputArray.resize(ni);
+  mOutputArray.resize(no);
+
+  // 外部入力に対応する SimNode の生成
+  for (ymuint i = 0; i < ni; ++ i) {
+    const TgNode* tgnode = mNetwork->input(i);
+    SimNode* node = make_node(kTgInput, vector<SimNode*>());
+    mSimMap[tgnode->gid()] = node;
+    mInputArray[i] = node;
+  }
+  // 論理ノードに対応する SimNode の生成
+  for (ymuint i = 0; i < nl; ++ i) {
+    const TgNode* tgnode = mNetwork->sorted_logic(i);
+    ymuint ni = tgnode->ni();
+    vector<SimNode*> inputs(ni);
+    for (ymuint i = 0; i < ni; ++ i) {
+      const TgNode* itgnode = tgnode->fanin(i);
+      SimNode* inode = find_simnode(itgnode);
+      assert_cond(inode, __FILE__, __LINE__);
+      inputs[i] = inode;
+    }
+
+    // 出力の論理を表す SimNode を作る．
+    SimNode* simnode = NULL;
+    mEdgeMap[tgnode->gid()].resize(ni);
+    if ( tgnode->is_cplx_logic() ) {
+      vector<SimNode*> inputs2(ni * 2);
+      LogExpr lexp = mNetwork->get_lexp(tgnode);
+      vector<EdgeMap*> emap(ni, NULL);
+      for (ymuint i = 0; i < ni; ++ i) {
+	// 各変数の使われ方をチェック
+	// - A) 肯定リテラルが 1 つ．
+	// - B) 肯定リテラルが 2 つ以上
+	// - C) 否定リテラルのみ．数は問わない．
+	// - D) 肯定と否定リテラルが各々 1 つ以上
+	VarId var(i);
+	ymuint np = lexp.litnum(var, kPolPosi);
+	ymuint nn = lexp.litnum(var, kPolNega);
+	EdgeMap& edge_map = mEdgeMap[tgnode->gid()][i];
+	if ( np == 1 && nn == 0 ) {
+	  inputs2[i * 2] = inputs[i];
+	  emap[i] = &edge_map;
+	}
+	else if ( np > 1 && nn == 0 ) {
+	  vector<SimNode*> tmp(1, inputs[i]);
+	  SimNode* buf = make_node(kTgBuff, tmp);
+	  inputs2[i * 2] = buf;
+	  edge_map.mNode = buf;
+	  edge_map.mPos = 0;
+	}
+	else if ( np == 0 && nn > 0 ) {
+	  vector<SimNode*> tmp(1, inputs[i]);
+	  SimNode* inv = make_node(kTgNot, tmp);
+	  inputs2[i * 2 + 1] = inv;
+	  edge_map.mNode = inv;
+	  edge_map.mPos = 0;
+	}
+	else if ( np > 0 && nn > 0 ) {
+	  vector<SimNode*> tmp(1, inputs[i]);
+	  SimNode* buf = make_node(kTgBuff, tmp);
+	  tmp[0] = buf;
+	  SimNode* inv = make_node(kTgNot, tmp);
+	  inputs2[i * 2] = buf;
+	  inputs2[i * 2 + 1] = inv;
+	  edge_map.mNode = buf;
+	  edge_map.mPos = 0;
+	}
+	else {
+	  cout << "np = " << np << endl
+	       << "nn = " << nn << endl;
+	  assert_not_reached(__FILE__, __LINE__);
+	}
+      }
+      simnode = make_logic(lexp, inputs2, emap);
+    }
+    else {
+      tTgGateType type = tgnode->type();
+      simnode = make_node(type, inputs);
+      for (ymuint i = 0; i < ni; ++ i) {
+	EdgeMap& edge_map = mEdgeMap[tgnode->gid()][i];
+	edge_map.mNode = simnode;
+	edge_map.mPos = i;
+      }
+    }
+    mSimMap[tgnode->gid()] = simnode;
+  }
+  // 外部出力に対応する SimNode の生成
+  for (ymuint i = 0; i < no; ++ i) {
+    const TgNode* onode = mNetwork->output(i);
+    SimNode* inode = find_simnode(onode->fanin(0));
+    inode->set_output();
+    mSimMap[onode->gid()] = inode;
+    mOutputArray[i] = inode;
+  }
+
+  // 各ノードのファンアウトリストの設定
+  ymuint node_num = mNodeArray.size();
+  {
+    vector<vector<SimNode*> > fanout_lists(node_num);
+    vector<ymuint> ipos(node_num);
+    for (vector<SimNode*>::iterator p = mNodeArray.begin();
+	 p != mNodeArray.end(); ++ p) {
+      SimNode* node = *p;
+      ymuint ni = node->nfi();
+      for (ymuint i = 0; i < ni; ++ i) {
+	SimNode* inode = node->fanin(i);
+	fanout_lists[inode->id()].push_back(node);
+	ipos[inode->id()] = i;
+      }
+    }
+    for (ymuint i = 0; i < node_num; ++ i) {
+      SimNode* node = mNodeArray[i];
+      node->set_fanout_list(fanout_lists[i], ipos[i]);
+    }
+  }
+
+  // FFR の設定
+  ymuint ffr_num = 0;
+  for (ymuint i = node_num; i > 0; ) {
+    -- i;
+    SimNode* node = mNodeArray[i];
+    if ( node->is_output() || node->nfo() != 1 ) {
+      ++ ffr_num;
+    }
+  }
+  mFFRArray.resize(ffr_num);
+  ffr_num = 0;
+  for (ymuint i = node_num; i > 0; ) {
+    -- i;
+    SimNode* node = mNodeArray[i];
+    if ( node->is_output() || node->nfo() != 1 ) {
+      SimFFR* ffr = &mFFRArray[ffr_num];
+      node->set_ffr(ffr);
+      ffr->set_root(node);
+      ++ ffr_num;
+    }
+    else {
+      SimFFR* ffr = node->fanout(0)->ffr();
+      node->set_ffr(ffr);
+    }
+  }
+
+  // 消去用の配列の大きさはノード数を越えない．
+  mGvalClearArray.reserve(mNodeArray.size());
+  mFvalClearArray.reserve(mNodeArray.size());
+
+  // 最大レベルを求め，イベントキューを初期化する．
+  ymuint max_level = 0;
+  for (ymuint i = 0; i < no; ++ i) {
+    SimNode* inode = mOutputArray[i];
+    if ( max_level < inode->level() ) {
+      max_level = inode->level();
+    }
+  }
+  mEventQ.init(max_level);
+
+  // 値を X に初期化しておく
+  for (vector<SimNode*>::iterator p = mNodeArray.begin();
+       p != mNodeArray.end(); ++ p) {
+    SimNode* simnode = *p;
+    simnode->set_gval(PackedVal3(kPvAll0, kPvAll0));
+  }
+
   clear_faults();
 
   ymuint n = flist.size();
@@ -409,194 +585,6 @@ FsimX::run(TestVector* tv,
   return ans;
 }
 
-// @brief ネットワークをセットした後に呼ばれる関数
-void
-FsimX::after_set_network(const TgNetwork& network,
-			 TvMgr& tvmgr)
-{
-  clear();
-
-  mNetwork = &network;
-
-  ymuint nn = mNetwork->node_num();
-  ymuint ni = mNetwork->input_num2();
-  ymuint no = mNetwork->output_num2();
-  ymuint nl = mNetwork->logic_num();
-
-  // SimNode の生成
-  // 対応付けを行うマップの初期化
-  mSimMap.resize(nn);
-  mEdgeMap.resize(nn);
-  mInputArray.resize(ni);
-  mOutputArray.resize(no);
-
-  // 外部入力に対応する SimNode の生成
-  for (ymuint i = 0; i < ni; ++ i) {
-    const TgNode* tgnode = mNetwork->input(i);
-    SimNode* node = make_node(kTgInput, vector<SimNode*>());
-    mSimMap[tgnode->gid()] = node;
-    mInputArray[i] = node;
-  }
-  // 論理ノードに対応する SimNode の生成
-  for (ymuint i = 0; i < nl; ++ i) {
-    const TgNode* tgnode = mNetwork->sorted_logic(i);
-    ymuint ni = tgnode->ni();
-    vector<SimNode*> inputs(ni);
-    for (ymuint i = 0; i < ni; ++ i) {
-      const TgNode* itgnode = tgnode->fanin(i);
-      SimNode* inode = find_simnode(itgnode);
-      assert_cond(inode, __FILE__, __LINE__);
-      inputs[i] = inode;
-    }
-
-    // 出力の論理を表す SimNode を作る．
-    SimNode* simnode = NULL;
-    mEdgeMap[tgnode->gid()].resize(ni);
-    if ( tgnode->is_cplx_logic() ) {
-      vector<SimNode*> inputs2(ni * 2);
-      LogExpr lexp = mNetwork->get_lexp(tgnode);
-      vector<EdgeMap*> emap(ni, NULL);
-      for (ymuint i = 0; i < ni; ++ i) {
-	// 各変数の使われ方をチェック
-	// - A) 肯定リテラルが 1 つ．
-	// - B) 肯定リテラルが 2 つ以上
-	// - C) 否定リテラルのみ．数は問わない．
-	// - D) 肯定と否定リテラルが各々 1 つ以上
-	VarId var(i);
-	ymuint np = lexp.litnum(var, kPolPosi);
-	ymuint nn = lexp.litnum(var, kPolNega);
-	EdgeMap& edge_map = mEdgeMap[tgnode->gid()][i];
-	if ( np == 1 && nn == 0 ) {
-	  inputs2[i * 2] = inputs[i];
-	  emap[i] = &edge_map;
-	}
-	else if ( np > 1 && nn == 0 ) {
-	  vector<SimNode*> tmp(1, inputs[i]);
-	  SimNode* buf = make_node(kTgBuff, tmp);
-	  inputs2[i * 2] = buf;
-	  edge_map.mNode = buf;
-	  edge_map.mPos = 0;
-	}
-	else if ( np == 0 && nn > 0 ) {
-	  vector<SimNode*> tmp(1, inputs[i]);
-	  SimNode* inv = make_node(kTgNot, tmp);
-	  inputs2[i * 2 + 1] = inv;
-	  edge_map.mNode = inv;
-	  edge_map.mPos = 0;
-	}
-	else if ( np > 0 && nn > 0 ) {
-	  vector<SimNode*> tmp(1, inputs[i]);
-	  SimNode* buf = make_node(kTgBuff, tmp);
-	  tmp[0] = buf;
-	  SimNode* inv = make_node(kTgNot, tmp);
-	  inputs2[i * 2] = buf;
-	  inputs2[i * 2 + 1] = inv;
-	  edge_map.mNode = buf;
-	  edge_map.mPos = 0;
-	}
-	else {
-	  cout << "np = " << np << endl
-	       << "nn = " << nn << endl;
-	  assert_not_reached(__FILE__, __LINE__);
-	}
-      }
-      simnode = make_logic(lexp, inputs2, emap);
-    }
-    else {
-      tTgGateType type = tgnode->type();
-      simnode = make_node(type, inputs);
-      for (ymuint i = 0; i < ni; ++ i) {
-	EdgeMap& edge_map = mEdgeMap[tgnode->gid()][i];
-	edge_map.mNode = simnode;
-	edge_map.mPos = i;
-      }
-    }
-    mSimMap[tgnode->gid()] = simnode;
-  }
-  // 外部出力に対応する SimNode の生成
-  for (ymuint i = 0; i < no; ++ i) {
-    const TgNode* onode = mNetwork->output(i);
-    SimNode* inode = find_simnode(onode->fanin(0));
-    inode->set_output();
-    mSimMap[onode->gid()] = inode;
-    mOutputArray[i] = inode;
-  }
-
-  // 各ノードのファンアウトリストの設定
-  ymuint node_num = mNodeArray.size();
-  {
-    vector<vector<SimNode*> > fanout_lists(node_num);
-    vector<ymuint> ipos(node_num);
-    for (vector<SimNode*>::iterator p = mNodeArray.begin();
-	 p != mNodeArray.end(); ++ p) {
-      SimNode* node = *p;
-      ymuint ni = node->nfi();
-      for (ymuint i = 0; i < ni; ++ i) {
-	SimNode* inode = node->fanin(i);
-	fanout_lists[inode->id()].push_back(node);
-	ipos[inode->id()] = i;
-      }
-    }
-    for (ymuint i = 0; i < node_num; ++ i) {
-      SimNode* node = mNodeArray[i];
-      node->set_fanout_list(fanout_lists[i], ipos[i]);
-    }
-  }
-
-  // FFR の設定
-  ymuint ffr_num = 0;
-  for (ymuint i = node_num; i > 0; ) {
-    -- i;
-    SimNode* node = mNodeArray[i];
-    if ( node->is_output() || node->nfo() != 1 ) {
-      ++ ffr_num;
-    }
-  }
-  mFFRArray.resize(ffr_num);
-  ffr_num = 0;
-  for (ymuint i = node_num; i > 0; ) {
-    -- i;
-    SimNode* node = mNodeArray[i];
-    if ( node->is_output() || node->nfo() != 1 ) {
-      SimFFR* ffr = &mFFRArray[ffr_num];
-      node->set_ffr(ffr);
-      ffr->set_root(node);
-      ++ ffr_num;
-    }
-    else {
-      SimFFR* ffr = node->fanout(0)->ffr();
-      node->set_ffr(ffr);
-    }
-  }
-
-  // 消去用の配列の大きさはノード数を越えない．
-  mGvalClearArray.reserve(mNodeArray.size());
-  mFvalClearArray.reserve(mNodeArray.size());
-
-  // 最大レベルを求め，イベントキューを初期化する．
-  ymuint max_level = 0;
-  for (ymuint i = 0; i < no; ++ i) {
-    SimNode* inode = mOutputArray[i];
-    if ( max_level < inode->level() ) {
-      max_level = inode->level();
-    }
-  }
-  mEventQ.init(max_level);
-
-  // 値を X に初期化しておく
-  for (vector<SimNode*>::iterator p = mNodeArray.begin();
-       p != mNodeArray.end(); ++ p) {
-    SimNode* simnode = *p;
-    simnode->set_gval(PackedVal3(kPvAll0, kPvAll0));
-  }
-}
-
-// @brief 故障リストの内容が変わった後に呼ばれる関数
-void
-FsimX::after_update_faults(const vector<SaFault*>& flist)
-{
-}
-
 // @brief 現在保持している SimNode のネットワークを破棄する．
 void
 FsimX::clear()
@@ -677,6 +665,32 @@ FsimX::clear_gval()
        p != mGvalClearArray.end(); ++ p) {
     SimNode* node = *p;
     node->set_gval(PackedVal3(kPvAll0, kPvAll0));
+  }
+}
+
+// @brief 内部の故障リストの更新を行なう．
+void
+FsimX::update_faults()
+{
+  ymuint nffr = mFFRArray.size();
+  for (ymuint i = 0; i < nffr; ++ i) {
+    SimFFR& ffr = mFFRArray[i];
+    vector<FsimFault*>& flist = ffr.fault_list();
+    ymuint fnum = flist.size();
+    ymuint wpos = 0;
+    for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
+      FsimFault* ff = flist[rpos];
+      SaFault* f = ff->mOrigF;
+      if ( f->status() != kFsDetected ) {
+	if ( wpos != rpos ) {
+	  flist[wpos] = ff;
+	}
+	++ wpos;
+      }
+    }
+    if ( wpos < fnum ) {
+      flist.erase(flist.begin() + wpos, flist.end());
+    }
   }
 }
 

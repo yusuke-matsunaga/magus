@@ -13,7 +13,6 @@
 
 
 #include "fsim3_nsdef.h"
-#include "ModBase.h"
 #include "ym_networks/tgnet.h"
 #include "ym_networks/TgNode.h"
 #include "ym_logic/LogExpr.h"
@@ -39,8 +38,7 @@ class SimNode;
 /// @brief 故障シミュレーションを行うモジュール
 /// @sa ModBase
 //////////////////////////////////////////////////////////////////////
-class Fsim3 :
-  public ModBase
+class Fsim3
 {
 public:
 
@@ -53,11 +51,14 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief 対象の故障をセットする
-  /// @param[in] flist 対象の故障リスト
+  /// @brief ネットワークをセットする．
   void
-  set_faults(const vector<SaFault*>& flist);
+  set_network(const TgNetwork& network,
+	      const vector<SaFault*>& flist);
 
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -83,22 +84,12 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // ModBase の継承クラスが用意する仮想関数
+  // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ネットワークをセットした後に呼ばれる関数
-  virtual
+  /// @brief 内部の故障リストの更新を行なう．
   void
-  after_set_network(const TgNetwork& network,
-		    TvMgr& tvmgr);
-
-  /// @brief 故障リストの内容が変わった後に呼ばれる関数
-  virtual
-  void
-  after_update_faults(const vector<SaFault*>& flist);
-
-
-private:
+  update_faults();
 
   /// @brief FFR 内の故障シミュレーションを行う．
   bool
