@@ -55,7 +55,8 @@ Params kDefaultParams(0.95, 0.02, 0.999);
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-YmSat::YmSat(SatAnalyzer* analyzer) :
+YmSat::YmSat(SatAnalyzer* analyzer,
+	     const string& option) :
   mAnalyzer(analyzer),
   mSane(true),
   mAlloc(4096),
@@ -97,6 +98,13 @@ YmSat::YmSat(SatAnalyzer* analyzer) :
   mRestart = 0;
 
   mTimerOn = false;
+
+  if ( option == "classic" ) {
+    mScanWatcher = false;
+  }
+  else {
+    mScanWatcher = true;
+  }
 }
 
 // @brief デストラクタ
@@ -615,8 +623,10 @@ YmSat::solve(const vector<Literal>& assumptions,
     }
   }
 
-  // 充足している節に対して watch literal の付け替えを行なう．
-  scan_watcher();
+  if ( mScanWatcher ) {
+    // 充足している節に対して watch literal の付け替えを行なう．
+    scan_watcher();
+  }
 
   // 以降，現在のレベルが基底レベルとなる．
   mRootLevel = decision_level();

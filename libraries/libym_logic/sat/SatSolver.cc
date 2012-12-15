@@ -37,10 +37,10 @@ SatSolver::SatSolver(const string& type,
   else {
     SatAnalyzer* analyzer = SaFactory::gen_analyzer(option);
     if ( outp ) {
-      mImpl = new YmSatR(*outp, analyzer);
+      mImpl = new YmSatR(*outp, analyzer, option);
     }
     else {
-      mImpl = new YmSat(analyzer);
+      mImpl = new YmSat(analyzer, option);
     }
   }
 }

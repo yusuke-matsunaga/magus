@@ -72,7 +72,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] analyzer 解析器のポインタ
-  YmSat(SatAnalyzer* analyzer);
+  /// @param[in] option オプション文字列
+  YmSat(SatAnalyzer* analyzer,
+	const string& option = string());
 
   /// @brief デストラクタ
   virtual
@@ -487,6 +489,9 @@ private:
 
   // 制御用パラメータ
   Params mParams;
+
+  // scan_watcher() ヒューリスティック制御用のフラグ
+  bool mScanWatcher;
 
   // restart 数
   ymuint mRestart;
