@@ -144,6 +144,10 @@ private:
 	   DtpgNode* node,
 	   ymuint id);
 
+  /// @brief activate_po(), activate_all() の下請け関数
+  void
+  activate_sub(const vector<bool>& mark);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

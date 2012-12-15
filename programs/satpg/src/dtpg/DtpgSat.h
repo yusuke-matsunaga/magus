@@ -20,9 +20,10 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+class FaultMgr;
+class SaFault;
 class TvMgr;
 class TestVector;
-class SaFault;
 
 END_NAMESPACE_YM_SATPG
 
@@ -65,99 +66,74 @@ public:
 	      const vector<SaFault*>& fault_list);
 
   /// @brief single モードでテスト生成を行なう．
+  /// @param[in] fmgr 故障の管理用オブジェクト
   /// @param[in] tvmgr テストベクタの管理用オブジェクト
-  /// @param[out] d_list 検出された故障のリスト
-  /// @param[out] u_list 検出不能と判定された故障のリスト
   void
-  dtpg_single(TvMgr& tvmgr,
-	      vector<SaFault*>& d_list,
-	      vector<SaFault*>& u_list);
+  dtpg_single(FaultMgr& fmgr,
+	      TvMgr& tvmgr);
 
   /// @brief dual モードでテスト生成を行なう．
+  /// @param[in] fmgr 故障の管理用オブジェクト
   /// @param[in] tvmgr テストベクタの管理用オブジェクト
-  /// @param[out] d_list 検出された故障のリスト
-  /// @param[out] u_list 検出不能と判定された故障のリスト
   void
-  dtpg_dual(TvMgr& tvmgr,
-	    vector<SaFault*>& d_list,
-	    vector<SaFault*>& u_list);
+  dtpg_dual(FaultMgr& fmgr,
+	    TvMgr& tvmgr);
 
   /// @brief ffr モードでテスト生成を行なう．
+  /// @param[in] fmgr 故障の管理用オブジェクト
   /// @param[in] tvmgr テストベクタの管理用オブジェクト
-  /// @param[out] d_list 検出された故障のリスト
-  /// @param[out] u_list 検出不能と判定された故障のリスト
   void
-  dtpg_ffr(TvMgr& tvmgr,
-	   vector<SaFault*>& d_list,
-	   vector<SaFault*>& u_list);
+  dtpg_ffr(FaultMgr& fmgr,
+	   TvMgr& tvmgr);
 
   /// @brief mffc モードでテスト生成を行なう．
+  /// @param[in] fmgr 故障の管理用オブジェクト
   /// @param[in] tvmgr テストベクタの管理用オブジェクト
-  /// @param[out] d_list 検出された故障のリスト
-  /// @param[out] u_list 検出不能と判定された故障のリスト
   void
-  dtpg_mffc(TvMgr& tvmgr,
-	    vector<SaFault*>& d_list,
-	    vector<SaFault*>& u_list);
+  dtpg_mffc(FaultMgr& fmgr,
+	    TvMgr& tvmgr);
 
   /// @brief all モードでテスト生成を行なう．
+  /// @param[in] fmgr 故障の管理用オブジェクト
   /// @param[in] tvmgr テストベクタの管理用オブジェクト
-  /// @param[out] d_list 検出された故障のリスト
-  /// @param[out] u_list 検出不能と判定された故障のリスト
   void
-  dtpg_all(TvMgr& tvmgr,
-	   vector<SaFault*>& d_list,
-	   vector<SaFault*>& u_list);
+  dtpg_all(FaultMgr& fmgr,
+	   TvMgr& tvmgr);
 
   /// @brief single モードでテスト生成を行なう．
+  /// @param[in] fmgr 故障の管理用オブジェクト
   /// @param[in] tvmgr テストベクタの管理用オブジェクト
-  /// @param[out] d_list 検出された故障のリスト
-  /// @param[out] u_list 検出不能と判定された故障のリスト
   void
-  dtpg_single_posplit(ymuint po_pos,
-		      TvMgr& tvmgr,
-		      vector<SaFault*>& d_list,
-		      vector<SaFault*>& u_list);
+  dtpg_single_posplit(FaultMgr& fmgr,
+		      TvMgr& tvmgr);
 
   /// @brief dual モードでテスト生成を行なう．
+  /// @param[in] fmgr 故障の管理用オブジェクト
   /// @param[in] tvmgr テストベクタの管理用オブジェクト
-  /// @param[out] d_list 検出された故障のリスト
-  /// @param[out] u_list 検出不能と判定された故障のリスト
   void
-  dtpg_dual_posplit(ymuint po_pos,
-		    TvMgr& tvmgr,
-		    vector<SaFault*>& d_list,
-		    vector<SaFault*>& u_list);
+  dtpg_dual_posplit(FaultMgr& fmgr,
+		    TvMgr& tvmgr);
 
   /// @brief ffr モードでテスト生成を行なう．
+  /// @param[in] fmgr 故障の管理用オブジェクト
   /// @param[in] tvmgr テストベクタの管理用オブジェクト
-  /// @param[out] d_list 検出された故障のリスト
-  /// @param[out] u_list 検出不能と判定された故障のリスト
   void
-  dtpg_ffr_posplit(ymuint po_pos,
-		   TvMgr& tvmgr,
-		   vector<SaFault*>& d_list,
-		   vector<SaFault*>& u_list);
+  dtpg_ffr_posplit(FaultMgr& fmgr,
+		   TvMgr& tvmgr);
 
   /// @brief mffc モードでテスト生成を行なう．
+  /// @param[in] fmgr 故障の管理用オブジェクト
   /// @param[in] tvmgr テストベクタの管理用オブジェクト
-  /// @param[out] d_list 検出された故障のリスト
-  /// @param[out] u_list 検出不能と判定された故障のリスト
   void
-  dtpg_mffc_posplit(ymuint po_pos,
-		    TvMgr& tvmgr,
-		    vector<SaFault*>& d_list,
-		    vector<SaFault*>& u_list);
+  dtpg_mffc_posplit(FaultMgr& fmgr,
+		    TvMgr& tvmgr);
 
   /// @brief all モードでテスト生成を行なう．
+  /// @param[in] fmgr 故障の管理用オブジェクト
   /// @param[in] tvmgr テストベクタの管理用オブジェクト
-  /// @param[out] d_list 検出された故障のリスト
-  /// @param[out] u_list 検出不能と判定された故障のリスト
   void
-  dtpg_all_posplit(ymuint po_pos,
-		   TvMgr& tvmgr,
-		   vector<SaFault*>& d_list,
-		   vector<SaFault*>& u_list);
+  dtpg_all_posplit(FaultMgr& fmgr,
+		   TvMgr& tvmgr);
 
   /// @brief StatList をクリアする．
   void
@@ -174,35 +150,50 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 一つの故障に対してテストパタン生成を行なう．
-  /// @param[in] f 故障ノード
+  /// @param[in] f 故障
+  /// @param[in] fmgr 故障の管理用オブジェクト
   /// @param[in] tvmgr テストベクタの管理用オブジェクト
+  /// @param[out] u_list 検査不能故障を格納するリスト
   void
   single_mode(DtpgFault* f,
+	      FaultMgr& fmgr,
 	      TvMgr& tvmgr,
-	      vector<SaFault*>& d_list,
-	      vector<SaFault*>& u_list);
+	      vector<DtpgFault*>& u_list);
+
+  /// @brief 一つのノードに対して dual_mode でテストパタン生成を行なう．
+  /// @param[in] node 対象のノード
+  /// @param[in] fmgr 故障の管理用オブジェクト
+  /// @param[in] tvmgr テストベクタの管理用オブジェクト
+  /// @param[out] u_list 検査不能故障を格納するリスト
+  void
+  dual_mode_node(DtpgNode* node,
+		 FaultMgr& fmgr,
+		 TvMgr& tvmgr,
+		 vector<DtpgFault*>& u_list);
 
   /// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
   /// @param[in] f0 0縮退故障
   /// @param[in] f1 1縮退故障
+  /// @param[in] fmgr 故障の管理用オブジェクト
   /// @param[in] tvmgr テストベクタの管理用オブジェクト
+  /// @param[out] u_list 検査不能故障を格納するリスト
   void
   dual_mode(DtpgFault* f0,
 	    DtpgFault* f1,
+	    FaultMgr& fmgr,
 	    TvMgr& tvmgr,
-	    vector<SaFault*>& d_list,
-	    vector<SaFault*>& u_list);
+	    vector<DtpgFault*>& u_list);
 
   /// @brief FFR 内の故障に対してテストパタン生成を行なう．
   /// @param[in] ffr FFR を表すクラス
+  /// @param[in] fmgr 故障の管理用オブジェクト
   /// @param[in] tvmgr テストベクタの管理用オブジェクト
-  /// @param[in] stat_list 結果を入れるベクタ
-  /// @note flist の故障は必ず root が dominator となっていなければならない．
+  /// @param[out] u_list 検査不能故障を格納するリスト
   void
   ffr_mode(DtpgFFR* ffr,
+	   FaultMgr& fmgr,
 	   TvMgr& tvmgr,
-	   vector<SaFault*>& d_list,
-	   vector<SaFault*>& u_list);
+	   vector<DtpgFault*>& u_list);
 
   /// @brief fnode の故障が伝搬する条件を表す CNF を作る．
   /// @param[in] solver SAT ソルバ

@@ -237,11 +237,9 @@ AtpgMgr::dtpg_single()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  vector<SaFault*> d_list;
-  vector<SaFault*> u_list;
-  mDtpg->dtpg_single(mTvMgr, d_list, u_list);
+  mDtpg->dtpg_single(mFaultMgr, mTvMgr);
 
-  update_faults(d_list, u_list);
+  after_update_faults();
 
   mTimer.change(old_id);
 }
@@ -253,11 +251,9 @@ AtpgMgr::dtpg_dual()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  vector<SaFault*> d_list;
-  vector<SaFault*> u_list;
-  mDtpg->dtpg_dual(mTvMgr, d_list, u_list);
+  mDtpg->dtpg_dual(mFaultMgr, mTvMgr);
 
-  update_faults(d_list, u_list);
+  after_update_faults();
 
   mTimer.change(old_id);
 }
@@ -269,11 +265,9 @@ AtpgMgr::dtpg_ffr()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  vector<SaFault*> d_list;
-  vector<SaFault*> u_list;
-  mDtpg->dtpg_ffr(mTvMgr, d_list, u_list);
+  mDtpg->dtpg_ffr(mFaultMgr, mTvMgr);
 
-  update_faults(d_list, u_list);
+  after_update_faults();
 
   mTimer.change(old_id);
 }
@@ -285,11 +279,9 @@ AtpgMgr::dtpg_mffc()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  vector<SaFault*> d_list;
-  vector<SaFault*> u_list;
-  mDtpg->dtpg_mffc(mTvMgr, d_list, u_list);
+  mDtpg->dtpg_mffc(mFaultMgr, mTvMgr);
 
-  update_faults(d_list, u_list);
+  after_update_faults();
 
   mTimer.change(old_id);
 }
@@ -301,11 +293,9 @@ AtpgMgr::dtpg_all()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  vector<SaFault*> d_list;
-  vector<SaFault*> u_list;
-  mDtpg->dtpg_all(mTvMgr, d_list, u_list);
+  mDtpg->dtpg_all(mFaultMgr, mTvMgr);
 
-  update_faults(d_list, u_list);
+  after_update_faults();
 
   mTimer.change(old_id);
 }
@@ -317,17 +307,9 @@ AtpgMgr::dtpg_single_posplit()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  ymuint no = _network().output_num2();
-  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-    vector<SaFault*> d_list;
-    vector<SaFault*> u_list;
-    mDtpg->dtpg_single_posplit(po_pos, mTvMgr, d_list, u_list);
-    update_faults(d_list, vector<SaFault*>());
-  }
-  vector<SaFault*> d_list;
-  vector<SaFault*> u_list;
-  mDtpg->dtpg_single(mTvMgr, d_list, u_list);
-  update_faults(d_list, u_list);
+  mDtpg->dtpg_single_posplit(mFaultMgr, mTvMgr);
+
+  after_update_faults();
 
   mTimer.change(old_id);
 }
@@ -339,19 +321,9 @@ AtpgMgr::dtpg_dual_posplit()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  ymuint no = _network().output_num2();
-  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-    vector<SaFault*> d_list;
-    vector<SaFault*> u_list;
-    mDtpg->dtpg_dual_posplit(po_pos, mTvMgr, d_list, u_list);
+  mDtpg->dtpg_dual_posplit(mFaultMgr, mTvMgr);
 
-    update_faults(d_list, vector<SaFault*>());
-  }
-  vector<SaFault*> d_list;
-  vector<SaFault*> u_list;
-  mDtpg->dtpg_dual(mTvMgr, d_list, u_list);
-
-  update_faults(d_list, u_list);
+  after_update_faults();
 
   mTimer.change(old_id);
 }
@@ -363,19 +335,9 @@ AtpgMgr::dtpg_ffr_posplit()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  ymuint no = _network().output_num2();
-  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-    vector<SaFault*> d_list;
-    vector<SaFault*> u_list;
-    mDtpg->dtpg_ffr_posplit(po_pos, mTvMgr, d_list, u_list);
+  mDtpg->dtpg_ffr_posplit(mFaultMgr, mTvMgr);
 
-    update_faults(d_list, vector<SaFault*>());
-  }
-  vector<SaFault*> d_list;
-  vector<SaFault*> u_list;
-  mDtpg->dtpg_ffr(mTvMgr, d_list, u_list);
-
-  update_faults(d_list, u_list);
+  after_update_faults();
 
   mTimer.change(old_id);
 }
@@ -387,19 +349,9 @@ AtpgMgr::dtpg_mffc_posplit()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  ymuint no = _network().output_num2();
-  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-    vector<SaFault*> d_list;
-    vector<SaFault*> u_list;
-    mDtpg->dtpg_mffc_posplit(po_pos, mTvMgr, d_list, u_list);
+  mDtpg->dtpg_mffc_posplit(mFaultMgr, mTvMgr);
 
-    update_faults(d_list, vector<SaFault*>());
-  }
-  vector<SaFault*> d_list;
-  vector<SaFault*> u_list;
-  mDtpg->dtpg_mffc(mTvMgr, d_list, u_list);
-
-  update_faults(d_list, u_list);
+  after_update_faults();
 
   mTimer.change(old_id);
 }
@@ -411,19 +363,9 @@ AtpgMgr::dtpg_all_posplit()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  ymuint no = _network().output_num2();
-  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-    vector<SaFault*> d_list;
-    vector<SaFault*> u_list;
-    mDtpg->dtpg_all_posplit(po_pos, mTvMgr, d_list, u_list);
+  mDtpg->dtpg_all_posplit(mFaultMgr, mTvMgr);
 
-    update_faults(d_list, vector<SaFault*>());
-  }
-  vector<SaFault*> d_list;
-  vector<SaFault*> u_list;
-  mDtpg->dtpg_all(mTvMgr, d_list, u_list);
-
-  update_faults(d_list, u_list);
+  after_update_faults();
 
   mTimer.change(old_id);
 }
@@ -463,28 +405,6 @@ AtpgMgr::misc_time() const
   return mTimer.time(TM_MISC);
 }
 
-// @brief 故障リストの更新を行なう．
-// @param[in] d_list 検出された故障のリスト
-// @param[in] u_list 検出不能と判定された故障のリスト
-void
-AtpgMgr::update_faults(const vector<SaFault*>& d_list,
-		       const vector<SaFault*>& u_list)
-{
-  for (vector<SaFault*>::const_iterator p = d_list.begin();
-       p != d_list.end(); ++ p) {
-    SaFault* f = *p;
-    mFaultMgr.set_status(f, kFsDetected);
-  }
-  for (vector<SaFault*>::const_iterator p = u_list.begin();
-       p != u_list.end(); ++ p) {
-    SaFault* f = *p;
-    mFaultMgr.set_status(f, kFsUntestable);
-  }
-
-  mFaultMgr.update();
-  after_update_faults();
-}
-
 // @brief ネットワークをセットした後に呼ぶ関数
 void
 AtpgMgr::after_set_network()
@@ -504,6 +424,7 @@ AtpgMgr::after_set_network()
 void
 AtpgMgr::after_update_faults()
 {
+  mFaultMgr.update();
   mFaultBindMgr.prop_event(mFaultMgr.remain_list());
 }
 

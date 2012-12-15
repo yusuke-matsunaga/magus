@@ -209,13 +209,6 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 故障リストの更新を行なう．
-  /// @param[in] d_list 検出された故障のリスト
-  /// @param[in] u_list 検出不能と判定された故障のリスト
-  void
-  update_faults(const vector<SaFault*>& d_list,
-		const vector<SaFault*>& u_list);
-
   /// @brief ネットワークが変更された時に呼ばれる関数
   void
   after_set_network();

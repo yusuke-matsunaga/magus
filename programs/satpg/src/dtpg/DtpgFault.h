@@ -77,11 +77,6 @@ public:
   int
   val() const;
 
-  /// @brief 反対の値の故障を返す．
-  /// @note なければ NULL を返す．
-  DtpgFault*
-  alt_fault() const;
-
   /// @brief テストパタンを設定する．
   /// @note 同時に検出済みになる．
   void
@@ -94,6 +89,10 @@ public:
   /// @brief 検出不能の印をつける．
   void
   set_untest();
+
+  /// @brief 状態をクリアする(kUndetectに戻す)
+  void
+  clear_stat();
 
   /// @brief 状態を返す．
   tStat
@@ -120,9 +119,6 @@ private:
   // 故障位置 + 故障値
   ymuint32 mPosVal;
 
-  // 反対の値を持つ故障
-  DtpgFault* mAltFault;
-
   // テストパタン
   TestVector* mTv;
 
@@ -140,6 +136,8 @@ private:
 inline
 DtpgFault::DtpgFault()
 {
+  mTv = NULL;
+  mStat = kUndetect;
 }
 
 // @brief デストラクタ
@@ -213,15 +211,6 @@ DtpgFault::val() const
   return static_cast<int>((mPosVal >> 1) & 1);
 }
 
-// @brief 反対の値の故障を返す．
-// @note なければ NULL を返す．
-inline
-DtpgFault*
-DtpgFault::alt_fault() const
-{
-  return mAltFault;
-}
-
 // @brief テストパタンを設定する．
 // @note 同時に検出済みになる．
 inline
@@ -246,6 +235,14 @@ void
 DtpgFault::set_untest()
 {
   mStat = kUntest;
+}
+
+// @brief 状態をクリアする(kUndetectに戻す)
+inline
+void
+DtpgFault::clear_stat()
+{
+  mStat = kUndetect;
 }
 
 // @brief 状態を返す．

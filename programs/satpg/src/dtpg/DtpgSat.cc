@@ -12,6 +12,7 @@
 #include "DtpgNode.h"
 #include "DtpgFFR.h"
 #include "DtpgFault.h"
+#include "FaultMgr.h"
 #include "TvMgr.h"
 #include "TestVector.h"
 #include "ym_logic/SatSolver.h"
@@ -377,124 +378,104 @@ END_NONAMESPACE
 
 
 // @brief 一つの故障に対してテストパタン生成を行なう．
+// @param[in] fmgr 故障の管理用オブジェクト
 // @param[in] tvmgr テストベクタの管理用オブジェクト
-// @param[out] d_list 検出された故障のリスト
-// @param[out] u_list 検出不能と判定された故障のリスト
 void
-DtpgSat::dtpg_single(TvMgr& tvmgr,
-		     vector<SaFault*>& d_list,
-		     vector<SaFault*>& u_list)
+DtpgSat::dtpg_single(FaultMgr& fmgr,
+		     TvMgr& tvmgr)
 {
   mNetwork->activate_all();
   const vector<DtpgFault*>& flist = mNetwork->fault_list();
+  vector<DtpgFault*> u_list;
   for (vector<DtpgFault*>::const_iterator p = flist.begin();
        p != flist.end(); ++ p) {
     DtpgFault* f = *p;
-    if ( f->safault()->status() != kFsDetected ) {
-      single_mode(f, tvmgr, d_list, u_list);
+    if ( f->stat() == kUndetect ) {
+      single_mode(f, fmgr, tvmgr, u_list);
     }
+  }
+  for (vector<DtpgFault*>::iterator p = u_list.begin();
+       p != u_list.end(); ++ p) {
+    DtpgFault* f = *p;
+    fmgr.set_status(f->safault(), kFsUntestable);
   }
 }
 
 // @brief dual モードでテスト生成を行なう．
+// @param[in] fmgr 故障の管理用オブジェクト
 // @param[in] tvmgr テストベクタの管理用オブジェクト
-// @param[out] d_list 検出された故障のリスト
-// @param[out] u_list 検出不能と判定された故障のリスト
 void
-DtpgSat::dtpg_dual(TvMgr& tvmgr,
-		   vector<SaFault*>& d_list,
-		   vector<SaFault*>& u_list)
+DtpgSat::dtpg_dual(FaultMgr& fmgr,
+		   TvMgr& tvmgr)
 {
   mNetwork->activate_all();
   ymuint nn = mNetwork->node_num();
+  vector<DtpgFault*> u_list;
   for (ymuint i = 0; i < nn; ++ i) {
     DtpgNode* node = mNetwork->node(i);
-    DtpgFault* f0 = node->output_fault(0);
-    DtpgFault* f1 = node->output_fault(1);
-    if ( f0 != NULL && f0->safault()->status() == kFsDetected ) {
-      f0 = NULL;
-    }
-    if ( f1 != NULL && f1->safault()->status() == kFsDetected ) {
-      f1 = NULL;
-    }
-    if ( f0 != NULL && f1 != NULL ) {
-      dual_mode(f0, f1, tvmgr, d_list, u_list);
-    }
-    else if ( f0 != NULL ) {
-      single_mode(f0, tvmgr, d_list, u_list);
-    }
-    else if ( f1 != NULL ) {
-      single_mode(f1, tvmgr, d_list, u_list);
-    }
-    ymuint ni = node->fanin_num();
-    for (ymuint j = 0; j < ni; ++ j) {
-      DtpgFault* f0 = node->input_fault(0, j);
-      DtpgFault* f1 = node->input_fault(1, j);
-      if ( f0 != NULL && f0->safault()->status() == kFsDetected ) {
-	f0 = NULL;
-      }
-      if ( f1 != NULL && f1->safault()->status() == kFsDetected ) {
-	f1 = NULL;
-      }
-      if ( f0 != NULL && f1 != NULL ) {
-	dual_mode(f0, f1, tvmgr, d_list, u_list);
-      }
-      else if ( f0 != NULL ) {
-	single_mode(f0, tvmgr, d_list, u_list);
-      }
-      else if ( f1 != NULL ) {
-	single_mode(f1, tvmgr, d_list, u_list);
-      }
-    }
+    dual_mode_node(node, fmgr, tvmgr, u_list);
+  }
+  for (vector<DtpgFault*>::iterator p = u_list.begin();
+       p != u_list.end(); ++ p) {
+    DtpgFault* f = *p;
+    fmgr.set_status(f->safault(), kFsUntestable);
   }
 }
 
 // @brief ffr モードでテスト生成を行なう．
+// @param[in] fmgr 故障の管理用オブジェクト
 // @param[in] tvmgr テストベクタの管理用オブジェクト
-// @param[out] d_list 検出された故障のリスト
-// @param[out] u_list 検出不能と判定された故障のリスト
 void
-DtpgSat::dtpg_ffr(TvMgr& tvmgr,
-		  vector<SaFault*>& d_list,
-		  vector<SaFault*>& u_list)
+DtpgSat::dtpg_ffr(FaultMgr& fmgr,
+		  TvMgr& tvmgr)
 {
   mNetwork->activate_all();
   vector<DtpgFFR*> ffr_list;
   mNetwork->get_ffr_list(ffr_list);
+  cout << "#FFR = " << ffr_list.size() << endl;
+  vector<DtpgFault*> u_list;
   for (vector<DtpgFFR*>::const_iterator p = ffr_list.begin();
        p != ffr_list.end(); ++ p) {
     DtpgFFR* ffr = *p;
-    ffr_mode(ffr, tvmgr, d_list, u_list);
+    ffr_mode(ffr, fmgr, tvmgr, u_list);
+  }
+  for (vector<DtpgFault*>::iterator p = u_list.begin();
+       p != u_list.end(); ++ p) {
+    DtpgFault* f = *p;
+    fmgr.set_status(f->safault(), kFsUntestable);
   }
 }
 
 // @brief mffc モードでテスト生成を行なう．
+// @param[in] fmgr 故障の管理用オブジェクト
 // @param[in] tvmgr テストベクタの管理用オブジェクト
-// @param[out] d_list 検出された故障のリスト
-// @param[out] u_list 検出不能と判定された故障のリスト
 void
-DtpgSat::dtpg_mffc(TvMgr& tvmgr,
-		   vector<SaFault*>& d_list,
-		   vector<SaFault*>& u_list)
+DtpgSat::dtpg_mffc(FaultMgr& fmgr,
+		   TvMgr& tvmgr)
 {
   mNetwork->activate_all();
   vector<DtpgFFR*> mffc_list;
   mNetwork->get_mffc_list(mffc_list);
+  cout << "#MFFC = " << mffc_list.size() << endl;
+  vector<DtpgFault*> u_list;
   for (vector<DtpgFFR*>::const_iterator p = mffc_list.begin();
        p != mffc_list.end(); ++ p) {
     DtpgFFR* ffr = *p;
-    ffr_mode(ffr, tvmgr, d_list, u_list);
+    ffr_mode(ffr, fmgr, tvmgr, u_list);
+  }
+  for (vector<DtpgFault*>::iterator p = u_list.begin();
+       p != u_list.end(); ++ p) {
+    DtpgFault* f = *p;
+    fmgr.set_status(f->safault(), kFsUntestable);
   }
 }
 
 // @brief all モードでテスト生成を行なう．
+// @param[in] fmgr 故障の管理用オブジェクト
 // @param[in] tvmgr テストベクタの管理用オブジェクト
-// @param[out] d_list 検出された故障のリスト
-// @param[out] u_list 検出不能と判定された故障のリスト
 void
-DtpgSat::dtpg_all(TvMgr& tvmgr,
-		  vector<SaFault*>& d_list,
-		  vector<SaFault*>& u_list)
+DtpgSat::dtpg_all(FaultMgr& fmgr,
+		  TvMgr& tvmgr)
 {
 #if 0
   mNetwork->activate_all();
@@ -509,130 +490,131 @@ DtpgSat::dtpg_all(TvMgr& tvmgr,
 }
 
 // @brief 一つの故障に対してテストパタン生成を行なう．
+// @param[in] fmgr 故障の管理用オブジェクト
 // @param[in] tvmgr テストベクタの管理用オブジェクト
 // @param[out] d_list 検出された故障のリスト
 // @param[out] u_list 検出不能と判定された故障のリスト
 void
-DtpgSat::dtpg_single_posplit(ymuint po_pos,
-			     TvMgr& tvmgr,
-			     vector<SaFault*>& d_list,
-			     vector<SaFault*>& u_list)
+DtpgSat::dtpg_single_posplit(FaultMgr& fmgr,
+			     TvMgr& tvmgr)
 {
   const vector<DtpgFault*>& flist = mNetwork->fault_list();
-  mNetwork->activate_po(po_pos);
-  for (vector<DtpgFault*>::const_iterator p = flist.begin();
-       p != flist.end(); ++ p) {
-    DtpgFault* f = *p;
-    if ( f->safault()->status() != kFsDetected && f->node()->is_active() ) {
-      single_mode(f, tvmgr, d_list, u_list);
+
+  ymuint no = mNetwork->output_num2();
+  vector<DtpgFault*> u_list;
+  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+    mNetwork->activate_po(po_pos);
+    for (vector<DtpgFault*>::const_iterator p = flist.begin();
+	 p != flist.end(); ++ p) {
+      DtpgFault* f = *p;
+      if ( f->stat() == kUndetect && f->node()->is_active() ) {
+	single_mode(f, fmgr, tvmgr, u_list);
+      }
     }
   }
-  mNetwork->activate_all();
+  for (vector<DtpgFault*>::iterator p = u_list.begin();
+       p != u_list.end(); ++ p) {
+    DtpgFault* f = *p;
+    f->clear_stat();
+  }
+
+  dtpg_single(fmgr, tvmgr);
 }
 
 // @brief dual モードでテスト生成を行なう．
+// @param[in] fmgr 故障の管理用オブジェクト
 // @param[in] tvmgr テストベクタの管理用オブジェクト
 // @param[out] d_list 検出された故障のリスト
 // @param[out] u_list 検出不能と判定された故障のリスト
 void
-DtpgSat::dtpg_dual_posplit(ymuint po_pos,
-			   TvMgr& tvmgr,
-			   vector<SaFault*>& d_list,
-			   vector<SaFault*>& u_list)
+DtpgSat::dtpg_dual_posplit(FaultMgr& fmgr,
+			   TvMgr& tvmgr)
 {
-  mNetwork->activate_po(po_pos);
-  ymuint nn = mNetwork->active_node_num();
-  for (ymuint i = 0; i < nn; ++ i) {
-    DtpgNode* node = mNetwork->active_node(i);
-    DtpgFault* f0 = node->output_fault(0);
-    DtpgFault* f1 = node->output_fault(1);
-    if ( f0 != NULL && f0->safault()->status() == kFsDetected ) {
-      f0 = NULL;
-    }
-    if ( f1 != NULL && f1->safault()->status() == kFsDetected ) {
-      f1 = NULL;
-    }
-    if ( f0 != NULL && f1 != NULL ) {
-      dual_mode(f0, f1, tvmgr, d_list, u_list);
-    }
-    else if ( f0 != NULL ) {
-      single_mode(f0, tvmgr, d_list, u_list);
-    }
-    else if ( f1 != NULL ) {
-      single_mode(f1, tvmgr, d_list, u_list);
-    }
-    ymuint ni = node->fanin_num();
-    for (ymuint j = 0; j < ni; ++ j) {
-      DtpgFault* f0 = node->input_fault(0, j);
-      DtpgFault* f1 = node->input_fault(1, j);
-      if ( f0 != NULL && f0->safault()->status() == kFsDetected ) {
-	f0 = NULL;
-      }
-      if ( f1 != NULL && f1->safault()->status() == kFsDetected ) {
-	f1 = NULL;
-      }
-      if ( f0 != NULL && f1 != NULL ) {
-	dual_mode(f0, f1, tvmgr, d_list, u_list);
-      }
-      else if ( f0 != NULL ) {
-	single_mode(f0, tvmgr, d_list, u_list);
-      }
-      else if ( f1 != NULL ) {
-	single_mode(f1, tvmgr, d_list, u_list);
-      }
+  ymuint no = mNetwork->output_num2();
+  vector<DtpgFault*> u_list;
+  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+    mNetwork->activate_po(po_pos);
+    ymuint nn = mNetwork->active_node_num();
+    for (ymuint i = 0; i < nn; ++ i) {
+      DtpgNode* node = mNetwork->active_node(i);
+      dual_mode_node(node, fmgr, tvmgr, u_list);
     }
   }
+  for (vector<DtpgFault*>::iterator p = u_list.begin();
+       p != u_list.end(); ++ p) {
+    DtpgFault* f = *p;
+    f->clear_stat();
+  }
+
+  dtpg_dual(fmgr, tvmgr);
 }
 
 // @brief ffr モードでテスト生成を行なう．
+// @param[in] fmgr 故障の管理用オブジェクト
 // @param[in] tvmgr テストベクタの管理用オブジェクト
 // @param[out] d_list 検出された故障のリスト
 // @param[out] u_list 検出不能と判定された故障のリスト
 void
-DtpgSat::dtpg_ffr_posplit(ymuint po_pos,
-			  TvMgr& tvmgr,
-			  vector<SaFault*>& d_list,
-			  vector<SaFault*>& u_list)
+DtpgSat::dtpg_ffr_posplit(FaultMgr& fmgr,
+			  TvMgr& tvmgr)
 {
-  mNetwork->activate_po(po_pos);
-  vector<DtpgFFR*> ffr_list;
-  mNetwork->get_ffr_list(ffr_list);
-  for (vector<DtpgFFR*>::const_iterator p = ffr_list.begin();
-       p != ffr_list.end(); ++ p) {
-    DtpgFFR* ffr = *p;
-    ffr_mode(ffr, tvmgr, d_list, u_list);
+  ymuint no = mNetwork->output_num2();
+  vector<DtpgFault*> u_list;
+  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+    mNetwork->activate_po(po_pos);
+    vector<DtpgFFR*> ffr_list;
+    mNetwork->get_ffr_list(ffr_list);
+    for (vector<DtpgFFR*>::const_iterator p = ffr_list.begin();
+	 p != ffr_list.end(); ++ p) {
+      DtpgFFR* ffr = *p;
+      ffr_mode(ffr, fmgr, tvmgr, u_list);
+    }
   }
+  for (vector<DtpgFault*>::iterator p = u_list.begin();
+       p != u_list.end(); ++ p) {
+    DtpgFault* f = *p;
+    f->clear_stat();
+  }
+
+  dtpg_mffc(fmgr, tvmgr);
 }
 
 // @brief mffc モードでテスト生成を行なう．
+// @param[in] fmgr 故障の管理用オブジェクト
 // @param[in] tvmgr テストベクタの管理用オブジェクト
 // @param[out] d_list 検出された故障のリスト
 // @param[out] u_list 検出不能と判定された故障のリスト
 void
-DtpgSat::dtpg_mffc_posplit(ymuint po_pos,
-			   TvMgr& tvmgr,
-			   vector<SaFault*>& d_list,
-			   vector<SaFault*>& u_list)
+DtpgSat::dtpg_mffc_posplit(FaultMgr& fmgr,
+			   TvMgr& tvmgr)
 {
-  mNetwork->activate_po(po_pos);
-  vector<DtpgFFR*> mffc_list;
-  mNetwork->get_mffc_list(mffc_list);
-  for (vector<DtpgFFR*>::const_iterator p = mffc_list.begin();
-       p != mffc_list.end(); ++ p) {
-    DtpgFFR* ffr = *p;
-    ffr_mode(ffr, tvmgr, d_list, u_list);
+  ymuint no = mNetwork->output_num2();
+  vector<DtpgFault*> u_list;
+  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+    mNetwork->activate_po(po_pos);
+    vector<DtpgFFR*> mffc_list;
+    mNetwork->get_mffc_list(mffc_list);
+    for (vector<DtpgFFR*>::const_iterator p = mffc_list.begin();
+	 p != mffc_list.end(); ++ p) {
+      DtpgFFR* ffr = *p;
+      ffr_mode(ffr, fmgr, tvmgr, u_list);
+    }
   }
+  for (vector<DtpgFault*>::iterator p = u_list.begin();
+       p != u_list.end(); ++ p) {
+    DtpgFault* f = *p;
+    f->clear_stat();
+  }
+
+  dtpg_mffc(fmgr, tvmgr);
 }
 
 // @brief all モードでテスト生成を行なう．
+// @param[in] fmgr 故障の管理用オブジェクト
 // @param[in] tvmgr テストベクタの管理用オブジェクト
-// @param[out] d_list 検出された故障のリスト
-// @param[out] u_list 検出不能と判定された故障のリスト
 void
-DtpgSat::dtpg_all_posplit(ymuint po_pos,
-			  TvMgr& tvmgr,
-			  vector<SaFault*>& d_list,
-			  vector<SaFault*>& u_list)
+DtpgSat::dtpg_all_posplit(FaultMgr& fmgr,
+			  TvMgr& tvmgr)
 {
 #if 0
   mNetwork->activate_po(po_pos);
@@ -657,14 +639,66 @@ DtpgSat::set_mode(const string& type,
   mOutP = outp;
 }
 
+// @brief 一つのノードに対して dual_mode でテストパタン生成を行なう．
+// @param[in] node 対象のノード
+// @param[in] fmgr 故障の管理用オブジェクト
+// @param[in] tvmgr テストベクタの管理用オブジェクト
+// @param[out] u_list 検査不能故障を格納するリスト
+void
+DtpgSat::dual_mode_node(DtpgNode* node,
+			FaultMgr& fmgr,
+			TvMgr& tvmgr,
+			vector<DtpgFault*>& u_list)
+{
+  DtpgFault* f0 = node->output_fault(0);
+  DtpgFault* f1 = node->output_fault(1);
+  if ( f0 != NULL && f0->stat() == kDetect ) {
+    f0 = NULL;
+  }
+  if ( f1 != NULL && f1->stat() == kDetect ) {
+    f1 = NULL;
+  }
+  if ( f0 != NULL && f1 != NULL ) {
+    dual_mode(f0, f1, fmgr, tvmgr, u_list);
+  }
+  else if ( f0 != NULL ) {
+    single_mode(f0, fmgr, tvmgr, u_list);
+  }
+  else if ( f1 != NULL ) {
+    single_mode(f1, fmgr, tvmgr, u_list);
+  }
+  ymuint ni = node->fanin_num();
+  for (ymuint j = 0; j < ni; ++ j) {
+    DtpgFault* f0 = node->input_fault(0, j);
+    DtpgFault* f1 = node->input_fault(1, j);
+    if ( f0 != NULL && f0->stat() == kDetect ) {
+      f0 = NULL;
+    }
+    if ( f1 != NULL && f1->stat() == kDetect ) {
+      f1 = NULL;
+    }
+    if ( f0 != NULL && f1 != NULL ) {
+      dual_mode(f0, f1, fmgr, tvmgr, u_list);
+    }
+    else if ( f0 != NULL ) {
+      single_mode(f0, fmgr, tvmgr, u_list);
+    }
+    else if ( f1 != NULL ) {
+      single_mode(f1, fmgr, tvmgr, u_list);
+    }
+  }
+}
+
 // @brief 一つの故障に対してテストパタン生成を行なう．
 // @param[in] f 故障ノード
+// @param[in] fmgr 故障の管理用オブジェクト
 // @param[in] tvmgr テストベクタの管理用オブジェクト
+// @param[out] u_list 検査不能故障を格納するリスト
 void
 DtpgSat::single_mode(DtpgFault* f,
+		     FaultMgr& fmgr,
 		     TvMgr& tvmgr,
-		     vector<SaFault*>& d_list,
-		     vector<SaFault*>& u_list)
+		     vector<DtpgFault*>& u_list)
 {
   SatSolver solver(mType, mOption, mOutP);
 
@@ -703,23 +737,27 @@ DtpgSat::single_mode(DtpgFault* f,
   if ( ans == kB3True ) {
     TestVector* tv = tvmgr.new_vector();
     set_tv(model, input_list, tv);
-    d_list.push_back(f->safault());
+    f->set_tv(tv);
+    fmgr.set_status(f->safault(), kFsDetected);
   }
   else if ( ans == kB3False ) {
-    u_list.push_back(f->safault());
+    f->set_untest();
+    u_list.push_back(f);
   }
 }
 
 // @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
 // @param[in] f0 0縮退故障
 // @param[in] f1 1縮退故障
+// @param[in] fmgr 故障の管理用オブジェクト
 // @param[in] tvmgr テストベクタの管理用オブジェクト
+// @param[out] u_list 検査不能故障を格納するリスト
 void
 DtpgSat::dual_mode(DtpgFault* f0,
 		   DtpgFault* f1,
+		   FaultMgr& fmgr,
 		   TvMgr& tvmgr,
-		   vector<SaFault*>& d_list,
-		   vector<SaFault*>& u_list)
+		   vector<DtpgFault*>& u_list)
 {
   SatSolver solver(mType, mOption, mOutP);
 
@@ -760,23 +798,26 @@ DtpgSat::dual_mode(DtpgFault* f0,
     if ( ans == kB3True ) {
       TestVector* tv = tvmgr.new_vector();
       set_tv(model, input_list, tv);
-      d_list.push_back(f[fval]->safault());
+      f[fval]->set_tv(tv);
+      fmgr.set_status(f[fval]->safault(), kFsDetected);
     }
     else if ( ans == kB3False ) {
-      u_list.push_back(f[fval]->safault());
+      f[fval]->set_untest();
+      u_list.push_back(f[fval]);
     }
   }
 }
 
 // @brief FFR 内の故障に対してテストパタン生成を行なう．
 // @param[in] ffr FFR を表すクラス
+// @param[in] fmgr 故障の管理用オブジェクト
 // @param[in] tvmgr テストベクタの管理用オブジェクト
-// @note flist の故障は必ず root が dominator となっていなければならない．
+// @param[out] u_list 検査不能故障を格納するリスト
 void
 DtpgSat::ffr_mode(DtpgFFR* ffr,
+		  FaultMgr& fmgr,
 		  TvMgr& tvmgr,
-		  vector<SaFault*>& d_list,
-		  vector<SaFault*>& u_list)
+		  vector<DtpgFault*>& u_list)
 {
   vector<DtpgFault*> flist;
   hash_set<ymuint> fmark;
@@ -788,7 +829,7 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
     bool found = false;
     for (int val = 0; val < 2; ++ val) {
       DtpgFault* f = node->output_fault(val);
-      if ( f != NULL && f->safault()->status() != kFsDetected ) {
+      if ( f != NULL && f->stat() == kUndetect ) {
 	flist.push_back(f);
 	found = true;
       }
@@ -797,7 +838,7 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
     for (ymuint i = 0; i < ni; ++ i) {
       for (int val = 0; val < 2; ++ val) {
 	DtpgFault* f = node->input_fault(val, i);
-	if ( f != NULL && f->safault()->status() != kFsDetected ) {
+	if ( f != NULL && f->stat() == kUndetect ) {
 	  flist.push_back(f);
 	  found = true;
 	}
@@ -868,7 +909,7 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
       }
       for (ymint val = 0; val < 2; ++ val) {
 	DtpgFault* f = node->input_fault(val, i);
-	if ( f != NULL && f->safault()->status() != kFsDetected ) {
+	if ( f != NULL && f->stat() == kUndetect ) {
 	  hash_map<ymuint, ymuint>::iterator p = fmap.find(f->id());
 	  assert_cond( p != fmap.end(), __FILE__, __LINE__);
 	  ymuint fid = p->second;
@@ -887,7 +928,7 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
     VarId tmp_ovar = node->fvar();
     for (ymint val = 0; val < 2; ++ val) {
       DtpgFault* f = node->output_fault(val);
-      if ( f != NULL && f->safault()->status() != kFsDetected ) {
+      if ( f != NULL && f->stat() == kUndetect ) {
 	hash_map<ymuint, ymuint>::iterator p = fmap.find(f->id());
 	assert_cond( p != fmap.end(), __FILE__, __LINE__);
 	ymuint fid = p->second;
@@ -927,18 +968,20 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
   for (ymuint i = 0; i < nf; ++ i) {
     DtpgFault* f = flist[i];
     vector<Literal> assumptions;
-    assumptions.reserve(nf + 1);
+    ymuint nim = 0;
+    for (DtpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
+      ++ nim;
+    }
+    assumptions.reserve(nf + nim + 1);
     for (ymuint j = 0; j < nf; ++ j) {
       tPol pol = (j == i) ? kPolPosi : kPolNega;
       assumptions.push_back(Literal(flt_var[j], pol));
     }
-    for (DtpgNode* node = f->node(); ; node = node->active_fanout(0)) {
+    for (DtpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
       Literal dlit(node->dvar(), kPolPosi);
       assumptions.push_back(dlit);
-      if ( node == root ) {
-	break;
-      }
     }
+
     DtpgNode* fnode = f->node();
     if ( f->is_input_fault() ) {
       fnode = f->source_node();
@@ -957,10 +1000,12 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
     if ( ans == kB3True ) {
       TestVector* tv = tvmgr.new_vector();
       set_tv(model, input_list, tv);
-      d_list.push_back(f->safault());
+      f->set_tv(tv);
+      fmgr.set_status(f->safault(), kFsDetected);
     }
     else if ( ans == kB3False ) {
-      u_list.push_back(f->safault());
+      f->set_untest();
+      u_list.push_back(f);
     }
   }
 }

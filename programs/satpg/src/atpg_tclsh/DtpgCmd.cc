@@ -101,7 +101,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   // SAT mode の設定
   if ( mPoptSat->is_specified() ) {
-    mgr().set_dtpg_mode();
+    mgr().set_dtpg_mode("", "classic");
   }
   else if ( mPoptSatRec->is_specified() ) {
     mgr().set_dtpg_mode("satrec");

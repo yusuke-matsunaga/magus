@@ -161,6 +161,10 @@ public:
   VarId
   dvar() const;
 
+  /// @brief 直近の dominator を得る．
+  DtpgNode*
+  imm_dom() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -226,6 +230,9 @@ private:
 
   // 故障差の変数番号
   VarId mDid;
+
+  // immediate dominator
+  DtpgNode* mImmDom;
 
 };
 
@@ -491,6 +498,14 @@ VarId
 DtpgNode::dvar() const
 {
   return mDid;
+}
+
+// @brief 直近の dominator を得る．
+inline
+DtpgNode*
+DtpgNode::imm_dom() const
+{
+  return mImmDom;
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

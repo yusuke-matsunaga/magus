@@ -61,6 +61,7 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
   mActNodeArray = alloc_nodearray(mAlloc, mNodeNum);
 
   { // TgNode を DtpgNode にコピーする．
+    // ただし mNodeArray は入力からのトポロジカル順になる．
     ymuint id = 0;
 
     for (ymuint i = 0; i < mInputNum; ++ i, ++ id) {
@@ -130,29 +131,6 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
     }
   }
 
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
-    DtpgNode* node = &mNodeArray[i];
-    DtpgFault* f0 = node->output_fault(0);
-    DtpgFault* f1 = node->output_fault(1);
-    if ( f0 != NULL ) {
-      f0->mAltFault = f1;
-    }
-    if ( f1 != NULL ) {
-      f1->mAltFault = f0;
-    }
-    ymuint ni = node->fanin_num();
-    for (ymuint j = 0; j < ni; ++ j) {
-      DtpgFault* f0 = node->input_fault(0, j);
-      DtpgFault* f1 = node->input_fault(1, j);
-      if ( f0 != NULL ) {
-	f0->mAltFault = f1;
-      }
-      if ( f1 != NULL ) {
-	f1->mAltFault = f0;
-      }
-    }
-  }
-
   activate_all();
 }
 
@@ -191,30 +169,10 @@ DtpgNetwork::activate_po(ymuint pos)
 {
   vector<bool> mark(mNodeNum, false);
 
+  // pos 番めの出力から到達可能なノードにマークをつける．
   dfs(output(pos), mark);
 
-  mActNodeNum = 0;
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
-    DtpgNode* node = &mNodeArray[i];
-    if ( !mark[i] ) {
-      node->clear_active();
-      continue;
-    }
-    node->set_active();
-    mActNodeArray[mActNodeNum] = node;
-    ++ mActNodeNum;
-
-    ymuint nfo = node->fanout_num();
-    ymuint act_nfo = 0;
-    for (ymuint i = 0; i < nfo; ++ i) {
-      DtpgNode* onode = node->fanout(i);
-      if ( mark[onode->id()] ) {
-	node->mActFanouts[act_nfo] = onode;
-	++ act_nfo;
-      }
-    }
-    node->mActFanoutNum = act_nfo;
-  }
+  activate_sub(mark);
 }
 
 // @brief 全てのノードをアクティブにする．
@@ -225,10 +183,46 @@ DtpgNetwork::activate_all()
 
   vector<bool> mark(mNodeNum, false);
 
+  // すべての PO から到達可能なノードにマークをつける．
   for (ymuint i = 0; i < mOutputNum + mFFNum; ++ i) {
     dfs(output(i), mark);
   }
 
+  activate_sub(mark);
+}
+
+
+BEGIN_NONAMESPACE
+
+DtpgNode*
+merge(DtpgNode* node1,
+      DtpgNode* node2)
+{
+  for ( ; ; ) {
+    if ( node1 == node2 ) {
+      return node1;
+    }
+    if ( node1 == NULL || node2 == NULL ) {
+      return NULL;
+    }
+    ymuint id1 = node1->id();
+    ymuint id2 = node2->id();
+    if ( id1 < id2 ) {
+      node1 = node1->imm_dom();
+    }
+    else if ( id1 > id2 ) {
+      node2 = node2->imm_dom();
+    }
+  }
+}
+
+END_NONAMESPACE
+
+// @brief activate_po(), activate_all() の下請け関数
+void
+DtpgNetwork::activate_sub(const vector<bool>& mark)
+{
+  // マークにしたがってファンアウトなどの情報をセットする．
   mActNodeNum = 0;
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     DtpgNode* node = &mNodeArray[i];
@@ -250,6 +244,35 @@ DtpgNetwork::activate_all()
       }
     }
     node->mActFanoutNum = act_nfo;
+  }
+
+  // immediate dominator を求める．
+  for (ymuint i = 0; i < mActNodeNum; ++ i) {
+    DtpgNode* node = mActNodeArray[mActNodeNum - i - 1];
+    ymuint nfo = node->active_fanout_num();
+    switch ( nfo ) {
+    case 0:
+      assert_cond( node->is_output(), __FILE__, __LINE__);
+      node->mImmDom = NULL;
+      break;
+
+    case 1:
+      node->mImmDom = node->active_fanout(0);
+      break;
+
+    default:
+      {
+	DtpgNode* node0 = node->active_fanout(0);
+	for (ymuint i = 1; i < nfo; ++ i) {
+	  node0 = merge(node0, node->active_fanout(i));
+	  if ( node0 == NULL ) {
+	    break;
+	  }
+	}
+	node->mImmDom = node0;
+      }
+      break;
+    }
   }
 }
 
@@ -261,35 +284,6 @@ DtpgNetwork::node(ymuint pos)
   assert_cond( pos < mNodeNum, __FILE__, __LINE__);
   return &mNodeArray[pos];
 }
-
-
-BEGIN_NONAMESPACE
-
-DtpgNode*
-merge(DtpgNode* node1,
-      DtpgNode* node2,
-      const vector<DtpgNode*>& mffc_root)
-{
-  for ( ; ; ) {
-    if ( node1 == node2 ) {
-      return node1;
-    }
-    if ( node1 == NULL || node2 == NULL ) {
-      return NULL;
-    }
-    ymuint id1 = node1->id();
-    ymuint id2 = node2->id();
-    if ( id1 > id2 ) {
-      node1 = mffc_root[node1->id()];
-    }
-    else if ( id1 < id2 ) {
-      node2 = mffc_root[node2->id()];
-    }
-  }
-}
-
-END_NONAMESPACE
-
 
 // @brief アクティブな部分に対して FFR を求める．
 void
@@ -326,54 +320,30 @@ DtpgNetwork::get_ffr_list(vector<DtpgFFR*>& ffr_list)
 void
 DtpgNetwork::get_mffc_list(vector<DtpgFFR*>& mffc_list)
 {
-  vector<DtpgNode*> mffc_root(mNodeNum, NULL);
   vector<DtpgFFR*> mffc_array(mNodeNum, NULL);
   for (ymuint i = 0; i < mActNodeNum; ++ i) {
     DtpgNode* node = mActNodeArray[mActNodeNum - i - 1];
     ymuint id = node->id();
-    ymuint nfo = node->active_fanout_num();
-    if ( node->is_output() || nfo > 1 ) {
-      DtpgNode* tmp_root = NULL;
-      if ( nfo > 0 ) {
-	tmp_root = mffc_root[node->active_fanout(0)->id()];
-	for (ymuint i = 1; i < nfo; ++ i) {
-	  DtpgNode* tmp_root1 = mffc_root[node->active_fanout(i)->id()];
-	  tmp_root = merge(tmp_root, tmp_root1, mffc_root);
-	  if ( tmp_root == NULL ) {
-	    break;
-	  }
-	}
-      }
-      mffc_root[id] = tmp_root;
-      if ( tmp_root == NULL ) {
-	DtpgFFR* mffc = new DtpgFFR;
-	mffc_array[id] = mffc;
-	mffc_list.push_back(mffc);
-	mffc->mRoot = node;
-      }
+    DtpgNode* root = node->imm_dom();
+    if ( root == NULL ) {
+      DtpgFFR* mffc = new DtpgFFR;
+      mffc_array[id] = mffc;
+      mffc_list.push_back(mffc);
+      mffc->mRoot = node;
     }
     else {
-      DtpgNode* fonode = node->active_fanout(0);
-      DtpgNode* root = mffc_root[fonode->id()];
-      if ( root == NULL ) {
-	root = fonode;
-      }
-      mffc_root[id] = root;
+      mffc_array[id] = mffc_array[root->id()];
     }
   }
 
   // 入力からのトポロジカル順にMFFC内のノードリストを作る．
   for (ymuint i = 0; i < mActNodeNum; ++ i) {
     DtpgNode* node = mActNodeArray[i];
-    DtpgFFR* mffc = mffc_array[node->id()];
-    if ( mffc == NULL ) {
-      mffc = mffc_array[mffc_root[node->id()]->id()];
-    }
+    ymuint id = node->id();
+    DtpgFFR* mffc = mffc_array[id];
     assert_cond( mffc != NULL, __FILE__, __LINE__);
     mffc->mNodeList.push_back(node);
   }
-
-  cout << "#MFFC = " << mffc_list.size() << endl;
 }
 
 // @brief fnode の TFO の TFI にマークをつける．
