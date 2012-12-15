@@ -151,7 +151,6 @@ AtpgMgr::fsim(TestVector* tv,
 	mFaultMgr.set_status(f, kFsDetected);
       }
     }
-    mFaultMgr.update();
     after_update_faults();
   }
 
@@ -187,7 +186,6 @@ AtpgMgr::fsim(const vector<TestVector*>& tv_list,
   }
 
   if ( det_count > 0 ) {
-    mFaultMgr.update();
     after_update_faults();
   }
 
@@ -210,7 +208,7 @@ AtpgMgr::fsim(TestVector* tv,
   if ( stat ) {
     if ( f->status() == kFsUndetected ) {
       mFaultMgr.set_status(f, kFsDetected);
-      mFaultMgr.update();
+
       after_update_faults();
     }
   }
