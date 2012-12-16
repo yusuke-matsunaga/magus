@@ -333,6 +333,7 @@ FaultMgr::add_fault(const TgNode* node,
   else {
     f = find_ifault(node, pos, val);
   }
+  f->mId = mAllList.size();
   mAllList.push_back(f);
   mChanged = true;
 
@@ -386,7 +387,7 @@ FaultMgr::update()
 	mUntestList.push_back(f);
 	break;
 
-      case kFsAbort:
+      case kFsAborted:
 	set_status(f, kFsUndetected);
 	if ( wpos != rpos ) {
 	  mRemainList[wpos] = f;

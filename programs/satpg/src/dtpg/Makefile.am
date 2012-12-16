@@ -9,12 +9,12 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libatpg_dtpg.la
 
 libatpg_dtpg_la_CPPFLAGS = \
-	$(TCL_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
 
 libatpg_dtpg_la_SOURCES = \
+	dtpg_nsdef.h \
 	DtpgNode.h \
 	DtpgFault.h \
 	DtpgFFR.h \

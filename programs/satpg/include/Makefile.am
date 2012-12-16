@@ -10,6 +10,7 @@ noinst_HEADERS = \
 	satpg_nsdef.h \
 	AtpgMgr.h \
 	FaultMgr.h \
+	FaultStatus.h \
 	PackedVal.h \
 	PackedVal3.h \
 	Rtpg.h \
@@ -17,8 +18,4 @@ noinst_HEADERS = \
 	TestVector.h
 	TvBuff.h \
 	TvMgr.h \
-	Val3.h \
-	fsim_nsdef.h \
-	fsim3_nsdef.h \
-	fsimx_nsdef.h \
-	dtpg_nsdef.h
+	Val3.h

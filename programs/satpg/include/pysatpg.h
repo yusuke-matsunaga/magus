@@ -12,6 +12,7 @@
 #include "ympython.h"
 #include "satpg_nsdef.h"
 #include "Val3.h"
+#include "FaultStatus.h"
 
 
 
@@ -28,13 +29,6 @@ END_NAMESPACE(nsPython)	 \
 END_NAMESPACE_YM_SATPG
 
 
-BEGIN_NAMESPACE_YM_SATPG
-
-class SaFault;
-
-END_NAMESPACE_YM_SATPG
-
-
 BEGIN_NAMESPACE_YM_PYSATPG
 
 //////////////////////////////////////////////////////////////////////
@@ -44,6 +38,10 @@ BEGIN_NAMESPACE_YM_PYSATPG
 /// @brief Val3 を表す型
 extern
 PyTypeObject Val3Type;
+
+/// @brief FaultStatus を表す型
+extern
+PyTypeObject FaultStatusType;
 
 /// @brief SaFault を表す型
 extern
@@ -75,6 +73,17 @@ bool
 Val3Object_Check(PyObject* obj)
 {
   return Py_TYPE(obj) == &Val3Type;
+}
+
+/// @brief FaultStatusType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が FaultStatusType だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+FaultStatusObject_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &FaultStatusType;
 }
 
 /// @brief SaFaultType の型チェック
@@ -136,6 +145,16 @@ bool
 conv_from_pyobject(PyObject* py_obj,
 		   Val3& obj);
 
+/// @brief PyObject から FaultStatus を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @param[out] obj FaultStatus を格納する変数
+/// @retval true 変換が成功した．
+/// @retval false 変換が失敗した．py_obj が FaultStatusObject ではなかった．
+extern
+bool
+conv_from_pyobject(PyObject* py_obj,
+		   FaultStatus& obj);
+
 /// @brief PyObject から SaFault を取り出す．
 /// @param[in] py_obj Python オブジェクト
 /// @param[out] pobj SaFault を格納する変数
@@ -151,26 +170,38 @@ conv_from_pyobject(PyObject* py_obj,
 // PyObject への型変換
 //////////////////////////////////////////////////////////////////////
 
-// @brief Val3 から PyObject を生成する．
-// @param[in] obj Val3 オブジェクト
+/// @brief Val3 から PyObject を生成する．
+/// @param[in] obj Val3 オブジェクト
 extern
 PyObject*
 Val3_FromVal3(Val3 obj);
 
-// @brief Val3 を表す文字列から PyObject を生成する．
-// @param[in] str 文字列
+/// @brief Val3 を表す文字列から PyObject を生成する．
+/// @param[in] str 文字列
 extern
 PyObject*
 Val3_FromString(const char* str);
 
-// @brief 整数から PyObject を生成する．
-// @param[in] val 整数値
+/// @brief 整数から PyObject を生成する．
+/// @param[in] val 整数値
 extern
 PyObject*
 Val3_FromLong(long val);
 
-// @brief SaFault から PyObject を生成する．
-// @param[in] obj SaFault オブジェクト
+/// @brief FaultStatus から PyObject を生成する．
+/// @param[in] obj FaultStatus オブジェクト
+extern
+PyObject*
+FaultStatus_FromFaultStatus(FaultStatus obj);
+
+/// @brief 文字列から PyObject を生成する．
+/// @param[in] str 文字列
+extern
+PyObject*
+FaultStatus_FromString(const char* str);
+
+/// @brief SaFault から PyObject を生成する．
+/// @param[in] obj SaFault オブジェクト
 extern
 PyObject*
 SaFault_FromSaFault(SaFault* obj);

@@ -28,6 +28,9 @@ struct FaultMgrObject
   // FaultMgr のポインタ
   FaultMgr* mPtr;
 
+  // 故障の ID をキーにして故障の PyObject を収めたハッシュ表
+  hash_map<ymuint, PyObject*>* mFaultHash;
+
 };
 
 
@@ -45,17 +48,19 @@ FaultMgr_new(PyTypeObject* type)
     return NULL;
   }
 
-  // ここではポインタを NULL にしておく．
-  self->mPtr = NULL;
+  self->mPtr = new FaultMgr();
+  self->mFaultHash = NULL;
 
   return self;
 }
 
 // FaultMgrObject を開放する関数
 void
-FaultMgr_dealloc(FaultMgr* self)
+FaultMgr_dealloc(FaultMgrObject* self)
 {
-  // FaultMgr は開放しない．
+  delete self->mPtr;
+
+  delete self->mFaultHash;
 
   PyObject_Del(self);
 }
@@ -65,7 +70,111 @@ int
 FaultMgr_init(FaultMgrObject* self,
 	      PyObject* args)
 {
+  // なにもしない．
   return 0;
+}
+
+// 故障に対応する Python オブジェクトを得る．
+PyObject*
+fobject(SaFault* f,
+	hash_map<ymuint, PyObject*>& fmap)
+{
+  hash_map<ymuint, PyObject*>::iterator p = fmap.find(f->id());
+  if ( p == fmap.end() ) {
+    PyObject* obj = SaFault_FromSaFault(f);
+    fmap.insert(make_pair(f->id(), obj));
+    return obj;
+  }
+  else {
+    return p->second;
+  }
+}
+
+// 故障のリストを表す Python オブジェクトを得る．
+PyObject*
+flist(const vector<SaFault*>& fault_list,
+      hash_map<ymuint, PyObject*>& fmap)
+{
+  ymuint n = fault_list.size();
+  PyObject* list_obj = PyList_New(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    SaFault* f = fault_list[i];
+    PyObject* obj1 = fobject(f, fmap);
+    PyList_SetItem(list_obj, i, obj1);
+  }
+  return list_obj;
+}
+
+// 全ての故障のリストを得る．
+PyObject*
+FaultMgr_all_list(FaultMgrObject* self,
+		  PyObject* args)
+{
+  return flist(self->mPtr->all_list(), *self->mFaultHash);
+}
+
+// 全ての代表故障のリストを得る．
+PyObject*
+FaultMgr_rep_list(FaultMgrObject* self,
+		  PyObject* args)
+{
+  return flist(self->mPtr->all_rep_list(), *self->mFaultHash);
+}
+
+// 検出済みの代表故障のリストを得る．
+PyObject*
+FaultMgr_det_list(FaultMgrObject* self,
+		  PyObject* args)
+{
+  return flist(self->mPtr->det_list(), *self->mFaultHash);
+}
+
+// 未検出の代表故障のリストを得る．
+PyObject*
+FaultMgr_remain_list(FaultMgrObject* self,
+		     PyObject* args)
+{
+  return flist(self->mPtr->remain_list(), *self->mFaultHash);
+}
+
+// 検出不能故障のリストを得る．
+PyObject*
+FaultMgr_untest_list(FaultMgrObject* self,
+		     PyObject* args)
+{
+  return flist(self->mPtr->untest_list(), *self->mFaultHash);
+}
+
+// 出力の故障を取り出す．
+PyObject*
+FaultMgr_find_ofault(FaultMgrObject* self,
+		     PyObject* args)
+{
+}
+
+// 入力の故障を取り出す．
+PyObject*
+FaultMgr_find_ifault(FaultMgrObject* self,
+		     PyObject* args)
+{
+}
+
+// クリアする．
+PyObject*
+FaultMgr_clear(FaultMgrObject* self,
+	       PyObject* args)
+{
+  self->mPtr->clear();
+  self->mFaultHash->clear();
+
+
+}
+
+// 故障の状態を変更する．
+PyObject*
+FaultMgr_set_status(FaultMgrObject* self,
+		    PyObject* args)
+{
 }
 
 
@@ -73,6 +182,16 @@ FaultMgr_init(FaultMgrObject* self,
 // FaultMgrObject のメソッドテーブル
 //////////////////////////////////////////////////////////////////////
 PyMethodDef FaultMgr_methods[] = {
+  {"all_list", (PyCFunction)FaultMgr_all_list, METH_NOARGS,
+   PyDoc_STR("return list of all faults (NONE)")},
+  {"rep_list", (PyCFunction)FaultMgr_rep_list, METH_NOARGS,
+   PyDoc_STR("return list of representative faults (NONE)")},
+  {"det_list", (PyCFunction)FaultMgr_det_list, METH_NOARGS,
+   PyDoc_STR("return list of detected faults (NONE)")},
+  {"remain_list", (PyCFunction)FaultMgr_remain_list, METH_NOARGS,
+   PyDoc_STR("return list of remain faults (NONE)")},
+  {"untest_list", (PyCFunction)FaultMgr_untest_list, METH_NOARGS,
+   PyDoc_STR("return list of untestable faults (NONE)")},
   {NULL, NULL, 0, NULL}
 };
 

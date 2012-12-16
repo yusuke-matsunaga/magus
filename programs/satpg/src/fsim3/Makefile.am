@@ -14,6 +14,7 @@ libatpg_fsim3_la_CPPFLAGS = \
 	-I$(top_srcdir)/include
 
 libatpg_fsim3_la_SOURCES = \
+	fsim3_nsdef.h \
 	EqElem.h \
 	SimNode.h \
 	SimNode.cc \

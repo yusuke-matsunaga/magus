@@ -435,7 +435,7 @@ Fsim::run(const vector<TestVector*>& tv_array,
     for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
       FsimFault* ff = flist[rpos];
       SaFault* f = ff->mOrigF;
-      if ( f->status() == kFsUndetected || f->status() == kFsAbort ) {
+      if ( f->status() == kFsUndetected || f->status() == kFsAborted ) {
 	PackedVal dbits = obs & ff->mObsMask;
 	if ( dbits ) {
 	  ymuint l;
@@ -685,7 +685,7 @@ Fsim::fault_sweep(SimFFR* ffr,
   for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
     FsimFault* ff = flist[rpos];
     SaFault* f = ff->mOrigF;
-    if ( f->status() == kFsUndetected || f->status() == kFsAbort ) {
+    if ( f->status() == kFsUndetected || f->status() == kFsAborted ) {
       if ( ff->mObsMask ) {
 	det_faults.push_back(f);
       }

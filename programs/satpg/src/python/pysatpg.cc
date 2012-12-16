@@ -29,6 +29,9 @@ void
 Val3Object_init(PyObject* module);
 
 void
+FaultStatusObject_init(PyObject* module);
+
+void
 SaFaultObject_init(PyObject* module);
 
 void
@@ -63,6 +66,8 @@ satpg_init()
   //////////////////////////////////////////////////////////////////////
 
   Val3Object_init(m);
+
+  FaultStatusObject_init(m);
 
   SaFaultObject_init(m);
 

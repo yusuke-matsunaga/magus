@@ -10,29 +10,11 @@
 
 #include "satpg_nsdef.h"
 #include "Val3.h"
+#include "FaultStatus.h"
 #include "ym_networks/tgnet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
-
-class FaultMgr;
-class SaFault;
-class TestVector;
-
-//////////////////////////////////////////////////////////////////////
-/// @brief 故障の状態
-//////////////////////////////////////////////////////////////////////
-enum FaultStatus {
-  /// @brief 未検出
-  kFsUndetected,
-  /// @brief 検出
-  kFsDetected,
-  /// @brief テスト不能 (冗長)
-  kFsUntestable,
-  /// @brief アボート
-  kFsAbort
-};
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class Finfo Finfo.h "Finfo.h"
@@ -135,6 +117,10 @@ public:
   // read-only のメソッド
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ID番号を返す．
+  ymuint
+  id() const;
+
   /// @brief 対象のゲートを返す．
   const TgNode*
   node() const;
@@ -190,6 +176,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // ID番号
+  ymuint32 mId;
 
   // 対象のノード
   const TgNode* mNode;
@@ -283,6 +272,14 @@ FaultStatus
 Finfo::status() const
 {
   return mStatus;
+}
+
+// @brief ID番号を返す．
+inline
+ymuint
+SaFault::id() const
+{
+  return mId;
 }
 
 // @brief 対象のゲートを返す．
