@@ -158,13 +158,12 @@ AC_CONFIG_FILES([
 
 YM_EXTRA_SUBDIRS=""
 
-#if test "$ym_have_python" = 1; then
-#  YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS python"
-#  AC_CONFIG_FILES([
-#	src/python/Makefile
-#	src/python/base/Makefile
-#	])
-#fi
+if test "$ym_have_python" = 1; then
+  YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS python"
+  AC_CONFIG_FILES([
+	src/python/Makefile
+	])
+fi
 
 AC_SUBST([YM_EXTRA_SUBDIRS])
 
