@@ -28,6 +28,9 @@ struct SaFaultObject
   // SaFault のポインタ
   SaFault* mPtr;
 
+  // 故障の ID をキーにして故障の PyObject を収めたハッシュ表
+  hash_map<ymuint, PyObject*>* mFaultMap;
+
 };
 
 
@@ -72,8 +75,6 @@ SaFault_init(SaFaultObject* self,
 PyObject*
 SaFault_str(SaFaultObject* self)
 {
-  using namespace nsYm::nsPython;
-
   SaFault* f = self->mPtr;
 
   string str;
@@ -86,15 +87,101 @@ SaFault_str(SaFaultObject* self)
   return conv_to_pyobject(str);
 }
 
-// is_valid 関数
+// id 関数
 PyObject*
-SaFault_is_valid(SaFaultObject* self,
-		 PyObject* args)
+SaFault_id(SaFaultObject* self,
+	   PyObject* args)
 {
-  using namespace nsYm::nsPython;
+  return conv_to_pyobject(self->mPtr->id());
+}
 
-  bool is_valid = (self->mPtr != NULL);
-  return conv_to_pyobject(is_valid);
+// node 関数
+PyObject*
+SaFault_node(SaFaultObject* self,
+	     PyObject* args)
+{
+}
+
+// source_node 関数
+PyObject*
+SaFault_source_node(SaFaultObject* self,
+		    PyObject* args)
+{
+}
+
+// is_input_fault 関数
+PyObject*
+SaFault_is_input_fault(SaFaultObject* self,
+		       PyObject* args)
+{
+  return conv_to_pyobject(self->mPtr->is_input_fault());
+}
+
+// is_output_fault 関数
+PyObject*
+SaFault_is_output_fault(SaFaultObject* self,
+			PyObject* args)
+{
+  return conv_to_pyobject(self->mPtr->is_output_fault());
+}
+
+// pos 関数
+PyObject*
+SaFault_pos(SaFaultObject* self,
+	    PyObject* args)
+{
+  return conv_to_pyobject(self->mPtr->pos());
+}
+
+// val 関数
+PyObject*
+SaFault_val(SaFaultObject* self,
+	    PyObject* args)
+{
+  return conv_to_pyobject(self->mPtr->val());
+}
+
+// val3 関数
+PyObject*
+SaFault_val3(SaFaultObject* self,
+	     PyObject* args)
+{
+  return conv_to_pyobject(self->mPtr->val3());
+}
+
+// rep 関数
+PyObject*
+SaFault_rep(SaFaultObject* self,
+	    PyObject* args)
+{
+}
+
+// status 関数を返す．
+PyObject*
+SaFault_status(SaFaultObject* self,
+	       PyObject* args)
+{
+  return conv_to_pyobject(self->mPtr->status());
+}
+
+// pat_num 関数を返す．
+PyObject*
+SaFault_pat_num(SaFaultObject* self,
+		PyObject* args)
+{
+  return conv_to_pyobject(self->mPtr->pat_num());
+}
+
+// pat 関数
+PyObject*
+SaFault_pat(SaFaultObject* self,
+	    PyObject* args)
+{
+  ymuint pos;
+  if ( !PyArg_ParseTuple(args, "k", &pos) ) {
+    return NULL;
+  }
+  return conv_to_pyobject(self->mPtr->pat(pos));
 }
 
 
@@ -102,8 +189,30 @@ SaFault_is_valid(SaFaultObject* self,
 // SaFaultObject のメソッドテーブル
 //////////////////////////////////////////////////////////////////////
 PyMethodDef SaFault_methods[] = {
-  {"is_valid", (PyCFunction)SaFault_is_valid, METH_NOARGS,
-   PyDoc_STR("return true if valid (NONE)")},
+  {"id", (PyCFunction)SaFault_id, METH_NOARGS,
+   PyDoc_STR("return ID number (NONE)")},
+  {"node", (PyCFunction)SaFault_node, METH_NOARGS,
+   PyDoc_STR("return node (NONE)")},
+  {"source_node", (PyCFunction)SaFault_source_node, METH_NOARGS,
+   PyDoc_STR("return source node (NONE)")},
+  {"is_input_fault", (PyCFunction)SaFault_is_input_fault, METH_NOARGS,
+   PyDoc_STR("check if input fault (NONE)")},
+  {"is_output_fault", (PyCFunction)SaFault_is_output_fault, METH_NOARGS,
+   PyDoc_STR("check if output fault (NONE)")},
+  {"pos", (PyCFunction)SaFault_pos, METH_NOARGS,
+   PyDoc_STR("return fault's input position (NONE)")},
+  {"val", (PyCFunction)SaFault_val, METH_NOARGS,
+   PyDoc_STR("return fault's value (NONE)")},
+  {"val3", (PyCFunction)SaFault_val3, METH_NOARGS,
+   PyDoc_STR("return fault's value in ternary mode (NONE)")},
+  {"rep", (PyCFunction)SaFault_rep, METH_NOARGS,
+   PyDoc_STR("return representative fault (NONE)")},
+  {"status", (PyCFunction)SaFault_status, METH_NOARGS,
+   PyDoc_STR("return fault's status (NONE)")},
+  {"pat_num", (PyCFunction)SaFault_pat_num, METH_NOARGS,
+   PyDoc_STR("return pattern number (NONE)")},
+  {"pat", (PyCFunction)SaFault_pat, METH_VARARGS,
+   PyDoc_STR("return test pattern (int)")},
   {NULL, NULL, 0, NULL}
 };
 
