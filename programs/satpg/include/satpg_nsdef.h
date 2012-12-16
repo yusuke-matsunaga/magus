@@ -6,17 +6,19 @@
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: atpg_nsdef.h 2128 2009-03-12 07:25:33Z matsunaga $
-///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
+
+#include "ymtools.h"
+
 
 // 名前空間の定義ファイル
 // 必ず先頭でインクルードしなければならない．
 
+//////////////////////////////////////////////////////////////////////
+// 名前空間の定義用マクロ
 // namespace でネストするのがいやなので define マクロでごまかす．
-
-#include "ymtools.h"
+//////////////////////////////////////////////////////////////////////
 
 #define BEGIN_NAMESPACE_YM_SATPG \
 BEGIN_NAMESPACE_YM \
