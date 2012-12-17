@@ -235,7 +235,7 @@ AtpgMgr::dtpg_single()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->dtpg_single(mFaultMgr, mTvMgr);
+  mDtpg->single(mFaultMgr, mTvMgr);
 
   after_update_faults();
 
@@ -249,7 +249,7 @@ AtpgMgr::dtpg_dual()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->dtpg_dual(mFaultMgr, mTvMgr);
+  mDtpg->dual(mFaultMgr, mTvMgr);
 
   after_update_faults();
 
@@ -263,7 +263,7 @@ AtpgMgr::dtpg_ffr()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->dtpg_ffr(mFaultMgr, mTvMgr);
+  mDtpg->ffr(mFaultMgr, mTvMgr);
 
   after_update_faults();
 
@@ -277,7 +277,7 @@ AtpgMgr::dtpg_mffc()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->dtpg_mffc(mFaultMgr, mTvMgr);
+  mDtpg->mffc(mFaultMgr, mTvMgr);
 
   after_update_faults();
 
@@ -291,7 +291,7 @@ AtpgMgr::dtpg_all()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->dtpg_all(mFaultMgr, mTvMgr);
+  mDtpg->all(mFaultMgr, mTvMgr);
 
   after_update_faults();
 
@@ -305,7 +305,7 @@ AtpgMgr::dtpg_single_posplit()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->dtpg_single_posplit(mFaultMgr, mTvMgr);
+  mDtpg->single_posplit(mFaultMgr, mTvMgr);
 
   after_update_faults();
 
@@ -319,7 +319,7 @@ AtpgMgr::dtpg_dual_posplit()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->dtpg_dual_posplit(mFaultMgr, mTvMgr);
+  mDtpg->dual_posplit(mFaultMgr, mTvMgr);
 
   after_update_faults();
 
@@ -333,7 +333,7 @@ AtpgMgr::dtpg_ffr_posplit()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->dtpg_ffr_posplit(mFaultMgr, mTvMgr);
+  mDtpg->ffr_posplit(mFaultMgr, mTvMgr);
 
   after_update_faults();
 
@@ -347,7 +347,7 @@ AtpgMgr::dtpg_mffc_posplit()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->dtpg_mffc_posplit(mFaultMgr, mTvMgr);
+  mDtpg->mffc_posplit(mFaultMgr, mTvMgr);
 
   after_update_faults();
 
@@ -361,7 +361,7 @@ AtpgMgr::dtpg_all_posplit()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->dtpg_all_posplit(mFaultMgr, mTvMgr);
+  mDtpg->all_posplit(mFaultMgr, mTvMgr);
 
   after_update_faults();
 

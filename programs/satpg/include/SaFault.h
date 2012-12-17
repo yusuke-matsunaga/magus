@@ -154,10 +154,6 @@ public:
   string
   str() const;
 
-  /// @brief 代表故障を返す．
-  SaFault*
-  rep() const;
-
   /// @brief 状態を返す．
   FaultStatus
   status() const;
@@ -334,14 +330,6 @@ SaFault::val3() const
   else {
     return kVal0;
   }
-}
-
-// @brief 代表故障を返す．
-inline
-SaFault*
-SaFault::rep() const
-{
-  return mFinfo->rep();
 }
 
 // @brief 状態を返す．

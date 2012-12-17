@@ -79,25 +79,29 @@ public:
   ymuint
   untest_num() const;
 
+  /// @brief 代表故障を返す．
+  SaFault*
+  find_rep_fault(SaFault* f) const;
+
   /// @brief 出力の故障を取り出す．
   /// @param[in] node 対象のノード
   /// @param[in] val 縮退している値
   SaFault*
-  find_ofault(const TgNode* node,
-	      int val);
+  find_output_fault(const TgNode* node,
+		    int val);
 
   /// @brief 入力の故障を取り出す．
   /// @param[in] node 対象のノード
   /// @param[in] pos 入力の故障の時に入力番号を表す
   /// @param[in] val 縮退している値
   SaFault*
-  find_ifault(const TgNode* node,
-	      ymuint pos,
-	      int val);
+  find_input_fault(const TgNode* node,
+		   ymuint pos,
+		   int val);
 
   /// @brief 同じ箇所で反対の故障値を持つ故障を返す．
   SaFault*
-  find_alt_fault(SaFault* f);
+  find_alternative_fault(SaFault* f);
 
 
 public:

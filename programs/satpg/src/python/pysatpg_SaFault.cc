@@ -9,6 +9,7 @@
 
 #include "pysatpg.h"
 #include "SaFault.h"
+#include "ym_networks/TgNode.h"
 
 
 BEGIN_NAMESPACE_YM_PYSATPG
@@ -100,6 +101,8 @@ PyObject*
 SaFault_node(SaFaultObject* self,
 	     PyObject* args)
 {
+  const TgNode* node = self->mPtr->node();
+  return conv_to_pyobject(node->gid());
 }
 
 // source_node 関数
@@ -107,6 +110,15 @@ PyObject*
 SaFault_source_node(SaFaultObject* self,
 		    PyObject* args)
 {
+  const TgNode* node = self->mPtr->source_node();
+  if ( node != NULL ) {
+    return conv_to_pyobject(node->gid());
+  }
+  else {
+    PyErr_SetString(PyExc_ValueError,
+		    "not an input fault");
+    return NULL;
+  }
 }
 
 // is_input_fault 関数
@@ -149,13 +161,6 @@ SaFault_val3(SaFaultObject* self,
   return conv_to_pyobject(self->mPtr->val3());
 }
 
-// rep 関数
-PyObject*
-SaFault_rep(SaFaultObject* self,
-	    PyObject* args)
-{
-}
-
 // status 関数を返す．
 PyObject*
 SaFault_status(SaFaultObject* self,
@@ -191,9 +196,9 @@ SaFault_pat(SaFaultObject* self,
 PyMethodDef SaFault_methods[] = {
   {"id", (PyCFunction)SaFault_id, METH_NOARGS,
    PyDoc_STR("return ID number (NONE)")},
-  {"node", (PyCFunction)SaFault_node, METH_NOARGS,
+  {"node_id", (PyCFunction)SaFault_node, METH_NOARGS,
    PyDoc_STR("return node (NONE)")},
-  {"source_node", (PyCFunction)SaFault_source_node, METH_NOARGS,
+  {"source_node_id", (PyCFunction)SaFault_source_node, METH_NOARGS,
    PyDoc_STR("return source node (NONE)")},
   {"is_input_fault", (PyCFunction)SaFault_is_input_fault, METH_NOARGS,
    PyDoc_STR("check if input fault (NONE)")},
@@ -205,8 +210,6 @@ PyMethodDef SaFault_methods[] = {
    PyDoc_STR("return fault's value (NONE)")},
   {"val3", (PyCFunction)SaFault_val3, METH_NOARGS,
    PyDoc_STR("return fault's value in ternary mode (NONE)")},
-  {"rep", (PyCFunction)SaFault_rep, METH_NOARGS,
-   PyDoc_STR("return representative fault (NONE)")},
   {"status", (PyCFunction)SaFault_status, METH_NOARGS,
    PyDoc_STR("return fault's status (NONE)")},
   {"pat_num", (PyCFunction)SaFault_pat_num, METH_NOARGS,

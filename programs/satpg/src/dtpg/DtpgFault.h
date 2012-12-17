@@ -95,7 +95,7 @@ public:
   clear_stat();
 
   /// @brief 状態を返す．
-  tStat
+  FaultStatus
   stat() const;
 
 
@@ -123,7 +123,7 @@ private:
   TestVector* mTv;
 
   // 状態
-  tStat mStat;
+  FaultStatus mStat;
 
 };
 
@@ -137,7 +137,7 @@ inline
 DtpgFault::DtpgFault()
 {
   mTv = NULL;
-  mStat = kUndetect;
+  mStat = kFsUndetected;
 }
 
 // @brief デストラクタ
@@ -218,7 +218,7 @@ void
 DtpgFault::set_tv(TestVector* tv)
 {
   mTv = tv;
-  mStat = kDetect;
+  mStat = kFsDetected;
 }
 
 // @brief テストパタンを返す．
@@ -234,7 +234,7 @@ inline
 void
 DtpgFault::set_untest()
 {
-  mStat = kUntest;
+  mStat = kFsPartiallyUntestable;
 }
 
 // @brief 状態をクリアする(kUndetectに戻す)
@@ -242,12 +242,12 @@ inline
 void
 DtpgFault::clear_stat()
 {
-  mStat = kUndetect;
+  mStat = kFsUndetected;
 }
 
 // @brief 状態を返す．
 inline
-tStat
+FaultStatus
 DtpgFault::stat() const
 {
   return mStat;

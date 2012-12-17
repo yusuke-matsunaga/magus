@@ -145,6 +145,13 @@ FaultMgr_untest_list(FaultMgrObject* self,
   return flist(self->mPtr->untest_list(), *self->mFaultMap);
 }
 
+// 代表故障を取り出す．
+PyObject*
+FaultMgr_find_rep_fault(FaultMgrObject* self,
+			PyObject* args)
+{
+}
+
 // 出力の故障を取り出す．
 PyObject*
 FaultMgr_find_ofault(FaultMgrObject* self,

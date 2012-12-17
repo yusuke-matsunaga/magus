@@ -30,6 +30,11 @@ END_NAMESPACE_YM_SATPG
 BEGIN_NAMESPACE_YM_SATPG_DTPG
 
 class DtpgSat;
+class DtpgNetwork;
+class DtpgNode;
+class DtpgFFR;
+class DtpgFault;
+class DtpgOperator;
 
 END_NAMESPACE_YM_SATPG_DTPG
 

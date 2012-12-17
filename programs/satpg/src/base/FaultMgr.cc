@@ -153,8 +153,8 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
     if ( node->fanout_num() == 1 ) {
       const TgEdge* e = node->fanout_edge(0);
       if ( !e->to_node()->is_output() ) {
-	rep0 = find_ifault(e->to_node(), e->to_ipos(), 0);
-	rep1 = find_ifault(e->to_node(), e->to_ipos(), 1);
+	rep0 = find_input_fault(e->to_node(), e->to_ipos(), 0);
+	rep1 = find_input_fault(e->to_node(), e->to_ipos(), 1);
       }
     }
     add_ofault(node, 0, rep0);
@@ -171,8 +171,8 @@ FaultMgr::reg_faults(const TgNode* node)
   if ( node->fanout_num() == 1 ) {
     const TgEdge* e = node->fanout_edge(0);
     if ( !e->to_node()->is_output() ) {
-      rep0 = find_ifault(e->to_node(), e->to_ipos(), 0);
-      rep1 = find_ifault(e->to_node(), e->to_ipos(), 1);
+      rep0 = find_input_fault(e->to_node(), e->to_ipos(), 0);
+      rep1 = find_input_fault(e->to_node(), e->to_ipos(), 1);
     }
   }
   SaFault* f0 = add_ofault(node, 0, rep0);
@@ -276,12 +276,19 @@ FaultMgr::new_fault(const TgNode* node,
   return f;
 }
 
+// @brief 代表故障を返す．
+SaFault*
+FaultMgr::find_rep_fault(SaFault* f) const
+{
+  return f->mFinfo->rep();
+}
+
 // @brief 出力の故障を取り出す．
 // @param[in] node 対象のノード
 // @param[in] val 縮退している値
 SaFault*
-FaultMgr::find_ofault(const TgNode* node,
-		      int val)
+FaultMgr::find_output_fault(const TgNode* node,
+			    int val)
 {
   Fnode& fnode = mFnodeArray[node->gid()];
   SaFault* f = fnode.mOfault[val];
@@ -293,9 +300,9 @@ FaultMgr::find_ofault(const TgNode* node,
 // @param[in] pos 入力の故障の時に入力番号を表す
 // @param[in] val 縮退している値
 SaFault*
-FaultMgr::find_ifault(const TgNode* node,
-		      ymuint pos,
-		      int val)
+FaultMgr::find_input_fault(const TgNode* node,
+			   ymuint pos,
+			   int val)
 {
   Fnode& fnode = mFnodeArray[node->gid()];
   SaFault* f = fnode.mIfaults[pos * 2 + val];
@@ -304,7 +311,7 @@ FaultMgr::find_ifault(const TgNode* node,
 
 // @brief 同じ箇所で反対の故障値を持つ故障を返す．
 SaFault*
-FaultMgr::find_alt_fault(SaFault* f)
+FaultMgr::find_alternative_fault(SaFault* f)
 {
   const TgNode* node = f->node();
   int fval = f->val() ^ 1;
@@ -328,10 +335,10 @@ FaultMgr::add_fault(const TgNode* node,
 {
   SaFault* f = NULL;
   if ( is_output ) {
-    f = find_ofault(node, val);
+    f = find_output_fault(node, val);
   }
   else {
-    f = find_ifault(node, pos, val);
+    f = find_input_fault(node, pos, val);
   }
   f->mId = mAllList.size();
   mAllList.push_back(f);
