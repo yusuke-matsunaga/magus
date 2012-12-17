@@ -113,31 +113,13 @@ public:
   void
   set_gval(PackedVal pat);
 
-  /// @brief 正常値のセットを行う．(3値版)
-  /// @param[in] pat0, pat1 値
-  /// @note 通常は外部入力に対して行われる．
-  /// @note 故障値も同様にセットされる．
-  void
-  set_gval(PackedVal pat0,
-	   PackedVal pat1);
-
   /// @brief 正常値を得る．(2値版)
   PackedVal
   gval() const;
 
-  /// @breif 正常値を得る．(3値版)
-  void
-  gval(PackedVal& pat0,
-       PackedVal& pat1) const;
-
   /// @brief 故障値をセットする．(2値版)
   void
   set_fval(PackedVal pat);
-
-  /// @brief 故障値をセットする．(3値版)
-  void
-  set_fval(PackedVal pat0,
-	   PackedVal pat1);
 
   /// @brief 故障値のマスクをセットする．
   void
@@ -146,11 +128,6 @@ public:
   /// @brief 故障値を得る．(2値版)
   PackedVal
   fval() const;
-
-  /// @brief 故障値を得る．(3値版)
-  void
-  fval(PackedVal& pat0,
-       PackedVal& pat1) const;
 
   /// @brief 故障値をクリアする．
   void
