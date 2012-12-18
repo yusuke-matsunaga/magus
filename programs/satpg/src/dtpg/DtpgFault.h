@@ -101,8 +101,6 @@ private:
 
   // 故障位置 + 故障値 + スキップフラグ
   ymuint32 mPosVal;
-
-  bool mSkip;
 };
 
 
@@ -115,7 +113,6 @@ inline
 DtpgFault::DtpgFault()
 {
   mPosVal = 0;
-  mSkip = false;
 }
 
 // @brief デストラクタ

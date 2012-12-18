@@ -11,7 +11,8 @@
 
 #include "dtpg_nsdef.h"
 #include "ym_logic/VarId.h"
-#include "ym_networks/TgNode.h"
+#include "ym_logic/LogExpr.h"
+#include "ym_networks/tgnet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
@@ -26,6 +27,7 @@ class DtpgNode
 
 public:
 
+  /// @brief DtpgNetwork::mark_tfo_tfi() で用いられるマーク
   enum Mark {
     kNone,
     kTFO,
@@ -45,10 +47,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief もとのノードを得る．
-  const TgNode*
-  tgnode() const;
 
   /// @brief タイプ id を得る．
   tTgGateType
@@ -87,6 +85,10 @@ public:
   /// @brief 外部出力タイプの時に出力番号を返す．
   ymuint
   output_id() const;
+
+  /// @brief cplx_logic タイプのときに論理式を返す．
+  LogExpr
+  expr() const;
 
   /// @brief ファンイン数を得る．
   ymuint
@@ -187,11 +189,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 元のノード
-  const TgNode* mTgNode;
-
   // ID 番号
   ymuint32 mId;
+
+  // 入力/出力ノードの場合の通し番号
+  ymuint32 mLid;
+
+  // タイプ ID
+  tTgGateType mGateType;
+
+  // 論理式
+  LogExpr mExpr;
 
   // ファンイン数
   ymuint32 mFaninNum;
@@ -252,20 +260,12 @@ DtpgNode::~DtpgNode()
 {
 }
 
-// @brief もとのノードを得る．
-inline
-const TgNode*
-DtpgNode::tgnode() const
-{
-  return mTgNode;
-}
-
 // @brief タイプ id を得る．
 inline
 tTgGateType
 DtpgNode::type() const
 {
-  return mTgNode->type();
+  return mGateType;
 }
 
 // @brief 未定義タイプの時 true を返す．
@@ -273,7 +273,7 @@ inline
 bool
 DtpgNode::is_undef() const
 {
-  return mTgNode->is_undef();
+  return type() == kTgUndef;
 }
 
 // @brief 外部入力タイプの時 true を返す．
@@ -282,7 +282,7 @@ inline
 bool
 DtpgNode::is_input() const
 {
-  return mTgNode->is_input();
+  return type() == kTgInput;
 }
 
 // @brief 外部出力タイプの時 true を返す．
@@ -291,7 +291,7 @@ inline
 bool
 DtpgNode::is_output() const
 {
-  return mTgNode->is_output();
+  return type() == kTgOutput;
 }
 
 // @brief logic タイプの時 true を返す．
@@ -299,7 +299,7 @@ inline
 bool
 DtpgNode::is_logic() const
 {
-  return mTgNode->is_logic();
+  return static_cast<ymuint>(type()) >= static_cast<ymuint>(kTgBuff);
 }
 
 // @brief 組み込み型でない logic タイプの時 true を返す．
@@ -307,7 +307,7 @@ inline
 bool
 DtpgNode::is_cplx_logic() const
 {
-  return mTgNode->is_cplx_logic();
+  return static_cast<ymuint>(type()) >= static_cast<ymuint>(kTgUsrDef);
 }
 
 // @brief ID番号を得る．
@@ -323,7 +323,7 @@ inline
 ymuint
 DtpgNode::input_id() const
 {
-  return mTgNode->lid();
+  return mLid;
 }
 
 // @brief 外部出力タイプの時に出力番号を返す．
@@ -331,7 +331,15 @@ inline
 ymuint
 DtpgNode::output_id() const
 {
-  return mTgNode->lid();
+  return mLid;
+}
+
+// @brief cplx_logic タイプのときに論理式を返す．
+inline
+LogExpr
+DtpgNode::expr() const
+{
+  return mExpr;
 }
 
 // @brief ファンイン数を得る．

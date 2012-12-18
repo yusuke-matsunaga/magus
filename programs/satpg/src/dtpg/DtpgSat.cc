@@ -12,13 +12,7 @@
 #include "DtpgNode.h"
 #include "DtpgFFR.h"
 #include "DtpgFault.h"
-#include "DtpgOperator.h"
-#include "FaultMgr.h"
-#include "TvMgr.h"
-#include "TestVector.h"
 #include "ym_logic/SatSolver.h"
-#include "ym_logic/LogExpr.h"
-#include "ym_networks/TgNetwork.h"
 #include "Op1.h"
 
 

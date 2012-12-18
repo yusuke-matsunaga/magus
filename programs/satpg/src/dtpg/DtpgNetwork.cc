@@ -40,8 +40,7 @@ END_NONAMESPACE
 // @param[in] fault_list 故障リスト
 DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
 			 const vector<SaFault*>& fault_list) :
-  mAlloc(4096),
-  mTgNetwork(tgnetwork)
+  mAlloc(4096)
 {
   mNodeNum = tgnetwork.node_num();
   mInputNum = tgnetwork.input_num1();
@@ -68,21 +67,21 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
       const TgNode* tgnode = tgnetwork.input(i);
       DtpgNode* node = &mNodeArray[id];
       mInputArray[i] = node;
-      set_node(tgnode, node, id);
+      set_node(tgnode, tgnetwork, node, id);
     }
 
     ymuint nl = tgnetwork.logic_num();
     for (ymuint i = 0; i < nl; ++ i, ++ id) {
       const TgNode* tgnode = tgnetwork.sorted_logic(i);
       DtpgNode* node = &mNodeArray[id];
-      set_node(tgnode, node, id);
+      set_node(tgnode, tgnetwork, node, id);
     }
 
     for (ymuint i = 0; i < mOutputNum; ++ i, ++ id) {
       const TgNode* tgnode = tgnetwork.output(i);
       DtpgNode* node = &mNodeArray[id];
       mOutputArray[i] = node;
-      set_node(tgnode, node, id);
+      set_node(tgnode, tgnetwork, node, id);
     }
 
     assert_cond( id == mNodeNum, __FILE__, __LINE__);
@@ -425,13 +424,18 @@ DtpgNetwork::clear_node_mark(const vector<DtpgNode*>& tfo_list,
 // @param[in] id ID番号
 void
 DtpgNetwork::set_node(const TgNode* tgnode,
+		      const TgNetwork& tgnetwork,
 		      DtpgNode* node,
 		      ymuint id)
 {
   mNodeMap[tgnode->gid()] = node;
-  node->mTgNode = tgnode;
+  node->mGateType = tgnode->type();
   node->mId = id;
+  node->mLid = tgnode->lid();
 
+  if ( tgnode->is_cplx_logic() ) {
+    node->mExpr = tgnetwork.get_lexp(tgnode);
+  }
   ymuint ni = tgnode->ni();
   node->mFaninNum = ni;
   node->mFanins = alloc_nodearray(mAlloc, ni);

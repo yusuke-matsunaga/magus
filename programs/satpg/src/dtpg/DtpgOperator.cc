@@ -11,11 +11,9 @@
 #include "DtpgNode.h"
 #include "DtpgFault.h"
 #include "DtpgOperator.h"
-#include "TestVector.h"
 #include "ym_logic/SatSolver.h"
 #include "ym_logic/SatStats.h"
 #include "ym_logic/LogExpr.h"
-#include "ym_networks/TgNetwork.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
@@ -73,12 +71,12 @@ make_cnf_from_type(SatSolver& solver,
 
   case kTgOutput:
   case kTgBuff:
-    solver.add_clause(inputs[0], ~output);
-    solver.add_clause(~inputs[0], output);
+    solver.add_clause( inputs[0], ~output);
+    solver.add_clause(~inputs[0],  output);
     break;
 
   case kTgNot:
-    solver.add_clause(inputs[0], output);
+    solver.add_clause( inputs[0],  output);
     solver.add_clause(~inputs[0], ~output);
     break;
 
@@ -352,14 +350,12 @@ make_cnf_from_lexp(SatSolver& solver,
 // @brief ノードの入出力の関係を表す CNF を作る．
 void
 make_node_cnf(SatSolver& solver,
-	      DtpgNetwork& network,
 	      DtpgNode* node,
 	      Literal olit,
 	      const vector<Literal>& ilits)
 {
   if ( node->is_cplx_logic() ) {
-    LogExpr lexp = network.tgnetwork().get_lexp(node->tgnode());
-    make_cnf_from_lexp(solver, lexp, olit, ilits);
+    make_cnf_from_lexp(solver, node->expr(), olit, ilits);
   }
   else {
     make_cnf_from_type(solver, node->type(), olit, ilits);
@@ -419,7 +415,7 @@ make_prop_cnf(SatSolver& solver,
       inputs[i] = Literal(inode->gvar(), kPolPosi);
     }
     Literal output(node->gvar(), kPolPosi);
-    make_node_cnf(solver, network, node, output, inputs);
+    make_node_cnf(solver, node, output, inputs);
   }
   for (vector<DtpgNode*>::const_iterator p = tfo_list.begin();
        p != tfo_list.end(); ++ p) {
@@ -431,7 +427,7 @@ make_prop_cnf(SatSolver& solver,
       inputs[i] = Literal(inode->gvar(), kPolPosi);
     }
     Literal output(node->gvar(), kPolPosi);
-    make_node_cnf(solver, network, node, output, inputs);
+    make_node_cnf(solver, node, output, inputs);
   }
 
 
@@ -487,7 +483,7 @@ make_prop_cnf(SatSolver& solver,
     }
 
     // node の入力と出力の関係の clause を追加する．
-    make_node_cnf(solver, network, node, flit, inputs);
+    make_node_cnf(solver, node, flit, inputs);
 
     solver.add_clause(dep);
   }
@@ -506,7 +502,6 @@ make_prop_cnf(SatSolver& solver,
 // @param[in] ipos 故障のある入力の番号
 void
 make_ifault_cnf(SatSolver& solver,
-		DtpgNetwork& network,
 		DtpgNode* fnode,
 		ymuint ipos)
 {
@@ -542,7 +537,7 @@ make_ifault_cnf(SatSolver& solver,
   dep[1] = Literal(fsrc->dvar(), kPolPosi);
   solver.add_clause(dep);
 
-  make_node_cnf(solver, network, fnode, flit, inputs);
+  make_node_cnf(solver, fnode, flit, inputs);
 }
 
 // @brief 一つの SAT問題を解く．
@@ -593,7 +588,7 @@ dtpg_single(SatSolver& solver,
   DtpgNode* fsrc = fnode;
   if ( f->is_input_fault() ) {
     ymuint ipos = f->pos();
-    make_ifault_cnf(solver, network, fnode, ipos);
+    make_ifault_cnf(solver, fnode, ipos);
     fsrc = fnode->fanin(ipos);
   }
 
@@ -632,7 +627,7 @@ dtpg_dual(SatSolver& solver,
   DtpgNode* fsrc = fnode;
   if ( f0->is_input_fault() ) {
     ymuint ipos = f0->pos();
-    make_ifault_cnf(solver, network, fnode, ipos);
+    make_ifault_cnf(solver, fnode, ipos);
     fsrc = f0->source_node();
   }
 
@@ -780,7 +775,7 @@ dtpg_ffr(SatSolver& solver,
       solver.add_clause( glit, ~olit);
     }
     else {
-      make_node_cnf(solver, network, node, olit, inputs);
+      make_node_cnf(solver, node, olit, inputs);
     }
     if ( node != root ) { // root の分は make_prop_cnf() で作っている．
       Literal flit(node->fvar(), kPolPosi);

@@ -17,8 +17,6 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
-class TestVector;
-
 //////////////////////////////////////////////////////////////////////
 /// @class FaultMgr FaultMgr.h "FaultMgr.h"
 /// @brief 故障リストを表すクラス

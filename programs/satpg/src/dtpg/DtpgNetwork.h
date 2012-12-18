@@ -40,10 +40,6 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief もとの TgNetwork を返す．
-  const TgNetwork&
-  tgnetwork();
-
   /// @brief 一つの外部出力に関係するノードのみをアクティブにする．
   /// @param[in] pos 外部出力の位置番号
   void
@@ -141,6 +137,7 @@ private:
   /// @param[in] id ID番号
   void
   set_node(const TgNode* tgnode,
+	   const TgNetwork& tgnetwork,
 	   DtpgNode* node,
 	   ymuint id);
 
@@ -156,9 +153,6 @@ private:
 
   // DtpgNetwork 関係のメモリ確保を行なうオブジェクト
   SimpleAlloc mAlloc;
-
-  // もとのネットワーク
-  const TgNetwork& mTgNetwork;
 
   // 全ノード数
   ymuint32 mNodeNum;
@@ -202,14 +196,6 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief もとの TgNetwork を返す．
-inline
-const TgNetwork&
-DtpgNetwork::tgnetwork()
-{
-  return mTgNetwork;
-}
 
 // @brief ノード数を得る．
 inline

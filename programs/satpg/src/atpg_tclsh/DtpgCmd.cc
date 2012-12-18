@@ -15,31 +15,6 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
-BEGIN_NONAMESPACE
-
-void
-update_stat(tStat stat,
-	    FaultMgr& fmgr,
-	    SaFault* f,
-	    TestVector* tv,
-	    vector<TestVector*>& tv_list,
-	    TvMgr& tvmgr)
-{
-  if ( stat == kUntest ) {
-    // 検出不能
-    fmgr.set_status(f, kFsUntestable);
-  }
-  else if ( stat == kDetect ) {
-    // 検出
-    fmgr.set_status(f, kFsDetected);
-    TestVector* tmp_tv = tvmgr.new_vector();
-    tmp_tv->copy(*tv);
-    tv_list.push_back(tmp_tv);
-  }
-}
-
-END_NONAMESPACE
-
 //////////////////////////////////////////////////////////////////////
 // テストパタン生成を行うコマンド
 //////////////////////////////////////////////////////////////////////
