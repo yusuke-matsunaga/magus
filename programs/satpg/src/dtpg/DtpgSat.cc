@@ -440,7 +440,7 @@ DtpgSat::clear_skip()
   for (vector<DtpgFault*>::const_iterator p = flist.begin();
        p != flist.end(); ++ p) {
     DtpgFault* f = *p;
-    if ( f->is_skip() ) {
+    if ( f->is_skip() && f->safault()->status() == kFsUntestable ) {
       f->clear_skip();
     }
   }
