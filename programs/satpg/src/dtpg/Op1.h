@@ -24,7 +24,8 @@ public:
 
   /// @brief コンストラクタ
   Op1(FaultMgr& fmgr,
-      TvMgr& tvmgr);
+      TvMgr& tvmgr,
+      bool skip);
 
   /// @brief デストラクタ
   ~Op1();
@@ -56,6 +57,8 @@ private:
   FaultMgr& mFaultMgr;
 
   TvMgr& mTvMgr;
+
+  bool mSkip;
 
 };
 

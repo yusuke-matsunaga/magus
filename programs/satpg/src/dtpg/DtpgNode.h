@@ -16,8 +16,6 @@
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
 
-class DtpgFault;
-
 //////////////////////////////////////////////////////////////////////
 /// @class DtpgNode DtpgNode.h "DtpgNode.h"
 /// @brief DtpgSat 用のノードを表すクラス

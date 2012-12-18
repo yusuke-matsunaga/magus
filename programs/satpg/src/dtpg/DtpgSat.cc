@@ -19,83 +19,10 @@
 #include "ym_logic/SatSolver.h"
 #include "ym_logic/LogExpr.h"
 #include "ym_networks/TgNetwork.h"
+#include "Op1.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
-
-BEGIN_NONAMESPACE
-
-//////////////////////////////////////////////////////////////////////
-// DtpgSat 用の DtpgOperator
-//////////////////////////////////////////////////////////////////////
-class Operator1 :
-  public DtpgOperator
-{
-public:
-
-  /// @brief コンストラクタ
-  Operator1(FaultMgr& fmgr,
-	    TvMgr& tvmgr);
-
-  /// @brief デストラクタ
-  ~Operator1();
-
-
-public:
-
-  /// @brief テストパタンが見つかった場合に呼ばれる関数
-  virtual
-  void
-  set_detected(DtpgFault* f,
-	       TestVector* tv);
-
-  /// @brief 検出不能のときに呼ばれる関数
-  virtual
-  void
-  set_untestable(DtpgFault* f);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  FaultMgr& mFaultMgr;
-
-  TvMgr& mTvMgr;
-
-};
-
-// @brief コンストラクタ
-Operator1::Operator1(FaultMgr& fmgr,
-		     TvMgr& tvmgr) :
-  mFaultMgr(fmgr),
-  mTvMgr(tvmgr)
-{
-}
-
-// @brief デストラクタ
-Operator1::~Operator1()
-{
-}
-
-// @brief テストパタンが見つかった場合に呼ばれる関数
-void
-Operator1::set_detected(DtpgFault* f,
-			TestVector* tv)
-{
-  mFaultMgr.set_status(f->safault(), kFsDetected);
-}
-
-// @brief 検出不能のときに呼ばれる関数
-void
-Operator1::set_untestable(DtpgFault* f)
-{
-  mFaultMgr.set_status(f->safault(), kFsUntestable);
-}
-
-END_NONAMESPACE
-
 
 // @brief コンストラクタ
 DtpgSat::DtpgSat()
@@ -120,6 +47,121 @@ DtpgSat::set_network(const TgNetwork& tgnetwork,
   mNetwork = new DtpgNetwork(tgnetwork, fault_list);
 }
 
+// @brief single モードでテスト生成を行なう．
+void
+DtpgSat::single(FaultMgr& fmgr,
+		TvMgr& tvmgr)
+{
+  Op1 op(fmgr, tvmgr, true);
+  single(op);
+}
+
+// @brief dual モードでテスト生成を行なう．
+void
+DtpgSat::dual(FaultMgr& fmgr,
+	      TvMgr& tvmgr)
+{
+  Op1 op(fmgr, tvmgr, true);
+  dual(op);
+}
+
+// @brief ffr モードでテスト生成を行なう．
+void
+DtpgSat::ffr(FaultMgr& fmgr,
+	     TvMgr& tvmgr)
+{
+  Op1 op(fmgr, tvmgr, true);
+  ffr(op);
+}
+
+// @brief mffc モードでテスト生成を行なう．
+void
+DtpgSat::mffc(FaultMgr& fmgr,
+	      TvMgr& tvmgr)
+{
+  Op1 op(fmgr, tvmgr, true);
+  mffc(op);
+}
+
+// @brief all モードでテスト生成を行なう．
+void
+DtpgSat::all(FaultMgr& fmgr,
+	     TvMgr& tvmgr)
+{
+  Op1 op(fmgr, tvmgr, true);
+  all(op);
+}
+
+// @brief single モードでテスト生成を行なう．
+void
+DtpgSat::single_posplit(FaultMgr& fmgr,
+			TvMgr& tvmgr,
+			bool skip)
+{
+  Op1 op(fmgr, tvmgr, skip);
+  single_posplit(op);
+
+  if ( skip ) {
+    clear_skip();
+  }
+}
+
+// @brief dual モードでテスト生成を行なう．
+void
+DtpgSat::dual_posplit(FaultMgr& fmgr,
+		      TvMgr& tvmgr,
+		      bool skip)
+{
+  Op1 op(fmgr, tvmgr, skip);
+  dual_posplit(op);
+
+  if ( skip ) {
+    clear_skip();
+  }
+}
+
+// @brief ffr モードでテスト生成を行なう．
+void
+DtpgSat::ffr_posplit(FaultMgr& fmgr,
+		     TvMgr& tvmgr,
+		     bool skip)
+{
+  Op1 op(fmgr, tvmgr, skip);
+  ffr_posplit(op);
+
+  if ( skip ) {
+    clear_skip();
+  }
+}
+
+// @brief mffc モードでテスト生成を行なう．
+void
+DtpgSat::mffc_posplit(FaultMgr& fmgr,
+		      TvMgr& tvmgr,
+		      bool skip)
+{
+  Op1 op(fmgr, tvmgr, skip);
+  mffc_posplit(op);
+
+  if ( skip ) {
+    clear_skip();
+  }
+}
+
+// @brief all モードでテスト生成を行なう．
+void
+DtpgSat::all_posplit(FaultMgr& fmgr,
+		     TvMgr& tvmgr,
+		     bool skip)
+{
+  Op1 op(fmgr, tvmgr, skip);
+  all_posplit(op);
+
+  if ( skip ) {
+    clear_skip();
+  }
+}
+
 // @brief 一つの故障に対してテストパタン生成を行なう．
 // @param[in] op テスト生成後に呼ばれるファンクター
 void
@@ -130,7 +172,7 @@ DtpgSat::single(DtpgOperator& op)
   for (vector<DtpgFault*>::const_iterator p = flist.begin();
        p != flist.end(); ++ p) {
     DtpgFault* f = *p;
-    if ( f->stat() == kFsUndetected ) {
+    if ( !f->is_skip() ) {
       SatSolver solver(mType, mOption, mOutP);
       dtpg_single(solver, *mNetwork, f, op);
     }
@@ -213,7 +255,7 @@ DtpgSat::single_posplit(DtpgOperator& op)
     for (vector<DtpgFault*>::const_iterator p = flist.begin();
 	 p != flist.end(); ++ p) {
       DtpgFault* f = *p;
-      if ( f->stat() == kFsUndetected && f->node()->is_active() ) {
+      if ( !f->is_skip() && f->node()->is_active() ) {
 	SatSolver solver(mType, mOption, mOutP);
 	dtpg_single(solver, *mNetwork, f, op);
       }
@@ -312,10 +354,10 @@ DtpgSat::dual_mode_node(DtpgNode* node,
 {
   DtpgFault* f0 = node->output_fault(0);
   DtpgFault* f1 = node->output_fault(1);
-  if ( f0 != NULL && f0->stat() == kFsDetected ) {
+  if ( f0 != NULL && f0->is_skip() ) {
     f0 = NULL;
   }
-  if ( f1 != NULL && f1->stat() == kFsDetected ) {
+  if ( f1 != NULL && f1->is_skip() ) {
     f1 = NULL;
   }
   if ( f0 != NULL && f1 != NULL ) {
@@ -334,10 +376,10 @@ DtpgSat::dual_mode_node(DtpgNode* node,
   for (ymuint j = 0; j < ni; ++ j) {
     DtpgFault* f0 = node->input_fault(0, j);
     DtpgFault* f1 = node->input_fault(1, j);
-    if ( f0 != NULL && f0->stat() == kFsDetected ) {
+    if ( f0 != NULL && f0->is_skip() ) {
       f0 = NULL;
     }
-    if ( f1 != NULL && f1->stat() == kFsDetected ) {
+    if ( f1 != NULL && f1->is_skip() ) {
       f1 = NULL;
     }
     if ( f0 != NULL && f1 != NULL ) {
@@ -368,7 +410,7 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
     DtpgNode* node = *p;
     for (int val = 0; val < 2; ++ val) {
       DtpgFault* f = node->output_fault(val);
-      if ( f->stat() == kFsUndetected ) {
+      if ( f != NULL && !f->is_skip() ) {
 	flist.push_back(f);
       }
     }
@@ -376,7 +418,7 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
     for (ymuint i = 0; i < ni; ++ i) {
       for (int val = 0; val < 2; ++ val) {
 	DtpgFault* f = node->input_fault(val, i);
-	if ( f->stat() == kFsUndetected ) {
+	if ( f != NULL && !f->is_skip() ) {
 	  flist.push_back(f);
 	}
       }
@@ -389,6 +431,20 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
 
   SatSolver solver(mType, mOption, mOutP);
   dtpg_ffr(solver, *mNetwork, flist, ffr->root(), node_list, op);
+}
+
+// @brief スキップフラグを解除する．
+void
+DtpgSat::clear_skip()
+{
+  const vector<DtpgFault*>& flist = mNetwork->fault_list();
+  for (vector<DtpgFault*>::const_iterator p = flist.begin();
+       p != flist.end(); ++ p) {
+    DtpgFault* f = *p;
+    if ( f->is_skip() ) {
+      f->clear_skip();
+    }
+  }
 }
 
 // @brief StatsList をクリアする．

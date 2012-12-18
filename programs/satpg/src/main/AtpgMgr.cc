@@ -300,12 +300,16 @@ AtpgMgr::dtpg_all()
 
 // @brief 一つの故障に対してテストパタン生成を行なう．
 void
-AtpgMgr::dtpg_single_posplit()
+AtpgMgr::dtpg_single_posplit(bool skip)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->single_posplit(mFaultMgr, mTvMgr);
+  mDtpg->single_posplit(mFaultMgr, mTvMgr, skip);
+
+  if ( skip ) {
+    clear_untestable();
+  }
 
   after_update_faults();
 
@@ -314,12 +318,16 @@ AtpgMgr::dtpg_single_posplit()
 
 // @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
 void
-AtpgMgr::dtpg_dual_posplit()
+AtpgMgr::dtpg_dual_posplit(bool skip)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->dual_posplit(mFaultMgr, mTvMgr);
+  mDtpg->dual_posplit(mFaultMgr, mTvMgr, skip);
+
+  if ( skip ) {
+    clear_untestable();
+  }
 
   after_update_faults();
 
@@ -328,12 +336,16 @@ AtpgMgr::dtpg_dual_posplit()
 
 // @brief FFR 内の故障に対してテストパタン生成を行なう．
 void
-AtpgMgr::dtpg_ffr_posplit()
+AtpgMgr::dtpg_ffr_posplit(bool skip)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->ffr_posplit(mFaultMgr, mTvMgr);
+  mDtpg->ffr_posplit(mFaultMgr, mTvMgr, skip);
+
+  if ( skip ) {
+    clear_untestable();
+  }
 
   after_update_faults();
 
@@ -342,12 +354,16 @@ AtpgMgr::dtpg_ffr_posplit()
 
 // @brief MFFC 内の故障に対してテストパタン生成を行なう．
 void
-AtpgMgr::dtpg_mffc_posplit()
+AtpgMgr::dtpg_mffc_posplit(bool skip)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->mffc_posplit(mFaultMgr, mTvMgr);
+  mDtpg->mffc_posplit(mFaultMgr, mTvMgr, skip);
+
+  if ( skip ) {
+    clear_untestable();
+  }
 
   after_update_faults();
 
@@ -356,12 +372,16 @@ AtpgMgr::dtpg_mffc_posplit()
 
 // @brief 全ての故障に対してテストパタン生成を行なう．
 void
-AtpgMgr::dtpg_all_posplit()
+AtpgMgr::dtpg_all_posplit(bool skip)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->all_posplit(mFaultMgr, mTvMgr);
+  mDtpg->all_posplit(mFaultMgr, mTvMgr, skip);
+
+  if ( skip ) {
+    clear_untestable();
+  }
 
   after_update_faults();
 
@@ -401,6 +421,20 @@ USTime
 AtpgMgr::misc_time() const
 {
   return mTimer.time(TM_MISC);
+}
+
+// @brief kFsUntestable マークを消す．
+void
+AtpgMgr::clear_untestable()
+{
+  const vector<SaFault*>& flist = mFaultMgr.remain_list();
+  for (vector<SaFault*>::const_iterator p = flist.begin();
+       p != flist.end(); ++ p) {
+    SaFault* f = *p;
+    if ( f->status() == kFsUntestable ) {
+      mFaultMgr.set_status(f, kFsUndetected);
+    }
+  }
 }
 
 // @brief ネットワークをセットした後に呼ぶ関数

@@ -736,6 +736,9 @@ dtpg_ffr(SatSolver& solver,
       }
       for (ymint val = 0; val < 2; ++ val) {
 	DtpgFault* f = node->input_fault(val, i);
+	if ( f == NULL ) {
+	  continue;
+	}
 	hash_map<ymuint, ymuint>::iterator p = fid_map.find(f->id());
 	if ( p != fid_map.end() ) {
 	  ymuint fid = p->second;
@@ -754,6 +757,9 @@ dtpg_ffr(SatSolver& solver,
     VarId tmp_ovar = node->fvar();
     for (ymint val = 0; val < 2; ++ val) {
       DtpgFault* f = node->output_fault(val);
+      if ( f == NULL ) {
+	continue;
+      }
       hash_map<ymuint, ymuint>::iterator p = fid_map.find(f->id());
       if ( p != fid_map.end() ) {
 	ymuint fid = p->second;

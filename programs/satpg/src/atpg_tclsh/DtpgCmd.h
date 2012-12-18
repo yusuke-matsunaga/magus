@@ -79,6 +79,9 @@ private:
   // po オプションの解析用オブジェクト
   TclPopt* mPoptPo;
 
+  // skip オプションの解析用オブジェクト
+  TclPopt* mPoptSkip;
+
 };
 
 END_NAMESPACE_YM_SATPG

@@ -23,9 +23,11 @@ BEGIN_NAMESPACE_YM_SATPG_DTPG
 
 // @brief コンストラクタ
 Op1::Op1(FaultMgr& fmgr,
-	 TvMgr& tvmgr) :
+	 TvMgr& tvmgr,
+	 bool skip) :
   mFaultMgr(fmgr),
-  mTvMgr(tvmgr)
+  mTvMgr(tvmgr),
+  mSkip(skip)
 {
 }
 
@@ -55,6 +57,7 @@ Op1::set_detected(DtpgFault* f,
       tv->set_val(iid, kVal0);
     }
   }
+  f->set_skip();
   mFaultMgr.set_status(f->safault(), kFsDetected);
 }
 
@@ -62,6 +65,9 @@ Op1::set_detected(DtpgFault* f,
 void
 Op1::set_untestable(DtpgFault* f)
 {
+  if ( mSkip ) {
+    f->set_skip();
+  }
   mFaultMgr.set_status(f->safault(), kFsUntestable);
 }
 

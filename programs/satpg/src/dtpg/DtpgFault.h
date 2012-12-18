@@ -12,15 +12,7 @@
 #include "dtpg_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG
-
-class SaFault;
-
-END_NAMESPACE_YM_SATPG
-
 BEGIN_NAMESPACE_YM_SATPG_DTPG
-
-class DtpgNode;
 
 //////////////////////////////////////////////////////////////////////
 /// @class DtpgFault DtpgFault.h "DtpgFault.h"
@@ -77,26 +69,17 @@ public:
   int
   val() const;
 
-  /// @brief テストパタンを設定する．
-  /// @note 同時に検出済みになる．
+  /// @brief スキップフラグを返す．
+  bool
+  is_skip() const;
+
+  /// @brief スキップフラグをセットする．
   void
-  set_tv(TestVector* tv);
+  set_skip();
 
-  /// @brief テストパタンを返す．
-  TestVector*
-  tv() const;
-
-  /// @brief 検出不能の印をつける．
+  /// @brief スキップフラグをクリアする．
   void
-  set_untest();
-
-  /// @brief 状態をクリアする(kUndetectに戻す)
-  void
-  clear_stat();
-
-  /// @brief 状態を返す．
-  FaultStatus
-  stat() const;
+  clear_skip();
 
 
 private:
@@ -108,7 +91,7 @@ private:
   SaFault* mSaFault;
 
   // ID番号
-  ymuint mId;
+  ymuint32 mId;
 
   // 故障の出力側のノード
   DtpgNode* mNode;
@@ -116,15 +99,10 @@ private:
   // 故障の入力側のノード
   DtpgNode* mSrcNode;
 
-  // 故障位置 + 故障値
+  // 故障位置 + 故障値 + スキップフラグ
   ymuint32 mPosVal;
 
-  // テストパタン
-  TestVector* mTv;
-
-  // 状態
-  FaultStatus mStat;
-
+  bool mSkip;
 };
 
 
@@ -136,8 +114,8 @@ private:
 inline
 DtpgFault::DtpgFault()
 {
-  mTv = NULL;
-  mStat = kFsUndetected;
+  mPosVal = 0;
+  mSkip = false;
 }
 
 // @brief デストラクタ
@@ -200,7 +178,7 @@ inline
 ymuint
 DtpgFault::pos() const
 {
-  return (mPosVal >> 2);
+  return (mPosVal >> 3);
 }
 
 // @brief 故障値を返す．
@@ -211,46 +189,28 @@ DtpgFault::val() const
   return static_cast<int>((mPosVal >> 1) & 1);
 }
 
-// @brief テストパタンを設定する．
-// @note 同時に検出済みになる．
+// @brief スキップフラグを返す．
+inline
+bool
+DtpgFault::is_skip() const
+{
+  return static_cast<bool>((mPosVal >> 2) & 1U);
+}
+
+// @brief スキップフラグをセットする．
 inline
 void
-DtpgFault::set_tv(TestVector* tv)
+DtpgFault::set_skip()
 {
-  mTv = tv;
-  mStat = kFsDetected;
+  mPosVal |= 4U;
 }
 
-// @brief テストパタンを返す．
-inline
-TestVector*
-DtpgFault::tv() const
-{
-  return mTv;
-}
-
-// @brief 検出不能の印をつける．
+// @brief スキップフラグをクリアする．
 inline
 void
-DtpgFault::set_untest()
+DtpgFault::clear_skip()
 {
-  mStat = kFsPartiallyUntestable;
-}
-
-// @brief 状態をクリアする(kUndetectに戻す)
-inline
-void
-DtpgFault::clear_stat()
-{
-  mStat = kFsUndetected;
-}
-
-// @brief 状態を返す．
-inline
-FaultStatus
-DtpgFault::stat() const
-{
-  return mStat;
+  mPosVal &= ~4U;
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

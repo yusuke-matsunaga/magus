@@ -121,7 +121,7 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
       ymuint ipos = f->pos();
       const TgNode* tgsrc = f->source_node();
       df->mSrcNode = mNodeMap[tgsrc->gid()];
-      df->mPosVal = (ipos << 2) | (fval << 1) | 1U;
+      df->mPosVal = (ipos << 3) | (fval << 1) | 1U;
       node->mInputFault[ipos * 2 + fval] = df;
     }
     else {
@@ -458,6 +458,8 @@ DtpgNetwork::set_node(const TgNode* tgnode,
   }
   node->mOutputFault[0] = NULL;
   node->mOutputFault[1] = NULL;
+
+  node->mMarks = (static_cast<ymuint32>(DtpgNode::kNone) << 1);
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

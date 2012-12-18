@@ -72,6 +72,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			 "all mode");
   mPoptPo = new TclPopt(this, "po",
 			"po-split mode");
+  mPoptSkip = new TclPopt(this, "skip",
+			  "skip mode");
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptSatRec);
   new_popt_group(mPoptDual, mPoptFFR, mPoptMFFC, mPoptAll);
 }
@@ -148,10 +150,11 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   bool mffc_mode = mPoptMFFC->is_specified();
   bool all_mode = mPoptAll->is_specified();
   bool po_mode = mPoptPo->is_specified();
+  bool skip_mode = mPoptSkip->is_specified();
 
   if ( ffr_mode ) {
     if ( po_mode ) {
-      mgr().dtpg_ffr_posplit();
+      mgr().dtpg_ffr_posplit(skip_mode);
     }
     else {
       mgr().dtpg_ffr();
@@ -159,7 +162,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
   else if ( mffc_mode ) {
     if ( po_mode ) {
-      mgr().dtpg_mffc_posplit();
+      mgr().dtpg_mffc_posplit(skip_mode);
     }
     else {
       mgr().dtpg_mffc();
@@ -169,7 +172,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
   else if ( dual_mode ) {
     if ( po_mode ) {
-      mgr().dtpg_dual_posplit();
+      mgr().dtpg_dual_posplit(skip_mode);
     }
     else {
       mgr().dtpg_dual();
@@ -177,7 +180,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
   else {
     if ( po_mode ) {
-      mgr().dtpg_single_posplit();
+      mgr().dtpg_single_posplit(skip_mode);
     }
     else {
       mgr().dtpg_single();

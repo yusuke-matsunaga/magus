@@ -145,23 +145,23 @@ public:
 
   /// @brief 一つの故障に対してテストパタン生成を行なう．
   void
-  dtpg_single_posplit();
+  dtpg_single_posplit(bool skip);
 
   /// @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
   void
-  dtpg_dual_posplit();
+  dtpg_dual_posplit(bool skip);
 
   /// @brief FFR 内の故障に対してテストパタン生成を行なう．
   void
-  dtpg_ffr_posplit();
+  dtpg_ffr_posplit(bool skip);
 
   /// @brief MFFC 内の故障に対してテストパタン生成を行なう．
   void
-  dtpg_mffc_posplit();
+  dtpg_mffc_posplit(bool skip);
 
   /// @brief 全ての故障に対してテストパタン生成を行なう．
   void
-  dtpg_all_posplit();
+  dtpg_all_posplit(bool skip);
 
 
 public:
@@ -208,6 +208,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief kFsUntestable マークを消す．
+  void
+  clear_untestable();
 
   /// @brief ネットワークが変更された時に呼ばれる関数
   void
