@@ -249,7 +249,6 @@ DtpgSat::single_posplit(DtpgOperator& op)
   const vector<DtpgFault*>& flist = mNetwork->fault_list();
 
   ymuint no = mNetwork->output_num2();
-  vector<DtpgFault*> u_list;
   for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
     mNetwork->activate_po(po_pos);
     for (vector<DtpgFault*>::const_iterator p = flist.begin();
