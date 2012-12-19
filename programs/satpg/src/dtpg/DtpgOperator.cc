@@ -644,6 +644,25 @@ dtpg_dual(SatSolver& solver,
   solve(solver, f1, assumptions, input_list, op);
 }
 
+BEGIN_NONAMESPACE
+
+void
+mark_tfo(DtpgNode* node,
+	 hash_set<ymuint>& tfo_mark)
+{
+  if ( tfo_mark.count(node->id()) > 0 ) {
+    return;
+  }
+  tfo_mark.insert(node->id());
+
+  ymuint nfo = node->active_fanout_num();
+  for (ymuint i = 0; i < nfo; ++ i) {
+    mark_tfo(node->active_fanout(i), tfo_mark);
+  }
+}
+
+END_NONAMESPACE
+
 // @brief FFR 内の故障に対してテストパタン生成を行なう．
 // @param[in] solver SatSolver
 // @@aram[in] network 対象のネットワーク
@@ -794,15 +813,33 @@ dtpg_ffr(SatSolver& solver,
   for (ymuint i = 0; i < nf; ++ i) {
     DtpgFault* f = flist[i];
     vector<Literal> assumptions;
+#if 1
+    assumptions.reserve(node_list.size() + nf);
+    hash_set<ymuint> tfo_mark;
+    mark_tfo(f->node(), tfo_mark);
+    for (vector<DtpgNode*>::const_iterator p = node_list.begin();
+	 p != node_list.end(); ++ p) {
+      DtpgNode* node = *p;
+      if ( fnode_mark.count(node->id()) > 0 && tfo_mark.count(node->id()) == 0 ) {
+	Literal dlit(node->dvar(), kPolNega);
+	assumptions.push_back(dlit);
+      }
+    }
+#else
     ymuint nim = 0;
     for (DtpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
       ++ nim;
     }
     assumptions.reserve(nf + nim + 1);
+#endif
+
+    // 該当の故障に対する変数のみ1にする．
     for (ymuint j = 0; j < nf; ++ j) {
       tPol pol = (j == i) ? kPolPosi : kPolNega;
       assumptions.push_back(Literal(flt_var[j], pol));
     }
+
+    // dominator ノードの dvar は1でなければならない．
     for (DtpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
       Literal dlit(node->dvar(), kPolPosi);
       assumptions.push_back(dlit);
