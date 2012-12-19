@@ -449,6 +449,7 @@ YmSat::scan_watcher()
     SatClause* c = *p;
     reorder_clause(c);
   }
+
   for (vector<SatClause*>::iterator p = mLearntClause.begin();
        p != mLearntClause.end(); ++ p) {
     SatClause* c = *p;
@@ -461,10 +462,8 @@ void
 YmSat::reorder_clause(SatClause* c)
 {
   ymuint lit_num = c->lit_num();
-  if ( lit_num == 2 ) {
-    return;
-  }
 
+  // 充足リテラルの数
   ymuint ns = 0;
 
   // 最初に見つかった充足リテラルの位置
@@ -476,15 +475,15 @@ YmSat::reorder_clause(SatClause* c)
     if ( eval(l) != kB3True ) {
       continue;
     }
-    if ( ns == 0 ) {
+    ++ ns;
+    if ( ns == 1 ) {
       pos0 = i;
     }
-    else if ( ns == 1 ) {
+    else if ( ns == 2 ) {
       pos1 = i;
       // 充足リテラルが2個見つかったらあとはどうでもよい．
       break;
     }
-    ++ ns;
   }
 
   if ( ns == 0 ) {
