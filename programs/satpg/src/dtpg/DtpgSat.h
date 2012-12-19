@@ -243,7 +243,8 @@ private:
 
   /// @brief 統計情報を得る．
   void
-  update_stats(SatSolver& solver);
+  update_stats(SatSolver& solver,
+	       ymuint n);
 
 
 private:
@@ -266,8 +267,11 @@ private:
   // 対象の回路
   DtpgNetwork* mNetwork;
 
-  // SAT の実行回数
+  // CNF の生成回数
   ymuint32 mRunCount;
+
+  // SAT の実行回数
+  ymuint32 mSatCount;
 
   // restart の回数の総和
   ymuint64 mRestart;
