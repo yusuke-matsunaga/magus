@@ -129,18 +129,13 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
       node->mOutputFault[fval] = df;
     }
   }
-
   activate_all();
 }
 
 // @brief デストラクタ
 DtpgNetwork::~DtpgNetwork()
 {
-  delete [] mFaultChunk;
-
-  // 残りは mAlloc のデストラクタがすべて開放してくれる
 }
-
 
 BEGIN_NONAMESPACE
 

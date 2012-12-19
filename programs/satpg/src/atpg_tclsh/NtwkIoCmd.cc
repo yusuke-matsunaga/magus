@@ -30,7 +30,6 @@ ReadBlif::ReadBlif(AtpgMgr* mgr) :
 // @brief デストラクタ
 ReadBlif::~ReadBlif()
 {
-  // mMsgHandler は BlifParser(TgBlifReader) が責任をもって破壊してくれる．
 }
 
 // コマンド処理関数
@@ -86,7 +85,6 @@ ReadIscas89::ReadIscas89(AtpgMgr* mgr) :
 // @brief デストラクタ
 ReadIscas89::~ReadIscas89()
 {
-  // mMsgHandler は Iscas89Parser(TgIscas89Reader) が責任をもって破壊してくれる．
 }
 
 // コマンド処理関数

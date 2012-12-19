@@ -112,7 +112,6 @@ private:
 inline
 DtpgFault::DtpgFault()
 {
-  mPosVal = 0;
 }
 
 // @brief デストラクタ
