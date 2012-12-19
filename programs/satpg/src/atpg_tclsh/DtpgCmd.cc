@@ -127,6 +127,8 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   bool po_mode = mPoptPo->is_specified();
   bool skip_mode = mPoptSkip->is_specified();
 
+  mgr().clear_stats();
+
   if ( ffr_mode ) {
     if ( po_mode ) {
       mgr().dtpg_ffr_posplit(skip_mode);
@@ -165,6 +167,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   after_update_faults();
 
   if ( print_stats ) {
+    mgr().get_stats();
 #if 0
     const DtpgStats& stats = mDtpg.stats();
     cout << "********** dtpg **********" << endl

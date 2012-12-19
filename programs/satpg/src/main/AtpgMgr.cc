@@ -423,6 +423,20 @@ AtpgMgr::misc_time() const
   return mTimer.time(TM_MISC);
 }
 
+// @brief 統計情報をクリアする．
+void
+AtpgMgr::clear_stats()
+{
+  mDtpg->clear_stats();
+}
+
+// @brief 統計情報を得る．
+void
+AtpgMgr::get_stats()
+{
+  mDtpg->get_stats();
+}
+
 // @brief kFsUntestable マークを消す．
 void
 AtpgMgr::clear_untestable()

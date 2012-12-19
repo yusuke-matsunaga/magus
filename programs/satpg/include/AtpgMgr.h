@@ -60,6 +60,14 @@ public:
   vector<TestVector*>&
   _tv_list();
 
+  /// @brief 統計情報をクリアする．
+  void
+  clear_stats();
+
+  /// @brief 統計情報を得る．
+  void
+  get_stats();
+
 
 public:
   //////////////////////////////////////////////////////////////////////

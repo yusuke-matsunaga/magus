@@ -554,9 +554,7 @@ solve(SatSolver& solver,
 #else
   Bool3 ans = kB3True;
 #endif
-  SatStats sat_stat;
-  solver.get_stats(sat_stat);
-  //mStatsList.push_back(sat_stat);
+
   if ( ans == kB3True ) {
     op.set_detected(f, input_list, model);
   }

@@ -158,13 +158,13 @@ public:
 	      bool skip);
 #endif
 
-  /// @brief StatList をクリアする．
+  /// @brief 統計情報をクリアする．
   void
-  clear_stats_list();
+  clear_stats();
 
-  /// @brief StatList を得る．
-  const vector<SatStats>&
-  stats_list() const;
+  /// @brief 統計情報を得る．
+  void
+  get_stats() const;
 
 
 private:
@@ -241,6 +241,10 @@ private:
   void
   clear_skip();
 
+  /// @brief 統計情報を得る．
+  void
+  update_stats(SatSolver& solver);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -262,8 +266,35 @@ private:
   // 対象の回路
   DtpgNetwork* mNetwork;
 
-  // SatStats のリスト
-  vector<SatStats> mStatsList;
+  // SAT の実行回数
+  ymuint32 mRunCount;
+
+  // restart の回数の総和
+  ymuint64 mRestart;
+
+  // 変数の数の総和
+  ymuint64 mVarNum;
+
+  // 制約節の数の総和
+  ymuint64 mConstrClauseNum;
+
+  // 制約節のリテラル数の総和
+  ymuint64 mConstrLitNum;
+
+  // 学習節の数の総和
+  ymuint64 mLearntClauseNum;
+
+  // 学習節のリテラル数の総和
+  ymuint64 mLearntLitNum;
+
+  // コンフリクト数の総和
+  ymuint64 mConflictNum;
+
+  // decision 数の総和
+  ymuint64 mDecisionNum;
+
+  // implication数の総和
+  ymuint64 mPropagationNum;
 
 };
 

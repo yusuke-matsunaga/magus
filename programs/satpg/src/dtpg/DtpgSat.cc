@@ -169,6 +169,7 @@ DtpgSat::single(DtpgOperator& op)
     if ( !f->is_skip() ) {
       SatSolver solver(mType, mOption, mOutP);
       dtpg_single(solver, *mNetwork, f, op);
+      update_stats(solver);
     }
   }
 }
@@ -251,6 +252,7 @@ DtpgSat::single_posplit(DtpgOperator& op)
       if ( !f->is_skip() && f->node()->is_active() ) {
 	SatSolver solver(mType, mOption, mOutP);
 	dtpg_single(solver, *mNetwork, f, op);
+	update_stats(solver);
       }
     }
   }
@@ -356,14 +358,17 @@ DtpgSat::dual_mode_node(DtpgNode* node,
   if ( f0 != NULL && f1 != NULL ) {
     SatSolver solver(mType, mOption, mOutP);
     dtpg_dual(solver, *mNetwork, f0, f1, op);
+    update_stats(solver);
   }
   else if ( f0 != NULL ) {
     SatSolver solver(mType, mOption, mOutP);
     dtpg_single(solver, *mNetwork, f0, op);
+    update_stats(solver);
   }
   else if ( f1 != NULL ) {
     SatSolver solver(mType, mOption, mOutP);
     dtpg_single(solver, *mNetwork, f1, op);
+    update_stats(solver);
   }
   ymuint ni = node->fanin_num();
   for (ymuint j = 0; j < ni; ++ j) {
@@ -378,14 +383,17 @@ DtpgSat::dual_mode_node(DtpgNode* node,
     if ( f0 != NULL && f1 != NULL ) {
       SatSolver solver(mType, mOption, mOutP);
       dtpg_dual(solver, *mNetwork, f0, f1, op);
+      update_stats(solver);
     }
     else if ( f0 != NULL ) {
       SatSolver solver(mType, mOption, mOutP);
       dtpg_single(solver, *mNetwork, f0, op);
+      update_stats(solver);
     }
     else if ( f1 != NULL ) {
       SatSolver solver(mType, mOption, mOutP);
       dtpg_single(solver, *mNetwork, f1, op);
+      update_stats(solver);
     }
   }
 }
@@ -424,6 +432,7 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
 
   SatSolver solver(mType, mOption, mOutP);
   dtpg_ffr(solver, *mNetwork, flist, ffr->root(), node_list, op);
+  update_stats(solver);
 }
 
 // @brief スキップフラグを解除する．
@@ -440,18 +449,58 @@ DtpgSat::clear_skip()
   }
 }
 
-// @brief StatsList をクリアする．
+// @brief 統計情報をクリアする．
 void
-DtpgSat::clear_stats_list()
+DtpgSat::clear_stats()
 {
-  mStatsList.clear();
+  mRunCount = 0;
+  mRestart = 0;
+  mVarNum = 0;
+  mConstrClauseNum = 0;
+  mConstrLitNum = 0;
+  mLearntClauseNum = 0;
+  mLearntLitNum = 0;
+  mConflictNum = 0;
+  mDecisionNum = 0;
+  mPropagationNum = 0;
 }
 
-// @brief StatsList を得る．
-const vector<SatStats>&
-DtpgSat::stats_list() const
+// @brief 統計情報を得る．
+void
+DtpgSat::get_stats() const
 {
-  return mStatsList;
+  if ( mRunCount > 0 ) {
+    cout << "# of runs:                     " << mRunCount << endl
+	 << "Ave. # of restarts:            " << (double) mRestart / mRunCount << endl
+	 << "Ave. # of varriables:          " << (double) mVarNum / mRunCount << endl
+	 << "Ave. # of constraint clauses:  " << (double) mConstrClauseNum / mRunCount << endl
+	 << "Ave. # of constraint literals: " << (double) mConstrLitNum / mRunCount << endl
+	 << "Ave. # of learnt clauses:      " << (double) mLearntClauseNum / mRunCount << endl
+	 << "Ave. # of learnt literals:     " << (double) mLearntLitNum / mRunCount << endl
+	 << "Ave. # of conflicts:           " << (double) mConflictNum / mRunCount << endl
+	 << "Ave. # of decisions:           " << (double) mDecisionNum / mRunCount << endl
+	 << "Av.e # of implications:        " << (double) mPropagationNum / mRunCount << endl
+	 << endl;
+  }
+}
+
+// @brief 統計情報を得る．
+void
+DtpgSat::update_stats(SatSolver& solver)
+{
+  SatStats sat_stat;
+  solver.get_stats(sat_stat);
+
+  ++ mRunCount;
+  mRestart += sat_stat.mRestart;
+  mVarNum += sat_stat.mVarNum;
+  mConstrClauseNum += sat_stat.mConstrClauseNum;
+  mConstrLitNum += sat_stat.mConstrLitNum;
+  mLearntClauseNum += sat_stat.mLearntClauseNum;
+  mLearntLitNum += sat_stat.mLearntLitNum;
+  mConflictNum += sat_stat.mConflictNum;
+  mDecisionNum += sat_stat.mDecisionNum;
+  mPropagationNum += sat_stat.mPropagationNum;
 }
 
 END_NAMESPACE_YM_SATPG_DTPG
