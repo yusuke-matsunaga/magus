@@ -548,19 +548,18 @@ solve(SatSolver& solver,
       const vector<DtpgNode*>& input_list,
       DtpgOperator& op)
 {
-  vector<Bool3> model;
 #if 1
+  vector<Bool3> model;
   Bool3 ans = solver.solve(assumptions, model);
-#else
-  Bool3 ans = kB3True;
-#endif
-
   if ( ans == kB3True ) {
     op.set_detected(f, input_list, model);
   }
   else if ( ans == kB3False ) {
     op.set_untestable(f);
   }
+#else
+  f->set_skip();
+#endif
 }
 
 END_NONAMESPACE
