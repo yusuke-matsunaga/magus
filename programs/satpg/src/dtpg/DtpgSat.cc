@@ -195,11 +195,11 @@ DtpgSat::ffr(DtpgOperator& op)
   mNetwork->activate_all();
   vector<DtpgFFR*> ffr_list;
   mNetwork->get_ffr_list(ffr_list);
-  cout << "#FFR = " << ffr_list.size() << endl;
   for (vector<DtpgFFR*>::const_iterator p = ffr_list.begin();
        p != ffr_list.end(); ++ p) {
     DtpgFFR* ffr = *p;
     ffr_mode(ffr, op);
+    delete ffr;
   }
 }
 
@@ -211,11 +211,11 @@ DtpgSat::mffc(DtpgOperator& op)
   mNetwork->activate_all();
   vector<DtpgFFR*> mffc_list;
   mNetwork->get_mffc_list(mffc_list);
-  cout << "#MFFC = " << mffc_list.size() << endl;
   for (vector<DtpgFFR*>::const_iterator p = mffc_list.begin();
        p != mffc_list.end(); ++ p) {
     DtpgFFR* ffr = *p;
     ffr_mode(ffr, op);
+    delete ffr;
   }
 }
 
@@ -288,6 +288,7 @@ DtpgSat::ffr_posplit(DtpgOperator& op)
 	 p != ffr_list.end(); ++ p) {
       DtpgFFR* ffr = *p;
       ffr_mode(ffr, op);
+      delete ffr;
     }
   }
 }
@@ -306,6 +307,7 @@ DtpgSat::mffc_posplit(DtpgOperator& op)
 	 p != mffc_list.end(); ++ p) {
       DtpgFFR* ffr = *p;
       ffr_mode(ffr, op);
+      delete ffr;
     }
   }
 }
@@ -315,16 +317,40 @@ DtpgSat::mffc_posplit(DtpgOperator& op)
 void
 DtpgSat::all_posplit(DtpgOperator& op)
 {
-#if 0
-  mNetwork->activate_po(po_pos);
-  vector<DtpgFFR*> ffr_list;
-  mNetwork->get_ffr_list(ffr_list);
-  for (vector<DtpgFFR*>::const_iterator p = ffr_list.begin();
-       p != ffr_list.end(); ++ p) {
-    DtpgFFR* ffr = *p;
-    ffr_mode(ffr, tvmgr, d_list, u_list);
+  ymuint no = mNetwork->output_num2();
+  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+    mNetwork->activate_po(po_pos);
+    vector<DtpgFault*> flist;
+    ymuint n = mNetwork->active_node_num();
+    vector<DtpgNode*> node_list;
+    node_list.reserve(n);
+    for (ymuint i = 0; i < n; ++ i) {
+      DtpgNode* node = mNetwork->active_node(i);
+      node_list.push_back(node);
+      for (int val = 0; val < 2; ++ val) {
+	DtpgFault* f = node->output_fault(val);
+	if ( f != NULL && !f->is_skip() ) {
+	  flist.push_back(f);
+	}
+      }
+      ymuint ni = node->fanin_num();
+      for (ymuint i = 0; i < ni; ++ i) {
+	for (int val = 0; val < 2; ++ val) {
+	  DtpgFault* f = node->input_fault(val, i);
+	  if ( f != NULL && !f->is_skip() ) {
+	    flist.push_back(f);
+	  }
+	}
+      }
+    }
+    if ( flist.empty() ) {
+      continue;
+    }
+
+    SatSolver solver(mType, mOption, mOutP);
+    dtpg_ffr(solver, *mNetwork, flist, mNetwork->output(po_pos), node_list, op);
+    update_stats(solver, flist.size());
   }
-#endif
 }
 
 // @brief 使用する SAT エンジンを指定する．

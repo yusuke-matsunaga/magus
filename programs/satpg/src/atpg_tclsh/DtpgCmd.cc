@@ -146,6 +146,12 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     }
   }
   else if ( all_mode ) {
+    if ( po_mode ) {
+      mgr().dtpg_all_posplit(skip_mode);
+    }
+    else {
+      mgr().dtpg_all();
+    }
   }
   else if ( dual_mode ) {
     if ( po_mode ) {
