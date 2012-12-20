@@ -425,17 +425,23 @@ void
 YmSat::del_watcher(Literal watch_lit,
 		   SatReason reason)
 {
+  Watcher w0(reason);
   WatcherList& wlist = watcher_list(watch_lit);
   ymuint n = wlist.num();
   ymuint wpos = 0;
-  for (ymuint rpos = 0; rpos < n; ++ rpos) {
-    Watcher w = wlist.elem(rpos);
-    if ( w != Watcher(reason) ) {
-      wlist.set_elem(wpos, w);
-      ++ wpos;
+  for ( ; wpos < n; ++ wpos) {
+    Watcher w = wlist.elem(wpos);
+    if ( w == w0 ) {
+      break;
     }
   }
-  wlist.erase(wpos);
+  assert_cond( wpos < n, __FILE__, __LINE__);
+  -- n;
+  for ( ; wpos < n; ++ wpos) {
+    Watcher w = wlist.elem(wpos + 1);
+    wlist.set_elem(wpos, w);
+  }
+  wlist.erase(n);
 }
 
 // watcher list を整理する．
@@ -463,87 +469,31 @@ YmSat::reorder_clause(SatClause* c)
 {
   ymuint lit_num = c->lit_num();
 
-  // 充足リテラルの数
-  ymuint ns = 0;
-
   // 最初に見つかった充足リテラルの位置
-  ymuint pos0 = lit_num;
-  // 2番めに見つかった充足リテラルの位置
-  ymuint pos1 = lit_num;
+  ymuint pos0 = 0;
   for (ymuint i = 0; i < lit_num; ++ i) {
     Literal l = c->lit(i);
-    if ( eval(l) != kB3True ) {
-      continue;
-    }
-    ++ ns;
-    if ( ns == 1 ) {
+    if ( eval(l) == kB3True ) {
       pos0 = i;
-    }
-    else if ( ns == 2 ) {
-      pos1 = i;
-      // 充足リテラルが2個見つかったらあとはどうでもよい．
+      // 充足リテラルが見つかったらあとはどうでもよい．
       break;
     }
   }
 
-  if ( ns == 0 ) {
+  if ( pos0 < 2 ) {
+    // 移動の必要無し
     return;
   }
 
-  if ( ns == 1 ) {
-    if ( pos0 < 2 ) {
-      // 移動の必要無し
-      return;
-    }
-    // 0 番めと pos0 番めのリテラルを入れ替える．
-    Literal l0 = c->lit0();
-    Literal l2 = c->lit(pos0);
-    c->lit0() = l2;
-    c->lit(pos0) = l0;
-    del_watcher(~l0, SatReason(c));
-    add_watcher(~l2, SatReason(c));
+  // pos0 番めのリテラルを0番めに移動
+  // 0番めから (pos0 - 1) 番めまのでリテラルをひとつずつ後ろにずらす．
+  Literal new_l0 = c->lit(pos0);
+  for (ymuint i = pos0; i > 0; -- i) {
+    c->lit(i) = c->lit(i - 1);
   }
-  else { // ns == 2
-    if ( pos1 == 1 ) {
-      // 移動の必要無し
-      return;
-    }
-    if ( pos0 == 0 ) {
-      // 1番めと pos1 番めのリテラルを入れ替える．
-      Literal l1 = c->lit1();
-      Literal l2 = c->lit(pos1);
-      c->lit1() = l2;
-      c->lit(pos1) = l1;
-      del_watcher(~l1, SatReason(c));
-      add_watcher(~l2, SatReason(c));
-    }
-    else if ( pos0 == 1 ) {
-      // 0番めと pos1 番めのリテラルを入れ替える．
-      Literal l0 = c->lit0();
-      Literal l2 = c->lit(pos1);
-      c->lit0() = l2;
-      c->lit(pos1) = l0;
-      del_watcher(~l0, SatReason(c));
-      add_watcher(~l2, SatReason(c));
-    }
-    else {
-      // 0番めとpos0番めのリテラルを入れ替える．
-      Literal l0 = c->lit0();
-      Literal l2 = c->lit(pos0);
-      c->lit0() = l2;
-      c->lit(pos0) = l0;
-      del_watcher(~l0, SatReason(c));
-      add_watcher(~l2, SatReason(c));
-
-      // 1番めと pos1 番めのリテラルを入れ替える．
-      Literal l1 = c->lit1();
-      Literal l3 = c->lit(pos1);
-      c->lit1() = l3;
-      c->lit(pos1) = l1;
-      del_watcher(~l1, SatReason(c));
-      add_watcher(~l3, SatReason(c));
-    }
-  }
+  c->lit0() = new_l0;
+  del_watcher(~(c->lit(2)), SatReason(c));
+  watcher_list(~new_l0).add(Watcher(SatReason(c)));
 }
 
 // @brief SAT 問題を解く．
@@ -622,10 +572,12 @@ YmSat::solve(const vector<Literal>& assumptions,
     }
   }
 
+#if 1
   if ( mScanWatcher ) {
     // 充足している節に対して watch literal の付け替えを行なう．
     scan_watcher();
   }
+#endif
 
   // 以降，現在のレベルが基底レベルとなる．
   mRootLevel = decision_level();
@@ -728,6 +680,8 @@ YmSat::reg_msg_handler(SatMsgHandler* msg_handler)
 Bool3
 YmSat::search()
 {
+  vector<Literal> learnt;
+
   // コンフリクトの起こった回数
   ymuint n_confl = 0;
   for ( ; ; ) {
@@ -748,7 +702,6 @@ YmSat::search()
       }
 
       // 今の矛盾の解消に必要な条件を「学習」する．
-      vector<Literal> learnt;
       int bt_level = mAnalyzer->analyze(conflict, learnt);
 
       if ( debug & debug_analyze ) {
@@ -859,7 +812,7 @@ YmSat::implication()
 	SatClause& c = w.clause();
 	Literal l0 = c.lit0();
 	if ( l0 == nl ) {
-	  // nl を 2番めのリテラルにする．
+	  // nl を 1番めのリテラルにする．
 	  l0 = c.lit1();
 	  c.lit0() = l0;
 	  c.lit1() = nl;
@@ -887,7 +840,10 @@ YmSat::implication()
 	  for (int i = 2; i < n; ++ i) {
 	    Literal l2 = c.lit(i);
 	    if ( eval(l2) != kB3False ) {
-	      c.lit(i) = nl;
+	      // l2 を 1番めに移動する．
+	      for (ymuint j = i; j > 1; -- j) {
+		c.lit(j) = c.lit(j - 1);
+	      }
 	      c.lit1() = l2;
 	      if ( debug & debug_implication ) {
 		cout << "\t\t\tsecond watching literal becomes "

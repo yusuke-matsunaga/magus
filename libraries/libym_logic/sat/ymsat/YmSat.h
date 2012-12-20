@@ -505,6 +505,9 @@ private:
   // 総 implication 数
   ymuint64 mPropagationNum;
 
+  // watch literal を変更した数
+  ymuint64 mWatchNum;
+
   // 二項制約節の数
   ymuint64 mConstrBinNum;
 
