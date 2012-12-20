@@ -168,6 +168,7 @@ DtpgSat::single(DtpgOperator& op)
     DtpgFault* f = *p;
     if ( !f->is_skip() ) {
       SatSolver solver(mType, mOption, mOutP);
+      mTimer.start();
       dtpg_single(solver, *mNetwork, f, op);
       update_stats(solver, 1);
     }
@@ -251,6 +252,7 @@ DtpgSat::single_posplit(DtpgOperator& op)
       DtpgFault* f = *p;
       if ( !f->is_skip() && f->node()->is_active() ) {
 	SatSolver solver(mType, mOption, mOutP);
+	mTimer.start();
 	dtpg_single(solver, *mNetwork, f, op);
 	update_stats(solver, 1);
       }
@@ -348,6 +350,7 @@ DtpgSat::all_posplit(DtpgOperator& op)
     }
 
     SatSolver solver(mType, mOption, mOutP);
+    mTimer.start();
     dtpg_ffr(solver, *mNetwork, flist, mNetwork->output(po_pos), node_list, op);
     update_stats(solver, flist.size());
   }
@@ -383,16 +386,19 @@ DtpgSat::dual_mode_node(DtpgNode* node,
   }
   if ( f0 != NULL && f1 != NULL ) {
     SatSolver solver(mType, mOption, mOutP);
+    mTimer.start();
     dtpg_dual(solver, *mNetwork, f0, f1, op);
     update_stats(solver, 2);
   }
   else if ( f0 != NULL ) {
     SatSolver solver(mType, mOption, mOutP);
+    mTimer.start();
     dtpg_single(solver, *mNetwork, f0, op);
     update_stats(solver, 1);
   }
   else if ( f1 != NULL ) {
     SatSolver solver(mType, mOption, mOutP);
+    mTimer.start();
     dtpg_single(solver, *mNetwork, f1, op);
     update_stats(solver, 1);
   }
@@ -408,16 +414,19 @@ DtpgSat::dual_mode_node(DtpgNode* node,
     }
     if ( f0 != NULL && f1 != NULL ) {
       SatSolver solver(mType, mOption, mOutP);
+      mTimer.start();
       dtpg_dual(solver, *mNetwork, f0, f1, op);
       update_stats(solver, 2);
     }
     else if ( f0 != NULL ) {
       SatSolver solver(mType, mOption, mOutP);
+      mTimer.start();
       dtpg_single(solver, *mNetwork, f0, op);
       update_stats(solver, 1);
     }
     else if ( f1 != NULL ) {
       SatSolver solver(mType, mOption, mOutP);
+      mTimer.start();
       dtpg_single(solver, *mNetwork, f1, op);
       update_stats(solver, 1);
     }
@@ -457,6 +466,7 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
   }
 
   SatSolver solver(mType, mOption, mOutP);
+  mTimer.start();
   dtpg_ffr(solver, *mNetwork, flist, ffr->root(), node_list, op);
   update_stats(solver, flist.size());
 }
@@ -490,6 +500,8 @@ DtpgSat::clear_stats()
   mConflictNum = 0;
   mDecisionNum = 0;
   mPropagationNum = 0;
+  mTimer.reset();
+  mTimer.start();
 }
 
 // @brief 統計情報を得る．
@@ -508,6 +520,7 @@ DtpgSat::get_stats() const
 	 << "Ave. # of conflicts:           " << (double) mConflictNum / mSatCount << endl
 	 << "Ave. # of decisions:           " << (double) mDecisionNum / mSatCount << endl
 	 << "Ave. # of implications:        " << (double) mPropagationNum / mSatCount << endl
+	 << "CPUT time:                     " << mTimer.time().usr_time() << endl
 	 << endl;
   }
 }
@@ -531,6 +544,7 @@ DtpgSat::update_stats(SatSolver& solver,
   mConflictNum += sat_stat.mConflictNum;
   mDecisionNum += sat_stat.mDecisionNum;
   mPropagationNum += sat_stat.mPropagationNum;
+  mTimer.stop();
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

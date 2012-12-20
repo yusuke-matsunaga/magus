@@ -13,6 +13,7 @@
 #include "dtpg_nsdef.h"
 #include "ym_networks/tgnet.h"
 #include "ym_logic/SatStats.h"
+#include "ym_utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
@@ -299,6 +300,9 @@ private:
 
   // implication数の総和
   ymuint64 mPropagationNum;
+
+  // タイマー
+  StopWatch mTimer;
 
 };
 
