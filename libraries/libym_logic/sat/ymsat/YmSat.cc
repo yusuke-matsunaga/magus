@@ -827,64 +827,67 @@ YmSat::implication()
 	}
 
 	Bool3 val0 = eval(l0);
-	if ( val0 != kB3True ) {
-	  if ( debug & debug_implication ) {
-	    cout << "\t\texamining watcher clause " << c << endl;
-	  }
+	if ( val0 == kB3True ) {
+	  // すでに充足していた．
+	  continue;
+	}
 
-	  // nl の替わりのリテラルを見つける．
-	  // この時，替わりのリテラルが未定かすでに充足しているかどうか
-	  // は問題でない．
-	  bool found = false;
-	  int n = c.lit_num();
-	  for (int i = 2; i < n; ++ i) {
-	    Literal l2 = c.lit(i);
-	    if ( eval(l2) != kB3False ) {
-	      // l2 を 1番めに移動する．
-	      for (ymuint j = i; j > 1; -- j) {
-		c.lit(j) = c.lit(j - 1);
-	      }
-	      c.lit1() = l2;
-	      if ( debug & debug_implication ) {
-		cout << "\t\t\tsecond watching literal becomes "
-		     << l2 << endl;
-	      }
-	      // l の watcher list からは取り除く
-	      -- wpos;
-	      // ~tmp の watcher list に追加する．
-	      watcher_list(~l2).add(w);
-	      found = true;
-	      break;
-	    }
-	  }
-	  if ( found ) {
-	    continue;
-	  }
+	if ( debug & debug_implication ) {
+	  cout << "\t\texamining watcher clause " << c << endl;
+	}
 
-	  if ( debug & debug_implication ) {
-	    cout << "\t\tno other watching literals" << endl;
-	  }
-
-	  // 見付からなかったので l0 に従った割り当てを行う．
-	  if ( val0 == kB3X ) {
-	    if ( debug & debug_assign ) {
-	      cout << "\tassign " << l0 << " @" << decision_level()
-		   << " from " << w << endl;
+	// nl の替わりのリテラルを見つける．
+	// この時，替わりのリテラルが未定かすでに充足しているかどうか
+	// は問題でない．
+	bool found = false;
+	ymuint n = c.lit_num();
+	for (ymuint i = 2; i < n; ++ i) {
+	  Literal l2 = c.lit(i);
+	  if ( eval(l2) != kB3False ) {
+	    // l2 を 1番めに移動する．
+	    for (ymuint j = i; j > 1; -- j) {
+	      c.lit(j) = c.lit(j - 1);
 	    }
-	    assign(l0, w);
-	  }
-	  else {
-	    // 矛盾がおこった．
-	    if ( debug & debug_assign ) {
-	      cout << "\t--> conflict with previous assignment" << endl
-		   << "\t    " << ~l0 << " was assigned at level "
-		   << decision_level(l0.varid()) << endl;
+	    c.lit1() = l2;
+	    if ( debug & debug_implication ) {
+	      cout << "\t\t\tsecond watching literal becomes "
+		   << l2 << endl;
 	    }
-	    // ループを抜けるためにキューの末尾まで先頭を動かす．
-	    mAssignList.skip_all();
-	    conflict = w;
+	    // l の watcher list からは取り除く
+	    -- wpos;
+	    // ~l2 の watcher list に追加する．
+	    watcher_list(~l2).add(w);
+	    found = true;
 	    break;
 	  }
+	}
+	if ( found ) {
+	  continue;
+	}
+
+	if ( debug & debug_implication ) {
+	  cout << "\t\tno other watching literals" << endl;
+	}
+
+	// 見付からなかったので l0 に従った割り当てを行う．
+	if ( val0 == kB3X ) {
+	  if ( debug & debug_assign ) {
+	    cout << "\tassign " << l0 << " @" << decision_level()
+		 << " from " << w << endl;
+	  }
+	  assign(l0, w);
+	}
+	else {
+	  // 矛盾がおこった．
+	  if ( debug & debug_assign ) {
+	    cout << "\t--> conflict with previous assignment" << endl
+		 << "\t    " << ~l0 << " was assigned at level "
+		 << decision_level(l0.varid()) << endl;
+	  }
+	  // ループを抜けるためにキューの末尾まで先頭を動かす．
+	  mAssignList.skip_all();
+	  conflict = w;
+	  break;
 	}
       }
     }
