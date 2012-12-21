@@ -800,15 +800,18 @@ YmSat::implication()
 		 << "\t    " << ~l0 << " was assigned at level "
 		 << decision_level(l0.varid()) << endl;
 	  }
+
 	  // ループを抜けるためにキューの末尾まで先頭を動かす．
 	  mAssignList.skip_all();
+
+	  // 矛盾の理由を表す節を作る．
 	  mTmpBinClause->mLits[0] = l0;
 	  mTmpBinClause->mLits[1] = nl;
 	  conflict = SatReason(mTmpBinClause);
 	  break;
 	}
       }
-      else {
+      else { // w.is_clause()
 	SatClause& c = w.clause();
 	Literal l0 = c.lit0();
 	if ( l0 == nl ) {
@@ -853,7 +856,7 @@ YmSat::implication()
 	      cout << "\t\t\tsecond watching literal becomes "
 		   << l2 << endl;
 	    }
-	    // l の watcher list からは取り除く
+	    // l の watcher list から取り除く
 	    -- wpos;
 	    // ~l2 の watcher list に追加する．
 	    watcher_list(~l2).add(w);
@@ -884,8 +887,11 @@ YmSat::implication()
 		 << "\t    " << ~l0 << " was assigned at level "
 		 << decision_level(l0.varid()) << endl;
 	  }
+
 	  // ループを抜けるためにキューの末尾まで先頭を動かす．
 	  mAssignList.skip_all();
+
+	  // この場合は w が矛盾の理由を表す節になっている．
 	  conflict = w;
 	  break;
 	}
