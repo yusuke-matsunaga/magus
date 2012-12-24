@@ -810,8 +810,9 @@ dtpg_ffr(SatSolver& solver,
   for (ymuint i = 0; i < nf; ++ i) {
     DtpgFault* f = flist[i];
     vector<Literal> assumptions;
-#if 1
     assumptions.reserve(node_list.size() + nf);
+
+    // 故障ノードの TFO 以外の dlit を0にする．
     hash_set<ymuint> tfo_mark;
     mark_tfo(f->node(), tfo_mark);
     for (vector<DtpgNode*>::const_iterator p = node_list.begin();
@@ -822,13 +823,6 @@ dtpg_ffr(SatSolver& solver,
 	assumptions.push_back(dlit);
       }
     }
-#else
-    ymuint nim = 0;
-    for (DtpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
-      ++ nim;
-    }
-    assumptions.reserve(nf + nim + 1);
-#endif
 
     // 該当の故障に対する変数のみ1にする．
     for (ymuint j = 0; j < nf; ++ j) {
