@@ -467,33 +467,22 @@ YmSat::scan_watcher()
 void
 YmSat::reorder_clause(SatClause* c)
 {
-  ymuint lit_num = c->lit_num();
-
-  // 最初に見つかった充足リテラルの位置
-  ymuint pos0 = 0;
-  for (ymuint i = 0; i < lit_num; ++ i) {
-    Literal l = c->lit(i);
-    if ( eval(l) == kB3True ) {
-      pos0 = i;
-      // 充足リテラルが見つかったらあとはどうでもよい．
-      break;
-    }
-  }
-
-  if ( pos0 < 2 ) {
-    // 移動の必要無し
+  if ( eval(c->wl0()) == kB3True || eval(c->wl1()) == kB3True ) {
     return;
   }
 
-  // pos0 番めのリテラルを0番めに移動
-  // 0番めから (pos0 - 1) 番めまのでリテラルをひとつずつ後ろにずらす．
-  Literal new_l0 = c->lit(pos0);
-  for (ymuint i = pos0; i > 0; -- i) {
-    c->lit(i) = c->lit(i - 1);
+  ymuint lit_num = c->lit_num();
+  for (ymuint i = 0; i < lit_num; ++ i) {
+    Literal l = c->lit(i);
+    if ( eval(l) == kB3True ) {
+      // i 番めのリテラルを0番めに移動
+      Literal l0 = c->wl0();
+      c->set_wl0(i);
+      del_watcher(~l0, SatReason(c));
+      watcher_list(~l).add(Watcher(SatReason(c)));
+      break;
+    }
   }
-  c->lit0() = new_l0;
-  del_watcher(~(c->lit(2)), SatReason(c));
-  watcher_list(~new_l0).add(Watcher(SatReason(c)));
 }
 
 // @brief SAT 問題を解く．
@@ -572,12 +561,10 @@ YmSat::solve(const vector<Literal>& assumptions,
     }
   }
 
-#if 1
   if ( mScanWatcher ) {
     // 充足している節に対して watch literal の付け替えを行なう．
     scan_watcher();
   }
-#endif
 
   // 以降，現在のレベルが基底レベルとなる．
   mRootLevel = decision_level();
@@ -805,27 +792,26 @@ YmSat::implication()
 	  mAssignList.skip_all();
 
 	  // 矛盾の理由を表す節を作る．
-	  mTmpBinClause->mLits[0] = l0;
-	  mTmpBinClause->mLits[1] = nl;
+	  mTmpBinClause->set(l0, nl);
 	  conflict = SatReason(mTmpBinClause);
 	  break;
 	}
       }
       else { // w.is_clause()
 	SatClause& c = w.clause();
-	Literal l0 = c.lit0();
+	Literal l0 = c.wl0();
 	if ( l0 == nl ) {
 	  // nl を 1番めのリテラルにする．
-	  l0 = c.lit1();
-	  c.lit0() = l0;
-	  c.lit1() = nl;
+	  c.xchange_wl();
+	  // 新しい wl0 を得る．
+	  l0 = c.wl0();
 	}
 	else { // l1 == nl
 	  if ( debug & debug_implication ) {
 	    // この assert は重いのでデバッグ時にしかオンにしない．
 	    // ※ debug と debug_implication が const なので結果が0の
 	    // ときにはコンパイル時に消されることに注意
-	    assert_cond(c.lit1() == nl, __FILE__, __LINE__);
+	    assert_cond(c.wl1() == nl, __FILE__, __LINE__);
 	  }
 	}
 
@@ -844,14 +830,12 @@ YmSat::implication()
 	// は問題でない．
 	bool found = false;
 	ymuint n = c.lit_num();
-	for (ymuint i = 2; i < n; ++ i) {
+	for (ymuint i = 0; i < n; ++ i) {
 	  Literal l2 = c.lit(i);
+	  if ( l2 == l0 ) continue;
 	  if ( eval(l2) != kB3False ) {
-	    // l2 を 1番めに移動する．
-	    for (ymuint j = i; j > 1; -- j) {
-	      c.lit(j) = c.lit(j - 1);
-	    }
-	    c.lit1() = l2;
+	    // l2 を 1番めの watch literal にする．
+	    c.set_wl1(i);
 	    if ( debug & debug_implication ) {
 	      cout << "\t\t\tsecond watching literal becomes "
 		   << l2 << endl;
@@ -860,6 +844,7 @@ YmSat::implication()
 	    -- wpos;
 	    // ~l2 の watcher list に追加する．
 	    watcher_list(~l2).add(w);
+
 	    found = true;
 	    break;
 	  }
@@ -1058,22 +1043,10 @@ YmSat::alloc_lits(ymuint lit_num)
 void
 YmSat::delete_clause(SatClause* clause)
 {
-  // 0 番目と 1 番目のリテラルに関係する watch list を更新
-  for (ymuint i = 0; i < 2; ++ i) {
-    Literal l = ~clause->lit(i);
-    WatcherList& wlist = watcher_list(l);
-    ymuint n = wlist.num();
-    ymuint rpos = 0;
-    ymuint wpos = 0;
-    for ( ; rpos < n; ++ rpos) {
-      Watcher w = wlist.elem(rpos);
-      if ( w != SatReason(clause) ) {
-	wlist.set_elem(wpos, w);
-	++ wpos;
-      }
-    }
-    wlist.erase(wpos);
-  }
+  // watch list を更新
+  del_watcher(~clause->wl0(), Watcher(SatReason(clause)));
+  del_watcher(~clause->wl1(), Watcher(SatReason(clause)));
+
   if ( clause->is_learnt() ) {
     mLearntLitNum -= clause->lit_num();
   }
@@ -1127,12 +1100,12 @@ YmSat::decay_var_activity2()
 void
 YmSat::bump_clause_activity(SatClause* clause)
 {
-  clause->mActivity += mClauseBump;
-  if ( clause->mActivity > 1e+100 ) {
+  clause->increase_activity(mClauseBump);
+  if ( clause->activity() > 1e+100 ) {
     for (vector<SatClause*>::iterator p = mLearntClause.begin();
 	 p != mLearntClause.end(); ++ p) {
       SatClause* clause1 = *p;
-      clause1->mActivity *= 1e-100;
+      clause1->factor_activity(1e-100);
     }
     mClauseBump *= 1e-100;
   }

@@ -31,14 +31,13 @@ BEGIN_NAMESPACE_YM_SAT
 //////////////////////////////////////////////////////////////////////
 class SatClause
 {
-  friend class YmSat;
-
-private:
+public:
 
   /// @brief コンストラクタ
   /// @param[in] lit_num リテラル数
   /// @param[in] lits リテラルの配列
   /// @param[in] learnt 学習節の場合 true
+  /// @note 上に書いたように普通にこのコンストラクタを呼んではいけない．
   SatClause(ymuint lit_num,
 	    Literal* lits,
 	    bool learnt);
@@ -49,7 +48,41 @@ private:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
+  // 情報を設定する外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容を設定する．(2リテラル節用)
+  /// @param[in] lit0, lit1 リテラル
+  void
+  set(Literal lit0,
+      Literal lit1);
+
+  /// @brief watch literal を入れ替える．
+  void
+  xchange_wl();
+
+  /// @brief 0番めの watch lieral を設定する．
+  /// @param[in] pos 設定するリテラルの位置
+  void
+  set_wl0(ymuint pos);
+
+  /// @brief 1番めの watch lieral を設定する．
+  /// @param[in] pos 設定するリテラルの位置
+  void
+  set_wl1(ymuint pos);
+
+  /// @brief アクティビティを増加させる．
+  void
+  increase_activity(double delta);
+
+  /// @brief アクティビティを定数倍する．
+  void
+  factor_activity(double factor);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 情報を取得する外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
   /// @brief リテラル数の取得
@@ -58,21 +91,16 @@ public:
 
   /// @brief リテラルのアクセス
   /// @param[in] pos リテラルの位置
-  Literal&
-  lit(ymuint pos);
-
-  /// @brief リテラルのアクセス
-  /// @param[in] pos リテラルの位置
   Literal
   lit(ymuint pos) const;
 
-  /// @brief 0番目のリテラルに対するアクセス
-  Literal&
-  lit0();
+  /// @brief 0番めの watch literal を得る．
+  Literal
+  wl0() const;
 
-  /// @brief 1番目のリテラルに対するアクセス
-  Literal&
-  lit1();
+  /// @brief 1番めの watch literal を得る．
+  Literal
+  wl1() const;
 
   /// @brief 学習節の場合 true を返す．
   bool
@@ -111,6 +139,49 @@ operator<<(ostream& s,
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief 内容を設定する．(2リテラル節用)
+// @param[in] lit0, lit1 リテラル
+inline
+void
+SatClause::set(Literal lit0,
+	       Literal lit1)
+{
+  mLits[0] = lit0;
+  mLits[1] = lit1;
+}
+
+// @brief watch literal を入れ替える．
+inline
+void
+SatClause::xchange_wl()
+{
+  Literal tmp = mLits[0];
+  mLits[0] = mLits[1];
+  mLits[1] = tmp;
+}
+
+// @brief 0番めの watch lieral を設定する．
+// @param[in] pos 設定するリテラルの位置
+inline
+void
+SatClause::set_wl0(ymuint pos)
+{
+  Literal tmp = mLits[0];
+  mLits[0] = mLits[pos];
+  mLits[pos] = tmp;
+}
+
+// @brief 1番めの watch lieral を設定する．
+// @param[in] pos 設定するリテラルの位置
+inline
+void
+SatClause::set_wl1(ymuint pos)
+{
+  Literal tmp = mLits[1];
+  mLits[1] = mLits[pos];
+  mLits[pos] = tmp;
+}
+
 // @brief リテラル数の取得
 inline
 ymuint
@@ -121,32 +192,24 @@ SatClause::lit_num() const
 
 // @brief リテラルのアクセス
 inline
-Literal&
-SatClause::lit(ymuint pos)
-{
-  return mLits[pos];
-}
-
-// @brief リテラルのアクセス
-inline
 Literal
 SatClause::lit(ymuint pos) const
 {
   return mLits[pos];
 }
 
-// @brief 0番目のリテラルに対するアクセス
+// @brief 0番めの watch literal を得る．
 inline
-Literal&
-SatClause::lit0()
+Literal
+SatClause::wl0() const
 {
   return mLits[0];
 }
 
-// @brief 1番目のリテラルに対するアクセス
+// @brief 1番めの watch literal を得る．
 inline
-Literal&
-SatClause::lit1()
+Literal
+SatClause::wl1() const
 {
   return mLits[1];
 }
@@ -165,6 +228,22 @@ double
 SatClause::activity() const
 {
   return mActivity;
+}
+
+// @brief アクティビティを増加させる．
+inline
+void
+SatClause::increase_activity(double delta)
+{
+  mActivity += delta;
+}
+
+// @brief アクティビティを定数倍する．
+inline
+void
+SatClause::factor_activity(double factor)
+{
+  mActivity *= factor;
 }
 
 END_NAMESPACE_YM_SAT

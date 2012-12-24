@@ -48,7 +48,7 @@ SaUIP1::capture(SatReason creason,
   learnt.clear();
   learnt.push_back(Literal()); // place holder
 
-  ymuint first_pos = 0;
+  bool first = true;
   ymuint count = 0;
   ymuint last = last_assign();
   for ( ; ; ) {
@@ -65,8 +65,11 @@ SaUIP1::capture(SatReason creason,
       // 現在の decision level なら count を増やすだけ．
       // あとで mAssignList をたどれば該当のリテラルは捜し出せる．
       ymuint n = cclause.lit_num();
-      for (ymuint i = first_pos; i < n; ++ i) {
+      // 最初の節は全てのリテラルを対象にするが，
+      // 二番目以降の節の最初のリテラルは割り当て結果なので除外する．
+      for (ymuint i = 0; i < n; ++ i) {
 	Literal q = cclause.lit(i);
+	if ( !first && q == cclause.wl0() ) continue;
 	VarId var = q.varid();
 	int var_level = decision_level(var);
 	if ( !get_mark(var) && var_level > 0 ) {
@@ -82,7 +85,7 @@ SaUIP1::capture(SatReason creason,
       }
     }
     else {
-      assert_cond(first_pos == 1, __FILE__, __LINE__);
+      assert_cond( !first, __FILE__, __LINE__);
       Literal q = creason.literal();
       VarId var = q.varid();
       int var_level = decision_level(var);
@@ -97,7 +100,8 @@ SaUIP1::capture(SatReason creason,
 	}
       }
     }
-    first_pos = 1;
+
+    first = false;
 
     // mAssignList に入っている最近の変数で mark の付いたものを探す．
     for ( ; ; -- last) {

@@ -656,12 +656,12 @@ inline
 bool
 YmSat::is_locked(SatClause* clause) const
 {
-  // 直感的には分かりにくいが，SatClause の最初のリテラルは
+  // 直感的には分かりにくいが，節の最初のリテラルは
   // 残りのリテラルによって含意されていることになっている．
   // そこで最初のリテラルの変数の割り当て理由が自分自身か
   // どうかを調べれば clause が割り当て理由として用いられて
   // いるかわかる．
-  return reason(clause->lit0().varid()) == SatReason(clause);
+  return reason(clause->wl0().varid()) == SatReason(clause);
 }
 
 // @brief 時間計測機能を制御する
