@@ -578,6 +578,15 @@ YmSat::watcher_list(Literal lit)
   return mWatcherList[index];
 }
 
+// Watcher を追加する．
+inline
+void
+YmSat::add_watcher(Literal watch_lit,
+		   SatReason reason)
+{
+  watcher_list(watch_lit).add(Watcher(reason));
+}
+
 // 変数の評価を行う．
 inline
 Bool3

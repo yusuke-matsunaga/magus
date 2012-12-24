@@ -410,14 +410,6 @@ YmSat::add_learnt_clause(const vector<Literal>& lits)
   assign(l0, reason);
 }
 
-// Watcher を追加する．
-void
-YmSat::add_watcher(Literal watch_lit,
-		   SatReason reason)
-{
-  watcher_list(watch_lit).add(Watcher(reason));
-}
-
 // @brief watcher を削除する．
 // @param[in] watch_lit リテラル
 // @param[in] reason 理由
@@ -479,7 +471,7 @@ YmSat::reorder_clause(SatClause* c)
       Literal l0 = c->wl0();
       c->set_wl0(i);
       del_watcher(~l0, SatReason(c));
-      watcher_list(~l).add(Watcher(SatReason(c)));
+      add_watcher(~l, SatReason(c));
       break;
     }
   }
@@ -1044,8 +1036,8 @@ void
 YmSat::delete_clause(SatClause* clause)
 {
   // watch list を更新
-  del_watcher(~clause->wl0(), Watcher(SatReason(clause)));
-  del_watcher(~clause->wl1(), Watcher(SatReason(clause)));
+  del_watcher(~clause->wl0(), SatReason(clause));
+  del_watcher(~clause->wl1(), SatReason(clause));
 
   if ( clause->is_learnt() ) {
     mLearntLitNum -= clause->lit_num();
