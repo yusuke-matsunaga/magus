@@ -445,12 +445,18 @@ YmSat::scan_watcher()
   for (vector<SatClause*>::iterator p = mConstrClause.begin();
        p != mConstrClause.end(); ++ p) {
     SatClause* c = *p;
+    if ( eval(c->wl0()) == kB3True || eval(c->wl1()) == kB3True ) {
+      continue;
+    }
     reorder_clause(c);
   }
 
   for (vector<SatClause*>::iterator p = mLearntClause.begin();
        p != mLearntClause.end(); ++ p) {
     SatClause* c = *p;
+    if ( eval(c->wl0()) == kB3True || eval(c->wl1()) == kB3True ) {
+      continue;
+    }
     reorder_clause(c);
   }
 }
@@ -459,10 +465,6 @@ YmSat::scan_watcher()
 void
 YmSat::reorder_clause(SatClause* c)
 {
-  if ( eval(c->wl0()) == kB3True || eval(c->wl1()) == kB3True ) {
-    return;
-  }
-
   ymuint lit_num = c->lit_num();
   for (ymuint i = 0; i < lit_num; ++ i) {
     Literal l = c->lit(i);

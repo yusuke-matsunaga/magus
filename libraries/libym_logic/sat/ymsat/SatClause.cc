@@ -20,26 +20,6 @@ BEGIN_NAMESPACE_YM_SAT
 // クラス SatClause
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-// @param[in] lit_num リテラル数
-// @param[in] lits リテラルの配列
-// @param[in] learnt 学習節の場合 true
-SatClause::SatClause(ymuint lit_num,
-		     Literal* lits,
-		     bool learnt)
-{
-  mSizeLearnt = (lit_num << 1) | static_cast<ymuint>(learnt);
-  mActivity = 0.0;
-  for (ymuint i = 0; i < lit_num; ++ i) {
-    mLits[i] = lits[i];
-  }
-}
-
-// @brief デストラクタ
-SatClause::~SatClause()
-{
-}
-
 // @brief SatClause の内容を出力する
 ostream&
 operator<<(ostream& s,

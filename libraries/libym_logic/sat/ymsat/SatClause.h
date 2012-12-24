@@ -139,6 +139,28 @@ operator<<(ostream& s,
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+// @param[in] lit_num リテラル数
+// @param[in] lits リテラルの配列
+// @param[in] learnt 学習節の場合 true
+inline
+SatClause::SatClause(ymuint lit_num,
+		     Literal* lits,
+		     bool learnt)
+{
+  mSizeLearnt = (lit_num << 1) | static_cast<ymuint>(learnt);
+  mActivity = 0.0;
+  for (ymuint i = 0; i < lit_num; ++ i) {
+    mLits[i] = lits[i];
+  }
+}
+
+// @brief デストラクタ
+inline
+SatClause::~SatClause()
+{
+}
+
 // @brief 内容を設定する．(2リテラル節用)
 // @param[in] lit0, lit1 リテラル
 inline
@@ -166,9 +188,18 @@ inline
 void
 SatClause::set_wl0(ymuint pos)
 {
+#if 0
   Literal tmp = mLits[0];
   mLits[0] = mLits[pos];
   mLits[pos] = tmp;
+#else
+  Literal tmp = mLits[pos];
+  for (ymuint i = pos; i > 2; -- i) {
+    mLits[i] = mLits[i - 1];
+  }
+  mLits[2] = mLits[0];
+  mLits[0] = tmp;
+#endif
 }
 
 // @brief 1番めの watch lieral を設定する．
@@ -177,9 +208,17 @@ inline
 void
 SatClause::set_wl1(ymuint pos)
 {
+#if 0
   Literal tmp = mLits[1];
   mLits[1] = mLits[pos];
   mLits[pos] = tmp;
+#else
+  Literal tmp = mLits[pos];
+  for (ymuint i = pos; i > 1; -- i) {
+    mLits[i] = mLits[i - 1];
+  }
+  mLits[1] = tmp;
+#endif
 }
 
 // @brief リテラル数の取得
