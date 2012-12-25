@@ -814,6 +814,59 @@ dtpg_ffr(SatSolver& solver,
     }
     else {
       make_node_cnf(solver, node, olit, inputs);
+
+      // 出力の dlit が1になる条件を作る．
+      // - 入力の dlit のいずれかが 1
+      // - 入力のいずれかに故障がある．
+      // - 出力に故障がある．
+      vector<Literal> dep;
+      dep.reserve(ni * 3 + 3);
+      Literal dlit(node->dvar(), kPolNega);
+      dep.push_back(dlit);
+      for (ymuint j = 0; j < ni; ++ j) {
+	DtpgNode* inode = node->fanin(j);
+	if ( fnode_mark.count(inode->id()) > 0 ) {
+	  dep.push_back(Literal(inode->dvar(), kPolPosi));
+	}
+
+	DtpgFault* fi0 = node->input_fault(0, j);
+	if ( fi0 != NULL ) {
+	  hash_map<ymuint, ymuint>::iterator p = fid_map.find(fi0->id());
+	  if ( p != fid_map.end() ) {
+	    ymuint fid = p->second;
+	    dep.push_back(Literal(flt_var[fid], kPolPosi));
+	  }
+	}
+
+	DtpgFault* fi1 = node->input_fault(1, j);
+	if ( fi1 != NULL ) {
+	  hash_map<ymuint, ymuint>::iterator p = fid_map.find(fi1->id());
+	  if ( p != fid_map.end() ) {
+	    ymuint fid = p->second;
+	    dep.push_back(Literal(flt_var[fid], kPolPosi));
+	  }
+	}
+      }
+
+      DtpgFault* fo0 = node->output_fault(0);
+      if ( fo0 != NULL ) {
+	hash_map<ymuint, ymuint>::iterator p = fid_map.find(fo0->id());
+	if ( p != fid_map.end() ) {
+	  ymuint fid = p->second;
+	  dep.push_back(Literal(flt_var[fid], kPolPosi));
+	}
+      }
+
+      DtpgFault* fo1 = node->output_fault(1);
+      if ( fo1 != NULL ) {
+	hash_map<ymuint, ymuint>::iterator p = fid_map.find(fo1->id());
+	if ( p != fid_map.end() ) {
+	  ymuint fid = p->second;
+	  dep.push_back(Literal(flt_var[fid], kPolPosi));
+	}
+      }
+
+      solver.add_clause(dep);
     }
     if ( node != root ) { // root の分は make_prop_cnf() で作っている．
       Literal flit(node->fvar(), kPolPosi);
