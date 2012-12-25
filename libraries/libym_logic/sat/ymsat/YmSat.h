@@ -255,17 +255,6 @@ private:
   del_watcher(Literal watch_lit,
 	      SatReason reason);
 
-  /// @brief watcher list を整理する．
-  /// 具体的にはすでに充足している節に対して，
-  /// 充足しているリテラルを watcher に付け替える．
-  void
-  scan_watcher();
-
-  /// @brief 充足しているリテラルを0番め1番めにもってくる．
-  /// @param[in] c 対象の節
-  void
-  reorder_clause(SatClause* c);
-
   /// @brief 変数の評価を行う．
   /// @param[in] id 変数番号
   Bool3
@@ -489,9 +478,6 @@ private:
 
   // 制御用パラメータ
   Params mParams;
-
-  // scan_watcher() ヒューリスティック制御用のフラグ
-  bool mScanWatcher;
 
   // restart 数
   ymuint mRestart;

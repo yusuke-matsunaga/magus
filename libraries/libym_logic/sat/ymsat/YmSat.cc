@@ -98,13 +98,6 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mRestart = 0;
 
   mTimerOn = false;
-
-  if ( option == "classic" ) {
-    mScanWatcher = false;
-  }
-  else {
-    mScanWatcher = true;
-  }
 }
 
 // @brief デストラクタ
@@ -436,49 +429,6 @@ YmSat::del_watcher(Literal watch_lit,
   wlist.erase(n);
 }
 
-// watcher list を整理する．
-// 具体的にはすでに充足している節に対して，
-// 充足しているリテラルを watcher に付け替える．
-void
-YmSat::scan_watcher()
-{
-  for (vector<SatClause*>::iterator p = mConstrClause.begin();
-       p != mConstrClause.end(); ++ p) {
-    SatClause* c = *p;
-    if ( eval(c->wl0()) == kB3True || eval(c->wl1()) == kB3True ) {
-      continue;
-    }
-    reorder_clause(c);
-  }
-
-  for (vector<SatClause*>::iterator p = mLearntClause.begin();
-       p != mLearntClause.end(); ++ p) {
-    SatClause* c = *p;
-    if ( eval(c->wl0()) == kB3True || eval(c->wl1()) == kB3True ) {
-      continue;
-    }
-    reorder_clause(c);
-  }
-}
-
-// 充足しているリテラルを0番め1番めにもってくる．
-void
-YmSat::reorder_clause(SatClause* c)
-{
-  ymuint lit_num = c->lit_num();
-  for (ymuint i = 0; i < lit_num; ++ i) {
-    Literal l = c->lit(i);
-    if ( eval(l) == kB3True ) {
-      // i 番めのリテラルを0番めに移動
-      Literal l0 = c->wl0();
-      c->set_wl0(i);
-      del_watcher(~l0, SatReason(c));
-      add_watcher(~l, SatReason(c));
-      break;
-    }
-  }
-}
-
 // @brief SAT 問題を解く．
 // @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
 // @param[out] model 充足するときの値の割り当てを格納する配列．
@@ -513,13 +463,17 @@ YmSat::solve(const vector<Literal>& assumptions,
     mTimer.start();
   }
 
-  alloc_var();
-
+  // 自明な簡単化を行う．
   simplifyDB();
   if ( !mSane ) {
+    // その時点で充足不可能なら終わる．
+      if ( debug & debug_solve ) {
+	cout << "UNSAT in simplifyDB()" << endl;
+      }
     return kB3False;
   }
 
+  // パラメータの初期化
   double confl_limit = 100;
   double learnt_limit = mConstrClause.size() / 3;
   mVarDecay = mParams.mVarDecay;
@@ -546,18 +500,16 @@ YmSat::solve(const vector<Literal>& assumptions,
       }
     }
 
+    // 条件式のなかに重要な手続きが書いてあるあんまり良くないコード
+    // だけど implication() は stat == true の時しか実行しないのでしょうがない．
     if ( !stat || implication() != kNullSatReason ) {
+      // 矛盾が起こった．
       backtrack(0);
       if ( debug & debug_solve ) {
 	cout << "UNSAT" << endl;
       }
       return kB3False;
     }
-  }
-
-  if ( mScanWatcher ) {
-    // 充足している節に対して watch literal の付け替えを行なう．
-    scan_watcher();
   }
 
   // 以降，現在のレベルが基底レベルとなる．
@@ -568,6 +520,7 @@ YmSat::solve(const vector<Literal>& assumptions,
 
   Bool3 stat = kB3X;
   for ( ; ; ) {
+    // 実際の探索を行う．
     mConflictLimit = static_cast<ymuint64>(confl_limit);
     if ( mConflictLimit > mMaxConflict ) {
       mConflictLimit = mMaxConflict;
@@ -583,11 +536,15 @@ YmSat::solve(const vector<Literal>& assumptions,
     ++ mRestart;
     stat = search();
     if ( stat != kB3X ) {
+      // 結果が求められた．
       break;
     }
     if ( mConflictLimit == mMaxConflict ) {
+      // 制限値に達した．(アボート)
       break;
     }
+
+    // 判定できなかったのでパラメータを更新して次のラウンドへ
     decay_var_activity2();
     confl_limit = confl_limit * 1.5;
     learnt_limit = learnt_limit * 1.1;
@@ -661,6 +618,7 @@ YmSat::reg_msg_handler(SatMsgHandler* msg_handler)
 Bool3
 YmSat::search()
 {
+  // 矛盾の解析時に用いられるベクタ
   vector<Literal> learnt;
 
   // コンフリクトの起こった回数
@@ -765,6 +723,7 @@ YmSat::implication()
       ++ rpos;
       ++ wpos;
       if ( w.is_literal() ) {
+	// 2-リテラル節の場合は相方のリテラルに基づく値の割り当てを行う．
 	Literal l0 = w.literal();
 	Bool3 val0 = eval(l0);
 	if ( val0 == kB3X ) {
@@ -792,6 +751,12 @@ YmSat::implication()
 	}
       }
       else { // w.is_clause()
+	// 3つ以上のリテラルを持つ節の場合は，
+	// - nl(~l) を wl1() にする．(場合によっては wl0 を入れ替える)
+	// - wl0() が充足していたらなにもしない．
+	// - wl0() が不定，もしくは偽なら，nl の代わりの watch literal を探す．
+	// - 代わりが見つかったらそのリテラルを wl1() にする．
+	// - なければ wl0() に基づいた割り当てを行う．場合によっては矛盾が起こる．
 	SatClause& c = w.clause();
 	Literal l0 = c.wl0();
 	if ( l0 == nl ) {
@@ -876,6 +841,7 @@ YmSat::implication()
 	}
       }
     }
+    // 途中でループを抜けた場合に wlist の後始末をしておく．
     if ( wpos != rpos ) {
       for ( ; rpos < n; ++ rpos) {
 	wlist.set_elem(wpos, wlist.elem(rpos));
@@ -921,19 +887,25 @@ Literal
 YmSat::next_decision()
 {
 #if 0
+  // 一定確率でランダムな変数を選ぶ．
   if ( mRandGen.real1() < mParams.mVarFreq && !heap_empty() ) {
     ymuint pos = mRandGen.int32() % mVarNum;
+    VarId vid(pos);
     tPol pol = kPolNega;
-    if ( eval(pos) == kB3X ) {
-      return Literal(pos, pol);
+    if ( eval(VarId(vid)) == kB3X ) {
+      return Literal(vid, pol);
     }
   }
 #endif
   while ( !heap_empty() ) {
     ymuint vindex = heap_pop_top();
     if ( mVal[vindex] == kB3X ) {
-      //tPol pol = (mRandGen.int32() & 1) ? kPolPosi : kPolNega;
+      // Watcher の多い方の極性を(わざと)選ぶ
+      ymuint v2 = vindex * 2;
       tPol pol = kPolNega;
+      if ( mWatcherList[v2 + 0].num() >= mWatcherList[v2 + 1].num() ) {
+	pol = kPolPosi;
+      }
       return Literal(VarId(vindex), pol);
     }
   }

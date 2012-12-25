@@ -12,6 +12,9 @@
 #include "ym_logic/sat_nsdef.h"
 #include "ym_logic/Literal.h"
 
+// リテラルの並び替え時に挿入ではなく置き換えを行う．
+#define SWAP_LITERALS 0
+
 
 BEGIN_NAMESPACE_YM_SAT
 
@@ -188,7 +191,7 @@ inline
 void
 SatClause::set_wl0(ymuint pos)
 {
-#if 0
+#if SWAP_LITERALS
   Literal tmp = mLits[0];
   mLits[0] = mLits[pos];
   mLits[pos] = tmp;
@@ -208,7 +211,7 @@ inline
 void
 SatClause::set_wl1(ymuint pos)
 {
-#if 0
+#if SWAP_LITERALS
   Literal tmp = mLits[1];
   mLits[1] = mLits[pos];
   mLits[pos] = tmp;
