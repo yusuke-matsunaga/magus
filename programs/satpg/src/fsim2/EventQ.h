@@ -1,21 +1,19 @@
-#ifndef FSIM_EVENTQ_H
-#define FSIM_EVENTQ_H
+#ifndef FSIM2_EVENTQ_H
+#define FSIM2_EVENTQ_H
 
-/// @file src/fsim/EventQ.h
+/// @file src/fsim2/EventQ.h
 /// @brief EventQ のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: EventQ.h 2128 2009-03-12 07:25:33Z matsunaga $
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "fsim_nsdef.h"
+#include "fsim2_nsdef.h"
 #include "SimNode.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIM
+BEGIN_NAMESPACE_YM_SATPG_FSIM2
 
 //////////////////////////////////////////////////////////////////////
 /// @class EventQ EventQ.h "EventQ.h"
@@ -117,6 +115,6 @@ EventQ::get()
   return NULL;
 }
 
-END_NAMESPACE_YM_SATPG_FSIM
+END_NAMESPACE_YM_SATPG_FSIM2
 
-#endif // FSIM_EVENTQ_H
+#endif // FSIM2_EVENTQ_H

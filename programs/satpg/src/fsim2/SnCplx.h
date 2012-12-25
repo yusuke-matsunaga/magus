@@ -1,11 +1,9 @@
 #ifndef SNCPLX_H
 #define SNCPLX_H
 
-/// @file src/fsim/SnCplx.h
+/// @file src/fsim2/SnCplx.h
 /// @brief SnCplx のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: SnCplx.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
@@ -14,7 +12,7 @@
 #include "SnGate.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIM
+BEGIN_NAMESPACE_YM_SATPG_FSIM2
 
 //////////////////////////////////////////////////////////////////////
 /// @class SnCplx SimNode.h
@@ -68,6 +66,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_SATPG_FSIM
+END_NAMESPACE_YM_SATPG_FSIM2
 
 #endif // SNCPLX_H

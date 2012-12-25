@@ -1,8 +1,8 @@
-#ifndef FSIM_H
-#define FSIM_H
+#ifndef FSIM2_H
+#define FSIM2_H
 
-/// @file src/fsim/Fsim.h
-/// @brief Fsim のヘッダファイル
+/// @file src/fsim2/Fsim2.h
+/// @brief Fsim2 のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,40 +10,34 @@
 /// All rights reserved.
 
 
-#include "fsim_nsdef.h"
+#include "fsim2_nsdef.h"
+#include "Fsim.h"
 #include "PackedVal.h"
 #include "EventQ.h"
 #include "FsimFault.h"
-#include "ym_networks/tgnet.h"
 #include "ym_logic/LogExpr.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG
-
-class SaFault;
-class TestVector;
-
-END_NAMESPACE_YM_SATPG
-
-
-BEGIN_NAMESPACE_YM_SATPG_FSIM
+BEGIN_NAMESPACE_YM_SATPG_FSIM2
 
 class SimFFR;
 class SimNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class Fsim Fsim.h "Fsim.h"
+/// @class Fsim2 Fsim2.h "Fsim2.h"
 /// @brief 故障シミュレーションを行うモジュール
 //////////////////////////////////////////////////////////////////////
-class Fsim
+class Fsim2 :
+  public Fsim
 {
 public:
 
   /// @brief コンストラクタ
-  Fsim();
+  Fsim2();
 
   /// @brief デストラクタ
-  ~Fsim();
+  virtual
+  ~Fsim2();
 
 
 public:
@@ -52,6 +46,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ネットワークをセットする．
+  virtual
   void
   set_network(const TgNetwork& network,
 	      const vector<SaFault*>& flist);
@@ -59,6 +54,7 @@ public:
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
   /// @param[out] det_faults 検出された故障を格納するリスト
+  virtual
   void
   run(TestVector* tv,
       vector<SaFault*>& det_faults);
@@ -66,6 +62,7 @@ public:
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
   /// @param[out] det_faults 検出された故障を格納するリストの配列
+  virtual
   void
   run(const vector<TestVector*>& tv_array,
       vector<vector<SaFault*> >& det_faults);
@@ -73,6 +70,7 @@ public:
   /// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
   /// @param[in] tv テストベクタ
   /// @param[in] f 対象の故障
+  virtual
   bool
   run(TestVector* tv,
       SaFault* f);
@@ -186,6 +184,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_SATPG_FSIM
+END_NAMESPACE_YM_SATPG_FSIM2
 
-#endif // FSIM_H
+#endif // FSIM2_H

@@ -12,7 +12,7 @@
 #include "PackedVal.h"
 #include "SaFault.h"
 #include "FaultMgr.h"
-#include "fsim/Fsim.h"
+#include "Fsim.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

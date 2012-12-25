@@ -3,16 +3,12 @@
 /// @brief AtpgMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: AtpgMgr.cc 2203 2009-04-16 05:04:40Z matsunaga $
-///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "AtpgMgr.h"
 #include "Op1.h"
-#include "fsim/Fsim.h"
-#include "dtpg/DtpgSat.h"
 #include "ym_networks/TgBlifReader.h"
 #include "ym_networks/TgIscas89Reader.h"
 
@@ -71,9 +67,9 @@ FsimNetBinder::event_proc(const TgNetwork& network,
 AtpgMgr::AtpgMgr() :
   mTimer(TM_SIZE, TM_MISC)
 {
-  mFsim = new_Fsim();
+  mFsim = new_Fsim2();
 
-  mDtpg = new DtpgSat();
+  mDtpg = new_DtpgSat();
 
   reg_network_handler(new FsimNetBinder(mFsim));
 
@@ -228,9 +224,9 @@ AtpgMgr::set_dtpg_mode(const string& type,
   mDtpg->set_mode(type, option, outp);
 }
 
-// @brief 一つの故障に対してテストパタン生成を行なう．
+// @brief テストパタン生成を行なう．
 void
-AtpgMgr::dtpg_single()
+AtpgMgr::dtpg(const string& option)
 {
 
   ymuint old_id = mTimer.cur_id();
@@ -238,171 +234,7 @@ AtpgMgr::dtpg_single()
 
   Op1 op(mFaultMgr, mTvMgr);
 
-  mDtpg->single(op);
-
-  after_update_faults();
-
-  mTimer.change(old_id);
-}
-
-// @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
-void
-AtpgMgr::dtpg_dual()
-{
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_DTPG);
-
-  Op1 op(mFaultMgr, mTvMgr);
-
-  mDtpg->dual(op);
-
-  after_update_faults();
-
-  mTimer.change(old_id);
-}
-
-// @brief FFR 内の故障に対してテストパタン生成を行なう．
-void
-AtpgMgr::dtpg_ffr()
-{
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_DTPG);
-
-  Op1 op(mFaultMgr, mTvMgr);
-
-  mDtpg->ffr(op);
-
-  after_update_faults();
-
-  mTimer.change(old_id);
-}
-
-// @brief MFFC 内の故障に対してテストパタン生成を行なう．
-void
-AtpgMgr::dtpg_mffc()
-{
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_DTPG);
-
-  Op1 op(mFaultMgr, mTvMgr);
-
-  mDtpg->mffc(op);
-
-  after_update_faults();
-
-  mTimer.change(old_id);
-}
-
-// @brief 全ての故障に対してテストパタン生成を行なう．
-void
-AtpgMgr::dtpg_all()
-{
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_DTPG);
-
-  Op1 op(mFaultMgr, mTvMgr);
-
-  mDtpg->all(op);
-
-  after_update_faults();
-
-  mTimer.change(old_id);
-}
-
-// @brief 一つの故障に対してテストパタン生成を行なう．
-void
-AtpgMgr::dtpg_single_posplit(bool skip)
-{
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_DTPG);
-
-  Op1 op(mFaultMgr, mTvMgr);
-
-  mDtpg->single_posplit(op, skip);
-
-  if ( skip ) {
-    clear_untestable();
-  }
-
-  after_update_faults();
-
-  mTimer.change(old_id);
-}
-
-// @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
-void
-AtpgMgr::dtpg_dual_posplit(bool skip)
-{
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_DTPG);
-
-  Op1 op(mFaultMgr, mTvMgr);
-
-  mDtpg->dual_posplit(op, skip);
-
-  if ( skip ) {
-    clear_untestable();
-  }
-
-  after_update_faults();
-
-  mTimer.change(old_id);
-}
-
-// @brief FFR 内の故障に対してテストパタン生成を行なう．
-void
-AtpgMgr::dtpg_ffr_posplit(bool skip)
-{
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_DTPG);
-
-  Op1 op(mFaultMgr, mTvMgr);
-
-  mDtpg->ffr_posplit(op, skip);
-
-  if ( skip ) {
-    clear_untestable();
-  }
-
-  after_update_faults();
-
-  mTimer.change(old_id);
-}
-
-// @brief MFFC 内の故障に対してテストパタン生成を行なう．
-void
-AtpgMgr::dtpg_mffc_posplit(bool skip)
-{
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_DTPG);
-
-  Op1 op(mFaultMgr, mTvMgr);
-
-  mDtpg->mffc_posplit(op, skip);
-
-  if ( skip ) {
-    clear_untestable();
-  }
-
-  after_update_faults();
-
-  mTimer.change(old_id);
-}
-
-// @brief 全ての故障に対してテストパタン生成を行なう．
-void
-AtpgMgr::dtpg_all_posplit(bool skip)
-{
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_DTPG);
-
-  Op1 op(mFaultMgr, mTvMgr);
-
-  mDtpg->all_posplit(op, skip);
-
-  if ( skip ) {
-    clear_untestable();
-  }
+  mDtpg->run(op, option);
 
   after_update_faults();
 
@@ -456,20 +288,6 @@ void
 AtpgMgr::get_stats()
 {
   mDtpg->get_stats();
-}
-
-// @brief kFsUntestable マークを消す．
-void
-AtpgMgr::clear_untestable()
-{
-  const vector<SaFault*>& flist = mFaultMgr.remain_list();
-  for (vector<SaFault*>::const_iterator p = flist.begin();
-       p != flist.end(); ++ p) {
-    SaFault* f = *p;
-    if ( f->status() == kFsUntestable ) {
-      mFaultMgr.set_status(f, kFsUndetected);
-    }
-  }
 }
 
 // @brief ネットワークをセットした後に呼ぶ関数

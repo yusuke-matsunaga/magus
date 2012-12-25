@@ -1,11 +1,9 @@
 #ifndef SNAND_H
 #define SNAND_H
 
-/// @file src/fsim/SnAnd.h
+/// @file src/fsim2/SnAnd.h
 /// @brief SnAnd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: SnAnd.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
@@ -14,7 +12,7 @@
 #include "SnGate.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIM
+BEGIN_NAMESPACE_YM_SATPG_FSIM2
 
 //////////////////////////////////////////////////////////////////////
 /// @class SnAnd SimNode.h
@@ -339,6 +337,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_SATPG_FSIM
+END_NAMESPACE_YM_SATPG_FSIM2
 
 #endif // SNAND_H

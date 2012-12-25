@@ -4,7 +4,7 @@
 
 SUBDIRS = \
 	base \
-	fsim \
+	fsim2 \
 	fsim3 \
 	fsimx \
 	dtpg \

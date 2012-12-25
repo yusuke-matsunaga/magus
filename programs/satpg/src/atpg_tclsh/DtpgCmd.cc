@@ -129,46 +129,33 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   mgr().clear_stats();
 
+  string dtpg_option;
   if ( ffr_mode ) {
-    if ( po_mode ) {
-      mgr().dtpg_ffr_posplit(skip_mode);
-    }
-    else {
-      mgr().dtpg_ffr();
-    }
+    dtpg_option = "ffr";
   }
   else if ( mffc_mode ) {
-    if ( po_mode ) {
-      mgr().dtpg_mffc_posplit(skip_mode);
-    }
-    else {
-      mgr().dtpg_mffc();
-    }
+    dtpg_option = "mffc";
   }
   else if ( all_mode ) {
-    if ( po_mode ) {
-      mgr().dtpg_all_posplit(skip_mode);
-    }
-    else {
-      mgr().dtpg_all();
-    }
+    dtpg_option = "all";
   }
   else if ( dual_mode ) {
-    if ( po_mode ) {
-      mgr().dtpg_dual_posplit(skip_mode);
-    }
-    else {
-      mgr().dtpg_dual();
-    }
+    dtpg_option = "dual";
   }
   else {
-    if ( po_mode ) {
-      mgr().dtpg_single_posplit(skip_mode);
-    }
-    else {
-      mgr().dtpg_single();
-    }
+    single_mode = true;
   }
+  if ( single_mode ) {
+    dtpg_option = "single";
+  }
+  if ( po_mode ) {
+    dtpg_option += "_po";
+  }
+  if ( skip_mode ) {
+    dtpg_option += "_skip";
+  }
+
+  mgr().dtpg(dtpg_option);
 
   after_update_faults();
 

@@ -1,9 +1,7 @@
 
-/// @file src/fsim/SnGate.cc
+/// @file src/fsim2/SnGate.cc
 /// @brief SnGate の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: SnGate.cc 2128 2009-03-12 07:25:33Z matsunaga $
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
@@ -12,7 +10,7 @@
 #include "SnGate.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIM
+BEGIN_NAMESPACE_YM_SATPG_FSIM2
 
 //////////////////////////////////////////////////////////////////////
 // @class SnGate SimNode.h
@@ -236,4 +234,4 @@ SnGate4::fanin(ymuint pos) const
   return mFanins[pos];
 }
 
-END_NAMESPACE_YM_SATPG_FSIM
+END_NAMESPACE_YM_SATPG_FSIM2

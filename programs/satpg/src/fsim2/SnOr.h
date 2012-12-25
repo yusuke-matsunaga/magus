@@ -1,11 +1,9 @@
 #ifndef SNOR_H
 #define SNOR_H
 
-/// @file src/fsim/SnOr.h
+/// @file src/fsim2/SnOr.h
 /// @brief SnOr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: SnOr.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
@@ -14,7 +12,7 @@
 #include "SnGate.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIM
+BEGIN_NAMESPACE_YM_SATPG_FSIM2
 
 //////////////////////////////////////////////////////////////////////
 /// @class SnOr SimNode.h
@@ -339,6 +337,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_SATPG_FSIM
+END_NAMESPACE_YM_SATPG_FSIM2
 
 #endif // SNOR_H

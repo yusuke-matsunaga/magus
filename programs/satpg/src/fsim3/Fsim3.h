@@ -2,30 +2,21 @@
 #define FSIM3_H
 
 /// @file src/fsim3/Fsim3.h
-/// @brief Fsim のヘッダファイル
+/// @brief Fsim3 のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: Fsim3.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "fsim3_nsdef.h"
+#include "Fsim.h"
 #include "ym_networks/tgnet.h"
 #include "ym_networks/TgNode.h"
 #include "ym_logic/LogExpr.h"
 #include "EventQ.h"
 #include "FsimFault.h"
-
-
-BEGIN_NAMESPACE_YM_SATPG
-
-class SaFault;
-class TestVector;
-
-END_NAMESPACE_YM_SATPG
 
 
 BEGIN_NAMESPACE_YM_SATPG_FSIM3
@@ -36,9 +27,9 @@ class SimNode;
 //////////////////////////////////////////////////////////////////////
 /// @class Fsim3 Fsim3.h "Fsim3.h"
 /// @brief 故障シミュレーションを行うモジュール
-/// @sa ModBase
 //////////////////////////////////////////////////////////////////////
-class Fsim3
+class Fsim3 :
+  public Fsim
 {
 public:
 
@@ -56,6 +47,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ネットワークをセットする．
+  virtual
   void
   set_network(const TgNetwork& network,
 	      const vector<SaFault*>& flist);
@@ -63,20 +55,23 @@ public:
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
   /// @param[out] det_faults 検出された故障を格納するリスト
+  virtual
   void
   run(TestVector* tv,
-      list<SaFault*>& det_faults);
+      vector<SaFault*>& det_faults);
 
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
   /// @param[out] det_faults 検出された故障を格納するリストの配列
+  virtual
   void
   run(const vector<TestVector*>& tv_array,
-      vector<list<SaFault*> >& det_faults);
+      vector<vector<SaFault*> >& det_faults);
 
   /// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
   /// @param[in] tv テストベクタ
   /// @param[in] f 対象の故障
+  virtual
   bool
   run(TestVector* tv,
       SaFault* f);

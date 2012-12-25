@@ -13,9 +13,8 @@
 #include "satpg_nsdef.h"
 #include "FaultMgr.h"
 #include "TvMgr.h"
-#include "../fsim/fsim_nsdef.h"
-#include "../dtpg/dtpg_nsdef.h"
-#include "ym_logic/SatSolver.h"
+#include "Fsim.h"
+#include "Dtpg.h"
 #include "ym_networks/TgNetwork.h"
 #include "ym_cell/cell_nsdef.h"
 #include "ym_utils/Binder.h"
@@ -131,45 +130,9 @@ public:
 		const string& option = string(),
 		ostream* outp = NULL);
 
-  /// @brief 一つの故障に対してテストパタン生成を行なう．
+  /// @brief テストパタン生成を行なう．
   void
-  dtpg_single();
-
-  /// @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
-  void
-  dtpg_dual();
-
-  /// @brief FFR 内の故障に対してテストパタン生成を行なう．
-  void
-  dtpg_ffr();
-
-  /// @brief MFFC 内の故障に対してテストパタン生成を行なう．
-  void
-  dtpg_mffc();
-
-  /// @brief 全ての故障に対してテストパタン生成を行なう．
-  void
-  dtpg_all();
-
-  /// @brief 一つの故障に対してテストパタン生成を行なう．
-  void
-  dtpg_single_posplit(bool skip);
-
-  /// @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
-  void
-  dtpg_dual_posplit(bool skip);
-
-  /// @brief FFR 内の故障に対してテストパタン生成を行なう．
-  void
-  dtpg_ffr_posplit(bool skip);
-
-  /// @brief MFFC 内の故障に対してテストパタン生成を行なう．
-  void
-  dtpg_mffc_posplit(bool skip);
-
-  /// @brief 全ての故障に対してテストパタン生成を行なう．
-  void
-  dtpg_all_posplit(bool skip);
+  dtpg(const string& option);
 
 
 public:
@@ -217,10 +180,6 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief kFsUntestable マークを消す．
-  void
-  clear_untestable();
-
   /// @brief ネットワークが変更された時に呼ばれる関数
   void
   after_set_network();
@@ -251,7 +210,7 @@ private:
   Fsim* mFsim;
 
   // テストパタン生成器
-  DtpgSat* mDtpg;
+  Dtpg* mDtpg;
 
   // ネットワークが変更された時に呼ばれるイベントハンドラ
   T2BindMgr<const TgNetwork&, const vector<SaFault*>&> mNtwkBindMgr;

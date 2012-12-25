@@ -1,9 +1,7 @@
 
-/// @file src/fsim/SimNode.cc
+/// @file src/fsim2/SimNode.cc
 /// @brief SimNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: SimNode.cc 2128 2009-03-12 07:25:33Z matsunaga $
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
@@ -18,7 +16,7 @@
 #include "SnCplx.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIM
+BEGIN_NAMESPACE_YM_SATPG_FSIM2
 
 //////////////////////////////////////////////////////////////////////
 // 故障シミュレーション用のノードを表すクラス
@@ -168,4 +166,4 @@ SimNode::calc_lobs()
   return mLobs;
 }
 
-END_NAMESPACE_YM_SATPG_FSIM
+END_NAMESPACE_YM_SATPG_FSIM2

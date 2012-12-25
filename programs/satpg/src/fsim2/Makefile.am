@@ -6,15 +6,15 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libatpg_fsim.la
+noinst_LTLIBRARIES = libatpg_fsim2.la
 
-libatpg_fsim_la_CPPFLAGS = \
+libatpg_fsim2_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
 
-libatpg_fsim_la_SOURCES = \
-	fsim_nsdef.h \
+libatpg_fsim2_la_SOURCES = \
+	fsim2_nsdef.h \
 	EqElem.h \
 	SimNode.h \
 	SimNode.cc \
@@ -34,9 +34,9 @@ libatpg_fsim_la_SOURCES = \
 	EventQ.h \
 	EventQ.cc \
 	FsimFault.h \
-	Fsim.h \
-	Fsim.cc
+	Fsim2.h \
+	Fsim2.cc
 
-libatpg_fsim_la_LIBADD =
+libatpg_fsim2_la_LIBADD =
 
-libatpg_fsim_la_LDFLAGS =
+libatpg_fsim2_la_LDFLAGS =

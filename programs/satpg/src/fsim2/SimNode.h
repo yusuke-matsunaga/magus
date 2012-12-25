@@ -1,24 +1,22 @@
-#ifndef FSIM_SIMNODE_H
-#define FSIM_SIMNODE_H
+#ifndef FSIM2_SIMNODE_H
+#define FSIM2_SIMNODE_H
 
-/// @file src/fsim/SimNode.h
+/// @file src/fsim2/SimNode.h
 /// @brief SimNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: SimNode.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "fsim_nsdef.h"
+#include "fsim2_nsdef.h"
 #include "EqElem.h"
 #include "PackedVal.h"
 #include "ym_networks/TgGateTemplate.h"
 #include "ym_logic/LogExpr.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIM
+BEGIN_NAMESPACE_YM_SATPG_FSIM2
 
 class SimFFR;
 
@@ -426,6 +424,6 @@ SimNode::set_ffr(SimFFR* ffr)
   mFFR = ffr;
 }
 
-END_NAMESPACE_YM_SATPG_FSIM
+END_NAMESPACE_YM_SATPG_FSIM2
 
-#endif // FSIM_SIMNODE_H
+#endif // FSIM2_SIMNODE_H

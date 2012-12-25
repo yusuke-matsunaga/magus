@@ -12,20 +12,12 @@
 /// All rights reserved.
 
 
+#include "Fsim.h"
 #include "fsimx_nsdef.h"
 #include "PackedVal.h"
-#include "ym_networks/tgnet.h"
 #include "ym_logic/LogExpr.h"
 #include "EventQ.h"
 #include "FsimFault.h"
-
-
-BEGIN_NAMESPACE_YM_SATPG
-
-class SaFault;
-class TestVector;
-
-END_NAMESPACE_YM_SATPG
 
 
 BEGIN_NAMESPACE_YM_SATPG_FSIMX
@@ -38,7 +30,8 @@ class SimNode;
 /// @brief 故障シミュレーションを行うモジュール
 /// @sa ModBase
 //////////////////////////////////////////////////////////////////////
-class FsimX
+class FsimX :
+  public Fsim
 {
 public:
 
@@ -52,10 +45,11 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
+  // Fsim の仮想関数
+  /////////////////////////////////////////////////////////////////////
 
   /// @brief ネットワークをセットする．
+  virtual
   void
   set_network(const TgNetwork& network,
 	      const vector<SaFault*>& flist);
@@ -63,20 +57,23 @@ public:
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
   /// @param[out] det_faults 検出された故障を格納するリスト
+  virtual
   void
   run(TestVector* tv,
-      list<SaFault*>& det_faults);
+      vector<SaFault*>& det_faults);
 
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
   /// @param[out] det_faults 検出された故障を格納するリストの配列
+  virtual
   void
   run(const vector<TestVector*>& tv_array,
-      vector<list<SaFault*> >& det_faults);
+      vector<vector<SaFault*> >& det_faults);
 
   /// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
   /// @param[in] tv テストベクタ
   /// @param[in] f 対象の故障
+  virtual
   bool
   run(TestVector* tv,
       SaFault* f);
@@ -113,7 +110,7 @@ private:
   /// @brief ffr 内の故障が検出可能か調べる．
   void
   fault_sweep(SimFFR* ffr,
-	      list<SaFault*>& det_faults);
+	      vector<SaFault*>& det_faults);
 
 
 private:

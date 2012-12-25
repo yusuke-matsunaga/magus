@@ -1,9 +1,7 @@
 
-/// @file src/fsim/EventQ.cc
+/// @file src/fsim2/EventQ.cc
 /// @brief EventQ の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: EventQ.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
@@ -13,7 +11,7 @@
 #include "SimNode.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIM
+BEGIN_NAMESPACE_YM_SATPG_FSIM2
 
 //////////////////////////////////////////////////////////////////////
 // 故障シミュレーション用のイベントキューを表すクラス
@@ -52,4 +50,4 @@ EventQ::init(ymuint max_level)
   mNum = 0;
 }
 
-END_NAMESPACE_YM_SATPG_FSIM
+END_NAMESPACE_YM_SATPG_FSIM2

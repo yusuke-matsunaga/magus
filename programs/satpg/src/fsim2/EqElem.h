@@ -1,7 +1,7 @@
 #ifndef EQELEM_H
 #define EQELEM_H
 
-/// @file src/fsim/EqElem.h
+/// @file src/fsim2/EqElem.h
 /// @brief EqElem のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,10 +10,10 @@
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "fsim_nsdef.h"
+#include "fsim2_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIM
+BEGIN_NAMESPACE_YM_SATPG_FSIM2
 
 class SimNode;
 class EventQ;
@@ -110,6 +110,6 @@ EqElem::clear_queue()
   mInQueue = false;
 }
 
-END_NAMESPACE_YM_SATPG_FSIM
+END_NAMESPACE_YM_SATPG_FSIM2
 
 #endif // EQELEM_H

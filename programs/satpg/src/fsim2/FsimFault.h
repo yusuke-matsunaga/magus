@@ -1,25 +1,17 @@
 #ifndef FSIMFAULT_H
 #define FSIMFAULT_H
 
-/// @file src/fsim/FsimFault.h
+/// @file src/fsim2/FsimFault.h
 /// @brief FsimFault のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: FsimFault.h 2128 2009-03-12 07:25:33Z matsunaga $
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "fsim_nsdef.h"
+#include "fsim2_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG
-
-class SaFault;
-
-END_NAMESPACE_YM_SATPG
-
-BEGIN_NAMESPACE_YM_SATPG_FSIM
+BEGIN_NAMESPACE_YM_SATPG_FSIM2
 
 class SimNode;
 
@@ -63,6 +55,6 @@ struct FsimFault
   PackedVal mObsMask;
 };
 
-END_NAMESPACE_YM_SATPG_FSIM
+END_NAMESPACE_YM_SATPG_FSIM2
 
 #endif // FSIMFAULT_H

@@ -147,7 +147,7 @@ AC_CONFIG_FILES([
 	include/Makefile
 	src/Makefile
 	src/base/Makefile
-	src/fsim/Makefile
+	src/fsim2/Makefile
 	src/fsim3/Makefile
 	src/fsimx/Makefile
 	src/dtpg/Makefile

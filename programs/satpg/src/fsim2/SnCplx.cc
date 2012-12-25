@@ -1,9 +1,7 @@
 
-/// @file src/fsim/SnCplx.cc
+/// @file src/fsim2/SnCplx.cc
 /// @brief SnCplx の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: SnCplx.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
@@ -12,7 +10,7 @@
 #include "SnCplx.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIM
+BEGIN_NAMESPACE_YM_SATPG_FSIM2
 
 //////////////////////////////////////////////////////////////////////
 // SnCplx
@@ -96,4 +94,4 @@ SnCplx::dump(ostream& s) const
   s << ")" << "\t" << mExpr << endl;
 }
 
-END_NAMESPACE_YM_SATPG_FSIM
+END_NAMESPACE_YM_SATPG_FSIM2

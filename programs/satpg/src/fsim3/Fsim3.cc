@@ -3,8 +3,6 @@
 /// @brief Fsim3 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Fsim3.cc 2203 2009-04-16 05:04:40Z matsunaga $
-///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -21,7 +19,7 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
-Fsim3*
+Fsim*
 new_Fsim3()
 {
   return new nsFsim3::Fsim3();
@@ -270,7 +268,7 @@ Fsim3::set_network(const TgNetwork& network,
 // @param[out] det_faults 検出された故障を格納するリスト
 void
 Fsim3::run(TestVector* tv,
-	   list<SaFault*>& det_faults)
+	   vector<SaFault*>& det_faults)
 {
   det_faults.clear();
 
@@ -332,7 +330,7 @@ Fsim3::run(TestVector* tv,
 // @param[out] det_faults 検出された故障を格納するリストの配列
 void
 Fsim3::run(const vector<TestVector*>& tv_array,
-	   vector<list<SaFault*> >& det_faults)
+	   vector<vector<SaFault*> >& det_faults)
 {
   ymuint nb = tv_array.size();
   assert_cond(det_faults.size() >= nb, __FILE__, __LINE__);

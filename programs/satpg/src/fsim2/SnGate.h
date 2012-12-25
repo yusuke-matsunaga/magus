@@ -1,11 +1,9 @@
 #ifndef SNGATE_H
 #define SNGATE_H
 
-/// @file src/fsim/SnGate.h
+/// @file src/fsim2/SnGate.h
 /// @brief SnGate のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: SnGate.h 2128 2009-03-12 07:25:33Z matsunaga $
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
@@ -14,7 +12,7 @@
 #include "SimNode.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIM
+BEGIN_NAMESPACE_YM_SATPG_FSIM2
 
 //////////////////////////////////////////////////////////////////////
 /// @class SnGate SimNode.h
@@ -228,6 +226,6 @@ protected:
 
 };
 
-END_NAMESPACE_YM_SATPG_FSIM
+END_NAMESPACE_YM_SATPG_FSIM2
 
 #endif // SNGATE_H

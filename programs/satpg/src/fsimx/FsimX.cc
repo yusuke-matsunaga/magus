@@ -1,9 +1,7 @@
 
-/// @file src/fsimx/Fsim.cc
-/// @brief Fsim の実装ファイル
+/// @file src/fsimx/FsimX.cc
+/// @brief FsimX の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: FsimX.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
@@ -21,7 +19,7 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
-FsimX*
+Fsim*
 new_FsimX()
 {
   return new nsFsimX::FsimX();
@@ -270,7 +268,7 @@ FsimX::set_network(const TgNetwork& network,
 // @param[out] det_faults 検出された故障を格納するリスト
 void
 FsimX::run(TestVector* tv,
-	   list<SaFault*>& det_faults)
+	   vector<SaFault*>& det_faults)
 {
   ymuint npi = mNetwork->input_num2();
 
@@ -369,7 +367,7 @@ FsimX::run(TestVector* tv,
 // @param[out] det_faults 検出された故障を格納するリストの配列
 void
 FsimX::run(const vector<TestVector*>& tv_array,
-	   vector<list<SaFault*> >& det_faults)
+	   vector<vector<SaFault*> >& det_faults)
 {
   ymuint npi = mNetwork->input_num2();
   ymuint nb = tv_array.size();
@@ -787,7 +785,7 @@ FsimX::calc_fval()
 // @brief ffr 内の故障が検出可能か調べる．
 void
 FsimX::fault_sweep(SimFFR* ffr,
-		   list<SaFault*>& det_faults)
+		   vector<SaFault*>& det_faults)
 {
   vector<FsimFault*>& flist = ffr->fault_list();
   ymuint fnum = flist.size();

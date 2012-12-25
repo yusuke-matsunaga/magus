@@ -16,6 +16,17 @@
 #include "ym_logic/SatSolver.h"
 
 
+BEGIN_NAMESPACE_YM_SATPG
+
+Dtpg*
+new_DtpgSat()
+{
+  return new nsDtpg::DtpgSat();
+}
+
+END_NAMESPACE_YM_SATPG
+
+
 BEGIN_NAMESPACE_YM_SATPG_DTPG
 
 BEGIN_NONAMESPACE
@@ -421,6 +432,17 @@ DtpgSat::~DtpgSat()
   delete mNetwork;
 }
 
+// @brief 使用する SAT エンジンを指定する．
+void
+DtpgSat::set_mode(const string& type,
+		  const string& option,
+		  ostream* outp)
+{
+  mType = type;
+  mOption = option;
+  mOutP = outp;
+}
+
 // @brief 回路と故障リストを設定する．
 // @param[in] tgnetwork 対象のネットワーク
 // @param[in] fault_list 故障リスト
@@ -432,186 +454,131 @@ DtpgSat::set_network(const TgNetwork& tgnetwork,
   mNetwork = new DtpgNetwork(tgnetwork, fault_list);
 }
 
-// @brief 一つの故障に対してテストパタン生成を行なう．
+// @brief モードでテスト生成を行なう．
 // @param[in] op テスト生成後に呼ばれるファンクター
+// @param[in] option オプション文字列
 void
-DtpgSat::single(DtpgOperator& op)
+DtpgSat::run(DtpgOperator& op,
+	     const string& option)
 {
-  mNetwork->activate_all();
-  single_sub(op);
-}
-
-// @brief dual モードでテスト生成を行なう．
-// @param[in] op テスト生成後に呼ばれるファンクター
-void
-DtpgSat::dual(DtpgOperator& op)
-{
-  mNetwork->activate_all();
-  dual_sub(op);
-}
-
-// @brief ffr モードでテスト生成を行なう．
-// @param[in] op テスト生成後に呼ばれるファンクター
-void
-DtpgSat::ffr(DtpgOperator& op)
-{
-  mNetwork->activate_all();
-  ffr_sub(op);
-}
-
-// @brief mffc モードでテスト生成を行なう．
-// @param[in] op テスト生成後に呼ばれるファンクター
-void
-DtpgSat::mffc(DtpgOperator& op)
-{
-  mNetwork->activate_all();
-  mffc_sub(op);
-}
-
-// @brief all モードでテスト生成を行なう．
-// @param[in] op テスト生成後に呼ばれるファンクター
-void
-DtpgSat::all(DtpgOperator& op)
-{
-#if 0
-  mNetwork->activate_all();
-  vector<DtpgFFR*> mffc_list;
-  mNetwork->get_mffc_list(mffc_list);
-  for (vector<DtpgFFR*>::const_iterator p = mffc_list.begin();
-       p != mffc_list.end(); ++ p) {
-    DtpgFFR* ffr = *p;
-    ffr_mode(ffr, tvmgr, d_list, u_list);
-  }
-#endif
-}
-
-// @brief 一つの故障に対してテストパタン生成を行なう．
-// @param[in] op テスト生成後に呼ばれるファンクター
-void
-DtpgSat::single_posplit(DtpgOperator& op,
-			bool skip)
-{
-  mSkip = skip;
-  ymuint no = mNetwork->output_num2();
-  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-    mNetwork->activate_po(po_pos);
+  if ( option == string() || option == "single" ) {
+    mNetwork->activate_all();
     single_sub(op);
   }
-
-  if ( mSkip ) {
-    clear_skip();
-  }
-
-  mSkip = false;
-}
-
-// @brief dual モードでテスト生成を行なう．
-// @param[in] op テスト生成後に呼ばれるファンクター
-void
-DtpgSat::dual_posplit(DtpgOperator& op,
-		      bool skip)
-{
-  mSkip = skip;
-  ymuint no = mNetwork->output_num2();
-  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-    mNetwork->activate_po(po_pos);
+  else if ( option == "dual" ) {
+    mNetwork->activate_all();
     dual_sub(op);
   }
-
-  if ( mSkip ) {
-    clear_skip();
-  }
-
-  mSkip = false;
-}
-
-// @brief ffr モードでテスト生成を行なう．
-// @param[in] op テスト生成後に呼ばれるファンクター
-void
-DtpgSat::ffr_posplit(DtpgOperator& op,
-		     bool skip)
-{
-  mSkip = skip;
-  ymuint no = mNetwork->output_num2();
-  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-    mNetwork->activate_po(po_pos);
+  else if ( option == "ffr" ) {
+    mNetwork->activate_all();
     ffr_sub(op);
   }
-
-  if ( mSkip ) {
-    clear_skip();
-  }
-
-  mSkip = false;
-}
-
-// @brief mffc モードでテスト生成を行なう．
-// @param[in] op テスト生成後に呼ばれるファンクター
-void
-DtpgSat::mffc_posplit(DtpgOperator& op,
-		      bool skip)
-{
-  mSkip = skip;
-  ymuint no = mNetwork->output_num2();
-  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-    mNetwork->activate_po(po_pos);
+  else if ( option == "mffc" ) {
+    mNetwork->activate_all();
     mffc_sub(op);
   }
+  else if ( option == "single_po" || option == "single_po_skip" ) {
+    mSkip = (option == "single_po_skip");
+    ymuint no = mNetwork->output_num2();
+    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+      mNetwork->activate_po(po_pos);
+      single_sub(op);
+    }
 
-  if ( mSkip ) {
-    clear_skip();
+    if ( mSkip ) {
+      clear_skip();
+    }
+
+    mSkip = false;
   }
+  else if ( option == "dual_po" || option == "dual_po_skip" ) {
+    mSkip = (option == "dual_po_skip");
+    ymuint no = mNetwork->output_num2();
+    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+      mNetwork->activate_po(po_pos);
+      dual_sub(op);
+    }
 
-  mSkip = false;
-}
+    if ( mSkip ) {
+      clear_skip();
+    }
 
-// @brief all モードでテスト生成を行なう．
-// @param[in] op テスト生成後に呼ばれるファンクター
-void
-DtpgSat::all_posplit(DtpgOperator& op,
-		     bool skip)
-{
-  mSkip = skip;
-  ymuint no = mNetwork->output_num2();
-  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-    mNetwork->activate_po(po_pos);
-    vector<DtpgFault*> flist;
-    ymuint n = mNetwork->active_node_num();
-    vector<DtpgNode*> node_list;
-    node_list.reserve(n);
-    for (ymuint i = 0; i < n; ++ i) {
-      DtpgNode* node = mNetwork->active_node(i);
-      node_list.push_back(node);
-      for (int val = 0; val < 2; ++ val) {
-	DtpgFault* f = node->output_fault(val);
-	if ( f != NULL && !f->is_skip() ) {
-	  flist.push_back(f);
-	}
-      }
-      ymuint ni = node->fanin_num();
-      for (ymuint i = 0; i < ni; ++ i) {
+    mSkip = false;
+  }
+  else if ( option == "ffr_po" || option == "ffr_po_skip" ) {
+    mSkip = (option == "ffr_po_skip");
+    ymuint no = mNetwork->output_num2();
+    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+      mNetwork->activate_po(po_pos);
+      ffr_sub(op);
+    }
+
+    if ( mSkip ) {
+      clear_skip();
+    }
+
+    mSkip = false;
+  }
+  else if ( option == "mffc_po" || option == "mffc_po_skip" ) {
+    mSkip = (option == "mffc_po_skip");
+    ymuint no = mNetwork->output_num2();
+    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+      mNetwork->activate_po(po_pos);
+      mffc_sub(op);
+    }
+
+    if ( mSkip ) {
+      clear_skip();
+    }
+
+    mSkip = false;
+  }
+  else if ( option == "all_po" || option == "all_po_skip" ) {
+    mSkip = (option == "all_po_skip");
+    ymuint no = mNetwork->output_num2();
+    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+      mNetwork->activate_po(po_pos);
+      vector<DtpgFault*> flist;
+      ymuint n = mNetwork->active_node_num();
+      vector<DtpgNode*> node_list;
+      node_list.reserve(n);
+      for (ymuint i = 0; i < n; ++ i) {
+	DtpgNode* node = mNetwork->active_node(i);
+	node_list.push_back(node);
 	for (int val = 0; val < 2; ++ val) {
-	  DtpgFault* f = node->input_fault(val, i);
+	  DtpgFault* f = node->output_fault(val);
 	  if ( f != NULL && !f->is_skip() ) {
 	    flist.push_back(f);
 	  }
 	}
+	ymuint ni = node->fanin_num();
+	for (ymuint i = 0; i < ni; ++ i) {
+	  for (int val = 0; val < 2; ++ val) {
+	    DtpgFault* f = node->input_fault(val, i);
+	    if ( f != NULL && !f->is_skip() ) {
+	      flist.push_back(f);
+	    }
+	  }
+	}
       }
+      if ( flist.empty() ) {
+	continue;
+      }
+
+      SatSolver solver(mType, mOption, mOutP);
+      mTimer.start();
+      dtpg_ffr(solver, flist, mNetwork->output(po_pos), node_list, op);
     }
-    if ( flist.empty() ) {
-      continue;
+
+    if ( mSkip ) {
+      clear_skip();
     }
 
-    SatSolver solver(mType, mOption, mOutP);
-    mTimer.start();
-    dtpg_ffr(solver, flist, mNetwork->output(po_pos), node_list, op);
+    mSkip = false;
   }
-
-  if ( mSkip ) {
-    clear_skip();
+  else {
+    cout << "illegal option " << option << ". ignored" << endl;
   }
-
-  mSkip = false;
 }
 
 // @brief single モードの共通処理
@@ -746,17 +713,6 @@ DtpgSat::mffc_sub(DtpgOperator& op)
     ffr_mode(ffr, op);
     delete ffr;
   }
-}
-
-// @brief 使用する SAT エンジンを指定する．
-void
-DtpgSat::set_mode(const string& type,
-		  const string& option,
-		  ostream* outp)
-{
-  mType = type;
-  mOption = option;
-  mOutP = outp;
 }
 
 // @brief 一つの FFR に対してテストパタン生成を行う．
@@ -1357,7 +1313,9 @@ DtpgSat::solve(SatSolver& solver,
     if ( mSkip ) {
       f->set_skip();
     }
-    op.set_untestable(f->safault());
+    else {
+      op.set_untestable(f->safault());
+    }
   }
 #else
   f->set_skip();

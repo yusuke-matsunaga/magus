@@ -11,6 +11,7 @@
 
 
 #include "dtpg_nsdef.h"
+#include "Dtpg.h"
 #include "ym_networks/tgnet.h"
 #include "ym_logic/Literal.h"
 #include "ym_logic/SatStats.h"
@@ -23,7 +24,8 @@ BEGIN_NAMESPACE_YM_SATPG_DTPG
 /// @class DtpgSat DtpgSat.h "DtpgSat.h"
 /// @brief SAT を用いたパタン生成器
 //////////////////////////////////////////////////////////////////////
-class DtpgSat
+class DtpgSat :
+  public Dtpg
 {
 public:
 
@@ -37,10 +39,11 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // パタン生成を行う関数
+  // Dtpg の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 使用する SAT エンジンを指定する．
+  virtual
   void
   set_mode(const string& type = string(),
 	   const string& option = string(),
@@ -49,64 +52,18 @@ public:
   /// @brief 回路と故障リストを設定する．
   /// @param[in] tgnetwork 対象のネットワーク
   /// @param[in] fault_list 故障リスト
+  virtual
   void
   set_network(const TgNetwork& tgnetwork,
 	      const vector<SaFault*>& fault_list);
 
-  /// @brief single モードでテスト生成を行なう．
+  /// @brief モードでテスト生成を行なう．
   /// @param[in] op テスト生成後に呼ばれるファンクター
+  /// @param[in] option オプション文字列
+  virtual
   void
-  single(DtpgOperator& op);
-
-  /// @brief dual モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  dual(DtpgOperator& op);
-
-  /// @brief ffr モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  ffr(DtpgOperator& op);
-
-  /// @brief mffc モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  mffc(DtpgOperator& op);
-
-  /// @brief all モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  all(DtpgOperator& op);
-
-  /// @brief single モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  single_posplit(DtpgOperator& op,
-		 bool skip);
-
-  /// @brief dual モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  dual_posplit(DtpgOperator& op,
-	       bool skip);
-
-  /// @brief ffr モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  ffr_posplit(DtpgOperator& op,
-	      bool skip);
-
-  /// @brief mffc モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  mffc_posplit(DtpgOperator& op,
-	       bool skip);
-
-  /// @brief all モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  all_posplit(DtpgOperator& op,
-	      bool skip);
+  run(DtpgOperator& op,
+      const string& option = string());
 
   /// @brief 統計情報をクリアする．
   void

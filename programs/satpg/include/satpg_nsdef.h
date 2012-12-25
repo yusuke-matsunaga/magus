@@ -72,6 +72,7 @@ class FaultMgr;
 class TestVector;
 class TvMgr;
 class DtpgOperator;
+class Fsim;
 
 END_NAMESPACE_YM_SATPG
 
