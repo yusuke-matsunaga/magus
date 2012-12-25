@@ -589,7 +589,12 @@ dtpg_single(SatSolver& solver,
     fsrc = fnode->fanin(ipos);
   }
 
-  vector<Literal> assumptions(2);
+  ymuint nim = 0;
+  for (DtpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    ++ nim;
+  }
+
+  vector<Literal> assumptions(nim + 2);
   if ( f->val() ) {
     assumptions[0] = Literal(fsrc->gvar(), kPolNega);
     assumptions[1] = Literal(fsrc->fvar(), kPolPosi);
@@ -597,6 +602,12 @@ dtpg_single(SatSolver& solver,
   else {
     assumptions[0] = Literal(fsrc->gvar(), kPolPosi);
     assumptions[1] = Literal(fsrc->fvar(), kPolNega);
+  }
+
+  // dominator ノードの dvar は1でなければならない．
+  ymuint i = 2;
+  for (DtpgNode* node = fnode; node != NULL; node = node->imm_dom(), ++ i) {
+    assumptions[i] = Literal(node->dvar(), kPolPosi);
   }
 
   solve(solver, f, assumptions, input_list, op);
@@ -628,10 +639,21 @@ dtpg_dual(SatSolver& solver,
     fsrc = f0->source_node();
   }
 
-  vector<Literal> assumptions(2);
+  ymuint nim = 0;
+  for (DtpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    ++ nim;
+  }
+
+  vector<Literal> assumptions(nim + 2);
 
   assumptions[0] = Literal(fsrc->gvar(), kPolPosi);
   assumptions[1] = Literal(fsrc->fvar(), kPolNega);
+
+  // dominator ノードの dvar は1でなければならない．
+  ymuint i = 2;
+  for (DtpgNode* node = fnode; node != NULL; node = node->imm_dom(), ++ i) {
+    assumptions[i] = Literal(node->dvar(), kPolPosi);
+  }
 
   solve(solver, f0, assumptions, input_list, op);
 
@@ -812,6 +834,12 @@ dtpg_ffr(SatSolver& solver,
     vector<Literal> assumptions;
     assumptions.reserve(node_list.size() + nf);
 
+    // 該当の故障に対する変数のみ1にする．
+    for (ymuint j = 0; j < nf; ++ j) {
+      tPol pol = (j == i) ? kPolPosi : kPolNega;
+      assumptions.push_back(Literal(flt_var[j], pol));
+    }
+
     // 故障ノードの TFO 以外の dlit を0にする．
     hash_set<ymuint> tfo_mark;
     mark_tfo(f->node(), tfo_mark);
@@ -822,12 +850,6 @@ dtpg_ffr(SatSolver& solver,
 	Literal dlit(node->dvar(), kPolNega);
 	assumptions.push_back(dlit);
       }
-    }
-
-    // 該当の故障に対する変数のみ1にする．
-    for (ymuint j = 0; j < nf; ++ j) {
-      tPol pol = (j == i) ? kPolPosi : kPolNega;
-      assumptions.push_back(Literal(flt_var[j], pol));
     }
 
     // dominator ノードの dvar は1でなければならない．
