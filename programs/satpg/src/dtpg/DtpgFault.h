@@ -81,6 +81,18 @@ public:
   void
   clear_skip();
 
+  /// @brief untestable フラグを返す．
+  bool
+  is_untestable() const;
+
+  /// @brief untestable フラグをセットする．
+  void
+  set_untestable();
+
+  /// @brief untestable フラグをクリアする．
+  void
+  clear_untestable();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -99,7 +111,7 @@ private:
   // 故障の入力側のノード
   DtpgNode* mSrcNode;
 
-  // 故障位置 + 故障値 + スキップフラグ
+  // 故障位置 + 故障値 + スキップフラグ + untestabel フラグ
   ymuint32 mPosVal;
 };
 
@@ -174,7 +186,7 @@ inline
 ymuint
 DtpgFault::pos() const
 {
-  return (mPosVal >> 3);
+  return (mPosVal >> 4);
 }
 
 // @brief 故障値を返す．
@@ -207,6 +219,30 @@ void
 DtpgFault::clear_skip()
 {
   mPosVal &= ~4U;
+}
+
+// @brief untestable フラグを返す．
+inline
+bool
+DtpgFault::is_untestable() const
+{
+  return static_cast<bool>((mPosVal >> 3) & 1U);
+}
+
+// @brief untestable フラグをセットする．
+inline
+void
+DtpgFault::set_untestable()
+{
+  mPosVal |= 8U;
+}
+
+// @brief untestable フラグをクリアする．
+inline
+void
+DtpgFault::clear_untestable()
+{
+  mPosVal &= ~8U;
 }
 
 END_NAMESPACE_YM_SATPG_DTPG
