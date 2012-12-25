@@ -1,7 +1,7 @@
 #ifndef OP1_H
 #define OP1_H
 
-/// @file atpg/src/dtpg/Op1.h
+/// @file atpg/src/main/Op1.h
 /// @brief Op1 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "DtpgOperator.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_DTPG
+BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
 // DtpgSat 用の DtpgOperator
@@ -24,8 +24,7 @@ public:
 
   /// @brief コンストラクタ
   Op1(FaultMgr& fmgr,
-      TvMgr& tvmgr,
-      bool skip);
+      TvMgr& tvmgr);
 
   /// @brief デストラクタ
   ~Op1();
@@ -37,16 +36,18 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テストパタンが見つかった場合に呼ばれる関数
+  /// @param[in] f 故障
+  /// @param[in] val_list "入力ノードの番号 x 2 + 値" のリスト
   virtual
   void
-  set_detected(DtpgFault* f,
-	       const vector<DtpgNode*>& input_list,
-	       const vector<Bool3>& model);
+  set_detected(SaFault* f,
+	       const vector<ymuint>& val_list);
 
   /// @brief 検出不能のときに呼ばれる関数
+  /// @param[in] f 故障
   virtual
   void
-  set_untestable(DtpgFault* f);
+  set_untestable(SaFault* f);
 
 
 private:
@@ -58,10 +59,8 @@ private:
 
   TvMgr& mTvMgr;
 
-  bool mSkip;
-
 };
 
-END_NAMESPACE_YM_SATPG_DTPG
+END_NAMESPACE_YM_SATPG
 
 #endif // OP1_H

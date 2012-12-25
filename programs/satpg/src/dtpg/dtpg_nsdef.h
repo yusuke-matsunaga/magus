@@ -34,7 +34,6 @@ class DtpgNetwork;
 class DtpgNode;
 class DtpgFFR;
 class DtpgFault;
-class DtpgOperator;
 
 END_NAMESPACE_YM_SATPG_DTPG
 

@@ -10,6 +10,7 @@
 
 
 #include "AtpgMgr.h"
+#include "Op1.h"
 #include "fsim/Fsim.h"
 #include "dtpg/DtpgSat.h"
 #include "ym_networks/TgBlifReader.h"
@@ -235,7 +236,9 @@ AtpgMgr::dtpg_single()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->single(mFaultMgr, mTvMgr);
+  Op1 op(mFaultMgr, mTvMgr);
+
+  mDtpg->single(op);
 
   after_update_faults();
 
@@ -249,7 +252,9 @@ AtpgMgr::dtpg_dual()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->dual(mFaultMgr, mTvMgr);
+  Op1 op(mFaultMgr, mTvMgr);
+
+  mDtpg->dual(op);
 
   after_update_faults();
 
@@ -263,7 +268,9 @@ AtpgMgr::dtpg_ffr()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->ffr(mFaultMgr, mTvMgr);
+  Op1 op(mFaultMgr, mTvMgr);
+
+  mDtpg->ffr(op);
 
   after_update_faults();
 
@@ -277,7 +284,9 @@ AtpgMgr::dtpg_mffc()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->mffc(mFaultMgr, mTvMgr);
+  Op1 op(mFaultMgr, mTvMgr);
+
+  mDtpg->mffc(op);
 
   after_update_faults();
 
@@ -291,7 +300,9 @@ AtpgMgr::dtpg_all()
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->all(mFaultMgr, mTvMgr);
+  Op1 op(mFaultMgr, mTvMgr);
+
+  mDtpg->all(op);
 
   after_update_faults();
 
@@ -305,7 +316,9 @@ AtpgMgr::dtpg_single_posplit(bool skip)
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->single_posplit(mFaultMgr, mTvMgr, skip);
+  Op1 op(mFaultMgr, mTvMgr);
+
+  mDtpg->single_posplit(op, skip);
 
   if ( skip ) {
     clear_untestable();
@@ -323,7 +336,9 @@ AtpgMgr::dtpg_dual_posplit(bool skip)
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->dual_posplit(mFaultMgr, mTvMgr, skip);
+  Op1 op(mFaultMgr, mTvMgr);
+
+  mDtpg->dual_posplit(op, skip);
 
   if ( skip ) {
     clear_untestable();
@@ -341,7 +356,9 @@ AtpgMgr::dtpg_ffr_posplit(bool skip)
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->ffr_posplit(mFaultMgr, mTvMgr, skip);
+  Op1 op(mFaultMgr, mTvMgr);
+
+  mDtpg->ffr_posplit(op, skip);
 
   if ( skip ) {
     clear_untestable();
@@ -359,7 +376,9 @@ AtpgMgr::dtpg_mffc_posplit(bool skip)
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->mffc_posplit(mFaultMgr, mTvMgr, skip);
+  Op1 op(mFaultMgr, mTvMgr);
+
+  mDtpg->mffc_posplit(op, skip);
 
   if ( skip ) {
     clear_untestable();
@@ -377,7 +396,9 @@ AtpgMgr::dtpg_all_posplit(bool skip)
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->all_posplit(mFaultMgr, mTvMgr, skip);
+  Op1 op(mFaultMgr, mTvMgr);
+
+  mDtpg->all_posplit(op, skip);
 
   if ( skip ) {
     clear_untestable();

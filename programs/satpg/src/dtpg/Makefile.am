@@ -20,10 +20,6 @@ libatpg_dtpg_la_SOURCES = \
 	DtpgFFR.h \
 	DtpgNetwork.h \
 	DtpgNetwork.cc \
-	DtpgOperator.h \
-	DtpgOperator.cc \
-	Op1.h \
-	Op1.cc \
 	DtpgSat.h \
 	DtpgSat.cc
 

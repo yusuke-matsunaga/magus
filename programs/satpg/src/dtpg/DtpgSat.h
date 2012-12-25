@@ -12,6 +12,7 @@
 
 #include "dtpg_nsdef.h"
 #include "ym_networks/tgnet.h"
+#include "ym_logic/Literal.h"
 #include "ym_logic/SatStats.h"
 #include "ym_utils/StopWatch.h"
 
@@ -52,7 +53,6 @@ public:
   set_network(const TgNetwork& tgnetwork,
 	      const vector<SaFault*>& fault_list);
 
-#if 0
   /// @brief single モードでテスト生成を行なう．
   /// @param[in] op テスト生成後に呼ばれるファンクター
   void
@@ -81,83 +81,32 @@ public:
   /// @brief single モードでテスト生成を行なう．
   /// @param[in] op テスト生成後に呼ばれるファンクター
   void
-  single_posplit(DtpgOperator& op);
-
-  /// @brief dual モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  dual_posplit(DtpgOperator& op);
-
-  /// @brief ffr モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  ffr_posplit(DtpgOperator& op);
-
-  /// @brief mffc モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  mffc_posplit(DtpgOperator& op);
-
-  /// @brief all モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  all_posplit(DtpgOperator& op);
-#else
-  /// @brief single モードでテスト生成を行なう．
-  void
-  single(FaultMgr& fmgr,
-	 TvMgr& tvmgr);
-
-  /// @brief dual モードでテスト生成を行なう．
-  void
-  dual(FaultMgr& fmgr,
-       TvMgr& tvmgr);
-
-  /// @brief ffr モードでテスト生成を行なう．
-  void
-  ffr(FaultMgr& fmgr,
-      TvMgr& tvmgr);
-
-  /// @brief mffc モードでテスト生成を行なう．
-  void
-  mffc(FaultMgr& fmgr,
-       TvMgr& tvmgr);
-
-  /// @brief all モードでテスト生成を行なう．
-  void
-  all(FaultMgr& fmgr,
-      TvMgr& tvmgr);
-
-  /// @brief single モードでテスト生成を行なう．
-  void
-  single_posplit(FaultMgr& fmgr,
-		 TvMgr& tvmgr,
+  single_posplit(DtpgOperator& op,
 		 bool skip);
 
   /// @brief dual モードでテスト生成を行なう．
+  /// @param[in] op テスト生成後に呼ばれるファンクター
   void
-  dual_posplit(FaultMgr& fmgr,
-	       TvMgr& tvmgr,
+  dual_posplit(DtpgOperator& op,
 	       bool skip);
 
   /// @brief ffr モードでテスト生成を行なう．
+  /// @param[in] op テスト生成後に呼ばれるファンクター
   void
-  ffr_posplit(FaultMgr& fmgr,
-	      TvMgr& tvmgr,
+  ffr_posplit(DtpgOperator& op,
 	      bool skip);
 
   /// @brief mffc モードでテスト生成を行なう．
+  /// @param[in] op テスト生成後に呼ばれるファンクター
   void
-  mffc_posplit(FaultMgr& fmgr,
-	       TvMgr& tvmgr,
+  mffc_posplit(DtpgOperator& op,
 	       bool skip);
 
   /// @brief all モードでテスト生成を行なう．
+  /// @param[in] op テスト生成後に呼ばれるファンクター
   void
-  all_posplit(FaultMgr& fmgr,
-	      TvMgr& tvmgr,
+  all_posplit(DtpgOperator& op,
 	      bool skip);
-#endif
 
   /// @brief 統計情報をクリアする．
   void
@@ -173,64 +122,21 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief single モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
+  /// @brief single モードの共通処理
   void
-  single(DtpgOperator& op);
+  single_sub(DtpgOperator& op);
 
-  /// @brief dual モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
+  /// @brief dual モードの共通処理
   void
-  dual(DtpgOperator& op);
+  dual_sub(DtpgOperator& op);
 
-  /// @brief ffr モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
+  /// @brief ffr モードの共通処理
   void
-  ffr(DtpgOperator& op);
+  ffr_sub(DtpgOperator& op);
 
-  /// @brief mffc モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
+  /// @brief mffc モードの共通処理
   void
-  mffc(DtpgOperator& op);
-
-  /// @brief all モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  all(DtpgOperator& op);
-
-  /// @brief single モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  single_posplit(DtpgOperator& op);
-
-  /// @brief dual モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  dual_posplit(DtpgOperator& op);
-
-  /// @brief ffr モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  ffr_posplit(DtpgOperator& op);
-
-  /// @brief mffc モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  mffc_posplit(DtpgOperator& op);
-
-  /// @brief all モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  void
-  all_posplit(DtpgOperator& op);
-
-  /// @brief 一つのノードに対して dual_mode でテストパタン生成を行なう．
-  /// @param[in] node 対象のノード
-  /// @param[in] fmgr 故障の管理用オブジェクト
-  /// @param[in] tvmgr テストベクタの管理用オブジェクト
-  /// @param[out] u_list 検査不能故障を格納するリスト
-  void
-  dual_mode_node(DtpgNode* node,
-		 DtpgOperator& op);
+  mffc_sub(DtpgOperator& op);
 
   /// @brief 一つの FFR に対してテストパタン生成を行う．
   /// @param[in] ffr 対象の FFR
@@ -242,10 +148,62 @@ private:
   void
   clear_skip();
 
+  /// @brief 一つの故障に対してテストパタン生成を行う．
+  /// @param[in] solver SatSolver
+  /// @param[in] f 故障
+  /// @param[in] op テスト生成の結果を処理するファンクター
+  void
+  dtpg_single(SatSolver& solver,
+	      DtpgFault* f,
+	      DtpgOperator& op);
+
+  /// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
+  /// @param[in] solver SatSolver
+  /// @param[in] f0 0縮退故障
+  /// @param[in] f1 1縮退故障
+  /// @param[in] op テスト生成の結果を処理するファンクター
+  void
+  dtpg_dual(SatSolver& solver,
+	    DtpgFault* f0,
+	    DtpgFault* f1,
+	    DtpgOperator& op);
+
+  /// @brief FFR 内の故障に対してテストパタン生成を行なう．
+  /// @param[in] solver SatSolver
+  /// @@aram[in] network 対象のネットワーク
+  /// @param[in] flist 故障リスト
+  /// @param[in] root FFR の根のノード
+  /// @param[in] node_list FFR 内のノードリスト
+  /// @param[in] op テスト生成の結果を処理するファンクター
+  void
+  dtpg_ffr(SatSolver& solver,
+	   const vector<DtpgFault*>& flist,
+	   DtpgNode* root,
+	   const vector<DtpgNode*>& node_list,
+	   DtpgOperator& op);
+
   /// @brief 統計情報を得る．
+  /// @param[in] solver SatSolver
   void
   update_stats(SatSolver& solver,
 	       ymuint n);
+
+  /// @brief fnode の故障が伝搬する条件を表す CNF を作る．
+  /// @param[in] solver SatSolver
+  /// @param[in] fnode 対象のノード
+  /// @param[in] input_list fnode の TFI に含まれる入力ノードのリスト
+  void
+  make_prop_cnf(SatSolver& solver,
+		DtpgNode* fnode,
+		vector<DtpgNode*>& input_list);
+
+  /// @brief 一つの SAT問題を解く．
+  void
+  solve(SatSolver& solver,
+	DtpgFault* f,
+	const vector<Literal>& assumptions,
+	const vector<DtpgNode*>& input_list,
+	DtpgOperator& op);
 
 
 private:
@@ -267,6 +225,9 @@ private:
 
   // 対象の回路
   DtpgNetwork* mNetwork;
+
+  // skip フラグ
+  bool mSkip;
 
   // CNF の生成回数
   ymuint32 mRunCount;

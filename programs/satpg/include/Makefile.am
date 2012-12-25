@@ -9,6 +9,7 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	satpg_nsdef.h \
 	AtpgMgr.h \
+	DtpgOperator.h \
 	FaultMgr.h \
 	FaultStatus.h \
 	PackedVal.h \
