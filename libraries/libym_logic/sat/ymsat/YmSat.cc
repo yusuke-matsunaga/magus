@@ -219,25 +219,6 @@ YmSat::add_clause(ymuint lit_num,
   add_clause_sub(lit_num);
 }
 
-BEGIN_NONAMESPACE
-
-void
-sort(ymuint lit_num,
-     Literal* lits)
-{
-  for (ymuint i = 1; i < lit_num; ++ i) {
-    for (ymuint j = i; j > 0; -- j) {
-      if ( lits[j] < lits[j - 1] ) {
-	Literal tmp = lits[j];
-	lits[j] = lits[j - 1];
-	lits[j - 1] = tmp;
-      }
-    }
-  }
-}
-
-END_NONAMESPACE
-
 // @brief add_clause() の下請け関数
 void
 YmSat::add_clause_sub(ymuint lit_num)
@@ -252,10 +233,6 @@ YmSat::add_clause_sub(ymuint lit_num)
     cout << "Error![YmSat]: mSane == false" << endl;
     return;
   }
-
-  // operator<(Literal, Literal) を使ったソート
-  //sort(lits.begin(), lits.end());
-  sort(lit_num, mTmpLits);
 
   alloc_var();
 
