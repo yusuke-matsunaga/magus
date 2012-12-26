@@ -28,6 +28,32 @@ alloc_nodearray(Alloc& alloc,
   return new (p) DtpgNode*[n];
 }
 
+void
+dfs(DtpgNode* node,
+    vector<bool>& mark)
+{
+  if ( mark[node->id()] ) {
+    return;
+  }
+
+  mark[node->id()] = true;
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    dfs(node->fanin(i), mark);
+  }
+}
+
+struct Lt
+{
+  bool
+  operator()(const pair<ymuint, ymuint>& left,
+	     const pair<ymuint, ymuint>& right)
+  {
+    return left.first < right.first;
+  }
+
+};
+
 END_NONAMESPACE
 
 
@@ -55,6 +81,7 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
   mNodeMap = alloc_nodearray(mAlloc, mNodeNum);
   mInputArray = alloc_nodearray(mAlloc, input_num2());
   mOutputArray = alloc_nodearray(mAlloc, output_num2());
+  mOutputArray2 = alloc_nodearray(mAlloc, output_num2());
 
   mActNodeNum = 0;
   mActNodeArray = alloc_nodearray(mAlloc, mNodeNum);
@@ -63,7 +90,7 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
     // ただし mNodeArray は入力からのトポロジカル順になる．
     ymuint id = 0;
 
-    for (ymuint i = 0; i < mInputNum; ++ i, ++ id) {
+    for (ymuint i = 0; i < input_num2(); ++ i, ++ id) {
       const TgNode* tgnode = tgnetwork.input(i);
       DtpgNode* node = &mNodeArray[id];
       mInputArray[i] = node;
@@ -77,7 +104,7 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
       set_node(tgnode, tgnetwork, node, id);
     }
 
-    for (ymuint i = 0; i < mOutputNum; ++ i, ++ id) {
+    for (ymuint i = 0; i < output_num2(); ++ i, ++ id) {
       const TgNode* tgnode = tgnetwork.output(i);
       DtpgNode* node = &mNodeArray[id];
       mOutputArray[i] = node;
@@ -130,6 +157,24 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
     }
   }
   activate_all();
+
+  // TFI のサイズの昇順に出力を並べ替える．
+  vector<pair<ymuint, ymuint> > tmp_list(output_num2());
+  for (ymuint i = 0; i < output_num2(); ++ i) {
+    vector<bool> mark(mNodeNum, false);
+    dfs(output(i), mark);
+    ymuint n = 0;
+    for (ymuint j = 0; j < mNodeNum; ++ j) {
+      if ( mark[j] ) {
+	++ n;
+      }
+    }
+    tmp_list[i] = make_pair(n, i);
+  }
+  sort(tmp_list.begin(), tmp_list.end(), Lt());
+  for (ymuint i = 0; i < output_num2(); ++ i) {
+    mOutputArray2[i] = mOutputArray[tmp_list[i].second];
+  }
 }
 
 // @brief デストラクタ
@@ -137,34 +182,17 @@ DtpgNetwork::~DtpgNetwork()
 {
 }
 
-BEGIN_NONAMESPACE
-
-void
-dfs(DtpgNode* node,
-    vector<bool>& mark)
-{
-  if ( mark[node->id()] ) {
-    return;
-  }
-
-  mark[node->id()] = true;
-  ymuint ni = node->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    dfs(node->fanin(i), mark);
-  }
-}
-
-END_NONAMESPACE
-
 // @brief 一つの外部出力に関係するノードのみをアクティブにする．
-// @param[in] pos 外部出力の位置番号
+// @param[in] onode 外部出力ノード
 void
-DtpgNetwork::activate_po(ymuint pos)
+DtpgNetwork::activate_po(DtpgNode* onode)
 {
+  assert_cond( onode->is_output(), __FILE__, __LINE__);
+
   vector<bool> mark(mNodeNum, false);
 
   // pos 番めの出力から到達可能なノードにマークをつける．
-  dfs(output(pos), mark);
+  dfs(onode, mark);
 
   activate_sub(mark);
 }

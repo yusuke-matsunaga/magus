@@ -41,9 +41,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 一つの外部出力に関係するノードのみをアクティブにする．
-  /// @param[in] pos 外部出力の位置番号
+  /// @param[in] onode 外部出力ノード
   void
-  activate_po(ymuint pos);
+  activate_po(DtpgNode* onode);
 
   /// @brief 全てのノードをアクティブにする．
   void
@@ -84,6 +84,10 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < output_num2() )
   DtpgNode*
   output(ymuint pos);
+
+  /// @brief サイズの降順で整列した順番で外部出力ノードを取り出す．
+  DtpgNode*
+  output2(ymuint pos);
 
   /// @brief 故障リストを得る．
   const vector<DtpgFault*>&
@@ -178,6 +182,9 @@ private:
   // 外部出力ノードの配列
   DtpgNode** mOutputArray;
 
+  // TFO サイズの降順に整列した外部出力ノードの配列
+  DtpgNode** mOutputArray2;
+
   // アクティブなノード数
   ymuint32 mActNodeNum;
 
@@ -255,6 +262,15 @@ DtpgNetwork::output(ymuint pos)
 {
   assert_cond( pos < output_num2(), __FILE__, __LINE__);
   return mOutputArray[pos];
+}
+
+// @brief サイズの降順で整列した順番で外部出力ノードを取り出す．
+inline
+DtpgNode*
+DtpgNetwork::output2(ymuint pos)
+{
+  assert_cond( pos < output_num2(), __FILE__, __LINE__);
+  return mOutputArray2[pos];
 }
 
 // @brief 故障リストを得る．
