@@ -32,33 +32,26 @@ BEGIN_NAMESPACE_YM_SATPG_DTPG
 BEGIN_NONAMESPACE
 
 void
-make_cnf_and(SatSolver& solver,
-	     VarId i0,
-	     VarId i1,
-	     VarId o)
+make_flt_cnf(SatSolver& solver,
+	     VarId ivar,
+	     VarId fvar,
+	     VarId ovar,
+	     int val)
 {
-  Literal l0(i0, kPolNega);
-  Literal l1(i1, kPolPosi);
-  Literal l2(o, kPolPosi);
-  solver.add_clause(l0, ~l2);
-  solver.add_clause(l1, ~l2);
-  solver.add_clause(~l0, ~l1, l2);
+  Literal l0(ivar, kPolPosi);
+  Literal l1(fvar, kPolPosi);
+  Literal l2(ovar, kPolPosi);
+  if ( val == 0 ) {
+    solver.add_clause( l0, ~l2);
+    solver.add_clause(~l1, ~l2);
+    solver.add_clause(~l0,  l1, l2);
+  }
+  else {
+    solver.add_clause(~l0, l2);
+    solver.add_clause(~l1, l2);
+    solver.add_clause( l0, l1, ~l2);
+  }
 }
-
-void
-make_cnf_or(SatSolver& solver,
-	    VarId i0,
-	    VarId i1,
-	    VarId o)
-{
-  Literal l0(i0, kPolPosi);
-  Literal l1(i1, kPolPosi);
-  Literal l2(o, kPolPosi);
-  solver.add_clause(~l0, l2);
-  solver.add_clause(~l1, l2);
-  solver.add_clause(l0, l1, ~l2);
-}
-
 /// @brief ノードの入出力の関係を表す CNF クローズを生成する．
 /// @param[in] solver SAT ソルバ
 /// @param[in] type ノードの型
@@ -416,6 +409,21 @@ make_ifault_cnf(SatSolver& solver,
   make_node_cnf(solver, fnode, flit, inputs);
 }
 
+void
+mark_tfo(DtpgNode* node,
+	 hash_set<ymuint>& tfo_mark)
+{
+  if ( tfo_mark.count(node->id()) > 0 ) {
+    return;
+  }
+  tfo_mark.insert(node->id());
+
+  ymuint nfo = node->active_fanout_num();
+  for (ymuint i = 0; i < nfo; ++ i) {
+    mark_tfo(node->active_fanout(i), tfo_mark);
+  }
+}
+
 END_NONAMESPACE
 
 
@@ -461,123 +469,118 @@ void
 DtpgSat::run(DtpgOperator& op,
 	     const string& option)
 {
+  bool single = false;
+  bool dual = false;
+  bool ffr = false;
+  bool mffc = false;
+  bool all = false;
+  bool po = false;
+  mSkip = false;
+
   if ( option == string() || option == "single" ) {
-    mNetwork->activate_all();
-    single_sub(op);
+    single = true;
   }
   else if ( option == "dual" ) {
-    mNetwork->activate_all();
-    dual_sub(op);
+    dual = true;
   }
   else if ( option == "ffr" ) {
-    mNetwork->activate_all();
-    ffr_sub(op);
+    ffr = true;
   }
   else if ( option == "mffc" ) {
-    mNetwork->activate_all();
-    mffc_sub(op);
+    mffc = true;
   }
-  else if ( option == "single_po" || option == "single_po_skip" ) {
-    mSkip = (option == "single_po_skip");
-    ymuint no = mNetwork->output_num2();
-    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-      mNetwork->activate_po(po_pos);
-      single_sub(op);
-    }
-
-    if ( mSkip ) {
-      clear_skip();
-    }
-
-    mSkip = false;
+  else if ( option == "single_po" ) {
+    single = true;
+    po = true;
   }
-  else if ( option == "dual_po" || option == "dual_po_skip" ) {
-    mSkip = (option == "dual_po_skip");
-    ymuint no = mNetwork->output_num2();
-    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-      mNetwork->activate_po(po_pos);
-      dual_sub(op);
-    }
-
-    if ( mSkip ) {
-      clear_skip();
-    }
-
-    mSkip = false;
+  else if ( option == "single_po_skip" ) {
+    single = true;
+    po = true;
+    mSkip = true;
   }
-  else if ( option == "ffr_po" || option == "ffr_po_skip" ) {
-    mSkip = (option == "ffr_po_skip");
-    ymuint no = mNetwork->output_num2();
-    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-      mNetwork->activate_po(po_pos);
-      ffr_sub(op);
-    }
-
-    if ( mSkip ) {
-      clear_skip();
-    }
-
-    mSkip = false;
+  else if ( option == "dual_po" ) {
+    dual = true;
+    po = true;
   }
-  else if ( option == "mffc_po" || option == "mffc_po_skip" ) {
-    mSkip = (option == "mffc_po_skip");
-    ymuint no = mNetwork->output_num2();
-    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-      mNetwork->activate_po(po_pos);
-      mffc_sub(op);
-    }
+  else if ( option == "dual_po_skip" ) {
+    dual = true;
+    po = true;
+    mSkip = true;
 
-    if ( mSkip ) {
-      clear_skip();
-    }
-
-    mSkip = false;
   }
-  else if ( option == "all_po" || option == "all_po_skip" ) {
-    mSkip = (option == "all_po_skip");
-    ymuint no = mNetwork->output_num2();
-    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-      mNetwork->activate_po(po_pos);
-      vector<DtpgFault*> flist;
-      ymuint n = mNetwork->active_node_num();
-      vector<DtpgNode*> node_list;
-      node_list.reserve(n);
-      for (ymuint i = 0; i < n; ++ i) {
-	DtpgNode* node = mNetwork->active_node(i);
-	node_list.push_back(node);
-	for (int val = 0; val < 2; ++ val) {
-	  DtpgFault* f = node->output_fault(val);
-	  if ( f != NULL && !f->is_skip() ) {
-	    flist.push_back(f);
-	  }
-	}
-	ymuint ni = node->fanin_num();
-	for (ymuint i = 0; i < ni; ++ i) {
-	  for (int val = 0; val < 2; ++ val) {
-	    DtpgFault* f = node->input_fault(val, i);
-	    if ( f != NULL && !f->is_skip() ) {
-	      flist.push_back(f);
-	    }
-	  }
-	}
-      }
-      if ( flist.empty() ) {
-	continue;
-      }
-
-      SatSolver solver(mType, mOption, mOutP);
-      mTimer.start();
-      dtpg_ffr(solver, flist, mNetwork->output(po_pos), node_list, op);
-    }
-
-    if ( mSkip ) {
-      clear_skip();
-    }
-
-    mSkip = false;
+  else if ( option == "ffr_po" ) {
+    ffr = true;
+    po = true;
+  }
+  else if ( option == "ffr_po_skip" ) {
+    ffr = true;
+    po = true;
+    mSkip = true;
+  }
+  else if ( option == "mffc_po" ) {
+    mffc = true;
+    po = true;
+  }
+  else if ( option == "mffc_po_skip" ) {
+    mffc = true;
+    po = true;
+    mSkip = true;
+  }
+  else if ( option == "all_po" ) {
+    all = true;
+    po = true;
+  }
+  else if ( option == "all_po_skip" ) {
+    all = true;
+    po = true;
+    mSkip = true;
   }
   else {
     cout << "illegal option " << option << ". ignored" << endl;
+    return;
+  }
+
+  if ( !po ) {
+    mNetwork->activate_all();
+    if ( single ) {
+      single_sub(op);
+    }
+    else if ( dual ) {
+      dual_sub(op);
+    }
+    else if ( ffr ) {
+      ffr_sub(op);
+    }
+    else if ( mffc ) {
+      mffc_sub(op);
+    }
+  }
+  else {
+    ymuint no = mNetwork->output_num2();
+    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+      DtpgNode* onode = mNetwork->output2(po_pos);
+      mNetwork->activate_po(onode);
+      if ( single ) {
+	single_sub(op);
+      }
+      else if ( dual ) {
+	dual_sub(op);
+      }
+      else if ( ffr ) {
+	ffr_sub(op);
+      }
+      else if ( mffc ) {
+	mffc_sub(op);
+      }
+      else if ( all ) {
+	all_sub(op);
+      }
+    }
+    if ( mSkip ) {
+      clear_skip();
+    }
+
+    mSkip = false;
   }
 }
 
@@ -593,14 +596,12 @@ DtpgSat::single_sub(DtpgOperator& op)
     DtpgFault* f0 = node->output_fault(0);
     if ( f0 != NULL && !f0->is_skip() ) {
       SatSolver solver(mType, mOption, mOutP);
-      mTimer.start();
       dtpg_single(solver, f0, op);
     }
 
     DtpgFault* f1 = node->output_fault(1);
     if ( f1 != NULL && !f1->is_skip() ) {
       SatSolver solver(mType, mOption, mOutP);
-      mTimer.start();
       dtpg_single(solver, f1, op);
     }
 
@@ -610,14 +611,12 @@ DtpgSat::single_sub(DtpgOperator& op)
       DtpgFault* f0 = node->input_fault(0, j);
       if ( f0 != NULL && !f0->is_skip() ) {
 	SatSolver solver(mType, mOption, mOutP);
-	mTimer.start();
 	dtpg_single(solver, f0, op);
       }
 
       DtpgFault* f1 = node->input_fault(1, j);
       if ( f1 != NULL && !f1->is_skip() ) {
 	SatSolver solver(mType, mOption, mOutP);
-	mTimer.start();
 	dtpg_single(solver, f1, op);
       }
     }
@@ -643,17 +642,14 @@ DtpgSat::dual_sub(DtpgOperator& op)
     }
     if ( f0 != NULL && f1 != NULL ) {
       SatSolver solver(mType, mOption, mOutP);
-      mTimer.start();
       dtpg_dual(solver, f0, f1, op);
     }
     else if ( f0 != NULL ) {
       SatSolver solver(mType, mOption, mOutP);
-      mTimer.start();
       dtpg_single(solver, f0, op);
     }
     else if ( f1 != NULL ) {
       SatSolver solver(mType, mOption, mOutP);
-      mTimer.start();
       dtpg_single(solver, f1, op);
     }
 
@@ -670,17 +666,14 @@ DtpgSat::dual_sub(DtpgOperator& op)
       }
       if ( f0 != NULL && f1 != NULL ) {
 	SatSolver solver(mType, mOption, mOutP);
-	mTimer.start();
 	dtpg_dual(solver, f0, f1, op);
       }
       else if ( f0 != NULL ) {
 	SatSolver solver(mType, mOption, mOutP);
-	mTimer.start();
 	dtpg_single(solver, f0, op);
       }
       else if ( f1 != NULL ) {
 	SatSolver solver(mType, mOption, mOutP);
-	mTimer.start();
 	dtpg_single(solver, f1, op);
       }
     }
@@ -713,6 +706,45 @@ DtpgSat::mffc_sub(DtpgOperator& op)
     ffr_mode(ffr, op);
     delete ffr;
   }
+}
+
+// @brief all モードの共通処理
+void
+DtpgSat::all_sub(DtpgOperator& op)
+{
+  vector<DtpgFault*> flist;
+  ymuint n = mNetwork->active_node_num();
+  vector<DtpgNode*> node_list;
+  node_list.reserve(n);
+  DtpgNode* onode = NULL;
+  for (ymuint i = 0; i < n; ++ i) {
+    DtpgNode* node = mNetwork->active_node(i);
+    node_list.push_back(node);
+    if ( node->is_output() ) {
+      onode = node;
+    }
+    for (int val = 0; val < 2; ++ val) {
+      DtpgFault* f = node->output_fault(val);
+      if ( f != NULL && !f->is_skip() ) {
+	flist.push_back(f);
+      }
+    }
+    ymuint ni = node->fanin_num();
+    for (ymuint i = 0; i < ni; ++ i) {
+      for (int val = 0; val < 2; ++ val) {
+	DtpgFault* f = node->input_fault(val, i);
+	if ( f != NULL && !f->is_skip() ) {
+	  flist.push_back(f);
+	}
+      }
+    }
+  }
+  if ( flist.empty() ) {
+    return;
+  }
+
+  SatSolver solver(mType, mOption, mOutP);
+  dtpg_ffr(solver, flist, onode, node_list, op);
 }
 
 // @brief 一つの FFR に対してテストパタン生成を行う．
@@ -748,7 +780,6 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
   }
 
   SatSolver solver(mType, mOption, mOutP);
-  mTimer.start();
   dtpg_ffr(solver, flist, ffr->root(), node_list, op);
 }
 
@@ -795,6 +826,8 @@ DtpgSat::dtpg_single(SatSolver& solver,
 		     DtpgFault* f,
 		     DtpgOperator& op)
 {
+  mTimer.start();
+
   DtpgNode* fnode = f->node();
 
   // fnode から外部出力へ至る部分の CNF を作る．
@@ -845,6 +878,8 @@ DtpgSat::dtpg_dual(SatSolver& solver,
 		   DtpgFault* f1,
 		   DtpgOperator& op)
 {
+  mTimer.start();
+
   DtpgNode* fnode = f0->node();
 
   // fnode から外部出力へ至る部分の CNF を作る．
@@ -884,25 +919,6 @@ DtpgSat::dtpg_dual(SatSolver& solver,
   update_stats(solver, 2);
 }
 
-BEGIN_NONAMESPACE
-
-void
-mark_tfo(DtpgNode* node,
-	 hash_set<ymuint>& tfo_mark)
-{
-  if ( tfo_mark.count(node->id()) > 0 ) {
-    return;
-  }
-  tfo_mark.insert(node->id());
-
-  ymuint nfo = node->active_fanout_num();
-  for (ymuint i = 0; i < nfo; ++ i) {
-    mark_tfo(node->active_fanout(i), tfo_mark);
-  }
-}
-
-END_NONAMESPACE
-
 // @brief FFR 内の故障に対してテストパタン生成を行なう．
 // @param[in] solver SatSolver
 // @param[in] flist 故障リスト
@@ -916,6 +932,8 @@ DtpgSat::dtpg_ffr(SatSolver& solver,
 		  const vector<DtpgNode*>& node_list,
 		  DtpgOperator& op)
 {
+  mTimer.start();
+
   // 故障の影響を受けるノードにつけるマーク
   hash_set<ymuint> fnode_mark;
   // 故障IDををキーにして flist[] 中の位置を格納するハッシュ表
@@ -994,12 +1012,7 @@ DtpgSat::dtpg_ffr(SatSolver& solver,
 	hash_map<ymuint, ymuint>::iterator p = fid_map.find(f->id());
 	if ( p != fid_map.end() ) {
 	  ymuint fid = p->second;
-	  if ( val == 0 ) {
-	    make_cnf_and(solver, flt_var[fid], fvar, tmp_var[fid]);
-	  }
-	  else {
-	    make_cnf_or(solver, flt_var[fid], fvar, tmp_var[fid]);
-	  }
+	  make_flt_cnf(solver, fvar, flt_var[fid], tmp_var[fid], val);
 	  fvar = tmp_var[fid];
 	}
       }
@@ -1015,12 +1028,7 @@ DtpgSat::dtpg_ffr(SatSolver& solver,
       hash_map<ymuint, ymuint>::iterator p = fid_map.find(f->id());
       if ( p != fid_map.end() ) {
 	ymuint fid = p->second;
-	if ( val == 0 ) {
-	  make_cnf_and(solver, flt_var[fid], tmp_var[fid], tmp_ovar);
-	}
-	else {
-	  make_cnf_or(solver, flt_var[fid], tmp_var[fid], tmp_ovar);
-	}
+	make_flt_cnf(solver, tmp_var[fid], flt_var[fid], tmp_ovar, val);
 	tmp_ovar = tmp_var[fid];
       }
     }

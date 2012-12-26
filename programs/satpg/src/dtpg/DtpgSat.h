@@ -95,6 +95,10 @@ private:
   void
   mffc_sub(DtpgOperator& op);
 
+  /// @brief all モードの共通処理
+  void
+  all_sub(DtpgOperator& op);
+
   /// @brief 一つの FFR に対してテストパタン生成を行う．
   /// @param[in] ffr 対象の FFR
   void
