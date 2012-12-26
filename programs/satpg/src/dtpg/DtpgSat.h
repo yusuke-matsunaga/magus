@@ -110,35 +110,29 @@ private:
   clear_skip();
 
   /// @brief 一つの故障に対してテストパタン生成を行う．
-  /// @param[in] solver SatSolver
   /// @param[in] f 故障
   /// @param[in] op テスト生成の結果を処理するファンクター
   void
-  dtpg_single(SatSolver& solver,
-	      DtpgFault* f,
+  dtpg_single(DtpgFault* f,
 	      DtpgOperator& op);
 
   /// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
-  /// @param[in] solver SatSolver
   /// @param[in] f0 0縮退故障
   /// @param[in] f1 1縮退故障
   /// @param[in] op テスト生成の結果を処理するファンクター
   void
-  dtpg_dual(SatSolver& solver,
-	    DtpgFault* f0,
+  dtpg_dual(DtpgFault* f0,
 	    DtpgFault* f1,
 	    DtpgOperator& op);
 
   /// @brief FFR 内の故障に対してテストパタン生成を行なう．
-  /// @param[in] solver SatSolver
   /// @@aram[in] network 対象のネットワーク
   /// @param[in] flist 故障リスト
   /// @param[in] root FFR の根のノード
   /// @param[in] node_list FFR 内のノードリスト
   /// @param[in] op テスト生成の結果を処理するファンクター
   void
-  dtpg_ffr(SatSolver& solver,
-	   const vector<DtpgFault*>& flist,
+  dtpg_ffr(const vector<DtpgFault*>& flist,
 	   DtpgNode* root,
 	   const vector<DtpgNode*>& node_list,
 	   DtpgOperator& op);

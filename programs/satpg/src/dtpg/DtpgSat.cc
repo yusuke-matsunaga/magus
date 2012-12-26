@@ -595,14 +595,12 @@ DtpgSat::single_sub(DtpgOperator& op)
     // 出力の故障
     DtpgFault* f0 = node->output_fault(0);
     if ( f0 != NULL && !f0->is_skip() ) {
-      SatSolver solver(mType, mOption, mOutP);
-      dtpg_single(solver, f0, op);
+      dtpg_single(f0, op);
     }
 
     DtpgFault* f1 = node->output_fault(1);
     if ( f1 != NULL && !f1->is_skip() ) {
-      SatSolver solver(mType, mOption, mOutP);
-      dtpg_single(solver, f1, op);
+      dtpg_single(f1, op);
     }
 
     // 入力の故障
@@ -610,14 +608,12 @@ DtpgSat::single_sub(DtpgOperator& op)
     for (ymuint j = 0; j < ni; ++ j) {
       DtpgFault* f0 = node->input_fault(0, j);
       if ( f0 != NULL && !f0->is_skip() ) {
-	SatSolver solver(mType, mOption, mOutP);
-	dtpg_single(solver, f0, op);
+	dtpg_single(f0, op);
       }
 
       DtpgFault* f1 = node->input_fault(1, j);
       if ( f1 != NULL && !f1->is_skip() ) {
-	SatSolver solver(mType, mOption, mOutP);
-	dtpg_single(solver, f1, op);
+	dtpg_single(f1, op);
       }
     }
   }
@@ -641,16 +637,13 @@ DtpgSat::dual_sub(DtpgOperator& op)
       f1 = NULL;
     }
     if ( f0 != NULL && f1 != NULL ) {
-      SatSolver solver(mType, mOption, mOutP);
-      dtpg_dual(solver, f0, f1, op);
+      dtpg_dual(f0, f1, op);
     }
     else if ( f0 != NULL ) {
-      SatSolver solver(mType, mOption, mOutP);
-      dtpg_single(solver, f0, op);
+      dtpg_single(f0, op);
     }
     else if ( f1 != NULL ) {
-      SatSolver solver(mType, mOption, mOutP);
-      dtpg_single(solver, f1, op);
+      dtpg_single(f1, op);
     }
 
     // 入力の故障
@@ -665,16 +658,13 @@ DtpgSat::dual_sub(DtpgOperator& op)
 	f1 = NULL;
       }
       if ( f0 != NULL && f1 != NULL ) {
-	SatSolver solver(mType, mOption, mOutP);
-	dtpg_dual(solver, f0, f1, op);
+	dtpg_dual(f0, f1, op);
       }
       else if ( f0 != NULL ) {
-	SatSolver solver(mType, mOption, mOutP);
-	dtpg_single(solver, f0, op);
+	dtpg_single(f0, op);
       }
       else if ( f1 != NULL ) {
-	SatSolver solver(mType, mOption, mOutP);
-	dtpg_single(solver, f1, op);
+	dtpg_single(f1, op);
       }
     }
   }
@@ -743,8 +733,7 @@ DtpgSat::all_sub(DtpgOperator& op)
     return;
   }
 
-  SatSolver solver(mType, mOption, mOutP);
-  dtpg_ffr(solver, flist, onode, node_list, op);
+  dtpg_ffr(flist, onode, node_list, op);
 }
 
 // @brief 一つの FFR に対してテストパタン生成を行う．
@@ -779,8 +768,7 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
     return;
   }
 
-  SatSolver solver(mType, mOption, mOutP);
-  dtpg_ffr(solver, flist, ffr->root(), node_list, op);
+  dtpg_ffr(flist, ffr->root(), node_list, op);
 }
 
 // @brief スキップフラグを解除する．
@@ -818,15 +806,15 @@ DtpgSat::clear_stats()
 }
 
 // @brief 一つの故障に対してテストパタン生成を行う．
-// @param[in] solver SatSolver
 // @param[in] f 故障
 // @param[in] op テスト生成の結果を処理するファンクター
 void
-DtpgSat::dtpg_single(SatSolver& solver,
-		     DtpgFault* f,
+DtpgSat::dtpg_single(DtpgFault* f,
 		     DtpgOperator& op)
 {
   mTimer.start();
+
+  SatSolver solver(mType, mOption, mOutP);
 
   DtpgNode* fnode = f->node();
 
@@ -868,17 +856,17 @@ DtpgSat::dtpg_single(SatSolver& solver,
 }
 
 // @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
-// @param[in] solver SatSolver
 // @param[in] f0 0縮退故障
 // @param[in] f1 1縮退故障
 // @param[in] op テスト生成の結果を処理するファンクター
 void
-DtpgSat::dtpg_dual(SatSolver& solver,
-		   DtpgFault* f0,
+DtpgSat::dtpg_dual(DtpgFault* f0,
 		   DtpgFault* f1,
 		   DtpgOperator& op)
 {
   mTimer.start();
+
+  SatSolver solver(mType, mOption, mOutP);
 
   DtpgNode* fnode = f0->node();
 
@@ -920,19 +908,19 @@ DtpgSat::dtpg_dual(SatSolver& solver,
 }
 
 // @brief FFR 内の故障に対してテストパタン生成を行なう．
-// @param[in] solver SatSolver
 // @param[in] flist 故障リスト
 // @param[in] root FFR の根のノード
 // @param[in] node_list FFR 内のノードリスト
 // @param[in] op テスト生成の結果を処理するファンクター
 void
-DtpgSat::dtpg_ffr(SatSolver& solver,
-		  const vector<DtpgFault*>& flist,
+DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 		  DtpgNode* root,
 		  const vector<DtpgNode*>& node_list,
 		  DtpgOperator& op)
 {
   mTimer.start();
+
+  SatSolver solver(mType, mOption, mOutP);
 
   // 故障の影響を受けるノードにつけるマーク
   hash_set<ymuint> fnode_mark;
