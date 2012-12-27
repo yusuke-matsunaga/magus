@@ -422,13 +422,8 @@ DtpgNetwork::mark_tfo_tfi(DtpgNode* fnode,
       }
     }
   }
-}
 
-// @brief ノードのマークをクリアする．
-void
-DtpgNetwork::clear_node_mark(const vector<DtpgNode*>& tfo_list,
-			     const vector<DtpgNode*>& tfi_list)
-{
+  // ノードのマークをクリアする．
   for (vector<DtpgNode*>::const_iterator p = tfo_list.begin();
        p != tfo_list.end(); ++ p) {
     DtpgNode* node = *p;
@@ -486,7 +481,7 @@ DtpgNetwork::set_node(const TgNode* tgnode,
   node->mOutputFault[0] = NULL;
   node->mOutputFault[1] = NULL;
 
-  node->mMarks = (static_cast<ymuint32>(DtpgNode::kNone) << 1);
+  node->mMarks = (static_cast<ymuint32>(DtpgNode::kNone) << 3);
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

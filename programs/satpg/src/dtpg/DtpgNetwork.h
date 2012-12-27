@@ -121,14 +121,6 @@ public:
 	       vector<DtpgNode*>& tfo_list,
 	       vector<DtpgNode*>& tfi_list);
 
-  /// @brief ノードのマークをクリアする．
-  /// @param[in] tfo_list TFO ノードを格納したリスト
-  /// @param[in] tfi_list TFI ノードを格納したリスト
-  /// @note tfo_list, tfi_list は直前の mark_tfo_tfi の結果を用いること．
-  void
-  clear_node_mark(const vector<DtpgNode*>& tfo_list,
-		  const vector<DtpgNode*>& tfi_list);
-
 
 private:
   //////////////////////////////////////////////////////////////////////

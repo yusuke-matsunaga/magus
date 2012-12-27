@@ -160,6 +160,10 @@ private:
 	const vector<DtpgNode*>& input_list,
 	DtpgOperator& op);
 
+  /// @brief ノードの変数割り当てフラグを消す．
+  void
+  clear_node_mark();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -180,6 +184,9 @@ private:
 
   // 対象の回路
   DtpgNetwork* mNetwork;
+
+  // 変数を割り当てたノードを格納するリスト
+  vector<DtpgNode*> mUsedNodeList;
 
   // skip フラグ
   bool mSkip;

@@ -366,9 +366,10 @@ make_fnode_cnf(SatSolver& solver,
   for (ymuint i = 0; i < ni; ++ i) {
     DtpgNode* inode = fnode->fanin(i);
     if ( i == ipos ) {
-      inode->set_fvar(solver.new_var());
-      inode->set_dvar(solver.new_var());
-      inputs[i] = Literal(inode->fvar(), kPolPosi);
+      VarId fvar = solver.new_var();
+      VarId dvar = solver.new_var();
+      inode->set_fvar(fvar, dvar);
+      inputs[i] = Literal(fvar, kPolPosi);
     }
     else {
       inputs[i] = Literal(inode->gvar(), kPolPosi);
@@ -822,6 +823,8 @@ DtpgSat::dtpg_single(DtpgFault* f,
 
   solve(solver, f, assumptions, input_list, op);
 
+  clear_node_mark();
+
   update_stats(solver, 1);
 }
 
@@ -873,6 +876,8 @@ DtpgSat::dtpg_dual(DtpgFault* f0,
   assumptions[1] = Literal(fsrc->fvar(), kPolPosi);
 
   solve(solver, f1, assumptions, input_list, op);
+
+  clear_node_mark();
 
   update_stats(solver, 2);
 }
@@ -931,8 +936,9 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
        p != node_list.end(); ++ p) {
     DtpgNode* node = *p;
     if ( (node != root) && (fnode_mark.count(node->id()) > 0) ) {
-      node->set_fvar(solver.new_var());
-      node->set_dvar(solver.new_var());
+      VarId fvar = solver.new_var();
+      VarId dvar = solver.new_var();
+      node->set_fvar(fvar, dvar);
     }
   }
 
@@ -1106,6 +1112,8 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
     solve(solver, f, assumptions, input_list, op);
   }
 
+  clear_node_mark();
+
   update_stats(solver, nf);
 }
 
@@ -1119,21 +1127,26 @@ DtpgSat::make_prop_cnf(SatSolver& solver,
   vector<DtpgNode*> tfi_list;
   mNetwork->mark_tfo_tfi(fnode, tfo_list, tfi_list);
 
-  // 以降は kTFO か kTFI マークのついたノードのみを対象とする．
+  // 以降は tfo_list か tfi_list に含まれるノードのみを対象とする．
 
   // TFO マークのついたノード用の変数の生成 (glit, flit, dlit の3つを作る)
   for (vector<DtpgNode*>::iterator p = tfo_list.begin();
        p != tfo_list.end(); ++ p) {
     DtpgNode* node = *p;
-    node->set_gvar(solver.new_var());
-    node->set_fvar(solver.new_var());
-    node->set_dvar(solver.new_var());
+    VarId gvar = solver.new_var();
+    VarId fvar = solver.new_var();
+    VarId dvar = solver.new_var();
+    node->set_gvar(gvar);
+    node->set_fvar(fvar, dvar);
+    mUsedNodeList.push_back(node);
   }
   // TFI マークのついたノード用の変数の生成 (glit のみを作る)
   for (vector<DtpgNode*>::iterator p = tfi_list.begin();
        p != tfi_list.end(); ++ p) {
     DtpgNode* node = *p;
-    node->set_gvar(solver.new_var());
+    VarId gvar = solver.new_var();
+    node->set_gvar(gvar);
+    mUsedNodeList.push_back(node);
   }
 
   if ( fnode->is_input() ) {
@@ -1219,7 +1232,7 @@ DtpgSat::make_prop_cnf(SatSolver& solver,
 
     for (ymuint j = 0; j < ni; ++ j) {
       DtpgNode* inode = node->fanin(j);
-      if ( inode->mark() == DtpgNode::kTFO ) {
+      if ( inode->has_fvar() ) {
 	inputs[j] = Literal(inode->fvar(), kPolPosi);
 	dep.push_back(Literal(inode->dvar(), kPolPosi));
       }
@@ -1233,8 +1246,6 @@ DtpgSat::make_prop_cnf(SatSolver& solver,
 
     solver.add_clause(dep);
   }
-
-  mNetwork->clear_node_mark(tfo_list, tfi_list);
 
   // 出力のうち，最低1つは故障差が伝搬しなければならない．
   assert_cond( !odiff.empty(), __FILE__, __LINE__);
@@ -1286,6 +1297,18 @@ DtpgSat::solve(SatSolver& solver,
 #else
   f->set_skip();
 #endif
+}
+
+// @brief ノードの変数割り当てフラグを消す．
+void
+DtpgSat::clear_node_mark()
+{
+  for (vector<DtpgNode*>::iterator p = mUsedNodeList.begin();
+       p != mUsedNodeList.end(); ++ p) {
+    DtpgNode* node = *p;
+    node->clear_var();
+  }
+  mUsedNodeList.clear();
 }
 
 // @brief 統計情報を得る．

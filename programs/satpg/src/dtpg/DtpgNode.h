@@ -27,15 +27,6 @@ class DtpgNode
 
 public:
 
-  /// @brief DtpgNetwork::mark_tfo_tfi() で用いられるマーク
-  enum Mark {
-    kNone,
-    kTFO,
-    kTFI
-  };
-
-public:
-
   /// @brief コンストラクタ
   DtpgNode();
 
@@ -129,35 +120,43 @@ public:
   input_fault(int val,
 	      ymuint pos);
 
-  /// @brief マークを得る．
-  Mark
-  mark() const;
-
   /// @brief アクティブの場合 true を返す．
   bool
   is_active() const;
 
-  /// @brief 正常回路の変数番号をセットする．
+  /// @brief 正常回路用の変数番号をセットする．
+  /// @param[in] gvar 正常値を表す変数番号
   void
   set_gvar(VarId gvar);
 
-  /// @brief 故障回路の変数番号をセットする．
+  /// @brief 故障回路用の変数番号をセットする．
+  /// @param[in] fvar 故障値を表す変数番号
+  /// @param[in] dvar 故障差(正常値 xor 故障値)を表す変数番号
   void
-  set_fvar(VarId fvar);
+  set_fvar(VarId fvar,
+	   VarId dvar);
 
-  /// @brief 故障差の変数番号をセットする．
+  /// @brief 変数番号の割り当て情報をクリアする．
   void
-  set_dvar(VarId dvar);
+  clear_var();
 
-  /// @brief 正常回路の変数番号を得る．
+  /// @brief 正常回路用の変数番号が割り当てられていたら true を返す．
+  bool
+  has_gvar() const;
+
+  /// @brief 正常値を表す変数番号を得る．
   VarId
   gvar() const;
 
-  /// @brief 故障回路の変数番号を得る．
+  /// @brief 故障回路用の変数番号が割り当てられていたら true を返す．
+  bool
+  has_fvar() const;
+
+  /// @brief 故障値を表す変数番号を得る．
   VarId
   fvar() const;
 
-  /// @brief 故障差の変数番号を得る．
+  /// @brief 故障差を表す変数番号を得る．
   VarId
   dvar() const;
 
@@ -168,12 +167,29 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる型の定義
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief DtpgNetwork::mark_tfo_tfi() で用いられるマーク
+  enum Mark {
+    kNone,
+    kTFO,
+    kTFI
+  };
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief マークをつける．
   void
   set_mark(Mark mark);
+
+  /// @brief マークを得る．
+  Mark
+  mark() const;
 
   /// @brief アクティブにする．
   void
@@ -422,7 +438,7 @@ inline
 DtpgNode::Mark
 DtpgNode::mark() const
 {
-  return static_cast<Mark>(mMarks >> 1);
+  return static_cast<Mark>(mMarks >> 3);
 }
 
 // @brief マークをつける．
@@ -430,8 +446,8 @@ inline
 void
 DtpgNode::set_mark(Mark mark)
 {
-  mMarks &= 1U;
-  mMarks |= (mark << 1);
+  mMarks &= 7U;
+  mMarks |= (mark << 3);
 }
 
 // @brief アクティブの場合 true を返す．
@@ -458,31 +474,47 @@ DtpgNode::clear_active()
   mMarks &= ~1U;
 }
 
-// @brief 正常回路の変数番号をセットする．
+// @brief 正常回路用の変数番号をセットする．
+// @param[in] gvar 正常値を表す変数番号
 inline
 void
 DtpgNode::set_gvar(VarId gvar)
 {
   mGid = gvar;
+  mMarks |= 2U;
 }
 
-// @brief 故障回路の変数番号をセットする．
+// @brief 故障回路用の変数番号をセットする．
+// @param[in] fvar 故障値を表す変数番号
+// @param[in] dvar 故障差(正常値 xor 故障値)を表す変数番号
 inline
 void
-DtpgNode::set_fvar(VarId fvar)
+DtpgNode::set_fvar(VarId fvar,
+		   VarId dvar)
 {
   mFid = fvar;
+  mDid = dvar;
+  mMarks |= 4U;
 }
 
-// @brief 故障差の変数番号をセットする．
+// @brief 変数番号の割り当て情報をクリアする．
 inline
 void
-DtpgNode::set_dvar(VarId dvar)
+DtpgNode::clear_var()
 {
-  mDid = dvar;
+  mMarks &= ~6U;
 }
 
-// @brief 正常回路の変数番号
+// @brief 正常回路用の変数番号が割り当てられていたら true を返す．
+inline
+bool
+DtpgNode::has_gvar() const
+{
+  return static_cast<bool>((mMarks >> 1) & 1U);
+}
+
+
+// @brief 正常値を表す変数番号を得る．
 inline
 VarId
 DtpgNode::gvar() const
@@ -490,7 +522,15 @@ DtpgNode::gvar() const
   return mGid;
 }
 
-// @brief 故障回路の変数番号
+// @brief 故障回路用の変数番号が割り当てられていたら true を返す．
+inline
+bool
+DtpgNode::has_fvar() const
+{
+  return static_cast<bool>((mMarks >> 2) & 1U);
+}
+
+// @brief 故障値を表す変数番号を得る．
 inline
 VarId
 DtpgNode::fvar() const
@@ -498,7 +538,7 @@ DtpgNode::fvar() const
   return mFid;
 }
 
-// @brief 故障差の変数番号
+// @brief 故障差を表す変数番号を得る．
 inline
 VarId
 DtpgNode::dvar() const
