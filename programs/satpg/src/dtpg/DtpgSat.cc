@@ -52,226 +52,6 @@ make_flt_cnf(SatSolver& solver,
     solver.add_clause( l0, l1, ~l2);
   }
 }
-/// @brief ノードの入出力の関係を表す CNF クローズを生成する．
-/// @param[in] solver SAT ソルバ
-/// @param[in] type ノードの型
-/// @param[in] output 出力リテラル
-/// @param[in] inputs 入力リテラル
-void
-make_cnf_from_type(SatSolver& solver,
-		   tTgGateType type,
-		   Literal output,
-		   const vector<Literal>& inputs)
-{
-  ymuint ni = inputs.size();
-  switch ( type ) {
-  case kTgUndef:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
-
-  case kTgInput:
-    break;
-
-  case kTgOutput:
-  case kTgBuff:
-    solver.add_clause( inputs[0], ~output);
-    solver.add_clause(~inputs[0],  output);
-    break;
-
-  case kTgNot:
-    solver.add_clause( inputs[0],  output);
-    solver.add_clause(~inputs[0], ~output);
-    break;
-
-  case kTgAnd:
-    switch ( ni ) {
-    case 2:
-      solver.add_clause(~inputs[0], ~inputs[1], output);
-      break;
-
-    case 3:
-      solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], output);
-      break;
-
-    case 4:
-      solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~inputs[3], output);
-      break;
-
-    default:
-      {
-	vector<Literal> tmp(ni + 1);
-	for (ymuint i = 0; i < ni; ++ i) {
-	  tmp[i] = ~inputs[i];
-	}
-	tmp[ni] = output;
-	solver.add_clause(tmp);
-      }
-      break;
-    }
-    for (ymuint i = 0; i < ni; ++ i) {
-      solver.add_clause(inputs[i], ~output);
-    }
-    break;
-
-  case kTgNand:
-    switch ( ni ) {
-    case 2:
-      solver.add_clause(~inputs[0], ~inputs[1], ~output);
-      break;
-
-    case 3:
-      solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~output);
-      break;
-
-    case 4:
-      solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~inputs[3], ~output);
-      break;
-
-    default:
-      {
-	vector<Literal> tmp(ni + 1);
-	for (ymuint i = 0; i < ni; ++ i) {
-	  tmp[i] = ~inputs[i];
-	}
-	tmp[ni] = ~output;
-	solver.add_clause(tmp);
-      }
-      break;
-    }
-    for (ymuint i = 0; i < ni; ++ i) {
-      solver.add_clause(inputs[i], output);
-    }
-    break;
-
-  case kTgOr:
-    switch ( ni ) {
-    case 2:
-      solver.add_clause(inputs[0], inputs[1], ~output);
-      break;
-
-    case 3:
-      solver.add_clause(inputs[0], inputs[1], inputs[2], ~output);
-      break;
-
-    case 4:
-      solver.add_clause(inputs[0], inputs[1], inputs[2], inputs[3], ~output);
-      break;
-
-    default:
-      {
-	vector<Literal> tmp(ni + 1);
-	for (ymuint i = 0; i < ni; ++ i) {
-	  tmp[i] = inputs[i];
-	}
-	tmp[ni] = ~output;
-	solver.add_clause(tmp);
-      }
-      break;
-    }
-    for (ymuint i = 0; i < ni; ++ i) {
-      solver.add_clause(~inputs[i], output);
-    }
-    break;
-
-  case kTgNor:
-    switch ( ni ) {
-    case 2:
-      solver.add_clause(inputs[0], inputs[1], output);
-      break;
-
-    case 3:
-      solver.add_clause(inputs[0], inputs[1], inputs[2], output);
-      break;
-
-    case 4:
-      solver.add_clause(inputs[0], inputs[1], inputs[2], inputs[3], output);
-      break;
-
-    default:
-      {
-	vector<Literal> tmp(ni + 1);
-	for (ymuint i = 0; i < ni; ++ i) {
-	  tmp[i] = inputs[i];
-	}
-	tmp[ni] = output;
-	solver.add_clause(tmp);
-      }
-      break;
-    }
-    for (ymuint i = 0; i < ni; ++ i) {
-      solver.add_clause(~inputs[i], ~output);
-    }
-    break;
-
-  case kTgXor:
-    if ( ni == 2 ) {
-      solver.add_clause(~inputs[0],  inputs[1],  output);
-      solver.add_clause( inputs[0], ~inputs[1],  output);
-      solver.add_clause( inputs[0],  inputs[1], ~output);
-      solver.add_clause(~inputs[0], ~inputs[1], ~output);
-    }
-    else {
-      vector<Literal> tmp(ni + 1);
-      ymuint nip = (1U << ni);
-      for (ymuint p = 0; p < nip; ++ p) {
-	ymuint c = 0;
-	for (ymuint i = 0; i < ni; ++ i) {
-	  if ( p & (1U << i) ) {
-	    tmp[i] = inputs[i];
-	  }
-	  else {
-	    tmp[i] = ~inputs[i];
-	    ++ c;
-	  }
-	}
-	if ( (c % 2) == 0 ) {
-	  tmp[ni] = ~output;
-	}
-	else {
-	  tmp[ni] = output;
-	}
-	solver.add_clause(tmp);
-      }
-    }
-    break;
-
-  case kTgXnor:
-    if ( ni == 2 ) {
-      solver.add_clause(~inputs[0],  inputs[1], ~output);
-      solver.add_clause( inputs[0], ~inputs[1], ~output);
-      solver.add_clause( inputs[0],  inputs[1],  output);
-      solver.add_clause(~inputs[0], ~inputs[1],  output);
-    }
-    else {
-      vector<Literal> tmp(ni + 1);
-      ymuint nip = (1U << ni);
-      for (ymuint p = 0; p < nip; ++ p) {
-	ymuint c = 0;
-	for (ymuint i = 0; i < ni; ++ i) {
-	  if ( p & (1U << i) ) {
-	    tmp[i] = inputs[i];
-	  }
-	  else {
-	    tmp[i] = ~inputs[i];
-	    ++ c;
-	  }
-	}
-	if ( (c % 2) == 0 ) {
-	  tmp[ni] = output;
-	}
-	else {
-	  tmp[ni] = ~output;
-	}
-	solver.add_clause(tmp);
-      }
-    }
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
-  }
-}
 
 /// @brief ノードの入出力の関係を表す CNF クローズを生成する．
 /// @param[in] solver SAT ソルバ
@@ -279,10 +59,10 @@ make_cnf_from_type(SatSolver& solver,
 /// @param[in] output 出力リテラル
 /// @param[in] inputs 入力リテラル
 void
-make_cnf_from_lexp(SatSolver& solver,
-		   const LogExpr& lexp,
-		   Literal output,
-		   const vector<Literal>& inputs)
+make_lexp_cnf(SatSolver& solver,
+	      const LogExpr& lexp,
+	      Literal output,
+	      const vector<Literal>& inputs)
 {
   if ( lexp.is_constant() || lexp.is_literal() ) {
     assert_not_reached(__FILE__, __LINE__);
@@ -302,7 +82,7 @@ make_cnf_from_lexp(SatSolver& solver,
     else {
       VarId new_varid = solver.new_var();
       local_inputs[i] = Literal(new_varid, kPolPosi);
-      make_cnf_from_lexp(solver, lexp1, local_inputs[i], inputs);
+      make_lexp_cnf(solver, lexp1, local_inputs[i], inputs);
     }
   }
   vector<Literal> tmp(nc + 1);
@@ -354,14 +134,221 @@ make_cnf_from_lexp(SatSolver& solver,
 void
 make_node_cnf(SatSolver& solver,
 	      DtpgNode* node,
-	      Literal olit,
-	      const vector<Literal>& ilits)
+	      Literal output,
+	      const vector<Literal>& inputs)
 {
   if ( node->is_cplx_logic() ) {
-    make_cnf_from_lexp(solver, node->expr(), olit, ilits);
+    make_lexp_cnf(solver, node->expr(), output, inputs);
   }
   else {
-    make_cnf_from_type(solver, node->type(), olit, ilits);
+    ymuint ni = inputs.size();
+    switch ( node->type() ) {
+    case kTgUndef:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+
+    case kTgInput:
+      break;
+
+    case kTgOutput:
+    case kTgBuff:
+      solver.add_clause( inputs[0], ~output);
+      solver.add_clause(~inputs[0],  output);
+      break;
+
+    case kTgNot:
+      solver.add_clause( inputs[0],  output);
+      solver.add_clause(~inputs[0], ~output);
+      break;
+
+    case kTgAnd:
+      switch ( ni ) {
+      case 2:
+	solver.add_clause(~inputs[0], ~inputs[1], output);
+	break;
+
+      case 3:
+	solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], output);
+	break;
+
+      case 4:
+	solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~inputs[3], output);
+	break;
+
+      default:
+	{
+	  vector<Literal> tmp(ni + 1);
+	  for (ymuint i = 0; i < ni; ++ i) {
+	    tmp[i] = ~inputs[i];
+	  }
+	  tmp[ni] = output;
+	  solver.add_clause(tmp);
+	}
+	break;
+      }
+      for (ymuint i = 0; i < ni; ++ i) {
+	solver.add_clause(inputs[i], ~output);
+      }
+      break;
+
+    case kTgNand:
+      switch ( ni ) {
+      case 2:
+	solver.add_clause(~inputs[0], ~inputs[1], ~output);
+	break;
+
+      case 3:
+	solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~output);
+	break;
+
+      case 4:
+	solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~inputs[3], ~output);
+	break;
+
+      default:
+	{
+	  vector<Literal> tmp(ni + 1);
+	  for (ymuint i = 0; i < ni; ++ i) {
+	    tmp[i] = ~inputs[i];
+	  }
+	  tmp[ni] = ~output;
+	  solver.add_clause(tmp);
+	}
+	break;
+      }
+      for (ymuint i = 0; i < ni; ++ i) {
+	solver.add_clause(inputs[i], output);
+      }
+      break;
+
+    case kTgOr:
+      switch ( ni ) {
+      case 2:
+	solver.add_clause(inputs[0], inputs[1], ~output);
+	break;
+
+      case 3:
+	solver.add_clause(inputs[0], inputs[1], inputs[2], ~output);
+	break;
+
+      case 4:
+	solver.add_clause(inputs[0], inputs[1], inputs[2], inputs[3], ~output);
+	break;
+
+      default:
+	{
+	  vector<Literal> tmp(ni + 1);
+	  for (ymuint i = 0; i < ni; ++ i) {
+	    tmp[i] = inputs[i];
+	  }
+	  tmp[ni] = ~output;
+	  solver.add_clause(tmp);
+	}
+	break;
+      }
+      for (ymuint i = 0; i < ni; ++ i) {
+	solver.add_clause(~inputs[i], output);
+      }
+      break;
+
+    case kTgNor:
+      switch ( ni ) {
+      case 2:
+	solver.add_clause(inputs[0], inputs[1], output);
+	break;
+
+      case 3:
+	solver.add_clause(inputs[0], inputs[1], inputs[2], output);
+	break;
+
+      case 4:
+	solver.add_clause(inputs[0], inputs[1], inputs[2], inputs[3], output);
+	break;
+
+      default:
+	{
+	  vector<Literal> tmp(ni + 1);
+	  for (ymuint i = 0; i < ni; ++ i) {
+	    tmp[i] = inputs[i];
+	  }
+	  tmp[ni] = output;
+	  solver.add_clause(tmp);
+	}
+	break;
+      }
+      for (ymuint i = 0; i < ni; ++ i) {
+	solver.add_clause(~inputs[i], ~output);
+      }
+      break;
+
+    case kTgXor:
+      if ( ni == 2 ) {
+	solver.add_clause(~inputs[0],  inputs[1],  output);
+	solver.add_clause( inputs[0], ~inputs[1],  output);
+	solver.add_clause( inputs[0],  inputs[1], ~output);
+	solver.add_clause(~inputs[0], ~inputs[1], ~output);
+      }
+      else {
+	vector<Literal> tmp(ni + 1);
+	ymuint nip = (1U << ni);
+	for (ymuint p = 0; p < nip; ++ p) {
+	  ymuint c = 0;
+	  for (ymuint i = 0; i < ni; ++ i) {
+	    if ( p & (1U << i) ) {
+	      tmp[i] = inputs[i];
+	    }
+	    else {
+	      tmp[i] = ~inputs[i];
+	      ++ c;
+	    }
+	  }
+	  if ( (c % 2) == 0 ) {
+	    tmp[ni] = ~output;
+	  }
+	  else {
+	    tmp[ni] = output;
+	  }
+	  solver.add_clause(tmp);
+	}
+      }
+      break;
+
+    case kTgXnor:
+      if ( ni == 2 ) {
+	solver.add_clause(~inputs[0],  inputs[1], ~output);
+	solver.add_clause( inputs[0], ~inputs[1], ~output);
+	solver.add_clause( inputs[0],  inputs[1],  output);
+	solver.add_clause(~inputs[0], ~inputs[1],  output);
+      }
+      else {
+	vector<Literal> tmp(ni + 1);
+	ymuint nip = (1U << ni);
+	for (ymuint p = 0; p < nip; ++ p) {
+	  ymuint c = 0;
+	  for (ymuint i = 0; i < ni; ++ i) {
+	    if ( p & (1U << i) ) {
+	    tmp[i] = inputs[i];
+	    }
+	    else {
+	      tmp[i] = ~inputs[i];
+	      ++ c;
+	    }
+	  }
+	  if ( (c % 2) == 0 ) {
+	    tmp[ni] = output;
+	  }
+	  else {
+	    tmp[ni] = ~output;
+	  }
+	  solver.add_clause(tmp);
+	}
+      }
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
   }
 }
 
@@ -370,19 +357,17 @@ make_node_cnf(SatSolver& solver,
 // @param[in] fnode 対象のノード
 // @param[in] ipos 故障のある入力の番号
 void
-make_ifault_cnf(SatSolver& solver,
-		DtpgNode* fnode,
-		ymuint ipos)
+make_fnode_cnf(SatSolver& solver,
+	       DtpgNode* fnode,
+	       ymuint ipos)
 {
-  DtpgNode* fsrc = fnode->fanin(ipos);
-  fsrc->set_fvar(solver.new_var());
-  fsrc->set_dvar(solver.new_var());
-
   ymuint ni = fnode->fanin_num();
   vector<Literal> inputs(ni);
   for (ymuint i = 0; i < ni; ++ i) {
     DtpgNode* inode = fnode->fanin(i);
     if ( i == ipos ) {
+      inode->set_fvar(solver.new_var());
+      inode->set_dvar(solver.new_var());
       inputs[i] = Literal(inode->fvar(), kPolPosi);
     }
     else {
@@ -390,22 +375,7 @@ make_ifault_cnf(SatSolver& solver,
     }
   }
 
-  Literal glit(fnode->gvar(), kPolPosi);
   Literal flit(fnode->fvar(), kPolPosi);
-  Literal dlit(fnode->dvar(), kPolPosi);
-
-  // XOR(glit, flit, dlit) を追加する．
-  // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-  solver.add_clause(~glit, ~flit, ~dlit);
-  solver.add_clause(~glit,  flit,  dlit);
-  solver.add_clause( glit, ~flit,  dlit);
-  solver.add_clause( glit,  flit, ~dlit);
-
-  vector<Literal> dep(2);
-  dep[0] = ~dlit;
-  dep[1] = Literal(fsrc->dvar(), kPolPosi);
-  solver.add_clause(dep);
-
   make_node_cnf(solver, fnode, flit, inputs);
 }
 
@@ -825,7 +795,7 @@ DtpgSat::dtpg_single(DtpgFault* f,
   DtpgNode* fsrc = fnode;
   if ( f->is_input_fault() ) {
     ymuint ipos = f->pos();
-    make_ifault_cnf(solver, fnode, ipos);
+    make_fnode_cnf(solver, fnode, ipos);
     fsrc = fnode->fanin(ipos);
   }
 
@@ -877,7 +847,7 @@ DtpgSat::dtpg_dual(DtpgFault* f0,
   DtpgNode* fsrc = fnode;
   if ( f0->is_input_fault() ) {
     ymuint ipos = f0->pos();
-    make_ifault_cnf(solver, fnode, ipos);
+    make_fnode_cnf(solver, fnode, ipos);
     fsrc = f0->source_node();
   }
 
