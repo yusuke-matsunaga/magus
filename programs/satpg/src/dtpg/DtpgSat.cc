@@ -1256,6 +1256,57 @@ DtpgSat::make_prop_cnf(SatSolver& solver,
   solver.add_clause(odiff);
 }
 
+BEGIN_NONAMESPACE
+
+bool
+dfs(DtpgNode* node,
+    const vector<Bool3>& model)
+{
+  if ( node->mark1() ) {
+    return node->mark2();
+  }
+  node->set_mark1();
+
+  VarId gvar = node->gvar();
+  VarId fvar = node->fvar();
+  if ( model[gvar.val()] == model[fvar.val()] ) {
+    // 故障差が伝搬していない．
+    return false;
+  }
+
+  bool stat = true;
+  ymuint nfo = node->active_fanout_num();
+  for (ymuint i = 0; i < nfo; ++ i) {
+    DtpgNode* onode = node->active_fanout(i);
+    bool stat1 = dfs(onode, model);
+    if ( stat1 ) {
+      stat = true;
+    }
+  }
+  if ( stat ) {
+    node->set_mark2();
+  }
+  return stat;
+}
+
+void
+dfs2(DtpgNode* node)
+{
+  if ( !node->mark1() ) {
+    return;
+  }
+  node->clear_mark1();
+  node->clear_mark2();
+
+  ymuint nfo = node->active_fanout_num();
+  for (ymuint i = 0; i < nfo; ++ i) {
+    DtpgNode* onode = node->active_fanout(i);
+    dfs2(onode);
+  }
+}
+
+END_NONAMESPACE
+
 /// @brief 一つの SAT問題を解く．
 void
 DtpgSat::solve(SatSolver& solver,
@@ -1269,6 +1320,10 @@ DtpgSat::solve(SatSolver& solver,
   Bool3 ans = solver.solve(assumptions, model);
   if ( ans == kB3True ) {
     f->set_skip();
+
+    dfs(f->node(), model);
+
+    dfs2(f->node());
 
     vector<ymuint> val_list;
     val_list.reserve(input_list.size());
