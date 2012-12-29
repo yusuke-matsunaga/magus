@@ -44,6 +44,14 @@ public:
   ymuint
   id() const;
 
+  /// @brief 一時的な番号を返す．
+  ymuint
+  tmp_id() const;
+
+  /// @brief 一時的な番号をつける．
+  void
+  set_tmp_id(ymuint id);
+
   /// @brief 入力の故障の時 true を返す．
   bool
   is_input_fault() const;
@@ -105,6 +113,9 @@ private:
   // ID番号
   ymuint32 mId;
 
+  // 一時的な ID 番号
+  ymuint32 mTmpId;
+
   // 故障の出力側のノード
   DtpgNode* mNode;
 
@@ -146,6 +157,22 @@ ymuint
 DtpgFault::id() const
 {
   return mId;
+}
+
+// @brief 一時的な番号を返す．
+inline
+ymuint
+DtpgFault::tmp_id() const
+{
+  return mTmpId;
+}
+
+// @brief 一時的な番号をつける．
+inline
+void
+DtpgFault::set_tmp_id(ymuint id)
+{
+  mTmpId = id;
 }
 
 // @brief 入力の故障の時 true を返す．

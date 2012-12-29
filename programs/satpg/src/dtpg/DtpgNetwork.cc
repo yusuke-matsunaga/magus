@@ -382,15 +382,15 @@ DtpgNetwork::mark_tfo_tfi(DtpgNode* fnode,
   tfo_list.clear();
   tfo_list.reserve(mActNodeNum);
   tfo_list.push_back(fnode);
-  fnode->set_mark(DtpgNode::kTFO);
+  fnode->set_mark1();
   for (ymuint rpos = 0; rpos < tfo_list.size(); ++ rpos) {
     DtpgNode* node = tfo_list[rpos];
     ymuint nfo = node->active_fanout_num();
     for (ymuint i = 0; i < nfo; ++ i) {
       DtpgNode* onode = node->active_fanout(i);
-      if ( onode->mark() == DtpgNode::kNone ) {
+      if ( !onode->mark1() ) {
 	tfo_list.push_back(onode);
-	onode->set_mark(DtpgNode::kTFO);
+	onode->set_mark1();
       }
     }
   }
@@ -403,10 +403,10 @@ DtpgNetwork::mark_tfo_tfi(DtpgNode* fnode,
     ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       DtpgNode* inode = node->fanin(i);
-      if ( inode->mark() == DtpgNode::kNone ) {
+      if ( !inode->mark1() && !inode->mark2() ) {
 	// マークの付いていないファンインがあった．
 	tfi_list.push_back(inode);
-	inode->set_mark(DtpgNode::kTFI);
+	inode->set_mark2();
       }
     }
   }
@@ -415,10 +415,10 @@ DtpgNetwork::mark_tfo_tfi(DtpgNode* fnode,
     ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       DtpgNode* inode = node->fanin(i);
-      if ( inode->mark() == DtpgNode::kNone ) {
+      if ( !inode->mark1() && !inode->mark2() ) {
 	// マークの付いていないファンインがあった．
 	tfi_list.push_back(inode);
-	inode->set_mark(DtpgNode::kTFI);
+	inode->set_mark2();
       }
     }
   }
@@ -427,12 +427,14 @@ DtpgNetwork::mark_tfo_tfi(DtpgNode* fnode,
   for (vector<DtpgNode*>::const_iterator p = tfo_list.begin();
        p != tfo_list.end(); ++ p) {
     DtpgNode* node = *p;
-    node->set_mark(DtpgNode::kNone);
+    node->clear_mark1();
+    node->clear_mark2();
   }
   for (vector<DtpgNode*>::const_iterator p = tfi_list.begin();
        p != tfi_list.end(); ++ p) {
     DtpgNode* node = *p;
-    node->set_mark(DtpgNode::kNone);
+    node->clear_mark1();
+    node->clear_mark2();
   }
 }
 
@@ -481,7 +483,7 @@ DtpgNetwork::set_node(const TgNode* tgnode,
   node->mOutputFault[0] = NULL;
   node->mOutputFault[1] = NULL;
 
-  node->mMarks = (static_cast<ymuint32>(DtpgNode::kNone) << 3);
+  node->mMarks = 0U;
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

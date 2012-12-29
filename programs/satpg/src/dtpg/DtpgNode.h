@@ -164,32 +164,47 @@ public:
   DtpgNode*
   imm_dom() const;
 
+  /// @brief mark1 を得る．
+  bool
+  mark1() const;
 
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる型の定義
-  //////////////////////////////////////////////////////////////////////
+  /// @brief mark1 をつける．
+  void
+  set_mark1();
 
-  /// @brief DtpgNetwork::mark_tfo_tfi() で用いられるマーク
-  enum Mark {
-    kNone,
-    kTFO,
-    kTFI
-  };
+  /// @brief mark1 を消す．
+  void
+  clear_mark1();
+
+  /// @brief mark2 を得る．
+  bool
+  mark2() const;
+
+  /// @brief mark2 をつける．
+  void
+  set_mark2();
+
+  /// @brief mark2 を消す．
+  void
+  clear_mark2();
+
+  /// @brief mark3 を得る．
+  bool
+  mark3() const;
+
+  /// @brief mark3 をつける．
+  void
+  set_mark3();
+
+  /// @brief mark3 を消す．
+  void
+  clear_mark3();
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief マークをつける．
-  void
-  set_mark(Mark mark);
-
-  /// @brief マークを得る．
-  Mark
-  mark() const;
 
   /// @brief アクティブにする．
   void
@@ -433,21 +448,76 @@ DtpgNode::input_fault(int val,
   return mInputFault[pos * 2 + (val % 2)];
 }
 
-// @brief マークを得る．
+// @brief mark1 を得る．
 inline
-DtpgNode::Mark
-DtpgNode::mark() const
+bool
+DtpgNode::mark1() const
 {
-  return static_cast<Mark>(mMarks >> 3);
+  return static_cast<bool>((mMarks >> 3) & 1U);
 }
 
-// @brief マークをつける．
+// @brief mark1 をつける．
 inline
 void
-DtpgNode::set_mark(Mark mark)
+DtpgNode::set_mark1()
 {
-  mMarks &= 7U;
-  mMarks |= (mark << 3);
+  mMarks |= 8U;
+}
+
+// @brief mark1 を消す．
+inline
+void
+DtpgNode::clear_mark1()
+{
+  mMarks &= ~8U;
+}
+
+// @brief mark2 を得る．
+inline
+bool
+DtpgNode::mark2() const
+{
+  return static_cast<bool>((mMarks >> 4) & 1U);
+}
+
+// @brief mark2 をつける．
+inline
+void
+DtpgNode::set_mark2()
+{
+  mMarks |= 16U;
+}
+
+// @brief mark2 を消す．
+inline
+void
+DtpgNode::clear_mark2()
+{
+  mMarks &= ~16U;
+}
+
+// @brief mark3 を得る．
+inline
+bool
+DtpgNode::mark3() const
+{
+  return static_cast<bool>((mMarks >> 5) & 1U);
+}
+
+// @brief mark3 をつける．
+inline
+void
+DtpgNode::set_mark3()
+{
+  mMarks |= 32U;
+}
+
+// @brief mark3 を消す．
+inline
+void
+DtpgNode::clear_mark3()
+{
+  mMarks &= ~32U;
 }
 
 // @brief アクティブの場合 true を返す．

@@ -381,17 +381,30 @@ make_fnode_cnf(SatSolver& solver,
 }
 
 void
-mark_tfo(DtpgNode* node,
-	 hash_set<ymuint>& tfo_mark)
+mark_tfo(DtpgNode* node)
 {
-  if ( tfo_mark.count(node->id()) > 0 ) {
+  if ( node->mark1() ) {
     return;
   }
-  tfo_mark.insert(node->id());
+  node->set_mark1();
 
   ymuint nfo = node->active_fanout_num();
   for (ymuint i = 0; i < nfo; ++ i) {
-    mark_tfo(node->active_fanout(i), tfo_mark);
+    mark_tfo(node->active_fanout(i));
+  }
+}
+
+void
+clear_tfo(DtpgNode* node)
+{
+  if ( !node->mark1() ) {
+    return;
+  }
+  node->clear_mark1();
+
+  ymuint nfo = node->active_fanout_num();
+  for (ymuint i = 0; i < nfo; ++ i) {
+    clear_tfo(node->active_fanout(i));
   }
 }
 
@@ -897,49 +910,46 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 
   SatSolver solver(mType, mOption, mOutP);
 
-  // 故障の影響を受けるノードにつけるマーク
-  hash_set<ymuint> fnode_mark;
-  // 故障IDををキーにして flist[] 中の位置を格納するハッシュ表
-  hash_map<ymuint, ymuint> fid_map;
+  // root から外部出力までの正常回路，故障回路を作る．
+  vector<DtpgNode*> input_list;
+  make_prop_cnf(solver, root, input_list);
 
   ymuint nf = flist.size();
   for (ymuint i = 0; i < nf; ++ i) {
     DtpgFault* f = flist[i];
-    fid_map.insert(make_pair(f->id(), i));
-    fnode_mark.insert(f->node()->id());
+    f->set_tmp_id(i);
+    f->node()->set_mark1();
   }
   for (vector<DtpgNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     DtpgNode* node = *p;
-    if ( fnode_mark.count(node->id()) > 0 ) {
+    if ( node->mark1() ) {
       continue;
     }
     bool found = false;
     ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       DtpgNode* inode = node->fanin(i);
-      if ( fnode_mark.count(inode->id()) > 0 ) {
+      if ( inode->mark1() ) {
 	found = true;
+	break;
       }
     }
     if ( found ) {
-      fnode_mark.insert(node->id());
+      node->set_mark1();
     }
   }
-
-  // root から外部出力までの正常回路，故障回路を作る．
-  vector<DtpgNode*> input_list;
-  make_prop_cnf(solver, root, input_list);
 
   // 故障回路用の変数を割り当てる．
   for (vector<DtpgNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     DtpgNode* node = *p;
-    if ( (node != root) && (fnode_mark.count(node->id()) > 0) ) {
+    if ( (node != root) && node->mark1() ) {
       VarId fvar = solver.new_var();
       VarId dvar = solver.new_var();
       node->set_fvar(fvar, dvar);
     }
+    node->clear_mark1();
   }
 
   vector<VarId> flt_var(nf);
@@ -953,7 +963,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
   for (vector<DtpgNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     DtpgNode* node = *p;
-    if ( fnode_mark.count(node->id()) == 0 ) {
+    if ( !node->has_fvar() ) {
       continue;
     }
 
@@ -962,7 +972,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
     for (ymuint i = 0; i < ni; ++ i) {
       DtpgNode* inode = node->fanin(i);
       VarId fvar;
-      if ( fnode_mark.count(inode->id()) > 0 ) {
+      if ( inode->has_fvar() ) {
 	fvar = inode->fvar();
       }
       else {
@@ -973,9 +983,8 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	if ( f == NULL ) {
 	  continue;
 	}
-	hash_map<ymuint, ymuint>::iterator p = fid_map.find(f->id());
-	if ( p != fid_map.end() ) {
-	  ymuint fid = p->second;
+	ymuint fid = f->tmp_id();
+	if ( flist[fid] == f ) {
 	  make_flt_cnf(solver, fvar, flt_var[fid], tmp_var[fid], val);
 	  fvar = tmp_var[fid];
 	}
@@ -989,9 +998,8 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
       if ( f == NULL ) {
 	continue;
       }
-      hash_map<ymuint, ymuint>::iterator p = fid_map.find(f->id());
-      if ( p != fid_map.end() ) {
-	ymuint fid = p->second;
+      ymuint fid = f->tmp_id();
+      if ( flist[fid] == f ) {
 	make_flt_cnf(solver, tmp_var[fid], flt_var[fid], tmp_ovar, val);
 	tmp_ovar = tmp_var[fid];
       }
@@ -1016,24 +1024,21 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
       dep.push_back(dlit);
       for (ymuint j = 0; j < ni; ++ j) {
 	DtpgNode* inode = node->fanin(j);
-	if ( fnode_mark.count(inode->id()) > 0 ) {
+	if ( inode->has_fvar() ) {
 	  dep.push_back(Literal(inode->dvar(), kPolPosi));
 	}
-
 	DtpgFault* fi0 = node->input_fault(0, j);
 	if ( fi0 != NULL ) {
-	  hash_map<ymuint, ymuint>::iterator p = fid_map.find(fi0->id());
-	  if ( p != fid_map.end() ) {
-	    ymuint fid = p->second;
+	  ymuint fid = fi0->tmp_id();
+	  if ( flist[fid] == fi0 ) {
 	    dep.push_back(Literal(flt_var[fid], kPolPosi));
 	  }
 	}
 
 	DtpgFault* fi1 = node->input_fault(1, j);
 	if ( fi1 != NULL ) {
-	  hash_map<ymuint, ymuint>::iterator p = fid_map.find(fi1->id());
-	  if ( p != fid_map.end() ) {
-	    ymuint fid = p->second;
+	  ymuint fid = fi1->tmp_id();
+	  if ( flist[fid] == fi1 ) {
 	    dep.push_back(Literal(flt_var[fid], kPolPosi));
 	  }
 	}
@@ -1041,18 +1046,16 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 
       DtpgFault* fo0 = node->output_fault(0);
       if ( fo0 != NULL ) {
-	hash_map<ymuint, ymuint>::iterator p = fid_map.find(fo0->id());
-	if ( p != fid_map.end() ) {
-	  ymuint fid = p->second;
+	ymuint fid = fo0->tmp_id();
+	if ( flist[fid] == fo0 ) {
 	  dep.push_back(Literal(flt_var[fid], kPolPosi));
 	}
       }
 
       DtpgFault* fo1 = node->output_fault(1);
       if ( fo1 != NULL ) {
-	hash_map<ymuint, ymuint>::iterator p = fid_map.find(fo1->id());
-	if ( p != fid_map.end() ) {
-	  ymuint fid = p->second;
+	ymuint fid = fo1->tmp_id();
+	if ( flist[fid] == fo1 ) {
 	  dep.push_back(Literal(flt_var[fid], kPolPosi));
 	}
       }
@@ -1085,16 +1088,16 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
     }
 
     // 故障ノードの TFO 以外の dlit を0にする．
-    hash_set<ymuint> tfo_mark;
-    mark_tfo(f->node(), tfo_mark);
+    mark_tfo(f->node());
     for (vector<DtpgNode*>::const_iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
       DtpgNode* node = *p;
-      if ( fnode_mark.count(node->id()) > 0 && tfo_mark.count(node->id()) == 0 ) {
+      if ( node->has_fvar() && !node->mark1() ) {
 	Literal dlit(node->dvar(), kPolNega);
 	assumptions.push_back(dlit);
       }
     }
+    clear_tfo(f->node());
 
     // dominator ノードの dvar は1でなければならない．
     for (DtpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
