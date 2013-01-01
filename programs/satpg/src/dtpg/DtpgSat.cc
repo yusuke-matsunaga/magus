@@ -14,6 +14,7 @@
 #include "DtpgFault.h"
 #include "DtpgOperator.h"
 #include "ym_logic/SatSolver.h"
+#include "ym_logic/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

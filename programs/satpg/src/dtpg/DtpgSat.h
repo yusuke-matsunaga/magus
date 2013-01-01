@@ -15,7 +15,7 @@
 #include "ym_networks/tgnet.h"
 #include "ym_logic/Literal.h"
 #include "ym_logic/Bool3.h"
-#include "ym_logic/SatStats.h"
+#include "ym_logic/sat_nsdef.h"
 #include "ym_utils/StopWatch.h"
 
 
