@@ -224,6 +224,13 @@ AtpgMgr::set_dtpg_mode(const string& type,
   mDtpg->set_mode(type, option, outp);
 }
 
+// @brief X抽出のモードを指定する．
+void
+AtpgMgr::set_dtpg_xmode(ymuint val)
+{
+  mDtpg->set_get_pat(val);
+}
+
 // @brief テストパタン生成を行なう．
 void
 AtpgMgr::dtpg(const string& option)

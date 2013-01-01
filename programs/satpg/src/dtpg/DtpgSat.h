@@ -14,6 +14,7 @@
 #include "Dtpg.h"
 #include "ym_networks/tgnet.h"
 #include "ym_logic/Literal.h"
+#include "ym_logic/Bool3.h"
 #include "ym_logic/SatStats.h"
 #include "ym_utils/StopWatch.h"
 
@@ -48,6 +49,11 @@ public:
   set_mode(const string& type = string(),
 	   const string& option = string(),
 	   ostream* outp = NULL);
+
+  /// @brief get_pat フラグを設定する．
+  virtual
+  void
+  set_get_pat(ymuint val);
 
   /// @brief 回路と故障リストを設定する．
   /// @param[in] tgnetwork 対象のネットワーク
@@ -146,19 +152,47 @@ private:
   /// @brief fnode の故障が伝搬する条件を表す CNF を作る．
   /// @param[in] solver SatSolver
   /// @param[in] fnode 対象のノード
-  /// @param[in] input_list fnode の TFI に含まれる入力ノードのリスト
   void
   make_prop_cnf(SatSolver& solver,
-		DtpgNode* fnode,
-		vector<DtpgNode*>& input_list);
+		DtpgNode* fnode);
 
   /// @brief 一つの SAT問題を解く．
   void
   solve(SatSolver& solver,
 	DtpgFault* f,
-	const vector<Literal>& assumptions,
-	const vector<DtpgNode*>& input_list,
 	DtpgOperator& op);
+
+  /// @brief テストパタンを求める．
+  /// @param[in] fnode 故障のあるノード
+  /// @note 結果は mValList に格納される．
+  void
+  get_pat(DtpgNode* fnode);
+
+  /// @brief solve 中で故障差を持つノードをたどる．
+  /// @param[in] node 対象のノード
+  /// @retval true node を通って外部出力まで故障差が伝搬している．
+  /// @retval false 故障差が伝搬していない．
+  /// @note 故障差の伝搬経路上のノードは mDiffNodeList に格納される．
+  /// @note 一旦調べたノードはすべて mark1 がつく．
+  /// @note 故障差が伝搬しているノードは mark2 がつく．
+  /// @note マークがついたノードは mBwdNodeList に格納される．
+  bool
+  fwd_dfs(DtpgNode* node);
+
+  /// @brief solve 中で変数割り当ての正当化を行なう．
+  /// @param[in] node 対象のノード
+  /// @note node の値割り当てを正当化する．
+  /// @note 正当化に用いられているノードには mark3 がつく．
+  /// @note mark3 がついたノードは mBwdNodeList に格納される．
+  void
+  justify(DtpgNode* node);
+
+  /// @brief 入力ノードの値を記録する．
+  /// @param[in] node 対象の外部入力ノード
+  /// @note node の値を mValList に記録する．
+  /// @note 単純だが mModel 上のインデックスと mValList の符号化は異なる．
+  void
+  record_value(DtpgNode* node);
 
   /// @brief ノードの変数割り当てフラグを消す．
   void
@@ -170,9 +204,6 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 直前の SAT の実行結果
-  SatStats mStats;
-
   // SAT solver のタイプ
   string mType;
 
@@ -182,11 +213,32 @@ private:
   // SAT solver の記録用ストリーム
   ostream* mOutP;
 
+  // get_pat フラグ
+  ymuint32 mGetPatFlag;
+
+  // SAT 用の assumption を格納するベクタ
+  vector<Literal> mAssumptions;
+
+  // SAT 用の model を格納するベクタ
+  vector<Bool3> mModel;
+
+  // SAT 用の割り当てリスト
+  vector<ymuint> mValList;
+
   // 対象の回路
   DtpgNetwork* mNetwork;
 
   // 変数を割り当てたノードを格納するリスト
   vector<DtpgNode*> mUsedNodeList;
+
+  // 現在の故障に関係のありそうな外部入力のリスト
+  vector<DtpgNode*> mInputList;
+
+  // 故障差が伝搬しているノードを格納するリスト
+  vector<DtpgNode*> mDiffNodeList;
+
+  // バックトレースに用いたノードを格納するリスト
+  vector<DtpgNode*> mBwdNodeList;
 
   // skip フラグ
   bool mSkip;
@@ -223,9 +275,6 @@ private:
 
   // implication数の総和
   ymuint64 mPropagationNum;
-
-  // タイマー
-  StopWatch mTimer;
 
 };
 

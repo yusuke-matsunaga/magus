@@ -130,6 +130,10 @@ public:
 		const string& option = string(),
 		ostream* outp = NULL);
 
+  /// @brief X抽出のモードを指定する．
+  void
+  set_dtpg_xmode(ymuint val);
+
   /// @brief テストパタン生成を行なう．
   void
   dtpg(const string& option);

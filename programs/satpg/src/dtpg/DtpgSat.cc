@@ -414,6 +414,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 DtpgSat::DtpgSat()
 {
+  mGetPatFlag = 0;
   mNetwork = NULL;
   mSkip = false;
 }
@@ -433,6 +434,13 @@ DtpgSat::set_mode(const string& type,
   mType = type;
   mOption = option;
   mOutP = outp;
+}
+
+// @brief get_pat フラグを設定する．
+void
+DtpgSat::set_get_pat(ymuint val)
+{
+  mGetPatFlag = val;
 }
 
 // @brief 回路と故障リストを設定する．
@@ -785,8 +793,6 @@ DtpgSat::clear_stats()
   mConflictNum = 0;
   mDecisionNum = 0;
   mPropagationNum = 0;
-  mTimer.reset();
-  mTimer.start();
 }
 
 // @brief 一つの故障に対してテストパタン生成を行う．
@@ -796,15 +802,12 @@ void
 DtpgSat::dtpg_single(DtpgFault* f,
 		     DtpgOperator& op)
 {
-  mTimer.start();
-
   SatSolver solver(mType, mOption, mOutP);
 
   DtpgNode* fnode = f->node();
 
   // fnode から外部出力へ至る部分の CNF を作る．
-  vector<DtpgNode*> input_list;
-  make_prop_cnf(solver, fnode, input_list);
+  make_prop_cnf(solver, fnode);
 
   DtpgNode* fsrc = fnode;
   if ( f->is_input_fault() ) {
@@ -818,23 +821,24 @@ DtpgSat::dtpg_single(DtpgFault* f,
     ++ nim;
   }
 
-  vector<Literal> assumptions(nim + 2);
+  mAssumptions.clear();
+  mAssumptions.reserve(nim + 2);
   if ( f->val() ) {
-    assumptions[0] = Literal(fsrc->gvar(), kPolNega);
-    assumptions[1] = Literal(fsrc->fvar(), kPolPosi);
+    mAssumptions[0] = Literal(fsrc->gvar(), kPolNega);
+    mAssumptions[1] = Literal(fsrc->fvar(), kPolPosi);
   }
   else {
-    assumptions[0] = Literal(fsrc->gvar(), kPolPosi);
-    assumptions[1] = Literal(fsrc->fvar(), kPolNega);
+    mAssumptions[0] = Literal(fsrc->gvar(), kPolPosi);
+    mAssumptions[1] = Literal(fsrc->fvar(), kPolNega);
   }
 
   // dominator ノードの dvar は1でなければならない．
   ymuint i = 2;
   for (DtpgNode* node = fnode; node != NULL; node = node->imm_dom(), ++ i) {
-    assumptions[i] = Literal(node->dvar(), kPolPosi);
+    mAssumptions[i] = Literal(node->dvar(), kPolPosi);
   }
 
-  solve(solver, f, assumptions, input_list, op);
+  solve(solver, f, op);
 
   clear_node_mark();
 
@@ -850,15 +854,12 @@ DtpgSat::dtpg_dual(DtpgFault* f0,
 		   DtpgFault* f1,
 		   DtpgOperator& op)
 {
-  mTimer.start();
-
   SatSolver solver(mType, mOption, mOutP);
 
   DtpgNode* fnode = f0->node();
 
   // fnode から外部出力へ至る部分の CNF を作る．
-  vector<DtpgNode*> input_list;
-  make_prop_cnf(solver, fnode, input_list);
+  make_prop_cnf(solver, fnode);
 
   DtpgNode* fsrc = fnode;
   if ( f0->is_input_fault() ) {
@@ -872,23 +873,24 @@ DtpgSat::dtpg_dual(DtpgFault* f0,
     ++ nim;
   }
 
-  vector<Literal> assumptions(nim + 2);
+  mAssumptions.clear();
+  mAssumptions.reserve(nim + 2);
 
-  assumptions[0] = Literal(fsrc->gvar(), kPolPosi);
-  assumptions[1] = Literal(fsrc->fvar(), kPolNega);
+  mAssumptions[0] = Literal(fsrc->gvar(), kPolPosi);
+  mAssumptions[1] = Literal(fsrc->fvar(), kPolNega);
 
   // dominator ノードの dvar は1でなければならない．
   ymuint i = 2;
   for (DtpgNode* node = fnode; node != NULL; node = node->imm_dom(), ++ i) {
-    assumptions[i] = Literal(node->dvar(), kPolPosi);
+    mAssumptions[i] = Literal(node->dvar(), kPolPosi);
   }
 
-  solve(solver, f0, assumptions, input_list, op);
+  solve(solver, f0, op);
 
-  assumptions[0] = Literal(fsrc->gvar(), kPolNega);
-  assumptions[1] = Literal(fsrc->fvar(), kPolPosi);
+  mAssumptions[0] = Literal(fsrc->gvar(), kPolNega);
+  mAssumptions[1] = Literal(fsrc->fvar(), kPolPosi);
 
-  solve(solver, f1, assumptions, input_list, op);
+  solve(solver, f1, op);
 
   clear_node_mark();
 
@@ -906,13 +908,10 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 		  const vector<DtpgNode*>& node_list,
 		  DtpgOperator& op)
 {
-  mTimer.start();
-
   SatSolver solver(mType, mOption, mOutP);
 
   // root から外部出力までの正常回路，故障回路を作る．
-  vector<DtpgNode*> input_list;
-  make_prop_cnf(solver, root, input_list);
+  make_prop_cnf(solver, root);
 
   ymuint nf = flist.size();
   for (ymuint i = 0; i < nf; ++ i) {
@@ -1078,13 +1077,13 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
   // 個々の故障に対するテスト生成を行なう．
   for (ymuint i = 0; i < nf; ++ i) {
     DtpgFault* f = flist[i];
-    vector<Literal> assumptions;
-    assumptions.reserve(node_list.size() + nf);
+    mAssumptions.clear();
+    mAssumptions.reserve(node_list.size() + nf);
 
     // 該当の故障に対する変数のみ1にする．
     for (ymuint j = 0; j < nf; ++ j) {
       tPol pol = (j == i) ? kPolPosi : kPolNega;
-      assumptions.push_back(Literal(flt_var[j], pol));
+      mAssumptions.push_back(Literal(flt_var[j], pol));
     }
 
     // 故障ノードの TFO 以外の dlit を0にする．
@@ -1094,7 +1093,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
       DtpgNode* node = *p;
       if ( node->has_fvar() && !node->mark1() ) {
 	Literal dlit(node->dvar(), kPolNega);
-	assumptions.push_back(dlit);
+	mAssumptions.push_back(dlit);
       }
     }
     clear_tfo(f->node());
@@ -1102,7 +1101,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
     // dominator ノードの dvar は1でなければならない．
     for (DtpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
       Literal dlit(node->dvar(), kPolPosi);
-      assumptions.push_back(dlit);
+      mAssumptions.push_back(dlit);
     }
 
     DtpgNode* fnode = f->node();
@@ -1110,9 +1109,9 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
       fnode = f->source_node();
     }
     tPol pol = (f->val() == 0) ? kPolPosi : kPolNega;
-    assumptions.push_back(Literal(fnode->gvar(), pol));
+    mAssumptions.push_back(Literal(fnode->gvar(), pol));
 
-    solve(solver, f, assumptions, input_list, op);
+    solve(solver, f, op);
   }
 
   clear_node_mark();
@@ -1123,8 +1122,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 // @brief fnode の故障が伝搬する条件を表す CNF を作る．
 void
 DtpgSat::make_prop_cnf(SatSolver& solver,
-		       DtpgNode* fnode,
-		       vector<DtpgNode*>& input_list)
+		       DtpgNode* fnode)
 {
   vector<DtpgNode*> tfo_list;
   vector<DtpgNode*> tfi_list;
@@ -1152,14 +1150,16 @@ DtpgSat::make_prop_cnf(SatSolver& solver,
     mUsedNodeList.push_back(node);
   }
 
+  // mInputList を作る．
+  mInputList.clear();
   if ( fnode->is_input() ) {
-    input_list.push_back(fnode);
+    mInputList.push_back(fnode);
   }
   for (vector<DtpgNode*>::iterator p = tfi_list.begin();
        p != tfi_list.end(); ++ p) {
     DtpgNode* node = *p;
     if ( node->is_input() ) {
-      input_list.push_back(node);
+      mInputList.push_back(node);
     }
   }
 
@@ -1256,92 +1256,31 @@ DtpgSat::make_prop_cnf(SatSolver& solver,
   solver.add_clause(odiff);
 }
 
-BEGIN_NONAMESPACE
-
-bool
-dfs(DtpgNode* node,
-    const vector<Bool3>& model)
-{
-  if ( node->mark1() ) {
-    return node->mark2();
-  }
-  node->set_mark1();
-
-  VarId gvar = node->gvar();
-  VarId fvar = node->fvar();
-  if ( model[gvar.val()] == model[fvar.val()] ) {
-    // 故障差が伝搬していない．
-    return false;
-  }
-
-  bool stat = true;
-  ymuint nfo = node->active_fanout_num();
-  for (ymuint i = 0; i < nfo; ++ i) {
-    DtpgNode* onode = node->active_fanout(i);
-    bool stat1 = dfs(onode, model);
-    if ( stat1 ) {
-      stat = true;
-    }
-  }
-  if ( stat ) {
-    node->set_mark2();
-  }
-  return stat;
-}
-
-void
-dfs2(DtpgNode* node)
-{
-  if ( !node->mark1() ) {
-    return;
-  }
-  node->clear_mark1();
-  node->clear_mark2();
-
-  ymuint nfo = node->active_fanout_num();
-  for (ymuint i = 0; i < nfo; ++ i) {
-    DtpgNode* onode = node->active_fanout(i);
-    dfs2(onode);
-  }
-}
-
-END_NONAMESPACE
-
 /// @brief 一つの SAT問題を解く．
 void
 DtpgSat::solve(SatSolver& solver,
 	       DtpgFault* f,
-	       const vector<Literal>& assumptions,
-	       const vector<DtpgNode*>& input_list,
 	       DtpgOperator& op)
 {
 #if 1
-  vector<Bool3> model;
-  Bool3 ans = solver.solve(assumptions, model);
+  Bool3 ans = solver.solve(mAssumptions, mModel);
   if ( ans == kB3True ) {
     f->set_skip();
 
-    dfs(f->node(), model);
-
-    dfs2(f->node());
-
-    vector<ymuint> val_list;
-    val_list.reserve(input_list.size());
-    for (vector<DtpgNode*>::const_iterator p = input_list.begin();
-	 p != input_list.end(); ++ p) {
-      DtpgNode* node = *p;
-      VarId idx = node->gvar();
-      ymuint iid = node->input_id();
-
-      // 今のところ model には 0 か 1 しか設定されていないはず．
-      if ( model[idx.val()] == kB3True ) {
-	val_list.push_back(iid * 2 + 1);
-      }
-      else if ( model[idx.val()] == kB3False ) {
-	val_list.push_back(iid * 2 + 0);
+    if ( mGetPatFlag == 1 ) {
+      get_pat(f->node());
+    }
+    else {
+      mValList.clear();
+      mValList.reserve(mInputList.size());
+      for (vector<DtpgNode*>::const_iterator p = mInputList.begin();
+	   p != mInputList.end(); ++ p) {
+	DtpgNode* node = *p;
+	record_value(node);
       }
     }
-    op.set_detected(f->safault(), val_list);
+
+    op.set_detected(f->safault(), mValList);
   }
   else if ( ans == kB3False ) {
     f->set_untestable();
@@ -1355,6 +1294,251 @@ DtpgSat::solve(SatSolver& solver,
 #else
   f->set_skip();
 #endif
+}
+
+// @brief テストパタンを求める．
+// @note 結果は mValList に格納される．
+void
+DtpgSat::get_pat(DtpgNode* fnode)
+{
+  mValList.clear();
+  mDiffNodeList.clear();
+  mBwdNodeList.clear();
+
+  // 故障差の伝搬経路にマークをつける．
+  fwd_dfs(fnode);
+
+  // 故障差を伝搬させるためのサイド入力の値を正当化する．
+  for (vector<DtpgNode*>::iterator p = mDiffNodeList.begin();
+       p != mDiffNodeList.end(); ++ p) {
+    DtpgNode* node = *p;
+    if ( node->is_input() ) {
+      record_value(node);
+    }
+    else {
+      ymuint ni = node->fanin_num();
+      for (ymuint i = 0; i < ni; ++ i) {
+	DtpgNode* inode = node->fanin(i);
+	if ( !inode->mark2() ) {
+	  justify(inode);
+	}
+      }
+    }
+  }
+
+  // 一連の処理でつけたマークを消す．
+  for (vector<DtpgNode*>::iterator p = mBwdNodeList.begin();
+       p != mBwdNodeList.end(); ++ p) {
+    DtpgNode* node = *p;
+    node->clear_mark1();
+    node->clear_mark2();
+    node->clear_mark3();
+  }
+}
+
+// @brief solve 中で故障差を持つノードをたどる．
+// @param[in] node 対象のノード
+// @retval true node を通って外部出力まで故障差が伝搬している．
+// @retval false 故障差が伝搬していない．
+// @note 故障差の伝搬経路上のノードは mDiffNodeList に格納される．
+// @note 一旦調べたノードはすべて mark1 がつく．
+// @note 故障差が伝搬しているノードは mark2 がつく．
+// @note マークがついたノードは mBwdNodeList に格納される．
+bool
+DtpgSat::fwd_dfs(DtpgNode* node)
+{
+  if ( node->mark1() ) {
+    return node->mark2();
+  }
+  node->set_mark1();
+  mBwdNodeList.push_back(node);
+
+  VarId gvar = node->gvar();
+  VarId fvar = node->fvar();
+  if ( mModel[gvar.val()] == mModel[fvar.val()] ) {
+    // 故障差が伝搬していない．
+    return false;
+  }
+
+  bool stat = true;
+  ymuint nfo = node->active_fanout_num();
+  for (ymuint i = 0; i < nfo; ++ i) {
+    DtpgNode* onode = node->active_fanout(i);
+    bool stat1 = fwd_dfs(onode);
+    if ( stat1 ) {
+      stat = true;
+    }
+  }
+  if ( stat ) {
+    node->set_mark2();
+    mDiffNodeList.push_back(node);
+  }
+  return stat;
+}
+
+// @brief solve 中で変数割り当ての正当化を行なう．
+// @param[in] node 対象のノード
+// @note node の値割り当てを正当化する．
+// @note 正当化に用いられているノードには mark3 がつく．
+// @note mark3 がついたノードは mBwdNodeList に格納される．
+void
+DtpgSat::justify(DtpgNode* node)
+{
+  if ( node->mark3() ) {
+    return;
+  }
+  node->set_mark3();
+  mBwdNodeList.push_back(node);
+
+  Bool3 val = mModel[node->gvar().val()];
+  if ( node->is_cplx_logic() ) {
+    // 未完
+  }
+  else {
+    ymuint ni = node->fanin_num();
+    switch ( node->type() ) {
+    case kTgUndef:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+
+    case kTgInput:
+      // val を記録
+      record_value(node);
+      break;
+
+    case kTgOutput:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+
+    case kTgBuff:
+    case kTgNot:
+      justify(node->fanin(0));
+      break;
+
+    case kTgAnd:
+       if ( val == kB3True ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgNode* inode = node->fanin(i);
+	  if ( !inode->mark2() ) {
+	    justify(inode);
+	  }
+	}
+      }
+      else if ( val == kB3False ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgNode* inode = node->fanin(i);
+	  if ( !inode->mark2() ) {
+	    if ( mModel[inode->gvar().val()] == kB3False ) {
+	      justify(inode);
+	      break;
+	    }
+	  }
+	}
+      }
+      break;
+
+    case kTgNand:
+      if ( val == kB3True ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgNode* inode = node->fanin(i);
+	  if ( !inode->mark2() ) {
+	    if ( mModel[inode->gvar().val()] == kB3False ) {
+	      justify(inode);
+	      break;
+	    }
+	  }
+	}
+      }
+      else if ( val == kB3False ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgNode* inode = node->fanin(i);
+	  if ( !inode->mark2() ) {
+	    justify(inode);
+	  }
+	}
+      }
+      break;
+
+    case kTgOr:
+      if ( val == kB3True ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgNode* inode = node->fanin(i);
+	  if ( !inode->mark2() ) {
+	    if ( mModel[inode->gvar().val()] == kB3True ) {
+	      justify(inode);
+	      break;
+	    }
+	  }
+	}
+      }
+      else if ( val == kB3False ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgNode* inode = node->fanin(i);
+	  if ( !inode->mark2() ) {
+	    justify(inode);
+	  }
+	}
+      }
+      break;
+
+    case kTgNor:
+      if ( val == kB3True ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgNode* inode = node->fanin(i);
+	  if ( !inode->mark2() ) {
+	    justify(inode);
+	  }
+	}
+      }
+      else if ( val == kB3False ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgNode* inode = node->fanin(i);
+	  if ( !inode->mark2() ) {
+	    if ( mModel[inode->gvar().val()] == kB3True ) {
+	      justify(inode);
+	      break;
+	    }
+	  }
+	}
+      }
+      break;
+
+    case kTgXor:
+    case kTgXnor:
+      for (ymuint i = 0; i < ni; ++ i) {
+	DtpgNode* inode = node->fanin(i);
+	if ( !inode->mark2() ) {
+	  justify(node);
+	}
+      }
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
+  }
+}
+
+// @brief 入力ノードの値を記録する．
+// @param[in] node 対象の外部入力ノード
+// @note node の値を mValList に記録する．
+// @note 単純だが mModel 上のインデックスと mValList の符号化は異なる．
+void
+DtpgSat::record_value(DtpgNode* node)
+{
+  assert_cond( node->is_input(), __FILE__, __LINE__);
+
+  VarId idx = node->gvar();
+  ymuint iid = node->input_id();
+
+  // 今のところ model には 0 か 1 しか設定されていないはず．
+  Bool3 v = mModel[idx.val()];
+  ymuint packed_val = iid * 2;
+  if ( v == kB3True ) {
+    packed_val += 1;
+  }
+  mValList.push_back(packed_val);
 }
 
 // @brief ノードの変数割り当てフラグを消す．
@@ -1384,9 +1568,7 @@ DtpgSat::get_stats() const
 	 << "Ave. # of learnt literals:     " << (double) mLearntLitNum / mRunCount << endl
 	 << "Ave. # of conflicts:           " << (double) mConflictNum / mSatCount << endl
 	 << "Ave. # of decisions:           " << (double) mDecisionNum / mSatCount << endl
-	 << "Ave. # of implications:        " << (double) mPropagationNum / mSatCount << endl
-	 << "CPUT time:                     " << mTimer.time().usr_time() << endl
-	 << endl;
+	 << "Ave. # of implications:        " << (double) mPropagationNum / mSatCount << endl;
   }
 }
 
@@ -1409,7 +1591,6 @@ DtpgSat::update_stats(SatSolver& solver,
   mConflictNum += sat_stat.mConflictNum;
   mDecisionNum += sat_stat.mDecisionNum;
   mPropagationNum += sat_stat.mPropagationNum;
-  mTimer.stop();
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

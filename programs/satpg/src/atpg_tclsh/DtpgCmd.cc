@@ -49,6 +49,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			"po-split mode");
   mPoptSkip = new TclPopt(this, "skip",
 			  "skip mode");
+  mPoptX = new TclPoptInt(this, "x",
+			  "X-extract ode [0-1]");
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptSatRec);
   new_popt_group(mPoptDual, mPoptFFR, mPoptMFFC, mPoptAll);
 }
@@ -126,6 +128,10 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   bool all_mode = mPoptAll->is_specified();
   bool po_mode = mPoptPo->is_specified();
   bool skip_mode = mPoptSkip->is_specified();
+
+  if ( mPoptX->is_specified() ) {
+    mgr().set_dtpg_xmode(mPoptX->val());
+  }
 
   mgr().clear_stats();
 
