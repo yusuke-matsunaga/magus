@@ -1,0 +1,138 @@
+#ifndef DTPGCOVER_H
+#define DTPGCOVER_H
+
+/// @file DtpgCover.h
+/// @brief DtpgCover のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "dtpg_nsdef.h"
+
+
+BEGIN_NAMESPACE_YM_SATPG_DTPG
+
+//////////////////////////////////////////////////////////////////////
+/// @class DtpgCube DtpgCover.h "DtpgCover.h"
+/// @brief キューブ(積項)を表すクラス
+//////////////////////////////////////////////////////////////////////
+class DtpgCube
+{
+  friend class DtpgNetwork;
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を取り出す関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief リテラル数を得る．
+  ymuint
+  literal_num() const;
+
+  /// @brief リテラルを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < literal_num() )
+  Literal
+  literal(ymuint pos) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // リテラル数
+  ymuint32 mLitNum;
+
+  // リテラルの配列
+  Literal* mLitArray;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class DtpgCover DtpgCover.h "DtpgCover.h"
+/// @brief カバー(積和形論理式)を表すクラス
+//////////////////////////////////////////////////////////////////////
+class DtpgCover
+{
+  friend class DtpgNetwork;
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を取り出す関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief キューブ数を得る．
+  ymuint
+  cube_num() const;
+
+  /// @brief キューブを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < cube_num() )
+  const DtpgCube&
+  cube(ymuint pos) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 積項数
+  ymuint32 mCubeNum;
+
+  // キューブの配列
+  DtpgCube* mCubeArray;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+// DtpgCube のインライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief リテラル数を得る．
+inline
+ymuint
+DtpgCube::literal_num() const
+{
+  return mLitNum;
+}
+
+// @brief リテラルを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < literal_num() )
+inline
+Literal
+DtpgCube::literal(ymuint pos) const
+{
+  assert_cond( pos < mLitNum, __FILE__, __LINE__);
+  return mLitArray[pos];
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// DtpgCover のインライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief キューブ数を得る．
+inline
+ymuint
+DtpgCover::cube_num() const
+{
+  return mCubeNum;
+}
+
+// @brief キューブを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < cube_num() )
+inline
+const DtpgCube&
+DtpgCover::cube(ymuint pos) const
+{
+  assert_cond( pos < mCubeNum, __FILE__, __LINE__);
+  return mCubeArray[pos];
+}
+
+END_NAMESPACE_YM_SATPG_DTPG
+
+#endif // DTPGCOVER_H

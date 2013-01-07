@@ -141,6 +141,11 @@ private:
   void
   activate_sub(const vector<bool>& mark);
 
+  /// @brief ゲート型からカバーを作る．
+  /// @param[in] gate_type ゲート型
+  DtpgCover*
+  gate_to_cover(tTgGateType gate_type);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -149,6 +154,9 @@ private:
 
   // DtpgNetwork 関係のメモリ確保を行なうオブジェクト
   SimpleAlloc mAlloc;
+
+  // ゲート型をキーとしてカバーを格納する配列
+  vector<DtpgCover*> mCoverList;
 
   // 全ノード数
   ymuint32 mNodeNum;

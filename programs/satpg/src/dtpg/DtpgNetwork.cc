@@ -486,4 +486,12 @@ DtpgNetwork::set_node(const TgNode* tgnode,
   node->mMarks = 0U;
 }
 
+// @brief ゲート型からカバーを作る．
+// @param[in] gate_type ゲート型
+DtpgCover*
+DtpgNetwork::gate_to_cover(tTgGateType gate_type)
+{
+  LogExpr expr =
+}
+
 END_NAMESPACE_YM_SATPG_DTPG
