@@ -10,7 +10,6 @@
 #include "TgIscas89Handler.h"
 #include "ym_networks/TgNetwork.h"
 #include "ym_networks/TgNode.h"
-#include "ym_networks/TgGateTemplate.h"
 #include "../LogicMgr.h"
 
 
@@ -110,12 +109,12 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
 
   case kGt89BUFF:
     assert_cond(ni == 1, __FILE__, __LINE__);
-    mNetwork->set_to_logic(node, TgGateTemplate(kTgBuff, 1));
+    mNetwork->set_to_logic(node, kTgBuff, 1);
     break;
 
   case kGt89NOT:
     assert_cond(ni == 1, __FILE__, __LINE__);
-    mNetwork->set_to_logic(node, TgGateTemplate(kTgNot, 1));
+    mNetwork->set_to_logic(node, kTgNot, 1);
     break;
 
   case kGt89AND:
@@ -125,7 +124,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
       assert_not_reached(__FILE__, __LINE__);
       break;
     default:
-      mNetwork->set_to_logic(node, TgGateTemplate(kTgAnd, ni));
+      mNetwork->set_to_logic(node, kTgAnd, ni);
       break;
     }
     break;
@@ -137,7 +136,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
       assert_not_reached(__FILE__, __LINE__);
       break;
     default:
-      mNetwork->set_to_logic(node, TgGateTemplate(kTgNand, ni));
+      mNetwork->set_to_logic(node, kTgNand, ni);
       break;
     }
     break;
@@ -149,7 +148,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
       assert_not_reached(__FILE__, __LINE__);
       break;
     default:
-      mNetwork->set_to_logic(node, TgGateTemplate(kTgOr, ni));
+      mNetwork->set_to_logic(node, kTgOr, ni);
       break;
     }
     break;
@@ -161,7 +160,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
       assert_not_reached(__FILE__, __LINE__);
       break;
     default:
-      mNetwork->set_to_logic(node, TgGateTemplate(kTgNor, ni));
+      mNetwork->set_to_logic(node, kTgNor, ni);
       break;
     }
     break;
@@ -173,7 +172,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
       assert_not_reached(__FILE__, __LINE__);
       break;
     default:
-      mNetwork->set_to_logic(node, TgGateTemplate(kTgXor, ni));
+      mNetwork->set_to_logic(node, kTgXor, ni);
       break;
     }
     break;
@@ -185,7 +184,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
       assert_not_reached(__FILE__, __LINE__);
       break;
     default:
-      mNetwork->set_to_logic(node, TgGateTemplate(kTgXnor, ni));
+      mNetwork->set_to_logic(node, kTgXnor, ni);
       break;
     }
     break;

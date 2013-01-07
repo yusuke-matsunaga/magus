@@ -17,8 +17,44 @@ test1(const LogExpr& expr,
       LogicMgr& lm)
 {
   cout << "Registering: " << expr << endl;
-  TgGateTemplate id = lm.reg_logic(expr);
-  cout << "  ID = " << id << endl;
+  ymuint32 id = lm.reg_logic(expr);
+  tTgGateType type = LogicMgr::type(id);
+  ymuint ni = LogicMgr::ni(id);
+
+  cout << "  ID = ";
+  switch ( type ) {
+  case kTgUndef:  cout << "--UNDEF--"; break;
+
+  case kTgInput:  cout << "--INPUT--"; break;
+  case kTgOutput: cout << "--OUTPUT--"; break;
+
+  case kTgConst0: cout << "--CONST0--"; break;
+  case kTgConst1: cout << "--CONST1--"; break;
+
+  case kTgBuff:   cout << "--BUFF--"; break;
+  case kTgNot:    cout << "--NOT--"; break;
+
+  case kTgAnd:    cout << "--AND(" << ni << ")--"; break;
+
+  case kTgNand:   cout << "--NAND(" << ni << ")--"; break;
+
+  case kTgOr:     cout << "--OR(" << ni << ")--"; break;
+
+  case kTgNor:    cout << "--NOR(" << ni << ")--"; break;
+
+  case kTgXor:    cout << "--XOR(" << ni << ")--"; break;
+
+  case kTgXnor:   cout << "--XNOR(" << ni << ")--"; break;
+
+  default:
+    if ( static_cast<ymuint32>(type) >= static_cast<ymuint32>(kTgUsrDef) ) {
+      cout << "--CPLX(" << ni << ")--"; break;
+    }
+    else {
+      cout << "--ERROR--"; break;
+    }
+  }
+  cout << endl;
 }
 
 END_NAMESPACE_YM_NETWORKS_TGNET

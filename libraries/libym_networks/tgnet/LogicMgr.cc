@@ -3,7 +3,7 @@
 /// @brief LogicMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -53,10 +53,9 @@ LogicMgr::num() const
 // @brief 論理式を取り出す．
 // @param[in] gt_id ゲートテンプレート
 LogExpr
-LogicMgr::get(TgGateTemplate gt_id) const
+LogicMgr::get(tTgGateType type,
+	      ymuint ni) const
 {
-  tTgGateType type = gt_id.type();
-  ymuint ni = gt_id.ni();
   if ( static_cast<ymuint32>(type) < kBase ) {
     vector<LogExpr> literals(ni);
     for (ymuint i = 0; i < ni; ++ i) {
@@ -133,7 +132,7 @@ check_builtin(const LogExpr& lexp,
     return kTgNot;
   }
   ymuint np = 1 << ni;
-  const ymuint NBPW = sizeof(ymulong) * 8;
+  //const ymuint NBPW = sizeof(ymulong) * 8;
 
   bool and_flag = true;
   bool nand_flag = true;
@@ -206,7 +205,7 @@ END_NONAMESPACE
 
 
 // @brief 新しい論理式を登録する．
-TgGateTemplate
+ymuint32
 LogicMgr::reg_logic(const LogExpr& lexp)
 {
   // 真理値ベクタに変換する．
@@ -217,14 +216,14 @@ LogicMgr::reg_logic(const LogExpr& lexp)
   tTgGateType type = check_builtin(lexp, ni, tmp_func);
 
   if ( type != kTgUndef ) {
-    return TgGateTemplate(type, ni);
+    return pack(type, ni);
   }
 
   // ハッシュ表から同一の関数がないか調べる．
   ymuint pos0 = tmp_func.hash();
   ymuint pos = pos0 % mHashSize;
   for (Cell* cell = mHashTable[pos]; cell; cell = cell->mLink) {
-    if ( cell->mId.ni() == ni && cell->mTvFunc == tmp_func ) {
+    if ( LogicMgr::ni(cell->mId) == ni && cell->mTvFunc == tmp_func ) {
       // 同じ関数が登録されていた．
       // もしもリテラル数が少なかったら論理式を変更する．
       if ( cell->mLexp.litnum() > lexp.litnum() ) {
@@ -242,7 +241,7 @@ LogicMgr::reg_logic(const LogExpr& lexp)
 
   Cell* new_cell = new Cell;
   type = static_cast<tTgGateType>(mCellArray.size() + kBase);
-  new_cell->mId = TgGateTemplate(type, ni);
+  new_cell->mId = pack(type, ni);
   new_cell->mLexp = lexp;
   new_cell->mTvFunc = tmp_func;
   new_cell->mLink = mHashTable[pos];
@@ -291,56 +290,44 @@ LogicMgr::dump(ostream& s) const
   ymuint n = mCellArray.size();
   for (ymuint i = 0; i < n; ++ i) {
     Cell* tmp = mCellArray[i];
-    s << tmp->mId << "\t: " << tmp->mLexp << endl;
+    tTgGateType type = LogicMgr::type(tmp->mId);
+    ymuint ni = LogicMgr::ni(tmp->mId);
+    switch ( type ) {
+    case kTgUndef:  s << "--UNDEF--"; break;
+
+    case kTgInput:  s << "--INPUT--"; break;
+    case kTgOutput: s << "--OUTPUT--"; break;
+
+    case kTgConst0: s << "--CONST0--"; break;
+    case kTgConst1: s << "--CONST1--"; break;
+
+    case kTgBuff:   s << "--BUFF--"; break;
+    case kTgNot:    s << "--NOT--"; break;
+
+    case kTgAnd:    s << "--AND(" << ni << ")--"; break;
+
+    case kTgNand:   s << "--NAND(" << ni << ")--"; break;
+
+    case kTgOr:     s << "--OR(" << ni << ")--"; break;
+
+    case kTgNor:    s << "--NOR(" << ni << ")--"; break;
+
+    case kTgXor:    s << "--XOR(" << ni << ")--"; break;
+
+    case kTgXnor:   s << "--XNOR(" << ni << ")--"; break;
+
+    default:
+      if ( static_cast<ymuint32>(type) >= static_cast<ymuint32>(kTgUsrDef) ) {
+	s << "--CPLX(" << ni << ")--"; break;
+      }
+      else {
+	s << "--ERROR--"; break;
+      }
+    }
+
+    s << "\t: " << tmp->mLexp << endl;
   }
   s << "=====< LogicMgr Dump End >=====" << endl;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// TgGateTemplate
-//////////////////////////////////////////////////////////////////////
-
-// @relates TgGateTemplate
-// @brief TgGateTemplate の内容を出力する．
-ostream&
-operator<<(ostream& s,
-	   TgGateTemplate gt)
-{
-  tTgGateType type = gt.type();
-  switch ( type ) {
-  case kTgUndef:  s << "--UNDEF--"; break;
-
-  case kTgInput:  s << "--INPUT--"; break;
-  case kTgOutput: s << "--OUTPUT--"; break;
-
-  case kTgConst0: s << "--CONST0--"; break;
-  case kTgConst1: s << "--CONST1--"; break;
-
-  case kTgBuff:   s << "--BUFF--"; break;
-  case kTgNot:    s << "--NOT--"; break;
-
-  case kTgAnd:    s << "--AND(" << gt.ni() << ")--"; break;
-
-  case kTgNand:   s << "--NAND(" << gt.ni() << ")--"; break;
-
-  case kTgOr:     s << "--OR(" << gt.ni() << ")--"; break;
-
-  case kTgNor:    s << "--NOR(" << gt.ni() << ")--"; break;
-
-  case kTgXor:    s << "--XOR(" << gt.ni() << ")--"; break;
-
-  case kTgXnor:   s << "--XNOR(" << gt.ni() << ")--"; break;
-
-  default:
-    if ( static_cast<ymuint32>(type) >= static_cast<ymuint32>(kTgUsrDef) ) {
-      s << "--CPLX(" << gt.ni() << ")--"; break;
-    }
-    else {
-      s << "--ERROR--"; break;
-    }
-  }
-  return s;
 }
 
 END_NAMESPACE_YM_NETWORKS_TGNET

@@ -5,7 +5,7 @@
 /// @brief TgNetwork のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -22,7 +22,6 @@
 
 
 #include "ym_networks/tgnet.h"
-#include "ym_networks/TgGateTemplate.h"
 #include "ym_logic/LogExpr.h"
 #include "ym_utils/UnitAlloc.h"
 #include "ym_utils/SimpleAlloc.h"
@@ -34,7 +33,7 @@ class NameHash;
 class LogicMgr;
 
 //////////////////////////////////////////////////////////////////////
-/// @class TgNetwork TgNetwork.h <ym_networks/TgNetwork.h>
+/// @class TgNetwork TgNetwork.h "ym_networks/TgNetwork.h"
 /// @brief ATPG対象のネットワークを表すクラス
 //////////////////////////////////////////////////////////////////////
 class TgNetwork
@@ -54,7 +53,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 全ノード数を得る．
-  size_t
+  ymuint
   node_num() const;
 
   /// @brief pos 番めのノードを得る．
@@ -70,11 +69,11 @@ public:
   find_node(const char* name) const;
 
   /// @brief 外部入力数を得る．
-  size_t
+  ymuint
   input_num1() const;
 
   /// @brief 外部入力数 + FFノード数を得る．
-  size_t
+  ymuint
   input_num2() const;
 
   /// @brief pos 番めの入力ノードを得る．
@@ -85,11 +84,11 @@ public:
   input(ymuint32 pos) const;
 
   /// @brief 外部出力数を得る．
-  size_t
+  ymuint
   output_num1() const;
 
   /// @brief 外部出力数 + FF ノード数を得る．
-  size_t
+  ymuint
   output_num2() const;
 
   /// @brief pos 番めの外部出力ノードを得る．
@@ -100,7 +99,7 @@ public:
   output(ymuint32 pos) const;
 
   /// @brief logic ノード数を得る．
-  size_t
+  ymuint
   logic_num() const;
 
   /// @brief pos 番めの logic ノードを得る．
@@ -116,7 +115,7 @@ public:
   sorted_logic(ymuint32 pos) const;
 
   /// @brief FF ノード数を得る．
-  size_t
+  ymuint
   ff_num() const;
 
   /// @brief node の論理式を取り出す．
@@ -158,10 +157,19 @@ public:
 
   /// @brief ノードを論理ノードに設定する．
   /// @param[in] node 対象のノード
-  /// @param[in] gt_id 論理式ID
+  /// @param[in] gate_type ゲートタイプ
+  /// @param[in] ni 入力数
   void
   set_to_logic(TgNode* node,
-	       TgGateTemplate gt_id);
+	       tTgGateType gate_type,
+	       ymuint ni);
+
+  /// @brief ノードを論理ノードに設定する．
+  /// @param[in] node 対象のノード
+  /// @param[in] expr 論理式
+  void
+  set_to_logic(TgNode* node,
+	       const LogExpr& expr);
 
   /// @brief ノードを FF ノードに設定する．
   /// @param[in] ffin FF-in に設定するノード
@@ -177,13 +185,7 @@ public:
   void
   connect(TgNode* from_node,
 	  TgNode* to_node,
-	  size_t to_ipos);
-
-  /// @brief 論理式の登録を行う．
-  /// @param[in] lexp 論理式
-  /// @return 登録された論理式番号を返す．
-  TgGateTemplate
-  reg_lexp(const LogExpr& lexp);
+	  ymuint to_ipos);
 
   /// @brief ネットワークの設定後の処理を行う．
   void
@@ -247,7 +249,7 @@ dump(ostream& s,
 
 // @brief 全ノード数を得る．
 inline
-size_t
+ymuint
 TgNetwork::node_num() const
 {
   return mNodeArray.size();
@@ -264,7 +266,7 @@ TgNetwork::node(ymuint32 pos) const
 
 // @brief 外部入力数を得る．
 inline
-size_t
+ymuint
 TgNetwork::input_num1() const
 {
   return mInputArray.size();
@@ -272,7 +274,7 @@ TgNetwork::input_num1() const
 
 // @brief 外部入力数 + FF ノード数を得る．
 inline
-size_t
+ymuint
 TgNetwork::input_num2() const
 {
   return input_num1() + ff_num();
@@ -293,7 +295,7 @@ TgNetwork::input(ymuint32 pos) const
 
 // @brief 外部出力数を得る．
 inline
-size_t
+ymuint
 TgNetwork::output_num1() const
 {
   return mOutputArray.size();
@@ -301,7 +303,7 @@ TgNetwork::output_num1() const
 
 // @brief 外部出力数 + FF ノード数を得る．
 inline
-size_t
+ymuint
 TgNetwork::output_num2() const
 {
   return output_num1() + ff_num();
@@ -322,7 +324,7 @@ TgNetwork::output(ymuint32 pos) const
 
 // @brief logic ノード数を得る．
 inline
-size_t
+ymuint
 TgNetwork::logic_num() const
 {
   return mLogicArray.size();
@@ -338,7 +340,7 @@ TgNetwork::logic(ymuint32 pos) const
 
 // @brief FF ノード数を得る．
 inline
-size_t
+ymuint
 TgNetwork::ff_num() const
 {
   return mFFOutArray.size();

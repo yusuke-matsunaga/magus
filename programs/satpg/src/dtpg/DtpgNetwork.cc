@@ -491,7 +491,9 @@ DtpgNetwork::set_node(const TgNode* tgnode,
 DtpgCover*
 DtpgNetwork::gate_to_cover(tTgGateType gate_type)
 {
-  LogExpr expr =
+#if 0
+  LogExpr expr =;
+#endif
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

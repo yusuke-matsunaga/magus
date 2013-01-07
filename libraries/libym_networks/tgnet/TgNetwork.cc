@@ -71,8 +71,7 @@ TgNetwork::clear()
 LogExpr
 TgNetwork::get_lexp(const TgNode* node) const
 {
-  TgGateTemplate gt_id(node->type(), node->ni());
-  return mLogicMgr->get(gt_id);
+  return mLogicMgr->get(node->mTypeId);
 }
 
 // @brief 新しいノードを生成する．
@@ -127,17 +126,30 @@ TgNetwork::set_to_output(TgNode* node)
 
 // @brief ノードを論理ノードに設定する．
 // @param[in] node 対象のノード
-// @param[in] gt_id 論理式ID
+// @param[in] gate_type ゲートタイプ
+// @param[in] ni 入力数
 void
 TgNetwork::set_to_logic(TgNode* node,
-			TgGateTemplate gt_id)
+			tTgGateType gate_type,
+			ymuint ni)
 {
   ymuint32 lid = mLogicArray.size();
-  tTgGateType type = gt_id.type();
-  size_t ni = gt_id.ni();
   void* p = mFaninAlloc.get_memory(sizeof(TgNode*) * ni);
-  node->set_type(lid, type, ni, p);
+  node->set_type(lid, gate_type, ni, p);
   mLogicArray.push_back(node);
+}
+
+// @brief ノードを論理ノードに設定する．
+// @param[in] node 対象のノード
+// @param[in] expr 論理式
+void
+TgNetwork::set_to_logic(TgNode* node,
+			const LogExpr& expr)
+{
+  ymuint32 data = mLogicMgr->reg_logic(expr);
+  tTgGateType type = LogicMgr::type(data);
+  ymuint ni = LogicMgr::ni(data);
+  set_to_logic(node, type, ni);
 }
 
 // @brief ノードを FF ノードに設定する．
@@ -164,54 +176,45 @@ TgNetwork::set_to_ff(TgNode* ffin,
 void
 TgNetwork::connect(TgNode* from_node,
 		   TgNode* to_node,
-		   size_t to_ipos)
+		   ymuint to_ipos)
 {
   to_node->mFanins[to_ipos] = from_node;
 }
-
-// @brief 論理式の登録を行う．
-// @param[in] lexp 論理式
-TgGateTemplate
-TgNetwork::reg_lexp(const LogExpr& lexp)
-{
-  return mLogicMgr->reg_logic(lexp);
-}
-
 
 // @brief ネットワークの設定後の処理を行う．
 void
 TgNetwork::wrap_up()
 {
-  size_t n = node_num();
-  size_t ni = input_num1();
-  size_t no = output_num1();
-  size_t nl = logic_num();
-  size_t nq = ff_num();
+  ymuint n = node_num();
+  ymuint ni = input_num1();
+  ymuint no = output_num1();
+  ymuint nl = logic_num();
+  ymuint nq = ff_num();
 
   // ファンアウトリストの設定を行う．
   // まず，ファンアウト数を数える．
-  for (size_t i = 0; i < nl; ++ i) {
+  for (ymuint i = 0; i < nl; ++ i) {
     TgNode* node = mLogicArray[i];
-    size_t ni = node->ni();
-    for (size_t j = 0; j < ni; ++ j) {
+    ymuint ni = node->ni();
+    for (ymuint j = 0; j < ni; ++ j) {
       TgNode* inode = node->mFanins[j];
       ++ inode->mFanoutNum;
     }
   }
-  for (size_t i = 0; i < no; ++ i) {
+  for (ymuint i = 0; i < no; ++ i) {
     TgNode* node = mOutputArray[i];
     TgNode* inode = node->mFanins[0];
     ++ inode->mFanoutNum;
   }
-  for (size_t i = 0; i < nq; ++ i) {
+  for (ymuint i = 0; i < nq; ++ i) {
     TgNode* node = mFFInArray[i];
     TgNode* inode = node->mFanins[0];
     ++ inode->mFanoutNum;
   }
   // ファンアウト数分の配列を確保する．
-  for (size_t i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     TgNode* node = mNodeArray[i];
-    size_t& nfo = node->mFanoutNum;
+    ymuint& nfo = node->mFanoutNum;
     if ( nfo > 0 ) {
       void* p = mEdgeAlloc.get_memory(sizeof(TgEdge) * nfo);
       node->mFanouts = new (p) TgEdge[nfo];
@@ -219,29 +222,29 @@ TgNetwork::wrap_up()
     nfo = 0;
   }
   // ファンアウトの設定を行う．
-  for (size_t i = 0; i < nl; ++ i) {
+  for (ymuint i = 0; i < nl; ++ i) {
     TgNode* node = mLogicArray[i];
-    size_t ni = node->ni();
-    for (size_t j = 0; j < ni; ++ j) {
+    ymuint ni = node->ni();
+    for (ymuint j = 0; j < ni; ++ j) {
       TgNode* inode = node->mFanins[j];
-      size_t& pos = inode->mFanoutNum;
+      ymuint& pos = inode->mFanoutNum;
       inode->mFanouts[pos].mTo = node;
       inode->mFanouts[pos].mIpos = j;
       ++ pos;
     }
   }
-  for (size_t i = 0; i < no; ++ i) {
+  for (ymuint i = 0; i < no; ++ i) {
     TgNode* node = mOutputArray[i];
     TgNode* inode = node->mFanins[0];
-    size_t& pos = inode->mFanoutNum;
+    ymuint& pos = inode->mFanoutNum;
     inode->mFanouts[pos].mTo = node;
     inode->mFanouts[pos].mIpos = 0;
     ++ pos;
   }
-  for (size_t i = 0; i < nq; ++ i) {
+  for (ymuint i = 0; i < nq; ++ i) {
     TgNode* node = mFFInArray[i];
     TgNode* inode = node->mFanins[0];
-    size_t& pos = inode->mFanoutNum;
+    ymuint& pos = inode->mFanoutNum;
     inode->mFanouts[pos].mTo = node;
     inode->mFanouts[pos].mIpos = 0;
     ++ pos;
@@ -250,17 +253,17 @@ TgNetwork::wrap_up()
   // ソーティングを行う．
   vector<bool> visited(n, false);
   vector<TgNode*> queue(n);
-  size_t rpos = 0;
-  size_t wpos = 0;
+  ymuint rpos = 0;
+  ymuint wpos = 0;
   mSortedArray.clear();
   mSortedArray.reserve(nl);
-  for (size_t i = 0; i < ni; ++ i) {
+  for (ymuint i = 0; i < ni; ++ i) {
     TgNode* node = mInputArray[i];
     visited[node->gid()] = true;
     queue[wpos] = node;
     ++ wpos;
   }
-  for (size_t i = 0; i < nq; ++ i) {
+  for (ymuint i = 0; i < nq; ++ i) {
     TgNode* node = mFFOutArray[i];
     visited[node->gid()] = true;
     queue[wpos] = node;
@@ -272,14 +275,14 @@ TgNetwork::wrap_up()
     if ( node->is_logic() ) {
       mSortedArray.push_back(node);
     }
-    size_t nfo = node->fanout_num();
-    for (size_t i = 0; i < nfo; ++ i) {
+    ymuint nfo = node->fanout_num();
+    for (ymuint i = 0; i < nfo; ++ i) {
       TgNode* fonode = node->fanout_edge(i)->mTo;
       if ( !fonode->is_logic() ) continue;
       if ( visited[fonode->gid()] ) continue;
-      size_t ni = fonode->ni();
+      ymuint ni = fonode->ni();
       bool ok = true;
-      for (size_t i = 0; i < ni; ++ i) {
+      for (ymuint i = 0; i < ni; ++ i) {
 	const TgNode* finode = fonode->fanin(i);
 	if ( !visited[finode->gid()] ) {
 	  ok = false;
@@ -336,8 +339,8 @@ dump(ostream& s,
 
   s << endl
     << "Logic Nodes" << endl;
-  size_t nlo = network.logic_num();
-  for (size_t i = 0; i < nlo; ++ i) {
+  ymuint nlo = network.logic_num();
+  for (ymuint i = 0; i < nlo; ++ i) {
     const TgNode* node = network.logic(i);
     dump_node(s, node);
     s << ": ni = " << node->ni() << endl;
@@ -352,11 +355,11 @@ dump(ostream& s,
 
   s << endl
     << "Connections" << endl;
-  size_t nn = network.node_num();
-  for (size_t i = 0; i < nn; ++ i) {
+  ymuint nn = network.node_num();
+  for (ymuint i = 0; i < nn; ++ i) {
     const TgNode* node = network.node(i);
-    size_t ni = node->ni();
-    for (size_t j = 0; j < ni; ++ j) {
+    ymuint ni = node->ni();
+    for (ymuint j = 0; j < ni; ++ j) {
       const TgNode* inode = node->fanin(j);
       dump_node(s, inode);
       s << " -->> "
@@ -375,7 +378,7 @@ dump(ostream& s,
 
 // コンストラクタ
 TgNode::TgNode(ymuint32 gid) :
-  mTypeId(kTgUndef, 0),
+  mTypeId(LogicMgr::pack(kTgUndef, 0)),
   mGid(gid),
   mName(NULL),
   mFanins(NULL),
@@ -390,14 +393,28 @@ TgNode::~TgNode()
 {
 }
 
+// @brief タイプ id を得る．
+tTgGateType
+TgNode::type() const
+{
+  return LogicMgr::type(mTypeId);
+}
+
+// @brief 入力数を得る．
+ymuint
+TgNode::ni() const
+{
+  return LogicMgr::ni(mTypeId);
+}
+
 // タイプをセットする．
 void
 TgNode::set_type(ymuint32 lid,
 		 tTgGateType type,
-		 size_t ni,
+		 ymuint ni,
 		 void* p)
 {
-  mTypeId = TgGateTemplate(type, ni);;
+  mTypeId = LogicMgr::pack(type, ni);
   mLid = lid;
   if ( ni > 0 ) {
     mFanins = static_cast<TgNode**>(p);
@@ -405,7 +422,7 @@ TgNode::set_type(ymuint32 lid,
   else {
     mFanins = NULL;
   }
-  for (size_t i = 0; i < ni; ++ i) {
+  for (ymuint i = 0; i < ni; ++ i) {
     mFanins[i] = NULL;
   }
   mFanoutNum = 0;

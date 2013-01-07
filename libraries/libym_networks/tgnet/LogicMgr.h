@@ -10,7 +10,6 @@
 
 
 #include "ym_networks/tgnet.h"
-#include "ym_networks/TgGateTemplate.h"
 #include "ym_logic/LogExpr.h"
 #include "ym_logic/TvFunc.h"
 
@@ -33,6 +32,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化する．
   void
@@ -40,31 +42,68 @@ public:
 
   /// @brief 新しい論理式を登録する．
   /// @param[in] lexp 論理式
-  /// @return ゲートの型を返す．
-  TgGateTemplate
+  /// @return ID番号を返す．
+  ymuint32
   reg_logic(const LogExpr& lexp);
 
   /// @brief 登録されている論理式の数を返す．
   ymuint
   num() const;
 
-  /// @brief 論理式を取り出す．
-  /// @param[in] gt_id ゲートテンプレート
+  /// @brief 論理式を返す．
+  /// @param[in] gate_type ゲートタイプ
+  /// @param[in] ni 入力数
   LogExpr
-  get(TgGateTemplate gt_id) const;
+  get(tTgGateType gate_type,
+      ymuint ni) const;
+
+  /// @brief 論理式を返す．
+  /// @param[in] id ID番号
+  LogExpr
+  get(ymuint32 id) const;
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // reg_logic() の返り値の変換用関数
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief デバッグ用の関数
+  /// @brief ゲートタイプと入力数から ID番号を作る．
+  /// @param[in] type ゲートタイプ
+  /// @param[in] ni 入力数
+  static
+  ymuint32
+  pack(tTgGateType type,
+       ymuint ni);
+
+  /// @brief ゲートタイプを得る．
+  /// @param[in] id ID番号
+  static
+  tTgGateType
+  type(ymuint32 id);
+
+  /// @brief 入力数を得る．
+  /// @param[in] id ID番号
+  static
+  ymuint
+  ni(ymuint32 id);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // デバッグ用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内部データを出力する．
   /// @param[in] s 出力先のストリーム
   void
   dump(ostream& s) const;
 
 
 private:
-
-  class Cell;
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   // ハッシュ表を拡大して再ハッシュする．
   void
@@ -84,7 +123,7 @@ private:
   struct Cell
   {
     // ID番号
-    TgGateTemplate mId;
+    ymuint32 mId;
 
     // 論理式
     LogExpr mLexp;
@@ -123,6 +162,46 @@ private:
   ymuint32 mNextLimit;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 論理式を返す．
+// @param[in] id ID番号
+inline
+LogExpr
+LogicMgr::get(ymuint32 id) const
+{
+  return get(type(id), ni(id));
+}
+
+// @brief データを圧縮する．
+inline
+ymuint32
+LogicMgr::pack(tTgGateType type,
+	       ymuint ni)
+{
+  return (static_cast<ymuint32>(type) << 12) | static_cast<ymuint32>(ni);
+}
+
+// @brief ゲートタイプを得る．
+inline
+tTgGateType
+LogicMgr::type(ymuint32 data)
+{
+  return static_cast<tTgGateType>(data >> 12);
+}
+
+// @brief 入力数を得る．
+inline
+ymuint
+LogicMgr::ni(ymuint32 data)
+{
+  return static_cast<ymuint>(data & 0xFFF);
+}
+
 
 END_NAMESPACE_YM_NETWORKS_TGNET
 

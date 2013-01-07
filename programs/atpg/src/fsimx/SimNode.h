@@ -1,20 +1,18 @@
 #ifndef FSIMX_SIMNODE_H
 #define FSIMX_SIMNODE_H
 
-/// @file fsim/SimNode.h
+/// @file fsimx/SimNode.h
 /// @brief SimNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SimNode.h 2203 2009-04-16 05:04:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "fsimx_nsdef.h"
 #include "EqElem.h"
 #include "PackedVal3.h"
-#include "ym_networks/TgGateTemplate.h"
+#include "ym_networks/tgnet.h"
 #include "ym_logic/LogExpr.h"
 
 

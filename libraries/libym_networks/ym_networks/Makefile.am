@@ -54,7 +54,6 @@ noinst_HEADERS = \
 	MvnVerilogReader.h \
 	MvnVerilogWriter.h \
 	TgBlifReader.h \
-	TgGateTemplate.h \
 	TgIscas89Reader.h \
 	TgNetwork.h \
 	TgNode.h

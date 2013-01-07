@@ -71,7 +71,6 @@ enum tTgGateType {
 };
 
 
-class TgGateTemplate;
 class TgEdge;
 class TgNode;
 class TgNetwork;
@@ -98,7 +97,6 @@ using nsNetworks::nsTgnet::kTgXor;
 using nsNetworks::nsTgnet::kTgXnor;
 using nsNetworks::nsTgnet::kTgUsrDef;
 
-using nsNetworks::nsTgnet::TgGateTemplate;
 using nsNetworks::nsTgnet::TgEdge;
 using nsNetworks::nsTgnet::TgNode;
 using nsNetworks::nsTgnet::TgNetwork;
