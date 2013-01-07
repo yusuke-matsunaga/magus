@@ -51,10 +51,11 @@ LogicMgr::num() const
 }
 
 // @brief 論理式を取り出す．
-// @param[in] gt_id ゲートテンプレート
+// @param[in] gate_type ゲートタイプ
+// @param[in] ni 入力数
 LogExpr
-LogicMgr::get(tTgGateType type,
-	      ymuint ni) const
+LogicMgr::get_expr(tTgGateType type,
+		   ymuint ni) const
 {
   if ( static_cast<ymuint32>(type) < kBase ) {
     vector<LogExpr> literals(ni);
@@ -114,6 +115,76 @@ LogicMgr::get(tTgGateType type,
   }
 }
 
+// @brief 論理関数を返す．
+// @param[in] gate_type ゲートタイプ
+// @param[in] ni 入力数
+const TvFunc&
+LogicMgr::get_func(tTgGateType gate_type,
+		   ymuint ni) const
+{
+  // 組み込み型のためのスタティックオブジェクト
+  static TvFunc builtin_func;
+  if ( static_cast<ymuint32>(gate_type) < kBase ) {
+    builtin_func = TvFunc::posi_literal(ni, VarId(0));
+
+    switch ( gate_type ) {
+    case kTgBuff:
+      break;
+
+    case kTgNot:
+      builtin_func = ~builtin_func;
+      break;
+
+    case kTgAnd:
+      for (ymuint i = 1; i < ni; ++ i) {
+	builtin_func &= TvFunc::posi_literal(ni, VarId(i));
+      }
+      break;
+
+    case kTgNand:
+      for (ymuint i = 1; i < ni; ++ i) {
+	builtin_func &= TvFunc::posi_literal(ni, VarId(i));
+      }
+      builtin_func = ~builtin_func;
+      break;
+
+    case kTgOr:
+      for (ymuint i = 1; i < ni; ++ i) {
+	builtin_func |= TvFunc::posi_literal(ni, VarId(i));
+      }
+      break;
+
+    case kTgNor:
+      for (ymuint i = 1; i < ni; ++ i) {
+	builtin_func |= TvFunc::posi_literal(ni, VarId(i));
+      }
+      builtin_func = ~builtin_func;
+      break;
+
+    case kTgXor:
+      for (ymuint i = 1; i < ni; ++ i) {
+	builtin_func ^= TvFunc::posi_literal(ni, VarId(i));
+      }
+      break;
+
+    case kTgXnor:
+      for (ymuint i = 1; i < ni; ++ i) {
+	builtin_func ^= TvFunc::posi_literal(ni, VarId(i));
+      }
+      builtin_func = ~builtin_func;
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
+    return builtin_func;
+  }
+  else {
+    return mCellArray[gate_type - kBase]->mTvFunc;
+  }
+}
+
 
 BEGIN_NONAMESPACE
 
@@ -132,7 +203,6 @@ check_builtin(const LogExpr& lexp,
     return kTgNot;
   }
   ymuint np = 1 << ni;
-  //const ymuint NBPW = sizeof(ymulong) * 8;
 
   bool and_flag = true;
   bool nand_flag = true;

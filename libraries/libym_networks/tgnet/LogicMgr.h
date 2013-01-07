@@ -19,6 +19,12 @@ BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 //////////////////////////////////////////////////////////////////////
 /// @class LogicMgr LogicMgr.h "LogicMgr.h"
 /// @brief logic ノードのタイプ番号を管理するクラス
+///
+/// 論理式を登録するが，内部で論理関数に変換している．
+/// 同一の論理関数を表す論理式が登録された場合には
+/// リテラル数の少ない論理式を記録する．
+/// BUF/NOTAND/NAND/OR/NOR/XOR/XNOR の関数はハッシュを調べる前に
+/// 決められたID番号を返す．
 //////////////////////////////////////////////////////////////////////
 class LogicMgr
 {
@@ -53,14 +59,30 @@ public:
   /// @brief 論理式を返す．
   /// @param[in] gate_type ゲートタイプ
   /// @param[in] ni 入力数
+  /// @note 組み込み型の場合の効率はあまりよくない．
   LogExpr
-  get(tTgGateType gate_type,
-      ymuint ni) const;
+  get_expr(tTgGateType gate_type,
+	   ymuint ni) const;
 
   /// @brief 論理式を返す．
   /// @param[in] id ID番号
+  /// @note 組み込み型の場合の効率はあまりよくない．
   LogExpr
-  get(ymuint32 id) const;
+  get_expr(ymuint32 id) const;
+
+  /// @brief 論理関数を返す．
+  /// @param[in] gate_type ゲートタイプ
+  /// @param[in] ni 入力数
+  /// @note 組み込み型の場合の効率はあまりよくない．
+  const TvFunc&
+  get_func(tTgGateType gate_type,
+	   ymuint ni) const;
+
+  /// @brief 論理関数を返す．
+  /// @param[in] id ID番号
+  /// @note 組み込み型の場合の効率はあまりよくない．
+  const TvFunc&
+  get_func(ymuint32 id) const;
 
 
 public:
@@ -172,9 +194,18 @@ private:
 // @param[in] id ID番号
 inline
 LogExpr
-LogicMgr::get(ymuint32 id) const
+LogicMgr::get_expr(ymuint32 id) const
 {
-  return get(type(id), ni(id));
+  return get_expr(type(id), ni(id));
+}
+
+// @brief 論理関数を返す．
+// @param[in] id ID番号
+inline
+const TvFunc&
+LogicMgr::get_func(ymuint32 id) const
+{
+  return get_func(type(id), ni(id));
 }
 
 // @brief データを圧縮する．

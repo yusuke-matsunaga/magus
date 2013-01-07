@@ -118,10 +118,15 @@ public:
   ymuint
   ff_num() const;
 
-  /// @brief node の論理式を取り出す．
+  /// @brief ノードの論理式を取り出す．
   /// @note node 対象のノード
   LogExpr
   get_lexp(const TgNode* node) const;
+
+  /// @brief ノードの論理式を取り出す．
+  /// @note node 対象のノード
+  const TvFunc&
+  get_func(const TgNode* node) const;
 
 
 public:

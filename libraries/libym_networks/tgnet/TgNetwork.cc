@@ -71,7 +71,15 @@ TgNetwork::clear()
 LogExpr
 TgNetwork::get_lexp(const TgNode* node) const
 {
-  return mLogicMgr->get(node->mTypeId);
+  return mLogicMgr->get_expr(node->mTypeId);
+}
+
+// @brief ノードの論理式を取り出す．
+// @note node 対象のノード
+const TvFunc&
+TgNetwork::get_func(const TgNode* node) const
+{
+  return mLogicMgr->get_func(node->mTypeId);
 }
 
 // @brief 新しいノードを生成する．
