@@ -17,11 +17,11 @@ test1(const LogExpr& expr,
       LogicMgr& lm)
 {
   cout << "Registering: " << expr << endl;
-  ymuint32 id = lm.reg_logic(expr);
-  tTgGateType type = LogicMgr::type(id);
-  ymuint ni = LogicMgr::ni(id);
+  ymuint32 id;
+  tTgNodeType type = lm.reg_logic(expr, id);
+  ymuint ni = expr.input_size();
 
-  cout << "  ID = ";
+  cout << "  TYPE = ";
   switch ( type ) {
   case kTgUndef:  cout << "--UNDEF--"; break;
 
@@ -46,13 +46,10 @@ test1(const LogExpr& expr,
 
   case kTgXnor:   cout << "--XNOR(" << ni << ")--"; break;
 
+  case kTgCplx:   cout << "--CPLX#" << id << " (" << ni << ")--"; break;
+
   default:
-    if ( static_cast<ymuint32>(type) >= static_cast<ymuint32>(kTgUsrDef) ) {
-      cout << "--CPLX(" << ni << ")--"; break;
-    }
-    else {
-      cout << "--ERROR--"; break;
-    }
+    cout << "--ERROR--"; break;
   }
   cout << endl;
 }
@@ -95,8 +92,6 @@ main(int argc,
 
     LogExpr tmp3 = v0 & v1 | v2 & v3 | v4 & v5 | v6 & v7;
     test1(tmp3, lm);
-
-    lm.dump(cout);
   }
   catch ( AssertError x) {
     cout << x << endl;

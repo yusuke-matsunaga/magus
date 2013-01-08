@@ -40,7 +40,7 @@ BEGIN_NONAMESPACE
 /// @param[in] inputs 入力リテラル
 void
 make_cnf_from_type(SatSolver& solver,
-		   tTgGateType type,
+		   tTgNodeType type,
 		   Literal output,
 		   const vector<Literal>& inputs)
 {

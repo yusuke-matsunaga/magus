@@ -44,7 +44,7 @@ SimNode::~SimNode()
 // @brief ノードを生成するクラスメソッド
 SimNode*
 SimNode::new_node(ymuint32 id,
-		  tTgGateType type,
+		  tTgNodeType type,
 		  const LogExpr& lexp,
 		  const vector<SimNode*>& inputs)
 {
@@ -116,9 +116,12 @@ SimNode::new_node(ymuint32 id,
     }
     break;
 
-  default:
+  case kTgCplx:
     node = new SnCplx(id, lexp, inputs);
     break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
   }
   return node;
 }

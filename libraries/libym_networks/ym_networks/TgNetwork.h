@@ -162,19 +162,28 @@ public:
 
   /// @brief ノードを論理ノードに設定する．
   /// @param[in] node 対象のノード
-  /// @param[in] gate_type ゲートタイプ
-  /// @param[in] ni 入力数
-  void
-  set_to_logic(TgNode* node,
-	       tTgGateType gate_type,
-	       ymuint ni);
-
-  /// @brief ノードを論理ノードに設定する．
-  /// @param[in] node 対象のノード
   /// @param[in] expr 論理式
   void
   set_to_logic(TgNode* node,
 	       const LogExpr& expr);
+
+  /// @brief ノードを論理ノードに設定する．
+  /// @param[in] node 対象のノード
+  /// @param[in] gate_type ゲートタイプ
+  /// @param[in] ni 入力数
+  void
+  set_to_builtin_logic(TgNode* node,
+		       tTgGateType gate_type,
+		       ymuint ni);
+
+  /// @brief ノードを論理ノードに設定する．
+  /// @param[in] node 対象のノード
+  /// @param[in] ni 入力数
+  /// @param[in] aux_id 補助ID
+  void
+  set_to_cplx_logic(TgNode* node,
+		    ymuint ni,
+		    ymuint aux_id);
 
   /// @brief ノードを FF ノードに設定する．
   /// @param[in] ffin FF-in に設定するノード
@@ -195,6 +204,20 @@ public:
   /// @brief ネットワークの設定後の処理を行う．
   void
   wrap_up();
+
+
+private:
+
+  /// @brief ノードを論理ノードに設定する．
+  /// @param[in] node 対象のノード
+  /// @param[in] node_type 論理タイプ
+  /// @param[in] ni 入力数
+  /// @param[in] aux_id 論理タイプが kTgCplx の場合の補助ID
+  void
+  set_to_logic(TgNode* node,
+	       tTgNodeType node_type,
+	       ymuint ni,
+	       ymuint aux_id);
 
 
 private:

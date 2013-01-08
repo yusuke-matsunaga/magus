@@ -212,7 +212,7 @@ Gate*
 Network::new_Gate(const TgNode* node,
 		  ymuint input_id)
 {
-  tTgGateType type = node->type();
+  tTgNodeType type = node->type();
   ymuint ni = node->ni();
   Gate* gate = NULL;
   ymuint id = mGateList.size();
@@ -310,7 +310,7 @@ Network::set_eq_gate()
     if ( ni == 0 ) {
       continue;
     }
-    tTgGateType gtype = gate->gate_type();
+    tTgNodeType gtype = gate->gate_type();
     Gate* igate0 = gate->fanin(0);
     Gate* igate = igate0;
     if (igate->eq_gate() == igate && igate->nfo() == 1) {

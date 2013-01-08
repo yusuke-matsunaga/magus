@@ -109,12 +109,12 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
 
   case kGt89BUFF:
     assert_cond(ni == 1, __FILE__, __LINE__);
-    mNetwork->set_to_logic(node, kTgBuff, 1);
+    mNetwork->set_to_builtin_logic(node, kTgGateBuff, 1);
     break;
 
   case kGt89NOT:
     assert_cond(ni == 1, __FILE__, __LINE__);
-    mNetwork->set_to_logic(node, kTgNot, 1);
+    mNetwork->set_to_builtin_logic(node, kTgGateNot, 1);
     break;
 
   case kGt89AND:
@@ -124,7 +124,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
       assert_not_reached(__FILE__, __LINE__);
       break;
     default:
-      mNetwork->set_to_logic(node, kTgAnd, ni);
+      mNetwork->set_to_builtin_logic(node, kTgGateAnd, ni);
       break;
     }
     break;
@@ -136,7 +136,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
       assert_not_reached(__FILE__, __LINE__);
       break;
     default:
-      mNetwork->set_to_logic(node, kTgNand, ni);
+      mNetwork->set_to_builtin_logic(node, kTgGateNand, ni);
       break;
     }
     break;
@@ -148,7 +148,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
       assert_not_reached(__FILE__, __LINE__);
       break;
     default:
-      mNetwork->set_to_logic(node, kTgOr, ni);
+      mNetwork->set_to_builtin_logic(node, kTgGateOr, ni);
       break;
     }
     break;
@@ -160,7 +160,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
       assert_not_reached(__FILE__, __LINE__);
       break;
     default:
-      mNetwork->set_to_logic(node, kTgNor, ni);
+      mNetwork->set_to_builtin_logic(node, kTgGateNor, ni);
       break;
     }
     break;
@@ -172,7 +172,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
       assert_not_reached(__FILE__, __LINE__);
       break;
     default:
-      mNetwork->set_to_logic(node, kTgXor, ni);
+      mNetwork->set_to_builtin_logic(node, kTgGateXor, ni);
       break;
     }
     break;
@@ -184,7 +184,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
       assert_not_reached(__FILE__, __LINE__);
       break;
     default:
-      mNetwork->set_to_logic(node, kTgXnor, ni);
+      mNetwork->set_to_builtin_logic(node, kTgGateXnor, ni);
       break;
     }
     break;

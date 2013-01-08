@@ -16,10 +16,10 @@
  *
  * Revision 2.1  91/12/23  23:12:10  yusuke
  * a slightly speed-up
- * 
+ *
  * Revision 2.0  91/12/21  18:55:56  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.5  1991/10/05  08:18:18  yusuke
  * add Log and RCSid for RCS
  *
@@ -33,9 +33,9 @@ class sa_node :
   public gate_t
 {
 public:
-  
+
   sa_node();
-  
+
   virtual
   bool
   is_f_site() const;
@@ -70,20 +70,20 @@ public:
   void
   bwd_imp_f(val3 val,
 	    gate_t* from);
-  
+
 };
 
 class sa0_node :
   public sa_node
 {
 public:
-  
+
   virtual
   const char*
   get_name() const;
-  
+
   virtual
-  tTgGateType
+  tTgNodeType
   get_gtype() const;
 
   virtual
@@ -100,15 +100,15 @@ public:
   virtual
   const char*
   get_name() const;
-  
+
   virtual
-  tTgGateType
+  tTgNodeType
   get_gtype() const;
 
   virtual
   bool
   is_sa1() const;
-  
+
 };
 
 END_NAMESPACE_YM_MATPG

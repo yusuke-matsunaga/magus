@@ -10,7 +10,7 @@
  *
  * Revision 2.0  91/12/21  18:51:04  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.5  1991/10/05  08:18:18  yusuke
  * add Log and RCSid for RCS
  *
@@ -25,7 +25,7 @@ BEGIN_NAMESPACE_YM_MATPG
 
 
 gate_t*
-new_gate_t(tTgGateType id,
+new_gate_t(tTgNodeType id,
 	   const TgNode* node,
 	   int ni)
 {
@@ -41,7 +41,7 @@ new_gate_t(tTgGateType id,
     case 4:		return new AND_4_gate_t(node);
     }
     return new AND_gate_t(node, ni);
-    
+
   case kTgNand:
     switch (ni) {
     case 2:		return new NAND_2_gate_t(node);
@@ -49,7 +49,7 @@ new_gate_t(tTgGateType id,
     case 4:		return new NAND_4_gate_t(node);
     }
     return new NAND_gate_t(node, ni);
-    
+
   case kTgOr:
     switch (ni) {
     case 2:		return new OR_2_gate_t(node);
@@ -57,7 +57,7 @@ new_gate_t(tTgGateType id,
     case 4:		return new OR_4_gate_t(node);
     }
     return new OR_gate_t(node, ni);
-    
+
   case kTgNor:
     switch (ni) {
     case 2:		return new NOR_2_gate_t(node);
@@ -65,22 +65,22 @@ new_gate_t(tTgGateType id,
     case 4:		return new NOR_4_gate_t(node);
     }
     return new NOR_gate_t(node, ni);
-    
+
   case kTgXor:
     if (ni == 2) return new XOR_2_gate_t(node);
     return new XOR_gate_t(node, ni);
-    
+
   case kTgXnor:
     if (ni == 2) return new XNOR_2_gate_t(node);
     return new XNOR_gate_t(node, ni);
-    
+
   default:
     break;
   }
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-  
+
 gate_t::gate_t(const TgNode* node0,
 	       int ni0)
 {
@@ -186,7 +186,7 @@ gate_t::get_pi_id() const
 {
   return -1;
 }
-  
+
 bool
 gate_t::is_f_site() const
 {
@@ -211,7 +211,7 @@ gate_t::get_name() const
   return node->name();
 }
 
-tTgGateType
+tTgNodeType
 gate_t::get_gtype() const
 {
   return node->type();
@@ -244,7 +244,7 @@ PI_gate_t::dump(FILE* fp) const
 }
 
 /* C0_gate_t */
-tTgGateType
+tTgNodeType
 C0_gate_t::get_gtype() const
 {
   return kTgConst0;
@@ -258,7 +258,7 @@ C0_gate_t::dump(FILE* fp) const
 }
 
 /* C1_gate_t */
-tTgGateType
+tTgNodeType
 C1_gate_t::get_gtype() const
 {
   return kTgConst1;
@@ -272,7 +272,7 @@ C1_gate_t::dump(FILE* fp) const
 }
 
 /* BUF_gate_t */
-tTgGateType
+tTgNodeType
 BUF_gate_t::get_gtype() const
 {
   return kTgBuff;
@@ -288,7 +288,7 @@ BUF_gate_t::dump(FILE* fp) const
 }
 
 /* NOT_gate_t */
-tTgGateType
+tTgNodeType
 NOT_gate_t::get_gtype() const
 {
   return kTgNot;
@@ -328,7 +328,7 @@ SIMPLE_gate_t::get_no_val() const
 }
 
 /* AND_gate_t */
-tTgGateType
+tTgNodeType
 AND_gate_t::get_gtype() const
 {
   return kTgAnd;
@@ -352,7 +352,7 @@ AND_gate_t::dump(FILE* fp) const
 }
 
 /* NAND_gate_t */
-tTgGateType
+tTgNodeType
 NAND_gate_t::get_gtype() const
 {
   return kTgNand;
@@ -376,7 +376,7 @@ NAND_gate_t::dump(FILE* fp) const
 }
 
 /* OR_gate_t */
-tTgGateType
+tTgNodeType
 OR_gate_t::get_gtype() const
 {
   return kTgOr;
@@ -400,7 +400,7 @@ OR_gate_t::dump(FILE* fp) const
 }
 
 /* NOR_gate_t */
-tTgGateType
+tTgNodeType
 NOR_gate_t::get_gtype() const
 {
   return kTgNor;
@@ -424,7 +424,7 @@ NOR_gate_t::dump(FILE* fp) const
 }
 
 /* XOR_gate_t */
-tTgGateType
+tTgNodeType
 XOR_gate_t::get_gtype() const
 {
   return kTgXor;
@@ -448,7 +448,7 @@ XOR_gate_t::dump(FILE* fp) const
 }
 
 /* XNOR_gate_t */
-tTgGateType
+tTgNodeType
 XNOR_gate_t::get_gtype() const
 {
   return kTgXnor;

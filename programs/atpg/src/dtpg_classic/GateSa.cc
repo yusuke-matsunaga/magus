@@ -28,7 +28,7 @@ GateSa::GateSa() :
 GateSa::~GateSa()
 {
 }
-  
+
 bool
 GateSa::is_f_site() const
 {
@@ -118,7 +118,7 @@ GateSa0::name() const
   return "GateSa0";
 }
 
-tTgGateType
+tTgNodeType
 GateSa0::gate_type() const
 {
   return kTgConst0;
@@ -154,7 +154,7 @@ GateSa1::name() const
   return "GateSa1";
 }
 
-tTgGateType
+tTgNodeType
 GateSa1::gate_type() const
 {
   return kTgConst1;

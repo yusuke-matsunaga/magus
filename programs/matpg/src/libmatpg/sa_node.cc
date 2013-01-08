@@ -17,13 +17,13 @@
  *
  * Revision 2.2  91/12/26  19:56:59  yusuke
  * Final revision of version 2
- * 
+ *
  * Revision 2.1  91/12/23  23:11:02  yusuke
  * a slightly speed-up
- * 
+ *
  * Revision 2.0  91/12/21  18:50:09  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.7  1991/10/05  08:18:18  yusuke
  * add Log and RCSid for RCS
  *
@@ -34,13 +34,13 @@
 
 
 BEGIN_NAMESPACE_YM_MATPG
-  
+
 sa_node::sa_node() :
   gate_t(NULL, 1)
 {
   init_fogate(NULL, 0);
 }
-  
+
 bool
 sa_node::is_f_site() const
 {
@@ -112,7 +112,7 @@ sa0_node::get_name() const
   return "sa0_node";
 }
 
-tTgGateType
+tTgNodeType
 sa0_node::get_gtype() const
 {
   return kTgConst0;
@@ -130,7 +130,7 @@ sa1_node::get_name() const
   return "sa1_node";
 }
 
-tTgGateType
+tTgNodeType
 sa1_node::get_gtype() const
 {
   return kTgConst1;

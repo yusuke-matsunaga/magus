@@ -31,7 +31,7 @@ GateBuf::~GateBuf()
 {
 }
 
-tTgGateType
+tTgNodeType
 GateBuf::gate_type() const
 {
   return kTgBuff;
@@ -139,7 +139,7 @@ GateNot::~GateNot()
 {
 }
 
-tTgGateType
+tTgNodeType
 GateNot::gate_type() const
 {
   return kTgNot;

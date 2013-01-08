@@ -38,7 +38,7 @@ Gate::Gate(ymuint id,
 {
   mFlags = 0U;
   mMarkCount = 0U;
-  
+
   if ( ni ) {
     mFanins = new Gate*[ni];
     mSortedPos = new ymuint32[ni];
@@ -46,10 +46,10 @@ Gate::Gate(ymuint id,
       mSortedPos[i] = i;
     }
   }
-  
+
   mLevel = 0;
   mState = 0;
-  
+
   mEqGate = this;
 }
 
@@ -80,7 +80,7 @@ Gate::name() const
 }
 
 // @brief ゲート型を得る．
-tTgGateType
+tTgNodeType
 Gate::gate_type() const
 {
   return mTgNode->type();
@@ -169,7 +169,7 @@ Gate::imp0_h()
 #endif
     return false;
   }
-  
+
 #ifdef DEBUG
   cerr << name() << "::imp0_h() end" << endl;
 #endif
@@ -208,7 +208,7 @@ Gate::imp1_h()
 #endif
     return false;
   }
-  
+
 #ifdef DEBUG
   cerr << name() << "::imp1_h() end" << endl;
 #endif
@@ -253,7 +253,7 @@ Gate::imp0_hb()
 #endif
     return false;
   }
-  
+
 #ifdef DEBUG
   cerr << name() << "::imp0_hb() end" << endl;
 #endif
@@ -298,7 +298,7 @@ Gate::imp1_hb()
 #endif
     return false;
   }
-  
+
 #ifdef DEBUG
   cerr << name() << "::imp1_hb() end" << endl;
 #endif
@@ -335,7 +335,7 @@ Gate::imp0_g()
 #endif
     return false;
   }
-  
+
 #ifdef DEBUG
   cerr << name() << "::imp0_g() end" << endl;
 #endif
@@ -372,7 +372,7 @@ Gate::imp1_g()
 #endif
     return false;
   }
-  
+
 #ifdef DEBUG
   cerr << name() << "::imp1_g() end" << endl;
 #endif
@@ -469,7 +469,7 @@ Gate::imp0_f()
 #ifdef DEBUG
   cerr << name() << "::imp0_f()" << endl;
 #endif
-    
+
   Val3 old_val = fval();
   if ( old_val == kValX ) {
     sm.save_value(this);
@@ -493,7 +493,7 @@ Gate::imp0_f()
 #endif
     return false;
   }
-  
+
 #ifdef DEBUG
   cerr << name() << "::imp0_f() end" << endl;
 #endif
@@ -506,7 +506,7 @@ Gate::imp1_f()
 #ifdef DEBUG
   cerr << name() << "::imp1_f()" << endl;
 #endif
-    
+
   Val3 old_val = fval();
   if ( old_val == kValX ) {
     sm.save_value(this);
@@ -530,7 +530,7 @@ Gate::imp1_f()
 #endif
     return false;
   }
-  
+
 #ifdef DEBUG
   cerr << name() << "::imp1_f() end" << endl;
 #endif
@@ -544,7 +544,7 @@ Gate::imp0_fb()
 #ifdef DEBUG
     cerr << name() << "::imp0_fb()" << endl;
 #endif
-    
+
     Val3 old_val = fval();
     if ( old_val == kValX ) {
       sm.save_value(this);
@@ -586,7 +586,7 @@ Gate::imp1_fb()
 #ifdef DEBUG
     cerr << name() << "::imp1_fb()" << endl;
 #endif
-    
+
     Val3 old_val = fval();
     if ( old_val == kValX ) {
       sm.save_value(this);

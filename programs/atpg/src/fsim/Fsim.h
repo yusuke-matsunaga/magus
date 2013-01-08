@@ -155,7 +155,7 @@ private:
 
   /// @brief logic ノードを作る．
   SimNode*
-  make_node(tTgGateType type,
+  make_node(tTgNodeType type,
 	    const vector<SimNode*>& inputs);
 
 

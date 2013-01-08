@@ -91,8 +91,8 @@ public:
   // 内部情報を得る関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief タイプ id を得る．
-  tTgGateType
+  /// @brief ノードのタイプを得る．
+  tTgNodeType
   type() const;
 
   /// @brief 未定義タイプの時 true を返す．
@@ -116,6 +116,10 @@ public:
   /// @brief 組み込み型でない logic タイプの時 true を返す．
   bool
   is_cplx_logic() const;
+
+  /// @brief cplx_logic タイプの時の関数IDを返す．
+  ymuint
+  cplx_logic_id() const;
 
   /// @brief ffin タイプの時 true を返す．
   bool
@@ -176,10 +180,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief タイプをセットする．
+  /// @param[in] lid 論理ノードの通し番号
+  /// @param[in] type 論理関数のタイプ
+  /// @param[in] ni 入力数
+  /// @param[in] aux_id kTgCplx 型の時の補助ID
+  /// @param[in] p ファンインの配列用のメモリ領域
   void
   set_type(ymuint32 lid,
-	   tTgGateType type,
+	   tTgNodeType type,
 	   ymuint ni,
+	   ymuint aux_id,
 	   void* p);
 
 
@@ -188,7 +198,7 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // タイプ id + 入力数
+  // タイプ + 関数ID
   ymuint32 mTypeId;
 
   // 全体での通し番号
@@ -199,6 +209,9 @@ private:
 
   // 名前
   const char* mName;
+
+  // 入力数
+  ymuint32 mNi;
 
   // ファンインのノードの配列
   TgNode** mFanins;
@@ -254,6 +267,14 @@ TgEdge::to_ipos() const
 // TgNode のインライン関数
 //////////////////////////////////////////////////////////////////////
 
+// @brief タイプ id を得る．
+inline
+tTgNodeType
+TgNode::type() const
+{
+  return static_cast<tTgNodeType>(mTypeId & 63U);
+}
+
 // @brief 未定義タイプの時 true を返す．
 inline
 bool
@@ -283,7 +304,7 @@ inline
 bool
 TgNode::is_logic() const
 {
-  return static_cast<ymuint>(type()) >= static_cast<ymuint>(kTgBuff);
+  return (static_cast<ymuint>(type()) & kTgLogic) == kTgLogic;
 }
 
 // @brief 組み込み型でない logic タイプの時 true を返す．
@@ -291,7 +312,7 @@ inline
 bool
 TgNode::is_cplx_logic() const
 {
-  return static_cast<ymuint>(type()) >= static_cast<ymuint>(kTgUsrDef);
+  return type() == kTgCplx;
 }
 
 // @brief ffin タイプの時 true を返す．
@@ -332,6 +353,14 @@ const char*
 TgNode::name() const
 {
   return mName;
+}
+
+// @brief 入力数を得る．
+inline
+ymuint
+TgNode::ni() const
+{
+  return mNi;
 }
 
 // @brief pos 番めの入力のノードを得る．

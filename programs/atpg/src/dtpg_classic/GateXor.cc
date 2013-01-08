@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM_ATPG_DTPGCL
 //////////////////////////////////////////////////////////////////////
 // クラス GateXor
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] id ゲートID
 // @param[in] node 元のノード
@@ -34,7 +34,7 @@ GateXor::~GateXor()
 {
 }
 
-tTgGateType
+tTgNodeType
 GateXor::gate_type() const
 {
   return kTgXor;
@@ -487,7 +487,7 @@ GateXor::bwd_imp1_f()
 //////////////////////////////////////////////////////////////////////
 // クラス XGateNor
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] id ゲートID
 // @param[in] node 元のノード
@@ -504,7 +504,7 @@ XGateNor::~XGateNor()
 {
 }
 
-tTgGateType
+tTgNodeType
 XGateNor::gate_type() const
 {
   return kTgXnor;

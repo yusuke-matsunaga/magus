@@ -314,7 +314,7 @@ Fsim3::after_set_network(const TgNetwork& network,
       simnode = make_logic(lexp, inputs2, emap);
     }
     else {
-      tTgGateType type = tgnode->type();
+      tTgNodeType type = tgnode->type();
       simnode = make_node(type, inputs);
       for (ymuint i = 0; i < ni; ++ i) {
 	EdgeMap& edge_map = mEdgeMap[tgnode->gid()][i];
@@ -649,7 +649,7 @@ Fsim3::make_logic(const LogExpr& lexp,
 
 // @brief 単純な logic ノードを作る．
 SimNode*
-Fsim3::make_node(tTgGateType type,
+Fsim3::make_node(tTgNodeType type,
 		 const vector<SimNode*>& inputs)
 {
   ymuint32 id = mNodeArray.size();

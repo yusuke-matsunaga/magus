@@ -43,83 +43,31 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化する．
+  /// @note 登録されている関数がない状態になる．
   void
   clear();
 
   /// @brief 新しい論理式を登録する．
   /// @param[in] lexp 論理式
-  /// @return ID番号を返す．
-  ymuint32
-  reg_logic(const LogExpr& lexp);
+  /// @param[out] id kTgGateCplx の場合はID番号を格納する．
+  /// @return 論理関数の型を返す．
+  tTgGateType
+  reg_logic(const LogExpr& lexp,
+	    ymuint32& id);
 
   /// @brief 登録されている論理式の数を返す．
-  ymuint
-  num() const;
+  ymuint32
+  logic_num() const;
 
   /// @brief 論理式を返す．
-  /// @param[in] gate_type ゲートタイプ
-  /// @param[in] ni 入力数
-  /// @note 組み込み型の場合の効率はあまりよくない．
-  LogExpr
-  get_expr(tTgGateType gate_type,
-	   ymuint ni) const;
-
-  /// @brief 論理式を返す．
-  /// @param[in] id ID番号
-  /// @note 組み込み型の場合の効率はあまりよくない．
+  /// @param[in] id ID番号 ( 0 <= id < logic_num() )
   LogExpr
   get_expr(ymuint32 id) const;
 
   /// @brief 論理関数を返す．
-  /// @param[in] gate_type ゲートタイプ
-  /// @param[in] ni 入力数
-  /// @note 組み込み型の場合の効率はあまりよくない．
-  const TvFunc&
-  get_func(tTgGateType gate_type,
-	   ymuint ni) const;
-
-  /// @brief 論理関数を返す．
-  /// @param[in] id ID番号
-  /// @note 組み込み型の場合の効率はあまりよくない．
+  /// @param[in] id ID番号 ( 0 <= id < logic_num() )
   const TvFunc&
   get_func(ymuint32 id) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // reg_logic() の返り値の変換用関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ゲートタイプと入力数から ID番号を作る．
-  /// @param[in] type ゲートタイプ
-  /// @param[in] ni 入力数
-  static
-  ymuint32
-  pack(tTgGateType type,
-       ymuint ni);
-
-  /// @brief ゲートタイプを得る．
-  /// @param[in] id ID番号
-  static
-  tTgGateType
-  type(ymuint32 id);
-
-  /// @brief 入力数を得る．
-  /// @param[in] id ID番号
-  static
-  ymuint
-  ni(ymuint32 id);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // デバッグ用の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 内部データを出力する．
-  /// @param[in] s 出力先のストリーム
-  void
-  dump(ostream& s) const;
 
 
 private:
@@ -167,10 +115,6 @@ private:
   static
   const double kHashCapacity = 1.8;
 
-  // 一般の論理関数のオフセット値
-  static
-  const ymuint32 kBase = static_cast<ymuint32>(kTgUsrDef);
-
   // Cell の配列
   vector<Cell*> mCellArray;
 
@@ -190,49 +134,33 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief 登録されている論理式の数を返す．
+inline
+ymuint
+LogicMgr::logic_num() const
+{
+  return mCellArray.size();
+}
+
 // @brief 論理式を返す．
-// @param[in] id ID番号
+// @param[in] id ID番号 ( 0 <= id < logic_num() )
 inline
 LogExpr
 LogicMgr::get_expr(ymuint32 id) const
 {
-  return get_expr(type(id), ni(id));
+  assert_cond( id < logic_num(), __FILE__, __LINE__);
+  return mCellArray[id]->mLexp;
 }
 
 // @brief 論理関数を返す．
-// @param[in] id ID番号
+// @param[in] id ID番号 ( 0 <= id < logic_num() )
 inline
 const TvFunc&
 LogicMgr::get_func(ymuint32 id) const
 {
-  return get_func(type(id), ni(id));
+  assert_cond( id < logic_num(), __FILE__, __LINE__);
+  return mCellArray[id]->mTvFunc;
 }
-
-// @brief データを圧縮する．
-inline
-ymuint32
-LogicMgr::pack(tTgGateType type,
-	       ymuint ni)
-{
-  return (static_cast<ymuint32>(type) << 12) | static_cast<ymuint32>(ni);
-}
-
-// @brief ゲートタイプを得る．
-inline
-tTgGateType
-LogicMgr::type(ymuint32 data)
-{
-  return static_cast<tTgGateType>(data >> 12);
-}
-
-// @brief 入力数を得る．
-inline
-ymuint
-LogicMgr::ni(ymuint32 data)
-{
-  return static_cast<ymuint>(data & 0xFFF);
-}
-
 
 END_NAMESPACE_YM_NETWORKS_TGNET
 

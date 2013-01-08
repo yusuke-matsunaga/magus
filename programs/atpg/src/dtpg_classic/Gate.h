@@ -110,7 +110,7 @@ public:
 
   /// @brief ゲート型を得る．
   virtual
-  tTgGateType
+  tTgNodeType
   gate_type() const;
 
   /// @brief 名前とゲート型を表す文字列を返す．

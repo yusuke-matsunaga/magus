@@ -141,10 +141,12 @@ private:
   void
   activate_sub(const vector<bool>& mark);
 
+#if 0
   /// @brief ゲート型からカバーを作る．
   /// @param[in] gate_type ゲート型
   DtpgCover*
   gate_to_cover(tTgGateType gate_type);
+#endif
 
 
 private:

@@ -117,7 +117,7 @@ void
 TgNetwork::set_to_input(TgNode* node)
 {
   ymuint32 lid = mInputArray.size();
-  node->set_type(lid, kTgInput, 0, NULL);
+  node->set_type(lid, kTgInput, 0, 0, NULL);
   mInputArray.push_back(node);
 }
 
@@ -128,23 +128,8 @@ TgNetwork::set_to_output(TgNode* node)
 {
   ymuint32 lid = mOutputArray.size();
   void* p = mFaninAlloc.get_memory(sizeof(TgNode*));
-  node->set_type(lid, kTgOutput, 1, p);
+  node->set_type(lid, kTgOutput, 1, 0, p);
   mOutputArray.push_back(node);
-}
-
-// @brief ノードを論理ノードに設定する．
-// @param[in] node 対象のノード
-// @param[in] gate_type ゲートタイプ
-// @param[in] ni 入力数
-void
-TgNetwork::set_to_logic(TgNode* node,
-			tTgGateType gate_type,
-			ymuint ni)
-{
-  ymuint32 lid = mLogicArray.size();
-  void* p = mFaninAlloc.get_memory(sizeof(TgNode*) * ni);
-  node->set_type(lid, gate_type, ni, p);
-  mLogicArray.push_back(node);
 }
 
 // @brief ノードを論理ノードに設定する．
@@ -154,10 +139,51 @@ void
 TgNetwork::set_to_logic(TgNode* node,
 			const LogExpr& expr)
 {
-  ymuint32 data = mLogicMgr->reg_logic(expr);
-  tTgGateType type = LogicMgr::type(data);
-  ymuint ni = LogicMgr::ni(data);
-  set_to_logic(node, type, ni);
+  ymuint ni = expr.input_size();
+  ymuint32 id;
+  tTgNodeType type = mLogicMgr->reg_logic(expr, id);
+  set_to_logic(node, type, ni, id);
+}
+
+// @brief ノードを論理ノードに設定する．
+// @param[in] node 対象のノード
+// @param[in] gate_type ゲートタイプ
+/// @param[in] ni 入力数
+void
+TgNetwork::set_to_builtin_logic(TgNode* node,
+				tTgGateType gate_type,
+				ymuint ni)
+{
+  tTgNodeType node_type = static_cast<tTgNodeType>(kTgLogic | static_cast<ymuint>(gate_type));
+  set_to_logic(node, node_type, ni, 0);
+}
+
+// @brief ノードを論理ノードに設定する．
+// @param[in] node 対象のノード
+// @param[in] ni 入力数
+// @param[in] aux_id 補助ID
+void
+TgNetwork::set_to_cplx_logic(TgNode* node,
+			     ymuint ni,
+			     ymuint aux_id)
+{
+  set_to_logic(node, kTgCplx, ni, aux_id);
+}
+
+// @brief ノードを論理ノードに設定する．
+// @param[in] node 対象のノード
+// @param[in] node_type 論理タイプ
+// @param[in] ni 入力数
+void
+TgNetwork::set_to_logic(TgNode* node,
+			tTgNodeType node_type,
+			ymuint ni,
+			ymuint aux_id)
+{
+  ymuint32 lid = mLogicArray.size();
+  void* p = mFaninAlloc.get_memory(sizeof(TgNode*) * ni);
+  node->set_type(lid, node_type, ni, aux_id, p);
+  mLogicArray.push_back(node);
 }
 
 // @brief ノードを FF ノードに設定する．
@@ -169,10 +195,10 @@ TgNetwork::set_to_ff(TgNode* ffin,
 {
   ymuint32 lid = mFFOutArray.size();
   void* p = mFaninAlloc.get_memory(sizeof(TgNode*));
-  ffin->set_type(lid, kTgOutput, 1, p);
+  ffin->set_type(lid, kTgOutput, 1, 0, p);
   ffin->mAltNode = ffout;
   mFFInArray.push_back(ffin);
-  ffout->set_type(lid, kTgInput, 0, NULL);
+  ffout->set_type(lid, kTgInput, 0, 0, NULL);
   ffout->mAltNode = ffin;
   mFFOutArray.push_back(ffout);
 }
@@ -386,7 +412,7 @@ dump(ostream& s,
 
 // コンストラクタ
 TgNode::TgNode(ymuint32 gid) :
-  mTypeId(LogicMgr::pack(kTgUndef, 0)),
+  mTypeId(kTgUndef),
   mGid(gid),
   mName(NULL),
   mFanins(NULL),
@@ -401,29 +427,22 @@ TgNode::~TgNode()
 {
 }
 
-// @brief タイプ id を得る．
-tTgGateType
-TgNode::type() const
-{
-  return LogicMgr::type(mTypeId);
-}
-
-// @brief 入力数を得る．
-ymuint
-TgNode::ni() const
-{
-  return LogicMgr::ni(mTypeId);
-}
-
-// タイプをセットする．
+// @brief タイプをセットする．
+// @param[in] lid 論理ノードの通し番号
+// @param[in] type 論理関数のタイプ
+// @param[in] ni 入力数
+// @param[in] aux_id kTgCplx 型の時の補助ID
+// @param[in] p ファンインの配列用のメモリ領域
 void
 TgNode::set_type(ymuint32 lid,
-		 tTgGateType type,
+		 tTgNodeType type,
 		 ymuint ni,
+		 ymuint aux_id,
 		 void* p)
 {
-  mTypeId = LogicMgr::pack(type, ni);
+  mTypeId = type | (aux_id << 6);
   mLid = lid;
+  mNi = ni;
   if ( ni > 0 ) {
     mFanins = static_cast<TgNode**>(p);
   }

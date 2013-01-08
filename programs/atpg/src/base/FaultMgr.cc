@@ -178,15 +178,9 @@ FaultMgr::reg_faults(const TgNode* node)
   SaFault* f0 = add_ofault(node, 0, rep0);
   SaFault* f1 = add_ofault(node, 1, rep1);
 
-  tTgGateType type = node->type();
+  tTgNodeType type = node->type();
   ymuint ni = node->ni();
   switch ( type ) {
-  case kTgUndef:
-  case kTgInput:
-  case kTgOutput:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
-
   case kTgBuff:
     add_ifault(node, 0, 0, f0);
     add_ifault(node, 0, 1, f1);
@@ -232,7 +226,7 @@ FaultMgr::reg_faults(const TgNode* node)
     }
     break;
 
-  default:
+  case kTgCplx:
     {
       LogExpr ofunc = mNetwork->get_lexp(node);
       for (ymuint j = 0; j < ni; ++ j) {
@@ -256,6 +250,10 @@ FaultMgr::reg_faults(const TgNode* node)
 	add_ifault(node, j, 1, rep);
       }
     }
+    break;
+
+  default: // kTgUndef, kTgInput, kTgOutput 含む．
+    assert_not_reached(__FILE__, __LINE__);
     break;
   }
 }

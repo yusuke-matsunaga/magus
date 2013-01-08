@@ -46,7 +46,7 @@ public:
   static
   SimNode*
   new_node(ymuint32 id,
-	   tTgGateType type,
+	   tTgNodeType type,
 	   const LogExpr& lexp,
 	   const vector<SimNode*>& inputs);
 

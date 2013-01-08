@@ -24,7 +24,7 @@ class GateXor :
   public Gate
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] id ゲートID
   /// @param[in] node 元のノード
@@ -32,50 +32,50 @@ public:
   GateXor(ymuint id,
 	  const TgNode* node,
 	  ymuint ni);
-  
+
   /// @brief デストラクタ
   virtual
   ~GateXor();
-  
-  
+
+
 public:
-  
+
   virtual
   void
   calc_C();
-  
+
   virtual
   ymuint
   calc_O(ymuint pos);
-  
+
   virtual
   bool
   calc_obs(ymuint ipos) const;
-  
+
   virtual
-  tTgGateType
+  tTgNodeType
   gate_type() const;
-  
+
   virtual
   bool
   fwd_imp0_h();
-  
+
   virtual
   bool
   fwd_imp1_h();
-  
+
   virtual
   bool
   fwd_imp0_g();
-  
+
   virtual
   bool
   fwd_imp1_g();
-  
+
   virtual
   bool
   fwd_imp0_f();
-  
+
   virtual
   bool
   fwd_imp1_f();
@@ -87,23 +87,23 @@ public:
   virtual
   bool
   bwd_imp1_h();
-  
+
   virtual
   bool
   bwd_imp0_g();
-  
+
   virtual
   bool
   bwd_imp1_g();
-  
+
   virtual
   bool
   bwd_imp0_f();
-  
+
   virtual
   bool
   bwd_imp1_f();
-  
+
 };
 
 
@@ -115,7 +115,7 @@ class XGateNor :
   public GateXor
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] id ゲートID
   /// @param[in] node 元のノード
@@ -130,11 +130,11 @@ public:
 
 
 public:
-  
+
   virtual
-  tTgGateType
+  tTgNodeType
   gate_type() const;
-  
+
 };
 
 END_NAMESPACE_YM_ATPG_DTPGCL

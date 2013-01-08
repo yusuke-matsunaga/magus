@@ -47,47 +47,47 @@ public:
   virtual
   bool
   calc_obs(ymuint ipos) const;
-  
+
   virtual
   bool
   fwd_imp0_h();
-  
+
   virtual
   bool
   fwd_imp1_h();
-  
+
   virtual
   bool
   fwd_imp0_g();
-  
+
   virtual
   bool
   fwd_imp1_g();
-  
+
   virtual
   bool
   fwd_imp0_f();
-  
+
   virtual
   bool
   fwd_imp1_f();
-  
+
   virtual
   bool
   bwd_imp0_g();
-  
+
   virtual
   bool
   bwd_imp1_g();
-  
+
   virtual
   bool
   bwd_imp0_f();
-  
+
   virtual
   bool
   bwd_imp1_f();
-  
+
 };
 
 
@@ -112,13 +112,13 @@ public:
 
 
 public:
-  
+
   virtual
   void
   calc_C();
-  
+
   virtual
-  tTgGateType
+  tTgNodeType
   gate_type() const;
 
   virtual
@@ -128,7 +128,7 @@ public:
   virtual
   bool
   bwd_imp1_h();
-  
+
 };
 
 
@@ -146,20 +146,20 @@ public:
   /// @param[in] node 元のノード
   GateConst1(ymuint id,
 	     const TgNode* node);
-  
+
   /// @brief デストラクタ
   virtual
   ~GateConst1();
 
-  
+
 public:
-  
+
   virtual
   void
   calc_C();
-  
+
   virtual
-  tTgGateType
+  tTgNodeType
   gate_type() const;
 
   virtual
@@ -169,7 +169,7 @@ public:
   virtual
   bool
   bwd_imp1_h();
-  
+
 };
 
 END_NAMESPACE_YM_ATPG_DTPGCL

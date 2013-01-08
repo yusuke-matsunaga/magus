@@ -40,7 +40,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief タイプ id を得る．
-  tTgGateType
+  tTgNodeType
   type() const;
 
   /// @brief 未定義タイプの時 true を返す．
@@ -227,7 +227,7 @@ private:
   ymuint32 mLid;
 
   // タイプ ID
-  tTgGateType mGateType;
+  tTgNodeType mGateType;
 
   // 論理式
   LogExpr mExpr;
@@ -293,7 +293,7 @@ DtpgNode::~DtpgNode()
 
 // @brief タイプ id を得る．
 inline
-tTgGateType
+tTgNodeType
 DtpgNode::type() const
 {
   return mGateType;
@@ -330,7 +330,7 @@ inline
 bool
 DtpgNode::is_logic() const
 {
-  return static_cast<ymuint>(type()) >= static_cast<ymuint>(kTgBuff);
+  return (static_cast<ymuint>(type()) & kTgLogic) == kTgLogic;
 }
 
 // @brief 組み込み型でない logic タイプの時 true を返す．
@@ -338,7 +338,7 @@ inline
 bool
 DtpgNode::is_cplx_logic() const
 {
-  return static_cast<ymuint>(type()) >= static_cast<ymuint>(kTgUsrDef);
+  return type() == kTgCplx;
 }
 
 // @brief ID番号を得る．
