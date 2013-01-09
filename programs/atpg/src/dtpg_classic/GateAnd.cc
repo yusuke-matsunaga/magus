@@ -34,10 +34,10 @@ GateAnd::~GateAnd()
 {
 }
 
-tTgNodeType
+tTgGateType
 GateAnd::gate_type() const
 {
-  return kTgAnd;
+  return kTgGateAnd;
 }
 
 bool
@@ -296,10 +296,10 @@ GateNand::~GateNand()
 {
 }
 
-tTgNodeType
+tTgGateType
 GateNand::gate_type() const
 {
-  return kTgNand;
+  return kTgGateNand;
 }
 
 bool

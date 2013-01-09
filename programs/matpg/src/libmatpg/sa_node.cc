@@ -112,10 +112,10 @@ sa0_node::get_name() const
   return "sa0_node";
 }
 
-tTgNodeType
+tTgGateType
 sa0_node::get_gtype() const
 {
-  return kTgConst0;
+  return kTgGateConst0;
 }
 
 bool
@@ -130,10 +130,10 @@ sa1_node::get_name() const
   return "sa1_node";
 }
 
-tTgNodeType
+tTgGateType
 sa1_node::get_gtype() const
 {
-  return kTgConst1;
+  return kTgGateConst1;
 }
 
 bool

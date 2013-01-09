@@ -69,7 +69,7 @@ enum tTgGateType {
   kTgGateCplx   = 10
 };
 
-
+#if 0
 //////////////////////////////////////////////////////////////////////
 /// @brief TgNode の種類を表す列挙型
 ///
@@ -127,6 +127,7 @@ enum tTgNodeType {
   /// @brief 上記以外の複雑なゲート
   kTgCplx   = kTgLogic | static_cast<ymuint>(kTgGateCplx)
 };
+#endif
 
 END_NAMESPACE_YM
 

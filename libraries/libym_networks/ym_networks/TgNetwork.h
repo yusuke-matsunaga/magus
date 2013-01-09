@@ -210,12 +210,12 @@ private:
 
   /// @brief ノードを論理ノードに設定する．
   /// @param[in] node 対象のノード
-  /// @param[in] node_type 論理タイプ
+  /// @param[in] gate_type 論理タイプ
   /// @param[in] ni 入力数
   /// @param[in] aux_id 論理タイプが kTgCplx の場合の補助ID
   void
   set_to_logic(TgNode* node,
-	       tTgNodeType node_type,
+	       tTgGateType gate_type,
 	       ymuint ni,
 	       ymuint aux_id);
 

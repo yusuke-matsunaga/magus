@@ -40,28 +40,22 @@ BEGIN_NONAMESPACE
 /// @param[in] inputs 入力リテラル
 void
 make_cnf_from_type(SatSolver& solver,
-		   tTgNodeType type,
+		   tTgGateType type,
 		   Literal output,
 		   const vector<Literal>& inputs)
 {
   switch ( type ) {
-  case kTgUndef:
-  case kTgInput:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
-
-  case kTgOutput:
-  case kTgBuff:
+  case kTgGateBuff:
     solver.add_clause(inputs[0], ~output);
     solver.add_clause(~inputs[0], output);
     break;
 
-  case kTgNot:
+  case kTgGateNot:
     solver.add_clause(inputs[0], output);
     solver.add_clause(~inputs[0], ~output);
     break;
 
-  case kTgAnd:
+  case kTgGateAnd:
     {
       ymuint ni = inputs.size();
       vector<Literal> tmp(ni + 1);
@@ -76,7 +70,7 @@ make_cnf_from_type(SatSolver& solver,
     }
     break;
 
-  case kTgNand:
+  case kTgGateNand:
     {
       ymuint ni = inputs.size();
       vector<Literal> tmp(ni + 1);
@@ -91,7 +85,7 @@ make_cnf_from_type(SatSolver& solver,
     }
     break;
 
-  case kTgOr:
+  case kTgGateOr:
     {
       ymuint ni = inputs.size();
       vector<Literal> tmp(ni + 1);
@@ -106,7 +100,7 @@ make_cnf_from_type(SatSolver& solver,
     }
     break;
 
-  case kTgNor:
+  case kTgGateNor:
     {
       ymuint ni = inputs.size();
       vector<Literal> tmp(ni + 1);
@@ -121,7 +115,7 @@ make_cnf_from_type(SatSolver& solver,
     }
     break;
 
-  case kTgXor:
+  case kTgGateXor:
     {
       ymuint ni = inputs.size();
       vector<Literal> tmp(ni + 1);
@@ -148,7 +142,7 @@ make_cnf_from_type(SatSolver& solver,
     }
     break;
 
-  case kTgXnor:
+  case kTgGateXnor:
     {
       ymuint ni = inputs.size();
       vector<Literal> tmp(ni + 1);
@@ -276,7 +270,7 @@ make_node_cnf(SatSolver& solver,
     make_cnf_from_lexp(solver, lexp, output, inputs);
   }
   else {
-    make_cnf_from_type(solver, node->type(), output, inputs);
+    make_cnf_from_type(solver, node->gate_type(), output, inputs);
   }
 }
 

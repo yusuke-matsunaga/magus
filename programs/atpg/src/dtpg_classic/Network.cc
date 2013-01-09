@@ -109,10 +109,10 @@ Network::set(const TgNetwork& tgnetwork)
       gate->set_fanin(j, igate);
       ++ igate->mNo;
     }
-    if ( gate->gate_type() == kTgConst0 ) {
+    if ( gate->gate_type() == kTgGateConst0 ) {
       sm.add_const0(gate);
     }
-    if ( gate->gate_type() == kTgConst1 ) {
+    if ( gate->gate_type() == kTgGateConst1 ) {
       sm.add_const1(gate);
     }
   }
@@ -212,24 +212,28 @@ Gate*
 Network::new_Gate(const TgNode* node,
 		  ymuint input_id)
 {
-  tTgNodeType type = node->type();
-  ymuint ni = node->ni();
   Gate* gate = NULL;
   ymuint id = mGateList.size();
-  switch ( type ) {
-  case kTgConst0: gate = new GateConst0(id, node); break;
-  case kTgConst1: gate = new GateConst1(id, node); break;
-  case kTgInput:  gate = new GateInput(id, node, input_id); break;
-  case kTgBuff:   gate = new GateBuf(id, node); break;
-  case kTgNot:    gate = new GateNot(id, node); break;
-  case kTgAnd:    gate = new GateAnd(id, node, ni); break;
-  case kTgNand:   gate = new GateNand(id, node, ni); break;
-  case kTgOr:     gate = new GateOr(id, node, ni); break;
-  case kTgNor:    gate = new GateNor(id, node, ni); break;
-  case kTgXor:    gate = new GateXor(id, node, ni); break;
-  case kTgXnor:   gate = new XGateNor(id, node, ni); break;
-  default:
-    assert_not_reached(__FILE__, __LINE__);
+  if ( node->is_input() ) {
+    gate = new GateInput(id, node, input_id);
+  }
+  else {
+    tTgGateType type = node->gate_type();
+    ymuint ni = node->ni();
+    switch ( type ) {
+    case kTgGateConst0: gate = new GateConst0(id, node); break;
+    case kTgGateConst1: gate = new GateConst1(id, node); break;
+      case kTgGateBuff:   gate = new GateBuf(id, node); break;
+    case kTgGateNot:    gate = new GateNot(id, node); break;
+    case kTgGateAnd:    gate = new GateAnd(id, node, ni); break;
+    case kTgGateNand:   gate = new GateNand(id, node, ni); break;
+    case kTgGateOr:     gate = new GateOr(id, node, ni); break;
+    case kTgGateNor:    gate = new GateNor(id, node, ni); break;
+    case kTgGateXor:    gate = new GateXor(id, node, ni); break;
+    case kTgGateXnor:   gate = new XGateNor(id, node, ni); break;
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+    }
   }
   mGateList.push_back(gate);
   mGateMap[node->gid()] = gate;
@@ -310,7 +314,7 @@ Network::set_eq_gate()
     if ( ni == 0 ) {
       continue;
     }
-    tTgNodeType gtype = gate->gate_type();
+    tTgGateType gtype = gate->gate_type();
     Gate* igate0 = gate->fanin(0);
     Gate* igate = igate0;
     if (igate->eq_gate() == igate && igate->nfo() == 1) {
@@ -687,7 +691,7 @@ Network::new_fault(Val3 fval)
 void
 Network::delete_fault(GateSa* f_gate)
 {
-  if ( f_gate->gate_type() == kTgConst0 ) {
+  if ( f_gate->gate_type() == kTgGateConst0 ) {
     mSa0List.push_back(f_gate);
   }
   else {

@@ -133,10 +133,10 @@ GateConst0::~GateConst0()
 {
 }
 
-tTgNodeType
+tTgGateType
 GateConst0::gate_type() const
 {
-  return kTgConst0;
+  return kTgGateConst0;
 }
 
 bool
@@ -171,10 +171,10 @@ GateConst1::~GateConst1()
 {
 }
 
-tTgNodeType
+tTgGateType
 GateConst1::gate_type() const
 {
-  return kTgConst1;
+  return kTgGateConst1;
 }
 
 bool

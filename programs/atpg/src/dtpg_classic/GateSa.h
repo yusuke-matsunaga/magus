@@ -109,7 +109,7 @@ public:
   name() const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   gate_type() const;
 
   /// @brief 名前とゲート型を表す文字列を返す．
@@ -142,7 +142,7 @@ public:
   name() const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   gate_type() const;
 
   /// @brief 名前とゲート型を表す文字列を返す．

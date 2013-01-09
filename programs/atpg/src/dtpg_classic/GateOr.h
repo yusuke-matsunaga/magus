@@ -45,7 +45,7 @@ public:
   calc_obs(ymuint ipos) const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   gate_type() const;
 
   virtual
@@ -159,7 +159,7 @@ public:
 public:
 
   virtual
-  tTgNodeType
+  tTgGateType
   gate_type() const;
 
   virtual

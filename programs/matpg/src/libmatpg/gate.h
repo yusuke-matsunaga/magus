@@ -698,7 +698,7 @@ public:
   get_name() const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   get_gtype() const;
 
   virtual
@@ -730,7 +730,7 @@ public:
   calc_fval() const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   get_gtype() const;
 
   virtual
@@ -773,7 +773,7 @@ public:
   calc_fval() const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   get_gtype() const;
 
   virtual
@@ -824,7 +824,7 @@ public:
   calc_obs(int ipos) const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   get_gtype() const;
 
   virtual
@@ -913,7 +913,7 @@ public:
   calc_obs(int ipos) const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   get_gtype() const;
 
   virtual
@@ -1046,7 +1046,7 @@ public:
   calc_obs2(int ipos) const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   get_gtype() const;
 
   virtual
@@ -1131,7 +1131,7 @@ public:
   calc_obs2(int ipos) const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   get_gtype() const;
 
   virtual
@@ -1253,7 +1253,7 @@ public:
   calc_obs2(int ipos) const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   get_gtype() const;
 
   virtual
@@ -1337,7 +1337,7 @@ public:
   calc_obs2(int ipos) const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   get_gtype() const;
 
   virtual
@@ -1437,7 +1437,7 @@ public:
   calc_obs2(int ipos) const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   get_gtype() const;
 
   virtual
@@ -1527,7 +1527,7 @@ public:
   calc_obs(int ipos) const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   get_gtype() const;
 
   virtual
@@ -1555,7 +1555,7 @@ public:
 
 extern
 gate_t*
-new_gate_t(tTgNodeType id,
+new_gate_t(tTgGateType id,
 	   const TgNode* node,
 	   int ni);
 

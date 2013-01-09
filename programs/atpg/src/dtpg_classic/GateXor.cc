@@ -34,10 +34,10 @@ GateXor::~GateXor()
 {
 }
 
-tTgNodeType
+tTgGateType
 GateXor::gate_type() const
 {
-  return kTgXor;
+  return kTgGateXor;
 }
 
 bool
@@ -61,7 +61,7 @@ GateXor::fwd_imp0_h()
 {
   Val3 old_val = gval();
   if ( old_val == kValX ) {
-    Val3 xval = (gate_type() == kTgXor) ? kVal0 : kVal1;
+    Val3 xval = (gate_type() == kTgGateXor) ? kVal0 : kVal1;
     bool all_fixed = true;
     for (ymuint i = 0; i < nfi(); ++ i) {
       Val3 i_val = fanin(i)->gval();
@@ -96,7 +96,7 @@ GateXor::fwd_imp1_h()
 {
   Val3 old_val = gval();
   if ( old_val == kValX ) {
-    Val3 xval = (gate_type() == kTgXor) ? kVal0 : kVal1;
+    Val3 xval = (gate_type() == kTgGateXor) ? kVal0 : kVal1;
     bool all_fixed = true;
     for (ymuint i = 0; i < nfi(); ++ i) {
       Val3 i_val = fanin(i)->gval();
@@ -131,7 +131,7 @@ GateXor::fwd_imp0_g()
 {
   Val3 old_val = gval();
   if ( old_val == kValX ) {
-    Val3 xval = (gate_type() == kTgXor) ? kVal0 : kVal1;
+    Val3 xval = (gate_type() == kTgGateXor) ? kVal0 : kVal1;
     bool all_fixed = true;
     for (ymuint i = 0; i < nfi(); ++ i) {
       Val3 i_val = fanin(i)->gval();
@@ -166,7 +166,7 @@ GateXor::fwd_imp1_g()
 {
   Val3 old_val = gval();
   if ( old_val == kValX ) {
-    Val3 xval = (gate_type() == kTgXor) ? kVal0 : kVal1;
+    Val3 xval = (gate_type() == kTgGateXor) ? kVal0 : kVal1;
     bool all_fixed = true;
     for (ymuint i = 0; i < nfi(); ++ i) {
       Val3 i_val = fanin(i)->gval();
@@ -201,7 +201,7 @@ GateXor::fwd_imp0_f()
 {
   Val3 old_val = fval();
   if ( old_val == kValX ) {
-    Val3 xval = (gate_type() == kTgXor) ? kVal0 : kVal1;
+    Val3 xval = (gate_type() == kTgGateXor) ? kVal0 : kVal1;
     bool all_fixed = true;
     for (ymuint i = 0; i < nfi(); ++ i) {
       Val3 i_val = fanin(i)->fval();
@@ -235,7 +235,7 @@ GateXor::fwd_imp1_f()
 {
   Val3 old_val = fval();
   if ( old_val == kValX ) {
-    Val3 xval = (gate_type() == kTgXor) ? kVal0 : kVal1;
+    Val3 xval = (gate_type() == kTgGateXor) ? kVal0 : kVal1;
     bool all_fixed = true;
     for (ymuint i = 0; i < nfi(); ++ i) {
       Val3 i_val = fanin(i)->fval();
@@ -267,7 +267,7 @@ GateXor::fwd_imp1_f()
 bool
 GateXor::bwd_imp0_h()
 {
-  Val3 xval = (gate_type() == kTgXor) ? kVal0 : kVal1;
+  Val3 xval = (gate_type() == kTgGateXor) ? kVal0 : kVal1;
   int ucount = 0;
   Gate* last = NULL;
   for (ymuint i = 0; i < nfi(); ++ i) {
@@ -304,7 +304,7 @@ bool
 GateXor::bwd_imp1_h()
 {
   // 上と逆になっていることに注意
-  Val3 xval = (gate_type() == kTgXor) ? kVal1 : kVal0;
+  Val3 xval = (gate_type() == kTgGateXor) ? kVal1 : kVal0;
   int ucount = 0;
   Gate* last = NULL;
   for (ymuint i = 0; i < nfi(); ++ i) {
@@ -340,7 +340,7 @@ GateXor::bwd_imp1_h()
 bool
 GateXor::bwd_imp0_g()
 {
-  Val3 xval = (gate_type() == kTgXor) ? kVal0 : kVal1;
+  Val3 xval = (gate_type() == kTgGateXor) ? kVal0 : kVal1;
   int ucount = 0;
   Gate* last = NULL;
   for (ymuint i = 0; i < nfi(); ++ i) {
@@ -377,7 +377,7 @@ bool
 GateXor::bwd_imp1_g()
 {
   // 上と逆になっていることに注意
-  Val3 xval = (gate_type() == kTgXor) ? kVal1 : kVal0;
+  Val3 xval = (gate_type() == kTgGateXor) ? kVal1 : kVal0;
   int ucount = 0;
   Gate* last = NULL;
   for (ymuint i = 0; i < nfi(); ++ i) {
@@ -413,7 +413,7 @@ GateXor::bwd_imp1_g()
 bool
 GateXor::bwd_imp0_f()
 {
-  Val3 xval = (gate_type() == kTgXor) ? kVal0 : kVal1;
+  Val3 xval = (gate_type() == kTgGateXor) ? kVal0 : kVal1;
   int ucount = 0;
   Gate* last = NULL;
   for (ymuint i = 0; i < nfi(); ++ i) {
@@ -450,7 +450,7 @@ bool
 GateXor::bwd_imp1_f()
 {
   // 上と逆になっていることに注意
-  Val3 xval = (gate_type() == kTgXor) ? kVal1 : kVal0;
+  Val3 xval = (gate_type() == kTgGateXor) ? kVal1 : kVal0;
   int ucount = 0;
   Gate* last = NULL;
   for (ymuint i = 0; i < nfi(); ++ i) {
@@ -504,10 +504,10 @@ XGateNor::~XGateNor()
 {
 }
 
-tTgNodeType
+tTgGateType
 XGateNor::gate_type() const
 {
-  return kTgXnor;
+  return kTgGateXnor;
 }
 
 END_NAMESPACE_YM_ATPG_DTPGCL

@@ -39,10 +39,6 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief タイプ id を得る．
-  tTgNodeType
-  type() const;
-
   /// @brief 未定義タイプの時 true を返す．
   bool
   is_undef() const;
@@ -60,6 +56,10 @@ public:
   /// @brief logic タイプの時 true を返す．
   bool
   is_logic() const;
+
+  /// @brief ゲートタイプを得る．
+  tTgGateType
+  gate_type() const;
 
   /// @brief 組み込み型でない logic タイプの時 true を返す．
   bool
@@ -291,20 +291,12 @@ DtpgNode::~DtpgNode()
 {
 }
 
-// @brief タイプ id を得る．
+// @brief ゲートタイプを得る．
 inline
-tTgNodeType
-DtpgNode::type() const
+tTgGateType
+DtpgNode::gate_type() const
 {
   return mGateType;
-}
-
-// @brief 未定義タイプの時 true を返す．
-inline
-bool
-DtpgNode::is_undef() const
-{
-  return type() == kTgUndef;
 }
 
 // @brief 外部入力タイプの時 true を返す．

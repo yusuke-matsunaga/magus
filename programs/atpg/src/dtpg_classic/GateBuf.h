@@ -47,7 +47,7 @@ public:
   calc_O(ymuint pos);
 
   virtual
-  tTgNodeType
+  tTgGateType
   gate_type() const;
 
   virtual
@@ -136,7 +136,7 @@ public:
   calc_O(ymuint pos);
 
   virtual
-  tTgNodeType
+  tTgGateType
   gate_type() const;
 
   virtual

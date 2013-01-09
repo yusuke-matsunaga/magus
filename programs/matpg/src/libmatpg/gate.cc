@@ -25,16 +25,16 @@ BEGIN_NAMESPACE_YM_MATPG
 
 
 gate_t*
-new_gate_t(tTgNodeType id,
+new_gate_t(tTgGateType id,
 	   const TgNode* node,
 	   int ni)
 {
   switch (id) {
-  case kTgConst0:   return new C0_gate_t(node);
-  case kTgConst1:   return new C1_gate_t(node);
-  case kTgBuff:  return new BUF_gate_t(node);
-  case kTgNot:  return new NOT_gate_t(node);
-  case kTgAnd:
+  case kTgGateConst0:   return new C0_gate_t(node);
+  case kTgGateConst1:   return new C1_gate_t(node);
+  case kTgGateBuff:  return new BUF_gate_t(node);
+  case kTgGateNot:  return new NOT_gate_t(node);
+  case kTgGateAnd:
     switch (ni) {
     case 2:		return new AND_2_gate_t(node);
     case 3:		return new AND_3_gate_t(node);
@@ -42,7 +42,7 @@ new_gate_t(tTgNodeType id,
     }
     return new AND_gate_t(node, ni);
 
-  case kTgNand:
+  case kTgGateNand:
     switch (ni) {
     case 2:		return new NAND_2_gate_t(node);
     case 3:		return new NAND_3_gate_t(node);
@@ -50,7 +50,7 @@ new_gate_t(tTgNodeType id,
     }
     return new NAND_gate_t(node, ni);
 
-  case kTgOr:
+  case kTgGateOr:
     switch (ni) {
     case 2:		return new OR_2_gate_t(node);
     case 3:		return new OR_3_gate_t(node);
@@ -58,7 +58,7 @@ new_gate_t(tTgNodeType id,
     }
     return new OR_gate_t(node, ni);
 
-  case kTgNor:
+  case kTgGateNor:
     switch (ni) {
     case 2:		return new NOR_2_gate_t(node);
     case 3:		return new NOR_3_gate_t(node);
@@ -66,11 +66,11 @@ new_gate_t(tTgNodeType id,
     }
     return new NOR_gate_t(node, ni);
 
-  case kTgXor:
+  case kTgGateXor:
     if (ni == 2) return new XOR_2_gate_t(node);
     return new XOR_gate_t(node, ni);
 
-  case kTgXnor:
+  case kTgGateXnor:
     if (ni == 2) return new XNOR_2_gate_t(node);
     return new XNOR_gate_t(node, ni);
 
@@ -91,7 +91,7 @@ gate_t::gate_t(const TgNode* node0,
   if ( ni ) {
     igate = new gate_t*[ni];
     sorted_pos = new int[ni];
-    for (size_t i = 0; i < ni; ++ i) {
+    for (int i = 0; i < ni; ++ i) {
       sorted_pos[i] = i;
     }
   }
@@ -131,7 +131,7 @@ gate_t::init_fogate(gate_t* output,
 {
   if (outputs == NULL) {
     outputs = new net_t[no];
-    for (size_t i = 0; i < no; ++ i) {
+    for (int i = 0; i < no; ++ i) {
       outputs[i].gate = NULL;
     }
     act_outputs = new net_t[no + 1];
@@ -211,10 +211,10 @@ gate_t::get_name() const
   return node->name();
 }
 
-tTgNodeType
+tTgGateType
 gate_t::get_gtype() const
 {
-  return node->type();
+  return node->gate_type();
 }
 
 void
@@ -244,10 +244,10 @@ PI_gate_t::dump(FILE* fp) const
 }
 
 /* C0_gate_t */
-tTgNodeType
+tTgGateType
 C0_gate_t::get_gtype() const
 {
-  return kTgConst0;
+  return kTgGateConst0;
 }
 
 void
@@ -258,10 +258,10 @@ C0_gate_t::dump(FILE* fp) const
 }
 
 /* C1_gate_t */
-tTgNodeType
+tTgGateType
 C1_gate_t::get_gtype() const
 {
-  return kTgConst1;
+  return kTgGateConst1;
 }
 
 void
@@ -272,10 +272,10 @@ C1_gate_t::dump(FILE* fp) const
 }
 
 /* BUF_gate_t */
-tTgNodeType
+tTgGateType
 BUF_gate_t::get_gtype() const
 {
-  return kTgBuff;
+  return kTgGateBuff;
 }
 
 void
@@ -288,10 +288,10 @@ BUF_gate_t::dump(FILE* fp) const
 }
 
 /* NOT_gate_t */
-tTgNodeType
+tTgGateType
 NOT_gate_t::get_gtype() const
 {
-  return kTgNot;
+  return kTgGateNot;
 }
 
 void
@@ -328,10 +328,10 @@ SIMPLE_gate_t::get_no_val() const
 }
 
 /* AND_gate_t */
-tTgNodeType
+tTgGateType
 AND_gate_t::get_gtype() const
 {
-  return kTgAnd;
+  return kTgGateAnd;
 }
 
 void
@@ -352,10 +352,10 @@ AND_gate_t::dump(FILE* fp) const
 }
 
 /* NAND_gate_t */
-tTgNodeType
+tTgGateType
 NAND_gate_t::get_gtype() const
 {
-  return kTgNand;
+  return kTgGateNand;
 }
 
 void
@@ -376,10 +376,10 @@ NAND_gate_t::dump(FILE* fp) const
 }
 
 /* OR_gate_t */
-tTgNodeType
+tTgGateType
 OR_gate_t::get_gtype() const
 {
-  return kTgOr;
+  return kTgGateOr;
 }
 
 void
@@ -400,10 +400,10 @@ OR_gate_t::dump(FILE* fp) const
 }
 
 /* NOR_gate_t */
-tTgNodeType
+tTgGateType
 NOR_gate_t::get_gtype() const
 {
-  return kTgNor;
+  return kTgGateNor;
 }
 
 void
@@ -424,10 +424,10 @@ NOR_gate_t::dump(FILE* fp) const
 }
 
 /* XOR_gate_t */
-tTgNodeType
+tTgGateType
 XOR_gate_t::get_gtype() const
 {
-  return kTgXor;
+  return kTgGateXor;
 }
 
 void
@@ -448,10 +448,10 @@ XOR_gate_t::dump(FILE* fp) const
 }
 
 /* XNOR_gate_t */
-tTgNodeType
+tTgGateType
 XNOR_gate_t::get_gtype() const
 {
-  return kTgXnor;
+  return kTgGateXnor;
 }
 
 void

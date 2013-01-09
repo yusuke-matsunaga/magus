@@ -118,7 +118,7 @@ public:
   calc_C();
 
   virtual
-  tTgNodeType
+  tTgGateType
   gate_type() const;
 
   virtual
@@ -159,7 +159,7 @@ public:
   calc_C();
 
   virtual
-  tTgNodeType
+  tTgGateType
   gate_type() const;
 
   virtual

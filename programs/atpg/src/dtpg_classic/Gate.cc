@@ -80,10 +80,10 @@ Gate::name() const
 }
 
 // @brief ゲート型を得る．
-tTgNodeType
+tTgGateType
 Gate::gate_type() const
 {
-  return mTgNode->type();
+  return mTgNode->gate_type();
 }
 
 // @brief 名前とゲート型を表す文字列を返す．
@@ -93,17 +93,17 @@ Gate::description() const
   string ans;
   ans = string(name()) + string(": ");
   switch ( gate_type() ) {
-  case kTgInput:  ans += "INPUT"; break;
-  case kTgConst0: ans += "CONST0"; break;
-  case kTgConst1: ans += "CONST1"; break;
-  case kTgBuff:   ans += "BUF"; break;
-  case kTgNot:    ans += "NOT"; break;
-  case kTgAnd:    ans += "AND"; break;
-  case kTgNand:   ans += "NAND"; break;
-  case kTgOr:     ans += "OR"; break;
-  case kTgNor:    ans += "NOR"; break;
-  case kTgXor:    ans += "XOR"; break;
-  case kTgXnor:   ans += "XNOR"; break;
+  case kTgGateConst0: ans += "CONST0"; break;
+  case kTgGateConst1: ans += "CONST1"; break;
+  case kTgGateBuff:   ans += "BUF"; break;
+  case kTgGateNot:    ans += "NOT"; break;
+  case kTgGateAnd:    ans += "AND"; break;
+  case kTgGateNand:   ans += "NAND"; break;
+  case kTgGateOr:     ans += "OR"; break;
+  case kTgGateNor:    ans += "NOR"; break;
+  case kTgGateXor:    ans += "XOR"; break;
+  case kTgGateXnor:   ans += "XNOR"; break;
+  case kTgGateCplx:   ans += "CPLX"; break;
   default:        ans += "UNKNOWN"; break;
   }
   return ans;

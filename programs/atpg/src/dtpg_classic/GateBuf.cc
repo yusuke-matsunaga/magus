@@ -31,10 +31,10 @@ GateBuf::~GateBuf()
 {
 }
 
-tTgNodeType
+tTgGateType
 GateBuf::gate_type() const
 {
-  return kTgBuff;
+  return kTgGateBuff;
 }
 
 bool
@@ -139,10 +139,10 @@ GateNot::~GateNot()
 {
 }
 
-tTgNodeType
+tTgGateType
 GateNot::gate_type() const
 {
-  return kTgNot;
+  return kTgGateNot;
 }
 
 bool

@@ -158,6 +158,10 @@ private:
 	       SimNode*& simnode,
 	       ymuint& ipos) const;
 
+  /// @brief 外部入力ノードを作る．
+  SimNode*
+  make_input();
+
   /// @brief logic ノードを作る．
   SimNode*
   make_logic(const LogExpr& lexp,
@@ -166,7 +170,7 @@ private:
 
   /// @brief logic ノードを作る．
   SimNode*
-  make_node(tTgNodeType type,
+  make_node(tTgGateType type,
 	    const vector<SimNode*>& inputs);
 
 

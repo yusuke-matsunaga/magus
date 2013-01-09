@@ -83,7 +83,7 @@ public:
   get_name() const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   get_gtype() const;
 
   virtual
@@ -102,7 +102,7 @@ public:
   get_name() const;
 
   virtual
-  tTgNodeType
+  tTgGateType
   get_gtype() const;
 
   virtual

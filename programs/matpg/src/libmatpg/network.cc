@@ -178,7 +178,7 @@ gn_gen(const TgNetwork& tgnetwork)
   for (size_t i = 0; i < nl; ++ i) {
     const TgNode* node = tgnetwork.sorted_logic(i);
     size_t ni = node->ni();
-    gate_t* gate =  new_gate_t(node->type(), node, ni);
+    gate_t* gate =  new_gate_t(node->gate_type(), node, ni);
     for (size_t j = 0; j < ni; ++ j) {
       const TgNode* inode = node->fanin(j);
       gate_t* igate = gate_map[inode->gid()];
@@ -188,10 +188,10 @@ gn_gen(const TgNetwork& tgnetwork)
     gates[gate_id] = gate;
     ++ gate_id;
     gate_map[node->gid()] = gate;
-    if (gate->get_gtype() == kTgConst0) {
+    if (gate->get_gtype() == kTgGateConst0) {
       const0_add(gate);
     }
-    if (gate->get_gtype() == kTgConst1) {
+    if (gate->get_gtype() == kTgGateConst1) {
       const1_add(gate);
     }
   }
@@ -241,7 +241,7 @@ gn_gen(const TgNetwork& tgnetwork)
     gate->lvl_i = level + 1;
     if ( gate->is_fos() ) {
       next_ptr = &(gate->next_eval);
-      for (size_t j = 0; j < ni; ++ j) {
+      for (int j = 0; j < ni; ++ j) {
 	ord_ffr(gate->get_figate(j));
       }
       *next_ptr = gate;
@@ -295,7 +295,7 @@ ord_ffr(gate_t* gate)
   if ( !gate->is_fos() && !gate->is_pi() ) {
     *next_ptr = gate;
     next_ptr = &(gate->next_eval);
-    for (size_t i = 0; i < gate->get_ni(); ++ i) {
+    for (int i = 0; i < gate->get_ni(); ++ i) {
       ord_ffr(gate->get_figate(i));
     }
   }
@@ -315,7 +315,7 @@ set_eq_gate()
     if (ni == 0) {
       continue;
     }
-    tTgNodeType gtype = gate->get_gtype();
+    tTgGateType gtype = gate->get_gtype();
     gate_t* igate0 = gate->get_figate(0);
     gate_t* igate = igate0;
     if (igate->eq_gate == igate && igate->get_no() == 1) {

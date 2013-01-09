@@ -91,41 +91,42 @@ public:
   // 内部情報を得る関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ノードのタイプを得る．
-  tTgNodeType
-  type() const;
-
-  /// @brief 未定義タイプの時 true を返す．
+  /// @brief ノードの型が未定義の時 true を返す．
   bool
   is_undef() const;
 
-  /// @brief 外部入力タイプの時 true を返す．
+  /// @brief 外部入力ノードの時 true を返す．
   /// @note FF 出力もここに含まれる．
   bool
   is_input() const;
 
-  /// @brief 外部出力タイプの時 true を返す．
+  /// @brief 外部出力ノードの時 true を返す．
   /// @note FF 入力もここに含まれる．
   bool
   is_output() const;
 
-  /// @brief logic タイプの時 true を返す．
+  /// @brief 論理ノードの時 true を返す．
+  /// @note cplx_logic を包含している．
   bool
   is_logic() const;
 
-  /// @brief 組み込み型でない logic タイプの時 true を返す．
+  /// @brief 組み込み型でない論理ノードの時 true を返す．
   bool
   is_cplx_logic() const;
 
-  /// @brief cplx_logic タイプの時の関数IDを返す．
-  ymuint
-  cplx_logic_id() const;
+  /// @brief 論理ノードの時の論理関数タイプを返す．
+  tTgGateType
+  gate_type() const;
 
-  /// @brief ffin タイプの時 true を返す．
+  /// @brief gate_type() == kTgGateCplx の時の関数IDを返す．
+  ymuint
+  func_id() const;
+
+  /// @brief FF入力の時 true を返す．
   bool
   is_ffin() const;
 
-  /// @brief ffout タイプの時 true を返す．
+  /// @brief FF出力の時 true を返す．
   bool
   is_ffout() const;
 
@@ -176,20 +177,40 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる定数の定義
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 未定義
+  static
+  const ymuint32 kUndefType = 0U;
+
+  /// @brief 外部入力ノード
+  static
+  const ymuint32 kInputType = 1U;
+
+  /// @brief 外部出力ノード
+  static
+  const ymuint32 kOutputType = 2U;
+
+  /// @brief 論理ノード
+  static
+  const ymuint32 kLogicType = 3U;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief タイプをセットする．
-  /// @param[in] lid 論理ノードの通し番号
-  /// @param[in] type 論理関数のタイプ
+  /// @param[in] lid ローカルID
+  /// @param[in] type ノードのタイプ
   /// @param[in] ni 入力数
-  /// @param[in] aux_id kTgCplx 型の時の補助ID
   /// @param[in] p ファンインの配列用のメモリ領域
   void
   set_type(ymuint32 lid,
-	   tTgNodeType type,
+	   ymuint type,
 	   ymuint ni,
-	   ymuint aux_id,
 	   void* p);
 
 
@@ -198,8 +219,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // タイプ + 関数ID
+  // ノードタイプ + 関数タイプ
   ymuint32 mTypeId;
+
+  // 関数ID
+  ymuint32 mFuncId;
 
   // 全体での通し番号
   ymuint32 mGid;
@@ -267,60 +291,70 @@ TgEdge::to_ipos() const
 // TgNode のインライン関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief タイプ id を得る．
-inline
-tTgNodeType
-TgNode::type() const
-{
-  return static_cast<tTgNodeType>(mTypeId & 63U);
-}
-
-// @brief 未定義タイプの時 true を返す．
+// @brief ノードの型が未定義の時 true を返す．
 inline
 bool
 TgNode::is_undef() const
 {
-  return type() == kTgUndef;
+  return (mTypeId & 3U) == kUndefType;
 }
 
-// @brief 外部入力タイプの時 true を返す．
+// @brief 外部入力ノードの時 true を返す．
+// @note FF 出力もここに含まれる．
 inline
 bool
 TgNode::is_input() const
 {
-  return type() == kTgInput;
+  return (mTypeId & 3U) == kInputType;
 }
 
-// @brief 外部出力タイプの時 true を返す．
+// @brief 外部出力ノードの時 true を返す．
+// @note FF 入力もここに含まれる．
 inline
 bool
 TgNode::is_output() const
 {
-  return type() == kTgOutput;
+  return (mTypeId & 3U) == kOutputType;
 }
 
-// @brief logic タイプの時 true を返す．
+// @brief 論理ノードの時 true を返す．
+// @note cplx_logic を包含している．
 inline
 bool
 TgNode::is_logic() const
 {
-  return (static_cast<ymuint>(type()) & kTgLogic) == kTgLogic;
+  return (mTypeId & 3U) == kLogicType;
 }
 
-// @brief 組み込み型でない logic タイプの時 true を返す．
+// @brief 論理ノードの時の論理関数タイプを返す．
+inline
+tTgGateType
+TgNode::gate_type() const
+{
+  return static_cast<tTgGateType>((mTypeId >> 2) & 15U);
+}
+
+// @brief 組み込み型でない論理ノードの時 true を返す．
 inline
 bool
 TgNode::is_cplx_logic() const
 {
-  return type() == kTgCplx;
+  return gate_type() == kTgGateCplx;
 }
 
+// @brief gate_type() == kTgGateCplx の時の関数IDを返す．
+inline
+ymuint
+TgNode::func_id() const
+{
+  return mFuncId;
+}
 // @brief ffin タイプの時 true を返す．
 inline
 bool
 TgNode::is_ffin() const
 {
-  return type() == kTgOutput && mAltNode != NULL;
+  return is_output() && mAltNode != NULL;
 }
 
 // @brief ffout タイプの時 true を返す．
@@ -328,7 +362,7 @@ inline
 bool
 TgNode::is_ffout() const
 {
-  return type() == kTgInput && mAltNode != NULL;
+  return is_input() && mAltNode != NULL;
 }
 
 // @brief ノード全体での通し番号を得る．

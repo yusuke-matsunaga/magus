@@ -42,11 +42,16 @@ public:
 
 public:
 
-  /// @brief ノードを生成するクラスメソッド
+  /// @brief 入力ノードを生成するクラスメソッド
+  static
+  SimNode*
+  new_input(ymuint32 id);
+
+  /// @brief 論理ノードを生成するクラスメソッド
   static
   SimNode*
   new_node(ymuint32 id,
-	   tTgNodeType type,
+	   tTgGateType type,
 	   const LogExpr& lexp,
 	   const vector<SimNode*>& inputs);
 

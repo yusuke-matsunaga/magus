@@ -121,7 +121,7 @@ check_builtin(const LogExpr& lexp,
     return kTgGateNand;
   }
   if ( or_flag ) {
-    return kTgGAteOr;
+    return kTgGateOr;
   }
   if ( nor_flag ) {
     return kTgGateNor;
@@ -130,7 +130,7 @@ check_builtin(const LogExpr& lexp,
     return kTgGateXor;
   }
   if ( xnor_flag ) {
-    return kTgGAteXnor;
+    return kTgGateXnor;
   }
   return kTgGateCplx;
 }

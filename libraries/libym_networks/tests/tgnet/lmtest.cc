@@ -18,35 +18,30 @@ test1(const LogExpr& expr,
 {
   cout << "Registering: " << expr << endl;
   ymuint32 id;
-  tTgNodeType type = lm.reg_logic(expr, id);
+  tTgGateType type = lm.reg_logic(expr, id);
   ymuint ni = expr.input_size();
 
   cout << "  TYPE = ";
   switch ( type ) {
-  case kTgUndef:  cout << "--UNDEF--"; break;
+  case kTgGateConst0: cout << "--CONST0--"; break;
+  case kTgGateConst1: cout << "--CONST1--"; break;
 
-  case kTgInput:  cout << "--INPUT--"; break;
-  case kTgOutput: cout << "--OUTPUT--"; break;
+  case kTgGateBuff:   cout << "--BUFF--"; break;
+  case kTgGateNot:    cout << "--NOT--"; break;
 
-  case kTgConst0: cout << "--CONST0--"; break;
-  case kTgConst1: cout << "--CONST1--"; break;
+  case kTgGateAnd:    cout << "--AND(" << ni << ")--"; break;
 
-  case kTgBuff:   cout << "--BUFF--"; break;
-  case kTgNot:    cout << "--NOT--"; break;
+  case kTgGateNand:   cout << "--NAND(" << ni << ")--"; break;
 
-  case kTgAnd:    cout << "--AND(" << ni << ")--"; break;
+  case kTgGateOr:     cout << "--OR(" << ni << ")--"; break;
 
-  case kTgNand:   cout << "--NAND(" << ni << ")--"; break;
+  case kTgGateNor:    cout << "--NOR(" << ni << ")--"; break;
 
-  case kTgOr:     cout << "--OR(" << ni << ")--"; break;
+  case kTgGateXor:    cout << "--XOR(" << ni << ")--"; break;
 
-  case kTgNor:    cout << "--NOR(" << ni << ")--"; break;
+  case kTgGateXnor:   cout << "--XNOR(" << ni << ")--"; break;
 
-  case kTgXor:    cout << "--XOR(" << ni << ")--"; break;
-
-  case kTgXnor:   cout << "--XNOR(" << ni << ")--"; break;
-
-  case kTgCplx:   cout << "--CPLX#" << id << " (" << ni << ")--"; break;
+  case kTgGateCplx:   cout << "--CPLX#" << id << " (" << ni << ")--"; break;
 
   default:
     cout << "--ERROR--"; break;

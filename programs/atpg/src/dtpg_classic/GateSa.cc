@@ -118,10 +118,10 @@ GateSa0::name() const
   return "GateSa0";
 }
 
-tTgNodeType
+tTgGateType
 GateSa0::gate_type() const
 {
-  return kTgConst0;
+  return kTgGateConst0;
 }
 
 // @brief 名前とゲート型を表す文字列を返す．
@@ -154,10 +154,10 @@ GateSa1::name() const
   return "GateSa1";
 }
 
-tTgNodeType
+tTgGateType
 GateSa1::gate_type() const
 {
-  return kTgConst1;
+  return kTgGateConst1;
 }
 
 // @brief 名前とゲート型を表す文字列を返す．

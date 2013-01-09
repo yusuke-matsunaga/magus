@@ -82,7 +82,7 @@ Fsim2::set_network(const TgNetwork& network,
   // 外部入力に対応する SimNode の生成
   for (ymuint i = 0; i < ni; ++ i) {
     const TgNode* tgnode = mNetwork->input(i);
-    SimNode* node = make_node(kTgInput, vector<SimNode*>());
+    SimNode* node = make_input();
     mSimMap[tgnode->gid()] = node;
     mInputArray[i] = node;
   }
@@ -121,23 +121,23 @@ Fsim2::set_network(const TgNetwork& network,
 	}
 	else if ( np > 1 && nn == 0 ) {
 	  vector<SimNode*> tmp(1, inputs[i]);
-	  SimNode* buf = make_node(kTgBuff, tmp);
+	  SimNode* buf = make_node(kTgGateBuff, tmp);
 	  inputs2[i * 2] = buf;
 	  edge_map.mNode = buf;
 	  edge_map.mPos = 0;
 	}
 	else if ( np == 0 && nn > 0 ) {
 	  vector<SimNode*> tmp(1, inputs[i]);
-	  SimNode* inv = make_node(kTgNot, tmp);
+	  SimNode* inv = make_node(kTgGateNot, tmp);
 	  inputs2[i * 2 + 1] = inv;
 	  edge_map.mNode = inv;
 	  edge_map.mPos = 0;
 	}
 	else if ( np > 0 && nn > 0 ) {
 	  vector<SimNode*> tmp(1, inputs[i]);
-	  SimNode* buf = make_node(kTgBuff, tmp);
+	  SimNode* buf = make_node(kTgGateBuff, tmp);
 	  tmp[0] = buf;
-	  SimNode* inv = make_node(kTgNot, tmp);
+	  SimNode* inv = make_node(kTgGateNot, tmp);
 	  inputs2[i * 2] = buf;
 	  inputs2[i * 2 + 1] = inv;
 	  edge_map.mNode = buf;
@@ -152,7 +152,7 @@ Fsim2::set_network(const TgNetwork& network,
       simnode = make_logic(lexp, inputs2, emap);
     }
     else {
-      tTgNodeType type = tgnode->type();
+      tTgGateType type = tgnode->gate_type();
       simnode = make_node(type, inputs);
       for (ymuint i = 0; i < ni; ++ i) {
 	EdgeMap& edge_map = mEdgeMap[tgnode->gid()][i];
@@ -702,6 +702,16 @@ Fsim2::fault_sweep(SimFFR* ffr,
   }
 }
 
+// @brief 外部入力ノードを作る．
+SimNode*
+Fsim2::make_input()
+{
+  ymuint32 id = mNodeArray.size();
+  SimNode* node = SimNode::new_input(id);
+  mNodeArray.push_back(node);
+  return node;
+}
+
 // @brief logic ノードを作る．
 SimNode*
 Fsim2::make_logic(const LogExpr& lexp,
@@ -728,13 +738,13 @@ Fsim2::make_logic(const LogExpr& lexp,
       tmp[i] = make_logic(lexp.child(i), inputs, emap);
     }
     if ( lexp.is_and() ) {
-      node = make_node(kTgAnd, tmp);
+      node = make_node(kTgGateAnd, tmp);
     }
     else if ( lexp.is_or() ) {
-      node = make_node(kTgOr, tmp);
+      node = make_node(kTgGateOr, tmp);
     }
     else if ( lexp.is_xor() ) {
-      node = make_node(kTgXor, tmp);
+      node = make_node(kTgGateXor, tmp);
     }
     // ちょっとかっこわるい探し方
     ymuint ni = inputs.size() / 2;
@@ -756,15 +766,13 @@ Fsim2::make_logic(const LogExpr& lexp,
 
 // @brief 単純な logic ノードを作る．
 SimNode*
-Fsim2::make_node(tTgNodeType type,
+Fsim2::make_node(tTgGateType type,
 		 const vector<SimNode*>& inputs)
 {
   ymuint32 id = mNodeArray.size();
   SimNode* node = SimNode::new_node(id, type, LogExpr(), inputs);
   mNodeArray.push_back(node);
-  if ( type != kTgInput ) {
-    mLogicArray.push_back(node);
-  }
+  mLogicArray.push_back(node);
   return node;
 }
 

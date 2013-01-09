@@ -65,21 +65,16 @@ AtpgCmd::after_set_network()
   ymuint n_cplx = 0;
   for (ymuint i = 0; i < nlo; ++ i) {
     const TgNode* node = network.logic(i);
-    switch ( node->type() ) {
-    case kTgUndef:
-    case kTgInput:
-    case kTgOutput:
-      break;
-
-    case kTgBuff:
+    switch ( node->gate_type() ) {
+    case kTgGateBuff:
       ++ n_buff;
       break;
 
-    case kTgNot:
+    case kTgGateNot:
       ++ n_not;
       break;
 
-    case kTgAnd:
+    case kTgGateAnd:
       ++ n_and;
       switch ( node->ni() ) {
       case 2: ++ n_and2; break;
@@ -88,7 +83,7 @@ AtpgCmd::after_set_network()
       }
       break;
 
-    case kTgNand:
+    case kTgGateNand:
       ++ n_nand;
       switch ( node->ni() ) {
       case 2: ++ n_nand2; break;
@@ -97,7 +92,7 @@ AtpgCmd::after_set_network()
       }
       break;
 
-    case kTgOr:
+    case kTgGateOr:
       ++ n_or;
       switch ( node->ni() ) {
       case 2: ++ n_or2; break;
@@ -106,7 +101,7 @@ AtpgCmd::after_set_network()
       }
       break;
 
-    case kTgNor:
+    case kTgGateNor:
       ++ n_nor;
       switch ( node->ni() ) {
       case 2: ++ n_nor2; break;
@@ -115,14 +110,14 @@ AtpgCmd::after_set_network()
       }
       break;
 
-    case kTgXor:
+    case kTgGateXor:
       ++ n_xor;
       switch ( node->ni() ) {
       case 2: ++ n_xor2; break;
       }
       break;
 
-    case kTgXnor:
+    case kTgGateXnor:
       ++ n_xnor;
       switch ( node->ni() ) {
       case 2: ++ n_xnor2; break;

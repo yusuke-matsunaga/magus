@@ -42,11 +42,16 @@ public:
 
 public:
 
+  /// @brief 外部入力ノードを生成するクラスメソッド
+  static
+  SimNode*
+  new_input(ymuint32 id);
+
   /// @brief ノードを生成するクラスメソッド
   static
   SimNode*
   new_node(ymuint32 id,
-	   tTgNodeType type,
+	   tTgGateType type,
 	   const LogExpr& lexp,
 	   const vector<SimNode*>& inputs);
 
