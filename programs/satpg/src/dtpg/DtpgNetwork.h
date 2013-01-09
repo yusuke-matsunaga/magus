@@ -133,7 +133,6 @@ private:
   /// @param[in] id ID番号
   void
   set_node(const TgNode* tgnode,
-	   const TgNetwork& tgnetwork,
 	   DtpgNode* node,
 	   ymuint id);
 

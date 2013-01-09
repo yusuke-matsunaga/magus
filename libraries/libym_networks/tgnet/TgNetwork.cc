@@ -13,7 +13,45 @@
 #include "LogicMgr.h"
 
 
+BEGIN_NAMESPACE_YM
+
+//////////////////////////////////////////////////////////////////////
+// tTgGateType
+//////////////////////////////////////////////////////////////////////
+
+// @brief tTgGateType のストリーム出力
+ostream&
+operator<<(ostream& s,
+	   tTgGateType gate_type)
+{
+  switch ( gate_type ) {
+  case kTgGateConst0: s << "CONST0"; break;
+  case kTgGateConst1: s << "CONST1"; break;
+
+  case kTgGateBuff:   s << "BUFF"; break;
+  case kTgGateNot:    s << "NOT"; break;
+
+  case kTgGateAnd:    s << "AND"; break;
+  case kTgGateNand:   s << "NAND"; break;
+
+  case kTgGateOr:     s << "OR"; break;
+  case kTgGateNor:    s << "NOR"; break;
+
+  case kTgGateXor:    s << "XOR"; break;
+  case kTgGateXnor:   s << "XNOR"; break;
+
+  case kTgGateCplx:   s << "CPLX"; break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+  }
+  return s;
+}
+
+END_NAMESPACE_YM
+
 BEGIN_NAMESPACE_YM_NETWORKS_TGNET
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス TgNetwork
@@ -384,7 +422,8 @@ dump(ostream& s,
       s << "\t" << tmp << endl;
     }
     else {
-      s << "\t" << node->gate_type() << endl;
+      tTgGateType gate_type = node->gate_type();
+      s << "\t" << gate_type << endl;
     }
   }
 

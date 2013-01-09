@@ -69,65 +69,10 @@ enum tTgGateType {
   kTgGateCplx   = 10
 };
 
-#if 0
-//////////////////////////////////////////////////////////////////////
-/// @brief TgNode の種類を表す列挙型
-///
-/// 全部で6ビット長
-/// - 上位2ビット [5:4] の値
-///   - 0: 未定義
-///   - 1: 外部入力
-///   - 2: 外部出力
-///   - 3: 論理ノード
-///   を表す．
-/// - 論理ノードの場合は下位4ビット[3:0]の値で論理関数を表す．
-//////////////////////////////////////////////////////////////////////
-enum tTgNodeType {
-  /// @brief 未定義
-  kTgUndef  = 0x00U,
-
-  /// @brief 外部入力
-  kTgInput  = 0x10U,
-
-  /// @brief 外部出力
-  kTgOutput = 0x20U,
-
-  /// @brief 論理ノード
-  kTgLogic  = 0x30U,
-
-  /// @brief 定数0
-  kTgConst0 = kTgLogic | static_cast<ymuint>(kTgGateConst0),
-
-  /// @brief 定数1
-  kTgConst1 = kTgLogic | static_cast<ymuint>(kTgGateConst1),
-
-  /// @brief バッファ
-  kTgBuff   = kTgLogic | static_cast<ymuint>(kTgGateBuff),
-
-  /// @brief NOT ゲート
-  kTgNot    = kTgLogic | static_cast<ymuint>(kTgGateNot),
-  /// @brief AND ゲート
-  kTgAnd    = kTgLogic | static_cast<ymuint>(kTgGateAnd),
-
-  /// @brief NAND ゲート
-  kTgNand   = kTgLogic | static_cast<ymuint>(kTgGateNand),
-
-  /// @brief OR ゲート
-  kTgOr     = kTgLogic | static_cast<ymuint>(kTgGateOr),
-
-  /// @brief NOR ゲート
-  kTgNor    = kTgLogic | static_cast<ymuint>(kTgGateNor),
-
-  /// @brief XOR ゲート
-  kTgXor    = kTgLogic | static_cast<ymuint>(kTgGateXor),
-
-  /// @brief XNOR ゲート
-  kTgXnor   = kTgLogic | static_cast<ymuint>(kTgGateXnor),
-
-  /// @brief 上記以外の複雑なゲート
-  kTgCplx   = kTgLogic | static_cast<ymuint>(kTgGateCplx)
-};
-#endif
+/// @brief tTgGateType のストリーム出力
+ostream&
+operator<<(ostream& s,
+	   tTgGateType gate_type);
 
 END_NAMESPACE_YM
 

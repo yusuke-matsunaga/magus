@@ -138,31 +138,27 @@ make_node_cnf(SatSolver& solver,
 	      Literal output,
 	      const vector<Literal>& inputs)
 {
+  if ( node->is_input() ) {
+    return;
+  }
+
   if ( node->is_cplx_logic() ) {
     make_lexp_cnf(solver, node->expr(), output, inputs);
   }
   else {
     ymuint ni = inputs.size();
-    switch ( node->type() ) {
-    case kTgUndef:
-      assert_not_reached(__FILE__, __LINE__);
-      break;
-
-    case kTgInput:
-      break;
-
-    case kTgOutput:
-    case kTgBuff:
+    switch ( node->gate_type() ) {
+    case kTgGateBuff:
       solver.add_clause( inputs[0], ~output);
       solver.add_clause(~inputs[0],  output);
       break;
 
-    case kTgNot:
+    case kTgGateNot:
       solver.add_clause( inputs[0],  output);
       solver.add_clause(~inputs[0], ~output);
       break;
 
-    case kTgAnd:
+    case kTgGateAnd:
       switch ( ni ) {
       case 2:
 	solver.add_clause(~inputs[0], ~inputs[1], output);
@@ -192,7 +188,7 @@ make_node_cnf(SatSolver& solver,
       }
       break;
 
-    case kTgNand:
+    case kTgGateNand:
       switch ( ni ) {
       case 2:
 	solver.add_clause(~inputs[0], ~inputs[1], ~output);
@@ -222,7 +218,7 @@ make_node_cnf(SatSolver& solver,
       }
       break;
 
-    case kTgOr:
+    case kTgGateOr:
       switch ( ni ) {
       case 2:
 	solver.add_clause(inputs[0], inputs[1], ~output);
@@ -252,7 +248,7 @@ make_node_cnf(SatSolver& solver,
       }
       break;
 
-    case kTgNor:
+    case kTgGateNor:
       switch ( ni ) {
       case 2:
 	solver.add_clause(inputs[0], inputs[1], output);
@@ -282,7 +278,7 @@ make_node_cnf(SatSolver& solver,
       }
       break;
 
-    case kTgXor:
+    case kTgGateXor:
       if ( ni == 2 ) {
 	solver.add_clause(~inputs[0],  inputs[1],  output);
 	solver.add_clause( inputs[0], ~inputs[1],  output);
@@ -314,7 +310,7 @@ make_node_cnf(SatSolver& solver,
       }
       break;
 
-    case kTgXnor:
+    case kTgGateXnor:
       if ( ni == 2 ) {
 	solver.add_clause(~inputs[0],  inputs[1], ~output);
 	solver.add_clause( inputs[0], ~inputs[1], ~output);
@@ -1391,32 +1387,25 @@ DtpgSat::justify(DtpgNode* node)
   node->set_mark3();
   mBwdNodeList.push_back(node);
 
+  if ( node->is_input() ) {
+    // val を記録
+    record_value(node);
+    return;
+  }
+
   Bool3 val = mModel[node->gvar().val()];
   if ( node->is_cplx_logic() ) {
     // 未完
   }
   else {
     ymuint ni = node->fanin_num();
-    switch ( node->type() ) {
-    case kTgUndef:
-      assert_not_reached(__FILE__, __LINE__);
-      break;
-
-    case kTgInput:
-      // val を記録
-      record_value(node);
-      break;
-
-    case kTgOutput:
-      assert_not_reached(__FILE__, __LINE__);
-      break;
-
-    case kTgBuff:
-    case kTgNot:
+    switch ( node->gate_type() ) {
+    case kTgGateBuff:
+    case kTgGateNot:
       justify(node->fanin(0));
       break;
 
-    case kTgAnd:
+    case kTgGateAnd:
        if ( val == kB3True ) {
 	for (ymuint i = 0; i < ni; ++ i) {
 	  DtpgNode* inode = node->fanin(i);
@@ -1438,7 +1427,7 @@ DtpgSat::justify(DtpgNode* node)
       }
       break;
 
-    case kTgNand:
+    case kTgGateNand:
       if ( val == kB3True ) {
 	for (ymuint i = 0; i < ni; ++ i) {
 	  DtpgNode* inode = node->fanin(i);
@@ -1460,7 +1449,7 @@ DtpgSat::justify(DtpgNode* node)
       }
       break;
 
-    case kTgOr:
+    case kTgGateOr:
       if ( val == kB3True ) {
 	for (ymuint i = 0; i < ni; ++ i) {
 	  DtpgNode* inode = node->fanin(i);
@@ -1482,7 +1471,7 @@ DtpgSat::justify(DtpgNode* node)
       }
       break;
 
-    case kTgNor:
+    case kTgGateNor:
       if ( val == kB3True ) {
 	for (ymuint i = 0; i < ni; ++ i) {
 	  DtpgNode* inode = node->fanin(i);
@@ -1504,8 +1493,8 @@ DtpgSat::justify(DtpgNode* node)
       }
       break;
 
-    case kTgXor:
-    case kTgXnor:
+    case kTgGateXor:
+    case kTgGateXnor:
       for (ymuint i = 0; i < ni; ++ i) {
 	DtpgNode* inode = node->fanin(i);
 	if ( !inode->mark2() ) {

@@ -39,9 +39,9 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 未定義タイプの時 true を返す．
-  bool
-  is_undef() const;
+  /// @brief ID番号を得る．
+  ymuint
+  id() const;
 
   /// @brief 外部入力タイプの時 true を返す．
   /// @note FF 出力もここに含まれる．
@@ -65,9 +65,9 @@ public:
   bool
   is_cplx_logic() const;
 
-  /// @brief ID番号を得る．
+  /// @brief cplx_logic タイプのときに関数IDを返す．
   ymuint
-  id() const;
+  func_id() const;
 
   /// @brief 外部入力タイプの時に入力番号を返す．
   ymuint
@@ -226,8 +226,11 @@ private:
   // 入力/出力ノードの場合の通し番号
   ymuint32 mLid;
 
-  // タイプ ID
-  tTgNodeType mGateType;
+  // ノードタイプ＋ゲートタイプ
+  ymuint32 mGateType;
+
+  // 関数ID
+  ymuint32 mFuncId;
 
   // 論理式
   LogExpr mExpr;
@@ -296,7 +299,7 @@ inline
 tTgGateType
 DtpgNode::gate_type() const
 {
-  return mGateType;
+  return static_cast<tTgGateType>((mGateType >> 2) & 15U);
 }
 
 // @brief 外部入力タイプの時 true を返す．
@@ -305,7 +308,7 @@ inline
 bool
 DtpgNode::is_input() const
 {
-  return type() == kTgInput;
+  return (mGateType & 3U) == 1U;
 }
 
 // @brief 外部出力タイプの時 true を返す．
@@ -314,7 +317,7 @@ inline
 bool
 DtpgNode::is_output() const
 {
-  return type() == kTgOutput;
+  return (mGateType & 3U) == 2U;
 }
 
 // @brief logic タイプの時 true を返す．
@@ -322,7 +325,7 @@ inline
 bool
 DtpgNode::is_logic() const
 {
-  return (static_cast<ymuint>(type()) & kTgLogic) == kTgLogic;
+  return (mGateType & 3U) == 3U;
 }
 
 // @brief 組み込み型でない logic タイプの時 true を返す．
@@ -330,7 +333,7 @@ inline
 bool
 DtpgNode::is_cplx_logic() const
 {
-  return type() == kTgCplx;
+  return gate_type() == kTgGateCplx;
 }
 
 // @brief ID番号を得る．
@@ -355,6 +358,14 @@ ymuint
 DtpgNode::output_id() const
 {
   return mLid;
+}
+
+// @brief cplx_logic タイプのときに関数IDを返す．
+inline
+ymuint
+DtpgNode::func_id() const
+{
+  return mFuncId;
 }
 
 // @brief cplx_logic タイプのときに論理式を返す．

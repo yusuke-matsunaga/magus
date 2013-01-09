@@ -21,30 +21,9 @@ test1(const LogExpr& expr,
   tTgGateType type = lm.reg_logic(expr, id);
   ymuint ni = expr.input_size();
 
-  cout << "  TYPE = ";
-  switch ( type ) {
-  case kTgGateConst0: cout << "--CONST0--"; break;
-  case kTgGateConst1: cout << "--CONST1--"; break;
-
-  case kTgGateBuff:   cout << "--BUFF--"; break;
-  case kTgGateNot:    cout << "--NOT--"; break;
-
-  case kTgGateAnd:    cout << "--AND(" << ni << ")--"; break;
-
-  case kTgGateNand:   cout << "--NAND(" << ni << ")--"; break;
-
-  case kTgGateOr:     cout << "--OR(" << ni << ")--"; break;
-
-  case kTgGateNor:    cout << "--NOR(" << ni << ")--"; break;
-
-  case kTgGateXor:    cout << "--XOR(" << ni << ")--"; break;
-
-  case kTgGateXnor:   cout << "--XNOR(" << ni << ")--"; break;
-
-  case kTgGateCplx:   cout << "--CPLX#" << id << " (" << ni << ")--"; break;
-
-  default:
-    cout << "--ERROR--"; break;
+  cout << "  TYPE = " << type << "(" << ni << ")";
+  if ( type == kTgGateCplx ) {
+    cout << ", ID = " << id;
   }
   cout << endl;
 }

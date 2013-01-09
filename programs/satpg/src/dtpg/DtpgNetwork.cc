@@ -94,21 +94,30 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
       const TgNode* tgnode = tgnetwork.input(i);
       DtpgNode* node = &mNodeArray[id];
       mInputArray[i] = node;
-      set_node(tgnode, tgnetwork, node, id);
+      node->mGateType = 1U;
+      node->mLid = tgnode->lid();
+      set_node(tgnode, node, id);
     }
 
     ymuint nl = tgnetwork.logic_num();
     for (ymuint i = 0; i < nl; ++ i, ++ id) {
       const TgNode* tgnode = tgnetwork.sorted_logic(i);
       DtpgNode* node = &mNodeArray[id];
-      set_node(tgnode, tgnetwork, node, id);
+      node->mGateType = 3U | (static_cast<ymuint>(tgnode->gate_type()) << 2);
+      node->mFuncId = tgnode->func_id();
+      if ( tgnode->is_cplx_logic() ) {
+	node->mExpr = tgnetwork.get_lexp(tgnode);
+      }
+      set_node(tgnode, node, id);
     }
 
     for (ymuint i = 0; i < output_num2(); ++ i, ++ id) {
       const TgNode* tgnode = tgnetwork.output(i);
       DtpgNode* node = &mNodeArray[id];
       mOutputArray[i] = node;
-      set_node(tgnode, tgnetwork, node, id);
+      node->mGateType = 2U | (static_cast<ymuint>(kTgGateBuff) << 2);
+      node->mLid = tgnode->lid();
+      set_node(tgnode, node, id);
     }
 
     assert_cond( id == mNodeNum, __FILE__, __LINE__);
@@ -444,18 +453,12 @@ DtpgNetwork::mark_tfo_tfi(DtpgNode* fnode,
 // @param[in] id ID番号
 void
 DtpgNetwork::set_node(const TgNode* tgnode,
-		      const TgNetwork& tgnetwork,
 		      DtpgNode* node,
 		      ymuint id)
 {
   mNodeMap[tgnode->gid()] = node;
-  node->mGateType = tgnode->type();
   node->mId = id;
-  node->mLid = tgnode->lid();
 
-  if ( tgnode->is_cplx_logic() ) {
-    node->mExpr = tgnetwork.get_lexp(tgnode);
-  }
   ymuint ni = tgnode->ni();
   node->mFaninNum = ni;
   node->mFanins = alloc_nodearray(mAlloc, ni);
