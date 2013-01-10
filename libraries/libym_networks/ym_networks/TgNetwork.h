@@ -23,7 +23,6 @@
 
 #include "ym_networks/tgnet.h"
 #include "ym_logic/LogExpr.h"
-#include "ym_utils/UnitAlloc.h"
 #include "ym_utils/SimpleAlloc.h"
 
 
@@ -229,14 +228,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // TgNode の確保用のアロケータ
-  UnitAlloc mNodeAlloc;
-
-  // TgNode のファンイン配列の確保用アロケータ
-  SimpleAlloc mFaninAlloc;
-
-  // TgEdge の確保用のアロケータ
-  SimpleAlloc mEdgeAlloc;
+  // メモリアロケータ
+  SimpleAlloc mAlloc;
 
   // 全ノードの配列
   vector<TgNode*> mNodeArray;

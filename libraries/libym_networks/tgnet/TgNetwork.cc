@@ -59,9 +59,7 @@ BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 // @brief コンストラクタ
 TgNetwork::TgNetwork() :
-  mNodeAlloc(sizeof(TgNode), 1024),
-  mFaninAlloc(4096),
-  mEdgeAlloc(4096),
+  mAlloc(4096),
   mNameHash(new NameHash),
   mLogicMgr(new LogicMgr)
 {
@@ -100,9 +98,7 @@ TgNetwork::clear()
   mNameHash->clear();
   mLogicMgr->clear();
 
-  mNodeAlloc.destroy();
-  mFaninAlloc.destroy();
-  mEdgeAlloc.destroy();
+  mAlloc.destroy();
 }
 
 // @brief 中で使われている論理関数の数を得る．
@@ -133,7 +129,7 @@ TgNode*
 TgNetwork::new_node()
 {
   ymuint32 gid = mNodeArray.size();
-  void* p = mNodeAlloc.get_memory(sizeof(TgNode));
+  void* p = mAlloc.get_memory(sizeof(TgNode));
   TgNode* node = new (p) TgNode(gid);
   mNodeArray.push_back(node);
   return node;
@@ -173,7 +169,7 @@ void
 TgNetwork::set_to_output(TgNode* node)
 {
   ymuint32 lid = mOutputArray.size();
-  void* p = mFaninAlloc.get_memory(sizeof(TgNode*));
+  void* p = mAlloc.get_memory(sizeof(TgNode*));
   node->set_type(lid, TgNode::kOutputType, 1, p);
   mOutputArray.push_back(node);
 }
@@ -227,7 +223,7 @@ TgNetwork::set_to_logic(TgNode* node,
 			ymuint aux_id)
 {
   ymuint32 lid = mLogicArray.size();
-  void* p = mFaninAlloc.get_memory(sizeof(TgNode*) * ni);
+  void* p = mAlloc.get_memory(sizeof(TgNode*) * ni);
   node->set_type(lid, TgNode::kLogicType | (gate_type << 2), ni, p);
   node->mFuncId = aux_id;
   mLogicArray.push_back(node);
@@ -241,7 +237,7 @@ TgNetwork::set_to_ff(TgNode* ffin,
 		     TgNode* ffout)
 {
   ymuint32 lid = mFFOutArray.size();
-  void* p = mFaninAlloc.get_memory(sizeof(TgNode*));
+  void* p = mAlloc.get_memory(sizeof(TgNode*));
   ffin->set_type(lid, TgNode::kOutputType, 1, p);
   ffin->mAltNode = ffout;
   mFFInArray.push_back(ffin);
@@ -297,7 +293,7 @@ TgNetwork::wrap_up()
     TgNode* node = mNodeArray[i];
     ymuint& nfo = node->mFanoutNum;
     if ( nfo > 0 ) {
-      void* p = mEdgeAlloc.get_memory(sizeof(TgEdge) * nfo);
+      void* p = mAlloc.get_memory(sizeof(TgEdge) * nfo);
       node->mFanouts = new (p) TgEdge[nfo];
     }
     nfo = 0;
