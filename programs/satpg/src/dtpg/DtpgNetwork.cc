@@ -106,7 +106,7 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
       node->mGateType = 3U | (static_cast<ymuint>(tgnode->gate_type()) << 2);
       node->mFuncId = tgnode->func_id();
       if ( tgnode->is_cplx_logic() ) {
-	node->mExpr = tgnetwork.get_lexp(tgnode);
+	node->mExpr = tgnetwork.get_lexp(tgnode->func_id());
       }
       set_node(tgnode, node, id);
     }

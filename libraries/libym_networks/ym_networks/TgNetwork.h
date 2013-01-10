@@ -118,15 +118,19 @@ public:
   ymuint
   ff_num() const;
 
-  /// @brief ノードの論理式を取り出す．
-  /// @note node 対象のノード
-  LogExpr
-  get_lexp(const TgNode* node) const;
+  /// @brief 中で使われている論理関数の数を得る．
+  ymuint
+  func_num() const;
 
-  /// @brief ノードの論理式を取り出す．
-  /// @note node 対象のノード
+  /// @brief 関数を取り出す．
+  /// @note param[in] id 関数番号 ( 0 <= id < func_num() )
   const TvFunc&
-  get_func(const TgNode* node) const;
+  get_func(ymuint id) const;
+
+  /// @brief 関数の論理式を取り出す．
+  /// @note param[in] id 関数番号 ( 0 <= id < func_num() )
+  LogExpr
+  get_lexp(ymuint id) const;
 
 
 public:

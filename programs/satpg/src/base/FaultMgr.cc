@@ -228,7 +228,7 @@ FaultMgr::reg_faults(const TgNode* node)
 
   case kTgGateCplx:
     {
-      LogExpr ofunc = mNetwork->get_lexp(node);
+      LogExpr ofunc = mNetwork->get_lexp(node->func_id());
       for (ymuint j = 0; j < ni; ++ j) {
 	LogExpr tmp = ofunc.compose(VarId(j), LogExpr::make_zero());
 	SaFault* rep = NULL;

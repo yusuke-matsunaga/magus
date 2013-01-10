@@ -266,7 +266,7 @@ make_node_cnf(SatSolver& solver,
 	      const vector<Literal>& inputs)
 {
   if ( node->is_cplx_logic() ) {
-    LogExpr lexp = network.get_lexp(node);
+    LogExpr lexp = network.get_lexp(node->func_id());
     make_cnf_from_lexp(solver, lexp, output, inputs);
   }
   else {

@@ -385,8 +385,8 @@ Fsim::after_set_network(const TgNetwork& network,
     SimNode* simnode = NULL;
     mEdgeMap[tgnode->gid()].resize(ni);
     if ( tgnode->is_cplx_logic() ) {
+      LogExpr lexp = mNetwork->get_lexp(tgnode->func_id());
       vector<SimNode*> inputs2(ni * 2);
-      LogExpr lexp = mNetwork->get_lexp(tgnode);
       vector<EdgeMap*> emap(ni, NULL);
       for (ymuint i = 0; i < ni; ++ i) {
 	// 各変数の使われ方をチェック

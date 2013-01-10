@@ -105,19 +105,27 @@ TgNetwork::clear()
   mEdgeAlloc.destroy();
 }
 
-// @brief node の論理式を取り出す．
-LogExpr
-TgNetwork::get_lexp(const TgNode* node) const
+// @brief 中で使われている論理関数の数を得る．
+ymuint
+TgNetwork::func_num() const
 {
-  return mLogicMgr->get_expr(node->mTypeId);
+  return mLogicMgr->logic_num();
 }
 
-// @brief ノードの論理式を取り出す．
-// @note node 対象のノード
+// @brief 関数を取り出す．
+// @note param[in] id 関数番号 ( 0 <= id < func_num() )
 const TvFunc&
-TgNetwork::get_func(const TgNode* node) const
+TgNetwork::get_func(ymuint id) const
 {
-  return mLogicMgr->get_func(node->mTypeId);
+  return mLogicMgr->get_func(id);
+}
+
+// @brief 関数の論理式を取り出す．
+// @note param[in] id 関数番号 ( 0 <= id < func_num() )
+LogExpr
+TgNetwork::get_lexp(ymuint id) const
+{
+  return mLogicMgr->get_expr(id);
 }
 
 // @brief 新しいノードを生成する．
@@ -416,15 +424,11 @@ dump(ostream& s,
   for (ymuint i = 0; i < nlo; ++ i) {
     const TgNode* node = network.logic(i);
     dump_node(s, node);
-    s << ": ni = " << node->ni() << endl;
+    s << ": " << node->gate_type();
     if ( node->is_cplx_logic() ) {
-      LogExpr tmp = network.get_lexp(node);
-      s << "\t" << tmp << endl;
+      s << "#" << node->func_id();
     }
-    else {
-      tTgGateType gate_type = node->gate_type();
-      s << "\t" << gate_type << endl;
-    }
+    s << "(" << node->ni() << ")" << endl;
   }
 
   s << endl
@@ -442,6 +446,15 @@ dump(ostream& s,
       s << endl;
     }
   }
+
+  s << endl
+    << "Functions" << endl;
+  ymuint nf = network.func_num();
+  for (ymuint i = 0; i < nf; ++ i) {
+    LogExpr expr = network.get_lexp(i);
+    s << "Func#" << i << ": " << expr << endl;
+  }
+
   s << "=====<TgNework Dump End>=====" << endl;
 }
 
