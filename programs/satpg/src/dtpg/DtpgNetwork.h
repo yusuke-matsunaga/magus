@@ -140,12 +140,10 @@ private:
   void
   activate_sub(const vector<bool>& mark);
 
-#if 0
-  /// @brief ゲート型からカバーを作る．
-  /// @param[in] gate_type ゲート型
+  /// @brief 最小項のリストからプライムカバーを作る．
   DtpgCover*
-  gate_to_cover(tTgGateType gate_type);
-#endif
+  prime_cover(ymuint ni,
+	      const vector<ymuint32>& minterm_list);
 
 
 private:
@@ -155,9 +153,6 @@ private:
 
   // DtpgNetwork 関係のメモリ確保を行なうオブジェクト
   SimpleAlloc mAlloc;
-
-  // ゲート型をキーとしてカバーを格納する配列
-  vector<DtpgCover*> mCoverList;
 
   // 全ノード数
   ymuint32 mNodeNum;
@@ -183,7 +178,7 @@ private:
   // 外部出力ノードの配列
   DtpgNode** mOutputArray;
 
-  // TFO サイズの降順に整列した外部出力ノードの配列
+  // TFI サイズの降順に整列した外部出力ノードの配列
   DtpgNode** mOutputArray2;
 
   // アクティブなノード数
@@ -191,6 +186,13 @@ private:
 
   // アクティブなノードの配列
   DtpgNode** mActNodeArray;
+
+  // 関数の個数
+  ymuint32 mFuncNum;
+
+  // 関数番号をキーとしてプライムカバーを格納する配列
+  // ただし，肯定と否定の２つづつ格納する．
+  DtpgCover** mCoverList;
 
   // 故障の本体の配列
   DtpgFault* mFaultChunk;

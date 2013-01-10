@@ -11,8 +11,10 @@
 #include "DtpgNode.h"
 #include "DtpgFFR.h"
 #include "DtpgFault.h"
+#include "DtpgCover.h"
 #include "ym_networks/TgNetwork.h"
 #include "ym_networks/TgNode.h"
+#include "ym_logic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
@@ -104,11 +106,13 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
       const TgNode* tgnode = tgnetwork.sorted_logic(i);
       DtpgNode* node = &mNodeArray[id];
       node->mGateType = 3U | (static_cast<ymuint>(tgnode->gate_type()) << 2);
-      node->mFuncId = tgnode->func_id();
-      if ( tgnode->is_cplx_logic() ) {
-	node->mExpr = tgnetwork.get_lexp(tgnode->func_id());
-      }
       set_node(tgnode, node, id);
+      if ( tgnode->is_cplx_logic() ) {
+	ymuint fid = tgnode->func_id();
+	node->mOnSet = mCoverList[fid * 2 + 0];
+	node->mOffSet = mCoverList[fid * 2 + 1];
+	node->mExpr = tgnetwork.get_lexp(fid);
+      }
     }
 
     for (ymuint i = 0; i < output_num2(); ++ i, ++ id) {
@@ -183,6 +187,36 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
   sort(tmp_list.begin(), tmp_list.end(), Lt());
   for (ymuint i = 0; i < output_num2(); ++ i) {
     mOutputArray2[i] = mOutputArray[tmp_list[i].second];
+  }
+
+  // 各関数のカバーを作る．
+  ymuint nfunc = tgnetwork.func_num();
+  mFuncNum = nfunc;
+  {
+    void* p = mAlloc.get_memory(sizeof(DtpgCover*) * nfunc * 2);
+    mCoverList = new (p) DtpgCover*[nfunc * 2];
+  }
+  for (ymuint i = 0; i < nfunc; ++ i) {
+    const TvFunc& f = tgnetwork.get_func(i);
+    ymuint ni = f.ni();
+    if ( ni > 20 ) {
+      // ちょっと乱暴
+      cerr << "Too many inputs (" << ni << ")" << endl;
+      abort();
+    }
+    vector<ymuint32> onset;
+    vector<ymuint32> offset;
+    ymuint32 nip = 1U << ni;
+    for (ymuint32 p = 0; p < nip; ++ p) {
+      if ( f.value(p) ) {
+	onset.push_back(p);
+      }
+      else {
+	offset.push_back(p);
+      }
+    }
+    mCoverList[i * 2 + 0] = prime_cover(ni, onset);
+    mCoverList[i * 2 + 1] = prime_cover(ni, offset);
   }
 }
 
@@ -489,16 +523,44 @@ DtpgNetwork::set_node(const TgNode* tgnode,
   node->mMarks = 0U;
 }
 
-#if 0
-// @brief ゲート型からカバーを作る．
-// @param[in] gate_type ゲート型
+extern
+void
+prime_gen(ymuint ni,
+	  const vector<ymuint32>& minterm_list,
+	  vector<vector<Literal> >& cover);
+
+
+// @brief 最小項のリストからプライムカバーを作る．
 DtpgCover*
-DtpgNetwork::gate_to_cover(tTgGateType gate_type)
+DtpgNetwork::prime_cover(ymuint ni,
+			 const vector<ymuint32>& minterm_list)
 {
-#if 0
-  LogExpr expr =;
-#endif
+  vector<vector<Literal> > tmp_cover;
+  prime_gen(ni, minterm_list, tmp_cover);
+
+  void* p = mAlloc.get_memory(sizeof(DtpgCover));
+  DtpgCover* cover = new (p) DtpgCover;
+  ymuint nc = tmp_cover.size();
+  cover->mCubeNum = nc;
+
+  void* q = mAlloc.get_memory(sizeof(DtpgCube) * nc);
+  cover->mCubeArray = new (q) DtpgCube[nc];
+
+  for (ymuint i = 0; i < nc; ++ i) {
+    const vector<Literal>& tmp_cube = tmp_cover[i];
+    DtpgCube& cube = cover->mCubeArray[i];
+    ymuint nl = tmp_cube.size();
+    cube.mLitNum = nl;
+
+    void* r = mAlloc.get_memory(sizeof(Literal) * nl);
+    cube.mLitArray = new (r) Literal[nl];
+    for (ymuint j = 0; j < nl; ++ j) {
+      cube.mLitArray[j] = tmp_cube[j];
+    }
+  }
+
+  return cover;
 }
-#endif
+
 
 END_NAMESPACE_YM_SATPG_DTPG

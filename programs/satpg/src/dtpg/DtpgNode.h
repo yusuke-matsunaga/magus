@@ -61,13 +61,17 @@ public:
   tTgGateType
   gate_type() const;
 
-  /// @brief 組み込み型でない logic タイプの時 true を返す．
+  /// @brief 組み込み型でない logic タイプ (cplx_logic タイプ)の時 true を返す．
   bool
   is_cplx_logic() const;
 
-  /// @brief cplx_logic タイプのときに関数IDを返す．
-  ymuint
-  func_id() const;
+  /// @brief cplx_logic タイプのときにオンセットカバーを返す．
+  DtpgCover*
+  onset_cover() const;
+
+  /// @brief cplx_logic タイプのときにオフセットカバーを返す．
+  DtpgCover*
+  offset_cover() const;
 
   /// @brief 外部入力タイプの時に入力番号を返す．
   ymuint
@@ -229,8 +233,11 @@ private:
   // ノードタイプ＋ゲートタイプ
   ymuint32 mGateType;
 
-  // 関数ID
-  ymuint32 mFuncId;
+  // オンセットプライムカバー
+  DtpgCover* mOnSet;
+
+  // オフセットプライムカバー
+  DtpgCover* mOffSet;
 
   // 論理式
   LogExpr mExpr;
@@ -336,6 +343,22 @@ DtpgNode::is_cplx_logic() const
   return gate_type() == kTgGateCplx;
 }
 
+// @brief cplx_logic タイプのときにオンセットカバーを返す．
+inline
+DtpgCover*
+DtpgNode::onset_cover() const
+{
+  return mOnSet;
+}
+
+// @brief cplx_logic タイプのときにオフセットカバーを返す．
+inline
+DtpgCover*
+DtpgNode::offset_cover() const
+{
+  return mOffSet;
+}
+
 // @brief ID番号を得る．
 inline
 ymuint
@@ -358,14 +381,6 @@ ymuint
 DtpgNode::output_id() const
 {
   return mLid;
-}
-
-// @brief cplx_logic タイプのときに関数IDを返す．
-inline
-ymuint
-DtpgNode::func_id() const
-{
-  return mFuncId;
 }
 
 // @brief cplx_logic タイプのときに論理式を返す．

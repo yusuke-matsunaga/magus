@@ -10,6 +10,7 @@
 
 
 #include "dtpg_nsdef.h"
+#include "ym_logic/Literal.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
