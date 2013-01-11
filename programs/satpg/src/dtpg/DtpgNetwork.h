@@ -12,6 +12,7 @@
 #include "dtpg_nsdef.h"
 #include "SaFault.h"
 #include "ym_networks/tgnet.h"
+#include "ym_logic/LogExpr.h"
 #include "ym_utils/SimpleAlloc.h"
 
 
@@ -20,6 +21,15 @@ BEGIN_NAMESPACE_YM_SATPG_DTPG
 //////////////////////////////////////////////////////////////////////
 /// @class DtpgNetwork DtpgNetwork.h "DtpgNetwork.h"
 /// @brief DtpgSat 用のネットワークを表すクラス
+///
+/// わかりにくいがここでは「ゲート」と「ノード」を区別して使う．
+/// - ゲートは TgNode に対応するもの．入力と出力に故障を仮定する．
+/// - ノードは単純な論理関数に対応するもの．通常はノードとゲート
+///   は一致するが，複雑な論理式を持つゲートの場合は複数のノード
+///   で構成されることになる．
+/// 故障を考える場合にはゲート単位が好ましいが，パタン生成や故障
+/// シミュレーションを行う場合には単純なノードのほうがわかりやすい
+/// のでこのような構成になっている．
 //////////////////////////////////////////////////////////////////////
 class DtpgNetwork
 {
@@ -127,24 +137,40 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief DtpgNode の内容を設定する．
-  /// @param[in] tgnode もととなる TgNode
-  /// @param[in] node 対象のノード
-  /// @param[in] id ID番号
+  /// @brief 論理式から DtpgNode を作る．
+  /// @param[in] expr 論理式
+  /// @param[in] tgnode 元のノード (ファンインの情報を得るために必要)
+  DtpgNode*
+  make_node_tree(const LogExpr& expr,
+		 const TgNode* tgnode);
+
+  /// @brief 新しいノードを確保する．
+  /// @param[in] ni 入力数
+  /// @note 実際には mNodeArray はすでに確保済なのでポインタを返すだけ．
+  /// @note 結果 mNodeNum の値が一つ増える．
+  /// @note DtptNode は適切に初期化される．
+  DtpgNode*
+  new_node(ymuint ni);
+
+  /// @brief DtpgGate の設定を行う．
+  /// @param[in] gate DtpgGate
+  /// @param[in] root 根のノード
+  /// @param[in] ni 入力数
   void
-  set_node(const TgNode* tgnode,
-	   DtpgNode* node,
-	   ymuint id);
+  set_gate(DtpgGate* gate,
+	   DtpgNode* root,
+	   ymuint ni);
 
   /// @brief activate_po(), activate_all() の下請け関数
   void
   activate_sub(const vector<bool>& mark);
 
+#if 0
   /// @brief 最小項のリストからプライムカバーを作る．
   DtpgCover*
   prime_cover(ymuint ni,
 	      const vector<ymuint32>& minterm_list);
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -153,6 +179,9 @@ private:
 
   // DtpgNetwork 関係のメモリ確保を行なうオブジェクト
   SimpleAlloc mAlloc;
+
+  // 全ゲート数
+  ymuint32 mGateNum;
 
   // 全ノード数
   ymuint32 mNodeNum;
@@ -166,11 +195,11 @@ private:
   // FF数
   ymuint32 mFFNum;
 
+  // ゲートの本体の配列
+  DtpgGate* mGateArray;
+
   // ノードの本体の配列
   DtpgNode* mNodeArray;
-
-  // TgNode->gid() をキーにしたノードの配列
-  DtpgNode** mNodeMap;
 
   // 外部入力ノードの配列
   DtpgNode** mInputArray;
@@ -187,12 +216,14 @@ private:
   // アクティブなノードの配列
   DtpgNode** mActNodeArray;
 
+#if 0
   // 関数の個数
   ymuint32 mFuncNum;
 
   // 関数番号をキーとしてプライムカバーを格納する配列
   // ただし，肯定と否定の２つづつ格納する．
   DtpgCover** mCoverList;
+#endif
 
   // 故障の本体の配列
   DtpgFault* mFaultChunk;

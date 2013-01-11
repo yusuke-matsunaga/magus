@@ -10,6 +10,7 @@
 #include "DtpgSat.h"
 #include "DtpgNetwork.h"
 #include "DtpgNode.h"
+#include "DtpgGate.h"
 #include "DtpgFFR.h"
 #include "DtpgFault.h"
 #include "DtpgOperator.h"
@@ -142,10 +143,12 @@ make_node_cnf(SatSolver& solver,
     return;
   }
 
+#if 0
   if ( node->is_cplx_logic() ) {
     make_lexp_cnf(solver, node->expr(), output, inputs);
   }
   else {
+#endif
     ymuint ni = inputs.size();
     switch ( node->gate_type() ) {
     case kTgGateBuff:
@@ -346,7 +349,9 @@ make_node_cnf(SatSolver& solver,
       assert_not_reached(__FILE__, __LINE__);
       break;
     }
+#if 0
   }
+#endif
 }
 
 // @brief 入力に故障を持つノードの CNF を作る．
@@ -580,27 +585,31 @@ DtpgSat::single_sub(DtpgOperator& op)
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
     DtpgNode* node = mNetwork->active_node(i);
+    DtpgGate* gate = node->gate_info();
+    if ( gate == NULL ) {
+      continue;
+    }
 
     // 出力の故障
-    DtpgFault* f0 = node->output_fault(0);
+    DtpgFault* f0 = gate->output_fault(0);
     if ( f0 != NULL && !f0->is_skip() ) {
       dtpg_single(f0, op);
     }
 
-    DtpgFault* f1 = node->output_fault(1);
+    DtpgFault* f1 = gate->output_fault(1);
     if ( f1 != NULL && !f1->is_skip() ) {
       dtpg_single(f1, op);
     }
 
     // 入力の故障
-    ymuint ni = node->fanin_num();
+    ymuint ni = gate->input_num();
     for (ymuint j = 0; j < ni; ++ j) {
-      DtpgFault* f0 = node->input_fault(0, j);
+      DtpgFault* f0 = gate->input_fault(0, j);
       if ( f0 != NULL && !f0->is_skip() ) {
 	dtpg_single(f0, op);
       }
 
-      DtpgFault* f1 = node->input_fault(1, j);
+      DtpgFault* f1 = gate->input_fault(1, j);
       if ( f1 != NULL && !f1->is_skip() ) {
 	dtpg_single(f1, op);
       }
@@ -615,10 +624,14 @@ DtpgSat::dual_sub(DtpgOperator& op)
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
     DtpgNode* node = mNetwork->active_node(i);
+    DtpgGate* gate = node->gate_info();
+    if ( gate == NULL ) {
+      continue;
+    }
 
     // 出力の故障
-    DtpgFault* f0 = node->output_fault(0);
-    DtpgFault* f1 = node->output_fault(1);
+    DtpgFault* f0 = gate->output_fault(0);
+    DtpgFault* f1 = gate->output_fault(1);
     if ( f0 != NULL && f0->is_skip() ) {
       f0 = NULL;
     }
@@ -636,10 +649,10 @@ DtpgSat::dual_sub(DtpgOperator& op)
     }
 
     // 入力の故障
-    ymuint ni = node->fanin_num();
+    ymuint ni = gate->input_num();
     for (ymuint j = 0; j < ni; ++ j) {
-      DtpgFault* f0 = node->input_fault(0, j);
-      DtpgFault* f1 = node->input_fault(1, j);
+      DtpgFault* f0 = gate->input_fault(0, j);
+      DtpgFault* f1 = gate->input_fault(1, j);
       if ( f0 != NULL && f0->is_skip() ) {
 	f0 = NULL;
       }
@@ -702,16 +715,22 @@ DtpgSat::all_sub(DtpgOperator& op)
     if ( node->is_output() ) {
       onode = node;
     }
+
+    DtpgGate* gate = node->gate_info();
+    if ( gate == NULL ) {
+      continue;
+    }
+
     for (int val = 0; val < 2; ++ val) {
-      DtpgFault* f = node->output_fault(val);
+      DtpgFault* f = gate->output_fault(val);
       if ( f != NULL && !f->is_skip() ) {
 	flist.push_back(f);
       }
     }
-    ymuint ni = node->fanin_num();
+    ymuint ni = gate->input_num();
     for (ymuint i = 0; i < ni; ++ i) {
       for (int val = 0; val < 2; ++ val) {
-	DtpgFault* f = node->input_fault(val, i);
+	DtpgFault* f = gate->input_fault(val, i);
 	if ( f != NULL && !f->is_skip() ) {
 	  flist.push_back(f);
 	}
@@ -736,16 +755,22 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
   for (vector<DtpgNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     DtpgNode* node = *p;
+
+    DtpgGate* gate = node->gate_info();
+    if ( gate == NULL ) {
+      continue;
+    }
+
     for (int val = 0; val < 2; ++ val) {
-      DtpgFault* f = node->output_fault(val);
+      DtpgFault* f = gate->output_fault(val);
       if ( f != NULL && !f->is_skip() ) {
 	flist.push_back(f);
       }
     }
-    ymuint ni = node->fanin_num();
+    ymuint ni = gate->input_num();
     for (ymuint i = 0; i < ni; ++ i) {
       for (int val = 0; val < 2; ++ val) {
-	DtpgFault* f = node->input_fault(val, i);
+	DtpgFault* f = gate->input_fault(val, i);
 	if ( f != NULL && !f->is_skip() ) {
 	  flist.push_back(f);
 	}
@@ -974,6 +999,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
       else {
 	fvar = inode->gvar();
       }
+#if 0
       for (ymint val = 0; val < 2; ++ val) {
 	DtpgFault* f = node->input_fault(val, i);
 	if ( f == NULL ) {
@@ -985,10 +1011,12 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	  fvar = tmp_var[fid];
 	}
       }
+#endif
       inputs[i] = Literal(fvar, kPolPosi);
     }
 
     VarId tmp_ovar = node->fvar();
+#if 0
     for (ymint val = 0; val < 2; ++ val) {
       DtpgFault* f = node->output_fault(val);
       if ( f == NULL ) {
@@ -1000,6 +1028,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	tmp_ovar = tmp_var[fid];
       }
     }
+#endif
 
     Literal glit(node->gvar(), kPolPosi);
     Literal olit(tmp_ovar, kPolPosi);
@@ -1023,6 +1052,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	if ( inode->has_fvar() ) {
 	  dep.push_back(Literal(inode->dvar(), kPolPosi));
 	}
+#if 0
 	DtpgFault* fi0 = node->input_fault(0, j);
 	if ( fi0 != NULL ) {
 	  ymuint fid = fi0->tmp_id();
@@ -1038,8 +1068,10 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	    dep.push_back(Literal(flt_var[fid], kPolPosi));
 	  }
 	}
+#endif
       }
 
+#if 0
       DtpgFault* fo0 = node->output_fault(0);
       if ( fo0 != NULL ) {
 	ymuint fid = fo0->tmp_id();
@@ -1055,6 +1087,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	  dep.push_back(Literal(flt_var[fid], kPolPosi));
 	}
       }
+#endif
 
       solver.add_clause(dep);
     }

@@ -9,6 +9,7 @@
 
 #include "DtpgNetwork.h"
 #include "DtpgNode.h"
+#include "DtpgGate.h"
 #include "DtpgFFR.h"
 #include "DtpgFault.h"
 #include "DtpgCover.h"
@@ -70,17 +71,47 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
 			 const vector<SaFault*>& fault_list) :
   mAlloc(4096)
 {
-  mNodeNum = tgnetwork.node_num();
   mInputNum = tgnetwork.input_num1();
   mOutputNum = tgnetwork.output_num1();
   mFFNum = tgnetwork.ff_num();
 
+  mGateNum = tgnetwork.node_num();
   {
-    void* p = mAlloc.get_memory(sizeof(DtpgNode) * mNodeNum);
-    mNodeArray = new (p) DtpgNode[mNodeNum];
+    void* p = mAlloc.get_memory(sizeof(DtpgGate) * mGateNum);
+    mGateArray = new (p) DtpgGate[mGateNum];
   }
 
-  mNodeMap = alloc_nodearray(mAlloc, mNodeNum);
+  // DtpgNode の必要ノード数を計算する．
+  ymuint node_num = 0;
+  for (ymuint i = 0; i < mGateNum; ++ i) {
+    const TgNode* tgnode = tgnetwork.node(i);
+    if ( tgnode->is_cplx_logic() ) {
+      // 論理式から必要なノード数を見積もる．
+      LogExpr lexp = tgnetwork.get_lexp(tgnode->func_id());
+      // 基本は全リテラル数 - 1
+      node_num += lexp.litnum() - 1;
+      ymuint n = lexp.input_size();
+      // ただし否定のリテラルは NOT ゲートが必要となる．
+      for (ymuint i = 0; i < n; ++ i) {
+	node_num += lexp.litnum(VarId(i), kPolNega);
+      }
+    }
+    else {
+      // 外部入力，外部出力，単純な論理ノードは1対1に対応する．
+      ++ node_num;
+    }
+  }
+
+
+  //////////////////////////////////////////////////////////////////////
+  // いくつかの配列用のメモリ領域を確保する．
+  //////////////////////////////////////////////////////////////////////
+  { // これは DtpgNode そのものの配列なので alloc_nodearray() は使えない．
+    void* p = mAlloc.get_memory(sizeof(DtpgNode) * node_num);
+    mNodeArray = new (p) DtpgNode[node_num];
+    mNodeNum = 0;
+  }
+
   mInputArray = alloc_nodearray(mAlloc, input_num2());
   mOutputArray = alloc_nodearray(mAlloc, output_num2());
   mOutputArray2 = alloc_nodearray(mAlloc, output_num2());
@@ -88,59 +119,115 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
   mActNodeNum = 0;
   mActNodeArray = alloc_nodearray(mAlloc, mNodeNum);
 
-  { // TgNode を DtpgNode にコピーする．
-    // ただし mNodeArray は入力からのトポロジカル順になる．
-    ymuint id = 0;
 
-    for (ymuint i = 0; i < input_num2(); ++ i, ++ id) {
-      const TgNode* tgnode = tgnetwork.input(i);
-      DtpgNode* node = &mNodeArray[id];
-      mInputArray[i] = node;
-      node->mGateType = 1U;
-      node->mLid = tgnode->lid();
-      set_node(tgnode, node, id);
+  //////////////////////////////////////////////////////////////////////
+  // 外部入力をコピーする．
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < input_num2(); ++ i) {
+    const TgNode* tgnode = tgnetwork.input(i);
+
+    DtpgNode* node = new_node(0);
+    node->mGateType = 1U;
+    node->mLid = tgnode->lid();
+
+    mInputArray[i] = node;
+
+    DtpgGate* gate = &mGateArray[tgnode->gid()];
+    set_gate(gate, node, 0);
+  }
+
+
+  //////////////////////////////////////////////////////////////////////
+  // 論理ノードをコピーする．
+  // ただし mNodeArray には入力からのトポロジカル順にノードを格納する．
+  //////////////////////////////////////////////////////////////////////
+  ymuint nl = tgnetwork.logic_num();
+  for (ymuint i = 0; i < nl; ++ i) {
+    const TgNode* tgnode = tgnetwork.sorted_logic(i);
+    ymuint ni = tgnode->ni();
+    DtpgNode* node = NULL;
+    if ( tgnode->is_cplx_logic() ) {
+      LogExpr lexp = tgnetwork.get_lexp(tgnode->func_id());
+      node = make_node_tree(lexp, tgnode);
     }
+    else {
+      DtpgNode* node = new_node(ni);
 
-    ymuint nl = tgnetwork.logic_num();
-    for (ymuint i = 0; i < nl; ++ i, ++ id) {
-      const TgNode* tgnode = tgnetwork.sorted_logic(i);
-      DtpgNode* node = &mNodeArray[id];
       node->mGateType = 3U | (static_cast<ymuint>(tgnode->gate_type()) << 2);
-      set_node(tgnode, node, id);
-      if ( tgnode->is_cplx_logic() ) {
-	ymuint fid = tgnode->func_id();
-	node->mOnSet = mCoverList[fid * 2 + 0];
-	node->mOffSet = mCoverList[fid * 2 + 1];
-	node->mExpr = tgnetwork.get_lexp(fid);
+
+      for (ymuint i = 0; i < ni; ++ i) {
+	const TgNode* itgnode = tgnode->fanin(i);
+	DtpgNode* inode = mGateArray[itgnode->gid()].root_node();
+	node->mFanins[i] = inode;
       }
     }
 
-    for (ymuint i = 0; i < output_num2(); ++ i, ++ id) {
-      const TgNode* tgnode = tgnetwork.output(i);
-      DtpgNode* node = &mNodeArray[id];
-      mOutputArray[i] = node;
-      node->mGateType = 2U | (static_cast<ymuint>(kTgGateBuff) << 2);
-      node->mLid = tgnode->lid();
-      set_node(tgnode, node, id);
-    }
-
-    assert_cond( id == mNodeNum, __FILE__, __LINE__);
+    DtpgGate* gate = &mGateArray[tgnode->gid()];
+    set_gate(gate, node, ni);
   }
 
-  // ファンアウトの情報をコピーする．
-  ymuint n = tgnetwork.node_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    const TgNode* tgnode = tgnetwork.node(i);
-    ymuint nfo = tgnode->fanout_num();
-    DtpgNode* node = mNodeMap[tgnode->gid()];
-    for (ymuint i = 0; i < nfo; ++ i) {
-      const TgNode* otgnode = tgnode->fanout(i);
-      DtpgNode* onode = mNodeMap[otgnode->gid()];
-      node->mFanouts[i] = onode;
+
+  //////////////////////////////////////////////////////////////////////
+  // 外部出力をコピーする．
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < output_num2(); ++ i) {
+    const TgNode* tgnode = tgnetwork.output(i);
+
+    DtpgNode* node = new_node(1);
+    node->mGateType = 2U;
+    node->mLid = tgnode->lid();
+
+    const TgNode* itgnode = tgnode->fanin(0);
+    DtpgNode* inode = mGateArray[itgnode->gid()].root_node();
+    node->mFanins[0] = inode;
+
+    mOutputArray[i] = node;
+
+    DtpgGate* gate = &mGateArray[tgnode->gid()];
+    gate->mRoot = node;
+    set_gate(gate, node, 1);
+  }
+
+  assert_cond( mNodeNum == node_num, __FILE__, __LINE__);
+
+
+  //////////////////////////////////////////////////////////////////////
+  // ファンアウトの情報を設定する．
+  //////////////////////////////////////////////////////////////////////
+
+  // Phase-1: 各ノードのファンアウト数を数える．
+  for (ymuint i = 0; i < mNodeNum; ++ i) {
+    DtpgNode* node = &mNodeArray[i];
+    ymuint ni = node->fanin_num();
+    for (ymuint j = 0; j < ni; ++ j) {
+      DtpgNode* inode = node->fanin(j);
+      ++ inode->mFanoutNum;
     }
   }
 
+  // Phase-2: 各ノードのファンアウト用の配列を確保する．
+  for (ymuint i = 0; i < mNodeNum; ++ i) {
+    DtpgNode* node = &mNodeArray[i];
+    node->mFanouts = alloc_nodearray(mAlloc, node->mFanoutNum);
+    node->mActFanouts = alloc_nodearray(mAlloc, node->mFanoutNum);
+    node->mFanoutNum = 0;
+  }
+
+  // Phase-3: 各ノードのファンアウト情報を設定する．
+  for (ymuint i = 0; i < mNodeNum; ++ i) {
+    DtpgNode* node = &mNodeArray[i];
+    ymuint ni = node->fanin_num();
+    for (ymuint j = 0; j < ni; ++ j) {
+      DtpgNode* inode = node->fanin(j);
+      inode->mFanouts[inode->mFanoutNum] = node;
+      ++ inode->mFanoutNum;
+    }
+  }
+
+#if 0
+  //////////////////////////////////////////////////////////////////////
   // 故障リストを作る．
+  //////////////////////////////////////////////////////////////////////
   ymuint nf = fault_list.size();
   void* p = mAlloc.get_memory(sizeof(DtpgFault) * nf);
   mFaultChunk = new (p) DtpgFault[nf];
@@ -152,7 +239,7 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
     df->mSaFault = f;
     df->mId = i;
     const TgNode* tgnode = f->node();
-    DtpgNode* node = mNodeMap[tgnode->gid()];
+    DtpgNode* node = mGateArray[tgnode->gid()].root_node();
     df->mNode = node;
     int fval = f->val();
     assert_cond( fval == 0 || fval == 1, __FILE__, __LINE__);
@@ -169,6 +256,8 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
       node->mOutputFault[fval] = df;
     }
   }
+#endif
+
   activate_all();
 
   // TFI のサイズの昇順に出力を並べ替える．
@@ -189,6 +278,7 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
     mOutputArray2[i] = mOutputArray[tmp_list[i].second];
   }
 
+#if 0
   // 各関数のカバーを作る．
   ymuint nfunc = tgnetwork.func_num();
   mFuncNum = nfunc;
@@ -218,6 +308,7 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
     mCoverList[i * 2 + 0] = prime_cover(ni, onset);
     mCoverList[i * 2 + 1] = prime_cover(ni, offset);
   }
+#endif
 }
 
 // @brief デストラクタ
@@ -345,7 +436,7 @@ DtpgNetwork::activate_sub(const vector<bool>& mark)
 DtpgNode*
 DtpgNetwork::node(ymuint pos)
 {
-  // アドレス計算のために DtpgNode の定義が必要なのでここに置く．
+  // アドレス計算のために DtpgNode の定義が必要なのでインライン関数にしないでここに置く．
   assert_cond( pos < mNodeNum, __FILE__, __LINE__);
   return &mNodeArray[pos];
 }
@@ -481,6 +572,113 @@ DtpgNetwork::mark_tfo_tfi(DtpgNode* fnode,
   }
 }
 
+// @brief 論理式から DtpgNode を作る．
+// @param[in] expr 論理式
+// @param[in] tgnode 元のノード (ファンインの情報を得るために必要)
+DtpgNode*
+DtpgNetwork::make_node_tree(const LogExpr& expr,
+			    const TgNode* tgnode)
+{
+  assert_cond( !expr.is_constant(), __FILE__, __LINE__);
+
+  if ( expr.is_posiliteral() ) {
+    ymuint ipos = expr.varid().val();
+    const TgNode* itgnode = tgnode->fanin(ipos);
+    DtpgNode* inode = mGateArray[itgnode->gid()].root_node();
+    return inode;
+  }
+  if ( expr.is_negaliteral() ) {
+    ymuint ipos = expr.varid().val();
+    const TgNode* itgnode = tgnode->fanin(ipos);
+    DtpgNode* inode = mGateArray[itgnode->gid()].root_node();
+    // NOT ゲートを作る．
+    DtpgNode* node = new_node(1);
+    node->mGateType = 3U | (static_cast<ymuint>(kTgGateNot) << 2);
+    node->mFanins[0] = inode;
+    return node;
+  }
+
+  // 入力からのトポロジカル順に並べたいので
+  // ファンインを先に処理しなければならない．
+  ymuint nc = expr.child_num();
+  vector<DtpgNode*> fanins(nc);
+  for (ymuint i = 0; i < nc; ++ i) {
+    LogExpr expr1 = expr.child(i);
+    fanins[i] = make_node_tree(expr1, tgnode);
+  }
+
+  DtpgNode* node = new_node(nc);
+  node->mGateType = 3U;
+  if ( expr.is_and() ) {
+    node->mGateType |= (static_cast<ymuint>(kTgGateAnd) << 2);
+  }
+  else if ( expr.is_or() ) {
+    node->mGateType |= (static_cast<ymuint>(kTgGateOr) << 2);
+  }
+  else if ( expr.is_xor() ) {
+    node->mGateType |= (static_cast<ymuint>(kTgGateXor) << 2);
+  }
+  for (ymuint i = 0; i < nc; ++ i) {
+    node->mFanins[i] = fanins[i];
+  }
+  return node;
+}
+
+// @brief 新しいノードを確保する．
+// @param[in] ni 入力数
+// @note 実際には mNodeArray はすでに確保済なのでポインタを返すだけ．
+// @note 結果 mNodeNum の値が一つ増える．
+// @note DtptNode は適切に初期化される．
+DtpgNode*
+DtpgNetwork::new_node(ymuint ni)
+{
+  DtpgNode* node = &mNodeArray[mNodeNum];
+  node->mId = mNodeNum;
+  ++ mNodeNum;
+
+  node->mFaninNum = ni;
+  node->mFanins = alloc_nodearray(mAlloc, ni);
+
+  node->mFanoutNum = 0;
+  node->mFanouts = NULL;
+
+  node->mActFanoutNum = 0;
+  node->mActFanouts = NULL;
+
+  node->mGate = NULL;
+
+  node->mMarks = 0U;
+
+  node->mImmDom = NULL;
+
+  return node;
+}
+
+// @brief DtpgGate の設定を行う．
+// @param[in] gate DtpgGate
+// @param[in] root 根のノード
+// @param[in] ni 入力数
+void
+DtpgNetwork::set_gate(DtpgGate* gate,
+		      DtpgNode* root,
+		      ymuint ni)
+{
+  gate->mRoot = root;
+  gate->mInputNum = ni;
+
+  gate->mOutputFault[0] = NULL;
+  gate->mOutputFault[1] = NULL;
+
+  void* p = mAlloc.get_memory(sizeof(DtpgFault*) * ni * 2);
+
+  gate->mInputFault = new (p) DtpgFault*[ni * 2];
+  for (ymuint i = 0; i < ni; ++ i) {
+    gate->mInputFault[i * 2 + 0] = NULL;
+    gate->mInputFault[i * 2 + 1] = NULL;
+  }
+}
+
+#if 0
 // @brief DtpgNode の内容を設定する．
 // @param[in] tgnode もととなる TgNode
 // @param[in] node 対象のノード
@@ -522,7 +720,9 @@ DtpgNetwork::set_node(const TgNode* tgnode,
 
   node->mMarks = 0U;
 }
+#endif
 
+#if 0
 extern
 void
 prime_gen(ymuint ni,
@@ -561,6 +761,6 @@ DtpgNetwork::prime_cover(ymuint ni,
 
   return cover;
 }
-
+#endif
 
 END_NAMESPACE_YM_SATPG_DTPG
