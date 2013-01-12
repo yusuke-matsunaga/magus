@@ -32,8 +32,9 @@ BEGIN_NAMESPACE_YM_SATPG_DTPG
 class DtpgSat;
 class DtpgNetwork;
 class DtpgNode;
+class DtpgCube;
+class DtpgCover;
 class DtpgFFR;
-class DtpgGate;
 class DtpgFault;
 
 END_NAMESPACE_YM_SATPG_DTPG

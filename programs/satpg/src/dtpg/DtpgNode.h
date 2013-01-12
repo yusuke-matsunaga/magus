@@ -65,7 +65,6 @@ public:
   bool
   is_cplx_logic() const;
 
-#if 0
   /// @brief cplx_logic タイプのときにオンセットカバーを返す．
   DtpgCover*
   onset_cover() const;
@@ -73,7 +72,6 @@ public:
   /// @brief cplx_logic タイプのときにオフセットカバーを返す．
   DtpgCover*
   offset_cover() const;
-#endif
 
   /// @brief 外部入力タイプの時に入力番号を返す．
   ymuint
@@ -83,11 +81,9 @@ public:
   ymuint
   output_id() const;
 
-#if 0
   /// @brief cplx_logic タイプのときに論理式を返す．
   LogExpr
   expr() const;
-#endif
 
   /// @brief ファンイン数を得る．
   ymuint
@@ -116,12 +112,6 @@ public:
   DtpgNode*
   active_fanout(ymuint pos) const;
 
-  /// @brief 代表ノードの場合に DtpgGate を返す．
-  /// @note 代表ノードでなければ NULL を返す．
-  DtpgGate*
-  gate_info() const;
-
-#if 0
   /// @brief 出力の故障を得る．
   /// @param[in] val 故障値 ( 0 / 1 )
   DtpgFault*
@@ -133,7 +123,6 @@ public:
   DtpgFault*
   input_fault(int val,
 	      ymuint pos);
-#endif
 
   /// @brief アクティブの場合 true を返す．
   bool
@@ -244,7 +233,6 @@ private:
   // ノードタイプ＋ゲートタイプ
   ymuint32 mGateType;
 
-#if 0
   // オンセットプライムカバー
   DtpgCover* mOnSet;
 
@@ -253,7 +241,6 @@ private:
 
   // 論理式
   LogExpr mExpr;
-#endif
 
   // ファンイン数
   ymuint32 mFaninNum;
@@ -273,16 +260,11 @@ private:
   // アクティブなファンアウトの配列
   DtpgNode** mActFanouts;
 
-  // DtpgGate
-  DtpgGate* mGate;
-
-#if 0
   // 出力の故障
   DtpgFault* mOutputFault[2];
 
   // 入力の故障
   DtpgFault** mInputFault;
-#endif
 
   // いくつかのマークを納めるビットベクタ
   ymuint32 mMarks;
@@ -361,7 +343,6 @@ DtpgNode::is_cplx_logic() const
   return gate_type() == kTgGateCplx;
 }
 
-#if 0
 // @brief cplx_logic タイプのときにオンセットカバーを返す．
 inline
 DtpgCover*
@@ -377,7 +358,6 @@ DtpgNode::offset_cover() const
 {
   return mOffSet;
 }
-#endif
 
 // @brief ID番号を得る．
 inline
@@ -403,7 +383,6 @@ DtpgNode::output_id() const
   return mLid;
 }
 
-#if 0
 // @brief cplx_logic タイプのときに論理式を返す．
 inline
 LogExpr
@@ -411,7 +390,6 @@ DtpgNode::expr() const
 {
   return mExpr;
 }
-#endif
 
 // @brief ファンイン数を得る．
 inline
@@ -467,16 +445,6 @@ DtpgNode::active_fanout(ymuint pos) const
   return mActFanouts[pos];
 }
 
-// @brief 代表ノードの場合に DtpgGate を返す．
-// @note 代表ノードでなければ NULL を返す．
-inline
-DtpgGate*
-DtpgNode::gate_info() const
-{
-  return mGate;
-}
-
-#if 0
 // @brief 出力の故障を得る．
 // @param[in] val 故障値 ( 0 / 1 )
 inline
@@ -497,7 +465,6 @@ DtpgNode::input_fault(int val,
   assert_cond( pos < mFaninNum, __FILE__, __LINE__);
   return mInputFault[pos * 2 + (val % 2)];
 }
-#endif
 
 // @brief mark1 を得る．
 inline
