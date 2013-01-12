@@ -48,10 +48,18 @@ public:
   bool
   is_input() const;
 
+  /// @brief 外部入力タイプの時に入力番号を返す．
+  ymuint
+  input_id() const;
+
   /// @brief 外部出力タイプの時 true を返す．
   /// @note FF 入力もここに含まれる．
   bool
   is_output() const;
+
+  /// @brief 外部出力タイプの時に出力番号を返す．
+  ymuint
+  output_id() const;
 
   /// @brief logic タイプの時 true を返す．
   bool
@@ -64,22 +72,6 @@ public:
   /// @brief 組み込み型でない logic タイプ (cplx_logic タイプ)の時 true を返す．
   bool
   is_cplx_logic() const;
-
-  /// @brief cplx_logic タイプのときにオンセットカバーを返す．
-  DtpgCover*
-  onset_cover() const;
-
-  /// @brief cplx_logic タイプのときにオフセットカバーを返す．
-  DtpgCover*
-  offset_cover() const;
-
-  /// @brief 外部入力タイプの時に入力番号を返す．
-  ymuint
-  input_id() const;
-
-  /// @brief 外部出力タイプの時に出力番号を返す．
-  ymuint
-  output_id() const;
 
   /// @brief cplx_logic タイプのときに論理式を返す．
   LogExpr
@@ -227,17 +219,15 @@ private:
   // ID 番号
   ymuint32 mId;
 
-  // 入力/出力ノードの場合の通し番号
-  ymuint32 mLid;
-
-  // ノードタイプ＋ゲートタイプ
-  ymuint32 mGateType;
-
-  // オンセットプライムカバー
-  DtpgCover* mOnSet;
-
-  // オフセットプライムカバー
-  DtpgCover* mOffSet;
+  // いくつかのデータをパックしたもの
+  // - [0:1] ノードタイプ
+  //   0: 未使用
+  //   1: 外部入力
+  //   2: 外部出力
+  //   3: 論理ノード
+  // - [2:31] 入力/出力ノードの場合の通し番号
+  //          or ゲートタイプ
+  ymuint32 mTypeId;
 
   // 論理式
   LogExpr mExpr;
@@ -301,64 +291,6 @@ DtpgNode::~DtpgNode()
 {
 }
 
-// @brief ゲートタイプを得る．
-inline
-tTgGateType
-DtpgNode::gate_type() const
-{
-  return static_cast<tTgGateType>((mGateType >> 2) & 15U);
-}
-
-// @brief 外部入力タイプの時 true を返す．
-// @note FF 出力もここに含まれる．
-inline
-bool
-DtpgNode::is_input() const
-{
-  return (mGateType & 3U) == 1U;
-}
-
-// @brief 外部出力タイプの時 true を返す．
-// @note FF 入力もここに含まれる．
-inline
-bool
-DtpgNode::is_output() const
-{
-  return (mGateType & 3U) == 2U;
-}
-
-// @brief logic タイプの時 true を返す．
-inline
-bool
-DtpgNode::is_logic() const
-{
-  return (mGateType & 3U) == 3U;
-}
-
-// @brief 組み込み型でない logic タイプの時 true を返す．
-inline
-bool
-DtpgNode::is_cplx_logic() const
-{
-  return gate_type() == kTgGateCplx;
-}
-
-// @brief cplx_logic タイプのときにオンセットカバーを返す．
-inline
-DtpgCover*
-DtpgNode::onset_cover() const
-{
-  return mOnSet;
-}
-
-// @brief cplx_logic タイプのときにオフセットカバーを返す．
-inline
-DtpgCover*
-DtpgNode::offset_cover() const
-{
-  return mOffSet;
-}
-
 // @brief ID番号を得る．
 inline
 ymuint
@@ -367,12 +299,31 @@ DtpgNode::id() const
   return mId;
 }
 
+// @brief 外部入力タイプの時 true を返す．
+// @note FF 出力もここに含まれる．
+inline
+bool
+DtpgNode::is_input() const
+{
+  return (mTypeId & 3U) == 1U;
+}
+
 // @brief 外部入力タイプの時に入力番号を返す．
 inline
 ymuint
 DtpgNode::input_id() const
 {
-  return mLid;
+  assert_cond( is_input(), __FILE__, __LINE__);
+  return (mTypeId >> 2);
+}
+
+// @brief 外部出力タイプの時 true を返す．
+// @note FF 入力もここに含まれる．
+inline
+bool
+DtpgNode::is_output() const
+{
+  return (mTypeId & 3U) == 2U;
 }
 
 // @brief 外部出力タイプの時に出力番号を返す．
@@ -380,7 +331,33 @@ inline
 ymuint
 DtpgNode::output_id() const
 {
-  return mLid;
+  assert_cond( is_output(), __FILE__, __LINE__);
+  return (mTypeId >> 2);
+}
+
+// @brief logic タイプの時 true を返す．
+inline
+bool
+DtpgNode::is_logic() const
+{
+  return (mTypeId & 3U) == 3U;
+}
+
+// @brief ゲートタイプを得る．
+inline
+tTgGateType
+DtpgNode::gate_type() const
+{
+  assert_cond( is_logic(), __FILE__, __LINE__);
+  return static_cast<tTgGateType>((mTypeId >> 2) & 15U);
+}
+
+// @brief 組み込み型でない logic タイプの時 true を返す．
+inline
+bool
+DtpgNode::is_cplx_logic() const
+{
+  return gate_type() == kTgGateCplx;
 }
 
 // @brief cplx_logic タイプのときに論理式を返す．

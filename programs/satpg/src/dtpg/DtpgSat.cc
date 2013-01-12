@@ -142,210 +142,216 @@ make_node_cnf(SatSolver& solver,
     return;
   }
 
+  if ( node->is_output() ) {
+    solver.add_clause( inputs[0], ~output);
+    solver.add_clause(~inputs[0],  output);
+    return;
+  }
+
   if ( node->is_cplx_logic() ) {
     make_lexp_cnf(solver, node->expr(), output, inputs);
+    return;
   }
-  else {
-    ymuint ni = inputs.size();
-    switch ( node->gate_type() ) {
-    case kTgGateBuff:
-      solver.add_clause( inputs[0], ~output);
-      solver.add_clause(~inputs[0],  output);
+
+  ymuint ni = inputs.size();
+  switch ( node->gate_type() ) {
+  case kTgGateBuff:
+    solver.add_clause( inputs[0], ~output);
+    solver.add_clause(~inputs[0],  output);
+    break;
+
+  case kTgGateNot:
+    solver.add_clause( inputs[0],  output);
+    solver.add_clause(~inputs[0], ~output);
+    break;
+
+  case kTgGateAnd:
+    switch ( ni ) {
+    case 2:
+      solver.add_clause(~inputs[0], ~inputs[1], output);
       break;
 
-    case kTgGateNot:
-      solver.add_clause( inputs[0],  output);
-      solver.add_clause(~inputs[0], ~output);
+    case 3:
+      solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], output);
       break;
 
-    case kTgGateAnd:
-      switch ( ni ) {
-      case 2:
-	solver.add_clause(~inputs[0], ~inputs[1], output);
-	break;
-
-      case 3:
-	solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], output);
-	break;
-
-      case 4:
-	solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~inputs[3], output);
-	break;
-
-      default:
-	{
-	  vector<Literal> tmp(ni + 1);
-	  for (ymuint i = 0; i < ni; ++ i) {
-	    tmp[i] = ~inputs[i];
-	  }
-	  tmp[ni] = output;
-	  solver.add_clause(tmp);
-	}
-	break;
-      }
-      for (ymuint i = 0; i < ni; ++ i) {
-	solver.add_clause(inputs[i], ~output);
-      }
-      break;
-
-    case kTgGateNand:
-      switch ( ni ) {
-      case 2:
-	solver.add_clause(~inputs[0], ~inputs[1], ~output);
-	break;
-
-      case 3:
-	solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~output);
-	break;
-
-      case 4:
-	solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~inputs[3], ~output);
-	break;
-
-      default:
-	{
-	  vector<Literal> tmp(ni + 1);
-	  for (ymuint i = 0; i < ni; ++ i) {
-	    tmp[i] = ~inputs[i];
-	  }
-	  tmp[ni] = ~output;
-	  solver.add_clause(tmp);
-	}
-	break;
-      }
-      for (ymuint i = 0; i < ni; ++ i) {
-	solver.add_clause(inputs[i], output);
-      }
-      break;
-
-    case kTgGateOr:
-      switch ( ni ) {
-      case 2:
-	solver.add_clause(inputs[0], inputs[1], ~output);
-	break;
-
-      case 3:
-	solver.add_clause(inputs[0], inputs[1], inputs[2], ~output);
-	break;
-
-      case 4:
-	solver.add_clause(inputs[0], inputs[1], inputs[2], inputs[3], ~output);
-	break;
-
-      default:
-	{
-	  vector<Literal> tmp(ni + 1);
-	  for (ymuint i = 0; i < ni; ++ i) {
-	    tmp[i] = inputs[i];
-	  }
-	  tmp[ni] = ~output;
-	  solver.add_clause(tmp);
-	}
-	break;
-      }
-      for (ymuint i = 0; i < ni; ++ i) {
-	solver.add_clause(~inputs[i], output);
-      }
-      break;
-
-    case kTgGateNor:
-      switch ( ni ) {
-      case 2:
-	solver.add_clause(inputs[0], inputs[1], output);
-	break;
-
-      case 3:
-	solver.add_clause(inputs[0], inputs[1], inputs[2], output);
-	break;
-
-      case 4:
-	solver.add_clause(inputs[0], inputs[1], inputs[2], inputs[3], output);
-	break;
-
-      default:
-	{
-	  vector<Literal> tmp(ni + 1);
-	  for (ymuint i = 0; i < ni; ++ i) {
-	    tmp[i] = inputs[i];
-	  }
-	  tmp[ni] = output;
-	  solver.add_clause(tmp);
-	}
-	break;
-      }
-      for (ymuint i = 0; i < ni; ++ i) {
-	solver.add_clause(~inputs[i], ~output);
-      }
-      break;
-
-    case kTgGateXor:
-      if ( ni == 2 ) {
-	solver.add_clause(~inputs[0],  inputs[1],  output);
-	solver.add_clause( inputs[0], ~inputs[1],  output);
-	solver.add_clause( inputs[0],  inputs[1], ~output);
-	solver.add_clause(~inputs[0], ~inputs[1], ~output);
-      }
-      else {
-	vector<Literal> tmp(ni + 1);
-	ymuint nip = (1U << ni);
-	for (ymuint p = 0; p < nip; ++ p) {
-	  ymuint c = 0;
-	  for (ymuint i = 0; i < ni; ++ i) {
-	    if ( p & (1U << i) ) {
-	      tmp[i] = inputs[i];
-	    }
-	    else {
-	      tmp[i] = ~inputs[i];
-	      ++ c;
-	    }
-	  }
-	  if ( (c % 2) == 0 ) {
-	    tmp[ni] = ~output;
-	  }
-	  else {
-	    tmp[ni] = output;
-	  }
-	  solver.add_clause(tmp);
-	}
-      }
-      break;
-
-    case kTgGateXnor:
-      if ( ni == 2 ) {
-	solver.add_clause(~inputs[0],  inputs[1], ~output);
-	solver.add_clause( inputs[0], ~inputs[1], ~output);
-	solver.add_clause( inputs[0],  inputs[1],  output);
-	solver.add_clause(~inputs[0], ~inputs[1],  output);
-      }
-      else {
-	vector<Literal> tmp(ni + 1);
-	ymuint nip = (1U << ni);
-	for (ymuint p = 0; p < nip; ++ p) {
-	  ymuint c = 0;
-	  for (ymuint i = 0; i < ni; ++ i) {
-	    if ( p & (1U << i) ) {
-	    tmp[i] = inputs[i];
-	    }
-	    else {
-	      tmp[i] = ~inputs[i];
-	      ++ c;
-	    }
-	  }
-	  if ( (c % 2) == 0 ) {
-	    tmp[ni] = output;
-	  }
-	  else {
-	    tmp[ni] = ~output;
-	  }
-	  solver.add_clause(tmp);
-	}
-      }
+    case 4:
+      solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~inputs[3], output);
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      {
+	vector<Literal> tmp(ni + 1);
+	for (ymuint i = 0; i < ni; ++ i) {
+	  tmp[i] = ~inputs[i];
+	}
+	tmp[ni] = output;
+	solver.add_clause(tmp);
+      }
       break;
     }
+    for (ymuint i = 0; i < ni; ++ i) {
+      solver.add_clause(inputs[i], ~output);
+    }
+    break;
+
+  case kTgGateNand:
+    switch ( ni ) {
+    case 2:
+      solver.add_clause(~inputs[0], ~inputs[1], ~output);
+      break;
+
+    case 3:
+      solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~output);
+      break;
+
+    case 4:
+      solver.add_clause(~inputs[0], ~inputs[1], ~inputs[2], ~inputs[3], ~output);
+      break;
+
+    default:
+      {
+	vector<Literal> tmp(ni + 1);
+	for (ymuint i = 0; i < ni; ++ i) {
+	  tmp[i] = ~inputs[i];
+	}
+	tmp[ni] = ~output;
+	solver.add_clause(tmp);
+      }
+      break;
+    }
+    for (ymuint i = 0; i < ni; ++ i) {
+      solver.add_clause(inputs[i], output);
+    }
+    break;
+
+  case kTgGateOr:
+    switch ( ni ) {
+    case 2:
+      solver.add_clause(inputs[0], inputs[1], ~output);
+      break;
+
+    case 3:
+      solver.add_clause(inputs[0], inputs[1], inputs[2], ~output);
+      break;
+
+    case 4:
+      solver.add_clause(inputs[0], inputs[1], inputs[2], inputs[3], ~output);
+      break;
+
+    default:
+      {
+	vector<Literal> tmp(ni + 1);
+	for (ymuint i = 0; i < ni; ++ i) {
+	  tmp[i] = inputs[i];
+	}
+	tmp[ni] = ~output;
+	solver.add_clause(tmp);
+      }
+      break;
+    }
+    for (ymuint i = 0; i < ni; ++ i) {
+      solver.add_clause(~inputs[i], output);
+    }
+    break;
+
+  case kTgGateNor:
+    switch ( ni ) {
+    case 2:
+      solver.add_clause(inputs[0], inputs[1], output);
+      break;
+
+    case 3:
+      solver.add_clause(inputs[0], inputs[1], inputs[2], output);
+      break;
+
+    case 4:
+      solver.add_clause(inputs[0], inputs[1], inputs[2], inputs[3], output);
+      break;
+
+    default:
+      {
+	vector<Literal> tmp(ni + 1);
+	for (ymuint i = 0; i < ni; ++ i) {
+	  tmp[i] = inputs[i];
+	}
+	tmp[ni] = output;
+	solver.add_clause(tmp);
+      }
+      break;
+    }
+    for (ymuint i = 0; i < ni; ++ i) {
+      solver.add_clause(~inputs[i], ~output);
+    }
+    break;
+
+  case kTgGateXor:
+    if ( ni == 2 ) {
+      solver.add_clause(~inputs[0],  inputs[1],  output);
+      solver.add_clause( inputs[0], ~inputs[1],  output);
+      solver.add_clause( inputs[0],  inputs[1], ~output);
+      solver.add_clause(~inputs[0], ~inputs[1], ~output);
+    }
+    else {
+      vector<Literal> tmp(ni + 1);
+      ymuint nip = (1U << ni);
+      for (ymuint p = 0; p < nip; ++ p) {
+	ymuint c = 0;
+	for (ymuint i = 0; i < ni; ++ i) {
+	  if ( p & (1U << i) ) {
+	    tmp[i] = inputs[i];
+	  }
+	  else {
+	    tmp[i] = ~inputs[i];
+	    ++ c;
+	  }
+	}
+	if ( (c % 2) == 0 ) {
+	  tmp[ni] = ~output;
+	}
+	else {
+	  tmp[ni] = output;
+	}
+	solver.add_clause(tmp);
+      }
+    }
+    break;
+
+  case kTgGateXnor:
+    if ( ni == 2 ) {
+      solver.add_clause(~inputs[0],  inputs[1], ~output);
+      solver.add_clause( inputs[0], ~inputs[1], ~output);
+      solver.add_clause( inputs[0],  inputs[1],  output);
+      solver.add_clause(~inputs[0], ~inputs[1],  output);
+    }
+    else {
+      vector<Literal> tmp(ni + 1);
+      ymuint nip = (1U << ni);
+      for (ymuint p = 0; p < nip; ++ p) {
+	ymuint c = 0;
+	for (ymuint i = 0; i < ni; ++ i) {
+	  if ( p & (1U << i) ) {
+	    tmp[i] = inputs[i];
+	  }
+	  else {
+	    tmp[i] = ~inputs[i];
+	    ++ c;
+	  }
+	}
+	if ( (c % 2) == 0 ) {
+	  tmp[ni] = output;
+	}
+	else {
+	  tmp[ni] = ~output;
+	}
+	solver.add_clause(tmp);
+      }
+    }
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
 }
 
