@@ -13,9 +13,12 @@
 #include "DtpgFFR.h"
 #include "DtpgFault.h"
 #include "DtpgOperator.h"
+#include "ym_logic/LogExpr.h"
 #include "ym_logic/SatSolver.h"
 #include "ym_logic/SatStats.h"
 
+
+#define USE_LOGEXPR 0
 
 BEGIN_NAMESPACE_YM_SATPG
 
@@ -52,6 +55,25 @@ make_flt_cnf(SatSolver& solver,
     solver.add_clause(~l1, l2);
     solver.add_clause( l0, l1, ~l2);
   }
+}
+
+#if USE_LOGEXPR
+
+void
+set_gvar(SatSolver& solver,
+	 DtpgNode* node)
+{
+  VarId gvar = solver.new_var();
+  node->set_gvar(gvar);
+}
+
+void
+set_fvar(SatSolver& solver,
+	 DtpgNode* node)
+{
+  VarId fvar = solver.new_var();
+  VarId dvar = solver.new_var();
+  node->set_fvar(fvar, dvar);
 }
 
 /// @brief ノードの入出力の関係を表す CNF クローズを生成する．
@@ -131,30 +153,59 @@ make_lexp_cnf(SatSolver& solver,
   }
 }
 
-// @brief ノードの入出力の関係を表す CNF を作る．
+#else
+
 void
-make_node_cnf(SatSolver& solver,
-	      DtpgNode* node,
+set_gvar(SatSolver& solver,
+	 DtpgNode* node)
+{
+  VarId gvar = solver.new_var();
+  node->set_gvar(gvar);
+  if ( node->is_cplx_logic() ) {
+    ymuint n = node->subnode_num();
+    ymuint n1 = n - 1;
+    for (ymuint i = 0; i < n1; ++ i) {
+      DtpgNode* node1 = node->subnode(i);
+      VarId gvar = solver.new_var();
+      node1->set_gvar(gvar);
+    }
+    DtpgNode* node1 = node->subnode(n1);
+    node1->set_gvar(gvar);
+  }
+}
+
+void
+set_fvar(SatSolver& solver,
+	 DtpgNode* node)
+{
+  VarId fvar = solver.new_var();
+  VarId dvar = solver.new_var();
+  node->set_fvar(fvar, dvar);
+  if ( node->is_cplx_logic() ) {
+    ymuint n = node->subnode_num();
+    ymuint n1 = n - 1;
+    for (ymuint i = 0; i < n1; ++ i) {
+      DtpgNode* node1 = node->subnode(i);
+      VarId fvar = solver.new_var();
+      VarId dvar = solver.new_var();
+      node1->set_fvar(fvar, dvar);
+    }
+    DtpgNode* node1 = node->subnode(n1);
+    node1->set_fvar(fvar, dvar);
+  }
+}
+
+#endif
+
+// @brief ゲートの入出力関係を表す CNF を作る．
+void
+make_gate_cnf(SatSolver& solver,
+	      tTgGateType gate_type,
 	      Literal output,
 	      const vector<Literal>& inputs)
 {
-  if ( node->is_input() ) {
-    return;
-  }
-
-  if ( node->is_output() ) {
-    solver.add_clause( inputs[0], ~output);
-    solver.add_clause(~inputs[0],  output);
-    return;
-  }
-
-  if ( node->is_cplx_logic() ) {
-    make_lexp_cnf(solver, node->expr(), output, inputs);
-    return;
-  }
-
   ymuint ni = inputs.size();
-  switch ( node->gate_type() ) {
+  switch ( gate_type ) {
   case kTgGateBuff:
     solver.add_clause( inputs[0], ~output);
     solver.add_clause(~inputs[0],  output);
@@ -355,32 +406,103 @@ make_node_cnf(SatSolver& solver,
   }
 }
 
-// @brief 入力に故障を持つノードの CNF を作る．
-// @param[in] solver SAT ソルバ
-// @param[in] fnode 対象のノード
-// @param[in] ipos 故障のある入力の番号
+// @brief 正常回路におけるノードの入出力の関係を表す CNF を作る．
 void
-make_fnode_cnf(SatSolver& solver,
-	       DtpgNode* fnode,
-	       ymuint ipos)
+make_gnode_cnf(SatSolver& solver,
+	       DtpgNode* node)
 {
-  ymuint ni = fnode->fanin_num();
+  if ( node->is_input() ) {
+    return;
+  }
+
+  Literal output(node->gvar(), kPolPosi);
+
+  if ( node->is_output() ) {
+    DtpgNode* inode = node->fanin(0);
+    Literal input(inode->gvar(), kPolPosi);
+
+    solver.add_clause( input, ~output);
+    solver.add_clause(~input,  output);
+    return;
+  }
+
+  ymuint ni = node->fanin_num();
   vector<Literal> inputs(ni);
   for (ymuint i = 0; i < ni; ++ i) {
-    DtpgNode* inode = fnode->fanin(i);
-    if ( i == ipos ) {
-      VarId fvar = solver.new_var();
-      VarId dvar = solver.new_var();
-      inode->set_fvar(fvar, dvar);
-      inputs[i] = Literal(fvar, kPolPosi);
+    DtpgNode* inode = node->fanin(i);
+    inputs[i] = Literal(inode->gvar(), kPolPosi);
+  }
+
+  if ( node->is_cplx_logic() ) {
+#if USE_LOGEXPR
+    make_lexp_cnf(solver, node->expr(), output, inputs);
+#else
+    ymuint n = node->subnode_num();
+    for (ymuint i = 0; i < n; ++ i) {
+      DtpgNode* node1 = node->subnode(i);
+      make_gnode_cnf(solver, node1);
+    }
+#endif
+  }
+  else {
+    make_gate_cnf(solver, node->gate_type(), output, inputs);
+  }
+}
+
+// @brief 故障回路におけるノードの入出力の関係を表す CNF を作る．
+void
+make_fnode_cnf(SatSolver& solver,
+	       DtpgNode* node)
+{
+  if ( node->is_input() ) {
+    return;
+  }
+
+  Literal output(node->fvar(), kPolPosi);
+
+  ymuint ni = node->fanin_num();
+  vector<Literal> inputs(ni);
+
+  // dlit が 1 の時，入力のノードの dlit も1でなければならない．
+  vector<Literal> dep;
+  dep.reserve(ni + 1);
+
+  Literal dlit(node->dvar(), kPolPosi);
+  dep.push_back(~dlit);
+
+  for (ymuint i = 0; i < ni; ++ i) {
+    DtpgNode* inode = node->fanin(i);
+    if ( inode->has_fvar() ) {
+      inputs[i] = Literal(inode->fvar(), kPolPosi);
+      dep.push_back(Literal(inode->dvar(), kPolPosi));
     }
     else {
       inputs[i] = Literal(inode->gvar(), kPolPosi);
     }
   }
 
-  Literal flit(fnode->fvar(), kPolPosi);
-  make_node_cnf(solver, fnode, flit, inputs);
+  if ( node->is_output() ) {
+    solver.add_clause( inputs[0], ~output);
+    solver.add_clause(~inputs[0],  output);
+  }
+  else {
+    if ( node->is_cplx_logic() ) {
+#if USE_LOGEXPR
+      make_lexp_cnf(solver, node->expr(), output, inputs);
+#else
+      ymuint n = node->subnode_num();
+      for (ymuint i = 0; i < n; ++ i) {
+	DtpgNode* node1 = node->subnode(i);
+	make_fnode_cnf(solver, node1);
+      }
+#endif
+    }
+    else {
+      make_gate_cnf(solver, node->gate_type(), output, inputs);
+    }
+  }
+
+  solver.add_clause(dep);
 }
 
 void
@@ -815,7 +937,9 @@ DtpgSat::dtpg_single(DtpgFault* f,
   DtpgNode* fsrc = fnode;
   if ( f->is_input_fault() ) {
     ymuint ipos = f->pos();
-    make_fnode_cnf(solver, fnode, ipos);
+    DtpgNode* inode = fnode->fanin(ipos);
+    set_fvar(solver, inode);
+    make_fnode_cnf(solver, fnode);
     fsrc = fnode->fanin(ipos);
   }
 
@@ -825,7 +949,8 @@ DtpgSat::dtpg_single(DtpgFault* f,
   }
 
   mAssumptions.clear();
-  mAssumptions.reserve(nim + 2);
+  mAssumptions.resize(nim + 2);
+
   if ( f->val() ) {
     mAssumptions[0] = Literal(fsrc->gvar(), kPolNega);
     mAssumptions[1] = Literal(fsrc->fvar(), kPolPosi);
@@ -867,7 +992,9 @@ DtpgSat::dtpg_dual(DtpgFault* f0,
   DtpgNode* fsrc = fnode;
   if ( f0->is_input_fault() ) {
     ymuint ipos = f0->pos();
-    make_fnode_cnf(solver, fnode, ipos);
+    DtpgNode* inode = fnode->fanin(ipos);
+    set_fvar(solver, inode);
+    make_fnode_cnf(solver, fnode);
     fsrc = f0->source_node();
   }
 
@@ -947,9 +1074,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
        p != node_list.end(); ++ p) {
     DtpgNode* node = *p;
     if ( (node != root) && node->mark1() ) {
-      VarId fvar = solver.new_var();
-      VarId dvar = solver.new_var();
-      node->set_fvar(fvar, dvar);
+      set_fvar(solver, node);
     }
     node->clear_mark1();
   }
@@ -971,6 +1096,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 
     ymuint ni = node->fanin_num();
     vector<Literal> inputs(ni);
+    hash_map<ymuint, ymuint> fanin_map;
     for (ymuint i = 0; i < ni; ++ i) {
       DtpgNode* inode = node->fanin(i);
       VarId fvar;
@@ -992,6 +1118,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	}
       }
       inputs[i] = Literal(fvar, kPolPosi);
+      fanin_map.insert(make_pair(inode->id(), i));
     }
 
     VarId tmp_ovar = node->fvar();
@@ -1014,7 +1141,47 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
       solver.add_clause( glit, ~olit);
     }
     else {
-      make_node_cnf(solver, node, olit, inputs);
+      if ( node->is_output() ) {
+	solver.add_clause( inputs[0], ~olit);
+	solver.add_clause(~inputs[0],  olit);
+      }
+      else {
+	if ( node->is_cplx_logic() ) {
+#if USE_LOGEXPR
+	  make_lexp_cnf(solver, node->expr(), olit, inputs);
+#else
+	  ymuint n = node->subnode_num();
+	  ymuint n1 = n - 1;
+	  for (ymuint i = 0; i < n; ++ i) {
+	    DtpgNode* node1 = node->subnode(i);
+	    ymuint ni1 = node1->fanin_num();
+	    vector<Literal> inputs1(ni1);
+	    for (ymuint j = 0; j < ni1; ++ j) {
+	      DtpgNode* inode1 = node1->fanin(j);
+	      if ( inode1->is_subnode() ) {
+		inputs1[j] = Literal(inode1->fvar(), kPolPosi);
+	      }
+	      else {
+		hash_map<ymuint, ymuint>::iterator p = fanin_map.find(inode1->id());
+		assert_cond( p != fanin_map.end(), __FILE__, __LINE__);
+		inputs1[j] = inputs[p->second];
+	      }
+	    }
+	    Literal output;
+	    if ( i == n1 ) {
+	      output = olit;
+	    }
+	    else {
+	      output = Literal(node1->fvar(), kPolPosi);
+	    }
+	    make_gate_cnf(solver, node1->gate_type(), output, inputs1);
+	  }
+#endif
+	}
+	else {
+	  make_gate_cnf(solver, node->gate_type(), olit, inputs);
+	}
+      }
 
       // 出力の dlit が1になる条件を作る．
       // - 入力の dlit のいずれかが 1
@@ -1137,19 +1304,15 @@ DtpgSat::make_prop_cnf(SatSolver& solver,
   for (vector<DtpgNode*>::iterator p = tfo_list.begin();
        p != tfo_list.end(); ++ p) {
     DtpgNode* node = *p;
-    VarId gvar = solver.new_var();
-    VarId fvar = solver.new_var();
-    VarId dvar = solver.new_var();
-    node->set_gvar(gvar);
-    node->set_fvar(fvar, dvar);
+    set_gvar(solver, node);
+    set_fvar(solver, node);
     mUsedNodeList.push_back(node);
   }
   // TFI マークのついたノード用の変数の生成 (glit のみを作る)
   for (vector<DtpgNode*>::iterator p = tfi_list.begin();
        p != tfi_list.end(); ++ p) {
     DtpgNode* node = *p;
-    VarId gvar = solver.new_var();
-    node->set_gvar(gvar);
+    set_gvar(solver, node);
     mUsedNodeList.push_back(node);
   }
 
@@ -1173,26 +1336,12 @@ DtpgSat::make_prop_cnf(SatSolver& solver,
   for (vector<DtpgNode*>::const_iterator p = tfi_list.begin();
        p != tfi_list.end(); ++ p) {
     DtpgNode* node = *p;
-    ymuint ni = node->fanin_num();
-    vector<Literal> inputs(ni);
-    for (ymuint i = 0; i < ni; ++ i) {
-      DtpgNode* inode = node->fanin(i);
-      inputs[i] = Literal(inode->gvar(), kPolPosi);
-    }
-    Literal output(node->gvar(), kPolPosi);
-    make_node_cnf(solver, node, output, inputs);
+    make_gnode_cnf(solver, node);
   }
   for (vector<DtpgNode*>::const_iterator p = tfo_list.begin();
        p != tfo_list.end(); ++ p) {
     DtpgNode* node = *p;
-    ymuint ni = node->fanin_num();
-    vector<Literal> inputs(ni);
-    for (ymuint i = 0; i < ni; ++ i) {
-      DtpgNode* inode = node->fanin(i);
-      inputs[i] = Literal(inode->gvar(), kPolPosi);
-    }
-    Literal output(node->gvar(), kPolPosi);
-    make_node_cnf(solver, node, output, inputs);
+    make_gnode_cnf(solver, node);
   }
 
 
@@ -1231,26 +1380,7 @@ DtpgSat::make_prop_cnf(SatSolver& solver,
     ymuint ni = node->fanin_num();
     vector<Literal> inputs(ni);
 
-    // dlit が 1 の時，入力のノードの dlit も1でなければならない．
-    vector<Literal> dep;
-    dep.reserve(ni + 1);
-    dep.push_back(~dlit);
-
-    for (ymuint j = 0; j < ni; ++ j) {
-      DtpgNode* inode = node->fanin(j);
-      if ( inode->has_fvar() ) {
-	inputs[j] = Literal(inode->fvar(), kPolPosi);
-	dep.push_back(Literal(inode->dvar(), kPolPosi));
-      }
-      else {
-	inputs[j] = Literal(inode->gvar(), kPolPosi);
-      }
-    }
-
-    // node の入力と出力の関係の clause を追加する．
-    make_node_cnf(solver, node, flit, inputs);
-
-    solver.add_clause(dep);
+    make_fnode_cnf(solver, node);
   }
 
   // 出力のうち，最低1つは故障差が伝搬しなければならない．

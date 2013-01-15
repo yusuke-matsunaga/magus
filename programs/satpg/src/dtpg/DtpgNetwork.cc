@@ -55,6 +55,26 @@ struct Lt
 
 };
 
+// 論理式から必要なノード数を数える．
+ymuint
+subnode_count(const LogExpr& expr)
+{
+  if ( expr.is_posiliteral() ) {
+    return 0;
+  }
+  if ( expr.is_negaliteral() ) {
+    return 1;
+  }
+
+  ymuint n = 1;
+  ymuint nc = expr.child_num();
+  for (ymuint i = 0; i < nc; ++ i) {
+    LogExpr expr1 = expr.child(i);
+    n += subnode_count(expr1);
+  }
+  return n;
+}
+
 END_NONAMESPACE
 
 
@@ -100,10 +120,8 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
   ymuint npi = input_num2();
   for (ymuint i = 0; i < npi; ++ i, ++ id) {
     const TgNode* tgnode = tgnetwork.input(i);
-    DtpgNode* node = &mNodeArray[id];
+    DtpgNode* node = make_node(id, tgnode);
     mInputArray[i] = node;
-    node->mTypeId = 1U | (tgnode->lid() << 2);
-    set_node(tgnode, node, id);
   }
 
 
@@ -114,12 +132,19 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
   ymuint nl = tgnetwork.logic_num();
   for (ymuint i = 0; i < nl; ++ i, ++ id) {
     const TgNode* tgnode = tgnetwork.sorted_logic(i);
-    DtpgNode* node = &mNodeArray[id];
-    node->mTypeId = 3U | (static_cast<ymuint>(tgnode->gate_type()) << 2);
-    set_node(tgnode, node, id);
+    DtpgNode* node = make_node(id, tgnode);
     if ( tgnode->is_cplx_logic() ) {
       ymuint fid = tgnode->func_id();
-      node->mExpr = tgnetwork.get_lexp(fid);
+      LogExpr expr = tgnetwork.get_lexp(fid);
+      // サブノード数を数える．
+      ymuint nc = subnode_count(expr);
+      node->mSubNodeNum = nc;
+      void* p = mAlloc.get_memory(sizeof(DtpgNode) * nc);
+      node->mSubNodeList = new (p) DtpgNode[nc];
+      ymuint subid = 0;
+      make_subnode(expr, tgnode, node->mSubNodeList, subid);
+      assert_cond( subid == nc, __FILE__, __LINE__);
+      node->mExpr = expr;
     }
   }
 
@@ -130,14 +155,11 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
   ymuint npo = output_num2();
   for (ymuint i = 0; i < npo; ++ i, ++ id) {
     const TgNode* tgnode = tgnetwork.output(i);
-    DtpgNode* node = &mNodeArray[id];
+    DtpgNode* node = make_node(id, tgnode);
     mOutputArray[i] = node;
-    node->mTypeId = 2U | (tgnode->lid() << 2);
-    set_node(tgnode, node, id);
   }
 
   assert_cond( id == mNodeNum, __FILE__, __LINE__);
-
 
 
   //////////////////////////////////////////////////////////////////////
@@ -502,23 +524,46 @@ DtpgNetwork::mark_tfo_tfi(DtpgNode* fnode,
 }
 
 // @brief DtpgNode の内容を設定する．
-// @param[in] tgnode もととなる TgNode
-// @param[in] node 対象のノード
 // @param[in] id ID番号
-void
-DtpgNetwork::set_node(const TgNode* tgnode,
-		      DtpgNode* node,
-		      ymuint id)
+// @param[in] tgnode もととなる TgNode
+// @param[in] type ノードタイプ
+// @param[in] sub_id サブID
+DtpgNode*
+DtpgNetwork::make_node(ymuint id,
+		       const TgNode* tgnode)
 {
-  mNodeMap[tgnode->gid()] = node;
+  DtpgNode* node = &mNodeArray[id];
   node->mId = id;
+
+  mNodeMap[tgnode->gid()] = node;
+
+  if ( tgnode->is_input() ) {
+    node->mTypeId = 1U | (tgnode->lid() << 2);
+  }
+  else if ( tgnode->is_output() ) {
+    node->mTypeId = 2U | (tgnode->lid() << 2);
+  }
+  else if ( tgnode->is_logic() ) {
+    node->mTypeId = 3U | (static_cast<ymuint>(tgnode->gate_type()) << 2);
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
+  }
+
+  node->mSubNodeNum = 0;
+  node->mSubNodeList = NULL;
 
   ymuint ni = tgnode->ni();
   node->mFaninNum = ni;
-  node->mFanins = alloc_nodearray(mAlloc, ni);
-  {
+  if ( ni > 0 ) {
+    node->mFanins = alloc_nodearray(mAlloc, ni);
+
     void* p = mAlloc.get_memory(sizeof(DtpgFault*) * ni * 2);
     node->mInputFault = new (p) DtpgFault*[ni * 2];
+  }
+  else {
+    node->mFanins = NULL;
+    node->mInputFault = NULL;
   }
 
   for (ymuint i = 0; i < ni; ++ i) {
@@ -541,6 +586,66 @@ DtpgNetwork::set_node(const TgNode* tgnode,
   node->mOutputFault[1] = NULL;
 
   node->mMarks = 0U;
+
+  return node;
+}
+
+// @brief 複雑な論理式に対応するサブノードを作る．
+DtpgNode*
+DtpgNetwork::make_subnode(const LogExpr& expr,
+			  const TgNode* tgnode,
+			  DtpgNode* node_list,
+			  ymuint& id)
+{
+  if ( expr.is_posiliteral() ) {
+    ymuint ipos = expr.varid().val();
+    const TgNode* itgnode = tgnode->fanin(ipos);
+    DtpgNode* inode = mNodeMap[itgnode->gid()];
+    return inode;
+  }
+  if ( expr.is_negaliteral() ) {
+    ymuint ipos = expr.varid().val();
+    const TgNode* itgnode = tgnode->fanin(ipos);
+    DtpgNode* inode = mNodeMap[itgnode->gid()];
+    DtpgNode* node = &node_list[id];
+    ++ id;
+    node->mTypeId = 0U | (kTgGateNot << 2);
+    node->mFaninNum = 1;
+    node->mFanins = alloc_nodearray(mAlloc, 1);
+    node->mFanins[0] = inode;
+    return node;
+  }
+
+  ymuint nc = expr.child_num();
+  vector<DtpgNode*> fanin(nc);
+  for (ymuint i = 0; i < nc; ++ i) {
+    LogExpr expr1 = expr.child(i);
+    DtpgNode* inode = make_subnode(expr1, tgnode, node_list, id);
+    fanin[i] = inode;
+  }
+
+  DtpgNode* node = &node_list[id];
+  ++ id;
+  node->mTypeId = 0U;
+  if ( expr.is_and() ) {
+    node->mTypeId |= (static_cast<ymuint>(kTgGateAnd) << 2);
+  }
+  else if ( expr.is_or() ) {
+    node->mTypeId |= (static_cast<ymuint>(kTgGateOr) << 2);
+  }
+  else if ( expr.is_xor() ) {
+    node->mTypeId |= (static_cast<ymuint>(kTgGateXor) << 2);
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
+  }
+
+  node->mFaninNum = nc;
+  node->mFanins = alloc_nodearray(mAlloc, nc);
+  for (ymuint i = 0; i < nc; ++ i) {
+    node->mFanins[i] = fanin[i];
+  }
+  return node;
 }
 
 #if 0

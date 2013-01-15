@@ -73,9 +73,22 @@ public:
   bool
   is_cplx_logic() const;
 
+  /// @brief cplx_logic タイプのときに内部ノード数を返す．
+  ymuint
+  subnode_num() const;
+
+  /// @brief cplx_logic タイプのときに内部ノードを返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < subnode_num() )
+  DtpgNode*
+  subnode(ymuint pos) const;
+
   /// @brief cplx_logic タイプのときに論理式を返す．
   LogExpr
   expr() const;
+
+  /// @brief subnode タイプの時 true を返す．
+  bool
+  is_subnode() const;
 
   /// @brief ファンイン数を得る．
   ymuint
@@ -229,6 +242,13 @@ private:
   //          or ゲートタイプ
   ymuint32 mTypeId;
 
+  // 内部ノード数
+  ymuint32 mSubNodeNum;
+
+  // 内部ノードのリスト
+  // 入力からのトポロジカル順に格納する．
+  DtpgNode* mSubNodeList;
+
   // 論理式
   LogExpr mExpr;
 
@@ -348,7 +368,7 @@ inline
 tTgGateType
 DtpgNode::gate_type() const
 {
-  assert_cond( is_logic(), __FILE__, __LINE__);
+  assert_cond( is_logic() || is_subnode(), __FILE__, __LINE__);
   return static_cast<tTgGateType>((mTypeId >> 2) & 15U);
 }
 
@@ -357,7 +377,25 @@ inline
 bool
 DtpgNode::is_cplx_logic() const
 {
-  return gate_type() == kTgGateCplx;
+  return is_logic() && gate_type() == kTgGateCplx;
+}
+
+// @brief cplx_logic タイプのときに内部ノード数を返す．
+inline
+ymuint
+DtpgNode::subnode_num() const
+{
+  return mSubNodeNum;
+}
+
+// @brief cplx_logic タイプのときに内部ノードを返す．
+// @param[in] pos 位置番号 ( 0 <= pos < subnode_num() )
+inline
+DtpgNode*
+DtpgNode::subnode(ymuint pos) const
+{
+  assert_cond( pos < subnode_num(), __FILE__, __LINE__);
+  return &mSubNodeList[pos];
 }
 
 // @brief cplx_logic タイプのときに論理式を返す．
@@ -366,6 +404,14 @@ LogExpr
 DtpgNode::expr() const
 {
   return mExpr;
+}
+
+// @brief subnode タイプの時 true を返す．
+inline
+bool
+DtpgNode::is_subnode() const
+{
+  return (mTypeId & 3U) == 0U;
 }
 
 // @brief ファンイン数を得る．

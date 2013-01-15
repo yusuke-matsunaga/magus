@@ -12,6 +12,7 @@
 #include "dtpg_nsdef.h"
 #include "SaFault.h"
 #include "ym_networks/tgnet.h"
+#include "ym_logic/lexp_nsdef.h"
 #include "ym_utils/SimpleAlloc.h"
 
 
@@ -128,13 +129,18 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief DtpgNode の内容を設定する．
-  /// @param[in] tgnode もととなる TgNode
-  /// @param[in] node 対象のノード
   /// @param[in] id ID番号
-  void
-  set_node(const TgNode* tgnode,
-	   DtpgNode* node,
-	   ymuint id);
+  /// @param[in] tgnode もととなる TgNode
+  DtpgNode*
+  make_node(ymuint id,
+	    const TgNode* tgnode);
+
+  /// @brief 複雑な論理式に対応するサブノードを作る．
+  DtpgNode*
+  make_subnode(const LogExpr& expr,
+	       const TgNode* tgnode,
+	       DtpgNode* node_list,
+	       ymuint& id);
 
   /// @brief activate_po(), activate_all() の下請け関数
   void
