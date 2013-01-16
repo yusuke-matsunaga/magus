@@ -146,11 +146,6 @@ private:
   void
   activate_sub(const vector<bool>& mark);
 
-  /// @brief 最小項のリストからプライムカバーを作る．
-  DtpgCover*
-  prime_cover(ymuint ni,
-	      const vector<ymuint32>& minterm_list);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -195,10 +190,6 @@ private:
 
   // 関数の個数
   ymuint32 mFuncNum;
-
-  // 関数番号をキーとしてプライムカバーを格納する配列
-  // ただし，肯定と否定の２つづつ格納する．
-  DtpgCover** mCoverList;
 
   // 故障の本体の配列
   DtpgFault* mFaultChunk;
