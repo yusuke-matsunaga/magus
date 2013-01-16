@@ -36,6 +36,8 @@ atpg_tclsh_SOURCES = \
 	PrintFaultCmd.cc \
 	PrintPatCmd.h \
 	PrintPatCmd.cc \
+	PrintPatStatsCmd.h \
+	PrintPatStatsCmd.cc \
 	PrintStatsCmd.h \
 	PrintStatsCmd.cc \
 	RfsimCmd.h \

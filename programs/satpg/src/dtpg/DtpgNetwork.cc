@@ -75,6 +75,30 @@ subnode_count(const LogExpr& expr)
   return n;
 }
 
+// tTgGateType と入力数から LogExpr を作る．
+LogExpr
+gate_type_to_expr(tTgGateType gate_type,
+		  ymuint ni)
+{
+  vector<LogExpr> inputs(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    inputs[i] = LogExpr::make_posiliteral(VarId(i));
+  }
+  switch ( gate_type ) {
+  case kTgGateBuff: return inputs[0];
+  case kTgGateNot:  return ~inputs[0];
+  case kTgGateAnd:  return LogExpr::make_and(inputs);
+  case kTgGateNand: return ~LogExpr::make_and(inputs);
+  case kTgGateOr:   return LogExpr::make_or(inputs);
+  case kTgGateNor:  return ~LogExpr::make_or(inputs);
+  case kTgGateXor:  return LogExpr::make_xor(inputs);
+  case kTgGateXnor: return ~LogExpr::make_xor(inputs);
+  default: assert_not_reached(__FILE__, __LINE__);
+  }
+  // ダミー
+  return LogExpr();
+}
+
 END_NONAMESPACE
 
 
@@ -145,6 +169,9 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
       make_subnode(expr, tgnode, node->mSubNodeList, subid);
       assert_cond( subid == nc, __FILE__, __LINE__);
       node->mExpr = expr;
+    }
+    else {
+      node->mExpr = gate_type_to_expr(tgnode->gate_type(), node->fanin_num());
     }
   }
 

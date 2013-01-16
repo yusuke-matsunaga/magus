@@ -10,7 +10,6 @@
 #include "PrintPatCmd.h"
 #include "AtpgMgr.h"
 #include "TestVector.h"
-#include "TvMgr.h"
 #include "ym_tclpp/TclPopt.h"
 
 

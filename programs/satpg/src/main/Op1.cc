@@ -11,6 +11,7 @@
 #include "SaFault.h"
 #include "FaultMgr.h"
 #include "TvMgr.h"
+#include "Fsim.h"
 #include "TestVector.h"
 
 
@@ -22,9 +23,15 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
 Op1::Op1(FaultMgr& fmgr,
-	 TvMgr& tvmgr) :
+	 TvMgr& tvmgr,
+	 vector<TestVector*>& tv_list,
+	 Fsim& fsim3,
+	 bool verify) :
   mFaultMgr(fmgr),
-  mTvMgr(tvmgr)
+  mTvMgr(tvmgr),
+  mTvList(tv_list),
+  mFsim3(fsim3),
+  mVerify(verify)
 {
 }
 
@@ -54,6 +61,13 @@ Op1::set_detected(SaFault* f,
       tv->set_val(iid, kVal0);
     }
   }
+  if ( mVerify ) {
+    bool detect = mFsim3.run(tv, f);
+    assert_cond( detect , __FILE__, __LINE__);
+  }
+
+  mTvList.push_back(tv);
+
   mFaultMgr.set_status(f, kFsDetected);
 }
 

@@ -24,7 +24,10 @@ public:
 
   /// @brief コンストラクタ
   Op1(FaultMgr& fmgr,
-      TvMgr& tvmgr);
+      TvMgr& tvmgr,
+      vector<TestVector*>& tv_list,
+      Fsim& fsim3,
+      bool verify = false);
 
   /// @brief デストラクタ
   ~Op1();
@@ -59,6 +62,11 @@ private:
 
   TvMgr& mTvMgr;
 
+  vector<TestVector*>& mTvList;
+
+  Fsim& mFsim3;
+
+  bool mVerify;
 };
 
 END_NAMESPACE_YM_SATPG

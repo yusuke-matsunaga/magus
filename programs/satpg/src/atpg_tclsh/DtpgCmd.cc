@@ -50,7 +50,9 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
   mPoptSkip = new TclPopt(this, "skip",
 			  "skip mode");
   mPoptX = new TclPoptInt(this, "x",
-			  "X-extract ode [0-1]");
+			  "X-extract mode [0-1]");
+  mPoptVerify = new TclPopt(this, "verify",
+			    "verify generated pattern");
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptSatRec);
   new_popt_group(mPoptDual, mPoptFFR, mPoptMFFC, mPoptAll);
 }
@@ -131,6 +133,10 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   if ( mPoptX->is_specified() ) {
     mgr().set_dtpg_xmode(mPoptX->val());
+  }
+
+  if ( mPoptVerify->is_specified() ) {
+    mgr().set_dtpg_verify_mode(true);
   }
 
   mgr().clear_stats();

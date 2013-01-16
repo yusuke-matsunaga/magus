@@ -34,16 +34,16 @@ public:
 
   /// @brief 入力数を得る．
   ymuint
-  ni() const;
+  input_num() const;
 
   /// @brief pos 番めの値を得る．
   /// @param[in] pos 入力の位置番号
   Val3
   val3(ymuint pos) const;
 
-  /// @brief このパタンで検出した故障のリストを返す．
-  const list<SaFault*>&
-  det_faults() const;
+  /// @brief X の個数を得る．
+  ymuint
+  x_num() const;
 
   /// @brief 内容を BIN 形式で出力する．
   /// @param[in] s 出力先のストリーム
@@ -97,11 +97,6 @@ public:
   /// @note X の部分はコピーしない．
   void
   copy(const TestVector& src);
-
-  /// @brief このパタンで検出した故障を追加する．
-  /// @param[in] fault 追加する故障
-  void
-  add_fault(SaFault* fault);
 
 
 private:
@@ -170,10 +165,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入力数
-  ymuint32 mNi;
-
-  // このパタンで検出した故障のリスト
-  list<SaFault*> mDetFaults;
+  ymuint32 mInputNum;
 
   // ベクタ本体(ただしサイズは可変)
   PackedVal mPat[1];
@@ -213,9 +205,9 @@ operator<<(ostream& s,
 // @brief 入力数を得る．
 inline
 ymuint
-TestVector::ni() const
+TestVector::input_num() const
 {
-  return mNi;
+  return mInputNum;
 }
 
 // @brief pos 番めの値を得る．
@@ -253,22 +245,6 @@ TestVector::set_val(ymuint pos,
     mPat[block0] &= ~mask;
     mPat[block1] &= ~mask;
   }
-}
-
-// @brief このパタンで検出した故障のリストを返す．
-inline
-const list<SaFault*>&
-TestVector::det_faults() const
-{
-  return mDetFaults;
-}
-
-// @brief このパタンで検出した故障を追加する．
-inline
-void
-TestVector::add_fault(SaFault* fault)
-{
-  mDetFaults.push_back(fault);
 }
 
 // @brief ブロック数を返す．

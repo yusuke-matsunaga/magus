@@ -68,10 +68,14 @@ AtpgMgr::AtpgMgr() :
   mTimer(TM_SIZE, TM_MISC)
 {
   mFsim = new_Fsim2();
+  mFsim3 = new_Fsim3();
 
   mDtpg = new_DtpgSat();
 
+  mDtpgVerify = false;
+
   reg_network_handler(new FsimNetBinder(mFsim));
+  reg_network_handler(new FsimNetBinder(mFsim3));
 
   set_dtpg_mode();
 }
@@ -80,6 +84,7 @@ AtpgMgr::AtpgMgr() :
 AtpgMgr::~AtpgMgr()
 {
   delete mFsim;
+  delete mFsim3;
   delete mDtpg;
 }
 
@@ -231,6 +236,13 @@ AtpgMgr::set_dtpg_xmode(ymuint val)
   mDtpg->set_get_pat(val);
 }
 
+// @brief テストパタン生成時に故障シミュレーションを用いて検証するかを指定する．
+void
+AtpgMgr::set_dtpg_verify_mode(bool verify)
+{
+  mDtpgVerify = verify;
+}
+
 // @brief テストパタン生成を行なう．
 void
 AtpgMgr::dtpg(const string& option)
@@ -239,7 +251,7 @@ AtpgMgr::dtpg(const string& option)
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  Op1 op(mFaultMgr, mTvMgr);
+  Op1 op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgVerify);
 
   mDtpg->run(op, option);
 

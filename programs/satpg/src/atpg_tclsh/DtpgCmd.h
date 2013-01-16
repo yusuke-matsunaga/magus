@@ -85,6 +85,9 @@ private:
   // X抽出オプションの解析用オブジェクト
   TclPoptInt* mPoptX;
 
+  // verify オプションの解析用オブジェクト
+  TclPopt* mPoptVerify;
+
 };
 
 END_NAMESPACE_YM_SATPG

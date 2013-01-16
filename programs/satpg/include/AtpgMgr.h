@@ -134,6 +134,10 @@ public:
   void
   set_dtpg_xmode(ymuint val);
 
+  /// @brief テストパタン生成時に故障シミュレーションを用いて検証するかを指定する．
+  void
+  set_dtpg_verify_mode(bool verify);
+
   /// @brief テストパタン生成を行なう．
   void
   dtpg(const string& option);
@@ -213,8 +217,14 @@ private:
   // 故障シミュレータ
   Fsim* mFsim;
 
+  // 3値の故障シミュレータ
+  Fsim* mFsim3;
+
   // テストパタン生成器
   Dtpg* mDtpg;
+
+  // テストパタン生成時に検証を行うときに true にする．
+  bool mDtpgVerify;
 
   // ネットワークが変更された時に呼ばれるイベントハンドラ
   T2BindMgr<const TgNetwork&, const vector<SaFault*>&> mNtwkBindMgr;

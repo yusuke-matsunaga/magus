@@ -87,11 +87,21 @@ make_lexp_cnf(SatSolver& solver,
 	      Literal output,
 	      const vector<Literal>& inputs)
 {
-  if ( lexp.is_constant() || lexp.is_literal() ) {
+  if ( lexp.is_constant() ) {
     assert_not_reached(__FILE__, __LINE__);
     return;
   }
 
+  if ( lexp.is_posiliteral() ) {
+    solver.add_clause( inputs[0], ~output);
+    solver.add_clause(~inputs[0],  output);
+    return;
+  }
+  if ( lexp.is_negaliteral() ) {
+    solver.add_clause( inputs[0],  output);
+    solver.add_clause(~inputs[0], ~output);
+    return;
+  }
   ymuint nc = lexp.child_num();
   vector<Literal> local_inputs(nc);
   for (ymuint i = 0; i < nc; ++ i) {
@@ -433,20 +443,20 @@ make_gnode_cnf(SatSolver& solver,
     inputs[i] = Literal(inode->gvar(), kPolPosi);
   }
 
-  if ( node->is_cplx_logic() ) {
 #if USE_LOGEXPR
-    make_lexp_cnf(solver, node->expr(), output, inputs);
+  make_lexp_cnf(solver, node->expr(), output, inputs);
 #else
+  if ( node->is_cplx_logic() ) {
     ymuint n = node->subnode_num();
     for (ymuint i = 0; i < n; ++ i) {
       DtpgNode* node1 = node->subnode(i);
       make_gnode_cnf(solver, node1);
     }
-#endif
   }
   else {
     make_gate_cnf(solver, node->gate_type(), output, inputs);
   }
+#endif
 }
 
 // @brief 故障回路におけるノードの入出力の関係を表す CNF を作る．
@@ -486,20 +496,20 @@ make_fnode_cnf(SatSolver& solver,
     solver.add_clause(~inputs[0],  output);
   }
   else {
-    if ( node->is_cplx_logic() ) {
 #if USE_LOGEXPR
-      make_lexp_cnf(solver, node->expr(), output, inputs);
+    make_lexp_cnf(solver, node->expr(), output, inputs);
 #else
+    if ( node->is_cplx_logic() ) {
       ymuint n = node->subnode_num();
       for (ymuint i = 0; i < n; ++ i) {
 	DtpgNode* node1 = node->subnode(i);
 	make_fnode_cnf(solver, node1);
       }
-#endif
     }
     else {
       make_gate_cnf(solver, node->gate_type(), output, inputs);
     }
+#endif
   }
 
   solver.add_clause(dep);
@@ -1146,10 +1156,10 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	solver.add_clause(~inputs[0],  olit);
       }
       else {
-	if ( node->is_cplx_logic() ) {
 #if USE_LOGEXPR
-	  make_lexp_cnf(solver, node->expr(), olit, inputs);
+	make_lexp_cnf(solver, node->expr(), olit, inputs);
 #else
+	if ( node->is_cplx_logic() ) {
 	  ymuint n = node->subnode_num();
 	  ymuint n1 = n - 1;
 	  for (ymuint i = 0; i < n; ++ i) {
@@ -1176,11 +1186,11 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	    }
 	    make_gate_cnf(solver, node1->gate_type(), output, inputs1);
 	  }
-#endif
 	}
 	else {
 	  make_gate_cnf(solver, node->gate_type(), olit, inputs);
 	}
+#endif
       }
 
       // 出力の dlit が1になる条件を作る．

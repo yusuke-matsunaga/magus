@@ -16,8 +16,8 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
 // @param[in] 入力数を指定する．
-TestVector::TestVector(ymuint ni) :
-  mNi(ni)
+TestVector::TestVector(ymuint input_num) :
+  mInputNum(input_num)
 {
 }
 
@@ -26,11 +26,26 @@ TestVector::~TestVector()
 {
 }
 
+// @brief X の個数を得る．
+ymuint
+TestVector::x_num() const
+{
+  ymuint ni = input_num();
+  ymuint nb = block_num(ni);
+  ymint n = 0;
+  for (ymuint i = 0; i < nb; i += 2) {
+    PackedVal v = mPat[i] | mPat[i + 1];
+    // v 中の1の数を数える．
+    n += count_ones(v);
+  }
+  return ni - n;
+}
+
 // @brief すべて未定(X) で初期化する．
 void
 TestVector::init()
 {
-  ymuint nb = block_num(ni());
+  ymuint nb = block_num(input_num());
   for (ymuint i = 0; i < nb; i += 2) {
     ymuint i0 = i;
     ymuint i1 = i + 1;
@@ -48,7 +63,7 @@ bool
 TestVector::set_from_hex(const string& hex_string)
 {
   // よく問題になるが，ここでは最下位ビット側から入力する．
-  ymuint nl = hex_length(ni());
+  ymuint nl = hex_length(input_num());
   ymuint sft = 0;
   ymuint blk = 0;
   PackedVal pat = kPvAll0;
@@ -90,7 +105,7 @@ TestVector::set_from_hex(const string& hex_string)
 void
 TestVector::set_from_random(RandGen& randgen)
 {
-  ymuint nb = block_num(ni());
+  ymuint nb = block_num(input_num());
   for (ymuint i = 0; i < nb; i += 2) {
     PackedVal v = randgen.ulong();
     mPat[i] = ~v;
@@ -104,7 +119,7 @@ TestVector::set_from_random(RandGen& randgen)
 void
 TestVector::copy(const TestVector& src)
 {
-  ymuint nb = block_num(ni());
+  ymuint nb = block_num(input_num());
   for (ymuint i = 0; i < nb; i += 2) {
     ymuint i0 = i;
     ymuint i1 = i + 1;
@@ -121,7 +136,7 @@ void
 TestVector::dump_bin(ostream& s) const
 {
   // よく問題になるが，ここでは最下位ビット側から出力する．
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     switch ( val3(i) ) {
     case kVal0: s << '0'; break;
     case kVal1: s << '1'; break;
@@ -139,7 +154,7 @@ TestVector::dump_hex(ostream& s) const
   ymuint tmp = 0U;
   ymuint bit = 1U;
   for (ymuint i = 0; ; ++ i) {
-    if ( i < ni() ) {
+    if ( i < input_num() ) {
       if ( val3(i) == kVal1 ) {
 	// 面倒くさいので kValX は kVal0 と同じとみなす．
 	tmp += bit;
@@ -168,7 +183,7 @@ TestVector::dump_hex(ostream& s) const
 void
 TestVector::dump(FILE* fp) const
 {
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     putc((val3(i) == kVal1 ? '1' : '0'), fp);
   }
   putc('\n', fp);
