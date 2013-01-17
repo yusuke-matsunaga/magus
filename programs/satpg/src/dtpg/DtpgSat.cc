@@ -1383,7 +1383,12 @@ DtpgSat::solve(SatSolver& solver,
     if ( mGetPatFlag == 1 ) {
       get_pat(f->node());
     }
+    else if ( mGetPatFlag == 2 ) {
+      get_pat2(f->node());
+    }
     else {
+      // フォールバック
+      // TFI に含まれる全ての外部入力の値を記録する．
       mValList.clear();
       mValList.reserve(mInputList.size());
       for (vector<DtpgNode*>::const_iterator p = mInputList.begin();
@@ -1413,6 +1418,46 @@ DtpgSat::solve(SatSolver& solver,
 // @note 結果は mValList に格納される．
 void
 DtpgSat::get_pat(DtpgNode* fnode)
+{
+  mValList.clear();
+  mDiffNodeList.clear();
+  mBwdNodeList.clear();
+
+  // 故障差の伝搬経路にマークをつける．
+  fwd_dfs(fnode);
+
+  // 故障差を伝搬させるためのサイド入力の値を正当化する．
+  for (vector<DtpgNode*>::iterator p = mDiffNodeList.begin();
+       p != mDiffNodeList.end(); ++ p) {
+    DtpgNode* node = *p;
+    if ( node->is_input() ) {
+      record_value(node);
+    }
+    else {
+      ymuint ni = node->fanin_num();
+      for (ymuint i = 0; i < ni; ++ i) {
+	DtpgNode* inode = node->fanin(i);
+	if ( !inode->mark2() ) {
+	  justify(inode);
+	}
+      }
+    }
+  }
+
+  // 一連の処理でつけたマークを消す．
+  for (vector<DtpgNode*>::iterator p = mBwdNodeList.begin();
+       p != mBwdNodeList.end(); ++ p) {
+    DtpgNode* node = *p;
+    node->clear_mark1();
+    node->clear_mark2();
+    node->clear_mark3();
+  }
+}
+
+// @brief テストパタンを求める．
+// @note 結果は mValList に格納される．
+void
+DtpgSat::get_pat2(DtpgNode* fnode)
 {
   mValList.clear();
   mDiffNodeList.clear();
@@ -1520,11 +1565,13 @@ DtpgSat::justify(DtpgNode* node)
     switch ( node->gate_type() ) {
     case kTgGateBuff:
     case kTgGateNot:
+      // 無条件で唯一のファンインをたどる．
       justify(node->fanin(0));
       break;
 
     case kTgGateAnd:
-       if ( val == kB3True ) {
+      if ( val == kB3True ) {
+	// 故障差が伝搬していないノードをすべてたどる．
 	for (ymuint i = 0; i < ni; ++ i) {
 	  DtpgNode* inode = node->fanin(i);
 	  if ( !inode->mark2() ) {
@@ -1533,31 +1580,52 @@ DtpgSat::justify(DtpgNode* node)
 	}
       }
       else if ( val == kB3False ) {
+	// 故障差が伝搬していない0の値を持つ最初のノードをたどる．
+	// ただし，既にたどっているノードがあればなにもしない．
+	DtpgNode* first_node = NULL;
+	bool found = false;
 	for (ymuint i = 0; i < ni; ++ i) {
 	  DtpgNode* inode = node->fanin(i);
-	  if ( !inode->mark2() ) {
-	    if ( mModel[inode->gvar().val()] == kB3False ) {
-	      justify(inode);
+	  if ( !inode->mark2() && mModel[inode->gvar().val()] == kB3False ) {
+	    if ( inode->mark3() ) {
+	      found = true;
 	      break;
 	    }
+	    if ( first_node == NULL ) {
+	      first_node = inode;
+	    }
 	  }
+	}
+	if ( !found && first_node != NULL ) {
+	  justify(first_node);
 	}
       }
       break;
 
     case kTgGateNand:
       if ( val == kB3True ) {
+	// 故障差が伝搬していない0の値を持つ最初のノードをたどる．
+	// ただし，既にたどっているノードがあればなにもしない．
+	DtpgNode* first_node = NULL;
+	bool found = false;
 	for (ymuint i = 0; i < ni; ++ i) {
 	  DtpgNode* inode = node->fanin(i);
-	  if ( !inode->mark2() ) {
-	    if ( mModel[inode->gvar().val()] == kB3False ) {
-	      justify(inode);
+	  if ( !inode->mark2() && mModel[inode->gvar().val()] == kB3False ) {
+	    if ( inode->mark3() ) {
+	      found = true;
 	      break;
+	    }
+	    if ( first_node == NULL ) {
+	      first_node = inode;
 	    }
 	  }
 	}
+	if ( !found && first_node != NULL ) {
+	  justify(first_node);
+	}
       }
       else if ( val == kB3False ) {
+	// 故障差が伝搬していないノードをすべてたどる．
 	for (ymuint i = 0; i < ni; ++ i) {
 	  DtpgNode* inode = node->fanin(i);
 	  if ( !inode->mark2() ) {
@@ -1569,17 +1637,28 @@ DtpgSat::justify(DtpgNode* node)
 
     case kTgGateOr:
       if ( val == kB3True ) {
+	// 故障差が伝搬していない1の値を持つ最初のノードをたどる．
+	// ただし，既にたどっているノードがあればなにもしない．
+	DtpgNode* first_node = NULL;
+	bool found = false;
 	for (ymuint i = 0; i < ni; ++ i) {
 	  DtpgNode* inode = node->fanin(i);
-	  if ( !inode->mark2() ) {
-	    if ( mModel[inode->gvar().val()] == kB3True ) {
-	      justify(inode);
+	  if ( !inode->mark2() && mModel[inode->gvar().val()] == kB3True ) {
+	    if ( inode->mark3() ) {
+	      found = true;
 	      break;
+	    }
+	    if ( first_node == NULL ) {
+	      first_node = inode;
 	    }
 	  }
 	}
+	if ( !found && first_node != NULL ) {
+	  justify(first_node);
+	}
       }
       else if ( val == kB3False ) {
+	// 故障差が伝搬していないノードをすべてたどる．
 	for (ymuint i = 0; i < ni; ++ i) {
 	  DtpgNode* inode = node->fanin(i);
 	  if ( !inode->mark2() ) {
@@ -1591,6 +1670,7 @@ DtpgSat::justify(DtpgNode* node)
 
     case kTgGateNor:
       if ( val == kB3True ) {
+	// 故障差が伝搬していないノードをすべてたどる．
 	for (ymuint i = 0; i < ni; ++ i) {
 	  DtpgNode* inode = node->fanin(i);
 	  if ( !inode->mark2() ) {
@@ -1599,20 +1679,31 @@ DtpgSat::justify(DtpgNode* node)
 	}
       }
       else if ( val == kB3False ) {
+	// 故障差が伝搬していない1の値を持つ最初のノードをたどる．
+	// ただし，既にたどっているノードがあればなにもしない．
+	DtpgNode* first_node = NULL;
+	bool found = false;
 	for (ymuint i = 0; i < ni; ++ i) {
 	  DtpgNode* inode = node->fanin(i);
-	  if ( !inode->mark2() ) {
-	    if ( mModel[inode->gvar().val()] == kB3True ) {
-	      justify(inode);
+	  if ( !inode->mark2() && mModel[inode->gvar().val()] == kB3True ) {
+	    if ( inode->mark3() ) {
+	      found = true;
 	      break;
 	    }
+	    if ( first_node == NULL ) {
+	      first_node = inode;
+	    }
 	  }
+	}
+	if ( !found && first_node != NULL ) {
+	  justify(first_node);
 	}
       }
       break;
 
     case kTgGateXor:
     case kTgGateXnor:
+      // 故障差が伝搬していないノードをすべてたどる．
       for (ymuint i = 0; i < ni; ++ i) {
 	DtpgNode* inode = node->fanin(i);
 	if ( !inode->mark2() ) {

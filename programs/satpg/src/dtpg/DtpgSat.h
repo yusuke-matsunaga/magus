@@ -168,6 +168,12 @@ private:
   void
   get_pat(DtpgNode* fnode);
 
+  /// @brief テストパタンを求める．
+  /// @param[in] fnode 故障のあるノード
+  /// @note 結果は mValList に格納される．
+  void
+  get_pat2(DtpgNode* fnode);
+
   /// @brief solve 中で故障差を持つノードをたどる．
   /// @param[in] node 対象のノード
   /// @retval true node を通って外部出力まで故障差が伝搬している．
