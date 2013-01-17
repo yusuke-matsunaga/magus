@@ -6,9 +6,7 @@
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: dtpgsat_nsdef.h 2128 2009-03-12 07:25:33Z matsunaga $
-///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 // 名前空間の定義ファイル
@@ -32,6 +30,7 @@ BEGIN_NAMESPACE_YM_SATPG_DTPG
 class DtpgSat;
 class DtpgNetwork;
 class DtpgNode;
+class DtpgPrimitive;
 class DtpgFFR;
 class DtpgFault;
 

@@ -187,6 +187,16 @@ private:
   void
   justify(DtpgNode* node);
 
+  /// @brief justify の下請け関数
+  /// @param[in] prim 対象のプリミティブ
+  /// @param[in] node 対象のノード
+  /// @note node の値割り当てを正当化する．
+  /// @note 正当化に用いられているノードには mark3 がつく．
+  /// @note mark3 がついたノードは mBwdNodeList に格納される．
+  void
+  justify_primitive(DtpgPrimitive* prim,
+		    DtpgNode* node);
+
   /// @brief 入力ノードの値を記録する．
   /// @param[in] node 対象の外部入力ノード
   /// @note node の値を mValList に記録する．

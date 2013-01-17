@@ -13,12 +13,9 @@
 #include "DtpgFFR.h"
 #include "DtpgFault.h"
 #include "DtpgOperator.h"
-#include "ym_logic/LogExpr.h"
 #include "ym_logic/SatSolver.h"
 #include "ym_logic/SatStats.h"
 
-
-#define USE_LOGEXPR 0
 
 BEGIN_NAMESPACE_YM_SATPG
 
@@ -35,17 +32,23 @@ BEGIN_NAMESPACE_YM_SATPG_DTPG
 
 BEGIN_NONAMESPACE
 
+// @brief 故障挿入回路を表す CNF 式を作る．
+// @param[in] solver SAT ソルバー
+// @param[in] ivar 入力の変数
+// @param[in] fvar 故障変数
+// @param[in] ovar 出力の変数
+// @param[in] fval 故障値
 void
 make_flt_cnf(SatSolver& solver,
 	     VarId ivar,
 	     VarId fvar,
 	     VarId ovar,
-	     int val)
+	     int vval)
 {
   Literal l0(ivar, kPolPosi);
   Literal l1(fvar, kPolPosi);
   Literal l2(ovar, kPolPosi);
-  if ( val == 0 ) {
+  if ( vval == 0 ) {
     solver.add_clause( l0, ~l2);
     solver.add_clause(~l1, ~l2);
     solver.add_clause(~l0,  l1, l2);
@@ -57,157 +60,98 @@ make_flt_cnf(SatSolver& solver,
   }
 }
 
-#if USE_LOGEXPR
-
+// @brief ノードに正常回路用の変数を設定する．
+// @param[in] solver SAT ソルバー
+// @param[in] node 対象のノード
 void
 set_gvar(SatSolver& solver,
 	 DtpgNode* node)
 {
+  // ノードそのものに割り当てる．
   VarId gvar = solver.new_var();
   node->set_gvar(gvar);
 }
 
+// @brief ノードに正常回路用の変数を設定する．
+// @param[in] solver SAT ソルバー
+// @param[in] node 対象のノード
 void
-set_fvar(SatSolver& solver,
-	 DtpgNode* node)
+set_gvar2(SatSolver& solver,
+	  DtpgNode* node)
 {
-  VarId fvar = solver.new_var();
-  VarId dvar = solver.new_var();
-  node->set_fvar(fvar, dvar);
-}
-
-/// @brief ノードの入出力の関係を表す CNF クローズを生成する．
-/// @param[in] solver SAT ソルバ
-/// @param[in] lexp 論理式
-/// @param[in] output 出力リテラル
-/// @param[in] inputs 入力リテラル
-void
-make_lexp_cnf(SatSolver& solver,
-	      const LogExpr& lexp,
-	      Literal output,
-	      const vector<Literal>& inputs)
-{
-  if ( lexp.is_constant() ) {
-    assert_not_reached(__FILE__, __LINE__);
-    return;
-  }
-
-  if ( lexp.is_posiliteral() ) {
-    solver.add_clause( inputs[0], ~output);
-    solver.add_clause(~inputs[0],  output);
-    return;
-  }
-  if ( lexp.is_negaliteral() ) {
-    solver.add_clause( inputs[0],  output);
-    solver.add_clause(~inputs[0], ~output);
-    return;
-  }
-  ymuint nc = lexp.child_num();
-  vector<Literal> local_inputs(nc);
-  for (ymuint i = 0; i < nc; ++ i) {
-    LogExpr lexp1 = lexp.child(i);
-    if ( lexp1.is_posiliteral() ) {
-      local_inputs[i] = inputs[lexp1.varid().val()];
-    }
-    else if ( lexp1.is_negaliteral() ) {
-      local_inputs[i] = ~inputs[lexp1.varid().val()];
-    }
-    else {
-      VarId new_varid = solver.new_var();
-      local_inputs[i] = Literal(new_varid, kPolPosi);
-      make_lexp_cnf(solver, lexp1, local_inputs[i], inputs);
-    }
-  }
-  vector<Literal> tmp(nc + 1);
-  if ( lexp.is_and() ) {
-    for (ymuint i = 0; i < nc; ++ i) {
-      tmp[i] = ~local_inputs[i];
-    }
-    tmp[nc] = output;
-    solver.add_clause(tmp);
-    for (ymuint i = 0; i < nc; ++ i) {
-      solver.add_clause(local_inputs[i], ~output);
-    }
-  }
-  else if ( lexp.is_or() ) {
-    for (ymuint i = 0; i < nc; ++ i) {
-      tmp[i] = local_inputs[i];
-    }
-    tmp[nc] = ~output;
-    solver.add_clause(tmp);
-    for (ymuint i = 0; i < nc; ++ i) {
-      solver.add_clause(~local_inputs[i], output);
-    }
-  }
-  else if ( lexp.is_xor() ) {
-    ymuint np = (1U << nc);
-    for (ymuint p = 0; p < np; ++ p) {
-      ymuint c = 0;
-      for (ymuint i = 0; i < nc; ++ i) {
-	if ( p & (1U << i) ) {
-	  tmp[i] = local_inputs[i];
-	}
-	else {
-	  tmp[i] = ~local_inputs[i];
-	  ++ c;
-	}
-      }
-      if ( (c % 2) == 0 ) {
-	tmp[nc] = ~output;
+  // ノード内部のプリミティブに割り当てる．
+  ymuint n = node->primitive_num();
+  if ( n > 0 ) {
+    ymuint n1 = n - 1;
+    for (ymuint i = 0; i < n1; ++ i) {
+      DtpgPrimitive* prim = node->primitive(i);
+      VarId gvar;
+      if ( prim->is_input() ) {
+	ymuint ipos = prim->input_id();
+	DtpgNode* inode = node->fanin(ipos);
+	gvar = inode->gvar();
       }
       else {
-	tmp[nc] = output;
+	gvar = solver.new_var();
       }
-      solver.add_clause(tmp);
+      prim->set_gvar(gvar);
+      prim->set_fvar(gvar);
     }
+    // 根のプリミティブの場合はノードの変数をコピーする．
+    DtpgPrimitive* prim = node->primitive(n1);
+    VarId gvar = node->gvar();
+    prim->set_gvar(gvar);
+    prim->set_fvar(gvar);
   }
 }
 
-#else
-
-void
-set_gvar(SatSolver& solver,
-	 DtpgNode* node)
-{
-  VarId gvar = solver.new_var();
-  node->set_gvar(gvar);
-  if ( node->is_cplx_logic() ) {
-    ymuint n = node->subnode_num();
-    ymuint n1 = n - 1;
-    for (ymuint i = 0; i < n1; ++ i) {
-      DtpgNode* node1 = node->subnode(i);
-      VarId gvar = solver.new_var();
-      node1->set_gvar(gvar);
-    }
-    DtpgNode* node1 = node->subnode(n1);
-    node1->set_gvar(gvar);
-  }
-}
-
+// @brief ノードに正常回路用の変数を設定する．
+// @param[in] solver SAT ソルバー
+// @param[in] node 対象のノード
 void
 set_fvar(SatSolver& solver,
 	 DtpgNode* node)
 {
+  // ノードそのものに割り当てる．
   VarId fvar = solver.new_var();
   VarId dvar = solver.new_var();
   node->set_fvar(fvar, dvar);
-  if ( node->is_cplx_logic() ) {
-    ymuint n = node->subnode_num();
+}
+
+// @brief ノードに正常回路用の変数を設定する．
+// @param[in] solver SAT ソルバー
+// @param[in] node 対象のノード
+void
+set_fvar2(SatSolver& solver,
+	  DtpgNode* node)
+{
+  // ノード内部のプリミティブに割り当てる．
+  ymuint n = node->primitive_num();
+  if ( n > 0 ) {
     ymuint n1 = n - 1;
     for (ymuint i = 0; i < n1; ++ i) {
-      DtpgNode* node1 = node->subnode(i);
-      VarId fvar = solver.new_var();
-      VarId dvar = solver.new_var();
-      node1->set_fvar(fvar, dvar);
+      DtpgPrimitive* prim = node->primitive(i);
+      if ( prim->is_input() ) {
+	ymuint ipos = prim->input_id();
+	DtpgNode* inode = node->fanin(ipos);
+	prim->set_fvar(inode->fvar());
+      }
+      else {
+	VarId fvar = solver.new_var();
+	prim->set_fvar(fvar);
+      }
     }
-    DtpgNode* node1 = node->subnode(n1);
-    node1->set_fvar(fvar, dvar);
+    // 根のプリミティブの場合はノードの変数をコピーする．
+    DtpgPrimitive* prim = node->primitive(n1);
+    prim->set_fvar(node->fvar());
   }
 }
 
-#endif
-
 // @brief ゲートの入出力関係を表す CNF を作る．
+// @param[in] solver SAT ソルバー
+// @param[in] gate_type ゲートタイプ
+// @param[in] output 出力のリテラル
+// @param[in] inputs 入力のリテラル
 void
 make_gate_cnf(SatSolver& solver,
 	      tTgGateType gate_type,
@@ -436,27 +380,31 @@ make_gnode_cnf(SatSolver& solver,
     return;
   }
 
-  ymuint ni = node->fanin_num();
-  vector<Literal> inputs(ni);
-  for (ymuint i = 0; i < ni; ++ i) {
-    DtpgNode* inode = node->fanin(i);
-    inputs[i] = Literal(inode->gvar(), kPolPosi);
-  }
-
-#if USE_LOGEXPR
-  make_lexp_cnf(solver, node->expr(), output, inputs);
-#else
   if ( node->is_cplx_logic() ) {
-    ymuint n = node->subnode_num();
+    ymuint n = node->primitive_num();
     for (ymuint i = 0; i < n; ++ i) {
-      DtpgNode* node1 = node->subnode(i);
-      make_gnode_cnf(solver, node1);
+      DtpgPrimitive* prim = node->primitive(i);
+      if ( !prim->is_input() ) {
+	Literal output(prim->gvar(), kPolPosi);
+	ymuint ni = prim->fanin_num();
+	vector<Literal> inputs(ni);
+	for (ymuint j = 0; j < ni; ++ j) {
+	  DtpgPrimitive* iprim = prim->fanin(j);
+	  inputs[j] = Literal(iprim->gvar(), kPolPosi);
+	}
+	make_gate_cnf(solver, prim->gate_type(), output, inputs);
+      }
     }
   }
   else {
+    ymuint ni = node->fanin_num();
+    vector<Literal> inputs(ni);
+    for (ymuint i = 0; i < ni; ++ i) {
+      DtpgNode* inode = node->fanin(i);
+      inputs[i] = Literal(inode->gvar(), kPolPosi);
+    }
     make_gate_cnf(solver, node->gate_type(), output, inputs);
   }
-#endif
 }
 
 // @brief 故障回路におけるノードの入出力の関係を表す CNF を作る．
@@ -496,20 +444,25 @@ make_fnode_cnf(SatSolver& solver,
     solver.add_clause(~inputs[0],  output);
   }
   else {
-#if USE_LOGEXPR
-    make_lexp_cnf(solver, node->expr(), output, inputs);
-#else
     if ( node->is_cplx_logic() ) {
-      ymuint n = node->subnode_num();
+      ymuint n = node->primitive_num();
       for (ymuint i = 0; i < n; ++ i) {
-	DtpgNode* node1 = node->subnode(i);
-	make_fnode_cnf(solver, node1);
+	DtpgPrimitive* prim = node->primitive(i);
+	if ( !prim->is_input() ) {
+	  Literal output(prim->fvar(), kPolPosi);
+	  ymuint ni = prim->fanin_num();
+	  vector<Literal> inputs(ni);
+	  for (ymuint j = 0; j < ni; ++ j) {
+	    DtpgPrimitive* iprim = prim->fanin(j);
+	    inputs[j] = Literal(iprim->fvar(), kPolPosi);
+	  }
+	  make_gate_cnf(solver, prim->gate_type(), output, inputs);
+	}
       }
     }
     else {
       make_gate_cnf(solver, node->gate_type(), output, inputs);
     }
-#endif
   }
 
   solver.add_clause(dep);
@@ -941,6 +894,12 @@ DtpgSat::dtpg_single(DtpgFault* f,
 
   DtpgNode* fnode = f->node();
 
+  if ( f->is_input_fault() ) {
+    ymuint ipos = f->pos();
+    DtpgNode* inode = fnode->fanin(ipos);
+    set_fvar(solver, inode);
+  }
+
   // fnode から外部出力へ至る部分の CNF を作る．
   make_prop_cnf(solver, fnode);
 
@@ -948,7 +907,8 @@ DtpgSat::dtpg_single(DtpgFault* f,
   if ( f->is_input_fault() ) {
     ymuint ipos = f->pos();
     DtpgNode* inode = fnode->fanin(ipos);
-    set_fvar(solver, inode);
+    //set_fvar(solver, inode);
+    set_fvar2(solver, inode);
     make_fnode_cnf(solver, fnode);
     fsrc = fnode->fanin(ipos);
   }
@@ -1004,6 +964,7 @@ DtpgSat::dtpg_dual(DtpgFault* f0,
     ymuint ipos = f0->pos();
     DtpgNode* inode = fnode->fanin(ipos);
     set_fvar(solver, inode);
+    set_fvar2(solver, inode);
     make_fnode_cnf(solver, fnode);
     fsrc = f0->source_node();
   }
@@ -1088,6 +1049,13 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
     }
     node->clear_mark1();
   }
+  for (vector<DtpgNode*>::const_iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    if ( (node != root) && node->mark1() ) {
+      set_fvar2(solver, node);
+    }
+  }
 
   vector<VarId> flt_var(nf);
   vector<VarId> tmp_var(nf);
@@ -1109,13 +1077,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
     hash_map<ymuint, ymuint> fanin_map;
     for (ymuint i = 0; i < ni; ++ i) {
       DtpgNode* inode = node->fanin(i);
-      VarId fvar;
-      if ( inode->has_fvar() ) {
-	fvar = inode->fvar();
-      }
-      else {
-	fvar = inode->gvar();
-      }
+      VarId fvar = inode->fvar();
       for (ymint val = 0; val < 2; ++ val) {
 	DtpgFault* f = node->input_fault(val, i);
 	if ( f == NULL ) {
@@ -1156,41 +1118,38 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	solver.add_clause(~inputs[0],  olit);
       }
       else {
-#if USE_LOGEXPR
-	make_lexp_cnf(solver, node->expr(), olit, inputs);
-#else
 	if ( node->is_cplx_logic() ) {
-	  ymuint n = node->subnode_num();
+	  ymuint n = node->primitive_num();
 	  ymuint n1 = n - 1;
 	  for (ymuint i = 0; i < n; ++ i) {
-	    DtpgNode* node1 = node->subnode(i);
-	    ymuint ni1 = node1->fanin_num();
-	    vector<Literal> inputs1(ni1);
-	    for (ymuint j = 0; j < ni1; ++ j) {
-	      DtpgNode* inode1 = node1->fanin(j);
-	      if ( inode1->is_subnode() ) {
-		inputs1[j] = Literal(inode1->fvar(), kPolPosi);
+	    DtpgPrimitive* prim = node->primitive(i);
+	    if ( !prim->is_input() ) {
+	      ymuint ni1 = prim->fanin_num();
+	      vector<Literal> inputs1(ni1);
+	      for (ymuint j = 0; j < ni1; ++ j) {
+		DtpgPrimitive* iprim = prim->fanin(j);
+		if ( iprim->is_input() ) {
+		  ymuint ipos = iprim->input_id();
+		  inputs1[j] = inputs[ipos];
+		}
+		else {
+		  inputs1[j] = Literal(iprim->fvar(), kPolPosi);
+		}
+	      }
+	      Literal output;
+	      if ( i == n1 ) {
+		output = olit;
 	      }
 	      else {
-		hash_map<ymuint, ymuint>::iterator p = fanin_map.find(inode1->id());
-		assert_cond( p != fanin_map.end(), __FILE__, __LINE__);
-		inputs1[j] = inputs[p->second];
+		output = Literal(prim->fvar(), kPolPosi);
 	      }
+	      make_gate_cnf(solver, prim->gate_type(), output, inputs1);
 	    }
-	    Literal output;
-	    if ( i == n1 ) {
-	      output = olit;
-	    }
-	    else {
-	      output = Literal(node1->fvar(), kPolPosi);
-	    }
-	    make_gate_cnf(solver, node1->gate_type(), output, inputs1);
 	  }
 	}
 	else {
 	  make_gate_cnf(solver, node->gate_type(), olit, inputs);
 	}
-#endif
       }
 
       // 出力の dlit が1になる条件を作る．
@@ -1324,6 +1283,17 @@ DtpgSat::make_prop_cnf(SatSolver& solver,
     DtpgNode* node = *p;
     set_gvar(solver, node);
     mUsedNodeList.push_back(node);
+  }
+  for (vector<DtpgNode*>::iterator p = tfo_list.begin();
+       p != tfo_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    set_gvar2(solver, node);
+    set_fvar2(solver, node);
+  }
+  for (vector<DtpgNode*>::iterator p = tfi_list.begin();
+       p != tfi_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    set_gvar2(solver, node);
   }
 
   // mInputList を作る．
@@ -1539,11 +1509,13 @@ DtpgSat::justify(DtpgNode* node)
     return;
   }
 
-  Bool3 val = mModel[node->gvar().val()];
   if ( node->is_cplx_logic() ) {
-    // 未完
+    ymuint np = node->primitive_num();
+    DtpgPrimitive* prim = node->primitive(np - 1);
+    justify_primitive(prim, node);
   }
   else {
+    Bool3 val = mModel[node->gvar().val()];
     ymuint ni = node->fanin_num();
     switch ( node->gate_type() ) {
     case kTgGateBuff:
@@ -1645,6 +1617,145 @@ DtpgSat::justify(DtpgNode* node)
 	DtpgNode* inode = node->fanin(i);
 	if ( !inode->mark2() ) {
 	  justify(node);
+	}
+      }
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
+  }
+}
+
+// @brief justify の下請け関数
+// @param[in] prim 対象のプリミティブ
+// @param[in] node 対象のノード
+// @note node の値割り当てを正当化する．
+// @note 正当化に用いられているノードには mark3 がつく．
+// @note mark3 がついたノードは mBwdNodeList に格納される．
+void
+DtpgSat::justify_primitive(DtpgPrimitive* prim,
+			   DtpgNode* node)
+{
+  if ( prim->is_input() ) {
+    ymuint ipos = prim->input_id();
+    DtpgNode* inode = node->fanin(ipos);
+    justify(inode);
+  }
+  else {
+    Bool3 val = mModel[prim->gvar().val()];
+    ymuint ni = prim->fanin_num();
+    switch ( prim->gate_type() ) {
+    case kTgGateBuff:
+    case kTgGateNot:
+      justify_primitive(prim->fanin(0), node);
+      break;
+
+    case kTgGateAnd:
+      if ( val == kB3True ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgPrimitive* iprim = prim->fanin(i);
+	  Bool3 igval = mModel[iprim->gvar().val()];
+	  Bool3 ifval = mModel[iprim->fvar().val()];
+	  if ( igval == ifval ) {
+	    justify_primitive(iprim, node);
+	  }
+	}
+      }
+      else if ( val == kB3False ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgPrimitive* iprim = prim->fanin(i);
+	  Bool3 igval = mModel[iprim->gvar().val()];
+	  Bool3 ifval = mModel[iprim->fvar().val()];
+	  if ( igval == kB3False && ifval == kB3False ) {
+	    justify_primitive(iprim, node);
+	    break;
+	  }
+	}
+      }
+      break;
+
+    case kTgGateNand:
+      if ( val == kB3True ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgPrimitive* iprim = prim->fanin(i);
+	  Bool3 igval = mModel[iprim->gvar().val()];
+	  Bool3 ifval = mModel[iprim->fvar().val()];
+	  if ( igval == kB3False && ifval == kB3False ) {
+	    justify_primitive(iprim, node);
+	    break;
+	  }
+	}
+      }
+      else if ( val == kB3False ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgPrimitive* iprim = prim->fanin(i);
+	  Bool3 igval = mModel[iprim->gvar().val()];
+	  Bool3 ifval = mModel[iprim->fvar().val()];
+	  if ( igval == ifval ) {
+	    justify_primitive(iprim, node);
+	  }
+	}
+      }
+      break;
+
+    case kTgGateOr:
+      if ( val == kB3True ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgPrimitive* iprim = prim->fanin(i);
+	  Bool3 igval = mModel[iprim->gvar().val()];
+	  Bool3 ifval = mModel[iprim->fvar().val()];
+	  if ( igval == kB3True && ifval == kB3True ) {
+	    justify_primitive(iprim, node);
+	    break;
+	  }
+	}
+      }
+      else if ( val == kB3False ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgPrimitive* iprim = prim->fanin(i);
+	  Bool3 igval = mModel[iprim->gvar().val()];
+	  Bool3 ifval = mModel[iprim->fvar().val()];
+	  if ( igval == ifval ) {
+	    justify_primitive(iprim, node);
+	  }
+	}
+      }
+      break;
+
+    case kTgGateNor:
+      if ( val == kB3True ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgPrimitive* iprim = prim->fanin(i);
+	  Bool3 igval = mModel[iprim->gvar().val()];
+	  Bool3 ifval = mModel[iprim->fvar().val()];
+	  if ( igval == ifval ) {
+	    justify_primitive(iprim, node);
+	  }
+	}
+      }
+      else if ( val == kB3False ) {
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgPrimitive* iprim = prim->fanin(i);
+	  Bool3 igval = mModel[iprim->gvar().val()];
+	  Bool3 ifval = mModel[iprim->fvar().val()];
+	  if ( igval == kB3True && ifval == kB3True ) {
+	    justify_primitive(iprim, node);
+	    break;
+	  }
+	}
+      }
+      break;
+
+    case kTgGateXor:
+    case kTgGateXnor:
+      for (ymuint i = 0; i < ni; ++ i) {
+	DtpgPrimitive* iprim = prim->fanin(i);
+	Bool3 igval = mModel[iprim->gvar().val()];
+	Bool3 ifval = mModel[iprim->fvar().val()];
+	if ( igval == ifval ) {
+	  justify_primitive(iprim, node);
 	}
       }
       break;
