@@ -76,39 +76,6 @@ set_gvar(SatSolver& solver,
 // @param[in] solver SAT ソルバー
 // @param[in] node 対象のノード
 void
-set_gvar2(SatSolver& solver,
-	  DtpgNode* node)
-{
-  // ノード内部のプリミティブに割り当てる．
-  ymuint n = node->primitive_num();
-  if ( n > 0 ) {
-    ymuint n1 = n - 1;
-    for (ymuint i = 0; i < n1; ++ i) {
-      DtpgPrimitive* prim = node->primitive(i);
-      VarId gvar;
-      if ( prim->is_input() ) {
-	ymuint ipos = prim->input_id();
-	DtpgNode* inode = node->fanin(ipos);
-	gvar = inode->gvar();
-      }
-      else {
-	gvar = solver.new_var();
-      }
-      prim->set_gvar(gvar);
-      prim->set_fvar(gvar);
-    }
-    // 根のプリミティブの場合はノードの変数をコピーする．
-    DtpgPrimitive* prim = node->primitive(n1);
-    VarId gvar = node->gvar();
-    prim->set_gvar(gvar);
-    prim->set_fvar(gvar);
-  }
-}
-
-// @brief ノードに正常回路用の変数を設定する．
-// @param[in] solver SAT ソルバー
-// @param[in] node 対象のノード
-void
 set_fvar(SatSolver& solver,
 	 DtpgNode* node)
 {
@@ -116,35 +83,6 @@ set_fvar(SatSolver& solver,
   VarId fvar = solver.new_var();
   VarId dvar = solver.new_var();
   node->set_fvar(fvar, dvar);
-}
-
-// @brief ノードに正常回路用の変数を設定する．
-// @param[in] solver SAT ソルバー
-// @param[in] node 対象のノード
-void
-set_fvar2(SatSolver& solver,
-	  DtpgNode* node)
-{
-  // ノード内部のプリミティブに割り当てる．
-  ymuint n = node->primitive_num();
-  if ( n > 0 ) {
-    ymuint n1 = n - 1;
-    for (ymuint i = 0; i < n1; ++ i) {
-      DtpgPrimitive* prim = node->primitive(i);
-      if ( prim->is_input() ) {
-	ymuint ipos = prim->input_id();
-	DtpgNode* inode = node->fanin(ipos);
-	prim->set_fvar(inode->fvar());
-      }
-      else {
-	VarId fvar = solver.new_var();
-	prim->set_fvar(fvar);
-      }
-    }
-    // 根のプリミティブの場合はノードの変数をコピーする．
-    DtpgPrimitive* prim = node->primitive(n1);
-    prim->set_fvar(node->fvar());
-  }
 }
 
 // @brief ゲートの入出力関係を表す CNF を作る．
@@ -374,19 +312,38 @@ make_gnode_cnf(SatSolver& solver,
   if ( node->is_output() ) {
     DtpgNode* inode = node->fanin(0);
     Literal input(inode->gvar(), kPolPosi);
-
     solver.add_clause( input, ~output);
     solver.add_clause(~input,  output);
     return;
   }
 
-  set_gvar2(solver, node);
   if ( node->is_cplx_logic() ) {
+    // 複数のプリミティブで構成されたノードの場合
     ymuint n = node->primitive_num();
     for (ymuint i = 0; i < n; ++ i) {
       DtpgPrimitive* prim = node->primitive(i);
-      if ( !prim->is_input() ) {
-	Literal output(prim->gvar(), kPolPosi);
+      VarId gvar;
+      if ( prim->is_input() ) {
+	// 入力プリミティブの場合
+	// 対応する DtpgNode の変数を持ってくる．
+	ymuint ipos = prim->input_id();
+	DtpgNode* inode = node->fanin(ipos);
+	gvar = inode->gvar();
+      }
+      else {
+	if ( i == n - 1 ) {
+	  // 根のプリミティブの場合
+	  // node の変数を使う．
+	  gvar = node->gvar();
+	}
+	else {
+	  // それ以外の場合
+	  // 新たな変数を割り当てる．
+	  gvar = solver.new_var();
+	}
+
+	// プリミティブの入出力の関係を表す CNF 式を作る．
+	Literal output(gvar, kPolPosi);
 	ymuint ni = prim->fanin_num();
 	vector<Literal> inputs(ni);
 	for (ymuint j = 0; j < ni; ++ j) {
@@ -395,9 +352,13 @@ make_gnode_cnf(SatSolver& solver,
 	}
 	make_gate_cnf(solver, prim->gate_type(), output, inputs);
       }
+      // prim の変数 gvar と fvar の両方に登録しておく
+      prim->set_gvar(gvar);
+      prim->set_fvar(gvar);
     }
   }
   else {
+    // 単純な組み込み型の場合
     ymuint ni = node->fanin_num();
     vector<Literal> inputs(ni);
     for (ymuint i = 0; i < ni; ++ i) {
@@ -418,53 +379,83 @@ make_fnode_cnf(SatSolver& solver,
   }
 
   Literal output(node->fvar(), kPolPosi);
+  Literal dlit(node->dvar(), kPolPosi);
+
+  if ( node->is_output() ) {
+    DtpgNode* inode = node->fanin(0);
+    Literal input(inode->fvar(), kPolPosi);
+    solver.add_clause( input, ~output);
+    solver.add_clause(~input,  output);
+
+    // dlit 用の節の追加
+    Literal idlit(inode->dvar(), kPolPosi);
+    solver.add_clause(idlit, ~dlit);
+
+    return;
+  }
 
   ymuint ni = node->fanin_num();
-  vector<Literal> inputs(ni);
 
-  // dlit が 1 の時，入力のノードの dlit も1でなければならない．
+  // dlit が 1 の時，入力のノードの dlit の最低1つは1でなければならない．
   vector<Literal> dep;
   dep.reserve(ni + 1);
-
-  Literal dlit(node->dvar(), kPolPosi);
   dep.push_back(~dlit);
-
   for (ymuint i = 0; i < ni; ++ i) {
     DtpgNode* inode = node->fanin(i);
-    inputs[i] = Literal(inode->fvar(), kPolPosi);
     if ( inode->has_fvar() ) {
       dep.push_back(Literal(inode->dvar(), kPolPosi));
     }
   }
+  solver.add_clause(dep);
 
-  set_fvar2(solver, node);
-  if ( node->is_output() ) {
-    solver.add_clause( inputs[0], ~output);
-    solver.add_clause(~inputs[0],  output);
+  if ( node->is_cplx_logic() ) {
+    // 複数のプリミティブで構成されたノードの場合
+    ymuint n = node->primitive_num();
+    for (ymuint i = 0; i < n; ++ i) {
+      DtpgPrimitive* prim = node->primitive(i);
+      VarId fvar;
+      if ( prim->is_input() ) {
+	// 入力プリミティブの場合
+	// 対応する DtpgNode の fvar を用いる．
+	ymuint ipos = prim->input_id();
+	DtpgNode* inode = node->fanin(ipos);
+	fvar = inode->fvar();
+      }
+      else {
+	if ( i == n - 1 ) {
+	  // 根のプリミティブの場合
+	  // node の fvar を用いる．
+	  fvar = node->fvar();
+	}
+	else {
+	  // それ以外の場合
+	  // 新たな変数を割り当てる．
+	  fvar = solver.new_var();
+	}
+
+	// プリミティブの入出力の関係を表す CNF 式を作る．
+	Literal output(fvar, kPolPosi);
+	ymuint ni = prim->fanin_num();
+	vector<Literal> inputs(ni);
+	for (ymuint j = 0; j < ni; ++ j) {
+	  DtpgPrimitive* iprim = prim->fanin(j);
+	  inputs[j] = Literal(iprim->fvar(), kPolPosi);
+	}
+	make_gate_cnf(solver, prim->gate_type(), output, inputs);
+      }
+      // プリミティブの変数を登録する．
+      prim->set_fvar(fvar);
+    }
   }
   else {
-    if ( node->is_cplx_logic() ) {
-      ymuint n = node->primitive_num();
-      for (ymuint i = 0; i < n; ++ i) {
-	DtpgPrimitive* prim = node->primitive(i);
-	if ( !prim->is_input() ) {
-	  Literal output(prim->fvar(), kPolPosi);
-	  ymuint ni = prim->fanin_num();
-	  vector<Literal> inputs(ni);
-	  for (ymuint j = 0; j < ni; ++ j) {
-	    DtpgPrimitive* iprim = prim->fanin(j);
-	    inputs[j] = Literal(iprim->fvar(), kPolPosi);
-	  }
-	  make_gate_cnf(solver, prim->gate_type(), output, inputs);
-	}
-      }
+    // 単純な組み込み型の場合
+    vector<Literal> inputs(ni);
+    for (ymuint i = 0; i < ni; ++ i) {
+      DtpgNode* inode = node->fanin(i);
+      inputs[i] = Literal(inode->fvar(), kPolPosi);
     }
-    else {
-      make_gate_cnf(solver, node->gate_type(), output, inputs);
-    }
+    make_gate_cnf(solver, node->gate_type(), output, inputs);
   }
-
-  solver.add_clause(dep);
 }
 
 void
