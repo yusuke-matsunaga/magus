@@ -10,8 +10,8 @@
 
 
 #include "dtpg_nsdef.h"
+#include "DtpgPrimitive.h"
 #include "ym_logic/VarId.h"
-#include "ym_logic/LogExpr.h"
 #include "ym_networks/tgnet.h"
 
 
@@ -25,7 +25,7 @@ class DtpgNode
 {
   friend class DtpgNetwork;
 
-public:
+private:
 
   /// @brief コンストラクタ
   DtpgNode();
@@ -73,18 +73,14 @@ public:
   bool
   is_cplx_logic() const;
 
-  /// @brief cplx_logic タイプのときに内部ノード数を返す．
+  /// @brief cplx_logic タイプのときにプリミティブ数を返す．
   ymuint
-  subnode_num() const;
+  primitive_num() const;
 
-  /// @brief cplx_logic タイプのときに内部ノードを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < subnode_num() )
-  DtpgNode*
-  subnode(ymuint pos) const;
-
-  /// @brief cplx_logic タイプのときに論理式を返す．
-  LogExpr
-  expr() const;
+  /// @brief cplx_logic タイプのときにプリミティブを返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < primitive_num() )
+  DtpgPrimitive*
+  primitive(ymuint pos) const;
 
   /// @brief subnode タイプの時 true を返す．
   bool
@@ -242,15 +238,12 @@ private:
   //          or ゲートタイプ
   ymuint32 mTypeId;
 
-  // 内部ノード数
-  ymuint32 mSubNodeNum;
+  // プリミティブ数
+  ymuint32 mPrimitiveNum;
 
-  // 内部ノードのリスト
+  // プリミティブのリスト
   // 入力からのトポロジカル順に格納する．
-  DtpgNode* mSubNodeList;
-
-  // 論理式
-  LogExpr mExpr;
+  DtpgPrimitive* mPrimitiveList;
 
   // ファンイン数
   ymuint32 mFaninNum;
@@ -380,30 +373,22 @@ DtpgNode::is_cplx_logic() const
   return is_logic() && gate_type() == kTgGateCplx;
 }
 
-// @brief cplx_logic タイプのときに内部ノード数を返す．
+// @brief cplx_logic タイプのときにプリミティブ数を返す．
 inline
 ymuint
-DtpgNode::subnode_num() const
+DtpgNode::primitive_num() const
 {
-  return mSubNodeNum;
+  return mPrimitiveNum;
 }
 
-// @brief cplx_logic タイプのときに内部ノードを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < subnode_num() )
+// @brief cplx_logic タイプのときにプリミティブを返す．
+// @param[in] pos 位置番号 ( 0 <= pos < primitive_num() )
 inline
-DtpgNode*
-DtpgNode::subnode(ymuint pos) const
+DtpgPrimitive*
+DtpgNode::primitive(ymuint pos) const
 {
-  assert_cond( pos < subnode_num(), __FILE__, __LINE__);
-  return &mSubNodeList[pos];
-}
-
-// @brief cplx_logic タイプのときに論理式を返す．
-inline
-LogExpr
-DtpgNode::expr() const
-{
-  return mExpr;
+  assert_cond( pos < primitive_num(), __FILE__, __LINE__);
+  return &mPrimitiveList[pos];
 }
 
 // @brief subnode タイプの時 true を返す．
@@ -592,6 +577,7 @@ void
 DtpgNode::set_gvar(VarId gvar)
 {
   mGid = gvar;
+  mFid = gvar;
   mMarks |= 2U;
 }
 

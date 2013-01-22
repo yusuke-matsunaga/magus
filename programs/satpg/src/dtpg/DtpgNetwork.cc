@@ -9,6 +9,7 @@
 
 #include "DtpgNetwork.h"
 #include "DtpgNode.h"
+#include "DtpgPrimitive.h"
 #include "DtpgFFR.h"
 #include "DtpgFault.h"
 #include "ym_networks/TgNetwork.h"
@@ -16,9 +17,14 @@
 #include "ym_logic/TvFunc.h"
 
 
+
 BEGIN_NAMESPACE_YM_SATPG_DTPG
 
 BEGIN_NONAMESPACE
+
+// 全ての論理ノードを kTgGateCplx タイプとして登録する時に true にする．
+// DtpgPrimitive 関係のコードのデバッグ用
+const bool FORCE_TO_CPLX_LOGIC = false;
 
 inline
 DtpgNode**
@@ -57,46 +63,22 @@ struct Lt
 
 // 論理式から必要なノード数を数える．
 ymuint
-subnode_count(const LogExpr& expr)
+primitive_count(const LogExpr& expr)
 {
   if ( expr.is_posiliteral() ) {
-    return 0;
+    return 1;
   }
   if ( expr.is_negaliteral() ) {
-    return 1;
+    return 2;
   }
 
   ymuint n = 1;
   ymuint nc = expr.child_num();
   for (ymuint i = 0; i < nc; ++ i) {
     LogExpr expr1 = expr.child(i);
-    n += subnode_count(expr1);
+    n += primitive_count(expr1);
   }
   return n;
-}
-
-// tTgGateType と入力数から LogExpr を作る．
-LogExpr
-gate_type_to_expr(tTgGateType gate_type,
-		  ymuint ni)
-{
-  vector<LogExpr> inputs(ni);
-  for (ymuint i = 0; i < ni; ++ i) {
-    inputs[i] = LogExpr::make_posiliteral(VarId(i));
-  }
-  switch ( gate_type ) {
-  case kTgGateBuff: return inputs[0];
-  case kTgGateNot:  return ~inputs[0];
-  case kTgGateAnd:  return LogExpr::make_and(inputs);
-  case kTgGateNand: return ~LogExpr::make_and(inputs);
-  case kTgGateOr:   return LogExpr::make_or(inputs);
-  case kTgGateNor:  return ~LogExpr::make_or(inputs);
-  case kTgGateXor:  return LogExpr::make_xor(inputs);
-  case kTgGateXnor: return ~LogExpr::make_xor(inputs);
-  default: assert_not_reached(__FILE__, __LINE__);
-  }
-  // ダミー
-  return LogExpr();
 }
 
 END_NONAMESPACE
@@ -160,18 +142,34 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
     if ( tgnode->is_cplx_logic() ) {
       ymuint fid = tgnode->func_id();
       LogExpr expr = tgnetwork.get_lexp(fid);
-      // サブノード数を数える．
-      ymuint nc = subnode_count(expr);
-      node->mSubNodeNum = nc;
-      void* p = mAlloc.get_memory(sizeof(DtpgNode) * nc);
-      node->mSubNodeList = new (p) DtpgNode[nc];
+      // プリミティブ数を数える．
+      ymuint np = primitive_count(expr);
+      node->mPrimitiveNum = np;
+      void* p = mAlloc.get_memory(sizeof(DtpgPrimitive) * np);
+      node->mPrimitiveList = new (p) DtpgPrimitive[np];
       ymuint subid = 0;
-      make_subnode(expr, tgnode, node->mSubNodeList, subid);
-      assert_cond( subid == nc, __FILE__, __LINE__);
-      node->mExpr = expr;
+      make_primitive(expr, tgnode, node->mPrimitiveList, subid);
+      assert_cond( subid == np, __FILE__, __LINE__);
     }
-    else {
-      node->mExpr = gate_type_to_expr(tgnode->gate_type(), node->fanin_num());
+    else if ( FORCE_TO_CPLX_LOGIC ) {
+      // デバッグ用のコード
+      // 組み込み型のゲートも DtpgPrimit を用いて表す．
+      ymuint ni = tgnode->ni();
+      tTgGateType gate_type = tgnode->gate_type();
+      ymuint np = ni + 1;
+      node->mPrimitiveNum = np;
+      void* p = mAlloc.get_memory(sizeof(DtpgPrimitive) * np);
+      node->mPrimitiveList = new (p) DtpgPrimitive[np];
+      for (ymuint i = 0; i < ni; ++ i) {
+	DtpgPrimitive* prim = &node->mPrimitiveList[i];
+	set_input_primitive(prim, i);
+      }
+      DtpgPrimitive* prim = &node->mPrimitiveList[ni];
+      set_logic_primitive(prim, gate_type, ni);
+      for (ymuint i = 0; i < ni; ++ i) {
+	prim->mFanins[i] = &node->mPrimitiveList[i];
+      }
+      node->mTypeId = 3U | (kTgGateCplx << 2);
     }
   }
 
@@ -545,8 +543,8 @@ DtpgNetwork::make_node(ymuint id,
     assert_not_reached(__FILE__, __LINE__);
   }
 
-  node->mSubNodeNum = 0;
-  node->mSubNodeList = NULL;
+  node->mPrimitiveNum = 0;
+  node->mPrimitiveList = NULL;
 
   ymuint ni = tgnode->ni();
   node->mFaninNum = ni;
@@ -585,62 +583,86 @@ DtpgNetwork::make_node(ymuint id,
   return node;
 }
 
-// @brief 複雑な論理式に対応するサブノードを作る．
-DtpgNode*
-DtpgNetwork::make_subnode(const LogExpr& expr,
-			  const TgNode* tgnode,
-			  DtpgNode* node_list,
-			  ymuint& id)
+// @brief 複雑な論理式に対応するプリミティブを作る．
+DtpgPrimitive*
+DtpgNetwork::make_primitive(const LogExpr& expr,
+			    const TgNode* tgnode,
+			    DtpgPrimitive* primitive_list,
+			    ymuint& id)
 {
   if ( expr.is_posiliteral() ) {
     ymuint ipos = expr.varid().val();
-    const TgNode* itgnode = tgnode->fanin(ipos);
-    DtpgNode* inode = mNodeMap[itgnode->gid()];
-    return inode;
+    DtpgPrimitive* input = &primitive_list[id];
+    ++ id;
+    set_input_primitive(input, ipos);
+    return input;
   }
   if ( expr.is_negaliteral() ) {
     ymuint ipos = expr.varid().val();
-    const TgNode* itgnode = tgnode->fanin(ipos);
-    DtpgNode* inode = mNodeMap[itgnode->gid()];
-    DtpgNode* node = &node_list[id];
+    DtpgPrimitive* input = &primitive_list[id];
     ++ id;
-    node->mTypeId = 0U | (kTgGateNot << 2);
-    node->mFaninNum = 1;
-    node->mFanins = alloc_nodearray(mAlloc, 1);
-    node->mFanins[0] = inode;
-    return node;
+    set_input_primitive(input, ipos);
+
+    DtpgPrimitive* prim = &primitive_list[id];
+    ++ id;
+    set_logic_primitive(prim, kTgGateNot, 1);
+    prim->mFanins[0] = input;
+    return prim;
   }
 
   ymuint nc = expr.child_num();
-  vector<DtpgNode*> fanin(nc);
+  vector<DtpgPrimitive*> fanin(nc);
   for (ymuint i = 0; i < nc; ++ i) {
     LogExpr expr1 = expr.child(i);
-    DtpgNode* inode = make_subnode(expr1, tgnode, node_list, id);
+    DtpgPrimitive* inode = make_primitive(expr1, tgnode, primitive_list, id);
     fanin[i] = inode;
   }
 
-  DtpgNode* node = &node_list[id];
+  DtpgPrimitive* prim = &primitive_list[id];
   ++ id;
-  node->mTypeId = 0U;
+
+  tTgGateType gate_type;
   if ( expr.is_and() ) {
-    node->mTypeId |= (static_cast<ymuint>(kTgGateAnd) << 2);
+    gate_type = kTgGateAnd;
   }
   else if ( expr.is_or() ) {
-    node->mTypeId |= (static_cast<ymuint>(kTgGateOr) << 2);
+    gate_type = kTgGateOr;
   }
   else if ( expr.is_xor() ) {
-    node->mTypeId |= (static_cast<ymuint>(kTgGateXor) << 2);
+    gate_type = kTgGateXor;
   }
   else {
     assert_not_reached(__FILE__, __LINE__);
   }
-
-  node->mFaninNum = nc;
-  node->mFanins = alloc_nodearray(mAlloc, nc);
+  set_logic_primitive(prim, gate_type, nc);
   for (ymuint i = 0; i < nc; ++ i) {
-    node->mFanins[i] = fanin[i];
+    prim->mFanins[i] = fanin[i];
   }
-  return node;
+  return prim;
+}
+
+// @brief 入力プリミティブの設定を行なう．
+// @param[in] id 入力番号
+void
+DtpgNetwork::set_input_primitive(DtpgPrimitive* prim,
+				 ymuint id)
+{
+  prim->mTypeId = 0U | (id << 1);
+  prim->mFaninNum = 0;
+  prim->mFanins = NULL;
+}
+
+// @brief 論理プリミティブの設定を行なう．
+void
+DtpgNetwork::set_logic_primitive(DtpgPrimitive* prim,
+				 tTgGateType gate_type,
+				 ymuint ni)
+{
+  prim->mTypeId = 1U | (static_cast<ymuint32>(gate_type) << 1);
+  prim->mFaninNum = ni;
+
+  void* p = mAlloc.get_memory(sizeof(DtpgPrimitive*) * ni);
+  prim->mFanins = new (p) DtpgPrimitive*[ni];
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

@@ -168,6 +168,12 @@ private:
   void
   get_pat(DtpgNode* fnode);
 
+  /// @brief テストパタンを求める．
+  /// @param[in] fnode 故障のあるノード
+  /// @note 結果は mValList に格納される．
+  void
+  get_pat2(DtpgNode* fnode);
+
   /// @brief solve 中で故障差を持つノードをたどる．
   /// @param[in] node 対象のノード
   /// @retval true node を通って外部出力まで故障差が伝搬している．
@@ -186,6 +192,16 @@ private:
   /// @note mark3 がついたノードは mBwdNodeList に格納される．
   void
   justify(DtpgNode* node);
+
+  /// @brief justify の下請け関数
+  /// @param[in] prim 対象のプリミティブ
+  /// @param[in] node 対象のノード
+  /// @note node の値割り当てを正当化する．
+  /// @note 正当化に用いられているノードには mark3 がつく．
+  /// @note mark3 がついたノードは mBwdNodeList に格納される．
+  void
+  justify_primitive(DtpgPrimitive* prim,
+		    DtpgNode* node);
 
   /// @brief 入力ノードの値を記録する．
   /// @param[in] node 対象の外部入力ノード

@@ -135,12 +135,24 @@ private:
   make_node(ymuint id,
 	    const TgNode* tgnode);
 
-  /// @brief 複雑な論理式に対応するサブノードを作る．
-  DtpgNode*
-  make_subnode(const LogExpr& expr,
-	       const TgNode* tgnode,
-	       DtpgNode* node_list,
-	       ymuint& id);
+  /// @brief 複雑な論理式に対応するプリミティブを作る．
+  DtpgPrimitive*
+  make_primitive(const LogExpr& expr,
+		 const TgNode* tgnode,
+		 DtpgPrimitive* primitive_list,
+		 ymuint& id);
+
+  /// @brief 入力プリミティブの設定を行なう．
+  /// @param[in] id 入力番号
+  void
+  set_input_primitive(DtpgPrimitive* prim,
+		      ymuint id);
+
+  /// @brief 論理プリミティブの設定を行なう．
+  void
+  set_logic_primitive(DtpgPrimitive* prim,
+		      tTgGateType gate_type,
+		      ymuint ni);
 
   /// @brief activate_po(), activate_all() の下請け関数
   void
