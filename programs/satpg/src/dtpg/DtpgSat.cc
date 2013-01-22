@@ -380,6 +380,7 @@ make_gnode_cnf(SatSolver& solver,
     return;
   }
 
+  set_gvar2(solver, node);
   if ( node->is_cplx_logic() ) {
     ymuint n = node->primitive_num();
     for (ymuint i = 0; i < n; ++ i) {
@@ -430,15 +431,13 @@ make_fnode_cnf(SatSolver& solver,
 
   for (ymuint i = 0; i < ni; ++ i) {
     DtpgNode* inode = node->fanin(i);
+    inputs[i] = Literal(inode->fvar(), kPolPosi);
     if ( inode->has_fvar() ) {
-      inputs[i] = Literal(inode->fvar(), kPolPosi);
       dep.push_back(Literal(inode->dvar(), kPolPosi));
-    }
-    else {
-      inputs[i] = Literal(inode->gvar(), kPolPosi);
     }
   }
 
+  set_fvar2(solver, node);
   if ( node->is_output() ) {
     solver.add_clause( inputs[0], ~output);
     solver.add_clause(~inputs[0],  output);
@@ -894,12 +893,6 @@ DtpgSat::dtpg_single(DtpgFault* f,
 
   DtpgNode* fnode = f->node();
 
-  if ( f->is_input_fault() ) {
-    ymuint ipos = f->pos();
-    DtpgNode* inode = fnode->fanin(ipos);
-    set_fvar(solver, inode);
-  }
-
   // fnode から外部出力へ至る部分の CNF を作る．
   make_prop_cnf(solver, fnode);
 
@@ -907,8 +900,7 @@ DtpgSat::dtpg_single(DtpgFault* f,
   if ( f->is_input_fault() ) {
     ymuint ipos = f->pos();
     DtpgNode* inode = fnode->fanin(ipos);
-    //set_fvar(solver, inode);
-    set_fvar2(solver, inode);
+    set_fvar(solver, inode);
     make_fnode_cnf(solver, fnode);
     fsrc = fnode->fanin(ipos);
   }
@@ -964,7 +956,6 @@ DtpgSat::dtpg_dual(DtpgFault* f0,
     ymuint ipos = f0->pos();
     DtpgNode* inode = fnode->fanin(ipos);
     set_fvar(solver, inode);
-    set_fvar2(solver, inode);
     make_fnode_cnf(solver, fnode);
     fsrc = f0->source_node();
   }
@@ -1048,13 +1039,6 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
       set_fvar(solver, node);
     }
     node->clear_mark1();
-  }
-  for (vector<DtpgNode*>::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    DtpgNode* node = *p;
-    if ( (node != root) && node->mark1() ) {
-      set_fvar2(solver, node);
-    }
   }
 
   vector<VarId> flt_var(nf);
@@ -1283,17 +1267,6 @@ DtpgSat::make_prop_cnf(SatSolver& solver,
     DtpgNode* node = *p;
     set_gvar(solver, node);
     mUsedNodeList.push_back(node);
-  }
-  for (vector<DtpgNode*>::iterator p = tfo_list.begin();
-       p != tfo_list.end(); ++ p) {
-    DtpgNode* node = *p;
-    set_gvar2(solver, node);
-    set_fvar2(solver, node);
-  }
-  for (vector<DtpgNode*>::iterator p = tfi_list.begin();
-       p != tfi_list.end(); ++ p) {
-    DtpgNode* node = *p;
-    set_gvar2(solver, node);
   }
 
   // mInputList を作る．
