@@ -1273,6 +1273,17 @@ DtpgSat::make_prop_cnf(SatSolver& solver,
     }
   }
 
+  // mOutputList を作る．
+  mOutputList.clear();
+  for (vector<DtpgNode*>::iterator p = tfo_list.begin();
+       p != tfo_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    if ( node->is_output() ) {
+      mOutputList.push_back(node);
+    }
+  }
+
+
   //////////////////////////////////////////////////////////////////////
   // 正常回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
@@ -1384,36 +1395,24 @@ void
 DtpgSat::get_pat(DtpgNode* fnode)
 {
   mValList.clear();
-  mDiffNodeList.clear();
   mBwdNodeList.clear();
 
-  // 故障差の伝搬経路にマークをつける．
-  fwd_dfs(fnode);
-
-  // 故障差を伝搬させるためのサイド入力の値を正当化する．
-  for (vector<DtpgNode*>::iterator p = mDiffNodeList.begin();
-       p != mDiffNodeList.end(); ++ p) {
+  DtpgNode* onode = NULL;
+  for (vector<DtpgNode*>::iterator p = mOutputList.begin();
+       p != mOutputList.end(); ++ p) {
     DtpgNode* node = *p;
-    if ( node->is_input() ) {
-      record_value(node);
-    }
-    else {
-      ymuint ni = node->fanin_num();
-      for (ymuint i = 0; i < ni; ++ i) {
-	DtpgNode* inode = node->fanin(i);
-	if ( !inode->mark2() ) {
-	  justify(inode);
-	}
-      }
+    if ( mModel[node->dvar().val()] == kB3True ) {
+      onode = node;
+      break;
     }
   }
+  assert_cond( onode != NULL, __FILE__, __LINE__);
+  justify(onode);
 
   // 一連の処理でつけたマークを消す．
   for (vector<DtpgNode*>::iterator p = mBwdNodeList.begin();
        p != mBwdNodeList.end(); ++ p) {
     DtpgNode* node = *p;
-    node->clear_mark1();
-    node->clear_mark2();
     node->clear_mark3();
   }
 }
@@ -1423,6 +1422,7 @@ DtpgSat::get_pat(DtpgNode* fnode)
 void
 DtpgSat::get_pat2(DtpgNode* fnode)
 {
+#if 0
   mValList.clear();
   mDiffNodeList.clear();
   mBwdNodeList.clear();
@@ -1456,46 +1456,7 @@ DtpgSat::get_pat2(DtpgNode* fnode)
     node->clear_mark2();
     node->clear_mark3();
   }
-}
-
-// @brief solve 中で故障差を持つノードをたどる．
-// @param[in] node 対象のノード
-// @retval true node を通って外部出力まで故障差が伝搬している．
-// @retval false 故障差が伝搬していない．
-// @note 故障差の伝搬経路上のノードは mDiffNodeList に格納される．
-// @note 一旦調べたノードはすべて mark1 がつく．
-// @note 故障差が伝搬しているノードは mark2 がつく．
-// @note マークがついたノードは mBwdNodeList に格納される．
-bool
-DtpgSat::fwd_dfs(DtpgNode* node)
-{
-  if ( node->mark1() ) {
-    return node->mark2();
-  }
-  node->set_mark1();
-  mBwdNodeList.push_back(node);
-
-  VarId gvar = node->gvar();
-  VarId fvar = node->fvar();
-  if ( mModel[gvar.val()] == mModel[fvar.val()] ) {
-    // 故障差が伝搬していない．
-    return false;
-  }
-
-  bool stat = true;
-  ymuint nfo = node->active_fanout_num();
-  for (ymuint i = 0; i < nfo; ++ i) {
-    DtpgNode* onode = node->active_fanout(i);
-    bool stat1 = fwd_dfs(onode);
-    if ( stat1 ) {
-      stat = true;
-    }
-  }
-  if ( stat ) {
-    node->set_mark2();
-    mDiffNodeList.push_back(node);
-  }
-  return stat;
+#endif
 }
 
 // @brief solve 中で変数割り当ての正当化を行なう．
@@ -1518,14 +1479,22 @@ DtpgSat::justify(DtpgNode* node)
     return;
   }
 
+  Bool3 gval = mModel[node->gvar().val()];
+  Bool3 fval = mModel[node->fvar().val()];
+
+  if ( gval != fval ) {
+    // 正常値と故障値が異なっていたら
+    // すべてのファンインをたどる．
+    just_sub1(node);
+    return;
+  }
+
   if ( node->is_cplx_logic() ) {
     ymuint np = node->primitive_num();
     DtpgPrimitive* prim = node->primitive(np - 1);
     justify_primitive(prim, node);
   }
   else {
-    Bool3 val = mModel[node->gvar().val()];
-    ymuint ni = node->fanin_num();
     switch ( node->gate_type() ) {
     case kTgGateBuff:
     case kTgGateNot:
@@ -1534,150 +1503,100 @@ DtpgSat::justify(DtpgNode* node)
       break;
 
     case kTgGateAnd:
-      if ( val == kB3True ) {
-	// 故障差が伝搬していないノードをすべてたどる．
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgNode* inode = node->fanin(i);
-	  if ( !inode->mark2() ) {
-	    justify(inode);
-	  }
-	}
+      if ( gval == kB3True ) {
+	// すべてのファンインノードをたどる．
+	just_sub1(node);
       }
-      else if ( val == kB3False ) {
-	// 故障差が伝搬していない0の値を持つ最初のノードをたどる．
-	// ただし，既にたどっているノードがあればなにもしない．
-	DtpgNode* first_node = NULL;
-	bool found = false;
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgNode* inode = node->fanin(i);
-	  if ( !inode->mark2() && mModel[inode->gvar().val()] == kB3False ) {
-	    if ( inode->mark3() ) {
-	      found = true;
-	      break;
-	    }
-	    if ( first_node == NULL ) {
-	      first_node = inode;
-	    }
-	  }
-	}
-	if ( !found && first_node != NULL ) {
-	  justify(first_node);
-	}
+      else if ( gval == kB3False ) {
+	// 0の値を持つ最初のノードをたどる．
+	just_sub2(node, kB3False);
       }
       break;
 
     case kTgGateNand:
-      if ( val == kB3True ) {
-	// 故障差が伝搬していない0の値を持つ最初のノードをたどる．
-	// ただし，既にたどっているノードがあればなにもしない．
-	DtpgNode* first_node = NULL;
-	bool found = false;
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgNode* inode = node->fanin(i);
-	  if ( !inode->mark2() && mModel[inode->gvar().val()] == kB3False ) {
-	    if ( inode->mark3() ) {
-	      found = true;
-	      break;
-	    }
-	    if ( first_node == NULL ) {
-	      first_node = inode;
-	    }
-	  }
-	}
-	if ( !found && first_node != NULL ) {
-	  justify(first_node);
-	}
+      if ( gval == kB3True ) {
+	// 0の値を持つ最初のノードをたどる．
+	just_sub2(node, kB3False);
       }
-      else if ( val == kB3False ) {
-	// 故障差が伝搬していないノードをすべてたどる．
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgNode* inode = node->fanin(i);
-	  if ( !inode->mark2() ) {
-	    justify(inode);
-	  }
-	}
+      else if ( gval == kB3False ) {
+	// すべてのファンインノードをたどる．
+	just_sub1(node);
       }
       break;
 
     case kTgGateOr:
-      if ( val == kB3True ) {
-	// 故障差が伝搬していない1の値を持つ最初のノードをたどる．
-	// ただし，既にたどっているノードがあればなにもしない．
-	DtpgNode* first_node = NULL;
-	bool found = false;
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgNode* inode = node->fanin(i);
-	  if ( !inode->mark2() && mModel[inode->gvar().val()] == kB3True ) {
-	    if ( inode->mark3() ) {
-	      found = true;
-	      break;
-	    }
-	    if ( first_node == NULL ) {
-	      first_node = inode;
-	    }
-	  }
-	}
-	if ( !found && first_node != NULL ) {
-	  justify(first_node);
-	}
+      if ( gval == kB3True ) {
+	// 1の値を持つ最初のノードをたどる．
+	just_sub2(node, kB3True);
       }
-      else if ( val == kB3False ) {
-	// 故障差が伝搬していないノードをすべてたどる．
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgNode* inode = node->fanin(i);
-	  if ( !inode->mark2() ) {
-	    justify(inode);
-	  }
-	}
+      else if ( gval == kB3False ) {
+	// すべてのファンインノードをたどる．
+	just_sub1(node);
       }
       break;
 
     case kTgGateNor:
-      if ( val == kB3True ) {
-	// 故障差が伝搬していないノードをすべてたどる．
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgNode* inode = node->fanin(i);
-	  if ( !inode->mark2() ) {
-	    justify(inode);
-	  }
-	}
+      if ( gval == kB3True ) {
+	// すべてのファンインノードをたどる．
+	just_sub1(node);
       }
-      else if ( val == kB3False ) {
-	// 故障差が伝搬していない1の値を持つ最初のノードをたどる．
-	// ただし，既にたどっているノードがあればなにもしない．
-	DtpgNode* first_node = NULL;
-	bool found = false;
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgNode* inode = node->fanin(i);
-	  if ( !inode->mark2() && mModel[inode->gvar().val()] == kB3True ) {
-	    if ( inode->mark3() ) {
-	      found = true;
-	      break;
-	    }
-	    if ( first_node == NULL ) {
-	      first_node = inode;
-	    }
-	  }
-	}
-	if ( !found && first_node != NULL ) {
-	  justify(first_node);
-	}
+      else if ( gval == kB3False ) {
+	// 1の値を持つ最初のノードをたどる．
+	just_sub2(node, kB3True);
       }
       break;
 
     case kTgGateXor:
     case kTgGateXnor:
-      // 故障差が伝搬していないノードをすべてたどる．
-      for (ymuint i = 0; i < ni; ++ i) {
-	DtpgNode* inode = node->fanin(i);
-	if ( !inode->mark2() ) {
-	  justify(node);
-	}
-      }
+      // すべてのファンインノードをたどる．
+      just_sub1(node);
       break;
 
     default:
       assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
+  }
+}
+
+// @brief すべてのファンインに対して justify() を呼ぶ．
+// @param[in] node 対象のノード
+void
+DtpgSat::just_sub1(DtpgNode* node)
+{
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    DtpgNode* inode = node->fanin(i);
+    justify(inode);
+  }
+}
+
+// @brief 指定した値を持つのファンインに対して justify() を呼ぶ．
+// @param[in] node 対象のノード
+// @param[in] val 値
+void
+DtpgSat::just_sub2(DtpgNode* node,
+		   Bool3 val)
+{
+  bool gfound = false;
+  bool ffound = false;
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    DtpgNode* inode = node->fanin(i);
+    Bool3 igval = mModel[inode->gvar().val()];
+    Bool3 ifval = mModel[inode->fvar().val()];
+    if ( !gfound && igval == val ) {
+      justify(inode);
+      gfound = true;
+      if ( ifval == val ) {
+	break;
+      }
+    }
+    else if ( !ffound && ifval == val ) {
+      justify(inode);
+      ffound = true;
+    }
+    if ( gfound && ffound ) {
       break;
     }
   }
@@ -1697,126 +1616,122 @@ DtpgSat::justify_primitive(DtpgPrimitive* prim,
     ymuint ipos = prim->input_id();
     DtpgNode* inode = node->fanin(ipos);
     justify(inode);
+    return;
   }
-  else {
-    Bool3 val = mModel[prim->gvar().val()];
-    ymuint ni = prim->fanin_num();
-    switch ( prim->gate_type() ) {
-    case kTgGateBuff:
-    case kTgGateNot:
-      justify_primitive(prim->fanin(0), node);
-      break;
 
-    case kTgGateAnd:
-      if ( val == kB3True ) {
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgPrimitive* iprim = prim->fanin(i);
-	  Bool3 igval = mModel[iprim->gvar().val()];
-	  Bool3 ifval = mModel[iprim->fvar().val()];
-	  if ( igval == ifval ) {
-	    justify_primitive(iprim, node);
-	  }
-	}
-      }
-      else if ( val == kB3False ) {
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgPrimitive* iprim = prim->fanin(i);
-	  Bool3 igval = mModel[iprim->gvar().val()];
-	  Bool3 ifval = mModel[iprim->fvar().val()];
-	  if ( igval == kB3False && ifval == kB3False ) {
-	    justify_primitive(iprim, node);
-	    break;
-	  }
-	}
-      }
+  Bool3 gval = mModel[prim->gvar().val()];
+  Bool3 fval = mModel[prim->fvar().val()];
+  if ( gval != fval ) {
+    // すべてのファンインノードをたどる．
+    jp_sub1(prim, node);
+    return;
+  }
+
+  switch ( prim->gate_type() ) {
+  case kTgGateBuff:
+  case kTgGateNot:
+    // 唯一のファンインをたどる．
+    justify_primitive(prim->fanin(0), node);
+    break;
+
+  case kTgGateAnd:
+    if ( gval == kB3True ) {
+      // すべてのファンインをたどる．
+      jp_sub1(prim, node);
+    }
+    else if ( gval == kB3False ) {
+      // 0 の値を持つ最初のファンインをたどる．
+      jp_sub2(prim, node, kB3False);
       break;
 
     case kTgGateNand:
-      if ( val == kB3True ) {
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgPrimitive* iprim = prim->fanin(i);
-	  Bool3 igval = mModel[iprim->gvar().val()];
-	  Bool3 ifval = mModel[iprim->fvar().val()];
-	  if ( igval == kB3False && ifval == kB3False ) {
-	    justify_primitive(iprim, node);
-	    break;
-	  }
-	}
+      if ( gval == kB3True ) {
+	// 0 の値を持つ最初のファンインをたどる．
+	jp_sub2(prim, node, kB3False);
       }
-      else if ( val == kB3False ) {
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgPrimitive* iprim = prim->fanin(i);
-	  Bool3 igval = mModel[iprim->gvar().val()];
-	  Bool3 ifval = mModel[iprim->fvar().val()];
-	  if ( igval == ifval ) {
-	    justify_primitive(iprim, node);
-	  }
-	}
+      else if ( gval == kB3False ) {
+	// すべてのファンインをたどる．
+	jp_sub1(prim, node);
       }
       break;
 
     case kTgGateOr:
-      if ( val == kB3True ) {
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgPrimitive* iprim = prim->fanin(i);
-	  Bool3 igval = mModel[iprim->gvar().val()];
-	  Bool3 ifval = mModel[iprim->fvar().val()];
-	  if ( igval == kB3True && ifval == kB3True ) {
-	    justify_primitive(iprim, node);
-	    break;
-	  }
-	}
+      if ( gval == kB3True ) {
+	// 1の値をもつ最初のファンインをたどる．
+	jp_sub2(prim, node, kB3True);
       }
-      else if ( val == kB3False ) {
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgPrimitive* iprim = prim->fanin(i);
-	  Bool3 igval = mModel[iprim->gvar().val()];
-	  Bool3 ifval = mModel[iprim->fvar().val()];
-	  if ( igval == ifval ) {
-	    justify_primitive(iprim, node);
-	  }
-	}
+      else if ( gval == kB3False ) {
+	// すべてのファンインをたどる．
+	jp_sub1(prim, node);
       }
       break;
 
     case kTgGateNor:
-      if ( val == kB3True ) {
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgPrimitive* iprim = prim->fanin(i);
-	  Bool3 igval = mModel[iprim->gvar().val()];
-	  Bool3 ifval = mModel[iprim->fvar().val()];
-	  if ( igval == ifval ) {
-	    justify_primitive(iprim, node);
-	  }
-	}
+      if ( gval == kB3True ) {
+	// すべてのファンインをたどる．
+	jp_sub1(prim, node);
       }
-      else if ( val == kB3False ) {
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgPrimitive* iprim = prim->fanin(i);
-	  Bool3 igval = mModel[iprim->gvar().val()];
-	  Bool3 ifval = mModel[iprim->fvar().val()];
-	  if ( igval == kB3True && ifval == kB3True ) {
-	    justify_primitive(iprim, node);
-	    break;
-	  }
-	}
+      else if ( gval == kB3False ) {
+	// 1の値をもつすべてのファンインをたどる．
+	jp_sub2(prim, node, kB3True);
       }
       break;
 
     case kTgGateXor:
     case kTgGateXnor:
-      for (ymuint i = 0; i < ni; ++ i) {
-	DtpgPrimitive* iprim = prim->fanin(i);
-	Bool3 igval = mModel[iprim->gvar().val()];
-	Bool3 ifval = mModel[iprim->fvar().val()];
-	if ( igval == ifval ) {
-	  justify_primitive(iprim, node);
-	}
-      }
+      // すべてのファンインをたどる．
+      jp_sub1(prim, node);
       break;
 
     default:
       assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
+  }
+}
+
+// @brief すべてのファンインに対して justify_primitive() を呼ぶ．
+// @param[in] prim 対象のプリミティブ
+// @param[in] node 対象のノード
+void
+DtpgSat::jp_sub1(DtpgPrimitive* prim,
+		 DtpgNode* node)
+{
+  ymuint ni = prim->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    DtpgPrimitive* iprim = prim->fanin(i);
+    justify_primitive(iprim, node);
+  }
+}
+
+// @brief 指定した値を持つファンインに対して justify_primitive() を呼ぶ．
+// @param[in] prim 対象のプリミティブ
+// @param[in] node 対象のノード
+// @param[in] val 値
+void
+DtpgSat::jp_sub2(DtpgPrimitive* prim,
+		 DtpgNode* node,
+		 Bool3 val)
+{
+  bool gfound = false;
+  bool ffound = false;
+  ymuint ni = prim->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    DtpgPrimitive* iprim = prim->fanin(i);
+    Bool3 igval = mModel[iprim->gvar().val()];
+    Bool3 ifval = mModel[iprim->fvar().val()];
+    if ( !gfound && igval == val ) {
+      justify_primitive(iprim, node);
+      gfound = true;
+      if ( ifval == val ) {
+	break;
+      }
+    }
+    else if ( !ffound && ifval == val ) {
+      justify_primitive(iprim, node);
+      ffound = true;
+    }
+    if ( gfound && ffound ) {
       break;
     }
   }

@@ -193,6 +193,18 @@ private:
   void
   justify(DtpgNode* node);
 
+  /// @brief すべてのファンインに対して justify() を呼ぶ．
+  /// @param[in] node 対象のノード
+  void
+  just_sub1(DtpgNode* node);
+
+  /// @brief 指定した値を持つのファンインに対して justify() を呼ぶ．
+  /// @param[in] node 対象のノード
+  /// @param[in] val 値
+  void
+  just_sub2(DtpgNode* node,
+	    Bool3 val);
+
   /// @brief justify の下請け関数
   /// @param[in] prim 対象のプリミティブ
   /// @param[in] node 対象のノード
@@ -202,6 +214,22 @@ private:
   void
   justify_primitive(DtpgPrimitive* prim,
 		    DtpgNode* node);
+
+  /// @brief すべてのファンインに対して justify_primitive() を呼ぶ．
+  /// @param[in] prim 対象のプリミティブ
+  /// @param[in] node 対象のノード
+  void
+  jp_sub1(DtpgPrimitive* prim,
+	  DtpgNode* node);
+
+  /// @brief 指定した値を持つファンインに対して justify_primitive() を呼ぶ．
+  /// @param[in] prim 対象のプリミティブ
+  /// @param[in] node 対象のノード
+  /// @param[in] val 値
+  void
+  jp_sub2(DtpgPrimitive* prim,
+	  DtpgNode* node,
+	  Bool3 val);
 
   /// @brief 入力ノードの値を記録する．
   /// @param[in] node 対象の外部入力ノード
@@ -249,6 +277,9 @@ private:
 
   // 現在の故障に関係のありそうな外部入力のリスト
   vector<DtpgNode*> mInputList;
+
+  // 現在の故障に関係ありそうな外部出力のリスト
+  vector<DtpgNode*> mOutputList;
 
   // 故障差が伝搬しているノードを格納するリスト
   vector<DtpgNode*> mDiffNodeList;
