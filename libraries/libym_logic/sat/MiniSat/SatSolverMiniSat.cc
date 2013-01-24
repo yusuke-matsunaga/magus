@@ -116,6 +116,12 @@ SatSolverMiniSat::solve(const vector<Literal>& assumptions,
   return kB3False;
 }
 
+// @brief 学習節の整理を行なう．
+void
+SatSolverMiniSat::reduce_learnt_clause()
+{
+}
+
 // @brief conflict_limit の最大値
 // @param[in] val 設定する値
 // @return 以前の設定値を返す．

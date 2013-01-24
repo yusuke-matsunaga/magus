@@ -151,6 +151,13 @@ SatSolver::solve(const vector<Literal>& assumptions,
   return mImpl->solve(assumptions, model);
 }
 
+// @brief 学習節の整理を行なう．
+void
+SatSolver::reduce_learnt_clause()
+{
+  mImpl->reduce_learnt_clause();
+}
+
 // @brief 現在の内部状態を得る．
 // @param[out] stats 状態を格納する構造体
 void

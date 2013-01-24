@@ -553,6 +553,13 @@ YmSat::solve(const vector<Literal>& assumptions,
   return stat;
 }
 
+// @brief 学習節の整理を行なう．
+void
+YmSat::reduce_learnt_clause()
+{
+  reduceDB();
+}
+
 // @brief conflict_limit の最大値
 // @param[in] val 設定する値
 // @return 以前の設定値を返す．

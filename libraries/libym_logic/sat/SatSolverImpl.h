@@ -73,6 +73,11 @@ public:
   solve(const vector<Literal>& assumptions,
 	vector<Bool3>& model) = 0;
 
+  /// @brief 学習節の整理を行なう．
+  virtual
+  void
+  reduce_learnt_clause() = 0;
+
   /// @brief 現在の内部状態を得る．
   /// @param[out] stats 状態を格納する構造体
   virtual
