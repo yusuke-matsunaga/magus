@@ -495,6 +495,7 @@ DtpgSat::DtpgSat()
   mGetPatFlag = 0;
   mNetwork = NULL;
   mSkip = false;
+  mDryRun = false;
 }
 
 // @brief デストラクタ
@@ -519,6 +520,13 @@ void
 DtpgSat::set_get_pat(ymuint val)
 {
   mGetPatFlag = val;
+}
+
+// @brief dry-run フラグを設定する．
+void
+DtpgSat::set_dry_run(bool flag)
+{
+  mDryRun = flag;
 }
 
 // @brief 回路と故障リストを設定する．
@@ -1350,7 +1358,11 @@ DtpgSat::solve(SatSolver& solver,
 	       DtpgFault* f,
 	       DtpgOperator& op)
 {
-#if 1
+  if ( mDryRun ) {
+    f->set_skip();
+    return;
+  }
+
   Bool3 ans = solver.solve(mAssumptions, mModel);
   if ( ans == kB3True ) {
     f->set_skip();
@@ -1384,9 +1396,6 @@ DtpgSat::solve(SatSolver& solver,
       op.set_untestable(f->safault());
     }
   }
-#else
-  f->set_skip();
-#endif
 }
 
 // @brief テストパタンを求める．

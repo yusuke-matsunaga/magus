@@ -134,6 +134,10 @@ public:
   void
   set_dtpg_xmode(ymuint val);
 
+  /// @brief dry-run フラグを設定する．
+  void
+  set_dtpg_dry_run(bool flag);
+
   /// @brief テストパタン生成時に故障シミュレーションを用いて検証するかを指定する．
   void
   set_dtpg_verify_mode(bool verify);

@@ -51,6 +51,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			  "skip mode");
   mPoptX = new TclPoptInt(this, "x",
 			  "X-extract mode [0-1]");
+  mPoptDryRun = new TclPopt(this, "dry",
+			    "dry run mode");
   mPoptVerify = new TclPopt(this, "verify",
 			    "verify generated pattern");
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptSatRec);
@@ -133,6 +135,10 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   if ( mPoptX->is_specified() ) {
     mgr().set_dtpg_xmode(mPoptX->val());
+  }
+
+  if ( mPoptDryRun->is_specified() ) {
+    mgr().set_dtpg_dry_run(true);
   }
 
   if ( mPoptVerify->is_specified() ) {

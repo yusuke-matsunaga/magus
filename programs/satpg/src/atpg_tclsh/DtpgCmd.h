@@ -85,6 +85,9 @@ private:
   // X抽出オプションの解析用オブジェクト
   TclPoptInt* mPoptX;
 
+  // dry runオプションの解析用オブジェクト
+  TclPopt* mPoptDryRun;
+
   // verify オプションの解析用オブジェクト
   TclPopt* mPoptVerify;
 

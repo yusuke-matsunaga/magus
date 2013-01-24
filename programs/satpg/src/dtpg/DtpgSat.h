@@ -55,6 +55,11 @@ public:
   void
   set_get_pat(ymuint val);
 
+  /// @brief dry-run フラグを設定する．
+  virtual
+  void
+  set_dry_run(bool flag);
+
   /// @brief 回路と故障リストを設定する．
   /// @param[in] tgnetwork 対象のネットワーク
   /// @param[in] fault_list 故障リスト
@@ -289,6 +294,9 @@ private:
 
   // skip フラグ
   bool mSkip;
+
+  // dry-run フラグ
+  bool mDryRun;
 
   // CNF の生成回数
   ymuint32 mRunCount;
