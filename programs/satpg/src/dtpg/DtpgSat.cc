@@ -965,16 +965,16 @@ DtpgSat::dtpg_dual(DtpgFault* f0,
   }
 
   mAssumptions.clear();
-  mAssumptions.reserve(nim + 2);
-
-  mAssumptions[0] = Literal(fsrc->gvar(), kPolPosi);
-  mAssumptions[1] = Literal(fsrc->fvar(), kPolNega);
+  mAssumptions.resize(nim + 2);
 
   // dominator ノードの dvar は1でなければならない．
   ymuint i = 2;
   for (DtpgNode* node = fnode; node != NULL; node = node->imm_dom(), ++ i) {
     mAssumptions[i] = Literal(node->dvar(), kPolPosi);
   }
+
+  mAssumptions[0] = Literal(fsrc->gvar(), kPolPosi);
+  mAssumptions[1] = Literal(fsrc->fvar(), kPolNega);
 
   solve(solver, f0, op);
 
