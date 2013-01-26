@@ -16,6 +16,8 @@
 #include "SatClause.h"
 
 
+#define NEW_IMPL 1
+
 BEGIN_NAMESPACE_YM_SAT
 
 BEGIN_NONAMESPACE
@@ -308,8 +310,9 @@ YmSat::add_clause_sub(ymuint lit_num)
     mConstrClause.push_back(clause);
 
     // watcher-list の設定
-    add_watcher(~l0, SatReason(clause));
-    add_watcher(~l1, SatReason(clause));
+    SatReason reason(clause);
+    add_watcher(~l0, reason);
+    add_watcher(~l1, reason);
   }
 }
 
@@ -479,7 +482,7 @@ YmSat::solve(const vector<Literal>& assumptions,
 
     // 条件式のなかに重要な手続きが書いてあるあんまり良くないコード
     // だけど implication() は stat == true の時しか実行しないのでしょうがない．
-    if ( !stat || implication() != kNullSatReason ) {
+    if ( !stat || implication0() != kNullSatReason ) {
       // 矛盾が起こった．
       backtrack(0);
       if ( debug & debug_solve ) {
@@ -494,6 +497,53 @@ YmSat::solve(const vector<Literal>& assumptions,
   if ( debug & (debug_assign | debug_decision) ) {
     cout << "RootLevel = " << mRootLevel << endl;
   }
+
+#if NEW_IMPL
+  for (vector<SatClause*>::iterator p = mConstrClause.begin();
+       p != mConstrClause.end(); ++ p) {
+    SatClause* c = *p;
+    ymuint n = c->lit_num();
+    bool sat = false;
+    ymuint last_pos = 0;
+    for (ymuint i = 0; i < n; ++ i) {
+      Literal l = c->lit(i);
+      Bool3 val = eval(l);
+      if ( val == kB3True ) {
+	c->set_skip(true);
+	sat = true;
+	break;
+      }
+      else if ( val == kB3X ) {
+	last_pos = i;
+      }
+    }
+    if ( !sat ) {
+      c->set_active_lit_num(last_pos + 1);
+    }
+  }
+  for (vector<SatClause*>::iterator p = mLearntClause.begin();
+       p != mLearntClause.end(); ++ p) {
+    SatClause* c = *p;
+    ymuint n = c->lit_num();
+    bool sat = false;
+    ymuint last_pos = 0;
+    for (ymuint i = 0; i < n; ++ i) {
+      Literal l = c->lit(i);
+      Bool3 val = eval(l);
+      if ( val == kB3True ) {
+	c->set_skip(true);
+	sat = true;
+	break;
+      }
+      else if ( val == kB3X ) {
+	last_pos = i;
+      }
+    }
+    if ( !sat ) {
+      c->set_active_lit_num(last_pos + 1);
+    }
+  }
+#endif
 
   Bool3 stat = kB3X;
   for ( ; ; ) {
@@ -536,6 +586,21 @@ YmSat::solve(const vector<Literal>& assumptions,
     }
   }
   backtrack(0);
+
+#if NEW_IMPL
+  for (vector<SatClause*>::iterator p = mConstrClause.begin();
+       p != mConstrClause.end(); ++ p) {
+    SatClause* c = *p;
+    c->set_skip(false);
+    c->set_active_lit_num(c->lit_num());
+  }
+  for (vector<SatClause*>::iterator p = mLearntClause.begin();
+       p != mLearntClause.end(); ++ p) {
+    SatClause* c = *p;
+    c->set_skip(false);
+    c->set_active_lit_num(c->lit_num());
+  }
+#endif
 
   if ( mTimerOn ) {
     mTimer.stop();
@@ -742,6 +807,7 @@ YmSat::implication()
 	// - 代わりが見つかったらそのリテラルを wl1() にする．
 	// - なければ wl0() に基づいた割り当てを行う．場合によっては矛盾が起こる．
 	SatClause& c = w.clause();
+	if ( c.skip() ) continue;
 	Literal l0 = c.wl0();
 	if ( l0 == nl ) {
 	  // nl を 1番めのリテラルにする．
@@ -772,11 +838,186 @@ YmSat::implication()
 	// この時，替わりのリテラルが未定かすでに充足しているかどうか
 	// は問題でない．
 	bool found = false;
-	ymuint n = c.lit_num();
-	for (ymuint i = 0; i < n; ++ i) {
+	ymuint n = c.active_lit_num();
+	for (ymuint i = 2; i < n; ++ i) {
 	  Literal l2 = c.lit(i);
-	  if ( l2 == l0 ) continue;
 	  if ( eval(l2) != kB3False ) {
+	    // l2 を 1番めの watch literal にする．
+	    c.set_wl1(i);
+	    if ( debug & debug_implication ) {
+	      cout << "\t\t\tsecond watching literal becomes "
+		   << l2 << endl;
+	    }
+	    // l の watcher list から取り除く
+	    -- wpos;
+	    // ~l2 の watcher list に追加する．
+	    watcher_list(~l2).add(w);
+
+	    found = true;
+	    break;
+	  }
+	}
+	if ( found ) {
+	  continue;
+	}
+
+	if ( debug & debug_implication ) {
+	  cout << "\t\tno other watching literals" << endl;
+	}
+
+	// 見付からなかったので l0 に従った割り当てを行う．
+	if ( val0 == kB3X ) {
+	  if ( debug & debug_assign ) {
+	    cout << "\tassign " << l0 << " @" << decision_level()
+		 << " from " << w << endl;
+	  }
+	  assign(l0, w);
+	}
+	else {
+	  // 矛盾がおこった．
+	  if ( debug & debug_assign ) {
+	    cout << "\t--> conflict with previous assignment" << endl
+		 << "\t    " << ~l0 << " was assigned at level "
+		 << decision_level(l0.varid()) << endl;
+	  }
+
+	  // ループを抜けるためにキューの末尾まで先頭を動かす．
+	  mAssignList.skip_all();
+
+	  // この場合は w が矛盾の理由を表す節になっている．
+	  conflict = w;
+	  break;
+	}
+      }
+    }
+    // 途中でループを抜けた場合に wlist の後始末をしておく．
+    if ( wpos != rpos ) {
+      for ( ; rpos < n; ++ rpos) {
+	wlist.set_elem(wpos, wlist.elem(rpos));
+	++ wpos;
+      }
+      wlist.erase(wpos);
+    }
+  }
+
+  return conflict;
+}
+
+// 割当てキューに基づいて implication を行う．
+SatReason
+YmSat::implication0()
+{
+  SatReason conflict = kNullSatReason;
+  while ( mAssignList.has_elem() ) {
+    Literal l = mAssignList.get_next();
+    ++ mPropagationNum;
+
+    if ( debug & debug_implication ) {
+      cout << "\tpick up " << l << endl;
+    }
+    // l の割り当てによって無効化された watcher-list の更新を行う．
+    Literal nl = ~l;
+
+    WatcherList& wlist = watcher_list(l);
+    ymuint n = wlist.num();
+    ymuint rpos = 0;
+    ymuint wpos = 0;
+    while ( rpos < n ) {
+      Watcher w = wlist.elem(rpos);
+      wlist.set_elem(wpos, w);
+      ++ rpos;
+      ++ wpos;
+      if ( w.is_literal() ) {
+	// 2-リテラル節の場合は相方のリテラルに基づく値の割り当てを行う．
+	Literal l0 = w.literal();
+	Bool3 val0 = eval(l0);
+	if ( val0 == kB3X ) {
+	  if ( debug & debug_assign ) {
+	    cout << "\tassign " << l0 << " @" << decision_level()
+		 << " from " << l << endl;
+	  }
+	  assign(l0, SatReason(nl));
+	}
+	else if ( val0 == kB3False ) {
+	  // 矛盾がおこった．
+	  if ( debug & debug_assign ) {
+	    cout << "\t--> conflict with previous assignment" << endl
+		 << "\t    " << ~l0 << " was assigned at level "
+		 << decision_level(l0.varid()) << endl;
+	  }
+
+	  // ループを抜けるためにキューの末尾まで先頭を動かす．
+	  mAssignList.skip_all();
+
+	  // 矛盾の理由を表す節を作る．
+	  mTmpBinClause->set(l0, nl);
+	  conflict = SatReason(mTmpBinClause);
+	  break;
+	}
+      }
+      else { // w.is_clause()
+	// 3つ以上のリテラルを持つ節の場合は，
+	// - nl(~l) を wl1() にする．(場合によっては wl0 を入れ替える)
+	// - wl0() が充足していたらなにもしない．
+	// - wl0() が不定，もしくは偽なら，nl の代わりの watch literal を探す．
+	// - 代わりが見つかったらそのリテラルを wl1() にする．
+	// - なければ wl0() に基づいた割り当てを行う．場合によっては矛盾が起こる．
+	SatClause& c = w.clause();
+	Literal l0 = c.wl0();
+	if ( l0 == nl ) {
+	  // nl を 1番めのリテラルにする．
+	  c.xchange_wl();
+	  // 新しい wl0 を得る．
+	  l0 = c.wl0();
+	}
+	else { // l1 == nl
+	  if ( debug & debug_implication ) {
+	    // この assert は重いのでデバッグ時にしかオンにしない．
+	    // ※ debug と debug_implication が const なので結果が0の
+	    // ときにはコンパイル時に消されることに注意
+	    assert_cond(c.wl1() == nl, __FILE__, __LINE__);
+	  }
+	}
+
+	Bool3 val0 = eval(l0);
+	if ( val0 == kB3True ) {
+	  // すでに充足していた．
+	  continue;
+	}
+
+	if ( debug & debug_implication ) {
+	  cout << "\t\texamining watcher clause " << c << endl;
+	}
+
+	// nl の替わりのリテラルを見つける．
+	// まず，充足しているリテラルを探す．
+	// 次に未定のリテラルを探す．
+	bool found = false;
+	ymuint n = c.active_lit_num();
+	for (ymuint i = 2; i < n; ++ i) {
+	  Literal l2 = c.lit(i);
+	  if ( eval(l2) == kB3True ) {
+	    // l2 を 1番めの watch literal にする．
+	    c.set_wl1(i);
+	    if ( debug & debug_implication ) {
+	      cout << "\t\t\tsecond watching literal becomes "
+		   << l2 << endl;
+	    }
+	    // l の watcher list から取り除く
+	    -- wpos;
+	    // ~l2 の watcher list に追加する．
+	    watcher_list(~l2).add(w);
+
+	    found = true;
+	    break;
+	  }
+	}
+	if ( found ) {
+	  continue;
+	}
+	for (ymuint i = 2; i < n; ++ i) {
+	  Literal l2 = c.lit(i);
+	  if ( eval(l2) == kB3X ) {
 	    // l2 を 1番めの watch literal にする．
 	    c.set_wl1(i);
 	    if ( debug & debug_implication ) {
@@ -941,7 +1182,7 @@ YmSat::reduceDB()
   vector<SatClause*>::iterator wpos = mLearntClause.begin();
   for (ymuint i = 0; i < n2; ++ i) {
     SatClause* clause = mLearntClause[i];
-    if ( clause->lit_num() > 2 && !is_locked(clause) ) {
+    if ( clause->lit_num() > 2 && !is_locked(clause) && !clause->skip() ) {
       delete_clause(clause);
     }
     else {
@@ -951,7 +1192,7 @@ YmSat::reduceDB()
   }
   for (ymuint i = n2; i < n; ++ i) {
     SatClause* clause = mLearntClause[i];
-    if ( clause->lit_num() > 2 && !is_locked(clause) &&
+    if ( clause->lit_num() > 2 && !is_locked(clause) && !clause->skip() &&
 	 clause->activity() < abs_limit ) {
       delete_clause(clause);
     }

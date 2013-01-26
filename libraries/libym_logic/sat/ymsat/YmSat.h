@@ -182,6 +182,10 @@ private:
   SatReason
   implication();
 
+  /// @brief 割当てキューに基づいて implication を行う．
+  SatReason
+  implication0();
+
   /// @brief level までバックトラックする
   /// @param[in] level バックトラックするレベル
   void
@@ -260,7 +264,7 @@ private:
   del_watcher(Literal watch_lit,
 	      SatReason reason);
 
-  /// @brief 変数の評価を行う．
+  /// @brief 変数1の評価を行う．
   /// @param[in] id 変数番号
   Bool3
   eval(VarId id) const;

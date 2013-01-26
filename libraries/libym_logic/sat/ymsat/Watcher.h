@@ -58,6 +58,10 @@ public:
 
 public:
 
+  /// @brief クリアする．
+  void
+  clear();
+
   /// @brief 要素を追加する．
   /// @param[in] elem 追加する要素
   void
@@ -151,6 +155,14 @@ inline
 WatcherList::~WatcherList()
 {
   delete [] mArray;
+}
+
+// @brief クリアする．
+inline
+void
+WatcherList::clear()
+{
+  mNum = 0;
 }
 
 // @brief 要素を追加する．
