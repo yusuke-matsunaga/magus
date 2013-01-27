@@ -16,7 +16,7 @@
 #include "SatClause.h"
 
 
-#define NEW_IMPL 1
+#define NEW_IMPL 0
 
 BEGIN_NAMESPACE_YM_SAT
 
@@ -963,6 +963,7 @@ YmSat::implication0()
 	// - 代わりが見つかったらそのリテラルを wl1() にする．
 	// - なければ wl0() に基づいた割り当てを行う．場合によっては矛盾が起こる．
 	SatClause& c = w.clause();
+	if ( c.skip() ) continue;
 	Literal l0 = c.wl0();
 	if ( l0 == nl ) {
 	  // nl を 1番めのリテラルにする．
