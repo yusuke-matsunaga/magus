@@ -95,6 +95,11 @@ public:
   void
   set_skip(bool flag);
 
+  /// @brief 更新フラグを設定する．
+  /// @param[in] flag 設定する値
+  void
+  set_update(bool flag);
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -133,6 +138,10 @@ public:
   /// @brief スキップフラグを返す．
   bool
   skip() const;
+
+  /// @brief 更新フラグを返す．
+  bool
+  update() const;
 
 
 private:
@@ -175,7 +184,7 @@ SatClause::SatClause(ymuint lit_num,
 		     Literal* lits,
 		     bool learnt)
 {
-  mSizeLearnt = (lit_num << 2) | static_cast<ymuint>(learnt);
+  mSizeLearnt = (lit_num << 3) | static_cast<ymuint>(learnt);
   mActiveLitNum = lit_num;
   mActivity = 0.0;
   for (ymuint i = 0; i < lit_num; ++ i) {
@@ -255,7 +264,7 @@ inline
 ymuint
 SatClause::lit_num() const
 {
-  return (mSizeLearnt >> 2);
+  return (mSizeLearnt >> 3);
 }
 
 // @brief リテラルのアクセス
@@ -342,6 +351,28 @@ bool
 SatClause::skip() const
 {
   return static_cast<bool>((mSizeLearnt >> 1) & 1UL);
+}
+
+// @brief 更新フラグを設定する．
+// @param[in] flag 設定する値
+inline
+void
+SatClause::set_update(bool flag)
+{
+  if ( flag ) {
+    mSizeLearnt |= 4UL;
+  }
+  else {
+    mSizeLearnt &= ~4UL;
+  }
+}
+
+// @brief 更新フラグを返す．
+inline
+bool
+SatClause::update() const
+{
+  return static_cast<bool>((mSizeLearnt >> 2) & 1UL);
 }
 
 END_NAMESPACE_YM_SAT

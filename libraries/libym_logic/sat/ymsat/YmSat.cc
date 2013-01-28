@@ -16,7 +16,11 @@
 #include "SatClause.h"
 
 
+#if LIT_LINK
+#define NEW_IMPL 1
+#else
 #define NEW_IMPL 0
+#endif
 
 BEGIN_NAMESPACE_YM_SAT
 
@@ -71,6 +75,9 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mHeapPos(NULL),
   mActivity(NULL),
   mWatcherList(NULL),
+#if LIT_LINK
+  mClauseList(NULL),
+#endif
   mHeap(NULL),
   mHeapNum(0),
   mRootLevel(0),
@@ -112,6 +119,9 @@ YmSat::~YmSat()
   delete [] mHeapPos;
   delete [] mActivity;
   delete [] mWatcherList;
+#if LIT_LINK
+  delete [] mClauseList;
+#endif
   delete [] mHeap;
   delete [] mTmpLits;
 }
@@ -153,6 +163,9 @@ YmSat::expand_var()
   ymint32* old_heap_pos = mHeapPos;
   double* old_activity = mActivity;
   WatcherList* old_watcher_list = mWatcherList;
+#if LIT_LINK
+  WatcherList* old_clause_list = mClauseList;
+#endif
   ymuint32* old_heap = mHeap;
   if ( mVarSize == 0 ) {
     mVarSize = 1024;
@@ -166,6 +179,9 @@ YmSat::expand_var()
   mHeapPos = new ymint32[mVarSize];
   mActivity = new double[mVarSize];
   mWatcherList = new WatcherList[mVarSize * 2];
+#if LIT_LINK
+  mClauseList = new WatcherList[mVarSize * 2];
+#endif
   mHeap = new ymuint32[mVarSize];
   for (ymuint i = 0; i < mOldVarNum; ++ i) {
     mVal[i] = old_val[i];
@@ -177,6 +193,9 @@ YmSat::expand_var()
   ymuint n2 = mOldVarNum * 2;
   for (ymuint i = 0; i < n2; ++ i) {
     mWatcherList[i].move(old_watcher_list[i]);
+#if LIT_LINK
+    mClauseList[i].move(old_clause_list[i]);
+#endif
   }
   for (ymuint i = 0; i < mHeapNum; ++ i) {
     mHeap[i] = old_heap[i];
@@ -188,6 +207,9 @@ YmSat::expand_var()
     delete [] old_heap_pos;
     delete [] old_activity;
     delete [] old_watcher_list;
+#if LIT_LINK
+    delete [] old_clause_list;
+#endif
     delete [] old_heap;
   }
   mAssignList.reserve(mVarSize);
@@ -313,6 +335,13 @@ YmSat::add_clause_sub(ymuint lit_num)
     SatReason reason(clause);
     add_watcher(~l0, reason);
     add_watcher(~l1, reason);
+
+#if LIT_LINK
+    // clause list に追加する．
+    for (ymuint i = 0; i < lit_num; ++ i) {
+      add_clause_list(mTmpLits[i], clause);
+    }
+#endif
   }
 }
 
@@ -371,6 +400,13 @@ YmSat::add_learnt_clause(const vector<Literal>& lits)
     // watcher-list の設定
     add_watcher(~l0, reason);
     add_watcher(~l1, reason);
+
+#if LIT_LINK
+    // clause list に追加する．
+    for (ymuint i = 0; i < n; ++ i) {
+      add_clause_list(mTmpLits[i], clause);
+    }
+#endif
   }
 
   // learnt clause の場合には必ず unit clause になっているはず．
@@ -408,6 +444,34 @@ YmSat::del_watcher(Literal watch_lit,
   }
   wlist.erase(n);
 }
+
+#if LIT_LINK
+// @brief clause を clause list から取り除く
+inline
+void
+YmSat::del_clause_list(Literal lit,
+		       SatClause* clause)
+{
+  SatReason reason(clause);
+  Watcher w0(reason);
+  WatcherList& wlist = clause_list(lit);
+  ymuint n = wlist.num();
+  ymuint wpos = 0;
+  for ( ; wpos < n; ++ wpos) {
+    Watcher w = wlist.elem(wpos);
+    if ( w == w0 ) {
+      break;
+    }
+  }
+  assert_cond( wpos < n, __FILE__, __LINE__);
+  -- n;
+  for ( ; wpos < n; ++ wpos) {
+    Watcher w = wlist.elem(wpos + 1);
+    wlist.set_elem(wpos, w);
+  }
+  wlist.erase(n);
+}
+#endif
 
 // @brief SAT 問題を解く．
 // @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
@@ -461,6 +525,8 @@ YmSat::solve(const vector<Literal>& assumptions,
 
   assert_cond(decision_level() == 0, __FILE__, __LINE__);
 
+  mL0List.clear();
+
   // assumption の割り当てを行う．
   for (vector<Literal>::const_iterator p = assumptions.begin();
        p != assumptions.end(); ++ p) {
@@ -488,6 +554,7 @@ YmSat::solve(const vector<Literal>& assumptions,
       if ( debug & debug_solve ) {
 	cout << "UNSAT" << endl;
       }
+
       return kB3False;
     }
   }
@@ -499,50 +566,60 @@ YmSat::solve(const vector<Literal>& assumptions,
   }
 
 #if NEW_IMPL
-  for (vector<SatClause*>::iterator p = mConstrClause.begin();
-       p != mConstrClause.end(); ++ p) {
-    SatClause* c = *p;
-    ymuint n = c->lit_num();
-    bool sat = false;
-    ymuint last_pos = 0;
-    for (ymuint i = 0; i < n; ++ i) {
-      Literal l = c->lit(i);
-      Bool3 val = eval(l);
-      if ( val == kB3True ) {
-	c->set_skip(true);
-	sat = true;
-	break;
+  mSkipList.clear();
+  for (vector<Literal>::iterator p = mL0List.begin();
+       p != mL0List.end(); ++ p) {
+    Literal l = *p;
+    WatcherList& c1list = clause_list(l);
+    ymuint n1 = c1list.num();
+    for (ymuint i = 0; i < n1; ++ i) {
+      Watcher w = c1list.elem(i);
+      SatClause& c = w.clause();
+      if ( !c.skip() ) {
+	c.set_skip(true);
+	mSkipList.push_back(&c);
       }
-      else if ( val == kB3X ) {
-	last_pos = i;
-      }
-    }
-    if ( !sat ) {
-      c->set_active_lit_num(last_pos + 1);
     }
   }
-  for (vector<SatClause*>::iterator p = mLearntClause.begin();
-       p != mLearntClause.end(); ++ p) {
-    SatClause* c = *p;
-    ymuint n = c->lit_num();
-    bool sat = false;
-    ymuint last_pos = 0;
-    for (ymuint i = 0; i < n; ++ i) {
-      Literal l = c->lit(i);
-      Bool3 val = eval(l);
-      if ( val == kB3True ) {
-	c->set_skip(true);
-	sat = true;
-	break;
+  mUpdateList.clear();
+
+  for (vector<Literal>::iterator p = mL0List.begin();
+       p != mL0List.end(); ++ p) {
+    Literal l = *p;
+    WatcherList& c0list = clause_list(~l);
+    ymuint n0 = c0list.num();
+    for (ymuint i = 0; i < n0; ++ i) {
+      Watcher w = c0list.elem(i);
+      SatClause& c = w.clause();
+      if ( !c.skip() && !c.update() ) {
+	c.set_update(true);
+	mUpdateList.push_back(&c);
+	ymuint n = c.lit_num();
+#if 0
+	ymuint last_pos = 2;
+	for (ymuint i = 2; i < n; ++ i) {
+	  if ( eval(c.lit(i)) == kB3X ) {
+	    if ( last_pos < i ) {
+	      c.insert(i, last_pos);
+	    }
+	    ++ last_pos;
+	  }
+	}
+	c.set_active_lit_num(last_pos);
+#else
+	ymuint last_pos = 2;
+	for (ymuint i = n; -- i >= 2; ) {
+	  if ( eval(c.lit(i)) == kB3X ) {
+	    last_pos = i + 1;
+	    break;
+	  }
+	}
+	c.set_active_lit_num(last_pos);
+#endif
       }
-      else if ( val == kB3X ) {
-	last_pos = i;
-      }
-    }
-    if ( !sat ) {
-      c->set_active_lit_num(last_pos + 1);
     }
   }
+
 #endif
 
   Bool3 stat = kB3X;
@@ -588,18 +665,18 @@ YmSat::solve(const vector<Literal>& assumptions,
   backtrack(0);
 
 #if NEW_IMPL
-  for (vector<SatClause*>::iterator p = mConstrClause.begin();
-       p != mConstrClause.end(); ++ p) {
+  for (vector<SatClause*>::iterator p = mSkipList.begin();
+       p != mSkipList.end(); ++ p) {
     SatClause* c = *p;
     c->set_skip(false);
-    c->set_active_lit_num(c->lit_num());
   }
-  for (vector<SatClause*>::iterator p = mLearntClause.begin();
-       p != mLearntClause.end(); ++ p) {
+  mSkipList.clear();
+  for (vector<SatClause*>::iterator p = mUpdateList.begin();
+       p != mUpdateList.end(); ++ p) {
     SatClause* c = *p;
-    c->set_skip(false);
     c->set_active_lit_num(c->lit_num());
   }
+  mUpdateList.clear();
 #endif
 
   if ( mTimerOn ) {
@@ -1075,8 +1152,12 @@ YmSat::implication0()
       }
       wlist.erase(wpos);
     }
+#if NEW_IMPL
+    if ( conflict == kNullSatReason ) {
+      mL0List.push_back(l);
+    }
+#endif
   }
-
   return conflict;
 }
 
@@ -1183,7 +1264,7 @@ YmSat::reduceDB()
   vector<SatClause*>::iterator wpos = mLearntClause.begin();
   for (ymuint i = 0; i < n2; ++ i) {
     SatClause* clause = mLearntClause[i];
-    if ( clause->lit_num() > 2 && !is_locked(clause) && !clause->skip() ) {
+    if ( clause->lit_num() > 2 && !is_locked(clause) && !clause->skip() && !clause->update() ) {
       delete_clause(clause);
     }
     else {
@@ -1214,7 +1295,9 @@ YmSat::new_clause(ymuint lit_num,
 {
   ymuint size = sizeof(SatClause) + sizeof(Literal) * (lit_num - 1);
   void* p = mAlloc.get_memory(size);
-  return new (p) SatClause(lit_num, mTmpLits, learnt);
+  SatClause* clause = new (p) SatClause(lit_num, mTmpLits, learnt);
+
+  return clause;
 }
 
 // @brief mTmpLits を確保する．
@@ -1238,6 +1321,13 @@ YmSat::delete_clause(SatClause* clause)
   // watch list を更新
   del_watcher(~clause->wl0(), SatReason(clause));
   del_watcher(~clause->wl1(), SatReason(clause));
+
+#if LIT_LINK
+  // clause list から取り除く
+  for (ymuint i = 0; i < clause->lit_num(); ++ i) {
+    del_clause_list(clause->lit(i), clause);
+  }
+#endif
 
   if ( clause->is_learnt() ) {
     mLearntLitNum -= clause->lit_num();
