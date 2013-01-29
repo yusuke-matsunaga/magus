@@ -316,9 +316,9 @@ YmSat::add_clause_sub(ymuint lit_num)
 
 // 学習節を追加する．
 void
-YmSat::add_learnt_clause(const vector<Literal>& lits)
+YmSat::add_learnt_clause()
 {
-  ymuint n = lits.size();
+  ymuint n = mLearntLits.size();
   mLearntLitNum += n;
 
   if ( n == 0 ) {
@@ -327,7 +327,7 @@ YmSat::add_learnt_clause(const vector<Literal>& lits)
     return;
   }
 
-  Literal l0 = lits[0];
+  Literal l0 = mLearntLits[0];
   if ( n == 1 ) {
     // unit clause があったら値の割り当てを行う．
     bool stat = check_and_assign(l0);
@@ -347,7 +347,7 @@ YmSat::add_learnt_clause(const vector<Literal>& lits)
   }
 
   SatReason reason;
-  Literal l1 = lits[1];
+  Literal l1 = mLearntLits[1];
   if ( n == 2 ) {
     reason = SatReason(l1);
 
@@ -360,7 +360,7 @@ YmSat::add_learnt_clause(const vector<Literal>& lits)
     // 節の生成
     alloc_lits(n);
     for (ymuint i = 0; i < n; ++ i) {
-      mTmpLits[i] = lits[i];
+      mTmpLits[i] = mLearntLits[i];
     }
     SatClause* clause = new_clause(n, true);
     mLearntClause.push_back(clause);
@@ -605,9 +605,6 @@ YmSat::reg_msg_handler(SatMsgHandler* msg_handler)
 Bool3
 YmSat::search()
 {
-  // 矛盾の解析時に用いられるベクタ
-  vector<Literal> learnt;
-
   // コンフリクトの起こった回数
   ymuint n_confl = 0;
   for ( ; ; ) {
@@ -628,15 +625,15 @@ YmSat::search()
       }
 
       // 今の矛盾の解消に必要な条件を「学習」する．
-      int bt_level = mAnalyzer->analyze(conflict, learnt);
+      int bt_level = mAnalyzer->analyze(conflict, mLearntLits);
 
       if ( debug & debug_analyze ) {
 	cout << endl
 	     << "analyze for " << conflict << endl
 	     << "learnt clause is ";
 	const char* plus = "";
-	for (ymuint i = 0; i < learnt.size(); ++ i) {
-	  Literal l = learnt[i];
+	for (ymuint i = 0; i < mLearntLits.size(); ++ i) {
+	  Literal l = mLearntLits[i];
 	  cout << plus << l << " @" << decision_level(l.varid());
 	  plus = " + ";
 	}
@@ -650,7 +647,7 @@ YmSat::search()
       backtrack(bt_level);
 
       // 学習節の生成
-      add_learnt_clause(learnt);
+      add_learnt_clause();
 
       decay_var_activity();
       decay_clause_activity();

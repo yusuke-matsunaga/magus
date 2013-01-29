@@ -216,9 +216,9 @@ private:
   reduceDB();
 
   /// @brief 学習節を追加する．
-  /// @param[in] lits 追加する節を構成するリテラルのリスト
+  /// @note 追加するリテラルは mLearntLits に入れる．
   void
-  add_learnt_clause(const vector<Literal>& lits);
+  add_learnt_clause();
 
   /// @brief add_clause() の下請け関数
   void
@@ -525,6 +525,9 @@ private:
 
   // mTmpLits のサイズ
   ymuint32 mTmpLitsSize;
+
+  // search() で用いられるリテラル配列
+  vector<Literal> mLearntLits;
 
 };
 
