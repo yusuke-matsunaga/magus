@@ -64,11 +64,6 @@ public:
   void
   xchange_wl();
 
-  /// @brief 1番めの watch lieral を設定する．
-  /// @param[in] pos 設定するリテラルの位置
-  void
-  set_wl1(ymuint pos);
-
   /// @brief src_pos 番めのリテラルを dst_pos に移動する．
   /// @param[in] src_pos もとの位置
   /// @param[in] dst_pos 移動先
@@ -86,20 +81,6 @@ public:
   void
   factor_activity(double factor);
 
-  /// @brief active_lit_num を設定する．
-  void
-  set_active_lit_num(ymuint num);
-
-  /// @brief スキップフラグを設定する．
-  /// @param[in] flag 設定する値
-  void
-  set_skip(bool flag);
-
-  /// @brief 更新フラグを設定する．
-  /// @param[in] flag 設定する値
-  void
-  set_update(bool flag);
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -109,10 +90,6 @@ public:
   /// @brief リテラル数の取得
   ymuint
   lit_num() const;
-
-  /// @brief まだ値が固定していないリテラル数を得る．
-  ymuint
-  active_lit_num() const;
 
   /// @brief リテラルのアクセス
   /// @param[in] pos リテラルの位置 ( 0 <= pos < lit_num() )
@@ -135,14 +112,6 @@ public:
   double
   activity() const;
 
-  /// @brief スキップフラグを返す．
-  bool
-  skip() const;
-
-  /// @brief 更新フラグを返す．
-  bool
-  update() const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -151,9 +120,6 @@ private:
 
   // サイズと learnt フラグをパックしたもの
   ymuint32 mSizeLearnt;
-
-  // 値が決まっていないリテラルの数．
-  ymuint32 mActiveLitNum;
 
   // activity
   double mActivity;
@@ -184,8 +150,7 @@ SatClause::SatClause(ymuint lit_num,
 		     Literal* lits,
 		     bool learnt)
 {
-  mSizeLearnt = (lit_num << 3) | static_cast<ymuint>(learnt);
-  mActiveLitNum = lit_num;
+  mSizeLearnt = (lit_num << 1) | static_cast<ymuint>(learnt);
   mActivity = 0.0;
   for (ymuint i = 0; i < lit_num; ++ i) {
     mLits[i] = lits[i];
@@ -219,21 +184,6 @@ SatClause::xchange_wl()
   mLits[1] = tmp;
 }
 
-// @brief 1番めの watch lieral を設定する．
-// @param[in] pos 設定するリテラルの位置
-inline
-void
-SatClause::set_wl1(ymuint pos)
-{
-#if SWAP_LITERALS
-  Literal tmp = mLits[1];
-  mLits[1] = mLits[pos];
-  mLits[pos] = tmp;
-#else
-  insert(pos, 1);
-#endif
-}
-
 // @brief src_pos 番めのリテラルを dst_pos に移動する．
 // @param[in] src_pos もとの位置
 // @param[in] dst_pos 移動先
@@ -251,20 +201,12 @@ SatClause::insert(ymuint src_pos,
   mLits[dst_pos] = tmp;
 }
 
-// @brief active_lit_num を設定する．
-inline
-void
-SatClause::set_active_lit_num(ymuint num)
-{
-  mActiveLitNum = num;
-}
-
 // @brief リテラル数の取得
 inline
 ymuint
 SatClause::lit_num() const
 {
-  return (mSizeLearnt >> 3);
+  return (mSizeLearnt >> 1);
 }
 
 // @brief リテラルのアクセス
@@ -299,14 +241,6 @@ SatClause::is_learnt() const
   return static_cast<bool>(mSizeLearnt & 1UL);
 }
 
-// @brief まだ値が固定していないリテラル数を得る．
-inline
-ymuint
-SatClause::active_lit_num() const
-{
-  return mActiveLitNum;
-}
-
 // @brief 学習節の場合にアクティビティを返す．
 inline
 double
@@ -329,50 +263,6 @@ void
 SatClause::factor_activity(double factor)
 {
   mActivity *= factor;
-}
-
-// @brief スキップフラグを設定する．
-// @param[in] flag 設定する値
-inline
-void
-SatClause::set_skip(bool flag)
-{
-  if ( flag ) {
-    mSizeLearnt |= 2UL;
-  }
-  else {
-    mSizeLearnt &= ~2UL;
-  }
-}
-
-// @brief スキップフラグを返す．
-inline
-bool
-SatClause::skip() const
-{
-  return static_cast<bool>((mSizeLearnt >> 1) & 1UL);
-}
-
-// @brief 更新フラグを設定する．
-// @param[in] flag 設定する値
-inline
-void
-SatClause::set_update(bool flag)
-{
-  if ( flag ) {
-    mSizeLearnt |= 4UL;
-  }
-  else {
-    mSizeLearnt &= ~4UL;
-  }
-}
-
-// @brief 更新フラグを返す．
-inline
-bool
-SatClause::update() const
-{
-  return static_cast<bool>((mSizeLearnt >> 2) & 1UL);
 }
 
 END_NAMESPACE_YM_SAT

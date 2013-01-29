@@ -19,9 +19,6 @@
 #include "Watcher.h"
 
 
-#define LIT_LINK 1
-
-
 BEGIN_NAMESPACE_YM_SAT
 
 class SatAnalyzer;
@@ -185,10 +182,6 @@ private:
   SatReason
   implication();
 
-  /// @brief 割当てキューに基づいて implication を行う．
-  SatReason
-  implication0();
-
   /// @brief level までバックトラックする
   /// @param[in] level バックトラックするレベル
   void
@@ -266,22 +259,6 @@ private:
   void
   del_watcher(Literal watch_lit,
 	      SatReason reason);
-
-#if LIT_LINK
-  /// @brief clause list を得る．
-  WatcherList&
-  clause_list(Literal lit);
-
-  /// @brief clause を clause list に追加する．
-  void
-  add_clause_list(Literal lit,
-		  SatClause* clause);
-
-  /// @brief clause を clause list から取り除く
-  void
-  del_clause_list(Literal lit,
-		  SatClause* clause);
-#endif
 
   /// @brief 変数1の評価を行う．
   /// @param[in] id 変数番号
@@ -467,21 +444,6 @@ private:
   // サイズは mVarSize * 2
   WatcherList* mWatcherList;
 
-#if LIT_LINK
-  // clause list の配列
-  // サイズは mVarSize * 2
-  WatcherList* mClauseList;
-#endif
-
-  // レベル0で割り当てたリテラルのリスト
-  vector<Literal> mL0List;
-
-  // レベル0で充足している節のリスト
-  vector<SatClause*> mSkipList;
-
-  // リテラルの並べ替えが必要な節のリスト
-  vector<SatClause*> mUpdateList;
-
   // ヒープ用の配列
   // サイズは mVarSize
   ymuint32* mHeap;
@@ -623,27 +585,6 @@ YmSat::eval(VarId id) const
 {
   return mVal[id.val()];
 }
-
-#if LIT_LINK
-// @brief clause list を得る．
-inline
-WatcherList&
-YmSat::clause_list(Literal lit)
-{
-  ymuint index = lit.index();
-  return mClauseList[index];
-}
-
-// @brief clause を clause list に追加する．
-inline
-void
-YmSat::add_clause_list(Literal lit,
-		       SatClause* clause)
-{
-  SatReason reason(clause);
-  clause_list(lit).add(Watcher(reason));
-}
-#endif
 
 // literal の評価を行う．
 inline
