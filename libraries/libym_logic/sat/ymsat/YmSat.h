@@ -408,8 +408,20 @@ private:
   // 制約節の配列
   vector<SatClause*> mConstrClause;
 
+  // 二項制約節の数
+  ymuint64 mConstrBinNum;
+
+  // 制約節の総リテラル数 (二項制約節も含む)
+  ymuint64 mConstrLitNum;
+
   // 学習節の配列
   vector<SatClause*> mLearntClause;
+
+  // 二項学習節の数
+  ymuint64 mLearntBinNum;
+
+  // 学習節の総リテラル数 (二項制約節も含む)
+  ymuint64 mLearntLitNum;
 
   // 変数の数
   ymuint32 mVarNum;
@@ -495,21 +507,6 @@ private:
 
   // 総 implication 数
   ymuint64 mPropagationNum;
-
-  // watch literal を変更した数
-  ymuint64 mWatchNum;
-
-  // 二項制約節の数
-  ymuint64 mConstrBinNum;
-
-  // 制約節の総リテラル数
-  ymuint64 mConstrLitNum;
-
-  // 二項学習節の数
-  ymuint64 mLearntBinNum;
-
-  // 学習節の総リテラル数
-  ymuint64 mLearntLitNum;
 
   // コンフリクト数の制限
   ymuint64 mConflictLimit;

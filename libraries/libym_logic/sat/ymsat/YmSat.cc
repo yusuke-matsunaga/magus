@@ -60,6 +60,10 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mAnalyzer(analyzer),
   mSane(true),
   mAlloc(4096),
+  mConstrBinNum(0),
+  mConstrLitNum(0),
+  mLearntBinNum(0),
+  mLearntLitNum(0),
   mVarNum(0),
   mOldVarNum(0),
   mVarSize(0),
@@ -80,10 +84,6 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mConflictNum(0),
   mDecisionNum(0),
   mPropagationNum(0),
-  mConstrBinNum(0),
-  mConstrLitNum(0),
-  mLearntBinNum(0),
-  mLearntLitNum(0),
   mConflictLimit(0),
   mLearntLimit(0),
   mMaxConflict(1024 * 10)
@@ -364,6 +364,7 @@ YmSat::add_learnt_clause(const vector<Literal>& lits)
     }
     SatClause* clause = new_clause(n, true);
     mLearntClause.push_back(clause);
+
     reason = SatReason(clause);
 
     // watcher-list の設定
@@ -445,9 +446,9 @@ YmSat::solve(const vector<Literal>& assumptions,
   simplifyDB();
   if ( !mSane ) {
     // その時点で充足不可能なら終わる．
-      if ( debug & debug_solve ) {
-	cout << "UNSAT in simplifyDB()" << endl;
-      }
+    if ( debug & debug_solve ) {
+      cout << "UNSAT in simplifyDB()" << endl;
+    }
     return kB3False;
   }
 
@@ -996,16 +997,13 @@ YmSat::alloc_lits(ymuint lit_num)
 void
 YmSat::delete_clause(SatClause* clause)
 {
+  assert_cond( clause->is_learnt(), __FILE__, __LINE__);
+
   // watch list を更新
   del_watcher(~clause->wl0(), SatReason(clause));
   del_watcher(~clause->wl1(), SatReason(clause));
 
-  if ( clause->is_learnt() ) {
-    mLearntLitNum -= clause->lit_num();
-  }
-  else {
-    mConstrLitNum -= clause->lit_num();
-  }
+  mLearntLitNum -= clause->lit_num();
 
   ymuint size = sizeof(SatClause) + sizeof(Literal) * (clause->lit_num() - 1);
   mAlloc.put_memory(size, static_cast<void*>(clause));
