@@ -32,6 +32,295 @@ BEGIN_NAMESPACE_YM_SATPG_DTPG
 
 BEGIN_NONAMESPACE
 
+
+//////////////////////////////////////////////////////////////////////
+// make_gate_cnf で用いられるファンクター
+//////////////////////////////////////////////////////////////////////
+struct InputLiteral
+{
+
+  /// @brief リテラルを返す．
+  virtual
+  Literal
+  operator[](ymuint pos) const = 0;
+
+  /// @brief 入力数を返す．
+  virtual
+  ymuint
+  size() const = 0;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+// vector<> を用いた InputLiteral
+//////////////////////////////////////////////////////////////////////
+class VectorInputLiteral :
+  public InputLiteral
+{
+public:
+
+  /// @brief コンストラクタ
+  VectorInputLiteral(const vector<Literal>& vec);
+
+  /// @brief リテラルを返す．
+  virtual
+  Literal
+  operator[](ymuint pos) const;
+
+  /// @brief 入力数を返す．
+  virtual
+  ymuint
+  size() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ベクタ
+  const vector<Literal>& mVector;
+
+};
+
+// @brief コンストラクタ
+VectorInputLiteral::VectorInputLiteral(const vector<Literal>& vec) :
+  mVector(vec)
+{
+}
+
+// @brief リテラルを返す．
+Literal
+VectorInputLiteral::operator[](ymuint pos) const
+{
+  return mVector[pos];
+}
+
+// @brief 入力数を返す．
+ymuint
+VectorInputLiteral::size() const
+{
+  return mVector.size();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// DtpgNode->gvar() を用いた InputLiteral
+//////////////////////////////////////////////////////////////////////
+class GvarInputLiteral :
+  public InputLiteral
+{
+public:
+
+  /// @brief コンストラクタ
+  GvarInputLiteral(DtpgNode* node);
+
+  /// @brief リテラルを返す．
+  virtual
+  Literal
+  operator[](ymuint pos) const;
+
+  /// @brief 入力数を返す．
+  virtual
+  ymuint
+  size() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ノード
+  DtpgNode* mNode;
+
+};
+
+// @brief コンストラクタ
+GvarInputLiteral::GvarInputLiteral(DtpgNode* node) :
+  mNode(node)
+{
+}
+
+// @brief リテラルを返す．
+Literal
+GvarInputLiteral::operator[](ymuint pos) const
+{
+  DtpgNode* inode = mNode->fanin(pos);
+  return Literal(inode->gvar(), kPolPosi);
+}
+
+// @brief 入力数を返す．
+ymuint
+GvarInputLiteral::size() const
+{
+  return mNode->fanin_num();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// DtpgNode->fvar() を用いた InputLiteral
+//////////////////////////////////////////////////////////////////////
+class FvarInputLiteral :
+  public InputLiteral
+{
+public:
+
+  /// @brief コンストラクタ
+  FvarInputLiteral(DtpgNode* node);
+
+  /// @brief リテラルを返す．
+  virtual
+  Literal
+  operator[](ymuint pos) const;
+
+  /// @brief 入力数を返す．
+  virtual
+  ymuint
+  size() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ノード
+  DtpgNode* mNode;
+
+};
+
+// @brief コンストラクタ
+FvarInputLiteral::FvarInputLiteral(DtpgNode* node) :
+  mNode(node)
+{
+}
+
+// @brief リテラルを返す．
+Literal
+FvarInputLiteral::operator[](ymuint pos) const
+{
+  DtpgNode* inode = mNode->fanin(pos);
+  return Literal(inode->fvar(), kPolPosi);
+}
+
+// @brief 入力数を返す．
+ymuint
+FvarInputLiteral::size() const
+{
+  return mNode->fanin_num();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// DtpgPrimitive->gvar() を用いた InputLiteral
+//////////////////////////////////////////////////////////////////////
+class PrimGvarInputLiteral :
+  public InputLiteral
+{
+public:
+
+  /// @brief コンストラクタ
+  PrimGvarInputLiteral(DtpgPrimitive* prim);
+
+  /// @brief リテラルを返す．
+  virtual
+  Literal
+  operator[](ymuint pos) const;
+
+  /// @brief 入力数を返す．
+  virtual
+  ymuint
+  size() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // プリミティブ
+  DtpgPrimitive* mPrim;
+
+};
+
+// @brief コンストラクタ
+PrimGvarInputLiteral::PrimGvarInputLiteral(DtpgPrimitive* prim) :
+  mPrim(prim)
+{
+}
+
+// @brief リテラルを返す．
+Literal
+PrimGvarInputLiteral::operator[](ymuint pos) const
+{
+  DtpgPrimitive* iprim = mPrim->fanin(pos);
+  return Literal(iprim->gvar(), kPolPosi);
+}
+
+// @brief 入力数を返す．
+ymuint
+PrimGvarInputLiteral::size() const
+{
+  return mPrim->fanin_num();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// DtpgPrimitive->fvar() を用いた InputLiteral
+//////////////////////////////////////////////////////////////////////
+class PrimFvarInputLiteral :
+  public InputLiteral
+{
+public:
+
+  /// @brief コンストラクタ
+  PrimFvarInputLiteral(DtpgPrimitive* prim);
+
+  /// @brief リテラルを返す．
+  virtual
+  Literal
+  operator[](ymuint pos) const;
+
+  /// @brief 入力数を返す．
+  virtual
+  ymuint
+  size() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // プリミティブ
+  DtpgPrimitive* mPrim;
+
+};
+
+// @brief コンストラクタ
+PrimFvarInputLiteral::PrimFvarInputLiteral(DtpgPrimitive* prim) :
+  mPrim(prim)
+{
+}
+
+// @brief リテラルを返す．
+Literal
+PrimFvarInputLiteral::operator[](ymuint pos) const
+{
+  DtpgPrimitive* iprim = mPrim->fanin(pos);
+  return Literal(iprim->fvar(), kPolPosi);
+}
+
+// @brief 入力数を返す．
+ymuint
+PrimFvarInputLiteral::size() const
+{
+  return mPrim->fanin_num();
+}
+
+
 // @brief 故障挿入回路を表す CNF 式を作る．
 // @param[in] solver SAT ソルバー
 // @param[in] ivar 入力の変数
@@ -94,7 +383,7 @@ void
 make_gate_cnf(SatSolver& solver,
 	      tTgGateType gate_type,
 	      Literal output,
-	      const vector<Literal>& inputs)
+	      const InputLiteral& inputs)
 {
   ymuint ni = inputs.size();
   switch ( gate_type ) {
@@ -344,13 +633,7 @@ make_gnode_cnf(SatSolver& solver,
 
 	// プリミティブの入出力の関係を表す CNF 式を作る．
 	Literal output(gvar, kPolPosi);
-	ymuint ni = prim->fanin_num();
-	vector<Literal> inputs(ni);
-	for (ymuint j = 0; j < ni; ++ j) {
-	  DtpgPrimitive* iprim = prim->fanin(j);
-	  inputs[j] = Literal(iprim->gvar(), kPolPosi);
-	}
-	make_gate_cnf(solver, prim->gate_type(), output, inputs);
+	make_gate_cnf(solver, prim->gate_type(), output, PrimGvarInputLiteral(prim));
       }
       // prim の変数 gvar と fvar の両方に登録しておく
       prim->set_gvar(gvar);
@@ -359,13 +642,7 @@ make_gnode_cnf(SatSolver& solver,
   }
   else {
     // 単純な組み込み型の場合
-    ymuint ni = node->fanin_num();
-    vector<Literal> inputs(ni);
-    for (ymuint i = 0; i < ni; ++ i) {
-      DtpgNode* inode = node->fanin(i);
-      inputs[i] = Literal(inode->gvar(), kPolPosi);
-    }
-    make_gate_cnf(solver, node->gate_type(), output, inputs);
+    make_gate_cnf(solver, node->gate_type(), output, GvarInputLiteral(node));
   }
 }
 
@@ -435,26 +712,14 @@ make_fnode_cnf(SatSolver& solver,
 
 	// プリミティブの入出力の関係を表す CNF 式を作る．
 	Literal output(fvar, kPolPosi);
-	ymuint ni = prim->fanin_num();
-	vector<Literal> inputs(ni);
-	for (ymuint j = 0; j < ni; ++ j) {
-	  DtpgPrimitive* iprim = prim->fanin(j);
-	  inputs[j] = Literal(iprim->fvar(), kPolPosi);
-	}
-	make_gate_cnf(solver, prim->gate_type(), output, inputs);
+	make_gate_cnf(solver, prim->gate_type(), output, PrimFvarInputLiteral(prim));
       }
       // プリミティブの変数を登録する．
       prim->set_fvar(fvar);
     }
   }
   else {
-    // 単純な組み込み型の場合
-    vector<Literal> inputs(ni);
-    for (ymuint i = 0; i < ni; ++ i) {
-      DtpgNode* inode = node->fanin(i);
-      inputs[i] = Literal(inode->fvar(), kPolPosi);
-    }
-    make_gate_cnf(solver, node->gate_type(), output, inputs);
+    make_gate_cnf(solver, node->gate_type(), output, FvarInputLiteral(node));
   }
 }
 
@@ -1126,12 +1391,12 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	      else {
 		output = Literal(prim->fvar(), kPolPosi);
 	      }
-	      make_gate_cnf(solver, prim->gate_type(), output, inputs1);
+	      make_gate_cnf(solver, prim->gate_type(), output, VectorInputLiteral(inputs1));
 	    }
 	  }
 	}
 	else {
-	  make_gate_cnf(solver, node->gate_type(), olit, inputs);
+	  make_gate_cnf(solver, node->gate_type(), olit, VectorInputLiteral(inputs));
 	}
       }
 
