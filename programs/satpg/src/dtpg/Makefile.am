@@ -16,6 +16,7 @@ libatpg_dtpg_la_CPPFLAGS = \
 libatpg_dtpg_la_SOURCES = \
 	dtpg_nsdef.h \
 	DtpgNode.h \
+	DtpgNode.cc \
 	DtpgFault.h \
 	DtpgFFR.h \
 	DtpgNetwork.h \

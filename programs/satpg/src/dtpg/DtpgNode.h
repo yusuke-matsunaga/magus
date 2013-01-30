@@ -10,9 +10,9 @@
 
 
 #include "dtpg_nsdef.h"
-#include "DtpgPrimitive.h"
 #include "ym_logic/VarId.h"
 #include "ym_networks/tgnet.h"
+#include "ym_logic/Bool3.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
@@ -206,6 +206,30 @@ public:
   clear_mark3();
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // mandatory assignment 用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 後方含意で出力に0を割り当てる．
+  /// @param[in] from_node 含意元のノード
+  /// @param[in] val 値
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  bwd_prop(DtpgNode* from_node,
+	   Bool3 val);
+
+  /// @brief ファンアウト先に0を伝播する．
+  /// @param[in] from_node 含意元のノード
+  /// @param[in] val 値
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fanout_prop(DtpgNode* from_node,
+	      Bool3 val);
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる下請け関数
@@ -218,6 +242,22 @@ private:
   /// @brief アクティブフラグを消す．
   void
   clear_active();
+
+  /// @brief 後方含意を行う．
+  /// @param[in] val 値
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  bwd_imp(Bool3 val);
+
+  /// @brief 前方含意を行う．
+  /// @param[in] from_node 含意元のノード
+  /// @param[in] val 値
+  /// @retval true 矛盾なく含意が行われた．
+  /// @retval false 矛盾が発生した．
+  bool
+  fwd_imp(DtpgNode* from_node,
+	  Bool3 val);
 
 
 private:
@@ -283,6 +323,9 @@ private:
 
   // immediate dominator
   DtpgNode* mImmDom;
+
+  // mandatory assignments 用の値
+  Bool3 mMaVal;
 
 };
 
@@ -379,16 +422,6 @@ ymuint
 DtpgNode::primitive_num() const
 {
   return mPrimitiveNum;
-}
-
-// @brief cplx_logic タイプのときにプリミティブを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < primitive_num() )
-inline
-DtpgPrimitive*
-DtpgNode::primitive(ymuint pos) const
-{
-  assert_cond( pos < primitive_num(), __FILE__, __LINE__);
-  return &mPrimitiveList[pos];
 }
 
 // @brief subnode タイプの時 true を返す．

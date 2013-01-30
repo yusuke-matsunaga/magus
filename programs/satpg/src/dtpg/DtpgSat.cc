@@ -10,6 +10,7 @@
 #include "DtpgSat.h"
 #include "DtpgNetwork.h"
 #include "DtpgNode.h"
+#include "DtpgPrimitive.h"
 #include "DtpgFFR.h"
 #include "DtpgFault.h"
 #include "DtpgOperator.h"
