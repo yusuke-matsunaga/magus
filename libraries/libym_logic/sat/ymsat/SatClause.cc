@@ -62,7 +62,7 @@ operator<<(ostream& s,
     s << r.literal();
   }
   else {
-    s << r.clause();
+    s << *(r.clause());
   }
   return s;
 }
