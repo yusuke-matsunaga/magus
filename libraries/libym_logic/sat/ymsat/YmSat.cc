@@ -103,6 +103,10 @@ YmSat::YmSat(SatAnalyzer* analyzer,
 // @brief デストラクタ
 YmSat::~YmSat()
 {
+  for (ymuint i = 0; i < mVarSize * 2; ++ i) {
+    mWatcherList[i].finish(mAlloc);
+  }
+
   delete mAnalyzer;
   delete [] mVal;
   delete [] mDecisionLevel;
@@ -300,6 +304,7 @@ YmSat::add_clause_sub(ymuint lit_num)
     // watcher-list の設定
     add_watcher(~l0, SatReason(l1));
     add_watcher(~l1, SatReason(l0));
+
     ++ mConstrBinNum;
   }
   else {
@@ -308,9 +313,8 @@ YmSat::add_clause_sub(ymuint lit_num)
     mConstrClause.push_back(clause);
 
     // watcher-list の設定
-    SatReason reason(clause);
-    add_watcher(~l0, reason);
-    add_watcher(~l1, reason);
+    add_watcher(~l0, SatReason(clause));
+    add_watcher(~l1, SatReason(clause));
   }
 }
 
@@ -354,6 +358,7 @@ YmSat::add_learnt_clause()
     // watcher-list の設定
     add_watcher(~l0, SatReason(l1));
     add_watcher(~l1, SatReason(l0));
+
     ++ mLearntBinNum;
   }
   else {
@@ -785,7 +790,7 @@ YmSat::implication()
 	    // l の watcher list から取り除く
 	    -- wpos;
 	    // ~l2 の watcher list に追加する．
-	    watcher_list(~l2).add(w);
+	    add_watcher(~l2, w);
 
 	    found = true;
 	    break;

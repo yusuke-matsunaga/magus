@@ -575,7 +575,7 @@ void
 YmSat::add_watcher(Literal watch_lit,
 		   SatReason reason)
 {
-  watcher_list(watch_lit).add(Watcher(reason));
+  watcher_list(watch_lit).add(Watcher(reason), mAlloc);
 }
 
 // 変数の評価を行う．
