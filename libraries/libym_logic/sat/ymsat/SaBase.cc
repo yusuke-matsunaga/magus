@@ -99,11 +99,11 @@ SaBase::check_recur(VarId varid,
   }
 
   if ( r.is_clause() ) {
-    SatClause& clause = r.clause();
-    ymuint n = clause.lit_num();
-    Literal p = clause.wl0();
+    SatClause* clause = r.clause();
+    ymuint n = clause->lit_num();
+    Literal p = clause->wl0();
     for (ymuint i = 0; i < n; ++ i) {
-      Literal q = clause.lit(i);
+      Literal q = clause->lit(i);
       if ( q == p ) continue;
       VarId var1 = q.varid();
       if ( !get_mark(var1) && decision_level(var1) > 0 ) {

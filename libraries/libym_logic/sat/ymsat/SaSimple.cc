@@ -46,18 +46,18 @@ SaSimple::capture(SatReason creason,
   ymuint last = last_assign();
   for ( ; ; ) {
     if ( creason.is_clause() ) {
-      SatClause& cclause = creason.clause();
+      SatClause* cclause = creason.clause();
 
       // cclause が学習節なら activity をあげる．
-      if ( cclause.is_learnt() ) {
-	bump_clause_activity(&cclause);
+      if ( cclause->is_learnt() ) {
+	bump_clause_activity(cclause);
       }
 
       // conflict 節に含まれるリテラルが以前の decision level
       // で割り当てられていたら学習節に加える．
-      ymuint n = cclause.lit_num();
+      ymuint n = cclause->lit_num();
       for (ymuint i = 0; i < n; ++ i) {
-	Literal q = cclause.lit(i);
+	Literal q = cclause->lit(i);
 	if ( q == p ) {
 	  continue;
 	}

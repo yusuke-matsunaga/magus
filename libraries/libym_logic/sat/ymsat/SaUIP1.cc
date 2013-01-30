@@ -53,23 +53,23 @@ SaUIP1::capture(SatReason creason,
   ymuint last = last_assign();
   for ( ; ; ) {
     if ( creason.is_clause() ) {
-      SatClause& cclause = creason.clause();
+      SatClause* cclause = creason.clause();
 
       // cclause が学習節なら activity をあげる．
-      if ( cclause.is_learnt() ) {
-	bump_clause_activity(&cclause);
+      if ( cclause->is_learnt() ) {
+	bump_clause_activity(cclause);
       }
 
       // cclause 節に含まれるリテラルが以前の decision level
       // で割り当てられていたら学習節に加える．
       // 現在の decision level なら count を増やすだけ．
       // あとで mAssignList をたどれば該当のリテラルは捜し出せる．
-      ymuint n = cclause.lit_num();
+      ymuint n = cclause->lit_num();
       // 最初の節は全てのリテラルを対象にするが，
       // 二番目以降の節の最初のリテラルは割り当て結果なので除外する．
       for (ymuint i = 0; i < n; ++ i) {
-	Literal q = cclause.lit(i);
-	if ( !first && q == cclause.wl0() ) continue;
+	Literal q = cclause->lit(i);
+	if ( !first && q == cclause->wl0() ) continue;
 	VarId var = q.varid();
 	int var_level = decision_level(var);
 	if ( !get_mark(var) && var_level > 0 ) {

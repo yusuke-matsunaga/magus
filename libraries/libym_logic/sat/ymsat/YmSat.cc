@@ -741,20 +741,20 @@ YmSat::implication()
 	// - wl0() が不定，もしくは偽なら，nl の代わりの watch literal を探す．
 	// - 代わりが見つかったらそのリテラルを wl1() にする．
 	// - なければ wl0() に基づいた割り当てを行う．場合によっては矛盾が起こる．
-	SatClause& c = w.clause();
-	Literal l0 = c.wl0();
+	SatClause* c = w.clause();
+	Literal l0 = c->wl0();
 	if ( l0 == nl ) {
 	  // nl を 1番めのリテラルにする．
-	  c.xchange_wl();
+	  c->xchange_wl();
 	  // 新しい wl0 を得る．
-	  l0 = c.wl0();
+	  l0 = c->wl0();
 	}
 	else { // l1 == nl
 	  if ( debug & debug_implication ) {
 	    // この assert は重いのでデバッグ時にしかオンにしない．
 	    // ※ debug と debug_implication が const なので結果が0の
 	    // ときにはコンパイル時に消されることに注意
-	    assert_cond(c.wl1() == nl, __FILE__, __LINE__);
+	    assert_cond(c->wl1() == nl, __FILE__, __LINE__);
 	  }
 	}
 
@@ -772,12 +772,12 @@ YmSat::implication()
 	// この時，替わりのリテラルが未定かすでに充足しているかどうか
 	// は問題でない．
 	bool found = false;
-	ymuint n = c.lit_num();
+	ymuint n = c->lit_num();
 	for (ymuint i = 2; i < n; ++ i) {
-	  Literal l2 = c.lit(i);
+	  Literal l2 = c->lit(i);
 	  if ( eval(l2) != kB3False ) {
 	    // l2 を 1番めの watch literal にする．
-	    c.insert(i, 1);
+	    c->insert(i, 1);
 	    if ( debug & debug_implication ) {
 	      cout << "\t\t\tsecond watching literal becomes "
 		   << l2 << endl;
