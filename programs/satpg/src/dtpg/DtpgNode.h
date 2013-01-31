@@ -214,20 +214,42 @@ public:
   /// @brief 後方含意で出力に0を割り当てる．
   /// @param[in] from_node 含意元のノード
   /// @param[in] val 値
+  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
   bwd_prop(DtpgNode* from_node,
-	   Bool3 val);
+	   Bool3 val,
+	   vector<DtpgNode*>& node_list);
 
   /// @brief ファンアウト先に0を伝播する．
   /// @param[in] from_node 含意元のノード
   /// @param[in] val 値
+  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
   fanout_prop(DtpgNode* from_node,
-	      Bool3 val);
+	      Bool3 val,
+	      vector<DtpgNode*>& node_list);
+
+  /// @brief controling value を得る．
+  /// @note ない場合は kB3X を返す．
+  Bool3
+  cval() const;
+
+  /// @brief noncontroling valueを得る．
+  /// @note ない場合は kB3X を返す．
+  Bool3
+  nval() const;
+
+  /// @brief 値を得る．
+  Bool3
+  ma_value() const;
+
+  /// @brief 値をクリアする．
+  void
+  clear_ma_value();
 
 
 private:
@@ -245,19 +267,23 @@ private:
 
   /// @brief 後方含意を行う．
   /// @param[in] val 値
+  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  bwd_imp(Bool3 val);
+  bwd_imp(Bool3 val,
+	  vector<DtpgNode*>& node_list);
 
   /// @brief 前方含意を行う．
   /// @param[in] from_node 含意元のノード
   /// @param[in] val 値
+  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
   fwd_imp(DtpgNode* from_node,
-	  Bool3 val);
+	  Bool3 val,
+	  vector<DtpgNode*>& node_list);
 
 
 private:
@@ -323,6 +349,12 @@ private:
 
   // immediate dominator
   DtpgNode* mImmDom;
+
+  // controling value
+  Bool3 mCval;
+
+  // noncontroling value
+  Bool3 mNval;
 
   // mandatory assignments 用の値
   Bool3 mMaVal;
@@ -682,6 +714,40 @@ DtpgNode*
 DtpgNode::imm_dom() const
 {
   return mImmDom;
+}
+
+// @brief controling value を得る．
+// @note ない場合は kB3X を返す．
+inline
+Bool3
+DtpgNode::cval() const
+{
+  return mCval;
+}
+
+// @brief noncontroling valueを得る．
+// @note ない場合は kB3X を返す．
+inline
+Bool3
+DtpgNode::nval() const
+{
+  return mNval;
+}
+
+// @brief 値を得る．
+inline
+Bool3
+DtpgNode::ma_value() const
+{
+  return mMaVal;
+}
+
+// @brief 値をクリアする．
+inline
+void
+DtpgNode::clear_ma_value()
+{
+  mMaVal = kB3X;
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

@@ -13,6 +13,10 @@
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
 
+//////////////////////////////////////////////////////////////////////
+// クラス DtpgNode
+//////////////////////////////////////////////////////////////////////
+
 // @brief cplx_logic タイプのときにプリミティブを返す．
 // @param[in] pos 位置番号 ( 0 <= pos < primitive_num() )
 DtpgPrimitive*
@@ -25,31 +29,39 @@ DtpgNode::primitive(ymuint pos) const
 // @brief 後方含意で出力に値を割り当てる．
 // @param[in] from_node 含意元のノード
 // @param[in] val 値
+// @param[in] node_list 割り当ての行われたノードを格納するリスト
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
 DtpgNode::bwd_prop(DtpgNode* from_node,
-		   Bool3 val)
+		   Bool3 val,
+		   vector<DtpgNode*>& node_list)
 {
-  return bwd_imp(val) && fanout_prop(from_node, val);
+  // ノードのファンイン方向への後方含意と
+  // from_node 以外のファンアウト方向への前方含意を行う．
+  return bwd_imp(val, node_list) && fanout_prop(from_node, val, node_list);
 }
 
 // @brief ファンアウト先に0を伝播する．
 // @param[in] from_node 含意元のノード
+// @param[in] node_list 割り当ての行われたノードを格納するリスト
 // @param[in] val 値
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
 DtpgNode::fanout_prop(DtpgNode* from_node,
-		      Bool3 val)
+		      Bool3 val,
+		      vector<DtpgNode*>& node_list)
 {
+  // from_node 以外の(アクティブな)ファンアウトに対して
+  // 前方含意を行う．
   for (ymuint i = 0; i < mActFanoutNum; ++ i) {
     DtpgNode* fo_node = mActFanouts[i];
     if ( fo_node == from_node ) {
       continue;
     }
 
-    if ( !fo_node->fwd_imp(this, val) ) {
+    if ( !fo_node->fwd_imp(this, val, node_list) ) {
       return false;
     }
   }
@@ -58,12 +70,16 @@ DtpgNode::fanout_prop(DtpgNode* from_node,
 
 // @brief 後方含意を行う．
 // @param[in] val 値
+// @param[in] node_list 割り当ての行われたノードを格納するリスト
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
-DtpgNode::bwd_imp(Bool3 val)
+DtpgNode::bwd_imp(Bool3 val,
+		  vector<DtpgNode*>& node_list)
 {
   if ( mMaVal != kB3X ) {
+    // 既に値が決まっている場合は
+    // 新しい値が等しいかを試す．
     if ( mMaVal == val ) {
       return true;
     }
@@ -73,7 +89,7 @@ DtpgNode::bwd_imp(Bool3 val)
   }
 
   mMaVal = val;
-  // val を記録
+  node_list.push_back(this);
 
   if ( is_input() ) {
     return true;
@@ -81,7 +97,7 @@ DtpgNode::bwd_imp(Bool3 val)
 
   if ( is_output() ) {
     DtpgNode* inode = fanin(0);
-    return inode->bwd_prop(this, val);
+    return inode->bwd_prop(this, val, node_list);
   }
 
   if ( is_cplx_logic() ) {
@@ -94,20 +110,20 @@ DtpgNode::bwd_imp(Bool3 val)
   case kTgGateBuff:
     {
       DtpgNode* inode = fanin(0);
-      return inode->bwd_prop(this, val);
+      return inode->bwd_prop(this, val, node_list);
     }
 
   case kTgGateNot:
     {
       DtpgNode* inode = fanin(0);
-      return inode->bwd_prop(this, ~val);
+      return inode->bwd_prop(this, ~val, node_list);
     }
 
   case kTgGateAnd:
     if ( val == kB3True ) {
       for (ymuint i = 0; i < fanin_num(); ++ i) {
 	DtpgNode* inode = fanin(i);
-	if ( !inode->bwd_prop(this, kB3True) ) {
+	if ( !inode->bwd_prop(this, kB3True, node_list) ) {
 	  return false;
 	}
       }
@@ -119,7 +135,7 @@ DtpgNode::bwd_imp(Bool3 val)
     if ( val == kB3False ) {
       for (ymuint i = 0; i < fanin_num(); ++ i) {
 	DtpgNode* inode = fanin(i);
-	if ( !inode->bwd_prop(this, kB3True) ) {
+	if ( !inode->bwd_prop(this, kB3True, node_list) ) {
 	  return false;
 	}
       }
@@ -131,7 +147,7 @@ DtpgNode::bwd_imp(Bool3 val)
     if ( val == kB3False ) {
       for (ymuint i = 0; i < fanin_num(); ++ i) {
 	DtpgNode* inode = fanin(i);
-	if ( !inode->bwd_prop(this, kB3False) ) {
+	if ( !inode->bwd_prop(this, kB3False, node_list) ) {
 	  return false;
 	}
       }
@@ -143,7 +159,7 @@ DtpgNode::bwd_imp(Bool3 val)
     if ( val == kB3True ) {
       for (ymuint i = 0; i < fanin_num(); ++ i) {
 	DtpgNode* inode = fanin(i);
-	if ( !inode->bwd_prop(this, kB3False) ) {
+	if ( !inode->bwd_prop(this, kB3False, node_list) ) {
 	  return false;
 	}
       }
@@ -156,17 +172,19 @@ DtpgNode::bwd_imp(Bool3 val)
     break;
   }
 
-  return false;
+  return true;
 }
 
 // @brief 前方含意を行う．
 // @param[in] from_node 含意元のノード
 // @param[in] val 値
+// @param[in] node_list 割り当ての行われたノードを格納するリスト
 // @retval true 矛盾なく含意が行われた．
 // @retval false 矛盾が発生した．
 bool
 DtpgNode::fwd_imp(DtpgNode* from_node,
-		  Bool3 val)
+		  Bool3 val,
+		  vector<DtpgNode*>& node_list)
 {
   if ( is_input() ) {
     assert_not_reached(__FILE__, __LINE__);
@@ -176,7 +194,7 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
   if ( is_output() ) {
     if ( mMaVal == kB3X ) {
       mMaVal = val;
-      // val を記録
+      node_list.push_back(this);
     }
     else if ( mMaVal != val ) {
       return false;
@@ -186,6 +204,7 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
 
   if ( is_cplx_logic() ) {
     // 未完
+    assert_not_reached(__FILE__, __LINE__);
     return false;
   }
 
@@ -193,22 +212,22 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
   case kTgGateBuff:
     if ( mMaVal == kB3X ) {
       mMaVal = val;
-      // val を記録
+      node_list.push_back(this);
     }
     else if ( mMaVal != val ) {
       return false;
     }
-    return fanout_prop(NULL, val);
+    return fanout_prop(NULL, val, node_list);
 
   case kTgGateNot:
     if ( mMaVal == kB3X ) {
       mMaVal = ~val;
-      // ~val を記録
+      node_list.push_back(this);
     }
     else if ( mMaVal == val ) {
       return false;
     }
-    return fanout_prop(NULL, ~val);
+    return fanout_prop(NULL, ~val, node_list);
 
   case kTgGateAnd:
     if ( mMaVal == kB3X ) {
@@ -226,13 +245,13 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
       }
       if ( has_0 ) {
 	mMaVal = kB3False;
-	// 0 を記録
-	return fanout_prop(NULL, mMaVal);
+	node_list.push_back(this);
+	return fanout_prop(NULL, mMaVal, node_list);
       }
       if ( !has_x ) {
 	mMaVal = kB3True;
-	// 1 を記録
-	return fanout_prop(NULL, mMaVal);
+	node_list.push_back(this);
+	return fanout_prop(NULL, mMaVal, node_list);
       }
     }
     else if ( mMaVal == kB3False ) {
@@ -266,7 +285,7 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
 	if ( x_node == NULL ) {
 	  return true;
 	}
-	return x_node->bwd_prop(this, kB3False);
+	return x_node->bwd_prop(this, kB3False, node_list);
       }
       return false;
     }
@@ -293,13 +312,13 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
       }
       if ( has_0 ) {
 	mMaVal = kB3True;
-	// 1 を記録
-	return fanout_prop(NULL, mMaVal);
+	node_list.push_back(this);
+	return fanout_prop(NULL, mMaVal, node_list);
       }
       if ( !has_x ) {
 	mMaVal = kB3False;
-	// 0 を記録
-	return fanout_prop(NULL, mMaVal);
+	node_list.push_back(this);
+	return fanout_prop(NULL, mMaVal, node_list);
       }
     }
     else if ( mMaVal == kB3True ) {
@@ -333,7 +352,7 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
 	if ( x_node == NULL ) {
 	  return true;
 	}
-	return x_node->bwd_prop(this, kB3False);
+	return x_node->bwd_prop(this, kB3False, node_list);
       }
       return false;
     }
@@ -360,13 +379,13 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
       }
       if ( has_1 ) {
 	mMaVal = kB3True;
-	// 1 を記録
-	return fanout_prop(NULL, mMaVal);
+	node_list.push_back(this);
+	return fanout_prop(NULL, mMaVal, node_list);
       }
       if ( !has_x ) {
 	mMaVal = kB3False;
-	// 0 を記録
-	return fanout_prop(NULL, mMaVal);
+	node_list.push_back(this);
+	return fanout_prop(NULL, mMaVal, node_list);
       }
     }
     else if ( mMaVal == kB3True ) {
@@ -400,7 +419,7 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
 	if ( x_node == NULL ) {
 	  return true;
 	}
-	return x_node->bwd_prop(this, kB3True);
+	return x_node->bwd_prop(this, kB3True, node_list);
       }
       return false;
     }
@@ -427,13 +446,13 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
       }
       if ( has_1 ) {
 	mMaVal = kB3False;
-	// 1 を記録
-	return fanout_prop(NULL, mMaVal);
+	node_list.push_back(this);
+	return fanout_prop(NULL, mMaVal, node_list);
       }
       if ( !has_x ) {
 	mMaVal = kB3True;
-	// 0 を記録
-	return fanout_prop(NULL, mMaVal);
+	node_list.push_back(this);
+	return fanout_prop(NULL, mMaVal, node_list);
       }
     }
     else if ( mMaVal == kB3False ) {
@@ -467,7 +486,7 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
 	if ( x_node == NULL ) {
 	  return true;
 	}
-	return x_node->bwd_prop(this, kB3True);
+	return x_node->bwd_prop(this, kB3True, node_list);
       }
       return false;
     }
@@ -494,7 +513,8 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
 	return true;
       }
       mMaVal = val;
-      return fanout_prop(NULL, mMaVal);
+      node_list.push_back(this);
+      return fanout_prop(NULL, mMaVal, node_list);
     }
     else {
       bool has_x = false;
@@ -519,10 +539,10 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
       if ( has_x ) {
 	if ( x_node != NULL ) {
 	  if ( val == mMaVal ) {
-	    return x_node->fanout_prop(this, kB3False);
+	    return x_node->fanout_prop(this, kB3False, node_list);
 	  }
 	  else {
-	    return x_node->fanout_prop(this, kB3True);
+	    return x_node->fanout_prop(this, kB3True, node_list);
 	  }
 	}
 	return true;
@@ -549,7 +569,8 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
 	return true;
       }
       mMaVal = val;
-      return fanout_prop(NULL, mMaVal);
+      node_list.push_back(this);
+      return fanout_prop(NULL, mMaVal, node_list);
     }
     else {
       bool has_x = false;
@@ -574,10 +595,10 @@ DtpgNode::fwd_imp(DtpgNode* from_node,
       if ( has_x ) {
 	if ( x_node != NULL ) {
 	  if ( val == mMaVal ) {
-	    return x_node->fanout_prop(this, kB3False);
+	    return x_node->fanout_prop(this, kB3False, node_list);
 	  }
 	  else {
-	    return x_node->fanout_prop(this, kB3True);
+	    return x_node->fanout_prop(this, kB3True, node_list);
 	  }
 	}
 	return true;

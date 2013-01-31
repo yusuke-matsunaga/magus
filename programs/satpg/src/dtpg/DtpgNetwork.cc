@@ -530,6 +530,10 @@ DtpgNetwork::make_node(ymuint id,
 
   mNodeMap[tgnode->gid()] = node;
 
+  node->mCval = kB3X;
+  node->mNval = kB3X;
+  node->mMaVal = kB3X;
+
   if ( tgnode->is_input() ) {
     node->mTypeId = 1U | (tgnode->lid() << 2);
   }
@@ -538,6 +542,23 @@ DtpgNetwork::make_node(ymuint id,
   }
   else if ( tgnode->is_logic() ) {
     node->mTypeId = 3U | (static_cast<ymuint>(tgnode->gate_type()) << 2);
+
+    switch ( tgnode->gate_type() ) {
+    case kTgGateAnd:
+    case kTgGateNand:
+      node->mCval = kB3False;
+      node->mNval = kB3True;
+      break;
+
+    case kTgGateOr:
+    case kTgGateNor:
+      node->mCval = kB3True;
+      node->mNval = kB3False;
+      break;
+
+    default:
+      break;
+    }
   }
   else {
     assert_not_reached(__FILE__, __LINE__);

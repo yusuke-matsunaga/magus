@@ -122,6 +122,14 @@ public:
 	       vector<DtpgNode*>& tfo_list,
 	       vector<DtpgNode*>& tfi_list);
 
+  /// @brief f の検出に必要な割り当てを求める．
+  /// @param[in] f 対象の故障
+  /// @param[in] ma_list 必要割り当てのリスト
+  /// @return 故障が検出可能なら true を返す．
+  bool
+  get_mandatory_assignment(DtpgFault* f,
+			   vector<pair<DtpgNode*, int> >& ma_list);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

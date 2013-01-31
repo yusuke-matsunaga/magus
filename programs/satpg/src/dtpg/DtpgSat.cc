@@ -18,6 +18,9 @@
 #include "ym_logic/SatStats.h"
 
 
+#define VERIFY_MAIMP 0
+
+
 BEGIN_NAMESPACE_YM_SATPG
 
 Dtpg*
@@ -1254,6 +1257,133 @@ DtpgSat::dtpg_dual(DtpgFault* f0,
   update_stats(solver, 2);
 }
 
+
+BEGIN_NONAMESPACE
+
+// node のファンアウトに mark1 をつける．
+void
+set_tfo_mark(DtpgNode* node)
+{
+  if ( node->mark1() ) {
+    return;
+  }
+  node->set_mark1();
+
+  ymuint n = node->active_fanout_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    DtpgNode* onode = node->active_fanout(i);
+    set_tfo_mark(onode);
+  }
+}
+
+// node のファンアウトに mark1 をつける．
+void
+clear_tfo_mark(DtpgNode* node)
+{
+  if ( !node->mark1() ) {
+    return;
+  }
+  node->clear_mark1();
+
+  ymuint n = node->active_fanout_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    DtpgNode* onode = node->active_fanout(i);
+    clear_tfo_mark(onode);
+  }
+}
+
+string
+f_str(DtpgFault* f)
+{
+  ostringstream buf;
+  buf << "Node#" << f->node()->id() << ": ";
+  if ( f->is_output_fault() ) {
+    buf << "O";
+  }
+  else {
+    buf << "I" << f->pos();
+  }
+  buf << ": SA" << f->val();
+  return buf.str();
+}
+
+// @brief f の検出に必要な割り当てを求める．
+bool
+get_mandatory_assignment(DtpgFault* f,
+			 vector<ymuint>& ma_list)
+{
+  DtpgNode* fnode = f->node();
+  DtpgNode* fsrc = fnode;
+  if ( f->is_input_fault() ) {
+    fsrc = f->source_node();
+  }
+
+  vector<DtpgNode*> node_list;
+  Bool3 gval;
+  if ( f->val() == 1 ) {
+    gval = kB3False;
+  }
+  else {
+    gval = kB3True;
+  }
+  bool stat = fsrc->bwd_prop(NULL, gval, node_list);
+  if ( !stat ) {
+    goto untestable;
+  }
+
+  if ( f->is_input_fault() ) {
+    Bool3 nval = fnode->nval();
+    if ( nval != kB3X ) {
+      ymuint ni = fnode->fanin_num();
+      for (ymuint i = 0; i < ni; ++ i) {
+	if ( i == f->pos() ) continue;
+	DtpgNode* inode = fnode->fanin(i);
+	if ( !inode->bwd_prop(fnode, nval, node_list) ) {
+	  goto untestable;
+	}
+      }
+    }
+  }
+  if ( fnode->imm_dom() != NULL ) {
+    mark_tfo(fnode);
+    for (DtpgNode* dom = fnode->imm_dom(); dom != NULL; dom = dom->imm_dom()) {
+      Bool3 nval = dom->nval();
+      if ( nval != kB3X ) {
+	ymuint ni = dom->fanin_num();
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgNode* inode = dom->fanin(i);
+	  if ( inode->mark1() ) continue;
+	  if ( !inode->bwd_prop(dom, nval, node_list) ) {
+	    clear_tfo(fnode);
+	    goto untestable;
+	  }
+	}
+      }
+    }
+    clear_tfo(fnode);
+  }
+
+  for (vector<DtpgNode*>::iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    assert_cond( node->ma_value() != kB3X, __FILE__, __LINE__);
+    int val = node->ma_value() == kB3True ? 1 : 0;
+    ma_list.push_back(node->id() * 2 + val);
+    node->clear_ma_value();
+  }
+  return true;
+
+ untestable:
+  for (vector<DtpgNode*>::iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    node->clear_ma_value();
+  }
+  return false;
+}
+
+END_NONAMESPACE
+
 // @brief FFR 内の故障に対してテストパタン生成を行なう．
 // @param[in] flist 故障リスト
 // @param[in] root FFR の根のノード
@@ -1265,14 +1395,48 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 		  const vector<DtpgNode*>& node_list,
 		  DtpgOperator& op)
 {
+  // 必要割り当てを求め，その時点で冗長だとわかったものは除外する．
+  vector<DtpgFault*> u_list;
+#if VERIFY_MAIMP
+  // 検証モードの時は冗長故障も u_list に入れておいてあとで SAT の結果と比較する．
+  vector<DtpgFault*> r_list;
+#endif
+  for (vector<DtpgFault*>::const_iterator p = flist.begin();
+       p != flist.end(); ++ p) {
+    DtpgFault* f = *p;
+    vector<ymuint> ma_list;
+    bool stat = get_mandatory_assignment(f, ma_list);
+    if ( stat ) {
+      u_list.push_back(f);
+    }
+    else {
+#if VERIFY_MAIMP
+      u_list.push_back(f);
+      r_list.push_back(f);
+#else
+      f->set_untestable();
+      if ( mSkip ) {
+	f->set_skip();
+      }
+      else {
+	op.set_untestable(f->safault());
+      }
+#endif
+    }
+  }
+
+  if ( u_list.empty() ) {
+    return;
+  }
+
   SatSolver solver(mType, mOption, mOutP);
 
   // root から外部出力までの正常回路，故障回路を作る．
   make_prop_cnf(solver, root);
 
-  ymuint nf = flist.size();
+  ymuint nf = u_list.size();
   for (ymuint i = 0; i < nf; ++ i) {
-    DtpgFault* f = flist[i];
+    DtpgFault* f = u_list[i];
     f->set_tmp_id(i);
     f->node()->set_mark1();
   }
@@ -1333,7 +1497,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	  continue;
 	}
 	ymuint fid = f->tmp_id();
-	if ( flist[fid] == f ) {
+	if ( u_list[fid] == f ) {
 	  make_flt_cnf(solver, fvar, flt_var[fid], tmp_var[fid], val);
 	  fvar = tmp_var[fid];
 	}
@@ -1349,7 +1513,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	continue;
       }
       ymuint fid = f->tmp_id();
-      if ( flist[fid] == f ) {
+      if ( u_list[fid] == f ) {
 	make_flt_cnf(solver, tmp_var[fid], flt_var[fid], tmp_ovar, val);
 	tmp_ovar = tmp_var[fid];
       }
@@ -1417,7 +1581,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	DtpgFault* fi0 = node->input_fault(0, j);
 	if ( fi0 != NULL ) {
 	  ymuint fid = fi0->tmp_id();
-	  if ( flist[fid] == fi0 ) {
+	  if ( u_list[fid] == fi0 ) {
 	    dep.push_back(Literal(flt_var[fid], kPolPosi));
 	  }
 	}
@@ -1425,7 +1589,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	DtpgFault* fi1 = node->input_fault(1, j);
 	if ( fi1 != NULL ) {
 	  ymuint fid = fi1->tmp_id();
-	  if ( flist[fid] == fi1 ) {
+	  if ( u_list[fid] == fi1 ) {
 	    dep.push_back(Literal(flt_var[fid], kPolPosi));
 	  }
 	}
@@ -1434,7 +1598,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
       DtpgFault* fo0 = node->output_fault(0);
       if ( fo0 != NULL ) {
 	ymuint fid = fo0->tmp_id();
-	if ( flist[fid] == fo0 ) {
+	if ( u_list[fid] == fo0 ) {
 	  dep.push_back(Literal(flt_var[fid], kPolPosi));
 	}
       }
@@ -1442,7 +1606,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
       DtpgFault* fo1 = node->output_fault(1);
       if ( fo1 != NULL ) {
 	ymuint fid = fo1->tmp_id();
-	if ( flist[fid] == fo1 ) {
+	if ( u_list[fid] == fo1 ) {
 	  dep.push_back(Literal(flt_var[fid], kPolPosi));
 	}
       }
@@ -1464,7 +1628,8 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 
   // 個々の故障に対するテスト生成を行なう．
   for (ymuint i = 0; i < nf; ++ i) {
-    DtpgFault* f = flist[i];
+    DtpgFault* f = u_list[i];
+
     mAssumptions.clear();
     mAssumptions.reserve(node_list.size() + nf);
 
@@ -1501,6 +1666,18 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 
     solve(solver, f, op);
   }
+
+#if VERIFY_MAIMP
+  for (vector<DtpgFault*>::iterator p = r_list.begin();
+       p != r_list.end(); ++ p) {
+    DtpgFault* f = *p;
+    if ( !f->is_untestable() ) {
+      cout << "Error! " << f_str(f)
+	   << " is not redundant" << endl;
+    }
+    assert_cond( f->is_untestable(), __FILE__, __LINE__);
+  }
+#endif
 
   clear_node_mark();
 
