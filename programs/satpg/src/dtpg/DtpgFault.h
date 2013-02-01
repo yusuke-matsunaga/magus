@@ -101,6 +101,10 @@ public:
   void
   clear_untestable();
 
+  /// @brief 必要割り当てのリストを得る．
+  vector<ymuint32>&
+  ma_list();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -124,6 +128,11 @@ private:
 
   // 故障位置 + 故障値 + スキップフラグ + untestabel フラグ
   ymuint32 mPosVal;
+
+  // 必要割り当てのリスト
+  // 値は　ノードのID番号 × 2 + 値
+  vector<ymuint32> mMaList;
+
 };
 
 
@@ -270,6 +279,14 @@ void
 DtpgFault::clear_untestable()
 {
   mPosVal &= ~8U;
+}
+
+// @brief 必要割り当てのリストを得る．
+inline
+vector<ymuint32>&
+DtpgFault::ma_list()
+{
+  return mMaList;
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

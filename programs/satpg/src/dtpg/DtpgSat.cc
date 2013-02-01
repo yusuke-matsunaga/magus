@@ -1260,38 +1260,6 @@ DtpgSat::dtpg_dual(DtpgFault* f0,
 
 BEGIN_NONAMESPACE
 
-// node のファンアウトに mark1 をつける．
-void
-set_tfo_mark(DtpgNode* node)
-{
-  if ( node->mark1() ) {
-    return;
-  }
-  node->set_mark1();
-
-  ymuint n = node->active_fanout_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    DtpgNode* onode = node->active_fanout(i);
-    set_tfo_mark(onode);
-  }
-}
-
-// node のファンアウトに mark1 をつける．
-void
-clear_tfo_mark(DtpgNode* node)
-{
-  if ( !node->mark1() ) {
-    return;
-  }
-  node->clear_mark1();
-
-  ymuint n = node->active_fanout_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    DtpgNode* onode = node->active_fanout(i);
-    clear_tfo_mark(onode);
-  }
-}
-
 string
 f_str(DtpgFault* f)
 {
@@ -1307,84 +1275,484 @@ f_str(DtpgFault* f)
   return buf.str();
 }
 
-// @brief f の検出に必要な割り当てを求める．
-bool
-get_mandatory_assignment(DtpgFault* f,
-			 vector<ymuint>& ma_list)
+struct FaultGroup
 {
-  DtpgNode* fnode = f->node();
-  DtpgNode* fsrc = fnode;
-  if ( f->is_input_fault() ) {
-    fsrc = f->source_node();
+  vector<DtpgFault*> mFaultList;
+
+  vector<ymuint32> mMaList;
+
+};
+
+bool
+check_conflict(const vector<ymuint32>& list_a,
+	       const vector<ymuint32>& list_b)
+{
+  if ( list_a.empty() || list_b.empty() ) {
+    return false;
   }
 
-  vector<DtpgNode*> node_list;
-  Bool3 gval;
-  if ( f->val() == 1 ) {
-    gval = kB3False;
+  vector<ymuint32>::const_iterator p_a = list_a.begin();
+  vector<ymuint32>::const_iterator p_b = list_b.begin();
+  ymuint32 tmp_a = *p_a;
+  ymuint32 tmp_b = *p_b;
+  ymuint idx_a = tmp_a / 2;
+  ymuint idx_b = tmp_b / 2;
+  for ( ; ; ) {
+    if ( idx_a < idx_b ) {
+      ++ p_a;
+      if ( p_a == list_a.end() ) {
+	return false;
+      }
+      tmp_a = *p_a;
+      idx_a = tmp_a / 2;
+    }
+    else if ( idx_a > idx_b ) {
+      ++ p_b;
+      if ( p_b == list_b.end() ) {
+	return false;
+      }
+      tmp_b = *p_b;
+      idx_b = tmp_b / 2;
+    }
+    else {
+      if ( tmp_a != tmp_b ) {
+	// インデックスが同じで極性が異なっていた．
+	return true;
+      }
+      ++ p_a;
+      if ( p_a == list_a.end() ) {
+	return false;
+      }
+      tmp_a = *p_a;
+      idx_a = tmp_a / 2;
+
+	++ p_b;
+      if ( p_b == list_b.end() ) {
+	return false;
+      }
+      tmp_b = *p_b;
+      idx_b = tmp_b / 2;
+    }
   }
-  else {
-    gval = kB3True;
+}
+
+void
+merge(vector<ymuint32>& list_a,
+      const vector<ymuint32>& list_b)
+{
+  if ( list_a.empty() ) {
+    list_a = list_b;
+    return;
   }
-  bool stat = fsrc->bwd_prop(NULL, gval, node_list);
-  if ( !stat ) {
-    goto untestable;
+  if ( list_b.empty() ) {
+    return;
   }
 
-  if ( f->is_input_fault() ) {
-    Bool3 nval = fnode->nval();
-    if ( nval != kB3X ) {
-      ymuint ni = fnode->fanin_num();
-      for (ymuint i = 0; i < ni; ++ i) {
-	if ( i == f->pos() ) continue;
-	DtpgNode* inode = fnode->fanin(i);
-	if ( !inode->bwd_prop(fnode, nval, node_list) ) {
-	  goto untestable;
+  vector<ymuint32> dst_list;
+
+  vector<ymuint32>::const_iterator p_a = list_a.begin();
+  vector<ymuint32>::const_iterator p_b = list_b.begin();
+  ymuint32 tmp_a = *p_a;
+  ymuint32 tmp_b = *p_b;
+  ymuint idx_a = tmp_a / 2;
+  ymuint idx_b = tmp_b / 2;
+  for ( ; ; ) {
+    if ( idx_a < idx_b ) {
+      dst_list.push_back(tmp_a);
+      ++ p_a;
+      if ( p_a == list_a.end() ) {
+	break;
+      }
+      tmp_a = *p_a;
+      idx_a = tmp_a / 2;
+    }
+    else if ( idx_a > idx_b ) {
+      dst_list.push_back(tmp_b);
+      ++ p_b;
+      if ( p_b == list_b.end() ) {
+	break;
+      }
+      tmp_b = *p_b;
+      idx_b = tmp_b / 2;
+    }
+    else {
+      assert_cond( tmp_a == tmp_b, __FILE__, __LINE__);
+      dst_list.push_back(tmp_a);
+
+      ++ p_a;
+      if ( p_a == list_a.end() ) {
+	break;
+      }
+      tmp_a = *p_a;
+      idx_a = tmp_a / 2;
+
+      ++ p_b;
+      if ( p_b == list_b.end() ) {
+	break;
+      }
+      tmp_b = *p_b;
+      idx_b = tmp_b / 2;
+    }
+  }
+  for ( ; p_a != list_a.end(); ++ p_a) {
+    dst_list.push_back(*p_a);
+  }
+  for ( ; p_b != list_b.end(); ++ p_b) {
+    dst_list.push_back(*p_b);
+  }
+
+  list_a = dst_list;
+}
+
+END_NONAMESPACE
+
+#if 0
+// @brief 必要割り当ての情報に基づいて故障をグループ分けする．
+// @note 内部で dtpg_ffr() を呼ぶ．
+void
+DtpgSat::dtpg_ffr2(const vector<DtpgFault*>& flist,
+		   DtpgNode* root,
+		   const vector<DtpgNode*>& node_list,
+		   DtpgOperator& op)
+{
+#if VERIFY_MAIMP
+  // 必要割り当てで冗長と判定された故障のリストを作る．
+  vector<DtpgFault*> r_list;
+  for (vector<DtpgFault*>::const_iterator p = flist.begin();
+       p != flist.end(); ++ p) {
+    DtpgFault* f = *p;
+    bool stat = get_mandatory_assignment(f, f->ma_list());
+    if ( !stat ) {
+      r_list.push_back(f);
+    }
+  }
+
+  dtpg_ffr(flist, root, node_list, op);
+
+  // SAT でも冗長と判定されたかチェックする．
+  for (vector<DtpgFault*>::iterator p = r_list.begin();
+       p != r_list.end(); ++ p) {
+    DtpgFault* f = *p;
+    if ( !f->is_untestable() ) {
+      cout << "Error! " << f_str(f)
+	   << " is not redundant" << endl;
+    }
+    assert_cond( f->is_untestable(), __FILE__, __LINE__);
+  }
+
+#else
+
+  // 必要割り当てに基づいて故障をグループ分けする．
+  vector<FaultGroup> fault_group;
+  for (vector<DtpgFault*>::const_iterator p = flist.begin();
+       p != flist.end(); ++ p) {
+    DtpgFault* f = *p;
+    bool stat = get_mandatory_assignment(f, f->ma_list());
+    if ( stat ) {
+      ymuint n = fault_group.size();
+      bool found = false;
+      for (ymuint i = 0; i < n; ++ i) {
+	FaultGroup& fg = fault_group[i];
+	if ( !check_conflict(fg.mMaList, f->ma_list()) ) {
+	  fg.mFaultList.push_back(f);
+	  merge(fg.mMaList, f->ma_list());
+	  found = true;
+	  break;
 	}
+      }
+      if ( !found ) {
+	fault_group.push_back(FaultGroup());
+	FaultGroup& fg = fault_group.back();
+	fg.mFaultList.push_back(f);
+	fg.mMaList = f->ma_list();
+      }
+    }
+    else {
+      // ここで冗長とわかったら以下の処理は必要ない．
+      f->set_untestable();
+      if ( mSkip ) {
+	f->set_skip();
+      }
+      else {
+	op.set_untestable(f->safault());
       }
     }
   }
-  if ( fnode->imm_dom() != NULL ) {
-    mark_tfo(fnode);
-    for (DtpgNode* dom = fnode->imm_dom(); dom != NULL; dom = dom->imm_dom()) {
-      Bool3 nval = dom->nval();
-      if ( nval != kB3X ) {
-	ymuint ni = dom->fanin_num();
-	for (ymuint i = 0; i < ni; ++ i) {
-	  DtpgNode* inode = dom->fanin(i);
-	  if ( inode->mark1() ) continue;
-	  if ( !inode->bwd_prop(dom, nval, node_list) ) {
-	    clear_tfo(fnode);
-	    goto untestable;
-	  }
-	}
+
+  if ( fault_group.empty() ) {
+    return;
+  }
+
+#if 0
+  for (vector<FaultGroup>::iterator p = fault_group.begin();
+       p != fault_group.end(); ++ p) {
+    FaultGroup& fg = *p;
+    dtpg_ffr(fg.mFaultList, root, node_list, op);
+  }
+#else
+  dtpg_ffr(flist, root, node_list, op);
+#endif
+#endif
+}
+#endif
+
+BEGIN_NONAMESPACE
+
+void
+tfo_mark2(DtpgNode* node,
+	  vector<DtpgNode*>& tfo_list)
+{
+  if ( !node->mark1() ) {
+    node->set_mark1();
+    tfo_list.push_back(node);
+
+    ymuint nfo = node->active_fanout_num();
+    for (ymuint i = 0; i < nfo; ++ i) {
+      DtpgNode* onode = node->active_fanout(i);
+      tfo_mark2(onode, tfo_list);
+      if ( onode->mark2() || onode->mark3() ) {
+	node->set_mark3();
       }
     }
-    clear_tfo(fnode);
+  }
+}
+
+void
+tfi_mark2(DtpgNode* node,
+	  vector<DtpgNode*>& tfi_list)
+{
+  if ( !node->mark2() ) {
+    node->set_mark2();
+    tfi_list.push_back(node);
+
+    ymuint ni = node->fanin_num();
+    for (ymuint i = 0; i < ni; ++ i) {
+      DtpgNode* inode = node->fanin(i);
+      tfi_mark2(inode, tfi_list);
+    }
+  }
+}
+
+END_NONAMESPACE
+
+// @brief 複数の故障に対してテストパタン生成を行なう．
+// @param[in] flist 故障リスト
+// @param[in] root FFR の根のノード
+// @param[in] node_list FFR 内のノードリスト
+// @param[in] op テスト生成の結果を処理するファンクター
+void
+DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
+		    DtpgOperator& op)
+{
+  SatSolver solver(mType, mOption, mOutP);
+
+  // 故障に一時的なID番号を割り振る．
+  // 故障のあるノードに mark2 をつける．
+  ymuint nf = flist.size();
+  vector<DtpgNode*> fnode_list;
+  fnode_list.reserve(nf);
+  for (ymuint i = 0; i < nf; ++ i) {
+    DtpgFault* f = flist[i];
+    f->set_tmp_id(i);
+    DtpgNode* fnode = f->node();
+    if ( !fnode->mark2() ) {
+      fnode->set_mark2();
+      fnode_list.push_back(fnode);
+    }
   }
 
-  for (vector<DtpgNode*>::iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    DtpgNode* node = *p;
-    assert_cond( node->ma_value() != kB3X, __FILE__, __LINE__);
-    int val = node->ma_value() == kB3True ? 1 : 0;
-    ma_list.push_back(node->id() * 2 + val);
-    node->clear_ma_value();
+  // 故障のあるノードの TFO に mark1 をつける．
+  // TFO に故障があるノードを含むノードに mark3 をつける．
+  vector<DtpgNode*> tfo_list;
+  for (vector<DtpgNode*>::iterator p = fnode_list.begin();
+       p != fnode_list.end(); ++ p) {
+    DtpgNode* fnode = *p;
+    tfo_mark2(fnode, tfo_list);
+    if ( !fnode->mark3() ) {
+      // fnode が frontier
+    }
   }
-  return true;
 
- untestable:
-  for (vector<DtpgNode*>::iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
+  // mark2 を消す．
+  for (ymuint i = 0; i < nf; ++ i) {
+    DtpgFault* f = flist[i];
+    DtpgNode* fnode = f->node();
+    fnode->clear_mark2();
+  }
+
+  // TFO の TFI に mark2 をつける．
+  vector<DtpgNode*> tfi_list;
+  for (vector<DtpgNode*>::iterator p = tfo_list.begin();
+       p != tfo_list.end(); ++ p) {
     DtpgNode* node = *p;
-    node->clear_ma_value();
+    ymuint ni = node->fanin_num();
+    for (ymuint i = 0; i < ni; ++ i) {
+      DtpgNode* inode = node->fanin(i);
+      tfi_mark2(inode, tfi_list);
+    }
+  }
+
+  // TFO マークのついたノード用の変数の生成
+  for (vector<DtpgNode*>::iterator p = tfo_list.begin();
+       p != tfo_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    set_gvar(solver, node);
+    set_fvar(solver, node);
+    mUsedNodeList.push_back(node);
+  }
+
+  // TFI マークのついたノード用の変数の生成
+  for (vector<DtpgNode*>::iterator p = tfi_list.begin();
+       p != tfi_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    set_gvar(solver, node);
+    mUsedNodeList.push_back(node);
+  }
+
+  // mInputList を作る．
+  mInputList.clear();
+  for (vector<DtpgNode*>::iterator p = tfi_list.begin();
+       p != tfi_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    if ( node->is_input() ) {
+      mInputList.push_back(node);
+    }
+  }
+
+  // mOutputList を作る．
+  mOutputList.clear();
+  for (vector<DtpgNode*>::iterator p = tfo_list.begin();
+       p != tfo_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    if ( node->is_input() ) {
+      mInputList.push_back(node);
+    }
+    if ( node->is_output() ) {
+      mOutputList.push_back(node);
+    }
+  }
+
+
+  //////////////////////////////////////////////////////////////////////
+  // 正常回路の CNF を生成
+  //////////////////////////////////////////////////////////////////////
+
+  for (vector<DtpgNode*>::const_iterator p = tfi_list.begin();
+       p != tfi_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    make_gnode_cnf(solver, node);
+  }
+  for (vector<DtpgNode*>::const_iterator p = tfo_list.begin();
+       p != tfo_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    make_gnode_cnf(solver, node);
+  }
+
+#if 0
+  //////////////////////////////////////////////////////////////////////
+  // 故障回路の CNF を生成
+  //////////////////////////////////////////////////////////////////////
+  vector<Literal> odiff;
+  odiff.reserve(mOutputList.size());
+
+  for (ymuint i = 0; i < tfo_list.size(); ++ i) {
+    DtpgNode* node = tfo_list[i];
+
+    Literal glit(node->gvar(), kPolPosi);
+    Literal flit(node->fvar(), kPolPosi);
+    Literal dlit(node->dvar(), kPolPosi);
+
+    // XOR(glit, flit, dlit) を追加する．
+    // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
+    solver.add_clause(~glit, ~flit, ~dlit);
+    solver.add_clause(~glit,  flit,  dlit);
+    solver.add_clause( glit, ~flit,  dlit);
+    solver.add_clause( glit,  flit, ~dlit);
+
+    // node が出力の時には odiff に追加しておく．
+    if ( node->is_output() ) {
+      odiff.push_back(dlit);
+    }
+
+    if ( node == fnode ) {
+      continue;
+    }
+
+    make_fnode_cnf(solver, node);
+  }
+
+  // 出力のうち，最低1つは故障差が伝搬しなければならない．
+  assert_cond( !odiff.empty(), __FILE__, __LINE__);
+
+  solver.add_clause(odiff);
+
+  // 個々の故障に対するテスト生成を行なう．
+  for (ymuint i = 0; i < nf; ++ i) {
+    DtpgFault* f = flist[i];
+
+    mAssumptions.clear();
+    mAssumptions.reserve(node_list.size() + nf);
+
+    // 該当の故障に対する変数のみ1にする．
+    for (ymuint j = 0; j < nf; ++ j) {
+      tPol pol = (j == i) ? kPolPosi : kPolNega;
+      mAssumptions.push_back(Literal(flt_var[j], pol));
+    }
+
+    // 故障ノードの TFO 以外の dlit を0にする．
+    mark_tfo(f->node());
+    for (vector<DtpgNode*>::const_iterator p = node_list.begin();
+	 p != node_list.end(); ++ p) {
+      DtpgNode* node = *p;
+      if ( node->has_fvar() && !node->mark1() ) {
+	Literal dlit(node->dvar(), kPolNega);
+	mAssumptions.push_back(dlit);
+      }
+    }
+    clear_tfo(f->node());
+
+    // dominator ノードの dvar は1でなければならない．
+    for (DtpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
+      Literal dlit(node->dvar(), kPolPosi);
+      mAssumptions.push_back(dlit);
+    }
+
+    DtpgNode* fnode = f->node();
+    if ( f->is_input_fault() ) {
+      fnode = f->source_node();
+    }
+    tPol pol = (f->val() == 0) ? kPolPosi : kPolNega;
+    mAssumptions.push_back(Literal(fnode->gvar(), pol));
+
+    solve(solver, f, op);
+  }
+#endif
+  clear_node_mark();
+
+  update_stats(solver, nf);
+}
+
+BEGIN_NONAMESPACE
+
+// f が対象の故障の場合 true を返す．
+inline
+bool
+is_valid(DtpgFault* f,
+	 const vector<DtpgFault*>& flist)
+{
+  if ( f == NULL ) {
+    return false;
+  }
+  ymuint fid = f->tmp_id();
+  if ( fid < flist.size() && flist[fid] == f ) {
+    return true;
   }
   return false;
 }
 
 END_NONAMESPACE
 
-// @brief FFR 内の故障に対してテストパタン生成を行なう．
+// @brief 同一のFFR内の故障に対してテストパタン生成を行なう．
 // @param[in] flist 故障リスト
 // @param[in] root FFR の根のノード
 // @param[in] node_list FFR 内のノードリスト
@@ -1395,51 +1763,22 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 		  const vector<DtpgNode*>& node_list,
 		  DtpgOperator& op)
 {
-  // 必要割り当てを求め，その時点で冗長だとわかったものは除外する．
-  vector<DtpgFault*> u_list;
-#if VERIFY_MAIMP
-  // 検証モードの時は冗長故障も u_list に入れておいてあとで SAT の結果と比較する．
-  vector<DtpgFault*> r_list;
-#endif
-  for (vector<DtpgFault*>::const_iterator p = flist.begin();
-       p != flist.end(); ++ p) {
-    DtpgFault* f = *p;
-    vector<ymuint> ma_list;
-    bool stat = get_mandatory_assignment(f, ma_list);
-    if ( stat ) {
-      u_list.push_back(f);
-    }
-    else {
-#if VERIFY_MAIMP
-      u_list.push_back(f);
-      r_list.push_back(f);
-#else
-      f->set_untestable();
-      if ( mSkip ) {
-	f->set_skip();
-      }
-      else {
-	op.set_untestable(f->safault());
-      }
-#endif
-    }
-  }
-
-  if ( u_list.empty() ) {
-    return;
-  }
-
   SatSolver solver(mType, mOption, mOutP);
 
   // root から外部出力までの正常回路，故障回路を作る．
   make_prop_cnf(solver, root);
 
-  ymuint nf = u_list.size();
+  // flist 内のインデックスを仮IDとする．
+  // 故障に関係するノードに mark1 をつける．
+  ymuint nf = flist.size();
   for (ymuint i = 0; i < nf; ++ i) {
-    DtpgFault* f = u_list[i];
+    DtpgFault* f = flist[i];
     f->set_tmp_id(i);
     f->node()->set_mark1();
   }
+
+  // mark1 のついたノードの TFO に mark1 をつける．
+  // 以下のコードが正しく動くためには node_list がトポロジカル順になっている必要がある．
   for (vector<DtpgNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     DtpgNode* node = *p;
@@ -1461,6 +1800,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
   }
 
   // 故障回路用の変数を割り当てる．
+  // ついでに mark1 を消す．
   for (vector<DtpgNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     DtpgNode* node = *p;
@@ -1470,7 +1810,9 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
     node->clear_mark1();
   }
 
+  // 故障を活性化するとき true にする変数．
   vector<VarId> flt_var(nf);
+  // 故障挿入回路の出力に対応する変数．
   vector<VarId> tmp_var(nf);
   for (ymuint i = 0; i < nf; ++ i) {
     flt_var[i] = solver.new_var();
@@ -1485,42 +1827,39 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
       continue;
     }
 
+    // inputs[] に入力変数を表すリテラルを格納する．
+    // ただし，入力の故障を仮定する場合には故障挿入回路の出力変数となる．
     ymuint ni = node->fanin_num();
     vector<Literal> inputs(ni);
-    hash_map<ymuint, ymuint> fanin_map;
     for (ymuint i = 0; i < ni; ++ i) {
       DtpgNode* inode = node->fanin(i);
-      VarId fvar = inode->fvar();
+      VarId ivar = inode->fvar();
       for (ymint val = 0; val < 2; ++ val) {
 	DtpgFault* f = node->input_fault(val, i);
-	if ( f == NULL ) {
-	  continue;
-	}
-	ymuint fid = f->tmp_id();
-	if ( u_list[fid] == f ) {
-	  make_flt_cnf(solver, fvar, flt_var[fid], tmp_var[fid], val);
-	  fvar = tmp_var[fid];
+	if ( is_valid(f, flist) ) {
+	  ymuint fid = f->tmp_id();
+	  make_flt_cnf(solver, ivar, flt_var[fid], tmp_var[fid], val);
+	  ivar = tmp_var[fid];
 	}
       }
-      inputs[i] = Literal(fvar, kPolPosi);
-      fanin_map.insert(make_pair(inode->id(), i));
+      inputs[i] = Literal(ivar, kPolPosi);
     }
 
-    VarId tmp_ovar = node->fvar();
+    // ovar に出力変数を入れる．
+    // こちらは入力の故障と異なり，故障挿入回路の出力が node->fvar() となる．
+    // 逆に ovar はゲートの直接の出力変数となる．
+    VarId ovar = node->fvar();
     for (ymint val = 0; val < 2; ++ val) {
       DtpgFault* f = node->output_fault(val);
-      if ( f == NULL ) {
-	continue;
-      }
-      ymuint fid = f->tmp_id();
-      if ( u_list[fid] == f ) {
-	make_flt_cnf(solver, tmp_var[fid], flt_var[fid], tmp_ovar, val);
-	tmp_ovar = tmp_var[fid];
+      if ( is_valid(f, flist) ) {
+	ymuint fid = f->tmp_id();
+	make_flt_cnf(solver, tmp_var[fid], flt_var[fid], ovar, val);
+	ovar = tmp_var[fid];
       }
     }
 
     Literal glit(node->gvar(), kPolPosi);
-    Literal olit(tmp_ovar, kPolPosi);
+    Literal olit(ovar, kPolPosi);
     if ( node->is_input() ) {
       solver.add_clause(~glit,  olit);
       solver.add_clause( glit, ~olit);
@@ -1579,36 +1918,28 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	  dep.push_back(Literal(inode->dvar(), kPolPosi));
 	}
 	DtpgFault* fi0 = node->input_fault(0, j);
-	if ( fi0 != NULL ) {
+	if ( is_valid(fi0, flist) ) {
 	  ymuint fid = fi0->tmp_id();
-	  if ( u_list[fid] == fi0 ) {
-	    dep.push_back(Literal(flt_var[fid], kPolPosi));
-	  }
+	  dep.push_back(Literal(flt_var[fid], kPolPosi));
 	}
 
 	DtpgFault* fi1 = node->input_fault(1, j);
-	if ( fi1 != NULL ) {
+	if ( is_valid(fi1, flist) ) {
 	  ymuint fid = fi1->tmp_id();
-	  if ( u_list[fid] == fi1 ) {
-	    dep.push_back(Literal(flt_var[fid], kPolPosi));
-	  }
+	  dep.push_back(Literal(flt_var[fid], kPolPosi));
 	}
       }
 
       DtpgFault* fo0 = node->output_fault(0);
-      if ( fo0 != NULL ) {
+      if ( is_valid(fo0, flist) ) {
 	ymuint fid = fo0->tmp_id();
-	if ( u_list[fid] == fo0 ) {
-	  dep.push_back(Literal(flt_var[fid], kPolPosi));
-	}
+	dep.push_back(Literal(flt_var[fid], kPolPosi));
       }
 
       DtpgFault* fo1 = node->output_fault(1);
-      if ( fo1 != NULL ) {
+      if ( is_valid(fo1, flist) ) {
 	ymuint fid = fo1->tmp_id();
-	if ( u_list[fid] == fo1 ) {
-	  dep.push_back(Literal(flt_var[fid], kPolPosi));
-	}
+	dep.push_back(Literal(flt_var[fid], kPolPosi));
       }
 
       solver.add_clause(dep);
@@ -1625,10 +1956,9 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
     }
   }
 
-
   // 個々の故障に対するテスト生成を行なう．
   for (ymuint i = 0; i < nf; ++ i) {
-    DtpgFault* f = u_list[i];
+    DtpgFault* f = flist[i];
 
     mAssumptions.clear();
     mAssumptions.reserve(node_list.size() + nf);
@@ -1666,18 +1996,6 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 
     solve(solver, f, op);
   }
-
-#if VERIFY_MAIMP
-  for (vector<DtpgFault*>::iterator p = r_list.begin();
-       p != r_list.end(); ++ p) {
-    DtpgFault* f = *p;
-    if ( !f->is_untestable() ) {
-      cout << "Error! " << f_str(f)
-	   << " is not redundant" << endl;
-    }
-    assert_cond( f->is_untestable(), __FILE__, __LINE__);
-  }
-#endif
 
   clear_node_mark();
 
@@ -1755,7 +2073,7 @@ DtpgSat::make_prop_cnf(SatSolver& solver,
   // 故障回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
   vector<Literal> odiff;
-  odiff.reserve(mNetwork->output_num2());
+  odiff.reserve(mOutputList.size());
 
   // mark の付いていないノードは正常回路，付いているノードは故障回路
   // を用いて CNF を作る．
@@ -1781,10 +2099,6 @@ DtpgSat::make_prop_cnf(SatSolver& solver,
     if ( node == fnode ) {
       continue;
     }
-
-    // 入力のリテラル
-    ymuint ni = node->fanin_num();
-    vector<Literal> inputs(ni);
 
     make_fnode_cnf(solver, node);
   }

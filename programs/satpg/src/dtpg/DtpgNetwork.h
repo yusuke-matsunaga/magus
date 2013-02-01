@@ -124,11 +124,14 @@ public:
 
   /// @brief f の検出に必要な割り当てを求める．
   /// @param[in] f 対象の故障
-  /// @param[in] ma_list 必要割り当てのリスト
-  /// @return 故障が検出可能なら true を返す．
+  /// @param[in] ma_list 割り当て結果を格納するリスト
+  /// @return 矛盾が生じたら(fが冗長故障の場合) false を返す．
+  /// @note DtpgNetwork のメンバにはアクセスしないので static メンバになっている．
+  /// @note ma_list の内容は DtpgNode::id() * 2 + val (0 / 1)
+  static
   bool
   get_mandatory_assignment(DtpgFault* f,
-			   vector<pair<DtpgNode*, int> >& ma_list);
+			   vector<ymuint32>& ma_list);
 
 
 private:

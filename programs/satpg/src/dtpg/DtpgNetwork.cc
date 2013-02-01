@@ -686,4 +686,121 @@ DtpgNetwork::set_logic_primitive(DtpgPrimitive* prim,
   prim->mFanins = new (p) DtpgPrimitive*[ni];
 }
 
+BEGIN_NONAMESPACE
+
+// node のファンアウトに mark1 をつける．
+void
+set_tfo_mark(DtpgNode* node)
+{
+  if ( node->mark1() ) {
+    return;
+  }
+  node->set_mark1();
+
+  ymuint n = node->active_fanout_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    DtpgNode* onode = node->active_fanout(i);
+    set_tfo_mark(onode);
+  }
+}
+
+// node のファンアウトに mark1 をつける．
+void
+clear_tfo_mark(DtpgNode* node)
+{
+  if ( !node->mark1() ) {
+    return;
+  }
+  node->clear_mark1();
+
+  ymuint n = node->active_fanout_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    DtpgNode* onode = node->active_fanout(i);
+    clear_tfo_mark(onode);
+  }
+}
+
+END_NONAMESPACE
+
+// @brief f の検出に必要な割り当てを求める．
+// @param[in] f 対象の故障
+// @param[in] ma_list 割り当て結果を格納するリスト
+// @return 矛盾が生じたら(fが冗長故障の場合) false を返す．
+// @note DtpgNetwork のメンバにはアクセスしないので static メンバになっている．
+// @note ma_list の内容は DtpgNode::id() * 2 + val (0 / 1)
+bool
+DtpgNetwork::get_mandatory_assignment(DtpgFault* f,
+				      vector<ymuint32>& ma_list)
+{
+  DtpgNode* fnode = f->node();
+  DtpgNode* fsrc = fnode;
+  if ( f->is_input_fault() ) {
+    fsrc = f->source_node();
+  }
+
+  vector<DtpgNode*> node_list;
+  Bool3 gval;
+  if ( f->val() == 1 ) {
+    gval = kB3False;
+  }
+  else {
+    gval = kB3True;
+  }
+  bool stat = fsrc->bwd_prop(NULL, gval, node_list);
+  if ( !stat ) {
+    goto untestable;
+  }
+
+  if ( f->is_input_fault() ) {
+    Bool3 nval = fnode->nval();
+    if ( nval != kB3X ) {
+      ymuint ni = fnode->fanin_num();
+      for (ymuint i = 0; i < ni; ++ i) {
+	if ( i == f->pos() ) continue;
+	DtpgNode* inode = fnode->fanin(i);
+	if ( !inode->bwd_prop(fnode, nval, node_list) ) {
+	  goto untestable;
+	}
+      }
+    }
+  }
+  if ( fnode->imm_dom() != NULL ) {
+    set_tfo_mark(fnode);
+    for (DtpgNode* dom = fnode->imm_dom(); dom != NULL; dom = dom->imm_dom()) {
+      Bool3 nval = dom->nval();
+      if ( nval != kB3X ) {
+	ymuint ni = dom->fanin_num();
+	for (ymuint i = 0; i < ni; ++ i) {
+	  DtpgNode* inode = dom->fanin(i);
+	  if ( inode->mark1() ) continue;
+	  if ( !inode->bwd_prop(dom, nval, node_list) ) {
+	    clear_tfo_mark(fnode);
+	    goto untestable;
+	  }
+	}
+      }
+    }
+    clear_tfo_mark(fnode);
+  }
+
+  for (vector<DtpgNode*>::iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    assert_cond( node->ma_value() != kB3X, __FILE__, __LINE__);
+    int val = node->ma_value() == kB3True ? 1 : 0;
+    ma_list.push_back(node->id() * 2 + val);
+    node->clear_ma_value();
+  }
+  sort(ma_list.begin(), ma_list.end());
+  return true;
+
+ untestable:
+  for (vector<DtpgNode*>::iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    node->clear_ma_value();
+  }
+  return false;
+}
+
 END_NAMESPACE_YM_SATPG_DTPG

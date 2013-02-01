@@ -167,6 +167,10 @@ DtpgNode::bwd_imp(Bool3 val,
     }
     break;
 
+  case kTgGateXor:
+  case kTgGateXnor:
+    break;
+
   default:
     assert_not_reached(__FILE__, __LINE__);
     break;
