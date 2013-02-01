@@ -136,17 +136,6 @@ private:
 	    DtpgFault* f1,
 	    DtpgOperator& op);
 
-  /// @brief FFR 内の故障に対してテストパタン生成を行なう．
-  /// @param[in] flist 故障リスト
-  /// @param[in] root FFR の根のノード
-  /// @param[in] node_list FFR 内のノードリスト
-  /// @param[in] op テスト生成の結果を処理するファンクター
-  void
-  dtpg_ffr(const vector<DtpgFault*>& flist,
-	   DtpgNode* root,
-	   const vector<DtpgNode*>& node_list,
-	   DtpgOperator& op);
-
   /// @brief 複数の故障に対してテストパタン生成を行なう．
   /// @param[in] flist 故障リスト
   /// @param[in] root FFR の根のノード
@@ -161,13 +150,6 @@ private:
   void
   update_stats(SatSolver& solver,
 	       ymuint n);
-
-  /// @brief fnode の故障が伝搬する条件を表す CNF を作る．
-  /// @param[in] solver SatSolver
-  /// @param[in] fnode 対象のノード
-  void
-  make_prop_cnf(SatSolver& solver,
-		DtpgNode* fnode);
 
   /// @brief 一つの SAT問題を解く．
   void
@@ -340,6 +322,41 @@ private:
   ymuint64 mPropagationNum;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+
+// @brief 一つの故障に対してテストパタン生成を行う．
+// @param[in] f 故障
+// @param[in] op テスト生成の結果を処理するファンクター
+inline
+void
+DtpgSat::dtpg_single(DtpgFault* f,
+		     DtpgOperator& op)
+{
+  vector<DtpgFault*> flist(1);
+  flist[0] = f;
+  dtpg_group(flist, op);
+}
+
+// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
+// @param[in] f0 0縮退故障
+// @param[in] f1 1縮退故障
+// @param[in] op テスト生成の結果を処理するファンクター
+inline
+void
+DtpgSat::dtpg_dual(DtpgFault* f0,
+		   DtpgFault* f1,
+		   DtpgOperator& op)
+{
+  vector<DtpgFault*> flist(2);
+  flist[0] = f0;
+  flist[1] = f1;
+  dtpg_group(flist, op);
+}
 
 END_NAMESPACE_YM_SATPG_DTPG
 

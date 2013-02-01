@@ -14,6 +14,7 @@
 #include "DtpgFFR.h"
 #include "DtpgFault.h"
 #include "DtpgOperator.h"
+#include "InputLiteral.h"
 #include "ym_logic/SatSolver.h"
 #include "ym_logic/SatStats.h"
 
@@ -35,295 +36,6 @@ END_NAMESPACE_YM_SATPG
 BEGIN_NAMESPACE_YM_SATPG_DTPG
 
 BEGIN_NONAMESPACE
-
-
-//////////////////////////////////////////////////////////////////////
-// make_gate_cnf で用いられるファンクター
-//////////////////////////////////////////////////////////////////////
-struct InputLiteral
-{
-
-  /// @brief リテラルを返す．
-  virtual
-  Literal
-  operator[](ymuint pos) const = 0;
-
-  /// @brief 入力数を返す．
-  virtual
-  ymuint
-  size() const = 0;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-// vector<> を用いた InputLiteral
-//////////////////////////////////////////////////////////////////////
-class VectorInputLiteral :
-  public InputLiteral
-{
-public:
-
-  /// @brief コンストラクタ
-  VectorInputLiteral(const vector<Literal>& vec);
-
-  /// @brief リテラルを返す．
-  virtual
-  Literal
-  operator[](ymuint pos) const;
-
-  /// @brief 入力数を返す．
-  virtual
-  ymuint
-  size() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // ベクタ
-  const vector<Literal>& mVector;
-
-};
-
-// @brief コンストラクタ
-VectorInputLiteral::VectorInputLiteral(const vector<Literal>& vec) :
-  mVector(vec)
-{
-}
-
-// @brief リテラルを返す．
-Literal
-VectorInputLiteral::operator[](ymuint pos) const
-{
-  return mVector[pos];
-}
-
-// @brief 入力数を返す．
-ymuint
-VectorInputLiteral::size() const
-{
-  return mVector.size();
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// DtpgNode->gvar() を用いた InputLiteral
-//////////////////////////////////////////////////////////////////////
-class GvarInputLiteral :
-  public InputLiteral
-{
-public:
-
-  /// @brief コンストラクタ
-  GvarInputLiteral(DtpgNode* node);
-
-  /// @brief リテラルを返す．
-  virtual
-  Literal
-  operator[](ymuint pos) const;
-
-  /// @brief 入力数を返す．
-  virtual
-  ymuint
-  size() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // ノード
-  DtpgNode* mNode;
-
-};
-
-// @brief コンストラクタ
-GvarInputLiteral::GvarInputLiteral(DtpgNode* node) :
-  mNode(node)
-{
-}
-
-// @brief リテラルを返す．
-Literal
-GvarInputLiteral::operator[](ymuint pos) const
-{
-  DtpgNode* inode = mNode->fanin(pos);
-  return Literal(inode->gvar(), kPolPosi);
-}
-
-// @brief 入力数を返す．
-ymuint
-GvarInputLiteral::size() const
-{
-  return mNode->fanin_num();
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// DtpgNode->fvar() を用いた InputLiteral
-//////////////////////////////////////////////////////////////////////
-class FvarInputLiteral :
-  public InputLiteral
-{
-public:
-
-  /// @brief コンストラクタ
-  FvarInputLiteral(DtpgNode* node);
-
-  /// @brief リテラルを返す．
-  virtual
-  Literal
-  operator[](ymuint pos) const;
-
-  /// @brief 入力数を返す．
-  virtual
-  ymuint
-  size() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // ノード
-  DtpgNode* mNode;
-
-};
-
-// @brief コンストラクタ
-FvarInputLiteral::FvarInputLiteral(DtpgNode* node) :
-  mNode(node)
-{
-}
-
-// @brief リテラルを返す．
-Literal
-FvarInputLiteral::operator[](ymuint pos) const
-{
-  DtpgNode* inode = mNode->fanin(pos);
-  return Literal(inode->fvar(), kPolPosi);
-}
-
-// @brief 入力数を返す．
-ymuint
-FvarInputLiteral::size() const
-{
-  return mNode->fanin_num();
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// DtpgPrimitive->gvar() を用いた InputLiteral
-//////////////////////////////////////////////////////////////////////
-class PrimGvarInputLiteral :
-  public InputLiteral
-{
-public:
-
-  /// @brief コンストラクタ
-  PrimGvarInputLiteral(DtpgPrimitive* prim);
-
-  /// @brief リテラルを返す．
-  virtual
-  Literal
-  operator[](ymuint pos) const;
-
-  /// @brief 入力数を返す．
-  virtual
-  ymuint
-  size() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // プリミティブ
-  DtpgPrimitive* mPrim;
-
-};
-
-// @brief コンストラクタ
-PrimGvarInputLiteral::PrimGvarInputLiteral(DtpgPrimitive* prim) :
-  mPrim(prim)
-{
-}
-
-// @brief リテラルを返す．
-Literal
-PrimGvarInputLiteral::operator[](ymuint pos) const
-{
-  DtpgPrimitive* iprim = mPrim->fanin(pos);
-  return Literal(iprim->gvar(), kPolPosi);
-}
-
-// @brief 入力数を返す．
-ymuint
-PrimGvarInputLiteral::size() const
-{
-  return mPrim->fanin_num();
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// DtpgPrimitive->fvar() を用いた InputLiteral
-//////////////////////////////////////////////////////////////////////
-class PrimFvarInputLiteral :
-  public InputLiteral
-{
-public:
-
-  /// @brief コンストラクタ
-  PrimFvarInputLiteral(DtpgPrimitive* prim);
-
-  /// @brief リテラルを返す．
-  virtual
-  Literal
-  operator[](ymuint pos) const;
-
-  /// @brief 入力数を返す．
-  virtual
-  ymuint
-  size() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // プリミティブ
-  DtpgPrimitive* mPrim;
-
-};
-
-// @brief コンストラクタ
-PrimFvarInputLiteral::PrimFvarInputLiteral(DtpgPrimitive* prim) :
-  mPrim(prim)
-{
-}
-
-// @brief リテラルを返す．
-Literal
-PrimFvarInputLiteral::operator[](ymuint pos) const
-{
-  DtpgPrimitive* iprim = mPrim->fanin(pos);
-  return Literal(iprim->fvar(), kPolPosi);
-}
-
-// @brief 入力数を返す．
-ymuint
-PrimFvarInputLiteral::size() const
-{
-  return mPrim->fanin_num();
-}
-
 
 // @brief 故障挿入回路を表す CNF 式を作る．
 // @param[in] solver SAT ソルバー
@@ -1051,15 +763,8 @@ DtpgSat::all_sub(DtpgOperator& op)
 {
   vector<DtpgFault*> flist;
   ymuint n = mNetwork->active_node_num();
-  vector<DtpgNode*> node_list;
-  node_list.reserve(n);
-  DtpgNode* onode = NULL;
   for (ymuint i = 0; i < n; ++ i) {
     DtpgNode* node = mNetwork->active_node(i);
-    node_list.push_back(node);
-    if ( node->is_output() ) {
-      onode = node;
-    }
     for (int val = 0; val < 2; ++ val) {
       DtpgFault* f = node->output_fault(val);
       if ( f != NULL && !f->is_skip() ) {
@@ -1080,7 +785,7 @@ DtpgSat::all_sub(DtpgOperator& op)
     return;
   }
 
-  dtpg_ffr(flist, onode, node_list, op);
+  dtpg_group(flist, op);
 }
 
 // @brief 一つの FFR に対してテストパタン生成を行う．
@@ -1115,7 +820,7 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
     return;
   }
 
-  dtpg_ffr(flist, ffr->root(), node_list, op);
+  dtpg_group(flist, op);
 }
 
 // @brief スキップフラグを解除する．
@@ -1148,113 +853,6 @@ DtpgSat::clear_stats()
   mConflictNum = 0;
   mDecisionNum = 0;
   mPropagationNum = 0;
-}
-
-// @brief 一つの故障に対してテストパタン生成を行う．
-// @param[in] f 故障
-// @param[in] op テスト生成の結果を処理するファンクター
-void
-DtpgSat::dtpg_single(DtpgFault* f,
-		     DtpgOperator& op)
-{
-  SatSolver solver(mType, mOption, mOutP);
-
-  DtpgNode* fnode = f->node();
-
-  // fnode から外部出力へ至る部分の CNF を作る．
-  make_prop_cnf(solver, fnode);
-
-  DtpgNode* fsrc = fnode;
-  if ( f->is_input_fault() ) {
-    ymuint ipos = f->pos();
-    DtpgNode* inode = fnode->fanin(ipos);
-    set_fvar(solver, inode);
-    make_fnode_cnf(solver, fnode);
-    fsrc = fnode->fanin(ipos);
-  }
-
-  ymuint nim = 0;
-  for (DtpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-    ++ nim;
-  }
-
-  mAssumptions.clear();
-  mAssumptions.resize(nim + 2);
-
-  if ( f->val() ) {
-    mAssumptions[0] = Literal(fsrc->gvar(), kPolNega);
-    mAssumptions[1] = Literal(fsrc->fvar(), kPolPosi);
-  }
-  else {
-    mAssumptions[0] = Literal(fsrc->gvar(), kPolPosi);
-    mAssumptions[1] = Literal(fsrc->fvar(), kPolNega);
-  }
-
-  // dominator ノードの dvar は1でなければならない．
-  ymuint i = 2;
-  for (DtpgNode* node = fnode; node != NULL; node = node->imm_dom(), ++ i) {
-    mAssumptions[i] = Literal(node->dvar(), kPolPosi);
-  }
-
-  solve(solver, f, op);
-
-  clear_node_mark();
-
-  update_stats(solver, 1);
-}
-
-// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
-// @param[in] f0 0縮退故障
-// @param[in] f1 1縮退故障
-// @param[in] op テスト生成の結果を処理するファンクター
-void
-DtpgSat::dtpg_dual(DtpgFault* f0,
-		   DtpgFault* f1,
-		   DtpgOperator& op)
-{
-  SatSolver solver(mType, mOption, mOutP);
-
-  DtpgNode* fnode = f0->node();
-
-  // fnode から外部出力へ至る部分の CNF を作る．
-  make_prop_cnf(solver, fnode);
-
-  DtpgNode* fsrc = fnode;
-  if ( f0->is_input_fault() ) {
-    ymuint ipos = f0->pos();
-    DtpgNode* inode = fnode->fanin(ipos);
-    set_fvar(solver, inode);
-    make_fnode_cnf(solver, fnode);
-    fsrc = f0->source_node();
-  }
-
-  ymuint nim = 0;
-  for (DtpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-    ++ nim;
-  }
-
-  mAssumptions.clear();
-  mAssumptions.resize(nim + 2);
-
-  // dominator ノードの dvar は1でなければならない．
-  ymuint i = 2;
-  for (DtpgNode* node = fnode; node != NULL; node = node->imm_dom(), ++ i) {
-    mAssumptions[i] = Literal(node->dvar(), kPolPosi);
-  }
-
-  mAssumptions[0] = Literal(fsrc->gvar(), kPolPosi);
-  mAssumptions[1] = Literal(fsrc->fvar(), kPolNega);
-
-  solve(solver, f0, op);
-
-  mAssumptions[0] = Literal(fsrc->gvar(), kPolNega);
-  mAssumptions[1] = Literal(fsrc->fvar(), kPolPosi);
-
-  solve(solver, f1, op);
-
-  clear_node_mark();
-
-  update_stats(solver, 2);
 }
 
 
@@ -1498,39 +1096,20 @@ DtpgSat::dtpg_ffr2(const vector<DtpgFault*>& flist,
 
 BEGIN_NONAMESPACE
 
-void
-tfo_mark2(DtpgNode* node,
-	  vector<DtpgNode*>& tfo_list)
+// f が対象の故障の場合 true を返す．
+inline
+bool
+is_valid(DtpgFault* f,
+	 const vector<DtpgFault*>& flist)
 {
-  if ( !node->mark1() ) {
-    node->set_mark1();
-    tfo_list.push_back(node);
-
-    ymuint nfo = node->active_fanout_num();
-    for (ymuint i = 0; i < nfo; ++ i) {
-      DtpgNode* onode = node->active_fanout(i);
-      tfo_mark2(onode, tfo_list);
-      if ( onode->mark2() || onode->mark3() ) {
-	node->set_mark3();
-      }
-    }
+  if ( f == NULL ) {
+    return false;
   }
-}
-
-void
-tfi_mark2(DtpgNode* node,
-	  vector<DtpgNode*>& tfi_list)
-{
-  if ( !node->mark2() ) {
-    node->set_mark2();
-    tfi_list.push_back(node);
-
-    ymuint ni = node->fanin_num();
-    for (ymuint i = 0; i < ni; ++ i) {
-      DtpgNode* inode = node->fanin(i);
-      tfi_mark2(inode, tfi_list);
-    }
+  ymuint fid = f->tmp_id();
+  if ( fid < flist.size() && flist[fid] == f ) {
+    return true;
   }
+  return false;
 }
 
 END_NONAMESPACE
@@ -1562,22 +1141,25 @@ DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
   }
 
   // 故障のあるノードの TFO に mark1 をつける．
-  // TFO に故障があるノードを含むノードに mark3 をつける．
+  // ついでに mark2 を消す．
   vector<DtpgNode*> tfo_list;
   for (vector<DtpgNode*>::iterator p = fnode_list.begin();
        p != fnode_list.end(); ++ p) {
     DtpgNode* fnode = *p;
-    tfo_mark2(fnode, tfo_list);
-    if ( !fnode->mark3() ) {
-      // fnode が frontier
-    }
-  }
-
-  // mark2 を消す．
-  for (ymuint i = 0; i < nf; ++ i) {
-    DtpgFault* f = flist[i];
-    DtpgNode* fnode = f->node();
+    fnode->set_mark1();
+    tfo_list.push_back(fnode);
     fnode->clear_mark2();
+  }
+  for (ymuint rpos = 0; rpos < tfo_list.size(); ++ rpos) {
+    DtpgNode* node = tfo_list[rpos];
+    ymuint nfo = node->active_fanout_num();
+    for (ymuint i = 0; i < nfo; ++ i) {
+      DtpgNode* fonode = node->active_fanout(i);
+      if ( !fonode->mark1() ) {
+	fonode->set_mark1();
+	tfo_list.push_back(fonode);
+      }
+    }
   }
 
   // TFO の TFI に mark2 をつける．
@@ -1587,12 +1169,41 @@ DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
     DtpgNode* node = *p;
     ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
-      DtpgNode* inode = node->fanin(i);
-      tfi_mark2(inode, tfi_list);
+      DtpgNode* finode = node->fanin(i);
+      if ( !finode->mark1() && !finode->mark2() ) {
+	finode->set_mark2();
+	tfi_list.push_back(finode);
+      }
+    }
+  }
+  for (ymuint rpos = 0; rpos < tfi_list.size(); ++ rpos) {
+    DtpgNode* node = tfi_list[rpos];
+    ymuint ni = node->fanin_num();
+    for (ymuint i = 0; i < ni; ++ i) {
+      DtpgNode* finode = node->fanin(i);
+      if ( !finode->mark1() && !finode->mark2() ) {
+	finode->set_mark2();
+	tfi_list.push_back(finode);
+      }
     }
   }
 
+  // mark1 と mark2 をクリアする．
+  for (vector<DtpgNode*>::iterator p = tfo_list.begin();
+       p != tfo_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    node->clear_mark1();
+    node->clear_mark2();
+  }
+  for (vector<DtpgNode*>::iterator p = tfi_list.begin();
+       p != tfi_list.end(); ++ p) {
+    DtpgNode* node = *p;
+    node->clear_mark1();
+    node->clear_mark2();
+  }
+
   // TFO マークのついたノード用の変数の生成
+  mUsedNodeList.clear();
   for (vector<DtpgNode*>::iterator p = tfo_list.begin();
        p != tfo_list.end(); ++ p) {
     DtpgNode* node = *p;
@@ -1632,6 +1243,15 @@ DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
     }
   }
 
+  // 故障を活性化するとき true にする変数．
+  vector<VarId> flt_var(nf);
+  // 故障挿入回路の出力に対応する変数．
+  vector<VarId> tmp_var(nf);
+  for (ymuint i = 0; i < nf; ++ i) {
+    flt_var[i] = solver.new_var();
+    tmp_var[i] = solver.new_var();
+  }
+
 
   //////////////////////////////////////////////////////////////////////
   // 正常回路の CNF を生成
@@ -1648,184 +1268,11 @@ DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
     make_gnode_cnf(solver, node);
   }
 
-#if 0
   //////////////////////////////////////////////////////////////////////
   // 故障回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
-  vector<Literal> odiff;
-  odiff.reserve(mOutputList.size());
-
   for (ymuint i = 0; i < tfo_list.size(); ++ i) {
     DtpgNode* node = tfo_list[i];
-
-    Literal glit(node->gvar(), kPolPosi);
-    Literal flit(node->fvar(), kPolPosi);
-    Literal dlit(node->dvar(), kPolPosi);
-
-    // XOR(glit, flit, dlit) を追加する．
-    // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-    solver.add_clause(~glit, ~flit, ~dlit);
-    solver.add_clause(~glit,  flit,  dlit);
-    solver.add_clause( glit, ~flit,  dlit);
-    solver.add_clause( glit,  flit, ~dlit);
-
-    // node が出力の時には odiff に追加しておく．
-    if ( node->is_output() ) {
-      odiff.push_back(dlit);
-    }
-
-    if ( node == fnode ) {
-      continue;
-    }
-
-    make_fnode_cnf(solver, node);
-  }
-
-  // 出力のうち，最低1つは故障差が伝搬しなければならない．
-  assert_cond( !odiff.empty(), __FILE__, __LINE__);
-
-  solver.add_clause(odiff);
-
-  // 個々の故障に対するテスト生成を行なう．
-  for (ymuint i = 0; i < nf; ++ i) {
-    DtpgFault* f = flist[i];
-
-    mAssumptions.clear();
-    mAssumptions.reserve(node_list.size() + nf);
-
-    // 該当の故障に対する変数のみ1にする．
-    for (ymuint j = 0; j < nf; ++ j) {
-      tPol pol = (j == i) ? kPolPosi : kPolNega;
-      mAssumptions.push_back(Literal(flt_var[j], pol));
-    }
-
-    // 故障ノードの TFO 以外の dlit を0にする．
-    mark_tfo(f->node());
-    for (vector<DtpgNode*>::const_iterator p = node_list.begin();
-	 p != node_list.end(); ++ p) {
-      DtpgNode* node = *p;
-      if ( node->has_fvar() && !node->mark1() ) {
-	Literal dlit(node->dvar(), kPolNega);
-	mAssumptions.push_back(dlit);
-      }
-    }
-    clear_tfo(f->node());
-
-    // dominator ノードの dvar は1でなければならない．
-    for (DtpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
-      Literal dlit(node->dvar(), kPolPosi);
-      mAssumptions.push_back(dlit);
-    }
-
-    DtpgNode* fnode = f->node();
-    if ( f->is_input_fault() ) {
-      fnode = f->source_node();
-    }
-    tPol pol = (f->val() == 0) ? kPolPosi : kPolNega;
-    mAssumptions.push_back(Literal(fnode->gvar(), pol));
-
-    solve(solver, f, op);
-  }
-#endif
-  clear_node_mark();
-
-  update_stats(solver, nf);
-}
-
-BEGIN_NONAMESPACE
-
-// f が対象の故障の場合 true を返す．
-inline
-bool
-is_valid(DtpgFault* f,
-	 const vector<DtpgFault*>& flist)
-{
-  if ( f == NULL ) {
-    return false;
-  }
-  ymuint fid = f->tmp_id();
-  if ( fid < flist.size() && flist[fid] == f ) {
-    return true;
-  }
-  return false;
-}
-
-END_NONAMESPACE
-
-// @brief 同一のFFR内の故障に対してテストパタン生成を行なう．
-// @param[in] flist 故障リスト
-// @param[in] root FFR の根のノード
-// @param[in] node_list FFR 内のノードリスト
-// @param[in] op テスト生成の結果を処理するファンクター
-void
-DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
-		  DtpgNode* root,
-		  const vector<DtpgNode*>& node_list,
-		  DtpgOperator& op)
-{
-  SatSolver solver(mType, mOption, mOutP);
-
-  // root から外部出力までの正常回路，故障回路を作る．
-  make_prop_cnf(solver, root);
-
-  // flist 内のインデックスを仮IDとする．
-  // 故障に関係するノードに mark1 をつける．
-  ymuint nf = flist.size();
-  for (ymuint i = 0; i < nf; ++ i) {
-    DtpgFault* f = flist[i];
-    f->set_tmp_id(i);
-    f->node()->set_mark1();
-  }
-
-  // mark1 のついたノードの TFO に mark1 をつける．
-  // 以下のコードが正しく動くためには node_list がトポロジカル順になっている必要がある．
-  for (vector<DtpgNode*>::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    DtpgNode* node = *p;
-    if ( node->mark1() ) {
-      continue;
-    }
-    bool found = false;
-    ymuint ni = node->fanin_num();
-    for (ymuint i = 0; i < ni; ++ i) {
-      DtpgNode* inode = node->fanin(i);
-      if ( inode->mark1() ) {
-	found = true;
-	break;
-      }
-    }
-    if ( found ) {
-      node->set_mark1();
-    }
-  }
-
-  // 故障回路用の変数を割り当てる．
-  // ついでに mark1 を消す．
-  for (vector<DtpgNode*>::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    DtpgNode* node = *p;
-    if ( (node != root) && node->mark1() ) {
-      set_fvar(solver, node);
-    }
-    node->clear_mark1();
-  }
-
-  // 故障を活性化するとき true にする変数．
-  vector<VarId> flt_var(nf);
-  // 故障挿入回路の出力に対応する変数．
-  vector<VarId> tmp_var(nf);
-  for (ymuint i = 0; i < nf; ++ i) {
-    flt_var[i] = solver.new_var();
-    tmp_var[i] = solver.new_var();
-  }
-
-  // FFR 内の故障回路を作る．
-  for (vector<DtpgNode*>::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    DtpgNode* node = *p;
-    if ( !node->has_fvar() ) {
-      continue;
-    }
 
     // inputs[] に入力変数を表すリテラルを格納する．
     // ただし，入力の故障を仮定する場合には故障挿入回路の出力変数となる．
@@ -1859,15 +1306,25 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
     }
 
     Literal glit(node->gvar(), kPolPosi);
-    Literal olit(ovar, kPolPosi);
+    Literal flit(node->fvar(), kPolPosi);
+    Literal dlit(node->dvar(), kPolPosi);
+
+    // XOR(glit, flit, dlit) を追加する．
+    // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
+    solver.add_clause(~glit, ~flit, ~dlit);
+    solver.add_clause(~glit,  flit,  dlit);
+    solver.add_clause( glit, ~flit,  dlit);
+    solver.add_clause( glit,  flit, ~dlit);
+
+    Literal gate_output(ovar, kPolPosi);
     if ( node->is_input() ) {
-      solver.add_clause(~glit,  olit);
-      solver.add_clause( glit, ~olit);
+      solver.add_clause(~glit,  gate_output);
+      solver.add_clause( glit, ~gate_output);
     }
     else {
       if ( node->is_output() ) {
-	solver.add_clause( inputs[0], ~olit);
-	solver.add_clause(~inputs[0],  olit);
+	solver.add_clause( inputs[0], ~gate_output);
+	solver.add_clause(~inputs[0],  gate_output);
       }
       else {
 	if ( node->is_cplx_logic() ) {
@@ -1890,7 +1347,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	      }
 	      Literal output;
 	      if ( i == n1 ) {
-		output = olit;
+		output = gate_output;
 	      }
 	      else {
 		output = Literal(prim->fvar(), kPolPosi);
@@ -1900,7 +1357,7 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 	  }
 	}
 	else {
-	  make_gate_cnf(solver, node->gate_type(), olit, VectorInputLiteral(inputs));
+	  make_gate_cnf(solver, node->gate_type(), gate_output, VectorInputLiteral(inputs));
 	}
       }
 
@@ -1944,24 +1401,28 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 
       solver.add_clause(dep);
     }
-    if ( node != root ) { // root の分は make_prop_cnf() で作っている．
-      Literal flit(node->fvar(), kPolPosi);
-      Literal dlit(node->dvar(), kPolPosi);
-      // XOR(glit, flit, dlit) を追加する．
-      // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-      solver.add_clause(~glit, ~flit, ~dlit);
-      solver.add_clause(~glit,  flit,  dlit);
-      solver.add_clause( glit, ~flit,  dlit);
-      solver.add_clause( glit,  flit, ~dlit);
-    }
   }
+
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障の検出条件
+  //////////////////////////////////////////////////////////////////////
+  vector<Literal> odiff;
+  odiff.reserve(mOutputList.size());
+  for (vector<DtpgNode*>::iterator p = mOutputList.begin();
+       p != mOutputList.end(); ++ p) {
+    DtpgNode* node = *p;
+    Literal dlit(node->dvar(), kPolPosi);
+    odiff.push_back(dlit);
+  }
+  solver.add_clause(odiff);
 
   // 個々の故障に対するテスト生成を行なう．
   for (ymuint i = 0; i < nf; ++ i) {
     DtpgFault* f = flist[i];
 
     mAssumptions.clear();
-    mAssumptions.reserve(node_list.size() + nf);
+    mAssumptions.reserve(tfo_list.size() + nf);
 
     // 該当の故障に対する変数のみ1にする．
     for (ymuint j = 0; j < nf; ++ j) {
@@ -1971,8 +1432,8 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 
     // 故障ノードの TFO 以外の dlit を0にする．
     mark_tfo(f->node());
-    for (vector<DtpgNode*>::const_iterator p = node_list.begin();
-	 p != node_list.end(); ++ p) {
+    for (vector<DtpgNode*>::const_iterator p = tfo_list.begin();
+	 p != tfo_list.end(); ++ p) {
       DtpgNode* node = *p;
       if ( node->has_fvar() && !node->mark1() ) {
 	Literal dlit(node->dvar(), kPolNega);
@@ -1996,120 +1457,12 @@ DtpgSat::dtpg_ffr(const vector<DtpgFault*>& flist,
 
     solve(solver, f, op);
   }
-
   clear_node_mark();
 
   update_stats(solver, nf);
 }
 
-// @brief fnode の故障が伝搬する条件を表す CNF を作る．
-void
-DtpgSat::make_prop_cnf(SatSolver& solver,
-		       DtpgNode* fnode)
-{
-  vector<DtpgNode*> tfo_list;
-  vector<DtpgNode*> tfi_list;
-  mNetwork->mark_tfo_tfi(fnode, tfo_list, tfi_list);
-
-  // 以降は tfo_list か tfi_list に含まれるノードのみを対象とする．
-
-  // TFO マークのついたノード用の変数の生成 (glit, flit, dlit の3つを作る)
-  for (vector<DtpgNode*>::iterator p = tfo_list.begin();
-       p != tfo_list.end(); ++ p) {
-    DtpgNode* node = *p;
-    set_gvar(solver, node);
-    set_fvar(solver, node);
-    mUsedNodeList.push_back(node);
-  }
-  // TFI マークのついたノード用の変数の生成 (glit のみを作る)
-  for (vector<DtpgNode*>::iterator p = tfi_list.begin();
-       p != tfi_list.end(); ++ p) {
-    DtpgNode* node = *p;
-    set_gvar(solver, node);
-    mUsedNodeList.push_back(node);
-  }
-
-  // mInputList を作る．
-  mInputList.clear();
-  if ( fnode->is_input() ) {
-    mInputList.push_back(fnode);
-  }
-  for (vector<DtpgNode*>::iterator p = tfi_list.begin();
-       p != tfi_list.end(); ++ p) {
-    DtpgNode* node = *p;
-    if ( node->is_input() ) {
-      mInputList.push_back(node);
-    }
-  }
-
-  // mOutputList を作る．
-  mOutputList.clear();
-  for (vector<DtpgNode*>::iterator p = tfo_list.begin();
-       p != tfo_list.end(); ++ p) {
-    DtpgNode* node = *p;
-    if ( node->is_output() ) {
-      mOutputList.push_back(node);
-    }
-  }
-
-
-  //////////////////////////////////////////////////////////////////////
-  // 正常回路の CNF を生成
-  //////////////////////////////////////////////////////////////////////
-
-  for (vector<DtpgNode*>::const_iterator p = tfi_list.begin();
-       p != tfi_list.end(); ++ p) {
-    DtpgNode* node = *p;
-    make_gnode_cnf(solver, node);
-  }
-  for (vector<DtpgNode*>::const_iterator p = tfo_list.begin();
-       p != tfo_list.end(); ++ p) {
-    DtpgNode* node = *p;
-    make_gnode_cnf(solver, node);
-  }
-
-
-  //////////////////////////////////////////////////////////////////////
-  // 故障回路の CNF を生成
-  //////////////////////////////////////////////////////////////////////
-  vector<Literal> odiff;
-  odiff.reserve(mOutputList.size());
-
-  // mark の付いていないノードは正常回路，付いているノードは故障回路
-  // を用いて CNF を作る．
-  for (ymuint i = 0; i < tfo_list.size(); ++ i) {
-    DtpgNode* node = tfo_list[i];
-
-    Literal glit(node->gvar(), kPolPosi);
-    Literal flit(node->fvar(), kPolPosi);
-    Literal dlit(node->dvar(), kPolPosi);
-
-    // XOR(glit, flit, dlit) を追加する．
-    // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-    solver.add_clause(~glit, ~flit, ~dlit);
-    solver.add_clause(~glit,  flit,  dlit);
-    solver.add_clause( glit, ~flit,  dlit);
-    solver.add_clause( glit,  flit, ~dlit);
-
-    // node が出力の時には odiff に追加しておく．
-    if ( node->is_output() ) {
-      odiff.push_back(dlit);
-    }
-
-    if ( node == fnode ) {
-      continue;
-    }
-
-    make_fnode_cnf(solver, node);
-  }
-
-  // 出力のうち，最低1つは故障差が伝搬しなければならない．
-  assert_cond( !odiff.empty(), __FILE__, __LINE__);
-
-  solver.add_clause(odiff);
-}
-
-/// @brief 一つの SAT問題を解く．
+// @brief 一つの SAT問題を解く．
 void
 DtpgSat::solve(SatSolver& solver,
 	       DtpgFault* f,

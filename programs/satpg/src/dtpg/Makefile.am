@@ -22,7 +22,9 @@ libatpg_dtpg_la_SOURCES = \
 	DtpgNetwork.h \
 	DtpgNetwork.cc \
 	DtpgSat.h \
-	DtpgSat.cc
+	DtpgSat.cc \
+	InputLiteral.h \
+	InputLiteral.cc
 
 libatpg_dtpg_la_LIBADD =
 
