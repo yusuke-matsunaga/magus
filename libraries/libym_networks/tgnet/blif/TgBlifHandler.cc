@@ -155,9 +155,9 @@ TgBlifHandler::names(ymuint32 onode_id,
       expr = LogExpr::make_and(mChd1);
     }
   }
-  TgGateTemplate id = mNetwork->reg_lexp(expr);
 
-  mNetwork->set_to_logic(node, id);
+  mNetwork->set_to_logic(node, expr);
+
   if ( ni != node->ni() ) {
     // .names の後の要素数とパタンの列数が異なる．
     ostringstream buf;

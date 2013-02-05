@@ -25,24 +25,24 @@ SetFault::SetFault(AtpgMgr* mgr) :
   AtpgCmd(mgr)
 {
 }
-  
+
 // コマンド処理関数
 int
 SetFault::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
 
   if ( objc > 1 ) {
     print_usage();
     return TCL_ERROR;
   }
-  
+
   TgNetwork& network = _network();
   FaultMgr& fault_mgr = _fault_mgr();
   fault_mgr.set_ssa_fault(network);
 
   after_update_faults();
-  
+
   return TCL_OK;
 }
 

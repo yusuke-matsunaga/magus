@@ -110,7 +110,7 @@ sensitize(Gate* f_node)
   if ( dfs.empty() || reached ) {
     return false;
   }
-  
+
   // 'Primary Path' をマークする．
   gn.clear_mark();
   ymuint max_side_val = dfs[0]->level();
@@ -121,7 +121,7 @@ sensitize(Gate* f_node)
       max_side_val = side_val;
     }
   }
-  
+
   bool assigned = false;
   Gate* gate = dfs[0];
   for ( ; ; ) {
@@ -182,7 +182,7 @@ sensitize(Gate* f_node)
 	  Val3 root_cval = gate->c_val();
 #ifndef NAIVE_SENSE
 	  while ( root->nfi() == 1 ) {
-	    if ( root->gate_type() == kTgNot ) {
+	    if ( root->gate_type() == kTgGateNot ) {
 	      root_cval = ~root_cval;
 	      root_ncval = ~root_ncval;
 	    }
@@ -250,7 +250,7 @@ mark_ppath(Gate* gate)
     po_sideval = max_side_val;
     return;
   }
-  
+
   Gate* best_fo = NULL;
   ymuint best_lvl = max_level + 1;
   ymuint no = gate->act_nfo();
@@ -270,7 +270,7 @@ mark_ppath(Gate* gate)
     fputs("sensitize: Internal error!\n", stderr);
     exit(1);
   }
-  
+
   mark_ppath(best_fo);
   for (ymuint i = 0; i < no; ++ i) {
     Gate* gate1 = gate->act_fanout(i);
@@ -301,14 +301,14 @@ mark_spath(Gate* gate)
   }
   gate->set_mark();
   gate->rst_ppath();
-  if ( gate->is_po() 
+  if ( gate->is_po()
 #ifndef NAIVE_SENSE
       || gate->level() >= po_sideval
 #endif
       ) {
     return gate->side_val = max_level;
   }
-  
+
   ymuint max_side_val = 0;
   ymuint no = gate->act_nfo();
   for (ymuint i = 0; i < no; ++ i) {
@@ -339,7 +339,7 @@ set_block(Gate* gate,
 	}
       }
       else {
-	if ( o_gate->gate_type() == kTgNot ) {
+	if ( o_gate->gate_type() == kTgGateNot ) {
 	  set_block(o_gate, ~cval);
 	}
 	else {
@@ -388,16 +388,16 @@ chk_another_path(Gate* gate)
   if ( gate->chk_block() ) {
     return false;
   }
-  
+
   if ( gate->chk_mark() ) {
     return false;
   }
   gate->set_mark();
-  
+
   if ( gate->is_po() ) {
     return true;
   }
-  
+
   if ( gate->chk_ppath() ) {
     if ( gate->level() > max_p ) {
       return true;
@@ -408,7 +408,7 @@ chk_another_path(Gate* gate)
       return true;
     }
   }
-  
+
   ymuint no = gate->act_nfo();
   for (ymuint i = 0; i < no; ++ i) {
     Gate* o_gate = gate->act_fanout(i);

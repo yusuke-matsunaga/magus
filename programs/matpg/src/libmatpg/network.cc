@@ -7,16 +7,16 @@
  *
  * Revision 2.3  91/12/28  16:59:09  yusuke
  * Final , Final revision
- * 
+ *
  * Revision 2.2  91/12/26  19:57:29  yusuke
  * Final revision of version 2
- * 
+ *
  * Revision 2.1  91/12/23  23:11:56  yusuke
  * a slightly speed-up
- * 
+ *
  * Revision 2.0  91/12/21  18:54:50  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.7  1991/10/17  02:55:53  yusuke
  * made a new function eq_imp()
  *
@@ -178,7 +178,7 @@ gn_gen(const TgNetwork& tgnetwork)
   for (size_t i = 0; i < nl; ++ i) {
     const TgNode* node = tgnetwork.sorted_logic(i);
     size_t ni = node->ni();
-    gate_t* gate =  new_gate_t(node->type(), node, ni);
+    gate_t* gate =  new_gate_t(node->gate_type(), node, ni);
     for (size_t j = 0; j < ni; ++ j) {
       const TgNode* inode = node->fanin(j);
       gate_t* igate = gate_map[inode->gid()];
@@ -188,14 +188,14 @@ gn_gen(const TgNetwork& tgnetwork)
     gates[gate_id] = gate;
     ++ gate_id;
     gate_map[node->gid()] = gate;
-    if (gate->get_gtype() == kTgConst0) {
+    if (gate->get_gtype() == kTgGateConst0) {
       const0_add(gate);
     }
-    if (gate->get_gtype() == kTgConst1) {
+    if (gate->get_gtype() == kTgGateConst1) {
       const1_add(gate);
     }
   }
-  
+
   for (size_t i = 0; i < npo; ++ i) {
     const TgNode* node = tgnetwork.output(i);
     const TgNode* inode = node->fanin(0);
@@ -203,7 +203,7 @@ gn_gen(const TgNetwork& tgnetwork)
     pos[i] = gate;
     gate->set_po();
   }
-  
+
   // Connect output
   for (size_t i = npi; i < ngate; ++ i) {
     gate_t* gate = gn_get_gate(i);
@@ -215,7 +215,7 @@ gn_gen(const TgNetwork& tgnetwork)
   for (size_t i = 0; i < npo; ++ i) {
     gn_get_po(i)->init_fogate(NULL, -1);
   }
-  
+
   // find fanout stems
   for (int i = ngate; -- i >= 0; ) {
     gate_t* gate = gn_get_gate(i);
@@ -226,7 +226,7 @@ gn_gen(const TgNetwork& tgnetwork)
       gate->set_fos(gate);
     }
   }
-  
+
   // set level and ordering in FFR
   for (size_t i = 0; i < ngate; ++ i) {
     gate_t* gate = gn_get_gate(i);
@@ -241,7 +241,7 @@ gn_gen(const TgNetwork& tgnetwork)
     gate->lvl_i = level + 1;
     if ( gate->is_fos() ) {
       next_ptr = &(gate->next_eval);
-      for (size_t j = 0; j < ni; ++ j) {
+      for (int j = 0; j < ni; ++ j) {
 	ord_ffr(gate->get_figate(j));
       }
       *next_ptr = gate;
@@ -272,10 +272,10 @@ gn_gen(const TgNetwork& tgnetwork)
       gate->min_lvl_i = level;
     }
   }
-  
+
   // set equivallent gate
   set_eq_gate();
-  
+
   used_gate_init(ngate);
 
   // find conflict-free gate assignment
@@ -283,7 +283,7 @@ gn_gen(const TgNetwork& tgnetwork)
   calc_basis();
   cfna_init();
   gn_deactivate();
-  
+
   // testability measure
   t_analyze();
 }
@@ -295,7 +295,7 @@ ord_ffr(gate_t* gate)
   if ( !gate->is_fos() && !gate->is_pi() ) {
     *next_ptr = gate;
     next_ptr = &(gate->next_eval);
-    for (size_t i = 0; i < gate->get_ni(); ++ i) {
+    for (int i = 0; i < gate->get_ni(); ++ i) {
       ord_ffr(gate->get_figate(i));
     }
   }
@@ -469,14 +469,14 @@ calc_basis()
   int nn = gn_get_ngate();
   int i;
   int j;
-  
+
   gid_array.clear();
   gid_array.resize(nn);
   dom_array.clear();
   dom_array.resize(nn);
   di_array.clear();
   di_array.resize(nn);
-  
+
   j = 1;
   for (i = nn; -- i >= 0; ) {
     gate_id(gn_get_gate(i)) = j ++;
@@ -496,7 +496,7 @@ calc_basis()
     }
     dominator(gate) = d;
   }
-  
+
   for (i = 0; i < nn; i ++) {
     gate_t* gate = gn_get_gate(i);
     int ni = gate->get_ni();
@@ -528,7 +528,7 @@ calc_basis()
       }
     }
   }
-  
+
   for (i = nn; -- i >= 0; ) {
     gn_get_gate(i)->state = 0L;
   }

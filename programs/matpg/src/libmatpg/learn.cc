@@ -10,13 +10,13 @@
  *
  * Revision 2.2  91/12/28  16:58:57  yusuke
  * Final , Final revision
- * 
+ *
  * Revision 2.1  91/12/23  23:11:34  yusuke
  * a slightly speed-up
- * 
+ *
  * Revision 2.0  91/12/21  18:52:36  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.6  1991/10/17  02:55:53  yusuke
  * made a new function eq_imp()
  *
@@ -287,7 +287,7 @@ C1_gate_t::l_bwd_imp(val3 val,
 void
 BUF_gate_t::l_fwd_imp(val3 val)
 {
-  if (get_gtype() == kTgNot) {
+  if (get_gtype() == kTgGateNot) {
     val = neg3(val);
   }
   if (get_gval() == val_X) {
@@ -315,7 +315,7 @@ BUF_gate_t::l_bwd_imp(val3 val,
 	o_gate->l_fwd_imp(val);
       }
     }
-    if (get_gtype() == kTgNot) {
+    if (get_gtype() == kTgGateNot) {
       val = neg3(val);
     }
     get_figate(0)->l_bwd_imp(val, this);
@@ -447,7 +447,7 @@ SIMPLE_gate_t::l_bwd_imp(val3 val,
 void
 XOR_gate_t::l_fwd_imp(val3 val)
 {
-  if (get_gtype() == kTgXor) {
+  if (get_gtype() == kTgGateXor) {
     val = val_0;
   }
   else {
@@ -510,7 +510,7 @@ XOR_gate_t::l_bwd_imp(val3 val,
     }
     int u_num = 0;
     gate_t* last = NULL;
-    if (get_gtype() == kTgXnor) {
+    if (get_gtype() == kTgGateXnor) {
       val = neg3(val);
     }
     for (int i = get_ni(); -- i >= 0; ) {

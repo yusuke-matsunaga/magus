@@ -40,7 +40,7 @@ public:
   /// @param[in] ni 入力数
   /// @note 副作用で clear() が呼ばれる．
   void
-  init(size_t ni);
+  init(ymuint ni);
 
   /// @brief 新しいパタンを生成する．
   /// @return 生成されたパタンを返す．
@@ -74,91 +74,12 @@ private:
   SimpleAlloc mAlloc;
 
   // テストベクタの入力数
-  size_t mNi;
+  ymuint32 mNi;
 
   // 未使用のテストベクタをつないでおくリスト
   list<TestVector*> mAvail;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-#if 0
-// @brief テストベクタの要素数を返す．
-inline
-size_t
-TvMgr::num() const
-{
-  return mNum;
-}
-
-// @brief 内部ポインタを先頭のテストベクタにセットする．
-// @return 内部ポインタの指しているテストベクタを返す．
-// @note 内部ポインタが範囲外を指していたら NULL を返す．
-inline
-TestVector*
-TvMgr::seek_top()
-{
-  mCurVector = mDummyTop->mNextLink;
-  return cur_vector();
-}
-
-// @brief 内部ポインタを末尾のテストベクタにセットする．
-// @return 内部ポインタの指しているテストベクタを返す．
-// @note 内部ポインタが範囲外を指していたら NULL を返す．
-inline
-TestVector*
-TvMgr::seek_tail()
-{
-  mCurVector = mDummyTop->mPrevLink;
-  return cur_vector();
-}
-
-// @brief 内部ポインタを一つ進める．
-// @return 内部ポインタの指しているテストベクタを返す．
-// @note 内部ポインタが範囲外を指していたら NULL を返す．
-inline
-TestVector*
-TvMgr::seek_next()
-{
-  if ( mCurVector == mDummyTop ) {
-    return NULL;
-  }
-  mCurVector = mCurVector->mNextLink;
-  return cur_vector();
-}
-
-// @brief 内部ポインタを一つ戻す．
-// @return 内部ポインタの指しているテストベクタを返す．
-// @note 内部ポインタが範囲外を指していたら NULL を返す．
-inline
-TestVector*
-TvMgr::seek_prev()
-{
-  if ( mCurVector == mDummyTop ) {
-    return NULL;
-  }
-  mCurVector = mCurVector->mPrevLink;
-  return cur_vector();
-}
-
-// @brief 内部ポインタの指しているテストベクタを返す．
-// @note 内部ポインタが範囲外を指していたら NULL を返す．
-inline
-TestVector*
-TvMgr::cur_vector()
-{
-  if ( mCurVector == mDummyTop ) {
-    return NULL;
-  }
-  else {
-    return mCurVector;
-  }
-}
-#endif
 
 END_NAMESPACE_YM_ATPG
 

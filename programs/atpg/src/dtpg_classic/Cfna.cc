@@ -58,16 +58,16 @@ Cfna::init(Network& network,
 	   TvMgr& tvmgr)
 {
   clear();
-  
+
 #ifdef DEBUG
   cerr << "Finding conflict-free node assignment." << endl;
 #endif
-  
+
   mTvMgr = &tvmgr;
-  
+
   mNpi = network.npi();
   ymuint nn = network.ngate();
-  
+
   rf_array.clear();
   rf_array.resize(nn);
 
@@ -79,7 +79,7 @@ Cfna::init(Network& network,
     gate->set_cfna0();
     gate->set_cfna1();
   }
-  
+
   // basis node に対して正当化ができるか試す．
   for (ymuint i = mNpi; i < nn; ++ i) {
     Gate* gate = network.gate(i);
@@ -106,7 +106,7 @@ Cfna::init(Network& network,
       rf_gate(gate) = 0;
     }
   }
-  
+
   clear_vector();
   for (ymuint i = mNpi; i < nn; ++ i) {
     Gate* gate = network.gate(i);
@@ -183,7 +183,7 @@ rf_chk(Gate* gate0,
        Network& network)
 {
   ymuint no = gate0->nfo();
-  
+
   if ( no < 2 ) {
     return false;
   }
@@ -270,30 +270,31 @@ bool
 Cfna::justify_gate(Gate* gate,
 		   Val3 val)
 {
-  switch ( gate->gate_type() ) {
-  case kTgInput:
+  if ( gate->is_pi() ) {
     // 外部入力はもちろん正当化可能
     return true;
-    
-  case kTgConst0:
+  }
+
+  switch ( gate->gate_type() ) {
+  case kTgGateConst0:
     if ( val == kVal0 ) {
       // 定数0は0のみ正当化可能
       return true;
     }
     return false;
 
-  case kTgConst1:
+  case kTgGateConst1:
     if ( val == kVal1 ) {
       // 定数1は1のみ正当化可能
       return true;
     }
     return false;
-    
-  case kTgNot:
+
+  case kTgGateNot:
     val = ~val;
     // わざと次に続く
-    
-  case kTgBuff:
+
+  case kTgGateBuff:
     {
       Gate* i_gate = gate->fanin(0);
       if ( rf_gate(i_gate) == 1 ) {
@@ -307,10 +308,10 @@ Cfna::justify_gate(Gate* gate,
       return false;
     }
 
-  case kTgAnd:
-  case kTgNand:
-  case kTgOr:
-  case kTgNor:
+  case kTgGateAnd:
+  case kTgGateNand:
+  case kTgGateOr:
+  case kTgGateNor:
     if ( val == gate->o_val() ) {
       // 要求される値が制御出力値の場合
       for (ymuint i = 0; i < gate->nfi(); ++ i) {
@@ -345,11 +346,11 @@ Cfna::justify_gate(Gate* gate,
     }
     return false;
 
-  case kTgXnor:
+  case kTgGateXnor:
     val = ~val;
     // わざと次に続く
-    
-  case kTgXor:
+
+  case kTgGateXor:
     {
       bool slack = false;
       Gate* slack_gate = NULL;

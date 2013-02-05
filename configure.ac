@@ -146,6 +146,7 @@ YM_FINISH_LIBRARIES_SUBDIRS
 ym_magus_tclsh_enable=1
 ym_atpg_enable=1
 ym_matpg_enable=1
+ym_satpg_enable=1
 
 YM_INIT_PROGRAMS_SUBDIRS
 
@@ -161,6 +162,13 @@ YM_BUILD_PROGRAM([atpg],
 
 # matpg
 YM_BUILD_PROGRAM([matpg],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
+		  ym_libym_tclpp_enable])
+
+# satpg
+YM_BUILD_PROGRAM([satpg],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable,
 		  ym_libym_networks_enable,

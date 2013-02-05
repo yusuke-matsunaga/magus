@@ -40,17 +40,17 @@ PrintFaultCmd::~PrintFaultCmd()
 int
 PrintFaultCmd::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
   if ( objc != 1 ) {
     print_usage();
     return TCL_ERROR;
   }
-  
+
   FaultMgr& fmgr = _fault_mgr();
-  
+
   vector<SaFault*>::const_iterator b = fmgr.remain_list().begin();
   vector<SaFault*>::const_iterator e = fmgr.remain_list().end();
-  
+
   if ( mPoptType->is_specified() ) {
     string tmp = mPoptType->val();
     if ( tmp == "detected" ) {
@@ -74,7 +74,7 @@ PrintFaultCmd::cmd_proc(TclObjVector& objv)
     SaFault* f = *p;
     cout << f->str() << endl;
   }
-  
+
   return TCL_OK;
 }
 

@@ -27,23 +27,25 @@ main(int argc,
   }
   string filename = argv[1];
 
-  try {
-    StreamMsgHandler* msg_handler = new StreamMsgHandler(&cerr);
-    MsgMgr::reg_handler(msg_handler);
-    Iscas89NetworkReader reader;
+  for (ymuint i = 0; i < 2; ++ i) {
+    try {
+      StreamMsgHandler* msg_handler = new StreamMsgHandler(&cerr);
+      MsgMgr::reg_handler(msg_handler);
+      Iscas89NetworkReader reader;
 
-    Iscas89Network network;
+      Iscas89Network network;
 
-    if ( !reader.read(filename, network) ) {
-      cerr << "Error in reading " << filename << endl;
-      return 4;
+      if ( !reader.read(filename, network) ) {
+	cerr << "Error in reading " << filename << endl;
+	return 4;
+      }
+
+      network.write_iscas89(cout);
+
     }
-
-    network.write_iscas89(cout);
-
-  }
-  catch ( const AssertError& x) {
-    cout << x << endl;
+    catch ( const AssertError& x) {
+      cout << x << endl;
+    }
   }
 
   return 0;

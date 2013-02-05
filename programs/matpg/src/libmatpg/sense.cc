@@ -10,13 +10,13 @@
  *
  * Revision 2.2  91/12/28  16:59:19  yusuke
  * Final , Final revision
- * 
+ *
  * Revision 2.1  91/12/26  19:57:47  yusuke
  * Final revision of version 2
- * 
+ *
  * Revision 2.0  91/12/21  18:56:49  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.5  1991/10/05  08:18:18  yusuke
  * add Log and RCSid for RCS
  *
@@ -128,7 +128,7 @@ sensitize(gate_t* f_node)
   if (dfs.empty() || reach_to_po == true) {
     return;
   }
-  
+
   /* mark 'primary path' */
   gn_clr_mark();
   int max_side_val = dfs[0]->lvl_i;
@@ -192,7 +192,7 @@ sensitize(gate_t* f_node)
 	  val3 root_cval = gate->get_c_val();
 #ifndef NAIVE_SENSE
 	  while (root->get_ni() == 1) {
-	    if ( root->get_gtype() == kTgNot ) {
+	    if ( root->get_gtype() == kTgGateNot ) {
 	      root_cval = neg3(root_cval);
 	      root_ncval = neg3(root_ncval);
 	    }
@@ -340,7 +340,7 @@ set_block(gate_t* gate,
 	}
       }
       else {
-	if ( o_gate->get_gtype() == kTgNot ) {
+	if ( o_gate->get_gtype() == kTgGateNot ) {
 	  set_block(o_gate, neg3(cval));
 	}
 	else {

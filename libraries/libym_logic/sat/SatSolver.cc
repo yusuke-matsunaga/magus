@@ -37,10 +37,10 @@ SatSolver::SatSolver(const string& type,
   else {
     SatAnalyzer* analyzer = SaFactory::gen_analyzer(option);
     if ( outp ) {
-      mImpl = new YmSatR(*outp, analyzer);
+      mImpl = new YmSatR(*outp, analyzer, option);
     }
     else {
-      mImpl = new YmSat(analyzer);
+      mImpl = new YmSat(analyzer, option);
     }
   }
 }
@@ -79,9 +79,7 @@ SatSolver::add_clause(const vector<Literal>& lits)
 void
 SatSolver::add_clause(Literal lit1)
 {
-  vector<Literal> tmp(1);
-  tmp[0] = lit1;
-  mImpl->add_clause(tmp);
+  mImpl->add_clause(1, &lit1);
 }
 
 // @brief 2項の節を追加する．
@@ -89,10 +87,8 @@ void
 SatSolver::add_clause(Literal lit1,
 		      Literal lit2)
 {
-  vector<Literal> tmp(2);
-  tmp[0] = lit1;
-  tmp[1] = lit2;
-  mImpl->add_clause(tmp);
+  Literal tmp_lits[2] = {lit1, lit2};
+  mImpl->add_clause(2, tmp_lits);
 }
 
 // @brief 3項の節を追加する．
@@ -101,11 +97,31 @@ SatSolver::add_clause(Literal lit1,
 		      Literal lit2,
 		      Literal lit3)
 {
-  vector<Literal> tmp(3);
-  tmp[0] = lit1;
-  tmp[1] = lit2;
-  tmp[2] = lit3;
-  mImpl->add_clause(tmp);
+  Literal tmp_lits[3] = {lit1, lit2, lit3};
+  mImpl->add_clause(3, tmp_lits);
+}
+
+// @brief 4項の節を追加する．
+void
+SatSolver::add_clause(Literal lit1,
+		      Literal lit2,
+		      Literal lit3,
+		      Literal lit4)
+{
+  Literal tmp_lits[4] = {lit1, lit2, lit3, lit4};
+  mImpl->add_clause(4, tmp_lits);
+}
+
+// @brief 5項の節を追加する．
+void
+SatSolver::add_clause(Literal lit1,
+		      Literal lit2,
+		      Literal lit3,
+		      Literal lit4,
+		      Literal lit5)
+{
+  Literal tmp_lits[5] = {lit1, lit2, lit3, lit4, lit5};
+  mImpl->add_clause(5, tmp_lits);
 }
 
 // @brief SAT 問題を解く．
@@ -133,6 +149,13 @@ SatSolver::solve(const vector<Literal>& assumptions,
 		 vector<Bool3>& model)
 {
   return mImpl->solve(assumptions, model);
+}
+
+// @brief 学習節の整理を行なう．
+void
+SatSolver::reduce_learnt_clause()
+{
+  mImpl->reduce_learnt_clause();
 }
 
 // @brief 現在の内部状態を得る．

@@ -13,7 +13,7 @@
 
 #include "dtpgcl_nsdef.h"
 #include "Val3.h"
-#include "ym_networks/TgGateTemplate.h"
+#include "ym_networks/tgnet.h"
 #include "LqElem.h"
 
 
@@ -32,7 +32,7 @@ class Gate :
 {
   friend class Network;
   friend class SearchMgr;
-  
+
 public:
 
   /// @brief コンストラクタ
@@ -98,11 +98,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   // その他の属性
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief ID番号を得る．
   ymuint
   id() const;
-  
+
   /// @brief ゲート名を得る．
   virtual
   const char*
@@ -112,12 +112,12 @@ public:
   virtual
   tTgGateType
   gate_type() const;
-  
+
   /// @brief 名前とゲート型を表す文字列を返す．
   virtual
   string
   description() const;
-  
+
   /// @brief 外部入力の時 true を返す．
   bool
   is_pi() const;
@@ -131,7 +131,7 @@ public:
   /// @brief 外部出力の時 true を返す．
   bool
   is_po() const;
-  
+
   /// @brief 外部出力でなくす．
   void
   rst_po();
@@ -143,7 +143,7 @@ public:
   /// @brief FOS のゲートの時 true を返す．
   bool
   is_fos() const;
-  
+
   /// @brief レベルを返す．
   ymuint
   level() const;
@@ -167,12 +167,12 @@ public:
   virtual
   Val3
   o_val() const;
-  
+
   /// @brief 非制御出力値を得る．
   Val3
   no_val() const { return ~o_val(); }
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 探索用の値のアクセス関数
@@ -233,7 +233,7 @@ public:
   /// @brief 両方の値を同時にセットし，両方の正当化フラグを立てる．
   void
   set_hjval(Val3 val);
-  
+
   /// @brief 正常値と故障値から mState の値を作る．
   static
   ymuint32
@@ -250,7 +250,7 @@ public:
   Val3
   state2fval(ymuint32 state);
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // Propagation Graph に関する関数
@@ -287,7 +287,7 @@ public:
   /// @brief PG フラグと DIF フラグを下ろす．
   void
   rst_pg_dif();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -301,24 +301,24 @@ public:
   /// @brief マークをつける．
   void
   set_mark();
-  
+
   /// @brief マークを消す．
   void
   rst_mark();
-  
+
   /// @brief フラグをすべて下ろす．
   void
   clr_flag();
-  
+
   /// @brief アクティブなゲートか調べる．
   bool
   is_active() const;
-  
+
   /// @brief 外部出力で正当化されていたら true を返す．
   bool
   chk_POJ() const;
-  
-  /// @brief 基底ノードの時 true を返す． 
+
+  /// @brief 基底ノードの時 true を返す．
   bool
   is_basis() const;
 
@@ -333,7 +333,7 @@ public:
   /// @brief fcone でなくす．
   void
   rst_fcone();
-  
+
   /// @brief lvlq に入っているか調べる．
   bool
   chk_lvlq();
@@ -345,7 +345,7 @@ public:
   /// @brief lvlq マークを消す．
   void
   rst_lvlq();
-  
+
   /// @brief primary path かどうか調べる．
   bool
   chk_ppath() const;
@@ -425,21 +425,21 @@ public:
   /// @brief 0 の設定要求を即正当化できるか調べる．
   bool
   chk_term0() const;
-  
+
   /// @brief 1 の設定要求を即正当化できるか調べる．
   bool
   chk_term1() const;
-  
+
   /// @brief val の設定要求を即正当化できるか調べる．
   bool
   chk_term(Val3 val) const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // testability measure の計算関係の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 可制御性を計算する．
   virtual
   void
@@ -460,118 +460,118 @@ public:
   virtual
   bool
   calc_obs(ymuint ipos) const = 0;
-  
+
   /// @brief 正当化のチェックを行う．
   virtual
   void
   chk_just();
-  
+
   /// @brief 正常値/故障値の含意を行う．
   bool
   imp0_h();
-  
+
   /// @brief 正常値/故障値の含意を行う．
   bool
   imp1_h();
-  
+
   /// @brief 正常値/故障値の含意を行う．
   bool
   imp0_hb();
-  
+
   /// @brief 正常値/故障値の含意を行う．
   bool
   imp1_hb();
-  
+
   /// @brief 正常値の含意を行う．
   bool
   imp0_g();
-  
+
   /// @brief 正常値の含意を行う．
   bool
   imp1_g();
-  
+
   /// @brief 正常値の含意を行う．
   bool
   imp0_gb();
-  
+
   /// @brief 正常値の含意を行う．
   bool
   imp1_gb();
-  
+
   /// @brief 故障値の含意を行う．
   bool
   imp0_f();
-  
+
   /// @brief 故障値の含意を行う．
   bool
   imp1_f();
-  
+
   /// @brief 故障値の含意を行う．
   bool
   imp0_fb();
-  
+
   /// @brief 故障値の含意を行う．
   bool
   imp1_fb();
-  
-  
+
+
 public:
-  
+
   /// @brief 正常値/故障値の前方含意を行う．
   virtual
   bool
   fwd_imp0_h() = 0;
-  
+
   /// @brief 正常値/故障値の前方含意を行う．
   virtual
   bool
   fwd_imp1_h() = 0;
-  
+
   /// @brief 正常値の前方含意を行う．
   virtual
   bool
   fwd_imp0_g() = 0;
-  
+
   /// @brief 正常値の前方含意を行う．
   virtual
   bool
   fwd_imp1_g() = 0;
-  
+
   /// @brief 故障値の前方含意を行う．
   virtual
   bool
   fwd_imp0_f() = 0;
-  
+
   /// @brief 故障値の前方含意を行う．
   virtual
   bool
   fwd_imp1_f() = 0;
-  
+
   /// @brief 正常値/故障値の後方含意を行う．
   virtual
   bool
   bwd_imp0_h() = 0;
-  
+
   /// @brief 正常値/故障値の後方含意を行う．
   virtual
   bool
   bwd_imp1_h() = 0;
-  
+
   /// @brief 正常値の後方含意を行う．
   virtual
   bool
   bwd_imp0_g() = 0;
-  
+
   /// @brief 正常値の後方含意を行う．
   virtual
   bool
   bwd_imp1_g() = 0;
-  
+
   /// @brief 故障値の後方含意を行う．
   virtual
   bool
   bwd_imp0_f() = 0;
-  
+
   /// @brief 故障値の後方含意を行う．
   virtual
   bool
@@ -580,24 +580,24 @@ public:
   /// @brief 論理的に等価なゲートを得る．
   Gate*
   eq_gate() const;
-  
+
   /// @brief 論理的に等価なゲートに含意を行う．
   bool
   eq_imp0();
-  
+
   /// @brief 論理的に等価なゲートに含意を行う．
   bool
   eq_imp1();
-  
-  
+
+
 public:
-  
+
   /// @brief 故障ノードのときに true を返す．
   /// @note デフォルトでは false を返す．
   virtual
   bool
   is_f_site() const;
-  
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -607,8 +607,8 @@ protected:
   /// @brief 外部入力にする．
   void
   set_pi();
-  
-  
+
+
 protected:
   //////////////////////////////////////////////////////////////////////
   // 多入力ゲートの派生クラスが使う関数
@@ -618,7 +618,7 @@ protected:
   void
   set_sorted_pos(ymuint pos,
 		 ymuint s_pos);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -649,7 +649,7 @@ private:
   /// @brief アクティブなファンアウト数を設定する．
   void
   set_act_no(ymuint no);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -678,7 +678,7 @@ private:
 
   /// @brief 基底ノードでなくす．
   void
-  rst_basis(); 
+  rst_basis();
 
 
 private:
@@ -688,16 +688,16 @@ private:
 
   bool
   chk_generic(ymuint32 bitpat) const;
-  
+
   bool
   chk_OR_generic(ymuint32 bitpat) const;
-  
+
   void
   set_generic(ymuint32 bitpat);
-  
+
   void
   rst_generic(ymuint32 bitpat);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -710,13 +710,13 @@ private:
     Gate* mGate;
     ymuint32 mIpos;
   };
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ID 番号
   ymuint32 mId;
 
@@ -728,10 +728,10 @@ private:
 
   // 汎用のマーク用カウンタ
   ymuint32 mMarkCount;
-  
+
   // Fanout Stem のノード
   Gate* mFos;
-  
+
   // ファンイン数
   ymuint32 mNi;
 
@@ -740,7 +740,7 @@ private:
 
   // 優先順位の配列
   ymuint32* mSortedPos;
-  
+
   // ファンアウト数
   ymuint32 mNo;
 
@@ -752,31 +752,31 @@ private:
 
   // アクティブなファンアウトの配列
   Fob* mActFanouts;
-  
+
   // レベル
   ymuint32 mLevel;
-  
+
   // 到達可能な外部出力の最小レベル
   ymuint32 mMinLevel;
-  
+
   // for DTPG
   ymuint32 mState;
-  
+
   // for learning
   Gate* mEqGate;
-  
-  
+
+
 public:
-  
+
   // for unique sensitization
   ymuint32 side_val;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // このクラスに固有の定数
   //////////////////////////////////////////////////////////////////////
-  
+
   static
   const ymuint J_SHIFT = 2;
   static
@@ -785,24 +785,24 @@ private:
   const ymuint P_SHIFT = 6;
   static
   const ymuint D_SHIFT = 7;
-  
+
   static
   const ymuint32 GVAL3_MASK    = (1 << J_SHIFT) - 1;
   static
   const ymuint32 GJ_MASK       = 1 << J_SHIFT;
   static
   const ymuint32 GSTATE_MASK   = GVAL3_MASK | GJ_MASK;
-  
+
   static
   const ymuint32 FVAL3_MASK    = GVAL3_MASK << F_SHIFT;
   static
   const ymuint32 FJ_MASK       = GJ_MASK << F_SHIFT;
   static
   const ymuint32 FSTATE_MASK   = FVAL3_MASK | FJ_MASK;
-  
+
   static
   const ymuint32 J_MASK        = GJ_MASK | FJ_MASK;
-  
+
   static
   const ymuint32 P_MASK        = 1 << P_SHIFT;
   static
@@ -832,14 +832,14 @@ private:
   const ymuint32 GN_cfna1      = 1 << 10;
   static
   const ymuint32 GN_scope      = 1 << 11;
-  
+
   static
   const ymuint32 GN_term0      = GN_cfna0 | GN_const;
   static
   const ymuint32 GN_term1      = GN_cfna1 | GN_const;
 
 };
-  
+
 
 /// @brief mMarkCount 用の変数
 extern
@@ -979,7 +979,7 @@ Gate::set_act_fanout(ymuint pos,
   fob.mGate = output;
   fob.mIpos = ipos;
 }
-  
+
 // @brief ID番号を得る．
 inline
 ymuint
@@ -1011,7 +1011,7 @@ Gate::is_fos() const
 {
   return this == mFos;
 }
-    
+
 // @brief レベルを返す．
 inline
 ymuint
@@ -1250,7 +1250,7 @@ Gate::set_mark()
 {
   mMarkCount = gn_common_count;
 }
-  
+
 // @brief マークを消す．
 inline
 void
@@ -1258,7 +1258,7 @@ Gate::rst_mark()
 {
   mMarkCount = 0;
 }
-  
+
 // @brief フラグをすべて下ろす．
 inline
 void
@@ -1266,7 +1266,7 @@ Gate::clr_flag()
 {
   mFlags = 0;
 }
-  
+
 // @brief アクティブなゲートか調べる．
 inline
 bool
@@ -1298,7 +1298,7 @@ Gate::is_pi() const
 {
   return chk_generic(GN_PI);
 }
-  
+
 // @brief 外部入力にする．
 inline
 void
@@ -1314,7 +1314,7 @@ Gate::is_po() const
 {
   return chk_generic(GN_PO);
 }
-  
+
 // @brief 外部出力にする．
 inline
 void
@@ -1322,7 +1322,7 @@ Gate::set_po()
 {
   set_generic(GN_PO);
 }
-  
+
 // @brief 外部出力でなくす．
 inline
 void
@@ -1330,7 +1330,7 @@ Gate::rst_po()
 {
   rst_generic(GN_PO);
 }
-  
+
 // @brief 外部出力で正当化されていたら true を返す．
 inline
 bool
@@ -1338,7 +1338,7 @@ Gate::chk_POJ() const
 {
   return is_po() && ((mState & J_MASK) == J_MASK);
 }
-  
+
 // @brief 基底ノードの時 true を返す．
 inline
 bool
@@ -1386,7 +1386,7 @@ Gate::rst_fcone()
 {
   rst_generic(GN_fcone);
 }
-  
+
 // @brief lvlq に入っているか調べる．
 inline
 bool
@@ -1583,7 +1583,7 @@ Gate::chk_term1() const
 {
   return chk_OR_generic(GN_term1) && !chk_generic(GN_fcone);
 }
-  
+
 // @brief val の設定要求を即正当化できるか調べる．
 inline
 bool

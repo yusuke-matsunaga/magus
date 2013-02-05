@@ -41,18 +41,18 @@ PrintPatCmd::~PrintPatCmd()
 int
 PrintPatCmd::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
   if ( objc != 1 ) {
     print_usage();
     return TCL_ERROR;
   }
-  
+
   bool hex_flag = mPoptHex->is_specified();
   bool num_flag = mPoptNum->is_specified();
 
   vector<TestVector*>& tvlist = mgr()._tv_list();
-  size_t n = tvlist.size();
-  for (size_t i = 0; i < n; ++ i) {
+  ymuint n = tvlist.size();
+  for (ymuint i = 0; i < n; ++ i) {
     TestVector* tv = tvlist[i];
     if ( num_flag ) {
       cout << setw(5) << setfill('0') << (i + 1) << ": ";
@@ -65,7 +65,7 @@ PrintPatCmd::cmd_proc(TclObjVector& objv)
     }
     cout << endl;
   }
-  
+
   return TCL_OK;
 }
 

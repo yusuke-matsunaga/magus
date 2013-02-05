@@ -10,7 +10,7 @@
  *
  * Revision 2.0  91/12/21  18:57:52  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.7  1991/10/15  03:12:17  yusuke
  * *** empty log message ***
  *
@@ -92,7 +92,7 @@ void
 t_analyze()
 {
   size_t nn = gn_get_ngate();
-  
+
   c0_array.clear();
   c0_array.resize(nn, 0);
   c1_array.clear();
@@ -126,7 +126,7 @@ t_analyze()
       set_ob(gate, 0);
       continue;
     }
-    
+
     vector<ymuint> obs(no);
     obs[0] = gate->get_fogate(0)->calc_O(gate->get_fogate_ipos(0));
     for (size_t j = 1; j < no; ++ j) {
@@ -276,7 +276,7 @@ SIMPLE_gate_t::calc_C()
 	  int pos2 = get_sorted_pos(k);
 	  set_sorted_pos(k, pos);
 	  pos = pos2;
-	}	
+	}
       }
     }
     min_0 = get_c0(get_sorted_figate(0));
@@ -299,7 +299,7 @@ SIMPLE_gate_t::calc_C()
 	  int pos2 = get_sorted_pos(k);
 	  set_sorted_pos(k, pos);
 	  pos = pos2;
-	}	
+	}
       }
     }
     min_0 = get_c1(get_sorted_figate(0));
@@ -380,7 +380,7 @@ XOR_gate_t::calc_C()
       }
     }
   }
-  if ( get_gtype() == kTgXor ) {
+  if ( get_gtype() == kTgGateXor ) {
     set_c0(this, min_0);
     set_c1(this, min_1);
   }
@@ -422,7 +422,7 @@ XOR_gate_t::calc_O(int pos)
       min_ob = sum;
     }
   }
-  
+
 #ifdef DEBUG
   fprintf(stderr, "%s::calc_O(%d) = %d\n",
 	  get_name(), pos, min_ob + get_ob(this));

@@ -10,7 +10,6 @@
 
 
 #include "ym_networks/tgnet.h"
-#include "ym_networks/TgGateTemplate.h"
 #include "ym_logic/LogExpr.h"
 #include "ym_logic/TvFunc.h"
 
@@ -20,6 +19,12 @@ BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 //////////////////////////////////////////////////////////////////////
 /// @class LogicMgr LogicMgr.h "LogicMgr.h"
 /// @brief logic ノードのタイプ番号を管理するクラス
+///
+/// 論理式を登録するが，内部で論理関数に変換している．
+/// 同一の論理関数を表す論理式が登録された場合には
+/// リテラル数の少ない論理式を記録する．
+/// BUF/NOTAND/NAND/OR/NOR/XOR/XNOR の関数はハッシュを調べる前に
+/// 決められたID番号を返す．
 //////////////////////////////////////////////////////////////////////
 class LogicMgr
 {
@@ -33,38 +38,42 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化する．
+  /// @note 登録されている関数がない状態になる．
   void
   clear();
 
   /// @brief 新しい論理式を登録する．
   /// @param[in] lexp 論理式
-  /// @return ゲートの型を返す．
-  TgGateTemplate
-  reg_logic(const LogExpr& lexp);
+  /// @param[out] id kTgGateCplx の場合はID番号を格納する．
+  /// @return 論理関数の型を返す．
+  tTgGateType
+  reg_logic(const LogExpr& lexp,
+	    ymuint32& id);
 
   /// @brief 登録されている論理式の数を返す．
-  ymuint
-  num() const;
+  ymuint32
+  logic_num() const;
 
-  /// @brief 論理式を取り出す．
-  /// @param[in] gt_id ゲートテンプレート
+  /// @brief 論理式を返す．
+  /// @param[in] id ID番号 ( 0 <= id < logic_num() )
   LogExpr
-  get(TgGateTemplate gt_id) const;
+  get_expr(ymuint32 id) const;
 
-
-public:
-
-  /// @brief デバッグ用の関数
-  /// @param[in] s 出力先のストリーム
-  void
-  dump(ostream& s) const;
+  /// @brief 論理関数を返す．
+  /// @param[in] id ID番号 ( 0 <= id < logic_num() )
+  const TvFunc&
+  get_func(ymuint32 id) const;
 
 
 private:
-
-  class Cell;
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   // ハッシュ表を拡大して再ハッシュする．
   void
@@ -84,7 +93,7 @@ private:
   struct Cell
   {
     // ID番号
-    TgGateTemplate mId;
+    ymuint32 mId;
 
     // 論理式
     LogExpr mLexp;
@@ -106,10 +115,6 @@ private:
   static
   const double kHashCapacity = 1.8;
 
-  // 一般の論理関数のオフセット値
-  static
-  const ymuint32 kBase = static_cast<ymuint32>(kTgUsrDef);
-
   // Cell の配列
   vector<Cell*> mCellArray;
 
@@ -123,6 +128,39 @@ private:
   ymuint32 mNextLimit;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 登録されている論理式の数を返す．
+inline
+ymuint
+LogicMgr::logic_num() const
+{
+  return mCellArray.size();
+}
+
+// @brief 論理式を返す．
+// @param[in] id ID番号 ( 0 <= id < logic_num() )
+inline
+LogExpr
+LogicMgr::get_expr(ymuint32 id) const
+{
+  assert_cond( id < logic_num(), __FILE__, __LINE__);
+  return mCellArray[id]->mLexp;
+}
+
+// @brief 論理関数を返す．
+// @param[in] id ID番号 ( 0 <= id < logic_num() )
+inline
+const TvFunc&
+LogicMgr::get_func(ymuint32 id) const
+{
+  assert_cond( id < logic_num(), __FILE__, __LINE__);
+  return mCellArray[id]->mTvFunc;
+}
 
 END_NAMESPACE_YM_NETWORKS_TGNET
 

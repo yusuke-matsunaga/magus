@@ -34,15 +34,15 @@ public:
 
 
 public:
-  
+
   virtual
   bool
   is_f_site() const;
-  
+
   virtual
   void
   calc_C();
-  
+
   virtual
   ymuint
   calc_O(ymuint pos);
@@ -51,19 +51,19 @@ public:
   virtual
   bool
   calc_obs(ymuint ipos) const;
-  
+
   virtual
   bool
   fwd_imp0_h();
-  
+
   virtual
   bool
   fwd_imp1_h();
-  
+
   virtual
   bool
   fwd_imp0_g();
-  
+
   virtual
   bool
   fwd_imp1_g();
@@ -75,19 +75,19 @@ public:
   virtual
   bool
   bwd_imp1_h();
-  
+
   virtual
   bool
   bwd_imp0_g();
-  
+
   virtual
   bool
   bwd_imp1_g();
-  
+
   virtual
   bool
   bwd_imp0_f();
-  
+
   virtual
   bool
   bwd_imp1_f();
@@ -103,24 +103,24 @@ class GateSa0 :
   public GateSa
 {
 public:
-  
+
   virtual
   const char*
   name() const;
-  
+
   virtual
   tTgGateType
   gate_type() const;
-  
+
   /// @brief 名前とゲート型を表す文字列を返す．
   virtual
   string
   description() const;
-  
+
   virtual
   bool
   fwd_imp0_f();
-  
+
   virtual
   bool
   fwd_imp1_f();
@@ -140,24 +140,24 @@ public:
   virtual
   const char*
   name() const;
-  
+
   virtual
   tTgGateType
   gate_type() const;
-  
+
   /// @brief 名前とゲート型を表す文字列を返す．
   virtual
   string
   description() const;
-  
+
   virtual
   bool
   fwd_imp0_f();
-  
+
   virtual
   bool
   fwd_imp1_f();
-  
+
 };
 
 END_NAMESPACE_YM_ATPG_DTPGCL

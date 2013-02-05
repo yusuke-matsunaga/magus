@@ -24,7 +24,7 @@ class GateOr :
   public Gate
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] id ゲートID
   /// @param[in] node 元のノード
@@ -32,42 +32,42 @@ public:
   GateOr(ymuint id,
 	 const TgNode* node,
 	 ymuint ni);
-  
+
   /// @brief デストラクタ
   virtual
   ~GateOr();
 
 
 public:
-  
+
   virtual
   bool
   calc_obs(ymuint ipos) const;
-  
+
   virtual
   tTgGateType
   gate_type() const;
-  
+
   virtual
   bool
   fwd_imp0_h();
-  
+
   virtual
   bool
   fwd_imp1_h();
-  
+
   virtual
   bool
   fwd_imp0_g();
-  
+
   virtual
   bool
   fwd_imp1_g();
-  
+
   virtual
   bool
   fwd_imp0_f();
-  
+
   virtual
   bool
   fwd_imp1_f();
@@ -79,39 +79,39 @@ public:
   virtual
   bool
   bwd_imp1_h();
-  
+
   virtual
   bool
   bwd_imp0_g();
-  
+
   virtual
   bool
   bwd_imp1_g();
-  
+
   virtual
   bool
   bwd_imp0_f();
-  
+
   virtual
   bool
   bwd_imp1_f();
-  
+
   /// @brief 正常値/故障値の後方含意を行う．
   bool
   check_last_h();
-  
+
   /// @brief 正常値の後方含意を行う．
   bool
   check_last_g();
-  
+
   /// @brief 故障値の後方含意を行う．
   bool
   check_last_f();
-    
+
   virtual
   void
   calc_C();
-  
+
   virtual
   ymuint
   calc_O(ymuint pos);
@@ -123,14 +123,14 @@ public:
   virtual
   Val3
   o_val() const;
-  
-  
+
+
 protected:
-  
+
   void
   calc_C_sub(ymuint& sum_0,
 	     ymuint& min_1);
-  
+
 };
 
 
@@ -142,7 +142,7 @@ class GateNor :
   public GateOr
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] id ゲートID
   /// @param[in] node 元のノード
@@ -150,38 +150,38 @@ public:
   GateNor(ymuint id,
 	  const TgNode* node,
 	  ymuint ni);
-  
+
   /// @brief デストラクタ
   virtual
   ~GateNor();
 
 
 public:
-  
+
   virtual
   tTgGateType
   gate_type() const;
-  
+
   virtual
   bool
   fwd_imp0_h();
-  
+
   virtual
   bool
   fwd_imp1_h();
-  
+
   virtual
   bool
   fwd_imp0_g();
-  
+
   virtual
   bool
   fwd_imp1_g();
-  
+
   virtual
   bool
   fwd_imp0_f();
-  
+
   virtual
   bool
   fwd_imp1_f();
@@ -193,27 +193,27 @@ public:
   virtual
   bool
   bwd_imp1_h();
-  
+
   virtual
   bool
   bwd_imp0_g();
-  
+
   virtual
   bool
   bwd_imp1_g();
-  
+
   virtual
   bool
   bwd_imp0_f();
-  
+
   virtual
   bool
   bwd_imp1_f();
-    
+
   virtual
   void
   calc_C();
-  
+
   virtual
   ymuint
   calc_O(ymuint pos);
@@ -221,7 +221,7 @@ public:
   virtual
   Val3
   o_val() const;
-  
+
 };
 
 END_NAMESPACE_YM_ATPG_DTPGCL

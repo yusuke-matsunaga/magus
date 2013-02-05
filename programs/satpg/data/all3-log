@@ -1,0 +1,1281 @@
+
+~/share/data/MCNC.blifdata/C432.blif
+
+# of runs:                     7
+# of problems:                 524
+Ave. # of restarts:            0.994275
+Ave. # of variables:           345.571
+Ave. # of constraint clauses:  779.714
+Ave. # of constraint literals: 2005
+Ave. # of learnt clauses:      26.5714
+Ave. # of learnt literals:     142
+Ave. # of conflicts:           0.360687
+Ave. # of decisions:           21.7634
+Ave. # of implications:        418.208
+# of runs:                     4
+# of problems:                 6
+Ave. # of restarts:            0.833333
+Ave. # of variables:           193
+Ave. # of constraint clauses:  504
+Ave. # of constraint literals: 1242.75
+Ave. # of learnt clauses:      15.75
+Ave. # of learnt literals:     88.5
+Ave. # of conflicts:           11
+Ave. # of decisions:           50
+Ave. # of implications:        559
+
+~/share/data/MCNC.blifdata/C432.blif ***mffc_po_skip*** results
+#A: # of total faults       =     524
+#B: # of detected faults    =     520
+#C: # of redundant faults   =       4
+#D: # of undetected faults  =       0
+#E: # of generated patterns =     520
+#F:   Total CPU time        =    0.01u    0.00s
+#G:    (read time           =    0.00)
+#H:    (dtpg time           =    0.01)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/MCNC.blifdata/C499.blif
+
+# of runs:                     32
+# of problems:                 758
+Ave. # of restarts:            0.996042
+Ave. # of variables:           206.438
+Ave. # of constraint clauses:  511.438
+Ave. # of constraint literals: 1438.44
+Ave. # of learnt clauses:      100.406
+Ave. # of learnt literals:     1088.25
+Ave. # of conflicts:           8.76253
+Ave. # of decisions:           49.0475
+Ave. # of implications:        1136.21
+# of runs:                     2
+# of problems:                 26
+Ave. # of restarts:            0.692308
+Ave. # of variables:           338
+Ave. # of constraint clauses:  1063
+Ave. # of constraint literals: 2911
+Ave. # of learnt clauses:      19
+Ave. # of learnt literals:     166
+Ave. # of conflicts:           1.46154
+Ave. # of decisions:           27.8462
+Ave. # of implications:        316.308
+
+~/share/data/MCNC.blifdata/C499.blif ***mffc_po_skip*** results
+#A: # of total faults       =     758
+#B: # of detected faults    =     750
+#C: # of redundant faults   =       8
+#D: # of undetected faults  =       0
+#E: # of generated patterns =     750
+#F:   Total CPU time        =    0.10u    0.00s
+#G:    (read time           =    0.01)
+#H:    (dtpg time           =    0.09)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/MCNC.blifdata/C880.blif
+
+# of runs:                     26
+# of problems:                 942
+Ave. # of restarts:            1
+Ave. # of variables:           160.462
+Ave. # of constraint clauses:  351.115
+Ave. # of constraint literals: 895.692
+Ave. # of learnt clauses:      5.76923
+Ave. # of learnt literals:     25.7692
+Ave. # of conflicts:           0.159236
+Ave. # of decisions:           18.1115
+Ave. # of implications:        315.925
+
+~/share/data/MCNC.blifdata/C880.blif ***mffc_po_skip*** results
+#A: # of total faults       =     942
+#B: # of detected faults    =     942
+#C: # of redundant faults   =       0
+#D: # of undetected faults  =       0
+#E: # of generated patterns =     942
+#F:   Total CPU time        =    0.02u    0.00s
+#G:    (read time           =    0.00)
+#H:    (dtpg time           =    0.02)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/MCNC.blifdata/C1355.blif
+
+# of runs:                     32
+# of problems:                 1574
+Ave. # of restarts:            0.988564
+Ave. # of variables:           498.938
+Ave. # of constraint clauses:  1255.69
+Ave. # of constraint literals: 3029.72
+Ave. # of learnt clauses:      137.156
+Ave. # of learnt literals:     847.625
+Ave. # of conflicts:           3.85959
+Ave. # of decisions:           47.4098
+Ave. # of implications:        2666.78
+# of runs:                     2
+# of problems:                 26
+Ave. # of restarts:            0.692308
+Ave. # of variables:           746
+Ave. # of constraint clauses:  2279
+Ave. # of constraint literals: 5631
+Ave. # of learnt clauses:      104
+Ave. # of learnt literals:     413
+Ave. # of conflicts:           8
+Ave. # of decisions:           65.3846
+Ave. # of implications:        1451.77
+
+~/share/data/MCNC.blifdata/C1355.blif ***mffc_po_skip*** results
+#A: # of total faults       =    1574
+#B: # of detected faults    =    1566
+#C: # of redundant faults   =       8
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    1566
+#F:   Total CPU time        =    0.37u    0.00s
+#G:    (read time           =    0.00)
+#H:    (dtpg time           =    0.37)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/MCNC.blifdata/C1908.blif
+
+# of runs:                     25
+# of problems:                 1879
+Ave. # of restarts:            0.965939
+Ave. # of variables:           735.04
+Ave. # of constraint clauses:  1707.44
+Ave. # of constraint literals: 3993.04
+Ave. # of learnt clauses:      64.44
+Ave. # of learnt literals:     681.72
+Ave. # of conflicts:           0.878127
+Ave. # of decisions:           24.4657
+Ave. # of implications:        2050.53
+# of runs:                     20
+# of problems:                 66
+Ave. # of restarts:            0.878788
+Ave. # of variables:           1041.5
+Ave. # of constraint clauses:  3039.95
+Ave. # of constraint literals: 7282.1
+Ave. # of learnt clauses:      10.1
+Ave. # of learnt literals:     53.5
+Ave. # of conflicts:           3.07576
+Ave. # of decisions:           31.3333
+Ave. # of implications:        1225.24
+
+~/share/data/MCNC.blifdata/C1908.blif ***mffc_po_skip*** results
+#A: # of total faults       =    1879
+#B: # of detected faults    =    1870
+#C: # of redundant faults   =       9
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    1870
+#F:   Total CPU time        =    0.31u    0.00s
+#G:    (read time           =    0.00)
+#H:    (dtpg time           =    0.30)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.01)
+
+~/share/data/MCNC.blifdata/C2670.blif
+
+# of runs:                     140
+# of problems:                 2747
+Ave. # of restarts:            0.959956
+Ave. # of variables:           99.0571
+Ave. # of constraint clauses:  224.671
+Ave. # of constraint literals: 566.907
+Ave. # of learnt clauses:      7.85
+Ave. # of learnt literals:     95.8643
+Ave. # of conflicts:           0.609392
+Ave. # of decisions:           39.289
+Ave. # of implications:        938.701
+# of runs:                     13
+# of problems:                 117
+Ave. # of restarts:            0.196581
+Ave. # of variables:           807.462
+Ave. # of constraint clauses:  2092.85
+Ave. # of constraint literals: 4939.92
+Ave. # of learnt clauses:      42.0769
+Ave. # of learnt literals:     428.692
+Ave. # of conflicts:           9.49573
+Ave. # of decisions:           23.3504
+Ave. # of implications:        1046.16
+
+~/share/data/MCNC.blifdata/C2670.blif ***mffc_po_skip*** results
+#A: # of total faults       =    2747
+#B: # of detected faults    =    2630
+#C: # of redundant faults   =     117
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    2630
+#F:   Total CPU time        =    0.21u    0.01s
+#G:    (read time           =    0.00)
+#H:    (dtpg time           =    0.21)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/MCNC.blifdata/C3540.blif
+
+# of runs:                     22
+# of problems:                 3428
+Ave. # of restarts:            0.934072
+Ave. # of variables:           1000
+Ave. # of constraint clauses:  2463.59
+Ave. # of constraint literals: 6016.5
+Ave. # of learnt clauses:      129.182
+Ave. # of learnt literals:     1337.45
+Ave. # of conflicts:           0.831972
+Ave. # of decisions:           27.5175
+Ave. # of implications:        1195.95
+# of runs:                     73
+# of problems:                 235
+Ave. # of restarts:            0.459574
+Ave. # of variables:           1664.03
+Ave. # of constraint clauses:  4801.89
+Ave. # of constraint literals: 11385.7
+Ave. # of learnt clauses:      16.2466
+Ave. # of learnt literals:     210.493
+Ave. # of conflicts:           5.10638
+Ave. # of decisions:           31.8766
+Ave. # of implications:        2575.31
+
+~/share/data/MCNC.blifdata/C3540.blif ***mffc_po_skip*** results
+#A: # of total faults       =    3428
+#B: # of detected faults    =    3291
+#C: # of redundant faults   =     137
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    3291
+#F:   Total CPU time        =    0.41u    0.00s
+#G:    (read time           =    0.01)
+#H:    (dtpg time           =    0.39)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/MCNC.blifdata/C5315.blif
+
+# of runs:                     123
+# of problems:                 5350
+Ave. # of restarts:            0.988411
+Ave. # of variables:           280.764
+Ave. # of constraint clauses:  641.285
+Ave. # of constraint literals: 1568.38
+Ave. # of learnt clauses:      23.5285
+Ave. # of learnt literals:     153.016
+Ave. # of conflicts:           0.562243
+Ave. # of decisions:           23.9561
+Ave. # of implications:        994.3
+# of runs:                     22
+# of problems:                 64
+Ave. # of restarts:            0.09375
+Ave. # of variables:           452.409
+Ave. # of constraint clauses:  1253.32
+Ave. # of constraint literals: 2985.32
+Ave. # of learnt clauses:      0.318182
+Ave. # of learnt literals:     1.45455
+Ave. # of conflicts:           0.125
+Ave. # of decisions:           1.04688
+Ave. # of implications:        55.5312
+
+~/share/data/MCNC.blifdata/C5315.blif ***mffc_po_skip*** results
+#A: # of total faults       =    5350
+#B: # of detected faults    =    5291
+#C: # of redundant faults   =      59
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    5291
+#F:   Total CPU time        =    0.42u    0.00s
+#G:    (read time           =    0.01)
+#H:    (dtpg time           =    0.41)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/MCNC.blifdata/C6288.blif
+
+# of runs:                     32
+# of problems:                 7744
+Ave. # of restarts:            1.02479
+Ave. # of variables:           1862.19
+Ave. # of constraint clauses:  4913.03
+Ave. # of constraint literals: 11913.7
+Ave. # of learnt clauses:      988.281
+Ave. # of learnt literals:     5628.22
+Ave. # of conflicts:           19.7186
+Ave. # of decisions:           78.0797
+Ave. # of implications:        7540.14
+# of runs:                     20
+# of problems:                 37
+Ave. # of restarts:            0.0810811
+Ave. # of variables:           3916.9
+Ave. # of constraint clauses:  13107.5
+Ave. # of constraint literals: 32881.2
+Ave. # of learnt clauses:      0.05
+Ave. # of learnt literals:     0.25
+Ave. # of conflicts:           0.027027
+Ave. # of decisions:           3.35135
+Ave. # of implications:        206.243
+
+~/share/data/MCNC.blifdata/C6288.blif ***mffc_po_skip*** results
+#A: # of total faults       =    7744
+#B: # of detected faults    =    7710
+#C: # of redundant faults   =      34
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    7710
+#F:   Total CPU time        =    5.66u    0.00s
+#G:    (read time           =    0.01)
+#H:    (dtpg time           =    5.65)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/MCNC.blifdata/C7552.blif
+
+# of runs:                     108
+# of problems:                 7550
+Ave. # of restarts:            0.978278
+Ave. # of variables:           412.824
+Ave. # of constraint clauses:  939.426
+Ave. # of constraint literals: 2316.45
+Ave. # of learnt clauses:      42.3519
+Ave. # of learnt literals:     470.593
+Ave. # of conflicts:           0.748477
+Ave. # of decisions:           57.8574
+Ave. # of implications:        1695.88
+# of runs:                     94
+# of problems:                 176
+Ave. # of restarts:            0.465909
+Ave. # of variables:           1500.32
+Ave. # of constraint clauses:  4079.7
+Ave. # of constraint literals: 9702.66
+Ave. # of learnt clauses:      8.03191
+Ave. # of learnt literals:     39.7447
+Ave. # of conflicts:           4.51705
+Ave. # of decisions:           78.5511
+Ave. # of implications:        1323.14
+
+~/share/data/MCNC.blifdata/C7552.blif ***mffc_po_skip*** results
+#A: # of total faults       =    7550
+#B: # of detected faults    =    7419
+#C: # of redundant faults   =     131
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    7419
+#F:   Total CPU time        =    1.04u    0.00s
+#G:    (read time           =    0.02)
+#H:    (dtpg time           =    1.02)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/ISCAS.s/COMBI/s1196.blif
+
+# of runs:                     32
+# of problems:                 1242
+Ave. # of restarts:            0.954911
+Ave. # of variables:           192.031
+Ave. # of constraint clauses:  440
+Ave. # of constraint literals: 1095.53
+Ave. # of learnt clauses:      6.15625
+Ave. # of learnt literals:     34.0625
+Ave. # of conflicts:           0.15942
+Ave. # of decisions:           7.49839
+Ave. # of implications:        256.279
+# of runs:                     10
+# of problems:                 57
+Ave. # of restarts:            1
+Ave. # of variables:           472.7
+Ave. # of constraint clauses:  1383.3
+Ave. # of constraint literals: 3333.2
+Ave. # of learnt clauses:      5.7
+Ave. # of learnt literals:     38.5
+Ave. # of conflicts:           1
+Ave. # of decisions:           17.8772
+Ave. # of implications:        595.614
+
+~/share/data/ISCAS.s/COMBI/s1196.blif ***mffc_po_skip*** results
+#A: # of total faults       =    1242
+#B: # of detected faults    =    1242
+#C: # of redundant faults   =       0
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    1242
+#F:   Total CPU time        =    0.03u    0.00s
+#G:    (read time           =    0.00)
+#H:    (dtpg time           =    0.03)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/ISCAS.s/COMBI/s1238.blif
+
+# of runs:                     32
+# of problems:                 1355
+Ave. # of restarts:            0.920295
+Ave. # of variables:           201.875
+Ave. # of constraint clauses:  466.375
+Ave. # of constraint literals: 1166.03
+Ave. # of learnt clauses:      8.6875
+Ave. # of learnt literals:     56.3438
+Ave. # of conflicts:           0.214022
+Ave. # of decisions:           7.32399
+Ave. # of implications:        274.325
+# of runs:                     32
+# of problems:                 120
+Ave. # of restarts:            0.575
+Ave. # of variables:           343.375
+Ave. # of constraint clauses:  1011.06
+Ave. # of constraint literals: 2438.16
+Ave. # of learnt clauses:      5.34375
+Ave. # of learnt literals:     31.8125
+Ave. # of conflicts:           1.59167
+Ave. # of decisions:           8.1
+Ave. # of implications:        392.275
+
+~/share/data/ISCAS.s/COMBI/s1238.blif ***mffc_po_skip*** results
+#A: # of total faults       =    1355
+#B: # of detected faults    =    1286
+#C: # of redundant faults   =      69
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    1286
+#F:   Total CPU time        =    0.04u    0.00s
+#G:    (read time           =    0.00)
+#H:    (dtpg time           =    0.04)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/ISCAS.s/COMBI/s1423.blif
+
+# of runs:                     79
+# of problems:                 1515
+Ave. # of restarts:            0.984158
+Ave. # of variables:           166.962
+Ave. # of constraint clauses:  351.354
+Ave. # of constraint literals: 846.405
+Ave. # of learnt clauses:      3.01266
+Ave. # of learnt literals:     9.18987
+Ave. # of conflicts:           0.157096
+Ave. # of decisions:           20.4251
+Ave. # of implications:        218.18
+# of runs:                     19
+# of problems:                 24
+Ave. # of restarts:            0.416667
+Ave. # of variables:           515.895
+Ave. # of constraint clauses:  1520.68
+Ave. # of constraint literals: 3777.89
+Ave. # of learnt clauses:      0.105263
+Ave. # of learnt literals:     0.894737
+Ave. # of conflicts:           0.0833333
+Ave. # of decisions:           21.5417
+Ave. # of implications:        323.167
+
+~/share/data/ISCAS.s/COMBI/s1423.blif ***mffc_po_skip*** results
+#A: # of total faults       =    1515
+#B: # of detected faults    =    1501
+#C: # of redundant faults   =      14
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    1501
+#F:   Total CPU time        =    0.04u    0.00s
+#G:    (read time           =    0.01)
+#H:    (dtpg time           =    0.03)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/ISCAS.s/COMBI/s1488.blif
+
+# of runs:                     25
+# of problems:                 1486
+Ave. # of restarts:            0.999327
+Ave. # of variables:           229.96
+Ave. # of constraint clauses:  524.08
+Ave. # of constraint literals: 1341.16
+Ave. # of learnt clauses:      4.12
+Ave. # of learnt literals:     15.76
+Ave. # of conflicts:           0.0693136
+Ave. # of decisions:           5.09287
+Ave. # of implications:        278.501
+# of runs:                     1
+# of problems:                 1
+Ave. # of restarts:            1
+Ave. # of variables:           142
+Ave. # of constraint clauses:  414
+Ave. # of constraint literals: 1003
+Ave. # of learnt clauses:      2
+Ave. # of learnt literals:     10
+Ave. # of conflicts:           2
+Ave. # of decisions:           6
+Ave. # of implications:        242
+
+~/share/data/ISCAS.s/COMBI/s1488.blif ***mffc_po_skip*** results
+#A: # of total faults       =    1486
+#B: # of detected faults    =    1486
+#C: # of redundant faults   =       0
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    1486
+#F:   Total CPU time        =    0.02u    0.01s
+#G:    (read time           =    0.00)
+#H:    (dtpg time           =    0.02)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/ISCAS.s/COMBI/s1494.blif
+
+# of runs:                     25
+# of problems:                 1506
+Ave. # of restarts:            0.991368
+Ave. # of variables:           231.64
+Ave. # of constraint clauses:  528.08
+Ave. # of constraint literals: 1352.32
+Ave. # of learnt clauses:      3.6
+Ave. # of learnt literals:     13.28
+Ave. # of conflicts:           0.059761
+Ave. # of decisions:           5.09562
+Ave. # of implications:        280.203
+# of runs:                     8
+# of problems:                 13
+Ave. # of restarts:            0.0769231
+Ave. # of variables:           103.25
+Ave. # of constraint clauses:  285.875
+Ave. # of constraint literals: 693.375
+Ave. # of learnt clauses:      0.25
+Ave. # of learnt literals:     1.25
+Ave. # of conflicts:           0.153846
+Ave. # of decisions:           0.461538
+Ave. # of implications:        84.3846
+
+~/share/data/ISCAS.s/COMBI/s1494.blif ***mffc_po_skip*** results
+#A: # of total faults       =    1506
+#B: # of detected faults    =    1494
+#C: # of redundant faults   =      12
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    1494
+#F:   Total CPU time        =    0.04u    0.00s
+#G:    (read time           =    0.01)
+#H:    (dtpg time           =    0.03)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/ISCAS.s/COMBI/s5378.blif
+
+# of runs:                     213
+# of problems:                 4437
+Ave. # of restarts:            0.914131
+Ave. # of variables:           145.225
+Ave. # of constraint clauses:  318.39
+Ave. # of constraint literals: 765.934
+Ave. # of learnt clauses:      1.23005
+Ave. # of learnt literals:     9.13615
+Ave. # of conflicts:           0.0610773
+Ave. # of decisions:           6.48704
+Ave. # of implications:        322.189
+# of runs:                     50
+# of problems:                 387
+Ave. # of restarts:            0.896641
+Ave. # of variables:           512.18
+Ave. # of constraint clauses:  1323.96
+Ave. # of constraint literals: 3126.42
+Ave. # of learnt clauses:      1.92
+Ave. # of learnt literals:     19.34
+Ave. # of conflicts:           0.268734
+Ave. # of decisions:           42.3669
+Ave. # of implications:        1231.66
+
+~/share/data/ISCAS.s/COMBI/s5378.blif ***mffc_po_skip*** results
+#A: # of total faults       =    4437
+#B: # of detected faults    =    4397
+#C: # of redundant faults   =      40
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    4397
+#F:   Total CPU time        =    0.15u    0.00s
+#G:    (read time           =    0.02)
+#H:    (dtpg time           =    0.13)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/ISCAS.s/COMBI/s9234.blif
+
+# of runs:                     250
+# of problems:                 6927
+Ave. # of restarts:            0.907608
+Ave. # of variables:           200.892
+Ave. # of constraint clauses:  451.86
+Ave. # of constraint literals: 1087.54
+Ave. # of learnt clauses:      8.424
+Ave. # of learnt literals:     44.236
+Ave. # of conflicts:           0.313844
+Ave. # of decisions:           20.0723
+Ave. # of implications:        798.712
+# of runs:                     172
+# of problems:                 708
+Ave. # of restarts:            0.468927
+Ave. # of variables:           1498.62
+Ave. # of constraint clauses:  3916.63
+Ave. # of constraint literals: 9108.93
+Ave. # of learnt clauses:      7.31395
+Ave. # of learnt literals:     43.657
+Ave. # of conflicts:           1.88559
+Ave. # of decisions:           54
+Ave. # of implications:        1620.87
+
+~/share/data/ISCAS.s/COMBI/s9234.blif ***mffc_po_skip*** results
+#A: # of total faults       =    6927
+#B: # of detected faults    =    6475
+#C: # of redundant faults   =     452
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    6475
+#F:   Total CPU time        =    0.55u    0.00s
+#G:    (read time           =    0.03)
+#H:    (dtpg time           =    0.52)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/ISCAS.s/COMBI/s13207.blif
+
+# of runs:                     790
+# of problems:                 9759
+Ave. # of restarts:            0.981863
+Ave. # of variables:           82.8785
+Ave. # of constraint clauses:  189.511
+Ave. # of constraint literals: 463.653
+Ave. # of learnt clauses:      1.25823
+Ave. # of learnt literals:     11.0354
+Ave. # of conflicts:           0.104929
+Ave. # of decisions:           9.67886
+Ave. # of implications:        383.063
+# of runs:                     106
+# of problems:                 203
+Ave. # of restarts:            0.418719
+Ave. # of variables:           1089.73
+Ave. # of constraint clauses:  3057.62
+Ave. # of constraint literals: 7377.01
+Ave. # of learnt clauses:      3.82075
+Ave. # of learnt literals:     33.7453
+Ave. # of conflicts:           2.17734
+Ave. # of decisions:           56.6749
+Ave. # of implications:        1510.31
+
+~/share/data/ISCAS.s/COMBI/s13207.blif ***mffc_po_skip*** results
+#A: # of total faults       =    9759
+#B: # of detected faults    =    9608
+#C: # of redundant faults   =     151
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    9608
+#F:   Total CPU time        =    0.39u    0.01s
+#G:    (read time           =    0.04)
+#H:    (dtpg time           =    0.35)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/ISCAS.s/COMBI/s15850.blif
+
+# of runs:                     684
+# of problems:                 11719
+Ave. # of restarts:            0.956652
+Ave. # of variables:           237.484
+Ave. # of constraint clauses:  556.238
+Ave. # of constraint literals: 1310.55
+Ave. # of learnt clauses:      2.73099
+Ave. # of learnt literals:     12.6067
+Ave. # of conflicts:           0.168786
+Ave. # of decisions:           31.7376
+Ave. # of implications:        486.114
+# of runs:                     244
+# of problems:                 531
+Ave. # of restarts:            0.318267
+Ave. # of variables:           1796.55
+Ave. # of constraint clauses:  5194.82
+Ave. # of constraint literals: 12652.8
+Ave. # of learnt clauses:      3.80328
+Ave. # of learnt literals:     27.0041
+Ave. # of conflicts:           1.83616
+Ave. # of decisions:           91.6365
+Ave. # of implications:        2748.76
+
+~/share/data/ISCAS.s/COMBI/s15850.blif ***mffc_po_skip*** results
+#A: # of total faults       =   11719
+#B: # of detected faults    =   11330
+#C: # of redundant faults   =     389
+#D: # of undetected faults  =       0
+#E: # of generated patterns =   11330
+#F:   Total CPU time        =    0.73u    0.01s
+#G:    (read time           =    0.05)
+#H:    (dtpg time           =    0.67)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/ISCAS.s/COMBI/s35932.blif
+
+# of runs:                     2048
+# of problems:                 38454
+Ave. # of restarts:            0.881209
+Ave. # of variables:           74.4795
+Ave. # of constraint clauses:  163.432
+Ave. # of constraint literals: 417.947
+Ave. # of learnt clauses:      2.65088
+Ave. # of learnt literals:     8.82129
+Ave. # of conflicts:           0.141182
+Ave. # of decisions:           4.91699
+Ave. # of implications:        274.33
+# of runs:                     280
+# of problems:                 4568
+Ave. # of restarts:            0.127846
+Ave. # of variables:           615.236
+Ave. # of constraint clauses:  1705.3
+Ave. # of constraint literals: 4144
+Ave. # of learnt clauses:      3.42857
+Ave. # of learnt literals:     7.65714
+Ave. # of conflicts:           0.210158
+Ave. # of decisions:           3.31699
+Ave. # of implications:        161.418
+
+~/share/data/ISCAS.s/COMBI/s35932.blif ***mffc_po_skip*** results
+#A: # of total faults       =   38454
+#B: # of detected faults    =   34470
+#C: # of redundant faults   =    3984
+#D: # of undetected faults  =       0
+#E: # of generated patterns =   34470
+#F:   Total CPU time        =    1.12u    0.04s
+#G:    (read time           =    0.14)
+#H:    (dtpg time           =    0.98)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/ISCAS.s/COMBI/s38417.blif
+
+# of runs:                     1742
+# of problems:                 31024
+Ave. # of restarts:            0.988461
+Ave. # of variables:           158.502
+Ave. # of constraint clauses:  351.774
+Ave. # of constraint literals: 847.611
+Ave. # of learnt clauses:      2.71584
+Ave. # of learnt literals:     14.3347
+Ave. # of conflicts:           0.15372
+Ave. # of decisions:           28.1487
+Ave. # of implications:        420.173
+# of runs:                     244
+# of problems:                 366
+Ave. # of restarts:            0.581967
+Ave. # of variables:           1047.25
+Ave. # of constraint clauses:  2960.59
+Ave. # of constraint literals: 7190.25
+Ave. # of learnt clauses:      3.34836
+Ave. # of learnt literals:     22.3361
+Ave. # of conflicts:           2.27596
+Ave. # of decisions:           58.8443
+Ave. # of implications:        1379.96
+
+~/share/data/ISCAS.s/COMBI/s38417.blif ***mffc_po_skip*** results
+#A: # of total faults       =   31024
+#B: # of detected faults    =   30859
+#C: # of redundant faults   =     165
+#D: # of undetected faults  =       0
+#E: # of generated patterns =   30859
+#F:   Total CPU time        =    1.39u    0.05s
+#G:    (read time           =    0.17)
+#H:    (dtpg time           =    1.22)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/share/data/ISCAS.s/COMBI/s38584.blif
+
+# of runs:                     1730
+# of problems:                 35999
+Ave. # of restarts:            0.947304
+Ave. # of variables:           128.049
+Ave. # of constraint clauses:  275.312
+Ave. # of constraint literals: 669.69
+Ave. # of learnt clauses:      1.37457
+Ave. # of learnt literals:     8.19884
+Ave. # of conflicts:           0.0697519
+Ave. # of decisions:           9.87522
+Ave. # of implications:        204.919
+# of runs:                     493
+# of problems:                 2009
+Ave. # of restarts:            0.30214
+Ave. # of variables:           423.935
+Ave. # of constraint clauses:  1165.43
+Ave. # of constraint literals: 2811.68
+Ave. # of learnt clauses:      1.48479
+Ave. # of learnt literals:     12.6471
+Ave. # of conflicts:           0.437033
+Ave. # of decisions:           20.0508
+Ave. # of implications:        686.904
+
+~/share/data/ISCAS.s/COMBI/s38584.blif ***mffc_po_skip*** results
+#A: # of total faults       =   35999
+#B: # of detected faults    =   34493
+#C: # of redundant faults   =    1506
+#D: # of undetected faults  =       0
+#E: # of generated patterns =   34493
+#F:   Total CPU time        =    0.98u    0.05s
+#G:    (read time           =    0.16)
+#H:    (dtpg time           =    0.82)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/data/public/itc99/b10/b10_C.bench
+
+# of runs:                     23
+# of problems:                 505
+Ave. # of restarts:            0.982178
+Ave. # of variables:           89.9565
+Ave. # of constraint clauses:  194.391
+Ave. # of constraint literals: 495.435
+Ave. # of learnt clauses:      1.73913
+Ave. # of learnt literals:     12
+Ave. # of conflicts:           0.0811881
+Ave. # of decisions:           4.59604
+Ave. # of implications:        146.475
+# of runs:                     2
+# of problems:                 10
+Ave. # of restarts:            1
+Ave. # of variables:           171.5
+Ave. # of constraint clauses:  514
+Ave. # of constraint literals: 1281
+Ave. # of learnt clauses:      0
+Ave. # of learnt literals:     0
+Ave. # of conflicts:           0
+Ave. # of decisions:           10.1
+Ave. # of implications:        160.7
+
+~/data/public/itc99/b10/b10_C.bench ***mffc_po_skip*** results
+#A: # of total faults       =     505
+#B: # of detected faults    =     505
+#C: # of redundant faults   =       0
+#D: # of undetected faults  =       0
+#E: # of generated patterns =     505
+#F:   Total CPU time        =    0.01u    0.00s
+#G:    (read time           =    0.00)
+#H:    (dtpg time           =    0.01)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.01)
+
+~/data/public/itc99/b11/b11_C.bench
+
+# of runs:                     37
+# of problems:                 1728
+Ave. # of restarts:            0.921875
+Ave. # of variables:           221.595
+Ave. # of constraint clauses:  510.919
+Ave. # of constraint literals: 1278.62
+Ave. # of learnt clauses:      10.6486
+Ave. # of learnt literals:     48.6216
+Ave. # of conflicts:           0.24537
+Ave. # of decisions:           10.0087
+Ave. # of implications:        397.626
+# of runs:                     46
+# of problems:                 142
+Ave. # of restarts:            0.556338
+Ave. # of variables:           529.587
+Ave. # of constraint clauses:  1564.98
+Ave. # of constraint literals: 3759.67
+Ave. # of learnt clauses:      1.73913
+Ave. # of learnt literals:     8.47826
+Ave. # of conflicts:           0.577465
+Ave. # of decisions:           10.8944
+Ave. # of implications:        355.373
+
+~/data/public/itc99/b11/b11_C.bench ***mffc_po_skip*** results
+#A: # of total faults       =    1728
+#B: # of detected faults    =    1663
+#C: # of redundant faults   =      65
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    1663
+#F:   Total CPU time        =    0.07u    0.00s
+#G:    (read time           =    0.01)
+#H:    (dtpg time           =    0.06)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/data/public/itc99/b12/b12_C.bench
+
+# of runs:                     125
+# of problems:                 2858
+Ave. # of restarts:            0.987054
+Ave. # of variables:           114.344
+Ave. # of constraint clauses:  244.952
+Ave. # of constraint literals: 613.064
+Ave. # of learnt clauses:      3.176
+Ave. # of learnt literals:     18.632
+Ave. # of conflicts:           0.141707
+Ave. # of decisions:           9.74178
+Ave. # of implications:        190.478
+# of runs:                     17
+# of problems:                 45
+Ave. # of restarts:            1
+Ave. # of variables:           397
+Ave. # of constraint clauses:  1202.59
+Ave. # of constraint literals: 2970.35
+Ave. # of learnt clauses:      6.58824
+Ave. # of learnt literals:     64.8824
+Ave. # of conflicts:           2.48889
+Ave. # of decisions:           26.7556
+Ave. # of implications:        898.489
+
+~/data/public/itc99/b12/b12_C.bench ***mffc_po_skip*** results
+#A: # of total faults       =    2858
+#B: # of detected faults    =    2858
+#C: # of redundant faults   =       0
+#D: # of undetected faults  =       0
+#E: # of generated patterns =    2858
+#F:   Total CPU time        =    0.05u    0.00s
+#G:    (read time           =    0.01)
+#H:    (dtpg time           =    0.04)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/data/public/itc99/b13/b13_C.bench
+
+# of runs:                     63
+# of problems:                 834
+Ave. # of restarts:            0.965228
+Ave. # of variables:           55.4286
+Ave. # of constraint clauses:  114.127
+Ave. # of constraint literals: 292.111
+Ave. # of learnt clauses:      0.238095
+Ave. # of learnt literals:     1.11111
+Ave. # of conflicts:           0.0191847
+Ave. # of decisions:           3.85851
+Ave. # of implications:        73.4532
+# of runs:                     10
+# of problems:                 29
+Ave. # of restarts:            0.103448
+Ave. # of variables:           103.7
+Ave. # of constraint clauses:  288
+Ave. # of constraint literals: 711.5
+Ave. # of learnt clauses:      0.1
+Ave. # of learnt literals:     1.7
+Ave. # of conflicts:           0.0344828
+Ave. # of decisions:           0.758621
+Ave. # of implications:        53.2759
+
+~/data/public/itc99/b13/b13_C.bench ***mffc_po_skip*** results
+#A: # of total faults       =     834
+#B: # of detected faults    =     808
+#C: # of redundant faults   =      26
+#D: # of undetected faults  =       0
+#E: # of generated patterns =     808
+#F:   Total CPU time        =    0.01u    0.00s
+#G:    (read time           =    0.00)
+#H:    (dtpg time           =    0.01)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/data/public/itc99/b14/b14_C.bench
+
+# of runs:                     299
+# of problems:                 22692
+Ave. # of restarts:            0.987881
+Ave. # of variables:           852.696
+Ave. # of constraint clauses:  2106.1
+Ave. # of constraint literals: 5032.9
+Ave. # of learnt clauses:      146.258
+Ave. # of learnt literals:     863.987
+Ave. # of conflicts:           2.50132
+Ave. # of decisions:           119.872
+Ave. # of implications:        3326.96
+# of runs:                     55
+# of problems:                 307
+Ave. # of restarts:            0.609121
+Ave. # of variables:           9337.71
+Ave. # of constraint clauses:  29819.8
+Ave. # of constraint literals: 73505.4
+Ave. # of learnt clauses:      138.182
+Ave. # of learnt literals:     2530.6
+Ave. # of conflicts:           24.886
+Ave. # of decisions:           308.583
+Ave. # of implications:        25082.3
+
+~/data/public/itc99/b14/b14_C.bench ***mffc_po_skip*** results
+#A: # of total faults       =   22692
+#B: # of detected faults    =   22536
+#C: # of redundant faults   =     156
+#D: # of undetected faults  =       0
+#E: # of generated patterns =   22536
+#F:   Total CPU time        =    7.00u    0.03s
+#G:    (read time           =    0.07)
+#H:    (dtpg time           =    6.93)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/data/public/itc99/b15/b15_C.bench
+
+# of runs:                     519
+# of problems:                 21848
+Ave. # of restarts:            0.879211
+Ave. # of variables:           1199.41
+Ave. # of constraint clauses:  3267.91
+Ave. # of constraint literals: 7800.22
+Ave. # of learnt clauses:      57.9441
+Ave. # of learnt literals:     465.225
+Ave. # of conflicts:           1.3864
+Ave. # of decisions:           134.626
+Ave. # of implications:        2360.94
+# of runs:                     643
+# of problems:                 2748
+Ave. # of restarts:            0.879185
+Ave. # of variables:           7088.99
+Ave. # of constraint clauses:  22498.3
+Ave. # of constraint literals: 55385
+Ave. # of learnt clauses:      37.4837
+Ave. # of learnt literals:     1207.16
+Ave. # of conflicts:           8.9829
+Ave. # of decisions:           281.165
+Ave. # of implications:        14495
+
+~/data/public/itc99/b15/b15_C.bench ***mffc_po_skip*** results
+#A: # of total faults       =   21848
+#B: # of detected faults    =   21121
+#C: # of redundant faults   =     727
+#D: # of undetected faults  =       0
+#E: # of generated patterns =   21121
+#F:   Total CPU time        =    8.81u    0.04s
+#G:    (read time           =    0.08)
+#H:    (dtpg time           =    8.73)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/data/public/itc99/b17/b17_C.bench
+
+# of runs:                     1512
+# of problems:                 76487
+Ave. # of restarts:            0.914195
+Ave. # of variables:           1072.11
+Ave. # of constraint clauses:  2771.87
+Ave. # of constraint literals: 6607.16
+Ave. # of learnt clauses:      75.5298
+Ave. # of learnt literals:     644.903
+Ave. # of conflicts:           1.517
+Ave. # of decisions:           140.989
+Ave. # of implications:        2173.98
+# of runs:                     1556
+# of problems:                 6982
+Ave. # of restarts:            0.868519
+Ave. # of variables:           7694.82
+Ave. # of constraint clauses:  24425
+Ave. # of constraint literals: 60283.1
+Ave. # of learnt clauses:      45.2892
+Ave. # of learnt literals:     1911.59
+Ave. # of conflicts:           10.3742
+Ave. # of decisions:           336.125
+Ave. # of implications:        18425.7
+
+~/data/public/itc99/b17/b17_C.bench ***mffc_po_skip*** results
+#A: # of total faults       =   76487
+#B: # of detected faults    =   74529
+#C: # of redundant faults   =    1958
+#D: # of undetected faults  =       0
+#E: # of generated patterns =   74529
+#F:   Total CPU time        =   27.55u    0.35s
+#G:    (read time           =    0.34)
+#H:    (dtpg time           =   27.21)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/data/public/itc99/b18/b18_C.bench
+
+# of runs:                     3343
+# of problems:                 264065
+Ave. # of restarts:            1.00802
+Ave. # of variables:           1330.24
+Ave. # of constraint clauses:  3405.84
+Ave. # of constraint literals: 8052.82
+Ave. # of learnt clauses:      203.16
+Ave. # of learnt literals:     2252.43
+Ave. # of conflicts:           8.89024
+Ave. # of decisions:           155.266
+Ave. # of implications:        7748.7
+# of runs:                     1193
+# of problems:                 4001
+Ave. # of restarts:            0.824044
+Ave. # of variables:           5227.41
+Ave. # of constraint clauses:  15540.6
+Ave. # of constraint literals: 37346.8
+Ave. # of learnt clauses:      62.0595
+Ave. # of learnt literals:     1065.98
+Ave. # of conflicts:           18.8028
+Ave. # of decisions:           269.235
+Ave. # of implications:        18564.1
+
+~/data/public/itc99/b18/b18_C.bench ***mffc_po_skip*** results
+#A: # of total faults       =  264065
+#B: # of detected faults    =  262581
+#C: # of redundant faults   =    1484
+#D: # of undetected faults  =       0
+#E: # of generated patterns =  262581
+#F:   Total CPU time        =  204.30u    0.63s
+#G:    (read time           =    2.02)
+#H:    (dtpg time           =  202.28)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/data/public/itc99/b19/b19_C.bench
+
+# of runs:                     6669
+# of problems:                 533236
+Ave. # of restarts:            1.01533
+Ave. # of variables:           1346.06
+Ave. # of constraint clauses:  3447.76
+Ave. # of constraint literals: 8149.11
+Ave. # of learnt clauses:      199.432
+Ave. # of learnt literals:     2171.75
+Ave. # of conflicts:           10.4766
+Ave. # of decisions:           158.498
+Ave. # of implications:        10082.2
+# of runs:                     2825
+# of problems:                 8782
+Ave. # of restarts:            0.839558
+Ave. # of variables:           6141.29
+Ave. # of constraint clauses:  18270.6
+Ave. # of constraint literals: 43807.4
+Ave. # of learnt clauses:      75.4782
+Ave. # of learnt literals:     1419.46
+Ave. # of conflicts:           24.5921
+Ave. # of decisions:           290.337
+Ave. # of implications:        22841.7
+
+~/data/public/itc99/b19/b19_C.bench ***mffc_po_skip*** results
+#A: # of total faults       =  533236
+#B: # of detected faults    =  529919
+#C: # of redundant faults   =    3317
+#D: # of undetected faults  =       0
+#E: # of generated patterns =  529919
+#F:   Total CPU time        =  564.35u    2.79s
+#G:    (read time           =    7.65)
+#H:    (dtpg time           =  556.69)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/data/public/itc99/b20/b20.bench
+
+# of runs:                     512
+# of problems:                 45449
+Ave. # of restarts:            0.980792
+Ave. # of variables:           1225.16
+Ave. # of constraint clauses:  3104.8
+Ave. # of constraint literals: 7406.17
+Ave. # of learnt clauses:      236.43
+Ave. # of learnt literals:     1031.12
+Ave. # of conflicts:           3.58248
+Ave. # of decisions:           160.978
+Ave. # of implications:        3559.45
+# of runs:                     171
+# of problems:                 960
+Ave. # of restarts:            1.03021
+Ave. # of variables:           16473
+Ave. # of constraint clauses:  54767.7
+Ave. # of constraint literals: 137589
+Ave. # of learnt clauses:      514.275
+Ave. # of learnt literals:     4298.5
+Ave. # of conflicts:           92.0771
+Ave. # of decisions:           1530.17
+Ave. # of implications:        151401
+
+~/data/public/itc99/b20/b20.bench ***mffc_po_skip*** results
+#A: # of total faults       =   45449
+#B: # of detected faults    =   45130
+#C: # of redundant faults   =     319
+#D: # of undetected faults  =       0
+#E: # of generated patterns =   45130
+#F:   Total CPU time        =   27.36u    0.08s
+#G:    (read time           =    0.16)
+#H:    (dtpg time           =   27.21)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/data/public/itc99/b21/b21_C.bench
+
+# of runs:                     512
+# of problems:                 46144
+Ave. # of restarts:            0.981038
+Ave. # of variables:           1241.85
+Ave. # of constraint clauses:  3153.46
+Ave. # of constraint literals: 7522.81
+Ave. # of learnt clauses:      235.336
+Ave. # of learnt literals:     1057.13
+Ave. # of conflicts:           3.57262
+Ave. # of decisions:           161.808
+Ave. # of implications:        3776.15
+# of runs:                     157
+# of problems:                 965
+Ave. # of restarts:            0.953368
+Ave. # of variables:           17694.6
+Ave. # of constraint clauses:  59344.5
+Ave. # of constraint literals: 149666
+Ave. # of learnt clauses:      507.975
+Ave. # of learnt literals:     3635.76
+Ave. # of conflicts:           83.0974
+Ave. # of decisions:           1449.72
+Ave. # of implications:        153857
+
+~/data/public/itc99/b21/b21_C.bench ***mffc_po_skip*** results
+#A: # of total faults       =   46144
+#B: # of detected faults    =   45766
+#C: # of redundant faults   =     378
+#D: # of undetected faults  =       0
+#E: # of generated patterns =   45766
+#F:   Total CPU time        =   29.17u    0.09s
+#G:    (read time           =    0.15)
+#H:    (dtpg time           =   29.01)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)
+
+~/data/public/itc99/b22/b22_C.bench
+
+# of runs:                     757
+# of problems:                 67522
+Ave. # of restarts:            0.982865
+Ave. # of variables:           1235.12
+Ave. # of constraint clauses:  3118.23
+Ave. # of constraint literals: 7430.38
+Ave. # of learnt clauses:      237.523
+Ave. # of learnt literals:     1008.81
+Ave. # of conflicts:           3.56882
+Ave. # of decisions:           159.555
+Ave. # of implications:        3297.89
+# of runs:                     238
+# of problems:                 1278
+Ave. # of restarts:            1.11189
+Ave. # of variables:           14043.4
+Ave. # of constraint clauses:  46153
+Ave. # of constraint literals: 115381
+Ave. # of learnt clauses:      501.664
+Ave. # of learnt literals:     4167.76
+Ave. # of conflicts:           93.8772
+Ave. # of decisions:           1479.09
+Ave. # of implications:        141285
+
+~/data/public/itc99/b22/b22_C.bench ***mffc_po_skip*** results
+#A: # of total faults       =   67522
+#B: # of detected faults    =   67178
+#C: # of redundant faults   =     344
+#D: # of undetected faults  =       0
+#E: # of generated patterns =   67178
+#F:   Total CPU time        =   35.83u    0.12s
+#G:    (read time           =    0.28)
+#H:    (dtpg time           =   35.55)
+#I:    (fsim time           =    0.00)
+#J:    (sat  time           =    0.00)
+#K:    (misc time           =    0.00)

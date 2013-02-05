@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM_ATPG_DTPGCL
 //////////////////////////////////////////////////////////////////////
 // クラス GateOr
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] id ゲートID
 // @param[in] node 元のノード
@@ -37,7 +37,7 @@ GateOr::~GateOr()
 tTgGateType
 GateOr::gate_type() const
 {
-  return kTgOr;
+  return kTgGateOr;
 }
 
 bool
@@ -299,7 +299,7 @@ GateNor::~GateNor()
 tTgGateType
 GateNor::gate_type() const
 {
-  return kTgNor;
+  return kTgGateNor;
 }
 
 bool
