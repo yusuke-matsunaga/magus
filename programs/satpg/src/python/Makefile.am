@@ -27,7 +27,7 @@ pysatpg_LDFLAGS = \
 
 pysatpg_LDADD = \
 	$(top_builddir)/src/dtpg/libatpg_dtpg.la \
-	$(top_builddir)/src/fsim/libatpg_fsim.la \
+	$(top_builddir)/src/fsim2/libatpg_fsim2.la \
 	$(top_builddir)/src/fsim3/libatpg_fsim3.la \
 	$(top_builddir)/src/fsimx/libatpg_fsimx.la \
 	$(top_builddir)/src/base/libatpg_base.la \
