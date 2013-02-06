@@ -147,6 +147,7 @@ ym_magus_tclsh_enable=1
 ym_atpg_enable=1
 ym_matpg_enable=1
 ym_satpg_enable=1
+ym_led_enable=1
 
 YM_INIT_PROGRAMS_SUBDIRS
 
@@ -173,6 +174,12 @@ YM_BUILD_PROGRAM([satpg],
 		  ym_libym_logic_enable,
 		  ym_libym_networks_enable,
 		  ym_libym_tclpp_enable])
+
+# led
+YM_BUILD_PROGRAM([led],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable])
 
 YM_FINISH_PROGRAMS_SUBDIRS
 
