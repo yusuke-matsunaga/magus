@@ -4,10 +4,8 @@
 /// @file led/GateObj.h
 /// @brief GateObj のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-//
-/// $Id: GateObj.h 347 2007-01-16 02:37:45Z matsunaga $
 ///
-/// Copyright(C) 2002 by Yusuke Matsunaga
+/// Copyright(C) 2002, 2013 by Yusuke Matsunaga
 
 
 #include <ym_utils/DlList.h>
@@ -53,37 +51,42 @@ public:
 
   /// @brief 位置を設定する．
   /// @param[in] loc 設定する位置
-  void set_location(const Point& loc);
+  void
+  set_location(const Point& loc);
 
   /// @brief 位置を設定する．
   /// @param[in] x 位置のX座標
   /// @param[in] y 位置のY座標
-  void set_location(GLdouble x,
-		    GLdouble y);
-  
+  void
+  set_location(GLdouble x,
+	       GLdouble y);
+
   /// @brief 位置を取得する．
-  Point location() const;
+  Point
+  location() const;
 
 
 public:
 
   /// @brief 入力数を得る．
-  size_t ni() const;
+  ymuint
+  input_num() const;
 
   /// @brief 出力数を得る．
-  size_t no() const;
+  ymuint
+  output_num() const;
 
   /// @brief このゲートを囲む最小の矩形を表す左上と右下の点を得る．
-  DiagPoints bounding_box() const;
+  DiagPoints
+  bounding_box() const;
 
   /// @brief pos 番目の入力ピン位置を得る．
-  Point ipin_location(size_t pos) const;
+  Point
+  ipin_location(ymuint pos) const;
 
   /// @brief pos 番目の出力ピン位置を得る．
-  Point opin_location(size_t pos) const;
-
-  // @brief ディスプレイリストを取り出す．
-  GLuint id() const;
+  Point
+  opin_location(ymuint pos) const;
 
 
 private:
@@ -97,15 +100,14 @@ private:
   // 位置
   Point mLocation;
 
-  // オブジェクト管理用の番号
-  size_t mObjId;
-
 };
 
 /// @brief GateObj のリスト
 typedef DlList<GateObj> GateObjList;
+
 /// @brief GateObjList の反復子
 typedef DlListIter<GateObj> GateObjListIter;
+
 /// @brief GateObjList の定数反復子
 typedef DlListConstIter<GateObj> GateObjListConstIter;
 

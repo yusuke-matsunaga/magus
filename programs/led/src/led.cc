@@ -1,17 +1,11 @@
 
-/// @file led/led.cc
+/// @file led.cc
 /// @brief LedScene を使ったデモプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: led.cc 347 2007-01-16 02:37:45Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2006, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
-
-#if HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 #include "LedScene.h"
 
@@ -34,6 +28,7 @@ public:
 
 
 protected:
+
   // signal handlers:
   void on_button_quit_clicked();
 
@@ -75,7 +70,7 @@ Led::Led() :
   set_size_request(3000, 2000);
 
   set_size_request(300, 200);
-  
+
   show_all();
 }
 
@@ -143,7 +138,7 @@ Led::on_key_press_event(GdkEventKey* event)
   default:
     return true;
   }
-  
+
   return true;
 }
 
@@ -171,7 +166,7 @@ main(int argc,
       is_sync = false;
   }
 #endif
-  
+
   // Instantiate and run the application.
   nsYm::nsGlv::Led led;
 

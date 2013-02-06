@@ -4,14 +4,12 @@
 /// @file led/LedScene.h
 /// @brief LedScene のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-//
-/// $Id: LedScene.h 347 2007-01-16 02:37:45Z matsunaga $
 ///
-/// Copyright(C) 2002 by Yusuke Matsunaga
+/// Copyright(C) 2002, 2013 by Yusuke Matsunaga
 
 
-#include <ym_utils/DlList.h>
-#include <ym_utils/ItvlMgr.h>
+#include "ym_utils/DlList.h"
+#include "ym_utils/ItvlMgr.h"
 #include "GlvScene.h"
 #include "GateObj.h"
 
@@ -43,40 +41,50 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 入力を表すテンプレートを返す．
-  const GateTemplate* input();
+  const GateTemplate*
+  input();
 
   /// @brief 出力を表すテンプレートを返す．
-  const GateTemplate* output();
+  const GateTemplate*
+  output();
 
   /// @brief バッファを表すテンプレートを返す．
-  const GateTemplate* buf_gate();
+  const GateTemplate*
+  buf_gate();
 
   /// @brief NOTゲートを表すテンプレートを返す．
-  const GateTemplate* not_gate();
+  const GateTemplate*
+  not_gate();
 
   /// @brie ANDゲートを表すテンプレートを返す．
   /// @param[in] ni 入力数
-  const GateTemplate* and_gate(size_t ni);
+  const GateTemplate*
+  and_gate(ymuint ni);
 
   /// @brief NANDゲートを表すテンプレートを返す．
   /// @param[in] ni 入力数
-  const GateTemplate* nand_gate(size_t ni);
+  const GateTemplate*
+  nand_gate(ymuint ni);
 
   /// @brief ORゲートを表すテンプレートを返す．
   /// @param[in] ni 入力数
-  const GateTemplate* or_gate(size_t ni);
+  const GateTemplate*
+  or_gate(ymuint ni);
 
   /// @brief NORゲートを表すテンプレートを返す．
   /// @param[in] ni 入力数
-  const GateTemplate* nor_gate(size_t ni);
+  const GateTemplate*
+  nor_gate(ymuint ni);
 
   /// @brief XORゲートを表すテンプレートを返す．
   /// @param[in] ni 入力数
-  const GateTemplate* xor_gate(size_t ni);
+  const GateTemplate*
+  xor_gate(ymuint ni);
 
   /// @brief XNORゲートを表すテンプレートを返す．
   /// @param[in] ni 入力数
-  const GateTemplate* xnor_gate(size_t ni);
+  const GateTemplate*
+  xnor_gate(ymuint ni);
 
 
 public:
@@ -88,22 +96,25 @@ public:
   /// @param[in] gt ゲートテンプレート
   /// @param[in] point 位置
   /// @return オブジェクトを返す．
-  GateObj* new_obj(const GateTemplate* gt,
-		   const Point& point);
+  GateObj*
+  new_obj(const GateTemplate* gt,
+	  const QPoint& point);
 
   /// @brief 描画オブジェクトを追加する．
   /// @param[in] gt ゲートテンプレート
   /// @param[in] x 位置のX座標
   /// @param[in] y 位置のY座標
   /// @return オブジェクトを返す．
-  GateObj* new_obj(const GateTemplate* gt,
-		   GLdouble x,
-		   GLdouble y);
+  GateObj*
+  new_obj(const GateTemplate* gt,
+	  GLdouble x,
+	  GLdouble y);
 
   /// @brief 描画オブジェクトを削除する．
   /// @param[in] id オブジェクトID
   /// @note 該当のオブジェクトがなければなにもしない．
-  void delete_obj(size_t id);
+  void
+  delete_obj(ymuint id);
 
 
 public:
@@ -112,31 +123,39 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 拡大率を設定する．
-  void set_zoom(GLdouble zoom);
+  void
+  set_zoom(GLdouble zoom);
 
   /// @brief 拡大率を得る．
-  GLdouble zoom() const;
+  GLdouble
+  zoom() const;
 
   /// @brief 表示領域の左下の座標を設定する．
-  void set_corner(const Point& point);
+  void
+  set_corner(const Point& point);
 
   /// @brief 表示領域の左下の座標を設定する．
-  void set_corner(GLdouble x,
-		  GLdouble y);
+  void
+  set_corner(GLdouble x,
+	     GLdouble y);
 
   /// @brief 表示領域の左下の座標を得る．
-  Point corner() const;
+  Point
+  corner() const;
 
   /// @brief 枠線の表示を行う．
-  void enable_bbox();
+  void
+  enable_bbox();
 
   /// @brief 枠線の表示を行わない．
-  void disable_bbox();
+  void
+  disable_bbox();
 
   /// @brief 枠線の表示モードを得る．
   /// @retval true 枠線の表示を行う．
   /// @retval false 枠線の表示を行わない．
-  bool bbox_mode() const;
+  bool
+  bbox_mode() const;
 
 
 public:
@@ -145,33 +164,41 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ゲート描画用の線幅を得る．
-  GLfloat gate_line_width();
+  GLfloat
+  gate_line_width();
 
   /// @brief ゲート描画用の色を得る．
   /// @return RGBA の4つの値を持つ配列の先頭アドレスと返す．
-  const GLclampf* gate_line_color();
-  
+  const GLclampf*
+  gate_line_color();
+
   /// @brief 配線描画用の線幅を得る．
-  GLfloat wire_line_width();
+  GLfloat
+  wire_line_width();
 
   /// @brief 配線描画用の色を得る．
   /// @return RGBA の4つの値を持つ配列の先頭アドレスと返す．
-  const GLclampf* wire_line_color();
+  const GLclampf*
+  wire_line_color();
 
   /// @brief 枠線描画用の線幅を得る．
-  GLfloat bbox_line_width();
+  GLfloat
+  bbox_line_width();
 
   /// @brief 枠線描画用の色を得る．
   /// @return RGBA の4つの値を持つ配列の先頭アドレスと返す．
-  const GLclampf* bbox_line_color();
+  const GLclampf*
+  bbox_line_color();
 
   /// @brief 配線の X 軸方向のマージンを得る．
-  GLdouble wire_x_margin();
+  GLdouble
+  wire_x_margin();
 
   /// @brief 配線の Y 軸方向のマージンを得る．
-  GLdouble wire_y_margin();
-  
-  
+  GLdouble
+  wire_y_margin();
+
+
 protected:
   //////////////////////////////////////////////////////////////////////
   // GlvScene の継承クラスが実装しなければならない仮想関数
@@ -181,13 +208,15 @@ protected:
   /// @note on_realize() 中で呼ばれる．
   /// @note gl_begin() と gl_end() で挟まれている．
   virtual
-  void initialize();
+  void
+  initialize();
 
   /// @brief ウィンドウのサイズが変わったときの処理
   /// @note on_configure_event() 中で呼ばれる．
   /// @note gl_begin() と gl_end() で挟まれている．
   virtual
-  void resize();
+  void
+  resize();
 
   /// @brief 描画を行う．
   /// @note on_expose_event() 中で呼ばれる．
@@ -195,7 +224,8 @@ protected:
   /// @note ただし gl_end() の前に swap_buffers() か glFlush()
   /// を行う．
   virtual
-  void draw();
+  void
+  draw();
 
 
 private:
@@ -204,13 +234,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // GateObj を登録する．
-  void reg_obj(GateObj* obj);
+  void
+  reg_obj(GateObj* obj);
 
   // GateObj を削除する．
-  void del_obj(GateObj* obj);
+  void
+  del_obj(GateObj* obj);
 
   // GateObj を描画する．
-  void draw_obj(GateObj* obj);
+  void
+  draw_obj(GateObj* obj);
 
 
 private:
@@ -259,7 +292,7 @@ private:
 
   // ゲート描画用の色
   GLclampf mGateLineColor[4];
-  
+
   // 配線描画用の線幅
   GLfloat mWireLineWidth;
 
@@ -286,17 +319,17 @@ private:
 
   // 枠線を表示するとき true
   bool mDrawBBox;
-  
+
   // オブジェクトの配列
   // ID をキーにしている
   vector<GateObj*> mObjArray;
 
   // mObjAray の使用区間を管理するオブジェクト
   ItvlMgr mObjItvl;
-  
+
   // オブジェクトのリスト
   GateObjList mObjList;
-  
+
 };
 
 END_NAMESPACE_YM_GLV
