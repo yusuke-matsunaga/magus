@@ -179,15 +179,27 @@ InputSymbol::opin_location(ymuint pos) const
 
 // @brief 描画を行う．
 // @param[in] painter 描画を行うオブジェクト
-// @param[in] ul_pos オブジェクトの左上の位置
 // @param[in] rect 描画矩形
 void
 InputSymbol::draw(QPainter& painter,
-		  const QPoint& ul_pos,
 		  const QRect& rect) const
 {
-  double mid_x = kInputW - (kInputH / 2.0);
-  Q
+  const double l_x = 0;
+  const double m_x = kInputW - (kInputH / 2.0);
+  const double r_x = kInputW;
+  const double u_y = -(kInputH / 2);
+  const double m_y = 0;
+  const double l_y = (kInputH / 2);
+
+  const ymuint kNumPoints = 5;
+  QPoint path[kNumPoints];
+  path[0] = QPoint(l_x, u_y);
+  path[1] = QPoint(m_x, u_y);
+  path[2] = QPoint(r_x, m_y);
+  path[3] = QPoint(m_x, l_y);
+  path[4] = QPoint(l_x, l_y);
+
+  painter.drawPolygon(path, kNumPoints);
 }
 
 END_NAMESPACE_YM_LED

@@ -62,12 +62,10 @@ public:
 
   /// @brief 描画を行う．
   /// @param[in] painter 描画を行うオブジェクト
-  /// @param[in] ul_pos オブジェクトの左上の位置
   /// @param[in] rect 描画矩形
   virtual
   void
   draw(QPainter& painter,
-       const QPoint& ul_pos,
        const QRect& rect) const = 0;
 
 };
