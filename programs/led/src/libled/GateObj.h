@@ -14,7 +14,7 @@
 
 BEGIN_NAMESPACE_YM_LED
 
-class GateTemplate;
+class Symbol;
 
 //////////////////////////////////////////////////////////////////////
 /// @class GateObj GateObj.h "GateObj.h"
@@ -29,16 +29,16 @@ class GateObj :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] gt ゲートテンプレート
+  /// @param[in] sym シンボル
   /// @param[in] pos 位置
-  GateObj(const GateTemplate* gt,
+  GateObj(const Symbol* sym,
 	  const QPoint& pos = QPoint(0, 0));
 
   /// @brief コンストラクタ
-  /// @param[in] gt ゲートテンプレート
+  /// @param[in] sym シンボル
   /// @param[in] x 位置のX座標
   /// @param[in] y 位置のY座標
-  GateObj(const GateTemplate* gt,
+  GateObj(const Symbol* sym,
 	  ymuint x,
 	  ymuint y);
 
@@ -100,8 +100,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ゲートテンプレート
-  const GateTemplate* mGateTemplate;
+  // シンボル
+  const Symbol* mSymbol;
 
   // 位置
   QPoint mPosition;
@@ -123,25 +123,25 @@ typedef DlListConstIter<GateObj> GateObjListConstIter;
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] gt ゲートテンプレート
+// @param[in] sym シンボル
 // @param[in] pos 位置
 inline
-GateObj::GateObj(const GateTemplate* gt,
+GateObj::GateObj(const Symbol* sym,
 		 const QPoint& pos) :
-  mGateTemplate(gt),
+  mSymbol(sym),
   mPosition(pos)
 {
 }
 
 // @brief コンストラクタ
-// @param[in] gt ゲートテンプレート
+// @param[in] sym シンボル
 // @param[in] x 位置のX座標
 // @param[in] y 位置のY座標
 inline
-GateObj::GateObj(const GateTemplate* gt,
+GateObj::GateObj(const Symbol* sym,
 		 ymuint x,
 		 ymuint y) :
-  mGateTemplate(gt),
+  mSymbol(sym),
   mPosition(x, y)
 {
 }
@@ -181,6 +181,6 @@ GateObj::position() const
   return mPosition;
 }
 
-END_NAMESPACE_YM_GLV
+END_NAMESPACE_YM_LED
 
-#endif // LED_GATEOBJ_H
+#endif // GATEOBJ_H

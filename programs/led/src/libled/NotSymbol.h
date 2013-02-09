@@ -1,34 +1,34 @@
-#ifndef INPUTSYMBOL_H
-#define INPUTSYMBOL_H
+#ifndef NOTSYMBOL_H
+#define NOTSYMBOL_H
 
-/// @file InputSymbol.h
-/// @brief InputSymbol のヘッダファイル
+/// @file NotSymbol.h
+/// @brief NotSymbol のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "Symbol.h"
+#include "GateSymbol.h"
 
 
 BEGIN_NAMESPACE_YM_LED
 
 //////////////////////////////////////////////////////////////////////
-/// @class InputSymbol InputSymbol.h "InputSymbol.h"
-/// @brief 入力ピンのシンボルを表すクラス
+/// @class NotSymbol NotSymbol.h "NotSymbol.h"
+/// @brief バッファのシンボルを表すクラス
 //////////////////////////////////////////////////////////////////////
-class InputSymbol :
-  public Symbol
+class NotSymbol :
+  public GateSymbol
 {
 public:
 
   /// @brief コンストラクタ
-  InputSymbol();
+  NotSymbol();
 
   /// @brief デストラクタ
   virtual
-  ~InputSymbol();
+  ~NotSymbol();
 
 
 public:
@@ -41,6 +41,7 @@ public:
   QRect
   bounding_box() const;
 
+#if 0
   /// @brief 入力数を得る．
   virtual
   ymuint
@@ -62,17 +63,16 @@ public:
   virtual
   QPoint
   opin_location(ymuint pos) const;
+#endif
 
   /// @brief 描画を行う．
   /// @param[in] painter 描画を行うオブジェクト
-  /// @param[in] rect 描画矩形
   virtual
   void
-  draw(QPainter& painter,
-       const QRect& rect) const;
+  draw(QPainter& painter) const;
 
 };
 
 END_NAMESPACE_YM_LED
 
-#endif // INPUTSYMBOL_H
+#endif // NOTSYMBOL_H

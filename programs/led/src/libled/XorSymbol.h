@@ -24,7 +24,10 @@ class XorSymbol :
 public:
 
   /// @brief コンストラクタ
-  XorSymbol();
+  /// @param[in] ipols 入力の極性 ( 0 で肯定, 1 で否定を表す )
+  /// @param[in] opol 出力の極性 ( 0 で肯定, 1 で否定を表す )
+  XorSymbol(const vector<int>& ipols,
+	    int opol);
 
   /// @brief デストラクタ
   virtual
@@ -67,11 +70,9 @@ public:
 
   /// @brief 描画を行う．
   /// @param[in] painter 描画を行うオブジェクト
-  /// @param[in] rect 描画矩形
   virtual
   void
-  draw(QPainter& painter,
-       const QRect& rect) const;
+  draw(QPainter& painter) const;
 
 };
 

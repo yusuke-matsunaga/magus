@@ -1,8 +1,8 @@
-#ifndef ORSYMBOL_H
-#define ORSYMBOL_H
+#ifndef BUFSYMBOL_H
+#define BUFSYMBOL_H
 
-/// @file OrSymbol.h
-/// @brief OrSymbol のヘッダファイル
+/// @file BufSymbol.h
+/// @brief BufSymbol のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -15,20 +15,20 @@
 BEGIN_NAMESPACE_YM_LED
 
 //////////////////////////////////////////////////////////////////////
-/// @class OrSymbol OrSymbol.h "OrSymbol.h"
-/// @brief ORゲートのシンボルを表すクラス
+/// @class BufSymbol BufSymbol.h "BufSymbol.h"
+/// @brief バッファのシンボルを表すクラス
 //////////////////////////////////////////////////////////////////////
-class OrSymbol :
+class BufSymbol :
   public GateSymbol
 {
 public:
 
   /// @brief コンストラクタ
-  OrSymbol();
+  BufSymbol();
 
   /// @brief デストラクタ
   virtual
-  ~OrSymbol();
+  ~BufSymbol();
 
 
 public:
@@ -67,14 +67,12 @@ public:
 
   /// @brief 描画を行う．
   /// @param[in] painter 描画を行うオブジェクト
-  /// @param[in] rect 描画矩形
   virtual
   void
-  draw(QPainter& painter,
-       const QRect& rect) const;
+  draw(QPainter& painter) const;
 
 };
 
 END_NAMESPACE_YM_LED
 
-#endif // ORSYMBOL_H
+#endif // BUFSYMBOL_H

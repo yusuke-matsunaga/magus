@@ -1,8 +1,8 @@
-#ifndef OUTPUTSYMBOL_H
-#define OUTPUTSYMBOL_H
+#ifndef INPUTSYMBOL_H
+#define INPUTSYMBOL_H
 
-/// @file OutputSymbol.h
-/// @brief OutputSymbol のヘッダファイル
+/// @file InputSymbol.h
+/// @brief InputSymbol のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -15,20 +15,20 @@
 BEGIN_NAMESPACE_YM_LED
 
 //////////////////////////////////////////////////////////////////////
-/// @class OutputSymbol OutputSymbol.h "OutputSymbol.h"
-/// @brief 出力ピンのシンボルを表すクラス
+/// @class InputSymbol InputSymbol.h "InputSymbol.h"
+/// @brief 入力ピンのシンボルを表すクラス
 //////////////////////////////////////////////////////////////////////
-class OutputSymbol :
+class InputSymbol :
   public Symbol
 {
 public:
 
   /// @brief コンストラクタ
-  OutputSymbol();
+  InputSymbol();
 
   /// @brief デストラクタ
   virtual
-  ~OutputSymbol();
+  ~InputSymbol();
 
 
 public:
@@ -65,14 +65,12 @@ public:
 
   /// @brief 描画を行う．
   /// @param[in] painter 描画を行うオブジェクト
-  /// @param[in] rect 描画矩形
   virtual
   void
-  draw(QPainter& painter,
-       const QRect& rect) const;
+  draw(QPainter& painter) const;
 
 };
 
 END_NAMESPACE_YM_LED
 
-#endif // OUTPUTSYMBOL_H
+#endif // INPUTSYMBOL_H

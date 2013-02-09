@@ -9,8 +9,6 @@
 
 
 #include "led_nsdef.h"
-#include <QPoint>
-#include <QRect>
 
 
 BEGIN_NAMESPACE_YM_LED
@@ -26,6 +24,50 @@ public:
   /// @brief デストラクタ
   virtual
   ~Symbol() { }
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // インスタンスを生成するクラスメソッド
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入力を生成する．
+  static
+  Symbol*
+  input_symbol();
+
+  /// @brief 出力を生成する．
+  static
+  Symbol*
+  output_symbol();
+
+  /// @brief バッファを生成する．
+  static
+  Symbol*
+  buffer_symbol();
+
+  /// @brief インバーター (NOT ゲート) を生成する．
+  static
+  Symbol*
+  not_symbol();
+
+  /// @brief AND ゲートを生成する．
+  /// @param[in] ni 入力数
+  static
+  Symbol*
+  and_symbol(ymuint ni);
+
+  /// @brief OR ゲートを生成する．
+  /// @param[in] ni 入力数
+  static
+  Symbol*
+  or_symbol(ymuint ni);
+
+  /// @brief XOR ゲートを生成する．
+  /// @param[in] ni 入力数
+  static
+  Symbol*
+  xor_symbol(ymuint ni);
 
 
 public:
@@ -62,11 +104,9 @@ public:
 
   /// @brief 描画を行う．
   /// @param[in] painter 描画を行うオブジェクト
-  /// @param[in] rect 描画矩形
   virtual
   void
-  draw(QPainter& painter,
-       const QRect& rect) const = 0;
+  draw(QPainter& painter) const = 0;
 
 };
 

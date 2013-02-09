@@ -1,8 +1,8 @@
-#ifndef NOTSYMBOL_H
-#define NOTSYMBOL_H
+#ifndef ORSYMBOL_H
+#define ORSYMBOL_H
 
-/// @file NotSymbol.h
-/// @brief NotSymbol のヘッダファイル
+/// @file OrSymbol.h
+/// @brief OrSymbol のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -15,20 +15,23 @@
 BEGIN_NAMESPACE_YM_LED
 
 //////////////////////////////////////////////////////////////////////
-/// @class NotSymbol NotSymbol.h "NotSymbol.h"
-/// @brief バッファのシンボルを表すクラス
+/// @class OrSymbol OrSymbol.h "OrSymbol.h"
+/// @brief ORゲートのシンボルを表すクラス
 //////////////////////////////////////////////////////////////////////
-class NotSymbol :
+class OrSymbol :
   public GateSymbol
 {
 public:
 
   /// @brief コンストラクタ
-  NotSymbol();
+  /// @param[in] ipols 入力の極性 ( 0 で肯定, 1 で否定を表す )
+  /// @param[in] opol 出力の極性 ( 0 で肯定, 1 で否定を表す )
+  OrSymbol(const vector<int>& ipols,
+	   int opol);
 
   /// @brief デストラクタ
   virtual
-  ~NotSymbol();
+  ~OrSymbol();
 
 
 public:
@@ -67,14 +70,12 @@ public:
 
   /// @brief 描画を行う．
   /// @param[in] painter 描画を行うオブジェクト
-  /// @param[in] rect 描画矩形
   virtual
   void
-  draw(QPainter& painter,
-       const QRect& rect) const;
+  draw(QPainter& painter) const;
 
 };
 
 END_NAMESPACE_YM_LED
 
-#endif // NOTSYMBOL_H
+#endif // ORSYMBOL_H

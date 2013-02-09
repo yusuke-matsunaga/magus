@@ -1,34 +1,34 @@
-#ifndef BUFSYMBOL_H
-#define BUFSYMBOL_H
+#ifndef OUTPUTSYMBOL_H
+#define OUTPUTSYMBOL_H
 
-/// @file BufSymbol.h
-/// @brief BufSymbol のヘッダファイル
+/// @file OutputSymbol.h
+/// @brief OutputSymbol のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GateSymbol.h"
+#include "Symbol.h"
 
 
 BEGIN_NAMESPACE_YM_LED
 
 //////////////////////////////////////////////////////////////////////
-/// @class BufSymbol BufSymbol.h "BufSymbol.h"
-/// @brief バッファのシンボルを表すクラス
+/// @class OutputSymbol OutputSymbol.h "OutputSymbol.h"
+/// @brief 出力ピンのシンボルを表すクラス
 //////////////////////////////////////////////////////////////////////
-class BufSymbol :
-  public GateSymbol
+class OutputSymbol :
+  public Symbol
 {
 public:
 
   /// @brief コンストラクタ
-  BufSymbol();
+  OutputSymbol();
 
   /// @brief デストラクタ
   virtual
-  ~BufSymbol();
+  ~OutputSymbol();
 
 
 public:
@@ -41,7 +41,6 @@ public:
   QRect
   bounding_box() const;
 
-#if 0
   /// @brief 入力数を得る．
   virtual
   ymuint
@@ -63,18 +62,15 @@ public:
   virtual
   QPoint
   opin_location(ymuint pos) const;
-#endif
 
   /// @brief 描画を行う．
   /// @param[in] painter 描画を行うオブジェクト
-  /// @param[in] rect 描画矩形
   virtual
   void
-  draw(QPainter& painter,
-       const QRect& rect) const;
+  draw(QPainter& painter) const;
 
 };
 
 END_NAMESPACE_YM_LED
 
-#endif // BUFSYMBOL_H
+#endif // OUTPUTSYMBOL_H
