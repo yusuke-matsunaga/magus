@@ -46,11 +46,6 @@ public:
   Symbol*
   buffer_symbol();
 
-  /// @brief インバーター (NOT ゲート) を生成する．
-  static
-  Symbol*
-  not_symbol();
-
   /// @brief AND ゲートを生成する．
   /// @param[in] ni 入力数
   static
@@ -68,6 +63,20 @@ public:
   static
   Symbol*
   xor_symbol(ymuint ni);
+
+  /// @brief 出力に否定のドットをつけたシンボルを生成する．
+  /// @param[in] src_symbol もととなるシンボル．
+  static
+  Symbol*
+  output_inv_symbol(Symbol* src_symbol);
+
+  /// @brief 入力に否定のドットをつけたシンボルを生成する．
+  /// @param[in] src_symbol もととなるシンボル．
+  /// @param[in] pols 入力の否定の情報 (0 で肯定，1 で否定)
+  static
+  Symbol*
+  input_inv_symbol(Symbol* src_symbol,
+		   const vector<int>& pols);
 
 
 public:

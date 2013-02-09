@@ -24,10 +24,8 @@ class XorSymbol :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] ipols 入力の極性 ( 0 で肯定, 1 で否定を表す )
-  /// @param[in] opol 出力の極性 ( 0 で肯定, 1 で否定を表す )
-  XorSymbol(const vector<int>& ipols,
-	    int opol);
+  /// @param[in] ni 入力数
+  XorSymbol(ymuint ni);
 
   /// @brief デストラクタ
   virtual
@@ -39,12 +37,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief このゲートを囲む最小の矩形を表す左上と右下の点を得る．
   virtual
   QRect
   bounding_box() const;
 
-#if 0
   /// @brief 入力数を得る．
   virtual
   ymuint

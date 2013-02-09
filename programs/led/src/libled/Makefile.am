@@ -21,7 +21,6 @@ libled_la_SOURCES = \
 	OutputSymbol.h \
 	GateSymbol.h \
 	BufSymbol.h \
-	NotSymbol.h \
 	AndSymbol.h \
 	OrSymbol.h \
 	XorSymbol.h \

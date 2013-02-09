@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "GateSymbol.h"
+#include "Symbol.h"
 
 
 BEGIN_NAMESPACE_YM_LED
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_LED
 /// @brief バッファのシンボルを表すクラス
 //////////////////////////////////////////////////////////////////////
 class BufSymbol :
-  public GateSymbol
+  public Symbol
 {
 public:
 
@@ -41,7 +41,6 @@ public:
   QRect
   bounding_box() const;
 
-#if 0
   /// @brief 入力数を得る．
   virtual
   ymuint
@@ -63,7 +62,6 @@ public:
   virtual
   QPoint
   opin_location(ymuint pos) const;
-#endif
 
   /// @brief 描画を行う．
   /// @param[in] painter 描画を行うオブジェクト

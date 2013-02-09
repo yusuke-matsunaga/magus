@@ -38,6 +38,12 @@ private:
   // 入力シンボル
   Symbol* mInputSymbol;
 
+  // 出力シンボル
+  Symbol* mOutputSymbol;
+
+  // バッファシンボル
+  Symbol* mBufSymbol;
+
 };
 
 // @brief コンストラクタ
@@ -46,6 +52,8 @@ SymbolTestWidget::SymbolTestWidget(QWidget* parent) :
   QWidget(parent)
 {
   mInputSymbol = Symbol::input_symbol();
+  mOutputSymbol = Symbol::output_symbol();
+  mBufSymbol = Symbol::buffer_symbol();
 }
 
 // @brief 描画イベントのハンドラ
@@ -56,11 +64,27 @@ SymbolTestWidget::paintEvent(QPaintEvent* event)
 
   painter.setRenderHint(QPainter::Antialiasing, true);
 
-  QMatrix matrix;
-  matrix.translate(20.0, 20.0);
+  {
+    QMatrix matrix;
+    matrix.translate(20.0, 20.0);
 
-  painter.setMatrix(matrix);
-  mInputSymbol->draw(painter);
+    painter.setMatrix(matrix);
+    mInputSymbol->draw(painter);
+  }
+  {
+    QMatrix matrix;
+    matrix.translate(200.0, 20.0);
+
+    painter.setMatrix(matrix);
+    mOutputSymbol->draw(painter);
+  }
+  {
+    QMatrix matrix;
+    matrix.translate(100.0, 20.0);
+
+    painter.setMatrix(matrix);
+    mBufSymbol->draw(painter);
+  }
 }
 
 

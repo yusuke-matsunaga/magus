@@ -91,8 +91,7 @@ public:
 
   /// @brief 描画する．
   void
-  draw(QPainter& painter,
-       const QRect& rect) const;
+  draw(QPainter& painter) const;
 
 
 private:

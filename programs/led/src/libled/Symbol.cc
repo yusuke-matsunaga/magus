@@ -12,7 +12,6 @@
 #include "OutputSymbol.h"
 #include "GateSymbol.h"
 #include "BufSymbol.h"
-#include "NotSymbol.h"
 #include "AndSymbol.h"
 #include "OrSymbol.h"
 #include "XorSymbol.h"
@@ -141,33 +140,14 @@ Symbol::input_symbol()
 Symbol*
 Symbol::output_symbol()
 {
-#if 0
   return new OutputSymbol();
-#else
-  return NULL;
-#endif
 }
 
 // @brief バッファを生成する．
 Symbol*
 Symbol::buffer_symbol()
 {
-#if 0
   return new BufSymbol();
-#else
-  return NULL;
-#endif
-}
-
-// @brief インバーター (NOT ゲート) を生成する．
-Symbol*
-Symbol::not_symbol()
-{
-#if 0
-  return new NotSymbol();
-#else
-  return NULL;
-#endif
 }
 
 // @brief AND ゲートを生成する．
@@ -175,11 +155,7 @@ Symbol::not_symbol()
 Symbol*
 Symbol::and_symbol(ymuint ni)
 {
-#if 0
-  return new AndSymbol(ipols, opol);
-#else
-  return NULL;
-#endif
+  return new AndSymbol(ni);
 }
 
 // @brief OR ゲートを生成する．
@@ -187,11 +163,7 @@ Symbol::and_symbol(ymuint ni)
 Symbol*
 Symbol::or_symbol(ymuint ni)
 {
-#if 0
-  return new OrSymbol(ipols, opol);
-#else
-  return NULL;
-#endif
+  return new OrSymbol(ni);
 }
 
 // @brief XOR ゲートを生成する．
@@ -199,11 +171,23 @@ Symbol::or_symbol(ymuint ni)
 Symbol*
 Symbol::xor_symbol(ymuint ni)
 {
-#if 0
-  return new XorSymbol(ipols, opol);
-#else
-  return NULL;
-#endif
+  return new XorSymbol(ni);
+}
+
+// @brief 出力に否定のドットをつけたシンボルを生成する．
+// @param[in] src_symbol もととなるシンボル．
+Symbol*
+Symbol::output_inv_symbol(Symbol* src_symbol)
+{
+}
+
+// @brief 入力に否定のドットをつけたシンボルを生成する．
+// @param[in] src_symbol もととなるシンボル．
+// @param[in] pols 入力の否定の情報 (0 で肯定，1 で否定)
+Symbol*
+Symbol::input_inv_symbol(Symbol* src_symbol,
+			 const vector<int>& pols)
+{
 }
 
 
@@ -225,7 +209,7 @@ InputSymbol::~InputSymbol()
 QRect
 InputSymbol::bounding_box() const
 {
-  return QRect(0, -(kInputH / 2), kInputW, kInputH);
+  return QRect(0, -(kInputH / 2.0), kInputW, kInputH);
 }
 
 // @brief 入力数を得る．
@@ -283,6 +267,284 @@ InputSymbol::draw(QPainter& painter) const
   const ymuint kNumPoints = sizeof(path) / sizeof(QPoint);
 
   painter.drawPolygon(path, kNumPoints);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス OutputSymbol
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+OutputSymbol::OutputSymbol()
+{
+}
+
+// @brief デストラクタ
+OutputSymbol::~OutputSymbol()
+{
+}
+
+// @brief このゲートを囲む最小の矩形を表す左上と右下の点を得る．
+QRect
+OutputSymbol::bounding_box() const
+{
+  return QRect(0, -(kOutputH / 2.0), kOutputW, kOutputH);
+}
+
+// @brief 入力数を得る．
+ymuint
+OutputSymbol::ipin_num() const
+{
+  return 1;
+}
+
+// @brief pos 番目の入力ピン位置を得る．
+// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
+QPoint
+OutputSymbol::ipin_location(ymuint pos) const
+{
+  assert_cond( pos == 0, __FILE__, __LINE__);
+  return QPoint(0, 0);
+}
+
+// @brief 出力数を得る．
+ymuint
+OutputSymbol::opin_num() const
+{
+  return 0;
+}
+
+// @brief pos 番目の出力ピン位置を得る．
+// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
+QPoint
+OutputSymbol::opin_location(ymuint pos) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return QPoint();
+}
+
+// @brief 描画を行う．
+// @param[in] painter 描画を行うオブジェクト
+void
+OutputSymbol::draw(QPainter& painter) const
+{
+  const double l_x = 0;
+  const double m_x = kOutputW - (kOutputH / 2.0);
+  const double r_x = kOutputW;
+  const double u_y = -(kOutputH / 2);
+  const double m_y = 0;
+  const double l_y = (kOutputH / 2);
+
+  const QPoint path[] = {
+    QPoint(l_x, u_y),
+    QPoint(m_x, u_y),
+    QPoint(r_x, m_y),
+    QPoint(m_x, l_y),
+    QPoint(l_x, l_y)
+  };
+  const ymuint kNumPoints = sizeof(path) / sizeof(QPoint);
+
+  painter.drawPolygon(path, kNumPoints);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス GateSymbol
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] ni 入力数
+GateSymbol::GateSymbol(ymuint ni) :
+  mInputNum(ni)
+{
+}
+
+/// @brief デストラクタ
+GateSymbol::~GateSymbol()
+{
+}
+
+// @brief このゲートを囲む最小の矩形を表す左上と右下の点を得る．
+QRect
+GateSymbol::bounding_box() const
+{
+  return QRect(0, - (kGateH / 2), kGateW, kGateH);
+}
+
+// @brief 入力数を得る．
+ymuint
+GateSymbol::ipin_num() const
+{
+  return mInputNum;
+}
+
+// @brief pos 番目の入力ピン位置を得る．
+// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
+QPoint
+GateSymbol::ipin_location(ymuint pos) const
+{
+}
+
+// @brief 出力数を得る．
+ymuint
+GateSymbol::opin_num() const
+{
+  return 1;
+}
+
+// @brief pos 番目の出力ピン位置を得る．
+// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
+QPoint
+GateSymbol::opin_location(ymuint pos) const
+{
+  return QPoint(kGateW, 0);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス BufSymbol
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+BufSymbol::BufSymbol()
+{
+}
+
+// @brief デストラクタ
+BufSymbol::~BufSymbol()
+{
+}
+
+// @brief このゲートを囲む最小の矩形を表す左上と右下の点を得る．
+QRect
+BufSymbol::bounding_box() const
+{
+  return QRect(0, -(kBufH / 2.0), kBufW, kBufH);
+}
+
+// @brief 入力数を得る．
+ymuint
+BufSymbol::ipin_num() const
+{
+  return 1;
+}
+
+// @brief pos 番目の入力ピン位置を得る．
+// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
+QPoint
+BufSymbol::ipin_location(ymuint pos) const
+{
+  assert_cond( pos == 0, __FILE__, __LINE__);
+  return QPoint(0, 0);
+}
+
+// @brief 出力数を得る．
+ymuint
+BufSymbol::opin_num() const
+{
+  return 1;
+}
+
+// @brief pos 番目の出力ピン位置を得る．
+// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
+QPoint
+BufSymbol::opin_location(ymuint pos) const
+{
+  assert_cond( pos == 0, __FILE__, __LINE__);
+  return QPoint(kBufW, 0);
+}
+
+// @brief 描画を行う．
+// @param[in] painter 描画を行うオブジェクト
+void
+BufSymbol::draw(QPainter& painter) const
+{
+  const double l_x = 0;
+  const double r_x = kBufW;
+  const double u_y = -(kBufH / 2);
+  const double m_y = 0;
+  const double l_y =  (kBufH / 2);
+
+  const QPoint path[] = {
+    QPoint(l_x, u_y),
+    QPoint(r_x, m_y),
+    QPoint(l_x, l_y)
+  };
+  const ymuint kNumPoints = sizeof(path) / sizeof(QPoint);
+
+  painter.drawPolygon(path, kNumPoints);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス AndSymbol
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] ni 入力数
+AndSymbol::AndSymbol(ymuint ni) :
+  GateSymbol(ni)
+{
+}
+
+// @brief デストラクタ
+AndSymbol::~AndSymbol()
+{
+}
+
+// @brief 描画を行う．
+// @param[in] painter 描画を行うオブジェクト
+void
+AndSymbol::draw(QPainter& painter) const
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス OrSymbol
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] ni 入力数
+OrSymbol::OrSymbol(ymuint ni) :
+  GateSymbol(ni)
+{
+}
+
+// @brief デストラクタ
+OrSymbol::~OrSymbol()
+{
+}
+
+// @brief 描画を行う．
+// @param[in] painter 描画を行うオブジェクト
+void
+OrSymbol::draw(QPainter& painter) const
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス XorSymbol
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] ni 入力数
+XorSymbol::XorSymbol(ymuint ni) :
+  GateSymbol(ni)
+{
+}
+
+// @brief デストラクタ
+XorSymbol::~XorSymbol()
+{
+}
+
+// @brief 描画を行う．
+// @param[in] painter 描画を行うオブジェクト
+void
+XorSymbol::draw(QPainter& painter) const
+{
 }
 
 END_NAMESPACE_YM_LED
