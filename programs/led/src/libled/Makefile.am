@@ -16,15 +16,9 @@ libled_la_CPPFLAGS = \
 	-I$(top_srcdir)/include
 
 libled_la_SOURCES = \
-	Symbol.h \
-	InputSymbol.h \
-	OutputSymbol.h \
-	GateSymbol.h \
-	BufSymbol.h \
-	AndSymbol.h \
-	OrSymbol.h \
-	XorSymbol.h \
 	Symbol.cc \
+	SymbolImpl.h \
+	SymbolImpl.cc \
 	GateObj.h \
 	GateObj.cc
 

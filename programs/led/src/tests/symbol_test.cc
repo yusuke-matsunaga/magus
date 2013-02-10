@@ -50,6 +50,8 @@ private:
   // OR シンボル
   Symbol* mOrSymbol;
 
+  // XOR シンボル
+  Symbol* mXorSymbol;
 };
 
 // @brief コンストラクタ
@@ -62,6 +64,7 @@ SymbolTestWidget::SymbolTestWidget(QWidget* parent) :
   mBufSymbol = Symbol::buffer_symbol();
   mAndSymbol = Symbol::and_symbol(3);
   mOrSymbol = Symbol::or_symbol(3);
+  mXorSymbol = Symbol::or_symbol(3);
 }
 
 // @brief 描画イベントのハンドラ
@@ -72,6 +75,7 @@ SymbolTestWidget::paintEvent(QPaintEvent* event)
 
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
+  painter.eraseRect(rect());
   {
     QMatrix matrix;
     matrix.translate(20.0, 20.0);
@@ -106,6 +110,13 @@ SymbolTestWidget::paintEvent(QPaintEvent* event)
 
     painter.setMatrix(matrix);
     mOrSymbol->draw(painter);
+  }
+  {
+    QMatrix matrix;
+    matrix.translate(200.0, 200.0);
+
+    painter.setMatrix(matrix);
+    mXorSymbol->draw(painter);
   }
 }
 
