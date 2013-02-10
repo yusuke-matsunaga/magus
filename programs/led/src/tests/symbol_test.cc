@@ -44,6 +44,12 @@ private:
   // バッファシンボル
   Symbol* mBufSymbol;
 
+  // AND シンボル
+  Symbol* mAndSymbol;
+
+  // OR シンボル
+  Symbol* mOrSymbol;
+
 };
 
 // @brief コンストラクタ
@@ -54,6 +60,8 @@ SymbolTestWidget::SymbolTestWidget(QWidget* parent) :
   mInputSymbol = Symbol::input_symbol();
   mOutputSymbol = Symbol::output_symbol();
   mBufSymbol = Symbol::buffer_symbol();
+  mAndSymbol = Symbol::and_symbol(3);
+  mOrSymbol = Symbol::or_symbol(3);
 }
 
 // @brief 描画イベントのハンドラ
@@ -63,7 +71,7 @@ SymbolTestWidget::paintEvent(QPaintEvent* event)
   QPainter painter(this);
 
   painter.setRenderHint(QPainter::Antialiasing, true);
-
+  painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
   {
     QMatrix matrix;
     matrix.translate(20.0, 20.0);
@@ -84,6 +92,20 @@ SymbolTestWidget::paintEvent(QPaintEvent* event)
 
     painter.setMatrix(matrix);
     mBufSymbol->draw(painter);
+  }
+  {
+    QMatrix matrix;
+    matrix.translate(100.0, 100.0);
+
+    painter.setMatrix(matrix);
+    mAndSymbol->draw(painter);
+  }
+  {
+    QMatrix matrix;
+    matrix.translate(200.0, 100.0);
+
+    painter.setMatrix(matrix);
+    mOrSymbol->draw(painter);
   }
 }
 

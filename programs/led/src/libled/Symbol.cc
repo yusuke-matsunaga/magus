@@ -16,6 +16,8 @@
 #include "OrSymbol.h"
 #include "XorSymbol.h"
 
+#include <math.h>
+
 
 BEGIN_NAMESPACE_YM_LED
 
@@ -349,59 +351,6 @@ OutputSymbol::draw(QPainter& painter) const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス GateSymbol
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] ni 入力数
-GateSymbol::GateSymbol(ymuint ni) :
-  mInputNum(ni)
-{
-}
-
-/// @brief デストラクタ
-GateSymbol::~GateSymbol()
-{
-}
-
-// @brief このゲートを囲む最小の矩形を表す左上と右下の点を得る．
-QRect
-GateSymbol::bounding_box() const
-{
-  return QRect(0, - (kGateH / 2), kGateW, kGateH);
-}
-
-// @brief 入力数を得る．
-ymuint
-GateSymbol::ipin_num() const
-{
-  return mInputNum;
-}
-
-// @brief pos 番目の入力ピン位置を得る．
-// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
-QPoint
-GateSymbol::ipin_location(ymuint pos) const
-{
-}
-
-// @brief 出力数を得る．
-ymuint
-GateSymbol::opin_num() const
-{
-  return 1;
-}
-
-// @brief pos 番目の出力ピン位置を得る．
-// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
-QPoint
-GateSymbol::opin_location(ymuint pos) const
-{
-  return QPoint(kGateW, 0);
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス BufSymbol
 //////////////////////////////////////////////////////////////////////
 
@@ -477,6 +426,59 @@ BufSymbol::draw(QPainter& painter) const
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス GateSymbol
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] ni 入力数
+GateSymbol::GateSymbol(ymuint ni) :
+  mInputNum(ni)
+{
+}
+
+/// @brief デストラクタ
+GateSymbol::~GateSymbol()
+{
+}
+
+// @brief このゲートを囲む最小の矩形を表す左上と右下の点を得る．
+QRect
+GateSymbol::bounding_box() const
+{
+  return QRect(0, kGateUY, kGateW, kGateH);
+}
+
+// @brief 入力数を得る．
+ymuint
+GateSymbol::ipin_num() const
+{
+  return mInputNum;
+}
+
+// @brief pos 番目の入力ピン位置を得る．
+// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
+QPoint
+GateSymbol::ipin_location(ymuint pos) const
+{
+}
+
+// @brief 出力数を得る．
+ymuint
+GateSymbol::opin_num() const
+{
+  return 1;
+}
+
+// @brief pos 番目の出力ピン位置を得る．
+// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
+QPoint
+GateSymbol::opin_location(ymuint pos) const
+{
+  return QPoint(kGateW, 0);
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス AndSymbol
 //////////////////////////////////////////////////////////////////////
 
@@ -492,11 +494,59 @@ AndSymbol::~AndSymbol()
 {
 }
 
+
+BEGIN_NONAMESPACE
+
+// 円弧を表す点列を作る．
+void
+create_arc(double cx,
+	   double cy,
+	   double r,
+	   ymuint ndiv,
+	   double start_rad,
+	   double end_rad,
+	   QVector<QPoint>& points)
+{
+  double rad = pi * start_rad;
+  double diff = end_rad - start_rad;
+  double inc = (pi * diff) / ndiv;
+  for (size_t i = 1; i < ndiv; i ++) {
+    rad += inc;
+    double dx = cx + cos(rad) * r;
+    double dy = cy + sin(rad) * r;
+    points.push_back(QPoint(dx, dy));
+  }
+}
+
+END_NONAMESPACE
+
 // @brief 描画を行う．
 // @param[in] painter 描画を行うオブジェクト
 void
 AndSymbol::draw(QPainter& painter) const
 {
+  ymuint ndiv = 24;
+
+  QVector<QPoint> tmp_list;
+  tmp_list.push_back(QPoint(0.0, kGateUY));
+  tmp_list.push_back(QPoint(kAndL, kGateUY));
+  create_arc(kAndL, 0.0, kAndR, ndiv, 1.5, 2.5, tmp_list);
+  tmp_list.push_back(QPoint(kAndL, kGateLY));
+  tmp_list.push_back(QPoint(0.0, kGateLY));
+  QPolygon poly(tmp_list);
+
+  QImage image_buffer(kGateW, kGateH, QImage::Format_ARGB32_Premultiplied);
+  QPainter image_painter(&image_buffer);
+  //image_painter.initFrom(this);
+  image_painter.setRenderHint(QPainter::Antialiasing, true);
+
+  QMatrix matrix;
+  matrix.translate(0.0, kGateH / 2.0);
+  image_painter.setMatrix(matrix);
+  image_painter.drawPolygon(poly);
+  image_painter.end();
+
+  painter.drawImage(0, - kGateH / 2.0, image_buffer);
 }
 
 
@@ -521,6 +571,21 @@ OrSymbol::~OrSymbol()
 void
 OrSymbol::draw(QPainter& painter) const
 {
+  ymuint ndiv = 16;
+
+  QVector<QPoint> tmp_list;
+  tmp_list.push_back(QPoint(0.0, kGateUY));
+  tmp_list.push_back(QPoint(kOrL, kGateUY));
+  create_arc(kOrL, kGateLY, kOrR, ndiv, 9.0 / 6.0, 11.0 / 6.0, tmp_list);
+  tmp_list.push_back(QPoint(kGateW, 0.0));
+  create_arc(kOrL, kGateUY, kOrR, ndiv, 1.0 / 6.0, 3.0 / 6.0, tmp_list);
+  tmp_list.push_back(QPoint(kOrL, kGateLY));
+  tmp_list.push_back(QPoint(0.0, kGateLY));
+  double cx = - (kOrR / 2.0) * sqrt3;
+  create_arc(cx, 0.0, kOrR, ndiv, 1.0 / 6.0, -1.0 / 6.0, tmp_list);
+  QPolygon poly(tmp_list);
+
+  painter.drawPolygon(poly);
 }
 
 

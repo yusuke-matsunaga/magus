@@ -103,6 +103,7 @@ protected:
        ymuint npins,
        bool or_xor);
 
+#if 0
   /// @brief 円弧を表す点列を作る．
   /// @param[in] cx 中心の X 座標
   /// @param[in] cy 中心の Y 座標
@@ -120,6 +121,7 @@ protected:
 	     ymuint start_rad,
 	     ymuint end_rad,
 	     vector<QPoint>& points);
+#endif
 
 
 private:
