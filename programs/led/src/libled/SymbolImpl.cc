@@ -7,6 +7,7 @@
 /// All rights reserved.
 
 
+#include "Symbol.h"
 #include "SymbolImpl.h"
 #include "DrawObj.h"
 
@@ -314,6 +315,22 @@ create_dot(const QPointF& offset = QPointF(0.0, 0.0))
 }
 
 END_NONAMESPACE
+
+//////////////////////////////////////////////////////////////////////
+// クラス Symbol
+//////////////////////////////////////////////////////////////////////
+
+// @brief 単純な型のシンボルを生成する．
+// @param[in] type 型
+// @param[in] ni 入力数
+// @note 入力/出力/バッファ/NOT の場合は ni の値は無視される．
+// @note それ以外の場合は ni は 2 以上でなければならない．
+Symbol*
+Symbol::new_symbol(GateType type,
+		   ymuint ni)
+{
+  return new SymbolImpl(type, ni);
+}
 
 
 //////////////////////////////////////////////////////////////////////
