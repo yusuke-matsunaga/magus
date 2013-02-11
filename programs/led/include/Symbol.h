@@ -9,6 +9,7 @@
 
 
 #include "led_nsdef.h"
+#include "GateType.h"
 
 
 BEGIN_NAMESPACE_YM_LED
@@ -31,57 +32,15 @@ public:
   // インスタンスを生成するクラスメソッド
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 入力を生成する．
-  static
-  Symbol*
-  input_symbol();
-
-  /// @brief 出力を生成する．
-  static
-  Symbol*
-  output_symbol();
-
-  /// @brief バッファを生成する．
-  static
-  Symbol*
-  buffer_symbol();
-
-  /// @brief NOT ゲートを生成する．
-  static
-  Symbol*
-  not_symbol();
-
-  /// @brief AND ゲートを生成する．
+  /// @brief 単純な型のシンボルを生成する．
+  /// @param[in] type 型
   /// @param[in] ni 入力数
+  /// @note 入力/出力/バッファ/NOT の場合は ni の値は無視される．
+  /// @note それ以外の場合は ni は 2 以上でなければならない．
   static
   Symbol*
-  and_symbol(ymuint ni);
-
-  /// @brief OR ゲートを生成する．
-  /// @param[in] ni 入力数
-  static
-  Symbol*
-  or_symbol(ymuint ni);
-
-  /// @brief XOR ゲートを生成する．
-  /// @param[in] ni 入力数
-  static
-  Symbol*
-  xor_symbol(ymuint ni);
-
-  /// @brief 出力に否定のドットをつけたシンボルを生成する．
-  /// @param[in] src_symbol もととなるシンボル．
-  static
-  Symbol*
-  output_inv_symbol(Symbol* src_symbol);
-
-  /// @brief 入力に否定のドットをつけたシンボルを生成する．
-  /// @param[in] src_symbol もととなるシンボル．
-  /// @param[in] pols 入力の否定の情報 (0 で肯定，1 で否定)
-  static
-  Symbol*
-  input_inv_symbol(Symbol* src_symbol,
-		   const vector<int>& pols);
+  new_symbol(GateType type,
+	     ymuint ni = 0);
 
 
 public:

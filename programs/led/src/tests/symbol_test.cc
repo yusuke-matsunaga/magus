@@ -62,13 +62,13 @@ private:
 SymbolTestWidget::SymbolTestWidget(QWidget* parent) :
   QWidget(parent)
 {
-  mInputSymbol = Symbol::input_symbol();
-  mOutputSymbol = Symbol::output_symbol();
-  mBufSymbol = Symbol::buffer_symbol();
-  mNotSymbol = Symbol::not_symbol();
-  mAndSymbol = Symbol::and_symbol(7);
-  mOrSymbol = Symbol::or_symbol(23);
-  mXorSymbol = Symbol::xor_symbol(28);
+  mInputSymbol = Symbol::new_symbol(kGtInput);
+  mOutputSymbol = Symbol::new_symbol(kGtOutput);
+  mBufSymbol = Symbol::new_symbol(kGtBuffer);
+  mNotSymbol = Symbol::new_symbol(kGtNot);
+  mAndSymbol = Symbol::new_symbol(kGtNand, 7);
+  mOrSymbol = Symbol::new_symbol(kGtNor, 23);
+  mXorSymbol = Symbol::new_symbol(kGtXnor, 28);
 }
 
 // @brief 描画イベントのハンドラ

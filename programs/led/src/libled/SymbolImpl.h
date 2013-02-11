@@ -26,62 +26,15 @@ class SymbolImpl :
 public:
 
   /// @brief コンストラクタ
-  SymbolImpl();
+  /// @param[in] type 型
+  /// @param[in] ni 入力数
+  /// @note 入力/出力/バッファ/NOT の場合は ni の値は無視される．
+  /// @note それ以外の場合は ni は 2 以上でなければならない．
+  SymbolImpl(GateType type,
+	     ymuint ni);
 
   /// @brief デストラクタ
   ~SymbolImpl();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を設定する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 入力に設定する．
-  void
-  set_to_input();
-
-  /// @brief 出力に設定する．
-  void
-  set_to_output();
-
-  /// @brief バッファに設定する．
-  void
-  set_to_buffer();
-
-  /// @brief NOT ゲートに設定する．
-  void
-  set_to_not();
-
-  /// @brief AND ゲートに設定する．
-  /// @param[in] ni 入力数
-  void
-  set_to_and(ymuint ni);
-
-  /// @brief NAND ゲートに設定する．
-  /// @param[in] ni 入力数
-  void
-  set_to_nand(ymuint ni);
-
-  /// @brief OR ゲートに設定する．
-  /// @param[in] ni 入力数
-  void
-  set_to_or(ymuint ni);
-
-  /// @brief NOR ゲートに設定する．
-  /// @param[in] ni 入力数
-  void
-  set_to_nor(ymuint ni);
-
-  /// @brief XOR ゲートに設定する．
-  /// @param[in] ni 入力数
-  void
-  set_to_xor(ymuint ni);
-
-  /// @brief XNOR ゲートに設定する．
-  /// @param[in] ni 入力数
-  void
-  set_to_xnor(ymuint ni);
 
 
 public:
@@ -125,6 +78,46 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内容を設定する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入力に設定する．
+  void
+  set_to_input();
+
+  /// @brief 出力に設定する．
+  void
+  set_to_output();
+
+  /// @brief バッファに設定する．
+  /// @param[in] oinv 出力に否定を持つとき true にするフラグ
+  void
+  set_to_buffer(bool oinv);
+
+  /// @brief AND ゲートに設定する．
+  /// @param[in] ni 入力数
+  /// @param[in] oinv 出力に否定を持つとき true にするフラグ
+  void
+  set_to_and(ymuint ni,
+	     bool oinv);
+
+  /// @brief OR ゲートに設定する．
+  /// @param[in] ni 入力数
+  /// @param[in] oinv 出力に否定を持つとき true にするフラグ
+  void
+  set_to_or(ymuint ni,
+	    bool oinv);
+
+  /// @brief XOR ゲートに設定する．
+  /// @param[in] ni 入力数
+  /// @param[in] oinv 出力に否定を持つとき true にするフラグ
+  void
+  set_to_xor(ymuint ni,
+	     bool oinv);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // 設定用の下請け関数
   //////////////////////////////////////////////////////////////////////
 
@@ -141,27 +134,6 @@ private:
   /// @param[in] obj 設定する描画用オブジェクト
   void
   set_drawobj(DrawObj* obj);
-
-  /// @brief 描画用のオブジェクトを設定する．
-  /// @param[in] obj1, obj2 設定する描画用オブジェクト
-  void
-  set_drawobj(DrawObj* obj1,
-	      DrawObj* obj2);
-
-  /// @brief 描画用のオブジェクトを設定する．
-  /// @param[in] obj1, obj2, obj3 設定する描画用オブジェクト
-  void
-  set_drawobj(DrawObj* obj1,
-	      DrawObj* obj2,
-	      DrawObj* obj3);
-
-  /// @brief 描画用のオブジェクトを設定する．
-  /// @param[in] obj1, obj2, obj3, obj4 設定する描画用オブジェクト
-  void
-  set_drawobj(DrawObj* obj1,
-	      DrawObj* obj2,
-	      DrawObj* obj3,
-	      DrawObj* obj4);
 
   /// @brief 描画用のオブジェクトを設定する．
   /// @param[in] obj_list 設定する描画用オブジェクトのリスト

@@ -17,6 +17,19 @@ BEGIN_NAMESPACE_YM_LED
 // クラス Symbol
 //////////////////////////////////////////////////////////////////////
 
+// @brief 単純な型のシンボルを生成する．
+// @param[in] type 型
+// @param[in] ni 入力数
+// @note 入力/出力/バッファ/NOT の場合は ni の値は無視される．
+// @note それ以外の場合は ni は 2 以上でなければならない．
+Symbol*
+Symbol::new_symbol(GateType type,
+		   ymuint ni)
+{
+  return new SymbolImpl(type, ni);
+}
+
+#if 0
 // @brief 入力を生成する．
 Symbol*
 Symbol::input_symbol()
@@ -98,5 +111,6 @@ Symbol::input_inv_symbol(Symbol* src_symbol,
 			 const vector<int>& pols)
 {
 }
+#endif
 
 END_NAMESPACE_YM_LED
