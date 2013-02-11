@@ -27,8 +27,8 @@ const qreal sqrt3  = 1.73205080756887729353;
 const qreal kUnit  = 2;
 
 // ドット(否定)の大きさ
-const qreal kDotH  = 3.0 * kUnit;
-const qreal kDotW  = 3.0 * kUnit;
+const qreal kDotH  = 4.0 * kUnit;
+const qreal kDotW  = 4.0 * kUnit;
 
 // バッファ(正三角形)のサイズ
 const qreal kBufH  = 14.0 * kUnit;
@@ -119,6 +119,9 @@ const qreal kOutputW = 20.0 * kUnit;
 // 出力シンボルの上下の幅
 const qreal kOutputH = 4.0 * kUnit;
 
+// bounding box のマージン
+const qreal kBoundMargin = 4.0 * kUnit;
+
 // @brief 円弧を表す点列を points に追加する．
 // @param[in] cx, cy 中心の座標
 // @param[in] r 半径
@@ -171,11 +174,11 @@ create_input(vector<QPointF>& points)
 void
 create_output(vector<QPointF>& points)
 {
-  const qreal l_x = 0;
+  const qreal l_x = 0.0;
   const qreal m_x = kOutputW - (kOutputH / 2.0);
   const qreal r_x = kOutputW;
   const qreal u_y = -(kOutputH / 2);
-  const qreal c_y = 0;
+  const qreal c_y = 0.0;
   const qreal l_y = (kOutputH / 2);
 
   points.push_back(QPointF(l_x, u_y));
@@ -183,11 +186,11 @@ create_output(vector<QPointF>& points)
   points.push_back(QPointF(r_x, c_y));
   points.push_back(QPointF(m_x, l_y));
   points.push_back(QPointF(l_x, l_y));
-  points.push_back(QPointF(l_x, u_y));
 }
 
 // @brief BUF ゲートを表すポリゴンを作る．
 // @param[in] points 結果を格納するベクタ
+// @param[in] offset オフセット
 void
 create_buffer(vector<QPointF>& points,
 	      const QPointF& offset = QPointF(0.0, 0.0))
@@ -205,6 +208,7 @@ create_buffer(vector<QPointF>& points,
 
 // @brief AND ゲートを表すポリゴンを作る．
 // @param[in] points 結果を格納するベクタ
+// @param[in] offset オフセット
 void
 create_and(vector<QPointF>& points,
 	   const QPointF& offset = QPointF(0.0, 0.0))
@@ -229,6 +233,7 @@ create_and(vector<QPointF>& points,
 
 // @brief OR ゲートを表すポリゴンを作る．
 // @param[in] points 結果を格納するベクタ
+// @param[in] offset オフセット
 void
 create_or(vector<QPointF>& points,
 	  const QPointF& offset = QPointF(0.0, 0.0))
@@ -307,6 +312,8 @@ SymbolImpl::set_drawobj(DrawObj* obj)
   mObjNum = 1;
   mObjList = new DrawObj*[mObjNum];
   mObjList[0] = obj;
+
+  calc_bounding_box();
 }
 
 // @brief 描画用のオブジェクトを設定する．
@@ -319,6 +326,8 @@ SymbolImpl::set_drawobj(DrawObj* obj1,
   mObjList = new DrawObj*[mObjNum];
   mObjList[0] = obj1;
   mObjList[1] = obj2;
+
+  calc_bounding_box();
 }
 
 // @brief 描画用のオブジェクトを設定する．
@@ -333,6 +342,26 @@ SymbolImpl::set_drawobj(DrawObj* obj1,
   mObjList[0] = obj1;
   mObjList[1] = obj2;
   mObjList[2] = obj3;
+
+  calc_bounding_box();
+}
+
+// @brief 描画用のオブジェクトを設定する．
+void
+SymbolImpl::set_drawobj(DrawObj* obj1,
+			DrawObj* obj2,
+			DrawObj* obj3,
+			DrawObj* obj4)
+{
+  delete [] mObjList;
+  mObjNum = 4;
+  mObjList = new DrawObj*[mObjNum];
+  mObjList[0] = obj1;
+  mObjList[1] = obj2;
+  mObjList[2] = obj3;
+  mObjList[3] = obj4;
+
+  calc_bounding_box();
 }
 
 // @brief 描画用のオブジェクトを設定する．
@@ -345,15 +374,31 @@ SymbolImpl::set_drawobj(const vector<DrawObj*>& obj_list)
   for (ymuint i = 0; i < mObjNum; ++ i) {
     mObjList[i] = obj_list[i];
   }
+
+  calc_bounding_box();
+}
+
+// @brief bounding box の計算を行う．
+void
+SymbolImpl::calc_bounding_box()
+{
+  if ( mObjNum == 0 ) {
+    mBoundingBox.setRect(0.0, 0.0, 0.0, 0.0);
+  }
+  else {
+    QRectF tmp = mObjList[0]->bounding_box();
+    for (ymuint i = 1; i < mObjNum; ++ i) {
+      tmp = tmp.united(mObjList[i]->bounding_box());
+    }
+    mBoundingBox = tmp.toRect();
+  }
+  mBoundingBox.adjust(- kBoundMargin, - kBoundMargin, kBoundMargin, kBoundMargin);
 }
 
 // @brief 入力に設定する．
 void
 SymbolImpl::set_to_input()
 {
-  // bounding box を設定する．
-  mBBox.setRect(0, -(kInputH / 2.0), kInputW, kInputH);
-
   // 入力ピンリストを設定する．
   mIpinList.resize(0);
 
@@ -372,9 +417,6 @@ SymbolImpl::set_to_input()
 void
 SymbolImpl::set_to_output()
 {
-  // bounding box を設定する．
-  mBBox.setRect(0, -(kOutputH / 2.0), kOutputW, kOutputH);
-
   // 入力ピンリストを設定する．
   mIpinList.resize(1);
   mIpinList[0] = QPoint(0, 0);
@@ -393,9 +435,6 @@ SymbolImpl::set_to_output()
 void
 SymbolImpl::set_to_buffer()
 {
-  // bounding box を設定する．
-  mBBox.setRect(0, -(kBufH / 2.0), kBufW, kBufH);
-
   // 入力ピンリストを設定する．
   mIpinList.resize(1);
   mIpinList[0] = QPoint(0, 0);
@@ -411,12 +450,34 @@ SymbolImpl::set_to_buffer()
   set_drawobj(obj);
 }
 
+// @brief NOT ゲートに設定する．
+void
+SymbolImpl::set_to_not()
+{
+  // 入力ピンリストを設定する．
+  mIpinList.resize(1);
+  mIpinList[0] = QPoint(0, 0);
+
+  // 出力ピンリストを設定する．
+  mOpinList.resize(1);
+  mOpinList[0] = QPoint(kBufW + kDotW, 0);
+
+  // 描画用オブジェクトを設定する．
+  vector<QPointF> points;
+  create_buffer(points);
+  DrawObj* obj1 = new PolygonObj(points);
+
+  DrawObj* obj2 = new EllipseObj(QRectF(kBufW, -kDotH / 2.0, kDotW, kDotH));
+
+  set_drawobj(obj1, obj2);
+}
+
 // @brief AND ゲートに設定する．
 // @param[in] ni 入力数
 void
 SymbolImpl::set_to_and(ymuint ni)
 {
-  calc_points(ni, kGateW, false);
+  ymuint nseg = calc_points(ni, kGateW, false);
 
   // 出力ピンリストを設定する．
   mOpinList.resize(1);
@@ -426,7 +487,25 @@ SymbolImpl::set_to_and(ymuint ni)
   vector<QPointF> points;
   create_and(points);
   DrawObj* obj = new PolygonObj(points);
-  set_drawobj(obj);
+
+  if ( nseg > 1 ) {
+    assert_cond( nseg >= 3, __FILE__, __LINE__);
+    // 上下に入力辺を伸ばす．
+    ymuint nseg_u = nseg / 2;
+    QPointF p0(0.0, kGateUY - (nseg_u * kGateH));
+    QPointF p1(0.0, kGateUY);
+    DrawObj* obj2 = new LineObj(p0, p1);
+
+    ymuint nseg_l = nseg - nseg_u - 1;
+    QPointF p2(0.0, kGateLY + (nseg_l * kGateH));
+    QPointF p3(0.0, kGateLY);
+    DrawObj* obj3 = new LineObj(p2, p3);
+
+    set_drawobj(obj, obj2, obj3);
+  }
+  else {
+    set_drawobj(obj);
+  }
 }
 
 // @brief OR ゲートに設定する．
@@ -434,7 +513,7 @@ SymbolImpl::set_to_and(ymuint ni)
 void
 SymbolImpl::set_to_or(ymuint ni)
 {
-  calc_points(ni, kGateW, true);
+  ymuint nseg = calc_points(ni, kGateW, true);
 
   // 出力ピンリストを設定する．
   mOpinList.resize(1);
@@ -444,7 +523,31 @@ SymbolImpl::set_to_or(ymuint ni)
   vector<QPointF> points;
   create_or(points);
   DrawObj* obj = new PolygonObj(points);
-  set_drawobj(obj);
+
+  if ( nseg > 1 ) {
+    assert_cond( nseg >= 3, __FILE__, __LINE__);
+    // 上下に入力辺を伸ばす．
+    ymuint nseg_u = nseg / 2;
+    vector<QPointF> points2;
+    for (ymuint i = 0; i < nseg_u; ++ i) {
+      QPointF offset(0.0, - kGateH * (i + 1));
+      create_or_edge(points2, offset);
+    }
+    DrawObj* obj2 = new PolylineObj(points2);
+
+    ymuint nseg_l = nseg - nseg_u - 1;
+    vector<QPointF> points3;
+    for (ymuint i = 0; i < nseg_l; ++ i) {
+      QPointF offset(0.0, kGateH * (nseg_l - i));
+      create_or_edge(points3, offset);
+    }
+    DrawObj* obj3 = new PolylineObj(points3);
+
+    set_drawobj(obj, obj2, obj3);
+  }
+  else {
+    set_drawobj(obj);
+  }
 }
 
 // @brief XOR ゲートに設定する．
@@ -452,7 +555,7 @@ SymbolImpl::set_to_or(ymuint ni)
 void
 SymbolImpl::set_to_xor(ymuint ni)
 {
-  calc_points(ni, kXorW, true);
+  ymuint nseg = calc_points(ni, kXorW, true);
 
   // 出力ピンリストを設定する．
   mOpinList.resize(1);
@@ -463,18 +566,49 @@ SymbolImpl::set_to_xor(ymuint ni)
   create_or(points, QPointF(kXorM, 0.0));
   DrawObj* or_obj = new PolygonObj(points);
 
-  vector<QPointF> points2;
-  create_or_edge(points2);
-  DrawObj* edge_obj = new PolylineObj(points2);
+  if ( nseg > 1 ) {
+    assert_cond( nseg >= 3, __FILE__, __LINE__);
+    // 上下に入力辺を伸ばす．
+    ymuint nseg_u = nseg / 2;
+    ymuint nseg_l = nseg - nseg_u - 1;
+    vector<QPointF> points2;
+    qreal bias_y = kGateH * nseg_l;
+    for (ymuint i = 0; i < nseg; ++ i) {
+      QPointF offset(0.0, bias_y - kGateH * i);
+      create_or_edge(points2, offset);
+    }
+    DrawObj* obj2 = new PolylineObj(points2);
 
-  set_drawobj(or_obj, edge_obj);
+    vector<QPointF> points3;
+    for (ymuint i = 0; i < nseg_u; ++ i) {
+      QPointF offset(kXorM, - kGateH * (i + 1));
+      create_or_edge(points3, offset);
+    }
+    DrawObj* obj3 = new PolylineObj(points3);
+
+    vector<QPointF> points4;
+    for (ymuint i = 0; i < nseg_l; ++ i) {
+      QPointF offset(kXorM, kGateH * (nseg_l - i));
+      create_or_edge(points4, offset);
+    }
+    DrawObj* obj4 = new PolylineObj(points4);
+
+    set_drawobj(or_obj, obj2, obj3, obj4);
+  }
+  else {
+    vector<QPointF> points2;
+    create_or_edge(points2);
+    DrawObj* edge_obj = new PolylineObj(points2);
+
+    set_drawobj(or_obj, edge_obj);
+  }
 }
 
 // @brief このゲートを囲む最小の矩形を表す左上と右下の点を得る．
 QRect
 SymbolImpl::bounding_box() const
 {
-  return mBBox;
+  return mBoundingBox;
 }
 
 // @brief 入力数を得る．
@@ -514,10 +648,31 @@ SymbolImpl::opin_location(ymuint pos) const
 void
 SymbolImpl::draw(QPainter& painter) const
 {
+  // オブジェクト本体の描画
   for (ymuint i = 0; i < mObjNum; ++ i) {
     mObjList[i]->draw(painter);
   }
-  painter.drawRect(mBBox);
+
+  // 入力線の描画
+  for (ymuint i = 0; i < ipin_num(); ++ i) {
+    QPoint ipos = ipin_location(i);
+    ymuint x0 = bounding_box().x();
+    painter.drawLine(QPoint(x0, ipos.y()), ipos);
+  }
+
+  // 出力線の描画
+  for (ymuint i = 0; i < opin_num(); ++ i) {
+    QPoint opos = opin_location(i);
+    ymuint x1 = bounding_box().right();
+    painter.drawLine(opos, QPoint(x1, opos.y()));
+  }
+
+  // 枠線の描画
+  painter.save();
+  painter.setPen(QPen(Qt::DotLine));
+  painter.setBrush(QBrush(Qt::NoBrush));
+  painter.drawRect(mBoundingBox);
+  painter.restore();
 }
 
 BEGIN_NONAMESPACE
@@ -652,7 +807,7 @@ END_NONAMESPACE
 // @param[in] ni 入力数
 // @param[in] gate_w ゲートの幅
 // @param[in] or_xor OR/XOR ゲートの時 true にするフラグ
-void
+ymuint
 SymbolImpl::calc_points(ymuint ni,
 			qreal gate_w,
 			bool or_xor)
@@ -667,9 +822,7 @@ SymbolImpl::calc_points(ymuint ni,
   // 上側のセグメント数
   ymuint nseg_u = nseg / 2;
 
-  qreal u0_y = - kGateH / 2.0;
-  mBBox = QRect(0.0, u0_y - (kGateH * nseg_u), gate_w, nseg * kGateH);
-
+  const qreal u0_y = - kGateH / 2.0;
   qreal u_y = u0_y - (kGateH * nseg_u);
 
   // 各セグメントごとの入力数
@@ -686,6 +839,8 @@ SymbolImpl::calc_points(ymuint ni,
     }
     pin_offset += np;
   }
+
+  return nseg;
  }
 
 END_NAMESPACE_YM_LED

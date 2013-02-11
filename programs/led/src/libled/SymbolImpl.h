@@ -49,20 +49,39 @@ public:
   void
   set_to_buffer();
 
+  /// @brief NOT ゲートに設定する．
+  void
+  set_to_not();
+
   /// @brief AND ゲートに設定する．
   /// @param[in] ni 入力数
   void
   set_to_and(ymuint ni);
+
+  /// @brief NAND ゲートに設定する．
+  /// @param[in] ni 入力数
+  void
+  set_to_nand(ymuint ni);
 
   /// @brief OR ゲートに設定する．
   /// @param[in] ni 入力数
   void
   set_to_or(ymuint ni);
 
+  /// @brief NOR ゲートに設定する．
+  /// @param[in] ni 入力数
+  void
+  set_to_nor(ymuint ni);
+
   /// @brief XOR ゲートに設定する．
   /// @param[in] ni 入力数
   void
   set_to_xor(ymuint ni);
+
+  /// @brief XNOR ゲートに設定する．
+  /// @param[in] ni 入力数
+  void
+  set_to_xnor(ymuint ni);
 
 
 public:
@@ -113,7 +132,7 @@ private:
   /// @param[in] ni 入力数
   /// @param[in] gate_w ゲートの幅
   /// @param[in] or_xor OR/XOR ゲートの時 true にするフラグ
-  void
+  ymuint
   calc_points(ymuint ni,
 	      qreal gate_w,
 	      bool or_xor);
@@ -137,9 +156,21 @@ private:
 	      DrawObj* obj3);
 
   /// @brief 描画用のオブジェクトを設定する．
+  /// @param[in] obj1, obj2, obj3, obj4 設定する描画用オブジェクト
+  void
+  set_drawobj(DrawObj* obj1,
+	      DrawObj* obj2,
+	      DrawObj* obj3,
+	      DrawObj* obj4);
+
+  /// @brief 描画用のオブジェクトを設定する．
   /// @param[in] obj_list 設定する描画用オブジェクトのリスト
   void
   set_drawobj(const vector<DrawObj*>& obj_list);
+
+  /// @brief bounding box の計算を行う．
+  void
+  calc_bounding_box();
 
 
 private:
@@ -148,7 +179,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // シンボルを囲む矩形
-  QRect mBBox;
+  QRect mBoundingBox;
 
   // 入力ピンの位置の配列
   vector<QPoint> mIpinList;

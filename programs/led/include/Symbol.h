@@ -46,6 +46,11 @@ public:
   Symbol*
   buffer_symbol();
 
+  /// @brief NOT ゲートを生成する．
+  static
+  Symbol*
+  not_symbol();
+
   /// @brief AND ゲートを生成する．
   /// @param[in] ni 入力数
   static

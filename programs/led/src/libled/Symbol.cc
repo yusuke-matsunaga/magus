@@ -44,6 +44,15 @@ Symbol::buffer_symbol()
   return symbol;
 }
 
+// @brief NOT ゲートを生成する．
+Symbol*
+Symbol::not_symbol()
+{
+  SymbolImpl* symbol = new SymbolImpl();
+  symbol->set_to_not();
+  return symbol;
+}
+
 // @brief AND ゲートを生成する．
 // @param[in] ni 入力数
 Symbol*
