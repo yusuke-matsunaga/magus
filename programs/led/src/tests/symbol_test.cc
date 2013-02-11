@@ -64,7 +64,7 @@ SymbolTestWidget::SymbolTestWidget(QWidget* parent) :
   mBufSymbol = Symbol::buffer_symbol();
   mAndSymbol = Symbol::and_symbol(3);
   mOrSymbol = Symbol::or_symbol(3);
-  mXorSymbol = Symbol::or_symbol(3);
+  mXorSymbol = Symbol::xor_symbol(3);
 }
 
 // @brief 描画イベントのハンドラ

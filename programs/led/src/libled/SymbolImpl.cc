@@ -8,6 +8,7 @@
 
 
 #include "SymbolImpl.h"
+#include "DrawObj.h"
 
 
 BEGIN_NAMESPACE_YM_LED
@@ -54,6 +55,9 @@ const qreal kOff[][2] = {
 
 // XORの入力側の円弧のオフセット
 const qreal kXorM  = 2.0 * kUnit;
+
+// XORゲートの幅
+const qreal kXorW = kGateW + kXorM;
 
 // ANDの円弧の半径
 const qreal kAndR  = kGateH / 2.0;
@@ -121,7 +125,8 @@ const qreal kOutputH = 4.0 * kUnit;
 // @param[in] ndiv 円弧を折れ線で近似するときの分割数
 // @param[in] start_rad 開始位置の角度 (ラジアン)
 // @param[in] end_rad 終了位置の角度 (ラジアン)
-// @param[in] polygon 追加対象のポリゴン
+// @param[in] points 追加するベクタ
+// @note 最初と最後の点は points には含まれない．
 void
 create_arc(qreal cx,
 	   qreal cy,
@@ -129,23 +134,23 @@ create_arc(qreal cx,
 	   ymuint ndiv,
 	   qreal start_rad,
 	   qreal end_rad,
-	   QPolygonF& polygon)
+	   vector<QPointF>& points)
 {
   qreal rad = pi * start_rad;
   qreal diff = end_rad - start_rad;
   qreal inc = (pi * diff) / ndiv;
-  for (size_t i = 1; i < ndiv; i ++) {
+  for (ymuint i = 1; i < ndiv; i ++) {
     rad += inc;
     qreal dx = cx + cos(rad) * r;
     qreal dy = cy + sin(rad) * r;
-    polygon << QPointF(dx, dy);
+    points.push_back(QPointF(dx, dy));
   }
 }
 
 // @brief 入力を表すポリゴンを作る．
-// @param[in] polygon 結果を格納するポリゴン
+// @param[in] points 結果を格納するベクタ
 void
-create_input(QPolygonF& polygon)
+create_input(vector<QPointF>& points)
 {
   const qreal l_x = 0.0;
   const qreal m_x = kInputW - (kInputH / 2.0);
@@ -154,18 +159,17 @@ create_input(QPolygonF& polygon)
   const qreal m_y = 0.0;
   const qreal l_y =  (kInputH / 2.0);
 
-  polygon << QPointF(l_x, u_y)
-	  << QPointF(m_x, u_y)
-	  << QPointF(r_x, m_y)
-	  << QPointF(m_x, l_y)
-	  << QPointF(l_x, l_y)
-	  << QPointF(l_x, u_y);
+  points.push_back(QPointF(l_x, u_y));
+  points.push_back(QPointF(m_x, u_y));
+  points.push_back(QPointF(r_x, m_y));
+  points.push_back(QPointF(m_x, l_y));
+  points.push_back(QPointF(l_x, l_y));
 }
 
 // @brief 出力を表すポリゴンを作る．
-// @param[in] polygon 結果を格納するポリゴン
+// @param[in] points 結果を格納するベクタ
 void
-create_output(QPolygonF& polygon)
+create_output(vector<QPointF>& points)
 {
   const qreal l_x = 0;
   const qreal m_x = kOutputW - (kOutputH / 2.0);
@@ -174,86 +178,105 @@ create_output(QPolygonF& polygon)
   const qreal c_y = 0;
   const qreal l_y = (kOutputH / 2);
 
-  polygon << QPointF(l_x, u_y)
-	  << QPointF(m_x, u_y)
-	  << QPointF(r_x, c_y)
-	  << QPointF(m_x, l_y)
-	  << QPointF(l_x, l_y)
-	  << QPointF(l_x, u_y);
+  points.push_back(QPointF(l_x, u_y));
+  points.push_back(QPointF(m_x, u_y));
+  points.push_back(QPointF(r_x, c_y));
+  points.push_back(QPointF(m_x, l_y));
+  points.push_back(QPointF(l_x, l_y));
+  points.push_back(QPointF(l_x, u_y));
 }
 
 // @brief BUF ゲートを表すポリゴンを作る．
-// @param[in] polygon 結果を格納するポリゴン
+// @param[in] points 結果を格納するベクタ
 void
-create_buffer(QPolygonF& polygon)
+create_buffer(vector<QPointF>& points,
+	      const QPointF& offset = QPointF(0.0, 0.0))
 {
-  const qreal l_x = 0;
-  const qreal r_x = kBufW;
-  const qreal u_y = -(kBufH / 2);
-  const qreal c_y = 0;
-  const qreal l_y =  (kBufH / 2);
+  const qreal l_x = 0.0 + offset.x();
+  const qreal r_x = kBufW + offset.x();
+  const qreal u_y = -(kBufH / 2) + offset.y();
+  const qreal c_y = 0.0 + offset.y();
+  const qreal l_y =  (kBufH / 2) + offset.y();
 
-  polygon << QPointF(l_x, u_y)
-	  << QPointF(r_x, c_y)
-	  << QPointF(l_x, l_y)
-	  << QPointF(l_x, u_y);
+  points.push_back(QPointF(l_x, u_y));
+  points.push_back(QPointF(r_x, c_y));
+  points.push_back(QPointF(l_x, l_y));
 }
 
 // @brief AND ゲートを表すポリゴンを作る．
-// @param[in] polygon 結果を格納するポリゴン
+// @param[in] points 結果を格納するベクタ
 void
-create_and(QPolygonF& polygon)
+create_and(vector<QPointF>& points,
+	   const QPointF& offset = QPointF(0.0, 0.0))
 {
   ymuint ndiv = 24;
 
-  const qreal l_x = 0.0;
-  const qreal m_x = kAndL;
-  const qreal u_y = kGateUY;
-  const qreal c_y = 0.0;
-  const qreal l_y = kGateLY;
+  const qreal l_x = 0.0 + offset.x();
+  const qreal m_x = kAndL + offset.x();
+  const qreal u_y = kGateUY + offset.y();
+  const qreal c_y = 0.0 + offset.y();
+  const qreal l_y = kGateLY + offset.y();
   const qreal r   = kAndR;
 
-  polygon << QPointF(l_x, u_y)
-	  << QPointF(m_x, u_y);
+  points.push_back(QPointF(l_x, u_y));
+  points.push_back(QPointF(m_x, u_y));
 
-  create_arc(m_x, c_y, r, ndiv, 1.5, 2.5, polygon);
+  create_arc(m_x, c_y, r, ndiv, 1.5, 2.5, points);
 
-  polygon << QPointF(m_x, l_y)
-	  << QPointF(l_x, l_y)
-	  << QPointF(l_x, u_y);
+  points.push_back(QPointF(m_x, l_y));
+  points.push_back(QPointF(l_x, l_y));
 }
 
 // @brief OR ゲートを表すポリゴンを作る．
-// @param[in] polygon 結果を格納するポリゴン
+// @param[in] points 結果を格納するベクタ
 void
-create_or(QPolygonF& polygon)
+create_or(vector<QPointF>& points,
+	  const QPointF& offset = QPointF(0.0, 0.0))
 {
   ymuint ndiv = 16;
 
-  const qreal l_x = 0.0;
-  const qreal m_x = kOrL;
-  const qreal r_x = kGateW;
-  const qreal ll_x = - (kOrR / 2.0) * sqrt3;
-  const qreal u_y = kGateUY;
-  const qreal c_y = 0.0;
-  const qreal l_y = kGateLY;
+  const qreal l_x = 0.0 + offset.x();
+  const qreal m_x = kOrL + offset.x();
+  const qreal r_x = kGateW + offset.x();
+  const qreal ll_x = - (kOrR / 2.0) * sqrt3 + offset.x();
+  const qreal u_y = kGateUY + offset.y();
+  const qreal c_y = 0.0 + offset.y();
+  const qreal l_y = kGateLY + offset.y();
   const qreal r   = kOrR;
 
-  polygon << QPointF(l_x, u_y)
-	  << QPointF(m_x, u_y);
+  points.push_back(QPointF(l_x, u_y));
+  points.push_back(QPointF(m_x, u_y));
 
-  create_arc(m_x, l_y, r, ndiv, 9.0 / 6.0, 11.0 / 6.0, polygon);
+  create_arc(m_x, l_y, r, ndiv, 9.0 / 6.0, 11.0 / 6.0, points);
 
-  polygon << QPointF(r_x, c_y);
+  points.push_back(QPointF(r_x, c_y));
 
-  create_arc(m_x, u_y, r, ndiv, 1.0 / 6.0, 3.0 / 6.0, polygon);
+  create_arc(m_x, u_y, r, ndiv, 1.0 / 6.0, 3.0 / 6.0, points);
 
-  polygon << QPointF(m_x, l_y)
-	  << QPointF(l_x, l_y);
+  points.push_back(QPointF(m_x, l_y));
+  points.push_back(QPointF(l_x, l_y));
 
-  create_arc(ll_x, c_y, r, ndiv, 1.0 / 6.0, -1.0 / 6.0, polygon);
+  create_arc(ll_x, c_y, r, ndiv, 1.0 / 6.0, -1.0 / 6.0, points);
+}
 
-  polygon << QPointF(l_x, u_y);
+// @brief OR ゲートの入力辺を表す点列を作る．
+// @param[in] points 結果を格納するベクタ
+void
+create_or_edge(vector<QPointF>& points,
+	       const QPointF& offset = QPointF(0.0, 0.0))
+{
+  ymuint ndiv = 16;
+
+  const qreal l_x  = 0.0 + offset.x();
+  const qreal ll_x = - (kOrR / 2.0) * sqrt3 + offset.x();
+  const qreal u_y  = kGateUY + offset.y();
+  const qreal c_y  = 0.0 + offset.y();
+  const qreal l_y  = kGateLY + offset.y();
+  const qreal r    = kOrR;
+
+  points.push_back(QPointF(l_x, l_y));
+  create_arc(ll_x, c_y, r, ndiv, 1.0 / 6.0, -1.0 / 6.0, points);
+  points.push_back(QPointF(l_x, u_y));
 }
 
 END_NONAMESPACE
@@ -264,13 +287,64 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SymbolImpl::SymbolImpl()
+SymbolImpl::SymbolImpl() :
+  mObjNum(0),
+  mObjList(NULL)
 {
 }
 
 // @brief デストラクタ
 SymbolImpl::~SymbolImpl()
 {
+  delete [] mObjList;
+}
+
+// @brief 描画用のオブジェクトを設定する．
+void
+SymbolImpl::set_drawobj(DrawObj* obj)
+{
+  delete [] mObjList;
+  mObjNum = 1;
+  mObjList = new DrawObj*[mObjNum];
+  mObjList[0] = obj;
+}
+
+// @brief 描画用のオブジェクトを設定する．
+void
+SymbolImpl::set_drawobj(DrawObj* obj1,
+			DrawObj* obj2)
+{
+  delete [] mObjList;
+  mObjNum = 2;
+  mObjList = new DrawObj*[mObjNum];
+  mObjList[0] = obj1;
+  mObjList[1] = obj2;
+}
+
+// @brief 描画用のオブジェクトを設定する．
+void
+SymbolImpl::set_drawobj(DrawObj* obj1,
+			DrawObj* obj2,
+			DrawObj* obj3)
+{
+  delete [] mObjList;
+  mObjNum = 3;
+  mObjList = new DrawObj*[mObjNum];
+  mObjList[0] = obj1;
+  mObjList[1] = obj2;
+  mObjList[2] = obj3;
+}
+
+// @brief 描画用のオブジェクトを設定する．
+void
+SymbolImpl::set_drawobj(const vector<DrawObj*>& obj_list)
+{
+  delete [] mObjList;
+  mObjNum = obj_list.size();
+  mObjList = new DrawObj*[mObjNum];
+  for (ymuint i = 0; i < mObjNum; ++ i) {
+    mObjList[i] = obj_list[i];
+  }
 }
 
 // @brief 入力に設定する．
@@ -287,11 +361,11 @@ SymbolImpl::set_to_input()
   mOpinList.resize(1);
   mOpinList[0] = QPoint(kInputW, 0);
 
-  // painter path を設定する．
-  QPolygonF polygon;
-  create_input(polygon);
-
-  mPath.addPolygon(polygon);
+  // 描画用オブジェクトを設定する．
+  vector<QPointF> points;
+  create_input(points);
+  DrawObj* obj = new PolygonObj(points);
+  set_drawobj(obj);
 }
 
 // @brief 出力に設定する．
@@ -308,11 +382,11 @@ SymbolImpl::set_to_output()
   // 出力ピンリストを設定する．
   mOpinList.resize(0);
 
-  // painter path を設定する．
-  QPolygonF polygon;
-  create_output(polygon);
-
-  mPath.addPolygon(polygon);
+  // 描画用オブジェクトを設定する．
+  vector<QPointF> points;
+  create_output(points);
+  DrawObj* obj = new PolygonObj(points);
+  set_drawobj(obj);
 }
 
 // @brief バッファに設定する．
@@ -330,11 +404,11 @@ SymbolImpl::set_to_buffer()
   mOpinList.resize(1);
   mOpinList[0] = QPoint(kBufW, 0);
 
-  // painter path を設定する．
-  QPolygonF polygon;
-  create_buffer(polygon);
-
-  mPath.addPolygon(polygon);
+  // 描画用オブジェクトを設定する．
+  vector<QPointF> points;
+  create_buffer(points);
+  DrawObj* obj = new PolygonObj(points);
+  set_drawobj(obj);
 }
 
 // @brief AND ゲートに設定する．
@@ -342,21 +416,17 @@ SymbolImpl::set_to_buffer()
 void
 SymbolImpl::set_to_and(ymuint ni)
 {
-  // bounding box を設定する．
-  mBBox.setRect(0, kGateUY, kGateW, kGateH);
-
-  // 入力ピンリストを設定する．
-  mIpinList.resize(ni);
+  calc_points(ni, kGateW, false);
 
   // 出力ピンリストを設定する．
   mOpinList.resize(1);
   mOpinList[0] = QPoint(kGateW, 0);
 
-  // painter path を設定する．
-  QPolygonF polygon;
-  create_and(polygon);
-
-  mPath.addPolygon(polygon);
+  // 描画用オブジェクトを設定する．
+  vector<QPointF> points;
+  create_and(points);
+  DrawObj* obj = new PolygonObj(points);
+  set_drawobj(obj);
 }
 
 // @brief OR ゲートに設定する．
@@ -364,21 +434,17 @@ SymbolImpl::set_to_and(ymuint ni)
 void
 SymbolImpl::set_to_or(ymuint ni)
 {
-  // bounding box を設定する．
-  mBBox.setRect(0, kGateUY, kGateW, kGateH);
-
-  // 入力ピンリストを設定する．
-  mIpinList.resize(ni);
+  calc_points(ni, kGateW, true);
 
   // 出力ピンリストを設定する．
   mOpinList.resize(1);
   mOpinList[0] = QPoint(kGateW, 0);
 
-  // painter path を設定する．
-  QPolygonF polygon;
-  create_or(polygon);
-
-  mPath.addPolygon(polygon);
+  // 描画用オブジェクトを設定する．
+  vector<QPointF> points;
+  create_or(points);
+  DrawObj* obj = new PolygonObj(points);
+  set_drawobj(obj);
 }
 
 // @brief XOR ゲートに設定する．
@@ -386,21 +452,22 @@ SymbolImpl::set_to_or(ymuint ni)
 void
 SymbolImpl::set_to_xor(ymuint ni)
 {
-  // bounding box を設定する．
-  mBBox.setRect(0, kGateUY, kGateW, kGateH);
-
-  // 入力ピンリストを設定する．
-  mIpinList.resize(ni);
+  calc_points(ni, kXorW, true);
 
   // 出力ピンリストを設定する．
   mOpinList.resize(1);
-  mOpinList[0] = QPoint(kGateW, 0);
+  mOpinList[0] = QPoint(kXorW, 0);
 
-  // painter path を設定する．
-  QPolygonF polygon;
-  create_or(polygon);
+  // 描画用オブジェクトを設定する．
+  vector<QPointF> points;
+  create_or(points, QPointF(kXorM, 0.0));
+  DrawObj* or_obj = new PolygonObj(points);
 
-  mPath.addPolygon(polygon);
+  vector<QPointF> points2;
+  create_or_edge(points2);
+  DrawObj* edge_obj = new PolylineObj(points2);
+
+  set_drawobj(or_obj, edge_obj);
 }
 
 // @brief このゲートを囲む最小の矩形を表す左上と右下の点を得る．
@@ -447,14 +514,178 @@ SymbolImpl::opin_location(ymuint pos) const
 void
 SymbolImpl::draw(QPainter& painter) const
 {
-  painter.drawPath(mPath);
+  for (ymuint i = 0; i < mObjNum; ++ i) {
+    mObjList[i]->draw(painter);
+  }
+  painter.drawRect(mBBox);
 }
 
-// @brief 描画用の PainterPath を得る．
-QPainterPath&
-SymbolImpl::path()
+BEGIN_NONAMESPACE
+
+// 各セグメントにピンを分配する．
+void
+distribute_pins(ymuint ni,
+		vector<ymuint>& npins)
 {
-  return mPath;
+  if ( ni >= 6 && ni <= 10 ) {
+    assert_cond( npins.size() == 3, __FILE__, __LINE__);
+    switch (ni) {
+    case 6:
+      npins[0] = 2;
+      npins[1] = 2;
+      npins[2] = 2;
+      break;
+
+    case 7:
+      npins[0] = 2;
+      npins[1] = 3;
+      npins[2] = 2;
+      break;
+
+    case 8:
+      npins[0] = 3;
+      npins[1] = 3;
+      npins[2] = 2;
+      break;
+
+    case 9:
+      npins[0] = 3;
+      npins[1] = 3;
+      npins[2] = 3;
+      break;
+
+    case 10:
+      npins[0] = 3;
+      npins[1] = 4;
+      npins[2] = 3;
+      break;
+    }
+  }
+  else {
+    ymuint nseg = npins.size();
+    ymuint c = nseg / 2;  // 真ん中のセグメント
+    bool up = false;
+    ymuint u = c - 1; // c が 0 の時はやばいけど, そのときは使われない．
+    ymuint l = c;
+    while ( ni > 0 ) {
+      if ( up ) {
+	if ( ni >= 9 ) {
+	  npins[u] = 5;
+	}
+	else if ( ni == 8 || ni == 7 ) {
+	  npins[u] = 4;
+	}
+	else if ( ni == 6 ) {
+	  npins[u] = 3;
+	}
+	else {
+	  npins[u] = ni;
+	}
+	ni -= npins[u];
+	u --;
+	up = false;
+      }
+      else {
+	if ( ni >= 9 ) {
+	  npins[l] = 5;
+	}
+	else if ( ni == 8 || ni == 7 ) {
+	  npins[l] = 4;
+	}
+	else if ( ni == 6 ) {
+	  npins[l] = 3;
+	}
+	else {
+	  npins[l] = ni;
+	}
+	ni -= npins[l];
+	l ++;
+	up = true;
+      }
+    }
+  }
 }
+
+// AND/OR/XOR の入力辺上のピンの座標を計算する関数
+// x_off : X 軸のオフセット
+// y_off : Y 軸のオフセット
+// pos   : 入力ピン位置(上が0)
+// n     : 入力ピン数
+// or_xor: OR/XOR の時 true
+QPoint
+ipos(qreal x_off,
+     qreal y_off,
+     ymuint pos,
+     ymuint n,
+     bool or_xor)
+{
+  qreal y1;
+  ymuint dpos = pos * 2 + 1;
+  if ( dpos < n ) {
+    y1 = -kOff[n - 2][pos];
+  }
+  else if ( dpos == n ) {
+    y1 = 0.0;
+  }
+  else {
+    y1 = kOff[n - 2][n - pos - 1];
+  }
+  qreal x1 = 0.0;
+  if ( or_xor ) {
+    qreal y2 = kGateH * 0.5;
+    if ( y1 > 0.0 ) {
+      y2 -= y1;
+    }
+    else {
+      y2 += y1;
+    }
+    qreal tmp1 = sqrt(3.0 * kOrR * kOrR / 4.0 + kOrR * y2 - y2 * y2);
+    x1 = tmp1 - sqrt3 * kOrR / 2.0;
+  }
+  return QPoint(x_off + x1, y_off + y1);
+}
+
+END_NONAMESPACE
+
+
+// @brief AND/OR/XOR ゲートの時の諸元を設定する．
+// @param[in] ni 入力数
+// @param[in] gate_w ゲートの幅
+// @param[in] or_xor OR/XOR ゲートの時 true にするフラグ
+void
+SymbolImpl::calc_points(ymuint ni,
+			qreal gate_w,
+			bool or_xor)
+{
+  // 本体を含めたセグメント数
+  ymuint nseg = (ni + 4) / 5;
+  if ( nseg == 2 ) {
+    // これだけ例外
+    nseg = 3;
+  }
+
+  // 上側のセグメント数
+  ymuint nseg_u = nseg / 2;
+
+  qreal u0_y = - kGateH / 2.0;
+  mBBox = QRect(0.0, u0_y - (kGateH * nseg_u), gate_w, nseg * kGateH);
+
+  qreal u_y = u0_y - (kGateH * nseg_u);
+
+  // 各セグメントごとの入力数
+  vector<ymuint> npins(nseg);
+  distribute_pins(ni, npins);
+
+  mIpinList.resize(ni);
+  ymuint pin_offset = 0;
+  for (ymuint i = 0; i < nseg; ++ i) {
+    ymuint np = npins[i];
+    qreal cy = u_y + kGateH * (i + 0.5);
+    for (ymuint j = 0; j < np; ++ j) {
+      mIpinList[pin_offset + j] = ipos(0.0, cy, j, np, or_xor);
+    }
+    pin_offset += np;
+  }
+ }
 
 END_NAMESPACE_YM_LED

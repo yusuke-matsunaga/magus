@@ -16,6 +16,8 @@ libled_la_CPPFLAGS = \
 	-I$(top_srcdir)/include
 
 libled_la_SOURCES = \
+	DrawObj.h \
+	DrawObj.cc \
 	Symbol.cc \
 	SymbolImpl.h \
 	SymbolImpl.cc \

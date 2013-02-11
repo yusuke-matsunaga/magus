@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM_LED
 
+class DrawObj;
+
 //////////////////////////////////////////////////////////////////////
 /// @class SymbolImpl SymbolImpl.h "SymbolImpl.h"
 /// @brief Symbol の実装クラス
@@ -102,14 +104,42 @@ public:
   draw(QPainter& painter) const;
 
 
-protected:
+private:
   //////////////////////////////////////////////////////////////////////
-  // 継承クラスから用いられる関数
+  // 設定用の下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 描画用の PainterPath を得る．
-  QPainterPath&
-  path();
+  /// @brief AND/OR/XOR ゲートの時の諸元を設定する．
+  /// @param[in] ni 入力数
+  /// @param[in] gate_w ゲートの幅
+  /// @param[in] or_xor OR/XOR ゲートの時 true にするフラグ
+  void
+  calc_points(ymuint ni,
+	      qreal gate_w,
+	      bool or_xor);
+
+  /// @brief 描画用のオブジェクトを設定する．
+  /// @param[in] obj 設定する描画用オブジェクト
+  void
+  set_drawobj(DrawObj* obj);
+
+  /// @brief 描画用のオブジェクトを設定する．
+  /// @param[in] obj1, obj2 設定する描画用オブジェクト
+  void
+  set_drawobj(DrawObj* obj1,
+	      DrawObj* obj2);
+
+  /// @brief 描画用のオブジェクトを設定する．
+  /// @param[in] obj1, obj2, obj3 設定する描画用オブジェクト
+  void
+  set_drawobj(DrawObj* obj1,
+	      DrawObj* obj2,
+	      DrawObj* obj3);
+
+  /// @brief 描画用のオブジェクトを設定する．
+  /// @param[in] obj_list 設定する描画用オブジェクトのリスト
+  void
+  set_drawobj(const vector<DrawObj*>& obj_list);
 
 
 private:
@@ -126,8 +156,11 @@ private:
   // 出力ピンの位置の配列
   vector<QPoint> mOpinList;
 
-  // 描画用の PainterPath
-  QPainterPath mPath;
+  // 描画用のオブジェクトの要素数
+  ymuint32 mObjNum;
+
+  // 描画用のオブジェクトの配列
+  DrawObj** mObjList;
 
 };
 
