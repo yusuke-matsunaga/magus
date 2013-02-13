@@ -53,9 +53,9 @@ GateMgrTestWidget::GateMgrTestWidget(QWidget* parent) :
   mGateList.push_back(mGateMgr.new_gate(500, 20, kGtOutput));
   mGateList.push_back(mGateMgr.new_gate(100, 20, kGtBuffer));
   mGateList.push_back(mGateMgr.new_gate(100, 150, kGtNot));
-  mGateList.push_back(mGateMgr.new_gate(100, 300, kGtAnd));
-  mGateList.push_back(mGateMgr.new_gate(200, 100, kGtOr));
-  mGateList.push_back(mGateMgr.new_gate(200, 400, kGtXor));
+  mGateList.push_back(mGateMgr.new_gate(100, 300, kGtAnd, 5));
+  mGateList.push_back(mGateMgr.new_gate(200, 100, kGtOr, 7));
+  mGateList.push_back(mGateMgr.new_gate(200, 400, kGtXor, 9));
 }
 
 // @brief 描画イベントのハンドラ
