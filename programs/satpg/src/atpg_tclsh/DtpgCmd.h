@@ -88,6 +88,9 @@ private:
   // dry runオプションの解析用オブジェクト
   TclPopt* mPoptDryRun;
 
+  // drop オプションの解析用オブジェクト
+  TclPopt* mPoptDrop;
+
   // verify オプションの解析用オブジェクト
   TclPopt* mPoptVerify;
 

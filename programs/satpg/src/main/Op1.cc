@@ -26,11 +26,13 @@ Op1::Op1(FaultMgr& fmgr,
 	 TvMgr& tvmgr,
 	 vector<TestVector*>& tv_list,
 	 Fsim& fsim3,
+	 bool drop,
 	 bool verify) :
   mFaultMgr(fmgr),
   mTvMgr(tvmgr),
   mTvList(tv_list),
   mFsim3(fsim3),
+  mDrop(drop),
   mVerify(verify)
 {
 }
@@ -59,6 +61,15 @@ Op1::set_detected(SaFault* f,
     }
     else {
       tv->set_val(iid, kVal0);
+    }
+  }
+  if ( mDrop ) {
+    vector<SaFault*> det_faults;
+    mFsim3.run(tv, det_faults);
+    for (vector<SaFault*>::iterator p = det_faults.begin();
+	 p != det_faults.end(); ++ p) {
+      SaFault* f = *p;
+      mFaultMgr.set_status(f, kFsDetected);
     }
   }
   if ( mVerify ) {

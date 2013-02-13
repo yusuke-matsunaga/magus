@@ -72,6 +72,8 @@ AtpgMgr::AtpgMgr() :
 
   mDtpg = new_DtpgSat();
 
+  mDtpgDrop = false;
+
   mDtpgVerify = false;
 
   reg_network_handler(new FsimNetBinder(mFsim));
@@ -243,6 +245,13 @@ AtpgMgr::set_dtpg_dry_run(bool flag)
   mDtpg->set_dry_run(flag);
 }
 
+// @brief テストパタン生成時に故障ドロップを行なうかを指定する．
+void
+AtpgMgr::set_dtpg_drop_mode(bool drop)
+{
+  mDtpgDrop = drop;
+}
+
 // @brief テストパタン生成時に故障シミュレーションを用いて検証するかを指定する．
 void
 AtpgMgr::set_dtpg_verify_mode(bool verify)
@@ -258,7 +267,7 @@ AtpgMgr::dtpg(const string& option)
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  Op1 op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgVerify);
+  Op1 op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
 
   mDtpg->run(op, option);
 

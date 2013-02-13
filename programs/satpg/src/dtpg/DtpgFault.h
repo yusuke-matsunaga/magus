@@ -10,6 +10,7 @@
 
 
 #include "dtpg_nsdef.h"
+#include "SaFault.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
@@ -238,6 +239,9 @@ inline
 bool
 DtpgFault::is_skip() const
 {
+  if ( safault()->status() == kFsDetected ) {
+    return true;
+  }
   return static_cast<bool>((mPosVal >> 2) & 1U);
 }
 

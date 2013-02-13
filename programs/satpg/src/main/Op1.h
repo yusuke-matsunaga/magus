@@ -27,6 +27,7 @@ public:
       TvMgr& tvmgr,
       vector<TestVector*>& tv_list,
       Fsim& fsim3,
+      bool drop = false,
       bool verify = false);
 
   /// @brief デストラクタ
@@ -65,6 +66,8 @@ private:
   vector<TestVector*>& mTvList;
 
   Fsim& mFsim3;
+
+  bool mDrop;
 
   bool mVerify;
 };

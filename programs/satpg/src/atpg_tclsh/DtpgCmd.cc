@@ -53,8 +53,11 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			  "X-extract mode [0-1]");
   mPoptDryRun = new TclPopt(this, "dry",
 			    "dry run mode");
+  mPoptDrop = new TclPopt(this, "drop",
+			  "with fault drop");
   mPoptVerify = new TclPopt(this, "verify",
 			    "verify generated pattern");
+
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptSatRec);
   new_popt_group(mPoptDual, mPoptFFR, mPoptMFFC, mPoptAll);
 }
@@ -141,9 +144,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     mgr().set_dtpg_dry_run(true);
   }
 
-  if ( mPoptVerify->is_specified() ) {
-    mgr().set_dtpg_verify_mode(true);
-  }
+  mgr().set_dtpg_drop_mode(mPoptDrop->is_specified());
+
+  mgr().set_dtpg_verify_mode(mPoptVerify->is_specified());
 
   mgr().clear_stats();
 
