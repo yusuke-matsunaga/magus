@@ -1,5 +1,5 @@
 
-/// @file symbol_test.cc
+/// @file gateobj_test.cc
 /// @brief Symbol のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,18 +9,19 @@
 
 #include "led_nsdef.h"
 #include "Symbol.h"
+#include "GateObj.h"
 
 
 BEGIN_NAMESPACE_YM_LED
 
-class SymbolTestWidget :
+class GateObjTestWidget :
   public QWidget
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parent 親のウィジェット
-  SymbolTestWidget(QWidget* parent = NULL);
+  GateObjTestWidget(QWidget* parent = NULL);
 
 
 protected:
@@ -55,11 +56,15 @@ private:
 
   // XOR シンボル
   Symbol* mXorSymbol;
+
+  // GateObj のリスト
+  vector<GateObj*> mGateList;
+
 };
 
 // @brief コンストラクタ
 // @param[in] parent 親のウィジェット
-SymbolTestWidget::SymbolTestWidget(QWidget* parent) :
+GateObjTestWidget::GateObjTestWidget(QWidget* parent) :
   QWidget(parent)
 {
   mInputSymbol = new Symbol(kGtInput);
@@ -69,69 +74,32 @@ SymbolTestWidget::SymbolTestWidget(QWidget* parent) :
   mAndSymbol = new Symbol(kGtNand, 7);
   mOrSymbol = new Symbol(kGtNor, 23);
   mXorSymbol = new Symbol(kGtXnor, 28);
+
+  mGateList.push_back(new GateObj(mInputSymbol, QPoint(20, 20)));
+  mGateList.push_back(new GateObj(mOutputSymbol, QPoint(500, 20)));
+  mGateList.push_back(new GateObj(mBufSymbol, QPoint(100, 20)));
+  mGateList.push_back(new GateObj(mNotSymbol, QPoint(100, 150)));
+  mGateList.push_back(new GateObj(mAndSymbol, QPoint(100, 300)));
+  mGateList.push_back(new GateObj(mOrSymbol, QPoint(200, 100)));
+  mGateList.push_back(new GateObj(mXorSymbol, QPoint(200, 400)));
 }
 
 // @brief 描画イベントのハンドラ
 void
-SymbolTestWidget::paintEvent(QPaintEvent* event)
+GateObjTestWidget::paintEvent(QPaintEvent* event)
 {
   QPainter painter(this);
 
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
   painter.eraseRect(rect());
-  {
-    QMatrix matrix;
-    matrix.translate(20.0, 20.0);
 
-    painter.setMatrix(matrix);
-    mInputSymbol->draw(painter);
-  }
-  {
-    QMatrix matrix;
-    matrix.translate(200.0, 20.0);
-
-    painter.setMatrix(matrix);
-    mOutputSymbol->draw(painter);
-  }
-  {
-    QMatrix matrix;
-    matrix.translate(100.0, 20.0);
-
-    painter.setMatrix(matrix);
-    mBufSymbol->draw(painter);
-  }
-  {
-    QMatrix matrix;
-    matrix.translate(100.0, 70.0);
-
-    painter.setMatrix(matrix);
-    mNotSymbol->draw(painter);
-  }
-  {
-    QMatrix matrix;
-    matrix.translate(150.0, 100.0);
-
-    painter.setMatrix(matrix);
-    mAndSymbol->draw(painter);
-  }
-  {
-    QMatrix matrix;
-    matrix.translate(400.0, 100.0);
-
-    painter.setMatrix(matrix);
-    mOrSymbol->draw(painter);
-  }
-  {
-    QMatrix matrix;
-    matrix.translate(600.0, 200.0);
-
-    painter.setMatrix(matrix);
-    mXorSymbol->draw(painter);
+  for (vector<GateObj*>::iterator p = mGateList.begin();
+       p != mGateList.end(); ++ p) {
+    GateObj* gate_obj = *p;
+    gate_obj->draw(painter);
   }
 }
-
-
 
 END_NAMESPACE_YM_LED
 
@@ -140,11 +108,11 @@ int
 main(int argc,
      char** argv)
 {
-  using nsYm::nsLed::SymbolTestWidget;
+  using nsYm::nsLed::GateObjTestWidget;
 
   QApplication app(argc, argv);
 
-  QWidget* w = new SymbolTestWidget();
+  QWidget* w = new GateObjTestWidget();
 
   w->show();
 

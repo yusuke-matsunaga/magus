@@ -16,7 +16,6 @@ BEGIN_NAMESPACE_YM_LED
 // @brief コンストラクタ
 // @param[in] sym シンボル
 // @param[in] pos 位置
-inline
 GateObj::GateObj(const Symbol* sym,
 		 const QPoint& pos) :
   mSymbol(sym),
@@ -28,7 +27,6 @@ GateObj::GateObj(const Symbol* sym,
 // @param[in] sym シンボル
 // @param[in] x 位置のX座標
 // @param[in] y 位置のY座標
-inline
 GateObj::GateObj(const Symbol* sym,
 		 ymuint x,
 		 ymuint y) :
@@ -38,14 +36,12 @@ GateObj::GateObj(const Symbol* sym,
 }
 
 // @brief デストラクタ
-inline
 GateObj::~GateObj()
 {
 }
 
 // @brief 位置を設定する．
 // @param[in] pos 設定する位置
-inline
 void
 GateObj::set_position(const QPoint& pos)
 {
@@ -55,7 +51,6 @@ GateObj::set_position(const QPoint& pos)
 // @brief 位置を設定する．
 // @param[in] x 位置のX座標
 // @param[in] y 位置のY座標
-inline
 void
 GateObj::set_position(ymuint x,
 		      ymuint y)
@@ -65,7 +60,6 @@ GateObj::set_position(ymuint x,
 }
 
 // @brief 位置を取得する．
-inline
 QPoint
 GateObj::position() const
 {
@@ -77,8 +71,12 @@ QRect
 GateObj::bounding_box() const
 {
   QRect tmp = mSymbol->bounding_box();
+#if 0
   tmp.translate(mPosition);
   return tmp;
+#else
+  return tmp.translated(mPosition);
+#endif
 }
 
 // @brief 入力数を得る．
@@ -119,6 +117,8 @@ GateObj::draw(QPainter& painter) const
 
   QMatrix matrix;
   matrix.translate(mPosition.x(), mPosition.y());
+
+  painter.setMatrix(matrix);
 
   mSymbol->draw(painter);
 

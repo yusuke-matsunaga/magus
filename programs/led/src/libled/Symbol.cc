@@ -1,6 +1,6 @@
 
-/// @file SymbolImpl.cc
-/// @brief SymbolImpl の実装ファイル
+/// @file Symbol.cc
+/// @brief Symbol の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -8,7 +8,6 @@
 
 
 #include "Symbol.h"
-#include "SymbolImpl.h"
 #include "DrawObj.h"
 
 
@@ -320,30 +319,13 @@ END_NONAMESPACE
 // クラス Symbol
 //////////////////////////////////////////////////////////////////////
 
-// @brief 単純な型のシンボルを生成する．
-// @param[in] type 型
-// @param[in] ni 入力数
-// @note 入力/出力/バッファ/NOT の場合は ni の値は無視される．
-// @note それ以外の場合は ni は 2 以上でなければならない．
-Symbol*
-Symbol::new_symbol(GateType type,
-		   ymuint ni)
-{
-  return new SymbolImpl(type, ni);
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス SymbolImpl
-//////////////////////////////////////////////////////////////////////
-
 // @brief コンストラクタ
 // @param[in] type 型
 // @param[in] ni 入力数
 // @note 入力/出力/バッファ/NOT の場合は ni の値は無視される．
 // @note それ以外の場合は ni は 2 以上でなければならない．
-SymbolImpl::SymbolImpl(GateType type,
-		       ymuint ni)
+Symbol::Symbol(GateType type,
+	       ymuint ni)
 {
   mObjNum = 0;
   mObjList = NULL;
@@ -365,7 +347,7 @@ SymbolImpl::SymbolImpl(GateType type,
 }
 
 // @brief デストラクタ
-SymbolImpl::~SymbolImpl()
+Symbol::~Symbol()
 {
   for (ymuint i = 0; i < mObjNum; ++ i) {
     delete mObjList[i];
@@ -376,14 +358,14 @@ SymbolImpl::~SymbolImpl()
 
 // @brief このゲートを囲む最小の矩形を表す左上と右下の点を得る．
 QRect
-SymbolImpl::bounding_box() const
+Symbol::bounding_box() const
 {
   return mBoundingBox;
 }
 
 // @brief 入力数を得る．
 ymuint
-SymbolImpl::ipin_num() const
+Symbol::ipin_num() const
 {
   return mIpinList.size();
 }
@@ -391,7 +373,7 @@ SymbolImpl::ipin_num() const
 // @brief pos 番目の入力ピン位置を得る．
 // @param[in] pos 入力番号 ( 0 <= pos < input_num() )
 QPoint
-SymbolImpl::ipin_location(ymuint pos) const
+Symbol::ipin_location(ymuint pos) const
 {
   assert_cond( pos < mIpinList.size(), __FILE__, __LINE__);
   return mIpinList[pos];
@@ -399,7 +381,7 @@ SymbolImpl::ipin_location(ymuint pos) const
 
 // @brief 出力数を得る．
 ymuint
-SymbolImpl::opin_num() const
+Symbol::opin_num() const
 {
   return mOpinList.size();
 }
@@ -407,7 +389,7 @@ SymbolImpl::opin_num() const
 // @brief pos 番目の出力ピン位置を得る．
 // @param[in] pos 出力番号 ( 0 <= pos < output_num() )
 QPoint
-SymbolImpl::opin_location(ymuint pos) const
+Symbol::opin_location(ymuint pos) const
 {
   assert_cond( pos < mOpinList.size(), __FILE__, __LINE__);
   return mOpinList[pos];
@@ -416,7 +398,7 @@ SymbolImpl::opin_location(ymuint pos) const
 // @brief 描画を行う．
 // @param[in] painter 描画を行うオブジェクト
 void
-SymbolImpl::draw(QPainter& painter) const
+Symbol::draw(QPainter& painter) const
 {
   // オブジェクト本体の描画
   for (ymuint i = 0; i < mObjNum; ++ i) {
@@ -449,7 +431,7 @@ SymbolImpl::draw(QPainter& painter) const
 
 // @brief 入力に設定する．
 void
-SymbolImpl::set_to_input()
+Symbol::set_to_input()
 {
   // 入力ピンリストを設定する．
   mIpinList.resize(0);
@@ -465,7 +447,7 @@ SymbolImpl::set_to_input()
 
 // @brief 出力に設定する．
 void
-SymbolImpl::set_to_output()
+Symbol::set_to_output()
 {
   // 入力ピンリストを設定する．
   mIpinList.resize(1);
@@ -482,7 +464,7 @@ SymbolImpl::set_to_output()
 // @brief バッファに設定する．
 // @param[in] oinv 出力に否定を持つとき true にするフラグ
 void
-SymbolImpl::set_to_buffer(bool oinv)
+Symbol::set_to_buffer(bool oinv)
 {
   // 入力ピンリストを設定する．
   mIpinList.resize(1);
@@ -511,7 +493,7 @@ SymbolImpl::set_to_buffer(bool oinv)
 // @param[in] ni 入力数
 // @param[in] oinv 出力に否定を持つとき true にするフラグ
 void
-SymbolImpl::set_to_and(ymuint ni,
+Symbol::set_to_and(ymuint ni,
 		       bool oinv)
 {
   ymuint nseg = calc_points(ni, kGateW, false);
@@ -555,7 +537,7 @@ SymbolImpl::set_to_and(ymuint ni,
 // @param[in] ni 入力数
 // @param[in] oinv 出力に否定を持つとき true にするフラグ
 void
-SymbolImpl::set_to_or(ymuint ni,
+Symbol::set_to_or(ymuint ni,
 		      bool oinv)
 {
   ymuint nseg = calc_points(ni, kGateW, true);
@@ -595,7 +577,7 @@ SymbolImpl::set_to_or(ymuint ni,
 // @param[in] ni 入力数
 // @param[in] oinv 出力に否定を持つとき true にするフラグ
 void
-SymbolImpl::set_to_xor(ymuint ni,
+Symbol::set_to_xor(ymuint ni,
 		       bool oinv)
 {
   ymuint nseg = calc_points(ni, kXorW, true);
@@ -636,7 +618,7 @@ SymbolImpl::set_to_xor(ymuint ni,
 
 // @brief 描画用のオブジェクトを設定する．
 void
-SymbolImpl::set_drawobj(DrawObj* obj)
+Symbol::set_drawobj(DrawObj* obj)
 {
   delete [] mObjList;
   mObjNum = 1;
@@ -648,7 +630,7 @@ SymbolImpl::set_drawobj(DrawObj* obj)
 
 // @brief 描画用のオブジェクトを設定する．
 void
-SymbolImpl::set_drawobj(const vector<DrawObj*>& obj_list)
+Symbol::set_drawobj(const vector<DrawObj*>& obj_list)
 {
   delete [] mObjList;
   mObjNum = obj_list.size();
@@ -662,7 +644,7 @@ SymbolImpl::set_drawobj(const vector<DrawObj*>& obj_list)
 
 // @brief bounding box の計算を行う．
 void
-SymbolImpl::calc_bounding_box()
+Symbol::calc_bounding_box()
 {
   if ( mObjNum == 0 ) {
     mBoundingBox.setRect(0.0, 0.0, 0.0, 0.0);
@@ -810,7 +792,7 @@ END_NONAMESPACE
 // @param[in] gate_w ゲートの幅
 // @param[in] or_xor OR/XOR ゲートの時 true にするフラグ
 ymuint
-SymbolImpl::calc_points(ymuint ni,
+Symbol::calc_points(ymuint ni,
 			qreal gate_w,
 			bool or_xor)
 {

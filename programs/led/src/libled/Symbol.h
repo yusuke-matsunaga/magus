@@ -1,15 +1,16 @@
-#ifndef SYMBOLIMPL_H
-#define SYMBOLIMPL_H
+#ifndef SYMBOL_H
+#define SYMBOL_H
 
-/// @file SymbolImpl
-/// @brief SymbolImpl
+/// @file Symbol.h
+/// @brief Symbol のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "Symbol.h"
+#include "led_nsdef.h"
+#include "GateType.h"
 
 
 BEGIN_NAMESPACE_YM_LED
@@ -20,8 +21,7 @@ class DrawObj;
 /// @class SymbolImpl SymbolImpl.h "SymbolImpl.h"
 /// @brief Symbol の実装クラス
 //////////////////////////////////////////////////////////////////////
-class SymbolImpl :
-  public Symbol
+class Symbol
 {
 public:
 
@@ -30,11 +30,11 @@ public:
   /// @param[in] ni 入力数
   /// @note 入力/出力/バッファ/NOT の場合は ni の値は無視される．
   /// @note それ以外の場合は ni は 2 以上でなければならない．
-  SymbolImpl(GateType type,
-	     ymuint ni);
+  Symbol(GateType type,
+	 ymuint ni = 0);
 
   /// @brief デストラクタ
-  ~SymbolImpl();
+  ~Symbol();
 
 
 public:
@@ -43,35 +43,29 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief このゲートを囲む最小の矩形を表す左上と右下の点を得る．
-  virtual
   QRect
   bounding_box() const;
 
   /// @brief 入力数を得る．
-  virtual
   ymuint
   ipin_num() const;
 
   /// @brief pos 番目の入力ピン位置を得る．
   /// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
-  virtual
   QPoint
   ipin_location(ymuint pos) const;
 
   /// @brief 出力数を得る．
-  virtual
   ymuint
   opin_num() const;
 
   /// @brief pos 番目の出力ピン位置を得る．
   /// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
-  virtual
   QPoint
   opin_location(ymuint pos) const;
 
   /// @brief 描画を行う．
   /// @param[in] painter 描画を行うオブジェクト
-  virtual
   void
   draw(QPainter& painter) const;
 
@@ -169,4 +163,4 @@ private:
 
 END_NAMESPACE_YM_LED
 
-#endif // SYMBOLIMPL_H
+#endif // SYMBOL_H

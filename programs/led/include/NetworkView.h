@@ -1,0 +1,69 @@
+#ifndef NETWORKVIEW_H
+#define NETWORKVIEW_H
+
+/// @file NetworkView.h
+/// @brief NetworkView のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2013 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "led_nsdef.h"
+
+
+BEGIN_NAMESPACE_YM_LED
+
+class GateObj;
+
+//////////////////////////////////////////////////////////////////////
+/// @class NetworkView NetworkView.h "NetworkView.h"
+/// @brief 回路図を表示するためのウィジェット
+//////////////////////////////////////////////////////////////////////
+class NetworkView :
+  public QWidget
+{
+public:
+
+  /// @brief コンストラクタ
+  NetworkView(QWidget* parent = NULL);
+
+  /// @brief デストラクタ
+  virtual
+  ~NetworkView();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ゲートを追加する．
+  void
+  add_gate(GateObj* gate);
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // QWidget の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 描画イベントのハンドラ
+  virtual
+  void
+  paintEvent(QPaintEvent* event);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ゲートリスト
+  vector<GateObj*> mGateList;
+
+};
+
+END_NAMESPACE_YM_LED
+
+#endif // NETWORKVIEW_H

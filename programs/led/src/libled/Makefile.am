@@ -18,10 +18,11 @@ libled_la_CPPFLAGS = \
 libled_la_SOURCES = \
 	DrawObj.h \
 	DrawObj.cc \
-	SymbolImpl.h \
-	SymbolImpl.cc \
-	GateObj.h \
-	GateObj.cc
+	Symbol.h \
+	Symbol.cc \
+	GateMgr.cc \
+	GateObj.cc \
+	NetworkView.cc
 
 
 #libled_la_LDADD = \
