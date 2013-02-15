@@ -2,6 +2,8 @@
 
 ## $Id: Makefile.am 697 2007-05-28 17:10:53Z matsunaga $
 
+include $(top_srcdir)/../../etc/autotroll.mk
+
 SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -22,11 +24,18 @@ libled_la_SOURCES = \
 	Symbol.cc \
 	GateMgr.cc \
 	GateObj.cc \
-	NetworkView.cc
+	NetworkView.cc \
+	NetworkView.moc.cc
 
+
+BUILT_SOURCES = \
+	NetworkView.moc.cc
+
+NetworkView.moc.cc : ../../include/NetworkView.h
 
 #libled_la_LDADD = \
 #	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 #	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 #	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 #	$(QT_LIBS)
+

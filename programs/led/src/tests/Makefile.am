@@ -20,7 +20,8 @@ distclean-local:
 bin_PROGRAMS = \
 	symbol_test \
 	gateobj_test \
-	gatemgr_test
+	gatemgr_test \
+	networkview_test
 
 symbol_test_CPPFLAGS = \
 	$(QT_CPPFLAGS) \
@@ -71,6 +72,24 @@ gatemgr_test_SOURCES = \
 
 
 gatemgr_test_LDADD = \
+	../libled/libled.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(QT_LIBS)
+
+
+networkview_test_CPPFLAGS = \
+	$(QT_CPPFLAGS) \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include
+
+networkview_test_SOURCES = \
+	networkview_test.cc
+
+
+networkview_test_LDADD = \
 	../libled/libled.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \

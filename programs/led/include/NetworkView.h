@@ -10,9 +10,11 @@
 
 
 #include "led_nsdef.h"
+#include "GateMgr.h"
 
 
-BEGIN_NAMESPACE_YM_LED
+namespace nsYm {
+namespace nsLed {
 
 class GateObj;
 
@@ -23,6 +25,9 @@ class GateObj;
 class NetworkView :
   public QWidget
 {
+
+  Q_OBJECT
+
 public:
 
   /// @brief コンストラクタ
@@ -38,9 +43,41 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ゲートを追加する．
+  /// @brief ゲートを作る．
+  /// @param[in] pos 位置
+  /// @param[in] type 型
+  /// @param[in] ni 入力数
+  GateObj*
+  new_gate(const QPoint& pos,
+	   GateType type,
+	   ymuint ni = 0);
+
+  /// @brief ゲートを作る．
+  /// @param[in] x, y 位置
+  /// @param[in] type 型
+  /// @param[in] ni 入力数
+  GateObj*
+  new_gate(int x,
+	   int y,
+	   GateType type,
+	   ymuint ni = 0);
+
+  /// @brief 倍率を得る．
+  qreal
+  scale() const;
+
+
+public slots:
+  //////////////////////////////////////////////////////////////////////
+  // スロット
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 倍率を変更する．
   void
-  add_gate(GateObj* gate);
+  setScale(qreal scale);
+
+  void
+  setScale2(int val);
 
 
 protected:
@@ -56,14 +93,34 @@ protected:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief サイズや倍率が変更されたときに再計算を行なう．
+  void
+  calc_size();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // ゲートを管理するオブジェクト
+  GateMgr mGateMgr;
 
   // ゲートリスト
   vector<GateObj*> mGateList;
 
+  // 全てのゲートを囲む最小の矩形
+  QRect mBoundingBox;
+
+  // 倍率
+  qreal mScale;
+
 };
 
-END_NAMESPACE_YM_LED
+} // nsLed
+} // nsYm
 
 #endif // NETWORKVIEW_H
