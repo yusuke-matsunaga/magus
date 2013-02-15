@@ -19,6 +19,7 @@
 #include "ym_logic/SatStats.h"
 
 
+#define TIMER_ENABLE 1
 #define VERIFY_MAIMP 0
 
 
@@ -853,6 +854,13 @@ DtpgSat::clear_stats()
   mConflictNum = 0;
   mDecisionNum = 0;
   mPropagationNum = 0;
+
+  mCnfTime.set(0.0, 0.0, 0.0);
+  mCnfCount = 0;
+  mDetTime.set(0.0, 0.0, 0.0);
+  mDetCount = 0;
+  mUndetTime.set(0.0, 0.0, 0.0);
+  mUndetCount = 0;
 }
 
 
@@ -1123,6 +1131,11 @@ void
 DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
 		    DtpgOperator& op)
 {
+#if TIMER_ENABLE
+  StopWatch timer;
+  timer.start();
+#endif
+
   SatSolver solver(mType, mOption, mOutP);
 
   // 故障に一時的なID番号を割り振る．
@@ -1417,6 +1430,12 @@ DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
   }
   solver.add_clause(odiff);
 
+#if TIMER_ENABLE
+  timer.stop();
+  mCnfTime += timer.time();
+  ++ mCnfCount;
+#endif
+
   // 個々の故障に対するテスト生成を行なう．
   for (ymuint i = 0; i < nf; ++ i) {
     DtpgFault* f = flist[i];
@@ -1473,6 +1492,11 @@ DtpgSat::solve(SatSolver& solver,
     return;
   }
 
+#if TIMER_ENABLE
+  StopWatch timer;
+  timer.start();
+#endif
+
   Bool3 ans = solver.solve(mAssumptions, mModel);
   if ( ans == kB3True ) {
     f->set_skip();
@@ -1496,6 +1520,12 @@ DtpgSat::solve(SatSolver& solver,
     }
 
     op.set_detected(f->safault(), mValList);
+
+#if TIMER_ENABLE
+    timer.stop();
+    mDetTime += timer.time();
+    ++ mDetCount;
+#endif
   }
   else if ( ans == kB3False ) {
     f->set_untestable();
@@ -1505,6 +1535,12 @@ DtpgSat::solve(SatSolver& solver,
     else {
       op.set_untestable(f->safault());
     }
+
+#if TIMER_ENABLE
+    timer.stop();
+    mUndetTime += timer.time();
+    ++ mUndetCount;
+#endif
   }
 }
 
@@ -1904,7 +1940,23 @@ DtpgSat::get_stats() const
 	 << "Ave. # of learnt literals:     " << (double) mLearntLitNum / mRunCount << endl
 	 << "Ave. # of conflicts:           " << (double) mConflictNum / mSatCount << endl
 	 << "Ave. # of decisions:           " << (double) mDecisionNum / mSatCount << endl
-	 << "Ave. # of implications:        " << (double) mPropagationNum / mSatCount << endl;
+	 << "Ave. # of implications:        " << (double) mPropagationNum / mSatCount << endl
+	 << "CPU time for CNF generation: "
+	 << mCnfTime.usr_time_usec() / mCnfCount
+	 << "u usec, "
+	 << mCnfTime.sys_time_usec() / mCnfCount
+	 << "u ssec" << endl
+	 << "CPU time for detected faults:  "
+	 << mDetTime.usr_time_usec() / mDetCount
+	 << "u usec, "
+	 << mDetTime.sys_time_usec() / mDetCount
+	 << "u ssec" << endl
+	 << "CPU time for undetected faults: "
+	 << mUndetTime.usr_time_usec() / mUndetCount
+	 << "u usec, "
+	 << mUndetTime.sys_time_usec() / mUndetCount
+	 << "u ssec"
+	 << endl;
   }
 }
 
