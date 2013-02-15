@@ -478,6 +478,7 @@ DtpgSat::DtpgSat()
   mNetwork = NULL;
   mSkip = false;
   mDryRun = false;
+  mTimerEnable = false;
 }
 
 // @brief デストラクタ
@@ -1132,8 +1133,10 @@ DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
 		    DtpgOperator& op)
 {
 #if TIMER_ENABLE
-  StopWatch timer;
-  timer.start();
+  if ( mTimerEnable ) {
+    mTimer.reset();
+    mTimer.start();
+  }
 #endif
 
   SatSolver solver(mType, mOption, mOutP);
@@ -1431,9 +1434,11 @@ DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
   solver.add_clause(odiff);
 
 #if TIMER_ENABLE
-  timer.stop();
-  mCnfTime += timer.time();
-  ++ mCnfCount;
+  if ( mTimerEnable ) {
+    mTimer.stop();
+    mCnfTime += mTimer.time();
+    ++ mCnfCount;
+  }
 #endif
 
   // 個々の故障に対するテスト生成を行なう．
@@ -1493,8 +1498,10 @@ DtpgSat::solve(SatSolver& solver,
   }
 
 #if TIMER_ENABLE
-  StopWatch timer;
-  timer.start();
+  if ( mTimerEnable ) {
+    mTimer.reset();
+    mTimer.start();
+  }
 #endif
 
   Bool3 ans = solver.solve(mAssumptions, mModel);
@@ -1522,9 +1529,11 @@ DtpgSat::solve(SatSolver& solver,
     op.set_detected(f->safault(), mValList);
 
 #if TIMER_ENABLE
-    timer.stop();
-    mDetTime += timer.time();
-    ++ mDetCount;
+    if ( mTimerEnable ) {
+      mTimer.stop();
+      mDetTime += mTimer.time();
+      ++ mDetCount;
+    }
 #endif
   }
   else if ( ans == kB3False ) {
@@ -1537,9 +1546,11 @@ DtpgSat::solve(SatSolver& solver,
     }
 
 #if TIMER_ENABLE
-    timer.stop();
-    mUndetTime += timer.time();
-    ++ mUndetCount;
+    if ( mTimerEnable ) {
+      mTimer.stop();
+      mUndetTime += mTimer.time();
+      ++ mUndetCount;
+    }
 #endif
   }
 }
@@ -1940,24 +1951,33 @@ DtpgSat::get_stats() const
 	 << "Ave. # of learnt literals:     " << (double) mLearntLitNum / mRunCount << endl
 	 << "Ave. # of conflicts:           " << (double) mConflictNum / mSatCount << endl
 	 << "Ave. # of decisions:           " << (double) mDecisionNum / mSatCount << endl
-	 << "Ave. # of implications:        " << (double) mPropagationNum / mSatCount << endl
-	 << "CPU time for CNF generation: "
-	 << mCnfTime.usr_time_usec() / mCnfCount
+	 << "Ave. # of implications:        " << (double) mPropagationNum / mSatCount << endl;
+    if ( mTimerEnable ) {
+      cout << "CPU time for CNF generation: "
+	   << mCnfTime.usr_time_usec() / mCnfCount
+	   << "u usec, "
+	   << mCnfTime.sys_time_usec() / mCnfCount
+	   << "u ssec" << endl
+	   << "CPU time for detected faults:  "
+	   << mDetTime.usr_time_usec() / mDetCount
+	   << "u usec, "
+	   << mDetTime.sys_time_usec() / mDetCount
+	   << "u ssec" << endl
+	   << "CPU time for undetected faults: "
+	   << mUndetTime.usr_time_usec() / mUndetCount
 	 << "u usec, "
-	 << mCnfTime.sys_time_usec() / mCnfCount
-	 << "u ssec" << endl
-	 << "CPU time for detected faults:  "
-	 << mDetTime.usr_time_usec() / mDetCount
-	 << "u usec, "
-	 << mDetTime.sys_time_usec() / mDetCount
-	 << "u ssec" << endl
-	 << "CPU time for undetected faults: "
-	 << mUndetTime.usr_time_usec() / mUndetCount
-	 << "u usec, "
-	 << mUndetTime.sys_time_usec() / mUndetCount
-	 << "u ssec"
-	 << endl;
+	   << mUndetTime.sys_time_usec() / mUndetCount
+	   << "u ssec"
+	   << endl;
+    }
   }
+}
+
+// @breif 時間計測を制御する．
+void
+DtpgSat::timer_enable(bool enable)
+{
+  mTimerEnable = enable;
 }
 
 // @brief 統計情報を得る．

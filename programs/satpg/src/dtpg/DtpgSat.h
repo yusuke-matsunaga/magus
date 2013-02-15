@@ -77,12 +77,19 @@ public:
       const string& option = string());
 
   /// @brief 統計情報をクリアする．
+  virtual
   void
   clear_stats();
 
   /// @brief 統計情報を得る．
+  virtual
   void
   get_stats() const;
+
+  /// @breif 時間計測を制御する．
+  virtual
+  void
+  timer_enable(bool enable);
 
 
 private:
@@ -320,6 +327,12 @@ private:
 
   // implication数の総和
   ymuint64 mPropagationNum;
+
+  // 時間計測を行なうかどうかの制御フラグ
+  bool mTimerEnable;
+
+  // 時間計測用のタイマー
+  StopWatch mTimer;
 
   // CNF 式を生成する時の時間
   USTime mCnfTime;

@@ -259,6 +259,13 @@ AtpgMgr::set_dtpg_verify_mode(bool verify)
   mDtpgVerify = verify;
 }
 
+// @brief テストパタン生成時に時間計測を行なうかどうかを指定する．
+void
+AtpgMgr::set_dtpg_timer(bool enable)
+{
+  mDtpg->timer_enable(enable);
+}
+
 // @brief テストパタン生成を行なう．
 void
 AtpgMgr::dtpg(const string& option)

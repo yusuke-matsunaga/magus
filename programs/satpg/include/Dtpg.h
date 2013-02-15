@@ -70,6 +70,11 @@ public:
   void
   get_stats() const = 0;
 
+  /// @breif 時間計測を制御する．
+  virtual
+  void
+  timer_enable(bool enable) = 0;
+
 };
 
 

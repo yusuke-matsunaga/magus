@@ -146,6 +146,10 @@ public:
   void
   set_dtpg_verify_mode(bool verify);
 
+  /// @brief テストパタン生成時に時間計測を行なうかどうかを指定する．
+  void
+  set_dtpg_timer(bool enable);
+
   /// @brief テストパタン生成を行なう．
   void
   dtpg(const string& option);

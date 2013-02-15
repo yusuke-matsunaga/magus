@@ -94,6 +94,9 @@ private:
   // verify オプションの解析用オブジェクト
   TclPopt* mPoptVerify;
 
+  // timer オプションの解析用オブジェクト
+  TclPopt* mPoptTimer;
+
 };
 
 END_NAMESPACE_YM_SATPG
