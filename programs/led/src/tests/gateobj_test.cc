@@ -10,6 +10,7 @@
 #include "led_nsdef.h"
 #include "Symbol.h"
 #include "GateObj.h"
+#include "GateColor.h"
 
 
 BEGIN_NAMESPACE_YM_LED
@@ -57,6 +58,9 @@ private:
   // XOR シンボル
   Symbol* mXorSymbol;
 
+  // 描画用の設定
+  GateColor mColor;
+
   // GateObj のリスト
   vector<GateObj*> mGateList;
 
@@ -82,6 +86,12 @@ GateObjTestWidget::GateObjTestWidget(QWidget* parent) :
   mGateList.push_back(new GateObj(mAndSymbol, QPoint(100, 300)));
   mGateList.push_back(new GateObj(mOrSymbol, QPoint(200, 100)));
   mGateList.push_back(new GateObj(mXorSymbol, QPoint(200, 400)));
+
+  for (vector<GateObj*>::iterator p = mGateList.begin();
+       p != mGateList.end(); ++ p) {
+    GateObj* gate_obj = *p;
+    gate_obj->set_color(&mColor);
+  }
 }
 
 // @brief 描画イベントのハンドラ

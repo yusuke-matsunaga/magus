@@ -14,6 +14,7 @@
 
 BEGIN_NAMESPACE_YM_LED
 
+class GateColor;
 class Symbol;
 
 //////////////////////////////////////////////////////////////////////
@@ -50,6 +51,10 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 描画用の設定を行なう．
+  void
+  set_color(const GateColor* color);
 
   /// @brief 位置を設定する．
   /// @param[in] pos 設定する位置
@@ -101,6 +106,9 @@ private:
 
   // シンボル
   const Symbol* mSymbol;
+
+  // 描画用の設定
+  const GateColor* mColor;
 
   // 位置
   QPoint mPosition;

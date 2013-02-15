@@ -64,10 +64,15 @@ public:
   QPoint
   opin_location(ymuint pos) const;
 
-  /// @brief 描画を行う．
+  /// @brief シンボルの描画を行う．
   /// @param[in] painter 描画を行うオブジェクト
   void
-  draw(QPainter& painter) const;
+  draw_symbol(QPainter& painter) const;
+
+  /// @brief 枠線の描画を行う．
+  /// @param[in] painter 描画を行うオブジェクト
+  void
+  draw_box(QPainter& painter) const;
 
 
 private:

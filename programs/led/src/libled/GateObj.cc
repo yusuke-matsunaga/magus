@@ -8,6 +8,7 @@
 
 
 #include "GateObj.h"
+#include "GateColor.h"
 #include "Symbol.h"
 
 
@@ -19,6 +20,7 @@ BEGIN_NAMESPACE_YM_LED
 GateObj::GateObj(const Symbol* sym,
 		 const QPoint& pos) :
   mSymbol(sym),
+  mColor(NULL),
   mPosition(pos)
 {
 }
@@ -31,6 +33,7 @@ GateObj::GateObj(const Symbol* sym,
 		 ymuint x,
 		 ymuint y) :
   mSymbol(sym),
+  mColor(NULL),
   mPosition(x, y)
 {
 }
@@ -38,6 +41,13 @@ GateObj::GateObj(const Symbol* sym,
 // @brief デストラクタ
 GateObj::~GateObj()
 {
+}
+
+// @brief 描画用の設定を行なう．
+void
+GateObj::set_color(const GateColor* color)
+{
+  mColor = color;
 }
 
 // @brief 位置を設定する．
@@ -70,13 +80,7 @@ GateObj::position() const
 QRect
 GateObj::bounding_box() const
 {
-  QRect tmp = mSymbol->bounding_box();
-#if 0
-  tmp.translate(mPosition);
-  return tmp;
-#else
-  return tmp.translated(mPosition);
-#endif
+  return mSymbol->bounding_box().translated(mPosition);
 }
 
 // @brief 入力数を得る．
@@ -113,14 +117,23 @@ GateObj::opin_location(ymuint pos) const
 void
 GateObj::draw(QPainter& painter) const
 {
+  if ( mColor == NULL ) {
+    return;
+  }
+
   painter.save();
 
   QMatrix matrix;
   matrix.translate(mPosition.x(), mPosition.y());
-
   painter.setMatrix(matrix);
 
-  mSymbol->draw(painter);
+  painter.setPen(mColor->frame_pen());
+  painter.setBrush(mColor->gate_brush());
+  mSymbol->draw_symbol(painter);
+
+  painter.setPen(mColor->box_pen());
+  painter.setBrush(QBrush(Qt::NoBrush));
+  mSymbol->draw_box(painter);
 
   painter.restore();
 }

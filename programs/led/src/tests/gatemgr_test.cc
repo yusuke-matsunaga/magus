@@ -10,6 +10,7 @@
 #include "led_nsdef.h"
 #include "GateObj.h"
 #include "GateMgr.h"
+#include "GateColor.h"
 
 
 BEGIN_NAMESPACE_YM_LED
@@ -42,6 +43,9 @@ private:
   // GateObj のリスト
   vector<GateObj*> mGateList;
 
+  // 描画用の設定
+  GateColor mColor;
+
 };
 
 // @brief コンストラクタ
@@ -56,6 +60,12 @@ GateMgrTestWidget::GateMgrTestWidget(QWidget* parent) :
   mGateList.push_back(mGateMgr.new_gate(100, 300, kGtAnd, 5));
   mGateList.push_back(mGateMgr.new_gate(200, 100, kGtOr, 7));
   mGateList.push_back(mGateMgr.new_gate(200, 400, kGtXor, 9));
+
+  for (vector<GateObj*>::iterator p = mGateList.begin();
+       p != mGateList.end(); ++ p) {
+    GateObj* gate_obj = *p;
+    gate_obj->set_color(&mColor);
+  }
 }
 
 // @brief 描画イベントのハンドラ

@@ -10,13 +10,15 @@
 
 
 #include "led_nsdef.h"
-#include "GateMgr.h"
+#include "GateType.h"
 
 
 namespace nsYm {
 namespace nsLed {
 
+class GateMgr;
 class GateObj;
+class GateColor;
 
 //////////////////////////////////////////////////////////////////////
 /// @class NetworkView NetworkView.h "NetworkView.h"
@@ -107,7 +109,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ゲートを管理するオブジェクト
-  GateMgr mGateMgr;
+  GateMgr* mGateMgr;
 
   // ゲートリスト
   vector<GateObj*> mGateList;
@@ -117,6 +119,9 @@ private:
 
   // 倍率
   qreal mScale;
+
+  // デフォルトのゲート描画設定
+  GateColor* mDefaultColor;
 
 };
 

@@ -8,7 +8,9 @@
 
 
 #include "NetworkView.h"
+#include "GateMgr.h"
 #include "GateObj.h"
+#include "GateColor.h"
 
 
 BEGIN_NAMESPACE_YM_LED
@@ -23,11 +25,15 @@ NetworkView::NetworkView(QWidget* parent) :
   mBoundingBox(0, 0, 0, 0),
   mScale(2.0)
 {
+  mGateMgr = new GateMgr();
+  mDefaultColor = new GateColor();
 }
 
 // @brief デストラクタ
 NetworkView::~NetworkView()
 {
+  delete mDefaultColor;
+
   for (vector<GateObj*>::iterator p = mGateList.begin();
        p != mGateList.end(); ++ p) {
     GateObj* gate_obj = *p;
@@ -44,7 +50,8 @@ NetworkView::new_gate(const QPoint& pos,
 		      GateType type,
 		      ymuint ni)
 {
-  GateObj* gate = mGateMgr.new_gate(pos, type, ni);
+  GateObj* gate = mGateMgr->new_gate(pos, type, ni);
+  gate->set_color(mDefaultColor);
   mGateList.push_back(gate);
 
   // サイズの再計算を行なう．
@@ -98,11 +105,10 @@ NetworkView::paintEvent(QPaintEvent* event)
   QPainter painter(this);
 
   painter.setRenderHint(QPainter::Antialiasing, true);
-  painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
 
   painter.setWindow(mBoundingBox);
-  painter.setViewport(rect());
   painter.eraseRect(mBoundingBox);
+  painter.setViewport(rect());
 
   for (vector<GateObj*>::iterator p = mGateList.begin();
        p != mGateList.end(); ++ p) {

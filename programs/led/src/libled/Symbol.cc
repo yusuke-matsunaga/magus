@@ -395,17 +395,23 @@ Symbol::opin_location(ymuint pos) const
   return mOpinList[pos];
 }
 
-// @brief 描画を行う．
+// @brief シンボルの描画を行う．
 // @param[in] painter 描画を行うオブジェクト
 void
-Symbol::draw(QPainter& painter) const
+Symbol::draw_symbol(QPainter& painter) const
 {
   // オブジェクト本体の描画
   for (ymuint i = 0; i < mObjNum; ++ i) {
     mObjList[i]->draw(painter);
   }
+}
 
-#if 1
+// @brief 枠線の描画を行う．
+// @param[in] painter 描画を行うオブジェクト
+void
+Symbol::draw_box(QPainter& painter) const
+{
+#if 0
   // 入力線の描画
   for (ymuint i = 0; i < ipin_num(); ++ i) {
     QPoint ipos = ipin_location(i);

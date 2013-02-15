@@ -85,49 +85,49 @@ SymbolTestWidget::paintEvent(QPaintEvent* event)
     matrix.translate(20.0, 20.0);
 
     painter.setMatrix(matrix);
-    mInputSymbol->draw(painter);
+    mInputSymbol->draw_symbol(painter);
   }
   {
     QMatrix matrix;
     matrix.translate(200.0, 20.0);
 
     painter.setMatrix(matrix);
-    mOutputSymbol->draw(painter);
+    mOutputSymbol->draw_symbol(painter);
   }
   {
     QMatrix matrix;
     matrix.translate(100.0, 20.0);
 
     painter.setMatrix(matrix);
-    mBufSymbol->draw(painter);
+    mBufSymbol->draw_symbol(painter);
   }
   {
     QMatrix matrix;
     matrix.translate(100.0, 70.0);
 
     painter.setMatrix(matrix);
-    mNotSymbol->draw(painter);
+    mNotSymbol->draw_symbol(painter);
   }
   {
     QMatrix matrix;
     matrix.translate(150.0, 100.0);
 
     painter.setMatrix(matrix);
-    mAndSymbol->draw(painter);
+    mAndSymbol->draw_symbol(painter);
   }
   {
     QMatrix matrix;
     matrix.translate(400.0, 100.0);
 
     painter.setMatrix(matrix);
-    mOrSymbol->draw(painter);
+    mOrSymbol->draw_symbol(painter);
   }
   {
     QMatrix matrix;
     matrix.translate(600.0, 200.0);
 
     painter.setMatrix(matrix);
-    mXorSymbol->draw(painter);
+    mXorSymbol->draw_symbol(painter);
   }
 }
 

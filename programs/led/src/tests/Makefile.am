@@ -65,7 +65,8 @@ gatemgr_test_CPPFLAGS = \
 	$(QT_CPPFLAGS) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src/libled
 
 gatemgr_test_SOURCES = \
 	gatemgr_test.cc

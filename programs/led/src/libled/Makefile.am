@@ -22,6 +22,9 @@ libled_la_SOURCES = \
 	DrawObj.cc \
 	Symbol.h \
 	Symbol.cc \
+	GateColor.h \
+	GateColor.cc \
+	GateMgr.h \
 	GateMgr.cc \
 	GateObj.cc \
 	NetworkView.cc \
