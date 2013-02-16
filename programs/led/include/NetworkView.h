@@ -99,6 +99,11 @@ protected:
   void
   paintEvent(QPaintEvent* event);
 
+  /// @brief マウスが押された時のハンドラ
+  virtual
+  void
+  mousePressEvent(QMouseEvent* event);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

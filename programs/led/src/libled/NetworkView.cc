@@ -152,6 +152,18 @@ NetworkView::paintEvent(QPaintEvent* event)
   }
 }
 
+// @brief マウスが押された時のハンドラ
+void
+NetworkView::mousePressEvent(QMouseEvent* event)
+{
+  cout << "mouse press event: ";
+  int vx = event->pos().x();
+  int vy = event->pos().y();
+  int x = (vx / mScale) + mBoundingBox.x();
+  int y = (vy / mScale) + mBoundingBox.y();
+  cout << "( " << x << ", " << y << ")" << endl;
+}
+
 // @brief サイズや倍率が変更されたときに再計算を行なう．
 void
 NetworkView::calc_size()
