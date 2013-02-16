@@ -47,9 +47,14 @@ networkview_test(int argc,
 		   nv, SLOT(setScale2(int)));
   spinbox->setValue(100);
 
+  QCheckBox* gcheckbox = new QCheckBox("grid on");
+  QObject::connect(gcheckbox, SIGNAL(stateChanged(int)),
+		   nv, SLOT(enableGrid(int)));
+
   QHBoxLayout* layout = new QHBoxLayout;
   layout->addWidget(spinbox);
   layout->addWidget(slider);
+  layout->addWidget(gcheckbox);
 
   QVBoxLayout* vlayout = new QVBoxLayout;
   vlayout->addWidget(w);

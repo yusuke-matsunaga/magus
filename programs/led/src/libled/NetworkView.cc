@@ -23,7 +23,9 @@ BEGIN_NAMESPACE_YM_LED
 NetworkView::NetworkView(QWidget* parent) :
   QWidget(parent),
   mBoundingBox(0, 0, 0, 0),
-  mScale(2.0)
+  mScale(2.0),
+  mGridSize(20),
+  mGridEnable(false)
 {
   mGateMgr = new GateMgr();
   mDefaultColor = new GateColor();
@@ -98,6 +100,14 @@ NetworkView::setScale2(int val)
   setScale(scale);
 }
 
+// @brief グリッド表示を行なう
+void
+NetworkView::enableGrid(int enable)
+{
+  mGridEnable = enable;
+  update();
+}
+
 // @brief 描画イベントのハンドラ
 void
 NetworkView::paintEvent(QPaintEvent* event)
@@ -106,10 +116,35 @@ NetworkView::paintEvent(QPaintEvent* event)
 
   painter.setRenderHint(QPainter::Antialiasing, true);
 
+  // ウィンドウとビューポートの設定
   painter.setWindow(mBoundingBox);
-  painter.eraseRect(mBoundingBox);
   painter.setViewport(rect());
 
+  // 領域のクリア
+  painter.eraseRect(mBoundingBox);
+
+  // グリッド線の描画
+  if ( mGridEnable ) {
+    int start_x = mBoundingBox.x();
+    int start_y = mBoundingBox.y();
+    start_x = ((start_x + mGridSize - 1) / mGridSize) * mGridSize;
+    start_y = ((start_y + mGridSize - 1) / mGridSize) * mGridSize;
+
+    int end_x = mBoundingBox.x() + mBoundingBox.width();
+    int end_y = mBoundingBox.y() + mBoundingBox.height();
+
+    painter.save();
+    painter.setPen(QPen(Qt::DashLine));
+    for (int x = start_x; x < end_x; x += mGridSize) {
+      painter.drawLine(x, start_y, x, end_y);
+    }
+    for (int y = start_y; y < end_y; y += mGridSize) {
+      painter.drawLine(start_x, y, end_x, y);
+    }
+    painter.restore();
+  }
+
+  // ゲートの描画
   for (vector<GateObj*>::iterator p = mGateList.begin();
        p != mGateList.end(); ++ p) {
     GateObj* gate_obj = *p;
@@ -124,6 +159,7 @@ NetworkView::calc_size()
   qreal w = mBoundingBox.width() * mScale;
   qreal h = mBoundingBox.height() * mScale;
   resize(w, h);
+  update();
 }
 
 END_NAMESPACE_YM_LED

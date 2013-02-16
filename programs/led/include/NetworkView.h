@@ -75,11 +75,18 @@ public slots:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 倍率を変更する．
+  /// @param[in] scale 倍率
   void
   setScale(qreal scale);
 
+  /// @brief 倍率を変更する．
+  /// @param[in] val パーセントで表した倍率値
   void
   setScale2(int val);
+
+  /// @brief グリッド表示を行なう
+  void
+  enableGrid(int enable);
 
 
 protected:
@@ -122,6 +129,12 @@ private:
 
   // デフォルトのゲート描画設定
   GateColor* mDefaultColor;
+
+  // グリッドの感覚
+  ymint32 mGridSize;
+
+  // グリッドの描画を制御するフラグ
+  bool mGridEnable;
 
 };
 
