@@ -11,7 +11,7 @@
 #include "ym_utils/FileBinI.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -230,7 +230,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // FileBinIObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject FileBinIType = {
+PyTypeObject PyFileBinI_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -347,7 +347,7 @@ FileBinI*
 parse_FileBinI(PyObject* args)
 {
   PyObject* obj;
-  if ( !PyArg_ParseTuple(args, "O!", &FileBinIType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!", &PyFileBinI_Type, &obj) ) {
     return NULL;
   }
 
@@ -364,12 +364,12 @@ void
 FileBinIObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&FileBinIType) < 0 ) {
+  if ( PyType_Ready(&PyFileBinI_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "FileBinI", (PyObject*)&FileBinIType);
+  PyModule_AddObject(m, "FileBinI", (PyObject*)&PyFileBinI_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

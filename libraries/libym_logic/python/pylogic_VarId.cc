@@ -11,7 +11,7 @@
 #include "ym_logic/VarId.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -143,7 +143,7 @@ END_NONAMESPACE
 
 
 // VarIdObject 用のタイプオブジェクト
-PyTypeObject VarIdType = {
+PyTypeObject PyVarId_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -214,9 +214,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief VarId から PyObject を生成する．
 // @param[in] obj VarId オブジェクト
 PyObject*
-VarId_FromVarId(VarId obj)
+PyVarId_FromVarId(VarId obj)
 {
-  VarIdObject* varid_obj = VarId_new(&VarIdType);
+  VarIdObject* varid_obj = VarId_new(&PyVarId_Type);
   if ( varid_obj == NULL ) {
     return NULL;
   }
@@ -233,12 +233,12 @@ void
 VarIdObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&VarIdType) < 0 ) {
+  if ( PyType_Ready(&PyVarId_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの生成
-  PyModule_AddObject(m, "VarId", (PyObject*)&VarIdType);
+  PyModule_AddObject(m, "VarId", (PyObject*)&PyVarId_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

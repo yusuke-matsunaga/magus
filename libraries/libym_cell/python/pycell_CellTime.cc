@@ -13,7 +13,7 @@
 #include "ym_utils/FileBinI.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // CellTimeObject の外部変数
@@ -42,7 +42,7 @@ struct CellTimeObject
 
 // Py_kCellTimeInf の本体
 CellTimeObject Py_kCellTimeInfStruct = {
-  PyObject_HEAD_INIT(&CellTimeType)
+  PyObject_HEAD_INIT(&PyCellTime_Type)
   DBL_MAX
 };
 
@@ -141,7 +141,7 @@ CellTime_add(PyObject* left,
        CellTimeObject_Check(right) ) {
     CellTimeObject* obj1 = (CellTimeObject*)left;
     CellTimeObject* obj2 = (CellTimeObject*)right;
-    return CellTime_FromDouble(obj1->mVal + obj2->mVal);
+    return PyCellTime_FromDouble(obj1->mVal + obj2->mVal);
   }
   PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellTime");
   return NULL;
@@ -156,7 +156,7 @@ CellTime_sub(PyObject* left,
        CellTimeObject_Check(right) ) {
     CellTimeObject* obj1 = (CellTimeObject*)left;
     CellTimeObject* obj2 = (CellTimeObject*)right;
-    return CellTime_FromDouble(obj1->mVal - obj2->mVal);
+    return PyCellTime_FromDouble(obj1->mVal - obj2->mVal);
   }
   PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellTime");
   return NULL;
@@ -278,7 +278,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // CellTimeObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject CellTimeType = {
+PyTypeObject PyCellTime_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -390,9 +390,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief CellTime から CellTimeObject を生成する．
 // @param[in] obj CellTime オブジェクト
 PyObject*
-CellTime_FromCellTime(const CellTime& obj)
+PyCellTime_FromCellTime(const CellTime& obj)
 {
-  CellTimeObject* py_obj = CellTime_new(&CellTimeType);
+  CellTimeObject* py_obj = CellTime_new(&PyCellTime_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -406,9 +406,9 @@ CellTime_FromCellTime(const CellTime& obj)
 // @brief double から CellTimeObject を生成する．
 // @param[in] val 値
 PyObject*
-CellTime_FromDouble(double val)
+PyCellTime_FromDouble(double val)
 {
-  CellTimeObject* py_obj = CellTime_new(&CellTimeType);
+  CellTimeObject* py_obj = CellTime_new(&PyCellTime_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -424,12 +424,12 @@ void
 CellTimeObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&CellTimeType) < 0 ) {
+  if ( PyType_Ready(&PyCellTime_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "CellTime", (PyObject*)&CellTimeType);
+  PyModule_AddObject(m, "CellTime", (PyObject*)&PyCellTime_Type);
 
   // 定数オブジェクトの生成
   Py_kCellTimeInf = (PyObject*)&Py_kCellTimeInfStruct;
@@ -441,4 +441,4 @@ CellTimeObject_init(PyObject* m)
   Py_INCREF(Py_kCellTimeInfString);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

@@ -11,7 +11,7 @@
 #include "ym_utils/FileRegion.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -125,7 +125,7 @@ FileRegion_init(FileRegionObject* self,
     ymuint end_line;
     ymuint end_column;
     if ( !PyArg_ParseTuple(args, "O!kkkk",
-			   &FileInfoType, &obj1,
+			   &PyFileInfo_Type, &obj1,
 			   &start_line, &start_column,
 			   &end_line, &end_column) ) {
       return -1;
@@ -134,7 +134,8 @@ FileRegion_init(FileRegionObject* self,
     if ( !conv_from_pyobject(obj1, info) ) {
       return -1;
     }
-    self->mFileRegion = FileRegion(info, start_line, start_column, end_line, end_column);
+    self->mFileRegion = FileRegion(info, start_line, start_column,
+				   end_line, end_column);
   }
   else if ( n == 6 ) {
     PyObject* obj1;
@@ -144,9 +145,9 @@ FileRegion_init(FileRegionObject* self,
     ymuint end_line;
     ymuint end_column;
     if ( !PyArg_ParseTuple(args, "O!kkO!kk",
-			   &FileInfoType, &obj1,
+			   &PyFileInfo_Type, &obj1,
 			   &start_line, &start_column,
-			   &FileInfoType, &obj2,
+			   &PyFileInfo_Type, &obj2,
 			   &end_line, &end_column) ) {
       return -1;
     }
@@ -158,7 +159,8 @@ FileRegion_init(FileRegionObject* self,
     if ( !conv_from_pyobject(obj2, info2) ) {
       return -1;
     }
-    self->mFileRegion = FileRegion(info1, start_line, start_column, info2, end_line, end_column);
+    self->mFileRegion = FileRegion(info1, start_line, start_column,
+				   info2, end_line, end_column);
   }
   else {
     goto error;
@@ -194,7 +196,7 @@ PyObject*
 FileRegion_start_loc(FileRegionObject* self,
 		     PyObject* args)
 {
-  return FileLoc_FromFileLoc(self->mFileRegion.start_loc());
+  return PyFileLoc_FromFileLoc(self->mFileRegion.start_loc());
 }
 
 // start_file_info 関数
@@ -202,7 +204,7 @@ PyObject*
 FileRegion_start_file_info(FileRegionObject* self,
 			   PyObject* args)
 {
-  return FileInfo_FromFileInfo(self->mFileRegion.start_file_info());
+  return PyFileInfo_FromFileInfo(self->mFileRegion.start_file_info());
 }
 
 // start_line 関数
@@ -226,7 +228,7 @@ PyObject*
 FileRegion_end_loc(FileRegionObject* self,
 		   PyObject* args)
 {
-  return FileLoc_FromFileLoc(self->mFileRegion.end_loc());
+  return PyFileLoc_FromFileLoc(self->mFileRegion.end_loc());
 }
 
 // end_file_info 関数
@@ -234,7 +236,7 @@ PyObject*
 FileRegion_end_file_info(FileRegionObject* self,
 			 PyObject* args)
 {
-  return FileInfo_FromFileInfo(self->mFileRegion.end_file_info());
+  return PyFileInfo_FromFileInfo(self->mFileRegion.end_file_info());
 }
 
 // end_line 関数
@@ -286,7 +288,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // FileRegionObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject FileRegionType = {
+PyTypeObject PyFileRegion_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -362,9 +364,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief FileRegion から FileRegionObject を生成する．
 // @param[in] obj FileRegion オブジェクト
 PyObject*
-FileRegion_FromFileRegion(const FileRegion& obj)
+PyFileRegion_FromFileRegion(const FileRegion& obj)
 {
-  FileRegionObject* py_obj = FileRegion_new(&FileRegionType);
+  FileRegionObject* py_obj = FileRegion_new(&PyFileRegion_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -380,12 +382,12 @@ void
 FileRegionObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&FileRegionType) < 0 ) {
+  if ( PyType_Ready(&PyFileRegion_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "FileRegion", (PyObject*)&FileRegionType);
+  PyModule_AddObject(m, "FileRegion", (PyObject*)&PyFileRegion_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

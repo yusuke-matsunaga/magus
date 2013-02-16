@@ -12,7 +12,7 @@
 #include "ym_logic/Bdd.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -97,7 +97,7 @@ PyObject*
 BddMgr_make_zero(BddMgrObject* self,
 		 PyObject* args)
 {
-  return Bdd_FromBdd(self->mMgr->make_zero());
+  return PyBdd_FromBdd(self->mMgr->make_zero());
 }
 
 // make_one 関数
@@ -106,7 +106,7 @@ PyObject*
 BddMgr_make_one(BddMgrObject* self,
 		PyObject* args)
 {
-  return Bdd_FromBdd(self->mMgr->make_one());
+  return PyBdd_FromBdd(self->mMgr->make_one());
 }
 
 // make_overflow 関数
@@ -115,7 +115,7 @@ PyObject*
 BddMgr_make_overflow(BddMgrObject* self,
 		     PyObject* args)
 {
-  return Bdd_FromBdd(self->mMgr->make_overflow());
+  return PyBdd_FromBdd(self->mMgr->make_overflow());
 }
 
 // make_error 関数
@@ -124,7 +124,7 @@ PyObject*
 BddMgr_make_error(BddMgrObject* self,
 		  PyObject* args)
 {
-  return Bdd_FromBdd(self->mMgr->make_error());
+  return PyBdd_FromBdd(self->mMgr->make_error());
 }
 
 // make_literal 関数
@@ -144,22 +144,22 @@ BddMgr_make_literal(BddMgrObject* self,
     // obj1 は VarId, obj2 は Pol でなければならない．
     VarId vid;
     if ( !conv_from_pyobject(obj1, vid) ) {
-      PyErr_SetString(ErrorObject, "must be logic.VarId");
+      PyErr_SetString(PyExc_TypeError, "must be logic.VarId");
       return NULL;
     }
     tPol pol;
     if ( !conv_from_pyobject(obj2, pol) ) {
-      PyErr_SetString(ErrorObject, "must be logic.Pol");
+      PyErr_SetString(PyExc_TypeError, "must be logic.Pol");
       return NULL;
     }
     lit.set(vid, pol);
   }
   else if ( !conv_from_pyobject(obj1, lit) ) {
-    PyErr_SetString(ErrorObject, "must be logic.Literal");
+    PyErr_SetString(PyExc_TypeError, "must be logic.Literal");
     return NULL;
   }
 
-  return Bdd_FromBdd(self->mMgr->make_literal(lit));
+  return PyBdd_FromBdd(self->mMgr->make_literal(lit));
 }
 
 // make_posiliteral 関数
@@ -169,7 +169,8 @@ BddMgr_make_posiliteral(BddMgrObject* self,
 			PyObject* args)
 {
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &VarIdType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyVarId_Type, &obj) ) {
     return NULL;
   }
   VarId vid;
@@ -177,7 +178,7 @@ BddMgr_make_posiliteral(BddMgrObject* self,
     return NULL;
   }
 
-  return Bdd_FromBdd(self->mMgr->make_posiliteral(vid));
+  return PyBdd_FromBdd(self->mMgr->make_posiliteral(vid));
 }
 
 // make_negaliteral 関数
@@ -187,7 +188,8 @@ BddMgr_make_negaliteral(BddMgrObject* self,
 			PyObject* args)
 {
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &VarIdType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyVarId_Type, &obj) ) {
     return NULL;
   }
   VarId vid;
@@ -195,7 +197,7 @@ BddMgr_make_negaliteral(BddMgrObject* self,
     return NULL;
   }
 
-  return Bdd_FromBdd(self->mMgr->make_negaliteral(vid));
+  return PyBdd_FromBdd(self->mMgr->make_negaliteral(vid));
 }
 
 // make_bdd 関数
@@ -207,7 +209,10 @@ BddMgr_make_bdd(BddMgrObject* self,
   PyObject* obj1 = NULL;
   PyObject* obj2 = NULL;
   PyObject* obj3 = NULL;
-  if ( !PyArg_ParseTuple(args, "O!O!O!", &VarIdType, &obj1, &BddType, &obj2, &BddType, &obj3) ) {
+  if ( !PyArg_ParseTuple(args, "O!O!O!",
+			 &PyVarId_Type, &obj1,
+			 &PyBdd_Type, &obj2,
+			 &PyBdd_Type, &obj3) ) {
     return NULL;
   }
 
@@ -226,7 +231,7 @@ BddMgr_make_bdd(BddMgrObject* self,
     return NULL;
   }
 
-  return Bdd_FromBdd(self->mMgr->make_bdd(vid, bdd0, bdd1));
+  return PyBdd_FromBdd(self->mMgr->make_bdd(vid, bdd0, bdd1));
 }
 
 // tvec_to_bdd 関数
@@ -237,7 +242,9 @@ BddMgr_tvec_to_bdd(BddMgrObject* self,
 {
   PyObject* obj1 = NULL;
   PyObject* obj2 = NULL;
-  if ( !PyArg_ParseTuple(args, "O!O!", &PyTuple_Type, &obj1, &PyTuple_Type, &obj2) ) {
+  if ( !PyArg_ParseTuple(args, "O!O!",
+			 &PyTuple_Type, &obj1,
+			 &PyTuple_Type, &obj2) ) {
     return NULL;
   }
 
@@ -254,20 +261,21 @@ BddMgr_tvec_to_bdd(BddMgrObject* self,
 
   ymuint nv = PyTuple_GET_SIZE(obj2);
   if ( nvec != (1U << nv) ) {
-    PyErr_SetString(ErrorObject, "size mismatch");
+    PyErr_SetString(PyExc_TypeError, "size mismatch");
     return NULL;
   }
   VarVector vars(nv);
   for (ymuint i = 0; i < nv; ++ i) {
     PyObject* var_obj = PyTuple_GET_ITEM(obj2, i);
     VarId var;
-    if ( !PyArg_ParseTuple(var_obj, "O!", &VarIdType, &var) ) {
+    if ( !PyArg_ParseTuple(var_obj, "O!",
+			   &PyVarId_Type, &var) ) {
       return NULL;
     }
     vars[i] = var;
   }
 
-  return Bdd_FromBdd(self->mMgr->tvec_to_bdd(vec, vars));
+  return PyBdd_FromBdd(self->mMgr->tvec_to_bdd(vec, vars));
 }
 
 // expr_to_bdd 関数
@@ -278,7 +286,9 @@ BddMgr_expr_to_bdd(BddMgrObject* self,
 {
   PyObject* obj1 = NULL;
   PyObject* obj2 = NULL;
-  if ( !PyArg_ParseTuple(args, "O!|O!", &LogExprType, &obj1, &PyDict_Type, &obj2) ) {
+  if ( !PyArg_ParseTuple(args, "O!|O!",
+			 &PyLogExpr_Type, &obj1,
+			 &PyDict_Type, &obj2) ) {
     return NULL;
   }
 
@@ -297,7 +307,8 @@ BddMgr_expr_to_bdd(BddMgrObject* self,
 
       PyObject* vid1_obj = PyTuple_GET_ITEM(item, 0);
       if ( !VarIdObject_Check(vid1_obj) ) {
-	PyErr_SetString(ErrorObject, "A dictionary of (VarId, VarId) is expected");
+	PyErr_SetString(PyExc_TypeError,
+			"A dictionary of (VarId, VarId) is expected");
 	return NULL;
       }
       VarId vid1;
@@ -307,7 +318,8 @@ BddMgr_expr_to_bdd(BddMgrObject* self,
 
       PyObject* vid2_obj = PyTuple_GET_ITEM(item, 1);
       if ( !VarIdObject_Check(vid2_obj) ) {
-	PyErr_SetString(ErrorObject, "A dictionary of (VarId, VarId) is expected");
+	PyErr_SetString(PyExc_TypeError,
+			"A dictionary of (VarId, VarId) is expected");
 	return NULL;
       }
       VarId vid2;
@@ -319,7 +331,7 @@ BddMgr_expr_to_bdd(BddMgrObject* self,
     }
   }
 
-  return Bdd_FromBdd(self->mMgr->expr_to_bdd(expr, varmap));
+  return PyBdd_FromBdd(self->mMgr->expr_to_bdd(expr, varmap));
 }
 
 // make_thfunc 関数
@@ -333,7 +345,7 @@ BddMgr_make_thfunc(BddMgrObject* self,
     return NULL;
   }
 
-  return Bdd_FromBdd(self->mMgr->make_thfunc(n, th));
+  return PyBdd_FromBdd(self->mMgr->make_thfunc(n, th));
 }
 
 // new_var 関数
@@ -342,7 +354,8 @@ BddMgr_new_var(BddMgrObject* self,
 	       PyObject* args)
 {
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &VarIdType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyVarId_Type, &obj) ) {
     return NULL;
   }
 
@@ -369,7 +382,7 @@ BddMgr_var_list(BddMgrObject* self,
   for (list<VarId>::iterator p = vlist.begin();
        p != vlist.end(); ++ p, ++ i) {
     VarId vid = *p;
-    PyObject* obj = VarId_FromVarId(vid);
+    PyObject* obj = PyVarId_FromVarId(vid);
     PyList_SetItem(ans_list, i, obj);
   }
 
@@ -382,7 +395,8 @@ BddMgr_level(BddMgrObject* self,
 	     PyObject* args)
 {
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &VarIdType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyVarId_Type, &obj) ) {
     return NULL;
   }
 
@@ -405,7 +419,7 @@ BddMgr_varid(BddMgrObject* self,
   }
 
   VarId vid = self->mMgr->varid(level);
-  return VarId_FromVarId(vid);
+  return PyVarId_FromVarId(vid);
 }
 
 // enable_gc 関数
@@ -499,7 +513,7 @@ END_NONAMESPACE
 
 
 // BddMgrObject 用のタイプオブジェクト
-PyTypeObject BddMgrType = {
+PyTypeObject PyBddMgr_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -572,12 +586,12 @@ void
 BddMgrObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&BddMgrType) < 0 ) {
+  if ( PyType_Ready(&PyBddMgr_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "BddMgr", (PyObject*)&BddMgrType);
+  PyModule_AddObject(m, "BddMgr", (PyObject*)&PyBddMgr_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

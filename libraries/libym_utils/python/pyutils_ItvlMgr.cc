@@ -13,7 +13,7 @@
 #include "ym_utils/FileBinO.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -235,7 +235,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // ItvlMgrObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject ItvlMgrType = {
+PyTypeObject PyItvlMgr_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -349,12 +349,12 @@ void
 ItvlMgrObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&ItvlMgrType) < 0 ) {
+  if ( PyType_Ready(&PyItvlMgr_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "ItvlMgr", (PyObject*)&ItvlMgrType);
+  PyModule_AddObject(m, "ItvlMgr", (PyObject*)&PyItvlMgr_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

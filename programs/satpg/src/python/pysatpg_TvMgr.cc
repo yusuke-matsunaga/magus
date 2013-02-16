@@ -11,7 +11,7 @@
 #include "TvMgr.h"
 
 
-BEGIN_NAMESPACE_YM_PYSATPG
+BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
@@ -83,7 +83,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // TvMgr 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject TvMgrType = {
+PyTypeObject PyTvMgr_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -159,9 +159,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief TvMgr から PyObject を生成する．
 // @param[in] obj TvMgr オブジェクト
 PyObject*
-TvMgr_FromTvMgr(TvMgr* obj)
+PyTvMgr_FromTvMgr(TvMgr* obj)
 {
-  TvMgrObject* py_obj = TvMgr_new(&TvMgrType);
+  TvMgrObject* py_obj = TvMgr_new(&PyTvMgr_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -177,13 +177,13 @@ void
 TvMgrObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&TvMgrType) < 0 ) {
+  if ( PyType_Ready(&PyTvMgr_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "TvMgr", (PyObject*)&TvMgrType);
+  PyModule_AddObject(m, "TvMgr", (PyObject*)&PyTvMgr_Type);
 }
 
 
-END_NAMESPACE_YM_PYSATPG
+END_NAMESPACE_YM_SATPG

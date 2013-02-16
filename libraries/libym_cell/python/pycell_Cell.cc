@@ -12,7 +12,7 @@
 #include "PyCell.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -83,7 +83,7 @@ PyObject*
 Cell_area(CellObject* self,
 	  PyObject* args)
 {
-  return CellArea_FromCellArea(self->mBody->area());
+  return PyCellArea_FromCellArea(self->mBody->area());
 }
 
 // pin 関数
@@ -164,7 +164,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // CellObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject CellType = {
+PyTypeObject PyCell_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -278,12 +278,12 @@ void
 CellObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&CellType) < 0 ) {
+  if ( PyType_Ready(&PyCell_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "Cell", (PyObject*)&CellType);
+  PyModule_AddObject(m, "Cell", (PyObject*)&PyCell_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

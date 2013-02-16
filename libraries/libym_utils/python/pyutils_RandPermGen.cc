@@ -11,7 +11,7 @@
 #include "ym_utils/RandPermGen.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -96,7 +96,7 @@ RandPermGen_generate(RandPermGenObject* self,
   // 引数の形式は
   // - (RandGen)
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &RandGenType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!", &PyRandGen_Type, &obj) ) {
     return NULL;
   }
   RandGen* p_rg = NULL;
@@ -159,7 +159,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // RandPermGenObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject RandPermGenType = {
+PyTypeObject PyTypeRandPermGen = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -247,12 +247,12 @@ void
 RandPermGenObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&RandPermGenType) < 0 ) {
+  if ( PyType_Ready(&PyTypeRandPermGen) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "RandPermGen", (PyObject*)&RandPermGenType);
+  PyModule_AddObject(m, "RandPermGen", (PyObject*)&PyTypeRandPermGen);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

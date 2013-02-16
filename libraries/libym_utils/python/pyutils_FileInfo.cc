@@ -12,7 +12,7 @@
 #include "ym_utils/FileLoc.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -71,7 +71,8 @@ FileInfo_init(FileInfoObject* self,
   // - (string, FileLoc)
   char* filename = NULL;
   PyObject* obj1 = NULL;
-  if ( !PyArg_ParseTuple(args, "|sO!", &filename, &FileLocType, &obj1) ) {
+  if ( !PyArg_ParseTuple(args, "|sO!", &filename,
+			 &PyFileLoc_Type, &obj1) ) {
     return -1;
   }
 
@@ -131,7 +132,7 @@ PyObject*
 FileInfo_parent_loc(FileInfoObject* self,
 		    PyObject* args)
 {
-  return FileLoc_FromFileLoc(self->mFileInfo.parent_loc());
+  return PyFileLoc_FromFileLoc(self->mFileInfo.parent_loc());
 }
 
 // parent_loc_list 関数
@@ -147,7 +148,7 @@ FileInfo_parent_loc_list(FileInfoObject* self,
   ymuint i = 0;
   for (list<FileLoc>::iterator p = loc_list.begin();
        p != loc_list.end(); ++ p, ++ i) {
-    PyObject* obj = FileLoc_FromFileLoc(*p);
+    PyObject* obj = PyFileLoc_FromFileLoc(*p);
     PyList_SetItem(obj, i, obj);
   }
   return ans_list;
@@ -175,7 +176,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // FileInfoObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject FileInfoType = {
+PyTypeObject PyFileInfo_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -251,9 +252,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief FileInfo から PyObject を生成する．
 // @param[in] obj FileInfo オブジェクト
 PyObject*
-FileInfo_FromFileInfo(const FileInfo& obj)
+PyFileInfo_FromFileInfo(const FileInfo& obj)
 {
-  FileInfoObject* py_obj = FileInfo_new(&FileInfoType);
+  FileInfoObject* py_obj = FileInfo_new(&PyFileInfo_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -269,12 +270,12 @@ void
 FileInfoObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&FileInfoType) < 0 ) {
+  if ( PyType_Ready(&PyFileInfo_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録を行う．
-  PyModule_AddObject(m, "FileInfo", (PyObject*)&FileInfoType);
+  PyModule_AddObject(m, "FileInfo", (PyObject*)&PyFileInfo_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

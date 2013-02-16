@@ -11,7 +11,7 @@
 #include "ym_utils/USTime.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -180,7 +180,7 @@ USTime_add(PyObject* left,
     return NULL;
   }
 
-  return USTime_FromUSTime(time1 + time2);
+  return PyUSTime_FromUSTime(time1 + time2);
 }
 
 // sub 関数
@@ -198,7 +198,7 @@ USTime_sub(PyObject* left,
     return NULL;
   }
 
-  return USTime_FromUSTime(time1 - time2);
+  return PyUSTime_FromUSTime(time1 - time2);
 }
 
 // inplace add 関数
@@ -326,7 +326,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // USTimeObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject USTimeType = {
+PyTypeObject PyUSTime_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -402,9 +402,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief USTime から USTimeObject を生成する．
 // @param[in] obj USTime オブジェクト
 PyObject*
-USTime_FromUSTime(const USTime& obj)
+PyUSTime_FromUSTime(const USTime& obj)
 {
-  USTimeObject* py_obj = USTime_new(&USTimeType);
+  USTimeObject* py_obj = USTime_new(&PyUSTime_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -420,12 +420,12 @@ void
 USTimeObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&USTimeType) < 0 ) {
+  if ( PyType_Ready(&PyUSTime_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "USTime", (PyObject*)&USTimeType);
+  PyModule_AddObject(m, "USTime", (PyObject*)&PyUSTime_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

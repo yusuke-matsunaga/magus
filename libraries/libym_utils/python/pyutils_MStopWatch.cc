@@ -12,7 +12,7 @@
 #include "ym_utils/MStopWatch.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -111,7 +111,7 @@ MStopWatch_time(MStopWatchObject* self,
     return NULL;
   }
 
-  return USTime_FromUSTime(self->mMStopWatch->time(id));
+  return PyUSTime_FromUSTime(self->mMStopWatch->time(id));
 }
 
 
@@ -135,7 +135,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // MStopWatchObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject MStopWatchType = {
+PyTypeObject PyMStopWatch_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -209,12 +209,12 @@ void
 MStopWatchObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&MStopWatchType) < 0 ) {
+  if ( PyType_Ready(&PyMStopWatch_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "MStopWatch", (PyObject*)&StopWatchType);
+  PyModule_AddObject(m, "MStopWatch", (PyObject*)&PyMStopWatch_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

@@ -13,7 +13,7 @@
 #include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 /// @class PyCell PyCell.h "Pycell.h"
@@ -58,6 +58,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM
 
 #endif // PYCELL_H

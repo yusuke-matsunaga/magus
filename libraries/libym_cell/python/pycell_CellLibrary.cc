@@ -18,7 +18,7 @@
 #include "PyLibrary.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -512,7 +512,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // CellLibraryObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject CellLibraryType = {
+PyTypeObject PyCellLibrary_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -641,12 +641,12 @@ void
 CellLibraryObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&CellLibraryType) < 0 ) {
+  if ( PyType_Ready(&PyCellLibrary_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "CellLibrary", (PyObject*)&CellLibraryType);
+  PyModule_AddObject(m, "CellLibrary", (PyObject*)&PyCellLibrary_Type);
 
   Py_kTechCmos           = new_string("cmos");
   Py_kTechFpga           = new_string("fpga");
@@ -657,4 +657,4 @@ CellLibraryObject_init(PyObject* m)
   Py_kDelayDcm           = new_string("dcm");
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

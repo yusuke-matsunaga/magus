@@ -11,7 +11,7 @@
 #include "ym_cell/CellCapacitance.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // CellCapacitanceObject の外部変数
@@ -40,7 +40,7 @@ struct CellCapacitanceObject
 
 // Py_kCellCapacitanceInf の本体
 CellCapacitanceObject Py_kCellCapacitanceInfStruct = {
-  PyObject_HEAD_INIT(&CellCapacitanceType)
+  PyObject_HEAD_INIT(&PyCellCapacitance_Type)
   DBL_MAX
 };
 
@@ -139,7 +139,7 @@ CellCapacitance_add(PyObject* left,
        CellCapacitanceObject_Check(right) ) {
     CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
     CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
-    return CellCapacitance_FromDouble(obj1->mVal + obj2->mVal);
+    return PyCellCapacitance_FromDouble(obj1->mVal + obj2->mVal);
   }
   PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellCapacitance");
   return NULL;
@@ -154,7 +154,7 @@ CellCapacitance_sub(PyObject* left,
        CellCapacitanceObject_Check(right) ) {
     CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
     CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
-    return CellCapacitance_FromDouble(obj1->mVal - obj2->mVal);
+    return PyCellCapacitance_FromDouble(obj1->mVal - obj2->mVal);
   }
   PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellCapacitance");
   return NULL;
@@ -276,7 +276,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // CellCapacitanceObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject CellCapacitanceType = {
+PyTypeObject PyCellCapacitance_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -388,9 +388,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief CellCapacitance から CellCapacitanceObject を生成する．
 // @param[in] obj CellCapacitance オブジェクト
 PyObject*
-CellCapacitance_FromCellCapacitance(const CellCapacitance& obj)
+PyCellCapacitance_FromCellCapacitance(const CellCapacitance& obj)
 {
-  CellCapacitanceObject* py_obj = CellCapacitance_new(&CellCapacitanceType);
+  CellCapacitanceObject* py_obj = CellCapacitance_new(&PyCellCapacitance_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -404,9 +404,9 @@ CellCapacitance_FromCellCapacitance(const CellCapacitance& obj)
 // @brief double から CellCapacitanceObject を生成する．
 // @param[in] val 値
 PyObject*
-CellCapacitance_FromDouble(double val)
+PyCellCapacitance_FromDouble(double val)
 {
-  CellCapacitanceObject* py_obj = CellCapacitance_new(&CellCapacitanceType);
+  CellCapacitanceObject* py_obj = CellCapacitance_new(&PyCellCapacitance_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -422,12 +422,12 @@ void
 CellCapacitanceObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&CellCapacitanceType) < 0 ) {
+  if ( PyType_Ready(&PyCellCapacitance_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "CellCapacitance", (PyObject*)&CellCapacitanceType);
+  PyModule_AddObject(m, "CellCapacitance", (PyObject*)&PyCellCapacitance_Type);
 
   // 定数オブジェクトの生成
   Py_kCellCapacitanceInf = (PyObject*)&Py_kCellCapacitanceInfStruct;
@@ -439,4 +439,4 @@ CellCapacitanceObject_init(PyObject* m)
   Py_INCREF(Py_kCellCapacitanceInfString);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

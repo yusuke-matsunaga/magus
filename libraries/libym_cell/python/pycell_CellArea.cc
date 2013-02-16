@@ -11,7 +11,7 @@
 #include "ym_cell/CellArea.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // CellAreaObject の外部変数
@@ -40,7 +40,7 @@ struct CellAreaObject
 
 // Py_kCellAreaInf の本体
 CellAreaObject Py_kCellAreaInfStruct = {
-  PyObject_HEAD_INIT(&CellAreaType)
+  PyObject_HEAD_INIT(&PyCellArea_Type)
   DBL_MAX
 };
 
@@ -139,7 +139,7 @@ CellArea_add(PyObject* left,
        CellAreaObject_Check(right) ) {
     CellAreaObject* obj1 = (CellAreaObject*)left;
     CellAreaObject* obj2 = (CellAreaObject*)right;
-    return CellArea_FromDouble(obj1->mVal + obj2->mVal);
+    return PyCellArea_FromDouble(obj1->mVal + obj2->mVal);
   }
   PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellArea");
   return NULL;
@@ -154,7 +154,7 @@ CellArea_sub(PyObject* left,
        CellAreaObject_Check(right) ) {
     CellAreaObject* obj1 = (CellAreaObject*)left;
     CellAreaObject* obj2 = (CellAreaObject*)right;
-    return CellArea_FromDouble(obj1->mVal - obj2->mVal);
+    return PyCellArea_FromDouble(obj1->mVal - obj2->mVal);
   }
   PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellArea");
   return NULL;
@@ -276,7 +276,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // CellAreaObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject CellAreaType = {
+PyTypeObject PyCellArea_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -388,9 +388,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief CellArea から CellAreaObject を生成する．
 // @param[in] obj CellArea オブジェクト
 PyObject*
-CellArea_FromCellArea(const CellArea& obj)
+PyCellArea_FromCellArea(const CellArea& obj)
 {
-  CellAreaObject* py_obj = CellArea_new(&CellAreaType);
+  CellAreaObject* py_obj = CellArea_new(&PyCellArea_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -404,9 +404,9 @@ CellArea_FromCellArea(const CellArea& obj)
 // @brief double から CellAreaObject を生成する．
 // @param[in] val 値
 PyObject*
-CellArea_FromDouble(double val)
+PyCellArea_FromDouble(double val)
 {
-  CellAreaObject* py_obj = CellArea_new(&CellAreaType);
+  CellAreaObject* py_obj = CellArea_new(&PyCellArea_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -422,12 +422,12 @@ void
 CellAreaObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&CellAreaType) < 0 ) {
+  if ( PyType_Ready(&PyCellArea_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "CellArea", (PyObject*)&CellAreaType);
+  PyModule_AddObject(m, "CellArea", (PyObject*)&PyCellArea_Type);
 
   // 定数オブジェクトの生成
   Py_kCellAreaInf = (PyObject*)&Py_kCellAreaInfStruct;
@@ -439,4 +439,4 @@ CellAreaObject_init(PyObject* m)
   Py_INCREF(Py_kCellAreaInfString);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

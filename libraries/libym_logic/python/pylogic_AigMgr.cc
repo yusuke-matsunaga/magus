@@ -11,7 +11,7 @@
 #include "ym_logic/AigMgr.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -98,7 +98,7 @@ PyObject*
 AigMgr_make_zero(AigMgrObject* self,
 		 PyObject* args)
 {
-  return Aig_FromAig(self->mMgr->make_zero());
+  return PyAig_FromAig(self->mMgr->make_zero());
 }
 
 // make_one 関数
@@ -106,7 +106,7 @@ PyObject*
 AigMgr_make_one(AigMgrObject* self,
 		PyObject* args)
 {
-  return Aig_FromAig(self->mMgr->make_one());
+  return PyAig_FromAig(self->mMgr->make_one());
 }
 
 // make_input 関数
@@ -115,7 +115,8 @@ AigMgr_make_input(AigMgrObject* self,
 		  PyObject* args)
 {
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &VarIdType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyVarId_Type, &obj) ) {
     return NULL;
   }
 
@@ -124,7 +125,7 @@ AigMgr_make_input(AigMgrObject* self,
     return NULL;
   }
 
-  return Aig_FromAig(self->mMgr->make_input(vid));
+  return PyAig_FromAig(self->mMgr->make_input(vid));
 }
 
 // make_not 関数
@@ -133,7 +134,8 @@ AigMgr_make_not(AigMgrObject* self,
 		PyObject* args)
 {
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &AigType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyAig_Type, &obj) ) {
     return NULL;
   }
 
@@ -142,7 +144,7 @@ AigMgr_make_not(AigMgrObject* self,
     return NULL;
   }
 
-  return Aig_FromAig(self->mMgr->make_not(aig));
+  return PyAig_FromAig(self->mMgr->make_not(aig));
 }
 
 BEGIN_NONAMESPACE
@@ -158,7 +160,7 @@ parse_aig_list(PyObject* args,
   if ( n == 1 ) {
     PyObject* obj0 = PyTuple_GET_ITEM(args, 0);
     if ( !PyList_Check(obj0) ) {
-      PyErr_SetString(ErrorObject, "list of Aig is expected");
+      PyErr_SetString(PyExc_TypeError, "list of Aig is expected");
       return false;
     }
     n = PyList_GET_SIZE(obj0);
@@ -197,7 +199,7 @@ AigMgr_make_and(AigMgrObject* self,
     return NULL;
   }
 
-  return Aig_FromAig(self->mMgr->make_and(aig_list));
+  return PyAig_FromAig(self->mMgr->make_and(aig_list));
 }
 
 // make_nand 関数
@@ -210,7 +212,7 @@ AigMgr_make_nand(AigMgrObject* self,
     return NULL;
   }
 
-  return Aig_FromAig(self->mMgr->make_nand(aig_list));
+  return PyAig_FromAig(self->mMgr->make_nand(aig_list));
 }
 
 // make_or 関数
@@ -223,7 +225,7 @@ AigMgr_make_or(AigMgrObject* self,
     return NULL;
   }
 
-  return Aig_FromAig(self->mMgr->make_or(aig_list));
+  return PyAig_FromAig(self->mMgr->make_or(aig_list));
 }
 
 // make_nor 関数
@@ -236,7 +238,7 @@ AigMgr_make_nor(AigMgrObject* self,
     return NULL;
   }
 
-  return Aig_FromAig(self->mMgr->make_nor(aig_list));
+  return PyAig_FromAig(self->mMgr->make_nor(aig_list));
 }
 
 // make_xor 関数
@@ -249,7 +251,7 @@ AigMgr_make_xor(AigMgrObject* self,
     return NULL;
   }
 
-  return Aig_FromAig(self->mMgr->make_xor(aig_list));
+  return PyAig_FromAig(self->mMgr->make_xor(aig_list));
 }
 
 // make_xnor 関数
@@ -262,7 +264,7 @@ AigMgr_make_xnor(AigMgrObject* self,
     return NULL;
   }
 
-  return Aig_FromAig(self->mMgr->make_xnor(aig_list));
+  return PyAig_FromAig(self->mMgr->make_xnor(aig_list));
 }
 
 // make_logic 関数
@@ -272,7 +274,9 @@ AigMgr_make_logic(AigMgrObject* self,
 {
   PyObject* obj1 = NULL;
   PyObject* obj2 = NULL;
-  if ( !PyArg_ParseTuple(args, "O!O!", &LogExprType, &obj1, &PyDict_Type, &obj2) ) {
+  if ( !PyArg_ParseTuple(args, "O!O!",
+			 &PyLogExpr_Type, &obj1,
+			 &PyDict_Type, &obj2) ) {
     return NULL;
   }
 
@@ -288,7 +292,9 @@ AigMgr_make_logic(AigMgrObject* self,
     PyObject* item = PyList_GET_ITEM(item_list, i);
     PyObject* vid_obj = NULL;
     PyObject* aig_obj = NULL;
-    if ( !PyArg_ParseTuple(item, "O!O!", &VarIdType, &vid_obj, &AigType, &aig_obj) ) {
+    if ( !PyArg_ParseTuple(item, "O!O!",
+			   &PyVarId_Type, &vid_obj,
+			   &PyAig_Type, &aig_obj) ) {
       return NULL;
     }
 
@@ -305,7 +311,7 @@ AigMgr_make_logic(AigMgrObject* self,
     input_map.insert(make_pair(vid, aig));
   }
 
-  return Aig_FromAig(self->mMgr->make_logic(expr, input_map));
+  return PyAig_FromAig(self->mMgr->make_logic(expr, input_map));
 }
 
 // make_cofactor 関数
@@ -316,7 +322,10 @@ AigMgr_make_cofactor(AigMgrObject* self,
   PyObject* obj1 = NULL;
   PyObject* obj2 = NULL;
   PyObject* obj3 = NULL;
-  if ( !PyArg_ParseTuple(args, "O!O!O!", &AigType, &obj1, &VarIdType, &obj2, &PolType, &obj3) ) {
+  if ( !PyArg_ParseTuple(args, "O!O!O!",
+			 &PyAig_Type, &obj1,
+			 &PyVarId_Type, &obj2,
+			 &PyPol_Type, &obj3) ) {
     return NULL;
   }
 
@@ -335,7 +344,7 @@ AigMgr_make_cofactor(AigMgrObject* self,
     return NULL;
   }
 
-  return Aig_FromAig(self->mMgr->make_cofactor(aig, vid, pol));
+  return PyAig_FromAig(self->mMgr->make_cofactor(aig, vid, pol));
 }
 
 // AigMgrObject のメソッドテーブル
@@ -375,7 +384,7 @@ END_NONAMESPACE
 
 
 // AigMgrObject 用のタイプオブジェクト
-PyTypeObject AigMgrType = {
+PyTypeObject PyAigMgr_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -448,12 +457,12 @@ void
 AigMgrObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&AigMgrType) < 0 ) {
+  if ( PyType_Ready(&PyAigMgr_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "AigMgr", (PyObject*)&AigMgrType);
+  PyModule_AddObject(m, "AigMgr", (PyObject*)&PyAigMgr_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

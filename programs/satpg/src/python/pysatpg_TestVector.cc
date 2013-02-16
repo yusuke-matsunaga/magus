@@ -11,7 +11,7 @@
 #include "TestVector.h"
 
 
-BEGIN_NAMESPACE_YM_PYSATPG
+BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
@@ -83,7 +83,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // TestVector 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject TestVectorType = {
+PyTypeObject PyTestVector_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -159,9 +159,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief TestVector から PyObject を生成する．
 // @param[in] obj TestVector オブジェクト
 PyObject*
-TestVector_FromTestVector(TestVector* obj)
+PyTestVector_FromTestVector(TestVector* obj)
 {
-  TestVectorObject* py_obj = TestVector_new(&TestVectorType);
+  TestVectorObject* py_obj = TestVector_new(&PyTestVector_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -177,13 +177,13 @@ void
 TestVectorObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&TestVectorType) < 0 ) {
+  if ( PyType_Ready(&PyTestVector_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "TestVector", (PyObject*)&TestVectorType);
+  PyModule_AddObject(m, "TestVector", (PyObject*)&PyTestVector_Type);
 }
 
 
-END_NAMESPACE_YM_PYSATPG
+END_NAMESPACE_YM_SATPG

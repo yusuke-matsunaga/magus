@@ -11,7 +11,7 @@
 #include "FaultMgr.h"
 
 
-BEGIN_NAMESPACE_YM_PYSATPG
+BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
@@ -81,7 +81,7 @@ fobject(SaFault* f,
 {
   hash_map<ymuint, PyObject*>::iterator p = fmap.find(f->id());
   if ( p == fmap.end() ) {
-    PyObject* obj = SaFault_FromSaFault(f);
+    PyObject* obj = PySaFault_FromSaFault(f);
     fmap.insert(make_pair(f->id(), obj));
     return obj;
   }
@@ -209,7 +209,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // FaultMgr 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject FaultMgrType = {
+PyTypeObject PyFaultMgr_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -285,9 +285,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief FaultMgr から PyObject を生成する．
 // @param[in] obj FaultMgr オブジェクト
 PyObject*
-FaultMgr_FromFaultMgr(FaultMgr* obj)
+PyFaultMgr_FromFaultMgr(FaultMgr* obj)
 {
-  FaultMgrObject* py_obj = FaultMgr_new(&FaultMgrType);
+  FaultMgrObject* py_obj = FaultMgr_new(&PyFaultMgr_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -303,13 +303,13 @@ void
 FaultMgrObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&FaultMgrType) < 0 ) {
+  if ( PyType_Ready(&PyFaultMgr_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "FaultMgr", (PyObject*)&FaultMgrType);
+  PyModule_AddObject(m, "FaultMgr", (PyObject*)&PyFaultMgr_Type);
 }
 
 
-END_NAMESPACE_YM_PYSATPG
+END_NAMESPACE_YM_SATPG

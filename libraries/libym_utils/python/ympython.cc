@@ -10,9 +10,9 @@
 #include "ympython.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
-PyObject* ErrorObject;
+PyObject* PyErrorObject;
 
 /// @brief bool から PyObject を生成する．
 PyObject*
@@ -112,4 +112,4 @@ conv_to_pyobject(const string& val)
   return Py_BuildValue("s", val.c_str());
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

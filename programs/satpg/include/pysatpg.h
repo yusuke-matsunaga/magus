@@ -15,28 +15,7 @@
 #include "FaultStatus.h"
 
 
-
-//////////////////////////////////////////////////////////////////////
-// 名前空間の定義
-//////////////////////////////////////////////////////////////////////
-
-#define BEGIN_NAMESPACE_YM_PYSATPG \
-BEGIN_NAMESPACE_YM_SATPG \
-BEGIN_NAMESPACE(nsPython)
-
-#define END_NAMESPACE_YM_PYSATPG \
-END_NAMESPACE(nsPython)	 \
-END_NAMESPACE_YM_SATPG
-
-
-BEGIN_NAMESPACE_YM_PYSATPG
-
-//////////////////////////////////////////////////////////////////////
-// ympython.h で定義されている関数
-//////////////////////////////////////////////////////////////////////
-
-using nsYm::nsPython::conv_to_pyobject;
-
+BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
 // 型を表すタイプオブジェクト
@@ -44,27 +23,27 @@ using nsYm::nsPython::conv_to_pyobject;
 
 /// @brief Val3 を表す型
 extern
-PyTypeObject Val3Type;
+PyTypeObject PyVal3_Type;
 
 /// @brief FaultStatus を表す型
 extern
-PyTypeObject FaultStatusType;
+PyTypeObject PyFaultStatus_Type;
 
 /// @brief SaFault を表す型
 extern
-PyTypeObject SaFaultType;
+PyTypeObject PySaFault_Type;
 
 /// @brief FaultMgr を表す型
 extern
-PyTypeObject FaultMgrType;
+PyTypeObject PyFaultMgr_Type;
 
 /// @brief TestVector を表す型
 extern
-PyTypeObject TestVectorType;
+PyTypeObject PyTestVector_Type;
 
 /// @brief TvMgr を表す型
 extern
-PyTypeObject TvMgrType;
+PyTypeObject PyTvMgr_Type;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -79,7 +58,7 @@ inline
 bool
 Val3Object_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &Val3Type;
+  return Py_TYPE(obj) == &PyVal3_Type;
 }
 
 /// @brief FaultStatusType の型チェック
@@ -90,7 +69,7 @@ inline
 bool
 FaultStatusObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &FaultStatusType;
+  return Py_TYPE(obj) == &PyFaultStatus_Type;
 }
 
 /// @brief SaFaultType の型チェック
@@ -101,7 +80,7 @@ inline
 bool
 SaFaultObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &SaFaultType;
+  return Py_TYPE(obj) == &PySaFault_Type;
 }
 
 /// @brief FaultMgrType の型チェック
@@ -112,7 +91,7 @@ inline
 bool
 FaultMgrObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &FaultMgrType;
+  return Py_TYPE(obj) == &PyFaultMgr_Type;
 }
 
 /// @brief TestVectorType の型チェック
@@ -123,7 +102,7 @@ inline
 bool
 TestVectorObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &TestVectorType;
+  return Py_TYPE(obj) == &PyTestVector_Type;
 }
 
 /// @brief TvMgrType の型チェック
@@ -134,7 +113,7 @@ inline
 bool
 TvMgrObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &TvMgrType;
+  return Py_TYPE(obj) == &PyTvMgr_Type;
 }
 
 
@@ -181,37 +160,37 @@ conv_from_pyobject(PyObject* py_obj,
 /// @param[in] obj Val3 オブジェクト
 extern
 PyObject*
-Val3_FromVal3(Val3 obj);
+PyVal3_FromVal3(Val3 obj);
 
 /// @brief Val3 を表す文字列から PyObject を生成する．
 /// @param[in] str 文字列
 extern
 PyObject*
-Val3_FromString(const char* str);
+PyVal3_FromString(const char* str);
 
 /// @brief 整数から PyObject を生成する．
 /// @param[in] val 整数値
 extern
 PyObject*
-Val3_FromLong(long val);
+PyVal3_FromLong(long val);
 
 /// @brief FaultStatus から PyObject を生成する．
 /// @param[in] obj FaultStatus オブジェクト
 extern
 PyObject*
-FaultStatus_FromFaultStatus(FaultStatus obj);
+PyFaultStatus_FromFaultStatus(FaultStatus obj);
 
 /// @brief 文字列から PyObject を生成する．
 /// @param[in] str 文字列
 extern
 PyObject*
-FaultStatus_FromString(const char* str);
+PyFaultStatus_FromString(const char* str);
 
 /// @brief SaFault から PyObject を生成する．
 /// @param[in] obj SaFault オブジェクト
 extern
 PyObject*
-SaFault_FromSaFault(SaFault* obj);
+PySaFault_FromSaFault(SaFault* obj);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -236,7 +215,7 @@ FileBinI*
 parse_FileBinI(PyObject* args);
 #endif
 
-END_NAMESPACE_YM_PYSATPG
+END_NAMESPACE_YM_SATPG
 
 
 //////////////////////////////////////////////////////////////////////

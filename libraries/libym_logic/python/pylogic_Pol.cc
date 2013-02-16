@@ -11,7 +11,7 @@
 #include "ym_logic/Pol.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // PolObject の外部変数
@@ -43,13 +43,13 @@ struct PolObject
 
 // Py_kPolPosi の本体
 PolObject Py_kPolPosiStruct = {
-  PyObject_HEAD_INIT(&PolType)
+  PyObject_HEAD_INIT(&PyPol_Type)
   kPolPosi
 };
 
 // Py_kPolNega の本体
 PolObject Py_kPolNegaStruct = {
-  PyObject_HEAD_INIT(&PolType)
+  PyObject_HEAD_INIT(&PyPol_Type)
   kPolNega
 };
 
@@ -75,7 +75,7 @@ Pol_new(PyTypeObject* type,
   if ( !PyArg_ParseTuple(args, "|s", &str) ) {
     return NULL;
   }
-  return (PolObject*)Pol_FromString(str);
+  return (PolObject*)PyPol_FromString(str);
 }
 
 // 初期化関数
@@ -100,7 +100,7 @@ Pol_init(PolObject* self,
     else {
       ostringstream buf;
       buf << "\"" << str << "\": illegal string for polarity initializer";
-      PyErr_SetString(ErrorObject, buf.str().c_str());
+      PyErr_SetString(PyExc_ValueError, buf.str().c_str());
       return -1;
     }
   }
@@ -134,7 +134,7 @@ PyObject*
 Pol_inv(PyObject* obj)
 {
   PolObject* pol_obj = (PolObject*)obj;
-  return Pol_FromPol(~pol_obj->mPol);
+  return PyPol_FromPol(~pol_obj->mPol);
 }
 
 
@@ -193,7 +193,7 @@ END_NONAMESPACE
 
 
 // PolObject 用のタイプオブジェクト
-PyTypeObject PolType = {
+PyTypeObject PyPol_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -269,7 +269,7 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief tPol から PyObject を生成する．
 // @param[in] obj tPol オブジェクト
 PyObject*
-Pol_FromPol(tPol obj)
+PyPol_FromPol(tPol obj)
 {
   PyObject* result = NULL;
   if ( obj == kPolPosi ) {
@@ -284,7 +284,7 @@ Pol_FromPol(tPol obj)
 
 // 文字列からの変換関数
 PyObject*
-Pol_FromString(const char* str)
+PyPol_FromString(const char* str)
 {
   if ( str == NULL ) {
     PyErr_SetString(PyExc_ValueError,
@@ -355,12 +355,12 @@ void
 PolObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&PolType) < 0 ) {
+  if ( PyType_Ready(&PyPol_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "Pol", (PyObject*)&PolType);
+  PyModule_AddObject(m, "Pol", (PyObject*)&PyPol_Type);
 
   // 定数オブジェクトの登録
   Pol_set(Py_kPolPosiStruct, Py_kPolPosi, m, "kPolPosi");
@@ -371,4 +371,4 @@ PolObject_init(PyObject* m)
   Py_kPolNegaString = new_string("negative");
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

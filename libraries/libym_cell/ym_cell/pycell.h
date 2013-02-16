@@ -19,7 +19,7 @@
 #include "ym_cell/CellClass.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // 型を表すタイプオブジェクト
@@ -27,7 +27,7 @@ BEGIN_NAMESPACE_YM_PYTHON
 
 /// @brief CellArea を表す型
 extern
-PyTypeObject CellAreaType;
+PyTypeObject PyCellArea_Type;
 
 /// @brief CellArea の無限大定数を表すオブジェクト
 extern
@@ -35,7 +35,7 @@ PyObject* Py_kCellAreaInf;
 
 /// @brief CellCapacitance を表す型
 extern
-PyTypeObject CellCapacitanceType;
+PyTypeObject PyCellCapacitance_Type;
 
 /// @brief CellCapacitance の無限大定数を表すオブジェクト
 extern
@@ -43,7 +43,7 @@ PyObject* Py_kCellCapacitanceInf;
 
 /// @brief CellTime を表す型
 extern
-PyTypeObject CellTimeType;
+PyTypeObject PyCellTime_Type;
 
 /// @brief CellTime の無限大定数を表すオブジェクト
 extern
@@ -51,31 +51,31 @@ PyObject* Py_kCellTimeInf;
 
 /// @brief CellLutTemplate を表す型
 extern
-PyTypeObject CellLutTemplateType;
+PyTypeObject PyCellLutTemplate_Type;
 
 /// @brief CellLut を表す型
 extern
-PyTypeObject CellLutType;
+PyTypeObject PyCellLut_Type;
 
 /// @brief Cell を表す型
 extern
-PyTypeObject CellType;
+PyTypeObject PyCell_Type;
 
 /// @breif CellPin を表す型
 extern
-PyTypeObject CellPinType;
+PyTypeObject PyCellPin_Type;
 
 /// @brief CellGroup を表す型
 extern
-PyTypeObject CellGroupType;
+PyTypeObject PyCellGroup_Type;
 
 /// @brief CellClass を表す型
 extern
-PyTypeObject CellClassType;
+PyTypeObject PyCellClass_Type;
 
 /// @brief CellLibrary を表す型
 extern
-PyTypeObject CellLibraryType;
+PyTypeObject PyCellLibrary_Type;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ inline
 bool
 CellAreaObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &CellAreaType;
+  return Py_TYPE(obj) == &PyCellArea_Type;
 }
 
 /// @brief CellCapacitanceType の型チェック
@@ -101,7 +101,7 @@ inline
 bool
 CellCapacitanceObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &CellCapacitanceType;
+  return Py_TYPE(obj) == &PyCellCapacitance_Type;
 }
 
 /// @brief CellTimeType の型チェック
@@ -112,7 +112,7 @@ inline
 bool
 CellTimeObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &CellTimeType;
+  return Py_TYPE(obj) == &PyCellTime_Type;
 }
 
 /// @brief CellLutTemplateType の型チェック
@@ -123,7 +123,7 @@ inline
 bool
 CellLutTempalteObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &CellLutTemplateType;
+  return Py_TYPE(obj) == &PyCellLutTemplate_Type;
 }
 
 /// @brief CellLutType の型チェック
@@ -134,7 +134,7 @@ inline
 bool
 CellLutObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &CellLutType;
+  return Py_TYPE(obj) == &PyCellLut_Type;
 }
 
 /// @brief CellType の型チェック
@@ -145,7 +145,7 @@ inline
 bool
 CellObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &CellType;
+  return Py_TYPE(obj) == &PyCell_Type;
 }
 
 /// @brief CellPinType の型チェック
@@ -156,7 +156,7 @@ inline
 bool
 CellPinObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &CellPinType;
+  return Py_TYPE(obj) == &PyCellPin_Type;
 }
 
 /// @brief CellGroupType の型チェック
@@ -167,7 +167,7 @@ inline
 bool
 CellGroupObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &CellGroupType;
+  return Py_TYPE(obj) == &PyCellGroup_Type;
 }
 
 /// @brief CellClassType の型チェック
@@ -178,7 +178,7 @@ inline
 bool
 CellClassObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &CellClassType;
+  return Py_TYPE(obj) == &PyCellClass_Type;
 }
 
 /// @brief CellLibraryType の型チェック
@@ -189,7 +189,7 @@ inline
 bool
 CellLibraryObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &CellLibraryType;
+  return Py_TYPE(obj) == &PyCellLibrary_Type;
 }
 
 
@@ -296,76 +296,76 @@ conv_from_pyobject(PyObject* py_obj,
 /// @param[in] obj CellArea オブジェクト
 extern
 PyObject*
-CellArea_FromCellArea(const CellArea& obj);
+PyCellArea_FromCellArea(const CellArea& obj);
 
 /// @brief double から CellAreaObject を生成する．
 /// @param[in] val 値
 extern
 PyObject*
-CellArea_FromDouble(double val);
+PyCellArea_FromDouble(double val);
 
 /// @brief CellCapacitance から CellCapacitanceObject を生成する．
 /// @param[in] obj CellCapacitance オブジェクト
 extern
 PyObject*
-CellCapacitance_FromCellCapacitance(const CellCapacitance& obj);
+PyCellCapacitance_FromCellCapacitance(const CellCapacitance& obj);
 
 /// @brief double から CellCapacitanceObject を生成する．
 /// @param[in] val 値
 extern
 PyObject*
-CellCapacitance_FromDouble(double val);
+PyCellCapacitance_FromDouble(double val);
 
 /// @brief CellTime から CellTimeObject を生成する．
 /// @param[in] obj CellTime オブジェクト
 extern
 PyObject*
-CellTime_FromCellTime(const CellTime& obj);
+PyCellTime_FromCellTime(const CellTime& obj);
 
 /// @brief double から CellTimeObject を生成する．
 /// @param[in] val 値
 extern
 PyObject*
-CellTime_FromDouble(double val);
+PyCellTime_FromDouble(double val);
 
 /// @brief CellLutTemplate から CellLutTemplateObject を生成する．
 /// @param[in] lut_template LUTテンプレート
 extern
 PyObject*
-CellLutTemplate_FromCellLutTemplate(const CellLutTemplate* lut_template);
+PyCellLutTemplate_FromCellLutTemplate(const CellLutTemplate* lut_template);
 
 /// @brief CellLut から CellLutObject を生成する．
 /// @param[in] lut LUT
 extern
 PyObject*
-CellLut_FromCellLut(const CellLut* lut);
+PyCellLut_FromCellLut(const CellLut* lut);
 
 /// @brief Cell から CellObject を生成する．
 /// @param[in] cell セル
 extern
 PyObject*
-Cell_FromCell(const Cell* cell);
+PyCell_FromCell(const Cell* cell);
 
 /// @brief CellGroup から CellGroupObject を生成する．
 /// @param[in] group グループ
 extern
 PyObject*
-CellGroup_FromCellGroup(const CellGroup* group);
+PyCellGroup_FromCellGroup(const CellGroup* group);
 
 /// @brief CellClass から CellClassObject を生成する．
 /// @param[in] cell_class セルクラス
 extern
 PyObject*
-CellClass_FromCellClass(const CellClass* cell_class);
+PyCellClass_FromCellClass(const CellClass* cell_class);
 
 /// @brief CellLibrary から CellLibraryObject を生成する．
 /// @param[in] cell_class セルクラス
 extern
 PyObject*
-CellLibrary_FromCellLibrary(const CellLibrary* cell_class);
+PyCellLibrary_FromCellLibrary(const CellLibrary* cell_class);
 
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM
 
 
 //////////////////////////////////////////////////////////////////////

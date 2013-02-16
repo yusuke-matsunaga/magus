@@ -12,7 +12,7 @@
 #include "ym_utils/pyutils.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // クラス PySatMsgHandler
@@ -51,7 +51,7 @@ PySatMsgHandler::operator()(const SatStats& stats)
   PyDict_SetItemString(dict_obj, "propagation_num",    conv_to_pyobject(stats.mPropagationNum));
   PyDict_SetItemString(dict_obj, "conflict_limit",     conv_to_pyobject(stats.mConflictLimit));
   PyDict_SetItemString(dict_obj, "learnt_limit",       conv_to_pyobject(stats.mLearntLimit));
-  PyDict_SetItemString(dict_obj, "time",               USTime_FromUSTime(stats.mTime));
+  PyDict_SetItemString(dict_obj, "time",               PyUSTime_FromUSTime(stats.mTime));
 
   PyObject* args = Py_BuildValue("O", dict_obj);
 
@@ -71,4 +71,4 @@ PySatMsgHandler::operator()(const SatStats& stats)
   }
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

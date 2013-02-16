@@ -30,9 +30,6 @@ class NameMgr;
 class FileBinI;
 class FileBinO;
 
-END_NAMESPACE_YM
-
-BEGIN_NAMESPACE_YM_PYTHON
 
 //////////////////////////////////////////////////////////////////////
 // 型を表すタイプオブジェクト
@@ -40,19 +37,19 @@ BEGIN_NAMESPACE_YM_PYTHON
 
 /// @brief FileInfo を表す型
 extern
-PyTypeObject FileInfoType;
+PyTypeObject PyFileInfo_Type;
 
 /// @brief FileLoc を表す型
 extern
-PyTypeObject FileLocType;
+PyTypeObject PyFileLoc_Type;
 
 /// @brief FileRegion を表す型
 extern
-PyTypeObject FileRegionType;
+PyTypeObject PyFileRegion_Type;
 
 /// @brief MsgType を表す型
 extern
-PyTypeObject MsgTypeType;
+PyTypeObject PyMsgType_Type;
 
 /// @brief kMsgError を表すオブジェクト
 extern
@@ -76,51 +73,51 @@ PyObject* Py_kMsgDebug;
 
 /// @brief MsgMgr を表す型
 extern
-PyTypeObject MsgMgrType;
+PyTypeObject PyMsgMgr_Type;
 
 /// @brief USTime を表す型
 extern
-PyTypeObject USTimeType;
+PyTypeObject PyUSTime_Type;
 
 /// @brief StopWatch を表す型
 extern
-PyTypeObject StopWatchType;
+PyTypeObject PyStopWatch_Type;
 
 /// @brief MStopWatch を表す型
 extern
-PyTypeObject MStopWatchType;
+PyTypeObject PyMStopWatch_Type;
 
 /// @brief RandGen を表す型
 extern
-PyTypeObject RandGenType;
+PyTypeObject PyRandGen_Type;
 
 /// @brief RandPermGen を表す型
 extern
-PyTypeObject RandPermGenType;
+PyTypeObject PyRandPermGen_Type;
 
 /// @brief RandCombiGen を表す型
 extern
-PyTypeObject RandCombiGenType;
+PyTypeObject PyRandCombiGen_Type;
 
 /// @brief MFSet を表す型
 extern
-PyTypeObject MFSetType;
+PyTypeObject PyMFSet_Type;
 
 /// @brief ItvlMgr を表す型
 extern
-PyTypeObject ItvlMgrType;
+PyTypeObject PyItvlMgr_Type;
 
 /// @brief NameMgr を表す型
 extern
-PyTypeObject NameMgrType;
+PyTypeObject PyNameMgr_Type;
 
 /// @brief FileBinI を表す型
 extern
-PyTypeObject FileBinIType;
+PyTypeObject PyFileBinI_Type;
 
 /// @brief FileBinO を表す型
 extern
-PyTypeObject FileBinOType;
+PyTypeObject PyFileBinO_Type;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -135,7 +132,7 @@ inline
 bool
 FileInfoObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &FileInfoType;
+  return Py_TYPE(obj) == &PyFileInfo_Type;
 }
 
 /// @brief FileLocType の型チェック
@@ -146,7 +143,7 @@ inline
 bool
 FileLocObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &FileLocType;
+  return Py_TYPE(obj) == &PyFileLoc_Type;
 }
 
 /// @brief FileRegionType の型チェック
@@ -157,7 +154,7 @@ inline
 bool
 FileRegionObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &FileRegionType;
+  return Py_TYPE(obj) == &PyFileRegion_Type;
 }
 
 /// @brief MsgTypeType の型チェック
@@ -168,7 +165,7 @@ inline
 bool
 MsgTypeObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &MsgTypeType;
+  return Py_TYPE(obj) == &PyMsgType_Type;
 }
 
 /// @brief MsgMgrType の型チェック
@@ -179,7 +176,7 @@ inline
 bool
 MsgMgrObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &MsgMgrType;
+  return Py_TYPE(obj) == &PyMsgMgr_Type;
 }
 
 /// @brief USTimeType の型チェック
@@ -190,7 +187,7 @@ inline
 bool
 USTimeObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &USTimeType;
+  return Py_TYPE(obj) == &PyUSTime_Type;
 }
 
 /// @brief StopWatchType の型チェック
@@ -201,7 +198,7 @@ inline
 bool
 StopWatchObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &StopWatchType;
+  return Py_TYPE(obj) == &PyStopWatch_Type;
 }
 
 /// @brief MStopWatchType の型チェック
@@ -212,7 +209,7 @@ inline
 bool
 MStopWatchObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &MStopWatchType;
+  return Py_TYPE(obj) == &PyMStopWatch_Type;
 }
 
 /// @brief RandGenType の型チェック
@@ -223,7 +220,7 @@ inline
 bool
 RandGenObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &RandGenType;
+  return Py_TYPE(obj) == &PyRandGen_Type;
 }
 
 /// @brief RandPermGenType の型チェック
@@ -234,7 +231,7 @@ inline
 bool
 RandPermGenObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &RandPermGenType;
+  return Py_TYPE(obj) == &PyRandPermGen_Type;
 }
 
 /// @brief RandCombiGenType の型チェック
@@ -245,7 +242,7 @@ inline
 bool
 RandCombiGenObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &RandCombiGenType;
+  return Py_TYPE(obj) == &PyRandCombiGen_Type;
 }
 
 /// @brief MFSetType の型チェック
@@ -256,7 +253,7 @@ inline
 bool
 MFSetObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &MFSetType;
+  return Py_TYPE(obj) == &PyMFSet_Type;
 }
 
 /// @brief ItvlMgrType の型チェック
@@ -267,7 +264,7 @@ inline
 bool
 ItvlMgrObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &ItvlMgrType;
+  return Py_TYPE(obj) == &PyItvlMgr_Type;
 }
 
 /// @brief NameMgrType の型チェック
@@ -278,7 +275,7 @@ inline
 bool
 NameMgrObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &NameMgrType;
+  return Py_TYPE(obj) == &PyNameMgr_Type;
 }
 
 /// @brief FileBinIType の型チェック
@@ -289,7 +286,7 @@ inline
 bool
 FileBinIObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &FileBinIType;
+  return Py_TYPE(obj) == &PyFileBinI_Type;
 }
 
 /// @brief FileBinOType の型チェック
@@ -300,7 +297,7 @@ inline
 bool
 FileBinOObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &FileBinOType;
+  return Py_TYPE(obj) == &PyFileBinO_Type;
 }
 
 
@@ -443,41 +440,41 @@ conv_from_pyobject(PyObject* py_obj,
 /// @param[in] obj FileInfo オブジェクト
 extern
 PyObject*
-FileInfo_FromFileInfo(const FileInfo& obj);
+PyFileInfo_FromFileInfo(const FileInfo& obj);
 
 /// @brief FileLoc から FileLocObject を生成する．
 /// @param[in] obj FileLoc オブジェクト
 extern
 PyObject*
-FileLoc_FromFileLoc(const FileLoc& obj);
+PyFileLoc_FromFileLoc(const FileLoc& obj);
 
 /// @brief FileRegion から FileRegionObject を生成する．
 /// @param[in] obj FileRegion オブジェクト
 extern
 PyObject*
-FileRegion_FromFileRegion(const FileRegion& obj);
+PyFileRegion_FromFileRegion(const FileRegion& obj);
 
 /// @brief tMsgType から PyObject を生成する．
 /// @param[in] obj tMsgType オブジェクト
 extern
 PyObject*
-MsgType_FromMsgType(tMsgType obj);
+PyMsgType_FromMsgType(tMsgType obj);
 
 /// @brief 文字列から MsgTypeObject を生成する．
 extern
 PyObject*
-MsgType_FromString(const char* str);
+PyMsgType_FromString(const char* str);
 
 /// @brief long から MsgTypeObject を生成する．
 extern
 PyObject*
-MsgType_FromLong(ymlong val);
+PyMsgType_FromLong(ymlong val);
 
 /// @brief USTime から USTimeObject を生成する．
 /// @param[in] obj USTime オブジェクト
 extern
 PyObject*
-USTime_FromUSTime(const USTime& obj);
+PyUSTime_FromUSTime(const USTime& obj);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -501,7 +498,7 @@ FileBinI*
 parse_FileBinI(PyObject* args);
 
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM
 
 
 //////////////////////////////////////////////////////////////////////

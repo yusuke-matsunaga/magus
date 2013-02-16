@@ -11,7 +11,7 @@
 #include "Val3.h"
 
 
-BEGIN_NAMESPACE_YM_PYSATPG
+BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
@@ -44,19 +44,19 @@ PyObject* Py_kVal1;
 
 // Py_kValX の実体
 Val3Object Py_kValXStruct = {
-  PyObject_HEAD_INIT(&Val3Type)
+  PyObject_HEAD_INIT(&PyVal3_Type)
   kValX
 };
 
 // Py_kVal0 の実体
 Val3Object Py_kVal0Struct = {
-  PyObject_HEAD_INIT(&Val3Type)
+  PyObject_HEAD_INIT(&PyVal3_Type)
   kVal0
 };
 
 // Py_kVal1 の実体
 Val3Object Py_kVal1Struct = {
-  PyObject_HEAD_INIT(&Val3Type)
+  PyObject_HEAD_INIT(&PyVal3_Type)
   kVal1
 };
 
@@ -90,11 +90,11 @@ Val3_new(PyTypeObject* type,
     PyObject* obj = PyTuple_GET_ITEM(args, 0);
     if ( PyString_Check(obj) ) {
       char* str = PyString_AsString(obj);
-      return (Val3Object*)Val3_FromString(str);
+      return (Val3Object*)PyVal3_FromString(str);
     }
     if ( PyInt_Check(obj) ) {
       long val = PyInt_AS_LONG(obj);
-      return (Val3Object*)Val3_FromLong(val);
+      return (Val3Object*)PyVal3_FromLong(val);
     }
   }
 
@@ -122,7 +122,7 @@ Val3_inv(PyObject* left)
 {
   if ( Val3Object_Check(left) ) {
     Val3Object* obj1 = (Val3Object*)left;
-    return Val3_FromVal3(~(obj1->mVal));
+    return PyVal3_FromVal3(~(obj1->mVal));
   }
   PyErr_SetString(PyExc_TypeError, "satpg.Val3 is expected");
   return NULL;
@@ -136,7 +136,7 @@ Val3_and(PyObject* left,
   if ( Val3Object_Check(left) && Val3Object_Check(right) ) {
     Val3Object* obj1 = (Val3Object*)left;
     Val3Object* obj2 = (Val3Object*)right;
-    return Val3_FromVal3(obj1->mVal & obj2->mVal);
+    return PyVal3_FromVal3(obj1->mVal & obj2->mVal);
   }
   PyErr_SetString(PyExc_TypeError, "satpg.Val3 is expected");
   return NULL;
@@ -150,7 +150,7 @@ Val3_or(PyObject* left,
   if ( Val3Object_Check(left) && Val3Object_Check(right) ) {
     Val3Object* obj1 = (Val3Object*)left;
     Val3Object* obj2 = (Val3Object*)right;
-    return Val3_FromVal3(obj1->mVal | obj2->mVal);
+    return PyVal3_FromVal3(obj1->mVal | obj2->mVal);
   }
   PyErr_SetString(PyExc_TypeError, "satpg.Val3 is expected");
   return NULL;
@@ -164,7 +164,7 @@ Val3_xor(PyObject* left,
   if ( Val3Object_Check(left) && Val3Object_Check(right) ) {
     Val3Object* obj1 = (Val3Object*)left;
     Val3Object* obj2 = (Val3Object*)right;
-    return Val3_FromVal3(obj1->mVal ^ obj2->mVal);
+    return PyVal3_FromVal3(obj1->mVal ^ obj2->mVal);
   }
   PyErr_SetString(PyExc_TypeError, "satpg.Val3 is expected");
   return NULL;
@@ -236,7 +236,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // Val3Object 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject Val3Type = {
+PyTypeObject PyVal3_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -325,7 +325,7 @@ PyTypeObject Val3Type = {
 
 // Val3 からの変換関数
 PyObject*
-Val3_FromVal3(Val3 val)
+PyVal3_FromVal3(Val3 val)
 {
   PyObject* result = NULL;
   switch ( val ) {
@@ -341,7 +341,7 @@ Val3_FromVal3(Val3 val)
 
 // 文字列からの変換関数
 PyObject*
-Val3_FromString(const char* str)
+PyVal3_FromString(const char* str)
 {
   if ( str == NULL ) {
     PyErr_SetString(PyExc_ValueError,
@@ -370,7 +370,7 @@ Val3_FromString(const char* str)
 
 // long からの変換関数
 PyObject*
-Val3_FromLong(long val)
+PyVal3_FromLong(long val)
 {
   // 0, 1 以外は X だと思う．
   PyObject* result = NULL;
@@ -435,12 +435,12 @@ void
 Val3Object_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&Val3Type) < 0 ) {
+  if ( PyType_Ready(&PyVal3_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "Val3", (PyObject*)&Val3Type);
+  PyModule_AddObject(m, "Val3", (PyObject*)&PyVal3_Type);
 
   // 定数オブジェクトの生成と登録
   Val3_set(Py_kValXStruct, Py_kValX, m, "kValX");
@@ -453,4 +453,4 @@ Val3Object_init(PyObject* m)
   Py_kVal1String = new_string("1");
 }
 
-END_NAMESPACE_YM_PYSATPG
+END_NAMESPACE_YM_SATPG

@@ -21,7 +21,7 @@
 #include "ym_logic/sat_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // 型を表すタイプオブジェクト
@@ -29,7 +29,7 @@ BEGIN_NAMESPACE_YM_PYTHON
 
 /// @brief Bool3 を表す型
 extern
-PyTypeObject Bool3Type;
+PyTypeObject PyBool3_Type;
 
 /// @brief kB3True を表すオブジェクト
 extern
@@ -45,11 +45,11 @@ PyObject* Py_kB3X;
 
 /// @brief VarId を表す型
 extern
-PyTypeObject VarIdType;
+PyTypeObject PyVarId_Type;
 
 /// @brief tPol を表す型
 extern
-PyTypeObject PolType;
+PyTypeObject PyPol_Type;
 
 /// @brief kPolPosi を表すオブジェクト
 extern
@@ -61,15 +61,15 @@ PyObject* Py_kPolNega;
 
 /// @brief Literal を表す型
 extern
-PyTypeObject LiteralType;
+PyTypeObject PyLiteral_Type;
 
 /// @brief TvFunc を表す型
 extern
-PyTypeObject TvFuncType;
+PyTypeObject PyTvFunc_Type;
 
 /// @brief LogExpr を表す型
 extern
-PyTypeObject LogExprType;
+PyTypeObject PyLogExpr_Type;
 
 /// @brief 定数0の式
 extern
@@ -81,23 +81,23 @@ PyObject* Py_kLogExprConst1;
 
 /// @brief BddMgr を表す型
 extern
-PyTypeObject BddMgrType;
+PyTypeObject PyBddMgr_Type;
 
 /// @brief Bdd を表す型
 extern
-PyTypeObject BddType;
+PyTypeObject PyBdd_Type;
 
 /// @brief AigMgr を表す型
 extern
-PyTypeObject AigMgrType;
+PyTypeObject PyAigMgr_Type;
 
 /// @brief Aig を表す型
 extern
-PyTypeObject AigType;
+PyTypeObject PyAig_Type;
 
 /// @brief SatSolver を表す型
 extern
-PyTypeObject SatSolverType;
+PyTypeObject PySatSolver_Type;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -112,7 +112,7 @@ inline
 bool
 Bool3Object_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &Bool3Type;
+  return Py_TYPE(obj) == &PyBool3_Type;
 }
 
 /// @brief VarIdType の型チェック
@@ -123,7 +123,7 @@ inline
 bool
 VarIdObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &VarIdType;
+  return Py_TYPE(obj) == &PyVarId_Type;
 }
 
 /// @brief PolType の型チェック
@@ -134,7 +134,7 @@ inline
 bool
 PolObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &PolType;
+  return Py_TYPE(obj) == &PyPol_Type;
 }
 
 /// @brief LiteralType の型チェック
@@ -145,7 +145,7 @@ inline
 bool
 LiteralObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &LiteralType;
+  return Py_TYPE(obj) == &PyLiteral_Type;
 }
 
 /// @brief TvFuncType の型チェック
@@ -156,7 +156,7 @@ inline
 bool
 TvFuncObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &TvFuncType;
+  return Py_TYPE(obj) == &PyTvFunc_Type;
 }
 
 /// @brief LogExprType の型チェック
@@ -167,7 +167,7 @@ inline
 bool
 LogExprObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &LogExprType;
+  return Py_TYPE(obj) == &PyLogExpr_Type;
 }
 
 /// @brief BddMgrType の型チェック
@@ -178,7 +178,7 @@ inline
 bool
 BddMgrObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &BddMgrType;
+  return Py_TYPE(obj) == &PyBddMgr_Type;
 }
 
 /// @brief BddType の型チェック
@@ -189,7 +189,7 @@ inline
 bool
 BddObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &BddType;
+  return Py_TYPE(obj) == &PyBdd_Type;
 }
 
 /// @brief AigMgrType の型チェック
@@ -200,7 +200,7 @@ inline
 bool
 AigMgrObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &AigMgrType;
+  return Py_TYPE(obj) == &PyAigMgr_Type;
 }
 
 /// @brief AigType の型チェック
@@ -211,7 +211,7 @@ inline
 bool
 AigObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &AigType;
+  return Py_TYPE(obj) == &PyAig_Type;
 }
 
 /// @brief SatSolverType の型チェック
@@ -222,7 +222,7 @@ inline
 bool
 SatSolverObject_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &SatSolverType;
+  return Py_TYPE(obj) == &PySatSolver_Type;
 }
 
 
@@ -349,69 +349,69 @@ conv_from_pyobject(PyObject* py_obj,
 /// @param[in] obj Bool3 オブジェクト
 extern
 PyObject*
-Bool3_FromBool3(Bool3 obj);
+PyBool3_FromBool3(Bool3 obj);
 
 /// @brief 文字列から Bool3Object への変換関数
 /// @param[in] str 値を表す文字列("true"|"false"|"x")
 /// @note 不正な文字列が与えられた場合には NULL を返す．
 PyObject*
-Bool3_FromString(const char* str);
+PyBool3_FromString(const char* str);
 
 /// @brief long から Bool3Object への変換関数
 /// @param[in] val 値
 /// @note 0 を kB3False, それ以外を kB3True に対応させる．
 PyObject*
-Bool3_FromLong(ymlong val);
+PyBool3_FromLong(ymlong val);
 
 /// @brief VarId から PyObject を生成する．
 /// @param[in] obj VarId オブジェクト
 extern
 PyObject*
-VarId_FromVarId(VarId obj);
+PyVarId_FromVarId(VarId obj);
 
 /// @brief tPol から PyObject を生成する．
 /// @param[in] obj tPol オブジェクト
 extern
 PyObject*
-Pol_FromPol(tPol obj);
+PyPol_FromPol(tPol obj);
 
 /// @brief 文字列から PolObject への変換関数
 /// @param[in] str 極性を表す文字列("positive"|"negative")
 /// @note 不正な文字列が与えられた場合には NULL を返す．
 PyObject*
-Pol_FromString(const char* str);
+PyPol_FromString(const char* str);
 
 /// @brief Literal から PyObject を生成する．
 /// @param[in] obj Literal オブジェクト
 extern
 PyObject*
-Literal_FromLiteral(Literal obj);
+PyLiteral_FromLiteral(Literal obj);
 
 /// @brief TvFunc から PyObject を生成する．
 /// @param[in] obj TvFunc オブジェクト
 extern
 PyObject*
-TvFunc_FromTvFunc(const TvFunc& obj);
+PyTvFunc_FromTvFunc(const TvFunc& obj);
 
 /// @brief LogExpr から PyObject を生成する．
 /// @param[in] obj LogExpr オブジェクト
 extern
 PyObject*
-LogExpr_FromLogExpr(const LogExpr& obj);
+PyLogExpr_FromLogExpr(const LogExpr& obj);
 
 /// @brief Bdd から PyObject を生成する．
 /// @param[in] obj Bdd オブジェクト
 extern
 PyObject*
-Bdd_FromBdd(const Bdd& obj);
+PyBdd_FromBdd(const Bdd& obj);
 
 /// @brief Aig から PyObject を生成する．
 /// @param[in] obj Aig オブジェクト
 extern
 PyObject*
-Aig_FromAig(const Aig& obj);
+PyAig_FromAig(const Aig& obj);
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM
 
 
 //////////////////////////////////////////////////////////////////////

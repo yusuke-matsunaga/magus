@@ -11,7 +11,7 @@
 #include "ym_logic/LogExpr.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -99,7 +99,7 @@ LogExpr_inv(PyObject* left)
   if ( !conv_from_pyobject(left, expr) ) {
     return NULL;
   }
-  return LogExpr_FromLogExpr(~expr);
+  return PyLogExpr_FromLogExpr(~expr);
 }
 
 // and 関数
@@ -116,7 +116,7 @@ LogExpr_and(PyObject* left,
     if ( !conv_from_pyobject(right, expr2) ) {
       return NULL;
     }
-    return LogExpr_FromLogExpr(expr1 & expr2);
+    return PyLogExpr_FromLogExpr(expr1 & expr2);
   }
   PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
   return NULL;
@@ -136,7 +136,7 @@ LogExpr_or(PyObject* left,
     if ( !conv_from_pyobject(right, expr2) ) {
       return NULL;
     }
-    return LogExpr_FromLogExpr(expr1 | expr2);
+    return PyLogExpr_FromLogExpr(expr1 | expr2);
   }
   PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
   return NULL;
@@ -156,7 +156,7 @@ LogExpr_xor(PyObject* left,
     if ( !conv_from_pyobject(right, expr2) ) {
       return NULL;
     }
-    return LogExpr_FromLogExpr(expr1 ^ expr2);
+    return PyLogExpr_FromLogExpr(expr1 ^ expr2);
   }
   PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
   return NULL;
@@ -224,7 +224,7 @@ PyObject*
 LogExpr_make_zero(PyTypeObject* type_obj,
 		  PyObject* args)
 {
-  return LogExpr_FromLogExpr(LogExpr::make_zero());
+  return PyLogExpr_FromLogExpr(LogExpr::make_zero());
 }
 
 // make_one 関数
@@ -232,7 +232,7 @@ PyObject*
 LogExpr_make_one(PyTypeObject* type_obj,
 		 PyObject* args)
 {
-  return LogExpr_FromLogExpr(LogExpr::make_one());
+  return PyLogExpr_FromLogExpr(LogExpr::make_one());
 }
 
 // make_literal 関数
@@ -265,13 +265,14 @@ LogExpr_make_literal(PyTypeObject* type_obj,
   else if ( !conv_from_pyobject(obj1, lit) ) {
     VarId vid;
     if ( !conv_from_pyobject(obj1, vid) ) {
-      PyErr_SetString(PyExc_TypeError, "parameter must be logic.Literal or logic.VarId");
+      PyErr_SetString(PyExc_TypeError,
+		      "parameter must be logic.Literal or logic.VarId");
       return NULL;
     }
     lit.set(vid, kPolPosi);
   }
 
-  return LogExpr_FromLogExpr(LogExpr::make_literal(lit));
+  return PyLogExpr_FromLogExpr(LogExpr::make_literal(lit));
 }
 
 // make_posiliteral 関数
@@ -281,14 +282,15 @@ LogExpr_make_posiliteral(PyTypeObject* type_obj,
 			 PyObject* args)
 {
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &VarIdType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyVarId_Type, &obj) ) {
     return NULL;
   }
   VarId vid;
   if ( !conv_from_pyobject(obj, vid) ) {
     return NULL;
   }
-  return LogExpr_FromLogExpr(LogExpr::make_posiliteral(vid));
+  return PyLogExpr_FromLogExpr(LogExpr::make_posiliteral(vid));
 }
 
 // make_negaliteral 関数
@@ -298,18 +300,19 @@ LogExpr_make_negaliteral(PyTypeObject* type_obj,
 			 PyObject* args)
 {
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &VarIdType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyVarId_Type, &obj) ) {
     return NULL;
   }
   VarId vid;
   if ( !conv_from_pyobject(obj, vid) ) {
     return NULL;
   }
-  return LogExpr_FromLogExpr(LogExpr::make_negaliteral(vid));
+  return PyLogExpr_FromLogExpr(LogExpr::make_negaliteral(vid));
 }
 
 // make_and 関数
-// LogExprType のオブジェクトのタプルを一つ引数にとる．
+// PyLogExpr_Type のオブジェクトのタプルを一つ引数にとる．
 PyObject*
 LogExpr_make_and(PyTypeObject* type_obj,
 		 PyObject* args)
@@ -332,11 +335,11 @@ LogExpr_make_and(PyTypeObject* type_obj,
     }
     child_list[i] = chd_expr;
   }
-  return LogExpr_FromLogExpr(LogExpr::make_and(child_list));
+  return PyLogExpr_FromLogExpr(LogExpr::make_and(child_list));
 }
 
 // make_or 関数
-// LogExprType のオブジェクトのタプルを一つ引数にとる．
+// PyLogExpr_Type のオブジェクトのタプルを一つ引数にとる．
 PyObject*
 LogExpr_make_or(PyTypeObject* type_obj,
 		PyObject* args)
@@ -359,11 +362,11 @@ LogExpr_make_or(PyTypeObject* type_obj,
     }
     child_list[i] = chd_expr;
   }
-  return LogExpr_FromLogExpr(LogExpr::make_or(child_list));
+  return PyLogExpr_FromLogExpr(LogExpr::make_or(child_list));
 }
 
 // make_xor 関数
-// LogExprType のオブジェクトのタプルを一つ引数にとる．
+// PyLogExpr_Type のオブジェクトのタプルを一つ引数にとる．
 PyObject*
 LogExpr_make_xor(PyTypeObject* type_obj,
 		 PyObject* args)
@@ -377,7 +380,7 @@ LogExpr_make_xor(PyTypeObject* type_obj,
   for (ymuint i = 0; i < n; ++ i) {
     PyObject* chd_obj = PyList_GET_ITEM(arg_list, i);
     if ( !LogExprObject_Check(chd_obj) ) {
-      PyErr_SetString(ErrorObject, "LogExprObject is expected");
+      PyErr_SetString(PyExc_TypeError, "LogExprObject is expected");
       return NULL;
     }
     LogExpr chd_expr;
@@ -386,18 +389,20 @@ LogExpr_make_xor(PyTypeObject* type_obj,
     }
     child_list[i] = chd_expr;
   }
-  return LogExpr_FromLogExpr(LogExpr::make_xor(child_list));
+  return PyLogExpr_FromLogExpr(LogExpr::make_xor(child_list));
 }
 
 // compose 関数
-// VarIdType と LogExprType のオブジェクトを引数にとる．
+// VarIdType と PyLogExpr_Type のオブジェクトを引数にとる．
 PyObject*
 LogExpr_compose(LogExprObject* self,
 		PyObject* args)
 {
   PyObject* obj1 = NULL;
   PyObject* obj2 = NULL;
-  if ( !PyArg_ParseTuple(args, "O!O!", &VarIdType, &obj1, &LogExprType, &obj2) ) {
+  if ( !PyArg_ParseTuple(args, "O!O!",
+			 &PyVarId_Type, &obj1,
+			 &PyLogExpr_Type, &obj2) ) {
     return NULL;
   }
   VarId vid;
@@ -409,7 +414,7 @@ LogExpr_compose(LogExprObject* self,
     return NULL;
   }
 
-  return LogExpr_FromLogExpr(self->mLogExpr->compose(vid, sub_expr));
+  return PyLogExpr_FromLogExpr(self->mLogExpr->compose(vid, sub_expr));
 }
 
 // multi_compose 関数
@@ -431,8 +436,8 @@ LogExpr_multi_compose(LogExprObject* self,
     PyObject* vid_obj = NULL;
     PyObject* sub_obj = NULL;
     if ( !PyArg_ParseTuple(item, "O!O!",
-			   &VarIdType, &vid_obj,
-			   &LogExprType, &sub_obj) ) {
+			   &PyVarId_Type, &vid_obj,
+			   &PyLogExpr_Type, &sub_obj) ) {
       return NULL;
     }
 
@@ -448,7 +453,7 @@ LogExpr_multi_compose(LogExprObject* self,
     comp_map.insert(make_pair(vid, sub_expr));
   }
 
-  return LogExpr_FromLogExpr(self->mLogExpr->compose(comp_map));
+  return PyLogExpr_FromLogExpr(self->mLogExpr->compose(comp_map));
 }
 
 // remap_var 関数
@@ -470,8 +475,8 @@ LogExpr_remap_var(LogExprObject* self,
     PyObject* obj1 = NULL;
     PyObject* obj2 = NULL;
     if ( !PyArg_ParseTuple(item, "O!O!",
-			   &VarIdType, &obj1,
-			   &VarIdType, &obj2) ) {
+			   &PyVarId_Type, &obj1,
+			   &PyVarId_Type, &obj2) ) {
       return NULL;
     }
 
@@ -487,7 +492,7 @@ LogExpr_remap_var(LogExprObject* self,
     var_map.insert(make_pair(vid, new_vid));
   }
 
-  return LogExpr_FromLogExpr(self->mLogExpr->remap_var(var_map));
+  return PyLogExpr_FromLogExpr(self->mLogExpr->remap_var(var_map));
 }
 
 // simplify 関数
@@ -584,7 +589,7 @@ PyObject*
 LogExpr_varid(LogExprObject* self,
 	      PyObject* args)
 {
-  return VarId_FromVarId(self->mLogExpr->varid());
+  return PyVarId_FromVarId(self->mLogExpr->varid());
 }
 
 // is_and 関数
@@ -639,7 +644,7 @@ LogExpr_child(LogExprObject* self,
   }
   LogExpr child = self->mLogExpr->child(pos);
 
-  return LogExpr_FromLogExpr(child);
+  return PyLogExpr_FromLogExpr(child);
 }
 
 // child_list 関数
@@ -651,7 +656,7 @@ LogExpr_child_list(LogExprObject* self,
   PyObject* ans_list = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
     LogExpr child = self->mLogExpr->child(i);
-    PyObject* obj = LogExpr_FromLogExpr(child);
+    PyObject* obj = PyLogExpr_FromLogExpr(child);
     PyList_SetItem(ans_list, i, obj);
   }
 
@@ -708,8 +713,8 @@ LogExpr_litnum(LogExprObject* self,
   PyObject* obj1 = NULL;
   PyObject* obj2 = NULL;
   if ( !PyArg_ParseTuple(args, "|O!O!",
-			 &VarIdType, &obj1,
-			 &PolType, &obj2) ) {
+			 &PyVarId_Type, &obj1,
+			 &PyPol_Type, &obj2) ) {
     return NULL;
   }
   ymuint litnum = 0;
@@ -761,7 +766,9 @@ LogExpr_sop_litnum(LogExprObject* self,
 {
   PyObject* obj1 = NULL;
   PyObject* obj2 = NULL;
-  if ( !PyArg_ParseTuple(args, "|O!O!", &VarIdType, &obj1, &PolType, &obj2) ) {
+  if ( !PyArg_ParseTuple(args, "|O!O!",
+			 &PyVarId_Type, &obj1,
+			 &PyPol_Type, &obj2) ) {
     return NULL;
   }
   ymuint litnum = 0;
@@ -924,7 +931,7 @@ END_NONAMESPACE
 
 
 // LogExprObject 用のタイプオブジェクト
-PyTypeObject LogExprType = {
+PyTypeObject PyLogExpr_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -995,9 +1002,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief LogExpr から PyObject を生成する．
 // @param[in] obj LogExpr オブジェクト
 PyObject*
-LogExpr_FromLogExpr(const LogExpr& obj)
+PyLogExpr_FromLogExpr(const LogExpr& obj)
 {
-  LogExprObject* logexpr_obj = LogExpr_new(&LogExprType);
+  LogExprObject* logexpr_obj = LogExpr_new(&PyLogExpr_Type);
   if ( logexpr_obj == NULL ) {
     return NULL;
   }
@@ -1013,12 +1020,12 @@ void
 LogExprObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&LogExprType) < 0 ) {
+  if ( PyType_Ready(&PyLogExpr_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "LogExpr", (PyObject*)&LogExprType);
+  PyModule_AddObject(m, "LogExpr", (PyObject*)&PyLogExpr_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

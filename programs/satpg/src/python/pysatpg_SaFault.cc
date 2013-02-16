@@ -12,7 +12,7 @@
 #include "ym_networks/TgNode.h"
 
 
-BEGIN_NAMESPACE_YM_PYSATPG
+BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
@@ -226,7 +226,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // SaFaultObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject SaFaultType = {
+PyTypeObject PySaFault_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -302,9 +302,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief SaFault から PyObject を生成する．
 // @param[in] obj SaFault オブジェクト
 PyObject*
-SaFault_FromSaFault(SaFault* obj)
+PySaFault_FromSaFault(SaFault* obj)
 {
-  SaFaultObject* py_obj = SaFault_new(&SaFaultType);
+  SaFaultObject* py_obj = SaFault_new(&PySaFault_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -320,12 +320,12 @@ void
 SaFaultObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&SaFaultType) < 0 ) {
+  if ( PyType_Ready(&PySaFault_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "SaFault", (PyObject*)&SaFaultType);
+  PyModule_AddObject(m, "SaFault", (PyObject*)&PySaFault_Type);
 }
 
-END_NAMESPACE_YM_PYSATPG
+END_NAMESPACE_YM_SATPG

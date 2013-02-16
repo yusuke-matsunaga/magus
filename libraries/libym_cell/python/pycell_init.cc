@@ -14,7 +14,7 @@
 #include "ym_cell/pycell.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -38,13 +38,13 @@ CellTimeObject_init(PyObject* m);
 void
 CellLibraryObject_init(PyObject* m);
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM
 
 
 PyMODINIT_FUNC
 cell_init()
 {
-  using namespace nsYm::nsPython;
+  using namespace nsYm;
 
   // モジュールオブジェクトの生成
   PyDoc_STRVAR(module_doc,

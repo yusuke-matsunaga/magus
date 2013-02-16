@@ -11,7 +11,7 @@
 #include "ym_utils/RandGen.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -189,7 +189,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // RandGenObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject RandGenType = {
+PyTypeObject PyRandGen_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -267,12 +267,12 @@ void
 RandGenObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&RandGenType) < 0 ) {
+  if ( PyType_Ready(&PyRandGen_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "RandGen", (PyObject*)&RandGenType);
+  PyModule_AddObject(m, "RandGen", (PyObject*)&PyRandGen_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

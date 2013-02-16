@@ -11,7 +11,7 @@
 #include "ym_logic/Bool3.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // Bool3Object の外部変数
@@ -47,19 +47,19 @@ struct Bool3Object
 
 // Py_kB3True の本体
 Bool3Object Py_kB3TrueStruct = {
-  PyObject_HEAD_INIT(&Bool3Type)
+  PyObject_HEAD_INIT(&PyBool3_Type)
   kB3True
 };
 
 // Py_kB3False の本体
 Bool3Object Py_kB3FalseStruct = {
-  PyObject_HEAD_INIT(&Bool3Type)
+  PyObject_HEAD_INIT(&PyBool3_Type)
   kB3False
 };
 
 // Py_kB3X の本体
 Bool3Object Py_kB3XStruct = {
-  PyObject_HEAD_INIT(&Bool3Type)
+  PyObject_HEAD_INIT(&PyBool3_Type)
   kB3X
 };
 
@@ -90,11 +90,11 @@ Bool3_new(PyTypeObject* type,
     PyObject* obj = PyTuple_GET_ITEM(args, 0);
     if ( PyString_Check(obj) ) {
       const char* str = PyString_AsString(obj);
-      return (Bool3Object*)Bool3_FromString(str);
+      return (Bool3Object*)PyBool3_FromString(str);
     }
     if ( PyInt_Check(obj) ) {
       ymlong val = PyInt_AS_LONG(obj);
-      return (Bool3Object*)Bool3_FromLong(val);
+      return (Bool3Object*)PyBool3_FromLong(val);
     }
   }
 
@@ -269,7 +269,7 @@ PyNumberMethods Bool3_nbmethods = {
 
 
 // Bool3Object 用のタイプオブジェクト
-PyTypeObject Bool3Type = {
+PyTypeObject PyBool3_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -360,7 +360,7 @@ conv_to_pyobject(Bool3 obj)
 
 // 文字列からの変換関数
 PyObject*
-Bool3_FromString(const char* str)
+PyBool3_FromString(const char* str)
 {
   if ( str == NULL ) {
     PyErr_SetString(PyExc_ValueError,
@@ -401,7 +401,7 @@ Bool3_FromString(const char* str)
 // @param[in] val 値
 // @note 0 を kB3False, それ以外を kB3True に対応させる．
 PyObject*
-Bool3_FromLong(ymlong val)
+PyBool3_FromLong(ymlong val)
 {
   Bool3 b3val = val ? kB3True : kB3False;
   return conv_to_pyobject(b3val);
@@ -431,12 +431,12 @@ void
 Bool3Object_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&Bool3Type) < 0 ) {
+  if ( PyType_Ready(&PyBool3_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "Bool3", (PyObject*)&Bool3Type);
+  PyModule_AddObject(m, "Bool3", (PyObject*)&PyBool3_Type);
 
   // 定数オブジェクトの登録
   Bool3_set(Py_kB3TrueStruct,  Py_kB3True,  m, "kB3True");
@@ -444,4 +444,4 @@ Bool3Object_init(PyObject* m)
   Bool3_set(Py_kB3XStruct,     Py_kB3X,     m, "kB3X");
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

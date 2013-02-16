@@ -11,7 +11,7 @@
 #include "ym_utils/pyutils.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // クラス PyMsgHandler
@@ -52,7 +52,7 @@ PyMsgHandler::put_msg(const char* src_file,
     return;
   }
 
-  PyObject* loc_obj = FileRegion_FromFileRegion(loc);
+  PyObject* loc_obj = PyFileRegion_FromFileRegion(loc);
   PyObject* args = Py_BuildValue("(siOkss)",
 				 src_file, src_line,
 				 loc_obj, type,
@@ -71,4 +71,4 @@ PyMsgHandler::put_msg(const char* src_file,
   }
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

@@ -14,7 +14,7 @@
 #include "pysatpg.h"
 
 
-BEGIN_NAMESPACE_YM_PYSATPG
+BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
@@ -43,13 +43,13 @@ TestVectorObject_init(PyObject* module);
 void
 TvMgrObject_init(PyObject* module);
 
-END_NAMESPACE_YM_PYSATPG
+END_NAMESPACE_YM_SATPG
 
 
 PyMODINIT_FUNC
 satpg_init()
 {
-  using namespace nsYm::nsSatpg::nsPython;
+  using namespace nsYm::nsSatpg;
 
   //////////////////////////////////////////////////////////////////////
   // モジュールオブジェクトの生成

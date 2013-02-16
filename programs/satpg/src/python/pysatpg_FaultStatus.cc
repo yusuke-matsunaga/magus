@@ -11,7 +11,7 @@
 #include "FaultStatus.h"
 
 
-BEGIN_NAMESPACE_YM_PYSATPG
+BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
@@ -51,31 +51,31 @@ PyObject* Py_kFsAborted;
 
 // Py_kFsUndetected の実体
 FaultStatusObject Py_kFsUndetectedStruct = {
-  PyObject_HEAD_INIT(&FaultStatusType)
+  PyObject_HEAD_INIT(&PyFaultStatus_Type)
   kFsUndetected
 };
 
 // Py_kFsDetected の実体
 FaultStatusObject Py_kFsDetectedStruct = {
-  PyObject_HEAD_INIT(&FaultStatusType)
+  PyObject_HEAD_INIT(&PyFaultStatus_Type)
   kFsDetected
 };
 
 // Py_kFsUntestable の実体
 FaultStatusObject Py_kFsUntestableStruct = {
-  PyObject_HEAD_INIT(&FaultStatusType)
+  PyObject_HEAD_INIT(&PyFaultStatus_Type)
   kFsUntestable
 };
 
 // Py_kFsPartiallyUntestable の実体
 FaultStatusObject Py_kFsPartiallyUntestableStruct = {
-  PyObject_HEAD_INIT(&FaultStatusType)
+  PyObject_HEAD_INIT(&PyFaultStatus_Type)
   kFsPartiallyUntestable
 };
 
 // Py_kFsAborted の実体
 FaultStatusObject Py_kFsAbortedStruct = {
-  PyObject_HEAD_INIT(&FaultStatusType)
+  PyObject_HEAD_INIT(&PyFaultStatus_Type)
   kFsAborted
 };
 
@@ -110,7 +110,7 @@ FaultStatus_new(PyTypeObject* type,
     PyObject* obj = PyTuple_GET_ITEM(args, 0);
     if ( PyString_Check(obj) ) {
       char* str = PyString_AsString(obj);
-      return (FaultStatusObject*)FaultStatus_FromString(str);
+      return (FaultStatusObject*)PyFaultStatus_FromString(str);
     }
   }
 }
@@ -145,7 +145,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // FaultStatusObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject FaultStatusType = {
+PyTypeObject PyFaultStatus_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -234,7 +234,7 @@ PyTypeObject FaultStatusType = {
 
 // FaultStatus からの変換関数
 PyObject*
-FaultStatus_FromFaultStatus(FaultStatus val)
+PyFaultStatus_FromFaultStatus(FaultStatus val)
 {
   PyObject* result = NULL;
   switch ( val ) {
@@ -252,7 +252,7 @@ FaultStatus_FromFaultStatus(FaultStatus val)
 
 // 文字列からの変換関数
 PyObject*
-FaultStatus_FromString(const char* str)
+PyFaultStatus_FromString(const char* str)
 {
   if ( str == NULL ) {
     PyErr_SetString(PyExc_ValueError,
@@ -337,12 +337,12 @@ void
 FaultStatusObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&FaultStatusType) < 0 ) {
+  if ( PyType_Ready(&PyFaultStatus_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "FaultStatus", (PyObject*)&FaultStatusType);
+  PyModule_AddObject(m, "FaultStatus", (PyObject*)&PyFaultStatus_Type);
 
   // 定数オブジェクトの生成と登録
   FaultStatus_set(Py_kFsUndetectedStruct, Py_kFsUndetected, m, "kFsUndetected");
@@ -352,4 +352,4 @@ FaultStatusObject_init(PyObject* m)
   FaultStatus_set(Py_kFsAbortedStruct,    Py_kFsAborted,    m, "kFsAborted");
 }
 
-END_NAMESPACE_YM_PYSATPG
+END_NAMESPACE_YM_SATPG

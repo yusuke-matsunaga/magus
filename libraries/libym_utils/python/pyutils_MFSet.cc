@@ -11,7 +11,7 @@
 #include "ym_utils/MFSet.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -158,7 +158,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // MFSetObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject MFSetType = {
+PyTypeObject PyMFSet_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -271,12 +271,12 @@ conv_from_pyobject(PyObject* py_obj,
 void
 MFSetObject_init(PyObject* m)
 {
-  if ( PyType_Ready(&MFSetType) < 0 ) {
+  if ( PyType_Ready(&PyMFSet_Type) < 0 ) {
     return;
   }
 
   // タイプモジュールの登録を行う．
-  PyModule_AddObject(m, "MFSet", (PyObject*)&MFSetType);
+  PyModule_AddObject(m, "MFSet", (PyObject*)&PyMFSet_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

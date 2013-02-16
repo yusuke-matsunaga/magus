@@ -11,7 +11,7 @@
 #include "ym_utils/FileLoc.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -62,7 +62,7 @@ FileLoc_dealloc(FileLocObject* self)
 // 初期化関数
 int
 FileLoc_init(FileLocObject* self,
-	      PyObject* args)
+	     PyObject* args)
 {
   // 引数の形式は
   // - ()
@@ -70,7 +70,9 @@ FileLoc_init(FileLocObject* self,
   PyObject* obj1 = NULL;
   ymuint line = 0;
   ymuint column = 0;
-  if ( !PyArg_ParseTuple(args, "|O!kk", &FileInfoType, &obj1, &line, &column) ) {
+  if ( !PyArg_ParseTuple(args, "|O!kk",
+			 &PyFileInfo_Type, &obj1,
+			 &line, &column) ) {
     return -1;
   }
 
@@ -118,7 +120,7 @@ PyObject*
 FileLoc_parent_loc(FileLocObject* self,
 		   PyObject* args)
 {
-  return FileLoc_FromFileLoc(self->mFileLoc.parent_loc());
+  return PyFileLoc_FromFileLoc(self->mFileLoc.parent_loc());
 }
 
 // parent_loc_list 関数
@@ -134,7 +136,7 @@ FileLoc_parent_loc_list(FileLocObject* self,
   ymuint i = 0;
   for (list<FileLoc>::iterator p = loc_list.begin();
        p != loc_list.end(); ++ p, ++ i) {
-    PyObject* obj = FileLoc_FromFileLoc(*p);
+    PyObject* obj = PyFileLoc_FromFileLoc(*p);
     PyList_SetItem(obj, i, obj);
   }
   return ans_list;
@@ -183,7 +185,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // FileLocObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject FileLocType = {
+PyTypeObject PyFileLoc_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -259,9 +261,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief FileLoc から PyObject を生成する．
 // @param[in] obj FileLoc オブジェクト
 PyObject*
-FileLoc_FromFileLoc(const FileLoc& obj)
+PyFileLoc_FromFileLoc(const FileLoc& obj)
 {
-  FileLocObject* py_obj = FileLoc_new(&FileLocType);
+  FileLocObject* py_obj = FileLoc_new(&PyFileLoc_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -277,12 +279,12 @@ void
 FileLocObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&FileLocType) < 0 ) {
+  if ( PyType_Ready(&PyFileLoc_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "FileLoc", (PyObject*)&FileLocType);
+  PyModule_AddObject(m, "FileLoc", (PyObject*)&PyFileLoc_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

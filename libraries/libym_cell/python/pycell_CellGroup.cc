@@ -11,7 +11,7 @@
 #include "ym_cell/CellGroup.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -81,7 +81,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // CellGroupObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject CellGroupType = {
+PyTypeObject PyCellGroup_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -195,12 +195,12 @@ void
 CellGroupObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&CellGroupType) < 0 ) {
+  if ( PyType_Ready(&PyCellGroup_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "CellGroup", (PyObject*)&CellGroupType);
+  PyModule_AddObject(m, "CellGroup", (PyObject*)&PyCellGroup_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

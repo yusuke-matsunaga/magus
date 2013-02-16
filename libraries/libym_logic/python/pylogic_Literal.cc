@@ -11,7 +11,7 @@
 #include "ym_logic/Literal.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -81,7 +81,9 @@ Literal_init(LiteralObject* self,
 {
   PyObject* vobj = NULL;
   PyObject* pobj = NULL;
-  if ( !PyArg_ParseTuple(args, "|O!O!", &VarIdType, &vobj, &PolType, &pobj) ) {
+  if ( !PyArg_ParseTuple(args, "|O!O!",
+			 &PyVarId_Type, &vobj,
+			 &PyPol_Type, &pobj) ) {
     return -1;
   }
   VarId vid;
@@ -133,7 +135,7 @@ PyObject*
 Literal_varid(LiteralObject* self)
 {
   VarId vid = self->mLiteral.varid();
-  return VarId_FromVarId(vid);
+  return PyVarId_FromVarId(vid);
 }
 
 // pol 関数
@@ -153,7 +155,9 @@ Literal_set(LiteralObject* self,
 {
   PyObject* vobj = NULL;
   PyObject* pobj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!|O!", &VarIdType, &vobj, &PolType, &pobj) ) {
+  if ( !PyArg_ParseTuple(args, "O!|O!",
+			 &PyVarId_Type, &vobj,
+			 &PyPol_Type, &pobj) ) {
     return NULL;
   }
   VarId vid;
@@ -179,21 +183,21 @@ Literal_set(LiteralObject* self,
 PyObject*
 Literal_negate(LiteralObject* self)
 {
-  return Literal_FromLiteral(~self->mLiteral);
+  return PyLiteral_FromLiteral(~self->mLiteral);
 }
 
 // make_positive 関数
 PyObject*
 Literal_make_positive(LiteralObject* self)
 {
-  return Literal_FromLiteral(self->mLiteral.make_positive());
+  return PyLiteral_FromLiteral(self->mLiteral.make_positive());
 }
 
 // make_negative 関数
 PyObject*
 Literal_make_negative(LiteralObject* self)
 {
-  return Literal_FromLiteral(self->mLiteral.make_negative());
+  return PyLiteral_FromLiteral(self->mLiteral.make_negative());
 }
 
 // index 関数
@@ -226,7 +230,7 @@ END_NONAMESPACE
 
 
 // LiteralObject 用のタイプオブジェクト
-PyTypeObject LiteralType = {
+PyTypeObject PyLiteral_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -297,9 +301,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief Literal から PyObject を生成する．
 // @param[in] obj Literal オブジェクト
 PyObject*
-Literal_FromLiteral(Literal obj)
+PyLiteral_FromLiteral(Literal obj)
 {
-  LiteralObject* literal_obj = Literal_new(&LiteralType);
+  LiteralObject* literal_obj = Literal_new(&PyLiteral_Type);
   if ( literal_obj == NULL ) {
     return NULL;
   }
@@ -315,12 +319,12 @@ void
 LiteralObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&LiteralType) < 0 ) {
+  if ( PyType_Ready(&PyLiteral_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "Literal", (PyObject*)&LiteralType);
+  PyModule_AddObject(m, "Literal", (PyObject*)&PyLiteral_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

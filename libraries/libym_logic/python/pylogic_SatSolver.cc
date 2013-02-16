@@ -14,7 +14,7 @@
 #include "ym_utils/pyutils.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -108,7 +108,7 @@ PyObject*
 SatSolver_new_var(SatSolverObject* self,
 		  PyObject* args)
 {
-  return VarId_FromVarId(self->mSolver->new_var());
+  return PyVarId_FromVarId(self->mSolver->new_var());
 }
 
 // add_clause 関数
@@ -121,7 +121,7 @@ SatSolver_add_clause(SatSolverObject* self,
   if ( n == 1 ) {
     PyObject* obj0 = PyTuple_GET_ITEM(args, 0);
     if ( !PyList_Check(obj0) ) {
-      PyErr_SetString(ErrorObject, "list of Literal is expected");
+      PyErr_SetString(PyExc_TypeError, "list of Literal is expected");
       return NULL;
     }
     n = PyList_GET_SIZE(obj0);
@@ -164,7 +164,7 @@ SatSolver_solve(SatSolverObject* self,
   if ( args != NULL ) {
     if ( PyTuple_GET_SIZE(args) != 1 ||
 	 !PyList_Check(PyTuple_GET_ITEM(args, 0)) ) {
-      PyErr_SetString(ErrorObject, "list of Literal is expected");
+      PyErr_SetString(PyExc_TypeError, "list of Literal is expected");
       return NULL;
     }
     PyObject* list_obj = PyTuple_GET_ITEM(args, 0);
@@ -218,7 +218,7 @@ SatSolver_get_stats(SatSolverObject* self,
   PyDict_SetItemString(dict_obj, "propagation_num",    conv_to_pyobject(stats.mPropagationNum));
   PyDict_SetItemString(dict_obj, "conflict_limit",     conv_to_pyobject(stats.mConflictLimit));
   PyDict_SetItemString(dict_obj, "learnt_limit",       conv_to_pyobject(stats.mLearntLimit));
-  PyDict_SetItemString(dict_obj, "time",               USTime_FromUSTime(stats.mTime));
+  PyDict_SetItemString(dict_obj, "time",               PyUSTime_FromUSTime(stats.mTime));
 
   return dict_obj;
 }
@@ -333,7 +333,7 @@ END_NONAMESPACE
 
 
 // SatSolverObject 用のタイプオブジェクト
-PyTypeObject SatSolverType = {
+PyTypeObject PySatSolver_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -406,12 +406,12 @@ void
 SatSolverObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&SatSolverType) < 0 ) {
+  if ( PyType_Ready(&PySatSolver_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "SatSolver", (PyObject*)&SatSolverType);
+  PyModule_AddObject(m, "SatSolver", (PyObject*)&PySatSolver_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

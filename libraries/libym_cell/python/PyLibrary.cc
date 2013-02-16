@@ -10,7 +10,7 @@
 #include "PyLibrary.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // クラス PyLibrary;
@@ -64,4 +64,4 @@ PyLibrary::get_obj(ympuint ptr)
   return p->second;
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

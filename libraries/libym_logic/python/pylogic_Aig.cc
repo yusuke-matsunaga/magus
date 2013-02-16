@@ -11,7 +11,7 @@
 #include "ym_logic/Aig.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -81,7 +81,7 @@ PyObject*
 Aig_negate(AigObject* self,
 	   PyObject* args)
 {
-  return Aig_FromAig(~self->mAig);
+  return PyAig_FromAig(~self->mAig);
 }
 
 // normalize 関数
@@ -89,7 +89,7 @@ PyObject*
 Aig_normalize(AigObject* self,
 	      PyObject* args)
 {
-  return Aig_FromAig(self->mAig.normalize());
+  return PyAig_FromAig(self->mAig.normalize());
 }
 
 // node_id 関数
@@ -145,7 +145,7 @@ PyObject*
 Aig_input_id(AigObject* self,
 	     PyObject* args)
 {
-  return VarId_FromVarId(self->mAig.input_id());
+  return PyVarId_FromVarId(self->mAig.input_id());
 }
 
 // is_and 関数
@@ -166,7 +166,7 @@ Aig_fanin(AigObject* self,
     return NULL;
   }
 
-  return Aig_FromAig(self->mAig.fanin(pos));
+  return PyAig_FromAig(self->mAig.fanin(pos));
 }
 
 // fanin0 関数
@@ -174,7 +174,7 @@ PyObject*
 Aig_fanin0(AigObject* self,
 	   PyObject* args)
 {
-  return Aig_FromAig(self->mAig.fanin0());
+  return PyAig_FromAig(self->mAig.fanin0());
 }
 
 // fanin1 関数
@@ -182,7 +182,7 @@ PyObject*
 Aig_fanin1(AigObject* self,
 	   PyObject* args)
 {
-  return Aig_FromAig(self->mAig.fanin1());
+  return PyAig_FromAig(self->mAig.fanin1());
 }
 
 
@@ -221,7 +221,7 @@ END_NONAMESPACE
 
 
 // AigObject 用のタイプオブジェクト
-PyTypeObject AigType = {
+PyTypeObject PyAig_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -292,9 +292,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief Aig から PyObject を生成する．
 // @param[in] obj Aig オブジェクト
 PyObject*
-Aig_FromAig(const Aig& obj)
+PyAig_FromAig(const Aig& obj)
 {
-  AigObject* aig_obj = Aig_new(&AigType);
+  AigObject* aig_obj = Aig_new(&PyAig_Type);
   if ( aig_obj == NULL ) {
     return NULL;
   }
@@ -310,12 +310,12 @@ void
 AigObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&AigType) < 0 ) {
+  if ( PyType_Ready(&PyAig_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "Aig", (PyObject*)&AigType);
+  PyModule_AddObject(m, "Aig", (PyObject*)&PyAig_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

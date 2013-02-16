@@ -14,7 +14,7 @@
 #include "ym_utils/FileBinO.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -141,7 +141,7 @@ TvFunc_const_zero(PyTypeObject* type,
     return NULL;
   }
 
-  return TvFunc_FromTvFunc(TvFunc::const_zero(ni));
+  return PyTvFunc_FromTvFunc(TvFunc::const_zero(ni));
 }
 
 // const_one 関数
@@ -154,7 +154,7 @@ TvFunc_const_one(PyTypeObject* type,
     return NULL;
   }
 
-  return TvFunc_FromTvFunc(TvFunc::const_one(ni));
+  return PyTvFunc_FromTvFunc(TvFunc::const_one(ni));
 }
 
 // posi_literal 関数
@@ -164,7 +164,8 @@ TvFunc_posi_literal(PyTypeObject* type,
 {
   ymuint ni;
   PyObject* obj1;
-  if ( !PyArg_ParseTuple(args, "kO!", &ni, &VarIdType, &obj1) ) {
+  if ( !PyArg_ParseTuple(args, "kO!", &ni,
+			 &PyVarId_Type, &obj1) ) {
     return NULL;
   }
   VarId vid;
@@ -172,7 +173,7 @@ TvFunc_posi_literal(PyTypeObject* type,
     return NULL;
   }
 
-  return TvFunc_FromTvFunc(TvFunc::posi_literal(ni, vid));
+  return PyTvFunc_FromTvFunc(TvFunc::posi_literal(ni, vid));
 }
 
 // nega_literal 関数
@@ -182,7 +183,8 @@ TvFunc_nega_literal(PyTypeObject* type,
 {
   ymuint ni;
   PyObject* obj1;
-  if ( !PyArg_ParseTuple(args, "kO!", &ni, &VarIdType, &obj1) ) {
+  if ( !PyArg_ParseTuple(args, "kO!", &ni,
+			 &PyVarId_Type, &obj1) ) {
     return NULL;
   }
   VarId vid;
@@ -190,7 +192,7 @@ TvFunc_nega_literal(PyTypeObject* type,
     return NULL;
   }
 
-  return TvFunc_FromTvFunc(TvFunc::nega_literal(ni, vid));
+  return PyTvFunc_FromTvFunc(TvFunc::nega_literal(ni, vid));
 }
 
 // ni 関数
@@ -250,7 +252,8 @@ TvFunc_walsh_1(TvFuncObject* self,
 	       PyObject* args)
 {
   PyObject* obj;
-  if ( !PyArg_ParseTuple(args, "O!", &VarIdType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyVarId_Type, &obj) ) {
     return NULL;
   }
   VarId vid;
@@ -268,7 +271,9 @@ TvFunc_walsh_2(TvFuncObject* self,
 {
   PyObject* obj1;
   PyObject* obj2;
-  if ( !PyArg_ParseTuple(args, "O!O!", &VarIdType, &obj1, &VarIdType, &obj2) ) {
+  if ( !PyArg_ParseTuple(args, "O!O!",
+			 &PyVarId_Type, &obj1,
+			 &PyVarId_Type, &obj2) ) {
     return NULL;
   }
   VarId vid1;
@@ -289,7 +294,8 @@ TvFunc_check_sup(TvFuncObject* self,
 		 PyObject* args)
 {
   PyObject* obj;
-  if ( !PyArg_ParseTuple(args, "O!", &VarIdType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyVarId_Type, &obj) ) {
     return NULL;
   }
   VarId vid;
@@ -309,9 +315,9 @@ TvFunc_check_sym(TvFuncObject* self,
   PyObject* obj2;
   PyObject* obj3;
   if ( !PyArg_ParseTuple(args, "O!O!|O!",
-			 &VarIdType, &obj1,
-			 &VarIdType, &obj2,
-			 &PolType, &obj3) ) {
+			 &PyVarId_Type, &obj1,
+			 &PyVarId_Type, &obj2,
+			 &PyPol_Type, &obj3) ) {
     return NULL;
   }
   VarId vid1;
@@ -379,8 +385,8 @@ TvFunc_icofactor(TvFuncObject* self,
   PyObject* obj1;
   PyObject* obj2;
   if ( !PyArg_ParseTuple(args, "O!O!",
-			 &VarIdType, &obj1,
-			 &PolType, &obj2) ) {
+			 &PyVarId_Type, &obj1,
+			 &PyPol_Type, &obj2) ) {
     return NULL;
   }
   VarId vid1;
@@ -408,8 +414,8 @@ TvFunc_cofactor(TvFuncObject* self,
   PyObject* obj1;
   PyObject* obj2;
   if ( !PyArg_ParseTuple(args, "O!O!",
-			 &VarIdType, &obj1,
-			 &PolType, &obj2) ) {
+			 &PyVarId_Type, &obj1,
+			 &PyPol_Type, &obj2) ) {
     return NULL;
   }
   VarId vid1;
@@ -423,7 +429,7 @@ TvFunc_cofactor(TvFuncObject* self,
     }
   }
 
-  return TvFunc_FromTvFunc(self->mBody->cofactor(vid1, pol));
+  return PyTvFunc_FromTvFunc(self->mBody->cofactor(vid1, pol));
 }
 
 // xform 関数
@@ -441,7 +447,7 @@ TvFunc_xform(TvFuncObject* self,
     return NULL;
   }
 
-  return TvFunc_FromTvFunc(self->mBody->xform(npnmap));
+  return PyTvFunc_FromTvFunc(self->mBody->xform(npnmap));
 #else
   return NULL;
 #endif
@@ -453,7 +459,7 @@ TvFunc_invert(PyObject* left)
 {
   if ( TvFuncObject_Check(left) ) {
     TvFuncObject* obj = (TvFuncObject*)left;
-    return TvFunc_FromTvFunc(~(*obj->mBody));
+    return PyTvFunc_FromTvFunc(~(*obj->mBody));
   }
   PyErr_SetString(PyExc_TypeError, "parameter must be logic.TvFunc");
   return NULL;
@@ -481,7 +487,7 @@ TvFunc_and(PyObject* left,
   if ( TvFuncObject_Check(left) && TvFuncObject_Check(right) ) {
     TvFuncObject* obj1 = (TvFuncObject*)left;
     TvFuncObject* obj2 = (TvFuncObject*)right;
-    return TvFunc_FromTvFunc(*obj1->mBody & *obj2->mBody);
+    return PyTvFunc_FromTvFunc(*obj1->mBody & *obj2->mBody);
   }
   PyErr_SetString(PyExc_TypeError, "parameter must be logic.TvFunc");
   return NULL;
@@ -495,7 +501,7 @@ TvFunc_or(PyObject* left,
   if ( TvFuncObject_Check(left) && TvFuncObject_Check(right) ) {
     TvFuncObject* obj1 = (TvFuncObject*)left;
     TvFuncObject* obj2 = (TvFuncObject*)right;
-    return TvFunc_FromTvFunc(*obj1->mBody | *obj2->mBody);
+    return PyTvFunc_FromTvFunc(*obj1->mBody | *obj2->mBody);
   }
   PyErr_SetString(PyExc_TypeError, "parameter must be logic.TvFunc");
   return NULL;
@@ -509,7 +515,7 @@ TvFunc_xor(PyObject* left,
   if ( TvFuncObject_Check(left) && TvFuncObject_Check(right) ) {
     TvFuncObject* obj1 = (TvFuncObject*)left;
     TvFuncObject* obj2 = (TvFuncObject*)right;
-    return TvFunc_FromTvFunc(*obj1->mBody ^ *obj2->mBody);
+    return PyTvFunc_FromTvFunc(*obj1->mBody ^ *obj2->mBody);
   }
   PyErr_SetString(PyExc_TypeError, "parameter must be logic.TvFunc");
   return NULL;
@@ -681,7 +687,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // TvFuncObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject TvFuncType = {
+PyTypeObject PyTvFunc_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -793,9 +799,9 @@ conv_from_pyobject(PyObject* py_obj,
 // @brief TvFunc から PyObject を生成する．
 // @param[in] obj TvFunc オブジェクト
 PyObject*
-TvFunc_FromTvFunc(const TvFunc& obj)
+PyTvFunc_FromTvFunc(const TvFunc& obj)
 {
-  TvFuncObject* py_obj = TvFunc_new(&TvFuncType);
+  TvFuncObject* py_obj = TvFunc_new(&PyTvFunc_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -811,12 +817,12 @@ void
 TvFuncObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&TvFuncType) < 0 ) {
+  if ( PyType_Ready(&PyTvFunc_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "TvFunc", (PyObject*)&TvFuncType);
+  PyModule_AddObject(m, "TvFunc", (PyObject*)&PyTvFunc_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

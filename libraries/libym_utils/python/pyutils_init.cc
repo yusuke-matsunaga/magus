@@ -13,7 +13,7 @@
 
 #include "ym_utils/pyutils.h"
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -72,13 +72,13 @@ FileBinIObject_init(PyObject* module);
 void
 FileBinOObject_init(PyObject* module);
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM
 
 
 PyMODINIT_FUNC
 utils_init()
 {
-  using namespace nsYm::nsPython;
+  using namespace nsYm;
 
   //////////////////////////////////////////////////////////////////////
   // モジュールオブジェクトの生成

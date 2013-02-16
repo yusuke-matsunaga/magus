@@ -13,7 +13,7 @@
 #include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 /// @class PyLibrary PyLibrary.h "PyLibrary.h"
@@ -72,6 +72,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM
 
 #endif // PYLIBRARY_H

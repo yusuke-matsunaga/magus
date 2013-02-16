@@ -13,22 +13,7 @@
 #include "ymtools.h"
 
 
-//////////////////////////////////////////////////////////////////////
-// 名前空間の定義
-//////////////////////////////////////////////////////////////////////
-
-/// @brief ympython 用の名前空間の開始
-#define BEGIN_NAMESPACE_YM_PYTHON		\
-  BEGIN_NAMESPACE_YM \
-  BEGIN_NAMESPACE(nsPython)
-
-/// @brief ympython 用の名前空間の終了
-#define END_NAMESPACE_YM_PYTHON			\
-  END_NAMESPACE(nsPython)			\
-  END_NAMESPACE_YM
-
-
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // 共通のオブジェクトの宣言
@@ -36,7 +21,7 @@ BEGIN_NAMESPACE_YM_PYTHON
 
 /// @brief エラー用のオブジェクト
 extern
-PyObject* ErrorObject;
+PyObject* PyErrorObject;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -108,6 +93,6 @@ extern
 PyObject*
 conv_to_pyobject(const string& val);
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM
 
 #endif // YMPYTHON_H
