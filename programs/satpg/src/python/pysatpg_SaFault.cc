@@ -85,7 +85,7 @@ SaFault_str(SaFaultObject* self)
   else {
     str = "NONE";
   }
-  return conv_to_pyobject(str);
+  return PyObject_FromString(str);
 }
 
 // id 関数
@@ -93,7 +93,7 @@ PyObject*
 SaFault_id(SaFaultObject* self,
 	   PyObject* args)
 {
-  return conv_to_pyobject(self->mPtr->id());
+  return PyObject_FromYmuint32(self->mPtr->id());
 }
 
 // node 関数
@@ -102,7 +102,7 @@ SaFault_node(SaFaultObject* self,
 	     PyObject* args)
 {
   const TgNode* node = self->mPtr->node();
-  return conv_to_pyobject(node->gid());
+  return PyObject_FromYmuint32(node->gid());
 }
 
 // source_node 関数
@@ -111,14 +111,13 @@ SaFault_source_node(SaFaultObject* self,
 		    PyObject* args)
 {
   const TgNode* node = self->mPtr->source_node();
-  if ( node != NULL ) {
-    return conv_to_pyobject(node->gid());
-  }
-  else {
+  if ( node == NULL ) {
     PyErr_SetString(PyExc_ValueError,
 		    "not an input fault");
     return NULL;
   }
+
+  return PyObject_FromYmuint32(node->gid());
 }
 
 // is_input_fault 関数
@@ -126,7 +125,7 @@ PyObject*
 SaFault_is_input_fault(SaFaultObject* self,
 		       PyObject* args)
 {
-  return conv_to_pyobject(self->mPtr->is_input_fault());
+  return PyObject_FromBool(self->mPtr->is_input_fault());
 }
 
 // is_output_fault 関数
@@ -134,7 +133,7 @@ PyObject*
 SaFault_is_output_fault(SaFaultObject* self,
 			PyObject* args)
 {
-  return conv_to_pyobject(self->mPtr->is_output_fault());
+  return PyObject_FromBool(self->mPtr->is_output_fault());
 }
 
 // pos 関数
@@ -142,7 +141,7 @@ PyObject*
 SaFault_pos(SaFaultObject* self,
 	    PyObject* args)
 {
-  return conv_to_pyobject(self->mPtr->pos());
+  return PyObject_FromYmuint32(self->mPtr->pos());
 }
 
 // val 関数
@@ -150,7 +149,7 @@ PyObject*
 SaFault_val(SaFaultObject* self,
 	    PyObject* args)
 {
-  return conv_to_pyobject(self->mPtr->val());
+  return PyObject_FromYmint32(self->mPtr->val());
 }
 
 // val3 関数
@@ -158,7 +157,7 @@ PyObject*
 SaFault_val3(SaFaultObject* self,
 	     PyObject* args)
 {
-  return conv_to_pyobject(self->mPtr->val3());
+  return PyVal3_FromVal3(self->mPtr->val3());
 }
 
 // status 関数を返す．
@@ -166,7 +165,7 @@ PyObject*
 SaFault_status(SaFaultObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mPtr->status());
+  return PyFaultStatus_FromFaultStatus(self->mPtr->status());
 }
 
 // pat_num 関数を返す．
@@ -174,7 +173,7 @@ PyObject*
 SaFault_pat_num(SaFaultObject* self,
 		PyObject* args)
 {
-  return conv_to_pyobject(self->mPtr->pat_num());
+  return PyObject_FromYmuint32(self->mPtr->pat_num());
 }
 
 // pat 関数
@@ -186,7 +185,7 @@ SaFault_pat(SaFaultObject* self,
   if ( !PyArg_ParseTuple(args, "k", &pos) ) {
     return NULL;
   }
-  return conv_to_pyobject(self->mPtr->pat(pos));
+  return PyTestVector_FromTestVector(self->mPtr->pat(pos));
 }
 
 
@@ -220,7 +219,6 @@ PyMethodDef SaFault_methods[] = {
 };
 
 END_NONAMESPACE
-
 
 
 //////////////////////////////////////////////////////////////////////
@@ -277,28 +275,6 @@ PyTypeObject PySaFault_Type = {
 // PyObject と SaFault 間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から SaFault を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] pobj SaFault を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が SaFaultObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   SaFault*& pobj)
-{
-  // 型のチェック
-  if ( !SaFaultObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  SaFaultObject* fileloc_obj = (SaFaultObject*)py_obj;
-
-  pobj = fileloc_obj->mPtr;
-
-  return true;
-}
-
 // @brief SaFault から PyObject を生成する．
 // @param[in] obj SaFault オブジェクト
 PyObject*
@@ -313,6 +289,25 @@ PySaFault_FromSaFault(SaFault* obj)
 
   Py_INCREF(py_obj);
   return (PyObject*)py_obj;
+}
+
+// @brief PyObject から SaFault へのポインタを取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return SaFault へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+SaFault*
+PySaFault_AsSaFaultPtr(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PySaFault_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "satpg.SaFault is expected");
+    return NULL;
+  }
+
+  // 強制的にキャスト
+  SaFaultObject* my_obj = (SaFaultObject*)py_obj;
+
+  return my_obj->mPtr;
 }
 
 // SaFaultObject 関係の初期化を行う．

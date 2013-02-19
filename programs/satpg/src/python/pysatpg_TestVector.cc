@@ -134,28 +134,6 @@ PyTypeObject PyTestVector_Type = {
 // PyObject と TestVector 間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から TestVector を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] pobj TestVector を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が TestVectorObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   TestVector*& pobj)
-{
-  // 型のチェック
-  if ( !TestVectorObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  TestVectorObject* fileloc_obj = (TestVectorObject*)py_obj;
-
-  pobj = fileloc_obj->mPtr;
-
-  return true;
-}
-
 // @brief TestVector から PyObject を生成する．
 // @param[in] obj TestVector オブジェクト
 PyObject*
@@ -172,6 +150,25 @@ PyTestVector_FromTestVector(TestVector* obj)
   return (PyObject*)py_obj;
 }
 
+// @brief PyObject から TestVector へのポインタを取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return TestVector へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+TestVector*
+PyTestVector_AsTestVectorPtr(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyTestVector_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "satpg.TestVector is expected");
+    return NULL;
+  }
+
+  // 強制的にキャスト
+  TestVectorObject* my_obj = (TestVectorObject*)py_obj;
+
+  return my_obj->mPtr;
+}
+
 // TestVectorObject 関係の初期化を行う．
 void
 TestVectorObject_init(PyObject* m)
@@ -184,6 +181,5 @@ TestVectorObject_init(PyObject* m)
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "TestVector", (PyObject*)&PyTestVector_Type);
 }
-
 
 END_NAMESPACE_YM_SATPG

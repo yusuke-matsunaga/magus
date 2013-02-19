@@ -106,7 +106,7 @@ CellTime_repr(CellTimeObject* self)
 
   ostringstream buf;
   buf << self->mVal;
-  return conv_to_pyobject(buf.str());
+  return PyObject_FromString(buf.str());
 }
 
 // 比較関数
@@ -129,7 +129,7 @@ PyObject*
 CellTime_value(CellTimeObject* self,
 	       PyObject* args)
 {
-  return Py_BuildValue("d", self->mVal);
+  return PyObject_FromDouble(self->mVal);
 }
 
 // add 関数
@@ -137,14 +137,15 @@ PyObject*
 CellTime_add(PyObject* left,
 	     PyObject* right)
 {
-  if ( CellTimeObject_Check(left) &&
-       CellTimeObject_Check(right) ) {
-    CellTimeObject* obj1 = (CellTimeObject*)left;
-    CellTimeObject* obj2 = (CellTimeObject*)right;
-    return PyCellTime_FromDouble(obj1->mVal + obj2->mVal);
+  if ( !PyCellTime_Check(left) || !PyCellTime_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellTime");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellTime");
-  return NULL;
+
+  double val1 = PyCellTime_AsDouble(left);
+  double val2 = PyCellTime_AsDouble(right);
+
+  return PyCellTime_FromDouble(val1 + val2);
 }
 
 // sub 関数
@@ -152,14 +153,15 @@ PyObject*
 CellTime_sub(PyObject* left,
 	     PyObject* right)
 {
-  if ( CellTimeObject_Check(left) &&
-       CellTimeObject_Check(right) ) {
-    CellTimeObject* obj1 = (CellTimeObject*)left;
-    CellTimeObject* obj2 = (CellTimeObject*)right;
-    return PyCellTime_FromDouble(obj1->mVal - obj2->mVal);
+  if ( !PyCellTime_Check(left) || !PyCellTime_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellTime");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellTime");
-  return NULL;
+
+  double val1 = PyCellTime_AsDouble(left);
+  double val2 = PyCellTime_AsDouble(right);
+
+  return PyCellTime_FromDouble(val1 - val2);
 }
 
 // inplace add 関数
@@ -167,16 +169,17 @@ PyObject*
 CellTime_iadd(PyObject* left,
 	      PyObject* right)
 {
-  if ( CellTimeObject_Check(left) &&
-       CellTimeObject_Check(right) ) {
-    CellTimeObject* obj1 = (CellTimeObject*)left;
-    CellTimeObject* obj2 = (CellTimeObject*)right;
-    obj1->mVal += obj2->mVal;
-    Py_INCREF(left);
-    return left;
+  if ( !PyCellTime_Check(left) || !PyCellTime_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellTime");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellTime");
-  return NULL;
+
+  CellTimeObject* obj1 = (CellTimeObject*)left;
+  CellTimeObject* obj2 = (CellTimeObject*)right;
+  obj1->mVal += obj2->mVal;
+
+  Py_INCREF(left);
+  return left;
 }
 
 // inplace sub 関数
@@ -184,16 +187,17 @@ PyObject*
 CellTime_isub(PyObject* left,
 	      PyObject* right)
 {
-  if ( CellTimeObject_Check(left) &&
-       CellTimeObject_Check(right) ) {
-    CellTimeObject* obj1 = (CellTimeObject*)left;
-    CellTimeObject* obj2 = (CellTimeObject*)right;
-    obj1->mVal += obj2->mVal;
-    Py_INCREF(left);
-    return left;
+  if ( !PyCellTime_Check(left) || !PyCellTime_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellTime");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellTime");
-  return NULL;
+
+  CellTimeObject* obj1 = (CellTimeObject*)left;
+  CellTimeObject* obj2 = (CellTimeObject*)right;
+  obj1->mVal += obj2->mVal;
+
+  Py_INCREF(left);
+  return left;
 }
 
 
@@ -365,28 +369,6 @@ PyTypeObject PyCellTime_Type = {
 // PyObject と CellTime の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から CellTime を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj CellTime を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が CellTimeObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   CellTime& obj)
-{
-  // 型のチェック
-  if ( !CellTimeObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  CellTimeObject* my_obj = (CellTimeObject*)py_obj;
-
-  obj = CellTime(my_obj->mVal);
-
-  return true;
-}
-
 // @brief CellTime から CellTimeObject を生成する．
 // @param[in] obj CellTime オブジェクト
 PyObject*
@@ -417,6 +399,44 @@ PyCellTime_FromDouble(double val)
 
   Py_INCREF(py_obj);
   return (PyObject*)py_obj;
+}
+
+// @brief PyObject から CellTime を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return CellTime を返す．
+// @note 変換が失敗したら TypeError を送出し，CellTime(0.0) を返す．
+CellTime
+PyCellTime_AsCellTime(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyCellTime_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "cell.CellTime is expected");
+    return CellTime(0.0);
+  }
+
+  // 強制的にキャスト
+  CellTimeObject* my_obj = (CellTimeObject*)py_obj;
+
+  return CellTime(my_obj->mVal);
+}
+
+// @brief PyObject から double を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return double を返す．
+// @note 変換が失敗したら TypeError を送出し，0.0 を返す．
+double
+PyCellTime_AsDouble(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyCellTime_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "cell.CellTime is expected");
+    return 0.0;
+  }
+
+  // 強制的にキャスト
+  CellTimeObject* my_obj = (CellTimeObject*)py_obj;
+
+  return my_obj->mVal;
 }
 
 // CellTimeObject 関係の初期化を行う．

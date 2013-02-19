@@ -286,22 +286,24 @@ PyFaultStatus_FromString(const char* str)
   return result;
 }
 
-// PyObject から FaultStatus を取り出す．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   FaultStatus& obj)
+/// @brief PyObject から FaultStatus を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return FaultStatus を返す．
+/// @note 変換が失敗したら TypeError を送出し，kFsUndetected を返す．
+extern
+FaultStatus
+PyFaultStatus_AsFaultStatus(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !FaultStatusObject_Check(py_obj) ) {
-    return false;
+  if ( !PyFaultStatus_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "satpg.FaultStatus is expected");
+    return kFsUndetected;
   }
 
   // 強制的にキャスト
   FaultStatusObject* my_obj = (FaultStatusObject*)py_obj;
 
-  obj = my_obj->mVal;
-
-  return true;
+  return my_obj->mVal;
 }
 
 

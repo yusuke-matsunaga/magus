@@ -5,7 +5,7 @@
 /// @brief satpg の Python 用拡張モジュール
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,143 +18,23 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-// 型を表すタイプオブジェクト
+// PyVal3: 3値の論理型を表す型
 //////////////////////////////////////////////////////////////////////
 
-/// @brief Val3 を表す型
+/// @brief Val3 を表すタイプオブジェクト
 extern
 PyTypeObject PyVal3_Type;
 
-/// @brief FaultStatus を表す型
-extern
-PyTypeObject PyFaultStatus_Type;
-
-/// @brief SaFault を表す型
-extern
-PyTypeObject PySaFault_Type;
-
-/// @brief FaultMgr を表す型
-extern
-PyTypeObject PyFaultMgr_Type;
-
-/// @brief TestVector を表す型
-extern
-PyTypeObject PyTestVector_Type;
-
-/// @brief TvMgr を表す型
-extern
-PyTypeObject PyTvMgr_Type;
-
-
-//////////////////////////////////////////////////////////////////////
-// 型をチェックする関数
-//////////////////////////////////////////////////////////////////////
-
-/// @brief Val3 の型チェック
+/// @brief PyVal3 の型チェック
 /// @param[in] obj Python オブジェクト
-/// @retval true obj が Val3Type だった．
+/// @retval true obj が PyVal3_Type だった．
 /// @retval false obj が他の型だった．
 inline
 bool
-Val3Object_Check(PyObject* obj)
+PyVal3_Check(PyObject* obj)
 {
   return Py_TYPE(obj) == &PyVal3_Type;
 }
-
-/// @brief FaultStatusType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が FaultStatusType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-FaultStatusObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &PyFaultStatus_Type;
-}
-
-/// @brief SaFaultType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が SaFaultType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-SaFaultObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &PySaFault_Type;
-}
-
-/// @brief FaultMgrType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が FaultMgrType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-FaultMgrObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &PyFaultMgr_Type;
-}
-
-/// @brief TestVectorType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が TestVectorType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-TestVectorObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &PyTestVector_Type;
-}
-
-/// @brief TvMgrType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が TvMgrType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-TvMgrObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &PyTvMgr_Type;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// PyObject からの型変換
-//////////////////////////////////////////////////////////////////////
-
-/// @brief PyObject から Val3 を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] obj Val3 を格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した．py_obj が Val3Object ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   Val3& obj);
-
-/// @brief PyObject から FaultStatus を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] obj FaultStatus を格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した．py_obj が FaultStatusObject ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   FaultStatus& obj);
-
-/// @brief PyObject から SaFault を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] pobj SaFault を格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した．py_obj が SaFaultObject ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   SaFault*& pobj);
-
-
-//////////////////////////////////////////////////////////////////////
-// PyObject への型変換
-//////////////////////////////////////////////////////////////////////
 
 /// @brief Val3 から PyObject を生成する．
 /// @param[in] obj Val3 オブジェクト
@@ -174,6 +54,34 @@ extern
 PyObject*
 PyVal3_FromLong(long val);
 
+/// @brief PyObject から Val3 を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return Val3 を返す．
+/// @note 変換が失敗したら TypeError を送出し，kVal3X を返す．
+extern
+Val3
+PyVal3_AsVal3(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyFaultStatus: 故障の状態を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief FaultStatus を表すタイプオブジェクト
+extern
+PyTypeObject PyFaultStatus_Type;
+
+/// @brief PyFaultStatus の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyFaultStatus_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyFaultStatus_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyFaultStatus_Type;
+}
+
 /// @brief FaultStatus から PyObject を生成する．
 /// @param[in] obj FaultStatus オブジェクト
 extern
@@ -186,11 +94,137 @@ extern
 PyObject*
 PyFaultStatus_FromString(const char* str);
 
+/// @brief PyObject から FaultStatus を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return FaultStatus を返す．
+/// @note 変換が失敗したら TypeError を送出し，kFsUndetected を返す．
+extern
+FaultStatus
+PyFaultStatus_AsFaultStatus(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PySaFault: 縮退故障を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief SaFault を表すタイプオブジェクト
+extern
+PyTypeObject PySaFault_Type;
+
+/// @brief PySaFault の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PySaFault_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PySaFault_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PySaFault_Type;
+}
+
 /// @brief SaFault から PyObject を生成する．
 /// @param[in] obj SaFault オブジェクト
 extern
 PyObject*
 PySaFault_FromSaFault(SaFault* obj);
+
+/// @brief PyObject から SaFault へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return SaFault へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+SaFault*
+PySaFault_AsSaFaultPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyFaultMgr: 故障を管理するクラス
+//////////////////////////////////////////////////////////////////////
+
+/// @brief FaultMgr を表すタイプオブジェクト
+extern
+PyTypeObject PyFaultMgr_Type;
+
+/// @brief PyFaultMgr の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyFaultMgr_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyFaultMgr_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyFaultMgr_Type;
+}
+
+/// @brief PyObject から FaultMgr へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return FaultMgr へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+FaultMgr*
+PyFaultMgr_AsFaultMgrPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyTestVector: テストベクタを表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief TestVector を表すタイプオブジェクト
+extern
+PyTypeObject PyTestVector_Type;
+
+/// @brief PyTestVector の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyTestVector_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyTestVector_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyTestVector_Type;
+}
+
+/// @brief TestVector から PyObject を生成する．
+/// @param[in] obj TestVector オブジェクト
+extern
+PyObject*
+PyTestVector_FromTestVector(TestVector* obj);
+
+/// @brief PyObject から TestVector へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return TestVector へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+TestVector*
+PyTestVector_AsTestVectorPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyTvMgr: テストベクタを管理するクラス
+//////////////////////////////////////////////////////////////////////
+
+/// @brief TvMgr を表すタイプオブジェクト
+extern
+PyTypeObject PyTvMgr_Type;
+
+/// @brief PyTvMgr の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyTvMgr_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyTvMgr_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyTvMgr_Type;
+}
+
+/// @brief PyObject から TvMgr へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return TvMgr へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+TvMgr*
+PyTvMgr_AsTvMgrPtr(PyObject* py_obj);
 
 
 //////////////////////////////////////////////////////////////////////

@@ -260,28 +260,6 @@ PyTypeObject PyFaultMgr_Type = {
 // PyObject と FaultMgr 間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から FaultMgr を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] pobj FaultMgr を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が FaultMgrObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   FaultMgr*& pobj)
-{
-  // 型のチェック
-  if ( !FaultMgrObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  FaultMgrObject* fileloc_obj = (FaultMgrObject*)py_obj;
-
-  pobj = fileloc_obj->mPtr;
-
-  return true;
-}
-
 // @brief FaultMgr から PyObject を生成する．
 // @param[in] obj FaultMgr オブジェクト
 PyObject*
@@ -296,6 +274,25 @@ PyFaultMgr_FromFaultMgr(FaultMgr* obj)
 
   Py_INCREF(py_obj);
   return (PyObject*)py_obj;
+}
+
+// @brief PyObject から FaultMgr へのポインタを取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return FaultMgr へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+FaultMgr*
+PyFaultMgr_AsFaultMgrPtr(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyFaultMgr_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "satpg.FaultMgr is expected");
+    return NULL;
+  }
+
+  // 強制的にキャスト
+  FaultMgrObject* my_obj = (FaultMgrObject*)py_obj;
+
+  return my_obj->mPtr;
 }
 
 // FaultMgrObject 関係の初期化を行う．

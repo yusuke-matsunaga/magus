@@ -408,14 +408,14 @@ PyCellCapacitance_FromDouble(double val)
 // @brief PyObject から CellCapacitance を取り出す．
 // @param[in] py_obj Python オブジェクト
 // @return CellCapacitance を返す．
-// @note 変換が失敗したら TypeError を送出し，kCellCapacitanceInf を返す．
+// @note 変換が失敗したら TypeError を送出し，CellCapacitance(0.0) を返す．
 CellCapacitance
 PyCellCapacitance_AsCellCapacitance(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !CellCapacitanceObject_Check(py_obj) ) {
+  if ( !PyCellCapacitance_Check(py_obj) ) {
     PyErr_SetString(PyExc_TypeError, "cell.CellCapacitance is expected");
-    return kCellCapacitanceInf;
+    return CellCapacitance(0.0);
   }
 
   // 強制的にキャスト
@@ -432,9 +432,9 @@ double
 PyCellCapacitance_AsDouble(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !CellCapacitanceObject_Check(py_obj) ) {
+  if ( !PyCellCapacitance_Check(py_obj) ) {
     PyErr_SetString(PyExc_TypeError, "cell.CellCapacitance is expected");
-    return kCellCapacitanceInf;
+    return 0.0;
   }
 
   // 強制的にキャスト

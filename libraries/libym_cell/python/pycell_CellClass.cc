@@ -48,7 +48,7 @@ PyObject*
 CellClass_id(CellClassObject* self,
 	     PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->id());
+  return PyObject_FromYmuint32(self->mBody->id());
 }
 
 
@@ -167,26 +167,23 @@ PyTypeObject PyCellClass_Type = {
 // PyObject と CellClass の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から CellClass を取り出す．
+// @brief PyObject から CellClass へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] p_obj CellClass のポインタを格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が CellClassObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   const CellClass*& p_obj)
+// @return CellClass へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+const CellClass*
+PyCellClass_AsCellClassPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !CellClassObject_Check(py_obj) ) {
-    return false;
+  if ( !PyCellClass_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "cell.CellClass is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   CellClassObject* my_obj = (CellClassObject*)py_obj;
 
-  p_obj = my_obj->mBody;
-
-  return true;
+  return my_obj->mBody;
 }
 
 // CellClassObject 関係の初期化を行う．

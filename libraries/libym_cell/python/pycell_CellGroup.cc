@@ -168,26 +168,23 @@ PyTypeObject PyCellGroup_Type = {
 // PyObject と CellGroup の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から CellGroup を取り出す．
+// @brief PyObject から CellGroup へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] p_obj CellGroup のポインタを格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が CellGroupObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   const CellGroup*& p_obj)
+// @return CellGroup へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+const CellGroup*
+PyCellGroup_AsCellGroupPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !CellGroupObject_Check(py_obj) ) {
-    return false;
+  if ( !PyCellGroup_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "cell.CellGroup is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   CellGroupObject* my_obj = (CellGroupObject*)py_obj;
 
-  p_obj = my_obj->mBody;
-
-  return true;
+  return my_obj->mBody;
 }
 
 // CellGroupObject 関係の初期化を行う．

@@ -120,12 +120,14 @@ Val3_repr(Val3Object* self)
 PyObject*
 Val3_inv(PyObject* left)
 {
-  if ( Val3Object_Check(left) ) {
-    Val3Object* obj1 = (Val3Object*)left;
-    return PyVal3_FromVal3(~(obj1->mVal));
+  if ( !PyVal3_Check(left) ) {
+    PyErr_SetString(PyExc_TypeError, "satpg.Val3 is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "satpg.Val3 is expected");
-  return NULL;
+
+  Val3 val = PyVal3_AsVal3(left);
+
+  return PyVal3_FromVal3(~val);
 }
 
 // and 演算
@@ -133,13 +135,15 @@ PyObject*
 Val3_and(PyObject* left,
 	 PyObject* right)
 {
-  if ( Val3Object_Check(left) && Val3Object_Check(right) ) {
-    Val3Object* obj1 = (Val3Object*)left;
-    Val3Object* obj2 = (Val3Object*)right;
-    return PyVal3_FromVal3(obj1->mVal & obj2->mVal);
+  if ( !PyVal3_Check(left) || !PyVal3_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "satpg.Val3 is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "satpg.Val3 is expected");
-  return NULL;
+
+  Val3 val1 = PyVal3_AsVal3(left);
+  Val3 val2 = PyVal3_AsVal3(right);
+
+  return PyVal3_FromVal3(val1 & val2);
 }
 
 // or 演算
@@ -147,13 +151,15 @@ PyObject*
 Val3_or(PyObject* left,
 	PyObject* right)
 {
-  if ( Val3Object_Check(left) && Val3Object_Check(right) ) {
-    Val3Object* obj1 = (Val3Object*)left;
-    Val3Object* obj2 = (Val3Object*)right;
-    return PyVal3_FromVal3(obj1->mVal | obj2->mVal);
+  if ( !PyVal3_Check(left) || !PyVal3_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "satpg.Val3 is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "satpg.Val3 is expected");
-  return NULL;
+
+  Val3 val1 = PyVal3_AsVal3(left);
+  Val3 val2 = PyVal3_AsVal3(right);
+
+  return PyVal3_FromVal3(val1 | val2);
 }
 
 // xor 演算
@@ -161,13 +167,15 @@ PyObject*
 Val3_xor(PyObject* left,
 	 PyObject* right)
 {
-  if ( Val3Object_Check(left) && Val3Object_Check(right) ) {
-    Val3Object* obj1 = (Val3Object*)left;
-    Val3Object* obj2 = (Val3Object*)right;
-    return PyVal3_FromVal3(obj1->mVal ^ obj2->mVal);
+  if ( !PyVal3_Check(left) || !PyVal3_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "satpg.Val3 is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "satpg.Val3 is expected");
-  return NULL;
+
+  Val3 val1 = PyVal3_AsVal3(left);
+  Val3 val2 = PyVal3_AsVal3(right);
+
+  return PyVal3_FromVal3(val1 ^ val2);
 }
 
 
@@ -384,22 +392,23 @@ PyVal3_FromLong(long val)
   return result;
 }
 
-// PyObject から Val3 を取り出す．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   Val3& obj)
+// @brief PyObject から Val3 を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return Val3 を返す．
+// @note 変換が失敗したら TypeError を送出し，kVal3X を返す．
+Val3
+PyVal3_AsVal3(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !Val3Object_Check(py_obj) ) {
-    return false;
+  if ( !PyVal3_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "satpg.Val3 is expected");
+    return kValX;
   }
 
   // 強制的にキャスト
   Val3Object* my_obj = (Val3Object*)py_obj;
 
-  obj = my_obj->mVal;
-
-  return true;
+  return my_obj->mVal;
 }
 
 

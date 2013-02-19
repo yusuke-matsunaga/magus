@@ -134,28 +134,6 @@ PyTypeObject PyTvMgr_Type = {
 // PyObject と TvMgr 間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から TvMgr を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] pobj TvMgr を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が TvMgrObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   TvMgr*& pobj)
-{
-  // 型のチェック
-  if ( !TvMgrObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  TvMgrObject* fileloc_obj = (TvMgrObject*)py_obj;
-
-  pobj = fileloc_obj->mPtr;
-
-  return true;
-}
-
 // @brief TvMgr から PyObject を生成する．
 // @param[in] obj TvMgr オブジェクト
 PyObject*
@@ -170,6 +148,25 @@ PyTvMgr_FromTvMgr(TvMgr* obj)
 
   Py_INCREF(py_obj);
   return (PyObject*)py_obj;
+}
+
+// @brief PyObject から TvMgr へのポインタを取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return TvMgr へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+TvMgr*
+PyTvMgr_AsTvMgrPtr(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyTvMgr_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "satpg.TvMgr is expected");
+    return NULL;
+  }
+
+  // 強制的にキャスト
+  TvMgrObject* my_obj = (TvMgrObject*)py_obj;
+
+  return my_obj->mPtr;
 }
 
 // TvMgrObject 関係の初期化を行う．

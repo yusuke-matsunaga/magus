@@ -164,7 +164,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // CellObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject PyCell_Type = {
+PyTypeObject PyCellCell_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -256,10 +256,10 @@ PyTypeObject PyCell_Type = {
 // @return Cell へんおポインタを返す．
 // @note 変換が失敗したら TypeError を送出し，NULL を返す．
 const Cell*
-PyCell_AsCellPtr(PyObject* py_obj)
+PyCellCell_AsCellPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !PyCell_Check(py_obj) ) {
+  if ( !PyCellCell_Check(py_obj) ) {
     PyErr_SetString(PyExc_TypeError, "cell.Cell is expected");
     return NULL;
   }
@@ -275,12 +275,12 @@ void
 CellObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&PyCell_Type) < 0 ) {
+  if ( PyType_Ready(&PyCellCell_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "Cell", (PyObject*)&PyCell_Type);
+  PyModule_AddObject(m, "Cell", (PyObject*)&PyCellCell_Type);
 }
 
 END_NAMESPACE_YM

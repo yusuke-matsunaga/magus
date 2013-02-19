@@ -103,7 +103,7 @@ PyObject*
 CellLibrary_name(CellLibraryObject* self,
 		 PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->name());
+  return PyObject_FromString(self->mBody->name());
 }
 
 // technology 関数
@@ -144,7 +144,7 @@ PyObject*
 CellLibrary_bus_naming_style(CellLibraryObject* self,
 			     PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->bus_naming_style());
+  return PyObject_FromString(self->mBody->bus_naming_style());
 }
 
 // date 関数
@@ -152,7 +152,7 @@ PyObject*
 CellLibrary_date(CellLibraryObject* self,
 		 PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->date());
+  return PyObject_FromString(self->mBody->date());
 }
 
 // revision 関数
@@ -160,7 +160,7 @@ PyObject*
 CellLibrary_revision(CellLibraryObject* self,
 		     PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->revision());
+  return PyObject_FromString(self->mBody->revision());
 }
 
 // comment 関数
@@ -168,7 +168,7 @@ PyObject*
 CellLibrary_comment(CellLibraryObject* self,
 		    PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->comment());
+  return PyObject_FromString(self->mBody->comment());
 }
 
 // time_unit 関数
@@ -176,7 +176,7 @@ PyObject*
 CellLibrary_time_unit(CellLibraryObject* self,
 		      PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->time_unit());
+  return PyObject_FromString(self->mBody->time_unit());
 }
 
 // voltage_unit 関数
@@ -184,7 +184,7 @@ PyObject*
 CellLibrary_voltage_unit(CellLibraryObject* self,
 			 PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->voltage_unit());
+  return PyObject_FromString(self->mBody->voltage_unit());
 }
 
 // current_unit 関数
@@ -192,7 +192,7 @@ PyObject*
 CellLibrary_current_unit(CellLibraryObject* self,
 			 PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->current_unit());
+  return PyObject_FromString(self->mBody->current_unit());
 }
 
 // pulling_resistance_unit 関数
@@ -200,7 +200,7 @@ PyObject*
 CellLibrary_pulling_resistance_unit(CellLibraryObject* self,
 				    PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->pulling_resistance_unit());
+  return PyObject_FromString(self->mBody->pulling_resistance_unit());
 }
 
 // capacitive_load_unit 関数
@@ -218,7 +218,7 @@ PyObject*
 CellLibrary_leakage_power_unit(CellLibraryObject* self,
 			       PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->leakage_power_unit());
+  return PyObject_FromString(self->mBody->leakage_power_unit());
 }
 
 // lu_table_template 関数
@@ -269,7 +269,11 @@ CellLibrary_bus_type(CellLibraryObject* self,
 
   const CellBusType* bus_type = self->mBody->bus_type(name);
   if ( bus_type != NULL ) {
+#if 0
     return conv_to_pyobject(bus_type);
+#else
+    return NULL;
+#endif
   }
   else {
     Py_INCREF(Py_None);
@@ -599,26 +603,23 @@ PyTypeObject PyCellLibrary_Type = {
 // PyObject と CellLibrary の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から CellLibrary を取り出す．
+// @brief PyObject から CellLibrary へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] p_obj CellLibrary のポインタを格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が CellLibraryObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   const CellLibrary*& p_obj)
+// @return CellLibrary へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+const CellLibrary*
+PyCellLibrary_AsCellLibraryPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !CellLibraryObject_Check(py_obj) ) {
-    return false;
+  if ( !PyCellLibrary_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "cell.CellLibrary is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   CellLibraryObject* my_obj = (CellLibraryObject*)py_obj;
 
-  p_obj = my_obj->mBody;
-
-  return true;
+  return my_obj->mBody;
 }
 
 

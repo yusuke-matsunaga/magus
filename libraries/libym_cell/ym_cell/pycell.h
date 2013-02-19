@@ -160,10 +160,18 @@ PyCellTime_FromDouble(double val);
 /// @brief PyObject から CellTime を取り出す．
 /// @param[in] py_obj Python オブジェクト
 /// @return CellTime を返す．
-/// @note 変換が失敗したら TypeError を送出し，kCellTimeInf を返す．
+/// @note 変換が失敗したら TypeError を送出し，CellTime(0.0) を返す．
 extern
 CellTime
 PyCellTime_AsCellTime(PyObject* py_obj);
+
+/// @brief PyObject から double を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return double を返す．
+/// @note 変換が失敗したら TypeError を送出し，0.0 を返す．
+extern
+double
+PyCellTime_AsDouble(PyObject* py_obj);
 
 /// @brief CellTime の無限大定数を表すオブジェクト
 extern
@@ -238,34 +246,32 @@ const CellLut*
 PyCellLut_AsCellLutPtr(PyObject* py_obj);
 
 
-#if 0
 //////////////////////////////////////////////////////////////////////
-// PyCell: セルを表す型
+// PyCellCell: セルを表す型
 //////////////////////////////////////////////////////////////////////
 
 /// @brief Cell を表すタイプオブジェクト
 extern
-PyTypeObject PyCell_Type;
+PyTypeObject PyCellCell_Type;
 
-/// @brief PyCell の型チェック
+/// @brief PyCellCell の型チェック
 /// @param[in] obj Python オブジェクト
-/// @retval true obj が PyCell_Type だった．
+/// @retval true obj が PyCellCell_Type だった．
 /// @retval false obj が他の型だった．
 inline
 bool
-PyCell_Check(PyObject* obj)
+PyCellCell_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &PyCell_Type;
+  return Py_TYPE(obj) == &PyCellCell_Type;
 }
 
 /// @brief PyObject から Cell へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト
-/// @return Cell へんおポインタを返す．
+/// @return Cell へのポインタを返す．
 /// @note 変換が失敗したら TypeError を送出し，NULL を返す．
 extern
 const Cell*
-PyCell_AsCellPtr(PyObject* py_obj);
-#endif
+PyCellCell_AsCellPtr(PyObject* py_obj);
 
 //////////////////////////////////////////////////////////////////////
 // PyCellPin: セルのピンを表す型
@@ -306,11 +312,13 @@ PyCellGroup_Check(PyObject* obj)
   return Py_TYPE(obj) == &PyCellGroup_Type;
 }
 
+#if 0
 /// @brief CellGroup から CellGroupObject を生成する．
 /// @param[in] group グループ
 extern
 PyObject*
 PyCellGroup_FromCellGroup(const CellGroup* group);
+#endif
 
 /// @brief PyObject から CellGroup へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト
@@ -340,11 +348,13 @@ PyCellClass_Check(PyObject* obj)
   return Py_TYPE(obj) == &PyCellClass_Type;
 }
 
+#if 0
 /// @brief CellClass から CellClassObject を生成する．
 /// @param[in] cell_class セルクラス
 extern
 PyObject*
 PyCellClass_FromCellClass(const CellClass* cell_class);
+#endif
 
 /// @brief PyObject から CellClass へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト
@@ -374,11 +384,13 @@ PyCellLibrary_Check(PyObject* obj)
   return Py_TYPE(obj) == &PyCellLibrary_Type;
 }
 
+#if 0
 /// @brief CellLibrary から CellLibraryObject を生成する．
 /// @param[in] cell_class セルクラス
 extern
 PyObject*
 PyCellLibrary_FromCellLibrary(const CellLibrary* cell_class);
+#endif
 
 /// @brief PyObject から CellLibrary へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト
