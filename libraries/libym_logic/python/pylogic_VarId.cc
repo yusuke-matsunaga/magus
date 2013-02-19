@@ -3,7 +3,7 @@
 /// @brief VarId の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -96,7 +96,7 @@ VarId_str(VarIdObject* self)
 {
   ostringstream buf;
   buf << "V#" << self->mVal;
-  return conv_to_pyobject(buf.str());
+  return PyObject_FromString(buf.str());
 }
 
 // hash 関数
@@ -110,7 +110,7 @@ VarId_hash(VarIdObject* self)
 PyObject*
 VarId_val(VarIdObject* self)
 {
-  return conv_to_pyobject(self->mVal);
+  return PyObject_FromYmuint32(self->mVal);
 }
 
 // set 関数
@@ -189,28 +189,6 @@ PyTypeObject PyVarId_Type = {
   0,                          /*tp_is_gc*/
 };
 
-// @brief PyObject から VarId を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj VarId を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が VarIdObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   VarId& obj)
-{
-  // 型のチェック
-  if ( !VarIdObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  VarIdObject* varid_obj = (VarIdObject*)py_obj;
-
-  obj = VarId(varid_obj->mVal);
-
-  return true;
-}
-
 // @brief VarId から PyObject を生成する．
 // @param[in] obj VarId オブジェクト
 PyObject*
@@ -225,6 +203,25 @@ PyVarId_FromVarId(VarId obj)
 
   Py_INCREF(varid_obj);
   return (PyObject*)varid_obj;
+}
+
+// @brief PyObject から VarId を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return VarId を返す．
+// @note 変換が失敗したら TypeError を送出し，VarId(0) を返す．
+VarId
+PyVarId_AsVarId(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyVarId_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.VarId is expected");
+    return VarId(0);
+  }
+
+  // 強制的にキャスト
+  VarIdObject* varid_obj = (VarIdObject*)py_obj;
+
+  return VarId(varid_obj->mVal);
 }
 
 

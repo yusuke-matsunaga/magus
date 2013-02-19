@@ -3,7 +3,7 @@
 /// @brief AigMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -74,7 +74,7 @@ PyObject*
 AigMgr_input_num(AigMgrObject* self,
 		 PyObject* args)
 {
-  return conv_to_pyobject(self->mMgr->input_num());
+  return PyObject_FromYmuint32(self->mMgr->input_num());
 }
 
 // node_num 関数
@@ -82,7 +82,7 @@ PyObject*
 AigMgr_node_num(AigMgrObject* self,
 		PyObject* args)
 {
-  return conv_to_pyobject(self->mMgr->node_num());
+  return PyObject_FromYmuint32(self->mMgr->node_num());
 }
 
 // print_handles 関数
@@ -90,7 +90,8 @@ PyObject*
 AigMgr_print_handles(AigMgrObject* self,
 		     PyObject* args)
 {
-
+#warning "TODO: 未完"
+  return NULL;
 }
 
 // make_zero 関数
@@ -120,10 +121,7 @@ AigMgr_make_input(AigMgrObject* self,
     return NULL;
   }
 
-  VarId vid;
-  if ( !conv_from_pyobject(obj, vid) ) {
-    return NULL;
-  }
+  VarId vid = PyVarId_AsVarId(obj);
 
   return PyAig_FromAig(self->mMgr->make_input(vid));
 }
@@ -139,10 +137,7 @@ AigMgr_make_not(AigMgrObject* self,
     return NULL;
   }
 
-  Aig aig;
-  if ( !conv_from_pyobject(obj, aig) ) {
-    return NULL;
-  }
+  Aig aig = PyAig_AsAig(obj);
 
   return PyAig_FromAig(self->mMgr->make_not(aig));
 }
@@ -160,27 +155,29 @@ parse_aig_list(PyObject* args,
   if ( n == 1 ) {
     PyObject* obj0 = PyTuple_GET_ITEM(args, 0);
     if ( !PyList_Check(obj0) ) {
-      PyErr_SetString(PyExc_TypeError, "list of Aig is expected");
+      PyErr_SetString(PyExc_TypeError, "list of Aigs is expected");
       return false;
     }
     n = PyList_GET_SIZE(obj0);
     aig_list.reserve(n);
     for (ymuint i = 0; i < n; ++ i) {
       PyObject* obj = PyList_GET_ITEM(obj0, i);
-      Aig aig;
-      if ( !conv_from_pyobject(obj, aig) ) {
-	return false;;
+      if ( !PyAig_Check(obj) ) {
+	PyErr_SetString(PyExc_TypeError, "list of Aigs is expected");
+	return false;
       }
+      Aig aig = PyAig_AsAig(obj);
       aig_list.push_back(aig);
     }
   }
   else {
     for (ymuint i = 0; i < n; ++ i) {
       PyObject* obj = PyTuple_GET_ITEM(args, i);
-      Aig aig;
-      if ( !conv_from_pyobject(obj, aig) ) {
+      if ( !PyAig_Check(obj) ) {
+	PyErr_SetString(PyExc_TypeError, "tuple of Aigs is expected");
 	return false;
       }
+      Aig aig = PyAig_AsAig(obj);
       aig_list.push_back(aig);
     }
   }
@@ -280,10 +277,7 @@ AigMgr_make_logic(AigMgrObject* self,
     return NULL;
   }
 
-  LogExpr expr;
-  if ( !conv_from_pyobject(obj1, expr) ) {
-    return NULL;
-  }
+  LogExpr* expr_p = PyLogExpr_AsLogExprPtr(obj1);
 
   hash_map<VarId, Aig> input_map;
   PyObject* item_list = PyDict_Items(obj2);
@@ -298,20 +292,13 @@ AigMgr_make_logic(AigMgrObject* self,
       return NULL;
     }
 
-    VarId vid;
-    if ( !conv_from_pyobject(vid_obj, vid) ) {
-      return NULL;
-    }
-
-    Aig aig;
-    if ( !conv_from_pyobject(aig_obj, aig) ) {
-      return NULL;
-    }
+    VarId vid = PyVarId_AsVarId(vid_obj);
+    Aig aig = PyAig_AsAig(aig_obj);
 
     input_map.insert(make_pair(vid, aig));
   }
 
-  return PyAig_FromAig(self->mMgr->make_logic(expr, input_map));
+  return PyAig_FromAig(self->mMgr->make_logic(*expr_p, input_map));
 }
 
 // make_cofactor 関数
@@ -329,20 +316,9 @@ AigMgr_make_cofactor(AigMgrObject* self,
     return NULL;
   }
 
-  Aig aig;
-  if ( !conv_from_pyobject(obj1, aig) ) {
-    return NULL;
-  }
-
-  VarId vid;
-  if ( !conv_from_pyobject(obj2, vid) ) {
-    return NULL;
-  }
-
-  tPol pol;
-  if ( !conv_from_pyobject(obj3, pol) ) {
-    return NULL;
-  }
+  Aig aig = PyAig_AsAig(obj1);
+  VarId vid = PyVarId_AsVarId(obj2);
+  tPol pol = PyPol_AsPol(obj3);
 
   return PyAig_FromAig(self->mMgr->make_cofactor(aig, vid, pol));
 }
@@ -430,26 +406,23 @@ PyTypeObject PyAigMgr_Type = {
   0,                          /*tp_is_gc*/
 };
 
-// @brief PyObject から AigMgr を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj AigMgr を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が PolObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   AigMgr*& p_obj)
+/// @brief PyObject から AigMgr へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return AigMgr へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+AigMgr*
+PyAigMgr_AsAigMgrPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !AigMgrObject_Check(py_obj) ) {
-    return false;
+  if ( !PyAigMgr_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.AigMgr type is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   AigMgrObject* aigmgr_obj = (AigMgrObject*)py_obj;
 
-  p_obj = aigmgr_obj->mMgr;
-
-  return true;
+  return aigmgr_obj->mMgr;
 }
 
 // AigMgrObject 関係の初期化を行う．

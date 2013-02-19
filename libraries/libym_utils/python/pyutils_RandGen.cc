@@ -3,7 +3,7 @@
 /// @brief RandGen の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -108,7 +108,7 @@ PyObject*
 RandGen_int32(RandGenObject* self,
 	      PyObject* args)
 {
-  return conv_to_pyobject(self->mRandGen->int32());
+  return PyObject_FromYmuint32(self->mRandGen->int32());
 }
 
 // int31 関数
@@ -116,7 +116,7 @@ PyObject*
 RandGen_int31(RandGenObject* self,
 	      PyObject* args)
 {
-  return conv_to_pyobject(self->mRandGen->int31());
+  return PyObject_FromYmuint32(self->mRandGen->int31());
 }
 
 // ulong 関数
@@ -124,7 +124,7 @@ PyObject*
 RandGen_ulong(RandGenObject* self,
 	      PyObject* args)
 {
-  return conv_to_pyobject(self->mRandGen->ulong());
+  return PyObject_FromYmuint64(self->mRandGen->ulong());
 }
 
 // real1 関数
@@ -132,7 +132,7 @@ PyObject*
 RandGen_real1(RandGenObject* self,
 	      PyObject* args)
 {
-  return conv_to_pyobject(self->mRandGen->real1());
+  return PyObject_FromDouble(self->mRandGen->real1());
 }
 
 // real2 関数
@@ -140,7 +140,7 @@ PyObject*
 RandGen_real2(RandGenObject* self,
 	      PyObject* args)
 {
-  return conv_to_pyobject(self->mRandGen->real2());
+  return PyObject_FromDouble(self->mRandGen->real2());
 }
 
 // real3 関数
@@ -148,7 +148,7 @@ PyObject*
 RandGen_real3(RandGenObject* self,
 	      PyObject* args)
 {
-  return conv_to_pyobject(self->mRandGen->real3());
+  return PyObject_FromDouble(self->mRandGen->real3());
 }
 
 // res53 関数
@@ -156,7 +156,7 @@ PyObject*
 RandGen_res53(RandGenObject* self,
 	      PyObject* args)
 {
-  return conv_to_pyobject(self->mRandGen->res53());
+  return PyObject_FromDouble(self->mRandGen->res53());
 }
 
 
@@ -240,26 +240,23 @@ PyTypeObject PyRandGen_Type = {
 // PyObject と RandGen の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から RandGen を取り出す．
+// @brief PyObject から RandGen へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] obj RandGen を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した． py_obj が RandGenObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   RandGen*& obj)
+// @return RandGen へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+RandGen*
+PyRandGen_AsRandGenPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !RandGenObject_Check(py_obj) ) {
-    return false;
+  if ( !PyRandGen_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.RandGen is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   RandGenObject* my_obj = (RandGenObject*)py_obj;
 
-  obj = my_obj->mRandGen;
-
-  return true;
+  return my_obj->mRandGen;
 }
 
 // RandGenObject 関係の初期化を行う．

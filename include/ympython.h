@@ -15,14 +15,6 @@
 
 BEGIN_NAMESPACE_YM
 
-//////////////////////////////////////////////////////////////////////
-// 共通のオブジェクトの宣言
-//////////////////////////////////////////////////////////////////////
-
-/// @brief エラー用のオブジェクト
-extern
-PyObject* PyErrorObject;
-
 
 //////////////////////////////////////////////////////////////////////
 // PyObject への型変換
@@ -31,67 +23,67 @@ PyObject* PyErrorObject;
 /// @brief bool から PyObject を生成する．
 extern
 PyObject*
-conv_to_pyobject(bool val);
+PyObject_FromBool(bool val);
 
 /// @brief ymint8 から PyObject を生成する．
 extern
 PyObject*
-conv_to_pyobject(ymint8 val);
+PyObject_FromYmint8(ymint8 val);
 
 /// @brief ymint16 から PyObject を生成する．
 extern
 PyObject*
-conv_to_pyobject(ymint16 val);
+PyObject_FromYmint16(ymint16 val);
 
 /// @brief ymint32 から PyObject を生成する．
 extern
 PyObject*
-conv_to_pyobject(ymint32 val);
+PyObject_FromYmint32(ymint32 val);
 
 /// @brief ymint64 から PyObject を生成する．
 extern
 PyObject*
-conv_to_pyobject(ymint64 val);
+PyObject_FromYmint64(ymint64 val);
 
 /// @brief ymuint8 から PyObject を生成する．
 extern
 PyObject*
-conv_to_pyobject(ymuint8 val);
+PyObject_FromYmuint8(ymuint8 val);
 
 /// @brief ymuint16 から PyObject を生成する．
 extern
 PyObject*
-conv_to_pyobject(ymuint16 val);
+PyObject_FromYmuint16(ymuint16 val);
 
 /// @brief ymuint32 から PyObject を生成する．
 extern
 PyObject*
-conv_to_pyobject(ymuint32 val);
+PyObject_FromYmuint32(ymuint32 val);
 
 /// @brief ymuint64 から PyObject を生成する．
 extern
 PyObject*
-conv_to_pyobject(ymuint64 val);
+PyObject_FromYmuint64(ymuint64 val);
 
 /// @brief float から PyObject を生成する．
 extern
 PyObject*
-conv_to_pyobject(float val);
+PyObject_FromFloat(float val);
 
 /// @brief double から PyObject を生成する．
 extern
 PyObject*
-conv_to_pyobject(double val);
+PyObject_FromDouble(double val);
 
 /// @brief const char* から PyObject を生成する．
 extern
 PyObject*
-conv_to_pyobject(const char* val);
+PyObject_FromString(const char* val);
 
 /// @brief string から PyObject を生成する．
 extern
 PyObject*
-conv_to_pyobject(const string& val);
+PyObject_FromString(const string& val);
 
 END_NAMESPACE_YM
 

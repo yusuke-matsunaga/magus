@@ -3,7 +3,7 @@
 /// @brief CellCapacitance の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -77,7 +77,7 @@ CellCapacitance_dealloc(CellCapacitanceObject* self)
 // 初期化関数
 int
 CellCapacitance_init(CellCapacitanceObject* self,
-	      PyObject* args)
+		     PyObject* args)
 {
   // args をパーズして初期化を行なう．
   // エラーが起きたらエラーメッセージをセットして -1 を返す．
@@ -104,13 +104,13 @@ CellCapacitance_repr(CellCapacitanceObject* self)
 
   ostringstream buf;
   buf << self->mVal;
-  return conv_to_pyobject(buf.str());
+  return PyObject_FromString(buf.str());
 }
 
 // 比較関数
 int
 CellCapacitance_compare(CellCapacitanceObject* left,
-		 CellCapacitanceObject* right)
+			CellCapacitanceObject* right)
 {
   double diff = left->mVal - right->mVal;
   if ( diff < 0.0 ) {
@@ -125,56 +125,63 @@ CellCapacitance_compare(CellCapacitanceObject* left,
 // value 関数
 PyObject*
 CellCapacitance_value(CellCapacitanceObject* self,
-	       PyObject* args)
+		      PyObject* args)
 {
-  return Py_BuildValue("d", self->mVal);
+  return PyObject_FromDouble(self->mVal);
 }
 
 // add 関数
 PyObject*
 CellCapacitance_add(PyObject* left,
-	     PyObject* right)
+		    PyObject* right)
 {
-  if ( CellCapacitanceObject_Check(left) &&
-       CellCapacitanceObject_Check(right) ) {
-    CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
-    CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
-    return PyCellCapacitance_FromDouble(obj1->mVal + obj2->mVal);
+  if ( !PyCellCapacitance_Check(left) ||
+       !PyCellCapacitance_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellCapacitance");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellCapacitance");
-  return NULL;
+
+  CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
+  CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
+
+  return PyCellCapacitance_FromDouble(obj1->mVal + obj2->mVal);
 }
 
 // sub 関数
 PyObject*
 CellCapacitance_sub(PyObject* left,
-	     PyObject* right)
+		    PyObject* right)
 {
-  if ( CellCapacitanceObject_Check(left) &&
-       CellCapacitanceObject_Check(right) ) {
-    CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
-    CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
-    return PyCellCapacitance_FromDouble(obj1->mVal - obj2->mVal);
+  if ( !PyCellCapacitance_Check(left) ||
+       !PyCellCapacitance_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellCapacitance");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellCapacitance");
-  return NULL;
+
+  CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
+  CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
+
+  return PyCellCapacitance_FromDouble(obj1->mVal - obj2->mVal);
 }
 
 // inplace add 関数
 PyObject*
 CellCapacitance_iadd(PyObject* left,
-	      PyObject* right)
+		     PyObject* right)
 {
-  if ( CellCapacitanceObject_Check(left) &&
-       CellCapacitanceObject_Check(right) ) {
-    CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
-    CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
-    obj1->mVal += obj2->mVal;
-    Py_INCREF(left);
-    return left;
+  if ( !PyCellCapacitance_Check(left) ||
+       !PyCellCapacitance_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellCapacitance");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellCapacitance");
-  return NULL;
+
+  CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
+  CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
+
+  obj1->mVal += obj2->mVal;
+
+  Py_INCREF(left);
+  return left;
 }
 
 // inplace sub 関数
@@ -182,16 +189,19 @@ PyObject*
 CellCapacitance_isub(PyObject* left,
 	      PyObject* right)
 {
-  if ( CellCapacitanceObject_Check(left) &&
-       CellCapacitanceObject_Check(right) ) {
-    CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
-    CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
-    obj1->mVal += obj2->mVal;
-    Py_INCREF(left);
-    return left;
+  if ( !PyCellCapacitance_Check(left) ||
+       !PyCellCapacitance_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellCapacitance");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellCapacitance");
-  return NULL;
+
+  CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
+  CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
+
+  obj1->mVal += obj2->mVal;
+
+  Py_INCREF(left);
+  return left;
 }
 
 
@@ -312,7 +322,7 @@ PyTypeObject PyCellCapacitance_Type = {
   Py_TPFLAGS_DEFAULT,              // tp_flags
 
   // Documentation string
-  "Cell Area",                     // tp_doc
+  "Cell Capacitance",              // tp_doc
 
   // Assigned meaning in release 2.0
 
@@ -363,28 +373,6 @@ PyTypeObject PyCellCapacitance_Type = {
 // PyObject と CellCapacitance の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から CellCapacitance を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj CellCapacitance を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が CellCapacitanceObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   CellCapacitance& obj)
-{
-  // 型のチェック
-  if ( !CellCapacitanceObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  CellCapacitanceObject* my_obj = (CellCapacitanceObject*)py_obj;
-
-  obj = CellCapacitance(my_obj->mVal);
-
-  return true;
-}
-
 // @brief CellCapacitance から CellCapacitanceObject を生成する．
 // @param[in] obj CellCapacitance オブジェクト
 PyObject*
@@ -415,6 +403,44 @@ PyCellCapacitance_FromDouble(double val)
 
   Py_INCREF(py_obj);
   return (PyObject*)py_obj;
+}
+
+// @brief PyObject から CellCapacitance を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return CellCapacitance を返す．
+// @note 変換が失敗したら TypeError を送出し，kCellCapacitanceInf を返す．
+CellCapacitance
+PyCellCapacitance_AsCellCapacitance(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !CellCapacitanceObject_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "cell.CellCapacitance is expected");
+    return kCellCapacitanceInf;
+  }
+
+  // 強制的にキャスト
+  CellCapacitanceObject* my_obj = (CellCapacitanceObject*)py_obj;
+
+  return CellCapacitance(my_obj->mVal);
+}
+
+// @brief PyObject から double を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return doubleを返す．
+// @note 変換が失敗したら TypeError を送出し，0.0 を返す．
+double
+PyCellCapacitance_AsDouble(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !CellCapacitanceObject_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "cell.CellCapacitance is expected");
+    return kCellCapacitanceInf;
+  }
+
+  // 強制的にキャスト
+  CellCapacitanceObject* my_obj = (CellCapacitanceObject*)py_obj;
+
+  return my_obj->mVal;
 }
 
 // CellCapacitanceObject 関係の初期化を行う．

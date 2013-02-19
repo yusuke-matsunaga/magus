@@ -19,7 +19,6 @@
 #include "ym_logic/SatStats.h"
 
 
-#define TIMER_ENABLE 1
 #define VERIFY_MAIMP 0
 
 
@@ -1132,12 +1131,10 @@ void
 DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
 		    DtpgOperator& op)
 {
-#if TIMER_ENABLE
   if ( mTimerEnable ) {
     mTimer.reset();
     mTimer.start();
   }
-#endif
 
   SatSolver solver(mType, mOption, mOutP);
 
@@ -1433,13 +1430,11 @@ DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
   }
   solver.add_clause(odiff);
 
-#if TIMER_ENABLE
   if ( mTimerEnable ) {
     mTimer.stop();
     mCnfTime += mTimer.time();
     ++ mCnfCount;
   }
-#endif
 
   // 個々の故障に対するテスト生成を行なう．
   for (ymuint i = 0; i < nf; ++ i) {
@@ -1497,12 +1492,10 @@ DtpgSat::solve(SatSolver& solver,
     return;
   }
 
-#if TIMER_ENABLE
   if ( mTimerEnable ) {
     mTimer.reset();
     mTimer.start();
   }
-#endif
 
   Bool3 ans = solver.solve(mAssumptions, mModel);
   if ( ans == kB3True ) {
@@ -1528,13 +1521,11 @@ DtpgSat::solve(SatSolver& solver,
 
     op.set_detected(f->safault(), mValList);
 
-#if TIMER_ENABLE
     if ( mTimerEnable ) {
       mTimer.stop();
       mDetTime += mTimer.time();
       ++ mDetCount;
     }
-#endif
   }
   else if ( ans == kB3False ) {
     f->set_untestable();
@@ -1545,13 +1536,11 @@ DtpgSat::solve(SatSolver& solver,
       op.set_untestable(f->safault());
     }
 
-#if TIMER_ENABLE
     if ( mTimerEnable ) {
       mTimer.stop();
       mUndetTime += mTimer.time();
       ++ mUndetCount;
     }
-#endif
   }
 }
 

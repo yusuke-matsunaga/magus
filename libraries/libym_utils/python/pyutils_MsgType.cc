@@ -3,7 +3,7 @@
 /// @brief tMsgType の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -147,7 +147,7 @@ MsgType_str(MsgTypeObject* self)
 {
   ostringstream buf;
   buf << self->mType;
-  return conv_to_pyobject(buf.str());
+  return PyObject_FromString(buf.str());
 }
 
 // bitmask 関数
@@ -156,7 +156,7 @@ MsgType_bitmask(MsgTypeObject* self,
 		PyObject* args)
 {
   ymuint32 val = (1U << static_cast<ymuint32>(self->mType));
-  return conv_to_pyobject(val);
+  return PyObject_FromYmuint32(val);
 }
 
 
@@ -364,27 +364,27 @@ PyMsgType_FromLong(long val)
   return result;
 }
 
-// @brief PyObject から MsgType を取り出す．
+// @brief PyObject から tMsgType を取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] obj MsgType を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が MsgTypeObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   tMsgType& obj)
+// @return tMsgType を返す．
+// @note 変換が失敗したら TypeError を送出し，kMsgError を返す．
+tMsgType
+PyMsgType_AsMsgType(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !MsgTypeObject_Check(py_obj) ) {
-    return false;
+  if ( !PyMsgType_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.MsgType is expected");
+    return kMsgError;
   }
 
   // 強制的にキャスト
   MsgTypeObject* my_obj = (MsgTypeObject*)py_obj;
 
-  obj = my_obj->mType;
-
-  return true;
+  return my_obj->mType;
 }
+
+
+BEGIN_NONAMESPACE
 
 // MsgType の定数を設定する関数
 inline
@@ -408,6 +408,9 @@ new_string(const char* str)
   Py_INCREF(py_obj);
   return py_obj;
 }
+
+END_NONAMESPACE
+
 
 // MsgTypeObject 関係の初期化を行う．
 void

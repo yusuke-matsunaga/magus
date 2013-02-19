@@ -3,7 +3,7 @@
 /// @brief NameMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -114,7 +114,7 @@ PyObject*
 NameMgr_prefix(NameMgrObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->prefix());
+  return PyObject_FromString(self->mBody->prefix());
 }
 
 // suffix 関数
@@ -122,7 +122,7 @@ PyObject*
 NameMgr_suffix(NameMgrObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->suffix());
+  return PyObject_FromString(self->mBody->suffix());
 }
 
 // new_name 関数
@@ -137,7 +137,7 @@ NameMgr_new_name(NameMgrObject* self,
 
   bool add_name = b ? true : false;
   string result = self->mBody->new_name(add_name);
-  return conv_to_pyobject(result);
+  return PyObject_FromString(result);
 }
 
 // add 関数
@@ -299,26 +299,23 @@ PyTypeObject PyNameMgr_Type = {
 // PyObject と NameMgr の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から NameMgr を取り出す．
+// @brief PyObject から NameMgr へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] p_obj NameMgr のポインタを格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が NameMgrObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   NameMgr*& p_obj)
+// @return NameMgr へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+NameMgr*
+PyNameMgr_AsNameMgrPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !NameMgrObject_Check(py_obj) ) {
-    return false;
+  if ( !PyNameMgr_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.NameMgr is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   NameMgrObject* my_obj = (NameMgrObject*)py_obj;
 
-  p_obj = my_obj->mBody;
-
-  return true;
+  return my_obj->mBody;
 }
 
 // NameMgrobject 関係の初期化を行なう．

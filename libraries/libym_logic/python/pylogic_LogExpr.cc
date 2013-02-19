@@ -88,18 +88,21 @@ LogExpr_str(LogExprObject* self)
 {
   ostringstream buf;
   buf << *self->mLogExpr;
-  return conv_to_pyobject(buf.str());
+  return PyObject_FromString(buf.str());
 }
 
 // inv 関数
 PyObject*
 LogExpr_inv(PyObject* left)
 {
-  LogExpr expr;
-  if ( !conv_from_pyobject(left, expr) ) {
+  if ( !PyLogExpr_Check(left) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
     return NULL;
   }
-  return PyLogExpr_FromLogExpr(~expr);
+
+  LogExpr* expr_p = PyLogExpr_AsLogExprPtr(left);
+
+  return PyLogExpr_FromLogExpr(~(*expr_p));
 }
 
 // and 関数
@@ -107,19 +110,15 @@ PyObject*
 LogExpr_and(PyObject* left,
 	    PyObject* right)
 {
-  if ( LogExprObject_Check(left) && LogExprObject_Check(right) ) {
-    LogExpr expr1;
-    LogExpr expr2;
-    if ( !conv_from_pyobject(left, expr1) ) {
-      return NULL;
-    }
-    if ( !conv_from_pyobject(right, expr2) ) {
-      return NULL;
-    }
-    return PyLogExpr_FromLogExpr(expr1 & expr2);
+  if ( !PyLogExpr_Check(left) || !PyLogExpr_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
-  return NULL;
+
+  LogExpr* expr1_p = PyLogExpr_AsLogExprPtr(left);
+  LogExpr* expr2_p = PyLogExpr_AsLogExprPtr(right);
+
+  return PyLogExpr_FromLogExpr(*expr1_p & *expr2_p);
 }
 
 // or 関数
@@ -127,19 +126,15 @@ PyObject*
 LogExpr_or(PyObject* left,
 	   PyObject* right)
 {
-  if ( LogExprObject_Check(left) && LogExprObject_Check(right) ) {
-    LogExpr expr1;
-    LogExpr expr2;
-    if ( !conv_from_pyobject(left, expr1) ) {
-      return NULL;
-    }
-    if ( !conv_from_pyobject(right, expr2) ) {
-      return NULL;
-    }
-    return PyLogExpr_FromLogExpr(expr1 | expr2);
+  if ( !PyLogExpr_Check(left) || !PyLogExpr_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
-  return NULL;
+
+  LogExpr* expr1_p = PyLogExpr_AsLogExprPtr(left);
+  LogExpr* expr2_p = PyLogExpr_AsLogExprPtr(right);
+
+  return PyLogExpr_FromLogExpr(*expr1_p | *expr2_p);
 }
 
 // xor 関数
@@ -147,19 +142,15 @@ PyObject*
 LogExpr_xor(PyObject* left,
 	    PyObject* right)
 {
-  if ( LogExprObject_Check(left) && LogExprObject_Check(right) ) {
-    LogExpr expr1;
-    LogExpr expr2;
-    if ( !conv_from_pyobject(left, expr1) ) {
-      return NULL;
-    }
-    if ( !conv_from_pyobject(right, expr2) ) {
-      return NULL;
-    }
-    return PyLogExpr_FromLogExpr(expr1 ^ expr2);
+  if ( !PyLogExpr_Check(left) || !PyLogExpr_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
-  return NULL;
+
+  LogExpr* expr1_p = PyLogExpr_AsLogExprPtr(left);
+  LogExpr* expr2_p = PyLogExpr_AsLogExprPtr(right);
+
+  return PyLogExpr_FromLogExpr(*expr1_p ^ *expr2_p);
 }
 
 // inplace and 関数
@@ -167,18 +158,18 @@ PyObject*
 LogExpr_iand(PyObject* left,
 	     PyObject* right)
 {
-  if ( LogExprObject_Check(left) && LogExprObject_Check(right) ) {
-    LogExprObject* self = (LogExprObject*)left;
-    LogExpr expr2;
-    if ( !conv_from_pyobject(right, expr2) ) {
-      return NULL;
-    }
-    *self->mLogExpr &= expr2;
-    Py_INCREF(self);
-    return (PyObject*)self;
+  if ( !PyLogExpr_Check(left) || !PyLogExpr_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
-  return NULL;
+
+  LogExpr* expr1_p = PyLogExpr_AsLogExprPtr(left);
+  LogExpr* expr2_p = PyLogExpr_AsLogExprPtr(right);
+
+  *expr1_p &= *expr2_p;
+
+  Py_INCREF(left);
+  return (PyObject*)left;
 }
 
 // inplace xor 関数
@@ -186,18 +177,18 @@ PyObject*
 LogExpr_ixor(PyObject* left,
 	     PyObject* right)
 {
-  if ( LogExprObject_Check(left) && LogExprObject_Check(right) ) {
-    LogExprObject* self = (LogExprObject*)left;
-    LogExpr expr2;
-    if ( !conv_from_pyobject(right, expr2) ) {
-      return NULL;
-    }
-    *self->mLogExpr ^= expr2;
-    Py_INCREF(self);
-    return (PyObject*)self;
+  if ( !PyLogExpr_Check(left) || !PyLogExpr_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
-  return NULL;
+
+  LogExpr* expr1_p = PyLogExpr_AsLogExprPtr(left);
+  LogExpr* expr2_p = PyLogExpr_AsLogExprPtr(right);
+
+  *expr1_p ^= *expr2_p;
+
+  Py_INCREF(left);
+  return (PyObject*)left;
 }
 
 // inplace or 関数
@@ -205,18 +196,18 @@ PyObject*
 LogExpr_ior(PyObject* left,
 	    PyObject* right)
 {
-  if ( LogExprObject_Check(left) && LogExprObject_Check(right) ) {
-    LogExprObject* self = (LogExprObject*)left;
-    LogExpr expr2;
-    if ( !conv_from_pyobject(right, expr2) ) {
-      return NULL;
-    }
-    *self->mLogExpr |= expr2;
-    Py_INCREF(self);
-    return (PyObject*)self;
+  if ( !PyLogExpr_Check(left) || !PyLogExpr_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
-  return NULL;
+
+  LogExpr* expr1_p = PyLogExpr_AsLogExprPtr(left);
+  LogExpr* expr2_p = PyLogExpr_AsLogExprPtr(right);
+
+  *expr1_p |= *expr2_p;
+
+  Py_INCREF(left);
+  return (PyObject*)left;
 }
 
 // make_zero 関数
@@ -250,26 +241,28 @@ LogExpr_make_literal(PyTypeObject* type_obj,
   Literal lit;
   if ( obj2 != NULL ) {
     // obj1 は VarId, obj2 は Pol でなければならない．
-    VarId vid;
-    if ( !conv_from_pyobject(obj1, vid) ) {
-      PyErr_SetString(PyExc_TypeError, "parameter must be logic.VarId");
+    if ( !PyVarId_Check(obj1) || !PyPol_Check(obj2) ) {
+      PyErr_SetString(PyExc_TypeError, "(logic.VarId, logic.Pol) is expected");
       return NULL;
     }
-    tPol pol;
-    if ( !conv_from_pyobject(obj2, pol) ) {
-      PyErr_SetString(PyExc_TypeError, "parameter must be logic.Pol");
-      return NULL;
-    }
+
+    VarId vid = PyVarId_AsVarId(obj1);
+    tPol pol = PyPol_AsPol(obj2);
     lit.set(vid, pol);
   }
-  else if ( !conv_from_pyobject(obj1, lit) ) {
-    VarId vid;
-    if ( !conv_from_pyobject(obj1, vid) ) {
+  else {
+    if ( PyVarId_Check(obj1) ) {
+      VarId vid = PyVarId_AsVarId(obj1);
+      lit.set(vid, kPolPosi);
+    }
+    else if ( PyLiteral_Check(obj1) ) {
+      lit = PyLiteral_AsLiteral(obj1);
+    }
+    else {
       PyErr_SetString(PyExc_TypeError,
-		      "parameter must be logic.Literal or logic.VarId");
+		      "logic.Literal or logic.VarId are expected");
       return NULL;
     }
-    lit.set(vid, kPolPosi);
   }
 
   return PyLogExpr_FromLogExpr(LogExpr::make_literal(lit));
@@ -286,10 +279,9 @@ LogExpr_make_posiliteral(PyTypeObject* type_obj,
 			 &PyVarId_Type, &obj) ) {
     return NULL;
   }
-  VarId vid;
-  if ( !conv_from_pyobject(obj, vid) ) {
-    return NULL;
-  }
+
+  VarId vid = PyVarId_AsVarId(obj);
+
   return PyLogExpr_FromLogExpr(LogExpr::make_posiliteral(vid));
 }
 
@@ -304,10 +296,9 @@ LogExpr_make_negaliteral(PyTypeObject* type_obj,
 			 &PyVarId_Type, &obj) ) {
     return NULL;
   }
-  VarId vid;
-  if ( !conv_from_pyobject(obj, vid) ) {
-    return NULL;
-  }
+
+  VarId vid = PyVarId_AsVarId(obj);
+
   return PyLogExpr_FromLogExpr(LogExpr::make_negaliteral(vid));
 }
 
@@ -325,15 +316,13 @@ LogExpr_make_and(PyTypeObject* type_obj,
   LogExprVector child_list(n);
   for (ymuint i = 0; i < n; ++ i) {
     PyObject* chd_obj = PyList_GET_ITEM(arg_list, i);
-    if ( !LogExprObject_Check(chd_obj) ) {
-      PyErr_SetString(PyExc_TypeError, "LogExprObject is expected");
+    if ( !PyLogExpr_Check(chd_obj) ) {
+      PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
       return NULL;
     }
-    LogExpr chd_expr;
-    if ( !conv_from_pyobject(chd_obj, chd_expr) ) {
-      return NULL;
-    }
-    child_list[i] = chd_expr;
+
+    LogExpr* chd_expr_p = PyLogExpr_AsLogExprPtr(chd_obj);
+    child_list[i] = *chd_expr_p;
   }
   return PyLogExpr_FromLogExpr(LogExpr::make_and(child_list));
 }
@@ -352,15 +341,13 @@ LogExpr_make_or(PyTypeObject* type_obj,
   LogExprVector child_list(n);
   for (ymuint i = 0; i < n; ++ i) {
     PyObject* chd_obj = PyList_GET_ITEM(arg_list, i);
-    if ( !LogExprObject_Check(chd_obj) ) {
-      PyErr_SetString(PyExc_TypeError, "LogExprObject is expected");
+    if ( !PyLogExpr_Check(chd_obj) ) {
+      PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
       return NULL;
     }
-    LogExpr chd_expr;
-    if ( !conv_from_pyobject(chd_obj, chd_expr) ) {
-      return NULL;
-    }
-    child_list[i] = chd_expr;
+
+    LogExpr* chd_expr_p = PyLogExpr_AsLogExprPtr(chd_obj);
+    child_list[i] = *chd_expr_p;
   }
   return PyLogExpr_FromLogExpr(LogExpr::make_or(child_list));
 }
@@ -379,15 +366,13 @@ LogExpr_make_xor(PyTypeObject* type_obj,
   LogExprVector child_list(n);
   for (ymuint i = 0; i < n; ++ i) {
     PyObject* chd_obj = PyList_GET_ITEM(arg_list, i);
-    if ( !LogExprObject_Check(chd_obj) ) {
-      PyErr_SetString(PyExc_TypeError, "LogExprObject is expected");
+    if ( !PyLogExpr_Check(chd_obj) ) {
+      PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
       return NULL;
     }
-    LogExpr chd_expr;
-    if ( !conv_from_pyobject(chd_obj, chd_expr) ) {
-      return NULL;
-    }
-    child_list[i] = chd_expr;
+
+    LogExpr* chd_expr_p = PyLogExpr_AsLogExprPtr(chd_obj);
+    child_list[i] = *chd_expr_p;
   }
   return PyLogExpr_FromLogExpr(LogExpr::make_xor(child_list));
 }
@@ -405,16 +390,11 @@ LogExpr_compose(LogExprObject* self,
 			 &PyLogExpr_Type, &obj2) ) {
     return NULL;
   }
-  VarId vid;
-  if ( !conv_from_pyobject(obj1, vid) ) {
-    return NULL;
-  }
-  LogExpr sub_expr;
-  if ( !conv_from_pyobject(obj2, sub_expr) ) {
-    return NULL;
-  }
 
-  return PyLogExpr_FromLogExpr(self->mLogExpr->compose(vid, sub_expr));
+  VarId vid = PyVarId_AsVarId(obj1);
+  LogExpr* sub_expr_p = PyLogExpr_AsLogExprPtr(obj2);
+
+  return PyLogExpr_FromLogExpr(self->mLogExpr->compose(vid, *sub_expr_p));
 }
 
 // multi_compose 関数
@@ -441,16 +421,9 @@ LogExpr_multi_compose(LogExprObject* self,
       return NULL;
     }
 
-    VarId vid;
-    if ( !conv_from_pyobject(vid_obj, vid) ) {
-      return NULL;
-    }
-
-    LogExpr sub_expr;
-    if ( !conv_from_pyobject(sub_obj, sub_expr) ) {
-      return NULL;
-    }
-    comp_map.insert(make_pair(vid, sub_expr));
+    VarId vid = PyVarId_AsVarId(vid_obj);
+    LogExpr* sub_expr_p = PyLogExpr_AsLogExprPtr(sub_obj);
+    comp_map.insert(make_pair(vid, *sub_expr_p));
   }
 
   return PyLogExpr_FromLogExpr(self->mLogExpr->compose(comp_map));
@@ -480,15 +453,8 @@ LogExpr_remap_var(LogExprObject* self,
       return NULL;
     }
 
-    VarId vid;
-    if ( !conv_from_pyobject(obj1, vid) ) {
-      return NULL;
-    }
-
-    VarId new_vid;
-    if ( !conv_from_pyobject(obj2, new_vid) ) {
-      return NULL;
-    }
+    VarId vid = PyVarId_AsVarId(obj1);
+    VarId new_vid = PyVarId_AsVarId(obj2);
     var_map.insert(make_pair(vid, new_vid));
   }
 
@@ -518,7 +484,8 @@ LogExpr_eval(LogExprObject* self,
 {
   PyObject* obj1 = NULL;
   ymulong mask = ~0UL;
-  if ( !PyArg_ParseTuple(args, "O!|k", &PyTuple_Type, &obj1, &mask) ) {
+  if ( !PyArg_ParseTuple(args, "O!|k",
+			 &PyTuple_Type, &obj1, &mask) ) {
     return NULL;
   }
   ymuint n = PyTuple_GET_SIZE(obj1);
@@ -533,7 +500,7 @@ LogExpr_eval(LogExprObject* self,
   }
   ymulong val = self->mLogExpr->eval(vals, mask);
 
-  return conv_to_pyobject(val);
+  return PyObject_FromYmuint64(val);
 }
 
 // is_zero 関数
@@ -541,7 +508,7 @@ PyObject*
 LogExpr_is_zero(LogExprObject* self,
 		PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_zero());
+  return PyObject_FromBool(self->mLogExpr->is_zero());
 }
 
 // is_one 関数
@@ -549,7 +516,7 @@ PyObject*
 LogExpr_is_one(LogExprObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_one());
+  return PyObject_FromBool(self->mLogExpr->is_one());
 }
 
 // is_constant 関数
@@ -557,7 +524,7 @@ PyObject*
 LogExpr_is_constant(LogExprObject* self,
 		    PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_constant());
+  return PyObject_FromBool(self->mLogExpr->is_constant());
 }
 
 // is_posiliteral 関数
@@ -565,7 +532,7 @@ PyObject*
 LogExpr_is_posiliteral(LogExprObject* self,
 		       PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_posiliteral());
+  return PyObject_FromBool(self->mLogExpr->is_posiliteral());
 }
 
 // is_negaliteral 関数
@@ -573,7 +540,7 @@ PyObject*
 LogExpr_is_negaliteral(LogExprObject* self,
 		       PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_negaliteral());
+  return PyObject_FromBool(self->mLogExpr->is_negaliteral());
 }
 
 // is_literal 関数
@@ -581,7 +548,7 @@ PyObject*
 LogExpr_is_literal(LogExprObject* self,
 		       PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_literal());
+  return PyObject_FromBool(self->mLogExpr->is_literal());
 }
 
 // varid 関数
@@ -597,7 +564,7 @@ PyObject*
 LogExpr_is_and(LogExprObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_and());
+  return PyObject_FromBool(self->mLogExpr->is_and());
 }
 
 // is_or 関数
@@ -605,7 +572,7 @@ PyObject*
 LogExpr_is_or(LogExprObject* self,
 	      PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_or());
+  return PyObject_FromBool(self->mLogExpr->is_or());
 }
 
 // is_xor 関数
@@ -613,7 +580,7 @@ PyObject*
 LogExpr_is_xor(LogExprObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_xor());
+  return PyObject_FromBool(self->mLogExpr->is_xor());
 }
 
 // is_op 関数
@@ -621,7 +588,7 @@ PyObject*
 LogExpr_is_op(LogExprObject* self,
 	      PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_op());
+  return PyObject_FromBool(self->mLogExpr->is_op());
 }
 
 // child_num 関数
@@ -629,7 +596,7 @@ PyObject*
 LogExpr_child_num(LogExprObject* self,
 		  PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->child_num());
+  return PyObject_FromYmuint32(self->mLogExpr->child_num());
 }
 
 // child 関数
@@ -642,6 +609,7 @@ LogExpr_child(LogExprObject* self,
   if ( !PyArg_ParseTuple(args, "k", &pos) ) {
     return NULL;
   }
+
   LogExpr child = self->mLogExpr->child(pos);
 
   return PyLogExpr_FromLogExpr(child);
@@ -668,7 +636,7 @@ PyObject*
 LogExpr_is_simple(LogExprObject* self,
 		  PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_simple());
+  return PyObject_FromBool(self->mLogExpr->is_simple());
 }
 
 // is_simple_and 関数
@@ -676,7 +644,7 @@ PyObject*
 LogExpr_is_simple_and(LogExprObject* self,
 		      PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_simple_and());
+  return PyObject_FromBool(self->mLogExpr->is_simple_and());
 }
 
 // is_simple_or 関数
@@ -684,7 +652,7 @@ PyObject*
 LogExpr_is_simple_or(LogExprObject* self,
 		     PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_simple_or());
+  return PyObject_FromBool(self->mLogExpr->is_simple_or());
 }
 
 // is_simple_xor 関数
@@ -692,7 +660,7 @@ PyObject*
 LogExpr_is_simple_xor(LogExprObject* self,
 		      PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_simple_xor());
+  return PyObject_FromBool(self->mLogExpr->is_simple_xor());
 }
 
 // is_sop 関数
@@ -700,7 +668,7 @@ PyObject*
 LogExpr_is_sop(LogExprObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->is_sop());
+  return PyObject_FromBool(self->mLogExpr->is_sop());
 }
 
 // litnum 関数
@@ -717,28 +685,35 @@ LogExpr_litnum(LogExprObject* self,
 			 &PyPol_Type, &obj2) ) {
     return NULL;
   }
+
   ymuint litnum = 0;
-  if ( obj1 != NULL ) {
-    VarId varid;
-    if ( !conv_from_pyobject(obj1, varid) ) {
-      return NULL;
-    }
-    if ( obj2 != NULL ) {
-      tPol pol;
-      if ( !conv_from_pyobject(obj2, pol) ) {
-	return NULL;
-      }
-      litnum = self->mLogExpr->litnum(varid, pol);
-    }
-    else {
-      litnum = self->mLogExpr->litnum(varid);
-    }
-  }
-  else {
+  if ( obj1 == NULL ) {
     litnum = self->mLogExpr->litnum();
   }
+  else {
+    // obj1 は VarId でなければならない．
+    if ( !PyVarId_Check(obj1) ) {
+      PyErr_SetString(PyExc_TypeError, "logic.VarId is expected");
+      return NULL;
+    }
 
-  return conv_to_pyobject(litnum);
+    VarId varid = PyVarId_AsVarId(obj1);
+    if ( obj2 == NULL ) {
+      litnum = self->mLogExpr->litnum(varid);
+    }
+    else {
+      // obj2 は Pol でなければならない．
+      if ( !PyPol_Check(obj2) ) {
+	PyErr_SetString(PyExc_TypeError, "logic.Pol is expected");
+	return NULL;
+      }
+
+      tPol pol = PyPol_AsPol(obj2);
+      litnum = self->mLogExpr->litnum(varid, pol);
+    }
+  }
+
+  return PyObject_FromYmuint32(litnum);
 }
 
 // input_size 関数
@@ -746,7 +721,7 @@ PyObject*
 LogExpr_input_size(LogExprObject* self,
 		   PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->input_size());
+  return PyObject_FromYmuint32(self->mLogExpr->input_size());
 }
 
 // sop_cubenum 関数
@@ -754,7 +729,7 @@ PyObject*
 LogExpr_sop_cubenum(LogExprObject* self,
 		    PyObject* args)
 {
-  return conv_to_pyobject(self->mLogExpr->sop_cubenum());
+  return PyObject_FromYmuint32(self->mLogExpr->sop_cubenum());
 }
 
 // sop_litnum 関数
@@ -771,28 +746,35 @@ LogExpr_sop_litnum(LogExprObject* self,
 			 &PyPol_Type, &obj2) ) {
     return NULL;
   }
+
   ymuint litnum = 0;
-  if ( obj1 != NULL ) {
-    VarId varid;
-    if ( !conv_from_pyobject(obj1, varid) ) {
-      return NULL;
-    }
-    if ( obj2 != NULL ) {
-      tPol pol;
-      if ( !conv_from_pyobject(obj2, pol) ) {
-	return NULL;
-      }
-      litnum = self->mLogExpr->sop_litnum(varid, pol);
-    }
-    else {
-      litnum = self->mLogExpr->sop_litnum(varid);
-    }
-  }
-  else {
+  if ( obj1 == NULL ) {
     litnum = self->mLogExpr->sop_litnum();
   }
+  else {
+    // obj1 は VarId でなければならない．
+    if ( !PyVarId_Check(obj1) ) {
+      PyErr_SetString(PyExc_TypeError, "logic.VarId is expected");
+      return NULL;
+    }
 
-  return conv_to_pyobject(litnum);
+    VarId varid = PyVarId_AsVarId(obj1);
+    if ( obj2 == NULL ) {
+      litnum = self->mLogExpr->sop_litnum(varid);
+    }
+    else {
+      // obj2 は Pol でなければならない．
+      if ( !PyPol_Check(obj2) ) {
+	PyErr_SetString(PyExc_TypeError, "logic.Pol is expected");
+	return NULL;
+      }
+
+      tPol pol = PyPol_AsPol(obj2);
+      litnum = self->mLogExpr->sop_litnum(varid, pol);
+    }
+  }
+
+  return PyObject_FromYmuint32(litnum);
 }
 
 
@@ -977,28 +959,6 @@ PyTypeObject PyLogExpr_Type = {
   0,                          /*tp_is_gc*/
 };
 
-// @brief PyObject から LogExpr を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj LogExpr を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が PolObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   LogExpr& obj)
-{
-  // 型のチェック
-  if ( !LogExprObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  LogExprObject* logexpr_obj = (LogExprObject*)py_obj;
-
-  obj = *(logexpr_obj->mLogExpr);
-
-  return true;
-}
-
 // @brief LogExpr から PyObject を生成する．
 // @param[in] obj LogExpr オブジェクト
 PyObject*
@@ -1013,6 +973,25 @@ PyLogExpr_FromLogExpr(const LogExpr& obj)
 
   Py_INCREF(logexpr_obj);
   return (PyObject*)logexpr_obj;
+}
+
+// @brief PyObject から LogExpr へのポインタを取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return LogExpr へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+LogExpr*
+PyLogExpr_AsLogExprPtr(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyLogExpr_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.LogExpr is expected");
+    return NULL;
+  }
+
+  // 強制的にキャスト
+  LogExprObject* logexpr_obj = (LogExprObject*)py_obj;
+
+  return logexpr_obj->mLogExpr;
 }
 
 // LogExprObject 関係の初期化

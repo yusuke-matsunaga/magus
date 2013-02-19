@@ -3,7 +3,7 @@
 /// @brief ItvlMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -78,7 +78,7 @@ PyObject*
 ItvlMgr_avail_num(ItvlMgrObject* self,
 		  PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->avail_num());
+  return PyObject_FromYmuint32(self->mBody->avail_num());
 }
 
 // erase 関数
@@ -138,7 +138,7 @@ ItvlMgr_check(ItvlMgrObject* self,
 
   bool result = self->mBody->check(d1, d2);
 
-  return conv_to_pyobject(result);
+  return PyObject_FromBool(result);
 }
 
 // min_id 関数
@@ -146,7 +146,7 @@ PyObject*
 ItvlMgr_min_id(ItvlMgrObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->min_id());
+  return PyObject_FromYmint32(self->mBody->min_id());
 }
 
 // max_id 関数
@@ -154,7 +154,7 @@ PyObject*
 ItvlMgr_max_id(ItvlMgrObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->max_id());
+  return PyObject_FromYmint32(self->mBody->max_id());
 }
 
 // dump 関数
@@ -322,26 +322,23 @@ PyTypeObject PyItvlMgr_Type = {
 // PyObject と ItvlMgr の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から ItvlMgr を取り出す．
+// @brief PyObject から ItvlMgr へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] obj ItvlMgr を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が ItvlMgrObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   ItvlMgr*& p_obj)
+// @return ItvlMgr へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+ItvlMgr*
+PyItvlMgr_AsItvlMgrPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !ItvlMgrObject_Check(py_obj) ) {
-    return false;
+  if ( !PyItvlMgr_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.ItvlMgr is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   ItvlMgrObject* my_obj = (ItvlMgrObject*)py_obj;
 
-  p_obj = my_obj->mBody;
-
-  return true;
+  return my_obj->mBody;
 }
 
 // ItvlMgrObject 関係の初期化を行なう．

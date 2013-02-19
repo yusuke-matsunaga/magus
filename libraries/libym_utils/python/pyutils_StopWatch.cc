@@ -3,7 +3,7 @@
 /// @brief StopWatch の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -177,26 +177,23 @@ PyTypeObject PyStopWatch_Type = {
 };
 
 
-// @brief PyObject から StopWatch を取り出す．
+// @brief PyObject から StopWatch へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] p_obj StopWatch のポインタを格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した． py_obj が StopWatchObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   StopWatch*& p_obj)
+// @return StopWatch へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+StopWatch*
+PyStopWatch_AsStopWatchPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !StopWatchObject_Check(py_obj) ) {
-    return false;
+  if ( !PyStopWatch_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.StopWatch is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   StopWatchObject* my_obj = (StopWatchObject*)py_obj;
 
-  p_obj = &my_obj->mStopWatch;
-
-  return true;
+  return &my_obj->mStopWatch;
 }
 
 // StopWatchObject 関係の初期化を行う．

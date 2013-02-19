@@ -89,7 +89,7 @@ FileBinO_ok(FileBinOObject* self,
   // 奇妙な文
   bool stat = self->mBody;
 
-  return conv_to_pyobject(stat);
+  return PyObject_FromBool(stat);
 }
 
 // open 関数
@@ -366,26 +366,23 @@ PyTypeObject PyFileBinO_Type = {
 // PyObject と FileBinO の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から FileBinO を取り出す．
+// @brief PyObject から FileBinO へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] p_obj FileBinO のポインタを格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が FileBinOObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   FileBinO*& p_obj)
+// @return FileBinO へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+FileBinO*
+PyFileBinO_AsFileBinOPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !FileBinOObject_Check(py_obj) ) {
-    return false;
+  if ( !PyFileBinO_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.FileBinO is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   FileBinOObject* my_obj = (FileBinOObject*)py_obj;
 
-  p_obj = &my_obj->mBody;
-
-  return true;
+  return &my_obj->mBody;
 }
 
 // @brief 引数をパースして FileBinO を取り出す．
@@ -400,11 +397,7 @@ parse_FileBinO(PyObject* args)
     return NULL;
   }
 
-  FileBinO* bp;
-  if ( !conv_from_pyobject(obj, bp) ) {
-    return NULL;
-  }
-
+  FileBinO* bp = PyFileBinO_AsFileBinOPtr(obj);
   return bp;
 }
 

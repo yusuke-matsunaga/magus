@@ -3,7 +3,7 @@
 /// @brief SatSolver の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -100,7 +100,7 @@ PyObject*
 SatSolver_sane(SatSolverObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mSolver->sane());
+  return PyObject_FromBool(self->mSolver->sane());
 }
 
 // new_var 関数
@@ -121,29 +121,31 @@ SatSolver_add_clause(SatSolverObject* self,
   if ( n == 1 ) {
     PyObject* obj0 = PyTuple_GET_ITEM(args, 0);
     if ( !PyList_Check(obj0) ) {
-      PyErr_SetString(PyExc_TypeError, "list of Literal is expected");
+      PyErr_SetString(PyExc_TypeError, "list of logic.Literal is expected");
       return NULL;
     }
     n = PyList_GET_SIZE(obj0);
     lits.resize(n);
     for (ymuint i = 0; i < n; ++ i) {
       PyObject* obj = PyList_GET_ITEM(obj0, i);
-      Literal lit;
-      if ( !conv_from_pyobject(obj, lit) ) {
+      if ( !PyLiteral_Check(obj) ) {
+	PyErr_SetString(PyExc_TypeError, "logic.Literal is expected");
 	return NULL;
       }
-      lits[i] = lit;
+
+      lits[i] = PyLiteral_AsLiteral(obj);
     }
   }
   else {
     lits.resize(n);
     for (ymuint i = 0; i < n; ++ i) {
       PyObject* obj = PyTuple_GET_ITEM(args, i);
-      Literal lit;
-      if ( !conv_from_pyobject(obj, lit) ) {
+      if ( !PyLiteral_Check(obj) ) {
+	PyErr_SetString(PyExc_TypeError, "logic.Literal is expected");
 	return NULL;
       }
-      lits[i] = lit;
+
+      lits[i] = PyLiteral_AsLiteral(obj);
     }
   }
 
@@ -172,11 +174,12 @@ SatSolver_solve(SatSolverObject* self,
     vector<Literal> assumptions(n);
     for (ymuint i = 0; i < n; ++ i) {
       PyObject* item = PyList_GET_ITEM(list_obj, i);
-      Literal lit;
-      if ( !conv_from_pyobject(item, lit) ) {
+      if ( !PyLiteral_Check(item) ) {
+	PyErr_SetString(PyExc_TypeError, "logic.Literal is expected");
 	return NULL;
       }
-      assumptions[i] = lit;
+
+      assumptions[i] = PyLiteral_AsLiteral(item);
     }
     stat = self->mSolver->solve(assumptions, model);
   }
@@ -187,11 +190,11 @@ SatSolver_solve(SatSolverObject* self,
   ymuint n = model.size();
   PyObject* model_obj = PyTuple_New(n);
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* val_obj = conv_to_pyobject(model[i]);
+    PyObject* val_obj = PyBool3_FromBool3(model[i]);
     PyTuple_SetItem(model_obj, i, val_obj);
   }
 
-  PyObject* stat_obj = conv_to_pyobject(stat);
+  PyObject* stat_obj = PyBool3_FromBool3(stat);
   return Py_BuildValue("(OO)", stat_obj, model_obj);
 }
 
@@ -207,17 +210,17 @@ SatSolver_get_stats(SatSolverObject* self,
   // 結果を Python の dictionary に格納する．
   PyObject* dict_obj = PyDict_New();
 
-  PyDict_SetItemString(dict_obj, "restart",            conv_to_pyobject(stats.mRestart));
-  PyDict_SetItemString(dict_obj, "variable_num",       conv_to_pyobject(stats.mVarNum));
-  PyDict_SetItemString(dict_obj, "constr_clause_num",  conv_to_pyobject(stats.mConstrClauseNum));
-  PyDict_SetItemString(dict_obj, "constr_literal_num", conv_to_pyobject(stats.mConstrLitNum));
-  PyDict_SetItemString(dict_obj, "learnt_clause_num",  conv_to_pyobject(stats.mLearntClauseNum));
-  PyDict_SetItemString(dict_obj, "learnt_literal_num", conv_to_pyobject(stats.mLearntLitNum));
-  PyDict_SetItemString(dict_obj, "conflict_num",       conv_to_pyobject(stats.mConflictNum));
-  PyDict_SetItemString(dict_obj, "decision_num",       conv_to_pyobject(stats.mDecisionNum));
-  PyDict_SetItemString(dict_obj, "propagation_num",    conv_to_pyobject(stats.mPropagationNum));
-  PyDict_SetItemString(dict_obj, "conflict_limit",     conv_to_pyobject(stats.mConflictLimit));
-  PyDict_SetItemString(dict_obj, "learnt_limit",       conv_to_pyobject(stats.mLearntLimit));
+  PyDict_SetItemString(dict_obj, "restart",            PyObject_FromYmuint64(stats.mRestart));
+  PyDict_SetItemString(dict_obj, "variable_num",       PyObject_FromYmuint64(stats.mVarNum));
+  PyDict_SetItemString(dict_obj, "constr_clause_num",  PyObject_FromYmuint64(stats.mConstrClauseNum));
+  PyDict_SetItemString(dict_obj, "constr_literal_num", PyObject_FromYmuint64(stats.mConstrLitNum));
+  PyDict_SetItemString(dict_obj, "learnt_clause_num",  PyObject_FromYmuint64(stats.mLearntClauseNum));
+  PyDict_SetItemString(dict_obj, "learnt_literal_num", PyObject_FromYmuint64(stats.mLearntLitNum));
+  PyDict_SetItemString(dict_obj, "conflict_num",       PyObject_FromYmuint64(stats.mConflictNum));
+  PyDict_SetItemString(dict_obj, "decision_num",       PyObject_FromYmuint64(stats.mDecisionNum));
+  PyDict_SetItemString(dict_obj, "propagation_num",    PyObject_FromYmuint64(stats.mPropagationNum));
+  PyDict_SetItemString(dict_obj, "conflict_limit",     PyObject_FromYmuint64(stats.mConflictLimit));
+  PyDict_SetItemString(dict_obj, "learnt_limit",       PyObject_FromYmuint64(stats.mLearntLimit));
   PyDict_SetItemString(dict_obj, "time",               PyUSTime_FromUSTime(stats.mTime));
 
   return dict_obj;
@@ -228,7 +231,7 @@ PyObject*
 SatSolver_variable_num(SatSolverObject* self,
 		       PyObject* args)
 {
-  return conv_to_pyobject(self->mSolver->variable_num());
+  return PyObject_FromYmuint64(self->mSolver->variable_num());
 }
 
 // clause_num 関数
@@ -236,7 +239,7 @@ PyObject*
 SatSolver_clause_num(SatSolverObject* self,
 		     PyObject* args)
 {
-  return conv_to_pyobject(self->mSolver->clause_num());
+  return PyObject_FromYmuint64(self->mSolver->clause_num());
 }
 
 // literal_num 関数
@@ -244,7 +247,7 @@ PyObject*
 SatSolver_literal_num(SatSolverObject* self,
 		      PyObject* args)
 {
-  return conv_to_pyobject(self->mSolver->literal_num());
+  return PyObject_FromYmuint64(self->mSolver->literal_num());
 }
 
 // set_max_conflict 関数
@@ -257,7 +260,7 @@ SatSolver_set_max_conflict(SatSolverObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mSolver->set_max_conflict(val));
+  return PyObject_FromYmuint64(self->mSolver->set_max_conflict(val));
 }
 
 // reg_mesg_handler 関数
@@ -379,26 +382,23 @@ PyTypeObject PySatSolver_Type = {
   0,                          /*tp_is_gc*/
 };
 
-// @brief PyObject から SatSolver を取り出す．
+// @brief PyObject から SatSolver へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] p_obj SatSolver のポインタを格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が SatSolverObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   SatSolver*& p_obj)
+// @return SatSolver へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+SatSolver*
+PySatSolver_AsSatSolverPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !SatSolverObject_Check(py_obj) ) {
-    return false;
+  if ( !PySatSolver_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.SatSolver is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   SatSolverObject* satsolver_obj = (SatSolverObject*)py_obj;
 
-  p_obj = satsolver_obj->mSolver;
-
-  return true;
+  return satsolver_obj->mSolver;
 }
 
 // SatSolverObject 関係の初期化を行う．

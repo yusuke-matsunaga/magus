@@ -3,7 +3,7 @@
 /// @brief FileBinI の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -89,7 +89,7 @@ FileBinI_ok(FileBinIObject* self,
   // 奇妙な文
   bool stat = self->mBody;
 
-  return conv_to_pyobject(stat);
+  return PyObject_FromBool(stat);
 }
 
 // open 関数
@@ -125,7 +125,7 @@ FileBinI_read_8(FileBinIObject* self,
 		PyObject* args)
 {
   ymuint8 val = self->mBody.read_8();
-  return conv_to_pyobject(val);
+  return PyObject_FromYmuint8(val);
 }
 
 // read_16 関数
@@ -134,7 +134,7 @@ FileBinI_read_16(FileBinIObject* self,
 		 PyObject* args)
 {
   ymuint16 val = self->mBody.read_16();
-  return conv_to_pyobject(val);
+  return PyObject_FromYmuint16(val);
 }
 
 // read_32 関数
@@ -143,7 +143,7 @@ FileBinI_read_32(FileBinIObject* self,
 		 PyObject* args)
 {
   ymuint32 val = self->mBody.read_32();
-  return conv_to_pyobject(val);
+  return PyObject_FromYmuint32(val);
 }
 
 // read_64 関数
@@ -151,8 +151,8 @@ PyObject*
 FileBinI_read_64(FileBinIObject* self,
 		 PyObject* args)
 {
-  ymuint8 val = self->mBody.read_64();
-  return conv_to_pyobject(val);
+  ymuint64 val = self->mBody.read_64();
+  return PyObject_FromYmuint64(val);
 }
 
 // read_float 関数
@@ -160,8 +160,8 @@ PyObject*
 FileBinI_read_float(FileBinIObject* self,
 		    PyObject* args)
 {
-  ymuint8 val = self->mBody.read_float();
-  return conv_to_pyobject(val);
+  float val = self->mBody.read_float();
+  return PyObject_FromFloat(val);
 }
 
 // read_double 関数
@@ -169,8 +169,8 @@ PyObject*
 FileBinI_read_double(FileBinIObject* self,
 		     PyObject* args)
 {
-  ymuint8 val = self->mBody.read_double();
-  return conv_to_pyobject(val);
+  double val = self->mBody.read_double();
+  return PyObject_FromDouble(val);
 }
 
 // read_str 関数
@@ -179,7 +179,7 @@ FileBinI_read_str(FileBinIObject* self,
 		  PyObject* args)
 {
   string val = self->mBody.read_str();
-  return conv_to_pyobject(val);
+  return PyObject_FromString(val);
 }
 
 
@@ -317,26 +317,22 @@ PyTypeObject PyFileBinI_Type = {
 // PyObject と FileBinI の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から FileBinI を取り出す．
+// @brief PyObject から FileBinI へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] p_obj FileBinI のポインタを格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が FileBinIObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   FileBinI*& p_obj)
+// @return FileBinI へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+FileBinI*
+PyFileBinI_AsFileBinIPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !FileBinIObject_Check(py_obj) ) {
-    return false;
+  if ( !PyFileBinI_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.FileBinI is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   FileBinIObject* my_obj = (FileBinIObject*)py_obj;
-
-  p_obj = &my_obj->mBody;
-
-  return true;
+  return &my_obj->mBody;
 }
 
 // @brief 引数をパースして FileBinI を取り出す．
@@ -347,14 +343,12 @@ FileBinI*
 parse_FileBinI(PyObject* args)
 {
   PyObject* obj;
-  if ( !PyArg_ParseTuple(args, "O!", &PyFileBinI_Type, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyFileBinI_Type, &obj) ) {
     return NULL;
   }
 
-  FileBinI* bp;
-  if ( !conv_from_pyobject(obj, bp) ) {
-    return NULL;
-  }
+  FileBinI* bp = PyFileBinI_AsFileBinIPtr(obj);
 
   return bp;
 }

@@ -3,7 +3,7 @@
 /// @brief Bool3 の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -107,31 +107,22 @@ PyObject* Py_kB3TrueString = NULL;
 PyObject* Py_kB3FalseString = NULL;
 PyObject* Py_kB3XString = NULL;
 
-// 文字列用オブジェクトが生成されていなければ生成する．
-inline
-PyObject*
-new_string(const char* str,
-	   PyObject*& py_obj)
-{
-  if ( py_obj == NULL ) {
-    py_obj = PyString_InternFromString(str);
-  }
-  Py_INCREF(py_obj);
-  return py_obj;
-}
-
 // repr 関数
 PyObject*
 Bool3_repr(Bool3Object* self)
 {
+  PyObject* obj = NULL;
   switch ( self->mVal ) {
-  case kB3True:  return new_string("true", Py_kB3TrueString);
-  case kB3False: return new_string("false", Py_kB3FalseString);
-  case kB3X:     return new_string("x", Py_kB3XString);
-  default: break;
+  case kB3True:  obj = Py_kB3TrueString; break;
+  case kB3False: obj = Py_kB3FalseString; break;
+  case kB3X:     obj = Py_kB3XString; break;
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
+
+  Py_INCREF(obj);
+  return obj;
 }
 
 // inv 関数
@@ -139,7 +130,7 @@ PyObject*
 Bool3_inv(PyObject* left)
 {
   Bool3Object* b3_obj = (Bool3Object*)left;
-  return conv_to_pyobject(~b3_obj->mVal);
+  return PyBool3_FromBool3(~b3_obj->mVal);
 }
 
 // and 関数
@@ -147,11 +138,9 @@ PyObject*
 Bool3_and(PyObject* left,
 	  PyObject* right)
 {
-  if ( Bool3Object_Check(left) && Bool3Object_Check(right) ) {
-    Bool3Object* b3_obj1 = (Bool3Object*)left;
-    Bool3Object* b3_obj2 = (Bool3Object*)right;
-    Bool3 v1 = b3_obj1->mVal;
-    Bool3 v2 = b3_obj2->mVal;
+  if ( PyBool3_Check(left) && PyBool3_Check(right) ) {
+    Bool3 v1 = PyBool3_AsBool3(left);
+    Bool3 v2 = PyBool3_AsBool3(right);
     Bool3 val = kB3X;
     if ( v1 == kB3True && v2 == kB3True ) {
       val = kB3True;
@@ -159,7 +148,7 @@ Bool3_and(PyObject* left,
     else if ( v1 == kB3False || v2 == kB3False ) {
       val = kB3False;
     }
-    return conv_to_pyobject(val);
+    return PyBool3_FromBool3(val);
   }
   // デフォルトでは数値型の演算を行なう．
   return PyInt_Type.tp_as_number->nb_and(left, right);
@@ -170,11 +159,9 @@ PyObject*
 Bool3_xor(PyObject* left,
 	  PyObject* right)
 {
-  if ( Bool3Object_Check(left) && Bool3Object_Check(right) ) {
-    Bool3Object* b3_obj1 = (Bool3Object*)left;
-    Bool3Object* b3_obj2 = (Bool3Object*)right;
-    Bool3 v1 = b3_obj1->mVal;
-    Bool3 v2 = b3_obj2->mVal;
+  if ( PyBool3_Check(left) && PyBool3_Check(right) ) {
+    Bool3 v1 = PyBool3_AsBool3(left);
+    Bool3 v2 = PyBool3_AsBool3(right);
     Bool3 val = kB3X;
     if ( v1 == kB3True && v2 == kB3False ||
 	 v1 == kB3False && v2 == kB3True ) {
@@ -184,7 +171,7 @@ Bool3_xor(PyObject* left,
 	      v1 == kB3True && v2 == kB3True ) {
       val = kB3False;
     }
-    return conv_to_pyobject(val);
+    return PyBool3_FromBool3(val);
   }
   // デフォルトでは数値型の演算を行なう．
   return PyInt_Type.tp_as_number->nb_xor(left, right);
@@ -195,11 +182,9 @@ PyObject*
 Bool3_or(PyObject* left,
 	 PyObject* right)
 {
-  if ( Bool3Object_Check(left) && Bool3Object_Check(right) ) {
-    Bool3Object* b3_obj1 = (Bool3Object*)left;
-    Bool3Object* b3_obj2 = (Bool3Object*)right;
-    Bool3 v1 = b3_obj1->mVal;
-    Bool3 v2 = b3_obj2->mVal;
+  if ( PyBool3_Check(left) && PyBool3_Check(right) ) {
+    Bool3 v1 = PyBool3_AsBool3(left);
+    Bool3 v2 = PyBool3_AsBool3(right);
     Bool3 val = kB3X;
     if ( v1 == kB3True || v2 == kB3True ) {
       val = kB3True;
@@ -207,7 +192,7 @@ Bool3_or(PyObject* left,
     else if ( v1 == kB3False && v2 == kB3False ) {
       val = kB3False;
     }
-    return conv_to_pyobject(val);
+    return PyBool3_FromBool3(val);
   }
   // デフォルトでは数値型の演算を行なう．
   return PyInt_Type.tp_as_number->nb_or(left, right);
@@ -320,38 +305,19 @@ PyTypeObject PyBool3_Type = {
 // PyObject と Bool3 の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から Bool3 を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj tBool3 を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が Bool3Object ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   Bool3& obj)
-{
-  // 型のチェック
-  if ( !Bool3Object_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  Bool3Object* bool3_obj = (Bool3Object*)py_obj;
-
-  obj = bool3_obj->mVal;
-
-  return true;
-}
-
-// @brief tBool3 から PyObject を生成する．
-// @param[in] obj tBool3 オブジェクト
+/// @brief Bool3 から PyObject を生成する．
+/// @param[in] val Bool3 オブジェクト
 PyObject*
-conv_to_pyobject(Bool3 obj)
+PyBool3_FromBool3(Bool3 val)
 {
   PyObject* result = NULL;
-  switch ( obj ) {
+  switch ( val ) {
   case kB3True:  result = Py_kB3True; break;
   case kB3False: result = Py_kB3False; break;
   case kB3X:     result = Py_kB3X; break;
+  default:
+    PyErr_SetString(PyExc_ValueError, "value is out-of-range");
+    return NULL;
   }
 
   Py_INCREF(result);
@@ -394,7 +360,7 @@ PyBool3_FromString(const char* str)
     return NULL;
   }
 
-  return conv_to_pyobject(b3val);
+  return PyBool3_FromBool3(b3val);
 }
 
 // @brief long から Bool3Object への変換関数
@@ -404,7 +370,26 @@ PyObject*
 PyBool3_FromLong(ymlong val)
 {
   Bool3 b3val = val ? kB3True : kB3False;
-  return conv_to_pyobject(b3val);
+  return PyBool3_FromBool3(b3val);
+}
+
+// @brief PyObject から Bool3 を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return Bool3 を返す．
+// @note 変換が失敗したら TypeError を送出し，kB3X を返す．
+Bool3
+PyBool3_AsBool3(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyBool3_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.Bool3 is expected");
+    return kB3X;
+  }
+
+  // 強制的にキャスト
+  Bool3Object* bool3_obj = (Bool3Object*)py_obj;
+
+  return bool3_obj->mVal;
 }
 
 
@@ -421,6 +406,17 @@ Bool3_set(Bool3Object& b3_obj,
   py_obj = (PyObject*)&b3_obj;
   Py_XINCREF(py_obj);
   PyModule_AddObject(module, name, py_obj);
+}
+
+// 文字列用オブジェクトが生成されていなければ生成する．
+inline
+PyObject*
+new_string(const char* str)
+{
+  PyObject* py_obj = PyString_InternFromString(str);
+
+  Py_INCREF(py_obj);
+  return py_obj;
 }
 
 END_NONAMESPACE
@@ -442,6 +438,11 @@ Bool3Object_init(PyObject* m)
   Bool3_set(Py_kB3TrueStruct,  Py_kB3True,  m, "kB3True");
   Bool3_set(Py_kB3FalseStruct, Py_kB3False, m, "kB3False");
   Bool3_set(Py_kB3XStruct,     Py_kB3X,     m, "kB3X");
+
+  // 定数オブジェクトの名前を表す文字列オブジェクトの生成
+  Py_kB3TrueString = new_string("true");
+  Py_kB3FalseString = new_string("false");
+  Py_kB3XString = new_string("x");
 }
 
 END_NAMESPACE_YM

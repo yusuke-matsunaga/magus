@@ -3,7 +3,7 @@
 /// @brief MStopWatch の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -90,7 +90,7 @@ MStopWatch_change(MStopWatchObject* self,
 
   ymuint old_id = self->mMStopWatch->change(new_id);
 
-  return conv_to_pyobject(old_id);
+  return PyObject_FromYmuint32(old_id);
 }
 
 // cur_id 関数
@@ -98,7 +98,7 @@ PyObject*
 MStopWatch_cur_id(MStopWatchObject* self,
 		  PyObject* args)
 {
-  return conv_to_pyobject(self->mMStopWatch->cur_id());
+  return PyObject_FromYmuint32(self->mMStopWatch->cur_id());
 }
 
 // time 関数
@@ -182,26 +182,23 @@ PyTypeObject PyMStopWatch_Type = {
 };
 
 
-// @brief PyObject から MStopWatch を取り出す．
+// @brief PyObject から MStopWatch へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] p_obj MStopWatch のポインタを格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した． py_obj が MStopWatchObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   MStopWatch*& p_obj)
+// @return MStopWatch へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+MStopWatch*
+PyMStopWatch_AsMStopWatchPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !MStopWatchObject_Check(py_obj) ) {
-    return false;
+  if ( !PyMStopWatch_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.MStopWatch is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   MStopWatchObject* my_obj = (MStopWatchObject*)py_obj;
 
-  p_obj = my_obj->mMStopWatch;
-
-  return true;
+  return my_obj->mMStopWatch;
 }
 
 // MStopWatchObject 関係の初期化を行う．

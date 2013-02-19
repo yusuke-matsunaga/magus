@@ -3,7 +3,7 @@
 /// @brief MsgMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -154,15 +154,8 @@ MsgMgr_put_msg(PyTypeObject* type_obj,
     return NULL;
   }
 
-  FileRegion fr;
-  if ( !conv_from_pyobject(obj1, fr) ) {
-    return NULL;
-  }
-
-  tMsgType type;
-  if ( !conv_from_pyobject(obj2, type) ) {
-    return NULL;
-  }
+  FileRegion fr = PyFileRegion_AsFileRegion(obj1);
+  tMsgType type = PyMsgType_AsMsgType(obj2);
 
   MsgMgr::put_msg(src_file, src_line, fr, type, label, msg);
 

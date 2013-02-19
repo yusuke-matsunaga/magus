@@ -40,17 +40,17 @@ PySatMsgHandler::operator()(const SatStats& stats)
   // stats を Python の dictionary に格納する．
   PyObject* dict_obj = PyDict_New();
 
-  PyDict_SetItemString(dict_obj, "restart",            conv_to_pyobject(stats.mRestart));
-  PyDict_SetItemString(dict_obj, "variable_num",       conv_to_pyobject(stats.mVarNum));
-  PyDict_SetItemString(dict_obj, "constr_clause_num",  conv_to_pyobject(stats.mConstrClauseNum));
-  PyDict_SetItemString(dict_obj, "constr_literal_num", conv_to_pyobject(stats.mConstrLitNum));
-  PyDict_SetItemString(dict_obj, "learnt_clause_num",  conv_to_pyobject(stats.mLearntClauseNum));
-  PyDict_SetItemString(dict_obj, "learnt_literal_num", conv_to_pyobject(stats.mLearntLitNum));
-  PyDict_SetItemString(dict_obj, "conflict_num",       conv_to_pyobject(stats.mConflictNum));
-  PyDict_SetItemString(dict_obj, "decision_num",       conv_to_pyobject(stats.mDecisionNum));
-  PyDict_SetItemString(dict_obj, "propagation_num",    conv_to_pyobject(stats.mPropagationNum));
-  PyDict_SetItemString(dict_obj, "conflict_limit",     conv_to_pyobject(stats.mConflictLimit));
-  PyDict_SetItemString(dict_obj, "learnt_limit",       conv_to_pyobject(stats.mLearntLimit));
+  PyDict_SetItemString(dict_obj, "restart",            PyObject_FromYmuint64(stats.mRestart));
+  PyDict_SetItemString(dict_obj, "variable_num",       PyObject_FromYmuint64(stats.mVarNum));
+  PyDict_SetItemString(dict_obj, "constr_clause_num",  PyObject_FromYmuint64(stats.mConstrClauseNum));
+  PyDict_SetItemString(dict_obj, "constr_literal_num", PyObject_FromYmuint64(stats.mConstrLitNum));
+  PyDict_SetItemString(dict_obj, "learnt_clause_num",  PyObject_FromYmuint64(stats.mLearntClauseNum));
+  PyDict_SetItemString(dict_obj, "learnt_literal_num", PyObject_FromYmuint64(stats.mLearntLitNum));
+  PyDict_SetItemString(dict_obj, "conflict_num",       PyObject_FromYmuint64(stats.mConflictNum));
+  PyDict_SetItemString(dict_obj, "decision_num",       PyObject_FromYmuint64(stats.mDecisionNum));
+  PyDict_SetItemString(dict_obj, "propagation_num",    PyObject_FromYmuint64(stats.mPropagationNum));
+  PyDict_SetItemString(dict_obj, "conflict_limit",     PyObject_FromYmuint64(stats.mConflictLimit));
+  PyDict_SetItemString(dict_obj, "learnt_limit",       PyObject_FromYmuint64(stats.mLearntLimit));
   PyDict_SetItemString(dict_obj, "time",               PyUSTime_FromUSTime(stats.mTime));
 
   PyObject* args = Py_BuildValue("O", dict_obj);

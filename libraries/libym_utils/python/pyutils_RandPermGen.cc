@@ -3,7 +3,7 @@
 /// @brief RandPermGen の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -85,7 +85,7 @@ PyObject*
 RandPermGen_num(RandPermGenObject* self,
 		PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->num());
+  return PyObject_FromYmuint32(self->mBody->num());
 }
 
 // generate 関数
@@ -96,13 +96,11 @@ RandPermGen_generate(RandPermGenObject* self,
   // 引数の形式は
   // - (RandGen)
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &PyRandGen_Type, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyRandGen_Type, &obj) ) {
     return NULL;
   }
-  RandGen* p_rg = NULL;
-  if ( !conv_from_pyobject(obj, p_rg) ) {
-    return NULL;
-  }
+  RandGen* p_rg = PyRandGen_AsRandGenPtr(obj);
 
   self->mBody->generate(*p_rg);
 
@@ -122,7 +120,7 @@ RandPermGen_elem(RandPermGenObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mBody->elem(pos));
+  return PyObject_FromYmuint32(self->mBody->elem(pos));
 }
 
 

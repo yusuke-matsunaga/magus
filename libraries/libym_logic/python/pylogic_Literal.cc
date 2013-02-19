@@ -3,7 +3,7 @@
 /// @brief Literal の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -88,9 +88,7 @@ Literal_init(LiteralObject* self,
   }
   VarId vid;
   if ( vobj != NULL ) {
-    if ( !conv_from_pyobject(vobj, vid) ) {
-      return -1;
-    }
+    vid = PyVarId_AsVarId(vobj);
   }
   else {
     vid = VarId(0);
@@ -98,9 +96,7 @@ Literal_init(LiteralObject* self,
 
   tPol pol = kPolPosi;
   if ( pobj != NULL ) {
-    if ( !conv_from_pyobject(pobj, pol) ) {
-      return -1;
-    }
+    pol = PyPol_AsPol(pobj);
   }
 
   self->mLiteral.set(vid, pol);
@@ -120,7 +116,7 @@ Literal_str(LiteralObject* self)
     buf << "~";
   }
   buf << "V" << vid.val();
-  return conv_to_pyobject(buf.str());
+  return PyObject_FromString(buf.str());
 }
 
 // hash 関数
@@ -143,7 +139,7 @@ PyObject*
 Literal_pol(LiteralObject* self)
 {
   tPol pol = self->mLiteral.pol();
-  return conv_to_pyobject(pol);
+  return PyPol_FromPol(pol);
 }
 
 // set 関数
@@ -160,16 +156,11 @@ Literal_set(LiteralObject* self,
 			 &PyPol_Type, &pobj) ) {
     return NULL;
   }
-  VarId vid;
-  if ( !conv_from_pyobject(vobj, vid) ) {
-    return NULL;
-  }
+  VarId vid = PyVarId_AsVarId(vobj);
 
   tPol pol = kPolPosi;
   if ( pobj != NULL ) {
-    if ( !conv_from_pyobject(pobj, pol) ) {
-      return NULL;
-    }
+    pol = PyPol_AsPol(pobj);
   }
 
   self->mLiteral.set(vid, pol);
@@ -204,7 +195,7 @@ Literal_make_negative(LiteralObject* self)
 PyObject*
 Literal_index(LiteralObject* self)
 {
-  return conv_to_pyobject(self->mLiteral.index());
+  return PyObject_FromYmuint32(self->mLiteral.index());
 }
 
 // LiteralObject のメソッドテーブル
@@ -276,28 +267,6 @@ PyTypeObject PyLiteral_Type = {
   0,                          /*tp_is_gc*/
 };
 
-// @brief PyObject から Literal を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj Literal を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が LiteralObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   Literal& obj)
-{
-  // 型のチェック
-  if ( !LiteralObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  LiteralObject* literal_obj = (LiteralObject*)py_obj;
-
-  obj = literal_obj->mLiteral;
-
-  return true;
-}
-
 // @brief Literal から PyObject を生成する．
 // @param[in] obj Literal オブジェクト
 PyObject*
@@ -312,6 +281,25 @@ PyLiteral_FromLiteral(Literal obj)
 
   Py_INCREF(literal_obj);
   return (PyObject*)literal_obj;
+}
+
+// @brief PyObject から Literal を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return Literal を返す．
+// @note 変換が失敗したら TypeError を送出し，Literal(VarId(0), kPolPosi) を返す．
+Literal
+PyLiteral_AsLiteral(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyLiteral_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.Literal is expected");
+    return Literal();
+  }
+
+  // 強制的にキャスト
+  LiteralObject* literal_obj = (LiteralObject*)py_obj;
+
+  return literal_obj->mLiteral;
 }
 
 // LiteralObject 関係の初期化を行う．

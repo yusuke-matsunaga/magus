@@ -99,7 +99,7 @@ MFSet_find(MFSetObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(y);
+  return PyObject_FromYmuint32(y);
 }
 
 // merge 関数
@@ -122,7 +122,7 @@ MFSet_merge(MFSetObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(z);
+  return PyObject_FromYmuint32(z);
 }
 
 
@@ -245,26 +245,23 @@ PyTypeObject PyMFSet_Type = {
 // PyObject と MFSet の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から MFSet を取り出す．
+// @brief PyObject から MFSet へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] obj MFSet を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が MFSetObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   MFSet*& p_obj)
+// @return MFSet へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+MFSet*
+PyMFSet_AsMFSetPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !MFSetObject_Check(py_obj) ) {
-    return false;
+  if ( !PyMFSet_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.MFSet is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   MFSetObject* my_obj = (MFSetObject*)py_obj;
 
-  p_obj = my_obj->mBody;
-
-  return true;
+  return my_obj->mBody;
 }
 
 // MFSetObject 関係の初期化を行う．

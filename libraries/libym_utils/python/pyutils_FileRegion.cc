@@ -3,7 +3,7 @@
 /// @brief FileRegion の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -77,18 +77,12 @@ FileRegion_init(FileRegionObject* self,
   }
   else if ( n == 1 ) {
     PyObject* obj1 = PyTuple_GET_ITEM(args, 0);
-    if ( FileLocObject_Check(obj1) ) {
-      FileLoc loc;
-      if ( !conv_from_pyobject(obj1, loc) ) {
-	return -1;
-      }
+    if ( PyFileLoc_Check(obj1) ) {
+      FileLoc loc = PyFileLoc_AsFileLoc(obj1);
       self->mFileRegion = FileRegion(loc);
     }
-    else if ( FileRegionObject_Check(obj1) ) {
-      FileRegion fr;
-      if ( !conv_from_pyobject(obj1, fr) ) {
-	return -1;
-      }
+    else if ( PyFileRegion_Check(obj1) ) {
+      FileRegion fr = PyFileRegion_AsFileRegion(obj1);
       self->mFileRegion = fr;
     }
     else {
@@ -98,20 +92,14 @@ FileRegion_init(FileRegionObject* self,
   else if ( n == 2 ) {
     PyObject* obj1 = PyTuple_GET_ITEM(args, 0);
     PyObject* obj2 = PyTuple_GET_ITEM(args, 1);
-    if ( FileLocObject_Check(obj1) && FileLocObject_Check(obj2) ) {
-      FileLoc loc1;
-      FileLoc loc2;
-      if ( !conv_from_pyobject(obj1, loc1) || !conv_from_pyobject(obj2, loc2) ) {
-	return -1;
-      }
+    if ( PyFileLoc_Check(obj1) && PyFileLoc_Check(obj2) ) {
+      FileLoc loc1 = PyFileLoc_AsFileLoc(obj1);
+      FileLoc loc2 = PyFileLoc_AsFileLoc(obj2);
       self->mFileRegion = FileRegion(loc1, loc2);
     }
-    else if ( FileRegionObject_Check(obj1) && FileRegionObject_Check(obj2) ) {
-      FileRegion fr1;
-      FileRegion fr2;
-      if ( !conv_from_pyobject(obj1, fr1) || !conv_from_pyobject(obj2, fr2) ) {
-	return -1;
-      }
+    else if ( PyFileRegion_Check(obj1) && PyFileRegion_Check(obj2) ) {
+      FileRegion fr1 = PyFileRegion_AsFileRegion(obj1);
+      FileRegion fr2 = PyFileRegion_AsFileRegion(obj2);
       self->mFileRegion = FileRegion(fr1, fr2);
     }
     else {
@@ -130,10 +118,7 @@ FileRegion_init(FileRegionObject* self,
 			   &end_line, &end_column) ) {
       return -1;
     }
-    FileInfo info;
-    if ( !conv_from_pyobject(obj1, info) ) {
-      return -1;
-    }
+    FileInfo info = PyFileInfo_AsFileInfo(obj1);
     self->mFileRegion = FileRegion(info, start_line, start_column,
 				   end_line, end_column);
   }
@@ -151,14 +136,8 @@ FileRegion_init(FileRegionObject* self,
 			   &end_line, &end_column) ) {
       return -1;
     }
-    FileInfo info1;
-    if ( !conv_from_pyobject(obj1, info1) ) {
-      return -1;
-    }
-    FileInfo info2;
-    if ( !conv_from_pyobject(obj2, info2) ) {
-      return -1;
-    }
+    FileInfo info1 = PyFileInfo_AsFileInfo(obj1);
+    FileInfo info2 = PyFileInfo_AsFileInfo(obj2);
     self->mFileRegion = FileRegion(info1, start_line, start_column,
 				   info2, end_line, end_column);
   }
@@ -180,15 +159,15 @@ FileRegion_str(FileRegionObject* self)
 {
   ostringstream buf;
   buf << self->mFileRegion;
-  return conv_to_pyobject(buf.str());
+  return PyObject_FromString(buf.str());
 }
 
 // is_valid 関数
 PyObject*
 FileRegion_is_valid(FileRegionObject* self,
-		  PyObject* args)
+		    PyObject* args)
 {
-  return conv_to_pyobject(self->mFileRegion.is_valid());
+  return PyObject_FromBool(self->mFileRegion.is_valid());
 }
 
 // start_loc 関数
@@ -212,7 +191,7 @@ PyObject*
 FileRegion_start_line(FileRegionObject* self,
 		      PyObject* args)
 {
-  return conv_to_pyobject(self->mFileRegion.start_line());
+  return PyObject_FromYmuint32(self->mFileRegion.start_line());
 }
 
 // start_column 関数
@@ -220,7 +199,7 @@ PyObject*
 FileRegion_start_column(FileRegionObject* self,
 			PyObject* args)
 {
-  return conv_to_pyobject(self->mFileRegion.start_column());
+  return PyObject_FromYmuint32(self->mFileRegion.start_column());
 }
 
 // end_loc 関数
@@ -244,7 +223,7 @@ PyObject*
 FileRegion_end_line(FileRegionObject* self,
 		    PyObject* args)
 {
-  return conv_to_pyobject(self->mFileRegion.end_line());
+  return PyObject_FromYmuint32(self->mFileRegion.end_line());
 }
 
 // end_column 関数
@@ -252,7 +231,7 @@ PyObject*
 FileRegion_end_column(FileRegionObject* self,
 		      PyObject* args)
 {
-  return conv_to_pyobject(self->mFileRegion.end_column());
+  return PyObject_FromYmuint32(self->mFileRegion.end_column());
 }
 
 
@@ -339,28 +318,6 @@ PyTypeObject PyFileRegion_Type = {
 // PyObject と FileRegion 間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から FileRegion を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj FileRegion を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が FileRegionObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   FileRegion& obj)
-{
-  // 型のチェック
-  if ( !FileRegionObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  FileRegionObject* my_obj = (FileRegionObject*)py_obj;
-
-  obj = my_obj->mFileRegion;
-
-  return true;
-}
-
 // @brief FileRegion から FileRegionObject を生成する．
 // @param[in] obj FileRegion オブジェクト
 PyObject*
@@ -375,6 +332,25 @@ PyFileRegion_FromFileRegion(const FileRegion& obj)
 
   Py_INCREF(py_obj);
   return (PyObject*)py_obj;
+}
+
+// @brief PyObject から FileRegion を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return FileRegion を返す．
+// @note 変換が失敗したら TypeError を送出し，不正な値を返す．
+FileRegion
+PyFileRegion_AsFileRegion(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyFileRegion_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.FileRegion is expected");
+    return FileRegion();
+  }
+
+  // 強制的にキャスト
+  FileRegionObject* my_obj = (FileRegionObject*)py_obj;
+
+  return my_obj->mFileRegion;
 }
 
 // FileRegionObject 関係の初期化を行う．

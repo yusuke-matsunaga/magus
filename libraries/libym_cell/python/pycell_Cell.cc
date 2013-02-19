@@ -3,7 +3,7 @@
 /// @brief Cell の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -67,7 +67,7 @@ PyObject*
 Cell_id(CellObject* self,
 	PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->id());
+  return PyObject_FromYmuint32(self->mBody->id());
 }
 
 // name 関数
@@ -75,7 +75,7 @@ PyObject*
 Cell_name(CellObject* self,
 	  PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->name());
+  return PyObject_FromString(self->mBody->name());
 }
 
 // area 関数
@@ -251,26 +251,23 @@ PyTypeObject PyCell_Type = {
 // PyObject と Cell の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から Cell を取り出す．
+// @brief PyObject から Cell へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] p_obj Cell のポインタを格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が CellObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   const Cell*& p_obj)
+// @return Cell へんおポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+const Cell*
+PyCell_AsCellPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !CellObject_Check(py_obj) ) {
-    return false;
+  if ( !PyCell_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "cell.Cell is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   CellObject* my_obj = (CellObject*)py_obj;
 
-  p_obj = my_obj->mBody;
-
-  return true;
+  return my_obj->mBody;
 }
 
 // CellObject 関係の初期化を行う．

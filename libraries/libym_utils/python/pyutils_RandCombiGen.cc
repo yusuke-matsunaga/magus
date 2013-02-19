@@ -3,7 +3,7 @@
 /// @brief RandCombiGen の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -86,7 +86,7 @@ PyObject*
 RandCombiGen_num(RandCombiGenObject* self,
 		 PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->num());
+  return PyObject_FromYmuint32(self->mBody->num());
 }
 
 // combi_num 関数
@@ -94,7 +94,7 @@ PyObject*
 RandCombiGen_combi_num(RandCombiGenObject* self,
 		       PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->combi_num());
+  return PyObject_FromYmuint32(self->mBody->combi_num());
 }
 
 // generate 関数
@@ -109,10 +109,7 @@ RandCombiGen_generate(RandCombiGenObject* self,
 			 &PyRandGen_Type, &obj) ) {
     return NULL;
   }
-  RandGen* p_rg;
-  if ( !conv_from_pyobject(obj, p_rg) ) {
-    return NULL;
-  }
+  RandGen* p_rg = PyRandGen_AsRandGenPtr(obj);
 
   self->mBody->generate(*p_rg);
 
@@ -132,7 +129,7 @@ RandCombiGen_elem(RandCombiGenObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mBody->elem(pos));
+  return PyObject_FromYmuint32(self->mBody->elem(pos));
 }
 
 

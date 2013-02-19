@@ -244,28 +244,6 @@ PyTypeObject PyPol_Type = {
 // PyObject と tPol の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から tPol を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj tPol を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が PolObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   tPol& obj)
-{
-  // 型のチェック
-  if ( !PolObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  PolObject* pol_obj = (PolObject*)py_obj;
-
-  obj = pol_obj->mPol;
-
-  return true;
-}
-
 // @brief tPol から PyObject を生成する．
 // @param[in] obj tPol オブジェクト
 PyObject*
@@ -318,7 +296,26 @@ PyPol_FromString(const char* str)
 
   delete [] buf;
 
-  return conv_to_pyobject(pol);
+  return PyPol_FromPol(pol);
+}
+
+// @brief PyObject から tPol を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return tPol を返す．
+// @note 変換が失敗したら TypeError を送出し，kPolPosi を返す．
+tPol
+PyPol_AsPol(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyPol_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.Pol is expected");
+    return kPolPosi;
+  }
+
+  // 強制的にキャスト
+  PolObject* pol_obj = (PolObject*)py_obj;
+
+  return pol_obj->mPol;
 }
 
 

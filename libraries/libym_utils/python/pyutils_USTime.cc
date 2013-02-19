@@ -3,7 +3,7 @@
 /// @brief USTime の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -85,7 +85,7 @@ USTime_repr(USTimeObject* self)
       << self->mTime.sys_time_usec()
       << ", "
       << self->mTime.real_time_usec();
-  return conv_to_pyobject(buf.str());
+  return PyObject_FromString(buf.str());
 }
 
 // str 関数
@@ -94,7 +94,7 @@ USTime_str(USTimeObject* self)
 {
   ostringstream buf;
   buf << self->mTime;
-  return conv_to_pyobject(buf.str());
+  return PyObject_FromString(buf.str());
 }
 
 // set 関数
@@ -120,7 +120,7 @@ PyObject*
 USTime_user_time_usec(USTimeObject* self,
 		      PyObject* args)
 {
-  return conv_to_pyobject(self->mTime.usr_time_usec());
+  return PyObject_FromDouble(self->mTime.usr_time_usec());
 }
 
 // system_time_usec 関数
@@ -128,7 +128,7 @@ PyObject*
 USTime_system_time_usec(USTimeObject* self,
 			PyObject* args)
 {
-  return conv_to_pyobject(self->mTime.sys_time_usec());
+  return PyObject_FromDouble(self->mTime.sys_time_usec());
 }
 
 // real_time_usec 関数
@@ -136,7 +136,7 @@ PyObject*
 USTime_real_time_usec(USTimeObject* self,
 		      PyObject* args)
 {
-  return conv_to_pyobject(self->mTime.real_time_usec());
+  return PyObject_FromDouble(self->mTime.real_time_usec());
 }
 
 // user_time 関数
@@ -144,7 +144,7 @@ PyObject*
 USTime_user_time(USTimeObject* self,
 		 PyObject* args)
 {
-  return conv_to_pyobject(self->mTime.usr_time());
+  return PyObject_FromDouble(self->mTime.usr_time());
 }
 
 // system_time 関数
@@ -152,7 +152,7 @@ PyObject*
 USTime_system_time(USTimeObject* self,
 		   PyObject* args)
 {
-  return conv_to_pyobject(self->mTime.sys_time());
+  return PyObject_FromDouble(self->mTime.sys_time());
 }
 
 // real_time 関数
@@ -160,7 +160,7 @@ PyObject*
 USTime_real_time(USTimeObject* self,
 		 PyObject* args)
 {
-  return conv_to_pyobject(self->mTime.real_time());
+  return PyObject_FromDouble(self->mTime.real_time());
 }
 
 // add 関数
@@ -168,17 +168,11 @@ PyObject*
 USTime_add(PyObject* left,
 	   PyObject* right)
 {
-  USTime time1;
-  if ( !conv_from_pyobject(left, time1) ) {
-    // TODO: エラーメッセージを作る．
-    return NULL;
-  }
+  USTime time1 = PyUSTime_AsUSTime(left);
+  // TODO: エラーメッセージを作る．
 
-  USTime time2;
-  if ( !conv_from_pyobject(right, time2) ) {
-    // TODO: エラーメッセージを作る．
-    return NULL;
-  }
+  USTime time2 = PyUSTime_AsUSTime(right);
+  // TODO: エラーメッセージを作る．
 
   return PyUSTime_FromUSTime(time1 + time2);
 }
@@ -188,15 +182,9 @@ PyObject*
 USTime_sub(PyObject* left,
 	   PyObject* right)
 {
-  USTime time1;
-  if ( !conv_from_pyobject(left, time1) ) {
-    return NULL;
-  }
+  USTime time1 = PyUSTime_AsUSTime(left);
 
-  USTime time2;
-  if ( !conv_from_pyobject(right, time2) ) {
-    return NULL;
-  }
+  USTime time2 = PyUSTime_AsUSTime(right);
 
   return PyUSTime_FromUSTime(time1 - time2);
 }
@@ -206,17 +194,14 @@ PyObject*
 USTime_iadd(PyObject* left,
 	    PyObject* right)
 {
-  if ( !USTimeObject_Check(left) ) {
+  if ( !PyUSTime_Check(left) ) {
     // TODO: エラーメッセージを作る．
     return NULL;
   }
   USTimeObject* obj1 = (USTimeObject*)left;
 
-  USTime time2;
-  if ( !conv_from_pyobject(right, time2) ) {
-    // TODO: エラーメッセージを作る．
-    return NULL;
-  }
+  USTime time2 = PyUSTime_AsUSTime(right);
+  // TODO: エラーメッセージを作る．
 
   obj1->mTime += time2;
 
@@ -229,16 +214,13 @@ PyObject*
 USTime_isub(PyObject* left,
 	    PyObject* right)
 {
-  if ( !USTimeObject_Check(left) ) {
+  if ( !PyUSTime_Check(left) ) {
     // TODO: エラーメッセージを作る．
     return NULL;
   }
   USTimeObject* obj1 = (USTimeObject*)left;
 
-  USTime time2;
-  if ( !conv_from_pyobject(right, time2) ) {
-    return NULL;
-  }
+  USTime time2 = PyUSTime_AsUSTime(right);
 
   obj1->mTime -= time2;
 
@@ -377,28 +359,6 @@ PyTypeObject PyUSTime_Type = {
 // PyObject と USTime 間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から USTime を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj USTime を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が USTimeObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   USTime& obj)
-{
-  // 型のチェック
-  if ( !USTimeObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  USTimeObject* time_obj = (USTimeObject*)py_obj;
-
-  obj = time_obj->mTime;
-
-  return true;
-}
-
 // @brief USTime から USTimeObject を生成する．
 // @param[in] obj USTime オブジェクト
 PyObject*
@@ -413,6 +373,25 @@ PyUSTime_FromUSTime(const USTime& obj)
 
   Py_INCREF(py_obj);
   return (PyObject*)py_obj;
+}
+
+// @brief PyObject から USTime を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return USTime を返す．
+// @note 変換が失敗したら TypeError を送出し，適当な値を返す．
+USTime
+PyUSTime_AsUSTime(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyUSTime_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.USTime is expected");
+    return USTime();
+  }
+
+  // 強制的にキャスト
+  USTimeObject* time_obj = (USTimeObject*)py_obj;
+
+  return time_obj->mTime;
 }
 
 // USTimeObject 関係の初期化を行う．
