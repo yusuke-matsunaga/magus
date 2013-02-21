@@ -283,6 +283,10 @@ AtpgMgr::dtpg(const string& option)
   mTimer.change(old_id);
 }
 
+BEGIN_NONAMESPACE
+
+END_NONAMESPACE
+
 // @brief テストパタン生成を行なう．
 void
 AtpgMgr::dtpg2(const string& option)
@@ -293,6 +297,7 @@ AtpgMgr::dtpg2(const string& option)
   Op1 op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
   bool single = false;
   bool dual = false;
+  bool node = false;
   bool ffr = false;
   bool mffc = false;
   bool all = false;
@@ -304,6 +309,9 @@ AtpgMgr::dtpg2(const string& option)
   }
   else if ( option == "dual" ) {
     dual = true;
+  }
+  else if ( option == "node" ) {
+    node = true;
   }
   else if ( option == "ffr" ) {
     ffr = true;
@@ -392,57 +400,81 @@ AtpgMgr::dtpg2(const string& option)
 	}
       }
     }
-    else if ( ffr ) {
-      vector<ymuint> root_id(nn);
-      vector<vector<const TgNode*> > ffr_list(nn);
-      for (ymuint i = 0; i < mNetwork.output_num2(); ++ i) {
-	const TgNode* node = mNetwork.output(i);
-	root_id[node->gid()] = node->gid();
-	ffr_list[node->gid()].push_back(node);
-      }
-      ymuint nl = mNetwork.logic_num();
-      for (ymuint i = 0; i < nl; ++ i) {
-	const TgNode* node = mNetwork.sorted_logic(nl - i - 1);
-	if ( node->fanout_num() == 1 ) {
-	  root_id[node->gid()] = root_id[node->fanout(0)->gid()];
-	}
-	else {
-	  root_id[node->gid()] = node->gid();
-	}
-	ffr_list[root_id[node->gid()]].push_back(node);
-      }
-      for (ymuint i = 0; i < mNetwork.input_num2(); ++ i) {
-	const TgNode* node = mNetwork.input(i);
-	if ( node->fanout_num() == 1 ) {
-	  root_id[node->gid()] = root_id[node->fanout(0)->gid()];
-	}
-	else {
-	  root_id[node->gid()] = node->gid();
-	}
-	ffr_list[root_id[node->gid()]].push_back(node);
-      }
+    else if ( node ) {
       vector<SaFault*> tmp_list;
       for (ymuint i = 0; i < nn; ++ i) {
 	tmp_list.clear();
-	const vector<const TgNode*>& node_list = ffr_list[i];
-	for (vector<const TgNode*>::const_iterator p = node_list.begin();
-	     p != node_list.end(); ++ p) {
-	  const TgNode* node = *p;
-	  FaultInfo& fi = mFaultArray[node->gid()];
-	  for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
-	       q != fi.mAllFaults.end(); ++ q) {
-	    SaFault* f = *q;
-	    tmp_list.push_back(f);
-	  }
+	FaultInfo& fi = mFaultArray[i];
+	for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
+	     q != fi.mAllFaults.end(); ++ q) {
+	  SaFault* f = *q;
+	  tmp_list.push_back(f);
 	}
 	mDtpg->run(tmp_list, op);
       }
     }
-#if 0
-    else if ( mffc ) {
-      mffc_sub(op);
+    else if ( ffr ) {
+      vector<SaFault*> tmp_list;
+      for (ymuint i = 0; i < nn; ++ i) {
+	const TgNode* node = mNetwork.node(i);
+	if ( node->is_output() || node->fanout_num() > 1 ) {
+	  tmp_list.clear();
+	  dfs_ffr(node, tmp_list);
+	  mDtpg->run(tmp_list, op);
+	}
+      }
     }
+    else if ( mffc ) {
+      mImmDomArray.clear();
+      mImmDomArray.resize(nn, NULL);
+      ymuint nl = mNetwork.logic_num();
+      for (ymuint i = 0; i < nl; ++ i) {
+	const TgNode* node = mNetwork.sorted_logic(nl - i - 1);
+	ymuint nfo = node->fanout_num();
+	if ( nfo > 0 ) {
+	  const TgNode* node0 = node->fanout(0);
+	  for (ymuint j = 1; j < nfo; ++ j) {
+	    node0 = merge(node0, node->fanout(j));
+	    if ( node0 == NULL ) {
+	      break;
+	    }
+	  }
+	  mImmDomArray[node->gid()] = node0;
+	}
+      }
+      ymuint npi = mNetwork.input_num2();
+      for (ymuint i = 0; i < npi; ++ i) {
+	const TgNode* node = mNetwork.input(i);
+	ymuint nfo = node->fanout_num();
+	if ( nfo > 0 ) {
+	  const TgNode* node0 = node->fanout(0);
+	  for (ymuint j = 1; j < nfo; ++ j) {
+	    node0 = merge(node0, node->fanout(j));
+	    if ( node0 == NULL ) {
+	      break;
+	    }
+	  }
+	  mImmDomArray[node->gid()] = node0;
+	}
+      }
+#if 0
+      vector<SaFault*> tmp_list;
+      vector<bool> mark(nn, false);
+      for (ymuint i = 0; i < nn; ++ i) {
+	const TgNode* node = mNetwork.node(i);
+	if ( mImmDomArray[node->gid()] == NULL && !mark[node->gid()] ) {
+	  tmp_list.clear();
+	  dfs_mffc(node, mark, tmp_list);
+	  mDtpg->run(tmp_list, op);
+	}
+      }
+#else
+      vector<vector<ymuint32> > mffc_array(nn);
+      for (ymuint i = 0; i < nn; ++ i) {
+
+      }
 #endif
+    }
   }
 #if 0
   else {
@@ -477,6 +509,71 @@ AtpgMgr::dtpg2(const string& option)
   after_update_faults();
 
   mTimer.change(old_id);
+}
+
+void
+AtpgMgr::dfs_ffr(const TgNode* node,
+		 vector<SaFault*>& flist)
+{
+  FaultInfo& fi = mFaultArray[node->gid()];
+  for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
+       q != fi.mAllFaults.end(); ++ q) {
+    SaFault* f = *q;
+    flist.push_back(f);
+  }
+
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const TgNode* inode = node->fanin(i);
+    if ( inode->fanout_num() == 1 ) {
+      dfs_ffr(inode, flist);
+    }
+  }
+}
+
+void
+AtpgMgr::dfs_mffc(const TgNode* node,
+		  vector<bool>& mark,
+		  vector<SaFault*>& flist)
+{
+  mark[node->gid()] = true;
+
+  FaultInfo& fi = mFaultArray[node->gid()];
+  for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
+       q != fi.mAllFaults.end(); ++ q) {
+    SaFault* f = *q;
+    flist.push_back(f);
+  }
+
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const TgNode* inode = node->fanin(i);
+    if ( mImmDomArray[inode->gid()] != NULL && !mark[inode->gid()] ) {
+      dfs_mffc(inode, mark, flist);
+    }
+  }
+}
+
+const TgNode*
+AtpgMgr::merge(const TgNode* node1,
+	       const TgNode* node2)
+{
+  for ( ; ; ) {
+    if ( node1 == node2 ) {
+      return node1;
+    }
+    if ( node1 == NULL || node2 == NULL ) {
+      return NULL;
+    }
+    ymuint id1 = node1->gid();
+    ymuint id2 = node2->gid();
+    if ( id1 < id2 ) {
+      node1 = mImmDomArray[node1->gid()];
+    }
+    else if ( id1 > id2 ) {
+      node2 = mImmDomArray[node2->gid()];
+    }
+  }
 }
 
 // @brief ファイル読み込みに関わる時間を得る．

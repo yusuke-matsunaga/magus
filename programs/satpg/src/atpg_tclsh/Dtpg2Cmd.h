@@ -67,6 +67,9 @@ private:
   // dual オプションの解析用オブジェクト
   TclPopt* mPoptDual;
 
+  // node オプションの解析用オブジェクト
+  TclPopt* mPoptNode;
+
   // ffr オプションの解析用オブジェクト
   TclPopt* mPoptFFR;
 

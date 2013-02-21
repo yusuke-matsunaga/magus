@@ -39,6 +39,8 @@ Dtpg2Cmd::Dtpg2Cmd(AtpgMgr* mgr) :
 			    "dual mode");
   mPoptDual = new TclPopt(this, "dual",
 			  "dual mode");
+  mPoptNode = new TclPopt(this, "node",
+			  "node mode");
   mPoptFFR = new TclPopt(this, "ffr",
 			  "FFR mode");
   mPoptMFFC = new TclPopt(this, "mffc",
@@ -61,7 +63,7 @@ Dtpg2Cmd::Dtpg2Cmd(AtpgMgr* mgr) :
 			   "enable timer");
 
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptSatRec);
-  new_popt_group(mPoptDual, mPoptFFR, mPoptMFFC, mPoptAll);
+  new_popt_group(mPoptDual, mPoptNode, mPoptFFR, mPoptMFFC, mPoptAll);
 }
 
 // @brief デストラクタ
@@ -132,6 +134,7 @@ Dtpg2Cmd::cmd_proc(TclObjVector& objv)
 
   bool single_mode = mPoptSingle->is_specified();
   bool dual_mode = mPoptDual->is_specified();
+  bool node_mode = mPoptNode->is_specified();
   bool ffr_mode = mPoptFFR->is_specified();
   bool mffc_mode = mPoptMFFC->is_specified();
   bool all_mode = mPoptAll->is_specified();
@@ -163,6 +166,9 @@ Dtpg2Cmd::cmd_proc(TclObjVector& objv)
   }
   else if ( all_mode ) {
     dtpg_option = "all";
+  }
+  else if ( node_mode ) {
+    dtpg_option = "node";
   }
   else if ( dual_mode ) {
     dtpg_option = "dual";

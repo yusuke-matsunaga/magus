@@ -213,6 +213,21 @@ private:
   void
   after_update_faults();
 
+  /// @brief FFR 内の故障リストを作るために DFS を行なう．
+  void
+  dfs_ffr(const TgNode* node,
+	  vector<SaFault*>& flist);
+
+  /// @brief FFR 内の故障リストを作るために DFS を行なう．
+  void
+  dfs_mffc(const TgNode* node,
+	   vector<bool>& mark,
+	   vector<SaFault*>& flist);
+
+  const TgNode*
+  merge(const TgNode* node1,
+	const TgNode* node2);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -247,6 +262,9 @@ private:
 
   // ノード番号をキーにして故障情報を格納する配列
   vector<FaultInfo> mFaultArray;
+
+  // 直近の支配ノードを格納する配列
+  vector<const TgNode*> mImmDomArray;
 
   // 故障リスト
   FaultMgr mFaultMgr;
@@ -323,7 +341,8 @@ AtpgMgr::_tv_list()
 // @brief ネットワークの変更に関するハンドラを登録する．
 inline
 void
-AtpgMgr::reg_network_handler(T2Binder<const TgNetwork&, const vector<SaFault*>&>* handler)
+AtpgMgr::reg_network_handler(T2Binder<const TgNetwork&,
+				      const vector<SaFault*>&>* handler)
 {
   mNtwkBindMgr.reg_binder(handler);
 }

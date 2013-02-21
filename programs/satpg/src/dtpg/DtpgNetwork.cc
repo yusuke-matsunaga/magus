@@ -350,28 +350,19 @@ DtpgNetwork::activate_sub(const vector<bool>& mark)
   for (ymuint i = 0; i < mActNodeNum; ++ i) {
     DtpgNode* node = mActNodeArray[mActNodeNum - i - 1];
     ymuint nfo = node->active_fanout_num();
-    switch ( nfo ) {
-    case 0:
+    if ( nfo == 0 ) {
       assert_cond( node->is_output(), __FILE__, __LINE__);
       node->mImmDom = NULL;
-      break;
-
-    case 1:
-      node->mImmDom = node->active_fanout(0);
-      break;
-
-    default:
-      {
-	DtpgNode* node0 = node->active_fanout(0);
-	for (ymuint i = 1; i < nfo; ++ i) {
-	  node0 = merge(node0, node->active_fanout(i));
-	  if ( node0 == NULL ) {
-	    break;
-	  }
+    }
+    else {
+      DtpgNode* node0 = node->active_fanout(0);
+      for (ymuint i = 1; i < nfo; ++ i) {
+	node0 = merge(node0, node->active_fanout(i));
+	if ( node0 == NULL ) {
+	  break;
 	}
-	node->mImmDom = node0;
       }
-      break;
+      node->mImmDom = node0;
     }
   }
 }
