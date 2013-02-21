@@ -64,8 +64,9 @@ public:
   clear_stats();
 
   /// @brief 統計情報を得る．
+  /// @param[in] stats 結果を格納する構造体
   void
-  get_stats();
+  get_stats(DtpgStats& stats);
 
 
 public:

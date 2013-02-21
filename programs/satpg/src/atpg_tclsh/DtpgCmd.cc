@@ -185,7 +185,8 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   after_update_faults();
 
   if ( print_stats ) {
-    mgr().get_stats();
+    DtpgStats stats;
+    mgr().get_stats(stats);
 #if 0
     const DtpgStats& stats = mDtpg.stats();
     cout << "********** dtpg **********" << endl

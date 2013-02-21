@@ -327,9 +327,9 @@ AtpgMgr::clear_stats()
 
 // @brief 統計情報を得る．
 void
-AtpgMgr::get_stats()
+AtpgMgr::get_stats(DtpgStats& stats)
 {
-  mDtpg->get_stats();
+  mDtpg->get_stats(stats);
 }
 
 // @brief ネットワークをセットした後に呼ぶ関数

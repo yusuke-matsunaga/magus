@@ -82,9 +82,10 @@ public:
   clear_stats();
 
   /// @brief 統計情報を得る．
+  /// @param[in] stats 結果を格納する構造体
   virtual
   void
-  get_stats() const;
+  get_stats(DtpgStats& stats) const;
 
   /// @breif 時間計測を制御する．
   virtual
@@ -334,23 +335,29 @@ private:
   // 時間計測用のタイマー
   StopWatch mTimer;
 
-  // CNF 式を生成する時の時間
-  USTime mCnfTime;
-
   // CNF 式を生成した回数
   ymuint32 mCnfCount;
 
-  // テスト生成が成功した場合の実行時間
-  USTime mDetTime;
+  // CNF 式を生成する時の時間
+  USTime mCnfTime;
 
   // テスト生成が成功した回数
   ymuint32 mDetCount;
 
-  // 冗長故障の場合の実行実験
-  USTime mUndetTime;
+  // テスト生成が成功した場合の実行時間
+  USTime mDetTime;
 
   // 冗長故障の判定回数
   ymuint32 mUndetCount;
+
+  // 冗長故障の場合の実行時間
+  USTime mUndetTime;
+
+  // アボート回数
+  ymuint32 mAbortCount;
+
+  // アボートの場合の実行時間
+  USTime mAbortTime;
 
 };
 

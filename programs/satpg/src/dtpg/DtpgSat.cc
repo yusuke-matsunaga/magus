@@ -855,12 +855,14 @@ DtpgSat::clear_stats()
   mDecisionNum = 0;
   mPropagationNum = 0;
 
-  mCnfTime.set(0.0, 0.0, 0.0);
   mCnfCount = 0;
-  mDetTime.set(0.0, 0.0, 0.0);
+  mCnfTime.set(0.0, 0.0, 0.0);
   mDetCount = 0;
-  mUndetTime.set(0.0, 0.0, 0.0);
+  mDetTime.set(0.0, 0.0, 0.0);
   mUndetCount = 0;
+  mUndetTime.set(0.0, 0.0, 0.0);
+  mAbortCount = 0;
+  mAbortTime.set(0.0, 0.0, 0.0);
 }
 
 
@@ -1542,6 +1544,13 @@ DtpgSat::solve(SatSolver& solver,
       ++ mUndetCount;
     }
   }
+  else { // ans == kB3X つまりアボート
+    if ( mTimerEnable ) {
+      mTimer.stop();
+      mAbortTime += mTimer.time();
+      ++ mAbortCount;
+    }
+  }
 }
 
 // @brief テストパタンを求める．
@@ -1926,39 +1935,31 @@ DtpgSat::clear_node_mark()
 }
 
 // @brief 統計情報を得る．
+// @param[in] stats 結果を格納する構造体
 void
-DtpgSat::get_stats() const
+DtpgSat::get_stats(DtpgStats& stats) const
 {
+  stats.mCnfGenCount = mCnfCount;
+  stats.mCnfGenTime = mCnfTime;
+  stats.mDetCount = mDetCount;
+  stats.mDetTime = mDetTime;
+  stats.mRedCount = mUndetCount;
+  stats.mRedTime = mUndetTime;
+  stats.mAbortCount = mAbortCount;
+  stats.mAbortTime = mAbortTime;
+
   if ( mRunCount > 0 ) {
-    cout << "# of runs:                     " << mRunCount << endl
-	 << "# of problems:                 " << mSatCount << endl
-	 << "Ave. # of restarts:            " << (double) mRestart / mSatCount << endl
-	 << "Ave. # of variables:           " << (double) mVarNum / mRunCount << endl
-	 << "Ave. # of constraint clauses:  " << (double) mConstrClauseNum / mRunCount << endl
-	 << "Ave. # of constraint literals: " << (double) mConstrLitNum / mRunCount << endl
-	 << "Ave. # of learnt clauses:      " << (double) mLearntClauseNum / mRunCount << endl
-	 << "Ave. # of learnt literals:     " << (double) mLearntLitNum / mRunCount << endl
-	 << "Ave. # of conflicts:           " << (double) mConflictNum / mSatCount << endl
-	 << "Ave. # of decisions:           " << (double) mDecisionNum / mSatCount << endl
-	 << "Ave. # of implications:        " << (double) mPropagationNum / mSatCount << endl;
-    if ( mTimerEnable ) {
-      cout << "CPU time for CNF generation: "
-	   << mCnfTime.usr_time_usec() / mCnfCount
-	   << "u usec, "
-	   << mCnfTime.sys_time_usec() / mCnfCount
-	   << "u ssec" << endl
-	   << "CPU time for detected faults:  "
-	   << mDetTime.usr_time_usec() / mDetCount
-	   << "u usec, "
-	   << mDetTime.sys_time_usec() / mDetCount
-	   << "u ssec" << endl
-	   << "CPU time for undetected faults: "
-	   << mUndetTime.usr_time_usec() / mUndetCount
-	 << "u usec, "
-	   << mUndetTime.sys_time_usec() / mUndetCount
-	   << "u ssec"
-	   << endl;
-    }
+    cout << "# of runs:                       " << mRunCount << endl
+	 << "# of problems:                   " << mSatCount << endl
+	 << "Ave. # of restarts:              " << (double) mRestart / mSatCount << endl
+	 << "Ave. # of variables:             " << (double) mVarNum / mRunCount << endl
+	 << "Ave. # of constraint clauses:    " << (double) mConstrClauseNum / mRunCount << endl
+	 << "Ave. # of constraint literals:   " << (double) mConstrLitNum / mRunCount << endl
+	 << "Ave. # of learnt clauses:        " << (double) mLearntClauseNum / mRunCount << endl
+	 << "Ave. # of learnt literals:       " << (double) mLearntLitNum / mRunCount << endl
+	 << "Ave. # of conflicts:             " << (double) mConflictNum / mSatCount << endl
+	 << "Ave. # of decisions:             " << (double) mDecisionNum / mSatCount << endl
+	 << "Ave. # of implications:          " << (double) mPropagationNum / mSatCount << endl;
   }
 }
 
