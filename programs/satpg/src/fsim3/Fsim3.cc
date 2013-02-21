@@ -88,7 +88,7 @@ Fsim3::set_network(const TgNetwork& network,
   // 論理ノードに対応する SimNode の生成
   for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* tgnode = mNetwork->sorted_logic(i);
-    ymuint ni = tgnode->ni();
+    ymuint ni = tgnode->fanin_num();
     vector<SimNode*> inputs(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       const TgNode* itgnode = tgnode->fanin(i);

@@ -102,7 +102,7 @@ Network::set(const TgNetwork& tgnetwork)
   for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* node = tgnetwork.sorted_logic(i);
     Gate* gate =  new_Gate(node);
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
       const TgNode* inode = node->fanin(j);
       Gate* igate = mGateMap[inode->gid()];
@@ -219,7 +219,7 @@ Network::new_Gate(const TgNode* node,
   }
   else {
     tTgGateType type = node->gate_type();
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     switch ( type ) {
     case kTgGateConst0: gate = new GateConst0(id, node); break;
     case kTgGateConst1: gate = new GateConst1(id, node); break;

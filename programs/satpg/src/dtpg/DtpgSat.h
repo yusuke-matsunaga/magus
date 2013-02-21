@@ -76,6 +76,14 @@ public:
   run(DtpgOperator& op,
       const string& option = string());
 
+  /// @brief テスト生成を行なう．
+  /// @param[in] flist 対象の故障リスト
+  /// @param[in] op テスト生成後に呼ばれるファンクター
+  virtual
+  void
+  run(const vector<SaFault*>& flist,
+      DtpgOperator& op);
+
   /// @brief 統計情報をクリアする．
   virtual
   void

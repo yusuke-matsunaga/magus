@@ -272,7 +272,7 @@ TgNetwork::wrap_up()
   // まず，ファンアウト数を数える．
   for (ymuint i = 0; i < nl; ++ i) {
     TgNode* node = mLogicArray[i];
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
       TgNode* inode = node->mFanins[j];
       ++ inode->mFanoutNum;
@@ -301,7 +301,7 @@ TgNetwork::wrap_up()
   // ファンアウトの設定を行う．
   for (ymuint i = 0; i < nl; ++ i) {
     TgNode* node = mLogicArray[i];
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
       TgNode* inode = node->mFanins[j];
       ymuint& pos = inode->mFanoutNum;
@@ -357,7 +357,7 @@ TgNetwork::wrap_up()
       TgNode* fonode = node->fanout_edge(i)->mTo;
       if ( !fonode->is_logic() ) continue;
       if ( visited[fonode->gid()] ) continue;
-      ymuint ni = fonode->ni();
+      ymuint ni = fonode->fanin_num();
       bool ok = true;
       for (ymuint i = 0; i < ni; ++ i) {
 	const TgNode* finode = fonode->fanin(i);
@@ -424,7 +424,7 @@ dump(ostream& s,
     if ( node->is_cplx_logic() ) {
       s << "#" << node->func_id();
     }
-    s << "(" << node->ni() << ")" << endl;
+    s << "(" << node->fanin_num() << ")" << endl;
   }
 
   s << endl
@@ -432,7 +432,7 @@ dump(ostream& s,
   ymuint nn = network.node_num();
   for (ymuint i = 0; i < nn; ++ i) {
     const TgNode* node = network.node(i);
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
       const TgNode* inode = node->fanin(j);
       dump_node(s, inode);

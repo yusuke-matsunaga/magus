@@ -144,7 +144,7 @@ public:
 
   /// @brief 入力数を得る．
   ymuint
-  ni() const;
+  fanin_num() const;
 
   /// @brief pos 番めの入力のノードを得る．
   const TgNode*
@@ -392,7 +392,7 @@ TgNode::name() const
 // @brief 入力数を得る．
 inline
 ymuint
-TgNode::ni() const
+TgNode::fanin_num() const
 {
   return mNi;
 }

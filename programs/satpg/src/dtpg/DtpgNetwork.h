@@ -60,6 +60,10 @@ public:
   DtpgNode*
   node(ymuint id);
 
+  /// @brief TgNode::gid() に対応したノードを得る．
+  DtpgNode*
+  node_from_gid(ymuint gid);
+
   /// @brief 外部入力数を得る．
   ymuint
   input_num();
@@ -93,6 +97,10 @@ public:
   /// @brief 故障リストを得る．
   const vector<DtpgFault*>&
   fault_list();
+
+  /// @brief SaFault に対応する DtpgFault を得る．
+  DtpgFault*
+  conv_fault(SaFault* src_fault);
 
   /// @brief アクティブなノード数を得る．
   ymuint
@@ -233,6 +241,14 @@ ymuint
 DtpgNetwork::node_num()
 {
   return mNodeNum;
+}
+
+// @brief TgNode::gid() に対応したノードを得る．
+inline
+DtpgNode*
+DtpgNetwork::node_from_gid(ymuint gid)
+{
+  return mNodeMap[gid];
 }
 
 // @brief 外部入力数を得る．

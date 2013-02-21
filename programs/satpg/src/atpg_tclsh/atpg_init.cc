@@ -16,6 +16,7 @@
 #include "RtpgCmd.h"
 #include "RfsimCmd.h"
 #include "DtpgCmd.h"
+#include "Dtpg2Cmd.h"
 #include "PrintFaultCmd.h"
 #include "PrintPatCmd.h"
 #include "PrintPatStatsCmd.h"
@@ -51,6 +52,7 @@ atpg_init(Tcl_Interp* interp)
   TclCmdBinder1<RtpgCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::rtpg");
   TclCmdBinder1<RfsimCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::rfsim");
   TclCmdBinder1<DtpgCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::dtpg");
+  TclCmdBinder1<Dtpg2Cmd, AtpgMgr*>::reg(interp, mgr, "::atpg::dtpg2");
 
 
   //////////////////////////////////////////////////////////////////////
@@ -70,6 +72,7 @@ atpg_init(Tcl_Interp* interp)
       << "proc complete(rtpg) { t s e l p m } { return \"\" }" << endl
       << "proc complete(rfsim) { t s e l p m } { return \"\" }" << endl
       << "proc complete(dtpg) { t s e l p m } { return \"\" }" << endl
+      << "proc complete(dtpg2) { t s e l p m } { return \"\" }" << endl
       << "}" << endl
       << "}" << endl;
   string str = buf.str();

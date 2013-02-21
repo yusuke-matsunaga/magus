@@ -177,7 +177,7 @@ gn_gen(const TgNetwork& tgnetwork)
   }
   for (size_t i = 0; i < nl; ++ i) {
     const TgNode* node = tgnetwork.sorted_logic(i);
-    size_t ni = node->ni();
+    size_t ni = node->fanin_num();
     gate_t* gate =  new_gate_t(node->gate_type(), node, ni);
     for (size_t j = 0; j < ni; ++ j) {
       const TgNode* inode = node->fanin(j);

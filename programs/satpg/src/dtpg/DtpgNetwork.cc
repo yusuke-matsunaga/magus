@@ -154,7 +154,7 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
     else if ( FORCE_TO_CPLX_LOGIC ) {
       // デバッグ用のコード
       // 組み込み型のゲートも DtpgPrimit を用いて表す．
-      ymuint ni = tgnode->ni();
+      ymuint ni = tgnode->fanin_num();
       tTgGateType gate_type = tgnode->gate_type();
       ymuint np = ni + 1;
       node->mPrimitiveNum = np;
@@ -567,7 +567,7 @@ DtpgNetwork::make_node(ymuint id,
   node->mPrimitiveNum = 0;
   node->mPrimitiveList = NULL;
 
-  ymuint ni = tgnode->ni();
+  ymuint ni = tgnode->fanin_num();
   node->mFaninNum = ni;
   if ( ni > 0 ) {
     node->mFanins = alloc_nodearray(mAlloc, ni);
@@ -801,6 +801,20 @@ DtpgNetwork::get_mandatory_assignment(DtpgFault* f,
     node->clear_ma_value();
   }
   return false;
+}
+
+// @brief SaFault に対応する DtpgFault を得る．
+DtpgFault*
+DtpgNetwork::conv_fault(SaFault* src_fault)
+{
+  const TgNode* src_node = src_fault->node();
+  DtpgNode* node = mNodeMap[src_node->gid()];
+  if ( src_fault->is_output_fault() ) {
+    return node->output_fault(src_fault->val());
+  }
+  else {
+    return node->input_fault(src_fault->val(), src_fault->pos());
+  }
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

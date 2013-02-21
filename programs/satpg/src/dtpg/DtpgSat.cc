@@ -644,6 +644,29 @@ DtpgSat::run(DtpgOperator& op,
   }
 }
 
+// @brief テスト生成を行なう．
+// @param[in] flist 対象の故障リスト
+// @param[in] op テスト生成後に呼ばれるファンクター
+void
+DtpgSat::run(const vector<SaFault*>& flist,
+	     DtpgOperator& op)
+{
+  ymuint nf = flist.size();
+  vector<DtpgFault*> dtpg_flist;
+  dtpg_flist.reserve(nf);
+  for (ymuint i = 0; i < nf; ++ i) {
+    SaFault* f = flist[i];
+    if ( f != NULL ) {
+      dtpg_flist.push_back(mNetwork->conv_fault(f));
+    }
+  }
+  if ( dtpg_flist.empty() ) {
+    return;
+  }
+
+  dtpg_group(dtpg_flist, op);
+}
+
 // @brief single モードの共通処理
 void
 DtpgSat::single_sub(DtpgOperator& op)

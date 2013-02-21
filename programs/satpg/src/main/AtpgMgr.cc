@@ -11,6 +11,7 @@
 #include "Op1.h"
 #include "ym_networks/TgBlifReader.h"
 #include "ym_networks/TgIscas89Reader.h"
+#include "ym_networks/TgNode.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -270,13 +271,208 @@ AtpgMgr::set_dtpg_timer(bool enable)
 void
 AtpgMgr::dtpg(const string& option)
 {
-
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
   Op1 op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
 
   mDtpg->run(op, option);
+
+  after_update_faults();
+
+  mTimer.change(old_id);
+}
+
+// @brief テストパタン生成を行なう．
+void
+AtpgMgr::dtpg2(const string& option)
+{
+  ymuint old_id = mTimer.cur_id();
+  mTimer.change(TM_DTPG);
+
+  Op1 op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
+  bool single = false;
+  bool dual = false;
+  bool ffr = false;
+  bool mffc = false;
+  bool all = false;
+  bool po = false;
+  bool skip = false;
+
+  if ( option == string() || option == "single" ) {
+    single = true;
+  }
+  else if ( option == "dual" ) {
+    dual = true;
+  }
+  else if ( option == "ffr" ) {
+    ffr = true;
+  }
+  else if ( option == "mffc" ) {
+    mffc = true;
+  }
+  else if ( option == "single_po" ) {
+    single = true;
+    po = true;
+  }
+  else if ( option == "single_po_skip" ) {
+    single = true;
+    po = true;
+    skip = true;
+  }
+  else if ( option == "dual_po" ) {
+    dual = true;
+    po = true;
+  }
+  else if ( option == "dual_po_skip" ) {
+    dual = true;
+    po = true;
+    skip = true;
+
+  }
+  else if ( option == "ffr_po" ) {
+    ffr = true;
+    po = true;
+  }
+  else if ( option == "ffr_po_skip" ) {
+    ffr = true;
+    po = true;
+    skip = true;
+  }
+  else if ( option == "mffc_po" ) {
+    mffc = true;
+    po = true;
+  }
+  else if ( option == "mffc_po_skip" ) {
+    mffc = true;
+    po = true;
+    skip = true;
+  }
+  else if ( option == "all_po" ) {
+    all = true;
+    po = true;
+  }
+  else if ( option == "all_po_skip" ) {
+    all = true;
+    po = true;
+    skip = true;
+  }
+  else {
+    cout << "illegal option " << option << ". ignored" << endl;
+    return;
+  }
+
+  if ( !po ) {
+    mDtpg->set_network(mNetwork, mFaultMgr.remain_list());
+
+    ymuint nn = mNetwork.node_num();
+    if ( single ) {
+      vector<SaFault*> tmp(1);
+      for (ymuint i = 0; i < nn; ++ i) {
+	FaultInfo& fi = mFaultArray[i];
+	ymuint n = fi.mAllFaults.size();
+	for (ymuint j = 0; j < n; ++ j) {
+	  tmp[0] = fi.mAllFaults[j];
+	  mDtpg->run(tmp, op);
+	}
+      }
+    }
+    else if ( dual ) {
+      vector<SaFault*> tmp(2);
+      for (ymuint i = 0; i < nn; ++ i) {
+	FaultInfo& fi = mFaultArray[i];
+	tmp[0] = fi.mOutputFaults[0];
+	tmp[1] = fi.mOutputFaults[1];
+	mDtpg->run(tmp, op);
+	ymuint n = fi.mInputFaults.size() / 2;
+	for (ymuint j = 0; j < n; ++ j) {
+	  tmp[0] = fi.mInputFaults[j * 2 + 0];
+	  tmp[1] = fi.mInputFaults[j * 2 + 1];
+	  mDtpg->run(tmp, op);
+	}
+      }
+    }
+    else if ( ffr ) {
+      vector<ymuint> root_id(nn);
+      vector<vector<const TgNode*> > ffr_list(nn);
+      for (ymuint i = 0; i < mNetwork.output_num2(); ++ i) {
+	const TgNode* node = mNetwork.output(i);
+	root_id[node->gid()] = node->gid();
+	ffr_list[node->gid()].push_back(node);
+      }
+      ymuint nl = mNetwork.logic_num();
+      for (ymuint i = 0; i < nl; ++ i) {
+	const TgNode* node = mNetwork.sorted_logic(nl - i - 1);
+	if ( node->fanout_num() == 1 ) {
+	  root_id[node->gid()] = root_id[node->fanout(0)->gid()];
+	}
+	else {
+	  root_id[node->gid()] = node->gid();
+	}
+	ffr_list[root_id[node->gid()]].push_back(node);
+      }
+      for (ymuint i = 0; i < mNetwork.input_num2(); ++ i) {
+	const TgNode* node = mNetwork.input(i);
+	if ( node->fanout_num() == 1 ) {
+	  root_id[node->gid()] = root_id[node->fanout(0)->gid()];
+	}
+	else {
+	  root_id[node->gid()] = node->gid();
+	}
+	ffr_list[root_id[node->gid()]].push_back(node);
+      }
+      vector<SaFault*> tmp_list;
+      for (ymuint i = 0; i < nn; ++ i) {
+	tmp_list.clear();
+	const vector<const TgNode*>& node_list = ffr_list[i];
+	for (vector<const TgNode*>::const_iterator p = node_list.begin();
+	     p != node_list.end(); ++ p) {
+	  const TgNode* node = *p;
+	  FaultInfo& fi = mFaultArray[node->gid()];
+	  for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
+	       q != fi.mAllFaults.end(); ++ q) {
+	    SaFault* f = *q;
+	    tmp_list.push_back(f);
+	  }
+	}
+	mDtpg->run(tmp_list, op);
+      }
+    }
+#if 0
+    else if ( mffc ) {
+      mffc_sub(op);
+    }
+#endif
+  }
+#if 0
+  else {
+    ymuint no = mNetwork->output_num2();
+    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+      DtpgNode* onode = mNetwork->output2(po_pos);
+      mNetwork->activate_po(onode);
+      if ( single ) {
+	single_sub(op);
+      }
+      else if ( dual ) {
+	dual_sub(op);
+      }
+      else if ( ffr ) {
+	ffr_sub(op);
+      }
+      else if ( mffc ) {
+	mffc_sub(op);
+      }
+      else if ( all ) {
+	all_sub(op);
+      }
+    }
+    if ( skip ) {
+      clear_skip();
+    }
+
+    skip = false;
+  }
+#endif
 
   after_update_faults();
 
@@ -341,6 +537,68 @@ AtpgMgr::after_set_network()
 
   mTvMgr.clear();
   mTvMgr.init(mNetwork.input_num2());
+
+  ymuint nn = mNetwork.node_num();
+  mFaultArray.clear();
+  mFaultArray.resize(nn);
+
+  for (ymuint i = 0; i < nn; ++ i) {
+    const TgNode* node = mNetwork.node(i);
+    FaultInfo& fi = mFaultArray[i];
+    fi.mOutputFaults[0] = NULL;
+    fi.mOutputFaults[1] = NULL;
+    ymuint ni = node->fanin_num();
+    fi.mInputFaults.resize(ni * 2);
+    for (ymuint j = 0; j < ni; ++ j) {
+      fi.mInputFaults[j * 2 + 0] = NULL;
+      fi.mInputFaults[j * 2 + 1] = NULL;
+    }
+  }
+
+  const vector<SaFault*>& flist = mFaultMgr.remain_list();
+  for (vector<SaFault*>::const_iterator p = flist.begin();
+       p != flist.end(); ++ p) {
+    SaFault* f = *p;
+    const TgNode* node = f->node();
+    FaultInfo& fi = mFaultArray[node->gid()];
+    if ( f->is_output_fault() ) {
+      fi.mOutputFaults[f->val()] = f;
+    }
+    else { // f->is_input_fault()
+      fi.mInputFaults[f->pos() * 2 + f->val()] = f;
+    }
+  }
+
+  for (ymuint i = 0; i < nn; ++ i) {
+    FaultInfo& fi = mFaultArray[i];
+    ymuint nf = 0;
+    if ( fi.mOutputFaults[0] != NULL ) {
+      ++ nf;
+    }
+    if ( fi.mOutputFaults[1] != NULL ) {
+      ++ nf;
+    }
+    ymuint n = fi.mInputFaults.size();
+    for (ymuint j = 0; j < n; ++ j) {
+      if ( fi.mInputFaults[j] != NULL ) {
+	++ nf;
+      }
+    }
+    if ( nf > 0 ) {
+      fi.mAllFaults.reserve(nf);
+    }
+    if ( fi.mOutputFaults[0] != NULL ) {
+      fi.mAllFaults.push_back(fi.mOutputFaults[0]);
+    }
+    if ( fi.mOutputFaults[1] != NULL ) {
+      fi.mAllFaults.push_back(fi.mOutputFaults[1]);
+    }
+    for (ymuint j = 0; j < n; ++ j) {
+      if ( fi.mInputFaults[j] != NULL ) {
+	fi.mAllFaults.push_back(fi.mInputFaults[j]);
+      }
+    }
+  }
 
   mDtpg->set_network(mNetwork, mFaultMgr.remain_list());
 
