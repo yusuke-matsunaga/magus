@@ -82,10 +82,6 @@ public:
   DtpgPrimitive*
   primitive(ymuint pos) const;
 
-  /// @brief subnode タイプの時 true を返す．
-  bool
-  is_subnode() const;
-
   /// @brief ファンイン数を得る．
   ymuint
   fanin_num() const;
@@ -436,7 +432,7 @@ inline
 tTgGateType
 DtpgNode::gate_type() const
 {
-  assert_cond( is_logic() || is_subnode(), __FILE__, __LINE__);
+  assert_cond( is_logic(), __FILE__, __LINE__);
   return static_cast<tTgGateType>((mTypeId >> 2) & 15U);
 }
 
@@ -454,14 +450,6 @@ ymuint
 DtpgNode::primitive_num() const
 {
   return mPrimitiveNum;
-}
-
-// @brief subnode タイプの時 true を返す．
-inline
-bool
-DtpgNode::is_subnode() const
-{
-  return (mTypeId & 3U) == 0U;
 }
 
 // @brief ファンイン数を得る．
