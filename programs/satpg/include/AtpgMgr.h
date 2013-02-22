@@ -226,7 +226,8 @@ private:
 
   const TgNode*
   merge(const TgNode* node1,
-	const TgNode* node2);
+	const TgNode* node2,
+	const vector<ymuint32>& order);
 
 
 private:

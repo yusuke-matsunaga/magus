@@ -319,6 +319,9 @@ AtpgMgr::dtpg2(const string& option)
   else if ( option == "mffc" ) {
     mffc = true;
   }
+  else if ( option == "all" ) {
+    all = true;
+  }
   else if ( option == "single_po" ) {
     single = true;
     po = true;
@@ -425,31 +428,40 @@ AtpgMgr::dtpg2(const string& option)
       }
     }
     else if ( mffc ) {
-      mImmDomArray.clear();
-      mImmDomArray.resize(nn, NULL);
-      ymuint nl = mNetwork.logic_num();
-      for (ymuint i = 0; i < nl; ++ i) {
-	const TgNode* node = mNetwork.sorted_logic(nl - i - 1);
-	ymuint nfo = node->fanout_num();
-	if ( nfo > 0 ) {
-	  const TgNode* node0 = node->fanout(0);
-	  for (ymuint j = 1; j < nfo; ++ j) {
-	    node0 = merge(node0, node->fanout(j));
-	    if ( node0 == NULL ) {
-	      break;
-	    }
-	  }
-	  mImmDomArray[node->gid()] = node0;
-	}
-      }
+      vector<ymuint32> order(nn);
+      vector<const TgNode*> node_list(nn);
       ymuint npi = mNetwork.input_num2();
+      ymuint nl = mNetwork.logic_num();
+      ymuint npo = mNetwork.output_num2();
+      ymuint pos = 0;
       for (ymuint i = 0; i < npi; ++ i) {
 	const TgNode* node = mNetwork.input(i);
+	node_list[pos] = node;
+	order[node->gid()] = pos;
+	++ pos;
+      }
+      for (ymuint i = 0; i < nl; ++ i) {
+	const TgNode* node = mNetwork.sorted_logic(i);
+	node_list[pos] = node;
+	order[node->gid()] = pos;
+	++ pos;
+      }
+      for (ymuint i = 0; i < npo; ++ i) {
+	const TgNode* node = mNetwork.output(i);
+	node_list[pos] = node;
+	order[node->gid()] = pos;
+	++ pos;
+      }
+
+      mImmDomArray.clear();
+      mImmDomArray.resize(nn, NULL);
+      for (ymuint i = 0; i < nn; ++ i) {
+	const TgNode* node = node_list[nn - i - 1];
 	ymuint nfo = node->fanout_num();
 	if ( nfo > 0 ) {
 	  const TgNode* node0 = node->fanout(0);
 	  for (ymuint j = 1; j < nfo; ++ j) {
-	    node0 = merge(node0, node->fanout(j));
+	    node0 = merge(node0, node->fanout(j), order);
 	    if ( node0 == NULL ) {
 	      break;
 	    }
@@ -457,23 +469,29 @@ AtpgMgr::dtpg2(const string& option)
 	  mImmDomArray[node->gid()] = node0;
 	}
       }
-#if 0
+
       vector<SaFault*> tmp_list;
       vector<bool> mark(nn, false);
       for (ymuint i = 0; i < nn; ++ i) {
 	const TgNode* node = mNetwork.node(i);
-	if ( mImmDomArray[node->gid()] == NULL && !mark[node->gid()] ) {
+	if ( mImmDomArray[node->gid()] == NULL ) {
 	  tmp_list.clear();
 	  dfs_mffc(node, mark, tmp_list);
 	  mDtpg->run(tmp_list, op);
 	}
       }
-#else
-      vector<vector<ymuint32> > mffc_array(nn);
+    }
+    else if ( all ) {
+      vector<SaFault*> tmp_list;
       for (ymuint i = 0; i < nn; ++ i) {
-
+	FaultInfo& fi = mFaultArray[i];
+	for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
+	     q != fi.mAllFaults.end(); ++ q) {
+	  SaFault* f = *q;
+	  tmp_list.push_back(f);
+	}
       }
-#endif
+      mDtpg->run(tmp_list, op);
     }
   }
 #if 0
@@ -556,7 +574,8 @@ AtpgMgr::dfs_mffc(const TgNode* node,
 
 const TgNode*
 AtpgMgr::merge(const TgNode* node1,
-	       const TgNode* node2)
+	       const TgNode* node2,
+	       const vector<ymuint32>& order)
 {
   for ( ; ; ) {
     if ( node1 == node2 ) {
@@ -565,8 +584,8 @@ AtpgMgr::merge(const TgNode* node1,
     if ( node1 == NULL || node2 == NULL ) {
       return NULL;
     }
-    ymuint id1 = node1->gid();
-    ymuint id2 = node2->gid();
+    ymuint id1 = order[node1->gid()];
+    ymuint id2 = order[node2->gid()];
     if ( id1 < id2 ) {
       node1 = mImmDomArray[node1->gid()];
     }
