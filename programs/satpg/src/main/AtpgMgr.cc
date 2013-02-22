@@ -533,19 +533,19 @@ void
 AtpgMgr::dfs_ffr(const TgNode* node,
 		 vector<SaFault*>& flist)
 {
-  FaultInfo& fi = mFaultArray[node->gid()];
-  for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
-       q != fi.mAllFaults.end(); ++ q) {
-    SaFault* f = *q;
-    flist.push_back(f);
-  }
-
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     const TgNode* inode = node->fanin(i);
     if ( inode->fanout_num() == 1 ) {
       dfs_ffr(inode, flist);
     }
+  }
+
+  FaultInfo& fi = mFaultArray[node->gid()];
+  for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
+       q != fi.mAllFaults.end(); ++ q) {
+    SaFault* f = *q;
+    flist.push_back(f);
   }
 }
 
@@ -703,16 +703,16 @@ AtpgMgr::after_set_network()
     if ( nf > 0 ) {
       fi.mAllFaults.reserve(nf);
     }
+    for (ymuint j = 0; j < n; ++ j) {
+      if ( fi.mInputFaults[j] != NULL ) {
+	fi.mAllFaults.push_back(fi.mInputFaults[j]);
+      }
+    }
     if ( fi.mOutputFaults[0] != NULL ) {
       fi.mAllFaults.push_back(fi.mOutputFaults[0]);
     }
     if ( fi.mOutputFaults[1] != NULL ) {
       fi.mAllFaults.push_back(fi.mOutputFaults[1]);
-    }
-    for (ymuint j = 0; j < n; ++ j) {
-      if ( fi.mInputFaults[j] != NULL ) {
-	fi.mAllFaults.push_back(fi.mInputFaults[j]);
-      }
     }
   }
 

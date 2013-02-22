@@ -660,10 +660,10 @@ DtpgSat::run(const vector<SaFault*>& flist,
       dtpg_flist.push_back(mNetwork->conv_fault(f));
     }
   }
+
   if ( dtpg_flist.empty() ) {
     return;
   }
-
   dtpg_group(dtpg_flist, op);
 }
 
@@ -753,10 +753,55 @@ DtpgSat::dual_sub(DtpgOperator& op)
   }
 }
 
+BEGIN_NONAMESPACE
+
+void
+add_faults(DtpgNode* node,
+	   vector<DtpgFault*>& fault_list)
+{
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    DtpgFault* f0 = node->input_fault(0, i);
+    if ( f0 != NULL && !f0->is_skip() ) {
+      fault_list.push_back(f0);
+    }
+    DtpgFault* f1 = node->input_fault(1, i);
+    if ( f1 != NULL && !f1->is_skip() ) {
+      fault_list.push_back(f1);
+    }
+  }
+  DtpgFault* f0 = node->output_fault(0);
+  if ( f0 != NULL && !f0->is_skip() ) {
+    fault_list.push_back(f0);
+  }
+  DtpgFault* f1 = node->output_fault(1);
+  if ( f1 != NULL && !f1->is_skip() ) {
+    fault_list.push_back(f1);
+  }
+}
+
+void
+dfs_ffr(DtpgNode* node,
+	vector<DtpgFault*>& fault_list)
+{
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    DtpgNode* inode = node->fanin(i);
+    if ( inode->active_fanout_num() == 1 ) {
+      dfs_ffr(inode, fault_list);
+    }
+  }
+
+  add_faults(node, fault_list);
+}
+
+END_NONAMESPACE
+
 // @brief ffr モードの共通処理
 void
 DtpgSat::ffr_sub(DtpgOperator& op)
 {
+#if 0
   vector<DtpgFFR*> ffr_list;
   mNetwork->get_ffr_list(ffr_list);
   for (vector<DtpgFFR*>::const_iterator p = ffr_list.begin();
@@ -765,6 +810,21 @@ DtpgSat::ffr_sub(DtpgOperator& op)
     ffr_mode(ffr, op);
     delete ffr;
   }
+#else
+  vector<DtpgFault*> tmp_list;
+  ymuint n = mNetwork->active_node_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    DtpgNode* node = mNetwork->active_node(i);
+    if ( node->is_output() || node->active_fanout_num() > 1 ) {
+      tmp_list.clear();
+      dfs_ffr(node, tmp_list);
+      if ( tmp_list.empty() ) {
+	continue;
+      }
+      dtpg_group(tmp_list, op);
+    }
+  }
+#endif
 }
 
 // @brief mffc モードの共通処理
@@ -789,26 +849,11 @@ DtpgSat::all_sub(DtpgOperator& op)
   ymuint n = mNetwork->active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
     DtpgNode* node = mNetwork->active_node(i);
-    for (int val = 0; val < 2; ++ val) {
-      DtpgFault* f = node->output_fault(val);
-      if ( f != NULL && !f->is_skip() ) {
-	flist.push_back(f);
-      }
-    }
-    ymuint ni = node->fanin_num();
-    for (ymuint i = 0; i < ni; ++ i) {
-      for (int val = 0; val < 2; ++ val) {
-	DtpgFault* f = node->input_fault(val, i);
-	if ( f != NULL && !f->is_skip() ) {
-	  flist.push_back(f);
-	}
-      }
-    }
+    add_faults(node, flist);
   }
   if ( flist.empty() ) {
     return;
   }
-
   dtpg_group(flist, op);
 }
 
@@ -823,27 +868,12 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
   for (vector<DtpgNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     DtpgNode* node = *p;
-    for (int val = 0; val < 2; ++ val) {
-      DtpgFault* f = node->output_fault(val);
-      if ( f != NULL && !f->is_skip() ) {
-	flist.push_back(f);
-      }
-    }
-    ymuint ni = node->fanin_num();
-    for (ymuint i = 0; i < ni; ++ i) {
-      for (int val = 0; val < 2; ++ val) {
-	DtpgFault* f = node->input_fault(val, i);
-	if ( f != NULL && !f->is_skip() ) {
-	  flist.push_back(f);
-	}
-      }
-    }
+    add_faults(node, flist);
   }
 
   if ( flist.empty() ) {
     return;
   }
-
   dtpg_group(flist, op);
 }
 
@@ -1156,6 +1186,10 @@ void
 DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
 		    DtpgOperator& op)
 {
+  if ( flist.empty() ) {
+    return;
+  }
+
   if ( mTimerEnable ) {
     mTimer.reset();
     mTimer.start();
