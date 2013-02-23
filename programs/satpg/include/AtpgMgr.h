@@ -205,6 +205,20 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
+  void
+  dtpg_po(bool single,
+	  bool dual,
+	  bool node,
+	  bool ffr,
+	  bool all);
+
+  void
+  dtpg_po_skip(bool single,
+	       bool dual,
+	       bool node,
+	       bool ffr,
+	       bool all);
+
   /// @brief ネットワークが変更された時に呼ばれる関数
   void
   after_set_network();

@@ -10,8 +10,8 @@
 
 
 #include "SaFault.h"
-#include <ym_networks/TgNetwork.h>
-#include <ym_networks/TgNode.h>
+#include "ym_networks/TgNetwork.h"
+#include "ym_networks/TgNode.h"
 #include <sstream>
 
 

@@ -618,8 +618,7 @@ DtpgSat::run(DtpgOperator& op,
   else {
     ymuint no = mNetwork->output_num2();
     for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-      DtpgNode* onode = mNetwork->output2(po_pos);
-      mNetwork->activate_po(onode);
+      mNetwork->activate_po(po_pos);
       if ( single ) {
 	single_sub(op);
       }
@@ -664,6 +663,8 @@ DtpgSat::run(const vector<SaFault*>& flist,
   if ( dtpg_flist.empty() ) {
     return;
   }
+
+  mNetwork->activate_all();
   dtpg_group(dtpg_flist, op);
 }
 
@@ -676,9 +677,23 @@ DtpgSat::run(const vector<SaFault*>& flist,
 	     ymuint po_pos,
 	     DtpgOperator& op)
 {
-  mNetwork->activate_po(mNetwork->output(po_pos));
-  run(flist, op);
-  mNetwork->activate_all();
+  mNetwork->activate_po(po_pos);
+
+  ymuint nf = flist.size();
+  vector<DtpgFault*> dtpg_flist;
+  dtpg_flist.reserve(nf);
+  for (ymuint i = 0; i < nf; ++ i) {
+    SaFault* f = flist[i];
+    if ( f != NULL ) {
+      dtpg_flist.push_back(mNetwork->conv_fault(f));
+    }
+  }
+
+  if ( dtpg_flist.empty() ) {
+    return;
+  }
+
+  dtpg_group(dtpg_flist, op);
 }
 
 // @brief single モードの共通処理

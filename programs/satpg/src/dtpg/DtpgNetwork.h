@@ -42,9 +42,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 一つの外部出力に関係するノードのみをアクティブにする．
-  /// @param[in] onode 外部出力ノード
+  /// @param[in] po_pos 出力番号
   void
-  activate_po(DtpgNode* onode);
+  activate_po(ymuint po_pos);
 
   /// @brief 全てのノードをアクティブにする．
   void
@@ -218,6 +218,10 @@ private:
 
   // アクティブなノードの配列
   DtpgNode** mActNodeArray;
+
+  // 直前の activate_po() の出力番号
+  // 直前が activate_all() だった場合には output_num2()
+  ymuint32 mLastPoPos;
 
   // 関数の個数
   ymuint32 mFuncNum;

@@ -259,34 +259,41 @@ DtpgNetwork::~DtpgNetwork()
 }
 
 // @brief 一つの外部出力に関係するノードのみをアクティブにする．
-// @param[in] onode 外部出力ノード
+// @param[in] po_pos 出力番号
 void
-DtpgNetwork::activate_po(DtpgNode* onode)
+DtpgNetwork::activate_po(ymuint po_pos)
 {
-  assert_cond( onode->is_output(), __FILE__, __LINE__);
+  if ( mLastPoPos != po_pos ) {
+    mLastPoPos = po_pos;
 
-  vector<bool> mark(mNodeNum, false);
+    vector<bool> mark(mNodeNum, false);
 
-  // pos 番めの出力から到達可能なノードにマークをつける．
-  dfs(onode, mark);
+    // po_pos 番めの出力から到達可能なノードにマークをつける．
+    DtpgNode* onode = output(po_pos);
+    dfs(onode, mark);
 
-  activate_sub(mark);
+    activate_sub(mark);
+  }
 }
 
 // @brief 全てのノードをアクティブにする．
 void
 DtpgNetwork::activate_all()
 {
-  // といっても PO に到達できないノードは除外する．
+  if ( mLastPoPos != output_num2() ) {
+    mLastPoPos = output_num2();
 
-  vector<bool> mark(mNodeNum, false);
+    // といっても PO に到達できないノードは除外する．
 
-  // すべての PO から到達可能なノードにマークをつける．
-  for (ymuint i = 0; i < mOutputNum + mFFNum; ++ i) {
-    dfs(output(i), mark);
+    vector<bool> mark(mNodeNum, false);
+
+    // すべての PO から到達可能なノードにマークをつける．
+    for (ymuint i = 0; i < mOutputNum + mFFNum; ++ i) {
+      dfs(output(i), mark);
+    }
+
+    activate_sub(mark);
   }
-
-  activate_sub(mark);
 }
 
 

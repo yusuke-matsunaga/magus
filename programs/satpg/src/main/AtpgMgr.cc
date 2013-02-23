@@ -401,22 +401,42 @@ AtpgMgr::dtpg2(const string& option)
 	FaultInfo& fi = mFaultArray[i];
 	ymuint n = fi.mAllFaults.size();
 	for (ymuint j = 0; j < n; ++ j) {
-	  tmp[0] = fi.mAllFaults[j];
-	  mDtpg->run(tmp, op);
+	  SaFault* f = fi.mAllFaults[j];
+	  if ( f->status() == kFsUndetected ) {
+	    tmp[0] = f;
+	    mDtpg->run(tmp, op);
+	  }
 	}
       }
     }
     else if ( dual ) {
-      vector<SaFault*> tmp(2);
+      vector<SaFault*> tmp;
+      tmp.reserve(2);
       for (ymuint i = 0; i < nn; ++ i) {
 	FaultInfo& fi = mFaultArray[i];
-	tmp[0] = fi.mOutputFaults[0];
-	tmp[1] = fi.mOutputFaults[1];
-	mDtpg->run(tmp, op);
+	tmp.clear();
+	SaFault* f0 = fi.mOutputFaults[0];
+	if ( f0->status() == kFsUndetected ) {
+	  tmp.push_back(f0);
+	}
+	SaFault* f1 = fi.mOutputFaults[1];
+	if ( f1->status() == kFsUndetected ) {
+	  tmp.push_back(f1);
+	}
+	if ( !tmp.empty() ) {
+	  mDtpg->run(tmp, op);
+	}
 	ymuint n = fi.mInputFaults.size() / 2;
 	for (ymuint j = 0; j < n; ++ j) {
-	  tmp[0] = fi.mInputFaults[j * 2 + 0];
-	  tmp[1] = fi.mInputFaults[j * 2 + 1];
+	  tmp.clear();
+	  SaFault* f0 = fi.mInputFaults[j * 2 + 0];
+	  if ( f0->status() == kFsUndetected ) {
+	    tmp.push_back(f0);
+	  }
+	  SaFault* f1 = fi.mInputFaults[j * 2 + 1];
+	  if ( f1->status() == kFsUndetected ) {
+	    tmp.push_back(f1);
+	  }
 	  mDtpg->run(tmp, op);
 	}
       }
@@ -429,9 +449,13 @@ AtpgMgr::dtpg2(const string& option)
 	for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
 	     q != fi.mAllFaults.end(); ++ q) {
 	  SaFault* f = *q;
-	  tmp_list.push_back(f);
+	  if ( f->status() == kFsUndetected ) {
+	    tmp_list.push_back(f);
+	  }
 	}
-	mDtpg->run(tmp_list, op);
+	if ( !tmp_list.empty() ) {
+	  mDtpg->run(tmp_list, op);
+	}
       }
     }
     else if ( ffr ) {
@@ -441,7 +465,9 @@ AtpgMgr::dtpg2(const string& option)
 	if ( node->is_output() || node->fanout_num() > 1 ) {
 	  tmp_list.clear();
 	  dfs_ffr(node, tmp_list);
-	  mDtpg->run(tmp_list, op);
+	  if ( !tmp_list.empty() ) {
+	    mDtpg->run(tmp_list, op);
+	  }
 	}
       }
     }
@@ -495,7 +521,9 @@ AtpgMgr::dtpg2(const string& option)
 	if ( mImmDomArray[node->gid()] == NULL ) {
 	  tmp_list.clear();
 	  dfs_mffc(node, mark, tmp_list);
-	  mDtpg->run(tmp_list, op);
+	  if ( !tmp_list.empty() ) {
+	    mDtpg->run(tmp_list, op);
+	  }
 	}
       }
     }
@@ -506,115 +534,320 @@ AtpgMgr::dtpg2(const string& option)
 	for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
 	     q != fi.mAllFaults.end(); ++ q) {
 	  SaFault* f = *q;
-	  tmp_list.push_back(f);
+	  if ( f->status() == kFsUndetected ) {
+	    tmp_list.push_back(f);
+	  }
 	}
       }
-      mDtpg->run(tmp_list, op);
+      if ( !tmp_list.empty() ) {
+	mDtpg->run(tmp_list, op);
+      }
     }
   }
+  else if ( skip ) {
+    dtpg_po_skip(single, dual, node, ffr, mffc | all);
+  }
   else {
-    vector<SaFault*> skip_faults;
-    Op2 op(mFaultMgr, skip_faults, mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
-    ymuint nn = mNetwork.node_num();
-    ymuint no = mNetwork.output_num2();
-    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-      vector<bool> mark(nn, false);
-      vector<const TgNode*> node_list;
-      node_list.reserve(nn);
-      const TgNode* node = mNetwork.output(po_pos);
-      mark_tfi(node, node_list, mark);
-
-      skip_faults.clear();
-
-      if ( single ) {
-	vector<SaFault*> tmp(1);
-	for (vector<const TgNode*>::iterator p = node_list.begin();
-	     p != node_list.end(); ++ p) {
-	  const TgNode* node = *p;
-	  FaultInfo& fi = mFaultArray[node->gid()];
-	  ymuint n = fi.mAllFaults.size();
-	  for (ymuint j = 0; j < n; ++ j) {
-	    SaFault* f = fi.mAllFaults[j];
-	    tmp[0] = f;
-	    mDtpg->run(tmp, po_pos, op);
-	  }
-	}
-      }
-      else if ( dual ) {
-	vector<SaFault*> tmp(2);
-	for (vector<const TgNode*>::iterator p = node_list.begin();
-	     p != node_list.end(); ++ p) {
-	  const TgNode* node = *p;
-	  FaultInfo& fi = mFaultArray[node->gid()];
-	  SaFault* f0 = fi.mOutputFaults[0];
-	  SaFault* f1 = fi.mOutputFaults[1];
-	  tmp[0] = f0;
-	  tmp[1] = f1;
-	  mDtpg->run(tmp, op);
-	  ymuint n = fi.mInputFaults.size() / 2;
-	  for (ymuint j = 0; j < n; ++ j) {
-	    SaFault* f0 = fi.mInputFaults[j * 2 + 0];
-	    SaFault* f1 = fi.mInputFaults[j * 2 + 1];
-	    tmp[0] = f0;
-	    tmp[1] = f1;
-	    mDtpg->run(tmp, po_pos, op);
-	  }
-	}
-      }
-      else if ( node ) {
-	vector<SaFault*> tmp_list;
-	for (vector<const TgNode*>::iterator p = node_list.begin();
-	     p != node_list.end(); ++ p) {
-	  const TgNode* node = *p;
-	  FaultInfo& fi = mFaultArray[node->gid()];
-	  tmp_list.clear();
-	  for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
-	       q != fi.mAllFaults.end(); ++ q) {
-	    SaFault* f = *q;
-	    tmp_list.push_back(f);
-	  }
-	  mDtpg->run(tmp_list, po_pos, op);
-	}
-      }
-      else if ( ffr ) {
-	vector<SaFault*> tmp_list;
-	for (vector<const TgNode*>::iterator p = node_list.begin();
-	     p != node_list.end(); ++ p) {
-	  const TgNode* node = *p;
-	  if ( node->is_output() || node->fanout_num() > 1 ) {
-	    tmp_list.clear();
-	    dfs_ffr(node, tmp_list);
-	    mDtpg->run(tmp_list, po_pos, op);
-	  }
-	}
-      }
-      else if ( mffc || all ) {
-	vector<SaFault*> tmp_list;
-	for (vector<const TgNode*>::iterator p = node_list.begin();
-	     p != node_list.end(); ++ p) {
-	  const TgNode* node = *p;
-	  FaultInfo& fi = mFaultArray[node->gid()];
-	  for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
-	       q != fi.mAllFaults.end(); ++ q) {
-	    SaFault* f = *q;
-	    tmp_list.push_back(f);
-	  }
-	}
-	mDtpg->run(tmp_list, po_pos, op);
-      }
-    }
-    if ( skip ) {
-      for (vector<SaFault*>::iterator p = skip_faults.begin();
-	   p != skip_faults.end(); ++ p) {
-	SaFault* f = *p;
-	mFaultMgr.set_status(f, kFsUndetected);
-      }
-    }
+    dtpg_po(single, dual, node, ffr, mffc | all);
   }
 
   after_update_faults();
 
   mTimer.change(old_id);
+}
+
+
+BEGIN_NONAMESPACE
+
+struct Lt
+{
+  bool
+  operator()(const pair<ymuint, ymuint>& left,
+	     const pair<ymuint, ymuint>& right)
+  {
+    return left.first < right.first;
+  }
+
+};
+
+END_NONAMESPACE
+
+
+void
+AtpgMgr::dtpg_po(bool single,
+		 bool dual,
+		 bool node,
+		 bool ffr,
+		 bool all)
+{
+  Op1 op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
+
+  ymuint nn = mNetwork.node_num();
+  ymuint no = mNetwork.output_num2();
+  vector<vector<const TgNode*> > node_list_array(no);
+  vector<pair<ymuint, ymuint> > tmp_list(no);
+  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+    vector<bool> mark(nn, false);
+    vector<const TgNode*>& node_list = node_list_array[po_pos];
+    node_list.reserve(nn);
+    const TgNode* node = mNetwork.output(po_pos);
+    mark_tfi(node, node_list, mark);
+    tmp_list[po_pos] = make_pair(node_list.size(), po_pos);
+  }
+  sort(tmp_list.begin(), tmp_list.end(), Lt());
+
+  for (ymuint i = 0; i < no; ++ i) {
+    ymuint po_pos = tmp_list[i].second;
+
+    vector<bool> mark(nn, false);
+    vector<const TgNode*> node_list;
+    node_list.reserve(nn);
+    const TgNode* node = mNetwork.output(po_pos);
+    mark_tfi(node, node_list, mark);
+
+    if ( single ) {
+      vector<SaFault*> tmp(1);
+      for (vector<const TgNode*>::iterator p = node_list.begin();
+	   p != node_list.end(); ++ p) {
+	const TgNode* node = *p;
+	FaultInfo& fi = mFaultArray[node->gid()];
+	ymuint n = fi.mAllFaults.size();
+	for (ymuint j = 0; j < n; ++ j) {
+	  SaFault* f = fi.mAllFaults[j];
+	  if ( f->status() == kFsUndetected ||
+	       f->status() == kFsUntestable ) {
+	    tmp[0] = f;
+	    mDtpg->run(tmp, po_pos, op);
+	  }
+	}
+      }
+    }
+    else if ( dual ) {
+      vector<SaFault*> tmp;
+      tmp.reserve(2);
+      for (vector<const TgNode*>::iterator p = node_list.begin();
+	   p != node_list.end(); ++ p) {
+	const TgNode* node = *p;
+	FaultInfo& fi = mFaultArray[node->gid()];
+
+	tmp.clear();
+	SaFault* f0 = fi.mOutputFaults[0];
+	if ( f0->status() == kFsUndetected ||
+	     f0->status() == kFsUntestable ) {
+	  tmp.push_back(f0);
+	}
+	SaFault* f1 = fi.mOutputFaults[1];
+	if ( f1->status() == kFsUndetected ||
+	     f1->status() == kFsUntestable ) {
+	  tmp.push_back(f1);
+	}
+	if ( !tmp.empty() ) {
+	  mDtpg->run(tmp, po_pos, op);
+	}
+	ymuint n = fi.mInputFaults.size() / 2;
+	for (ymuint j = 0; j < n; ++ j) {
+	  tmp.clear();
+	  SaFault* f0 = fi.mInputFaults[j * 2 + 0];
+	  if ( f0->status() == kFsUndetected ||
+	       f0->status() == kFsUntestable ) {
+	    tmp.push_back(f0);
+	  }
+	  SaFault* f1 = fi.mInputFaults[j * 2 + 1];
+	  if ( f1->status() == kFsUndetected ||
+	       f1->status() == kFsUntestable ) {
+	    tmp.push_back(f1);
+	  }
+	  if ( !tmp.empty() ) {
+	    mDtpg->run(tmp, po_pos, op);
+	  }
+	}
+      }
+    }
+    else if ( node ) {
+      vector<SaFault*> tmp_list;
+      for (vector<const TgNode*>::iterator p = node_list.begin();
+	   p != node_list.end(); ++ p) {
+	const TgNode* node = *p;
+	FaultInfo& fi = mFaultArray[node->gid()];
+	tmp_list.clear();
+	for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
+	     q != fi.mAllFaults.end(); ++ q) {
+	  SaFault* f = *q;
+	  if ( f->status() == kFsUndetected ||
+	       f->status() == kFsUntestable ) {
+	    tmp_list.push_back(f);
+	  }
+	}
+	if ( !tmp_list.empty() ) {
+	  mDtpg->run(tmp_list, po_pos, op);
+	}
+      }
+    }
+    else if ( ffr ) {
+      vector<SaFault*> tmp_list;
+      for (vector<const TgNode*>::iterator p = node_list.begin();
+	   p != node_list.end(); ++ p) {
+	const TgNode* node = *p;
+	if ( node->is_output() || node->fanout_num() > 1 ) {
+	  tmp_list.clear();
+	  dfs_ffr(node, tmp_list);
+	  if ( !tmp_list.empty() ) {
+	    mDtpg->run(tmp_list, po_pos, op);
+	  }
+	}
+      }
+    }
+    else if ( all ) {
+      vector<SaFault*> tmp_list;
+      for (vector<const TgNode*>::iterator p = node_list.begin();
+	   p != node_list.end(); ++ p) {
+	const TgNode* node = *p;
+	FaultInfo& fi = mFaultArray[node->gid()];
+	for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
+	     q != fi.mAllFaults.end(); ++ q) {
+	  SaFault* f = *q;
+	  if ( f->status() == kFsUndetected ||
+	       f->status() == kFsUntestable ) {
+	    tmp_list.push_back(f);
+	  }
+	}
+      }
+      if ( !tmp_list.empty() ) {
+	mDtpg->run(tmp_list, po_pos, op);
+      }
+    }
+  }
+}
+
+void
+AtpgMgr::dtpg_po_skip(bool single,
+		      bool dual,
+		      bool node,
+		      bool ffr,
+		      bool all)
+{
+  vector<SaFault*> skip_faults;
+  Op2 op(mFaultMgr, skip_faults, mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
+
+  ymuint nn = mNetwork.node_num();
+  ymuint no = mNetwork.output_num2();
+  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+    vector<bool> mark(nn, false);
+    vector<const TgNode*> node_list;
+    node_list.reserve(nn);
+    const TgNode* node = mNetwork.output(po_pos);
+    mark_tfi(node, node_list, mark);
+
+    if ( single ) {
+      vector<SaFault*> tmp(1);
+      for (vector<const TgNode*>::iterator p = node_list.begin();
+	   p != node_list.end(); ++ p) {
+	const TgNode* node = *p;
+	FaultInfo& fi = mFaultArray[node->gid()];
+	ymuint n = fi.mAllFaults.size();
+	for (ymuint j = 0; j < n; ++ j) {
+	  SaFault* f = fi.mAllFaults[j];
+	  if ( f->status() == kFsUndetected ) {
+	    tmp[0] = f;
+	    mDtpg->run(tmp, po_pos, op);
+	  }
+	}
+      }
+    }
+    else if ( dual ) {
+      vector<SaFault*> tmp;
+      tmp.reserve(2);
+      for (vector<const TgNode*>::iterator p = node_list.begin();
+	   p != node_list.end(); ++ p) {
+	const TgNode* node = *p;
+	FaultInfo& fi = mFaultArray[node->gid()];
+
+	tmp.clear();
+	SaFault* f0 = fi.mOutputFaults[0];
+	if ( f0->status() == kFsUndetected ) {
+	  tmp.push_back(f0);
+	}
+	SaFault* f1 = fi.mOutputFaults[1];
+	if ( f1->status() == kFsUndetected ) {
+	  tmp.push_back(f1);
+	}
+	if ( !tmp.empty() ) {
+	  mDtpg->run(tmp, po_pos, op);
+	}
+	ymuint n = fi.mInputFaults.size() / 2;
+	for (ymuint j = 0; j < n; ++ j) {
+	  tmp.clear();
+	  SaFault* f0 = fi.mInputFaults[j * 2 + 0];
+	  if ( f0->status() == kFsUndetected ) {
+	    tmp.push_back(f0);
+	  }
+	  SaFault* f1 = fi.mInputFaults[j * 2 + 1];
+	  if ( f1->status() == kFsUndetected ) {
+	    tmp.push_back(f1);
+	  }
+	  if ( !tmp.empty() ) {
+	    mDtpg->run(tmp, po_pos, op);
+	  }
+	}
+      }
+    }
+    else if ( node ) {
+      vector<SaFault*> tmp_list;
+      for (vector<const TgNode*>::iterator p = node_list.begin();
+	   p != node_list.end(); ++ p) {
+	const TgNode* node = *p;
+	FaultInfo& fi = mFaultArray[node->gid()];
+	tmp_list.clear();
+	for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
+	     q != fi.mAllFaults.end(); ++ q) {
+	  SaFault* f = *q;
+	  if ( f->status() == kFsUndetected ) {
+	    tmp_list.push_back(f);
+	  }
+	}
+	if ( !tmp_list.empty() ) {
+	  mDtpg->run(tmp_list, po_pos, op);
+	}
+      }
+    }
+    else if ( ffr ) {
+      vector<SaFault*> tmp_list;
+      for (vector<const TgNode*>::iterator p = node_list.begin();
+	   p != node_list.end(); ++ p) {
+	const TgNode* node = *p;
+	if ( node->is_output() || node->fanout_num() > 1 ) {
+	  tmp_list.clear();
+	  dfs_ffr(node, tmp_list);
+	  if ( !tmp_list.empty() ) {
+	    mDtpg->run(tmp_list, po_pos, op);
+	  }
+	}
+      }
+    }
+    else if ( all ) {
+      vector<SaFault*> tmp_list;
+      for (vector<const TgNode*>::iterator p = node_list.begin();
+	   p != node_list.end(); ++ p) {
+	const TgNode* node = *p;
+	FaultInfo& fi = mFaultArray[node->gid()];
+	for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
+	     q != fi.mAllFaults.end(); ++ q) {
+	  SaFault* f = *q;
+	  if ( f->status() == kFsUndetected ) {
+	    tmp_list.push_back(f);
+	  }
+	}
+      }
+      if ( !tmp_list.empty() ) {
+	mDtpg->run(tmp_list, po_pos, op);
+      }
+    }
+  }
+  for (vector<SaFault*>::iterator p = skip_faults.begin();
+       p != skip_faults.end(); ++ p) {
+    SaFault* f = *p;
+    mFaultMgr.set_status(f, kFsUndetected);
+  }
 }
 
 void
@@ -633,7 +866,10 @@ AtpgMgr::dfs_ffr(const TgNode* node,
   for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
        q != fi.mAllFaults.end(); ++ q) {
     SaFault* f = *q;
-    flist.push_back(f);
+    if ( f->status() == kFsUndetected ||
+	 f->status() == kFsUntestable ) {
+      flist.push_back(f);
+    }
   }
 }
 
@@ -644,18 +880,21 @@ AtpgMgr::dfs_mffc(const TgNode* node,
 {
   mark[node->gid()] = true;
 
-  FaultInfo& fi = mFaultArray[node->gid()];
-  for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
-       q != fi.mAllFaults.end(); ++ q) {
-    SaFault* f = *q;
-    flist.push_back(f);
-  }
-
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     const TgNode* inode = node->fanin(i);
     if ( mImmDomArray[inode->gid()] != NULL && !mark[inode->gid()] ) {
       dfs_mffc(inode, mark, flist);
+    }
+  }
+
+  FaultInfo& fi = mFaultArray[node->gid()];
+  for (vector<SaFault*>::iterator q = fi.mAllFaults.begin();
+       q != fi.mAllFaults.end(); ++ q) {
+    SaFault* f = *q;
+    if ( f->status() == kFsUndetected ||
+	 f->status() == kFsUntestable ) {
+      flist.push_back(f);
     }
   }
 }
