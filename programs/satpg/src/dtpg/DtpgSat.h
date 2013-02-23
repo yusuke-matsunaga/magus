@@ -84,6 +84,16 @@ public:
   run(const vector<SaFault*>& flist,
       DtpgOperator& op);
 
+  /// @brief テスト生成を行なう．
+  /// @param[in] flist 対象の故障リスト
+  /// @param[in] po_pos 外部出力番号
+  /// @param[in] op テスト生成後に呼ばれるファンクター
+  virtual
+  void
+  run(const vector<SaFault*>& flist,
+      ymuint po_pos,
+      DtpgOperator& op);
+
   /// @brief 統計情報をクリアする．
   virtual
   void

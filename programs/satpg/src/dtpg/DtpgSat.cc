@@ -667,6 +667,20 @@ DtpgSat::run(const vector<SaFault*>& flist,
   dtpg_group(dtpg_flist, op);
 }
 
+// @brief テスト生成を行なう．
+// @param[in] flist 対象の故障リスト
+// @param[in] po_pos 外部出力番号
+// @param[in] op テスト生成後に呼ばれるファンクター
+void
+DtpgSat::run(const vector<SaFault*>& flist,
+	     ymuint po_pos,
+	     DtpgOperator& op)
+{
+  mNetwork->activate_po(mNetwork->output(po_pos));
+  run(flist, op);
+  mNetwork->activate_all();
+}
+
 // @brief single モードの共通処理
 void
 DtpgSat::single_sub(DtpgOperator& op)
