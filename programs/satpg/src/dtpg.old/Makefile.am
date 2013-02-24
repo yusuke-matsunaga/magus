@@ -6,27 +6,26 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libatpg_dtpg.la
+noinst_LTLIBRARIES = libatpg_dtpg_old.la
 
-libatpg_dtpg_la_CPPFLAGS = \
+libatpg_dtpg_old_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
 
-libatpg_dtpg_la_SOURCES = \
+libatpg_dtpg_old_la_SOURCES = \
 	dtpg_nsdef.h \
 	DtpgNode.h \
 	DtpgNode.cc \
 	DtpgFault.h \
+	DtpgFFR.h \
 	DtpgNetwork.h \
 	DtpgNetwork.cc \
 	DtpgSat.h \
 	DtpgSat.cc \
 	InputLiteral.h \
-	InputLiteral.cc \
-	SatEngine.h \
-	SatEngine.cc
+	InputLiteral.cc
 
-libatpg_dtpg_la_LIBADD =
+libatpg_dtpg_old_la_LIBADD =
 
-libatpg_dtpg_la_LDFLAGS =
+libatpg_dtpg_old_la_LDFLAGS =

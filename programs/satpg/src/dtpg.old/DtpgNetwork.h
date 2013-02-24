@@ -107,6 +107,10 @@ public:
   DtpgNode*
   active_node(ymuint pos);
 
+  /// @brief アクティブな部分に対して MFFC を求める．
+  void
+  get_mffc_list(vector<DtpgFFR*>& mffc_list);
+
   /// @brief f の検出に必要な割り当てを求める．
   /// @param[in] f 対象の故障
   /// @param[in] ma_list 割り当て結果を格納するリスト

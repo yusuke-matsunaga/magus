@@ -10,6 +10,7 @@
 #include "DtpgNetwork.h"
 #include "DtpgNode.h"
 #include "DtpgPrimitive.h"
+#include "DtpgFFR.h"
 #include "DtpgFault.h"
 #include "ym_networks/TgNetwork.h"
 #include "ym_networks/TgNode.h"
@@ -369,6 +370,36 @@ DtpgNetwork::node(ymuint pos)
   // アドレス計算のために DtpgNode の定義が必要なのでここに置く．
   assert_cond( pos < mNodeNum, __FILE__, __LINE__);
   return &mNodeArray[pos];
+}
+
+// @brief アクティブな部分に対して MFFC を求める．
+void
+DtpgNetwork::get_mffc_list(vector<DtpgFFR*>& mffc_list)
+{
+  vector<DtpgFFR*> mffc_array(mNodeNum, NULL);
+  for (ymuint i = 0; i < mActNodeNum; ++ i) {
+    DtpgNode* node = mActNodeArray[mActNodeNum - i - 1];
+    ymuint id = node->id();
+    DtpgNode* root = node->imm_dom();
+    if ( root == NULL ) {
+      DtpgFFR* mffc = new DtpgFFR;
+      mffc_array[id] = mffc;
+      mffc_list.push_back(mffc);
+      mffc->mRoot = node;
+    }
+    else {
+      mffc_array[id] = mffc_array[root->id()];
+    }
+  }
+
+  // 入力からのトポロジカル順にMFFC内のノードリストを作る．
+  for (ymuint i = 0; i < mActNodeNum; ++ i) {
+    DtpgNode* node = mActNodeArray[i];
+    ymuint id = node->id();
+    DtpgFFR* mffc = mffc_array[id];
+    assert_cond( mffc != NULL, __FILE__, __LINE__);
+    mffc->mNodeList.push_back(node);
+  }
 }
 
 // @brief DtpgNode の内容を設定する．

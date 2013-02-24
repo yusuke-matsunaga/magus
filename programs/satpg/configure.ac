@@ -151,6 +151,7 @@ AC_CONFIG_FILES([
 	src/fsim3/Makefile
 	src/fsimx/Makefile
 	src/dtpg/Makefile
+	src/dtpg.old/Makefile
 	src/main/Makefile
 	src/atpg_tclsh/Makefile
 	tclsrc/Makefile

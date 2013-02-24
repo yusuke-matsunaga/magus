@@ -18,10 +18,10 @@
 
 #define BEGIN_NAMESPACE_YM_SATPG_DTPG \
 BEGIN_NAMESPACE_YM_SATPG \
-BEGIN_NAMESPACE(nsDtpg)
+BEGIN_NAMESPACE(nsDtpgOld)
 
 #define END_NAMESPACE_YM_SATPG_DTPG \
-END_NAMESPACE(nsDtpg) \
+END_NAMESPACE(nsDtpgOld) \
 END_NAMESPACE_YM_SATPG
 
 
@@ -31,6 +31,7 @@ class DtpgSat;
 class DtpgNetwork;
 class DtpgNode;
 class DtpgPrimitive;
+class DtpgFFR;
 class DtpgFault;
 
 END_NAMESPACE_YM_SATPG_DTPG

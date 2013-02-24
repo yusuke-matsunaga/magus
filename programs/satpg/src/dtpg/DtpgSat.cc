@@ -10,7 +10,6 @@
 #include "DtpgSat.h"
 #include "DtpgNetwork.h"
 #include "DtpgNode.h"
-#include "DtpgFFR.h"
 #include "DtpgFault.h"
 #include "DtpgOperator.h"
 
@@ -386,14 +385,35 @@ DtpgSat::dfs_ffr(DtpgNode* node)
 void
 DtpgSat::mffc_sub(DtpgOperator& op)
 {
-  vector<DtpgFFR*> mffc_list;
-  mNetwork->get_mffc_list(mffc_list);
-  for (vector<DtpgFFR*>::const_iterator p = mffc_list.begin();
-       p != mffc_list.end(); ++ p) {
-    DtpgFFR* ffr = *p;
-    ffr_mode(ffr, op);
-    delete ffr;
+  ymuint n = mNetwork->active_node_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    DtpgNode* node = mNetwork->active_node(i);
+    if ( node->imm_dom() == NULL ) {
+      mFaultList.clear();
+
+      vector<bool> mark(mNetwork->node_num(), false);
+      dfs_mffc(node, mark);
+
+      do_dtpg(op);
+    }
   }
+}
+
+void
+DtpgSat::dfs_mffc(DtpgNode* node,
+		  vector<bool>& mark)
+{
+  mark[node->id()] = true;
+
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    DtpgNode* inode = node->fanin(i);
+    if ( mark[inode->id()] == false && inode->imm_dom() != NULL ) {
+      dfs_mffc(inode, mark);
+    }
+  }
+
+  add_node_faults(node);
 }
 
 // @brief all モードの共通処理
@@ -405,24 +425,6 @@ DtpgSat::all_sub(DtpgOperator& op)
   ymuint n = mNetwork->active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
     DtpgNode* node = mNetwork->active_node(i);
-    add_node_faults(node);
-  }
-
-  do_dtpg(op);
-}
-
-// @brief 一つの FFR に対してテストパタン生成を行う．
-// @param[in] ffr 対象の FFR
-void
-DtpgSat::ffr_mode(DtpgFFR* ffr,
-		  DtpgOperator& op)
-{
-  mFaultList.clear();
-
-  const vector<DtpgNode*>& node_list = ffr->node_list();
-  for (vector<DtpgNode*>::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    DtpgNode* node = *p;
     add_node_faults(node);
   }
 

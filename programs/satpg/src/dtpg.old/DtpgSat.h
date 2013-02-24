@@ -1,8 +1,8 @@
-#ifndef DTPGSATOLD_H
-#define DTPGSATOLD_H
+#ifndef DTPGSAT_H
+#define DTPGSAT_H
 
-/// @file DtpgSatOld.h
-/// @brief DtpgSatOld のヘッダファイル
+/// @file DtpgSat.h
+/// @brief DtpgSat のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -23,20 +23,20 @@
 BEGIN_NAMESPACE_YM_SATPG_DTPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class DtpgSatOld DtpgSatOld.h "DtpgSatOld.h"
+/// @class DtpgSat DtpgSat.h "DtpgSat.h"
 /// @brief SAT を用いたパタン生成器
 //////////////////////////////////////////////////////////////////////
-class DtpgSatOld :
+class DtpgSat :
   public Dtpg
 {
 public:
 
   /// @brief コンストラクタ
-  DtpgSatOld();
+  DtpgSat();
 
   /// @brief デストラクタ
   virtual
-  ~DtpgSatOld();
+  ~DtpgSat();
 
 
 public:
@@ -387,8 +387,8 @@ private:
 // @param[in] op テスト生成の結果を処理するファンクター
 inline
 void
-DtpgSatOld::dtpg_single(DtpgFault* f,
-			DtpgOperator& op)
+DtpgSat::dtpg_single(DtpgFault* f,
+		     DtpgOperator& op)
 {
   mFaultList.clear();
 
@@ -403,9 +403,9 @@ DtpgSatOld::dtpg_single(DtpgFault* f,
 // @param[in] op テスト生成の結果を処理するファンクター
 inline
 void
-DtpgSatOld::dtpg_dual(DtpgFault* f0,
-		      DtpgFault* f1,
-		      DtpgOperator& op)
+DtpgSat::dtpg_dual(DtpgFault* f0,
+		   DtpgFault* f1,
+		   DtpgOperator& op)
 {
   mFaultList.clear();
 
@@ -418,7 +418,7 @@ DtpgSatOld::dtpg_dual(DtpgFault* f0,
 // @brief 故障を追加する．
 inline
 void
-DtpgSatOld::add_fault(DtpgFault* f)
+DtpgSat::add_fault(DtpgFault* f)
 {
   if ( f != NULL && !f->is_skip() ) {
     mFaultList.push_back(f);
@@ -429,7 +429,7 @@ DtpgSatOld::add_fault(DtpgFault* f)
 // @param[in] op テスト生成の結果を処理するファンクター
 inline
 void
-DtpgSatOld::do_dtpg(DtpgOperator& op)
+DtpgSat::do_dtpg(DtpgOperator& op)
 {
   if ( !mFaultList.empty() ) {
     dtpg_group(op);
@@ -438,4 +438,4 @@ DtpgSatOld::do_dtpg(DtpgOperator& op)
 
 END_NAMESPACE_YM_SATPG_DTPG
 
-#endif // DTPGSATOLD_H
+#endif // DTPGSAT_H

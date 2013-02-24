@@ -116,12 +116,6 @@ private:
   void
   all_sub(DtpgOperator& op);
 
-  /// @brief 一つの FFR に対してテストパタン生成を行う．
-  /// @param[in] ffr 対象の FFR
-  void
-  ffr_mode(DtpgFFR* ffr,
-	   DtpgOperator& op);
-
   /// @brief 一つの故障に対してテストパタン生成を行う．
   /// @param[in] f 故障
   /// @param[in] op テスト生成の結果を処理するファンクター
@@ -141,6 +135,11 @@ private:
   /// @brief DFS で FFR を求める．
   void
   dfs_ffr(DtpgNode* node);
+
+  /// @brief DFS で MFFC を求める．
+  void
+  dfs_mffc(DtpgNode* node,
+	   vector<bool>& mark);
 
   /// @brief ノードの故障を追加する．
   void
