@@ -24,7 +24,7 @@ enum FaultStatus {
   /// @brief テスト不能 (冗長)
   kFsUntestable,
   /// @brief 部分的なテスト不能
-  kFsPartiallyUntestable,
+  kFsSkip,
   /// @brief アボート
   kFsAborted
 };
@@ -36,11 +36,11 @@ const char*
 str(FaultStatus fs)
 {
   switch ( fs ) {
-  case kFsUndetected:          return "undetected";
-  case kFsDetected:            return "detected";
-  case kFsUntestable:          return "untestable";
-  case kFsPartiallyUntestable: return "parially untestable";
-  case kFsAborted:             return "aborted";
+  case kFsUndetected: return "undetected";
+  case kFsDetected:   return "detected";
+  case kFsUntestable: return "untestable";
+  case kFsSkip:       return "skipped";
+  case kFsAborted:    return "aborted";
   default: break;
   }
   assert_not_reached(__FILE__, __LINE__);
