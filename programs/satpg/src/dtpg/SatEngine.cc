@@ -493,6 +493,16 @@ void
 SatEngine::set_skip(bool flag)
 {
   mSkip = flag;
+
+  if ( !flag ) {
+    for (vector<DtpgFault*>::iterator p = mSkippedFaults.begin();
+	 p != mSkippedFaults.end(); ++ p) {
+      DtpgFault* f = *p;
+      f->clear_skip();
+    }
+  }
+
+  mSkippedFaults.clear();
 }
 
 // @brief get_pat フラグを設定する．
@@ -750,6 +760,7 @@ SatEngine::dtpg_ffr2(const vector<DtpgFault*>& flist,
       f->set_untestable();
       if ( mSkip ) {
 	f->set_skip();
+	mSkippedFaults.push_back(f);
       }
       else {
 	op.set_untestable(f->safault());
@@ -1203,6 +1214,7 @@ SatEngine::solve(SatSolver& solver,
     f->set_untestable();
     if ( mSkip ) {
       f->set_skip();
+      mSkippedFaults.push_back(f);
     }
     else {
       op.set_untestable(f->safault());

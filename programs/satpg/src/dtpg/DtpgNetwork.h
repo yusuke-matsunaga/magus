@@ -42,9 +42,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 一つの外部出力に関係するノードのみをアクティブにする．
-  /// @param[in] onode 外部出力ノード
+  /// @param[in] po_pos 出力番号
   void
-  activate_po(DtpgNode* onode);
+  activate_po(ymuint po_pos);
 
   /// @brief 全てのノードをアクティブにする．
   void
@@ -94,10 +94,6 @@ public:
   DtpgNode*
   output2(ymuint pos);
 
-  /// @brief 故障リストを得る．
-  const vector<DtpgFault*>&
-  fault_list();
-
   /// @brief SaFault に対応する DtpgFault を得る．
   DtpgFault*
   conv_fault(SaFault* src_fault);
@@ -110,10 +106,6 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < active_node_num() )
   DtpgNode*
   active_node(ymuint pos);
-
-  /// @brief アクティブな部分に対して FFR を求める．
-  void
-  get_ffr_list(vector<DtpgFFR*>& ffr_list);
 
   /// @brief アクティブな部分に対して MFFC を求める．
   void
@@ -225,9 +217,6 @@ private:
   // 故障の本体の配列
   DtpgFault* mFaultChunk;
 
-  // 故障リスト
-  vector<DtpgFault*> mFaultList;
-
 };
 
 
@@ -310,14 +299,6 @@ DtpgNetwork::output2(ymuint pos)
 {
   assert_cond( pos < output_num2(), __FILE__, __LINE__);
   return mOutputArray2[pos];
-}
-
-// @brief 故障リストを得る．
-inline
-const vector<DtpgFault*>&
-DtpgNetwork::fault_list()
-{
-  return mFaultList;
 }
 
 // @brief アクティブなノード数を得る．

@@ -86,10 +86,6 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief スキップフラグを解除する．
-  void
-  clear_skip();
-
   /// @brief 統計情報を得る．
   /// @param[in] solver SatSolver
   void
@@ -226,6 +222,9 @@ private:
 
   // skip フラグ
   bool mSkip;
+
+  // skip フラグのついた故障のリスト
+  vector<DtpgFault*> mSkippedFaults;
 
   // dry-run フラグ
   bool mDryRun;

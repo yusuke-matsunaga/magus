@@ -47,6 +47,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			 "all mode");
   mPoptPo = new TclPopt(this, "po",
 			"po-split mode");
+  mPoptRpo = new TclPopt(this, "rpo",
+			 "po-split (reverse order) mode");
   mPoptSkip = new TclPopt(this, "skip",
 			  "skip mode");
   mPoptX = new TclPoptInt(this, "x",
@@ -62,6 +64,7 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptSatRec);
   new_popt_group(mPoptDual, mPoptFFR, mPoptMFFC, mPoptAll);
+  new_popt_group(mPoptPo, mPoptRpo);
 }
 
 // @brief デストラクタ
@@ -136,6 +139,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   bool mffc_mode = mPoptMFFC->is_specified();
   bool all_mode = mPoptAll->is_specified();
   bool po_mode = mPoptPo->is_specified();
+  bool rpo_mode = mPoptRpo->is_specified();
   bool skip_mode = mPoptSkip->is_specified();
 
   if ( mPoptX->is_specified() ) {
@@ -175,6 +179,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
   if ( po_mode ) {
     dtpg_option += "_po";
+  }
+  if ( rpo_mode ) {
+    dtpg_option += "_rpo";
   }
   if ( skip_mode ) {
     dtpg_option += "_skip";

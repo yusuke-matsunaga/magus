@@ -79,6 +79,9 @@ private:
   // po オプションの解析用オブジェクト
   TclPopt* mPoptPo;
 
+  // rpo オプションの解析用オブジェクト
+  TclPopt* mPoptRpo;
+
   // skip オプションの解析用オブジェクト
   TclPopt* mPoptSkip;
 

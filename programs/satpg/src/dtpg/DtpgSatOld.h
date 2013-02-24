@@ -12,6 +12,7 @@
 
 #include "dtpg_nsdef.h"
 #include "Dtpg.h"
+#include "DtpgFault.h"
 #include "ym_networks/tgnet.h"
 #include "ym_logic/Literal.h"
 #include "ym_logic/Bool3.h"
@@ -124,10 +125,6 @@ private:
   ffr_mode(DtpgFFR* ffr,
 	   DtpgOperator& op);
 
-  /// @brief スキップフラグを解除する．
-  void
-  clear_skip();
-
   /// @brief 一つの故障に対してテストパタン生成を行う．
   /// @param[in] f 故障
   /// @param[in] op テスト生成の結果を処理するファンクター
@@ -144,14 +141,26 @@ private:
 	    DtpgFault* f1,
 	    DtpgOperator& op);
 
+  void
+  dfs_ffr(DtpgNode* node);
+
+  /// @brief ノードの故障を追加する．
+  void
+  add_node_faults(DtpgNode* node);
+
+  /// @brief 故障を追加する．
+  void
+  add_fault(DtpgFault* f);
+
   /// @brief 複数の故障に対してテストパタン生成を行なう．
-  /// @param[in] flist 故障リスト
-  /// @param[in] root FFR の根のノード
-  /// @param[in] node_list FFR 内のノードリスト
   /// @param[in] op テスト生成の結果を処理するファンクター
   void
-  dtpg_group(const vector<DtpgFault*>& flist,
-	     DtpgOperator& op);
+  do_dtpg(DtpgOperator& op);
+
+  /// @brief 複数の故障に対してテストパタン生成を行なう．
+  /// @param[in] op テスト生成の結果を処理するファンクター
+  void
+  dtpg_group(DtpgOperator& op);
 
   /// @brief 統計情報を得る．
   /// @param[in] solver SatSolver
@@ -275,6 +284,9 @@ private:
   // 対象の回路
   DtpgNetwork* mNetwork;
 
+  // 対象の故障リスト
+  vector<DtpgFault*> mFaultList;
+
   // 変数を割り当てたノードを格納するリスト
   vector<DtpgNode*> mUsedNodeList;
 
@@ -292,6 +304,9 @@ private:
 
   // skip フラグ
   bool mSkip;
+
+  // skip マークのついた故障のリスト
+  vector<DtpgFault*> mSkippedFaults;
 
   // dry-run フラグ
   bool mDryRun;
@@ -375,9 +390,11 @@ void
 DtpgSatOld::dtpg_single(DtpgFault* f,
 			DtpgOperator& op)
 {
-  vector<DtpgFault*> flist(1);
-  flist[0] = f;
-  dtpg_group(flist, op);
+  mFaultList.clear();
+
+  add_fault(f);
+
+  do_dtpg(op);
 }
 
 // @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
@@ -390,10 +407,33 @@ DtpgSatOld::dtpg_dual(DtpgFault* f0,
 		      DtpgFault* f1,
 		      DtpgOperator& op)
 {
-  vector<DtpgFault*> flist(2);
-  flist[0] = f0;
-  flist[1] = f1;
-  dtpg_group(flist, op);
+  mFaultList.clear();
+
+  add_fault(f0);
+  add_fault(f1);
+
+  do_dtpg(op);
+}
+
+// @brief 故障を追加する．
+inline
+void
+DtpgSatOld::add_fault(DtpgFault* f)
+{
+  if ( f != NULL && !f->is_skip() ) {
+    mFaultList.push_back(f);
+  }
+}
+
+// @brief 複数の故障に対してテストパタン生成を行なう．
+// @param[in] op テスト生成の結果を処理するファンクター
+inline
+void
+DtpgSatOld::do_dtpg(DtpgOperator& op)
+{
+  if ( !mFaultList.empty() ) {
+    dtpg_group(op);
+  }
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

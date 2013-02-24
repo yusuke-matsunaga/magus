@@ -206,11 +206,9 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
   ymuint nf = fault_list.size();
   void* p = mAlloc.get_memory(sizeof(DtpgFault) * nf);
   mFaultChunk = new (p) DtpgFault[nf];
-  mFaultList.reserve(nf);
   for (ymuint i = 0; i < nf; ++ i) {
     SaFault* f = fault_list[i];
     DtpgFault* df = &mFaultChunk[i];
-    mFaultList.push_back(df);
     df->mSaFault = f;
     df->mId = i;
     const TgNode* tgnode = f->node();
@@ -259,11 +257,11 @@ DtpgNetwork::~DtpgNetwork()
 }
 
 // @brief 一つの外部出力に関係するノードのみをアクティブにする．
-// @param[in] onode 外部出力ノード
+// @param[in] po_pos 出力番号
 void
-DtpgNetwork::activate_po(DtpgNode* onode)
+DtpgNetwork::activate_po(ymuint po_pos)
 {
-  assert_cond( onode->is_output(), __FILE__, __LINE__);
+  DtpgNode* onode = output2(po_pos);
 
   vector<bool> mark(mNodeNum, false);
 
@@ -372,37 +370,6 @@ DtpgNetwork::node(ymuint pos)
   // アドレス計算のために DtpgNode の定義が必要なのでここに置く．
   assert_cond( pos < mNodeNum, __FILE__, __LINE__);
   return &mNodeArray[pos];
-}
-
-// @brief アクティブな部分に対して FFR を求める．
-void
-DtpgNetwork::get_ffr_list(vector<DtpgFFR*>& ffr_list)
-{
-  // FFR を求める．
-  vector<DtpgFFR*> ffr_array(mNodeNum);
-  for (ymuint i = 0; i < mActNodeNum; ++ i) {
-    DtpgNode* node = mActNodeArray[mActNodeNum - i - 1];
-    ymuint id = node->id();
-    if ( node->is_output() || node->active_fanout_num() > 1 ) {
-      DtpgFFR* ffr = new DtpgFFR;
-      ffr_array[id] = ffr;
-      ffr_list.push_back(ffr);
-      ffr->mRoot = node;
-    }
-    else if ( node->active_fanout_num() == 1 ) {
-      DtpgNode* fonode = node->active_fanout(0);
-      DtpgFFR* ffr = ffr_array[fonode->id()];
-      assert_cond( ffr != NULL, __FILE__, __LINE__);
-      ffr_array[id] = ffr;
-    }
-  }
-
-  for (ymuint i = 0; i < mActNodeNum; ++ i) {
-    DtpgNode* node = mActNodeArray[i];
-    DtpgFFR* ffr = ffr_array[node->id()];
-    assert_cond( ffr != NULL, __FILE__, __LINE__);
-    ffr->mNodeList.push_back(node);
-  }
 }
 
 // @brief アクティブな部分に対して MFFC を求める．
