@@ -645,6 +645,7 @@ DtpgSatOld::run(DtpgOperator& op,
   }
 }
 
+#if 0
 // @brief テスト生成を行なう．
 // @param[in] flist 対象の故障リスト
 // @param[in] op テスト生成後に呼ばれるファンクター
@@ -667,6 +668,7 @@ DtpgSatOld::run(const vector<SaFault*>& flist,
   }
   dtpg_group(dtpg_flist, op);
 }
+#endif
 
 // @brief single モードの共通処理
 void

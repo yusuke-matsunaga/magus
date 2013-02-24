@@ -90,15 +90,6 @@ private:
   void
   clear_skip();
 
-  /// @brief 複数の故障に対してテストパタン生成を行なう．
-  /// @param[in] flist 故障リスト
-  /// @param[in] root FFR の根のノード
-  /// @param[in] node_list FFR 内のノードリスト
-  /// @param[in] op テスト生成の結果を処理するファンクター
-  void
-  dtpg_group(const vector<DtpgFault*>& flist,
-	     DtpgOperator& op);
-
   /// @brief 統計情報を得る．
   /// @param[in] solver SatSolver
   void

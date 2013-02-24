@@ -12,11 +12,9 @@
 
 #include "dtpg_nsdef.h"
 #include "Dtpg.h"
+#include "SatEngine.h"
+#include "DtpgFault.h"
 #include "ym_networks/tgnet.h"
-#include "ym_logic/Literal.h"
-#include "ym_logic/Bool3.h"
-#include "ym_logic/sat_nsdef.h"
-#include "ym_utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
@@ -75,14 +73,6 @@ public:
   void
   run(DtpgOperator& op,
       const string& option = string());
-
-  /// @brief テスト生成を行なう．
-  /// @param[in] flist 対象の故障リスト
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  virtual
-  void
-  run(const vector<SaFault*>& flist,
-      DtpgOperator& op);
 
   /// @brief 統計情報をクリアする．
   virtual
@@ -152,6 +142,19 @@ private:
 	    DtpgFault* f1,
 	    DtpgOperator& op);
 
+  /// @brief ノードの故障を追加する．
+  void
+  add_node_faults(DtpgNode* node);
+
+  /// @brief 故障を追加する．
+  void
+  add_fault(DtpgFault* fault);
+
+  /// @brief テストパタン生成を行なう．
+  void
+  do_dtpg(DtpgOperator& op);
+
+#if 0
   /// @brief 複数の故障に対してテストパタン生成を行なう．
   /// @param[in] flist 故障リスト
   /// @param[in] root FFR の根のノード
@@ -160,13 +163,14 @@ private:
   void
   dtpg_group(const vector<DtpgFault*>& flist,
 	     DtpgOperator& op);
-
+#endif
   /// @brief 統計情報を得る．
   /// @param[in] solver SatSolver
   void
   update_stats(SatSolver& solver,
 	       ymuint n);
 
+#if 0
   /// @brief 一つの SAT問題を解く．
   void
   solve(SatSolver& solver,
@@ -253,12 +257,26 @@ private:
   void
   clear_node_mark();
 
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // SAT エンジン
+  SatEngine mSatEngine;
+
+  // 対象の回路
+  DtpgNetwork* mNetwork;
+
+  // 対象の故障リスト
+  vector<DtpgFault*> mFaultList;
+
+  // skip フラグ
+  bool mSkip;
+
+#if 0
   // SAT solver のタイプ
   string mType;
 
@@ -280,9 +298,6 @@ private:
   // SAT 用の割り当てリスト
   vector<ymuint> mValList;
 
-  // 対象の回路
-  DtpgNetwork* mNetwork;
-
   // 変数を割り当てたノードを格納するリスト
   vector<DtpgNode*> mUsedNodeList;
 
@@ -297,9 +312,6 @@ private:
 
   // バックトレースに用いたノードを格納するリスト
   vector<DtpgNode*> mBwdNodeList;
-
-  // skip フラグ
-  bool mSkip;
 
   // dry-run フラグ
   bool mDryRun;
@@ -367,6 +379,8 @@ private:
   // アボートの場合の実行時間
   USTime mAbortTime;
 
+#endif
+
 };
 
 
@@ -374,34 +388,24 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-
-// @brief 一つの故障に対してテストパタン生成を行う．
-// @param[in] f 故障
-// @param[in] op テスト生成の結果を処理するファンクター
+// @brief 故障を追加する．
 inline
 void
-DtpgSat::dtpg_single(DtpgFault* f,
-		     DtpgOperator& op)
+DtpgSat::add_fault(DtpgFault* fault)
 {
-  vector<DtpgFault*> flist(1);
-  flist[0] = f;
-  dtpg_group(flist, op);
+  if ( fault != NULL && !fault->is_skip() ) {
+    mFaultList.push_back(fault);
+  }
 }
 
-// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
-// @param[in] f0 0縮退故障
-// @param[in] f1 1縮退故障
-// @param[in] op テスト生成の結果を処理するファンクター
+// @brief テストパタン生成を行なう．
 inline
 void
-DtpgSat::dtpg_dual(DtpgFault* f0,
-		   DtpgFault* f1,
-		   DtpgOperator& op)
+DtpgSat::do_dtpg(DtpgOperator& op)
 {
-  vector<DtpgFault*> flist(2);
-  flist[0] = f0;
-  flist[1] = f1;
-  dtpg_group(flist, op);
+  if ( !mFaultList.empty() ) {
+    mSatEngine.run(mFaultList, op);
+  }
 }
 
 END_NAMESPACE_YM_SATPG_DTPG
