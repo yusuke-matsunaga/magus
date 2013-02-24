@@ -882,6 +882,7 @@ DtpgSat::all_sub(DtpgOperator& op)
   if ( flist.empty() ) {
     return;
   }
+
   dtpg_group(flist, op);
 }
 
@@ -902,6 +903,7 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
   if ( flist.empty() ) {
     return;
   }
+
   dtpg_group(flist, op);
 }
 
@@ -1214,10 +1216,6 @@ void
 DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
 		    DtpgOperator& op)
 {
-  if ( flist.empty() ) {
-    return;
-  }
-
   if ( mTimerEnable ) {
     mTimer.reset();
     mTimer.start();
