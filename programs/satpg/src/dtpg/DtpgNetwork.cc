@@ -115,6 +115,7 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
   mActNodeNum = 0;
   mActNodeArray = alloc_nodearray(mAlloc, mNodeNum);
 
+  mLastPoPos = 0;
 
   ymuint id = 0;
 

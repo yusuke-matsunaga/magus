@@ -234,6 +234,12 @@ private:
 
   /// @brief FFR 内の故障リストを作るために DFS を行なう．
   void
+  dfs_ffr(const TgNode* node,
+	  const vector<bool>& root_mark,
+	  vector<SaFault*>& flist);
+
+  /// @brief FFR 内の故障リストを作るために DFS を行なう．
+  void
   dfs_mffc(const TgNode* node,
 	   vector<bool>& mark,
 	   vector<SaFault*>& flist);

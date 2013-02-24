@@ -677,8 +677,6 @@ DtpgSat::run(const vector<SaFault*>& flist,
 	     ymuint po_pos,
 	     DtpgOperator& op)
 {
-  mNetwork->activate_po(po_pos);
-
   ymuint nf = flist.size();
   vector<DtpgFault*> dtpg_flist;
   dtpg_flist.reserve(nf);
@@ -693,6 +691,7 @@ DtpgSat::run(const vector<SaFault*>& flist,
     return;
   }
 
+  mNetwork->activate_po(po_pos);
   dtpg_group(dtpg_flist, op);
 }
 
