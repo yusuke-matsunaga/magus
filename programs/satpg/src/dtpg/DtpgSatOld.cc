@@ -1,13 +1,13 @@
 
-/// @file atpg/src/dtpg/DtpgSat.cc
-/// @brief DtpgSat の実装ファイル
+/// @file atpg/src/dtpg/DtpgSatOld.cc
+/// @brief DtpgSatOld の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "DtpgSat.h"
+#include "DtpgSatOld.h"
 #include "DtpgStats.h"
 #include "DtpgNetwork.h"
 #include "DtpgNode.h"
@@ -26,9 +26,9 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 Dtpg*
-new_DtpgSat()
+new_DtpgSatOld()
 {
-  return new nsDtpg::DtpgSat();
+  return new nsDtpg::DtpgSatOld();
 }
 
 END_NAMESPACE_YM_SATPG
@@ -472,7 +472,7 @@ END_NONAMESPACE
 
 
 // @brief コンストラクタ
-DtpgSat::DtpgSat()
+DtpgSatOld::DtpgSatOld()
 {
   mGetPatFlag = 0;
   mNetwork = NULL;
@@ -482,16 +482,16 @@ DtpgSat::DtpgSat()
 }
 
 // @brief デストラクタ
-DtpgSat::~DtpgSat()
+DtpgSatOld::~DtpgSatOld()
 {
   delete mNetwork;
 }
 
 // @brief 使用する SAT エンジンを指定する．
 void
-DtpgSat::set_mode(const string& type,
-		  const string& option,
-		  ostream* outp)
+DtpgSatOld::set_mode(const string& type,
+		     const string& option,
+		     ostream* outp)
 {
   mType = type;
   mOption = option;
@@ -500,14 +500,14 @@ DtpgSat::set_mode(const string& type,
 
 // @brief get_pat フラグを設定する．
 void
-DtpgSat::set_get_pat(ymuint val)
+DtpgSatOld::set_get_pat(ymuint val)
 {
   mGetPatFlag = val;
 }
 
 // @brief dry-run フラグを設定する．
 void
-DtpgSat::set_dry_run(bool flag)
+DtpgSatOld::set_dry_run(bool flag)
 {
   mDryRun = flag;
 }
@@ -516,8 +516,8 @@ DtpgSat::set_dry_run(bool flag)
 // @param[in] tgnetwork 対象のネットワーク
 // @param[in] fault_list 故障リスト
 void
-DtpgSat::set_network(const TgNetwork& tgnetwork,
-		     const vector<SaFault*>& fault_list)
+DtpgSatOld::set_network(const TgNetwork& tgnetwork,
+			const vector<SaFault*>& fault_list)
 {
   delete mNetwork;
   mNetwork = new DtpgNetwork(tgnetwork, fault_list);
@@ -527,8 +527,8 @@ DtpgSat::set_network(const TgNetwork& tgnetwork,
 // @param[in] op テスト生成後に呼ばれるファンクター
 // @param[in] option オプション文字列
 void
-DtpgSat::run(DtpgOperator& op,
-	     const string& option)
+DtpgSatOld::run(DtpgOperator& op,
+		const string& option)
 {
   bool single = false;
   bool dual = false;
@@ -649,8 +649,8 @@ DtpgSat::run(DtpgOperator& op,
 // @param[in] flist 対象の故障リスト
 // @param[in] op テスト生成後に呼ばれるファンクター
 void
-DtpgSat::run(const vector<SaFault*>& flist,
-	     DtpgOperator& op)
+DtpgSatOld::run(const vector<SaFault*>& flist,
+		DtpgOperator& op)
 {
   ymuint nf = flist.size();
   vector<DtpgFault*> dtpg_flist;
@@ -670,7 +670,7 @@ DtpgSat::run(const vector<SaFault*>& flist,
 
 // @brief single モードの共通処理
 void
-DtpgSat::single_sub(DtpgOperator& op)
+DtpgSatOld::single_sub(DtpgOperator& op)
 {
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
@@ -705,7 +705,7 @@ DtpgSat::single_sub(DtpgOperator& op)
 
 // @brief dual モードの共通処理
 void
-DtpgSat::dual_sub(DtpgOperator& op)
+DtpgSatOld::dual_sub(DtpgOperator& op)
 {
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
@@ -800,7 +800,7 @@ END_NONAMESPACE
 
 // @brief ffr モードの共通処理
 void
-DtpgSat::ffr_sub(DtpgOperator& op)
+DtpgSatOld::ffr_sub(DtpgOperator& op)
 {
 #if 0
   vector<DtpgFFR*> ffr_list;
@@ -830,7 +830,7 @@ DtpgSat::ffr_sub(DtpgOperator& op)
 
 // @brief mffc モードの共通処理
 void
-DtpgSat::mffc_sub(DtpgOperator& op)
+DtpgSatOld::mffc_sub(DtpgOperator& op)
 {
   vector<DtpgFFR*> mffc_list;
   mNetwork->get_mffc_list(mffc_list);
@@ -844,7 +844,7 @@ DtpgSat::mffc_sub(DtpgOperator& op)
 
 // @brief all モードの共通処理
 void
-DtpgSat::all_sub(DtpgOperator& op)
+DtpgSatOld::all_sub(DtpgOperator& op)
 {
   vector<DtpgFault*> flist;
   ymuint n = mNetwork->active_node_num();
@@ -861,8 +861,8 @@ DtpgSat::all_sub(DtpgOperator& op)
 // @brief 一つの FFR に対してテストパタン生成を行う．
 // @param[in] ffr 対象の FFR
 void
-DtpgSat::ffr_mode(DtpgFFR* ffr,
-		  DtpgOperator& op)
+DtpgSatOld::ffr_mode(DtpgFFR* ffr,
+		     DtpgOperator& op)
 {
   vector<DtpgFault*> flist;
   const vector<DtpgNode*>& node_list = ffr->node_list();
@@ -880,7 +880,7 @@ DtpgSat::ffr_mode(DtpgFFR* ffr,
 
 // @brief スキップフラグを解除する．
 void
-DtpgSat::clear_skip()
+DtpgSatOld::clear_skip()
 {
   const vector<DtpgFault*>& flist = mNetwork->fault_list();
   for (vector<DtpgFault*>::const_iterator p = flist.begin();
@@ -895,7 +895,7 @@ DtpgSat::clear_skip()
 
 // @brief 統計情報をクリアする．
 void
-DtpgSat::clear_stats()
+DtpgSatOld::clear_stats()
 {
   mRunCount = 0;
   mSatCount = 0;
@@ -1072,10 +1072,10 @@ END_NONAMESPACE
 // @brief 必要割り当ての情報に基づいて故障をグループ分けする．
 // @note 内部で dtpg_ffr() を呼ぶ．
 void
-DtpgSat::dtpg_ffr2(const vector<DtpgFault*>& flist,
-		   DtpgNode* root,
-		   const vector<DtpgNode*>& node_list,
-		   DtpgOperator& op)
+DtpgSatOld::dtpg_ffr2(const vector<DtpgFault*>& flist,
+		      DtpgNode* root,
+		      const vector<DtpgNode*>& node_list,
+		      DtpgOperator& op)
 {
 #if VERIFY_MAIMP
   // 必要割り当てで冗長と判定された故障のリストを作る．
@@ -1184,8 +1184,8 @@ END_NONAMESPACE
 // @param[in] node_list FFR 内のノードリスト
 // @param[in] op テスト生成の結果を処理するファンクター
 void
-DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
-		    DtpgOperator& op)
+DtpgSatOld::dtpg_group(const vector<DtpgFault*>& flist,
+		       DtpgOperator& op)
 {
   if ( flist.empty() ) {
     return;
@@ -1543,9 +1543,9 @@ DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
 
 // @brief 一つの SAT問題を解く．
 void
-DtpgSat::solve(SatSolver& solver,
-	       DtpgFault* f,
-	       DtpgOperator& op)
+DtpgSatOld::solve(SatSolver& solver,
+		  DtpgFault* f,
+		  DtpgOperator& op)
 {
   if ( mDryRun ) {
     f->set_skip();
@@ -1614,7 +1614,7 @@ DtpgSat::solve(SatSolver& solver,
 // @brief テストパタンを求める．
 // @note 結果は mValList に格納される．
 void
-DtpgSat::get_pat(DtpgNode* fnode)
+DtpgSatOld::get_pat(DtpgNode* fnode)
 {
   mValList.clear();
   mBwdNodeList.clear();
@@ -1642,7 +1642,7 @@ DtpgSat::get_pat(DtpgNode* fnode)
 // @brief テストパタンを求める．
 // @note 結果は mValList に格納される．
 void
-DtpgSat::get_pat2(DtpgNode* fnode)
+DtpgSatOld::get_pat2(DtpgNode* fnode)
 {
 #if 0
   mValList.clear();
@@ -1687,7 +1687,7 @@ DtpgSat::get_pat2(DtpgNode* fnode)
 // @note 正当化に用いられているノードには mark3 がつく．
 // @note mark3 がついたノードは mBwdNodeList に格納される．
 void
-DtpgSat::justify(DtpgNode* node)
+DtpgSatOld::justify(DtpgNode* node)
 {
   if ( node->mark3() ) {
     return;
@@ -1784,7 +1784,7 @@ DtpgSat::justify(DtpgNode* node)
 // @brief すべてのファンインに対して justify() を呼ぶ．
 // @param[in] node 対象のノード
 void
-DtpgSat::just_sub1(DtpgNode* node)
+DtpgSatOld::just_sub1(DtpgNode* node)
 {
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -1797,8 +1797,8 @@ DtpgSat::just_sub1(DtpgNode* node)
 // @param[in] node 対象のノード
 // @param[in] val 値
 void
-DtpgSat::just_sub2(DtpgNode* node,
-		   Bool3 val)
+DtpgSatOld::just_sub2(DtpgNode* node,
+		      Bool3 val)
 {
   bool gfound = false;
   bool ffound = false;
@@ -1831,8 +1831,8 @@ DtpgSat::just_sub2(DtpgNode* node,
 // @note 正当化に用いられているノードには mark3 がつく．
 // @note mark3 がついたノードは mBwdNodeList に格納される．
 void
-DtpgSat::justify_primitive(DtpgPrimitive* prim,
-			   DtpgNode* node)
+DtpgSatOld::justify_primitive(DtpgPrimitive* prim,
+			      DtpgNode* node)
 {
   if ( prim->is_input() ) {
     ymuint ipos = prim->input_id();
@@ -1916,8 +1916,8 @@ DtpgSat::justify_primitive(DtpgPrimitive* prim,
 // @param[in] prim 対象のプリミティブ
 // @param[in] node 対象のノード
 void
-DtpgSat::jp_sub1(DtpgPrimitive* prim,
-		 DtpgNode* node)
+DtpgSatOld::jp_sub1(DtpgPrimitive* prim,
+		    DtpgNode* node)
 {
   ymuint ni = prim->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -1931,9 +1931,9 @@ DtpgSat::jp_sub1(DtpgPrimitive* prim,
 // @param[in] node 対象のノード
 // @param[in] val 値
 void
-DtpgSat::jp_sub2(DtpgPrimitive* prim,
-		 DtpgNode* node,
-		 Bool3 val)
+DtpgSatOld::jp_sub2(DtpgPrimitive* prim,
+		    DtpgNode* node,
+		    Bool3 val)
 {
   bool gfound = false;
   bool ffound = false;
@@ -1964,7 +1964,7 @@ DtpgSat::jp_sub2(DtpgPrimitive* prim,
 // @note node の値を mValList に記録する．
 // @note 単純だが mModel 上のインデックスと mValList の符号化は異なる．
 void
-DtpgSat::record_value(DtpgNode* node)
+DtpgSatOld::record_value(DtpgNode* node)
 {
   assert_cond( node->is_input(), __FILE__, __LINE__);
 
@@ -1982,7 +1982,7 @@ DtpgSat::record_value(DtpgNode* node)
 
 // @brief ノードの変数割り当てフラグを消す．
 void
-DtpgSat::clear_node_mark()
+DtpgSatOld::clear_node_mark()
 {
   for (vector<DtpgNode*>::iterator p = mUsedNodeList.begin();
        p != mUsedNodeList.end(); ++ p) {
@@ -1995,7 +1995,7 @@ DtpgSat::clear_node_mark()
 // @brief 統計情報を得る．
 // @param[in] stats 結果を格納する構造体
 void
-DtpgSat::get_stats(DtpgStats& stats) const
+DtpgSatOld::get_stats(DtpgStats& stats) const
 {
   stats.mCnfGenCount = mCnfCount;
   stats.mCnfGenTime = mCnfTime;
@@ -2007,6 +2007,8 @@ DtpgSat::get_stats(DtpgStats& stats) const
   stats.mAbortTime = mAbortTime;
 
   if ( mRunCount > 0 ) {
+    cout.setf(ios::fixed);
+    cout.precision(2);
     cout << "# of runs:                       " << mRunCount << endl
 	 << "# of problems:                   " << mSatCount << endl
 	 << "Ave. # of restarts:              " << (double) mRestart / mSatCount << endl
@@ -2023,15 +2025,15 @@ DtpgSat::get_stats(DtpgStats& stats) const
 
 // @breif 時間計測を制御する．
 void
-DtpgSat::timer_enable(bool enable)
+DtpgSatOld::timer_enable(bool enable)
 {
   mTimerEnable = enable;
 }
 
 // @brief 統計情報を得る．
 void
-DtpgSat::update_stats(SatSolver& solver,
-		      ymuint n)
+DtpgSatOld::update_stats(SatSolver& solver,
+			 ymuint n)
 {
   SatStats sat_stat;
   solver.get_stats(sat_stat);

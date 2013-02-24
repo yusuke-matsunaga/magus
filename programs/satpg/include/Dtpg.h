@@ -12,43 +12,9 @@
 
 #include "satpg_nsdef.h"
 #include "ym_networks/tgnet.h"
-#include "ym_utils/USTime.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
-
-//////////////////////////////////////////////////////////////////////
-/// @class DtpgStats Dtpg.h "Dtpg.h"
-/// @brief DTPG の統計情報を表すクラス
-//////////////////////////////////////////////////////////////////////
-struct DtpgStats
-{
-  /// @brief CNF 式を生成した回数
-  ymuint32 mCnfGenCount;
-
-  /// @brief CNF 式の生成に費やした時間
-  USTime mCnfGenTime;
-
-  /// @brief テスト生成に成功した回数．
-  ymuint32 mDetCount;
-
-  /// @brief テスト生成に成功した時の SAT に要した時間
-  USTime mDetTime;
-
-  /// @brief 冗長故障と判定した回数
-  ymuint32 mRedCount;
-
-  /// @brief 冗長故障と判定した時の SAT に要した時間
-  USTime mRedTime;
-
-  /// @brief アボートした回数
-  ymuint32 mAbortCount;
-
-  /// @brief アボートした時の SAT に要した時間
-  USTime mAbortTime;
-
-};
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class Dtpg Dtpg.h "Dtpg.h"
@@ -121,10 +87,15 @@ public:
 };
 
 
-/// @brief Dtpg のインスタンスを生成する．
+/// @brief DtpgSat のインスタンスを生成する．
 extern
 Dtpg*
 new_DtpgSat();
+
+/// @brief DtpgSatOld のインスタンスを生成する．
+extern
+Dtpg*
+new_DtpgSatOld();
 
 END_NAMESPACE_YM_SATPG
 

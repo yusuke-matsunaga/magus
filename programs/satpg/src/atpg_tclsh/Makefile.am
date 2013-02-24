@@ -46,8 +46,8 @@ atpg_tclsh_SOURCES = \
 	RtpgCmd.cc \
 	DtpgCmd.h \
 	DtpgCmd.cc \
-	Dtpg2Cmd.h \
-	Dtpg2Cmd.cc
+	DtpgOldCmd.h \
+	DtpgOldCmd.cc
 
 atpg_tclsh_LDADD = \
 	$(top_builddir)/src/main/libatpg_main.la \

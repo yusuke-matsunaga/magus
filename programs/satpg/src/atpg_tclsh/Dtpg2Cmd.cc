@@ -10,7 +10,7 @@
 #include "Dtpg2Cmd.h"
 #include "ym_tclpp/TclPopt.h"
 #include "AtpgMgr.h"
-#include "ym_networks/TgNode.h"
+#include "DtpgStats.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

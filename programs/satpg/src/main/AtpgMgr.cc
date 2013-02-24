@@ -72,6 +72,7 @@ AtpgMgr::AtpgMgr() :
   mFsim3 = new_Fsim3();
 
   mDtpg = new_DtpgSat();
+  mDtpgOld = new_DtpgSatOld();
 
   mDtpgDrop = false;
 
@@ -89,6 +90,7 @@ AtpgMgr::~AtpgMgr()
   delete mFsim;
   delete mFsim3;
   delete mDtpg;
+  delete mDtpgOld;
 }
 
 // @brief blif 形式のファイルを読み込む．
@@ -230,6 +232,7 @@ AtpgMgr::set_dtpg_mode(const string& type,
 		       ostream* outp)
 {
   mDtpg->set_mode(type, option, outp);
+  mDtpgOld->set_mode(type, option, outp);
 }
 
 // @brief X抽出のモードを指定する．
@@ -237,6 +240,7 @@ void
 AtpgMgr::set_dtpg_xmode(ymuint val)
 {
   mDtpg->set_get_pat(val);
+  mDtpgOld->set_get_pat(val);
 }
 
 // @brief dry-run フラグを設定する．
@@ -244,6 +248,7 @@ void
 AtpgMgr::set_dtpg_dry_run(bool flag)
 {
   mDtpg->set_dry_run(flag);
+  mDtpgOld->set_dry_run(flag);
 }
 
 // @brief テストパタン生成時に故障ドロップを行なうかを指定する．
@@ -265,6 +270,7 @@ void
 AtpgMgr::set_dtpg_timer(bool enable)
 {
   mDtpg->timer_enable(enable);
+  mDtpgOld->timer_enable(enable);
 }
 
 // @brief テストパタン生成を行なう．
@@ -283,9 +289,24 @@ AtpgMgr::dtpg(const string& option)
   mTimer.change(old_id);
 }
 
-BEGIN_NONAMESPACE
+// @brief テストパタン生成を行なう．
+void
+AtpgMgr::dtpg_old(const string& option)
+{
+  ymuint old_id = mTimer.cur_id();
+  mTimer.change(TM_DTPG);
 
-END_NONAMESPACE
+  Op1 op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
+
+  mDtpgOld->run(op, option);
+
+  after_update_faults();
+
+  mTimer.change(old_id);
+}
+
+
+#if 0
 
 // @brief テストパタン生成を行なう．
 void
@@ -595,6 +616,8 @@ AtpgMgr::merge(const TgNode* node1,
   }
 }
 
+#endif
+
 // @brief ファイル読み込みに関わる時間を得る．
 USTime
 AtpgMgr::read_time() const
@@ -635,6 +658,7 @@ void
 AtpgMgr::clear_stats()
 {
   mDtpg->clear_stats();
+  mDtpgOld->clear_stats();
 }
 
 // @brief 統計情報を得る．
@@ -642,6 +666,13 @@ void
 AtpgMgr::get_stats(DtpgStats& stats)
 {
   mDtpg->get_stats(stats);
+}
+
+// @brief 統計情報を得る．
+void
+AtpgMgr::get_stats_old(DtpgStats& stats)
+{
+  mDtpgOld->get_stats(stats);
 }
 
 // @brief ネットワークをセットした後に呼ぶ関数
@@ -717,6 +748,7 @@ AtpgMgr::after_set_network()
   }
 
   mDtpg->set_network(mNetwork, mFaultMgr.remain_list());
+  mDtpgOld->set_network(mNetwork, mFaultMgr.remain_list());
 
   mNtwkBindMgr.prop_event(mNetwork, mFaultMgr.remain_list());
 }

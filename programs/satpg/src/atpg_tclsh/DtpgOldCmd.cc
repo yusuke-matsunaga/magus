@@ -1,13 +1,13 @@
 
-/// @file src/atpg_tclsh/DtpgCmd.cc
-/// @brief DtpgCmd の実装ファイル
+/// @file src/atpg_tclsh/DtpgOldCmd.cc
+/// @brief DtpgOldCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "DtpgCmd.h"
+#include "DtpgOldCmd.h"
 #include "ym_tclpp/TclPopt.h"
 #include "AtpgMgr.h"
 #include "DtpgStats.h"
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
+DtpgOldCmd::DtpgOldCmd(AtpgMgr* mgr) :
   AtpgCmd(mgr)
 {
   mPoptVerbose = new TclPoptInt(this, "verbose",
@@ -65,13 +65,13 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 }
 
 // @brief デストラクタ
-DtpgCmd::~DtpgCmd()
+DtpgOldCmd::~DtpgOldCmd()
 {
 }
 
 // コマンド処理関数
 int
-DtpgCmd::cmd_proc(TclObjVector& objv)
+DtpgOldCmd::cmd_proc(TclObjVector& objv)
 {
   ymuint objc = objv.size();
   if ( objc != 1 ) {
@@ -180,13 +180,13 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     dtpg_option += "_skip";
   }
 
-  mgr().dtpg(dtpg_option);
+  mgr().dtpg_old(dtpg_option);
 
   after_update_faults();
 
   if ( print_stats ) {
     DtpgStats stats;
-    mgr().get_stats(stats);
+    mgr().get_stats_old(stats);
 #if 0
     const DtpgStats& stats = mDtpg.stats();
     cout << "********** dtpg **********" << endl

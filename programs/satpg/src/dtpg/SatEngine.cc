@@ -1,18 +1,17 @@
 
-/// @file atpg/src/dtpg/DtpgSat.cc
-/// @brief DtpgSat の実装ファイル
+/// @file atpg/src/dtpg/SatEngine.cc
+/// @brief SatEngine の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "DtpgSat.h"
+#include "SatEngine.h"
+#include "Dtpg.h"
 #include "DtpgStats.h"
-#include "DtpgNetwork.h"
 #include "DtpgNode.h"
 #include "DtpgPrimitive.h"
-#include "DtpgFFR.h"
 #include "DtpgFault.h"
 #include "DtpgOperator.h"
 #include "InputLiteral.h"
@@ -21,17 +20,6 @@
 
 
 #define VERIFY_MAIMP 0
-
-
-BEGIN_NAMESPACE_YM_SATPG
-
-Dtpg*
-new_DtpgSat()
-{
-  return new nsDtpg::DtpgSat();
-}
-
-END_NAMESPACE_YM_SATPG
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
@@ -350,7 +338,8 @@ make_gnode_cnf(SatSolver& solver,
 
 	// プリミティブの入出力の関係を表す CNF 式を作る．
 	Literal output(gvar, kPolPosi);
-	make_gate_cnf(solver, prim->gate_type(), output, PrimGvarInputLiteral(prim));
+	make_gate_cnf(solver, prim->gate_type(), output,
+		      PrimGvarInputLiteral(prim));
       }
       // prim の変数 gvar と fvar の両方に登録しておく
       prim->set_gvar(gvar);
@@ -359,7 +348,8 @@ make_gnode_cnf(SatSolver& solver,
   }
   else {
     // 単純な組み込み型の場合
-    make_gate_cnf(solver, node->gate_type(), output, GvarInputLiteral(node));
+    make_gate_cnf(solver, node->gate_type(), output,
+		  GvarInputLiteral(node));
   }
 }
 
@@ -429,14 +419,16 @@ make_fnode_cnf(SatSolver& solver,
 
 	// プリミティブの入出力の関係を表す CNF 式を作る．
 	Literal output(fvar, kPolPosi);
-	make_gate_cnf(solver, prim->gate_type(), output, PrimFvarInputLiteral(prim));
+	make_gate_cnf(solver, prim->gate_type(), output,
+		      PrimFvarInputLiteral(prim));
       }
       // プリミティブの変数を登録する．
       prim->set_fvar(fvar);
     }
   }
   else {
-    make_gate_cnf(solver, node->gate_type(), output, FvarInputLiteral(node));
+    make_gate_cnf(solver, node->gate_type(), output,
+		  FvarInputLiteral(node));
   }
 }
 
@@ -472,430 +464,54 @@ END_NONAMESPACE
 
 
 // @brief コンストラクタ
-DtpgSat::DtpgSat()
+SatEngine::SatEngine()
 {
   mGetPatFlag = 0;
-  mNetwork = NULL;
   mSkip = false;
   mDryRun = false;
   mTimerEnable = false;
 }
 
 // @brief デストラクタ
-DtpgSat::~DtpgSat()
+SatEngine::~SatEngine()
 {
-  delete mNetwork;
 }
 
 // @brief 使用する SAT エンジンを指定する．
 void
-DtpgSat::set_mode(const string& type,
-		  const string& option,
-		  ostream* outp)
+SatEngine::set_mode(const string& type,
+		    const string& option,
+		    ostream* outp)
 {
   mType = type;
   mOption = option;
   mOutP = outp;
 }
 
+// @brief skip フラグを設定する．
+void
+SatEngine::set_skip(bool flag)
+{
+  mSkip = flag;
+}
+
 // @brief get_pat フラグを設定する．
 void
-DtpgSat::set_get_pat(ymuint val)
+SatEngine::set_get_pat(ymuint val)
 {
   mGetPatFlag = val;
 }
 
 // @brief dry-run フラグを設定する．
 void
-DtpgSat::set_dry_run(bool flag)
+SatEngine::set_dry_run(bool flag)
 {
   mDryRun = flag;
 }
 
-// @brief 回路と故障リストを設定する．
-// @param[in] tgnetwork 対象のネットワーク
-// @param[in] fault_list 故障リスト
-void
-DtpgSat::set_network(const TgNetwork& tgnetwork,
-		     const vector<SaFault*>& fault_list)
-{
-  delete mNetwork;
-  mNetwork = new DtpgNetwork(tgnetwork, fault_list);
-}
-
-// @brief モードでテスト生成を行なう．
-// @param[in] op テスト生成後に呼ばれるファンクター
-// @param[in] option オプション文字列
-void
-DtpgSat::run(DtpgOperator& op,
-	     const string& option)
-{
-  bool single = false;
-  bool dual = false;
-  bool ffr = false;
-  bool mffc = false;
-  bool all = false;
-  bool po = false;
-  mSkip = false;
-
-  if ( option == string() || option == "single" ) {
-    single = true;
-  }
-  else if ( option == "dual" ) {
-    dual = true;
-  }
-  else if ( option == "ffr" ) {
-    ffr = true;
-  }
-  else if ( option == "mffc" ) {
-    mffc = true;
-  }
-  else if ( option == "single_po" ) {
-    single = true;
-    po = true;
-  }
-  else if ( option == "single_po_skip" ) {
-    single = true;
-    po = true;
-    mSkip = true;
-  }
-  else if ( option == "dual_po" ) {
-    dual = true;
-    po = true;
-  }
-  else if ( option == "dual_po_skip" ) {
-    dual = true;
-    po = true;
-    mSkip = true;
-
-  }
-  else if ( option == "ffr_po" ) {
-    ffr = true;
-    po = true;
-  }
-  else if ( option == "ffr_po_skip" ) {
-    ffr = true;
-    po = true;
-    mSkip = true;
-  }
-  else if ( option == "mffc_po" ) {
-    mffc = true;
-    po = true;
-  }
-  else if ( option == "mffc_po_skip" ) {
-    mffc = true;
-    po = true;
-    mSkip = true;
-  }
-  else if ( option == "all_po" ) {
-    all = true;
-    po = true;
-  }
-  else if ( option == "all_po_skip" ) {
-    all = true;
-    po = true;
-    mSkip = true;
-  }
-  else {
-    cout << "illegal option " << option << ". ignored" << endl;
-    return;
-  }
-
-  if ( !po ) {
-    mNetwork->activate_all();
-    if ( single ) {
-      single_sub(op);
-    }
-    else if ( dual ) {
-      dual_sub(op);
-    }
-    else if ( ffr ) {
-      ffr_sub(op);
-    }
-    else if ( mffc ) {
-      mffc_sub(op);
-    }
-  }
-  else {
-    ymuint no = mNetwork->output_num2();
-    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-      DtpgNode* onode = mNetwork->output2(po_pos);
-      mNetwork->activate_po(onode);
-      if ( single ) {
-	single_sub(op);
-      }
-      else if ( dual ) {
-	dual_sub(op);
-      }
-      else if ( ffr ) {
-	ffr_sub(op);
-      }
-      else if ( mffc ) {
-	mffc_sub(op);
-      }
-      else if ( all ) {
-	all_sub(op);
-      }
-    }
-    if ( mSkip ) {
-      clear_skip();
-    }
-
-    mSkip = false;
-  }
-}
-
-// @brief テスト生成を行なう．
-// @param[in] flist 対象の故障リスト
-// @param[in] op テスト生成後に呼ばれるファンクター
-void
-DtpgSat::run(const vector<SaFault*>& flist,
-	     DtpgOperator& op)
-{
-  ymuint nf = flist.size();
-  vector<DtpgFault*> dtpg_flist;
-  dtpg_flist.reserve(nf);
-  for (ymuint i = 0; i < nf; ++ i) {
-    SaFault* f = flist[i];
-    if ( f != NULL ) {
-      dtpg_flist.push_back(mNetwork->conv_fault(f));
-    }
-  }
-
-  if ( dtpg_flist.empty() ) {
-    return;
-  }
-  dtpg_group(dtpg_flist, op);
-}
-
-// @brief single モードの共通処理
-void
-DtpgSat::single_sub(DtpgOperator& op)
-{
-  ymuint nn = mNetwork->active_node_num();
-  for (ymuint i = 0; i < nn; ++ i) {
-    DtpgNode* node = mNetwork->active_node(i);
-
-    // 出力の故障
-    DtpgFault* f0 = node->output_fault(0);
-    if ( f0 != NULL && !f0->is_skip() ) {
-      dtpg_single(f0, op);
-    }
-
-    DtpgFault* f1 = node->output_fault(1);
-    if ( f1 != NULL && !f1->is_skip() ) {
-      dtpg_single(f1, op);
-    }
-
-    // 入力の故障
-    ymuint ni = node->fanin_num();
-    for (ymuint j = 0; j < ni; ++ j) {
-      DtpgFault* f0 = node->input_fault(0, j);
-      if ( f0 != NULL && !f0->is_skip() ) {
-	dtpg_single(f0, op);
-      }
-
-      DtpgFault* f1 = node->input_fault(1, j);
-      if ( f1 != NULL && !f1->is_skip() ) {
-	dtpg_single(f1, op);
-      }
-    }
-  }
-}
-
-// @brief dual モードの共通処理
-void
-DtpgSat::dual_sub(DtpgOperator& op)
-{
-  ymuint nn = mNetwork->active_node_num();
-  for (ymuint i = 0; i < nn; ++ i) {
-    DtpgNode* node = mNetwork->active_node(i);
-
-    // 出力の故障
-    DtpgFault* f0 = node->output_fault(0);
-    DtpgFault* f1 = node->output_fault(1);
-    if ( f0 != NULL && f0->is_skip() ) {
-      f0 = NULL;
-    }
-    if ( f1 != NULL && f1->is_skip() ) {
-      f1 = NULL;
-    }
-    if ( f0 != NULL && f1 != NULL ) {
-      dtpg_dual(f0, f1, op);
-    }
-    else if ( f0 != NULL ) {
-      dtpg_single(f0, op);
-    }
-    else if ( f1 != NULL ) {
-      dtpg_single(f1, op);
-    }
-
-    // 入力の故障
-    ymuint ni = node->fanin_num();
-    for (ymuint j = 0; j < ni; ++ j) {
-      DtpgFault* f0 = node->input_fault(0, j);
-      DtpgFault* f1 = node->input_fault(1, j);
-      if ( f0 != NULL && f0->is_skip() ) {
-	f0 = NULL;
-      }
-      if ( f1 != NULL && f1->is_skip() ) {
-	f1 = NULL;
-      }
-      if ( f0 != NULL && f1 != NULL ) {
-	dtpg_dual(f0, f1, op);
-      }
-      else if ( f0 != NULL ) {
-	dtpg_single(f0, op);
-      }
-      else if ( f1 != NULL ) {
-	dtpg_single(f1, op);
-      }
-    }
-  }
-}
-
-BEGIN_NONAMESPACE
-
-void
-add_faults(DtpgNode* node,
-	   vector<DtpgFault*>& fault_list)
-{
-  ymuint ni = node->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    DtpgFault* f0 = node->input_fault(0, i);
-    if ( f0 != NULL && !f0->is_skip() ) {
-      fault_list.push_back(f0);
-    }
-    DtpgFault* f1 = node->input_fault(1, i);
-    if ( f1 != NULL && !f1->is_skip() ) {
-      fault_list.push_back(f1);
-    }
-  }
-  DtpgFault* f0 = node->output_fault(0);
-  if ( f0 != NULL && !f0->is_skip() ) {
-    fault_list.push_back(f0);
-  }
-  DtpgFault* f1 = node->output_fault(1);
-  if ( f1 != NULL && !f1->is_skip() ) {
-    fault_list.push_back(f1);
-  }
-}
-
-void
-dfs_ffr(DtpgNode* node,
-	vector<DtpgFault*>& fault_list)
-{
-  ymuint ni = node->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    DtpgNode* inode = node->fanin(i);
-    if ( inode->active_fanout_num() == 1 ) {
-      dfs_ffr(inode, fault_list);
-    }
-  }
-
-  add_faults(node, fault_list);
-}
-
-END_NONAMESPACE
-
-// @brief ffr モードの共通処理
-void
-DtpgSat::ffr_sub(DtpgOperator& op)
-{
-#if 0
-  vector<DtpgFFR*> ffr_list;
-  mNetwork->get_ffr_list(ffr_list);
-  for (vector<DtpgFFR*>::const_iterator p = ffr_list.begin();
-       p != ffr_list.end(); ++ p) {
-    DtpgFFR* ffr = *p;
-    ffr_mode(ffr, op);
-    delete ffr;
-  }
-#else
-  vector<DtpgFault*> tmp_list;
-  ymuint n = mNetwork->active_node_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    DtpgNode* node = mNetwork->active_node(i);
-    if ( node->is_output() || node->active_fanout_num() > 1 ) {
-      tmp_list.clear();
-      dfs_ffr(node, tmp_list);
-      if ( tmp_list.empty() ) {
-	continue;
-      }
-      dtpg_group(tmp_list, op);
-    }
-  }
-#endif
-}
-
-// @brief mffc モードの共通処理
-void
-DtpgSat::mffc_sub(DtpgOperator& op)
-{
-  vector<DtpgFFR*> mffc_list;
-  mNetwork->get_mffc_list(mffc_list);
-  for (vector<DtpgFFR*>::const_iterator p = mffc_list.begin();
-       p != mffc_list.end(); ++ p) {
-    DtpgFFR* ffr = *p;
-    ffr_mode(ffr, op);
-    delete ffr;
-  }
-}
-
-// @brief all モードの共通処理
-void
-DtpgSat::all_sub(DtpgOperator& op)
-{
-  vector<DtpgFault*> flist;
-  ymuint n = mNetwork->active_node_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    DtpgNode* node = mNetwork->active_node(i);
-    add_faults(node, flist);
-  }
-  if ( flist.empty() ) {
-    return;
-  }
-  dtpg_group(flist, op);
-}
-
-// @brief 一つの FFR に対してテストパタン生成を行う．
-// @param[in] ffr 対象の FFR
-void
-DtpgSat::ffr_mode(DtpgFFR* ffr,
-		  DtpgOperator& op)
-{
-  vector<DtpgFault*> flist;
-  const vector<DtpgNode*>& node_list = ffr->node_list();
-  for (vector<DtpgNode*>::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    DtpgNode* node = *p;
-    add_faults(node, flist);
-  }
-
-  if ( flist.empty() ) {
-    return;
-  }
-  dtpg_group(flist, op);
-}
-
-// @brief スキップフラグを解除する．
-void
-DtpgSat::clear_skip()
-{
-  const vector<DtpgFault*>& flist = mNetwork->fault_list();
-  for (vector<DtpgFault*>::const_iterator p = flist.begin();
-       p != flist.end(); ++ p) {
-    DtpgFault* f = *p;
-    if ( f->is_skip() && f->is_untestable() ) {
-      f->clear_skip();
-      f->clear_untestable();
-    }
-  }
-}
-
 // @brief 統計情報をクリアする．
 void
-DtpgSat::clear_stats()
+SatEngine::clear_stats()
 {
   mRunCount = 0;
   mSatCount = 0;
@@ -1072,10 +688,10 @@ END_NONAMESPACE
 // @brief 必要割り当ての情報に基づいて故障をグループ分けする．
 // @note 内部で dtpg_ffr() を呼ぶ．
 void
-DtpgSat::dtpg_ffr2(const vector<DtpgFault*>& flist,
-		   DtpgNode* root,
-		   const vector<DtpgNode*>& node_list,
-		   DtpgOperator& op)
+SatEngine::dtpg_ffr2(const vector<DtpgFault*>& flist,
+		     DtpgNode* root,
+		     const vector<DtpgNode*>& node_list,
+		     DtpgOperator& op)
 {
 #if VERIFY_MAIMP
   // 必要割り当てで冗長と判定された故障のリストを作る．
@@ -1178,19 +794,13 @@ is_valid(DtpgFault* f,
 
 END_NONAMESPACE
 
-// @brief 複数の故障に対してテストパタン生成を行なう．
+// @brief テストパタン生成を行なう．
 // @param[in] flist 故障リスト
-// @param[in] root FFR の根のノード
-// @param[in] node_list FFR 内のノードリスト
 // @param[in] op テスト生成の結果を処理するファンクター
 void
-DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
-		    DtpgOperator& op)
+SatEngine::run(const vector<DtpgFault*>& flist,
+	       DtpgOperator& op)
 {
-  if ( flist.empty() ) {
-    return;
-  }
-
   if ( mTimerEnable ) {
     mTimer.reset();
     mTimer.start();
@@ -1425,12 +1035,14 @@ DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
 	      else {
 		output = Literal(prim->fvar(), kPolPosi);
 	      }
-	      make_gate_cnf(solver, prim->gate_type(), output, VectorInputLiteral(inputs1));
+	      make_gate_cnf(solver, prim->gate_type(), output,
+			    VectorInputLiteral(inputs1));
 	    }
 	  }
 	}
 	else {
-	  make_gate_cnf(solver, node->gate_type(), gate_output, VectorInputLiteral(inputs));
+	  make_gate_cnf(solver, node->gate_type(), gate_output,
+			VectorInputLiteral(inputs));
 	}
       }
 
@@ -1543,9 +1155,9 @@ DtpgSat::dtpg_group(const vector<DtpgFault*>& flist,
 
 // @brief 一つの SAT問題を解く．
 void
-DtpgSat::solve(SatSolver& solver,
-	       DtpgFault* f,
-	       DtpgOperator& op)
+SatEngine::solve(SatSolver& solver,
+		 DtpgFault* f,
+		 DtpgOperator& op)
 {
   if ( mDryRun ) {
     f->set_skip();
@@ -1614,7 +1226,7 @@ DtpgSat::solve(SatSolver& solver,
 // @brief テストパタンを求める．
 // @note 結果は mValList に格納される．
 void
-DtpgSat::get_pat(DtpgNode* fnode)
+SatEngine::get_pat(DtpgNode* fnode)
 {
   mValList.clear();
   mBwdNodeList.clear();
@@ -1642,7 +1254,7 @@ DtpgSat::get_pat(DtpgNode* fnode)
 // @brief テストパタンを求める．
 // @note 結果は mValList に格納される．
 void
-DtpgSat::get_pat2(DtpgNode* fnode)
+SatEngine::get_pat2(DtpgNode* fnode)
 {
 #if 0
   mValList.clear();
@@ -1687,7 +1299,7 @@ DtpgSat::get_pat2(DtpgNode* fnode)
 // @note 正当化に用いられているノードには mark3 がつく．
 // @note mark3 がついたノードは mBwdNodeList に格納される．
 void
-DtpgSat::justify(DtpgNode* node)
+SatEngine::justify(DtpgNode* node)
 {
   if ( node->mark3() ) {
     return;
@@ -1784,7 +1396,7 @@ DtpgSat::justify(DtpgNode* node)
 // @brief すべてのファンインに対して justify() を呼ぶ．
 // @param[in] node 対象のノード
 void
-DtpgSat::just_sub1(DtpgNode* node)
+SatEngine::just_sub1(DtpgNode* node)
 {
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -1797,8 +1409,8 @@ DtpgSat::just_sub1(DtpgNode* node)
 // @param[in] node 対象のノード
 // @param[in] val 値
 void
-DtpgSat::just_sub2(DtpgNode* node,
-		   Bool3 val)
+SatEngine::just_sub2(DtpgNode* node,
+		     Bool3 val)
 {
   bool gfound = false;
   bool ffound = false;
@@ -1831,8 +1443,8 @@ DtpgSat::just_sub2(DtpgNode* node,
 // @note 正当化に用いられているノードには mark3 がつく．
 // @note mark3 がついたノードは mBwdNodeList に格納される．
 void
-DtpgSat::justify_primitive(DtpgPrimitive* prim,
-			   DtpgNode* node)
+SatEngine::justify_primitive(DtpgPrimitive* prim,
+			     DtpgNode* node)
 {
   if ( prim->is_input() ) {
     ymuint ipos = prim->input_id();
@@ -1916,8 +1528,8 @@ DtpgSat::justify_primitive(DtpgPrimitive* prim,
 // @param[in] prim 対象のプリミティブ
 // @param[in] node 対象のノード
 void
-DtpgSat::jp_sub1(DtpgPrimitive* prim,
-		 DtpgNode* node)
+SatEngine::jp_sub1(DtpgPrimitive* prim,
+		   DtpgNode* node)
 {
   ymuint ni = prim->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -1931,9 +1543,9 @@ DtpgSat::jp_sub1(DtpgPrimitive* prim,
 // @param[in] node 対象のノード
 // @param[in] val 値
 void
-DtpgSat::jp_sub2(DtpgPrimitive* prim,
-		 DtpgNode* node,
-		 Bool3 val)
+SatEngine::jp_sub2(DtpgPrimitive* prim,
+		   DtpgNode* node,
+		   Bool3 val)
 {
   bool gfound = false;
   bool ffound = false;
@@ -1964,7 +1576,7 @@ DtpgSat::jp_sub2(DtpgPrimitive* prim,
 // @note node の値を mValList に記録する．
 // @note 単純だが mModel 上のインデックスと mValList の符号化は異なる．
 void
-DtpgSat::record_value(DtpgNode* node)
+SatEngine::record_value(DtpgNode* node)
 {
   assert_cond( node->is_input(), __FILE__, __LINE__);
 
@@ -1982,7 +1594,7 @@ DtpgSat::record_value(DtpgNode* node)
 
 // @brief ノードの変数割り当てフラグを消す．
 void
-DtpgSat::clear_node_mark()
+SatEngine::clear_node_mark()
 {
   for (vector<DtpgNode*>::iterator p = mUsedNodeList.begin();
        p != mUsedNodeList.end(); ++ p) {
@@ -1995,7 +1607,7 @@ DtpgSat::clear_node_mark()
 // @brief 統計情報を得る．
 // @param[in] stats 結果を格納する構造体
 void
-DtpgSat::get_stats(DtpgStats& stats) const
+SatEngine::get_stats(DtpgStats& stats) const
 {
   stats.mCnfGenCount = mCnfCount;
   stats.mCnfGenTime = mCnfTime;
@@ -2023,15 +1635,15 @@ DtpgSat::get_stats(DtpgStats& stats) const
 
 // @breif 時間計測を制御する．
 void
-DtpgSat::timer_enable(bool enable)
+SatEngine::timer_enable(bool enable)
 {
   mTimerEnable = enable;
 }
 
 // @brief 統計情報を得る．
 void
-DtpgSat::update_stats(SatSolver& solver,
-		      ymuint n)
+SatEngine::update_stats(SatSolver& solver,
+			ymuint n)
 {
   SatStats sat_stat;
   solver.get_stats(sat_stat);

@@ -68,6 +68,11 @@ public:
   void
   get_stats(DtpgStats& stats);
 
+  /// @brief 統計情報を得る．
+  /// @param[in] stats 結果を格納する構造体
+  void
+  get_stats_old(DtpgStats& stats);
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -157,7 +162,7 @@ public:
 
   /// @brief テストパタン生成を行なう．
   void
-  dtpg2(const string& option);
+  dtpg_old(const string& option);
 
 
 public:
@@ -281,6 +286,9 @@ private:
 
   // 3値の故障シミュレータ
   Fsim* mFsim3;
+
+  // テストパタン生成器
+  Dtpg* mDtpgOld;
 
   // テストパタン生成器
   Dtpg* mDtpg;
