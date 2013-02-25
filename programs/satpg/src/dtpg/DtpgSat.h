@@ -165,6 +165,9 @@ private:
   // 対象の回路
   DtpgNetwork* mNetwork;
 
+  // mNetwork のノード数
+  ymuint32 mMaxId;
+
   // 対象の故障リスト
   vector<DtpgFault*> mFaultList;
 
@@ -191,7 +194,7 @@ void
 DtpgSat::do_dtpg(DtpgOperator& op)
 {
   if ( !mFaultList.empty() ) {
-    mSatEngine.run(mFaultList, op);
+    mSatEngine.run(mFaultList, mMaxId, op);
   }
 }
 

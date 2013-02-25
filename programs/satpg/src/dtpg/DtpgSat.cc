@@ -74,6 +74,7 @@ DtpgSat::set_network(const TgNetwork& tgnetwork,
 {
   delete mNetwork;
   mNetwork = new DtpgNetwork(tgnetwork, fault_list);
+  mMaxId = mNetwork->node_num();
 }
 
 // @brief モードでテスト生成を行なう．

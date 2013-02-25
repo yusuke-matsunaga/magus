@@ -39,7 +39,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // Dtpg の仮想関数
+  // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 使用する SAT エンジンを指定する．
@@ -62,9 +62,11 @@ public:
 
   /// @brief テスト生成を行なう．
   /// @param[in] flist 対象の故障リスト
+  /// @param[in] max_id ノード番号の最大値 + 1
   /// @param[in] op テスト生成後に呼ばれるファンクター
   void
   run(const vector<DtpgFault*>& flist,
+      ymuint max_id,
       DtpgOperator& op);
 
   /// @brief 統計情報をクリアする．
@@ -204,6 +206,12 @@ private:
 
   // SAT 用の割り当てリスト
   vector<ymuint> mValList;
+
+  // 故障の TFO のノードリスト
+  vector<DtpgNode*> mTfoList;
+
+  // 故障の TFO の TFI のノードリスト
+  vector<DtpgNode*> mTfiList;
 
   // 変数を割り当てたノードを格納するリスト
   vector<DtpgNode*> mUsedNodeList;
