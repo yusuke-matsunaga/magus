@@ -460,21 +460,32 @@ SatEngine::set_mode(const string& type,
   mOutP = outp;
 }
 
-// @brief skip フラグを設定する．
+// @brief skip モードに設定する．
+// @param[in] threshold 検出不能故障をスキップするしきい値
 void
-SatEngine::set_skip(bool flag)
+SatEngine::set_skip(ymuint32 threshold)
 {
-  mSkip = flag;
-
-  if ( !flag ) {
-    for (vector<DtpgFault*>::iterator p = mSkippedFaults.begin();
-	 p != mSkippedFaults.end(); ++ p) {
-      DtpgFault* f = *p;
-      f->clear_skip();
-    }
-  }
-
+  mSkip = true;
+  mSkipThreshold = threshold;
+  mUntestFaults.clear();
   mSkippedFaults.clear();
+}
+
+// @brief skip モードを解除する．
+void
+SatEngine::clear_skip()
+{
+  mSkip = false;
+  for (vector<DtpgFault*>::iterator p = mUntestFaults.begin();
+       p != mUntestFaults.end(); ++ p) {
+    DtpgFault* f = *p;
+    f->clear_untest_num();
+  }
+  for (vector<DtpgFault*>::iterator p = mSkippedFaults.begin();
+       p != mSkippedFaults.end(); ++ p) {
+    DtpgFault* f = *p;
+    f->clear_skip();
+  }
 }
 
 // @brief get_pat フラグを設定する．
@@ -1131,7 +1142,7 @@ SatEngine::run(const vector<DtpgFault*>& flist,
 
     DtpgNode* fnode = f->node();
     if ( f->is_input_fault() ) {
-      fnode = f->source_node();
+      fnode = fnode->fanin(f->pos());
     }
     tPol pol = (f->val() == 0) ? kPolPosi : kPolNega;
     mAssumptions.push_back(Literal(fnode->gvar(), pol));
@@ -1161,7 +1172,12 @@ SatEngine::solve(SatSolver& solver,
 
   Bool3 ans = solver.solve(mAssumptions, mModel);
   if ( ans == kB3True ) {
-    f->set_skip();
+    // パタンが求まった．
+
+    if ( mSkip ) {
+      // 以降の処理ではスキップする．
+      f->set_skip();
+    }
 
     if ( mGetPatFlag == 1 ) {
       get_pat(f->node());
@@ -1189,10 +1205,22 @@ SatEngine::solve(SatSolver& solver,
     }
   }
   else if ( ans == kB3False ) {
-    f->set_untestable();
+    // 検出不能と判定された．
+
     if ( mSkip ) {
-      f->set_skip();
-      mSkippedFaults.push_back(f);
+      if ( f->untest_num() == 0 ) {
+	// はじめて検出不能になった．
+	mUntestFaults.push_back(f);
+      }
+
+      // 検出不能回数を1増やす．
+      f->inc_untest_num();
+
+      if ( f->untest_num() >= mSkipThreshold ) {
+	// 検出不能回数がしきい値を越えたのでスキップする．
+	f->set_skip();
+	mSkippedFaults.push_back(f);
+      }
     }
     else {
       op.set_untestable(f->safault());

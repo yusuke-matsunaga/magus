@@ -65,10 +65,6 @@ public:
   DtpgNode*
   node() const;
 
-  /// @brief 故障の入力側のノードを返す．
-  DtpgNode*
-  source_node() const;
-
   /// @brief 故障位置を返す．
   /// @note 入力側のノードの時のみ意味を持つ．
   ymuint
@@ -90,17 +86,17 @@ public:
   void
   clear_skip();
 
-  /// @brief untestable フラグを返す．
-  bool
-  is_untestable() const;
+  /// @brief POモードで検出不能と判定された回数を得る．
+  ymuint
+  untest_num() const;
 
-  /// @brief untestable フラグをセットする．
+  /// @brief POモードで検出不能と判定された回数を1増やす．
   void
-  set_untestable();
+  inc_untest_num();
 
-  /// @brief untestable フラグをクリアする．
+  /// @brief POモードで検出不能と判定された回数をクリアする．
   void
-  clear_untestable();
+  clear_untest_num();
 
   /// @brief 必要割り当てのリストを得る．
   vector<ymuint32>&
@@ -124,11 +120,11 @@ private:
   // 故障の出力側のノード
   DtpgNode* mNode;
 
-  // 故障の入力側のノード
-  DtpgNode* mSrcNode;
-
-  // 故障位置 + 故障値 + スキップフラグ + untestabel フラグ
+  // 故障位置 + 故障値 + スキップフラグ
   ymuint32 mPosVal;
+
+  // POモードで検出不能と判定された回数
+  ymuint32 mUntestNum;
 
   // 必要割り当てのリスト
   // 値は　ノードのID番号 × 2 + 値
@@ -209,14 +205,6 @@ DtpgFault::node() const
   return mNode;
 }
 
-// @brief 故障の入力側のノードを返す．
-inline
-DtpgNode*
-DtpgFault::source_node() const
-{
-  return mSrcNode;
-}
-
 // @brief 故障位置を返す．
 // @note 入力側のノードの時のみ意味を持つ．
 inline
@@ -261,28 +249,28 @@ DtpgFault::clear_skip()
   mPosVal &= ~4U;
 }
 
-// @brief untestable フラグを返す．
+// @brief POモードで検出不能と判定された回数を得る．
 inline
-bool
-DtpgFault::is_untestable() const
+ymuint
+DtpgFault::untest_num() const
 {
-  return static_cast<bool>((mPosVal >> 3) & 1U);
+  return mUntestNum;
 }
 
-// @brief untestable フラグをセットする．
+// @brief POモードで検出不能と判定された回数を1増やす．
 inline
 void
-DtpgFault::set_untestable()
+DtpgFault::inc_untest_num()
 {
-  mPosVal |= 8U;
+  ++ mUntestNum;
 }
 
-// @brief untestable フラグをクリアする．
+// @brief POモードで検出不能と判定された回数をクリアする．
 inline
 void
-DtpgFault::clear_untestable()
+DtpgFault::clear_untest_num()
 {
-  mPosVal &= ~8U;
+  mUntestNum = 0;
 }
 
 // @brief 必要割り当てのリストを得る．

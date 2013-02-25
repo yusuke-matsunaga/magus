@@ -49,9 +49,14 @@ public:
 	   const string& option = string(),
 	   ostream* outp = NULL);
 
-  /// @brief skip フラグを設定する．
+  /// @brief skip モードに設定する．
+  /// @param[in] threshold 検出不能故障をスキップするしきい値
   void
-  set_skip(bool flag);
+  set_skip(ymuint32 threshold);
+
+  /// @brief skip モードを解除する．
+  void
+  clear_skip();
 
   /// @brief get_pat フラグを設定する．
   void
@@ -277,6 +282,12 @@ private:
 
   // skip フラグ
   bool mSkip;
+
+  // 検出不能故障をスキップするしきい値
+  ymuint32 mSkipThreshold;
+
+  // 検出不能と判定された故障のリスト
+  vector<DtpgFault*> mUntestFaults;
 
   // skip フラグのついた故障のリスト
   vector<DtpgFault*> mSkippedFaults;

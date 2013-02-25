@@ -202,7 +202,7 @@ DtpgSat::run(DtpgOperator& op,
 
   if ( po ) {
     if ( skip ) {
-      mSatEngine.set_skip(true);
+      mSatEngine.set_skip(3);
     }
     ymuint no = mNetwork->output_num2();
     for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
@@ -223,12 +223,12 @@ DtpgSat::run(DtpgOperator& op,
     }
 
     if ( skip ) {
-      mSatEngine.set_skip(false);
+      mSatEngine.clear_skip();
     }
   }
   else if ( rpo ) {
     if ( skip ) {
-      mSatEngine.set_skip(true);
+      mSatEngine.set_skip(3);
     }
     ymuint no = mNetwork->output_num2();
     for (ymuint i = 0; i < no; ++ i) {
@@ -250,7 +250,7 @@ DtpgSat::run(DtpgOperator& op,
     }
 
     if ( skip ) {
-      mSatEngine.set_skip(false);
+      mSatEngine.clear_skip();
     }
   }
   else { // !po && !rpo

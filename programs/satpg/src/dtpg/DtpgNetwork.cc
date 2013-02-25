@@ -217,13 +217,10 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
     assert_cond( fval == 0 || fval == 1, __FILE__, __LINE__);
     if ( f->is_input_fault() ) {
       ymuint ipos = f->pos();
-      const TgNode* tgsrc = f->source_node();
-      df->mSrcNode = mNodeMap[tgsrc->gid()];
       df->mPosVal = (ipos << 4) | (fval << 1) | 1U;
       node->mInputFault[ipos * 2 + fval] = df;
     }
     else {
-      df->mSrcNode = NULL;
       df->mPosVal = (fval << 1);
       node->mOutputFault[fval] = df;
     }
@@ -590,7 +587,7 @@ DtpgNetwork::get_mandatory_assignment(DtpgFault* f,
   DtpgNode* fnode = f->node();
   DtpgNode* fsrc = fnode;
   if ( f->is_input_fault() ) {
-    fsrc = f->source_node();
+    fsrc = fnode->fanin(f->pos());
   }
 
   vector<DtpgNode*> node_list;
