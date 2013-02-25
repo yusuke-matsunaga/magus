@@ -88,7 +88,7 @@ Op2::set_detected(SaFault* f,
 void
 Op2::set_untestable(SaFault* f)
 {
-  mFaultMgr.set_status(f, kFsSkip);
+  mFaultMgr.set_status(f, kFsSkipped);
   mSkipFaults.push_back(f);
 }
 

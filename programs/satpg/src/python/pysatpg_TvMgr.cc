@@ -3,7 +3,7 @@
 /// @brief TvMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -34,7 +34,6 @@ struct TvMgrObject
 //////////////////////////////////////////////////////////////////////
 // Python 用のメソッド関数定義
 //////////////////////////////////////////////////////////////////////
-
 
 // TvMgrObject の生成関数
 TvMgrObject*
@@ -68,14 +67,78 @@ TvMgr_init(TvMgrObject* self,
   return 0;
 }
 
+// "clear" 関数
+PyObject*
+TvMgr_clear(TvMgrObject* self,
+	    PyObject* args)
+{
+  self->mPtr->clear();
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+// "init" 関数
+PyObject*
+TvMgr_init_func(TvMgrObject* self,
+		PyObject* args)
+{
+  ymuint ni = 0;
+  if ( !PyArg_ParseTuple(args, "l", &ni) ) {
+    return NULL;
+  }
+
+  self->mPtr->init(ni);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+// "new_vector" 関数
+PyObject*
+TvMgr_new_vector(TvMgrObject* self,
+		 PyObject* args)
+{
+  TestVector* tv = self->mPtr->new_vector();
+
+  return PyTestVector_FromTestVector(tv);
+}
+
+// "delete_vector" 関数
+PyObject*
+TvMgr_delete_vector(TvMgrObject* self,
+		    PyObject* args)
+{
+  PyObject* obj1 = NULL;
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyTestVector_Type, &obj1) ) {
+    return NULL;
+  }
+
+  TestVector* tv = PyTestVector_AsTestVectorPtr(obj1);
+  assert_cond( tv != NULL, __FILE__, __LINE__);
+
+  self->mPtr->delete_vector(tv);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // TvMgrObject のメソッドテーブル
 //////////////////////////////////////////////////////////////////////
 PyMethodDef TvMgr_methods[] = {
+  {"clear", (PyCFunction)TvMgr_clear, METH_NOARGS,
+   PyDoc_STR("clear (NONE)")},
+  {"init", (PyCFunction)TvMgr_init_func, METH_VARARGS,
+   PyDoc_STR("initialize (int: number of inputs)")},
+  {"new_vector", (PyCFunction)TvMgr_new_vector, METH_NOARGS,
+   PyDoc_STR("new vector (NONE)")},
+  {"delete_vector", (PyCFunction)TvMgr_delete_vector, METH_VARARGS,
+   PyDoc_STR("delete vector (TestVector: vector to be deleted)")},
   {NULL, NULL, 0, NULL}
 };
-
 
 END_NONAMESPACE
 

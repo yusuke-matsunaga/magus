@@ -1,8 +1,8 @@
-#ifndef DTPGNETWORK_H
-#define DTPGNETWORK_H
+#ifndef SATPGNETWORK_H
+#define SATPGNETWORK_H
 
-/// @file DtpgNetwork.h
-/// @brief DtpgNetwork のヘッダファイル
+/// @file SatpgNetwork.h
+/// @brief SatpgNetwork のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2013 Yusuke Matsunaga
@@ -19,21 +19,21 @@
 BEGIN_NAMESPACE_YM_SATPG_DTPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class DtpgNetwork DtpgNetwork.h "DtpgNetwork.h"
-/// @brief DtpgSat 用のネットワークを表すクラス
+/// @class SatpgNetwork SatpgNetwork.h "SatpgNetwork.h"
+/// @brief SATPG 用のネットワークを表すクラス
 //////////////////////////////////////////////////////////////////////
-class DtpgNetwork
+class SatpgNetwork
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] tgnetwork もとのネットワーク
   /// @param[in] fault_list 故障リスト
-  DtpgNetwork(const TgNetwork& tgnetwork,
-	      const vector<SaFault*>& fault_list);
+  SatpgNetwork(const TgNetwork& tgnetwork,
+	       const vector<SaFault*>& fault_list);
 
   /// @brief デストラクタ
-  ~DtpgNetwork();
+  ~SatpgNetwork();
 
 
 public:
@@ -48,12 +48,8 @@ public:
   /// @brief ノードを得る．
   /// @param[in] id ID番号 ( 0 <= id < node_num() )
   /// @note node->id() == id となるノードを返す．
-  DtpgNode*
+  SatpgNode*
   node(ymuint id);
-
-  /// @brief TgNode::gid() に対応したノードを得る．
-  DtpgNode*
-  node_from_gid(ymuint gid);
 
   /// @brief 外部入力数を得る．
   ymuint
@@ -65,7 +61,7 @@ public:
 
   /// @brief 外部入力ノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < input_num2() )
-  DtpgNode*
+  SatpgNode*
   input(ymuint pos);
 
   /// @brief 外部出力数を得る．
@@ -78,16 +74,12 @@ public:
 
   /// @brief 外部出力ノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < output_num2() )
-  DtpgNode*
+  SatpgNode*
   output(ymuint pos);
 
   /// @brief サイズの降順で整列した順番で外部出力ノードを取り出す．
-  DtpgNode*
+  SatpgNode*
   output2(ymuint pos);
-
-  /// @brief SaFault に対応する DtpgFault を得る．
-  DtpgFault*
-  conv_fault(SaFault* src_fault);
 
 
 public:
@@ -110,7 +102,7 @@ public:
 
   /// @brief アクティブなノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < active_node_num() )
-  DtpgNode*
+  SatpgNode*
   active_node(ymuint pos);
 
 
@@ -123,8 +115,8 @@ public:
   /// @param[in] f 対象の故障
   /// @param[in] ma_list 割り当て結果を格納するリスト
   /// @return 矛盾が生じたら(fが冗長故障の場合) false を返す．
-  /// @note DtpgNetwork のメンバにはアクセスしないので static メンバになっている．
-  /// @note ma_list の内容は DtpgNode::id() * 2 + val (0 / 1)
+  /// @note SatpgNetwork のメンバにはアクセスしないので static メンバになっている．
+  /// @note ma_list の内容は SatpgNode::id() * 2 + val (0 / 1)
   static
   bool
   get_mandatory_assignment(DtpgFault* f,
@@ -136,10 +128,10 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief DtpgNode の内容を設定する．
+  /// @brief SatpgNode の内容を設定する．
   /// @param[in] id ID番号
   /// @param[in] tgnode もととなる TgNode
-  DtpgNode*
+  SatpgNode*
   make_node(ymuint id,
 	    const TgNode* tgnode);
 
@@ -174,12 +166,12 @@ private:
   /// @brief ノードの TFI にマークをつける．
   /// @note 結果は mTmpMark[node->id()] に格納される．
   void
-  dfs_mark(DtpgNode* node);
+  dfs_mark(SatpgNode* node);
 
   /// @brief ノードの TFI のマークを消す．
   /// @note 結果は mTmpMark[node->id()] に格納される．
   void
-  dfs_unmark(DtpgNode* node);
+  dfs_unmark(SatpgNode* node);
 
   /// @brief activate_po(), activate_all() の下請け関数
   void
@@ -191,7 +183,7 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // DtpgNetwork 関係のメモリ確保を行なうオブジェクト
+  // SatpgNetwork 関係のメモリ確保を行なうオブジェクト
   SimpleAlloc mAlloc;
 
   // 全ノード数
@@ -207,34 +199,29 @@ private:
   ymuint32 mFFNum;
 
   // ノードの本体の配列
-  DtpgNode* mNodeArray;
+  SatpgNode* mNodeArray;
 
   // TgNode->gid() をキーにしたノードの配列
-  DtpgNode** mNodeMap;
+  SatpgNode** mNodeMap;
 
   // 外部入力ノードの配列
-  DtpgNode** mInputArray;
+  SatpgNode** mInputArray;
 
   // 外部出力ノードの配列
-  DtpgNode** mOutputArray;
+  SatpgNode** mOutputArray;
 
   // TFI サイズの降順に整列した外部出力ノードの配列
-  DtpgNode** mOutputArray2;
+  SatpgNode** mOutputArray2;
 
   // アクティブなノード数
   ymuint32 mActNodeNum;
 
   // アクティブなノードの配列
-  DtpgNode** mActNodeArray;
+  SatpgNode** mActNodeArray;
 
   // activate_sub() で用いられるマーク
   // サイズは mNodeNum
   bool* mTmpMark;
-
-#if 0
-  // 関数の個数
-  ymuint32 mFuncNum;
-#endif
 
   // 故障の本体の配列
   DtpgFault* mFaultChunk;
@@ -249,15 +236,15 @@ private:
 // @brief ノード数を得る．
 inline
 ymuint
-DtpgNetwork::node_num()
+SatpgNetwork::node_num()
 {
   return mNodeNum;
 }
 
 // @brief TgNode::gid() に対応したノードを得る．
 inline
-DtpgNode*
-DtpgNetwork::node_from_gid(ymuint gid)
+SatpgNode*
+SatpgNetwork::node_from_gid(ymuint gid)
 {
   return mNodeMap[gid];
 }
@@ -265,7 +252,7 @@ DtpgNetwork::node_from_gid(ymuint gid)
 // @brief 外部入力数を得る．
 inline
 ymuint
-DtpgNetwork::input_num()
+SatpgNetwork::input_num()
 {
   return mInputNum;
 }
@@ -273,7 +260,7 @@ DtpgNetwork::input_num()
 // @brief 外部入力数 + FF数を得る．
 inline
 ymuint
-DtpgNetwork::input_num2()
+SatpgNetwork::input_num2()
 {
   return mInputNum + mFFNum;
 }
@@ -281,8 +268,8 @@ DtpgNetwork::input_num2()
 // @brief 外部入力ノードを得る．
 // @param[in] pos 位置番号 ( 0 <= pos < input_num2() )
 inline
-DtpgNode*
-DtpgNetwork::input(ymuint pos)
+SatpgNode*
+SatpgNetwork::input(ymuint pos)
 {
   assert_cond( pos < input_num2(), __FILE__, __LINE__);
   return mInputArray[pos];
@@ -291,7 +278,7 @@ DtpgNetwork::input(ymuint pos)
 // @brief 外部出力数を得る．
 inline
 ymuint
-DtpgNetwork::output_num()
+SatpgNetwork::output_num()
 {
   return mOutputNum;
 }
@@ -299,7 +286,7 @@ DtpgNetwork::output_num()
 // @brief 外部出力数 + FF数を得る．
 inline
 ymuint
-DtpgNetwork::output_num2()
+SatpgNetwork::output_num2()
 {
   return mOutputNum + mFFNum;
 }
@@ -307,8 +294,8 @@ DtpgNetwork::output_num2()
 // @brief 外部出力ノードを得る．
 // @param[in] pos 位置番号 ( 0 <= pos < output_num2() )
 inline
-DtpgNode*
-DtpgNetwork::output(ymuint pos)
+SatpgNode*
+SatpgNetwork::output(ymuint pos)
 {
   assert_cond( pos < output_num2(), __FILE__, __LINE__);
   return mOutputArray[pos];
@@ -316,8 +303,8 @@ DtpgNetwork::output(ymuint pos)
 
 // @brief サイズの降順で整列した順番で外部出力ノードを取り出す．
 inline
-DtpgNode*
-DtpgNetwork::output2(ymuint pos)
+SatpgNode*
+SatpgNetwork::output2(ymuint pos)
 {
   assert_cond( pos < output_num2(), __FILE__, __LINE__);
   return mOutputArray2[pos];
@@ -326,7 +313,7 @@ DtpgNetwork::output2(ymuint pos)
 // @brief アクティブなノード数を得る．
 inline
 ymuint
-DtpgNetwork::active_node_num()
+SatpgNetwork::active_node_num()
 {
   return mActNodeNum;
 }
@@ -334,8 +321,8 @@ DtpgNetwork::active_node_num()
 // @brief アクティブなノードを得る．
 // @param[in] pos 位置番号 ( 0 <= pos < active_node_num() )
 inline
-DtpgNode*
-DtpgNetwork::active_node(ymuint pos)
+SatpgNode*
+SatpgNetwork::active_node(ymuint pos)
 {
   assert_cond( pos < mActNodeNum, __FILE__, __LINE__);
   return mActNodeArray[pos];
@@ -343,4 +330,4 @@ DtpgNetwork::active_node(ymuint pos)
 
 END_NAMESPACE_YM_SATPG_DTPG
 
-#endif // DTPGNETWORK_H
+#endif // SATPGNETWORK_H

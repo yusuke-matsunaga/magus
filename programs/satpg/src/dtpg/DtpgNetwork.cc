@@ -3,7 +3,7 @@
 /// @brief DtpgNetwork の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -32,20 +32,29 @@ alloc_nodearray(Alloc& alloc,
   return new (p) DtpgNode*[n];
 }
 
-void
-dfs(DtpgNode* node,
-    vector<bool>& mark)
-{
-  if ( mark[node->id()] ) {
-    return;
-  }
 
-  mark[node->id()] = true;
-  ymuint ni = node->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    dfs(node->fanin(i), mark);
+DtpgNode*
+merge(DtpgNode* node1,
+      DtpgNode* node2)
+{
+  for ( ; ; ) {
+    if ( node1 == node2 ) {
+      return node1;
+    }
+    if ( node1 == NULL || node2 == NULL ) {
+      return NULL;
+    }
+    ymuint id1 = node1->id();
+    ymuint id2 = node2->id();
+    if ( id1 < id2 ) {
+      node1 = node1->imm_dom();
+    }
+    else if ( id1 > id2 ) {
+      node2 = node2->imm_dom();
+    }
   }
 }
+
 
 struct Lt
 {
@@ -114,6 +123,13 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
   mActNodeNum = 0;
   mActNodeArray = alloc_nodearray(mAlloc, mNodeNum);
 
+  {
+    void* p = mAlloc.get_memory(sizeof(bool) * mNodeNum);
+    mTmpMark = new (p) bool[mNodeNum];
+  }
+  for (ymuint i = 0; i < mNodeNum; ++ i) {
+    mTmpMark[i] = false;
+  }
 
   ymuint id = 0;
 
@@ -231,14 +247,15 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
   // TFI のサイズの昇順に出力を並べ替える．
   vector<pair<ymuint, ymuint> > tmp_list(output_num2());
   for (ymuint i = 0; i < output_num2(); ++ i) {
-    vector<bool> mark(mNodeNum, false);
-    dfs(output(i), mark);
+    DtpgNode* onode = output(i);
+    dfs_mark(onode);
     ymuint n = 0;
     for (ymuint j = 0; j < mNodeNum; ++ j) {
-      if ( mark[j] ) {
+      if ( mTmpMark[j] ) {
 	++ n;
       }
     }
+    dfs_unmark(onode);
     tmp_list[i] = make_pair(n, i);
   }
   sort(tmp_list.begin(), tmp_list.end(), Lt());
@@ -259,12 +276,13 @@ DtpgNetwork::activate_po(ymuint po_pos)
 {
   DtpgNode* onode = output2(po_pos);
 
-  vector<bool> mark(mNodeNum, false);
-
   // pos 番めの出力から到達可能なノードにマークをつける．
-  dfs(onode, mark);
+  dfs_mark(onode);
 
-  activate_sub(mark);
+  activate_sub();
+
+  // マークを消す．
+  dfs_unmark(onode);
 }
 
 // @brief 全てのノードをアクティブにする．
@@ -273,52 +291,60 @@ DtpgNetwork::activate_all()
 {
   // といっても PO に到達できないノードは除外する．
 
-  vector<bool> mark(mNodeNum, false);
-
   // すべての PO から到達可能なノードにマークをつける．
   for (ymuint i = 0; i < mOutputNum + mFFNum; ++ i) {
-    dfs(output(i), mark);
+    dfs_mark(output(i));
   }
 
-  activate_sub(mark);
+  activate_sub();
+
+  // マークを消す．
+  for (ymuint i = 0; i < mOutputNum + mFFNum; ++ i) {
+    dfs_unmark(output(i));
+  }
 }
 
-
-BEGIN_NONAMESPACE
-
-DtpgNode*
-merge(DtpgNode* node1,
-      DtpgNode* node2)
+// @brief ノードの TFI にマークをつける．
+// @note 結果は mTmpMark[node->id()] に格納される．
+void
+DtpgNetwork::dfs_mark(DtpgNode* node)
 {
-  for ( ; ; ) {
-    if ( node1 == node2 ) {
-      return node1;
-    }
-    if ( node1 == NULL || node2 == NULL ) {
-      return NULL;
-    }
-    ymuint id1 = node1->id();
-    ymuint id2 = node2->id();
-    if ( id1 < id2 ) {
-      node1 = node1->imm_dom();
-    }
-    else if ( id1 > id2 ) {
-      node2 = node2->imm_dom();
-    }
+  if ( mTmpMark[node->id()] ) {
+    return;
+  }
+
+  mTmpMark[node->id()] = true;
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    dfs_mark(node->fanin(i));
   }
 }
 
-END_NONAMESPACE
+// @brief ノードの TFI のマークを消す．
+// @note 結果は mTmpMark[node->id()] に格納される．
+void
+DtpgNetwork::dfs_unmark(DtpgNode* node)
+{
+  if ( !mTmpMark[node->id()] ) {
+    return;
+  }
+
+  mTmpMark[node->id()] = false;
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    dfs_unmark(node->fanin(i));
+  }
+}
 
 // @brief activate_po(), activate_all() の下請け関数
 void
-DtpgNetwork::activate_sub(const vector<bool>& mark)
+DtpgNetwork::activate_sub()
 {
   // マークにしたがってファンアウトなどの情報をセットする．
   mActNodeNum = 0;
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     DtpgNode* node = &mNodeArray[i];
-    if ( !mark[i] ) {
+    if ( !mTmpMark[i] ) {
       node->clear_active();
       continue;
     }
@@ -330,7 +356,7 @@ DtpgNetwork::activate_sub(const vector<bool>& mark)
     ymuint act_nfo = 0;
     for (ymuint i = 0; i < nfo; ++ i) {
       DtpgNode* onode = node->fanout(i);
-      if ( mark[onode->id()] ) {
+      if ( mTmpMark[onode->id()] ) {
 	node->mActFanouts[act_nfo] = onode;
 	++ act_nfo;
       }
@@ -457,6 +483,11 @@ DtpgNetwork::make_node(ymuint id,
 }
 
 // @brief 複雑な論理式に対応するプリミティブを作る．
+// @param[in] expr 論理式
+// @param[in] tgnode もととなる TgNode
+// @param[in] primitive_list プリミティブを設定する領域
+// @param[inout] id プリミティブID
+// @note id は内部でインクリメントされる．
 DtpgPrimitive*
 DtpgNetwork::make_primitive(const LogExpr& expr,
 			    const TgNode* tgnode,
@@ -464,6 +495,7 @@ DtpgNetwork::make_primitive(const LogExpr& expr,
 			    ymuint& id)
 {
   if ( expr.is_posiliteral() ) {
+    // 肯定のリテラル
     ymuint ipos = expr.varid().val();
     DtpgPrimitive* input = &primitive_list[id];
     ++ id;
@@ -471,6 +503,7 @@ DtpgNetwork::make_primitive(const LogExpr& expr,
     return input;
   }
   if ( expr.is_negaliteral() ) {
+    // 否定のリテラル
     ymuint ipos = expr.varid().val();
     DtpgPrimitive* input = &primitive_list[id];
     ++ id;
@@ -486,6 +519,7 @@ DtpgNetwork::make_primitive(const LogExpr& expr,
   ymuint nc = expr.child_num();
   vector<DtpgPrimitive*> fanin(nc);
   for (ymuint i = 0; i < nc; ++ i) {
+    // 子供の論理式に対するプリミティブを作る．
     LogExpr expr1 = expr.child(i);
     DtpgPrimitive* inode = make_primitive(expr1, tgnode, primitive_list, id);
     fanin[i] = inode;
@@ -515,6 +549,7 @@ DtpgNetwork::make_primitive(const LogExpr& expr,
 }
 
 // @brief 入力プリミティブの設定を行なう．
+// @param[in] prim プリミティブ
 // @param[in] id 入力番号
 void
 DtpgNetwork::set_input_primitive(DtpgPrimitive* prim,
@@ -526,6 +561,9 @@ DtpgNetwork::set_input_primitive(DtpgPrimitive* prim,
 }
 
 // @brief 論理プリミティブの設定を行なう．
+// @param[in] prim プリミティブ
+// @param[in] gate_type ゲートタイプ
+// @param[in] ni 入力数
 void
 DtpgNetwork::set_logic_primitive(DtpgPrimitive* prim,
 				 tTgGateType gate_type,

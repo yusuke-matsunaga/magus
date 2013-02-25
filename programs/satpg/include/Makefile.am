@@ -18,6 +18,8 @@ noinst_HEADERS = \
 	PackedVal3.h \
 	Rtpg.h \
 	SaFault.h \
+	SatpgNetwork.h \
+	SatpgNode.h \
 	TestVector.h
 	TvBuff.h \
 	TvMgr.h \

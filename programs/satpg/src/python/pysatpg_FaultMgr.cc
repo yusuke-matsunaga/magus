@@ -3,7 +3,7 @@
 /// @brief FaultMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -37,7 +37,6 @@ struct FaultMgrObject
 //////////////////////////////////////////////////////////////////////
 // Python 用のメソッド関数定義
 //////////////////////////////////////////////////////////////////////
-
 
 // FaultMgrObject の生成関数
 FaultMgrObject*

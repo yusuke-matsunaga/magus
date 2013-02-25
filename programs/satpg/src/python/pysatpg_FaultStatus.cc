@@ -43,8 +43,8 @@ PyObject* Py_kFsDetected;
 // kFsUntestable を表すオブジェクト
 PyObject* Py_kFsUntestable;
 
-// kFsSkip を表すオブジェクト
-PyObject* Py_kFsSkip;
+// kFsSkipped を表すオブジェクト
+PyObject* Py_kFsSkipped;
 
 // kFsAborted を表すオブジェクト
 PyObject* Py_kFsAborted;
@@ -67,10 +67,10 @@ FaultStatusObject Py_kFsUntestableStruct = {
   kFsUntestable
 };
 
-// Py_kFsSkip の実体
-FaultStatusObject Py_kFsSkipStruct = {
+// Py_kFsSkipped の実体
+FaultStatusObject Py_kFsSkippedStruct = {
   PyObject_HEAD_INIT(&PyFaultStatus_Type)
-  kFsSkip
+  kFsSkipped
 };
 
 // Py_kFsAborted の実体
@@ -83,7 +83,7 @@ FaultStatusObject Py_kFsAbortedStruct = {
 PyObject* Py_kFsUndetectedString = NULL;
 PyObject* Py_kFsDetectedString = NULL;
 PyObject* Py_kFsUntestableString = NULL;
-PyObject* Py_kFsSkipString = NULL;
+PyObject* Py_kFsSkippedString = NULL;
 PyObject* Py_kFsAbortedString = NULL;
 
 
@@ -99,7 +99,7 @@ FaultStatus_new(PyTypeObject* type,
 {
   // 引数は
   // - ()
-  // - (str) {"undetected"|"detected"|"untestable"|"parially untestable"|"aborted"}
+  // - (str) {"undetected"|"detected"|"untestable"|"skipped"|"aborted"}
   ymuint n = PyTuple_GET_SIZE(args);
   if ( n == 0 ) {
     // デフォルトは kFsUndetected
@@ -124,9 +124,10 @@ FaultStatus_repr(FaultStatusObject* self)
   case kFsUndetected: result = Py_kFsUndetectedString; break;
   case kFsDetected:   result = Py_kFsDetectedString; break;
   case kFsUntestable: result = Py_kFsUntestableString; break;
-  case kFsSkip:       result = Py_kFsSkipString; break;
+  case kFsSkipped:    result = Py_kFsSkippedString; break;
   case kFsAborted:    result = Py_kFsAbortedString; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default:
+    assert_not_reached(__FILE__, __LINE__);
   }
 
   Py_INCREF(result);
@@ -243,9 +244,10 @@ PyFaultStatus_FromFaultStatus(FaultStatus val)
   case kFsUndetected: result = Py_kFsUndetected; break;
   case kFsDetected:   result = Py_kFsDetected; break;
   case kFsUntestable: result = Py_kFsUntestable; break;
-  case kFsSkip:       result = Py_kFsSkip; break;
+  case kFsSkipped:    result = Py_kFsSkipped; break;
   case kFsAborted:    result = Py_kFsAborted; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default:
+    assert_not_reached(__FILE__, __LINE__);
   }
 
   Py_INCREF(result);
@@ -272,15 +274,15 @@ PyFaultStatus_FromString(const char* str)
   else if ( strcmp(str, "untestable") == 0 ) {
     result = Py_kFsUntestable;
   }
-  else if ( strcmp(str, "partially untestable") == 0 ) {
-    result = Py_kFsSkip;
+  else if ( strcmp(str, "skipped") == 0 ) {
+    result = Py_kFsSkipped;
   }
   else if ( strcmp(str, "aborted") == 0 ) {
     result = Py_kFsAborted;
   }
   else {
     PyErr_SetString(PyExc_ValueError,
-		    "Only 'undetected', 'detected', 'untestable', 'partially untestable' and 'aborted' are allowed here");
+		    "Only 'undetected', 'detected', 'untestable', 'skipped' and 'aborted' are allowed here");
     return NULL;
   }
 
@@ -288,11 +290,10 @@ PyFaultStatus_FromString(const char* str)
   return result;
 }
 
-/// @brief PyObject から FaultStatus を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @return FaultStatus を返す．
-/// @note 変換が失敗したら TypeError を送出し，kFsUndetected を返す．
-extern
+// @brief PyObject から FaultStatus を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return FaultStatus を返す．
+// @note 変換が失敗したら TypeError を送出し，kFsUndetected を返す．
 FaultStatus
 PyFaultStatus_AsFaultStatus(PyObject* py_obj)
 {
@@ -312,6 +313,8 @@ PyFaultStatus_AsFaultStatus(PyObject* py_obj)
 //////////////////////////////////////////////////////////////////////
 // 初期化用の関数
 //////////////////////////////////////////////////////////////////////
+
+BEGIN_NONAMESPACE
 
 // FaultStatus の定数を設定する関数
 inline
@@ -336,6 +339,9 @@ new_string(const char* str)
   return py_obj;
 }
 
+END_NONAMESPACE
+
+
 // FaultStatusObject 関係の初期化を行う．
 void
 FaultStatusObject_init(PyObject* m)
@@ -352,7 +358,7 @@ FaultStatusObject_init(PyObject* m)
   FaultStatus_set(Py_kFsUndetectedStruct, Py_kFsUndetected, m, "kFsUndetected");
   FaultStatus_set(Py_kFsDetectedStruct,   Py_kFsDetected,   m, "kFsDetected");
   FaultStatus_set(Py_kFsUntestableStruct, Py_kFsUntestable, m, "kFsUntestable");
-  FaultStatus_set(Py_kFsSkipStruct,       Py_kFsSkip,       m, "kFsSkip");
+  FaultStatus_set(Py_kFsSkippedStruct,    Py_kFsSkipped,    m, "kFsSkipped");
   FaultStatus_set(Py_kFsAbortedStruct,    Py_kFsAborted,    m, "kFsAborted");
 }
 

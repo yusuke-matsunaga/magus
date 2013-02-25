@@ -416,6 +416,8 @@ PyVal3_AsVal3(PyObject* py_obj)
 // 初期化用の関数
 //////////////////////////////////////////////////////////////////////
 
+BEGIN_NONAMESPACE
+
 // Val3 の定数を設定する関数
 inline
 void
@@ -438,6 +440,9 @@ new_string(const char* str)
   Py_INCREF(py_obj);
   return py_obj;
 }
+
+END_NONAMESPACE
+
 
 // Val3Object 関係の初期化を行う．
 void
