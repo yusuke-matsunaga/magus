@@ -12,7 +12,6 @@
 
 #include "dtpg_nsdef.h"
 
-//#include "ym_networks/tgnet.h"
 #include "DtpgNode.h"
 #include "ym_logic/Literal.h"
 #include "ym_logic/Bool3.h"

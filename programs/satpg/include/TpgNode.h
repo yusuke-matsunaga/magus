@@ -1,37 +1,37 @@
-#ifndef SATPGNODE_H
-#define SATPGNODE_H
+#ifndef TPGNODE_H
+#define TPGNODE_H
 
-/// @file SatpgNode.h
-/// @brief SatpgNode のヘッダファイル
+/// @file TpgNode.h
+/// @brief TpgNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "dtpg_nsdef.h"
+#include "satpg_nsdef.h"
 #include "ym_networks/tgnet.h"
 #include "ym_logic/VarId.h"
 #include "ym_logic/Bool3.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_DTPG
+BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatpgNode SatpgNode.h "SatpgNode.h"
+/// @class TpgNode TpgNode.h "TpgNode.h"
 /// @brief SATPG 用のノードを表すクラス
 //////////////////////////////////////////////////////////////////////
-class SatpgNode
+class TpgNode
 {
-  friend class SatpgNetwork;
+  friend class TpgNetwork;
 
 private:
 
   /// @brief コンストラクタ
-  SatpgNode();
+  TpgNode();
 
   /// @brief デストラクタ
-  ~SatpgNode();
+  ~TpgNode();
 
 
 public:
@@ -42,6 +42,10 @@ public:
   /// @brief ID番号を得る．
   ymuint
   id() const;
+
+  /// @brief 名前を得る．
+  const char*
+  name() const;
 
   /// @brief 外部入力タイプの時 true を返す．
   /// @note FF 出力もここに含まれる．
@@ -79,7 +83,7 @@ public:
 
   /// @brief cplx_logic タイプのときにプリミティブを返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < primitive_num() )
-  DtpgPrimitive*
+  TpgPrimitive*
   primitive(ymuint pos) const;
 
   /// @brief ファンイン数を得る．
@@ -88,7 +92,7 @@ public:
 
   /// @brief ファンインを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < fanin_num() )
-  SatpgNode*
+  TpgNode*
   fanin(ymuint pos) const;
 
   /// @brief ファンアウト数を得る．
@@ -97,7 +101,7 @@ public:
 
   /// @brief ファンアウトを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < fanout_num() )
-  SatpgNode*
+  TpgNode*
   fanout(ymuint pos) const;
 
   /// @brief アクティブなファンアウト数を得る．
@@ -106,18 +110,18 @@ public:
 
   /// @brief アクティブなファンアウトを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < active_fanout_num() )
-  SatpgNode*
+  TpgNode*
   active_fanout(ymuint pos) const;
 
   /// @brief 出力の故障を得る．
   /// @param[in] val 故障値 ( 0 / 1 )
-  DtpgFault*
+  TpgFault*
   output_fault(int val);
 
   /// @brief 入力の故障を得る．
   /// @param[in] val 故障値 ( 0 / 1 )
   /// @param[in] pos 入力の位置番号
-  DtpgFault*
+  TpgFault*
   input_fault(int val,
 	      ymuint pos);
 
@@ -126,7 +130,7 @@ public:
   is_active() const;
 
   /// @brief 直近の dominator を得る．
-  SatpgNode*
+  TpgNode*
   imm_dom() const;
 
 
@@ -216,9 +220,9 @@ public:
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  bwd_prop(SatpgNode* from_node,
+  bwd_prop(TpgNode* from_node,
 	   Bool3 val,
-	   vector<SatpgNode*>& node_list);
+	   vector<TpgNode*>& node_list);
 
   /// @brief ファンアウト先に0を伝播する．
   /// @param[in] from_node 含意元のノード
@@ -227,9 +231,9 @@ public:
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  fanout_prop(SatpgNode* from_node,
+  fanout_prop(TpgNode* from_node,
 	      Bool3 val,
-	      vector<SatpgNode*>& node_list);
+	      vector<TpgNode*>& node_list);
 
   /// @brief controling value を得る．
   /// @note ない場合は kB3X を返す．
@@ -270,7 +274,7 @@ private:
   /// @retval false 矛盾が発生した．
   bool
   bwd_imp(Bool3 val,
-	  vector<SatpgNode*>& node_list);
+	  vector<TpgNode*>& node_list);
 
   /// @brief 前方含意を行う．
   /// @param[in] from_node 含意元のノード
@@ -279,9 +283,9 @@ private:
   /// @retval true 矛盾なく含意が行われた．
   /// @retval false 矛盾が発生した．
   bool
-  fwd_imp(SatpgNode* from_node,
+  fwd_imp(TpgNode* from_node,
 	  Bool3 val,
-	  vector<SatpgNode*>& node_list);
+	  vector<TpgNode*>& node_list);
 
 
 private:
@@ -291,6 +295,9 @@ private:
 
   // ID 番号
   ymuint32 mId;
+
+  // 名前
+  const char* mName;
 
   // いくつかのデータをパックしたもの
   // - [0:1] ノードタイプ
@@ -307,31 +314,31 @@ private:
 
   // プリミティブのリスト
   // 入力からのトポロジカル順に格納する．
-  DtpgPrimitive* mPrimitiveList;
+  TpgPrimitive* mPrimitiveList;
 
   // ファンイン数
   ymuint32 mFaninNum;
 
   // ファンインの配列
-  SatpgNode** mFanins;
+  TpgNode** mFanins;
 
   // ファンアウト数
   ymuint32 mFanoutNum;
 
   // ファンアウトの配列
-  SatpgNode** mFanouts;
+  TpgNode** mFanouts;
 
   // アクティブなファンアウト数
   ymuint32 mActFanoutNum;
 
   // アクティブなファンアウトの配列
-  SatpgNode** mActFanouts;
+  TpgNode** mActFanouts;
 
   // 出力の故障
-  DtpgFault* mOutputFault[2];
+  TpgFault* mOutputFault[2];
 
   // 入力の故障
-  DtpgFault** mInputFault;
+  TpgFault** mInputFault;
 
   // いくつかのマークを納めるビットベクタ
   ymuint32 mMarks;
@@ -346,7 +353,7 @@ private:
   VarId mDid;
 
   // immediate dominator
-  SatpgNode* mImmDom;
+  TpgNode* mImmDom;
 
   // controling value
   Bool3 mCval;
@@ -366,21 +373,21 @@ private:
 
 // @brief コンストラクタ
 inline
-SatpgNode::SatpgNode()
+TpgNode::TpgNode()
 {
-  // 実際の初期化は SatpgNetwork が行なう．
+  // 実際の初期化は TpgNetwork が行なう．
 }
 
 // @brief デストラクタ
 inline
-SatpgNode::~SatpgNode()
+TpgNode::~TpgNode()
 {
 }
 
 // @brief ID番号を得る．
 inline
 ymuint
-SatpgNode::id() const
+TpgNode::id() const
 {
   return mId;
 }
@@ -389,7 +396,7 @@ SatpgNode::id() const
 // @note FF 出力もここに含まれる．
 inline
 bool
-SatpgNode::is_input() const
+TpgNode::is_input() const
 {
   return (mTypeId & 3U) == 1U;
 }
@@ -397,7 +404,7 @@ SatpgNode::is_input() const
 // @brief 外部入力タイプの時に入力番号を返す．
 inline
 ymuint
-SatpgNode::input_id() const
+TpgNode::input_id() const
 {
   assert_cond( is_input(), __FILE__, __LINE__);
   return (mTypeId >> 2);
@@ -407,7 +414,7 @@ SatpgNode::input_id() const
 // @note FF 入力もここに含まれる．
 inline
 bool
-SatpgNode::is_output() const
+TpgNode::is_output() const
 {
   return (mTypeId & 3U) == 2U;
 }
@@ -415,7 +422,7 @@ SatpgNode::is_output() const
 // @brief 外部出力タイプの時に出力番号を返す．
 inline
 ymuint
-SatpgNode::output_id() const
+TpgNode::output_id() const
 {
   assert_cond( is_output(), __FILE__, __LINE__);
   return (mTypeId >> 2);
@@ -424,7 +431,7 @@ SatpgNode::output_id() const
 // @brief logic タイプの時 true を返す．
 inline
 bool
-SatpgNode::is_logic() const
+TpgNode::is_logic() const
 {
   return (mTypeId & 3U) == 3U;
 }
@@ -432,7 +439,7 @@ SatpgNode::is_logic() const
 // @brief ゲートタイプを得る．
 inline
 tTgGateType
-SatpgNode::gate_type() const
+TpgNode::gate_type() const
 {
   assert_cond( is_logic(), __FILE__, __LINE__);
   return static_cast<tTgGateType>((mTypeId >> 2) & 15U);
@@ -441,7 +448,7 @@ SatpgNode::gate_type() const
 // @brief 組み込み型でない logic タイプの時 true を返す．
 inline
 bool
-SatpgNode::is_cplx_logic() const
+TpgNode::is_cplx_logic() const
 {
   return is_logic() && gate_type() == kTgGateCplx;
 }
@@ -449,7 +456,7 @@ SatpgNode::is_cplx_logic() const
 // @brief cplx_logic タイプのときにプリミティブ数を返す．
 inline
 ymuint
-SatpgNode::primitive_num() const
+TpgNode::primitive_num() const
 {
   return mPrimitiveNum;
 }
@@ -457,7 +464,7 @@ SatpgNode::primitive_num() const
 // @brief ファンイン数を得る．
 inline
 ymuint
-SatpgNode::fanin_num() const
+TpgNode::fanin_num() const
 {
   return mFaninNum;
 }
@@ -465,8 +472,8 @@ SatpgNode::fanin_num() const
 // @brief ファンインを得る．
 // @param[in] pos 位置番号 ( 0 <= pos < fanin_num() )
 inline
-SatpgNode*
-SatpgNode::fanin(ymuint pos) const
+TpgNode*
+TpgNode::fanin(ymuint pos) const
 {
   assert_cond( pos < mFaninNum, __FILE__, __LINE__);
   return mFanins[pos];
@@ -475,7 +482,7 @@ SatpgNode::fanin(ymuint pos) const
 // @brief ファンアウト数を得る．
 inline
 ymuint
-SatpgNode::fanout_num() const
+TpgNode::fanout_num() const
 {
   return mFanoutNum;
 }
@@ -483,8 +490,8 @@ SatpgNode::fanout_num() const
 // @brief ファンアウトを得る．
 // @param[in] pos 位置番号 ( 0 <= pos < fanout_num() )
 inline
-SatpgNode*
-SatpgNode::fanout(ymuint pos) const
+TpgNode*
+TpgNode::fanout(ymuint pos) const
 {
   assert_cond( pos < mFanoutNum, __FILE__, __LINE__);
   return mFanouts[pos];
@@ -493,7 +500,7 @@ SatpgNode::fanout(ymuint pos) const
 // @brief アクティブなファンアウト数を得る．
 inline
 ymuint
-SatpgNode::active_fanout_num() const
+TpgNode::active_fanout_num() const
 {
   return mActFanoutNum;
 }
@@ -501,8 +508,8 @@ SatpgNode::active_fanout_num() const
 // @brief アクティブなファンアウトを得る．
 // @param[in] pos 位置番号 ( 0 <= pos < active_fanout_num() )
 inline
-SatpgNode*
-SatpgNode::active_fanout(ymuint pos) const
+TpgNode*
+TpgNode::active_fanout(ymuint pos) const
 {
   assert_cond( pos < mActFanoutNum, __FILE__, __LINE__);
   return mActFanouts[pos];
@@ -511,8 +518,8 @@ SatpgNode::active_fanout(ymuint pos) const
 // @brief 出力の故障を得る．
 // @param[in] val 故障値 ( 0 / 1 )
 inline
-DtpgFault*
-SatpgNode::output_fault(int val)
+TpgFault*
+TpgNode::output_fault(int val)
 {
   return mOutputFault[val % 2];
 }
@@ -521,8 +528,8 @@ SatpgNode::output_fault(int val)
 // @param[in] val 故障値 ( 0 / 1 )
 // @param[in] pos 入力の位置番号
 inline
-DtpgFault*
-SatpgNode::input_fault(int val,
+TpgFault*
+TpgNode::input_fault(int val,
 		      ymuint pos)
 {
   assert_cond( pos < mFaninNum, __FILE__, __LINE__);
@@ -532,7 +539,7 @@ SatpgNode::input_fault(int val,
 // @brief mark1 を得る．
 inline
 bool
-SatpgNode::mark1() const
+TpgNode::mark1() const
 {
   return static_cast<bool>((mMarks >> 3) & 1U);
 }
@@ -540,7 +547,7 @@ SatpgNode::mark1() const
 // @brief mark1 をつける．
 inline
 void
-SatpgNode::set_mark1()
+TpgNode::set_mark1()
 {
   mMarks |= 8U;
 }
@@ -548,7 +555,7 @@ SatpgNode::set_mark1()
 // @brief mark1 を消す．
 inline
 void
-SatpgNode::clear_mark1()
+TpgNode::clear_mark1()
 {
   mMarks &= ~8U;
 }
@@ -556,7 +563,7 @@ SatpgNode::clear_mark1()
 // @brief mark2 を得る．
 inline
 bool
-SatpgNode::mark2() const
+TpgNode::mark2() const
 {
   return static_cast<bool>((mMarks >> 4) & 1U);
 }
@@ -564,7 +571,7 @@ SatpgNode::mark2() const
 // @brief mark2 をつける．
 inline
 void
-SatpgNode::set_mark2()
+TpgNode::set_mark2()
 {
   mMarks |= 16U;
 }
@@ -572,7 +579,7 @@ SatpgNode::set_mark2()
 // @brief mark2 を消す．
 inline
 void
-SatpgNode::clear_mark2()
+TpgNode::clear_mark2()
 {
   mMarks &= ~16U;
 }
@@ -580,7 +587,7 @@ SatpgNode::clear_mark2()
 // @brief mark3 を得る．
 inline
 bool
-SatpgNode::mark3() const
+TpgNode::mark3() const
 {
   return static_cast<bool>((mMarks >> 5) & 1U);
 }
@@ -588,7 +595,7 @@ SatpgNode::mark3() const
 // @brief mark3 をつける．
 inline
 void
-SatpgNode::set_mark3()
+TpgNode::set_mark3()
 {
   mMarks |= 32U;
 }
@@ -596,7 +603,7 @@ SatpgNode::set_mark3()
 // @brief mark3 を消す．
 inline
 void
-SatpgNode::clear_mark3()
+TpgNode::clear_mark3()
 {
   mMarks &= ~32U;
 }
@@ -604,7 +611,7 @@ SatpgNode::clear_mark3()
 // @brief アクティブの場合 true を返す．
 inline
 bool
-SatpgNode::is_active() const
+TpgNode::is_active() const
 {
   return static_cast<bool>(mMarks & 1U);
 }
@@ -612,7 +619,7 @@ SatpgNode::is_active() const
 // @brief アクティブにする．
 inline
 void
-SatpgNode::set_active()
+TpgNode::set_active()
 {
   mMarks |= 1U;
 }
@@ -620,7 +627,7 @@ SatpgNode::set_active()
 // @brief アクティブフラグを消す．
 inline
 void
-SatpgNode::clear_active()
+TpgNode::clear_active()
 {
   mMarks &= ~1U;
 }
@@ -629,7 +636,7 @@ SatpgNode::clear_active()
 // @param[in] gvar 正常値を表す変数番号
 inline
 void
-SatpgNode::set_gvar(VarId gvar)
+TpgNode::set_gvar(VarId gvar)
 {
   mGid = gvar;
   mFid = gvar;
@@ -641,7 +648,7 @@ SatpgNode::set_gvar(VarId gvar)
 // @param[in] dvar 故障差(正常値 xor 故障値)を表す変数番号
 inline
 void
-SatpgNode::set_fvar(VarId fvar,
+TpgNode::set_fvar(VarId fvar,
 		   VarId dvar)
 {
   mFid = fvar;
@@ -652,24 +659,15 @@ SatpgNode::set_fvar(VarId fvar,
 // @brief 変数番号の割り当て情報をクリアする．
 inline
 void
-SatpgNode::clear_var()
+TpgNode::clear_var()
 {
   mMarks &= ~6U;
 }
 
-// @brief 正常回路用の変数番号が割り当てられていたら true を返す．
-inline
-bool
-SatpgNode::has_gvar() const
-{
-  return static_cast<bool>((mMarks >> 1) & 1U);
-}
-
-
 // @brief 正常値を表す変数番号を得る．
 inline
 VarId
-SatpgNode::gvar() const
+TpgNode::gvar() const
 {
   return mGid;
 }
@@ -677,7 +675,7 @@ SatpgNode::gvar() const
 // @brief 故障回路用の変数番号が割り当てられていたら true を返す．
 inline
 bool
-SatpgNode::has_fvar() const
+TpgNode::has_fvar() const
 {
   return static_cast<bool>((mMarks >> 2) & 1U);
 }
@@ -685,7 +683,7 @@ SatpgNode::has_fvar() const
 // @brief 故障値を表す変数番号を得る．
 inline
 VarId
-SatpgNode::fvar() const
+TpgNode::fvar() const
 {
   return mFid;
 }
@@ -693,15 +691,15 @@ SatpgNode::fvar() const
 // @brief 故障差を表す変数番号を得る．
 inline
 VarId
-SatpgNode::dvar() const
+TpgNode::dvar() const
 {
   return mDid;
 }
 
 // @brief 直近の dominator を得る．
 inline
-SatpgNode*
-SatpgNode::imm_dom() const
+TpgNode*
+TpgNode::imm_dom() const
 {
   return mImmDom;
 }
@@ -710,7 +708,7 @@ SatpgNode::imm_dom() const
 // @note ない場合は kB3X を返す．
 inline
 Bool3
-SatpgNode::cval() const
+TpgNode::cval() const
 {
   return mCval;
 }
@@ -719,7 +717,7 @@ SatpgNode::cval() const
 // @note ない場合は kB3X を返す．
 inline
 Bool3
-SatpgNode::nval() const
+TpgNode::nval() const
 {
   return mNval;
 }
@@ -727,7 +725,7 @@ SatpgNode::nval() const
 // @brief 値を得る．
 inline
 Bool3
-SatpgNode::ma_value() const
+TpgNode::ma_value() const
 {
   return mMaVal;
 }
@@ -735,11 +733,11 @@ SatpgNode::ma_value() const
 // @brief 値をクリアする．
 inline
 void
-SatpgNode::clear_ma_value()
+TpgNode::clear_ma_value()
 {
   mMaVal = kB3X;
 }
 
-END_NAMESPACE_YM_SATPG_DTPG
+END_NAMESPACE_YM_SATPG
 
-#endif // SATPGNODE_H
+#endif // TPGNODE_H

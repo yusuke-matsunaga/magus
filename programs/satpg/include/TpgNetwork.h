@@ -1,39 +1,52 @@
-#ifndef SATPGNETWORK_H
-#define SATPGNETWORK_H
+#ifndef TPGNETWORK_H
+#define TPGNETWORK_H
 
-/// @file SatpgNetwork.h
-/// @brief SatpgNetwork のヘッダファイル
+/// @file TpgNetwork.h
+/// @brief TpgNetwork のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "dtpg_nsdef.h"
-#include "SaFault.h"
+#include "satpg_nsdef.h"
 #include "ym_networks/tgnet.h"
+#include "ym_cell/cell_nsdef.h"
 #include "ym_logic/lexp_nsdef.h"
 #include "ym_utils/SimpleAlloc.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_DTPG
+BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatpgNetwork SatpgNetwork.h "SatpgNetwork.h"
+/// @class TpgNetwork TpgNetwork.h "TpgNetwork.h"
 /// @brief SATPG 用のネットワークを表すクラス
 //////////////////////////////////////////////////////////////////////
-class SatpgNetwork
+class TpgNetwork
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  // ファイルを読み込んでインスタンスを作るクラスメソッド
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief コンストラクタ
-  /// @param[in] tgnetwork もとのネットワーク
-  /// @param[in] fault_list 故障リスト
-  SatpgNetwork(const TgNetwork& tgnetwork,
-	       const vector<SaFault*>& fault_list);
+  /// @brief blif ファイルを読み込んでインスタンスを作る．
+  /// @param[in] filename ファイル名
+  /// @param[in] cell_library セルライブラリ
+  /// @note エラーが起こったら NULL を返す．
+  static
+  TpgNetwork*
+  read_blif(const string& filename,
+	    const CellLibrary* cell_library);
+
+  /// @brief iscas89 形式のファイルを読み込む．
+  /// @param[in] filename ファイル名
+  /// @note エラーが起こったら NULL を返す．
+  static
+  TpgNetwork*
+  read_iscas89(const string& filename);
 
   /// @brief デストラクタ
-  ~SatpgNetwork();
+  ~TpgNetwork();
 
 
 public:
@@ -48,7 +61,7 @@ public:
   /// @brief ノードを得る．
   /// @param[in] id ID番号 ( 0 <= id < node_num() )
   /// @note node->id() == id となるノードを返す．
-  SatpgNode*
+  TpgNode*
   node(ymuint id);
 
   /// @brief 外部入力数を得る．
@@ -61,7 +74,7 @@ public:
 
   /// @brief 外部入力ノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < input_num2() )
-  SatpgNode*
+  TpgNode*
   input(ymuint pos);
 
   /// @brief 外部出力数を得る．
@@ -74,11 +87,11 @@ public:
 
   /// @brief 外部出力ノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < output_num2() )
-  SatpgNode*
+  TpgNode*
   output(ymuint pos);
 
   /// @brief サイズの降順で整列した順番で外部出力ノードを取り出す．
-  SatpgNode*
+  TpgNode*
   output2(ymuint pos);
 
 
@@ -102,7 +115,7 @@ public:
 
   /// @brief アクティブなノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < active_node_num() )
-  SatpgNode*
+  TpgNode*
   active_node(ymuint pos);
 
 
@@ -115,11 +128,11 @@ public:
   /// @param[in] f 対象の故障
   /// @param[in] ma_list 割り当て結果を格納するリスト
   /// @return 矛盾が生じたら(fが冗長故障の場合) false を返す．
-  /// @note SatpgNetwork のメンバにはアクセスしないので static メンバになっている．
-  /// @note ma_list の内容は SatpgNode::id() * 2 + val (0 / 1)
+  /// @note TpgNetwork のメンバにはアクセスしないので static メンバになっている．
+  /// @note ma_list の内容は TpgNode::id() * 2 + val (0 / 1)
   static
   bool
-  get_mandatory_assignment(DtpgFault* f,
+  get_mandatory_assignment(TpgFault* f,
 			   vector<ymuint32>& ma_list);
 
 
@@ -128,10 +141,10 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief SatpgNode の内容を設定する．
+  /// @brief TpgNode の内容を設定する．
   /// @param[in] id ID番号
   /// @param[in] tgnode もととなる TgNode
-  SatpgNode*
+  TpgNode*
   make_node(ymuint id,
 	    const TgNode* tgnode);
 
@@ -141,17 +154,17 @@ private:
   /// @param[in] primitive_list プリミティブを設定する領域
   /// @param[inout] id プリミティブID
   /// @note id は内部でインクリメントされる．
-  DtpgPrimitive*
+  TpgPrimitive*
   make_primitive(const LogExpr& expr,
 		 const TgNode* tgnode,
-		 DtpgPrimitive* primitive_list,
+		 TpgPrimitive* primitive_list,
 		 ymuint& id);
 
   /// @brief 入力プリミティブの設定を行なう．
   /// @param[in] prim プリミティブ
   /// @param[in] id 入力番号
   void
-  set_input_primitive(DtpgPrimitive* prim,
+  set_input_primitive(TpgPrimitive* prim,
 		      ymuint id);
 
   /// @brief 論理プリミティブの設定を行なう．
@@ -159,23 +172,47 @@ private:
   /// @param[in] gate_type ゲートタイプ
   /// @param[in] ni 入力数
   void
-  set_logic_primitive(DtpgPrimitive* prim,
+  set_logic_primitive(TpgPrimitive* prim,
 		      tTgGateType gate_type,
 		      ymuint ni);
 
   /// @brief ノードの TFI にマークをつける．
   /// @note 結果は mTmpMark[node->id()] に格納される．
   void
-  dfs_mark(SatpgNode* node);
+  dfs_mark(TpgNode* node);
 
   /// @brief ノードの TFI のマークを消す．
   /// @note 結果は mTmpMark[node->id()] に格納される．
   void
-  dfs_unmark(SatpgNode* node);
+  dfs_unmark(TpgNode* node);
 
   /// @brief activate_po(), activate_all() の下請け関数
   void
   activate_sub();
+
+  /// @brief 故障を生成する．
+  /// @param[in] node 対象のノード
+  /// @param[in] is_output 出力の故障の時 true にするフラグ
+  /// @param[in] ipos 入力位置
+  /// @param[in] val 故障値
+  /// @param[inout] fid 故障ID
+  /// @note この関数内で fid の値がインクリメントされる．
+  TpgFault*
+  new_fault(TpgNode* node,
+	    bool is_output,
+	    ymuint ipos,
+	    int val,
+	    ymuint& fid);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // オブジェクトの生成はクラスメソッドのみが行なう．
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief コンストラクタ
+  /// @param[in] tgnetwork もとのネットワーク
+  TpgNetwork(const TgNetwork& tgnetwork);
 
 
 private:
@@ -183,7 +220,7 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // SatpgNetwork 関係のメモリ確保を行なうオブジェクト
+  // TpgNetwork 関係のメモリ確保を行なうオブジェクト
   SimpleAlloc mAlloc;
 
   // 全ノード数
@@ -199,32 +236,32 @@ private:
   ymuint32 mFFNum;
 
   // ノードの本体の配列
-  SatpgNode* mNodeArray;
+  TpgNode* mNodeArray;
 
   // TgNode->gid() をキーにしたノードの配列
-  SatpgNode** mNodeMap;
+  TpgNode** mNodeMap;
 
   // 外部入力ノードの配列
-  SatpgNode** mInputArray;
+  TpgNode** mInputArray;
 
   // 外部出力ノードの配列
-  SatpgNode** mOutputArray;
+  TpgNode** mOutputArray;
 
   // TFI サイズの降順に整列した外部出力ノードの配列
-  SatpgNode** mOutputArray2;
+  TpgNode** mOutputArray2;
 
   // アクティブなノード数
   ymuint32 mActNodeNum;
 
   // アクティブなノードの配列
-  SatpgNode** mActNodeArray;
+  TpgNode** mActNodeArray;
 
   // activate_sub() で用いられるマーク
   // サイズは mNodeNum
   bool* mTmpMark;
 
   // 故障の本体の配列
-  DtpgFault* mFaultChunk;
+  TpgFault* mFaultChunk;
 
 };
 
@@ -236,23 +273,15 @@ private:
 // @brief ノード数を得る．
 inline
 ymuint
-SatpgNetwork::node_num()
+TpgNetwork::node_num()
 {
   return mNodeNum;
-}
-
-// @brief TgNode::gid() に対応したノードを得る．
-inline
-SatpgNode*
-SatpgNetwork::node_from_gid(ymuint gid)
-{
-  return mNodeMap[gid];
 }
 
 // @brief 外部入力数を得る．
 inline
 ymuint
-SatpgNetwork::input_num()
+TpgNetwork::input_num()
 {
   return mInputNum;
 }
@@ -260,7 +289,7 @@ SatpgNetwork::input_num()
 // @brief 外部入力数 + FF数を得る．
 inline
 ymuint
-SatpgNetwork::input_num2()
+TpgNetwork::input_num2()
 {
   return mInputNum + mFFNum;
 }
@@ -268,8 +297,8 @@ SatpgNetwork::input_num2()
 // @brief 外部入力ノードを得る．
 // @param[in] pos 位置番号 ( 0 <= pos < input_num2() )
 inline
-SatpgNode*
-SatpgNetwork::input(ymuint pos)
+TpgNode*
+TpgNetwork::input(ymuint pos)
 {
   assert_cond( pos < input_num2(), __FILE__, __LINE__);
   return mInputArray[pos];
@@ -278,7 +307,7 @@ SatpgNetwork::input(ymuint pos)
 // @brief 外部出力数を得る．
 inline
 ymuint
-SatpgNetwork::output_num()
+TpgNetwork::output_num()
 {
   return mOutputNum;
 }
@@ -286,7 +315,7 @@ SatpgNetwork::output_num()
 // @brief 外部出力数 + FF数を得る．
 inline
 ymuint
-SatpgNetwork::output_num2()
+TpgNetwork::output_num2()
 {
   return mOutputNum + mFFNum;
 }
@@ -294,8 +323,8 @@ SatpgNetwork::output_num2()
 // @brief 外部出力ノードを得る．
 // @param[in] pos 位置番号 ( 0 <= pos < output_num2() )
 inline
-SatpgNode*
-SatpgNetwork::output(ymuint pos)
+TpgNode*
+TpgNetwork::output(ymuint pos)
 {
   assert_cond( pos < output_num2(), __FILE__, __LINE__);
   return mOutputArray[pos];
@@ -303,8 +332,8 @@ SatpgNetwork::output(ymuint pos)
 
 // @brief サイズの降順で整列した順番で外部出力ノードを取り出す．
 inline
-SatpgNode*
-SatpgNetwork::output2(ymuint pos)
+TpgNode*
+TpgNetwork::output2(ymuint pos)
 {
   assert_cond( pos < output_num2(), __FILE__, __LINE__);
   return mOutputArray2[pos];
@@ -313,7 +342,7 @@ SatpgNetwork::output2(ymuint pos)
 // @brief アクティブなノード数を得る．
 inline
 ymuint
-SatpgNetwork::active_node_num()
+TpgNetwork::active_node_num()
 {
   return mActNodeNum;
 }
@@ -321,13 +350,13 @@ SatpgNetwork::active_node_num()
 // @brief アクティブなノードを得る．
 // @param[in] pos 位置番号 ( 0 <= pos < active_node_num() )
 inline
-SatpgNode*
-SatpgNetwork::active_node(ymuint pos)
+TpgNode*
+TpgNetwork::active_node(ymuint pos)
 {
   assert_cond( pos < mActNodeNum, __FILE__, __LINE__);
   return mActNodeArray[pos];
 }
 
-END_NAMESPACE_YM_SATPG_DTPG
+END_NAMESPACE_YM_SATPG
 
-#endif // SATPGNETWORK_H
+#endif // TPGNETWORK_H

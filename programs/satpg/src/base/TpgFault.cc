@@ -1,39 +1,41 @@
 
-/// @file src/base/SaFault.cc
-/// @brief SaFault の実装ファイル
+/// @file TpgFault.cc
+/// @brief TpgFault の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SaFault.cc 2203 2009-04-16 05:04:40Z matsunaga $
-///
-/// Copyright (C) 2005-2007, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2007, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SaFault.h"
-#include "ym_networks/TgNetwork.h"
-#include "ym_networks/TgNode.h"
+#include "TpgFault.h"
+#include "TpgNetwork.h"
+#include "TpgNode.h"
 #include <sstream>
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-// クラス SaFault
+// クラス TpgFault
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
+// @brief 内容を設定する．
+// @param[in] id ID番号
 // @param[in] node 対象のゲート
 // @param[in] output 入力の故障のとき false, 出力の故障のとき true を与える．
 // @param[in] pos 故障位置
 // @param[in] val 故障値 0 か非0 で 0/1 を区別する．
-SaFault::SaFault(const TgNode* node,
-		 bool output,
-		 ymuint pos,
-		 int val) :
-  mNode(node),
-  mPosVal(0UL),
-  mFinfo(NULL)
+void
+TpgFault::set(ymuint id,
+	      TpgNode* node,
+	      bool output,
+	      ymuint pos,
+	      int val)
 {
+  mId = id;
+  mNode = node;
+
+  mPosVal = 0U;
   if ( val ) {
     mPosVal |= 1U;
   }
@@ -43,14 +45,9 @@ SaFault::SaFault(const TgNode* node,
   mPosVal |= (pos << 3);
 }
 
-// @brief デストラクタ
-SaFault::~SaFault()
-{
-}
-
 // @brief 故障の入力側のゲートを返す．
-const TgNode*
-SaFault::source_node() const
+TpgNode*
+TpgFault::source_node() const
 {
   if ( is_output_fault() ) {
     return node();
@@ -62,7 +59,7 @@ SaFault::source_node() const
 
 // @brief 故障の内容を表す文字列を返す．
 string
-SaFault::str() const
+TpgFault::str() const
 {
   ostringstream ans;
   ans << node()->name() << ":";
@@ -87,7 +84,7 @@ SaFault::str() const
 // @param[in] f 故障
 ostream&
 operator<<(ostream& s,
-	   const SaFault* f)
+	   const TpgFault* f)
 {
   return s << f->str();
 }
