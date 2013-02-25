@@ -793,72 +793,61 @@ SatEngine::run(const vector<DtpgFault*>& flist,
 
   SatSolver solver(mType, mOption, mOutP);
 
+  mMarkArray.clear();
+  mMarkArray.resize(max_id, 0U);
+
+  mTfoList.clear();
+  mTfoList.reserve(max_id);
+
+  mTfiList.clear();
+  mTfiList.reserve(max_id);
+
   // 故障に一時的なID番号を割り振る．
-  // 故障を持つノードを fnode_list に入れる．
+  // 故障のあるノードの TFO を mTfoList に入れる．
+  // TFO の TFI のノードを mTfiList に入れる．
   ymuint nf = flist.size();
-  vector<DtpgNode*> fnode_list;
-  fnode_list.reserve(nf);
-  {
-    vector<bool> mark(max_id, false);
-    for (ymuint i = 0; i < nf; ++ i) {
-      DtpgFault* f = flist[i];
-      f->set_tmp_id(i);
-      DtpgNode* fnode = f->node();
-      if ( mark[fnode->id()] == false ) {
-	mark[fnode->id()] = true;
-	fnode_list.push_back(fnode);
-      }
+  for (ymuint i = 0; i < nf; ++ i) {
+    DtpgFault* f = flist[i];
+    f->set_tmp_id(i);
+    DtpgNode* fnode = f->node();
+    if ( !tfo_mark(fnode) ) {
+      set_tfo_mark(fnode);
+      mTfoList.push_back(fnode);
     }
   }
 
-  // 故障のあるノードの TFO をつけ mTfoList に入れる．
-  mTfoList.clear();
-  mTfoList.reserve(max_id);
-  vector<bool> tfo_mark(max_id, false);
-  for (vector<DtpgNode*>::iterator p = fnode_list.begin();
-       p != fnode_list.end(); ++ p) {
-    DtpgNode* fnode = *p;
-    tfo_mark[fnode->id()] = true;
-    mTfoList.push_back(fnode);
-  }
   for (ymuint rpos = 0; rpos < mTfoList.size(); ++ rpos) {
     DtpgNode* node = mTfoList[rpos];
     ymuint nfo = node->active_fanout_num();
     for (ymuint i = 0; i < nfo; ++ i) {
       DtpgNode* fonode = node->active_fanout(i);
-      if ( tfo_mark[fonode->id()] == false ) {
-	tfo_mark[fonode->id()] = true;
+      if ( !tfo_mark(fonode) ) {
+	set_tfo_mark(fonode);
 	mTfoList.push_back(fonode);
       }
     }
   }
 
-  // TFO の TFI のノードを mTfiList に入れる．
-  mTfiList.clear();
-  {
-    mTfiList.reserve(max_id);
-    vector<bool> mark2(max_id, false);
-    for (vector<DtpgNode*>::iterator p = mTfoList.begin();
-	 p != mTfoList.end(); ++ p) {
-      DtpgNode* node = *p;
-      ymuint ni = node->fanin_num();
-      for (ymuint i = 0; i < ni; ++ i) {
-	DtpgNode* finode = node->fanin(i);
-	if ( tfo_mark[finode->id()] == false && mark2[finode->id()] == false ) {
-	  mark2[finode->id()] = true;
-	  mTfiList.push_back(finode);
-	}
+  for (vector<DtpgNode*>::iterator p = mTfoList.begin();
+       p != mTfoList.end(); ++ p) {
+    DtpgNode* node = *p;
+    ymuint ni = node->fanin_num();
+    for (ymuint i = 0; i < ni; ++ i) {
+      DtpgNode* finode = node->fanin(i);
+      if ( !tfo_mark(finode) && !tfi_mark(finode) ) {
+	set_tfi_mark(finode);
+	mTfiList.push_back(finode);
       }
     }
-    for (ymuint rpos = 0; rpos < mTfiList.size(); ++ rpos) {
-      DtpgNode* node = mTfiList[rpos];
-      ymuint ni = node->fanin_num();
-      for (ymuint i = 0; i < ni; ++ i) {
-	DtpgNode* finode = node->fanin(i);
-	if ( tfo_mark[finode->id()] == false && mark2[finode->id()] == false ) {
-	  mark2[finode->id()] = true;
-	  mTfiList.push_back(finode);
-	}
+  }
+  for (ymuint rpos = 0; rpos < mTfiList.size(); ++ rpos) {
+    DtpgNode* node = mTfiList[rpos];
+    ymuint ni = node->fanin_num();
+    for (ymuint i = 0; i < ni; ++ i) {
+      DtpgNode* finode = node->fanin(i);
+      if ( !tfo_mark(finode) && !tfi_mark(finode) ) {
+	set_tfi_mark(finode);
+	mTfiList.push_back(finode);
       }
     }
   }
@@ -904,6 +893,9 @@ SatEngine::run(const vector<DtpgFault*>& flist,
       mOutputList.push_back(node);
     }
   }
+
+  // mValList の最大数は mInputList のサイズ
+  mValList.reserve(mInputList.size());
 
   // 故障を活性化するとき true にする変数．
   vector<VarId> flt_var(nf);
@@ -1101,32 +1093,35 @@ SatEngine::run(const vector<DtpgFault*>& flist,
     }
 
     // 故障ノードの TFO 以外の dlit を0にする．
-    {
-      vector<bool> mark(max_id, false);
-      vector<DtpgNode*> tmp_list;
-      tmp_list.reserve(mTfoList.size());
-      mark[f->node()->id()] = true;
-      tmp_list.push_back(f->node());
-      for (ymuint rpos = 0; rpos < tmp_list.size(); ++ rpos) {
-	DtpgNode* node = tmp_list[rpos];
-	ymuint nfo = node->active_fanout_num();
-	for (ymuint i = 0; i < nfo; ++ i) {
-	  DtpgNode* fonode = node->active_fanout(i);
-	  if ( mark[fonode->id()] == false ) {
-	    mark[fonode->id()] = true;
-	    tmp_list.push_back(fonode);
-	  }
-	}
-      }
-      for (vector<DtpgNode*>::const_iterator p = mTfoList.begin();
-	   p != mTfoList.end(); ++ p) {
-	DtpgNode* node = *p;
-	if ( node->has_fvar() && mark[node->id()] == false ) {
-	  Literal dlit(node->dvar(), kPolNega);
-	  mAssumptions.push_back(dlit);
+    mTmpNodeList.clear();
+    mTmpNodeList.reserve(mTfoList.size());
+    set_tmp_mark(f->node());
+    mTmpNodeList.push_back(f->node());
+    for (ymuint rpos = 0; rpos < mTmpNodeList.size(); ++ rpos) {
+      DtpgNode* node = mTmpNodeList[rpos];
+      ymuint nfo = node->active_fanout_num();
+      for (ymuint i = 0; i < nfo; ++ i) {
+	DtpgNode* fonode = node->active_fanout(i);
+	if ( !tmp_mark(fonode) ) {
+	  set_tmp_mark(fonode);
+	  mTmpNodeList.push_back(fonode);
 	}
       }
     }
+    for (vector<DtpgNode*>::const_iterator p = mTfoList.begin();
+	 p != mTfoList.end(); ++ p) {
+      DtpgNode* node = *p;
+      if ( node->has_fvar() && !tmp_mark(node) ) {
+	Literal dlit(node->dvar(), kPolNega);
+	mAssumptions.push_back(dlit);
+      }
+    }
+    for (vector<DtpgNode*>::iterator p = mTmpNodeList.begin();
+	 p != mTmpNodeList.end(); ++ p) {
+      DtpgNode* node = *p;
+      clear_tmp_mark(node);
+    }
+    mTmpNodeList.clear();
 
     // dominator ノードの dvar は1でなければならない．
     for (DtpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
@@ -1178,7 +1173,6 @@ SatEngine::solve(SatSolver& solver,
       // フォールバック
       // TFI に含まれる全ての外部入力の値を記録する．
       mValList.clear();
-      mValList.reserve(mInputList.size());
       for (vector<DtpgNode*>::const_iterator p = mInputList.begin();
 	   p != mInputList.end(); ++ p) {
 	DtpgNode* node = *p;
@@ -1225,7 +1219,7 @@ void
 SatEngine::get_pat(DtpgNode* fnode)
 {
   mValList.clear();
-  mBwdNodeList.clear();
+  mJustifiedNodeList.clear();
 
   DtpgNode* onode = NULL;
   for (vector<DtpgNode*>::iterator p = mOutputList.begin();
@@ -1240,10 +1234,10 @@ SatEngine::get_pat(DtpgNode* fnode)
   justify(onode);
 
   // 一連の処理でつけたマークを消す．
-  for (vector<DtpgNode*>::iterator p = mBwdNodeList.begin();
-       p != mBwdNodeList.end(); ++ p) {
+  for (vector<DtpgNode*>::iterator p = mJustifiedNodeList.begin();
+       p != mJustifiedNodeList.end(); ++ p) {
     DtpgNode* node = *p;
-    node->clear_mark3();
+    clear_justified_mark(node);
   }
 }
 
@@ -1292,16 +1286,16 @@ SatEngine::get_pat2(DtpgNode* fnode)
 // @brief solve 中で変数割り当ての正当化を行なう．
 // @param[in] node 対象のノード
 // @note node の値割り当てを正当化する．
-// @note 正当化に用いられているノードには mark3 がつく．
-// @note mark3 がついたノードは mBwdNodeList に格納される．
+// @note 正当化に用いられているノードには mJustifiedMark がつく．
+// @note mJustifiedMmark がついたノードは mJustifiedNodeList に格納される．
 void
 SatEngine::justify(DtpgNode* node)
 {
-  if ( node->mark3() ) {
+  if ( justified_mark(node) ) {
     return;
   }
-  node->set_mark3();
-  mBwdNodeList.push_back(node);
+  set_justified_mark(node);
+  mJustifiedNodeList.push_back(node);
 
   if ( node->is_input() ) {
     // val を記録
@@ -1436,8 +1430,6 @@ SatEngine::just_sub2(DtpgNode* node,
 // @param[in] prim 対象のプリミティブ
 // @param[in] node 対象のノード
 // @note node の値割り当てを正当化する．
-// @note 正当化に用いられているノードには mark3 がつく．
-// @note mark3 がついたノードは mBwdNodeList に格納される．
 void
 SatEngine::justify_primitive(DtpgPrimitive* prim,
 			     DtpgNode* node)

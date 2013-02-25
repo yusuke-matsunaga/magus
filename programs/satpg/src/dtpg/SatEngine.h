@@ -12,7 +12,8 @@
 
 #include "dtpg_nsdef.h"
 
-#include "ym_networks/tgnet.h"
+//#include "ym_networks/tgnet.h"
+#include "DtpgNode.h"
 #include "ym_logic/Literal.h"
 #include "ym_logic/Bool3.h"
 #include "ym_logic/sat_nsdef.h"
@@ -180,6 +181,46 @@ private:
   void
   clear_node_mark();
 
+  /// tfo マークをつける．
+  void
+  set_tfo_mark(DtpgNode* node);
+
+  /// @brief tfo マークを読む．
+  bool
+  tfo_mark(DtpgNode* node);
+
+  /// tfi マークをつける．
+  void
+  set_tfi_mark(DtpgNode* node);
+
+  /// @brief tfi マークを読む．
+  bool
+  tfi_mark(DtpgNode* node);
+
+  /// @brief tmp マークをつける．
+  void
+  set_tmp_mark(DtpgNode* node);
+
+  /// @brief tmp マークを消す．
+  void
+  clear_tmp_mark(DtpgNode* node);
+
+  /// @brief tmp マークを読む．
+  bool
+  tmp_mark(DtpgNode* node);
+
+  /// justified マークをつける．
+  void
+  set_justified_mark(DtpgNode* node);
+
+  /// justified マークを消す．
+  void
+  clear_justified_mark(DtpgNode* node);
+
+  /// @brief justified マークを読む．
+  bool
+  justified_mark(DtpgNode* node);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -207,6 +248,9 @@ private:
   // SAT 用の割り当てリスト
   vector<ymuint> mValList;
 
+  // いくつかのフラグをまとめた配列
+  vector<ymuint8> mMarkArray;
+
   // 故障の TFO のノードリスト
   vector<DtpgNode*> mTfoList;
 
@@ -222,11 +266,14 @@ private:
   // 現在の故障に関係ありそうな外部出力のリスト
   vector<DtpgNode*> mOutputList;
 
+  // 作業用のノードリスト
+  vector<DtpgNode*> mTmpNodeList;
+
   // 故障差が伝搬しているノードを格納するリスト
   vector<DtpgNode*> mDiffNodeList;
 
-  // バックトレースに用いたノードを格納するリスト
-  vector<DtpgNode*> mBwdNodeList;
+  // 正当化されたノードのリスト
+  vector<DtpgNode*> mJustifiedNodeList;
 
   // skip フラグ
   bool mSkip;
@@ -301,6 +348,91 @@ private:
   USTime mAbortTime;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// tfo マークをつける．
+inline
+void
+SatEngine::set_tfo_mark(DtpgNode* node)
+{
+  mMarkArray[node->id()] |= 1U;
+}
+
+// @brief tfo マークを読む．
+inline
+bool
+SatEngine::tfo_mark(DtpgNode* node)
+{
+  return static_cast<bool>((mMarkArray[node->id()] >> 0) & 1U);
+}
+
+// tfi マークをつける．
+inline
+void
+SatEngine::set_tfi_mark(DtpgNode* node)
+{
+  mMarkArray[node->id()] |= 2U;
+}
+
+// @brief tfi マークを読む．
+inline
+bool
+SatEngine::tfi_mark(DtpgNode* node)
+{
+  return static_cast<bool>((mMarkArray[node->id()] >> 1) & 1U);
+}
+
+// @brief tmp マークをつける．
+inline
+void
+SatEngine::set_tmp_mark(DtpgNode* node)
+{
+  mMarkArray[node->id()] |= 4U;
+}
+
+// @brief tmp マークを消す．
+inline
+void
+SatEngine::clear_tmp_mark(DtpgNode* node)
+{
+  mMarkArray[node->id()] &= ~4U;
+}
+
+// @brief tmp マークを読む．
+inline
+bool
+SatEngine::tmp_mark(DtpgNode* node)
+{
+  return static_cast<bool>((mMarkArray[node->id()] >> 2) & 1U);
+}
+
+// justified マークをつける．
+inline
+void
+SatEngine::set_justified_mark(DtpgNode* node)
+{
+  mMarkArray[node->id()] |= 8U;
+}
+
+// justified マークを消す．
+inline
+void
+SatEngine::clear_justified_mark(DtpgNode* node)
+{
+  mMarkArray[node->id()] &= ~8U;
+}
+
+// @brief justified マークを読む．
+inline
+bool
+SatEngine::justified_mark(DtpgNode* node)
+{
+  return static_cast<bool>((mMarkArray[node->id()] >> 3) & 1U);
+}
 
 END_NAMESPACE_YM_SATPG_DTPG
 
