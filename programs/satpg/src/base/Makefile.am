@@ -14,8 +14,8 @@ libatpg_base_la_CPPFLAGS = \
 	-I$(top_srcdir)/include
 
 libatpg_base_la_SOURCES = \
-	TpgNetwork.cc \
-	TpgFault.cc \
+	SaFault.cc \
+	FaultMgr.cc \
 	TestVector.cc \
 	TvMgr.cc
 

@@ -17,10 +17,9 @@ noinst_HEADERS = \
 	PackedVal.h \
 	PackedVal3.h \
 	Rtpg.h \
-	TpgFault.h \
-	TpgNetwork.h \
-	TpgNode.h \
-	TpgPrimitive.h \
+	SaFault.h \
+	SatpgNetwork.h \
+	SatpgNode.h \
 	TestVector.h
 	TvBuff.h \
 	TvMgr.h \
