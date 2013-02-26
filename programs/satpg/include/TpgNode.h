@@ -392,6 +392,14 @@ TpgNode::id() const
   return mId;
 }
 
+// @brief 名前を得る．
+inline
+const char*
+TpgNode::name() const
+{
+  return mName;
+}
+
 // @brief 外部入力タイプの時 true を返す．
 // @note FF 出力もここに含まれる．
 inline

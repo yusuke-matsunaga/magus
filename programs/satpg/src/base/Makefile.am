@@ -15,6 +15,7 @@ libatpg_base_la_CPPFLAGS = \
 
 libatpg_base_la_SOURCES = \
 	TpgNetwork.cc \
+	TpgNode.cc \
 	TpgFault.cc \
 	TestVector.cc \
 	TvMgr.cc

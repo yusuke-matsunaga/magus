@@ -61,7 +61,7 @@ Fsim2::~Fsim2()
 
 // @brief ネットワークをセットする関数
 void
-Fsim2::set_network(const TpgNetwork& network)
+Fsim2::set_network(TpgNetwork& network)
 {
   clear();
 
@@ -79,7 +79,7 @@ Fsim2::set_network(const TpgNetwork& network)
   mOutputArray.resize(no);
 
   for (ymuint i = 0; i < nn; ++ i) {
-    const TpgNode* tpgnode = mNetwork->node(i);
+    TpgNode* tpgnode = mNetwork->node(i);
     SimNode* node = NULL;
 
     if ( tpgnode->is_input() ) {
@@ -101,7 +101,7 @@ Fsim2::set_network(const TpgNetwork& network)
       // ファンインに対応する SimNode を探す．
       vector<SimNode*> inputs(ni);
       for (ymuint i = 0; i < ni; ++ i) {
-	const TpgNode* itpgnode = tpgnode->fanin(i);
+	TpgNode* itpgnode = tpgnode->fanin(i);
 	SimNode* inode = find_simnode(itpgnode);
 	assert_cond(inode, __FILE__, __LINE__);
 	inputs[i] = inode;
@@ -267,14 +267,14 @@ Fsim2::set_network(const TpgNetwork& network)
   ymuint n = mNetwork->rep_fault_num();
   mFsimFaults.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
-    const TpgFault* f = mNetwork->rep_fault(i);
-    const TpgNode* node = f->node();
+    TpgFault* f = mNetwork->rep_fault(i);
+    TpgNode* node = f->node();
     SimNode* simnode = NULL;
     ymuint ipos = 0;
     SimNode* isimnode = NULL;
     if ( f->is_input_fault() ) {
       find_simedge(node, f->pos(), simnode, ipos);
-      const TpgNode* inode = node->fanin(f->pos());
+      TpgNode* inode = node->fanin(f->pos());
       isimnode = find_simnode(inode);
     }
     else {
@@ -292,7 +292,7 @@ Fsim2::set_network(const TpgNetwork& network)
 // @param[out] det_faults 検出された故障を格納するリスト
 void
 Fsim2::run(TestVector* tv,
-	   vector<const TpgFault*>& det_faults)
+	   vector<TpgFault*>& det_faults)
 {
   update_faults();
 
@@ -379,7 +379,7 @@ Fsim2::run(TestVector* tv,
 // @param[out] det_faults 検出された故障を格納するリストの配列
 void
 Fsim2::run(const vector<TestVector*>& tv_array,
-	   vector<vector<const TpgFault*> >& det_faults)
+	   vector<vector<TpgFault*> >& det_faults)
 {
   ymuint npi = mNetwork->input_num2();
   ymuint nb = tv_array.size();
@@ -460,7 +460,7 @@ Fsim2::run(const vector<TestVector*>& tv_array,
     ymuint wpos = 0;
     for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
       FsimFault* ff = flist[rpos];
-      const TpgFault* f = ff->mOrigF;
+      TpgFault* f = ff->mOrigF;
       if ( f->status() == kFsUndetected || f->status() == kFsAborted ) {
 	PackedVal dbits = obs & ff->mObsMask;
 	if ( dbits ) {
@@ -488,7 +488,7 @@ Fsim2::run(const vector<TestVector*>& tv_array,
 // @param[in] f 対象の故障
 bool
 Fsim2::run(TestVector* tv,
-	   const TpgFault* f)
+	   TpgFault* f)
 {
   update_faults();
 
@@ -601,7 +601,7 @@ Fsim2::update_faults()
     ymuint wpos = 0;
     for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
       FsimFault* ff = flist[rpos];
-      const TpgFault* f = ff->mOrigF;
+      TpgFault* f = ff->mOrigF;
       if ( f->status() != kFsDetected ) {
 	if ( wpos != rpos ) {
 	  flist[wpos] = ff;
@@ -625,7 +625,7 @@ Fsim2::ffr_simulate(SimFFR* ffr)
   ymuint wpos = 0;
   for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
     FsimFault* ff = flist[rpos];
-    const TpgFault* f = ff->mOrigF;
+    TpgFault* f = ff->mOrigF;
     FaultStatus fs = f->status();
     if ( fs == kFsDetected || fs == kFsUntestable ) {
       continue;
@@ -703,14 +703,14 @@ Fsim2::eventq_simulate()
 // @brief ffr 内の故障が検出可能か調べる．
 void
 Fsim2::fault_sweep(SimFFR* ffr,
-		   vector<const TpgFault*>& det_faults)
+		   vector<TpgFault*>& det_faults)
 {
   vector<FsimFault*>& flist = ffr->fault_list();
   ymuint fnum = flist.size();
   ymuint wpos = 0;
   for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
     FsimFault* ff = flist[rpos];
-    const TpgFault* f = ff->mOrigF;
+    TpgFault* f = ff->mOrigF;
     if ( f->status() == kFsUndetected || f->status() == kFsAborted ) {
       if ( ff->mObsMask ) {
 	det_faults.push_back(f);
@@ -744,7 +744,7 @@ Fsim2::make_input()
 // @param[in] emap もとのノードの枝の対応関係を記録する配列
 // @note inputs のサイズはノードの入力数 x 2
 SimNode*
-Fsim2::make_primitive(const TpgPrimitive* prim,
+Fsim2::make_primitive(TpgPrimitive* prim,
 		      const vector<SimNode*>& inputs,
 		      const vector<EdgeMap*>& emap)
 {
@@ -766,7 +766,7 @@ Fsim2::make_primitive(const TpgPrimitive* prim,
   ymuint ni = prim->fanin_num();
   vector<SimNode*> tmp_inputs(ni);
   for (ymuint i = 0; i < ni; ++ i) {
-    const TpgPrimitive* iprim = prim->fanin(i);
+    TpgPrimitive* iprim = prim->fanin(i);
     SimNode* inode = make_primitive(iprim, inputs, emap);
     tmp_inputs[i] = inode;
   }
@@ -775,7 +775,7 @@ Fsim2::make_primitive(const TpgPrimitive* prim,
   // ファンインが入力プリミティブかつ対応する emap が NULL でなければ
   // EdgeMap の設定を行う．
   for (ymuint i = 0; i < ni; ++ i) {
-    const TpgPrimitive* iprim = prim->fanin(i);
+    TpgPrimitive* iprim = prim->fanin(i);
     if ( iprim->is_input() ) {
       ymuint iid = iprim->input_id();
       if ( emap[iid] != NULL ) {
@@ -802,14 +802,14 @@ Fsim2::make_node(tTgGateType type,
 
 // @brief node に対応する SimNode* を得る．
 SimNode*
-Fsim2::find_simnode(const TpgNode* node) const
+Fsim2::find_simnode(TpgNode* node) const
 {
   return mSimMap[node->id()];
 }
 
 // @brief node の pos 番めの入力に対応する枝を得る．
 void
-Fsim2::find_simedge(const TpgNode* node,
+Fsim2::find_simedge(TpgNode* node,
 		    ymuint pos,
 		    SimNode*& simnode,
 		    ymuint& ipos) const

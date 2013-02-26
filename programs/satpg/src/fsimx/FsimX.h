@@ -50,7 +50,7 @@ public:
   /// @brief ネットワークをセットする．
   virtual
   void
-  set_network(const TpgNetwork& network);
+  set_network(TpgNetwork& network);
 
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -58,7 +58,7 @@ public:
   virtual
   void
   run(TestVector* tv,
-      vector<const TpgFault*>& det_faults);
+      vector<TpgFault*>& det_faults);
 
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
@@ -66,7 +66,7 @@ public:
   virtual
   void
   run(const vector<TestVector*>& tv_array,
-      vector<vector<const TpgFault*> >& det_faults);
+      vector<vector<TpgFault*> >& det_faults);
 
   /// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -74,7 +74,7 @@ public:
   virtual
   bool
   run(TestVector* tv,
-      const TpgFault* f);
+      TpgFault* f);
 
 
 private:
@@ -108,7 +108,7 @@ private:
   /// @brief ffr 内の故障が検出可能か調べる．
   void
   fault_sweep(SimFFR* ffr,
-	      vector<const TpgFault*>& det_faults);
+	      vector<TpgFault*>& det_faults);
 
 
 private:
@@ -135,11 +135,11 @@ private:
 
   /// @brief node に対応する SimNode を得る．
   SimNode*
-  find_simnode(const TpgNode* node) const;
+  find_simnode(TpgNode* node) const;
 
   /// @brief node の pos 番めの入力に対応する枝を得る．
   void
-  find_simedge(const TpgNode* node,
+  find_simedge(TpgNode* node,
 	       ymuint pos,
 	       SimNode*& simnode,
 	       ymuint& ipos) const;
@@ -154,7 +154,7 @@ private:
   /// @param[in] emap もとのノードの枝の対応関係を記録する配列
   /// @note inputs のサイズはノードの入力数 x 2
   SimNode*
-  make_primitive(const TpgPrimitive* prim,
+  make_primitive(TpgPrimitive* prim,
 		 const vector<SimNode*>& inputs,
 		 const vector<EdgeMap*>& emap);
 
@@ -170,7 +170,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 対象のネットワーク
-  const TpgNetwork* mNetwork;
+  TpgNetwork* mNetwork;
 
   // TpgNode の gid をキーにして SimNode を入れる配列
   vector<SimNode*> mSimMap;

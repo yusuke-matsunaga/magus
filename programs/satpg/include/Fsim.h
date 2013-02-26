@@ -29,7 +29,7 @@ public:
   /// @brief ネットワークをセットする．
   virtual
   void
-  set_network(const TpgNetwork& network) = 0;
+  set_network(TpgNetwork& network) = 0;
 
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -37,7 +37,7 @@ public:
   virtual
   void
   run(TestVector* tv,
-      vector<const TpgFault*>& det_faults) = 0;
+      vector<TpgFault*>& det_faults) = 0;
 
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
@@ -45,7 +45,7 @@ public:
   virtual
   void
   run(const vector<TestVector*>& tv_array,
-      vector<vector<const TpgFault*> >& det_faults) = 0;
+      vector<vector<TpgFault*> >& det_faults) = 0;
 
   /// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -53,7 +53,7 @@ public:
   virtual
   bool
   run(TestVector* tv,
-      const TpgFault* f) = 0;
+      TpgFault* f) = 0;
 
 };
 

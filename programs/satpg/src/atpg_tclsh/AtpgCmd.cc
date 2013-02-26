@@ -9,9 +9,9 @@
 
 #include "AtpgCmd.h"
 #include "AtpgMgr.h"
-#include "ym_networks/TgNetwork.h"
-#include "ym_networks/TgNode.h"
-#include "SaFault.h"
+#include "TpgNetwork.h"
+#include "TpgNode.h"
+#include "TpgFault.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -36,8 +36,8 @@ void
 AtpgCmd::after_set_network()
 {
   // 諸元を TCL 変数にセットしておく
-  const TgNetwork& network = _network();
-  ymuint nlo = network.logic_num();
+  const TpgNetwork& network = _network();
+  ymuint nn = network.node_num();
   ymuint n_buff = 0;
   ymuint n_not = 0;
   ymuint n_and = 0;
@@ -61,8 +61,11 @@ AtpgCmd::after_set_network()
   ymuint n_xnor = 0;
   ymuint n_xnor2 = 0;
   ymuint n_cplx = 0;
-  for (ymuint i = 0; i < nlo; ++ i) {
-    const TgNode* node = network.logic(i);
+  for (ymuint i = 0; i < nn; ++ i) {
+    const TpgNode* node = network.node(i);
+    if ( !node->is_logic() ) {
+      continue;
+    }
     switch ( node->gate_type() ) {
     case kTgGateBuff:
       ++ n_buff;
@@ -130,10 +133,10 @@ AtpgCmd::after_set_network()
 
   TclObj varname = "::atpg::info";
   int varflag = 0;
-  set_var(varname, "input_num", network.input_num1(), varflag);
-  set_var(varname, "output_num", network.output_num1(), varflag);
-  set_var(varname, "ff_num", network.ff_num(), varflag);
-  set_var(varname, "logic_num", network.logic_num(), varflag);
+  set_var(varname, "input_num", network.input_num(), varflag);
+  set_var(varname, "output_num", network.output_num(), varflag);
+  set_var(varname, "ff_num", network.input_num2() - network.input_num(), varflag);
+  set_var(varname, "logic_num", network.node_num() - network.input_num2() - network.output_num2(), varflag);
   set_var(varname, "buff_num", n_buff, varflag);
   set_var(varname, "not_num", n_not, varflag);
   set_var(varname, "and_num", n_and, varflag);
@@ -163,7 +166,7 @@ BEGIN_NONAMESPACE
 
 // 故障を表す TclObj を作る
 TclObj
-f2obj(SaFault* f)
+f2obj(TpgFault* f)
 {
   TclObjVector tmp(3);
   tmp[0] = f->node()->name();
@@ -191,13 +194,14 @@ END_NONAMESPACE
 void
 AtpgCmd::after_update_faults()
 {
+#if 0
   FaultMgr& fault_mgr = _fault_mgr();
 
   // 諸元を TCL 変数にセットしておく
-  const vector<SaFault*>& all_list = fault_mgr.all_list();
-  const vector<SaFault*>& rep_list = fault_mgr.all_rep_list();
-  const vector<SaFault*>& remain_list = fault_mgr.remain_list();
-  const vector<SaFault*>& untest_list = fault_mgr.untest_list();
+  const vector<TpgFault*>& all_list = fault_mgr.all_list();
+  const vector<TpgFault*>& rep_list = fault_mgr.all_rep_list();
+  const vector<TpgFault*>& remain_list = fault_mgr.remain_list();
+  const vector<TpgFault*>& untest_list = fault_mgr.untest_list();
   ymuint n_all = all_list.size();
   ymuint n_rep = rep_list.size();
   ymuint n_remain = remain_list.size();
@@ -214,55 +218,49 @@ AtpgCmd::after_update_faults()
 #if 0
   {
     TclObjVector tmp_list;
-    for (vector<SaFault*>::const_iterator p = all_list.begin();
+    for (vector<TpgFault*>::const_iterator p = all_list.begin();
 	 p != all_list.end(); ++ p) {
-      SaFault* f = *p;
+      TpgFault* f = *p;
       tmp_list.push_back(f2obj(f));
     }
     set_var(varname, "all_fault_list", tmp_list, varflag);
   }
   {
     TclObjVector tmp_list;
-    for (vector<SaFault*>::const_iterator p = rep_list.begin();
+    for (vector<TpgFault*>::const_iterator p = rep_list.begin();
 	 p != rep_list.end(); ++ p) {
-      SaFault* f = *p;
+      TpgFault* f = *p;
       tmp_list.push_back(f2obj(f));
     }
     set_var(varname, "rep_fault_list", tmp_list, varflag);
   }
   {
     TclObjVector tmp_list;
-    for (vector<SaFault*>::const_iterator p = remain_list.begin();
+    for (vector<TpgFault*>::const_iterator p = remain_list.begin();
 	 p != remain_list.end(); ++ p) {
-      SaFault* f = *p;
+      TpgFault* f = *p;
       tmp_list.push_back(f2obj(f));
     }
     set_var(varname, "remain_fault_list", tmp_list, varflag);
   }
   {
     TclObjVector tmp_list;
-    for (vector<SaFault*>::const_iterator p = untest_list.begin();
+    for (vector<TpgFault*>::const_iterator p = untest_list.begin();
 	 p != untest_list.end(); ++ p) {
-      SaFault* f = *p;
+      TpgFault* f = *p;
       tmp_list.push_back(f2obj(f));
     }
     set_var(varname, "untest_fault_list", tmp_list, varflag);
   }
 #endif
+#endif
 }
 
 // @brief TgNetwork を取り出す．
-const TgNetwork&
+const TpgNetwork&
 AtpgCmd::_network()
 {
   return mgr()._network();
-}
-
-// @brief FaultMgr を取り出す．
-FaultMgr&
-AtpgCmd::_fault_mgr()
-{
-  return mgr()._fault_mgr();
 }
 
 // @brief TvMgr を取り出す．

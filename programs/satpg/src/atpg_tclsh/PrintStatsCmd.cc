@@ -9,7 +9,6 @@
 
 #include "PrintStatsCmd.h"
 #include "AtpgMgr.h"
-#include "FaultMgr.h"
 #include "TvMgr.h"
 
 
@@ -49,6 +48,7 @@ PrintStatsCmd::cmd_proc(TclObjVector& objv)
   USTime s_time = mgr().sat_time();
   USTime m_time = mgr().misc_time();
 
+#if 0
   FaultMgr& fmgr = _fault_mgr();
   ymuint num = mgr()._tv_list().size();
 
@@ -69,6 +69,7 @@ PrintStatsCmd::cmd_proc(TclObjVector& objv)
 	  s_time.usr_time());
   fprintf(stdout, "#K:    (misc time           = %7.2f)\n",
 	  m_time.usr_time());
+#endif
 
   return TCL_OK;
 }

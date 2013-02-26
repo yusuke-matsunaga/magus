@@ -8,8 +8,7 @@
 
 
 #include "Op1.h"
-#include "SaFault.h"
-#include "FaultMgr.h"
+#include "TpgFault.h"
 #include "TvMgr.h"
 #include "Fsim.h"
 #include "TestVector.h"
@@ -22,13 +21,11 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-Op1::Op1(FaultMgr& fmgr,
-	 TvMgr& tvmgr,
+Op1::Op1(TvMgr& tvmgr,
 	 vector<TestVector*>& tv_list,
 	 Fsim& fsim3,
 	 bool drop,
 	 bool verify) :
-  mFaultMgr(fmgr),
   mTvMgr(tvmgr),
   mTvList(tv_list),
   mFsim3(fsim3),
@@ -46,7 +43,7 @@ Op1::~Op1()
 // @param[in] f 故障
 // @param[in] val_list "入力ノードの番号 x 2 + 値" のリスト
 void
-Op1::set_detected(SaFault* f,
+Op1::set_detected(TpgFault* f,
 		  const vector<ymuint>& val_list)
 {
   TestVector* tv = mTvMgr.new_vector();
@@ -64,12 +61,13 @@ Op1::set_detected(SaFault* f,
     }
   }
   if ( mDrop ) {
-    vector<SaFault*> det_faults;
+    vector<TpgFault*> det_faults;
     mFsim3.run(tv, det_faults);
-    for (vector<SaFault*>::iterator p = det_faults.begin();
+    for (vector<TpgFault*>::iterator p = det_faults.begin();
 	 p != det_faults.end(); ++ p) {
-      SaFault* f = *p;
-      mFaultMgr.set_status(f, kFsDetected);
+      TpgFault* f = *p;
+#warning "TODO: 未完"
+      //mFaultMgr.set_status(f, kFsDetected);
     }
   }
   if ( mVerify ) {
@@ -79,14 +77,15 @@ Op1::set_detected(SaFault* f,
 
   mTvList.push_back(tv);
 
-  mFaultMgr.set_status(f, kFsDetected);
+  //mFaultMgr.set_status(f, kFsDetected);
 }
 
 // @brief 検出不能のときに呼ばれる関数
 void
-Op1::set_untestable(SaFault* f)
+Op1::set_untestable(TpgFault* f)
 {
-  mFaultMgr.set_status(f, kFsUntestable);
+#warning "TODO: 未完"
+  //mFaultMgr.set_status(f, kFsUntestable);
 }
 
 END_NAMESPACE_YM_SATPG

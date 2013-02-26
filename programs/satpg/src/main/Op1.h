@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "DtpgOperator.h"
+#include "TpgOperator.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -18,13 +18,12 @@ BEGIN_NAMESPACE_YM_SATPG
 // DtpgSat 用の DtpgOperator
 //////////////////////////////////////////////////////////////////////
 class Op1 :
-  public DtpgOperator
+  public TpgOperator
 {
 public:
 
   /// @brief コンストラクタ
-  Op1(FaultMgr& fmgr,
-      TvMgr& tvmgr,
+  Op1(TvMgr& tvmgr,
       vector<TestVector*>& tv_list,
       Fsim& fsim3,
       bool drop = false,
@@ -44,22 +43,20 @@ public:
   /// @param[in] val_list "入力ノードの番号 x 2 + 値" のリスト
   virtual
   void
-  set_detected(SaFault* f,
+  set_detected(TpgFault* f,
 	       const vector<ymuint>& val_list);
 
   /// @brief 検出不能のときに呼ばれる関数
   /// @param[in] f 故障
   virtual
   void
-  set_untestable(SaFault* f);
+  set_untestable(TpgFault* f);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  FaultMgr& mFaultMgr;
 
   TvMgr& mTvMgr;
 

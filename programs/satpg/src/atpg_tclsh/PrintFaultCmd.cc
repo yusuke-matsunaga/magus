@@ -9,8 +9,7 @@
 
 #include "PrintFaultCmd.h"
 #include "AtpgMgr.h"
-#include "FaultMgr.h"
-#include "SaFault.h"
+#include "TpgFault.h"
 #include "ym_tclpp/TclPopt.h"
 
 
@@ -44,8 +43,7 @@ PrintFaultCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  FaultMgr& fmgr = _fault_mgr();
-
+#if 0
   vector<SaFault*>::const_iterator b = fmgr.remain_list().begin();
   vector<SaFault*>::const_iterator e = fmgr.remain_list().end();
 
@@ -72,6 +70,7 @@ PrintFaultCmd::cmd_proc(TclObjVector& objv)
     SaFault* f = *p;
     cout << f->str() << endl;
   }
+#endif
 
   return TCL_OK;
 }

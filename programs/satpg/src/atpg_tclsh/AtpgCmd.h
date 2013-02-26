@@ -59,12 +59,8 @@ protected:
 protected:
 
   /// @brief TgNetwork を取り出す．
-  const TgNetwork&
+  const TpgNetwork&
   _network();
-
-  /// @brief FaultMgr を取り出す．
-  FaultMgr&
-  _fault_mgr();
 
   /// @brief TvMgr を取り出す．
   TvMgr&

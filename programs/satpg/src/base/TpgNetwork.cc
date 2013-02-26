@@ -101,12 +101,24 @@ primitive_count(const LogExpr& expr)
 
 // ゲートタイプから代表故障を求める．
 void
-get_rep_faults(tTgGateType type,
+get_rep_faults(TpgNode* node,
 	       TpgFault* f0,
 	       TpgFault* f1,
 	       TpgFault*& rep0,
 	       TpgFault*& rep1)
 {
+  if ( node->is_input() ) {
+    // どうでもいい
+    return;
+  }
+  if ( node->is_output() ) {
+    // バッファと同じ
+    rep0 = f0;
+    rep1 = f1;
+    return;
+  }
+
+  tTgGateType type = node->gate_type();
   switch ( type ) {
   case kTgGateBuff:
     rep0 = f0;
@@ -360,13 +372,13 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
       ymuint ni = onode->fanin_num();
       ymuint ipos = ni;
       for (ymuint j = 0; j < ni; ++ j) {
-	if ( onode->fanin(j) == onode ) {
+	if ( onode->fanin(j) == node ) {
 	  ipos = j;
 	}
       }
       assert_cond( ipos < ni, __FILE__, __LINE__);
-      rep0 = onode->input_fault(ipos, 0);
-      rep1 = onode->input_fault(ipos, 1);
+      rep0 = onode->input_fault(0, ipos);
+      rep1 = onode->input_fault(1, ipos);
     }
     TpgFault* f0 = new_fault(node, true, 0, 0, rep0, fid);
     TpgFault* f1 = new_fault(node, true, 0, 1, rep1, fid);
@@ -374,7 +386,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
     node->mOutputFault[1] = f1;
 
     // ノードタイプから代表故障(r0, r1)をもとめる．
-    get_rep_faults(node->gate_type(), f0, f1, rep0, rep1);
+    get_rep_faults(node, f0, f1, rep0, rep1);
 
     ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {

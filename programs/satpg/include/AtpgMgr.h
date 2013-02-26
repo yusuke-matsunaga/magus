@@ -6,16 +6,15 @@
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "satpg_nsdef.h"
-#include "FaultMgr.h"
+
 #include "TvMgr.h"
 #include "Fsim.h"
 #include "Dtpg.h"
-#include "ym_networks/TgNetwork.h"
 #include "ym_cell/cell_nsdef.h"
 #include "ym_utils/Binder.h"
 #include "ym_utils/MStopWatch.h"
@@ -44,12 +43,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief TgNetwork を取り出す．
-  const TgNetwork&
+  TpgNetwork&
   _network();
-
-  /// @brief FaultMgr を取り出す．
-  FaultMgr&
-  _fault_mgr();
 
   /// @brief TvMgr を取り出す．
   TvMgr&
@@ -106,14 +101,14 @@ public:
   /// @param[out] det_faults 検出された故障を格納するリスト
   void
   fsim(TestVector* tv,
-       vector<SaFault*>& det_faults);
+       vector<TpgFault*>& det_faults);
 
   /// @brief 複数のテストベクタに対する故障シミュレーションを行なう．
   /// @param[in] tv_list テストベクタのリスト
   /// @param[out] det_faults 検出された故障を格納するリストのリスト
   void
   fsim(const vector<TestVector*>& tv_list,
-       vector<vector<SaFault*> >& det_faults_list);
+       vector<vector<TpgFault*> >& det_faults_list);
 
   /// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -122,7 +117,7 @@ public:
   /// @retval false tv では f の検出ができない．
   bool
   fsim(TestVector* tv,
-       SaFault* f);
+       TpgFault* f);
 
 
 public:
@@ -160,10 +155,6 @@ public:
   void
   dtpg(const string& option);
 
-  /// @brief テストパタン生成を行なう．
-  void
-  dtpg_old(const string& option);
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -172,11 +163,7 @@ public:
 
   /// @brief ネットワークの変更に関するハンドラを登録する．
   void
-  reg_network_handler(T2Binder<const TgNetwork&, const vector<SaFault*>&>* handler);
-
-  /// @brief 故障リストの変更に関するハンドラを登録する．
-  void
-  reg_fault_handler(T1Binder<const vector<SaFault*>& >* handler);
+  reg_network_handler(T1Binder<TpgNetwork&>* handler);
 
 
 public:
@@ -214,49 +201,6 @@ private:
   void
   after_set_network();
 
-  /// @brief 故障リストが変更された時に呼ばれる関数
-  void
-  after_update_faults();
-
-  /// @brief FFR 内の故障リストを作るために DFS を行なう．
-  void
-  dfs_ffr(const TgNode* node,
-	  vector<SaFault*>& flist);
-
-  /// @brief FFR 内の故障リストを作るために DFS を行なう．
-  void
-  dfs_mffc(const TgNode* node,
-	   vector<bool>& mark,
-	   vector<SaFault*>& flist);
-
-  const TgNode*
-  merge(const TgNode* node1,
-	const TgNode* node2,
-	const vector<ymuint32>& order);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる構造体
-  //////////////////////////////////////////////////////////////////////
-
-  struct FaultInfo
-  {
-    // 出力の故障の配列
-    // NULL の場合もある．
-    SaFault* mOutputFaults[2];
-
-    // 入力の故障の配列
-    // サイズは入力数 x 2
-    // NULL の場合もある．
-    vector<SaFault*> mInputFaults;
-
-    // 全ての故障のリスト
-    // NULL の要素はない．
-    vector<SaFault*> mAllFaults;
-
-  };
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -264,16 +208,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 対象のネットワーク
-  TgNetwork mNetwork;
-
-  // ノード番号をキーにして故障情報を格納する配列
-  vector<FaultInfo> mFaultArray;
-
-  // 直近の支配ノードを格納する配列
-  vector<const TgNode*> mImmDomArray;
-
-  // 故障リスト
-  FaultMgr mFaultMgr;
+  TpgNetwork* mNetwork;
 
   // テストベクタを管理するオブジェクト
   TvMgr mTvMgr;
@@ -288,9 +223,6 @@ private:
   Fsim* mFsim3;
 
   // テストパタン生成器
-  Dtpg* mDtpgOld;
-
-  // テストパタン生成器
   Dtpg* mDtpg;
 
   // テストパタン生成時に故障ドロップを行なうときに true にする．
@@ -300,10 +232,7 @@ private:
   bool mDtpgVerify;
 
   // ネットワークが変更された時に呼ばれるイベントハンドラ
-  T2BindMgr<const TgNetwork&, const vector<SaFault*>&> mNtwkBindMgr;
-
-  // 故障リストが変更された時に呼ばれるイベントハンドラ
-  T1BindMgr<const vector<SaFault*>& > mFaultBindMgr;
+  T1BindMgr<TpgNetwork&> mNtwkBindMgr;
 
   // タイマー
   MStopWatch mTimer;
@@ -317,18 +246,10 @@ private:
 
 // @brief TgNetwork を取り出す．
 inline
-const TgNetwork&
+TpgNetwork&
 AtpgMgr::_network()
 {
-  return mNetwork;
-}
-
-// @brief FaultMgr を取り出す．
-inline
-FaultMgr&
-AtpgMgr::_fault_mgr()
-{
-  return mFaultMgr;
+  return *mNetwork;
 }
 
 // @brief TvMgr を取り出す．
@@ -350,8 +271,7 @@ AtpgMgr::_tv_list()
 // @brief ネットワークの変更に関するハンドラを登録する．
 inline
 void
-AtpgMgr::reg_network_handler(T2Binder<const TgNetwork&,
-				      const vector<SaFault*>&>* handler)
+AtpgMgr::reg_network_handler(T1Binder<TpgNetwork&>* handler)
 {
   mNtwkBindMgr.reg_binder(handler);
 }

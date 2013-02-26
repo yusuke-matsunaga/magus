@@ -30,8 +30,6 @@ atpg_tclsh_SOURCES = \
 	AtpgMsgHandler.cc \
 	NtwkIoCmd.h \
 	NtwkIoCmd.cc \
-	FaultCmd.h \
-	FaultCmd.cc \
 	PrintFaultCmd.h \
 	PrintFaultCmd.cc \
 	PrintPatCmd.h \
@@ -40,14 +38,8 @@ atpg_tclsh_SOURCES = \
 	PrintPatStatsCmd.cc \
 	PrintStatsCmd.h \
 	PrintStatsCmd.cc \
-	RfsimCmd.h \
-	RfsimCmd.cc \
-	RtpgCmd.h \
-	RtpgCmd.cc \
 	DtpgCmd.h \
-	DtpgCmd.cc \
-	DtpgOldCmd.h \
-	DtpgOldCmd.cc
+	DtpgCmd.cc
 
 atpg_tclsh_LDADD = \
 	$(top_builddir)/src/main/libatpg_main.la \

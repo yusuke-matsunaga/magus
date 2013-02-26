@@ -17,10 +17,11 @@ pysatpg_SOURCES = \
 	pysatpg.cc \
 	pysatpg_Val3.cc \
 	pysatpg_FaultStatus.cc \
-	pysatpg_SaFault.cc \
-	pysatpg_FaultMgr.cc \
+	pysatpg_TpgFault.cc \
 	pysatpg_TestVector.cc \
 	pysatpg_TvMgr.cc
+
+#	pysatpg_FaultMgr.cc
 
 pysatpg_LDFLAGS = \
 	$(PYTHON_LDFLAGS)

@@ -162,7 +162,8 @@ WriteNetwork::cmd_proc(TclObjVector& objv)
     osp = &ofs;
   }
 
-  dump(*osp, _network());
+#warning "TODO: 未完"
+  //dump(*osp, _network());
 
   return TCL_OK;
 }

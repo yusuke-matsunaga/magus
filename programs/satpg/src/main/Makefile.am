@@ -17,11 +17,7 @@ libatpg_main_la_CPPFLAGS = \
 libatpg_main_la_SOURCES = \
 	AtpgMgr.cc \
 	Op1.h \
-	Op1.cc \
-	Op2.h \
-	Op2.cc \
-	Rtpg.cc \
-	TvBuff.cc
+	Op1.cc
 
 libatpg_main_la_LDFLAGS =
 

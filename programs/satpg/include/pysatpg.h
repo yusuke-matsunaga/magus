@@ -104,37 +104,37 @@ PyFaultStatus_AsFaultStatus(PyObject* py_obj);
 
 
 //////////////////////////////////////////////////////////////////////
-// PySaFault: 縮退故障を表す型
+// PyTpgFault: 縮退故障を表す型
 //////////////////////////////////////////////////////////////////////
 
-/// @brief SaFault を表すタイプオブジェクト
+/// @brief TpgFault を表すタイプオブジェクト
 extern
-PyTypeObject PySaFault_Type;
+PyTypeObject PyTpgFault_Type;
 
-/// @brief PySaFault の型チェック
+/// @brief PyTpgFault の型チェック
 /// @param[in] obj Python オブジェクト
-/// @retval true obj が PySaFault_Type だった．
+/// @retval true obj が PyTpgFault_Type だった．
 /// @retval false obj が他の型だった．
 inline
 bool
-PySaFault_Check(PyObject* obj)
+PyTpgFault_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &PySaFault_Type;
+  return Py_TYPE(obj) == &PyTpgFault_Type;
 }
 
-/// @brief SaFault から PyObject を生成する．
-/// @param[in] obj SaFault オブジェクト
+/// @brief TpgFault から PyObject を生成する．
+/// @param[in] obj TpgFault オブジェクト
 extern
 PyObject*
-PySaFault_FromSaFault(SaFault* obj);
+PyTpgFault_FromTpgFault(TpgFault* obj);
 
-/// @brief PyObject から SaFault へのポインタを取り出す．
+/// @brief PyObject から TpgFault へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト
-/// @return SaFault へのポインタを返す．
+/// @return TpgFault へのポインタを返す．
 /// @note 変換が失敗したら TypeError を送出し，NULL を返す．
 extern
-SaFault*
-PySaFault_AsSaFaultPtr(PyObject* py_obj);
+TpgFault*
+PyTpgFault_AsTpgFaultPtr(PyObject* py_obj);
 
 
 //////////////////////////////////////////////////////////////////////
