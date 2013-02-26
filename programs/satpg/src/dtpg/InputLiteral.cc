@@ -44,7 +44,7 @@ VectorInputLiteral::size() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GvarInputLiteral::GvarInputLiteral(TpgNode* node) :
+GvarInputLiteral::GvarInputLiteral(const TpgNode* node) :
   mNode(node)
 {
 }
@@ -53,7 +53,7 @@ GvarInputLiteral::GvarInputLiteral(TpgNode* node) :
 Literal
 GvarInputLiteral::operator[](ymuint pos) const
 {
-  TpgNode* inode = mNode->fanin(pos);
+  const TpgNode* inode = mNode->fanin(pos);
   return Literal(inode->gvar(), kPolPosi);
 }
 
@@ -70,7 +70,7 @@ GvarInputLiteral::size() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-FvarInputLiteral::FvarInputLiteral(TpgNode* node) :
+FvarInputLiteral::FvarInputLiteral(const TpgNode* node) :
   mNode(node)
 {
 }
@@ -79,7 +79,7 @@ FvarInputLiteral::FvarInputLiteral(TpgNode* node) :
 Literal
 FvarInputLiteral::operator[](ymuint pos) const
 {
-  TpgNode* inode = mNode->fanin(pos);
+  const TpgNode* inode = mNode->fanin(pos);
   return Literal(inode->fvar(), kPolPosi);
 }
 
@@ -96,7 +96,7 @@ FvarInputLiteral::size() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PrimGvarInputLiteral::PrimGvarInputLiteral(TpgPrimitive* prim) :
+PrimGvarInputLiteral::PrimGvarInputLiteral(const TpgPrimitive* prim) :
   mPrim(prim)
 {
 }
@@ -105,8 +105,8 @@ PrimGvarInputLiteral::PrimGvarInputLiteral(TpgPrimitive* prim) :
 Literal
 PrimGvarInputLiteral::operator[](ymuint pos) const
 {
-  TpgPrimitive* iprim = mPrim->fanin(pos);
-  return Literal(iprim->gvar(), kPolPosi);
+  const TpgPrimitive* iprim = mPrim->fanin(pos);
+  return iprim->glit();
 }
 
 // @brief 入力数を返す．
@@ -122,7 +122,7 @@ PrimGvarInputLiteral::size() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PrimFvarInputLiteral::PrimFvarInputLiteral(TpgPrimitive* prim) :
+PrimFvarInputLiteral::PrimFvarInputLiteral(const TpgPrimitive* prim) :
   mPrim(prim)
 {
 }
@@ -131,8 +131,8 @@ PrimFvarInputLiteral::PrimFvarInputLiteral(TpgPrimitive* prim) :
 Literal
 PrimFvarInputLiteral::operator[](ymuint pos) const
 {
-  TpgPrimitive* iprim = mPrim->fanin(pos);
-  return Literal(iprim->fvar(), kPolPosi);
+  const TpgPrimitive* iprim = mPrim->fanin(pos);
+  return iprim->flit();
 }
 
 // @brief 入力数を返す．

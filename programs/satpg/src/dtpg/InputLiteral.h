@@ -79,7 +79,7 @@ class GvarInputLiteral :
 public:
 
   /// @brief コンストラクタ
-  GvarInputLiteral(TpgNode* node);
+  GvarInputLiteral(const TpgNode* node);
 
   /// @brief リテラルを返す．
   virtual
@@ -98,7 +98,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ノード
-  TpgNode* mNode;
+  const TpgNode* mNode;
 
 };
 
@@ -113,7 +113,7 @@ class FvarInputLiteral :
 public:
 
   /// @brief コンストラクタ
-  FvarInputLiteral(TpgNode* node);
+  FvarInputLiteral(const TpgNode* node);
 
   /// @brief リテラルを返す．
   virtual
@@ -132,7 +132,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ノード
-  TpgNode* mNode;
+  const TpgNode* mNode;
 
 };
 
@@ -147,7 +147,7 @@ class PrimGvarInputLiteral :
 public:
 
   /// @brief コンストラクタ
-  PrimGvarInputLiteral(TpgPrimitive* prim);
+  PrimGvarInputLiteral(const TpgPrimitive* prim);
 
   /// @brief リテラルを返す．
   virtual
@@ -166,7 +166,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // プリミティブ
-  TpgPrimitive* mPrim;
+  const TpgPrimitive* mPrim;
 
 };
 
@@ -181,7 +181,7 @@ class PrimFvarInputLiteral :
 public:
 
   /// @brief コンストラクタ
-  PrimFvarInputLiteral(TpgPrimitive* prim);
+  PrimFvarInputLiteral(const TpgPrimitive* prim);
 
   /// @brief リテラルを返す．
   virtual
@@ -200,7 +200,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // プリミティブ
-  TpgPrimitive* mPrim;
+  const TpgPrimitive* mPrim;
 
 };
 

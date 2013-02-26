@@ -11,6 +11,7 @@
 
 #include "satpg_nsdef.h"
 #include "ym_networks/tgnet.h"
+#include "ym_logic/Literal.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -66,21 +67,21 @@ public:
   TpgPrimitive*
   fanin(ymuint pos) const;
 
-  /// @brief 正常値を表す変数番号をセットする．
+  /// @brief 正常値を表すリテラルをセットする．
   void
-  set_gvar(VarId gvar);
+  set_glit(Literal lit);
 
-  /// @brief 故障値を表す変数番号をセットする．
+  /// @brief 故障値を表すリテラルをセットする．
   void
-  set_fvar(VarId fvar);
+  set_flit(Literal lit);
 
-  /// @brief 正常値を表す変数番号を得る．
-  VarId
-  gvar() const;
+  /// @brief 正常値を表すリテラルを得る．
+  Literal
+  glit() const;
 
-  /// @brief 故障値を表す変数番号を得る．
-  VarId
-  fvar() const;
+  /// @brief 故障値を表すリテラルを得る．
+  Literal
+  flit() const;
 
 
 private:
@@ -103,11 +104,11 @@ private:
   // ファンインの配列
   TpgPrimitive** mFanins;
 
-  // 正常回路の変数番号
-  VarId mGid;
+  // 正常回路のリテラル
+  Literal mGlit;
 
-  // 故障回路の変数番号
-  VarId mFid;
+  // 故障回路のリテラル
+  Literal mFlit;
 
 };
 
@@ -187,36 +188,36 @@ TpgPrimitive::fanin(ymuint pos) const
   return mFanins[pos];
 }
 
-// @brief 正常値を表す変数番号をセットする．
+// @brief 正常値を表すリテラルをセットする．
 inline
 void
-TpgPrimitive::set_gvar(VarId gvar)
+TpgPrimitive::set_glit(Literal lit)
 {
-  mGid = gvar;
+  mGlit = lit;
 }
 
-// @brief 故障値を表す変数番号をセットする．
+// @brief 故障値を表すリテラルをセットする．
 inline
 void
-TpgPrimitive::set_fvar(VarId fvar)
+TpgPrimitive::set_flit(Literal lit)
 {
-  mFid = fvar;
+  mFlit = lit;
 }
 
-// @brief 正常値を表す変数番号を得る．
+// @brief 正常値を表すリテラルを得る．
 inline
-VarId
-TpgPrimitive::gvar() const
+Literal
+TpgPrimitive::glit() const
 {
-  return mGid;
+  return mGlit;
 }
 
-// @brief 故障値を表す変数番号を得る．
+// @brief 故障値を表すリテラルを得る．
 inline
-VarId
-TpgPrimitive::fvar() const
+Literal
+TpgPrimitive::flit() const
 {
-  return mFid;
+  return mFlit;
 }
 
 END_NAMESPACE_YM_SATPG

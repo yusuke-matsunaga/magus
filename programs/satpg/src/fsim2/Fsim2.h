@@ -6,7 +6,7 @@
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -45,9 +45,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ネットワークをセットする．
+  /// @param[in] network ネットワーク
+  /// @param[in] fault_mgr 故障マネージャ
   virtual
   void
-  set_network(TpgNetwork& network);
+  set_network(const TpgNetwork& network,
+	      FaultMgr& fault_mgr);
 
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -121,11 +124,11 @@ private:
 
   /// @brief node に対応する SimNode を得る．
   SimNode*
-  find_simnode(TpgNode* node) const;
+  find_simnode(const TpgNode* node) const;
 
   /// @brief node の pos 番めの入力に対応する枝を得る．
   void
-  find_simedge(TpgNode* node,
+  find_simedge(const TpgNode* node,
 	       ymuint pos,
 	       SimNode*& simnode,
 	       ymuint& ipos) const;
@@ -140,7 +143,7 @@ private:
   /// @param[in] emap もとのノードの枝の対応関係を記録する配列
   /// @note inputs のサイズはノードの入力数 x 2
   SimNode*
-  make_primitive(TpgPrimitive* prim,
+  make_primitive(const TpgPrimitive* prim,
 		 const vector<SimNode*>& inputs,
 		 const vector<EdgeMap*>& emap);
 
@@ -156,7 +159,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 対象のネットワーク
-  TpgNetwork* mNetwork;
+  const TpgNetwork* mNetwork;
 
   // TpgNode の id をキーにして SimNode を入れる配列
   vector<SimNode*> mSimMap;

@@ -13,6 +13,7 @@
 #include "dtpg_nsdef.h"
 
 #include "TpgNode.h"
+#include "TpgPrimitive.h"
 #include "ym_logic/Literal.h"
 #include "ym_logic/Bool3.h"
 #include "ym_logic/sat_nsdef.h"
@@ -185,45 +186,79 @@ private:
   void
   clear_node_mark();
 
-  /// tfo マークをつける．
+  /// @brief tfo マークをつける．
+  /// @param[in] node 対象のノード
   void
   set_tfo_mark(TpgNode* node);
 
   /// @brief tfo マークを読む．
+  /// @param[in] node 対象のノード
   bool
   tfo_mark(TpgNode* node);
 
-  /// tfi マークをつける．
+  /// @brief tfi マークをつける．
+  /// @param[in] node 対象のノード
   void
   set_tfi_mark(TpgNode* node);
 
   /// @brief tfi マークを読む．
+  /// @param[in] node 対象のノード
   bool
   tfi_mark(TpgNode* node);
 
   /// @brief tmp マークをつける．
+  /// @param[in] node 対象のノード
   void
   set_tmp_mark(TpgNode* node);
 
   /// @brief tmp マークを消す．
+  /// @param[in] node 対象のノード
   void
   clear_tmp_mark(TpgNode* node);
 
   /// @brief tmp マークを読む．
+  /// @param[in] node 対象のノード
   bool
   tmp_mark(TpgNode* node);
 
-  /// justified マークをつける．
+  /// @brief justified マークをつける．
+  /// @param[in] node 対象のノード
   void
   set_justified_mark(TpgNode* node);
 
-  /// justified マークを消す．
+  /// @brief justified マークを消す．
+  /// @param[in] node 対象のノード
   void
   clear_justified_mark(TpgNode* node);
 
   /// @brief justified マークを読む．
+  /// @param[in] node 対象のノード
   bool
   justified_mark(TpgNode* node);
+
+  /// @brief ノードの正常値を読み出す．
+  /// @param[in] node 対象のノード
+  /// @note mModel の値を読む．
+  Bool3
+  node_gval(TpgNode* node);
+
+  /// @brief ノードの故障値を読み出す．
+  /// @param[in] node 対象のノード
+  /// @note mModel の値を読む．
+  Bool3
+  node_fval(TpgNode* node);
+
+  /// @brief プリミティブの正常値を読み出す．
+  /// @param[in] prim 対象のプリミティブ
+  /// @note mModel の値を読む．
+  Bool3
+  primitive_gval(TpgPrimitive* prim);
+
+  /// @brief プリミティブの故障値を読み出す．
+  /// @param[in] prim 対象のプリミティブ
+  /// @note mModel の値を読む．
+  Bool3
+  primitive_fval(TpgPrimitive* prim);
 
 
 private:
@@ -442,6 +477,52 @@ bool
 SatEngine::justified_mark(TpgNode* node)
 {
   return static_cast<bool>((mMarkArray[node->id()] >> 3) & 1U);
+}
+
+// @brief ノードの正常値を読み出す．
+// @note mModel の値を読む．
+inline
+Bool3
+SatEngine::node_gval(TpgNode* node)
+{
+  return mModel[node->gvar().val()];
+}
+
+// @brief ノードの故障値を読み出す．
+// @note mModel の値を読む．
+inline
+Bool3
+SatEngine::node_fval(TpgNode* node)
+{
+  return mModel[node->fvar().val()];
+}
+
+// @brief プリミティブの正常値を読み出す．
+// @note mModel の値を読む．
+inline
+Bool3
+SatEngine::primitive_gval(TpgPrimitive* prim)
+{
+  Literal lit = prim->glit();
+  Bool3 val = mModel[lit.varid().val()];
+  if ( lit.pol() == kPolNega ) {
+    val = ~val;
+  }
+  return val;
+}
+
+// @brief プリミティブの故障値を読み出す．
+// @note mModel の値を読む．
+inline
+Bool3
+SatEngine::primitive_fval(TpgPrimitive* prim)
+{
+  Literal lit = prim->flit();
+  Bool3 val = mModel[lit.varid().val()];
+  if ( lit.pol() == kPolNega ) {
+    val = ~val;
+  }
+  return val;
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

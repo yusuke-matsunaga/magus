@@ -194,16 +194,13 @@ END_NONAMESPACE
 void
 AtpgCmd::after_update_faults()
 {
-#if 0
   FaultMgr& fault_mgr = _fault_mgr();
 
   // 諸元を TCL 変数にセットしておく
-  const vector<TpgFault*>& all_list = fault_mgr.all_list();
-  const vector<TpgFault*>& rep_list = fault_mgr.all_rep_list();
   const vector<TpgFault*>& remain_list = fault_mgr.remain_list();
   const vector<TpgFault*>& untest_list = fault_mgr.untest_list();
-  ymuint n_all = all_list.size();
-  ymuint n_rep = rep_list.size();
+  ymuint n_all = fault_mgr.all_num();
+  ymuint n_rep = fault_mgr.rep_num();
   ymuint n_remain = remain_list.size();
   ymuint n_untest = untest_list.size();
   ymuint n_det = n_rep - n_remain - n_untest;
@@ -253,7 +250,6 @@ AtpgCmd::after_update_faults()
     set_var(varname, "untest_fault_list", tmp_list, varflag);
   }
 #endif
-#endif
 }
 
 // @brief TgNetwork を取り出す．
@@ -261,6 +257,13 @@ const TpgNetwork&
 AtpgCmd::_network()
 {
   return mgr()._network();
+}
+
+// @brief FaultMgr を取り出す．
+FaultMgr&
+AtpgCmd::_fault_mgr()
+{
+  return mgr()._fault_mgr();
 }
 
 // @brief TvMgr を取り出す．

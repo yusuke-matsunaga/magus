@@ -9,6 +9,7 @@
 
 #include "Op1.h"
 #include "TpgFault.h"
+#include "FaultMgr.h"
 #include "TvMgr.h"
 #include "Fsim.h"
 #include "TestVector.h"
@@ -21,11 +22,13 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-Op1::Op1(TvMgr& tvmgr,
+Op1::Op1(FaultMgr& fault_mgr,
+	 TvMgr& tvmgr,
 	 vector<TestVector*>& tv_list,
 	 Fsim& fsim3,
 	 bool drop,
 	 bool verify) :
+  mFaultMgr(fault_mgr),
   mTvMgr(tvmgr),
   mTvList(tv_list),
   mFsim3(fsim3),
@@ -66,8 +69,7 @@ Op1::set_detected(TpgFault* f,
     for (vector<TpgFault*>::iterator p = det_faults.begin();
 	 p != det_faults.end(); ++ p) {
       TpgFault* f = *p;
-#warning "TODO: 未完"
-      //mFaultMgr.set_status(f, kFsDetected);
+      mFaultMgr.set_status(f, kFsDetected);
     }
   }
   if ( mVerify ) {
@@ -77,15 +79,14 @@ Op1::set_detected(TpgFault* f,
 
   mTvList.push_back(tv);
 
-  //mFaultMgr.set_status(f, kFsDetected);
+  mFaultMgr.set_status(f, kFsDetected);
 }
 
 // @brief 検出不能のときに呼ばれる関数
 void
 Op1::set_untestable(TpgFault* f)
 {
-#warning "TODO: 未完"
-  //mFaultMgr.set_status(f, kFsUntestable);
+  mFaultMgr.set_status(f, kFsUntestable);
 }
 
 END_NAMESPACE_YM_SATPG

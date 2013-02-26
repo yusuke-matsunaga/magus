@@ -113,18 +113,6 @@ public:
   TpgNode*
   active_fanout(ymuint pos) const;
 
-  /// @brief 出力の故障を得る．
-  /// @param[in] val 故障値 ( 0 / 1 )
-  TpgFault*
-  output_fault(int val);
-
-  /// @brief 入力の故障を得る．
-  /// @param[in] val 故障値 ( 0 / 1 )
-  /// @param[in] pos 入力の位置番号
-  TpgFault*
-  input_fault(int val,
-	      ymuint pos);
-
   /// @brief アクティブの場合 true を返す．
   bool
   is_active() const;
@@ -132,6 +120,40 @@ public:
   /// @brief 直近の dominator を得る．
   TpgNode*
   imm_dom() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 故障に関する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 出力の故障を設定する．
+  /// @param[in] val 故障値
+  /// @param[in] f 故障
+  void
+  set_output_fault(int val,
+		   TpgFault* f);
+
+  /// @brief 入力の故障を設定する．
+  /// @param[in] val 故障値
+  /// @param[in] pos 入力の位置番号
+  /// @param[in] f 故障
+  void
+  set_input_fault(int val,
+		  ymuint pos,
+		  TpgFault* f);
+
+  /// @brief 出力の故障を得る．
+  /// @param[in] val 故障値 ( 0 / 1 )
+  TpgFault*
+  output_fault(int val) const;
+
+  /// @brief 入力の故障を得る．
+  /// @param[in] val 故障値 ( 0 / 1 )
+  /// @param[in] pos 入力の位置番号
+  TpgFault*
+  input_fault(int val,
+	      ymuint pos) const;
 
 
 public:
@@ -523,11 +545,36 @@ TpgNode::active_fanout(ymuint pos) const
   return mActFanouts[pos];
 }
 
+// @brief 出力の故障を設定する．
+// @param[in] val 故障値
+// @param[in] f 故障
+inline
+void
+TpgNode::set_output_fault(int val,
+			  TpgFault* f)
+{
+  mOutputFault[val % 2] = f;
+}
+
+// @brief 入力の故障を設定する．
+// @param[in] val 故障値
+// @param[in] pos 入力の位置番号
+// @param[in] f 故障
+inline
+void
+TpgNode::set_input_fault(int val,
+			 ymuint pos,
+			 TpgFault* f)
+{
+  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
+  mInputFault[pos * 2 + (val % 2)] = f;
+}
+
 // @brief 出力の故障を得る．
 // @param[in] val 故障値 ( 0 / 1 )
 inline
 TpgFault*
-TpgNode::output_fault(int val)
+TpgNode::output_fault(int val) const
 {
   return mOutputFault[val % 2];
 }
@@ -538,7 +585,7 @@ TpgNode::output_fault(int val)
 inline
 TpgFault*
 TpgNode::input_fault(int val,
-		      ymuint pos)
+		     ymuint pos) const
 {
   assert_cond( pos < mFaninNum, __FILE__, __LINE__);
   return mInputFault[pos * 2 + (val % 2)];

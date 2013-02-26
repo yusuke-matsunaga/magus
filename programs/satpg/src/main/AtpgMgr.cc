@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_SATPG
 // クラス FsimNetBinder
 //////////////////////////////////////////////////////////////////////
 class FsimNetBinder :
-  public T1Binder<TpgNetwork&>
+  public T2Binder<const TpgNetwork&, FaultMgr&>
 {
 public:
 
@@ -29,7 +29,8 @@ public:
   /// @brief イベント処理関数
   virtual
   void
-  event_proc(TpgNetwork& network);
+  event_proc(const TpgNetwork& network,
+	     FaultMgr& fault_mgr);
 
 
 private:
@@ -51,9 +52,10 @@ FsimNetBinder::FsimNetBinder(Fsim* fsim) :
 
 // @brief イベント処理関数
 void
-FsimNetBinder::event_proc(TpgNetwork& network)
+FsimNetBinder::event_proc(const TpgNetwork& network,
+			  FaultMgr& fault_mgr)
 {
-  mFsim->set_network(network);
+  mFsim->set_network(network, fault_mgr);
 }
 
 
@@ -153,12 +155,9 @@ AtpgMgr::fsim(TestVector* tv,
 	 p != det_faults.end(); ++ p) {
       TpgFault* f = *p;
       if ( f->status() == kFsUndetected ) {
-#warning "TODO: 未完"
-	//mFaultMgr.set_status(f, kFsDetected);
+	mFaultMgr.set_status(f, kFsDetected);
       }
     }
-#warning "TODO: 未完"
-    //after_update_faults();
   }
 
   mTimer.change(old_id);
@@ -186,16 +185,10 @@ AtpgMgr::fsim(const vector<TestVector*>& tv_list,
 	   p != det_faults.end(); ++ p) {
 	TpgFault* f = *p;
 	if ( f->status() == kFsUndetected ) {
-#warning "TODO: 未完"
-	  //mFaultMgr.set_status(f, kFsDetected);
+	  mFaultMgr.set_status(f, kFsDetected);
 	}
       }
     }
-  }
-
-  if ( det_count > 0 ) {
-#warning "TODO: 未完"
-    //after_update_faults();
   }
 
   mTimer.change(old_id);
@@ -216,9 +209,7 @@ AtpgMgr::fsim(TestVector* tv,
   bool stat = mFsim->run(tv, f);
   if ( stat ) {
     if ( f->status() == kFsUndetected ) {
-#warning "TODO: 未完"
-      //mFaultMgr.set_status(f, kFsDetected);
-      //after_update_faults();
+      mFaultMgr.set_status(f, kFsDetected);
     }
   }
 
@@ -278,12 +269,9 @@ AtpgMgr::dtpg(const string& option)
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  Op1 op(mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
+  Op1 op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
 
   mDtpg->run(op, option);
-
-#warning "TODO: 未完"
-  //after_update_faults();
 
   mTimer.change(old_id);
 }
@@ -341,12 +329,14 @@ AtpgMgr::get_stats(DtpgStats& stats)
 void
 AtpgMgr::after_set_network()
 {
+  mFaultMgr.set_ssa_fault(*mNetwork);
+
   mTvMgr.clear();
   mTvMgr.init(mNetwork->input_num2());
 
   mDtpg->set_network(*mNetwork);
 
-  mNtwkBindMgr.prop_event(*mNetwork);
+  mNtwkBindMgr.prop_event(*mNetwork, mFaultMgr);
 }
 
 END_NAMESPACE_YM_SATPG

@@ -27,9 +27,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ネットワークをセットする．
+  /// @param[in] network ネットワーク
+  /// @param[in] fault_mgr 故障マネージャ
   virtual
   void
-  set_network(TpgNetwork& network) = 0;
+  set_network(const TpgNetwork& network,
+	      FaultMgr& fault_mgr) = 0;
 
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -57,6 +60,10 @@ public:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+// Fsim の派生クラスのインスタンスを生成する関数
+//////////////////////////////////////////////////////////////////////
 
 extern
 Fsim*

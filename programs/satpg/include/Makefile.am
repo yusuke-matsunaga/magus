@@ -11,6 +11,7 @@ noinst_HEADERS = \
 	AtpgMgr.h \
 	Dtpg.h \
 	DtpgStats.h \
+	FaultMgr.h \
 	FaultStatus.h \
 	PackedVal.h \
 	PackedVal3.h \

@@ -316,34 +316,40 @@ make_gnode_cnf(SatSolver& solver,
     ymuint n = node->primitive_num();
     for (ymuint i = 0; i < n; ++ i) {
       TpgPrimitive* prim = node->primitive(i);
-      VarId gvar;
+      Literal olit;
       if ( prim->is_input() ) {
 	// 入力プリミティブの場合
 	// 対応する TpgNode の変数を持ってくる．
 	ymuint ipos = prim->input_id();
 	TpgNode* inode = node->fanin(ipos);
-	gvar = inode->gvar();
+	olit = Literal(inode->gvar(), kPolPosi);;
+      }
+      else if ( prim->is_not_input() ) {
+	// 否定付き入力プリミティブの場合
+	// 対応する TpgNode の変数を持ってきて否定する．
+	ymuint ipos = prim->input_id();
+	TpgNode* inode = node->fanin(ipos);
+	olit = Literal(inode->gvar(), kPolNega);
       }
       else {
 	if ( i == n - 1 ) {
 	  // 根のプリミティブの場合
 	  // node の変数を使う．
-	  gvar = node->gvar();
+	  olit = Literal(node->gvar(), kPolPosi);
 	}
 	else {
 	  // それ以外の場合
 	  // 新たな変数を割り当てる．
-	  gvar = solver.new_var();
+	  olit = Literal(solver.new_var(), kPolPosi);
 	}
 
 	// プリミティブの入出力の関係を表す CNF 式を作る．
-	Literal output(gvar, kPolPosi);
-	make_gate_cnf(solver, prim->gate_type(), output,
+	make_gate_cnf(solver, prim->gate_type(), olit,
 		      PrimGvarInputLiteral(prim));
       }
-      // prim の変数 gvar と fvar の両方に登録しておく
-      prim->set_gvar(gvar);
-      prim->set_fvar(gvar);
+      // prim の glit と flit の両方に登録しておく
+      prim->set_glit(olit);
+      prim->set_flit(olit);
     }
   }
   else {
@@ -397,33 +403,39 @@ make_fnode_cnf(SatSolver& solver,
     ymuint n = node->primitive_num();
     for (ymuint i = 0; i < n; ++ i) {
       TpgPrimitive* prim = node->primitive(i);
-      VarId fvar;
+      Literal olit;
       if ( prim->is_input() ) {
 	// 入力プリミティブの場合
 	// 対応する TpgNode の fvar を用いる．
 	ymuint ipos = prim->input_id();
 	TpgNode* inode = node->fanin(ipos);
-	fvar = inode->fvar();
+	olit = Literal(inode->fvar(), kPolPosi);
+      }
+      else if ( prim->is_not_input() ) {
+	// 否定付き入力プリミティブの場合
+	// 対応する TpgNode の fvar を用いる．
+	ymuint ipos = prim->input_id();
+	TpgNode* inode = node->fanin(ipos);
+	olit = Literal(inode->fvar(), kPolNega);
       }
       else {
 	if ( i == n - 1 ) {
 	  // 根のプリミティブの場合
 	  // node の fvar を用いる．
-	  fvar = node->fvar();
+	  olit = Literal(node->fvar(), kPolPosi);
 	}
 	else {
 	  // それ以外の場合
 	  // 新たな変数を割り当てる．
-	  fvar = solver.new_var();
+	  olit = Literal(solver.new_var(), kPolPosi);
 	}
 
 	// プリミティブの入出力の関係を表す CNF 式を作る．
-	Literal output(fvar, kPolPosi);
-	make_gate_cnf(solver, prim->gate_type(), output,
+	make_gate_cnf(solver, prim->gate_type(), olit,
 		      PrimFvarInputLiteral(prim));
       }
       // プリミティブの変数を登録する．
-      prim->set_fvar(fvar);
+      prim->set_flit(olit);
     }
   }
   else {
@@ -1001,13 +1013,17 @@ SatEngine::run(const vector<TpgFault*>& flist,
 	      ymuint ni1 = prim->fanin_num();
 	      vector<Literal> inputs1(ni1);
 	      for (ymuint j = 0; j < ni1; ++ j) {
-		TpgPrimitive* iprim = prim->fanin(j);
+		const TpgPrimitive* iprim = prim->fanin(j);
 		if ( iprim->is_input() ) {
 		  ymuint ipos = iprim->input_id();
 		  inputs1[j] = inputs[ipos];
 		}
+		else if ( iprim->is_not_input() ) {
+		  ymuint ipos = iprim->input_id();
+		  inputs1[j] = ~inputs[ipos];
+		}
 		else {
-		  inputs1[j] = Literal(iprim->fvar(), kPolPosi);
+		  inputs1[j] = iprim->flit();
 		}
 	      }
 	      Literal output;
@@ -1015,7 +1031,7 @@ SatEngine::run(const vector<TpgFault*>& flist,
 		output = gate_output;
 	      }
 	      else {
-		output = Literal(prim->fvar(), kPolPosi);
+		output = prim->flit();
 	      }
 	      make_gate_cnf(solver, prim->gate_type(), output,
 			    VectorInputLiteral(inputs1));
@@ -1331,8 +1347,8 @@ SatEngine::justify(TpgNode* node)
     return;
   }
 
-  Bool3 gval = mModel[node->gvar().val()];
-  Bool3 fval = mModel[node->fvar().val()];
+  Bool3 gval = node_gval(node);
+  Bool3 fval = node_fval(node);
 
   if ( gval != fval ) {
     // 正常値と故障値が異なっていたら
@@ -1435,8 +1451,8 @@ SatEngine::just_sub2(TpgNode* node,
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
-    Bool3 igval = mModel[inode->gvar().val()];
-    Bool3 ifval = mModel[inode->fvar().val()];
+    Bool3 igval = node_gval(inode);
+    Bool3 ifval = node_fval(inode);
     if ( !gfound && igval == val ) {
       justify(inode);
       gfound = true;
@@ -1469,8 +1485,8 @@ SatEngine::justify_primitive(TpgPrimitive* prim,
     return;
   }
 
-  Bool3 gval = mModel[prim->gvar().val()];
-  Bool3 fval = mModel[prim->fvar().val()];
+  Bool3 gval = primitive_gval(prim);
+  Bool3 fval = primitive_fval(prim);
   if ( gval != fval ) {
     // すべてのファンインノードをたどる．
     jp_sub1(prim, node);
@@ -1568,8 +1584,8 @@ SatEngine::jp_sub2(TpgPrimitive* prim,
   ymuint ni = prim->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     TpgPrimitive* iprim = prim->fanin(i);
-    Bool3 igval = mModel[iprim->gvar().val()];
-    Bool3 ifval = mModel[iprim->fvar().val()];
+    Bool3 igval = primitive_gval(iprim);
+    Bool3 ifval = primitive_fval(iprim);
     if ( !gfound && igval == val ) {
       justify_primitive(iprim, node);
       gfound = true;

@@ -99,73 +99,6 @@ primitive_count(const LogExpr& expr)
   return n;
 }
 
-// ゲートタイプから代表故障を求める．
-void
-get_rep_faults(TpgNode* node,
-	       TpgFault* f0,
-	       TpgFault* f1,
-	       TpgFault*& rep0,
-	       TpgFault*& rep1)
-{
-  if ( node->is_input() ) {
-    // どうでもいい
-    return;
-  }
-  if ( node->is_output() ) {
-    // バッファと同じ
-    rep0 = f0;
-    rep1 = f1;
-    return;
-  }
-
-  tTgGateType type = node->gate_type();
-  switch ( type ) {
-  case kTgGateBuff:
-    rep0 = f0;
-    rep1 = f1;
-    break;
-
-  case kTgGateNot:
-    rep0 = f1;
-    rep1 = f0;
-    break;
-
-  case kTgGateAnd:
-    rep0 = f0;
-    rep1 = NULL;
-    break;
-
-  case kTgGateNand:
-    rep0 = f1;
-    rep1 = NULL;
-    break;
-
-  case kTgGateOr:
-    rep0 = NULL;
-    rep1 = f1;
-    break;
-
-  case kTgGateNor:
-    rep0 = NULL;
-    rep1 = f0;
-    break;
-
-  case kTgGateXor:
-    rep0 = NULL;
-    rep1 = NULL;
-    break;
-
-  case kTgGateCplx:
-    // 面倒くさいので
-    rep0 = NULL;
-    rep1 = NULL;
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-  }
-}
-
 END_NONAMESPACE
 
 
@@ -346,78 +279,6 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
     }
   }
 
-
-  //////////////////////////////////////////////////////////////////////
-  // 故障リストを作る．
-  //////////////////////////////////////////////////////////////////////
-  mFaultNum = 0;
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
-    TpgNode* node = &mNodeArray[i];
-    mFaultNum += node->fanin_num() * 2 + 2;
-  }
-  {
-    void* p = mAlloc.get_memory(sizeof(TpgFault) * mFaultNum);
-    mFaultChunk = new (p) TpgFault[mFaultNum];
-  }
-  ymuint fid = 0;
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
-    // 代表故障を等価故障のなかでもっとも出力よりの故障と定めるので
-    // 出力側からのトポロジカル順に処理する．
-    TpgNode* node = &mNodeArray[mNodeNum - i - 1];
-    TpgFault* rep0 = NULL;
-    TpgFault* rep1 = NULL;
-    if ( node->fanout_num() == 1 ) {
-      TpgNode* onode = node->fanout(0);
-      // ちょっとかっこ悪い探し方
-      ymuint ni = onode->fanin_num();
-      ymuint ipos = ni;
-      for (ymuint j = 0; j < ni; ++ j) {
-	if ( onode->fanin(j) == node ) {
-	  ipos = j;
-	}
-      }
-      assert_cond( ipos < ni, __FILE__, __LINE__);
-      rep0 = onode->input_fault(0, ipos);
-      rep1 = onode->input_fault(1, ipos);
-    }
-    TpgFault* f0 = new_fault(node, true, 0, 0, rep0, fid);
-    TpgFault* f1 = new_fault(node, true, 0, 1, rep1, fid);
-    node->mOutputFault[0] = f0;
-    node->mOutputFault[1] = f1;
-
-    // ノードタイプから代表故障(r0, r1)をもとめる．
-    get_rep_faults(node, f0, f1, rep0, rep1);
-
-    ymuint ni = node->fanin_num();
-    for (ymuint j = 0; j < ni; ++ j) {
-      node->mInputFault[j * 2 + 0] = new_fault(node, false, j, 0, rep0, fid);
-      node->mInputFault[j * 2 + 1] = new_fault(node, false, j, 1, rep1, fid);
-    }
-  }
-  assert_cond( fid == mFaultNum, __FILE__, __LINE__);
-
-  // 代表故障のリストを作る．
-  mRepFaultNum = 0;
-  for (ymuint i = 0; i < mFaultNum; ++ i) {
-    TpgFault* f = &mFaultChunk[i];
-    if ( f->is_rep() ) {
-      ++ mRepFaultNum;
-    }
-  }
-  {
-    void* p = mAlloc.get_memory(sizeof(TpgFault*) * mRepFaultNum);
-    mRepFaultList = new (p) TpgFault*[mRepFaultNum];
-  }
-  ymuint pos = 0;
-  for (ymuint i = 0; i < mFaultNum; ++ i) {
-    TpgFault* f = &mFaultChunk[i];
-    if ( f->is_rep() ) {
-      mRepFaultList[pos] = f;
-      ++ pos;
-    }
-  }
-  assert_cond( pos == mRepFaultNum, __FILE__, __LINE__);
-
   // 全部アクティブにしておく．
   activate_all();
 
@@ -442,29 +303,6 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   for (ymuint i = 0; i < output_num2(); ++ i) {
     mOutputArray2[i] = mOutputArray[tmp_list[i].second];
   }
-}
-
-// @brief 故障を生成する．
-// @param[in] node 対象のノード
-// @param[in] is_output 出力の故障の時 true にするフラグ
-// @param[in] ipos 入力位置
-// @param[in] val 故障値
-// @param[in] rep_fault 代表故障
-// @param[inout] fid 故障ID
-// @note rep_fault が NULL の場合は自分自身が代表故障となる．
-// @note この関数内で fid の値がインクリメントされる．
-TpgFault*
-TpgNetwork::new_fault(TpgNode* node,
-		      bool is_output,
-		      ymuint ipos,
-		      int val,
-		      TpgFault* rep_fault,
-		      ymuint& fid)
-{
-  TpgFault* f = &mFaultChunk[fid];
-  f->set(fid, node, is_output, ipos, val, rep_fault);
-  ++ fid;
-  return f;
 }
 
 // @brief デストラクタ
@@ -606,54 +444,6 @@ TpgNetwork::node(ymuint pos) const
   // アドレス計算のために TpgNode の定義が必要なのでここに置く．
   assert_cond( pos < mNodeNum, __FILE__, __LINE__);
   return &mNodeArray[pos];
-}
-
-// @brief 全故障数を返す．
-ymuint
-TpgNetwork::all_fault_num() const
-{
-  return mFaultNum;
-}
-
-// @brief 故障を取り出す．
-// @param[in] id 故障番号 ( 0 <= id < all_fault_num() )
-TpgFault*
-TpgNetwork::fault(ymuint id)
-{
-  return &mFaultChunk[id];
-}
-
-// @brief 故障を取り出す．
-// @param[in] id 故障番号 ( 0 <= id < all_fault_num() )
-const TpgFault*
-TpgNetwork::fault(ymuint id) const
-{
-  return &mFaultChunk[id];
-}
-
-// @brief 代表故障数を得る．
-ymuint
-TpgNetwork::rep_fault_num() const
-{
-  return mRepFaultNum;
-}
-
-// @brief 代表故障を取り出す．
-// @param[in] pos 位置番号 ( 0 <= pos < rep_fault_num() )
-TpgFault*
-TpgNetwork::rep_fault(ymuint pos)
-{
-  assert_cond( pos < rep_fault_num(), __FILE__, __LINE__);
-  return mRepFaultList[pos];
-}
-
-// @brief 代表故障を取り出す．
-// @param[in] pos 位置番号 ( 0 <= pos < rep_fault_num() )
-const TpgFault*
-TpgNetwork::rep_fault(ymuint pos) const
-{
-  assert_cond( pos < rep_fault_num(), __FILE__, __LINE__);
-  return mRepFaultList[pos];
 }
 
 // @brief TpgNode の内容を設定する．

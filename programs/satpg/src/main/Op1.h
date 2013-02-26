@@ -23,7 +23,8 @@ class Op1 :
 public:
 
   /// @brief コンストラクタ
-  Op1(TvMgr& tvmgr,
+  Op1(FaultMgr& fault_mgr,
+      TvMgr& tvmgr,
       vector<TestVector*>& tv_list,
       Fsim& fsim3,
       bool drop = false,
@@ -57,6 +58,8 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  FaultMgr& mFaultMgr;
 
   TvMgr& mTvMgr;
 

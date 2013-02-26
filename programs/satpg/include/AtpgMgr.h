@@ -12,6 +12,7 @@
 
 #include "satpg_nsdef.h"
 
+#include "FaultMgr.h"
 #include "TvMgr.h"
 #include "Fsim.h"
 #include "Dtpg.h"
@@ -46,6 +47,10 @@ public:
   TpgNetwork&
   _network();
 
+  /// @brief FaultMgr を取り出す．
+  FaultMgr&
+  _fault_mgr();
+
   /// @brief TvMgr を取り出す．
   TvMgr&
   _tv_mgr();
@@ -62,11 +67,6 @@ public:
   /// @param[in] stats 結果を格納する構造体
   void
   get_stats(DtpgStats& stats);
-
-  /// @brief 統計情報を得る．
-  /// @param[in] stats 結果を格納する構造体
-  void
-  get_stats_old(DtpgStats& stats);
 
 
 public:
@@ -163,7 +163,7 @@ public:
 
   /// @brief ネットワークの変更に関するハンドラを登録する．
   void
-  reg_network_handler(T1Binder<TpgNetwork&>* handler);
+  reg_network_handler(T2Binder<const TpgNetwork&, FaultMgr&>* handler);
 
 
 public:
@@ -210,6 +210,9 @@ private:
   // 対象のネットワーク
   TpgNetwork* mNetwork;
 
+  // 故障マネージャ
+  FaultMgr mFaultMgr;
+
   // テストベクタを管理するオブジェクト
   TvMgr mTvMgr;
 
@@ -232,7 +235,7 @@ private:
   bool mDtpgVerify;
 
   // ネットワークが変更された時に呼ばれるイベントハンドラ
-  T1BindMgr<TpgNetwork&> mNtwkBindMgr;
+  T2BindMgr<const TpgNetwork&, FaultMgr&> mNtwkBindMgr;
 
   // タイマー
   MStopWatch mTimer;
@@ -250,6 +253,14 @@ TpgNetwork&
 AtpgMgr::_network()
 {
   return *mNetwork;
+}
+
+// @brief FaultMgr を取り出す．
+inline
+FaultMgr&
+AtpgMgr::_fault_mgr()
+{
+  return mFaultMgr;
 }
 
 // @brief TvMgr を取り出す．
@@ -271,7 +282,7 @@ AtpgMgr::_tv_list()
 // @brief ネットワークの変更に関するハンドラを登録する．
 inline
 void
-AtpgMgr::reg_network_handler(T1Binder<TpgNetwork&>* handler)
+AtpgMgr::reg_network_handler(T2Binder<const TpgNetwork&, FaultMgr&>* handler)
 {
   mNtwkBindMgr.reg_binder(handler);
 }

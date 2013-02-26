@@ -14,10 +14,11 @@ libatpg_base_la_CPPFLAGS = \
 	-I$(top_srcdir)/include
 
 libatpg_base_la_SOURCES = \
+	FaultMgr.cc \
+	TestVector.cc \
 	TpgNetwork.cc \
 	TpgNode.cc \
 	TpgFault.cc \
-	TestVector.cc \
 	TvMgr.cc
 
 libatpg_base_la_LDFLAGS =

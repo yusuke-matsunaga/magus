@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 class TpgFault
 {
-  friend class TpgNetwork;
+  friend class FaultMgr;
 
 private:
 

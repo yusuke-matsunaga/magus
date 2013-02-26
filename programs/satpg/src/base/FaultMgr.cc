@@ -3,29 +3,103 @@
 /// @brief FaultMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: FaultMgr.cc 2203 2009-04-16 05:04:40Z matsunaga $
-///
-/// Copyright (C) 2005-2009, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "FaultMgr.h"
-#include "SaFault.h"
+#include "TpgFault.h"
 #include "TestVector.h"
-#include "ym_networks/TgNetwork.h"
-#include "ym_networks/TgNode.h"
+#include "TpgNetwork.h"
+#include "TpgNode.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
-// @brief コンストラクタ
-FaultMgr::FaultMgr() :
-  mFaultAlloc(sizeof(SaFault), 1024),
-  mFinfoAlloc(sizeof(Finfo), 1024),
-  mIfaultsAlloc(4096),
-  mNetwork(NULL),
-  mChanged(false)
+BEGIN_NONAMESPACE
+
+// ゲートタイプから代表故障を求める．
+void
+get_rep_faults(TpgNode* node,
+	       TpgFault* f0,
+	       TpgFault* f1,
+	       TpgFault*& rep0,
+	       TpgFault*& rep1)
 {
+  if ( node->is_input() ) {
+    // どうでもいい
+    return;
+  }
+  if ( node->is_output() ) {
+    // バッファと同じ
+    rep0 = f0;
+    rep1 = f1;
+    return;
+  }
+
+  tTgGateType type = node->gate_type();
+  switch ( type ) {
+  case kTgGateBuff:
+    rep0 = f0;
+    rep1 = f1;
+    break;
+
+  case kTgGateNot:
+    rep0 = f1;
+    rep1 = f0;
+    break;
+
+  case kTgGateAnd:
+    rep0 = f0;
+    rep1 = NULL;
+    break;
+
+  case kTgGateNand:
+    rep0 = f1;
+    rep1 = NULL;
+    break;
+
+  case kTgGateOr:
+    rep0 = NULL;
+    rep1 = f1;
+    break;
+
+  case kTgGateNor:
+    rep0 = NULL;
+    rep1 = f0;
+    break;
+
+  case kTgGateXor:
+    rep0 = NULL;
+    rep1 = NULL;
+    break;
+
+  case kTgGateCplx:
+    // 面倒くさいので
+    rep0 = NULL;
+    rep1 = NULL;
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+  }
+}
+
+END_NONAMESPACE
+
+
+// @brief コンストラクタ
+FaultMgr::FaultMgr()
+{
+  mNetwork = NULL;
+
+  mAllNum = 0;
+  mFaultChunk = NULL;
+
+  mRepNum = 0;
+  mRepArray = NULL;
+
+  mChanged = false;
 }
 
 // @brief デストラクタ
@@ -37,224 +111,99 @@ FaultMgr::~FaultMgr()
 void
 FaultMgr::clear()
 {
-  mFaultAlloc.destroy();
-  mFinfoAlloc.destroy();
-  mIfaultsAlloc.destroy();
   mNetwork = NULL;
-  mFnodeArray.clear();
-  mAllList.clear();
-  mAllRepList.clear();
+
+  delete [] mFaultChunk;
+  delete [] mRepArray;
+
   mDetList.clear();
   mRemainList.clear();
   mUntestList.clear();
+
   mChanged = true;
 }
 
-
-BEGIN_NONAMESPACE
-
-// node が FOS の時 true を返す．
-inline
-bool
-check_fos(const TgNode* node)
-{
-  ymuint nfo = node->fanout_num();
-  if ( nfo == 0 ) {
-    return false;
-  }
-  if ( nfo > 1 ) {
-    return true;
-  }
-  if ( node->fanout(0)->is_output() ) {
-    return true;
-  }
-  return false;
-}
-
-// 同一 FFR のノードを DFS の preorder で廻る．
-void
-ord_ffr(const TgNode* node,
-	list<const TgNode*>& node_list)
-{
-  if ( !check_fos(node) && !node->is_input() ) {
-    node_list.push_back(node);
-    ymuint ni = node->fanin_num();
-    for (ymuint i = 0; i < ni; ++ i) {
-      ord_ffr(node->fanin(i), node_list);
-    }
-  }
-}
-
-END_NONAMESPACE
-
-
 // @brief FaultMgr に全ての単一縮退故障を設定する．
 void
-FaultMgr::set_ssa_fault(const TgNetwork& network)
+FaultMgr::set_ssa_fault(TpgNetwork& network)
 {
   clear();
 
   mNetwork = &network;
 
-  ymuint ni = network.input_num2();
-  ymuint nl = network.logic_num();
   ymuint nn = network.node_num();
 
-  mFnodeArray.resize(nn);
-
-  // 全部の故障を生成する．
+  // 全故障数を数える．
+  mAllNum = 0;
   for (ymuint i = 0; i < nn; ++ i) {
-    const TgNode* node = network.node(i);
-    Fnode& fnode = mFnodeArray[i];
-    fnode.mOfault[0] = new_fault(node, true, 0, 0);
-    fnode.mOfault[1] = new_fault(node, true, 0, 1);
+    TpgNode* node = network.node(i);
+    mAllNum += node->fanin_num() * 2 + 2;
+  }
+
+  // 故障を生成する．
+  mFaultChunk = new TpgFault[mAllNum];
+  ymuint fid = 0;
+  for (ymuint i = 0; i < nn; ++ i) {
+    // 代表故障を等価故障のなかでもっとも出力よりの故障と定めるので
+    // 出力側からのトポロジカル順に処理する．
+    TpgNode* node = network.node(nn - i - 1);
+    TpgFault* rep0 = NULL;
+    TpgFault* rep1 = NULL;
+
+    if ( node->fanout_num() == 1 ) {
+      TpgNode* onode = node->fanout(0);
+      // ちょっとかっこ悪い探し方
+      ymuint ni = onode->fanin_num();
+      ymuint ipos = ni;
+      for (ymuint j = 0; j < ni; ++ j) {
+	if ( onode->fanin(j) == node ) {
+	  ipos = j;
+	}
+      }
+      assert_cond( ipos < ni, __FILE__, __LINE__);
+      rep0 = onode->input_fault(0, ipos);
+      rep1 = onode->input_fault(1, ipos);
+    }
+
+    TpgFault* f0 = new_ofault(node, 0, rep0, fid);
+    TpgFault* f1 = new_ofault(node, 1, rep1, fid);
+    node->set_output_fault(0, f0);
+    node->set_output_fault(1, f1);
+
+    // ノードタイプから代表故障(r0, r1)をもとめる．
+    get_rep_faults(node, f0, f1, rep0, rep1);
+
     ymuint ni = node->fanin_num();
-    void* p = mIfaultsAlloc.get_memory(sizeof(SaFault*) * ni * 2);
-    fnode.mIfaults = new (p) SaFault*[ni * 2];
     for (ymuint j = 0; j < ni; ++ j) {
-      fnode.mIfaults[j * 2 + 0] = new_fault(node, false, j, 0);
-      fnode.mIfaults[j * 2 + 1] = new_fault(node, false, j, 1);
+      node->set_input_fault(0, j, new_ifault(node, j, 0, rep0, fid));
+      node->set_input_fault(1, j, new_ifault(node, j, 1, rep1, fid));
     }
   }
+  assert_cond( fid == mAllNum, __FILE__, __LINE__);
 
   // 代表故障を記録していく．
-#if 0
-  // トポロジカル順
-  for (ymuint i = nl; i > 0; ) {
-    -- i;
-    const TgNode* node = network.sorted_logic(i);
-    reg_faults(node);
-  }
-#else
-  // FFR を固めた順
-  for (ymuint i = 0; i < nl; ++ i) {
-    const TgNode* node = network.sorted_logic(i);
-    if ( !check_fos(node) ) {
-      continue;
-    }
-    list<const TgNode*> node_list;
-    node_list.push_back(node);
-    ymuint ni = node->fanin_num();
-    for (ymuint j = 0; j < ni; ++ j) {
-      ord_ffr(node->fanin(j), node_list);
-    }
-    for (list<const TgNode*>::iterator p = node_list.begin();
-	 p != node_list.end(); ++ p) {
-      const TgNode* node = *p;
-      reg_faults(node);
+  mRepNum = 0;
+  for (ymuint i = 0; i < mAllNum; ++ i) {
+    TpgFault* f = &mFaultChunk[i];
+    if ( f->is_rep() ) {
+      ++ mRepNum;
     }
   }
-#endif
-
-  for (ymuint i = 0; i < ni; ++ i) {
-    const TgNode* node = network.input(i);
-    SaFault* rep0 = NULL;
-    SaFault* rep1 = NULL;
-    if ( node->fanout_num() == 1 ) {
-      const TgEdge* e = node->fanout_edge(0);
-      if ( !e->to_node()->is_output() ) {
-	rep0 = find_input_fault(e->to_node(), e->to_ipos(), 0);
-	rep1 = find_input_fault(e->to_node(), e->to_ipos(), 1);
-      }
-    }
-    add_ofault(node, 0, rep0);
-    add_ofault(node, 1, rep1);
-  }
-}
-
-// @brief node に関する故障を登録する．
-void
-FaultMgr::reg_faults(const TgNode* node)
-{
-  SaFault* rep0 = NULL;
-  SaFault* rep1 = NULL;
-  if ( node->fanout_num() == 1 ) {
-    const TgEdge* e = node->fanout_edge(0);
-    if ( !e->to_node()->is_output() ) {
-      rep0 = find_input_fault(e->to_node(), e->to_ipos(), 0);
-      rep1 = find_input_fault(e->to_node(), e->to_ipos(), 1);
+  mRepArray = new TpgFault*[mRepNum];
+  ymuint pos = 0;
+  for (ymuint i = 0; i < mAllNum; ++ i) {
+    TpgFault* f = &mFaultChunk[i];
+    if ( f->is_rep() ) {
+      mRepArray[pos] = f;
+      ++ pos;
     }
   }
-  SaFault* f0 = add_ofault(node, 0, rep0);
-  SaFault* f1 = add_ofault(node, 1, rep1);
+  assert_cond( pos == mRepNum, __FILE__, __LINE__);
 
-  tTgGateType type = node->gate_type();
-  ymuint ni = node->fanin_num();
-  switch ( type ) {
-  case kTgGateBuff:
-    add_ifault(node, 0, 0, f0);
-    add_ifault(node, 0, 1, f1);
-    break;
-
-  case kTgGateNot:
-    add_ifault(node, 0, 0, f1);
-    add_ifault(node, 0, 1, f0);
-    break;
-
-  case kTgGateXor:
-    for (ymuint j = 0; j < ni; ++ j) {
-      add_ifault(node, j, 0);
-      add_ifault(node, j, 1);
-    }
-    break;
-
-  case kTgGateAnd:
-    for (ymuint j = 0; j < ni; ++ j) {
-      add_ifault(node, j, 0, f0);
-      add_ifault(node, j, 1);
-    }
-    break;
-
-  case kTgGateNand:
-    for (ymuint j = 0; j < ni; ++ j) {
-      add_ifault(node, j, 0, f1);
-      add_ifault(node, j, 1);
-    }
-    break;
-
-  case kTgGateOr:
-    for (ymuint j = 0; j < ni; ++ j) {
-      add_ifault(node, j, 0);
-      add_ifault(node, j, 1, f1);
-    }
-    break;
-
-  case kTgGateNor:
-    for (ymuint j = 0; j < ni; ++ j) {
-      add_ifault(node, j, 0);
-      add_ifault(node, j, 1, f0);
-    }
-    break;
-
-  case kTgGateCplx:
-    {
-      LogExpr ofunc = mNetwork->get_lexp(node->func_id());
-      for (ymuint j = 0; j < ni; ++ j) {
-	LogExpr tmp = ofunc.compose(VarId(j), LogExpr::make_zero());
-	SaFault* rep = NULL;
-	if ( tmp.is_zero() ) {
-	  rep = f0;
-	}
-	else if ( tmp.is_one() ) {
-	  rep = f1;
-	}
-	add_ifault(node, j, 0, rep);
-	tmp = ofunc.compose(VarId(j), LogExpr::make_one());
-	rep = NULL;
-	if ( tmp.is_zero() ) {
-	  rep = f0;
-	}
-	else if ( tmp.is_one() ) {
-	  rep = f1;
-	}
-	add_ifault(node, j, 1, rep);
-      }
-    }
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
+  // 最初はすべての故障が mRemainList に属する．
+  for (ymuint i = 0; i < mRepNum; ++ i) {
+    TpgFault* f = mRepArray[i];
+    mRemainList.push_back(f);
   }
 }
 
@@ -263,107 +212,29 @@ FaultMgr::reg_faults(const TgNode* node)
 // @param[in] is_output 出力の故障のときに true とするフラグ
 // @param[in] pos 入力の故障の時に入力番号を表す
 // @param[in] val 縮退している値
-SaFault*
-FaultMgr::new_fault(const TgNode* node,
-		    bool is_output,
-		    ymuint pos,
-		    int val)
-{
-  void* p = mFaultAlloc.get_memory(sizeof(SaFault));
-  SaFault* f = new (p) SaFault(node, is_output, pos, val);
-  return f;
-}
-
-// @brief 代表故障を返す．
-SaFault*
-FaultMgr::find_rep_fault(SaFault* f) const
-{
-  return f->mFinfo->rep();
-}
-
-// @brief 出力の故障を取り出す．
-// @param[in] node 対象のノード
-// @param[in] val 縮退している値
-SaFault*
-FaultMgr::find_output_fault(const TgNode* node,
-			    int val)
-{
-  Fnode& fnode = mFnodeArray[node->gid()];
-  SaFault* f = fnode.mOfault[val];
-  return f;
-}
-
-// @brief 入力の故障を取り出す．
-// @param[in] node 対象のノード
-// @param[in] pos 入力の故障の時に入力番号を表す
-// @param[in] val 縮退している値
-SaFault*
-FaultMgr::find_input_fault(const TgNode* node,
-			   ymuint pos,
-			   int val)
-{
-  Fnode& fnode = mFnodeArray[node->gid()];
-  SaFault* f = fnode.mIfaults[pos * 2 + val];
-  return f;
-}
-
-// @brief 同じ箇所で反対の故障値を持つ故障を返す．
-SaFault*
-FaultMgr::find_alternative_fault(SaFault* f)
-{
-  const TgNode* node = f->node();
-  int fval = f->val() ^ 1;
-  Fnode& fnode = mFnodeArray[node->gid()];
-  if ( f->is_input_fault() ) {
-    ymuint pos = f->pos();
-    return fnode.mIfaults[pos * 2 + fval];
-  }
-  else {
-    return fnode.mOfault[fval];
-  }
-}
-
-// @brief 故障を追加する．
-SaFault*
-FaultMgr::add_fault(const TgNode* node,
+// @param[in] rep 代表故障
+// @param[inout] fid 故障のID番号
+// @note fid はこの関数呼び出し後に1つインクリメントされる．
+TpgFault*
+FaultMgr::new_fault(TpgNode* node,
 		    bool is_output,
 		    ymuint pos,
 		    int val,
-		    SaFault* rep)
+		    TpgFault* rep,
+		    ymuint& fid)
 {
-  SaFault* f = NULL;
-  if ( is_output ) {
-    f = find_output_fault(node, val);
-  }
-  else {
-    f = find_input_fault(node, pos, val);
-  }
-  f->mId = mAllList.size();
-  mAllList.push_back(f);
-  mChanged = true;
-
-  if ( rep ) {
-    f->mFinfo = rep->mFinfo;
-
-  }
-  else {
-    void* p = mFinfoAlloc.get_memory(sizeof(Finfo));
-    f->mFinfo = new (p) Finfo;
-    mAllRepList.push_back(f);
-    mRemainList.push_back(f);
-  }
-  f->mFinfo->mEqFaults.push_back(f);
-
+  TpgFault* f = &mFaultChunk[fid];
+  f->set(fid, node, is_output, pos, val, rep);
+  ++ fid;
   return f;
 }
 
 // @brief fault の状態を変更する．
 void
-FaultMgr::set_status(SaFault* fault,
+FaultMgr::set_status(TpgFault* fault,
 		     FaultStatus stat)
 {
-  Finfo* finfo = fault->mFinfo;
-  finfo->mStatus = stat;
+  fault->mStatus = stat;
   mChanged = true;
 }
 
@@ -375,9 +246,10 @@ FaultMgr::update()
     ymuint n = mRemainList.size();
     ymuint wpos = 0;
     for (ymuint rpos = 0; rpos < n; ++ rpos) {
-      SaFault* f = mRemainList[rpos];
+      TpgFault* f = mRemainList[rpos];
       switch ( f->status() ) {
       case kFsUndetected:
+      case kFsSkipped:
 	if ( wpos != rpos ) {
 	  mRemainList[wpos] = f;
 	}

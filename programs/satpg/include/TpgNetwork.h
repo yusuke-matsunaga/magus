@@ -132,40 +132,6 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 故障に関するアクセス関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 全故障数を返す．
-  ymuint
-  all_fault_num() const;
-
-  /// @brief 故障を取り出す．
-  /// @param[in] id 故障番号 ( 0 <= id < all_fault_num() )
-  TpgFault*
-  fault(ymuint id);
-
-  /// @brief 故障を取り出す．
-  /// @param[in] id 故障番号 ( 0 <= id < all_fault_num() )
-  const TpgFault*
-  fault(ymuint id) const;
-
-  /// @brief 代表故障数を得る．
-  ymuint
-  rep_fault_num() const;
-
-  /// @brief 代表故障を取り出す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < rep_fault_num() )
-  TpgFault*
-  rep_fault(ymuint pos);
-
-  /// @brief 代表故障を取り出す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < rep_fault_num() )
-  const TpgFault*
-  rep_fault(ymuint pos) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
   // 必要割り当てに関する関数
   //////////////////////////////////////////////////////////////////////
 
@@ -242,23 +208,6 @@ private:
   void
   activate_sub();
 
-  /// @brief 故障を生成する．
-  /// @param[in] node 対象のノード
-  /// @param[in] is_output 出力の故障の時 true にするフラグ
-  /// @param[in] ipos 入力位置
-  /// @param[in] val 故障値
-  /// @param[in] rep_fault 代表故障
-  /// @param[inout] fid 故障ID
-  /// @note rep_fault が NULL の場合は自分自身が代表故障となる．
-  /// @note この関数内で fid の値がインクリメントされる．
-  TpgFault*
-  new_fault(TpgNode* node,
-	    bool is_output,
-	    ymuint ipos,
-	    int val,
-	    TpgFault* rep_fault,
-	    ymuint& fid);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -321,18 +270,6 @@ private:
   // activate_sub() で用いられるマーク用の配列
   // サイズは mNodeNum
   bool* mTmpMark;
-
-  // 全故障数
-  ymuint32 mFaultNum;
-
-  // 故障の本体の配列
-  TpgFault* mFaultChunk;
-
-  // 代表故障数
-  ymuint32 mRepFaultNum;
-
-  // 代表故障のポインタ配列
-  TpgFault** mRepFaultList;
 
 };
 
