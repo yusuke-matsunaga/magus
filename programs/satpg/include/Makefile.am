@@ -11,15 +11,16 @@ noinst_HEADERS = \
 	AtpgMgr.h \
 	Dtpg.h \
 	DtpgStats.h \
-	DtpgOperator.h \
 	FaultMgr.h \
 	FaultStatus.h \
 	PackedVal.h \
 	PackedVal3.h \
 	Rtpg.h \
-	SaFault.h \
-	SatpgNetwork.h \
-	SatpgNode.h \
+	TpgFault.h \
+	TpgNetwork.h \
+	TpgNode.h \
+	TpgPrimitive.h \
+	TpgOperator.h \
 	TestVector.h
 	TvBuff.h \
 	TvMgr.h \

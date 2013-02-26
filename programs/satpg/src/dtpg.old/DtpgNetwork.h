@@ -10,7 +10,6 @@
 
 
 #include "dtpg_nsdef.h"
-#include "SaFault.h"
 #include "ym_networks/tgnet.h"
 #include "ym_logic/lexp_nsdef.h"
 #include "ym_utils/SimpleAlloc.h"
@@ -28,9 +27,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] tgnetwork もとのネットワーク
-  /// @param[in] fault_list 故障リスト
-  DtpgNetwork(const TgNetwork& tgnetwork,
-	      const vector<SaFault*>& fault_list);
+  DtpgNetwork(const TgNetwork& tgnetwork);
 
   /// @brief デストラクタ
   ~DtpgNetwork();
@@ -93,10 +90,6 @@ public:
   /// @brief サイズの降順で整列した順番で外部出力ノードを取り出す．
   DtpgNode*
   output2(ymuint pos);
-
-  /// @brief SaFault に対応する DtpgFault を得る．
-  DtpgFault*
-  conv_fault(SaFault* src_fault);
 
   /// @brief アクティブなノード数を得る．
   ymuint

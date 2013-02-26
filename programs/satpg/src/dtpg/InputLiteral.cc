@@ -8,8 +8,8 @@
 
 
 #include "InputLiteral.h"
-#include "DtpgNode.h"
-#include "DtpgPrimitive.h"
+#include "TpgNode.h"
+#include "TpgPrimitive.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
@@ -44,7 +44,7 @@ VectorInputLiteral::size() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GvarInputLiteral::GvarInputLiteral(DtpgNode* node) :
+GvarInputLiteral::GvarInputLiteral(TpgNode* node) :
   mNode(node)
 {
 }
@@ -53,7 +53,7 @@ GvarInputLiteral::GvarInputLiteral(DtpgNode* node) :
 Literal
 GvarInputLiteral::operator[](ymuint pos) const
 {
-  DtpgNode* inode = mNode->fanin(pos);
+  TpgNode* inode = mNode->fanin(pos);
   return Literal(inode->gvar(), kPolPosi);
 }
 
@@ -70,7 +70,7 @@ GvarInputLiteral::size() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-FvarInputLiteral::FvarInputLiteral(DtpgNode* node) :
+FvarInputLiteral::FvarInputLiteral(TpgNode* node) :
   mNode(node)
 {
 }
@@ -79,7 +79,7 @@ FvarInputLiteral::FvarInputLiteral(DtpgNode* node) :
 Literal
 FvarInputLiteral::operator[](ymuint pos) const
 {
-  DtpgNode* inode = mNode->fanin(pos);
+  TpgNode* inode = mNode->fanin(pos);
   return Literal(inode->fvar(), kPolPosi);
 }
 
@@ -96,7 +96,7 @@ FvarInputLiteral::size() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PrimGvarInputLiteral::PrimGvarInputLiteral(DtpgPrimitive* prim) :
+PrimGvarInputLiteral::PrimGvarInputLiteral(TpgPrimitive* prim) :
   mPrim(prim)
 {
 }
@@ -105,7 +105,7 @@ PrimGvarInputLiteral::PrimGvarInputLiteral(DtpgPrimitive* prim) :
 Literal
 PrimGvarInputLiteral::operator[](ymuint pos) const
 {
-  DtpgPrimitive* iprim = mPrim->fanin(pos);
+  TpgPrimitive* iprim = mPrim->fanin(pos);
   return Literal(iprim->gvar(), kPolPosi);
 }
 
@@ -122,7 +122,7 @@ PrimGvarInputLiteral::size() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PrimFvarInputLiteral::PrimFvarInputLiteral(DtpgPrimitive* prim) :
+PrimFvarInputLiteral::PrimFvarInputLiteral(TpgPrimitive* prim) :
   mPrim(prim)
 {
 }
@@ -131,7 +131,7 @@ PrimFvarInputLiteral::PrimFvarInputLiteral(DtpgPrimitive* prim) :
 Literal
 PrimFvarInputLiteral::operator[](ymuint pos) const
 {
-  DtpgPrimitive* iprim = mPrim->fanin(pos);
+  TpgPrimitive* iprim = mPrim->fanin(pos);
   return Literal(iprim->fvar(), kPolPosi);
 }
 

@@ -67,12 +67,15 @@ enum tSimMode {
 // クラス名の宣言
 //////////////////////////////////////////////////////////////////////
 
-class SaFault;
+class TpgFault;
 class FaultMgr;
+class TpgNetwork;
+class TpgNode;
+class TpgPrimitive;
+class TpgOperator;
 class TestVector;
 class TvMgr;
 class Dtpg;
-class DtpgOperator;
 class DtpgStats;
 class Fsim;
 

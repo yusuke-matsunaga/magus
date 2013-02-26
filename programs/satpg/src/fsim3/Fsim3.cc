@@ -8,12 +8,13 @@
 
 
 #include "Fsim3.h"
-#include "ym_networks/TgNetwork.h"
-#include "ym_networks/TgNode.h"
+#include "TpgNetwork.h"
+#include "TpgNode.h"
+#include "TpgPrimitive.h"
+#include "TpgFault.h"
+#include "TestVector.h"
 #include "SimNode.h"
 #include "SimFFR.h"
-#include "SaFault.h"
-#include "TestVector.h"
 #include "ym_utils/StopWatch.h"
 
 
@@ -59,8 +60,7 @@ Fsim3::~Fsim3()
 
 // @brief ネットワークをセットする．
 void
-Fsim3::set_network(const TgNetwork& network,
-		   const vector<SaFault*>& flist)
+Fsim3::set_network(const TpgNetwork& network)
 {
   clear();
 
@@ -69,7 +69,6 @@ Fsim3::set_network(const TgNetwork& network,
   ymuint nn = mNetwork->node_num();
   ymuint ni = mNetwork->input_num2();
   ymuint no = mNetwork->output_num2();
-  ymuint nl = mNetwork->logic_num();
 
   // SimNode の生成
   // 対応付けを行うマップの初期化
@@ -78,96 +77,123 @@ Fsim3::set_network(const TgNetwork& network,
   mInputArray.resize(ni);
   mOutputArray.resize(no);
 
-  // 外部入力に対応する SimNode の生成
-  for (ymuint i = 0; i < ni; ++ i) {
-    const TgNode* tgnode = mNetwork->input(i);
-    SimNode* node = make_input();
-    mSimMap[tgnode->gid()] = node;
-    mInputArray[i] = node;
-  }
-  // 論理ノードに対応する SimNode の生成
-  for (ymuint i = 0; i < nl; ++ i) {
-    const TgNode* tgnode = mNetwork->sorted_logic(i);
-    ymuint ni = tgnode->fanin_num();
-    vector<SimNode*> inputs(ni);
-    for (ymuint i = 0; i < ni; ++ i) {
-      const TgNode* itgnode = tgnode->fanin(i);
-      SimNode* inode = find_simnode(itgnode);
-      assert_cond(inode, __FILE__, __LINE__);
-      inputs[i] = inode;
-    }
+  for (ymuint i = 0; i < nn; ++ i) {
+    const TpgNode* tpgnode = mNetwork->node(i);
+    SimNode* node = NULL;
 
-    // 出力の論理を表す SimNode を作る．
-    SimNode* simnode = NULL;
-    mEdgeMap[tgnode->gid()].resize(ni);
-    if ( tgnode->is_cplx_logic() ) {
-      vector<SimNode*> inputs2(ni * 2);
-      LogExpr lexp = mNetwork->get_lexp(tgnode->func_id());
-      vector<EdgeMap*> emap(ni, NULL);
+    if ( tpgnode->is_input() ) {
+      // 外部入力に対応する SimNode の生成
+      SimNode* node = make_input();
+      mInputArray[tpgnode->input_id()] = node;
+    }
+    else if ( tpgnode->is_output() ) {
+      // 外部出力に対応する SimNode の生成
+      // 実際には外部出力のファンインに対応するノードに出力の印をつけるだけ．
+      node = find_simnode(tpgnode->fanin(0));
+      node->set_output();
+      mOutputArray[tpgnode->output_id()] = node;
+    }
+    else if ( tpgnode->is_logic() ) {
+      // 論理ノードに対応する SimNode の生成
+      ymuint ni = tpgnode->fanin_num();
+
+      // ファンインに対応する SimNode を探す．
+      vector<SimNode*> inputs(ni);
       for (ymuint i = 0; i < ni; ++ i) {
+	const TpgNode* itpgnode = tpgnode->fanin(i);
+	SimNode* inode = find_simnode(itpgnode);
+	assert_cond(inode, __FILE__, __LINE__);
+	inputs[i] = inode;
+      }
+
+      // 出力の論理を表す SimNode を作る．
+      mEdgeMap[tpgnode->id()].resize(ni);
+      if ( tpgnode->is_cplx_logic() ) {
+	// 複数のプリミティブで構成されるノードの場合
+	// 基本的にはプリミティブを SimNode に対応させればよいが，
+	// ノードとしてのファンインの枝に対応するプリミティブのファンインが
+	// 複数存在する時に対応付けができないので，ダミーのバッファノードを
+	// 挿入する．
+	ymuint np = tpgnode->primitive_num();
+	vector<ymuint> input_count(ni * 2, 0);
+	for (ymuint pid = 0; pid < np; ++ pid) {
+	  TpgPrimitive* prim = tpgnode->primitive(pid);
+	  if ( prim->is_input() ) {
+	    // 入力プリミティブの場合
+	    ymuint iid = prim->input_id();
+	    ++ input_count[iid * 2 + 0];
+	  }
+	  else if ( prim->is_not_input() ) {
+	    // 否定付き入力プリミティブの場合
+	    ymuint iid = prim->input_id();
+	    ++ input_count[iid * 2 + 1];
+	  }
+	}
+
 	// 各変数の使われ方をチェック
-	// - A) 肯定リテラルが 1 つ．
-	// - B) 肯定リテラルが 2 つ以上
-	// - C) 否定リテラルのみ．数は問わない．
-	// - D) 肯定と否定リテラルが各々 1 つ以上
-	VarId var(i);
-	ymuint np = lexp.litnum(var, kPolPosi);
-	ymuint nn = lexp.litnum(var, kPolNega);
-	EdgeMap& edge_map = mEdgeMap[tgnode->gid()][i];
-	if ( np == 1 && nn == 0 ) {
-	  inputs2[i * 2] = inputs[i];
-	  emap[i] = &edge_map;
+	vector<SimNode*> inputs2(ni * 2);
+	vector<EdgeMap*> emap(ni, NULL);
+	for (ymuint i = 0; i < ni; ++ i) {
+	  ymuint np = input_count[i * 2 + 0];
+	  ymuint nn = input_count[i * 2 + 1];
+	  EdgeMap& edge_map = mEdgeMap[tpgnode->id()][i];
+	  if ( np == 1 && nn == 0 ) {
+	    // - A) 肯定リテラルが 1 つ．
+	    inputs2[i * 2 + 0] = inputs[i];
+	    emap[i] = &edge_map;
+	  }
+	  else if ( np > 1 && nn == 0 ) {
+	    // - B) 肯定リテラルが 2 つ以上
+	    // ダミーのバッファノードを作る．
+	    vector<SimNode*> tmp(1, inputs[i]);
+	    SimNode* buf = make_node(kTgGateBuff, tmp);
+	    inputs2[i * 2 + 0] = buf;
+	    edge_map.mNode = buf;
+	    edge_map.mPos = 0;
+	  }
+	  else if ( np == 0 && nn > 0 ) {
+	    // - C) 否定リテラルのみ．数は問わない．
+	    // NOTノードを作る．
+	    vector<SimNode*> tmp(1, inputs[i]);
+	    SimNode* inv = make_node(kTgGateNot, tmp);
+	    inputs2[i * 2 + 1] = inv;
+	    edge_map.mNode = inv;
+	    edge_map.mPos = 0;
+	  }
+	  else if ( np > 0 && nn > 0 ) {
+	    // - D) 肯定と否定リテラルが各々 1 つ以上
+	    // ダミーのバッファとNOTノードを作る．
+	    vector<SimNode*> tmp(1, inputs[i]);
+	    SimNode* buf = make_node(kTgGateBuff, tmp);
+	    tmp[0] = buf;
+	    SimNode* inv = make_node(kTgGateNot, tmp);
+	    inputs2[i * 2 + 0] = buf;
+	    inputs2[i * 2 + 1] = inv;
+	    edge_map.mNode = buf;
+	    edge_map.mPos = 0;
+	  }
+	  else {
+	    cout << "np = " << np << endl
+		 << "nn = " << nn << endl;
+	    assert_not_reached(__FILE__, __LINE__);
+	  }
 	}
-	else if ( np > 1 && nn == 0 ) {
-	  vector<SimNode*> tmp(1, inputs[i]);
-	  SimNode* buf = make_node(kTgGateBuff, tmp);
-	  inputs2[i * 2] = buf;
-	  edge_map.mNode = buf;
-	  edge_map.mPos = 0;
-	}
-	else if ( np == 0 && nn > 0 ) {
-	  vector<SimNode*> tmp(1, inputs[i]);
-	  SimNode* inv = make_node(kTgGateNot, tmp);
-	  inputs2[i * 2 + 1] = inv;
-	  edge_map.mNode = inv;
-	  edge_map.mPos = 0;
-	}
-	else if ( np > 0 && nn > 0 ) {
-	  vector<SimNode*> tmp(1, inputs[i]);
-	  SimNode* buf = make_node(kTgGateBuff, tmp);
-	  tmp[0] = buf;
-	  SimNode* inv = make_node(kTgGateNot, tmp);
-	  inputs2[i * 2] = buf;
-	  inputs2[i * 2 + 1] = inv;
-	  edge_map.mNode = buf;
-	  edge_map.mPos = 0;
-	}
-	else {
-	  cout << "np = " << np << endl
-	       << "nn = " << nn << endl;
-	  assert_not_reached(__FILE__, __LINE__);
+
+	// 各プリミティブに対応したノードを作る．
+	node = make_primitive(tpgnode->primitive(np - 1), inputs2, emap);
+      }
+      else {
+	tTgGateType type = tpgnode->gate_type();
+	node = make_node(type, inputs);
+	for (ymuint i = 0; i < ni; ++ i) {
+	  EdgeMap& edge_map = mEdgeMap[tpgnode->id()][i];
+	  edge_map.mNode = node;
+	  edge_map.mPos = i;
 	}
       }
-      simnode = make_logic(lexp, inputs2, emap);
     }
-    else {
-      tTgGateType type = tgnode->gate_type();
-      simnode = make_node(type, inputs);
-      for (ymuint i = 0; i < ni; ++ i) {
-	EdgeMap& edge_map = mEdgeMap[tgnode->gid()][i];
-	edge_map.mNode = simnode;
-	edge_map.mPos = i;
-      }
-    }
-    mSimMap[tgnode->gid()] = simnode;
-  }
-  // 外部出力に対応する SimNode の生成
-  for (ymuint i = 0; i < no; ++ i) {
-    const TgNode* onode = mNetwork->output(i);
-    SimNode* inode = find_simnode(onode->fanin(0));
-    inode->set_output();
-    mSimMap[onode->gid()] = inode;
-    mOutputArray[i] = inode;
+    // 対応表に登録しておく
+    mSimMap[tpgnode->id()] = node;
   }
 
   // 各ノードのファンアウトリストの設定
@@ -238,19 +264,24 @@ Fsim3::set_network(const TgNetwork& network,
     simnode->set_gval(kValX);
   }
 
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障リストの設定
+  //////////////////////////////////////////////////////////////////////
+
   clear_faults();
 
-  ymuint n = flist.size();
+  ymuint n = mNetwork->rep_fault_num();
   mFsimFaults.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
-    SaFault* f = flist[i];
-    const TgNode* node = f->node();
+    const TpgFault* f = mNetwork->rep_fault(i);
+    const TpgNode* node = f->node();
     SimNode* simnode = NULL;
     ymuint ipos = 0;
     SimNode* isimnode = NULL;
     if ( f->is_input_fault() ) {
       find_simedge(node, f->pos(), simnode, ipos);
-      const TgNode* inode = node->fanin(f->pos());
+      const TpgNode* inode = node->fanin(f->pos());
       isimnode = find_simnode(inode);
     }
     else {
@@ -268,7 +299,7 @@ Fsim3::set_network(const TgNetwork& network,
 // @param[out] det_faults 検出された故障を格納するリスト
 void
 Fsim3::run(TestVector* tv,
-	   vector<SaFault*>& det_faults)
+	   vector<const TpgFault*>& det_faults)
 {
   det_faults.clear();
 
@@ -316,7 +347,7 @@ Fsim3::run(TestVector* tv,
     for (vector<FsimFault*>::iterator p = det_flist.begin();
 	 p != det_flist.end(); ++ p) {
       FsimFault* ff = *p;
-      SaFault* f = ff->mOrigF;
+      const TpgFault* f = ff->mOrigF;
       det_faults.push_back(f);
     }
   }
@@ -330,7 +361,7 @@ Fsim3::run(TestVector* tv,
 // @param[out] det_faults 検出された故障を格納するリストの配列
 void
 Fsim3::run(const vector<TestVector*>& tv_array,
-	   vector<vector<SaFault*> >& det_faults)
+	   vector<vector<const TpgFault*> >& det_faults)
 {
   ymuint nb = tv_array.size();
   assert_cond(det_faults.size() >= nb, __FILE__, __LINE__);
@@ -346,7 +377,7 @@ Fsim3::run(const vector<TestVector*>& tv_array,
 // @param[in] f 対象の故障
 bool
 Fsim3::run(TestVector* tv,
-	   SaFault* f)
+	   const TpgFault* f)
 {
   ymuint npi = mNetwork->input_num2();
 
@@ -499,7 +530,7 @@ Fsim3::update_faults()
     ymuint wpos = 0;
     for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
       FsimFault* ff = flist[rpos];
-      SaFault* f = ff->mOrigF;
+      const TpgFault* f = ff->mOrigF;
       if ( f->status() != kFsDetected ) {
 	if ( wpos != rpos ) {
 	  flist[wpos] = ff;
@@ -525,7 +556,7 @@ Fsim3::ffr_simulate(SimFFR* ffr,
   det_flist.reserve(fnum);
   for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
     FsimFault* ff = flist[rpos];
-    SaFault* f = ff->mOrigF;
+    const TpgFault* f = ff->mOrigF;
     FaultStatus fs = f->status();
     if ( fs == kFsDetected || fs == kFsUntestable ) {
       continue;
@@ -627,55 +658,53 @@ Fsim3::make_input()
   return node;
 }
 
-// @brief logic ノードを作る．
+// @brief プリミティブに対応したノードを作る．
+// @param[in] prim プリミティブ
+// @param[in] inputs もとのノードの入力の SimNode
+// @param[in] emap もとのノードの枝の対応関係を記録する配列
+// @note inputs のサイズはノードの入力数 x 2
 SimNode*
-Fsim3::make_logic(const LogExpr& lexp,
-		  const vector<SimNode*>& inputs,
-		  const vector<EdgeMap*>& emap)
+Fsim3::make_primitive(const TpgPrimitive* prim,
+		      const vector<SimNode*>& inputs,
+		      const vector<EdgeMap*>& emap)
 {
-  SimNode* node = NULL;
-  if ( lexp.is_posiliteral() ) {
-    VarId var = lexp.varid();
-    ymuint pos = var.val();
-    node = inputs[pos * 2];
-    assert_cond(node, __FILE__, __LINE__);
+  if ( prim->is_input() ) {
+    // 入力の場合 inputs に登録されているノードを返す．
+    ymuint iid = prim->input_id();
+    return inputs[iid * 2 + 0];
   }
-  else if ( lexp.is_negaliteral() ) {
-    VarId var = lexp.varid();
-    ymuint pos = var.val();
-    node = inputs[pos * 2 + 1];
-    assert_cond(node, __FILE__, __LINE__);
+
+  if ( prim->is_not_input() ) {
+    // 否定付き入力の場合 inputs に登録されているノードを返す．
+    ymuint iid = prim->input_id();
+    return inputs[iid * 2 + 1];
   }
-  else {
-    ymuint nc = lexp.child_num();
-    vector<SimNode*> tmp(nc);
-    for (ymuint i = 0; i < nc; ++ i) {
-      tmp[i] = make_logic(lexp.child(i), inputs, emap);
-    }
-    if ( lexp.is_and() ) {
-      node = make_node(kTgGateAnd, tmp);
-    }
-    else if ( lexp.is_or() ) {
-      node = make_node(kTgGateOr, tmp);
-    }
-    else if ( lexp.is_xor() ) {
-      node = make_node(kTgGateXor, tmp);
-    }
-    // ちょっとかっこわるい探し方
-    ymuint ni = inputs.size() / 2;
-    for (ymuint i = 0; i < nc; ++ i) {
-      SimNode* inode = tmp[i];
-      for (ymuint j = 0; j < ni; ++ j) {
-	if ( inode == inputs[j * 2] ) {
-	  if ( emap[j] != NULL ) {
-	    emap[j]->mNode = node;
-	    emap[j]->mPos = i;
-	  }
-	  break;
-	}
+
+  assert_cond( prim->is_logic(), __FILE__, __LINE__);
+
+  // ファンインのノードを作る．
+  ymuint ni = prim->fanin_num();
+  vector<SimNode*> tmp_inputs(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    const TpgPrimitive* iprim = prim->fanin(i);
+    SimNode* inode = make_primitive(iprim, inputs, emap);
+    tmp_inputs[i] = inode;
+  }
+  SimNode* node = make_node(prim->gate_type(), tmp_inputs);
+
+  // ファンインが入力プリミティブかつ対応する emap が NULL でなければ
+  // EdgeMap の設定を行う．
+  for (ymuint i = 0; i < ni; ++ i) {
+    const TpgPrimitive* iprim = prim->fanin(i);
+    if ( iprim->is_input() ) {
+      ymuint iid = iprim->input_id();
+      if ( emap[iid] != NULL ) {
+	emap[iid]->mNode = node;
+	emap[iid]->mPos = i;
       }
     }
   }
+
   return node;
 }
 
@@ -685,9 +714,28 @@ Fsim3::make_node(tTgGateType type,
 		 const vector<SimNode*>& inputs)
 {
   ymuint32 id = mNodeArray.size();
-  SimNode* node = SimNode::new_node(id, type, LogExpr(), inputs);
+  SimNode* node = SimNode::new_node(id, type, inputs);
   mNodeArray.push_back(node);
   return node;
+}
+
+// @brief node に対応する SimNode* を得る．
+SimNode*
+Fsim3::find_simnode(const TpgNode* node) const
+{
+  return mSimMap[node->id()];
+}
+
+// @brief node の pos 番めの入力に対応する枝を得る．
+void
+Fsim3::find_simedge(const TpgNode* node,
+		    ymuint pos,
+		    SimNode*& simnode,
+		    ymuint& ipos) const
+{
+  const EdgeMap& edge_map = mEdgeMap[node->id()][pos];
+  simnode = edge_map.mNode;
+  ipos = edge_map.mPos;
 }
 
 END_NAMESPACE_YM_SATPG_FSIM3

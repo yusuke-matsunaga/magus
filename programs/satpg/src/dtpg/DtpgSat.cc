@@ -8,10 +8,10 @@
 
 
 #include "DtpgSat.h"
-#include "DtpgNetwork.h"
-#include "DtpgNode.h"
-#include "DtpgFault.h"
-#include "DtpgOperator.h"
+#include "TpgNetwork.h"
+#include "TpgNode.h"
+#include "TpgFault.h"
+#include "TpgOperator.h"
 
 
 #define VERIFY_MAIMP 0
@@ -39,7 +39,6 @@ DtpgSat::DtpgSat()
 // @brief デストラクタ
 DtpgSat::~DtpgSat()
 {
-  delete mNetwork;
 }
 
 // @brief 使用する SAT エンジンを指定する．
@@ -67,13 +66,10 @@ DtpgSat::set_dry_run(bool flag)
 
 // @brief 回路と故障リストを設定する．
 // @param[in] tgnetwork 対象のネットワーク
-// @param[in] fault_list 故障リスト
 void
-DtpgSat::set_network(const TgNetwork& tgnetwork,
-		     const vector<SaFault*>& fault_list)
+DtpgSat::set_network(TpgNetwork& tgnetwork)
 {
-  delete mNetwork;
-  mNetwork = new DtpgNetwork(tgnetwork, fault_list);
+  mNetwork = &tgnetwork;
   mMaxId = mNetwork->node_num();
 }
 
@@ -81,7 +77,7 @@ DtpgSat::set_network(const TgNetwork& tgnetwork,
 // @param[in] op テスト生成後に呼ばれるファンクター
 // @param[in] option オプション文字列
 void
-DtpgSat::run(DtpgOperator& op,
+DtpgSat::run(TpgOperator& op,
 	     const string& option)
 {
   bool single = false;
@@ -272,26 +268,26 @@ DtpgSat::run(DtpgOperator& op,
 
 // @brief single モードの共通処理
 void
-DtpgSat::single_sub(DtpgOperator& op)
+DtpgSat::single_sub(TpgOperator& op)
 {
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
-    DtpgNode* node = mNetwork->active_node(i);
+    TpgNode* node = mNetwork->active_node(i);
 
     // 出力の故障
-    DtpgFault* f0 = node->output_fault(0);
+    TpgFault* f0 = node->output_fault(0);
     dtpg_single(f0, op);
 
-    DtpgFault* f1 = node->output_fault(1);
+    TpgFault* f1 = node->output_fault(1);
     dtpg_single(f1, op);
 
     // 入力の故障
     ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
-      DtpgFault* f0 = node->input_fault(0, j);
+      TpgFault* f0 = node->input_fault(0, j);
       dtpg_single(f0, op);
 
-      DtpgFault* f1 = node->input_fault(1, j);
+      TpgFault* f1 = node->input_fault(1, j);
       dtpg_single(f1, op);
     }
   }
@@ -301,8 +297,8 @@ DtpgSat::single_sub(DtpgOperator& op)
 // @param[in] f 故障
 // @param[in] op テスト生成の結果を処理するファンクター
 void
-DtpgSat::dtpg_single(DtpgFault* f,
-		     DtpgOperator& op)
+DtpgSat::dtpg_single(TpgFault* f,
+		     TpgOperator& op)
 {
   mFaultList.clear();
 
@@ -313,22 +309,22 @@ DtpgSat::dtpg_single(DtpgFault* f,
 
 // @brief dual モードの共通処理
 void
-DtpgSat::dual_sub(DtpgOperator& op)
+DtpgSat::dual_sub(TpgOperator& op)
 {
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
-    DtpgNode* node = mNetwork->active_node(i);
+    TpgNode* node = mNetwork->active_node(i);
 
     // 出力の故障
-    DtpgFault* f0 = node->output_fault(0);
-    DtpgFault* f1 = node->output_fault(1);
+    TpgFault* f0 = node->output_fault(0);
+    TpgFault* f1 = node->output_fault(1);
     dtpg_dual(f0, f1, op);
 
     // 入力の故障
     ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
-      DtpgFault* f0 = node->input_fault(0, j);
-      DtpgFault* f1 = node->input_fault(1, j);
+      TpgFault* f0 = node->input_fault(0, j);
+      TpgFault* f1 = node->input_fault(1, j);
       dtpg_dual(f0, f1, op);
     }
   }
@@ -339,9 +335,9 @@ DtpgSat::dual_sub(DtpgOperator& op)
 // @param[in] f1 1縮退故障
 // @param[in] op テスト生成の結果を処理するファンクター
 void
-DtpgSat::dtpg_dual(DtpgFault* f0,
-		   DtpgFault* f1,
-		   DtpgOperator& op)
+DtpgSat::dtpg_dual(TpgFault* f0,
+		   TpgFault* f1,
+		   TpgOperator& op)
 {
   mFaultList.clear();
 
@@ -353,11 +349,11 @@ DtpgSat::dtpg_dual(DtpgFault* f0,
 
 // @brief ffr モードの共通処理
 void
-DtpgSat::ffr_sub(DtpgOperator& op)
+DtpgSat::ffr_sub(TpgOperator& op)
 {
   ymuint n = mNetwork->active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
-    DtpgNode* node = mNetwork->active_node(i);
+    TpgNode* node = mNetwork->active_node(i);
     if ( node->is_output() || node->active_fanout_num() > 1 ) {
       mFaultList.clear();
 
@@ -369,11 +365,11 @@ DtpgSat::ffr_sub(DtpgOperator& op)
 }
 
 void
-DtpgSat::dfs_ffr(DtpgNode* node)
+DtpgSat::dfs_ffr(TpgNode* node)
 {
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    DtpgNode* inode = node->fanin(i);
+    TpgNode* inode = node->fanin(i);
     if ( inode->active_fanout_num() == 1 ) {
       dfs_ffr(inode);
     }
@@ -384,11 +380,11 @@ DtpgSat::dfs_ffr(DtpgNode* node)
 
 // @brief mffc モードの共通処理
 void
-DtpgSat::mffc_sub(DtpgOperator& op)
+DtpgSat::mffc_sub(TpgOperator& op)
 {
   ymuint n = mNetwork->active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
-    DtpgNode* node = mNetwork->active_node(i);
+    TpgNode* node = mNetwork->active_node(i);
     if ( node->imm_dom() == NULL ) {
       mFaultList.clear();
 
@@ -401,14 +397,14 @@ DtpgSat::mffc_sub(DtpgOperator& op)
 }
 
 void
-DtpgSat::dfs_mffc(DtpgNode* node,
+DtpgSat::dfs_mffc(TpgNode* node,
 		  vector<bool>& mark)
 {
   mark[node->id()] = true;
 
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    DtpgNode* inode = node->fanin(i);
+    TpgNode* inode = node->fanin(i);
     if ( mark[inode->id()] == false && inode->imm_dom() != NULL ) {
       dfs_mffc(inode, mark);
     }
@@ -419,13 +415,13 @@ DtpgSat::dfs_mffc(DtpgNode* node,
 
 // @brief all モードの共通処理
 void
-DtpgSat::all_sub(DtpgOperator& op)
+DtpgSat::all_sub(TpgOperator& op)
 {
   mFaultList.clear();
 
   ymuint n = mNetwork->active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
-    DtpgNode* node = mNetwork->active_node(i);
+    TpgNode* node = mNetwork->active_node(i);
     add_node_faults(node);
   }
 
@@ -434,20 +430,20 @@ DtpgSat::all_sub(DtpgOperator& op)
 
 // @brief ノードの故障を追加する．
 void
-DtpgSat::add_node_faults(DtpgNode* node)
+DtpgSat::add_node_faults(TpgNode* node)
 {
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    DtpgFault* f0 = node->input_fault(0, i);
+    TpgFault* f0 = node->input_fault(0, i);
     add_fault(f0);
 
-    DtpgFault* f1 = node->input_fault(1, i);
+    TpgFault* f1 = node->input_fault(1, i);
     add_fault(f1);
   }
-  DtpgFault* f0 = node->output_fault(0);
+  TpgFault* f0 = node->output_fault(0);
   add_fault(f0);
 
-  DtpgFault* f1 = node->output_fault(1);
+  TpgFault* f1 = node->output_fault(1);
   add_fault(f1);
 }
 
@@ -462,7 +458,7 @@ DtpgSat::clear_stats()
 BEGIN_NONAMESPACE
 
 string
-f_str(DtpgFault* f)
+f_str(TpgFault* f)
 {
   ostringstream buf;
   buf << "Node#" << f->node()->id() << ": ";
@@ -478,7 +474,7 @@ f_str(DtpgFault* f)
 
 struct FaultGroup
 {
-  vector<DtpgFault*> mFaultList;
+  vector<TpgFault*> mFaultList;
 
   vector<ymuint32> mMaList;
 
@@ -612,17 +608,17 @@ END_NONAMESPACE
 // @brief 必要割り当ての情報に基づいて故障をグループ分けする．
 // @note 内部で dtpg_ffr() を呼ぶ．
 void
-DtpgSat::dtpg_ffr2(const vector<DtpgFault*>& flist,
-		   DtpgNode* root,
-		   const vector<DtpgNode*>& node_list,
-		   DtpgOperator& op)
+DtpgSat::dtpg_ffr2(const vector<TpgFault*>& flist,
+		   TpgNode* root,
+		   const vector<TpgNode*>& node_list,
+		   TpgOperator& op)
 {
 #if VERIFY_MAIMP
   // 必要割り当てで冗長と判定された故障のリストを作る．
-  vector<DtpgFault*> r_list;
-  for (vector<DtpgFault*>::const_iterator p = flist.begin();
+  vector<TpgFault*> r_list;
+  for (vector<TpgFault*>::const_iterator p = flist.begin();
        p != flist.end(); ++ p) {
-    DtpgFault* f = *p;
+    TpgFault* f = *p;
     bool stat = get_mandatory_assignment(f, f->ma_list());
     if ( !stat ) {
       r_list.push_back(f);
@@ -632,9 +628,9 @@ DtpgSat::dtpg_ffr2(const vector<DtpgFault*>& flist,
   dtpg_ffr(flist, root, node_list, op);
 
   // SAT でも冗長と判定されたかチェックする．
-  for (vector<DtpgFault*>::iterator p = r_list.begin();
+  for (vector<TpgFault*>::iterator p = r_list.begin();
        p != r_list.end(); ++ p) {
-    DtpgFault* f = *p;
+    TpgFault* f = *p;
     if ( !f->is_untestable() ) {
       cout << "Error! " << f_str(f)
 	   << " is not redundant" << endl;
@@ -646,9 +642,9 @@ DtpgSat::dtpg_ffr2(const vector<DtpgFault*>& flist,
 
   // 必要割り当てに基づいて故障をグループ分けする．
   vector<FaultGroup> fault_group;
-  for (vector<DtpgFault*>::const_iterator p = flist.begin();
+  for (vector<TpgFault*>::const_iterator p = flist.begin();
        p != flist.end(); ++ p) {
-    DtpgFault* f = *p;
+    TpgFault* f = *p;
     bool stat = get_mandatory_assignment(f, f->ma_list());
     if ( stat ) {
       ymuint n = fault_group.size();

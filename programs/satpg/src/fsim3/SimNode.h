@@ -13,7 +13,6 @@
 #include "EqElem.h"
 #include "Val3.h"
 #include "ym_networks/tgnet.h"
-#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_FSIM3
@@ -52,7 +51,6 @@ public:
   SimNode*
   new_node(ymuint32 id,
 	   tTgGateType type,
-	   const LogExpr& lexp,
 	   const vector<SimNode*>& inputs);
 
 

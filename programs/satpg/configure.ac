@@ -144,6 +144,17 @@ AC_SUBST(ATPG_BINDIR)dnl
 # ===================================================================
 AC_CONFIG_FILES([
 	Makefile
+	old/Makefile
+	old/include/Makefile
+	old/src/Makefile
+	old/src/base/Makefile
+	old/src/fsim2/Makefile
+	old/src/fsim3/Makefile
+	old/src/fsimx/Makefile
+	old/src/dtpg/Makefile
+	old/src/dtpg.old/Makefile
+	old/src/main/Makefile
+	old/src/atpg_tclsh/Makefile
 	include/Makefile
 	src/Makefile
 	src/base/Makefile
@@ -151,7 +162,6 @@ AC_CONFIG_FILES([
 	src/fsim3/Makefile
 	src/fsimx/Makefile
 	src/dtpg/Makefile
-	src/dtpg.old/Makefile
 	src/main/Makefile
 	src/atpg_tclsh/Makefile
 	tclsrc/Makefile

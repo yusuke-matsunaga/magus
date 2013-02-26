@@ -10,7 +10,7 @@
 
 
 #include "dtpg_nsdef.h"
-#include "SaFault.h"
+#include "FaultStatus.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
@@ -36,10 +36,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief もとの故障を返す．
-  SaFault*
-  safault() const;
 
   /// @brief ID番号を返す．
   ymuint
@@ -78,6 +74,10 @@ public:
   int
   val() const;
 
+  /// @brief 状態を返す．
+  FaultStatus
+  status() const;
+
   /// @brief スキップフラグを返す．
   bool
   is_skip() const;
@@ -112,9 +112,6 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // もとの故障
-  SaFault* mSaFault;
-
   // ID番号
   ymuint32 mId;
 
@@ -127,12 +124,15 @@ private:
   // 故障の入力側のノード
   DtpgNode* mSrcNode;
 
-  // 故障位置 + 故障値 + スキップフラグ + untestabel フラグ
+  // 故障位置 + 故障値 + スキップフラグ + untestable フラグ
   ymuint32 mPosVal;
 
   // 必要割り当てのリスト
   // 値は　ノードのID番号 × 2 + 値
   vector<ymuint32> mMaList;
+
+  // 状態
+  FaultStatus mStatus;
 
 };
 
@@ -151,14 +151,6 @@ DtpgFault::DtpgFault()
 inline
 DtpgFault::~DtpgFault()
 {
-}
-
-// @brief もとの故障を返す．
-inline
-SaFault*
-DtpgFault::safault() const
-{
-  return mSaFault;
 }
 
 // @brief ID番号を返す．
@@ -234,12 +226,20 @@ DtpgFault::val() const
   return static_cast<int>((mPosVal >> 1) & 1);
 }
 
+// @brief 状態を返す．
+inline
+FaultStatus
+DtpgFault::status() const
+{
+  return mStatus;
+}
+
 // @brief スキップフラグを返す．
 inline
 bool
 DtpgFault::is_skip() const
 {
-  if ( safault()->status() == kFsDetected ) {
+  if ( status() == kFsDetected ) {
     return true;
   }
   return static_cast<bool>((mPosVal >> 2) & 1U);

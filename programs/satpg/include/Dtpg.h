@@ -45,19 +45,17 @@ public:
   set_dry_run(bool flag) = 0;
 
   /// @brief 回路と故障リストを設定する．
-  /// @param[in] tgnetwork 対象のネットワーク
-  /// @param[in] fault_list 故障リスト
+  /// @param[in] tpgnetwork 対象のネットワーク
   virtual
   void
-  set_network(const TgNetwork& tgnetwork,
-	      const vector<SaFault*>& fault_list) = 0;
+  set_network(TpgNetwork& tgnetwork) = 0;
 
   /// @brief モードでテスト生成を行なう．
   /// @param[in] op テスト生成後に呼ばれるファンクター
   /// @param[in] option オプション文字列
   virtual
   void
-  run(DtpgOperator& op,
+  run(TpgOperator& op,
       const string& option = string()) = 0;
 
   /// @brief 統計情報をクリアする．

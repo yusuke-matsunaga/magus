@@ -1,21 +1,20 @@
 #ifndef FSIMX_H
 #define FSIMX_H
 
-/// @file src/fsimx/Fsim.h
-/// @brief Fsim のヘッダファイル
+/// @file src/fsimx/FsimX.h
+/// @brief FsimX のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: FsimX.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "Fsim.h"
 #include "fsimx_nsdef.h"
+#include "Fsim.h"
 #include "PackedVal.h"
-#include "ym_logic/LogExpr.h"
 #include "EventQ.h"
 #include "FsimFault.h"
 
@@ -51,8 +50,7 @@ public:
   /// @brief ネットワークをセットする．
   virtual
   void
-  set_network(const TgNetwork& network,
-	      const vector<SaFault*>& flist);
+  set_network(const TpgNetwork& network);
 
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -60,7 +58,7 @@ public:
   virtual
   void
   run(TestVector* tv,
-      vector<SaFault*>& det_faults);
+      vector<const TpgFault*>& det_faults);
 
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
@@ -68,7 +66,7 @@ public:
   virtual
   void
   run(const vector<TestVector*>& tv_array,
-      vector<vector<SaFault*> >& det_faults);
+      vector<vector<const TpgFault*> >& det_faults);
 
   /// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -76,7 +74,7 @@ public:
   virtual
   bool
   run(TestVector* tv,
-      SaFault* f);
+      const TpgFault* f);
 
 
 private:
@@ -110,12 +108,12 @@ private:
   /// @brief ffr 内の故障が検出可能か調べる．
   void
   fault_sweep(SimFFR* ffr,
-	      vector<SaFault*>& det_faults);
+	      vector<const TpgFault*>& det_faults);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // TgNode と SimNode の対応関係を表すためのデータ構造
+  // TpgNode と SimNode の対応関係を表すためのデータ構造
   //////////////////////////////////////////////////////////////////////
 
   struct EdgeMap {
@@ -137,11 +135,11 @@ private:
 
   /// @brief node に対応する SimNode を得る．
   SimNode*
-  find_simnode(const TgNode* node) const;
+  find_simnode(const TpgNode* node) const;
 
   /// @brief node の pos 番めの入力に対応する枝を得る．
   void
-  find_simedge(const TgNode* node,
+  find_simedge(const TpgNode* node,
 	       ymuint pos,
 	       SimNode*& simnode,
 	       ymuint& ipos) const;
@@ -150,11 +148,15 @@ private:
   SimNode*
   make_input();
 
-  /// @brief logic ノードを作る．
+  /// @brief プリミティブに対応したノードを作る．
+  /// @param[in] prim プリミティブ
+  /// @param[in] inputs もとのノードの入力の SimNode
+  /// @param[in] emap もとのノードの枝の対応関係を記録する配列
+  /// @note inputs のサイズはノードの入力数 x 2
   SimNode*
-  make_logic(const LogExpr& lexp,
-	     const vector<SimNode*>& inputs,
-	     const vector<EdgeMap*>& emap);
+  make_primitive(const TpgPrimitive* prim,
+		 const vector<SimNode*>& inputs,
+		 const vector<EdgeMap*>& emap);
 
   /// @brief logic ノードを作る．
   SimNode*
@@ -168,12 +170,12 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 対象のネットワーク
-  const TgNetwork* mNetwork;
+  const TpgNetwork* mNetwork;
 
-  // TgNode の gid をキーにして SimNode を入れる配列
+  // TpgNode の gid をキーにして SimNode を入れる配列
   vector<SimNode*> mSimMap;
 
-  // TgNode の gid と入力番号から枝の情報を取り出す配列
+  // TpgNode の gid と入力番号から枝の情報を取り出す配列
   vector<vector<EdgeMap> > mEdgeMap;
 
   // 全ての SimNode を納めた配列

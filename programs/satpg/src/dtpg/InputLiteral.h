@@ -11,16 +11,7 @@
 
 #include "dtpg_nsdef.h"
 #include "ym_logic/Literal.h"
-#if 0
-#include "DtpgNetwork.h"
-#include "DtpgNode.h"
-#include "DtpgPrimitive.h"
-#include "DtpgFFR.h"
-#include "DtpgFault.h"
-#include "DtpgOperator.h"
-#include "ym_logic/SatSolver.h"
-#include "ym_logic/SatStats.h"
-#endif
+
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
 
@@ -80,7 +71,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////
 /// @class GvarInputLiteral InputLiteral.h "InputLiter.h"
-/// @brief DtpgNode->gvar() を用いた InputLiteral
+/// @brief TpgNode->gvar() を用いた InputLiteral
 //////////////////////////////////////////////////////////////////////
 class GvarInputLiteral :
   public InputLiteral
@@ -88,7 +79,7 @@ class GvarInputLiteral :
 public:
 
   /// @brief コンストラクタ
-  GvarInputLiteral(DtpgNode* node);
+  GvarInputLiteral(TpgNode* node);
 
   /// @brief リテラルを返す．
   virtual
@@ -107,14 +98,14 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ノード
-  DtpgNode* mNode;
+  TpgNode* mNode;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
 /// @class FvarInputLiteral InputLiteral.h "InputLiter.h"
-/// @brief DtpgNode->fvar() を用いた InputLiteral
+/// @brief TpgNode->fvar() を用いた InputLiteral
 //////////////////////////////////////////////////////////////////////
 class FvarInputLiteral :
   public InputLiteral
@@ -122,7 +113,7 @@ class FvarInputLiteral :
 public:
 
   /// @brief コンストラクタ
-  FvarInputLiteral(DtpgNode* node);
+  FvarInputLiteral(TpgNode* node);
 
   /// @brief リテラルを返す．
   virtual
@@ -141,14 +132,14 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ノード
-  DtpgNode* mNode;
+  TpgNode* mNode;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
 /// @class PrimGvarInputLiteral InputLiteral.h "InputLiter.h"
-/// @brief DtpgPrimitive->gvar() を用いた InputLiteral
+/// @brief TpgPrimitive->gvar() を用いた InputLiteral
 //////////////////////////////////////////////////////////////////////
 class PrimGvarInputLiteral :
   public InputLiteral
@@ -156,7 +147,7 @@ class PrimGvarInputLiteral :
 public:
 
   /// @brief コンストラクタ
-  PrimGvarInputLiteral(DtpgPrimitive* prim);
+  PrimGvarInputLiteral(TpgPrimitive* prim);
 
   /// @brief リテラルを返す．
   virtual
@@ -175,14 +166,14 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // プリミティブ
-  DtpgPrimitive* mPrim;
+  TpgPrimitive* mPrim;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
 /// @class PrimFvarInputLiteral InputLiteral.h "InputLiter.h"
-/// @brief DtpgPrimitive->fvar() を用いた InputLiteral
+/// @brief TpgPrimitive->fvar() を用いた InputLiteral
 //////////////////////////////////////////////////////////////////////
 class PrimFvarInputLiteral :
   public InputLiteral
@@ -190,7 +181,7 @@ class PrimFvarInputLiteral :
 public:
 
   /// @brief コンストラクタ
-  PrimFvarInputLiteral(DtpgPrimitive* prim);
+  PrimFvarInputLiteral(TpgPrimitive* prim);
 
   /// @brief リテラルを返す．
   virtual
@@ -209,7 +200,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // プリミティブ
-  DtpgPrimitive* mPrim;
+  TpgPrimitive* mPrim;
 
 };
 

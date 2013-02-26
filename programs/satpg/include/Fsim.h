@@ -6,12 +6,11 @@
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "satpg_nsdef.h"
-#include "ym_networks/tgnet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -30,8 +29,7 @@ public:
   /// @brief ネットワークをセットする．
   virtual
   void
-  set_network(const TgNetwork& network,
-	      const vector<SaFault*>& flist) = 0;
+  set_network(const TpgNetwork& network) = 0;
 
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -39,7 +37,7 @@ public:
   virtual
   void
   run(TestVector* tv,
-      vector<SaFault*>& det_faults) = 0;
+      vector<const TpgFault*>& det_faults) = 0;
 
   /// @brief 故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
@@ -47,7 +45,7 @@ public:
   virtual
   void
   run(const vector<TestVector*>& tv_array,
-      vector<vector<SaFault*> >& det_faults) = 0;
+      vector<vector<const TpgFault*> >& det_faults) = 0;
 
   /// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -55,7 +53,7 @@ public:
   virtual
   bool
   run(TestVector* tv,
-      SaFault* f) = 0;
+      const TpgFault* f) = 0;
 
 };
 

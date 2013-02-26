@@ -28,7 +28,7 @@ struct FsimFault
   /// @param[in] inode 入力に対応する SimNode
   /// @note ipos と inode は f が入力の故障の時のみ意味を持つ．
   void
-  set(SaFault* f,
+  set(const TpgFault* f,
       SimNode* node,
       ymuint ipos,
       SimNode* inode)
@@ -40,7 +40,7 @@ struct FsimFault
   }
 
   // 元の故障
-  SaFault* mOrigF;
+  const TpgFault* mOrigF;
 
   // 故障のあるゲート
   SimNode* mNode;

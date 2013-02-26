@@ -8,7 +8,6 @@ SUBDIRS = \
 	fsim3 \
 	fsimx \
 	dtpg \
-	dtpg.old \
 	main \
 	atpg_tclsh \
 	$(YM_EXTRA_SUBDIRS)

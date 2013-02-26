@@ -13,7 +13,6 @@
 #include "SnAnd.h"
 #include "SnOr.h"
 #include "SnXor.h"
-#include "SnCplx.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_FSIM2
@@ -50,7 +49,6 @@ SimNode::new_input(ymuint32 id)
 SimNode*
 SimNode::new_node(ymuint32 id,
 		  tTgGateType type,
-		  const LogExpr& lexp,
 		  const vector<SimNode*>& inputs)
 {
   SimNode* node = NULL;
@@ -114,10 +112,6 @@ SimNode::new_node(ymuint32 id,
     case 2:  node = new SnXnor2(id, inputs); break;
     default: node = new SnXnor(id, inputs);  break;
     }
-    break;
-
-  case kTgGateCplx:
-    node = new SnCplx(id, lexp, inputs);
     break;
 
   default:

@@ -89,8 +89,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 // @param[in] tgnetwork もとのネットワーク
 // @param[in] fault_list 故障リスト
-DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
-			 const vector<SaFault*>& fault_list) :
+DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork) :
   mAlloc(4096)
 {
   //////////////////////////////////////////////////////////////////////
@@ -203,6 +202,7 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
   //////////////////////////////////////////////////////////////////////
   // 故障リストを作る．
   //////////////////////////////////////////////////////////////////////
+#if 0
   ymuint nf = fault_list.size();
   void* p = mAlloc.get_memory(sizeof(DtpgFault) * nf);
   mFaultChunk = new (p) DtpgFault[nf];
@@ -229,6 +229,7 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
       node->mOutputFault[fval] = df;
     }
   }
+#endif
 
   activate_all();
 
@@ -687,20 +688,6 @@ DtpgNetwork::get_mandatory_assignment(DtpgFault* f,
     node->clear_ma_value();
   }
   return false;
-}
-
-// @brief SaFault に対応する DtpgFault を得る．
-DtpgFault*
-DtpgNetwork::conv_fault(SaFault* src_fault)
-{
-  const TgNode* src_node = src_fault->node();
-  DtpgNode* node = mNodeMap[src_node->gid()];
-  if ( src_fault->is_output_fault() ) {
-    return node->output_fault(src_fault->val());
-  }
-  else {
-    return node->input_fault(src_fault->val(), src_fault->pos());
-  }
 }
 
 END_NAMESPACE_YM_SATPG_DTPG

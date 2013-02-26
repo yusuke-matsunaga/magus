@@ -13,8 +13,7 @@
 #include "dtpg_nsdef.h"
 #include "Dtpg.h"
 #include "SatEngine.h"
-#include "DtpgFault.h"
-#include "ym_networks/tgnet.h"
+#include "TpgFault.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
@@ -59,19 +58,17 @@ public:
   set_dry_run(bool flag);
 
   /// @brief 回路と故障リストを設定する．
-  /// @param[in] tgnetwork 対象のネットワーク
-  /// @param[in] fault_list 故障リスト
+  /// @param[in] tpgnetwork 対象のネットワーク
   virtual
   void
-  set_network(const TgNetwork& tgnetwork,
-	      const vector<SaFault*>& fault_list);
+  set_network(TpgNetwork& tgnetwork);
 
   /// @brief モードでテスト生成を行なう．
   /// @param[in] op テスト生成後に呼ばれるファンクター
   /// @param[in] option オプション文字列
   virtual
   void
-  run(DtpgOperator& op,
+  run(TpgOperator& op,
       const string& option = string());
 
   /// @brief 統計情報をクリアする．
@@ -98,60 +95,60 @@ private:
 
   /// @brief single モードの共通処理
   void
-  single_sub(DtpgOperator& op);
+  single_sub(TpgOperator& op);
 
   /// @brief dual モードの共通処理
   void
-  dual_sub(DtpgOperator& op);
+  dual_sub(TpgOperator& op);
 
   /// @brief ffr モードの共通処理
   void
-  ffr_sub(DtpgOperator& op);
+  ffr_sub(TpgOperator& op);
 
   /// @brief mffc モードの共通処理
   void
-  mffc_sub(DtpgOperator& op);
+  mffc_sub(TpgOperator& op);
 
   /// @brief all モードの共通処理
   void
-  all_sub(DtpgOperator& op);
+  all_sub(TpgOperator& op);
 
   /// @brief 一つの故障に対してテストパタン生成を行う．
   /// @param[in] f 故障
   /// @param[in] op テスト生成の結果を処理するファンクター
   void
-  dtpg_single(DtpgFault* f,
-	      DtpgOperator& op);
+  dtpg_single(TpgFault* f,
+	      TpgOperator& op);
 
   /// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
   /// @param[in] f0 0縮退故障
   /// @param[in] f1 1縮退故障
   /// @param[in] op テスト生成の結果を処理するファンクター
   void
-  dtpg_dual(DtpgFault* f0,
-	    DtpgFault* f1,
-	    DtpgOperator& op);
+  dtpg_dual(TpgFault* f0,
+	    TpgFault* f1,
+	    TpgOperator& op);
 
   /// @brief DFS で FFR を求める．
   void
-  dfs_ffr(DtpgNode* node);
+  dfs_ffr(TpgNode* node);
 
   /// @brief DFS で MFFC を求める．
   void
-  dfs_mffc(DtpgNode* node,
+  dfs_mffc(TpgNode* node,
 	   vector<bool>& mark);
 
   /// @brief ノードの故障を追加する．
   void
-  add_node_faults(DtpgNode* node);
+  add_node_faults(TpgNode* node);
 
   /// @brief 故障を追加する．
   void
-  add_fault(DtpgFault* fault);
+  add_fault(TpgFault* fault);
 
   /// @brief テストパタン生成を行なう．
   void
-  do_dtpg(DtpgOperator& op);
+  do_dtpg(TpgOperator& op);
 
 
 private:
@@ -163,13 +160,13 @@ private:
   SatEngine mSatEngine;
 
   // 対象の回路
-  DtpgNetwork* mNetwork;
+  TpgNetwork* mNetwork;
 
   // mNetwork のノード数
   ymuint32 mMaxId;
 
   // 対象の故障リスト
-  vector<DtpgFault*> mFaultList;
+  vector<TpgFault*> mFaultList;
 
 };
 
@@ -181,9 +178,9 @@ private:
 // @brief 故障を追加する．
 inline
 void
-DtpgSat::add_fault(DtpgFault* fault)
+DtpgSat::add_fault(TpgFault* fault)
 {
-  if ( fault != NULL && !fault->is_skip() ) {
+  if ( fault != NULL && fault->status() != kFsSkipped ) {
     mFaultList.push_back(fault);
   }
 }
@@ -191,7 +188,7 @@ DtpgSat::add_fault(DtpgFault* fault)
 // @brief テストパタン生成を行なう．
 inline
 void
-DtpgSat::do_dtpg(DtpgOperator& op)
+DtpgSat::do_dtpg(TpgOperator& op)
 {
   if ( !mFaultList.empty() ) {
     mSatEngine.run(mFaultList, mMaxId, op);

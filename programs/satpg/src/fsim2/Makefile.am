@@ -28,8 +28,6 @@ libatpg_fsim2_la_SOURCES = \
 	SnOr.cc \
 	SnXor.h \
 	SnXor.cc \
-	SnCplx.h \
-	SnCplx.cc \
 	SimFFR.h \
 	EventQ.h \
 	EventQ.cc \
