@@ -22,6 +22,17 @@
 #define VERIFY_MAIMP 0
 
 
+BEGIN_NAMESPACE_YM_SATPG
+
+// @brief SatEngine の継承クラスを生成する．
+SatEngine*
+new_SatEngine()
+{
+  return new nsDtpg::SatEngineImpl();
+}
+
+END_NAMESPACE_YM_SATPG
+
 BEGIN_NAMESPACE_YM_SATPG_DTPG
 
 BEGIN_NONAMESPACE

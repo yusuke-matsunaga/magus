@@ -11,8 +11,6 @@
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
-#include "TpgOperator.h"
-#include "SatEngineImpl.h"
 
 
 #define VERIFY_MAIMP 0
@@ -29,7 +27,7 @@ new_DtpgSat()
 // @brief コンストラクタ
 DtpgSat::DtpgSat()
 {
-  mSatEngine = new nsDtpg::SatEngineImpl();
+  mSatEngine = new_SatEngine();
 
   mNetwork = NULL;
 }
