@@ -180,7 +180,7 @@ inline
 void
 DtpgSat::add_fault(TpgFault* fault)
 {
-  if ( fault != NULL && fault->status() != kFsSkipped ) {
+  if ( fault != NULL && fault->is_rep() && fault->status() != kFsSkipped ) {
     mFaultList.push_back(fault);
   }
 }
