@@ -62,17 +62,9 @@ public:
   /// @param[in] option オプション文字列
   virtual
   void
-  run(TpgOperator& op,
+  run(tDtpgMode mode,
+      TpgOperator& op,
       const string& option = string());
-
-  /// @brief スキップモードを指定する．
-  /// @param[in] threshold しきい値
-  void
-  set_skip(ymuint threshold);
-
-  /// @brief スキップモードをクリアする．
-  void
-  clear_skip();
 
   /// @brief single モードでテスト生成を行なう．
   /// @param[in] op テスト生成後に呼ばれるファンクター
@@ -83,6 +75,11 @@ public:
   /// @param[in] op テスト生成後に呼ばれるファンクター
   void
   dual_mode(TpgOperator& op);
+
+  /// @brief node モードでテスト生成を行なう．
+  /// @param[in] op テスト生成後に呼ばれるファンクター
+  void
+  node_mode(TpgOperator& op);
 
   /// @brief ffr モードでテスト生成を行なう．
   /// @param[in] op テスト生成後に呼ばれるファンクター
@@ -233,7 +230,9 @@ inline
 void
 DtpgSat::add_fault(TpgFault* fault)
 {
-  if ( fault->is_rep() && !fault->is_skip() ) {
+  if ( fault->is_rep() &&
+       fault->status() != kFsDetected &&
+       !fault->is_skip() ) {
     mFaultList.push_back(fault);
   }
 }

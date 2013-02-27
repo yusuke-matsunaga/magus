@@ -1,11 +1,11 @@
-#ifndef OP1_H
-#define OP1_H
+#ifndef NORMALOP_H
+#define NORMALOP_H
 
-/// @file atpg/src/main/Op1.h
-/// @brief Op1 のヘッダファイル
+/// @file NormalOp.h
+/// @brief NormalOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,28 +15,29 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-// DtpgSat 用の DtpgOperator
+/// @class NormalOp NormalOp.h "NormalOp.h"
+/// @brief 通常の TpgOperator
 //////////////////////////////////////////////////////////////////////
-class Op1 :
+class NormalOp :
   public TpgOperator
 {
 public:
 
   /// @brief コンストラクタ
-  Op1(FaultMgr& fault_mgr,
-      TvMgr& tvmgr,
-      vector<TestVector*>& tv_list,
-      Fsim& fsim3,
-      bool drop = false,
-      bool verify = false);
+  NormalOp(FaultMgr& fault_mgr,
+	   TvMgr& tvmgr,
+	   vector<TestVector*>& tv_list,
+	   Fsim& fsim3,
+	   bool drop = false,
+	   bool verify = false);
 
   /// @brief デストラクタ
-  ~Op1();
+  ~NormalOp();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // DtpgOperator の仮想関数
+  // TpgOperator の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テストパタンが見つかった場合に呼ばれる関数
@@ -74,4 +75,4 @@ private:
 
 END_NAMESPACE_YM_SATPG
 
-#endif // OP1_H
+#endif // NORMALOP_H

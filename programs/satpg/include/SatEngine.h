@@ -40,17 +40,6 @@ public:
 	   const string& option = string(),
 	   ostream* outp = NULL) = 0;
 
-  /// @brief skip モードに設定する．
-  /// @param[in] threshold 検出不能故障をスキップするしきい値
-  virtual
-  void
-  set_skip(ymuint32 threshold) = 0;
-
-  /// @brief skip モードを解除する．
-  virtual
-  void
-  clear_skip() = 0;
-
   /// @brief get_pat フラグを設定する．
   virtual
   void

@@ -39,6 +39,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			    "dual mode");
   mPoptDual = new TclPopt(this, "dual",
 			  "dual mode");
+  mPoptNode = new TclPopt(this, "node",
+			  "node mode");
   mPoptFFR = new TclPopt(this, "ffr",
 			  "FFR mode");
   mPoptMFFC = new TclPopt(this, "mffc",
@@ -61,7 +63,7 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			   "enable timer");
 
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptSatRec);
-  new_popt_group(mPoptDual, mPoptFFR, mPoptMFFC, mPoptAll);
+  new_popt_group(mPoptSingle, mPoptDual, mPoptNode, mPoptFFR, mPoptMFFC, mPoptAll);
   new_popt_group(mPoptPo, mPoptRpo);
 }
 
@@ -131,11 +133,26 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   bool print_stats = mPoptPrintStats->is_specified();
 
-  bool single_mode = mPoptSingle->is_specified();
-  bool dual_mode = mPoptDual->is_specified();
-  bool ffr_mode = mPoptFFR->is_specified();
-  bool mffc_mode = mPoptMFFC->is_specified();
-  bool all_mode = mPoptAll->is_specified();
+  tDtpgMode mode = kDtpgSingle;
+  if ( mPoptSingle->is_specified() ) {
+    mode = kDtpgSingle;
+  }
+  else if ( mPoptDual->is_specified() ) {
+    mode = kDtpgDual;
+  }
+  else if ( mPoptNode->is_specified() ) {
+    mode = kDtpgNode;
+  }
+  else if ( mPoptFFR->is_specified() ) {
+    mode = kDtpgFFR;
+  }
+  else if ( mPoptMFFC->is_specified() ) {
+    mode = kDtpgMFFC;
+  }
+  else if ( mPoptAll->is_specified() ) {
+    mode = kDtpgAll;
+  }
+
   bool po_mode = mPoptPo->is_specified();
   bool rpo_mode = mPoptRpo->is_specified();
   bool skip_mode = mPoptSkip->is_specified();
@@ -152,36 +169,15 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   mgr().clear_stats();
 
-  string dtpg_option;
-  if ( ffr_mode ) {
-    dtpg_option = "ffr";
-  }
-  else if ( mffc_mode ) {
-    dtpg_option = "mffc";
-  }
-  else if ( all_mode ) {
-    dtpg_option = "all";
-  }
-  else if ( dual_mode ) {
-    dtpg_option = "dual";
-  }
-  else {
-    single_mode = true;
-  }
-  if ( single_mode ) {
-    dtpg_option = "single";
-  }
+  string dtpg_option = "";
   if ( po_mode ) {
-    dtpg_option += "_po";
+    dtpg_option = "po";
   }
   if ( rpo_mode ) {
-    dtpg_option += "_rpo";
-  }
-  if ( skip_mode ) {
-    dtpg_option += "_skip";
+    dtpg_option = "rpo";
   }
 
-  mgr().dtpg(dtpg_option);
+  mgr().dtpg(mode, skip_mode, dtpg_option);
 
   after_update_faults();
 

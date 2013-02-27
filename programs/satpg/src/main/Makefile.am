@@ -17,6 +17,10 @@ libatpg_main_la_CPPFLAGS = \
 libatpg_main_la_SOURCES = \
 	AtpgMgr.cc \
 	DtpgSat.cc \
+	NormalOp.h \
+	NormalOp.cc \
+	SkipOp.h \
+	SkipOp.cc \
 	Op1.h \
 	Op1.cc
 

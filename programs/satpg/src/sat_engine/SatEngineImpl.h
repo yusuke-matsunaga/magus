@@ -51,17 +51,6 @@ public:
 	   const string& option = string(),
 	   ostream* outp = NULL);
 
-  /// @brief skip モードに設定する．
-  /// @param[in] threshold 検出不能故障をスキップするしきい値
-  virtual
-  void
-  set_skip(ymuint32 threshold);
-
-  /// @brief skip モードを解除する．
-  virtual
-  void
-  clear_skip();
-
   /// @brief get_pat フラグを設定する．
   virtual
   void
@@ -318,18 +307,6 @@ private:
 
   // 正当化されたノードのリスト
   vector<TpgNode*> mJustifiedNodeList;
-
-  // skip フラグ
-  bool mSkip;
-
-  // 検出不能故障をスキップするしきい値
-  ymuint32 mSkipThreshold;
-
-  // 検出不能と判定された故障のリスト
-  vector<TpgFault*> mUntestFaults;
-
-  // skip フラグのついた故障のリスト
-  vector<TpgFault*> mSkippedFaults;
 
   // CNF の生成回数
   ymuint32 mRunCount;

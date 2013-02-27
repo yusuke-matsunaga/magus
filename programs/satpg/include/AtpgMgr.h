@@ -149,7 +149,9 @@ public:
 
   /// @brief テストパタン生成を行なう．
   void
-  dtpg(const string& option);
+  dtpg(tDtpgMode mode,
+       bool skip,
+       const string& option);
 
 
 public:

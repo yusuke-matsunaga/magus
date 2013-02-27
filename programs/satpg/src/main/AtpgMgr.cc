@@ -8,7 +8,9 @@
 
 
 #include "AtpgMgr.h"
-#include "Op1.h"
+#include "NormalOp.h"
+#include "NormalOp.h"
+#include "SkipOp.h"
 #include "TpgNetwork.h"
 #include "TpgFault.h"
 
@@ -257,14 +259,23 @@ AtpgMgr::set_dtpg_timer(bool enable)
 
 // @brief テストパタン生成を行なう．
 void
-AtpgMgr::dtpg(const string& option)
+AtpgMgr::dtpg(tDtpgMode mode,
+	      bool skip,
+	      const string& option)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  Op1 op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
+  if ( skip ) {
+    SkipOp op(mFaultMgr, mTvMgr, mTvList, *mFsim3, 3, mDtpgDrop, mDtpgVerify);
 
-  mDtpg->run(op, option);
+    mDtpg->run(mode, op, option);
+  }
+  else {
+    NormalOp op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
+
+    mDtpg->run(mode, op, option);
+  }
 
   mTimer.change(old_id);
 }

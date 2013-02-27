@@ -462,7 +462,6 @@ END_NONAMESPACE
 SatEngineImpl::SatEngineImpl()
 {
   mGetPatFlag = 0;
-  mSkip = false;
   mTimerEnable = false;
 }
 
@@ -480,34 +479,6 @@ SatEngineImpl::set_mode(const string& type,
   mType = type;
   mOption = option;
   mOutP = outp;
-}
-
-// @brief skip モードに設定する．
-// @param[in] threshold 検出不能故障をスキップするしきい値
-void
-SatEngineImpl::set_skip(ymuint32 threshold)
-{
-  mSkip = true;
-  mSkipThreshold = threshold;
-  mUntestFaults.clear();
-  mSkippedFaults.clear();
-}
-
-// @brief skip モードを解除する．
-void
-SatEngineImpl::clear_skip()
-{
-  mSkip = false;
-  for (vector<TpgFault*>::iterator p = mUntestFaults.begin();
-       p != mUntestFaults.end(); ++ p) {
-    TpgFault* f = *p;
-    f->clear_untest_num();
-  }
-  for (vector<TpgFault*>::iterator p = mSkippedFaults.begin();
-       p != mSkippedFaults.end(); ++ p) {
-    TpgFault* f = *p;
-    f->clear_skip();
-  }
 }
 
 // @brief get_pat フラグを設定する．
@@ -950,9 +921,6 @@ SatEngineImpl::solve(SatSolver& solver,
   if ( ans == kB3True ) {
     // パタンが求まった．
 
-    // 以降の処理ではスキップする．
-    f->set_skip();
-
     if ( mGetPatFlag == 1 ) {
       get_pat(f->node());
     }
@@ -980,25 +948,7 @@ SatEngineImpl::solve(SatSolver& solver,
   }
   else if ( ans == kB3False ) {
     // 検出不能と判定された．
-
-    if ( mSkip ) {
-      if ( f->untest_num() == 0 ) {
-	// はじめて検出不能になった．
-	mUntestFaults.push_back(f);
-      }
-
-      // 検出不能回数を1増やす．
-      f->inc_untest_num();
-
-      if ( f->untest_num() >= mSkipThreshold ) {
-	// 検出不能回数がしきい値を越えたのでスキップする．
-	f->set_skip();
-	mSkippedFaults.push_back(f);
-      }
-    }
-    else {
-      op.set_untestable(f);
-    }
+    op.set_untestable(f);
 
     if ( mTimerEnable ) {
       mTimer.stop();

@@ -1,43 +1,44 @@
-#ifndef OP2_H
-#define OP2_H
+#ifndef SKIPOP_H
+#define SKIPOP_H
 
-/// @file atpg/src/main/Op2.h
-/// @brief Op2 のヘッダファイル
+/// @file SkipOp.h
+/// @brief SkipOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "DtpgOperator.h"
+#include "TpgOperator.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-// DtpgSat 用の DtpgOperator
+/// @class SkipOp SkipOp.h "SkipOp.h"
+/// @brief スキップありの TpgOperator
 //////////////////////////////////////////////////////////////////////
-class Op2 :
-  public DtpgOperator
+class SkipOp :
+  public TpgOperator
 {
 public:
 
   /// @brief コンストラクタ
-  Op2(FaultMgr& fmgr,
-      vector<SaFault*>& skip_faults,
-      TvMgr& tvmgr,
-      vector<TestVector*>& tv_list,
-      Fsim& fsim3,
-      bool drop = false,
-      bool verify = false);
+  SkipOp(FaultMgr& fault_mgr,
+	 TvMgr& tvmgr,
+	 vector<TestVector*>& tv_list,
+	 Fsim& fsim3,
+	 ymuint threshold,
+	 bool drop = false,
+	 bool verify = false);
 
   /// @brief デストラクタ
-  ~Op2();
+  ~SkipOp();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // DtpgOperator の仮想関数
+  // TpgOperator の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テストパタンが見つかった場合に呼ばれる関数
@@ -45,14 +46,14 @@ public:
   /// @param[in] val_list "入力ノードの番号 x 2 + 値" のリスト
   virtual
   void
-  set_detected(SaFault* f,
+  set_detected(TpgFault* f,
 	       const vector<ymuint>& val_list);
 
   /// @brief 検出不能のときに呼ばれる関数
   /// @param[in] f 故障
   virtual
   void
-  set_untestable(SaFault* f);
+  set_untestable(TpgFault* f);
 
 
 private:
@@ -61,8 +62,6 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   FaultMgr& mFaultMgr;
-
-  vector<SaFault*>& mSkipFaults;
 
   TvMgr& mTvMgr;
 
@@ -73,8 +72,15 @@ private:
   bool mDrop;
 
   bool mVerify;
+
+  ymuint mThreshold;
+
+  vector<TpgFault*> mUntestList;
+
+  vector<TpgFault*> mSkipList;
+
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // OP2_H
+#endif // SKIPOP_H

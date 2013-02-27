@@ -1,13 +1,13 @@
 
-/// @file atpg/src/main/Op1.cc
-/// @brief Op1 の実装ファイル
+/// @file NormalOp.cc
+/// @brief NormalOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "Op1.h"
+#include "NormalOp.h"
 #include "TpgFault.h"
 #include "FaultMgr.h"
 #include "TvMgr.h"
@@ -18,16 +18,16 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-// クラス Op1
+// クラス NormalOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-Op1::Op1(FaultMgr& fault_mgr,
-	 TvMgr& tvmgr,
-	 vector<TestVector*>& tv_list,
-	 Fsim& fsim3,
-	 bool drop,
-	 bool verify) :
+NormalOp::NormalOp(FaultMgr& fault_mgr,
+		   TvMgr& tvmgr,
+		   vector<TestVector*>& tv_list,
+		   Fsim& fsim3,
+		   bool drop,
+		   bool verify) :
   mFaultMgr(fault_mgr),
   mTvMgr(tvmgr),
   mTvList(tv_list),
@@ -38,7 +38,7 @@ Op1::Op1(FaultMgr& fault_mgr,
 }
 
 // @brief デストラクタ
-Op1::~Op1()
+NormalOp::~NormalOp()
 {
 }
 
@@ -46,8 +46,8 @@ Op1::~Op1()
 // @param[in] f 故障
 // @param[in] val_list "入力ノードの番号 x 2 + 値" のリスト
 void
-Op1::set_detected(TpgFault* f,
-		  const vector<ymuint>& val_list)
+NormalOp::set_detected(TpgFault* f,
+		       const vector<ymuint>& val_list)
 {
   TestVector* tv = mTvMgr.new_vector();
   tv->init();
@@ -63,6 +63,11 @@ Op1::set_detected(TpgFault* f,
       tv->set_val(iid, kVal0);
     }
   }
+
+  mTvList.push_back(tv);
+
+  mFaultMgr.set_status(f, kFsDetected);
+
   if ( mDrop ) {
     vector<TpgFault*> det_faults;
     mFsim3.run(tv, det_faults);
@@ -76,15 +81,11 @@ Op1::set_detected(TpgFault* f,
     bool detect = mFsim3.run(tv, f);
     assert_cond( detect , __FILE__, __LINE__);
   }
-
-  mTvList.push_back(tv);
-
-  mFaultMgr.set_status(f, kFsDetected);
 }
 
 // @brief 検出不能のときに呼ばれる関数
 void
-Op1::set_untestable(TpgFault* f)
+NormalOp::set_untestable(TpgFault* f)
 {
   mFaultMgr.set_status(f, kFsUntestable);
 }

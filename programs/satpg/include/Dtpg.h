@@ -50,7 +50,8 @@ public:
   /// @param[in] option オプション文字列
   virtual
   void
-  run(TpgOperator& op,
+  run(tDtpgMode mode,
+      TpgOperator& op,
       const string& option = string()) = 0;
 
   /// @brief 統計情報をクリアする．
