@@ -27,12 +27,6 @@ END_NAMESPACE_YM_SATPG
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG
 
-class DtpgSat;
-class DtpgNetwork;
-class DtpgNode;
-class DtpgPrimitive;
-class DtpgFault;
-
 END_NAMESPACE_YM_SATPG_DTPG
 
 #endif // DTPG_NSDEF_H

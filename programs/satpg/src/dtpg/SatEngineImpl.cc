@@ -1,14 +1,14 @@
 
-/// @file atpg/src/dtpg/SatEngine.cc
-/// @brief SatEngine の実装ファイル
+/// @file SatEngineImpl.cc
+/// @brief SatEngineImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SatEngine.h"
-#include "Dtpg.h"
+#include "SatEngineImpl.h"
+
 #include "DtpgStats.h"
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
@@ -448,24 +448,23 @@ END_NONAMESPACE
 
 
 // @brief コンストラクタ
-SatEngine::SatEngine()
+SatEngineImpl::SatEngineImpl()
 {
   mGetPatFlag = 0;
   mSkip = false;
-  mDryRun = false;
   mTimerEnable = false;
 }
 
 // @brief デストラクタ
-SatEngine::~SatEngine()
+SatEngineImpl::~SatEngineImpl()
 {
 }
 
 // @brief 使用する SAT エンジンを指定する．
 void
-SatEngine::set_mode(const string& type,
-		    const string& option,
-		    ostream* outp)
+SatEngineImpl::set_mode(const string& type,
+			const string& option,
+			ostream* outp)
 {
   mType = type;
   mOption = option;
@@ -475,7 +474,7 @@ SatEngine::set_mode(const string& type,
 // @brief skip モードに設定する．
 // @param[in] threshold 検出不能故障をスキップするしきい値
 void
-SatEngine::set_skip(ymuint32 threshold)
+SatEngineImpl::set_skip(ymuint32 threshold)
 {
   mSkip = true;
   mSkipThreshold = threshold;
@@ -485,7 +484,7 @@ SatEngine::set_skip(ymuint32 threshold)
 
 // @brief skip モードを解除する．
 void
-SatEngine::clear_skip()
+SatEngineImpl::clear_skip()
 {
   mSkip = false;
   for (vector<TpgFault*>::iterator p = mUntestFaults.begin();
@@ -502,21 +501,14 @@ SatEngine::clear_skip()
 
 // @brief get_pat フラグを設定する．
 void
-SatEngine::set_get_pat(ymuint val)
+SatEngineImpl::set_get_pat(ymuint val)
 {
   mGetPatFlag = val;
 }
 
-// @brief dry-run フラグを設定する．
-void
-SatEngine::set_dry_run(bool flag)
-{
-  mDryRun = flag;
-}
-
 // @brief 統計情報をクリアする．
 void
-SatEngine::clear_stats()
+SatEngineImpl::clear_stats()
 {
   mRunCount = 0;
   mSatCount = 0;
@@ -543,245 +535,6 @@ SatEngine::clear_stats()
 
 BEGIN_NONAMESPACE
 
-string
-f_str(TpgFault* f)
-{
-  ostringstream buf;
-  buf << "Node#" << f->node()->id() << ": ";
-  if ( f->is_output_fault() ) {
-    buf << "O";
-  }
-  else {
-    buf << "I" << f->pos();
-  }
-  buf << ": SA" << f->val();
-  return buf.str();
-}
-
-struct FaultGroup
-{
-  vector<TpgFault*> mFaultList;
-
-  vector<ymuint32> mMaList;
-
-};
-
-bool
-check_conflict(const vector<ymuint32>& list_a,
-	       const vector<ymuint32>& list_b)
-{
-  if ( list_a.empty() || list_b.empty() ) {
-    return false;
-  }
-
-  vector<ymuint32>::const_iterator p_a = list_a.begin();
-  vector<ymuint32>::const_iterator p_b = list_b.begin();
-  ymuint32 tmp_a = *p_a;
-  ymuint32 tmp_b = *p_b;
-  ymuint idx_a = tmp_a / 2;
-  ymuint idx_b = tmp_b / 2;
-  for ( ; ; ) {
-    if ( idx_a < idx_b ) {
-      ++ p_a;
-      if ( p_a == list_a.end() ) {
-	return false;
-      }
-      tmp_a = *p_a;
-      idx_a = tmp_a / 2;
-    }
-    else if ( idx_a > idx_b ) {
-      ++ p_b;
-      if ( p_b == list_b.end() ) {
-	return false;
-      }
-      tmp_b = *p_b;
-      idx_b = tmp_b / 2;
-    }
-    else {
-      if ( tmp_a != tmp_b ) {
-	// インデックスが同じで極性が異なっていた．
-	return true;
-      }
-      ++ p_a;
-      if ( p_a == list_a.end() ) {
-	return false;
-      }
-      tmp_a = *p_a;
-      idx_a = tmp_a / 2;
-
-	++ p_b;
-      if ( p_b == list_b.end() ) {
-	return false;
-      }
-      tmp_b = *p_b;
-      idx_b = tmp_b / 2;
-    }
-  }
-}
-
-void
-merge(vector<ymuint32>& list_a,
-      const vector<ymuint32>& list_b)
-{
-  if ( list_a.empty() ) {
-    list_a = list_b;
-    return;
-  }
-  if ( list_b.empty() ) {
-    return;
-  }
-
-  vector<ymuint32> dst_list;
-
-  vector<ymuint32>::const_iterator p_a = list_a.begin();
-  vector<ymuint32>::const_iterator p_b = list_b.begin();
-  ymuint32 tmp_a = *p_a;
-  ymuint32 tmp_b = *p_b;
-  ymuint idx_a = tmp_a / 2;
-  ymuint idx_b = tmp_b / 2;
-  for ( ; ; ) {
-    if ( idx_a < idx_b ) {
-      dst_list.push_back(tmp_a);
-      ++ p_a;
-      if ( p_a == list_a.end() ) {
-	break;
-      }
-      tmp_a = *p_a;
-      idx_a = tmp_a / 2;
-    }
-    else if ( idx_a > idx_b ) {
-      dst_list.push_back(tmp_b);
-      ++ p_b;
-      if ( p_b == list_b.end() ) {
-	break;
-      }
-      tmp_b = *p_b;
-      idx_b = tmp_b / 2;
-    }
-    else {
-      assert_cond( tmp_a == tmp_b, __FILE__, __LINE__);
-      dst_list.push_back(tmp_a);
-
-      ++ p_a;
-      if ( p_a == list_a.end() ) {
-	break;
-      }
-      tmp_a = *p_a;
-      idx_a = tmp_a / 2;
-
-      ++ p_b;
-      if ( p_b == list_b.end() ) {
-	break;
-      }
-      tmp_b = *p_b;
-      idx_b = tmp_b / 2;
-    }
-  }
-  for ( ; p_a != list_a.end(); ++ p_a) {
-    dst_list.push_back(*p_a);
-  }
-  for ( ; p_b != list_b.end(); ++ p_b) {
-    dst_list.push_back(*p_b);
-  }
-
-  list_a = dst_list;
-}
-
-END_NONAMESPACE
-
-#if 0
-// @brief 必要割り当ての情報に基づいて故障をグループ分けする．
-// @note 内部で dtpg_ffr() を呼ぶ．
-void
-SatEngine::dtpg_ffr2(const vector<TpgFault*>& flist,
-		     TpgNode* root,
-		     const vector<TpgNode*>& node_list,
-		     TpgOperator& op)
-{
-#if VERIFY_MAIMP
-  // 必要割り当てで冗長と判定された故障のリストを作る．
-  vector<TpgFault*> r_list;
-  for (vector<TpgFault*>::const_iterator p = flist.begin();
-       p != flist.end(); ++ p) {
-    TpgFault* f = *p;
-    bool stat = get_mandatory_assignment(f, f->ma_list());
-    if ( !stat ) {
-      r_list.push_back(f);
-    }
-  }
-
-  dtpg_ffr(flist, root, node_list, op);
-
-  // SAT でも冗長と判定されたかチェックする．
-  for (vector<TpgFault*>::iterator p = r_list.begin();
-       p != r_list.end(); ++ p) {
-    TpgFault* f = *p;
-    if ( !f->is_untestable() ) {
-      cout << "Error! " << f_str(f)
-	   << " is not redundant" << endl;
-    }
-    assert_cond( f->is_untestable(), __FILE__, __LINE__);
-  }
-
-#else
-
-  // 必要割り当てに基づいて故障をグループ分けする．
-  vector<FaultGroup> fault_group;
-  for (vector<TpgFault*>::const_iterator p = flist.begin();
-       p != flist.end(); ++ p) {
-    TpgFault* f = *p;
-    bool stat = get_mandatory_assignment(f, f->ma_list());
-    if ( stat ) {
-      ymuint n = fault_group.size();
-      bool found = false;
-      for (ymuint i = 0; i < n; ++ i) {
-	FaultGroup& fg = fault_group[i];
-	if ( !check_conflict(fg.mMaList, f->ma_list()) ) {
-	  fg.mFaultList.push_back(f);
-	  merge(fg.mMaList, f->ma_list());
-	  found = true;
-	  break;
-	}
-      }
-      if ( !found ) {
-	fault_group.push_back(FaultGroup());
-	FaultGroup& fg = fault_group.back();
-	fg.mFaultList.push_back(f);
-	fg.mMaList = f->ma_list();
-      }
-    }
-    else {
-      // ここで冗長とわかったら以下の処理は必要ない．
-      f->set_untestable();
-      if ( mSkip ) {
-	f->set_skip();
-	mSkippedFaults.push_back(f);
-      }
-      else {
-	op.set_untestable(f->safault());
-      }
-    }
-  }
-
-  if ( fault_group.empty() ) {
-    return;
-  }
-
-#if 0
-  for (vector<FaultGroup>::iterator p = fault_group.begin();
-       p != fault_group.end(); ++ p) {
-    FaultGroup& fg = *p;
-    dtpg_ffr(fg.mFaultList, root, node_list, op);
-  }
-#else
-  dtpg_ffr(flist, root, node_list, op);
-#endif
-#endif
-}
-#endif
-
-BEGIN_NONAMESPACE
-
 // f が対象の故障の場合 true を返す．
 inline
 bool
@@ -805,9 +558,9 @@ END_NONAMESPACE
 // @param[in] max_id ノード番号の最大値 + 1
 // @param[in] op テスト生成の結果を処理するファンクター
 void
-SatEngine::run(const vector<TpgFault*>& flist,
-	       ymuint max_id,
-	       TpgOperator& op)
+SatEngineImpl::run(const vector<TpgFault*>& flist,
+		   ymuint max_id,
+		   TpgOperator& op)
 {
   if ( mTimerEnable ) {
     mTimer.reset();
@@ -948,6 +701,7 @@ SatEngine::run(const vector<TpgFault*>& flist,
   //////////////////////////////////////////////////////////////////////
   // 故障回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
+  vector<Literal> dep;
   for (ymuint i = 0; i < mTfoList.size(); ++ i) {
     TpgNode* node = mTfoList[i];
 
@@ -1048,7 +802,7 @@ SatEngine::run(const vector<TpgFault*>& flist,
       // - 入力の dlit のいずれかが 1
       // - 入力のいずれかに故障がある．
       // - 出力に故障がある．
-      vector<Literal> dep;
+      dep.clear();
       dep.reserve(ni * 3 + 3);
       Literal dlit(node->dvar(), kPolNega);
       dep.push_back(dlit);
@@ -1172,15 +926,10 @@ SatEngine::run(const vector<TpgFault*>& flist,
 
 // @brief 一つの SAT問題を解く．
 void
-SatEngine::solve(SatSolver& solver,
-		 TpgFault* f,
-		 TpgOperator& op)
+SatEngineImpl::solve(SatSolver& solver,
+		     TpgFault* f,
+		     TpgOperator& op)
 {
-  if ( mDryRun ) {
-    f->set_skip();
-    return;
-  }
-
   if ( mTimerEnable ) {
     mTimer.reset();
     mTimer.start();
@@ -1258,7 +1007,7 @@ SatEngine::solve(SatSolver& solver,
 // @brief テストパタンを求める．
 // @note 結果は mValList に格納される．
 void
-SatEngine::get_pat(TpgNode* fnode)
+SatEngineImpl::get_pat(TpgNode* fnode)
 {
   mValList.clear();
   mJustifiedNodeList.clear();
@@ -1286,7 +1035,7 @@ SatEngine::get_pat(TpgNode* fnode)
 // @brief テストパタンを求める．
 // @note 結果は mValList に格納される．
 void
-SatEngine::get_pat2(TpgNode* fnode)
+SatEngineImpl::get_pat2(TpgNode* fnode)
 {
 #if 0
   mValList.clear();
@@ -1331,7 +1080,7 @@ SatEngine::get_pat2(TpgNode* fnode)
 // @note 正当化に用いられているノードには mJustifiedMark がつく．
 // @note mJustifiedMmark がついたノードは mJustifiedNodeList に格納される．
 void
-SatEngine::justify(TpgNode* node)
+SatEngineImpl::justify(TpgNode* node)
 {
   if ( justified_mark(node) ) {
     return;
@@ -1428,7 +1177,7 @@ SatEngine::justify(TpgNode* node)
 // @brief すべてのファンインに対して justify() を呼ぶ．
 // @param[in] node 対象のノード
 void
-SatEngine::just_sub1(TpgNode* node)
+SatEngineImpl::just_sub1(TpgNode* node)
 {
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -1441,8 +1190,8 @@ SatEngine::just_sub1(TpgNode* node)
 // @param[in] node 対象のノード
 // @param[in] val 値
 void
-SatEngine::just_sub2(TpgNode* node,
-		     Bool3 val)
+SatEngineImpl::just_sub2(TpgNode* node,
+			 Bool3 val)
 {
   bool gfound = false;
   bool ffound = false;
@@ -1473,8 +1222,8 @@ SatEngine::just_sub2(TpgNode* node,
 // @param[in] node 対象のノード
 // @note node の値割り当てを正当化する．
 void
-SatEngine::justify_primitive(TpgPrimitive* prim,
-			     TpgNode* node)
+SatEngineImpl::justify_primitive(TpgPrimitive* prim,
+				 TpgNode* node)
 {
   if ( prim->is_input() ) {
     ymuint ipos = prim->input_id();
@@ -1558,8 +1307,8 @@ SatEngine::justify_primitive(TpgPrimitive* prim,
 // @param[in] prim 対象のプリミティブ
 // @param[in] node 対象のノード
 void
-SatEngine::jp_sub1(TpgPrimitive* prim,
-		   TpgNode* node)
+SatEngineImpl::jp_sub1(TpgPrimitive* prim,
+		       TpgNode* node)
 {
   ymuint ni = prim->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -1573,9 +1322,9 @@ SatEngine::jp_sub1(TpgPrimitive* prim,
 // @param[in] node 対象のノード
 // @param[in] val 値
 void
-SatEngine::jp_sub2(TpgPrimitive* prim,
-		   TpgNode* node,
-		   Bool3 val)
+SatEngineImpl::jp_sub2(TpgPrimitive* prim,
+		       TpgNode* node,
+		       Bool3 val)
 {
   bool gfound = false;
   bool ffound = false;
@@ -1606,7 +1355,7 @@ SatEngine::jp_sub2(TpgPrimitive* prim,
 // @note node の値を mValList に記録する．
 // @note 単純だが mModel 上のインデックスと mValList の符号化は異なる．
 void
-SatEngine::record_value(TpgNode* node)
+SatEngineImpl::record_value(TpgNode* node)
 {
   assert_cond( node->is_input(), __FILE__, __LINE__);
 
@@ -1624,7 +1373,7 @@ SatEngine::record_value(TpgNode* node)
 
 // @brief ノードの変数割り当てフラグを消す．
 void
-SatEngine::clear_node_mark()
+SatEngineImpl::clear_node_mark()
 {
   for (vector<TpgNode*>::iterator p = mUsedNodeList.begin();
        p != mUsedNodeList.end(); ++ p) {
@@ -1637,7 +1386,7 @@ SatEngine::clear_node_mark()
 // @brief 統計情報を得る．
 // @param[in] stats 結果を格納する構造体
 void
-SatEngine::get_stats(DtpgStats& stats) const
+SatEngineImpl::get_stats(DtpgStats& stats) const
 {
   stats.mCnfGenCount = mCnfCount;
   stats.mCnfGenTime = mCnfTime;
@@ -1665,15 +1414,15 @@ SatEngine::get_stats(DtpgStats& stats) const
 
 // @breif 時間計測を制御する．
 void
-SatEngine::timer_enable(bool enable)
+SatEngineImpl::timer_enable(bool enable)
 {
   mTimerEnable = enable;
 }
 
 // @brief 統計情報を得る．
 void
-SatEngine::update_stats(SatSolver& solver,
-			ymuint n)
+SatEngineImpl::update_stats(SatSolver& solver,
+			    ymuint n)
 {
   SatStats sat_stat;
   solver.get_stats(sat_stat);

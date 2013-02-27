@@ -15,12 +15,11 @@ libatpg_dtpg_la_CPPFLAGS = \
 
 libatpg_dtpg_la_SOURCES = \
 	dtpg_nsdef.h \
-	DtpgSat.h \
 	DtpgSat.cc \
 	InputLiteral.h \
 	InputLiteral.cc \
-	SatEngine.h \
-	SatEngine.cc
+	SatEngineImpl.h \
+	SatEngineImpl.cc
 
 libatpg_dtpg_la_LIBADD =
 

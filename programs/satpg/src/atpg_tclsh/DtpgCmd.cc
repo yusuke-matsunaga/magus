@@ -53,8 +53,6 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			  "skip mode");
   mPoptX = new TclPoptInt(this, "x",
 			  "X-extract mode [0-1]");
-  mPoptDryRun = new TclPopt(this, "dry",
-			    "dry run mode");
   mPoptDrop = new TclPopt(this, "drop",
 			  "with fault drop");
   mPoptVerify = new TclPopt(this, "verify",
@@ -144,10 +142,6 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   if ( mPoptX->is_specified() ) {
     mgr().set_dtpg_xmode(mPoptX->val());
-  }
-
-  if ( mPoptDryRun->is_specified() ) {
-    mgr().set_dtpg_dry_run(true);
   }
 
   mgr().set_dtpg_drop_mode(mPoptDrop->is_specified());

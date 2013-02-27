@@ -10,12 +10,14 @@ noinst_HEADERS = \
 	satpg_nsdef.h \
 	AtpgMgr.h \
 	Dtpg.h \
+	DtpgSat.h \
 	DtpgStats.h \
 	FaultMgr.h \
 	FaultStatus.h \
 	PackedVal.h \
 	PackedVal3.h \
 	Rtpg.h \
+	SatEngine.h \
 	TpgFault.h \
 	TpgNetwork.h \
 	TpgNode.h \

@@ -10,13 +10,12 @@
 /// All rights reserved.
 
 
-#include "dtpg_nsdef.h"
 #include "Dtpg.h"
-#include "SatEngine.h"
 #include "TpgFault.h"
+#include "SatEngine.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_DTPG
+BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
 /// @class DtpgSat DtpgSat.h "DtpgSat.h"
@@ -52,11 +51,6 @@ public:
   void
   set_get_pat(ymuint val);
 
-  /// @brief dry-run フラグを設定する．
-  virtual
-  void
-  set_dry_run(bool flag);
-
   /// @brief 回路と故障リストを設定する．
   /// @param[in] tpgnetwork 対象のネットワーク
   virtual
@@ -70,6 +64,40 @@ public:
   void
   run(TpgOperator& op,
       const string& option = string());
+
+  /// @brief スキップモードを指定する．
+  /// @param[in] threshold しきい値
+  void
+  set_skip(ymuint threshold);
+
+  /// @brief スキップモードをクリアする．
+  void
+  clear_skip();
+
+  /// @brief single モードでテスト生成を行なう．
+  /// @param[in] op テスト生成後に呼ばれるファンクター
+  void
+  single_mode(TpgOperator& op);
+
+  /// @brief dual モードでテスト生成を行なう．
+  /// @param[in] op テスト生成後に呼ばれるファンクター
+  void
+  dual_mode(TpgOperator& op);
+
+  /// @brief ffr モードでテスト生成を行なう．
+  /// @param[in] op テスト生成後に呼ばれるファンクター
+  void
+  ffr_mode(TpgOperator& op);
+
+  /// @brief mffc モードでテスト生成を行なう．
+  /// @param[in] op テスト生成後に呼ばれるファンクター
+  void
+  mffc_mode(TpgOperator& op);
+
+  /// @brief all モードでテスト生成を行なう．
+  /// @param[in] op テスト生成後に呼ばれるファンクター
+  void
+  all_mode(TpgOperator& op);
 
   /// @brief 統計情報をクリアする．
   virtual
@@ -157,7 +185,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // SAT エンジン
-  SatEngine mSatEngine;
+  SatEngine* mSatEngine;
 
   // 対象の回路
   TpgNetwork* mNetwork;
@@ -165,7 +193,7 @@ private:
   // mNetwork のノード数
   ymuint32 mMaxId;
 
-  // 対象の故障リスト
+  // do_dtpg() で用いる対象の故障リスト
   vector<TpgFault*> mFaultList;
 
 };
@@ -174,6 +202,31 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief 統計情報をクリアする．
+inline
+void
+DtpgSat::clear_stats()
+{
+  mSatEngine->clear_stats();
+}
+
+// @brief 統計情報を得る．
+// @param[in] stats 結果を格納する構造体
+inline
+void
+DtpgSat::get_stats(DtpgStats& stats) const
+{
+  mSatEngine->get_stats(stats);
+}
+
+// @breif 時間計測を制御する．
+inline
+void
+DtpgSat::timer_enable(bool enable)
+{
+  mSatEngine->timer_enable(enable);
+}
 
 // @brief 故障を追加する．
 inline
@@ -191,10 +244,10 @@ void
 DtpgSat::do_dtpg(TpgOperator& op)
 {
   if ( !mFaultList.empty() ) {
-    mSatEngine.run(mFaultList, mMaxId, op);
+    mSatEngine->run(mFaultList, mMaxId, op);
   }
 }
 
-END_NAMESPACE_YM_SATPG_DTPG
+END_NAMESPACE_YM_SATPG
 
 #endif // DTPGSAT_H

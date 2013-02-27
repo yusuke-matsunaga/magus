@@ -1,30 +1,36 @@
-#ifndef DTPG_H
-#define DTPG_H
+#ifndef SATENGINE_H
+#define SATENGINE_H
 
-/// @file Dtpg.h
-/// @brief Dtpg のヘッダファイル
+/// @file SatEngine.h
+/// @brief SatEngine のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "satpg_nsdef.h"
-#include "ym_networks/tgnet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class Dtpg Dtpg.h "Dtpg.h"
-/// @brief DTPG を行う基底クラス
+/// @class SatEngine SatEngine.h "SatEngine.h"
+/// @brief SAT を用いたパタン生成器
 //////////////////////////////////////////////////////////////////////
-class Dtpg
+class SatEngine
 {
 public:
+
+  /// @brief デストラクタ
+  virtual
+  ~SatEngine() { }
+
+
+public:
   //////////////////////////////////////////////////////////////////////
-  // パタン生成を行う関数
+  // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 使用する SAT エンジンを指定する．
@@ -34,24 +40,31 @@ public:
 	   const string& option = string(),
 	   ostream* outp = NULL) = 0;
 
+  /// @brief skip モードに設定する．
+  /// @param[in] threshold 検出不能故障をスキップするしきい値
+  virtual
+  void
+  set_skip(ymuint32 threshold) = 0;
+
+  /// @brief skip モードを解除する．
+  virtual
+  void
+  clear_skip() = 0;
+
   /// @brief get_pat フラグを設定する．
   virtual
   void
   set_get_pat(ymuint val) = 0;
 
-  /// @brief 回路と故障リストを設定する．
-  /// @param[in] tpgnetwork 対象のネットワーク
-  virtual
-  void
-  set_network(TpgNetwork& tgnetwork) = 0;
-
-  /// @brief モードでテスト生成を行なう．
+  /// @brief テスト生成を行なう．
+  /// @param[in] flist 対象の故障リスト
+  /// @param[in] max_id ノード番号の最大値 + 1
   /// @param[in] op テスト生成後に呼ばれるファンクター
-  /// @param[in] option オプション文字列
   virtual
   void
-  run(TpgOperator& op,
-      const string& option = string()) = 0;
+  run(const vector<TpgFault*>& flist,
+      ymuint max_id,
+      TpgOperator& op) = 0;
 
   /// @brief 統計情報をクリアする．
   virtual
@@ -71,17 +84,6 @@ public:
 
 };
 
-
-/// @brief DtpgSat のインスタンスを生成する．
-extern
-Dtpg*
-new_DtpgSat();
-
-/// @brief DtpgSatOld のインスタンスを生成する．
-extern
-Dtpg*
-new_DtpgSatOld();
-
 END_NAMESPACE_YM_SATPG
 
-#endif // DTPG_H
+#endif // SATENGINE_H

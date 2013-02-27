@@ -135,10 +135,6 @@ public:
   void
   set_dtpg_xmode(ymuint val);
 
-  /// @brief dry-run フラグを設定する．
-  void
-  set_dtpg_dry_run(bool flag);
-
   /// @brief テストパタン生成時に故障ドロップを行なうかを指定する．
   void
   set_dtpg_drop_mode(bool drop);

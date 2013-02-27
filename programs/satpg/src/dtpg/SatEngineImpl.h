@@ -1,5 +1,5 @@
-#ifndef SATENGINE_H
-#define SATENGINE_H
+#ifndef SATENGINEIMPL_H
+#define SATENGINEIMPL_H
 
 /// @file SatEngine.h
 /// @brief SatEngine のヘッダファイル
@@ -10,8 +10,8 @@
 /// All rights reserved.
 
 
+#include "SatEngine.h"
 #include "dtpg_nsdef.h"
-
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
 #include "ym_logic/Literal.h"
@@ -23,19 +23,20 @@
 BEGIN_NAMESPACE_YM_SATPG_DTPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngine SatEngine.h "SatEngine.h"
-/// @brief SAT を用いたパタン生成器
+/// @class SatEngineImpl SatEngineImpl.h "SatEngineImpl.h"
+/// @brief SatEngine の実装クラス
 //////////////////////////////////////////////////////////////////////
-class SatEngine
+class SatEngineImpl :
+  public SatEngine
 {
 public:
 
   /// @brief コンストラクタ
-  SatEngine();
+  SatEngineImpl();
 
   /// @brief デストラクタ
   virtual
-  ~SatEngine();
+  ~SatEngineImpl();
 
 
 public:
@@ -44,6 +45,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 使用する SAT エンジンを指定する．
+  virtual
   void
   set_mode(const string& type = string(),
 	   const string& option = string(),
@@ -51,40 +53,43 @@ public:
 
   /// @brief skip モードに設定する．
   /// @param[in] threshold 検出不能故障をスキップするしきい値
+  virtual
   void
   set_skip(ymuint32 threshold);
 
   /// @brief skip モードを解除する．
+  virtual
   void
   clear_skip();
 
   /// @brief get_pat フラグを設定する．
+  virtual
   void
   set_get_pat(ymuint val);
-
-  /// @brief dry-run フラグを設定する．
-  void
-  set_dry_run(bool flag);
 
   /// @brief テスト生成を行なう．
   /// @param[in] flist 対象の故障リスト
   /// @param[in] max_id ノード番号の最大値 + 1
   /// @param[in] op テスト生成後に呼ばれるファンクター
+  virtual
   void
   run(const vector<TpgFault*>& flist,
       ymuint max_id,
       TpgOperator& op);
 
   /// @brief 統計情報をクリアする．
+  virtual
   void
   clear_stats();
 
   /// @brief 統計情報を得る．
   /// @param[in] stats 結果を格納する構造体
+  virtual
   void
   get_stats(DtpgStats& stats) const;
 
   /// @breif 時間計測を制御する．
+  virtual
   void
   timer_enable(bool enable);
 
@@ -326,9 +331,6 @@ private:
   // skip フラグのついた故障のリスト
   vector<TpgFault*> mSkippedFaults;
 
-  // dry-run フラグ
-  bool mDryRun;
-
   // CNF の生成回数
   ymuint32 mRunCount;
 
@@ -402,7 +404,7 @@ private:
 // tfo マークをつける．
 inline
 void
-SatEngine::set_tfo_mark(TpgNode* node)
+SatEngineImpl::set_tfo_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 1U;
 }
@@ -410,7 +412,7 @@ SatEngine::set_tfo_mark(TpgNode* node)
 // @brief tfo マークを読む．
 inline
 bool
-SatEngine::tfo_mark(TpgNode* node)
+SatEngineImpl::tfo_mark(TpgNode* node)
 {
   return static_cast<bool>((mMarkArray[node->id()] >> 0) & 1U);
 }
@@ -418,7 +420,7 @@ SatEngine::tfo_mark(TpgNode* node)
 // tfi マークをつける．
 inline
 void
-SatEngine::set_tfi_mark(TpgNode* node)
+SatEngineImpl::set_tfi_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 2U;
 }
@@ -426,7 +428,7 @@ SatEngine::set_tfi_mark(TpgNode* node)
 // @brief tfi マークを読む．
 inline
 bool
-SatEngine::tfi_mark(TpgNode* node)
+SatEngineImpl::tfi_mark(TpgNode* node)
 {
   return static_cast<bool>((mMarkArray[node->id()] >> 1) & 1U);
 }
@@ -434,7 +436,7 @@ SatEngine::tfi_mark(TpgNode* node)
 // @brief tmp マークをつける．
 inline
 void
-SatEngine::set_tmp_mark(TpgNode* node)
+SatEngineImpl::set_tmp_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 4U;
 }
@@ -442,7 +444,7 @@ SatEngine::set_tmp_mark(TpgNode* node)
 // @brief tmp マークを消す．
 inline
 void
-SatEngine::clear_tmp_mark(TpgNode* node)
+SatEngineImpl::clear_tmp_mark(TpgNode* node)
 {
   mMarkArray[node->id()] &= ~4U;
 }
@@ -450,7 +452,7 @@ SatEngine::clear_tmp_mark(TpgNode* node)
 // @brief tmp マークを読む．
 inline
 bool
-SatEngine::tmp_mark(TpgNode* node)
+SatEngineImpl::tmp_mark(TpgNode* node)
 {
   return static_cast<bool>((mMarkArray[node->id()] >> 2) & 1U);
 }
@@ -458,7 +460,7 @@ SatEngine::tmp_mark(TpgNode* node)
 // justified マークをつける．
 inline
 void
-SatEngine::set_justified_mark(TpgNode* node)
+SatEngineImpl::set_justified_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 8U;
 }
@@ -466,7 +468,7 @@ SatEngine::set_justified_mark(TpgNode* node)
 // justified マークを消す．
 inline
 void
-SatEngine::clear_justified_mark(TpgNode* node)
+SatEngineImpl::clear_justified_mark(TpgNode* node)
 {
   mMarkArray[node->id()] &= ~8U;
 }
@@ -474,7 +476,7 @@ SatEngine::clear_justified_mark(TpgNode* node)
 // @brief justified マークを読む．
 inline
 bool
-SatEngine::justified_mark(TpgNode* node)
+SatEngineImpl::justified_mark(TpgNode* node)
 {
   return static_cast<bool>((mMarkArray[node->id()] >> 3) & 1U);
 }
@@ -483,7 +485,7 @@ SatEngine::justified_mark(TpgNode* node)
 // @note mModel の値を読む．
 inline
 Bool3
-SatEngine::node_gval(TpgNode* node)
+SatEngineImpl::node_gval(TpgNode* node)
 {
   return mModel[node->gvar().val()];
 }
@@ -492,7 +494,7 @@ SatEngine::node_gval(TpgNode* node)
 // @note mModel の値を読む．
 inline
 Bool3
-SatEngine::node_fval(TpgNode* node)
+SatEngineImpl::node_fval(TpgNode* node)
 {
   return mModel[node->fvar().val()];
 }
@@ -501,7 +503,7 @@ SatEngine::node_fval(TpgNode* node)
 // @note mModel の値を読む．
 inline
 Bool3
-SatEngine::primitive_gval(TpgPrimitive* prim)
+SatEngineImpl::primitive_gval(TpgPrimitive* prim)
 {
   Literal lit = prim->glit();
   Bool3 val = mModel[lit.varid().val()];
@@ -515,7 +517,7 @@ SatEngine::primitive_gval(TpgPrimitive* prim)
 // @note mModel の値を読む．
 inline
 Bool3
-SatEngine::primitive_fval(TpgPrimitive* prim)
+SatEngineImpl::primitive_fval(TpgPrimitive* prim)
 {
   Literal lit = prim->flit();
   Bool3 val = mModel[lit.varid().val()];
@@ -527,4 +529,4 @@ SatEngine::primitive_fval(TpgPrimitive* prim)
 
 END_NAMESPACE_YM_SATPG_DTPG
 
-#endif // SATENGINE_H
+#endif // SATENGINEIMPL_H
