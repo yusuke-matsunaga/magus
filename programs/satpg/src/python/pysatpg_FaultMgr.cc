@@ -75,12 +75,12 @@ FaultMgr_init(FaultMgrObject* self,
 
 // 故障に対応する Python オブジェクトを得る．
 PyObject*
-fobject(SaFault* f,
+fobject(TpgFault* f,
 	hash_map<ymuint, PyObject*>& fmap)
 {
   hash_map<ymuint, PyObject*>::iterator p = fmap.find(f->id());
   if ( p == fmap.end() ) {
-    PyObject* obj = PySaFault_FromSaFault(f);
+    PyObject* obj = PyTpgFault_FromTpgFault(f);
     fmap.insert(make_pair(f->id(), obj));
     return obj;
   }
@@ -91,13 +91,13 @@ fobject(SaFault* f,
 
 // 故障のリストを表す Python オブジェクトを得る．
 PyObject*
-flist(const vector<SaFault*>& fault_list,
+flist(const vector<TpgFault*>& fault_list,
       hash_map<ymuint, PyObject*>& fmap)
 {
   ymuint n = fault_list.size();
   PyObject* list_obj = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
-    SaFault* f = fault_list[i];
+    TpgFault* f = fault_list[i];
     PyObject* obj1 = fobject(f, fmap);
     PyList_SetItem(list_obj, i, obj1);
   }
@@ -109,7 +109,15 @@ PyObject*
 FaultMgr_all_list(FaultMgrObject* self,
 		  PyObject* args)
 {
-  return flist(self->mPtr->all_list(), *self->mFaultMap);
+  FaultMgr* fmgr = self->mPtr;
+  ymuint n = fmgr->all_num();
+  PyObject* list_obj = PyList_New(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    TpgFault* f = fmgr->fault(i);
+    PyObject* obj1 = fobject(f, *self->mFaultMap);
+    PyList_SetItem(list_obj, i, obj1);
+  }
+  return list_obj;
 }
 
 // 全ての代表故障のリストを得る．
@@ -117,7 +125,15 @@ PyObject*
 FaultMgr_rep_list(FaultMgrObject* self,
 		  PyObject* args)
 {
-  return flist(self->mPtr->all_rep_list(), *self->mFaultMap);
+  FaultMgr* fmgr = self->mPtr;
+  ymuint n = fmgr->rep_num();
+  PyObject* list_obj = PyList_New(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    TpgFault* f = fmgr->rep_fault(i);
+    PyObject* obj1 = fobject(f, *self->mFaultMap);
+    PyList_SetItem(list_obj, i, obj1);
+  }
+  return list_obj;
 }
 
 // 検出済みの代表故障のリストを得る．

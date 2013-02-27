@@ -16,18 +16,18 @@ pysatpg_CPPFLAGS = \
 pysatpg_SOURCES = \
 	pysatpg.cc \
 	pysatpg_Val3.cc \
+	pysatpg_FaultMgr.cc \
 	pysatpg_FaultStatus.cc \
 	pysatpg_TpgFault.cc \
 	pysatpg_TestVector.cc \
 	pysatpg_TvMgr.cc
 
-#	pysatpg_FaultMgr.cc
 
 pysatpg_LDFLAGS = \
 	$(PYTHON_LDFLAGS)
 
 pysatpg_LDADD = \
-	$(top_builddir)/src/dtpg/libatpg_dtpg.la \
+	$(top_builddir)/src/sat_engine/libatpg_sat_engine.la \
 	$(top_builddir)/src/fsim2/libatpg_fsim2.la \
 	$(top_builddir)/src/fsim3/libatpg_fsim3.la \
 	$(top_builddir)/src/fsimx/libatpg_fsimx.la \
