@@ -1190,10 +1190,8 @@ SatEngine::solve(SatSolver& solver,
   if ( ans == kB3True ) {
     // パタンが求まった．
 
-    if ( mSkip ) {
-      // 以降の処理ではスキップする．
-      f->set_skip();
-    }
+    // 以降の処理ではスキップする．
+    f->set_skip();
 
     if ( mGetPatFlag == 1 ) {
       get_pat(f->node());
