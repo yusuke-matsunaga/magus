@@ -1,5 +1,5 @@
 
-/// @file atpg/src/dtpg/InputLiteral.cc
+/// @file InputLiteral.cc
 /// @brief InputLiteral の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "TpgPrimitive.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_DTPG
+BEGIN_NAMESPACE_YM_SATPG_SAT_ENGINE
 
 //////////////////////////////////////////////////////////////////////
 // クラス VectorInputLiteral
@@ -142,4 +142,4 @@ PrimFvarInputLiteral::size() const
   return mPrim->fanin_num();
 }
 
-END_NAMESPACE_YM_SATPG_DTPG
+END_NAMESPACE_YM_SATPG_SAT_ENGINE

@@ -28,12 +28,12 @@ BEGIN_NAMESPACE_YM_SATPG
 SatEngine*
 new_SatEngine()
 {
-  return new nsDtpg::SatEngineImpl();
+  return new nsSatEngine::SatEngineImpl();
 }
 
 END_NAMESPACE_YM_SATPG
 
-BEGIN_NAMESPACE_YM_SATPG_DTPG
+BEGIN_NAMESPACE_YM_SATPG_SAT_ENGINE
 
 BEGIN_NONAMESPACE
 
@@ -1451,4 +1451,4 @@ SatEngineImpl::update_stats(SatSolver& solver,
   mPropagationNum += sat_stat.mPropagationNum;
 }
 
-END_NAMESPACE_YM_SATPG_DTPG
+END_NAMESPACE_YM_SATPG_SAT_ENGINE

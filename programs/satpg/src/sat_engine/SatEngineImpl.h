@@ -11,7 +11,7 @@
 
 
 #include "SatEngine.h"
-#include "dtpg_nsdef.h"
+#include "sat_engine_nsdef.h"
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
 #include "ym_logic/Literal.h"
@@ -20,7 +20,7 @@
 #include "ym_utils/StopWatch.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_DTPG
+BEGIN_NAMESPACE_YM_SATPG_SAT_ENGINE
 
 //////////////////////////////////////////////////////////////////////
 /// @class SatEngineImpl SatEngineImpl.h "SatEngineImpl.h"
@@ -527,6 +527,6 @@ SatEngineImpl::primitive_fval(TpgPrimitive* prim)
   return val;
 }
 
-END_NAMESPACE_YM_SATPG_DTPG
+END_NAMESPACE_YM_SATPG_SAT_ENGINE
 
 #endif // SATENGINEIMPL_H

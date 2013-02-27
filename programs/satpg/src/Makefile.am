@@ -7,7 +7,7 @@ SUBDIRS = \
 	fsim2 \
 	fsim3 \
 	fsimx \
-	dtpg \
+	sat_engine \
 	main \
 	atpg_tclsh \
 	$(YM_EXTRA_SUBDIRS)

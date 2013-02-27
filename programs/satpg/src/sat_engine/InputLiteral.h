@@ -1,7 +1,7 @@
 #ifndef INPUTLITERAL_H
 #define INPUTLITERAL_H
 
-/// @file atpg/src/dtpg/InputLiteral.h
+/// @file InputLiteral.h
 /// @brief InputLiteral のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "dtpg_nsdef.h"
+#include "sat_engine_nsdef.h"
 #include "ym_logic/Literal.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_DTPG
+BEGIN_NAMESPACE_YM_SATPG_SAT_ENGINE
 
 //////////////////////////////////////////////////////////////////////
 /// @class InputLiteral InputLiteral.h "InputLiter.h"
@@ -204,6 +204,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_SATPG_DTPG
+END_NAMESPACE_YM_SATPG_SAT_ENGINE
 
 #endif // INPUTLITERAL_H

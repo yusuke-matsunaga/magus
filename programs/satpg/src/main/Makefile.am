@@ -16,6 +16,7 @@ libatpg_main_la_CPPFLAGS = \
 
 libatpg_main_la_SOURCES = \
 	AtpgMgr.cc \
+	DtpgSat.cc \
 	Op1.h \
 	Op1.cc
 
