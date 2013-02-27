@@ -20,9 +20,7 @@ libatpg_main_la_SOURCES = \
 	NormalOp.h \
 	NormalOp.cc \
 	SkipOp.h \
-	SkipOp.cc \
-	Op1.h \
-	Op1.cc
+	SkipOp.cc
 
 libatpg_main_la_LDFLAGS =
 
