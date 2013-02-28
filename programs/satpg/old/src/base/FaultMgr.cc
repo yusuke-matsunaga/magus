@@ -18,6 +18,26 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+BEGIN_NONAMESPACE
+
+void
+tfi_mark(const TgNode* node,
+	 vector<bool>& mark)
+{
+  if ( mark[node->gid()] ) {
+    return;
+  }
+  mark[node->gid()] = true;
+
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const TgNode* inode = node->fanin(i);
+    tfi_mark(inode, mark);
+  }
+}
+
+END_NONAMESPACE
+
 // @brief コンストラクタ
 FaultMgr::FaultMgr() :
   mFaultAlloc(sizeof(SaFault), 1024),
@@ -50,44 +70,6 @@ FaultMgr::clear()
   mChanged = true;
 }
 
-
-BEGIN_NONAMESPACE
-
-// node が FOS の時 true を返す．
-inline
-bool
-check_fos(const TgNode* node)
-{
-  ymuint nfo = node->fanout_num();
-  if ( nfo == 0 ) {
-    return false;
-  }
-  if ( nfo > 1 ) {
-    return true;
-  }
-  if ( node->fanout(0)->is_output() ) {
-    return true;
-  }
-  return false;
-}
-
-// 同一 FFR のノードを DFS の preorder で廻る．
-void
-ord_ffr(const TgNode* node,
-	list<const TgNode*>& node_list)
-{
-  if ( !check_fos(node) && !node->is_input() ) {
-    node_list.push_back(node);
-    ymuint ni = node->fanin_num();
-    for (ymuint i = 0; i < ni; ++ i) {
-      ord_ffr(node->fanin(i), node_list);
-    }
-  }
-}
-
-END_NONAMESPACE
-
-
 // @brief FaultMgr に全ての単一縮退故障を設定する．
 void
 FaultMgr::set_ssa_fault(const TgNetwork& network)
@@ -97,6 +79,7 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
   mNetwork = &network;
 
   ymuint ni = network.input_num2();
+  ymuint no = network.output_num2();
   ymuint nl = network.logic_num();
   ymuint nn = network.node_num();
 
@@ -118,33 +101,12 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
   }
 
   // 代表故障を記録していく．
-#if 0
   // トポロジカル順
   for (ymuint i = nl; i > 0; ) {
     -- i;
     const TgNode* node = network.sorted_logic(i);
     reg_faults(node);
   }
-#else
-  // FFR を固めた順
-  for (ymuint i = 0; i < nl; ++ i) {
-    const TgNode* node = network.sorted_logic(i);
-    if ( !check_fos(node) ) {
-      continue;
-    }
-    list<const TgNode*> node_list;
-    node_list.push_back(node);
-    ymuint ni = node->fanin_num();
-    for (ymuint j = 0; j < ni; ++ j) {
-      ord_ffr(node->fanin(j), node_list);
-    }
-    for (list<const TgNode*>::iterator p = node_list.begin();
-	 p != node_list.end(); ++ p) {
-      const TgNode* node = *p;
-      reg_faults(node);
-    }
-  }
-#endif
 
   for (ymuint i = 0; i < ni; ++ i) {
     const TgNode* node = network.input(i);
@@ -159,6 +121,23 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
     }
     add_ofault(node, 0, rep0);
     add_ofault(node, 1, rep1);
+  }
+
+  // 外部出力から到達可能な故障は mRemainList に入れる．
+  // 外部出力から到達不可能な故障は mUntestList に入れる．
+  vector<bool> mark(nn, false);
+  for (ymuint i = 0; i < no; ++ i) {
+    tfi_mark(network.output(i), mark);
+  }
+  for (vector<SaFault*>::iterator p = mAllRepList.begin();
+       p != mAllRepList.end(); ++ p) {
+    SaFault* f = *p;
+    if ( mark[f->node()->gid()] ) {
+      mRemainList.push_back(f);
+    }
+    else {
+      mUntestList.push_back(f);
+    }
   }
 }
 
@@ -350,7 +329,6 @@ FaultMgr::add_fault(const TgNode* node,
     void* p = mFinfoAlloc.get_memory(sizeof(Finfo));
     f->mFinfo = new (p) Finfo;
     mAllRepList.push_back(f);
-    mRemainList.push_back(f);
   }
   f->mFinfo->mEqFaults.push_back(f);
 

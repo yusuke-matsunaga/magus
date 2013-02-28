@@ -459,6 +459,9 @@ TpgNetwork::make_node(ymuint id,
   node->mId = id;
 
   const char* src_name = tgnode->name();
+  if ( tgnode->is_output() ) {
+    src_name = tgnode->fanin(0)->name();
+  }
   if ( src_name != NULL ) {
     ymuint len = strlen(src_name) + 1;
     void* p = mAlloc.get_memory(sizeof(char) * len);

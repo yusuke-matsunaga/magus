@@ -137,7 +137,9 @@ FaultMgr::set_ssa_fault(TpgNetwork& network)
   mAllNum = 0;
   for (ymuint i = 0; i < nn; ++ i) {
     TpgNode* node = network.node(i);
-    mAllNum += node->fanin_num() * 2 + 2;
+    if ( !node->is_output() ) {
+      mAllNum += node->fanin_num() * 2 + 2;
+    }
   }
 
   // 故障を生成する．
@@ -147,10 +149,14 @@ FaultMgr::set_ssa_fault(TpgNetwork& network)
     // 代表故障を等価故障のなかでもっとも出力よりの故障と定めるので
     // 出力側からのトポロジカル順に処理する．
     TpgNode* node = network.node(nn - i - 1);
+    if ( node->is_output() ) {
+      continue;
+    }
+
     TpgFault* rep0 = NULL;
     TpgFault* rep1 = NULL;
 
-    if ( node->fanout_num() == 1 ) {
+    if ( node->fanout_num() == 1 && !node->fanout(0)->is_output() ) {
       TpgNode* onode = node->fanout(0);
       // ちょっとかっこ悪い探し方
       ymuint ni = onode->fanin_num();
@@ -203,7 +209,13 @@ FaultMgr::set_ssa_fault(TpgNetwork& network)
   // 最初はすべての故障が mRemainList に属する．
   for (ymuint i = 0; i < mRepNum; ++ i) {
     TpgFault* f = mRepArray[i];
-    mRemainList.push_back(f);
+    // ただし，外部出力に到達できない故障は検出不能となる．
+    if ( f->node()->is_active() ) {
+      mRemainList.push_back(f);
+    }
+    else {
+      mUntestList.push_back(f);
+    }
   }
 }
 

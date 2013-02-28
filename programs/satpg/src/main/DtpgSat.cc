@@ -211,6 +211,9 @@ DtpgSat::dual_mode(TpgOperator& op)
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
     TpgNode* node = mNetwork->active_node(i);
+    if ( node->is_output() ) {
+      continue;
+    }
 
     // 出力の故障
     TpgFault* f0 = node->output_fault(0);
@@ -237,6 +240,9 @@ DtpgSat::node_mode(TpgOperator& op)
     mFaultList.clear();
 
     TpgNode* node = mNetwork->active_node(i);
+    if ( node->is_output() ) {
+      continue;
+    }
 
     // 入力の故障
     ymuint ni = node->fanin_num();
@@ -303,7 +309,9 @@ DtpgSat::all_mode(TpgOperator& op)
   ymuint n = mNetwork->active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
     TpgNode* node = mNetwork->active_node(i);
-    add_node_faults(node);
+    if ( !node->is_output() ) {
+      add_node_faults(node);
+    }
   }
 
   do_dtpg(op);
@@ -351,7 +359,9 @@ DtpgSat::dfs_ffr(TpgNode* node)
     }
   }
 
-  add_node_faults(node);
+  if ( !node->is_output() ) {
+    add_node_faults(node);
+  }
 }
 
 void
@@ -368,7 +378,9 @@ DtpgSat::dfs_mffc(TpgNode* node,
     }
   }
 
-  add_node_faults(node);
+  if ( !node->is_output() ) {
+    add_node_faults(node);
+  }
 }
 
 // @brief ノードの故障を追加する．
