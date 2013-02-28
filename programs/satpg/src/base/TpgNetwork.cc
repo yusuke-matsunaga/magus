@@ -173,6 +173,9 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   mActNodeNum = 0;
   mActNodeArray = alloc_nodearray(mAlloc, mNodeNum);
 
+  mTmpNodeNum = 0;
+  mTmpNodeList = alloc_nodearray(mAlloc, mNodeNum);
+
   {
     void* p = mAlloc.get_memory(sizeof(bool) * mNodeNum);
     mTmpMark = new (p) bool[mNodeNum];
@@ -287,14 +290,9 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   vector<pair<ymuint, ymuint> > tmp_list(output_num2());
   for (ymuint i = 0; i < output_num2(); ++ i) {
     TpgNode* onode = output(i);
-    dfs_mark(onode);
-    ymuint n = 0;
-    for (ymuint j = 0; j < mNodeNum; ++ j) {
-      if ( mTmpMark[j] ) {
-	++ n;
-      }
-    }
-    dfs_unmark(onode);
+    tfimark(onode);
+    ymuint n = mTmpNodeNum;
+    clear_tfimark();
     tmp_list[i] = make_pair(n, i);
   }
 
@@ -320,12 +318,9 @@ TpgNetwork::activate_po(ymuint po_pos)
   TpgNode* onode = output2(po_pos);
 
   // pos 番めの出力から到達可能なノードにマークをつける．
-  dfs_mark(onode);
+  tfimark(onode);
 
   activate_sub();
-
-  // マークを消す．
-  dfs_unmark(onode);
 }
 
 // @brief 全てのノードをアクティブにする．
@@ -336,46 +331,28 @@ TpgNetwork::activate_all()
 
   // すべての PO から到達可能なノードにマークをつける．
   for (ymuint i = 0; i < mOutputNum + mFFNum; ++ i) {
-    dfs_mark(output(i));
+    tfimark(output(i));
   }
 
   activate_sub();
-
-  // マークを消す．
-  for (ymuint i = 0; i < mOutputNum + mFFNum; ++ i) {
-    dfs_unmark(output(i));
-  }
 }
 
 // @brief ノードの TFI にマークをつける．
 // @note 結果は mTmpMark[node->id()] に格納される．
 void
-TpgNetwork::dfs_mark(TpgNode* node)
+TpgNetwork::tfimark(TpgNode* node)
 {
   if ( mTmpMark[node->id()] ) {
     return;
   }
 
   mTmpMark[node->id()] = true;
+  mTmpNodeList[mTmpNodeNum] = node;
+  ++ mTmpNodeNum;
+
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    dfs_mark(node->fanin(i));
-  }
-}
-
-// @brief ノードの TFI のマークを消す．
-// @note 結果は mTmpMark[node->id()] に格納される．
-void
-TpgNetwork::dfs_unmark(TpgNode* node)
-{
-  if ( !mTmpMark[node->id()] ) {
-    return;
-  }
-
-  mTmpMark[node->id()] = false;
-  ymuint ni = node->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    dfs_unmark(node->fanin(i));
+    tfimark(node->fanin(i));
   }
 }
 
@@ -426,6 +403,20 @@ TpgNetwork::activate_sub()
       node->mImmDom = node0;
     }
   }
+
+  // マークを消す．
+  clear_tfimark();
+}
+
+// @brief TFI マークを消す．
+// @note この関数が終了すると mTmpNodeNum は 0 になる．
+void
+TpgNetwork::clear_tfimark()
+{
+  for (ymuint i = 0; i < mTmpNodeNum; ++ i) {
+    mTmpMark[mTmpNodeList[i]->id()] = false;
+  }
+  mTmpNodeNum = 0;
 }
 
 // @brief ノードを得る．
