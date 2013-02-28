@@ -196,13 +196,15 @@ private:
 
   /// @brief ノードの TFI にマークをつける．
   /// @note 結果は mTmpMark[node->id()] に格納される．
+  /// @note マークの追加ノードは mTmpNodeList[0] - mTmpNodeList[mTmpNodeNum - 1]
+  /// に格納される．
   void
-  dfs_mark(TpgNode* node);
+  tfimark(TpgNode* node);
 
-  /// @brief ノードの TFI のマークを消す．
-  /// @note 結果は mTmpMark[node->id()] に格納される．
+  /// @brief TFI マークを消す．
+  /// @note この関数が終了すると mTmpNodeNum は 0 になる．
   void
-  dfs_unmark(TpgNode* node);
+  clear_tfimark();
 
   /// @brief activate_po(), activate_all() の下請け関数
   void
@@ -270,6 +272,13 @@ private:
   // activate_sub() で用いられるマーク用の配列
   // サイズは mNodeNum
   bool* mTmpMark;
+
+  // 一時的に用いるノードリスト
+  // サイズは mNodeNum
+  TpgNode** mTmpNodeList;
+
+  // mTmpNodeList の見かけのサイズ
+  ymuint32 mTmpNodeNum;
 
 };
 
