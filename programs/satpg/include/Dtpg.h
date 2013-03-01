@@ -51,6 +51,7 @@ public:
   virtual
   void
   run(tDtpgMode mode,
+      BackTracer& bt,
       TpgOperator& op,
       const string& option = string()) = 0;
 

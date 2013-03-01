@@ -92,6 +92,7 @@ class TpgNetwork;
 class TpgNode;
 class TpgPrimitive;
 class TpgOperator;
+class BackTracer;
 class TestVector;
 class TvMgr;
 class Dtpg;

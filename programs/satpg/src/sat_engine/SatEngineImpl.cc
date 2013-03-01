@@ -13,6 +13,7 @@
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
 #include "TpgFault.h"
+#include "BackTracer.h"
 #include "TpgOperator.h"
 #include "InputLiteral.h"
 #include "ym_logic/SatSolver.h"
@@ -542,6 +543,7 @@ END_NONAMESPACE
 void
 SatEngineImpl::run(const vector<TpgFault*>& flist,
 		   ymuint max_id,
+		   BackTracer& bt,
 		   TpgOperator& op)
 {
   if ( mTimerEnable ) {
@@ -651,9 +653,6 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
       mOutputList.push_back(node);
     }
   }
-
-  // mValList の最大数は mInputList のサイズ
-  mValList.reserve(mInputList.size());
 
   // 故障を活性化するとき true にする変数．
   vector<VarId> flt_var(nf);
@@ -899,7 +898,7 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
     tPol pol = (f->val() == 0) ? kPolPosi : kPolNega;
     mAssumptions.push_back(Literal(fnode->gvar(), pol));
 
-    solve(solver, f, op);
+    solve(solver, f, bt, op);
   }
   clear_node_mark();
 
@@ -910,6 +909,7 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
 void
 SatEngineImpl::solve(SatSolver& solver,
 		     TpgFault* f,
+		     BackTracer& bt,
 		     TpgOperator& op)
 {
   if ( mTimerEnable ) {
@@ -917,28 +917,15 @@ SatEngineImpl::solve(SatSolver& solver,
     mTimer.start();
   }
 
-  Bool3 ans = solver.solve(mAssumptions, mModel);
+  Bool3 ans = solver.solve(mAssumptions, bt.model());
   if ( ans == kB3True ) {
     // パタンが求まった．
 
-    if ( mGetPatFlag == 1 ) {
-      get_pat(f->node());
-    }
-    else if ( mGetPatFlag == 2 ) {
-      get_pat2(f->node());
-    }
-    else {
-      // フォールバック
-      // TFI に含まれる全ての外部入力の値を記録する．
-      mValList.clear();
-      for (vector<TpgNode*>::const_iterator p = mInputList.begin();
-	   p != mInputList.end(); ++ p) {
-	TpgNode* node = *p;
-	record_value(node);
-      }
-    }
+    // バックトレースを行う．
+    bt(f->node(), mInputList, mOutputList);
 
-    op.set_detected(f, mValList);
+    // パタンの登録などを行う．
+    op.set_detected(f, bt.val_list());
 
     if ( mTimerEnable ) {
       mTimer.stop();
@@ -963,373 +950,6 @@ SatEngineImpl::solve(SatSolver& solver,
       ++ mAbortCount;
     }
   }
-}
-
-// @brief テストパタンを求める．
-// @note 結果は mValList に格納される．
-void
-SatEngineImpl::get_pat(TpgNode* fnode)
-{
-  mValList.clear();
-  mJustifiedNodeList.clear();
-
-  TpgNode* onode = NULL;
-  for (vector<TpgNode*>::iterator p = mOutputList.begin();
-       p != mOutputList.end(); ++ p) {
-    TpgNode* node = *p;
-    if ( mModel[node->dvar().val()] == kB3True ) {
-      onode = node;
-      break;
-    }
-  }
-  assert_cond( onode != NULL, __FILE__, __LINE__);
-  justify(onode);
-
-  // 一連の処理でつけたマークを消す．
-  for (vector<TpgNode*>::iterator p = mJustifiedNodeList.begin();
-       p != mJustifiedNodeList.end(); ++ p) {
-    TpgNode* node = *p;
-    clear_justified_mark(node);
-  }
-}
-
-// @brief テストパタンを求める．
-// @note 結果は mValList に格納される．
-void
-SatEngineImpl::get_pat2(TpgNode* fnode)
-{
-#if 0
-  mValList.clear();
-  mDiffNodeList.clear();
-  mBwdNodeList.clear();
-
-  // 故障差の伝搬経路にマークをつける．
-  fwd_dfs(fnode);
-
-  // 故障差を伝搬させるためのサイド入力の値を正当化する．
-  for (vector<TpgNode*>::iterator p = mDiffNodeList.begin();
-       p != mDiffNodeList.end(); ++ p) {
-    TpgNode* node = *p;
-    if ( node->is_input() ) {
-      record_value(node);
-    }
-    else {
-      ymuint ni = node->fanin_num();
-      for (ymuint i = 0; i < ni; ++ i) {
-	TpgNode* inode = node->fanin(i);
-	if ( !inode->mark2() ) {
-	  justify(inode);
-	}
-      }
-    }
-  }
-
-  // 一連の処理でつけたマークを消す．
-  for (vector<TpgNode*>::iterator p = mBwdNodeList.begin();
-       p != mBwdNodeList.end(); ++ p) {
-    TpgNode* node = *p;
-    node->clear_mark1();
-    node->clear_mark2();
-    node->clear_mark3();
-  }
-#endif
-}
-
-// @brief solve 中で変数割り当ての正当化を行なう．
-// @param[in] node 対象のノード
-// @note node の値割り当てを正当化する．
-// @note 正当化に用いられているノードには mJustifiedMark がつく．
-// @note mJustifiedMmark がついたノードは mJustifiedNodeList に格納される．
-void
-SatEngineImpl::justify(TpgNode* node)
-{
-  if ( justified_mark(node) ) {
-    return;
-  }
-  set_justified_mark(node);
-  mJustifiedNodeList.push_back(node);
-
-  if ( node->is_input() ) {
-    // val を記録
-    record_value(node);
-    return;
-  }
-
-  Bool3 gval = node_gval(node);
-  Bool3 fval = node_fval(node);
-
-  if ( gval != fval ) {
-    // 正常値と故障値が異なっていたら
-    // すべてのファンインをたどる．
-    just_sub1(node);
-    return;
-  }
-
-  if ( node->is_cplx_logic() ) {
-    ymuint np = node->primitive_num();
-    TpgPrimitive* prim = node->primitive(np - 1);
-    justify_primitive(prim, node);
-  }
-  else {
-    switch ( node->gate_type() ) {
-    case kTgGateBuff:
-    case kTgGateNot:
-      // 無条件で唯一のファンインをたどる．
-      justify(node->fanin(0));
-      break;
-
-    case kTgGateAnd:
-      if ( gval == kB3True ) {
-	// すべてのファンインノードをたどる．
-	just_sub1(node);
-      }
-      else if ( gval == kB3False ) {
-	// 0の値を持つ最初のノードをたどる．
-	just_sub2(node, kB3False);
-      }
-      break;
-
-    case kTgGateNand:
-      if ( gval == kB3True ) {
-	// 0の値を持つ最初のノードをたどる．
-	just_sub2(node, kB3False);
-      }
-      else if ( gval == kB3False ) {
-	// すべてのファンインノードをたどる．
-	just_sub1(node);
-      }
-      break;
-
-    case kTgGateOr:
-      if ( gval == kB3True ) {
-	// 1の値を持つ最初のノードをたどる．
-	just_sub2(node, kB3True);
-      }
-      else if ( gval == kB3False ) {
-	// すべてのファンインノードをたどる．
-	just_sub1(node);
-      }
-      break;
-
-    case kTgGateNor:
-      if ( gval == kB3True ) {
-	// すべてのファンインノードをたどる．
-	just_sub1(node);
-      }
-      else if ( gval == kB3False ) {
-	// 1の値を持つ最初のノードをたどる．
-	just_sub2(node, kB3True);
-      }
-      break;
-
-    case kTgGateXor:
-    case kTgGateXnor:
-      // すべてのファンインノードをたどる．
-      just_sub1(node);
-      break;
-
-    default:
-      assert_not_reached(__FILE__, __LINE__);
-      break;
-    }
-  }
-}
-
-// @brief すべてのファンインに対して justify() を呼ぶ．
-// @param[in] node 対象のノード
-void
-SatEngineImpl::just_sub1(TpgNode* node)
-{
-  ymuint ni = node->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    TpgNode* inode = node->fanin(i);
-    justify(inode);
-  }
-}
-
-// @brief 指定した値を持つのファンインに対して justify() を呼ぶ．
-// @param[in] node 対象のノード
-// @param[in] val 値
-void
-SatEngineImpl::just_sub2(TpgNode* node,
-			 Bool3 val)
-{
-  bool gfound = false;
-  bool ffound = false;
-  ymuint ni = node->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    TpgNode* inode = node->fanin(i);
-    Bool3 igval = node_gval(inode);
-    Bool3 ifval = node_fval(inode);
-    if ( !gfound && igval == val ) {
-      justify(inode);
-      gfound = true;
-      if ( ifval == val ) {
-	break;
-      }
-    }
-    else if ( !ffound && ifval == val ) {
-      justify(inode);
-      ffound = true;
-    }
-    if ( gfound && ffound ) {
-      break;
-    }
-  }
-}
-
-// @brief justify の下請け関数
-// @param[in] prim 対象のプリミティブ
-// @param[in] node 対象のノード
-// @note node の値割り当てを正当化する．
-void
-SatEngineImpl::justify_primitive(TpgPrimitive* prim,
-				 TpgNode* node)
-{
-  if ( prim->is_input() ) {
-    ymuint ipos = prim->input_id();
-    TpgNode* inode = node->fanin(ipos);
-    justify(inode);
-    return;
-  }
-
-  Bool3 gval = primitive_gval(prim);
-  Bool3 fval = primitive_fval(prim);
-  if ( gval != fval ) {
-    // すべてのファンインノードをたどる．
-    jp_sub1(prim, node);
-    return;
-  }
-
-  switch ( prim->gate_type() ) {
-  case kTgGateBuff:
-  case kTgGateNot:
-    // 唯一のファンインをたどる．
-    justify_primitive(prim->fanin(0), node);
-    break;
-
-  case kTgGateAnd:
-    if ( gval == kB3True ) {
-      // すべてのファンインをたどる．
-      jp_sub1(prim, node);
-    }
-    else if ( gval == kB3False ) {
-      // 0 の値を持つ最初のファンインをたどる．
-      jp_sub2(prim, node, kB3False);
-      break;
-
-    case kTgGateNand:
-      if ( gval == kB3True ) {
-	// 0 の値を持つ最初のファンインをたどる．
-	jp_sub2(prim, node, kB3False);
-      }
-      else if ( gval == kB3False ) {
-	// すべてのファンインをたどる．
-	jp_sub1(prim, node);
-      }
-      break;
-
-    case kTgGateOr:
-      if ( gval == kB3True ) {
-	// 1の値をもつ最初のファンインをたどる．
-	jp_sub2(prim, node, kB3True);
-      }
-      else if ( gval == kB3False ) {
-	// すべてのファンインをたどる．
-	jp_sub1(prim, node);
-      }
-      break;
-
-    case kTgGateNor:
-      if ( gval == kB3True ) {
-	// すべてのファンインをたどる．
-	jp_sub1(prim, node);
-      }
-      else if ( gval == kB3False ) {
-	// 1の値をもつすべてのファンインをたどる．
-	jp_sub2(prim, node, kB3True);
-      }
-      break;
-
-    case kTgGateXor:
-    case kTgGateXnor:
-      // すべてのファンインをたどる．
-      jp_sub1(prim, node);
-      break;
-
-    default:
-      assert_not_reached(__FILE__, __LINE__);
-      break;
-    }
-  }
-}
-
-// @brief すべてのファンインに対して justify_primitive() を呼ぶ．
-// @param[in] prim 対象のプリミティブ
-// @param[in] node 対象のノード
-void
-SatEngineImpl::jp_sub1(TpgPrimitive* prim,
-		       TpgNode* node)
-{
-  ymuint ni = prim->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    TpgPrimitive* iprim = prim->fanin(i);
-    justify_primitive(iprim, node);
-  }
-}
-
-// @brief 指定した値を持つファンインに対して justify_primitive() を呼ぶ．
-// @param[in] prim 対象のプリミティブ
-// @param[in] node 対象のノード
-// @param[in] val 値
-void
-SatEngineImpl::jp_sub2(TpgPrimitive* prim,
-		       TpgNode* node,
-		       Bool3 val)
-{
-  bool gfound = false;
-  bool ffound = false;
-  ymuint ni = prim->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    TpgPrimitive* iprim = prim->fanin(i);
-    Bool3 igval = primitive_gval(iprim);
-    Bool3 ifval = primitive_fval(iprim);
-    if ( !gfound && igval == val ) {
-      justify_primitive(iprim, node);
-      gfound = true;
-      if ( ifval == val ) {
-	break;
-      }
-    }
-    else if ( !ffound && ifval == val ) {
-      justify_primitive(iprim, node);
-      ffound = true;
-    }
-    if ( gfound && ffound ) {
-      break;
-    }
-  }
-}
-
-// @brief 入力ノードの値を記録する．
-// @param[in] node 対象の外部入力ノード
-// @note node の値を mValList に記録する．
-// @note 単純だが mModel 上のインデックスと mValList の符号化は異なる．
-void
-SatEngineImpl::record_value(TpgNode* node)
-{
-  assert_cond( node->is_input(), __FILE__, __LINE__);
-
-  VarId idx = node->gvar();
-  ymuint iid = node->input_id();
-
-  // 今のところ model には 0 か 1 しか設定されていないはず．
-  Bool3 v = mModel[idx.val()];
-  ymuint packed_val = iid * 2;
-  if ( v == kB3True ) {
-    packed_val += 1;
-  }
-  mValList.push_back(packed_val);
 }
 
 // @brief ノードの変数割り当てフラグを消す．

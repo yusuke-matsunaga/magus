@@ -64,6 +64,7 @@ public:
   void
   run(const vector<TpgFault*>& flist,
       ymuint max_id,
+      BackTracer& bt,
       TpgOperator& op);
 
   /// @brief 統計情報をクリアする．
@@ -98,83 +99,8 @@ private:
   void
   solve(SatSolver& solver,
 	TpgFault* f,
+	BackTracer& bt,
 	TpgOperator& op);
-
-  /// @brief テストパタンを求める．
-  /// @param[in] fnode 故障のあるノード
-  /// @note 結果は mValList に格納される．
-  void
-  get_pat(TpgNode* fnode);
-
-  /// @brief テストパタンを求める．
-  /// @param[in] fnode 故障のあるノード
-  /// @note 結果は mValList に格納される．
-  void
-  get_pat2(TpgNode* fnode);
-
-  /// @brief solve 中で故障差を持つノードをたどる．
-  /// @param[in] node 対象のノード
-  /// @retval true node を通って外部出力まで故障差が伝搬している．
-  /// @retval false 故障差が伝搬していない．
-  /// @note 故障差の伝搬経路上のノードは mDiffNodeList に格納される．
-  /// @note 一旦調べたノードはすべて mark1 がつく．
-  /// @note 故障差が伝搬しているノードは mark2 がつく．
-  /// @note マークがついたノードは mBwdNodeList に格納される．
-  bool
-  fwd_dfs(TpgNode* node);
-
-  /// @brief solve 中で変数割り当ての正当化を行なう．
-  /// @param[in] node 対象のノード
-  /// @note node の値割り当てを正当化する．
-  /// @note 正当化に用いられているノードには mark3 がつく．
-  /// @note mark3 がついたノードは mBwdNodeList に格納される．
-  void
-  justify(TpgNode* node);
-
-  /// @brief すべてのファンインに対して justify() を呼ぶ．
-  /// @param[in] node 対象のノード
-  void
-  just_sub1(TpgNode* node);
-
-  /// @brief 指定した値を持つのファンインに対して justify() を呼ぶ．
-  /// @param[in] node 対象のノード
-  /// @param[in] val 値
-  void
-  just_sub2(TpgNode* node,
-	    Bool3 val);
-
-  /// @brief justify の下請け関数
-  /// @param[in] prim 対象のプリミティブ
-  /// @param[in] node 対象のノード
-  /// @note node の値割り当てを正当化する．
-  /// @note 正当化に用いられているノードには mark3 がつく．
-  /// @note mark3 がついたノードは mBwdNodeList に格納される．
-  void
-  justify_primitive(TpgPrimitive* prim,
-		    TpgNode* node);
-
-  /// @brief すべてのファンインに対して justify_primitive() を呼ぶ．
-  /// @param[in] prim 対象のプリミティブ
-  /// @param[in] node 対象のノード
-  void
-  jp_sub1(TpgPrimitive* prim,
-	  TpgNode* node);
-
-  /// @brief 指定した値を持つファンインに対して justify_primitive() を呼ぶ．
-  /// @param[in] prim 対象のプリミティブ
-  /// @param[in] node 対象のノード
-  /// @param[in] val 値
-  void
-  jp_sub2(TpgPrimitive* prim,
-	  TpgNode* node,
-	  Bool3 val);
-
-  /// @brief 入力ノードの値を記録する．
-  /// @param[in] node 対象の外部入力ノード
-  /// @note node の値を mValList に記録する．
-  /// @note 単純だが mModel 上のインデックスと mValList の符号化は異なる．
-  void
-  record_value(TpgNode* node);
 
   /// @brief ノードの変数割り当てフラグを消す．
   void
@@ -215,45 +141,6 @@ private:
   bool
   tmp_mark(TpgNode* node);
 
-  /// @brief justified マークをつける．
-  /// @param[in] node 対象のノード
-  void
-  set_justified_mark(TpgNode* node);
-
-  /// @brief justified マークを消す．
-  /// @param[in] node 対象のノード
-  void
-  clear_justified_mark(TpgNode* node);
-
-  /// @brief justified マークを読む．
-  /// @param[in] node 対象のノード
-  bool
-  justified_mark(TpgNode* node);
-
-  /// @brief ノードの正常値を読み出す．
-  /// @param[in] node 対象のノード
-  /// @note mModel の値を読む．
-  Bool3
-  node_gval(TpgNode* node);
-
-  /// @brief ノードの故障値を読み出す．
-  /// @param[in] node 対象のノード
-  /// @note mModel の値を読む．
-  Bool3
-  node_fval(TpgNode* node);
-
-  /// @brief プリミティブの正常値を読み出す．
-  /// @param[in] prim 対象のプリミティブ
-  /// @note mModel の値を読む．
-  Bool3
-  primitive_gval(TpgPrimitive* prim);
-
-  /// @brief プリミティブの故障値を読み出す．
-  /// @param[in] prim 対象のプリミティブ
-  /// @note mModel の値を読む．
-  Bool3
-  primitive_fval(TpgPrimitive* prim);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -275,12 +162,6 @@ private:
   // SAT 用の assumption を格納するベクタ
   vector<Literal> mAssumptions;
 
-  // SAT 用の model を格納するベクタ
-  vector<Bool3> mModel;
-
-  // SAT 用の割り当てリスト
-  vector<ymuint> mValList;
-
   // いくつかのフラグをまとめた配列
   vector<ymuint8> mMarkArray;
 
@@ -301,12 +182,6 @@ private:
 
   // 作業用のノードリスト
   vector<TpgNode*> mTmpNodeList;
-
-  // 故障差が伝搬しているノードを格納するリスト
-  vector<TpgNode*> mDiffNodeList;
-
-  // 正当化されたノードのリスト
-  vector<TpgNode*> mJustifiedNodeList;
 
   // CNF の生成回数
   ymuint32 mRunCount;
@@ -432,76 +307,6 @@ bool
 SatEngineImpl::tmp_mark(TpgNode* node)
 {
   return static_cast<bool>((mMarkArray[node->id()] >> 2) & 1U);
-}
-
-// justified マークをつける．
-inline
-void
-SatEngineImpl::set_justified_mark(TpgNode* node)
-{
-  mMarkArray[node->id()] |= 8U;
-}
-
-// justified マークを消す．
-inline
-void
-SatEngineImpl::clear_justified_mark(TpgNode* node)
-{
-  mMarkArray[node->id()] &= ~8U;
-}
-
-// @brief justified マークを読む．
-inline
-bool
-SatEngineImpl::justified_mark(TpgNode* node)
-{
-  return static_cast<bool>((mMarkArray[node->id()] >> 3) & 1U);
-}
-
-// @brief ノードの正常値を読み出す．
-// @note mModel の値を読む．
-inline
-Bool3
-SatEngineImpl::node_gval(TpgNode* node)
-{
-  return mModel[node->gvar().val()];
-}
-
-// @brief ノードの故障値を読み出す．
-// @note mModel の値を読む．
-inline
-Bool3
-SatEngineImpl::node_fval(TpgNode* node)
-{
-  return mModel[node->fvar().val()];
-}
-
-// @brief プリミティブの正常値を読み出す．
-// @note mModel の値を読む．
-inline
-Bool3
-SatEngineImpl::primitive_gval(TpgPrimitive* prim)
-{
-  Literal lit = prim->glit();
-  Bool3 val = mModel[lit.varid().val()];
-  if ( lit.pol() == kPolNega ) {
-    val = ~val;
-  }
-  return val;
-}
-
-// @brief プリミティブの故障値を読み出す．
-// @note mModel の値を読む．
-inline
-Bool3
-SatEngineImpl::primitive_fval(TpgPrimitive* prim)
-{
-  Literal lit = prim->flit();
-  Bool3 val = mModel[lit.varid().val()];
-  if ( lit.pol() == kPolNega ) {
-    val = ~val;
-  }
-  return val;
 }
 
 END_NAMESPACE_YM_SATPG_SAT_ENGINE

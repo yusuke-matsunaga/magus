@@ -10,6 +10,7 @@
 
 
 #include "satpg_nsdef.h"
+#include "ym_logic/Bool3.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -32,16 +33,25 @@ public:
   // 継承クラスが実装する仮想関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief SAT の値割り当て用ベクタを返す．
+  virtual
+  vector<Bool3>&
+  model() = 0;
+
   /// @brief バックトレースを行なう．
   /// @param[in] fnode 故障のあるノード
-  /// @param[in] output_list 故障伝搬の可能性のある出力のリスト
   /// @param[in] input_list テストパタンに関係のある入力のリスト
-  /// @param[in] val_list 求まったテストパタンを格納する配列
+  /// @param[in] output_list 故障伝搬の可能性のある出力のリスト
+  virtual
   void
   operator()(TpgNode* fnode,
-	     const vector<TpgNode*>& output_list,
 	     const vector<TpgNode*>& input_list,
-	     vector<ymuint32>& val_list) = 0;
+	     const vector<TpgNode*>& output_list) = 0;
+
+  /// @brief バックトレースの結果の割り当てリストを返す．
+  virtual
+  const vector<ymuint32>&
+  val_list() = 0;
 
 };
 

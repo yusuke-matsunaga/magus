@@ -23,10 +23,40 @@ BEGIN_NAMESPACE_YM_SATPG
 class BtBase :
   public BackTracer
 {
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
+  BtBase(ymuint max_id);
+
+  /// @brief デストラクタ
+  virtual
+  ~BtBase();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // BackTracer の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief SAT の値割り当て用ベクタを返す．
+  virtual
+  vector<Bool3>&
+  model();
+
+  /// @brief バックトレースの結果の割り当てリストを返す．
+  const vector<ymuint32>&
+  val_list();
+
+
 protected:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスから用いられる便利関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief mValList を初期化する．
+  void
+  clear_val_list();
 
   /// @brief 入力ノードの値を記録する．
   /// @param[in] node 対象の外部入力ノード
@@ -34,21 +64,6 @@ protected:
   /// @note 単純だが mModel 上のインデックスと mValList の符号化は異なる．
   void
   record_value(TpgNode* node);
-
-  /// @brief justified マークをつける．
-  /// @param[in] node 対象のノード
-  void
-  set_justified_mark(TpgNode* node);
-
-  /// @brief justified マークを消す．
-  /// @param[in] node 対象のノード
-  void
-  clear_justified_mark(TpgNode* node);
-
-  /// @brief justified マークを読む．
-  /// @param[in] node 対象のノード
-  bool
-  justified_mark(TpgNode* node);
 
   /// @brief ノードの正常値を読み出す．
   /// @param[in] node 対象のノード
@@ -61,6 +76,12 @@ protected:
   /// @note mModel の値を読む．
   Bool3
   node_fval(TpgNode* node);
+
+  /// @brief ノードの故障差を読み出す．
+  /// @param[in] node 対象のノード
+  /// @note mModel の値を読む．
+  Bool3
+  node_dval(TpgNode* node);
 
   /// @brief プリミティブの正常値を読み出す．
   /// @param[in] prim 対象のプリミティブ
@@ -83,8 +104,8 @@ private:
   // SAT の割り当て結果
   vector<Bool3> mModel;
 
-  // 正当化されたノードのリスト
-  vector<TpgNode*> mJustifiedNodeList;
+  // バックトレースの結果
+  vector<ymuint32> mValList;
 
 };
 
@@ -92,6 +113,14 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief mValList を初期化する．
+inline
+void
+BtBase::clear_val_list()
+{
+  mValList.clear();
+}
 
 // @brief ノードの正常値を読み出す．
 // @note mModel の値を読む．
@@ -109,6 +138,16 @@ Bool3
 BtBase::node_fval(TpgNode* node)
 {
   return mModel[node->fvar().val()];
+}
+
+// @brief ノードの故障差を読み出す．
+// @param[in] node 対象のノード
+// @note mModel の値を読む．
+inline
+Bool3
+BtBase::node_dval(TpgNode* node)
+{
+  return mModel[node->dvar().val()];
 }
 
 // @brief プリミティブの正常値を読み出す．

@@ -13,6 +13,7 @@
 #include "SkipOp.h"
 #include "TpgNetwork.h"
 #include "TpgFault.h"
+#include "BtSimple.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -267,14 +268,16 @@ AtpgMgr::dtpg(tDtpgMode mode,
   mTimer.change(TM_DTPG);
 
   if ( skip ) {
+    BtSimple bt(_network().node_num());
     SkipOp op(mFaultMgr, mTvMgr, mTvList, *mFsim3, 3, mDtpgDrop, mDtpgVerify);
 
-    mDtpg->run(mode, op, option);
+    mDtpg->run(mode, bt, op, option);
   }
   else {
+    BtSimple bt(_network().node_num());
     NormalOp op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
 
-    mDtpg->run(mode, op, option);
+    mDtpg->run(mode, bt, op, option);
   }
 
   mTimer.change(old_id);

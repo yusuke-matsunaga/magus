@@ -63,38 +63,45 @@ public:
   virtual
   void
   run(tDtpgMode mode,
+      BackTracer& bt,
       TpgOperator& op,
       const string& option = string());
 
   /// @brief single モードでテスト生成を行なう．
   /// @param[in] op テスト生成後に呼ばれるファンクター
   void
-  single_mode(TpgOperator& op);
+  single_mode(BackTracer& bt,
+	      TpgOperator& op);
 
   /// @brief dual モードでテスト生成を行なう．
   /// @param[in] op テスト生成後に呼ばれるファンクター
   void
-  dual_mode(TpgOperator& op);
+  dual_mode(BackTracer& bt,
+	    TpgOperator& op);
 
   /// @brief node モードでテスト生成を行なう．
   /// @param[in] op テスト生成後に呼ばれるファンクター
   void
-  node_mode(TpgOperator& op);
+  node_mode(BackTracer& bt,
+	    TpgOperator& op);
 
   /// @brief ffr モードでテスト生成を行なう．
   /// @param[in] op テスト生成後に呼ばれるファンクター
   void
-  ffr_mode(TpgOperator& op);
+  ffr_mode(BackTracer& bt,
+	   TpgOperator& op);
 
   /// @brief mffc モードでテスト生成を行なう．
   /// @param[in] op テスト生成後に呼ばれるファンクター
   void
-  mffc_mode(TpgOperator& op);
+  mffc_mode(BackTracer& bt,
+	    TpgOperator& op);
 
   /// @brief all モードでテスト生成を行なう．
   /// @param[in] op テスト生成後に呼ばれるファンクター
   void
-  all_mode(TpgOperator& op);
+  all_mode(BackTracer& bt,
+	   TpgOperator& op);
 
   /// @brief 統計情報をクリアする．
   virtual
@@ -120,29 +127,35 @@ private:
 
   /// @brief single モードの共通処理
   void
-  single_sub(TpgOperator& op);
+  single_sub(BackTracer& bt,
+	     TpgOperator& op);
 
   /// @brief dual モードの共通処理
   void
-  dual_sub(TpgOperator& op);
+  dual_sub(BackTracer& bt,
+	   TpgOperator& op);
 
   /// @brief ffr モードの共通処理
   void
-  ffr_sub(TpgOperator& op);
+  ffr_sub(BackTracer& bt,
+	  TpgOperator& op);
 
   /// @brief mffc モードの共通処理
   void
-  mffc_sub(TpgOperator& op);
+  mffc_sub(BackTracer& bt,
+	   TpgOperator& op);
 
   /// @brief all モードの共通処理
   void
-  all_sub(TpgOperator& op);
+  all_sub(BackTracer& bt,
+	  TpgOperator& op);
 
   /// @brief 一つの故障に対してテストパタン生成を行う．
   /// @param[in] f 故障
   /// @param[in] op テスト生成の結果を処理するファンクター
   void
   dtpg_single(TpgFault* f,
+	      BackTracer& bt,
 	      TpgOperator& op);
 
   /// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
@@ -152,6 +165,7 @@ private:
   void
   dtpg_dual(TpgFault* f0,
 	    TpgFault* f1,
+	    BackTracer& bt,
 	    TpgOperator& op);
 
   /// @brief DFS で FFR を求める．
@@ -173,7 +187,8 @@ private:
 
   /// @brief テストパタン生成を行なう．
   void
-  do_dtpg(TpgOperator& op);
+  do_dtpg(BackTracer& bt,
+	  TpgOperator& op);
 
 
 private:
@@ -240,10 +255,11 @@ DtpgSat::add_fault(TpgFault* fault)
 // @brief テストパタン生成を行なう．
 inline
 void
-DtpgSat::do_dtpg(TpgOperator& op)
+DtpgSat::do_dtpg(BackTracer& bt,
+		 TpgOperator& op)
 {
   if ( !mFaultList.empty() ) {
-    mSatEngine->run(mFaultList, mMaxId, op);
+    mSatEngine->run(mFaultList, mMaxId, bt, op);
   }
 }
 

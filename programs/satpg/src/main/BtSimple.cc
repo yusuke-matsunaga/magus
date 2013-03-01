@@ -16,19 +16,26 @@ BEGIN_NAMESPACE_YM_SATPG
 // クラス BtSimple
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
+BtSimple::BtSimple(ymuint max_id) :
+  BtBase(max_id)
+{
+}
+
 // @brief バックトレースを行なう．
 // @param[in] fnode 故障のあるノード
-// @param[in] output_list 故障伝搬の可能性のある出力のリスト
 // @param[in] input_list テストパタンに関係のある入力のリスト
-// @param[in] val_list 求まったテストパタンを格納する配列
+// @param[in] output_list 故障伝搬の可能性のある出力のリスト
 void
 BtSimple::operator()(TpgNode* fnode,
-		     const vector<TpgNode*>& output_list,
 		     const vector<TpgNode*>& input_list,
-		     vector<ymuint32>& val_list)
+		     const vector<TpgNode*>& output_list)
 {
-  for (vector<TpgNode*>::const_iterator p = inputList.begin();
-       p != inputList.end(); ++ p) {
+  clear_val_list();
+
+  for (vector<TpgNode*>::const_iterator p = input_list.begin();
+       p != input_list.end(); ++ p) {
     TpgNode* node = *p;
     record_value(node);
   }

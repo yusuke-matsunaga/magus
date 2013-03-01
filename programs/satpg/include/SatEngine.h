@@ -53,6 +53,7 @@ public:
   void
   run(const vector<TpgFault*>& flist,
       ymuint max_id,
+      BackTracer& bt,
       TpgOperator& op) = 0;
 
   /// @brief 統計情報をクリアする．

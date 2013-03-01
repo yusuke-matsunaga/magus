@@ -20,7 +20,13 @@ libatpg_main_la_SOURCES = \
 	NormalOp.h \
 	NormalOp.cc \
 	SkipOp.h \
-	SkipOp.cc
+	SkipOp.cc \
+	BtBase.h \
+	BtBase.cc \
+	BtSimple.h \
+	BtSimple.cc \
+	BtJust1.h \
+	BtJust1.cc
 
 libatpg_main_la_LDFLAGS =
 
