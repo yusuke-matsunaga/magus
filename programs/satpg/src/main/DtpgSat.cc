@@ -64,90 +64,18 @@ DtpgSat::set_network(TpgNetwork& tgnetwork)
 }
 
 // @brief テスト生成を行なう．
+// @param[in] mode メインモード
+// @param[in] po_mode PO分割モード
 // @param[in] op テスト生成後に呼ばれるファンクター
 // @param[in] option オプション文字列
 void
 DtpgSat::run(tDtpgMode mode,
+	     tDtpgPoMode po_mode,
 	     BackTracer& bt,
-	     TpgOperator& op,
-	     const string& option)
+	     TpgOperator& op)
 {
-  bool po = false;
-  bool rpo = false;
-
-  if ( option != "" ) {
-    if ( option == "po" ) {
-      po = true;
-    }
-    else if ( option == "rpo" ) {
-      rpo = true;
-    }
-    else {
-      cout << "illegal option " << option << ". ignored" << endl;
-      return;
-    }
-  }
-
-  if ( po ) {
-    ymuint no = mNetwork->output_num2();
-    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-      mNetwork->activate_po(po_pos);
-
-      switch ( mode ) {
-      case kDtpgSingle:
-	single_mode(bt, op);
-	break;
-
-      case kDtpgDual:
-	dual_mode(bt, op);
-	break;
-
-      case kDtpgNode:
-	node_mode(bt, op);
-	break;
-
-      case kDtpgFFR:
-	ffr_mode(bt, op);
-	break;
-
-      case kDtpgMFFC:
-      case kDtpgAll:
-	all_mode(bt, op);
-	break;
-      }
-    }
-  }
-  else if ( rpo ) {
-    ymuint no = mNetwork->output_num2();
-    for (ymuint i = 0; i < no; ++ i) {
-      ymuint po_pos = no - i - 1;
-      mNetwork->activate_po(po_pos);
-
-      switch ( mode ) {
-      case kDtpgSingle:
-	single_mode(bt, op);
-	break;
-
-      case kDtpgDual:
-	dual_mode(bt, op);
-	break;
-
-      case kDtpgNode:
-	node_mode(bt, op);
-	break;
-
-      case kDtpgFFR:
-	ffr_mode(bt, op);
-	break;
-
-      case kDtpgMFFC:
-      case kDtpgAll:
-	all_mode(bt, op);
-	break;
-      }
-    }
-  }
-  else { // !po && !rpo
+  switch ( po_mode ) {
+  case kDtpgPoNone:
     mNetwork->activate_all();
 
     switch ( mode ) {
@@ -175,6 +103,72 @@ DtpgSat::run(tDtpgMode mode,
       all_mode(bt, op);
       break;
     }
+    break;
+
+  case kDtpgPoInc:
+    {
+      ymuint no = mNetwork->output_num2();
+      for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+	mNetwork->activate_po(po_pos);
+
+	switch ( mode ) {
+	case kDtpgSingle:
+	  single_mode(bt, op);
+	  break;
+
+	case kDtpgDual:
+	  dual_mode(bt, op);
+	  break;
+
+	case kDtpgNode:
+	  node_mode(bt, op);
+	  break;
+
+	case kDtpgFFR:
+	  ffr_mode(bt, op);
+	  break;
+
+	case kDtpgMFFC:
+	case kDtpgAll:
+	  all_mode(bt, op);
+	  break;
+	}
+      }
+    }
+    break;
+
+  case kDtpgPoDec:
+    {
+      ymuint no = mNetwork->output_num2();
+      for (ymuint i = 0; i < no; ++ i) {
+	ymuint po_pos = no - i - 1;
+	mNetwork->activate_po(po_pos);
+
+	switch ( mode ) {
+	case kDtpgSingle:
+	  single_mode(bt, op);
+	  break;
+
+	case kDtpgDual:
+	  dual_mode(bt, op);
+	  break;
+
+	case kDtpgNode:
+	  node_mode(bt, op);
+	  break;
+
+	case kDtpgFFR:
+	  ffr_mode(bt, op);
+	  break;
+
+	case kDtpgMFFC:
+	case kDtpgAll:
+	  all_mode(bt, op);
+	  break;
+	}
+      }
+    }
+    break;
   }
 }
 

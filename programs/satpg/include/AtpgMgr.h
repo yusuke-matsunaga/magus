@@ -148,10 +148,13 @@ public:
   set_dtpg_timer(bool enable);
 
   /// @brief テストパタン生成を行なう．
+  /// @param[in] mode メインモード
+  /// @param[in] po_mode PO分割モード
+  /// @param[in] skip_count スキップ回数
   void
   dtpg(tDtpgMode mode,
-       ymuint skip_count,
-       const string& option);
+       tDtpgPoMode po_mode,
+       ymuint skip_count);
 
 
 public:

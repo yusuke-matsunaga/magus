@@ -261,8 +261,8 @@ AtpgMgr::set_dtpg_timer(bool enable)
 // @brief テストパタン生成を行なう．
 void
 AtpgMgr::dtpg(tDtpgMode mode,
-	      ymuint skip_count,
-	      const string& option)
+	      tDtpgPoMode po_mode,
+	      ymuint skip_count)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
@@ -271,13 +271,13 @@ AtpgMgr::dtpg(tDtpgMode mode,
     BtSimple bt(_network().node_num());
     SkipOp op(mFaultMgr, mTvMgr, mTvList, *mFsim3, skip_count, mDtpgDrop, mDtpgVerify);
 
-    mDtpg->run(mode, bt, op, option);
+    mDtpg->run(mode, po_mode, bt, op);
   }
   else {
     BtSimple bt(_network().node_num());
     NormalOp op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
 
-    mDtpg->run(mode, bt, op, option);
+    mDtpg->run(mode, po_mode, bt, op);
   }
 
   mTimer.change(old_id);

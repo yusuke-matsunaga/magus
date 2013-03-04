@@ -57,15 +57,17 @@ public:
   void
   set_network(TpgNetwork& tgnetwork);
 
-  /// @brief モードでテスト生成を行なう．
+  /// @brief テスト生成を行なう．
+  /// @param[in] mode メインモード
+  /// @param[in] po_mode PO分割モード
   /// @param[in] op テスト生成後に呼ばれるファンクター
   /// @param[in] option オプション文字列
   virtual
   void
   run(tDtpgMode mode,
+      tDtpgPoMode po_mode,
       BackTracer& bt,
-      TpgOperator& op,
-      const string& option = string());
+      TpgOperator& op);
 
   /// @brief single モードでテスト生成を行なう．
   /// @param[in] op テスト生成後に呼ばれるファンクター

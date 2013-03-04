@@ -153,8 +153,8 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     mode = kDtpgAll;
   }
 
-  bool po_mode = mPoptPo->is_specified();
-  bool rpo_mode = mPoptRpo->is_specified();
+  bool po_flag = mPoptPo->is_specified();
+  bool rpo_flag = mPoptRpo->is_specified();
   int skip_count = 0;
   if ( mPoptSkip->is_specified() ) {
     skip_count = mPoptSkip->val();
@@ -172,15 +172,15 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   mgr().clear_stats();
 
-  string dtpg_option = "";
-  if ( po_mode ) {
-    dtpg_option = "po";
+  tDtpgPoMode po_mode = kDtpgPoNone;
+  if ( po_flag ) {
+    po_mode = kDtpgPoInc;
   }
-  if ( rpo_mode ) {
-    dtpg_option = "rpo";
+  if ( rpo_flag ) {
+    po_mode = kDtpgPoDec;
   }
 
-  mgr().dtpg(mode, skip_count, dtpg_option);
+  mgr().dtpg(mode, po_mode, skip_count);
 
   after_update_faults();
 
