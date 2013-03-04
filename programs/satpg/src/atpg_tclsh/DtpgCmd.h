@@ -86,7 +86,7 @@ private:
   TclPopt* mPoptRpo;
 
   // skip オプションの解析用オブジェクト
-  TclPopt* mPoptSkip;
+  TclPoptInt* mPoptSkip;
 
   // X抽出オプションの解析用オブジェクト
   TclPoptInt* mPoptX;

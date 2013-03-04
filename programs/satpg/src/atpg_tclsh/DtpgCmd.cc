@@ -51,8 +51,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			"po-split mode");
   mPoptRpo = new TclPopt(this, "rpo",
 			 "po-split (reverse order) mode");
-  mPoptSkip = new TclPopt(this, "skip",
-			  "skip mode");
+  mPoptSkip = new TclPoptInt(this, "skip",
+			     "specify skip count <INT>");
   mPoptX = new TclPoptInt(this, "x",
 			  "X-extract mode [0-1]");
   mPoptDrop = new TclPopt(this, "drop",
@@ -155,7 +155,10 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   bool po_mode = mPoptPo->is_specified();
   bool rpo_mode = mPoptRpo->is_specified();
-  bool skip_mode = mPoptSkip->is_specified();
+  int skip_count = 0;
+  if ( mPoptSkip->is_specified() ) {
+    skip_count = mPoptSkip->val();
+  }
 
   if ( mPoptX->is_specified() ) {
     mgr().set_dtpg_xmode(mPoptX->val());
@@ -177,7 +180,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     dtpg_option = "rpo";
   }
 
-  mgr().dtpg(mode, skip_mode, dtpg_option);
+  mgr().dtpg(mode, skip_count, dtpg_option);
 
   after_update_faults();
 

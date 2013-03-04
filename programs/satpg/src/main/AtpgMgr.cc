@@ -261,15 +261,15 @@ AtpgMgr::set_dtpg_timer(bool enable)
 // @brief テストパタン生成を行なう．
 void
 AtpgMgr::dtpg(tDtpgMode mode,
-	      bool skip,
+	      ymuint skip_count,
 	      const string& option)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  if ( skip ) {
+  if ( skip_count > 0 ) {
     BtSimple bt(_network().node_num());
-    SkipOp op(mFaultMgr, mTvMgr, mTvList, *mFsim3, 3, mDtpgDrop, mDtpgVerify);
+    SkipOp op(mFaultMgr, mTvMgr, mTvList, *mFsim3, skip_count, mDtpgDrop, mDtpgVerify);
 
     mDtpg->run(mode, bt, op, option);
   }

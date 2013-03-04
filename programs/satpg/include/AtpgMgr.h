@@ -150,7 +150,7 @@ public:
   /// @brief テストパタン生成を行なう．
   void
   dtpg(tDtpgMode mode,
-       bool skip,
+       ymuint skip_count,
        const string& option);
 
 
