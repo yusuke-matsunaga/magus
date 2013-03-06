@@ -462,7 +462,6 @@ END_NONAMESPACE
 // @brief コンストラクタ
 SatEngineImpl::SatEngineImpl()
 {
-  mGetPatFlag = 0;
   mTimerEnable = false;
 }
 
@@ -480,13 +479,6 @@ SatEngineImpl::set_mode(const string& type,
   mType = type;
   mOption = option;
   mOutP = outp;
-}
-
-// @brief get_pat フラグを設定する．
-void
-SatEngineImpl::set_get_pat(ymuint val)
-{
-  mGetPatFlag = val;
 }
 
 // @brief 統計情報をクリアする．

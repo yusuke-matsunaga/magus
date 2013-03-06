@@ -40,11 +40,6 @@ public:
 	   const string& option = string(),
 	   ostream* outp = NULL) = 0;
 
-  /// @brief get_pat フラグを設定する．
-  virtual
-  void
-  set_get_pat(ymuint val) = 0;
-
   /// @brief テスト生成を行なう．
   /// @param[in] flist 対象の故障リスト
   /// @param[in] max_id ノード番号の最大値 + 1

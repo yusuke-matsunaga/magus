@@ -47,13 +47,6 @@ DtpgSat::set_mode(const string& type,
   mSatEngine->set_mode(type, option, outp);
 }
 
-// @brief get_pat フラグを設定する．
-void
-DtpgSat::set_get_pat(ymuint val)
-{
-  mSatEngine->set_get_pat(val);
-}
-
 // @brief 回路と故障リストを設定する．
 // @param[in] tgnetwork 対象のネットワーク
 void

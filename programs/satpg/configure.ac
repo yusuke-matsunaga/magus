@@ -82,6 +82,9 @@ AC_DEFINE_UNQUOTED(ALIGNOF_DOUBLE, $ym_alignof_double, [Alignment of double])
 # Checks for library functions
 # ===================================================================
 
+# Check for gmp
+YM_CHECK_GMP
+
 
 # ===================================================================
 # Check for popt

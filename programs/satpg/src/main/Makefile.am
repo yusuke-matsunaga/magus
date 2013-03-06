@@ -12,7 +12,8 @@ libatpg_main_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/src
+	-I$(top_srcdir)/src \
+	$(GMP_INCLUDES)
 
 libatpg_main_la_SOURCES = \
 	AtpgMgr.cc \
@@ -25,8 +26,12 @@ libatpg_main_la_SOURCES = \
 	BtBase.cc \
 	BtSimple.h \
 	BtSimple.cc \
+	BtJustBase.h \
+	BtJustBase.cc \
 	BtJust1.h \
-	BtJust1.cc
+	BtJust1.cc \
+	BtZdd.h \
+	BtZdd.cc
 
 libatpg_main_la_LDFLAGS =
 

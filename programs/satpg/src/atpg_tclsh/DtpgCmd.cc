@@ -54,7 +54,7 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
   mPoptSkip = new TclPoptInt(this, "skip",
 			     "specify skip count <INT>");
   mPoptX = new TclPoptInt(this, "x",
-			  "X-extract mode [0-1]");
+			  "X-extract mode [0-2]");
   mPoptDrop = new TclPopt(this, "drop",
 			  "with fault drop");
   mPoptVerify = new TclPopt(this, "verify",
@@ -160,8 +160,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     skip_count = mPoptSkip->val();
   }
 
+  ymuint xmode = 0;
   if ( mPoptX->is_specified() ) {
-    mgr().set_dtpg_xmode(mPoptX->val());
+    xmode = mPoptX->val();
   }
 
   mgr().set_dtpg_drop_mode(mPoptDrop->is_specified());
@@ -180,7 +181,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     po_mode = kDtpgPoDec;
   }
 
-  mgr().dtpg(mode, po_mode, skip_count);
+  mgr().dtpg(mode, po_mode, skip_count, xmode);
 
   after_update_faults();
 

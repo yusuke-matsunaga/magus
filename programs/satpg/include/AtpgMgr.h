@@ -154,7 +154,8 @@ public:
   void
   dtpg(tDtpgMode mode,
        tDtpgPoMode po_mode,
-       ymuint skip_count);
+       ymuint skip_count,
+       ymuint xmode);
 
 
 public:

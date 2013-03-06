@@ -51,11 +51,6 @@ public:
 	   const string& option = string(),
 	   ostream* outp = NULL);
 
-  /// @brief get_pat フラグを設定する．
-  virtual
-  void
-  set_get_pat(ymuint val);
-
   /// @brief テスト生成を行なう．
   /// @param[in] flist 対象の故障リスト
   /// @param[in] max_id ノード番号の最大値 + 1
@@ -155,9 +150,6 @@ private:
 
   // SAT solver の記録用ストリーム
   ostream* mOutP;
-
-  // get_pat フラグ
-  ymuint32 mGetPatFlag;
 
   // SAT 用の assumption を格納するベクタ
   vector<Literal> mAssumptions;

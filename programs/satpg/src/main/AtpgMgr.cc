@@ -14,6 +14,8 @@
 #include "TpgNetwork.h"
 #include "TpgFault.h"
 #include "BtSimple.h"
+#include "BtJust1.h"
+#include "BtZdd.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -230,13 +232,6 @@ AtpgMgr::set_dtpg_mode(const string& type,
   mDtpg->set_mode(type, option, outp);
 }
 
-// @brief X抽出のモードを指定する．
-void
-AtpgMgr::set_dtpg_xmode(ymuint val)
-{
-  mDtpg->set_get_pat(val);
-}
-
 // @brief テストパタン生成時に故障ドロップを行なうかを指定する．
 void
 AtpgMgr::set_dtpg_drop_mode(bool drop)
@@ -262,23 +257,36 @@ AtpgMgr::set_dtpg_timer(bool enable)
 void
 AtpgMgr::dtpg(tDtpgMode mode,
 	      tDtpgPoMode po_mode,
-	      ymuint skip_count)
+	      ymuint skip_count,
+	      ymuint xmode)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  if ( skip_count > 0 ) {
-    BtSimple bt(_network().node_num());
-    SkipOp op(mFaultMgr, mTvMgr, mTvList, *mFsim3, skip_count, mDtpgDrop, mDtpgVerify);
+  BackTracer* bt = NULL;
+  ymuint max_id = _network().node_num();
+  switch ( xmode ) {
+  case 0: bt = new BtSimple(max_id); break;
+  case 1: bt = new BtJust1(max_id); break;
+  case 2: bt = new BtZdd(max_id); break;
+  default: // デフォルトフォールバック
+    bt = new BtSimple(max_id); break;
+  }
 
-    mDtpg->run(mode, po_mode, bt, op);
+  if ( skip_count > 0 ) {
+    SkipOp op(mFaultMgr, mTvMgr, mTvList, *mFsim3, skip_count,
+	      mDtpgDrop, mDtpgVerify);
+
+    mDtpg->run(mode, po_mode, *bt, op);
   }
   else {
-    BtSimple bt(_network().node_num());
-    NormalOp op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgDrop, mDtpgVerify);
+    NormalOp op(mFaultMgr, mTvMgr, mTvList, *mFsim3,
+		mDtpgDrop, mDtpgVerify);
 
-    mDtpg->run(mode, po_mode, bt, op);
+    mDtpg->run(mode, po_mode, *bt, op);
   }
+
+  delete bt;
 
   mTimer.change(old_id);
 }

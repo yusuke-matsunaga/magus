@@ -34,11 +34,6 @@ public:
 	   const string& option = string(),
 	   ostream* outp = NULL) = 0;
 
-  /// @brief get_pat フラグを設定する．
-  virtual
-  void
-  set_get_pat(ymuint val) = 0;
-
   /// @brief 回路と故障リストを設定する．
   /// @param[in] tpgnetwork 対象のネットワーク
   virtual
