@@ -1,40 +1,35 @@
-#ifndef MSOP_H
-#define MSOP_H
+#ifndef MS2OP_H
+#define MS2OP_H
 
-/// @file MsOp.h
-/// @brief MsOp のヘッダファイル
+/// @file Ms2Op.h
+/// @brief Ms2Op のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ZddOp.h"
-#include "CompTbl.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
 
-class ZddBinOp;
-
 //////////////////////////////////////////////////////////////////////
-/// @class MsOp MsOp.h "MsOp.h"
-/// @brief minimal setsを求めるクラス
+/// @class Ms2Op Ms2Op.h "Ms2Op.h"
+/// @brief minimum set を求める演算クラス
 //////////////////////////////////////////////////////////////////////
-class MsOp :
+class Ms2Op :
   public ZddOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr マネージャ
-  /// @param[in] diff_op 集合差演算オブジェクト
-  MsOp(ZddMgrImpl* mgr,
-       ZddBinOp* diff_op);
+  Ms2Op(ZddMgrImpl* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~MsOp();
+  ~Ms2Op();
 
 
 public:
@@ -43,12 +38,10 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief minimum set 演算を行う関数
-  /// @param[in] left オペランド
-  virtual
   ZddEdge
   apply(ZddEdge left);
 
-  /// @brief 次の GC で回収されるノードに関連した情報を削除する．
+  /// @brief 次回のGCで回収されるノードに関連した情報を削除する．
   virtual
   void
   sweep();
@@ -56,12 +49,16 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 下請け関数
+  // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 実際に演算を行う関数
+  /// @brief apply() の下請け関数
+  /// @param[in] e 対象の枝
+  /// @param[out] nelem 要素数
+  /// @return minimum set の枝を返す．
   ZddEdge
-  apply_step(ZddEdge e);
+  apply_step(ZddEdge e,
+	     ymuint& nelem);
 
 
 private:
@@ -69,14 +66,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 演算結果テーブル
-  CompTbl1 mCompTbl;
-
-  // 集合差演算
-  ZddBinOp* mDiffOp;
+  // 枝をキーとしてminimum set を保持するハッシュ表
+  hash_map<ZddEdge, pair<ZddEdge, ymuint32> > mHash;
 
 };
 
+
 END_NAMESPACE_YM_ZDD
 
-#endif // MSOP_H
+#endif // MS2OP_H

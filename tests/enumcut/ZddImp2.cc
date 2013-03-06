@@ -68,7 +68,7 @@ ZddImp2::operator()(BdnMgr& network,
     Zdd cut0 = mCuts[node0->id()];
     Zdd cut1 = mCuts[node1->id()];
     Zdd cut = mMgr.merge(cut0, cut1, limit);
-    cut = mMgr.minimum_set(cut);
+    cut = mMgr.make_minimal(cut);
     Zdd cut2 = mMgr.make_base();
     cut2.swap(VarId(node->id()));
     cut |= cut2;

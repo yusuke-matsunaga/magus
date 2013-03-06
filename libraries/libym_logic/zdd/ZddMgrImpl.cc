@@ -24,6 +24,7 @@
 #include "MergeOp2.h"
 #include "NeOp.h"
 #include "MsOp.h"
+#include "Ms2Op.h"
 
 
 #if !defined(__SUNPRO_CC) || __SUNPRO_CC >= 0x500
@@ -206,6 +207,7 @@ ZddMgrImpl::ZddMgrImpl(const string& name,
   mSupOp = new SupOp(this);
   mNeOp = new NeOp(this);
   mMsOp = new MsOp(this, mDiffOp);
+  mMs2Op = new Ms2Op(this);
   mMergeOp = new MergeOp(this, mCupOp);
   mMergeOp2 = new MergeOp2(this, mCupOp, mNeOp, mMsOp);
 }
@@ -447,9 +449,16 @@ ZddMgrImpl::n_element(ZddEdge e,
 
 // @brief 極小集合のみする．
 ZddEdge
-ZddMgrImpl::minimum_set(ZddEdge e)
+ZddMgrImpl::make_minimal(ZddEdge e)
 {
   return mMsOp->apply(e);
+}
+
+// @brief 要素数最小の集合を一つ返す．
+ZddEdge
+ZddMgrImpl::minimum_set(ZddEdge e)
+{
+  return mMs2Op->apply(e);
 }
 
 // edge_list に含まれる枝を根とするZDDのサポートに印をつける．

@@ -131,6 +131,10 @@ public:
 
   /// @brief 極小集合のみにする．
   Zdd
+  make_minimal(const Zdd& left);
+
+  /// @brief 要素数最小の集合を一つ返す．
+  Zdd
   minimum_set(const Zdd& left);
 
 

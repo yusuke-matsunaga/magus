@@ -26,6 +26,7 @@ class SupOp;
 class MergeOp2;
 class NeOp;
 class MsOp;
+class Ms2Op;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ZddMgrImpl ZddMgrImpl.h "ZddMgrImpl.h"
@@ -153,7 +154,11 @@ public:
   n_element(ZddEdge e,
 	    ymuint limit);
 
-  /// @brief 極小集合のみする．
+  /// @brief 極小集合のみにする．
+  ZddEdge
+  make_minimal(ZddEdge e);
+
+  /// @brief 要素数最小の集合を一つ返す．
   ZddEdge
   minimum_set(ZddEdge e);
 
@@ -585,8 +590,11 @@ private:
   // n_element 用の演算オブジェクト
   NeOp* mNeOp;
 
-  // minimum_set 用の演算オブジェクト
+  // make_minimal 用の演算オブジェクト
   MsOp* mMsOp;
+
+  // minimum_set 用の演算オブジェクト
+  Ms2Op* mMs2Op;
 
   // 演算オブジェクトのリスト
   list<ZddOp*> mOpList;
