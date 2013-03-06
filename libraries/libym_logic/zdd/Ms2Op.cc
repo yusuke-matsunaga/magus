@@ -57,7 +57,7 @@ Ms2Op::apply_step(ZddEdge e,
 {
   if ( e.zattr() ) {
     nelem = 0;
-    ZddEdge::make_one();
+    return ZddEdge::make_one();
   }
 
   assert_cond( !e.is_zero(), __FILE__, __LINE__);
@@ -82,7 +82,7 @@ Ms2Op::apply_step(ZddEdge e,
     ymuint nelem1;
     ZddEdge r_1 = apply_step(e_1, nelem1);
     if ( nelem == 0 || nelem > nelem1 + 1 ) {
-      nelem = nelem1;
+      nelem = nelem1 + 1;
       r = new_node(level, ZddEdge::make_zero(), r_1);
     }
   }
