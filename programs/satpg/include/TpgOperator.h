@@ -34,7 +34,7 @@ public:
 
   /// @brief テストパタンが見つかった場合に呼ばれる関数
   /// @param[in] f 故障
-  /// @param[in] val_list "入力ノードの番号 x 2 + 値" のリスト
+  /// @param[in] val_list ("入力ノードの番号 x 3 + 値") のリスト
   virtual
   void
   set_detected(TpgFault* f,

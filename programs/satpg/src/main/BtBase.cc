@@ -51,12 +51,14 @@ BtBase::record_value(TpgNode* node)
 {
   assert_cond( node->is_input(), __FILE__, __LINE__);
 
-  // 今のところ model には 0 か 1 しか設定されていないはず．
   Bool3 v = node_gval(node);
   ymuint iid = node->input_id();
-  ymuint packed_val = iid * 2;
-  if ( v == kB3True ) {
+  ymuint packed_val = iid * 3;
+  if ( v == kB3False ) {
     packed_val += 1;
+  }
+  else if ( v == kB3True ) {
+    packed_val += 2;
   }
   mValList.push_back(packed_val);
 }

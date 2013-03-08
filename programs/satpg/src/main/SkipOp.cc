@@ -9,10 +9,6 @@
 
 #include "SkipOp.h"
 #include "TpgFault.h"
-#include "FaultMgr.h"
-#include "TvMgr.h"
-#include "Fsim.h"
-#include "TestVector.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -29,13 +25,8 @@ SkipOp::SkipOp(FaultMgr& fault_mgr,
 	       ymuint threshold,
 	       bool drop,
 	       bool verify) :
-  mFaultMgr(fault_mgr),
-  mTvMgr(tvmgr),
-  mTvList(tv_list),
-  mFsim3(fsim3),
-  mThreshold(threshold),
-  mDrop(drop),
-  mVerify(verify)
+  OpBase(fault_mgr, tvmgr, tv_list, fsim3, drop, verify),
+  mThreshold(threshold)
 {
 }
 
@@ -51,48 +42,6 @@ SkipOp::~SkipOp()
        p != mSkipList.end(); ++ p) {
     TpgFault* f = *p;
     f->clear_skip();
-  }
-}
-
-// @brief テストパタンが見つかった場合に呼ばれる関数
-// @param[in] f 故障
-// @param[in] val_list "入力ノードの番号 x 2 + 値" のリスト
-void
-SkipOp::set_detected(TpgFault* f,
-		     const vector<ymuint>& val_list)
-{
-  TestVector* tv = mTvMgr.new_vector();
-  tv->init();
-  for (vector<ymuint>::const_iterator p = val_list.begin();
-       p != val_list.end(); ++ p) {
-    ymuint tmp = *p;
-    ymuint iid = tmp / 2;
-    ymuint val = tmp % 2;
-    if ( val == 1 ) {
-      tv->set_val(iid, kVal1);
-    }
-    else {
-      tv->set_val(iid, kVal0);
-    }
-  }
-
-  mTvList.push_back(tv);
-
-  mFaultMgr.set_status(f, kFsDetected);
-
-  if ( mDrop ) {
-    vector<TpgFault*> det_faults;
-    mFsim3.run(tv, det_faults);
-    for (vector<TpgFault*>::iterator p = det_faults.begin();
-	 p != det_faults.end(); ++ p) {
-      TpgFault* f = *p;
-      mFaultMgr.set_status(f, kFsDetected);
-    }
-  }
-
-  if ( mVerify ) {
-    bool detect = mFsim3.run(tv, f);
-    assert_cond( detect , __FILE__, __LINE__);
   }
 }
 
