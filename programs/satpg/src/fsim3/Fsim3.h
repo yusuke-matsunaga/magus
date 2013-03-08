@@ -87,8 +87,7 @@ private:
 
   /// @brief FFR 内の故障シミュレーションを行う．
   bool
-  ffr_simulate(SimFFR* ffr,
-	       vector<FsimFault*>& det_flist);
+  ffr_simulate(SimFFR& ffr);
 
   /// @brief 正常値の計算を行う．
   /// @note 値の変わったノードは mGvalClearArray に積まれる．
@@ -199,6 +198,9 @@ private:
 
   // 故障シミュレーション用の故障の配列
   vector<FsimFault> mFsimFaults;
+
+  // ffr_simulate() で用いる故障のベクタ
+  vector<FsimFault*> mDetFaults;
 
 };
 

@@ -319,10 +319,10 @@ Fsim3::run(TestVector* tv,
   // FFR ごとに処理を行う．
   for (vector<SimFFR>::iterator p = mFFRArray.begin();
        p != mFFRArray.end(); ++ p) {
-    SimFFR* ffr = &(*p);
-    if ( ffr->fault_list().empty() ) continue;
+    SimFFR& ffr = *p;
+    if ( ffr.fault_list().empty() ) continue;
 
-    SimNode* root = ffr->root();
+    SimNode* root = ffr.root();
     Val3 gval = root->gval();
 
     // FFR の根の値が X なら故障の検出はできない．
@@ -332,8 +332,7 @@ Fsim3::run(TestVector* tv,
     // 結果は Fsim3Fault.mObsMask に保存される．
     // FFR 内の全ての obs マスクを ffr_req に入れる．
     // 検出済みの故障は ffr->fault_list() から取り除かれる．
-    vector<FsimFault*> det_flist;
-    bool ffr_req = ffr_simulate(ffr, det_flist);
+    bool ffr_req = ffr_simulate(ffr);
 
     // ffr_req が 0 ならその後のシミュレーションを行う必要はない．
     if ( ffr_req == false ) {
@@ -348,8 +347,8 @@ Fsim3::run(TestVector* tv,
       }
     }
 
-    for (vector<FsimFault*>::iterator p = det_flist.begin();
-	 p != det_flist.end(); ++ p) {
+    for (vector<FsimFault*>::iterator p = mDetFaults.begin();
+	 p != mDetFaults.end(); ++ p) {
       FsimFault* ff = *p;
       TpgFault* f = ff->mOrigF;
       det_faults.push_back(f);
@@ -550,19 +549,18 @@ Fsim3::update_faults()
 
 // @brief FFR 内の故障シミュレーションを行う．
 bool
-Fsim3::ffr_simulate(SimFFR* ffr,
-		    vector<FsimFault*>& det_flist)
+Fsim3::ffr_simulate(SimFFR& ffr)
 {
-  vector<FsimFault*>& flist = ffr->fault_list();
+  vector<FsimFault*>& flist = ffr.fault_list();
   ymuint fnum = flist.size();
   ymuint wpos = 0;
-  det_flist.clear();
-  det_flist.reserve(fnum);
+  mDetFaults.clear();
+  mDetFaults.reserve(fnum);
   for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
     FsimFault* ff = flist[rpos];
     TpgFault* f = ff->mOrigF;
     FaultStatus fs = f->status();
-    if ( fs == kFsDetected || fs == kFsUntestable ) {
+    if ( fs == kFsDetected ) {
       continue;
     }
 
@@ -590,7 +588,7 @@ Fsim3::ffr_simulate(SimFFR* ffr,
 	continue;
       }
     }
-    det_flist.push_back(ff);
+    mDetFaults.push_back(ff);
   }
 
   if ( wpos < fnum ) {
@@ -605,7 +603,7 @@ Fsim3::ffr_simulate(SimFFR* ffr,
     clear_lobs(node);
   }
 
-  return !det_flist.empty();
+  return !mDetFaults.empty();
 }
 
 // @brief イベントキューを用いてシミュレーションを行う．
