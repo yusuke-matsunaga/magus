@@ -41,6 +41,7 @@ BtJustBase::clear_justified()
     mJustifiedMarkArray[node->id()] = false;
     clear_justified_hook(node);
   }
+  mJustifiedNodeList.clear();
 }
 
 // @brief clear_justified() 中で呼ばれるフック関数
