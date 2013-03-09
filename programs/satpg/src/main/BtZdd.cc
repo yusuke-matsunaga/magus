@@ -204,16 +204,25 @@ Zdd
 BtZdd::just_sub2(TpgNode* node,
 		 Bool3 val)
 {
-  Zdd ans = mMgr.make_empty();
+  Zdd gans = mMgr.make_empty();
+  Zdd fans = mMgr.make_empty();
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
     Bool3 igval = node_gval(inode);
     Bool3 ifval = node_fval(inode);
-    if ( igval == val || ifval == val ) {
-      ans |= justify(inode);
+    if ( igval != val && ifval != val ) {
+      continue;
+    }
+    Zdd tmp = justify(inode);
+    if ( igval == val ) {
+      gans |= tmp;
+    }
+    if ( ifval == val ) {
+      fans |= tmp;
     }
   }
+  Zdd ans = mMgr.merge(gans, fans);
   return ans;
 }
 
@@ -325,16 +334,25 @@ BtZdd::jp_sub2(TpgPrimitive* prim,
 	       TpgNode* node,
 	       Bool3 val)
 {
-  Zdd ans = mMgr.make_empty();
+  Zdd gans = mMgr.make_empty();
+  Zdd fans = mMgr.make_empty();
   ymuint ni = prim->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     TpgPrimitive* iprim = prim->fanin(i);
     Bool3 igval = primitive_gval(iprim);
     Bool3 ifval = primitive_fval(iprim);
-    if ( igval == val || ifval == val ) {
-      ans |= justify_primitive(iprim, node);
+    if ( igval != val && ifval != val ) {
+      continue;
+    }
+    Zdd tmp = justify_primitive(iprim, node);
+    if ( igval == val ) {
+      gans |= tmp;
+    }
+    if ( ifval == val ) {
+      fans |= tmp;
     }
   }
+  Zdd ans = mMgr.merge(gans, fans);
   return ans;
 }
 

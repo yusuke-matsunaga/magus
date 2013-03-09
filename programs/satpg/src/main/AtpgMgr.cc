@@ -15,6 +15,7 @@
 #include "TpgFault.h"
 #include "BtSimple.h"
 #include "BtJust1.h"
+#include "BtJust2.h"
 #include "BtZdd.h"
 
 
@@ -268,7 +269,8 @@ AtpgMgr::dtpg(tDtpgMode mode,
   switch ( xmode ) {
   case 0: bt = new BtSimple(max_id); break;
   case 1: bt = new BtJust1(max_id); break;
-  case 2: bt = new BtZdd(max_id); break;
+  case 2: bt = new BtJust2(max_id); break;
+  case 3: bt = new BtZdd(max_id); break;
   default: // デフォルトフォールバック
     bt = new BtSimple(max_id); break;
   }

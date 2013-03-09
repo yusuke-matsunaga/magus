@@ -32,6 +32,8 @@ libatpg_main_la_SOURCES = \
 	BtJustBase.cc \
 	BtJust1.h \
 	BtJust1.cc \
+	BtJust2.h \
+	BtJust2.cc \
 	BtZdd.h \
 	BtZdd.cc
 
