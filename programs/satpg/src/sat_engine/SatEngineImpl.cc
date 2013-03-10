@@ -970,6 +970,7 @@ SatEngineImpl::get_stats(DtpgStats& stats) const
   stats.mAbortCount = mAbortCount;
   stats.mAbortTime = mAbortTime;
 
+#if 0
   if ( mRunCount > 0 ) {
     cout << "# of runs:                       " << mRunCount << endl
 	 << "# of problems:                   " << mSatCount << endl
@@ -983,6 +984,7 @@ SatEngineImpl::get_stats(DtpgStats& stats) const
 	 << "Ave. # of decisions:             " << (double) mDecisionNum / mSatCount << endl
 	 << "Ave. # of implications:          " << (double) mPropagationNum / mSatCount << endl;
   }
+#endif
 }
 
 // @breif 時間計測を制御する．

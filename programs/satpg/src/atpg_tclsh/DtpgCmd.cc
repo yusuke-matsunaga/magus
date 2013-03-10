@@ -169,7 +169,11 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   mgr().set_dtpg_verify_mode(mPoptVerify->is_specified());
 
+#if 0
   mgr().set_dtpg_timer(mPoptTimer->is_specified());
+#else
+  mgr().set_dtpg_timer(print_stats);
+#endif
 
   mgr().clear_stats();
 
@@ -188,6 +192,47 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   if ( print_stats ) {
     DtpgStats stats;
     mgr().get_stats(stats);
+
+    ios::fmtflags save = cout.flags();
+    cout.setf(ios::fixed, ios::floatfield);
+    if ( stats.mCnfGenCount > 0 ) {
+      cout << "CNF generation" << endl
+	   << "  " << setw(10) << stats.mCnfGenCount
+	   << "  " << stats.mCnfGenTime
+	   << "  " << setw(8) << stats.mCnfGenTime.usr_time_usec() / stats.mCnfGenCount
+	   << "u usec"
+	   << "  " << setw(8) << stats.mCnfGenTime.sys_time_usec() / stats.mCnfGenCount
+	   << "s usec" << endl;
+    }
+    if ( stats.mDetCount > 0 ) {
+      cout << "SAT" << endl
+	   << "  " << setw(10) << stats.mDetCount
+	   << "  " << stats.mDetTime
+	   << "  " << setw(8) << stats.mDetTime.usr_time_usec() / stats.mDetCount
+	   << "u usec"
+	   << "  " << setw(8) << stats.mDetTime.sys_time_usec() / stats.mDetCount
+	   << "s usec" << endl;
+    }
+    if ( stats.mRedCount > 0 ) {
+      cout << "UNSAT" << endl
+	   << "  " << setw(10) << stats.mRedCount
+	   << "  " << stats.mRedTime
+	   << "  " << setw(8) << stats.mRedTime.usr_time_usec() / stats.mRedCount
+	   << "u usec"
+	   << "  " << setw(8) << stats.mRedTime.sys_time_usec() / stats.mRedCount
+	   << "s usec" << endl;
+    }
+    if ( stats.mAbortCount > 0 ) {
+      cout << "ABORT" << endl
+	   << "  " << setw(10) << stats.mAbortCount
+	   << "  " << stats.mAbortTime
+	   << "  " << setw(8) << stats.mAbortTime.usr_time_usec() / stats.mAbortCount
+	   << "u usec"
+	   << "  " << setw(8) << stats.mAbortTime.sys_time_usec() / stats.mAbortCount
+	   << "s usec" << endl;
+    }
+    cout.flags(save);
+
 #if 0
     const DtpgStats& stats = mDtpg.stats();
     cout << "********** dtpg **********" << endl
