@@ -12,6 +12,7 @@
 #include "AtpgMgr.h"
 #include "AtpgCmd.h"
 #include "NtwkIoCmd.h"
+#include "RtpgCmd.h"
 #include "DtpgCmd.h"
 #include "PrintFaultCmd.h"
 #include "PrintPatCmd.h"
@@ -44,6 +45,7 @@ atpg_init(Tcl_Interp* interp)
   TclCmdBinder1<PrintStatsCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::print_stats");
   TclCmdBinder1<PrintPatCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::print_pat");
   TclCmdBinder1<PrintPatStatsCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::print_pat_stats");
+  TclCmdBinder1<RtpgCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::rtpg");
   TclCmdBinder1<DtpgCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::dtpg");
 
 
@@ -60,6 +62,7 @@ atpg_init(Tcl_Interp* interp)
       << "proc complete(print_stats) { t s e l p m } { return \"\" }" << endl
       << "proc complete(print_pat) { t s e l p m } { return \"\" }" << endl
       << "proc complete(print_pat_stats) { t s e l p m } { return \"\" }" << endl
+      << "proc complete(rtpg) { t s e l p m } { return \"\" }" << endl
       << "proc complete(dtpg) { t s e l p m } { return \"\" }" << endl
       << "}" << endl
       << "}" << endl;

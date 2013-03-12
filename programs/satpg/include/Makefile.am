@@ -16,7 +16,7 @@ noinst_HEADERS = \
 	FaultStatus.h \
 	PackedVal.h \
 	PackedVal3.h \
-	Rtpg.h \
+	RtpgStats.h \
 	SatEngine.h \
 	TpgFault.h \
 	TpgNetwork.h \

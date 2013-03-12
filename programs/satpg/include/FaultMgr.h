@@ -239,6 +239,15 @@ FaultMgr::remain_list()
   return mRemainList;
 }
 
+// @brief 未検出の代表故障数を得る．
+inline
+ymuint
+FaultMgr::remain_num()
+{
+  update();
+  return mRemainList.size();
+}
+
 // @brief 検出不能故障のリストを得る．
 inline
 const vector<TpgFault*>&
@@ -246,6 +255,15 @@ FaultMgr::untest_list()
 {
   update();
   return mUntestList;
+}
+
+// @brief 検出不能故障数を得る．
+inline
+ymuint
+FaultMgr::untest_num()
+{
+  update();
+  return mUntestList.size();
 }
 
 // @brief 出力の故障を生成する．

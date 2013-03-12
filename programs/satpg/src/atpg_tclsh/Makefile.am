@@ -38,6 +38,8 @@ atpg_tclsh_SOURCES = \
 	PrintPatStatsCmd.cc \
 	PrintStatsCmd.h \
 	PrintStatsCmd.cc \
+	RtpgCmd.h \
+	RtpgCmd.cc \
 	DtpgCmd.h \
 	DtpgCmd.cc
 

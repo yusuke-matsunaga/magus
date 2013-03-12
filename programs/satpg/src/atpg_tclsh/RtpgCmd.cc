@@ -8,6 +8,8 @@
 
 
 #include "RtpgCmd.h"
+#include "AtpgMgr.h"
+#include "RtpgStats.h"
 #include "ym_tclpp/TclPopt.h"
 
 
@@ -19,8 +21,7 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
 RtpgCmd::RtpgCmd(AtpgMgr* mgr) :
-  AtpgCmd(mgr),
-  mRtpg(mgr)
+  AtpgCmd(mgr)
 {
   mPoptNpat = new TclPoptInt(this, "npat",
 			     "specify number of patterns to be simulated");
@@ -84,12 +85,12 @@ RtpgCmd::cmd_proc(TclObjVector& objv)
     max_i = 0;
   }
 
-  mRtpg(min_f, max_i, max_pat);
+  RtpgStats stats;
+  mgr().rtpg(min_f, max_i, max_pat, stats);
 
   after_update_faults();
 
   if ( print_stats ) {
-    const RtpgStats& stats = mRtpg.stats();
     cout << "********** rtpg **********" << endl
 	 << setw(10) << stats.detected_faults()
 	 << ": # of detected faults" << endl

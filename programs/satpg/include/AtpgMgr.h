@@ -19,9 +19,12 @@
 #include "ym_cell/cell_nsdef.h"
 #include "ym_utils/Binder.h"
 #include "ym_utils/MStopWatch.h"
+#include "ym_utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
+
+class RtpgStats;
 
 //////////////////////////////////////////////////////////////////////
 /// @class AtpgMgr AtpgMgr.h "AtpgMgr.h"
@@ -95,6 +98,17 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 故障シミュレーションを行なう関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 乱数パタンを用いた故障シミュレーションを行なう．
+  /// @param[in] min_f 1回のシミュレーションで検出する故障数の下限
+  /// @param[in] max_i 故障検出できないシミュレーション回数の上限
+  /// @param[in] max_pat 最大のパタン数
+  /// @param[in] stats 実行結果の情報を格納する変数
+  void
+  rtpg(ymuint min_f,
+       ymuint max_i,
+       ymuint max_pat,
+       RtpgStats& stats);
 
   /// @brief 一つのテストベクタに対する故障シミュレーションを行なう．
   /// @param[in] tv テストベクタ
@@ -220,6 +234,9 @@ private:
 
   // テストベクタのリスト
   vector<TestVector*> mTvList;
+
+  // RTPG 用の乱数発生器
+  RandGen mPatGen;
 
   // 故障シミュレータ
   Fsim* mFsim;

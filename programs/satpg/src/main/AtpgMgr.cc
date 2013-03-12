@@ -8,6 +8,7 @@
 
 
 #include "AtpgMgr.h"
+#include "RtpgStats.h"
 #include "NormalOp.h"
 #include "NormalOp.h"
 #include "SkipOp.h"
@@ -141,6 +142,111 @@ AtpgMgr::read_iscas89(const string& filename)
   mTimer.change(old_id);
 
   return mNetwork != NULL;
+}
+
+// @brief 乱数パタンを用いた故障シミュレーションを行なう．
+// @param[in] min_f 1回のシミュレーションで検出する故障数の下限
+// @param[in] max_i 故障検出できないシミュレーション回数の上限
+// @param[in] max_pat 最大のパタン数
+// @param[in] stats 実行結果の情報を格納する変数
+void
+AtpgMgr::rtpg(ymuint min_f,
+	      ymuint max_i,
+	      ymuint max_pat,
+	      RtpgStats& stats)
+{
+  ymuint old_id = mTimer.cur_id();
+  mTimer.change(TM_FSIM);
+
+  StopWatch local_timer;
+  local_timer.start();
+
+  ymuint fnum = mFaultMgr.remain_num();
+  ymuint undet_i = 0;
+  ymuint epat_num = 0;
+  ymuint total_det_count = 0;
+
+  TestVector* tv_array[kPvBitLen];
+  for (ymuint i = 0; i < kPvBitLen; ++ i) {
+    tv_array[i] = mTvMgr.new_vector();
+  }
+
+  vector<TestVector*> cur_array;
+  cur_array.reserve(kPvBitLen);
+  vector<vector<TpgFault*> > det_faults(kPvBitLen);
+
+  ymuint pat_num = 0;
+  for ( ; ; ) {
+    if ( pat_num < max_pat ) {
+      TestVector* tv = tv_array[cur_array.size()];
+      tv->set_from_random(mPatGen);
+      cur_array.push_back(tv);
+      ++ pat_num;
+      if ( cur_array.size() < kPvBitLen ) {
+	continue;
+      }
+    }
+    else if ( cur_array.empty() ) {
+      break;
+    }
+
+    mFsim->run(cur_array, det_faults);
+
+    ymuint det_count = 0;
+    for (ymuint i = 0; i < cur_array.size(); ++ i) {
+      ymuint det_count1 = det_faults[i].size();
+      if ( det_count1 ) {
+	det_count += det_count1;
+	TestVector* tv = cur_array[i];
+	mTvList.push_back(tv);
+	tv_array[i] = mTvMgr.new_vector();
+	++ epat_num;
+	for (vector<TpgFault*>::iterator p = det_faults[i].begin();
+	     p != det_faults[i].end(); ++ p) {
+	  TpgFault* f = *p;
+	  if ( f->status() == kFsUndetected ) {
+	    mFaultMgr.set_status(f, kFsDetected);
+	  }
+	}
+      }
+    }
+    cur_array.clear();
+
+    mFaultMgr.update();
+
+    total_det_count += det_count;
+
+    if ( total_det_count == fnum ) {
+      // 全ての故障を検出した．
+      break;
+    }
+    if ( det_count < min_f ) {
+      // 一回の故障検出数が下限を下回った．
+      break;
+    }
+    if ( det_count > 0 ) {
+      undet_i = 0;
+    }
+    else {
+      ++ undet_i;
+      if ( undet_i > max_i ) {
+	// 未検出の回数が上限を越えた．
+	break;
+      }
+    }
+  }
+
+  // 後始末
+  for (ymuint i = 0; i < kPvBitLen; ++ i) {
+    mTvMgr.delete_vector(tv_array[i]);
+  }
+
+  stats.mDetectNum = total_det_count;
+  stats.mPatNum = pat_num;
+  stats.mEfPatNum = epat_num;
+  stats.mTime = local_timer.time();
+
+  mTimer.change(old_id);
 }
 
 // @brief 一つのテストベクタに対する故障シミュレーションを行なう．
