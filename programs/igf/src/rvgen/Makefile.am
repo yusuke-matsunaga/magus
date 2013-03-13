@@ -14,12 +14,16 @@ AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	@POPT_INCLUDES@
 
 MAINTAINERCLEANFILES = Makefile.in
 
 bin_PROGRAMS = \
 	rvgen
+
+bin_SCRIPTS = \
+	gen_data.sh
 
 rvgen_SOURCES = \
 	rvgen.cc
@@ -29,4 +33,5 @@ rvgen_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
-	$(TCL_LDADD)
+	$(TCL_LDADD) \
+	@POPT_LIBS@
