@@ -20,12 +20,13 @@ AM_CPPFLAGS = \
 MAINTAINERCLEANFILES = Makefile.in
 
 bin_PROGRAMS = \
-	rvgen
+	igf
 
-rvgen_SOURCES = \
-	rvgen.cc
+igf_SOURCES = \
+	igf.cc \
+	RvMgr.cc
 
-rvgen_LDADD = \
+igf_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \

@@ -29,4 +29,11 @@ END_NAMESPACE(nsIgf) \
 END_NAMESPACE_YM
 
 
+BEGIN_NAMESPACE_YM_IGF
+
+class RegVect;
+class RvMgr;
+
+END_NAMESPACE_YM_IGF
+
 #endif // IGF_NSDEF_H

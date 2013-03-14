@@ -3,7 +3,8 @@
 ## $Id: Makefile.am 2203 2009-04-16 05:04:40Z matsunaga $
 
 SUBDIRS = \
-	rvgen
+	rvgen \
+	igf \
 	$(YM_EXTRA_SUBDIRS)
 
 MAINTAINERCLEANFILES = Makefile.in

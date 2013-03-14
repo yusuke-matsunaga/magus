@@ -147,9 +147,8 @@ AC_CONFIG_FILES([
 	include/Makefile
 	src/Makefile
 	src/rvgen/Makefile
+	src/igf/Makefile
 	])
-
-AC_CONFIG_FILES([src/rvgen/gen_data.sh], [chmod +x src/rvgen/gen_data.sh])
 
 YM_EXTRA_SUBDIRS=""
 

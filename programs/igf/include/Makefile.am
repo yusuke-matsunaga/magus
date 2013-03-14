@@ -7,4 +7,6 @@ SUBDIRS =
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
-	igf_nsdef.h
+	igf_nsdef.h \
+	RegVect.h \
+	RvMgr.h
