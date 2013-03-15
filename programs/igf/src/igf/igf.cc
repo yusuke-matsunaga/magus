@@ -16,10 +16,14 @@
 
 #include "igf_nsdef.h"
 #include "RvMgr.h"
+#include "RegVect.h"
+#include "VarSplitter.h"
+#include "XorSplitter.h"
+#include "MultiSplitter.h"
+#include "ym_utils/Generator.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
-
 
 // usage を出力する．
 void
@@ -39,8 +43,8 @@ int
 igf(int argc,
     const char** argv)
 {
-  ymuint32 multi = 0;
-  ymuint32 comp = 0;
+  ymuint32 multi = 1;
+  ymuint32 comp = 1;
 
   // オプション解析用のデータ
   const struct poptOption options[] = {
@@ -51,10 +55,6 @@ igf(int argc,
     // option tag
     // docstr
     // argstr
-    { "indirect", 'i', POPT_ARG_NONE, NULL, 'i',
-      "indirect method", NULL},
-    { "direct", 'd', POPT_ARG_NONE, NULL, 'd',
-      "direct method", NULL},
     { "multi", 'm', POPT_ARG_INT, &multi, 'm',
       "specify multiplicity", "<INT>"},
     { "xor-complex", 'x', POPT_ARG_INT, &comp, 'x',
@@ -108,6 +108,58 @@ igf(int argc,
   }
 
   rvmgr.dump(cout);
+
+  ymuint n = rvmgr.vect_size();
+
+  // Splitter を生成
+  vector<XorSplitter*> splitters;
+  for (ymuint i = 0; i < n; ++ i) {
+    XorSplitter* splitter = new XorSplitter(vector<ymuint32>(1, i));
+    splitters.push_back(splitter);
+  }
+  for (ymuint comp_i = 2; comp_i <= comp; ++ comp_i) {
+    CombiGen cg(n, comp_i);
+
+    for (CombiGen::iterator p = cg.begin(); !p.is_end(); ++ p) {
+      vector<ymuint32> var_list(2);
+      var_list[0] = p(0);
+      var_list[1] = p(1);
+      XorSplitter* splitter = new XorSplitter(var_list);
+      splitters.push_back(splitter);
+    }
+  }
+
+  cout << endl;
+  for (vector<XorSplitter*>::iterator p = splitters.begin();
+       p != splitters.end(); ++ p) {
+    XorSplitter& splitter = **p;
+    const vector<ymuint32>& var_list = splitter.varid_list();
+    for (vector<ymuint32>::const_iterator q = var_list.begin();
+	 q != var_list.end(); ++ q) {
+      cout << " " << *q;
+    }
+    cout << endl;
+
+    const vector<RegVect*>& vect_list = rvmgr.vect_list();
+    for (vector<RegVect*>::const_iterator q = vect_list.begin();
+	 q != vect_list.end(); ++ q) {
+      RegVect* vect = *q;
+      if ( splitter(vect) == 0 ) {
+	vect->dump(cout);
+      }
+    }
+    cout << "-------------" << endl;
+    for (vector<RegVect*>::const_iterator q = vect_list.begin();
+	 q != vect_list.end(); ++ q) {
+      RegVect* vect = *q;
+      if ( splitter(vect) == 1 ) {
+	vect->dump(cout);
+      }
+    }
+    cout << endl
+	 << "=============" << endl;
+  }
+
 
   return 0;
 }

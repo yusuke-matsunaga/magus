@@ -91,6 +91,7 @@ RegVect::RegVect(ymuint size,
 }
 
 // @brief デストラクタ
+inline
 RegVect::~RegVect()
 {
 }

@@ -24,17 +24,24 @@ public:
 
   /// @brief デストラクタ
   virtual
-  ~Splitter();
+  ~Splitter() { }
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // Splitter の仮想関数
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief ベクタを分割する．
+  /// @brief 分類数を返す．
   virtual
-  void
-  operator()(const vector<RegVect*>& src_list,
-	     vector<RegVect*>& dst0_list,
-	     vector<RegVect*>& dst1_list);
+  ymuint
+  split_num() const = 0;
+
+  /// @brief ベクタを分類する．
+  /// @param[in] vect 対象のベクタ
+  virtual
+  ymuint
+  operator()(const RegVect* vect) const = 0;
 
 };
 

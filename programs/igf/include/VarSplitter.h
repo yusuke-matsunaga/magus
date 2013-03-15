@@ -25,11 +25,37 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] varid 変数番号
-  VarSplitter(ymuint varid);
+  VarSplitter(ymuint32 varid);
 
   /// @brief デストラクタ
   virtual
   ~VarSplitter();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // Splitter の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 分類数を返す．
+  virtual
+  ymuint
+  split_num() const;
+
+  /// @brief ベクタを分類する．
+  /// @param[in] vect 対象のベクタ
+  virtual
+  ymuint
+  operator()(const RegVect* vect) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 変数番号
+  ymuint32 mVarId;
 
 };
 
