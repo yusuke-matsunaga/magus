@@ -17,9 +17,7 @@
 #include "igf_nsdef.h"
 #include "RvMgr.h"
 #include "RegVect.h"
-#include "VarSplitter.h"
-#include "XorSplitter.h"
-#include "MultiSplitter.h"
+#include "Variable.h"
 #include "ym_utils/Generator.h"
 
 
@@ -111,31 +109,33 @@ igf(int argc,
 
   ymuint n = rvmgr.vect_size();
 
-  // Splitter を生成
-  vector<XorSplitter*> splitters;
+  // Variable を生成
+  vector<Variable*> var_list;
   for (ymuint i = 0; i < n; ++ i) {
-    XorSplitter* splitter = new XorSplitter(vector<ymuint32>(1, i));
-    splitters.push_back(splitter);
+    Variable* var = new Variable(i);
+    var_list.push_back(var);
   }
   for (ymuint comp_i = 2; comp_i <= comp; ++ comp_i) {
     CombiGen cg(n, comp_i);
 
     for (CombiGen::iterator p = cg.begin(); !p.is_end(); ++ p) {
-      vector<ymuint32> var_list(2);
-      var_list[0] = p(0);
-      var_list[1] = p(1);
-      XorSplitter* splitter = new XorSplitter(var_list);
-      splitters.push_back(splitter);
+      vector<ymuint> vid_list(comp_i);
+      for (ymuint j = 0; j < comp_i; ++ j) {
+	vid_list[j] = p(j);
+      }
+      Variable* var = new Variable(vid_list);
+      var_list.push_back(var);
     }
   }
 
+#if 0
   cout << endl;
-  for (vector<XorSplitter*>::iterator p = splitters.begin();
-       p != splitters.end(); ++ p) {
-    XorSplitter& splitter = **p;
-    const vector<ymuint32>& var_list = splitter.varid_list();
-    for (vector<ymuint32>::const_iterator q = var_list.begin();
-	 q != var_list.end(); ++ q) {
+  for (vector<Variable*>::iterator p = var_list.begin();
+       p != var_list.end(); ++ p) {
+    Variable* var = *p;
+    const vector<ymuint>& vid_list = var->vid_list();
+    for (vector<ymuint>::const_iterator q = vid_list.begin();
+	 q != vid_list.end(); ++ q) {
       cout << " " << *q;
     }
     cout << endl;
@@ -144,7 +144,7 @@ igf(int argc,
     for (vector<RegVect*>::const_iterator q = vect_list.begin();
 	 q != vect_list.end(); ++ q) {
       RegVect* vect = *q;
-      if ( splitter(vect) == 0 ) {
+      if ( var->classify(vect) == 0 ) {
 	vect->dump(cout);
       }
     }
@@ -152,14 +152,41 @@ igf(int argc,
     for (vector<RegVect*>::const_iterator q = vect_list.begin();
 	 q != vect_list.end(); ++ q) {
       RegVect* vect = *q;
-      if ( splitter(vect) == 1 ) {
+      if ( var->classify(vect) == 1 ) {
 	vect->dump(cout);
       }
     }
     cout << endl
 	 << "=============" << endl;
   }
+#else
+  cout << endl;
+  for (vector<Variable*>::iterator p = var_list.begin();
+       p != var_list.end(); ++ p) {
+    Variable* var = *p;
+    const vector<ymuint>& vid_list = var->vid_list();
+    for (vector<ymuint>::const_iterator q = vid_list.begin();
+	 q != vid_list.end(); ++ q) {
+      cout << " " << *q;
+    }
+    cout << "     ";
 
+    ymuint n0 = 0;
+    ymuint n1 = 0;
+    const vector<RegVect*>& vect_list = rvmgr.vect_list();
+    for (vector<RegVect*>::const_iterator q = vect_list.begin();
+	 q != vect_list.end(); ++ q) {
+      RegVect* vect = *q;
+      if ( var->classify(vect) == 0 ) {
+	++ n0;
+      }
+      else {
+	++ n1;
+      }
+    }
+    cout << n0 << " : " << n1 << endl;
+  }
+#endif
 
   return 0;
 }

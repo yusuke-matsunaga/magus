@@ -25,9 +25,8 @@ bin_PROGRAMS = \
 igf_SOURCES = \
 	igf.cc \
 	RvMgr.cc \
-	VarSplitter.cc \
-	XorSplitter.cc \
-	MultiSplitter.cc
+	Variable.h \
+	Variable.cc
 
 igf_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
