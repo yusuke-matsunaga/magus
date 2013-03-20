@@ -116,11 +116,20 @@ gen_vectors(ymuint n,
 {
   s << n << " " << k << endl;
   // k 個のベクタを出力
+  hash_set<string> patterns;
   for (ymuint i = 0; i < k; ++ i) {
+    ostringstream buf;
     for (ymuint j = 0; j < n; ++ j) {
-      s << rg.value();
+      buf << rg.value();
     }
-    s << endl;
+    string pat = buf.str();
+    if ( patterns.count(pat) > 0 ) {
+      -- i;
+    }
+    else {
+      patterns.insert(pat);
+      s << pat << endl;
+    }
   }
 }
 

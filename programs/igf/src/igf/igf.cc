@@ -18,6 +18,7 @@
 #include "RvMgr.h"
 #include "RegVect.h"
 #include "Variable.h"
+#include "IguGen.h"
 #include "ym_utils/Generator.h"
 
 
@@ -37,12 +38,21 @@ usage(poptContext optCon,
   exit(exitcode);
 }
 
+void
+solve_igf(const vector<RegVect*>& vector_list,
+	  ymuint multi,
+	  const vector<Variable*>& variable_list,
+	  vector<Variable*>& solution)
+{
+}
+
 int
 igf(int argc,
     const char** argv)
 {
   ymuint32 multi = 1;
   ymuint32 comp = 1;
+  ymuint32 tlimit = 0;
 
   // オプション解析用のデータ
   const struct poptOption options[] = {
@@ -57,6 +67,8 @@ igf(int argc,
       "specify multiplicity", "<INT>"},
     { "xor-complex", 'x', POPT_ARG_INT, &comp, 'x',
       "specify XOR complexity", "<INT>"},
+    { "time-limit", 't', POPT_ARG_INT, &tlimit, 't',
+      "set time limit", "<INT>(min)"},
 
     POPT_AUTOHELP
 
@@ -105,8 +117,6 @@ igf(int argc,
     return 3;
   }
 
-  rvmgr.dump(cout);
-
   ymuint n = rvmgr.vect_size();
 
   // Variable を生成
@@ -128,10 +138,17 @@ igf(int argc,
     }
   }
 
-#if 0
-  cout << endl;
-  for (vector<Variable*>::iterator p = var_list.begin();
-       p != var_list.end(); ++ p) {
+  IguGen igu_gen;
+  vector<Variable*> solution;
+
+  if ( tlimit > 0 ) {
+    igu_gen.set_time_limit(tlimit, 0);
+  }
+  igu_gen.solve(rvmgr.vect_list(), multi, var_list, solution);
+
+  cout << "Variables = " << endl;
+  for (vector<Variable*>::iterator p = solution.begin();
+       p != solution.end(); ++ p) {
     Variable* var = *p;
     const vector<ymuint>& vid_list = var->vid_list();
     for (vector<ymuint>::const_iterator q = vid_list.begin();
@@ -139,55 +156,26 @@ igf(int argc,
       cout << " " << *q;
     }
     cout << endl;
-
-    const vector<RegVect*>& vect_list = rvmgr.vect_list();
-    for (vector<RegVect*>::const_iterator q = vect_list.begin();
-	 q != vect_list.end(); ++ q) {
-      RegVect* vect = *q;
-      if ( var->classify(vect) == 0 ) {
-	vect->dump(cout);
-      }
-    }
-    cout << "-------------" << endl;
-    for (vector<RegVect*>::const_iterator q = vect_list.begin();
-	 q != vect_list.end(); ++ q) {
-      RegVect* vect = *q;
-      if ( var->classify(vect) == 1 ) {
-	vect->dump(cout);
-      }
-    }
-    cout << endl
-	 << "=============" << endl;
   }
-#else
   cout << endl;
-  for (vector<Variable*>::iterator p = var_list.begin();
-       p != var_list.end(); ++ p) {
-    Variable* var = *p;
-    const vector<ymuint>& vid_list = var->vid_list();
-    for (vector<ymuint>::const_iterator q = vid_list.begin();
-	 q != vid_list.end(); ++ q) {
-      cout << " " << *q;
-    }
-    cout << "     ";
 
-    ymuint n0 = 0;
-    ymuint n1 = 0;
-    const vector<RegVect*>& vect_list = rvmgr.vect_list();
-    for (vector<RegVect*>::const_iterator q = vect_list.begin();
-	 q != vect_list.end(); ++ q) {
-      RegVect* vect = *q;
-      if ( var->classify(vect) == 0 ) {
-	++ n0;
-      }
-      else {
-	++ n1;
-      }
-    }
-    cout << n0 << " : " << n1 << endl;
+  {
+    ymuint n = rvmgr.vect_size();
+    ymuint p = solution.size();
+    ymuint q = rvmgr.index_size();
+    ymuint exp_p = (1 << p);
+    ymuint exp_q = (1 << q);
+    cout << "p = " << p << endl
+	 << "k = " << rvmgr.vect_list().size() << endl
+	 << "q = " << q << endl;
+    cout << "Total memory size = "
+	 << exp_p << " x (" << n << " - " << p << " + " << q << ") x " << multi
+	 << " = " << (exp_p * (n - p + q) * multi) << endl;
+    cout << "Sasao's IGU       = "
+	 << exp_p << " x " << q << " + " << exp_q << " x ("
+	 << n << " - " << p << ") x " << multi
+	 << " = " << ((exp_p * q + exp_q * (n - p)) * multi) << endl;
   }
-#endif
-
   return 0;
 }
 

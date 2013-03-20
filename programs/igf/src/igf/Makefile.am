@@ -24,6 +24,8 @@ bin_PROGRAMS = \
 
 igf_SOURCES = \
 	igf.cc \
+	IguGen.h \
+	IguGen.cc \
 	RvMgr.cc \
 	Variable.h \
 	Variable.cc
@@ -34,4 +36,5 @@ igf_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LDADD) \
+	-lrt \
 	@POPT_LIBS@

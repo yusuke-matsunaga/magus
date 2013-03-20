@@ -52,6 +52,10 @@ public:
   const vector<RegVect*>&
   vect_list() const;
 
+  /// @brief インデックスのサイズを得る．
+  ymuint
+  index_size() const;
+
   /// @brief 内容を出力する．
   void
   dump(ostream& s) const;

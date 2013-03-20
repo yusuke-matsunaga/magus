@@ -88,11 +88,12 @@ RvMgr::read_data(istream& s)
     for (ymuint j = 0; j < n; ++ j) {
       char c = buf[j];
       if ( c != '0' && c != '1' ) {
-	cerr << "illegal charactor at line " << (i + 1) << ", column " << (j + 1) << endl;
+	cerr << "illegal charactor at line "
+	     << (i + 1) << ", column " << (j + 1) << endl;
 	return false;
       }
     }
-    RegVect* rv = new_vector(i);
+    RegVect* rv = new_vector(i + 1);
     for (ymuint j = 0; j < n; ++ j) {
       ymuint blk = j / 64;
       ymuint sft = j % 64;
@@ -101,10 +102,47 @@ RvMgr::read_data(istream& s)
 	rv->mBody[blk] |= (1ULL << sft);
       }
     }
-    mVectList.push_back(rv);
+    bool found = false;
+    for (vector<RegVect*>::iterator p = mVectList.begin();
+	 p != mVectList.end(); ++ p) {
+      RegVect* rv1 = *p;
+      bool diff = false;
+      for (ymuint j = 0; j < mBlockSize; ++ j) {
+	if ( rv1->mBody[j] != rv->mBody[j] ) {
+	  diff = true;
+	  break;
+	}
+      }
+      if ( !diff ) {
+	found = true;
+	break;
+      }
+    }
+    if ( found ) {
+      // 重複したデータ
+      delete_vector(rv);
+    }
+    else {
+      mVectList.push_back(rv);
+    }
   }
 
   return true;
+}
+
+// @brief インデックスのサイズを得る．
+ymuint
+RvMgr::index_size() const
+{
+  ymuint k = mVectList.size();
+  ++ k;
+  ymuint ans = 0;
+  ymuint m = 1;
+  for ( ; m < k; ++ m) {
+    ++ ans;
+    m *= 2;
+  }
+  return ans;
 }
 
 // @brief ベクタのサイズを設定する．
