@@ -20,7 +20,8 @@ AM_CPPFLAGS = \
 MAINTAINERCLEANFILES = Makefile.in
 
 bin_PROGRAMS = \
-	rvgen
+	rvgen \
+	tseconv
 
 rvgen_SOURCES = \
 	rvgen.cc
@@ -31,4 +32,11 @@ rvgen_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LDADD) \
+	@POPT_LIBS@
+
+tseconv_SOURCES = \
+	tseconv.cc
+
+tseconv_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	@POPT_LIBS@
