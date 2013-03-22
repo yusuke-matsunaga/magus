@@ -9,6 +9,7 @@
 
 #include "IguGen.h"
 #include "RegVect.h"
+#include "VectSetList.h"
 #include "Variable.h"
 #include <signal.h>
 
@@ -134,7 +135,14 @@ IguGen::solve(const vector<RegVect*>& vector_list,
     }
   }
 
-  vector<vector<RegVect*> > initial_list(1, vector_list);
+  VectSetList initial_list(vector_list.size(), 1);
+  initial_list.add_set();
+  for (vector<RegVect*>::const_iterator p = vector_list.begin();
+       p != vector_list.end(); ++ p) {
+    RegVect* vect = *p;
+    initial_list.add_vect(vect);
+  }
+
   solve_recur(initial_list,
 	      new_variable_list.begin(), new_variable_list.end());
   solution = mSolutionSoFar;
@@ -176,7 +184,7 @@ IguGen::set_debug_level(ymuint32 level)
 // @param[in] var_begin 使用可能な変数のリストの先頭の反復子
 // @param[in] var_end 使用可能な変数のリストの末尾の反復子
 void
-IguGen::solve_recur(const vector<vector<RegVect*> >& vector_list,
+IguGen::solve_recur(const VectSetList& vector_list,
 		    vector<Variable*>::const_iterator var_begin,
 		    vector<Variable*>::const_iterator var_end)
 {
@@ -209,36 +217,33 @@ IguGen::solve_recur(const vector<vector<RegVect*> >& vector_list,
     }
     cerr << endl;
     if ( mDebug > 1 ) {
-      ymuint n = vector_list.size();
+      ymuint n = vector_list.set_num();
       for (ymuint i = 0; i < n; ++ i) {
-	const vector<RegVect*>& v_list = vector_list[i];
-	for (vector<RegVect*>::const_iterator p = v_list.begin();
-	     p != v_list.end(); ++ p) {
-	  RegVect* vect = *p;
+	ymuint m = vector_list.set_size(i);
+	for (ymuint j = 0; j < m; ++ j) {
+	  RegVect* vect = vector_list.set_elem(i, j);
 	  vect->dump(cerr);
 	}
 	cerr << "-----------------" << endl;
       }
     }
     else {
-      ymuint n = vector_list.size();
+      ymuint n = vector_list.set_num();
       cerr << "[";
       for (ymuint i = 0; i < n; ++ i) {
-	const vector<RegVect*>& v_list = vector_list[i];
-	cerr << " " << v_list.size();
+	cerr << " " << vector_list.set_size(i);
       }
       cerr << " ]" << endl;
     }
   }
 
-  ymuint n = vector_list.size();
+  ymuint n = vector_list.set_num();
 
   // 下界を計算して mBestSoFar を越えないことがわかったら枝刈りを行なう．
   {
     ymuint max_size = 0;
     for (ymuint i = 0; i < n; ++ i) {
-      const vector<RegVect*>& v_list = vector_list[i];
-      ymuint size = v_list.size();
+      ymuint size = vector_list.set_size(i);
       if ( max_size < size ) {
 	max_size = size;
       }
@@ -268,12 +273,11 @@ IguGen::solve_recur(const vector<vector<RegVect*> >& vector_list,
     ymuint max_size = 0;
     ymuint am = 0;
     for (ymuint j = 0; j < n; ++ j) {
-      const vector<RegVect*>& v_list = vector_list[j];
+      ymuint m = vector_list.set_size(j);
       ymuint n0 = 0;
       ymuint n1 = 0;
-      for (vector<RegVect*>::const_iterator p = v_list.begin();
-	   p != v_list.end(); ++ p) {
-	RegVect* vect = *p;
+      for (ymuint k = 0; k < m; ++ k) {
+	RegVect* vect = vector_list.set_elem(j, k);
 	if ( var->classify(vect) == 0 ) {
 	  ++ n0;
 	}
@@ -319,18 +323,16 @@ IguGen::solve_recur(const vector<vector<RegVect*> >& vector_list,
       break;
     }
 
-    vector<vector<RegVect*> > new_vector_list;
-    new_vector_list.reserve(n * 2);
+    VectSetList new_vector_list(vector_list.all_elem_num(), n * 2);
     for (ymuint j = 0; j < n; ++ j) {
-      const vector<RegVect*>& v_list = vector_list[j];
-      if ( v_list.size() <= mMulti ) {
+      ymuint m = vector_list.set_size(j);
+      if ( m <= mMulti ) {
 	continue;
       }
       ymuint n0 = 0;
       ymuint n1 = 0;
-      for (vector<RegVect*>::const_iterator p = v_list.begin();
-	   p != v_list.end(); ++ p) {
-	RegVect* vect = *p;
+      for (ymuint k = 0; k < m; ++ k) {
+	RegVect* vect = vector_list.set_elem(j, k);
 	if ( var->classify(vect) == 0 ) {
 	  ++ n0;
 	}
@@ -339,26 +341,30 @@ IguGen::solve_recur(const vector<vector<RegVect*> >& vector_list,
 	}
       }
       if ( n0 > mMulti ) {
-	vector<RegVect*> tmp_list;
-	for (vector<RegVect*>::const_iterator q = v_list.begin();
-	     q != v_list.end(); ++ q) {
-	  RegVect* vect = *q;
+	bool first = true;
+	for (ymuint k = 0; k < m; ++ k) {
+	  RegVect* vect = vector_list.set_elem(j, k);
 	  if ( var->classify(vect) == 0 ) {
-	    tmp_list.push_back(vect);
+	    if ( first ) {
+	      first = false;
+	      new_vector_list.add_set();
+	    }
+	    new_vector_list.add_vect(vect);
 	  }
 	}
-	new_vector_list.push_back(tmp_list);
       }
       if ( n1 > mMulti ) {
-	vector<RegVect*> tmp_list;
-	for (vector<RegVect*>::const_iterator q = v_list.begin();
-	     q != v_list.end(); ++ q) {
-	  RegVect* vect = *q;
+	bool first = true;
+	for (ymuint k = 0; k < m; ++ k) {
+	  RegVect* vect = vector_list.set_elem(j, k);
 	  if ( var->classify(vect) == 1 ) {
-	    tmp_list.push_back(vect);
+	    if ( first ) {
+	      first = false;
+	      new_vector_list.add_set();
+	    }
+	    new_vector_list.add_vect(vect);
 	  }
 	}
-	new_vector_list.push_back(tmp_list);
       }
     }
 

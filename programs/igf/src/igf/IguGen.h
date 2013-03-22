@@ -73,7 +73,7 @@ public:
   /// @param[in] var_begin 使用可能な変数のリストの先頭の反復子
   /// @param[in] var_end 使用可能な変数のリストの末尾の反復子
   void
-  solve_recur(const vector<vector<RegVect*> >& vector_list,
+  solve_recur(const VectSetList& vector_list,
 	      vector<Variable*>::const_iterator var_begin,
 	      vector<Variable*>::const_iterator var_end);
 
