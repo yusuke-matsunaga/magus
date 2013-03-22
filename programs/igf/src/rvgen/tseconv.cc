@@ -46,6 +46,8 @@ tseconv(int argc,
     // option tag
     // docstr
     // argstr
+    { "number", 'n', POPT_ARG_NONE, NULL, 'n',
+      "number mode", NULL},
     { "digit", 'd', POPT_ARG_NONE, NULL, 'd',
       "digit mode", NULL},
     { "ascii", 'a', POPT_ARG_NONE, NULL, 'a',
@@ -61,6 +63,7 @@ tseconv(int argc,
   poptSetOtherOptionHelp(popt_context, " <filename>");
 
   // オプション解析行う．
+  bool number_mode = false;
   bool digit_mode = false;
   bool ascii_mode = false;
   for ( ; ; ) {
@@ -74,20 +77,35 @@ tseconv(int argc,
 	   << ": " << poptStrerror(rc) << endl;
       return -1;
     }
-    if ( rc == 'd' ) {
+    if ( rc == 'n' ) {
+      number_mode = true;
+    }
+    else if ( rc == 'd' ) {
       digit_mode = true;
     }
     else if ( rc == 'a' ) {
       ascii_mode = true;
     }
   }
-  if ( digit_mode && ascii_mode ) {
-    cerr << "Both --digit and --ascii cannot be specified at the same time." << endl
-	 << "--digit assumed" <<endl;
-    ascii_mode = false;
+  if ( number_mode ) {
+    if ( digit_mode || ascii_mode ) {
+      cerr << "--digit and/or --ascii cannot be specified with --number." << endl;
+      digit_mode = false;
+      ascii_mode = false;
+    }
   }
-  if ( !digit_mode && !ascii_mode ) {
-    digit_mode = true;
+  else if ( digit_mode ) {
+    if ( ascii_mode ) {
+      cerr << "--ascii cannot be specified with --digit." << endl;
+      ascii_mode = false;
+    }
+  }
+  else if ( ascii_mode ) {
+    ;
+  }
+  else {
+    // none of the options are specified
+    number_mode = true;
   }
 
   const char* f_str = poptGetArg(popt_context);
@@ -109,6 +127,7 @@ tseconv(int argc,
   }
 
   ymuint line = 1;
+  vector<string> line_buf;
   string buf;
   while ( getline(ifs, buf) ) {
     if ( buf.size() != 4 ) {
@@ -124,34 +143,59 @@ tseconv(int argc,
       }
       val[i] = static_cast<ymuint>(c - '0');
     }
-    if ( digit_mode ) {
+    ostringstream os;
+    if ( number_mode ) {
+      ymuint32 num = ((val[0] * 10 + val[1]) * 10 + val[2]) * 10 + val[3];
+      for (ymuint i = 0; i < 14; ++ i) {
+	ymuint32 mask = (1U << (13 - i));
+	if ( num & mask ) {
+	  os << '1';
+	}
+	else {
+	  os << '0';
+	}
+      }
+    }
+    else if ( digit_mode ) {
       for (ymuint i = 0; i < 4; ++ i) {
 	for (ymuint j = 4; j > 0; -- j) {
 	  if ( val[i] & (1 << (j - 1)) ) {
-	    cout << '1';
+	    os << '1';
 	  }
 	  else {
-	    cout << '0';
+	    os << '0';
 	  }
 	}
       }
-      cout << endl;
     }
-    else {
+    else if ( ascii_mode ) {
       for (ymuint i = 0; i < 4; ++ i) {
 	ymuint aval = val[i] + '0';
 	for (ymuint j = 7; j > 0; -- j) {
 	  if ( aval & (1 << (j - 1)) ) {
-	    cout << '1';
+	    os << '1';
 	  }
 	  else {
-	    cout << '0';
+	    os << '0';
 	  }
 	}
       }
-      cout << endl;
     }
+    line_buf.push_back(os.str());
     ++ line;
+  }
+
+  ymuint n = 0;
+  if ( digit_mode ) {
+    n = 16;
+  }
+  else if ( ascii_mode ) {
+    n = 28;
+  }
+  cout << n << " " << (line - 1) << endl;
+  for (vector<string>::iterator p = line_buf.begin();
+       p != line_buf.end(); ++ p) {
+    cout << *p << endl;
   }
 
   return 0;
