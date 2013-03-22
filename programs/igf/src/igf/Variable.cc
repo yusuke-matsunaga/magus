@@ -20,6 +20,7 @@ BEGIN_NAMESPACE_YM_IGF
 // @brief 通常の変数用のコンストラクタ
 // @param[in] vid 変数番号
 Variable::Variable(ymuint vid) :
+  mVid0(vid),
   mVidList(1, vid)
 {
 }
@@ -27,6 +28,7 @@ Variable::Variable(ymuint vid) :
 // @brief 合成変数用のコンストラクタ
 // @param[in] vid_list 変数番号のリスト
 Variable::Variable(const vector<ymuint>& vid_list) :
+  mVid0(vid_list[0]),
   mVidList(vid_list)
 {
 }
@@ -48,7 +50,7 @@ Variable::compound_degree() const
 ymuint
 Variable::vid() const
 {
-  return mVidList[0];
+  return mVid0;
 }
 
 // @brief 合成変数の場合に変数番号のリストを返す．
@@ -64,10 +66,10 @@ Variable::vid_list() const
 ymuint
 Variable::classify(const RegVect* vect) const
 {
-  ymuint ans = 0;
-  for (vector<ymuint>::const_iterator p = mVidList.begin();
-       p != mVidList.end(); ++ p) {
-    ymuint varid = *p;
+  ymuint ans = vect->val(mVid0);
+  ymuint n = mVidList.size();
+  for (ymuint i = 1; i < n; ++ i) {
+    ymuint varid = mVidList[i];
     ans ^= vect->val(varid);
   }
   return ans;

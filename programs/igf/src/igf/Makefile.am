@@ -28,7 +28,6 @@ igf_SOURCES = \
 	IguGen.cc \
 	RvMgr.cc \
 	VectSetList.h \
-	VectSetList.cc \
 	Variable.h \
 	Variable.cc
 

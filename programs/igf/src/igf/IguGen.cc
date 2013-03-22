@@ -272,6 +272,7 @@ IguGen::solve_recur(const VectSetList& vector_list,
     Variable* var = *p;
     ymuint max_size = 0;
     ymuint am = 0;
+    bool split = false;
     for (ymuint j = 0; j < n; ++ j) {
       ymuint m = vector_list.set_size(j);
       ymuint n0 = 0;
@@ -284,6 +285,9 @@ IguGen::solve_recur(const VectSetList& vector_list,
 	else {
 	  ++ n1;
 	}
+      }
+      if ( n0 > 0 && n1 > 0 ) {
+	split = true;
       }
       if ( max_size < n0 ) {
 	max_size = n0;
@@ -298,11 +302,18 @@ IguGen::solve_recur(const VectSetList& vector_list,
 	am += n1 * n1;
       }
     }
-    ymuint lb = blog(max_size) + mSelectedVariables.size();
-    if ( lb >= mBestSoFar ) {
-      // 枝刈り
+
+    if ( !split ) {
+      // 一つも区別できない変数はいらない．
       continue;
     }
+
+    ymuint lb = blog(max_size) + mSelectedVariables.size();
+    if ( lb >= mBestSoFar ) {
+      // 下界が現時点の最適解を下回らないので枝刈り
+      continue;
+    }
+
     tmp_list.push_back(make_pair(am, var));
   }
   sort(tmp_list.begin(), tmp_list.end(), Lt());
