@@ -45,12 +45,22 @@ public:
 	const vector<Variable*>& variable_list,
 	vector<Variable*>& solution);
 
+  /// @brief 分岐制限を設定する．
+  /// @param[in] limit 分岐制限
+  /// @note limit = 0 の場合には制限なし
+  void
+  set_branch_limit(ymuint limit);
+
   /// @brief 時間制限を設定する．
   /// @param[in] limit_min 制限の分の部分
   /// @param[in] limit_sec 制限の秒の部分
   void
   set_time_limit(ymuint32 limit_min,
 		 ymuint32 limit_sec = 0);
+
+  /// @brief デバッグレベルを指定する．
+  void
+  set_debug_level(ymuint32 level);
 
 
 public:
@@ -85,8 +95,14 @@ private:
   // 現時点で選ばれている変数のリスト
   vector<Variable*> mSelectedVariables;
 
+  // いくつの分岐を試すかを制御するパラメータ
+  ymuint32 mBranchLimit;
+
   // 時間制限
-  ymuint32 mLimit;
+  ymuint32 mTimeLimit;
+
+  // デバッグフラグ
+  ymuint32 mDebug;
 
 };
 

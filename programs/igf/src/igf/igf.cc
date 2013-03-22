@@ -52,7 +52,9 @@ igf(int argc,
 {
   ymuint32 multi = 1;
   ymuint32 comp = 1;
+  ymuint32 blimit = 0;
   ymuint32 tlimit = 0;
+  ymuint32 debug = 0;
 
   // オプション解析用のデータ
   const struct poptOption options[] = {
@@ -67,8 +69,12 @@ igf(int argc,
       "specify multiplicity", "<INT>"},
     { "xor-complex", 'x', POPT_ARG_INT, &comp, 'x',
       "specify XOR complexity", "<INT>"},
+    { "branch-limit", 'b', POPT_ARG_INT, &blimit, 'b',
+      "set branch limit", "<INT>"},
     { "time-limit", 't', POPT_ARG_INT, &tlimit, 't',
       "set time limit", "<INT>(min)"},
+    { "debug-level", 'd', POPT_ARG_INT, &debug, 'd',
+      "set_debug_level", "<INT>"},
 
     POPT_AUTOHELP
 
@@ -141,9 +147,16 @@ igf(int argc,
   IguGen igu_gen;
   vector<Variable*> solution;
 
+  if ( blimit > 0 ) {
+    igu_gen.set_branch_limit(blimit);
+  }
   if ( tlimit > 0 ) {
     igu_gen.set_time_limit(tlimit, 0);
   }
+  if ( debug > 0 ) {
+    igu_gen.set_debug_level(debug);
+  }
+
   igu_gen.solve(rvmgr.vect_list(), multi, var_list, solution);
 
   cout << "Variables = " << endl;

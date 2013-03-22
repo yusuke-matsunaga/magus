@@ -54,7 +54,9 @@ END_NONAMESPACE
 // @brief コンストラクタ
 IguGen::IguGen()
 {
-  mLimit = 0;
+  mBranchLimit = 0;
+  mTimeLimit = 0;
+  mDebug = 0;
 }
 
 // @brief デストラクタ
@@ -100,14 +102,14 @@ IguGen::solve(const vector<RegVect*>& vector_list,
   }
 
   mMulti = multi;
-  mBestSoFar = nv;
+  mBestSoFar = nv + 1;
   mSelectedVariables.clear();
   timeout = false;
 
   // タイマーの設定
   struct sigaction old_act;
   timer_t tid;
-  if ( mLimit > 0 ) {
+  if ( mTimeLimit > 0 ) {
     struct sigaction act;
     act.sa_handler = timer_handler;
     act.sa_flags = 0;
@@ -117,7 +119,7 @@ IguGen::solve(const vector<RegVect*>& vector_list,
     }
 
     struct itimerspec itval;
-    itval.it_value.tv_sec = mLimit;
+    itval.it_value.tv_sec = mTimeLimit;
     itval.it_value.tv_nsec = 0;
     itval.it_interval.tv_sec = 0;
     itval.it_interval.tv_nsec = 0;
@@ -137,10 +139,19 @@ IguGen::solve(const vector<RegVect*>& vector_list,
 	      new_variable_list.begin(), new_variable_list.end());
   solution = mSolutionSoFar;
 
-  if ( mLimit > 0 ) {
+  if ( mTimeLimit > 0 ) {
     timer_delete(tid);
     sigaction(SIGALRM, &old_act, NULL);
   }
+}
+
+// @brief 分岐制限を設定する．
+// @param[in] limit 分岐制限
+// @note limit = 0 の場合には制限なし
+void
+IguGen::set_branch_limit(ymuint limit)
+{
+  mBranchLimit = limit;
 }
 
 // @brief 時間制限を設定する．
@@ -150,7 +161,14 @@ void
 IguGen::set_time_limit(ymuint32 limit_min,
 		       ymuint32 limit_sec)
 {
-  mLimit = limit_min * 60 + limit_sec;
+  mTimeLimit = limit_min * 60 + limit_sec;
+}
+
+// @brief デバッグレベルを指定する．
+void
+IguGen::set_debug_level(ymuint32 level)
+{
+  mDebug = level;
 }
 
 // @brief solve() の下請け関数
@@ -162,7 +180,7 @@ IguGen::solve_recur(const vector<vector<RegVect*> >& vector_list,
 		    vector<Variable*>::const_iterator var_begin,
 		    vector<Variable*>::const_iterator var_end)
 {
-  if ( 0 ) {
+  if ( mDebug > 0 ) {
     cerr << "best so far = " << mBestSoFar << endl
 	 << "selected variables = ";
     for (vector<Variable*>::const_iterator p = mSelectedVariables.begin();
@@ -190,15 +208,26 @@ IguGen::solve_recur(const vector<vector<RegVect*> >& vector_list,
       cerr << ")";
     }
     cerr << endl;
-    ymuint n = vector_list.size();
-    for (ymuint i = 0; i < n; ++ i) {
-      const vector<RegVect*>& v_list = vector_list[i];
-      for (vector<RegVect*>::const_iterator p = v_list.begin();
-	   p != v_list.end(); ++ p) {
-	RegVect* vect = *p;
-	vect->dump(cerr);
+    if ( mDebug > 1 ) {
+      ymuint n = vector_list.size();
+      for (ymuint i = 0; i < n; ++ i) {
+	const vector<RegVect*>& v_list = vector_list[i];
+	for (vector<RegVect*>::const_iterator p = v_list.begin();
+	     p != v_list.end(); ++ p) {
+	  RegVect* vect = *p;
+	  vect->dump(cerr);
+	}
+	cerr << "-----------------" << endl;
       }
-      cerr << "-----------------" << endl;
+    }
+    else {
+      ymuint n = vector_list.size();
+      cerr << "[";
+      for (ymuint i = 0; i < n; ++ i) {
+	const vector<RegVect*>& v_list = vector_list[i];
+	cerr << " " << v_list.size();
+      }
+      cerr << " ]" << endl;
     }
   }
 
@@ -258,7 +287,12 @@ IguGen::solve_recur(const vector<vector<RegVect*> >& vector_list,
       if ( max_size < n1 ) {
 	max_size = n1;
       }
-      am += n0 * n0 + n1 * n1;
+      if ( n0 > mMulti ) {
+	am += n0 * n0;
+      }
+      if ( n1 > mMulti ) {
+	am += n1 * n1;
+      }
     }
     ymuint lb = blog(max_size) + mSelectedVariables.size();
     if ( lb >= mBestSoFar ) {
@@ -275,9 +309,15 @@ IguGen::solve_recur(const vector<vector<RegVect*> >& vector_list,
     new_variables[i] = tmp_list[i].second;
   }
 
+  ymuint bid = 0;
   for (vector<Variable*>::const_iterator p = new_variables.begin();
-       p != new_variables.end(); ++ p) {
+       p != new_variables.end(); ++ p, ++ bid) {
     Variable* var = *p;
+    if ( mBranchLimit > 0 &&
+	 bid >= mBranchLimit &&
+	 tmp_list[mBranchLimit - 1].first < tmp_list[bid].first ) {
+      break;
+    }
 
     vector<vector<RegVect*> > new_vector_list;
     new_vector_list.reserve(n * 2);
@@ -300,9 +340,9 @@ IguGen::solve_recur(const vector<vector<RegVect*> >& vector_list,
       }
       if ( n0 > mMulti ) {
 	vector<RegVect*> tmp_list;
-	for (vector<RegVect*>::const_iterator p = v_list.begin();
-	     p != v_list.end(); ++ p) {
-	  RegVect* vect = *p;
+	for (vector<RegVect*>::const_iterator q = v_list.begin();
+	     q != v_list.end(); ++ q) {
+	  RegVect* vect = *q;
 	  if ( var->classify(vect) == 0 ) {
 	    tmp_list.push_back(vect);
 	  }
@@ -311,9 +351,9 @@ IguGen::solve_recur(const vector<vector<RegVect*> >& vector_list,
       }
       if ( n1 > mMulti ) {
 	vector<RegVect*> tmp_list;
-	for (vector<RegVect*>::const_iterator p = v_list.begin();
-	     p != v_list.end(); ++ p) {
-	  RegVect* vect = *p;
+	for (vector<RegVect*>::const_iterator q = v_list.begin();
+	     q != v_list.end(); ++ q) {
+	  RegVect* vect = *q;
 	  if ( var->classify(vect) == 1 ) {
 	    tmp_list.push_back(vect);
 	  }
@@ -323,7 +363,7 @@ IguGen::solve_recur(const vector<vector<RegVect*> >& vector_list,
     }
 
     mSelectedVariables.push_back(var);
-    solve_recur(new_vector_list, p, new_variables.end());
+    solve_recur(new_vector_list, p + 1, new_variables.end());
     mSelectedVariables.pop_back();
 
     if ( timeout ) {
