@@ -25,7 +25,8 @@ noinst_LTLIBRARIES = libym_utils.la
 
 libym_utils_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(YMTOOLS_BUILDDIR)/include \
+	@POPT_INCLUDES@
 
 libym_utils_la_SOURCES = \
 	Alloc.cc \
@@ -50,6 +51,7 @@ libym_utils_la_SOURCES = \
 	MsgMgrImpl.h \
 	MsgMgrImpl.cc \
 	NameMgr.cc \
+	PoptMainApp.cc \
 	RandGen.cc \
 	RefCount.cc \
 	SimpleAlloc.cc \
@@ -61,6 +63,7 @@ libym_utils_la_SOURCES = \
 	random.cc
 
 libym_utils_la_LIBADD = \
-	$(YM_EXTRA_LIBADD)
+	$(YM_EXTRA_LIBADD) \
+	@POPT_LIBS@
 
 libym_utils_la_LDFLAGS =

@@ -27,6 +27,7 @@ noinst_HEADERS = \
 	MsgMgr.h \
 	MStopWatch.h \
 	NameMgr.h \
+	PoptMainApp.h \
 	RandGen.h \
 	RandCombiGen.h \
 	RandPermGen.h \
