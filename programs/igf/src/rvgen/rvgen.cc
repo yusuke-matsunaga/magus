@@ -7,14 +7,8 @@
 /// All rights reserved.
 
 
-#if HAVE_POPT
-#include <popt.h>
-#else
-#error "<popt.h> not found."
-#endif
-
-
 #include "igf_nsdef.h"
+#include "ym_utils/PoptMainApp.h"
 #include "ym_utils/RandGen.h"
 
 
@@ -95,12 +89,12 @@ BinaryRandGen::value()
 
 // usage を出力する．
 void
-usage(poptContext optCon,
+usage(PoptMainApp& main_app,
       int exitcode,
       const char* error = NULL,
       const char* addl = NULL)
 {
-  poptPrintUsage(optCon, stderr, 0);
+  main_app.print_usage(stderr, 0);
   if ( error ) {
     fprintf(stderr, "%s: %s\n", error, addl);
   }
@@ -137,71 +131,43 @@ int
 rvgen(int argc,
       const char** argv)
 {
-  ymuint32 seed = 0;
-
   BinaryRandGen rg;
 
-  // オプション解析用のデータ
-  const struct poptOption options[] = {
-    // long-option
-    // short-option
-    // argument type
-    // variable address
-    // option tag
-    // docstr
-    // argstr
-    { "seed", 's', POPT_ARG_INT, &seed, 1,
-      "specify random seed", "<INT>"},
+  PoptMainApp main_app;
 
-    POPT_AUTOHELP
+  // seed オプション
+  PoptUint popt_seed("seed", 's',
+		     "specify random seed",
+		     "<INT>");
 
-    { NULL, '\0', 0, NULL, 0, NULL, NULL }
-  };
+  main_app.add_option(&popt_seed);
 
-  // オプション解析用のコンテキストを生成する．
-  poptContext popt_context = poptGetContext(NULL, argc, argv, options, 0);
-  poptSetOtherOptionHelp(popt_context, " <dimension of vectors> <# of vectors>");
+  main_app.set_other_option_help("<vector size> <vector num>");
 
-  // オプション解析行う．
-  for ( ; ; ) {
-    int rc = poptGetNextOpt(popt_context);
-    if ( rc == -1 ) {
-      break;
-    }
-    if ( rc < -1 ) {
-      // エラーが起きた．
-      cerr << poptBadOption(popt_context, POPT_BADOPTION_NOALIAS)
-	   << ": " << poptStrerror(rc) << endl;
-      return 1;
-    }
-    if ( rc == 1 ) {
-      // seed オプション
-      rg.init(seed);
-    }
+  // オプション解析を行なう．
+  tPoptStat stat = main_app.parse_options(argc, argv, 0);
+  if ( stat == kPoptAbort ) {
+    return -1;
   }
 
-  const char* n_str = poptGetArg(popt_context);
-  if ( n_str == NULL ) {
-    usage(popt_context, 2);
+  if ( popt_seed.is_specified() ) {
+    rg.init(popt_seed.val());
   }
 
-  const char* k_str = poptGetArg(popt_context);
-  if ( k_str == NULL ) {
-    usage(popt_context, 2);
+  vector<string> args;
+  ymuint n_args = main_app.get_args(args);
+
+  if ( n_args != 2 ) {
+    usage(main_app, 2);
   }
 
-  const char* dummy = poptGetArg(popt_context);
-  if ( dummy != NULL ) {
-    usage(popt_context, 2);
-  }
-
-  int tmp_n = atoi(n_str);
+  int tmp_n = atoi(args[0].c_str());
   if ( tmp_n <= 0 ) {
     cerr << "Argument value error: first argument should be >= 0" << endl;
     return 3;
   }
 
-  int tmp_k = atoi(k_str);
+  int tmp_k = atoi(args[1].c_str());
   if ( tmp_k <= 0 ) {
     cerr << "Argument value error: second argument should be >= 0" << endl;
     return 3;
