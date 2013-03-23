@@ -61,19 +61,4 @@ Variable::vid_list() const
   return mVidList;
 }
 
-// @brief ベクタを分類する．
-// @param[in] vect 対象のベクタ
-ymuint
-Variable::classify(const RegVect* vect) const
-{
-  ymuint ans = vect->val(mVid0);
-  ymuint n = mVidList.size();
-  for (ymuint i = 1; i < n; ++ i) {
-    ymuint varid = mVidList[i];
-    ans ^= vect->val(varid);
-  }
-  return ans;
-}
-
-
 END_NAMESPACE_YM_IGF
