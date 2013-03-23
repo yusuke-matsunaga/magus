@@ -28,19 +28,6 @@ struct Lt
   }
 };
 
-// 2の対数を計算する関数
-ymuint
-blog(ymuint n)
-{
-  ymuint ans = 0;
-  ymuint m = 1;
-  for ( ; m < n; ++ m) {
-    ++ ans;
-    m *= 2;
-  }
-  return ans;
-}
-
 bool timeout = false;
 
 void
@@ -56,6 +43,7 @@ END_NONAMESPACE
 IguGen::IguGen()
 {
   mBranchLimit = 0;
+  mOrderingMode = 0;
   mTimeLimit = 0;
   mDebug = 0;
 }
@@ -143,6 +131,7 @@ IguGen::solve(const vector<RegVect*>& vector_list,
     initial_list.add_vect(vect);
   }
 
+  mBeforeHasSolution = true;
   solve_recur(initial_list,
 	      new_variable_list.begin(), new_variable_list.end());
   solution = mSolutionSoFar;
@@ -170,6 +159,13 @@ IguGen::set_time_limit(ymuint32 limit_min,
 		       ymuint32 limit_sec)
 {
   mTimeLimit = limit_min * 60 + limit_sec;
+}
+
+// @brief 順序付けのヒューリスティックを指定する．
+void
+IguGen::set_ordering_mode(ymuint id)
+{
+  mOrderingMode = id;
 }
 
 // @brief デバッグレベルを指定する．
@@ -229,41 +225,31 @@ IguGen::solve_recur(const VectSetList& vector_list,
     }
     else {
       ymuint n = vector_list.set_num();
-      cerr << "[";
+      ymuint max_size = 0;
       for (ymuint i = 0; i < n; ++ i) {
-	cerr << " " << vector_list.set_size(i);
+	ymuint ssize = vector_list.set_size(i);
+	if ( max_size < ssize ) {
+	  max_size = ssize;
+	}
+      }
+      vector<ymuint> hist_array(max_size + 1);
+      for (ymuint i = 0; i < n; ++ i) {
+	ymuint ssize = vector_list.set_size(i);
+	++ hist_array[ssize];
+      }
+
+      cerr << "[";
+      for (ymuint i = 0; i <= max_size; ++ i) {
+	ymuint m = hist_array[i];
+	if ( m > 0 ) {
+	  cerr << " " << i << ": " << m;
+	}
       }
       cerr << " ]" << endl;
     }
   }
 
-  ymuint n = vector_list.set_num();
-
-  // 下界を計算して mBestSoFar を越えないことがわかったら枝刈りを行なう．
-  {
-    ymuint max_size = 0;
-    for (ymuint i = 0; i < n; ++ i) {
-      ymuint size = vector_list.set_size(i);
-      if ( max_size < size ) {
-	max_size = size;
-      }
-    }
-    ymuint lb = blog(max_size) + mSelectedVariables.size();
-    if ( lb >= mBestSoFar ) {
-      return;
-    }
-
-    if ( max_size <= mMulti ) {
-      // 解になっていた．
-      ymuint ans = mSelectedVariables.size();
-      if ( ans < mBestSoFar ) {
-	mSolutionSoFar = mSelectedVariables;
-	mBestSoFar = ans;
-	cerr << "best_so_far => " << mBestSoFar << endl;
-      }
-      return;
-    }
-  }
+  ymuint set_num = vector_list.set_num();
 
   // ambiguity measure の昇順に並び替える．
   vector<pair<ymuint, Variable*> > tmp_list;
@@ -272,13 +258,14 @@ IguGen::solve_recur(const VectSetList& vector_list,
     Variable* var = *p;
     ymuint max_size = 0;
     ymuint am = 0;
+    ymuint am2 = 0;
     bool split = false;
-    for (ymuint j = 0; j < n; ++ j) {
-      ymuint m = vector_list.set_size(j);
+    for (ymuint set_id = 0; set_id < set_num; ++ set_id) {
+      ymuint m = vector_list.set_size(set_id);
       ymuint n0 = 0;
       ymuint n1 = 0;
       for (ymuint k = 0; k < m; ++ k) {
-	RegVect* vect = vector_list.set_elem(j, k);
+	RegVect* vect = vector_list.set_elem(set_id, k);
 	if ( var->classify(vect) == 0 ) {
 	  ++ n0;
 	}
@@ -297,9 +284,11 @@ IguGen::solve_recur(const VectSetList& vector_list,
       }
       if ( n0 > mMulti ) {
 	am += n0 * n0;
+	am2 += lower_bound(n0);
       }
       if ( n1 > mMulti ) {
 	am += n1 * n1;
+	am2 += lower_bound(n1);
       }
     }
 
@@ -308,13 +297,18 @@ IguGen::solve_recur(const VectSetList& vector_list,
       continue;
     }
 
-    ymuint lb = blog(max_size) + mSelectedVariables.size();
+    ymuint lb = lower_bound(max_size) + mSelectedVariables.size();
     if ( lb >= mBestSoFar ) {
       // 下界が現時点の最適解を下回らないので枝刈り
       continue;
     }
 
-    tmp_list.push_back(make_pair(am, var));
+    if ( mOrderingMode == 0 || !mBeforeHasSolution ) {
+      tmp_list.push_back(make_pair(am, var));
+    }
+    else {
+      tmp_list.push_back(make_pair(am2, var));
+    }
   }
   sort(tmp_list.begin(), tmp_list.end(), Lt());
   ymuint nv2 = tmp_list.size();
@@ -334,16 +328,21 @@ IguGen::solve_recur(const VectSetList& vector_list,
       break;
     }
 
-    VectSetList new_vector_list(vector_list.all_elem_num(), n * 2);
-    for (ymuint j = 0; j < n; ++ j) {
-      ymuint m = vector_list.set_size(j);
+    VectSetList new_vector_list(vector_list.all_elem_num(), set_num * 2);
+    bool bounded = false;
+    for (ymuint set_id = 0; set_id < set_num && !bounded; ++ set_id) {
+      ymuint m = vector_list.set_size(set_id);
       if ( m <= mMulti ) {
+	// 多重度以下に分割されているベクタセットは無視する．
 	continue;
       }
+
+      // 現在のベクタセットが var によって分割されるときの
+      //各々の部分集合の数を数える．
       ymuint n0 = 0;
       ymuint n1 = 0;
       for (ymuint k = 0; k < m; ++ k) {
-	RegVect* vect = vector_list.set_elem(j, k);
+	RegVect* vect = vector_list.set_elem(set_id, k);
 	if ( var->classify(vect) == 0 ) {
 	  ++ n0;
 	}
@@ -352,9 +351,16 @@ IguGen::solve_recur(const VectSetList& vector_list,
 	}
       }
       if ( n0 > mMulti ) {
+	ymuint lb = lower_bound(n0) + mSelectedVariables.size();
+	if ( lb >= mBestSoFar ) {
+	  // n0 から計算される下界が mBestSoFar を越えないことが分かった．
+	  bounded = true;
+	  break;
+	}
+
 	bool first = true;
 	for (ymuint k = 0; k < m; ++ k) {
-	  RegVect* vect = vector_list.set_elem(j, k);
+	  RegVect* vect = vector_list.set_elem(set_id, k);
 	  if ( var->classify(vect) == 0 ) {
 	    if ( first ) {
 	      first = false;
@@ -365,9 +371,16 @@ IguGen::solve_recur(const VectSetList& vector_list,
 	}
       }
       if ( n1 > mMulti ) {
+	ymuint lb = lower_bound(n1) + mSelectedVariables.size();
+	if ( lb >= mBestSoFar ) {
+	  // n1 から計算される下界が mBestSoFar を越えないことが分かった．
+	  bounded = true;
+	  break;
+	}
+
 	bool first = true;
 	for (ymuint k = 0; k < m; ++ k) {
-	  RegVect* vect = vector_list.set_elem(j, k);
+	  RegVect* vect = vector_list.set_elem(set_id, k);
 	  if ( var->classify(vect) == 1 ) {
 	    if ( first ) {
 	      first = false;
@@ -378,6 +391,22 @@ IguGen::solve_recur(const VectSetList& vector_list,
 	}
       }
     }
+    if ( bounded ) {
+      continue;
+    }
+
+    if ( new_vector_list.set_num() == 0 ) {
+      // すべて多重度以下に分割されていた．
+      ymuint ans = mSelectedVariables.size() + 1;
+      if ( ans < mBestSoFar ) {
+	mSolutionSoFar = mSelectedVariables;
+	mSolutionSoFar.push_back(var);
+	mBestSoFar = ans;
+	mBeforeHasSolution = false;
+	cerr << "best_so_far => " << mBestSoFar << endl;
+      }
+      continue;
+    }
 
     mSelectedVariables.push_back(var);
     solve_recur(new_vector_list, p + 1, new_variables.end());
@@ -387,6 +416,21 @@ IguGen::solve_recur(const VectSetList& vector_list,
       break;
     }
   }
+}
+
+// @brief 下界を計算する．
+// @param[in] num 要素数
+ymuint
+IguGen::lower_bound(ymuint num) const
+{
+  ymuint n1 = (num + mMulti - 1) / mMulti;
+  ymuint ans = 0;
+  ymuint m = 1;
+  for ( ; m < n1; ++ m) {
+    ++ ans;
+    m *= 2;
+  }
+  return ans;
 }
 
 END_NAMESPACE_YM_IGF

@@ -53,6 +53,7 @@ igf(int argc,
   ymuint32 multi = 1;
   ymuint32 comp = 1;
   ymuint32 blimit = 0;
+  ymuint32 omode = 0;
   ymuint32 tlimit = 0;
   ymuint32 debug = 0;
 
@@ -71,6 +72,8 @@ igf(int argc,
       "specify XOR complexity", "<INT>"},
     { "branch-limit", 'b', POPT_ARG_INT, &blimit, 'b',
       "set branch limit", "<INT>"},
+    { "ordering-mode", 'o', POPT_ARG_INT, &omode, 'o',
+      "set ordering mode", "0, 1"},
     { "time-limit", 't', POPT_ARG_INT, &tlimit, 't',
       "set time limit", "<INT>(min)"},
     { "debug-level", 'd', POPT_ARG_INT, &debug, 'd',
@@ -149,6 +152,9 @@ igf(int argc,
 
   if ( blimit > 0 ) {
     igu_gen.set_branch_limit(blimit);
+  }
+  if ( omode > 0 ) {
+    igu_gen.set_ordering_mode(omode);
   }
   if ( tlimit > 0 ) {
     igu_gen.set_time_limit(tlimit, 0);

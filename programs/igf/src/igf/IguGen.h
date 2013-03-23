@@ -58,6 +58,10 @@ public:
   set_time_limit(ymuint32 limit_min,
 		 ymuint32 limit_sec = 0);
 
+  /// @brief 順序付けのヒューリスティックを指定する．
+  void
+  set_ordering_mode(ymuint id);
+
   /// @brief デバッグレベルを指定する．
   void
   set_debug_level(ymuint32 level);
@@ -77,6 +81,11 @@ public:
 	      vector<Variable*>::const_iterator var_begin,
 	      vector<Variable*>::const_iterator var_end);
 
+  /// @brief 下界を計算する．
+  /// @param[in] num 要素数
+  ymuint
+  lower_bound(ymuint num) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -89,6 +98,9 @@ private:
   // 現時点の最適値
   ymuint32 mBestSoFar;
 
+  // mBestSorFar がセットされた．
+  bool mBeforeHasSolution;
+
   // 現時点の解
   vector<Variable*> mSolutionSoFar;
 
@@ -97,6 +109,9 @@ private:
 
   // いくつの分岐を試すかを制御するパラメータ
   ymuint32 mBranchLimit;
+
+  // 順序づけのヒューリスティック
+  ymuint32 mOrderingMode;
 
   // 時間制限
   ymuint32 mTimeLimit;
