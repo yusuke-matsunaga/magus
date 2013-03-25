@@ -138,9 +138,9 @@ RvMgr::index_size() const
   ++ k;
   ymuint ans = 0;
   ymuint m = 1;
-  for ( ; m < k; ++ m) {
+  while ( m < k ) {
     ++ ans;
-    m *= 2;
+    m <<= 1;
   }
   return ans;
 }
