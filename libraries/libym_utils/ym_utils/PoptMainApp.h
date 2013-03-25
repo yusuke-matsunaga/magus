@@ -52,7 +52,7 @@ public:
   /// @note opt_str が空文字列だったり opt_char が \0 だったりする場合もある．
   Popt(const char* opt_str,
        char opt_char,
-       char* opt_desc);
+       const char* opt_desc);
 
   /// @brief デストラクタ
   virtual
@@ -83,15 +83,13 @@ public:
   arg() = 0;
 
   /// @brief オプションの説明文を返す．
-  /// @note char* は気持ち悪いけど struct poptOption がそうなっている．
-  char*
+  const char*
   opt_desc() const;
 
   /// @brief オプションの引数の記述を返す．
   /// @note デフォルトの実装では NULL を返す．
-  /// @note char* は気持ち悪いけど struct poptOption がそうなっている．
   virtual
-  char*
+  const char*
   arg_desc() const;
 
   /// @brief このオブジェクトが解析中に呼ばれていたら true を返す．
@@ -123,10 +121,50 @@ private:
   char mOptChar;
 
   // オプションの説明文
-  char* mOptDesc;
+  const char* mOptDesc;
 
   // このオプションが指定された回数
   ymuint32 mCount;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PoptNone Popt.h "ym_utils/Popt.h"
+/// @brief 引数をとらないオプションの処理を行なうオブジェクトの基底クラス
+//////////////////////////////////////////////////////////////////////
+class PoptNone :
+  public Popt
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] opt_str オプション文字列
+  /// @param[in] opt_char オプション文字
+  /// @param[in] opt_desc オプションの説明文
+  PoptNone(const char* opt_str,
+	   char opt_char,
+	   const char* opt_desc);
+
+  /// @brief デストラクタ
+  virtual
+  ~PoptNone();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief argInfo の値を返す．
+  virtual
+  int
+  arg_info();
+
+  /// @brief arg の値を返す．
+  virtual
+  void*
+  arg();
 
 };
 
@@ -147,8 +185,8 @@ public:
   /// @param[in] arg_desc 引数の説明文
   PoptArg(const char* opt_str,
 	  char opt_char,
-	  char* opt_desc,
-	  char* arg_desc);
+	  const char* opt_desc,
+	  const char* arg_desc);
 
   /// @brief デストラクタ
   virtual
@@ -161,10 +199,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief オプションの引数の記述を返す．
-  /// @note デフォルトの実装では NULL を返す．
-  /// @note char* は気持ち悪いけど struct poptOption がそうなっている．
   virtual
-  char*
+  const char*
   arg_desc() const;
 
 
@@ -174,7 +210,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 引数の説明文
-  char* mArgDesc;
+  const char* mArgDesc;
 
 };
 
@@ -195,8 +231,8 @@ public:
   /// @param[in] arg_desc 引数の説明文
   PoptStr(const char* opt_str,
 	  char opt_char,
-	  char* opt_desc,
-	  char* arg_desc);
+	  const char* opt_desc,
+	  const char* arg_desc);
 
   /// @brief デストラクタ
   virtual
@@ -256,8 +292,8 @@ public:
   /// @param[in] arg_desc 引数の説明文
   PoptInt(const char* opt_str,
 	  char opt_char,
-	  char* opt_desc,
-	  char* arg_desc);
+	  const char* opt_desc,
+	  const char* arg_desc);
 
   /// @brief デストラクタ
   virtual
@@ -317,8 +353,8 @@ public:
   /// @param[in] arg_desc 引数の説明文
   PoptBool(const char* opt_str,
 	   char opt_char,
-	   char* opt_desc,
-	   char* arg_desc);
+	   const char* opt_desc,
+	   const char* arg_desc);
 
   /// @brief デストラクタ
   virtual
@@ -353,8 +389,8 @@ public:
   /// @param[in] arg_desc 引数の説明文
   PoptUint(const char* opt_str,
 	   char opt_char,
-	   char* opt_desc,
-	   char* arg_desc);
+	   const char* opt_desc,
+	   const char* arg_desc);
 
   /// @brief デストラクタ
   virtual
@@ -389,8 +425,8 @@ public:
   /// @param[in] arg_desc 引数の説明文
   PoptFloat(const char* opt_str,
 	    char opt_char,
-	    char* opt_desc,
-	    char* arg_desc);
+	    const char* opt_desc,
+	    const char* arg_desc);
 
   /// @brief デストラクタ
   virtual
@@ -450,8 +486,8 @@ public:
   /// @param[in] arg_desc 引数の説明文
   PoptDouble(const char* opt_str,
 	     char opt_char,
-	     char* opt_desc,
-	     char* arg_desc);
+	     const char* opt_desc,
+	     const char* arg_desc);
 
   /// @brief デストラクタ
   virtual
@@ -561,6 +597,12 @@ public:
   print_usage(FILE* fp,
 	      int flags);
 
+  /// @brief usage を出力して終了する．
+  void
+  usage(int exitcode,
+	const char* error = NULL,
+	const char* addl = NULL);
+
   /// @brief PoptMainApp 用の strerror() 関数
   /// @param[in] error エラーコード
   static
@@ -584,7 +626,7 @@ public:
   /// @brief alias 用の設定ファイルを読み込む．
   /// @param[in] filename ファイル名
   int
-  read_config_file(char* filename);
+  read_config_file(const char* filename);
 
   /// @brief alias を追加する．
   /// @param[in] alias alias 構造体

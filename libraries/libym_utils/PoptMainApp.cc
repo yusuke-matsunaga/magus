@@ -115,11 +115,6 @@ PoptMainApp::parse_options(int argc,
     option.argDescrip = NULL;
   }
 
-  poptOption options[] = {
-    POPT_AUTOHELP
-    POPT_TABLEEND
-  };
-
   // poptContext を作る．
   mCon = poptGetContext(mName, argc, argv, mOptionTable, flags);
 
@@ -190,6 +185,19 @@ PoptMainApp::print_usage(FILE* fp,
   poptPrintUsage(mCon, fp, flags);
 }
 
+// @brief usage を出力して終了する．
+void
+PoptMainApp::usage(int exitcode,
+		   const char* error,
+		   const char* addl)
+{
+  print_usage(stderr, 0);
+  if ( error ) {
+    fprintf(stderr, "%s: %s\n", error, addl);
+  }
+  exit(exitcode);
+}
+
 // @brief PoptMainApp 用の strerror() 関数
 // @param[in] error エラーコード
 const char*
@@ -221,7 +229,7 @@ PoptMainApp::read_default_config(int flags)
 // @brief alias 用の設定ファイルを読み込む．
 // @param[in] filename ファイル名
 int
-PoptMainApp::read_config_file(char* filename)
+PoptMainApp::read_config_file(const char* filename)
 {
   return poptReadConfigFile(mCon, filename);
 }
@@ -248,7 +256,7 @@ PoptMainApp::add_alias(struct poptAlias alias,
 // @note opt_str が空文字列だったり opt_char が \0 だったりする場合もある．
 Popt::Popt(const char* opt_str,
 	   char opt_char,
-	   char* opt_desc) :
+	   const char* opt_desc) :
   mOptStr(opt_str),
   mOptChar(opt_char),
   mOptDesc(opt_desc),
@@ -276,8 +284,7 @@ Popt::opt_char() const
 }
 
 // @brief オプションの説明文を返す．
-// @note char* は気持ち悪いけど struct poptOption がそうなっている．
-char*
+const char*
 Popt::opt_desc() const
 {
   return mOptDesc;
@@ -285,8 +292,7 @@ Popt::opt_desc() const
 
 // @brief オプションの引数の記述を返す．
 // @note デフォルトの実装では NULL を返す．
-// @note char* は気持ち悪いけど struct poptOption がそうなっている．
-char*
+const char*
 Popt::arg_desc() const
 {
   return NULL;
@@ -316,6 +322,42 @@ Popt::action()
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス PoptNone
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] opt_str オプション文字列
+// @param[in] opt_char オプション文字
+// @param[in] opt_desc オプションの説明文
+PoptNone::PoptNone(const char* opt_str,
+		   char opt_char,
+		   const char* opt_desc) :
+  Popt(opt_str, opt_char, opt_desc)
+{
+}
+
+// @brief デストラクタ
+PoptNone::~PoptNone()
+{
+}
+
+// @brief argInfo の値を返す．
+int
+PoptNone::arg_info()
+{
+  return POPT_ARG_NONE;
+}
+
+// @brief arg の値を返す．
+void*
+PoptNone::arg()
+{
+  return NULL;
+}
+
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス PoptArg
 //////////////////////////////////////////////////////////////////////
 
@@ -326,8 +368,8 @@ Popt::action()
 // @param[in] arg_desc 引数の説明文
 PoptArg::PoptArg(const char* opt_str,
 		 char opt_char,
-		 char* opt_desc,
-		 char* arg_desc) :
+		 const char* opt_desc,
+		 const char* arg_desc) :
   Popt(opt_str, opt_char, opt_desc),
   mArgDesc(arg_desc)
 {
@@ -340,8 +382,7 @@ PoptArg::~PoptArg()
 
 // @brief オプションの引数の記述を返す．
 // @note デフォルトの実装では NULL を返す．
-// @note char* は気持ち悪いけど struct poptOption がそうなっている．
-char*
+const char*
 PoptArg::arg_desc() const
 {
   return mArgDesc;
@@ -359,8 +400,8 @@ PoptArg::arg_desc() const
 // @param[in] arg_desc 引数の説明文
 PoptStr::PoptStr(const char* opt_str,
 		 char opt_char,
-		 char* opt_desc,
-		 char* arg_desc) :
+		 const char* opt_desc,
+		 const char* arg_desc) :
   PoptArg(opt_str, opt_char, opt_desc, arg_desc)
 {
 }
@@ -403,8 +444,8 @@ PoptStr::val() const
 // @param[in] arg_desc 引数の説明文
 PoptInt::PoptInt(const char* opt_str,
 		 char opt_char,
-		 char* opt_desc,
-		 char* arg_desc) :
+		 const char* opt_desc,
+		 const char* arg_desc) :
   PoptArg(opt_str, opt_char, opt_desc, arg_desc)
 {
 }
@@ -447,8 +488,8 @@ PoptInt::val() const
 // @param[in] arg_desc 引数の説明文
 PoptBool::PoptBool(const char* opt_str,
 		   char opt_char,
-		   char* opt_desc,
-		   char* arg_desc) :
+		   const char* opt_desc,
+		   const char* arg_desc) :
   PoptInt(opt_str, opt_char, opt_desc, arg_desc)
 {
 }
@@ -477,8 +518,8 @@ PoptBool::val() const
 // @param[in] arg_desc 引数の説明文
 PoptUint::PoptUint(const char* opt_str,
 		   char opt_char,
-		   char* opt_desc,
-		   char* arg_desc) :
+		   const char* opt_desc,
+		   const char* arg_desc) :
   PoptInt(opt_str, opt_char, opt_desc, arg_desc)
 {
 }
@@ -507,8 +548,8 @@ PoptUint::val() const
 // @param[in] arg_desc 引数の説明文
 PoptFloat::PoptFloat(const char* opt_str,
 		     char opt_char,
-		     char* opt_desc,
-		     char* arg_desc) :
+		     const char* opt_desc,
+		     const char* arg_desc) :
   PoptArg(opt_str, opt_char, opt_desc, arg_desc)
 {
 }
@@ -551,8 +592,8 @@ PoptFloat::val() const
 // @param[in] arg_desc 引数の説明文
 PoptDouble::PoptDouble(const char* opt_str,
 		       char opt_char,
-		       char* opt_desc,
-		       char* arg_desc) :
+		       const char* opt_desc,
+		       const char* arg_desc) :
   PoptArg(opt_str, opt_char, opt_desc, arg_desc)
 {
 }
