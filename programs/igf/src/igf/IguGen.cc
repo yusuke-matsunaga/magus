@@ -284,11 +284,13 @@ IguGen::solve_recur(const VectSetList& vector_list,
       }
       if ( n0 > mMulti ) {
 	am += n0 * n0;
-	am2 += lower_bound(n0);
+	ymuint lb = lower_bound(n0);
+	am2 += lb * lb;
       }
       if ( n1 > mMulti ) {
 	am += n1 * n1;
-	am2 += lower_bound(n1);
+	ymuint lb = lower_bound(n1);
+	am2 += lb * lb;
       }
     }
 
@@ -303,11 +305,27 @@ IguGen::solve_recur(const VectSetList& vector_list,
       continue;
     }
 
-    if ( mOrderingMode == 0 || !mBeforeHasSolution ) {
+    switch ( mOrderingMode ) {
+    case 0:
       tmp_list.push_back(make_pair(am, var));
-    }
-    else {
+      break;
+
+    case 1:
+      if ( mBeforeHasSolution ) {
+	tmp_list.push_back(make_pair(am2, var));
+      }
+      else {
+	tmp_list.push_back(make_pair(am, var));
+      }
+      break;
+
+    case 2:
       tmp_list.push_back(make_pair(am2, var));
+      break;
+
+    default:
+      tmp_list.push_back(make_pair(am, var));
+      break;
     }
   }
   sort(tmp_list.begin(), tmp_list.end(), Lt());
@@ -426,9 +444,9 @@ IguGen::lower_bound(ymuint num) const
   ymuint n1 = (num + mMulti - 1) / mMulti;
   ymuint ans = 0;
   ymuint m = 1;
-  for ( ; m < n1; ++ m) {
+  while ( m < n1 ) {
     ++ ans;
-    m *= 2;
+    m <<= 1;
   }
   return ans;
 }
