@@ -14,79 +14,44 @@
 #endif
 
 #include "igf_nsdef.h"
+#include "ym_utils/PoptMainApp.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
-
-// usage を出力する．
-void
-usage(poptContext optCon,
-      int exitcode,
-      const char* error = NULL,
-      const char* addl = NULL)
-{
-  poptPrintUsage(optCon, stderr, 0);
-  if ( error ) {
-    fprintf(stderr, "%s: %s\n", error, addl);
-  }
-  exit(exitcode);
-}
 
 int
 tseconv(int argc,
 	const char** argv)
 {
 
-  // オプション解析用のデータ
-  const struct poptOption options[] = {
-    // long-option
-    // short-option
-    // argument type
-    // variable address
-    // option tag
-    // docstr
-    // argstr
-    { "number", 'n', POPT_ARG_NONE, NULL, 'n',
-      "number mode", NULL},
-    { "digit", 'd', POPT_ARG_NONE, NULL, 'd',
-      "digit mode", NULL},
-    { "ascii", 'a', POPT_ARG_NONE, NULL, 'a',
-      "ascii mode", NULL},
+  PoptMainApp app;
 
-    POPT_AUTOHELP
+  // number オプション
+  PoptNone popt_number("number", 'n',
+		       "number mode");
+  // digit オプション
+  PoptNone popt_digit("digit", 'd',
+		      "digit mode");
+  // ascii オプション
+  PoptNone popt_ascii("ascc", 'a',
+		      "ascii mode");
 
-    { NULL, '\0', 0, NULL, 0, NULL, NULL }
-  };
+  app.add_option(&popt_number);
+  app.add_option(&popt_digit);
+  app.add_option(&popt_ascii);
 
-  // オプション解析用のコンテキストを生成する．
-  poptContext popt_context = poptGetContext(NULL, argc, argv, options, 0);
-  poptSetOtherOptionHelp(popt_context, " <filename>");
+  app.set_other_option_help("<filename>");
+
+  // オプション解析を行う．
+  tPoptStat stat = app.parse_options(argc, argv, 0);
+  if ( stat == kPoptAbort ) {
+    return -1;
+  }
 
   // オプション解析行う．
-  bool number_mode = false;
-  bool digit_mode = false;
-  bool ascii_mode = false;
-  for ( ; ; ) {
-    int rc = poptGetNextOpt(popt_context);
-    if ( rc == -1 ) {
-      break;
-    }
-    if ( rc < -1 ) {
-      // エラーが起きた．
-      cerr << poptBadOption(popt_context, POPT_BADOPTION_NOALIAS)
-	   << ": " << poptStrerror(rc) << endl;
-      return -1;
-    }
-    if ( rc == 'n' ) {
-      number_mode = true;
-    }
-    else if ( rc == 'd' ) {
-      digit_mode = true;
-    }
-    else if ( rc == 'a' ) {
-      ascii_mode = true;
-    }
-  }
+  bool number_mode = popt_number.is_specified();
+  bool digit_mode = popt_digit.is_specified();
+  bool ascii_mode = popt_ascii.is_specified();
   if ( number_mode ) {
     if ( digit_mode || ascii_mode ) {
       cerr << "--digit and/or --ascii cannot be specified with --number." << endl;
@@ -108,21 +73,16 @@ tseconv(int argc,
     number_mode = true;
   }
 
-  const char* f_str = poptGetArg(popt_context);
-  if ( f_str == NULL ) {
-    usage(popt_context, 2);
+  vector<string> args;
+  ymuint n_args = app.get_args(args);
+  if ( n_args != 1 ) {
+    app.usage(2);
     return -1;
   }
 
-  const char* dummy = poptGetArg(popt_context);
-  if ( dummy != NULL ) {
-    usage(popt_context, 2);
-    return -1;
-  }
-
-  ifstream ifs(f_str);
+  ifstream ifs(args[0].c_str());
   if ( !ifs ) {
-    cerr << argv[1] << " : No such file" << endl;
+    cerr << args[0] << " : No such file" << endl;
     return -1;
   }
 
