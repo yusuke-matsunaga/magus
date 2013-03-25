@@ -89,7 +89,7 @@ PoptMainApp::parse_options(int argc,
     option.shortName = opt->opt_char();
     option.argInfo = opt->arg_info();
     option.arg = opt->arg();
-    option.val = i;
+    option.val = i + 1;
     option.descrip = opt->opt_desc();
     option.argDescrip = opt->arg_desc();
   }
@@ -135,6 +135,8 @@ PoptMainApp::parse_options(int argc,
       return kPoptAbort;
     }
     ymuint id = static_cast<ymuint>(rc);
+    assert_cond( id > 0, __FILE__, __LINE__);
+    -- id;
     assert_cond( id < mOptionList.size(), __FILE__, __LINE__);
     Popt* popt = mOptionList[id];
     ++ popt->mCount;
