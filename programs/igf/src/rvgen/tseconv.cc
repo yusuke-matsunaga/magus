@@ -146,6 +146,9 @@ tseconv(int argc,
   }
 
   ymuint n = 0;
+  if ( number_mode ) {
+    n = 14;
+  }
   if ( digit_mode ) {
     n = 16;
   }
