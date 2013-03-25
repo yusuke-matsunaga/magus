@@ -7,14 +7,8 @@
 /// All rights reserved.
 
 
-#if HAVE_POPT
-#include <popt.h>
-#else
-#error "<popt.h> not found."
-#endif
-
-
 #include "igf_nsdef.h"
+#include "ym_utils/PoptMainApp.h"
 #include "RvMgr.h"
 #include "RegVect.h"
 #include "Variable.h"
@@ -24,32 +18,46 @@
 
 BEGIN_NAMESPACE_YM_IGF
 
-// usage を出力する．
-void
-usage(poptContext optCon,
-      int exitcode,
-      const char* error = NULL,
-      const char* addl = NULL)
-{
-  poptPrintUsage(optCon, stderr, 0);
-  if ( error ) {
-    fprintf(stderr, "%s: %s\n", error, addl);
-  }
-  exit(exitcode);
-}
-
-void
-solve_igf(const vector<RegVect*>& vector_list,
-	  ymuint multi,
-	  const vector<Variable*>& variable_list,
-	  vector<Variable*>& solution)
-{
-}
-
 int
 igf(int argc,
     const char** argv)
 {
+  PoptMainApp app;
+
+  // multi オプション
+  PoptUint popt_multi("multi", 'm',
+		      "specify multiplexity", "<INT>");
+  // xor オプション
+  PoptUint popt_xor("xor", 'x',
+		    "specify XOR complexity", "<INT>");
+  // branch-limit オプション
+  PoptUint popt_blimit("branch-limit", 'b',
+		       "specify branch limit", "<INT>");
+  // ordering-mode オプション
+  PoptUint popt_omode("ordering-mode", 'o',
+		      "set ordering mode", "<INT>");
+  // time-limit オプション
+  PoptUint popt_tlimit("time-limit", 't',
+		       "set time limit", "<INT>(min)");
+  // debug-level オプション
+  PoptUint popt_debug("debug-level", 'd',
+		      "set debug level", "<INT>");
+
+  app.add_option(&popt_multi);
+  app.add_option(&popt_xor);
+  app.add_option(&popt_blimit);
+  app.add_option(&popt_omode);
+  app.add_option(&popt_tlimit);
+  app.add_option(&popt_debug);
+
+  app.set_other_option_help("<filename>");
+
+  // オプション解析を行う．
+  tPoptStat stat = app.parse_options(argc, argv, 0);
+  if ( stat == kPoptAbort ) {
+    return -1;
+  }
+
   ymuint32 multi = 1;
   ymuint32 comp = 1;
   ymuint32 blimit = 0;
@@ -57,61 +65,33 @@ igf(int argc,
   ymuint32 tlimit = 0;
   ymuint32 debug = 0;
 
-  // オプション解析用のデータ
-  const struct poptOption options[] = {
-    // long-option
-    // short-option
-    // argument type
-    // variable address
-    // option tag
-    // docstr
-    // argstr
-    { "multi", 'm', POPT_ARG_INT, &multi, 'm',
-      "specify multiplicity", "<INT>"},
-    { "xor-complex", 'x', POPT_ARG_INT, &comp, 'x',
-      "specify XOR complexity", "<INT>"},
-    { "branch-limit", 'b', POPT_ARG_INT, &blimit, 'b',
-      "set branch limit", "<INT>"},
-    { "ordering-mode", 'o', POPT_ARG_INT, &omode, 'o',
-      "set ordering mode", "0, 1"},
-    { "time-limit", 't', POPT_ARG_INT, &tlimit, 't',
-      "set time limit", "<INT>(min)"},
-    { "debug-level", 'd', POPT_ARG_INT, &debug, 'd',
-      "set_debug_level", "<INT>"},
-
-    POPT_AUTOHELP
-
-    { NULL, '\0', 0, NULL, 0, NULL, NULL }
-  };
-
-  // オプション解析用のコンテキストを生成する．
-  poptContext popt_context = poptGetContext(NULL, argc, argv, options, 0);
-  poptSetOtherOptionHelp(popt_context, " <dimension of vectors> <# of vectors>");
-
-  // オプション解析行う．
-  for ( ; ; ) {
-    int rc = poptGetNextOpt(popt_context);
-    if ( rc == -1 ) {
-      break;
-    }
-    if ( rc < -1 ) {
-      // エラーが起きた．
-      cerr << poptBadOption(popt_context, POPT_BADOPTION_NOALIAS)
-	   << ": " << poptStrerror(rc) << endl;
-      return 1;
-    }
+  if ( popt_multi.is_specified() ) {
+    multi = popt_multi.val();
+  }
+  if ( popt_xor.is_specified() ) {
+    comp = popt_xor.val();
+  }
+  if ( popt_blimit.is_specified() ) {
+    blimit = popt_blimit.val();
+  }
+  if ( popt_omode.is_specified() ) {
+    omode = popt_omode.val();
+  }
+  if ( popt_tlimit.is_specified() ) {
+    tlimit = popt_tlimit.val();
+  }
+  if ( popt_debug.is_specified() ) {
+    debug = popt_debug.val();
   }
 
-  const char* f_str = poptGetArg(popt_context);
-  if ( f_str == NULL ) {
-    usage(popt_context, 2);
+  vector<string> args;
+  ymuint n_args = app.get_args(args);
+
+  if ( n_args != 1 ) {
+    app.usage(2);
   }
 
-  const char* dummy = poptGetArg(popt_context);
-  if ( dummy != NULL ) {
-    usage(popt_context, 2);
-  }
-
+  const char* f_str = args[0].c_str();
   ifstream ifs(f_str);
   if ( !ifs ) {
     cerr << f_str << ": No such file" << endl;
@@ -120,8 +100,8 @@ igf(int argc,
 
   RvMgr rvmgr;
 
-  bool stat = rvmgr.read_data(ifs);
-  if ( !stat ) {
+  bool rstat = rvmgr.read_data(ifs);
+  if ( !rstat ) {
     cerr << "read error" << endl;
     return 3;
   }
