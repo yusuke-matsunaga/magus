@@ -87,20 +87,6 @@ BinaryRandGen::value()
 }
 
 
-// usage を出力する．
-void
-usage(PoptMainApp& main_app,
-      int exitcode,
-      const char* error = NULL,
-      const char* addl = NULL)
-{
-  main_app.print_usage(stderr, 0);
-  if ( error ) {
-    fprintf(stderr, "%s: %s\n", error, addl);
-  }
-  exit(exitcode);
-}
-
 // n 次元 k 個の登録ベクタを出力する．
 void
 gen_vectors(ymuint n,
@@ -158,7 +144,7 @@ rvgen(int argc,
   ymuint n_args = main_app.get_args(args);
 
   if ( n_args != 2 ) {
-    usage(main_app, 2);
+    main_app.usage(2);
   }
 
   int tmp_n = atoi(args[0].c_str());
