@@ -668,10 +668,11 @@ FsimX::calc_gval()
 void
 FsimX::clear_gval()
 {
+  PackedVal3 val_X(kPvAll0, kPvAll0);
   for (vector<SimNode*>::iterator p = mGvalClearArray.begin();
        p != mGvalClearArray.end(); ++ p) {
     SimNode* node = *p;
-    node->set_gval(PackedVal3(kPvAll0, kPvAll0));
+    node->set_gval(val_X);
   }
 }
 
