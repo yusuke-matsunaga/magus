@@ -314,16 +314,14 @@ FsimX::run(TestVector* tv,
   {
     PackedVal3 val0(kPvAll1, kPvAll0);
     PackedVal3 val1(kPvAll0, kPvAll1);
-    PackedVal3 valX(kPvAll0, kPvAll0);
     for (ymuint i = 0; i < npi; ++ i) {
-      PackedVal3 val(valX);
-      switch (tv->val3(i) ) {
-      case kVal0: val = val0; break;
-      case kVal1: val = val1; break;
-      case kValX: val = valX; break;
-      }
       SimNode* simnode = mInputArray[i];
-      simnode->set_gval(val);
+      switch ( tv->val3(i) ) {
+      case kVal0: simnode->set_gval(val0); break;
+      case kVal1: simnode->set_gval(val1); break;
+      case kValX: continue;
+      }
+      update_gval(simnode);
     }
   }
 
@@ -336,6 +334,8 @@ FsimX::run(TestVector* tv,
   for (vector<SimFFR>::iterator p = mFFRArray.begin();
        p != mFFRArray.end(); ++ p) {
     SimFFR* ffr = &(*p);
+
+    // 未検出の故障を持たない FFR はスキップする．
     if ( ffr->fault_list().empty() ) continue;
 
     SimNode* root = ffr->root();
@@ -366,11 +366,7 @@ FsimX::run(TestVector* tv,
     root->set_fval(fval);
     root->set_fmask(~bitmask);
 
-    mFvalClearArray.push_back(root);
-    ymuint no = root->nfo();
-    for (ymuint i = 0; i < no; ++ i) {
-      mEventQ.put(root->fanout(i));
-    }
+    update_fval(root);
     ffr_buff[bitpos] = ffr;
 
     ++ bitpos;
@@ -453,7 +449,10 @@ FsimX::run(const vector<TestVector*>& tv_array,
     }
     SimNode* simnode = mInputArray[i];
     PackedVal3 val(val_0, val_1);
-    simnode->set_gval(val);
+    if ( val.extract_01() != kPvAll0 ) {
+      simnode->set_gval(val);
+      update_gval(simnode);
+    }
   }
 
   // 正常値の計算を行う．
@@ -463,6 +462,8 @@ FsimX::run(const vector<TestVector*>& tv_array,
   for (vector<SimFFR>::iterator p = mFFRArray.begin();
        p != mFFRArray.end(); ++ p) {
     SimFFR* ffr = &(*p);
+
+    // 未検出の故障を含んでいないFFRはスキップする．
     if ( ffr->fault_list().empty() ) continue;
 
     SimNode* root = ffr->root();
@@ -487,15 +488,12 @@ FsimX::run(const vector<TestVector*>& tv_array,
       obs = kPvAll1;
     }
     else {
+      mFvalClearArray.clear();
+      // FFR 内で必要とされているビットだけ反転させる．
       PackedVal3 gval = root->gval();
       PackedVal3 fval = ite(ffr_req, ~gval, gval);
       root->set_fval(fval);
-      mFvalClearArray.clear();
-      mFvalClearArray.push_back(root);
-      ymuint no = root->nfo();
-      for (ymuint i = 0; i < no; ++ i) {
-	mEventQ.put(root->fanout(i));
-      }
+      update_fval(root);
       obs = calc_fval();
     }
 
@@ -547,16 +545,14 @@ FsimX::run(TestVector* tv,
   {
     PackedVal3 val_0(kPvAll1, kPvAll0);
     PackedVal3 val_1(kPvAll0, kPvAll1);
-    PackedVal3 val_X(kPvAll0, kPvAll0);
     for (ymuint i = 0; i < npi; ++ i) {
-      PackedVal3 val(val_X);
-      switch ( tv->val3(i) ) {
-      case kVal0: val = val_0; break;
-      case kVal1: val = val_1; break;
-      case kValX: val = val_X; break;
-      }
       SimNode* simnode = mInputArray[i];
-      simnode->set_gval(val);
+      switch ( tv->val3(i) ) {
+      case kVal0: simnode->set_gval(val_0); break;
+      case kVal1: simnode->set_gval(val_1); break;
+      case kValX: continue;
+      }
+      update_gval(simnode);
     }
   }
 
@@ -600,12 +596,7 @@ FsimX::run(TestVector* tv,
       PackedVal3 gval = root->gval();
       PackedVal3 fval = ite(lobs, ~gval, gval);
       root->set_fval(fval);
-
-      mFvalClearArray.push_back(root);
-      ymuint no = root->nfo();
-      for (ymuint i = 0; i < no; ++ i) {
-	mEventQ.put(root->fanout(i));
-      }
+      update_fval(root);
 
       PackedVal obs = calc_fval() & lobs;
       ans = (obs != kPvAll0);
@@ -663,28 +654,11 @@ FsimX::clear_faults()
 void
 FsimX::calc_gval()
 {
-  mGvalClearArray.clear();
-  ymuint npi = mNetwork->input_num2();
-  for (ymuint i = 0; i < npi; ++ i) {
-    SimNode* node = mInputArray[i];
-    PackedVal3 gval = node->gval();
-    if ( gval.extract_01() != kPvAll0 ) {
-      mGvalClearArray.push_back(node);
-      ymuint no = node->nfo();
-      for (ymuint i = 0; i < no; ++ i) {
-	mEventQ.put(node->fanout(i));
-      }
-    }
-  }
   for ( ; ; ) {
     SimNode* node = mEventQ.get();
     if ( node == NULL ) break;
     if ( node->calc_gval3() ) {
-      mGvalClearArray.push_back(node);
-      ymuint no = node->nfo();
-      for (ymuint i = 0; i < no; ++ i) {
-	mEventQ.put(node->fanout(i));
-      }
+      update_gval(node);
     }
   }
 }
@@ -832,21 +806,17 @@ FsimX::fault_sweep(SimFFR* ffr,
       if ( ff->mObsMask ) {
 	det_faults.push_back(f);
       }
-#if 0
       else {
 	if ( wpos != rpos ) {
 	  flist[wpos] = ff;
 	}
 	++ wpos;
       }
-#endif
     }
   }
-#if 0
   if ( wpos < fnum ) {
     flist.erase(flist.begin() + wpos, flist.end());
   }
-#endif
 }
 
 // @brief 外部入力ノードを作る．

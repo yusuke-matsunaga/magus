@@ -98,6 +98,10 @@ private:
   void
   calc_gval();
 
+  /// @brief 正常値が更新されたときの処理を行なう．
+  void
+  update_gval(SimNode* node);
+
   /// @brief 正常値をクリアする．
   /// @note mGvalClearArray を使う．
   void
@@ -107,6 +111,10 @@ private:
   /// @note この関数を抜けた時点で故障値はクリアされている．
   PackedVal
   calc_fval();
+
+  /// @brief 故障値が更新されたときの処理を行なう．
+  void
+  update_fval(SimNode* node);
 
   /// @brief ffr 内の故障が検出可能か調べる．
   void
@@ -209,6 +217,34 @@ private:
   vector<FsimFault> mFsimFaults;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 正常値が更新されたときの処理を行なう．
+inline
+void
+FsimX::update_gval(SimNode* node)
+{
+  mGvalClearArray.push_back(node);
+  ymuint no = node->nfo();
+  for (ymuint i = 0; i < no; ++ i) {
+    mEventQ.put(node->fanout(i));
+  }
+}
+
+// @brief 故障値が更新されたときの処理を行なう．
+void
+FsimX::update_fval(SimNode* node)
+{
+  mFvalClearArray.push_back(node);
+  ymuint no = node->nfo();
+  for (ymuint i = 0; i < no; ++ i) {
+    mEventQ.put(node->fanout(i));
+  }
+}
 
 END_NAMESPACE_YM_SATPG_FSIMX
 
