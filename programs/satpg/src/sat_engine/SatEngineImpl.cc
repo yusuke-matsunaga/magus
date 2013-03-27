@@ -837,6 +837,11 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
   for (ymuint i = 0; i < nf; ++ i) {
     TpgFault* f = flist[i];
 
+    if ( f->status() == kFsDetected ) {
+      // 他の故障のパタンで検出済みになっている場合がある．
+      continue;
+    }
+
     mAssumptions.clear();
     mAssumptions.reserve(mTfoList.size() + nf);
 
