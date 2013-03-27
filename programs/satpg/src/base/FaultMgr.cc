@@ -261,7 +261,6 @@ FaultMgr::update()
       TpgFault* f = mRemainList[rpos];
       switch ( f->status() ) {
       case kFsUndetected:
-      case kFsSkipped:
 	if ( wpos != rpos ) {
 	  mRemainList[wpos] = f;
 	}

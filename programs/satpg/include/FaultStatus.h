@@ -23,8 +23,6 @@ enum FaultStatus {
   kFsDetected,
   /// @brief テスト不能 (冗長)
   kFsUntestable,
-  /// @brief 部分的なテスト不能
-  kFsSkipped,
   /// @brief アボート
   kFsAborted
 };
@@ -39,7 +37,6 @@ str(FaultStatus fs)
   case kFsUndetected: return "undetected";
   case kFsDetected:   return "detected";
   case kFsUntestable: return "untestable";
-  case kFsSkipped:    return "skipped";
   case kFsAborted:    return "aborted";
   default: break;
   }

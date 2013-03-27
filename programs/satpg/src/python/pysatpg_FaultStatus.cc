@@ -43,9 +43,6 @@ PyObject* Py_kFsDetected;
 // kFsUntestable を表すオブジェクト
 PyObject* Py_kFsUntestable;
 
-// kFsSkipped を表すオブジェクト
-PyObject* Py_kFsSkipped;
-
 // kFsAborted を表すオブジェクト
 PyObject* Py_kFsAborted;
 
@@ -67,12 +64,6 @@ FaultStatusObject Py_kFsUntestableStruct = {
   kFsUntestable
 };
 
-// Py_kFsSkipped の実体
-FaultStatusObject Py_kFsSkippedStruct = {
-  PyObject_HEAD_INIT(&PyFaultStatus_Type)
-  kFsSkipped
-};
-
 // Py_kFsAborted の実体
 FaultStatusObject Py_kFsAbortedStruct = {
   PyObject_HEAD_INIT(&PyFaultStatus_Type)
@@ -83,7 +74,6 @@ FaultStatusObject Py_kFsAbortedStruct = {
 PyObject* Py_kFsUndetectedString = NULL;
 PyObject* Py_kFsDetectedString = NULL;
 PyObject* Py_kFsUntestableString = NULL;
-PyObject* Py_kFsSkippedString = NULL;
 PyObject* Py_kFsAbortedString = NULL;
 
 
@@ -124,7 +114,6 @@ FaultStatus_repr(FaultStatusObject* self)
   case kFsUndetected: result = Py_kFsUndetectedString; break;
   case kFsDetected:   result = Py_kFsDetectedString; break;
   case kFsUntestable: result = Py_kFsUntestableString; break;
-  case kFsSkipped:    result = Py_kFsSkippedString; break;
   case kFsAborted:    result = Py_kFsAbortedString; break;
   default:
     assert_not_reached(__FILE__, __LINE__);
@@ -244,7 +233,6 @@ PyFaultStatus_FromFaultStatus(FaultStatus val)
   case kFsUndetected: result = Py_kFsUndetected; break;
   case kFsDetected:   result = Py_kFsDetected; break;
   case kFsUntestable: result = Py_kFsUntestable; break;
-  case kFsSkipped:    result = Py_kFsSkipped; break;
   case kFsAborted:    result = Py_kFsAborted; break;
   default:
     assert_not_reached(__FILE__, __LINE__);
@@ -273,9 +261,6 @@ PyFaultStatus_FromString(const char* str)
   }
   else if ( strcmp(str, "untestable") == 0 ) {
     result = Py_kFsUntestable;
-  }
-  else if ( strcmp(str, "skipped") == 0 ) {
-    result = Py_kFsSkipped;
   }
   else if ( strcmp(str, "aborted") == 0 ) {
     result = Py_kFsAborted;
@@ -358,7 +343,6 @@ FaultStatusObject_init(PyObject* m)
   FaultStatus_set(Py_kFsUndetectedStruct, Py_kFsUndetected, m, "kFsUndetected");
   FaultStatus_set(Py_kFsDetectedStruct,   Py_kFsDetected,   m, "kFsDetected");
   FaultStatus_set(Py_kFsUntestableStruct, Py_kFsUntestable, m, "kFsUntestable");
-  FaultStatus_set(Py_kFsSkippedStruct,    Py_kFsSkipped,    m, "kFsSkipped");
   FaultStatus_set(Py_kFsAbortedStruct,    Py_kFsAborted,    m, "kFsAborted");
 }
 
