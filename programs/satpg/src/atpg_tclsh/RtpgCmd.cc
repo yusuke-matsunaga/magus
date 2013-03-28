@@ -53,7 +53,7 @@ RtpgCmd::cmd_proc(TclObjVector& objv)
   }
 
   bool n_flag = false;
-  ymuint max_pat = 10000;
+  ymuint max_pat = 100000;
   ymuint max_i = 4;
   ymuint min_f = 0;
 
