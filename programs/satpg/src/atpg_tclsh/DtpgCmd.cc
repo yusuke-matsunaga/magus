@@ -10,7 +10,11 @@
 #include "DtpgCmd.h"
 #include "ym_tclpp/TclPopt.h"
 #include "AtpgMgr.h"
+#include "TpgNetwork.h"
 #include "DtpgStats.h"
+#include "BackTracer.h"
+#include "DetectOp.h"
+#include "UntestOp.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -31,8 +35,6 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			 "SATREC mode");
   mPoptMiniSat = new TclPopt(this, "minisat",
 			     "MINISAT mode");
-  mPoptFsim = new TclPoptStr(this, "fsim",
-			     "specify FSIM mode (none, single, ppsfp)");
   mPoptPrintStats = new TclPopt(this, "print_stats",
 				"print statistics");
   mPoptSingle = new TclPopt(this, "single",
@@ -101,36 +103,6 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     mgr().set_dtpg_mode("minisat");
   }
 
-  // fsim_mode の設定
-  tSimMode fsim_mode = kSimPpsfp;
-  if ( mPoptFsim->is_specified() ) {
-    string str = mPoptFsim->val();
-    if ( str == "none" ) {
-      fsim_mode = kSimNone;
-    }
-    else if ( str == "single" ) {
-      fsim_mode = kSimSingle;
-    }
-    else if ( str == "ppsfp" ) {
-      fsim_mode = kSimPpsfp;
-    }
-    else {
-      print_usage();
-      return TCL_ERROR;
-    }
-  }
-
-  // backtrack limit の設定
-#if 0
-  if ( mPoptBacktrack->is_specified() ) {
-    int btnum = mPoptBacktrack->val();
-    mDtpg.set_backtrack_limit(btnum);
-  }
-  else {
-    mDtpg.set_default_backtrack_limit();
-  }
-#endif
-
   bool print_stats = mPoptPrintStats->is_specified();
 
   tDtpgMode mode = kDtpgSingle;
@@ -153,21 +125,43 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     mode = kDtpgAll;
   }
 
+  vector<DetectOp*> dop_list;
+  vector<UntestOp*> uop_list;
+
+  dop_list.push_back(new_BaseDetectOp(mgr()));
+
   bool po_flag = mPoptPo->is_specified();
   bool rpo_flag = mPoptRpo->is_specified();
   int skip_count = 0;
-  if ( mPoptSkip->is_specified() ) {
+  if ( (po_flag || rpo_flag) && mPoptSkip->is_specified() ) {
     skip_count = mPoptSkip->val();
+  }
+  if ( skip_count > 0 ) {
+    uop_list.push_back(new_SkipUntestOp(mgr(), skip_count));
+  }
+  else {
+    uop_list.push_back(new_BaseUntestOp(mgr()));
   }
 
   ymuint xmode = 0;
   if ( mPoptX->is_specified() ) {
     xmode = mPoptX->val();
   }
+  ymuint max_id = mgr()._network().node_num();
+  BackTracer* bt = NULL;
+  switch ( xmode ) {
+  case 1: bt = new_BtJust1(max_id); break;
+  case 2: bt = new_BtJust2(max_id); break;
+  case 3: bt = new_BtZdd(max_id); break;
+  default: bt = new_BtSimple(max_id); break;
+  }
 
-  mgr().set_dtpg_drop_mode(mPoptDrop->is_specified());
-
-  mgr().set_dtpg_verify_mode(mPoptVerify->is_specified());
+  if ( mPoptDrop->is_specified() ) {
+    dop_list.push_back(new_DropDetectOp(mgr()));
+  }
+  if ( mPoptVerify->is_specified() ) {
+    dop_list.push_back(new_VerifyDetectOp(mgr()));
+  }
 
 #if 0
   mgr().set_dtpg_timer(mPoptTimer->is_specified());
@@ -185,7 +179,16 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     po_mode = kDtpgPoDec;
   }
 
-  mgr().dtpg(mode, po_mode, skip_count, xmode);
+  mgr().dtpg(mode, po_mode, *bt, dop_list, uop_list);
+
+  for (vector<DetectOp*>::iterator p = dop_list.begin();
+       p != dop_list.end(); ++ p) {
+    delete *p;
+  }
+  for (vector<UntestOp*>::iterator p = uop_list.begin();
+       p != uop_list.end(); ++ p) {
+    delete *p;
+  }
 
   after_update_faults();
 

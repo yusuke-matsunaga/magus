@@ -32,7 +32,8 @@ class SatEngineImpl :
 public:
 
   /// @brief コンストラクタ
-  SatEngineImpl();
+  /// @param[in] mgr AtpgMgr
+  SatEngineImpl(AtpgMgr& mgr);
 
   /// @brief デストラクタ
   virtual
@@ -59,8 +60,7 @@ public:
   void
   run(const vector<TpgFault*>& flist,
       ymuint max_id,
-      BackTracer& bt,
-      TpgOperator& op);
+      BackTracer& bt);
 
   /// @brief 統計情報をクリアする．
   virtual
@@ -94,8 +94,7 @@ private:
   void
   solve(SatSolver& solver,
 	TpgFault* f,
-	BackTracer& bt,
-	TpgOperator& op);
+	BackTracer& bt);
 
   /// @brief ノードの変数割り当てフラグを消す．
   void
@@ -141,6 +140,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // AtpgMgr
+  AtpgMgr& mMgr;
 
   // SAT solver のタイプ
   string mType;

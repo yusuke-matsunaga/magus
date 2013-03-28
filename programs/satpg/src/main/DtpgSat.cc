@@ -19,15 +19,16 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 Dtpg*
-new_DtpgSat()
+new_DtpgSat(AtpgMgr& mgr)
 {
-  return new DtpgSat();
+  return new DtpgSat(mgr);
 }
 
 // @brief コンストラクタ
-DtpgSat::DtpgSat()
+// @param[in] mgr AtpgMgr
+DtpgSat::DtpgSat(AtpgMgr& mgr)
 {
-  mSatEngine = new_SatEngine();
+  mSatEngine = new_SatEngine(mgr);
 
   mNetwork = NULL;
 }
@@ -59,13 +60,11 @@ DtpgSat::set_network(TpgNetwork& tgnetwork)
 // @brief テスト生成を行なう．
 // @param[in] mode メインモード
 // @param[in] po_mode PO分割モード
-// @param[in] op テスト生成後に呼ばれるファンクター
-// @param[in] option オプション文字列
+// @param[in] bt バックトラッカー
 void
 DtpgSat::run(tDtpgMode mode,
 	     tDtpgPoMode po_mode,
-	     BackTracer& bt,
-	     TpgOperator& op)
+	     BackTracer& bt)
 {
   switch ( po_mode ) {
   case kDtpgPoNone:
@@ -73,27 +72,27 @@ DtpgSat::run(tDtpgMode mode,
 
     switch ( mode ) {
     case kDtpgSingle:
-      single_mode(bt, op);
+      single_mode(bt);
       break;
 
     case kDtpgDual:
-      dual_mode(bt, op);
+      dual_mode(bt);
       break;
 
     case kDtpgNode:
-      node_mode(bt, op);
+      node_mode(bt);
       break;
 
     case kDtpgFFR:
-      ffr_mode(bt, op);
+      ffr_mode(bt);
       break;
 
     case kDtpgMFFC:
-      mffc_mode(bt, op);
+      mffc_mode(bt);
       break;
 
     case kDtpgAll:
-      all_mode(bt, op);
+      all_mode(bt);
       break;
     }
     break;
@@ -106,24 +105,24 @@ DtpgSat::run(tDtpgMode mode,
 
 	switch ( mode ) {
 	case kDtpgSingle:
-	  single_mode(bt, op);
+	  single_mode(bt);
 	  break;
 
 	case kDtpgDual:
-	  dual_mode(bt, op);
+	  dual_mode(bt);
 	  break;
 
 	case kDtpgNode:
-	  node_mode(bt, op);
+	  node_mode(bt);
 	  break;
 
 	case kDtpgFFR:
-	  ffr_mode(bt, op);
+	  ffr_mode(bt);
 	  break;
 
 	case kDtpgMFFC:
 	case kDtpgAll:
-	  all_mode(bt, op);
+	  all_mode(bt);
 	  break;
 	}
       }
@@ -139,24 +138,24 @@ DtpgSat::run(tDtpgMode mode,
 
 	switch ( mode ) {
 	case kDtpgSingle:
-	  single_mode(bt, op);
+	  single_mode(bt);
 	  break;
 
 	case kDtpgDual:
-	  dual_mode(bt, op);
+	  dual_mode(bt);
 	  break;
 
 	case kDtpgNode:
-	  node_mode(bt, op);
+	  node_mode(bt);
 	  break;
 
 	case kDtpgFFR:
-	  ffr_mode(bt, op);
+	  ffr_mode(bt);
 	  break;
 
 	case kDtpgMFFC:
 	case kDtpgAll:
-	  all_mode(bt, op);
+	  all_mode(bt);
 	  break;
 	}
       }
@@ -167,8 +166,7 @@ DtpgSat::run(tDtpgMode mode,
 
 // @brief single モードでテスト生成を行なう．
 void
-DtpgSat::single_mode(BackTracer& bt,
-		     TpgOperator& op)
+DtpgSat::single_mode(BackTracer& bt)
 {
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
@@ -176,27 +174,26 @@ DtpgSat::single_mode(BackTracer& bt,
 
     // 出力の故障
     TpgFault* f0 = node->output_fault(0);
-    dtpg_single(f0, bt, op);
+    dtpg_single(f0, bt);
 
     TpgFault* f1 = node->output_fault(1);
-    dtpg_single(f1, bt, op);
+    dtpg_single(f1, bt);
 
     // 入力の故障
     ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
       TpgFault* f0 = node->input_fault(0, j);
-      dtpg_single(f0, bt, op);
+      dtpg_single(f0, bt);
 
       TpgFault* f1 = node->input_fault(1, j);
-      dtpg_single(f1, bt, op);
+      dtpg_single(f1, bt);
     }
   }
 }
 
 // @brief dual モードでテスト生成を行なう．
 void
-DtpgSat::dual_mode(BackTracer& bt,
-		   TpgOperator& op)
+DtpgSat::dual_mode(BackTracer& bt)
 {
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
@@ -208,14 +205,14 @@ DtpgSat::dual_mode(BackTracer& bt,
     // 出力の故障
     TpgFault* f0 = node->output_fault(0);
     TpgFault* f1 = node->output_fault(1);
-    dtpg_dual(f0, f1, bt, op);
+    dtpg_dual(f0, f1, bt);
 
     // 入力の故障
     ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
       TpgFault* f0 = node->input_fault(0, j);
       TpgFault* f1 = node->input_fault(1, j);
-      dtpg_dual(f0, f1, bt, op);
+      dtpg_dual(f0, f1, bt);
     }
   }
 }
@@ -223,8 +220,7 @@ DtpgSat::dual_mode(BackTracer& bt,
 // @brief node モードでテスト生成を行なう．
 // @param[in] op テスト生成後に呼ばれるファンクター
 void
-DtpgSat::node_mode(BackTracer& bt,
-		   TpgOperator& op)
+DtpgSat::node_mode(BackTracer& bt)
 {
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
@@ -252,14 +248,13 @@ DtpgSat::node_mode(BackTracer& bt,
     TpgFault* f1 = node->output_fault(1);
     add_fault(f1);
 
-    do_dtpg(bt, op);
+    do_dtpg(bt);
   }
 }
 
 // @brief ffr モードでテスト生成を行なう．
 void
-DtpgSat::ffr_mode(BackTracer& bt,
-		  TpgOperator& op)
+DtpgSat::ffr_mode(BackTracer& bt)
 {
   ymuint n = mNetwork->active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
@@ -269,15 +264,14 @@ DtpgSat::ffr_mode(BackTracer& bt,
 
       dfs_ffr(node);
 
-      do_dtpg(bt, op);
+      do_dtpg(bt);
     }
   }
 }
 
 // @brief mffc モードでテスト生成を行なう．
 void
-DtpgSat::mffc_mode(BackTracer& bt,
-		   TpgOperator& op)
+DtpgSat::mffc_mode(BackTracer& bt)
 {
   ymuint n = mNetwork->active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
@@ -288,15 +282,14 @@ DtpgSat::mffc_mode(BackTracer& bt,
       vector<bool> mark(mNetwork->node_num(), false);
       dfs_mffc(node, mark);
 
-      do_dtpg(bt, op);
+      do_dtpg(bt);
     }
   }
 }
 
 // @brief all モードでテスト生成を行なう．
 void
-DtpgSat::all_mode(BackTracer& bt,
-		  TpgOperator& op)
+DtpgSat::all_mode(BackTracer& bt)
 {
   mFaultList.clear();
 
@@ -308,40 +301,36 @@ DtpgSat::all_mode(BackTracer& bt,
     }
   }
 
-  do_dtpg(bt, op);
+  do_dtpg(bt);
 }
 
 // @brief 一つの故障に対してテストパタン生成を行う．
 // @param[in] f 故障
-// @param[in] op テスト生成の結果を処理するファンクター
 void
 DtpgSat::dtpg_single(TpgFault* f,
-		     BackTracer& bt,
-		     TpgOperator& op)
+		     BackTracer& bt)
 {
   mFaultList.clear();
 
   add_fault(f);
 
-  do_dtpg(bt, op);
+  do_dtpg(bt);
 }
 
 // @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
 // @param[in] f0 0縮退故障
 // @param[in] f1 1縮退故障
-// @param[in] op テスト生成の結果を処理するファンクター
 void
 DtpgSat::dtpg_dual(TpgFault* f0,
 		   TpgFault* f1,
-		   BackTracer& bt,
-		   TpgOperator& op)
+		   BackTracer& bt)
 {
   mFaultList.clear();
 
   add_fault(f0);
   add_fault(f1);
 
-  do_dtpg(bt, op);
+  do_dtpg(bt);
 }
 
 void

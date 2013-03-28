@@ -53,14 +53,14 @@ BtBase::record_value(TpgNode* node)
 
   Bool3 v = node_gval(node);
   ymuint iid = node->input_id();
-  ymuint packed_val = iid * 3;
+  ymuint packed_val = iid * 2;
   if ( v == kB3False ) {
-    packed_val += 1;
+    mValList.push_back(packed_val);
   }
   else if ( v == kB3True ) {
-    packed_val += 2;
+    packed_val += 1;
+    mValList.push_back(packed_val);
   }
-  mValList.push_back(packed_val);
 }
 
 END_NAMESPACE_YM_SATPG

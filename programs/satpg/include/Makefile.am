@@ -22,7 +22,8 @@ noinst_HEADERS = \
 	TpgNetwork.h \
 	TpgNode.h \
 	TpgPrimitive.h \
-	TpgOperator.h \
 	TestVector.h \
 	TvMgr.h \
+	DetectOp.h \
+	UntestOp.h \
 	Val3.h

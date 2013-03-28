@@ -9,12 +9,12 @@
 
 #include "SatEngineImpl.h"
 
+#include "AtpgMgr.h"
 #include "DtpgStats.h"
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
 #include "TpgFault.h"
 #include "BackTracer.h"
-#include "TpgOperator.h"
 #include "InputLiteral.h"
 #include "ym_logic/SatSolver.h"
 #include "ym_logic/SatStats.h"
@@ -27,9 +27,9 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief SatEngine の継承クラスを生成する．
 SatEngine*
-new_SatEngine()
+new_SatEngine(AtpgMgr& mgr)
 {
-  return new nsSatEngine::SatEngineImpl();
+  return new nsSatEngine::SatEngineImpl(mgr);
 }
 
 END_NAMESPACE_YM_SATPG
@@ -460,7 +460,8 @@ END_NONAMESPACE
 
 
 // @brief コンストラクタ
-SatEngineImpl::SatEngineImpl()
+SatEngineImpl::SatEngineImpl(AtpgMgr& mgr) :
+  mMgr(mgr)
 {
   mTimerEnable = false;
 }
@@ -531,12 +532,10 @@ END_NONAMESPACE
 // @brief テストパタン生成を行なう．
 // @param[in] flist 故障リスト
 // @param[in] max_id ノード番号の最大値 + 1
-// @param[in] op テスト生成の結果を処理するファンクター
 void
 SatEngineImpl::run(const vector<TpgFault*>& flist,
 		   ymuint max_id,
-		   BackTracer& bt,
-		   TpgOperator& op)
+		   BackTracer& bt)
 {
   if ( mTimerEnable ) {
     mTimer.reset();
@@ -895,7 +894,7 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
     tPol pol = (f->val() == 0) ? kPolPosi : kPolNega;
     mAssumptions.push_back(Literal(fnode->gvar(), pol));
 
-    solve(solver, f, bt, op);
+    solve(solver, f, bt);
   }
   clear_node_mark();
 
@@ -906,8 +905,7 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
 void
 SatEngineImpl::solve(SatSolver& solver,
 		     TpgFault* f,
-		     BackTracer& bt,
-		     TpgOperator& op)
+		     BackTracer& bt)
 {
   if ( mTimerEnable ) {
     mTimer.reset();
@@ -922,7 +920,7 @@ SatEngineImpl::solve(SatSolver& solver,
     bt(f->node(), mInputList, mOutputList);
 
     // パタンの登録などを行う．
-    op.set_detected(f, bt.val_list());
+    mMgr.set_detected(f, bt.val_list());
 
     if ( mTimerEnable ) {
       mTimer.stop();
@@ -932,7 +930,7 @@ SatEngineImpl::solve(SatSolver& solver,
   }
   else if ( ans == kB3False ) {
     // 検出不能と判定された．
-    op.set_untestable(f);
+    mMgr.set_untestable(f);
 
     if ( mTimerEnable ) {
       mTimer.stop();

@@ -12,6 +12,15 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+// @brief 'Just2' タイプの生成を行なう．
+// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
+BackTracer*
+new_BtJust2(ymuint max_id)
+{
+  return new BtJust2(max_id);
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // クラス BtJust2
 //////////////////////////////////////////////////////////////////////

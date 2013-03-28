@@ -48,8 +48,7 @@ public:
   void
   run(const vector<TpgFault*>& flist,
       ymuint max_id,
-      BackTracer& bt,
-      TpgOperator& op) = 0;
+      BackTracer& bt) = 0;
 
   /// @brief 統計情報をクリアする．
   virtual
@@ -77,7 +76,7 @@ public:
 /// @brief SatEngine の継承クラスを生成する．
 extern
 SatEngine*
-new_SatEngine();
+new_SatEngine(AtpgMgr& mgr);
 
 END_NAMESPACE_YM_SATPG
 

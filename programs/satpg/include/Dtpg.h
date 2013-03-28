@@ -49,8 +49,7 @@ public:
   void
   run(tDtpgMode mode,
       tDtpgPoMode po_mode,
-      BackTracer& bt,
-      TpgOperator& op) = 0;
+      BackTracer& bt) = 0;
 
   /// @brief 統計情報をクリアする．
   virtual
@@ -74,12 +73,12 @@ public:
 /// @brief DtpgSat のインスタンスを生成する．
 extern
 Dtpg*
-new_DtpgSat();
+new_DtpgSat(AtpgMgr& mgr);
 
 /// @brief DtpgSatOld のインスタンスを生成する．
 extern
 Dtpg*
-new_DtpgSatOld();
+new_DtpgSatOld(AtpgMgr& mgr);
 
 END_NAMESPACE_YM_SATPG
 

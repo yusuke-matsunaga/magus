@@ -99,13 +99,15 @@ enum tDtpgPoMode {
 // クラス名の宣言
 //////////////////////////////////////////////////////////////////////
 
+class AtpgMgr;
 class TpgFault;
 class FaultMgr;
 class TpgNetwork;
 class TpgNode;
 class TpgPrimitive;
-class TpgOperator;
 class BackTracer;
+class DetectOp;
+class UntestOp;
 class TestVector;
 class TvMgr;
 class Dtpg;

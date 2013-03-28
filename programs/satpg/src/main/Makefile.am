@@ -18,12 +18,6 @@ libatpg_main_la_CPPFLAGS = \
 libatpg_main_la_SOURCES = \
 	AtpgMgr.cc \
 	DtpgSat.cc \
-	OpBase.h \
-	OpBase.cc \
-	NormalOp.h \
-	NormalOp.cc \
-	SkipOp.h \
-	SkipOp.cc \
 	BtBase.h \
 	BtBase.cc \
 	BtSimple.h \
@@ -35,7 +29,17 @@ libatpg_main_la_SOURCES = \
 	BtJust2.h \
 	BtJust2.cc \
 	BtZdd.h \
-	BtZdd.cc
+	BtZdd.cc \
+	BaseDetectOp.h \
+	BaseDetectOp.cc \
+	DropDetectOp.h \
+	DropDetectOp.cc \
+	VerifyDetectOp.h \
+	VerifyDetectOp.cc \
+	BaseUntestOp.h \
+	BaseUntestOp.cc \
+	SkipUntestOp.h \
+	SkipUntestOp.cc
 
 libatpg_main_la_LDFLAGS =
 

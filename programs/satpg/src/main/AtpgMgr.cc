@@ -9,15 +9,16 @@
 
 #include "AtpgMgr.h"
 #include "RtpgStats.h"
-#include "NormalOp.h"
-#include "NormalOp.h"
-#include "SkipOp.h"
 #include "TpgNetwork.h"
 #include "TpgFault.h"
 #include "BtSimple.h"
 #include "BtJust1.h"
 #include "BtJust2.h"
 #include "BtZdd.h"
+#include "BaseDetectOp.h"
+#include "DropDetectOp.h"
+#include "VerifyDetectOp.h"
+#include "BaseUntestOp.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -77,11 +78,7 @@ AtpgMgr::AtpgMgr() :
   mFsim = new_Fsim2();
   mFsim3 = new_FsimX2();
 
-  mDtpg = new_DtpgSat();
-
-  mDtpgDrop = false;
-
-  mDtpgVerify = false;
+  mDtpg = new_DtpgSat(*this);
 
   mNetwork = NULL;
 
@@ -339,20 +336,6 @@ AtpgMgr::set_dtpg_mode(const string& type,
   mDtpg->set_mode(type, option, outp);
 }
 
-// @brief テストパタン生成時に故障ドロップを行なうかを指定する．
-void
-AtpgMgr::set_dtpg_drop_mode(bool drop)
-{
-  mDtpgDrop = drop;
-}
-
-// @brief テストパタン生成時に故障シミュレーションを用いて検証するかを指定する．
-void
-AtpgMgr::set_dtpg_verify_mode(bool verify)
-{
-  mDtpgVerify = verify;
-}
-
 // @brief テストパタン生成時に時間計測を行なうかどうかを指定する．
 void
 AtpgMgr::set_dtpg_timer(bool enable)
@@ -364,12 +347,14 @@ AtpgMgr::set_dtpg_timer(bool enable)
 void
 AtpgMgr::dtpg(tDtpgMode mode,
 	      tDtpgPoMode po_mode,
-	      ymuint skip_count,
-	      ymuint xmode)
+	      BackTracer& bt,
+	      const vector<DetectOp*>& dop_list,
+	      const vector<UntestOp*>& uop_list)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
+#if 0
   BackTracer* bt = NULL;
   ymuint max_id = _network().node_num();
   switch ( xmode ) {
@@ -380,23 +365,56 @@ AtpgMgr::dtpg(tDtpgMode mode,
   default: // デフォルトフォールバック
     bt = new BtSimple(max_id); break;
   }
+#endif
 
-  if ( skip_count > 0 ) {
-    SkipOp op(mFaultMgr, mTvMgr, mTvList, *mFsim3, skip_count,
-	      mDtpgDrop, mDtpgVerify);
+  mDetectOpList = dop_list;
+  mUntestOpList = uop_list;
 
-    mDtpg->run(mode, po_mode, *bt, op);
-  }
-  else {
-    NormalOp op(mFaultMgr, mTvMgr, mTvList, *mFsim3,
-		mDtpgDrop, mDtpgVerify);
-
-    mDtpg->run(mode, po_mode, *bt, op);
-  }
-
-  delete bt;
+  mDtpg->run(mode, po_mode, bt);
 
   mTimer.change(old_id);
+}
+
+// @brief テストパタンが見つかった場合に呼ばれる関数
+// @param[in] f 故障
+// @param[in] val_list ("入力ノードの番号 x 2 + 値(0/1)") のリスト
+void
+AtpgMgr::set_detected(TpgFault* f,
+		      const vector<ymuint>& val_list)
+{
+  TestVector* tv = mTvMgr.new_vector();
+  tv->init();
+  for (vector<ymuint>::const_iterator p = val_list.begin();
+       p != val_list.end(); ++ p) {
+    ymuint tmp = *p;
+    ymuint iid = tmp / 2;
+    ymuint val = tmp % 2;
+    if ( val == 0 ) {
+      tv->set_val(iid, kVal0);
+    }
+    else {
+      tv->set_val(iid, kVal1);
+    }
+  }
+  mTvList.push_back(tv);
+
+  for (vector<DetectOp*>::iterator p = mDetectOpList.begin();
+       p != mDetectOpList.end(); ++ p) {
+    DetectOp& op = **p;
+    op(f, tv);
+  }
+}
+
+// @brief 検出不能のときに呼ばれる関数
+// @param[in] f 故障
+void
+AtpgMgr::set_untestable(TpgFault* f)
+{
+  for (vector<UntestOp*>::iterator p = mUntestOpList.begin();
+       p != mUntestOpList.end(); ++ p) {
+    UntestOp& op = **p;
+    op(f);
+  }
 }
 
 // @brief ファイル読み込みに関わる時間を得る．

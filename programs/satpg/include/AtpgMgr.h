@@ -62,6 +62,14 @@ public:
   vector<TestVector*>&
   _tv_list();
 
+  /// @brief 2値の故障シミュレータを取り出す．
+  Fsim&
+  _fsim();
+
+  /// @brief 3値の故障シミュレータを返す．
+  Fsim&
+  _fsimx();
+
   /// @brief 統計情報をクリアする．
   void
   clear_stats();
@@ -145,18 +153,6 @@ public:
 		const string& option = string(),
 		ostream* outp = NULL);
 
-  /// @brief X抽出のモードを指定する．
-  void
-  set_dtpg_xmode(ymuint val);
-
-  /// @brief テストパタン生成時に故障ドロップを行なうかを指定する．
-  void
-  set_dtpg_drop_mode(bool drop);
-
-  /// @brief テストパタン生成時に故障シミュレーションを用いて検証するかを指定する．
-  void
-  set_dtpg_verify_mode(bool verify);
-
   /// @brief テストパタン生成時に時間計測を行なうかどうかを指定する．
   void
   set_dtpg_timer(bool enable);
@@ -164,12 +160,27 @@ public:
   /// @brief テストパタン生成を行なう．
   /// @param[in] mode メインモード
   /// @param[in] po_mode PO分割モード
-  /// @param[in] skip_count スキップ回数
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop_list DetectOp のリスト
+  /// @param[in] uop_list UntestOp のリスト
   void
   dtpg(tDtpgMode mode,
        tDtpgPoMode po_mode,
-       ymuint skip_count,
-       ymuint xmode);
+       BackTracer& bt,
+       const vector<DetectOp*>& dop_list,
+       const vector<UntestOp*>& uop_list);
+
+  /// @brief テストパタンが見つかった場合に呼ばれる関数
+  /// @param[in] f 故障
+  /// @param[in] val_list ("入力ノードの番号 x 2 + 値(0/1)") のリスト
+  void
+  set_detected(TpgFault* f,
+	       const vector<ymuint>& val_list);
+
+  /// @brief 検出不能のときに呼ばれる関数
+  /// @param[in] f 故障
+  void
+  set_untestable(TpgFault* f);
 
 
 public:
@@ -247,11 +258,11 @@ private:
   // テストパタン生成器
   Dtpg* mDtpg;
 
-  // テストパタン生成時に故障ドロップを行なうときに true にする．
-  bool mDtpgDrop;
+  // テストパタンが求められたときに実行するファンクタのリスト
+  vector<DetectOp*> mDetectOpList;
 
-  // テストパタン生成時に検証を行うときに true にする．
-  bool mDtpgVerify;
+  // 検出不能と判定されたときに実行するファンクタのリスト
+  vector<UntestOp*> mUntestOpList;
 
   // ネットワークが変更された時に呼ばれるイベントハンドラ
   T2BindMgr<const TpgNetwork&, FaultMgr&> mNtwkBindMgr;
@@ -296,6 +307,22 @@ vector<TestVector*>&
 AtpgMgr::_tv_list()
 {
   return mTvList;
+}
+
+// @brief 2値の故障シミュレータを取り出す．
+inline
+Fsim&
+AtpgMgr::_fsim()
+{
+  return *mFsim;
+}
+
+// @brief 3値の故障シミュレータを返す．
+inline
+Fsim&
+AtpgMgr::_fsimx()
+{
+  return *mFsim3;
 }
 
 // @brief ネットワークの変更に関するハンドラを登録する．

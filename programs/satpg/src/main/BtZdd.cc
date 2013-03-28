@@ -13,6 +13,15 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+// @brief 'Zdd' タイプの生成を行なう．
+// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
+BackTracer*
+new_BtZdd(ymuint max_id)
+{
+  return new BtZdd(max_id);
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // クラス BtZdd
 //////////////////////////////////////////////////////////////////////

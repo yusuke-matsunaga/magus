@@ -12,6 +12,15 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+// @brief 'Simple' タイプの生成を行なう．
+/// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
+BackTracer*
+new_BtSimple(ymuint max_id)
+{
+  return new BtSimple(max_id);
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // クラス BtSimple
 //////////////////////////////////////////////////////////////////////
