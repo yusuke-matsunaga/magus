@@ -49,6 +49,7 @@ atpg_tclsh_LDADD = \
 	$(top_builddir)/src/fsim2/libatpg_fsim2.la \
 	$(top_builddir)/src/fsim3/libatpg_fsim3.la \
 	$(top_builddir)/src/fsimx/libatpg_fsimx.la \
+	$(top_builddir)/src/fsimx2/libatpg_fsimx2.la \
 	$(top_builddir)/src/base/libatpg_base.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \

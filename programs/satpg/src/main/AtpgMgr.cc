@@ -75,7 +75,7 @@ AtpgMgr::AtpgMgr() :
   mTimer(TM_SIZE, TM_MISC)
 {
   mFsim = new_Fsim2();
-  mFsim3 = new_FsimX();
+  mFsim3 = new_FsimX2();
 
   mDtpg = new_DtpgSat();
 

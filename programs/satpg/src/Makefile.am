@@ -7,6 +7,7 @@ SUBDIRS = \
 	fsim2 \
 	fsim3 \
 	fsimx \
+	fsimx2 \
 	sat_engine \
 	main \
 	atpg_tclsh \

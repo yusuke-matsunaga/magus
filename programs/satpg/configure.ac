@@ -164,6 +164,7 @@ AC_CONFIG_FILES([
 	src/fsim2/Makefile
 	src/fsim3/Makefile
 	src/fsimx/Makefile
+	src/fsimx2/Makefile
 	src/sat_engine/Makefile
 	src/main/Makefile
 	src/atpg_tclsh/Makefile

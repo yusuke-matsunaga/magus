@@ -77,6 +77,10 @@ extern
 Fsim*
 new_FsimX();
 
+extern
+Fsim*
+new_FsimX2();
+
 END_NAMESPACE_YM_SATPG
 
 #endif // FSIM_H

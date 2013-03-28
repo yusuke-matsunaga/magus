@@ -17,6 +17,10 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 /// @class PackedaVal3 PackedVal.h "PackedVal3.h"
 /// @brief PackedVal を2つ使って 3値を表すクラス
+///
+/// 00: X
+/// 10: 0
+/// 01: 1
 //////////////////////////////////////////////////////////////////////
 class PackedVal3
 {
@@ -273,7 +277,7 @@ inline
 PackedVal
 PackedVal3::extract_0() const
 {
-  return mPat0 & ~mPat1;
+  return mPat0;
 }
 
 // @brief 1 の部分を取り出す．
@@ -282,7 +286,7 @@ inline
 PackedVal
 PackedVal3::extract_1() const
 {
-  return ~mPat0 & mPat1;
+  return mPat1;
 }
 
 // @brief X の部分を取り出す．
@@ -291,7 +295,7 @@ inline
 PackedVal
 PackedVal3::extract_X() const
 {
-  return ~mPat0 & ~mPat1;
+  return ~(mPat0 | mPat1);
 }
 
 // @brief 01 の部分を取り出す．
