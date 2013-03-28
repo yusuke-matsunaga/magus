@@ -1,8 +1,8 @@
-#ifndef VERIFYDETECTOP_H
-#define VERIFYDETECTOP_H
+#ifndef DOPBASE_H
+#define DOPBASE_H
 
-/// @file VerifyDetectOp.h
-/// @brief VerifyDetectOp のヘッダファイル
+/// @file DopBase.h
+/// @brief DopBase のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -15,21 +15,21 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VerifyDetectOp VerifyDetectOp.h "VerifyDetectOp.h"
-/// @brief 故障シミュレーションを行なった故障ドロップを行なうクラス
+/// @class DopBase DopBase.h "DopBase.h"
+/// @brief DetectOp の基本的な動作を行なうクラス
 //////////////////////////////////////////////////////////////////////
-class VerifyDetectOp :
+class DopBase :
   public DetectOp
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] fsim 故障シミュレータ
-  VerifyDetectOp(Fsim& fsim);
+  /// @param[in] fmgr FaultMgr
+  DopBase(FaultMgr& fmgr);
 
   /// @brief デストラクタ
   virtual
-  ~VerifyDetectOp();
+  ~DopBase();
 
 
 public:
@@ -51,11 +51,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 故障シミュレータ
-  Fsim& mFsim;
+  // FaultMgr
+  FaultMgr& mMgr;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // VERIFYDETECTOP_H
+#endif // DOPBASE_H

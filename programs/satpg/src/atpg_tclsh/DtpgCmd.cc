@@ -128,7 +128,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   vector<DetectOp*> dop_list;
   vector<UntestOp*> uop_list;
 
-  dop_list.push_back(new_BaseDetectOp(mgr()));
+  dop_list.push_back(new_DopBase(mgr()));
 
   bool po_flag = mPoptPo->is_specified();
   bool rpo_flag = mPoptRpo->is_specified();
@@ -137,10 +137,10 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     skip_count = mPoptSkip->val();
   }
   if ( skip_count > 0 ) {
-    uop_list.push_back(new_SkipUntestOp(mgr(), skip_count));
+    uop_list.push_back(new_UopSkip(mgr(), skip_count));
   }
   else {
-    uop_list.push_back(new_BaseUntestOp(mgr()));
+    uop_list.push_back(new_UopBase(mgr()));
   }
 
   ymuint xmode = 0;
@@ -157,10 +157,10 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
 
   if ( mPoptDrop->is_specified() ) {
-    dop_list.push_back(new_DropDetectOp(mgr()));
+    dop_list.push_back(new_DopDrop(mgr()));
   }
   if ( mPoptVerify->is_specified() ) {
-    dop_list.push_back(new_VerifyDetectOp(mgr()));
+    dop_list.push_back(new_DopVerify(mgr()));
   }
 
 #if 0

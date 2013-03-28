@@ -1,8 +1,8 @@
-#ifndef SKIPUNTESTOP_H
-#define SKIPUNTESTOP_H
+#ifndef UOPSKIP_H
+#define UOPSKIP_H
 
-/// @file SkipUntestOp.h
-/// @brief SkipUntestOp のヘッダファイル
+/// @file UopSkip.h
+/// @brief UopSkip のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -15,21 +15,21 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SkipUntestOp SkipUntestOp.h "SkipUntestOp.h"
+/// @class UopSkip UopSkip.h "UopSkip.h"
 /// @brief 指定した回数だけ検出不能となったらスキップフラグをセットする．
 //////////////////////////////////////////////////////////////////////
-class SkipUntestOp :
+class UopSkip :
   public UntestOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] threshold しきい値
-  SkipUntestOp(ymuint threshold);
+  UopSkip(ymuint threshold);
 
   /// @brief デストラクタ
   virtual
-  ~SkipUntestOp();
+  ~UopSkip();
 
 
 public:
@@ -66,4 +66,4 @@ private:
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SKIPUNTESTOP_H
+#endif // UOPSKIP_H

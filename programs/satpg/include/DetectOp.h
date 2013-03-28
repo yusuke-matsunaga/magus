@@ -45,16 +45,16 @@ public:
 /// @brief 'base' タイプを生成する．
 /// @param[in] mgr AtpgMgr
 DetectOp*
-new_BaseDetectOp(AtpgMgr& mgr);
+new_DopBase(AtpgMgr& mgr);
 
 /// @brief 'drop' タイプを生成する．
 /// @param[in] mgr AtpgMgr
 DetectOp*
-new_DropDetectOp(AtpgMgr& mgr);
+new_DopDrop(AtpgMgr& mgr);
 
 /// @brief 'verify' タイプを生成する．
 DetectOp*
-new_VerifyDetectOp(AtpgMgr& mgr);
+new_DopVerify(AtpgMgr& mgr);
 
 
 END_NAMESPACE_YM_SATPG

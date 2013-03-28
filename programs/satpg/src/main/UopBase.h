@@ -1,37 +1,35 @@
-#ifndef DROPDETECTOP_H
-#define DROPDETECTOP_H
+#ifndef UOPBASE_H
+#define UOPBASE_H
 
-/// @file DropDetectOp.h
-/// @brief DropDetectOp のヘッダファイル
+/// @file UopBase.h
+/// @brief UopBase のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "DetectOp.h"
+#include "UntestOp.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class DropDetectOp DropDetectOp.h "DropDetectOp.h"
-/// @brief 故障シミュレーションを行なった故障ドロップを行なうクラス
+/// @class UopBase UopBase.h "UopBase.h"
+/// @brief UntestOp の基本的な動作を行なうクラス
 //////////////////////////////////////////////////////////////////////
-class DropDetectOp :
-  public DetectOp
+class UopBase :
+  public UntestOp
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] fmgr 故障マネージャ
-  /// @param[in] fsim 故障シミュレータ
-  DropDetectOp(FaultMgr& fmgr,
-	       Fsim& fsim);
+  /// @param[in] fmgr FaultMgr
+  UopBase(FaultMgr& fmgr);
 
   /// @brief デストラクタ
   virtual
-  ~DropDetectOp();
+  ~UopBase();
 
 
 public:
@@ -39,13 +37,11 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief テストパタンが見つかった時の処理
+  /// @brief テスト不能故障と判定された時の処理
   /// @param[in] f 故障
-  /// @param[in] tv テストパタン
   virtual
   void
-  operator()(TpgFault* f,
-	     TestVector* tv);
+  operator()(TpgFault* f);
 
 
 private:
@@ -53,17 +49,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 故障マネージャ
+  // FaultMgr
   FaultMgr& mMgr;
-
-  // 故障シミュレータ
-  Fsim& mFsim;
-
-  // 検出された故障を入れるリスト
-  vector<TpgFault*> mDetFaults;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // DROPDETECTOP_H
+#endif // UOPBASE_H

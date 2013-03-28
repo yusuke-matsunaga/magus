@@ -11,14 +11,9 @@
 #include "RtpgStats.h"
 #include "TpgNetwork.h"
 #include "TpgFault.h"
-#include "BtSimple.h"
-#include "BtJust1.h"
-#include "BtJust2.h"
-#include "BtZdd.h"
-#include "BaseDetectOp.h"
-#include "DropDetectOp.h"
-#include "VerifyDetectOp.h"
-#include "BaseUntestOp.h"
+#include "BackTracer.h"
+#include "DetectOp.h"
+#include "UntestOp.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -353,19 +348,6 @@ AtpgMgr::dtpg(tDtpgMode mode,
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
-
-#if 0
-  BackTracer* bt = NULL;
-  ymuint max_id = _network().node_num();
-  switch ( xmode ) {
-  case 0: bt = new BtSimple(max_id); break;
-  case 1: bt = new BtJust1(max_id); break;
-  case 2: bt = new BtJust2(max_id); break;
-  case 3: bt = new BtZdd(max_id); break;
-  default: // デフォルトフォールバック
-    bt = new BtSimple(max_id); break;
-  }
-#endif
 
   mDetectOpList = dop_list;
   mUntestOpList = uop_list;

@@ -1,13 +1,13 @@
 
-/// @file BaseUntestOp.cc
-/// @brief BaseUntestOp の実装ファイル
+/// @file DopBase.cc
+/// @brief DopBase の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BaseUntestOp.h"
+#include "DopBase.h"
 #include "AtpgMgr.h"
 #include "FaultMgr.h"
 
@@ -16,36 +16,37 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief 'base' タイプを生成する．
 // @param[in] mgr AtpgMgr
-UntestOp*
-new_BaseUntestOp(AtpgMgr& mgr)
+DetectOp*
+new_DopBase(AtpgMgr& mgr)
 {
-  return new BaseUntestOp(mgr._fault_mgr());
+  return new DopBase(mgr._fault_mgr());
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス BaseUntestOp
+// クラス DopBase
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] fmgr FaultMgr
-BaseUntestOp::BaseUntestOp(FaultMgr& fmgr) :
+DopBase::DopBase(FaultMgr& fmgr) :
   mMgr(fmgr)
 {
 }
 
 // @brief デストラクタ
-BaseUntestOp::~BaseUntestOp()
+DopBase::~DopBase()
 {
 }
 
-// @brief テスト不能故障と判定された時の処理
+// @brief テストパタンが見つかった時の処理
 // @param[in] f 故障
+// @param[in] tv テストパタン
 void
-BaseUntestOp::operator()(TpgFault* f)
+DopBase::operator()(TpgFault* f,
+		    TestVector* tv)
 {
-  mMgr.set_status(f, kFsUntestable);
+  mMgr.set_status(f, kFsDetected);
 }
-
 
 END_NAMESPACE_YM_SATPG

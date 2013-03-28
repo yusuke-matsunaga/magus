@@ -1,41 +1,45 @@
 
-/// @file VerifyDetectOp.cc
-/// @brief VerifyDetectOp の実装ファイル
+/// @file DopDrop.cc
+/// @brief DopDrop の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "VerifyDetectOp.h"
+#include "DopDrop.h"
 #include "AtpgMgr.h"
 #include "Fsim.h"
+#include "FaultMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
-// @brief 'verify' タイプを生成する．
+// @brief 'drop' タイプを生成する．
 // @param[in] mgr AtpgMgr
 DetectOp*
-new_VerifyDetectOp(AtpgMgr& mgr)
+new_DopDrop(AtpgMgr& mgr)
 {
-  return new VerifyDetectOp(mgr._fsimx());
+  return new DopDrop(mgr._fault_mgr(), mgr._fsimx());
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス VerifyDetectOp
+// クラス DopDrop
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] fmgr 故障マネージャ
 // @param[in] fsim 故障シミュレータ
-VerifyDetectOp::VerifyDetectOp(Fsim& fsim) :
+DopDrop::DopDrop(FaultMgr& fmgr,
+		 Fsim& fsim) :
+  mMgr(fmgr),
   mFsim(fsim)
 {
 }
 
 // @brief デストラクタ
-VerifyDetectOp::~VerifyDetectOp()
+DopDrop::~DopDrop()
 {
 }
 
@@ -43,11 +47,15 @@ VerifyDetectOp::~VerifyDetectOp()
 // @param[in] f 故障
 // @param[in] tv テストパタン
 void
-VerifyDetectOp::operator()(TpgFault* f,
-			   TestVector* tv)
+DopDrop::operator()(TpgFault* f,
+		    TestVector* tv)
 {
-  bool detect = mFsim.run(tv, f);
-  assert_cond( detect, __FILE__, __LINE__);
+  mFsim.run(tv, mDetFaults);
+  for (vector<TpgFault*>::iterator p = mDetFaults.begin();
+       p != mDetFaults.end(); ++ p) {
+    TpgFault* f = *p;
+    mMgr.set_status(f, kFsDetected);
+  }
 }
 
 END_NAMESPACE_YM_SATPG

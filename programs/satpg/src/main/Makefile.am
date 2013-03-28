@@ -30,16 +30,16 @@ libatpg_main_la_SOURCES = \
 	BtJust2.cc \
 	BtZdd.h \
 	BtZdd.cc \
-	BaseDetectOp.h \
-	BaseDetectOp.cc \
-	DropDetectOp.h \
-	DropDetectOp.cc \
-	VerifyDetectOp.h \
-	VerifyDetectOp.cc \
-	BaseUntestOp.h \
-	BaseUntestOp.cc \
-	SkipUntestOp.h \
-	SkipUntestOp.cc
+	DopBase.h \
+	DopBase.cc \
+	DopDrop.h \
+	DopDrop.cc \
+	DopVerify.h \
+	DopVerify.cc \
+	UopBase.h \
+	UopBase.cc \
+	UopSkip.h \
+	UopSkip.cc
 
 libatpg_main_la_LDFLAGS =
 

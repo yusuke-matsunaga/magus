@@ -1,13 +1,13 @@
 
-/// @file SkipUntestOp.h
-/// @brief SkipUntestOp の実装ファイル
+/// @file UopSkip.h
+/// @brief UopSkip の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SkipUntestOp.h"
+#include "UopSkip.h"
 #include "TpgFault.h"
 
 
@@ -16,26 +16,26 @@ BEGIN_NAMESPACE_YM_SATPG
 // @brief 'skip' タイプを生成する．
 // @param[in] threshold しきい値
 UntestOp*
-new_SkipUntestOp(AtpgMgr& mgr,
-		 ymuint threshold)
+new_UopSkip(AtpgMgr& mgr,
+	    ymuint threshold)
 {
-  return new SkipUntestOp(threshold);
+  return new UopSkip(threshold);
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス SkipUntestOp
+// クラス UopSkip
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] threshold しきい値
-SkipUntestOp::SkipUntestOp(ymuint threshold)
+UopSkip::UopSkip(ymuint threshold)
 {
   mThreshold = threshold;
 }
 
 // @brief デストラクタ
-SkipUntestOp::~SkipUntestOp()
+UopSkip::~UopSkip()
 {
   clear();
 }
@@ -43,7 +43,7 @@ SkipUntestOp::~SkipUntestOp()
 // @brief テスト不能故障と判定された時の処理
 // @param[in] f 故障
 void
-SkipUntestOp::operator()(TpgFault* f)
+UopSkip::operator()(TpgFault* f)
 {
   if ( f->untest_num() == 0 ) {
     // はじめて検出不能になった．
@@ -62,7 +62,7 @@ SkipUntestOp::operator()(TpgFault* f)
 
 // @brief 検出不能回数とスキップフラグをクリアする．
 void
-SkipUntestOp::clear()
+UopSkip::clear()
 {
   for (vector<TpgFault*>::iterator p = mUntestList.begin();
        p != mUntestList.end(); ++ p) {

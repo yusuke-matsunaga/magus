@@ -43,14 +43,14 @@ public:
 /// @brief 'base' タイプを生成する．
 /// @param[in] mgr AtpgMgr
 UntestOp*
-new_BaseUntestOp(AtpgMgr& mgr);
+new_UopBase(AtpgMgr& mgr);
 
 /// @brief 'skip' タイプを生成する．
 /// @param[in] mgr AtpgMgr
 /// @param[in] threshold しきい値
 UntestOp*
-new_SkipUntestOp(AtpgMgr& mgr,
-		 ymuint threshold);
+new_UopSkip(AtpgMgr& mgr,
+	    ymuint threshold);
 
 
 END_NAMESPACE_YM_SATPG
