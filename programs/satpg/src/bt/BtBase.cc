@@ -8,6 +8,8 @@
 
 
 #include "BtBase.h"
+#include "TvMgr.h"
+#include "TestVector.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -17,10 +19,10 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
-BtBase::BtBase(ymuint max_id)
+// @param[in] tvmgr TvMgr
+BtBase::BtBase(TvMgr& tvmgr) :
+  mTvMgr(tvmgr)
 {
-  mValList.reserve(max_id);
 }
 
 // @brief デストラクタ
@@ -35,17 +37,19 @@ BtBase::model()
   return mModel;
 }
 
-// @brief バックトレースの結果の割り当てリストを返す．
-const vector<ymuint32>&
-BtBase::val_list()
+// @brief テストベクタを生成する．
+// @note 結果は mCurPattern に格納される．
+TestVector*
+BtBase::new_vector()
 {
-  return mValList;
+  mCurPattern = mTvMgr.new_vector();
+
+  return mCurPattern;
 }
 
 // @brief 入力ノードの値を記録する．
 // @param[in] node 対象の外部入力ノード
-// @note node の値を mValList に記録する．
-// @note 単純だが mModel 上のインデックスと mValList の符号化は異なる．
+// @note node の値を mCurPattern に記録する．
 void
 BtBase::record_value(TpgNode* node)
 {
@@ -53,13 +57,11 @@ BtBase::record_value(TpgNode* node)
 
   Bool3 v = node_gval(node);
   ymuint iid = node->input_id();
-  ymuint packed_val = iid * 2;
   if ( v == kB3False ) {
-    mValList.push_back(packed_val);
+    mCurPattern->set_val(iid, kVal0);
   }
   else if ( v == kB3True ) {
-    packed_val += 1;
-    mValList.push_back(packed_val);
+    mCurPattern->set_val(iid, kVal1);
   }
 }
 

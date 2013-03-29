@@ -13,11 +13,13 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 // @brief 'Just1' タイプの生成を行なう．
+// @param[in] tvmgr TvMgr
 // @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
 BackTracer*
-new_BtJust1(ymuint max_id)
+new_BtJust1(TvMgr& tvmgr,
+	    ymuint max_id)
 {
-  return new BtJust1(max_id);
+  return new BtJust1(tvmgr, max_id);
 }
 
 
@@ -26,9 +28,11 @@ new_BtJust1(ymuint max_id)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] tvmgr TvMgr
 // @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
-BtJust1::BtJust1(ymuint max_id) :
-  BtJustBase(max_id)
+BtJust1::BtJust1(TvMgr& tvmgr,
+		 ymuint max_id) :
+  BtJustBase(tvmgr, max_id)
 {
 }
 
@@ -41,12 +45,12 @@ BtJust1::~BtJust1()
 // @param[in] fnode 故障のあるノード
 // @param[in] input_list テストパタンに関係のある入力のリスト
 // @param[in] output_list 故障伝搬の可能性のある出力のリスト
-void
+TestVector*
 BtJust1::operator()(TpgNode* fnode,
 		    const vector<TpgNode*>& input_list,
 		    const vector<TpgNode*>& output_list)
 {
-  clear_val_list();
+  TestVector* tv = new_vector();
 
   // 故障差の伝搬している外部出力を選ぶ．
   TpgNode* onode = NULL;
@@ -65,6 +69,8 @@ BtJust1::operator()(TpgNode* fnode,
 
   // 一連の処理でつけたマークを消す．
   clear_justified();
+
+  return tv;
 }
 
 // @brief solve 中で変数割り当ての正当化を行なう．

@@ -24,8 +24,10 @@ class BtJust1 :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] tvmgr TvMgr
   /// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
-  BtJust1(ymuint max_id);
+  BtJust1(TvMgr& tvmgr,
+	  ymuint max_id);
 
   /// @brief デストラクタ
   virtual
@@ -41,7 +43,7 @@ public:
   /// @param[in] fnode 故障のあるノード
   /// @param[in] input_list テストパタンに関係のある入力のリスト
   /// @param[in] output_list 故障伝搬の可能性のある出力のリスト
-  void
+  TestVector*
   operator()(TpgNode* fnode,
 	     const vector<TpgNode*>& input_list,
 	     const vector<TpgNode*>& output_list);

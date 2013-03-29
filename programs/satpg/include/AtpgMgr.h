@@ -170,18 +170,6 @@ public:
        const vector<DetectOp*>& dop_list,
        const vector<UntestOp*>& uop_list);
 
-  /// @brief テストパタンが見つかった場合に呼ばれる関数
-  /// @param[in] f 故障
-  /// @param[in] val_list ("入力ノードの番号 x 2 + 値(0/1)") のリスト
-  void
-  set_detected(TpgFault* f,
-	       const vector<ymuint>& val_list);
-
-  /// @brief 検出不能のときに呼ばれる関数
-  /// @param[in] f 故障
-  void
-  set_untestable(TpgFault* f);
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -257,12 +245,6 @@ private:
 
   // テストパタン生成器
   Dtpg* mDtpg;
-
-  // テストパタンが求められたときに実行するファンクタのリスト
-  vector<DetectOp*> mDetectOpList;
-
-  // 検出不能と判定されたときに実行するファンクタのリスト
-  vector<UntestOp*> mUntestOpList;
 
   // ネットワークが変更された時に呼ばれるイベントハンドラ
   T2BindMgr<const TpgNetwork&, FaultMgr&> mNtwkBindMgr;

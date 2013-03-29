@@ -26,8 +26,8 @@ class BtBase :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
-  BtBase(ymuint max_id);
+  /// @param[in] tvmgr TvMgr
+  BtBase(TvMgr& tvmgr);
 
   /// @brief デストラクタ
   virtual
@@ -44,24 +44,20 @@ public:
   vector<Bool3>&
   model();
 
-  /// @brief バックトレースの結果の割り当てリストを返す．
-  const vector<ymuint32>&
-  val_list();
-
 
 protected:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスから用いられる便利関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief mValList を初期化する．
-  void
-  clear_val_list();
+  /// @brief テストベクタを生成する．
+  /// @note 結果は mCurPattern に格納される．
+  TestVector*
+  new_vector();
 
   /// @brief 入力ノードの値を記録する．
   /// @param[in] node 対象の外部入力ノード
-  /// @note node の値を mValList に記録する．
-  /// @note 単純だが mModel 上のインデックスと mValList の符号化は異なる．
+  /// @note node の値を mCurPattern に記録する．
   void
   record_value(TpgNode* node);
 
@@ -101,11 +97,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // TvMgr
+  TvMgr& mTvMgr;
+
   // SAT の割り当て結果
   vector<Bool3> mModel;
 
-  // バックトレースの結果
-  vector<ymuint32> mValList;
+  // 現在処理中のテストベクタ
+  TestVector* mCurPattern;
 
 };
 
@@ -113,14 +112,6 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief mValList を初期化する．
-inline
-void
-BtBase::clear_val_list()
-{
-  mValList.clear();
-}
 
 // @brief ノードの正常値を読み出す．
 // @note mModel の値を読む．

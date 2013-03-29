@@ -13,11 +13,13 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 // @brief 'Just2' タイプの生成を行なう．
+// @param[in] tvmgr TvMgr
 // @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
 BackTracer*
-new_BtJust2(ymuint max_id)
+new_BtJust2(TvMgr& tvmgr,
+	    ymuint max_id)
 {
-  return new BtJust2(max_id);
+  return new BtJust2(tvmgr, max_id);
 }
 
 
@@ -26,9 +28,11 @@ new_BtJust2(ymuint max_id)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] tvmgr TvMgr
 // @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
-BtJust2::BtJust2(ymuint max_id) :
-  BtJustBase(max_id),
+BtJust2::BtJust2(TvMgr& tvmgr,
+		 ymuint max_id) :
+  BtJustBase(tvmgr, max_id),
   mAlloc(sizeof(NodeList), 1024),
   mJustArray(max_id, NULL)
 {
@@ -43,7 +47,7 @@ BtJust2::~BtJust2()
 // @param[in] fnode 故障のあるノード
 // @param[in] input_list テストパタンに関係のある入力のリスト
 // @param[in] output_list 故障伝搬の可能性のある出力のリスト
-void
+TestVector*
 BtJust2::operator()(TpgNode* fnode,
 		    const vector<TpgNode*>& input_list,
 		    const vector<TpgNode*>& output_list)
@@ -66,7 +70,7 @@ BtJust2::operator()(TpgNode* fnode,
   }
   assert_cond( nmin > 0, __FILE__, __LINE__);
 
-  clear_val_list();
+  TestVector* tv = new_vector();
 
   for (NodeList* tmp = best_list; tmp; tmp = tmp->mLink) {
     TpgNode* node = tmp->mNode;
@@ -75,6 +79,8 @@ BtJust2::operator()(TpgNode* fnode,
 
   // 一連の処理でつけたマークを消す．
   clear_justified();
+
+  return tv;
 }
 
 // @brief clear_justified() 中で呼ばれるフック関数

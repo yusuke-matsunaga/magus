@@ -25,8 +25,10 @@ class BtJustBase :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] tvmgr TvMgr
   /// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
-  BtJustBase(ymuint max_id);
+  BtJustBase(TvMgr& tvmgr,
+	     ymuint max_id);
 
   /// @brief デストラクタ
   virtual

@@ -24,8 +24,8 @@ class BtSimple :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
-  BtSimple(ymuint max_id);
+  /// @param[in] tvmgr TvMgr
+  BtSimple(TvMgr& tvmgr);
 
 
 public:
@@ -37,7 +37,7 @@ public:
   /// @param[in] fnode 故障のあるノード
   /// @param[in] input_list テストパタンに関係のある入力のリスト
   /// @param[in] output_list 故障伝搬の可能性のある出力のリスト
-  void
+  TestVector*
   operator()(TpgNode* fnode,
 	     const vector<TpgNode*>& input_list,
 	     const vector<TpgNode*>& output_list);

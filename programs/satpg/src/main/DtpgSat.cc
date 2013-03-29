@@ -11,6 +11,8 @@
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
+#include "DetectOp.h"
+#include "UntestOp.h"
 
 
 #define VERIFY_MAIMP 0
@@ -19,16 +21,15 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 Dtpg*
-new_DtpgSat(AtpgMgr& mgr)
+new_DtpgSat()
 {
-  return new DtpgSat(mgr);
+  return new DtpgSat();
 }
 
 // @brief コンストラクタ
-// @param[in] mgr AtpgMgr
-DtpgSat::DtpgSat(AtpgMgr& mgr)
+DtpgSat::DtpgSat()
 {
-  mSatEngine = new_SatEngine(mgr);
+  mSatEngine = new_SatEngine(*this);
 
   mNetwork = NULL;
 }
@@ -64,8 +65,13 @@ DtpgSat::set_network(TpgNetwork& tgnetwork)
 void
 DtpgSat::run(tDtpgMode mode,
 	     tDtpgPoMode po_mode,
-	     BackTracer& bt)
+	     BackTracer& bt,
+	     const vector<DetectOp*>& dop_list,
+	     const vector<UntestOp*>& uop_list)
 {
+  mDetectOpList = dop_list;
+  mUntestOpList = uop_list;
+
   switch ( po_mode ) {
   case kDtpgPoNone:
     mNetwork->activate_all();
@@ -161,6 +167,32 @@ DtpgSat::run(tDtpgMode mode,
       }
     }
     break;
+  }
+}
+
+// @brief テストパタンが見つかった場合に呼ばれる関数
+// @param[in] f 故障
+// @param[in] tv テストパタン
+void
+DtpgSat::set_detected(TpgFault* f,
+		      TestVector* tv)
+{
+  for (vector<DetectOp*>::iterator p = mDetectOpList.begin();
+       p != mDetectOpList.end(); ++ p) {
+    DetectOp& op = **p;
+    op(f, tv);
+  }
+}
+
+// @brief 検出不能のときに呼ばれる関数
+// @param[in] f 故障
+void
+DtpgSat::set_untestable(TpgFault* f)
+{
+  for (vector<UntestOp*>::iterator p = mUntestOpList.begin();
+       p != mUntestOpList.end(); ++ p) {
+    UntestOp& op = **p;
+    op(f);
   }
 }
 

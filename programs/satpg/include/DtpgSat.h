@@ -27,8 +27,7 @@ class DtpgSat :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] mgr AtpgMgr
-  DtpgSat(AtpgMgr& mgr);
+  DtpgSat();
 
   /// @brief デストラクタ
   virtual
@@ -56,42 +55,16 @@ public:
   /// @brief テスト生成を行なう．
   /// @param[in] mode メインモード
   /// @param[in] po_mode PO分割モード
-  /// @param[in] bt バックトラッカー
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop_list DetectOp のリスト
+  /// @param[in] uop_list UntestOp のリスト
   virtual
   void
   run(tDtpgMode mode,
       tDtpgPoMode po_mode,
-      BackTracer& bt);
-
-  /// @brief single モードでテスト生成を行なう．
-  /// @param[in] bt バックトラッカー
-  void
-  single_mode(BackTracer& bt);
-
-  /// @brief dual モードでテスト生成を行なう．
-  /// @param[in] bt バックトラッカー
-  void
-  dual_mode(BackTracer& bt);
-
-  /// @brief node モードでテスト生成を行なう．
-  /// @param[in] bt バックトラッカー
-  void
-  node_mode(BackTracer& bt);
-
-  /// @brief ffr モードでテスト生成を行なう．
-  /// @param[in] bt バックトラッカー
-  void
-  ffr_mode(BackTracer& bt);
-
-  /// @brief mffc モードでテスト生成を行なう．
-  /// @param[in] bt バックトラッカー
-  void
-  mffc_mode(BackTracer& bt);
-
-  /// @brief all モードでテスト生成を行なう．
-  /// @param[in] bt バックトラッカー
-  void
-  all_mode(BackTracer& bt);
+      BackTracer& bt,
+      const vector<DetectOp*>& dop_list,
+      const vector<UntestOp*>& uop_list);
 
   /// @brief 統計情報をクリアする．
   virtual
@@ -110,10 +83,58 @@ public:
   timer_enable(bool enable);
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 一つの故障に対する処理が終わったときに呼ばれる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief テストパタンが見つかった場合に呼ばれる関数
+  /// @param[in] f 故障
+  /// @param[in] tv テストパタン
+  void
+  set_detected(TpgFault* f,
+	       TestVector* tv);
+
+  /// @brief 検出不能のときに呼ばれる関数
+  /// @param[in] f 故障
+  void
+  set_untestable(TpgFault* f);
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief single モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  void
+  single_mode(BackTracer& bt);
+
+  /// @brief dual モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  void
+  dual_mode(BackTracer& bt);
+
+  /// @brief node モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  void
+  node_mode(BackTracer& bt);
+
+  /// @brief ffr モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  void
+  ffr_mode(BackTracer& bt);
+
+  /// @brief mffc モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  void
+  mffc_mode(BackTracer& bt);
+
+  /// @brief all モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  void
+  all_mode(BackTracer& bt);
 
   /// @brief single モードの共通処理
   void
@@ -189,6 +210,12 @@ private:
 
   // do_dtpg() で用いる対象の故障リスト
   vector<TpgFault*> mFaultList;
+
+  // テストパタンが求められたときに実行するファンクタのリスト
+  vector<DetectOp*> mDetectOpList;
+
+  // 検出不能と判定されたときに実行するファンクタのリスト
+  vector<UntestOp*> mUntestOpList;
 
 };
 

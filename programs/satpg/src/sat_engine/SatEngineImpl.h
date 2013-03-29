@@ -32,8 +32,8 @@ class SatEngineImpl :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] mgr AtpgMgr
-  SatEngineImpl(AtpgMgr& mgr);
+  /// @param[in] dtpg DtpgSat
+  SatEngineImpl(DtpgSat& dtpg);
 
   /// @brief デストラクタ
   virtual
@@ -141,8 +141,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // AtpgMgr
-  AtpgMgr& mMgr;
+  // DtpgSat
+  DtpgSat& mDtpg;
 
   // SAT solver のタイプ
   string mType;

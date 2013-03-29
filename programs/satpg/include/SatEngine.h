@@ -15,6 +15,8 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+class DtpgSat;
+
 //////////////////////////////////////////////////////////////////////
 /// @class SatEngine SatEngine.h "SatEngine.h"
 /// @brief SAT を用いたパタン生成器
@@ -76,7 +78,7 @@ public:
 /// @brief SatEngine の継承クラスを生成する．
 extern
 SatEngine*
-new_SatEngine(AtpgMgr& mgr);
+new_SatEngine(DtpgSat& dtpg);
 
 END_NAMESPACE_YM_SATPG
 

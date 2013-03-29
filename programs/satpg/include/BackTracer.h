@@ -42,38 +42,42 @@ public:
   /// @param[in] fnode 故障のあるノード
   /// @param[in] input_list テストパタンに関係のある入力のリスト
   /// @param[in] output_list 故障伝搬の可能性のある出力のリスト
+  /// @return テストベクタを返す．
   virtual
-  void
+  TestVector*
   operator()(TpgNode* fnode,
 	     const vector<TpgNode*>& input_list,
 	     const vector<TpgNode*>& output_list) = 0;
 
-  /// @brief バックトレースの結果の割り当てリストを返す．
-  virtual
-  const vector<ymuint32>&
-  val_list() = 0;
-
 };
 
 /// @brief 'Simple' タイプの生成を行なう．
+/// @param[in] tvmgr TvMgr
 /// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
 BackTracer*
-new_BtSimple(ymuint max_id);
+new_BtSimple(TvMgr& tvmgr,
+	     ymuint max_id);
 
 /// @brief 'Just1' タイプの生成を行なう．
+/// @param[in] tvmgr TvMgr
 /// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
 BackTracer*
-new_BtJust1(ymuint max_id);
+new_BtJust1(TvMgr& tvmgr,
+	    ymuint max_id);
 
 /// @brief 'Just2' タイプの生成を行なう．
+/// @param[in] tvmgr TvMgr
 /// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
 BackTracer*
-new_BtJust2(ymuint max_id);
+new_BtJust2(TvMgr& tvmgr,
+	    ymuint max_id);
 
 /// @brief 'Zdd' タイプの生成を行なう．
+/// @param[in] tvmgr TvMgr
 /// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
 BackTracer*
-new_BtZdd(ymuint max_id);
+new_BtZdd(TvMgr& tvmgr,
+	  ymuint max_id);
 
 END_NAMESPACE_YM_SATPG
 

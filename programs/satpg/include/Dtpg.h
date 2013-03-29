@@ -23,6 +23,12 @@ BEGIN_NAMESPACE_YM_SATPG
 class Dtpg
 {
 public:
+
+  /// @brief デストラクタ
+  virtual
+  ~Dtpg() {}
+
+public:
   //////////////////////////////////////////////////////////////////////
   // パタン生成を行う関数
   //////////////////////////////////////////////////////////////////////
@@ -43,13 +49,16 @@ public:
   /// @brief テスト生成を行なう．
   /// @param[in] mode メインモード
   /// @param[in] po_mode PO分割モード
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  /// @param[in] option オプション文字列
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop_list DetectOp のリスト
+  /// @param[in] uop_list UntestOp のリスト
   virtual
   void
   run(tDtpgMode mode,
       tDtpgPoMode po_mode,
-      BackTracer& bt) = 0;
+      BackTracer& bt,
+      const vector<DetectOp*>& dop_list,
+      const vector<UntestOp*>& uop_list) = 0;
 
   /// @brief 統計情報をクリアする．
   virtual
@@ -73,12 +82,7 @@ public:
 /// @brief DtpgSat のインスタンスを生成する．
 extern
 Dtpg*
-new_DtpgSat(AtpgMgr& mgr);
-
-/// @brief DtpgSatOld のインスタンスを生成する．
-extern
-Dtpg*
-new_DtpgSatOld(AtpgMgr& mgr);
+new_DtpgSat();
 
 END_NAMESPACE_YM_SATPG
 

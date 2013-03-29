@@ -14,11 +14,13 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 // @brief 'Zdd' タイプの生成を行なう．
+// @param[in] tvmgr TvMgr
 // @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
 BackTracer*
-new_BtZdd(ymuint max_id)
+new_BtZdd(TvMgr& tvmgr,
+	  ymuint max_id)
 {
-  return new BtZdd(max_id);
+  return new BtZdd(tvmgr, max_id);
 }
 
 
@@ -27,9 +29,11 @@ new_BtZdd(ymuint max_id)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] tvmgr TvMgr
 // @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
-BtZdd::BtZdd(ymuint max_id) :
-  BtJustBase(max_id),
+BtZdd::BtZdd(TvMgr& tvmgr,
+	     ymuint max_id) :
+  BtJustBase(tvmgr, max_id),
   mMgr(""),
   mJustArray(max_id)
 {
@@ -44,7 +48,7 @@ BtZdd::~BtZdd()
 // @param[in] fnode 故障のあるノード
 // @param[in] input_list テストパタンに関係のある入力のリスト
 // @param[in] output_list 故障伝搬の可能性のある出力のリスト
-void
+TestVector*
 BtZdd::operator()(TpgNode* fnode,
 		  const vector<TpgNode*>& input_list,
 		  const vector<TpgNode*>& output_list)
@@ -71,7 +75,8 @@ BtZdd::operator()(TpgNode* fnode,
     }
   }
   clear_justified();
-  clear_val_list();
+
+  TestVector* tv = new_vector();
 
   ans = mMgr.minimum_set(ans);
 
@@ -84,6 +89,8 @@ BtZdd::operator()(TpgNode* fnode,
     record_value(node);
     ans = ans.edge1();
   }
+
+  return tv;
 }
 
 // @brief clear_justified() 中で呼ばれるフック関数

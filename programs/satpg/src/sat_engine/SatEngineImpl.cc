@@ -9,7 +9,7 @@
 
 #include "SatEngineImpl.h"
 
-#include "AtpgMgr.h"
+#include "DtpgSat.h"
 #include "DtpgStats.h"
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
@@ -27,9 +27,9 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief SatEngine の継承クラスを生成する．
 SatEngine*
-new_SatEngine(AtpgMgr& mgr)
+new_SatEngine(DtpgSat& dtpg)
 {
-  return new nsSatEngine::SatEngineImpl(mgr);
+  return new nsSatEngine::SatEngineImpl(dtpg);
 }
 
 END_NAMESPACE_YM_SATPG
@@ -460,8 +460,8 @@ END_NONAMESPACE
 
 
 // @brief コンストラクタ
-SatEngineImpl::SatEngineImpl(AtpgMgr& mgr) :
-  mMgr(mgr)
+SatEngineImpl::SatEngineImpl(DtpgSat& dtpg) :
+  mDtpg(dtpg)
 {
   mTimerEnable = false;
 }
@@ -917,10 +917,10 @@ SatEngineImpl::solve(SatSolver& solver,
     // パタンが求まった．
 
     // バックトレースを行う．
-    bt(f->node(), mInputList, mOutputList);
+    TestVector* tv = bt(f->node(), mInputList, mOutputList);
 
     // パタンの登録などを行う．
-    mMgr.set_detected(f, bt.val_list());
+    mDtpg.set_detected(f, tv);
 
     if ( mTimerEnable ) {
       mTimer.stop();
@@ -930,7 +930,7 @@ SatEngineImpl::solve(SatSolver& solver,
   }
   else if ( ans == kB3False ) {
     // 検出不能と判定された．
-    mMgr.set_untestable(f);
+    mDtpg.set_untestable(f);
 
     if ( mTimerEnable ) {
       mTimer.stop();

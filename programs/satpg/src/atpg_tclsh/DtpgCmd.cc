@@ -128,6 +128,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   vector<DetectOp*> dop_list;
   vector<UntestOp*> uop_list;
 
+  dop_list.push_back(new_DopTvList(mgr()));
   dop_list.push_back(new_DopBase(mgr()));
 
   bool po_flag = mPoptPo->is_specified();
@@ -147,13 +148,14 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   if ( mPoptX->is_specified() ) {
     xmode = mPoptX->val();
   }
+  TvMgr& tvmgr = mgr()._tv_mgr();
   ymuint max_id = mgr()._network().node_num();
   BackTracer* bt = NULL;
   switch ( xmode ) {
-  case 1: bt = new_BtJust1(max_id); break;
-  case 2: bt = new_BtJust2(max_id); break;
-  case 3: bt = new_BtZdd(max_id); break;
-  default: bt = new_BtSimple(max_id); break;
+  case 1: bt = new_BtJust1(tvmgr, max_id); break;
+  case 2: bt = new_BtJust2(tvmgr, max_id); break;
+  case 3: bt = new_BtZdd(tvmgr, max_id); break;
+  default: bt = new_BtSimple(tvmgr, max_id); break;
   }
 
   if ( mPoptDrop->is_specified() ) {
