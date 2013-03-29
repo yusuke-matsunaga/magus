@@ -12,7 +12,6 @@ libatpg_bt_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/src \
 	$(GMP_INCLUDES)
 
 libatpg_bt_la_SOURCES = \

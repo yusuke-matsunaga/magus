@@ -46,10 +46,12 @@ BtZdd::~BtZdd()
 
 // @brief バックトレースを行なう．
 // @param[in] fnode 故障のあるノード
+// @param[in] model SATの値の割り当て結果を収めた配列
 // @param[in] input_list テストパタンに関係のある入力のリスト
 // @param[in] output_list 故障伝搬の可能性のある出力のリスト
 TestVector*
 BtZdd::operator()(TpgNode* fnode,
+		  const vector<Bool3>& model,
 		  const vector<TpgNode*>& input_list,
 		  const vector<TpgNode*>& output_list)
 {
@@ -70,8 +72,8 @@ BtZdd::operator()(TpgNode* fnode,
   for (vector<TpgNode*>::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     TpgNode* node = *p;
-    if ( node_dval(node) == kB3True ) {
-      ans |= justify(node);
+    if ( node_dval(node, model) == kB3True ) {
+      ans |= justify(node, model);
     }
   }
   clear_justified();
@@ -86,7 +88,7 @@ BtZdd::operator()(TpgNode* fnode,
     hash_map<ymuint, TpgNode*>::iterator p = input_map.find(vid.val());
     assert_cond( p != input_map.end(), __FILE__, __LINE__);
     TpgNode* node = p->second;
-    record_value(node);
+    record_value(node, model);
     ans = ans.edge1();
   }
 
@@ -102,8 +104,10 @@ BtZdd::clear_justified_hook(TpgNode* node)
 
 // @brief ノードの値を正当化する入力の組み合わせを求める．
 // @param[in] node 対象のノード
+// @param[in] model SATの値の割り当て結果を収めた配列
 Zdd
-BtZdd::justify(TpgNode* node)
+BtZdd::justify(TpgNode* node,
+	       const vector<Bool3>& model)
 {
   if ( node->is_input() ) {
     ymuint iid = node->input_id();
@@ -116,77 +120,77 @@ BtZdd::justify(TpgNode* node)
   }
   set_justified(node);
 
-  Bool3 gval = node_gval(node);
-  Bool3 fval = node_fval(node);
+  Bool3 gval = node_gval(node, model);
+  Bool3 fval = node_fval(node, model);
 
   Zdd ans;
 
   if ( gval != fval ) {
     // 正常値と故障値が異なっていたら
     // すべてのファンインをたどる．
-    ans = just_sub1(node);
+    ans = just_sub1(node, model);
   }
   else if ( node->is_cplx_logic() ) {
     ymuint np = node->primitive_num();
     TpgPrimitive* prim = node->primitive(np - 1);
-    ans = justify_primitive(prim, node);
+    ans = justify_primitive(prim, node, model);
   }
   else {
     switch ( node->gate_type() ) {
     case kTgGateBuff:
     case kTgGateNot:
       // 無条件で唯一のファンインをたどる．
-      ans = justify(node->fanin(0));
+      ans = justify(node->fanin(0), model);
       break;
 
     case kTgGateAnd:
       if ( gval == kB3True ) {
 	// すべてのファンインノードをたどる．
-	ans = just_sub1(node);
+	ans = just_sub1(node, model);
       }
       else if ( gval == kB3False ) {
 	// 0の値を持つノードをたどる．
-	ans = just_sub2(node, kB3False);
+	ans = just_sub2(node, model, kB3False);
       }
       break;
 
     case kTgGateNand:
       if ( gval == kB3True ) {
 	// 0の値を持つノードをたどる．
-	ans = just_sub2(node, kB3False);
+	ans = just_sub2(node, model, kB3False);
       }
       else if ( gval == kB3False ) {
 	// すべてのファンインノードをたどる．
-	ans = just_sub1(node);
+	ans = just_sub1(node, model);
       }
       break;
 
     case kTgGateOr:
       if ( gval == kB3True ) {
 	// 1の値を持つノードをたどる．
-	ans = just_sub2(node, kB3True);
+	ans = just_sub2(node, model, kB3True);
       }
       else if ( gval == kB3False ) {
 	// すべてのファンインノードをたどる．
-	ans = just_sub1(node);
+	ans = just_sub1(node, model);
       }
       break;
 
     case kTgGateNor:
       if ( gval == kB3True ) {
 	// すべてのファンインノードをたどる．
-	ans = just_sub1(node);
+	ans = just_sub1(node, model);
       }
       else if ( gval == kB3False ) {
 	// 1の値を持つノードをたどる．
-	ans = just_sub2(node, kB3True);
+	ans = just_sub2(node, model, kB3True);
       }
       break;
 
     case kTgGateXor:
     case kTgGateXnor:
       // すべてのファンインノードをたどる．
-      ans = just_sub1(node);
+      ans = just_sub1(node, model);
       break;
 
     default:
@@ -200,14 +204,16 @@ BtZdd::justify(TpgNode* node)
 
 // @brief すべてのファンインに対して justify() を呼ぶ．
 // @param[in] node 対象のノード
+// @param[in] model SATの値の割り当て結果を収めた配列
 Zdd
-BtZdd::just_sub1(TpgNode* node)
+BtZdd::just_sub1(TpgNode* node,
+		 const vector<Bool3>& model)
 {
   Zdd ans = mMgr.make_base();
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
-    Zdd ans1 = justify(inode);
+    Zdd ans1 = justify(inode, model);
     ans = mMgr.merge(ans, ans1);
   }
   return ans;
@@ -215,9 +221,11 @@ BtZdd::just_sub1(TpgNode* node)
 
 // @brief 指定した値を持つのファンインに対して justify() を呼ぶ．
 // @param[in] node 対象のノード
+// @param[in] model SATの値の割り当て結果を収めた配列
 // @param[in] val 値
 Zdd
 BtZdd::just_sub2(TpgNode* node,
+		 const vector<Bool3>& model,
 		 Bool3 val)
 {
   Zdd gans = mMgr.make_empty();
@@ -225,12 +233,12 @@ BtZdd::just_sub2(TpgNode* node,
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
-    Bool3 igval = node_gval(inode);
-    Bool3 ifval = node_fval(inode);
+    Bool3 igval = node_gval(inode, model);
+    Bool3 ifval = node_fval(inode, model);
     if ( igval != val && ifval != val ) {
       continue;
     }
-    Zdd tmp = justify(inode);
+    Zdd tmp = justify(inode, model);
     if ( igval == val ) {
       gans |= tmp;
     }
@@ -245,77 +253,79 @@ BtZdd::just_sub2(TpgNode* node,
 // @brief プリミティブの値を正当化する入力の組み合わせを求める．
 // @param[in] prim 対象のプリミティブ
 // @param[in] node 対象のノード
+// @param[in] model SATの値の割り当て結果を収めた配列
 Zdd
 BtZdd::justify_primitive(TpgPrimitive* prim,
-			 TpgNode* node)
+			 TpgNode* node,
+			 const vector<Bool3>& model)
 {
   if ( prim->is_input() ) {
     ymuint ipos = prim->input_id();
     TpgNode* inode = node->fanin(ipos);
-    return justify(inode);
+    return justify(inode, model);
   }
 
-  Bool3 gval = primitive_gval(prim);
-  Bool3 fval = primitive_fval(prim);
+  Bool3 gval = primitive_gval(prim, model);
+  Bool3 fval = primitive_fval(prim, model);
   if ( gval != fval ) {
     // すべてのファンインノードをたどる．
-    return jp_sub1(prim, node);
+    return jp_sub1(prim, node, model);
   }
 
   switch ( prim->gate_type() ) {
   case kTgGateBuff:
   case kTgGateNot:
     // 唯一のファンインをたどる．
-    return justify_primitive(prim->fanin(0), node);
+    return justify_primitive(prim->fanin(0), node, model);
 
   case kTgGateAnd:
     if ( gval == kB3True ) {
       // すべてのファンインをたどる．
-      return jp_sub1(prim, node);
+      return jp_sub1(prim, node, model);
     }
     else if ( gval == kB3False ) {
       // 0 の値を持つファンインをたどる．
-      return jp_sub2(prim, node, kB3False);
+      return jp_sub2(prim, node, model, kB3False);
     }
     break;
 
   case kTgGateNand:
     if ( gval == kB3True ) {
       // 0 の値を持つファンインをたどる．
-      return jp_sub2(prim, node, kB3False);
+      return jp_sub2(prim, node, model, kB3False);
     }
     else if ( gval == kB3False ) {
       // すべてのファンインをたどる．
-      return jp_sub1(prim, node);
+      return jp_sub1(prim, node, model);
     }
     break;
 
   case kTgGateOr:
     if ( gval == kB3True ) {
       // 1の値をもつファンインをたどる．
-      return jp_sub2(prim, node, kB3True);
+      return jp_sub2(prim, node, model, kB3True);
     }
     else if ( gval == kB3False ) {
       // すべてのファンインをたどる．
-      return jp_sub1(prim, node);
+      return jp_sub1(prim, node, model);
     }
     break;
 
   case kTgGateNor:
     if ( gval == kB3True ) {
       // すべてのファンインをたどる．
-      return jp_sub1(prim, node);
+      return jp_sub1(prim, node, model);
     }
     else if ( gval == kB3False ) {
       // 1の値をもつすべてのファンインをたどる．
-      return jp_sub2(prim, node, kB3True);
+      return jp_sub2(prim, node, model, kB3True);
     }
     break;
 
   case kTgGateXor:
   case kTgGateXnor:
     // すべてのファンインをたどる．
-    return jp_sub1(prim, node);
+    return jp_sub1(prim, node, model);
 
   default:
     break;
@@ -327,15 +337,17 @@ BtZdd::justify_primitive(TpgPrimitive* prim,
 // @brief すべてのファンインに対して justify_primitive() を呼ぶ．
 // @param[in] prim 対象のプリミティブ
 // @param[in] node 対象のノード
+// @param[in] model SATの値の割り当て結果を収めた配列
 Zdd
 BtZdd::jp_sub1(TpgPrimitive* prim,
-	       TpgNode* node)
+	       TpgNode* node,
+	       const vector<Bool3>& model)
 {
   Zdd ans = mMgr.make_base();
   ymuint ni = prim->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     TpgPrimitive* iprim = prim->fanin(i);
-    Zdd ans1 = justify_primitive(iprim, node);
+    Zdd ans1 = justify_primitive(iprim, node, model);
     ans = mMgr.merge(ans, ans1);
   }
   return ans;
@@ -344,10 +356,12 @@ BtZdd::jp_sub1(TpgPrimitive* prim,
 // @brief 指定した値を持つファンインに対して justify_primitive() を呼ぶ．
 // @param[in] prim 対象のプリミティブ
 // @param[in] node 対象のノード
+/// @param[in] model SATの値の割り当て結果を収めた配列
 // @param[in] val 値
 Zdd
 BtZdd::jp_sub2(TpgPrimitive* prim,
 	       TpgNode* node,
+	       const vector<Bool3>& model,
 	       Bool3 val)
 {
   Zdd gans = mMgr.make_empty();
@@ -355,12 +369,12 @@ BtZdd::jp_sub2(TpgPrimitive* prim,
   ymuint ni = prim->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     TpgPrimitive* iprim = prim->fanin(i);
-    Bool3 igval = primitive_gval(iprim);
-    Bool3 ifval = primitive_fval(iprim);
+    Bool3 igval = primitive_gval(iprim, model);
+    Bool3 ifval = primitive_fval(iprim, model);
     if ( igval != val && ifval != val ) {
       continue;
     }
-    Zdd tmp = justify_primitive(iprim, node);
+    Zdd tmp = justify_primitive(iprim, node, model);
     if ( igval == val ) {
       gans |= tmp;
     }

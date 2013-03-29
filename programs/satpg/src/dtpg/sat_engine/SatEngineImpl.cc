@@ -9,7 +9,7 @@
 
 #include "SatEngineImpl.h"
 
-#include "DtpgSat.h"
+#include "../DtpgSat.h"
 #include "DtpgStats.h"
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
@@ -912,12 +912,12 @@ SatEngineImpl::solve(SatSolver& solver,
     mTimer.start();
   }
 
-  Bool3 ans = solver.solve(mAssumptions, bt.model());
+  Bool3 ans = solver.solve(mAssumptions, mModel);
   if ( ans == kB3True ) {
     // パタンが求まった．
 
     // バックトレースを行う．
-    TestVector* tv = bt(f->node(), mInputList, mOutputList);
+    TestVector* tv = bt(f->node(), mModel, mInputList, mOutputList);
 
     // パタンの登録などを行う．
     mDtpg.set_detected(f, tv);

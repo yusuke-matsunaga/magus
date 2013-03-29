@@ -11,9 +11,7 @@ noinst_LTLIBRARIES = libatpg_dop.la
 libatpg_dop_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/src \
-	$(GMP_INCLUDES)
+	-I$(top_srcdir)/include
 
 libatpg_dop_la_SOURCES = \
 	DopBase.h \

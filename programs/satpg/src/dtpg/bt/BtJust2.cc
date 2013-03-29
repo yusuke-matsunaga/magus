@@ -45,10 +45,12 @@ BtJust2::~BtJust2()
 
 // @brief バックトレースを行なう．
 // @param[in] fnode 故障のあるノード
+// @param[in] model SATの値の割り当て結果を収めた配列
 // @param[in] input_list テストパタンに関係のある入力のリスト
 // @param[in] output_list 故障伝搬の可能性のある出力のリスト
 TestVector*
 BtJust2::operator()(TpgNode* fnode,
+		    const vector<Bool3>& model,
 		    const vector<TpgNode*>& input_list,
 		    const vector<TpgNode*>& output_list)
 {
@@ -58,9 +60,9 @@ BtJust2::operator()(TpgNode* fnode,
   for (vector<TpgNode*>::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     TpgNode* node = *p;
-    if ( node_dval(node) == kB3True ) {
+    if ( node_dval(node, model) == kB3True ) {
       // 正当化を行う．
-      NodeList* node_list = justify(node);
+      NodeList* node_list = justify(node, model);
       ymuint n = list_size(node_list);
       if ( nmin == 0 || nmin > n ) {
 	nmin = n;
@@ -74,7 +76,7 @@ BtJust2::operator()(TpgNode* fnode,
 
   for (NodeList* tmp = best_list; tmp; tmp = tmp->mLink) {
     TpgNode* node = tmp->mNode;
-    record_value(node);
+    record_value(node, model);
   }
 
   // 一連の処理でつけたマークを消す．
@@ -93,11 +95,13 @@ BtJust2::clear_justified_hook(TpgNode* node)
 
 // @brief solve 中で変数割り当ての正当化を行なう．
 // @param[in] node 対象のノード
+// @param[in] model SATの値の割り当て結果を収めた配列
 // @note node の値割り当てを正当化する．
 // @note 正当化に用いられているノードには mJustifiedMark がつく．
 // @note mJustifiedMmark がついたノードは mJustifiedNodeList に格納される．
 BtJust2::NodeList*
-BtJust2::justify(TpgNode* node)
+BtJust2::justify(TpgNode* node,
+		 const vector<Bool3>& model)
 {
   if ( justified_mark(node) ) {
     return mJustArray[node->id()];
@@ -110,19 +114,19 @@ BtJust2::justify(TpgNode* node)
     return mJustArray[node->id()];
   }
 
-  Bool3 gval = node_gval(node);
-  Bool3 fval = node_fval(node);
+  Bool3 gval = node_gval(node, model);
+  Bool3 fval = node_fval(node, model);
 
   if ( gval != fval ) {
     // 正常値と故障値が異なっていたら
     // すべてのファンインをたどる．
-    return just_sub1(node);
+    return just_sub1(node, model);
   }
 
   if ( node->is_cplx_logic() ) {
     ymuint np = node->primitive_num();
     TpgPrimitive* prim = node->primitive(np - 1);
-    mJustArray[node->id()] = justify_primitive(prim, node);
+    mJustArray[node->id()] = justify_primitive(prim, node, model);
     return mJustArray[node->id()];
   }
   else {
@@ -130,56 +134,56 @@ BtJust2::justify(TpgNode* node)
     case kTgGateBuff:
     case kTgGateNot:
       // 無条件で唯一のファンインをたどる．
-      return just_sub1(node);
+      return just_sub1(node, model);
 
     case kTgGateAnd:
       if ( gval == kB3True ) {
 	// すべてのファンインノードをたどる．
-	return just_sub1(node);
+	return just_sub1(node, model);
       }
       else if ( gval == kB3False ) {
 	// 0の値を持つ最初のノードをたどる．
-	return just_sub2(node, kB3False);
+	return just_sub2(node, model, kB3False);
       }
       break;
 
     case kTgGateNand:
       if ( gval == kB3True ) {
 	// 0の値を持つ最初のノードをたどる．
-	return just_sub2(node, kB3False);
+	return just_sub2(node, model, kB3False);
       }
       else if ( gval == kB3False ) {
 	// すべてのファンインノードをたどる．
-	return just_sub1(node);
+	return just_sub1(node, model);
       }
       break;
 
     case kTgGateOr:
       if ( gval == kB3True ) {
 	// 1の値を持つ最初のノードをたどる．
-	return just_sub2(node, kB3True);
+	return just_sub2(node, model, kB3True);
       }
       else if ( gval == kB3False ) {
 	// すべてのファンインノードをたどる．
-	return just_sub1(node);
+	return just_sub1(node, model);
       }
       break;
 
     case kTgGateNor:
       if ( gval == kB3True ) {
 	// すべてのファンインノードをたどる．
-	return just_sub1(node);
+	return just_sub1(node, model);
       }
       else if ( gval == kB3False ) {
 	// 1の値を持つ最初のノードをたどる．
-	return just_sub2(node, kB3True);
+	return just_sub2(node, model, kB3True);
       }
       break;
 
     case kTgGateXor:
     case kTgGateXnor:
       // すべてのファンインノードをたどる．
-      return just_sub1(node);
+      return just_sub1(node, model);
       break;
 
     default:
@@ -194,14 +198,16 @@ BtJust2::justify(TpgNode* node)
 
 // @brief すべてのファンインに対して justify() を呼ぶ．
 // @param[in] node 対象のノード
+// @param[in] model SATの値の割り当て結果を収めた配列
 BtJust2::NodeList*
-BtJust2::just_sub1(TpgNode* node)
+BtJust2::just_sub1(TpgNode* node,
+		   const vector<Bool3>& model)
 {
   NodeList*& node_list = mJustArray[node->id()];
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
-    NodeList* node_list1 = justify(inode);
+    NodeList* node_list1 = justify(inode, model);
     list_merge(node_list, node_list1);
   }
   return node_list;
@@ -209,9 +215,11 @@ BtJust2::just_sub1(TpgNode* node)
 
 // @brief 指定した値を持つのファンインに対して justify() を呼ぶ．
 // @param[in] node 対象のノード
+// @param[in] model SATの値の割り当て結果を収めた配列
 // @param[in] val 値
 BtJust2::NodeList*
 BtJust2::just_sub2(TpgNode* node,
+		   const vector<Bool3>& model,
 		   Bool3 val)
 {
   ymuint ni = node->fanin_num();
@@ -221,12 +229,12 @@ BtJust2::just_sub2(TpgNode* node,
   ymuint fmin = 0;
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
-    Bool3 igval = node_gval(inode);
-    Bool3 ifval = node_fval(inode);
+    Bool3 igval = node_gval(inode, model);
+    Bool3 ifval = node_fval(inode, model);
     if ( igval != val && ifval != val ) {
       continue;
     }
-    NodeList* node_list1 = justify(inode);
+    NodeList* node_list1 = justify(inode, model);
     ymuint n = list_size(node_list1);
     if ( igval == val ) {
       if ( gmin == 0 || gmin > n ) {
@@ -254,78 +262,80 @@ BtJust2::just_sub2(TpgNode* node,
 // @brief justify の下請け関数
 // @param[in] prim 対象のプリミティブ
 // @param[in] node 対象のノード
+// @param[in] model SATの値の割り当て結果を収めた配列
 // @note node の値割り当てを正当化する．
 BtJust2::NodeList*
 BtJust2::justify_primitive(TpgPrimitive* prim,
-			   TpgNode* node)
+			   TpgNode* node,
+			   const vector<Bool3>& model)
 {
   if ( prim->is_input() ) {
     ymuint ipos = prim->input_id();
     TpgNode* inode = node->fanin(ipos);
-    return justify(inode);
+    return justify(inode, model);
   }
 
-  Bool3 gval = primitive_gval(prim);
-  Bool3 fval = primitive_fval(prim);
+  Bool3 gval = primitive_gval(prim, model);
+  Bool3 fval = primitive_fval(prim, model);
   if ( gval != fval ) {
     // すべてのファンインノードをたどる．
-    return jp_sub1(prim, node);
+    return jp_sub1(prim, node, model);
   }
 
   switch ( prim->gate_type() ) {
   case kTgGateBuff:
   case kTgGateNot:
     // 唯一のファンインをたどる．
-    return justify_primitive(prim->fanin(0), node);
+    return justify_primitive(prim->fanin(0), node, model);
 
   case kTgGateAnd:
     if ( gval == kB3True ) {
       // すべてのファンインをたどる．
-      return jp_sub1(prim, node);
+      return jp_sub1(prim, node, model);
     }
     else if ( gval == kB3False ) {
       // 0 の値を持つ最初のファンインをたどる．
-      return jp_sub2(prim, node, kB3False);
+      return jp_sub2(prim, node, model, kB3False);
     }
     break;
 
   case kTgGateNand:
     if ( gval == kB3True ) {
       // 0 の値を持つ最初のファンインをたどる．
-      return jp_sub2(prim, node, kB3False);
+      return jp_sub2(prim, node, model, kB3False);
     }
     else if ( gval == kB3False ) {
       // すべてのファンインをたどる．
-      return jp_sub1(prim, node);
+      return jp_sub1(prim, node, model);
     }
     break;
 
   case kTgGateOr:
     if ( gval == kB3True ) {
       // 1の値をもつ最初のファンインをたどる．
-      return jp_sub2(prim, node, kB3True);
+      return jp_sub2(prim, node, model, kB3True);
     }
     else if ( gval == kB3False ) {
       // すべてのファンインをたどる．
-      return jp_sub1(prim, node);
+      return jp_sub1(prim, node, model);
     }
     break;
 
   case kTgGateNor:
     if ( gval == kB3True ) {
       // すべてのファンインをたどる．
-      return jp_sub1(prim, node);
+      return jp_sub1(prim, node, model);
     }
     else if ( gval == kB3False ) {
       // 1の値をもつすべてのファンインをたどる．
-      return jp_sub2(prim, node, kB3True);
+      return jp_sub2(prim, node, model, kB3True);
     }
     break;
 
   case kTgGateXor:
   case kTgGateXnor:
     // すべてのファンインをたどる．
-    return jp_sub1(prim, node);
+    return jp_sub1(prim, node, model);
     break;
 
   default:
@@ -339,15 +349,17 @@ BtJust2::justify_primitive(TpgPrimitive* prim,
 // @brief すべてのファンインに対して justify_primitive() を呼ぶ．
 // @param[in] prim 対象のプリミティブ
 // @param[in] node 対象のノード
+// @param[in] model SATの値の割り当て結果を収めた配列
 BtJust2::NodeList*
 BtJust2::jp_sub1(TpgPrimitive* prim,
-		 TpgNode* node)
+		 TpgNode* node,
+		 const vector<Bool3>& model)
 {
   NodeList* node_list = NULL;
   ymuint ni = prim->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     TpgPrimitive* iprim = prim->fanin(i);
-    NodeList* node_list1 = justify_primitive(iprim, node);
+    NodeList* node_list1 = justify_primitive(iprim, node, model);
     list_merge(node_list, node_list1);
   }
   return node_list;
@@ -356,10 +368,12 @@ BtJust2::jp_sub1(TpgPrimitive* prim,
 // @brief 指定した値を持つファンインに対して justify_primitive() を呼ぶ．
 // @param[in] prim 対象のプリミティブ
 // @param[in] node 対象のノード
+// @param[in] model SATの値の割り当て結果を収めた配列
 // @param[in] val 値
 BtJust2::NodeList*
 BtJust2::jp_sub2(TpgPrimitive* prim,
 		 TpgNode* node,
+		 const vector<Bool3>& model,
 		 Bool3 val)
 {
   ymuint ni = prim->fanin_num();
@@ -370,12 +384,12 @@ BtJust2::jp_sub2(TpgPrimitive* prim,
   vector<NodeList*> node_list_array(ni);
   for (ymuint i = 0; i < ni; ++ i) {
     TpgPrimitive* iprim = prim->fanin(i);
-    Bool3 igval = primitive_gval(iprim);
-    Bool3 ifval = primitive_fval(iprim);
+    Bool3 igval = primitive_gval(iprim, model);
+    Bool3 ifval = primitive_fval(iprim, model);
     if ( igval != val && ifval != val ) {
       continue;
     }
-    node_list_array[i] = justify_primitive(iprim, node);
+    node_list_array[i] = justify_primitive(iprim, node, model);
     ymuint n = list_size(node_list_array[i]);
     if ( igval == val ) {
       if ( gmin == 0 || gmin > n ) {

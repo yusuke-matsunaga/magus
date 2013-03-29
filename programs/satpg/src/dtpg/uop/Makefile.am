@@ -11,9 +11,7 @@ noinst_LTLIBRARIES = libatpg_uop.la
 libatpg_uop_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/src \
-	$(GMP_INCLUDES)
+	-I$(top_srcdir)/include
 
 libatpg_uop_la_SOURCES = \
 	UopBase.h \

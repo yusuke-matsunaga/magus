@@ -42,10 +42,12 @@ public:
 
   /// @brief バックトレースを行なう．
   /// @param[in] fnode 故障のあるノード
+  /// @param[in] model SATの値の割り当て結果を収めた配列
   /// @param[in] input_list テストパタンに関係のある入力のリスト
   /// @param[in] output_list 故障伝搬の可能性のある出力のリスト
   TestVector*
   operator()(TpgNode* fnode,
+	     const vector<Bool3>& model,
 	     const vector<TpgNode*>& input_list,
 	     const vector<TpgNode*>& output_list);
 
@@ -81,48 +83,60 @@ private:
 
   /// @brief solve 中で変数割り当ての正当化を行なう．
   /// @param[in] node 対象のノード
+  /// @param[in] model SATの値の割り当て結果を収めた配列
   /// @note node の値割り当てを正当化する．
   /// @note 正当化に用いられているノードには mark3 がつく．
   /// @note mark3 がついたノードは mBwdNodeList に格納される．
   NodeList*
-  justify(TpgNode* node);
+  justify(TpgNode* node,
+	  const vector<Bool3>& model);
 
   /// @brief すべてのファンインに対して justify() を呼ぶ．
   /// @param[in] node 対象のノード
+  /// @param[in] model SATの値の割り当て結果を収めた配列
   NodeList*
-  just_sub1(TpgNode* node);
+  just_sub1(TpgNode* node,
+	    const vector<Bool3>& model);
 
   /// @brief 指定した値を持つのファンインに対して justify() を呼ぶ．
   /// @param[in] node 対象のノード
+  /// @param[in] model SATの値の割り当て結果を収めた配列
   /// @param[in] val 値
   NodeList*
   just_sub2(TpgNode* node,
+	    const vector<Bool3>& model,
 	    Bool3 val);
 
   /// @brief justify の下請け関数
   /// @param[in] prim 対象のプリミティブ
   /// @param[in] node 対象のノード
+  /// @param[in] model SATの値の割り当て結果を収めた配列
   /// @note node の値割り当てを正当化する．
   /// @note 正当化に用いられているノードには mark3 がつく．
   /// @note mark3 がついたノードは mBwdNodeList に格納される．
   NodeList*
   justify_primitive(TpgPrimitive* prim,
-		    TpgNode* node);
+		    TpgNode* node,
+		    const vector<Bool3>& model);
 
   /// @brief すべてのファンインに対して justify_primitive() を呼ぶ．
   /// @param[in] prim 対象のプリミティブ
   /// @param[in] node 対象のノード
+  /// @param[in] model SATの値の割り当て結果を収めた配列
   NodeList*
   jp_sub1(TpgPrimitive* prim,
-	  TpgNode* node);
+	  TpgNode* node,
+	  const vector<Bool3>& model);
 
   /// @brief 指定した値を持つファンインに対して justify_primitive() を呼ぶ．
   /// @param[in] prim 対象のプリミティブ
   /// @param[in] node 対象のノード
+  /// @param[in] model SATの値の割り当て結果を収めた配列
   /// @param[in] val 値
   NodeList*
   jp_sub2(TpgPrimitive* prim,
 	  TpgNode* node,
+	  const vector<Bool3>& model,
 	  Bool3 val);
 
   /// @brief 新しいリストのセルを返す．

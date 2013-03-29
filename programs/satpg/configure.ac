@@ -166,10 +166,11 @@ AC_CONFIG_FILES([
 	src/fsim3/Makefile
 	src/fsimx/Makefile
 	src/fsimx2/Makefile
-	src/sat_engine/Makefile
-	src/bt/Makefile
-	src/dop/Makefile
-	src/uop/Makefile
+	src/dtpg/Makefile
+	src/dtpg/sat_engine/Makefile
+	src/dtpg/bt/Makefile
+	src/dtpg/dop/Makefile
+	src/dtpg/uop/Makefile
 	src/atpg_tclsh/Makefile
 	tclsrc/Makefile
 	])

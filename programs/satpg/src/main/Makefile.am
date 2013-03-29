@@ -12,12 +12,10 @@ libatpg_main_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/src \
-	$(GMP_INCLUDES)
+	-I$(top_srcdir)/src
 
 libatpg_main_la_SOURCES = \
-	AtpgMgr.cc \
-	DtpgSat.cc
+	AtpgMgr.cc
 
 libatpg_main_la_LDFLAGS =
 

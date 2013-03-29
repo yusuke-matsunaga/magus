@@ -30,13 +30,6 @@ BtBase::~BtBase()
 {
 }
 
-// @brief SAT の値割り当て用ベクタを返す．
-vector<Bool3>&
-BtBase::model()
-{
-  return mModel;
-}
-
 // @brief テストベクタを生成する．
 // @note 結果は mCurPattern に格納される．
 TestVector*
@@ -49,13 +42,15 @@ BtBase::new_vector()
 
 // @brief 入力ノードの値を記録する．
 // @param[in] node 対象の外部入力ノード
+// @param[in] model SAT の割り当て結果
 // @note node の値を mCurPattern に記録する．
 void
-BtBase::record_value(TpgNode* node)
+BtBase::record_value(TpgNode* node,
+		     const vector<Bool3>& model)
 {
   assert_cond( node->is_input(), __FILE__, __LINE__);
 
-  Bool3 v = node_gval(node);
+  Bool3 v = node_gval(node, model);
   ymuint iid = node->input_id();
   if ( v == kB3False ) {
     mCurPattern->set_val(iid, kVal0);

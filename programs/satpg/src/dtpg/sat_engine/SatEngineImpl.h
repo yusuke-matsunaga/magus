@@ -10,7 +10,7 @@
 /// All rights reserved.
 
 
-#include "SatEngine.h"
+#include "../SatEngine.h"
 #include "sat_engine_nsdef.h"
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
@@ -156,7 +156,10 @@ private:
   // SAT 用の assumption を格納するベクタ
   vector<Literal> mAssumptions;
 
-  // いくつかのフラグをまとめた配列
+  // SAT の結果を格納する配列
+  vector<Bool3> mModel;
+
+  // ノードごとのいくつかのフラグをまとめた配列
   vector<ymuint8> mMarkArray;
 
   // 故障の TFO のノードリスト
