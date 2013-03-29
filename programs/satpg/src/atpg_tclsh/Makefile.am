@@ -46,6 +46,9 @@ atpg_tclsh_SOURCES = \
 atpg_tclsh_LDADD = \
 	$(top_builddir)/src/main/libatpg_main.la \
 	$(top_builddir)/src/sat_engine/libatpg_sat_engine.la \
+	$(top_builddir)/src/bt/libatpg_bt.la \
+	$(top_builddir)/src/dop/libatpg_dop.la \
+	$(top_builddir)/src/uop/libatpg_uop.la \
 	$(top_builddir)/src/fsim2/libatpg_fsim2.la \
 	$(top_builddir)/src/fsim3/libatpg_fsim3.la \
 	$(top_builddir)/src/fsimx/libatpg_fsimx.la \

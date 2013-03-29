@@ -6,19 +6,21 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libatpg_main.la
+noinst_LTLIBRARIES = libatpg_uop.la
 
-libatpg_main_la_CPPFLAGS = \
+libatpg_uop_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src \
 	$(GMP_INCLUDES)
 
-libatpg_main_la_SOURCES = \
-	AtpgMgr.cc \
-	DtpgSat.cc
+libatpg_uop_la_SOURCES = \
+	UopBase.h \
+	UopBase.cc \
+	UopSkip.h \
+	UopSkip.cc
 
-libatpg_main_la_LDFLAGS =
+libatpg_uop_la_LDFLAGS =
 
-libatpg_main_la_LIBADD =
+libatpg_uop_la_LIBADD =
