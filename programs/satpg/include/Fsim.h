@@ -34,29 +34,29 @@ public:
   set_network(const TpgNetwork& network,
 	      FaultMgr& fault_mgr) = 0;
 
-  /// @brief 故障シミュレーションを行う．
+  /// @brief SPPFP故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
   /// @param[out] det_faults 検出された故障を格納するリスト
   virtual
   void
-  run(TestVector* tv,
-      vector<TpgFault*>& det_faults) = 0;
+  sppfp(TestVector* tv,
+	vector<TpgFault*>& det_faults) = 0;
 
-  /// @brief 故障シミュレーションを行う．
+  /// @brief PPSFP故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
   /// @param[out] det_faults 検出された故障を格納するリストの配列
   virtual
   void
-  run(const vector<TestVector*>& tv_array,
-      vector<vector<TpgFault*> >& det_faults) = 0;
+  ppsfp(const vector<TestVector*>& tv_array,
+	vector<vector<TpgFault*> >& det_faults) = 0;
 
-  /// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
+  /// @brief SPSFP故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
   /// @param[in] f 対象の故障
   virtual
   bool
-  run(TestVector* tv,
-      TpgFault* f) = 0;
+  spsfp(TestVector* tv,
+	TpgFault* f) = 0;
 
 };
 

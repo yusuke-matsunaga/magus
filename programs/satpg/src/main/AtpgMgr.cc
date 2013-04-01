@@ -182,7 +182,7 @@ AtpgMgr::rtpg(ymuint min_f,
       break;
     }
 
-    mFsim->run(cur_array, det_faults);
+    mFsim->ppsfp(cur_array, det_faults);
 
     ymuint det_count = 0;
     for (ymuint i = 0; i < cur_array.size(); ++ i) {
@@ -251,7 +251,7 @@ AtpgMgr::fsim(TestVector* tv,
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_FSIM);
 
-  mFsim->run(tv, det_faults);
+  mFsim->sppfp(tv, det_faults);
 
   ymuint det_count = det_faults.size();
   if ( det_count > 0 ) {
@@ -277,7 +277,7 @@ AtpgMgr::fsim(const vector<TestVector*>& tv_list,
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_FSIM);
 
-  mFsim->run(tv_list, det_faults_list);
+  mFsim->ppsfp(tv_list, det_faults_list);
 
   ymuint det_count = 0;
   for (ymuint i = 0; i < tv_list.size(); ++ i) {
@@ -310,7 +310,7 @@ AtpgMgr::fsim(TestVector* tv,
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_FSIM);
 
-  bool stat = mFsim->run(tv, f);
+  bool stat = mFsim->spsfp(tv, f);
   if ( stat ) {
     if ( f->status() == kFsUndetected ) {
       mFaultMgr.set_status(f, kFsDetected);

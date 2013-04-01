@@ -50,7 +50,7 @@ void
 DopDrop::operator()(TpgFault* f,
 		    TestVector* tv)
 {
-  mFsim.run(tv, mDetFaults);
+  mFsim.sppfp(tv, mDetFaults);
   for (vector<TpgFault*>::iterator p = mDetFaults.begin();
        p != mDetFaults.end(); ++ p) {
     TpgFault* f = *p;

@@ -298,12 +298,12 @@ Fsim3::set_network(const TpgNetwork& network,
   }
 }
 
-// @brief 故障シミュレーションを行う．
+// @brief SPPFP故障シミュレーションを行う．
 // @param[in] tv テストベクタ
 // @param[out] det_faults 検出された故障を格納するリスト
 void
-Fsim3::run(TestVector* tv,
-	   vector<TpgFault*>& det_faults)
+Fsim3::sppfp(TestVector* tv,
+	     vector<TpgFault*>& det_faults)
 {
   det_faults.clear();
 
@@ -359,28 +359,28 @@ Fsim3::run(TestVector* tv,
   clear_gval();
 }
 
-// @brief 故障シミュレーションを行う．
+// @brief PPSFP故障シミュレーションを行う．
 // @param[in] tv_array テストベクタの配列
 // @param[out] det_faults 検出された故障を格納するリストの配列
 void
-Fsim3::run(const vector<TestVector*>& tv_array,
-	   vector<vector<TpgFault*> >& det_faults)
+Fsim3::ppsfp(const vector<TestVector*>& tv_array,
+	     vector<vector<TpgFault*> >& det_faults)
 {
   ymuint nb = tv_array.size();
   assert_cond(det_faults.size() >= nb, __FILE__, __LINE__);
 
   // このクラスは複数パタンを扱えない．
   for (ymuint i = 0; i < nb; ++ i) {
-    run(tv_array[i], det_faults[i]);
+    sppfp(tv_array[i], det_faults[i]);
   }
 }
 
-// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
+// @brief SPSFP故障シミュレーションを行う．
 // @param[in] tv テストベクタ
 // @param[in] f 対象の故障
 bool
-Fsim3::run(TestVector* tv,
-	   TpgFault* f)
+Fsim3::spsfp(TestVector* tv,
+	     TpgFault* f)
 {
   ymuint npi = mNetwork->input_num2();
 

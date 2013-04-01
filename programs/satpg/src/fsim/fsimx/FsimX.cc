@@ -298,12 +298,12 @@ FsimX::set_network(const TpgNetwork& network,
   }
 }
 
-// @brief 故障シミュレーションを行う．
+// @brief SPPFP故障シミュレーションを行う．
 // @param[in] tv テストベクタ
 // @param[out] det_faults 検出された故障を格納するリスト
 void
-FsimX::run(TestVector* tv,
-	   vector<TpgFault*>& det_faults)
+FsimX::sppfp(TestVector* tv,
+	     vector<TpgFault*>& det_faults)
 {
   ymuint npi = mNetwork->input_num2();
 
@@ -393,12 +393,12 @@ FsimX::run(TestVector* tv,
   clear_gval();
 }
 
-// @brief 故障シミュレーションを行う．
+// @brief PPSFP故障シミュレーションを行う．
 // @param[in] tv_array テストベクタの配列
 // @param[out] det_faults 検出された故障を格納するリストの配列
 void
-FsimX::run(const vector<TestVector*>& tv_array,
-	   vector<vector<TpgFault*> >& det_faults)
+FsimX::ppsfp(const vector<TestVector*>& tv_array,
+	     vector<vector<TpgFault*> >& det_faults)
 {
   ymuint npi = mNetwork->input_num2();
   ymuint nb = tv_array.size();
@@ -531,12 +531,12 @@ FsimX::run(const vector<TestVector*>& tv_array,
   clear_gval();
 }
 
-// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
+// @brief SPSFP故障シミュレーションを行う．
 // @param[in] tv テストベクタ
 // @param[in] f 対象の故障
 bool
-FsimX::run(TestVector* tv,
-	   TpgFault* f)
+FsimX::spsfp(TestVector* tv,
+	     TpgFault* f)
 {
   ymuint npi = mNetwork->input_num2();
 

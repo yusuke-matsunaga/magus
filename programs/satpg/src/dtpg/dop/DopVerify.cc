@@ -46,7 +46,7 @@ void
 DopVerify::operator()(TpgFault* f,
 		      TestVector* tv)
 {
-  bool detect = mFsim.run(tv, f);
+  bool detect = mFsim.spsfp(tv, f);
   assert_cond( detect, __FILE__, __LINE__);
 }
 
