@@ -6,6 +6,7 @@ SUBDIRS = \
 	base \
 	main \
 	fsim \
+	fsim_old \
 	dtpg \
 	atpg_tclsh \
 	$(YM_EXTRA_SUBDIRS)
