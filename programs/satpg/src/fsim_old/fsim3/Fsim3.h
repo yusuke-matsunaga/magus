@@ -11,7 +11,7 @@
 
 
 #include "fsim3_nsdef.h"
-#include "Fsim.h"
+#include "FsimOld.h"
 #include "EventQ.h"
 #include "FsimFault.h"
 
@@ -26,7 +26,7 @@ class SimNode;
 /// @brief 故障シミュレーションを行うモジュール
 //////////////////////////////////////////////////////////////////////
 class Fsim3 :
-  public Fsim
+  public FsimOld
 {
 public:
 

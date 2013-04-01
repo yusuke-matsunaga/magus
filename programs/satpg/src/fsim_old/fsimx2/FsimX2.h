@@ -11,7 +11,7 @@
 
 
 #include "fsimx2_nsdef.h"
-#include "Fsim.h"
+#include "FsimOld.h"
 #include "PackedVal.h"
 #include "EventQ.h"
 #include "FsimFault.h"
@@ -28,7 +28,7 @@ class SimNode;
 /// @sa ModBase
 //////////////////////////////////////////////////////////////////////
 class FsimX2 :
-  public Fsim
+  public FsimOld
 {
 public:
 

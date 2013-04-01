@@ -6,7 +6,7 @@
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -51,21 +51,21 @@ public:
   set_network(const TpgNetwork& network,
 	      FaultMgr& fault_mgr);
 
-  /// @brief SPPFP故障シミュレーションを行う．
+  /// @brief ひとつのパタンで故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
-  /// @param[in] det_faults 検出された故障を格納するリスト
+  /// @param[in] dop_list DetectOp のリスト
   virtual
   void
   sppfp(TestVector* tv,
-	vector<TpgFault*>& det_faults);
+	const vector<DetectOp*>& dop_list);
 
-  /// @brief PPSFP故障シミュレーションを行う．
+  /// @brief 複数のパタンで故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
-  /// @param[in] det_faults 検出された故障を格納するリストの配列
+  /// @param[in] dop_list DetectOp のリスト
   virtual
   void
   ppsfp(const vector<TestVector*>& tv_array,
-	vector<vector<TpgFault*> >& det_faults);
+	const vector<DetectOp*>& dop_list);
 
   /// @brief SPSFP故障シミュレーションを行う．
   /// @param[in] tv テストベクタ

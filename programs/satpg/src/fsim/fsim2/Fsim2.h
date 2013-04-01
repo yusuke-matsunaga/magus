@@ -52,32 +52,6 @@ public:
   set_network(const TpgNetwork& network,
 	      FaultMgr& fault_mgr);
 
-  /// @brief SPPFP故障シミュレーションを行う．
-  /// @param[in] tv テストベクタ
-  /// @param[in] det_faults 検出された故障を格納するリスト
-  virtual
-  void
-  sppfp(TestVector* tv,
-	vector<TpgFault*>& det_faults);
-
-  /// @brief PPSFP故障シミュレーションを行う．
-  /// @param[in] tv_array テストベクタの配列
-  /// @param[in] det_faults 検出された故障を格納するリストの配列
-  virtual
-  void
-  ppsfp(const vector<TestVector*>& tv_array,
-	vector<vector<TpgFault*> >& det_faults);
-
-  /// @brief SPSFP故障シミュレーションを行う．
-  /// @param[in] tv テストベクタ
-  /// @param[in] f 対象の故障
-  /// @retval true 故障の検出が行えた．
-  /// @retval false 故障の検出が行えなかった．
-  virtual
-  bool
-  spsfp(TestVector* tv,
-	TpgFault* f);
-
   /// @brief ひとつのパタンで故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
   /// @param[in] dop_list DetectOp のリスト
@@ -93,6 +67,16 @@ public:
   void
   ppsfp(const vector<TestVector*>& tv_array,
 	const vector<DetectOp*>& dop_list);
+
+  /// @brief SPSFP故障シミュレーションを行う．
+  /// @param[in] tv テストベクタ
+  /// @param[in] f 対象の故障
+  /// @retval true 故障の検出が行えた．
+  /// @retval false 故障の検出が行えなかった．
+  virtual
+  bool
+  spsfp(TestVector* tv,
+	TpgFault* f);
 
 
 private:
@@ -115,7 +99,8 @@ private:
   /// @brief ffr 内の故障が検出可能か調べる．
   void
   fault_sweep(SimFFR* ffr,
-	      vector<TpgFault*>& det_faults);
+	      TestVector* tv,
+	      const vector<DetectOp*>& dop_list);
 
 
 private:

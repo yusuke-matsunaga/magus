@@ -15,6 +15,7 @@
 #include "FaultMgr.h"
 #include "TvMgr.h"
 #include "Fsim.h"
+#include "FsimOld.h"
 #include "Dtpg.h"
 #include "ym_cell/cell_nsdef.h"
 #include "ym_utils/Binder.h"
@@ -69,6 +70,14 @@ public:
   /// @brief 3値の故障シミュレータを返す．
   Fsim&
   _fsimx();
+
+  /// @brief 2値の故障シミュレータを取り出す．
+  FsimOld&
+  _fsimold();
+
+  /// @brief 3値の故障シミュレータを返す．
+  FsimOld&
+  _fsimoldx();
 
   /// @brief 統計情報をクリアする．
   void
@@ -220,6 +229,12 @@ private:
   // 3値の故障シミュレータ
   Fsim* mFsim3;
 
+  // 故障シミュレータ
+  FsimOld* mFsimOld;
+
+  // 3値の故障シミュレータ
+  FsimOld* mFsimOld3;
+
   // テストパタン生成器
   Dtpg* mDtpg;
 
@@ -282,6 +297,22 @@ Fsim&
 AtpgMgr::_fsimx()
 {
   return *mFsim3;
+}
+
+// @brief 2値の故障シミュレータを取り出す．
+inline
+FsimOld&
+AtpgMgr::_fsimold()
+{
+  return *mFsimOld;
+}
+
+// @brief 3値の故障シミュレータを返す．
+inline
+FsimOld&
+AtpgMgr::_fsimoldx()
+{
+  return *mFsimOld3;
 }
 
 // @brief ネットワークの変更に関するハンドラを登録する．

@@ -13,7 +13,7 @@
 
 
 #include "fsimx_nsdef.h"
-#include "Fsim.h"
+#include "FsimOld.h"
 #include "PackedVal.h"
 #include "EventQ.h"
 #include "FsimFault.h"
@@ -30,7 +30,7 @@ class SimNode;
 /// @sa ModBase
 //////////////////////////////////////////////////////////////////////
 class FsimX :
-  public Fsim
+  public FsimOld
 {
 public:
 

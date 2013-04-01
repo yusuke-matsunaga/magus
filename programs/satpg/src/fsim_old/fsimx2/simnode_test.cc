@@ -1006,7 +1006,7 @@ int
 main(int argc,
      const char** argv)
 {
-  if ( nsYm::nsSatpg::nsFsimX2:: simnode_test() ) {
+  if ( nsYm::nsSatpg::nsFsimOldX2:: simnode_test() ) {
     return 1;
   }
   return 0;

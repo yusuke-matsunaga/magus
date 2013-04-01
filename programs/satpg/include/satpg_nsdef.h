@@ -113,6 +113,7 @@ class TvMgr;
 class Dtpg;
 class DtpgStats;
 class Fsim;
+class FsimOld;
 
 END_NAMESPACE_YM_SATPG
 

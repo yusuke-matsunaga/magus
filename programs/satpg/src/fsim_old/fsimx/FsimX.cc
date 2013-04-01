@@ -21,10 +21,10 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
-Fsim*
-new_FsimX()
+FsimOld*
+new_FsimOldX()
 {
-  return new nsFsimX::FsimX();
+  return new nsFsimOldX::FsimX();
 }
 
 END_NAMESPACE_YM_SATPG

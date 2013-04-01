@@ -1,8 +1,8 @@
-#ifndef OPDETECT_H
-#define OPDETECT_H
+#ifndef RTPGOP_H
+#define RTPGOP_H
 
-/// @file DopDrop.h
-/// @brief DopDrop のヘッダファイル
+/// @file RtpgOp.h
+/// @brief RtpgOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -15,23 +15,20 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class DopDrop DopDrop.h "DopDrop.h"
-/// @brief 故障シミュレーションを行なった故障ドロップを行なうクラス
+/// @class RtpgOp RtpgOp.h "RtpgOp.h"
+/// @brief rtpg 用の DetectOp
 //////////////////////////////////////////////////////////////////////
-class DopDrop :
+class RtpgOp :
   public DetectOp
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] fmgr 故障マネージャ
-  /// @param[in] fsim 故障シミュレータ
-  DopDrop(FaultMgr& fmgr,
-	  FsimOld& fsim);
+  RtpgOp();
 
   /// @brief デストラクタ
   virtual
-  ~DopDrop();
+  ~RtpgOp();
 
 
 public:
@@ -47,23 +44,19 @@ public:
   operator()(TpgFault* f,
 	     TestVector* tv);
 
+  /// @brief テストベクタを設定する．
+  void
+  set_tv(const vector<TestVector*>& tv_list);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 故障マネージャ
-  FaultMgr& mMgr;
-
-  // 故障シミュレータ
-  FsimOld& mFsim;
-
-  // 検出された故障を入れるリスト
-  vector<TpgFault*> mDetFaults;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // OPDETECT_H
+#endif // RTPGOP_H

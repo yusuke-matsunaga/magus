@@ -298,6 +298,7 @@ FsimX2::set_network(const TpgNetwork& network,
   }
 }
 
+#if 0
 // @brief SPPFP故障シミュレーションを行う．
 // @param[in] tv テストベクタ
 // @param[in] det_faults 検出された故障を格納するリスト
@@ -531,6 +532,25 @@ FsimX2::ppsfp(const vector<TestVector*>& tv_array,
 
   // 値をクリアする．
   clear_gval();
+}
+#endif
+
+// @brief ひとつのパタンで故障シミュレーションを行う．
+// @param[in] tv テストベクタ
+// @param[in] dop_list DetectOp のリスト
+void
+FsimX2::sppfp(TestVector* tv,
+	      const vector<DetectOp*>& dop_list)
+{
+}
+
+// @brief 複数のパタンで故障シミュレーションを行う．
+// @param[in] tv_array テストベクタの配列
+// @param[in] dop_list DetectOp のリスト
+void
+FsimX2::ppsfp(const vector<TestVector*>& tv_array,
+	      const vector<DetectOp*>& dop_list)
+{
 }
 
 // @brief SPSFP故障シミュレーションを行う．
