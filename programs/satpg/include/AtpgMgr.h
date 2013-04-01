@@ -118,29 +118,6 @@ public:
        ymuint max_pat,
        RtpgStats& stats);
 
-  /// @brief 一つのテストベクタに対する故障シミュレーションを行なう．
-  /// @param[in] tv テストベクタ
-  /// @param[out] det_faults 検出された故障を格納するリスト
-  void
-  fsim(TestVector* tv,
-       vector<TpgFault*>& det_faults);
-
-  /// @brief 複数のテストベクタに対する故障シミュレーションを行なう．
-  /// @param[in] tv_list テストベクタのリスト
-  /// @param[out] det_faults 検出された故障を格納するリストのリスト
-  void
-  fsim(const vector<TestVector*>& tv_list,
-       vector<vector<TpgFault*> >& det_faults_list);
-
-  /// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
-  /// @param[in] tv テストベクタ
-  /// @param[in] f 対象の故障
-  /// @retval true tv で f の検出ができた．
-  /// @retval false tv では f の検出ができない．
-  bool
-  fsim(TestVector* tv,
-       TpgFault* f);
-
 
 public:
   //////////////////////////////////////////////////////////////////////

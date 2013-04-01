@@ -300,7 +300,7 @@ Fsim3::set_network(const TpgNetwork& network,
 
 // @brief SPPFP故障シミュレーションを行う．
 // @param[in] tv テストベクタ
-// @param[out] det_faults 検出された故障を格納するリスト
+// @param[in] det_faults 検出された故障を格納するリスト
 void
 Fsim3::sppfp(TestVector* tv,
 	     vector<TpgFault*>& det_faults)
@@ -361,7 +361,7 @@ Fsim3::sppfp(TestVector* tv,
 
 // @brief PPSFP故障シミュレーションを行う．
 // @param[in] tv_array テストベクタの配列
-// @param[out] det_faults 検出された故障を格納するリストの配列
+// @param[in] det_faults 検出された故障を格納するリストの配列
 void
 Fsim3::ppsfp(const vector<TestVector*>& tv_array,
 	     vector<vector<TpgFault*> >& det_faults)
@@ -378,6 +378,8 @@ Fsim3::ppsfp(const vector<TestVector*>& tv_array,
 // @brief SPSFP故障シミュレーションを行う．
 // @param[in] tv テストベクタ
 // @param[in] f 対象の故障
+// @retval true 故障の検出が行えた．
+// @retval false 故障の検出が行えなかった．
 bool
 Fsim3::spsfp(TestVector* tv,
 	     TpgFault* f)
