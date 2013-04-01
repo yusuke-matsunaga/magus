@@ -78,6 +78,22 @@ public:
   spsfp(TestVector* tv,
 	TpgFault* f);
 
+  /// @brief ひとつのパタンで故障シミュレーションを行う．
+  /// @param[in] tv テストベクタ
+  /// @param[in] dop_list DetectOp のリスト
+  virtual
+  void
+  sppfp(TestVector* tv,
+	const vector<DetectOp*>& dop_list);
+
+  /// @brief 複数のパタンで故障シミュレーションを行う．
+  /// @param[in] tv_array テストベクタの配列
+  /// @param[in] dop_list DetectOp のリスト
+  virtual
+  void
+  ppsfp(const vector<TestVector*>& tv_array,
+	const vector<DetectOp*>& dop_list);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
