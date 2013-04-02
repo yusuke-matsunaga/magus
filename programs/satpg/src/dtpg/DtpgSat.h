@@ -58,24 +58,15 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop_list DetectOp のリスト
   /// @param[in] uop_list UntestOp のリスト
+  /// @param[in] stats 結果を格納する構造体
   virtual
   void
   run(tDtpgMode mode,
       tDtpgPoMode po_mode,
       BackTracer& bt,
       const vector<DetectOp*>& dop_list,
-      const vector<UntestOp*>& uop_list);
-
-  /// @brief 統計情報をクリアする．
-  virtual
-  void
-  clear_stats();
-
-  /// @brief 統計情報を得る．
-  /// @param[in] stats 結果を格納する構造体
-  virtual
-  void
-  get_stats(DtpgStats& stats) const;
+      const vector<UntestOp*>& uop_list,
+      DtpgStats& stats);
 
   /// @breif 時間計測を制御する．
   virtual
@@ -223,23 +214,6 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief 統計情報をクリアする．
-inline
-void
-DtpgSat::clear_stats()
-{
-  mSatEngine->clear_stats();
-}
-
-// @brief 統計情報を得る．
-// @param[in] stats 結果を格納する構造体
-inline
-void
-DtpgSat::get_stats(DtpgStats& stats) const
-{
-  mSatEngine->get_stats(stats);
-}
 
 // @breif 時間計測を制御する．
 inline

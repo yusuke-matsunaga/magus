@@ -419,12 +419,13 @@ AtpgMgr::dtpg(tDtpgMode mode,
 	      tDtpgPoMode po_mode,
 	      BackTracer& bt,
 	      const vector<DetectOp*>& dop_list,
-	      const vector<UntestOp*>& uop_list)
+	      const vector<UntestOp*>& uop_list,
+	      DtpgStats& stats)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->run(mode, po_mode, bt, dop_list, uop_list);
+  mDtpg->run(mode, po_mode, bt, dop_list, uop_list, stats);
 
   mTimer.change(old_id);
 }
@@ -462,20 +463,6 @@ USTime
 AtpgMgr::misc_time() const
 {
   return mTimer.time(TM_MISC);
-}
-
-// @brief 統計情報をクリアする．
-void
-AtpgMgr::clear_stats()
-{
-  mDtpg->clear_stats();
-}
-
-// @brief 統計情報を得る．
-void
-AtpgMgr::get_stats(DtpgStats& stats)
-{
-  mDtpg->get_stats(stats);
 }
 
 // @brief ネットワークをセットした後に呼ぶ関数

@@ -79,15 +79,6 @@ public:
   FsimOld&
   _fsimoldx();
 
-  /// @brief 統計情報をクリアする．
-  void
-  clear_stats();
-
-  /// @brief 統計情報を得る．
-  /// @param[in] stats 結果を格納する構造体
-  void
-  get_stats(DtpgStats& stats);
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -160,12 +151,14 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop_list DetectOp のリスト
   /// @param[in] uop_list UntestOp のリスト
+  /// @param[in] stats 結果を格納する構造体
   void
   dtpg(tDtpgMode mode,
        tDtpgPoMode po_mode,
        BackTracer& bt,
        const vector<DetectOp*>& dop_list,
-       const vector<UntestOp*>& uop_list);
+       const vector<UntestOp*>& uop_list,
+       DtpgStats& stats);
 
 
 public:

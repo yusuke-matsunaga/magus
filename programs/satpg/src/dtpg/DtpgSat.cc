@@ -61,16 +61,22 @@ DtpgSat::set_network(TpgNetwork& tgnetwork)
 // @brief テスト生成を行なう．
 // @param[in] mode メインモード
 // @param[in] po_mode PO分割モード
-// @param[in] bt バックトラッカー
+// @param[in] bt バックトレーサー
+// @param[in] dop_list DetectOp のリスト
+// @param[in] uop_list UntestOp のリスト
+// @param[in] stats 結果を格納する構造体
 void
 DtpgSat::run(tDtpgMode mode,
 	     tDtpgPoMode po_mode,
 	     BackTracer& bt,
 	     const vector<DetectOp*>& dop_list,
-	     const vector<UntestOp*>& uop_list)
+	     const vector<UntestOp*>& uop_list,
+	     DtpgStats& stats)
 {
   mDetectOpList = dop_list;
   mUntestOpList = uop_list;
+
+  mSatEngine->clear_stats();
 
   switch ( po_mode ) {
   case kDtpgPoNone:
@@ -168,6 +174,8 @@ DtpgSat::run(tDtpgMode mode,
     }
     break;
   }
+
+  mSatEngine->get_stats(stats);
 }
 
 // @brief テストパタンが見つかった場合に呼ばれる関数

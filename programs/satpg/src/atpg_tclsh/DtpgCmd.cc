@@ -171,8 +171,6 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   mgr().set_dtpg_timer(print_stats);
 #endif
 
-  mgr().clear_stats();
-
   tDtpgPoMode po_mode = kDtpgPoNone;
   if ( po_flag ) {
     po_mode = kDtpgPoInc;
@@ -181,7 +179,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     po_mode = kDtpgPoDec;
   }
 
-  mgr().dtpg(mode, po_mode, *bt, dop_list, uop_list);
+  DtpgStats stats;
+
+  mgr().dtpg(mode, po_mode, *bt, dop_list, uop_list, stats);
 
   for (vector<DetectOp*>::iterator p = dop_list.begin();
        p != dop_list.end(); ++ p) {
@@ -195,9 +195,6 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   after_update_faults();
 
   if ( print_stats ) {
-    DtpgStats stats;
-    mgr().get_stats(stats);
-
     ios::fmtflags save = cout.flags();
     cout.setf(ios::fixed, ios::floatfield);
     if ( stats.mCnfGenCount > 0 ) {

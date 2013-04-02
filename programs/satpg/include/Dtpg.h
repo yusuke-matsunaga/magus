@@ -52,24 +52,15 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop_list DetectOp のリスト
   /// @param[in] uop_list UntestOp のリスト
+  /// @param[in] stats 結果を格納する構造体
   virtual
   void
   run(tDtpgMode mode,
       tDtpgPoMode po_mode,
       BackTracer& bt,
       const vector<DetectOp*>& dop_list,
-      const vector<UntestOp*>& uop_list) = 0;
-
-  /// @brief 統計情報をクリアする．
-  virtual
-  void
-  clear_stats() = 0;
-
-  /// @brief 統計情報を得る．
-  /// @param[in] stats 結果を格納する構造体
-  virtual
-  void
-  get_stats(DtpgStats& stats) const = 0;
+      const vector<UntestOp*>& uop_list,
+      DtpgStats& stats) = 0;
 
   /// @breif 時間計測を制御する．
   virtual
