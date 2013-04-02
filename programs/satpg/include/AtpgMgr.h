@@ -127,6 +127,17 @@ public:
        ymuint max_pat,
        RtpgStats& stats);
 
+  /// @brief 乱数パタンを用いた故障シミュレーションを行なう．
+  /// @param[in] min_f 1回のシミュレーションで検出する故障数の下限
+  /// @param[in] max_i 故障検出できないシミュレーション回数の上限
+  /// @param[in] max_pat 最大のパタン数
+  /// @param[in] stats 実行結果の情報を格納する変数
+  void
+  rtpg_old(ymuint min_f,
+	   ymuint max_i,
+	   ymuint max_pat,
+	   RtpgStats& stats);
+
 
 public:
   //////////////////////////////////////////////////////////////////////

@@ -15,6 +15,7 @@ libatpg_fsimx_la_CPPFLAGS = \
 
 libatpg_fsimx_la_SOURCES = \
 	fsimx_nsdef.h \
+	PackedVal3.h \
 	EqElem.h \
 	SimNode.h \
 	SimNode.cc \

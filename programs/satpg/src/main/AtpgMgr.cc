@@ -204,6 +204,7 @@ AtpgMgr::rtpg(ymuint min_f,
   StopWatch local_timer;
   local_timer.start();
 
+#if 0
   ymuint fnum = mFaultMgr.remain_num();
   ymuint undet_i = 0;
   ymuint epat_num = 0;
@@ -232,7 +233,7 @@ AtpgMgr::rtpg(ymuint min_f,
       break;
     }
 
-    mFsimOld->ppsfp(cur_array, det_faults);
+    mFsim->ppsfp(cur_array, det_faults);
 
     ymuint det_count = 0;
     for (ymuint i = 0; i < cur_array.size(); ++ i) {
@@ -277,7 +278,6 @@ AtpgMgr::rtpg(ymuint min_f,
       }
     }
   }
-
   // 後始末
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
     mTvMgr.delete_vector(tv_array[i]);
@@ -287,6 +287,7 @@ AtpgMgr::rtpg(ymuint min_f,
   stats.mPatNum = pat_num;
   stats.mEfPatNum = epat_num;
   stats.mTime = local_timer.time();
+#endif
 
   mTimer.change(old_id);
 }
