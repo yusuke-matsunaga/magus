@@ -116,6 +116,8 @@ class Rtpg;
 class RtpgStats;
 class Fsim;
 class FsimOld;
+class FsimOp1;
+class FsimOp2;
 
 END_NAMESPACE_YM_SATPG
 

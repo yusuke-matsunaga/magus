@@ -36,19 +36,19 @@ public:
 
   /// @brief ひとつのパタンで故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
-  /// @param[in] dop_list DetectOp のリスト
+  /// @param[in] op_list FsimOp1 のリスト
   virtual
   void
   sppfp(TestVector* tv,
-	const vector<DetectOp*>& dop_list) = 0;
+	const vector<FsimOp1*>& op_list) = 0;
 
   /// @brief 複数のパタンで故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
-  /// @param[in] dop_list DetectOp のリスト
+  /// @param[in] op_list FsimOp2 のリスト
   virtual
   void
   ppsfp(const vector<TestVector*>& tv_array,
-	const vector<DetectOp*>& dop_list) = 0;
+	const vector<FsimOp2*>& dop_list) = 0;
 
   /// @brief SPSFP故障シミュレーションを行う．
   /// @param[in] tv テストベクタ

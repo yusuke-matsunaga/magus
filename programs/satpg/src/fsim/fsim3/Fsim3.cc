@@ -299,67 +299,6 @@ Fsim3::set_network(const TpgNetwork& network,
 }
 
 #if 0
-// @brief SPPFP故障シミュレーションを行う．
-// @param[in] tv テストベクタ
-// @param[in] det_faults 検出された故障を格納するリスト
-void
-Fsim3::sppfp(TestVector* tv,
-	     vector<TpgFault*>& det_faults)
-{
-  det_faults.clear();
-
-  ymuint npi = mNetwork->input_num2();
-  for (ymuint i = 0; i < npi; ++ i) {
-    SimNode* simnode = mInputArray[i];
-    simnode->set_gval(tv->val3(i));
-  }
-
-  // 正常値の計算を行う．
-  calc_gval();
-
-  // FFR ごとに処理を行う．
-  for (vector<SimFFR>::iterator p = mFFRArray.begin();
-       p != mFFRArray.end(); ++ p) {
-    SimFFR& ffr = *p;
-    if ( ffr.fault_list().empty() ) continue;
-
-    SimNode* root = ffr.root();
-    Val3 gval = root->gval();
-
-    // FFR の根の値が X なら故障の検出はできない．
-    if ( gval == kValX ) continue;
-
-    // FFR 内の故障伝搬を行う．
-    // 結果は Fsim3Fault.mObsMask に保存される．
-    // FFR 内の全ての obs マスクを ffr_req に入れる．
-    // 検出済みの故障は ffr->fault_list() から取り除かれる．
-    bool ffr_req = ffr_simulate(ffr);
-
-    // ffr_req が 0 ならその後のシミュレーションを行う必要はない．
-    if ( ffr_req == false ) {
-      continue;
-    }
-
-    if ( !root->is_output() ) {
-      // ffr から外部出力までの故障シミュレーションを行う．
-      bool obs = calc_fval(root);
-      if ( !obs ) {
-	continue;
-      }
-    }
-
-    for (vector<FsimFault*>::iterator p = mDetFaults.begin();
-	 p != mDetFaults.end(); ++ p) {
-      FsimFault* ff = *p;
-      TpgFault* f = ff->mOrigF;
-      det_faults.push_back(f);
-    }
-  }
-
-  // 値をクリアする．
-  clear_gval();
-}
-
 // @brief PPSFP故障シミュレーションを行う．
 // @param[in] tv_array テストベクタの配列
 // @param[in] det_faults 検出された故障を格納するリストの配列
@@ -379,19 +318,19 @@ Fsim3::ppsfp(const vector<TestVector*>& tv_array,
 
 // @brief ひとつのパタンで故障シミュレーションを行う．
 // @param[in] tv テストベクタ
-// @param[in] dop_list DetectOp のリスト
+// @param[in] op_list FsimOp のリスト
 void
 Fsim3::sppfp(TestVector* tv,
-	     const vector<DetectOp*>& dop_list)
+	     const vector<FsimOp1*>& op_list)
 {
 }
 
 // @brief 複数のパタンで故障シミュレーションを行う．
 // @param[in] tv_array テストベクタの配列
-// @param[in] dop_list DetectOp のリスト
+// @param[in] op_list FsimOp のリスト
 void
 Fsim3::ppsfp(const vector<TestVector*>& tv_array,
-	     const vector<DetectOp*>& dop_list)
+	     const vector<FsimOp2*>& op_list)
 {
 }
 

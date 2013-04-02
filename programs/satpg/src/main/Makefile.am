@@ -17,7 +17,9 @@ libatpg_main_la_CPPFLAGS = \
 libatpg_main_la_SOURCES = \
 	AtpgMgr.cc \
 	RtpgOld.h \
-	RtpgOld.cc
+	RtpgOld.cc \
+	RtpgImpl.h \
+	RtpgImpl.cc
 
 libatpg_main_la_LDFLAGS =
 
