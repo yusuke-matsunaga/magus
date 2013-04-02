@@ -100,6 +100,10 @@ public:
   // 故障シミュレーションを行なう関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 乱数生成器を初期化する．
+  void
+  rtpg_init(ymuint32 seed);
+
   /// @brief 乱数パタンを用いた故障シミュレーションを行なう．
   /// @param[in] min_f 1回のシミュレーションで検出する故障数の下限
   /// @param[in] max_i 故障検出できないシミュレーション回数の上限
@@ -231,6 +235,12 @@ private:
 
   // 3値の故障シミュレータ
   FsimOld* mFsimOld3;
+
+  // RTPG
+  Rtpg* mRtpg;
+
+  // RTPG
+  Rtpg* mRtpgOld;
 
   // テストパタン生成器
   Dtpg* mDtpg;

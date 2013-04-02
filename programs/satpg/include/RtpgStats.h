@@ -22,8 +22,6 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 class RtpgStats
 {
-  friend class AtpgMgr;
-
 public:
 
   /// @brief コンストラクタ
@@ -31,6 +29,19 @@ public:
 
   /// @brief デストラクタ
   ~RtpgStats();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 情報を設定する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 情報を設定する関数
+  void
+  set(ymuint det_num,
+      ymuint pat_num,
+      ymuint epat_num,
+      USTime time);
 
 
 public:
@@ -78,6 +89,20 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief 情報を設定する関数
+inline
+void
+RtpgStats::set(ymuint det_num,
+	       ymuint pat_num,
+	       ymuint epat_num,
+	       USTime time)
+{
+  mDetectNum = det_num;
+  mPatNum = pat_num;
+  mEfPatNum = epat_num;
+  mTime = time;
+}
 
 // @brief コンストラクタ
 inline

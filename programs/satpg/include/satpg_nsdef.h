@@ -112,6 +112,7 @@ class TestVector;
 class TvMgr;
 class Dtpg;
 class DtpgStats;
+class Rtpg;
 class RtpgStats;
 class Fsim;
 class FsimOld;

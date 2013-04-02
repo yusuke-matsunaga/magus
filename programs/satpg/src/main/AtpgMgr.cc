@@ -15,6 +15,7 @@
 #include "TvMgr.h"
 #include "Fsim.h"
 #include "FsimOld.h"
+#include "RtpgOld.h"
 #include "Dtpg.h"
 #include "BackTracer.h"
 #include "DetectOp.h"
@@ -127,6 +128,8 @@ AtpgMgr::AtpgMgr() :
   mFsimOld = new_FsimOld2();
   mFsimOld3 = new_FsimOldX2();
 
+  mRtpg = new_RtpgOld(*this);
+  mRtpgOld = new_RtpgOld(*this);
   mDtpg = new_DtpgSat();
 
   mNetwork = NULL;
@@ -149,6 +152,8 @@ AtpgMgr::~AtpgMgr()
   delete mFsim3;
   delete mFsimOld;
   delete mFsimOld3;
+  delete mRtpg;
+  delete mRtpgOld;
   delete mDtpg;
   delete mNetwork;
 }
@@ -197,6 +202,13 @@ AtpgMgr::read_iscas89(const string& filename)
   return mNetwork != NULL;
 }
 
+// @brief 乱数生成器を初期化する．
+void
+AtpgMgr::rtpg_init(ymuint32 seed)
+{
+  mRtpg->init(seed);
+}
+
 // @brief 乱数パタンを用いた故障シミュレーションを行なう．
 // @param[in] min_f 1回のシミュレーションで検出する故障数の下限
 // @param[in] max_i 故障検出できないシミュレーション回数の上限
@@ -211,93 +223,7 @@ AtpgMgr::rtpg(ymuint min_f,
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_FSIM);
 
-  StopWatch local_timer;
-  local_timer.start();
-
-#if 0
-  ymuint fnum = mFaultMgr.remain_num();
-  ymuint undet_i = 0;
-  ymuint epat_num = 0;
-  ymuint total_det_count = 0;
-
-  TestVector* tv_array[kPvBitLen];
-  for (ymuint i = 0; i < kPvBitLen; ++ i) {
-    tv_array[i] = mTvMgr.new_vector();
-  }
-
-  vector<TestVector*> cur_array;
-  cur_array.reserve(kPvBitLen);
-
-  ymuint pat_num = 0;
-  for ( ; ; ) {
-    if ( pat_num < max_pat ) {
-      TestVector* tv = tv_array[cur_array.size()];
-      tv->set_from_random(mPatGen);
-      cur_array.push_back(tv);
-      ++ pat_num;
-      if ( cur_array.size() < kPvBitLen ) {
-	continue;
-      }
-    }
-    else if ( cur_array.empty() ) {
-      break;
-    }
-
-    mFsim->ppsfp(cur_array, det_faults);
-
-    ymuint det_count = 0;
-    for (ymuint i = 0; i < cur_array.size(); ++ i) {
-      ymuint det_count1 = det_faults[i].size();
-      if ( det_count1 ) {
-	det_count += det_count1;
-	TestVector* tv = cur_array[i];
-	mTvList.push_back(tv);
-	tv_array[i] = mTvMgr.new_vector();
-	++ epat_num;
-	for (vector<TpgFault*>::iterator p = det_faults[i].begin();
-	     p != det_faults[i].end(); ++ p) {
-	  TpgFault* f = *p;
-	  if ( f->status() == kFsUndetected ) {
-	    mFaultMgr.set_status(f, kFsDetected);
-	  }
-	}
-      }
-    }
-    cur_array.clear();
-
-    mFaultMgr.update();
-
-    total_det_count += det_count;
-
-    if ( total_det_count == fnum ) {
-      // 全ての故障を検出した．
-      break;
-    }
-    if ( det_count < min_f ) {
-      // 一回の故障検出数が下限を下回った．
-      break;
-    }
-    if ( det_count > 0 ) {
-      undet_i = 0;
-    }
-    else {
-      ++ undet_i;
-      if ( undet_i > max_i ) {
-	// 未検出の回数が上限を越えた．
-	break;
-      }
-    }
-  }
-  // 後始末
-  for (ymuint i = 0; i < kPvBitLen; ++ i) {
-    mTvMgr.delete_vector(tv_array[i]);
-  }
-
-  stats.mDetectNum = total_det_count;
-  stats.mPatNum = pat_num;
-  stats.mEfPatNum = epat_num;
-  stats.mTime = local_timer.time();
-#endif
+  mRtpg->run(min_f, max_i, max_pat, stats);
 
   mTimer.change(old_id);
 }
@@ -316,93 +242,7 @@ AtpgMgr::rtpg_old(ymuint min_f,
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_FSIM);
 
-  StopWatch local_timer;
-  local_timer.start();
-
-  ymuint fnum = mFaultMgr->remain_num();
-  ymuint undet_i = 0;
-  ymuint epat_num = 0;
-  ymuint total_det_count = 0;
-
-  TestVector* tv_array[kPvBitLen];
-  for (ymuint i = 0; i < kPvBitLen; ++ i) {
-    tv_array[i] = mTvMgr->new_vector();
-  }
-
-  vector<TestVector*> cur_array;
-  cur_array.reserve(kPvBitLen);
-  vector<vector<TpgFault*> > det_faults(kPvBitLen);
-
-  ymuint pat_num = 0;
-  for ( ; ; ) {
-    if ( pat_num < max_pat ) {
-      TestVector* tv = tv_array[cur_array.size()];
-      tv->set_from_random(mPatGen);
-      cur_array.push_back(tv);
-      ++ pat_num;
-      if ( cur_array.size() < kPvBitLen ) {
-	continue;
-      }
-    }
-    else if ( cur_array.empty() ) {
-      break;
-    }
-
-    mFsimOld->ppsfp(cur_array, det_faults);
-
-    ymuint det_count = 0;
-    for (ymuint i = 0; i < cur_array.size(); ++ i) {
-      ymuint det_count1 = det_faults[i].size();
-      if ( det_count1 ) {
-	det_count += det_count1;
-	TestVector* tv = cur_array[i];
-	mTvList.push_back(tv);
-	tv_array[i] = mTvMgr->new_vector();
-	++ epat_num;
-	for (vector<TpgFault*>::iterator p = det_faults[i].begin();
-	     p != det_faults[i].end(); ++ p) {
-	  TpgFault* f = *p;
-	  if ( f->status() == kFsUndetected ) {
-	    mFaultMgr->set_status(f, kFsDetected);
-	  }
-	}
-      }
-    }
-    cur_array.clear();
-
-    mFaultMgr->update();
-
-    total_det_count += det_count;
-
-    if ( total_det_count == fnum ) {
-      // 全ての故障を検出した．
-      break;
-    }
-    if ( det_count < min_f ) {
-      // 一回の故障検出数が下限を下回った．
-      break;
-    }
-    if ( det_count > 0 ) {
-      undet_i = 0;
-    }
-    else {
-      ++ undet_i;
-      if ( undet_i > max_i ) {
-	// 未検出の回数が上限を越えた．
-	break;
-      }
-    }
-  }
-
-  // 後始末
-  for (ymuint i = 0; i < kPvBitLen; ++ i) {
-    mTvMgr->delete_vector(tv_array[i]);
-  }
-
-  stats.mDetectNum = total_det_count;
-  stats.mPatNum = pat_num;
-  stats.mEfPatNum = epat_num;
-  stats.mTime = local_timer.time();
+  mRtpgOld->run(min_f, max_i, max_pat, stats);
 
   mTimer.change(old_id);
 }

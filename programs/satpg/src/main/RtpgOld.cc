@@ -1,5 +1,5 @@
 
-/// @file src/main/Rtpg.cc
+/// @file RtpgOld.cc
 /// @brief Rtpg の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,65 +7,93 @@
 /// All rights reserved.
 
 
-#include "Rtpg.h"
+#include "RtpgOld.h"
 #include "AtpgMgr.h"
+#include "FaultMgr.h"
+#include "TvMgr.h"
+#include "TestVector.h"
+#include "FsimOld.h"
+#include "RtpgStats.h"
 #include "ym_utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
+Rtpg*
+new_RtpgOld(AtpgMgr& mgr)
+{
+  return new RtpgOld(mgr._fault_mgr(), mgr._tv_mgr(),
+		     mgr._tv_list(), mgr._fsimold());
+}
+
+
 //////////////////////////////////////////////////////////////////////
-// クラス Rtpg
+// クラス RtpgOld
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-Rtpg::Rtpg(AtpgMgr* mgr) :
-  mAtpgMgr(mgr)
+// @param[in] fmgr 故障マネージャ
+// @param[in] tvmgr テストベクタマネージャ
+// @param[in] tvlist テストベクタのリスト
+// @param[in] fsim 故障シミュレータ
+RtpgOld::RtpgOld(FaultMgr& fmgr,
+		 TvMgr& tvmgr,
+		 vector<TestVector*>& tvlist,
+		 FsimOld& fsim) :
+  mFaultMgr(fmgr),
+  mTvMgr(tvmgr),
+  mTvList(tvlist),
+  mFsim(fsim)
 {
 }
 
 // @brief デストラクタ
-Rtpg::~Rtpg()
+RtpgOld::~RtpgOld()
 {
 }
 
-// @brief ランダムパタンを用いた故障シミュレーションを行う．
+// @brief 乱数生成器を初期化する．
+// @param[in] seed 乱数の種
+void
+RtpgOld::init(ymuint32 seed)
+{
+  mRandGen.init(seed);
+}
+
+// @brief RTPGを行なう．
 // @param[in] min_f 1回のシミュレーションで検出する故障数の下限
 // @param[in] max_i 故障検出できないシミュレーション回数の上限
 // @param[in] max_pat 最大のパタン数
-// @param[in] randgen 乱数発生器
+// @param[in] stats 実行結果の情報を格納する変数
 void
-Rtpg::operator()(ymuint min_f,
-		 ymuint max_i,
-		 ymuint max_pat)
+RtpgOld::run(ymuint min_f,
+	     ymuint max_i,
+	     ymuint max_pat,
+	     RtpgStats& stats)
 {
   StopWatch local_timer;
 
   local_timer.start();
 
-  const FaultMgr& fault_mgr = mAtpgMgr->_fault_mgr();
-  TvMgr& tv_mgr = mAtpgMgr->_tv_mgr();
-  vector<TestVector*>& tv_list = mAtpgMgr->_tv_list();
-
-  ymuint fnum = fault_mgr.remain_list().size();
+  ymuint fnum = mFaultMgr.remain_list().size();
   ymuint undet_i = 0;
   ymuint epat_num = 0;
   ymuint total_det_count = 0;
 
   TestVector* tv_array[kPvBitLen];
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
-    tv_array[i] = tv_mgr.new_vector();
+    tv_array[i] = mTvMgr.new_vector();
   }
 
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
-  vector<vector<SaFault*> > det_faults(kPvBitLen);
+  vector<vector<TpgFault*> > det_faults(kPvBitLen);
 
   ymuint pat_num = 0;
   for ( ; ; ) {
     if ( pat_num < max_pat ) {
       TestVector* tv = tv_array[cur_array.size()];
-      tv->set_from_random(mPatGen);
+      tv->set_from_random(mRandGen);
       cur_array.push_back(tv);
       ++ pat_num;
       if ( cur_array.size() < kPvBitLen ) {
@@ -76,7 +104,7 @@ Rtpg::operator()(ymuint min_f,
       break;
     }
 
-    mAtpgMgr->fsim(cur_array, det_faults);
+    mFsim.ppsfp(cur_array, det_faults);
 
     ymuint det_count = 0;
     for (ymuint i = 0; i < cur_array.size(); ++ i) {
@@ -84,9 +112,16 @@ Rtpg::operator()(ymuint min_f,
       if ( det_count1 > 0 ) {
 	det_count += det_count1;
 	TestVector* tv = cur_array[i];
-	tv_list.push_back(tv);
-	tv_array[i] = tv_mgr.new_vector();
+	mTvList.push_back(tv);
+	tv_array[i] = mTvMgr.new_vector();
 	++ epat_num;
+	for (vector<TpgFault*>::iterator p = det_faults[i].begin();
+	     p != det_faults[i].end(); ++ p) {
+	  TpgFault* f = *p;
+	  if ( f->status() == kFsUndetected ) {
+	    mFaultMgr.set_status(f, kFsDetected);
+	  }
+	}
       }
     }
     cur_array.clear();
@@ -114,76 +149,13 @@ Rtpg::operator()(ymuint min_f,
   }
 
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
-    tv_mgr.delete_vector(tv_array[i]);
+    mTvMgr.delete_vector(tv_array[i]);
   }
 
   local_timer.stop();
   USTime time = local_timer.time();
 
-  mStats.mDetectNum = total_det_count;
-  mStats.mPatNum = pat_num;
-  mStats.mEfPatNum = epat_num;
-  mStats.mTime = local_timer.time();
-}
-
-// @brief 直前の実行結果を得る．
-const RtpgStats&
-Rtpg::stats() const
-{
-  return mStats;
-}
-
-// @brief パタン生成用の乱数発生器を取り出す．
-RandGen&
-Rtpg::randgen()
-{
-  return mPatGen;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス RtpgStats
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-RtpgStats::RtpgStats()
-{
-  mDetectNum = 0;
-  mPatNum = 0;
-  mEfPatNum = 0;
-}
-
-// @brief デストラクタ
-RtpgStats::~RtpgStats()
-{
-}
-
-// @brief 検出した故障数を得る．
-ymuint
-RtpgStats::detected_faults() const
-{
-  return mDetectNum;
-}
-
-// @brief シミュレーションしたパタン数を得る．
-ymuint
-RtpgStats::simulated_patterns() const
-{
-  return mPatNum;
-}
-
-// @brief 有効なパタン数を得る．
-ymuint
-RtpgStats::effective_patterns() const
-{
-  return mEfPatNum;
-}
-
-// @brief 計算時間を得る．
-USTime
-RtpgStats::time() const
-{
-  return mTime;
+  stats.set(total_det_count, pat_num, epat_num, time);
 }
 
 END_NAMESPACE_YM_SATPG
