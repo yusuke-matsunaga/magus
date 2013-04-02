@@ -86,7 +86,7 @@ RtpgCmd::cmd_proc(TclObjVector& objv)
   }
 
   RtpgStats stats;
-  mgr().rtpg(min_f, max_i, max_pat, stats);
+  mgr().rtpg_old(min_f, max_i, max_pat, stats);
 
   after_update_faults();
 
