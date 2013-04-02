@@ -9,7 +9,7 @@
 
 #include "PrintStatsCmd.h"
 #include "AtpgMgr.h"
-#include "TvMgr.h"
+#include "FaultMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

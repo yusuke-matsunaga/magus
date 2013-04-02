@@ -12,11 +12,6 @@
 
 #include "satpg_nsdef.h"
 
-#include "FaultMgr.h"
-#include "TvMgr.h"
-#include "Fsim.h"
-#include "FsimOld.h"
-#include "Dtpg.h"
 #include "ym_cell/cell_nsdef.h"
 #include "ym_utils/Binder.h"
 #include "ym_utils/MStopWatch.h"
@@ -24,8 +19,6 @@
 
 
 BEGIN_NAMESPACE_YM_SATPG
-
-class RtpgStats;
 
 //////////////////////////////////////////////////////////////////////
 /// @class AtpgMgr AtpgMgr.h "AtpgMgr.h"
@@ -216,10 +209,10 @@ private:
   TpgNetwork* mNetwork;
 
   // 故障マネージャ
-  FaultMgr mFaultMgr;
+  FaultMgr* mFaultMgr;
 
   // テストベクタを管理するオブジェクト
-  TvMgr mTvMgr;
+  TvMgr* mTvMgr;
 
   // テストベクタのリスト
   vector<TestVector*> mTvList;
@@ -268,7 +261,7 @@ inline
 FaultMgr&
 AtpgMgr::_fault_mgr()
 {
-  return mFaultMgr;
+  return *mFaultMgr;
 }
 
 // @brief TvMgr を取り出す．
@@ -276,7 +269,7 @@ inline
 TvMgr&
 AtpgMgr::_tv_mgr()
 {
-  return mTvMgr;
+  return *mTvMgr;
 }
 
 // @brief テストベクタのリストを取り出す．

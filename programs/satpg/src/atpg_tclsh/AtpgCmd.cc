@@ -12,6 +12,7 @@
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
+#include "FaultMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

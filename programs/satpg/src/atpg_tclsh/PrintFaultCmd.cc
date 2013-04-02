@@ -10,6 +10,7 @@
 #include "PrintFaultCmd.h"
 #include "AtpgMgr.h"
 #include "TpgFault.h"
+#include "FaultMgr.h"
 #include "ym_tclpp/TclPopt.h"
 
 

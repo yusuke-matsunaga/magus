@@ -11,6 +11,11 @@
 #include "RtpgStats.h"
 #include "TpgNetwork.h"
 #include "TpgFault.h"
+#include "FaultMgr.h"
+#include "TvMgr.h"
+#include "Fsim.h"
+#include "FsimOld.h"
+#include "Dtpg.h"
 #include "BackTracer.h"
 #include "DetectOp.h"
 #include "UntestOp.h"
@@ -114,6 +119,9 @@ FsimOldNetBinder::event_proc(const TpgNetwork& network,
 AtpgMgr::AtpgMgr() :
   mTimer(TM_SIZE, TM_MISC)
 {
+  mFaultMgr = new FaultMgr();
+  mTvMgr = new TvMgr();
+
   mFsim = new_Fsim2();
   mFsim3 = new_FsimX2();
   mFsimOld = new_FsimOld2();
@@ -135,6 +143,8 @@ AtpgMgr::AtpgMgr() :
 // @brief デストラクタ
 AtpgMgr::~AtpgMgr()
 {
+  delete mFaultMgr;
+  delete mTvMgr;
   delete mFsim;
   delete mFsim3;
   delete mFsimOld;
@@ -309,14 +319,14 @@ AtpgMgr::rtpg_old(ymuint min_f,
   StopWatch local_timer;
   local_timer.start();
 
-  ymuint fnum = mFaultMgr.remain_num();
+  ymuint fnum = mFaultMgr->remain_num();
   ymuint undet_i = 0;
   ymuint epat_num = 0;
   ymuint total_det_count = 0;
 
   TestVector* tv_array[kPvBitLen];
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
-    tv_array[i] = mTvMgr.new_vector();
+    tv_array[i] = mTvMgr->new_vector();
   }
 
   vector<TestVector*> cur_array;
@@ -347,20 +357,20 @@ AtpgMgr::rtpg_old(ymuint min_f,
 	det_count += det_count1;
 	TestVector* tv = cur_array[i];
 	mTvList.push_back(tv);
-	tv_array[i] = mTvMgr.new_vector();
+	tv_array[i] = mTvMgr->new_vector();
 	++ epat_num;
 	for (vector<TpgFault*>::iterator p = det_faults[i].begin();
 	     p != det_faults[i].end(); ++ p) {
 	  TpgFault* f = *p;
 	  if ( f->status() == kFsUndetected ) {
-	    mFaultMgr.set_status(f, kFsDetected);
+	    mFaultMgr->set_status(f, kFsDetected);
 	  }
 	}
       }
     }
     cur_array.clear();
 
-    mFaultMgr.update();
+    mFaultMgr->update();
 
     total_det_count += det_count;
 
@@ -386,7 +396,7 @@ AtpgMgr::rtpg_old(ymuint min_f,
 
   // 後始末
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
-    mTvMgr.delete_vector(tv_array[i]);
+    mTvMgr->delete_vector(tv_array[i]);
   }
 
   stats.mDetectNum = total_det_count;
@@ -469,14 +479,14 @@ AtpgMgr::misc_time() const
 void
 AtpgMgr::after_set_network()
 {
-  mFaultMgr.set_ssa_fault(*mNetwork);
+  mFaultMgr->set_ssa_fault(*mNetwork);
 
-  mTvMgr.clear();
-  mTvMgr.init(mNetwork->input_num2());
+  mTvMgr->clear();
+  mTvMgr->init(mNetwork->input_num2());
 
   mDtpg->set_network(*mNetwork);
 
-  mNtwkBindMgr.prop_event(*mNetwork, mFaultMgr);
+  mNtwkBindMgr.prop_event(*mNetwork, *mFaultMgr);
 }
 
 END_NAMESPACE_YM_SATPG
