@@ -90,10 +90,6 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 内部の故障リストの更新を行なう．
-  void
-  update_faults();
-
   /// @brief FFR 内の故障シミュレーションを行う．
   PackedVal
   ffr_simulate(SimFFR* ffr);
@@ -124,7 +120,7 @@ private:
   /// @brief ffr 内の故障が検出可能か調べる．
   void
   fault_sweep(SimFFR* ffr,
-	      vector<TpgFault*>& det_faults);
+	      const vector<FsimOp1*>& op_list);
 
 
 private:
@@ -220,6 +216,9 @@ private:
 
   // 故障シミュレーション用の故障の配列
   vector<FsimFault> mFsimFaults;
+
+  // TpgFault::id() をキーにして FsimFault を格納する配列
+  vector<FsimFault*> mFaultArray;
 
 };
 

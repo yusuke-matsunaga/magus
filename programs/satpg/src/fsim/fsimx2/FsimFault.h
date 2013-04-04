@@ -38,6 +38,7 @@ struct FsimFault
     mNode = node;
     mIpos = ipos;
     mInode = inode;
+    mSkip = false;
   }
 
   // 元の故障
@@ -54,6 +55,10 @@ struct FsimFault
 
   // 現在計算中のローカルな故障伝搬マスク
   PackedVal mObsMask;
+
+  // スキップフラグ
+  bool mSkip;
+
 };
 
 END_NAMESPACE_YM_SATPG_FSIMX2

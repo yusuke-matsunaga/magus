@@ -311,8 +311,6 @@ void
 Fsim2::sppfp(TestVector* tv,
 	     const vector<FsimOp1*>& op_list)
 {
-  update_faults();
-
   ymuint npi = mNetwork->input_num2();
 
   // tv を全ビットにセットしていく．
@@ -398,8 +396,6 @@ Fsim2::ppsfp(const vector<TestVector*>& tv_array,
 {
   ymuint npi = mNetwork->input_num2();
   ymuint nb = tv_array.size();
-
-  update_faults();
 
   // tv_array を入力ごとに固めてセットしていく．
   for (ymuint i = 0; i < npi; ++ i) {
@@ -493,8 +489,6 @@ bool
 Fsim2::spsfp(TestVector* tv,
 	     TpgFault* f)
 {
-  update_faults();
-
   ymuint npi = mNetwork->input_num2();
 
   // tv を全ビットにセットしていく．
@@ -591,12 +585,6 @@ Fsim2::clear_faults()
 
   mFsimFaults.clear();
   mFaultArray.clear();
-}
-
-// @brief 内部の故障リストの更新を行なう．
-void
-Fsim2::update_faults()
-{
 }
 
 // @brief FFR 内の故障シミュレーションを行う．
