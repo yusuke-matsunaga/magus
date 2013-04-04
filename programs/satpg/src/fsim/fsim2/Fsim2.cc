@@ -273,6 +273,7 @@ Fsim2::set_network(const TpgNetwork& network,
 
   ymuint nf = fault_mgr.rep_num();
   mFsimFaults.resize(nf);
+  mFaultArray.resize(fault_mgr.all_num());
   for (ymuint i = 0; i < nf; ++ i) {
     TpgFault* f = fault_mgr.rep_fault(i);
     const TpgNode* node = f->node();
@@ -290,8 +291,17 @@ Fsim2::set_network(const TpgNetwork& network,
     }
     mFsimFaults[i].set(f, simnode, ipos, isimnode);
     SimFFR* ffr = simnode->ffr();
-    ffr->fault_list().push_back(&mFsimFaults[i]);
+    FsimFault* ff = &mFsimFaults[i];
+    ffr->fault_list().push_back(ff);
+    mFaultArray[f->id()] = ff;
   }
+}
+
+// @brief 故障にスキップマークをつける．
+void
+Fsim2::set_skip(TpgFault* f)
+{
+  mFaultArray[f->id()]->mSkip = true;
 }
 
 // @brief ひとつのパタンで故障シミュレーションを行う．
@@ -458,15 +468,16 @@ Fsim2::ppsfp(const vector<TestVector*>& tv_array,
     for (vector<FsimFault*>::const_iterator p = flist.begin();
 	 p != flist.end(); ++ p) {
       FsimFault* ff = *p;
-      TpgFault* f = ff->mOrigF;
-      if ( f->status() == kFsUndetected || f->status() == kFsAborted ) {
-	PackedVal dpat = obs & ff->mObsMask;
-	if ( dpat ) {
-	  for (vector<FsimOp2*>::const_iterator q = op_list.begin();
-	       q != op_list.end(); ++ q) {
-	    FsimOp2& op = **q;
-	    op(f, dpat);
-	  }
+      if ( ff->mSkip ) {
+	continue;
+      }
+      PackedVal dpat = obs & ff->mObsMask;
+      if ( dpat ) {
+	TpgFault* f = ff->mOrigF;
+	for (vector<FsimOp2*>::const_iterator q = op_list.begin();
+	     q != op_list.end(); ++ q) {
+	  FsimOp2& op = **q;
+	  op(f, dpat);
 	}
       }
     }
@@ -579,32 +590,13 @@ Fsim2::clear_faults()
   }
 
   mFsimFaults.clear();
+  mFaultArray.clear();
 }
 
 // @brief 内部の故障リストの更新を行なう．
 void
 Fsim2::update_faults()
 {
-  ymuint nffr = mFFRArray.size();
-  for (ymuint i = 0; i < nffr; ++ i) {
-    SimFFR& ffr = mFFRArray[i];
-    vector<FsimFault*>& flist = ffr.fault_list();
-    ymuint fnum = flist.size();
-    ymuint wpos = 0;
-    for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
-      FsimFault* ff = flist[rpos];
-      TpgFault* f = ff->mOrigF;
-      if ( f->status() != kFsDetected ) {
-	if ( wpos != rpos ) {
-	  flist[wpos] = ff;
-	}
-	++ wpos;
-      }
-    }
-    if ( wpos < fnum ) {
-      flist.erase(flist.begin() + wpos, flist.end());
-    }
-  }
 }
 
 // @brief FFR 内の故障シミュレーションを行う．
@@ -612,26 +604,19 @@ PackedVal
 Fsim2::ffr_simulate(SimFFR* ffr)
 {
   PackedVal ffr_req = kPvAll0;
-  vector<FsimFault*>& flist = ffr->fault_list();
-  ymuint fnum = flist.size();
-  ymuint wpos = 0;
-  for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
-    FsimFault* ff = flist[rpos];
-    TpgFault* f = ff->mOrigF;
-    FaultStatus fs = f->status();
-    if ( fs == kFsDetected || fs == kFsUntestable ) {
+  const vector<FsimFault*>& flist = ffr->fault_list();
+  for (vector<FsimFault*>::const_iterator p = flist.begin();
+       p != flist.end(); ++ p) {
+    FsimFault* ff = *p;
+    if ( ff->mSkip ) {
       continue;
     }
-
-    if ( wpos != rpos ) {
-      flist[wpos] = ff;
-    }
-    ++ wpos;
 
     // ff の故障伝搬を行う．
     SimNode* simnode = ff->mNode;
     PackedVal lobs = simnode->calc_lobs();
     PackedVal valdiff = ff->mInode->gval();
+    TpgFault* f = ff->mOrigF;
     if ( f->is_input_fault() ) {
       // 入力の故障
       ymuint ipos = ff->mIpos;
@@ -646,16 +631,13 @@ Fsim2::ffr_simulate(SimFFR* ffr)
     ffr_req |= lobs;
   }
 
-  if ( wpos < fnum ) {
-    // flist を切り詰める．
-    flist.erase(flist.begin() + wpos, flist.end());
-    fnum = wpos;
-  }
-
-  for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
-    FsimFault* ff = flist[rpos];
-    SimNode* node = ff->mNode;
-    clear_lobs(node);
+  for (vector<FsimFault*>::const_iterator p = flist.begin();
+       p != flist.end(); ++ p) {
+    FsimFault* ff = *p;
+    if ( !ff->mSkip ) {
+      SimNode* node = ff->mNode;
+      clear_lobs(node);
+    }
   }
 
   return ffr_req;
@@ -701,14 +683,12 @@ Fsim2::fault_sweep(SimFFR* ffr,
   for (vector<FsimFault*>::const_iterator p = flist.begin();
        p != flist.end(); ++ p) {
     FsimFault* ff = *p;
-    TpgFault* f = ff->mOrigF;
-    if ( f->status() == kFsUndetected || f->status() == kFsAborted ) {
-      if ( ff->mObsMask ) {
-	for (vector<FsimOp1*>::const_iterator q = op_list.begin();
-	     q != op_list.end(); ++ q) {
-	  FsimOp1& op = **q;
-	  op(f);
-	}
+    if ( !ff->mSkip && ff->mObsMask != kPvAll0 ) {
+      TpgFault* f = ff->mOrigF;
+      for (vector<FsimOp1*>::const_iterator q = op_list.begin();
+	   q != op_list.end(); ++ q) {
+	FsimOp1& op = **q;
+	op(f);
       }
     }
   }

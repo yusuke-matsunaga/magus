@@ -298,23 +298,11 @@ Fsim3::set_network(const TpgNetwork& network,
   }
 }
 
-#if 0
-// @brief PPSFP故障シミュレーションを行う．
-// @param[in] tv_array テストベクタの配列
-// @param[in] det_faults 検出された故障を格納するリストの配列
+// @brief 故障にスキップマークをつける．
 void
-Fsim3::ppsfp(const vector<TestVector*>& tv_array,
-	     vector<vector<TpgFault*> >& det_faults)
+Fsim3::set_skip(TpgFault* f)
 {
-  ymuint nb = tv_array.size();
-  assert_cond(det_faults.size() >= nb, __FILE__, __LINE__);
-
-  // このクラスは複数パタンを扱えない．
-  for (ymuint i = 0; i < nb; ++ i) {
-    sppfp(tv_array[i], det_faults[i]);
-  }
 }
-#endif
 
 // @brief ひとつのパタンで故障シミュレーションを行う．
 // @param[in] tv テストベクタ

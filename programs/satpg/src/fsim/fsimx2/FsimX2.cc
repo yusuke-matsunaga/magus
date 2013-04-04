@@ -535,6 +535,12 @@ FsimX2::ppsfp(const vector<TestVector*>& tv_array,
 }
 #endif
 
+// @brief 故障にスキップマークをつける．
+void
+FsimX2::set_skip(TpgFault* f)
+{
+}
+
 // @brief ひとつのパタンで故障シミュレーションを行う．
 // @param[in] tv テストベクタ
 // @param[in] op_list FsimOp1 のリスト

@@ -19,7 +19,9 @@ libatpg_main_la_SOURCES = \
 	RtpgOld.h \
 	RtpgOld.cc \
 	RtpgImpl.h \
-	RtpgImpl.cc
+	RtpgImpl.cc \
+	Fop2Rtpg.h \
+	Fop2Rtpg.cc
 
 libatpg_main_la_LDFLAGS =
 

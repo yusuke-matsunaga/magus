@@ -10,6 +10,7 @@
 
 
 #include "satpg_nsdef.h"
+#include "PackedVal.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

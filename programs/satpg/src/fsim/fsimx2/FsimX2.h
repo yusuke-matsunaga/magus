@@ -53,6 +53,11 @@ public:
   set_network(const TpgNetwork& network,
 	      FaultMgr& fault_mgr);
 
+  /// @brief 故障にスキップマークをつける．
+  virtual
+  void
+  set_skip(TpgFault* f);
+
   /// @brief ひとつのパタンで故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
   /// @param[in] op_list FsimOp1 のリスト

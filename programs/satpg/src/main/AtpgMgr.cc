@@ -128,7 +128,7 @@ AtpgMgr::AtpgMgr() :
   mFsimOld = new_FsimOld2();
   mFsimOld3 = new_FsimOldX2();
 
-  mRtpg = new_RtpgOld(*this);
+  mRtpg = new_Rtpg(*this);
   mRtpgOld = new_RtpgOld(*this);
   mDtpg = new_DtpgSat();
 

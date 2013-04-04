@@ -14,6 +14,7 @@
 #include "TestVector.h"
 #include "Fsim.h"
 #include "RtpgStats.h"
+#include "Fop2Rtpg.h"
 #include "ym_utils/StopWatch.h"
 
 
@@ -88,6 +89,9 @@ RtpgImpl::run(ymuint min_f,
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
 
+  Fop2Rtpg op(mFsim, mFaultMgr);
+  vector<FsimOp2*> op_list(1, &op);
+
   ymuint pat_num = 0;
   for ( ; ; ) {
     if ( pat_num < max_pat ) {
@@ -103,27 +107,20 @@ RtpgImpl::run(ymuint min_f,
       break;
     }
 
-    //mFsim.ppsfp(cur_array, det_faults);
+    op.clear_count();
+
+    mFsim.ppsfp(cur_array, op_list);
 
     ymuint det_count = 0;
     for (ymuint i = 0; i < cur_array.size(); ++ i) {
-#if 0
-      ymuint det_count1 = det_faults[i].size();
+      ymuint det_count1 = op.count(i);
       if ( det_count1 > 0 ) {
 	det_count += det_count1;
 	TestVector* tv = cur_array[i];
 	mTvList.push_back(tv);
 	tv_array[i] = mTvMgr.new_vector();
 	++ epat_num;
-	for (vector<TpgFault*>::iterator p = det_faults[i].begin();
-	     p != det_faults[i].end(); ++ p) {
-	  TpgFault* f = *p;
-	  if ( f->status() == kFsUndetected ) {
-	    mFaultMgr.set_status(f, kFsDetected);
-	  }
-	}
       }
-#endif
     }
     cur_array.clear();
 
