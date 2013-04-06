@@ -1,30 +1,26 @@
-#ifndef MAIN_MINPAT_H
-#define MAIN_MINPAT_H
+#ifndef MINPATSTATS_H
+#define MINPATSTATS_H
 
-/// @file src/main/MinPat.h
-/// @brief MinPat のヘッダファイル
+/// @file MinPatStats.h
+/// @brief MinPatStats のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MinPat.h 2203 2009-04-16 05:04:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AtpgFunctor.h"
+#include "satpg_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class MinPatStats MinPat.h "MinPat.h"
+/// @class MinPatStats MinPatStats.h "MinPatStats.h"
 /// @brief MinPat の statistics data を表すクラス
 //////////////////////////////////////////////////////////////////////
 class MinPatStats
 {
-  friend class MinPat;
-
 public:
 
   /// @brief コンストラクタ
@@ -33,7 +29,19 @@ public:
   /// @brief デストラクタ
   ~MinPatStats();
 
-  
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 情報を設定する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 情報を設定する．
+  void
+  set(ymuint pat1,
+      ymuint pat2,
+      UStime time);
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 情報を取得する関数
@@ -51,63 +59,76 @@ public:
   USTime
   time() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // 元のパタン数
-  ymuint mPatNum1;
+  ymuint32 mPatNum1;
 
   // 最小化後のパタン数
-  ymuint mPatNum2;
+  ymuint32 mPatNum2;
 
   // 計算時間
   USTime mTime;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MinPat MinPat.h "MinPat.h"
-/// @brief テストベクタの最小化を行うクラス
+// インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-class MinPat :
-  public AtpgFunctor
+
+// @brief コンストラクタ
+inline
+MinPatStats::MinPatStats()
 {
-public:
+}
 
-  /// @brief コンストラクタ
-  MinPat(AtpgMgr* mgr);
+// @brief デストラクタ
+inline
+MinPatStats::~MinPatStats()
+{
+}
 
-  /// @brief デストラクタ
-  virtual
-  ~MinPat();
-  
-  
-public:
-  
-  /// @brief テストベクタの最小化を行う．
-  /// @param[in] mode 最小化モード
-  void
-  operator()(ymuint mode);
-  
-  /// @brief 直前の実行結果を得る．
-  const MinPatStats&
-  stats() const;
+// @brief 情報を設定する．
+inline
+void
+MinPatStats::set(ymuint pat1,
+		 ymuint pat2,
+		 UStime time)
+{
+  mPatNum1 = pat1;
+  mPatNum2 = pat2;
+  mTime = time;
+}
 
-  
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-  
-  // 実行結果
-  MinPatStats mStats;
-  
-};
+// @brief 元のパタン数を得る．
+inline
+ymuint
+MinPatStats::original_patterns() const
+{
+  return mPatNum1;
+}
+
+// @brief 最小化後のパタン数を得る．
+inline
+ymuint
+MinPatStats::minimized_patterns() const
+{
+  return mPatNum2;
+}
+
+// @brief 計算時間を得る．
+inline
+USTime
+MinPatStats::time() const
+{
+  return mTime;
+}
 
 END_NAMESPACE_YM_ATPG
 
-#endif // MAIN_MINPAT_H
+#endif // MINPATSTATS_H

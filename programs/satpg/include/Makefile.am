@@ -18,7 +18,10 @@ noinst_HEADERS = \
 	Fsim.h \
 	FsimOld.h \
 	PackedVal.h \
+	Rtpg.h \
 	RtpgStats.h \
+	MinPat.h \
+	MinPatStats.h \
 	TestVector.h \
 	TpgFault.h \
 	TpgNetwork.h \

@@ -114,6 +114,8 @@ class Dtpg;
 class DtpgStats;
 class Rtpg;
 class RtpgStats;
+class MinPat;
+class MinPatStats;
 class Fsim;
 class FsimOld;
 class FsimOp1;
