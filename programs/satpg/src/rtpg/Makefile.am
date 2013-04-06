@@ -6,17 +6,22 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libatpg_main.la
+noinst_LTLIBRARIES = libatpg_rtpg.la
 
-libatpg_main_la_CPPFLAGS = \
+libatpg_rtpg_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src
 
-libatpg_main_la_SOURCES = \
-	AtpgMgr.cc
+libatpg_rtpg_la_SOURCES = \
+	RtpgOld.h \
+	RtpgOld.cc \
+	RtpgImpl.h \
+	RtpgImpl.cc \
+	Fop2Rtpg.h \
+	Fop2Rtpg.cc
 
-libatpg_main_la_LDFLAGS =
+libatpg_rtpg_la_LDFLAGS =
 
-libatpg_main_la_LIBADD =
+libatpg_rtpg_la_LIBADD =

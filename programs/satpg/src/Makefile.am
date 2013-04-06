@@ -8,6 +8,7 @@ SUBDIRS = \
 	fsim \
 	fsim_old \
 	dtpg \
+	rtpg \
 	atpg_tclsh \
 	$(YM_EXTRA_SUBDIRS)
 

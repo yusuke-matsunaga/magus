@@ -177,6 +177,7 @@ AC_CONFIG_FILES([
 	src/dtpg/bt/Makefile
 	src/dtpg/dop/Makefile
 	src/dtpg/uop/Makefile
+	src/rtpg/Makefile
 	src/atpg_tclsh/Makefile
 	tclsrc/Makefile
 	])
