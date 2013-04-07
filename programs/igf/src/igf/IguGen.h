@@ -38,11 +38,13 @@ public:
   /// @param[in] vector_list ベクタのリスト
   /// @param[in] multi 多重度
   /// @param[in] variable_list 変数のリスト
+  /// @param[in] best_so_far 今までに求められている最適解
   /// @param[in] solution 解として選ばれた変数を格納するリスト
   void
   solve(const vector<RegVect*>& vector_list,
 	ymuint multi,
 	const vector<Variable*>& variable_list,
+	ymuint best_so_far,
 	vector<Variable*>& solution);
 
   /// @brief 分岐制限を設定する．

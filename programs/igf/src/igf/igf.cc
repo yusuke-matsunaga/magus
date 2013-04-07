@@ -106,29 +106,7 @@ igf(int argc,
     return 3;
   }
 
-  ymuint n = rvmgr.vect_size();
-
-  // Variable を生成
-  vector<Variable*> var_list;
-  for (ymuint i = 0; i < n; ++ i) {
-    Variable* var = new Variable(i);
-    var_list.push_back(var);
-  }
-  for (ymuint comp_i = 2; comp_i <= comp; ++ comp_i) {
-    CombiGen cg(n, comp_i);
-
-    for (CombiGen::iterator p = cg.begin(); !p.is_end(); ++ p) {
-      vector<ymuint> vid_list(comp_i);
-      for (ymuint j = 0; j < comp_i; ++ j) {
-	vid_list[j] = p(j);
-      }
-      Variable* var = new Variable(vid_list);
-      var_list.push_back(var);
-    }
-  }
-
   IguGen igu_gen;
-  vector<Variable*> solution;
 
   if ( blimit > 0 ) {
     igu_gen.set_branch_limit(blimit);
@@ -143,7 +121,44 @@ igf(int argc,
     igu_gen.set_debug_level(debug);
   }
 
-  igu_gen.solve(rvmgr.vect_list(), multi, var_list, solution);
+  ymuint n = rvmgr.vect_size();
+
+  // Variable を生成
+  vector<Variable*> var_list;
+  for (ymuint i = 0; i < n; ++ i) {
+    Variable* var = new Variable(i);
+    var_list.push_back(var);
+  }
+
+  vector<Variable*> solution;
+  ymuint best_so_far = n + 1;
+  {
+    cerr << "Only Input Variables" << endl;
+    igu_gen.solve(rvmgr.vect_list(), multi, var_list, best_so_far, solution);
+    best_so_far = solution.size();
+    cerr << " => " << best_so_far << endl;
+  }
+  for (ymuint comp_i = 2; comp_i <= comp; ++ comp_i) {
+    CombiGen cg(n, comp_i);
+
+    cerr << "With Compound Variables of degree " << comp_i << endl;
+    for (CombiGen::iterator p = cg.begin(); !p.is_end(); ++ p) {
+      vector<ymuint> vid_list(comp_i);
+      for (ymuint j = 0; j < comp_i; ++ j) {
+	vid_list[j] = p(j);
+      }
+      Variable* var = new Variable(vid_list);
+      var_list.push_back(var);
+    }
+    vector<Variable*> solution1;
+    igu_gen.solve(rvmgr.vect_list(), multi, var_list, best_so_far, solution1);
+    ymuint ans = solution1.size();
+    cerr << " => " << ans << endl;
+    if ( best_so_far > ans ) {
+      best_so_far = ans;
+      solution = solution1;
+    }
+  }
 
   cout << "Variables = " << endl;
   for (vector<Variable*>::iterator p = solution.begin();

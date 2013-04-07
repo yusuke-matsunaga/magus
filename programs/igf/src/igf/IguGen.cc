@@ -62,6 +62,7 @@ void
 IguGen::solve(const vector<RegVect*>& vector_list,
 	      ymuint multi,
 	      const vector<Variable*>& variable_list,
+	      ymuint best_so_far,
 	      vector<Variable*>& solution)
 {
   // imbalance measure の昇順に並び替える．
@@ -91,7 +92,7 @@ IguGen::solve(const vector<RegVect*>& vector_list,
   }
 
   mMulti = multi;
-  mBestSoFar = nv + 1;
+  mBestSoFar = best_so_far;
   mSelectedVariables.clear();
   timeout = false;
 
