@@ -16,8 +16,30 @@ libatpg_minpat_la_CPPFLAGS = \
 
 libatpg_minpat_la_SOURCES = \
 	MinPatImpl.h \
-	MinPatImpl.cc
+	MinPatImpl.cc \
+	GcNode.h \
+	GcMgr.h \
+	GcMgr.cc
 
 libatpg_minpat_la_LDFLAGS =
 
 libatpg_minpat_la_LIBADD =
+
+
+noinst_PROGRAMS = \
+	gctest
+
+gctest_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src
+
+gctest_SOURCES = \
+	gctest.cc \
+	GcNode.h \
+	GcMgr.h \
+	GcMgr.cc
+
+gctest_LDADD =
+
