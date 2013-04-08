@@ -45,6 +45,12 @@ public:
   ymuint
   x_num() const;
 
+  /// @brief 2つのベクタが両立しないとき true を返す．
+  static
+  bool
+  is_conflict(const TestVector& tv1,
+	      const TestVector& tv2);
+
   /// @brief 内容を BIN 形式で出力する．
   /// @param[in] s 出力先のストリーム
   void

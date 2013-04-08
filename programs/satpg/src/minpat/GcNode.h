@@ -46,12 +46,11 @@ public:
 
   /// @brief 隣接するノードの度数を返す．
   ymuint
-  adj_dgree() const;
+  adj_degree() const;
 
   /// @brief saturation degree を返す．
-  /// @param[in] max_color 現時点の彩色数
   ymuint
-  sat_dgree(ymuint max_color) const;
+  sat_degree() const;
 
   /// @brief 色番号を得る．
   /// @note 0 は未彩色を表す．
@@ -67,8 +66,14 @@ private:
   // ID番号
   ymuint32 mId;
 
+  // ヒープ中の位置
+  ymuint32 mHeapPos;
+
   // 隣接するノードのリスト
   vector<GcNode*> mLinkList;
+
+  // SAT degree
+  ymuint32 mSatDegree;
 
   // 色番号
   // 0 が未彩色
@@ -100,9 +105,17 @@ GcNode::link_list() const
 // @brief 隣接するノードの度数を返す．
 inline
 ymuint
-GcNode::adj_dgree() const
+GcNode::adj_degree() const
 {
   return mLinkList.size();
+}
+
+// @brief saturation degree を返す．
+inline
+ymuint
+GcNode::sat_degree() const
+{
+  return mSatDegree;
 }
 
 // @brief 色番号を得る．

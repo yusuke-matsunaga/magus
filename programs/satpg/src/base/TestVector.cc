@@ -41,6 +41,25 @@ TestVector::x_num() const
   return ni - n;
 }
 
+// @brief 2つのベクタが両立しないとき true を返す．
+bool
+TestVector::is_conflict(const TestVector& tv1,
+			const TestVector& tv2)
+{
+  assert_cond( tv1.input_num() == tv2.input_num(), __FILE__, __LINE__);
+  ymuint nb = block_num(tv1.input_num());
+  for (ymuint i = 0; i < nb; i += 2) {
+    ymuint i0 = i;
+    ymuint i1 = i + 1;
+    PackedVal diff0 = (tv1.mPat[i0] ^ tv2.mPat[i0]);
+    PackedVal diff1 = (tv1.mPat[i1] ^ tv2.mPat[i1]);
+    if ( (diff0 & diff1) != kPvAll0 ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // @brief すべて未定(X) で初期化する．
 void
 TestVector::init()

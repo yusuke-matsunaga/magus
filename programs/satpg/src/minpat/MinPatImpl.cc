@@ -78,7 +78,9 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
   }
 
   if ( tv3_list.empty() ) {
+#if 0
     cout << "No x-patterns" << endl;
+#endif
   }
   else {
     // 最小彩色問題を解くことで3値のパタンを圧縮する．
@@ -91,16 +93,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
       TestVector* tv1 = tv3_list[i1];
       for (ymuint i2 = 0; i2 < i1; ++ i2) {
 	TestVector* tv2 = tv3_list[i2];
-	bool conflict = false;
-	for (ymuint j = 0; j < ni; ++ j) {
-	  Val3 v1 = tv1->val3(j);
-	  Val3 v2 = tv2->val3(j);
-	  if ( v1 != kValX && v2 != kValX && v1 != v2 ) {
-	    conflict = true;
-	    break;
-	  }
-	}
-	if ( conflict ) {
+	if ( TestVector::is_conflict(*tv1, *tv2) ) {
 	  gcmgr.connect(i1, i2);
 	}
       }
@@ -108,7 +101,9 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     vector<vector<ymuint> > color_group;
     ymuint nc = gcmgr.coloring(color_group);
 
+#if 0
     cout << "coloring " << n << " --> " << nc << endl;
+#endif
 
     for (ymuint i = 0; i < nc; ++ i) {
       TestVector* new_tv = mTvMgr.new_vector();
