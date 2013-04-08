@@ -11,9 +11,10 @@
 
 
 #include "satpg_nsdef.h"
+#include "ym_utils/USTime.h"
 
 
-BEGIN_NAMESPACE_YM_ATPG
+BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
 /// @class MinPatStats MinPatStats.h "MinPatStats.h"
@@ -39,7 +40,7 @@ public:
   void
   set(ymuint pat1,
       ymuint pat2,
-      UStime time);
+      USTime time);
 
 
 public:
@@ -98,7 +99,7 @@ inline
 void
 MinPatStats::set(ymuint pat1,
 		 ymuint pat2,
-		 UStime time)
+		 USTime time)
 {
   mPatNum1 = pat1;
   mPatNum2 = pat2;
@@ -129,6 +130,6 @@ MinPatStats::time() const
   return mTime;
 }
 
-END_NAMESPACE_YM_ATPG
+END_NAMESPACE_YM_SATPG
 
 #endif // MINPATSTATS_H

@@ -98,6 +98,11 @@ public:
   void
   copy(const TestVector& src);
 
+  /// @breif テストベクタをマージする．
+  /// @note X 以外で相異なるビットがあったら false を返す．
+  bool
+  merge(const TestVector& src);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

@@ -131,6 +131,34 @@ TestVector::copy(const TestVector& src)
   }
 }
 
+// @breif テストベクタをマージする．
+// @note X 以外で相異なるビットがあったら false を返す．
+bool
+TestVector::merge(const TestVector& src)
+{
+  ymuint nb = block_num(input_num());
+
+  // コンフリクトチェック
+  for (ymuint i = 0; i < nb; i += 2) {
+    ymuint i0 = i;
+    ymuint i1 = i + 1;
+    PackedVal diff0 = (mPat[i0] ^ src.mPat[i0]);
+    PackedVal diff1 = (mPat[i1] ^ src.mPat[i1]);
+    if ( (diff0 & diff1) != kPvAll0 ) {
+      return false;
+    }
+  }
+
+  // 実際のマージ
+  for (ymuint i = 0; i < nb; i += 2) {
+    ymuint i0 = i;
+    ymuint i1 = i + 1;
+    mPat[i0] |= src.mPat[i0];
+    mPat[i1] |= src.mPat[i1];
+  }
+  return true;
+}
+
 // @brief 内容を BIN 形式で出力する．
 void
 TestVector::dump_bin(ostream& s) const

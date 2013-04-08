@@ -17,6 +17,7 @@
 #include "FsimOld.h"
 #include "Dtpg.h"
 #include "Rtpg.h"
+#include "MinPat.h"
 #include "BackTracer.h"
 #include "DetectOp.h"
 #include "UntestOp.h"
@@ -131,6 +132,7 @@ AtpgMgr::AtpgMgr() :
   mRtpg = new_Rtpg(*this);
   mRtpgOld = new_RtpgOld(*this);
   mDtpg = new_DtpgSat();
+  mMinPat = new_MinPat(*this);
 
   mNetwork = NULL;
 
@@ -155,6 +157,7 @@ AtpgMgr::~AtpgMgr()
   delete mRtpg;
   delete mRtpgOld;
   delete mDtpg;
+  delete mMinPat;
   delete mNetwork;
 }
 
@@ -278,6 +281,13 @@ AtpgMgr::dtpg(tDtpgMode mode,
   mDtpg->run(mode, po_mode, bt, dop_list, uop_list, stats);
 
   mTimer.change(old_id);
+}
+
+// @brief テストパタン圧縮を行なう．
+void
+AtpgMgr::minpat(MinPatStats& stats)
+{
+  mMinPat->run(_tv_list(), stats);
 }
 
 // @brief ファイル読み込みに関わる時間を得る．

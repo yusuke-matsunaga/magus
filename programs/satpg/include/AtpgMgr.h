@@ -15,7 +15,6 @@
 #include "ym_cell/cell_nsdef.h"
 #include "ym_utils/Binder.h"
 #include "ym_utils/MStopWatch.h"
-#include "ym_utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -160,6 +159,16 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
+  // テストパタン圧縮を行なう関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief テストパタン圧縮を行なう．
+  void
+  minpat(MinPatStats& stats);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
   // イベントハンドラの登録
   //////////////////////////////////////////////////////////////////////
 
@@ -221,9 +230,6 @@ private:
   // テストベクタのリスト
   vector<TestVector*> mTvList;
 
-  // RTPG 用の乱数発生器
-  RandGen mPatGen;
-
   // 故障シミュレータ
   Fsim* mFsim;
 
@@ -244,6 +250,9 @@ private:
 
   // テストパタン生成器
   Dtpg* mDtpg;
+
+  // パタン圧縮器
+  MinPat* mMinPat;
 
   // ネットワークが変更された時に呼ばれるイベントハンドラ
   T2BindMgr<const TpgNetwork&, FaultMgr&> mNtwkBindMgr;

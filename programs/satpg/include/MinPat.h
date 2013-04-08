@@ -43,6 +43,12 @@ public:
 
 };
 
+
+/// @brief インスタンスを生成する関数
+extern
+MinPat*
+new_MinPat(AtpgMgr& mgr);
+
 END_NAMESPACE_YM_SATPG
 
 #endif // MINPAT_H

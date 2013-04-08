@@ -24,9 +24,11 @@ class MinPatImpl :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] tvmgr テストベクタマネージャ
   /// @param[in] fsim2 2値の故障シミュレータ
   /// @param[in] fsim3 3値の故障シミュレータ
-  MinPatImpl(Fsim& fsim2,
+  MinPatImpl(TvMgr& tvmgr,
+	     Fsim& fsim2,
 	     Fsim& fsim3);
 
   /// @brief デストラクタ
@@ -52,6 +54,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // テストベクタマネージャ
+  TvMgr& mTvMgr;
 
   // 2値の故障シミュレータ
   Fsim& mFsim2;
