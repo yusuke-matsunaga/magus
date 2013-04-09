@@ -60,6 +60,65 @@ TestVector::is_conflict(const TestVector& tv1,
   return false;
 }
 
+// @brief 等価関係の比較を行なう．
+// @param[in] right オペランド
+// @return 自分自身と right が等しいとき true を返す．
+bool
+TestVector::operator==(const TestVector& right) const
+{
+  assert_cond( input_num() == right.input_num(), __FILE__, __LINE__);
+  ymuint nb = block_num(input_num());
+  for (ymuint i = 0; i < nb; ++ i) {
+    if ( mPat[i] != right.mPat[i] ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// @brief 包含関係の比較を行なう
+// @param[in] right オペランド
+// @return minterm の集合として right が自分自身を含んでいたら true を返す．
+// @note false だからといって逆に自分自身が right を含むとは限らない．
+bool
+TestVector::operator<(const TestVector& right) const
+{
+  assert_cond( input_num() == right.input_num(), __FILE__, __LINE__);
+  ymuint nb = block_num(input_num());
+  bool diff = false;
+  for (ymuint i = 0; i < nb; ++ i) {
+    PackedVal val1 = mPat[i];
+    PackedVal val2 = right.mPat[i];
+    if ( (~val1 & val2) != kPvAll0 ) {
+      return false;
+    }
+    if ( val1 != val2 ) {
+      diff = true;
+    }
+  }
+  return diff;
+}
+
+// @brief 包含関係の比較を行なう
+// @param[in] right オペランド
+// @return minterm の集合として right が自分自身を含んでいたら true を返す．
+// @note こちらは等しい場合も含む．
+// @note false だからといって逆に自分自身が right を含むとは限らない．
+bool
+TestVector::operator<=(const TestVector& right) const
+{
+  assert_cond( input_num() == right.input_num(), __FILE__, __LINE__);
+  ymuint nb = block_num(input_num());
+  for (ymuint i = 0; i < nb; ++ i) {
+    PackedVal val1 = mPat[i];
+    PackedVal val2 = right.mPat[i];
+    if ( (~val1 & val2) != kPvAll0 ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 // @brief すべて未定(X) で初期化する．
 void
 TestVector::init()
