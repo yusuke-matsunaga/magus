@@ -174,7 +174,37 @@ igf(int argc,
   cout << endl;
 
   {
+    ymuint nv = solution.size();
+    ymuint exp_p = (1 << nv);
+    vector<ymuint> multi_dist(exp_p, 0);
+    const vector<RegVect*>& vect_list = rvmgr.vect_list();
+    for (vector<RegVect*>::const_iterator p = vect_list.begin();
+	 p != vect_list.end(); ++ p) {
+      RegVect* vect = *p;
+      ymuint sig = 0;
+      for (ymuint i = 0; i < nv; ++ i) {
+	Variable* var = solution[i];
+	if ( var->classify(vect) ) {
+	  sig |= (1 << i);
+	}
+      }
+      ++ multi_dist[sig];
+    }
+    vector<ymuint> hist(multi + 1, 0);
+    for (ymuint i = 0; i < exp_p; ++ i) {
+      ymuint m = multi_dist[i];
+      assert_cond( m <= multi, __FILE__, __LINE__);
+      ++ hist[m];
+    }
+    cout << "Distributions" << endl;
+    for (ymuint i = 0; i <= multi; ++ i) {
+      cout << i << ": " << hist[i] << endl;
+    }
+    cout << endl;
+  }
+  {
     ymuint n = rvmgr.vect_size();
+    ymuint k = rvmgr.vect_list().size();
     ymuint p = solution.size();
     ymuint q = rvmgr.index_size();
     ymuint exp_p = (1 << p);
@@ -189,6 +219,9 @@ igf(int argc,
 	 << exp_p << " x " << q << " + " << exp_q << " x ("
 	 << n << " - " << p << ") x " << multi
 	 << " = " << ((exp_p * q + exp_q * (n - p)) * multi) << endl;
+    cout << "Ideal memory size = "
+	 << k << " x (" << n << " + " << q << ") = "
+	 << (k * (n + q)) << endl;
   }
   return 0;
 }
