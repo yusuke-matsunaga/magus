@@ -127,10 +127,9 @@ GcMgr::coloring(vector<vector<ymuint> >& color_group)
 	 p != node_list.end(); ++ p) {
       GcNode* node1 = *p;
       ymuint c = node1->color();
-      if ( c == 0 ) {
-	continue;
+      if ( c > 0 ) {
+	mCountArray[c - 1] = true;
       }
-      mCountArray[c - 1] = true;
     }
     ymuint min_col = 0;
     for (ymuint i = 0; i < mMaxColor; ++ i) {
