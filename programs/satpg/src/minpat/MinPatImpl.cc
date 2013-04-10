@@ -13,6 +13,7 @@
 #include "TvMgr.h"
 #include "TestVector.h"
 #include "Fsim.h"
+#include "Fop2MinPat.h"
 #include "GcMgr.h"
 #include "ym_utils/RandGen.h"
 
@@ -23,7 +24,8 @@ BEGIN_NAMESPACE_YM_SATPG
 MinPat*
 new_MinPat(AtpgMgr& mgr)
 {
-  return new MinPatImpl(mgr._tv_mgr(), mgr._fsim(), mgr._fsimx());
+  return new MinPatImpl(mgr._tv_mgr(), mgr._fault_mgr(),
+			mgr._fsim(), mgr._fsimx());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -32,12 +34,15 @@ new_MinPat(AtpgMgr& mgr)
 
 // @brief コンストラクタ
 // @param[in] tvmgr テストベクタマネージャ
+// @param[in] fmgr 故障マネージャ
 // @param[in] fsim2 2値の故障シミュレータ
 // @param[in] fsim3 3値の故障シミュレータ
 MinPatImpl::MinPatImpl(TvMgr& tvmgr,
+		       FaultMgr& fmgr,
 		       Fsim& fsim2,
 		       Fsim& fsim3) :
   mTvMgr(tvmgr),
+  mFaultMgr(fmgr),
   mFsim2(fsim2),
   mFsim3(fsim3)
 {
@@ -126,6 +131,32 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
   }
 
   // tv2_list のパタンを用いて故障シミュレーションを行なう．
+  cout << "Fault Simulation Start" << endl;
+  Fop2MinPat op(mFsim2, mFaultMgr);
+  vector<FsimOp2*> op_list(1, &op);
+
+  op.clear_count();
+  op.set_limit(10);
+
+  vector<TestVector*> cur_array;
+  cur_array.reserve(kPvBitLen);
+
+  for (vector<TestVector*>::iterator p = tv2_list.begin();
+       p != tv2_list.end(); ++ p) {
+    TestVector* tv = *p;
+    cur_array.push_back(tv);
+    if ( cur_array.size() == kPvBitLen ) {
+      op.set_pattern(cur_array);
+      mFsim2.ppsfp(cur_array, op_list);
+      cur_array.clear();
+    }
+  }
+  if ( !cur_array.empty() ) {
+    op.set_pattern(cur_array);
+    mFsim2.ppsfp(cur_array, op_list);
+    cur_array.clear();
+  }
+  cout << "Fault Simulation End" << endl;
 
   tv_list = tv2_list;
 

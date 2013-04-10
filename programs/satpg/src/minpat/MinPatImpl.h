@@ -25,9 +25,11 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] tvmgr テストベクタマネージャ
+  /// @param[in] fmgr 故障マネージャ
   /// @param[in] fsim2 2値の故障シミュレータ
   /// @param[in] fsim3 3値の故障シミュレータ
   MinPatImpl(TvMgr& tvmgr,
+	     FaultMgr& fmgr,
 	     Fsim& fsim2,
 	     Fsim& fsim3);
 
@@ -57,6 +59,9 @@ private:
 
   // テストベクタマネージャ
   TvMgr& mTvMgr;
+
+  // 故障マネージャ
+  FaultMgr& mFaultMgr;
 
   // 2値の故障シミュレータ
   Fsim& mFsim2;
