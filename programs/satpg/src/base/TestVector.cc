@@ -19,6 +19,8 @@ BEGIN_NAMESPACE_YM_SATPG
 TestVector::TestVector(ymuint input_num) :
   mInputNum(input_num)
 {
+  ymuint k = input_num % kPvBitLen;
+  mMask = kPvAll1 << (kPvBitLen - k);
 }
 
 // @brief デストラクタ
@@ -186,8 +188,38 @@ TestVector::set_from_random(RandGen& randgen)
   ymuint nb = block_num(input_num());
   for (ymuint i = 0; i < nb; i += 2) {
     PackedVal v = randgen.ulong();
-    mPat[i] = ~v;
-    mPat[i + 1] = v;
+    ymuint i0 = i;
+    ymuint i1 = i + 1;
+    if ( i == nb - 2 ) {
+      mPat[i0] = ~v & mMask;
+      mPat[i1] =  v & mMask;
+    }
+    else {
+      mPat[i0] = ~v;
+      mPat[i1] =  v;
+    }
+  }
+}
+
+// @brief X の部分を乱数で 0/1 に設定する．
+// @param[in] randgen 乱数生成器
+void
+TestVector::fix_x_from_random(RandGen& randgen)
+{
+  ymuint nb = block_num(input_num());
+  for (ymuint i = 0; i < nb; i += 2) {
+    ymuint i0 = i;
+    ymuint i1 = i + 1;
+    PackedVal mask = ~(mPat[i0] | mPat[i1]);
+    if ( i == nb - 2 ) {
+      mask &= mMask;
+    }
+    if ( mask == kPvAll0 ) {
+      continue;
+    }
+    PackedVal v = randgen.ulong();
+    mPat[i0] |= ~v & mask;
+    mPat[i1] |=  v & mask;
   }
 }
 

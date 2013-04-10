@@ -14,6 +14,7 @@
 #include "TestVector.h"
 #include "Fsim.h"
 #include "GcMgr.h"
+#include "ym_utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -58,6 +59,8 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
 
   local_timer.start();
 
+  RandGen randgen;
+
   ymuint orig_num = tv_list.size();
 
   // 3値のパタンを抜き出し tv3_list に入れる．
@@ -87,7 +90,6 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     GcMgr gcmgr;
 
     ymuint n = tv3_list.size();
-    ymuint ni = tv3_list[0]->input_num();
     gcmgr.init(n);
     for (ymuint i1 = 1; i1 < n; ++ i1) {
       TestVector* tv1 = tv3_list[i1];
@@ -106,6 +108,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
 #endif
 
     for (ymuint i = 0; i < nc; ++ i) {
+      // 同じ色のグループのパタンを一つにマージする．
       TestVector* new_tv = mTvMgr.new_vector();
       const vector<ymuint>& id_list = color_group[i];
       for (vector<ymuint>::const_iterator p = id_list.begin();
@@ -115,9 +118,16 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
 	bool stat = new_tv->merge(*tv);
 	assert_cond( stat, __FILE__, __LINE__);
       }
+      // 残った X にランダムに 0/1 を割り当てる．
+      new_tv->fix_x_from_random(randgen);
+
       tv2_list.push_back(new_tv);
     }
   }
+
+  // tv2_list のパタンを用いて故障シミュレーションを行なう．
+
+  tv_list = tv2_list;
 
   local_timer.stop();
   USTime time = local_timer.time();

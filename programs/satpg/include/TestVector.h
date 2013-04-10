@@ -119,6 +119,11 @@ public:
   void
   set_from_random(RandGen& randgen);
 
+  /// @brief X の部分を乱数で 0/1 に設定する．
+  /// @param[in] randgen 乱数生成器
+  void
+  fix_x_from_random(RandGen& randgen);
+
   /// @brief テストベクタをコピーする．
   /// @param[in] src コピー元のテストベクタ
   /// @note X の部分はコピーしない．
@@ -198,6 +203,9 @@ private:
 
   // 入力数
   ymuint32 mInputNum;
+
+  // 最後のブロックのマスク
+  PackedVal mMask;
 
   // ベクタ本体(ただしサイズは可変)
   PackedVal mPat[1];
