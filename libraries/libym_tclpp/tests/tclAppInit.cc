@@ -1,4 +1,4 @@
-/* 
+/*
  * tclAppInit.c --
  *
  *	Provides a default version of the main program and Tcl_AppInit
@@ -55,7 +55,7 @@ extern int		Tclxttest_Init _ANSI_ARGS_((Tcl_Interp *interp));
  */
 
 #ifndef TCL_LOCAL_APPINIT
-#define TCL_LOCAL_APPINIT Tcl_AppInit    
+#define TCL_LOCAL_APPINIT Tcl_AppInit
 #endif
 extern int TCL_LOCAL_APPINIT _ANSI_ARGS_((Tcl_Interp *interp));
 
@@ -81,27 +81,27 @@ int
 main(int argc,
      char** argv)
 {
-    
+
   /*
    * The following #if block allows you to change how Tcl finds the startup
    * script, prime the library or encoding paths, fiddle with the argv,
    * etc., without needing to rewrite Tk_Main()
    */
-    
+
 #ifdef TCL_LOCAL_MAIN_HOOK
   extern int TCL_LOCAL_MAIN_HOOK _ANSI_ARGS_((int *argc, char ***argv));
 #endif
-  
+
 #ifdef TCL_XT_TEST
   XtToolkitInitialize();
 #endif
-  
+
 #ifdef TCL_LOCAL_MAIN_HOOK
   TCL_LOCAL_MAIN_HOOK(&argc, &argv);
 #endif
 
   Tcl_Main(argc, argv, TCL_LOCAL_APPINIT);
-  
+
   return 0;			/* Needed only to prevent compiler warning. */
 }
 
@@ -171,10 +171,10 @@ Tcl_AppInit(Tcl_Interp* interp)
   int status = Tcl_EvalFile(interp, file.c_str());
   if ( status != TCL_OK ) {
     cerr << "(TclreadlineAppInit) unable to eval " << file << endl;
-    exit (1);
+    return TCL_ERROR;
   }
 #endif
-  
+
   /*
    * Call the init procedures for included packages.  Each call should
    * look like this:
@@ -206,8 +206,8 @@ Tcl_AppInit(Tcl_Interp* interp)
    * where "app" is the name of the application.  If this line is deleted
    * then no user-specific startup file will be run under any conditions.
    */
-  
+
   Tcl_SetVar(interp, "tcl_rcFileName", "~/.ymtclpprc", TCL_GLOBAL_ONLY);
-    
+
   return TCL_OK;
 }
