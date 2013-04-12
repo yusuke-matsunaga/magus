@@ -176,7 +176,7 @@ Tcl_AppInit(Tcl_Interp* interp)
   int status = Tcl_EvalFile(interp, file.c_str());
   if ( status != TCL_OK ) {
     cerr << "(TclreadlineAppInit) unable to eval " << file << endl;
-    exit (1);
+    return TCL_ERROR;
   }
 #ifdef ERRORCODE_HACK
   // よくわからないけど errorCode と errorInfo を定義しておかないと
@@ -186,7 +186,7 @@ Tcl_AppInit(Tcl_Interp* interp)
     if ( Tcl_Eval(interp, tmp_script) != TCL_OK ) {
       cerr << "(Tcl_AppInit) unable to eval \"" << tmp_script
 	   << "\"" << endl;
-      exit(1);
+      return TCL_ERROR;
     }
   }
 #endif // ERRORCODE_HACK
