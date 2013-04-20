@@ -10,6 +10,7 @@
 
 
 #include "Lexer.h"
+#include "Driver.h"
 
 
 BEGIN_NAMESPACE_YM_BB
