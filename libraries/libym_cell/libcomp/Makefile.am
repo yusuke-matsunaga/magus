@@ -31,6 +31,10 @@ libym_cell_libcomp_la_SOURCES = \
 	LcPatMgr.cc \
 	LcPatNode.h \
 	LcPatNode.cc \
+	LcPat2Mgr.h \
+	LcPat2Mgr.cc \
+	LcPat2Node.h \
+	LcPat2Handle.h \
 	LibComp.h \
 	LibComp.cc
 

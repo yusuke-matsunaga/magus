@@ -103,6 +103,13 @@ LibComp::pat_mgr() const
   return mPatMgr;
 }
 
+// @brief パタングラフの情報を取り出す．
+const LcPat2Mgr&
+LibComp::pat2_mgr() const
+{
+  return mPat2Mgr;
+}
+
 // @brief セルのグループ化，クラス化を行う．
 void
 LibComp::compile(const CellLibrary& library)
@@ -114,6 +121,7 @@ LibComp::compile(const CellLibrary& library)
   mFFMgr.init();
   mLatchMgr.init();
   mPatMgr.init();
+  mPat2Mgr.init();
   mMux4Id = 0xFFFFFFFFU;
 
   // XOR のパタンを登録しておく．
@@ -162,7 +170,7 @@ LibComp::compile(const CellLibrary& library)
       // パタンを作る．
       ymuint ni2 = cell->input_num2();
       ymuint no2 = cell->output_num2();
-      if ( ni2 > 8 ) {
+      if ( ni2 > 6 ) {
 	// 入力ピンが8つ以上のセルは対象外
 	continue;
       }
@@ -189,6 +197,8 @@ LibComp::compile(const CellLibrary& library)
       mLatchMgr.add_cell(cell);
     }
   }
+
+  display(cout);
 }
 
 // @brief セルグループの数を返す．
@@ -281,6 +291,7 @@ LibComp::reg_expr(const LogExpr& expr)
     assert_cond( !cexpr.is_constant(), __FILE__, __LINE__);
 
     mPatMgr.reg_pat(cexpr, fclass->id());
+    mPat2Mgr.reg_pat(cexpr, fclass->id());
   }
 }
 
@@ -372,6 +383,7 @@ LibComp::display(ostream& s) const
 
   // パタングラフの情報を出力する．
   mPatMgr.display(s);
+  mPat2Mgr.display(s);
 }
 
 END_NAMESPACE_YM_CELL_LIBCOMP
