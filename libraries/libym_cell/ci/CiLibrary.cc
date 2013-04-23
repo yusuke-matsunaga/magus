@@ -343,96 +343,199 @@ CiLibrary::simple_latch_class(bool has_clear,
 
 // @brief 総パタン数を返す．
 ymuint
-CiLibrary::pat_num() const
+CiLibrary::pg_pat_num() const
 {
   return mPatMgr.pat_num();
 }
 
 // @brief パタンを返す．
-// @param[in] id パタン番号 ( 0 <= id < pat_num() )
+// @param[in] id パタン番号 ( 0 <= id < pg_pat_num() )
 const CellPatGraph&
-CiLibrary::pat(ymuint id) const
+CiLibrary::pg_pat(ymuint id) const
 {
   return mPatMgr.pat(id);
 }
 
 // @brief パタンの最大の入力数を得る．
 ymuint
-CiLibrary::max_input() const
+CiLibrary::pg_max_input() const
 {
   return mPatMgr.max_input();
 }
 
 // @brief 総ノード数を返す．
 ymuint
-CiLibrary::node_num() const
+CiLibrary::pg_node_num() const
 {
   return mPatMgr.node_num();
 }
 
 // @brief ノードの種類を返す．
-// @param[in] id ノード番号 ( 0 <= id < node_num() )
+// @param[in] id ノード番号 ( 0 <= id < pg_node_num() )
 tCellPatType
-CiLibrary::node_type(ymuint id) const
+CiLibrary::pg_node_type(ymuint id) const
 {
   return mPatMgr.node_type(id);
 }
 
 // @brief ノードが入力ノードの時に入力番号を返す．
-// @param[in] id ノード番号 ( 0 <= id < node_num() )
+// @param[in] id ノード番号 ( 0 <= id < pg_node_num() )
 // @note 入力ノードでない場合の返り値は不定
 ymuint
-CiLibrary::input_id(ymuint id) const
+CiLibrary::pg_input_id(ymuint id) const
 {
   return mPatMgr.input_id(id);
 }
 
 // @brief 入力のノード番号を返す．
-// @param[in] input_id 入力番号 ( 0 <= input_id < input_num() )
+// @param[in] input_id 入力番号 ( 0 <= input_id < pg_input_num() )
 // @return input_id の入力に対応するノードのノード番号
 ymuint
-CiLibrary::input_node(ymuint input_id) const
+CiLibrary::pg_input_node(ymuint input_id) const
 {
   return mPatMgr.input_node(input_id);
 }
 
 // @brief 総枝数を返す．
 ymuint
-CiLibrary::edge_num() const
+CiLibrary::pg_edge_num() const
 {
   return mPatMgr.edge_num();
 }
 
 // @brief 枝のファンイン元のノード番号を返す．
-// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+// @param[in] id 枝番号 ( 0 <= id < pg_edge_num() )
 ymuint
-CiLibrary::edge_from(ymuint id) const
+CiLibrary::pg_edge_from(ymuint id) const
 {
   return mPatMgr.edge_from(id);
 }
 
 // @brief 枝のファンアウト先のノード番号を返す．
-// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+// @param[in] id 枝番号 ( 0 <= id < pg_edge_num() )
 ymuint
-CiLibrary::edge_to(ymint id) const
+CiLibrary::pg_edge_to(ymint id) const
 {
   return mPatMgr.edge_to(id);
 }
 
 // @brief 枝のファンアウト先の入力位置( 0 or 1 ) を返す．
-// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+// @param[in] id 枝番号 ( 0 <= id < pg_edge_num() )
 ymuint
-CiLibrary::edge_pos(ymuint id) const
+CiLibrary::pg_edge_pos(ymuint id) const
 {
   return mPatMgr.edge_pos(id);
 }
 
 // @brief 枝の反転属性を返す．
-// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+// @param[in] id 枝番号 ( 0 <= id < pg_edge_num() )
 bool
-CiLibrary::edge_inv(ymuint id) const
+CiLibrary::pg_edge_inv(ymuint id) const
 {
   return mPatMgr.edge_inv(id);
+}
+
+// @brief 総パタン数を返す．
+ymuint
+CiLibrary::pg2_num() const
+{
+  return mPat2Mgr.pat_num();
+}
+
+// @brief パタンを返す．
+// @param[in] id パタン番号 ( 0 <= id < pg2_num() )
+const CellPat2Graph&
+CiLibrary::pg2_pat(ymuint id) const
+{
+  return mPat2Mgr.pat(id);
+}
+
+// @brief パタンの最大の入力数を得る．
+ymuint
+CiLibrary::pg2_max_input() const
+{
+  return mPat2Mgr.max_input();
+}
+
+// @brief 総ノード数を返す．
+ymuint
+CiLibrary::pg2_node_num() const
+{
+  return mPat2Mgr.node_num();
+}
+
+// @brief ノードの種類を返す．
+// @param[in] id ノード番号 ( 0 <= id < pg2_node_num() )
+tCellPatType
+CiLibrary::pg2_node_type(ymuint id) const
+{
+  return mPat2Mgr.node_type(id);
+}
+
+// @brief ノードが入力ノードの時に入力番号を返す．
+// @param[in] id ノード番号 ( 0 <= id < pg2_node_num() )
+// @note 入力ノードでない場合の返り値は不定
+ymuint
+CiLibrary::pg2_input_id(ymuint id) const
+{
+  return mPat2Mgr.input_id(id);
+}
+
+// @brief ノードがAND/XORノードの時にファンイン数を返す．
+// @param[in] id ノード番号 ( 0 <= id < pg2_node_num() )
+// @note AND/XORノードでない場合の返り値は不定
+ymuint
+CiLibrary::pg2_fanin_num(ymuint id) const
+{
+  return mPat2Mgr.fanin_num(id);
+}
+
+// @brief 入力のノード番号を返す．
+// @param[in] input_id 入力番号 ( 0 <= input_id < pg2_input_num() )
+// @return input_id の入力に対応するノードのノード番号
+ymuint
+CiLibrary::pg2_input_node(ymuint input_id) const
+{
+  return mPat2Mgr.input_node(input_id);
+}
+
+// @brief 総枝数を返す．
+ymuint
+CiLibrary::pg2_edge_num() const
+{
+  return mPat2Mgr.edge_num();
+}
+
+// @brief 枝のファンイン元のノード番号を返す．
+// @param[in] id 枝番号 ( 0 <= id < pg2_edge_num() )
+ymuint
+CiLibrary::pg2_edge_from(ymuint id) const
+{
+  return mPat2Mgr.edge_from(id);
+}
+
+// @brief 枝のファンアウト先のノード番号を返す．
+// @param[in] id 枝番号 ( 0 <= id < pg2_edge_num() )
+ymuint
+CiLibrary::pg2_edge_to(ymint id) const
+{
+  return mPat2Mgr.edge_to(id);
+}
+
+// @brief 枝のファンアウト先の入力位置を返す．
+// @param[in] id 枝番号 ( 0 <= id < pg2_edge_num() )
+ymuint
+CiLibrary::pg2_edge_pos(ymuint id) const
+{
+  return mPat2Mgr.edge_pos(id);
+}
+
+// @brief 枝の反転属性を返す．
+// @param[in] id 枝番号 ( 0 <= id < pg2_edge_num() )
+bool
+CiLibrary::pg2_edge_inv(ymuint id) const
+{
+  return mPat2Mgr.edge_inv(id);
 }
 
 // @brief 名前を設定する．

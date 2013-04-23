@@ -678,11 +678,11 @@ display_library(ostream& s,
   s << "==== PatMgr dump start ====" << endl;
 
   // ノードの種類の出力
-  ymuint nn = library.node_num();
+  ymuint nn = library.pg_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
     s << "Node#" << i << ": ";
-    switch ( library.node_type(i) ) {
-    case kCellPatInput: s << "INPUT#" << library.input_id(i) ; break;
+    switch ( library.pg_node_type(i) ) {
+    case kCellPatInput: s << "INPUT#" << library.pg_input_id(i) ; break;
     case kCellPatAnd:   s << "AND"; break;
     case kCellPatXor:   s << "XOR"; break;
     default: assert_not_reached(__FILE__, __LINE__);
@@ -692,11 +692,12 @@ display_library(ostream& s,
   s << endl;
 
   // 枝の情報の出力
-  ymuint ne = library.edge_num();
+  ymuint ne = library.pg_edge_num();
   for (ymuint i = 0; i < ne; ++ i) {
-    s << "Edge#" << i << ": " << library.edge_from(i)
-      << " -> " << library.edge_to(i) << "(" << library.edge_pos(i) << ")";
-    if ( library.edge_inv(i) ) {
+    s << "Edge#" << i << ": " << library.pg_edge_from(i)
+      << " -> " << library.pg_edge_to(i)
+      << "(" << library.pg_edge_pos(i) << ")";
+    if ( library.pg_edge_inv(i) ) {
       s << " ***";
     }
     s << endl;
@@ -704,9 +705,9 @@ display_library(ostream& s,
   s << endl;
 
   // パタングラフの情報の出力
-  ymuint np = library.pat_num();
+  ymuint np = library.pg_pat_num();
   for (ymuint i = 0; i < np; ++ i) {
-    const CellPatGraph& pat = library.pat(i);
+    const CellPatGraph& pat = library.pg_pat(i);
     s << "Pat#" << i << ": "
       << "Rep#" << pat.rep_id() << ": ";
     if ( pat.root_inv() ) {

@@ -206,6 +206,7 @@ class CellClass;
 class CellFFInfo;
 class CellLatchInfo;
 class CellPatGraph;
+class CellPat2Graph;
 
 END_NAMESPACE_YM_CELL
 
@@ -307,6 +308,7 @@ using nsCell::CellClass;
 using nsCell::CellFFInfo;
 using nsCell::CellLatchInfo;
 using nsCell::CellPatGraph;
+using nsCell::CellPat2Graph;
 
 using nsCell::tCellTimingSense;
 using nsCell::tCellTimingType;

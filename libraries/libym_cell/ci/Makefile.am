@@ -57,6 +57,10 @@ libym_cell_ci_la_SOURCES = \
 	CiPatGraph.cc \
 	CiPatMgr.h \
 	CiPatMgr.cc \
+	CiPat2Graph.h \
+	CiPat2Graph.cc \
+	CiPat2Mgr.h \
+	CiPat2Mgr.cc \
 	CiPin.h \
 	CiPin.cc \
 	CiPinHash.h \
