@@ -1,36 +1,35 @@
-#ifndef PATMATCHER_H
-#define PATMATCHER_H
+#ifndef PAT2MATCHER_H
+#define PAT2MATCHER_H
 
-/// @file PatMatcher.h
-/// @brief PatMatcher のヘッダファイル
+/// @file Pat2Matcher.h
+/// @brief Pat2Matcher のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_techmap/cellmap_nsdef.h"
 #include "ym_networks/bdn.h"
 #include "ym_cell/cell_nsdef.h"
-#include "Match.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
-/// @class PatMatcher PatMatcher.h "PatMatcher.h"
+/// @class Pat2Matcher Pat2Matcher.h "Pat2Matcher.h"
 /// @brief パタンマッチングを行うクラス
 //////////////////////////////////////////////////////////////////////
-class PatMatcher
+class Pat2Matcher
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] library セルライブラリ
-  PatMatcher(const CellLibrary& library);
+  Pat2Matcher(const CellLibrary& library);
 
   /// @brief デストラクタ
-  ~PatMatcher();
+  ~Pat2Matcher();
 
 
 public:
@@ -38,15 +37,12 @@ public:
   /// @brief パタンマッチングを行う．
   /// @param[in] sbj_root サブジェクトグラフの根のノード
   /// @param[in] pat_graph パタングラフ
-  /// @param[in] match マッチング結果を格納する変数
-  /// @retval true マッチングが成功した
-  /// @retval false マッチングが失敗した．
+  /// @retval true マッチした．
+  /// @retval false マッチしなかった．
   bool
   operator()(const BdnNode* sbj_root,
-	     const CellPatGraph& pat_graph,
-	     Match& match);
+	     const CellPat2Graph& pat_graph);
 
-#if 0
   /// @brief 直前のマッチングにおける入力のノードを得る．
   /// @param[in] pos 入力番号
   const BdnNode*
@@ -58,12 +54,19 @@ public:
   /// @retval false 反転なし
   bool
   leaf_inv(ymuint pos) const;
-#endif
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief マッチングを行なう下請け関数
+  /// @param[in] pat_graph パタングラフ
+  /// @param[in] pos 枝番号
+  bool
+  match_sub(const CellPat2Graph& pat_graph,
+	    ymuint pos);
 
   /// @brief サブジェクトノードとパタンノードをバインドする．
   /// @param[in] sbj_node サブジェクトノード
@@ -98,13 +101,11 @@ private:
   // mSbjMap と mInvMap のクリア用キュー
   vector<ymuint> mClearQueue;
 
-#if 0
   // 直前のマッチングにおけるパタンの入力ノードを記録する配列
   vector<const BdnNode*> mLeafNodeArray;
 
   // 直前のマッチングにおけるパタンの入力の極性を記録する配列
   vector<bool> mLeafInvArray;
-#endif
 
 };
 
@@ -113,12 +114,11 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-#if 0
 // @brief 直前のマッチングにおける入力のノードを得る．
 // @param[in] pos 入力番号
 inline
 const BdnNode*
-PatMatcher::leaf_node(ymuint pos) const
+Pat2Matcher::leaf_node(ymuint pos) const
 {
   return mLeafNodeArray[pos];
 }
@@ -129,12 +129,11 @@ PatMatcher::leaf_node(ymuint pos) const
 // @retval false 反転なし
 inline
 bool
-PatMatcher::leaf_inv(ymuint pos) const
+Pat2Matcher::leaf_inv(ymuint pos) const
 {
   return mLeafInvArray[pos];
 }
-#endif
 
 END_NAMESPACE_YM_CELLMAP
 
-#endif // PATMATCHER_H
+#endif // PAT2MATCHER_H

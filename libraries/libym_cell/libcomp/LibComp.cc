@@ -170,7 +170,7 @@ LibComp::compile(const CellLibrary& library)
       // パタンを作る．
       ymuint ni2 = cell->input_num2();
       ymuint no2 = cell->output_num2();
-      if ( ni2 > 6 ) {
+      if ( ni2 > 8 ) {
 	// 入力ピンが8つ以上のセルは対象外
 	continue;
       }
@@ -278,10 +278,12 @@ LibComp::reg_expr(const LogExpr& expr)
   LcGroup* fgroup = mLogicMgr.find_group(TvFuncM(f));
   const LcClass* fclass = fgroup->parent();
 
+#if 0
   if ( fclass->id() == mMux4Id ) {
     // かなり苦しいハック
     return;
   }
+#endif
 
   // fclass->rep_func() を用いる理由は論理式に現れる変数が
   // 真のサポートとは限らないから

@@ -225,7 +225,8 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
     for (ymuint pat_id = 0; pat_id < np; ++ pat_id) {
       const CellPatGraph& pat = cell_library.pg_pat(pat_id);
       ymuint ni = pat.input_num();
-      if ( pat_match(node, pat) ) {
+      Match match(ni);
+      if ( pat_match(node, pat, match) ) {
 	ymuint rep_id = pat.rep_id();
 	if ( debug ) {
 	  cout << "Match with Pat#" << pat_id
@@ -241,8 +242,8 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	    NpnVmap imap = npn_map.imap(VarId(i));
 	    VarId dst_var = imap.var();
 	    ymuint pos = dst_var.val();
-	    const BdnNode* inode = pat_match.leaf_node(pos);
-	    bool iinv = pat_match.leaf_inv(pos);
+	    const BdnNode* inode = match.leaf_node(pos);
+	    bool iinv = match.leaf_inv(pos);
 	    if ( imap.pol() == kPolNega ) {
 	      iinv = !iinv;
 	    }
