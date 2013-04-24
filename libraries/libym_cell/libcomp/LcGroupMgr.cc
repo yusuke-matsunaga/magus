@@ -55,7 +55,7 @@ LcGroupMgr::add_cell(const Cell* cell)
     ymuint ni = cell->input_num2();
     ymuint no = cell->output_num2();
     TvFuncM repfunc(ni, no);
-    LcClass* fclass = mLibComp.new_class(repfunc);
+    LcClass* fclass = mLibComp.new_class(repfunc, false);
     NpnMapM xmap;
     xmap.set_identity(ni, no);
     fclass->add_group(fgroup, xmap);
@@ -66,7 +66,7 @@ LcGroupMgr::add_cell(const Cell* cell)
     gen_signature(cell, f);
 
     // f に対するセルグループを求める．
-    LcGroup* fgroup = find_group(f);
+    LcGroup* fgroup = find_group(f, false);
 
     // セル(番号)を追加する．
     fgroup->add_cell(cell);
@@ -75,9 +75,11 @@ LcGroupMgr::add_cell(const Cell* cell)
 
 // @brief f に対応する LcGroup を求める．
 // @param[in] f 関数
+// @param[in] builtin 組み込みクラスの時 true にするフラグ
 // @note なければ新規に作る．
 LcGroup*
-LcGroupMgr::find_group(const TvFuncM& f)
+LcGroupMgr::find_group(const TvFuncM& f,
+		       bool builtin)
 {
   LcGroup* fgroup = NULL;
   hash_map<TvFuncM, ymuint>::iterator p = mGroupMap.find(f);
@@ -95,7 +97,7 @@ LcGroupMgr::find_group(const TvFuncM& f)
     hash_map<TvFuncM, ymuint>::iterator q = mClassMap.find(repfunc);
     if ( q == mClassMap.end() ) {
       // まだ登録されていない．
-      fclass = mLibComp.new_class(repfunc);
+      fclass = mLibComp.new_class(repfunc, builtin);
       mClassMap.insert(make_pair(repfunc, fclass->id()));
       find_idmap_list(repfunc, fclass->mIdmapList);
     }
