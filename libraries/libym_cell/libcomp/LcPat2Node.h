@@ -79,27 +79,6 @@ public:
   bool
   fanin_inv(ymuint pos) const;
 
-#if 0
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 設定用の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 入力に設定する．
-  /// @param[in] input_id 入力番号
-  void
-  set_input(ymuint input_id);
-
-  /// @brief ANDに設定する．
-  /// @param[in] fanin_num ファンイン数
-  void
-  set_and(ymuint fanin_num);
-
-  /// @brief XORに設定する．
-  /// @param[in] fanin_num ファンイン数
-  void
-  set_xor(ymuint fanin_num);
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////

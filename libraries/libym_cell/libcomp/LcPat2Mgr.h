@@ -102,7 +102,20 @@ private:
   check_equivalent(const LogExpr& expr1,
 		   const LogExpr& expr2);
 
-  /// @brief
+  /// @brief 2つのパタンが同型かどうか調べる．
+  static
+  bool
+  check_equivalent(LcPat2Handle handle1,
+		   LcPat2Handle handle2);
+
+  /// @brief check_equivalent の下請け関数
+  static
+  bool
+  ceq_sub(LcPat2Handle handle1,
+	  LcPat2Handle handle2,
+	  hash_map<ymuint, ymuint>& map1,
+	  hash_map<ymuint, ymuint>& map2);
+
   /// @brief 使われていないパタンとノードを削除してID番号を詰める．
   /// @note 同時に入力ノードの入力番号とノード番号を一致させる．
   void
@@ -114,14 +127,6 @@ private:
   void
   pg_sub(const LogExpr& expr,
 	 vector<LcPat2Handle>& pg_list);
-
-  /// @brief pg_list に new_handle を追加する．
-  /// @note ただし，同形のパタンがすでにある場合には追加しない．
-  static
-  void
-  add_pg_list(vector<LcPat2Handle>& pg_list,
-	      hash_set<string>& pg_hash,
-	      LcPat2Handle new_handle);
 
   /// @brief 入力ノードを作る．
   /// @param[in] var 入力変数

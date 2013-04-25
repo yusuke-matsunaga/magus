@@ -12,6 +12,7 @@
 #include "LcPat2Handle.h"
 
 #include "ym_logic/LogExpr.h"
+#include "ym_utils/MFSet.h"
 #include "ym_utils/Generator.h"
 
 
@@ -114,14 +115,10 @@ LcPat2Mgr::reg_pat(const LogExpr& expr,
     expr_list.push_back(expr);
   }
 
-#if 1
-  LcPat2Handle pat = pg_sub(expr);
-  mPatList.push_back(pat);
-  mRepList.push_back(rep_id);
-#else
   vector<LcPat2Handle> tmp_pat_list;
   pg_sub(expr, tmp_pat_list);
 
+#if 0
   // 重複チェック
   hash_set<string> pg_hash;
   ymuint n = mPatList.size();
@@ -153,9 +150,8 @@ LcPat2Mgr::reg_pat(const LogExpr& expr,
       node1->set_locked();
     }
   }
-
-  sweep();
 #endif
+  sweep();
 }
 
 // @brief 2つの論理式が同形かどうか調べる．
@@ -226,34 +222,82 @@ LcPat2Mgr::check_equivalent(const LogExpr& expr1,
   return false;
 }
 
-#if 1
-
-// @brief パタングラフを生成する再帰関数
-// @param[in] expr 元になる論理式
-LcPat2Handle
-LcPat2Mgr::pg_sub(const LogExpr& expr)
+// @brief 2つのパタンが同型かどうか調べる．
+bool
+LcPat2Mgr::check_equivalent(LcPat2Handle handle1,
+			    LcPat2Handle handle2)
 {
-  if ( expr.is_literal() ) {
-    LcPat2Node* node = make_input(expr.varid());
-    bool inv = expr.is_negaliteral();
-    return LcPat2Handle(node, inv);
-  }
+  hash_map<ymuint, ymuint> map1;
+  hash_map<ymuint, ymuint> map2;
 
-  ymuint n = expr.child_num();
-  vector<LcPat2Handle> chd_array(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    chd_array[i] = pg_sub(expr.child(i));
-  }
-
-  return make_node(expr, chd_array);
+  return ceq_sub(handle1, handle2, map1, map2);
 }
 
-#else
+// @brief check_equivalent の下請け関数
+bool
+LcPat2Mgr::ceq_sub(LcPat2Handle handle1,
+		   LcPat2Handle handle2,
+		   hash_map<ymuint, ymuint>& map1,
+		   hash_map<ymuint, ymuint>& map2)
+{
+  if ( handle1.inv() != handle2.inv() ) {
+    return false;
+  }
+
+  LcPat2Node* node1 = handle1.node();
+  LcPat2Node* node2 = handle2.node();
+
+  if ( node1->is_input() && node2->is_input() ) {
+    ymuint id1 = node1->input_id();
+    ymuint id2 = node2->input_id();
+    hash_map<ymuint, ymuint>::iterator p1 = map1.find(id1);
+    hash_map<ymuint, ymuint>::iterator p2 = map2.find(id2);
+    if ( p1 == map1.end() ) {
+      map1.insert(make_pair(id1, id2));
+    }
+    else {
+      if ( p1->second != id2 ) {
+	return false;
+      }
+    }
+    if ( p2 == map2.end() ) {
+      map2.insert(make_pair(id2, id1));
+    }
+    else {
+      if ( p2->second != id1 ) {
+	return false;
+      }
+    }
+    return true;
+  }
+
+  if ( node1->is_and() && !node2->is_and() ||
+       node1->is_xor() && !node2->is_xor() ) {
+    return false;
+  }
+
+  ymuint ni = node1->fanin_num();
+  if ( ni != node2->fanin_num() ) {
+    return false;
+  }
+
+  for (ymuint i = 0; i < ni; ++ i) {
+    bool stat = ceq_sub(node1->fanin_handle(i),
+			node2->fanin_handle(i),
+			map1, map2);
+    if ( !stat ) {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 // @brief 使われていないパタンとノードを削除してID番号を詰める．
 void
 LcPat2Mgr::sweep()
 {
+#if 0
   // lock されていないノードの削除
   ymuint wpos = 0;
   for (ymuint i = 0; i < mNodeList.size(); ++ i) {
@@ -298,6 +342,7 @@ LcPat2Mgr::sweep()
     mNodeList[i] = node1;
     node1->mId = i;
   }
+#endif
 }
 
 // @brief パタングラフを生成する再帰関数
@@ -322,58 +367,71 @@ LcPat2Mgr::pg_sub(const LogExpr& expr,
       nk_array[i] = make_pair(input_pg_list[i].size(), 1);
     }
 
-    hash_set<string> pg_hash;
     // ファンインのパタンの組み合わせを列挙するオブジェクト
     MultiCombiGen mcg(nk_array);
     for (MultiCombiGen::iterator p = mcg.begin(); !p.is_end(); ++ p) {
       vector<LcPat2Handle> tmp_input(n);
-      bool all_inputs = true;
       for (ymuint i = 0; i < n; ++ i) {
 	tmp_input[i] = input_pg_list[i][p(i, 0)];
-	if ( !tmp_input[i].node()->is_input() ) {
-	  all_inputs = false;
+      }
+
+      // 同型なパタンを求める．
+      MFSet mfset(n);
+      for (ymuint i1 = 1; i1 < n; ++ i1) {
+	LcPat2Handle pat1 = tmp_input[i1];
+	for (ymuint i2 = 0; i2 < i1; ++ i2) {
+	  LcPat2Handle pat2 = tmp_input[i2];
+	  if ( check_equivalent(pat1, pat2) ) {
+	    mfset.merge(i1, i2);
+	  }
+	}
+      }
+      vector<ymuint> rep_id;
+      rep_id.reserve(n);
+      vector<ymuint> rev_rep(n);
+      for (ymuint i = 0; i < n; ++ i) {
+	ymuint x = mfset.find(i);
+	if ( x == i ) {
+	  rev_rep[x] = rep_id.size();
+	  rep_id.push_back(x);
 	}
       }
 
-      if ( all_inputs ) {
+      // group_list[0〜(ng - 1)] に同形なパタンのリストを格納する．
+      ymuint ng = rep_id.size();
+      vector<vector<ymuint> > group_list(ng);
+      for (ymuint i = 0; i < n; ++ i) {
+	ymuint x = mfset.find(i);
+	ymuint id = rev_rep[x];
+	group_list[id].push_back(i);
+      }
+
+      // 入力の順列を列挙するオブジェクト
+#if 0
+      PermGen pg(n, n);
+      vector<LcPat2Handle> input(n);
+      for (PermGen::iterator q = pg.begin(); !q.is_end(); ++ q) {
+	vector<ymuint> order(n);
+	for (ymuint i = 0; i < n; ++ i) {
+	  ymuint j = q(i);
+	  order[i] = j;
+	  for (ymuint k = 0; k < i; ++ k) {
+	    ymuint j0 = order[k];
+
+	  }
+	}
+
+	for (ymuint i = 0; i < n; ++ i) {
+	  ymuint j = order[i];
+	  input[j] = tmp_input[i];
+	}
 	LcPat2Handle pat = make_node(expr, tmp_input);
 	pg_list.push_back(pat);
       }
-      else {
-	// 入力の順列を列挙するオブジェクト
-	PermGen pg(n, n);
-	vector<LcPat2Handle> input(n);
-	for (PermGen::iterator q = pg.begin(); !q.is_end(); ++ q) {
-	  for (ymuint i = 0; i < n; ++ i) {
-	    ymuint j = q(i);
-	    input[j] = tmp_input[i];
-	  }
-	  LcPat2Handle pat = make_node(expr, tmp_input);
-	  pg_list.push_back(pat);
-	}
-      }
+#endif
     }
   }
 }
-
-// pg_list に new_handle を追加する．
-// ただし，同形のパタンがすでにある場合には追加しない．
-void
-LcPat2Mgr::add_pg_list(vector<LcPat2Handle>& pg_list,
-		      hash_set<string>& pg_hash,
-		      LcPat2Handle new_handle)
-{
-  string signature = new_handle.node()->signature();
-  if ( new_handle.inv() ) {
-    signature = "~" + signature;
-  }
-  if ( pg_hash.find(signature) == pg_hash.end() ) {
-    pg_hash.insert(signature);
-    pg_list.push_back(new_handle);
-  }
-}
-
-#endif
 
 // @brief 入力ノードを作る．
 // @param[in] var 入力変数
