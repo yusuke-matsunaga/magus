@@ -102,15 +102,7 @@ private:
   check_equivalent(const LogExpr& expr1,
 		   const LogExpr& expr2);
 
-#if 1
-
-  /// @brief パタングラフを生成する再帰関数
-  /// @param[in] expr 元になる論理式
-  LcPat2Handle
-  pg_sub(const LogExpr& expr);
-
-#else
-
+  /// @brief
   /// @brief 使われていないパタンとノードを削除してID番号を詰める．
   /// @note 同時に入力ノードの入力番号とノード番号を一致させる．
   void
@@ -130,8 +122,6 @@ private:
   add_pg_list(vector<LcPat2Handle>& pg_list,
 	      hash_set<string>& pg_hash,
 	      LcPat2Handle new_handle);
-
-#endif
 
   /// @brief 入力ノードを作る．
   /// @param[in] var 入力変数
