@@ -101,21 +101,6 @@ private:
   // 設定用の関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 入力に設定する．
-  /// @param[in] input_id 入力番号
-  void
-  set_input(ymuint input_id);
-
-  /// @brief ANDに設定する．
-  /// @param[in] inv0, inv1 ファンインの反転属性
-  void
-  set_and(bool inv0,
-	  bool inv1);
-
-  /// @brief XORに設定する．
-  void
-  set_xor();
-
   /// @brief 'lock' する．
   /// @note ファンインに再帰する．
   void

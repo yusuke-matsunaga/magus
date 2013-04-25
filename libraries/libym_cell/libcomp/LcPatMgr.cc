@@ -302,22 +302,19 @@ LcPatMgr::pg_sub(const LogExpr& expr,
     MultiCombiGen mcg(nk_array);
     for (MultiCombiGen::iterator p = mcg.begin(); !p.is_end(); ++ p) {
       vector<LcPatHandle> tmp_input(n);
+      bool all_inputs = true;
       for (ymuint i = 0; i < n; ++ i) {
 	tmp_input[i] = input_pg_list[i][p(i, 0)];
+	if ( !tmp_input[i].node()->is_input() ) {
+	  all_inputs = false;
+	}
       }
 
-      // 入力の順列を列挙するオブジェクト
-      PermGen pg(n, n);
-      vector<LcPatHandle> input(n);
-      for (PermGen::iterator q = pg.begin(); !q.is_end(); ++ q) {
-	for (ymuint i = 0; i < n; ++ i) {
-	  ymuint j = q(i);
-	  input[j] = tmp_input[i];
-	}
+      if ( all_inputs ) {
 	switch ( n ) {
 	case 2:
 	  {
-	    LcPatHandle handle = make_node(expr, input[0], input[1]);
+	    LcPatHandle handle = make_node(expr, tmp_input[0], tmp_input[1]);
 	    add_pg_list(pg_list, pg_hash, handle);
 	  }
 	  break;
@@ -325,7 +322,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	case 3:
 	  for (ymuint i = 0; i < n_pat3; ++ i) {
 	    ymuint pos = 0;
-	    LcPatHandle handle = make_bintree(expr, input, pat3[i], pos);
+	    LcPatHandle handle = make_bintree(expr, tmp_input, pat3[i], pos);
 	    add_pg_list(pg_list, pg_hash, handle);
 	  }
 	  break;
@@ -333,7 +330,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	case 4:
 	  for (ymuint i = 0; i < n_pat4; ++ i) {
 	    ymuint pos = 0;
-	    LcPatHandle handle = make_bintree(expr, input, pat4[i], pos);
+	    LcPatHandle handle = make_bintree(expr, tmp_input, pat4[i], pos);
 	    add_pg_list(pg_list, pg_hash, handle);
 	  }
 	  break;
@@ -341,7 +338,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	case 5:
 	  for (ymuint i = 0; i < n_pat5; ++ i) {
 	    ymuint pos = 0;
-	    LcPatHandle handle = make_bintree(expr, input, pat5[i], pos);
+	    LcPatHandle handle = make_bintree(expr, tmp_input, pat5[i], pos);
 	    add_pg_list(pg_list, pg_hash, handle);
 	  }
 	  break;
@@ -349,7 +346,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	case 6:
 	  for (ymuint i = 0; i < n_pat6; ++ i) {
 	    ymuint pos = 0;
-	    LcPatHandle handle = make_bintree(expr, input, pat6[i], pos);
+	    LcPatHandle handle = make_bintree(expr, tmp_input, pat6[i], pos);
 	    add_pg_list(pg_list, pg_hash, handle);
 	  }
 	  break;
@@ -357,7 +354,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	case 7:
 	  for (ymuint i = 0; i < n_pat7; ++ i) {
 	    ymuint pos = 0;
-	    LcPatHandle handle = make_bintree(expr, input, pat7[i], pos);
+	    LcPatHandle handle = make_bintree(expr, tmp_input, pat7[i], pos);
 	    add_pg_list(pg_list, pg_hash, handle);
 	  }
 	  break;
@@ -365,7 +362,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	case 8:
 	  for (ymuint i = 0; i < n_pat8; ++ i) {
 	    ymuint pos = 0;
-	    LcPatHandle handle = make_bintree(expr, input, pat8[i], pos);
+	    LcPatHandle handle = make_bintree(expr, tmp_input, pat8[i], pos);
 	    add_pg_list(pg_list, pg_hash, handle);
 	  }
 	  break;
@@ -373,6 +370,78 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	default:
 	  assert_not_reached(__FILE__, __LINE__);
 	  break;
+	}
+      }
+      else {
+
+	// 入力の順列を列挙するオブジェクト
+	PermGen pg(n, n);
+	vector<LcPatHandle> input(n);
+	for (PermGen::iterator q = pg.begin(); !q.is_end(); ++ q) {
+	  for (ymuint i = 0; i < n; ++ i) {
+	    ymuint j = q(i);
+	    input[j] = tmp_input[i];
+	  }
+	  switch ( n ) {
+	  case 2:
+	    {
+	      LcPatHandle handle = make_node(expr, input[0], input[1]);
+	      add_pg_list(pg_list, pg_hash, handle);
+	    }
+	    break;
+
+	  case 3:
+	    for (ymuint i = 0; i < n_pat3; ++ i) {
+	      ymuint pos = 0;
+	      LcPatHandle handle = make_bintree(expr, input, pat3[i], pos);
+	      add_pg_list(pg_list, pg_hash, handle);
+	    }
+	    break;
+
+	  case 4:
+	    for (ymuint i = 0; i < n_pat4; ++ i) {
+	      ymuint pos = 0;
+	      LcPatHandle handle = make_bintree(expr, input, pat4[i], pos);
+	      add_pg_list(pg_list, pg_hash, handle);
+	    }
+	    break;
+
+	  case 5:
+	    for (ymuint i = 0; i < n_pat5; ++ i) {
+	      ymuint pos = 0;
+	      LcPatHandle handle = make_bintree(expr, input, pat5[i], pos);
+	      add_pg_list(pg_list, pg_hash, handle);
+	    }
+	    break;
+
+	  case 6:
+	    for (ymuint i = 0; i < n_pat6; ++ i) {
+	      ymuint pos = 0;
+	      LcPatHandle handle = make_bintree(expr, input, pat6[i], pos);
+	      add_pg_list(pg_list, pg_hash, handle);
+	    }
+	    break;
+
+	  case 7:
+	    for (ymuint i = 0; i < n_pat7; ++ i) {
+	      ymuint pos = 0;
+	      LcPatHandle handle = make_bintree(expr, input, pat7[i], pos);
+	      add_pg_list(pg_list, pg_hash, handle);
+	    }
+	    break;
+
+	  case 8:
+	    for (ymuint i = 0; i < n_pat8; ++ i) {
+	      ymuint pos = 0;
+	      LcPatHandle handle = make_bintree(expr, input, pat8[i], pos);
+	      add_pg_list(pg_list, pg_hash, handle);
+	    }
+	    break;
+
+	  default:
+	    assert_not_reached(__FILE__, __LINE__);
+	    break;
+	  }
 	}
       }
     }
@@ -431,8 +500,8 @@ LcPatMgr::make_input(VarId var)
   ymuint id = var.val();
   while ( mInputList.size() <= id ) {
     LcPatNode* node = new_node();
-    ymuint id1 = mInputList.size();
-    node->set_input(id1);
+    ymuint input_id = mInputList.size();
+    node->mType = (input_id << 2) | LcPatNode::kInput;
     mInputList.push_back(node);
   }
   LcPatNode* node = mInputList[id];

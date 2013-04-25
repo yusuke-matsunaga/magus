@@ -406,26 +406,6 @@ LibComp::display(ostream& s) const
   s << "*** NPN Class END ***" << endl
     << endl;
 
-#if 0
-  // 論理セルグループの情報を出力する．
-  s << "*** LogicGroupMgr BEGIN ***" << endl;
-  mLogicMgr.display(s);
-  s << "*** LogicGroupMgr END ***" << endl
-    << endl;
-
-  // FFグループの情報を出力する．
-  s << "*** FFGroupMgr BEGIN ***" << endl;
-  mFFMgr.display(s);
-  s << "*** FFGroupMgr END ***" << endl
-    << endl;
-
-  // ラッチグループの情報を出力する．
-  s << "*** LatchGroupMgr BEGIN ***" << endl;
-  mLatchMgr.display(s);
-  s << "*** LatchGroupMgr END ***" << endl
-    << endl;
-#endif
-
   // パタングラフの情報を出力する．
   mPatMgr.display(s);
   mPat2Mgr.display(s);
