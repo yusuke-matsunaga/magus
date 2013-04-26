@@ -13,6 +13,7 @@
 
 #include "ym_logic/LogExpr.h"
 #include "ym_utils/Generator.h"
+#include "MultiSetPermGen.h"
 
 
 BEGIN_NONAMESPACE

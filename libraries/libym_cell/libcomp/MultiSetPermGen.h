@@ -139,7 +139,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 要素の重複度
-  vector<ymuint32> mMultiArray;
+  vector<ymuint32> mNumArray;
 
   // 選択する要素数
   ymuint32 mK;
