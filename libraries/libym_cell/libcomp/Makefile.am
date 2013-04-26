@@ -30,11 +30,6 @@ libym_cell_libcomp_la_SOURCES = \
 	LcPatMgr.h \
 	LcPatMgr.cc \
 	LcPatNode.h \
-	LcPatNode.cc \
-	LcPat2Mgr.h \
-	LcPat2Mgr.cc \
-	LcPat2Node.h \
-	LcPat2Handle.h \
 	MultiSetPermGen.h \
 	MultiSetPermGen.cc \
 	LibComp.h \

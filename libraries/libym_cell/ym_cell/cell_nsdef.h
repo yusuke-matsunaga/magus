@@ -308,7 +308,6 @@ using nsCell::CellClass;
 using nsCell::CellFFInfo;
 using nsCell::CellLatchInfo;
 using nsCell::CellPatGraph;
-using nsCell::CellPat2Graph;
 
 using nsCell::tCellTimingSense;
 using nsCell::tCellTimingType;

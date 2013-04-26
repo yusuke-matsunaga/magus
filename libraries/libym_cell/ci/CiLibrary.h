@@ -23,7 +23,6 @@
 #include "CiCellHash.h"
 #include "CiPinHash.h"
 #include "CiPatMgr.h"
-#include "CiPat2Mgr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -342,89 +341,6 @@ public:
   virtual
   bool
   pg_edge_inv(ymuint id) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // パタングラフ関係の情報の取得
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 総パタン数を返す．
-  virtual
-  ymuint
-  pg2_num() const;
-
-  /// @brief パタンを返す．
-  /// @param[in] id パタン番号 ( 0 <= id < pg2_num() )
-  virtual
-  const CellPat2Graph&
-  pg2_pat(ymuint id) const;
-
-  /// @brief パタンの最大の入力数を得る．
-  virtual
-  ymuint
-  pg2_max_input() const;
-
-  /// @brief 総ノード数を返す．
-  virtual
-  ymuint
-  pg2_node_num() const;
-
-  /// @brief ノードの種類を返す．
-  /// @param[in] id ノード番号 ( 0 <= id < pg2_node_num() )
-  virtual
-  tCellPatType
-  pg2_node_type(ymuint id) const;
-
-  /// @brief ノードが入力ノードの時に入力番号を返す．
-  /// @param[in] id ノード番号 ( 0 <= id < pg2_node_num() )
-  /// @note 入力ノードでない場合の返り値は不定
-  virtual
-  ymuint
-  pg2_input_id(ymuint id) const;
-
-  /// @brief ノードがAND/XORノードの時にファンイン数を返す．
-  /// @param[in] id ノード番号 ( 0 <= id < pg2_node_num() )
-  /// @note AND/XORノードでない場合の返り値は不定
-  virtual
-  ymuint
-  pg2_fanin_num(ymuint id) const;
-
-  /// @brief 入力のノード番号を返す．
-  /// @param[in] input_id 入力番号 ( 0 <= input_id < pg2_input_num() )
-  /// @return input_id の入力に対応するノードのノード番号
-  virtual
-  ymuint
-  pg2_input_node(ymuint input_id) const;
-
-  /// @brief 総枝数を返す．
-  virtual
-  ymuint
-  pg2_edge_num() const;
-
-  /// @brief 枝のファンイン元のノード番号を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < pg2_edge_num() )
-  virtual
-  ymuint
-  pg2_edge_from(ymuint id) const;
-
-  /// @brief 枝のファンアウト先のノード番号を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < pg2_edge_num() )
-  virtual
-  ymuint
-  pg2_edge_to(ymint id) const;
-
-  /// @brief 枝のファンアウト先の入力位置を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < pg2_edge_num() )
-  virtual
-  ymuint
-  pg2_edge_pos(ymuint id) const;
-
-  /// @brief 枝の反転属性を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < pg2_edge_num() )
-  virtual
-  bool
-  pg2_edge_inv(ymuint id) const;
 
 
 public:
@@ -1076,9 +992,6 @@ private:
 
   // パタングラフを管理するクラス
   CiPatMgr mPatMgr;
-
-  // パタングラフを管理するクラス
-  CiPat2Mgr mPat2Mgr;
 
 };
 

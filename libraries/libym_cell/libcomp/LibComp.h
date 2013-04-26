@@ -14,7 +14,6 @@
 #include "LcFFMgr.h"
 #include "LcLatchMgr.h"
 #include "LcPatMgr.h"
-#include "LcPat2Mgr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
@@ -60,10 +59,6 @@ public:
   /// @brief パタングラフの情報を取り出す．
   const LcPatMgr&
   pat_mgr() const;
-
-  /// @brief パタングラフの情報を取り出す．
-  const LcPat2Mgr&
-  pat2_mgr() const;
 
   /// @brief グラフ構造全体の内容を表示する．
   /// @param[in] s 出力先のストリーム
@@ -170,12 +165,6 @@ private:
 
   // パタングラフを管理するオブジェクト
   LcPatMgr mPatMgr;
-
-  LcPat2Mgr mPat2Mgr;
-
-  // 組み込みパタンのクラス番号
-
-
 
 };
 

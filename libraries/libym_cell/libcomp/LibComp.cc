@@ -102,13 +102,6 @@ LibComp::pat_mgr() const
   return mPatMgr;
 }
 
-// @brief パタングラフの情報を取り出す．
-const LcPat2Mgr&
-LibComp::pat2_mgr() const
-{
-  return mPat2Mgr;
-}
-
 // @brief セルのグループ化，クラス化を行う．
 void
 LibComp::compile(const CellLibrary& library)
@@ -120,11 +113,9 @@ LibComp::compile(const CellLibrary& library)
   mFFMgr.init();
   mLatchMgr.init();
   mPatMgr.init();
-  mPat2Mgr.init();
 
   // AND2 〜 AND8 のパタンを登録しておく．
   for (ymuint ni = 2; ni <= 8; ++ ni) {
-    cout << "AND" << ni << endl;
     LogExpr and_expr = LogExpr::make_posiliteral(VarId(0));
     for (ymuint i = 1; i < ni; ++ i) {
       and_expr &= LogExpr::make_posiliteral(VarId(i));
@@ -134,7 +125,6 @@ LibComp::compile(const CellLibrary& library)
 
   // XOR2 〜 XOR4 のパタンを登録しておく．
   for (ymuint ni = 2; ni <= 4; ++ ni) {
-    cout << "XOR" << ni << endl;
     LogExpr xor_expr = LogExpr::make_posiliteral(VarId(0));
     for (ymuint i = 1; i < ni; ++ i) {
       xor_expr ^= LogExpr::make_posiliteral(VarId(i));
@@ -144,7 +134,6 @@ LibComp::compile(const CellLibrary& library)
 
   // MUX2 のパタンを登録しておく．
   {
-    cout << "MUX2" << endl;
     LogExpr lit0 = LogExpr::make_posiliteral(VarId(0));
     LogExpr lit1 = LogExpr::make_posiliteral(VarId(1));
     LogExpr lit2 = LogExpr::make_posiliteral(VarId(2));
@@ -154,7 +143,6 @@ LibComp::compile(const CellLibrary& library)
 
   // MUX4 のパタンを登録しておく．
   {
-    cout << "MUX4" << endl;
     LogExpr lit0 = LogExpr::make_posiliteral(VarId(0));
     LogExpr lit1 = LogExpr::make_posiliteral(VarId(1));
     LogExpr lit2 = LogExpr::make_posiliteral(VarId(2));
@@ -168,7 +156,6 @@ LibComp::compile(const CellLibrary& library)
       lit3 &  lit4 &  lit5;
     reg_expr(mux4_ex, true);
   }
-  cout << "END" << endl;
 
   // MUX8 のパタンを登録しておく．
   if ( 0 ) {
@@ -203,12 +190,7 @@ LibComp::compile(const CellLibrary& library)
       mLogicMgr.add_cell(cell);
 
       // パタンを作る．
-      ymuint ni2 = cell->input_num2();
       ymuint no2 = cell->output_num2();
-      if ( ni2 > 8 ) {
-	// 入力ピンが8つ以上のセルは対象外
-	continue;
-      }
       if ( no2 != 1 ) {
 	// 出力ピンが複数あるセルは対象外
 	continue;
@@ -233,7 +215,9 @@ LibComp::compile(const CellLibrary& library)
     }
   }
 
-  display(cout);
+  if ( 0 ) {
+    display(cout);
+  }
 }
 
 // @brief セルグループの数を返す．
@@ -324,7 +308,9 @@ LibComp::reg_expr(const LogExpr& expr,
   // fclass->rep_func() を用いる理由は論理式に現れる変数が
   // 真のサポートとは限らないから
 
-  if ( fclass->repfunc().ni() <= 1 ) {
+  ymuint ni = fclass->repfunc().ni();
+
+  if ( ni <= 1 ) {
     // 定数関数およびバッファ，インバータは別に処理する．
     return;
   }
@@ -333,8 +319,12 @@ LibComp::reg_expr(const LogExpr& expr,
   LogExpr cexpr = xform_expr(expr, fgroup->map());
   assert_cond( !cexpr.is_constant(), __FILE__, __LINE__);
 
-  mPatMgr.reg_pat(cexpr, fclass->id());
-  mPat2Mgr.reg_pat(cexpr, fclass->id());
+  if ( ni <= 8 ) {
+    mPatMgr.reg_pat(cexpr, fclass->id());
+  }
+  else {
+    // 登録できなかったことを通知する？
+  }
 }
 
 // @brief 新しいグループを作る．
@@ -408,7 +398,6 @@ LibComp::display(ostream& s) const
 
   // パタングラフの情報を出力する．
   mPatMgr.display(s);
-  mPat2Mgr.display(s);
 }
 
 END_NAMESPACE_YM_CELL_LIBCOMP
