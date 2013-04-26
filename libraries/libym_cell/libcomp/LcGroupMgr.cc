@@ -13,7 +13,7 @@
 #include "LibComp.h"
 #include "ym_cell/Cell.h"
 #include "ym_utils/MFSet.h"
-#include "ym_utils/Generator.h"
+#include "ym_utils/PermGen.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP

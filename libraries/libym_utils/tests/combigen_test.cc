@@ -3,7 +3,7 @@
 // nsMagus::CombiGen のテスト
 
 
-#include "ym_utils/Generator.h"
+#include "ym_utils/CombiGen.h"
 
 
 int

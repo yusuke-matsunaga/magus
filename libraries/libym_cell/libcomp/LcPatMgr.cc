@@ -13,8 +13,9 @@
 
 #include "ym_logic/LogExpr.h"
 #include "ym_utils/MFSet.h"
-#include "ym_utils/Generator.h"
-#include "MultiSetPermGen.h"
+#include "ym_utils/PermGen.h"
+#include "ym_utils/MultiCombiGen.h"
+#include "ym_utils/MultiSetPermGen.h"
 
 
 BEGIN_NONAMESPACE

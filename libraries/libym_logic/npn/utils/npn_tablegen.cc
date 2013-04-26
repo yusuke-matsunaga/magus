@@ -3,7 +3,7 @@
 // NPN パッケージのテスト
 
 #include "ymtools.h"
-#include "ym_utils/Generator.h"
+#include "ym_utils/PermGen.h"
 
 //#define DEBUG
 
@@ -33,7 +33,7 @@ naive(size_t ni)
 
     // 反転用のマスク
     size_t omask = (1 << ni_pow) - 1;
-  
+
     bool first = true;
     size_t max_vect = 0UL;
     for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
@@ -158,7 +158,7 @@ main(int argc, char** argv)
     if ( argc != 2 ) {
       return 2;
     }
-      
+
     size_t ni = atoi(argv[1]);
     naive(ni);
   }

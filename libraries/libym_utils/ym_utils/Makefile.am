@@ -11,6 +11,7 @@ noinst_HEADERS = \
 	Binder.h \
 	BinI.h \
 	BinO.h \
+	CombiGen.h \
 	DlList.h \
 	File.h \
 	FileBinI.h \
@@ -19,14 +20,19 @@ noinst_HEADERS = \
 	FileLoc.h \
 	FileRegion.h \
 	FileScanner.h \
-	Generator.h \
+	GenBase.h \
 	HeapTree.h \
 	ItvlMgr.h \
 	MFSet.h \
 	MsgHandler.h \
 	MsgMgr.h \
 	MStopWatch.h \
+	MultiCombiGen.h \
+	MultiGenBase.h \
+	MultiPermGen.h \
+	MultiSetPermGen.h \
 	NameMgr.h \
+	PermGen.h \
 	RandGen.h \
 	RandCombiGen.h \
 	RandPermGen.h \

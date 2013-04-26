@@ -8,7 +8,7 @@
 
 
 #include "NpnXform.h"
-#include "ym_utils/Generator.h"
+#include "ym_utils/PermGen.h"
 
 
 BEGIN_NAMESPACE_YM

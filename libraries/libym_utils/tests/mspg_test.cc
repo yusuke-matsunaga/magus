@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "MultiSetPermGen.h"
+#include "ym_utils/MultiSetPermGen.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBCOMP
+BEGIN_NAMESPACE_YM
 
 int
 mspg_test(int argc,
@@ -32,13 +32,14 @@ mspg_test(int argc,
   return 0;
 }
 
-END_NAMESPACE_YM_CELL_LIBCOMP
+END_NAMESPACE_YM
 
 
 int
 main(int argc,
      const char** argv)
 {
-  using namespace nsYm::nsCell::nsLibcomp;
+  using namespace nsYm;
+
   return mspg_test(argc, argv);
 }

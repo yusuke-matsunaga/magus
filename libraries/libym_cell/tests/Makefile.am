@@ -45,8 +45,7 @@ bin_PROGRAMS = \
 	cell_mgr_test \
 	cell_dump_test \
 	luttest \
-	lcpatmgr_test \
-	mspg_test
+	lcpatmgr_test
 
 mislib_parser_test_SOURCES = \
 	mislib_parser_test.cc
@@ -96,21 +95,6 @@ lcpatmgr_test_SOURCES = \
 lcpatmgr_test_LDFLAGS =
 
 lcpatmgr_test_LDADD = \
-	$(YM_CELL)
-
-
-mspg_test_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell \
-	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell/libcomp
-
-mspg_test_SOURCES = \
-	mspg_test.cc
-
-mspg_test_LDFLAGS =
-
-mspg_test_LDADD = \
 	$(YM_CELL)
 
 

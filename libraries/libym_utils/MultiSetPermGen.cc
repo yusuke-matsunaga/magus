@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "MultiSetPermGen.h"
+#include "ym_utils/MultiSetPermGen.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBCOMP
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // クラス MspgIterator
@@ -190,4 +190,4 @@ MultiSetPermGen::begin()
   return iterator(this);
 }
 
-END_NAMESPACE_YM_CELL_LIBCOMP
+END_NAMESPACE_YM

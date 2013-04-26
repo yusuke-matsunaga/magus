@@ -48,7 +48,8 @@ noinst_PROGRAMS = \
 	randpermgen_test \
 	randcombigen_test \
 	dllist_test \
-	heaptree_test
+	heaptree_test \
+	mspg_test
 
 
 ############################################################
@@ -201,4 +202,18 @@ dllist_test_LDADD = \
 heaptree_test_SOURCES = \
 	heaptree_test.cc
 heaptree_test_LDADD = \
+	$(YMUTILS)
+
+
+
+############################################################
+## Variables for building mspg_test
+############################################################
+
+mspg_test_SOURCES = \
+	mspg_test.cc
+
+mspg_test_LDFLAGS =
+
+mspg_test_LDADD = \
 	$(YMUTILS)

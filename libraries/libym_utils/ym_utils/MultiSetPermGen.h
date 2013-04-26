@@ -1,5 +1,5 @@
-#ifndef MULTISETPERMGEN_H
-#define MULTISETPERMGEN_H
+#ifndef YM_UTILS_MULTISETPERMGEN_H
+#define YM_UTILS_MULTISETPERMGEN_H
 
 /// @file MultiSetPermGen.h
 /// @brief MultiSetPermGen のヘッダファイル
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "libcomp_nsdef.h"
+#include "ymtools.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_LIBCOMP
+BEGIN_NAMESPACE_YM
 
 class MultiSetPermGen;
 
@@ -146,6 +146,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_CELL_LIBCOMP
+END_NAMESPACE_YM
 
-#endif // MULTISETPERMGEN_H
+#endif // YM_UTILS_MULTISETPERMGEN_H

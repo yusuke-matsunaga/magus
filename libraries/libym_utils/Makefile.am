@@ -31,6 +31,7 @@ libym_utils_la_SOURCES = \
 	Alloc.cc \
 	BinIO.cc \
 	Binder.cc \
+	CombiGen.cc \
 	DlList.cc \
 	File.cc \
 	FileInfo.h \
@@ -39,7 +40,7 @@ libym_utils_la_SOURCES = \
 	FileInfoMgr.cc \
 	FileScanner.cc \
 	FragAlloc.cc \
-	Generator.cc \
+	GenBase.cc \
 	ItvlCell.h \
 	ItvlMgrImpl.h \
 	ItvlMgrImpl.cc \
@@ -49,7 +50,12 @@ libym_utils_la_SOURCES = \
 	MsgMgr.cc \
 	MsgMgrImpl.h \
 	MsgMgrImpl.cc \
+	MultiCombiGen.cc \
+	MultiGenBase.cc \
+	MultiSetPermGen.cc \
+	MultiPermGen.cc \
 	NameMgr.cc \
+	PermGen.cc \
 	RandGen.cc \
 	RefCount.cc \
 	SimpleAlloc.cc \

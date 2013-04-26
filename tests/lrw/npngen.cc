@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_utils/Generator.h"
+#include "ym_utils/PermGen.h"
 #include "NpnXform.h"
 
 
