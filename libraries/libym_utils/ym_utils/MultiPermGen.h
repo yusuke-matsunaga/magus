@@ -112,6 +112,79 @@ private:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// コンストラクタ
+// 全要素数 n と選択する要素数 k のベクタを指定する．
+inline
+MultiPermGen::MultiPermGen(const vector<pair<ymuint, ymuint> >& nk_array) :
+  MultiGenBase(nk_array)
+{
+}
+
+// デストラクタ
+inline
+MultiPermGen::~MultiPermGen()
+{
+}
+
+// 最初の組み合わせを取り出す．
+inline
+MultiPermGenIterator
+MultiPermGen::begin()
+{
+  return iterator(this);
+}
+
+// 空のコンストラクタ
+inline
+MultiPermGenIterator::MultiPermGenIterator()
+{
+}
+
+// コンストラクタ
+// MultiPermGen が用いる．
+inline
+MultiPermGenIterator::MultiPermGenIterator(const MultiPermGen* parent) :
+  MultiGenIterator(parent)
+{
+}
+
+// コピーコンストラクタ
+inline
+MultiPermGenIterator::MultiPermGenIterator(const MultiPermGenIterator& src)
+{
+  copy(src);
+}
+
+// 代入演算子
+inline
+const MultiPermGenIterator&
+MultiPermGenIterator::operator=(const MultiPermGenIterator& src)
+{
+  copy(src);
+  return *this;
+}
+
+// 末尾の時に true を返す．
+inline
+bool
+MultiPermGenIterator::is_end() const
+{
+  return is_end_sub(0);
+}
+
+// grp 番目のグループが終了状態の時 true を返す．
+inline
+bool
+MultiPermGenIterator::is_end_sub(ymuint grp) const
+{
+  return elem(grp)[0] == n(grp);
+}
+
 END_NAMESPACE_YM
 
 #endif // YM_UTILS_MULTIPERMGEN_H

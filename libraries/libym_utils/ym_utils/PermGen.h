@@ -106,6 +106,72 @@ private:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// コンストラクタ
+// 全要素数 n と選択する要素数 k を必ず指定する．
+inline
+PermGen::PermGen(ymuint n,
+		 ymuint k) :
+  GenBase(n, k)
+{
+}
+
+// デストラクタ
+inline
+PermGen::~PermGen()
+{
+}
+
+// 最初の組み合わせを取り出す．
+inline
+PermGenIterator
+PermGen::begin()
+{
+  return iterator(this);
+}
+
+// 空のコンストラクタ
+inline
+PermGenIterator::PermGenIterator()
+{
+}
+
+// コンストラクタ
+// PermGen が用いる．
+inline
+PermGenIterator::PermGenIterator(const PermGen* parent) :
+  GenIterator(parent)
+{
+}
+
+// コピーコンストラクタ
+inline
+PermGenIterator::PermGenIterator(const PermGenIterator& src)
+{
+  copy(src);
+}
+
+// 代入演算子
+inline
+const PermGenIterator&
+PermGenIterator::operator=(const PermGenIterator& src)
+{
+  copy(src);
+  return *this;
+}
+
+// 末尾の時に true を返す．
+inline
+bool
+PermGenIterator::is_end() const
+{
+  return elem(0) == n();
+}
+
 END_NAMESPACE_YM
 
 #endif // YM_UTILS_PERMGEN_H

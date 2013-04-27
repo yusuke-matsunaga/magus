@@ -52,6 +52,8 @@ libym_utils_la_SOURCES = \
 	MsgMgrImpl.cc \
 	MultiCombiGen.cc \
 	MultiGenBase.cc \
+	MultiSetCombiGen.cc \
+	MultiSetGenBase.cc \
 	MultiSetPermGen.cc \
 	MultiPermGen.cc \
 	NameMgr.cc \

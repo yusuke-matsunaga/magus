@@ -104,11 +104,74 @@ private:
   /// @note CombiGen が用いる．
   CombiGenIterator(const CombiGen* parent);
 
-  /// @brief operator++() のサブルーティン
-  void
-  next(ymuint pos);
-
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// コンストラクタ
+// 全要素数 n と選択する要素数 k を必ず指定する．
+inline
+CombiGen::CombiGen(ymuint n,
+		   ymuint k) :
+  GenBase(n, k)
+{
+}
+
+// デストラクタ
+inline
+CombiGen::~CombiGen()
+{
+}
+
+// 最初の組み合わせを取り出す．
+inline
+CombiGenIterator
+CombiGen::begin()
+{
+  return iterator(this);
+}
+
+// 空のコンストラクタ
+inline
+CombiGenIterator::CombiGenIterator()
+{
+}
+
+// コンストラクタ
+// CombiGen が用いる．
+inline
+CombiGenIterator::CombiGenIterator(const CombiGen* parent) :
+  GenIterator(parent)
+{
+}
+
+// コピーコンストラクタ
+inline
+CombiGenIterator::CombiGenIterator(const CombiGenIterator& src)
+{
+  copy(src);
+}
+
+// 代入演算子
+inline
+const CombiGenIterator&
+CombiGenIterator::operator=(const CombiGenIterator& src)
+{
+  copy(src);
+  return *this;
+}
+
+// 末尾の時に true を返す．
+inline
+bool
+CombiGenIterator::is_end() const
+{
+  // 末尾の時には範囲外の値(= n())を持っている．
+  return elem(0) == n();
+}
 
 END_NAMESPACE_YM
 

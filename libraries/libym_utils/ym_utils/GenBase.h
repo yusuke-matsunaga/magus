@@ -161,6 +161,22 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// コンストラクタ
+// 全要素数 n と選択する要素数 k を必ず指定する．
+inline
+GenBase::GenBase(ymuint n,
+		 ymuint k) :
+  mN(n),
+  mK(k)
+{
+}
+
+// デストラクタ
+inline
+GenBase::~GenBase()
+{
+}
+
 // 全要素数を得る．
 inline
 ymuint
@@ -175,6 +191,41 @@ ymuint
 GenBase::k() const
 {
   return mK;
+}
+
+// 空のコンストラクタ
+inline
+GenIterator::GenIterator() :
+  mElem(0),
+  mParent(NULL)
+{
+}
+
+// コンストラクタ
+// 継承クラスが用いる．
+inline
+GenIterator::GenIterator(const GenBase* parent) :
+  mElem(parent->k()),
+  mParent(parent)
+{
+  for (ymuint i = 0; i < mParent->k(); ++ i) {
+    mElem[i] = i;
+  }
+}
+
+// 内容をコピーする関数
+inline
+void
+GenIterator::copy(const GenIterator& src)
+{
+  mElem = src.mElem;
+  mParent = src.mParent;
+}
+
+// @brief デストラクタ
+inline
+GenIterator::~GenIterator()
+{
 }
 
 // 全要素数を得る．

@@ -177,6 +177,20 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// コンストラクタ
+// 全要素数 n と選択する要素数 k のベクタを指定する．
+inline
+MultiGenBase::MultiGenBase(const vector<pair<ymuint, ymuint> >& nk_array) :
+  mNkArray(nk_array)
+{
+}
+
+// デストラクタ
+inline
+MultiGenBase::~MultiGenBase()
+{
+}
+
 // グループ数を得る．
 inline
 ymuint
@@ -199,6 +213,14 @@ ymuint
 MultiGenBase::k(ymuint grp) const
 {
   return mNkArray[grp].second;
+}
+
+// 空のコンストラクタ
+inline
+MultiGenIterator::MultiGenIterator() :
+  mElemArray(0),
+  mParent(NULL)
+{
 }
 
 // grp 番目のグループの pos 番目の要素を取り出す．
@@ -232,6 +254,24 @@ ymuint
 MultiGenIterator::k(ymuint grp) const
 {
   return mParent->k(grp);
+}
+
+// grp 番目のグループの要素配列を得る．
+inline
+vector<ymuint>&
+MultiGenIterator::elem(ymuint g)
+{
+  assert_cond(mElemArray[g], __FILE__, __LINE__);
+  return *mElemArray[g];
+}
+
+// grp 番目のグループの要素配列を得る．
+// こちらは const 版
+inline
+const vector<ymuint>&
+MultiGenIterator::elem(ymuint g) const
+{
+  return *mElemArray[g];
 }
 
 END_NAMESPACE_YM

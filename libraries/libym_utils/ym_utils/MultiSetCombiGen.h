@@ -1,8 +1,8 @@
-#ifndef YM_UTILS_MULTISETPERMGEN_H
-#define YM_UTILS_MULTISETPERMGEN_H
+#ifndef YM_UTILS_MULTISETCOMBIGEN_H
+#define YM_UTILS_MULTISETCOMBIGEN_H
 
-/// @file MultiSetPermGen.h
-/// @brief MultiSetPermGen のヘッダファイル
+/// @file MultiSetCombiGen.h
+/// @brief MultiSetCombiGen のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2013 Yusuke Matsunaga
@@ -14,29 +14,29 @@
 
 BEGIN_NAMESPACE_YM
 
-class MspgIterator;
+class MscgIterator;
 
 //////////////////////////////////////////////////////////////////////
-/// @class MultiSetPermGen MultiSetPermGen.h "MultiSetPermGen.h"
-/// @brief 重複を許した集合の組み合わせを作るクラス
+/// @class MultiSetCombiGen MultiSetCombiGen.h "MultiSetCombiGen.h"
+/// @brief 重複を許した集合の順列を作るクラス
 //////////////////////////////////////////////////////////////////////
-class MultiSetPermGen :
+class MultiSetCombiGen :
   public MultiSetGenBase
 {
 public:
 
-  typedef MspgIterator iterator;
+  typedef MscgIterator iterator;
 
 public:
 
   /// @brief コンストラクタ
   /// @param[in] num_array 各要素の重複度を納めた配列
   /// @param[in] k 選び出す要素数
-  MultiSetPermGen(const vector<ymuint>& num_array,
+  MultiSetCombiGen(const vector<ymuint>& num_array,
 		   ymuint k);
 
   /// @brief デストラクタ
-  ~MultiSetPermGen();
+  ~MultiSetCombiGen();
 
 
 public:
@@ -52,31 +52,31 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MspgIterator MultiSetPermGen.h "MultiSetPermGen.h"
-/// @brief MultiSetPermGen の反復子
+/// @class MscgIterator MultiSetCombiGen.h "MultiSetCombiGen.h"
+/// @brief MultiSetCombiGen の反復子
 //////////////////////////////////////////////////////////////////////
-class MspgIterator :
+class MscgIterator :
   public MsGenIterator
 {
-  friend class MultiSetPermGen;
+  friend class MultiSetCombiGen;
 
 public:
 
   /// @brief 空のコンストラクタ
-  MspgIterator();
+  MscgIterator();
 
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
-  MspgIterator(const MspgIterator& src);
+  MscgIterator(const MscgIterator& src);
 
   /// @brief 代入演算子
   /// @param[in] src コピー元のオブジェクト
   /// @return 自分自身
-  const MspgIterator&
-  operator=(const MspgIterator& src);
+  const MscgIterator&
+  operator=(const MscgIterator& src);
 
   /// @brief デストラクタ
-  ~MspgIterator();
+  ~MscgIterator();
 
 
 public:
@@ -86,7 +86,7 @@ public:
 
   /// @brief 次の要素を求める．
   /// @return 次の要素を指す反復子
-  MspgIterator
+  MscgIterator
   operator++();
 
   /// @brief 末尾のチェック
@@ -101,8 +101,8 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  /// @param[in] parent 親の MultiSetPermGen オブジェクト
-  MspgIterator(const MultiSetPermGen* parent);
+  /// @param[in] parent 親の MultiSetCombiGen オブジェクト
+  MscgIterator(const MultiSetCombiGen* parent);
 
 };
 
@@ -115,44 +115,44 @@ private:
 // @param[in] num_array 各要素の重複度を納めた配列
 // @param[in] k 選び出す要素数
 inline
-MultiSetPermGen::MultiSetPermGen(const vector<ymuint>& num_array,
-				 ymuint k) :
+MultiSetCombiGen::MultiSetCombiGen(const vector<ymuint>& num_array,
+				   ymuint k) :
   MultiSetGenBase(num_array, k)
 {
 }
 
 // @brief デストラクタ
 inline
-MultiSetPermGen::~MultiSetPermGen()
+MultiSetCombiGen::~MultiSetCombiGen()
 {
 }
 
 // @brief 先頭の反復子を返す．
 inline
-MultiSetPermGen::iterator
-MultiSetPermGen::begin()
+MultiSetCombiGen::iterator
+MultiSetCombiGen::begin()
 {
   return iterator(this);
 }
 
 // @brief 空のコンストラクタ
 inline
-MspgIterator::MspgIterator()
+MscgIterator::MscgIterator()
 {
 }
 
 // @brief コピーコンストラクタ
 // @param[in] src コピー元のオブジェクト
 inline
-MspgIterator::MspgIterator(const MspgIterator& src) :
+MscgIterator::MscgIterator(const MscgIterator& src) :
   MsGenIterator(src)
 {
 }
 
 // @brief コンストラクタ
-// @param[in] parent 親の MultiSetPermGen オブジェクト
+// @param[in] parent 親の MultiSetCombiGen オブジェクト
 inline
-MspgIterator::MspgIterator(const MultiSetPermGen* parent) :
+MscgIterator::MscgIterator(const MultiSetCombiGen* parent) :
   MsGenIterator(parent)
 {
 }
@@ -161,8 +161,8 @@ MspgIterator::MspgIterator(const MultiSetPermGen* parent) :
 // @param[in] src コピー元のオブジェクト
 // @return 自分自身
 inline
-const MspgIterator&
-MspgIterator::operator=(const MspgIterator& src)
+const MscgIterator&
+MscgIterator::operator=(const MscgIterator& src)
 {
   copy(src);
   return *this;
@@ -170,7 +170,7 @@ MspgIterator::operator=(const MspgIterator& src)
 
 // @brief デストラクタ
 inline
-MspgIterator::~MspgIterator()
+MscgIterator::~MscgIterator()
 {
 }
 
@@ -178,7 +178,7 @@ MspgIterator::~MspgIterator()
 // @return 末尾の時に true を返す．
 inline
 bool
-MspgIterator::is_end() const
+MscgIterator::is_end() const
 {
   if ( parent() == NULL ) {
     return true;
@@ -188,4 +188,4 @@ MspgIterator::is_end() const
 
 END_NAMESPACE_YM
 
-#endif // YM_UTILS_MULTISETPERMGEN_H
+#endif // YM_UTILS_MULTISETCOMBIGEN_H

@@ -1,28 +1,28 @@
 
-/// @file MultiSetPermGen.cc
-/// @brief MultiSetPermGen の実装ファイル
+/// @file MultiSetCombiGen.cc
+/// @brief MultiSetCombiGen の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/MultiSetPermGen.h"
+#include "ym_utils/MultiSetCombiGen.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス MspgIterator
+// クラス MscgIterator
 //////////////////////////////////////////////////////////////////////
 
 // @brief 次の要素を求める．
 // @return 次の要素を指す反復子
-MspgIterator
-MspgIterator::operator++()
+MscgIterator
+MscgIterator::operator++()
 {
   if ( parent() == NULL ) {
-    return MspgIterator();
+    return MscgIterator();
   }
 
   ymuint ng = group_num();
@@ -47,9 +47,17 @@ MspgIterator::operator++()
       }
     }
     if ( found ) {
-      ymuint g = 0;
+      ymuint g = elem(pos);
       for (ymuint pos1 = pos + 1; pos1 < k(); ++ pos1) {
-	for ( ; count[g] == n(g); ++ g) ;
+	for ( ; g < ng; ++ g) {
+	  if ( count[g] < n(g) ) {
+	    break;
+	  }
+	}
+	if ( g == ng ) {
+	  elem(0) = ng;
+	  goto end;
+	}
 	++ count[g];
 	elem(pos1) = g;
       }
@@ -62,6 +70,8 @@ MspgIterator::operator++()
       elem(0) = ng;
     }
   }
+
+ end:
 
   return *this;
 }

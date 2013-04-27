@@ -30,6 +30,8 @@ noinst_HEADERS = \
 	MultiCombiGen.h \
 	MultiGenBase.h \
 	MultiPermGen.h \
+	MultiSetCombiGen.h \
+	MultiSetGenBase.h \
 	MultiSetPermGen.h \
 	NameMgr.h \
 	PermGen.h \

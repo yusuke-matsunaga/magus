@@ -13,32 +13,8 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス MultiGenBase
-//////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-// 全要素数 n と選択する要素数 k のベクタを指定する．
-MultiGenBase::MultiGenBase(const vector<pair<ymuint, ymuint> >& nk_array) :
-  mNkArray(nk_array)
-{
-}
-
-// デストラクタ
-MultiGenBase::~MultiGenBase()
-{
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス MultiGenIterator
 //////////////////////////////////////////////////////////////////////
-
-// 空のコンストラクタ
-MultiGenIterator::MultiGenIterator() :
-  mElemArray(0),
-  mParent(NULL)
-{
-}
 
 // コンストラクタ
 // 継承クラスが用いる．
@@ -87,22 +63,6 @@ MultiGenIterator::init(ymuint grp)
   for (ymuint i = 0; i < k(grp); ++ i) {
     elem(grp)[i] = i;
   }
-}
-
-// grp 番目のグループの要素配列を得る．
-vector<ymuint>&
-MultiGenIterator::elem(ymuint g)
-{
-  assert_cond(mElemArray[g], __FILE__, __LINE__);
-  return *mElemArray[g];
-}
-
-// grp 番目のグループの要素配列を得る．
-// こちらは const 版
-const vector<ymuint>&
-MultiGenIterator::elem(ymuint g) const
-{
-  return *mElemArray[g];
 }
 
 // 確保したメモリを解放する

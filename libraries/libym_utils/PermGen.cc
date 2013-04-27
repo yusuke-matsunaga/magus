@@ -13,107 +13,54 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス PermGen
-//////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-// 全要素数 n と選択する要素数 k を必ず指定する．
-PermGen::PermGen(ymuint n,
-		 ymuint k) :
-  GenBase(n, k)
-{
-}
-
-// デストラクタ
-PermGen::~PermGen()
-{
-}
-
-// 最初の組み合わせを取り出す．
-PermGenIterator
-PermGen::begin()
-{
-  return iterator(this);
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス PermGenIterator
 //////////////////////////////////////////////////////////////////////
-
-// 空のコンストラクタ
-PermGenIterator::PermGenIterator()
-{
-}
-
-// コンストラクタ
-// PermGen が用いる．
-PermGenIterator::PermGenIterator(const PermGen* parent) :
-  GenIterator(parent)
-{
-}
-
-// コピーコンストラクタ
-PermGenIterator::PermGenIterator(const PermGenIterator& src)
-{
-  copy(src);
-}
-
-// 代入演算子
-const PermGenIterator&
-PermGenIterator::operator=(const PermGenIterator& src)
-{
-  copy(src);
-  return *this;
-}
 
 // 次の要素を求める．
 PermGenIterator
 PermGenIterator::operator++()
 {
-  vector<int> bitmap(n());
-  for (ymuint i = 0; i < n(); ++ i) {
-    bitmap[i] = 0;
+  // 各値の使用回数(0/1)を数える．
+  vector<int> bitmap(n(), 0);
+  for (ymuint pos = 0; pos < k(); ++ pos) {
+    bitmap[elem(pos)] = 1;
   }
-  for (ymuint i = 0; i < k(); ++ i) {
-    bitmap[elem(i)] = 1;
-  }
-  for (ymuint i = k(); i -- > 0; ) {
+
+  // 最後の要素から次の値にしていく．
+  for (ymuint pos = k(); pos -- > 0; ) {
     bool found = false;
-    for (ymuint j = elem(i); ++ j < n(); ) {
+    for (ymuint j = elem(pos); ++ j < n(); ) {
       if ( bitmap[j] == 0 ) {
-	bitmap[elem(i)] = 0;
-	elem(i) = j;
+	bitmap[elem(pos)] = 0;
+	elem(pos) = j;
 	bitmap[j] = 1;
 	found = true;
 	break;
       }
     }
     if ( found ) {
-      ymuint pos = 0;
-      for (ymuint j = i + 1; j < k(); ++ j) {
-	for ( ; bitmap[pos] == 1; ++ pos) ;
-	bitmap[pos] = 1;
-	elem(j) = pos;
+      // pos + 1 以降の値をセットする．
+      ymuint val = 0;
+      for (ymuint j = pos + 1; j < k(); ++ j) {
+	// 使われていない値を探す．
+	for ( ; bitmap[val] == 1; ++ val) ;
+	bitmap[val] = 1;
+	elem(j) = val;
+	++ val;
       }
       break;
     }
-    if ( i > 0 ) {
-      bitmap[elem(i)] = 0;
+    if ( pos > 0 ) {
+      // pos の値を未定にする．
+      bitmap[elem(pos)] = 0;
     }
     else {
+      // すべての順列を試した印を書き込む．
       elem(0) = n();
     }
   }
 
   return *this;
-}
-
-// 末尾の時に true を返す．
-bool
-PermGenIterator::is_end() const
-{
-  return elem(0) == n();
 }
 
 END_NAMESPACE_YM
