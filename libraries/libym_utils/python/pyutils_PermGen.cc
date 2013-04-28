@@ -1,14 +1,14 @@
 
-/// @file pyutils_MFSet.cc
-/// @brief MFSet の Python 用ラッパ
+/// @file pyutils_PermGen.cc
+/// @brief PermGen の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_utils/pyutils.h"
-#include "ym_utils/MFSet.h"
+#include "ym_utils/PermGen.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -19,14 +19,14 @@ BEGIN_NONAMESPACE
 // Python 用の構造体定義
 //////////////////////////////////////////////////////////////////////
 
-// MFSet を表す型
-struct MFSetObject
+// PermGen を表す型
+struct PermGenObject
 {
   // Python のお約束
   PyObject_HEAD
 
-  // MFSet の本体
-  MFSet* mBody;
+  // PermGen の本体
+  PermGen* mPtr;
 
 };
 
@@ -35,101 +35,112 @@ struct MFSetObject
 // Python 用のメソッド関数定義
 //////////////////////////////////////////////////////////////////////
 
-// MFSetObject の生成関数
-MFSetObject*
-MFSet_new(PyTypeObject* type)
+// PermGenObject の生成関数
+PermGenObject*
+PermGen_new(PyTypeObject* type)
 {
-  MFSetObject* self = PyObject_New(MFSetObject, type);
+  PermGenObject* self = PyObject_New(PermGenObject, type);
   if ( self == NULL ) {
     return NULL;
   }
 
-  // ここでは NULL のままにしておく．
-  self->mBody = NULL;
+  self->mPtr = NULL;
 
   return self;
 }
 
-// MFSetObject を開放する関数
+// PermGenObject を開放する関数
 void
-MFSet_dealloc(MFSetObject* self)
+PermGen_dealloc(PermGenObject* self)
 {
-  // MFSet の開放を行なう．
-  delete self->mBody;
+  delete self->mPtr;
 
   PyObject_Del(self);
 }
 
 // 初期化関数
 int
-MFSet_init(MFSetObject* self,
-	   PyObject* args)
+PermGen_init(PermGenObject* self,
+	     PyObject* args)
 {
-  // 引数の形式は
-  // - (uint)
-  ymuint n;
-  if ( !PyArg_ParseTuple(args, "I", &n) ) {
-    return NULL;
+  ymuint n = 0;
+  ymuint k = 0;
+  if ( !PyArg_ParseTuple(args, "II", &n, &k) ) {
+    return -1;
   }
 
-  if ( self->mBody != NULL ) {
-    delete self->mBody;
-  }
-  self->mBody = new MFSet(n);
+  delete self->mPtr;
+  self->mPtr = new PermGen(n, k);
 
-  // 正常に終了したら 0 を返す．
   return 0;
 }
 
-// find 関数
+// n() 関数
 PyObject*
-MFSet_find(MFSetObject* self,
-	   PyObject* args)
+PermGen_n(PermGenObject* self,
+	  PyObject* args)
 {
-  // 引数の形式は
-  // - (uint)
-  ymuint x;
-  if ( !PyArg_ParseTuple(args, "I", &x) ) {
-    return NULL;
-  }
-
-  ymuint y = self->mBody->find(x);
-  if ( y == MFSet::kBadID ) {
-    PyErr_SetString(PyExc_ValueError, "parameter is out of range");
-    return NULL;
-  }
-
-  return PyObject_FromYmuint32(y);
+  return PyObject_FromYmuint32(self->mPtr->n());
 }
 
-// merge 関数
+// k() 関数
 PyObject*
-MFSet_merge(MFSetObject* self,
+PermGen_k(PermGenObject* self,
+	  PyObject* args)
+{
+  return PyObject_FromYmuint32(self->mPtr->k());
+}
+
+// reset() 関数
+PyObject*
+PermGen_reset(PermGenObject* self,
+	      PyObject* args)
+{
+  self->mPtr->init();
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+// get() 関数
+PyObject*
+PermGen_get(PermGenObject* self,
 	    PyObject* args)
 {
-  // 引数の形式は
-  // - (uint, uint)
-  ymuint x;
-  ymuint y;
-  if ( !PyArg_ParseTuple(args, "II", &x, &y) ) {
-    return NULL;
+  ymuint k = self->mPtr->k();
+  PyObject* list_obj = PyList_New(k);
+  for (ymuint i = 0; i < k; ++ i) {
+    ymuint v = (*self->mPtr)(i);
+    PyObject* obj1 = PyObject_FromYmuint32(v);
+    PyList_SetItem(list_obj, i, obj1);
   }
+  return list_obj;
+}
 
-  ymuint z = self->mBody->merge(x, y);
+// is_end() 関数
+PyObject*
+PermGen_is_end(PermGenObject* self,
+	       PyObject* args)
+{
+  return PyObject_FromBool(self->mPtr->is_end());
+}
 
-  if ( z == MFSet::kBadID ) {
-    PyErr_SetString(PyExc_ValueError, "parameter is out of range");
-    return NULL;
-  }
+// next() 関数
+PyObject*
+PermGen_next(PermGenObject* self,
+	     PyObject* args)
+{
+  ++ (*self->mPtr);
 
-  return PyObject_FromYmuint32(z);
+  Py_INCREF(Py_None);
+  return Py_None;
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// MFSetObject のメソッドテーブル
+// PermGenObject のメソッドテーブル
 //////////////////////////////////////////////////////////////////////
-PyMethodDef MFSet_methods[] = {
+PyMethodDef PermGen_methods[] = {
   // PyMethodDef のフィールド
   //   char*       ml_name;
   //   PyCFunction ml_meth;
@@ -144,31 +155,40 @@ PyMethodDef MFSet_methods[] = {
   //  - METH_CLASS
   //  - METH_STATIC
   //  - METH_COEXIST
-  {"find", (PyCFunction)MFSet_find, METH_VARARGS,
-   PyDoc_STR("find representative (uint)")},
-  {"merge", (PyCFunction)MFSet_merge, METH_VARARGS,
-   PyDoc_STR("merge two sets (uint, uint)")},
+
+  {"n", (PyCFunction)PermGen_n, METH_NOARGS,
+   PyDoc_STR("return N")},
+  {"k", (PyCFunction)PermGen_k, METH_NOARGS,
+   PyDoc_STR("return K")},
+  {"reset", (PyCFunction)PermGen_reset, METH_NOARGS,
+   PyDoc_STR("reset")},
+  {"get", (PyCFunction)PermGen_get, METH_NOARGS,
+   PyDoc_STR("get current permutation")},
+  {"is_end", (PyCFunction)PermGen_is_end, METH_NOARGS,
+   PyDoc_STR("return TRUE if end-of-permutation")},
+  {"next", (PyCFunction)PermGen_next, METH_NOARGS,
+   PyDoc_STR("move to next permutation")},
+
   {NULL, NULL, 0, NULL} // end-marker
 };
-
 
 END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
-// MFSetObject 用のタイプオブジェクト
+// PermGenObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject PyMFSet_Type = {
+PyTypeObject PyPermGen_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "utils.MFSet",                // tp_name
-  sizeof(MFSetObject),          // tp_basicsize
+  "utils.PermGen",             // tp_name
+  sizeof(PermGenObject),       // tp_basicsize
   (int)0,                       // tp_itemsize
 
   // Methods to implement standard operations
 
-  (destructor)MFSet_dealloc,    // tp_dealloc
+  (destructor)PermGen_dealloc, // tp_dealloc
   (printfunc)0,                 // tp_print
   (getattrfunc)0,               // tp_getattr
   (setattrfunc)0,               // tp_setattr
@@ -194,7 +214,7 @@ PyTypeObject PyMFSet_Type = {
   Py_TPFLAGS_DEFAULT,           // tp_flags
 
   // Documentation string
-  "Merge/Find Set",             // tp_doc
+  "Permutation Generator",      // tp_doc
 
   // Assigned meaning in release 2.0
 
@@ -219,7 +239,7 @@ PyTypeObject PyMFSet_Type = {
   (iternextfunc)0,              // tp_iternext
 
   // Attribute descriptor and subclassing stuff
-  MFSet_methods,                // tp_methods
+  PermGen_methods,              // tp_methods
   0,                            // tp_members
   0,                            // tp_getset
   (struct _typeobject*)0,       // tp_base
@@ -227,9 +247,9 @@ PyTypeObject PyMFSet_Type = {
   (descrgetfunc)0,              // tp_descr_get
   (descrsetfunc)0,              // tp_descr_set
   (long)0,                      // tp_dictoffset
-  (initproc)MFSet_init,         // tp_init
+  (initproc)PermGen_init,       // tp_init
   (allocfunc)0,                 // tp_alloc
-  (newfunc)MFSet_new,           // tp_new
+  (newfunc)PermGen_new,         // tp_new
   (freefunc)0,                  // tp_free
   (inquiry)0,                   // tp_is_gc
 
@@ -242,38 +262,40 @@ PyTypeObject PyMFSet_Type = {
 
 
 //////////////////////////////////////////////////////////////////////
-// PyObject と MFSet の間の変換関数
+// PyObject と PermGen の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から MFSet へのポインタを取り出す．
+// @brief PyObject から PermGen へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @return MFSet へのポインタを返す．
+// @return PermGen へのポインタを返す．
 // @note 変換が失敗したら TypeError を送出し，NULL を返す．
-MFSet*
-PyMFSet_AsMFSetPtr(PyObject* py_obj)
+PermGen*
+PyPermGen_AsPermGenPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !PyMFSet_Check(py_obj) ) {
-    PyErr_SetString(PyExc_TypeError, "utils.MFSet is expected");
+  if ( !PyPermGen_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.PermGen is expected");
     return NULL;
   }
 
   // 強制的にキャスト
-  MFSetObject* my_obj = (MFSetObject*)py_obj;
+  PermGenObject* my_obj = (PermGenObject*)py_obj;
 
-  return my_obj->mBody;
+  return my_obj->mPtr;
 }
 
-// MFSetObject 関係の初期化を行う．
+// PermGenObject 関係の初期化を行なう．
 void
-MFSetObject_init(PyObject* m)
+PermGenObject_init(PyObject* m)
 {
-  if ( PyType_Ready(&PyMFSet_Type) < 0 ) {
+  // タイプオブジェクトの初期化
+  if ( PyType_Ready(&PyPermGen_Type) < 0 ) {
     return;
   }
 
-  // タイプモジュールの登録を行う．
-  PyModule_AddObject(m, "MFSet", (PyObject*)&PyMFSet_Type);
+  // タイプオブジェクトの登録
+  PyModule_AddObject(m, "PermGen", (PyObject*)&PyPermGen_Type);
 }
 
 END_NAMESPACE_YM
+

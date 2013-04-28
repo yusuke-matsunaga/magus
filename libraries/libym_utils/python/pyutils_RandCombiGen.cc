@@ -69,8 +69,8 @@ RandCombiGen_init(RandCombiGenObject* self,
   // - (uint, uint)
   ymuint n = 0;
   ymuint k = 0;
-  if ( !PyArg_ParseTuple(args, "kk", &n, &k) ) {
-    return NULL;
+  if ( !PyArg_ParseTuple(args, "II", &n, &k) ) {
+    return -1;
   }
 
   if ( self->mBody != NULL ) {
@@ -125,7 +125,7 @@ RandCombiGen_elem(RandCombiGenObject* self,
   // 引数の形式は
   // - (uint)
   ymuint pos = 0;
-  if ( !PyArg_ParseTuple(args, "k", &pos) ) {
+  if ( !PyArg_ParseTuple(args, "I", &pos) ) {
     return NULL;
   }
 

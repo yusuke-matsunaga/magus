@@ -69,8 +69,8 @@ MsgMgr_reg_handler(PyTypeObject* type,
 		   PyObject* args)
 {
   PyObject* obj = NULL;
-  ymuint32 mask = kMaskAll;
-  if ( !PyArg_ParseTuple(args, "O|k", &obj, &mask) ) {
+  ymuint mask = kMaskAll;
+  if ( !PyArg_ParseTuple(args, "O|I", &obj, &mask) ) {
     return NULL;
   }
 

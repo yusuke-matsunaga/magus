@@ -66,7 +66,7 @@ MStopWatch_init(MStopWatchObject* self,
 {
   ymuint n = 0;
   ymuint id = 0;
-  if ( !PyArg_ParseTuple(args, "k|k", &n, &id) ) {
+  if ( !PyArg_ParseTuple(args, "I|I", &n, &id) ) {
     return NULL;
   }
 
@@ -84,7 +84,7 @@ MStopWatch_change(MStopWatchObject* self,
 		  PyObject* args)
 {
   ymuint new_id = 0;
-  if ( !PyArg_ParseTuple(args, "k", &new_id) ) {
+  if ( !PyArg_ParseTuple(args, "I", &new_id) ) {
     return NULL;
   }
 
@@ -107,7 +107,7 @@ MStopWatch_time(MStopWatchObject* self,
 		PyObject* args)
 {
   ymuint id = 0;
-  if ( !PyArg_ParseTuple(args, "k", &id) ) {
+  if ( !PyArg_ParseTuple(args, "I", &id) ) {
     return NULL;
   }
 

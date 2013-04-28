@@ -70,7 +70,7 @@ FileLoc_init(FileLocObject* self,
   PyObject* obj1 = NULL;
   ymuint line = 0;
   ymuint column = 0;
-  if ( !PyArg_ParseTuple(args, "|O!kk",
+  if ( !PyArg_ParseTuple(args, "|O!II",
 			 &PyFileInfo_Type, &obj1,
 			 &line, &column) ) {
     return -1;

@@ -112,7 +112,7 @@ FileRegion_init(FileRegionObject* self,
     ymuint start_column;
     ymuint end_line;
     ymuint end_column;
-    if ( !PyArg_ParseTuple(args, "O!kkkk",
+    if ( !PyArg_ParseTuple(args, "O!IIII",
 			   &PyFileInfo_Type, &obj1,
 			   &start_line, &start_column,
 			   &end_line, &end_column) ) {
@@ -129,7 +129,7 @@ FileRegion_init(FileRegionObject* self,
     ymuint start_column;
     ymuint end_line;
     ymuint end_column;
-    if ( !PyArg_ParseTuple(args, "O!kkO!kk",
+    if ( !PyArg_ParseTuple(args, "O!IIO!II",
 			   &PyFileInfo_Type, &obj1,
 			   &start_line, &start_column,
 			   &PyFileInfo_Type, &obj2,

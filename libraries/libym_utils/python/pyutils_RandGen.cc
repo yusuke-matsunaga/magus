@@ -63,7 +63,7 @@ int
 RandGen_init(RandGenObject* self,
 	     PyObject* args)
 {
-  ymuint32 s = 0;
+  ymulong s = 0;
   if ( !PyArg_ParseTuple(args, "|k", &s) ) {
     return -1;
   }
@@ -88,7 +88,7 @@ RandGen_init_by_array(RandGenObject* self,
   ymuint32* init_key = new ymuint32[n];
   for (ymuint i = 0; i < n; ++ i) {
     PyObject* obj1 = PyList_GET_ITEM(obj, i);
-    ymuint32 val = 0;
+    ymulong val = 0;
     if ( !PyArg_ParseTuple(obj1, "k", &val) ) {
       return NULL;
     }

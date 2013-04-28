@@ -18,6 +18,12 @@ BEGIN_NAMESPACE_YM
 class FileInfo;
 class FileLoc;
 class FileRegion;
+class CombiGen;
+class PermGen;
+class MultiCombiGen;
+class MultiPermGen;
+class MultiSetCombiGen;
+class MultiSetPermGen;
 class RandGen;
 class RandCombiGen;
 class RandPermGen;
@@ -523,6 +529,174 @@ PyFileBinO_Check(PyObject* obj)
 extern
 FileBinO*
 PyFileBinO_AsFileBinOPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyCombiGen: 組み合わせを列挙するオブジェクトを表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief CombiGen を表す型
+extern
+PyTypeObject PyCombiGen_Type;
+
+/// @brief PyCombiGen の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyCombiGen_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyCombiGen_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyCombiGen_Type;
+}
+
+/// @brief PyObject から CombiGen へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return CombiGen へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+CombiGen*
+PyCombiGen_AsCombiGenPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyPermGen: 組み合わせを列挙するオブジェクトを表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief PermGen を表す型
+extern
+PyTypeObject PyPermGen_Type;
+
+/// @brief PyPermGen の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyPermGen_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyPermGen_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyPermGen_Type;
+}
+
+/// @brief PyObject から PermGen へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return PermGen へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+PermGen*
+PyPermGen_AsPermGenPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyMultiCombiGen: 組み合わせを列挙するオブジェクトを表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief MultiCombiGen を表す型
+extern
+PyTypeObject PyMultiCombiGen_Type;
+
+/// @brief PyMultiCombiGen の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyMultiCombiGen_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyMultiCombiGen_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyMultiCombiGen_Type;
+}
+
+/// @brief PyObject から MultiCombiGen へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return MultiCombiGen へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+MultiCombiGen*
+PyMultiCombiGen_AsMultiCombiGenPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyMultiPermGen: 順列を列挙するオブジェクトを表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief MultiPermGen を表す型
+extern
+PyTypeObject PyMultiPermGen_Type;
+
+/// @brief PyMultiPermGen の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyMultiPermGen_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyMultiPermGen_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyMultiPermGen_Type;
+}
+
+/// @brief PyObject から MultiPermGen へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return MultiPermGen へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+MultiPermGen*
+PyMultiPermGen_AsMultiPermGenPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyMultiSetCombiGen: 重複を許した集合の組み合わせを列挙するオブジェクトを表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief MultiSetCombiGen を表す型
+extern
+PyTypeObject PyMultiSetCombiGen_Type;
+
+/// @brief PyMultiSetCombiGen の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyMultiSetCombiGen_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyMultiSetCombiGen_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyMultiSetCombiGen_Type;
+}
+
+/// @brief PyObject から MultiSetCombiGen へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return MultiSetCombiGen へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+MultiSetCombiGen*
+PyMultiSetCombiGen_AsMultiSetCombiGenPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyMultiSetPermGen: 重複を許した集合の順列を列挙するオブジェクトを表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief MultiSetPermGen を表す型
+extern
+PyTypeObject PyMultiSetPermGen_Type;
+
+/// @brief PyMultiSetPermGen の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyMultiSetPermGen_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyMultiSetPermGen_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyMultiSetPermGen_Type;
+}
+
+/// @brief PyObject から MultiSetPermGen へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return MultiSetPermGen へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+MultiSetPermGen*
+PyMultiSetPermGen_AsMultiSetPermGenPtr(PyObject* py_obj);
 
 
 //////////////////////////////////////////////////////////////////////

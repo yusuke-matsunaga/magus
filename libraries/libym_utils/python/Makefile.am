@@ -32,6 +32,12 @@ libym_utils_python_la_SOURCES = \
 	pyutils_USTime.cc \
 	pyutils_StopWatch.cc \
 	pyutils_MStopWatch.cc \
+	pyutils_CombiGen.cc \
+	pyutils_PermGen.cc \
+	pyutils_MultiCombiGen.cc \
+	pyutils_MultiPermGen.cc \
+	pyutils_MultiSetCombiGen.cc \
+	pyutils_MultiSetPermGen.cc \
 	pyutils_RandGen.cc \
 	pyutils_RandPermGen.cc \
 	pyutils_RandCombiGen.cc

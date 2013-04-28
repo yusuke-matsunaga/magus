@@ -72,6 +72,24 @@ FileBinIObject_init(PyObject* module);
 void
 FileBinOObject_init(PyObject* module);
 
+void
+CombiGenObject_init(PyObject* module);
+
+void
+PermGenObject_init(PyObject* module);
+
+void
+MultiCombiGenObject_init(PyObject* module);
+
+void
+MultiPermGenObject_init(PyObject* module);
+
+void
+MultiSetCombiGenObject_init(PyObject* module);
+
+void
+MultiSetPermGenObject_init(PyObject* module);
+
 END_NAMESPACE_YM
 
 
@@ -125,5 +143,17 @@ utils_init()
   FileBinIObject_init(m);
 
   FileBinOObject_init(m);
+
+  CombiGenObject_init(m);
+
+  PermGenObject_init(m);
+
+  MultiCombiGenObject_init(m);
+
+  MultiPermGenObject_init(m);
+
+  MultiSetCombiGenObject_init(m);
+
+  MultiSetPermGenObject_init(m);
 
 }

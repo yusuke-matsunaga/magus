@@ -68,7 +68,7 @@ RandPermGen_init(RandPermGenObject* self,
   // 引数の形式は
   // - (uint)
   ymuint n = 0;
-  if ( !PyArg_ParseTuple(args, "k", &n) ) {
+  if ( !PyArg_ParseTuple(args, "I", &n) ) {
     return NULL;
   }
 
@@ -116,7 +116,7 @@ RandPermGen_elem(RandPermGenObject* self,
   // 引数の形式は
   // - (uint)
   ymuint pos = 0;
-  if ( !PyArg_ParseTuple(args, "k", &pos) ) {
+  if ( !PyArg_ParseTuple(args, "I", &pos) ) {
     return NULL;
   }
 
