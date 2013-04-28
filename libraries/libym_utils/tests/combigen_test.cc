@@ -18,21 +18,20 @@ main(int argc, char** argv)
 	cerr << "ERROR: n must be specified" << endl;
 	return 2;
       }
-      size_t n = atoi(p);
+      ymuint n = atoi(p);
       p = strtok(NULL, " \t");
       if ( !p ) {
 	cerr << "ERROR: k must be specified" << endl;
 	return 2;
       }
-      size_t k = atoi(p);
+      ymuint k = atoi(p);
       if ( n < k ) {
 	cerr << "ERROR: n(" << n << ") < k(" << k << ")" << endl;
 	return 1;
       }
-      CombiGen cg(n, k);
-      for (CombiGen::iterator p = cg.begin(); !p.is_end(); ++ p) {
-	for (size_t i = 0; i < k; ++ i) {
-	  cout << " " << p(i);
+      for (CombiGen cg(n, k); !cg.is_end(); ++ cg) {
+	for (ymuint i = 0; i < k; ++ i) {
+	  cout << " " << cg(i);
 	}
 	cout << endl;
       }

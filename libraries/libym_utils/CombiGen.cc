@@ -17,8 +17,8 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // 次の要素を求める．
-CombiGenIterator
-CombiGenIterator::operator++()
+void
+CombiGen::operator++()
 {
   for (ymuint pos = k(); pos -- > 0; ) {
     if ( elem(pos) < n() - k() + pos ) {
@@ -32,8 +32,6 @@ CombiGenIterator::operator++()
       elem(0) = n();
     }
   }
-
-  return *this;
 }
 
 END_NAMESPACE_YM

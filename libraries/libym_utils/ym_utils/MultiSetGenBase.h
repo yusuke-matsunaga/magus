@@ -50,47 +50,9 @@ public:
   ymuint
   k() const;
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 要素の重複度
-  vector<ymuint32> mNumArray;
-
-  // 選択する要素数
-  ymuint32 mK;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class MsGenIterator MultiSetGenBase.h "MultiSetGenBase.h"
-/// @brief MultiSetCombiGen::iterator と MultiSetPermGen::iterator の親クラス
-//////////////////////////////////////////////////////////////////////
-class MsGenIterator
-{
-protected:
-
-  /// @brief 空のコンストラクタ
-  MsGenIterator();
-
-  /// @brief コピーコンストラクタ
-  MsGenIterator(const MsGenIterator& src);
-
-  /// @brief コンストラクタ
-  /// @param[in] parent 親のオブジェクト
-  MsGenIterator(const MultiSetGenBase* parent);
-
-  /// @brief デストラクタ
-  ~MsGenIterator();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
+  /// @brief 初期化する．
+  void
+  init();
 
   /// @brief 要素の取得
   /// @param[in] pos 取り出す要素の位置
@@ -103,36 +65,10 @@ protected:
   // 継承クラスから用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 親を返す．
-  const MultiSetGenBase*
-  parent() const;
-
   /// @brief 内容をコピーする関数
   /// @param[in] src コピー元のオブジェクト
   void
-  copy(const MsGenIterator& src);
-
-  /// @brief グループ数を得る．
-  ymuint
-  group_num() const;
-
-  /// @brief グループの要素数を得る．
-  /// @param[in] grp_id グループ番号 ( 0 <= grp_id < group_num() )
-  /// @return 要素数
-  ymuint
-  n(ymuint grp_id) const;
-
-  /// @brief 順列/組合わせ数を得る．
-  /// @return 順列/組み合わせ数
-  ymuint
-  k() const;
-
-  /// @brief 要素の取得
-  /// @param[in] pos 取り出す要素の位置 (最初の位置は 0)
-  /// @return pos 番目の要素
-  /// @note operator() の別名
-  ymuint
-  elem(ymuint pos) const;
+  copy(const MultiSetGenBase& src);
 
   /// @brief 要素の参照の取得
   /// @param[in] pos 取り出す要素の位置 (最初の位置は 0)
@@ -146,11 +82,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 要素の重複度
+  vector<ymuint32> mNumArray;
+
+  // 選択する要素数
+  ymuint32 mK;
+
   // 現在の要素
   vector<ymuint32> mElem;
-
-  // 親の MultiSetGenBase
-  const MultiSetGenBase* mParent;
 
 };
 
@@ -166,8 +105,10 @@ inline
 MultiSetGenBase::MultiSetGenBase(const vector<ymuint>& num_array,
 				 ymuint k) :
   mNumArray(num_array),
-  mK(k)
+  mK(k),
+  mElem(k)
 {
+  init();
 }
 
 // @brief デストラクタ
@@ -202,83 +143,42 @@ MultiSetGenBase::k() const
   return mK;
 }
 
-// @brief 空のコンストラクタ
+// @brief 初期化する．
 inline
-MsGenIterator::MsGenIterator()
+void
+MultiSetGenBase::init()
 {
-  mParent = NULL;
-}
-
-// @brief コピーコンストラクタ
-inline
-MsGenIterator::MsGenIterator(const MsGenIterator& src) :
-  mElem(src.mElem),
-  mParent(src.mParent)
-{
-}
-
-// @brief デストラクタ
-inline
-MsGenIterator::~MsGenIterator()
-{
+  ymuint pos = 0;
+  ymuint count = 0;
+  for (ymuint i = 0; i < mK; ++ i) {
+    if ( count >= mNumArray[pos] ) {
+      ++ pos;
+      count = 0;
+    }
+    assert_cond( count < mNumArray[pos], __FILE__, __LINE__);
+    mElem[i] = pos;
+    ++ count;
+  }
 }
 
 // @brief 要素の取得
 // @param[in] pos 取り出す要素の位置
 inline
 ymuint
-MsGenIterator::operator()(ymuint pos) const
-{
-  return elem(pos);
-}
-
-// @brief 親を返す．
-inline
-const MultiSetGenBase*
-MsGenIterator::parent() const
-{
-  return mParent;
-}
-
-// @brief グループ数を得る．
-inline
-ymuint
-MsGenIterator::group_num() const
-{
-  assert_cond( mParent != NULL, __FILE__, __LINE__);
-  return mParent->group_num();
-}
-
-// @brief グループの要素数を得る．
-// @param[in] grp_id グループ番号 ( 0 <= grp_id < group_num() )
-// @return 要素数
-inline
-ymuint
-MsGenIterator::n(ymuint grp_id) const
-{
-  assert_cond( mParent != NULL, __FILE__, __LINE__);
-  return mParent->n(grp_id);
-}
-
-// @brief 順列/組合わせ数を得る．
-// @return 順列/組み合わせ数
-inline
-ymuint
-MsGenIterator::k() const
-{
-  assert_cond( mParent != NULL, __FILE__, __LINE__);
-  return mParent->k();
-}
-
-// @brief 要素の取得
-// @param[in] pos 取り出す要素の位置 (最初の位置は 0)
-// @return pos 番目の要素
-// @note operator() の別名
-inline
-ymuint
-MsGenIterator::elem(ymuint pos) const
+MultiSetGenBase::operator()(ymuint pos) const
 {
   return mElem[pos];
+}
+
+// @brief 内容をコピーする関数
+// @param[in] src コピー元のオブジェクト
+inline
+void
+MultiSetGenBase::copy(const MultiSetGenBase& src)
+{
+  mNumArray = src.mNumArray;
+  mK = src.mK;
+  mElem = src.mElem;
 }
 
 // @brief 要素の参照の取得
@@ -286,7 +186,7 @@ MsGenIterator::elem(ymuint pos) const
 // @return pos 番目の要素への参照
 inline
 ymuint&
-MsGenIterator::elem(ymuint pos)
+MultiSetGenBase::elem(ymuint pos)
 {
   return mElem[pos];
 }

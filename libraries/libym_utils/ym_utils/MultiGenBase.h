@@ -29,6 +29,10 @@ public:
   /// @param[in] nk_array 全要素数 n と選択する要素数 k のベクタ
   MultiGenBase(const vector<pair<ymuint, ymuint> >& nk_array);
 
+  /// @brief コピーコンストラクタ
+  /// @param[in] src コピー元のオブジェクト
+  MultiGenBase(const MultiGenBase& src);
+
   /// @brief デストラクタ
   ~MultiGenBase();
 
@@ -55,43 +59,9 @@ public:
   ymuint
   k(ymuint grp) const;
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 各グループごとの全要素数を選択する要素数を入れる配列
-  vector<pair<ymuint, ymuint> > mNkArray;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class MultiGenIterator MultiGenBase.h "ym_utils/MultiGenBase.h"
-/// @ingroup GeneratorGroup
-/// @brief MultiPermGenIterator と MultiCombiGenIterator の基底クラス
-//////////////////////////////////////////////////////////////////////
-class MultiGenIterator
-{
-protected:
-
-  /// @brief 空のコンストラクタ
-  MultiGenIterator();
-
-  /// @brief コンストラクタ
-  /// @param[in] parent 親のオブジェクト
-  /// @note 継承クラスが用いる．
-  MultiGenIterator(const MultiGenBase* parent);
-
-  /// @brief デストラクタ
-  ~MultiGenIterator();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
+  /// @brief 初期化
+  void
+  init();
 
   /// @brief 要素の取得
   /// @param[in] grp グループ番号
@@ -110,30 +80,13 @@ protected:
   /// @brief コピーする．
   /// @param[in] src コピー元のオブジェクト
   void
-  copy(const MultiGenIterator& src);
-
-  /// @brief グループ数を得る．
-  /// @return グループ数
-  ymuint
-  group_num() const;
+  copy(const MultiGenBase& src);
 
   /// @brief 要素配列の初期化
   /// @param[in] grp グループ番号
   /// @note grp 番目のグループの要素配列を初期化する．
   void
-  init(ymuint grp);
-
-  /// @brief 要素数の取得
-  /// @param[in] grp グループ番号
-  /// @return grp 番目のグループの全要素数
-  ymuint
-  n(ymuint grp) const;
-
-  /// @brief 選択する要素数の取得
-  /// @param[in] grp グループ番号
-  /// @return grp 番目のグループの選択する要素数
-  ymuint
-  k(ymuint grp) const;
+  init_group(ymuint grp);
 
   /// @brief 要素配列の取得
   /// @param[in] grp グループ番号
@@ -141,34 +94,17 @@ protected:
   vector<ymuint>&
   elem(ymuint grp);
 
-  /// @brief 要素配列の取得
-  /// @param[in] grp グループ番号
-  /// @return grp 番目のグループの要素配列
-  /// @note こちらは const 版
-  const vector<ymuint>&
-  elem(ymuint grp) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 確保したメモリを解放する
-  void
-  free();
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 現在の要素(二重の配列なので少しめんどくさい)
-  vector<vector<ymuint>*> mElemArray;
+  // 各グループごとの全要素数を選択する要素数を入れる配列
+  vector<pair<ymuint, ymuint> > mNkArray;
 
-  // 親の MultiGenBase
-  const MultiGenBase* mParent;
+  // 現在の要素(二重の配列なので少しめんどくさい)
+  vector<vector<ymuint> > mElemArray;
 
 };
 
@@ -181,7 +117,22 @@ private:
 // 全要素数 n と選択する要素数 k のベクタを指定する．
 inline
 MultiGenBase::MultiGenBase(const vector<pair<ymuint, ymuint> >& nk_array) :
-  mNkArray(nk_array)
+  mNkArray(nk_array),
+  mElemArray(nk_array.size())
+{
+  ymuint ng = mNkArray.size();
+  for (ymuint g = 0; g < ng; ++ g) {
+    mElemArray[g].resize(k(g));
+  }
+  init();
+}
+
+// @brief コピーコンストラクタ
+// @param[in] src コピー元のオブジェクト
+inline
+MultiGenBase::MultiGenBase(const MultiGenBase& src) :
+  mNkArray(src.mNkArray),
+  mElemArray(src.mElemArray)
 {
 }
 
@@ -215,63 +166,54 @@ MultiGenBase::k(ymuint grp) const
   return mNkArray[grp].second;
 }
 
-// 空のコンストラクタ
+// @brief 初期化
 inline
-MultiGenIterator::MultiGenIterator() :
-  mElemArray(0),
-  mParent(NULL)
+void
+MultiGenBase::init()
 {
+  for (ymuint group = 0; group < mNkArray.size(); ++ group) {
+    init_group(group);
+  }
 }
 
 // grp 番目のグループの pos 番目の要素を取り出す．
 inline
 ymuint
-MultiGenIterator::operator()(ymuint grp,
-			     ymuint pos) const
+MultiGenBase::operator()(ymuint grp,
+			 ymuint pos) const
 {
-  return (*mElemArray[grp])[pos];
+  return mElemArray[grp][pos];
 }
 
-// グループ数を得る．
+// コピーする．
 inline
-ymuint
-MultiGenIterator::group_num() const
+void
+MultiGenBase::copy(const MultiGenBase& src)
 {
-  return mParent->group_num();
+  if ( this != &src ) {
+    mNkArray = src.mNkArray;
+    mElemArray = src.mElemArray;
+  }
 }
 
-// grp 番目のグループの全要素数を得る．
+// @brief 要素配列の初期化
+// @param[in] grp グループ番号
+// @note grp 番目のグループの要素配列を初期化する．
 inline
-ymuint
-MultiGenIterator::n(ymuint grp) const
+void
+MultiGenBase::init_group(ymuint grp)
 {
-  return mParent->n(grp);
-}
-
-// grp 番目のグループの選択する要素数を得る．
-inline
-ymuint
-MultiGenIterator::k(ymuint grp) const
-{
-  return mParent->k(grp);
+  for (ymuint i = 0; i < k(grp); ++ i) {
+    (elem(grp))[i] = i;
+  }
 }
 
 // grp 番目のグループの要素配列を得る．
 inline
 vector<ymuint>&
-MultiGenIterator::elem(ymuint g)
+MultiGenBase::elem(ymuint g)
 {
-  assert_cond(mElemArray[g], __FILE__, __LINE__);
-  return *mElemArray[g];
-}
-
-// grp 番目のグループの要素配列を得る．
-// こちらは const 版
-inline
-const vector<ymuint>&
-MultiGenIterator::elem(ymuint g) const
-{
-  return *mElemArray[g];
+  return mElemArray[g];
 }
 
 END_NAMESPACE_YM

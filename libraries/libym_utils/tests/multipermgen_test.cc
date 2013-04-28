@@ -51,12 +51,11 @@ main(int argc,
 	}
 	nk_array[g] = make_pair(n, k);
       }
-      MultiPermGen mpg(nk_array);
-      for (MultiPermGen::iterator p = mpg.begin(); !p.is_end(); ++ p) {
+      for (MultiPermGen mpg(nk_array); !mpg.is_end(); ++ mpg) {
 	for (ymuint g = 0; g < ngrp; ++ g) {
 	  ymuint k = nk_array[g].second;
 	  for (ymuint i = 0; i < k; ++ i) {
-	    cout << " " << p(g, i);
+	    cout << " " << mpg(g, i);
 	  }
 	  cout << " |";
 	}

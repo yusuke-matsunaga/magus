@@ -13,18 +13,13 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス MspgIterator
+// クラス MultiSetPermGen
 //////////////////////////////////////////////////////////////////////
 
 // @brief 次の要素を求める．
-// @return 次の要素を指す反復子
-MspgIterator
-MspgIterator::operator++()
+void
+MultiSetPermGen::operator++()
 {
-  if ( parent() == NULL ) {
-    return MspgIterator();
-  }
-
   ymuint ng = group_num();
   vector<ymuint> count(ng, 0);
   for (ymuint i = 0; i < k(); ++ i) {
@@ -62,8 +57,6 @@ MspgIterator::operator++()
       elem(0) = ng;
     }
   }
-
-  return *this;
 }
 
 END_NAMESPACE_YM

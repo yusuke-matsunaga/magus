@@ -19,21 +19,20 @@ main(int argc,
 	cerr << "ERROR: n must be specified" << endl;
 	return 2;
       }
-      size_t n = atoi(p);
+      ymuint n = atoi(p);
       p = strtok(NULL, " \t");
       if ( !p ) {
 	cerr << "ERROR: k must be specified" << endl;
 	return 2;
       }
-      size_t k = atoi(p);
+      ymuint k = atoi(p);
       if ( n < k ) {
 	cerr << "ERROR: n(" << n << ") < k(" << k << ")" << endl;
 	return 1;
       }
-      PermGen pg(n, k);
-      for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
-	for (size_t i = 0; i < k; ++ i) {
-	  cout << " " << p(i);
+      for (PermGen pg(n, k); !pg.is_end(); ++ pg) {
+	for (ymuint i = 0; i < k; ++ i) {
+	  cout << " " << pg(i);
 	}
 	cout << endl;
       }

@@ -51,12 +51,11 @@ main(int argc,
 	}
 	nk_array[g] = make_pair(n, k);
       }
-      MultiCombiGen mcg(nk_array);
-      for (MultiCombiGen::iterator p = mcg.begin(); !p.is_end(); ++ p) {
+      for (MultiCombiGen mcg(nk_array); !mcg.is_end(); ++ mcg) {
 	for (ymuint g = 0; g < ngrp; ++ g) {
 	  ymuint k = nk_array[g].second;
 	  for (ymuint i = 0; i < k; ++ i) {
-	    cout << " " << p(g, i);
+	    cout << " " << mcg(g, i);
 	  }
 	  cout << " |";
 	}

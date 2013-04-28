@@ -14,8 +14,6 @@
 
 BEGIN_NAMESPACE_YM
 
-class PermGenIterator;
-
 //////////////////////////////////////////////////////////////////////
 /// @class PermGen PermGen.h "ym_utils/PermGen.h"
 /// @ingroup GeneratorGroup
@@ -26,15 +24,21 @@ class PermGen :
 {
 public:
 
-  typedef PermGenIterator iterator;
-
-public:
-
   /// @brief コンストラクタ
   /// @param[in] n 全要素数
   /// @param[in] k 選択する要素数
   PermGen(ymuint n,
 	  ymuint k);
+
+  /// @brief コピーコンストラクタ
+  /// @param[in] src コピー元のオブジェクト
+  PermGen(const PermGen& src);
+
+  /// @brief 代入演算子
+  /// @param[in] src コピー元のオブジェクト
+  /// @return 自分自身
+  const PermGen&
+  operator=(const PermGen& src);
 
   /// @brief デストラクタ
   ~PermGen();
@@ -45,64 +49,14 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 最初の順列を取り出す．
-  iterator
-  begin();
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class PermGenIterator PermGen.h "ym_utils/PermGen.h"
-/// @ingroup GeneratorGroup
-/// @brief PermGen の反復子
-//////////////////////////////////////////////////////////////////////
-class PermGenIterator :
-  public GenIterator
-{
-  friend class PermGen;
-
-public:
-
-  /// @brief 空のコンストラクタ
-  PermGenIterator();
-
-  /// @brief コピーコンストラクタ
-  /// @param[in] src コピー元のオブジェクト
-  PermGenIterator(const PermGenIterator& src);
-
-  /// @brief 代入演算子
-  /// @param[in] src コピー元のオブジェクト
-  /// @return 自分自身
-  const PermGenIterator&
-  operator=(const PermGenIterator& src);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
   /// @brief 次の要素を求める．
-  /// @return 次の要素を指す反復子
-  PermGenIterator
+  void
   operator++();
 
   /// @brief 末尾のチェック
   /// @return 末尾の時に true を返す．
   bool
   is_end() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief コンストラクタ
-  /// @param[in] parent 親の PermGen オブジェクト
-  /// @note PermGen が用いる．
-  PermGenIterator(const PermGen* parent);
 
 };
 
@@ -120,56 +74,37 @@ PermGen::PermGen(ymuint n,
 {
 }
 
+// @brief コピーコンストラクタ
+// @param[in] src コピー元のオブジェクト
+inline
+PermGen::PermGen(const PermGen& src) :
+  GenBase(src)
+{
+}
+
+// @brief 代入演算子
+// @param[in] src コピー元のオブジェクト
+// @return 自分自身
+inline
+const PermGen&
+PermGen::operator=(const PermGen& src)
+{
+  copy(src);
+  return *this;
+}
+
 // デストラクタ
 inline
 PermGen::~PermGen()
 {
 }
 
-// 最初の組み合わせを取り出す．
-inline
-PermGenIterator
-PermGen::begin()
-{
-  return iterator(this);
-}
-
-// 空のコンストラクタ
-inline
-PermGenIterator::PermGenIterator()
-{
-}
-
-// コンストラクタ
-// PermGen が用いる．
-inline
-PermGenIterator::PermGenIterator(const PermGen* parent) :
-  GenIterator(parent)
-{
-}
-
-// コピーコンストラクタ
-inline
-PermGenIterator::PermGenIterator(const PermGenIterator& src)
-{
-  copy(src);
-}
-
-// 代入演算子
-inline
-const PermGenIterator&
-PermGenIterator::operator=(const PermGenIterator& src)
-{
-  copy(src);
-  return *this;
-}
-
 // 末尾の時に true を返す．
 inline
 bool
-PermGenIterator::is_end() const
+PermGen::is_end() const
 {
-  return elem(0) == n();
+  return operator()(0) == n();
 }
 
 END_NAMESPACE_YM

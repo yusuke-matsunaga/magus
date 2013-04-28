@@ -409,7 +409,6 @@ void
 init_repfunc(hash_set<TvFunc>& rep_func)
 {
   hash_set<TvFunc> nonrep;
-  PermGen pg(4, 4);
   NpnMap map(4, kPolPosi);
   for (ymuint32 p = 0U; p < 0x10000; ++ p) {
     vector<int> vals(16);
@@ -428,10 +427,10 @@ init_repfunc(hash_set<TvFunc>& rep_func)
 
     rep_func.insert(f);
     for (ymuint pols = 0U; pols < 16; ++ pols) {
-      for (PermGen::iterator q = pg.begin(); !q.is_end(); ++ q) {
+      for (PermGen pg(4, 4); !pg.is_end(); ++ pg) {
 	for (ymuint i = 0; i < 4; ++ i) {
 	  tPol pol = (pols & (1U << i)) ? kPolNega : kPolPosi;
-	  map.set(VarId(i), VarId(q(i)), pol);
+	  map.set(VarId(i), VarId(pg(i)), pol);
 	}
 	map.set_opol(kPolPosi);
 	TvFunc f1 = f.xform(map);

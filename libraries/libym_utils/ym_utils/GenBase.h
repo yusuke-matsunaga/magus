@@ -19,9 +19,8 @@
 ///   MultiPermGen
 ///
 /// 使いかたは全てのクラスで共通で，コンストラクタでオブジェクトを
-/// 生成した後，メンバ関数の begin() で反復子を取り出し，その反復子が
-/// 末尾に達するまで(!is_end())，繰り返せばよい．
-/// 反復子から値を取り出すには () 演算子を用いる．
+/// 生成した後，++ 演算子で末尾に達するまで(!is_end())，進めれば良い．
+/// 値を取り出すには () 演算子を用いる．
 
 
 #include "ymtools.h"
@@ -44,11 +43,17 @@ public:
   GenBase(ymuint n,
 	  ymuint k);
 
+  /// @brief コピーコンストラクタ
+  GenBase(const GenBase& src);
+
   /// @brief デストラクタ
   ~GenBase();
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 全要素数を得る．
   /// @return 全要素数
@@ -60,47 +65,9 @@ public:
   ymuint
   k() const;
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 全要素数
-  ymuint32 mN;
-
-  // 選択する要素数
-  ymuint32 mK;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class GenIterator GenBase.h "ym_utils/GenBase.h"
-/// @ingroup GeneratorGroup
-/// @brief CombiGen::iterator と PermGen::iterator の基底クラス
-//////////////////////////////////////////////////////////////////////
-class GenIterator
-{
-protected:
-
-  /// @brief 空のコンストラクタ
-  /// @note なにも指さない．
-  GenIterator();
-
-  /// @brief コンストラクタ
-  /// @param[in] parent 親のオブジェクト
-  /// @note 継承クラスが用いる．
-  GenIterator(const GenBase* parent);
-
-  /// @brief デストラクタ
-  ~GenIterator();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
+  /// @brief 最初の要素を指すように初期化する．
+  void
+  init();
 
   /// @brief 要素の取得
   /// @param[in] pos 取り出す要素の位置 (最初の位置は 0)
@@ -117,24 +84,7 @@ protected:
   /// @brief 内容をコピーする関数
   /// @param[in] src コピー元のオブジェクト
   void
-  copy(const GenIterator& src);
-
-  /// @brief 全要素数を得る．
-  /// @return 全要素数
-  ymuint
-  n() const;
-
-  /// @brief 順列/組合わせ数を得る．
-  /// @return 順列/組み合わせ数
-  ymuint
-  k() const;
-
-  /// @brief 要素の取得
-  /// @param[in] pos 取り出す要素の位置 (最初の位置は 0)
-  /// @return pos 番目の要素
-  /// @note operator() の別名
-  ymuint
-  elem(ymuint pos) const;
+  copy(const GenBase& src);
 
   /// @brief 要素の参照の取得
   /// @param[in] pos 取り出す要素の位置 (最初の位置は 0)
@@ -148,11 +98,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 全要素数
+  ymuint32 mN;
+
+  // 選択する要素数
+  ymuint32 mK;
+
   // 現在の要素
   vector<ymuint32> mElem;
-
-  // 親の GenBase
-  const GenBase* mParent;
 
 };
 
@@ -167,7 +120,18 @@ inline
 GenBase::GenBase(ymuint n,
 		 ymuint k) :
   mN(n),
-  mK(k)
+  mK(k),
+  mElem(k)
+{
+  init();
+}
+
+// @brief コピーコンストラクタ
+inline
+GenBase::GenBase(const GenBase& src) :
+  mN(src.mN),
+  mK(src.mK),
+  mElem(src.mElem)
 {
 }
 
@@ -193,77 +157,44 @@ GenBase::k() const
   return mK;
 }
 
-// 空のコンストラクタ
+// @brief 最初の要素を指すように初期化する．
 inline
-GenIterator::GenIterator() :
-  mElem(0),
-  mParent(NULL)
+void
+GenBase::init()
 {
-}
-
-// コンストラクタ
-// 継承クラスが用いる．
-inline
-GenIterator::GenIterator(const GenBase* parent) :
-  mElem(parent->k()),
-  mParent(parent)
-{
-  for (ymuint i = 0; i < mParent->k(); ++ i) {
+  for (ymuint i = 0; i < mK; ++ i) {
     mElem[i] = i;
   }
+}
+
+// pos 番目の要素を取り出す．
+inline
+ymuint
+GenBase::operator()(ymuint pos) const
+{
+  assert_cond( pos < mK, __FILE__, __LINE__);
+  return mElem[pos];
 }
 
 // 内容をコピーする関数
 inline
 void
-GenIterator::copy(const GenIterator& src)
+GenBase::copy(const GenBase& src)
 {
-  mElem = src.mElem;
-  mParent = src.mParent;
-}
-
-// @brief デストラクタ
-inline
-GenIterator::~GenIterator()
-{
-}
-
-// 全要素数を得る．
-inline
-ymuint
-GenIterator::n() const
-{
-  return mParent->n();
-}
-
-// 順列/組合わせ数を得る．
-inline
-ymuint
-GenIterator::k() const
-{
-  return mParent->k();
-}
-
-// pos 番目の要素を取り出す．
-inline
-ymuint
-GenIterator::operator()(ymuint pos) const
-{
-  return elem(pos);
-}
-
-// pos 番目の要素を取り出す．
-inline
-ymuint
-GenIterator::elem(ymuint pos) const
-{
-  return mElem[pos];
+  mN = src.mN;
+  mK = src.mK;
+  if ( mElem.size() != mK ) {
+    mElem.resize(mK);
+  }
+  for (ymuint i = 0; i < mK; ++ i) {
+    mElem[i] = src.mElem[i];
+  }
 }
 
 // pos 番目の要素への参照を取り出す．
 inline
 ymuint&
-GenIterator::elem(ymuint pos)
+GenBase::elem(ymuint pos)
 {
   return mElem[pos];
 }

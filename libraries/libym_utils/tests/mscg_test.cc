@@ -20,11 +20,9 @@ mscg_test(int argc,
   num_array[0] = 3;
   num_array[1] = 2;
 
-  MultiSetCombiGen mscg(num_array, 3);
-
-  for (MultiSetCombiGen::iterator p = mscg.begin(); !p.is_end(); ++ p) {
+  for (MultiSetCombiGen mscg(num_array, 3); !mscg.is_end(); ++ mscg) {
     for (ymuint i = 0; i < 3; ++ i) {
-      cout << " " << p(i);
+      cout << " " << mscg(i);
     }
     cout << endl;
   }

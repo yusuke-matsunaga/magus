@@ -13,18 +13,13 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス MscgIterator
+// クラス MultiSetCombiGen
 //////////////////////////////////////////////////////////////////////
 
 // @brief 次の要素を求める．
-// @return 次の要素を指す反復子
-MscgIterator
-MscgIterator::operator++()
+void
+MultiSetCombiGen::operator++()
 {
-  if ( parent() == NULL ) {
-    return MscgIterator();
-  }
-
   ymuint ng = group_num();
   vector<ymuint> count(ng, 0);
   for (ymuint i = 0; i < k(); ++ i) {
@@ -56,7 +51,7 @@ MscgIterator::operator++()
 	}
 	if ( g == ng ) {
 	  elem(0) = ng;
-	  goto end;
+	  return;
 	}
 	++ count[g];
 	elem(pos1) = g;
@@ -70,10 +65,6 @@ MscgIterator::operator++()
       elem(0) = ng;
     }
   }
-
- end:
-
-  return *this;
 }
 
 END_NAMESPACE_YM

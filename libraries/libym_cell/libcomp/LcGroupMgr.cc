@@ -160,9 +160,8 @@ gen_maxmap(const TvFuncM& f,
   NpnMapM map;
   bool first = true;
   TvFuncM repfunc;
-  PermGen pg(ni1, ni1);
   ymuint nip = 1U << ni1;
-  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+  for (PermGen pg(ni1, ni1); !pg.is_end(); ++ pg) {
     NpnMapM map1(ni, no);
     for (ymuint i = 0; i < no; ++ i) {
       map1.set_omap(VarId(i), VarId(i), kPolPosi);
@@ -171,7 +170,7 @@ gen_maxmap(const TvFuncM& f,
       for (ymuint i = 0; i < ni1; ++ i) {
 	tPol pol = (x & (1U << i)) ? kPolPosi : kPolNega;
 	VarId src_var = i_list[i];
-	VarId dst_var(p(i) + offset);
+	VarId dst_var(pg(i) + offset);
 	map1.set_imap(src_var, dst_var, pol);
       }
       TvFuncM f1 = f.xform(map1);

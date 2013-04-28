@@ -60,11 +60,10 @@ test1()
 {
   cout << "test1" << endl;
   bool error = false;
-  PermGen pg(4, 4);
-  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+  for (PermGen pg(4, 4); !pg.is_end(); ++ pg) {
     ymuint perm[4];
     for (ymuint i = 0; i < 4; ++ i) {
-      perm[i] = p(i);
+      perm[i] = pg(i);
     }
     ymuint pid = NpnXform::perm_id(perm);
     for (ymuint pols = 0; pols < 32; ++ pols) {
@@ -145,21 +144,19 @@ test2()
 {
   cout << "test2" << endl;
   bool error = false;
-  PermGen pg(4, 4);
-  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+  for (PermGen pg(4, 4); !pg.is_end(); ++ pg) {
     ymuint perm[4];
     for (ymuint i = 0; i < 4; ++ i) {
-      perm[i] = p(i);
+      perm[i] = pg(i);
     }
     ymuint pid = NpnXform::perm_id(perm);
     for (ymuint pols = 0; pols < 32; ++ pols) {
       NpnXform xf(pid, pols);
 
-      PermGen pg2(4, 4);
-      for (PermGen::iterator q = pg2.begin(); !q.is_end(); ++ q) {
+      for (PermGen pg2(4, 4); !pg2.is_end(); ++ pg2) {
 	ymuint perm2[4];
 	for (ymuint i = 0; i < 4; ++ i) {
-	  perm2[i] = q(i);
+	  perm2[i] = pg2(i);
 	}
 	ymuint pid2 = NpnXform::perm_id(perm2);
 	for (ymuint pols2 = 0; pols2 < 32; ++ pols2) {
@@ -218,11 +215,10 @@ test3()
 {
   cout << "test3" << endl;
   bool error = false;
-  PermGen pg(4, 4);
-  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+  for (PermGen pg(4, 4); !pg.is_end(); ++ pg) {
     ymuint perm[4];
     for (ymuint i = 0; i < 4; ++ i) {
-      perm[i] = p(i);
+      perm[i] = pg(i);
     }
     ymuint pid = NpnXform::perm_id(perm);
     for (ymuint pols = 0; pols < 32; ++ pols) {

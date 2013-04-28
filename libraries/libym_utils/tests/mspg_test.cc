@@ -20,11 +20,9 @@ mspg_test(int argc,
   num_array[0] = 3;
   num_array[1] = 2;
 
-  MultiSetPermGen mspg(num_array, 5);
-
-  for (MultiSetPermGen::iterator p = mspg.begin(); !p.is_end(); ++ p) {
+  for (MultiSetPermGen mspg(num_array, 5); !mspg.is_end(); ++ mspg) {
     for (ymuint i = 0; i < 5; ++ i) {
-      cout << " " << p(i);
+      cout << " " << mspg(i);
     }
     cout << endl;
   }

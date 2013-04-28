@@ -198,11 +198,10 @@ LcPatMgr::check_equivalent(const LogExpr& expr1,
     return false;
   }
 
-  PermGen pg(n, n);
-  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+  for (PermGen pg(n, n); !pg.is_end(); ++ pg) {
     bool match = true;
     for (ymuint i = 0; i < n; ++ i) {
-      if ( !check_equivalent(expr1.child(i), expr2.child(p(i))) ) {
+      if ( !check_equivalent(expr1.child(i), expr2.child(pg(i))) ) {
 	match = false;
 	break;
       }
@@ -300,12 +299,11 @@ LcPatMgr::pg_sub(const LogExpr& expr,
     }
 
     // ファンインのパタンの組み合わせを列挙するオブジェクト
-    MultiCombiGen mcg(nk_array);
-    for (MultiCombiGen::iterator p = mcg.begin(); !p.is_end(); ++ p) {
+    for (MultiCombiGen mcg(nk_array); !mcg.is_end(); ++ mcg) {
       // 各ファンインから1つずつパタンを取り出して tmp_input に入れる．
       vector<LcPatHandle> tmp_input(n);
       for (ymuint i = 0; i < n; ++ i) {
-	tmp_input[i] = input_pg_list[i][p(i, 0)];
+	tmp_input[i] = input_pg_list[i][mcg(i, 0)];
       }
 
       // tmp_input のなかで同形なパタンを求める．
@@ -344,12 +342,11 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	num_array[g] = group_list[g].size();
       }
 
-      MultiSetPermGen mspg(num_array, n);
       vector<LcPatHandle> input(n);
-      for (MultiSetPermGen::iterator q = mspg.begin(); !q.is_end(); ++ q) {
+      for (MultiSetPermGen mspg(num_array, n); !mspg.is_end(); ++ mspg) {
 	vector<ymuint> count(ng, 0);
 	for (ymuint i = 0; i < n; ++ i) {
-	  ymuint g = q(i);
+	  ymuint g = mspg(i);
 	  input[i] = tmp_input[group_list[g][count[g]]];
 	  ++ count[g];
 	}

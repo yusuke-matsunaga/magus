@@ -14,8 +14,6 @@
 
 BEGIN_NAMESPACE_YM
 
-class MultiCombiGenIterator;
-
 //////////////////////////////////////////////////////////////////////
 /// @class MultiCombiGen MultiCombiGen.h "ym_utils/MultiCombiGen.h"
 /// @ingroup GeneratorGroup
@@ -26,13 +24,19 @@ class MultiCombiGen :
 {
 public:
 
-  typedef MultiCombiGenIterator iterator;
-
-public:
-
   /// @brief コンストラクタ
   /// @param[in] nk_array 全要素数 n と選択する要素数 k のベクタ
   MultiCombiGen(const vector<pair<ymuint, ymuint> >& nk_array);
+
+  /// @brief コピーコンストラクタ
+  /// @param[in] src コピー元のオブジェクト
+  MultiCombiGen(const MultiCombiGen& src);
+
+  /// @brief 代入演算子
+  /// @param[in] src コピー元のオブジェクト
+  /// @return 自分自身
+  const MultiCombiGen&
+  operator=(const MultiCombiGen& src);
 
   /// @brief デストラクタ
   ~MultiCombiGen();
@@ -43,47 +47,8 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 最初の組み合わせを取り出す．
-  iterator
-  begin();
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class MultiCombiGenIterator MultiCombiGen.h "ym_utils/MultiCombiGen.h"
-/// @ingroup GeneratorGroup
-/// @brief MultiCombiGen の反復子
-//////////////////////////////////////////////////////////////////////
-class MultiCombiGenIterator :
-  public MultiGenIterator
-{
-  friend class MultiCombiGen;
-
-public:
-
-  /// @brief 空のコンストラクタ
-  MultiCombiGenIterator();
-
-  /// @brief コピーコンストラクタ
-  /// @param[in] src コピー元のオブジェクト
-  MultiCombiGenIterator(const MultiCombiGenIterator& src);
-
-  /// @brief 代入演算子
-  /// @param[in] src コピー元のオブジェクト
-  /// @return 自分自身
-  const MultiCombiGenIterator&
-  operator=(const MultiCombiGenIterator& src);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
   /// @brief 次の要素を求める．
-  /// @return 次の要素を指す反復子
-  MultiCombiGenIterator
+  void
   operator++();
 
   /// @brief 末尾のチェック
@@ -96,11 +61,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief コンストラクタ
-  /// @param[in] parent 親のオブジェクト
-  /// @brief MultiCombiGen が用いる．
-  MultiCombiGenIterator(const MultiCombiGen* parent);
 
   /// @brief grp 番目のグループが終了状態の時 true を返す．
   bool
@@ -121,54 +81,35 @@ MultiCombiGen::MultiCombiGen(const vector<pair<ymuint, ymuint> >& nk_array) :
 {
 }
 
+// @brief コピーコンストラクタ
+// @param[in] src コピー元のオブジェクト
+inline
+MultiCombiGen::MultiCombiGen(const MultiCombiGen& src) :
+  MultiGenBase(src)
+{
+}
+
+// @brief 代入演算子
+// @param[in] src コピー元のオブジェクト
+// @return 自分自身
+inline
+const MultiCombiGen&
+MultiCombiGen::operator=(const MultiCombiGen& src)
+{
+  copy(src);
+  return *this;
+}
+
 // デストラクタ
 inline
 MultiCombiGen::~MultiCombiGen()
 {
 }
 
-// 最初の組み合わせを取り出す．
-inline
-MultiCombiGenIterator
-MultiCombiGen::begin()
-{
-  return iterator(this);
-}
-
-// 空のコンストラクタ
-inline
-MultiCombiGenIterator::MultiCombiGenIterator()
-{
-}
-
-// コンストラクタ
-// MultiCombiGen が用いる．
-inline
-MultiCombiGenIterator::MultiCombiGenIterator(const MultiCombiGen* parent) :
-  MultiGenIterator(parent)
-{
-}
-
-// コピーコンストラクタ
-inline
-MultiCombiGenIterator::MultiCombiGenIterator(const MultiCombiGenIterator& src)
-{
-  copy(src);
-}
-
-// 代入演算子
-inline
-const MultiCombiGenIterator&
-MultiCombiGenIterator::operator=(const MultiCombiGenIterator& src)
-{
-  copy(src);
-  return *this;
-}
-
 // 末尾の時に true を返す．
 inline
 bool
-MultiCombiGenIterator::is_end() const
+MultiCombiGen::is_end() const
 {
   return is_end_sub(0);
 }
@@ -176,9 +117,9 @@ MultiCombiGenIterator::is_end() const
 // grp 番目のグループが終了状態の時 true を返す．
 inline
 bool
-MultiCombiGenIterator::is_end_sub(ymuint grp) const
+MultiCombiGen::is_end_sub(ymuint grp) const
 {
-  return elem(grp)[0] == n(grp);
+  return operator()(grp, 0) == n(grp);
 }
 
 

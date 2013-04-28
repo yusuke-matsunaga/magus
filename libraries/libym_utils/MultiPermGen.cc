@@ -13,12 +13,12 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス MultiPermGenIterator
+// クラス MultiPermGen
 //////////////////////////////////////////////////////////////////////
 
 // 次の要素を求める．
-MultiPermGenIterator
-MultiPermGenIterator::operator++()
+void
+MultiPermGen::operator++()
 {
   for (ymuint g = group_num(); g -- > 0; ) {
     vector<int> bitmap(n(g), 0);
@@ -57,11 +57,9 @@ MultiPermGenIterator::operator++()
       break;
     }
     if ( g > 0 ) {
-      init(g);
+      init_group(g);
     }
   }
-
-  return *this;
 }
 
 END_NAMESPACE_YM

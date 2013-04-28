@@ -13,12 +13,12 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス MultiCombiGenIterator
+// クラス MultiCombiGen
 //////////////////////////////////////////////////////////////////////
 
 // 次の要素を求める．
-MultiCombiGenIterator
-MultiCombiGenIterator::operator++()
+void
+MultiCombiGen::operator++()
 {
   for (ymuint g = group_num(); g -- > 0; ) {
     for (ymuint pos = k(g); pos -- > 0; ) {
@@ -37,11 +37,9 @@ MultiCombiGenIterator::operator++()
       break;
     }
     if ( g > 0 ) {
-      init(g);
+      init_group(g);
     }
   }
-
-  return *this;
 }
 
 END_NAMESPACE_YM

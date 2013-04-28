@@ -17,8 +17,8 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // 次の要素を求める．
-PermGenIterator
-PermGenIterator::operator++()
+void
+PermGen::operator++()
 {
   // 各値の使用回数(0/1)を数える．
   vector<int> bitmap(n(), 0);
@@ -59,8 +59,6 @@ PermGenIterator::operator++()
       elem(0) = n();
     }
   }
-
-  return *this;
 }
 
 END_NAMESPACE_YM

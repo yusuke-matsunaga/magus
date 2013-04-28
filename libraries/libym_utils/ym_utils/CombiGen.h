@@ -14,8 +14,6 @@
 
 BEGIN_NAMESPACE_YM
 
-class CombiGenIterator;
-
 //////////////////////////////////////////////////////////////////////
 /// @class CombiGen CombiGen.h "ym_utils/CombiGen.h"
 /// @ingroup GeneratorGroup
@@ -26,15 +24,21 @@ class CombiGen :
 {
 public:
 
-  typedef CombiGenIterator iterator;
-
-public:
-
   /// @brief コンストラクタ
   /// @param[in] n 全要素数
   /// @param[in] k 選び出す要素数
   CombiGen(ymuint n,
 	   ymuint k);
+
+  /// @brief コピーコンストラクタ
+  /// @param[in] src コピー元のオブジェクト
+  CombiGen(const CombiGen& src);
+
+  /// @brief 代入演算子
+  /// @param[in] src コピー元のオブジェクト
+  /// @return 自分自身
+  const CombiGen&
+  operator=(const CombiGen& src);
 
   /// @brief デストラクタ
   ~CombiGen();
@@ -45,64 +49,14 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 最初の組み合わせを取り出す．
-  iterator
-  begin();
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class CombiGenIterator CombiGen.h "ym_utils/CombiGen.h"
-/// @ingroup GeneratorGroup
-/// @brief CombiGen の反復子
-//////////////////////////////////////////////////////////////////////
-class CombiGenIterator :
-  public GenIterator
-{
-  friend class CombiGen;
-
-public:
-
-  /// @brief 空のコンストラクタ
-  CombiGenIterator();
-
-  /// @brief コピーコンストラクタ
-  /// @param[in] src コピー元のオブジェクト
-  /// @return 自分自身
-  CombiGenIterator(const CombiGenIterator& src);
-
-  /// @brief 代入演算子
-  /// @param[in] src コピー元のオブジェクト
-  const CombiGenIterator&
-  operator=(const CombiGenIterator& src);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
   /// @brief 次の要素を求める．
-  /// @return 次の要素を指す反復子
-  CombiGenIterator
+  void
   operator++();
 
   /// @brief 末尾のチェック
   /// @return 末尾の時に true を返す．
   bool
   is_end() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief コンストラクタ
-  /// @param[in] parent 親の CombiGen オブジェクト
-  /// @note CombiGen が用いる．
-  CombiGenIterator(const CombiGen* parent);
 
 };
 
@@ -120,57 +74,38 @@ CombiGen::CombiGen(ymuint n,
 {
 }
 
+// @brief コピーコンストラクタ
+// @param[in] src コピー元のオブジェクト
+inline
+CombiGen::CombiGen(const CombiGen& src) :
+  GenBase(src)
+{
+}
+
+// @brief 代入演算子
+// @param[in] src コピー元のオブジェクト
+// @return 自分自身
+inline
+const CombiGen&
+CombiGen::operator=(const CombiGen& src)
+{
+  copy(src);
+  return *this;
+}
+
 // デストラクタ
 inline
 CombiGen::~CombiGen()
 {
 }
 
-// 最初の組み合わせを取り出す．
-inline
-CombiGenIterator
-CombiGen::begin()
-{
-  return iterator(this);
-}
-
-// 空のコンストラクタ
-inline
-CombiGenIterator::CombiGenIterator()
-{
-}
-
-// コンストラクタ
-// CombiGen が用いる．
-inline
-CombiGenIterator::CombiGenIterator(const CombiGen* parent) :
-  GenIterator(parent)
-{
-}
-
-// コピーコンストラクタ
-inline
-CombiGenIterator::CombiGenIterator(const CombiGenIterator& src)
-{
-  copy(src);
-}
-
-// 代入演算子
-inline
-const CombiGenIterator&
-CombiGenIterator::operator=(const CombiGenIterator& src)
-{
-  copy(src);
-  return *this;
-}
-
 // 末尾の時に true を返す．
 inline
 bool
-CombiGenIterator::is_end() const
+CombiGen::is_end() const
 {
   // 末尾の時には範囲外の値(= n())を持っている．
-  return elem(0) == n();
+  return operator()(0) == n();
 }
 
 END_NAMESPACE_YM

@@ -13,47 +13,17 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス MultiGenIterator
+// クラス MultiGenBase
 //////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-// 継承クラスが用いる．
-MultiGenIterator::MultiGenIterator(const MultiGenBase* parent) :
-  mElemArray(parent->group_num()),
-  mParent(parent)
-{
-  ymuint group_num = parent->group_num();
-  for (ymuint g = 0; g < group_num; ++ g) {
-    mElemArray[g] = new vector<ymuint>(k(g));
-    init(g);
-  }
-}
 
 // コピーする．
 void
-MultiGenIterator::copy(const MultiGenIterator& src)
+MultiGenBase::copy(const MultiGenBase& src)
 {
   if ( this != &src ) {
-    free();
-    mParent = src.mParent;
-    if ( mParent ) {
-      ymuint group_num = mParent->group_num();
-      mElemArray.resize(group_num);
-      for (ymuint g = 0; g < group_num; ++ g) {
-	mElemArray[g] = new vector<ymuint>(k(g));
-	elem(g) = src.elem(g);
-      }
-    }
-    else {
-      mElemArray.resize(0);
-    }
+    mNKArray = src.mNKArray;
+    mElemArray = src.mElemArray;
   }
-}
-
-// デストラクタ
-MultiGenIterator::~MultiGenIterator()
-{
-  free();
 }
 
 // grp 番目のグループの要素配列を初期化する．
@@ -62,17 +32,6 @@ MultiGenIterator::init(ymuint grp)
 {
   for (ymuint i = 0; i < k(grp); ++ i) {
     elem(grp)[i] = i;
-  }
-}
-
-// 確保したメモリを解放する
-void
-MultiGenIterator::free()
-{
-  ymuint n = mElemArray.size();
-  for (ymuint g = 0; g < n; ++ g) {
-    delete mElemArray[g];
-    mElemArray[g] = NULL;
   }
 }
 
