@@ -52,61 +52,7 @@ public:
   void
   operator++();
 
-  /// @brief 末尾のチェック
-  /// @return 末尾の時に true を返す．
-  bool
-  is_end() const;
-
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] num_array 各要素の重複度を納めた配列
-// @param[in] k 選び出す要素数
-inline
-MultiSetCombiGen::MultiSetCombiGen(const vector<ymuint>& num_array,
-				   ymuint k) :
-  MultiSetGenBase(num_array, k)
-{
-}
-
-// @brief コピーコンストラクタ
-// @param[in] src コピー元のオブジェクト
-inline
-MultiSetCombiGen::MultiSetCombiGen(const MultiSetCombiGen& src) :
-  MultiSetGenBase(src)
-{
-}
-
-// @brief 代入演算子
-// @param[in] src コピー元のオブジェクト
-// @return 自分自身
-inline
-const MultiSetCombiGen&
-MultiSetCombiGen::operator=(const MultiSetCombiGen& src)
-{
-  copy(src);
-  return *this;
-}
-
-// @brief デストラクタ
-inline
-MultiSetCombiGen::~MultiSetCombiGen()
-{
-}
-
-// @brief 末尾のチェック
-// @return 末尾の時に true を返す．
-inline
-bool
-MultiSetCombiGen::is_end() const
-{
-  return operator()(0) == group_num();
-}
 
 END_NAMESPACE_YM
 

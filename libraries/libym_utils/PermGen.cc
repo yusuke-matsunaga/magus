@@ -16,6 +16,36 @@ BEGIN_NAMESPACE_YM
 // クラス PermGenIterator
 //////////////////////////////////////////////////////////////////////
 
+// コンストラクタ
+// 全要素数 n と選択する要素数 k を必ず指定する．
+PermGen::PermGen(ymuint n,
+		 ymuint k) :
+  GenBase(n, k)
+{
+}
+
+// @brief コピーコンストラクタ
+// @param[in] src コピー元のオブジェクト
+PermGen::PermGen(const PermGen& src) :
+  GenBase(src)
+{
+}
+
+// @brief 代入演算子
+// @param[in] src コピー元のオブジェクト
+// @return 自分自身
+const PermGen&
+PermGen::operator=(const PermGen& src)
+{
+  copy(src);
+  return *this;
+}
+
+// デストラクタ
+PermGen::~PermGen()
+{
+}
+
 // 次の要素を求める．
 void
 PermGen::operator++()

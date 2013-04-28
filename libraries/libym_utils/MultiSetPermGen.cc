@@ -16,6 +16,37 @@ BEGIN_NAMESPACE_YM
 // クラス MultiSetPermGen
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+// @param[in] num_array 各要素の重複度を納めた配列
+// @param[in] k 選び出す要素数
+MultiSetPermGen::MultiSetPermGen(const vector<ymuint>& num_array,
+				 ymuint k) :
+  MultiSetGenBase(num_array, k)
+{
+}
+
+// @brief コピーコンストラクタ
+// @param[in] src コピー元のオブジェクト
+MultiSetPermGen::MultiSetPermGen(const MultiSetPermGen& src) :
+  MultiSetGenBase(src)
+{
+}
+
+// @brief 代入演算子
+// @param[in] src コピー元のオブジェクト
+// @return 自分自身
+const MultiSetPermGen&
+MultiSetPermGen::operator=(const MultiSetPermGen& src)
+{
+  copy(src);
+  return *this;
+}
+
+// @brief デストラクタ
+MultiSetPermGen::~MultiSetPermGen()
+{
+}
+
 // @brief 次の要素を求める．
 void
 MultiSetPermGen::operator++()

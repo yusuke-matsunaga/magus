@@ -40,6 +40,7 @@ libym_utils_la_SOURCES = \
 	FileInfoMgr.cc \
 	FileScanner.cc \
 	FragAlloc.cc \
+	GenBase.cc \
 	ItvlCell.h \
 	ItvlMgrImpl.h \
 	ItvlMgrImpl.cc \
@@ -50,7 +51,9 @@ libym_utils_la_SOURCES = \
 	MsgMgrImpl.h \
 	MsgMgrImpl.cc \
 	MultiCombiGen.cc \
+	MultiGenBase.cc \
 	MultiSetCombiGen.cc \
+	MultiSetGenBase.cc \
 	MultiSetPermGen.cc \
 	MultiPermGen.cc \
 	NameMgr.cc \

@@ -53,60 +53,7 @@ public:
   void
   operator++();
 
-  /// @brief 末尾のチェック
-  /// @return 末尾の時に true を返す．
-  bool
-  is_end() const;
-
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-// 全要素数 n と選択する要素数 k を必ず指定する．
-inline
-CombiGen::CombiGen(ymuint n,
-		   ymuint k) :
-  GenBase(n, k)
-{
-}
-
-// @brief コピーコンストラクタ
-// @param[in] src コピー元のオブジェクト
-inline
-CombiGen::CombiGen(const CombiGen& src) :
-  GenBase(src)
-{
-}
-
-// @brief 代入演算子
-// @param[in] src コピー元のオブジェクト
-// @return 自分自身
-inline
-const CombiGen&
-CombiGen::operator=(const CombiGen& src)
-{
-  copy(src);
-  return *this;
-}
-
-// デストラクタ
-inline
-CombiGen::~CombiGen()
-{
-}
-
-// 末尾の時に true を返す．
-inline
-bool
-CombiGen::is_end() const
-{
-  // 末尾の時には範囲外の値(= n())を持っている．
-  return operator()(0) == n();
-}
 
 END_NAMESPACE_YM
 

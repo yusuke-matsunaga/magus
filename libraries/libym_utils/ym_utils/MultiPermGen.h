@@ -51,76 +51,7 @@ public:
   void
   operator++();
 
-  /// @brief 末尾のチェック
-  /// @return 末尾の時に true を返す．
-  bool
-  is_end() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief grp 番目のグループが終了状態の時 true を返す．
-  bool
-  is_end_sub(ymuint grp) const;
-
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-// 全要素数 n と選択する要素数 k のベクタを指定する．
-inline
-MultiPermGen::MultiPermGen(const vector<pair<ymuint, ymuint> >& nk_array) :
-  MultiGenBase(nk_array)
-{
-}
-
-// @brief コピーコンストラクタ
-// @param[in] src コピー元のオブジェクト
-inline
-MultiPermGen::MultiPermGen(const MultiPermGen& src) :
-  MultiGenBase(src)
-{
-}
-
-// @brief 代入演算子
-// @param[in] src コピー元のオブジェクト
-// @return 自分自身
-inline
-const MultiPermGen&
-MultiPermGen::operator=(const MultiPermGen& src)
-{
-  copy(src);
-  return *this;
-}
-
-// デストラクタ
-inline
-MultiPermGen::~MultiPermGen()
-{
-}
-
-// 末尾の時に true を返す．
-inline
-bool
-MultiPermGen::is_end() const
-{
-  return is_end_sub(0);
-}
-
-// grp 番目のグループが終了状態の時 true を返す．
-inline
-bool
-MultiPermGen::is_end_sub(ymuint grp) const
-{
-  return operator()(grp, 0) == n(grp);
-}
 
 END_NAMESPACE_YM
 

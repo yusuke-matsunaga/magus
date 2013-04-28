@@ -75,6 +75,11 @@ public:
   ymuint
   operator()(ymuint pos) const;
 
+  /// @brief 末尾のチェック
+  /// @return 末尾の時に true を返す．
+  bool
+  is_end() const;
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -114,33 +119,6 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// コンストラクタ
-// 全要素数 n と選択する要素数 k を必ず指定する．
-inline
-GenBase::GenBase(ymuint n,
-		 ymuint k) :
-  mN(n),
-  mK(k),
-  mElem(k)
-{
-  init();
-}
-
-// @brief コピーコンストラクタ
-inline
-GenBase::GenBase(const GenBase& src) :
-  mN(src.mN),
-  mK(src.mK),
-  mElem(src.mElem)
-{
-}
-
-// デストラクタ
-inline
-GenBase::~GenBase()
-{
-}
-
 // 全要素数を得る．
 inline
 ymuint
@@ -157,16 +135,6 @@ GenBase::k() const
   return mK;
 }
 
-// @brief 最初の要素を指すように初期化する．
-inline
-void
-GenBase::init()
-{
-  for (ymuint i = 0; i < mK; ++ i) {
-    mElem[i] = i;
-  }
-}
-
 // pos 番目の要素を取り出す．
 inline
 ymuint
@@ -176,27 +144,21 @@ GenBase::operator()(ymuint pos) const
   return mElem[pos];
 }
 
-// 内容をコピーする関数
-inline
-void
-GenBase::copy(const GenBase& src)
-{
-  mN = src.mN;
-  mK = src.mK;
-  if ( mElem.size() != mK ) {
-    mElem.resize(mK);
-  }
-  for (ymuint i = 0; i < mK; ++ i) {
-    mElem[i] = src.mElem[i];
-  }
-}
-
 // pos 番目の要素への参照を取り出す．
 inline
 ymuint&
 GenBase::elem(ymuint pos)
 {
   return mElem[pos];
+}
+
+// 末尾の時に true を返す．
+inline
+bool
+GenBase::is_end() const
+{
+  // 末尾の時には範囲外の値(= n())を持っている．
+  return operator()(0) == n();
 }
 
 END_NAMESPACE_YM

@@ -13,29 +13,51 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス MsGenIterator
+// クラス MultiSetGenBase
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] parent 親の MultiSetGenBase オブジェクト
-MsGenIterator::MsGenIterator(const MultiSetGenBase* parent)
+// @param[in] num_array 各要素の重複度を納めた配列
+// @param[in] k 選び出す要素数
+MultiSetGenBase::MultiSetGenBase(const vector<ymuint>& num_array,
+				 ymuint k) :
+  mNumArray(num_array),
+  mK(k),
+  mElem(k)
 {
-  assert_cond( parent != NULL, __FILE__, __LINE__);
+  init();
+}
 
-  mParent = parent;
-  ymuint k = parent->k();
-  mElem.resize(k);
+// @brief デストラクタ
+MultiSetGenBase::~MultiSetGenBase()
+{
+}
+
+// @brief 初期化する．
+void
+MultiSetGenBase::init()
+{
   ymuint pos = 0;
   ymuint count = 0;
-  for (ymuint i = 0; i < k; ++ i) {
-    if ( count >= parent->n(pos) ) {
+  for (ymuint i = 0; i < mK; ++ i) {
+    if ( count >= mNumArray[pos] ) {
       ++ pos;
       count = 0;
     }
-    assert_cond( count < parent->n(pos), __FILE__, __LINE__);
+    assert_cond( count < mNumArray[pos], __FILE__, __LINE__);
     mElem[i] = pos;
     ++ count;
   }
+}
+
+// @brief 内容をコピーする関数
+// @param[in] src コピー元のオブジェクト
+void
+MultiSetGenBase::copy(const MultiSetGenBase& src)
+{
+  mNumArray = src.mNumArray;
+  mK = src.mK;
+  mElem = src.mElem;
 }
 
 END_NAMESPACE_YM

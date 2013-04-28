@@ -16,6 +16,35 @@ BEGIN_NAMESPACE_YM
 // クラス MultiPermGen
 //////////////////////////////////////////////////////////////////////
 
+// コンストラクタ
+// 全要素数 n と選択する要素数 k のベクタを指定する．
+MultiPermGen::MultiPermGen(const vector<pair<ymuint, ymuint> >& nk_array) :
+  MultiGenBase(nk_array)
+{
+}
+
+// @brief コピーコンストラクタ
+// @param[in] src コピー元のオブジェクト
+MultiPermGen::MultiPermGen(const MultiPermGen& src) :
+  MultiGenBase(src)
+{
+}
+
+// @brief 代入演算子
+// @param[in] src コピー元のオブジェクト
+// @return 自分自身
+const MultiPermGen&
+MultiPermGen::operator=(const MultiPermGen& src)
+{
+  copy(src);
+  return *this;
+}
+
+// デストラクタ
+MultiPermGen::~MultiPermGen()
+{
+}
+
 // 次の要素を求める．
 void
 MultiPermGen::operator++()

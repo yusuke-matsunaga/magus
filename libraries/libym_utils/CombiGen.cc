@@ -16,6 +16,36 @@ BEGIN_NAMESPACE_YM
 // クラス CombiGenIterator
 //////////////////////////////////////////////////////////////////////
 
+// コンストラクタ
+// 全要素数 n と選択する要素数 k を必ず指定する．
+CombiGen::CombiGen(ymuint n,
+		   ymuint k) :
+  GenBase(n, k)
+{
+}
+
+// @brief コピーコンストラクタ
+// @param[in] src コピー元のオブジェクト
+CombiGen::CombiGen(const CombiGen& src) :
+  GenBase(src)
+{
+}
+
+// @brief 代入演算子
+// @param[in] src コピー元のオブジェクト
+// @return 自分自身
+const CombiGen&
+CombiGen::operator=(const CombiGen& src)
+{
+  copy(src);
+  return *this;
+}
+
+// デストラクタ
+CombiGen::~CombiGen()
+{
+}
+
 // 次の要素を求める．
 void
 CombiGen::operator++()

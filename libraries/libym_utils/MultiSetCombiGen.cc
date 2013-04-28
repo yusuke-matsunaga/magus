@@ -16,6 +16,37 @@ BEGIN_NAMESPACE_YM
 // クラス MultiSetCombiGen
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+// @param[in] num_array 各要素の重複度を納めた配列
+// @param[in] k 選び出す要素数
+MultiSetCombiGen::MultiSetCombiGen(const vector<ymuint>& num_array,
+				   ymuint k) :
+  MultiSetGenBase(num_array, k)
+{
+}
+
+// @brief コピーコンストラクタ
+// @param[in] src コピー元のオブジェクト
+MultiSetCombiGen::MultiSetCombiGen(const MultiSetCombiGen& src) :
+  MultiSetGenBase(src)
+{
+}
+
+// @brief 代入演算子
+// @param[in] src コピー元のオブジェクト
+// @return 自分自身
+const MultiSetCombiGen&
+MultiSetCombiGen::operator=(const MultiSetCombiGen& src)
+{
+  copy(src);
+  return *this;
+}
+
+// @brief デストラクタ
+MultiSetCombiGen::~MultiSetCombiGen()
+{
+}
+
 // @brief 次の要素を求める．
 void
 MultiSetCombiGen::operator++()

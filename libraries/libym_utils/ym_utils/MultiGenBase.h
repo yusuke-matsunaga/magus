@@ -71,6 +71,11 @@ public:
   operator()(ymuint grp,
 	     ymuint pos) const;
 
+  /// @brief 末尾のチェック
+  /// @return 末尾の時に true を返す．
+  bool
+  is_end() const;
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -94,6 +99,10 @@ protected:
   vector<ymuint>&
   elem(ymuint grp);
 
+  /// @brief grp 番目のグループが終了状態の時 true を返す．
+  bool
+  is_end_sub(ymuint grp) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -112,35 +121,6 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-// 全要素数 n と選択する要素数 k のベクタを指定する．
-inline
-MultiGenBase::MultiGenBase(const vector<pair<ymuint, ymuint> >& nk_array) :
-  mNkArray(nk_array),
-  mElemArray(nk_array.size())
-{
-  ymuint ng = mNkArray.size();
-  for (ymuint g = 0; g < ng; ++ g) {
-    mElemArray[g].resize(k(g));
-  }
-  init();
-}
-
-// @brief コピーコンストラクタ
-// @param[in] src コピー元のオブジェクト
-inline
-MultiGenBase::MultiGenBase(const MultiGenBase& src) :
-  mNkArray(src.mNkArray),
-  mElemArray(src.mElemArray)
-{
-}
-
-// デストラクタ
-inline
-MultiGenBase::~MultiGenBase()
-{
-}
 
 // グループ数を得る．
 inline
@@ -166,16 +146,6 @@ MultiGenBase::k(ymuint grp) const
   return mNkArray[grp].second;
 }
 
-// @brief 初期化
-inline
-void
-MultiGenBase::init()
-{
-  for (ymuint group = 0; group < mNkArray.size(); ++ group) {
-    init_group(group);
-  }
-}
-
 // grp 番目のグループの pos 番目の要素を取り出す．
 inline
 ymuint
@@ -185,27 +155,12 @@ MultiGenBase::operator()(ymuint grp,
   return mElemArray[grp][pos];
 }
 
-// コピーする．
+// 末尾の時に true を返す．
 inline
-void
-MultiGenBase::copy(const MultiGenBase& src)
+bool
+MultiGenBase::is_end() const
 {
-  if ( this != &src ) {
-    mNkArray = src.mNkArray;
-    mElemArray = src.mElemArray;
-  }
-}
-
-// @brief 要素配列の初期化
-// @param[in] grp グループ番号
-// @note grp 番目のグループの要素配列を初期化する．
-inline
-void
-MultiGenBase::init_group(ymuint grp)
-{
-  for (ymuint i = 0; i < k(grp); ++ i) {
-    (elem(grp))[i] = i;
-  }
+  return is_end_sub(0);
 }
 
 // grp 番目のグループの要素配列を得る．
@@ -214,6 +169,14 @@ vector<ymuint>&
 MultiGenBase::elem(ymuint g)
 {
   return mElemArray[g];
+}
+
+// grp 番目のグループが終了状態の時 true を返す．
+inline
+bool
+MultiGenBase::is_end_sub(ymuint grp) const
+{
+  return mElemArray[grp][0] == n(grp);
 }
 
 END_NAMESPACE_YM
