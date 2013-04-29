@@ -62,12 +62,27 @@ Cell_dealloc(CellObject* self)
   PyObject_Del(self);
 }
 
+// 初期化関数
+int
+Cell_init(CellLibraryObject* self,
+	  PyObject* args)
+{
+  // args をパーズして初期化を行なう．
+  // エラーが起きたらエラーメッセージをセットして -1 を返す．
+  // 正常に終了したら 0 を返す．
+
+  return 0;
+}
+
 // id 関数
 PyObject*
 Cell_id(CellObject* self,
 	PyObject* args)
 {
-  return PyObject_FromYmuint32(self->mBody->id());
+  PyObject* result = self->mCell->mId;
+
+  Py_INCREF(result);
+  return result;
 }
 
 // name 関数
@@ -75,7 +90,10 @@ PyObject*
 Cell_name(CellObject* self,
 	  PyObject* args)
 {
-  return PyObject_FromString(self->mBody->name());
+  PyObject* result = self->mCell->mName;
+
+  Py_INCREF(result);
+  return result;
 }
 
 // area 関数
@@ -83,7 +101,10 @@ PyObject*
 Cell_area(CellObject* self,
 	  PyObject* args)
 {
-  return PyCellArea_FromCellArea(self->mBody->area());
+  PyObject* result = self->mCell->mArea;
+
+  Py_INCREF(result);
+  return result;
 }
 
 // pin 関数
@@ -154,6 +175,19 @@ PyMethodDef Cell_methods[] = {
   //  - METH_CLASS
   //  - METH_STATIC
   //  - METH_COEXIST
+
+  {"id", (PyCFunction)Cell_id, METH_NOARGS,
+   "return ID"},
+  {"name", (PyCFunction)Cell_name, METH_NOARGS,
+   "return name"},
+  {"area", (PyCFunction)Cell_area, METH_NOARGS,
+   "return area"},
+  {"pin", (PyCFunction)Cell_pin, METH_VARARGS,
+   "return pin (name: string)"},
+  {"pin_list", (PyCFunction)Cell_pin_list, METH_NOARGS,
+   "return pin-list"},
+  {"input_pin_list", (PyCFunction)Cell_input_pin_list, METH_NOARGS,
+   "return input-pin-list"},
 
   {NULL, NULL, 0, NULL} // end-marker
 };
@@ -233,9 +267,9 @@ PyTypeObject PyCellCell_Type = {
   (descrgetfunc)0,              // tp_descr_get
   (descrsetfunc)0,              // tp_descr_set
   (long)0,                      // tp_dictoffset
-  0,                            // tp_init
+  (initproc)0,                  // tp_init
   (allocfunc)0,                 // tp_alloc
-  0,                            // tp_new
+  (newfunc)Cell_new,            // tp_new
   (freefunc)0,                  // tp_free
   (inquiry)0,                   // tp_is_gc
 

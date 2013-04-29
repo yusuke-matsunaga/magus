@@ -45,9 +45,6 @@ struct CellLibraryObject
   // Python のお約束
   PyObject_HEAD
 
-  // CellLibrary の本体
-  const CellLibrary* mBody;
-
   // PyLibrary
   PyLibrary* mLibrary;
 
@@ -67,9 +64,7 @@ CellLibrary_new(PyTypeObject* type)
     return NULL;
   }
 
-  // CellLibrary の生成を行なう．
-  //self->mBody = CellLibrary::new_obj();
-  self->mLibrary = new PyLibrary();
+  self->mLibrary = NULL;
 
   return self;
 }
@@ -79,9 +74,6 @@ void
 CellLibrary_dealloc(CellLibraryObject* self)
 {
   delete self->mLibrary;
-
-  // CellLibrary の開放を行なう．
-  delete self->mBody;
 
   PyObject_Del(self);
 }
@@ -94,6 +86,50 @@ CellLibrary_init(CellLibraryObject* self,
   // args をパーズして初期化を行なう．
   // エラーが起きたらエラーメッセージをセットして -1 を返す．
   // 正常に終了したら 0 を返す．
+  // 引数は
+  // - (ファイル名 [, タイプ])
+  // タイプは
+  // - liberty
+  // - mislib
+  // - binary
+  char* filename = NULL;
+  char* type = NULL;
+  if ( !PyArg_ParseTuple(args, "s|s", &filname, &type) ) {
+    return -1;
+  }
+
+  if ( type == NULL ) {
+    type = "liberty";
+  }
+  if ( strcmp(type, "liberty") == 0 ) {
+    CellDotlibReader read;
+
+    self->mBody = read(filename);
+    if ( self->mBody == NULL ) {
+      PyErr_SetString(PyExc_ValueError, "Read error");
+      return -1;
+    }
+  }
+  else if ( strcmp(type, "mislib") == 0 ) {
+    CellMislibReader read;
+
+    self->mBody = read(filename);
+    if ( self->mBody == NULL ) {
+      PyErr_SetString(PyExc_ValueError, "Read error");
+      return -1;
+    }
+  }
+  else if ( strcmp(type, "binary") == 0 ) {
+    BinI s;
+    self->mBody = CellLibrary::new_obj();
+    self->mBody->restore(s);
+  }
+  else {
+    PyErr_SetString(PyExc_ValueError, "Illegal type string.");
+    return -1;
+  }
+
+  self->mLibrary = new PyLibrary(self->mBody);
 
   return 0;
 }
@@ -103,7 +139,10 @@ PyObject*
 CellLibrary_name(CellLibraryObject* self,
 		 PyObject* args)
 {
-  return PyObject_FromString(self->mBody->name());
+  PyObject* result = self->mLibary->mName;
+
+  Py_INCREF(result);
+  return result;
 }
 
 // technology 関数
@@ -144,7 +183,10 @@ PyObject*
 CellLibrary_bus_naming_style(CellLibraryObject* self,
 			     PyObject* args)
 {
-  return PyObject_FromString(self->mBody->bus_naming_style());
+  PyObject* result = self->mLibrary->mBusNamingStyle;
+
+  Py_INCREF(result);
+  return result;
 }
 
 // date 関数
@@ -152,7 +194,10 @@ PyObject*
 CellLibrary_date(CellLibraryObject* self,
 		 PyObject* args)
 {
-  return PyObject_FromString(self->mBody->date());
+  PyObject* result = self->mLibrary->mDate;
+
+  Py_INCREF(result);
+  return result;
 }
 
 // revision 関数
@@ -160,7 +205,10 @@ PyObject*
 CellLibrary_revision(CellLibraryObject* self,
 		     PyObject* args)
 {
-  return PyObject_FromString(self->mBody->revision());
+  PyObject* result = self->mLibrary->mRevision;
+
+  Py_INCREF(result);
+  return result;
 }
 
 // comment 関数
@@ -168,7 +216,10 @@ PyObject*
 CellLibrary_comment(CellLibraryObject* self,
 		    PyObject* args)
 {
-  return PyObject_FromString(self->mBody->comment());
+  PyObject* result = self->mLibrary->mComment;
+
+  Py_INCREF(result);
+  return result;
 }
 
 // time_unit 関数
@@ -176,7 +227,10 @@ PyObject*
 CellLibrary_time_unit(CellLibraryObject* self,
 		      PyObject* args)
 {
-  return PyObject_FromString(self->mBody->time_unit());
+  PyObject* result = self->mLibrary->mTimeUnit;
+
+  Py_INCREF(result);
+  return result;
 }
 
 // voltage_unit 関数
@@ -184,7 +238,10 @@ PyObject*
 CellLibrary_voltage_unit(CellLibraryObject* self,
 			 PyObject* args)
 {
-  return PyObject_FromString(self->mBody->voltage_unit());
+  PyObject* result = self->mLibrary->mVoltageUnit;
+
+  Py_INCREF(result);
+  return result;
 }
 
 // current_unit 関数
@@ -192,7 +249,10 @@ PyObject*
 CellLibrary_current_unit(CellLibraryObject* self,
 			 PyObject* args)
 {
-  return PyObject_FromString(self->mBody->current_unit());
+  PyObject* result = self->mLibrary->mCurrentUnit;
+
+  Py_INCREF(result);
+  return result;
 }
 
 // pulling_resistance_unit 関数
@@ -200,7 +260,10 @@ PyObject*
 CellLibrary_pulling_resistance_unit(CellLibraryObject* self,
 				    PyObject* args)
 {
-  return PyObject_FromString(self->mBody->pulling_resistance_unit());
+  PyObject* result = self->mLibrary->mPullingResistanceUnit;
+
+  Py_INCREF(result);
+  return result;
 }
 
 // capacitive_load_unit 関数
@@ -208,9 +271,10 @@ PyObject*
 CellLibrary_capacitive_load_unit(CellLibraryObject* self,
 				 PyObject* args)
 {
-  double unit_val = self->mBody->capacitive_load_unit();
-  string unit_str = self->mBody->capacitive_load_unit_str();
-  return Py_BuildValue("(ds)", unit_val, unit_str.c_str());
+  PyObject* result = self->mLibrary->mCapacitiveLoadUnit;
+
+  Py_INCREF(result);
+  return result;
 }
 
 // leakage_power_unit 関数
@@ -218,7 +282,10 @@ PyObject*
 CellLibrary_leakage_power_unit(CellLibraryObject* self,
 			       PyObject* args)
 {
-  return PyObject_FromString(self->mBody->leakage_power_unit());
+  PyObject* result = self->mLibrary->mLeakagePowerUnit;
+
+  Py_INCREF(result);
+  return result;
 }
 
 // lu_table_template 関数

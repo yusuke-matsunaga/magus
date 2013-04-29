@@ -24,7 +24,7 @@ class PyCell
 public:
 
   /// @brief コンストラクタ
-  PyCell();
+  PyCell(const Cell* cell);
 
   /// @brief デストラクタ
   ~PyCell();
@@ -55,6 +55,15 @@ private:
 
   // 任意のポインタから PyObject* を取り出すためのハッシュ表
   hash_map<ympuint, PyObject*> mObjMap;
+
+  // ID 番号を表すオブジェクト
+  PyObject* mId;
+
+  // 名前を表すオブジェクト
+  PyObject* mName;
+
+  // area を表すオブジェクト
+  PyObject* mArea;
 
 };
 

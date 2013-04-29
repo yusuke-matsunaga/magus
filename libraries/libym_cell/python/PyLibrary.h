@@ -24,13 +24,16 @@ class PyLibrary
 public:
 
   /// @brief コンストラクタ
-  PyLibrary();
+  PyLibrary(const CellLibrary* library);
 
   /// @brief デストラクタ
   ~PyLibrary();
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief Cell のポインタから CellObject を得る．
   PyObject*
@@ -67,8 +70,44 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // CellLibrary の本体
+  const CellLibrary* mLibrary;
+
   // 任意のポインタから PyObject* を取り出すためのハッシュ表
   hash_map<ympuint, PyObject*> mObjMap;
+
+  // bus_name_style オブジェクト
+  PyObject* mBusNamingStyle;
+
+  // date オブジェクト
+  PyObject* mDate;
+
+  // revision オブジェクト
+  PyObject* mRevision;
+
+  // comment オブジェクト
+  PyObject* mComment;
+
+  // time_unit オブジェクト
+  PyObject* mTimeUnit;
+
+  // voltage_unit オブジェクト
+  PyObject* mVoltageUnit;
+
+  // current_unit オブジェクト
+  PyObject* mCurrentUnit;
+
+  // pulling_resistance_unit オブジェクト
+  PyObject* mPullingResistanceUnit;
+
+  // capacitive_load_unit オブジェクト
+  PyObject* mCapacitiveLoadUnit;
+
+  // leakage_power_unit オブジェクト
+  PyObject* mLeakage_PowerUnit;
+
+  // セルオブジェクトのリスト
+  PyObject* mCellList;
 
 };
 

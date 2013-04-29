@@ -17,13 +17,46 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PyLibrary::PyLibrary()
+PyLibrary::PyLibrary(const CellLibrary* library)
 {
+  mLibrary = library;
+
+  mBusNamingStyle = PyObject_FromString(library->bus_naming_style());
+  mDate = PyObject_FromString(library->date());
+  mRevision = PyObject_FromString(library->revision());
+  mComment = PyObject_FromString(library->comment());
+  mTimeUnit = PyObject_FromString(library->time_unit());
+  mVoltageUnit = PyObject_FromString(library->voltage_unit());
+  mCurrentUnit = PyObject_FromString(library->current_unit());
+  mPullingResistanceUnit = PyObject_FromString(library->pulling_resistance_unit());
+  double unit_val = library->capacitive_load_unit();
+  string unit_str = library->capacitive_load_unit_str();
+  mCapacitiveLoadUnit = Py_BuildValue("(ds)", unit_val, unit_str.c_str());
+  mLeakagePowerUnit = PyObject_FromString(library->leakage_power_unit());
+
+  ymuint nc = library->cell_num();
+  mCellList = PyList_New(nc);
+  for (ymuint i = 0; i < nc; ++ i) {
+    const Cell* cell = library->cell(i);
+    PyObject* cell_obj = new Py_Cell(cell);
+    mObjMap.insert(make_pair(cell, cell_obj));
+    PyList_SetItem(mCellList, i, cell_obj);
+  }
 }
 
 // @brief デストラクタ
 PyLibrary::~PyLibrary()
 {
+  Py_DECREF(mBusNamingStyle);
+  Py_DECREF(mDate);
+  Py_DECREF(mRevision);
+  Py_DECREF(mComment);
+  Py_DECREF(mTimeUnit);
+  Py_DECREF(mVoltageUnit);
+  Py_DECREF(mCurrentUnit);
+  Py_DECREF(mPullingResistanceUnit);
+  Py_DECREF(mCapacitiveLoadUnit);
+  Py_DECREF(mLeakagePowerUnit);
 }
 
 // @brief Cell のポインタから CellObject を得る．
@@ -61,7 +94,10 @@ PyLibrary::get_obj(ympuint ptr)
 {
   hash_map<ympuint, PyObject*>::iterator p = mObjMap.find(ptr);
   assert_cond( p != mObjMap.end(), __FILE__, __LINE__);
-  return p->second;
+  PyObject* result = p->second;
+
+  Py_INCREF(result);
+  return result;
 }
 
 END_NAMESPACE_YM

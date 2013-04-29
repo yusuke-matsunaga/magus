@@ -17,13 +17,19 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PyCell::PyCell()
+PyCell::PyCell(const Cell* cell)
 {
+  mId = PyObject_FromYmuint32(cell->id());
+  mName = PyObject_FromString(cell->name());
+  mArea = PyCellArea_FromCellArea(cell->area());
 }
 
 // @brief デストラクタ
 PyCell::~PyCell()
 {
+  Py_DECREF(mId);
+  Py_DECREF(mName);
+  Py_DECREF(mArea);
 }
 
 // @brief CellPin のポインタから CellPinObject を得る．
@@ -40,7 +46,10 @@ PyCell::get_obj(ympuint ptr)
 {
   hash_map<ympuint, PyObject*>::iterator p = mObjMap.find(ptr);
   assert_cond( p != mObjMap.end(), __FILE__, __LINE__);
-  return p->second;
+  PyObject* result = p->second;
+
+  Py_INCREF(result);
+  return result;
 }
 
 END_NAMESPACE_YM
