@@ -8,6 +8,7 @@
 
 
 #include "PyCell.h"
+#include "ym_cell/CellPin.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -27,14 +28,7 @@ PyCell::PyCell(const Cell* cell)
   mPinArray = new PyObject*[np];
   for (ymuint i = 0; i < np; ++ i) {
     const CellPin* pin = cell->pin(i);
-    PyObject* obj = NULL;
-    switch ( pin->direction() ) {
-    case CellPin::kDirInput:    obj = new PyInput(pin); break;
-    case CellPin::kDirOutput:   obj = new PyOutput(pin); break;
-    case CellPin::kDirInout:    obj = new PyInout(pin); break;
-    case CellPin::kDirInternal: obj = new PyInternal(pin); break;
-    }
-    mPinArray[i] = obj;
+    mPinArray[i] = PyCellPin_FromCellPin(pin);
   }
 }
 
@@ -44,7 +38,7 @@ PyCell::~PyCell()
   Py_DECREF(mId);
   Py_DECREF(mName);
   Py_DECREF(mArea);
-  ymuint np = cell->pin_num();
+  ymuint np = mCell->pin_num();
   for (ymuint i = 0; i < np; ++ i) {
     Py_DECREF(mPinArray[i]);
   }
@@ -56,12 +50,6 @@ PyObject*
 PyCell::pin(ymuint pin_id)
 {
   return mPinArray[pin_id];
-}
-
-// @brief 名前からピンを得る．
-PyObject*
-PyCell::pin(const string& name)
-{
 }
 
 END_NAMESPACE_YM

@@ -9,6 +9,7 @@
 
 #include "ym_cell/pycell.h"
 #include "ym_cell/Cell.h"
+#include "ym_cell/CellPin.h"
 #include "PyCell.h"
 
 
@@ -45,7 +46,7 @@ Cell_new(PyTypeObject* type)
     return NULL;
   }
 
-  self->mCell = new PyCell();
+  self->mCell = NULL;
 
   return self;
 }
@@ -57,18 +58,6 @@ Cell_dealloc(CellObject* self)
   delete self->mCell;
 
   PyObject_Del(self);
-}
-
-// 初期化関数
-int
-Cell_init(CellLibraryObject* self,
-	  PyObject* args)
-{
-  // args をパーズして初期化を行なう．
-  // エラーが起きたらエラーメッセージをセットして -1 を返す．
-  // 正常に終了したら 0 を返す．
-
-  return 0;
 }
 
 // id 関数
@@ -114,13 +103,13 @@ Cell_pin(CellObject* self,
     return NULL;
   }
 
-  const CellPin* pin = self->mBody->pin(name);
+  const CellPin* pin = self->mCell->cell()->pin(name);
   if ( pin == NULL ) {
     PyErr_SetString(PyExc_ValueError, "No such pin");
     return NULL;
   }
 
-  return self->mCell->get_CellPin(pin);
+  return self->mCell->pin(pin->pin_id());
 }
 
 // pin_list 関数
@@ -128,11 +117,10 @@ PyObject*
 Cell_pin_list(CellObject* self,
 	      PyObject* args)
 {
-  ymuint n = self->mBody->pin_num();
-  PyObject* pin_list = PyList_New(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    const CellPin* pin = self->mBody->pin(i);
-    PyObject* obj = self->mCell->get_CellPin(pin);
+  ymuint np = self->mCell->cell()->pin_num();
+  PyObject* pin_list = PyList_New(np);
+  for (ymuint i = 0; i < np; ++ i) {
+    PyObject* obj = self->mCell->pin(i);
     PyList_SetItem(pin_list, i, obj);
   }
   return pin_list;
@@ -143,12 +131,15 @@ PyObject*
 Cell_input_pin_list(CellObject* self,
 		    PyObject* args)
 {
-  ymuint n = self->mBody->input_num();
+  ymuint n = self->mCell->cell()->input_num();
   PyObject* pin_list = PyList_New(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    const CellPin* pin = self->mBody->input(i);
-    PyObject* obj = self->mCell->get_CellPin(pin);
-    PyList_SetItem(pin_list, i, obj);
+  ymuint np = self->mCell->cell()->pin_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const CellPin* pin = self->mCell->cell()->pin(i);
+    if ( pin->is_input() ) {
+      PyObject* obj = self->mCell->pin(i);
+      PyList_SetItem(pin_list, pin->input_id(), obj);
+    }
   }
   return pin_list;
 }
@@ -199,7 +190,7 @@ PyTypeObject PyCellCell_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "cell.Cell",                  // tp_name
+  "cell_lib.Cell",                  // tp_name
   sizeof(CellObject),           // tp_basicsize
   (int)0,                       // tp_itemsize
 
@@ -282,6 +273,23 @@ PyTypeObject PyCellCell_Type = {
 // PyObject と Cell の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
+// @brief Cell から PyObject を作る．
+// @param[in] cell Cell へのポインタ
+// @return cell を表す PyObject
+PyObject*
+PyCellCell_FromCell(const Cell* cell)
+{
+  CellObject* py_obj = Cell_new(&PyCellCell_Type);
+  if ( py_obj == NULL ) {
+    return NULL;
+  }
+
+  py_obj->mCell = new PyCell(cell);
+
+  Py_INCREF(py_obj);
+  return (PyObject*)py_obj;
+}
+
 // @brief PyObject から Cell へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
 // @return Cell へんおポインタを返す．
@@ -291,14 +299,14 @@ PyCellCell_AsCellPtr(PyObject* py_obj)
 {
   // 型のチェック
   if ( !PyCellCell_Check(py_obj) ) {
-    PyErr_SetString(PyExc_TypeError, "cell.Cell is expected");
+    PyErr_SetString(PyExc_TypeError, "cell_lib.Cell is expected");
     return NULL;
   }
 
   // 強制的にキャスト
   CellObject* my_obj = (CellObject*)py_obj;
 
-  return my_obj->mBody;
+  return my_obj->mCell->cell();
 }
 
 // CellObject 関係の初期化を行う．

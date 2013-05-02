@@ -8,6 +8,7 @@
 
 
 #include "PyPin.h"
+#include "ym_cell/CellPin.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -20,15 +21,15 @@ BEGIN_NAMESPACE_YM
 PyPin::PyPin(const CellPin* pin) :
   mPin(pin)
 {
-  mId = PyObject_FromYuint32(pin->id());
+  mId = PyObject_FromYmuint32(pin->pin_id());
   mName = PyObject_FromString(pin->name());
 }
 
 // @brief デストラクタ
 PyPin::~PyPin()
 {
-  Py_DEFREF(mId);
-  Py_DEFREF(mName);
+  Py_DECREF(mId);
+  Py_DECREF(mName);
 }
 
 // @brief 入力ピン番号を得る．

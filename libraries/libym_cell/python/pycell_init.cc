@@ -38,6 +38,12 @@ CellTimeObject_init(PyObject* m);
 void
 CellLibraryObject_init(PyObject* m);
 
+void
+CellObject_init(PyObject* m);
+
+void
+CellPinObject_init(PyObject* m);
+
 END_NAMESPACE_YM
 
 
@@ -49,7 +55,7 @@ cell_init()
   // モジュールオブジェクトの生成
   PyDoc_STRVAR(module_doc,
 	       "Module for libym_cell");
-  PyObject* m = Py_InitModule3("cell", cell_methods, module_doc);
+  PyObject* m = Py_InitModule3("cell_lib", cell_methods, module_doc);
   if ( m == NULL ) {
     return;
   }
@@ -65,5 +71,11 @@ cell_init()
 
   // CellLibraryObject 関係の初期化
   CellLibraryObject_init(m);
+
+  // CellObject 関係の初期化
+  CellObject_init(m);
+
+  // CellPinObject 関係の初期化
+  CellPinObject_init(m);
 
 }

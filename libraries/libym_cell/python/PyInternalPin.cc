@@ -8,6 +8,7 @@
 
 
 #include "PyInternalPin.h"
+#include "ym_cell/CellPin.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -27,7 +28,7 @@ PyInternalPin::PyInternalPin(const CellPin* pin) :
 // @brief デストラクタ
 PyInternalPin::~PyInternalPin()
 {
-  Py_DEFREF(mInternalid);
+  Py_DECREF(mInternalId);
 }
 
 // @brief 内部ピン番号を返す．
@@ -37,4 +38,4 @@ PyInternalPin::internal_id()
   return mInternalId;
 }
 
-ED_NAMESPACE_YM
+END_NAMESPACE_YM

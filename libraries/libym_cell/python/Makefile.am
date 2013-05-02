@@ -20,6 +20,7 @@ libym_cell_python_la_SOURCES = \
 	pycell_CellCapacitance.cc \
 	pycell_CellTime.cc \
 	pycell_Cell.cc \
+	pycell_CellPin.cc \
 	pycell_CellGroup.cc \
 	pycell_CellClass.cc \
 	pycell_CellLibrary.cc \
@@ -36,7 +37,7 @@ libym_cell_python_la_SOURCES = \
 	PyInoutPin.h \
 	PyInoutPin.cc \
 	PyInternalPin.h \
-	PyInterlaPin.cc
+	PyInternalPin.cc
 
 libym_cell_python_la_LIBADD =
 

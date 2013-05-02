@@ -8,6 +8,7 @@
 
 
 #include "PyInoutPin.h"
+#include "ym_cell/CellPin.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -22,18 +23,18 @@ PyInoutPin::PyInoutPin(const CellPin* pin) :
 {
   assert_cond( pin->is_inout(), __FILE__, __LINE__);
   mInputId = PyObject_FromYmuint32(pin->input_id());
-  mCapacitance = PyObject_FromDouble(pin->capacitance());
-  mRiseCapacitance = PyObject_FromDouble(pin->rise_capacitance());
-  mFallCapacitance = PyObject_FromDouble(pin->fall_capacitance());
+  mCapacitance = PyCellCapacitance_FromCellCapacitance(pin->capacitance());
+  mRiseCapacitance = PyCellCapacitance_FromCellCapacitance(pin->rise_capacitance());
+  mFallCapacitance = PyCellCapacitance_FromCellCapacitance(pin->fall_capacitance());
 }
 
 // @brief デストラクタ
 PyInoutPin::~PyInoutPin()
 {
-  Py_DEFREF(mInputId);
-  Py_DEFREF(mCapacitance);
-  Py_DEFREF(mRiseCapacitance);
-  Py_DEFREF(mFallCapacitance);
+  Py_DECREF(mInputId);
+  Py_DECREF(mCapacitance);
+  Py_DECREF(mRiseCapacitance);
+  Py_DECREF(mFallCapacitance);
 }
 
 // @brief 入力ピン番号を得る．

@@ -265,6 +265,13 @@ PyCellCell_Check(PyObject* obj)
   return Py_TYPE(obj) == &PyCellCell_Type;
 }
 
+/// @brief Cell から PyObject を作る．
+/// @param[in] cell Cell へのポインタ
+/// @return cell を表す PyObject
+extern
+PyObject*
+PyCellCell_FromCell(const Cell* cell);
+
 /// @brief PyObject から Cell へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト
 /// @return Cell へのポインタを返す．
@@ -272,6 +279,7 @@ PyCellCell_Check(PyObject* obj)
 extern
 const Cell*
 PyCellCell_AsCellPtr(PyObject* py_obj);
+
 
 //////////////////////////////////////////////////////////////////////
 // PyCellPin: セルのピンを表す型
@@ -291,6 +299,21 @@ PyCellPin_Check(PyObject* obj)
 {
   return Py_TYPE(obj) == &PyCellPin_Type;
 }
+
+/// @brief CellPin から PyObject を作る．
+/// @param[in] pin CellPin へのポインタ
+/// @return cell を表す PyObject
+extern
+PyObject*
+PyCellPin_FromCellPin(const CellPin* pin);
+
+/// @brief PyObject から CellPin へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return CellPin へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+const CellPin*
+PyCellPin_AsCellPinPtr(PyObject* py_obj);
 
 
 //////////////////////////////////////////////////////////////////////

@@ -15,6 +15,8 @@
 
 BEGIN_NAMESPACE_YM
 
+class PyPin;
+
 //////////////////////////////////////////////////////////////////////
 /// @class PyCell PyCell.h "Pycell.h"
 /// @brief CellObject のための補助的なクラス
@@ -54,21 +56,6 @@ public:
   /// @brief ピン番号からピンを得る．
   PyObject*
   pin(ymuint pin_id);
-
-  /// @brief 名前からピンを得る．
-  PyObject*
-  pin(const string& name);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ympuint から PyObject* を返す．
-  /// @note なければ NULL となる．
-  PyObject*
-  get_obj(ympuint ptr);
 
 
 private:

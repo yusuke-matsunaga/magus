@@ -85,7 +85,7 @@ PyTypeObject PyCellGroup_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "cell.CellGroup",             // tp_name
+  "cell_lib.CellGroup",             // tp_name
   sizeof(CellGroupObject),      // tp_basicsize
   (int)0,                       // tp_itemsize
 
@@ -177,7 +177,7 @@ PyCellGroup_AsCellGroupPtr(PyObject* py_obj)
 {
   // 型のチェック
   if ( !PyCellGroup_Check(py_obj) ) {
-    PyErr_SetString(PyExc_TypeError, "cell.CellGroup is expected");
+    PyErr_SetString(PyExc_TypeError, "cell_lib.CellGroup is expected");
     return NULL;
   }
 

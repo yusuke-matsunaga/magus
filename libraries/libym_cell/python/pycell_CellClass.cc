@@ -84,7 +84,7 @@ PyTypeObject PyCellClass_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "cell.CellClass",                 // tp_name
+  "cell_lib.Class",                     // tp_name
   sizeof(CellClassObject),          // tp_basicsize
   (int)0,                           // tp_itemsize
 
@@ -176,7 +176,7 @@ PyCellClass_AsCellClassPtr(PyObject* py_obj)
 {
   // 型のチェック
   if ( !PyCellClass_Check(py_obj) ) {
-    PyErr_SetString(PyExc_TypeError, "cell.CellClass is expected");
+    PyErr_SetString(PyExc_TypeError, "cell_lib.Class is expected");
     return NULL;
   }
 
@@ -196,7 +196,7 @@ CellClassObject_init(PyObject* m)
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "CellClass", (PyObject*)&PyCellClass_Type);
+  PyModule_AddObject(m, "Class", (PyObject*)&PyCellClass_Type);
 }
 
 END_NAMESPACE_YM

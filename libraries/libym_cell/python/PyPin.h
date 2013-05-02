@@ -121,7 +121,7 @@ public:
   max_transition();
 
   /// @brief 最小遷移時間を返す．
-  virutal
+  virtual
   PyObject*
   min_transition();
 

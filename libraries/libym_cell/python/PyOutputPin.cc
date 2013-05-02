@@ -8,6 +8,7 @@
 
 
 #include "PyOutputPin.h"
+#include "ym_cell/CellPin.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -24,26 +25,26 @@ PyOutputPin::PyOutputPin(const CellPin* pin) :
   mOutputId = PyObject_FromYmuint32(pin->output_id());
   mFunction = NULL;
   mThreeState = NULL;
-  mMaxFanout = PyObject_FromDouble(pin->max_fanout());
-  mMinFanout = PyObject_FromDouble(pin->min_fanout());
-  mMaxCapacitance = PyObject_FromDouble(pin->max_capacitance());
-  mMinCapacitance = PyObject_FromDouble(pin->min_capacitance());
-  mMaxTransition = PyObject_FromDouble(pin->max_transition());
-  mMinTransition = PyObject_FromDouble(pin->min_transition());
+  mMaxFanout = PyCellCapacitance_FromCellCapacitance(pin->max_fanout());
+  mMinFanout = PyCellCapacitance_FromCellCapacitance(pin->min_fanout());
+  mMaxCapacitance = PyCellCapacitance_FromCellCapacitance(pin->max_capacitance());
+  mMinCapacitance = PyCellCapacitance_FromCellCapacitance(pin->min_capacitance());
+  mMaxTransition = PyCellTime_FromCellTime(pin->max_transition());
+  mMinTransition = PyCellTime_FromCellTime(pin->min_transition());
 }
 
 // @brief デストラクタ
 PyOutputPin::~PyOutputPin()
 {
-  Py_DEFREF(mOutputId);
-  Py_DEFREF(mFunction);
-  Py_DEFREF(mThreeState);
-  Py_DEFREF(mMaxFanout);
-  Py_DEFREF(mMinFanout);
-  Py_DEFREF(mMaxCapacitance);
-  Py_DEFREF(mMinCapacitance);
-  Py_DEFREF(mMaxTransition);
-  Py_DEFREF(mMinTransition);
+  Py_DECREF(mOutputId);
+  Py_DECREF(mFunction);
+  Py_DECREF(mThreeState);
+  Py_DECREF(mMaxFanout);
+  Py_DECREF(mMinFanout);
+  Py_DECREF(mMaxCapacitance);
+  Py_DECREF(mMinCapacitance);
+  Py_DECREF(mMaxTransition);
+  Py_DECREF(mMinTransition);
 }
 
 // @brief 出力ピン番号を返す．

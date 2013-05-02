@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM
 /// @brief 入出力ピン用の PyPin
 //////////////////////////////////////////////////////////////////////
 class PyInoutPin :
-  PyOutputPin
+  public PyOutputPin
 {
 public:
 

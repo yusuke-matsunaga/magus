@@ -3,11 +3,12 @@
 /// @brief PyLibrary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "PyLibrary.h"
+#include "ym_cell/CellLibrary.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -21,6 +22,20 @@ PyLibrary::PyLibrary(const CellLibrary* library)
 {
   mLibrary = library;
 
+  mName = PyObject_FromString(library->name());
+  switch ( library->technology() ) {
+  case CellLibrary::kTechCmos: mTechnology = PyObject_FromString("cmos"); break;
+  case CellLibrary::kTechFpga: mTechnology = PyObject_FromString("fpga"); break;
+  }
+  const char* dm_str = NULL;
+  switch ( library->delay_model() ) {
+  case kCellDelayGenericCmos:   dm_str = "generic_cmos"; break;
+  case kCellDelayTableLookup:   dm_str = "table_lookup"; break;
+  case kCellDelayPiecewiseCmos: dm_str = "piecewise_cmos"; break;
+  case kCellDelayCmos2:         dm_str = "cmos2"; break;
+  case kCellDelayDcm:           dm_str = "dcm"; break;
+  }
+  mDelayModel = PyObject_FromString(dm_str);
   mBusNamingStyle = PyObject_FromString(library->bus_naming_style());
   mDate = PyObject_FromString(library->date());
   mRevision = PyObject_FromString(library->revision());
@@ -35,18 +50,20 @@ PyLibrary::PyLibrary(const CellLibrary* library)
   mLeakagePowerUnit = PyObject_FromString(library->leakage_power_unit());
 
   ymuint nc = library->cell_num();
-  mCellList = PyList_New(nc);
+  mCellList = new PyObject*[nc];
   for (ymuint i = 0; i < nc; ++ i) {
     const Cell* cell = library->cell(i);
-    PyObject* cell_obj = new Py_Cell(cell);
-    mObjMap.insert(make_pair(cell, cell_obj));
-    PyList_SetItem(mCellList, i, cell_obj);
+    PyObject* cell_obj = PyCellCell_FromCell(cell);
+    mCellList[i] = cell_obj;
   }
 }
 
 // @brief デストラクタ
 PyLibrary::~PyLibrary()
 {
+  Py_DECREF(mName);
+  Py_DECREF(mTechnology);
+  Py_DECREF(mDelayModel);
   Py_DECREF(mBusNamingStyle);
   Py_DECREF(mDate);
   Py_DECREF(mRevision);
@@ -57,8 +74,15 @@ PyLibrary::~PyLibrary()
   Py_DECREF(mPullingResistanceUnit);
   Py_DECREF(mCapacitiveLoadUnit);
   Py_DECREF(mLeakagePowerUnit);
+
+  ymuint n = mLibrary->cell_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    Py_DECREF(mCellList[i]);
+  }
+  delete [] mCellList;
 }
 
+#if 0
 // @brief Cell のポインタから CellObject を得る．
 PyObject*
 PyLibrary::get_Cell(const Cell* cell)
@@ -99,5 +123,6 @@ PyLibrary::get_obj(ympuint ptr)
   Py_INCREF(result);
   return result;
 }
+#endif
 
 END_NAMESPACE_YM

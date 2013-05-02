@@ -138,7 +138,7 @@ CellTime_add(PyObject* left,
 	     PyObject* right)
 {
   if ( !PyCellTime_Check(left) || !PyCellTime_Check(right) ) {
-    PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellTime");
+    PyErr_SetString(PyExc_TypeError, "both parameters must be cell_lib.Time");
     return NULL;
   }
 
@@ -154,7 +154,7 @@ CellTime_sub(PyObject* left,
 	     PyObject* right)
 {
   if ( !PyCellTime_Check(left) || !PyCellTime_Check(right) ) {
-    PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellTime");
+    PyErr_SetString(PyExc_TypeError, "both parameters must be cell_lib.Time");
     return NULL;
   }
 
@@ -170,7 +170,7 @@ CellTime_iadd(PyObject* left,
 	      PyObject* right)
 {
   if ( !PyCellTime_Check(left) || !PyCellTime_Check(right) ) {
-    PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellTime");
+    PyErr_SetString(PyExc_TypeError, "both parameters must be cell_lib.Time");
     return NULL;
   }
 
@@ -188,7 +188,7 @@ CellTime_isub(PyObject* left,
 	      PyObject* right)
 {
   if ( !PyCellTime_Check(left) || !PyCellTime_Check(right) ) {
-    PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellTime");
+    PyErr_SetString(PyExc_TypeError, "both parameters must be cell_lib.Time");
     return NULL;
   }
 
@@ -286,7 +286,7 @@ PyTypeObject PyCellTime_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "cell.CellTime",                 // tp_name
+  "cell_lib.Time",                     // tp_name
   sizeof(CellTimeObject),          // tp_basicsize
   (int)0,                          // tp_itemsize
 
@@ -410,7 +410,7 @@ PyCellTime_AsCellTime(PyObject* py_obj)
 {
   // 型のチェック
   if ( !PyCellTime_Check(py_obj) ) {
-    PyErr_SetString(PyExc_TypeError, "cell.CellTime is expected");
+    PyErr_SetString(PyExc_TypeError, "cell_lib.Time is expected");
     return CellTime(0.0);
   }
 
@@ -429,7 +429,7 @@ PyCellTime_AsDouble(PyObject* py_obj)
 {
   // 型のチェック
   if ( !PyCellTime_Check(py_obj) ) {
-    PyErr_SetString(PyExc_TypeError, "cell.CellTime is expected");
+    PyErr_SetString(PyExc_TypeError, "cell_lib.Time is expected");
     return 0.0;
   }
 
@@ -449,12 +449,12 @@ CellTimeObject_init(PyObject* m)
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "CellTime", (PyObject*)&PyCellTime_Type);
+  PyModule_AddObject(m, "Time", (PyObject*)&PyCellTime_Type);
 
   // 定数オブジェクトの生成
   Py_kCellTimeInf = (PyObject*)&Py_kCellTimeInfStruct;
   Py_XINCREF(Py_kCellTimeInf);
-  PyModule_AddObject(m, "kCellTimeInf", Py_kCellTimeInf);
+  PyModule_AddObject(m, "kTimeInf", Py_kCellTimeInf);
 
   // 定数オブジェクト用の文字列オブジェクトの生成
   Py_kCellTimeInfString = PyString_InternFromString("infinity");
