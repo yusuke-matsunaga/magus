@@ -26,7 +26,17 @@ libym_cell_python_la_SOURCES = \
 	PyCell.h \
 	PyCell.cc \
 	PyLibrary.h \
-	PyLibrary.cc
+	PyLibrary.cc \
+	PyPin.h \
+	PyPin.cc \
+	PyInputPin.h \
+	PyInputPin.cc \
+	PyOutputPin.h \
+	PyOutputPin.cc \
+	PyInoutPin.h \
+	PyInoutPin.cc \
+	PyInternalPin.h \
+	PyInterlaPin.cc
 
 libym_cell_python_la_LIBADD =
 

@@ -31,10 +31,33 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief CellPin のポインタから CellPinObject を得る．
+  /// @brief Cell を得る．
+  const Cell*
+  cell();
+
+  /// @brief ID番号を得る．
   PyObject*
-  get_CellPin(const CellPin* pin);
+  id();
+
+  /// @brief 名前を得る．
+  PyObject*
+  name();
+
+  /// @brief 面積を得る．
+  PyObject*
+  area();
+
+  /// @brief ピン番号からピンを得る．
+  PyObject*
+  pin(ymuint pin_id);
+
+  /// @brief 名前からピンを得る．
+  PyObject*
+  pin(const string& name);
 
 
 private:
@@ -53,8 +76,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 任意のポインタから PyObject* を取り出すためのハッシュ表
-  hash_map<ympuint, PyObject*> mObjMap;
+  // Cell の本体
+  const Cell* mCell;
 
   // ID 番号を表すオブジェクト
   PyObject* mId;
@@ -65,7 +88,47 @@ private:
   // area を表すオブジェクト
   PyObject* mArea;
 
+  // ピンを表すオブジェクトの配列
+  PyObject** mPinArray;
+
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief Cell を得る．
+inline
+const Cell*
+PyCell::cell()
+{
+  return mCell;
+}
+
+// @brief ID番号を得る．
+inline
+PyObject*
+PyCell::id()
+{
+  return mId;
+}
+
+// @brief 名前を得る．
+inline
+PyObject*
+PyCell::name()
+{
+  return mName;
+}
+
+// @brief 面積を得る．
+inline
+PyObject*
+PyCell::area()
+{
+  return mArea;
+}
 
 END_NAMESPACE_YM
 

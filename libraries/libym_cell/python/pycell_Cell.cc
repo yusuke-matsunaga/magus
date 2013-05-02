@@ -26,9 +26,6 @@ struct CellObject
   // Python のお約束
   PyObject_HEAD
 
-  // Cell の本体
-  const Cell* mBody;
-
   // PyCell
   PyCell* mCell;
 
@@ -79,7 +76,7 @@ PyObject*
 Cell_id(CellObject* self,
 	PyObject* args)
 {
-  PyObject* result = self->mCell->mId;
+  PyObject* result = self->mCell->id();
 
   Py_INCREF(result);
   return result;
@@ -90,7 +87,7 @@ PyObject*
 Cell_name(CellObject* self,
 	  PyObject* args)
 {
-  PyObject* result = self->mCell->mName;
+  PyObject* result = self->mCell->name();
 
   Py_INCREF(result);
   return result;
@@ -101,7 +98,7 @@ PyObject*
 Cell_area(CellObject* self,
 	  PyObject* args)
 {
-  PyObject* result = self->mCell->mArea;
+  PyObject* result = self->mCell->area();
 
   Py_INCREF(result);
   return result;
