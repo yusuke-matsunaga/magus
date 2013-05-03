@@ -259,13 +259,6 @@ PyCellCell_Check(PyObject* obj)
   return Py_TYPE(obj) == &PyCellCell_Type;
 }
 
-/// @brief Cell から PyObject を作る．
-/// @param[in] cell Cell へのポインタ
-/// @return cell を表す PyObject
-extern
-PyObject*
-PyCellCell_FromCell(const Cell* cell);
-
 /// @brief PyObject から Cell へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト
 /// @return Cell へのポインタを返す．
@@ -294,13 +287,6 @@ PyCellPin_Check(PyObject* obj)
   return Py_TYPE(obj) == &PyCellPin_Type;
 }
 
-/// @brief CellPin から PyObject を作る．
-/// @param[in] pin CellPin へのポインタ
-/// @return cell を表す PyObject
-extern
-PyObject*
-PyCellPin_FromCellPin(const CellPin* pin);
-
 /// @brief PyObject から CellPin へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト
 /// @return CellPin へのポインタを返す．
@@ -328,12 +314,6 @@ PyCellGroup_Check(PyObject* obj)
 {
   return Py_TYPE(obj) == &PyCellGroup_Type;
 }
-
-/// @brief CellGroup から CellGroupObject を生成する．
-/// @param[in] group グループ
-extern
-PyObject*
-PyCellGroup_FromCellGroup(const CellGroup* group);
 
 /// @brief PyObject から CellGroup へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト

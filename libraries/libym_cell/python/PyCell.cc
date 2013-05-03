@@ -14,6 +14,13 @@
 
 BEGIN_NAMESPACE_YM
 
+/// @brief CellPin から PyObject を作る．
+/// @param[in] pin CellPin へのポインタ
+/// @return cell を表す PyObject
+extern
+PyObject*
+PyCellPin_FromCellPin(const CellPin* pin);
+
 //////////////////////////////////////////////////////////////////////
 // クラス PyCell
 //////////////////////////////////////////////////////////////////////

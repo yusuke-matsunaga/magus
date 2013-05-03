@@ -13,6 +13,22 @@
 
 BEGIN_NAMESPACE_YM
 
+/// @brief CellGroup から CellGroupObject を生成する．
+/// @param[in] group グループ
+/// @param[in] py_library ライブラリ
+extern
+PyObject*
+PyCellGroup_FromCellGroup(const CellGroup* group,
+			  PyLibrary* py_library);
+
+/// @brief Cell から PyObject を作る．
+/// @param[in] cell Cell へのポインタ
+/// @return cell を表す PyObject
+extern
+PyObject*
+PyCellCell_FromCell(const Cell* cell);
+
+
 //////////////////////////////////////////////////////////////////////
 // クラス PyLibrary;
 //////////////////////////////////////////////////////////////////////
@@ -61,7 +77,7 @@ PyLibrary::PyLibrary(const CellLibrary* library)
   mGroupList = new PyObject*[ng];
   for (ymuint i = 0; i < ng; ++ i) {
     const CellGroup* group = library->group(i);
-    PyObject* group_obj = PyCellGroup_FromCellGroup(group);
+    PyObject* group_obj = PyCellGroup_FromCellGroup(group, this);
     mGroupList[i] = group_obj;
   }
 

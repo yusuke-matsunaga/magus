@@ -231,14 +231,15 @@ PyTypeObject PyCellGroup_Type = {
 // @brief CellGroup から CellGroupObject を生成する．
 // @param[in] group グループ
 PyObject*
-PyCellGroup_FromCellGroup(const CellGroup* group)
+PyCellGroup_FromCellGroup(const CellGroup* group,
+			  PyLibrary* py_library)
 {
   CellGroupObject* self = PyObject_New(CellGroupObject, &PyCellGroup_Type);
   if ( self == NULL ) {
     return NULL;
   }
 
-  self->mGroup = new PyCellGroup(group);
+  self->mGroup = new PyCellGroup(group, py_library);
 
   Py_INCREF(self);
   return (PyObject*)self;

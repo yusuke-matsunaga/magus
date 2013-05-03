@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM
 
+class PyLibrary;
+
 //////////////////////////////////////////////////////////////////////
 /// @class PyCellGroup PyCellGroup.h "PyCellGroup.h"
 /// @brief CellGroupObject のための補助的なクラス
@@ -23,7 +25,8 @@ class PyCellGroup
 public:
 
   /// @brief コンストラクタ
-  PyCellGroup(const CellGroup* group);
+  PyCellGroup(const CellGroup* group,
+	      PyLibrary* py_library);
 
   /// @brief デストラクタ
   virtual

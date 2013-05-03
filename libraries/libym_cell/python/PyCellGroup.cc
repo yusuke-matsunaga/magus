@@ -8,7 +8,9 @@
 
 
 #include "PyCellGroup.h"
+#include "PyLibrary.h"
 #include "ym_cell/CellGroup.h"
+#include "ym_cell/Cell.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -18,16 +20,29 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PyCellGroup::PyCellGroup(const CellGroup* group) :
+PyCellGroup::PyCellGroup(const CellGroup* group,
+			 PyLibrary* py_library) :
   mGroup(group)
 {
   mId = PyObject_FromYmuint32(group->id());
+
+  ymuint nc = group->cell_num();
+  mCellList = new PyObject*[nc];
+  for (ymuint i = 0; i < nc; ++ i) {
+    const Cell* cell = group->cell(i);
+    mCellList[i] = py_library->cell(cell->id());
+  }
 }
 
 // @brief デストラクタ
 PyCellGroup::~PyCellGroup()
 {
   Py_DECREF(mId);
+  ymuint nc = mGroup->cell_num();
+  for (ymuint i = 0; i < nc; ++ i) {
+    Py_DECREF(mCellList[i]);
+  }
+  delete [] mCellList;
 }
 
 // @brief セルを返す．
