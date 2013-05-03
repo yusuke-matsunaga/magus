@@ -36,20 +36,6 @@ struct CellGroupObject
 // Python 用のメソッド関数定義
 //////////////////////////////////////////////////////////////////////
 
-// CellGroupObject の生成関数
-CellGroupObject*
-CellGroup_new(PyTypeObject* type)
-{
-  CellGroupObject* self = PyObject_New(CellGroupObject, type);
-  if ( self == NULL ) {
-    return NULL;
-  }
-
-  self->mGroup = NULL;
-
-  return self;
-}
-
 // CellGroupObject を開放する関数
 void
 CellGroup_dealloc(CellGroupObject* self)
@@ -226,7 +212,7 @@ PyTypeObject PyCellGroup_Type = {
   (long)0,                      // tp_dictoffset
   (initproc)0,                  // tp_init
   (allocfunc)0,                 // tp_alloc
-  (newfunc)CellGroup_new,       // tp_new
+  (newfunc)0,                   // tp_new
   (freefunc)0,                  // tp_free
   (inquiry)0,                   // tp_is_gc
 
@@ -247,15 +233,15 @@ PyTypeObject PyCellGroup_Type = {
 PyObject*
 PyCellGroup_FromCellGroup(const CellGroup* group)
 {
-  CellGroupObject* py_obj = CellGroup_new(&PyCellGroup_Type);
-  if ( py_obj == NULL ) {
+  CellGroupObject* self = PyObject_New(CellGroupObject, &PyCellGroup_Type);
+  if ( self == NULL ) {
     return NULL;
   }
 
-  py_obj->mGroup = new PyCellGroup(group);
+  self->mGroup = new PyCellGroup(group);
 
-  Py_INCREF(py_obj);
-  return (PyObject*)py_obj;
+  Py_INCREF(self);
+  return (PyObject*)self;
 }
 
 // @brief PyObject から CellGroup へのポインタを取り出す．

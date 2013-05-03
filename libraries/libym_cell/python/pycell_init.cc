@@ -39,6 +39,12 @@ void
 CellLibraryObject_init(PyObject* m);
 
 void
+CellClassObject_init(PyObject* m);
+
+void
+CellGroupObject_init(PyObject* m);
+
+void
 CellObject_init(PyObject* m);
 
 void
@@ -71,6 +77,12 @@ cell_init()
 
   // CellLibraryObject 関係の初期化
   CellLibraryObject_init(m);
+
+  // CellClassObject 関係の初期化
+  CellClassObject_init(m);
+
+  // CellGroupObject 関係の初期化
+  CellGroupObject_init(m);
 
   // CellObject 関係の初期化
   CellObject_init(m);

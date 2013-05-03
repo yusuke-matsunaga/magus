@@ -36,20 +36,6 @@ struct CellClassObject
 // Python 用のメソッド関数定義
 //////////////////////////////////////////////////////////////////////
 
-// CellClassObject の生成関数
-CellClassObject*
-CellClass_new(PyTypeObject* type)
-{
-  CellClassObject* self = PyObject_New(CellClassObject, type);
-  if ( self == NULL ) {
-    return NULL;
-  }
-
-  self->mClass = NULL;
-
-  return self;
-}
-
 // CellClassObject を開放する関数
 void
 CellClass_dealloc(CellClassObject* self)
@@ -65,6 +51,22 @@ CellClass_id(CellClassObject* self,
 	     PyObject* args)
 {
   PyObject* result = self->mClass->id();
+
+  Py_INCREF(result);
+  return result;
+}
+
+// idmap 関数
+PyObject*
+CellClass_idmap(CellClassObject* self,
+		PyObject* args)
+{
+  ymuint pos = 0;
+  if ( !PyArg_ParseTuple(args, "I", &pos) ) {
+    return NULL;
+  }
+
+  PyObject* result = NULL;
 
   Py_INCREF(result);
   return result;
@@ -89,6 +91,10 @@ PyMethodDef CellClass_methods[] = {
   //  - METH_CLASS
   //  - METH_STATIC
   //  - METH_COEXIST
+  {"id", (PyCFunction)CellClass_id, METH_NOARGS,
+   "return ID"},
+  {"idmap", (PyCFunction)CellClass_idmap, METH_VARARGS,
+   "return ident map (unsigned int)"},
 
   {NULL, NULL, 0, NULL} // end-marker
 };
@@ -170,7 +176,7 @@ PyTypeObject PyCellClass_Type = {
   (long)0,                          // tp_dictoffset
   (initproc)0,                      // tp_init
   (allocfunc)0,                     // tp_alloc
-  (newfunc)CellClass_new,           // tp_new
+  (newfunc)0,                       // tp_new
   (freefunc)0,                      // tp_free
   (inquiry)0,                       // tp_is_gc
 
@@ -191,15 +197,15 @@ PyTypeObject PyCellClass_Type = {
 PyObject*
 PyCellClass_FromCellClass(const CellClass* cell_class)
 {
-  CellClassObject* py_obj = CellClass_new(&PyCellClass_Type);
-  if ( py_obj == NULL ) {
+  CellClassObject* self = PyObject_New(CellClassObject, &PyCellClass_Type);
+  if ( self == NULL ) {
     return NULL;
   }
 
-  py_obj->mClass = new PyCellClass(cell_class);
+  self->mClass = new PyCellClass(cell_class);
 
-  Py_INCREF(py_obj);
-  return (PyObject*)py_obj;
+  Py_INCREF(self);
+  return (PyObject*)self;
 }
 
 // @brief PyObject から CellClass へのポインタを取り出す．

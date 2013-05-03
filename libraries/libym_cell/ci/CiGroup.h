@@ -54,10 +54,10 @@ public:
   // 機能情報を取得する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 属している CellClass を返す．
+  /// @brief 代表クラスを返す．
   virtual
   const CellClass*
-  cell_class() const;
+  rep_class() const;
 
   /// @brief 代表クラスに対する変換マップを返す．
   virtual
@@ -267,7 +267,7 @@ private:
   ymuint32 mId;
 
   // 属している CellClass
-  const CellClass* mCellClass;
+  const CellClass* mRepClass;
 
   // CellClass に対する入出力の変換関数
   NpnMapM mMap;

@@ -60,7 +60,7 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 CiGroup::CiGroup() :
-  mCellClass(NULL),
+  mRepClass(NULL),
   mPinInfo(0U),
   mCellNum(0),
   mCellList(NULL)
@@ -81,11 +81,11 @@ CiGroup::id() const
   return mId;
 }
 
-// @brief 属している CellClass を返す．
+// @brief 代表クラスを返す．
 const CellClass*
-CiGroup::cell_class() const
+CiGroup::rep_class() const
 {
-  return mCellClass;
+  return mRepClass;
 }
 
 // @brief 代表クラスに対する変換マップを返す．
@@ -279,7 +279,7 @@ CiGroup::init(const CellClass* cell_class,
 	      const vector<const Cell*>& cell_list,
 	      Alloc& alloc)
 {
-  mCellClass = cell_class;
+  mRepClass = cell_class;
   mMap = map;
   mCellNum = cell_list.size();
 
@@ -335,7 +335,7 @@ CiGroup::set_latch_info(ymuint pos_array[])
 void
 CiGroup::dump(BinO& bos) const
 {
-  ymuint32 parent_id = mCellClass->id();
+  ymuint32 parent_id = mRepClass->id();
   bos << parent_id
       << mMap
       << mPinInfo
@@ -360,7 +360,7 @@ CiGroup::restore(BinI& bis,
       >> mMap
       >> mPinInfo
       >> mCellNum;
-  mCellClass = library.npn_class(parent_id);
+  mRepClass = library.npn_class(parent_id);
 
   alloc_array(alloc);
   for (ymuint i = 0; i < mCellNum; ++ i) {

@@ -39,20 +39,6 @@ struct CellPinObject
 // Python 用のメソッド関数定義
 //////////////////////////////////////////////////////////////////////
 
-// CellPinObject の生成関数
-CellPinObject*
-CellPin_new(PyTypeObject* type)
-{
-  CellPinObject* self = PyObject_New(CellPinObject, type);
-  if ( self == NULL ) {
-    return NULL;
-  }
-
-  self->mPin = NULL;
-
-  return self;
-}
-
 // CellPinObject を開放する関数
 void
 CellPin_dealloc(CellPinObject* self)
@@ -342,7 +328,7 @@ PyTypeObject PyCellPin_Type = {
   (long)0,                      // tp_dictoffset
   (initproc)0,                  // tp_init
   (allocfunc)0,                 // tp_alloc
-  (newfunc)CellPin_new,         // tp_new
+  (newfunc)0,                   // tp_new
   (freefunc)0,                  // tp_free
   (inquiry)0,                   // tp_is_gc
 
@@ -364,8 +350,8 @@ PyTypeObject PyCellPin_Type = {
 PyObject*
 PyCellPin_FromCellPin(const CellPin* pin)
 {
-  CellPinObject* py_obj = CellPin_new(&PyCellPin_Type);
-  if ( py_obj == NULL ) {
+  CellPinObject* self = PyObject_New(CellPinObject, &PyCellPin_Type);
+  if ( self == NULL ) {
     return NULL;
   }
 
@@ -376,10 +362,10 @@ PyCellPin_FromCellPin(const CellPin* pin)
   case CellPin::kDirInout:    pypin = new PyInoutPin(pin); break;
   case CellPin::kDirInternal: pypin = new PyInternalPin(pin); break;
   }
-  py_obj->mPin = pypin;
+  self->mPin = pypin;
 
-  Py_INCREF(py_obj);
-  return (PyObject*)py_obj;
+  Py_INCREF(self);
+  return (PyObject*)self;
 }
 
 // @brief PyObject から CellPin へのポインタを取り出す．

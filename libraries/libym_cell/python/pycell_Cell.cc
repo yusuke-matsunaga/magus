@@ -37,20 +37,6 @@ struct CellObject
 // Python 用のメソッド関数定義
 //////////////////////////////////////////////////////////////////////
 
-// CellObject の生成関数
-CellObject*
-Cell_new(PyTypeObject* type)
-{
-  CellObject* self = PyObject_New(CellObject, type);
-  if ( self == NULL ) {
-    return NULL;
-  }
-
-  self->mCell = NULL;
-
-  return self;
-}
-
 // CellObject を開放する関数
 void
 Cell_dealloc(CellObject* self)
@@ -257,7 +243,7 @@ PyTypeObject PyCellCell_Type = {
   (long)0,                      // tp_dictoffset
   (initproc)0,                  // tp_init
   (allocfunc)0,                 // tp_alloc
-  (newfunc)Cell_new,            // tp_new
+  (newfunc)0,                   // tp_new
   (freefunc)0,                  // tp_free
   (inquiry)0,                   // tp_is_gc
 
@@ -279,15 +265,15 @@ PyTypeObject PyCellCell_Type = {
 PyObject*
 PyCellCell_FromCell(const Cell* cell)
 {
-  CellObject* py_obj = Cell_new(&PyCellCell_Type);
-  if ( py_obj == NULL ) {
+  CellObject* self = PyObject_New(CellObject, &PyCellCell_Type);
+  if ( self == NULL ) {
     return NULL;
   }
 
-  py_obj->mCell = new PyCell(cell);
+  self->mCell = new PyCell(cell);
 
-  Py_INCREF(py_obj);
-  return (PyObject*)py_obj;
+  Py_INCREF(self);
+  return (PyObject*)self;
 }
 
 // @brief PyObject から Cell へのポインタを取り出す．
