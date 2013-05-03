@@ -15,6 +15,8 @@
 #include "ym_cell/CellClass.h"
 #include "ym_cell/CellGroup.h"
 #include "ym_cell/CellPatGraph.h"
+#include "ym_cell/CellCapacitance.h"
+#include "ym_cell/CellTime.h"
 
 #include "ym_logic/LogExpr.h"
 #include "ym_logic/NpnMapM.h"

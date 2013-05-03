@@ -9,6 +9,7 @@
 
 #include "ym_cell/pycell.h"
 #include "ym_cell/CellClass.h"
+#include "PyCellClass.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -25,8 +26,8 @@ struct CellClassObject
   // Python のお約束
   PyObject_HEAD
 
-  // CellClass の本体
-  const CellClass* mBody;
+  // PyCellClass
+  PyCellClass* mClass;
 
 };
 
@@ -35,10 +36,25 @@ struct CellClassObject
 // Python 用のメソッド関数定義
 //////////////////////////////////////////////////////////////////////
 
+// CellClassObject の生成関数
+CellClassObject*
+CellClass_new(PyTypeObject* type)
+{
+  CellClassObject* self = PyObject_New(CellClassObject, type);
+  if ( self == NULL ) {
+    return NULL;
+  }
+
+  self->mClass = NULL;
+
+  return self;
+}
+
 // CellClassObject を開放する関数
 void
 CellClass_dealloc(CellClassObject* self)
 {
+  delete self->mClass;
 
   PyObject_Del(self);
 }
@@ -48,7 +64,10 @@ PyObject*
 CellClass_id(CellClassObject* self,
 	     PyObject* args)
 {
-  return PyObject_FromYmuint32(self->mBody->id());
+  PyObject* result = self->mClass->id();
+
+  Py_INCREF(result);
+  return result;
 }
 
 
@@ -151,7 +170,7 @@ PyTypeObject PyCellClass_Type = {
   (long)0,                          // tp_dictoffset
   (initproc)0,                      // tp_init
   (allocfunc)0,                     // tp_alloc
-  (newfunc)0,                       // tp_new
+  (newfunc)CellClass_new,           // tp_new
   (freefunc)0,                      // tp_free
   (inquiry)0,                       // tp_is_gc
 
@@ -166,6 +185,22 @@ PyTypeObject PyCellClass_Type = {
 //////////////////////////////////////////////////////////////////////
 // PyObject と CellClass の間の変換関数
 //////////////////////////////////////////////////////////////////////
+
+// @brief CellClass から CellClassObject を生成する．
+// @param[in] cell_class セルクラス
+PyObject*
+PyCellClass_FromCellClass(const CellClass* cell_class)
+{
+  CellClassObject* py_obj = CellClass_new(&PyCellClass_Type);
+  if ( py_obj == NULL ) {
+    return NULL;
+  }
+
+  py_obj->mClass = new PyCellClass(cell_class);
+
+  Py_INCREF(py_obj);
+  return (PyObject*)py_obj;
+}
 
 // @brief PyObject から CellClass へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
@@ -183,7 +218,7 @@ PyCellClass_AsCellClassPtr(PyObject* py_obj)
   // 強制的にキャスト
   CellClassObject* my_obj = (CellClassObject*)py_obj;
 
-  return my_obj->mBody;
+  return my_obj->mClass->cell_class();
 }
 
 // CellClassObject 関係の初期化を行う．

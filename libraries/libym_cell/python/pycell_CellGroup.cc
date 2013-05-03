@@ -9,6 +9,7 @@
 
 #include "ym_cell/pycell.h"
 #include "ym_cell/CellGroup.h"
+#include "PyCellGroup.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -25,8 +26,8 @@ struct CellGroupObject
   // Python のお約束
   PyObject_HEAD
 
-  // CellGroup の本体
-  const CellGroup* mBody;
+  // PyCellGroup
+  PyCellGroup* mGroup;
 
 };
 
@@ -35,10 +36,25 @@ struct CellGroupObject
 // Python 用のメソッド関数定義
 //////////////////////////////////////////////////////////////////////
 
+// CellGroupObject の生成関数
+CellGroupObject*
+CellGroup_new(PyTypeObject* type)
+{
+  CellGroupObject* self = PyObject_New(CellGroupObject, type);
+  if ( self == NULL ) {
+    return NULL;
+  }
+
+  self->mGroup = NULL;
+
+  return self;
+}
+
 // CellGroupObject を開放する関数
 void
 CellGroup_dealloc(CellGroupObject* self)
 {
+  delete self->mGroup;
 
   PyObject_Del(self);
 }
@@ -48,8 +64,54 @@ PyObject*
 CellGroup_id(CellGroupObject* self,
 	     PyObject* args)
 {
-  Py_INCREF(Py_None);
-  return Py_None;
+  PyObject* result = self->mGroup->id();
+
+  Py_INCREF(result);
+  return result;
+}
+
+// cell_class 関数
+PyObject*
+CellGroup_cell_class(CellGroupObject* self,
+		     PyObject* args)
+{
+  PyObject* result = Py_None;
+
+  Py_INCREF(result);
+  return result;
+}
+
+// map 関数
+PyObject*
+CellGroup_map(CellGroupObject* self,
+	      PyObject* args)
+{
+  PyObject* result = Py_None;
+
+  Py_INCREF(result);
+  return result;
+}
+
+// ff_info 関数
+PyObject*
+CellGroup_ff_info(CellGroupObject* self,
+		  PyObject* args)
+{
+  PyObject* result = Py_None;
+
+  Py_INCREF(result);
+  return result;
+}
+
+// latch_info 関数
+PyObject*
+CellGroup_latch_info(CellGroupObject* self,
+		     PyObject* args)
+{
+  PyObject* result = Py_None;
+
+  Py_INCREF(result);
+  return result;
 }
 
 
@@ -71,6 +133,18 @@ PyMethodDef CellGroup_methods[] = {
   //  - METH_CLASS
   //  - METH_STATIC
   //  - METH_COEXIST
+  {"id", (PyCFunction)CellGroup_id, METH_NOARGS,
+   "return ID"},
+
+  {"cell_class", (PyCFunction)CellGroup_cell_class, METH_NOARGS,
+   "return parent class"},
+  {"rep_map", (PyCFunction)CellGroup_map, METH_NOARGS,
+   "return NPN-map"},
+
+  {"ff_info", (PyCFunction)CellGroup_ff_info, METH_NOARGS,
+   "return FF info"},
+  {"latch_info", (PyCFunction)CellGroup_latch_info, METH_NOARGS,
+   "return latch info"},
 
   {NULL, NULL, 0, NULL} // end-marker
 };
@@ -150,9 +224,9 @@ PyTypeObject PyCellGroup_Type = {
   (descrgetfunc)0,              // tp_descr_get
   (descrsetfunc)0,              // tp_descr_set
   (long)0,                      // tp_dictoffset
-  0,                            // tp_init
+  (initproc)0,                  // tp_init
   (allocfunc)0,                 // tp_alloc
-  0,                            // tp_new
+  (newfunc)CellGroup_new,       // tp_new
   (freefunc)0,                  // tp_free
   (inquiry)0,                   // tp_is_gc
 
@@ -167,6 +241,22 @@ PyTypeObject PyCellGroup_Type = {
 //////////////////////////////////////////////////////////////////////
 // PyObject と CellGroup の間の変換関数
 //////////////////////////////////////////////////////////////////////
+
+// @brief CellGroup から CellGroupObject を生成する．
+// @param[in] group グループ
+PyObject*
+PyCellGroup_FromCellGroup(const CellGroup* group)
+{
+  CellGroupObject* py_obj = CellGroup_new(&PyCellGroup_Type);
+  if ( py_obj == NULL ) {
+    return NULL;
+  }
+
+  py_obj->mGroup = new PyCellGroup(group);
+
+  Py_INCREF(py_obj);
+  return (PyObject*)py_obj;
+}
 
 // @brief PyObject から CellGroup へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
@@ -184,7 +274,7 @@ PyCellGroup_AsCellGroupPtr(PyObject* py_obj)
   // 強制的にキャスト
   CellGroupObject* my_obj = (CellGroupObject*)py_obj;
 
-  return my_obj->mBody;
+  return my_obj->mGroup->cell_group();
 }
 
 // CellGroupObject 関係の初期化を行う．

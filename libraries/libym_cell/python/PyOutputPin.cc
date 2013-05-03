@@ -9,6 +9,8 @@
 
 #include "PyOutputPin.h"
 #include "ym_cell/CellPin.h"
+#include "ym_cell/CellCapacitance.h"
+#include "ym_cell/CellTime.h"
 
 
 BEGIN_NAMESPACE_YM

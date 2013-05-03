@@ -8,6 +8,7 @@
 
 
 #include "PyCell.h"
+#include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
 
 

@@ -12,6 +12,7 @@
 #include "ym_cell/CellDotlibReader.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellBus.h"
+#include "ym_cell/Cell.h"
 #include "ym_utils/pyutils.h"
 #include "ym_utils/FileBinO.h"
 #include "ym_utils/FileBinI.h"

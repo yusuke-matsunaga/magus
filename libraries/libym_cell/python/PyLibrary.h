@@ -10,7 +10,6 @@
 
 
 #include "ym_cell/pycell.h"
-#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -155,8 +154,17 @@ private:
   // leakage_power_unit オブジェクト
   PyObject* mLeakagePowerUnit;
 
+  // 遅延テーブルのテンプレートの配列
+  PyObject** mLuTableTemplateList;
+
   // セルオブジェクトの配列
   PyObject** mCellList;
+
+  // セルグループの配列
+  PyObject** mGroupList;
+
+  // セルクラスの配列
+  PyObject** mClassList;
 
 };
 
@@ -275,14 +283,6 @@ PyObject*
 PyLibrary::leakage_power_unit()
 {
   return mLeakagePowerUnit;
-}
-
-// @brief セルを返す．
-inline
-PyObject*
-PyLibrary::cell(ymuint pos)
-{
-  return mCellList[pos];
 }
 
 END_NAMESPACE_YM

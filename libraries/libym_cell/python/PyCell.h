@@ -10,7 +10,6 @@
 
 
 #include "ym_cell/pycell.h"
-#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM

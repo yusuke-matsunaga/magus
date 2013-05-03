@@ -56,6 +56,22 @@ PyLibrary::PyLibrary(const CellLibrary* library)
     PyObject* cell_obj = PyCellCell_FromCell(cell);
     mCellList[i] = cell_obj;
   }
+
+  ymuint ng = library->group_num();
+  mGroupList = new PyObject*[ng];
+  for (ymuint i = 0; i < ng; ++ i) {
+    const CellGroup* group = library->group(i);
+    PyObject* group_obj = PyCellGroup_FromCellGroup(group);
+    mGroupList[i] = group_obj;
+  }
+
+  ymuint nn = library->npn_class_num();
+  mClassList = new PyObject*[nn];
+  for (ymuint i = 0; i < nn; ++ i) {
+    const CellClass* cell_class = library->npn_class(i);
+    PyObject* class_obj = PyCellClass_FromCellClass(cell_class);
+    mClassList[i] = class_obj;
+  }
 }
 
 // @brief デストラクタ
@@ -80,6 +96,42 @@ PyLibrary::~PyLibrary()
     Py_DECREF(mCellList[i]);
   }
   delete [] mCellList;
+
+  ymuint ng = mLibrary->group_num();
+  for (ymuint i = 0; i < ng; ++ i) {
+    Py_DECREF(mGroupList[i]);
+  }
+  delete [] mGroupList;
+
+  ymuint nn = mLibrary->npn_class_num();
+  for (ymuint i = 0; i < nn; ++ i) {
+    Py_DECREF(mClassList[i]);
+  }
+  delete [] mClassList;
+}
+
+// @brief セルを返す．
+PyObject*
+PyLibrary::cell(ymuint pos)
+{
+  assert_cond( pos < mLibrary->cell_num(), __FILE__, __LINE__);
+  return mCellList[pos];
+}
+
+// @brief セルグループを返す．
+PyObject*
+PyLibrary::cell_group(ymuint pos)
+{
+  assert_cond( pos < mLibrary->group_num(), __FILE__, __LINE__);
+  return mGroupList[pos];
+}
+
+// @brief NPN同値クラスを返す．
+PyObject*
+PyLibrary::npn_class(ymuint pos)
+{
+  assert_cond( pos < mLibrary->npn_class_num(), __FILE__, __LINE__);
+  return mClassList[pos];
 }
 
 #if 0

@@ -10,13 +10,7 @@
 
 
 #include "ympython.h"
-#include "ym_cell/CellArea.h"
-#include "ym_cell/CellCapacitance.h"
-#include "ym_cell/CellTime.h"
-#include "ym_cell/CellLut.h"
-#include "ym_cell/Cell.h"
-#include "ym_cell/CellGroup.h"
-#include "ym_cell/CellClass.h"
+#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -335,13 +329,11 @@ PyCellGroup_Check(PyObject* obj)
   return Py_TYPE(obj) == &PyCellGroup_Type;
 }
 
-#if 0
 /// @brief CellGroup から CellGroupObject を生成する．
 /// @param[in] group グループ
 extern
 PyObject*
 PyCellGroup_FromCellGroup(const CellGroup* group);
-#endif
 
 /// @brief PyObject から CellGroup へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト
@@ -371,13 +363,11 @@ PyCellClass_Check(PyObject* obj)
   return Py_TYPE(obj) == &PyCellClass_Type;
 }
 
-#if 0
 /// @brief CellClass から CellClassObject を生成する．
 /// @param[in] cell_class セルクラス
 extern
 PyObject*
 PyCellClass_FromCellClass(const CellClass* cell_class);
-#endif
 
 /// @brief PyObject から CellClass へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト
@@ -406,14 +396,6 @@ PyCellLibrary_Check(PyObject* obj)
 {
   return Py_TYPE(obj) == &PyCellLibrary_Type;
 }
-
-#if 0
-/// @brief CellLibrary から CellLibraryObject を生成する．
-/// @param[in] cell_class セルクラス
-extern
-PyObject*
-PyCellLibrary_FromCellLibrary(const CellLibrary* cell_class);
-#endif
 
 /// @brief PyObject から CellLibrary へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト

@@ -10,7 +10,6 @@
 
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_cell/CellCapacitance.h"
 #include "ym_logic/lexp_nsdef.h"
 
 
