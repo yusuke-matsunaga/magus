@@ -30,6 +30,10 @@ public:
   /// @brief デストラクタ
   ~PyCell();
 
+  /// @brief セルグループを設定する．
+  void
+  set_group(PyObject* group);
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -56,6 +60,10 @@ public:
   PyObject*
   pin(ymuint pin_id);
 
+  /// @brief セルグループを得る．
+  PyObject*
+  cell_group();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -76,6 +84,9 @@ private:
 
   // ピンを表すオブジェクトの配列
   PyObject** mPinArray;
+
+  // セルグループ
+  PyObject* mGroup;
 
 };
 
@@ -114,6 +125,14 @@ PyObject*
 PyCell::area()
 {
   return mArea;
+}
+
+// @brief セルグループを得る．
+inline
+PyObject*
+PyCell::cell_group()
+{
+  return mGroup;
 }
 
 END_NAMESPACE_YM

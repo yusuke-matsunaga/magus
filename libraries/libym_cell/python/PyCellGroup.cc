@@ -25,12 +25,15 @@ PyCellGroup::PyCellGroup(const CellGroup* group,
   mGroup(group)
 {
   mId = PyObject_FromYmuint32(group->id());
+  mRepClass = NULL;
 
   ymuint nc = group->cell_num();
   mCellList = new PyObject*[nc];
   for (ymuint i = 0; i < nc; ++ i) {
     const Cell* cell = group->cell(i);
-    mCellList[i] = py_library->cell(cell->id());
+    PyObject* obj = py_library->cell(cell->id());
+    Py_INCREF(obj);
+    mCellList[i] = obj;
   }
 }
 
@@ -38,11 +41,21 @@ PyCellGroup::PyCellGroup(const CellGroup* group,
 PyCellGroup::~PyCellGroup()
 {
   Py_DECREF(mId);
+  Py_DECREF(mRepClass);
+
   ymuint nc = mGroup->cell_num();
   for (ymuint i = 0; i < nc; ++ i) {
     Py_DECREF(mCellList[i]);
   }
   delete [] mCellList;
+}
+
+// @brief 代表クラスを設定する．
+void
+PyCellGroup::set_rep(PyObject* rep)
+{
+  mRepClass = rep;
+  Py_INCREF(mRepClass);
 }
 
 // @brief セルを返す．

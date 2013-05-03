@@ -195,14 +195,15 @@ PyTypeObject PyCellClass_Type = {
 // @brief CellClass から CellClassObject を生成する．
 // @param[in] cell_class セルクラス
 PyObject*
-PyCellClass_FromCellClass(const CellClass* cell_class)
+PyCellClass_FromCellClass(const CellClass* cell_class,
+			  PyLibrary* py_library)
 {
   CellClassObject* self = PyObject_New(CellClassObject, &PyCellClass_Type);
   if ( self == NULL ) {
     return NULL;
   }
 
-  self->mClass = new PyCellClass(cell_class);
+  self->mClass = new PyCellClass(cell_class, py_library);
 
   Py_INCREF(self);
   return (PyObject*)self;

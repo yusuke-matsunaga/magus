@@ -32,12 +32,15 @@ PyCell::PyCell(const Cell* cell)
   mId = PyObject_FromYmuint32(cell->id());
   mName = PyObject_FromString(cell->name());
   mArea = PyCellArea_FromCellArea(cell->area());
+
   ymuint np = cell->pin_num();
   mPinArray = new PyObject*[np];
   for (ymuint i = 0; i < np; ++ i) {
     const CellPin* pin = cell->pin(i);
     mPinArray[i] = PyCellPin_FromCellPin(pin);
   }
+
+  mGroup = NULL;
 }
 
 // @brief デストラクタ
@@ -46,11 +49,22 @@ PyCell::~PyCell()
   Py_DECREF(mId);
   Py_DECREF(mName);
   Py_DECREF(mArea);
+
   ymuint np = mCell->pin_num();
   for (ymuint i = 0; i < np; ++ i) {
     Py_DECREF(mPinArray[i]);
   }
   delete [] mPinArray;
+
+  Py_DECREF(mGroup);
+}
+
+// @brief セルグループを設定する．
+void
+PyCell::set_group(PyObject* group)
+{
+  mGroup = group;
+  Py_INCREF(mGroup);
 }
 
 // @brief ピン番号からピンを得る．

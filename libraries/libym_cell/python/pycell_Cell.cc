@@ -276,6 +276,16 @@ PyCellCell_FromCell(const Cell* cell)
   return (PyObject*)self;
 }
 
+// @brief Cell にセルグループを設定する．
+void
+PyCellCell_set_group(PyObject* py_obj,
+		     PyObject* group_obj)
+{
+  assert_cond( PyCellCell_Check(py_obj), __FILE__, __LINE__);
+  CellObject* cell_obj = (CellObject*)py_obj;
+  cell_obj->mCell->set_group(group_obj);
+}
+
 // @brief PyObject から Cell へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
 // @return Cell へんおポインタを返す．

@@ -9,9 +9,20 @@
 
 #include "PyLibrary.h"
 #include "ym_cell/CellLibrary.h"
+#include "ym_cell/CellClass.h"
+#include "ym_cell/CellGroup.h"
+#include "ym_cell/Cell.h"
 
 
 BEGIN_NAMESPACE_YM
+
+/// @brief CellClass から CellClassObject を生成する．
+/// @param[in] cell_class セルクラス
+/// @param[in] py_library ライブラリ
+extern
+PyObject*
+PyCellClass_FromCellClass(const CellClass* cell_class,
+			  PyLibrary* py_library);
 
 /// @brief CellGroup から CellGroupObject を生成する．
 /// @param[in] group グループ
@@ -21,12 +32,24 @@ PyObject*
 PyCellGroup_FromCellGroup(const CellGroup* group,
 			  PyLibrary* py_library);
 
+/// @brief CellGroup に代表クラスを設定する．
+extern
+void
+PyCellGroup_set_rep(PyObject* py_obj,
+		    PyObject* rep_obj);
+
 /// @brief Cell から PyObject を作る．
 /// @param[in] cell Cell へのポインタ
 /// @return cell を表す PyObject
 extern
 PyObject*
 PyCellCell_FromCell(const Cell* cell);
+
+/// @brief Cell にセルグループを設定する．
+extern
+void
+PyCellCell_set_group(PyObject* py_obj,
+		     PyObject* group_obj);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -85,8 +108,24 @@ PyLibrary::PyLibrary(const CellLibrary* library)
   mClassList = new PyObject*[nn];
   for (ymuint i = 0; i < nn; ++ i) {
     const CellClass* cell_class = library->npn_class(i);
-    PyObject* class_obj = PyCellClass_FromCellClass(cell_class);
+    PyObject* class_obj = PyCellClass_FromCellClass(cell_class, this);
     mClassList[i] = class_obj;
+  }
+
+  for (ymuint i = 0; i < nc; ++ i) {
+    PyObject* py_obj = mCellList[i];
+    const Cell* cell = library->cell(i);
+    const CellGroup* group = cell->cell_group();
+    PyObject* group_obj = mGroupList[group->id()];
+    PyCellCell_set_group(py_obj, group_obj);
+  }
+
+  for (ymuint i = 0; i < ng; ++ i) {
+    PyObject* py_obj = mGroupList[i];
+    const CellGroup* group = library->group(i);
+    const CellClass* rep = group->rep_class();
+    PyObject* rep_obj = mClassList[rep->id()];
+    PyCellGroup_set_rep(py_obj, rep_obj);
   }
 }
 
@@ -149,48 +188,5 @@ PyLibrary::npn_class(ymuint pos)
   assert_cond( pos < mLibrary->npn_class_num(), __FILE__, __LINE__);
   return mClassList[pos];
 }
-
-#if 0
-// @brief Cell のポインタから CellObject を得る．
-PyObject*
-PyLibrary::get_Cell(const Cell* cell)
-{
-  return get_obj(reinterpret_cast<ympuint>(cell));
-}
-
-// @brief CellGroup のポインタから CellGroupObject を得る．
-PyObject*
-PyLibrary::get_CellGroup(const CellGroup* cell_group)
-{
-  return get_obj(reinterpret_cast<ympuint>(cell_group));
-}
-
-// @brief CellClass のポインタから CellClassObject を得る．
-PyObject*
-PyLibrary::get_CellClass(const CellClass* cell_class)
-{
-  return get_obj(reinterpret_cast<ympuint>(cell_class));
-}
-
-// @brief CellLutTemplate のポインタから CellLutTemplateObject を得る．
-PyObject*
-PyLibrary::get_CellLutTemplate(const CellLutTemplate* cell_lut_template)
-{
-  return get_obj(reinterpret_cast<ympuint>(cell_lut_template));
-}
-
-// @brief ympuint から PyObject* を返す．
-// @note なければエラーとなる．
-PyObject*
-PyLibrary::get_obj(ympuint ptr)
-{
-  hash_map<ympuint, PyObject*>::iterator p = mObjMap.find(ptr);
-  assert_cond( p != mObjMap.end(), __FILE__, __LINE__);
-  PyObject* result = p->second;
-
-  Py_INCREF(result);
-  return result;
-}
-#endif
 
 END_NAMESPACE_YM

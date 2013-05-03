@@ -32,6 +32,10 @@ public:
   virtual
   ~PyCellGroup();
 
+  /// @brief 代表クラスを設定する．
+  void
+  set_rep(PyObject* rep);
+
 
 public:
   //////////////////////////////////////////////////////////////////////

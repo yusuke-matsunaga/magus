@@ -245,6 +245,17 @@ PyCellGroup_FromCellGroup(const CellGroup* group,
   return (PyObject*)self;
 }
 
+// @brief CellGroup に代表クラスを設定する．
+void
+PyCellGroup_set_rep(PyObject* py_obj,
+		    PyObject* rep_obj)
+{
+  assert_cond( PyCellGroup_Check(py_obj), __FILE__, __LINE__);
+
+  CellGroupObject* group_obj = (CellGroupObject*)py_obj;
+  group_obj->mGroup->set_rep(rep_obj);
+}
+
 // @brief PyObject から CellGroup へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
 // @return CellGroup へのポインタを返す．

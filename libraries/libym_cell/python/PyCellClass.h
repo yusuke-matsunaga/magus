@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM
 
+class PyLibrary;
+
 //////////////////////////////////////////////////////////////////////
 /// @class PyCellClass PyCellClass.h "PyCellClass.h"
 /// @brief CellClassObject のための補助的なクラス
@@ -23,7 +25,8 @@ class PyCellClass
 public:
 
   /// @brief コンストラクタ
-  PyCellClass(const CellClass* cell_class);
+  PyCellClass(const CellClass* cell_class,
+	      PyLibrary* py_library);
 
   /// @brief デストラクタ
   ~PyCellClass();
@@ -42,6 +45,14 @@ public:
   PyObject*
   id();
 
+  /// @brief 同位体変換を得る．
+  PyObject*
+  idmap(ymuint pos);
+
+  /// @brief セルグループを得る．
+  PyObject*
+  cell_group(ymuint pos);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -53,6 +64,12 @@ private:
 
   // ID
   PyObject* mId;
+
+  // 同位体変換のリスト
+  PyObject** mIdMapList;
+
+  // セルグループのリスト
+  PyObject** mGroupList;
 
 };
 
