@@ -50,6 +50,10 @@ CellObject_init(PyObject* m);
 void
 CellPinObject_init(PyObject* m);
 
+void
+CellPatGraphObject_init(PyObject* m);
+
+
 END_NAMESPACE_YM
 
 
@@ -89,5 +93,8 @@ cell_init()
 
   // CellPinObject 関係の初期化
   CellPinObject_init(m);
+
+  // CellPatGraph 関係の初期化
+  CellPatGraphObject_init(m);
 
 }

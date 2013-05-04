@@ -664,6 +664,15 @@ CiLibrary::set_cell_num(ymuint num)
   mCellArray = new (p) CiCell*[num];
 }
 
+// @brief セルを取り出す．
+// @param[in] pos 位置番号 ( 0 <= pos < cell_num() )
+Cell*
+CiLibrary::cell(ymuint pos)
+{
+  assert_cond( pos < mCellNum, __FILE__, __LINE__);
+  return mCellArray[pos];
+}
+
 // @brief 論理セルを生成する．
 // @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
 // @param[in] name 名前
@@ -1333,7 +1342,7 @@ CiLibrary::compile()
     const LcGroup* src_group = libcomp.group(g);
     CiGroup& dst_group = mGroupArray[g];
     const CellClass* parent = npn_class(src_group->parent()->id());
-    const vector<const Cell*>& cell_list = src_group->cell_list();
+    const vector<Cell*>& cell_list = src_group->cell_list();
     dst_group.init(parent, src_group->map(), cell_list, mAlloc);
   }
 

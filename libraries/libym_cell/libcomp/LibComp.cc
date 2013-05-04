@@ -104,7 +104,7 @@ LibComp::pat_mgr() const
 
 // @brief セルのグループ化，クラス化を行う．
 void
-LibComp::compile(const CellLibrary& library)
+LibComp::compile(CellLibrary& library)
 {
   mGroupList.clear();
   mClassList.clear();
@@ -184,7 +184,7 @@ LibComp::compile(const CellLibrary& library)
 
   ymuint nc = library.cell_num();
   for (ymuint i = 0; i < nc; ++ i) {
-    const Cell* cell = library.cell(i);
+    Cell* cell = library.cell(i);
 
     if ( cell->is_logic() ) {
       mLogicMgr.add_cell(cell);
@@ -367,8 +367,8 @@ LibComp::display(ostream& s) const
       << ": " << group->map()
       << endl;
     s << "  CELL:";
-    const vector<const Cell*>& cell_list = group->cell_list();
-    for (vector<const Cell*>::const_iterator p = cell_list.begin();
+    const vector<Cell*>& cell_list = group->cell_list();
+    for (vector<Cell*>::const_iterator p = cell_list.begin();
 	 p != cell_list.end(); ++ p) {
       const Cell* cell = *p;
       s << " " << cell->name();

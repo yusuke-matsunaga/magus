@@ -276,7 +276,7 @@ CiGroup::cell(ymuint pos) const
 void
 CiGroup::init(const CellClass* cell_class,
 	      const NpnMapM& map,
-	      const vector<const Cell*>& cell_list,
+	      const vector<Cell*>& cell_list,
 	      Alloc& alloc)
 {
   mRepClass = cell_class;
@@ -285,7 +285,9 @@ CiGroup::init(const CellClass* cell_class,
 
   alloc_array(alloc);
   for (ymuint i = 0; i < mCellNum; ++ i) {
-    mCellList[i] = cell_list[i];
+    Cell* cell = cell_list[i];
+    mCellList[i] = cell;
+    cell->set_group(this);
   }
 }
 

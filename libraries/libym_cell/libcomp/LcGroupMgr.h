@@ -43,7 +43,7 @@ public:
   /// @brief セルを追加する．
   /// @param[in] cell セル
   void
-  add_cell(const Cell* cell);
+  add_cell(Cell* cell);
 
   /// @brief f に対応する LcGroup を求める．
   /// @param[in] f 関数

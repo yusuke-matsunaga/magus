@@ -313,6 +313,34 @@ PyCellPin_AsCellPinPtr(PyObject* py_obj);
 
 
 //////////////////////////////////////////////////////////////////////
+// PyCellPatGraph: CellPatGraph を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief CellPatGraph を表すタイプオブジェクト
+extern
+PyTypeObject PyCellPatGraph_Type;
+
+/// @brief PyCellPatGraph の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyCellPatGraph_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyCellPatGraph_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyCellPatGraph_Type;
+}
+
+/// @brief PyObject から CellPatGraph へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return CellPatGraph へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+const CellPatGraph*
+PyCellPatGraph_AsCellPatGraphPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
 // PyCellLutTemplate: LUT のテンプレートを表す型
 //////////////////////////////////////////////////////////////////////
 

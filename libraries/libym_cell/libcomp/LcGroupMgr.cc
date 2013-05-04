@@ -45,7 +45,7 @@ LcGroupMgr::clear()
 
 // @brief セルを追加する．
 void
-LcGroupMgr::add_cell(const Cell* cell)
+LcGroupMgr::add_cell(Cell* cell)
 {
   if ( !cell->has_logic() || cell->output_num2() == 0 ) {
     // ひとつでも論理式を持たない出力があるセルは独立したグループとなる．

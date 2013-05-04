@@ -200,7 +200,7 @@ public:
   void
   init(const CellClass* cell_class,
        const NpnMapM& map,
-       const vector<const Cell*>& cell_list,
+       const vector<Cell*>& cell_list,
        Alloc& alloc);
 
   /// @brief FFのピン情報を設定する．

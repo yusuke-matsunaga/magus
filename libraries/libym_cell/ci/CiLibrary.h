@@ -466,6 +466,12 @@ public:
   void
   set_cell_num(ymuint num);
 
+  /// @brief セルを取り出す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < cell_num() )
+  virtual
+  Cell*
+  cell(ymuint pos);
+
   /// @brief 論理セルを生成する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] name 名前

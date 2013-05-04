@@ -410,6 +410,17 @@ public:
   dump(BinO& s) const;
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 設定用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief セルグループを設定する．
+  virtual
+  void
+  set_group(const CellGroup* group);
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -477,7 +488,7 @@ private:
   CiTimingArray** mTimingMap;
 
   // セルグループ
-  CellGroup* mCellGroup;
+  const CellGroup* mCellGroup;
 
   // 出力の情報を格納する配列
   // サイズは output_num2()

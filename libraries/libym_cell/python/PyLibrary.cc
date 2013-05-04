@@ -51,6 +51,27 @@ void
 PyCellCell_set_group(PyObject* py_obj,
 		     PyObject* group_obj);
 
+/// @brief CellPatGraph から PyObject を作る．
+/// @param[in] pat_graph CellPatGraph へのポインタ
+/// @return pat_graph を表す PyObject
+extern
+PyObject*
+PyCellPatGraph_FromCellPatGraph(const CellPatGraph* pat_graph);
+
+
+BEGIN_NONAMESPACE
+
+/// @brief 'I' を表す定数オブジェクト
+PyObject* kPatI = NULL;
+
+/// @brief 'A' を表す定数オブジェクト
+PyObject* kPatA = NULL;
+
+/// @brief 'X' を表す定数オブジェクト
+PyObject* kPatX = NULL;
+
+END_NONAMESPACE
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス PyLibrary;
@@ -113,9 +134,9 @@ PyLibrary::PyLibrary(const CellLibrary* library)
   }
 
   for (ymuint i = 0; i < nc; ++ i) {
-    PyObject* py_obj = mCellList[i];
     const Cell* cell = library->cell(i);
     const CellGroup* group = cell->cell_group();
+    PyObject* py_obj = mCellList[i];
     PyObject* group_obj = mGroupList[group->id()];
     PyCellCell_set_group(py_obj, group_obj);
   }
@@ -126,6 +147,31 @@ PyLibrary::PyLibrary(const CellLibrary* library)
     const CellClass* rep = group->rep_class();
     PyObject* rep_obj = mClassList[rep->id()];
     PyCellGroup_set_rep(py_obj, rep_obj);
+  }
+
+  ymuint np = library->pg_pat_num();
+  mPatList = new PyObject*[np];
+  for (ymuint i = 0; i < np; ++ i) {
+    const CellPatGraph& pat = library->pg_pat(i);
+    PyObject* pat_obj = PyCellPatGraph_FromCellPatGraph(&pat);
+    mPatList[i] = pat_obj;
+  }
+
+  ymuint npn = library->pg_node_num();
+  mNodeList = new PyObject*[npn];
+  for (ymuint i = 0; i < npn; ++ i) {
+    tCellPatType pat_type = library->pg_node_type(i);
+    PyObject* pat = NULL;
+    switch ( pat_type ) {
+    case kCellPatInput: pat = kPatI; break;
+    case kCellPatAnd:   pat = kPatA; break;
+    case kCellPatXor:   pat = kPatX; break;
+    }
+    ymuint id = 0;
+    if ( pat_type == kCellPatInput ) {
+      id = library->pg_input_id(i);
+    }
+    mNodeList[i] = Py_BuildValue("(OI)", pat, id);
   }
 }
 
@@ -163,6 +209,20 @@ PyLibrary::~PyLibrary()
     Py_DECREF(mClassList[i]);
   }
   delete [] mClassList;
+
+  ymuint np = mLibrary->pg_pat_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    Py_DECREF(mPatList[i]);
+  }
+  delete [] mPatList;
+
+  ymuint npn = mLibrary->pg_node_num();
+  for (ymuint i = 0; i < npn; ++ i) {
+#if 0
+    Py_DECREF(mNodeList[i]);
+#endif
+  }
+  delete [] mNodeList;
 }
 
 // @brief セルを返す．
@@ -187,6 +247,31 @@ PyLibrary::npn_class(ymuint pos)
 {
   assert_cond( pos < mLibrary->npn_class_num(), __FILE__, __LINE__);
   return mClassList[pos];
+}
+
+// @brief パタンを返す．
+PyObject*
+PyLibrary::pg_pat(ymuint pos)
+{
+  assert_cond( pos < mLibrary->pg_pat_num(), __FILE__, __LINE__);
+  return mPatList[pos];
+}
+
+// @brief ノードの情報を返す．
+PyObject*
+PyLibrary::pg_node(ymuint pos)
+{
+  assert_cond( pos < mLibrary->pg_node_num(), __FILE__, __LINE__);
+  return mNodeList[pos];
+}
+
+// @brief 枝の情報を返す．
+// @note (from, to, ipos, inv) のタプルを返す．
+PyObject*
+PyLibrary::pg_edge(ymuint pos)
+{
+  assert_cond( pos < mLibrary->pg_edge_num(), __FILE__, __LINE__);
+  return mEdgeList[pos];
 }
 
 END_NAMESPACE_YM

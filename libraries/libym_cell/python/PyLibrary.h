@@ -106,6 +106,19 @@ public:
   PyObject*
   npn_class(ymuint pos);
 
+  /// @brief パタンを返す．
+  PyObject*
+  pg_pat(ymuint pos);
+
+  /// @brief ノードの情報を返す．
+  PyObject*
+  pg_node(ymuint pos);
+
+  /// @brief 枝の情報を返す．
+  /// @note (from, to, ipos, inv) のタプルを返す．
+  PyObject*
+  pg_edge(ymuint pos);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -165,6 +178,15 @@ private:
 
   // セルクラスの配列
   PyObject** mClassList;
+
+  // パタンの配列
+  PyObject** mPatList;
+
+  // ノードの配列
+  PyObject** mNodeList;
+
+  // 枝の配列
+  PyObject** mEdgeList;
 
 };
 

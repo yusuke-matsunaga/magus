@@ -671,4 +671,11 @@ CiCell::dump(BinO& s) const
   }
 }
 
+// @brief セルグループを設定する．
+void
+CiCell::set_group(const CellGroup* group)
+{
+  mCellGroup = group;
+}
+
 END_NAMESPACE_YM_CELL

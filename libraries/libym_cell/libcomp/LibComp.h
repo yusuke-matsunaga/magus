@@ -42,7 +42,7 @@ public:
 
   /// @brief セルのグループ化，クラス化を行う．
   void
-  compile(const CellLibrary& library);
+  compile(CellLibrary& library);
 
   /// @brief 論理セルグループの情報を取り出す．
   const LcGroupMgr&
