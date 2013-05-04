@@ -188,6 +188,15 @@ private:
   // 枝の配列
   PyObject** mEdgeList;
 
+  // 'I' を表す定数オブジェクト
+  PyObject* kPatI;
+
+  // 'A' を表す定数オブジェクト
+  PyObject* kPatA;
+
+  // 'X' を表す定数オブジェクト
+  PyObject* kPatX;
+
 };
 
 

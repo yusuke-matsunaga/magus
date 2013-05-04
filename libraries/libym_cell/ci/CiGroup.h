@@ -243,7 +243,7 @@ public:
   /// @param[in] alloc メモリアロケータ
   void
   restore(BinI& bis,
-	  const CellLibrary& library,
+	  CellLibrary& library,
 	  Alloc& alloc);
 
 

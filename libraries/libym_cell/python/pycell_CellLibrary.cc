@@ -338,10 +338,36 @@ CellLibrary_bus_type(CellLibraryObject* self,
 #endif
 }
 
+// cell_num 関数
+PyObject*
+CellLibrary_cell_num(CellLibraryObject* self,
+		     PyObject* args)
+{
+  return Py_BuildValue("I", self->mLibrary->library()->cell_num());
+}
+
 // cell 関数
 PyObject*
 CellLibrary_cell(CellLibraryObject* self,
 		 PyObject* args)
+{
+  // 引数の形式は
+  // - (int) セル番号
+  ymuint pos = 0;
+  if ( !PyArg_ParseTuple(args, "I", &pos) ) {
+    return NULL;
+  }
+
+  PyObject* cell_obj = self->mLibrary->cell(pos);
+
+  Py_INCREF(cell_obj);
+  return cell_obj;
+}
+
+// cell_by_name 関数
+PyObject*
+CellLibrary_cell_by_name(CellLibraryObject* self,
+			 PyObject* args)
 {
   // 引数の形式は
   // - (str) セル名
@@ -357,6 +383,7 @@ CellLibrary_cell(CellLibraryObject* self,
   }
 
   PyObject* cell_obj = self->mLibrary->cell(cell->id());
+
   Py_INCREF(cell_obj);
   return cell_obj;
 }
@@ -531,7 +558,11 @@ PyMethodDef CellLibrary_methods[] = {
    PyDoc_STR("return list of lu_table_template (NONE)")},
   {"bus_type", (PyCFunction)CellLibrary_bus_type, METH_VARARGS,
    PyDoc_STR("return bus type of the library (NONE)")},
+  {"cell_num", (PyCFunction)CellLibrary_cell_num, METH_NOARGS,
+   PyDoc_STR("return cell number")},
   {"cell", (PyCFunction)CellLibrary_cell, METH_VARARGS,
+   PyDoc_STR("return cell (int)")},
+  {"cell_by_name", (PyCFunction)CellLibrary_cell_by_name, METH_VARARGS,
    PyDoc_STR("return cell (str)")},
   {"cell_list", (PyCFunction)CellLibrary_cell_list, METH_NOARGS,
    PyDoc_STR("return list of cell (NONE)")},

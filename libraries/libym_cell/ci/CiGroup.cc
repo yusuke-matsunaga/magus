@@ -354,7 +354,7 @@ CiGroup::dump(BinO& bos) const
 // @param[in] alloc メモリアロケータ
 void
 CiGroup::restore(BinI& bis,
-		 const CellLibrary& library,
+		 CellLibrary& library,
 		 Alloc& alloc)
 {
   ymuint32 parent_id;
@@ -368,7 +368,9 @@ CiGroup::restore(BinI& bis,
   for (ymuint i = 0; i < mCellNum; ++ i) {
     ymuint32 cell_id;
     bis >> cell_id;
-    mCellList[i] = library.cell(cell_id);
+    Cell* cell = library.cell(cell_id);
+    mCellList[i] = cell;
+    cell->set_group(this);
   }
 }
 

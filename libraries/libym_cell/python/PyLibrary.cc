@@ -59,20 +59,6 @@ PyObject*
 PyCellPatGraph_FromCellPatGraph(const CellPatGraph* pat_graph);
 
 
-BEGIN_NONAMESPACE
-
-/// @brief 'I' を表す定数オブジェクト
-PyObject* kPatI = NULL;
-
-/// @brief 'A' を表す定数オブジェクト
-PyObject* kPatA = NULL;
-
-/// @brief 'X' を表す定数オブジェクト
-PyObject* kPatX = NULL;
-
-END_NONAMESPACE
-
-
 //////////////////////////////////////////////////////////////////////
 // クラス PyLibrary;
 //////////////////////////////////////////////////////////////////////
@@ -157,6 +143,10 @@ PyLibrary::PyLibrary(const CellLibrary* library)
     mPatList[i] = pat_obj;
   }
 
+  kPatI = PyObject_FromString("INPUT");
+  kPatA = PyObject_FromString("AND");
+  kPatX = PyObject_FromString("XOR");
+
   ymuint npn = library->pg_node_num();
   mNodeList = new PyObject*[npn];
   for (ymuint i = 0; i < npn; ++ i) {
@@ -172,6 +162,17 @@ PyLibrary::PyLibrary(const CellLibrary* library)
       id = library->pg_input_id(i);
     }
     mNodeList[i] = Py_BuildValue("(OI)", pat, id);
+  }
+
+  ymuint ne = library->pg_edge_num();
+  mEdgeList = new PyObject*[ne];
+  for (ymuint i = 0; i < ne; ++ i) {
+    ymuint from_id = library->pg_edge_from(i);
+    ymuint to_id = library->pg_edge_to(i);
+    ymuint pos = library->pg_edge_pos(i);
+    bool inv = library->pg_edge_inv(i);
+    PyObject* obj = Py_BuildValue("(IIII)", from_id, to_id, pos, inv);
+    mEdgeList[i] = obj;
   }
 }
 
@@ -218,11 +219,19 @@ PyLibrary::~PyLibrary()
 
   ymuint npn = mLibrary->pg_node_num();
   for (ymuint i = 0; i < npn; ++ i) {
-#if 0
     Py_DECREF(mNodeList[i]);
-#endif
   }
   delete [] mNodeList;
+
+  ymuint ne = mLibrary->pg_edge_num();
+  for (ymuint i = 0; i < ne; ++ i) {
+    Py_DECREF(mEdgeList[i]);
+  }
+  delete [] mEdgeList;
+
+  Py_DECREF(kPatI);
+  Py_DECREF(kPatA);
+  Py_DECREF(kPatX);
 }
 
 // @brief セルを返す．
