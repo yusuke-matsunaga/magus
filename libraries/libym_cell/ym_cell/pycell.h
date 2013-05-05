@@ -354,7 +354,7 @@ PyTypeObject PyCellLutTemplate_Type;
 /// @retval false obj が他の型だった．
 inline
 bool
-PyCellLutTempalte_Check(PyObject* obj)
+PyCellLutTemplate_Check(PyObject* obj)
 {
   return Py_TYPE(obj) == &PyCellLutTemplate_Type;
 }

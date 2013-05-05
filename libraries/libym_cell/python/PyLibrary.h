@@ -168,7 +168,7 @@ private:
   PyObject* mLeakagePowerUnit;
 
   // 遅延テーブルのテンプレートの配列
-  PyObject** mLuTableTemplateList;
+  PyObject** mLutTemplateList;
 
   // セルオブジェクトの配列
   PyObject** mCellList;

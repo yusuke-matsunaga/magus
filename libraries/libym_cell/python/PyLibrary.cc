@@ -95,6 +95,14 @@ PyLibrary::PyLibrary(const CellLibrary* library)
   mCapacitiveLoadUnit = Py_BuildValue("(ds)", unit_val, unit_str.c_str());
   mLeakagePowerUnit = PyObject_FromString(library->leakage_power_unit());
 
+  ymuint nl = library->lu_table_template_num();
+  mLutTemplateList = new PyObject*[nl];
+  for (ymuint i = 0; i < nl; ++ i) {
+    const CellLutTemplate* lut_template = library->lu_table_template(i);
+    PyObject* obj = PyCellLutTemplate_FromCellLutTemplate(lut_template);
+    mLutTemplateList[i] = obj;
+  }
+
   ymuint nc = library->cell_num();
   mCellList = new PyObject*[nc];
   for (ymuint i = 0; i < nc; ++ i) {
@@ -193,6 +201,12 @@ PyLibrary::~PyLibrary()
   Py_DECREF(mCapacitiveLoadUnit);
   Py_DECREF(mLeakagePowerUnit);
 
+  ymuint nl = mLibrary->lu_table_template_num();
+  for (ymuint i = 0; i < nl; ++ i) {
+    Py_DECREF(mLutTemplateList[i]);
+  }
+  delete [] mLutTemplateList;
+
   ymuint n = mLibrary->cell_num();
   for (ymuint i = 0; i < n; ++ i) {
     Py_DECREF(mCellList[i]);
@@ -232,6 +246,14 @@ PyLibrary::~PyLibrary()
   Py_DECREF(kPatI);
   Py_DECREF(kPatA);
   Py_DECREF(kPatX);
+}
+
+// @brief 遅延テーブルのテンプレートを返す．
+PyObject*
+PyLibrary::lu_table_template(ymuint pos)
+{
+  assert_cond(pos < mLibrary->lu_table_template_num(), __FILE__, __LINE__);
+  return mLutTemplateList[pos];
 }
 
 // @brief セルを返す．
