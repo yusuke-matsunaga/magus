@@ -78,6 +78,30 @@ CellGroup_map(CellGroupObject* self,
   return result;
 }
 
+// cell_num 関数
+PyObject*
+CellGroup_cell_num(CellGroupObject* self,
+		   PyObject* args)
+{
+  return PyObject_FromYmuint32(self->mGroup->cell_group()->cell_num());
+}
+
+// cell 関数
+PyObject*
+CellGroup_cell(CellGroupObject* self,
+	       PyObject* args)
+{
+  ymuint pos = 0;
+  if ( !PyArg_ParseTuple(args, "I", &pos) ) {
+    return NULL;
+  }
+
+  PyObject* result = self->mGroup->cell(pos);
+
+  Py_INCREF(result);
+  return result;
+}
+
 // ff_info 関数
 PyObject*
 CellGroup_ff_info(CellGroupObject* self,
@@ -120,17 +144,22 @@ PyMethodDef CellGroup_methods[] = {
   //  - METH_STATIC
   //  - METH_COEXIST
   {"id", (PyCFunction)CellGroup_id, METH_NOARGS,
-   "return ID"},
+   PyDoc_STR("return ID")},
 
   {"cell_class", (PyCFunction)CellGroup_cell_class, METH_NOARGS,
-   "return parent class"},
+   PyDoc_STR("return parent class")},
   {"rep_map", (PyCFunction)CellGroup_map, METH_NOARGS,
-   "return NPN-map"},
+   PyDoc_STR("return NPN-map")},
+
+  {"cell_num", (PyCFunction)CellGroup_cell_num, METH_NOARGS,
+   PyDoc_STR("return cell number")},
+  {"cell", (PyCFunction)CellGroup_cell, METH_VARARGS,
+   PyDoc_STR("return cell (unsigned int)")},
 
   {"ff_info", (PyCFunction)CellGroup_ff_info, METH_NOARGS,
-   "return FF info"},
+   PyDoc_STR("return FF info")},
   {"latch_info", (PyCFunction)CellGroup_latch_info, METH_NOARGS,
-   "return latch info"},
+   PyDoc_STR("return latch info")},
 
   {NULL, NULL, 0, NULL} // end-marker
 };

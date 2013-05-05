@@ -410,18 +410,16 @@ PyObject*
 CellLibrary_group_list(CellLibraryObject* self,
 		       PyObject* args)
 {
-#if 0
   ymuint n = self->mLibrary->library()->group_num();
   PyObject* list_obj = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
-    const CellGroup* group = self->mLibrary->group(i);
-    PyObject* obj1 = self->mLibrary->get_CellGroup(group);
+    PyObject* obj1 = self->mLibrary->cell_group(i);
+    Py_INCREF(obj1);
     PyList_SetItem(list_obj, i, obj1);
   }
+
+  Py_INCREF(list_obj);
   return list_obj;
-#else
-  return NULL;
-#endif
 }
 
 // npn_class_list 関数
@@ -429,18 +427,16 @@ PyObject*
 CellLibrary_npn_class_list(CellLibraryObject* self,
 			   PyObject* args)
 {
-#if 0
-  ymuint n = self->mBody->npn_class_num();
+  ymuint n = self->mLibrary->library()->npn_class_num();
   PyObject* list_obj = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
-    const CellClass* npn_class = self->mBody->npn_class(i);
-    PyObject* obj1 = self->mLibrary->get_CellClass(npn_class);
+    PyObject* obj1 = self->mLibrary->npn_class(i);
+    Py_INCREF(obj1);
     PyList_SetItem(list_obj, i, obj1);
   }
+
+  Py_INCREF(list_obj);
   return list_obj;
-#else
-  return NULL;
-#endif
 }
 
 // パタンを返す．
@@ -566,7 +562,7 @@ PyMethodDef CellLibrary_methods[] = {
    PyDoc_STR("return cell (str)")},
   {"cell_list", (PyCFunction)CellLibrary_cell_list, METH_NOARGS,
    PyDoc_STR("return list of cell (NONE)")},
-  {"group_list", (PyCFunction)CellLibrary_group_list, METH_NOARGS,
+  {"cell_group_list", (PyCFunction)CellLibrary_group_list, METH_NOARGS,
    PyDoc_STR("return list of cell group (NONE)")},
   {"npn_class_list", (PyCFunction)CellLibrary_npn_class_list, METH_NOARGS,
    PyDoc_STR("return list of cell class (NONE)")},
@@ -589,7 +585,7 @@ PyTypeObject PyCellLibrary_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "cell_lib.Library",                     // tp_name
+  "cell_lib.CellLibrary",             // tp_name
   sizeof(CellLibraryObject),          // tp_basicsize
   (int)0,                             // tp_itemsize
 
@@ -681,7 +677,7 @@ PyCellLibrary_AsCellLibraryPtr(PyObject* py_obj)
 {
   // 型のチェック
   if ( !PyCellLibrary_Check(py_obj) ) {
-    PyErr_SetString(PyExc_TypeError, "cell_lib.Library is expected");
+    PyErr_SetString(PyExc_TypeError, "cell_lib.CellLibrary is expected");
     return NULL;
   }
 
@@ -716,7 +712,7 @@ CellLibraryObject_init(PyObject* m)
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "Library", (PyObject*)&PyCellLibrary_Type);
+  PyModule_AddObject(m, "CellLibrary", (PyObject*)&PyCellLibrary_Type);
 }
 
 END_NAMESPACE_YM

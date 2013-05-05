@@ -19,6 +19,12 @@ BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
+// 定数オブジェクト
+PyObject* kStrInput = NULL;
+PyObject* kStrOutput = NULL;
+PyObject* kStrInout = NULL;
+PyObject* kStrInternal = NULL;
+
 //////////////////////////////////////////////////////////////////////
 // Python 用の構造体定義
 //////////////////////////////////////////////////////////////////////
@@ -65,6 +71,23 @@ CellPin_name(CellPinObject* self,
 	     PyObject* args)
 {
   PyObject* result = self->mPin->name();
+
+  Py_INCREF(result);
+  return result;
+}
+
+// direction 関数
+PyObject*
+CellPin_direction(CellPinObject* self,
+		  PyObject* args)
+{
+  PyObject* result = NULL;
+  switch ( self->mPin->pin()->direction() ) {
+  case CellPin::kDirInput:    result = kStrInput; break;
+  case CellPin::kDirOutput:   result = kStrOutput; break;
+  case CellPin::kDirInout:    result = kStrInout; break;
+  case CellPin::kDirInternal: result = kStrInternal; break;
+  }
 
   Py_INCREF(result);
   return result;
@@ -244,9 +267,42 @@ PyMethodDef CellPin_methods[] = {
   //  - METH_STATIC
   //  - METH_COEXIST
   {"id", (PyCFunction)CellPin_id, METH_NOARGS,
-   "return ID"},
+   PyDoc_STR("return ID")},
   {"name", (PyCFunction)CellPin_name, METH_NOARGS,
-   "return name"},
+   PyDoc_STR("return name")},
+  {"direction", (PyCFunction)CellPin_direction, METH_NOARGS,
+   PyDoc_STR("return direction(pin-type)")},
+
+  {"input_id", (PyCFunction)CellPin_input_id, METH_NOARGS,
+   PyDoc_STR("return input ID")},
+  {"capacitance", (PyCFunction)CellPin_capacitance, METH_NOARGS,
+   PyDoc_STR("return capacitance")},
+  {"rise_capacitance", (PyCFunction)CellPin_rise_capacitance, METH_NOARGS,
+   PyDoc_STR("return rise capacitance")},
+  {"fall_capacitance", (PyCFunction)CellPin_fall_capacitance, METH_NOARGS,
+   PyDoc_STR("return fall capacitance")},
+
+  {"output_id", (PyCFunction)CellPin_output_id, METH_NOARGS,
+   PyDoc_STR("return output ID")},
+  {"function", (PyCFunction)CellPin_function, METH_NOARGS,
+   PyDoc_STR("return function expression")},
+  {"three_state", (PyCFunction)CellPin_three_state, METH_NOARGS,
+   PyDoc_STR("return tristate condition")},
+  {"max_fanout", (PyCFunction)CellPin_max_fanout, METH_NOARGS,
+   PyDoc_STR("return max fanout")},
+  {"min_fanout", (PyCFunction)CellPin_min_fanout, METH_NOARGS,
+   PyDoc_STR("return min fanout")},
+  {"max_capacitance", (PyCFunction)CellPin_max_capacitance, METH_NOARGS,
+   PyDoc_STR("return max capacitance")},
+  {"min_capacitance", (PyCFunction)CellPin_min_capacitance, METH_NOARGS,
+   PyDoc_STR("return min capacitance")},
+  {"max_transition", (PyCFunction)CellPin_max_transition, METH_NOARGS,
+   PyDoc_STR("return max transition time")},
+  {"min_transition", (PyCFunction)CellPin_min_transition, METH_NOARGS,
+   PyDoc_STR("return min transition time")},
+
+  {"internal_id", (PyCFunction)CellPin_internal_id, METH_NOARGS,
+   PyDoc_STR("return internal ID")},
 
   {NULL, NULL, 0, NULL} // end-marker
 };
@@ -261,7 +317,7 @@ PyTypeObject PyCellPin_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "cell_lib.Pin",                   // tp_name
+  "cell_lib.CellPin",           // tp_name
   sizeof(CellPinObject),        // tp_basicsize
   (int)0,                       // tp_itemsize
 
@@ -293,7 +349,7 @@ PyTypeObject PyCellPin_Type = {
   Py_TPFLAGS_DEFAULT,           // tp_flags
 
   // Documentation string
-  "Pin",                        // tp_doc
+  "Cell Pin",                   // tp_doc
 
   // Assigned meaning in release 2.0
 
@@ -377,7 +433,7 @@ PyCellPin_AsCellPinPtr(PyObject* py_obj)
 {
   // 型のチェック
   if ( !PyCellPin_Check(py_obj) ) {
-    PyErr_SetString(PyExc_TypeError, "cell_lib.Pin is expected");
+    PyErr_SetString(PyExc_TypeError, "cell_lib.CellPin is expected");
     return NULL;
   }
 
@@ -397,7 +453,7 @@ CellPinObject_init(PyObject* m)
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "Pin", (PyObject*)&PyCellPin_Type);
+  PyModule_AddObject(m, "CellPin", (PyObject*)&PyCellPin_Type);
 }
 
 END_NAMESPACE_YM

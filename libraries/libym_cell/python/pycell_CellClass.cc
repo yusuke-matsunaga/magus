@@ -72,6 +72,30 @@ CellClass_idmap(CellClassObject* self,
   return result;
 }
 
+// group_num 関数
+PyObject*
+CellClass_group_num(CellClassObject* self,
+		    PyObject* args)
+{
+  return PyObject_FromYmuint32(self->mClass->cell_class()->group_num());
+}
+
+// group 関数
+PyObject*
+CellClass_group(CellClassObject* self,
+		PyObject* args)
+{
+  ymuint pos = 0;
+  if ( !PyArg_ParseTuple(args, "I", &pos) ) {
+    return NULL;
+  }
+
+  PyObject* result = self->mClass->cell_group(pos);
+
+  Py_INCREF(result);
+  return result;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // CellClassObject のメソッドテーブル
@@ -92,9 +116,14 @@ PyMethodDef CellClass_methods[] = {
   //  - METH_STATIC
   //  - METH_COEXIST
   {"id", (PyCFunction)CellClass_id, METH_NOARGS,
-   "return ID"},
+   PyDoc_STR("return ID")},
   {"idmap", (PyCFunction)CellClass_idmap, METH_VARARGS,
-   "return ident map (unsigned int)"},
+   PyDoc_STR("return ident map (unsigned int)")},
+
+  {"cell_group_num", (PyCFunction)CellClass_group_num, METH_NOARGS,
+   PyDoc_STR("return group number")},
+  {"cell_group", (PyCFunction)CellClass_group, METH_VARARGS,
+   PyDoc_STR("return cell group (unsigned int)")},
 
   {NULL, NULL, 0, NULL} // end-marker
 };
@@ -109,7 +138,7 @@ PyTypeObject PyCellClass_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "cell_lib.Class",                     // tp_name
+  "cell_lib.CellClass",             // tp_name
   sizeof(CellClassObject),          // tp_basicsize
   (int)0,                           // tp_itemsize
 
@@ -218,7 +247,7 @@ PyCellClass_AsCellClassPtr(PyObject* py_obj)
 {
   // 型のチェック
   if ( !PyCellClass_Check(py_obj) ) {
-    PyErr_SetString(PyExc_TypeError, "cell_lib.Class is expected");
+    PyErr_SetString(PyExc_TypeError, "cell_lib.CellClass is expected");
     return NULL;
   }
 
@@ -238,7 +267,7 @@ CellClassObject_init(PyObject* m)
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "Class", (PyObject*)&PyCellClass_Type);
+  PyModule_AddObject(m, "CellClass", (PyObject*)&PyCellClass_Type);
 }
 
 END_NAMESPACE_YM

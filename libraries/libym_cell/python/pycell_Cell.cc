@@ -151,17 +151,17 @@ PyMethodDef Cell_methods[] = {
   //  - METH_COEXIST
 
   {"id", (PyCFunction)Cell_id, METH_NOARGS,
-   "return ID"},
+   PyDoc_STR("return ID")},
   {"name", (PyCFunction)Cell_name, METH_NOARGS,
-   "return name"},
+   PyDoc_STR("return name")},
   {"area", (PyCFunction)Cell_area, METH_NOARGS,
-   "return area"},
-  {"pin", (PyCFunction)Cell_pin, METH_VARARGS,
-   "return pin (name: string)"},
+   PyDoc_STR("return area")},
+  {"pin_by_name", (PyCFunction)Cell_pin, METH_VARARGS,
+   PyDoc_STR("return pin (name: string)")},
   {"pin_list", (PyCFunction)Cell_pin_list, METH_NOARGS,
-   "return pin-list"},
+   PyDoc_STR("return pin-list")},
   {"input_pin_list", (PyCFunction)Cell_input_pin_list, METH_NOARGS,
-   "return input-pin-list"},
+   PyDoc_STR("return input-pin-list")},
 
   {NULL, NULL, 0, NULL} // end-marker
 };
@@ -288,7 +288,7 @@ PyCellCell_set_group(PyObject* py_obj,
 
 // @brief PyObject から Cell へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @return Cell へんおポインタを返す．
+// @return Cell へのポインタを返す．
 // @note 変換が失敗したら TypeError を送出し，NULL を返す．
 const Cell*
 PyCellCell_AsCellPtr(PyObject* py_obj)
