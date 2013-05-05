@@ -637,6 +637,9 @@ public:
   /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
   /// @param[in] output_id 出力ピン番号 ( 0 <= output_id < cell->output_num2() )
   /// @param[in] name 出力ピン名
+  /// @param[in] has_logic 論理式を持つとき true にするフラグ
+  /// @param[in] logic_expr 論理式
+  /// @param[in] tristate_expr tristate 条件式
   /// @param[in] max_fanout 最大ファンアウト容量
   /// @param[in] min_fanout 最小ファンアウト容量
   /// @param[in] max_capacitance 最大負荷容量
@@ -649,6 +652,9 @@ public:
 		  ymuint pin_id,
 		  ymuint output_id,
 		  const string& name,
+		  bool has_logic,
+		  const LogExpr& logic_expr,
+		  const LogExpr& tristate_expr,
 		  CellCapacitance max_fanout,
 		  CellCapacitance min_fanout,
 		  CellCapacitance max_capacitance,
@@ -662,6 +668,9 @@ public:
   /// @param[in] input_id 入力ピン番号 ( 0 <= input_id < cell->input_num2() )
   /// @param[in] output_id 出力ピン番号 ( 0 <= output_id < cell->output_num2() )
   /// @param[in] name 入出力ピン名
+  /// @param[in] has_logic 論理式を持つとき true にするフラグ
+  /// @param[in] logic_expr 論理式
+  /// @param[in] tristate_expr tristate 条件式
   /// @param[in] capacitance 入力ピンの負荷容量
   /// @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
   /// @param[in] fall_capacitance 入力ピンの立ち下がり負荷容量
@@ -678,6 +687,9 @@ public:
 		 ymuint input_id,
 		 ymuint output_id,
 		 const string& name,
+		 bool has_logic,
+		 const LogExpr& logic_expr,
+		 const LogExpr& tristate_expr,
 		 CellCapacitance capacitance,
 		 CellCapacitance rise_capacitance,
 		 CellCapacitance fall_capacitance,

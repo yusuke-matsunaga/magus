@@ -454,6 +454,13 @@ CellPinObject_init(PyObject* m)
 
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "CellPin", (PyObject*)&PyCellPin_Type);
+
+  // 定数オブジェクトの生成
+  kStrInput    = PyObject_FromString("Input");
+  kStrOutput   = PyObject_FromString("Output");
+  kStrInout    = PyObject_FromString("Inout");
+  kStrInternal = PyObject_FromString("Internal");
+
 }
 
 END_NAMESPACE_YM

@@ -11,6 +11,8 @@
 #include "ym_cell/CellPin.h"
 #include "ym_cell/CellCapacitance.h"
 #include "ym_cell/CellTime.h"
+#include "ym_logic/LogExpr.h"
+#include "ym_logic/LogExprWriter.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -25,8 +27,21 @@ PyOutputPin::PyOutputPin(const CellPin* pin) :
 {
   assert_cond( pin->is_output(), __FILE__, __LINE__);
   mOutputId = PyObject_FromYmuint32(pin->output_id());
-  mFunction = NULL;
-  mThreeState = NULL;
+
+  LogExprWriter lew;
+
+  string func_str;
+  if ( pin->has_function() ) {
+    func_str = lew.dump_string(pin->function());
+  }
+  mFunction = PyObject_FromString(func_str);
+
+  string tristate_str;
+  if ( pin->has_three_state() ) {
+    tristate_str = lew.dump_string(pin->three_state());
+  }
+  mThreeState = PyObject_FromString(tristate_str);
+
   mMaxFanout = PyCellCapacitance_FromCellCapacitance(pin->max_fanout());
   mMinFanout = PyCellCapacitance_FromCellCapacitance(pin->min_fanout());
   mMaxCapacitance = PyCellCapacitance_FromCellCapacitance(pin->max_capacitance());
