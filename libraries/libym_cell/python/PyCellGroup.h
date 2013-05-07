@@ -126,9 +126,6 @@ private:
   // もとの CellGroup
   const CellGroup* mGroup;
 
-  // ID
-  PyObject* mId;
-
   // 代表クラス
   PyObject* mRepClass;
 
@@ -151,14 +148,6 @@ const CellGroup*
 PyCellGroup::cell_group()
 {
   return mGroup;
-}
-
-// @brief ID番号を返す．
-inline
-PyObject*
-PyCellGroup::id()
-{
-  return mId;
 }
 
 // @brief 代表クラスを返す．

@@ -22,20 +22,18 @@ PyInternalPin::PyInternalPin(const CellPin* pin) :
   PyPin(pin)
 {
   assert_cond(pin->is_internal(), __FILE__, __LINE__);
-  mInternalId = PyObject_FromYmuint32(pin->internal_id());
 }
 
 // @brief デストラクタ
 PyInternalPin::~PyInternalPin()
 {
-  Py_DECREF(mInternalId);
 }
 
 // @brief 内部ピン番号を返す．
 PyObject*
 PyInternalPin::internal_id()
 {
-  return mInternalId;
+  return PyObject_FromYmuint32(pin()->internal_id());
 }
 
 END_NAMESPACE_YM

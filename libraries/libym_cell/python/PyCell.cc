@@ -26,13 +26,9 @@ PyCellPin_FromCellPin(const CellPin* pin);
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PyCell::PyCell(const Cell* cell)
+PyCell::PyCell(const Cell* cell) :
+  mCell(cell)
 {
-  mCell = cell;
-  mId = PyObject_FromYmuint32(cell->id());
-  mName = PyObject_FromString(cell->name());
-  mArea = PyCellArea_FromCellArea(cell->area());
-
   ymuint np = cell->pin_num();
   mPinArray = new PyObject*[np];
   for (ymuint i = 0; i < np; ++ i) {
@@ -46,10 +42,6 @@ PyCell::PyCell(const Cell* cell)
 // @brief デストラクタ
 PyCell::~PyCell()
 {
-  Py_DECREF(mId);
-  Py_DECREF(mName);
-  Py_DECREF(mArea);
-
   ymuint np = mCell->pin_num();
   for (ymuint i = 0; i < np; ++ i) {
     Py_DECREF(mPinArray[i]);
@@ -65,6 +57,27 @@ PyCell::set_group(PyObject* group)
 {
   mGroup = group;
   Py_INCREF(mGroup);
+}
+
+// @brief ID番号を得る．
+PyObject*
+PyCell::id()
+{
+  return PyObject_FromYmuint32(cell()->id());
+}
+
+// @brief 名前を得る．
+PyObject*
+PyCell::name()
+{
+  return PyObject_FromString(cell()->name());
+}
+
+// @brief 面積を得る．
+PyObject*
+PyCell::area()
+{
+  return PyCellArea_FromCellArea(cell()->area());
 }
 
 // @brief ピン番号からピンを得る．

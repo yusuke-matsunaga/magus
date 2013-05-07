@@ -87,32 +87,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 出力ピン番号
-  PyObject* mOutputId;
-
   // 機能を表す論理式
   PyObject* mFunction;
 
   // three_state 条件を表す論理式
   PyObject* mThreeState;
-
-  // 最大ファンアウト容量
-  PyObject* mMaxFanout;
-
-  // 最小ファンアウト容量
-  PyObject* mMinFanout;
-
-  // 最大負荷容量
-  PyObject* mMaxCapacitance;
-
-  // 最小負荷容量
-  PyObject* mMinCapacitance;
-
-  // 最大遷移時間
-  PyObject* mMaxTransition;
-
-  // 最小遷移時間
-  PyObject* mMinTransition;
 
 };
 

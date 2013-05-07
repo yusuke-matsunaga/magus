@@ -24,8 +24,6 @@ PyCellClass::PyCellClass(const CellClass* cell_class,
 			 PyLibrary* py_library) :
   mClass(cell_class)
 {
-  mId = PyObject_FromYmuint32(cell_class->id());
-
   ymuint n1 = cell_class->idmap_num();
   mIdMapList = new PyObject*[n1];
   for (ymuint i = 0; i < n1; ++ i) {
@@ -45,8 +43,6 @@ PyCellClass::PyCellClass(const CellClass* cell_class,
 // @brief デストラクタ
 PyCellClass::~PyCellClass()
 {
-  Py_DECREF(mId);
-
   ymuint n1 = mClass->idmap_num();
   for (ymuint i = 0; i < n1; ++ i) {
     Py_DECREF(mIdMapList[i]);
@@ -60,11 +56,18 @@ PyCellClass::~PyCellClass()
   delete [] mGroupList;
 }
 
+// @brief ID番号を返す．
+PyObject*
+PyCellClass::id()
+{
+  return PyObject_FromYmuint32(cell_class()->id());
+}
+
 // @brief 同位体変換を得る．
 PyObject*
 PyCellClass::idmap(ymuint pos)
 {
-  assert_cond( pos < mClass->idmap_num(), __FILE__, __LINE__);
+  assert_cond( pos < cell_class()->idmap_num(), __FILE__, __LINE__);
   return mIdMapList[pos];
 }
 
@@ -72,7 +75,7 @@ PyCellClass::idmap(ymuint pos)
 PyObject*
 PyCellClass::cell_group(ymuint pos)
 {
-  assert_cond( pos < mClass->group_num(), __FILE__, __LINE__);
+  assert_cond( pos < cell_class()->group_num(), __FILE__, __LINE__);
   return mGroupList[pos];
 }
 

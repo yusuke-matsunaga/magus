@@ -21,8 +21,6 @@ BEGIN_NAMESPACE_YM
 PyPatGraph::PyPatGraph(const CellPatGraph* graph) :
   mPatGraph(graph)
 {
-  mRepId = PyObject_FromYmuint32(graph->rep_id());
-  mRootInfo = Py_BuildValue("(Ii)", graph->root_id(), graph->root_inv());
   ymuint ne = graph->edge_num();
   mEdgeList = PyList_New(ne);
   for (ymuint i = 0; i < ne; ++ i) {
@@ -34,9 +32,21 @@ PyPatGraph::PyPatGraph(const CellPatGraph* graph) :
 // @brief デストラクタ
 PyPatGraph::~PyPatGraph()
 {
-  Py_DECREF(mRepId);
-  Py_DECREF(mRootInfo);
   Py_DECREF(mEdgeList);
+}
+
+// @brief 代表関数番号を返す．
+PyObject*
+PyPatGraph::rep_id()
+{
+  return PyObject_FromYmuint32(pat_graph()->rep_id());
+}
+
+// @brief 根のノード番号と反転属性のタプルを返す．
+PyObject*
+PyPatGraph::root_info()
+{
+  return Py_BuildValue("(Ii)", pat_graph()->root_id(), pat_graph()->root_inv());
 }
 
 END_NAMESPACE_YM

@@ -24,7 +24,6 @@ PyCellGroup::PyCellGroup(const CellGroup* group,
 			 PyLibrary* py_library) :
   mGroup(group)
 {
-  mId = PyObject_FromYmuint32(group->id());
   mRepClass = NULL;
 
   ymuint nc = group->cell_num();
@@ -40,7 +39,6 @@ PyCellGroup::PyCellGroup(const CellGroup* group,
 // @brief デストラクタ
 PyCellGroup::~PyCellGroup()
 {
-  Py_DECREF(mId);
   Py_DECREF(mRepClass);
 
   ymuint nc = mGroup->cell_num();
@@ -58,12 +56,19 @@ PyCellGroup::set_rep(PyObject* rep)
   Py_INCREF(mRepClass);
 }
 
+// @brief ID番号を返す．
+PyObject*
+PyCellGroup::id()
+{
+  return PyObject_FromYmuint32(cell_group()->id());
+}
+
 // @brief セルを返す．
 // @param[in] pos 位置番号
 PyObject*
 PyCellGroup::cell(ymuint pos)
 {
-  assert_cond( pos < mGroup->cell_num(), __FILE__, __LINE__);
+  assert_cond( pos < cell_group()->cell_num(), __FILE__, __LINE__);
   return mCellList[pos];
 }
 

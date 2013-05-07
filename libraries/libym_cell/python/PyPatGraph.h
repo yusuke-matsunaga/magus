@@ -59,12 +59,6 @@ private:
   // CellPatGraph
   const CellPatGraph* mPatGraph;
 
-  // 代表関数番号
-  PyObject* mRepId;
-
-  // 根のノード番号と反転属性のタプル
-  PyObject* mRootInfo;
-
   // 枝番号のリスト
   PyObject* mEdgeList;
 
@@ -81,22 +75,6 @@ const CellPatGraph*
 PyPatGraph::pat_graph()
 {
   return mPatGraph;
-}
-
-// @brief 代表関数番号を返す．
-inline
-PyObject*
-PyPatGraph::rep_id()
-{
-  return mRepId;
-}
-
-// @brief 根のノード番号と反転属性のタプルを返す．
-inline
-PyObject*
-PyPatGraph::root_info()
-{
-  return mRootInfo;
 }
 
 // @brief 枝番号のリストを返す．

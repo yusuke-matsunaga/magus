@@ -21,15 +21,25 @@ BEGIN_NAMESPACE_YM
 PyPin::PyPin(const CellPin* pin) :
   mPin(pin)
 {
-  mId = PyObject_FromYmuint32(pin->pin_id());
-  mName = PyObject_FromString(pin->name());
 }
 
 // @brief デストラクタ
 PyPin::~PyPin()
 {
-  Py_DECREF(mId);
-  Py_DECREF(mName);
+}
+
+// @brief ピン番号を得る．
+PyObject*
+PyPin::id()
+{
+  return PyObject_FromYmuint32(mPin->pin_id());
+}
+
+// @brief ピン名を得る．
+PyObject*
+PyPin::name()
+{
+  return PyObject_FromString(mPin->name());
 }
 
 // @brief 入力ピン番号を得る．

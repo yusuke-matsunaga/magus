@@ -62,9 +62,6 @@ private:
   // もとの CellClass
   const CellClass* mClass;
 
-  // ID
-  PyObject* mId;
-
   // 同位体変換のリスト
   PyObject** mIdMapList;
 
@@ -84,14 +81,6 @@ const CellClass*
 PyCellClass::cell_class()
 {
   return mClass;
-}
-
-// @brief ID番号を返す．
-inline
-PyObject*
-PyCellClass::id()
-{
-  return mId;
 }
 
 END_NAMESPACE_YM

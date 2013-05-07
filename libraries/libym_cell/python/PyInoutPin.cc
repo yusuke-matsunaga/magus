@@ -23,47 +23,39 @@ PyInoutPin::PyInoutPin(const CellPin* pin) :
   PyOutputPin(pin)
 {
   assert_cond( pin->is_inout(), __FILE__, __LINE__);
-  mInputId = PyObject_FromYmuint32(pin->input_id());
-  mCapacitance = PyCellCapacitance_FromCellCapacitance(pin->capacitance());
-  mRiseCapacitance = PyCellCapacitance_FromCellCapacitance(pin->rise_capacitance());
-  mFallCapacitance = PyCellCapacitance_FromCellCapacitance(pin->fall_capacitance());
 }
 
 // @brief デストラクタ
 PyInoutPin::~PyInoutPin()
 {
-  Py_DECREF(mInputId);
-  Py_DECREF(mCapacitance);
-  Py_DECREF(mRiseCapacitance);
-  Py_DECREF(mFallCapacitance);
 }
 
 // @brief 入力ピン番号を得る．
 PyObject*
 PyInoutPin::input_id()
 {
-  return mInputId;
+  return PyObject_FromYmuint32(pin()->input_id());
 }
 
 // @brief 負荷容量を返す．
 PyObject*
 PyInoutPin::capacitance()
 {
-  return mCapacitance;
+  return PyCellCapacitance_FromCellCapacitance(pin()->capacitance());
 }
 
 // @brief 立ち上がりの負荷容量を返す．
 PyObject*
 PyInoutPin::rise_capacitance()
 {
-  return mRiseCapacitance;
+  return PyCellCapacitance_FromCellCapacitance(pin()->rise_capacitance());
 }
 
 // @brief 立ち下がりの負荷容量を返す．
 PyObject*
 PyInoutPin::fall_capacitance()
 {
-  return mFallCapacitance;
+  return PyCellCapacitance_FromCellCapacitance(pin()->fall_capacitance());
 }
 
 END_NAMESPACE_YM

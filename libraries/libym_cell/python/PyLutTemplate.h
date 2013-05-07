@@ -61,15 +61,6 @@ private:
   // CellLutTemplate
   const CellLutTemplate* mLutTemplate;
 
-  // 名前
-  PyObject* mName;
-
-  // 変数型の配列
-  PyObject** mVariableTypeArray;
-
-  // デフォルトインデックス値の配列
-  PyObject*** mIndexArray;
-
 };
 
 
@@ -83,14 +74,6 @@ const CellLutTemplate*
 PyLutTemplate::lut_template()
 {
   return mLutTemplate;
-}
-
-// @brief 名前を返す．
-inline
-PyObject*
-PyLutTemplate::name()
-{
-  return mName;
 }
 
 END_NAMESPACE_YM

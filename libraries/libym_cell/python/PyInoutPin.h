@@ -56,24 +56,6 @@ public:
   PyObject*
   fall_capacitance();
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 入力ピン番号
-  PyObject* mInputId;
-
-  // 負荷容量
-  PyObject* mCapacitance;
-
-  // 立ち上がりの負荷容量
-  PyObject* mRiseCapacitance;
-
-  // 立ち下がりの負荷容量
-  PyObject* mFallCapacitance;
-
 };
 
 END_NAMESPACE_YM

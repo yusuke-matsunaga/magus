@@ -73,15 +73,6 @@ private:
   // Cell の本体
   const Cell* mCell;
 
-  // ID 番号を表すオブジェクト
-  PyObject* mId;
-
-  // 名前を表すオブジェクト
-  PyObject* mName;
-
-  // area を表すオブジェクト
-  PyObject* mArea;
-
   // ピンを表すオブジェクトの配列
   PyObject** mPinArray;
 
@@ -101,30 +92,6 @@ const Cell*
 PyCell::cell()
 {
   return mCell;
-}
-
-// @brief ID番号を得る．
-inline
-PyObject*
-PyCell::id()
-{
-  return mId;
-}
-
-// @brief 名前を得る．
-inline
-PyObject*
-PyCell::name()
-{
-  return mName;
-}
-
-// @brief 面積を得る．
-inline
-PyObject*
-PyCell::area()
-{
-  return mArea;
 }
 
 // @brief セルグループを得る．

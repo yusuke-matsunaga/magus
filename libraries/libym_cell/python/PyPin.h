@@ -144,12 +144,6 @@ private:
   // もとの CellPin
   const CellPin* mPin;
 
-  // ピン番号
-  PyObject* mId;
-
-  // ピン名
-  PyObject* mName;
-
 };
 
 
@@ -164,23 +158,6 @@ PyPin::pin()
 {
   return mPin;
 }
-
-// @brief ピン番号を得る．
-inline
-PyObject*
-PyPin::id()
-{
-  return mId;
-}
-
-// @brief ピン名を得る．
-inline
-PyObject*
-PyPin::name()
-{
-  return mName;
-}
-
 
 END_NAMESPACE_YM
 
