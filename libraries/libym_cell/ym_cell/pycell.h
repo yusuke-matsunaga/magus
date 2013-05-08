@@ -173,6 +173,58 @@ PyObject* Py_kCellTimeInf;
 
 
 //////////////////////////////////////////////////////////////////////
+// PyCellResistance: 抵抗値を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief CellResistance を表す型
+extern
+PyTypeObject PyCellResistance_Type;
+
+/// @brief PyCellResistance の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyCellResistance_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyCellResistance_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyCellResistance_Type;
+}
+
+/// @brief CellResistance から CellResistanceObject を生成する．
+/// @param[in] obj CellResistance オブジェクト
+extern
+PyObject*
+PyCellResistance_FromCellResistance(const CellResistance& obj);
+
+/// @brief double から CellResistanceObject を生成する．
+/// @param[in] val 値
+extern
+PyObject*
+PyCellResistance_FromDouble(double val);
+
+/// @brief PyObject から CellResistance を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return CellResistance を返す．
+/// @note 変換が失敗したら TypeError を送出し，CellResistance(0.0) を返す．
+extern
+CellResistance
+PyCellResistance_AsCellResistance(PyObject* py_obj);
+
+/// @brief PyObject から double を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return double を返す．
+/// @note 変換が失敗したら TypeError を送出し，0.0 を返す．
+extern
+double
+PyCellResistance_AsDouble(PyObject* py_obj);
+
+/// @brief CellResistance の無限大定数を表すオブジェクト
+extern
+PyObject* Py_kCellResistanceInf;
+
+
+//////////////////////////////////////////////////////////////////////
 // PyCellLibrary: セルライブラリを表す型
 //////////////////////////////////////////////////////////////////////
 
@@ -338,6 +390,42 @@ PyCellPatGraph_Check(PyObject* obj)
 extern
 const CellPatGraph*
 PyCellPatGraph_AsCellPatGraphPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyCellTiming: CellTiming を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief CellTiming を表すタイプオブジェクト
+extern
+PyTypeObject PyCellTiming_Type;
+
+/// @brief PyCellTiming の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyCellTiming_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyCellTiming_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyCellTiming_Type;
+}
+
+/// @brief CellTiming から PyObject を作る．
+/// @param[in] timing CellTiming へのポインタ
+/// @return timing を表す PyObject
+extern
+PyObject*
+PyCellTiming_FromCellTiming(const CellTiming* timing);
+
+/// @brief PyObject から CellTiming へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return CellTiming へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+const CellTiming*
+PyCellTiming_AsCellTimingPtr(PyObject* py_obj);
+
 
 
 //////////////////////////////////////////////////////////////////////

@@ -9,10 +9,10 @@
 
 #include "ym_cell/pycell.h"
 #include "ym_cell/CellPin.h"
-#include "PyInputPin.h"
-#include "PyOutputPin.h"
-#include "PyInoutPin.h"
-#include "PyInternalPin.h"
+#include "ym_cell/CellCapacitance.h"
+#include "ym_cell/CellTime.h"
+#include "ym_logic/LogExpr.h"
+#include "ym_logic/LogExprWriter.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -35,8 +35,8 @@ struct CellPinObject
   // Python のお約束
   PyObject_HEAD
 
-  // PyPin
-  PyPin* mPin;
+  // CellPin
+  const CellPin* mPin;
 
 };
 
@@ -49,8 +49,6 @@ struct CellPinObject
 void
 CellPin_dealloc(CellPinObject* self)
 {
-  delete self->mPin;
-
   PyObject_Del(self);
 }
 
@@ -59,10 +57,7 @@ PyObject*
 CellPin_id(CellPinObject* self,
 	   PyObject* args)
 {
-  PyObject* result = self->mPin->id();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromYmuint32(self->mPin->pin_id());
 }
 
 // name 関数
@@ -70,10 +65,7 @@ PyObject*
 CellPin_name(CellPinObject* self,
 	     PyObject* args)
 {
-  PyObject* result = self->mPin->name();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromString(self->mPin->name());
 }
 
 // direction 関数
@@ -82,7 +74,7 @@ CellPin_direction(CellPinObject* self,
 		  PyObject* args)
 {
   PyObject* result = NULL;
-  switch ( self->mPin->pin()->direction() ) {
+  switch ( self->mPin->direction() ) {
   case CellPin::kDirInput:    result = kStrInput; break;
   case CellPin::kDirOutput:   result = kStrOutput; break;
   case CellPin::kDirInout:    result = kStrInout; break;
@@ -98,10 +90,7 @@ PyObject*
 CellPin_input_id(CellPinObject* self,
 		 PyObject* args)
 {
-  PyObject* result = self->mPin->input_id();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromYmuint32(self->mPin->input_id());
 }
 
 // capacitance 関数
@@ -109,10 +98,7 @@ PyObject*
 CellPin_capacitance(CellPinObject* self,
 		    PyObject* args)
 {
-  PyObject* result = self->mPin->capacitance();
-
-  Py_INCREF(result);
-  return result;
+  return PyCellCapacitance_FromCellCapacitance(self->mPin->capacitance());
 }
 
 // rise_capacitance 関数
@@ -120,10 +106,7 @@ PyObject*
 CellPin_rise_capacitance(CellPinObject* self,
 			 PyObject* args)
 {
-  PyObject* result = self->mPin->rise_capacitance();
-
-  Py_INCREF(result);
-  return result;
+  return PyCellCapacitance_FromCellCapacitance(self->mPin->rise_capacitance());
 }
 
 // fall_capacitance 関数
@@ -131,10 +114,7 @@ PyObject*
 CellPin_fall_capacitance(CellPinObject* self,
 			 PyObject* args)
 {
-  PyObject* result = self->mPin->fall_capacitance();
-
-  Py_INCREF(result);
-  return result;
+  return PyCellCapacitance_FromCellCapacitance(self->mPin->fall_capacitance());
 }
 
 // output_id 関数
@@ -142,10 +122,7 @@ PyObject*
 CellPin_output_id(CellPinObject* self,
 		  PyObject* args)
 {
-  PyObject* result = self->mPin->output_id();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromYmuint32(self->mPin->output_id());
 }
 
 // function 関数
@@ -153,10 +130,12 @@ PyObject*
 CellPin_function(CellPinObject* self,
 		 PyObject* args)
 {
-  PyObject* result = self->mPin->function();
-
-  Py_INCREF(result);
-  return result;
+  string func_str;
+  if ( self->mPin->has_function() ) {
+    LogExprWriter lew;
+    func_str = lew.dump_string(self->mPin->function());
+  }
+  return PyObject_FromString(func_str);
 }
 
 // three_state 関数
@@ -164,10 +143,12 @@ PyObject*
 CellPin_three_state(CellPinObject* self,
 		    PyObject* args)
 {
-  PyObject* result = self->mPin->three_state();
-
-  Py_INCREF(result);
-  return result;
+  string tristate_str;
+  if ( self->mPin->has_three_state() ) {
+    LogExprWriter lew;
+    tristate_str = lew.dump_string(self->mPin->three_state());
+  }
+  return PyObject_FromString(tristate_str);
 }
 
 // max_fanout 関数
@@ -175,10 +156,7 @@ PyObject*
 CellPin_max_fanout(CellPinObject* self,
 		   PyObject* args)
 {
-  PyObject* result = self->mPin->max_fanout();
-
-  Py_INCREF(result);
-  return result;
+  return PyCellCapacitance_FromCellCapacitance(self->mPin->max_fanout());
 }
 
 // min_fanout 関数
@@ -186,10 +164,7 @@ PyObject*
 CellPin_min_fanout(CellPinObject* self,
 		   PyObject* args)
 {
-  PyObject* result = self->mPin->min_fanout();
-
-  Py_INCREF(result);
-  return result;
+  return PyCellCapacitance_FromCellCapacitance(self->mPin->min_fanout());
 }
 
 // max_capacitance 関数
@@ -197,10 +172,7 @@ PyObject*
 CellPin_max_capacitance(CellPinObject* self,
 			PyObject* args)
 {
-  PyObject* result = self->mPin->max_capacitance();
-
-  Py_INCREF(result);
-  return result;
+  return PyCellCapacitance_FromCellCapacitance(self->mPin->max_capacitance());
 }
 
 // min_capacitance 関数
@@ -208,10 +180,7 @@ PyObject*
 CellPin_min_capacitance(CellPinObject* self,
 			PyObject* args)
 {
-  PyObject* result = self->mPin->min_capacitance();
-
-  Py_INCREF(result);
-  return result;
+  return PyCellCapacitance_FromCellCapacitance(self->mPin->min_capacitance());
 }
 
 // max_transition 関数
@@ -219,10 +188,7 @@ PyObject*
 CellPin_max_transition(CellPinObject*  self,
 		       PyObject* args)
 {
-  PyObject* result = self->mPin->max_transition();
-
-  Py_INCREF(result);
-  return result;
+  return PyCellTime_FromCellTime(self->mPin->max_transition());
 }
 
 // min_transition 関数
@@ -230,10 +196,7 @@ PyObject*
 CellPin_min_transition(CellPinObject*  self,
 		       PyObject* args)
 {
-  PyObject* result = self->mPin->min_transition();
-
-  Py_INCREF(result);
-  return result;
+  return PyCellTime_FromCellTime(self->mPin->min_transition());
 }
 
 // internal_id 関数
@@ -241,10 +204,7 @@ PyObject*
 CellPin_internal_id(CellPinObject* self,
 		    PyObject* args)
 {
-  PyObject* result = self->mPin->internal_id();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromYmuint32(self->mPin->internal_id());
 }
 
 
@@ -411,14 +371,7 @@ PyCellPin_FromCellPin(const CellPin* pin)
     return NULL;
   }
 
-  PyPin* pypin = NULL;
-  switch ( pin->direction() ){
-  case CellPin::kDirInput:    pypin = new PyInputPin(pin); break;
-  case CellPin::kDirOutput:   pypin = new PyOutputPin(pin); break;
-  case CellPin::kDirInout:    pypin = new PyInoutPin(pin); break;
-  case CellPin::kDirInternal: pypin = new PyInternalPin(pin); break;
-  }
-  self->mPin = pypin;
+  self->mPin = pin;
 
   Py_INCREF(self);
   return (PyObject*)self;
@@ -440,7 +393,7 @@ PyCellPin_AsCellPinPtr(PyObject* py_obj)
   // 強制的にキャスト
   CellPinObject* my_obj = (CellPinObject*)py_obj;
 
-  return my_obj->mPin->pin();
+  return my_obj->mPin;
 }
 
 // CellPinObject 関係の初期化を行う．

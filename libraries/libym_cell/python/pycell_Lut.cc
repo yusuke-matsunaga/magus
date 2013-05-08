@@ -9,7 +9,6 @@
 
 #include "ym_cell/pycell.h"
 #include "ym_cell/CellLut.h"
-#include "PyLut.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -26,8 +25,8 @@ struct LutObject
   // Python のお約束
   PyObject_HEAD
 
-  // PyLut
-  PyLut* mLut;
+  // CellLut
+  const CellLut* mLut;
 
 };
 
@@ -40,20 +39,7 @@ struct LutObject
 void
 Lut_dealloc(LutObject* self)
 {
-  delete self->mLut;
-
   PyObject_Del(self);
-}
-
-// lut_template 関数
-PyObject*
-Lut_lut_template(LutObject* self,
-		 PyObject* args)
-{
-  PyObject* result = self->mLut->lut_template();
-
-  Py_INCREF(result);
-  return result;
 }
 
 // template_name 関数
@@ -61,10 +47,7 @@ PyObject*
 Lut_template_name(LutObject* self,
 		  PyObject* args)
 {
-  PyObject* result = self->mLut->template_name();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromString(self->mLut->template_name());
 }
 
 // dimension 関数
@@ -72,7 +55,7 @@ PyObject*
 Lut_dimension(LutObject* self,
 	      PyObject* args)
 {
-  ymuint dim = self->mLut->lut()->dimension();
+  ymuint dim = self->mLut->dimension();
   return PyObject_FromYmuint32(dim);
 }
 
@@ -86,10 +69,47 @@ Lut_variable_type(LutObject* self,
     return NULL;
   }
 
-  PyObject* result = self->mLut->variable_type(var);
-
-  Py_INCREF(result);
-  return result;
+  tCellVarType var_type = self->mLut->variable_type(var);
+  string vt_str;
+  switch ( var_type ) {
+  case kVarInputNetTransition:
+    vt_str = "input_net_transition";
+    break;
+  case kVarTotalOutputNetCapacitance:
+    vt_str = "total_output_net_capacitance";
+    break;
+  case kVarOutputNetLength:
+    vt_str = "output_net_length";
+    break;
+  case kVarOutputNetWireCap:
+    vt_str = "output_net_wire_cap";
+    break;
+  case kVarOutputNetPinCap:
+    vt_str = "output_net_pin_cap";
+    break;
+  case kVarRelatedOutTotalOutputNetCapacitance:
+    vt_str = "related_out_total_output_net_capacitance";
+    break;
+  case kVarRelatedOutOutputNetLength:
+    vt_str = "related_out_output_net_length";
+    break;
+  case kVarRelatedOutOutputNetWireCap:
+    vt_str = "related_out_output_net_wire_cap";
+    break;
+  case kVarRelatedOutOutputNetPinCap:
+    vt_str = "related_out_output_net_pin_cap";
+    break;
+  case kVarConstrainedPinTransition:
+    vt_str = "constrained_pin_transition";
+    break;
+  case kVarRelatedPinTransition:
+    vt_str = "related_pin_transition";
+    break;
+  case kVarNone:
+    vt_str = "none";
+    break;
+  }
+  return PyObject_FromString(vt_str);
 }
 
 // index_num 関数
@@ -102,7 +122,7 @@ Lut_index_num(LutObject* self,
     return NULL;
   }
 
-  ymuint n = self->mLut->lut()->index_num(var);
+  ymuint n = self->mLut->index_num(var);
 
   return PyObject_FromYmuint32(n);
 }
@@ -118,7 +138,7 @@ Lut_index(LutObject* self,
     return NULL;
   }
 
-  double index = self->mLut->lut()->index(var, pos);
+  double index = self->mLut->index(var, pos);
 
   return PyObject_FromDouble(index);
 }
@@ -150,7 +170,7 @@ Lut_grid_value(LutObject* self,
     pos_array[i] = pos;
   }
 
-  double val = self->mLut->lut()->grid_value(pos_array);
+  double val = self->mLut->grid_value(pos_array);
 
   return PyObject_FromDouble(val);
 }
@@ -182,7 +202,7 @@ Lut_value(LutObject* self,
     val_array[i] = val;
   }
 
-  double val = self->mLut->lut()->value(val_array);
+  double val = self->mLut->value(val_array);
 
   return PyObject_FromDouble(val);
 }
@@ -207,8 +227,6 @@ PyMethodDef Lut_methods[] = {
   //  - METH_STATIC
   //  - METH_COEXIST
 
-  {"lut_template", (PyCFunction)Lut_lut_template, METH_NOARGS,
-   PyDoc_STR("return parent template (NONE)")},
   {"template_name", (PyCFunction)Lut_template_name, METH_NOARGS,
    PyDoc_STR("return template's name (NONE)")},
   {"dimension", (PyCFunction)Lut_dimension, METH_NOARGS,
@@ -330,7 +348,7 @@ PyCellLut_FromCellLut(const CellLut* lut)
     return NULL;
   }
 
-  self->mLut = new PyLut(lut);
+  self->mLut = lut;
 
   Py_INCREF(self);
   return (PyObject*)self;
@@ -352,7 +370,7 @@ PyCellLut_AsCellLutPtr(PyObject* py_obj)
   // 強制的にキャスト
   LutObject* my_obj = (LutObject*)py_obj;
 
-  return my_obj->mLut->lut();
+  return my_obj->mLut;
 }
 
 // CellLutObject 関係の初期化を行なう．

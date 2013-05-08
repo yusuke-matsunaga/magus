@@ -26,29 +26,15 @@ libym_cell_python_la_SOURCES = \
 	pycell_Lut.cc \
 	pycell_CellArea.cc \
 	pycell_CellCapacitance.cc \
+	pycell_CellResistance.cc \
 	pycell_CellTime.cc \
+	pycell_CellTiming.cc \
 	PyLibrary.h \
 	PyLibrary.cc \
-	PyCellClass.h \
-	PyCellClass.cc \
-	PyCellGroup.h \
-	PyCellGroup.cc \
 	PyCell.h \
 	PyCell.cc \
-	PyPin.h \
-	PyPin.cc \
-	PyInputPin.h \
-	PyInputPin.cc \
-	PyOutputPin.h \
-	PyOutputPin.cc \
-	PyInoutPin.h \
-	PyInoutPin.cc \
-	PyInternalPin.h \
-	PyInternalPin.cc \
 	PyPatGraph.h \
-	PyPatGraph.cc \
-	PyLut.h \
-	PyLut.cc
+	PyPatGraph.cc
 
 libym_cell_python_la_LIBADD =
 

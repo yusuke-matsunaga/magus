@@ -9,7 +9,8 @@
 
 #include "ym_cell/pycell.h"
 #include "ym_cell/CellGroup.h"
-#include "PyCellGroup.h"
+#include "ym_cell/Cell.h"
+#include "PyLibrary.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -26,8 +27,14 @@ struct CellGroupObject
   // Python のお約束
   PyObject_HEAD
 
-  // PyCellGroup
-  PyCellGroup* mGroup;
+  // CellGroup
+  const CellGroup* mGroup;
+
+  // 代表クラスを表すオブジェクト
+  PyObject* mRepClass;
+
+  // セルのオブジェクトのリスト
+  PyObject* mCellList;
 
 };
 
@@ -40,7 +47,8 @@ struct CellGroupObject
 void
 CellGroup_dealloc(CellGroupObject* self)
 {
-  delete self->mGroup;
+  Py_DECREF(self->mRepClass);
+  Py_DECREF(self->mCellList);
 
   PyObject_Del(self);
 }
@@ -50,10 +58,7 @@ PyObject*
 CellGroup_id(CellGroupObject* self,
 	     PyObject* args)
 {
-  PyObject* result = self->mGroup->id();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromYmuint32(self->mGroup->id());
 }
 
 // cell_class 関数
@@ -61,7 +66,7 @@ PyObject*
 CellGroup_cell_class(CellGroupObject* self,
 		     PyObject* args)
 {
-  PyObject* result = Py_None;
+  PyObject* result = self->mRepClass;
 
   Py_INCREF(result);
   return result;
@@ -78,25 +83,12 @@ CellGroup_map(CellGroupObject* self,
   return result;
 }
 
-// cell_num 関数
+// cell_list 関数
 PyObject*
-CellGroup_cell_num(CellGroupObject* self,
-		   PyObject* args)
+CellGroup_cell_list(CellGroupObject* self,
+		    PyObject* args)
 {
-  return PyObject_FromYmuint32(self->mGroup->cell_group()->cell_num());
-}
-
-// cell 関数
-PyObject*
-CellGroup_cell(CellGroupObject* self,
-	       PyObject* args)
-{
-  ymuint pos = 0;
-  if ( !PyArg_ParseTuple(args, "I", &pos) ) {
-    return NULL;
-  }
-
-  PyObject* result = self->mGroup->cell(pos);
+  PyObject* result = self->mCellList;
 
   Py_INCREF(result);
   return result;
@@ -151,10 +143,8 @@ PyMethodDef CellGroup_methods[] = {
   {"rep_map", (PyCFunction)CellGroup_map, METH_NOARGS,
    PyDoc_STR("return NPN-map")},
 
-  {"cell_num", (PyCFunction)CellGroup_cell_num, METH_NOARGS,
-   PyDoc_STR("return cell number")},
-  {"cell", (PyCFunction)CellGroup_cell, METH_VARARGS,
-   PyDoc_STR("return cell (unsigned int)")},
+  {"cell_list", (PyCFunction)CellGroup_cell_list, METH_NOARGS,
+   PyDoc_STR("return cell list")},
 
   {"ff_info", (PyCFunction)CellGroup_ff_info, METH_NOARGS,
    PyDoc_STR("return FF info")},
@@ -268,7 +258,15 @@ PyCellGroup_FromCellGroup(const CellGroup* group,
     return NULL;
   }
 
-  self->mGroup = new PyCellGroup(group, py_library);
+  self->mGroup = group;
+
+  ymuint n = group->cell_num();
+  self->mCellList = PyList_New(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    const Cell* cell = group->cell(i);
+    PyObject* obj = py_library->cell(cell->id());
+    PyList_SetItem(self->mCellList, i, obj);
+  }
 
   Py_INCREF(self);
   return (PyObject*)self;
@@ -282,7 +280,8 @@ PyCellGroup_set_rep(PyObject* py_obj,
   assert_cond( PyCellGroup_Check(py_obj), __FILE__, __LINE__);
 
   CellGroupObject* group_obj = (CellGroupObject*)py_obj;
-  group_obj->mGroup->set_rep(rep_obj);
+  group_obj->mRepClass = rep_obj;
+  Py_INCREF(rep_obj);
 }
 
 // @brief PyObject から CellGroup へのポインタを取り出す．
@@ -301,7 +300,7 @@ PyCellGroup_AsCellGroupPtr(PyObject* py_obj)
   // 強制的にキャスト
   CellGroupObject* my_obj = (CellGroupObject*)py_obj;
 
-  return my_obj->mGroup->cell_group();
+  return my_obj->mGroup;
 }
 
 // CellGroupObject 関係の初期化を行う．

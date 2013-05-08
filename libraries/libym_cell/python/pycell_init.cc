@@ -33,6 +33,9 @@ void
 CellCapacitanceObject_init(PyObject* m);
 
 void
+CellResistanceObject_init(PyObject* m);
+
+void
 CellTimeObject_init(PyObject* m);
 
 void
@@ -49,6 +52,9 @@ CellObject_init(PyObject* m);
 
 void
 CellPinObject_init(PyObject* m);
+
+void
+CellTimingObject_init(PyObject* m);
 
 void
 CellPatGraphObject_init(PyObject* m);
@@ -85,6 +91,9 @@ cell_init()
   // CellTimeObject 関係の初期化
   CellTimeObject_init(m);
 
+  // CellResistanceObject 関係の初期化
+  CellResistanceObject_init(m);
+
   // CellLibraryObject 関係の初期化
   CellLibraryObject_init(m);
 
@@ -99,6 +108,9 @@ cell_init()
 
   // CellPinObject 関係の初期化
   CellPinObject_init(m);
+
+  // CellTimingObject 関係の初期化
+  CellTimingObject_init(m);
 
   // CellPatGraph 関係の初期化
   CellPatGraphObject_init(m);
