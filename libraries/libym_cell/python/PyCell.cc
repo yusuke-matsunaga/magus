@@ -21,6 +21,14 @@ extern
 PyObject*
 PyCellPin_FromCellPin(const CellPin* pin);
 
+/// @brief CellTiming から PyObject を作る．
+/// @param[in] timing CellTiming へのポインタ
+/// @return timing を表す PyObject
+extern
+PyObject*
+PyCellTiming_FromCellTiming(const CellTiming* timing);
+
+
 //////////////////////////////////////////////////////////////////////
 // クラス PyCell
 //////////////////////////////////////////////////////////////////////
@@ -29,6 +37,8 @@ PyCellPin_FromCellPin(const CellPin* pin);
 PyCell::PyCell(const Cell* cell) :
   mCell(cell)
 {
+  mGroup = NULL;
+
   ymuint np = cell->pin_num();
   mPinArray = new PyObject*[np];
   for (ymuint i = 0; i < np; ++ i) {
@@ -36,7 +46,12 @@ PyCell::PyCell(const Cell* cell) :
     mPinArray[i] = PyCellPin_FromCellPin(pin);
   }
 
-  mGroup = NULL;
+  ymuint nt = cell->timing_num();
+  mTimingArray = new PyObject*[nt];
+  for (ymuint i = 0; i < nt; ++ i) {
+    const CellTiming* timing = cell->timing(i);
+    mTimingArray[i] = PyCellTiming_FromCellTiming(timing);
+  }
 }
 
 // @brief デストラクタ
@@ -47,6 +62,11 @@ PyCell::~PyCell()
     Py_DECREF(mPinArray[i]);
   }
   delete [] mPinArray;
+
+  ymuint nt = mCell->timing_num();
+  for (ymuint i = 0; i < nt; ++ i) {
+    Py_DECREF(mTimingArray[i]);
+  }
 
   Py_DECREF(mGroup);
 }
@@ -59,32 +79,20 @@ PyCell::set_group(PyObject* group)
   Py_INCREF(mGroup);
 }
 
-// @brief ID番号を得る．
-PyObject*
-PyCell::id()
-{
-  return PyObject_FromYmuint32(cell()->id());
-}
-
-// @brief 名前を得る．
-PyObject*
-PyCell::name()
-{
-  return PyObject_FromString(cell()->name());
-}
-
-// @brief 面積を得る．
-PyObject*
-PyCell::area()
-{
-  return PyCellArea_FromCellArea(cell()->area());
-}
-
 // @brief ピン番号からピンを得る．
 PyObject*
 PyCell::pin(ymuint pin_id)
 {
+  assert_cond( pin_id < mCell->pin_num(), __FILE__, __LINE__);
   return mPinArray[pin_id];
+}
+
+// @brief タイミング番号からタイミングを得る．
+PyObject*
+PyCell::timing(ymuint t_id)
+{
+  assert_cond( t_id < mCell->timing_num(), __FILE__, __LINE__);
+  return mTimingArray[t_id];
 }
 
 END_NAMESPACE_YM

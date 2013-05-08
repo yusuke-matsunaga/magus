@@ -56,6 +56,9 @@ CellPatGraphObject_init(PyObject* m);
 void
 CellLutTemplateObject_init(PyObject* m);
 
+void
+CellLutObject_init(PyObject* m);
+
 
 END_NAMESPACE_YM
 
@@ -102,5 +105,8 @@ cell_init()
 
   // CellLutTemplate 関係の初期化
   CellLutTemplateObject_init(m);
+
+  // CelLut 関係の初期化
+  CellLutObject_init(m);
 
 }

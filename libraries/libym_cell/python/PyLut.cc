@@ -1,49 +1,47 @@
 
-/// @file PyLutTemplate.cc
-/// @brief PyLutTemplate の実装ファイル
+/// @file PyLut.cc
+/// @brief PyLut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "PyLutTemplate.h"
-#include "ym_cell/CellLut.h"
+#include "PyLut.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス PyLutTemplate
+// クラス PyLut
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PyLutTemplate::PyLutTemplate(const CellLutTemplate* lut_template) :
-  mLutTemplate(lut_template)
+PyLut::PyLut(const CellLut* lut) :
+  mLut(lut)
 {
 }
 
 // @brief デストラクタ
-PyLutTemplate::~PyLutTemplate()
+PyLut::~PyLut()
 {
+  Py_DECREF(mLutTemplate);
 }
 
-// @brief 名前を返す．
+// @brief テンプレート名を返す．
 PyObject*
-PyLutTemplate::name()
+PyLut::template_name()
 {
-  return PyObject_FromString(lut_template()->name());
+  return PyObject_FromString(lut()->template_name());
 }
 
-// @brief 変数型を返す．
-// @param[in] var 変数番号
+// @brief 変数型の取得
 PyObject*
-PyLutTemplate::variable_type(ymuint var)
+PyLut::variable_type(ymuint var)
 {
-  ymuint dim = lut_template()->dimension();
-  assert_cond( var < dim, __FILE__, __LINE__);
+  assert_cond( var < lut()->dimension(), __FILE__, __LINE__);
 
-  tCellVarType var_type = lut_template()->variable_type(var);
+  tCellVarType var_type = lut()->variable_type(var);
   string vt_str;
   switch ( var_type ) {
   case kVarInputNetTransition:
@@ -86,19 +84,30 @@ PyLutTemplate::variable_type(ymuint var)
   return PyObject_FromString(vt_str);
 }
 
-// @brief デフォルトインデックス値を返す．
+// @brief インデックス値の取得
 PyObject*
-PyLutTemplate::index(ymuint var,
-		     ymuint pos)
+PyLut::index(ymuint var,
+	     ymuint pos)
 {
-  ymuint dim = lut_template()->dimension();
-  assert_cond( var < dim, __FILE__, __LINE__);
+  assert_cond( var < lut()->dimension(), __FILE__, __LINE__);
+  assert_cond( pos < lut()->index_num(var), __FILE__, __LINE__);
+  return PyObject_FromDouble(lut()->index(var, pos));
+}
 
-  ymuint n = lut_template()->index_num(var);
-  assert_cond( pos < n, __FILE__, __LINE__);
+// @brief 格子点の値の取得
+PyObject*
+PyLut::grid_value(const vector<ymuint>& pos_array)
+{
+  assert_cond( pos_array.size() == lut()->dimension(), __FILE__, __LINE__);
+  return PyObject_FromDouble(lut()->grid_value(pos_array));
+}
 
-  double index = lut_template()->index(var, pos);
-  return PyObject_FromDouble(index);
+// @brief 値の取得
+PyObject*
+PyLut::value(const vector<double>& val_array)
+{
+  assert_cond( val_array.size() == lut()->dimension(), __FILE__, __LINE__);
+  return PyObject_FromDouble(lut()->value(val_array));
 }
 
 END_NAMESPACE_YM

@@ -51,10 +51,7 @@ PyObject*
 Cell_id(CellObject* self,
 	PyObject* args)
 {
-  PyObject* result = self->mCell->id();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromYmuint32(self->mCell->cell()->id());
 }
 
 // name 関数
@@ -62,10 +59,7 @@ PyObject*
 Cell_name(CellObject* self,
 	  PyObject* args)
 {
-  PyObject* result = self->mCell->name();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromString(self->mCell->cell()->name());
 }
 
 // area 関数
@@ -73,10 +67,7 @@ PyObject*
 Cell_area(CellObject* self,
 	  PyObject* args)
 {
-  PyObject* result = self->mCell->area();
-
-  Py_INCREF(result);
-  return result;
+  return PyCellArea_FromCellArea(self->mCell->cell()->area());
 }
 
 // pin 関数
@@ -95,7 +86,10 @@ Cell_pin(CellObject* self,
     return NULL;
   }
 
-  return self->mCell->pin(pin->pin_id());
+  PyObject* result = self->mCell->pin(pin->pin_id());
+
+  Py_INCREF(result);
+  return result;
 }
 
 // pin_list 関数
@@ -130,6 +124,21 @@ Cell_input_pin_list(CellObject* self,
   return pin_list;
 }
 
+// timing_list 関数
+PyObject*
+Cell_timing_list(CellObject* self,
+		 PyObject* args)
+{
+  ymuint n = self->mCell->cell()->timing_num();
+  PyObject* timing_list = PyList_New(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    PyObject* obj1 = self->mCell->timing(i);
+    PyList_SetItem(timing_list, i, obj1);
+  }
+
+  return timing_list;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // CellObject のメソッドテーブル
@@ -160,8 +169,12 @@ PyMethodDef Cell_methods[] = {
    PyDoc_STR("return pin (name: string)")},
   {"pin_list", (PyCFunction)Cell_pin_list, METH_NOARGS,
    PyDoc_STR("return pin-list")},
+
   {"input_pin_list", (PyCFunction)Cell_input_pin_list, METH_NOARGS,
    PyDoc_STR("return input-pin-list")},
+
+  {"timing_list", (PyCFunction)Cell_timing_list, METH_NOARGS,
+   PyDoc_STR("return timing list")},
 
   {NULL, NULL, 0, NULL} // end-marker
 };

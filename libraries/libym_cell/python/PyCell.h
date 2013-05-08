@@ -44,25 +44,17 @@ public:
   const Cell*
   cell();
 
-  /// @brief ID番号を得る．
+  /// @brief セルグループを得る．
   PyObject*
-  id();
-
-  /// @brief 名前を得る．
-  PyObject*
-  name();
-
-  /// @brief 面積を得る．
-  PyObject*
-  area();
+  cell_group();
 
   /// @brief ピン番号からピンを得る．
   PyObject*
   pin(ymuint pin_id);
 
-  /// @brief セルグループを得る．
+  /// @brief タイミング番号からタイミングを得る．
   PyObject*
-  cell_group();
+  timing(ymuint t_id);
 
 
 private:
@@ -73,11 +65,14 @@ private:
   // Cell の本体
   const Cell* mCell;
 
+  // セルグループ
+  PyObject* mGroup;
+
   // ピンを表すオブジェクトの配列
   PyObject** mPinArray;
 
-  // セルグループ
-  PyObject* mGroup;
+  // タイミングを表すオブジェクトの配列
+  PyObject** mTimingArray;
 
 };
 

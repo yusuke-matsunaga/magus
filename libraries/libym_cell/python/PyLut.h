@@ -1,8 +1,8 @@
-#ifndef PYLUTTEMPLATE_H
-#define PYLUTTEMPLATE_H
+#ifndef PYLUT_H
+#define PYLUT_H
 
-/// @file PyLutTemplate.h
-/// @brief PyLutTemplate のヘッダファイル
+/// @file PyLut.h
+/// @brief PyLut のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2013 Yusuke Matsunaga
@@ -10,23 +10,24 @@
 
 
 #include "ym_cell/pycell.h"
+#include "ym_cell/CellLut.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class PyLutTemplate PyLutTemplate.h "PyLutTemplate.h"
-/// @brief CellLutTemplate を表すための補助クラス
+/// @class PyLut PyLut.h "PyLut.h"
+/// @brief CellLut を表す補助的なクラス
 //////////////////////////////////////////////////////////////////////
-class PyLutTemplate
+class PyLut
 {
 public:
 
   /// @brief コンストラクタ
-  PyLutTemplate(const CellLutTemplate* lut_template);
+  PyLut(const CellLut* lut);
 
   /// @brief デストラクタ
-  ~PyLutTemplate();
+  ~PyLut();
 
 
 public:
@@ -34,23 +35,34 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief CellLut を返す．
+  const CellLut*
+  lut();
+
   /// @brief CellLutTemplate を返す．
-  const CellLutTemplate*
+  PyObject*
   lut_template();
 
-  /// @brief 名前を返す．
+  /// @brief テンプレート名を返す．
   PyObject*
-  name();
+  template_name();
 
-  /// @brief 変数型を返す．
-  /// @param[in] var 変数番号
+  /// @brief 変数型の取得
   PyObject*
   variable_type(ymuint var);
 
-  /// @brief デフォルトインデックス値を返す．
+  /// @brief インデックス値の取得
   PyObject*
   index(ymuint var,
 	ymuint pos);
+
+  /// @brief 格子点の値の取得
+  PyObject*
+  grid_value(const vector<ymuint>& pos_array);
+
+  /// @brief 値の取得
+  PyObject*
+  value(const vector<double>& val_array);
 
 
 private:
@@ -58,8 +70,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // CellLutTemplate
-  const CellLutTemplate* mLutTemplate;
+  // CellLut
+  const CellLut* mLut;
+
+  // テンプレート
+  PyObject* mLutTemplate;
 
 };
 
@@ -68,14 +83,22 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief CellLut を返す．
+inline
+const CellLut*
+PyLut::lut()
+{
+  return mLut;
+}
+
 // @brief CellLutTemplate を返す．
 inline
-const CellLutTemplate*
-PyLutTemplate::lut_template()
+PyObject*
+PyLut::lut_template()
 {
   return mLutTemplate;
 }
 
 END_NAMESPACE_YM
 
-#endif // PYLUTTEMPLATE_H
+#endif // PYLUT_H

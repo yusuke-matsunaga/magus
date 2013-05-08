@@ -23,6 +23,7 @@ libym_cell_python_la_SOURCES = \
 	pycell_CellPin.cc \
 	pycell_CellPatGraph.cc \
 	pycell_LutTemplate.cc \
+	pycell_Lut.cc \
 	pycell_CellArea.cc \
 	pycell_CellCapacitance.cc \
 	pycell_CellTime.cc \
@@ -46,8 +47,8 @@ libym_cell_python_la_SOURCES = \
 	PyInternalPin.cc \
 	PyPatGraph.h \
 	PyPatGraph.cc \
-	PyLutTemplate.h \
-	PyLutTemplate.cc
+	PyLut.h \
+	PyLut.cc
 
 libym_cell_python_la_LIBADD =
 

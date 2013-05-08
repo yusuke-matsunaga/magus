@@ -1,6 +1,6 @@
 
-/// @file pycell_LutTemplate.cc
-/// @brief CellLutTemplate の Python 用ラッパ
+/// @file pycell_Lut.cc
+/// @brief CellLut の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2013 Yusuke Matsunaga
@@ -9,6 +9,7 @@
 
 #include "ym_cell/pycell.h"
 #include "ym_cell/CellLut.h"
+#include "PyLut.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -19,14 +20,14 @@ BEGIN_NONAMESPACE
 // Python 用の構造体定義
 //////////////////////////////////////////////////////////////////////
 
-// CellLutTemplate を表す型
-struct LutTemplateObject
+// CellLut を表す型
+struct LutObject
 {
   // Python のお約束
   PyObject_HEAD
 
-  // CellLutTemplate
-  const CellLutTemplate* mLutTemplate;
+  // PyLut
+  PyLut* mLut;
 
 };
 
@@ -35,102 +36,81 @@ struct LutTemplateObject
 // Python 用のメソッド関数定義
 //////////////////////////////////////////////////////////////////////
 
-// LutTemplateObject を開放する関数
+// LutObject を開放する関数
 void
-LutTemplate_dealloc(LutTemplateObject* self)
+Lut_dealloc(LutObject* self)
 {
+  delete self->mLut;
+
   PyObject_Del(self);
 }
 
-// name 関数
+// lut_template 関数
 PyObject*
-LutTemplate_name(LutTemplateObject* self,
+Lut_lut_template(LutObject* self,
 		 PyObject* args)
 {
-  return PyObject_FromString(self->mLutTemplate->name());
+  PyObject* result = self->mLut->lut_template();
+
+  Py_INCREF(result);
+  return result;
+}
+
+// template_name 関数
+PyObject*
+Lut_template_name(LutObject* self,
+		  PyObject* args)
+{
+  PyObject* result = self->mLut->template_name();
+
+  Py_INCREF(result);
+  return result;
 }
 
 // dimension 関数
 PyObject*
-LutTemplate_dimension(LutTemplateObject* self,
-		      PyObject* args)
+Lut_dimension(LutObject* self,
+	      PyObject* args)
 {
-  ymuint dim = self->mLutTemplate->dimension();
+  ymuint dim = self->mLut->lut()->dimension();
   return PyObject_FromYmuint32(dim);
 }
 
 // variable_type 関数
 PyObject*
-LutTemplate_variable_type(LutTemplateObject* self,
-			  PyObject* args)
+Lut_variable_type(LutObject* self,
+		  PyObject* args)
 {
   ymuint var = 0;
   if ( !PyArg_ParseTuple(args, "I", &var) ) {
     return NULL;
   }
 
-  tCellVarType var_type = self->mLutTemplate->variable_type(var);
-  string vt_str;
-  switch ( var_type ) {
-  case kVarInputNetTransition:
-    vt_str = "input_net_transition";
-    break;
-  case kVarTotalOutputNetCapacitance:
-    vt_str = "total_output_net_capacitance";
-    break;
-  case kVarOutputNetLength:
-    vt_str = "output_net_length";
-    break;
-  case kVarOutputNetWireCap:
-    vt_str = "output_net_wire_cap";
-    break;
-  case kVarOutputNetPinCap:
-    vt_str = "output_net_pin_cap";
-    break;
-  case kVarRelatedOutTotalOutputNetCapacitance:
-    vt_str = "related_out_total_output_net_capacitance";
-    break;
-  case kVarRelatedOutOutputNetLength:
-    vt_str = "related_out_output_net_length";
-    break;
-  case kVarRelatedOutOutputNetWireCap:
-    vt_str = "related_out_output_net_wire_cap";
-    break;
-  case kVarRelatedOutOutputNetPinCap:
-    vt_str = "related_out_output_net_pin_cap";
-    break;
-  case kVarConstrainedPinTransition:
-    vt_str = "constrained_pin_transition";
-    break;
-  case kVarRelatedPinTransition:
-    vt_str = "related_pin_transition";
-    break;
-  case kVarNone:
-    vt_str = "none";
-    break;
-  }
-  return PyObject_FromString(vt_str);
+  PyObject* result = self->mLut->variable_type(var);
+
+  Py_INCREF(result);
+  return result;
 }
 
 // index_num 関数
 PyObject*
-LutTemplate_index_num(LutTemplateObject* self,
-		      PyObject* args)
+Lut_index_num(LutObject* self,
+	      PyObject* args)
 {
   ymuint var = 0;
   if ( !PyArg_ParseTuple(args, "I", &var) ) {
     return NULL;
   }
 
-  ymuint n = self->mLutTemplate->index_num(var);
+  ymuint n = self->mLut->lut()->index_num(var);
 
   return PyObject_FromYmuint32(n);
 }
 
 // index 関数
 PyObject*
-LutTemplate_index(LutTemplateObject* self,
-		  PyObject* args)
+Lut_index(LutObject* self,
+	  PyObject* args)
 {
   ymuint var = 0;
   ymuint pos = 0;
@@ -138,7 +118,71 @@ LutTemplate_index(LutTemplateObject* self,
     return NULL;
   }
 
-  double val = self->mLutTemplate->index(var, pos);
+  double index = self->mLut->lut()->index(var, pos);
+
+  return PyObject_FromDouble(index);
+}
+
+// grid_value 関数
+PyObject*
+Lut_grid_value(LutObject* self,
+	       PyObject* args)
+{
+  if ( !PySequence_Check(args) ) {
+    PyErr_SetString(PyExc_TypeError, "sequence type is expected.");
+    return NULL;
+  }
+
+  ymuint n = PySequence_Size(args);
+  vector<ymuint32> pos_array(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    PyObject* obj1 = PySequence_GetItem(args, i);
+    if ( !PyNumber_Check(obj1) ) {
+      PyErr_SetString(PyExc_TypeError, "number type is expected.");
+      return NULL;
+    }
+    PyObject* obj2 = PyNumber_Long(obj1);
+    if ( obj2 == NULL ) {
+      PyErr_SetString(PyExc_TypeError, "integer type is expected.");
+      return NULL;
+    }
+    ymuint pos = PyLong_AsLong(obj2);
+    pos_array[i] = pos;
+  }
+
+  double val = self->mLut->lut()->grid_value(pos_array);
+
+  return PyObject_FromDouble(val);
+}
+
+// value 関数
+PyObject*
+Lut_value(LutObject* self,
+	  PyObject* args)
+{
+  if ( !PySequence_Check(args) ) {
+    PyErr_SetString(PyExc_TypeError, "sequence type is expected.");
+    return NULL;
+  }
+
+  ymuint n = PySequence_Size(args);
+  vector<double> val_array(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    PyObject* obj1 = PySequence_GetItem(args, i);
+    if ( !PyNumber_Check(obj1) ) {
+      PyErr_SetString(PyExc_TypeError, "number type is expected.");
+      return NULL;
+    }
+    PyObject* obj2 = PyNumber_Float(obj1);
+    if ( obj2 == NULL ) {
+      PyErr_SetString(PyExc_TypeError, "float type is expected.");
+      return NULL;
+    }
+    double val = PyFloat_AsDouble(obj2);
+    val_array[i] = val;
+  }
+
+  double val = self->mLut->lut()->value(val_array);
 
   return PyObject_FromDouble(val);
 }
@@ -147,7 +191,7 @@ LutTemplate_index(LutTemplateObject* self,
 //////////////////////////////////////////////////////////////////////
 // LutTemplateObject のメソッドテーブル
 //////////////////////////////////////////////////////////////////////
-PyMethodDef LutTemplate_methods[] = {
+PyMethodDef Lut_methods[] = {
   // PyMethodDef のフィールド
   //   char*       ml_name;
   //   PyCFunction ml_meth;
@@ -163,16 +207,22 @@ PyMethodDef LutTemplate_methods[] = {
   //  - METH_STATIC
   //  - METH_COEXIST
 
-  {"name", (PyCFunction)LutTemplate_name, METH_NOARGS,
-   PyDoc_STR("return name")},
-  {"dimension", (PyCFunction)LutTemplate_dimension, METH_NOARGS,
-   PyDoc_STR("return dimension")},
-  {"variable_type", (PyCFunction)LutTemplate_variable_type, METH_VARARGS,
+  {"lut_template", (PyCFunction)Lut_lut_template, METH_NOARGS,
+   PyDoc_STR("return parent template (NONE)")},
+  {"template_name", (PyCFunction)Lut_template_name, METH_NOARGS,
+   PyDoc_STR("return template's name (NONE)")},
+  {"dimension", (PyCFunction)Lut_dimension, METH_NOARGS,
+   PyDoc_STR("return dimension (NONE)")},
+  {"variable_type", (PyCFunction)Lut_variable_type, METH_VARARGS,
    PyDoc_STR("return variable type (var: unsigned int)")},
-  {"index_num", (PyCFunction)LutTemplate_index_num, METH_VARARGS,
+  {"index_num", (PyCFunction)Lut_index_num, METH_VARARGS,
    PyDoc_STR("return index number (var: unsigned int")},
-  {"index", (PyCFunction)LutTemplate_index, METH_VARARGS,
+  {"index", (PyCFunction)Lut_index, METH_VARARGS,
    PyDoc_STR("return default index value (var: unsigned int, pos: unsigned int")},
+  {"grid_value", (PyCFunction)Lut_grid_value, METH_VARARGS,
+   PyDoc_STR("return grid value (sequence of unsigned int)")},
+  {"value", (PyCFunction)Lut_value, METH_VARARGS,
+   PyDoc_STR("return value (sequence of float)")},
 
   {NULL, NULL, 0, NULL} // end-marker
 };
@@ -181,19 +231,19 @@ END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
-// LutTemplateObject 用のタイプオブジェクト
+// LutObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject PyCellLutTemplate_Type = {
+PyTypeObject PyCellLut_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "cell_lib.CellLutTemplate",   // tp_name
-  sizeof(LutTemplateObject),    // tp_basicsize
+  "cell_lib.CellLut",           // tp_name
+  sizeof(LutObject),            // tp_basicsize
   (int)0,                       // tp_itemsize
 
   // Methods to implement standard operations
 
-  (destructor)LutTemplate_dealloc,     // tp_dealloc
+  (destructor)Lut_dealloc,      // tp_dealloc
   (printfunc)0,                 // tp_print
   (getattrfunc)0,               // tp_getattr
   (setattrfunc)0,               // tp_setattr
@@ -219,7 +269,7 @@ PyTypeObject PyCellLutTemplate_Type = {
   Py_TPFLAGS_DEFAULT,           // tp_flags
 
   // Documentation string
-  "LUT template",                       // tp_doc
+  "Look-up Table",              // tp_doc
 
   // Assigned meaning in release 2.0
 
@@ -244,7 +294,7 @@ PyTypeObject PyCellLutTemplate_Type = {
   (iternextfunc)0,              // tp_iternext
 
   // Attribute descriptor and subclassing stuff
-  LutTemplate_methods,          // tp_methods
+  Lut_methods,                  // tp_methods
   0,                            // tp_members
   0,                            // tp_getset
   (struct _typeobject*)0,       // tp_base
@@ -267,55 +317,56 @@ PyTypeObject PyCellLutTemplate_Type = {
 
 
 //////////////////////////////////////////////////////////////////////
-// PyObject と LutTemplate の間の変換関数
+// PyObject と CellLut の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief CellLutTemplate から CellLutTemplateObject を生成する．
-// @param[in] lut_template LUTテンプレート
+// @brief CellLut から CellLutObject を生成する．
+// @param[in] lut LUT
 PyObject*
-PyCellLutTemplate_FromCellLutTemplate(const CellLutTemplate* lut_template)
+PyCellLut_FromCellLut(const CellLut* lut)
 {
-  LutTemplateObject* self = PyObject_New(LutTemplateObject, &PyCellLutTemplate_Type);
+  LutObject* self = PyObject_New(LutObject, &PyCellLut_Type);
   if ( self == NULL ) {
     return NULL;
   }
 
-  self->mLutTemplate = lut_template;
+  self->mLut = new PyLut(lut);
 
   Py_INCREF(self);
   return (PyObject*)self;
 }
 
-// @brief PyObject から CellLutTemplate へのポインタを取り出す．
+// @brief PyObject から CellLut へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @return CellLutTemplate へのポインタを返す．
+// @return CellLut へのポインタを返す．
 // @note 変換が失敗したら TypeError を送出し，NULL を返す．
-const CellLutTemplate*
-PyCellLutTemplate_AsCellLutTemplatePtr(PyObject* py_obj)
+const CellLut*
+PyCellLut_AsCellLutPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !PyCellLutTemplate_Check(py_obj) ) {
-    PyErr_SetString(PyExc_TypeError, "cell_lib.CellLutTemplate is expected");
+  if ( !PyCellLut_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "cell_lib.CellLut is expected.");
     return NULL;
   }
 
   // 強制的にキャスト
-  LutTemplateObject* my_obj = (LutTemplateObject*)py_obj;
+  LutObject* my_obj = (LutObject*)py_obj;
 
-  return my_obj->mLutTemplate;
+  return my_obj->mLut->lut();
 }
 
-// CellLutTemplateObject 関係の初期化を行なう．
+// CellLutObject 関係の初期化を行なう．
 void
-CellLutTemplateObject_init(PyObject* m)
+CellLutObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&PyCellLutTemplate_Type) < 0 ) {
+  if ( PyType_Ready(&PyCellLut_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "CellLutTemplate", (PyObject*)&PyCellLutTemplate_Type);
+  PyModule_AddObject(m, "CellLut", (PyObject*)&PyCellLut_Type);
 }
 
 END_NAMESPACE_YM
+

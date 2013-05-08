@@ -16,6 +16,12 @@
 
 BEGIN_NAMESPACE_YM
 
+/// @brief CellLutTemplate から CellLutTemplateObject を生成する．
+/// @param[in] lut_template LUTテンプレート
+extern
+PyObject*
+PyCellLutTemplate_FromCellLutTemplate(const CellLutTemplate* lut_template);
+
 /// @brief CellClass から CellClassObject を生成する．
 /// @param[in] cell_class セルクラス
 /// @param[in] py_library ライブラリ
@@ -95,9 +101,9 @@ PyLibrary::PyLibrary(const CellLibrary* library)
   mCapacitiveLoadUnit = Py_BuildValue("(ds)", unit_val, unit_str.c_str());
   mLeakagePowerUnit = PyObject_FromString(library->leakage_power_unit());
 
-  ymuint nl = library->lu_table_template_num();
-  mLutTemplateList = new PyObject*[nl];
-  for (ymuint i = 0; i < nl; ++ i) {
+  ymuint nlt = library->lu_table_template_num();
+  mLutTemplateList = new PyObject*[nlt];
+  for (ymuint i = 0; i < nlt; ++ i) {
     const CellLutTemplate* lut_template = library->lu_table_template(i);
     PyObject* obj = PyCellLutTemplate_FromCellLutTemplate(lut_template);
     mLutTemplateList[i] = obj;

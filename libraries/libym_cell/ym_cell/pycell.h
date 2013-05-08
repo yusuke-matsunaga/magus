@@ -359,12 +359,6 @@ PyCellLutTemplate_Check(PyObject* obj)
   return Py_TYPE(obj) == &PyCellLutTemplate_Type;
 }
 
-/// @brief CellLutTemplate から CellLutTemplateObject を生成する．
-/// @param[in] lut_template LUTテンプレート
-extern
-PyObject*
-PyCellLutTemplate_FromCellLutTemplate(const CellLutTemplate* lut_template);
-
 /// @brief PyObject から CellLutTemplate へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト
 /// @return CellLutTemplate へのポインタを返す．
