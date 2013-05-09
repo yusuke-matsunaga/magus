@@ -12,14 +12,58 @@
 #include "ym_cell/CellDotlibReader.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellBus.h"
+#include "ym_cell/CellClass.h"
+#include "ym_cell/CellGroup.h"
 #include "ym_cell/Cell.h"
 #include "ym_utils/pyutils.h"
 #include "ym_utils/FileBinO.h"
 #include "ym_utils/FileBinI.h"
-#include "PyLibrary.h"
 
 
 BEGIN_NAMESPACE_YM
+
+/// @brief CellClass から CellClassObject を生成する．
+/// @param[in] cell_class セルクラス
+/// @param[in] py_library ライブラリ
+extern
+PyObject*
+PyCellClass_FromCellClass(const CellClass* cell_class,
+			  PyObject* group_list[]);
+
+/// @brief CellGroup から CellGroupObject を生成する．
+/// @param[in] group グループ
+/// @param[in] py_library ライブラリ
+extern
+PyObject*
+PyCellGroup_FromCellGroup(const CellGroup* group,
+			  PyObject* cell_list[]);
+
+/// @brief CellGroup に代表クラスを設定する．
+extern
+void
+PyCellGroup_set_rep(PyObject* py_obj,
+		    PyObject* rep_obj);
+
+/// @brief Cell から PyObject を作る．
+/// @param[in] cell Cell へのポインタ
+/// @return cell を表す PyObject
+extern
+PyObject*
+PyCellCell_FromCell(const Cell* cell);
+
+/// @brief Cell にセルグループを設定する．
+extern
+void
+PyCellCell_set_group(PyObject* py_obj,
+		     PyObject* group_obj);
+
+/// @brief CellPatGraph から PyObject を作る．
+/// @param[in] pat_graph CellPatGraph へのポインタ
+/// @return pat_graph を表す PyObject
+extern
+PyObject*
+PyCellPatGraph_FromCellPatGraph(const CellPatGraph* pat_graph);
+
 
 BEGIN_NONAMESPACE
 
@@ -33,8 +77,35 @@ struct CellLibraryObject
   // Python のお約束
   PyObject_HEAD
 
-  // PyLibrary
-  PyLibrary* mLibrary;
+  // CellLibrary
+  const CellLibrary* mLibrary;
+
+  // Cell のリスト
+  PyObject** mCellList;
+
+  // セルグループの配列
+  PyObject** mGroupList;
+
+  // セルクラスの配列
+  PyObject** mClassList;
+
+  // パタンの配列
+  PyObject** mPatList;
+
+  // ノードの配列
+  PyObject** mNodeList;
+
+  // 枝の配列
+  PyObject** mEdgeList;
+
+  // 'I' を表す定数オブジェクト
+  PyObject* kPatI;
+
+  // 'A' を表す定数オブジェクト
+  PyObject* kPatA;
+
+  // 'X' を表す定数オブジェクト
+  PyObject* kPatX;
 
 };
 
@@ -61,7 +132,45 @@ CellLibrary_new(PyTypeObject* type)
 void
 CellLibrary_dealloc(CellLibraryObject* self)
 {
-  delete self->mLibrary;
+  ymuint nc = self->mLibrary->cell_num();
+  for (ymuint i = 0; i < nc; ++ i) {
+    Py_DECREF(self->mCellList[i]);
+  }
+  delete [] self->mCellList;
+
+  ymuint ng = self->mLibrary->group_num();
+  for (ymuint i = 0; i < ng; ++ i) {
+    Py_DECREF(self->mGroupList[i]);
+  }
+  delete [] self->mGroupList;
+
+  ymuint nn = self->mLibrary->npn_class_num();
+  for (ymuint i = 0; i < nn; ++ i) {
+    Py_DECREF(self->mClassList[i]);
+  }
+  delete [] self->mClassList;
+
+  ymuint np = self->mLibrary->pg_pat_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    Py_DECREF(self->mPatList[i]);
+  }
+  delete [] self->mPatList;
+
+  ymuint npn = self->mLibrary->pg_node_num();
+  for (ymuint i = 0; i < npn; ++ i) {
+    Py_DECREF(self->mNodeList[i]);
+  }
+  delete [] self->mNodeList;
+
+  ymuint ne = self->mLibrary->pg_edge_num();
+  for (ymuint i = 0; i < ne; ++ i) {
+    Py_DECREF(self->mEdgeList[i]);
+  }
+  delete [] self->mEdgeList;
+
+  Py_DECREF(self->kPatI);
+  Py_DECREF(self->kPatA);
+  Py_DECREF(self->kPatX);
 
   PyObject_Del(self);
 }
@@ -97,7 +206,7 @@ CellLibrary_init(CellLibraryObject* self,
       PyErr_SetString(PyExc_ValueError, "Read error");
       return -1;
     }
-    self->mLibrary = new PyLibrary(library);
+    self->mLibrary = library;
   }
   else if ( strcmp(type, "mislib") == 0 ) {
     CellMislibReader read;
@@ -107,17 +216,100 @@ CellLibrary_init(CellLibraryObject* self,
       PyErr_SetString(PyExc_ValueError, "Read error");
       return -1;
     }
-    self->mLibrary = new PyLibrary(library);
+    self->mLibrary = library;
   }
   else if ( strcmp(type, "binary") == 0 ) {
     FileBinI s(filename);
     CellLibrary* library = CellLibrary::new_obj();
     library->restore(s);
-    self->mLibrary = new PyLibrary(library);
+    self->mLibrary = library;
   }
   else {
     PyErr_SetString(PyExc_ValueError, "Illegal type string.");
     return -1;
+  }
+
+  const CellLibrary* library = self->mLibrary;
+  assert_cond( library != NULL, __FILE__, __LINE__);
+
+  ymuint nc = library->cell_num();
+  self->mCellList = new PyObject*[nc];
+  for (ymuint i = 0; i < nc; ++ i) {
+    const Cell* cell = library->cell(i);
+    PyObject* cell_obj = PyCellCell_FromCell(cell);
+    self->mCellList[i] = cell_obj;
+  }
+
+  ymuint ng = library->group_num();
+  self->mGroupList = new PyObject*[ng];
+  for (ymuint i = 0; i < ng; ++ i) {
+    const CellGroup* group = library->group(i);
+    PyObject* group_obj = PyCellGroup_FromCellGroup(group, self->mCellList);
+    self->mGroupList[i] = group_obj;
+  }
+
+  ymuint nn = library->npn_class_num();
+  self->mClassList = new PyObject*[nn];
+  for (ymuint i = 0; i < nn; ++ i) {
+    const CellClass* cell_class = library->npn_class(i);
+    PyObject* class_obj = PyCellClass_FromCellClass(cell_class, self->mGroupList);
+    self->mClassList[i] = class_obj;
+  }
+
+  for (ymuint i = 0; i < nc; ++ i) {
+    const Cell* cell = library->cell(i);
+    const CellGroup* group = cell->cell_group();
+    PyObject* py_obj = self->mCellList[i];
+    PyObject* group_obj = self->mGroupList[group->id()];
+    PyCellCell_set_group(py_obj, group_obj);
+  }
+
+  for (ymuint i = 0; i < ng; ++ i) {
+    PyObject* py_obj = self->mGroupList[i];
+    const CellGroup* group = library->group(i);
+    const CellClass* rep = group->rep_class();
+    PyObject* rep_obj = self->mClassList[rep->id()];
+    PyCellGroup_set_rep(py_obj, rep_obj);
+  }
+
+  ymuint np = library->pg_pat_num();
+  self->mPatList = new PyObject*[np];
+  for (ymuint i = 0; i < np; ++ i) {
+    const CellPatGraph& pat = library->pg_pat(i);
+    PyObject* pat_obj = PyCellPatGraph_FromCellPatGraph(&pat);
+    self->mPatList[i] = pat_obj;
+  }
+
+  self->kPatI = PyObject_FromString("INPUT");
+  self->kPatA = PyObject_FromString("AND");
+  self->kPatX = PyObject_FromString("XOR");
+
+  ymuint npn = library->pg_node_num();
+  self->mNodeList = new PyObject*[npn];
+  for (ymuint i = 0; i < npn; ++ i) {
+    tCellPatType pat_type = library->pg_node_type(i);
+    PyObject* pat = NULL;
+    switch ( pat_type ) {
+    case kCellPatInput: pat = self->kPatI; break;
+    case kCellPatAnd:   pat = self->kPatA; break;
+    case kCellPatXor:   pat = self->kPatX; break;
+    }
+    ymuint id = 0;
+    if ( pat_type == kCellPatInput ) {
+      id = library->pg_input_id(i);
+    }
+    self->mNodeList[i] = Py_BuildValue("(OI)", pat, id);
+  }
+
+  ymuint ne = library->pg_edge_num();
+  self->mEdgeList = new PyObject*[ne];
+  for (ymuint i = 0; i < ne; ++ i) {
+    ymuint from_id = library->pg_edge_from(i);
+    ymuint to_id = library->pg_edge_to(i);
+    ymuint pos = library->pg_edge_pos(i);
+    bool inv = library->pg_edge_inv(i);
+    PyObject* obj = Py_BuildValue("(IIII)", from_id, to_id, pos, inv);
+    self->mEdgeList[i] = obj;
   }
 
   return 0;
@@ -128,10 +320,7 @@ PyObject*
 CellLibrary_name(CellLibraryObject* self,
 		 PyObject* args)
 {
-  PyObject* result = self->mLibrary->name();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromString(self->mLibrary->name());
 }
 
 // technology 関数
@@ -139,10 +328,13 @@ PyObject*
 CellLibrary_technology(CellLibraryObject* self,
 		       PyObject* args)
 {
-  PyObject* result = self->mLibrary->technology();
-
-  Py_INCREF(result);
-  return result;
+  const char* tech_str = NULL;
+  switch ( self->mLibrary->technology() ) {
+  case CellLibrary::kTechCmos: tech_str = "cmos"; break;
+  case CellLibrary::kTechFpga: tech_str = "fpga"; break;
+  default: assert_not_reached(__FILE__, __LINE__);
+  }
+  return PyObject_FromString(tech_str);
 }
 
 // delay_model 関数
@@ -150,10 +342,16 @@ PyObject*
 CellLibrary_delay_model(CellLibraryObject* self,
 			PyObject* args)
 {
-  PyObject* result = self->mLibrary->delay_model();
-
-  Py_INCREF(result);
-  return result;
+  const char* dm_str = NULL;
+  switch ( self->mLibrary->delay_model() ) {
+  case kCellDelayGenericCmos:   dm_str = "generic_cmos"; break;
+  case kCellDelayTableLookup:   dm_str = "table_lookup"; break;
+  case kCellDelayPiecewiseCmos: dm_str = "piecewise_cmos"; break;
+  case kCellDelayCmos2:         dm_str = "cmos2"; break;
+  case kCellDelayDcm:           dm_str = "dcm"; break;
+  default: assert_not_reached(__FILE__, __LINE__);
+  }
+  return PyObject_FromString(dm_str);
 }
 
 // bus_naming_style 関数
@@ -161,10 +359,7 @@ PyObject*
 CellLibrary_bus_naming_style(CellLibraryObject* self,
 			     PyObject* args)
 {
-  PyObject* result = self->mLibrary->bus_naming_style();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromString(self->mLibrary->bus_naming_style());
 }
 
 // date 関数
@@ -172,10 +367,7 @@ PyObject*
 CellLibrary_date(CellLibraryObject* self,
 		 PyObject* args)
 {
-  PyObject* result = self->mLibrary->date();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromString(self->mLibrary->date());
 }
 
 // revision 関数
@@ -183,10 +375,7 @@ PyObject*
 CellLibrary_revision(CellLibraryObject* self,
 		     PyObject* args)
 {
-  PyObject* result = self->mLibrary->revision();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromString(self->mLibrary->revision());
 }
 
 // comment 関数
@@ -194,10 +383,7 @@ PyObject*
 CellLibrary_comment(CellLibraryObject* self,
 		    PyObject* args)
 {
-  PyObject* result = self->mLibrary->comment();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromString(self->mLibrary->comment());
 }
 
 // time_unit 関数
@@ -205,10 +391,7 @@ PyObject*
 CellLibrary_time_unit(CellLibraryObject* self,
 		      PyObject* args)
 {
-  PyObject* result = self->mLibrary->time_unit();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromString(self->mLibrary->time_unit());
 }
 
 // voltage_unit 関数
@@ -216,10 +399,7 @@ PyObject*
 CellLibrary_voltage_unit(CellLibraryObject* self,
 			 PyObject* args)
 {
-  PyObject* result = self->mLibrary->voltage_unit();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromString(self->mLibrary->voltage_unit());
 }
 
 // current_unit 関数
@@ -227,10 +407,7 @@ PyObject*
 CellLibrary_current_unit(CellLibraryObject* self,
 			 PyObject* args)
 {
-  PyObject* result = self->mLibrary->current_unit();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromString(self->mLibrary->current_unit());
 }
 
 // pulling_resistance_unit 関数
@@ -238,10 +415,7 @@ PyObject*
 CellLibrary_pulling_resistance_unit(CellLibraryObject* self,
 				    PyObject* args)
 {
-  PyObject* result = self->mLibrary->pulling_resistance_unit();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromString(self->mLibrary->pulling_resistance_unit());
 }
 
 // capacitive_load_unit 関数
@@ -249,10 +423,9 @@ PyObject*
 CellLibrary_capacitive_load_unit(CellLibraryObject* self,
 				 PyObject* args)
 {
-  PyObject* result = self->mLibrary->capacitive_load_unit();
-
-  Py_INCREF(result);
-  return result;
+  double unit_val = self->mLibrary->capacitive_load_unit();
+  string unit_str = self->mLibrary->capacitive_load_unit_str();
+  return Py_BuildValue("(ds)", unit_val, unit_str.c_str());
 }
 
 // leakage_power_unit 関数
@@ -260,10 +433,7 @@ PyObject*
 CellLibrary_leakage_power_unit(CellLibraryObject* self,
 			       PyObject* args)
 {
-  PyObject* result = self->mLibrary->leakage_power_unit();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromString(self->mLibrary->leakage_power_unit());
 }
 
 // lu_table_template 関数
@@ -338,30 +508,20 @@ CellLibrary_bus_type(CellLibraryObject* self,
 #endif
 }
 
-// cell_num 関数
+// cell_list 関数
 PyObject*
-CellLibrary_cell_num(CellLibraryObject* self,
-		     PyObject* args)
+CellLibrary_cell_list(CellLibraryObject* self,
+		      PyObject* args)
 {
-  return Py_BuildValue("I", self->mLibrary->library()->cell_num());
-}
-
-// cell 関数
-PyObject*
-CellLibrary_cell(CellLibraryObject* self,
-		 PyObject* args)
-{
-  // 引数の形式は
-  // - (int) セル番号
-  ymuint pos = 0;
-  if ( !PyArg_ParseTuple(args, "I", &pos) ) {
-    return NULL;
+  ymuint nc = self->mLibrary->cell_num();
+  PyObject* cell_list = PyList_New(nc);
+  for (ymuint i = 0; i < nc; ++ i) {
+    PyObject* obj = self->mCellList[i];
+    Py_INCREF(obj);
+    PyList_SetItem(cell_list, i, obj);
   }
 
-  PyObject* cell_obj = self->mLibrary->cell(pos);
-
-  Py_INCREF(cell_obj);
-  return cell_obj;
+  return cell_list;
 }
 
 // cell_by_name 関数
@@ -376,33 +536,16 @@ CellLibrary_cell_by_name(CellLibraryObject* self,
     return NULL;
   }
 
-  const Cell* cell = self->mLibrary->library()->cell(name);
+  const Cell* cell = self->mLibrary->cell(name);
   if ( cell == NULL ) {
     PyErr_SetString(PyExc_ValueError, "No such cell");
     return NULL;
   }
 
-  PyObject* cell_obj = self->mLibrary->cell(cell->id());
+  PyObject* cell_obj = self->mCellList[cell->id()];
 
   Py_INCREF(cell_obj);
   return cell_obj;
-}
-
-// cell_list 関数
-PyObject*
-CellLibrary_cell_list(CellLibraryObject* self,
-		      PyObject* args)
-{
-  ymuint n = self->mLibrary->library()->cell_num();
-  PyObject* list_obj = PyList_New(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    PyObject* obj1 = self->mLibrary->cell(i);
-    Py_INCREF(obj1);
-    PyList_SetItem(list_obj, i, obj1);
-  }
-
-  Py_INCREF(list_obj);
-  return list_obj;
 }
 
 // group_list 関数
@@ -410,10 +553,10 @@ PyObject*
 CellLibrary_group_list(CellLibraryObject* self,
 		       PyObject* args)
 {
-  ymuint n = self->mLibrary->library()->group_num();
+  ymuint n = self->mLibrary->group_num();
   PyObject* list_obj = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* obj1 = self->mLibrary->cell_group(i);
+    PyObject* obj1 = self->mGroupList[i];
     Py_INCREF(obj1);
     PyList_SetItem(list_obj, i, obj1);
   }
@@ -427,10 +570,10 @@ PyObject*
 CellLibrary_npn_class_list(CellLibraryObject* self,
 			   PyObject* args)
 {
-  ymuint n = self->mLibrary->library()->npn_class_num();
+  ymuint n = self->mLibrary->npn_class_num();
   PyObject* list_obj = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* obj1 = self->mLibrary->npn_class(i);
+    PyObject* obj1 = self->mClassList[i];
     Py_INCREF(obj1);
     PyList_SetItem(list_obj, i, obj1);
   }
@@ -449,7 +592,7 @@ CellLibrary_pg_pat(CellLibraryObject* self,
     return NULL;
   }
 
-  PyObject* result = self->mLibrary->pg_pat(pos);
+  PyObject* result = self->mPatList[pos];
 
   Py_INCREF(result);
   return result;
@@ -465,7 +608,7 @@ CellLibrary_pg_edge(CellLibraryObject* self,
     return NULL;
   }
 
-  PyObject* result = self->mLibrary->pg_edge(pos);
+  PyObject* result = self->mEdgeList[pos];
 
   Py_INCREF(result);
   return result;
@@ -494,7 +637,7 @@ CellLibrary_dump(CellLibraryObject* self,
     return NULL;
   }
 
-  self->mLibrary->library()->dump(*bp);
+  self->mLibrary->dump(*bp);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -554,14 +697,10 @@ PyMethodDef CellLibrary_methods[] = {
    PyDoc_STR("return list of lu_table_template (NONE)")},
   {"bus_type", (PyCFunction)CellLibrary_bus_type, METH_VARARGS,
    PyDoc_STR("return bus type of the library (NONE)")},
-  {"cell_num", (PyCFunction)CellLibrary_cell_num, METH_NOARGS,
-   PyDoc_STR("return cell number")},
-  {"cell", (PyCFunction)CellLibrary_cell, METH_VARARGS,
-   PyDoc_STR("return cell (int)")},
-  {"cell_by_name", (PyCFunction)CellLibrary_cell_by_name, METH_VARARGS,
-   PyDoc_STR("return cell (str)")},
   {"cell_list", (PyCFunction)CellLibrary_cell_list, METH_NOARGS,
    PyDoc_STR("return list of cell (NONE)")},
+  {"cell_by_name", (PyCFunction)CellLibrary_cell_by_name, METH_VARARGS,
+   PyDoc_STR("return cell (str)")},
   {"cell_group_list", (PyCFunction)CellLibrary_group_list, METH_NOARGS,
    PyDoc_STR("return list of cell group (NONE)")},
   {"npn_class_list", (PyCFunction)CellLibrary_npn_class_list, METH_NOARGS,
@@ -684,7 +823,7 @@ PyCellLibrary_AsCellLibraryPtr(PyObject* py_obj)
   // 強制的にキャスト
   CellLibraryObject* my_obj = (CellLibraryObject*)py_obj;
 
-  return my_obj->mLibrary->library();
+  return my_obj->mLibrary;
 }
 
 

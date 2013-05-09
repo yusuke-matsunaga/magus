@@ -10,7 +10,6 @@
 #include "ym_cell/pycell.h"
 #include "ym_cell/CellGroup.h"
 #include "ym_cell/Cell.h"
-#include "PyLibrary.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -251,7 +250,7 @@ PyTypeObject PyCellGroup_Type = {
 // @param[in] group グループ
 PyObject*
 PyCellGroup_FromCellGroup(const CellGroup* group,
-			  PyLibrary* py_library)
+			  PyObject* cell_list[])
 {
   CellGroupObject* self = PyObject_New(CellGroupObject, &PyCellGroup_Type);
   if ( self == NULL ) {
@@ -264,7 +263,7 @@ PyCellGroup_FromCellGroup(const CellGroup* group,
   self->mCellList = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
     const Cell* cell = group->cell(i);
-    PyObject* obj = py_library->cell(cell->id());
+    PyObject* obj = cell_list[cell->id()];
     PyList_SetItem(self->mCellList, i, obj);
   }
 

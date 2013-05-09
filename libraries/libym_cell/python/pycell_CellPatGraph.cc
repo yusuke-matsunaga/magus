@@ -9,7 +9,6 @@
 
 #include "ym_cell/pycell.h"
 #include "ym_cell/CellPatGraph.h"
-#include "PyPatGraph.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -26,8 +25,8 @@ struct CellPatGraphObject
   // Python のお約束
   PyObject_HEAD
 
-  // PyPatGraph
-  PyPatGraph* mPatGraph;
+  // CellPatGraph
+  const CellPatGraph* mPatGraph;
 
 };
 
@@ -40,8 +39,6 @@ struct CellPatGraphObject
 void
 CellPatGraph_dealloc(CellPatGraphObject* self)
 {
-  delete self->mPatGraph;
-
   PyObject_Del(self);
 }
 
@@ -50,10 +47,7 @@ PyObject*
 CellPatGraph_rep_id(CellPatGraphObject* self,
 		    PyObject* args)
 {
-  PyObject* result = self->mPatGraph->rep_id();
-
-  Py_INCREF(result);
-  return result;
+  return PyObject_FromYmuint32(self->mPatGraph->rep_id());
 }
 
 // root_info 関数
@@ -61,10 +55,9 @@ PyObject*
 CellPatGraph_root_info(CellPatGraphObject* self,
 		       PyObject* args)
 {
-  PyObject* result = self->mPatGraph->root_info();
-
-  Py_INCREF(result);
-  return result;
+  ymuint root_id = self->mPatGraph->root_id();
+  bool root_inv = self->mPatGraph->root_inv();
+  return Py_BuildValue("(Ii)", root_id, root_inv);
 }
 
 // edge_list 関数
@@ -72,10 +65,13 @@ PyObject*
 CellPatGraph_edge_list(CellPatGraphObject* self,
 		       PyObject* args)
 {
-  PyObject* result = self->mPatGraph->edge_list();
-
-  Py_INCREF(result);
-  return result;
+  ymuint ne = self->mPatGraph->edge_num();
+  PyObject* edge_list = PyList_New(ne);
+  for (ymuint i = 0; i < ne; ++ i) {
+    PyObject* obj = PyObject_FromYmuint32(self->mPatGraph->edge(i));
+    PyList_SetItem(edge_list, i, obj);
+  }
+  return edge_list;
 }
 
 
@@ -212,7 +208,7 @@ PyCellPatGraph_FromCellPatGraph(const CellPatGraph* pat_graph)
     return NULL;
   }
 
-  self->mPatGraph = new PyPatGraph(pat_graph);
+  self->mPatGraph = pat_graph;
 
   Py_INCREF(self);
   return (PyObject*)self;
@@ -234,7 +230,7 @@ PyCellPatGraph_AsCellPatGraphPtr(PyObject* py_obj)
   // 強制的にキャスト
   CellPatGraphObject* my_obj = (CellPatGraphObject*)py_obj;
 
-  return my_obj->mPatGraph->pat_graph();
+  return my_obj->mPatGraph;
 }
 
 // CellPatGraphObject 関係の初期化を行なう．

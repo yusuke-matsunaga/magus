@@ -28,13 +28,7 @@ libym_cell_python_la_SOURCES = \
 	pycell_CellCapacitance.cc \
 	pycell_CellResistance.cc \
 	pycell_CellTime.cc \
-	pycell_CellTiming.cc \
-	PyLibrary.h \
-	PyLibrary.cc \
-	PyCell.h \
-	PyCell.cc \
-	PyPatGraph.h \
-	PyPatGraph.cc
+	pycell_CellTiming.cc
 
 libym_cell_python_la_LIBADD =
 

@@ -10,10 +10,24 @@
 #include "ym_cell/pycell.h"
 #include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
-#include "PyCell.h"
 
 
 BEGIN_NAMESPACE_YM
+
+/// @brief CellPin から PyObject を作る．
+/// @param[in] pin CellPin へのポインタ
+/// @return cell を表す PyObject
+extern
+PyObject*
+PyCellPin_FromCellPin(const CellPin* pin);
+
+/// @brief CellTiming から PyObject を作る．
+/// @param[in] timing CellTiming へのポインタ
+/// @return timing を表す PyObject
+extern
+PyObject*
+PyCellTiming_FromCellTiming(const CellTiming* timing);
+
 
 BEGIN_NONAMESPACE
 
@@ -27,8 +41,17 @@ struct CellObject
   // Python のお約束
   PyObject_HEAD
 
-  // PyCell
-  PyCell* mCell;
+  // Cell
+  const Cell* mCell;
+
+  // 親のグループ
+  PyObject* mGroup;
+
+  // ピンの配列
+  PyObject** mPinArray;
+
+  // タイミング情報の配列
+  PyObject** mTimingArray;
 
 };
 
@@ -41,7 +64,19 @@ struct CellObject
 void
 Cell_dealloc(CellObject* self)
 {
-  delete self->mCell;
+  Py_DECREF(self->mGroup);
+
+  ymuint np = self->mCell->pin_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    Py_DECREF(self->mPinArray[i]);
+  }
+  delete [] self->mPinArray;
+
+  ymuint nt = self->mCell->timing_num();
+  for (ymuint i = 0; i < nt; ++ i) {
+    Py_DECREF(self->mTimingArray[i]);
+  }
+  delete [] self->mTimingArray;
 
   PyObject_Del(self);
 }
@@ -51,7 +86,7 @@ PyObject*
 Cell_id(CellObject* self,
 	PyObject* args)
 {
-  return PyObject_FromYmuint32(self->mCell->cell()->id());
+  return PyObject_FromYmuint32(self->mCell->id());
 }
 
 // name 関数
@@ -59,7 +94,7 @@ PyObject*
 Cell_name(CellObject* self,
 	  PyObject* args)
 {
-  return PyObject_FromString(self->mCell->cell()->name());
+  return PyObject_FromString(self->mCell->name());
 }
 
 // area 関数
@@ -67,7 +102,7 @@ PyObject*
 Cell_area(CellObject* self,
 	  PyObject* args)
 {
-  return PyCellArea_FromCellArea(self->mCell->cell()->area());
+  return PyCellArea_FromCellArea(self->mCell->area());
 }
 
 // pin 関数
@@ -80,13 +115,13 @@ Cell_pin(CellObject* self,
     return NULL;
   }
 
-  const CellPin* pin = self->mCell->cell()->pin(name);
+  const CellPin* pin = self->mCell->pin(name);
   if ( pin == NULL ) {
     PyErr_SetString(PyExc_ValueError, "No such pin");
     return NULL;
   }
 
-  PyObject* result = self->mCell->pin(pin->pin_id());
+  PyObject* result = self->mPinArray[pin->pin_id()];
 
   Py_INCREF(result);
   return result;
@@ -97,10 +132,10 @@ PyObject*
 Cell_pin_list(CellObject* self,
 	      PyObject* args)
 {
-  ymuint np = self->mCell->cell()->pin_num();
+  ymuint np = self->mCell->pin_num();
   PyObject* pin_list = PyList_New(np);
   for (ymuint i = 0; i < np; ++ i) {
-    PyObject* obj = self->mCell->pin(i);
+    PyObject* obj = self->mPinArray[i];
     PyList_SetItem(pin_list, i, obj);
   }
   return pin_list;
@@ -111,13 +146,67 @@ PyObject*
 Cell_input_pin_list(CellObject* self,
 		    PyObject* args)
 {
-  ymuint n = self->mCell->cell()->input_num();
+  ymuint n = self->mCell->input_num();
   PyObject* pin_list = PyList_New(n);
-  ymuint np = self->mCell->cell()->pin_num();
+  ymuint np = self->mCell->pin_num();
   for (ymuint i = 0; i < np; ++ i) {
-    const CellPin* pin = self->mCell->cell()->pin(i);
+    const CellPin* pin = self->mCell->pin(i);
     if ( pin->is_input() ) {
-      PyObject* obj = self->mCell->pin(i);
+      PyObject* obj = self->mPinArray[i];
+      PyList_SetItem(pin_list, pin->input_id(), obj);
+    }
+  }
+  return pin_list;
+}
+
+// output_pin_list 関数
+PyObject*
+Cell_output_pin_list(CellObject* self,
+		     PyObject* args)
+{
+  ymuint n = self->mCell->output_num();
+  PyObject* pin_list = PyList_New(n);
+  ymuint np = self->mCell->pin_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const CellPin* pin = self->mCell->pin(i);
+    if ( pin->is_output() ) {
+      PyObject* obj = self->mPinArray[i];
+      PyList_SetItem(pin_list, pin->input_id(), obj);
+    }
+  }
+  return pin_list;
+}
+
+// inout_pin_list 関数
+PyObject*
+Cell_inout_pin_list(CellObject* self,
+		    PyObject* args)
+{
+  ymuint n = self->mCell->inout_num();
+  PyObject* pin_list = PyList_New(n);
+  ymuint np = self->mCell->pin_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const CellPin* pin = self->mCell->pin(i);
+    if ( pin->is_inout() ) {
+      PyObject* obj = self->mPinArray[i];
+      PyList_SetItem(pin_list, pin->input_id(), obj);
+    }
+  }
+  return pin_list;
+}
+
+// internal_pin_list 関数
+PyObject*
+Cell_internal_pin_list(CellObject* self,
+		       PyObject* args)
+{
+  ymuint n = self->mCell->internal_num();
+  PyObject* pin_list = PyList_New(n);
+  ymuint np = self->mCell->pin_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const CellPin* pin = self->mCell->pin(i);
+    if ( pin->is_internal() ) {
+      PyObject* obj = self->mPinArray[i];
       PyList_SetItem(pin_list, pin->input_id(), obj);
     }
   }
@@ -129,10 +218,10 @@ PyObject*
 Cell_timing_list(CellObject* self,
 		 PyObject* args)
 {
-  ymuint n = self->mCell->cell()->timing_num();
+  ymuint n = self->mCell->timing_num();
   PyObject* timing_list = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* obj1 = self->mCell->timing(i);
+    PyObject* obj1 = self->mTimingArray[i];
     PyList_SetItem(timing_list, i, obj1);
   }
 
@@ -172,6 +261,15 @@ PyMethodDef Cell_methods[] = {
 
   {"input_pin_list", (PyCFunction)Cell_input_pin_list, METH_NOARGS,
    PyDoc_STR("return input-pin-list")},
+
+  {"output_pin_list", (PyCFunction)Cell_output_pin_list, METH_NOARGS,
+   PyDoc_STR("return output-pin-list")},
+
+  {"inout_pin_list", (PyCFunction)Cell_inout_pin_list, METH_NOARGS,
+   PyDoc_STR("return inout-pin-list")},
+
+  {"internal_pin_list", (PyCFunction)Cell_internal_pin_list, METH_NOARGS,
+   PyDoc_STR("return internal-pin-list")},
 
   {"timing_list", (PyCFunction)Cell_timing_list, METH_NOARGS,
    PyDoc_STR("return timing list")},
@@ -283,7 +381,22 @@ PyCellCell_FromCell(const Cell* cell)
     return NULL;
   }
 
-  self->mCell = new PyCell(cell);
+  self->mCell = cell;
+  self->mGroup = NULL;
+
+  ymuint np = cell->pin_num();
+  self->mPinArray = new PyObject*[np];
+  for (ymuint i = 0; i < np; ++ i) {
+    const CellPin* pin = cell->pin(i);
+    self->mPinArray[i] = PyCellPin_FromCellPin(pin);
+  }
+
+  ymuint nt = cell->timing_num();
+  self->mTimingArray = new PyObject*[nt];
+  for (ymuint i = 0; i < nt; ++ i) {
+    const CellTiming* timing = cell->timing(i);
+    self->mTimingArray[i] = PyCellTiming_FromCellTiming(timing);
+  }
 
   Py_INCREF(self);
   return (PyObject*)self;
@@ -296,7 +409,8 @@ PyCellCell_set_group(PyObject* py_obj,
 {
   assert_cond( PyCellCell_Check(py_obj), __FILE__, __LINE__);
   CellObject* cell_obj = (CellObject*)py_obj;
-  cell_obj->mCell->set_group(group_obj);
+  cell_obj->mGroup = group_obj;
+  Py_INCREF(group_obj);
 }
 
 // @brief PyObject から Cell へのポインタを取り出す．
@@ -315,7 +429,7 @@ PyCellCell_AsCellPtr(PyObject* py_obj)
   // 強制的にキャスト
   CellObject* my_obj = (CellObject*)py_obj;
 
-  return my_obj->mCell->cell();
+  return my_obj->mCell;
 }
 
 // CellObject 関係の初期化を行う．
