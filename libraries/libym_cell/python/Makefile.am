@@ -22,13 +22,12 @@ libym_cell_python_la_SOURCES = \
 	pycell_Cell.cc \
 	pycell_CellPin.cc \
 	pycell_CellPatGraph.cc \
-	pycell_LutTemplate.cc \
-	pycell_Lut.cc \
+	pycell_CellTiming.cc \
+	pycell_CellLut.cc \
 	pycell_CellArea.cc \
 	pycell_CellCapacitance.cc \
 	pycell_CellResistance.cc \
-	pycell_CellTime.cc \
-	pycell_CellTiming.cc
+	pycell_CellTime.cc
 
 libym_cell_python_la_LIBADD =
 

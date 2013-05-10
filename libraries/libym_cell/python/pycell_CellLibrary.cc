@@ -67,6 +67,15 @@ PyCellPatGraph_FromCellPatGraph(const CellPatGraph* pat_graph);
 
 BEGIN_NONAMESPACE
 
+// 'I' を表す定数オブジェクト
+PyObject* kPatI = NULL;
+
+// 'A' を表す定数オブジェクト
+PyObject* kPatA = NULL;
+
+// 'X' を表す定数オブジェクト
+PyObject* kPatX = NULL;
+
 //////////////////////////////////////////////////////////////////////
 // Python 用の構造体定義
 //////////////////////////////////////////////////////////////////////
@@ -97,15 +106,6 @@ struct CellLibraryObject
 
   // 枝の配列
   PyObject** mEdgeList;
-
-  // 'I' を表す定数オブジェクト
-  PyObject* kPatI;
-
-  // 'A' を表す定数オブジェクト
-  PyObject* kPatA;
-
-  // 'X' を表す定数オブジェクト
-  PyObject* kPatX;
 
 };
 
@@ -167,10 +167,6 @@ CellLibrary_dealloc(CellLibraryObject* self)
     Py_DECREF(self->mEdgeList[i]);
   }
   delete [] self->mEdgeList;
-
-  Py_DECREF(self->kPatI);
-  Py_DECREF(self->kPatA);
-  Py_DECREF(self->kPatX);
 
   PyObject_Del(self);
 }
@@ -280,19 +276,15 @@ CellLibrary_init(CellLibraryObject* self,
     self->mPatList[i] = pat_obj;
   }
 
-  self->kPatI = PyObject_FromString("INPUT");
-  self->kPatA = PyObject_FromString("AND");
-  self->kPatX = PyObject_FromString("XOR");
-
   ymuint npn = library->pg_node_num();
   self->mNodeList = new PyObject*[npn];
   for (ymuint i = 0; i < npn; ++ i) {
     tCellPatType pat_type = library->pg_node_type(i);
     PyObject* pat = NULL;
     switch ( pat_type ) {
-    case kCellPatInput: pat = self->kPatI; break;
-    case kCellPatAnd:   pat = self->kPatA; break;
-    case kCellPatXor:   pat = self->kPatX; break;
+    case kCellPatInput: pat = kPatI; break;
+    case kCellPatAnd:   pat = kPatA; break;
+    case kCellPatXor:   pat = kPatX; break;
     }
     ymuint id = 0;
     if ( pat_type == kCellPatInput ) {
@@ -434,50 +426,6 @@ CellLibrary_leakage_power_unit(CellLibraryObject* self,
 			       PyObject* args)
 {
   return PyObject_FromString(self->mLibrary->leakage_power_unit());
-}
-
-// lu_table_template 関数
-PyObject*
-CellLibrary_lu_table_template(CellLibraryObject* self,
-			      PyObject* args)
-{
-#if 0
-  // 引数の形式は
-  // - (str) テンプレート名
-  char* name = NULL;
-  if ( !PyArg_ParseTuple(args, "s", &name) ) {
-    return NULL;
-  }
-
-  const CellLutTemplate* lut_tmpl = self->mBody->lu_table_template(name);
-  if ( lut_tmpl == NULL ) {
-    PyErr_SetString(PyExc_ValueError, "No such lu_table_template");
-    return NULL;
-  }
-
-  return self->mLibrary->get_CellLutTemplate(lut_tmpl);
-#else
-  return NULL;
-#endif
-}
-
-// lut_table_template_list 関数
-PyObject*
-CellLibrary_lu_table_template_list(CellLibraryObject* self,
-				   PyObject* args)
-{
-#if 0
-  ymuint n = self->mBody->lu_table_template_num();
-  PyObject* list_obj = PyList_New(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    const CellLutTemplate* lut_tmpl = self->mBody->lu_table_template(i);
-    PyObject* obj1 = self->mLibrary->get_CellLutTemplate(lut_tmpl);
-    PyList_SetItem(list_obj, i, obj1);
-  }
-  return list_obj;
-#else
-  return NULL;
-#endif
 }
 
 // bus_type 関数
@@ -690,11 +638,6 @@ PyMethodDef CellLibrary_methods[] = {
    PyDoc_STR("return load unit of the library (NONE)")},
   {"leakage_power_unit", (PyCFunction)CellLibrary_leakage_power_unit, METH_NOARGS,
    PyDoc_STR("return power unit of the library (NONE)")},
-  {"lu_table_template", (PyCFunction)CellLibrary_lu_table_template, METH_VARARGS,
-   PyDoc_STR("return lu_table_template (str)")},
-  {"lu_table_template_lsit", (PyCFunction)CellLibrary_lu_table_template_list,
-   METH_NOARGS,
-   PyDoc_STR("return list of lu_table_template (NONE)")},
   {"bus_type", (PyCFunction)CellLibrary_bus_type, METH_VARARGS,
    PyDoc_STR("return bus type of the library (NONE)")},
   {"cell_list", (PyCFunction)CellLibrary_cell_list, METH_NOARGS,
@@ -852,6 +795,11 @@ CellLibraryObject_init(PyObject* m)
 
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "CellLibrary", (PyObject*)&PyCellLibrary_Type);
+
+  // 定数オブジェクトの登録
+  kPatI = PyObject_FromString("INPUT");
+  kPatA = PyObject_FromString("AND");
+  kPatX = PyObject_FromString("XOR");
 }
 
 END_NAMESPACE_YM
