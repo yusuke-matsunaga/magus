@@ -19,12 +19,6 @@ BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
-// 定数オブジェクト
-PyObject* kStrInput = NULL;
-PyObject* kStrOutput = NULL;
-PyObject* kStrInout = NULL;
-PyObject* kStrInternal = NULL;
-
 //////////////////////////////////////////////////////////////////////
 // Python 用の構造体定義
 //////////////////////////////////////////////////////////////////////
@@ -73,16 +67,7 @@ PyObject*
 CellPin_direction(CellPinObject* self,
 		  PyObject* args)
 {
-  PyObject* result = NULL;
-  switch ( self->mPin->direction() ) {
-  case CellPin::kDirInput:    result = kStrInput; break;
-  case CellPin::kDirOutput:   result = kStrOutput; break;
-  case CellPin::kDirInout:    result = kStrInout; break;
-  case CellPin::kDirInternal: result = kStrInternal; break;
-  }
-
-  Py_INCREF(result);
-  return result;
+  return PyCellDir_FromCellPinDirection(self->mPin->direction());
 }
 
 // input_id 関数
@@ -407,12 +392,6 @@ CellPinObject_init(PyObject* m)
 
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "CellPin", (PyObject*)&PyCellPin_Type);
-
-  // 定数オブジェクトの生成
-  kStrInput    = PyString_FromString("Input");
-  kStrOutput   = PyString_FromString("Output");
-  kStrInout    = PyString_FromString("Inout");
-  kStrInternal = PyString_FromString("Internal");
 
 }
 

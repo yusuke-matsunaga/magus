@@ -262,7 +262,7 @@ PyTypeObject PyCellDir_Type = {
 // @brief CellDir から CellDirObject を生成する．
 // @param[in] obj CellDir オブジェクト
 PyObject*
-PyCellDir_FromCellDir(CellPin::tDirection dir)
+PyCellDir_FromCellPinDirection(CellPin::tDirection dir)
 {
   PyObject* result = NULL;
   switch ( dir ) {
