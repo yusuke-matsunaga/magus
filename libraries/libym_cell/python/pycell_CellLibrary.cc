@@ -67,6 +67,14 @@ PyCellPatGraph_FromCellPatGraph(const CellPatGraph* pat_graph);
 
 BEGIN_NONAMESPACE
 
+PyObject* kTechCmos = NULL;
+PyObject* kTechFpga = NULL;
+PyObject* kDmGenericCmos = NULL;
+PyObject* kDmTableLookup = NULL;
+PyObject* kDmPiecewiseCmos = NULL;
+PyObject* kDmCmos2 = NULL;
+PyObject* kDmDcm = NULL;
+
 // 'I' を表す定数オブジェクト
 PyObject* kPatI = NULL;
 
@@ -132,41 +140,45 @@ CellLibrary_new(PyTypeObject* type)
 void
 CellLibrary_dealloc(CellLibraryObject* self)
 {
-  ymuint nc = self->mLibrary->cell_num();
-  for (ymuint i = 0; i < nc; ++ i) {
-    Py_DECREF(self->mCellList[i]);
-  }
-  delete [] self->mCellList;
+  const CellLibrary* library = self->mLibrary;
 
-  ymuint ng = self->mLibrary->group_num();
-  for (ymuint i = 0; i < ng; ++ i) {
-    Py_DECREF(self->mGroupList[i]);
-  }
-  delete [] self->mGroupList;
+  if ( library != NULL ) {
+    ymuint nc = library->cell_num();
+    for (ymuint i = 0; i < nc; ++ i) {
+      Py_DECREF(self->mCellList[i]);
+    }
+    delete [] self->mCellList;
 
-  ymuint nn = self->mLibrary->npn_class_num();
-  for (ymuint i = 0; i < nn; ++ i) {
-    Py_DECREF(self->mClassList[i]);
-  }
-  delete [] self->mClassList;
+    ymuint ng = library->group_num();
+    for (ymuint i = 0; i < ng; ++ i) {
+      Py_DECREF(self->mGroupList[i]);
+    }
+    delete [] self->mGroupList;
 
-  ymuint np = self->mLibrary->pg_pat_num();
-  for (ymuint i = 0; i < np; ++ i) {
-    Py_DECREF(self->mPatList[i]);
-  }
-  delete [] self->mPatList;
+    ymuint nn = library->npn_class_num();
+    for (ymuint i = 0; i < nn; ++ i) {
+      Py_DECREF(self->mClassList[i]);
+    }
+    delete [] self->mClassList;
 
-  ymuint npn = self->mLibrary->pg_node_num();
-  for (ymuint i = 0; i < npn; ++ i) {
-    Py_DECREF(self->mNodeList[i]);
-  }
-  delete [] self->mNodeList;
+    ymuint np = library->pg_pat_num();
+    for (ymuint i = 0; i < np; ++ i) {
+      Py_DECREF(self->mPatList[i]);
+    }
+    delete [] self->mPatList;
 
-  ymuint ne = self->mLibrary->pg_edge_num();
-  for (ymuint i = 0; i < ne; ++ i) {
-    Py_DECREF(self->mEdgeList[i]);
+    ymuint npn = library->pg_node_num();
+    for (ymuint i = 0; i < npn; ++ i) {
+      Py_DECREF(self->mNodeList[i]);
+    }
+    delete [] self->mNodeList;
+
+    ymuint ne = library->pg_edge_num();
+    for (ymuint i = 0; i < ne; ++ i) {
+      Py_DECREF(self->mEdgeList[i]);
+    }
+    delete [] self->mEdgeList;
   }
-  delete [] self->mEdgeList;
 
   PyObject_Del(self);
 }
@@ -320,13 +332,15 @@ PyObject*
 CellLibrary_technology(CellLibraryObject* self,
 		       PyObject* args)
 {
-  const char* tech_str = NULL;
+  PyObject* result = NULL;
   switch ( self->mLibrary->technology() ) {
-  case CellLibrary::kTechCmos: tech_str = "cmos"; break;
-  case CellLibrary::kTechFpga: tech_str = "fpga"; break;
+  case CellLibrary::kTechCmos: result = kTechCmos;
+  case CellLibrary::kTechFpga: result = kTechFpga;
   default: assert_not_reached(__FILE__, __LINE__);
   }
-  return PyObject_FromString(tech_str);
+
+  Py_INCREF(result);
+  return result;
 }
 
 // delay_model 関数
@@ -334,16 +348,18 @@ PyObject*
 CellLibrary_delay_model(CellLibraryObject* self,
 			PyObject* args)
 {
-  const char* dm_str = NULL;
+  PyObject* result = NULL;
   switch ( self->mLibrary->delay_model() ) {
-  case kCellDelayGenericCmos:   dm_str = "generic_cmos"; break;
-  case kCellDelayTableLookup:   dm_str = "table_lookup"; break;
-  case kCellDelayPiecewiseCmos: dm_str = "piecewise_cmos"; break;
-  case kCellDelayCmos2:         dm_str = "cmos2"; break;
-  case kCellDelayDcm:           dm_str = "dcm"; break;
+  case kCellDelayGenericCmos:   result = kDmGenericCmos; break;
+  case kCellDelayTableLookup:   result = kDmTableLookup; break;
+  case kCellDelayPiecewiseCmos: result = kDmPiecewiseCmos; break;
+  case kCellDelayCmos2:         result = kDmCmos2; break;
+  case kCellDelayDcm:           result = kDmDcm; break;
   default: assert_not_reached(__FILE__, __LINE__);
   }
-  return PyObject_FromString(dm_str);
+
+  Py_INCREF(result);
+  return result;
 }
 
 // bus_naming_style 関数
@@ -797,6 +813,15 @@ CellLibraryObject_init(PyObject* m)
   PyModule_AddObject(m, "CellLibrary", (PyObject*)&PyCellLibrary_Type);
 
   // 定数オブジェクトの登録
+  kTechCmos = PyString_FromString("cmos");
+  kTechFpga = PyString_FromString("fpga");
+
+  kDmGenericCmos   = PyString_FromString("generic_cmos");
+  kDmTableLookup   = PyString_FromString("table_lookup");
+  kDmPiecewiseCmos = PyString_FromString("piecewise_cmos");
+  kDmCmos2         = PyString_FromString("cmos2");
+  kDmDcm           = PyString_FromString("dcm");
+
   kPatI = PyObject_FromString("INPUT");
   kPatA = PyObject_FromString("AND");
   kPatX = PyObject_FromString("XOR");

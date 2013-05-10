@@ -409,10 +409,10 @@ CellPinObject_init(PyObject* m)
   PyModule_AddObject(m, "CellPin", (PyObject*)&PyCellPin_Type);
 
   // 定数オブジェクトの生成
-  kStrInput    = PyObject_FromString("Input");
-  kStrOutput   = PyObject_FromString("Output");
-  kStrInout    = PyObject_FromString("Inout");
-  kStrInternal = PyObject_FromString("Internal");
+  kStrInput    = PyString_FromString("Input");
+  kStrOutput   = PyString_FromString("Output");
+  kStrInout    = PyString_FromString("Inout");
+  kStrInternal = PyString_FromString("Internal");
 
 }
 
