@@ -1,0 +1,59 @@
+import cell_lib
+
+
+def print_pin(pin) :
+  dir = pin.direction()
+  print '      Pin: {}'.format(pin.name())
+  print '        Direction: {}'.format(dir)
+  if dir == 'Input' :
+    print '        I#{}'.format(str(pin.input_id()))
+    print '        capacitance: {}'.format(str(pin.capacitance()))
+    print '        rise capacitance: {}'.format(str(pin.rise_capacitance()))
+    print '        fall capacitance: {}'.format(str(pin.fall_capacitance()))
+  elif dir == 'Output' :
+    print '        O#{}'.format(str(pin.output_id()))
+    print '        function: {}'.format(str(pin.function()))
+    print '        three state: {}'.format(str(pin.three_state()))
+    print '        max fanout: {}'.format(str(pin.max_fanout()))
+    print '        min fanout: {}'.format(str(pin.min_fanout()))
+    print '        max capacitance: {}'.format(str(pin.max_capacitance()))
+    print '        min capacitance: {}'.format(str(pin.min_capacitance()))
+    print '        max transition: {}'.format(str(pin.max_transition()))
+    print '        min transition: {}'.format(str(pin.min_transition()))
+  elif dir == 'InOut' :
+    pass
+  elif dir == 'Internal' :
+    pass
+  
+  
+
+def print_cell(cell) :
+  print '    Cell: {}'.format(cell.name())
+  print '      Area: {}'.format(str(cell.area()))
+  pin_list = cell.pin_list()
+  for pin in pin_list :
+    print_pin(pin)
+
+def print_group(group) :
+  print '  Group#{}'.format(group.id())
+  cell_list = group.cell_list()
+  for cell in cell_list :
+    print_cell(cell)
+
+def print_class(cclass) :
+  print ''
+  print 'Class#{}'.format(cclass.id())
+  group_list = cclass.cell_group_list()
+  for group in group_list :
+    print_group(group)
+
+lib = cell_lib.CellLibrary("/home/yusuke/data/private/dot-libs/TSMC/tcb670tc.lib")
+#cell_list = lib.cell_list()
+#for cell in cell_list :
+#  print cell.name()
+#pg = lib.pg_pat(1)
+#print pg.edge_list()
+class_list = lib.npn_class_list()
+for cclass in class_list :
+  print_class(cclass)
+
