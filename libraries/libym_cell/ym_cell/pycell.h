@@ -11,9 +11,66 @@
 
 #include "ympython.h"
 #include "ym_cell/cell_nsdef.h"
+#include "ym_cell/CellPin.h"
 
 
 BEGIN_NAMESPACE_YM
+
+
+//////////////////////////////////////////////////////////////////////
+// PyCellDir: ピンの方向を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief CellDir を表すタイプオブジェクト
+extern
+PyTypeObject PyCellDir_Type;
+
+/// @brief PyCellDir の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyCellDir_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyCellDir_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyCellDir_Type;
+}
+
+/// @brief CellPin::tDirection から CellDirObject を生成する．
+/// @param[in] obj CellDir オブジェクト
+extern
+PyObject*
+PyCellDir_FromCellPinDirection(CellPin::tDirection dir);
+
+/// @brief 方向を表す文字列から CellDirObject を生成する．
+/// @param[in] str 文字列
+extern
+PyObject*
+PyCellDir_FromString(const char* str);
+
+/// @brief PyObject から CellPin::tDirection を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return CellPin::tDirection を返す．
+/// @note 変換が失敗したら TypeError を送出し，CellPin::kDirInput を返す．
+extern
+CellPin::tDirection
+PyCellDir_AsCellPinDirection(PyObject* py_obj);
+
+/// @brief CellPin::kDirInput を表すオブジェクト
+extern
+PyObject* Py_kDirInput;
+
+/// @brief CellPin::kDirOutput を表すオブジェクト
+extern
+PyObject* Py_kDirOutput;
+
+/// @brief CellPin::kDirInout を表すオブジェクト
+extern
+PyObject* Py_kDirInout;
+
+/// @brief CellPin::kDirInternal を表すオブジェクト
+extern
+PyObject* Py_kDirInternal;
 
 
 //////////////////////////////////////////////////////////////////////

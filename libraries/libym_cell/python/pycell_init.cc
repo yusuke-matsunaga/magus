@@ -27,6 +27,9 @@ END_NONAMESPACE
 
 
 void
+CellDirObject_init(PyObject* m);
+
+void
 CellAreaObject_init(PyObject* m);
 
 void
@@ -78,6 +81,9 @@ cell_init()
   if ( m == NULL ) {
     return;
   }
+
+  // CellDirObject 関係の初期化
+  CellDirObject_init(m);
 
   // CellAreaObject 関係の初期化
   CellAreaObject_init(m);
