@@ -484,6 +484,52 @@ const CellTiming*
 PyCellTiming_AsCellTimingPtr(PyObject* py_obj);
 
 
+//////////////////////////////////////////////////////////////////////
+// PyCellTimingType: tCellTimingType を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief tCellTimingType を表すタイプオブジェクト
+extern
+PyTypeObject PyCellTimingType_Type;
+
+/// @brief PyCellTimingType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyCellTimingType_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyCellTimingType_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyCellTimingType_Type;
+}
+
+/// @brief tCellTimingType から PyObject を作る．
+/// @param[in] timing_type tCellTimingType
+/// @return timing_type を表す PyObject
+extern
+PyObject*
+PyCellTimingType_FromCellTimingType(tCellTimingType timing_type);
+
+/// @brief 文字列から PyObject を作る．
+/// @param[in] str 文字列
+/// @return timing_type を表す PyObject
+extern
+PyObject*
+PyCellTimingType_FromString(const char* str);
+
+/// @brief PyObject から tCellTimingType の値を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return tCellTimingType を返す．
+/// @note 変換が失敗したら TypeError を送出し，kCellTimingCombinational を返す．
+extern
+tCellTimingType
+PyCellTimingType_AsCellTimingType(PyObject* py_obj);
+
+/// @brief kCellTimingCombinational を表す PyObject
+extern
+PyObject*
+Py_CellTimingType_kCombinational;
+
 
 //////////////////////////////////////////////////////////////////////
 // PyCellLutTemplate: LUT のテンプレートを表す型

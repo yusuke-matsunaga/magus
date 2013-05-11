@@ -23,6 +23,7 @@ libym_cell_python_la_SOURCES = \
 	pycell_CellPin.cc \
 	pycell_CellPatGraph.cc \
 	pycell_CellTiming.cc \
+	pycell_CellTimingType.cc \
 	pycell_CellLut.cc \
 	pycell_CellDir.cc \
 	pycell_CellArea.cc \
