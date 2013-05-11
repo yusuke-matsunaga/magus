@@ -453,8 +453,8 @@ display_library(ostream& s,
   // テクノロジ
   s << "  technology: ";
   switch ( library.technology() ) {
-  case CellLibrary::kTechCmos: s << "cmos"; break;
-  case CellLibrary::kTechFpga: s << "fpga"; break;
+  case kCellTechCmos: s << "cmos"; break;
+  case kCellTechFpga: s << "fpga"; break;
   default: assert_not_reached(__FILE__, __LINE__); break;
   }
   s << endl;

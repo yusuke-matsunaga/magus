@@ -43,7 +43,7 @@ public:
   name() const;
 
   /// @brief "technology" を返す．
-  CellLibrary::tTechnology
+  tCellTechnology
   technology() const;
 
   /// @brief "delay_model" を返す．
@@ -113,7 +113,7 @@ private:
   ShString mName;
 
   // "technology"
-  CellLibrary::tTechnology mTechnology;
+  tCellTechnology mTechnology;
 
   // "delay_model"
   tCellDelayModel mDelayModel;

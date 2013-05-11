@@ -52,7 +52,7 @@ CiLibrary::CiLibrary() :
   mLutHash(mAlloc),
   mCellHash(mAlloc)
 {
-  mTechnology = kTechCmos;
+  mTechnology = kCellTechCmos;
   mDelayModel = kCellDelayGenericCmos;
   mLutTemplateNum = 0;
   mLutTemplateArray = NULL;
@@ -77,7 +77,7 @@ CiLibrary::name() const
 }
 
 // @brief テクノロジの取得
-CellLibrary::tTechnology
+tCellTechnology
 CiLibrary::technology() const
 {
   return mTechnology;
@@ -445,7 +445,7 @@ CiLibrary::set_name(const string& name)
 
 // @brief 'technology' を設定する．
 void
-CiLibrary::set_technology(tTechnology technology)
+CiLibrary::set_technology(tCellTechnology technology)
 {
   mTechnology = technology;
 }
@@ -1573,7 +1573,7 @@ CiLibrary::restore(BinI& s)
   ymuint8 tmp2;
   s >> tmp1
     >> tmp2;
-  tTechnology technology = static_cast<tTechnology>(tmp1);
+  tCellTechnology technology = static_cast<tCellTechnology>(tmp1);
   tCellDelayModel delay_model = static_cast<tCellDelayModel>(tmp2);
 
   set_technology(technology);

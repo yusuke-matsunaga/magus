@@ -21,17 +21,6 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class CellPin
 {
-public:
-  //////////////////////////////////////////////////////////////////////
-  /// @brief ピンの方向を表す列挙型
-  //////////////////////////////////////////////////////////////////////
-  enum tDirection {
-    kDirInput,
-    kDirOutput,
-    kDirInout,
-    kDirInternal
-  };
-
 protected:
 
   /// @brief コンストラクタ
@@ -59,7 +48,7 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tDirection
+  tCellPinDirection
   direction() const = 0;
 
   /// @brief 入力ピンの時に true を返す．

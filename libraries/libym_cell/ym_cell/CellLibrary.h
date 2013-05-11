@@ -24,16 +24,6 @@ BEGIN_NAMESPACE_YM_CELL
 class CellLibrary
 {
 public:
-  //////////////////////////////////////////////////////////////////////
-  /// @brief テクノロジを表す列挙型
-  //////////////////////////////////////////////////////////////////////
-  enum tTechnology {
-    kTechCmos,
-    kTechFpga
-  };
-
-
-public:
 
   /// @brief コンストラクタ
   CellLibrary() { }
@@ -64,7 +54,7 @@ public:
   /// - kTechFpga
   /// のどちらか
   virtual
-  tTechnology
+  tCellTechnology
   technology() const = 0;
 
   /// @brief 遅延モデルの取得
@@ -375,7 +365,7 @@ public:
   /// @brief 'technology' を設定する．
   virtual
   void
-  set_technology(tTechnology technology) = 0;
+  set_technology(tCellTechnology technology) = 0;
 
   /// @brief 遅延モデルを設定する．
   /// @param[in] delay_model 遅延モデル．

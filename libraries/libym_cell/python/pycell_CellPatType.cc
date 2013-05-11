@@ -53,6 +53,11 @@ PyObject* kCellPatInputString = NULL;
 PyObject* kCellPatAndString   = NULL;
 PyObject* kCellPatXorString   = NULL;
 
+// 個々の定数に対する文字列
+const char* kCellPatInputName = "input";
+const char* kCellPatAndName   = "and";
+const char* kCellPatXorName   = "xor";
+
 
 //////////////////////////////////////////////////////////////////////
 // Python 用のメソッド関数定義
@@ -237,13 +242,13 @@ PyCellPatType_FromString(const char* str)
     // デフォルトは kCellPatInput
     result = Py_kCellPatInput;
   }
-  else if ( strcmp(str, "input") == 0 ) {
+  else if ( strcmp(str, kCellPatInputName) == 0 ) {
     result = Py_kCellPatInput;
   }
-  else if ( strcmp(str, "and") == 0 ) {
+  else if ( strcmp(str, kCellPatAndName) == 0 ) {
     result = Py_kCellPatAnd;
   }
-  else if ( strcmp(str, "xor") == 0 ) {
+  else if ( strcmp(str, kCellPatXorName) == 0 ) {
     result = Py_kCellPatXor;
   }
   else {
@@ -330,9 +335,9 @@ CellPatTypeObject_init(PyObject* m)
 	  "kCellPatXor");
 
   // 定数オブジェクト用の文字列オブジェクトの生成
-  kCellPatInputString = PyString_FromString("input");
-  kCellPatAndString   = PyString_FromString("and");
-  kCellPatXorString   = PyString_FromString("xor");
+  kCellPatInputString = PyString_FromString(kCellPatInputName);
+  kCellPatAndString   = PyString_FromString(kCellPatAndName);
+  kCellPatXorString   = PyString_FromString(kCellPatXorName);
 
 }
 

@@ -67,6 +67,13 @@ PyObject* kCellDelayPiecewiseCmosString = NULL;
 PyObject* kCellDelayCmos2String         = NULL;
 PyObject* kCellDelayDcmString           = NULL;
 
+// 個々の定数に対する文字列
+const char* kCellDelayGenericCmosName   = "generic_cmos";
+const char* kCellDelayTableLookupName   = "table_lookup";
+const char* kCellDelayPiecewiseCmosName = "piecewise_cmos";
+const char* kCellDelayCmos2Name         = "cmos2";
+const char* kCellDelayDcmName           = "dcm";
+
 
 //////////////////////////////////////////////////////////////////////
 // Python 用のメソッド関数定義
@@ -255,19 +262,19 @@ PyCellDelayModel_FromString(const char* str)
     // デフォルトは generic_cmos
     result = Py_kCellDelayGenericCmos;
   }
-  else if ( strcmp(str, "geneirc_cmos") == 0 ) {
+  else if ( strcmp(str, kCellDelayGenericCmosName) == 0 ) {
     result = Py_kCellDelayGenericCmos;
   }
-  else if ( strcmp(str, "table_lookup") == 0 ) {
+  else if ( strcmp(str, kCellDelayTableLookupName) == 0 ) {
     result = Py_kCellDelayTableLookup;
   }
-  else if ( strcmp(str, "piecewise_cmos") == 0 ) {
+  else if ( strcmp(str, kCellDelayPiecewiseCmosName) == 0 ) {
     result = Py_kCellDelayPiecewiseCmos;
   }
-  else if ( strcmp(str, "cmos2") == 0 ) {
+  else if ( strcmp(str, kCellDelayCmos2Name) == 0 ) {
     result = Py_kCellDelayCmos2;
   }
-  else if ( strcmp(str, "dcm") == 0 ) {
+  else if ( strcmp(str, kCellDelayDcmName) == 0 ) {
     result = Py_kCellDelayDcm;
   }
   else {
@@ -365,11 +372,11 @@ CellDelayModelObject_init(PyObject* m)
 	  "kCellDelayDcm");
 
   // 定数オブジェクト用の文字列オブジェクトの生成
-  kCellDelayGenericCmosString   = PyString_FromString("generic_cmos");
-  kCellDelayTableLookupString   = PyString_FromString("table_lookup");
-  kCellDelayPiecewiseCmosString = PyString_FromString("piecewise_cmos");
-  kCellDelayCmos2String         = PyString_FromString("cmos2");
-  kCellDelayDcmString           = PyString_FromString("dcm");
+  kCellDelayGenericCmosString   = PyString_FromString(kCellDelayGenericCmosName);
+  kCellDelayTableLookupString   = PyString_FromString(kCellDelayTableLookupName);
+  kCellDelayPiecewiseCmosString = PyString_FromString(kCellDelayPiecewiseCmosName);
+  kCellDelayCmos2String         = PyString_FromString(kCellDelayCmos2Name);
+  kCellDelayDcmString           = PyString_FromString(kCellDelayDcmName);
 }
 
 END_NAMESPACE_YM

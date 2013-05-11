@@ -64,7 +64,7 @@ public:
   /// @brief テクノロジの取得
   /// このクラスは常に kTechAsic を返す．
   virtual
-  tTechnology
+  tCellTechnology
   technology() const;
 
   /// @brief 遅延モデルの取得
@@ -375,7 +375,7 @@ public:
   /// @brief 'technology' を設定する．
   virtual
   void
-  set_technology(tTechnology technology);
+  set_technology(tCellTechnology technology);
 
   /// @brief 遅延モデルを設定する．
   /// @param[in] delay_model 遅延モデル．
@@ -922,7 +922,7 @@ private:
   string mName;
 
   // テクノロジ
-  tTechnology mTechnology;
+  tCellTechnology mTechnology;
 
   // バス命名規則
   string mBusNamingStyle;

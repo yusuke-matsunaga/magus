@@ -10,67 +10,66 @@
 
 
 #include "ympython.h"
-#include "ym_cell/CellLibrary.h"
-#include "ym_cell/CellPin.h"
+#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM
 
 
 //////////////////////////////////////////////////////////////////////
-// PyCellDir: ピンの方向を表す型
+// PyCellPinDir: ピンの方向を表す型
 //////////////////////////////////////////////////////////////////////
 
 /// @brief CellDir を表すタイプオブジェクト
 extern
-PyTypeObject PyCellDir_Type;
+PyTypeObject PyCellPinDir_Type;
 
-/// @brief PyCellDir の型チェック
+/// @brief PyCellPinDir の型チェック
 /// @param[in] obj Python オブジェクト
-/// @retval true obj が PyCellDir_Type だった．
+/// @retval true obj が PyCellPinDir_Type だった．
 /// @retval false obj が他の型だった．
 inline
 bool
-PyCellDir_Check(PyObject* obj)
+PyCellPinDir_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &PyCellDir_Type;
+  return Py_TYPE(obj) == &PyCellPinDir_Type;
 }
 
-/// @brief CellPin::tDirection から CellDirObject を生成する．
+/// @brief tCellPinDirection から CellDirObject を生成する．
 /// @param[in] obj CellDir オブジェクト
 extern
 PyObject*
-PyCellDir_FromCellPinDirection(CellPin::tDirection dir);
+PyCellPinDir_FromCellPinDirection(tCellPinDirection dir);
 
 /// @brief 方向を表す文字列から CellDirObject を生成する．
 /// @param[in] str 文字列
 extern
 PyObject*
-PyCellDir_FromString(const char* str);
+PyCellPinDir_FromString(const char* str);
 
-/// @brief PyObject から CellPin::tDirection を取り出す．
+/// @brief PyObject から tCellPinDirection を取り出す．
 /// @param[in] py_obj Python オブジェクト
-/// @return CellPin::tDirection を返す．
-/// @note 変換が失敗したら TypeError を送出し，CellPin::kDirInput を返す．
+/// @return tCellPinDirection を返す．
+/// @note 変換が失敗したら TypeError を送出し，kCellPinInput を返す．
 extern
-CellPin::tDirection
-PyCellDir_AsCellPinDirection(PyObject* py_obj);
+tCellPinDirection
+PyCellPinDir_AsCellPinDirection(PyObject* py_obj);
 
-/// @brief CellPin::kDirInput を表すオブジェクト
+/// @brief kCellPinInput を表すオブジェクト
 extern
-PyObject* Py_kDirInput;
+PyObject* Py_kCellPinInput;
 
-/// @brief CellPin::kDirOutput を表すオブジェクト
+/// @brief kCellPinOutput を表すオブジェクト
 extern
-PyObject* Py_kDirOutput;
+PyObject* Py_kCellPinOutput;
 
-/// @brief CellPin::kDirInout を表すオブジェクト
+/// @brief kCellPinInout を表すオブジェクト
 extern
-PyObject* Py_kDirInout;
+PyObject* Py_kCellPinInout;
 
-/// @brief CellPin::kDirInternal を表すオブジェクト
+/// @brief kCellPinInternal を表すオブジェクト
 extern
-PyObject* Py_kDirInternal;
+PyObject* Py_kCellPinInternal;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -422,10 +421,10 @@ PyCellPin_AsCellPinPtr(PyObject* py_obj);
 
 
 //////////////////////////////////////////////////////////////////////
-// PyCellTechnology: CellLibrary::tTechnology を表す型
+// PyCellTechnology: tCellTechnology を表す型
 //////////////////////////////////////////////////////////////////////
 
-/// @brief CellLibrary::tTechnology を表すタイプオブジェクト
+/// @brief tCellTechnology を表すタイプオブジェクト
 extern
 PyTypeObject PyCellTechnology_Type;
 
@@ -440,12 +439,12 @@ PyCellTechnology_Check(PyObject* obj)
   return Py_TYPE(obj) == &PyCellTechnology_Type;
 }
 
-/// @brief CellLibrary::tTechnology から PyObject を作る．
-/// @param[in] delay_model CellLibrary::tTechnology
+/// @brief tCellTechnology から PyObject を作る．
+/// @param[in] delay_model tCellTechnology
 /// @return delay_model を表す PyObject
 extern
 PyObject*
-PyCellTechnology_FromCellTechnology(CellLibrary::tTechnology delay_model);
+PyCellTechnology_FromCellTechnology(tCellTechnology delay_model);
 
 /// @brief 文字列から PyObject を作る．
 /// @param[in] str 文字列
@@ -454,12 +453,12 @@ extern
 PyObject*
 PyCellTechnology_FromString(const char* str);
 
-/// @brief PyObject から CellLibrary::tTechnology の値を取り出す．
+/// @brief PyObject から tCellTechnology の値を取り出す．
 /// @param[in] py_obj Python オブジェクト
-/// @return CellLibrary::tTechnology を返す．
+/// @return tCellTechnology を返す．
 /// @note 変換が失敗したら TypeError を送出し，kCellTechnologyGenericCmos を返す．
 extern
-CellLibrary::tTechnology
+tCellTechnology
 PyCellTechnology_AsCellTechnology(PyObject* py_obj);
 
 /// @brief kTechCmos を表す Python オブジェクト

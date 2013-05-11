@@ -1,6 +1,6 @@
 
 /// @file pycell_CellTechnology.cc
-/// @brief CellLibrary::tTechnology の Python 用ラッパ
+/// @brief tCellTechnology の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2013 Yusuke Matsunaga
@@ -8,7 +8,6 @@
 
 
 #include "ym_cell/pycell.h"
-#include "ym_cell/CellLibrary.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -19,32 +18,36 @@ BEGIN_NONAMESPACE
 // Python 用の構造体定義
 //////////////////////////////////////////////////////////////////////
 
-// CellLibrary::tTechnology を表す型
+// tCellTechnology を表す型
 struct CellTechnologyObject
 {
   // Python のお約束
   PyObject_HEAD
 
   // 実際の値
-  CellLibrary::tTechnology mVal;
+  tCellTechnology mVal;
 
 };
 
 // kTechCmos の実体
 CellTechnologyObject kTechCmosStruct = {
   PyObject_HEAD_INIT(&PyCellTechnology_Type)
-  CellLibrary::kTechCmos
+  kCellTechCmos
 };
 
 // kTechFpga の実体
 CellTechnologyObject kTechFpgaStruct = {
   PyObject_HEAD_INIT(&PyCellTechnology_Type)
-  CellLibrary::kTechFpga
+  kCellTechFpga
 };
 
 // repr 用の文字列オブジェクト
 PyObject* kTechCmosString = NULL;
 PyObject* kTechFpgaString = NULL;
+
+// 個々の定数に対する文字列
+const char* kTechCmosName = "cmos";
+const char* kTechFpgaName = "fpga";
 
 
 //////////////////////////////////////////////////////////////////////
@@ -78,8 +81,8 @@ CellTechnology_repr(CellTechnologyObject* self)
 {
   PyObject* result = NULL;
   switch ( self->mVal ) {
-  case CellLibrary::kTechCmos: result = kTechCmosString; break;
-  case CellLibrary::kTechFpga: result = kTechFpgaString; break;
+  case kCellTechCmos: result = kTechCmosString; break;
+  case kCellTechFpga: result = kTechFpgaString; break;
   default: assert_not_reached(__FILE__, __LINE__);
   }
 
@@ -199,18 +202,18 @@ PyTypeObject PyCellTechnology_Type = {
 
 
 //////////////////////////////////////////////////////////////////////
-// PyObject と CellLibrary::tTechnology の間の変換関数
+// PyObject と tCellTechnology の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief CellLibrary::tTechnology から CellTechnologyObject を生成する．
-// @param[in] technology CellLibrary::tTechnology の値
+// @brief tCellTechnology から CellTechnologyObject を生成する．
+// @param[in] technology tCellTechnology の値
 PyObject*
-PyCellTechnology_FromCellTechnology(CellLibrary::tTechnology technology)
+PyCellTechnology_FromCellTechnology(tCellTechnology technology)
 {
   PyObject* result = NULL;
   switch ( technology ) {
-  case CellLibrary::kTechCmos: result = Py_kCellTechCmos; break;
-  case CellLibrary::kTechFpga: result = Py_kCellTechFpga; break;
+  case kCellTechCmos: result = Py_kCellTechCmos; break;
+  case kCellTechFpga: result = Py_kCellTechFpga; break;
   default: assert_not_reached(__FILE__, __LINE__);
   }
 
@@ -228,15 +231,15 @@ PyCellTechnology_FromString(const char* str)
     // デフォルトは cmos
     result = Py_kCellTechCmos;
   }
-  else if ( strcmp(str, "cmos") == 0 ) {
+  else if ( strcmp(str, kTechCmosName) == 0 ) {
     result = Py_kCellTechCmos;
   }
-  else if ( strcmp(str, "fpga") == 0 ) {
+  else if ( strcmp(str, kTechFpgaName) == 0 ) {
     result = Py_kCellTechFpga;
   }
   else {
     PyErr_SetString(PyExc_ValueError,
-		    "Illegal string for CellLibrary::tTechnology");
+		    "Illegal string for tCellTechnology");
     return NULL;
   }
 
@@ -244,17 +247,17 @@ PyCellTechnology_FromString(const char* str)
   return result;
 }
 
-// @brief PyObject から CellLibrary::tTechnology を取り出す．
+// @brief PyObject から tCellTechnology を取り出す．
 // @param[in] py_obj Python オブジェクト
-// @return CellLibrary::tTechnology を返す．
+// @return tCellTechnology を返す．
 // @note 変換が失敗したら TypeError を送出し，kTechCmos を返す．
-CellLibrary::tTechnology
+tCellTechnology
 PyCellTechnology_AsCellTechnology(PyObject* py_obj)
 {
   // 型のチェック
   if ( !PyCellTechnology_Check(py_obj) ) {
     PyErr_SetString(PyExc_TypeError, "cell_lib.CellTechnology is expected");
-    return CellLibrary::kTechCmos;
+    return kCellTechCmos;
   }
 
   // 強制的にキャスト
@@ -277,7 +280,7 @@ PyObject* Py_kCellTechFpga = NULL;
 
 BEGIN_NONAMESPACE
 
-// CellLibrary::tTechnology の定数を設定する関数
+// tCellTechnology の定数を設定する関数
 void
 obj_set(CellTechnologyObject& my_obj,
 	PyObject*& py_obj,
@@ -312,8 +315,8 @@ CellTechnologyObject_init(PyObject* m)
 	  "kCellTechFpga");
 
   // 定数オブジェクト用の文字列オブジェクトの生成
-  kTechCmosString = PyString_FromString("cmos");
-  kTechFpgaString = PyString_FromString("fpga");
+  kTechCmosString = PyString_FromString(kTechCmosName);
+  kTechFpgaString = PyString_FromString(kTechFpgaName);
 
 }
 

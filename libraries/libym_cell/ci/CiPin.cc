@@ -225,10 +225,10 @@ CiInputPin::~CiInputPin()
 }
 
 // @brief 方向を返す．
-CellPin::tDirection
+tCellPinDirection
 CiInputPin::direction() const
 {
-  return kDirInput;
+  return kCellPinInput;
 }
 
 // @brief 入力ピンの時に true を返す．
@@ -453,10 +453,10 @@ CiOutputPin::~CiOutputPin()
 }
 
 // @brief 方向を返す．
-CellPin::tDirection
+tCellPinDirection
 CiOutputPin::direction() const
 {
-  return kDirOutput;
+  return kCellPinOutput;
 }
 
 // @brief 出力ピンの時に true を返す．
@@ -532,10 +532,10 @@ CiInoutPin::~CiInoutPin()
 }
 
 // @brief 方向を返す．
-CellPin::tDirection
+tCellPinDirection
 CiInoutPin::direction() const
 {
-  return kDirInput;
+  return kCellPinInput;
 }
 
 // @brief 入出力ピンの時に true を返す．
@@ -612,10 +612,10 @@ CiInternalPin::~CiInternalPin()
 }
 
 // @brief 方向を返す．
-CellPin::tDirection
+tCellPinDirection
 CiInternalPin::direction() const
 {
-  return kDirInternal;
+  return kCellPinInternal;
 }
 
 // @brief 内部ピンの時に true を返す．
