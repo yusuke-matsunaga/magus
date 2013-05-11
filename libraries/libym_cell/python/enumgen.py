@@ -44,11 +44,12 @@ type_list = (
     "NochangeLowLow"
 )
 
-#max_len = 0
-#for type in type_list :
-#    len = type.size()
-#    if max_len < len :
-#        max_len = len
+# キーワード長の最大値を求める．
+max_len = 0
+for type in type_list :
+    l = len(type)
+    if max_len < l :
+        max_len = l
 #print "max_length = {}".format(max_len)
 #print ""
 
@@ -60,7 +61,7 @@ type_list = (
 # };
 
 for type in type_list :
-    print "CellTimingTypeObject CellTmingType_k{}Struct = {}".format(type, '{')
+    print "CellTimingTypeObject CellTimingType_k{}Struct = {}".format(type, '{')
     print "  PyObject_HEAD_INIT(&PyCellTimingType_Type)"
     print "  kCellTiming{}".format(type)
     print "};"
@@ -71,19 +72,22 @@ print ""
 #
 # PyObject* CellTimingType_kCombinationalString = NULL;
 for type in type_list :
-    print "PyObject* CellTimingType_k{}String = NULL;".format(type)
+    fill_str = "".ljust(max_len - len(type))
+    print "PyObject* CellTimingType_k{}String{} = NULL;".format(type, fill_str)
 print ""
 
 #
 # case kCellTimingCombinational:    result = CellTimingType_kCombinationalString; break;
 for type in type_list :
-    print "  case kCellTiming{}:    result = CellTimingType_k{}String; break;".format(type, type)
+    fill_str = "".ljust(max_len - len(type))
+    print "  case kCellTiming{}:{} result = CellTimingType_k{}String; break;".format(type, fill_str, type)
 print ""
 
 #
 #  case kCellTimingCombinational:    result = Py_CellTimingType_kCombinational; break;
 for type in type_list :
-    print "  case kCellTiming{}:    result = Py_CellTimingType_k{}; break;".format(type, type)
+    fill_str = "".ljust(max_len - len(type))
+    print "  case kCellTiming{}:{} result = Py_CellTimingType_k{}; break;".format(type, fill_str, type)
 print ""
 
 #
@@ -101,20 +105,36 @@ print ""
 #// kCellTimingCombinational を表すオブジェクト
 #PyObject* Py_CellTimingType_kCombinational = NULL;
 for type in type_list :
+    fill_str = "".ljust(max_len - len(type))
     print "// kCellTiming{} を表すオブジェクト".format(type)
-    print "PyObject* Py_CellTimingType_k{} = NULL;".format(type)
+    print "PyObject* Py_CellTimingType_k{}{} = NULL;".format(type, fill_str)
     print ""
 print ""
 
 #
 #  timing_type_set(CellTimingType_kCombinationalStruct,    Py_CellTimingType_kCombinational,    m, "kTimingTypeCombinational");
 for type in type_list :
-    print "  timing_type_set(CellTimingType_k{}Struct, Py_CellTimingType_k{}, m, \"kTimingType{}\");".format(type, type, type)
+    print "  timing_type_set(CellTimingType_k{}Struct,".format(type)
+    print "                  Py_CellTimingType_k{}, m,".format(type)
+    print "                  \"kTimingType{}\");".format(type)
 print ""
 
 #
 #  CellTimingType_kCombinationalString    = PyString_FromString("combinational");
 for type in type_list :
     type_str = type
-    print "  CellTimingType_k{}String = PyString_FromString(\"{}\");".format(type, type_str)
+    fill_str = "".ljust(max_len - len(type))
+    print "  CellTimingType_k{}String{} = PyString_FromString(\"{}\");".format(type, fill_str, type_str)
 print ""
+
+#
+#/// @brief kCellTimingCombinational を表す PyObject
+#extern
+#PyObject*
+#Py_CellTimingType_kCombinational;
+for type in type_list :
+    print "/// @brief kCellTiming{}を表す PyObject".format(type)
+    print "extern"
+    print "PyObject*"
+    print "Py_CellTimingType_k{};".format(type)
+    print ""

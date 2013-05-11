@@ -17,50 +17,6 @@ BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
-// 定数オブジェクト
-PyObject* kCtStrCombinational = NULL;
-PyObject* kCtStrCombinationalRise = NULL;
-PyObject* kCtStrCombinationalFall = NULL;
-
-PyObject* kCtStrThreeStateEnable = NULL;
-PyObject* kCtStrThreeStateDisable = NULL;
-PyObject* kCtStrThreeStateEnableRise = NULL;
-PyObject* kCtStrThreeStateEnableFall = NULL;
-PyObject* kCtStrThreeStateDisableRise = NULL;
-PyObject* kCtStrThreeStateDisableFall = NULL;
-
-PyObject* kCtStrRisingEdge = NULL;
-PyObject* kCtStrFallingEdge = NULL;
-
-PyObject* kCtStrPreset = NULL;
-PyObject* kCtStrClear = NULL;
-
-PyObject* kCtStrHoldRising = NULL;
-PyObject* kCtStrHoldFalling = NULL;
-
-PyObject* kCtStrSetupRising = NULL;
-PyObject* kCtStrSetupFalling = NULL;
-
-PyObject* kCtStrRecoveryRising = NULL;
-PyObject* kCtStrRecoveryFalling = NULL;
-
-PyObject* kCtStrSkewRising = NULL;
-PyObject* kCtStrSkewFalling = NULL;
-
-PyObject* kCtStrRemovalRising = NULL;
-PyObject* kCtStrRemovalFalling = NULL;
-
-PyObject* kCtStrNonSeqSetupRising = NULL;
-PyObject* kCtStrNonSeqSetupFalling = NULL;
-PyObject* kCtStrNonSeqHoldRising = NULL;
-PyObject* kCtStrNonSeqHoldFalling = NULL;
-
-PyObject* kCtStrNochangeHighHigh = NULL;
-PyObject* kCtStrNochangeHighLow = NULL;
-PyObject* kCtStrNochangeLowHigh = NULL;
-PyObject* kCtStrNochangeLowLow = NULL;
-
-
 //////////////////////////////////////////////////////////////////////
 // Python 用の構造体定義
 //////////////////////////////////////////////////////////////////////
@@ -118,57 +74,7 @@ PyObject*
 CellTiming_type(CellTimingObject* self,
 		PyObject* args)
 {
-  PyObject* result = NULL;
-
-  switch ( self->mTiming->type() ) {
-  case kCellTimingCombinational:         result = kCtStrCombinational; break;
-  case kCellTimingCombinationalRise:     result = kCtStrCombinationalRise; break;
-  case kCellTimingCombinationalFall:     result = kCtStrCombinationalFall; break;
-
-  case kCellTimingThreeStateEnable:      result = kCtStrThreeStateEnable; break;
-  case kCellTimingThreeStateDisable:     result = kCtStrThreeStateDisable; break;
-  case kCellTimingThreeStateEnableRise:  result = kCtStrThreeStateEnableRise; break;
-  case kCellTimingThreeStateEnableFall:  result = kCtStrThreeStateEnableFall; break;
-  case kCellTimingThreeStateDisableRise: result = kCtStrThreeStateDisableRise; break;
-  case kCellTimingThreeStateDisableFall: result = kCtStrThreeStateDisableFall; break;
-
-  case kCellTimingRisingEdge:            result = kCtStrRisingEdge; break;
-  case kCellTimingFallingEdge:           result = kCtStrFallingEdge; break;
-
-  case kCellTimingPreset:                result = kCtStrPreset; break;
-  case kCellTimingClear:                 result = kCtStrClear; break;
-
-  case kCellTimingHoldRising:            result = kCtStrHoldRising; break;
-  case kCellTimingHoldFalling:           result = kCtStrHoldFalling; break;
-
-  case kCellTimingSetupRising:           result = kCtStrSetupRising; break;
-  case kCellTimingSetupFalling:          result = kCtStrSetupFalling; break;
-
-  case kCellTimingRecoveryRising:        result = kCtStrRecoveryRising; break;
-  case kCellTimingRecoveryFalling:       result = kCtStrRecoveryFalling; break;
-
-  case kCellTimingSkewRising:            result = kCtStrSkewRising; break;
-  case kCellTimingSkewFalling:           result = kCtStrSkewFalling; break;
-
-  case kCellTimingRemovalRising:         result = kCtStrRemovalRising; break;
-  case kCellTimingRemovalFalling:        result = kCtStrRemovalFalling; break;
-
-  case kCellTimingNonSeqSetupRising:     result = kCtStrNonSeqSetupRising; break;
-  case kCellTimingNonSeqSetupFalling:    result = kCtStrNonSeqSetupFalling; break;
-  case kCellTimingNonSeqHoldRising:      result = kCtStrNonSeqHoldRising; break;
-  case kCellTimingNonSeqHoldFalling:     result = kCtStrNonSeqHoldFalling; break;
-
-  case kCellTimingNochangeHighHigh:      result = kCtStrNochangeHighHigh; break;
-  case kCellTimingNochangeHighLow:       result = kCtStrNochangeHighLow; break;
-  case kCellTimingNochangeLowHigh:       result = kCtStrNochangeLowHigh; break;
-  case kCellTimingNochangeLowLow:        result = kCtStrNochangeLowLow; break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-  }
-
-  Py_INCREF(result);
-  return result;
+  return PyCellTimingType_FromCellTimingType(self->mTiming->type());
 }
 
 // timing_cond 関数
@@ -589,46 +495,6 @@ CellTimingObject_init(PyObject* m)
 
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "CellTiming", (PyObject*)&PyCellTiming_Type);
-
-  // 定数オブジェクトの生成
-  kCtStrCombinational = PyString_FromString("combinational");
-  kCtStrCombinationalRise = PyString_FromString("combinational_rise");
-  kCtStrCombinationalFall = PyString_FromString("combinational_fall");
-
-  kCtStrThreeStateEnable = PyString_FromString("three_state_enable");
-  kCtStrThreeStateDisable = PyString_FromString("three_state_disable");
-  kCtStrThreeStateEnableRise = PyString_FromString("three_state_enable_rise");
-  kCtStrThreeStateEnableFall = PyString_FromString("three_state_enable_fall");
-  kCtStrThreeStateDisableRise = PyString_FromString("three_state_disable_rise");
-  kCtStrThreeStateDisableFall = PyString_FromString("three_state_disable_fall");
-
-  kCtStrRisingEdge = PyString_FromString("rising_edge");
-  kCtStrFallingEdge = PyString_FromString("falling_edge");
-
-  kCtStrPreset = PyString_FromString("preset");
-  kCtStrClear = PyString_FromString("clear");
-
-  kCtStrHoldRising = PyString_FromString("hold_rising");
-  kCtStrHoldFalling = PyString_FromString("hold_falling");
-
-  kCtStrSetupRising = PyString_FromString("setup_rising");
-  kCtStrSetupFalling = PyString_FromString("setup_falling");
-
-  kCtStrRecoveryRising = PyString_FromString("recovery_rising");
-  kCtStrRecoveryFalling = PyString_FromString("recovery_falling");
-
-  kCtStrSkewRising = PyString_FromString("skew_rising");
-  kCtStrSkewFalling = PyString_FromString("skew_falling");
-
-  kCtStrNonSeqSetupRising = PyString_FromString("non_seq_setup_rising");
-  kCtStrNonSeqSetupFalling = PyString_FromString("non_seq_setup_falling");
-  kCtStrNonSeqHoldRising = PyString_FromString("non_seq_hold_rising");
-  kCtStrNonSeqHoldFalling = PyString_FromString("non_seq_hold_falling");
-
-  kCtStrNochangeHighHigh = PyString_FromString("nochange_high_high");
-  kCtStrNochangeHighLow = PyString_FromString("nochange_high_low");
-  kCtStrNochangeLowHigh = PyString_FromString("nochange_low_high");
-  kCtStrNochangeLowLow = PyString_FromString("nochange_low_low");
 }
 
 END_NAMESPACE_YM

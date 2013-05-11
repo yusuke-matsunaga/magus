@@ -67,23 +67,6 @@ PyCellPatGraph_FromCellPatGraph(const CellPatGraph* pat_graph);
 
 BEGIN_NONAMESPACE
 
-PyObject* kTechCmos = NULL;
-PyObject* kTechFpga = NULL;
-PyObject* kDmGenericCmos = NULL;
-PyObject* kDmTableLookup = NULL;
-PyObject* kDmPiecewiseCmos = NULL;
-PyObject* kDmCmos2 = NULL;
-PyObject* kDmDcm = NULL;
-
-// 'I' を表す定数オブジェクト
-PyObject* kPatI = NULL;
-
-// 'A' を表す定数オブジェクト
-PyObject* kPatA = NULL;
-
-// 'X' を表す定数オブジェクト
-PyObject* kPatX = NULL;
-
 //////////////////////////////////////////////////////////////////////
 // Python 用の構造体定義
 //////////////////////////////////////////////////////////////////////
@@ -292,12 +275,7 @@ CellLibrary_init(CellLibraryObject* self,
   self->mNodeList = new PyObject*[npn];
   for (ymuint i = 0; i < npn; ++ i) {
     tCellPatType pat_type = library->pg_node_type(i);
-    PyObject* pat = NULL;
-    switch ( pat_type ) {
-    case kCellPatInput: pat = kPatI; break;
-    case kCellPatAnd:   pat = kPatA; break;
-    case kCellPatXor:   pat = kPatX; break;
-    }
+    PyObject* pat = PyCellPatType_FromCellPatType(pat_type);
     ymuint id = 0;
     if ( pat_type == kCellPatInput ) {
       id = library->pg_input_id(i);
@@ -332,15 +310,7 @@ PyObject*
 CellLibrary_technology(CellLibraryObject* self,
 		       PyObject* args)
 {
-  PyObject* result = NULL;
-  switch ( self->mLibrary->technology() ) {
-  case CellLibrary::kTechCmos: result = kTechCmos;
-  case CellLibrary::kTechFpga: result = kTechFpga;
-  default: assert_not_reached(__FILE__, __LINE__);
-  }
-
-  Py_INCREF(result);
-  return result;
+  return PyCellTechnology_FromCellTechnology(self->mLibrary->technology());
 }
 
 // delay_model 関数
@@ -348,18 +318,7 @@ PyObject*
 CellLibrary_delay_model(CellLibraryObject* self,
 			PyObject* args)
 {
-  PyObject* result = NULL;
-  switch ( self->mLibrary->delay_model() ) {
-  case kCellDelayGenericCmos:   result = kDmGenericCmos; break;
-  case kCellDelayTableLookup:   result = kDmTableLookup; break;
-  case kCellDelayPiecewiseCmos: result = kDmPiecewiseCmos; break;
-  case kCellDelayCmos2:         result = kDmCmos2; break;
-  case kCellDelayDcm:           result = kDmDcm; break;
-  default: assert_not_reached(__FILE__, __LINE__);
-  }
-
-  Py_INCREF(result);
-  return result;
+  return PyCellDelayModel_FromCellDelayModel(self->mLibrary->delay_model());
 }
 
 // bus_naming_style 関数
@@ -578,19 +537,6 @@ CellLibrary_pg_edge(CellLibraryObject* self,
   return result;
 }
 
-// const0_func 関数
-PyObject*
-CellLibrary_const0_func(CellLibraryObject* self,
-			PyObject* args)
-{
-#if 0
-  const CellGroup* group = self->mBody->const0_func();
-  return self->mLibrary->get_CellGroup(group);
-#else
-  return NULL;
-#endif
-}
-
 // dump 関数
 PyObject*
 CellLibrary_dump(CellLibraryObject* self,
@@ -786,20 +732,6 @@ PyCellLibrary_AsCellLibraryPtr(PyObject* py_obj)
 }
 
 
-BEGIN_NONAMESPACE
-
-inline
-PyObject*
-new_string(const char* str)
-{
-  PyObject* py_obj = PyString_InternFromString(str);
-  Py_INCREF(py_obj);
-  return py_obj;
-}
-
-END_NONAMESPACE
-
-
 // CellLibraryObject 関係の初期化を行う．
 void
 CellLibraryObject_init(PyObject* m)
@@ -812,19 +744,6 @@ CellLibraryObject_init(PyObject* m)
   // タイプオブジェクトの登録
   PyModule_AddObject(m, "CellLibrary", (PyObject*)&PyCellLibrary_Type);
 
-  // 定数オブジェクトの登録
-  kTechCmos = PyString_FromString("cmos");
-  kTechFpga = PyString_FromString("fpga");
-
-  kDmGenericCmos   = PyString_FromString("generic_cmos");
-  kDmTableLookup   = PyString_FromString("table_lookup");
-  kDmPiecewiseCmos = PyString_FromString("piecewise_cmos");
-  kDmCmos2         = PyString_FromString("cmos2");
-  kDmDcm           = PyString_FromString("dcm");
-
-  kPatI = PyObject_FromString("INPUT");
-  kPatA = PyObject_FromString("AND");
-  kPatX = PyObject_FromString("XOR");
 }
 
 END_NAMESPACE_YM

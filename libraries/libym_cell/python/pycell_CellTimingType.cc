@@ -29,14 +29,194 @@ struct CellTimingTypeObject
 
 };
 
-// CellTimingType_kCombinational の実体
-CellTimingTypeObject CellTimingType_kCombinationalStruct = {
+// kCellTimingCombinational の実体
+CellTimingTypeObject kCellTimingCombinationalStruct = {
   PyObject_HEAD_INIT(&PyCellTimingType_Type)
   kCellTimingCombinational
 };
 
+CellTimingTypeObject kCellTimingCombinationalRiseStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingCombinationalRise
+};
+
+CellTimingTypeObject kCellTimingCombinationalFallStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingCombinationalFall
+};
+
+CellTimingTypeObject kCellTimingThreeStateEnableStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingThreeStateEnable
+};
+
+CellTimingTypeObject kCellTimingThreeStateDisableStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingThreeStateDisable
+};
+
+CellTimingTypeObject kCellTimingThreeStateEnableRiseStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingThreeStateEnableRise
+};
+
+CellTimingTypeObject kCellTimingThreeStateEnableFallStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingThreeStateEnableFall
+};
+
+CellTimingTypeObject kCellTimingThreeStateDisableRiseStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingThreeStateDisableRise
+};
+
+CellTimingTypeObject kCellTimingThreeStateDisableFallStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingThreeStateDisableFall
+};
+
+CellTimingTypeObject kCellTimingRisingEdgeStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingRisingEdge
+};
+
+CellTimingTypeObject kCellTimingFallingEdgeStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingFallingEdge
+};
+
+CellTimingTypeObject kCellTimingPresetStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingPreset
+};
+
+CellTimingTypeObject kCellTimingClearStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingClear
+};
+
+CellTimingTypeObject kCellTimingHoldRisingStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingHoldRising
+};
+
+CellTimingTypeObject kCellTimingHoldFallingStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingHoldFalling
+};
+
+CellTimingTypeObject kCellTimingSetupRisingStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingSetupRising
+};
+
+CellTimingTypeObject kCellTimingSetupFallingStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingSetupFalling
+};
+
+CellTimingTypeObject kCellTimingRecoveryRisingStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingRecoveryRising
+};
+
+CellTimingTypeObject kCellTimingRecoveryFallingStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingRecoveryFalling
+};
+
+CellTimingTypeObject kCellTimingSkewRisingStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingSkewRising
+};
+
+CellTimingTypeObject kCellTimingSkewFallingStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingSkewFalling
+};
+
+CellTimingTypeObject kCellTimingRemovalRisingStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingRemovalRising
+};
+
+CellTimingTypeObject kCellTimingRemovalFallingStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingRemovalFalling
+};
+
+CellTimingTypeObject kCellTimingNonSeqSetupRisingStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingNonSeqSetupRising
+};
+
+CellTimingTypeObject kCellTimingNonSeqSetupFallingStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingNonSeqSetupFalling
+};
+
+CellTimingTypeObject kCellTimingNonSeqHoldRisingStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingNonSeqHoldRising
+};
+
+CellTimingTypeObject kCellTimingNonSeqHoldFallingStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingNonSeqHoldFalling
+};
+
+CellTimingTypeObject kCellTimingNochangeHighHighStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingNochangeHighHigh
+};
+
+CellTimingTypeObject kCellTimingNochangeHighLowStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingNochangeHighLow
+};
+
+CellTimingTypeObject kCellTimingNochangeLowHighStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingNochangeLowHigh
+};
+
+CellTimingTypeObject kCellTimingNochangeLowLowStruct = {
+  PyObject_HEAD_INIT(&PyCellTimingType_Type)
+  kCellTimingNochangeLowLow
+};
+
 // repr 用の文字列オブジェクト
-PyObject* CellTimingType_kCombinationalString = NULL;
+PyObject* kCellTimingCombinationalStr         = NULL;
+PyObject* kCellTimingCombinationalRiseStr     = NULL;
+PyObject* kCellTimingCombinationalFallStr     = NULL;
+PyObject* kCellTimingThreeStateEnableStr      = NULL;
+PyObject* kCellTimingThreeStateDisableStr     = NULL;
+PyObject* kCellTimingThreeStateEnableRiseStr  = NULL;
+PyObject* kCellTimingThreeStateEnableFallStr  = NULL;
+PyObject* kCellTimingThreeStateDisableRiseStr = NULL;
+PyObject* kCellTimingThreeStateDisableFallStr = NULL;
+PyObject* kCellTimingRisingEdgeStr            = NULL;
+PyObject* kCellTimingFallingEdgeStr           = NULL;
+PyObject* kCellTimingPresetStr                = NULL;
+PyObject* kCellTimingClearStr                 = NULL;
+PyObject* kCellTimingHoldRisingStr            = NULL;
+PyObject* kCellTimingHoldFallingStr           = NULL;
+PyObject* kCellTimingSetupRisingStr           = NULL;
+PyObject* kCellTimingSetupFallingStr          = NULL;
+PyObject* kCellTimingRecoveryRisingStr        = NULL;
+PyObject* kCellTimingRecoveryFallingStr       = NULL;
+PyObject* kCellTimingSkewRisingStr            = NULL;
+PyObject* kCellTimingSkewFallingStr           = NULL;
+PyObject* kCellTimingRemovalRisingStr         = NULL;
+PyObject* kCellTimingRemovalFallingStr        = NULL;
+PyObject* kCellTimingNonSeqSetupRisingStr     = NULL;
+PyObject* kCellTimingNonSeqSetupFallingStr    = NULL;
+PyObject* kCellTimingNonSeqHoldRisingStr      = NULL;
+PyObject* kCellTimingNonSeqHoldFallingStr     = NULL;
+PyObject* kCellTimingNochangeHighHighStr      = NULL;
+PyObject* kCellTimingNochangeHighLowStr       = NULL;
+PyObject* kCellTimingNochangeLowHighStr       = NULL;
+PyObject* kCellTimingNochangeLowLowStr        = NULL;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -70,7 +250,68 @@ CellTimingType_repr(CellTimingTypeObject* self)
 {
   PyObject* result = NULL;
   switch ( self->mVal ) {
-  case kCellTimingCombinational:    result = CellTimingType_kCombinationalString; break;
+  case kCellTimingCombinational:
+    result = kCellTimingCombinationalStr; break;
+  case kCellTimingCombinationalRise:
+    result = kCellTimingCombinationalRiseStr; break;
+  case kCellTimingCombinationalFall:
+    result = kCellTimingCombinationalFallStr; break;
+  case kCellTimingThreeStateEnable:
+    result = kCellTimingThreeStateEnableStr; break;
+  case kCellTimingThreeStateDisable:
+    result = kCellTimingThreeStateDisableStr; break;
+  case kCellTimingThreeStateEnableRise:
+    result = kCellTimingThreeStateEnableRiseStr; break;
+  case kCellTimingThreeStateEnableFall:
+    result = kCellTimingThreeStateEnableFallStr; break;
+  case kCellTimingThreeStateDisableRise:
+    result = kCellTimingThreeStateDisableRiseStr; break;
+  case kCellTimingThreeStateDisableFall:
+    result = kCellTimingThreeStateDisableFallStr; break;
+  case kCellTimingRisingEdge:
+    result = kCellTimingRisingEdgeStr; break;
+  case kCellTimingFallingEdge:
+    result = kCellTimingFallingEdgeStr; break;
+  case kCellTimingPreset:
+    result = kCellTimingPresetStr; break;
+  case kCellTimingClear:
+    result = kCellTimingClearStr; break;
+  case kCellTimingHoldRising:
+    result = kCellTimingHoldRisingStr; break;
+  case kCellTimingHoldFalling:
+    result = kCellTimingHoldFallingStr; break;
+  case kCellTimingSetupRising:
+    result = kCellTimingSetupRisingStr; break;
+  case kCellTimingSetupFalling:
+    result = kCellTimingSetupFallingStr; break;
+  case kCellTimingRecoveryRising:
+    result = kCellTimingRecoveryRisingStr; break;
+  case kCellTimingRecoveryFalling:
+    result = kCellTimingRecoveryFallingStr; break;
+  case kCellTimingSkewRising:
+    result = kCellTimingSkewRisingStr; break;
+  case kCellTimingSkewFalling:
+    result = kCellTimingSkewFallingStr; break;
+  case kCellTimingRemovalRising:
+    result = kCellTimingRemovalRisingStr; break;
+  case kCellTimingRemovalFalling:
+    result = kCellTimingRemovalFallingStr; break;
+  case kCellTimingNonSeqSetupRising:
+    result = kCellTimingNonSeqSetupRisingStr; break;
+  case kCellTimingNonSeqSetupFalling:
+    result = kCellTimingNonSeqSetupFallingStr; break;
+  case kCellTimingNonSeqHoldRising:
+    result = kCellTimingNonSeqHoldRisingStr; break;
+  case kCellTimingNonSeqHoldFalling:
+    result = kCellTimingNonSeqHoldFallingStr; break;
+  case kCellTimingNochangeHighHigh:
+    result = kCellTimingNochangeHighHighStr; break;
+  case kCellTimingNochangeHighLow:
+    result = kCellTimingNochangeHighLowStr; break;
+  case kCellTimingNochangeLowHigh:
+    result = kCellTimingNochangeLowHighStr; break;
+  case kCellTimingNochangeLowLow:
+    result = kCellTimingNochangeLowLowStr; break;
   default: assert_not_reached(__FILE__, __LINE__); break;
   }
 
@@ -111,7 +352,7 @@ PyTypeObject PyCellTimingType_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "cell_lib.TimingType",              // tp_name
+  "cell_lib.CellTimingType",              // tp_name
   sizeof(CellTimingTypeObject),          // tp_basicsize
   (int)0,                         // tp_itemsize
 
@@ -201,7 +442,68 @@ PyCellTimingType_FromCellTimingType(tCellTimingType timing_type)
 {
   PyObject* result = NULL;
   switch ( timing_type ) {
-  case kCellTimingCombinational:    result = Py_CellTimingType_kCombinational; break;
+  case kCellTimingCombinational:
+    result = Py_kCellTimingCombinational; break;
+  case kCellTimingCombinationalRise:
+    result = Py_kCellTimingCombinationalRise; break;
+  case kCellTimingCombinationalFall:
+    result = Py_kCellTimingCombinationalFall; break;
+  case kCellTimingThreeStateEnable:
+    result = Py_kCellTimingThreeStateEnable; break;
+  case kCellTimingThreeStateDisable:
+    result = Py_kCellTimingThreeStateDisable; break;
+  case kCellTimingThreeStateEnableRise:
+    result = Py_kCellTimingThreeStateEnableRise; break;
+  case kCellTimingThreeStateEnableFall:
+    result = Py_kCellTimingThreeStateEnableFall; break;
+  case kCellTimingThreeStateDisableRise:
+    result = Py_kCellTimingThreeStateDisableRise; break;
+  case kCellTimingThreeStateDisableFall:
+    result = Py_kCellTimingThreeStateDisableFall; break;
+  case kCellTimingRisingEdge:
+    result = Py_kCellTimingRisingEdge; break;
+  case kCellTimingFallingEdge:
+    result = Py_kCellTimingFallingEdge; break;
+  case kCellTimingPreset:
+    result = Py_kCellTimingPreset; break;
+  case kCellTimingClear:
+    result = Py_kCellTimingClear; break;
+  case kCellTimingHoldRising:
+    result = Py_kCellTimingHoldRising; break;
+  case kCellTimingHoldFalling:
+    result = Py_kCellTimingHoldFalling; break;
+  case kCellTimingSetupRising:
+    result = Py_kCellTimingSetupRising; break;
+  case kCellTimingSetupFalling:
+    result = Py_kCellTimingSetupFalling; break;
+  case kCellTimingRecoveryRising:
+    result = Py_kCellTimingRecoveryRising; break;
+  case kCellTimingRecoveryFalling:
+    result = Py_kCellTimingRecoveryFalling; break;
+  case kCellTimingSkewRising:
+    result = Py_kCellTimingSkewRising; break;
+  case kCellTimingSkewFalling:
+    result = Py_kCellTimingSkewFalling; break;
+  case kCellTimingRemovalRising:
+    result = Py_kCellTimingRemovalRising; break;
+  case kCellTimingRemovalFalling:
+    result = Py_kCellTimingRemovalFalling; break;
+  case kCellTimingNonSeqSetupRising:
+    result = Py_kCellTimingNonSeqSetupRising; break;
+  case kCellTimingNonSeqSetupFalling:
+    result = Py_kCellTimingNonSeqSetupFalling; break;
+  case kCellTimingNonSeqHoldRising:
+    result = Py_kCellTimingNonSeqHoldRising; break;
+  case kCellTimingNonSeqHoldFalling:
+    result = Py_kCellTimingNonSeqHoldFalling; break;
+  case kCellTimingNochangeHighHigh:
+    result = Py_kCellTimingNochangeHighHigh; break;
+  case kCellTimingNochangeHighLow:
+    result = Py_kCellTimingNochangeHighLow; break;
+  case kCellTimingNochangeLowHigh:
+    result = Py_kCellTimingNochangeLowHigh; break;
+  case kCellTimingNochangeLowLow:
+    result = Py_kCellTimingNochangeLowLow; break;
   default: assert_not_reached(__FILE__, __LINE__);
   }
 
@@ -217,10 +519,100 @@ PyCellTimingType_FromString(const char* str)
   PyObject* result = NULL;
   if ( str == NULL ) {
     // デフォルトは combinational
-    result = Py_CellTimingType_kCombinational;
+    result = Py_kCellTimingCombinational;
   }
-  else if ( strcmp(str, "combinational") == 0 ) {
-    result = Py_CellTimingType_kCombinational;
+  else if ( strcmp(str, "Combinational") == 0 ) {
+    result = Py_kCellTimingCombinational;
+  }
+  else if ( strcmp(str, "CombinationalRise") == 0 ) {
+    result = Py_kCellTimingCombinationalRise;
+  }
+  else if ( strcmp(str, "CombinationalFall") == 0 ) {
+    result = Py_kCellTimingCombinationalFall;
+  }
+  else if ( strcmp(str, "ThreeStateEnable") == 0 ) {
+    result = Py_kCellTimingThreeStateEnable;
+  }
+  else if ( strcmp(str, "ThreeStateDisable") == 0 ) {
+    result = Py_kCellTimingThreeStateDisable;
+  }
+  else if ( strcmp(str, "ThreeStateEnableRise") == 0 ) {
+    result = Py_kCellTimingThreeStateEnableRise;
+  }
+  else if ( strcmp(str, "ThreeStateEnableFall") == 0 ) {
+    result = Py_kCellTimingThreeStateEnableFall;
+  }
+  else if ( strcmp(str, "ThreeStateDisableRise") == 0 ) {
+    result = Py_kCellTimingThreeStateDisableRise;
+  }
+  else if ( strcmp(str, "ThreeStateDisableFall") == 0 ) {
+    result = Py_kCellTimingThreeStateDisableFall;
+  }
+  else if ( strcmp(str, "RisingEdge") == 0 ) {
+    result = Py_kCellTimingRisingEdge;
+  }
+  else if ( strcmp(str, "FallingEdge") == 0 ) {
+    result = Py_kCellTimingFallingEdge;
+  }
+  else if ( strcmp(str, "Preset") == 0 ) {
+    result = Py_kCellTimingPreset;
+  }
+  else if ( strcmp(str, "Clear") == 0 ) {
+    result = Py_kCellTimingClear;
+  }
+  else if ( strcmp(str, "HoldRising") == 0 ) {
+    result = Py_kCellTimingHoldRising;
+  }
+  else if ( strcmp(str, "HoldFalling") == 0 ) {
+    result = Py_kCellTimingHoldFalling;
+  }
+  else if ( strcmp(str, "SetupRising") == 0 ) {
+    result = Py_kCellTimingSetupRising;
+  }
+  else if ( strcmp(str, "SetupFalling") == 0 ) {
+    result = Py_kCellTimingSetupFalling;
+  }
+  else if ( strcmp(str, "RecoveryRising") == 0 ) {
+    result = Py_kCellTimingRecoveryRising;
+  }
+  else if ( strcmp(str, "RecoveryFalling") == 0 ) {
+    result = Py_kCellTimingRecoveryFalling;
+  }
+  else if ( strcmp(str, "SkewRising") == 0 ) {
+    result = Py_kCellTimingSkewRising;
+  }
+  else if ( strcmp(str, "SkewFalling") == 0 ) {
+    result = Py_kCellTimingSkewFalling;
+  }
+  else if ( strcmp(str, "RemovalRising") == 0 ) {
+    result = Py_kCellTimingRemovalRising;
+  }
+  else if ( strcmp(str, "RemovalFalling") == 0 ) {
+    result = Py_kCellTimingRemovalFalling;
+  }
+  else if ( strcmp(str, "NonSeqSetupRising") == 0 ) {
+    result = Py_kCellTimingNonSeqSetupRising;
+  }
+  else if ( strcmp(str, "NonSeqSetupFalling") == 0 ) {
+    result = Py_kCellTimingNonSeqSetupFalling;
+  }
+  else if ( strcmp(str, "NonSeqHoldRising") == 0 ) {
+    result = Py_kCellTimingNonSeqHoldRising;
+  }
+  else if ( strcmp(str, "NonSeqHoldFalling") == 0 ) {
+    result = Py_kCellTimingNonSeqHoldFalling;
+  }
+  else if ( strcmp(str, "NochangeHighHigh") == 0 ) {
+    result = Py_kCellTimingNochangeHighHigh;
+  }
+  else if ( strcmp(str, "NochangeHighLow") == 0 ) {
+    result = Py_kCellTimingNochangeHighLow;
+  }
+  else if ( strcmp(str, "NochangeLowHigh") == 0 ) {
+    result = Py_kCellTimingNochangeLowHigh;
+  }
+  else if ( strcmp(str, "NochangeLowLow") == 0 ) {
+    result = Py_kCellTimingNochangeLowLow;
   }
   else {
     PyErr_SetString(PyExc_ValueError, "Illegal string for CellTimingType");
@@ -256,7 +648,97 @@ PyCellTimingType_AsCellTimingType(PyObject* py_obj)
 //////////////////////////////////////////////////////////////////////
 
 // kCellTimingCombinational を表すオブジェクト
-PyObject* Py_CellTimingType_kCombinational = NULL;
+PyObject* Py_kCellTimingCombinational         = NULL;
+
+// kCellTimingCombinationalRise を表すオブジェクト
+PyObject* Py_kCellTimingCombinationalRise     = NULL;
+
+// kCellTimingCombinationalFall を表すオブジェクト
+PyObject* Py_kCellTimingCombinationalFall     = NULL;
+
+// kCellTimingThreeStateEnable を表すオブジェクト
+PyObject* Py_kCellTimingThreeStateEnable      = NULL;
+
+// kCellTimingThreeStateDisable を表すオブジェクト
+PyObject* Py_kCellTimingThreeStateDisable     = NULL;
+
+// kCellTimingThreeStateEnableRise を表すオブジェクト
+PyObject* Py_kCellTimingThreeStateEnableRise  = NULL;
+
+// kCellTimingThreeStateEnableFall を表すオブジェクト
+PyObject* Py_kCellTimingThreeStateEnableFall  = NULL;
+
+// kCellTimingThreeStateDisableRise を表すオブジェクト
+PyObject* Py_kCellTimingThreeStateDisableRise = NULL;
+
+// kCellTimingThreeStateDisableFall を表すオブジェクト
+PyObject* Py_kCellTimingThreeStateDisableFall = NULL;
+
+// kCellTimingRisingEdge を表すオブジェクト
+PyObject* Py_kCellTimingRisingEdge            = NULL;
+
+// kCellTimingFallingEdge を表すオブジェクト
+PyObject* Py_kCellTimingFallingEdge           = NULL;
+
+// kCellTimingPreset を表すオブジェクト
+PyObject* Py_kCellTimingPreset                = NULL;
+
+// kCellTimingClear を表すオブジェクト
+PyObject* Py_kCellTimingClear                 = NULL;
+
+// kCellTimingHoldRising を表すオブジェクト
+PyObject* Py_kCellTimingHoldRising            = NULL;
+
+// kCellTimingHoldFalling を表すオブジェクト
+PyObject* Py_kCellTimingHoldFalling           = NULL;
+
+// kCellTimingSetupRising を表すオブジェクト
+PyObject* Py_kCellTimingSetupRising           = NULL;
+
+// kCellTimingSetupFalling を表すオブジェクト
+PyObject* Py_kCellTimingSetupFalling          = NULL;
+
+// kCellTimingRecoveryRising を表すオブジェクト
+PyObject* Py_kCellTimingRecoveryRising        = NULL;
+
+// kCellTimingRecoveryFalling を表すオブジェクト
+PyObject* Py_kCellTimingRecoveryFalling       = NULL;
+
+// kCellTimingSkewRising を表すオブジェクト
+PyObject* Py_kCellTimingSkewRising            = NULL;
+
+// kCellTimingSkewFalling を表すオブジェクト
+PyObject* Py_kCellTimingSkewFalling           = NULL;
+
+// kCellTimingRemovalRising を表すオブジェクト
+PyObject* Py_kCellTimingRemovalRising         = NULL;
+
+// kCellTimingRemovalFalling を表すオブジェクト
+PyObject* Py_kCellTimingRemovalFalling        = NULL;
+
+// kCellTimingNonSeqSetupRising を表すオブジェクト
+PyObject* Py_kCellTimingNonSeqSetupRising     = NULL;
+
+// kCellTimingNonSeqSetupFalling を表すオブジェクト
+PyObject* Py_kCellTimingNonSeqSetupFalling    = NULL;
+
+// kCellTimingNonSeqHoldRising を表すオブジェクト
+PyObject* Py_kCellTimingNonSeqHoldRising      = NULL;
+
+// kCellTimingNonSeqHoldFalling を表すオブジェクト
+PyObject* Py_kCellTimingNonSeqHoldFalling     = NULL;
+
+// kCellTimingNochangeHighHigh を表すオブジェクト
+PyObject* Py_kCellTimingNochangeHighHigh      = NULL;
+
+// kCellTimingNochangeHighLow を表すオブジェクト
+PyObject* Py_kCellTimingNochangeHighLow       = NULL;
+
+// kCellTimingNochangeLowHigh を表すオブジェクト
+PyObject* Py_kCellTimingNochangeLowHigh       = NULL;
+
+// kCellTimingNochangeLowLow を表すオブジェクト
+PyObject* Py_kCellTimingNochangeLowLow        = NULL;
 
 
 BEGIN_NONAMESPACE
@@ -288,10 +770,132 @@ CellTimingTypeObject_init(PyObject* m)
   PyModule_AddObject(m, "CellTimingType", (PyObject*)&PyCellTimingType_Type);
 
   // 定数オブジェクトの生成と登録
-  timing_type_set(CellTimingType_kCombinationalStruct,    Py_CellTimingType_kCombinational,    m, "kTimingTypeCombinational");
+  timing_type_set(kCellTimingCombinationalStruct,
+                  Py_kCellTimingCombinational, m,
+                  "kTimingTypeCombinational");
+  timing_type_set(kCellTimingCombinationalRiseStruct,
+                  Py_kCellTimingCombinationalRise, m,
+                  "kTimingTypeCombinationalRise");
+  timing_type_set(kCellTimingCombinationalFallStruct,
+                  Py_kCellTimingCombinationalFall, m,
+                  "kTimingTypeCombinationalFall");
+  timing_type_set(kCellTimingThreeStateEnableStruct,
+                  Py_kCellTimingThreeStateEnable, m,
+                  "kTimingTypeThreeStateEnable");
+  timing_type_set(kCellTimingThreeStateDisableStruct,
+                  Py_kCellTimingThreeStateDisable, m,
+                  "kTimingTypeThreeStateDisable");
+  timing_type_set(kCellTimingThreeStateEnableRiseStruct,
+                  Py_kCellTimingThreeStateEnableRise, m,
+                  "kTimingTypeThreeStateEnableRise");
+  timing_type_set(kCellTimingThreeStateEnableFallStruct,
+                  Py_kCellTimingThreeStateEnableFall, m,
+                  "kTimingTypeThreeStateEnableFall");
+  timing_type_set(kCellTimingThreeStateDisableRiseStruct,
+                  Py_kCellTimingThreeStateDisableRise, m,
+                  "kTimingTypeThreeStateDisableRise");
+  timing_type_set(kCellTimingThreeStateDisableFallStruct,
+                  Py_kCellTimingThreeStateDisableFall, m,
+                  "kTimingTypeThreeStateDisableFall");
+  timing_type_set(kCellTimingRisingEdgeStruct,
+                  Py_kCellTimingRisingEdge, m,
+                  "kTimingTypeRisingEdge");
+  timing_type_set(kCellTimingFallingEdgeStruct,
+                  Py_kCellTimingFallingEdge, m,
+                  "kTimingTypeFallingEdge");
+  timing_type_set(kCellTimingPresetStruct,
+                  Py_kCellTimingPreset, m,
+                  "kTimingTypePreset");
+  timing_type_set(kCellTimingClearStruct,
+                  Py_kCellTimingClear, m,
+                  "kTimingTypeClear");
+  timing_type_set(kCellTimingHoldRisingStruct,
+                  Py_kCellTimingHoldRising, m,
+                  "kTimingTypeHoldRising");
+  timing_type_set(kCellTimingHoldFallingStruct,
+                  Py_kCellTimingHoldFalling, m,
+                  "kTimingTypeHoldFalling");
+  timing_type_set(kCellTimingSetupRisingStruct,
+                  Py_kCellTimingSetupRising, m,
+                  "kTimingTypeSetupRising");
+  timing_type_set(kCellTimingSetupFallingStruct,
+                  Py_kCellTimingSetupFalling, m,
+                  "kTimingTypeSetupFalling");
+  timing_type_set(kCellTimingRecoveryRisingStruct,
+                  Py_kCellTimingRecoveryRising, m,
+                  "kTimingTypeRecoveryRising");
+  timing_type_set(kCellTimingRecoveryFallingStruct,
+                  Py_kCellTimingRecoveryFalling, m,
+                  "kTimingTypeRecoveryFalling");
+  timing_type_set(kCellTimingSkewRisingStruct,
+                  Py_kCellTimingSkewRising, m,
+                  "kTimingTypeSkewRising");
+  timing_type_set(kCellTimingSkewFallingStruct,
+                  Py_kCellTimingSkewFalling, m,
+                  "kTimingTypeSkewFalling");
+  timing_type_set(kCellTimingRemovalRisingStruct,
+                  Py_kCellTimingRemovalRising, m,
+                  "kTimingTypeRemovalRising");
+  timing_type_set(kCellTimingRemovalFallingStruct,
+                  Py_kCellTimingRemovalFalling, m,
+                  "kTimingTypeRemovalFalling");
+  timing_type_set(kCellTimingNonSeqSetupRisingStruct,
+                  Py_kCellTimingNonSeqSetupRising, m,
+                  "kTimingTypeNonSeqSetupRising");
+  timing_type_set(kCellTimingNonSeqSetupFallingStruct,
+                  Py_kCellTimingNonSeqSetupFalling, m,
+                  "kTimingTypeNonSeqSetupFalling");
+  timing_type_set(kCellTimingNonSeqHoldRisingStruct,
+                  Py_kCellTimingNonSeqHoldRising, m,
+                  "kTimingTypeNonSeqHoldRising");
+  timing_type_set(kCellTimingNonSeqHoldFallingStruct,
+                  Py_kCellTimingNonSeqHoldFalling, m,
+                  "kTimingTypeNonSeqHoldFalling");
+  timing_type_set(kCellTimingNochangeHighHighStruct,
+                  Py_kCellTimingNochangeHighHigh, m,
+                  "kTimingTypeNochangeHighHigh");
+  timing_type_set(kCellTimingNochangeHighLowStruct,
+                  Py_kCellTimingNochangeHighLow, m,
+                  "kTimingTypeNochangeHighLow");
+  timing_type_set(kCellTimingNochangeLowHighStruct,
+                  Py_kCellTimingNochangeLowHigh, m,
+                  "kTimingTypeNochangeLowHigh");
+  timing_type_set(kCellTimingNochangeLowLowStruct,
+                  Py_kCellTimingNochangeLowLow, m,
+                  "kTimingTypeNochangeLowLow");
 
   // 定数オブジェクト用の文字列オブジェクトの生成
-  CellTimingType_kCombinationalString    = PyString_FromString("combinational");
+  kCellTimingCombinationalStr         = PyString_FromString("Combinational");
+  kCellTimingCombinationalRiseStr     = PyString_FromString("CombinationalRise");
+  kCellTimingCombinationalFallStr     = PyString_FromString("CombinationalFall");
+  kCellTimingThreeStateEnableStr      = PyString_FromString("ThreeStateEnable");
+  kCellTimingThreeStateDisableStr     = PyString_FromString("ThreeStateDisable");
+  kCellTimingThreeStateEnableRiseStr  = PyString_FromString("ThreeStateEnableRise");
+  kCellTimingThreeStateEnableFallStr  = PyString_FromString("ThreeStateEnableFall");
+  kCellTimingThreeStateDisableRiseStr = PyString_FromString("ThreeStateDisableRise");
+  kCellTimingThreeStateDisableFallStr = PyString_FromString("ThreeStateDisableFall");
+  kCellTimingRisingEdgeStr            = PyString_FromString("RisingEdge");
+  kCellTimingFallingEdgeStr           = PyString_FromString("FallingEdge");
+  kCellTimingPresetStr                = PyString_FromString("Preset");
+  kCellTimingClearStr                 = PyString_FromString("Clear");
+  kCellTimingHoldRisingStr            = PyString_FromString("HoldRising");
+  kCellTimingHoldFallingStr           = PyString_FromString("HoldFalling");
+  kCellTimingSetupRisingStr           = PyString_FromString("SetupRising");
+  kCellTimingSetupFallingStr          = PyString_FromString("SetupFalling");
+  kCellTimingRecoveryRisingStr        = PyString_FromString("RecoveryRising");
+  kCellTimingRecoveryFallingStr       = PyString_FromString("RecoveryFalling");
+  kCellTimingSkewRisingStr            = PyString_FromString("SkewRising");
+  kCellTimingSkewFallingStr           = PyString_FromString("SkewFalling");
+  kCellTimingRemovalRisingStr         = PyString_FromString("RemovalRising");
+  kCellTimingRemovalFallingStr        = PyString_FromString("RemovalFalling");
+  kCellTimingNonSeqSetupRisingStr     = PyString_FromString("NonSeqSetupRising");
+  kCellTimingNonSeqSetupFallingStr    = PyString_FromString("NonSeqSetupFalling");
+  kCellTimingNonSeqHoldRisingStr      = PyString_FromString("NonSeqHoldRising");
+  kCellTimingNonSeqHoldFallingStr     = PyString_FromString("NonSeqHoldFalling");
+  kCellTimingNochangeHighHighStr      = PyString_FromString("NochangeHighHigh");
+  kCellTimingNochangeHighLowStr       = PyString_FromString("NochangeHighLow");
+  kCellTimingNochangeLowHighStr       = PyString_FromString("NochangeLowHigh");
+  kCellTimingNochangeLowLowStr        = PyString_FromString("NochangeLowLow");
 }
 
 END_NAMESPACE_YM

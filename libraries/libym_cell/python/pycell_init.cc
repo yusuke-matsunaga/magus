@@ -57,10 +57,22 @@ void
 CellPinObject_init(PyObject* m);
 
 void
+CellTechnologyObject_init(PyObject* m);
+
+void
+CellDelayModelObject_init(PyObject* m);
+
+void
 CellTimingObject_init(PyObject* m);
 
 void
+CellPatTypeObject_init(PyObject* m);
+
+void
 CellPatGraphObject_init(PyObject* m);
+
+void
+CellTimingTypeObject_init(PyObject* m);
 
 void
 CellLutObject_init(PyObject* m);
@@ -112,8 +124,20 @@ cell_init()
   // CellPinObject 関係の初期化
   CellPinObject_init(m);
 
+  // CellTechnologyObject 関係の初期化
+  CellTechnologyObject_init(m);
+
+  // CellDelayModelObject 関係の初期化
+  CellDelayModelObject_init(m);
+
   // CellTimingObject 関係の初期化
   CellTimingObject_init(m);
+
+  // CellTimingTypeObject 関係の初期化
+  CellTimingTypeObject_init(m);
+
+  // CellPatType 関係の初期化
+  CellPatTypeObject_init(m);
 
   // CellPatGraph 関係の初期化
   CellPatGraphObject_init(m);

@@ -10,7 +10,7 @@
 
 
 #include "ympython.h"
-#include "ym_cell/cell_nsdef.h"
+#include "ym_cell/CellLibrary.h"
 #include "ym_cell/CellPin.h"
 
 
@@ -422,6 +422,170 @@ PyCellPin_AsCellPinPtr(PyObject* py_obj);
 
 
 //////////////////////////////////////////////////////////////////////
+// PyCellTechnology: CellLibrary::tTechnology を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief CellLibrary::tTechnology を表すタイプオブジェクト
+extern
+PyTypeObject PyCellTechnology_Type;
+
+/// @brief PyCellTechnology の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyCellTechnology_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyCellTechnology_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyCellTechnology_Type;
+}
+
+/// @brief CellLibrary::tTechnology から PyObject を作る．
+/// @param[in] delay_model CellLibrary::tTechnology
+/// @return delay_model を表す PyObject
+extern
+PyObject*
+PyCellTechnology_FromCellTechnology(CellLibrary::tTechnology delay_model);
+
+/// @brief 文字列から PyObject を作る．
+/// @param[in] str 文字列
+/// @return delay_model を表す PyObject
+extern
+PyObject*
+PyCellTechnology_FromString(const char* str);
+
+/// @brief PyObject から CellLibrary::tTechnology の値を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return CellLibrary::tTechnology を返す．
+/// @note 変換が失敗したら TypeError を送出し，kCellTechnologyGenericCmos を返す．
+extern
+CellLibrary::tTechnology
+PyCellTechnology_AsCellTechnology(PyObject* py_obj);
+
+/// @brief kTechCmos を表す Python オブジェクト
+extern
+PyObject* Py_kCellTechCmos;
+
+/// @brief kTechFpga を表す Python オブジェクト
+extern
+PyObject* Py_kCellTechFpga;
+
+
+//////////////////////////////////////////////////////////////////////
+// PyCellDelayModel: tCellDelayModel を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief tCellDelayModel を表すタイプオブジェクト
+extern
+PyTypeObject PyCellDelayModel_Type;
+
+/// @brief PyCellDelayModel の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyCellDelayModel_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyCellDelayModel_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyCellDelayModel_Type;
+}
+
+/// @brief tCellDelayModel から PyObject を作る．
+/// @param[in] delay_model tCellDelayModel
+/// @return delay_model を表す PyObject
+extern
+PyObject*
+PyCellDelayModel_FromCellDelayModel(tCellDelayModel delay_model);
+
+/// @brief 文字列から PyObject を作る．
+/// @param[in] str 文字列
+/// @return delay_model を表す PyObject
+extern
+PyObject*
+PyCellDelayModel_FromString(const char* str);
+
+/// @brief PyObject から tCellDelayModel の値を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return tCellDelayModel を返す．
+/// @note 変換が失敗したら TypeError を送出し，kCellDelayModelGenericCmos を返す．
+extern
+tCellDelayModel
+PyCellDelayModel_AsCellDelayModel(PyObject* py_obj);
+
+/// @brief kCellDelayGenericCmos を表す Python オブジェクト
+extern
+PyObject* Py_kCellDelayGenericCmos;
+
+/// @brief kCellDelayTableLookup を表す Python オブジェクト
+extern
+PyObject* Py_kCellDelayTableLookup;
+
+/// @brief kCellDelayPiecewiseCmos を表す Python オブジェクト
+extern
+PyObject* Py_kCellDelayPiecewiseCmos;
+
+/// @brief kCellDelayCmos2 を表す Python オブジェクト
+extern
+PyObject* Py_kCellDelayCmos2;
+
+/// @brief kCellDelayDcm を表す Python オブジェクト
+extern
+PyObject* Py_kCellDelayDcm;
+
+
+//////////////////////////////////////////////////////////////////////
+// PyCellPatType: CellPatType を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief CellPatType を表すタイプオブジェクト
+extern
+PyTypeObject PyCellPatType_Type;
+
+/// @brief PyCellPatType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyCellPatType_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyCellPatType_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyCellPatType_Type;
+}
+
+/// @brief tCellPatType から CellPatTypeObject を生成する．
+/// @param[in] technology tCellPatType の値
+extern
+PyObject*
+PyCellPatType_FromCellPatType(tCellPatType technology);
+
+/// @brief 文字列から CellPatTypeObject を生成する．
+/// @param[in] str 文字列
+extern
+PyObject*
+PyCellPatType_FromString(const char* str);
+
+/// @brief PyObject から tCellPatType を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return tCellPatType の値を返す．
+/// @note 変換が失敗したら TypeError を送出し，kCellPatInput を返す．
+extern
+tCellPatType
+PyCellPatType_AsCellPatType(PyObject* py_obj);
+
+/// @brief kCellPatInput を表す Python オブジェクト
+extern
+PyObject* Py_kCellPatInput;
+
+/// @brief kCellPatAnd を表す Python オブジェクト
+extern
+PyObject* Py_kCellPatAnd;
+
+/// @brief kCellPatXor を表す Python オブジェクト
+extern
+PyObject* Py_kCellPatXor;
+
+
+//////////////////////////////////////////////////////////////////////
 // PyCellPatGraph: CellPatGraph を表す型
 //////////////////////////////////////////////////////////////////////
 
@@ -528,7 +692,157 @@ PyCellTimingType_AsCellTimingType(PyObject* py_obj);
 /// @brief kCellTimingCombinational を表す PyObject
 extern
 PyObject*
-Py_CellTimingType_kCombinational;
+Py_kCellTimingCombinational;
+
+/// @brief kCellTimingCombinationalRiseを表す PyObject
+extern
+PyObject*
+Py_kCellTimingCombinationalRise;
+
+/// @brief kCellTimingCombinationalFallを表す PyObject
+extern
+PyObject*
+Py_kCellTimingCombinationalFall;
+
+/// @brief kCellTimingThreeStateEnableを表す PyObject
+extern
+PyObject*
+Py_kCellTimingThreeStateEnable;
+
+/// @brief kCellTimingThreeStateDisableを表す PyObject
+extern
+PyObject*
+Py_kCellTimingThreeStateDisable;
+
+/// @brief kCellTimingThreeStateEnableRiseを表す PyObject
+extern
+PyObject*
+Py_kCellTimingThreeStateEnableRise;
+
+/// @brief kCellTimingThreeStateEnableFallを表す PyObject
+extern
+PyObject*
+Py_kCellTimingThreeStateEnableFall;
+
+/// @brief kCellTimingThreeStateDisableRiseを表す PyObject
+extern
+PyObject*
+Py_kCellTimingThreeStateDisableRise;
+
+/// @brief kCellTimingThreeStateDisableFallを表す PyObject
+extern
+PyObject*
+Py_kCellTimingThreeStateDisableFall;
+
+/// @brief kCellTimingRisingEdgeを表す PyObject
+extern
+PyObject*
+Py_kCellTimingRisingEdge;
+
+/// @brief kCellTimingFallingEdgeを表す PyObject
+extern
+PyObject*
+Py_kCellTimingFallingEdge;
+
+/// @brief kCellTimingPresetを表す PyObject
+extern
+PyObject*
+Py_kCellTimingPreset;
+
+/// @brief kCellTimingClearを表す PyObject
+extern
+PyObject*
+Py_kCellTimingClear;
+
+/// @brief kCellTimingHoldRisingを表す PyObject
+extern
+PyObject*
+Py_kCellTimingHoldRising;
+
+/// @brief kCellTimingHoldFallingを表す PyObject
+extern
+PyObject*
+Py_kCellTimingHoldFalling;
+
+/// @brief kCellTimingSetupRisingを表す PyObject
+extern
+PyObject*
+Py_kCellTimingSetupRising;
+
+/// @brief kCellTimingSetupFallingを表す PyObject
+extern
+PyObject*
+Py_kCellTimingSetupFalling;
+
+/// @brief kCellTimingRecoveryRisingを表す PyObject
+extern
+PyObject*
+Py_kCellTimingRecoveryRising;
+
+/// @brief kCellTimingRecoveryFallingを表す PyObject
+extern
+PyObject*
+Py_kCellTimingRecoveryFalling;
+
+/// @brief kCellTimingSkewRisingを表す PyObject
+extern
+PyObject*
+Py_kCellTimingSkewRising;
+
+/// @brief kCellTimingSkewFallingを表す PyObject
+extern
+PyObject*
+Py_kCellTimingSkewFalling;
+
+/// @brief kCellTimingRemovalRisingを表す PyObject
+extern
+PyObject*
+Py_kCellTimingRemovalRising;
+
+/// @brief kCellTimingRemovalFallingを表す PyObject
+extern
+PyObject*
+Py_kCellTimingRemovalFalling;
+
+/// @brief kCellTimingNonSeqSetupRisingを表す PyObject
+extern
+PyObject*
+Py_kCellTimingNonSeqSetupRising;
+
+/// @brief kCellTimingNonSeqSetupFallingを表す PyObject
+extern
+PyObject*
+Py_kCellTimingNonSeqSetupFalling;
+
+/// @brief kCellTimingNonSeqHoldRisingを表す PyObject
+extern
+PyObject*
+Py_kCellTimingNonSeqHoldRising;
+
+/// @brief kCellTimingNonSeqHoldFallingを表す PyObject
+extern
+PyObject*
+Py_kCellTimingNonSeqHoldFalling;
+
+/// @brief kCellTimingNochangeHighHighを表す PyObject
+extern
+PyObject*
+Py_kCellTimingNochangeHighHigh;
+
+/// @brief kCellTimingNochangeHighLowを表す PyObject
+extern
+PyObject*
+Py_kCellTimingNochangeHighLow;
+
+/// @brief kCellTimingNochangeLowHighを表す PyObject
+extern
+PyObject*
+Py_kCellTimingNochangeLowHigh;
+
+/// @brief kCellTimingNochangeLowLowを表す PyObject
+extern
+PyObject*
+Py_kCellTimingNochangeLowLow;
 
 
 //////////////////////////////////////////////////////////////////////
