@@ -58,12 +58,12 @@ struct CellTimingObject
 void
 CellTiming_dealloc(CellTimingObject* self)
 {
-  Py_XDECREF(self->mRiseTransition);
-  Py_XDECREF(self->mFallTransition);
-  Py_XDECREF(self->mRisePropagation);
-  Py_XDECREF(self->mFallPropagation);
-  Py_XDECREF(self->mCellRise);
-  Py_XDECREF(self->mCellFall);
+  Py_DECREF(self->mRiseTransition);
+  Py_DECREF(self->mFallTransition);
+  Py_DECREF(self->mRisePropagation);
+  Py_DECREF(self->mFallPropagation);
+  Py_DECREF(self->mCellRise);
+  Py_DECREF(self->mCellFall);
 
   PyObject_Del(self);
 }
@@ -171,11 +171,6 @@ CellTiming_rise_transition(CellTimingObject* self,
 {
   PyObject* result = self->mRiseTransition;
 
-  if ( result == NULL ) {
-    PyErr_SetString(PyExc_TypeError, "No LUT for rise_transition");
-    return NULL;
-  }
-
   Py_INCREF(result);
   return result;
 }
@@ -186,11 +181,6 @@ CellTiming_fall_transition(CellTimingObject* self,
 			   PyObject* args)
 {
   PyObject* result = self->mFallTransition;
-
-  if ( result == NULL ) {
-    PyErr_SetString(PyExc_TypeError, "No LUT for fall_transition");
-    return NULL;
-  }
 
   Py_INCREF(result);
   return result;
@@ -203,11 +193,6 @@ CellTiming_rise_propagation(CellTimingObject* self,
 {
   PyObject* result = self->mRisePropagation;
 
-  if ( result == NULL ) {
-    PyErr_SetString(PyExc_TypeError, "No LUT for rise_propagation");
-    return NULL;
-  }
-
   Py_INCREF(result);
   return result;
 }
@@ -218,11 +203,6 @@ CellTiming_fall_propagation(CellTimingObject* self,
 			    PyObject* args)
 {
   PyObject* result = self->mFallPropagation;
-
-  if ( result == NULL ) {
-    PyErr_SetString(PyExc_TypeError, "No LUT for fall_propagation");
-    return NULL;
-  }
 
   Py_INCREF(result);
   return result;
@@ -235,11 +215,6 @@ CellTiming_cell_rise(CellTimingObject* self,
 {
   PyObject* result = self->mCellRise;
 
-  if ( result == NULL ) {
-    PyErr_SetString(PyExc_TypeError, "No LUT for cell_rise");
-    return NULL;
-  }
-
   Py_INCREF(result);
   return result;
 }
@@ -250,11 +225,6 @@ CellTiming_cell_fall(CellTimingObject* self,
 		     PyObject* args)
 {
   PyObject* result = self->mCellFall;
-
-  if ( result == NULL ) {
-    PyErr_SetString(PyExc_TypeError, "No LUT for cell_fall");
-    return NULL;
-  }
 
   Py_INCREF(result);
   return result;
@@ -427,35 +397,46 @@ PyCellTiming_FromCellTiming(const CellTiming* timing)
   self->mTiming = timing;
 
   if ( timing->rise_transition() != NULL ) {
-    assert_cond( timing->fall_transition() != NULL, __FILE__, __LINE__);
     self->mRiseTransition = PyCellLut_FromCellLut(timing->rise_transition());
-    self->mFallTransition = PyCellLut_FromCellLut(timing->fall_transition());
-    if ( timing->rise_propagation() != NULL ) {
-      assert_cond( timing->fall_propagation() != NULL, __FILE__, __LINE__);
-      assert_cond( timing->cell_rise() == NULL, __FILE__, __LINE__);
-      assert_cond( timing->cell_fall() == NULL, __FILE__, __LINE__);
-      self->mRisePropagation = PyCellLut_FromCellLut(timing->rise_propagation());
-      self->mFallPropagation = PyCellLut_FromCellLut(timing->fall_propagation());
-      self->mCellRise = NULL;
-      self->mCellFall = NULL;
-    }
-    else {
-      assert_cond( timing->cell_rise() != NULL, __FILE__, __LINE__);
-      assert_cond( timing->cell_fall() != NULL, __FILE__, __LINE__);
-      assert_cond( timing->fall_propagation() == NULL, __FILE__, __LINE__);
-      self->mCellRise = PyCellLut_FromCellLut(timing->cell_rise());
-      self->mCellFall = PyCellLut_FromCellLut(timing->cell_fall());
-      self->mRisePropagation = NULL;
-      self->mFallPropagation = NULL;
-    }
   }
   else {
-    self->mRiseTransition = NULL;
-    self->mFallTransition = NULL;
-    self->mRisePropagation = NULL;
-    self->mFallPropagation = NULL;
-    self->mCellRise = NULL;
-    self->mCellFall = NULL;
+    self->mRiseTransition = Py_None;
+    Py_INCREF(Py_None);
+  }
+  if ( timing->fall_transition() != NULL ) {
+    self->mFallTransition = PyCellLut_FromCellLut(timing->fall_transition());
+  }
+  else {
+    self->mFallTransition = Py_None;
+    Py_INCREF(Py_None);
+  }
+  if ( timing->rise_propagation() != NULL ) {
+    self->mRisePropagation = PyCellLut_FromCellLut(timing->rise_propagation());
+  }
+  else {
+    self->mRisePropagation = Py_None;
+    Py_INCREF(Py_None);
+  }
+  if ( timing->fall_propagation() != NULL ) {
+    self->mFallPropagation = PyCellLut_FromCellLut(timing->fall_propagation());
+  }
+  else {
+    self->mFallPropagation = Py_None;
+    Py_INCREF(Py_None);
+  }
+  if ( timing->cell_rise() ) {
+    self->mCellRise = PyCellLut_FromCellLut(timing->cell_rise());
+  }
+  else {
+    self->mCellRise = Py_None;
+    Py_INCREF(Py_None);
+  }
+  if ( timing->cell_fall() ) {
+    self->mCellFall = PyCellLut_FromCellLut(timing->cell_fall());
+  }
+  else {
+    self->mCellFall = Py_None;
+    Py_INCREF(Py_None);
   }
 
   Py_INCREF(self);

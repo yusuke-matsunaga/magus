@@ -3,6 +3,8 @@
 import cell_lib
 
 
+delay_model = cell_lib.kCellDelayGenericCmos
+
 def print_pin(pin) :
   dir = pin.direction()
   print '      Pin: {}'.format(pin.name())
@@ -27,15 +29,46 @@ def print_pin(pin) :
   elif dir.is_internal() :
     print '        internal ID: {}'.format(pin.internal_id())
 
+def print_lut(lut) :
+  d = lut.dimension()
+  for i in range(d) :
+    print '          Variable_{} = {}'.format(i, lut.variable_type(i))
+
 def print_timing(timing) :
   print '        Type: {}'.format(timing.type())
   print '        Condition: {}'.format(str(timing.timing_cond()))
+  if delay_model == cell_lib.kCellDelayGenericCmos :
+    print '        Rise Intrinsic  = {}'.format(timing.intrinsic_rise())
+    print '        Rise Resistance = {}'.format(timing.rise_resistance())
+    print '        Fall Intrinsic  = {}'.format(timing.intrinsic_fall())
+    print '        Fall Resistance = {}'.format(timing.fall_resistance())
+  elif delay_model == cell_lib.kCellDelayTableLookup :
+    if timing.cell_rise() :
+      print '        Cell Rise'
+      print_lut(timing.cell_rise())
+    if timing.rise_transition() :
+      print '        Rise Transition'
+      print_lut(timing.rise_transition())
+    if timing.rise_propagation() :
+      print '        Rise Propagation'
+      print_lut(timing.rise_propagation())
+    if timing.cell_fall() :
+      print '        Cell Fall'
+      print_lut(timing.cell_fall())
+    if timing.fall_transition() :
+      print '        Fall Transition'
+      print_lut(timing.fall_transition())
+    if timing.fall_propagation() :
+      print '        Fall Propagation'
+      print_lut(timing.fall_propagation())
 
-def print_timing_list(cell, iid, oid, tsense) :
+def print_timing_list(cell, ipin, opin, tsense) :
+  iid = ipin.input_id()
+  oid = opin.output_id()
   timing_list = cell.timing_list2(iid, oid, tsense)
   if len(timing_list) == 0 :
     return
-  print '      Timing({}, {}, {})'.format(iid, oid, tsense)
+  print '      Timing({}, {}, {})'.format(ipin.name(), opin.name(), tsense)
   for timing in timing_list :
     print_timing(timing)
 
@@ -52,11 +85,9 @@ def print_cell(cell) :
   ts_posi = cell_lib.kCellPosiUnate
   ts_nega = cell_lib.kCellNegaUnate
   for opin in opin_list :
-    oid = opin.output_id()
     for ipin in ipin_list :
-      iid = ipin.input_id()
-      print_timing_list(cell, iid, oid, ts_posi)
-      print_timing_list(cell, iid, oid, ts_nega)
+      print_timing_list(cell, ipin, opin, ts_posi)
+      print_timing_list(cell, ipin, opin, ts_nega)
 
 def print_group(group) :
   print '  Group#{}'.format(group.id())
@@ -72,6 +103,7 @@ def print_class(cclass) :
     print_group(group)
 
 lib = cell_lib.CellLibrary("/home/yusuke/data/private/dot-libs/TSMC/tcb670tc.lib")
+delay_model = lib.delay_model()
 #cell_list = lib.cell_list()
 #for cell in cell_list :
 #  print cell.name()
