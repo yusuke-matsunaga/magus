@@ -7,6 +7,7 @@ delay_model = cell_lib.kCellDelayGenericCmos
 
 def print_pin(pin) :
   dir = pin.direction()
+  print ''
   print '      Pin: {}'.format(pin.name())
   print '        Direction: {}'.format(dir)
   if dir.is_input() or dir.is_inout() :
@@ -68,11 +69,13 @@ def print_timing_list(cell, ipin, opin, tsense) :
   timing_list = cell.timing_list2(iid, oid, tsense)
   if len(timing_list) == 0 :
     return
+  print ''
   print '      Timing({}, {}, {})'.format(ipin.name(), opin.name(), tsense)
   for timing in timing_list :
     print_timing(timing)
 
 def print_cell(cell) :
+  print ''
   print '    Cell: {}'.format(cell.name())
   print '      Area: {}'.format(str(cell.area()))
 
