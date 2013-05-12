@@ -1,3 +1,5 @@
+# coding=UTF-8
+
 import cell_lib
 
 
@@ -5,34 +7,56 @@ def print_pin(pin) :
   dir = pin.direction()
   print '      Pin: {}'.format(pin.name())
   print '        Direction: {}'.format(dir)
-  if dir == 'Input' :
-    print '        I#{}'.format(str(pin.input_id()))
+  if dir.is_input() or dir.is_inout() :
+    print '        input ID: {}'.format(pin.input_id())
     print '        capacitance: {}'.format(str(pin.capacitance()))
     print '        rise capacitance: {}'.format(str(pin.rise_capacitance()))
     print '        fall capacitance: {}'.format(str(pin.fall_capacitance()))
-  elif dir == 'Output' :
-    print '        O#{}'.format(str(pin.output_id()))
-    print '        function: {}'.format(str(pin.function()))
-    print '        three state: {}'.format(str(pin.three_state()))
+  elif dir.is_output() or dir.is_inout() :
+    print '        output ID: {}'.format(pin.output_id())
+    if pin.has_function() :
+      print '        function: {}'.format(str(pin.function()))
+    if pin.has_three_state() :
+      print '        three state: {}'.format(str(pin.three_state()))
     print '        max fanout: {}'.format(str(pin.max_fanout()))
     print '        min fanout: {}'.format(str(pin.min_fanout()))
     print '        max capacitance: {}'.format(str(pin.max_capacitance()))
     print '        min capacitance: {}'.format(str(pin.min_capacitance()))
     print '        max transition: {}'.format(str(pin.max_transition()))
     print '        min transition: {}'.format(str(pin.min_transition()))
-  elif dir == 'InOut' :
-    pass
-  elif dir == 'Internal' :
-    pass
-  
-  
+  elif dir.is_internal() :
+    print '        internal ID: {}'.format(pin.internal_id())
+
+def print_timing(timing) :
+  print '        Type: {}'.format(timing.type())
+  print '        Condition: {}'.format(str(timing.timing_cond()))
+
+def print_timing_list(cell, iid, oid, tsense) :
+  timing_list = cell.timing_list2(iid, oid, tsense)
+  if len(timing_list) == 0 :
+    return
+  print '      Timing({}, {}, {})'.format(iid, oid, tsense)
+  for timing in timing_list :
+    print_timing(timing)
 
 def print_cell(cell) :
   print '    Cell: {}'.format(cell.name())
   print '      Area: {}'.format(str(cell.area()))
+
   pin_list = cell.pin_list()
   for pin in pin_list :
     print_pin(pin)
+
+  ipin_list = cell.input_pin_list()
+  opin_list = cell.output_pin_list()
+  ts_posi = cell_lib.kCellPosiUnate
+  ts_nega = cell_lib.kCellNegaUnate
+  for opin in opin_list :
+    oid = opin.output_id()
+    for ipin in ipin_list :
+      iid = ipin.input_id()
+      print_timing_list(cell, iid, oid, ts_posi)
+      print_timing_list(cell, iid, oid, ts_nega)
 
 def print_group(group) :
   print '  Group#{}'.format(group.id())
@@ -56,4 +80,3 @@ lib = cell_lib.CellLibrary("/home/yusuke/data/private/dot-libs/TSMC/tcb670tc.lib
 class_list = lib.npn_class_list()
 for cclass in class_list :
   print_class(cclass)
-

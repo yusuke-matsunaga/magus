@@ -9,8 +9,7 @@
 
 #include "ym_cell/pycell.h"
 #include "ym_cell/CellTiming.h"
-#include "ym_logic/LogExpr.h"
-#include "ym_logic/LogExprWriter.h"
+#include "ym_logic/pylogic.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -82,9 +81,7 @@ PyObject*
 CellTiming_timing_cond(CellTimingObject* self,
 		       PyObject* args)
 {
-  LogExprWriter lew;
-  string func_str = lew.dump_string(self->mTiming->timing_cond());
-  return PyObject_FromString(func_str);
+  return PyLogExpr_FromLogExpr(self->mTiming->timing_cond());
 }
 
 // intrinsic_rise 関数

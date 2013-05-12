@@ -11,8 +11,8 @@
 #include "ym_cell/CellPin.h"
 #include "ym_cell/CellCapacitance.h"
 #include "ym_cell/CellTime.h"
+#include "ym_logic/pylogic.h"
 #include "ym_logic/LogExpr.h"
-#include "ym_logic/LogExprWriter.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -110,17 +110,32 @@ CellPin_output_id(CellPinObject* self,
   return PyObject_FromYmuint32(self->mPin->output_id());
 }
 
+// has_function 関数
+PyObject*
+CellPin_has_function(CellPinObject* self,
+		     PyObject* args)
+{
+  return PyObject_FromBool(self->mPin->has_function());
+}
+
 // function 関数
 PyObject*
 CellPin_function(CellPinObject* self,
 		 PyObject* args)
 {
-  string func_str;
-  if ( self->mPin->has_function() ) {
-    LogExprWriter lew;
-    func_str = lew.dump_string(self->mPin->function());
+  if ( !self->mPin->has_function() ) {
+    PyErr_SetString(PyExc_ValueError, "No function.");
+    return NULL;
   }
-  return PyObject_FromString(func_str);
+  return PyLogExpr_FromLogExpr(self->mPin->function());
+}
+
+// has_three_state 関数
+PyObject*
+CellPin_has_three_state(CellPinObject* self,
+			PyObject* args)
+{
+  return PyObject_FromBool(self->mPin->has_three_state());
 }
 
 // three_state 関数
@@ -128,12 +143,11 @@ PyObject*
 CellPin_three_state(CellPinObject* self,
 		    PyObject* args)
 {
-  string tristate_str;
-  if ( self->mPin->has_three_state() ) {
-    LogExprWriter lew;
-    tristate_str = lew.dump_string(self->mPin->three_state());
+  if ( !self->mPin->has_three_state() ) {
+    PyErr_SetString(PyExc_ValueError, "No three state condition");
+    return NULL;
   }
-  return PyObject_FromString(tristate_str);
+  return PyLogExpr_FromLogExpr(self->mPin->three_state());
 }
 
 // max_fanout 関数
@@ -231,6 +245,10 @@ PyMethodDef CellPin_methods[] = {
    PyDoc_STR("return output ID")},
   {"function", (PyCFunction)CellPin_function, METH_NOARGS,
    PyDoc_STR("return function expression")},
+  {"has_function", (PyCFunction)CellPin_has_function, METH_NOARGS,
+   PyDoc_STR("return True if having a function expression")},
+  {"has_three_state", (PyCFunction)CellPin_has_three_state, METH_NOARGS,
+   PyDoc_STR("return True if having a tristate condition")},
   {"three_state", (PyCFunction)CellPin_three_state, METH_NOARGS,
    PyDoc_STR("return tristate condition")},
   {"max_fanout", (PyCFunction)CellPin_max_fanout, METH_NOARGS,

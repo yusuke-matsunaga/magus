@@ -199,7 +199,7 @@ type_list = (
     ("Dcm",           "dcm")
 )
 
-make_cc_source(map_dict, type_list, "_CellDelayModel.cc")
+make_cc_source(map_dict, type_list, "pycell_CellDelayModel.cc")
 make_header(map_dict, type_list, "_CellDelayModel.h")
 
 
@@ -218,7 +218,7 @@ type_list = (
     ("Xor",   "xor")
 )
 
-make_cc_source(map_dict, type_list, "_CellPatType.cc")
+make_cc_source(map_dict, type_list, "pycell_CellPatType.cc")
 make_header(map_dict, type_list, "_CellPatType.h")
 
 
@@ -238,7 +238,7 @@ type_list = (
     ("Internal", "internal")
 )
 
-make_cc_source(map_dict, type_list, "_CellPinDir.cc")
+make_cc_source(map_dict, type_list, "pycell_CellPinDir.cc")
 make_header(map_dict, type_list, "_CellPinDir.h")
 
 
@@ -256,8 +256,27 @@ type_list = (
     ("Fpga", "fpga")
 )
 
-make_cc_source(map_dict, type_list, "_CellTechnology.cc")
+make_cc_source(map_dict, type_list, "pycell_CellTechnology.cc")
 make_header(map_dict, type_list, "_CellTechnology.h")
+
+
+# CellTimingSense
+map_dict = {
+    "type_name"    : "CellTimingSense",
+    "ctype_name"   : "tCellTimingSense",
+    "type_doc"     : "Timing Sense",
+    "const_prefix" : "kCell",
+    "default_val"  : "kCellNonUnate"
+}
+
+type_list = (
+    ("PosiUnate", "posi_unate"),
+    ("NegaUnate", "nega_unate"),
+    ("NonUnate",  "non_unate")
+)
+
+make_cc_source(map_dict, type_list, "pycell_CellTimingSense.cc")
+make_header(map_dict, type_list, "_CellTimingSense.h")
 
 
 # CellTimingType
@@ -313,5 +332,5 @@ type_list = (
     ("NochangeLowLow",        "nochange_low_low")
 )
 
-make_cc_source(map_dict, type_list, "_CellTimingType.cc")
+make_cc_source(map_dict, type_list, "pycell_CellTimingType.cc")
 make_header(map_dict, type_list, "_CellTimingType.h")

@@ -10,6 +10,7 @@
 #include "ym_cell/pycell.h"
 #include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
+#include "ym_cell/CellTiming.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -136,6 +137,7 @@ Cell_pin_list(CellObject* self,
   PyObject* pin_list = PyList_New(np);
   for (ymuint i = 0; i < np; ++ i) {
     PyObject* obj = self->mPinArray[i];
+    Py_INCREF(obj);
     PyList_SetItem(pin_list, i, obj);
   }
   return pin_list;
@@ -153,6 +155,7 @@ Cell_input_pin_list(CellObject* self,
     const CellPin* pin = self->mCell->pin(i);
     if ( pin->is_input() ) {
       PyObject* obj = self->mPinArray[i];
+      Py_INCREF(obj);
       PyList_SetItem(pin_list, pin->input_id(), obj);
     }
   }
@@ -171,7 +174,8 @@ Cell_output_pin_list(CellObject* self,
     const CellPin* pin = self->mCell->pin(i);
     if ( pin->is_output() ) {
       PyObject* obj = self->mPinArray[i];
-      PyList_SetItem(pin_list, pin->input_id(), obj);
+      Py_INCREF(obj);
+      PyList_SetItem(pin_list, pin->output_id(), obj);
     }
   }
   return pin_list;
@@ -185,11 +189,14 @@ Cell_inout_pin_list(CellObject* self,
   ymuint n = self->mCell->inout_num();
   PyObject* pin_list = PyList_New(n);
   ymuint np = self->mCell->pin_num();
+  ymuint pos = 0;
   for (ymuint i = 0; i < np; ++ i) {
     const CellPin* pin = self->mCell->pin(i);
     if ( pin->is_inout() ) {
       PyObject* obj = self->mPinArray[i];
-      PyList_SetItem(pin_list, pin->input_id(), obj);
+      Py_INCREF(obj);
+      PyList_SetItem(pin_list, pos, obj);
+      ++ pos;
     }
   }
   return pin_list;
@@ -207,7 +214,8 @@ Cell_internal_pin_list(CellObject* self,
     const CellPin* pin = self->mCell->pin(i);
     if ( pin->is_internal() ) {
       PyObject* obj = self->mPinArray[i];
-      PyList_SetItem(pin_list, pin->input_id(), obj);
+      Py_INCREF(obj);
+      PyList_SetItem(pin_list, pin->internal_id(), obj);
     }
   }
   return pin_list;
@@ -222,6 +230,32 @@ Cell_timing_list(CellObject* self,
   PyObject* timing_list = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
     PyObject* obj1 = self->mTimingArray[i];
+    Py_INCREF(obj1);
+    PyList_SetItem(timing_list, i, obj1);
+  }
+
+  return timing_list;
+}
+
+// timing_list2 関数
+PyObject*
+Cell_timing_list2(CellObject* self,
+		  PyObject* args)
+{
+  ymuint ipos = 0;
+  ymuint opos = 0;
+  PyObject* obj1 = NULL;
+  if ( !PyArg_ParseTuple(args, "IIO!", &ipos, &opos, &PyCellTimingSense_Type, &obj1) ) {
+    return NULL;
+  }
+  tCellTimingSense tsense = PyCellTimingSense_AsCellTimingSense(obj1);
+
+  ymuint n = self->mCell->timing_num(ipos, opos, tsense);
+  PyObject* timing_list = PyList_New(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    const CellTiming* timing = self->mCell->timing(ipos, opos, tsense, i);
+    PyObject* obj1 = self->mTimingArray[timing->id()];
+    Py_INCREF(obj1);
     PyList_SetItem(timing_list, i, obj1);
   }
 
@@ -273,6 +307,8 @@ PyMethodDef Cell_methods[] = {
 
   {"timing_list", (PyCFunction)Cell_timing_list, METH_NOARGS,
    PyDoc_STR("return timing list")},
+  {"timing_list2", (PyCFunction)Cell_timing_list2, METH_VARARGS,
+   PyDoc_STR("return timing list of (ipos, opos, timing_sense)")},
 
   {NULL, NULL, 0, NULL} // end-marker
 };

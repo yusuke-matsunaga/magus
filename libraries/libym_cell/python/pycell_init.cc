@@ -66,13 +66,16 @@ void
 CellTimingObject_init(PyObject* m);
 
 void
+CellTimingSenseObject_init(PyObject* m);
+
+void
+CellTimingTypeObject_init(PyObject* m);
+
+void
 CellPatTypeObject_init(PyObject* m);
 
 void
 CellPatGraphObject_init(PyObject* m);
-
-void
-CellTimingTypeObject_init(PyObject* m);
 
 void
 CellLutObject_init(PyObject* m);
@@ -132,6 +135,9 @@ cell_init()
 
   // CellTimingObject 関係の初期化
   CellTimingObject_init(m);
+
+  // CellTimingSenseObject 関係の初期化
+  CellTimingSenseObject_init(m);
 
   // CellTimingTypeObject 関係の初期化
   CellTimingTypeObject_init(m);

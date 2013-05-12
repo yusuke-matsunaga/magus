@@ -115,17 +115,9 @@ CiCell::CiCell(CiLibrary* library,
   mTristateArray = new (u) LogExpr[no2];
 
   for (ymuint i = 0; i < no2; ++ i) {
-    CiPin* pin = mOutputArray[i];
-
-    bool has_logic = output_array[i];
-    bool has_tristate = false;
-    if ( has_logic && !tristate_array[i].is_zero() ) {
-      has_tristate = true;
-    }
-
     ymuint8 val = 0U;
-    if ( has_logic ) {
-      if ( has_tristate ) {
+    if ( output_array[i] ) {
+      if ( !tristate_array[i].is_zero() ) {
 	val = 2U;
       }
       else {

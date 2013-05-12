@@ -1149,7 +1149,7 @@ CiLibrary::new_timing_generic(ymuint cell_id,
 			      CellResistance fall_resistance)
 {
   void* p = mAlloc.get_memory(sizeof(CiTimingGeneric));
-  CiTiming* timing = new (p) CiTimingGeneric(type, cond,
+  CiTiming* timing = new (p) CiTimingGeneric(tid, type, cond,
 					     intrinsic_rise,
 					     intrinsic_fall,
 					     slope_rise,
@@ -1182,7 +1182,7 @@ CiLibrary::new_timing_piecewise(ymuint cell_id,
 				CellResistance fall_pin_resistance)
 {
   void* p = mAlloc.get_memory(sizeof(CiTimingPiecewise));
-  CiTiming* timing = new (p) CiTimingPiecewise(timing_type, cond,
+  CiTiming* timing = new (p) CiTimingPiecewise(tid, timing_type, cond,
 					       intrinsic_rise,
 					       intrinsic_fall,
 					       slope_rise,
@@ -1211,7 +1211,7 @@ CiLibrary::new_timing_lut1(ymuint cell_id,
 			   CellLut* fall_transition)
 {
   void* p = mAlloc.get_memory(sizeof(CiTimingLut1));
-  CiTiming* timing = new (p) CiTimingLut1(timing_type, cond,
+  CiTiming* timing = new (p) CiTimingLut1(tid, timing_type, cond,
 					  cell_rise,
 					  cell_fall,
 					  rise_transition,
@@ -1240,7 +1240,7 @@ CiLibrary::new_timing_lut2(ymuint cell_id,
 			   CellLut* fall_propagation)
 {
   void* p = mAlloc.get_memory(sizeof(CiTimingLut2));
-  CiTiming* timing = new (p) CiTimingLut2(timing_type, cond,
+  CiTiming* timing = new (p) CiTimingLut2(tid, timing_type, cond,
 					  rise_transition,
 					  fall_transition,
 					  rise_propagation,

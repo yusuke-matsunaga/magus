@@ -651,6 +651,60 @@ PyCellTiming_AsCellTimingPtr(PyObject* py_obj);
 
 
 //////////////////////////////////////////////////////////////////////
+// PyCellTimingSense: tCellTimingSense を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief tCellTimingSense を表すタイプオブジェクト
+extern
+PyTypeObject PyCellTimingSense_Type;
+
+/// @brief PyCellTimingSense の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyCellTimingSense_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyCellTimingSense_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyCellTimingSense_Type;
+}
+
+/// @brief tCellTimingSense から PyObject を作る．
+/// @param[in] val tCellTimingSense の値
+/// @return val を表す PyObject
+extern
+PyObject*
+PyCellTimingSense_FromCellTimingSense(tCellTimingSense val);
+
+/// @brief 文字列から PyObject を作る．
+/// @param[in] str 文字列
+/// @return PyObject
+extern
+PyObject*
+PyCellTimingSense_FromString(const char* str);
+
+/// @brief PyObject から tCellTimingSense の値を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return tCellTimingSense を返す．
+/// @note 変換が失敗したら TypeError を送出し，kCellNonUnate を返す．
+extern
+tCellTimingSense
+PyCellTimingSense_AsCellTimingSense(PyObject* py_obj);
+
+/// @brief kCellPosiUnate を表す Python オブジェクト
+extern
+PyObject* Py_kCellPosiUnate;
+
+/// @brief kCellNegaUnate を表す Python オブジェクト
+extern
+PyObject* Py_kCellNegaUnate;
+
+/// @brief kCellNonUnate を表す Python オブジェクト
+extern
+PyObject* Py_kCellNonUnate;
+
+
+//////////////////////////////////////////////////////////////////////
 // PyCellTimingType: tCellTimingType を表す型
 //////////////////////////////////////////////////////////////////////
 
