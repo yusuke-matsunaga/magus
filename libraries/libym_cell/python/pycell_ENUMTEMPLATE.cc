@@ -209,7 +209,7 @@ Py%%TYPE_NAME%%_FromString(const char* str)
   PyObject* result = NULL;
   if ( str == NULL ) {
     // デフォルト値
-    result = Py_%%DEFAULT_VAL%%
+    result = Py_%%DEFAULT_VAL%%;
   }
 %%%PART_D%%%
   else {
@@ -248,7 +248,6 @@ Py%%TYPE_NAME%%_As%%TYPE_NAME%%(PyObject* py_obj)
 
 %%%PART_E%%%
 
-
 BEGIN_NONAMESPACE
 
 // %%CTYPE_NAME%% の定数を設定する関数
@@ -279,7 +278,6 @@ void
 
   // 定数オブジェクトの生成と登録
 %%%PART_F%%%
-
   // 定数オブジェクト用の文字列オブジェクトの生成
 %%%PART_G%%%
 
