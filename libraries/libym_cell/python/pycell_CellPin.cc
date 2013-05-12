@@ -67,7 +67,7 @@ PyObject*
 CellPin_direction(CellPinObject* self,
 		  PyObject* args)
 {
-  return PyCellPinDir_FromCellPinDirection(self->mPin->direction());
+  return PyCellPinDir_FromCellPinDir(self->mPin->direction());
 }
 
 // input_id 関数

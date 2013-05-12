@@ -206,12 +206,12 @@ PyTypeObject PyCellTechnology_Type = {
 //////////////////////////////////////////////////////////////////////
 
 // @brief tCellTechnology から CellTechnologyObject を生成する．
-// @param[in] technology tCellTechnology の値
+// @param[in] val tCellTechnology の値
 PyObject*
-PyCellTechnology_FromCellTechnology(tCellTechnology technology)
+PyCellTechnology_FromCellTechnology(tCellTechnology val)
 {
   PyObject* result = NULL;
-  switch ( technology ) {
+  switch ( val ) {
   case kCellTechCmos: result = Py_kCellTechCmos; break;
   case kCellTechFpga: result = Py_kCellTechFpga; break;
   default: assert_not_reached(__FILE__, __LINE__);
@@ -308,12 +308,12 @@ CellTechnologyObject_init(PyObject* m)
 
   // 定数オブジェクトの生成と登録
   obj_set(kCellTechCmosStruct,
-	  Py_kCellTechCmos, m,
-	  "kCellTechCmos");
+          Py_kCellTechCmos, m,
+          "kCellTechCmos");
 
   obj_set(kCellTechFpgaStruct,
-	  Py_kCellTechFpga, m,
-	  "kCellTechFpga");
+          Py_kCellTechFpga, m,
+          "kCellTechFpga");
 
   // 定数オブジェクト用の文字列オブジェクトの生成
   kCellTechCmosString = PyString_FromString(kCellTechCmosName);

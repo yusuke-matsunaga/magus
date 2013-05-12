@@ -1,5 +1,5 @@
 
-/// @file pycell_CellDir.cc
+/// @file pycell_CellPinDir.cc
 /// @brief tCellPinDirection の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -18,7 +18,7 @@ BEGIN_NONAMESPACE
 // Python 用の構造体定義
 //////////////////////////////////////////////////////////////////////
 
-// CellDir を表す型
+// tCellPinDirection を表す型
 struct CellPinDirObject
 {
   // Python のお約束
@@ -54,12 +54,12 @@ CellPinDirObject kCellPinInternalStruct = {
 };
 
 // repr 用の文字列オブジェクト
-PyObject* kCellPinInputString = NULL;
-PyObject* kCellPinOutputString = NULL;
-PyObject* kCellPinInoutString = NULL;
+PyObject* kCellPinInputString    = NULL;
+PyObject* kCellPinOutputString   = NULL;
+PyObject* kCellPinInoutString    = NULL;
 PyObject* kCellPinInternalString = NULL;
 
-// 個々の定数に対する文字列
+// 個々の定数を表す文字列
 const char* kCellPinInputName    = "input";
 const char* kCellPinOutputName   = "output";
 const char* kCellPinInoutName    = "inout";
@@ -73,8 +73,8 @@ const char* kCellPinInternalName = "internal";
 // CellPinDirObject の生成関数
 // 実際には既存のオブジェクトを返す．
 CellPinDirObject*
-CellDir_new(PyTypeObject* type,
-	    PyObject* args)
+CellPinDir_new(PyTypeObject* type,
+		   PyObject* args)
 {
   char* str = NULL;
   if ( !PyArg_ParseTuple(args, "|s", &str) ) {
@@ -86,14 +86,14 @@ CellDir_new(PyTypeObject* type,
 
 // CellPinDirObject を開放する関数
 void
-CellDir_dealloc(CellPinDirObject* self)
+CellPinDir_dealloc(CellPinDirObject* self)
 {
   PyObject_Del(self);
 }
 
 // repr 関数
 PyObject*
-CellDir_repr(CellPinDirObject* self)
+CellPinDir_repr(CellPinDirObject* self)
 {
   PyObject* result = NULL;
   switch ( self->mVal ) {
@@ -101,7 +101,7 @@ CellDir_repr(CellPinDirObject* self)
   case kCellPinOutput:   result = kCellPinOutputString; break;
   case kCellPinInout:    result = kCellPinInoutString; break;
   case kCellPinInternal: result = kCellPinInternalString; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: assert_not_reached(__FILE__, __LINE__);
   }
 
   Py_INCREF(result);
@@ -110,32 +110,32 @@ CellDir_repr(CellPinDirObject* self)
 
 // is_input 関数
 PyObject*
-CellDir_is_input(CellPinDirObject* self,
-		 PyObject* args)
+CellPinDir_is_input(CellPinDirObject* self,
+		    PyObject* args)
 {
   return PyObject_FromBool(self->mVal == kCellPinInput);
 }
 
 // is_output 関数
 PyObject*
-CellDir_is_output(CellPinDirObject* self,
-		  PyObject* args)
+CellPinDir_is_output(CellPinDirObject* self,
+		     PyObject* args)
 {
   return PyObject_FromBool(self->mVal == kCellPinOutput);
 }
 
 // is_inout 関数
 PyObject*
-CellDir_is_inout(CellPinDirObject* self,
-		 PyObject* args)
+CellPinDir_is_inout(CellPinDirObject* self,
+		    PyObject* args)
 {
   return PyObject_FromBool(self->mVal == kCellPinInout);
 }
 
 // is_internal 関数
 PyObject*
-CellDir_is_internal(CellPinDirObject* self,
-		    PyObject* args)
+CellPinDir_is_internal(CellPinDirObject* self,
+		       PyObject* args)
 {
   return PyObject_FromBool(self->mVal == kCellPinInternal);
 }
@@ -143,7 +143,7 @@ CellDir_is_internal(CellPinDirObject* self,
 //////////////////////////////////////////////////////////////////////
 // CellPinDirObject のメソッドテーブル
 //////////////////////////////////////////////////////////////////////
-PyMethodDef CellDir_methods[] = {
+PyMethodDef CellPinDir_methods[] = {
   // PyMethodDef のフィールド
   //   char*       ml_name;
   //   PyCFunction ml_meth;
@@ -159,13 +159,13 @@ PyMethodDef CellDir_methods[] = {
   //  - METH_STATIC
   //  - METH_COEXIST
 
-  {"is_input", (PyCFunction)CellDir_is_input, METH_NOARGS,
+  {"is_input", (PyCFunction)CellPinDir_is_input, METH_NOARGS,
    PyDoc_STR("return TRUE if INPUT (NONE)")},
-  {"is_output", (PyCFunction)CellDir_is_output, METH_NOARGS,
+  {"is_output", (PyCFunction)CellPinDir_is_output, METH_NOARGS,
    PyDoc_STR("return TRUE if OUTPUT (NONE)")},
-  {"is_inout", (PyCFunction)CellDir_is_inout, METH_NOARGS,
+  {"is_inout", (PyCFunction)CellPinDir_is_inout, METH_NOARGS,
    PyDoc_STR("return TRUE if INOUT (NONE)")},
-  {"is_internal", (PyCFunction)CellDir_is_internal, METH_NOARGS,
+  {"is_internal", (PyCFunction)CellPinDir_is_internal, METH_NOARGS,
    PyDoc_STR("return TRUE if INTERNAL (NONE)")},
 
   {NULL, NULL, 0, NULL} // end-marker
@@ -181,18 +181,18 @@ PyTypeObject PyCellPinDir_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "cell_lib.PinDir",              // tp_name
+  "cell_lib.CellPinDir",              // tp_name
   sizeof(CellPinDirObject),          // tp_basicsize
   (int)0,                         // tp_itemsize
 
   // Methods to implement standard operations
 
-  (destructor)CellDir_dealloc,     // tp_dealloc
+  (destructor)CellPinDir_dealloc,     // tp_dealloc
   (printfunc)0,                    // tp_print
   (getattrfunc)0,                  // tp_getattr
   (setattrfunc)0,                  // tp_setattr
   (cmpfunc)0,                      // tp_compare
-  (reprfunc)CellDir_repr,          // tp_repr
+  (reprfunc)CellPinDir_repr,          // tp_repr
 
   // Method suites for standard classes
   0,                               // tp_as_number
@@ -238,7 +238,7 @@ PyTypeObject PyCellPinDir_Type = {
   (iternextfunc)0,                 // tp_iternext
 
   // Attribute descriptor and subclassing stuff
-  CellDir_methods,                // tp_methods
+  CellPinDir_methods,                // tp_methods
   0,                               // tp_members
   0,                               // tp_getset
   (struct _typeobject*)0,          // tp_base
@@ -248,7 +248,7 @@ PyTypeObject PyCellPinDir_Type = {
   (long)0,                         // tp_dictoffset
   (initproc)0,                     // tp_init
   (allocfunc)0,                    // tp_alloc
-  (newfunc)CellDir_new,            // tp_new
+  (newfunc)CellPinDir_new,            // tp_new
   (freefunc)0,                     // tp_free
   (inquiry)0,                      // tp_is_gc
 
@@ -261,16 +261,16 @@ PyTypeObject PyCellPinDir_Type = {
 
 
 //////////////////////////////////////////////////////////////////////
-// PyObject と CellDir の間の変換関数
+// PyObject と tCellPinDirection の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief CellDir から CellPinDirObject を生成する．
-// @param[in] obj CellDir オブジェクト
+// @brief tCellPinDirection から CellPinDirObject を生成する．
+// @param[in] val tCellPinDirection の値
 PyObject*
-PyCellPinDir_FromCellPinDirection(tCellPinDirection dir)
+PyCellPinDir_FromCellPinDir(tCellPinDirection val)
 {
   PyObject* result = NULL;
-  switch ( dir ) {
+  switch ( val ) {
   case kCellPinInput:    result = Py_kCellPinInput; break;
   case kCellPinOutput:   result = Py_kCellPinOutput; break;
   case kCellPinInout:    result = Py_kCellPinInout; break;
@@ -289,7 +289,7 @@ PyCellPinDir_FromString(const char* str)
 {
   PyObject* result = NULL;
   if ( str == NULL ) {
-    // デフォルトは input
+    // デフォルト値
     result = Py_kCellPinInput;
   }
   else if ( strcmp(str, kCellPinInputName) == 0 ) {
@@ -305,7 +305,8 @@ PyCellPinDir_FromString(const char* str)
     result = Py_kCellPinInternal;
   }
   else {
-    PyErr_SetString(PyExc_ValueError, "Illegal string for CellDir");
+    PyErr_SetString(PyExc_ValueError,
+		    "Illegal string for tCellPinDirection");
     return NULL;
   }
 
@@ -315,14 +316,14 @@ PyCellPinDir_FromString(const char* str)
 
 // @brief PyObject から tCellPinDirection を取り出す．
 // @param[in] py_obj Python オブジェクト
-// @return CellDir を返す．
+// @return tCellPinDirection を返す．
 // @note 変換が失敗したら TypeError を送出し，kCellPinInput を返す．
 tCellPinDirection
-PyCellPinDir_AsCellPinDirection(PyObject* py_obj)
+PyCellPinDir_AsCellPinDir(PyObject* py_obj)
 {
   // 型のチェック
   if ( !PyCellPinDir_Check(py_obj) ) {
-    PyErr_SetString(PyExc_TypeError, "cell_lib.PinDir is expected");
+    PyErr_SetString(PyExc_TypeError, "cell_lib.CellPinDir is expected");
     return kCellPinInput;
   }
 
@@ -338,13 +339,13 @@ PyCellPinDir_AsCellPinDirection(PyObject* py_obj)
 //////////////////////////////////////////////////////////////////////
 
 // kCellPinInput を表すオブジェクト
-PyObject* Py_kCellPinInput = NULL;
+PyObject* Py_kCellPinInput    = NULL;
 
 // kCellPinOutput を表すオブジェクト
-PyObject* Py_kCellPinOutput = NULL;
+PyObject* Py_kCellPinOutput   = NULL;
 
 // kCellPinInout を表すオブジェクト
-PyObject* Py_kCellPinInout = NULL;
+PyObject* Py_kCellPinInout    = NULL;
 
 // kCellPinInternal を表すオブジェクト
 PyObject* Py_kCellPinInternal = NULL;
@@ -352,14 +353,14 @@ PyObject* Py_kCellPinInternal = NULL;
 
 BEGIN_NONAMESPACE
 
-// CellDir の定数を設定する関数
+// tCellPinDirection の定数を設定する関数
 void
-obj_set(CellPinDirObject& dir_obj,
+obj_set(CellPinDirObject& my_obj,
 	PyObject*& py_obj,
 	PyObject* module,
 	const char* name)
 {
-  py_obj = (PyObject*)&dir_obj;
+  py_obj = (PyObject*)&my_obj;
   Py_XINCREF(py_obj);
   PyModule_AddObject(module, name, py_obj);
 }
@@ -376,19 +377,31 @@ CellPinDirObject_init(PyObject* m)
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "PinDir", (PyObject*)&PyCellPinDir_Type);
+  PyModule_AddObject(m, "CellPinDir", (PyObject*)&PyCellPinDir_Type);
 
   // 定数オブジェクトの生成と登録
-  obj_set(kCellPinInputStruct,    Py_kCellPinInput,    m, "kCellPinInput");
-  obj_set(kCellPinOutputStruct,   Py_kCellPinOutput,   m, "kCellPinOutput");
-  obj_set(kCellPinInoutStruct,    Py_kCellPinInout,    m, "kCellPinInout");
-  obj_set(kCellPinInternalStruct, Py_kCellPinInternal, m, "kCellPinInternal");
+  obj_set(kCellPinInputStruct,
+          Py_kCellPinInput, m,
+          "kCellPinInput");
+
+  obj_set(kCellPinOutputStruct,
+          Py_kCellPinOutput, m,
+          "kCellPinOutput");
+
+  obj_set(kCellPinInoutStruct,
+          Py_kCellPinInout, m,
+          "kCellPinInout");
+
+  obj_set(kCellPinInternalStruct,
+          Py_kCellPinInternal, m,
+          "kCellPinInternal");
 
   // 定数オブジェクト用の文字列オブジェクトの生成
   kCellPinInputString    = PyString_FromString(kCellPinInputName);
   kCellPinOutputString   = PyString_FromString(kCellPinOutputName);
   kCellPinInoutString    = PyString_FromString(kCellPinInoutName);
   kCellPinInternalString = PyString_FromString(kCellPinInternalName);
+
 }
 
 END_NAMESPACE_YM

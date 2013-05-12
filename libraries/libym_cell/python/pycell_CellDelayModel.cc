@@ -8,7 +8,6 @@
 
 
 #include "ym_cell/pycell.h"
-#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -19,7 +18,7 @@ BEGIN_NONAMESPACE
 // Python 用の構造体定義
 //////////////////////////////////////////////////////////////////////
 
-// CellDelayModel を表す型
+// tCellDelayModel を表す型
 struct CellDelayModelObject
 {
   // Python のお約束
@@ -67,7 +66,7 @@ PyObject* kCellDelayPiecewiseCmosString = NULL;
 PyObject* kCellDelayCmos2String         = NULL;
 PyObject* kCellDelayDcmString           = NULL;
 
-// 個々の定数に対する文字列
+// 個々の定数を表す文字列
 const char* kCellDelayGenericCmosName   = "generic_cmos";
 const char* kCellDelayTableLookupName   = "table_lookup";
 const char* kCellDelayPiecewiseCmosName = "piecewise_cmos";
@@ -234,12 +233,12 @@ PyTypeObject PyCellDelayModel_Type = {
 //////////////////////////////////////////////////////////////////////
 
 // @brief tCellDelayModel から CellDelayModelObject を生成する．
-// @param[in] delay_model tCellDelayModel の値
+// @param[in] val tCellDelayModel の値
 PyObject*
-PyCellDelayModel_FromCellDelayModel(tCellDelayModel delay_model)
+PyCellDelayModel_FromCellDelayModel(tCellDelayModel val)
 {
   PyObject* result = NULL;
-  switch ( delay_model ) {
+  switch ( val ) {
   case kCellDelayGenericCmos:   result = Py_kCellDelayGenericCmos; break;
   case kCellDelayTableLookup:   result = Py_kCellDelayTableLookup; break;
   case kCellDelayPiecewiseCmos: result = Py_kCellDelayPiecewiseCmos; break;
@@ -259,7 +258,7 @@ PyCellDelayModel_FromString(const char* str)
 {
   PyObject* result = NULL;
   if ( str == NULL ) {
-    // デフォルトは generic_cmos
+    // デフォルト値
     result = Py_kCellDelayGenericCmos;
   }
   else if ( strcmp(str, kCellDelayGenericCmosName) == 0 ) {
@@ -278,7 +277,8 @@ PyCellDelayModel_FromString(const char* str)
     result = Py_kCellDelayDcm;
   }
   else {
-    PyErr_SetString(PyExc_ValueError, "Illegal string for tCellDelayModel");
+    PyErr_SetString(PyExc_ValueError,
+		    "Illegal string for tCellDelayModel");
     return NULL;
   }
 
@@ -289,7 +289,7 @@ PyCellDelayModel_FromString(const char* str)
 // @brief PyObject から tCellDelayModel を取り出す．
 // @param[in] py_obj Python オブジェクト
 // @return tCellDelayModel を返す．
-// @note 変換が失敗したら TypeError を送出し，kCellDelayGeneircCmos を返す．
+// @note 変換が失敗したら TypeError を送出し，kCellDelayGenericCmos を返す．
 tCellDelayModel
 PyCellDelayModel_AsCellDelayModel(PyObject* py_obj)
 {
@@ -311,31 +311,31 @@ PyCellDelayModel_AsCellDelayModel(PyObject* py_obj)
 //////////////////////////////////////////////////////////////////////
 
 // kCellDelayGenericCmos を表すオブジェクト
-PyObject* Py_kCellDelayGenericCmos = NULL;
+PyObject* Py_kCellDelayGenericCmos   = NULL;
 
 // kCellDelayTableLookup を表すオブジェクト
-PyObject* Py_kCellDelayTableLookup = NULL;
+PyObject* Py_kCellDelayTableLookup   = NULL;
 
 // kCellDelayPiecewiseCmos を表すオブジェクト
 PyObject* Py_kCellDelayPiecewiseCmos = NULL;
 
 // kCellDelayCmos2 を表すオブジェクト
-PyObject* Py_kCellDelayCmos2 = NULL;
+PyObject* Py_kCellDelayCmos2         = NULL;
 
 // kCellDelayDcm を表すオブジェクト
-PyObject* Py_kCellDelayDcm = NULL;
+PyObject* Py_kCellDelayDcm           = NULL;
 
 
 BEGIN_NONAMESPACE
 
 // tCellDelayModel の定数を設定する関数
 void
-obj_set(CellDelayModelObject& dm_obj,
+obj_set(CellDelayModelObject& my_obj,
 	PyObject*& py_obj,
 	PyObject* module,
 	const char* name)
 {
-  py_obj = (PyObject*)&dm_obj;
+  py_obj = (PyObject*)&my_obj;
   Py_XINCREF(py_obj);
   PyModule_AddObject(module, name, py_obj);
 }
@@ -356,20 +356,24 @@ CellDelayModelObject_init(PyObject* m)
 
   // 定数オブジェクトの生成と登録
   obj_set(kCellDelayGenericCmosStruct,
-	  Py_kCellDelayGenericCmos, m,
-	  "kCellDelayGenericCmos");
+          Py_kCellDelayGenericCmos, m,
+          "kCellDelayGenericCmos");
+
   obj_set(kCellDelayTableLookupStruct,
-	  Py_kCellDelayTableLookup, m,
-	  "kCellDelayTableLookup");
+          Py_kCellDelayTableLookup, m,
+          "kCellDelayTableLookup");
+
   obj_set(kCellDelayPiecewiseCmosStruct,
-	  Py_kCellDelayPiecewiseCmos, m,
-	  "kCellDelayPiecewiseCmos");
+          Py_kCellDelayPiecewiseCmos, m,
+          "kCellDelayPiecewiseCmos");
+
   obj_set(kCellDelayCmos2Struct,
-	  Py_kCellDelayCmos2, m,
-	  "kCellDelayCmos2");
+          Py_kCellDelayCmos2, m,
+          "kCellDelayCmos2");
+
   obj_set(kCellDelayDcmStruct,
-	  Py_kCellDelayDcm, m,
-	  "kCellDelayDcm");
+          Py_kCellDelayDcm, m,
+          "kCellDelayDcm");
 
   // 定数オブジェクト用の文字列オブジェクトの生成
   kCellDelayGenericCmosString   = PyString_FromString(kCellDelayGenericCmosName);
@@ -377,6 +381,7 @@ CellDelayModelObject_init(PyObject* m)
   kCellDelayPiecewiseCmosString = PyString_FromString(kCellDelayPiecewiseCmosName);
   kCellDelayCmos2String         = PyString_FromString(kCellDelayCmos2Name);
   kCellDelayDcmString           = PyString_FromString(kCellDelayDcmName);
+
 }
 
 END_NAMESPACE_YM

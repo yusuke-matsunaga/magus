@@ -15,12 +15,11 @@
 
 BEGIN_NAMESPACE_YM
 
-
 //////////////////////////////////////////////////////////////////////
-// PyCellPinDir: ピンの方向を表す型
+// PyCellPinDir: tCellPinDirection を表す型
 //////////////////////////////////////////////////////////////////////
 
-/// @brief CellDir を表すタイプオブジェクト
+/// @brief tCellPinDirection を表すタイプオブジェクト
 extern
 PyTypeObject PyCellPinDir_Type;
 
@@ -35,39 +34,41 @@ PyCellPinDir_Check(PyObject* obj)
   return Py_TYPE(obj) == &PyCellPinDir_Type;
 }
 
-/// @brief tCellPinDirection から CellDirObject を生成する．
-/// @param[in] obj CellDir オブジェクト
+/// @brief tCellPinDirection から PyObject を作る．
+/// @param[in] val tCellPinDirection の値
+/// @return val を表す PyObject
 extern
 PyObject*
-PyCellPinDir_FromCellPinDirection(tCellPinDirection dir);
+PyCellPinDir_FromCellPinDir(tCellPinDirection val);
 
-/// @brief 方向を表す文字列から CellDirObject を生成する．
+/// @brief 文字列から PyObject を作る．
 /// @param[in] str 文字列
+/// @return PyObject
 extern
 PyObject*
 PyCellPinDir_FromString(const char* str);
 
-/// @brief PyObject から tCellPinDirection を取り出す．
+/// @brief PyObject から tCellPinDirection の値を取り出す．
 /// @param[in] py_obj Python オブジェクト
 /// @return tCellPinDirection を返す．
 /// @note 変換が失敗したら TypeError を送出し，kCellPinInput を返す．
 extern
 tCellPinDirection
-PyCellPinDir_AsCellPinDirection(PyObject* py_obj);
+PyCellPinDir_AsCellPinDir(PyObject* py_obj);
 
-/// @brief kCellPinInput を表すオブジェクト
+/// @brief kCellPinInput を表す Python オブジェクト
 extern
 PyObject* Py_kCellPinInput;
 
-/// @brief kCellPinOutput を表すオブジェクト
+/// @brief kCellPinOutput を表す Python オブジェクト
 extern
 PyObject* Py_kCellPinOutput;
 
-/// @brief kCellPinInout を表すオブジェクト
+/// @brief kCellPinInout を表す Python オブジェクト
 extern
 PyObject* Py_kCellPinInout;
 
-/// @brief kCellPinInternal を表すオブジェクト
+/// @brief kCellPinInternal を表す Python オブジェクト
 extern
 PyObject* Py_kCellPinInternal;
 
@@ -440,15 +441,15 @@ PyCellTechnology_Check(PyObject* obj)
 }
 
 /// @brief tCellTechnology から PyObject を作る．
-/// @param[in] delay_model tCellTechnology
-/// @return delay_model を表す PyObject
+/// @param[in] val tCellTechnology の値
+/// @return val を表す PyObject
 extern
 PyObject*
-PyCellTechnology_FromCellTechnology(tCellTechnology delay_model);
+PyCellTechnology_FromCellTechnology(tCellTechnology val);
 
 /// @brief 文字列から PyObject を作る．
 /// @param[in] str 文字列
-/// @return delay_model を表す PyObject
+/// @return PyObject
 extern
 PyObject*
 PyCellTechnology_FromString(const char* str);
@@ -456,16 +457,16 @@ PyCellTechnology_FromString(const char* str);
 /// @brief PyObject から tCellTechnology の値を取り出す．
 /// @param[in] py_obj Python オブジェクト
 /// @return tCellTechnology を返す．
-/// @note 変換が失敗したら TypeError を送出し，kCellTechnologyGenericCmos を返す．
+/// @note 変換が失敗したら TypeError を送出し，kCellTechCmos を返す．
 extern
 tCellTechnology
 PyCellTechnology_AsCellTechnology(PyObject* py_obj);
 
-/// @brief kTechCmos を表す Python オブジェクト
+/// @brief kCellTechCmos を表す Python オブジェクト
 extern
 PyObject* Py_kCellTechCmos;
 
-/// @brief kTechFpga を表す Python オブジェクト
+/// @brief kCellTechFpga を表す Python オブジェクト
 extern
 PyObject* Py_kCellTechFpga;
 
@@ -490,15 +491,15 @@ PyCellDelayModel_Check(PyObject* obj)
 }
 
 /// @brief tCellDelayModel から PyObject を作る．
-/// @param[in] delay_model tCellDelayModel
-/// @return delay_model を表す PyObject
+/// @param[in] val tCellDelayModel の値
+/// @return val を表す PyObject
 extern
 PyObject*
-PyCellDelayModel_FromCellDelayModel(tCellDelayModel delay_model);
+PyCellDelayModel_FromCellDelayModel(tCellDelayModel val);
 
 /// @brief 文字列から PyObject を作る．
 /// @param[in] str 文字列
-/// @return delay_model を表す PyObject
+/// @return PyObject
 extern
 PyObject*
 PyCellDelayModel_FromString(const char* str);
@@ -506,7 +507,7 @@ PyCellDelayModel_FromString(const char* str);
 /// @brief PyObject から tCellDelayModel の値を取り出す．
 /// @param[in] py_obj Python オブジェクト
 /// @return tCellDelayModel を返す．
-/// @note 変換が失敗したら TypeError を送出し，kCellDelayModelGenericCmos を返す．
+/// @note 変換が失敗したら TypeError を送出し，kCellDelayGenericCmos を返す．
 extern
 tCellDelayModel
 PyCellDelayModel_AsCellDelayModel(PyObject* py_obj);
@@ -533,10 +534,10 @@ PyObject* Py_kCellDelayDcm;
 
 
 //////////////////////////////////////////////////////////////////////
-// PyCellPatType: CellPatType を表す型
+// PyCellPatType: tCellPatType を表す型
 //////////////////////////////////////////////////////////////////////
 
-/// @brief CellPatType を表すタイプオブジェクト
+/// @brief tCellPatType を表すタイプオブジェクト
 extern
 PyTypeObject PyCellPatType_Type;
 
@@ -551,21 +552,23 @@ PyCellPatType_Check(PyObject* obj)
   return Py_TYPE(obj) == &PyCellPatType_Type;
 }
 
-/// @brief tCellPatType から CellPatTypeObject を生成する．
-/// @param[in] technology tCellPatType の値
+/// @brief tCellPatType から PyObject を作る．
+/// @param[in] val tCellPatType の値
+/// @return val を表す PyObject
 extern
 PyObject*
-PyCellPatType_FromCellPatType(tCellPatType technology);
+PyCellPatType_FromCellPatType(tCellPatType val);
 
-/// @brief 文字列から CellPatTypeObject を生成する．
+/// @brief 文字列から PyObject を作る．
 /// @param[in] str 文字列
+/// @return PyObject
 extern
 PyObject*
 PyCellPatType_FromString(const char* str);
 
-/// @brief PyObject から tCellPatType を取り出す．
+/// @brief PyObject から tCellPatType の値を取り出す．
 /// @param[in] py_obj Python オブジェクト
-/// @return tCellPatType の値を返す．
+/// @return tCellPatType を返す．
 /// @note 変換が失敗したら TypeError を送出し，kCellPatInput を返す．
 extern
 tCellPatType
@@ -667,15 +670,15 @@ PyCellTimingType_Check(PyObject* obj)
 }
 
 /// @brief tCellTimingType から PyObject を作る．
-/// @param[in] timing_type tCellTimingType
-/// @return timing_type を表す PyObject
+/// @param[in] val tCellTimingType の値
+/// @return val を表す PyObject
 extern
 PyObject*
-PyCellTimingType_FromCellTimingType(tCellTimingType timing_type);
+PyCellTimingType_FromCellTimingType(tCellTimingType val);
 
 /// @brief 文字列から PyObject を作る．
 /// @param[in] str 文字列
-/// @return timing_type を表す PyObject
+/// @return PyObject
 extern
 PyObject*
 PyCellTimingType_FromString(const char* str);
@@ -688,160 +691,129 @@ extern
 tCellTimingType
 PyCellTimingType_AsCellTimingType(PyObject* py_obj);
 
-/// @brief kCellTimingCombinational を表す PyObject
+/// @brief kCellTimingCombinational を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingCombinational;
+PyObject* Py_kCellTimingCombinational;
 
-/// @brief kCellTimingCombinationalRiseを表す PyObject
+/// @brief kCellTimingCombinationalRise を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingCombinationalRise;
+PyObject* Py_kCellTimingCombinationalRise;
 
-/// @brief kCellTimingCombinationalFallを表す PyObject
+/// @brief kCellTimingCombinationalFall を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingCombinationalFall;
+PyObject* Py_kCellTimingCombinationalFall;
 
-/// @brief kCellTimingThreeStateEnableを表す PyObject
+/// @brief kCellTimingThreeStateEnable を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingThreeStateEnable;
+PyObject* Py_kCellTimingThreeStateEnable;
 
-/// @brief kCellTimingThreeStateDisableを表す PyObject
+/// @brief kCellTimingThreeStateDisable を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingThreeStateDisable;
+PyObject* Py_kCellTimingThreeStateDisable;
 
-/// @brief kCellTimingThreeStateEnableRiseを表す PyObject
+/// @brief kCellTimingThreeStateEnableRise を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingThreeStateEnableRise;
+PyObject* Py_kCellTimingThreeStateEnableRise;
 
-/// @brief kCellTimingThreeStateEnableFallを表す PyObject
+/// @brief kCellTimingThreeStateEnableFall を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingThreeStateEnableFall;
+PyObject* Py_kCellTimingThreeStateEnableFall;
 
-/// @brief kCellTimingThreeStateDisableRiseを表す PyObject
+/// @brief kCellTimingThreeStateDisableRise を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingThreeStateDisableRise;
+PyObject* Py_kCellTimingThreeStateDisableRise;
 
-/// @brief kCellTimingThreeStateDisableFallを表す PyObject
+/// @brief kCellTimingThreeStateDisableFall を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingThreeStateDisableFall;
+PyObject* Py_kCellTimingThreeStateDisableFall;
 
-/// @brief kCellTimingRisingEdgeを表す PyObject
+/// @brief kCellTimingRisingEdge を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingRisingEdge;
+PyObject* Py_kCellTimingRisingEdge;
 
-/// @brief kCellTimingFallingEdgeを表す PyObject
+/// @brief kCellTimingFallingEdge を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingFallingEdge;
+PyObject* Py_kCellTimingFallingEdge;
 
-/// @brief kCellTimingPresetを表す PyObject
+/// @brief kCellTimingPreset を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingPreset;
+PyObject* Py_kCellTimingPreset;
 
-/// @brief kCellTimingClearを表す PyObject
+/// @brief kCellTimingClear を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingClear;
+PyObject* Py_kCellTimingClear;
 
-/// @brief kCellTimingHoldRisingを表す PyObject
+/// @brief kCellTimingHoldRising を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingHoldRising;
+PyObject* Py_kCellTimingHoldRising;
 
-/// @brief kCellTimingHoldFallingを表す PyObject
+/// @brief kCellTimingHoldFalling を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingHoldFalling;
+PyObject* Py_kCellTimingHoldFalling;
 
-/// @brief kCellTimingSetupRisingを表す PyObject
+/// @brief kCellTimingSetupRising を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingSetupRising;
+PyObject* Py_kCellTimingSetupRising;
 
-/// @brief kCellTimingSetupFallingを表す PyObject
+/// @brief kCellTimingSetupFalling を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingSetupFalling;
+PyObject* Py_kCellTimingSetupFalling;
 
-/// @brief kCellTimingRecoveryRisingを表す PyObject
+/// @brief kCellTimingRecoveryRising を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingRecoveryRising;
+PyObject* Py_kCellTimingRecoveryRising;
 
-/// @brief kCellTimingRecoveryFallingを表す PyObject
+/// @brief kCellTimingRecoveryFalling を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingRecoveryFalling;
+PyObject* Py_kCellTimingRecoveryFalling;
 
-/// @brief kCellTimingSkewRisingを表す PyObject
+/// @brief kCellTimingSkewRising を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingSkewRising;
+PyObject* Py_kCellTimingSkewRising;
 
-/// @brief kCellTimingSkewFallingを表す PyObject
+/// @brief kCellTimingSkewFalling を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingSkewFalling;
+PyObject* Py_kCellTimingSkewFalling;
 
-/// @brief kCellTimingRemovalRisingを表す PyObject
+/// @brief kCellTimingRemovalRising を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingRemovalRising;
+PyObject* Py_kCellTimingRemovalRising;
 
-/// @brief kCellTimingRemovalFallingを表す PyObject
+/// @brief kCellTimingRemovalFalling を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingRemovalFalling;
+PyObject* Py_kCellTimingRemovalFalling;
 
-/// @brief kCellTimingNonSeqSetupRisingを表す PyObject
+/// @brief kCellTimingNonSeqSetupRising を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingNonSeqSetupRising;
+PyObject* Py_kCellTimingNonSeqSetupRising;
 
-/// @brief kCellTimingNonSeqSetupFallingを表す PyObject
+/// @brief kCellTimingNonSeqSetupFalling を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingNonSeqSetupFalling;
+PyObject* Py_kCellTimingNonSeqSetupFalling;
 
-/// @brief kCellTimingNonSeqHoldRisingを表す PyObject
+/// @brief kCellTimingNonSeqHoldRising を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingNonSeqHoldRising;
+PyObject* Py_kCellTimingNonSeqHoldRising;
 
-/// @brief kCellTimingNonSeqHoldFallingを表す PyObject
+/// @brief kCellTimingNonSeqHoldFalling を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingNonSeqHoldFalling;
+PyObject* Py_kCellTimingNonSeqHoldFalling;
 
-/// @brief kCellTimingNochangeHighHighを表す PyObject
+/// @brief kCellTimingNochangeHighHigh を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingNochangeHighHigh;
+PyObject* Py_kCellTimingNochangeHighHigh;
 
-/// @brief kCellTimingNochangeHighLowを表す PyObject
+/// @brief kCellTimingNochangeHighLow を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingNochangeHighLow;
+PyObject* Py_kCellTimingNochangeHighLow;
 
-/// @brief kCellTimingNochangeLowHighを表す PyObject
+/// @brief kCellTimingNochangeLowHigh を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingNochangeLowHigh;
+PyObject* Py_kCellTimingNochangeLowHigh;
 
-/// @brief kCellTimingNochangeLowLowを表す PyObject
+/// @brief kCellTimingNochangeLowLow を表す Python オブジェクト
 extern
-PyObject*
-Py_kCellTimingNochangeLowLow;
+PyObject* Py_kCellTimingNochangeLowLow;
 
 
 //////////////////////////////////////////////////////////////////////

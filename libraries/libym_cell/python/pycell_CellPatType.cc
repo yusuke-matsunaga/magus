@@ -8,7 +8,6 @@
 
 
 #include "ym_cell/pycell.h"
-#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -53,7 +52,7 @@ PyObject* kCellPatInputString = NULL;
 PyObject* kCellPatAndString   = NULL;
 PyObject* kCellPatXorString   = NULL;
 
-// 個々の定数に対する文字列
+// 個々の定数を表す文字列
 const char* kCellPatInputName = "input";
 const char* kCellPatAndName   = "and";
 const char* kCellPatXorName   = "xor";
@@ -67,7 +66,7 @@ const char* kCellPatXorName   = "xor";
 // 実際には既存のオブジェクトを返す．
 CellPatTypeObject*
 CellPatType_new(PyTypeObject* type,
-		PyObject* args)
+		   PyObject* args)
 {
   char* str = NULL;
   if ( !PyArg_ParseTuple(args, "|s", &str) ) {
@@ -164,7 +163,7 @@ PyTypeObject PyCellPatType_Type = {
   Py_TPFLAGS_DEFAULT,              // tp_flags
 
   // Documentation string
-  "Patttern Type",                 // tp_doc
+  "Pattern Node Type",                 // tp_doc
 
   // Assigned meaning in release 2.0
 
@@ -216,12 +215,12 @@ PyTypeObject PyCellPatType_Type = {
 //////////////////////////////////////////////////////////////////////
 
 // @brief tCellPatType から CellPatTypeObject を生成する．
-// @param[in] technology tCellPatType の値
+// @param[in] val tCellPatType の値
 PyObject*
-PyCellPatType_FromCellPatType(tCellPatType technology)
+PyCellPatType_FromCellPatType(tCellPatType val)
 {
   PyObject* result = NULL;
-  switch ( technology ) {
+  switch ( val ) {
   case kCellPatInput: result = Py_kCellPatInput; break;
   case kCellPatAnd:   result = Py_kCellPatAnd; break;
   case kCellPatXor:   result = Py_kCellPatXor; break;
@@ -239,7 +238,7 @@ PyCellPatType_FromString(const char* str)
 {
   PyObject* result = NULL;
   if ( str == NULL ) {
-    // デフォルトは kCellPatInput
+    // デフォルト値
     result = Py_kCellPatInput;
   }
   else if ( strcmp(str, kCellPatInputName) == 0 ) {
@@ -289,10 +288,10 @@ PyCellPatType_AsCellPatType(PyObject* py_obj)
 PyObject* Py_kCellPatInput = NULL;
 
 // kCellPatAnd を表すオブジェクト
-PyObject* Py_kCellPatAnd = NULL;
+PyObject* Py_kCellPatAnd   = NULL;
 
 // kCellPatXor を表すオブジェクト
-PyObject* Py_kCellPatXor = NULL;
+PyObject* Py_kCellPatXor   = NULL;
 
 
 BEGIN_NONAMESPACE
@@ -325,14 +324,16 @@ CellPatTypeObject_init(PyObject* m)
 
   // 定数オブジェクトの生成と登録
   obj_set(kCellPatInputStruct,
-	  Py_kCellPatInput, m,
-	  "kCellPatInput");
+          Py_kCellPatInput, m,
+          "kCellPatInput");
+
   obj_set(kCellPatAndStruct,
-	  Py_kCellPatAnd, m,
-	  "kCellPatAnd");
+          Py_kCellPatAnd, m,
+          "kCellPatAnd");
+
   obj_set(kCellPatXorStruct,
-	  Py_kCellPatXor, m,
-	  "kCellPatXor");
+          Py_kCellPatXor, m,
+          "kCellPatXor");
 
   // 定数オブジェクト用の文字列オブジェクトの生成
   kCellPatInputString = PyString_FromString(kCellPatInputName);
