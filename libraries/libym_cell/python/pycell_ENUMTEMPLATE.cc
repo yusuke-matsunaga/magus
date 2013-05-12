@@ -187,12 +187,12 @@ PyTypeObject Py%%TYPE_NAME%%_Type = {
 //////////////////////////////////////////////////////////////////////
 
 // @brief %%CTYPE_NAME%% から %%TYPE_NAME%%Object を生成する．
-// @param[in] technology %%CTYPE_NAME%% の値
+// @param[in] val %%CTYPE_NAME%% の値
 PyObject*
-Py%%TYPE_NAME%%_From%%TYPE_NAME%%(%%CTYPE_NAME%% technology)
+Py%%TYPE_NAME%%_From%%TYPE_NAME%%(%%CTYPE_NAME%% val)
 {
   PyObject* result = NULL;
-  switch ( technology ) {
+  switch ( val ) {
 %%%PART_C%%%
   default: assert_not_reached(__FILE__, __LINE__);
   }

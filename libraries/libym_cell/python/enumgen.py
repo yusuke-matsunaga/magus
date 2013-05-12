@@ -182,6 +182,67 @@ def make_header(map_dict, type_list, output_file) :
             output.write(translate(line))
 
 
+# CellDelayModel
+map_dict = {
+    "type_name"    : "CellDelayModel",
+    "ctype_name"   : "tCellDelayModel",
+    "type_doc"     : "Delay Model",
+    "const_prefix" : "kCellDelay",
+    "default_val"  : "kCellDelayGenericCmos"
+}
+
+type_list = (
+    ("GenericCmos",   "generic_cmos"),
+    ("TableLookup",   "table_lookup"),
+    ("PiecewiseCmos", "piecewise_cmos"),
+    ("Cmos2",         "cmos2"),
+    ("Dcm",           "dcm")
+)
+
+make_cc_source(map_dict, type_list, "_CellDelayModel.cc")
+make_header(map_dict, type_list, "_CellDelayModel.h")
+
+
+# CellPatType
+map_dict = {
+    "type_name"    : "CellPatType",
+    "ctype_name"   : "tCellPatType",
+    "type_doc"     : "Pattern Node Type",
+    "const_prefix" : "kCellPat",
+    "default_val"  : "kCellPatInput"
+}
+
+type_list = (
+    ("Input", "input"),
+    ("And",   "and"),
+    ("Xor",   "xor")
+)
+
+make_cc_source(map_dict, type_list, "_CellPatType.cc")
+make_header(map_dict, type_list, "_CellPatType.h")
+
+
+# CellPinDir
+map_dict = {
+    "type_name"    : "CellPinDir",
+    "ctype_name"   : "tCellPinDirection",
+    "type_doc"     : "Pin Direction",
+    "const_prefix" : "kCellPin",
+    "default_val"  : "kCellPinInput"
+}
+
+type_list = (
+    ("Input",    "input"),
+    ("Output",   "output"),
+    ("Inout",    "inout"),
+    ("Internal", "internal")
+)
+
+make_cc_source(map_dict, type_list, "_CellPinDir.cc")
+make_header(map_dict, type_list, "_CellPinDir.h")
+
+
+# CellTechnology
 map_dict = {
     "type_name"    : "CellTechnology",
     "ctype_name"   : "tCellTechnology",
@@ -195,5 +256,5 @@ type_list = (
     ("Fpga", "fpga")
 )
 
-make_cc_source(map_dict, type_list, "AAA.cc")
-make_header(map_dict, type_list, "AAA.h")
+make_cc_source(map_dict, type_list, "_CellTechnology.cc")
+make_header(map_dict, type_list, "_CellTechnology.h")
