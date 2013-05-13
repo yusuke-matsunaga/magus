@@ -350,7 +350,6 @@ PyCellLut_FromCellLut(const CellLut* lut)
 
   self->mLut = lut;
 
-  Py_INCREF(self);
   return (PyObject*)self;
 }
 

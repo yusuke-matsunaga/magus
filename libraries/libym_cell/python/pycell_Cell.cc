@@ -434,7 +434,6 @@ PyCellCell_FromCell(const Cell* cell)
     self->mTimingArray[i] = PyCellTiming_FromCellTiming(timing);
   }
 
-  Py_INCREF(self);
   return (PyObject*)self;
 }
 

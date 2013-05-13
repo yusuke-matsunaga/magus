@@ -228,10 +228,10 @@ PyCellClass_FromCellClass(const CellClass* cell_class,
   for (ymuint i = 0; i < n2; ++ i) {
     const CellGroup* group = cell_class->cell_group(i);
     PyObject* obj = group_list[group->id()];
+    Py_INCREF(obj);
     PyList_SetItem(self->mCellGroupList, i, obj);
   }
 
-  Py_INCREF(self);
   return (PyObject*)self;
 }
 

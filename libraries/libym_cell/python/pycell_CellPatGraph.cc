@@ -210,7 +210,6 @@ PyCellPatGraph_FromCellPatGraph(const CellPatGraph* pat_graph)
 
   self->mPatGraph = pat_graph;
 
-  Py_INCREF(self);
   return (PyObject*)self;
 }
 

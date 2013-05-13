@@ -264,10 +264,10 @@ PyCellGroup_FromCellGroup(const CellGroup* group,
   for (ymuint i = 0; i < n; ++ i) {
     const Cell* cell = group->cell(i);
     PyObject* obj = cell_list[cell->id()];
+    Py_INCREF(obj);
     PyList_SetItem(self->mCellList, i, obj);
   }
 
-  Py_INCREF(self);
   return (PyObject*)self;
 }
 

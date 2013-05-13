@@ -439,7 +439,6 @@ PyCellTiming_FromCellTiming(const CellTiming* timing)
     Py_INCREF(Py_None);
   }
 
-  Py_INCREF(self);
   return (PyObject*)self;
 }
 

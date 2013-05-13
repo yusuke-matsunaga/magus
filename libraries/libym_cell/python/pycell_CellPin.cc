@@ -376,7 +376,6 @@ PyCellPin_FromCellPin(const CellPin* pin)
 
   self->mPin = pin;
 
-  Py_INCREF(self);
   return (PyObject*)self;
 }
 
