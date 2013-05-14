@@ -167,23 +167,23 @@ enum tCellTimingType {
 /// @brief ルックアップテーブルの変数の型
 //////////////////////////////////////////////////////////////////////
 enum tCellVarType {
-  kVarInputNetTransition,
+  kCellVarInputNetTransition,
 
-  kVarTotalOutputNetCapacitance,
-  kVarOutputNetLength,
-  kVarOutputNetWireCap,
-  kVarOutputNetPinCap,
+  kCellVarTotalOutputNetCapacitance,
+  kCellVarOutputNetLength,
+  kCellVarOutputNetWireCap,
+  kCellVarOutputNetPinCap,
 
-  kVarRelatedOutTotalOutputNetCapacitance,
-  kVarRelatedOutOutputNetLength,
-  kVarRelatedOutOutputNetWireCap,
-  kVarRelatedOutOutputNetPinCap,
+  kCellVarRelatedOutTotalOutputNetCapacitance,
+  kCellVarRelatedOutOutputNetLength,
+  kCellVarRelatedOutOutputNetWireCap,
+  kCellVarRelatedOutOutputNetPinCap,
 
-  kVarConstrainedPinTransition,
+  kCellVarConstrainedPinTransition,
 
-  kVarRelatedPinTransition,
+  kCellVarRelatedPinTransition,
 
-  kVarNone
+  kCellVarNone
 };
 
 
@@ -320,18 +320,18 @@ using nsCell::kCellTimingNochangeLowHigh;
 using nsCell::kCellTimingNochangeLowLow;
 
 using nsCell::tCellVarType;
-using nsCell::kVarInputNetTransition;
-using nsCell::kVarTotalOutputNetCapacitance;
-using nsCell::kVarOutputNetLength;
-using nsCell::kVarOutputNetWireCap;
-using nsCell::kVarOutputNetPinCap;
-using nsCell::kVarRelatedOutTotalOutputNetCapacitance;
-using nsCell::kVarRelatedOutOutputNetLength;
-using nsCell::kVarRelatedOutOutputNetWireCap;
-using nsCell::kVarRelatedOutOutputNetPinCap;
-using nsCell::kVarConstrainedPinTransition;
-using nsCell::kVarRelatedPinTransition;
-using nsCell::kVarNone;
+using nsCell::kCellVarInputNetTransition;
+using nsCell::kCellVarTotalOutputNetCapacitance;
+using nsCell::kCellVarOutputNetLength;
+using nsCell::kCellVarOutputNetWireCap;
+using nsCell::kCellVarOutputNetPinCap;
+using nsCell::kCellVarRelatedOutTotalOutputNetCapacitance;
+using nsCell::kCellVarRelatedOutOutputNetLength;
+using nsCell::kCellVarRelatedOutOutputNetWireCap;
+using nsCell::kCellVarRelatedOutOutputNetPinCap;
+using nsCell::kCellVarConstrainedPinTransition;
+using nsCell::kCellVarRelatedPinTransition;
+using nsCell::kCellVarNone;
 
 using nsCell::tCellPatType;
 using nsCell::kCellPatInput;

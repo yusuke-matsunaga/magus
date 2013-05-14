@@ -871,6 +871,96 @@ PyObject* Py_kCellTimingNochangeLowLow;
 
 
 //////////////////////////////////////////////////////////////////////
+// PyCellVarType: tCellVarType を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief tCellVarType を表すタイプオブジェクト
+extern
+PyTypeObject PyCellVarType_Type;
+
+/// @brief PyCellVarType の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyCellVarType_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyCellVarType_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyCellVarType_Type;
+}
+
+/// @brief tCellVarType から PyObject を作る．
+/// @param[in] val tCellVarType の値
+/// @return val を表す PyObject
+extern
+PyObject*
+PyCellVarType_FromCellVarType(tCellVarType val);
+
+/// @brief 文字列から PyObject を作る．
+/// @param[in] str 文字列
+/// @return PyObject
+extern
+PyObject*
+PyCellVarType_FromString(const char* str);
+
+/// @brief PyObject から tCellVarType の値を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return tCellVarType を返す．
+/// @note 変換が失敗したら TypeError を送出し，kCellVarNone を返す．
+extern
+tCellVarType
+PyCellVarType_AsCellVarType(PyObject* py_obj);
+
+/// @brief kCellVarInputNetTransition を表す Python オブジェクト
+extern
+PyObject* Py_kCellVarInputNetTransition;
+
+/// @brief kCellVarTotalOutputNetCapacitance を表す Python オブジェクト
+extern
+PyObject* Py_kCellVarTotalOutputNetCapacitance;
+
+/// @brief kCellVarOutputNetLength を表す Python オブジェクト
+extern
+PyObject* Py_kCellVarOutputNetLength;
+
+/// @brief kCellVarOutputNetWireCap を表す Python オブジェクト
+extern
+PyObject* Py_kCellVarOutputNetWireCap;
+
+/// @brief kCellVarOutputNetPinCap を表す Python オブジェクト
+extern
+PyObject* Py_kCellVarOutputNetPinCap;
+
+/// @brief kCellVarRelatedOutTotalOutputNetCapacitance を表す Python オブジェクト
+extern
+PyObject* Py_kCellVarRelatedOutTotalOutputNetCapacitance;
+
+/// @brief kCellVarRelatedOutOutputNetLength を表す Python オブジェクト
+extern
+PyObject* Py_kCellVarRelatedOutOutputNetLength;
+
+/// @brief kCellVarRelatedOutOutputNetWireCap を表す Python オブジェクト
+extern
+PyObject* Py_kCellVarRelatedOutOutputNetWireCap;
+
+/// @brief kCellVarRelatedOutOutputNetPinCap を表す Python オブジェクト
+extern
+PyObject* Py_kCellVarRelatedOutOutputNetPinCap;
+
+/// @brief kCellVarConstrainedPinTransition を表す Python オブジェクト
+extern
+PyObject* Py_kCellVarConstrainedPinTransition;
+
+/// @brief kCellVarRelatedPinTransition を表す Python オブジェクト
+extern
+PyObject* Py_kCellVarRelatedPinTransition;
+
+/// @brief kCellVarNone を表す Python オブジェクト
+extern
+PyObject* Py_kCellVarNone;
+
+
+//////////////////////////////////////////////////////////////////////
 // PyCellLutTemplate: LUT のテンプレートを表す型
 //////////////////////////////////////////////////////////////////////
 

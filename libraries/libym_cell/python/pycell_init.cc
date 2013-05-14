@@ -72,6 +72,9 @@ void
 CellTimingTypeObject_init(PyObject* m);
 
 void
+CellVarTypeObject_init(PyObject* m);
+
+void
 CellPatTypeObject_init(PyObject* m);
 
 void
@@ -150,5 +153,8 @@ cell_init()
 
   // CelLut 関係の初期化
   CellLutObject_init(m);
+
+  // CellVarType 関係の初期化
+  CellVarTypeObject_init(m);
 
 }

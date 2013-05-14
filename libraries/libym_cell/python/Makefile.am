@@ -28,6 +28,7 @@ libym_cell_python_la_SOURCES = \
 	pycell_CellTiming.cc \
 	pycell_CellTimingSense.cc \
 	pycell_CellTimingType.cc \
+	pycell_CellVarType.cc \
 	pycell_CellLut.cc \
 	pycell_CellPinDir.cc \
 	pycell_CellArea.cc \

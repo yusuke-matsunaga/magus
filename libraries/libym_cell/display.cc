@@ -125,20 +125,56 @@ operator<<(ostream& s,
 	   tCellVarType var_type)
 {
   switch ( var_type ) {
-  case kVarInputNetTransition: s << "input_net_transition"; break;
-  case kVarTotalOutputNetCapacitance: s << "total_output_net_capacitance"; break;
-  case kVarOutputNetLength: s << "output_net_length"; break;
-  case kVarOutputNetWireCap: s << "output_net_wire_cap"; break;
-  case kVarOutputNetPinCap: s << "output_net_pin_cap"; break;
-  case kVarRelatedOutTotalOutputNetCapacitance: s << "related_out_total_output_net_capacitance"; break;
-  case kVarRelatedOutOutputNetLength: s << "related_out_output_net_length"; break;
-  case kVarRelatedOutOutputNetWireCap: s << "related_out_output_net_wire_cap"; break;
-  case kVarRelatedOutOutputNetPinCap: s << "related_out_output_net_pin_cap"; break;
-  case kVarConstrainedPinTransition: s << "constrained_pin_transition"; break;
-  case kVarRelatedPinTransition: s << "related_pin_transition"; break;
-  case kVarNone: s << "none"; break;
+  case kCellVarInputNetTransition:
+    s << "input_net_transition";
+    break;
 
-  default: assert_not_reached(__FILE__, __LINE__);
+  case kCellVarTotalOutputNetCapacitance:
+    s << "total_output_net_capacitance";
+    break;
+
+  case kCellVarOutputNetLength:
+    s << "output_net_length";
+    break;
+
+  case kCellVarOutputNetWireCap:
+    s << "output_net_wire_cap";
+    break;
+
+  case kCellVarOutputNetPinCap:
+    s << "output_net_pin_cap";
+    break;
+
+  case kCellVarRelatedOutTotalOutputNetCapacitance:
+    s << "related_out_total_output_net_capacitance";
+    break;
+
+  case kCellVarRelatedOutOutputNetLength:
+    s << "related_out_output_net_length";
+    break;
+
+  case kCellVarRelatedOutOutputNetWireCap:
+    s << "related_out_output_net_wire_cap";
+    break;
+
+  case kCellVarRelatedOutOutputNetPinCap:
+    s << "related_out_output_net_pin_cap";
+    break;
+
+  case kCellVarConstrainedPinTransition:
+    s << "constrained_pin_transition";
+    break;
+
+  case kCellVarRelatedPinTransition:
+    s << "related_pin_transition";
+    break;
+
+  case kCellVarNone:
+    s << "none";
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
   }
   return s;
 }
