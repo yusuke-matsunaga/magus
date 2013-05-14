@@ -32,8 +32,57 @@ def print_pin(pin) :
 
 def print_lut(lut) :
   d = lut.dimension()
+
   for i in range(d) :
     print '          Variable_{} = {}'.format(i, lut.variable_type(i))
+
+  for i in range(d) :
+    print '          Index_{} = ('.format(i),
+    n = lut.index_num(i)
+    comma = ""
+    for j in range(n) :
+      print '{}{}'.format(comma, lut.index(i, j)),
+      comma = ", "
+    print ')'
+
+  if d == 1 :
+    print '          Values = (',
+    n1 = lut.index_num(0)
+    comma = ""
+    for i1 in range(n1) :
+      print '{}{}'.format(comma, lut.grid_value(i1)),
+      comma = ", "
+    print ')'
+  elif d == 2 :
+    print '          Values = ('
+    n1 = lut.index_num(0)
+    n2 = lut.index_num(1)
+    for i1 in range(n1) :
+      print '                     (',
+      comma = ""
+      for i2 in range(n2) :
+        print '{}{}'.format(comma, lut.grid_value(i1, i2)),
+        comma = ", "
+      print ')'
+    print '                   )'
+  elif d == 3 :
+    print '          Values = ('
+    n1 = lut.index_num(0)
+    n2 = lut.index_num(1)
+    n3 = lut.index_num(2)
+    for i1 in range(n1) :
+      print '                     (',
+      comma2 = ""
+      for i2 in range(n2) :
+        print '{}('.format(comma2),
+        comma3 = ""
+        for i3 in range(n3) :
+          print '{}{}'.format(comma3, i1, i2, i3),
+          comma3 = ", "
+        print ')',
+        comma2 = ", "
+      print ')'
+    print '                   )'
 
 def print_timing(timing) :
   print '        Type: {}'.format(timing.type())
