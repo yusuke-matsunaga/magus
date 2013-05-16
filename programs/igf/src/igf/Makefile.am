@@ -20,7 +20,8 @@ AM_CPPFLAGS = \
 MAINTAINERCLEANFILES = Makefile.in
 
 bin_PROGRAMS = \
-	igf
+	igf \
+	phf
 
 igf_SOURCES = \
 	igf.cc \
@@ -32,6 +33,21 @@ igf_SOURCES = \
 	Variable.cc
 
 igf_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
+	$(YM_LIBS_LIBTCLREADLINE) \
+	$(TCL_LDADD) \
+	-lrt \
+	@POPT_LIBS@
+
+phf_SOURCES = \
+	phf.cc \
+	RvMgr.cc \
+	Variable.h \
+	Variable.cc
+
+phf_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \

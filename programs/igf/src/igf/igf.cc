@@ -13,7 +13,7 @@
 #include "RegVect.h"
 #include "Variable.h"
 #include "IguGen.h"
-#include "ym_utils/Generator.h"
+#include "ym_utils/CombiGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -139,13 +139,11 @@ igf(int argc,
     cerr << " => " << best_so_far << endl;
   }
   for (ymuint comp_i = 2; comp_i <= comp; ++ comp_i) {
-    CombiGen cg(n, comp_i);
-
     cerr << "With Compound Variables of degree " << comp_i << endl;
-    for (CombiGen::iterator p = cg.begin(); !p.is_end(); ++ p) {
+    for (CombiGen cg(n, comp_i); !cg.is_end(); ++ cg) {
       vector<ymuint> vid_list(comp_i);
       for (ymuint j = 0; j < comp_i; ++ j) {
-	vid_list[j] = p(j);
+	vid_list[j] = cg(j);
       }
       Variable* var = new Variable(vid_list);
       var_list.push_back(var);
