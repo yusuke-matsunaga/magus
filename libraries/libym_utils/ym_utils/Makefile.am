@@ -35,6 +35,7 @@ noinst_HEADERS = \
 	MultiSetPermGen.h \
 	NameMgr.h \
 	PermGen.h \
+	PoptMainApp.h \
 	RandGen.h \
 	RandCombiGen.h \
 	RandPermGen.h \
