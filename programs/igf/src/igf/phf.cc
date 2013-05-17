@@ -13,9 +13,11 @@
 #include "RegVect.h"
 #include "PhfNode.h"
 #include "PhfEdge.h"
+#include "Variable.h"
+#include "IguGen.h"
 #include "ym_utils/CombiGen.h"
 #include "ym_utils/RandGen.h"
-#include "ym_utils/RandPermGen.h"
+#include "ym_utils/RandCombiGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -138,7 +140,23 @@ phf(int argc,
 
   ymuint n = rvmgr.vect_size();
 
-  if ( (1U << (p * 2)) < n ) {
+  // Variable を生成
+  vector<Variable*> var_list;
+  for (ymuint i = 0; i < n; ++ i) {
+    Variable* var = new Variable(i);
+    var_list.push_back(var);
+  }
+
+
+  vector<Variable*> solution;
+  IguGen igu_gen;
+  igu_gen.solve(rvmgr.vect_list(), 1, var_list, n + 1, solution);
+
+  ymuint core_size = solution.size();
+
+  cout << "IGU gen end: core_size = " << core_size << endl;
+
+  if ( p * 2 < core_size ) {
     cerr << "p is too small" << endl;
     return 4;
   }
@@ -147,21 +165,58 @@ phf(int argc,
     return 4;
   }
 
+  vector<ymuint> core_list(core_size);
+  vector<bool> core_map(n, false);
+  for (ymuint i = 0; i < core_size; ++ i) {
+    ymuint vid = solution[i]->vid();
+    core_list[i] = vid;
+    core_map[vid] = true;
+  }
+  vector<ymuint> rest_list;
+  rest_list.reserve(n - core_size);
+  for (ymuint i = 0; i < n; ++ i) {
+    if ( core_map[i] == false ) {
+      rest_list.push_back(i);
+    }
+  }
+  assert_cond( rest_list.size() == n - core_size, __FILE__, __LINE__);
+
   RandGen rg;
   for (ymuint count = 0; count < count_limit; ++ count) {
-    // f1, f2 をランダムに作る．
-    RandPermGen rpg(n);
+    ymuint nrest = p * 2 - core_size;
+    cout << "nrest = " << nrest << endl
+	 << "n - core_size = " << (n - core_size) << endl;
+    // ランダムに nrest 個の変数を選ぶ．
+    RandCombiGen rpg1(n - core_size, nrest);
 
-    rpg.generate(rg);
-    vector<ymuint> f1_vect(p);
-    for (ymuint i = 0; i < p; ++ i) {
-      f1_vect[i] = rpg.elem(i);
+    rpg1.generate(rg);
+
+    vector<ymuint> tmp_list(p * 2);
+    for (ymuint i = 0; i < core_size; ++ i) {
+      tmp_list[i] = core_list[i];
+    }
+    for (ymuint i = 0; i < nrest; ++ i) {
+      tmp_list[i + core_size] = rpg1.elem(i);
     }
 
-    rpg.generate(rg);
-    vector<ymuint> f2_vect(p);
+    // tmp_list から f1, f2 をランダムに作る．
+    RandCombiGen rpg2(p * 2, p);
+
+    rpg2.generate(rg);
+    vector<ymuint> f1_vect(p);
+    vector<bool> mark(p * 2, false);
     for (ymuint i = 0; i < p; ++ i) {
-      f2_vect[i] = rpg.elem(i);
+      ymuint vid = tmp_list[rpg2.elem(i)];
+      f1_vect[i] = vid;
+      mark[vid] = true;
+    }
+
+    vector<ymuint> f2_vect;
+    f2_vect.reserve(p);
+    for (ymuint i = 0; i < p * 2; ++ i) {
+      if ( !mark[i] ) {
+	f2_vect.push_back(i);
+      }
     }
 
     const vector<RegVect*>& vlist = rvmgr.vect_list();
