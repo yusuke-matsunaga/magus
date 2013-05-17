@@ -44,6 +44,13 @@ igf_LDADD = \
 phf_SOURCES = \
 	phf.cc \
 	RvMgr.cc \
+	PhfNode.h \
+	PhfEdge.h \
+	PhfGen.h \
+	PhfGen.cc \
+	InputFunc.h \
+	VarFunc.h \
+	VarFunc.cc \
 	IguGen.h \
 	IguGen.cc \
 	Variable.h \
