@@ -1,8 +1,8 @@
-#ifndef PHFNODE_H
-#define PFHNODE_H
+#ifndef PHF2NODE_H
+#define PFH2NODE_H
 
-/// @file PhfNode.h
-/// @brief PhfNode のヘッダファイル
+/// @file Phf2Node.h
+/// @brief Phf2Node のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2013 Yusuke Matsunaga
@@ -14,24 +14,24 @@
 
 BEGIN_NAMESPACE_YM_IGF
 
-class PhfEdge;
+class Phf2Edge;
 
 //////////////////////////////////////////////////////////////////////
-/// @class PhfNode PhfNode.h "PhfNode.h"
+/// @class Phf2Node Phf2Node.h "Phf2Node.h"
 /// @brief PHF 用のノード
 //////////////////////////////////////////////////////////////////////
-class PhfNode
+class Phf2Node
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
   /// @param[in] pat パタン
-  PhfNode(ymuint id,
-	  ymuint32 pat);
+  Phf2Node(ymuint id,
+	   ymuint32 pat);
 
   /// @brief デストラクタ
-  ~PhfNode();
+  ~Phf2Node();
 
 
 public:
@@ -53,12 +53,16 @@ public:
 
   /// @brief 接続している枝を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < edge_num() )
-  PhfEdge*
+  Phf2Edge*
   edge(ymuint pos) const;
 
   /// @brief 値を得る．
   ymuint
   val() const;
+
+  /// @brief 値が設定されていたら true を返す．
+  bool
+  is_assigned() const;
 
 
 public:
@@ -68,7 +72,7 @@ public:
 
   /// @brief 枝を追加する．
   void
-  add_edge(PhfEdge* edge);
+  add_edge(Phf2Edge* edge);
 
   /// @brief 値を設定する．
   void
@@ -87,7 +91,7 @@ private:
   ymuint32 mPat;
 
   // 接続している枝のリスト
-  vector<PhfEdge*> mEdgeList;
+  vector<Phf2Edge*> mEdgeList;
 
   // このノードの値
   ymuint32 mVal;
@@ -104,8 +108,8 @@ private:
 // @param[in] id ID番号
 // @param[in] pat パタン
 inline
-PhfNode::PhfNode(ymuint id,
-		 ymuint32 pat)
+Phf2Node::Phf2Node(ymuint id,
+		   ymuint32 pat)
 {
   mId = id;
   mPat = pat;
@@ -115,14 +119,14 @@ PhfNode::PhfNode(ymuint id,
 
 // @brief デストラクタ
 inline
-PhfNode::~PhfNode()
+Phf2Node::~Phf2Node()
 {
 }
 
 // @brief ID番号を返す．
 inline
 ymuint
-PhfNode::id() const
+Phf2Node::id() const
 {
   return mId;
 }
@@ -130,7 +134,7 @@ PhfNode::id() const
 // @brief パタンを返す．
 inline
 ymuint32
-PhfNode::pat() const
+Phf2Node::pat() const
 {
   return mPat;
 }
@@ -138,7 +142,7 @@ PhfNode::pat() const
 // @brief 接続している枝の数を返す．
 inline
 ymuint
-PhfNode::edge_num() const
+Phf2Node::edge_num() const
 {
   return mEdgeList.size();
 }
@@ -146,8 +150,8 @@ PhfNode::edge_num() const
 // @brief 接続している枝を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < edge_num() )
 inline
-PhfEdge*
-PhfNode::edge(ymuint pos) const
+Phf2Edge*
+Phf2Node::edge(ymuint pos) const
 {
   assert_cond( pos < mEdgeList.size(), __FILE__, __LINE__);
   return mEdgeList[pos];
@@ -156,15 +160,23 @@ PhfNode::edge(ymuint pos) const
 // @brief 値を得る．
 inline
 ymuint
-PhfNode::val() const
+Phf2Node::val() const
 {
   return mVal;
+}
+
+// @brief 値が設定されていたら true を返す．
+inline
+bool
+Phf2Node::is_assigned() const
+{
+  return mAssigned;
 }
 
 // @brief 枝を追加する．
 inline
 void
-PhfNode::add_edge(PhfEdge* edge)
+Phf2Node::add_edge(Phf2Edge* edge)
 {
   mEdgeList.push_back(edge);
 }
@@ -172,7 +184,7 @@ PhfNode::add_edge(PhfEdge* edge)
 // @brief 値を設定する．
 inline
 void
-PhfNode::set_val(ymuint32 val)
+Phf2Node::set_val(ymuint32 val)
 {
   assert_cond( mAssigned == false, __FILE__, __LINE__);
   mVal = val;
@@ -181,4 +193,4 @@ PhfNode::set_val(ymuint32 val)
 
 END_NAMESPACE_YM_IGF
 
-#endif // PHFNODE_H
+#endif // PHF2NODE_H

@@ -1,8 +1,8 @@
-#ifndef PHFGEN_H
-#define PHFGEN_H
+#ifndef PHF3GEN_H
+#define PHF3GEN_H
 
-/// @file PhfGen.h
-/// @brief PhfGen のヘッダファイル
+/// @file Phf3Gen.h
+/// @brief Phf3Gen のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -17,18 +17,18 @@ BEGIN_NAMESPACE_YM_IGF
 class InputFunc;
 
 //////////////////////////////////////////////////////////////////////
-/// @class PhfGen PhfGen.h "PhfGen.h"
+/// @class Phf3Gen Phf3Gen.h "Phf3Gen.h"
 /// @brief PHF を作るクラス
 //////////////////////////////////////////////////////////////////////
-class PhfGen
+class Phf3Gen
 {
 public:
 
   /// @brief コンストラクタ
-  PhfGen();
+  Phf3Gen();
 
   /// @brief デストラクタ
-  ~PhfGen();
+  ~Phf3Gen();
 
 
 public:
@@ -41,11 +41,13 @@ public:
   mapping(const vector<RegVect*>& vector_list,
 	  const InputFunc& f1,
 	  const InputFunc& f2,
+	  const InputFunc& f3,
 	  vector<ymuint32>& g1,
-	  vector<ymuint32>& g2);
+	  vector<ymuint32>& g2,
+	  vector<ymuint32>& g3);
 
 };
 
 END_NAMESPACE_YM_IGF
 
-#endif // PHFGEN_H
+#endif // PHF3GEN_H

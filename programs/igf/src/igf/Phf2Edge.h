@@ -1,8 +1,8 @@
-#ifndef PHFEDGE_H
-#define PHFEDGE_H
+#ifndef PHF2EDGE_H
+#define PHF2EDGE_H
 
-/// @file PhfEdge.h
-/// @brief PhfEdge のヘッダファイル
+/// @file Phf2Edge.h
+/// @brief Phf2Edge のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2013 Yusuke Matsunaga
@@ -14,13 +14,13 @@
 
 BEGIN_NAMESPACE_YM_IGF
 
-class PhfNode;
+class Phf2Node;
 
 //////////////////////////////////////////////////////////////////////
-/// @class PhfEdge PhfEdge.h "PhfEdge.h"
+/// @class Phf2Edge Phf2Edge.h "Phf2Edge.h"
 /// @brief PHF 用の枝
 //////////////////////////////////////////////////////////////////////
-class PhfEdge
+class Phf2Edge
 {
 public:
 
@@ -29,13 +29,13 @@ public:
   /// @param[in] node1 ノード1
   /// @param[in] node2 ノード2
   /// @param[in] val 値
-  PhfEdge(ymuint id,
-	  PhfNode* node1,
-	  PhfNode* node2,
-	  ymuint val);
+  Phf2Edge(ymuint id,
+	   Phf2Node* node1,
+	   Phf2Node* node2,
+	   ymuint val);
 
   /// @brief デストラクタ
-  ~PhfEdge();
+  ~Phf2Edge();
 
 
 public:
@@ -48,24 +48,16 @@ public:
   id() const;
 
   /// @brief ノード1を返す．
-  PhfNode*
+  Phf2Node*
   node1() const;
 
   /// @brief ノード2を返す．
-  PhfNode*
+  Phf2Node*
   node2() const;
 
   /// @brief 値を返す．
   ymuint
   val() const;
-
-  /// @brief 向きを返す．
-  ymuint
-  dir() const;
-
-  /// @brief 向きを設定する．
-  void
-  set_dir(ymuint dir);
 
 
 private:
@@ -77,16 +69,13 @@ private:
   ymuint32 mId;
 
   // ノード1
-  PhfNode* mNode1;
+  Phf2Node* mNode1;
 
   // ノード2
-  PhfNode* mNode2;
+  Phf2Node* mNode2;
 
   // 値
   ymuint32 mVal;
-
-  // 向き
-  ymuint8 mDir;
 
 };
 
@@ -101,44 +90,43 @@ private:
 // @param[in] node2 ノード2
 // @param[in] val 値
 inline
-PhfEdge::PhfEdge(ymuint id,
-		 PhfNode* node1,
-		 PhfNode* node2,
-		 ymuint val)
+Phf2Edge::Phf2Edge(ymuint id,
+		   Phf2Node* node1,
+		   Phf2Node* node2,
+		   ymuint val)
 {
   mId = id;
   mNode1 = node1;
   mNode2 = node2;
   mVal = val;
-  mDir = 0;
 }
 
 // @brief デストラクタ
 inline
-PhfEdge::~PhfEdge()
+Phf2Edge::~Phf2Edge()
 {
 }
 
 // @brief ID番号を返す．
 inline
 ymuint
-PhfEdge::id() const
+Phf2Edge::id() const
 {
   return mId;
 }
 
 // @brief ノード1を返す．
 inline
-PhfNode*
-PhfEdge::node1() const
+Phf2Node*
+Phf2Edge::node1() const
 {
   return mNode1;
 }
 
 // @brief ノード2を返す．
 inline
-PhfNode*
-PhfEdge::node2() const
+Phf2Node*
+Phf2Edge::node2() const
 {
   return mNode2;
 }
@@ -146,27 +134,11 @@ PhfEdge::node2() const
 // @brief 値を返す．
 inline
 ymuint
-PhfEdge::val() const
+Phf2Edge::val() const
 {
   return mVal;
 }
 
-// @brief 向きを返す．
-inline
-ymuint
-PhfEdge::dir() const
-{
-  return mDir;
-}
-
-// @brief 向きを設定する．
-inline
-void
-PhfEdge::set_dir(ymuint dir)
-{
-  mDir = dir;
-}
-
 END_NAMESPACE_YM_IGF
 
-#endif // PHFEDGE_H
+#endif // PHF2EDGE_H

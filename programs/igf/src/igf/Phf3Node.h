@@ -1,0 +1,197 @@
+#ifndef PHF3NODE_H
+#define PFH3NODE_H
+
+/// @file Phf3Node.h
+/// @brief Phf3Node のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2013 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "igf_nsdef.h"
+
+
+BEGIN_NAMESPACE_YM_IGF
+
+class Phf3Edge;
+
+//////////////////////////////////////////////////////////////////////
+/// @class Phf3Node Phf3Node.h "Phf3Node.h"
+/// @brief PHF 用のノード
+//////////////////////////////////////////////////////////////////////
+class Phf3Node
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] id ID番号
+  /// @param[in] pat パタン
+  Phf3Node(ymuint id,
+	   ymuint32 pat);
+
+  /// @brief デストラクタ
+  ~Phf3Node();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ID番号を返す．
+  ymuint
+  id() const;
+
+  /// @brief パタンを返す．
+  ymuint32
+  pat() const;
+
+  /// @brief 接続している枝の数を返す．
+  ymuint
+  edge_num() const;
+
+  /// @brief 接続している枝を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < edge_num() )
+  Phf3Edge*
+  edge(ymuint pos) const;
+
+  /// @brief 値を得る．
+  ymuint
+  val() const;
+
+  /// @brief 値が設定されていたら true を返す．
+  bool
+  is_assigned() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 設定用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 枝を追加する．
+  void
+  add_edge(Phf3Edge* edge);
+
+  /// @brief 値を設定する．
+  void
+  set_val(ymuint32 val);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ノード ID
+  ymuint32 mId;
+
+  // パタン
+  ymuint32 mPat;
+
+  // 接続している枝のリスト
+  vector<Phf3Edge*> mEdgeList;
+
+  // このノードの値
+  ymuint32 mVal;
+
+  bool mAssigned;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] id ID番号
+// @param[in] pat パタン
+inline
+Phf3Node::Phf3Node(ymuint id,
+		   ymuint32 pat)
+{
+  mId = id;
+  mPat = pat;
+  mVal = 0;
+  mAssigned = false;
+}
+
+// @brief デストラクタ
+inline
+Phf3Node::~Phf3Node()
+{
+}
+
+// @brief ID番号を返す．
+inline
+ymuint
+Phf3Node::id() const
+{
+  return mId;
+}
+
+// @brief パタンを返す．
+inline
+ymuint32
+Phf3Node::pat() const
+{
+  return mPat;
+}
+
+// @brief 接続している枝の数を返す．
+inline
+ymuint
+Phf3Node::edge_num() const
+{
+  return mEdgeList.size();
+}
+
+// @brief 接続している枝を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < edge_num() )
+inline
+Phf3Edge*
+Phf3Node::edge(ymuint pos) const
+{
+  assert_cond( pos < mEdgeList.size(), __FILE__, __LINE__);
+  return mEdgeList[pos];
+}
+
+// @brief 値を得る．
+inline
+ymuint
+Phf3Node::val() const
+{
+  return mVal;
+}
+
+// @brief 値が設定されていたら true を返す．
+inline
+bool
+Phf3Node::is_assigned() const
+{
+  return mAssigned;
+}
+
+// @brief 枝を追加する．
+inline
+void
+Phf3Node::add_edge(Phf3Edge* edge)
+{
+  mEdgeList.push_back(edge);
+}
+
+// @brief 値を設定する．
+inline
+void
+Phf3Node::set_val(ymuint32 val)
+{
+  assert_cond( mAssigned == false, __FILE__, __LINE__);
+  mVal = val;
+  mAssigned = true;
+}
+
+END_NAMESPACE_YM_IGF
+
+#endif // PHF3NODE_H
