@@ -13,7 +13,7 @@
 #include "RegVect.h"
 
 #include "VarFunc.h"
-#include "Phf3Gen.h"
+#include "Phf2Gen.h"
 
 #include "Variable.h"
 #include "IguGen.h"
@@ -145,128 +145,31 @@ phf(int argc,
     }
 #endif
 
-    // tmp_list から f1, f2, f3 をランダムに作る．
+    // tmp_list から f1, f2 をランダムに作る．
     RandCombiGen rpg2(n, p);
 
+    rpg2.generate(rg);
     vector<ymuint> f1_vect(p);
-    vector<ymuint> f2_vect(p);
-    vector<ymuint> f3_vect(p);
-#if 0
-    vector<bool> used(n, false);
-
-    rpg2.generate(rg);
-    for (ymuint i = 0; i < p; ++ i) {
-      ymuint vid = rpg2.elem(i);
-      f1_vect[i] = vid;
-      used[vid] = true;
-    }
-
-    vector<ymuint> rest_list;
-    rest_list.reserve(n - p);
-    for (ymuint i = 0; i < n; ++ i) {
-      if ( !used[i] ) {
-	rest_list.push_back(i);
-      }
-    }
-    ymuint nr = rest_list.size();
-
-    if ( nr > p ) {
-      RandCombiGen rpg3(n - p, p);
-
-      rpg3.generate(rg);
-      for (ymuint i = 0; i < p; ++ i) {
-	ymuint vid = rest_list[rpg3.elem(i)];
-	f2_vect[i] = vid;
-	used[vid] = true;
-      }
-    }
-    else {
-      assert_cond( nr > 0, __FILE__, __LINE__);
-      for (ymuint i = 0; i < nr; ++ i) {
-	ymuint vid = rest_list[i];
-	f2_vect[i] = vid;
-	used[vid] = true;
-      }
-      if ( nr < p ) {
-	ymuint n1 = p - nr;
-	RandCombiGen rpg4(n, n1);
-	rpg4.generate(rg);
-	for (ymuint i = 0; i < n1; ++ i) {
-	  ymuint vid = rpg4.elem(i);
-	  f2_vect[nr + i] = vid;
-	  used[vid] = true;
-	}
-      }
-    }
-
-    rest_list.clear();
-    for (ymuint i = 0; i < n; ++ i) {
-      if ( !used[i] ) {
-	rest_list.push_back(i);
-      }
-    }
-    nr = rest_list.size();
-
-    if ( nr > p ) {
-      RandCombiGen rpg4(n - p - p, p);
-
-      rpg4.generate(rg);
-      for (ymuint i = 0; i < p; ++ i) {
-	ymuint vid = rest_list[rpg4.elem(i)];
-	f3_vect[i] = vid;
-	used[vid] = true;
-      }
-    }
-    else {
-      ymuint bias = nr;
-      if ( nr > 0 ) {
-	for (ymuint i = 0; i < nr; ++ i) {
-	  ymuint vid = rest_list[i];
-	  f3_vect[i] = vid;
-	  used[vid] = true;
-	}
-      }
-      RandCombiGen rpg5(n, p - bias);
-      rpg5.generate(rg);
-      for (ymuint i = 0; i < p - bias; ++ i) {
-	ymuint vid = rpg5.elem(i);
-	f3_vect[bias + i] = vid;
-	used[vid] = true;
-      }
-    }
-#else
-    rpg2.generate(rg);
     for (ymuint i = 0; i < p; ++ i) {
       f1_vect[i] = rpg2.elem(i);
     }
-    sort(f1_vect.begin(), f1_vect.end());
 
     rpg2.generate(rg);
+    vector<ymuint> f2_vect(p);
     for (ymuint i = 0; i < p; ++ i) {
       f2_vect[i] = rpg2.elem(i);
     }
-    sort(f2_vect.begin(), f2_vect.end());
 
-    rpg2.generate(rg);
-    for (ymuint i = 0; i < p; ++ i) {
-      f3_vect[i] = rpg2.elem(i);
-    }
-    sort(f3_vect.begin(), f3_vect.end());
-#endif
-
-    Phf3Gen phfgen;
+    Phf2Gen phfgen;
 
     const vector<RegVect*>& vlist = rvmgr.vect_list();
     VarFunc f1(f1_vect);
     VarFunc f2(f2_vect);
-    VarFunc f3(f3_vect);
     ymuint np = 1U << p;
     vector<ymuint32> g1(np, 0U);
     vector<ymuint32> g2(np, 0U);
-    vector<ymuint32> g3(np, 0U);
-    bool stat = phfgen.mapping(vlist, f1, f2, f3, g1, g2, g3);
+    bool stat = phfgen.mapping(vlist, f1, f2, g1, g2);
     if ( !stat ) {
-      cout << " failed" << endl;
       continue;
     }
 
@@ -275,15 +178,12 @@ phf(int argc,
       RegVect* rv = vlist[i];
       ymuint32 v1 = f1.eval(rv);
       ymuint32 v2 = f2.eval(rv);
-      ymuint32 v3 = f3.eval(rv);
       cout << "#" << i << ": "
 	   << setw(6) << v1 << " = " << g1[v1]
 	   << ", "
 	   << setw(6) << v2 << " = " << g2[v2]
-	   << ", "
-	   << setw(6) << v3 << " = " << g3[v3]
 	   << ": "
-	   << (g1[v1] ^ g2[v2] ^ g3[v3]) << endl;
+	   << (g1[v1] ^ g2[v2]) << endl;
     }
     break;
   }

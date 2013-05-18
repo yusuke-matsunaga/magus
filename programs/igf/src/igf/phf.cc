@@ -13,7 +13,7 @@
 #include "RegVect.h"
 
 #include "VarFunc.h"
-#include "Phf2Gen.h"
+#include "PhfGen.h"
 
 #include "Variable.h"
 #include "IguGen.h"
@@ -29,6 +29,11 @@ phf(int argc,
     const char** argv)
 {
   PoptMainApp app;
+
+  // m オプション
+  PoptUint popt_m("mult", 'm',
+		  "specify the number of hash functions", "<INT>");
+  app.add_option(&popt_m);
 
   // p オプション
   PoptUint popt_p(NULL, 'p',
@@ -46,6 +51,11 @@ phf(int argc,
   tPoptStat stat = app.parse_options(argc, argv, 0);
   if ( stat == kPoptAbort ) {
     return -1;
+  }
+
+  ymuint32 m = 2;
+  if ( popt_m.is_specified() ) {
+    m = popt_m.val();
   }
 
   ymuint32 p = 0;
@@ -82,110 +92,52 @@ phf(int argc,
 
   ymuint n = rvmgr.vect_size();
 
-#if 0
-  // Variable を生成
-  vector<Variable*> var_list;
-  for (ymuint i = 0; i < n; ++ i) {
-    Variable* var = new Variable(i);
-    var_list.push_back(var);
-  }
-
-
-  vector<Variable*> solution;
-  IguGen igu_gen;
-  igu_gen.solve(rvmgr.vect_list(), 1, var_list, n + 1, solution);
-
-  ymuint core_size = solution.size();
-
-  cout << "IGU gen end: core_size = " << core_size << endl;
-
-  if ( p * 2 < core_size ) {
-    cerr << "p is too small" << endl;
-    return 4;
-  }
-  if ( p > 31 ) {
-    cerr << "p is too big" << endl;
-    return 4;
-  }
-
-  vector<ymuint> core_list(core_size);
-  vector<bool> core_map(n, false);
-  for (ymuint i = 0; i < core_size; ++ i) {
-    ymuint vid = solution[i]->vid();
-    core_list[i] = vid;
-    core_map[vid] = true;
-  }
-  vector<ymuint> rest_list;
-  rest_list.reserve(n - core_size);
-  for (ymuint i = 0; i < n; ++ i) {
-    if ( core_map[i] == false ) {
-      rest_list.push_back(i);
-    }
-  }
-  assert_cond( rest_list.size() == n - core_size, __FILE__, __LINE__);
-#endif
-
   RandGen rg;
   for (ymuint count = 0; count < count_limit; ++ count) {
-#if 0
-    ymuint nrest = p * 2 - core_size;
-    cout << "nrest = " << nrest << endl
-	 << "n - core_size = " << (n - core_size) << endl;
-    // ランダムに nrest 個の変数を選ぶ．
-    RandCombiGen rpg1(n - core_size, nrest);
-
-    rpg1.generate(rg);
-
-    vector<ymuint> tmp_list(p * 2);
-    for (ymuint i = 0; i < core_size; ++ i) {
-      tmp_list[i] = core_list[i];
-    }
-    for (ymuint i = 0; i < nrest; ++ i) {
-      tmp_list[i + core_size] = rpg1.elem(i);
-    }
-#endif
-
-    // tmp_list から f1, f2 をランダムに作る．
     RandCombiGen rpg2(n, p);
-
-    rpg2.generate(rg);
-    vector<ymuint> f1_vect(p);
-    for (ymuint i = 0; i < p; ++ i) {
-      f1_vect[i] = rpg2.elem(i);
+    vector<const InputFunc*> func_list(m);
+    for (ymuint i = 0; i < m; ++ i) {
+      rpg2.generate(rg);
+      vector<ymuint> f1_vect(p);
+      for (ymuint k = 0; k < p; ++ k) {
+	f1_vect[k] = rpg2.elem(k);
+      }
+      VarFunc* f = new VarFunc(f1_vect);
+      func_list[i] = f;
     }
 
-    rpg2.generate(rg);
-    vector<ymuint> f2_vect(p);
-    for (ymuint i = 0; i < p; ++ i) {
-      f2_vect[i] = rpg2.elem(i);
-    }
-
-    Phf2Gen phfgen;
+    PhfGen phfgen;
 
     const vector<RegVect*>& vlist = rvmgr.vect_list();
-    VarFunc f1(f1_vect);
-    VarFunc f2(f2_vect);
     ymuint np = 1U << p;
-    vector<ymuint32> g1(np, 0U);
-    vector<ymuint32> g2(np, 0U);
-    bool stat = phfgen.mapping(vlist, f1, f2, g1, g2);
-    if ( !stat ) {
-      continue;
+    vector<vector<ymuint32>* > g_list(m);
+    for (ymuint i = 0; i < m; ++ i) {
+      g_list[i] = new vector<ymuint32>(np, 0U);
     }
-
-    ymuint nv = vlist.size();
-    for (ymuint i = 0; i < nv; ++ i) {
-      RegVect* rv = vlist[i];
-      ymuint32 v1 = f1.eval(rv);
-      ymuint32 v2 = f2.eval(rv);
-      cout << "#" << i << ": "
-	   << setw(6) << v1 << " = " << g1[v1]
-	   << ", "
-	   << setw(6) << v2 << " = " << g2[v2]
-	   << ": "
-	   << (g1[v1] ^ g2[v2]) << endl;
+    bool stat = phfgen.mapping(vlist, func_list, g_list);
+    if ( stat ) {
+      ymuint nv = vlist.size();
+      for (ymuint i = 0; i < nv; ++ i) {
+	RegVect* rv = vlist[i];
+	cout << "#" << i << ": ";
+	const char* comma = "";
+	ymuint32 val = 0;
+	for (ymuint j = 0; j < m; ++ j) {
+	  const InputFunc& f1 = *func_list[j];
+	  vector<ymuint32>& g1 = *g_list[j];
+	  ymuint32 v1 = f1.eval(rv);
+	  cout << comma << setw(6) << v1 << " = " << g1[v1];
+	  val ^= g1[v1];
+	  comma = ", ";
+	}
+	cout << ": " << val << endl;
+      }
+      break;
     }
-    break;
+    for (ymuint i = 0; i < m; ++ i) {
+      delete func_list[i];
+      delete g_list[i];
+    }
   }
 
   return 0;

@@ -37,6 +37,11 @@ public:
   ymuint32
   eval(const RegVect*) const = 0;
 
+  /// @brief 内容を表示する．
+  virtual
+  void
+  dump(ostream& s) const = 0;
+
 };
 
 END_NAMESPACE_YM_IGF

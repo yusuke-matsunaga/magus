@@ -11,6 +11,7 @@
 #include "Phf3Node.h"
 #include "Phf3Edge.h"
 #include "InputFunc.h"
+#include "RegVect.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -86,6 +87,7 @@ Phf3Gen::Phf3Gen()
 // @brief デストラクタ
 Phf3Gen::~Phf3Gen()
 {
+  clear();
 }
 
 // @brief マッピングを求める．
@@ -98,6 +100,8 @@ Phf3Gen::mapping(const vector<RegVect*>& vector_list,
 		 vector<ymuint32>& g2,
 		 vector<ymuint32>& g3)
 {
+  clear();
+
   ymuint nv = vector_list.size();
 
   hash_map<ymuint32, Phf3Node*> v1_hash;
@@ -106,56 +110,57 @@ Phf3Gen::mapping(const vector<RegVect*>& vector_list,
   vector<Phf3Node*> v1_array(nv);
   vector<Phf3Node*> v2_array(nv);
   vector<Phf3Node*> v3_array(nv);
-  vector<Phf3Node*> v_array;
-  for (ymuint i = 0; i < nv; ++ i) {
-    RegVect* rv = vector_list[i];
-    ymuint32 v1 = f1.eval(rv);
-    hash_map<ymuint32, Phf3Node*>::iterator p1 = v1_hash.find(v1);
-    Phf3Node* node1 = NULL;
-    if ( p1 == v1_hash.end() ) {
-      ymuint id1 = v_array.size();
-      node1 = new Phf3Node(id1, v1);
-      v_array.push_back(node1);
-      v1_hash.insert(make_pair(v1, node1));
-    }
-    else {
-      node1 = p1->second;
-    }
-    v1_array[i] = node1;
-  }
 
   for (ymuint i = 0; i < nv; ++ i) {
     RegVect* rv = vector_list[i];
-    ymuint32 v2 = f2.eval(rv);
-    hash_map<ymuint32, Phf3Node*>::iterator p2 = v2_hash.find(v2);
-    Phf3Node* node2 = NULL;
-    if ( p2 == v2_hash.end() ) {
-      ymuint id2 = v_array.size();
-      node2 = new Phf3Node(id2, v2);
-      v_array.push_back(node2);
-      v2_hash.insert(make_pair(v2, node2));
-    }
-    else {
-      node2 = p2->second;
-    }
-    v2_array[i] = node2;
-  }
+    {
+      ymuint32 pat = f1.eval(rv);
+      hash_map<ymuint32, Phf3Node*>& node_hash = v1_hash;
+      vector<Phf3Node*>& node_array = v1_array;
 
-  for (ymuint i = 0; i < nv; ++ i) {
-    RegVect* rv = vector_list[i];
-    ymuint32 v3 = f3.eval(rv);
-    hash_map<ymuint32, Phf3Node*>::iterator p3 = v3_hash.find(v3);
-    Phf3Node* node3 = NULL;
-    if ( p3 == v3_hash.end() ) {
-      ymuint id3 = v_array.size();
-      node3 = new Phf3Node(id3, v3);
-      v_array.push_back(node3);
-      v3_hash.insert(make_pair(v3, node3));
+      hash_map<ymuint32, Phf3Node*>::iterator p = node_hash.find(pat);
+      Phf3Node* node = NULL;
+      if ( p == node_hash.end() ) {
+	node = new_node(pat);
+	node_hash.insert(make_pair(pat, node));
+      }
+      else {
+	node = p->second;
+      }
+      node_array[i] = node;
     }
-    else {
-      node3 = p3->second;
+    {
+      ymuint32 pat = f2.eval(rv);
+      hash_map<ymuint32, Phf3Node*>& node_hash = v2_hash;
+      vector<Phf3Node*>& node_array = v2_array;
+
+      hash_map<ymuint32, Phf3Node*>::iterator p = node_hash.find(pat);
+      Phf3Node* node = NULL;
+      if ( p == node_hash.end() ) {
+	node = new_node(pat);
+	node_hash.insert(make_pair(pat, node));
+      }
+      else {
+	node = p->second;
+      }
+      node_array[i] = node;
     }
-    v3_array[i] = node3;
+    {
+      ymuint32 pat = f3.eval(rv);
+      hash_map<ymuint32, Phf3Node*>& node_hash = v3_hash;
+      vector<Phf3Node*>& node_array = v3_array;
+
+      hash_map<ymuint32, Phf3Node*>::iterator p = node_hash.find(pat);
+      Phf3Node* node = NULL;
+      if ( p == node_hash.end() ) {
+	node = new_node(pat);
+	node_hash.insert(make_pair(pat, node));
+      }
+      else {
+	node = p->second;
+      }
+      node_array[i] = node;
+    }
   }
 
   for (ymuint i = 0; i < nv; ++ i) {
@@ -166,35 +171,23 @@ Phf3Gen::mapping(const vector<RegVect*>& vector_list,
     node1->add_edge(edge);
     node2->add_edge(edge);
     node3->add_edge(edge);
+    mEdgeList.push_back(edge);
   }
 
-  ymuint nn = v_array.size();
+  ymuint nn = mNodeList.size();
 
   { // simple check
     bool not_simple = false;
-    for (ymuint i = 0; i < nv; ++ i) {
-      Phf3Node* node = v1_array[i];
+    for (ymuint v_pos = 0; v_pos < nv; ++ v_pos) {
+      Phf3Node* node = v1_array[v_pos];
       ymuint ne = node->edge_num();
-      for (ymuint j = 0; j < ne; ++ j) {
-	Phf3Edge* edge1 = node->edge(j);
-	for (ymuint k = j + 1; k < ne; ++ k) {
-	  Phf3Edge* edge2 = node->edge(k);
+      for (ymuint i1 = 0; i1 < ne; ++ i1) {
+	Phf3Edge* edge1 = node->edge(i1);
+	for (ymuint i2 = i1 + 1; i2 < ne; ++ i2) {
+	  Phf3Edge* edge2 = node->edge(i2);
 	  if ( edge1->node2()->id() == edge2->node2()->id() &&
 	       edge1->node3()->id() == edge2->node3()->id() ) {
 	    not_simple = true;
-	    cout << "Edge#" << edge1->id()
-		 << " and Edge#" << edge2->id()
-		 << " collaids" << endl;
-	    cout << "#" << edge1->id()
-		 << ": " << edge1->node1()->id()
-		 << ", " << edge1->node2()->id()
-		 << ", " << edge1->node3()->id()
-		 << endl
-		 << "#" << edge2->id()
-		 << ": " << edge2->node1()->id()
-		 << ", " << edge2->node2()->id()
-		 << ", " << edge2->node3()->id()
-		 << endl;
 	    break;
 	  }
 	}
@@ -219,7 +212,7 @@ Phf3Gen::mapping(const vector<RegVect*>& vector_list,
     for ( ; ; ) {
       Phf3Node* node0 = NULL;
       for (ymuint i = 0; i < nn; ++ i) {
-	Phf3Node* node = v_array[i];
+	Phf3Node* node = mNodeList[i];
 	if ( !v_mark[node->id()] ) {
 	  node0 = node;
 	  break;
@@ -268,6 +261,33 @@ Phf3Gen::mapping(const vector<RegVect*>& vector_list,
   }
 
   return true;
+}
+
+// @brief ノードを枝を開放する．
+void
+Phf3Gen::clear()
+{
+  for (vector<Phf3Node*>::iterator p = mNodeList.begin();
+       p != mNodeList.end(); ++ p) {
+    delete *p;
+  }
+  mNodeList.clear();
+
+  for (vector<Phf3Edge*>::iterator p = mEdgeList.begin();
+       p != mEdgeList.end(); ++ p) {
+    delete *p;
+  }
+  mEdgeList.clear();
+}
+
+// @brief ノードを生成する．
+Phf3Node*
+Phf3Gen::new_node(ymuint32 pat)
+{
+  ymuint id = mNodeList.size();
+  Phf3Node* node = new Phf3Node(id, pat);
+  mNodeList.push_back(node);
+  return node;
 }
 
 END_NAMESPACE_YM_IGF

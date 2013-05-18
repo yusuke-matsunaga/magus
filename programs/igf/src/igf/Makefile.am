@@ -22,6 +22,7 @@ MAINTAINERCLEANFILES = Makefile.in
 bin_PROGRAMS = \
 	igf \
 	phf \
+	phf2 \
 	phf3
 
 igf_SOURCES = \
@@ -45,6 +46,30 @@ igf_LDADD = \
 phf_SOURCES = \
 	phf.cc \
 	RvMgr.cc \
+	PhfNode.h \
+	PhfEdge.h \
+	PhfGen.h \
+	PhfGen.cc \
+	InputFunc.h \
+	VarFunc.h \
+	VarFunc.cc \
+	IguGen.h \
+	IguGen.cc \
+	Variable.h \
+	Variable.cc
+
+phf_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
+	$(YM_LIBS_LIBTCLREADLINE) \
+	$(TCL_LDADD) \
+	-lrt \
+	@POPT_LIBS@
+
+phf2_SOURCES = \
+	phf2.cc \
+	RvMgr.cc \
 	Phf2Node.h \
 	Phf2Edge.h \
 	Phf2Gen.h \
@@ -57,7 +82,7 @@ phf_SOURCES = \
 	Variable.h \
 	Variable.cc
 
-phf_LDADD = \
+phf2_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \

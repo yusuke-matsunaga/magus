@@ -44,4 +44,16 @@ VarFunc::eval(const RegVect* rv) const
   return v;
 }
 
+// @brief 内容を表示する．
+void
+VarFunc::dump(ostream& s) const
+{
+  ymuint n = mVarList.size();
+  s << "{";
+  for (ymuint i = 0; i < n; ++ i) {
+    s << " " << mVarList[i];
+  }
+  s << "}" << endl;
+}
+
 END_NAMESPACE_YM_IGF

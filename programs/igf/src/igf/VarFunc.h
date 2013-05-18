@@ -42,6 +42,11 @@ public:
   ymuint32
   eval(const RegVect* rv) const;
 
+  /// @brief 内容を表示する．
+  virtual
+  void
+  dump(ostream& s) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

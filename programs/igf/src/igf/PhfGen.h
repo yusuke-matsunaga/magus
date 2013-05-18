@@ -1,8 +1,8 @@
-#ifndef PHF3GEN_H
-#define PHF3GEN_H
+#ifndef PHFGEN_H
+#define PHFGEN_H
 
-/// @file Phf3Gen.h
-/// @brief Phf3Gen のヘッダファイル
+/// @file PhfGen.h
+/// @brief PhfGen のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -15,22 +15,22 @@
 BEGIN_NAMESPACE_YM_IGF
 
 class InputFunc;
-class Phf3Node;
-class Phf3Edge;
+class PhfNode;
+class PhfEdge;
 
 //////////////////////////////////////////////////////////////////////
-/// @class Phf3Gen Phf3Gen.h "Phf3Gen.h"
+/// @class PhfGen PhfGen.h "PhfGen.h"
 /// @brief PHF を作るクラス
 //////////////////////////////////////////////////////////////////////
-class Phf3Gen
+class PhfGen
 {
 public:
 
   /// @brief コンストラクタ
-  Phf3Gen();
+  PhfGen();
 
   /// @brief デストラクタ
-  ~Phf3Gen();
+  ~PhfGen();
 
 
 public:
@@ -41,12 +41,8 @@ public:
   /// @brief マッピングを求める．
   bool
   mapping(const vector<RegVect*>& vector_list,
-	  const InputFunc& f1,
-	  const InputFunc& f2,
-	  const InputFunc& f3,
-	  vector<ymuint32>& g1,
-	  vector<ymuint32>& g2,
-	  vector<ymuint32>& g3);
+	  const vector<const InputFunc*>& f_list,
+	  vector<vector<ymuint32>* >& g_list);
 
 
 private:
@@ -59,8 +55,14 @@ private:
   clear();
 
   /// @brief ノードを生成する．
-  Phf3Node*
+  PhfNode*
   new_node(ymuint32 pat);
+
+  /// @brief 枝を生成する．
+  PhfEdge*
+  new_edge(ymuint id,
+	   const vector<PhfNode*>& node_list,
+	   ymuint32 val);
 
 
 private:
@@ -69,13 +71,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 生成したノードを入れておくリスト
-  vector<Phf3Node*> mNodeList;
+  vector<PhfNode*> mNodeList;
 
   // 生成した枝を入れておくリスト
-  vector<Phf3Edge*> mEdgeList;
+  vector<PhfEdge*> mEdgeList;
 
 };
 
 END_NAMESPACE_YM_IGF
 
-#endif // PHF3GEN_H
+#endif // PHFGEN_H
