@@ -146,6 +146,7 @@ AC_CONFIG_FILES([
 	Makefile
 	include/Makefile
 	src/Makefile
+	src/libphf/Makefile
 	src/rvgen/Makefile
 	src/igf/Makefile
 	])

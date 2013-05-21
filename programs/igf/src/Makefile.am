@@ -4,6 +4,7 @@
 
 SUBDIRS = \
 	rvgen \
+	libphf \
 	igf \
 	$(YM_EXTRA_SUBDIRS)
 
