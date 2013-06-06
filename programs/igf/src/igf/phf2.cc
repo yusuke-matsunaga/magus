@@ -162,7 +162,7 @@ phf(int argc,
 
     Phf2Gen phfgen;
 
-    const vector<RegVect*>& vlist = rvmgr.vect_list();
+    const vector<const RegVect*>& vlist = rvmgr.vect_list();
     VarFunc f1(f1_vect);
     VarFunc f2(f2_vect);
     ymuint np = 1U << p;
@@ -175,7 +175,7 @@ phf(int argc,
 
     ymuint nv = vlist.size();
     for (ymuint i = 0; i < nv; ++ i) {
-      RegVect* rv = vlist[i];
+      const RegVect* rv = vlist[i];
       ymuint32 v1 = f1.eval(rv);
       ymuint32 v2 = f2.eval(rv);
       cout << "#" << i << ": "

@@ -7,7 +7,8 @@ SUBDIRS =
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	$(GMP_INCLUDES)
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -16,19 +17,14 @@ noinst_LTLIBRARIES = \
 
 libphf_la_SOURCES = \
 	RvMgr.cc \
-	IguGen.h \
 	IguGen.cc \
+	IguGen2.cc \
 	VectSetList.h \
-	Variable.h \
 	Variable.cc \
 	PhfNode.h \
 	PhfEdge.h \
-	PhfGen.h \
 	PhfGen.cc \
-	InputFunc.h \
-	VarFunc.h \
 	VarFunc.cc \
-	XorFunc.h \
 	XorFunc.cc
 
 libphf_la_LDFLAGS =

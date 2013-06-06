@@ -70,7 +70,7 @@ PhfGen::~PhfGen()
 
 // @brief マッピングを求める．
 bool
-PhfGen::mapping(const vector<RegVect*>& vector_list,
+PhfGen::mapping(const vector<const RegVect*>& vector_list,
 		const vector<const InputFunc*>& f_list,
 		vector<vector<ymuint32>* >& g_list)
 {
@@ -84,7 +84,7 @@ PhfGen::mapping(const vector<RegVect*>& vector_list,
   hash_map<ymuint32, PhfNode*>* v_hash_array = new hash_map<ymuint32, PhfNode*>[nf];
 
   for (ymuint v_pos = 0; v_pos < nv; ++ v_pos) {
-    RegVect* rv = vector_list[v_pos];
+    const RegVect* rv = vector_list[v_pos];
 
     vector<PhfNode*> node_list(nf);
     for (ymuint f_pos = 0; f_pos < nf; ++ f_pos) {

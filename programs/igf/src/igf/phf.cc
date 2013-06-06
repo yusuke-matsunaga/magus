@@ -108,7 +108,7 @@ phf(int argc,
 
     PhfGen phfgen;
 
-    const vector<RegVect*>& vlist = rvmgr.vect_list();
+    const vector<const RegVect*>& vlist = rvmgr.vect_list();
     ymuint np = 1U << p;
     vector<vector<ymuint32>* > g_list(m);
     for (ymuint i = 0; i < m; ++ i) {
@@ -118,7 +118,7 @@ phf(int argc,
     if ( stat ) {
       ymuint nv = vlist.size();
       for (ymuint i = 0; i < nv; ++ i) {
-	RegVect* rv = vlist[i];
+	const RegVect* rv = vlist[i];
 	cout << "#" << i << ": ";
 	const char* comma = "";
 	ymuint32 val = 0;

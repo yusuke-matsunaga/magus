@@ -103,9 +103,9 @@ RvMgr::read_data(istream& s)
       }
     }
     bool found = false;
-    for (vector<RegVect*>::iterator p = mVectList.begin();
+    for (vector<const RegVect*>::iterator p = mVectList.begin();
 	 p != mVectList.end(); ++ p) {
-      RegVect* rv1 = *p;
+      const RegVect* rv1 = *p;
       bool diff = false;
       for (ymuint j = 0; j < mBlockSize; ++ j) {
 	if ( rv1->mBody[j] != rv->mBody[j] ) {
@@ -185,9 +185,9 @@ RvMgr::delete_vector(RegVect* vec)
 void
 RvMgr::dump(ostream& s) const
 {
-  for (vector<RegVect*>::const_iterator p = mVectList.begin();
+  for (vector<const RegVect*>::const_iterator p = mVectList.begin();
        p != mVectList.end(); ++ p) {
-    RegVect* rv = *p;
+    const RegVect* rv = *p;
     rv->dump(s);
   }
 }

@@ -14,6 +14,7 @@ MAINTAINERCLEANFILES = Makefile.in
 
 bin_PROGRAMS = \
 	igf \
+	igf2 \
 	phf \
 	phf2 \
 	phf3
@@ -22,6 +23,16 @@ igf_SOURCES = \
 	igf.cc
 
 igf_LDADD = \
+	../libphf/libphf.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	-lrt \
+	@POPT_LIBS@
+
+igf2_SOURCES = \
+	igf2.cc
+
+igf2_LDADD = \
 	../libphf/libphf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \

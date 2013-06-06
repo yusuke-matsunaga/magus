@@ -43,7 +43,7 @@ public:
 
   /// @brief 現在の集合に要素を追加する．
   void
-  add_vect(RegVect* vect);
+  add_vect(const RegVect* vect);
 
   /// @brief 全要素数を得る．
   ymuint
@@ -61,7 +61,7 @@ public:
   /// @brief 指定された集合の要素を得る．
   /// @param[in] set_id 集合のID番号 ( 0 <= set_id < set_num() )
   /// @param[in] vec_id ベクタのID番号 ( 0 <= vect_id < set_size(set_id) )
-  RegVect*
+  const RegVect*
   set_elem(ymuint set_id,
 	   ymuint vect_id) const;
 
@@ -72,7 +72,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // すべてのベクタを格納する配列
-  vector<RegVect*> mBody;
+  vector<const RegVect*> mBody;
 
   // 個々の集合の開始位置を記録する配列
   vector<ymuint32> mStartPos;
@@ -111,7 +111,7 @@ VectSetList::add_set()
 // @brief 現在の集合に要素を追加する．
 inline
 void
-VectSetList::add_vect(RegVect* vect)
+VectSetList::add_vect(const RegVect* vect)
 {
   mBody.push_back(vect);
 }
@@ -150,7 +150,7 @@ VectSetList::set_size(ymuint set_id) const
 // @param[in] set_id 集合のID番号 ( 0 <= set_id < set_num() )
 // @param[in] vec_id ベクタのID番号 ( 0 <= vect_id < set_size(set_id) )
 inline
-RegVect*
+const RegVect*
 VectSetList::set_elem(ymuint set_id,
 		      ymuint vect_id) const
 {

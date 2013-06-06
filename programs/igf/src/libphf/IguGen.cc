@@ -21,10 +21,21 @@ BEGIN_NONAMESPACE
 struct Lt
 {
   bool
-  operator()(const pair<ymuint, Variable*>& left,
-	     const pair<ymuint, Variable*>& right)
+  operator()(const pair<ymuint, const Variable*>& left,
+	     const pair<ymuint, const Variable*>& right)
   {
-    return left < right;
+    return left.first < right.first;
+  }
+};
+
+// 変数を並び替えるための比較関数
+struct Gt
+{
+  bool
+  operator()(const pair<ymuint, const Variable*>& left,
+	     const pair<ymuint, const Variable*>& right)
+  {
+    return left.first > right.first;
   }
 };
 
@@ -53,28 +64,36 @@ IguGen::~IguGen()
 {
 }
 
+// @brief ベクタのリストをセットする．
+void
+IguGen::set_vector_list(const vector<const RegVect*>& vector_list)
+{
+  mVectorList = vector_list;
+}
+
 // @brief 変数を求める．
-// @param[in] vector_list ベクタのリスト
 // @param[in] multi 多重度
 // @param[in] variable_list 変数のリスト
 // @param[in] solution 解として選ばれた変数を格納するリスト
 void
-IguGen::solve(const vector<RegVect*>& vector_list,
-	      ymuint multi,
-	      const vector<Variable*>& variable_list,
+IguGen::solve(ymuint multi,
+	      const vector<const Variable*>& variable_list,
 	      ymuint best_so_far,
-	      vector<Variable*>& solution)
+	      vector<const Variable*>& solution)
 {
+  assert_cond( !mVectorList.empty(), __FILE__, __LINE__);
+  mVectorLength = mVectorList[0]->size();
+
   // imbalance measure の昇順に並び替える．
   ymuint nv = variable_list.size();
-  vector<pair<ymuint, Variable*> > tmp_list(nv);
+  vector<pair<ymuint, const Variable*> > tmp_list(nv);
   for (ymuint i = 0; i < nv; ++ i) {
-    Variable* var = variable_list[i];
+    const Variable* var = variable_list[i];
     ymuint n0 = 0;
     ymuint n1 = 0;
-    for (vector<RegVect*>::const_iterator p = vector_list.begin();
-	 p != vector_list.end(); ++ p) {
-      RegVect* vect = *p;
+    for (vector<const RegVect*>::const_iterator p = mVectorList.begin();
+	 p != mVectorList.end(); ++ p) {
+      const RegVect* vect = *p;
       if ( var->classify(vect) == 0 ) {
 	++ n0;
       }
@@ -86,9 +105,15 @@ IguGen::solve(const vector<RegVect*>& vector_list,
     tmp_list[i] = make_pair(im, var);
   }
   sort(tmp_list.begin(), tmp_list.end(), Lt());
-  vector<Variable*> new_variable_list(nv);
+  vector<const Variable*> new_variable_list(nv);
   for (ymuint i = 0; i < nv; ++ i) {
-    new_variable_list[i] = tmp_list[i].second;
+    const Variable* var = tmp_list[i].second;
+    new_variable_list[i] = var;
+    if ( 0 ) {
+      cout << "Variable:";
+      var->dump(cout);
+      cout << " " << tmp_list[i].first << endl;
+    }
   }
 
   mMulti = multi;
@@ -124,17 +149,17 @@ IguGen::solve(const vector<RegVect*>& vector_list,
     }
   }
 
-  VectSetList initial_list(vector_list.size(), 1);
+  VectSetList initial_list(mVectorList.size(), 1);
   initial_list.add_set();
-  for (vector<RegVect*>::const_iterator p = vector_list.begin();
-       p != vector_list.end(); ++ p) {
-    RegVect* vect = *p;
+  for (vector<const RegVect*>::const_iterator p = mVectorList.begin();
+       p != mVectorList.end(); ++ p) {
+    const RegVect* vect = *p;
     initial_list.add_vect(vect);
   }
 
   mBeforeHasSolution = true;
   solve_recur(initial_list,
-	      new_variable_list.begin(), new_variable_list.end());
+	      variable_list.begin(), variable_list.end());
   solution = mSolutionSoFar;
 
   if ( mTimeLimit > 0 ) {
@@ -182,35 +207,25 @@ IguGen::set_debug_level(ymuint32 level)
 // @param[in] var_end 使用可能な変数のリストの末尾の反復子
 void
 IguGen::solve_recur(const VectSetList& vector_list,
-		    vector<Variable*>::const_iterator var_begin,
-		    vector<Variable*>::const_iterator var_end)
+		    vector<const Variable*>::const_iterator var_begin,
+		    vector<const Variable*>::const_iterator var_end)
 {
   if ( mDebug > 0 ) {
     cerr << "best so far = " << mBestSoFar << endl
 	 << "selected variables = ";
-    for (vector<Variable*>::const_iterator p = mSelectedVariables.begin();
+    for (vector<const Variable*>::const_iterator p = mSelectedVariables.begin();
 	 p != mSelectedVariables.end(); ++ p) {
-      Variable* var = *p;
-      const vector<ymuint>& vid_list = var->vid_list();
-      cerr << " (";
-      for (vector<ymuint>::const_iterator q = vid_list.begin();
-	   q != vid_list.end(); ++ q) {
-	cerr << " " << *q;
-      }
-      cerr << ")";
+      cerr << " ";
+      const Variable* var = *p;
+      var->dump(cerr);
     }
     cerr << endl;
     cerr << "remain variables = ";
-    for (vector<Variable*>::const_iterator p = var_begin;
+    for (vector<const Variable*>::const_iterator p = var_begin;
 	 p != var_end; ++ p) {
-      Variable* var = *p;
-      const vector<ymuint>& vid_list = var->vid_list();
-      cerr << " (";
-      for (vector<ymuint>::const_iterator q = vid_list.begin();
-	   q != vid_list.end(); ++ q) {
-	cerr << " " << *q;
-      }
-      cerr << ")";
+      cerr << " ";
+      const Variable* var = *p;
+      var->dump(cerr);
     }
     cerr << endl;
     if ( mDebug > 1 ) {
@@ -218,7 +233,7 @@ IguGen::solve_recur(const VectSetList& vector_list,
       for (ymuint i = 0; i < n; ++ i) {
 	ymuint m = vector_list.set_size(i);
 	for (ymuint j = 0; j < m; ++ j) {
-	  RegVect* vect = vector_list.set_elem(i, j);
+	  const RegVect* vect = vector_list.set_elem(i, j);
 	  vect->dump(cerr);
 	}
 	cerr << "-----------------" << endl;
@@ -253,10 +268,10 @@ IguGen::solve_recur(const VectSetList& vector_list,
   ymuint set_num = vector_list.set_num();
 
   // ambiguity measure の昇順に並び替える．
-  vector<pair<ymuint, Variable*> > tmp_list;
-  for (vector<Variable*>::const_iterator p = var_begin;
+  vector<pair<ymuint, const Variable*> > tmp_list;
+  for (vector<const Variable*>::const_iterator p = var_begin;
        p != var_end; ++ p) {
-    Variable* var = *p;
+    const Variable* var = *p;
     ymuint max_size = 0;
     ymuint am = 0;
     ymuint am2 = 0;
@@ -266,7 +281,7 @@ IguGen::solve_recur(const VectSetList& vector_list,
       ymuint n0 = 0;
       ymuint n1 = 0;
       for (ymuint k = 0; k < m; ++ k) {
-	RegVect* vect = vector_list.set_elem(set_id, k);
+	const RegVect* vect = vector_list.set_elem(set_id, k);
 	if ( var->classify(vect) == 0 ) {
 	  ++ n0;
 	}
@@ -330,22 +345,30 @@ IguGen::solve_recur(const VectSetList& vector_list,
     }
   }
   sort(tmp_list.begin(), tmp_list.end(), Lt());
+
   ymuint nv2 = tmp_list.size();
 
-  vector<Variable*> new_variables(nv2);
+  vector<const Variable*> new_variables(nv2);
   for (ymuint i = 0; i < nv2; ++ i) {
     new_variables[i] = tmp_list[i].second;
   }
 
   ymuint bid = 0;
-  for (vector<Variable*>::const_iterator p = new_variables.begin();
+  for (vector<const Variable*>::const_iterator p = new_variables.begin();
        p != new_variables.end(); ++ p, ++ bid) {
-    Variable* var = *p;
+    const Variable* var = *p;
     if ( mBranchLimit > 0 &&
 	 bid >= mBranchLimit &&
 	 tmp_list[mBranchLimit - 1].first < tmp_list[bid].first ) {
       break;
     }
+
+#if 0
+    cout << "Choose Variable#" << (mSelectedVariables.size() + 1)
+	 << ": ";
+    var->dump(cout);
+    cout << endl;
+#endif
 
     VectSetList new_vector_list(vector_list.all_elem_num(), set_num * 2);
     bool bounded = false;
@@ -361,7 +384,7 @@ IguGen::solve_recur(const VectSetList& vector_list,
       ymuint n0 = 0;
       ymuint n1 = 0;
       for (ymuint k = 0; k < m; ++ k) {
-	RegVect* vect = vector_list.set_elem(set_id, k);
+	const RegVect* vect = vector_list.set_elem(set_id, k);
 	if ( var->classify(vect) == 0 ) {
 	  ++ n0;
 	}
@@ -379,7 +402,7 @@ IguGen::solve_recur(const VectSetList& vector_list,
 
 	bool first = true;
 	for (ymuint k = 0; k < m; ++ k) {
-	  RegVect* vect = vector_list.set_elem(set_id, k);
+	  const RegVect* vect = vector_list.set_elem(set_id, k);
 	  if ( var->classify(vect) == 0 ) {
 	    if ( first ) {
 	      first = false;
@@ -399,7 +422,7 @@ IguGen::solve_recur(const VectSetList& vector_list,
 
 	bool first = true;
 	for (ymuint k = 0; k < m; ++ k) {
-	  RegVect* vect = vector_list.set_elem(set_id, k);
+	  const RegVect* vect = vector_list.set_elem(set_id, k);
 	  if ( var->classify(vect) == 1 ) {
 	    if ( first ) {
 	      first = false;

@@ -35,6 +35,7 @@ class RegVect;
 class RvMgr;
 class VectSetList;
 class Variable;
+class IgVar;
 
 END_NAMESPACE_YM_IGF
 

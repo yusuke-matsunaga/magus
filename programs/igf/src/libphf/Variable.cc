@@ -9,6 +9,8 @@
 
 #include "Variable.h"
 #include "RegVect.h"
+#include "ym_logic/Bdd.h"
+#include "ym_logic/BddMgr.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -20,7 +22,6 @@ BEGIN_NAMESPACE_YM_IGF
 // @brief 通常の変数用のコンストラクタ
 // @param[in] vid 変数番号
 Variable::Variable(ymuint vid) :
-  mVid0(vid),
   mVidList(1, vid)
 {
 }
@@ -28,7 +29,6 @@ Variable::Variable(ymuint vid) :
 // @brief 合成変数用のコンストラクタ
 // @param[in] vid_list 変数番号のリスト
 Variable::Variable(const vector<ymuint>& vid_list) :
-  mVid0(vid_list[0]),
   mVidList(vid_list)
 {
 }
@@ -38,27 +38,37 @@ Variable::~Variable()
 {
 }
 
-// @brief 合成度を返す．
+// @brief ベクタを分類する．
+// @param[in] vect 対象のベクタ
 ymuint
-Variable::compound_degree() const
+Variable::classify(const RegVect* vect) const
 {
-  return mVidList.size();
+  ymuint n = mVidList.size();
+  ymuint ans = vect->val(mVidList[0]);
+  for (ymuint i = 1; i < n; ++ i) {
+    ymuint varid = mVidList[i];
+    ans ^= vect->val(varid);
+  }
+  return ans;
 }
 
-// @brief 通常の変数の場合に変数番号を返す．
-// @note 合成変数の場合の動作は未定
-ymuint
-Variable::vid() const
+// @brief 内容を出力する．
+void
+Variable::dump(ostream& s) const
 {
-  return mVid0;
-}
-
-// @brief 合成変数の場合に変数番号のリストを返す．
-// @note 通常の変数の場合の動作は未定
-const vector<ymuint>&
-Variable::vid_list() const
-{
-  return mVidList;
+  if ( mVidList.size() == 1 ) {
+    // 単一の変数の時
+    s << mVidList[0];
+  }
+  else {
+    // 合成変数の時
+    s << "(";
+    for (vector<ymuint>::const_iterator q = mVidList.begin();
+	 q != mVidList.end(); ++ q) {
+      s << " " << *q;
+    }
+    s << ")";
+  }
 }
 
 END_NAMESPACE_YM_IGF

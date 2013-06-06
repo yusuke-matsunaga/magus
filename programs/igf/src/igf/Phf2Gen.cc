@@ -78,7 +78,7 @@ Phf2Gen::~Phf2Gen()
 
 // @brief マッピングを求める．
 bool
-Phf2Gen::mapping(const vector<RegVect*>& vector_list,
+Phf2Gen::mapping(const vector<const RegVect*>& vector_list,
 		 const InputFunc& f1,
 		 const InputFunc& f2,
 		 vector<ymuint32>& g1,
@@ -93,7 +93,7 @@ Phf2Gen::mapping(const vector<RegVect*>& vector_list,
   vector<Phf2Node*> v_array;
   ymuint e_id = 0;
   for (ymuint i = 0; i < nv; ++ i) {
-    RegVect* rv = vector_list[i];
+    const RegVect* rv = vector_list[i];
     ymuint32 v1 = f1.eval(rv);
     hash_map<ymuint32, Phf2Node*>::iterator p1 = v1_hash.find(v1);
     Phf2Node* node1 = NULL;
@@ -111,7 +111,7 @@ Phf2Gen::mapping(const vector<RegVect*>& vector_list,
 
   ymuint offset = v1_hash.size();
   for (ymuint i = 0; i < nv; ++ i) {
-    RegVect* rv = vector_list[i];
+    const RegVect* rv = vector_list[i];
     ymuint32 v2 = f2.eval(rv);
     hash_map<ymuint32, Phf2Node*>::iterator p2 = v2_hash.find(v2);
     Phf2Node* node2 = NULL;

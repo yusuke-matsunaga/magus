@@ -49,7 +49,7 @@ public:
   vect_size() const;
 
   /// @brief ベクタのリストを得る．
-  const vector<RegVect*>&
+  const vector<const RegVect*>&
   vect_list() const;
 
   /// @brief インデックスのサイズを得る．
@@ -101,7 +101,7 @@ private:
   UnitAlloc* mAlloc;
 
   // ベクタのリスト
-  vector<RegVect*> mVectList;
+  vector<const RegVect*> mVectList;
 
 };
 
@@ -120,7 +120,7 @@ RvMgr::vect_size() const
 
 // @brief ベクタのリストを得る．
 inline
-const vector<RegVect*>&
+const vector<const RegVect*>&
 RvMgr::vect_list() const
 {
   return mVectList;

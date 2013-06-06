@@ -29,6 +29,13 @@ XorFunc::~XorFunc()
 {
 }
 
+// @brief 出力数を返す．
+ymuint
+XorFunc::output_num() const
+{
+  return mVarsList.size();
+}
+
 // @brief 関数値を求める．
 ymuint32
 XorFunc::eval(const RegVect* rv) const

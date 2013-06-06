@@ -92,7 +92,7 @@ Phf3Gen::~Phf3Gen()
 
 // @brief マッピングを求める．
 bool
-Phf3Gen::mapping(const vector<RegVect*>& vector_list,
+Phf3Gen::mapping(const vector<const RegVect*>& vector_list,
 		 const InputFunc& f1,
 		 const InputFunc& f2,
 		 const InputFunc& f3,
@@ -112,7 +112,7 @@ Phf3Gen::mapping(const vector<RegVect*>& vector_list,
   vector<Phf3Node*> v3_array(nv);
 
   for (ymuint i = 0; i < nv; ++ i) {
-    RegVect* rv = vector_list[i];
+    const RegVect* rv = vector_list[i];
     {
       ymuint32 pat = f1.eval(rv);
       hash_map<ymuint32, Phf3Node*>& node_hash = v1_hash;

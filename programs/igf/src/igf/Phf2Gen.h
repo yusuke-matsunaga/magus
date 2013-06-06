@@ -38,7 +38,7 @@ public:
 
   /// @brief マッピングを求める．
   bool
-  mapping(const vector<RegVect*>& vector_list,
+  mapping(const vector<const RegVect*>& vector_list,
 	  const InputFunc& f1,
 	  const InputFunc& f2,
 	  vector<ymuint32>& g1,

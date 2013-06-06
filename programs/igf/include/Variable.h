@@ -40,24 +40,14 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 合成度を返す．
-  ymuint
-  compound_degree() const;
-
-  /// @brief 通常の変数の場合に変数番号を返す．
-  /// @note 合成変数の場合の動作は未定
-  ymuint
-  vid() const;
-
-  /// @brief 合成変数の場合に変数番号のリストを返す．
-  /// @note 通常の変数の場合の動作は未定
-  const vector<ymuint>&
-  vid_list() const;
-
   /// @brief ベクタを分類する．
   /// @param[in] vect 対象のベクタ
   ymuint
   classify(const RegVect* vect) const;
+
+  /// @brief 内容を出力する．
+  void
+  dump(ostream& s) const;
 
 
 private:
@@ -65,28 +55,10 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 先頭の変数番号
-  ymuint mVid0;
-
   // 変数番号のリスト
   vector<ymuint> mVidList;
 
 };
-
-// @brief ベクタを分類する．
-// @param[in] vect 対象のベクタ
-inline
-ymuint
-Variable::classify(const RegVect* vect) const
-{
-  ymuint ans = vect->val(mVid0);
-  ymuint n = mVidList.size();
-  for (ymuint i = 1; i < n; ++ i) {
-    ymuint varid = mVidList[i];
-    ans ^= vect->val(varid);
-  }
-  return ans;
-}
 
 END_NAMESPACE_YM_IGF
 

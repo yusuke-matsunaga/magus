@@ -12,7 +12,7 @@
 #include "RvMgr.h"
 #include "RegVect.h"
 #include "Variable.h"
-#include "IguGen.h"
+#include "IguGen2.h"
 #include "ym_utils/CombiGen.h"
 
 
@@ -24,18 +24,12 @@ igf(int argc,
 {
   PoptMainApp app;
 
-  // multi オプション
-  PoptUint popt_multi("multi", 'm',
-		      "specify multiplexity", "<INT>");
   // xor オプション
   PoptUint popt_xor("xor", 'x',
 		    "specify XOR complexity", "<INT>");
   // branch-limit オプション
   PoptUint popt_blimit("branch-limit", 'b',
 		       "specify branch limit", "<INT>");
-  // ordering-mode オプション
-  PoptUint popt_omode("ordering-mode", 'o',
-		      "set ordering mode", "<INT>");
   // time-limit オプション
   PoptUint popt_tlimit("time-limit", 't',
 		       "set time limit", "<INT>(min)");
@@ -43,10 +37,8 @@ igf(int argc,
   PoptUint popt_debug("debug-level", 'd',
 		      "set debug level", "<INT>");
 
-  app.add_option(&popt_multi);
   app.add_option(&popt_xor);
   app.add_option(&popt_blimit);
-  app.add_option(&popt_omode);
   app.add_option(&popt_tlimit);
   app.add_option(&popt_debug);
 
@@ -58,24 +50,16 @@ igf(int argc,
     return -1;
   }
 
-  ymuint32 multi = 1;
   ymuint32 comp = 1;
   ymuint32 blimit = 0;
-  ymuint32 omode = 0;
   ymuint32 tlimit = 0;
   ymuint32 debug = 0;
 
-  if ( popt_multi.is_specified() ) {
-    multi = popt_multi.val();
-  }
   if ( popt_xor.is_specified() ) {
     comp = popt_xor.val();
   }
   if ( popt_blimit.is_specified() ) {
     blimit = popt_blimit.val();
-  }
-  if ( popt_omode.is_specified() ) {
-    omode = popt_omode.val();
   }
   if ( popt_tlimit.is_specified() ) {
     tlimit = popt_tlimit.val();
@@ -106,13 +90,10 @@ igf(int argc,
     return 3;
   }
 
-  IguGen igu_gen;
+  IguGen2 igu_gen;
 
   if ( blimit > 0 ) {
     igu_gen.set_branch_limit(blimit);
-  }
-  if ( omode > 0 ) {
-    igu_gen.set_ordering_mode(omode);
   }
   if ( tlimit > 0 ) {
     igu_gen.set_time_limit(tlimit, 0);
@@ -167,6 +148,7 @@ igf(int argc,
     const Variable* var = new Variable(i);
     var_list.push_back(var);
   }
+
   for (ymuint comp_i = 2; comp_i <= comp; ++ comp_i) {
     for (CombiGen cg(n, comp_i); !cg.is_end(); ++ cg) {
       vector<ymuint> vid_list(comp_i);
@@ -179,7 +161,7 @@ igf(int argc,
   }
 
   vector<const Variable*> solution;
-  igu_gen.solve(multi, var_list, n + 1, solution);
+  igu_gen.solve(var_list, n + 1, solution);
 #endif
 
   cout << "Variables = " << endl;
@@ -208,14 +190,14 @@ igf(int argc,
       }
       ++ multi_dist[sig];
     }
-    vector<ymuint> hist(multi + 1, 0);
+    vector<ymuint> hist(2, 0);
     for (ymuint i = 0; i < exp_p; ++ i) {
       ymuint m = multi_dist[i];
-      assert_cond( m <= multi, __FILE__, __LINE__);
+      assert_cond( m <= 1, __FILE__, __LINE__);
       ++ hist[m];
     }
     cout << "Distributions" << endl;
-    for (ymuint i = 0; i <= multi; ++ i) {
+    for (ymuint i = 0; i <= 1; ++ i) {
       cout << i << ": " << hist[i] << endl;
     }
     cout << endl;
@@ -231,12 +213,12 @@ igf(int argc,
 	 << "k = " << rvmgr.vect_list().size() << endl
 	 << "q = " << q << endl;
     cout << "Total memory size = "
-	 << exp_p << " x (" << n << " - " << p << " + " << q << ") x " << multi
-	 << " = " << (exp_p * (n - p + q) * multi) << endl;
+	 << exp_p << " x (" << n << " - " << p << " + " << q << ")"
+	 << " = " << (exp_p * (n - p + q)) << endl;
     cout << "Sasao's IGU       = "
 	 << exp_p << " x " << q << " + " << exp_q << " x ("
-	 << n << " - " << p << ") x " << multi
-	 << " = " << ((exp_p * q + exp_q * (n - p)) * multi) << endl;
+	 << n << " - " << p << ")"
+	 << " = " << (exp_p * q + exp_q * (n - p)) << endl;
     cout << "Ideal memory size = "
 	 << k << " x (" << n << " + " << q << ") = "
 	 << (k * (n + q)) << endl;
