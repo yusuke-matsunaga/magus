@@ -132,9 +132,11 @@ igf(int argc,
     igu_gen.set_debug_level(debug);
   }
 
-  ymuint n = rvmgr.vect_size();
+  const vector<const RegVect*>& vect_list = rvmgr.vect_list();
 
-  igu_gen.set_vector_list(rvmgr.vect_list());
+  igu_gen.set_vector_list(vect_list);
+
+  ymuint n = rvmgr.vect_size();
 
 #if 0
   // Variable を生成
@@ -193,6 +195,7 @@ igf(int argc,
   igu_gen.solve(multi, var_list, n + 1, solution);
 #endif
 
+#if 0
   cout << "Variables = " << endl;
   for (vector<const Variable*>::iterator p = solution.begin();
        p != solution.end(); ++ p) {
@@ -252,6 +255,109 @@ igf(int argc,
 	 << k << " x (" << n << " + " << q << ") = "
 	 << (k * (n + q)) << endl;
   }
+#else
+
+  // 最終的な分割を作る．
+  ymuint np = solution.size();
+  ymuint np_exp = 1U << np;
+  vector<const RegVect*> lut_array(np_exp * multi, NULL);
+  for (vector<const RegVect*>::const_iterator p = vect_list.begin();
+       p != vect_list.end(); ++ p) {
+    const RegVect* vect = *p;
+    ymuint id = 0U;
+    for (ymuint i = 0; i < np; ++ i) {
+      const Variable* var = solution[i];
+      if ( var->classify(vect) ) {
+	id |= (1U << i);
+      }
+    }
+    ymuint base = id * multi;
+    for (ymuint i = 0; i < multi; ++ i) {
+      if ( lut_array[base + i] == NULL ) {
+	lut_array[base + i] = vect;
+	break;
+      }
+    }
+  }
+
+  vector<ymuint> p_array(multi);
+  for (ymuint i = 0; i < multi; ++ i) {
+    vector<const RegVect*> vect_list1;
+    vect_list1.reserve(np_exp);
+    for (ymuint j = 0; j < np_exp; ++ j) {
+      const RegVect* vect = lut_array[j * multi + i];
+      if ( vect != NULL ) {
+	vect_list1.push_back(vect);
+      }
+    }
+
+    if ( vect_list1.empty() ) {
+      p_array[i] = 0;
+    }
+    else {
+      IguGen igu_gen1;
+
+      if ( blimit > 0 ) {
+	igu_gen1.set_branch_limit(blimit);
+      }
+      if ( omode > 0 ) {
+	igu_gen1.set_ordering_mode(omode);
+      }
+      if ( tlimit > 0 ) {
+	igu_gen1.set_time_limit(tlimit, 0);
+      }
+      if ( debug > 0 ) {
+	igu_gen1.set_debug_level(debug);
+      }
+
+      igu_gen1.set_vector_list(vect_list1);
+
+      vector<const Variable*> solution1;
+      igu_gen1.solve(1, solution, np + 1, solution1);
+
+      if ( rlimit > 0 ) {
+	igu_gen1.set_recur_limit(rlimit);
+	vector<const Variable*> solution2;
+	igu_gen1.solve(1, var_list, solution1.size(), solution2);
+	if ( solution2.size() > 0 && solution2.size() < solution1.size() ) {
+	  solution1 = solution2;
+	}
+      }
+
+      p_array[i] = solution1.size();
+    }
+  }
+
+  {
+    ymuint n = rvmgr.vect_size();
+    ymuint k = rvmgr.vect_list().size();
+    ymuint q = rvmgr.index_size();
+    ymuint exp_q = (1 << q);
+    ymuint t = 0;
+    ymuint t1 = 0;
+    for (ymuint i = 0; i < multi; ++ i) {
+      ymuint p = p_array[i];
+      if ( p > 0 ) {
+	ymuint exp_p = 1 << p;
+	t += (exp_p * (n - p + q));
+	t1 += (exp_p * q) + exp_q * (n - q);
+      }
+    }
+    cout << endl
+	 << "page size = ";
+    for (ymuint i = 0; i < multi; ++ i) {
+      cout << " " << p_array[i];
+    }
+    cout << endl;
+    cout << "Total memory size = "
+	 << t << endl
+	 << "Sasao's Parallel IGU = "
+	 << t1 << endl
+	 << "Ideal memory size = "
+	 << (k * (n + q)) << endl;
+  }
+#endif
+
   return 0;
 }
 
