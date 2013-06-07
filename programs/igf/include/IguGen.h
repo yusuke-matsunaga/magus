@@ -49,6 +49,10 @@ public:
 	ymuint best_so_far,
 	vector<const Variable*>& solution);
 
+  /// @brief 再帰呼び出しの回数制限を設定する．
+  void
+  set_recur_limit(ymuint limit);
+
   /// @brief 分岐制限を設定する．
   /// @param[in] limit 分岐制限
   /// @note limit = 0 の場合には制限なし
@@ -110,6 +114,15 @@ private:
 
   // mBestSorFar がセットされた．
   bool mBeforeHasSolution;
+
+  // mBestSoFar が更新されていない回数
+  ymuint32 mNoChangeCount;
+
+  // mNoChangeCount の制限値
+  ymuint32 mNoChangeLimit;
+
+  // mNoChangeCount の最大値
+  ymuint32 mMaxNoChangeCount;
 
   // 現時点の解
   vector<const Variable*> mSolutionSoFar;

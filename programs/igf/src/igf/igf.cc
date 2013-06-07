@@ -30,6 +30,9 @@ igf(int argc,
   // xor オプション
   PoptUint popt_xor("xor", 'x',
 		    "specify XOR complexity", "<INT>");
+  // recur-limit オプション
+  PoptUint popt_rlimit("recur-limit", 'r',
+		       "specify recursive call limit", "<INT>");
   // branch-limit オプション
   PoptUint popt_blimit("branch-limit", 'b',
 		       "specify branch limit", "<INT>");
@@ -45,6 +48,7 @@ igf(int argc,
 
   app.add_option(&popt_multi);
   app.add_option(&popt_xor);
+  app.add_option(&popt_rlimit);
   app.add_option(&popt_blimit);
   app.add_option(&popt_omode);
   app.add_option(&popt_tlimit);
@@ -60,6 +64,7 @@ igf(int argc,
 
   ymuint32 multi = 1;
   ymuint32 comp = 1;
+  ymuint32 rlimit = 0;
   ymuint32 blimit = 0;
   ymuint32 omode = 0;
   ymuint32 tlimit = 0;
@@ -70,6 +75,9 @@ igf(int argc,
   }
   if ( popt_xor.is_specified() ) {
     comp = popt_xor.val();
+  }
+  if ( popt_rlimit.is_specified() ) {
+    rlimit = popt_rlimit.val();
   }
   if ( popt_blimit.is_specified() ) {
     blimit = popt_blimit.val();
@@ -108,6 +116,9 @@ igf(int argc,
 
   IguGen igu_gen;
 
+  if ( rlimit > 0 ) {
+    igu_gen.set_recur_limit(rlimit);
+  }
   if ( blimit > 0 ) {
     igu_gen.set_branch_limit(blimit);
   }

@@ -149,7 +149,9 @@ PhfGen::mapping(const vector<const RegVect*>& vector_list,
       }
     }
     if ( not_simple ) {
+#if 0
       cout << " not simple" << endl;
+#endif
       return false;
     }
   }
@@ -173,7 +175,9 @@ PhfGen::mapping(const vector<const RegVect*>& vector_list,
       v_mark[node0->id()] = true;
       bool stat = dfs(node0, NULL, v_mark, edge_list);
       if ( !stat ) {
+#if 0
 	cout << " cyclic" << endl;
+#endif
 	return false;
       }
     }

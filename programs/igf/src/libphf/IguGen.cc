@@ -53,6 +53,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 IguGen::IguGen()
 {
+  mNoChangeLimit = 0;
   mBranchLimit = 0;
   mOrderingMode = 0;
   mTimeLimit = 0;
@@ -158,14 +159,25 @@ IguGen::solve(ymuint multi,
   }
 
   mBeforeHasSolution = true;
+  mNoChangeCount = 0;
+  mMaxNoChangeCount = 0;
   solve_recur(initial_list,
 	      variable_list.begin(), variable_list.end());
   solution = mSolutionSoFar;
+
+  cout << "Max NoChangeCount = " << mMaxNoChangeCount << endl;
 
   if ( mTimeLimit > 0 ) {
     timer_delete(tid);
     sigaction(SIGALRM, &old_act, NULL);
   }
+}
+
+// @brief 再帰呼び出しの回数制限を設定する．
+void
+IguGen::set_recur_limit(ymuint limit)
+{
+  mNoChangeLimit = limit;
 }
 
 // @brief 分岐制限を設定する．
@@ -210,6 +222,14 @@ IguGen::solve_recur(const VectSetList& vector_list,
 		    vector<const Variable*>::const_iterator var_begin,
 		    vector<const Variable*>::const_iterator var_end)
 {
+  if ( mNoChangeLimit > 0 && mNoChangeCount > mNoChangeLimit ) {
+    return;
+  }
+
+  if ( mMaxNoChangeCount < mNoChangeCount ) {
+    mMaxNoChangeCount = mNoChangeCount;
+  }
+
   if ( mDebug > 0 ) {
     cerr << "best so far = " << mBestSoFar << endl
 	 << "selected variables = ";
@@ -267,6 +287,38 @@ IguGen::solve_recur(const VectSetList& vector_list,
 
   ymuint set_num = vector_list.set_num();
 
+  // 残りの変数を全部使って所望の分割が行なえるか試す．
+  ymuint nvars = var_end - var_begin;
+  if ( nvars < 16 ) {
+    ymuint nexp = 1U << nvars;
+    bool overflow = false;
+    for (ymuint set_id = 0; set_id < set_num; ++ set_id) {
+      ymuint m = vector_list.set_size(set_id);
+      vector<ymuint> n_array(nexp, 0);
+      for (ymuint k = 0; k < m; ++ k) {
+	const RegVect* vect = vector_list.set_elem(set_id, k);
+	ymuint id = 0;
+	for (ymuint i = 0; i < nvars; ++ i) {
+	  const Variable* var = *(var_begin + i);
+	  if ( var->classify(vect) == 1 ) {
+	    id |= (1U << i);
+	  }
+	}
+	++ n_array[id];
+	if ( n_array[id] > mMulti ) {
+	  overflow = true;
+	  break;
+	}
+      }
+      if ( overflow ) {
+	break;
+      }
+    }
+    if ( overflow ) {
+      return;
+    }
+  }
+
   // ambiguity measure の昇順に並び替える．
   vector<pair<ymuint, const Variable*> > tmp_list;
   for (vector<const Variable*>::const_iterator p = var_begin;
@@ -275,6 +327,7 @@ IguGen::solve_recur(const VectSetList& vector_list,
     ymuint max_size = 0;
     ymuint am = 0;
     ymuint am2 = 0;
+    ymuint am3 = 0;
     bool split = false;
     for (ymuint set_id = 0; set_id < set_num; ++ set_id) {
       ymuint m = vector_list.set_size(set_id);
@@ -302,11 +355,15 @@ IguGen::solve_recur(const VectSetList& vector_list,
 	am += n0 * n0;
 	ymuint lb = lower_bound(n0);
 	am2 += lb * lb;
+	ymuint x = (n0 + mMulti - 1) / mMulti;
+	am3 += x * x;
       }
       if ( n1 > mMulti ) {
 	am += n1 * n1;
 	ymuint lb = lower_bound(n1);
 	am2 += lb * lb;
+	ymuint x = (n1 + mMulti - 1) / mMulti;
+	am3 += x * x;
       }
     }
 
@@ -321,28 +378,35 @@ IguGen::solve_recur(const VectSetList& vector_list,
       continue;
     }
 
+    ymuint val;
     switch ( mOrderingMode ) {
     case 0:
-      tmp_list.push_back(make_pair(am, var));
+      val = am;
       break;
 
     case 1:
       if ( mBeforeHasSolution ) {
-	tmp_list.push_back(make_pair(am2, var));
+	val = am2;
       }
       else {
-	tmp_list.push_back(make_pair(am, var));
+	val = am;
       }
       break;
 
     case 2:
-      tmp_list.push_back(make_pair(am2, var));
+      val = am2;
+      break;
+
+    case 3:
+      val = am3;
       break;
 
     default:
-      tmp_list.push_back(make_pair(am, var));
+      val = am;
       break;
     }
+
+    tmp_list.push_back(make_pair(val, var));
   }
   sort(tmp_list.begin(), tmp_list.end(), Lt());
 
@@ -445,12 +509,14 @@ IguGen::solve_recur(const VectSetList& vector_list,
 	mSolutionSoFar.push_back(var);
 	mBestSoFar = ans;
 	mBeforeHasSolution = false;
+	mNoChangeCount = 0;
 	cerr << "best_so_far => " << mBestSoFar << endl;
       }
       continue;
     }
 
     mSelectedVariables.push_back(var);
+    ++ mNoChangeCount;
     solve_recur(new_vector_list, p + 1, new_variables.end());
     mSelectedVariables.pop_back();
 
