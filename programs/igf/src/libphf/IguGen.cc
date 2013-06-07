@@ -165,8 +165,6 @@ IguGen::solve(ymuint multi,
 	      variable_list.begin(), variable_list.end());
   solution = mSolutionSoFar;
 
-  cout << "Max NoChangeCount = " << mMaxNoChangeCount << endl;
-
   if ( mTimeLimit > 0 ) {
     timer_delete(tid);
     sigaction(SIGALRM, &old_act, NULL);
@@ -427,12 +425,12 @@ IguGen::solve_recur(const VectSetList& vector_list,
       break;
     }
 
-#if 0
-    cout << "Choose Variable#" << (mSelectedVariables.size() + 1)
-	 << ": ";
-    var->dump(cout);
-    cout << endl;
-#endif
+    if ( mDebug > 0 ) {
+      cout << "Choose Variable#" << (mSelectedVariables.size() + 1)
+	   << ": ";
+      var->dump(cout);
+      cout << endl;
+    }
 
     VectSetList new_vector_list(vector_list.all_elem_num(), set_num * 2);
     bool bounded = false;
@@ -510,7 +508,9 @@ IguGen::solve_recur(const VectSetList& vector_list,
 	mBestSoFar = ans;
 	mBeforeHasSolution = false;
 	mNoChangeCount = 0;
-	cerr << "best_so_far => " << mBestSoFar << endl;
+	if ( mDebug > 0 ) {
+	  cerr << "best_so_far => " << mBestSoFar << endl;
+	}
       }
       continue;
     }
