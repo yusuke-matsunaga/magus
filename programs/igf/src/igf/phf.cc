@@ -35,11 +35,6 @@ phf(int argc,
 		  "specify the number of hash functions", "<INT>");
   app.add_option(&popt_m);
 
-  // p オプション
-  PoptUint popt_p(NULL, 'p',
-		  "specify the number of inputs", "<INT>");
-  app.add_option(&popt_p);
-
   // d オプション
   PoptNone popt_d("display", 'd',
 		  "display the result");
@@ -61,11 +56,6 @@ phf(int argc,
   ymuint32 m = 2;
   if ( popt_m.is_specified() ) {
     m = popt_m.val();
-  }
-
-  ymuint32 p = 0;
-  if ( popt_p.is_specified() ) {
-    p = popt_p.val();
   }
 
   bool disp = popt_d.is_specified();
@@ -99,6 +89,8 @@ phf(int argc,
 
   ymuint n = rvmgr.vect_size();
 
+  ymuint p = rvmgr.index_size();
+
   RandGen rg;
   for (bool found = false; !found ; ++ p) {
     for (ymuint count = 0; count < count_limit; ++ count) {
@@ -117,15 +109,18 @@ phf(int argc,
       PhfGen phfgen;
 
       const vector<const RegVect*>& vlist = rvmgr.vect_list();
-      ymuint np = 1U << p;
+      ymuint exp_p = 1U << p;
       vector<vector<ymuint32>* > g_list(m);
       for (ymuint i = 0; i < m; ++ i) {
-	g_list[i] = new vector<ymuint32>(np, 0U);
+	g_list[i] = new vector<ymuint32>(exp_p, 0U);
       }
       bool stat = phfgen.mapping(vlist, func_list, g_list);
       if ( stat ) {
 	found = true;
 	cout << "p = " << p << endl;
+	ymuint q = rvmgr.index_size();
+	cout << "Total memory size = "
+	     << (exp_p * q * m + vlist.size() * n) << endl;
 	if ( disp ) {
 	  ymuint nv = vlist.size();
 	  for (ymuint i = 0; i < nv; ++ i) {
