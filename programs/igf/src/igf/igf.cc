@@ -282,6 +282,25 @@ igf(int argc,
     }
   }
 
+  vector<ymuint> hist_array(multi + 1, 0);
+  {
+    for (ymuint j = 0; j < np_exp; ++ j) {
+      ymuint base = j * multi;
+      ymuint nelem = 0;
+      for ( ; nelem < multi; ++ nelem) {
+	if ( lut_array[base + nelem] == NULL ) {
+	  break;
+	}
+      }
+      ++ hist_array[nelem];
+    }
+    cout << " Distribution" << endl;
+    for (ymuint i = 0; i <= multi; ++ i) {
+      cout << "  " << i << ": " << hist_array[i] << endl;
+    }
+    cout << endl;
+  }
+
   RandGen rg;
   ymuint min_size = 0;
   vector<ymuint> p_array(multi);
@@ -296,15 +315,18 @@ igf(int argc,
 	  break;
 	}
       }
-      RandPermGen rpg(nelem);
-      rpg.generate(rg);
-      for (ymuint i = 0; i < nelem; ++ i) {
-	ymuint pos = rpg.elem(i);
-	lut_array1[base + i] = lut_array[base + pos];
+      if ( nelem > 0 ) {
+	RandPermGen rpg(nelem);
+	rpg.generate(rg);
+	for (ymuint i = 0; i < nelem; ++ i) {
+	  ymuint pos = rpg.elem(i);
+	  lut_array1[base + i] = lut_array[base + pos];
+	}
       }
     }
 
     vector<ymuint> p_array1(multi);
+    vector<ymuint> n_array(multi);
     for (ymuint i = 0; i < multi; ++ i) {
       vector<const RegVect*> vect_list1;
       vect_list1.reserve(np_exp);
@@ -314,7 +336,7 @@ igf(int argc,
 	  vect_list1.push_back(vect);
 	}
       }
-
+      n_array[i] = vect_list1.size();
       if ( vect_list1.empty() ) {
 	p_array1[i] = 0;
       }
@@ -359,6 +381,22 @@ igf(int argc,
 	ymuint exp_p = 1 << p;
 	t += (exp_p * (n - p + q));
       }
+    }
+    {
+      cout << "n = ";
+      for (ymuint i = 0; i < multi; ++ i) {
+	cout << " " << n_array[i];
+      }
+      cout << endl;
+
+      cout << "p = ";
+      for (ymuint i = 0; i < multi; ++ i) {
+	cout << " " << p_array1[i];
+      }
+      cout << endl;
+
+      cout << "Memory Size = " << t << endl
+	   << endl;
     }
     if ( min_size == 0 || min_size > t ) {
       min_size = t;
