@@ -14,6 +14,8 @@
 #include "Variable.h"
 #include "IguGen.h"
 #include "ym_utils/CombiGen.h"
+#include "ym_utils/RandGen.h"
+#include "ym_utils/RandPermGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -280,51 +282,89 @@ igf(int argc,
     }
   }
 
+  RandGen rg;
+  ymuint min_size = 0;
   vector<ymuint> p_array(multi);
-  for (ymuint i = 0; i < multi; ++ i) {
-    vector<const RegVect*> vect_list1;
-    vect_list1.reserve(np_exp);
+  for (ymuint l = 0; l < 100; ++ l) {
+    ymuint q = rvmgr.index_size();
+    vector<const RegVect*> lut_array1(np_exp * multi, NULL);
     for (ymuint j = 0; j < np_exp; ++ j) {
-      const RegVect* vect = lut_array[j * multi + i];
-      if ( vect != NULL ) {
-	vect_list1.push_back(vect);
+      ymuint base = j * multi;
+      ymuint nelem = 0;
+      for ( ; nelem < multi; ++ nelem) {
+	if ( lut_array[base + nelem] == NULL ) {
+	  break;
+	}
+      }
+      RandPermGen rpg(nelem);
+      rpg.generate(rg);
+      for (ymuint i = 0; i < nelem; ++ i) {
+	ymuint pos = rpg.elem(i);
+	lut_array1[base + i] = lut_array[base + pos];
       }
     }
 
-    if ( vect_list1.empty() ) {
-      p_array[i] = 0;
-    }
-    else {
-      IguGen igu_gen1;
-
-      if ( blimit > 0 ) {
-	igu_gen1.set_branch_limit(blimit);
-      }
-      if ( omode > 0 ) {
-	igu_gen1.set_ordering_mode(omode);
-      }
-      if ( tlimit > 0 ) {
-	igu_gen1.set_time_limit(tlimit, 0);
-      }
-      if ( debug > 0 ) {
-	igu_gen1.set_debug_level(debug);
-      }
-
-      igu_gen1.set_vector_list(vect_list1);
-
-      vector<const Variable*> solution1;
-      igu_gen1.solve(1, solution, np + 1, solution1);
-
-      if ( rlimit > 0 ) {
-	igu_gen1.set_recur_limit(rlimit);
-	vector<const Variable*> solution2;
-	igu_gen1.solve(1, var_list, solution1.size(), solution2);
-	if ( solution2.size() > 0 && solution2.size() < solution1.size() ) {
-	  solution1 = solution2;
+    vector<ymuint> p_array1(multi);
+    for (ymuint i = 0; i < multi; ++ i) {
+      vector<const RegVect*> vect_list1;
+      vect_list1.reserve(np_exp);
+      for (ymuint j = 0; j < np_exp; ++ j) {
+	const RegVect* vect = lut_array1[j * multi + i];
+	if ( vect != NULL ) {
+	  vect_list1.push_back(vect);
 	}
       }
 
-      p_array[i] = solution1.size();
+      if ( vect_list1.empty() ) {
+	p_array1[i] = 0;
+      }
+      else {
+	IguGen igu_gen1;
+
+	if ( blimit > 0 ) {
+	  igu_gen1.set_branch_limit(blimit);
+	}
+	if ( omode > 0 ) {
+	  igu_gen1.set_ordering_mode(omode);
+	}
+	if ( tlimit > 0 ) {
+	  igu_gen1.set_time_limit(tlimit, 0);
+	}
+	if ( debug > 0 ) {
+	  igu_gen1.set_debug_level(debug);
+	}
+
+	igu_gen1.set_vector_list(vect_list1);
+
+	vector<const Variable*> solution1;
+	igu_gen1.solve(1, solution, np + 1, solution1);
+
+	if ( rlimit > 0 ) {
+	  igu_gen1.set_recur_limit(rlimit);
+	  vector<const Variable*> solution2;
+	  igu_gen1.solve(1, var_list, solution1.size(), solution2);
+	  if ( solution2.size() > 0 && solution2.size() < solution1.size() ) {
+	    solution1 = solution2;
+	  }
+	}
+
+	p_array1[i] = solution1.size();
+      }
+    }
+
+    ymuint t = 0;
+    for (ymuint i = 0; i < multi; ++ i) {
+      ymuint p = p_array1[i];
+      if ( p > 0 ) {
+	ymuint exp_p = 1 << p;
+	t += (exp_p * (n - p + q));
+      }
+    }
+    if ( min_size == 0 || min_size > t ) {
+      min_size = t;
+      for (ymuint i = 0; i < multi; ++ i) {
+	p_array[i] = p_array1[i];
+      }
     }
   }
 
@@ -356,6 +396,7 @@ igf(int argc,
 	 << "Ideal memory size = "
 	 << (k * (n + q)) << endl;
   }
+
 #endif
 
   return 0;
