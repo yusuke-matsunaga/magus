@@ -26,26 +26,26 @@ igf(int argc,
 {
   PoptMainApp app;
 
-  // multi オプション
-  PoptUint popt_multi("multi", 'm',
-		      "specify multiplexity", "<INT>");
   // xor オプション
   PoptUint popt_xor("xor", 'x',
 		    "specify XOR complexity", "<INT>");
+
   // recur-limit オプション
   PoptUint popt_rlimit("recur-limit", 'r',
 		       "specify recursive call limit", "<INT>");
+
   // ordering-mode オプション
   PoptUint popt_omode("ordering-mode", 'o',
 		      "set ordering mode", "<INT>");
+
   // time-limit オプション
   PoptUint popt_tlimit("time-limit", 't',
 		       "set time limit", "<INT>(min)");
+
   // debug-level オプション
   PoptUint popt_debug("debug-level", 'd',
 		      "set debug level", "<INT>");
 
-  app.add_option(&popt_multi);
   app.add_option(&popt_xor);
   app.add_option(&popt_rlimit);
   app.add_option(&popt_omode);
@@ -60,16 +60,12 @@ igf(int argc,
     return -1;
   }
 
-  ymuint32 multi = 1;
   ymuint32 comp = 1;
   ymuint32 rlimit = 0;
   ymuint32 omode = 0;
   ymuint32 tlimit = 0;
   ymuint32 debug = 0;
 
-  if ( popt_multi.is_specified() ) {
-    multi = popt_multi.val();
-  }
   if ( popt_xor.is_specified() ) {
     comp = popt_xor.val();
   }
@@ -129,42 +125,6 @@ igf(int argc,
 
   ymuint n = rvmgr.vect_size();
 
-#if 0
-  // Variable を生成
-  vector<const Variable*> var_list;
-  for (ymuint i = 0; i < n; ++ i) {
-    const Variable* var = new Variable(i);
-    var_list.push_back(var);
-  }
-
-  vector<const Variable*> solution;
-  ymuint best_so_far = n + 1;
-  {
-    cerr << "Only Input Variables" << endl;
-    igu_gen.solve(multi, var_list, best_so_far, solution);
-    best_so_far = solution.size();
-    cerr << " => " << best_so_far << endl;
-  }
-  for (ymuint comp_i = 2; comp_i <= comp; ++ comp_i) {
-    cerr << "With Compound Variables of degree " << comp_i << endl;
-    for (CombiGen cg(n, comp_i); !cg.is_end(); ++ cg) {
-      vector<ymuint> vid_list(comp_i);
-      for (ymuint j = 0; j < comp_i; ++ j) {
-	vid_list[j] = cg(j);
-      }
-      const Variable* var = new Variable(vid_list);
-      var_list.push_back(var);
-    }
-    vector<const Variable*> solution1;
-    igu_gen.solve(multi, var_list, best_so_far, solution1);
-    ymuint ans = solution1.size();
-    cerr << " => " << ans << endl;
-    if ( best_so_far > ans ) {
-      best_so_far = ans;
-      solution = solution1;
-    }
-  }
-#else
   // Variable を生成
   vector<const Variable*> var_list;
   for (ymuint i = 0; i < n; ++ i) {
@@ -183,10 +143,8 @@ igf(int argc,
   }
 
   vector<const Variable*> solution;
-  igu_gen.solve(multi, var_list, n + 1, solution);
-#endif
+  igu_gen.solve(1, var_list, n + 1, solution);
 
-#if 0
   cout << "Variables = " << endl;
   for (vector<const Variable*>::iterator p = solution.begin();
        p != solution.end(); ++ p) {
@@ -196,35 +154,6 @@ igf(int argc,
   }
   cout << endl;
 
-  {
-    ymuint nv = solution.size();
-    ymuint exp_p = (1 << nv);
-    vector<ymuint> multi_dist(exp_p, 0);
-    const vector<const RegVect*>& vect_list = rvmgr.vect_list();
-    for (vector<const RegVect*>::const_iterator p = vect_list.begin();
-	 p != vect_list.end(); ++ p) {
-      const RegVect* vect = *p;
-      ymuint sig = 0;
-      for (ymuint i = 0; i < nv; ++ i) {
-	const Variable* var = solution[i];
-	if ( var->classify(vect) ) {
-	  sig |= (1 << i);
-	}
-      }
-      ++ multi_dist[sig];
-    }
-    vector<ymuint> hist(multi + 1, 0);
-    for (ymuint i = 0; i < exp_p; ++ i) {
-      ymuint m = multi_dist[i];
-      assert_cond( m <= multi, __FILE__, __LINE__);
-      ++ hist[m];
-    }
-    cout << "Distributions" << endl;
-    for (ymuint i = 0; i <= multi; ++ i) {
-      cout << i << ": " << hist[i] << endl;
-    }
-    cout << endl;
-  }
   {
     ymuint n = rvmgr.vect_size();
     ymuint k = rvmgr.vect_list().size();
@@ -236,192 +165,16 @@ igf(int argc,
 	 << "k = " << rvmgr.vect_list().size() << endl
 	 << "q = " << q << endl;
     cout << "Total memory size = "
-	 << exp_p << " x (" << n << " - " << p << " + " << q << ") x " << multi
-	 << " = " << (exp_p * (n - p + q) * multi) << endl;
+	 << exp_p << " x (" << n << " - " << p << " + " << q << ")"
+	 << " = " << (exp_p * (n - p + q)) << endl;
     cout << "Sasao's IGU       = "
 	 << exp_p << " x " << q << " + " << exp_q << " x ("
-	 << n << " - " << p << ") x " << multi
-	 << " = " << ((exp_p * q + exp_q * (n - p)) * multi) << endl;
+	 << n << " - " << p << ")"
+	 << " = " << ((exp_p * q + exp_q * (n - p))) << endl;
     cout << "Ideal memory size = "
 	 << k << " x (" << n << " + " << q << ") = "
 	 << (k * (n + q)) << endl;
   }
-#else
-
-  // 最終的な分割を作る．
-  ymuint np = solution.size();
-  ymuint np_exp = 1U << np;
-  vector<const RegVect*> lut_array(np_exp * multi, NULL);
-  for (vector<const RegVect*>::const_iterator p = vect_list.begin();
-       p != vect_list.end(); ++ p) {
-    const RegVect* vect = *p;
-    ymuint id = 0U;
-    for (ymuint i = 0; i < np; ++ i) {
-      const Variable* var = solution[i];
-      if ( var->classify(vect) ) {
-	id |= (1U << i);
-      }
-    }
-    ymuint base = id * multi;
-    for (ymuint i = 0; i < multi; ++ i) {
-      if ( lut_array[base + i] == NULL ) {
-	lut_array[base + i] = vect;
-	break;
-      }
-    }
-  }
-
-  vector<ymuint> hist_array(multi + 1, 0);
-  {
-    for (ymuint j = 0; j < np_exp; ++ j) {
-      ymuint base = j * multi;
-      ymuint nelem = 0;
-      for ( ; nelem < multi; ++ nelem) {
-	if ( lut_array[base + nelem] == NULL ) {
-	  break;
-	}
-      }
-      ++ hist_array[nelem];
-    }
-    cout << " Distribution" << endl;
-    for (ymuint i = 0; i <= multi; ++ i) {
-      cout << "  " << i << ": " << hist_array[i] << endl;
-    }
-    cout << endl;
-  }
-
-  RandGen rg;
-  ymuint min_size = 0;
-  vector<ymuint> p_array(multi);
-  for (ymuint l = 0; l < 1; ++ l) {
-    ymuint q = rvmgr.index_size();
-    vector<const RegVect*> lut_array1(np_exp * multi, NULL);
-    for (ymuint j = 0; j < np_exp; ++ j) {
-      ymuint base = j * multi;
-      ymuint nelem = 0;
-      for ( ; nelem < multi; ++ nelem) {
-	if ( lut_array[base + nelem] == NULL ) {
-	  break;
-	}
-      }
-      if ( nelem > 0 ) {
-	RandPermGen rpg(nelem);
-	rpg.generate(rg);
-	for (ymuint i = 0; i < nelem; ++ i) {
-	  ymuint pos = rpg.elem(i);
-	  lut_array1[base + i] = lut_array[base + pos];
-	}
-      }
-    }
-
-    vector<ymuint> p_array1(multi);
-    vector<ymuint> n_array(multi);
-    for (ymuint i = 0; i < multi; ++ i) {
-      vector<const RegVect*> vect_list1;
-      vect_list1.reserve(np_exp);
-      for (ymuint j = 0; j < np_exp; ++ j) {
-	const RegVect* vect = lut_array1[j * multi + i];
-	if ( vect != NULL ) {
-	  vect_list1.push_back(vect);
-	}
-      }
-      n_array[i] = vect_list1.size();
-      if ( vect_list1.empty() ) {
-	p_array1[i] = 0;
-      }
-      else {
-	IguGen igu_gen1;
-
-	if ( omode > 0 ) {
-	  igu_gen1.set_ordering_mode(omode);
-	}
-	if ( tlimit > 0 ) {
-	  igu_gen1.set_time_limit(tlimit, 0);
-	}
-	if ( debug > 0 ) {
-	  igu_gen1.set_debug_level(debug);
-	}
-
-	igu_gen1.set_vector_list(vect_list1);
-
-	vector<const Variable*> solution1;
-	igu_gen1.solve(1, solution, np + 1, solution1);
-
-	if ( rlimit > 0 ) {
-	  igu_gen1.set_recur_limit(rlimit);
-	  vector<const Variable*> solution2;
-	  igu_gen1.solve(1, var_list, solution1.size(), solution2);
-	  if ( solution2.size() > 0 && solution2.size() < solution1.size() ) {
-	    solution1 = solution2;
-	  }
-	}
-
-	p_array1[i] = solution1.size();
-      }
-    }
-
-    ymuint t = 0;
-    for (ymuint i = 0; i < multi; ++ i) {
-      ymuint p = p_array1[i];
-      if ( p > 0 ) {
-	ymuint exp_p = 1 << p;
-	t += (exp_p * (n - p + q));
-      }
-    }
-    {
-      cout << "n = ";
-      for (ymuint i = 0; i < multi; ++ i) {
-	cout << " " << n_array[i];
-      }
-      cout << endl;
-
-      cout << "p = ";
-      for (ymuint i = 0; i < multi; ++ i) {
-	cout << " " << p_array1[i];
-      }
-      cout << endl;
-
-      cout << "Memory Size = " << t << endl
-	   << endl;
-    }
-    if ( min_size == 0 || min_size > t ) {
-      min_size = t;
-      for (ymuint i = 0; i < multi; ++ i) {
-	p_array[i] = p_array1[i];
-      }
-    }
-  }
-
-  {
-    ymuint n = rvmgr.vect_size();
-    ymuint k = rvmgr.vect_list().size();
-    ymuint q = rvmgr.index_size();
-    ymuint exp_q = (1 << q);
-    ymuint t = 0;
-    ymuint t1 = 0;
-    for (ymuint i = 0; i < multi; ++ i) {
-      ymuint p = p_array[i];
-      if ( p > 0 ) {
-	ymuint exp_p = 1 << p;
-	t += (exp_p * (n - p + q));
-	t1 += (exp_p * q) + exp_q * (n - q);
-      }
-    }
-    cout << endl
-	 << "page size = ";
-    for (ymuint i = 0; i < multi; ++ i) {
-      cout << " " << p_array[i];
-    }
-    cout << endl;
-    cout << "Total memory size = "
-	 << t << endl
-	 << "Sasao's Parallel IGU = "
-	 << t1 << endl
-	 << "Ideal memory size = "
-	 << (k * (n + q)) << endl;
-  }
-
-#endif
 
   return 0;
 }
