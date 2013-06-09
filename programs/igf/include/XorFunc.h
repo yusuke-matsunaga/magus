@@ -18,7 +18,8 @@ BEGIN_NAMESPACE_YM_IGF
 /// @class XorFunc XorFunc.h "XorFunc.h"
 /// @brief XOR でまとめた入力関数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class XorFunc
+class XorFunc :
+  public InputFunc
 {
 public:
 
