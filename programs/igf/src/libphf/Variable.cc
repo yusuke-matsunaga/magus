@@ -38,6 +38,13 @@ Variable::~Variable()
 {
 }
 
+// @brief 変数番号のリストを得る．
+const vector<ymuint>&
+Variable::vid_list() const
+{
+  return mVidList;
+}
+
 // @brief ベクタを分類する．
 // @param[in] vect 対象のベクタ
 ymuint
