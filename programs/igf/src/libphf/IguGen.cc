@@ -54,7 +54,6 @@ END_NONAMESPACE
 IguGen::IguGen()
 {
   mNoChangeLimit = 0;
-  mBranchLimit = 0;
   mOrderingMode = 0;
   mTimeLimit = 0;
   mDebug = 0;
@@ -176,15 +175,6 @@ void
 IguGen::set_recur_limit(ymuint limit)
 {
   mNoChangeLimit = limit;
-}
-
-// @brief 分岐制限を設定する．
-// @param[in] limit 分岐制限
-// @note limit = 0 の場合には制限なし
-void
-IguGen::set_branch_limit(ymuint limit)
-{
-  mBranchLimit = limit;
 }
 
 // @brief 時間制限を設定する．
@@ -317,6 +307,9 @@ IguGen::solve_recur(const VectSetList& vector_list,
     }
   }
 
+  ymuint slack = mBestSoFar - mSelectedVariables.size();
+  assert_cond( slack > 1, __FILE__, __LINE__);
+
   // ambiguity measure の昇順に並び替える．
   vector<pair<ymuint, const Variable*> > tmp_list;
   for (vector<const Variable*>::const_iterator p = var_begin;
@@ -326,6 +319,7 @@ IguGen::solve_recur(const VectSetList& vector_list,
     ymuint am = 0;
     ymuint am2 = 0;
     ymuint am3 = 0;
+    ymuint am4 = 0;
     bool split = false;
     for (ymuint set_id = 0; set_id < set_num; ++ set_id) {
       ymuint m = vector_list.set_size(set_id);
@@ -339,6 +333,12 @@ IguGen::solve_recur(const VectSetList& vector_list,
 	else {
 	  ++ n1;
 	}
+      }
+      if ( n0 == 0 ) {
+	++ am4;
+      }
+      if ( n1 == 1 ) {
+	++ am4;
       }
       if ( n0 > 0 && n1 > 0 ) {
 	split = true;
@@ -370,7 +370,7 @@ IguGen::solve_recur(const VectSetList& vector_list,
       continue;
     }
 
-    ymuint lb = lower_bound(max_size) + mSelectedVariables.size();
+    ymuint lb = lower_bound(max_size) + mSelectedVariables.size() + 1;
     if ( lb >= mBestSoFar ) {
       // 下界が現時点の最適解を下回らないので枝刈り
       continue;
@@ -399,6 +399,10 @@ IguGen::solve_recur(const VectSetList& vector_list,
       val = am3;
       break;
 
+    case 4:
+      val = am4 * 10000 + am;
+      break;
+
     default:
       val = am;
       break;
@@ -406,6 +410,11 @@ IguGen::solve_recur(const VectSetList& vector_list,
 
     tmp_list.push_back(make_pair(val, var));
   }
+  if ( tmp_list.empty() ) {
+    // 使える変数が残っていなかった．
+    return;
+  }
+
   sort(tmp_list.begin(), tmp_list.end(), Lt());
 
   ymuint nv2 = tmp_list.size();
@@ -419,11 +428,6 @@ IguGen::solve_recur(const VectSetList& vector_list,
   for (vector<const Variable*>::const_iterator p = new_variables.begin();
        p != new_variables.end(); ++ p, ++ bid) {
     const Variable* var = *p;
-    if ( mBranchLimit > 0 &&
-	 bid >= mBranchLimit &&
-	 tmp_list[mBranchLimit - 1].first < tmp_list[bid].first ) {
-      break;
-    }
 
     if ( mDebug > 0 ) {
       cout << "Choose Variable#" << (mSelectedVariables.size() + 1)
@@ -455,13 +459,6 @@ IguGen::solve_recur(const VectSetList& vector_list,
 	}
       }
       if ( n0 > mMulti ) {
-	ymuint lb = lower_bound(n0) + mSelectedVariables.size();
-	if ( lb >= mBestSoFar ) {
-	  // n0 から計算される下界が mBestSoFar を越えないことが分かった．
-	  bounded = true;
-	  break;
-	}
-
 	bool first = true;
 	for (ymuint k = 0; k < m; ++ k) {
 	  const RegVect* vect = vector_list.set_elem(set_id, k);
@@ -475,13 +472,6 @@ IguGen::solve_recur(const VectSetList& vector_list,
 	}
       }
       if ( n1 > mMulti ) {
-	ymuint lb = lower_bound(n1) + mSelectedVariables.size();
-	if ( lb >= mBestSoFar ) {
-	  // n1 から計算される下界が mBestSoFar を越えないことが分かった．
-	  bounded = true;
-	  break;
-	}
-
 	bool first = true;
 	for (ymuint k = 0; k < m; ++ k) {
 	  const RegVect* vect = vector_list.set_elem(set_id, k);
@@ -494,9 +484,6 @@ IguGen::solve_recur(const VectSetList& vector_list,
 	  }
 	}
       }
-    }
-    if ( bounded ) {
-      continue;
     }
 
     if ( new_vector_list.set_num() == 0 ) {
@@ -511,14 +498,18 @@ IguGen::solve_recur(const VectSetList& vector_list,
 	if ( mDebug > 0 ) {
 	  cerr << "best_so_far => " << mBestSoFar << endl;
 	}
+	// この再帰レベルでは mBestSoFar が更新される可能性はない．
+	break;
       }
       continue;
     }
 
-    mSelectedVariables.push_back(var);
-    ++ mNoChangeCount;
-    solve_recur(new_vector_list, p + 1, new_variables.end());
-    mSelectedVariables.pop_back();
+    if ( mBestSoFar > mSelectedVariables.size() + 2 ) {
+      mSelectedVariables.push_back(var);
+      ++ mNoChangeCount;
+      solve_recur(new_vector_list, p + 1, new_variables.end());
+      mSelectedVariables.pop_back();
+    }
 
     if ( timeout ) {
       break;

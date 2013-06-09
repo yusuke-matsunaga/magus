@@ -35,9 +35,6 @@ igf(int argc,
   // recur-limit オプション
   PoptUint popt_rlimit("recur-limit", 'r',
 		       "specify recursive call limit", "<INT>");
-  // branch-limit オプション
-  PoptUint popt_blimit("branch-limit", 'b',
-		       "specify branch limit", "<INT>");
   // ordering-mode オプション
   PoptUint popt_omode("ordering-mode", 'o',
 		      "set ordering mode", "<INT>");
@@ -51,7 +48,6 @@ igf(int argc,
   app.add_option(&popt_multi);
   app.add_option(&popt_xor);
   app.add_option(&popt_rlimit);
-  app.add_option(&popt_blimit);
   app.add_option(&popt_omode);
   app.add_option(&popt_tlimit);
   app.add_option(&popt_debug);
@@ -67,7 +63,6 @@ igf(int argc,
   ymuint32 multi = 1;
   ymuint32 comp = 1;
   ymuint32 rlimit = 0;
-  ymuint32 blimit = 0;
   ymuint32 omode = 0;
   ymuint32 tlimit = 0;
   ymuint32 debug = 0;
@@ -80,9 +75,6 @@ igf(int argc,
   }
   if ( popt_rlimit.is_specified() ) {
     rlimit = popt_rlimit.val();
-  }
-  if ( popt_blimit.is_specified() ) {
-    blimit = popt_blimit.val();
   }
   if ( popt_omode.is_specified() ) {
     omode = popt_omode.val();
@@ -120,9 +112,6 @@ igf(int argc,
 
   if ( rlimit > 0 ) {
     igu_gen.set_recur_limit(rlimit);
-  }
-  if ( blimit > 0 ) {
-    igu_gen.set_branch_limit(blimit);
   }
   if ( omode > 0 ) {
     igu_gen.set_ordering_mode(omode);
@@ -304,7 +293,7 @@ igf(int argc,
   RandGen rg;
   ymuint min_size = 0;
   vector<ymuint> p_array(multi);
-  for (ymuint l = 0; l < 100; ++ l) {
+  for (ymuint l = 0; l < 1; ++ l) {
     ymuint q = rvmgr.index_size();
     vector<const RegVect*> lut_array1(np_exp * multi, NULL);
     for (ymuint j = 0; j < np_exp; ++ j) {
@@ -343,9 +332,6 @@ igf(int argc,
       else {
 	IguGen igu_gen1;
 
-	if ( blimit > 0 ) {
-	  igu_gen1.set_branch_limit(blimit);
-	}
 	if ( omode > 0 ) {
 	  igu_gen1.set_ordering_mode(omode);
 	}

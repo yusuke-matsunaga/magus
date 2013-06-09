@@ -53,12 +53,6 @@ public:
   void
   set_recur_limit(ymuint limit);
 
-  /// @brief 分岐制限を設定する．
-  /// @param[in] limit 分岐制限
-  /// @note limit = 0 の場合には制限なし
-  void
-  set_branch_limit(ymuint limit);
-
   /// @brief 時間制限を設定する．
   /// @param[in] limit_min 制限の分の部分
   /// @param[in] limit_sec 制限の秒の部分
@@ -129,9 +123,6 @@ private:
 
   // 現時点で選ばれている変数のリスト
   vector<const Variable*> mSelectedVariables;
-
-  // いくつの分岐を試すかを制御するパラメータ
-  ymuint32 mBranchLimit;
 
   // 順序づけのヒューリスティック
   ymuint32 mOrderingMode;
