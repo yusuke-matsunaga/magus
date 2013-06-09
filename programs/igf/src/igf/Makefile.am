@@ -17,6 +17,7 @@ bin_PROGRAMS = \
 	igf2 \
 	var_analyzer \
 	phf \
+	phf_fixed \
 	phf2 \
 	phf3
 
@@ -57,6 +58,16 @@ phf_LDADD = \
 	../libphf/libphf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	@POPT_LIBS@
+
+phf_fixed_SOURCES = \
+	phf_fixed.cc
+
+phf_fixed_LDADD = \
+	../libphf/libphf.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	-lrt \
 	@POPT_LIBS@
 
 phf2_SOURCES = \
