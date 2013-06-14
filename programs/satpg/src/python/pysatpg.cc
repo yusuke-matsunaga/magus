@@ -3,7 +3,7 @@
 /// @brief pysatpg のメイン関数
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -45,6 +45,9 @@ TestVectorObject_init(PyObject* module);
 void
 TvMgrObject_init(PyObject* module);
 
+void
+AtpgMgrObject_init(PyObject* module);
+
 END_NAMESPACE_YM_SATPG
 
 
@@ -79,6 +82,7 @@ satpg_init()
 
   TvMgrObject_init(m);
 
+  AtpgMgrObject_init(m);
 }
 
 

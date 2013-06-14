@@ -228,6 +228,34 @@ PyTvMgr_AsTvMgrPtr(PyObject* py_obj);
 
 
 //////////////////////////////////////////////////////////////////////
+// PyAtpgMgr: ATPG 全体を管理するクラス
+//////////////////////////////////////////////////////////////////////
+
+/// @brief AtpgMgr を表すタイプオブジェクト
+extern
+PyTypeObject PyAtpgMgr_Type;
+
+/// @brief PyAtpgMgr の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyAtpgMgr_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyAtpgMgr_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyAtpgMgr_Type;
+}
+
+/// @brief PyObject から AtpgMgr へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return AtpgMgr へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+AtpgMgr*
+PyAtpgMgr_AsAtpgMgrPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
 // 引数のパース用便利関数
 //////////////////////////////////////////////////////////////////////
 
