@@ -74,7 +74,7 @@ AtpgMgr_read_blif(AtpgMgrObject* self,
 		  PyObject* args)
 {
   char* str = NULL;
-  if ( !PyArg_ParseTuple(args, "%s", &str) ) {
+  if ( !PyArg_ParseTuple(args, "s", &str) ) {
     return NULL;
   }
 
@@ -117,15 +117,17 @@ PyObject*
 AtpgMgr_rtpg(AtpgMgrObject* self,
 	     PyObject* args)
 {
-  int min_f;
-  int max_i;
-  int max_pat;
+  int max_pat = 100000;
+  int max_i   = 4;
+  int min_f   = 0;
   if ( !PyArg_ParseTuple(args, "iii", &min_f, &max_i, &max_pat) ) {
     return NULL;
   }
 
   RtpgStats stats;
   self->mPtr->rtpg(min_f, max_i, max_pat, stats);
+
+  // TODO: stats の内容を PyObject 化して返り値とする．
 
   Py_INCREF(Py_None);
   return Py_None;
