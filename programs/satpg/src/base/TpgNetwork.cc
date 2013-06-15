@@ -25,13 +25,14 @@ BEGIN_NONAMESPACE
 // TpgPrimitive 関係のコードのデバッグ用
 const bool FORCE_TO_CPLX_LOGIC = false;
 
-inline
-TpgNode**
-alloc_nodearray(Alloc& alloc,
-		ymuint n)
+// 指定された型の配列を確保するテンプレート関数
+template <typename T>
+T*
+alloc_array(Alloc& alloc,
+	    ymuint n)
 {
-  void* p = alloc.get_memory(sizeof(TpgNode*) * n);
-  return new (p) TpgNode*[n];
+  void* p = alloc.get_memory(sizeof(T) * n);
+  return new (p) T[n];
 }
 
 
@@ -160,26 +161,20 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   mOutputNum = tgnetwork.output_num1();
   mFFNum = tgnetwork.ff_num();
 
-  {
-    void* p = mAlloc.get_memory(sizeof(TpgNode) * mNodeNum);
-    mNodeArray = new (p) TpgNode[mNodeNum];
-  }
+  mNodeArray = alloc_array<TpgNode>(mAlloc, mNodeNum);
 
-  mNodeMap = alloc_nodearray(mAlloc, mNodeNum);
-  mInputArray = alloc_nodearray(mAlloc, input_num2());
-  mOutputArray = alloc_nodearray(mAlloc, output_num2());
-  mOutputArray2 = alloc_nodearray(mAlloc, output_num2());
+  mNodeMap = alloc_array<TpgNode*>(mAlloc, mNodeNum);
+  mInputArray = alloc_array<TpgNode*>(mAlloc, input_num2());
+  mOutputArray = alloc_array<TpgNode*>(mAlloc, output_num2());
+  mOutputArray2 = alloc_array<TpgNode*>(mAlloc, output_num2());
 
   mActNodeNum = 0;
-  mActNodeArray = alloc_nodearray(mAlloc, mNodeNum);
+  mActNodeArray = alloc_array<TpgNode*>(mAlloc, mNodeNum);
 
   mTmpNodeNum = 0;
-  mTmpNodeList = alloc_nodearray(mAlloc, mNodeNum);
+  mTmpNodeList = alloc_array<TpgNode*>(mAlloc, mNodeNum);
 
-  {
-    void* p = mAlloc.get_memory(sizeof(bool) * mNodeNum);
-    mTmpMark = new (p) bool[mNodeNum];
-  }
+  mTmpMark = alloc_array<bool>(mAlloc, mNodeNum);
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     mTmpMark[i] = false;
   }
@@ -213,8 +208,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
       // プリミティブ数を数え，必要なメモリ領域を確保する．
       ymuint np = primitive_count(expr);
       node->mPrimitiveNum = np;
-      void* p = mAlloc.get_memory(sizeof(TpgPrimitive) * np);
-      node->mPrimitiveList = new (p) TpgPrimitive[np];
+      node->mPrimitiveList = alloc_array<TpgPrimitive>(mAlloc, np);
 
       // expr の内容を表すプリミティブの木を作る．
       // 結果は node->mPrimitiveList に直接書き込まれる．
@@ -233,8 +227,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
       // プリミティブ数はファンイン数＋1
       ymuint np = ni + 1;
       node->mPrimitiveNum = np;
-      void* p = mAlloc.get_memory(sizeof(TpgPrimitive) * np);
-      node->mPrimitiveList = new (p) TpgPrimitive[np];
+      node->mPrimitiveList = alloc_array<TpgPrimitive>(mAlloc, np);
 
       // 入力プリミティブの設定
       for (ymuint i = 0; i < ni; ++ i) {
@@ -455,8 +448,7 @@ TpgNetwork::make_node(ymuint id,
   }
   if ( src_name != NULL ) {
     ymuint len = strlen(src_name) + 1;
-    void* p = mAlloc.get_memory(sizeof(char) * len);
-    char* dst_name = new (p) char[len];
+    char* dst_name = alloc_array<char>(mAlloc, len);
     for (ymuint i = 0; i < len; ++ i) {
       dst_name[i] = src_name[i];
     }
@@ -508,10 +500,8 @@ TpgNetwork::make_node(ymuint id,
   ymuint ni = tgnode->fanin_num();
   node->mFaninNum = ni;
   if ( ni > 0 ) {
-    node->mFanins = alloc_nodearray(mAlloc, ni);
-
-    void* p = mAlloc.get_memory(sizeof(TpgFault*) * ni * 2);
-    node->mInputFault = new (p) TpgFault*[ni * 2];
+    node->mFanins = alloc_array<TpgNode*>(mAlloc, ni);
+    node->mInputFault = alloc_array<TpgFault*>(mAlloc, ni * 2);
   }
   else {
     node->mFanins = NULL;
@@ -526,9 +516,9 @@ TpgNetwork::make_node(ymuint id,
 
   ymuint no = tgnode->fanout_num();
   node->mFanoutNum = no;
-  node->mFanouts = alloc_nodearray(mAlloc, no);
+  node->mFanouts = alloc_array<TpgNode*>(mAlloc, no);
   node->mActFanoutNum = 0;
-  node->mActFanouts = alloc_nodearray(mAlloc, no);
+  node->mActFanouts = alloc_array<TpgNode*>(mAlloc, no);
 
   for (ymuint i = 0; i < ni; ++ i) {
     node->mInputFault[i * 2 + 0] = NULL;
@@ -638,8 +628,7 @@ TpgNetwork::set_logic_primitive(TpgPrimitive* prim,
 {
   prim->mTypeId = 2U | (static_cast<ymuint32>(gate_type) << 2);
   prim->mFaninNum = ni;
-  void* p = mAlloc.get_memory(sizeof(TpgPrimitive*) * ni);
-  prim->mFanins = new (p) TpgPrimitive*[ni];
+  prim->mFanins = alloc_array<TpgPrimitive*>(mAlloc, ni);
 }
 
 

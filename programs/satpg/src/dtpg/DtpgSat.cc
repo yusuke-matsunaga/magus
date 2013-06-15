@@ -80,6 +80,8 @@ DtpgSat::run(tDtpgMode mode,
 
   switch ( po_mode ) {
   case kDtpgPoNone:
+    // PO 分割を行わないモード
+
     mNetwork->activate_all();
 
     switch ( mode ) {
@@ -110,7 +112,7 @@ DtpgSat::run(tDtpgMode mode,
     break;
 
   case kDtpgPoInc:
-    {
+    { // 正順で PO を選び分割するモード
       ymuint no = mNetwork->output_num2();
       for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
 	mNetwork->activate_po(po_pos);
@@ -142,7 +144,7 @@ DtpgSat::run(tDtpgMode mode,
     break;
 
   case kDtpgPoDec:
-    {
+    { // 逆順で PO を選び分割するモード
       ymuint no = mNetwork->output_num2();
       for (ymuint i = 0; i < no; ++ i) {
 	ymuint po_pos = no - i - 1;

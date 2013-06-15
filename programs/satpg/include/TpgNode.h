@@ -25,7 +25,7 @@ class TpgNode
 {
   friend class TpgNetwork;
 
-private:
+public:
 
   /// @brief コンストラクタ
   TpgNode();
