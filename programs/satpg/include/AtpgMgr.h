@@ -11,7 +11,7 @@
 
 
 #include "satpg_nsdef.h"
-
+#include "DtpgMode.h"
 #include "ym_cell/cell_nsdef.h"
 #include "ym_utils/Binder.h"
 #include "ym_utils/MStopWatch.h"
@@ -149,7 +149,7 @@ public:
   /// @param[in] uop_list UntestOp のリスト
   /// @param[in] stats 結果を格納する構造体
   void
-  dtpg(tDtpgMode mode,
+  dtpg(DtpgMode mode,
        tDtpgPoMode po_mode,
        BackTracer& bt,
        const vector<DetectOp*>& dop_list,

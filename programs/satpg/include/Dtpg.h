@@ -11,6 +11,7 @@
 
 
 #include "satpg_nsdef.h"
+#include "DtpgMode.h"
 #include "ym_networks/tgnet.h"
 
 
@@ -55,7 +56,7 @@ public:
   /// @param[in] stats 結果を格納する構造体
   virtual
   void
-  run(tDtpgMode mode,
+  run(DtpgMode mode,
       tDtpgPoMode po_mode,
       BackTracer& bt,
       const vector<DetectOp*>& dop_list,

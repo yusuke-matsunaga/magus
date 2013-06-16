@@ -13,6 +13,10 @@
 #include "TpgFault.h"
 #include "DetectOp.h"
 #include "UntestOp.h"
+#include "DtpgNgMgr.h"
+#include "DtpgNodeGroup.h"
+#include "DtpgNgEdge.h"
+#include "ym_utils/HeapTree.h"
 
 
 #define VERIFY_MAIMP 0
@@ -66,7 +70,7 @@ DtpgSat::set_network(TpgNetwork& tgnetwork)
 // @param[in] uop_list UntestOp のリスト
 // @param[in] stats 結果を格納する構造体
 void
-DtpgSat::run(tDtpgMode mode,
+DtpgSat::run(DtpgMode mode,
 	     tDtpgPoMode po_mode,
 	     BackTracer& bt,
 	     const vector<DetectOp*>& dop_list,
@@ -84,31 +88,8 @@ DtpgSat::run(tDtpgMode mode,
 
     mNetwork->activate_all();
 
-    switch ( mode ) {
-    case kDtpgSingle:
-      single_mode(bt);
-      break;
+    dtpg1(mode, bt);
 
-    case kDtpgDual:
-      dual_mode(bt);
-      break;
-
-    case kDtpgNode:
-      node_mode(bt);
-      break;
-
-    case kDtpgFFR:
-      ffr_mode(bt);
-      break;
-
-    case kDtpgMFFC:
-      mffc_mode(bt);
-      break;
-
-    case kDtpgAll:
-      all_mode(bt);
-      break;
-    }
     break;
 
   case kDtpgPoInc:
@@ -117,28 +98,7 @@ DtpgSat::run(tDtpgMode mode,
       for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
 	mNetwork->activate_po(po_pos);
 
-	switch ( mode ) {
-	case kDtpgSingle:
-	  single_mode(bt);
-	  break;
-
-	case kDtpgDual:
-	  dual_mode(bt);
-	  break;
-
-	case kDtpgNode:
-	  node_mode(bt);
-	  break;
-
-	case kDtpgFFR:
-	  ffr_mode(bt);
-	  break;
-
-	case kDtpgMFFC:
-	case kDtpgAll:
-	  all_mode(bt);
-	  break;
-	}
+	dtpg1(mode, bt);
       }
     }
     break;
@@ -150,28 +110,7 @@ DtpgSat::run(tDtpgMode mode,
 	ymuint po_pos = no - i - 1;
 	mNetwork->activate_po(po_pos);
 
-	switch ( mode ) {
-	case kDtpgSingle:
-	  single_mode(bt);
-	  break;
-
-	case kDtpgDual:
-	  dual_mode(bt);
-	  break;
-
-	case kDtpgNode:
-	  node_mode(bt);
-	  break;
-
-	case kDtpgFFR:
-	  ffr_mode(bt);
-	  break;
-
-	case kDtpgMFFC:
-	case kDtpgAll:
-	  all_mode(bt);
-	  break;
-	}
+	dtpg1(mode, bt);
       }
     }
     break;
@@ -206,6 +145,44 @@ DtpgSat::set_untestable(TpgFault* f)
   }
 }
 
+// @brief activate された部分回路に大してテスト生成を行う．
+// @param[in] mode メインモード
+// @param[in] bt バックトレーサー
+void
+DtpgSat::dtpg1(DtpgMode mode,
+	       BackTracer& bt)
+{
+  switch ( mode.mode() ) {
+  case kDtpgSingle:
+    single_mode(bt);
+    break;
+
+  case kDtpgDual:
+    dual_mode(bt);
+    break;
+
+  case kDtpgNode:
+    node_mode(bt);
+    break;
+
+  case kDtpgFFR:
+    ffr_mode(bt);
+    break;
+
+  case kDtpgFFR2:
+    ffr2_mode(mode.ffr2_limit(), bt);
+    break;
+
+  case kDtpgMFFC:
+    mffc_mode(bt);
+    break;
+
+  case kDtpgAll:
+    all_mode(bt);
+    break;
+  }
+}
+
 // @brief single モードでテスト生成を行なう．
 void
 DtpgSat::single_mode(BackTracer& bt)
@@ -213,6 +190,9 @@ DtpgSat::single_mode(BackTracer& bt)
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
     TpgNode* node = mNetwork->active_node(i);
+    if ( node->is_output() ) {
+      continue;
+    }
 
     // 出力の故障
     TpgFault* f0 = node->output_fault(0);
@@ -266,29 +246,12 @@ DtpgSat::node_mode(BackTracer& bt)
 {
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
-    mFaultList.clear();
-
     TpgNode* node = mNetwork->active_node(i);
     if ( node->is_output() ) {
       continue;
     }
 
-    // 入力の故障
-    ymuint ni = node->fanin_num();
-    for (ymuint j = 0; j < ni; ++ j) {
-      TpgFault* f0 = node->input_fault(0, j);
-      add_fault(f0);
-
-      TpgFault* f1 = node->input_fault(1, j);
-      add_fault(f1);
-    }
-
-    // 出力の故障
-    TpgFault* f0 = node->output_fault(0);
-    add_fault(f0);
-
-    TpgFault* f1 = node->output_fault(1);
-    add_fault(f1);
+    add_node_faults(node);
 
     do_dtpg(bt);
   }
@@ -301,8 +264,9 @@ DtpgSat::ffr_mode(BackTracer& bt)
   ymuint n = mNetwork->active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
     TpgNode* node = mNetwork->active_node(i);
-    if ( node->is_output() || node->active_fanout_num() > 1 ) {
-      mFaultList.clear();
+    ymuint nfo = node->active_fanout_num();
+    if ( nfo > 1 || (nfo == 1 && node->active_fanout(0)->is_output()) ) {
+      clear_faults();
 
       dfs_ffr(node);
 
@@ -310,6 +274,110 @@ DtpgSat::ffr_mode(BackTracer& bt)
     }
   }
 }
+
+BEGIN_NONAMESPACE
+
+void
+get_ffr(TpgNode* node,
+	vector<TpgNode*>& node_list)
+{
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    TpgNode* inode = node->fanin(i);
+    if ( inode->active_fanout_num() == 1 ) {
+      get_ffr(inode, node_list);
+    }
+  }
+
+  node_list.push_back(node);
+}
+
+struct NgLt
+{
+  bool
+  operator()(DtpgNgEdge* left,
+	     DtpgNgEdge* right)
+  {
+    return left->size() < right->size();
+  }
+
+};
+
+END_NONAMESPACE
+
+// @brief ffr2 モードでテスト生成を行なう．
+// @param[in] size_limit サイズの上限
+// @param[in] bt バックトレーサー
+void
+DtpgSat::ffr2_mode(ymuint size_limit,
+		   BackTracer& bt)
+{
+  ymuint n = mNetwork->active_node_num();
+
+  // FFR ごとに DtpgNodeGroup を作る．
+  DtpgNgMgr mgr;
+  vector<DtpgNodeGroup*> rep_map(n, NULL);
+  for (ymuint i = 0; i < n; ++ i) {
+    TpgNode* node = mNetwork->active_node(i);
+    if ( node->is_output() ) {
+      continue;
+    }
+    ymuint nfo = node->active_fanout_num();
+    if ( nfo > 1 || (nfo == 1 && node->active_fanout(0)->is_output()) ) {
+      vector<TpgNode*> node_list;
+      get_ffr(node, node_list);
+
+      DtpgNodeGroup* ng = mgr.add_node_group(node_list);
+
+      for (vector<TpgNode*>::iterator p = node_list.begin();
+	   p != node_list.end(); ++ p) {
+	TpgNode* node1 = *p;
+	rep_map[node1->id()] = ng;
+      }
+    }
+  }
+
+  // DtpgNodeGroup 間の枝を作る．
+  for (ymuint i = 0; i < n; ++ i) {
+    TpgNode* node = mNetwork->active_node(i);
+    if ( node->is_output() ) {
+      continue;
+    }
+    DtpgNodeGroup* dst_ng = rep_map[node->id()];
+    ymuint dst_size = dst_ng->size();
+    ymuint nfi = node->fanin_num();
+    for (ymuint i = 0; i < nfi; ++ i) {
+      TpgNode* inode = node->fanin(i);
+      DtpgNodeGroup* src_ng = rep_map[inode->id()];
+      if ( dst_ng == src_ng ) {
+	continue;
+      }
+      ymuint size = dst_size + src_ng->size();
+      if ( size <= size_limit ) {
+	mgr.add_edge(src_ng, dst_ng);
+      }
+    }
+  }
+
+  mgr.merge(size_limit);
+
+#if 0
+  const vector<DtpgNodeGroup*>& ng_list = mgr.node_list();
+  for (vector<DtpgNodeGroup*>::const_iterator p = ng_list.begin();
+       p != ng_list.end(); ++ p) {
+    DtpgNodeGroup* ng = *p;
+    const vector<TpgNode*>& node_list = ng->node_list();
+    clear_faults();
+    for (vector<TpgNode*>::const_iterator p = node_list.begin();
+	 p != node_list.end(); ++ p) {
+      TpgNode* node = *p;
+      add_node_faults(node);
+    }
+    do_dtpg(bt);
+  }
+#endif
+}
+
 
 // @brief mffc モードでテスト生成を行なう．
 void
@@ -319,7 +387,7 @@ DtpgSat::mffc_mode(BackTracer& bt)
   for (ymuint i = 0; i < n; ++ i) {
     TpgNode* node = mNetwork->active_node(i);
     if ( node->imm_dom() == NULL ) {
-      mFaultList.clear();
+      clear_faults();
 
       vector<bool> mark(mNetwork->node_num(), false);
       dfs_mffc(node, mark);
@@ -333,7 +401,7 @@ DtpgSat::mffc_mode(BackTracer& bt)
 void
 DtpgSat::all_mode(BackTracer& bt)
 {
-  mFaultList.clear();
+  clear_faults();
 
   ymuint n = mNetwork->active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
@@ -352,7 +420,7 @@ void
 DtpgSat::dtpg_single(TpgFault* f,
 		     BackTracer& bt)
 {
-  mFaultList.clear();
+  clear_faults();
 
   add_fault(f);
 
@@ -367,7 +435,7 @@ DtpgSat::dtpg_dual(TpgFault* f0,
 		   TpgFault* f1,
 		   BackTracer& bt)
 {
-  mFaultList.clear();
+  clear_faults();
 
   add_fault(f0);
   add_fault(f1);
@@ -386,9 +454,7 @@ DtpgSat::dfs_ffr(TpgNode* node)
     }
   }
 
-  if ( !node->is_output() ) {
-    add_node_faults(node);
-  }
+  add_node_faults(node);
 }
 
 void

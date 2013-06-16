@@ -268,7 +268,7 @@ AtpgMgr::set_dtpg_timer(bool enable)
 
 // @brief テストパタン生成を行なう．
 void
-AtpgMgr::dtpg(tDtpgMode mode,
+AtpgMgr::dtpg(DtpgMode mode,
 	      tDtpgPoMode po_mode,
 	      BackTracer& bt,
 	      const vector<DetectOp*>& dop_list,

@@ -61,7 +61,7 @@ public:
   /// @param[in] stats 結果を格納する構造体
   virtual
   void
-  run(tDtpgMode mode,
+  run(DtpgMode mode,
       tDtpgPoMode po_mode,
       BackTracer& bt,
       const vector<DetectOp*>& dop_list,
@@ -97,6 +97,13 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief activate された部分回路に大してテスト生成を行う．
+  /// @param[in] mode メインモード
+  /// @param[in] bt バックトレーサー
+  void
+  dtpg1(DtpgMode mode,
+	BackTracer& bt);
+
   /// @brief single モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
   void
@@ -116,6 +123,13 @@ private:
   /// @param[in] bt バックトレーサー
   void
   ffr_mode(BackTracer& bt);
+
+  /// @brief ffr2 モードでテスト生成を行なう．
+  /// @param[in] size_limit サイズの上限
+  /// @param[in] bt バックトレーサー
+  void
+  ffr2_mode(ymuint size_limit,
+	    BackTracer& bt);
 
   /// @brief mffc モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
@@ -172,6 +186,10 @@ private:
   dfs_mffc(TpgNode* node,
 	   vector<bool>& mark);
 
+  /// @brief 故障リストをクリアする．
+  void
+  clear_faults();
+
   /// @brief ノードの故障を追加する．
   void
   add_node_faults(TpgNode* node);
@@ -221,6 +239,14 @@ void
 DtpgSat::timer_enable(bool enable)
 {
   mSatEngine->timer_enable(enable);
+}
+
+// @brief 故障リストをクリアする．
+inline
+void
+DtpgSat::clear_faults()
+{
+  mFaultList.clear();
 }
 
 // @brief 故障を追加する．

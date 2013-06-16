@@ -75,6 +75,8 @@ enum tDtpgMode {
   kDtpgNode,
   /// @brief ffr モード
   kDtpgFFR,
+  /// @brief ffr2 モード
+  kDtpgFFR2,
   /// @brief mffc モード
   kDtpgMFFC,
   /// @brief all モード

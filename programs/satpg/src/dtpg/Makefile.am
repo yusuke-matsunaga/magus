@@ -23,6 +23,11 @@ libatpg_dtpg_la_CPPFLAGS = \
 libatpg_dtpg_la_SOURCES = \
 	DtpgSat.h \
 	DtpgSat.cc \
+	DtpgNgMgr.h \
+	DtpgNgMgr.cc \
+	DtpgNodeGroup.h \
+	DtpgNgEdge.h \
+	DtpgNodeGroup.cc \
 	SatEngine.h
 
 libatpg_dtpg_la_LDFLAGS =

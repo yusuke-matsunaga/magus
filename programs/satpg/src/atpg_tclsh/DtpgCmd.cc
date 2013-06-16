@@ -45,6 +45,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			  "node mode");
   mPoptFFR = new TclPopt(this, "ffr",
 			  "FFR mode");
+  mPoptFFR2 = new TclPoptInt(this, "ffr2",
+			     "FFR2 mode");
   mPoptMFFC = new TclPopt(this, "mffc",
 			  "MFFC mode");
   mPoptAll = new TclPopt(this, "all",
@@ -106,6 +108,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   bool print_stats = mPoptPrintStats->is_specified();
 
   tDtpgMode mode = kDtpgSingle;
+  ymuint ffr2_limit = 0;
   if ( mPoptSingle->is_specified() ) {
     mode = kDtpgSingle;
   }
@@ -117,6 +120,10 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
   else if ( mPoptFFR->is_specified() ) {
     mode = kDtpgFFR;
+  }
+  else if ( mPoptFFR2->is_specified() ) {
+    mode = kDtpgFFR2;
+    ffr2_limit = mPoptFFR2->val();
   }
   else if ( mPoptMFFC->is_specified() ) {
     mode = kDtpgMFFC;
@@ -181,7 +188,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   DtpgStats stats;
 
-  mgr().dtpg(mode, po_mode, *bt, dop_list, uop_list, stats);
+  mgr().dtpg(DtpgMode(mode, ffr2_limit), po_mode, *bt, dop_list, uop_list, stats);
 
   for (vector<DetectOp*>::iterator p = dop_list.begin();
        p != dop_list.end(); ++ p) {
