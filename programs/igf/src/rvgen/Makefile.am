@@ -23,7 +23,8 @@ bin_PROGRAMS = \
 	rvgen \
 	tseconv \
 	k_of_n_gen \
-	dist_sim
+	dist_sim \
+	phf_sim
 
 rvgen_SOURCES = \
 	rvgen.cc
@@ -55,6 +56,14 @@ dist_sim_SOURCES = \
 	dist_sim.cc
 
 dist_sim_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	@GMP_LIBS@ \
+	@POPT_LIBS@
+
+phf_sim_SOURCES = \
+	phf_sim.cc
+
+phf_sim_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	@GMP_LIBS@ \
 	@POPT_LIBS@
