@@ -11,9 +11,9 @@
 #include "ym_utils/PoptMainApp.h"
 #include "RvMgr.h"
 #include "RegVect.h"
-
-#include "VarFunc.h"
+#include "FuncVect.h"
 #include "PhfGen.h"
+#include "VarFunc.h"
 
 #include "Variable.h"
 #include "IguGen.h"
@@ -94,27 +94,34 @@ phf(int argc,
   RandGen rg;
   for (bool found = false; !found ; ++ p) {
     for (ymuint count = 0; count < count_limit; ++ count) {
+      const vector<const RegVect*>& vlist = rvmgr.vect_list();
+      ymuint nv = vlist.size();
+      ymuint exp_p = 1U << p;
       RandCombiGen rpg2(n, p);
-      vector<const InputFunc*> func_list(m);
+      vector<const FuncVect*> func_list(m);
       for (ymuint i = 0; i < m; ++ i) {
 	rpg2.generate(rg);
 	vector<ymuint> f1_vect(p);
 	for (ymuint k = 0; k < p; ++ k) {
 	  f1_vect[k] = rpg2.elem(k);
 	}
-	VarFunc* f = new VarFunc(f1_vect);
-	func_list[i] = f;
+	VarFunc f(f1_vect);
+
+	FuncVect* fv = new FuncVect(exp_p, nv);
+	func_list[i] = fv;
+	for (ymuint v = 0; v < nv; ++ v) {
+	  const RegVect* rv = vlist[v];
+	  fv->set_val(v, f.eval(rv));
+	}
       }
 
       PhfGen phfgen;
 
-      const vector<const RegVect*>& vlist = rvmgr.vect_list();
-      ymuint exp_p = 1U << p;
       vector<vector<ymuint32>* > g_list(m);
       for (ymuint i = 0; i < m; ++ i) {
 	g_list[i] = new vector<ymuint32>(exp_p, 0U);
       }
-      bool stat = phfgen.mapping(vlist, func_list, g_list);
+      bool stat = phfgen.mapping(func_list, g_list);
       if ( stat ) {
 	found = true;
 	cout << "p = " << p << endl;
@@ -124,14 +131,13 @@ phf(int argc,
 	if ( disp ) {
 	  ymuint nv = vlist.size();
 	  for (ymuint i = 0; i < nv; ++ i) {
-	    const RegVect* rv = vlist[i];
 	    cout << "#" << i << ": ";
 	    const char* comma = "";
 	    ymuint32 val = 0;
 	    for (ymuint j = 0; j < m; ++ j) {
-	      const InputFunc& f1 = *func_list[j];
+	      const FuncVect& f1 = *func_list[j];
 	      vector<ymuint32>& g1 = *g_list[j];
-	      ymuint32 v1 = f1.eval(rv);
+	      ymuint32 v1 = f1.val(i);
 	      cout << comma << setw(6) << v1 << " = " << g1[v1];
 	      val ^= g1[v1];
 	      comma = ", ";

@@ -10,7 +10,7 @@
 #include "PhfGen.h"
 #include "PhfNode.h"
 #include "PhfEdge.h"
-#include "InputFunc.h"
+#include "FuncVect.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -69,29 +69,29 @@ PhfGen::~PhfGen()
 }
 
 // @brief マッピングを求める．
+// @param[in] func_list 関数のリスト
+// @param[out] g_list マッピングのリスト
 bool
-PhfGen::mapping(const vector<const RegVect*>& vector_list,
-		const vector<const InputFunc*>& f_list,
+PhfGen::mapping(const vector<const FuncVect*>& func_list,
 		vector<vector<ymuint32>* >& g_list)
 {
   clear();
 
-  ymuint nv = vector_list.size();
-
-  ymuint nf = f_list.size();
+  ymuint nf = func_list.size();
+  assert_cond( nf > 1, __FILE__, __LINE__);
   assert_cond( g_list.size() == nf, __FILE__, __LINE__);
+
+  ymuint nv = func_list[0]->input_size();
 
   hash_map<ymuint32, PhfNode*>* v_hash_array = new hash_map<ymuint32, PhfNode*>[nf];
 
   for (ymuint v_pos = 0; v_pos < nv; ++ v_pos) {
-    const RegVect* rv = vector_list[v_pos];
-
     vector<PhfNode*> node_list(nf);
     for (ymuint f_pos = 0; f_pos < nf; ++ f_pos) {
-      const InputFunc& f1 = *f_list[f_pos];
+      const FuncVect& f1 = *func_list[f_pos];
       hash_map<ymuint32, PhfNode*>& v1_hash = v_hash_array[f_pos];
 
-      ymuint32 pat1 = f1.eval(rv);
+      ymuint32 pat1 = f1.val(v_pos);
       hash_map<ymuint32, PhfNode*>::iterator p1 = v1_hash.find(pat1);
       PhfNode* node1 = NULL;
       if ( p1 == v1_hash.end() ) {

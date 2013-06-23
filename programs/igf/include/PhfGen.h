@@ -14,7 +14,6 @@
 
 BEGIN_NAMESPACE_YM_IGF
 
-class InputFunc;
 class PhfNode;
 class PhfEdge;
 
@@ -39,9 +38,10 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief マッピングを求める．
+  /// @param[in] func_list 関数のリスト
+  /// @param[out] g_list マッピングのリスト
   bool
-  mapping(const vector<const RegVect*>& vector_list,
-	  const vector<const InputFunc*>& f_list,
+  mapping(const vector<const FuncVect*>& func_list,
 	  vector<vector<ymuint32>* >& g_list);
 
 

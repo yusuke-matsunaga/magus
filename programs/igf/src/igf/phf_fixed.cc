@@ -12,6 +12,7 @@
 #include "RvMgr.h"
 #include "RegVect.h"
 
+#include "FuncVect.h"
 #include "VarFunc.h"
 #include "XorFunc.h"
 #include "PhfGen.h"
@@ -125,7 +126,9 @@ phf(int argc,
   cout << "ns = " << ns << ", p = " << p << endl;
 
   for ( ; ; ++ p) {
-    vector<const InputFunc*> func_list(2);
+    const vector<const RegVect*>& vlist = rvmgr.vect_list();
+    ymuint exp_p = 1U << p;
+    vector<const FuncVect*> func_list(2);
     { // f1 と f2 を作る．
       vector<vector<ymuint32> > f1_vect(p);
       vector<vector<ymuint32> > f2_vect(p);
@@ -151,22 +154,31 @@ phf(int argc,
 	  f2_vect[k] = solution[k]->vid_list();
 	}
       }
-      InputFunc* f1 = new XorFunc(f1_vect);
-      func_list[0] = f1;
+      ymuint nv = vlist.size();
+      XorFunc f1(f1_vect);
+      FuncVect* fv1 = new FuncVect(exp_p, nv);
+      func_list[0] = fv1;
+      for (ymuint i = 0; i < nv; ++ i) {
+	const RegVect* rv = vlist[i];
+	fv1->set_val(i, f1.eval(rv));
+      }
 
-      InputFunc* f2 = new XorFunc(f2_vect);
-      func_list[1] = f2;
+      XorFunc f2(f2_vect);
+      FuncVect* fv2 = new FuncVect(exp_p, nv);
+      func_list[1] = fv2;
+      for (ymuint i = 0; i < nv; ++ i) {
+	const RegVect* rv = vlist[i];
+	fv2->set_val(i, f2.eval(rv));
+      }
     }
 
     PhfGen phfgen;
 
-    const vector<const RegVect*>& vlist = rvmgr.vect_list();
-    ymuint exp_p = 1U << p;
     vector<vector<ymuint32>* > g_list(2);
     for (ymuint i = 0; i < 2; ++ i) {
       g_list[i] = new vector<ymuint32>(exp_p, 0U);
     }
-    bool stat1 = phfgen.mapping(vlist, func_list, g_list);
+    bool stat1 = phfgen.mapping(func_list, g_list);
     if ( stat1 ) {
       cout << "p = " << p << endl;
       ymuint q = rvmgr.index_size();
@@ -175,14 +187,13 @@ phf(int argc,
       if ( disp ) {
 	ymuint nv = vlist.size();
 	for (ymuint i = 0; i < nv; ++ i) {
-	  const RegVect* rv = vlist[i];
 	  cout << "#" << i << ": ";
 	  const char* comma = "";
 	  ymuint32 val = 0;
 	  for (ymuint j = 0; j < 2; ++ j) {
-	    const InputFunc& f1 = *func_list[j];
+	    const FuncVect& f1 = *func_list[j];
 	    vector<ymuint32>& g1 = *g_list[j];
-	    ymuint32 v1 = f1.eval(rv);
+	    ymuint32 v1 = f1.val(i);
 	    cout << comma << setw(6) << v1 << " = " << g1[v1];
 	    val ^= g1[v1];
 	    comma = ", ";

@@ -234,6 +234,7 @@ phf_sim(int argc,
     }
   }
 
+#if 0
   ymuint c_ok = 0;
   ymuint c_simple = 0;
   ymuint c_cyclic = 0;
@@ -254,6 +255,7 @@ phf_sim(int argc,
        << " # of Success:    " << c_ok << endl
        << " # of Not Simple: " << c_simple << endl
        << " # of Cyclic:     " << c_cyclic << endl;
+#endif
 
   return 0;
 }

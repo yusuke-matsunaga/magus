@@ -17,6 +17,8 @@
 
 BEGIN_NAMESPACE_YM_IGF
 
+class IgVar;
+
 //////////////////////////////////////////////////////////////////////
 /// @class IguGen2 IguGen2.h "IguGen2.h"
 /// @brief IGU の入力を求めるクラス (BDDバージョン)

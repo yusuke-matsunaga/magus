@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM_IGF
 
+class VectSetList;
+
 //////////////////////////////////////////////////////////////////////
 /// @class IguGen IguGen.h "IguGen.h"
 /// @brief IGU の入力を求めるクラス

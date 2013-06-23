@@ -33,9 +33,10 @@ BEGIN_NAMESPACE_YM_IGF
 
 class RegVect;
 class RvMgr;
-class VectSetList;
+
 class Variable;
-class IgVar;
+
+class FuncVect;
 
 END_NAMESPACE_YM_IGF
 
