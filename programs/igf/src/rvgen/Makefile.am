@@ -64,6 +64,7 @@ phf_sim_SOURCES = \
 	phf_sim.cc
 
 phf_sim_LDADD = \
+	../libphf/libphf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	@GMP_LIBS@ \
 	@POPT_LIBS@

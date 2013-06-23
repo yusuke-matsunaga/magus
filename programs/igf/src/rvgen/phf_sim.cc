@@ -8,6 +8,9 @@
 
 
 #include "igf_nsdef.h"
+#include "FuncVect.h"
+#include "PhfGraph.h"
+#include "ym_utils/CombiGen.h"
 #include "ym_utils/RandGen.h"
 
 
@@ -15,178 +18,77 @@ BEGIN_NAMESPACE_YM_IGF
 
 BEGIN_NONAMESPACE
 
-class PhfEdge;
-
-struct PhfNode
+void
+set_random_func(FuncVect* fv,
+		RandGen& rg)
 {
-  ymuint mId;
+  ymuint n = fv->input_size();
+  ymuint k = fv->max_val();
+  for (ymuint i = 0; i < n; ++ i) {
+    ymuint val = rg.int32() % k;
+    fv->set_val(i, val);
+  }
+}
 
-  vector<PhfEdge*> mEdgeList;
-
-  bool mVisited;
-
-};
-
-struct PhfEdge
+ymuint
+phf_sim1(const vector<const FuncVect*>& func_list)
 {
-  // もとのデータ番号
-  ymuint mIndex;
+  PhfGraph pg(func_list);
 
-  // ノードのリスト
-  vector<PhfNode*> mNodeList;
+  ymuint ans = 0;
+  if ( !pg.simple_check() ) {
+    ans |= 1;
+  }
 
-};
+  vector<PhfEdge*> edge_list;
+  if ( !pg.acyclic_check(edge_list) ) {
+    ans |= 2;
+  }
+
+  return ans;
+}
 
 bool
-dfs(PhfNode* node,
-    PhfEdge* edge_from,
-    vector<pair<ymuint, ymuint> >& index_list)
+phf_sim_recur(ymuint n,
+	      ymuint k,
+	      ymuint m,
+	      const vector<const FuncVect*>& func_list,
+	      RandGen& rg)
 {
-  for (vector<PhfEdge*>::iterator p = node->mEdgeList.begin();
-       p != node->mEdgeList.end(); ++ p) {
-    PhfEdge* edge = *p;
-    if ( edge == edge_from ) {
-      continue;
-    }
-    for (vector<PhfNode*>::iterator q = edge->mNodeList.begin();
-	 q != edge->mNodeList.end(); ++ q) {
-      PhfNode* node1 = *q;
-      if ( node1 != node ) {
-	index_list.push_back(make_pair(edge->mIndex, node1->mId));
-	if ( node1->mVisited ) {
-	  return false;
-	}
-	node1->mVisited = true;
-	bool stat = dfs(node1, edge, index_list);
-	if ( !stat ) {
-	  return false;
-	}
-      }
+  ymuint nf = func_list.size();
+  if ( nf == m ) {
+    ymuint stat = phf_sim1(func_list);
+    return (stat == 0);
+  }
+
+  if ( nf > 1 ) {
+    PhfGraph pg(func_list);
+    vector<PhfEdge*> edge_list;
+    if ( !pg.acyclic_check(edge_list) ) {
+      return false;
     }
   }
-  return true;
+
+  vector<const FuncVect*> func_list1(nf + 1);
+  for (ymuint i = 0; i < nf; ++ i) {
+    func_list1[i] = func_list[i];
+  }
+
+  for (ymuint i = 0; i < 100; ++ i) {
+    FuncVect* fv = new FuncVect(k, n);
+    set_random_func(fv, rg);
+    func_list1[nf] = fv;
+    bool stat = phf_sim_recur(n, k, m, func_list1, rg);
+    delete fv;
+    if ( stat ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 END_NONAMESPACE
 
-// @param[in] n データ数
-// @param[in] k スロット数
-// @param[in] m 多重度
-int
-phf_sim1(ymuint n,
-	 ymuint k,
-	 ymuint m,
-	 RandGen& rg)
-{
-  vector<vector<ymuint> > func_list(m, vector<ymuint>(n));
-
-  // ランダムに関数を作る．
-  for (ymuint f_pos = 0; f_pos < m; ++ f_pos) {
-    vector<ymuint>& func = func_list[f_pos];
-    for (ymuint i = 0; i < n; ++ i) {
-      ymuint pos = rg.int32() % k;
-      func[i] = f_pos * k + pos;
-    }
-  }
-
-  // ノードを作る．
-  ymuint mk = m * k;
-  vector<PhfNode> node_array(mk);
-  for (ymuint i = 0; i < mk; ++ i) {
-    node_array[i].mId = i;
-  }
-
-  // 枝を作る．
-  vector<PhfEdge> edge_array(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    PhfEdge* edge = &edge_array[i];
-    edge->mIndex = i;
-    for (ymuint f_pos = 0; f_pos < m; ++ f_pos) {
-      ymuint v = func_list[f_pos][i];
-      PhfNode* node = &node_array[v];
-      edge->mNodeList.push_back(node);
-      node->mEdgeList.push_back(edge);
-    }
-  }
-
-  // simple チェック
-  for (ymuint i = 0; i < n; ++ i) {
-    PhfEdge* edge = &edge_array[i];
-    PhfNode* node0 = edge->mNodeList[0];
-    for (vector<PhfEdge*>::iterator p = node0->mEdgeList.begin();
-	 p != node0->mEdgeList.end(); ++ p) {
-      PhfEdge* edge1 = *p;
-      if ( edge == edge1 ) {
-	continue;
-      }
-      bool diff = false;
-      for (ymuint j = 0; j < m; ++ j) {
-	if ( edge->mNodeList[j] != edge1->mNodeList[j] ) {
-	  diff = true;
-	  break;
-	}
-      }
-      if ( !diff ) {
-#if 0
-	cout << "Not simple" << endl;
-	cout << "Index#" << i << ":";
-	for (ymuint j = 0; j < m; ++ j) {
-	  cout << " " << func_list[j][i];
-	}
-	cout << endl;
-	cout << "Index#" << edge1->mIndex << ":";
-	for (ymuint j = 0; j < m; ++ j) {
-	  cout << " " << func_list[j][edge1->mIndex];
-	}
-	cout << endl;
-#endif
-	return 1;
-      }
-    }
-  }
-
-  // acyclic チェック
-  for (ymuint i = 0; i < mk; ++ i) {
-    node_array[i].mVisited = false;
-  }
-  for ( ; ; ) {
-    // mVisited マークのついていないノードを探す．
-    PhfNode* node0 = NULL;
-    for (ymuint i = 0; i < mk; ++ i) {
-      PhfNode* node = &node_array[i];
-      if ( !node->mVisited ) {
-	node0 = node;
-	break;
-      }
-    }
-    if ( node0 == NULL ) {
-      // すべてチェックした．
-      break;
-    }
-
-    vector<pair<ymuint, ymuint> > index_list;
-    node0->mVisited = true;
-    bool stat = dfs(node0, NULL, index_list);
-    if ( !stat ) {
-#if 0
-      cout << "Cyclic" << endl;
-      for (vector<pair<ymuint, ymuint> >::iterator p = index_list.begin();
-	   p != index_list.end(); ++ p) {
-	ymuint index = p->first;
-	ymuint node_id = p->second;
-	cout << "Node#" << node_id  << ",  ";
-	cout << "Index#" << index << ":";
-	for (ymuint j = 0; j < m; ++ j) {
-	  cout << " " << func_list[j][index];
-	}
-	cout << endl;
-      }
-#endif
-      return 2;
-    }
-  }
-  return 0;
-}
 
 int
 phf_sim(int argc,
@@ -222,40 +124,50 @@ phf_sim(int argc,
 
   RandGen rg;
 
-  ymuint nf = 40;
-  vector<vector<ymuint> > func_list(nf, vector<ymuint>(n));
-
-  // ランダムに関数を作る．
-  for (ymuint j = 0; j < nf; ++ j) {
-    vector<ymuint>& func = func_list[j];
-    for (ymuint i = 0; i < n; ++ i) {
-      ymuint pos = rg.int32() % k;
-      func[i] = pos;
-    }
-  }
-
 #if 0
+  ymuint nt = 2000;
   ymuint c_ok = 0;
   ymuint c_simple = 0;
   ymuint c_cyclic = 0;
+  for (ymuint i = 0; i < nt; ++ i) {
+    FuncVect* fv = new FuncVect(k, n);
+    set_random_func(fv, rg);
+    vector<const FuncVect*> func_list(1, fv);
+    if ( phf_sim_recur(n, k, m, func_list, rg) ) {
+      ++ c_ok;
+    }
+    delete fv;
+  }
+#else
   ymuint nt = 2000;
-  for (ymuint i1 = 0; i1 < nf; ++ i1) {
-    const vector<ymuint>& func1 = func_list[i1];
-    for (ymuint i2 = i1 + 1; i2 < nf; ++ i2) {
-      const vector<ymuint>& func2 = func_list[i2];
-      switch ( phf_sim1(n, k, m, func1, func2) ) {
-      case 0: ++ c_ok; break;
-      case 1: ++ c_simple; break;
-      case 2: ++ c_cyclic; break;
-      }
+  ymuint c_ok = 0;
+  ymuint c_simple = 0;
+  ymuint c_cyclic = 0;
+  for (ymuint i = 0; i < nt; ++ i) {
+    vector<const FuncVect*> func_list(m);
+    // ランダムに関数を作る．
+    for (ymuint j = 0; j < m; ++ j) {
+      FuncVect* fv = new FuncVect(k, n);
+      func_list[j] = fv;
+      set_random_func(fv, rg);
+    }
+    ymuint stat = phf_sim1(func_list);
+    if ( stat == 0 ) {
+      ++ c_ok;
+    }
+    if ( stat & 1U ){
+      ++ c_simple;
+    }
+    if ( stat & 2U ) {
+      ++ c_cyclic;
     }
   }
+#endif
 
   cout << "Total " << nt << " trials" << endl
        << " # of Success:    " << c_ok << endl
        << " # of Not Simple: " << c_simple << endl
        << " # of Cyclic:     " << c_cyclic << endl;
-#endif
 
   return 0;
 }

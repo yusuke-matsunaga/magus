@@ -14,9 +14,6 @@
 
 BEGIN_NAMESPACE_YM_IGF
 
-class PhfNode;
-class PhfEdge;
-
 //////////////////////////////////////////////////////////////////////
 /// @class PhfGen PhfGen.h "PhfGen.h"
 /// @brief PHF を作るクラス
@@ -43,38 +40,6 @@ public:
   bool
   mapping(const vector<const FuncVect*>& func_list,
 	  vector<vector<ymuint32>* >& g_list);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 下請け関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ノードを枝を開放する．
-  void
-  clear();
-
-  /// @brief ノードを生成する．
-  PhfNode*
-  new_node(ymuint32 pat);
-
-  /// @brief 枝を生成する．
-  PhfEdge*
-  new_edge(ymuint id,
-	   const vector<PhfNode*>& node_list,
-	   ymuint32 val);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 生成したノードを入れておくリスト
-  vector<PhfNode*> mNodeList;
-
-  // 生成した枝を入れておくリスト
-  vector<PhfEdge*> mEdgeList;
 
 };
 

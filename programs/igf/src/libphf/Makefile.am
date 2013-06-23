@@ -21,6 +21,7 @@ libphf_la_SOURCES = \
 	IguGen2.cc \
 	VectSetList.h \
 	Variable.cc \
+	PhfGraph.cc \
 	PhfNode.h \
 	PhfEdge.h \
 	PhfGen.cc \
