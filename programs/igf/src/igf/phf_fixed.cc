@@ -21,7 +21,7 @@
 #include "IguGen.h"
 #include "ym_utils/CombiGen.h"
 #include "ym_utils/RandGen.h"
-#include "ym_utils/RandCombiGen.h"
+#include "ym_utils/RandPermGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -125,82 +125,100 @@ phf(int argc,
 
   cout << "ns = " << ns << ", p = " << p << endl;
 
+  ymuint count_limit = 10000;
+  RandGen rg;
   for ( ; ; ++ p) {
-    const vector<const RegVect*>& vlist = rvmgr.vect_list();
-    ymuint exp_p = 1U << p;
-    vector<const FuncVect*> func_list(2);
-    { // f1 と f2 を作る．
-      vector<vector<ymuint32> > f1_vect(p);
-      vector<vector<ymuint32> > f2_vect(p);
-      if ( ns < p ) {
-	// ほとんど無意味だけど一応用意しておく．
-	for (ymuint k = 0; k < ns; ++ k) {
-	  f1_vect[k] = solution[k]->vid_list();
-	}
-	for (ymuint k = ns; k < p; ++ k) {
-	  // ダミー
-	  f1_vect[k].push_back(0);
-	}
-      }
-      else {
-	for (ymuint k = 0; k < p; ++ k) {
-	  f1_vect[k] = solution[k]->vid_list();
-	}
-	ymuint nr = ns - p;
-	for (ymuint k = 0; k < nr; ++ k) {
-	  f2_vect[k] = solution[k + p]->vid_list();
-	}
-	for (ymuint k = nr; k < p; ++ k) {
-	  f2_vect[k] = solution[k]->vid_list();
-	}
-      }
-      ymuint nv = vlist.size();
-      XorFunc f1(f1_vect);
-      FuncVect* fv1 = new FuncVect(exp_p, nv);
-      func_list[0] = fv1;
-      for (ymuint i = 0; i < nv; ++ i) {
-	const RegVect* rv = vlist[i];
-	fv1->set_val(i, f1.eval(rv));
-      }
-
-      XorFunc f2(f2_vect);
-      FuncVect* fv2 = new FuncVect(exp_p, nv);
-      func_list[1] = fv2;
-      for (ymuint i = 0; i < nv; ++ i) {
-	const RegVect* rv = vlist[i];
-	fv2->set_val(i, f2.eval(rv));
-      }
-    }
-
-    PhfGen phfgen;
-
-    vector<vector<ymuint32>* > g_list(2);
-    for (ymuint i = 0; i < 2; ++ i) {
-      g_list[i] = new vector<ymuint32>(exp_p, 0U);
-    }
-    bool stat1 = phfgen.mapping(func_list, g_list);
-    if ( stat1 ) {
-      cout << "p = " << p << endl;
-      ymuint q = rvmgr.index_size();
-      cout << "Total memory size = "
-	   << (exp_p * q * 2 + vlist.size() * n) << endl;
-      if ( disp ) {
-	ymuint nv = vlist.size();
-	for (ymuint i = 0; i < nv; ++ i) {
-	  cout << "#" << i << ": ";
-	  const char* comma = "";
-	  ymuint32 val = 0;
-	  for (ymuint j = 0; j < 2; ++ j) {
-	    const FuncVect& f1 = *func_list[j];
-	    vector<ymuint32>& g1 = *g_list[j];
-	    ymuint32 v1 = f1.val(i);
-	    cout << comma << setw(6) << v1 << " = " << g1[v1];
-	    val ^= g1[v1];
-	    comma = ", ";
+    bool found = false;
+    for (ymuint count = 0; count < count_limit; ++ count) {
+      const vector<const RegVect*>& vlist = rvmgr.vect_list();
+      ymuint exp_p = 1U << p;
+      vector<const FuncVect*> func_list(2);
+      { // f1 と f2 を作る．
+	vector<vector<ymuint32> > f1_vect(p);
+	vector<vector<ymuint32> > f2_vect(p);
+	if ( ns < p ) {
+	  // ほとんど無意味だけど一応用意しておく．
+	  for (ymuint k = 0; k < ns; ++ k) {
+	    f1_vect[k] = solution[k]->vid_list();
 	  }
-	  cout << ": " << val << endl;
+	  for (ymuint k = ns; k < p; ++ k) {
+	    // ダミー
+	    f1_vect[k].push_back(0);
+	  }
+	}
+	else {
+	  RandPermGen rpg(ns);
+	  rpg.generate(rg);
+	  for (ymuint k = 0; k < p; ++ k) {
+	    ymuint pos = rpg.elem(k);
+	    f1_vect[k] = solution[pos]->vid_list();
+	  }
+	  ymuint nr = ns - p;
+	  for (ymuint k = 0; k < nr; ++ k) {
+	    ymuint pos = rpg.elem(k + p);
+	    f2_vect[k] = solution[pos]->vid_list();
+	  }
+	  for (ymuint k = nr; k < p; ++ k) {
+	    ymuint pos = rpg.elem(k);
+	    f2_vect[k] = solution[pos]->vid_list();
+	  }
+	}
+	ymuint nv = vlist.size();
+	XorFunc f1(f1_vect);
+	FuncVect* fv1 = new FuncVect(exp_p, nv);
+	func_list[0] = fv1;
+	for (ymuint i = 0; i < nv; ++ i) {
+	  const RegVect* rv = vlist[i];
+	  fv1->set_val(i, f1.eval(rv));
+	}
+
+	XorFunc f2(f2_vect);
+	FuncVect* fv2 = new FuncVect(exp_p, nv);
+	func_list[1] = fv2;
+	for (ymuint i = 0; i < nv; ++ i) {
+	  const RegVect* rv = vlist[i];
+	  fv2->set_val(i, f2.eval(rv));
 	}
       }
+
+      PhfGen phfgen;
+
+      vector<vector<ymuint32>* > g_list(2);
+      for (ymuint i = 0; i < 2; ++ i) {
+	g_list[i] = new vector<ymuint32>(exp_p, 0U);
+      }
+      bool stat1 = phfgen.mapping(func_list, g_list);
+      for (vector<const FuncVect*>::iterator i = func_list.begin();
+	   i != func_list.end(); ++ i) {
+	delete *i;
+      }
+      if ( stat1 ) {
+	cout << "p = " << p << endl;
+	ymuint q = rvmgr.index_size();
+	cout << "Total memory size = "
+	     << (exp_p * q * 2 + vlist.size() * n) << endl;
+	if ( disp ) {
+	  ymuint nv = vlist.size();
+	  for (ymuint i = 0; i < nv; ++ i) {
+	    cout << "#" << i << ": ";
+	    const char* comma = "";
+	    ymuint32 val = 0;
+	    for (ymuint j = 0; j < 2; ++ j) {
+	      const FuncVect& f1 = *func_list[j];
+	      vector<ymuint32>& g1 = *g_list[j];
+	      ymuint32 v1 = f1.val(i);
+	      cout << comma << setw(6) << v1 << " = " << g1[v1];
+	      val ^= g1[v1];
+	      comma = ", ";
+	    }
+	    cout << ": " << val << endl;
+	  }
+	}
+	found = true;
+	break;
+      }
+    }
+    if ( found ) {
       break;
     }
   }
