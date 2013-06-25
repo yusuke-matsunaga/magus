@@ -22,6 +22,7 @@
 #include "ym_utils/CombiGen.h"
 #include "ym_utils/RandGen.h"
 #include "ym_utils/RandPermGen.h"
+#include "ym_utils/RandCombiGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -121,7 +122,7 @@ phf(int argc,
   }
   ymuint ns = solution.size();
 
-  ymuint p = rvmgr.index_size();
+  ymuint p = rvmgr.index_size() - 1;
 
   cout << "ns = " << ns << ", p = " << p << endl;
 
@@ -147,20 +148,41 @@ phf(int argc,
 	  }
 	}
 	else {
-	  RandPermGen rpg(ns);
-	  rpg.generate(rg);
-	  for (ymuint k = 0; k < p; ++ k) {
-	    ymuint pos = rpg.elem(k);
-	    f1_vect[k] = solution[pos]->vid_list();
-	  }
 	  ymuint nr = ns - p;
+	  RandCombiGen rcg1(ns, nr);
+	  rcg1.generate(rg);
+	  vector<bool> mark(ns, false);
 	  for (ymuint k = 0; k < nr; ++ k) {
-	    ymuint pos = rpg.elem(k + p);
-	    f2_vect[k] = solution[pos]->vid_list();
+	    ymuint pos = rcg1.elem(k);
+	    f1_vect[k] = solution[pos]->vid_list();
+	    mark[pos] = true;
 	  }
-	  for (ymuint k = nr; k < p; ++ k) {
-	    ymuint pos = rpg.elem(k);
-	    f2_vect[k] = solution[pos]->vid_list();
+	  vector<ymuint> r_list;
+	  r_list.reserve(p);
+	  for (ymuint i = 0; i < ns; ++ i) {
+	    if ( !mark[i] ) {
+	      r_list.push_back(i);
+	    }
+	  }
+	  assert_cond( r_list.size() == p, __FILE__, __LINE__);
+	  RandCombiGen rcg2(p, nr);
+	  rcg2.generate(rg);
+	  for (ymuint i = 0; i < nr; ++ i) {
+	    ymuint pos = r_list[rcg2.elem(i)];
+	    f2_vect[i] = solution[pos]->vid_list();
+	    mark[pos] = true;
+	  }
+	  vector<ymuint> r_list2;
+	  r_list2.reserve(ns - nr - nr);
+	  for (ymuint i = 0; i < ns; ++ i) {
+	    if ( !mark[i] ) {
+	      r_list2.push_back(i);
+	    }
+	  }
+	  for (ymuint i = nr; i < p; ++ i) {
+	    ymuint pos = r_list2[i - nr];
+	    f1_vect[i] = solution[pos]->vid_list();
+	    f2_vect[i] = solution[pos]->vid_list();
 	  }
 	}
 	ymuint nv = vlist.size();

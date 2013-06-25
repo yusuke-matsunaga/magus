@@ -70,6 +70,45 @@ PhfGraph::simple_check() const
   return true;
 }
 
+
+BEGIN_NONAMESPACE
+
+void
+dfs(PhfNode* node,
+    vector<bool>& v_mark,
+    vector<bool>& e_mark,
+    vector<PhfEdge*>& edge_list)
+{
+  ymuint ne = node->edge_num();
+  ymuint d = 0;
+  PhfEdge* edge0 = NULL;
+  for (ymuint i = 0; i < ne; ++ i) {
+    PhfEdge* edge = node->edge(i);
+    if ( !e_mark[edge->id()] ) {
+      ++ d;
+      edge0 = edge;
+    }
+  }
+  if ( d != 1 ) {
+    return;
+  }
+
+  v_mark[node->id()] = true;
+  e_mark[edge0->id()] = true;
+  edge_list.push_back(edge0);
+
+  ymuint nn = edge0->node_num();
+  for (ymuint i = 0; i < nn; ++ i) {
+    PhfNode* node1 = edge0->node(i);
+    if ( v_mark[node1->id()] ) {
+      continue;
+    }
+    dfs(node1, v_mark, e_mark, edge_list);
+  }
+}
+
+END_NONAMESPACE
+
 // @brief acyclic check を行なう．
 // @param[out] edge_list 枝の順番を格納するリスト
 // @retval true acyclic だった．
@@ -81,59 +120,55 @@ PhfGraph::acyclic_check(vector<PhfEdge*>& edge_list) const
   ymuint edge_num = mEdgeList.size();
   vector<bool> v_mark(node_num, false);
   vector<bool> e_mark(edge_num, false);
-  ymuint count = 0;
-  for ( ; ; ) {
-    PhfNode* node0 = NULL;
-    PhfEdge* edge0 = NULL;
-    for (ymuint n_pos = 0; n_pos < node_num; ++ n_pos) {
-      PhfNode* node = mNodeList[n_pos];
-      if ( v_mark[node->id()] ) {
-	continue;
-      }
-      ymuint ne = node->edge_num();
-      ymuint d = 0;
-      for (ymuint i = 0; i < ne; ++ i) {
-	PhfEdge* edge = node->edge(i);
-	if ( !e_mark[edge->id()] ) {
-	  ++ d;
-	  edge0 = edge;
-	}
-      }
-      if ( d == 1 ) {
-	node0 = node;
-	break;
-      }
-    }
-    if ( node0 == NULL ) {
-      return false;
-    }
-    v_mark[node0->id()] = true;
-    e_mark[edge0->id()] = true;
-    edge_list.push_back(edge0);
 
-    ++ count;
-    if ( count == edge_num ) {
-      if ( VERIFY_ACYCLIC_CHECK ) {
-	vector<bool> v_mark(node_num, false);
-	for (vector<PhfEdge*>::reverse_iterator p = edge_list.rbegin();
-	     p != edge_list.rend(); ++ p) {
-	  PhfEdge* edge = *p;
-	  ymuint n = edge->node_num();
-	  bool has_node = false;
-	  for (ymuint i = 0; i < n; ++ i) {
-	    PhfNode* node = edge->node(i);
-	    if ( !v_mark[node->id()] ) {
-	      has_node = true;
-	      v_mark[node->id()] = true;
-	    }
-	  }
-	  assert_cond( has_node, __FILE__, __LINE__);
-	}
-      }
-
-      return true;
+  vector<PhfNode*> seed_list;
+  for (ymuint n_pos = 0; n_pos < node_num; ++ n_pos) {
+    PhfNode* node = mNodeList[n_pos];
+    ymuint ne = node->edge_num();
+    if ( ne == 1 ) {
+      seed_list.push_back(node);
     }
   }
+
+  vector<PhfEdge*> tmp_list;
+  tmp_list.reserve(edge_num);
+  for (vector<PhfNode*>::iterator p = seed_list.begin();
+       p != seed_list.end(); ++ p) {
+    PhfNode* node = *p;
+    if ( v_mark[node->id()] ) {
+      continue;
+    }
+    dfs(node, v_mark, e_mark, tmp_list);
+  }
+
+  if ( tmp_list.size() != edge_num ) {
+    return false;
+  }
+
+  edge_list.resize(edge_num);
+  for (ymuint i = 0; i < edge_num; ++ i) {
+    edge_list[i] = tmp_list[edge_num - i - 1];
+  }
+
+  if ( VERIFY_ACYCLIC_CHECK ) {
+    vector<bool> v_mark(node_num, false);
+    for (vector<PhfEdge*>::iterator p = edge_list.begin();
+	 p != edge_list.end(); ++ p) {
+      PhfEdge* edge = *p;
+      ymuint n = edge->node_num();
+      bool has_node = false;
+      for (ymuint i = 0; i < n; ++ i) {
+	PhfNode* node = edge->node(i);
+	if ( !v_mark[node->id()] ) {
+	  has_node = true;
+	  v_mark[node->id()] = true;
+	}
+      }
+      assert_cond( has_node, __FILE__, __LINE__);
+    }
+  }
+
+  return true;
 }
 
 // @brief 関数のリストからグラフを作る．
