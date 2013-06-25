@@ -89,7 +89,7 @@ phf(int argc,
 
   ymuint n = rvmgr.vect_size();
 
-  ymuint p = rvmgr.index_size();
+  ymuint p = rvmgr.index_size() - 2;
 
   RandGen rg;
   for (bool found = false; !found ; ++ p) {
