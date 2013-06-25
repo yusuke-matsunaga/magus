@@ -13,45 +13,9 @@
 #include "FuncVect.h"
 
 
+#define VERIFY_ACYCLIC_CHECK 0
+
 BEGIN_NAMESPACE_YM_IGF
-
-BEGIN_NONAMESPACE
-
-bool
-dfs(PhfNode* node,
-    PhfEdge* from,
-    vector<bool>& v_mark,
-    vector<PhfEdge*>& edge_list)
-{
-  ymuint ne = node->edge_num();
-  for (ymuint i = 0; i < ne; ++ i) {
-    PhfEdge* edge = node->edge(i);
-    if ( edge == from ) {
-      continue;
-    }
-
-    edge_list.push_back(edge);
-
-    ymuint nn = edge->node_num();
-    for (ymuint i = 0; i < nn; ++ i) {
-      PhfNode* node1 = edge->node(i);
-      if ( node1 != node ) {
-	if ( v_mark[node1->id()] ) {
-	  return false;
-	}
-	v_mark[node1->id()] = true;
-	bool stat = dfs(node1, edge, v_mark, edge_list);
-	if ( !stat ) {
-	  return false;
-	}
-      }
-    }
-  }
-  return true;
-}
-
-END_NONAMESPACE
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス PhfGraph
@@ -72,7 +36,7 @@ PhfGraph::~PhfGraph()
 
 // @brief simple check を行なう．
 // @retval true simple graph だった．
-// @retval ffalse simple graph ではなかった．
+// @retval false simple graph ではなかった．
 bool
 PhfGraph::simple_check() const
 {
@@ -80,6 +44,7 @@ PhfGraph::simple_check() const
   for (ymuint n_pos = 0; n_pos < nn; ++ n_pos) {
     PhfNode* node = mNodeList[n_pos];
     if ( node->edge(0)->node(0) != node ) {
+      // 最初のハッシュ値のノードだけを対象にする．
       continue;
     }
 
@@ -112,27 +77,63 @@ PhfGraph::simple_check() const
 bool
 PhfGraph::acyclic_check(vector<PhfEdge*>& edge_list) const
 {
-  ymuint nn = mNodeList.size();
-  vector<bool> v_mark(nn, false);
+  ymuint node_num = mNodeList.size();
+  ymuint edge_num = mEdgeList.size();
+  vector<bool> v_mark(node_num, false);
+  vector<bool> e_mark(edge_num, false);
+  ymuint count = 0;
   for ( ; ; ) {
     PhfNode* node0 = NULL;
-    for (ymuint i = 0; i < nn; ++ i) {
-      PhfNode* node = mNodeList[i];
-      if ( !v_mark[node->id()] ) {
+    PhfEdge* edge0 = NULL;
+    for (ymuint n_pos = 0; n_pos < node_num; ++ n_pos) {
+      PhfNode* node = mNodeList[n_pos];
+      if ( v_mark[node->id()] ) {
+	continue;
+      }
+      ymuint ne = node->edge_num();
+      ymuint d = 0;
+      for (ymuint i = 0; i < ne; ++ i) {
+	PhfEdge* edge = node->edge(i);
+	if ( !e_mark[edge->id()] ) {
+	  ++ d;
+	  edge0 = edge;
+	}
+      }
+      if ( d == 1 ) {
 	node0 = node;
 	break;
       }
     }
     if ( node0 == NULL ) {
-      break;
-    }
-    v_mark[node0->id()] = true;
-    bool stat = dfs(node0, NULL, v_mark, edge_list);
-    if ( !stat ) {
       return false;
     }
+    v_mark[node0->id()] = true;
+    e_mark[edge0->id()] = true;
+    edge_list.push_back(edge0);
+
+    ++ count;
+    if ( count == edge_num ) {
+      if ( VERIFY_ACYCLIC_CHECK ) {
+	vector<bool> v_mark(node_num, false);
+	for (vector<PhfEdge*>::reverse_iterator p = edge_list.rbegin();
+	     p != edge_list.rend(); ++ p) {
+	  PhfEdge* edge = *p;
+	  ymuint n = edge->node_num();
+	  bool has_node = false;
+	  for (ymuint i = 0; i < n; ++ i) {
+	    PhfNode* node = edge->node(i);
+	    if ( !v_mark[node->id()] ) {
+	      has_node = true;
+	      v_mark[node->id()] = true;
+	    }
+	  }
+	  assert_cond( has_node, __FILE__, __LINE__);
+	}
+      }
+
+      return true;
+    }
   }
-  return true;
 }
 
 // @brief 関数のリストからグラフを作る．
