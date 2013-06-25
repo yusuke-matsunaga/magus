@@ -60,7 +60,7 @@ phf(int argc,
 
   bool disp = popt_d.is_specified();
 
-  ymuint32 count_limit = 10000;
+  ymuint32 count_limit = 1000;
   if ( popt_count.is_specified() ) {
     count_limit = popt_count.val();
   }
@@ -89,7 +89,13 @@ phf(int argc,
 
   ymuint n = rvmgr.vect_size();
 
-  ymuint p = rvmgr.index_size() - 2;
+  ymuint p = rvmgr.index_size();
+  {
+    for (ymuint tmp_m = 1; tmp_m < m; ) {
+      -- p;
+      tmp_m <<= 1;
+    }
+  }
 
   RandGen rg;
   for (bool found = false; !found ; ++ p) {
