@@ -74,36 +74,40 @@ PhfGraph::simple_check() const
 BEGIN_NONAMESPACE
 
 void
-dfs(PhfNode* node,
+dfs(PhfNode* node0,
     vector<bool>& v_mark,
     vector<bool>& e_mark,
     vector<PhfEdge*>& edge_list)
 {
-  ymuint ne = node->edge_num();
+  // node0 に接続している未処理の枝を探す．
+  ymuint ne = node0->edge_num();
   ymuint d = 0;
   PhfEdge* edge0 = NULL;
   for (ymuint i = 0; i < ne; ++ i) {
-    PhfEdge* edge = node->edge(i);
+    PhfEdge* edge = node0->edge(i);
     if ( !e_mark[edge->id()] ) {
       ++ d;
       edge0 = edge;
     }
   }
   if ( d != 1 ) {
+    // 次数が1でなければスキップする．
     return;
   }
 
-  v_mark[node->id()] = true;
+  // node0 と edge0 を処理済みにする．
+  v_mark[node0->id()] = true;
   e_mark[edge0->id()] = true;
+  // edge0 をリストに加える．
   edge_list.push_back(edge0);
 
+  // edge0 に接続している未処理のノードを探す．
   ymuint nn = edge0->node_num();
   for (ymuint i = 0; i < nn; ++ i) {
     PhfNode* node1 = edge0->node(i);
-    if ( v_mark[node1->id()] ) {
-      continue;
+    if ( !v_mark[node1->id()] ) {
+      dfs(node1, v_mark, e_mark, edge_list);
     }
-    dfs(node1, v_mark, e_mark, edge_list);
   }
 }
 
@@ -152,20 +156,46 @@ PhfGraph::acyclic_check(vector<PhfEdge*>& edge_list) const
 
   if ( VERIFY_ACYCLIC_CHECK ) {
     vector<bool> v_mark(node_num, false);
+    bool error = false;
     for (vector<PhfEdge*>::iterator p = edge_list.begin();
 	 p != edge_list.end(); ++ p) {
       PhfEdge* edge = *p;
-      ymuint n = edge->node_num();
+      ymuint nn = edge->node_num();
       bool has_node = false;
-      for (ymuint i = 0; i < n; ++ i) {
+      for (ymuint i = 0; i < nn; ++ i) {
 	PhfNode* node = edge->node(i);
 	if ( !v_mark[node->id()] ) {
 	  has_node = true;
 	  v_mark[node->id()] = true;
 	}
       }
-      assert_cond( has_node, __FILE__, __LINE__);
+      if ( !has_node ) {
+	error = true;
+      }
     }
+    if ( error ) {
+      for (ymuint i = 0; i < node_num; ++ i) {
+	PhfNode* node = mNodeList[i];
+	cout << "Node#" << i << ": " << node->pat() << endl;
+      }
+      cout << endl;
+      for (ymuint i = 0; i < edge_num; ++ i) {
+	cout << "Edge#" << i << ": ";
+	PhfEdge* edge = mEdgeList[i];
+	ymuint nn = edge->node_num();
+	for (ymuint j = 0; j < nn; ++ j) {
+	  cout << " Node#" << edge->node(j)->id();
+	}
+	cout << endl;
+      }
+      cout << endl;
+      cout << "EdgeList = ";
+      for (ymuint i = 0; i < edge_num; ++ i) {
+	cout << " " << edge_list[i]->id();
+      }
+      cout << endl;
+    }
+    assert_cond( !error, __FILE__, __LINE__);
   }
 
   return true;
