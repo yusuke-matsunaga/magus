@@ -47,15 +47,15 @@ PhfGen::mapping(const vector<const FuncVect*>& func_list,
     return false;
   }
 
+  ymuint d = func_list.size();
   ymuint ne = edge_list.size();
   for (ymuint i = 0; i < ne; ++ i) {
     PhfEdge* edge = edge_list[i];
-    ymuint nn = edge->node_num();
-    for (ymuint j = 0; j < nn; ++ j) {
+    for (ymuint j = 0; j < d; ++ j) {
       PhfNode* node1 = edge->node(j);
       if ( !node1->is_assigned() ) {
 	ymuint32 val = edge->val();
-	for (ymuint k = 0; k < nn; ++ k) {
+	for (ymuint k = 0; k < d; ++ k) {
 	  if ( k != j ) {
 	    PhfNode* node2 = edge->node(k);
 	    val ^= node2->val();

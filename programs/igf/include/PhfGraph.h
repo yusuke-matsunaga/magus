@@ -10,6 +10,7 @@
 
 
 #include "igf_nsdef.h"
+#include "ym_utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -66,6 +67,13 @@ private:
   void
   gen_graph(const vector<const FuncVect*>& func_list);
 
+  /// @brief acyclic_check() の下請け関数
+  void
+  dfs(PhfNode* node0,
+      vector<bool>& v_mark,
+      vector<bool>& e_mark,
+      vector<PhfEdge*>& edge_list) const;
+
   /// @brief ノードを生成する．
   PhfNode*
   new_node(ymuint32 pat);
@@ -73,7 +81,6 @@ private:
   /// @brief 枝を生成する．
   PhfEdge*
   new_edge(ymuint id,
-	   const vector<PhfNode*>& node_list,
 	   ymuint32 val);
 
 
@@ -82,11 +89,26 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 生成したノードを入れておくリスト
-  vector<PhfNode*> mNodeList;
+  // PhfNode と PhfEdge の生成用アロケータ
+  SimpleAlloc mAlloc;
+
+  // 現在のグラフ次数(枝に接続するノード数)
+  ymuint32 mDegree;
+
+  // ノードの次の ID 番号
+  ymuint32 mMaxId;
+
+  // mNodeArray のサイズ
+  ymuint32 mNodeArraySize;
+
+  // パタンをキーにしたノードの配列
+  PhfNode** mNodeArray;
+
+  // mEdgeList のサイズ
+  ymuint32 mEdgeListSize;
 
   // 生成した枝を入れておくリスト
-  vector<PhfEdge*> mEdgeList;
+  PhfEdge** mEdgeList;
 
 };
 

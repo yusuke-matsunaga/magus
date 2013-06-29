@@ -22,6 +22,7 @@ class PhfEdge;
 //////////////////////////////////////////////////////////////////////
 class PhfNode
 {
+  friend class PhfGraph;
 public:
 
   /// @brief コンストラクタ
@@ -95,6 +96,9 @@ private:
 
   // このノードの値
   ymuint32 mVal;
+
+  // active フラグ
+  bool mActive;
 
   bool mAssigned;
 

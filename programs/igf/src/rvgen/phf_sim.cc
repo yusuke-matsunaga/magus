@@ -152,6 +152,9 @@ phf_sim(int argc,
       set_random_func(fv, rg);
     }
     ymuint stat = phf_sim1(func_list);
+    for (ymuint j = 0; j < m; ++ j) {
+      delete func_list[j];
+    }
     if ( stat == 0 ) {
       ++ c_ok;
     }
