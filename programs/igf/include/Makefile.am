@@ -15,6 +15,7 @@ noinst_HEADERS = \
 	PhfGen.h \
 	RegVect.h \
 	RvMgr.h \
+	IGU.h \
 	VarFunc.h \
 	Variable.h \
 	XorFunc.h

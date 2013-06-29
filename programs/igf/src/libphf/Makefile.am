@@ -25,6 +25,7 @@ libphf_la_SOURCES = \
 	PhfNode.h \
 	PhfEdge.h \
 	PhfGen.cc \
+	IGU.cc \
 	VarFunc.cc \
 	XorFunc.cc
 

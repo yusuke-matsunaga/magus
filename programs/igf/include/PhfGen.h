@@ -41,6 +41,13 @@ public:
   mapping(const vector<const FuncVect*>& func_list,
 	  vector<vector<ymuint32>* >& g_list);
 
+  /// @brief 分割を求める．
+  /// @param[in] func_list 関数のリスト
+  /// @param[out] block_map 個々の入力ごとのブロック番号を入れる配列
+  bool
+  split(const vector<const FuncVect*>& func_list,
+	vector<ymuint>& block_map);
+
 };
 
 END_NAMESPACE_YM_IGF
