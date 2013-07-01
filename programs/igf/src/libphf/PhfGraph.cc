@@ -234,6 +234,14 @@ PhfGraph::gen_graph(const vector<const FuncVect*>& func_list)
       node1->add_edge(edge);
     }
   }
+
+  mNodeList = new PhfNode*[mMaxId];
+  for (ymuint i = 0; i < mNodeArraySize; ++ i) {
+    PhfNode* node = mNodeArray[i];
+    if ( node != NULL ) {
+      mNodeList[node->id()] = node;
+    }
+  }
 }
 
 // @brief ノードを枝を開放する．
@@ -252,6 +260,8 @@ PhfGraph::clear()
   delete [] mEdgeList;
 
   mMaxId = 0;
+  delete [] mNodeList;
+
   mAlloc.destroy();
 }
 

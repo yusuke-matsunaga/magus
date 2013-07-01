@@ -9,6 +9,7 @@
 
 #include "igf_nsdef.h"
 #include "FuncVect.h"
+#include "PhfGen.h"
 #include "PhfGraph.h"
 #include "ym_utils/CombiGen.h"
 #include "ym_utils/RandGen.h"
@@ -46,6 +47,15 @@ phf_sim1(const vector<const FuncVect*>& func_list)
   }
 
   return ans;
+}
+
+ymuint
+phf_sim2(const vector<const FuncVect*>& func_list)
+{
+  vector<ymuint> block_map;
+
+  PhfGen pg;
+  return pg.split(func_list, block_map);
 }
 
 bool
@@ -140,9 +150,15 @@ phf_sim(int argc,
   }
 #else
   ymuint nt = 2000;
+#if 0
   ymuint c_ok = 0;
   ymuint c_simple = 0;
   ymuint c_cyclic = 0;
+#else
+  ymuint c_easy = 0;
+  ymuint c_sat = 0;
+  ymuint c_ng = 0;
+#endif
   for (ymuint i = 0; i < nt; ++ i) {
     vector<const FuncVect*> func_list(m);
     // ランダムに関数を作る．
@@ -151,10 +167,11 @@ phf_sim(int argc,
       func_list[j] = fv;
       set_random_func(fv, rg);
     }
-    ymuint stat = phf_sim1(func_list);
+    ymuint stat = phf_sim2(func_list);
     for (ymuint j = 0; j < m; ++ j) {
       delete func_list[j];
     }
+#if 0
     if ( stat == 0 ) {
       ++ c_ok;
     }
@@ -164,13 +181,30 @@ phf_sim(int argc,
     if ( stat & 2U ) {
       ++ c_cyclic;
     }
+#else
+    if ( stat == 0 ) {
+      ++ c_ng;
+    }
+    else if ( stat == 1 ) {
+      ++ c_easy;
+    }
+    else if ( stat == 2 ) {
+      ++ c_sat;
+    }
+#endif
   }
 #endif
 
   cout << "Total " << nt << " trials" << endl
+#if 0
        << " # of Success:    " << c_ok << endl
        << " # of Not Simple: " << c_simple << endl
        << " # of Cyclic:     " << c_cyclic << endl;
+#else
+  << " # of easy case:  " << c_easy << endl
+  << " # of SAT case:   " << c_sat << endl
+  << " # of Failure:    " << c_ng << endl;
+#endif
 
   return 0;
 }

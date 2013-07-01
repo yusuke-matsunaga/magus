@@ -52,6 +52,24 @@ public:
   bool
   acyclic_check(vector<PhfEdge*>& edge_list) const;
 
+  /// @brief ノード数を返す．
+  ymuint
+  node_num() const;
+
+  /// @brief ノード番号からノードを返す．
+  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  const PhfNode*
+  node(ymuint id) const;
+
+  /// @brief 枝数を返す．
+  ymuint
+  edge_num() const;
+
+  /// @brief 枝番号から枝を返す．
+  /// @param[in] id 枝番号 ( 0 <= id < edge_num() )
+  const PhfEdge*
+  edge(ymuint id) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -98,6 +116,9 @@ private:
   // ノードの次の ID 番号
   ymuint32 mMaxId;
 
+  // ノード番号をキーにしたノードの配列
+  PhfNode** mNodeList;
+
   // mNodeArray のサイズ
   ymuint32 mNodeArraySize;
 
@@ -111,6 +132,47 @@ private:
   PhfEdge** mEdgeList;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief ノード数を返す．
+inline
+ymuint
+PhfGraph::node_num() const
+{
+  return mMaxId;
+}
+
+// @brief ノード番号からノードを返す．
+// @param[in] id ノード番号 ( 0 <= id < node_num() )
+inline
+const PhfNode*
+PhfGraph::node(ymuint id) const
+{
+  assert_cond( id < mMaxId, __FILE__, __LINE__);
+  return mNodeList[id];
+}
+
+// @brief 枝数を返す．
+inline
+ymuint
+PhfGraph::edge_num() const
+{
+  return mEdgeListSize;
+}
+
+// @brief 枝番号から枝を返す．
+// @param[in] id 枝番号 ( 0 <= id < edge_num() )
+inline
+const PhfEdge*
+PhfGraph::edge(ymuint id) const
+{
+  assert_cond( id < mEdgeListSize, __FILE__, __LINE__);
+  return mEdgeList[id];
+}
 
 END_NAMESPACE_YM_IGF
 
