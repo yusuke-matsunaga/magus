@@ -11,6 +11,8 @@
 #include "PhfNode.h"
 #include "PhfEdge.h"
 #include "FuncVect.h"
+#include "ym_logic/SatSolver.h"
+#include "ym_utils/CombiGen.h"
 
 
 #define VERIFY_ACYCLIC_CHECK 0
@@ -79,6 +81,13 @@ PhfGraph::simple_check() const
 bool
 PhfGraph::acyclic_check(vector<PhfEdge*>& edge_list) const
 {
+  for (ymuint i = 0; i < mMaxId; ++ i) {
+    mNodeList[i]->mActive = true;
+  }
+  for (ymuint i = 0; i < mEdgeListSize; ++ i) {
+    mEdgeList[i]->mActive = true;
+  }
+
   edge_list.resize(mEdgeListSize);
 
   vector<pair<PhfNode*, PhfEdge*> > node_queue(mNodeArraySize);
@@ -189,6 +198,180 @@ PhfGraph::acyclic_check(vector<PhfEdge*>& edge_list) const
       cout << endl;
     }
     assert_cond( !error, __FILE__, __LINE__);
+  }
+
+  return true;
+}
+
+// @brief 分割を行う．
+bool
+PhfGraph::split_check(vector<ymuint>& block_map)
+{
+  block_map.clear();
+  block_map.resize(mEdgeListSize);
+
+  // 実は acyclic_check() と似たことをやる．
+  for (ymuint i = 0; i < mMaxId; ++ i) {
+    mNodeList[i]->mActive = true;
+  }
+  for (ymuint i = 0; i < mEdgeListSize; ++ i) {
+    mEdgeList[i]->mActive = true;
+  }
+
+  vector<pair<PhfNode*, PhfEdge*> > node_queue(mNodeArraySize);
+  ymuint wpos = 0;
+  for (ymuint n_pos = 0; n_pos < mNodeArraySize; ++ n_pos) {
+    PhfNode* node = mNodeArray[n_pos];
+    if ( node != NULL ) {
+      ymuint ne = node->edge_num();
+      if ( ne == 1 ) {
+	PhfEdge* edge = node->edge(0);
+	node_queue[wpos].first = node;
+	node_queue[wpos].second = edge;
+	++ wpos;
+      }
+    }
+  }
+
+  ymuint epos = 0;
+  for (ymuint rpos = 0; rpos < wpos; ++ rpos) {
+    PhfNode* node0 = node_queue[rpos].first;
+    PhfEdge* edge0 = node_queue[rpos].second;
+
+    if ( !node0->mActive ) {
+      continue;
+    }
+    if ( !edge0->mActive ) {
+      continue;
+    }
+
+    // node0 と edge0 を処理済みにする．
+    node0->mActive = false;
+    edge0->mActive = false;
+
+    for (ymuint i = 0; i < mDegree; ++ i) {
+      if ( edge0->node(i) == node0 ) {
+	block_map[edge0->id()] = i;
+	break;
+      }
+    }
+    ++ epos;
+
+    // edge0 に接続している未処理のノードを探す．
+    for (ymuint i = 0; i < mDegree; ++ i) {
+      PhfNode* node1 = edge0->node(i);
+      if ( !node1->mActive ) {
+	continue;
+      }
+
+      // node1 に接続している未処理の枝を探す．
+      ymuint ne = node1->edge_num();
+      ymuint d = 0;
+      PhfEdge* edge1 = NULL;
+      for (ymuint j = 0; j < ne; ++ j) {
+	PhfEdge* edge = node1->edge(j);
+	if ( edge->mActive ) {
+	  ++ d;
+	  edge1 = edge;
+	}
+      }
+      if ( d == 1 ) {
+	// 次数が1ならキューに積む．
+	node_queue[wpos].first = node1;
+	node_queue[wpos].second = edge1;
+	++ wpos;
+      }
+    }
+  }
+
+  if ( epos == mEdgeListSize ) {
+    // 全ての枝を処理した．
+    return true;
+  }
+
+  cout << "# of edges = " << (mEdgeListSize - epos) << endl;
+
+  // 残ったグラフは cyclic なので SAT で解く．
+  SatSolver solver;
+
+  vector<VarId> var_array(mMaxId * mEdgeListSize);
+  for (ymuint i = 0; i < mEdgeListSize; ++ i) {
+    PhfEdge* edge = mEdgeList[i];
+    if ( !edge->mActive ) {
+      continue;
+    }
+    vector<Literal> tmp_clause(mDegree);
+    for (ymuint j = 0; j < mDegree; ++ j) {
+      PhfNode* node = edge->node(j);
+      VarId var = solver.new_var();
+      var_array[node->id() * mEdgeListSize + edge->id()] = var;
+      tmp_clause[j] = Literal(var, kPolPosi);
+    }
+    solver.add_clause(tmp_clause);
+  }
+
+  // 各ノードに関係する変数は最大1つしか true になってはいけない．
+  for (ymuint i = 0; i < mMaxId; ++ i) {
+    PhfNode* node = mNodeList[i];
+    if ( !node->mActive ) {
+      continue;
+    }
+    ymuint ne = node->edge_num();
+    vector<PhfEdge*> tmp_list;
+    tmp_list.reserve(ne);
+    for (ymuint j = 0;j < ne; ++ j) {
+      PhfEdge* edge = node->edge(j);
+      if ( edge->mActive ) {
+	tmp_list.push_back(edge);
+      }
+    }
+    if ( tmp_list.size() < 2 ) {
+      // そもそも関係する枝が1つ以下なら条件はない．
+      // もっともそんなノードは上で削除されているはずだよね．
+      continue;
+    }
+    for (CombiGen cg(tmp_list.size(), 2); !cg.is_end(); ++ cg) {
+      ymuint j1 = cg(0);
+      ymuint j2 = cg(1);
+      PhfEdge* edge1 = tmp_list[j1];
+      PhfEdge* edge2 = tmp_list[j2];
+      VarId var1 = var_array[node->id() * mEdgeListSize + edge1->id()];
+      VarId var2 = var_array[node->id() * mEdgeListSize + edge2->id()];
+      solver.add_clause(Literal(var1, kPolNega), Literal(var2, kPolNega));
+    }
+  }
+
+  vector<Bool3> model;
+  Bool3 stat = solver.solve(model);
+  if ( stat != kB3True ) {
+    return false;
+  }
+
+  for (ymuint i = 0; i < mEdgeListSize; ++ i) {
+    PhfEdge* edge = mEdgeList[i];
+    if ( !edge->mActive ) {
+      continue;
+    }
+    for (ymuint j = 0; j < mDegree; ++ j) {
+      PhfNode* node = edge->node(j);
+      if ( !node->mActive ) {
+	continue;
+      }
+      ymuint pos = var_array[node->id() * mEdgeListSize + edge->id()].val();
+      if ( model[pos] == kB3True ) {
+	block_map[i] = j;
+	break;
+      }
+    }
+  }
+
+  vector<bool> v_array(mMaxId, false);
+  for (ymuint i = 0; i < mEdgeListSize; ++ i) {
+    PhfEdge* edge = mEdgeList[i];
+    ymuint pos = block_map[edge->id()];
+    PhfNode* node = edge->node(pos);
+    assert_cond( !v_array[node->id()], __FILE__, __LINE__);
+    v_array[node->id()] = true;
   }
 
   return true;

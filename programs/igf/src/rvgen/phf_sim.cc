@@ -49,13 +49,13 @@ phf_sim1(const vector<const FuncVect*>& func_list)
   return ans;
 }
 
-ymuint
+bool
 phf_sim2(const vector<const FuncVect*>& func_list)
 {
   vector<ymuint> block_map;
 
-  PhfGen pg;
-  return pg.split(func_list, block_map);
+  PhfGraph pg(func_list);
+  return pg.split_check(block_map);
 }
 
 bool
@@ -167,7 +167,7 @@ phf_sim(int argc,
       func_list[j] = fv;
       set_random_func(fv, rg);
     }
-    ymuint stat = phf_sim2(func_list);
+    bool stat = phf_sim2(func_list);
     for (ymuint j = 0; j < m; ++ j) {
       delete func_list[j];
     }
@@ -182,14 +182,11 @@ phf_sim(int argc,
       ++ c_cyclic;
     }
 #else
-    if ( stat == 0 ) {
-      ++ c_ng;
-    }
-    else if ( stat == 1 ) {
-      ++ c_easy;
-    }
-    else if ( stat == 2 ) {
+    if ( stat ) {
       ++ c_sat;
+    }
+    else {
+      ++ c_ng;
     }
 #endif
   }

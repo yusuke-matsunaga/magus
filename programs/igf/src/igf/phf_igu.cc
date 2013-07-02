@@ -13,6 +13,7 @@
 #include "RegVect.h"
 #include "FuncVect.h"
 #include "PhfGen.h"
+#include "PhfGraph.h"
 #include "VarFunc.h"
 
 #include "Variable.h"
@@ -121,10 +122,10 @@ phf(int argc,
 	}
       }
 
-      PhfGen phfgen;
+      PhfGraph pg(func_list);
 
       vector<ymuint> block_map(nv);
-      bool stat = phfgen.split(func_list, block_map);
+      bool stat = pg.split_check(block_map);
       if ( stat ) {
 	found = true;
 	cout << "p = " << p << endl;

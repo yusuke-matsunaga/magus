@@ -52,6 +52,10 @@ public:
   bool
   acyclic_check(vector<PhfEdge*>& edge_list) const;
 
+  /// @brief 分割を行う．
+  bool
+  split_check(vector<ymuint>& block_map);
+
   /// @brief ノード数を返す．
   ymuint
   node_num() const;
