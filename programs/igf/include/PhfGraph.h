@@ -96,6 +96,12 @@ private:
       vector<bool>& e_mark,
       vector<PhfEdge*>& edge_list) const;
 
+  /// @brief split_check() の下請け関数
+  void
+  dfs(PhfEdge* edge,
+      vector<bool>& mark,
+      vector<PhfEdge*>& edge_list);
+
   /// @brief ノードを生成する．
   PhfNode*
   new_node(ymuint32 pat);

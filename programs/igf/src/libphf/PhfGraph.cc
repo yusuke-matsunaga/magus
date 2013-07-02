@@ -289,7 +289,116 @@ PhfGraph::split_check(vector<ymuint>& block_map)
     return true;
   }
 
-  cout << "# of edges = " << (mEdgeListSize - epos) << endl;
+  cout << "# of edges = " << (mEdgeListSize - epos) << endl
+       << "# of nodes = " << (mMaxId - epos) << endl
+       << endl;
+
+#if 1
+  while ( epos < mEdgeListSize ) {
+    for (ymuint i = 0; i < mEdgeListSize; ++ i) {
+      PhfEdge* edge = mEdgeList[i];
+      if ( !edge->mActive ) {
+	continue;
+      }
+      vector<bool> mark(mEdgeListSize, false);
+      vector<PhfEdge*> edge_list;
+      dfs(edge, mark, edge_list);
+      vector<bool> node_mark(mMaxId, false);
+      vector<PhfNode*> node_list;
+      ymuint nn = 0;
+      for (vector<PhfEdge*>::iterator p = edge_list.begin();
+	   p != edge_list.end(); ++ p) {
+	PhfEdge* edge = *p;
+	edge->mActive = false;
+	++ epos;
+	for (ymuint j = 0; j < mDegree; ++ j) {
+	  PhfNode* node = edge->node(j);
+	  if ( !node_mark[node->id()] ) {
+	    ++ nn;
+	    node_mark[node->id()] = true;
+	    node->mActive = false;
+	    node_list.push_back(node);
+	  }
+	}
+      }
+      cout << " # of edges = " << edge_list.size() << endl
+	   << " # of nodes = " << nn << endl;
+
+#if 0
+      if ( nn < edge_list.size() ) {
+	return false;
+      }
+#endif
+
+      // 残ったグラフは cyclic なので SAT で解く．
+      SatSolver solver;
+
+      vector<VarId> var_array(mMaxId * mEdgeListSize);
+      for (vector<PhfEdge*>::iterator p = edge_list.begin();
+	   p != edge_list.end(); ++ p) {
+	PhfEdge* edge = *p;
+
+	vector<Literal> tmp_clause(mDegree);
+	for (ymuint j = 0; j < mDegree; ++ j) {
+	  PhfNode* node = edge->node(j);
+	  VarId var = solver.new_var();
+	  var_array[node->id() * mEdgeListSize + edge->id()] = var;
+	  tmp_clause[j] = Literal(var, kPolPosi);
+	}
+	solver.add_clause(tmp_clause);
+      }
+
+      // 各ノードに関係する変数は最大1つしか true になってはいけない．
+      for (vector<PhfNode*>::iterator p = node_list.begin();
+	   p != node_list.end(); ++ p) {
+	PhfNode* node = *p;
+	ymuint ne = node->edge_num();
+	vector<PhfEdge*> tmp_list;
+	tmp_list.reserve(ne);
+	for (ymuint j = 0;j < ne; ++ j) {
+	  PhfEdge* edge = node->edge(j);
+	  if ( edge->mActive ) {
+	    tmp_list.push_back(edge);
+	  }
+	}
+	if ( tmp_list.size() < 2 ) {
+	  // そもそも関係する枝が1つ以下なら条件はない．
+	  // もっともそんなノードは上で削除されているはずだよね．
+	  continue;
+	}
+	for (CombiGen cg(tmp_list.size(), 2); !cg.is_end(); ++ cg) {
+	  ymuint j1 = cg(0);
+	  ymuint j2 = cg(1);
+	  PhfEdge* edge1 = tmp_list[j1];
+	  PhfEdge* edge2 = tmp_list[j2];
+	  VarId var1 = var_array[node->id() * mEdgeListSize + edge1->id()];
+	  VarId var2 = var_array[node->id() * mEdgeListSize + edge2->id()];
+	  solver.add_clause(Literal(var1, kPolNega), Literal(var2, kPolNega));
+	}
+      }
+
+      vector<Bool3> model;
+      Bool3 stat = solver.solve(model);
+      if ( stat != kB3True ) {
+	return false;
+      }
+
+      for (vector<PhfEdge*>::iterator p = edge_list.begin();
+	   p != edge_list.end(); ++ p) {
+	PhfEdge* edge = *p;
+	for (ymuint j = 0; j < mDegree; ++ j) {
+	  PhfNode* node = edge->node(j);
+	  ymuint pos = var_array[node->id() * mEdgeListSize + edge->id()].val();
+	  if ( model[pos] == kB3True ) {
+	    block_map[i] = j;
+	    break;
+	  }
+	}
+      }
+    }
+  }
+
+#else
 
   // 残ったグラフは cyclic なので SAT で解く．
   SatSolver solver;
@@ -373,8 +482,36 @@ PhfGraph::split_check(vector<ymuint>& block_map)
     assert_cond( !v_array[node->id()], __FILE__, __LINE__);
     v_array[node->id()] = true;
   }
+#endif
 
   return true;
+}
+
+void
+PhfGraph::dfs(PhfEdge* edge,
+	      vector<bool>& mark,
+	      vector<PhfEdge*>& edge_list)
+{
+  if ( mark[edge->id()] ) {
+    return;
+  }
+  mark[edge->id()] = true;
+  edge_list.push_back(edge);
+
+  for (ymuint i = 0; i < mDegree; ++ i) {
+    PhfNode* node = edge->node(i);
+    if ( !node->mActive ) {
+      continue;
+    }
+
+    ymuint ne = node->edge_num();
+    for (ymuint j = 0; j < ne; ++ j) {
+      PhfEdge* edge1 = node->edge(j);
+      if ( edge1->mActive ) {
+	dfs(edge1, mark, edge_list);
+      }
+    }
+  }
 }
 
 // @brief 関数のリストからグラフを作る．
