@@ -289,11 +289,7 @@ PhfGraph::split_check(vector<ymuint>& block_map)
     return true;
   }
 
-  cout << "# of edges = " << (mEdgeListSize - epos) << endl
-       << "# of nodes = " << (mMaxId - epos) << endl
-       << endl;
-
-#if 1
+#if 0
   while ( epos < mEdgeListSize ) {
     for (ymuint i = 0; i < mEdgeListSize; ++ i) {
       PhfEdge* edge = mEdgeList[i];
@@ -399,6 +395,36 @@ PhfGraph::split_check(vector<ymuint>& block_map)
   }
 
 #else
+
+  // 残った枝に関係するノード数を数える．
+#if 0
+  ymuint ne = 0;
+  ymuint nn = 0;
+  {
+    vector<bool> node_mark(mMaxId, false);
+    for (ymuint i = 0; i < mEdgeListSize; ++ i) {
+      PhfEdge* edge = mEdgeList[i];
+      if ( !edge->mActive ) {
+	continue;
+      }
+      ++ ne;
+      for (ymuint j = 0; j < mDegree; ++ j) {
+	PhfNode* node = edge->node(j);
+	if ( !node_mark[node->id()] ) {
+	  node_mark[node->id()] = true;
+	  ++ nn;
+	}
+      }
+    }
+  }
+
+  cout << "# of edges = " << ne << endl
+       << "# of nodes = " << nn << endl
+       << endl;
+  if ( nn < ne ) {
+    return false;
+  }
+#endif
 
   // 残ったグラフは cyclic なので SAT で解く．
   SatSolver solver;
