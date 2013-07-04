@@ -74,6 +74,9 @@ private:
   // 枝のリスト
   vector<BmEdge*> mEdgeList;
 
+  // 今選択されている枝
+  BmEdge* mCurEdge;
+
 };
 
 END_NAMESPACE_YM_IGF

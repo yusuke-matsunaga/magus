@@ -47,6 +47,20 @@ public:
   BmNode*
   v2();
 
+  /// @brief flow を設定する．
+  void
+  set_flow(ymuint flow);
+
+  /// @brief flow を返す．
+  /// @note 答えは 0 か 1
+  ymuint
+  flow();
+
+  /// @brief residual を返す．
+  /// @note 答えは 0 か 1
+  ymuint
+  residual();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -58,6 +72,12 @@ private:
 
   // V2 側のノード
   BmNode* mV2;
+
+  // flow を組にしたもの
+  ymuint32 mFlow;
+
+  // visited flag
+  bool mVisited;
 
 };
 

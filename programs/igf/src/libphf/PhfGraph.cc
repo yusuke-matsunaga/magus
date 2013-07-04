@@ -344,10 +344,12 @@ PhfGraph::split_check(vector<ymuint>& block_map)
   }
 
   vector<BmEdge*> bmedge_list;
-  bmg.find_match(bmedge_list);
-  if ( bmedge_list.size() < ne ) {
+  bool stat = bmg.find_match(bmedge_list);
+  if ( !stat ) {
     return false;
   }
+
+  assert_cond( bmedge_list.size() == ne, __FILE__, __LINE__);
   for (ymuint i = 0; i < ne; ++ i) {
     BmEdge* bm_edge = bmedge_list[i];
     BmNode* v1 = bm_edge->v1();

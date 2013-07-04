@@ -19,6 +19,7 @@ BEGIN_NAMESPACE_YM_IGF
 // @brief コンストラクタ
 BmNode::BmNode()
 {
+  mCurEdge = NULL;
 }
 
 // @brief デストラクタ

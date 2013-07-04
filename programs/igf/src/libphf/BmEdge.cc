@@ -44,4 +44,27 @@ BmEdge::v2()
   return mV2;
 }
 
+// @brief flow を設定する．
+void
+BmEdge::set_flow(ymuint flow)
+{
+  mFlow = flow;
+}
+
+// @brief flow を返す．
+// @note 答えは 0 か 1
+ymuint
+BmEdge::flow()
+{
+  return mFlow;
+}
+
+// @brief residual を返す．
+// @note 答えは 0 か 1
+ymuint
+BmEdge::residual()
+{
+  return 1 - mFlow;
+}
+
 END_NAMESPACE_YM_IGF
