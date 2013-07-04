@@ -218,8 +218,6 @@ PhfGraph::split_check(vector<ymuint>& block_map)
     mEdgeList[i]->mActive = true;
   }
 
-  vector<bool> global_node_mark(mMaxId, false);
-
   vector<pair<PhfNode*, PhfEdge*> > node_queue(mNodeArraySize);
   ymuint wpos = 0;
   for (ymuint n_pos = 0; n_pos < mNodeArraySize; ++ n_pos) {
@@ -254,7 +252,6 @@ PhfGraph::split_check(vector<ymuint>& block_map)
     for (ymuint i = 0; i < mDegree; ++ i) {
       if ( edge0->node(i) == node0 ) {
 	block_map[edge0->id()] = i;
-	global_node_mark[node0->id()] = true;
 	break;
       }
     }
@@ -291,114 +288,6 @@ PhfGraph::split_check(vector<ymuint>& block_map)
     // 全ての枝を処理した．
     return true;
   }
-
-  cout << "------------------------" << endl;
-#if 0
-  while ( epos < mEdgeListSize ) {
-    for (ymuint i = 0; i < mEdgeListSize; ++ i) {
-      PhfEdge* edge = mEdgeList[i];
-      if ( !edge->mActive ) {
-	continue;
-      }
-      vector<bool> edge_mark(mEdgeListSize, false);
-      vector<PhfEdge*> edge_list;
-      vector<bool> node_mark(mMaxId, false);
-      vector<PhfNode*> node_list;
-      dfs(edge, edge_mark, edge_list, node_mark, node_list);
-      ymuint ne = edge_list.size();
-      ymuint nn = node_list.size();
-      epos += ne;
-
-      if ( nn < ne ) {
-	return false;
-      }
-
-      cout << " # of edges = " << ne << endl
-	   << " # of nodes = " << nn << endl;
-
-      // 残ったグラフは cyclic なので SAT で解く．
-      SatSolver solver;
-
-      vector<VarId> var_array(mMaxId * mEdgeListSize);
-      for (vector<PhfEdge*>::iterator p = edge_list.begin();
-	   p != edge_list.end(); ++ p) {
-	PhfEdge* edge = *p;
-
-	vector<Literal> tmp_clause(mDegree);
-	for (ymuint j = 0; j < mDegree; ++ j) {
-	  PhfNode* node = edge->node(j);
-	  VarId var = solver.new_var();
-	  var_array[node->id() * mEdgeListSize + edge->id()] = var;
-	  tmp_clause[j] = Literal(var, kPolPosi);
-	}
-	solver.add_clause(tmp_clause);
-      }
-
-      // 各ノードに関係する変数は最大1つしか true になってはいけない．
-      for (vector<PhfNode*>::iterator p = node_list.begin();
-	   p != node_list.end(); ++ p) {
-	PhfNode* node = *p;
-	ymuint ne = node->edge_num();
-	vector<PhfEdge*> tmp_list;
-	tmp_list.reserve(ne);
-	for (ymuint j = 0;j < ne; ++ j) {
-	  PhfEdge* edge = node->edge(j);
-	  if ( edge->mActive ) {
-	    tmp_list.push_back(edge);
-	  }
-	}
-	if ( tmp_list.size() < 2 ) {
-	  // そもそも関係する枝が1つ以下なら条件はない．
-	  // もっともそんなノードは上で削除されているはずだよね．
-	  continue;
-	}
-	for (CombiGen cg(tmp_list.size(), 2); !cg.is_end(); ++ cg) {
-	  ymuint j1 = cg(0);
-	  ymuint j2 = cg(1);
-	  PhfEdge* edge1 = tmp_list[j1];
-	  PhfEdge* edge2 = tmp_list[j2];
-	  VarId var1 = var_array[node->id() * mEdgeListSize + edge1->id()];
-	  VarId var2 = var_array[node->id() * mEdgeListSize + edge2->id()];
-	  solver.add_clause(Literal(var1, kPolNega), Literal(var2, kPolNega));
-	}
-      }
-      for (vector<PhfEdge*>::iterator p = edge_list.begin();
-	   p != edge_list.end(); ++ p) {
-	PhfEdge* edge = *p;
-	edge->mActive = false;
-      }
-      for (vector<PhfNode*>::iterator p = node_list.begin();
-	   p != node_list.end(); ++ p) {
-	PhfNode* node = *p;
-	node->mActive = false;
-      }
-
-      vector<Bool3> model;
-      Bool3 stat = solver.solve(model);
-      if ( stat != kB3True ) {
-	cout << " --> NG" << endl;
-	return false;
-      }
-
-      cout << " --> OK" << endl;
-      for (vector<PhfEdge*>::iterator p = edge_list.begin();
-	   p != edge_list.end(); ++ p) {
-	PhfEdge* edge = *p;
-	for (ymuint j = 0; j < mDegree; ++ j) {
-	  PhfNode* node = edge->node(j);
-	  ymuint pos = var_array[node->id() * mEdgeListSize + edge->id()].val();
-	  if ( model[pos] == kB3True ) {
-	    block_map[edge->id()] = j;
-	    assert_cond( !global_node_mark[node->id()], __FILE__, __LINE__);
-	    global_node_mark[node->id()] = true;
-	    break;
-	  }
-	}
-      }
-    }
-  }
-
-#else
 
   // 残った枝に関係するノード数を数える．
   ymuint ne = 0;
@@ -479,7 +368,12 @@ PhfGraph::split_check(vector<ymuint>& block_map)
   vector<Bool3> model;
   Bool3 stat = solver.solve(model);
   if ( stat != kB3True ) {
-    cout << " --> NG" << endl;
+    if ( stat == kB3X ) {
+      cout << " --> Abort" << endl;
+    }
+    else {
+      cout << " --> NG" << endl;
+    }
     return false;
   }
 
@@ -498,7 +392,6 @@ PhfGraph::split_check(vector<ymuint>& block_map)
       }
     }
   }
-#endif
 
   // 検証用のコード
   vector<bool> v_array(mMaxId, false);
@@ -538,7 +431,7 @@ PhfGraph::dfs(PhfEdge* edge,
     ymuint ne = node->edge_num();
     for (ymuint j = 0; j < ne; ++ j) {
       PhfEdge* edge1 = node->edge(j);
-      if ( edge1->mActive ) {
+      if ( edge1 != edge && edge1->mActive ) {
 	dfs(edge1, edge_mark, edge_list, node_mark, node_list);
       }
     }
