@@ -11,8 +11,9 @@
 #include "PhfNode.h"
 #include "PhfEdge.h"
 #include "FuncVect.h"
-#include "ym_logic/SatSolver.h"
-#include "ym_utils/CombiGen.h"
+#include "BmGraph.h"
+#include "BmNode.h"
+#include "BmEdge.h"
 
 
 #define VERIFY_ACYCLIC_CHECK 0
@@ -291,7 +292,10 @@ PhfGraph::split_check(vector<ymuint>& block_map)
 
   // 残った枝に関係するノード数を数える．
   ymuint ne = 0;
+  vector<ymuint> edge_map(mEdgeListSize);
+  vector<PhfEdge*> redge_map;
   vector<PhfNode*> node_list;
+  vector<ymuint> node_map(mMaxId);
   {
     vector<bool> node_mark(mMaxId, false);
     for (ymuint i = 0; i < mEdgeListSize; ++ i) {
@@ -299,11 +303,15 @@ PhfGraph::split_check(vector<ymuint>& block_map)
       if ( !edge->mActive ) {
 	continue;
       }
+      edge_map[edge->id()] = ne;
+      redge_map.push_back(edge);
       ++ ne;
       for (ymuint j = 0; j < mDegree; ++ j) {
 	PhfNode* node = edge->node(j);
 	if ( !node_mark[node->id()] ) {
 	  node_mark[node->id()] = true;
+	  ymuint node_id = node_list.size();
+	  node_map[node->id()] = node_id;
 	  node_list.push_back(node);
 	}
       }
@@ -311,6 +319,7 @@ PhfGraph::split_check(vector<ymuint>& block_map)
   }
   ymuint nn = node_list.size();
 
+  // ノード数が枝数より少なければマッチングしない．
   if ( nn < ne ) {
     return false;
   }
@@ -318,76 +327,38 @@ PhfGraph::split_check(vector<ymuint>& block_map)
   cout << "# of edges = " << ne << endl
        << "# of nodes = " << nn << endl;
 
-  // 残ったグラフは cyclic なので SAT で解く．
-  SatSolver solver;
+  // 残ったグラフを別の2部グラフに変換してマッチングを求める．
+  BmGraph bmg(ne, nn);
 
-  vector<VarId> var_array(mMaxId * mEdgeListSize);
   for (ymuint i = 0; i < mEdgeListSize; ++ i) {
     PhfEdge* edge = mEdgeList[i];
     if ( !edge->mActive ) {
       continue;
     }
-    vector<Literal> tmp_clause(mDegree);
+    BmNode* v1 = bmg.v1_elem(edge_map[edge->id()]);
     for (ymuint j = 0; j < mDegree; ++ j) {
       PhfNode* node = edge->node(j);
-      VarId var = solver.new_var();
-      var_array[node->id() * mEdgeListSize + edge->id()] = var;
-      tmp_clause[j] = Literal(var, kPolPosi);
-    }
-    solver.add_clause(tmp_clause);
-  }
-
-  // 各ノードに関係する変数は最大1つしか true になってはいけない．
-  for (ymuint i = 0; i < nn; ++ i) {
-    PhfNode* node = node_list[i];
-    ymuint ne = node->edge_num();
-    vector<PhfEdge*> tmp_list;
-    tmp_list.reserve(ne);
-    for (ymuint j = 0;j < ne; ++ j) {
-      PhfEdge* edge = node->edge(j);
-      if ( edge->mActive ) {
-	tmp_list.push_back(edge);
-      }
-    }
-    if ( tmp_list.size() < 2 ) {
-      // そもそも関係する枝が1つ以下なら条件はない．
-      // もっともそんなノードは上で削除されているはずだよね．
-      continue;
-    }
-    for (CombiGen cg(tmp_list.size(), 2); !cg.is_end(); ++ cg) {
-      ymuint j1 = cg(0);
-      ymuint j2 = cg(1);
-      PhfEdge* edge1 = tmp_list[j1];
-      PhfEdge* edge2 = tmp_list[j2];
-      VarId var1 = var_array[node->id() * mEdgeListSize + edge1->id()];
-      VarId var2 = var_array[node->id() * mEdgeListSize + edge2->id()];
-      solver.add_clause(Literal(var1, kPolNega), Literal(var2, kPolNega));
+      BmNode* v2 = bmg.v2_elem(node_map[node->id()]);
+      bmg.new_edge(v1, v2);
     }
   }
 
-  vector<Bool3> model;
-  Bool3 stat = solver.solve(model);
-  if ( stat != kB3True ) {
-    if ( stat == kB3X ) {
-      cout << " --> Abort" << endl;
-    }
-    else {
-      cout << " --> NG" << endl;
-    }
+  vector<BmEdge*> bmedge_list;
+  bmg.find_match(bmedge_list);
+  if ( bmedge_list.size() < ne ) {
     return false;
   }
+  for (ymuint i = 0; i < ne; ++ i) {
+    BmEdge* bm_edge = bmedge_list[i];
+    BmNode* v1 = bm_edge->v1();
+    BmNode* v2 = bm_edge->v2();
+    PhfEdge* phf_edge = redge_map[v1->id()];
+    PhfNode* phf_node = node_list[v2->id()];
 
-  cout << " --> OK" << endl;
-  for (ymuint i = 0; i < mEdgeListSize; ++ i) {
-    PhfEdge* edge = mEdgeList[i];
-    if ( !edge->mActive ) {
-      continue;
-    }
     for (ymuint j = 0; j < mDegree; ++ j) {
-      PhfNode* node = edge->node(j);
-      ymuint pos = var_array[node->id() * mEdgeListSize + edge->id()].val();
-      if ( model[pos] == kB3True ) {
-	block_map[edge->id()] = j;
+      PhfNode* node1 = phf_edge->node(j);
+      if ( node1 == phf_node ) {
+	block_map[phf_edge->id()] = j;
 	break;
       }
     }
@@ -404,38 +375,6 @@ PhfGraph::split_check(vector<ymuint>& block_map)
   }
 
   return true;
-}
-
-void
-PhfGraph::dfs(PhfEdge* edge,
-	      vector<bool>& edge_mark,
-	      vector<PhfEdge*>& edge_list,
-	      vector<bool>& node_mark,
-	      vector<PhfNode*>& node_list)
-{
-  if ( edge_mark[edge->id()] ) {
-    return;
-  }
-  edge_mark[edge->id()] = true;
-  edge_list.push_back(edge);
-
-  for (ymuint i = 0; i < mDegree; ++ i) {
-    PhfNode* node = edge->node(i);
-    if ( node_mark[node->id()] ) {
-      continue;
-    }
-
-    node_mark[node->id()] = true;
-    node_list.push_back(node);
-
-    ymuint ne = node->edge_num();
-    for (ymuint j = 0; j < ne; ++ j) {
-      PhfEdge* edge1 = node->edge(j);
-      if ( edge1 != edge && edge1->mActive ) {
-	dfs(edge1, edge_mark, edge_list, node_mark, node_list);
-      }
-    }
-  }
 }
 
 // @brief 関数のリストからグラフを作る．

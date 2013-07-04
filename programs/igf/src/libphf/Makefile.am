@@ -25,6 +25,12 @@ libphf_la_SOURCES = \
 	PhfNode.h \
 	PhfEdge.h \
 	PhfGen.cc \
+	BmGraph.h \
+	BmGraph.cc \
+	BmNode.h \
+	BmNode.cc \
+	BmEdge.h \
+	BmEdge.cc \
 	IGU.cc \
 	VarFunc.cc \
 	XorFunc.cc
