@@ -89,18 +89,13 @@ private:
   void
   gen_graph(const vector<const FuncVect*>& func_list);
 
-  /// @brief acyclic_check() の下請け関数
-  void
-  dfs(PhfNode* node0,
-      vector<bool>& v_mark,
-      vector<bool>& e_mark,
-      vector<PhfEdge*>& edge_list) const;
-
   /// @brief split_check() の下請け関数
   void
   dfs(PhfEdge* edge,
-      vector<bool>& mark,
-      vector<PhfEdge*>& edge_list);
+      vector<bool>& edge_mark,
+      vector<PhfEdge*>& edge_list,
+      vector<bool>& node_mark,
+      vector<PhfNode*>& node_list);
 
   /// @brief ノードを生成する．
   PhfNode*

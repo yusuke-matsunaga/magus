@@ -218,6 +218,8 @@ PhfGraph::split_check(vector<ymuint>& block_map)
     mEdgeList[i]->mActive = true;
   }
 
+  vector<bool> global_node_mark(mMaxId, false);
+
   vector<pair<PhfNode*, PhfEdge*> > node_queue(mNodeArraySize);
   ymuint wpos = 0;
   for (ymuint n_pos = 0; n_pos < mNodeArraySize; ++ n_pos) {
@@ -252,6 +254,7 @@ PhfGraph::split_check(vector<ymuint>& block_map)
     for (ymuint i = 0; i < mDegree; ++ i) {
       if ( edge0->node(i) == node0 ) {
 	block_map[edge0->id()] = i;
+	global_node_mark[node0->id()] = true;
 	break;
       }
     }
@@ -289,6 +292,7 @@ PhfGraph::split_check(vector<ymuint>& block_map)
     return true;
   }
 
+  cout << "------------------------" << endl;
 #if 0
   while ( epos < mEdgeListSize ) {
     for (ymuint i = 0; i < mEdgeListSize; ++ i) {
@@ -296,35 +300,21 @@ PhfGraph::split_check(vector<ymuint>& block_map)
       if ( !edge->mActive ) {
 	continue;
       }
-      vector<bool> mark(mEdgeListSize, false);
+      vector<bool> edge_mark(mEdgeListSize, false);
       vector<PhfEdge*> edge_list;
-      dfs(edge, mark, edge_list);
       vector<bool> node_mark(mMaxId, false);
       vector<PhfNode*> node_list;
-      ymuint nn = 0;
-      for (vector<PhfEdge*>::iterator p = edge_list.begin();
-	   p != edge_list.end(); ++ p) {
-	PhfEdge* edge = *p;
-	edge->mActive = false;
-	++ epos;
-	for (ymuint j = 0; j < mDegree; ++ j) {
-	  PhfNode* node = edge->node(j);
-	  if ( !node_mark[node->id()] ) {
-	    ++ nn;
-	    node_mark[node->id()] = true;
-	    node->mActive = false;
-	    node_list.push_back(node);
-	  }
-	}
-      }
-      cout << " # of edges = " << edge_list.size() << endl
-	   << " # of nodes = " << nn << endl;
+      dfs(edge, edge_mark, edge_list, node_mark, node_list);
+      ymuint ne = edge_list.size();
+      ymuint nn = node_list.size();
+      epos += ne;
 
-#if 0
-      if ( nn < edge_list.size() ) {
+      if ( nn < ne ) {
 	return false;
       }
-#endif
+
+      cout << " # of edges = " << ne << endl
+	   << " # of nodes = " << nn << endl;
 
       // 残ったグラフは cyclic なので SAT で解く．
       SatSolver solver;
@@ -372,13 +362,25 @@ PhfGraph::split_check(vector<ymuint>& block_map)
 	  solver.add_clause(Literal(var1, kPolNega), Literal(var2, kPolNega));
 	}
       }
+      for (vector<PhfEdge*>::iterator p = edge_list.begin();
+	   p != edge_list.end(); ++ p) {
+	PhfEdge* edge = *p;
+	edge->mActive = false;
+      }
+      for (vector<PhfNode*>::iterator p = node_list.begin();
+	   p != node_list.end(); ++ p) {
+	PhfNode* node = *p;
+	node->mActive = false;
+      }
 
       vector<Bool3> model;
       Bool3 stat = solver.solve(model);
       if ( stat != kB3True ) {
+	cout << " --> NG" << endl;
 	return false;
       }
 
+      cout << " --> OK" << endl;
       for (vector<PhfEdge*>::iterator p = edge_list.begin();
 	   p != edge_list.end(); ++ p) {
 	PhfEdge* edge = *p;
@@ -386,7 +388,9 @@ PhfGraph::split_check(vector<ymuint>& block_map)
 	  PhfNode* node = edge->node(j);
 	  ymuint pos = var_array[node->id() * mEdgeListSize + edge->id()].val();
 	  if ( model[pos] == kB3True ) {
-	    block_map[i] = j;
+	    block_map[edge->id()] = j;
+	    assert_cond( !global_node_mark[node->id()], __FILE__, __LINE__);
+	    global_node_mark[node->id()] = true;
 	    break;
 	  }
 	}
@@ -397,9 +401,8 @@ PhfGraph::split_check(vector<ymuint>& block_map)
 #else
 
   // 残った枝に関係するノード数を数える．
-#if 0
   ymuint ne = 0;
-  ymuint nn = 0;
+  vector<PhfNode*> node_list;
   {
     vector<bool> node_mark(mMaxId, false);
     for (ymuint i = 0; i < mEdgeListSize; ++ i) {
@@ -412,19 +415,19 @@ PhfGraph::split_check(vector<ymuint>& block_map)
 	PhfNode* node = edge->node(j);
 	if ( !node_mark[node->id()] ) {
 	  node_mark[node->id()] = true;
-	  ++ nn;
+	  node_list.push_back(node);
 	}
       }
     }
   }
+  ymuint nn = node_list.size();
 
-  cout << "# of edges = " << ne << endl
-       << "# of nodes = " << nn << endl
-       << endl;
   if ( nn < ne ) {
     return false;
   }
-#endif
+
+  cout << "# of edges = " << ne << endl
+       << "# of nodes = " << nn << endl;
 
   // 残ったグラフは cyclic なので SAT で解く．
   SatSolver solver;
@@ -446,11 +449,8 @@ PhfGraph::split_check(vector<ymuint>& block_map)
   }
 
   // 各ノードに関係する変数は最大1つしか true になってはいけない．
-  for (ymuint i = 0; i < mMaxId; ++ i) {
-    PhfNode* node = mNodeList[i];
-    if ( !node->mActive ) {
-      continue;
-    }
+  for (ymuint i = 0; i < nn; ++ i) {
+    PhfNode* node = node_list[i];
     ymuint ne = node->edge_num();
     vector<PhfEdge*> tmp_list;
     tmp_list.reserve(ne);
@@ -479,9 +479,11 @@ PhfGraph::split_check(vector<ymuint>& block_map)
   vector<Bool3> model;
   Bool3 stat = solver.solve(model);
   if ( stat != kB3True ) {
+    cout << " --> NG" << endl;
     return false;
   }
 
+  cout << " --> OK" << endl;
   for (ymuint i = 0; i < mEdgeListSize; ++ i) {
     PhfEdge* edge = mEdgeList[i];
     if ( !edge->mActive ) {
@@ -489,17 +491,16 @@ PhfGraph::split_check(vector<ymuint>& block_map)
     }
     for (ymuint j = 0; j < mDegree; ++ j) {
       PhfNode* node = edge->node(j);
-      if ( !node->mActive ) {
-	continue;
-      }
       ymuint pos = var_array[node->id() * mEdgeListSize + edge->id()].val();
       if ( model[pos] == kB3True ) {
-	block_map[i] = j;
+	block_map[edge->id()] = j;
 	break;
       }
     }
   }
+#endif
 
+  // 検証用のコード
   vector<bool> v_array(mMaxId, false);
   for (ymuint i = 0; i < mEdgeListSize; ++ i) {
     PhfEdge* edge = mEdgeList[i];
@@ -508,33 +509,37 @@ PhfGraph::split_check(vector<ymuint>& block_map)
     assert_cond( !v_array[node->id()], __FILE__, __LINE__);
     v_array[node->id()] = true;
   }
-#endif
 
   return true;
 }
 
 void
 PhfGraph::dfs(PhfEdge* edge,
-	      vector<bool>& mark,
-	      vector<PhfEdge*>& edge_list)
+	      vector<bool>& edge_mark,
+	      vector<PhfEdge*>& edge_list,
+	      vector<bool>& node_mark,
+	      vector<PhfNode*>& node_list)
 {
-  if ( mark[edge->id()] ) {
+  if ( edge_mark[edge->id()] ) {
     return;
   }
-  mark[edge->id()] = true;
+  edge_mark[edge->id()] = true;
   edge_list.push_back(edge);
 
   for (ymuint i = 0; i < mDegree; ++ i) {
     PhfNode* node = edge->node(i);
-    if ( !node->mActive ) {
+    if ( node_mark[node->id()] ) {
       continue;
     }
+
+    node_mark[node->id()] = true;
+    node_list.push_back(node);
 
     ymuint ne = node->edge_num();
     for (ymuint j = 0; j < ne; ++ j) {
       PhfEdge* edge1 = node->edge(j);
       if ( edge1->mActive ) {
-	dfs(edge1, mark, edge_list);
+	dfs(edge1, edge_mark, edge_list, node_mark, node_list);
       }
     }
   }
