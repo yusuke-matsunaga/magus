@@ -87,7 +87,8 @@ private:
 
   /// @brief 増加パスを見つける．
   bool
-  find_path(BmEdge* edge);
+  find_alt_path(BmNode* v1,
+		vector<bool>& mark);
 
 
 private:

@@ -54,7 +54,7 @@ public:
 
   /// @brief 分割を行う．
   bool
-  split_check(vector<ymuint>& block_map);
+  cf_partition(vector<ymuint>& block_map);
 
   /// @brief ノード数を返す．
   ymuint
@@ -88,14 +88,6 @@ private:
   /// @param[in] func_list 関数のリスト
   void
   gen_graph(const vector<const FuncVect*>& func_list);
-
-  /// @brief split_check() の下請け関数
-  void
-  dfs(PhfEdge* edge,
-      vector<bool>& edge_mark,
-      vector<PhfEdge*>& edge_list,
-      vector<bool>& node_mark,
-      vector<PhfNode*>& node_list);
 
   /// @brief ノードを生成する．
   PhfNode*

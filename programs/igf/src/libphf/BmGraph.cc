@@ -116,33 +116,29 @@ BmGraph::new_edge(BmNode* v1,
 bool
 BmGraph::find_match(vector<BmEdge*>& edge_list)
 {
-  for (vector<BmEdge*>::iterator p = mEdgeList.begin();
-       p != mEdgeList.end(); ++ p) {
-    BmEdge* edge = *p;
-    cout << edge->v1()->id() << " : " << edge->v2()->id() << endl;
-  }
-  cout << endl;
-
   for (ymuint i = 0; i < mV1Num; ++ i) {
     BmNode* v1 = &mV1Array[i];
-    {
-      for (vector<BmEdge*>::iterator p = mEdgeList.begin();
-	   p != mEdgeList.end(); ++ p) {
-	BmEdge* edge = *p;
-	edge->mVisited = false;
-      }
-    }
     ymuint ne = v1->edge_num();
     bool found = false;
+    // 空いているノードを探す．
     for (ymuint j = 0; j < ne; ++ j) {
       BmEdge* edge = v1->edge(j);
-      if ( find_path(edge) ) {
+      BmNode* v2 = edge->v2();
+      BmEdge* edge1 = v2->mCurEdge;
+      if ( edge1 == NULL ) {
 	v1->mCurEdge = edge;
+	v2->mCurEdge = edge;
 	found = true;
 	break;
       }
     }
-    if ( !found ) {
+    if ( found ) {
+      continue;
+    }
+
+    // なかったので既に割り当てられている枝を取り替える．
+    vector<bool> mark(mV1Num, false);
+    if ( !find_alt_path(v1, mark) ) {
       return false;
     }
   }
@@ -151,41 +147,37 @@ BmGraph::find_match(vector<BmEdge*>& edge_list)
     BmNode* v1 = &mV1Array[i];
     BmEdge* edge = v1->mCurEdge;
     edge_list.push_back(edge);
-    cout << edge->v1()->id() << " : " << edge->v2()->id() << endl;
   }
   return true;
 }
 
 // @brief 増加パスを見つける．
 bool
-BmGraph::find_path(BmEdge* edge)
+BmGraph::find_alt_path(BmNode* v1,
+		       vector<bool>& mark)
 {
-  if ( edge->mVisited ) {
+  if ( mark[v1->id()] ) {
     return false;
   }
-  edge->mVisited = true;
-
-  BmNode* v2 = edge->v2();
-
-  if ( edge1 == NULL ) {
-    v2->mCurEdge = edge;
-    return true;
-  }
-
-  BmNode* v1 = edge1->v1();
+  mark[v1->id()] = true;
   ymuint ne = v1->edge_num();
   for (ymuint i = 0; i < ne; ++ i) {
-    BmEdge* edge2 = v1->edge(i);
-    if ( edge2 == edge1 ) {
-      continue;
+    BmEdge* edge = v1->edge(i);
+    BmNode* v2 = edge->v2();
+    BmEdge* edge1 = v2->mCurEdge;
+    if ( edge1 == NULL ) {
+      // 見つけた．
+      v1->mCurEdge = edge;
+      v2->mCurEdge = edge;
+      return true;
     }
-    if ( find_path(edge2) ){
-      v1->mCurEdge = edge2;
+    if ( find_alt_path(edge1->v1(), mark) ) {
+      // 見つけた．
+      v1->mCurEdge = edge;
       v2->mCurEdge = edge;
       return true;
     }
   }
-
   return false;
 }
 

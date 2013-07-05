@@ -125,7 +125,7 @@ phf(int argc,
       PhfGraph pg(func_list);
 
       vector<ymuint> block_map(nv);
-      bool stat = pg.split_check(block_map);
+      bool stat = pg.cf_partition(block_map);
       if ( stat ) {
 	found = true;
 	cout << "p = " << p << endl;

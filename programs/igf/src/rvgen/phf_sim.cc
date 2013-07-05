@@ -55,7 +55,7 @@ phf_sim2(const vector<const FuncVect*>& func_list)
   vector<ymuint> block_map;
 
   PhfGraph pg(func_list);
-  return pg.split_check(block_map);
+  return pg.cf_partition(block_map);
 }
 
 bool

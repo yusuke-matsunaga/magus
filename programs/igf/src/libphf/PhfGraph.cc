@@ -206,7 +206,7 @@ PhfGraph::acyclic_check(vector<PhfEdge*>& edge_list) const
 
 // @brief 分割を行う．
 bool
-PhfGraph::split_check(vector<ymuint>& block_map)
+PhfGraph::cf_partition(vector<ymuint>& block_map)
 {
   block_map.clear();
   block_map.resize(mEdgeListSize);
@@ -323,9 +323,6 @@ PhfGraph::split_check(vector<ymuint>& block_map)
   if ( nn < ne ) {
     return false;
   }
-
-  cout << "# of edges = " << ne << endl
-       << "# of nodes = " << nn << endl;
 
   // 残ったグラフを別の2部グラフに変換してマッチングを求める．
   BmGraph bmg(ne, nn);
