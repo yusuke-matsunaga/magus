@@ -21,8 +21,6 @@ bin_PROGRAMS = \
 	phf_fixed \
 	phf_fixed3 \
 	phf_igu
-	phf2 \
-	phf3
 
 igf_SOURCES = \
 	igf.cc
@@ -91,32 +89,6 @@ phf_fixed3_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	-lrt \
-	@POPT_LIBS@
-
-phf2_SOURCES = \
-	phf2.cc \
-	Phf2Node.h \
-	Phf2Edge.h \
-	Phf2Gen.h \
-	Phf2Gen.cc
-
-phf2_LDADD = \
-	../libphf/libphf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
-	@POPT_LIBS@
-
-phf3_SOURCES = \
-	phf3.cc \
-	Phf3Node.h \
-	Phf3Edge.h \
-	Phf3Gen.h \
-	Phf3Gen.cc
-
-phf3_LDADD = \
-	../libphf/libphf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	@POPT_LIBS@
 
 phf_igu_SOURCES = \
