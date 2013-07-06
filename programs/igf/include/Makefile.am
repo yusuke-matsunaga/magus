@@ -11,7 +11,6 @@ noinst_HEADERS = \
 	IguGen.h \
 	IguGen2.h \
 	InputFunc.h \
-	PhfGraph.h \
 	PhfGen.h \
 	RegVect.h \
 	RvMgr.h \

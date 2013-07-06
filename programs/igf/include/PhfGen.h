@@ -41,12 +41,12 @@ public:
   mapping(const vector<const FuncVect*>& func_list,
 	  vector<vector<ymuint32>* >& g_list);
 
-  /// @brief 分割を求める．
+  /// @brief collision free 分割を行う．
   /// @param[in] func_list 関数のリスト
-  /// @param[out] block_map 個々の入力ごとのブロック番号を入れる配列
-  ymuint
-  split(const vector<const FuncVect*>& func_list,
-	vector<ymuint>& block_map);
+  /// @param[out] block_map 分割を表す配列
+  bool
+  cf_partition(const vector<const FuncVect*>& func_list,
+	       vector<ymuint>& block_map);
 
 };
 

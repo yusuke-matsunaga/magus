@@ -10,7 +10,6 @@
 #include "igf_nsdef.h"
 #include "FuncVect.h"
 #include "PhfGen.h"
-#include "PhfGraph.h"
 #include "ym_utils/CombiGen.h"
 #include "ym_utils/RandGen.h"
 
@@ -31,70 +30,22 @@ set_random_func(FuncVect* fv,
   }
 }
 
-ymuint
+bool
 phf_sim1(const vector<const FuncVect*>& func_list)
 {
-  PhfGraph pg(func_list);
+  PhfGen pg;
 
-  ymuint ans = 0;
-  if ( !pg.simple_check() ) {
-    ans |= 1;
-  }
-
-  vector<PhfEdge*> edge_list;
-  if ( !pg.acyclic_check(edge_list) ) {
-    ans |= 2;
-  }
-
-  return ans;
+  vector<vector<ymuint32>* > g_list;
+  return pg.mapping(func_list, g_list);
 }
 
 bool
 phf_sim2(const vector<const FuncVect*>& func_list)
 {
+  PhfGen pg;
+
   vector<ymuint> block_map;
-
-  PhfGraph pg(func_list);
-  return pg.cf_partition(block_map);
-}
-
-bool
-phf_sim_recur(ymuint n,
-	      ymuint k,
-	      ymuint m,
-	      const vector<const FuncVect*>& func_list,
-	      RandGen& rg)
-{
-  ymuint nf = func_list.size();
-  if ( nf == m ) {
-    ymuint stat = phf_sim1(func_list);
-    return (stat == 0);
-  }
-
-  if ( nf > 1 ) {
-    PhfGraph pg(func_list);
-    vector<PhfEdge*> edge_list;
-    if ( !pg.acyclic_check(edge_list) ) {
-      return false;
-    }
-  }
-
-  vector<const FuncVect*> func_list1(nf + 1);
-  for (ymuint i = 0; i < nf; ++ i) {
-    func_list1[i] = func_list[i];
-  }
-
-  for (ymuint i = 0; i < 100; ++ i) {
-    FuncVect* fv = new FuncVect(k, n);
-    set_random_func(fv, rg);
-    func_list1[nf] = fv;
-    bool stat = phf_sim_recur(n, k, m, func_list1, rg);
-    delete fv;
-    if ( stat ) {
-      return true;
-    }
-  }
-  return false;
+  return pg.cf_partition(func_list, block_map);
 }
 
 END_NONAMESPACE
