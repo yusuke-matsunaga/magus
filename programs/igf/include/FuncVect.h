@@ -23,6 +23,8 @@ class FuncVect
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] max_val 値の最大値
+  /// @param[in] input_size 入力の要素数
   FuncVect(ymuint max_val,
 	   ymuint input_size);
 
@@ -45,6 +47,7 @@ public:
 
   /// @brief 値を得る．
   /// @param[in] id 入力番号 ( 0 <= id < input_size() )
+  /// @note 出力値の範囲は [0, max_val())
   ymuint
   val(ymuint id) const;
 
@@ -64,8 +67,11 @@ private:
   // 値の最大値 + 1
   ymuint32 mMaxVal;
 
+  // 入力の要素数
+  ymuint32 mInputSize;
+
   // 値のベクタ
-  vector<ymuint32> mVector;
+  ymuint32* mVector;
 
 };
 
@@ -79,14 +85,16 @@ inline
 FuncVect::FuncVect(ymuint max_val,
 		   ymuint input_size) :
   mMaxVal(max_val),
-  mVector(input_size)
+  mInputSize(input_size)
 {
+  mVector = new ymuint32[mInputSize];
 }
 
 // @brief デストラクタ
 inline
 FuncVect::~FuncVect()
 {
+  delete [] mVector;
 }
 
 // @brief 値の最大値を得る．
@@ -102,7 +110,7 @@ inline
 ymuint
 FuncVect::input_size() const
 {
-  return mVector.size();
+  return mInputSize;
 }
 
 // @brief 値を得る．
@@ -111,7 +119,7 @@ inline
 ymuint
 FuncVect::val(ymuint id) const
 {
-  assert_cond( id < mVector.size(), __FILE__, __LINE__);
+  assert_cond( id < mInputSize, __FILE__, __LINE__);
   return mVector[id];
 }
 
@@ -123,7 +131,7 @@ void
 FuncVect::set_val(ymuint id,
 		  ymuint val)
 {
-  assert_cond( id < mVector.size(), __FILE__, __LINE__);
+  assert_cond( id < mInputSize, __FILE__, __LINE__);
   mVector[id] = val;
 }
 
