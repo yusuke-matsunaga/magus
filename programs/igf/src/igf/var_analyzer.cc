@@ -20,6 +20,180 @@
 
 BEGIN_NAMESPACE_YM_IGF
 
+struct VarInfo
+{
+  const Variable* mVar;
+
+  ymuint mNdiff;
+
+};
+
+class VarHeap
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] max_size 最大サイズ
+  /// @note max_size を越えた要素は切り捨てらる．
+  VarHeap(ymuint max_size);
+
+  /// @brief デストラクタ
+  ~VarHeap();
+
+
+public:
+
+  /// @brief 空にする．
+  void
+  clear();
+
+  /// @brief 要素を追加する．
+  /// @note max_size を越えたら最大の要素を捨てる．
+  void
+  put(const Variable* var,
+      ymuint ndiff);
+
+  /// @brief 要素数を返す．
+  ymuint
+  elem_num() const;
+
+  /// @brief 要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < elem_num() )
+  const Variable*
+  elem(ymuint pos) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 引数の位置の要素を適当な位置まで沈めていく
+  void
+  push_down(ymuint first);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 配列のサイズ
+  ymuint32 mMaxSize;
+
+  // 要素数
+  ymuint32 mNum;
+
+  // 配列本体
+  VarInfo* mArray;
+
+};
+
+// @brief コンストラクタ
+// @param[in] max_size 最大サイズ
+// @note max_size を越えた要素は切り捨てらる．
+VarHeap::VarHeap(ymuint max_size) :
+  mMaxSize(max_size),
+  mNum(0),
+  mArray(new VarInfo[max_size + 1])
+{
+}
+
+// @brief デストラクタ
+VarHeap::~VarHeap()
+{
+  delete [] mArray;
+}
+
+// @brief 空にする．
+void
+VarHeap::clear()
+{
+  mNum = 0;
+}
+
+// @brief 要素を追加する．
+// @note max_size を越えたら最大の要素を捨てる．
+void
+VarHeap::put(const Variable* var,
+	     ymuint ndiff)
+{
+  mArray[mNum].mVar = var;
+  mArray[mNum].mNdiff = ndiff;
+
+  ymuint pos = mNum;
+  while ( pos > 0 ) {
+    VarInfo& node = mArray[pos];
+    ymuint parent = (pos - 1) >> 1;
+    VarInfo& node_p = mArray[parent];
+    if ( node_p.mNdiff > node.mNdiff ) {
+      VarInfo tmp = node_p;
+      node_p = node;
+      node = tmp;
+      pos = parent;
+    }
+    else {
+      break;
+    }
+  }
+  if ( mNum < mMaxSize ) {
+    ++ mNum;
+  }
+}
+
+// @brief 要素数を返す．
+ymuint
+VarHeap::elem_num() const
+{
+  return mNum;
+}
+
+// @brief 要素を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < elem_num() )
+const Variable*
+VarHeap::elem(ymuint pos) const
+{
+  return mArray[pos].mVar;
+}
+
+// @brief 引数の位置の要素を適当な位置まで沈めていく
+void
+VarHeap::push_down(ymuint first)
+{
+  ymuint parent = first;
+  for ( ; ; ) {
+    ymuint left = parent + parent + 1;
+    ymuint right = left + 1;
+    if ( right > mNum ) {
+      break;
+    }
+    VarInfo& node_p = mArray[parent];
+    VarInfo& node_l = mArray[left];
+    if ( right == mNum ) {
+      if ( node_p.mNdiff > node_l.mNdiff ) {
+	VarInfo tmp = node_p;
+	node_p = node_l;
+	node_l = tmp;
+      }
+      break;
+    }
+    else {
+      VarInfo& node_r = mArray[right];
+      if ( node_p.mNdiff > node_l.mNdiff &&
+	   node_l.mNdiff <= node_r.mNdiff ) {
+	VarInfo tmp = node_p;
+	node_p = node_r;
+	node_r = tmp;
+	parent = right;
+      }
+      else {
+	break;
+      }
+    }
+  }
+}
+
+
 int
 calc_ndiff(const Variable* var,
 	   const vector<const RegVect*>& vect_list)
@@ -36,44 +210,14 @@ calc_ndiff(const Variable* var,
       ++ n1;
     }
   }
-  return n0 - n1;
+  if ( n0 < n1 ) {
+    return n1 - n0;
+  }
+  else {
+    return n0 - n1;
+  }
 }
 
-void
-var_analyze(const vector<const Variable*>& var_list,
-	    const vector<const RegVect*>& vect_list)
-{
-  vector<int> ndiff_list;
-  ndiff_list.reserve(var_list.size());
-  for (vector<const Variable*>::const_iterator p = var_list.begin();
-       p != var_list.end(); ++ p) {
-    const Variable* var = *p;
-    int ndiff = calc_ndiff(var, vect_list);
-    ndiff_list.push_back(ndiff);
-  }
-
-  int total_ndiff = 0;
-  for (vector<int>::iterator p = ndiff_list.begin();
-       p != ndiff_list.end(); ++ p) {
-    total_ndiff += *p;
-  }
-
-  double n = var_list.size();
-  double ave_ndiff = static_cast<double>(total_ndiff) / n;
-  double total_vsq = 0.0;
-  for (vector<int>::iterator p = ndiff_list.begin();
-       p != ndiff_list.end(); ++ p) {
-    int ndiff = *p;
-    double v = ndiff - ave_ndiff;
-    double vsq = v * v;
-    total_vsq += vsq;
-  }
-  double div = sqrt(total_vsq) / n;
-
-  cout << "Mean:     " << ave_ndiff << endl
-       << "St. Div.: " << div << endl
-       << endl;
-}
 
 int
 igf(int argc,
@@ -81,10 +225,14 @@ igf(int argc,
 {
   PoptMainApp app;
 
+  // slack オプション
+  PoptUint popt_slack("slack", 's',
+		      "specify SLACK parameter", "<INT>");
+  app.add_option(&popt_slack);
+
   // xor オプション
   PoptUint popt_xor("xor", 'x',
 		    "specify XOR complexity", "<INT>");
-
   app.add_option(&popt_xor);
 
   app.set_other_option_help("<filename>");
@@ -95,8 +243,12 @@ igf(int argc,
     return -1;
   }
 
-  ymuint32 comp = 1;
+  ymuint32 slack = 0;
+  if ( popt_slack.is_specified() ) {
+    slack = popt_slack.val();
+  }
 
+  ymuint32 comp = 1;
   if ( popt_xor.is_specified() ) {
     comp = popt_xor.val();
   }
@@ -127,25 +279,86 @@ igf(int argc,
 
   ymuint n = rvmgr.vect_size();
 
+  vector<const Variable*>* var_list_array = new vector<const Variable*>[comp - 1];
+
   // Variable を生成
-  vector<const Variable*> var_list;
   for (ymuint i = 0; i < n; ++ i) {
     const Variable* var = new Variable(i);
-    var_list.push_back(var);
+    var_list_array[0].push_back(var);
+    assert_cond( var->vid_list().size() == 1, __FILE__, __LINE__);
   }
-  var_analyze(var_list, vect_list);
 
-  for (ymuint comp_i = 2; comp_i <= comp; ++ comp_i) {
-    var_list.clear();
-    for (CombiGen cg(n, comp_i); !cg.is_end(); ++ cg) {
+  if ( comp >= 2 ) {
+    VarHeap var_heap(n + slack);
+    for (ymuint i1 = 0; i1 < n; ++ i1) {
+      vector<ymuint> vid_list(2);
+      vid_list[0] = i1;
+      for (ymuint i2 = i1 + 1; i2 < n; ++ i2) {
+	vid_list[1] = i2;
+	const Variable* var = new Variable(vid_list);
+	ymuint ndiff = calc_ndiff(var, vect_list);
+	var_heap.put(var, ndiff);
+      }
+    }
+    ymuint nv = var_heap.elem_num();
+    for (ymuint i = 0; i < nv; ++ i) {
+      const Variable* var = var_heap.elem(i);
+      var_list_array[1].push_back(var);
+      assert_cond( var->vid_list().size() == 2, __FILE__, __LINE__);
+    }
+  }
+
+  for (ymuint comp_i = 3; comp_i <= comp; ++ comp_i) {
+    VarHeap var_heap(n + slack);
+    const vector<const Variable*>& var_list1 = var_list_array[comp_i - 2];
+    ymuint nv1 = var_list1.size();
+    for (ymuint i = 0; i < nv1; ++ i) {
+      const Variable* var0 = var_list1[i];
+      const vector<ymuint>& vid_list0 = var0->vid_list();
+      assert_cond( vid_list0.size() == comp_i - 1, __FILE__, __LINE__);
       vector<ymuint> vid_list(comp_i);
-      for (ymuint j = 0; j < comp_i; ++ j) {
-	vid_list[j] = cg(j);
+      for (ymuint i = 0; i < comp_i - 1; ++ i) {
+	vid_list[i] = vid_list0[i];
+      }
+      for (ymuint j = 0; j < n; ++ j) {
+	vid_list[comp_i - 1] = j;
       }
       const Variable* var = new Variable(vid_list);
-      var_list.push_back(var);
+      ymuint ndiff = calc_ndiff(var, vect_list);
+      var_heap.put(var, ndiff);
     }
-    var_analyze(var_list, vect_list);
+    ymuint nv = var_heap.elem_num();
+    for (ymuint i = 0; i < nv; ++ i) {
+      const Variable* var = var_heap.elem(i);
+      var_list_array[comp_i - 1].push_back(var);
+      assert_cond( var->vid_list().size() == comp_i, __FILE__, __LINE__);
+    }
+  }
+
+  vector<const Variable*> var_all_list;
+  for (ymuint i = 0; i < comp; ++ i) {
+    ymuint nv = var_list_array[i].size();
+    for (ymuint j = 0; j < nv; ++ j) {
+      var_all_list.push_back(var_list_array[i][j]);
+    }
+  }
+  ymuint nall = var_all_list.size();
+
+  ymuint nlimit = 2000;
+  ymuint p = rvmgr.index_size();
+  RandGen rg;
+  RandCombiGen rcg(nall, p);
+  for (ymuint c = 0; c < nlimit; ++ c) {
+    rcg.generate(rg);
+    vector<vector<ymuint32> > vars_list(p);
+    for (ymuint i = 0; i < p; ++ i) {
+      ymuint pos = rcg.elem(i);
+      const Variable* var = var_all_list[pos];
+      const vector<ymuint>& vid_list = var->vid_list();
+      vars_list[i] = vid_list;
+    }
+    XorFunc xf(vars_list);
+
   }
 
   return 0;
