@@ -12,13 +12,27 @@
 #include "RvMgr.h"
 #include "RegVect.h"
 #include "Variable.h"
+#include "XorFunc.h"
+#include "FuncVect.h"
 
 #include "ym_utils/CombiGen.h"
 #include "ym_utils/RandGen.h"
-#include "ym_utils/RandPermGen.h"
+#include "ym_utils/RandCombiGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
+
+struct PairLt
+{
+  PairLt() { }
+
+  bool
+  operator()(const pair<ymuint, const Variable*>& left,
+	     const pair<ymuint, const Variable*>& right)
+  {
+    return left.first < right.first;
+  }
+};
 
 struct VarInfo
 {
@@ -218,6 +232,25 @@ calc_ndiff(const Variable* var,
   }
 }
 
+ymuint
+calc_ds(XorFunc& xf,
+	ymuint exp_p,
+	const vector<const RegVect*>& vect_list)
+{
+  vector<ymuint> hist(exp_p, 0);
+  ymuint nv = vect_list.size();
+  for (ymuint i = 0; i < nv; ++ i) {
+    const RegVect* rv = vect_list[i];
+    ymuint pos = xf.eval(rv);
+    ++ hist[pos];
+  }
+  ymuint ds = 0;
+  for (ymuint i = 0; i < exp_p; ++ i) {
+    ymuint h = hist[i];
+    ds += h * h;
+  }
+  return ds;
+}
 
 int
 igf(int argc,
@@ -279,87 +312,85 @@ igf(int argc,
 
   ymuint n = rvmgr.vect_size();
 
-  vector<const Variable*>* var_list_array = new vector<const Variable*>[comp - 1];
+  vector<const Variable*> var_list;
 
-  // Variable を生成
+  // Primary Variable を生成
+  ymuint max_ndiff = 0;
   for (ymuint i = 0; i < n; ++ i) {
     const Variable* var = new Variable(i);
-    var_list_array[0].push_back(var);
-    assert_cond( var->vid_list().size() == 1, __FILE__, __LINE__);
-  }
-
-  if ( comp >= 2 ) {
-    VarHeap var_heap(n + slack);
-    for (ymuint i1 = 0; i1 < n; ++ i1) {
-      vector<ymuint> vid_list(2);
-      vid_list[0] = i1;
-      for (ymuint i2 = i1 + 1; i2 < n; ++ i2) {
-	vid_list[1] = i2;
-	const Variable* var = new Variable(vid_list);
-	ymuint ndiff = calc_ndiff(var, vect_list);
-	var_heap.put(var, ndiff);
-      }
-    }
-    ymuint nv = var_heap.elem_num();
-    for (ymuint i = 0; i < nv; ++ i) {
-      const Variable* var = var_heap.elem(i);
-      var_list_array[1].push_back(var);
-      assert_cond( var->vid_list().size() == 2, __FILE__, __LINE__);
+    var_list.push_back(var);
+    ymuint ndiff = calc_ndiff(var, vect_list);
+    if ( max_ndiff < ndiff ) {
+      max_ndiff = ndiff;
     }
   }
 
-  for (ymuint comp_i = 3; comp_i <= comp; ++ comp_i) {
-    VarHeap var_heap(n + slack);
-    const vector<const Variable*>& var_list1 = var_list_array[comp_i - 2];
-    ymuint nv1 = var_list1.size();
-    for (ymuint i = 0; i < nv1; ++ i) {
-      const Variable* var0 = var_list1[i];
-      const vector<ymuint>& vid_list0 = var0->vid_list();
-      assert_cond( vid_list0.size() == comp_i - 1, __FILE__, __LINE__);
+  // Composed Variable を生成
+  for (ymuint comp_i = 2; comp_i <= comp; ++ comp_i) {
+    for (CombiGen cg(n, comp_i); !cg.is_end(); ++ cg) {
       vector<ymuint> vid_list(comp_i);
-      for (ymuint i = 0; i < comp_i - 1; ++ i) {
-	vid_list[i] = vid_list0[i];
-      }
-      for (ymuint j = 0; j < n; ++ j) {
-	vid_list[comp_i - 1] = j;
+      for (ymuint i = 0; i < comp_i; ++ i) {
+	ymuint pos = cg(i);
+	vid_list[i] = pos;
       }
       const Variable* var = new Variable(vid_list);
       ymuint ndiff = calc_ndiff(var, vect_list);
-      var_heap.put(var, ndiff);
-    }
-    ymuint nv = var_heap.elem_num();
-    for (ymuint i = 0; i < nv; ++ i) {
-      const Variable* var = var_heap.elem(i);
-      var_list_array[comp_i - 1].push_back(var);
-      assert_cond( var->vid_list().size() == comp_i, __FILE__, __LINE__);
+      if ( ndiff < max_ndiff ) {
+	var_list.push_back(var);
+      }
     }
   }
 
-  vector<const Variable*> var_all_list;
-  for (ymuint i = 0; i < comp; ++ i) {
-    ymuint nv = var_list_array[i].size();
-    for (ymuint j = 0; j < nv; ++ j) {
-      var_all_list.push_back(var_list_array[i][j]);
-    }
+  ymuint nall = var_list.size();
+
+  vector<pair<ymuint, const Variable*> > pair_list;
+  pair_list.reserve(nall);
+  for (ymuint i = 0; i < nall; ++ i) {
+    const Variable* var = var_list[i];
+    ymuint ndiff = calc_ndiff(var, vect_list);
+    pair_list.push_back(make_pair(ndiff, var));
   }
-  ymuint nall = var_all_list.size();
+  sort(pair_list.begin(), pair_list.end(), PairLt());
+  ymuint ncut = n * n;
+  if ( ncut > nall ) {
+    ncut = nall;
+  }
 
   ymuint nlimit = 2000;
-  ymuint p = rvmgr.index_size();
+  ymuint p = rvmgr.index_size() - 1;
+  ymuint exp_p = 1U << p;
   RandGen rg;
-  RandCombiGen rcg(nall, p);
+  RandCombiGen rcg(ncut, p);
+  double ds_all = 0.0;
+  ymuint ds_best = 0;
   for (ymuint c = 0; c < nlimit; ++ c) {
     rcg.generate(rg);
     vector<vector<ymuint32> > vars_list(p);
+
     for (ymuint i = 0; i < p; ++ i) {
       ymuint pos = rcg.elem(i);
-      const Variable* var = var_all_list[pos];
+      const Variable* var = var_list[pos];
       const vector<ymuint>& vid_list = var->vid_list();
       vars_list[i] = vid_list;
     }
     XorFunc xf(vars_list);
 
+    ymuint ds = calc_ds(xf, exp_p, vect_list);
+    if ( ds_all == 0 ) {
+      ds_best = ds;
+    }
+    else {
+      if ( ds_best > ds ) {
+	ds_best = ds;
+      }
+    }
+    ds_all += ds;
   }
+  double ds_ave = ds_all / nlimit;
+  ymuint nv = vect_list.size();
+  double base = nv * (nv - 1);
+  cout << (ds_ave / base) << endl;
+  cout << (ds_best / base) << endl;
 
   return 0;
 }
