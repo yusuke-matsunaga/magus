@@ -29,31 +29,31 @@ igf(int argc,
   // multi オプション
   PoptUint popt_multi("multi", 'm',
 		      "specify multiplexity", "<INT>");
+  app.add_option(&popt_multi);
+
   // xor オプション
   PoptUint popt_xor("xor", 'x',
 		    "specify XOR complexity", "<INT>");
+  app.add_option(&popt_xor);
 
   // recur-limit オプション
   PoptUint popt_rlimit("recur-limit", 'r',
 		       "specify recursive call limit", "<INT>");
+  app.add_option(&popt_rlimit);
 
   // ordering-mode オプション
   PoptUint popt_omode("ordering-mode", 'o',
 		      "set ordering mode", "<INT>");
+  app.add_option(&popt_omode);
 
   // time-limit オプション
   PoptUint popt_tlimit("time-limit", 't',
 		       "set time limit", "<INT>(min)");
+  app.add_option(&popt_tlimit);
 
   // debug-level オプション
   PoptUint popt_debug("debug-level", 'd',
 		      "set debug level", "<INT>");
-
-  app.add_option(&popt_multi);
-  app.add_option(&popt_xor);
-  app.add_option(&popt_rlimit);
-  app.add_option(&popt_omode);
-  app.add_option(&popt_tlimit);
   app.add_option(&popt_debug);
 
   app.set_other_option_help("<filename>");

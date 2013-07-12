@@ -13,13 +13,8 @@
 #include "RegVect.h"
 #include "FuncVect.h"
 #include "PhfGen.h"
-#include "VarFunc.h"
-
-#include "Variable.h"
-#include "IguGen.h"
-#include "ym_utils/CombiGen.h"
-#include "ym_utils/RandGen.h"
-#include "ym_utils/RandCombiGen.h"
+#include "RandHashGen.h"
+#include "InputFunc.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -29,6 +24,11 @@ phf(int argc,
     const char** argv)
 {
   PoptMainApp app;
+
+  // xor オプション
+  PoptUint popt_xor("xor", 'x',
+		    "specify XOR complexity", "<INT>");
+  app.add_option(&popt_xor);
 
   // m オプション
   PoptUint popt_m("mult", 'm',
@@ -51,6 +51,11 @@ phf(int argc,
   tPoptStat stat = app.parse_options(argc, argv, 0);
   if ( stat == kPoptAbort ) {
     return -1;
+  }
+
+  ymuint32 comp = 1;
+  if ( popt_xor.is_specified() ) {
+    comp = popt_xor.val();
   }
 
   ymuint32 m = 2;
@@ -97,28 +102,23 @@ phf(int argc,
     }
   }
 
-  RandGen rg;
+  RandHashGen rhg;
   for (bool found = false; !found ; ++ p) {
     for (ymuint count = 0; count < count_limit; ++ count) {
       const vector<const RegVect*>& vlist = rvmgr.vect_list();
       ymuint nv = vlist.size();
       ymuint exp_p = 1U << p;
-      RandCombiGen rpg2(n, p);
+
       vector<const FuncVect*> func_list(m);
       for (ymuint i = 0; i < m; ++ i) {
-	rpg2.generate(rg);
-	vector<ymuint> f1_vect(p);
-	for (ymuint k = 0; k < p; ++ k) {
-	  f1_vect[k] = rpg2.elem(k);
-	}
-	VarFunc f(f1_vect);
-
+	InputFunc* f = rhg.gen_func(n, p, comp);
 	FuncVect* fv = new FuncVect(exp_p, nv);
 	func_list[i] = fv;
 	for (ymuint v = 0; v < nv; ++ v) {
 	  const RegVect* rv = vlist[v];
-	  fv->set_val(v, f.eval(rv));
+	  fv->set_val(v, f->eval(rv));
 	}
+	delete f;
       }
 
       PhfGen phfgen;
