@@ -36,6 +36,8 @@ class RvMgr;
 
 class Variable;
 
+class InputFunc;
+
 class FuncVect;
 
 END_NAMESPACE_YM_IGF

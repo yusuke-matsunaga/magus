@@ -34,7 +34,8 @@ libphf_la_SOURCES = \
 	BmEdge.cc \
 	IGU.cc \
 	VarFunc.cc \
-	XorFunc.cc
+	XorFunc.cc \
+	RandHashGen.cc
 
 libphf_la_LDFLAGS =
 

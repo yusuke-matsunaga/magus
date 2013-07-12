@@ -17,4 +17,5 @@ noinst_HEADERS = \
 	IGU.h \
 	VarFunc.h \
 	Variable.h \
-	XorFunc.h
+	XorFunc.h \
+	RandHashGen.h
