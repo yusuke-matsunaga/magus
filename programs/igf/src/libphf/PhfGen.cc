@@ -11,6 +11,7 @@
 #include "PhfGraph.h"
 #include "PhfNode.h"
 #include "PhfEdge.h"
+#include "FuncVect.h"
 #include "ym_logic/SatSolver.h"
 #include "ym_utils/CombiGen.h"
 
@@ -49,6 +50,14 @@ PhfGen::mapping(const vector<const FuncVect*>& func_list,
     return false;
   }
 
+  ymuint nf = func_list.size();
+  g_list.clear();
+  g_list.resize(nf);
+  ymuint nv = func_list[0]->max_val();
+  for (ymuint i = 0; i < nf; ++ i) {
+    g_list[i] = new vector<ymuint32>(nv, 0U);
+  }
+
   ymuint d = func_list.size();
   ymuint ne = edge_list.size();
   for (ymuint i = 0; i < ne; ++ i) {
@@ -83,6 +92,17 @@ PhfGen::cf_partition(const vector<const FuncVect*>& func_list,
   PhfGraph pg(func_list);
 
   return pg.cf_partition(block_map);
+}
+
+// @brief displace_decomposition を行う．
+bool
+PhfGen::displace_decomposition(const vector<const FuncVect*>& func_list,
+			       vector<ymuint>& displace_map,
+			       bool use_xor)
+{
+  PhfGraph pg(func_list);
+
+  return pg.displace_decomposition(displace_map, use_xor);
 }
 
 END_NAMESPACE_YM_IGF

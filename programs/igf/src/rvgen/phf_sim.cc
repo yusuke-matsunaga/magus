@@ -48,6 +48,24 @@ phf_sim2(const vector<const FuncVect*>& func_list)
   return pg.cf_partition(func_list, block_map);
 }
 
+bool
+phf_sim3(const vector<const FuncVect*>& func_list)
+{
+  PhfGen pg;
+
+  vector<ymuint> d_map;
+  return pg.displace_decomposition(func_list, d_map, false);
+}
+
+bool
+phf_sim4(const vector<const FuncVect*>& func_list)
+{
+  PhfGen pg;
+
+  vector<ymuint> d_map;
+  return pg.displace_decomposition(func_list, d_map, true);
+}
+
 END_NONAMESPACE
 
 
@@ -85,31 +103,11 @@ phf_sim(int argc,
 
   RandGen rg;
 
-#if 0
   ymuint nt = 2000;
-  ymuint c_ok = 0;
-  ymuint c_simple = 0;
-  ymuint c_cyclic = 0;
-  for (ymuint i = 0; i < nt; ++ i) {
-    FuncVect* fv = new FuncVect(k, n);
-    set_random_func(fv, rg);
-    vector<const FuncVect*> func_list(1, fv);
-    if ( phf_sim_recur(n, k, m, func_list, rg) ) {
-      ++ c_ok;
-    }
-    delete fv;
-  }
-#else
-  ymuint nt = 2000;
-#if 0
-  ymuint c_ok = 0;
-  ymuint c_simple = 0;
-  ymuint c_cyclic = 0;
-#else
-  ymuint c_easy = 0;
-  ymuint c_sat = 0;
-  ymuint c_ng = 0;
-#endif
+  ymuint c1 = 0;
+  ymuint c2 = 0;
+  ymuint c3 = 0;
+  ymuint c4 = 0;
   for (ymuint i = 0; i < nt; ++ i) {
     vector<const FuncVect*> func_list(m);
     // ランダムに関数を作る．
@@ -118,41 +116,35 @@ phf_sim(int argc,
       func_list[j] = fv;
       set_random_func(fv, rg);
     }
-    bool stat = phf_sim2(func_list);
+    bool stat1 = phf_sim1(func_list);
+    bool stat2 = phf_sim2(func_list);
+    bool stat3 = false;
+    bool stat4 = false;
+    if ( m == 2 ) {
+      stat3 = phf_sim3(func_list);
+      stat4 = phf_sim4(func_list);
+    }
     for (ymuint j = 0; j < m; ++ j) {
       delete func_list[j];
     }
-#if 0
-    if ( stat == 0 ) {
-      ++ c_ok;
+    if ( stat1 ) {
+      ++ c1;
     }
-    if ( stat & 1U ){
-      ++ c_simple;
+    if ( stat2 ) {
+      ++ c2;
     }
-    if ( stat & 2U ) {
-      ++ c_cyclic;
+    if ( stat3 ) {
+      ++ c3;
     }
-#else
-    if ( stat ) {
-      ++ c_sat;
+    if ( stat4 ) {
+      ++ c4;
     }
-    else {
-      ++ c_ng;
-    }
-#endif
   }
-#endif
-
   cout << "Total " << nt << " trials" << endl
-#if 0
-       << " # of Success:    " << c_ok << endl
-       << " # of Not Simple: " << c_simple << endl
-       << " # of Cyclic:     " << c_cyclic << endl;
-#else
-  << " # of easy case:  " << c_easy << endl
-  << " # of SAT case:   " << c_sat << endl
-  << " # of Failure:    " << c_ng << endl;
-#endif
+       << " # of C1 case:  " << c1 << endl
+       << " # of C2 case:  " << c2 << endl
+       << " # of C3 case:  " << c3 << endl
+       << " # of C4 case:  " << c4 << endl;
 
   return 0;
 }

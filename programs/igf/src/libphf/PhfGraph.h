@@ -56,6 +56,11 @@ public:
   bool
   cf_partition(vector<ymuint>& block_map);
 
+  /// @brief displace_decomposition を行う．
+  bool
+  displace_decomposition(vector<ymuint>& displace_map,
+			 bool use_xor);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

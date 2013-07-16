@@ -426,6 +426,117 @@ PhfGraph::gen_graph(const vector<const FuncVect*>& func_list)
   }
 }
 
+BEGIN_NONAMESPACE
+
+struct Lt
+{
+  bool
+  operator()(const pair<ymuint, PhfNode*>& left,
+	     const pair<ymuint, PhfNode*>& right)
+  {
+    return left.first < right.first;
+  }
+
+};
+
+struct Gt
+{
+  bool
+  operator()(const pair<ymuint, PhfNode*>& left,
+	     const pair<ymuint, PhfNode*>& right)
+  {
+    return left.first > right.first;
+  }
+
+};
+
+END_NONAMESPACE
+
+// @brief displace_decomposition を行う．
+bool
+PhfGraph::displace_decomposition(vector<ymuint>& displace_map,
+				 bool use_xor)
+{
+  assert_cond( mDegree == 2, __FILE__, __LINE__);
+
+  ymuint orange = mNodeArraySize / 2;
+  vector<pair<ymuint, PhfNode*> > node1_list;
+  vector<pair<ymuint, PhfNode*> > node2_list;
+  node1_list.reserve(orange);
+  node2_list.reserve(orange);
+  vector<bool> used(orange, false);
+  for (ymuint i = 0; i < mNodeArraySize; ++ i) {
+    PhfNode* node = mNodeArray[i];
+    if ( node == NULL ) {
+      continue;
+    }
+    assert_cond( node->edge_num() > 0, __FILE__, __LINE__);
+    PhfEdge* edge0 = node->edge(0);
+    if ( edge0->node(0) == node ) {
+      node1_list.push_back(make_pair(node->edge_num(), node));
+    }
+    else {
+      assert_cond( edge0->node(1) == node, __FILE__, __LINE__);
+      node2_list.push_back(make_pair(node->edge_num(), node));
+    }
+  }
+
+  displace_map.clear();
+  displace_map.resize(orange, 0);
+
+  sort(node2_list.begin(), node2_list.end(), Gt());
+
+  for (vector<pair<ymuint, PhfNode*> >::iterator p = node2_list.begin();
+       p != node2_list.end(); ++ p) {
+    PhfNode* node = p->second;
+    ymuint pat = node->pat();
+    ymuint ne = node->edge_num();
+    bool found = false;
+    for (ymuint d = 0; d < orange; ++ d) {
+      bool conflict = false;
+      for (ymuint i = 0; i < ne; ++ i) {
+	PhfEdge* edge = node->edge(i);
+	PhfNode* alt_node = edge->node(0);
+	ymuint pos = alt_node->pat();
+	if ( use_xor ) {
+	  pos ^= d;
+	}
+	else {
+	  pos = (pos + d) % orange;
+	}
+	if ( used[pos] ) {
+	  conflict = true;
+	  break;
+	}
+      }
+      if ( conflict ) {
+	continue;
+      }
+
+      for (ymuint i = 0; i < ne; ++ i) {
+	PhfEdge* edge = node->edge(i);
+	PhfNode* alt_node = edge->node(0);
+	ymuint pos = alt_node->pat();
+	if ( use_xor ) {
+	  pos ^= d;
+	}
+	else {
+	  pos = (pos + d) % orange;
+	}
+	used[pos] = true;
+      }
+
+      displace_map[pat] = d;
+      found = true;
+      break;
+    }
+    if ( !found ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 // @brief ノードを枝を開放する．
 void
 PhfGraph::clear()

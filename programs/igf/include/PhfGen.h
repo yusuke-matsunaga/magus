@@ -48,6 +48,12 @@ public:
   cf_partition(const vector<const FuncVect*>& func_list,
 	       vector<ymuint>& block_map);
 
+  /// @brief displace_decomposition を行う．
+  bool
+  displace_decomposition(const vector<const FuncVect*>& func_list,
+			 vector<ymuint>& displace_map,
+			 bool use_xor);
+
 };
 
 END_NAMESPACE_YM_IGF
