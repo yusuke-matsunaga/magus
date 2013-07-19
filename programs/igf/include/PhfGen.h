@@ -50,7 +50,8 @@ public:
 
   /// @brief displace_decomposition を行う．
   bool
-  displace_decomposition(const vector<const FuncVect*>& func_list,
+  displace_decomposition(const FuncVect* func1,
+			 const FuncVect* func2,
 			 vector<ymuint>& displace_map,
 			 bool use_xor);
 

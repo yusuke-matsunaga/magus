@@ -46,7 +46,27 @@ PyFuncVect_FromFuncVect(const FuncVect& obj);
 /// @return FuncVect へのポインタを返す．
 extern
 FuncVect*
-PyFuncVect_AsFuncVect(PyObject* py_obj);
+PyFuncVect_AsFuncVectPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyPhfGen: PhfGen の Python 用インターフェイス
+//////////////////////////////////////////////////////////////////////
+
+/// @brief PhfGen を表すタイプオブジェクト
+extern
+PyTypeObject PyPhfGen_Type;
+
+/// @brief PyPhfGen の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyPhfGen 型だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyPhfGen_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyPhfGen_Type;
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -116,34 +136,18 @@ extern
 const RvMgr*
 PyRvMgr_AsRvMgr(PyObject* py_obj);
 
-
-
-#if 0
-//////////////////////////////////////////////////////////////////////
-// PyPhfGraph: PhfGraph の Python 用インターフェイス
-//////////////////////////////////////////////////////////////////////
-
-/// @brief PhfGraph を表すタイプオブジェクト
-extern
-PyTypeObject PyPhfGraph_Type;
-
-/// @brief PyPhfGraph の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が PyPhfGraph 型だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-PyPhfGraph_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &PyPhfGraph_Type;
-}
-
-/// @brief PyObject から PhfGraph を取り出す．
-extern
-PhfGraph*
-PyPhfGraph_AsPhfGraph(PyObject* py_obj);
-#endif
-
 END_NAMESPACE_YM_IGF
+
+
+//////////////////////////////////////////////////////////////////////
+// 初期化関数
+//////////////////////////////////////////////////////////////////////
+
+BEGIN_EXTERN_C
+
+void
+igf_init();
+
+END_EXTERN_C
 
 #endif // PYIGF_H

@@ -96,10 +96,14 @@ PhfGen::cf_partition(const vector<const FuncVect*>& func_list,
 
 // @brief displace_decomposition を行う．
 bool
-PhfGen::displace_decomposition(const vector<const FuncVect*>& func_list,
+PhfGen::displace_decomposition(const FuncVect* func1,
+			       const FuncVect* func2,
 			       vector<ymuint>& displace_map,
 			       bool use_xor)
 {
+  vector<const FuncVect*> func_list(2);
+  func_list[0] = func1;
+  func_list[1] = func2;
   PhfGraph pg(func_list);
 
   return pg.displace_decomposition(displace_map, use_xor);

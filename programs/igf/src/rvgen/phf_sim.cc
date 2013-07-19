@@ -54,7 +54,7 @@ phf_sim3(const vector<const FuncVect*>& func_list)
   PhfGen pg;
 
   vector<ymuint> d_map;
-  return pg.displace_decomposition(func_list, d_map, false);
+  return pg.displace_decomposition(func_list[0], func_list[1], d_map, false);
 }
 
 bool
@@ -63,7 +63,7 @@ phf_sim4(const vector<const FuncVect*>& func_list)
   PhfGen pg;
 
   vector<ymuint> d_map;
-  return pg.displace_decomposition(func_list, d_map, true);
+  return pg.displace_decomposition(func_list[0], func_list[1], d_map, true);
 }
 
 END_NONAMESPACE
