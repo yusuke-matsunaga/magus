@@ -71,13 +71,13 @@ PhfGen_mapping(PhfGenObject* self,
     FuncVect* fv = PyFuncVect_AsFuncVectPtr(obj1);
     func_list[i] = fv;
   }
-  vector<vector<ymuint32>* > g_list;
+  vector<vector<ymuint32> > g_list;
   PhfGen pg;
   bool stat = pg.mapping(func_list, g_list);
   if ( stat ) {
     PyObject* ans_obj = PyList_New(n);
     for (ymuint i = 0; i < n; ++ i) {
-      const vector<ymuint32>& g_map = *g_list[i];
+      const vector<ymuint32>& g_map = g_list[i];
       ymuint s = g_map.size();
       PyObject* map_obj = PyList_New(s);
       for (ymuint j = 0; j < s; ++ j) {
@@ -85,8 +85,6 @@ PhfGen_mapping(PhfGenObject* self,
 	PyList_SetItem(map_obj, j, obj2);
       }
       PyList_SetItem(ans_obj, i, map_obj);
-
-      delete g_list[i];
     }
     return ans_obj;
   }

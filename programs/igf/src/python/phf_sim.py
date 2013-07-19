@@ -51,7 +51,7 @@ def sampling(input_size, output_range, m, n) :
     for i in range(0, n) :
         func_list = []
         for j in range(0, m) :
-            fv = gen_random_func(k, p, randgen)
+            fv = gen_random_func(input_size, output_range, randgen)
             func_list.append(fv)
 
         if check_phf_cond(func_list) :
@@ -73,7 +73,7 @@ m = int(sys.argv[3])
 
 randgen = utils.RandGen()
 
-n = 2000
+n = 1000
 (c1, c2) = sampling(k, p, m, n)
 
 print "Total {} trials".format(n)

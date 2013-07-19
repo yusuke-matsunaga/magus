@@ -112,7 +112,7 @@ phf(int argc,
       vector<const FuncVect*> func_list(m);
       for (ymuint i = 0; i < m; ++ i) {
 	InputFunc* f = rhg.gen_func(n, p, comp);
-	FuncVect* fv = new FuncVect(exp_p, nv);
+	FuncVect* fv = new FuncVect(nv, exp_p);
 	func_list[i] = fv;
 	for (ymuint v = 0; v < nv; ++ v) {
 	  const RegVect* rv = vlist[v];
@@ -123,10 +123,7 @@ phf(int argc,
 
       PhfGen phfgen;
 
-      vector<vector<ymuint32>* > g_list(m);
-      for (ymuint i = 0; i < m; ++ i) {
-	g_list[i] = new vector<ymuint32>(exp_p, 0U);
-      }
+      vector<vector<ymuint32> > g_list(m);
       bool stat = phfgen.mapping(func_list, g_list);
       if ( stat ) {
 	found = true;
@@ -142,7 +139,7 @@ phf(int argc,
 	    ymuint32 val = 0;
 	    for (ymuint j = 0; j < m; ++ j) {
 	      const FuncVect& f1 = *func_list[j];
-	      vector<ymuint32>& g1 = *g_list[j];
+	      vector<ymuint32>& g1 = g_list[j];
 	      ymuint32 v1 = f1.val(i);
 	      cout << comma << setw(6) << v1 << " = " << g1[v1];
 	      val ^= g1[v1];
@@ -154,7 +151,6 @@ phf(int argc,
       }
       for (ymuint i = 0; i < m; ++ i) {
 	delete func_list[i];
-	delete g_list[i];
       }
       if ( stat ) {
 	break;

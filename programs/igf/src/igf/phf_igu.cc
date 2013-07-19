@@ -112,7 +112,7 @@ phf(int argc,
       vector<const FuncVect*> func_list(m);
       for (ymuint i = 0; i < m; ++ i) {
 	InputFunc* f = rhg.gen_func(n, p, comp);
-	FuncVect* fv = new FuncVect(exp_p, nv);
+	FuncVect* fv = new FuncVect(nv, exp_p);
 	for (ymuint v = 0; v < nv; ++ v) {
 	  const RegVect* rv = vlist[v];
 	  fv->set_val(v, f->eval(rv));

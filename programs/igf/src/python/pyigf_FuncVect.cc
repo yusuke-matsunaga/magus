@@ -69,14 +69,14 @@ FuncVect_init(FuncVectObject* self,
   // - (uint, uint)
   ymuint max_val;
   ymuint input_size;
-  if ( !PyArg_ParseTuple(args, "II", &max_val, &input_size) ) {
+  if ( !PyArg_ParseTuple(args, "II", &input_size, &max_val) ) {
     return NULL;
   }
 
   if ( self->mBody != NULL ) {
     delete self->mBody;
   }
-  self->mBody = new FuncVect(max_val, input_size);
+  self->mBody = new FuncVect(input_size, max_val);
 
   // 正常に終了したら 0 を返す．
   return 0;
@@ -265,7 +265,7 @@ PyFuncVect_FromFuncVect(const FuncVect& obj)
 
   ymuint max_val = obj.max_val();
   ymuint input_size = obj.input_size();
-  py_obj->mBody = new FuncVect(max_val, input_size);
+  py_obj->mBody = new FuncVect(input_size, max_val);
   for (ymuint i = 0; i < input_size; ++ i) {
     py_obj->mBody->set_val(i, obj.val(i));
   }

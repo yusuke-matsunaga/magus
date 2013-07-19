@@ -64,11 +64,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 値の最大値 + 1
-  ymuint32 mMaxVal;
-
   // 入力の要素数
   ymuint32 mInputSize;
+
+  // 出力値の最大値 + 1
+  ymuint32 mMaxVal;
 
   // 値のベクタ
   ymuint32* mVector;
@@ -82,10 +82,10 @@ private:
 
 // @brief コンストラクタ
 inline
-FuncVect::FuncVect(ymuint max_val,
-		   ymuint input_size) :
-  mMaxVal(max_val),
-  mInputSize(input_size)
+FuncVect::FuncVect(ymuint input_size,
+		   ymuint max_val) :
+  mInputSize(input_size),
+  mMaxVal(max_val)
 {
   mVector = new ymuint32[mInputSize];
 }
@@ -132,6 +132,7 @@ FuncVect::set_val(ymuint id,
 		  ymuint val)
 {
   assert_cond( id < mInputSize, __FILE__, __LINE__);
+  assert_cond( val < mMaxVal, __FILE__, __LINE__);
   mVector[id] = val;
 }
 

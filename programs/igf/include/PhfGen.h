@@ -39,7 +39,7 @@ public:
   /// @param[out] g_list マッピングのリスト
   bool
   mapping(const vector<const FuncVect*>& func_list,
-	  vector<vector<ymuint32>* >& g_list);
+	  vector<vector<ymuint32> >& g_list);
 
   /// @brief collision free 分割を行う．
   /// @param[in] func_list 関数のリスト
