@@ -44,9 +44,27 @@ def check_rsd_cond(func1, func2, use_xor) :
         return False
     return True
 
+# ランダムサンプリングを用いて成功確率を求める．
+def sampling(input_size, output_range, m, n) :
+    c1 = 0
+    c2 = 0
+    for i in range(0, n) :
+        func_list = []
+        for j in range(0, m) :
+            fv = gen_random_func(k, p, randgen)
+            func_list.append(fv)
+
+        if check_phf_cond(func_list) :
+            c1 = c1 + 1
+
+        if check_cfp_cond(func_list) :
+            c2 = c2 + 1
+
+    return (c1, c2)
+
 
 if len(sys.argv) != 4 :
-    print "Usage: %s <k> <p> <m>" % sys.argv[0]
+    print "Usage: {} <k> <p> <m>".format(sys.argv[0])
     sys.exit(1)
 
 k = int(sys.argv[1])
@@ -56,31 +74,8 @@ m = int(sys.argv[3])
 randgen = utils.RandGen()
 
 n = 2000
-c1 = 0
-c2 = 0
-c3 = 0
-c4 = 0
-for i in range(0, n) :
-    func_list = []
-    for j in range(0, m) :
-        fv = gen_random_func(k, p, randgen)
-        func_list.append(fv)
+(c1, c2) = sampling(k, p, m, n)
 
-    if check_phf_cond(func_list) :
-        c1 = c1 + 1
-
-    if check_cfp_cond(func_list) :
-        c2 = c2 + 1
-
-    if m == 2 :
-        if check_rsd_cond(func_list[0], func_list[1], False) :
-            c3 = c3 + 1
-
-        if check_rsd_cond(func_list[0], func_list[1], True) :
-            c4 = c4 + 1
-
-print "Total %d trials" % n
-print " # of PHF:  %d" % c1
-print " # of CFP:  %d" % c2
-print " # of RSD1: %d" % c3
-print " # of RWD2: %d" % c4
+print "Total {} trials".format(n)
+print " # of PHF:  {}".format(c1)
+print " # of CFP:  {}".format(c2)
