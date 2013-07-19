@@ -63,19 +63,21 @@ def sampling(input_size, output_range, m, n) :
     return (c1, c2)
 
 
-if len(sys.argv) != 4 :
-    print "Usage: {} <k> <p> <m>".format(sys.argv[0])
+if len(sys.argv) != 6 :
+    print "Usage: {} <k1> <k2> <d> <p> <m>".format(sys.argv[0])
     sys.exit(1)
 
-k = int(sys.argv[1])
-p = int(sys.argv[2])
-m = int(sys.argv[3])
+k1 = int(sys.argv[1])
+k2 = int(sys.argv[2])
+d = int(sys.argv[3])
+p = int(sys.argv[4])
+m = int(sys.argv[5])
 
 randgen = utils.RandGen()
 
-n = 1000
-(c1, c2) = sampling(k, p, m, n)
-
-print "Total {} trials".format(n)
-print " # of PHF:  {}".format(c1)
-print " # of CFP:  {}".format(c2)
+n = 10000
+for input_size in range(k1, k2, d) :
+    (c1, c2) = sampling(input_size, p, m, n)
+    d1 = float(c1) / n
+    d2 = float(c2) / n
+    print "{} {} {}".format(input_size, d1, d2)
