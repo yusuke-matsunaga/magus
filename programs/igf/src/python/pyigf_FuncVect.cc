@@ -9,6 +9,8 @@
 
 #include "pyigf.h"
 #include "FuncVect.h"
+#include "ym_utils/pyutils.h"
+#include "ym_utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -128,6 +130,28 @@ FuncVect_set_val(FuncVectObject* self,
   return Py_None;
 }
 
+// set_random_val 関数
+PyObject*
+FuncVect_set_random_val(FuncVectObject* self,
+			PyObject* args)
+{
+  PyObject* obj = NULL;
+  if ( !PyArg_ParseTuple(args, "O!", &PyRandGen_Type, &obj) ) {
+    return NULL;
+  }
+
+  RandGen* rg = PyRandGen_AsRandGenPtr(obj);
+  ymuint input_size = self->mBody->input_size();
+  ymuint max_val = self->mBody->max_val();
+  for (ymuint i = 0; i < input_size; ++ i) {
+    ymuint val = rg->int32() % max_val;
+    self->mBody->set_val(i, val);
+  }
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // FuncVectObject のメソッドテーブル
@@ -155,6 +179,8 @@ PyMethodDef FuncVect_methods[] = {
    PyDoc_STR("return val() (uint)")},
   {"set_val", (PyCFunction)FuncVect_set_val, METH_VARARGS,
    PyDoc_STR("set_val() (uint, uint)")},
+  {"set_random_val", (PyCFunction)FuncVect_set_random_val, METH_VARARGS,
+   PyDoc_STR("set_random_val(RandGen)")},
   {NULL, NULL, 0, NULL} // end-marker
 };
 

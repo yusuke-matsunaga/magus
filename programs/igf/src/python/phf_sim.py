@@ -10,10 +10,7 @@ import igf
 # ランダムな関数ベクタを生成する．
 def gen_random_func(input_size, output_range, randgen ) :
     fv = igf.FuncVect(input_size, output_range)
-    for i in range(0, input_size) :
-        oval = randgen.int32() % output_range
-        fv.set_val(i, oval)
-
+    fv.set_random_val(randgen)
     return fv
 
 
@@ -63,8 +60,8 @@ def sampling(input_size, output_range, m, n) :
     return (c1, c2)
 
 
-if len(sys.argv) != 6 :
-    print "Usage: {} <k1> <k2> <d> <p> <m>".format(sys.argv[0])
+if len(sys.argv) != 7 :
+    print "Usage: {} <k1> <k2> <d> <p> <m> <n>".format(sys.argv[0])
     sys.exit(1)
 
 k1 = int(sys.argv[1])
@@ -72,10 +69,10 @@ k2 = int(sys.argv[2])
 d = int(sys.argv[3])
 p = int(sys.argv[4])
 m = int(sys.argv[5])
+n = int(sys.argv[6])
 
 randgen = utils.RandGen()
 
-n = 10000
 for input_size in range(k1, k2, d) :
     (c1, c2) = sampling(input_size, p, m, n)
     d1 = float(c1) / n
