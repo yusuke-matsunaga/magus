@@ -70,6 +70,7 @@ d = int(sys.argv[3])
 p = int(sys.argv[4])
 m = int(sys.argv[5])
 n = int(sys.argv[6])
+k2 = k2 + d
 
 randgen = utils.RandGen()
 
