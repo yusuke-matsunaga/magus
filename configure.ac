@@ -56,7 +56,7 @@ AC_CONFIG_SUBDIRS([tests])
 
 ym_libym_utils_enable=1
 ym_libym_logic_enable=1
-ym_libym_smtlibv2_enable=0
+ym_libym_smtlibv2_enable=1
 ym_libym_cell_enable=1
 ym_libym_verilog_enable=1
 ym_libym_networks_enable=1
@@ -147,7 +147,7 @@ ym_magus_tclsh_enable=1
 ym_atpg_enable=0
 ym_matpg_enable=0
 ym_satpg_enable=0
-ym_igf_enable=1
+ym_igf_enable=0
 
 YM_INIT_PROGRAMS_SUBDIRS
 
