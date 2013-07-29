@@ -148,6 +148,7 @@ ym_atpg_enable=0
 ym_matpg_enable=0
 ym_satpg_enable=0
 ym_igf_enable=0
+ym_llvmeq_enable=1
 
 YM_INIT_PROGRAMS_SUBDIRS
 
@@ -177,6 +178,12 @@ YM_BUILD_PROGRAM([satpg],
 
 # igf
 YM_BUILD_PROGRAM([igf],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_tclpp_enable])
+
+# llvmeq
+YM_BUILD_PROGRAM([llvmeq],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable,
 		  ym_libym_tclpp_enable])
