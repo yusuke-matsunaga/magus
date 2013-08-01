@@ -1,9 +1,10 @@
 # coding=UTF-8
 
+import sys
 import cell_lib
 
 
-delay_model = cell_lib.kCellDelayGenericCmos
+#delay_model = cell_lib.kCellDelayGenericCmos
 
 def print_pin(pin) :
   dir = pin.direction()
@@ -154,7 +155,26 @@ def print_class(cclass) :
   for group in group_list :
     print_group(group)
 
-lib = cell_lib.CellLibrary("/home/yusuke/data/private/dot-libs/TSMC/tcb670tc.lib")
+def print_pat(pat, id) :
+  (root_id, inv) = pat.root_info()
+  inv_char = ''
+  if inv :
+    inv_char = '~'
+  print '  Pat#{}: RepId = {}, Root = {}{}'.format(id, pat.rep_id(), inv_char, root_id)
+  print '    EdgeList = ',
+  edge_list = pat.edge_list()
+  comma = ''
+  for edge_id in edge_list :
+    print '{}{}'.format(comma, edge_id),
+    comma = ', '
+  print ''
+
+def print_edge(edge, id) :
+  (from_id, to_id, pos, inv) = edge
+  print '  Edge#{}: From = {}, To = {}, Pos = {}, Inv = {}'.format(id, from_id, to_id, pos, inv)
+
+path = "/home/matsunaga/data/private/dot-libs/TSMC/tcb670tc.lib"
+lib = cell_lib.CellLibrary(path)
 delay_model = lib.delay_model()
 #cell_list = lib.cell_list()
 #for cell in cell_list :
@@ -164,3 +184,15 @@ delay_model = lib.delay_model()
 class_list = lib.npn_class_list()
 for cclass in class_list :
   print_class(cclass)
+
+pat_list = lib.pg_pat_list()
+pos = 0
+for pg in pat_list :
+  print_pat(pg, pos)
+  pos = pos + 1
+
+edge_list = lib.pg_edge_list()
+pos = 0
+for edge in edge_list :
+  print_edge(edge, pos)
+  pos = pos + 1

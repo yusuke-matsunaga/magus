@@ -484,7 +484,6 @@ CellLibrary_group_list(CellLibraryObject* self,
     PyList_SetItem(list_obj, i, obj1);
   }
 
-  Py_INCREF(list_obj);
   return list_obj;
 }
 
@@ -501,40 +500,39 @@ CellLibrary_npn_class_list(CellLibraryObject* self,
     PyList_SetItem(list_obj, i, obj1);
   }
 
-  Py_INCREF(list_obj);
   return list_obj;
 }
 
-// パタンを返す．
+// パタンのリストを返す．
 PyObject*
-CellLibrary_pg_pat(CellLibraryObject* self,
-		   PyObject*  args)
+CellLibrary_pg_pat_list(CellLibraryObject* self,
+			PyObject*  args)
 {
-  ymuint pos = 0;
-  if ( !PyArg_ParseTuple(args, "I", &pos) ) {
-    return NULL;
+  ymuint np = self->mLibrary->pg_pat_num();
+  PyObject* list_obj = PyList_New(np);
+  for (ymuint i = 0; i < np; ++ i) {
+    PyObject* obj1 = self->mPatList[i];
+    Py_INCREF(obj1);
+    PyList_SetItem(list_obj, i, obj1);
   }
 
-  PyObject* result = self->mPatList[pos];
-
-  Py_INCREF(result);
-  return result;
+  return list_obj;
 }
 
-// 枝の情報を返す．
+// 枝のリストを返す．
 PyObject*
-CellLibrary_pg_edge(CellLibraryObject* self,
-		    PyObject* args)
+CellLibrary_pg_edge_list(CellLibraryObject* self,
+			 PyObject* args)
 {
-  ymuint pos = 0;
-  if ( !PyArg_ParseTuple(args, "I", &pos) ) {
-    return NULL;
+  ymuint ne = self->mLibrary->pg_edge_num();
+  PyObject* list_obj = PyList_New(ne);
+  for (ymuint i = 0; i < ne; ++ i) {
+    PyObject* obj1 = self->mEdgeList[i];
+    Py_INCREF(obj1);
+    PyList_SetItem(list_obj, i, obj1);
   }
 
-  PyObject* result = self->mEdgeList[pos];
-
-  Py_INCREF(result);
-  return result;
+  return list_obj;
 }
 
 // dump 関数
@@ -610,10 +608,10 @@ PyMethodDef CellLibrary_methods[] = {
    PyDoc_STR("return list of cell group (NONE)")},
   {"npn_class_list", (PyCFunction)CellLibrary_npn_class_list, METH_NOARGS,
    PyDoc_STR("return list of cell class (NONE)")},
-  {"pg_pat", (PyCFunction)CellLibrary_pg_pat, METH_VARARGS,
-   PyDoc_STR("return pattern graph (int)")},
-  {"pg_edge", (PyCFunction)CellLibrary_pg_edge, METH_VARARGS,
-   PyDoc_STR("return edge infomation (int)")},
+  {"pg_pat_list", (PyCFunction)CellLibrary_pg_pat_list, METH_NOARGS,
+   PyDoc_STR("return list of pattern graph (NONE)")},
+  {"pg_edge_list", (PyCFunction)CellLibrary_pg_edge_list, METH_NOARGS,
+   PyDoc_STR("return list of edge infomation (NONE)")},
   {"dump", (PyCFunction)CellLibrary_dump, METH_VARARGS,
    PyDoc_STR("dump (FileBinO)")},
   {NULL, NULL, 0, NULL} // end-marker
