@@ -160,8 +160,7 @@ def print_pat(pat, id) :
   inv_char = ''
   if inv :
     inv_char = '~'
-  print '  Pat#{}: RepId = {}, Root = {}{}'.format(id, pat.rep_id(), inv_char, root_id)
-  print '    EdgeList = ',
+  print '  Pat#{}: RepId = {}, [{}{}], EdgeList ='.format(id, pat.rep_id(), inv_char, root_id),
   edge_list = pat.edge_list()
   comma = ''
   for edge_id in edge_list :
@@ -169,30 +168,39 @@ def print_pat(pat, id) :
     comma = ', '
   print ''
 
+def print_node(type, input_id, id) :
+  iid_str = ''
+  if type == cell_lib.kCellPatInput :
+    iid_str = '[{}]'.format(input_id)
+  print '  Node#{}: {}{}'.format(id, type, iid_str)
+
 def print_edge(edge, id) :
   (from_id, to_id, pos, inv) = edge
-  print '  Edge#{}: From = {}, To = {}, Pos = {}, Inv = {}'.format(id, from_id, to_id, pos, inv)
+  inv_char = ''
+  if inv :
+    inv_char = '***'
+  print '  Edge#{}: {} --> {}({}) {}'.format(id, from_id, to_id, pos, inv_char)
 
 path = "/home/matsunaga/data/private/dot-libs/TSMC/tcb670tc.lib"
+
 lib = cell_lib.CellLibrary(path)
 delay_model = lib.delay_model()
-#cell_list = lib.cell_list()
-#for cell in cell_list :
-#  print cell.name()
-#pg = lib.pg_pat(1)
-#print pg.edge_list()
+
 class_list = lib.npn_class_list()
 for cclass in class_list :
   print_class(cclass)
 
-pat_list = lib.pg_pat_list()
-pos = 0
-for pg in pat_list :
-  print_pat(pg, pos)
-  pos = pos + 1
+pat_num = lib.pg_pat_num()
+for i in range(0, pat_num) :
+  pg = lib.pg_pat(i)
+  print_pat(pg, i)
 
-edge_list = lib.pg_edge_list()
-pos = 0
-for edge in edge_list :
-  print_edge(edge, pos)
-  pos = pos + 1
+node_num = lib.pg_node_num()
+for i in range(0, node_num) :
+  (type, input_id) = lib.pg_node(i)
+  print_node(type, input_id, i)
+
+edge_num = lib.pg_edge_num()
+for i in range(0, edge_num) :
+  edge = lib.pg_edge(i)
+  print_edge(edge, i)
