@@ -9,6 +9,7 @@
 
 #include "ymtools.h"
 #include <sys/cdefs.h>
+#include "ymutils/zstream.h"
 
 
 #define GZIP_MAGIC0	0x1F
@@ -121,6 +122,7 @@ gz_uncompress(int in,
 
 #define ADVANCE()       { z.next_in++; z.avail_in--; }
 
+  // 入出力バッファを確保する．
   if ( (outbufp = malloc(BUFLEN)) == NULL ) {
     maybe_err("malloc failed");
     goto out2;
@@ -130,6 +132,9 @@ gz_uncompress(int in,
     goto out1;
   }
 
+  // z_stream 構造体の初期化
+  // 少し面倒なのは先読みした部分が (pre[0] -- pre[prelen - 1])
+  // に入っているところ．
   memset(&z, 0, sizeof z);
   z.avail_in = prelen;
   z.next_in = (unsigned char *)pre;
