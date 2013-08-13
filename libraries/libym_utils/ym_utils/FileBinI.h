@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM
 
+class FileBuff;
+
 //////////////////////////////////////////////////////////////////////
 /// @class FileBinI FIleBinI.h "ym_utils/FileBinI.h"
 /// @ingroup YmUtils
@@ -22,18 +24,31 @@ BEGIN_NAMESPACE_YM
 class FileBinI :
   public BinI
 {
+private:
+
+  static
+  const ymuint kDefaultBuffSize = 4096;
+
 public:
 
   /// @brief 空のコンストラクタ
-  FileBinI();
+  /// @param[in] buff_size バッファサイズ
+  explicit
+  FileBinI(ymuint buff_size = kDefaultBuffSize);
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
-  FileBinI(const char* filename);
+  /// @param[in] buff_size バッファサイズ
+  explicit
+  FileBinI(const char* filename,
+	   ymuint buff_size = kDefaultBuffSize);
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
-  FileBinI(const string& filename);
+  /// @param[in] buff_size バッファサイズ
+  explicit
+  FileBinI(const string& filename,
+	   ymuint buff_size = kDefaultBuffSize);
 
   /// @brief デストラクタ
   virtual
@@ -50,12 +65,12 @@ public:
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
-  void
+  bool
   open(const char* filename);
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
-  void
+  bool
   open(const string& filename);
 
   /// @brief ファイルを閉じる．
@@ -74,18 +89,9 @@ public:
   /// @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
   /// @return 実際に読み込んだ量を返す．
   virtual
-  ymuint64
+  ssize_t
   read(ymuint64 n,
        ymuint8* buff);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる定数
-  //////////////////////////////////////////////////////////////////////
-
-  static
-  const ymuint16 BUFF_SIZE = 4096;
 
 
 private:
@@ -93,14 +99,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ファイルディスクリプタ
-  int mFd;
-
-  // バッファ
-  ymuint8 mBuff[BUFF_SIZE];
-
-  // バッファ上の読み出し位置
-  ymuint16 mPos;
+  // ファイルバッファ
+  FileBuff* mFileBuff;
 
 };
 

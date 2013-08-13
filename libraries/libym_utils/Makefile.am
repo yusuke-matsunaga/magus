@@ -35,6 +35,8 @@ libym_utils_la_SOURCES = \
 	CombiGen.cc \
 	DlList.cc \
 	File.cc \
+	FileBuff.h \
+	FileBuff.cc \
 	FileInfo.h \
 	FileInfo.cc \
 	FileInfoMgr.h \

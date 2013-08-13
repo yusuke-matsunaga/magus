@@ -18,6 +18,8 @@
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/FileRegion.h"
 
+#include "FileBuff.h"
+
 #include <fcntl.h>
 
 
@@ -40,8 +42,8 @@ void
 BinO::_write(ymuint64 n,
 	     const ymuint8* buff)
 {
-  ymuint64 ret = write(n, buff);
-  if ( ret != n ) {
+  ssize_t ret = write(n, buff);
+  if ( static_cast<ymuint64>(ret) != n ) {
     ostringstream buf;
     buf << "BinO::write(" << n << ") failed. wrote " << ret << " bytes.";
     MsgMgr::put_msg(__FILE__, __LINE__,
@@ -147,27 +149,29 @@ BinO::write_str(const char* val)
 //////////////////////////////////////////////////////////////////////
 
 // @brief 空のコンストラクタ
-FileBinO::FileBinO()
+// @param[in] buff_size バッファサイズ
+FileBinO::FileBinO(ymuint buff_size)
 {
-  mFd = -1;
-  mPos = 0;
+  mFileBuff = new FileBuff(buff_size);
 }
 
 // @brief コンストラクタ
 // @param[in] filename ファイル名
-FileBinO::FileBinO(const char* filename)
+// @param[in] buff_size バッファサイズ
+FileBinO::FileBinO(const char* filename,
+		   ymuint buff_size)
 {
-  mFd = -1;
-  mPos = 0;
+  mFileBuff = new FileBuff(buff_size);
   open(filename);
 }
 
 // @brief コンストラクタ
 // @param[in] filename ファイル名
-FileBinO::FileBinO(const string& filename)
+// @param[in] buff_size バッファサイズ
+FileBinO::FileBinO(const string& filename,
+		   ymuint buff_size)
 {
-  mFd = -1;
-  mPos = 0;
+  mFileBuff = new FileBuff(buff_size);
   open(filename);
 }
 
@@ -175,12 +179,13 @@ FileBinO::FileBinO(const string& filename)
 FileBinO::~FileBinO()
 {
   close();
+  delete mFileBuff;
 }
 
 // @brief 書き込み可能なら true を返す．
 FileBinO::operator bool() const
 {
-  return mFd >= 0;
+  return mFileBuff->is_ready();
 }
 
 // @brief ファイルを開く
@@ -189,8 +194,7 @@ void
 FileBinO::open(const char* filename)
 {
   close();
-  mFd = ::open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-  mPos = 0;
+  mFileBuff->open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 }
 
 // @brief ファイルを開く
@@ -206,53 +210,18 @@ FileBinO::open(const string& filename)
 void
 FileBinO::close()
 {
-  if ( mFd >= 0 ) {
-    if ( mPos > 0 ) {
-      ::write(mFd, reinterpret_cast<void*>(mBuff), mPos);
-    }
-    ::close(mFd);
-  }
-  mFd = -1;
+  mFileBuff->close();
 }
 
 // @brief データを書き出す．
 // @param[in] n データサイズ
 // @param[in] buff データを収めた領域のアドレス
 // @return 実際に書き出した量を返す．
-ymuint64
+ssize_t
 FileBinO::write(ymuint64 n,
 		const ymuint8* buff)
 {
-  if ( mFd < 0 ) {
-    return 0;
-  }
-
-  ymuint64 count = 0;
-  while ( n > 0 ) {
-    // 一度に書き込める最大のサイズを n1 に入れる．
-    ymuint64 n1 = n;
-    if ( mPos + n1 > BUFF_SIZE ) {
-      // バッファサイズの関係でこれだけしか書けない．
-      n1 = BUFF_SIZE - mPos;
-    }
-
-    // mBuff に転送する．
-    memcpy(reinterpret_cast<void*>(mBuff + mPos), reinterpret_cast<const void*>(buff), n1);
-
-    // 諸元を更新する．
-    mPos += n1;
-    count += n1;
-    buff += n1;
-    n -= n1;
-
-    if ( mPos == BUFF_SIZE ) {
-      // バッファが満杯になったので実際の書き込みを行う．
-      ::write(mFd, reinterpret_cast<void*>(mBuff), BUFF_SIZE);
-      mPos = 0;
-    }
-  }
-
-  return count;
+  return mFileBuff->write(buff, n);
 }
 
 
@@ -276,7 +245,7 @@ StreamBinO::~StreamBinO()
 // @param[in] n データサイズ
 // @param[in] buff データを収めた領域のアドレス
 // @return 実際に書き出した量を返す．
-ymuint64
+ssize_t
 StreamBinO::write(ymuint64 n,
 		  const ymuint8* buff)
 {
@@ -294,8 +263,8 @@ void
 BinI::_read(ymuint64 n,
 	    ymuint8* buff)
 {
-  ymuint64 ret = read(n, buff);
-  if ( ret != n ) {
+  ssize_t ret = read(n, buff);
+  if ( static_cast<ymuint64>(ret) != n ) {
     ostringstream buf;
     buf << "BinI::read(" << n << ") failed. read " << ret << " bytes.";
     MsgMgr::put_msg(__FILE__, __LINE__,
@@ -404,27 +373,26 @@ BinI::read_str()
 //////////////////////////////////////////////////////////////////////
 
 // @brief 空のコンストラクタ
-FileBinI::FileBinI()
+FileBinI::FileBinI(ymuint buff_size)
 {
-  mFd = -1;
-  mPos = 0;
+  mFileBuff = new FileBuff(buff_size);
 }
 
 // @brief コンストラクタ
 // @param[in] filename ファイル名
-FileBinI::FileBinI(const char* filename)
+FileBinI::FileBinI(const char* filename,
+		   ymuint buff_size)
 {
-  mFd = -1;
-  mPos = 0;
+  mFileBuff = new FileBuff(buff_size);
   open(filename);
 }
 
 // @brief コンストラクタ
 // @param[in] filename ファイル名
-FileBinI::FileBinI(const string& filename)
+FileBinI::FileBinI(const string& filename,
+		   ymuint buff_size)
 {
-  mFd = -1;
-  mPos = 0;
+  mFileBuff = new FileBuff(buff_size);
   open(filename);
 }
 
@@ -432,30 +400,30 @@ FileBinI::FileBinI(const string& filename)
 FileBinI::~FileBinI()
 {
   close();
+  delete mFileBuff;
 }
 
 // @brief 読み出し可能なら true を返す．
 FileBinI::operator bool() const
 {
-  return mFd >= 0;
+  return mFileBuff->is_ready();
 }
 
 // @brief ファイルを開く
 // @param[in] filename ファイル名
-void
+bool
 FileBinI::open(const char* filename)
 {
   close();
-  mFd = ::open(filename, O_RDONLY);
-  mPos = BUFF_SIZE;
+  return mFileBuff->open(filename, O_RDONLY);
 }
 
 // @brief ファイルを開く
 // @param[in] filename ファイル名
-void
+bool
 FileBinI::open(const string& filename)
 {
-  open(filename.c_str());
+  return open(filename.c_str());
 }
 
 // @brief ファイルを閉じる．
@@ -463,50 +431,18 @@ FileBinI::open(const string& filename)
 void
 FileBinI::close()
 {
-  if ( mFd >= 0 ) {
-    ::close(mFd);
-  }
-  mFd =-1;
+  mFileBuff->close();
 }
 
 // @brief データを読み込む．
 // @param[in] n 読み込むデータサイズ
 // @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
 // @return 実際に読み込んだ量を返す．
-ymuint64
+ssize_t
 FileBinI::read(ymuint64 n,
 	       ymuint8* buff)
 {
-  if ( mFd < 0 ) {
-    return 0;
-  }
-
-  ymuint64 count = 0;
-  while ( n > 0 ) {
-    if ( mPos == BUFF_SIZE ) {
-      // バッファが空なら読み込む
-      ::read(mFd, reinterpret_cast<void*>(mBuff), BUFF_SIZE);
-      mPos = 0;
-    }
-
-    // 一度に読み出せる最大の数を n1 に入れる．
-    ymuint64 n1 = n;
-    if ( mPos + n1 > BUFF_SIZE ) {
-      // バッファサイズの関係でこれしか読み出せない．
-      n1 = BUFF_SIZE - mPos;
-    }
-
-    // buff に転送する．
-    memcpy(reinterpret_cast<void*>(buff), reinterpret_cast<void*>(mBuff + mPos), n1);
-
-    // 諸元を更新する．
-    mPos += n1;
-    count += n1;
-    buff += n1;
-    n -= n1;
-  }
-
-  return count;
+  return mFileBuff->read(buff, n);
 }
 
 
@@ -530,7 +466,7 @@ StreamBinI::~StreamBinI()
 // @param[in] n 読み込むデータサイズ
 // @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
 // @return 実際に読み込んだ量を返す．
-ymuint64
+ssize_t
 StreamBinI::read(ymuint64 n,
 		 ymuint8* buff)
 {

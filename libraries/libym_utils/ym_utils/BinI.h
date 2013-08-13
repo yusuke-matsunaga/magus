@@ -82,7 +82,7 @@ public:
   /// @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
   /// @return 実際に読み込んだ量を返す．
   virtual
-  ymuint64
+  ssize_t
   read(ymuint64 n,
        ymuint8* buff) = 0;
 

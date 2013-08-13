@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM
 
+class FileBuff;
+
 //////////////////////////////////////////////////////////////////////
 /// @class FileBinO FileBinO.h "ym_utils/FileBinO.h"
 /// @ingroup YmUtils
@@ -22,18 +24,31 @@ BEGIN_NAMESPACE_YM
 class FileBinO :
   public BinO
 {
+private:
+
+  static
+  const ymuint kDefaultBuffSize = 4096;
+
 public:
 
   /// @brief 空のコンストラクタ
-  FileBinO();
+  /// @param[in] buff_size バッファサイズ
+  explicit
+  FileBinO(ymuint buff_size = kDefaultBuffSize);
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
-  FileBinO(const char* filename);
+  /// @param[in] buff_size バッファサイズ
+  explicit
+  FileBinO(const char* filename,
+	   ymuint buff_size = kDefaultBuffSize);
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
-  FileBinO(const string& filename);
+  /// @param[in] buff_size バッファサイズ
+  explicit
+  FileBinO(const string& filename,
+	   ymuint buff_size = kDefaultBuffSize);
 
   /// @brief デストラクタ
   virtual
@@ -74,18 +89,9 @@ public:
   /// @param[in] buff データを収めた領域のアドレス
   /// @return 実際に書き出した量を返す．
   virtual
-  ymuint64
+  ssize_t
   write(ymuint64 n,
 	const ymuint8* buff);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる定数
-  //////////////////////////////////////////////////////////////////////
-
-  static
-  const ymuint16 BUFF_SIZE = 4096;
 
 
 private:
@@ -93,14 +99,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ファイルディスクリプタ
-  int mFd;
-
-  // バッファ
-  ymuint8 mBuff[BUFF_SIZE];
-
-  // バッファ上の書き込み位置
-  ymuint16 mPos;
+  // ファイルバッファ
+  FileBuff* mFileBuff;
 
 };
 

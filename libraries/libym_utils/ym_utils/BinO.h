@@ -87,7 +87,7 @@ public:
   /// @param[in] buff データを収めた領域のアドレス
   /// @return 実際に書き出した量を返す．
   virtual
-  ymuint64
+  ssize_t
   write(ymuint64 n,
 	const ymuint8* buff) = 0;
 
