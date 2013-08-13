@@ -64,7 +64,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  zstream();
+  /// @param[in] af alloc 関数
+  /// @param[in] ff free 関数
+  /// @param[in] op opaque オブジェクト
+  zstream(alloc_func af = Z_NULL,
+	  free_func ff = Z_NULL,
+	  voidp op = Z_NULL);
 
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
@@ -125,15 +130,6 @@ public:
   /// @brief 内部の状態に応じて inflateEnd か deflateEnd を呼ぶ．
   int
   end();
-
-  /// @brief zalloc, zfree, opaque を設定する．
-  /// @param[in] af alloc 関数
-  /// @param[in] ff free 関数
-  /// @param[in] op opaque オブジェクト
-  void
-  set_alloc(alloc_func af,
-	    free_func ff,
-	    voidp op);
 
   /// @brief in バッファを設定する．
   /// @param[in] buf バッファ本体
@@ -632,13 +628,18 @@ zstream::version()
 }
 
 // @brief コンストラクタ
+// @param[in] af alloc 関数
+// @param[in] ff free 関数
+// @param[in] op opaque オブジェクト
 inline
-zstream::zstream() :
+zstream::zstream(alloc_func af,
+		 free_func ff,
+		 voidp op) :
   mMode(0)
 {
-  mZ.zalloc = Z_NULL;
-  mZ.zfree = Z_NULL;
-  mZ.opaque = 0;
+  mZ.zalloc = af;
+  mZ.zfree = ff;
+  mZ.opaque = op;
 }
 
 // @brief コピーコンストラクタ
@@ -771,18 +772,6 @@ zstream::end()
   }
   // なにもしない．
   return Z_OK;
-}
-
-// @brief zalloc, zfree, opaque を設定する．
-inline
-void
-zstream::set_alloc(alloc_func af,
-		   free_func ff,
-		   voidp op)
-{
-  mZ.zalloc = af;
-  mZ.zfree = ff;
-  mZ.opaque = op;
 }
 
 // @brief in バッファを設定する．
