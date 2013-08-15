@@ -70,6 +70,8 @@ libym_utils_la_SOURCES = \
 	StrPool.cc \
 	StopWatch.cc \
 	UnitAlloc.cc \
+	ZState.h \
+	ZState.cc \
 	random.cc
 
 libym_utils_la_LIBADD = \

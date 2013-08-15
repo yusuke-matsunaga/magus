@@ -10,11 +10,10 @@
 
 
 #include "ymtools.h"
+#include "FileBuff.h"
 
 
 BEGIN_NAMESPACE_YM
-
-class FileBuff;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ZStateBase ZState.h "ZState.h"
@@ -23,6 +22,43 @@ class FileBuff;
 class ZStateBase
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 型の定義
+  //////////////////////////////////////////////////////////////////////
+
+  typedef long code_int;
+  typedef long count_int;
+  typedef ymuint8 char_type;
+
+public:
+
+  /// @brief コンストラクタ
+  explicit
+  ZStateBase(int bits = 0);
+
+  /// @brief デストラクタ
+  ~ZStateBase();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ファイルをオープンする．
+  /// @param[in] filename ファイル名
+  /// @param[in] flags フラグ
+  /// @param[in] mode モード
+  /// @retval true オープンが成功した．
+  /// @retval false オープンが失敗した．
+  bool
+  open(const char* filename,
+       int flags,
+       mode_t mode = 0);
+
+  /// @brief ファイルをクローズする．
+  void
+  close();
 
 
 protected:
@@ -35,7 +71,7 @@ protected:
   /// @param[in] num 書き込むバイト数
   /// @return 実際に書き込んだバイト数を返す．
   ssize_t
-  _write(ymuint8* buff,
+  _write(const ymuint8* buff,
 	 ymuint num);
 
   /// @brief num バイトを読み込み buff[] に格納する．
@@ -45,6 +81,24 @@ protected:
   ssize_t
   _read(ymuint8* buff,
 	ymuint num);
+
+  count_int&
+  htabof(ymuint i);
+
+  ymuint8&
+  codetabof(ymuint i);
+
+  char_type&
+  tab_prefixof(ymuint i);
+
+  char_type&
+  tab_suffixof(ymuint i);
+
+  char_type*
+  de_stack();
+
+  void
+  cl_hash(count_int hsize);
 
 
 protected:
@@ -60,40 +114,33 @@ protected:
   static
   const ymuint32 k_HSIZE = 69001;
 
-  // magic number
   static
-  const ymuint8 k_MAGICHEADER[2] = { '\037', '\235' };
+  const char_type k_BIT_MASK = 0x1f;
 
   static
-  const ymuint8 k_BIT_MASK = 0x1f;
-
-  static
-  const ymuint8 k_BLOCK_MASK = 0x80;
+  const char_type k_BLOCK_MASK = 0x80;
 
   // Initial number of bits/code
   static
   const ymuint32 k_INIT_BITS = 9;
 
+  // Ratio check interval
+  static
+  const count_int k_CHECK_GAP = 10000;
+
   // First free entry
   static
-  code_int k_FIRST 257
+  const code_int k_FIRST = 257;
 
   // Table clear output code
   static
-  code_int k_CLEAR 256
-
-  // バッファサイズ
-  static
-  const ymuint32 kBuffSize;
+  const code_int k_CLEAR = 256;
 
 
 protected:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // ファイルバッファ
-  FileBuff* mFileBuff;
 
   // 状態
   enum tState {
@@ -114,31 +161,24 @@ protected:
   // Should NEVER generate this code
   code_int m_maxmaxcode;
 
-  count_int m_htab[k_HSIZE];
-
-  ymuint8 m_codetab[k_HSIZE];
-
-  code_int m_hsize;
-
   code_int m_free_ent;
 
   ymint32 m_block_compress;
 
   ymint32 m_clear_flg;
 
-  ymlong m_ratio;
 
-  count_int m_checkpoint;
+private:
+  //////////////////////////////////////////////////////////////////////
+  // プライベートデータメンバ
+  //////////////////////////////////////////////////////////////////////
 
-  ymuint32 m_offset;
+  // ファイルバッファ
+  FileBuff mFileBuff;
 
-  ymlong m_in_count;
+  count_int m_htab[k_HSIZE];
 
-  ymlong m_bytes_out;
-
-  ymlong m_out_count;
-
-  ymuint8 m_buf[k_BITS];
+  ymuint8 m_codetab[k_HSIZE];
 
 };
 
@@ -152,6 +192,40 @@ class ZStateW :
 {
 public:
 
+  /// @brief コンストラクタ
+  ZStateW(int bits = 0);
+
+  /// @brief デストラクタ
+  ~ZStateW();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief データを圧縮して書き込む．
+  /// @param[in] wbuff 書き込むデータを格納したバッファ
+  /// @param[in] num データ(バイト)
+  /// @return 実際に処理したバイト数を返す．
+  /// @note エラーが起こったら -1 を返す．
+  int
+  write(ymuint8* wbuff,
+	int num);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  int
+  cl_block();
+
+  int
+  output(code_int code);
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -164,6 +238,22 @@ private:
   code_int m_hsize_reg;
 
   ymint32 m_hshift;
+
+  ymuint32 m_offset;
+
+  code_int m_hsize;
+
+  ymlong m_ratio;
+
+  count_int m_checkpoint;
+
+  count_int m_in_count;
+
+  count_int m_out_count;
+
+  ymlong m_bytes_out;
+
+  char_type m_buf[k_BITS];
 
 };
 
@@ -204,11 +294,8 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  ymuint8&
-  tab_prefixof(ymuint i);
-
-  ymuint8&
-  tab_suffixof(ymuinti);
+  code_int
+  getcode();
 
 
 private:
@@ -216,9 +303,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  ymuint8* m_stackp
+  char_type* m_stackp;
 
-  ymuint32 m_finchar;
+  ymint32 m_finchar;
 
   code_int m_oldcode;
 
@@ -228,9 +315,14 @@ private:
 
   ymint32 m_size;
 
-  ymuint8 m_gbuf[k_BITS];
+  char_type m_gbuf[k_BITS];
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
 
 inline
 ymuint32
@@ -239,18 +331,86 @@ MAXCODE(ymuint32 n_bits)
   return (1UL << n_bits) - 1;
 }
 
+// @brief ファイルをオープンする．
+// @param[in] filename ファイル名
+// @param[in] flags フラグ
+// @param[in] mode モード
+// @retval true オープンが成功した．
+// @retval false オープンが失敗した．
 inline
-ymuint8&
-ZStateR::tab_prefixof(ymuint i)
+bool
+ZStateBase::open(const char* filename,
+		 int flags,
+		 mode_t mode)
+{
+  return mFileBuff.open(filename, flags, mode);
+}
+
+// @brief ファイルをクローズする．
+inline
+void
+ZStateBase::close()
+{
+  mFileBuff.close();
+}
+
+// @brief buff[0] - buff[num - 1] の内容を書き込む．
+// @param[in] buff データを格納したバッファ
+// @param[in] num 書き込むバイト数
+// @return 実際に書き込んだバイト数を返す．
+inline
+ssize_t
+ZStateBase::_write(const ymuint8* buff,
+		   ymuint num)
+{
+  return mFileBuff.write(buff, num);
+}
+
+// @brief num バイトを読み込み buff[] に格納する．
+// @param[in] buff データを格納するバッファ
+// @param[in] num 読み込むバイト数．
+// @return 実際に読み込んだバイト数を返す．
+inline
+ssize_t
+ZStateBase::_read(ymuint8* buff,
+		  ymuint num)
+{
+  return mFileBuff.read(buff, num);
+}
+
+inline
+ZStateBase::count_int&
+ZStateBase::htabof(ymuint i)
+{
+  return m_htab[i];
+}
+
+inline
+ZStateBase::char_type&
+ZStateBase::codetabof(ymuint i)
 {
   return m_codetab[i];
 }
 
 inline
-ymuint8&
-ZStateR::tab_suffixof(ymuint i)
+ZStateBase::char_type&
+ZStateBase::tab_prefixof(ymuint i)
 {
-  return static_cast<ymuint8*>(&m_htab)[i];
+  return m_codetab[i];
+}
+
+inline
+ZStateBase::char_type&
+ZStateBase::tab_suffixof(ymuint i)
+{
+  return (reinterpret_cast<char_type*>(&m_htab))[i];
+}
+
+inline
+ZStateBase::char_type*
+ZStateBase::de_stack()
+{
+  return &tab_suffixof(1 << k_BITS);
 }
 
 END_NAMESPACE_YM

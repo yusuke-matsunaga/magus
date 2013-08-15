@@ -76,6 +76,189 @@ maybe_err(const char *fmt, ...)
   exit(2);
 }
 
+class InBuff
+{
+public:
+
+  /// @brief コンストラクタ
+  InBuff(int fd);
+
+  /// @brief デストラクタ
+  ~InBuff();
+
+
+public:
+
+  /// @brief 1バイト読み出す．
+  ymuint8
+  read_8();
+
+  /// @brief 2バイト読み出す．
+  ymuint16
+  read_16();
+
+  /// @brief 4バイト読み出す．
+  ymuint32
+  read_32();
+
+  /// @brief nバイト読み出す．
+  /// @param[in] n 読み出すバイト数
+  /// @param[in] buff 読み出した結果を入れるバッファ
+  /// @return 実際に読み出したバイト数を返す．
+  /// @note buff が NULL の場合は結果を格納しないで空読みする．
+  ymuint64
+  read_n(ymuint64 n,
+	 ymuint8* buff = NULL);
+
+  /// @brief 読み出し位置のポインタを返す．
+  /// @note バッファが空の時は mFd から読み込む．
+  ymuint8*
+  next_in();
+
+  /// @brief 読み出せるバイト数を返す．
+  /// @note バッファが空の時は mFd から読み込む．
+  ymuint32
+  avail_in();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 実際の読み込みを行う
+  void
+  _read();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 定数
+  //////////////////////////////////////////////////////////////////////
+
+  // バッファサイズ
+  static
+  const ymuint kBuffSize = 4096;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ファイルディスクリプタ
+  int mFd;
+
+  // バッファ
+  ymuint8* mBuff;
+
+  // バッファ上の有効なサイズ
+  ymuint16 mBuffSize;
+
+  // バッファ上の読み出し位置
+  ymuint16 mPos;
+
+};
+
+// @brief コンストラクタ
+InBuff::InBuff(int fd) :
+  mFd(fd)
+{
+  mBuff = new ymuint8(kBuffSize);
+  mPos = kBuffSize;
+}
+
+// @brief デストラクタ
+InBuff::~InBuff()
+{
+  delete [] mBuff;
+}
+
+// @brief 1バイト読み出す．
+ymuint8
+InBuff::read_8()
+{
+  assert_cond( avail_in() > 0, __FILE__, __LINE__);
+
+  ymuint8 ans = *next_in();
+  ++ mPos;
+  return ans;
+}
+
+// @brief 2バイト読み出す．
+ymuint16
+InBuff::read_16()
+{
+  ymuint16 byte1 = read_8();
+  ymuint16 byte2 = read_8();
+  return (byte2 << 8) | byte1;
+}
+
+// @brief 4バイト読み出す．
+ymuint32
+InBuff::read_32()
+{
+  ymuint32 byte1 = read_8();
+  ymuint32 byte2 = read_8();
+  ymuint32 byte3 = read_8();
+  ymuint32 byte4 = read_8();
+  return (((((byte4 << 8) | byte3) << 8) | byte2) << 8) | byte1;
+}
+
+// @brief nバイト読み出す．
+// @param[in] n 読み出すバイト数
+// @param[in] buff 読み出した結果を入れるバッファ
+// @return 実際に読み出したバイト数を返す．
+// @note buff が NULL の場合は結果を格納しないで空読みする．
+ymuint64
+InBuff::read_n(ymuint64 n,
+	       ymuint8* buff)
+{
+  for (ymuint i = 0; i < n; ++ i) {
+    buff[i] = read_8();
+  }
+}
+
+// @brief 読み出し位置のポインタを返す．
+// @note バッファが空の時は mFd から読み込む．
+ymuint8*
+InBuff::next_in()
+{
+  _read();
+  return mBuff + mPos;
+}
+
+// @brief 読み出せるバイト数を返す．
+// @note バッファが空の時は mFd から読み込む．
+ymuint32
+InBuff::avail_in()
+{
+  _read();
+  return mBuffSize - mPos;
+}
+
+// @brief 実際の読み込みを行う
+void
+InBuff::_read()
+{
+  if ( mFd < 0 ) {
+    return;
+  }
+  if ( mPos == kBuffSize ) {
+    ssize_t n = ::read(mFd, reinterpret_cast<void*>(mBuff), kBuffSize);
+    if ( n < 0 ) {
+      // エラー
+    }
+    else if ( n == 0 ) {
+      // End Of File
+    }
+    else {
+      mBuffSize = n;
+      mPos = 0;
+    }
+  }
+}
+
 
 // uncompress input to output then close the input.  return the
 // uncompressed size written, and put the compressed sized read
@@ -88,284 +271,124 @@ gz_uncompress(int in,
 	      off_t *gsizep,
 	      const char *filename)
 {
-  z_stream z;
-  char *outbufp;
-  char *inbufp;
   off_t out_tot = -1;
   off_t in_tot = 0;
   uint32_t out_sub_tot = 0;
-  enum {
-    GZSTATE_MAGIC0,
-    GZSTATE_MAGIC1,
-    GZSTATE_METHOD,
-    GZSTATE_FLAGS,
-    GZSTATE_SKIPPING,
-    GZSTATE_EXTRA,
-    GZSTATE_EXTRA2,
-    GZSTATE_EXTRA3,
-    GZSTATE_ORIGNAME,
-    GZSTATE_COMMENT,
-    GZSTATE_HEAD_CRC1,
-    GZSTATE_HEAD_CRC2,
-    GZSTATE_INIT,
-    GZSTATE_READ,
-    GZSTATE_CRC,
-    GZSTATE_LEN,
-  } state = GZSTATE_MAGIC0;
-  int flags = 0;
-  int skip_count = 0;
   int error = Z_STREAM_ERROR;
   bool done_reading = false;
-  uLong crc = 0;
-  ssize_t wr;
   bool needmore = false;
 
-#define ADVANCE()       { z.next_in++; z.avail_in--; }
 
-  // 入出力バッファを確保する．
-  if ( (outbufp = malloc(BUFLEN)) == NULL ) {
-    maybe_err("malloc failed");
-    goto out2;
-  }
-  if ( (inbufp = malloc(BUFLEN)) == NULL ) {
-    maybe_err("malloc failed");
-    goto out1;
+  // ヘッダ部分を解釈する．
+
+  // 最初のバイトは CM(Compression Method)
+  ymuint8 cm = in.read_8();
+  if ( cm != Z_DEFLATED ) {
+    maybe_err("unknown cpression method");
   }
 
-  // z_stream 構造体の初期化
-  // 少し面倒なのは先読みした部分が (pre[0] -- pre[prelen - 1])
-  // に入っているところ．
-  memset(&z, 0, sizeof z);
-  z.avail_in = prelen;
-  z.next_in = (unsigned char *)pre;
-  z.avail_out = BUFLEN;
-  z.next_out = (unsigned char *)outbufp;
-  z.zalloc = NULL;
-  z.zfree = NULL;
-  z.opaque = 0;
+  // 2番めのバイトは FLG(FLaGs)
+  ymuint8 flags = in.read_8();
 
-  in_tot = prelen;
-  out_tot = 0;
+  // 3 - 6 番めのバイトは MTIME(Modification TIME)
+  // 7 番めのバイトは XFL (eXtra FLags)
+  // 8 番めのバイトは OS(Operationg Systeam)
+  // 全部無視
+  ymuint32 mtime = in.read_32();
+  ymuint8 xfl = in.read_8();
+  ymuint8 os = in.read_8();
 
-  for ( ; ; ) {
-    // 必要ならバッファに読み込む．
-    if ( (z.avail_in == 0 || needmore) && !done_reading ) {
-      if ( z.avail_in > 0 ) {
-	memmove(inbufp, z.next_in, z.avail_in);
-      }
-      z.next_in = (unsigned char *)inbufp;
-      ssize_t in_size = read(in, z.next_in + z.avail_in, BUFLEN - z.avail_in);
-      if ( in_size == -1 ) {
-	maybe_warn("failed to read stdin");
-	goto stop_and_fail;
-      }
-      else if ( in_size == 0 ) {
-	done_reading = 1;
-      }
-
-      z.avail_in += in_size;
-      needmore = 0;
-
-      in_tot += in_size;
+  if ( flags & EXTRA_FIELD ) {
+    // EXTRA_FIELD がセットされていたら最初の2バイトにそのサイズが書いてある．
+    ymuint16 xlen = in.read_16();
+    // その分を読み飛ばす．
+    for (ymuint i = 0; i < xlen; ++ i) {
+      (void) in.read_8();
     }
-    if ( z.avail_in == 0 ) {
-      if ( done_reading && state != GZSTATE_MAGIC0 ) {
-	maybe_warnx("%s: unexpected end of file",
-		    filename);
-	goto stop_and_fail;
-      }
-      goto stop;
-    }
+  }
 
-    // 状態にしたがって処理を行う．
+  if ( flags & ORIG_NAME ) {
+    // ORIG_NAME がセットされていたら0終端の文字列が書いてある．
+    ymuint8 c;
+    while ( (c = in.read_8()) != '\0' ) ;
+  }
+
+  if ( flags & COMMENT ) {
+    // COMMENT がセットされていたら0終端の文字列が書いてある．
+    ymuint8 c;
+    while ( (c = in.read_8()) != '\0' ) ;
+  }
+
+  if ( flags & HEAD_CRC ) {
+    // HEAD_CRC がセットされていたら2バイトのCRCコードが書いてある．
+    (void) in.read_16();
+  }
+
+  // 以降が圧縮されたデータ本体となる．
+  zstream zs;
+
+  if ( zs.inflateInit2(- MAX_WBITS) != Z_OK ) {
+    maybe_err("failed to inflateInit2");
+  }
+
+  ymuint8 outbuf = new ymuint8(4096);
+
+  zs.set_outbuf(outbuf, 4096);
+
+  ymuint32 crc = 0;
+  for (bool data_end = false; !data_end; ) {
+    zs.set_inbuf(in.next_ptr(), in.avail_size());
+    int stat = zs.inflate(Z_FINISH);
     switch ( state ) {
-    case GZSTATE_MAGIC0:
-      if ( z.next_in[0] != GZIP_MAGIC0 ) {
-	if ( in_tot > 0 ) {
-	  maybe_warnx("%s: trailing garbage "
-		      "ignored", filename);
-	  goto stop;
-	}
-	maybe_warnx("input not gziped (MAGIC0)");
-	goto stop_and_fail;
+    case Z_BUF_ERROR:
+      // Z_BUF_ERROR goes with Z_FINISH...
+      if ( zs.avail_out() > 0 && !done_reading ) {
+	continue;
       }
-      ADVANCE();
 
-      state = GZSTATE_MAGIC1;
-      out_sub_tot = 0;
-      crc = crc32(0L, Z_NULL, 0);
+    case Z_STREAM_END:
+      zs.inflateEnd();
+      data_end = true;
       break;
 
-    case GZSTATE_MAGIC1:
-      if ( z.next_in[0] != GZIP_MAGIC1 &&
-	   z.next_in[0] != GZIP_OMAGIC1) {
-	maybe_warnx("input not gziped (MAGIC1)");
-	goto stop_and_fail;
-      }
-      ADVANCE();
-
-      state = GZSTATE_METHOD;
+    case Z_OK:
       break;
 
-    case GZSTATE_METHOD:
-      if ( z.next_in[0] != Z_DEFLATED ) {
-	maybe_warnx("unknown compression method");
-	goto stop_and_fail;
-      }
-      ADVANCE();
-
-      state = GZSTATE_FLAGS;
+    case Z_NEED_DICT:
+      maybe_err("Z_NEED_DICT error");
       break;
 
-    case GZSTATE_FLAGS:
-      flags = z.next_in[0];
-      ADVANCE();
-
-      skip_count = 6;
-      state = GZSTATE_SKIPPING;
+    case Z_DATA_ERROR:
+      maybe_err("data stream error");
       break;
 
-    case GZSTATE_SKIPPING:
-      if ( skip_count > 0 ) {
-	-- skip_count;
-	ADVANCE();
-      }
-      else {
-	state = GZSTATE_EXTRA;
-      }
+    case Z_STREAM_ERROR:
+      maybe_err("internal stream error");
       break;
 
-    case GZSTATE_EXTRA:
-      if ( (flags & EXTRA_FIELD) == 0 ) {
-	state = GZSTATE_ORIGNAME;
-	break;
-      }
-      skip_count = z.next_in[0];
-      ADVANCE();
-
-      state = GZSTATE_EXTRA2;
+    case Z_MEM_ERROR:
+      maybe_err("memory allocation error");
       break;
 
-    case GZSTATE_EXTRA2:
-      skip_count |= (z.next_in[0] << 8);
-      ADVANCE();
+    default:
+      maybe_err("unknown error from inflate(): %d", status);
+    }
 
-      state = GZSTATE_EXTRA3;
-      break;
-
-    case GZSTATE_EXTRA3:
-      if ( skip_count > 0 ) {
-	-- skip_count;
-	ADVANCE();
-      }
-      else {
-	state = GZSTATE_ORIGNAME;
-      }
-      break;
-
-    case GZSTATE_ORIGNAME:
-      if ( (flags & ORIG_NAME) == 0 ) {
-	state = GZSTATE_COMMENT;
-	break;
-      }
-      if ( z.next_in[0] == 0 ) {
-	state = GZSTATE_COMMENT;
-      }
-      ADVANCE();
-      break;
-
-    case GZSTATE_COMMENT:
-      if ( (flags & COMMENT) == 0 ) {
-	state = GZSTATE_HEAD_CRC1;
-	break;
-      }
-      if ( z.next_in[0] == 0 ) {
-	state = GZSTATE_HEAD_CRC1;
-      }
-      ADVANCE();
-      break;
-
-    case GZSTATE_HEAD_CRC1:
-      if ( flags & HEAD_CRC ) {
-	skip_count = 2;
-      }
-      else {
-	skip_count = 0;
-      }
-      state = GZSTATE_HEAD_CRC2;
-      break;
-
-    case GZSTATE_HEAD_CRC2:
-      if ( skip_count > 0 ) {
-	-- skip_count;
-	ADVANCE();
-      }
-      else {
-	state = GZSTATE_INIT;
-      }
-      break;
-
-    case GZSTATE_INIT:
-      if ( inflateInit2(&z, -MAX_WBITS) != Z_OK ) {
-	maybe_warnx("failed to inflateInit");
-	goto stop_and_fail;
-      }
-      state = GZSTATE_READ;
-      break;
-
-    case GZSTATE_READ:
-      error = inflate(&z, Z_FINISH);
-      switch ( error ) {
-	/* Z_BUF_ERROR goes with Z_FINISH... */
-      case Z_BUF_ERROR:
-	if ( z.avail_out > 0 && !done_reading ) {
-	  continue;
-	}
-
-      case Z_STREAM_END:
-      case Z_OK:
-	break;
-
-      case Z_NEED_DICT:
-	maybe_warnx("Z_NEED_DICT error");
-	goto stop_and_fail;
-
-      case Z_DATA_ERROR:
-	maybe_warnx("data stream error");
-	goto stop_and_fail;
-
-      case Z_STREAM_ERROR:
-	maybe_warnx("internal stream error");
-	goto stop_and_fail;
-
-      case Z_MEM_ERROR:
-	maybe_warnx("memory allocation error");
-	goto stop_and_fail;
-
-      default:
-	maybe_warn("unknown error from inflate(): %d",
-		   error);
-      }
-      wr = BUFLEN - z.avail_out;
-      if ( wr != 0 ) {
-	crc = crc32(crc, (const Bytef *)outbufp, (unsigned)wr);
-	/* don't write anything with -t */
-	if ( !tflag ) {
-	  int act_wr = write(out, outbufp, wr);
-	  if ( act_wr != wr ) {
-	    maybe_warn("error writing to output");
-	    goto stop_and_fail;
-	  }
-	}
-
-	out_tot += wr;
-	out_sub_tot += wr;
+    wr = BUFLEN - z.avail_out;
+    if ( wr != 0 ) {
+      crc = crc32(crc, (const Bytef *)outbufp, (unsigned)wr);
+      int act_wr = write(out, outbufp, wr);
+      if ( act_wr != wr ) {
+	maybe_err("error writing to output");
       }
 
-      if ( error == Z_STREAM_END ) {
-	inflateEnd(&z);
-	state = GZSTATE_CRC;
-      }
+      out_tot += wr;
+      out_sub_tot += wr;
+    }
+
+    if ( error == Z_STREAM_END ) {
+      state = GZSTATE_CRC;
+    }
 
       z.next_out = (unsigned char *)outbufp;
       z.avail_out = BUFLEN;

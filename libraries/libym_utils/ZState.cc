@@ -13,18 +13,97 @@
 
 BEGIN_NAMESPACE_YM
 
+// magic number
+static
+const ZStateBase::char_type k_MAGICHEADER[] = { '\037', '\235' };
+
+static
+const ZStateBase::char_type lmask[9] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00 };
+
+static
+const ZStateBase::char_type rmask[9] = { 0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff };
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス ZStateBase
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+ZStateBase::ZStateBase(int bits)
+{
+  m_state = kStart;
+
+  m_maxbits = bits ? bits : k_BITS;	/* User settable max # bits/code. */
+  m_maxmaxcode = 1L << m_maxbits;	/* Should NEVER generate this code. */
+  m_free_ent = 0;			/* First unused entry. */
+  m_block_compress = k_BLOCK_MASK;
+  m_clear_flg = 0;
+}
+
+// @brief デストラクタ
+ZStateBase::~ZStateBase()
+{
+}
+
+void
+ZStateBase::cl_hash(count_int cl_hsize)
+{
+  long m1 = -1;
+  count_int* htab_p = m_htab + cl_hsize;
+  long i = cl_hsize - 16;
+  do {			/* Might use Sys V memset(3) here. */
+    *(htab_p - 16) = m1;
+    *(htab_p - 15) = m1;
+    *(htab_p - 14) = m1;
+    *(htab_p - 13) = m1;
+    *(htab_p - 12) = m1;
+    *(htab_p - 11) = m1;
+    *(htab_p - 10) = m1;
+    *(htab_p - 9) = m1;
+    *(htab_p - 8) = m1;
+    *(htab_p - 7) = m1;
+    *(htab_p - 6) = m1;
+    *(htab_p - 5) = m1;
+    *(htab_p - 4) = m1;
+    *(htab_p - 3) = m1;
+    *(htab_p - 2) = m1;
+    *(htab_p - 1) = m1;
+    htab_p -= 16;
+  } while ( (i -= 16) >= 0 );
+  for (i += 16; i > 0; i--) {
+    *(-- htab_p) = m1;
+  }
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // クラス ZStateW
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+ZStateW::ZStateW(int bits) :
+  ZStateBase(bits)
+{
+  m_hsize = k_HSIZE;			/* For dynamic table sizing. */
+  m_ratio = 0;
+  m_checkpoint = k_CHECK_GAP;
+  m_in_count = 1;			/* Length of input. */
+  m_out_count = 0;			/* # of codes output (for debugging). */
+}
+
+// @brief デストラクタ
+ZStateW::~ZStateW()
+{
+}
+
+// @brief データを圧縮して書き込む．
+// @param[in] wbuff 書き込むデータを格納したバッファ
+// @param[in] num データ(バイト)
+// @return 実際に処理したバイト数を返す．
+// @note エラーが起こったら -1 を返す．
 int
-ZStateW:write(ymuint8* wbuff,
-	      int num)
+ZStateW::write(ymuint8* wbuff,
+	       int num)
 {
   if ( num == 0 ) {
     return 0;
@@ -33,92 +112,91 @@ ZStateW:write(ymuint8* wbuff,
   ymuint count = num;
   ymuint8* bp = wbuff;
 
-  if ( m_state == kMiddle ) {
-    goto middle;
+  if ( m_state == kStart ) {
+    m_state = kMiddle;
+
+    m_maxmaxcode = 1UL << m_maxbits;
+    ssize_t n = _write(k_MAGICHEADER, sizeof(k_MAGICHEADER));
+    if ( n != sizeof(k_MAGICHEADER) ) {
+      return -1;
+    }
+
+    ymuint8 tmp = static_cast<ymuint8>(m_maxbits) | m_block_compress;
+    n = _write(&tmp, 1);
+    if ( n != 1 ) {
+      return -1;
+    }
+
+    m_offset = 0;
+    m_bytes_out = 3;
+    m_out_count = 0;
+    m_clear_flg = 0;
+    m_ratio = 0;
+    m_in_count = 1;
+    m_checkpoint = k_CHECK_GAP;
+    m_maxcode = MAXCODE(m_n_bits = k_INIT_BITS);
+    m_free_ent = m_block_compress ? k_FIRST : 256;
+
+    m_ent = *(bp ++);
+    -- count;
+
+    m_hshift = 0;
+    for (code_int fcode = m_hsize; fcode < 65536L; fcode *= 2L) {
+      ++ m_hshift;
+    }
+    m_hshift = 8 - m_hshift;
+
+    m_hsize_reg = m_hsize;
+    cl_hash(static_cast<count_int>(m_hsize_reg));
   }
 
-  m_state = kMiddle;
-
-  m_maxmaxcode = 1UL << m_maxbits;
-  ssize_t n = mFileBuff->write(k_MAGICHEADER, sizeof(k_MAGICHEADER));
-  if ( n != sizeof(k_MAGICHEADER) ) {
-    return -1;
-  }
-
-  ymuint8 tmp = static_cast<ymuint8>(m_maxbits) | m_block_compress;
-  n = _write(1, &tmp);
-  if ( n != 1 ) {
-    return -1;
-  }
-
-  m_offset = 0;
-  m_bytes_out = 3;
-  m_out_count = 0;
-  m_clear_flg = 0;
-  m_ratio = 0;
-  m_in_count = 1;
-  m_checkpoint = k_CHECK_GAP;
-  m_maxcode = MAXCODE(m_n_bits = k_INIT_BITS);
-  m_free_ent = m_block_compress ? k_FIRST : 256;
-
-  m_ent = *(bp ++);
-  -- count;
-
-  m_hshift = 0;
-  for (fcode = static_cast<long>(m_hsize); fcode < 65536L; fcode *= 2L) {
-    ++ hshift;
-  }
-  hshift = 8 - hshift;
-
-  hsize_reg = hsize;
-  cl_hash(static_cast<count_int>(hsize_reg));
-
- middle:
   for (code_int i = 0; -- count; ) {
     ymuint8 c = *(bp ++ );
     ++ m_in_count;
-    fcode = (static_cast<long>(c) << m_maxbits) + m_ent;
-    i = (c << hsift) ^ ent;
+    code_int fcode = (static_cast<code_int>(c) << m_maxbits) + m_ent;
+    i = (c << m_hshift) ^ m_ent;
 
     if ( htabof(i) == fcode ) {
-      ent = codetabof(i);
+      m_ent = codetabof(i);
       continue;
     }
     else if ( static_cast<long>(htabof(i)) < 0 ) {
       goto nomatch;
     }
 
-    disp = hsize_reg - i;
-    if ( i == 0 ) {
-      disp = 1;
-    }
+    {
+      int disp = m_hsize_reg - i;
+      if ( i == 0 ) {
+	disp = 1;
+      }
 
   probe:
-    if ( (i -= disp) < 0 ) {
-      i += hsize_reg;
-    }
+      if ( (i -= disp) < 0 ) {
+	i += m_hsize_reg;
+      }
 
-    if ( htabof(i) == fcode ) {
-      ent = codetabof(i);
-      continue;
-    }
-    if ( static_cast<long>(htablof(i)) >= 0 ) {
-      goto probe;
+      if ( htabof(i) == fcode ) {
+	m_ent = codetabof(i);
+	continue;
+      }
+      if ( static_cast<long>(htabof(i)) >= 0 ) {
+	goto probe;
+      }
     }
 
   nomatch:
-    if ( output(static_cast<code_int>(ent)) == -1 ) {
+    if ( output(m_ent) == -1 ) {
       return -1;
     }
 
     ++ m_out_count;
-    ent = c;
+    m_ent = c;
 
     if ( m_free_ent < m_maxmaxcode ) {
       codetabof(i) = m_free_ent ++;
       htabof(i) = fcode;
     }
-    else if ( static_cast<count_int>(in_count) >= m_checkpoint && m_block_compress ) {
+    else if ( m_in_count >= m_checkpoint && m_block_compress ) {
       if ( cl_block() == -1 ) {
 	return -1;
       }
@@ -128,121 +206,252 @@ ZStateW:write(ymuint8* wbuff,
   return num;
 }
 
+// Table clear for block compress
+int
+ZStateW::cl_block()
+{
+  m_checkpoint = m_in_count + k_CHECK_GAP;
+
+  count_int rat;
+  if ( m_in_count > 0x007fffff ) { // Shift will overflow.
+    rat = m_bytes_out >> 8;
+    if ( rat == 0 ) {
+      rat = 0x7fffffff;
+    }
+    else {
+      rat = m_in_count / rat;
+    }
+  }
+  else {
+    rat = (m_in_count << 8) / m_bytes_out;
+  }
+  if ( rat > m_ratio ) {
+    m_ratio = rat;
+  }
+  else {
+    m_ratio = 0;
+    cl_hash(m_hsize);
+    m_free_ent = k_FIRST;
+    m_clear_flg = 1;
+    if ( output(k_CLEAR) == -1 ) {
+      return -1;
+    }
+  }
+
+  return 0;
+}
+
+int
+ZStateW::output(code_int ocode)
+{
+  int r_off = m_offset;
+  ymuint32 bits = m_n_bits;
+  char_type* bp = m_buf;
+
+  if ( ocode >= 0 ) {
+    // Get to the first byte.
+    bp += (r_off >> 3);
+    r_off &= 7;
+
+    // Since ocode is always >= 8 bits, only need to mask the first
+    // hunk on the left.
+    *bp = (*bp & rmask[r_off]) | ((ocode << r_off) & lmask[r_off]);
+    bp++;
+    bits -= (8 - r_off);
+    ocode >>= 8 - r_off;
+
+    // Get any 8 bit parts in the middle (<=1 for up to 16 bits).
+    if ( bits >= 8 ) {
+      *bp ++ = ocode;
+      ocode >>= 8;
+      bits -= 8;
+    }
+
+    // Last bits.
+    if ( bits ) {
+      *bp = ocode;
+    }
+    m_offset += m_n_bits;
+    if ( m_offset == (m_n_bits << 3) ) {
+      bp = m_buf;
+      bits = m_n_bits;
+      m_bytes_out += bits;
+      ssize_t n = _write(bp, bits);
+      if ( n != bits ) {
+	return -1;
+      }
+      bp += bits;
+      bits = 0;
+      m_offset = 0;
+    }
+
+    // If the next entry is going to be too big for the ocode size,
+    // then increase it, if possible.
+    if ( m_free_ent > m_maxcode || (m_clear_flg > 0)) {
+      // Write the whole buffer, because the input side won't
+      // discover the size increase until after it has read it.
+      if ( m_offset > 0 ) {
+	ssize_t n = _write(m_buf, m_n_bits);
+	if ( n != m_n_bits ) {
+	  return -1;
+	}
+	m_bytes_out += m_n_bits;
+      }
+      m_offset = 0;
+
+      if ( m_clear_flg ) {
+	m_maxcode = MAXCODE(m_n_bits = k_INIT_BITS);
+	m_clear_flg = 0;
+      }
+      else {
+	++ m_n_bits;
+	if ( m_n_bits == m_maxbits ) {
+	  m_maxcode = m_maxmaxcode;
+	}
+	else {
+	  m_maxcode = MAXCODE(m_n_bits);
+	}
+      }
+    }
+  }
+  else {
+    // At EOF, write the rest of the buffer.
+    if ( m_offset > 0 ) {
+      m_offset = (m_offset + 7) / 8;
+      ssize_t n = _write(m_buf, m_offset);
+      if ( n != m_offset ) {
+	return -1;
+      }
+      m_bytes_out += m_offset;
+    }
+    m_offset = 0;
+  }
+  return 0;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス ZStateR
 //////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+ZStateR::ZStateR()
+{
+  m_roffset = 0;
+  m_size = 0;
+}
+
+// @brief デストラクタ
+ZStateR::~ZStateR()
+{
+}
 
 int
 ZStateR::read(ymuint8* rbuff,
 	      int num)
 {
   if ( num == 0 ) {
+    cerr << "num == 0" << endl;
     return 0;
   }
 
   ymuint count = num;
   ymuint8* bp = rbuff;
 
-  switch ( m_state ) {
-  case kStart:
+  if ( m_state == kStart ) {
     m_state = kMiddle;
-    break;
 
-  case kMiddle:
-    goto middle;
+    // 先頭のマジックナンバーと最大ビット数を読む．
+    ymuint8 header[3];
+    ssize_t n = _read(header, sizeof(header));
+    if ( n != sizeof(header) ||
+	 memcmp(header, k_MAGICHEADER, sizeof(k_MAGICHEADER)) != 0 ) {
+      // ファイルタイプミスマッチ
+      cerr << "invalid magic header" << endl;
+      return -1;
+    }
+    m_maxbits = header[2];
+    m_block_compress = m_maxbits & k_BLOCK_MASK;
+    m_maxbits &= k_BIT_MASK;
+    m_maxmaxcode = 1UL << m_maxbits;
+    if ( m_maxbits > k_BITS || m_maxbits < 12 ) {
+      // EFTYPE
+      cerr << "m_maxbits = " << m_maxbits << endl;
+      return -1;
+    }
 
-  case kEof:
-    goto eof;
-  }
+    m_n_bits = k_INIT_BITS;
+    m_maxcode = MAXCODE(m_n_bits);
+    for (code_int code = 255; code >= 0; -- code) {
+      tab_prefixof(code) = 0;
+      tab_suffixof(code) = code;
+    }
+    m_free_ent = m_block_compress ? k_FIRST : 256;
 
-  // kStart の処理
+    m_finchar = m_oldcode = getcode();
+    if ( m_oldcode == -1 ) {
+      return 0;
+    }
 
-  // 先頭のマジックナンバーと最大ビット数を読む．
-  ymuint8 header[3];
-  ssize_t n = mFileBuff->read(header, sizeof(header));
-  if ( n != sizeof(header) ||
-       memcmp(header, k_MAGICHEADER, sizeof(kMAGICHEADER)) != 0 ) {
-    // ファイルタイプミスマッチ
-    return -1;
-  }
-  m_maxbits = header[2];
-  m_block_compress = m_maxbits & k_BLOCK_MASK;
-  m_maxbits &= k_BIT_MASK;
-  m_maxmaxcode = 1UL << m_maxbits;
-  if ( m_maxbits > k_BITS || m_maxbits < 12 ) {
-    // EFTYPE
-    return -1;
-  }
+    *bp ++ = m_finchar;
+    -- count;
+    m_stackp = de_stack();
 
-  m_n_bits = k_INIT_BITS;
-  m_maxcode = MAXCODE(m_n_bits);
-  for (code_int code = 255; code >= 0; -- code) {
-    tab_prefixof(code) = 0;
-    tab_suffixof(code) = code;
-  }
-  m_free_ent = m_block_compress ? k_FIRST : 256;
-
-  m_finchar = m_oldcode = getcode();
-  if ( m_oldcode == -1 ) {
-    return 0;
-  }
-
-  *bp ++ = m_finchar;
-  -- count;
-  m_stackp = de_stack;
-
-  for (code_int code; (code = getcode()) > -1; ) {
-    if ( (code == k_CLEAR) && m_block_compress ) {
-      for (code = 255; code >= 0; -- code) {
-	tab_prefixof(code) = 0;
+    for (code_int code; (code = getcode()) > -1; ) {
+      if ( (code == k_CLEAR) && m_block_compress ) {
+	for (code = 255; code >= 0; -- code) {
+	  tab_prefixof(code) = 0;
+	}
+	m_clear_flg = 1;
+	m_free_ent = k_FIRST;
+	m_oldcode = -1;
+	continue;
       }
-      m_clear_flg = 1;
-      m_free_ent = FIRST;
-      m_oldcode = -1;
-      continue;
-    }
-    m_incode = code;
+      m_incode = code;
 
-    if ( code >= m_free_ent ) {
-      if ( code > m_free_ent || m_oldcode == -1 ) {
-	// EINVAL;
-	return -1;
+      if ( code >= m_free_ent ) {
+	if ( code > m_free_ent || m_oldcode == -1 ) {
+	  // EINVAL;
+	  cerr << "code = " << code << ", m_free_ent = " << m_free_ent
+	       << ", m_oldcode = " << m_oldcode << endl;
+	  return -1;
+	}
+	*m_stackp ++ = m_finchar;
+	code = m_oldcode;
       }
-      *m_stackp ++ = m_finchar;
-      code = m_oldcode;
-    }
 
-    while ( code >= 256 ) {
-      *m_stackp ++ = tab_suffixof(code);
-      code = tab_preffixof(code);
+      while ( code >= 256 ) {
+	*(m_stackp ++) = tab_suffixof(code);
+	code = tab_prefixof(code);
+      }
+      *m_stackp ++ = m_finchar = tab_suffixof(code);
     }
-    *m_stackp ++ = m_finchar = tab_suffixof(code);
+  }
 
-  middle:
+  if ( m_state == kMiddle ) {
     do {
-      if ( count -- = 0 ) {
+      if ( count -- == 0 ) {
 	return num;
       }
       *bp ++ = *(-- m_stackp);
-    } while ( m_stackp > de_stack );
+    } while ( m_stackp > de_stack() );
 
-    if ( (code = m_free_ent) < m_maxmaxcode && m_oldcode != -1 ) {
+    code_int code = m_free_ent;
+    if ( code < m_maxmaxcode && m_oldcode != -1 ) {
       tab_prefixof(code) = m_oldcode;
       tab_suffixof(code) = m_finchar;
       m_free_ent = code + 1;
     }
 
     m_oldcode = m_incode;
+
+    m_state = kEof;
   }
 
-  m_state = kEof;
-
- eof:
   return num - count;
 }
 
-code_int
+ZStateR::code_int
 ZStateR::getcode()
 {
   ymuint8* bp = m_gbuf;
@@ -257,10 +466,10 @@ ZStateR::getcode()
       }
     }
     if ( m_clear_flg > 0 ) {
-      m_maxcode = MAXCODE(m_n_bits = INIT_BITS);
+      m_maxcode = MAXCODE(m_n_bits = k_INIT_BITS);
       m_clear_flg = 0;
     }
-    ssize_t n = mFileBuff->read(m_gbuf, m_n_bits);
+    ssize_t n = _read(m_gbuf, m_n_bits);
     if ( n <= 0 ) {
       return -1;
     }
@@ -288,7 +497,7 @@ ZStateR::getcode()
 
   // High order bits.
   gcode |= (*bp & rmask[bits]) << r_off;
-  m_roffset += n_bits;
+  m_roffset += m_n_bits;
 
   return gcode;
 }

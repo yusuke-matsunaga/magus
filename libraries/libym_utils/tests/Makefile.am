@@ -50,7 +50,8 @@ noinst_PROGRAMS = \
 	dllist_test \
 	heaptree_test \
 	mspg_test \
-	mscg_test
+	mscg_test \
+	z_test
 
 
 ############################################################
@@ -229,4 +230,17 @@ mspg_test_SOURCES = \
 mspg_test_LDFLAGS =
 
 mspg_test_LDADD = \
+	$(YMUTILS)
+
+
+############################################################
+## Variables for building z_test
+############################################################
+
+z_test_SOURCES = \
+	z_test.cc
+
+z_test_LDFLAGS =
+
+z_test_LDADD = \
 	$(YMUTILS)
