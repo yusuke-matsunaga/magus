@@ -23,6 +23,25 @@ const ZStateBase::char_type lmask[9] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc
 static
 const ZStateBase::char_type rmask[9] = { 0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff };
 
+void
+print_code(ostream& s,
+	   u_char suffix)
+{
+  s << static_cast<int>(suffix);
+  if ( isprint(suffix) ) {
+    s << " \"" << suffix << "\"";
+  }
+  else if ( suffix == '\t' ) {
+    s << " TAB";
+  }
+  else if ( suffix == '\r' ) {
+    s << " CR";
+  }
+  else if ( suffix == '\n' ) {
+    s << " LF";
+  }
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス ZStateBase
@@ -358,10 +377,20 @@ ZStateR::read(ymuint8* rbuff,
   ymuint count = num;
   ymuint8* bp = rbuff;
 
-  if ( m_state == kStart ) {
+  switch ( m_state ) {
+  case kStart:
     m_state = kMiddle;
+    break;
 
-    // 先頭のマジックナンバーと最大ビット数を読む．
+  case kMiddle:
+    goto middle;
+
+  case kEof:
+    goto eof;
+  }
+
+  // 先頭のマジックナンバーと最大ビット数を読む．
+  {
     ymuint8 header[3];
     ssize_t n = _read(header, sizeof(header));
     if ( n != sizeof(header) ||
@@ -382,53 +411,54 @@ ZStateR::read(ymuint8* rbuff,
 
     m_n_bits = k_INIT_BITS;
     m_maxcode = MAXCODE(m_n_bits);
-    for (code_int code = 255; code >= 0; -- code) {
-      tab_prefixof(code) = 0;
-      tab_suffixof(code) = code;
-    }
-    m_free_ent = m_block_compress ? k_FIRST : 256;
-
-    m_finchar = m_oldcode = getcode();
-    if ( m_oldcode == -1 ) {
-      return 0;
-    }
-
-    *bp ++ = m_finchar;
-    -- count;
-    m_stackp = de_stack();
-
-    for (code_int code; (code = getcode()) > -1; ) {
-      if ( (code == k_CLEAR) && m_block_compress ) {
-	for (code = 255; code >= 0; -- code) {
-	  tab_prefixof(code) = 0;
-	}
-	m_clear_flg = 1;
-	m_free_ent = k_FIRST;
-	m_oldcode = -1;
-	continue;
-      }
-      m_incode = code;
-
-      if ( code >= m_free_ent ) {
-	if ( code > m_free_ent || m_oldcode == -1 ) {
-	  // EINVAL;
-	  cerr << "code = " << code << ", m_free_ent = " << m_free_ent
-	       << ", m_oldcode = " << m_oldcode << endl;
-	  return -1;
-	}
-	*m_stackp ++ = m_finchar;
-	code = m_oldcode;
-      }
-
-      while ( code >= 256 ) {
-	*(m_stackp ++) = tab_suffixof(code);
-	code = tab_prefixof(code);
-      }
-      *m_stackp ++ = m_finchar = tab_suffixof(code);
-    }
   }
 
-  if ( m_state == kMiddle ) {
+  for (code_int code = 255; code >= 0; -- code) {
+    tab_prefixof(code) = 0;
+    tab_suffixof(code) = static_cast<char_type>(code);
+  }
+  m_free_ent = m_block_compress ? k_FIRST : 256;
+
+  m_finchar = m_oldcode = getcode();
+  if ( m_oldcode == -1 ) {
+    m_state = kEof;
+    cout << "reached to EOF" << endl;
+    return 0;
+  }
+
+  *bp ++ = m_finchar;
+  -- count;
+  m_stackp = de_stack();
+
+  for (code_int code; (code = getcode()) > -1; ) {
+    if ( (code == k_CLEAR) && m_block_compress ) {
+      for (code = 255; code >= 0; -- code) {
+	tab_prefixof(code) = 0;
+      }
+      m_clear_flg = 1;
+      m_free_ent = k_FIRST;
+      m_oldcode = -1;
+      continue;
+    }
+    m_incode = code;
+
+    if ( code >= m_free_ent ) {
+      if ( code > m_free_ent || m_oldcode == -1 ) {
+	// Bad stream
+	// EINVAL;
+	return -1;
+      }
+      *m_stackp ++ = m_finchar;
+      code = m_oldcode;
+    }
+
+    while ( code >= 256 ) {
+      *(m_stackp ++) = tab_suffixof(code);
+      code = tab_prefixof(code);
+    }
+    *(m_stackp) ++ = m_finchar = tab_suffixof(code);
+
+  middle:
     do {
       if ( count -- == 0 ) {
 	return num;
@@ -436,18 +466,22 @@ ZStateR::read(ymuint8* rbuff,
       *bp ++ = *(-- m_stackp);
     } while ( m_stackp > de_stack() );
 
-    code_int code = m_free_ent;
-    if ( code < m_maxmaxcode && m_oldcode != -1 ) {
-      tab_prefixof(code) = m_oldcode;
-      tab_suffixof(code) = m_finchar;
-      m_free_ent = code + 1;
+    {
+      code_int code = m_free_ent;
+      if ( code < m_maxmaxcode && m_oldcode != -1 ) {
+	tab_prefixof(code) = m_oldcode;
+	tab_suffixof(code) = m_finchar;
+	m_free_ent = code + 1;
+      }
     }
 
     m_oldcode = m_incode;
-
-    m_state = kEof;
   }
 
+  cout << "m_state got kEof" << endl;
+  m_state = kEof;
+
+ eof:
   return num - count;
 }
 
@@ -471,6 +505,7 @@ ZStateR::getcode()
     }
     ssize_t n = _read(m_gbuf, m_n_bits);
     if ( n <= 0 ) {
+      cout << "EOF in getcode()" << endl;
       return -1;
     }
     m_roffset = 0;

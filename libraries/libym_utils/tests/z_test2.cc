@@ -23,6 +23,9 @@ z_test(int argc,
   for ( ; ; ) {
     ymuint8 buff[4096];
     char* tmp = fgets(reinterpret_cast<char*>(buff), sizeof(buff), fp);
+    if ( tmp == NULL ) {
+      break;
+    }
     cout << tmp;
   }
 

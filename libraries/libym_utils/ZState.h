@@ -28,7 +28,7 @@ public:
 
   typedef long code_int;
   typedef long count_int;
-  typedef ymuint8 char_type;
+  typedef u_char char_type;
 
 public:
 
@@ -85,10 +85,10 @@ protected:
   count_int&
   htabof(ymuint i);
 
-  ymuint8&
+  u_short&
   codetabof(ymuint i);
 
-  char_type&
+  u_short&
   tab_prefixof(ymuint i);
 
   char_type&
@@ -178,7 +178,7 @@ private:
 
   count_int m_htab[k_HSIZE];
 
-  ymuint8 m_codetab[k_HSIZE];
+  u_short m_codetab[k_HSIZE];
 
 };
 
@@ -386,14 +386,14 @@ ZStateBase::htabof(ymuint i)
 }
 
 inline
-ZStateBase::char_type&
+u_short&
 ZStateBase::codetabof(ymuint i)
 {
   return m_codetab[i];
 }
 
 inline
-ZStateBase::char_type&
+u_short&
 ZStateBase::tab_prefixof(ymuint i)
 {
   return m_codetab[i];
