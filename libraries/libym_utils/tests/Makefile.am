@@ -51,7 +51,8 @@ noinst_PROGRAMS = \
 	heaptree_test \
 	mspg_test \
 	mscg_test \
-	z_test
+	z_test \
+	z_test2
 
 
 ############################################################
@@ -243,4 +244,18 @@ z_test_SOURCES = \
 z_test_LDFLAGS =
 
 z_test_LDADD = \
+	$(YMUTILS)
+
+
+############################################################
+## Variables for building z_test2
+############################################################
+
+z_test2_SOURCES = \
+	z_test2.cc \
+	zopen.cc
+
+z_test2_LDFLAGS =
+
+z_test2_LDADD = \
 	$(YMUTILS)
