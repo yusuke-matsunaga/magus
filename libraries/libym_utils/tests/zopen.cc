@@ -658,6 +658,8 @@ getcode(struct s_zstate *zs)
 	gcode |= (*bp & rmask[bits]) << r_off;
 	roffset += n_bits;
 
+	cout << gcode << endl;
+
 	return (gcode);
 }
 

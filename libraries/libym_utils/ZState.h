@@ -82,24 +82,6 @@ protected:
   _read(ymuint8* buff,
 	ymuint num);
 
-  count_int&
-  htabof(ymuint i);
-
-  u_short&
-  codetabof(ymuint i);
-
-  u_short&
-  tab_prefixof(ymuint i);
-
-  char_type&
-  tab_suffixof(ymuint i);
-
-  char_type*
-  de_stack();
-
-  void
-  cl_hash(count_int hsize);
-
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -176,10 +158,6 @@ private:
   // ファイルバッファ
   FileBuff mFileBuff;
 
-  count_int m_htab[k_HSIZE];
-
-  u_short m_codetab[k_HSIZE];
-
 };
 
 
@@ -222,14 +200,27 @@ private:
   int
   cl_block();
 
+  void
+  cl_hash(count_int hsize);
+
   int
   output(code_int code);
+
+  count_int&
+  htabof(ymuint i);
+
+  u_short&
+  codetabof(ymuint i);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  count_int m_htab[k_HSIZE];
+
+  u_short m_codetab[k_HSIZE];
 
   ymlong m_fcode;
 
@@ -297,13 +288,41 @@ private:
   code_int
   getcode();
 
+  /// @brief スタックを初期化する．
+  void
+  init_stack();
+
+  /// @brief スタックが空の時 true を返す．
+  bool
+  is_empty();
+
+  /// @brief スタックにデータを積む．
+  void
+  push_stack(char_type data);
+
+  /// @brief スタックからデータを取り出す．
+  char_type
+  pop_stack();
+
+  u_short&
+  tab_prefixof(ymuint i);
+
+  char_type&
+  tab_suffixof(ymuint i);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  char_type* m_stackp;
+  char_type mStack[8000];
+
+  char_type* mStackPtr;
+
+  u_short mPrefix[k_HSIZE];
+
+  char_type mSuffix[1 << k_BITS];
 
   ymint32 m_finchar;
 
@@ -380,37 +399,63 @@ ZStateBase::_read(ymuint8* buff,
 
 inline
 ZStateBase::count_int&
-ZStateBase::htabof(ymuint i)
+ZStateW::htabof(ymuint i)
 {
   return m_htab[i];
 }
 
 inline
 u_short&
-ZStateBase::codetabof(ymuint i)
+ZStateW::codetabof(ymuint i)
 {
   return m_codetab[i];
 }
 
 inline
 u_short&
-ZStateBase::tab_prefixof(ymuint i)
+ZStateR::tab_prefixof(ymuint i)
 {
-  return m_codetab[i];
+  return mPrefix[i];
 }
 
 inline
 ZStateBase::char_type&
-ZStateBase::tab_suffixof(ymuint i)
+ZStateR::tab_suffixof(ymuint i)
 {
-  return (reinterpret_cast<char_type*>(&m_htab))[i];
+  return mSuffix[i];
 }
 
+// @brief スタックを初期化する．
 inline
-ZStateBase::char_type*
-ZStateBase::de_stack()
+void
+ZStateR::init_stack()
 {
-  return &tab_suffixof(1 << k_BITS);
+  mStackPtr = &mStack[0];
+}
+
+// @brief スタックが空の時 true を返す．
+inline
+bool
+ZStateR::is_empty()
+{
+  return mStackPtr == &mStack[0];
+}
+
+// @brief スタックにデータを積む．
+inline
+void
+ZStateR::push_stack(char_type data)
+{
+  assert_cond( mStackPtr < &mStack[8000], __FILE__, __LINE__);
+  *(mStackPtr ++) = data;
+}
+
+// @brief スタックからデータを取り出す．
+inline
+ZStateR::char_type
+ZStateR::pop_stack()
+{
+  return *(-- mStackPtr);
 }
 
 END_NAMESPACE_YM

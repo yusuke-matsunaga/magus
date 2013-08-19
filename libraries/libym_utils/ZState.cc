@@ -64,36 +64,6 @@ ZStateBase::~ZStateBase()
 {
 }
 
-void
-ZStateBase::cl_hash(count_int cl_hsize)
-{
-  long m1 = -1;
-  count_int* htab_p = m_htab + cl_hsize;
-  long i = cl_hsize - 16;
-  do {			/* Might use Sys V memset(3) here. */
-    *(htab_p - 16) = m1;
-    *(htab_p - 15) = m1;
-    *(htab_p - 14) = m1;
-    *(htab_p - 13) = m1;
-    *(htab_p - 12) = m1;
-    *(htab_p - 11) = m1;
-    *(htab_p - 10) = m1;
-    *(htab_p - 9) = m1;
-    *(htab_p - 8) = m1;
-    *(htab_p - 7) = m1;
-    *(htab_p - 6) = m1;
-    *(htab_p - 5) = m1;
-    *(htab_p - 4) = m1;
-    *(htab_p - 3) = m1;
-    *(htab_p - 2) = m1;
-    *(htab_p - 1) = m1;
-    htab_p -= 16;
-  } while ( (i -= 16) >= 0 );
-  for (i += 16; i > 0; i--) {
-    *(-- htab_p) = m1;
-  }
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス ZStateW
@@ -260,6 +230,36 @@ ZStateW::cl_block()
   return 0;
 }
 
+void
+ZStateW::cl_hash(count_int cl_hsize)
+{
+  long m1 = -1;
+  count_int* htab_p = m_htab + cl_hsize;
+  long i = cl_hsize - 16;
+  do {			/* Might use Sys V memset(3) here. */
+    *(htab_p - 16) = m1;
+    *(htab_p - 15) = m1;
+    *(htab_p - 14) = m1;
+    *(htab_p - 13) = m1;
+    *(htab_p - 12) = m1;
+    *(htab_p - 11) = m1;
+    *(htab_p - 10) = m1;
+    *(htab_p - 9) = m1;
+    *(htab_p - 8) = m1;
+    *(htab_p - 7) = m1;
+    *(htab_p - 6) = m1;
+    *(htab_p - 5) = m1;
+    *(htab_p - 4) = m1;
+    *(htab_p - 3) = m1;
+    *(htab_p - 2) = m1;
+    *(htab_p - 1) = m1;
+    htab_p -= 16;
+  } while ( (i -= 16) >= 0 );
+  for (i += 16; i > 0; i--) {
+    *(-- htab_p) = m1;
+  }
+}
+
 int
 ZStateW::output(code_int ocode)
 {
@@ -421,14 +421,12 @@ ZStateR::read(ymuint8* rbuff,
 
   m_finchar = m_oldcode = getcode();
   if ( m_oldcode == -1 ) {
-    m_state = kEof;
-    cout << "reached to EOF" << endl;
     return 0;
   }
 
   *bp ++ = m_finchar;
   -- count;
-  m_stackp = de_stack();
+  init_stack();
 
   for (code_int code; (code = getcode()) > -1; ) {
     if ( (code == k_CLEAR) && m_block_compress ) {
@@ -448,23 +446,24 @@ ZStateR::read(ymuint8* rbuff,
 	// EINVAL;
 	return -1;
       }
-      *m_stackp ++ = m_finchar;
+      push_stack(m_finchar);
       code = m_oldcode;
     }
 
     while ( code >= 256 ) {
-      *(m_stackp ++) = tab_suffixof(code);
+      push_stack(tab_suffixof(code));
       code = tab_prefixof(code);
     }
-    *(m_stackp) ++ = m_finchar = tab_suffixof(code);
+    m_finchar = tab_suffixof(code);
+    push_stack(m_finchar);
 
   middle:
     do {
       if ( count -- == 0 ) {
 	return num;
       }
-      *bp ++ = *(-- m_stackp);
-    } while ( m_stackp > de_stack() );
+      *bp ++ = pop_stack();
+    } while ( !is_empty() );
 
     {
       code_int code = m_free_ent;
@@ -478,7 +477,6 @@ ZStateR::read(ymuint8* rbuff,
     m_oldcode = m_incode;
   }
 
-  cout << "m_state got kEof" << endl;
   m_state = kEof;
 
  eof:
@@ -505,7 +503,6 @@ ZStateR::getcode()
     }
     ssize_t n = _read(m_gbuf, m_n_bits);
     if ( n <= 0 ) {
-      cout << "EOF in getcode()" << endl;
       return -1;
     }
     m_roffset = 0;

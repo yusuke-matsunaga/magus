@@ -31,7 +31,6 @@ z_test(int argc,
       return -1;
     }
     if ( n == 0 ) {
-      cerr << "EOF" << endl;
       break;
     }
     for (ymuint i = 0; i < n; ++ i) {

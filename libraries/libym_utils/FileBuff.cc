@@ -78,7 +78,7 @@ FileBuff::read(ymuint8* buff,
 
   ymuint64 count = 0;
   while ( num > 0 ) {
-    if ( mPos == mBuffSize ) {
+    if ( mPos == mDataSize ) {
       // バッファが空なら実際に読み込む．
       ssize_t n = ::read(mFd, reinterpret_cast<void*>(mBuff), mBuffSize);
       if ( n < 0 ) {
