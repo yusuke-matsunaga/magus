@@ -71,6 +71,17 @@ public:
   read(ymuint8* buff,
        ymuint64 num);
 
+  /// @brief num バイトを読み込む
+  /// @note ただし読み込んだデータは捨てる．
+  /// @param[in] num 読み込むバイト数．
+  /// @return 実際に読み込んだバイト数を返す．
+  ssize_t
+  dummy_read(ymuint64 num);
+
+  /// @brief バッファにデータを読みだす．
+  bool
+  prepare();
+
   /// @brief バッファの現在位置を返す．
   ymuint8*
   buff_ptr() const;
@@ -80,6 +91,10 @@ public:
   /// @note 書き込みモードの場合にはバッファの空き容量を返す．
   ymuint64
   buff_size() const;
+
+  /// @brief バッファから num バイト読み出した事にする．
+  void
+  peek(ymuint64 num);
 
 
 protected:
@@ -94,16 +109,16 @@ protected:
   bool mNeedFlush;
 
   // バッファサイズ
-  ymuint32 mBuffSize;
+  ymuint64 mBuffSize;
 
   // バッファ
   ymuint8* mBuff;
 
   // 有効なデータのサイズ ( <= mBuffSize )
-  ymuint32 mDataSize;
+  ymuint64 mDataSize;
 
   // 読み出し/書き込み位置
-  ymuint32 mPos;
+  ymuint64 mPos;
 
 };
 
@@ -193,6 +208,15 @@ ymuint64
 FileBuff::buff_size() const
 {
   return mDataSize - mPos;
+}
+
+// @brief バッファから num バイト読み出した事にする．
+inline
+void
+FileBuff::peek(ymuint64 num)
+{
+  assert_cond( mPos + num <= mDataSize, __FILE__, __LINE__);
+  mPos += num;
 }
 
 END_NAMESPACE_YM

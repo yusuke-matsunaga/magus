@@ -66,14 +66,6 @@ main(int argc,
     cerr << a << endl;
     return 255;
   }
-  catch ( zlib_error x ) {
-    cerr << x.mLabel << ": " << x.mStatus;
-    if ( x.mMsg ) {
-      cerr << ": " << x.mMsg;
-    }
-    cerr << endl;
-    return x.mStatus;
-  }
   catch ( ... ) {
     cerr << "unknown exception" << endl;
     return 254;
