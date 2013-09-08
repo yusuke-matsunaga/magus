@@ -13,7 +13,9 @@ libym_zstream_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_zstream_la_SOURCES = \
-	zstream.cc
+	zstream.cc \
+	GzIDO.cc \
+	GzIn.cc
 
 libym_zstream_la_LIBADD =
 

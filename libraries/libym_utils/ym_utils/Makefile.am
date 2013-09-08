@@ -16,12 +16,16 @@ noinst_HEADERS = \
 	File.h \
 	FileBinI.h \
 	FileBinO.h \
+	FileIDO.h \
 	FileInfo.h \
 	FileLoc.h \
+	FileODO.h \
 	FileRegion.h \
 	FileScanner.h \
 	GenBase.h \
+	GzIn.h \
 	HeapTree.h \
+	IDO.h \
 	ItvlMgr.h \
 	MFSet.h \
 	MsgHandler.h \
@@ -34,6 +38,7 @@ noinst_HEADERS = \
 	MultiSetGenBase.h \
 	MultiSetPermGen.h \
 	NameMgr.h \
+	ODO.h \
 	PermGen.h \
 	PoptMainApp.h \
 	RandGen.h \
@@ -46,5 +51,9 @@ noinst_HEADERS = \
 	StrBuff.h \
 	StreamBinI.h \
 	StreamBinO.h \
+	StreamIDO.h \
+	StreamODO.h \
 	msg_type.h \
-	random.h
+	random.h \
+	zstream.h
+

@@ -51,8 +51,7 @@ noinst_PROGRAMS = \
 	heaptree_test \
 	mspg_test \
 	mscg_test \
-	z_test \
-	z_test2
+	CompIDO_test
 
 
 ############################################################
@@ -235,27 +234,13 @@ mspg_test_LDADD = \
 
 
 ############################################################
-## Variables for building z_test
+## Variables for building CompIDO_test
 ############################################################
 
-z_test_SOURCES = \
-	z_test.cc
+CompIDO_test_SOURCES = \
+	CompIDO_test.cc
 
-z_test_LDFLAGS =
+CompIDO_test_LDFLAGS =
 
-z_test_LDADD = \
-	$(YMUTILS)
-
-
-############################################################
-## Variables for building z_test2
-############################################################
-
-z_test2_SOURCES = \
-	z_test2.cc \
-	zopen.cc
-
-z_test2_LDFLAGS =
-
-z_test2_LDADD = \
+CompIDO_test_LDADD = \
 	$(YMUTILS)

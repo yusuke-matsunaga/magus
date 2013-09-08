@@ -17,12 +17,19 @@ BEGIN_NAMESPACE_YM
 static
 const ZStateBase::char_type k_MAGICHEADER[] = { '\037', '\235' };
 
+// 左端(msb)から1を埋めていくビットパタン
 static
-const ZStateBase::char_type lmask[9] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00 };
+const ZStateBase::char_type lmask[9] = {
+  0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00
+};
 
+// 右端(lsb)から1を埋めていくビットパタン
 static
-const ZStateBase::char_type rmask[9] = { 0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff };
+const ZStateBase::char_type rmask[9] = {
+  0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff
+};
 
+// デバッグ用の表時間数
 void
 print_code(ostream& s,
 	   u_char suffix)
@@ -48,7 +55,7 @@ print_code(ostream& s,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ZStateBase::ZStateBase(int bits)
+ZStateBase::ZStateBase(ymuint bits)
 {
   m_state = kStart;
 
@@ -70,7 +77,7 @@ ZStateBase::~ZStateBase()
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ZStateW::ZStateW(int bits) :
+ZStateW::ZStateW(ymuint bits) :
   ZStateBase(bits)
 {
   m_hsize = k_HSIZE;			/* For dynamic table sizing. */
@@ -90,9 +97,9 @@ ZStateW::~ZStateW()
 // @param[in] num データ(バイト)
 // @return 実際に処理したバイト数を返す．
 // @note エラーが起こったら -1 を返す．
-int
+ssize_t
 ZStateW::write(ymuint8* wbuff,
-	       int num)
+	       size_t num)
 {
   if ( num == 0 ) {
     return 0;
@@ -365,9 +372,9 @@ ZStateR::~ZStateR()
 {
 }
 
-int
+ssize_t
 ZStateR::read(ymuint8* rbuff,
-	      int num)
+	      size_t num)
 {
   if ( num == 0 ) {
     cerr << "num == 0" << endl;

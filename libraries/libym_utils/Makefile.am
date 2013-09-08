@@ -44,6 +44,7 @@ libym_utils_la_SOURCES = \
 	FileScanner.cc \
 	FragAlloc.cc \
 	GenBase.cc \
+	IDO.cc \
 	ItvlCell.h \
 	ItvlMgrImpl.h \
 	ItvlMgrImpl.cc \

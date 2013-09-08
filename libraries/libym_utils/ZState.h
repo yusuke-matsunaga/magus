@@ -34,7 +34,7 @@ public:
 
   /// @brief コンストラクタ
   explicit
-  ZStateBase(int bits = 0);
+  ZStateBase(ymuint bits = 0);
 
   /// @brief デストラクタ
   ~ZStateBase();
@@ -60,6 +60,10 @@ public:
   void
   close();
 
+  /// @brief 適正な状態の時 true を返す．
+  bool
+  is_ready() const;
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -72,7 +76,7 @@ protected:
   /// @return 実際に書き込んだバイト数を返す．
   ssize_t
   _write(const ymuint8* buff,
-	 ymuint num);
+	 size_t num);
 
   /// @brief num バイトを読み込み buff[] に格納する．
   /// @param[in] buff データを格納するバッファ
@@ -80,7 +84,7 @@ protected:
   /// @return 実際に読み込んだバイト数を返す．
   ssize_t
   _read(ymuint8* buff,
-	ymuint num);
+	size_t num);
 
 
 protected:
@@ -171,7 +175,8 @@ class ZStateW :
 public:
 
   /// @brief コンストラクタ
-  ZStateW(int bits = 0);
+  explicit
+  ZStateW(ymuint bits = 0);
 
   /// @brief デストラクタ
   ~ZStateW();
@@ -187,9 +192,9 @@ public:
   /// @param[in] num データ(バイト)
   /// @return 実際に処理したバイト数を返す．
   /// @note エラーが起こったら -1 を返す．
-  int
+  ssize_t
   write(ymuint8* wbuff,
-	int num);
+	size_t num);
 
 
 private:
@@ -275,9 +280,9 @@ public:
   /// @param[in] num 読み出すデータ数(バイト)
   /// @return 実際に読み出したバイト数を返す．
   /// @note エラーが起こったら -1 を返す．
-  int
+  ssize_t
   read(ymuint8* rbuff,
-       int num);
+       size_t num);
 
 
 private:
@@ -373,6 +378,14 @@ ZStateBase::close()
   mFileBuff.close();
 }
 
+// @brief 適正な状態の時 true を返す．
+inline
+bool
+ZStateBase::is_ready() const
+{
+  return mFileBuff.is_ready();
+}
+
 // @brief buff[0] - buff[num - 1] の内容を書き込む．
 // @param[in] buff データを格納したバッファ
 // @param[in] num 書き込むバイト数
@@ -380,7 +393,7 @@ ZStateBase::close()
 inline
 ssize_t
 ZStateBase::_write(const ymuint8* buff,
-		   ymuint num)
+		   size_t num)
 {
   return mFileBuff.write(buff, num);
 }
@@ -392,7 +405,7 @@ ZStateBase::_write(const ymuint8* buff,
 inline
 ssize_t
 ZStateBase::_read(ymuint8* buff,
-		  ymuint num)
+		  size_t num)
 {
   return mFileBuff.read(buff, num);
 }

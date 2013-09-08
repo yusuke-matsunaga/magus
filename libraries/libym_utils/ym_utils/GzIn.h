@@ -47,12 +47,14 @@ public:
   void
   close();
 
-  /// @brief 圧縮されたデータを伸長する．
+  /// @brief 圧縮されたデータを伸長してバッファに書き込む．
   /// @param[in] buff 伸長したデータを格納するバッファ
   /// @param[in] size バッファの空きサイズ
-  ymuint
-  decomp(ymuint8* buff,
-	 ymuint size);
+  /// @return バッファに書き込まれたデータサイズを返す．
+  /// @note エラーが起こった場合には負の値が返される．
+  ssize_t
+  read(ymuint8* buff,
+       size_t size);
 
 
 private:
