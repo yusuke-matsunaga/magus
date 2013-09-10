@@ -163,7 +163,12 @@ FileBuff::open(const char* filename,
 {
   close();
   mFd = ::open(filename, flags, mode);
-  mPos = mBuffSize;
+  if ( flags == O_RDONLY ) {
+    mPos = mBuffSize;
+  }
+  else {
+    mPos = 0;
+  }
   mDataSize = mBuffSize;
   mNeedFlush = false;
   return mFd >= 0;

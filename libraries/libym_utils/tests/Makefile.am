@@ -51,7 +51,8 @@ noinst_PROGRAMS = \
 	heaptree_test \
 	mspg_test \
 	mscg_test \
-	CompIDO_test
+	CompIDO_test \
+	CompODO_test
 
 
 ############################################################
@@ -243,4 +244,17 @@ CompIDO_test_SOURCES = \
 CompIDO_test_LDFLAGS =
 
 CompIDO_test_LDADD = \
+	$(YMUTILS)
+
+
+############################################################
+## Variables for building CompODO_test
+############################################################
+
+CompODO_test_SOURCES = \
+	CompODO_test.cc
+
+CompODO_test_LDFLAGS =
+
+CompODO_test_LDADD = \
 	$(YMUTILS)
