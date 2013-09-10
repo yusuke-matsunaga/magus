@@ -14,10 +14,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -40,7 +36,7 @@ static char sccsid[] = "@(#)zopen.c	8.1 (Berkeley) 6/27/93";
 #endif /* LIBC_SCCS and not lint */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/usr.bin/compress/zopen.c,v 1.12.22.2 2011/09/28 08:47:17 bz Exp $");
+__FBSDID("$FreeBSD: release/9.1.0/usr.bin/compress/zopen.c 225827 2011-09-28 08:47:17Z bz $");
 
 /*-
  * fcompress.c - File compression ala IEEE Computer, June 1984.
@@ -63,8 +59,6 @@ __FBSDID("$FreeBSD: src/usr.bin/compress/zopen.c,v 1.12.22.2 2011/09/28 08:47:17
  *	The output is compatible with compress(1) with 16 bit tables.
  *	Any file produced by compress(1) can be read.
  */
-
-#include <iostream>
 
 #include <sys/param.h>
 #include <sys/stat.h>
@@ -100,14 +94,12 @@ static char_type magic_header[] =
 
 #define	MAXCODE(n_bits)	((1 << (n_bits)) - 1)
 
-enum t_zs_state {
-  S_START, S_MIDDLE, S_EOF
-};
-
 struct s_zstate {
 	FILE *zs_fp;			/* File stream for I/O */
 	char zs_mode;			/* r or w */
-	t_zs_state zs_state;			/* State of computation */
+	enum {
+		S_START, S_MIDDLE, S_EOF
+	} zs_state;			/* State of computation */
 	u_int zs_n_bits;		/* Number of bits/code. */
 	u_int zs_maxbits;		/* User settable max # bits/code. */
 	code_int zs_maxcode;		/* Maximum code, given n_bits. */
@@ -135,7 +127,7 @@ struct s_zstate {
 			code_int zs_ent;
 			code_int zs_hsize_reg;
 			int zs_hshift;
-		} w;			/* Write paramenters */
+		} w;			/* Write parameters */
 		struct {
 			char_type *zs_stackp;
 			int zs_finchar;
@@ -213,28 +205,6 @@ static int	zclose(void *);
 static int	zread(void *, char *, int);
 static int	zwrite(void *, const char *, int);
 
-using namespace std;
-
-static
-void
-print_code(ostream& s,
-	   u_char suffix)
-{
-  s << static_cast<int>(suffix);
-  if ( isprint(suffix) ) {
-    s << " \"" << suffix << "\"";
-  }
-  else if ( suffix == '\t' ) {
-    s << " TAB";
-  }
-  else if ( suffix == '\r' ) {
-    s << " CR";
-  }
-  else if ( suffix == '\n' ) {
-    s << " LF";
-  }
-}
-
 /*-
  * Algorithm from "A Technique for High Performance Data Compression",
  * Terry A. Welch, IEEE Computer Vol 17, No 6 (June 1984), pp 8-19.
@@ -274,7 +244,7 @@ zwrite(void *cookie, const char *wbp, int num)
 	if (num == 0)
 		return (0);
 
-	zs = reinterpret_cast<s_zstate*>(cookie);
+	zs = cookie;
 	count = num;
 	bp = (const u_char *)wbp;
 	if (state == S_MIDDLE)
@@ -355,7 +325,7 @@ zclose(void *cookie)
 	struct s_zstate *zs;
 	int rval;
 
-	zs = reinterpret_cast<s_zstate*>(cookie);
+	zs = cookie;
 	if (zmode == 'w') {		/* Put out the final code. */
 		if (output(zs, (code_int) ent) == -1) {
 			(void)fclose(fp);
@@ -485,8 +455,6 @@ output(struct s_zstate *zs, code_int ocode)
 static int
 zread(void *cookie, char *rbp, int num)
 {
-  using namespace std;
-
 	u_int count;
 	struct s_zstate *zs;
 	u_char *bp, header[3];
@@ -494,7 +462,7 @@ zread(void *cookie, char *rbp, int num)
 	if (num == 0)
 		return (0);
 
-	zs = reinterpret_cast<s_zstate*>(cookie);
+	zs = cookie;
 	count = num;
 	bp = (u_char *)rbp;
 	switch (state) {
@@ -540,6 +508,7 @@ zread(void *cookie, char *rbp, int num)
 	stackp = de_stack;
 
 	while ((code = getcode(zs)) > -1) {
+
 		if ((code == CLEAR) && block_compress) {
 			for (code = 255; code >= 0; code--)
 				tab_prefixof(code) = 0;
@@ -576,10 +545,9 @@ zread(void *cookie, char *rbp, int num)
 
 		/* And put them out in forward order.  */
 middle:		do {
-		  if (count-- == 0) {
-		    return (num);
-		  }
-		  *bp++ = *--stackp;
+			if (count-- == 0)
+				return (num);
+			*bp++ = *--stackp;
 		} while (stackp > de_stack);
 
 		/* Generate the new entry. */
@@ -658,8 +626,6 @@ getcode(struct s_zstate *zs)
 	gcode |= (*bp & rmask[bits]) << r_off;
 	roffset += n_bits;
 
-	cout << gcode << endl;
-
 	return (gcode);
 }
 
@@ -726,6 +692,7 @@ cl_hash(struct s_zstate *zs, count_int cl_hsize)	/* Reset code table. */
 FILE *
 zopen(const char *fname, const char *mode, int bits)
 {
+	struct s_zstate *zs;
 
 	if ((mode[0] != 'r' && mode[0] != 'w') || mode[1] != '\0' ||
 	    bits < 0 || bits > BITS) {
@@ -733,12 +700,8 @@ zopen(const char *fname, const char *mode, int bits)
 		return (NULL);
 	}
 
-	void* p = calloc(1, sizeof(struct s_zstate));
-	if ( p == NULL ) {
-	  return NULL;
-	}
-
-	struct s_zstate *zs = reinterpret_cast<s_zstate*>(p);
+	if ((zs = calloc(1, sizeof(struct s_zstate))) == NULL)
+		return (NULL);
 
 	maxbits = bits ? bits : BITS;	/* User settable max # bits/code. */
 	maxmaxcode = 1L << maxbits;	/* Should NEVER generate this code. */

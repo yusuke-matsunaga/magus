@@ -52,7 +52,8 @@ noinst_PROGRAMS = \
 	mspg_test \
 	mscg_test \
 	CompIDO_test \
-	CompODO_test
+	CompODO_test \
+	mycompress
 
 
 ############################################################
@@ -258,3 +259,20 @@ CompODO_test_LDFLAGS =
 
 CompODO_test_LDADD = \
 	$(YMUTILS)
+
+
+############################################################
+## Variables for building mycompress
+############################################################
+
+
+mycompress_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+mycompress_SOURCES = \
+	mycompress.c \
+	zopen.h \
+	zopen.c
+
+mycompress_LDADD =

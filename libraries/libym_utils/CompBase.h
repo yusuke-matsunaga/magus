@@ -76,7 +76,7 @@ protected:
   /// @return 実際に書き込んだバイト数を返す．
   ssize_t
   _write(const ymuint8* buff,
-	 size_t num);
+	 ymuint64 num);
 
   /// @brief num バイトを読み込み buff[] に格納する．
   /// @param[in] buff データを格納するバッファ
@@ -84,7 +84,7 @@ protected:
   /// @return 実際に読み込んだバイト数を返す．
   ssize_t
   _read(ymuint8* buff,
-	size_t num);
+	ymuint64 num);
 
 
 protected:
@@ -214,7 +214,7 @@ CompBase::is_ready() const
 inline
 ssize_t
 CompBase::_write(const ymuint8* buff,
-		 size_t num)
+		 ymuint64 num)
 {
   return mFileBuff.write(buff, num);
 }
@@ -226,7 +226,7 @@ CompBase::_write(const ymuint8* buff,
 inline
 ssize_t
 CompBase::_read(ymuint8* buff,
-		size_t num)
+		ymuint64 num)
 {
   return mFileBuff.read(buff, num);
 }

@@ -94,6 +94,24 @@ CompO::~CompO()
 {
 }
 
+// @brief ファイルをクローズする．
+void
+CompO::close()
+{
+  if ( output(m_ent) == -1 ) {
+    goto end;
+  }
+
+  ++ m_out_count;
+
+  if ( output(static_cast<code_int>(-1)) == -1 ) {
+    goto end;
+  }
+
+ end:
+  CompBase::close();
+}
+
 // @brief データを圧縮して書き込む．
 // @param[in] wbuff 書き込むデータを格納したバッファ
 // @param[in] num データ(バイト)
@@ -149,6 +167,7 @@ CompO::write(const ymuint8* wbuff,
   }
 
   for (code_int i = 0; -- count; ) {
+    int disp;
     ymuint8 c = *(bp ++ );
     ++ m_in_count;
     code_int fcode = (static_cast<code_int>(c) << m_maxbits) + m_ent;
@@ -162,24 +181,24 @@ CompO::write(const ymuint8* wbuff,
       goto nomatch;
     }
 
-    {
-      int disp = m_hsize_reg - i;
-      if ( i == 0 ) {
-	disp = 1;
-      }
+    if ( i == 0 ) {
+      disp = 1;
+    }
+    else {
+      disp = m_hsize_reg - i;
+    }
 
   probe:
-      if ( (i -= disp) < 0 ) {
-	i += m_hsize_reg;
-      }
+    if ( (i -= disp) < 0 ) {
+      i += m_hsize_reg;
+    }
 
-      if ( htabof(i) == fcode ) {
-	m_ent = codetabof(i);
-	continue;
-      }
-      if ( static_cast<long>(htabof(i)) >= 0 ) {
-	goto probe;
-      }
+    if ( htabof(i) == fcode ) {
+      m_ent = codetabof(i);
+      continue;
+    }
+    if ( static_cast<long>(htabof(i)) >= 0 ) {
+      goto probe;
     }
 
   nomatch:
