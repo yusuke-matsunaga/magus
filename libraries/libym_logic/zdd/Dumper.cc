@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_ZDD
 
 // @brief 内容のダンプ
 void
-Zdd::dump(BinO& s) const
+Zdd::dump(ODO& s) const
 {
   Dumper dumper(mMgr, s);
   ZddEdge e(mRoot);
@@ -29,7 +29,7 @@ Zdd::dump(BinO& s) const
 // @brief ZDD ベクタの内容をダンプする．
 // @param[in] s 出力ストリーム
 void
-ZddVector::dump(BinO& s) const
+ZddVector::dump(ODO& s) const
 {
   if ( empty() ) {
     return;
@@ -51,7 +51,7 @@ ZddVector::dump(BinO& s) const
 // @brief ZDD リストの内容をダンプする．
 // @param[in] s 出力ストリーム
 void
-ZddList::dump(BinO& s) const
+ZddList::dump(ODO& s) const
 {
   if ( empty() ) {
     return;
@@ -77,7 +77,7 @@ ZddList::dump(BinO& s) const
 
 // コンストラクタ
 Dumper::Dumper(ZddMgrImpl* mgr,
-	       BinO& s) :
+	       ODO& s) :
   mMgr(mgr),
   mStream(s)
 {

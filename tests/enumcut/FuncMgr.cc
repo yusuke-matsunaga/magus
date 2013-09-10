@@ -130,7 +130,7 @@ FuncMgr::func_list(ymuint ni,
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-FuncMgr::dump(BinO& s) const
+FuncMgr::dump(ODO& s) const
 {
   s << mNum;
   for (ymuint i = 0; i < mTableSize; ++ i) {
@@ -143,7 +143,7 @@ FuncMgr::dump(BinO& s) const
 // @brief 代表関数のみをバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-FuncMgr::dump_rep(BinO& s) const
+FuncMgr::dump_rep(ODO& s) const
 {
   NpnMgr npn_mgr;
   hash_set<TvFunc> rep_hash;
@@ -170,7 +170,7 @@ FuncMgr::dump_rep(BinO& s) const
 
 // @brief バイナリダンプされたファイルを読み込む．
 void
-FuncMgr::restore(BinI& s)
+FuncMgr::restore(IDO& s)
 {
   clear();
   ymuint32 n;

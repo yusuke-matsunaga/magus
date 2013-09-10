@@ -194,18 +194,18 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // BinIO 用の関数
+  // IDOO 用の関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief バイナリファイルの書き出し
   /// @param[in] s 出力先のストリーム
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリファイルの読み込み
   /// @param[in] s 入力元のストリーム
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 public:
@@ -437,16 +437,16 @@ operator<<(ostream& s,
 /// @param[in] s 出力ストリーム
 /// @param[in] func 関数
 /// @return s
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const TvFuncM& func);
 
 /// @brief バイナリ入力
 /// @param[in] s 入力ストリーム
 /// @param[out] func 関数
 /// @return s
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   TvFuncM& func);
 
 
@@ -648,8 +648,8 @@ operator<<(ostream& s,
 // @param[in] func 関数
 // @return s
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const TvFuncM& func)
 {
   func.dump(s);
@@ -661,8 +661,8 @@ operator<<(BinO& s,
 // @param[out] func 関数
 // @return s
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   TvFuncM& func)
 {
   func.restore(s);

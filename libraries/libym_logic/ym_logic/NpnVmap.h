@@ -12,8 +12,8 @@
 #include "ym_logic/npn_nsdef.h"
 #include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_NPN
@@ -82,8 +82,8 @@ public:
   /// @param[in] vmap 対象のオブジェクト
   /// @return s
   friend
-  BinO&
-  operator<<(BinO& s,
+  ODO&
+  operator<<(ODO& s,
 	     const NpnVmap& vmap);
 
   /// @brief バイナリ入力
@@ -91,8 +91,8 @@ public:
   /// @param[out] vmap 結果を格納する変数
   /// @return s
   friend
-  BinI&
-  operator>>(BinI& s,
+  IDO&
+  operator>>(IDO& s,
 	     NpnVmap& vmap);
 
 
@@ -184,8 +184,8 @@ NpnVmap::operator!=(const NpnVmap& right) const
 // @param[in] vmap 対象のオブジェクト
 // @return s
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const NpnVmap& vmap)
 {
   return s << vmap.mPosPol;
@@ -196,8 +196,8 @@ operator<<(BinO& s,
 // @param[out] vmap 結果を格納する変数
 // @return s
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   NpnVmap& vmap)
 {
   return s >> vmap.mPosPol;

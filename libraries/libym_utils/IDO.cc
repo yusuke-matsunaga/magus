@@ -15,12 +15,15 @@
 #include "ym_utils/ODO.h"
 #include "ym_utils/FileODO.h"
 #include "ym_utils/StreamODO.h"
+#include "ym_utils/CompODO.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/FileRegion.h"
 
+#include "CompI.h"
+#include "CompO.h"
+
 #include "FileBuff.h"
-#include "ZState.h"
 
 #include <fcntl.h>
 
@@ -232,7 +235,7 @@ FileIDO::read(ymuint8* buff,
 // @brief コンストラクタ
 CompIDO::CompIDO()
 {
-  mZ = new ZStateR();
+  mZ = new CompI();
 }
 
 // @brief コンストラクタ
@@ -240,7 +243,7 @@ CompIDO::CompIDO()
 // @note 意味的にはコンストラクタ + open()
 CompIDO::CompIDO(const char* filename)
 {
-  mZ = new ZStateR();
+  mZ = new CompI();
   open(filename);
 }
 
@@ -249,7 +252,7 @@ CompIDO::CompIDO(const char* filename)
 // @note 意味的にはコンストラクタ + open()
 CompIDO::CompIDO(const string& filename)
 {
-  mZ = new ZStateR();
+  mZ = new CompI();
   open(filename);
 }
 
@@ -329,9 +332,7 @@ ssize_t
 StreamIDO::read(ymuint8* buff,
 		ymuint64 n)
 {
-  mS.read(reinterpret_cast<char*>(buff), n);
-  #warning"TODO: istream::read() の仕様をチェック"
-  return n;
+  return mS.readsome(reinterpret_cast<char*>(buff), n);
 }
 
 
@@ -493,19 +494,19 @@ FileODO::operator bool() const
 
 // @brief ファイルを開く
 // @param[in] filename ファイル名
-void
+bool
 FileODO::open(const char* filename)
 {
   close();
-  mFileBuff->open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+  return mFileBuff->open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 }
 
 // @brief ファイルを開く
 // @param[in] filename ファイル名
-void
+bool
 FileODO::open(const string& filename)
 {
-  open(filename.c_str());
+  return open(filename.c_str());
 }
 
 // @brief ファイルを閉じる．
@@ -553,7 +554,94 @@ StreamODO::write(const ymuint8* buff,
 		 ymuint64 n)
 {
   mS.write(reinterpret_cast<const char*>(buff), n);
-  return n;
+  if ( mS.bad() ) {
+    return -1;
+  }
+  else {
+    return n;
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス CompODO
+//////////////////////////////////////////////////////////////////////
+
+// @brief 空のコンストラクタ
+// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
+CompODO::CompODO(ymuint bits)
+{
+  mZ = new CompO(bits);
+}
+
+// @brief コンストラクタ
+// @param[in] filename ファイル名
+// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
+CompODO::CompODO(const char* filename,
+		 ymuint bits)
+{
+  mZ = new CompO(bits);
+  open(filename);
+}
+
+// @brief コンストラクタ
+// @param[in] filename ファイル名
+// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
+CompODO::CompODO(const string& filename,
+		 ymuint bits)
+{
+  mZ = new CompO(bits);
+}
+
+// @brief デストラクタ
+CompODO::~CompODO()
+{
+  delete mZ;
+}
+
+// @brief 書き込み可能なら true を返す．
+CompODO::operator bool() const
+{
+  return mZ->is_ready();
+}
+
+// @brief ファイルを開く
+// @param[in] filename ファイル名
+// @retval true オープンが成功した．
+// @retval false オープンが失敗した．
+bool
+CompODO::open(const char* filename)
+{
+  return mZ->open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+}
+
+// @brief ファイルを開く
+// @param[in] filename ファイル名
+// @retval true オープンが成功した．
+// @retval false オープンが失敗した．
+bool
+CompODO::open(const string& filename)
+{
+  return open(filename.c_str());
+}
+
+// @brief ファイルを閉じる．
+// @note 以降の書き込みは行われない．
+void
+CompODO::close()
+{
+  mZ->close();
+}
+
+// @brief データを書き出す．
+// @param[in] buff データを収めた領域のアドレス
+// @param[in] n データサイズ
+// @return 実際に書き出した量を返す．
+ssize_t
+CompODO::write(const ymuint8* buff,
+	       ymuint64 n)
+{
+  return mZ->write(buff, n);
 }
 
 END_NAMESPACE_YM

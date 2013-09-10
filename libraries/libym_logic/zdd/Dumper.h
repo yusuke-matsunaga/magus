@@ -11,7 +11,7 @@
 
 #include "ZddMgrImpl.h"
 #include "IdMgr.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
@@ -28,7 +28,7 @@ public:
   /// @param[in] mgr ZddMgr
   /// @param[in] s 出力先のストリーム
   Dumper(ZddMgrImpl* mgr,
-	 BinO& s);
+	 ODO& s);
 
   /// @brief デストラクタ
   ~Dumper();
@@ -54,7 +54,7 @@ private:
   ZddMgrImpl* mMgr;
 
   // 出力用のストリーム
-  BinO& mStream;
+  ODO& mStream;
 
   // ID 番号を管理するマネージャ
   IdMgr mIdMgr;

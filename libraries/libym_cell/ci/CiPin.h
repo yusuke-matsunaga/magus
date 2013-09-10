@@ -187,7 +187,7 @@ protected:
 
   /// @brief dump 用の共通情報を出力する．
   void
-  dump_common(BinO& s) const;
+  dump_common(ODO& s) const;
 
 
 private:
@@ -290,7 +290,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
 
 private:
@@ -521,7 +521,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
 };
 
@@ -625,7 +625,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
 
 private:
@@ -707,7 +707,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
 
 private:

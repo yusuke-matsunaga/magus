@@ -13,8 +13,8 @@
 #include "ym_logic/BddVector.h"
 #include "ym_logic/BddList.h"
 
-#include "ym_utils/FileBinI.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
 
 #include "bddtest.h"
 
@@ -906,7 +906,7 @@ test_dump(BddMgr& bddmgr)
   Bdd bdd = str2bdd(bddmgr, "0 & 2 | 1 & 3 | ~1 & ~3");
   const char* fn = "/tmp/magus_bdd_base_test";
   {
-    FileBinO bo(fn);
+    FileODO bo(fn);
     if ( !bo ) {
       cout << "cannot open output file: " << fn << endl;
       stat = false;
@@ -915,7 +915,7 @@ test_dump(BddMgr& bddmgr)
   }
   Bdd bdd2(bddmgr);
   {
-    FileBinI bi(fn);
+    FileIDO bi(fn);
     if ( !bi ) {
       cout << "cannont open input file: " << fn << endl;
       stat = false;

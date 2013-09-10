@@ -9,13 +9,9 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	Alloc.h \
 	Binder.h \
-	BinI.h \
-	BinO.h \
 	CombiGen.h \
 	DlList.h \
 	File.h \
-	FileBinI.h \
-	FileBinO.h \
 	FileIDO.h \
 	FileInfo.h \
 	FileLoc.h \
@@ -49,11 +45,8 @@ noinst_HEADERS = \
 	ShString.h \
 	StopWatch.h \
 	StrBuff.h \
-	StreamBinI.h \
-	StreamBinO.h \
 	StreamIDO.h \
 	StreamODO.h \
 	msg_type.h \
 	random.h \
 	zstream.h
-

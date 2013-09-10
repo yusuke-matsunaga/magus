@@ -36,7 +36,7 @@ distclean-local:
 ############################################################
 
 noinst_PROGRAMS = \
-	binio_test \
+	IODO_test \
 	file_test \
 	namemgr_test \
 	combigen_test \
@@ -66,13 +66,13 @@ YMUTILS = ../libym_utils.la
 
 
 ############################################################
-## Variables for building binio_test
+## Variables for building IODO_test
 ############################################################
 
-binio_test_SOURCES = \
-	binio_test.cc
+IODO_test_SOURCES = \
+	IODO_test.cc
 
-binio_test_LDADD = \
+IODO_test_LDADD = \
 	$(YMUTILS)
 
 

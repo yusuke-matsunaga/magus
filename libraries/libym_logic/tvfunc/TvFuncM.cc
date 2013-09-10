@@ -697,7 +697,7 @@ TvFuncM::print(ostream& s,
 // @brief バイナリファイルの書き出し
 // @param[in] s 出力先のストリーム
 void
-TvFuncM::dump(BinO& s) const
+TvFuncM::dump(ODO& s) const
 {
   s << mNi
     << mNo
@@ -712,7 +712,7 @@ TvFuncM::dump(BinO& s) const
 // @brief バイナリファイルの読み込み
 // @param[in] s 入力元のストリーム
 void
-TvFuncM::restore(BinI& s)
+TvFuncM::restore(IDO& s)
 {
   ymuint32 nblk;
 

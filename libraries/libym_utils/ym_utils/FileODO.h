@@ -65,12 +65,12 @@ public:
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
-  void
+  bool
   open(const char* filename);
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
-  void
+  bool
   open(const string& filename);
 
   /// @brief ファイルを閉じる．

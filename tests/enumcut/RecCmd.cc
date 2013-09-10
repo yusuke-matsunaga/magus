@@ -18,8 +18,8 @@
 
 #include "ym_logic/NpnMgr.h"
 
-#include "ym_utils/FileBinI.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
 
 #include "TopDown.h"
 #include "FuncMgr.h"
@@ -273,7 +273,7 @@ DumpCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  FileBinO bo(ex_file_name);
+  FileODO bo(ex_file_name);
   if ( !bo ) {
     TclObj emsg;
     emsg << "Could not create " << file_name;
@@ -326,7 +326,7 @@ DumpRepCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  FileBinO bo(ex_file_name);
+  FileODO bo(ex_file_name);
   if ( !bo ) {
     TclObj emsg;
     emsg << "Could not create " << file_name;
@@ -378,7 +378,7 @@ RestoreCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  FileBinI bi(ex_file_name);
+  FileIDO bi(ex_file_name);
   if ( !bi ) {
     TclObj emsg;
     emsg << "Could not open " << file_name;

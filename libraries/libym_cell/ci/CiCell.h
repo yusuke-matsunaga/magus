@@ -13,7 +13,7 @@
 #include "ym_logic/LogExpr.h"
 #include "ym_utils/ShString.h"
 #include "ym_utils/Alloc.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -407,7 +407,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
 
 public:

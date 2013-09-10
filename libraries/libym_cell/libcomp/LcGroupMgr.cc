@@ -253,7 +253,7 @@ LcGroupMgr::default_repfunc(const TvFuncM& f,
 // @brief 内容をバイナリダンプする．
 // @param[in] bos 出力先のストリーム
 void
-LcGroupMgr::dump(BinO& bos) const
+LcGroupMgr::dump(ODO& bos) const
 {
   // セルグループの情報をダンプする．
   ymuint32 ng = group_num();

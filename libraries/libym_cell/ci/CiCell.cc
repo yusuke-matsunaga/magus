@@ -554,7 +554,7 @@ CiCell::clear_preset_var2() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiCell::dump(BinO& s) const
+CiCell::dump(ODO& s) const
 {
   ymuint8 tid = 0;
   if ( is_logic() ) {

@@ -13,8 +13,8 @@
 #include "ym_logic/AigMgr.h"
 #include "ym_logic/TvFunc.h"
 #include "ym_logic/NpnMgr.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 #include "CutHash.h"
 
 
@@ -66,11 +66,11 @@ public:
   /// @brief 内容をバイナリダンプする．
   /// @param[in] s 出力先のストリーム
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリダンプされたファイルを読み込む．
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 private:

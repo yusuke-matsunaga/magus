@@ -1,14 +1,14 @@
 
-/// @file pyutils_FileBinO.cc
-/// @brief FileBinO の Python 用ラッパ
+/// @file pyutils_FileIDO.cc
+/// @brief FileIDO の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_utils/pyutils.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -19,14 +19,14 @@ BEGIN_NONAMESPACE
 // Python 用の構造体定義
 //////////////////////////////////////////////////////////////////////
 
-// FileBinO を表す型
-struct FileBinOObject
+// FileIDO を表す型
+struct FileIDOObject
 {
   // Python のお約束
   PyObject_HEAD
 
-  // FileBinO の本体
-  FileBinO mBody;
+  // FileIDO の本体
+  FileIDO mBody;
 
 };
 
@@ -35,26 +35,26 @@ struct FileBinOObject
 // Python 用のメソッド関数定義
 //////////////////////////////////////////////////////////////////////
 
-// FileBinOObject の生成関数
-FileBinOObject*
-FileBinO_new(PyTypeObject* type)
+// FileIDOObject の生成関数
+FileIDOObject*
+FileIDO_new(PyTypeObject* type)
 {
-  FileBinOObject* self = PyObject_New(FileBinOObject, type);
+  FileIDOObject* self = PyObject_New(FileIDOObject, type);
   if ( self == NULL ) {
     return NULL;
   }
 
-  // FileBinO の最低限の初期化を行う．
-  new (&self->mBody) FileBinO();
+  // FileIDO の最低限の初期化を行う．
+  new (&self->mBody) FileIDO();
 
   return self;
 }
 
-// FileBinOObject を開放する関数
+// FileIDOObject を開放する関数
 void
-FileBinO_dealloc(FileBinOObject* self)
+FileIDO_dealloc(FileIDOObject* self)
 {
-  // FileBinO の後始末を行う．
+  // FileIDO の後始末を行う．
   self->mBody.close();
 
   PyObject_Del(self);
@@ -62,7 +62,7 @@ FileBinO_dealloc(FileBinOObject* self)
 
 // 初期化関数
 int
-FileBinO_init(FileBinOObject* self,
+FileIDO_init(FileIDOObject* self,
 	      PyObject* args)
 {
   // 引数の形式は
@@ -83,7 +83,7 @@ FileBinO_init(FileBinOObject* self,
 
 // ok 関数
 PyObject*
-FileBinO_ok(FileBinOObject* self,
+FileIDO_ok(FileIDOObject* self,
 	    PyObject* args)
 {
   // 奇妙な文
@@ -94,7 +94,7 @@ FileBinO_ok(FileBinOObject* self,
 
 // open 関数
 PyObject*
-FileBinO_open(FileBinOObject* self,
+FileIDO_open(FileIDOObject* self,
 	      PyObject* args)
 {
   char* filename = NULL;
@@ -110,7 +110,7 @@ FileBinO_open(FileBinOObject* self,
 
 // close 関数
 PyObject*
-FileBinO_close(FileBinOObject* self,
+FileIDO_close(FileIDOObject* self,
 	       PyObject* args)
 {
   self->mBody.close();
@@ -119,123 +119,74 @@ FileBinO_close(FileBinOObject* self,
   return Py_None;
 }
 
-// write_8 関数
+// read_8 関数
 PyObject*
-FileBinO_write_8(FileBinOObject* self,
+FileIDO_read_8(FileIDOObject* self,
+		PyObject* args)
+{
+  ymuint8 val = self->mBody.read_8();
+  return PyObject_FromYmuint8(val);
+}
+
+// read_16 関数
+PyObject*
+FileIDO_read_16(FileIDOObject* self,
 		 PyObject* args)
 {
-  ymuint8 val;
-  if ( !PyArg_ParseTuple(args, "b", &val) ) {
-    return NULL;
-  }
-
-  self->mBody.write_8(val);
-
-  Py_INCREF(Py_None);
-  return Py_None;
+  ymuint16 val = self->mBody.read_16();
+  return PyObject_FromYmuint16(val);
 }
 
-// write_16 関数
+// read_32 関数
 PyObject*
-FileBinO_write_16(FileBinOObject* self,
-		  PyObject* args)
+FileIDO_read_32(FileIDOObject* self,
+		 PyObject* args)
 {
-  ymuint16 val;
-  if ( !PyArg_ParseTuple(args, "H", &val) ) {
-    return NULL;
-  }
-
-  self->mBody.write_16(val);
-
-  Py_INCREF(Py_None);
-  return Py_None;
+  ymuint32 val = self->mBody.read_32();
+  return PyObject_FromYmuint32(val);
 }
 
-// write_32 関数
+// read_64 関数
 PyObject*
-FileBinO_write_32(FileBinOObject* self,
-		  PyObject* args)
+FileIDO_read_64(FileIDOObject* self,
+		 PyObject* args)
 {
-  ymuint32 val;
-  if ( !PyArg_ParseTuple(args, "k", &val) ) {
-    return NULL;
-  }
-
-  self->mBody.write_32(val);
-
-  Py_INCREF(Py_None);
-  return Py_None;
+  ymuint64 val = self->mBody.read_64();
+  return PyObject_FromYmuint64(val);
 }
 
-// write_64 関数
+// read_float 関数
 PyObject*
-FileBinO_write_64(FileBinOObject* self,
-		  PyObject* args)
+FileIDO_read_float(FileIDOObject* self,
+		    PyObject* args)
 {
-  ymuint64 val;
-  if ( !PyArg_ParseTuple(args, "K", &val) ) {
-    return NULL;
-  }
-
-  self->mBody.write_64(val);
-
-  Py_INCREF(Py_None);
-  return Py_None;
+  float val = self->mBody.read_float();
+  return PyObject_FromFloat(val);
 }
 
-// write_float 関数
+// read_double 関数
 PyObject*
-FileBinO_write_float(FileBinOObject* self,
+FileIDO_read_double(FileIDOObject* self,
 		     PyObject* args)
 {
-  float val;
-  if ( !PyArg_ParseTuple(args, "f", &val) ) {
-    return NULL;
-  }
-
-  self->mBody.write_float(val);
-
-  Py_INCREF(Py_None);
-  return Py_None;
+  double val = self->mBody.read_double();
+  return PyObject_FromDouble(val);
 }
 
-// write_double 関数
+// read_str 関数
 PyObject*
-FileBinO_write_double(FileBinOObject* self,
-		      PyObject* args)
+FileIDO_read_str(FileIDOObject* self,
+		  PyObject* args)
 {
-  double val;
-  if ( !PyArg_ParseTuple(args, "d", &val) ) {
-    return NULL;
-  }
-
-  self->mBody.write_double(val);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-// write_str 関数
-PyObject*
-FileBinO_write_str(FileBinOObject* self,
-		   PyObject* args)
-{
-  char* str;
-  if ( !PyArg_ParseTuple(args, "s", &str) ) {
-    return NULL;
-  }
-
-  self->mBody.write_str(str);
-
-  Py_INCREF(Py_None);
-  return Py_None;
+  string val = self->mBody.read_str();
+  return PyObject_FromString(val);
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// FileBinOObject のメソッドテーブル
+// FileIDOObject のメソッドテーブル
 //////////////////////////////////////////////////////////////////////
-PyMethodDef FileBinO_methods[] = {
+PyMethodDef FileIDO_methods[] = {
   // PyMethodDef のフィールド
   //   char*       ml_name;
   //   PyCFunction ml_meth;
@@ -250,26 +201,26 @@ PyMethodDef FileBinO_methods[] = {
   //  - METH_CLASS
   //  - METH_STATIC
   //  - METH_COEXIST
-  {"ok", (PyCFunction)FileBinO_ok, METH_NOARGS,
+  {"ok", (PyCFunction)FileIDO_ok, METH_NOARGS,
    PyDoc_STR("check if writable (NONE)")},
-  {"open", (PyCFunction)FileBinO_open, METH_VARARGS,
+  {"open", (PyCFunction)FileIDO_open, METH_VARARGS,
    PyDoc_STR("open file (str)")},
-  {"close", (PyCFunction)FileBinO_close, METH_NOARGS,
+  {"close", (PyCFunction)FileIDO_close, METH_NOARGS,
    PyDoc_STR("close file (NONE)")},
-  {"write_8", (PyCFunction)FileBinO_write_8, METH_VARARGS,
-   PyDoc_STR("write 8bit data (uint)")},
-  {"write_16", (PyCFunction)FileBinO_write_16, METH_VARARGS,
-   PyDoc_STR("write 16bit data (uint)")},
-  {"write_32", (PyCFunction)FileBinO_write_32, METH_VARARGS,
-   PyDoc_STR("write 32bit data (uint)")},
-  {"write_64", (PyCFunction)FileBinO_write_64, METH_VARARGS,
-   PyDoc_STR("write 64bit data (uint)")},
-  {"write_float", (PyCFunction)FileBinO_write_float, METH_VARARGS,
-   PyDoc_STR("write float data (uint)")},
-  {"write_double", (PyCFunction)FileBinO_write_double, METH_VARARGS,
-   PyDoc_STR("write double data (uint)")},
-  {"write_str", (PyCFunction)FileBinO_write_str, METH_VARARGS,
-   PyDoc_STR("write string data (uint)")},
+  {"read_8", (PyCFunction)FileIDO_read_8, METH_NOARGS,
+   PyDoc_STR("read 8bit data (NONE)")},
+  {"read_16", (PyCFunction)FileIDO_read_16, METH_NOARGS,
+   PyDoc_STR("read 16bit data (NONE)")},
+  {"read_32", (PyCFunction)FileIDO_read_32, METH_NOARGS,
+   PyDoc_STR("read 32bit data (NONE)")},
+  {"read_64", (PyCFunction)FileIDO_read_64, METH_NOARGS,
+   PyDoc_STR("read 8bit data (NONE)")},
+  {"read_float", (PyCFunction)FileIDO_read_float, METH_NOARGS,
+   PyDoc_STR("read float data (NONE)")},
+  {"read_double", (PyCFunction)FileIDO_read_double, METH_NOARGS,
+   PyDoc_STR("read double data (NONE)")},
+  {"read_str", (PyCFunction)FileIDO_read_str, METH_NOARGS,
+   PyDoc_STR("read string data (NONE)")},
   {NULL, NULL, 0, NULL} // end-marker
 };
 
@@ -277,19 +228,19 @@ END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
-// FileBinOObject 用のタイプオブジェクト
+// FileIDOObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject PyFileBinO_Type = {
+PyTypeObject PyFileIDO_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "utils.FileBinO",                // tp_name
-  sizeof(FileBinOObject),          // tp_basicsize
+  "utils.FileIDO",                // tp_name
+  sizeof(FileIDOObject),          // tp_basicsize
   (int)0,                          // tp_itemsize
 
   // Methods to implement standard operations
 
-  (destructor)FileBinO_dealloc,    // tp_dealloc
+  (destructor)FileIDO_dealloc,    // tp_dealloc
   (printfunc)0,                    // tp_print
   (getattrfunc)0,                  // tp_getattr
   (setattrfunc)0,                  // tp_setattr
@@ -315,7 +266,7 @@ PyTypeObject PyFileBinO_Type = {
   Py_TPFLAGS_DEFAULT,              // tp_flags
 
   // Documentation string
-  "Binary File Output",            // tp_doc
+  "Binary File Input",            // tp_doc
 
   // Assigned meaning in release 2.0
 
@@ -340,7 +291,7 @@ PyTypeObject PyFileBinO_Type = {
   (iternextfunc)0,                 // tp_iternext
 
   // Attribute descriptor and subclassing stuff
-  FileBinO_methods,                // tp_methods
+  FileIDO_methods,                // tp_methods
   0,                               // tp_members
   0,                               // tp_getset
   (struct _typeobject*)0,          // tp_base
@@ -348,9 +299,9 @@ PyTypeObject PyFileBinO_Type = {
   (descrgetfunc)0,                 // tp_descr_get
   (descrsetfunc)0,                 // tp_descr_set
   (long)0,                         // tp_dictoffset
-  (initproc)FileBinO_init,         // tp_init
+  (initproc)FileIDO_init,         // tp_init
   (allocfunc)0,                    // tp_alloc
-  (newfunc)FileBinO_new,           // tp_new
+  (newfunc)FileIDO_new,           // tp_new
   (freefunc)0,                     // tp_free
   (inquiry)0,                      // tp_is_gc
 
@@ -363,56 +314,56 @@ PyTypeObject PyFileBinO_Type = {
 
 
 //////////////////////////////////////////////////////////////////////
-// PyObject と FileBinO の間の変換関数
+// PyObject と FileIDO の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から FileBinO へのポインタを取り出す．
+// @brief PyObject から FileIDO へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @return FileBinO へのポインタを返す．
+// @return FileIDO へのポインタを返す．
 // @note 変換が失敗したら TypeError を送出し，NULL を返す．
-FileBinO*
-PyFileBinO_AsFileBinOPtr(PyObject* py_obj)
+FileIDO*
+PyFileIDO_AsFileIDOPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !PyFileBinO_Check(py_obj) ) {
-    PyErr_SetString(PyExc_TypeError, "utils.FileBinO is expected");
+  if ( !PyFileIDO_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.FileIDO is expected");
     return NULL;
   }
 
   // 強制的にキャスト
-  FileBinOObject* my_obj = (FileBinOObject*)py_obj;
-
+  FileIDOObject* my_obj = (FileIDOObject*)py_obj;
   return &my_obj->mBody;
 }
 
-// @brief 引数をパースして FileBinO を取り出す．
+// @brief 引数をパースして FileIDO を取り出す．
 // @param[in] args 引数オブジェクト
-// @return FileBinO のポインタを返す．
+// @return FileIDO のポインタを返す．
 // @note エラーが起きたら NULL を返す．
-FileBinO*
-parse_FileBinO(PyObject* args)
+FileIDO*
+parse_FileIDO(PyObject* args)
 {
   PyObject* obj;
-  if ( !PyArg_ParseTuple(args, "O!", &PyFileBinO_Type, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyFileIDO_Type, &obj) ) {
     return NULL;
   }
 
-  FileBinO* bp = PyFileBinO_AsFileBinOPtr(obj);
+  FileIDO* bp = PyFileIDO_AsFileIDOPtr(obj);
+
   return bp;
 }
 
-
-// FileBinOObject 関係の初期化を行う．
+// FileIDOObject 関係の初期化を行う．
 void
-FileBinOObject_init(PyObject* m)
+FileIDOObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&PyFileBinO_Type) < 0 ) {
+  if ( PyType_Ready(&PyFileIDO_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "FileBinO", (PyObject*)&PyFileBinO_Type);
+  PyModule_AddObject(m, "FileIDO", (PyObject*)&PyFileIDO_Type);
 }
 
 END_NAMESPACE_YM

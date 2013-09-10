@@ -335,7 +335,7 @@ CiGroup::set_latch_info(ymuint pos_array[])
 // @brief バイナリダンプを行う．
 // @param[in] bos 出力先のストリーム
 void
-CiGroup::dump(BinO& bos) const
+CiGroup::dump(ODO& bos) const
 {
   ymuint32 parent_id = mRepClass->id();
   bos << parent_id
@@ -353,7 +353,7 @@ CiGroup::dump(BinO& bos) const
 // @param[in] library セルライブラリ
 // @param[in] alloc メモリアロケータ
 void
-CiGroup::restore(BinI& bis,
+CiGroup::restore(IDO& bis,
 		 CellLibrary& library,
 		 Alloc& alloc)
 {

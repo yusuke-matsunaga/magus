@@ -1,14 +1,14 @@
 
-/// @file libym_utils/tests/binio_test.cc
-/// @brief BinIO のテスト
+/// @file libym_utils/tests/IODO_test.cc
+/// @brief IDOO のテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/FileBinI.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -58,11 +58,11 @@ ymuint n_64 = sizeof(data_64) / sizeof(ymuint64);
 END_NONAMESPACE
 
 bool
-binio_test()
+IODO_test()
 {
-  const char* datafile = "binio_test.bin";
+  const char* datafile = "IODO_test.bin";
 
-  FileBinO bo(datafile);
+  FileODO bo(datafile);
   if ( !bo ) {
     // エラー
     cerr << "Could not create " << datafile << endl;
@@ -82,7 +82,7 @@ binio_test()
   }
   bo.close();
 
-  FileBinI bi(datafile);
+  FileIDO bi(datafile);
   if ( !bi ) {
     // エラー
     cerr << "Could not open " << datafile << endl;
@@ -138,12 +138,12 @@ binio_test()
 }
 
 bool
-binio_test2()
+IODO_test2()
 {
-  const char* datafile = "binio_test2.bin";
+  const char* datafile = "IODO_test2.bin";
 
   {
-    FileBinO bo(datafile);
+    FileODO bo(datafile);
     if ( !bo ) {
       // エラー
       cerr << "Could not create " << datafile << endl;
@@ -166,7 +166,7 @@ binio_test2()
 
   ymuint nerr = 0;
   {
-    FileBinI bi(datafile);
+    FileIDO bi(datafile);
     if ( !bi ) {
       // エラー
       cerr << "Could not open " << datafile << endl;
@@ -231,12 +231,12 @@ int
 main(int argc,
      char** argv)
 {
-  bool stat = nsYm::binio_test();
+  bool stat = nsYm::IODO_test();
   if ( !stat ) {
     return 1;
   }
 
-  stat = nsYm::binio_test2();
+  stat = nsYm::IODO_test2();
   if ( !stat ) {
     return 2;
   }

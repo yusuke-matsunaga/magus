@@ -11,8 +11,8 @@
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
 
-#include "ym_utils/FileBinI.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -84,7 +84,7 @@ main(int argc,
 
   const char* datafile = "patdata.bin";
   {
-    FileBinO bo(datafile);
+    FileODO bo(datafile);
     if ( !bo ) {
       // エラー
       cerr << "Could not create " << datafile << endl;
@@ -94,7 +94,7 @@ main(int argc,
   }
 
   {
-    FileBinI bi(datafile);
+    FileIDO bi(datafile);
     if ( !bi ) {
       // エラー
       cerr << "Could not open " << datafile << endl;

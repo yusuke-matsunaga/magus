@@ -9,8 +9,8 @@
 
 #include "ym_utils/pyutils.h"
 #include "ym_utils/ItvlMgr.h"
-#include "ym_utils/FileBinI.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -162,7 +162,7 @@ PyObject*
 ItvlMgr_dump(ItvlMgrObject* self,
 	     PyObject* args)
 {
-  FileBinO* bp = parse_FileBinO(args);
+  FileODO* bp = parse_FileODO(args);
   if ( bp == NULL ) {
     return NULL;
   }
@@ -178,7 +178,7 @@ PyObject*
 ItvlMgr_restore(ItvlMgrObject* self,
 		PyObject* args)
 {
-  FileBinI* bp = parse_FileBinI(args);
+  FileIDO* bp = parse_FileIDO(args);
   if ( bp == NULL ) {
     return NULL;
   }
@@ -223,9 +223,9 @@ PyMethodDef ItvlMgr_methods[] = {
   {"max_id", (PyCFunction)ItvlMgr_max_id, METH_NOARGS,
    PyDoc_STR("return the maximum number (NONE)")},
   {"dump", (PyCFunction)ItvlMgr_dump, METH_VARARGS,
-   PyDoc_STR("dump (FileBinO)")},
+   PyDoc_STR("dump (FileODO)")},
   {"restore", (PyCFunction)ItvlMgr_restore, METH_VARARGS,
-   PyDoc_STR("restore (FileBinI)")},
+   PyDoc_STR("restore (FileIDO)")},
   {NULL, NULL, 0, NULL} // end-marker
 };
 

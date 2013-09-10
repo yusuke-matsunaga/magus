@@ -148,41 +148,41 @@ public:
   /// @param[in] s 出力ストリーム
   /// @param[in] zdd 対象のZDD
   void
-  dump(BinO& s,
+  dump(ODO& s,
        const Zdd& zdd);
 
   /// @brief ZDDの配列の内容をバイナリファイルに書き出す
   /// @param[in] s 出力先のストリーム
   /// @param[in] array ZDD を収めた配列
   void
-  dump(BinO& s,
+  dump(ODO& s,
        const ZddVector& array);
 
   /// @brief ZDDの配列の内容をバイナリファイルに書き出す
   /// @param[in] array ZDD を収めた配列
   /// @param[in] s 出力先のストリーム
   void
-  dump(BinO& s,
+  dump(ODO& s,
        const ZddList& array);
 
   /// @brief 保存されたZDDを読み込む．
   /// @param[in] s 入力ストリーム
   /// @return 生成された ZDD
   Zdd
-  restore(BinI& s);
+  restore(IDO& s);
 
   /// @brief 保存されたZDDをベクタに読み込む．
   /// @param[in] s 入力ストリーム
   /// @param[out] array 生成された ZDD を格納するベクタ
   void
-  restore(BinI& s,
+  restore(IDO& s,
 	  ZddVector& array);
 
   /// @brief 保存されたZDDをリストに読み込む．
   /// @param[in] s 入力ストリーム
   /// @param[out] array 生成された ZDD を格納するリスト
   void
-  restore(BinI& s,
+  restore(IDO& s,
 	  ZddList& array);
 #endif
   /// @}

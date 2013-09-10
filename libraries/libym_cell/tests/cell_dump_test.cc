@@ -11,8 +11,8 @@
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
 
-#include "ym_utils/FileBinI.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -38,7 +38,7 @@ dump_load_test(const char* in_filename,
 
   const char* data_filename = "cell_dump.bin";
   {
-    FileBinO bo(data_filename);
+    FileODO bo(data_filename);
     if ( !bo ) {
       // エラー
       cerr << "Could not create " << data_filename << endl;
@@ -49,7 +49,7 @@ dump_load_test(const char* in_filename,
 
   CellLibrary* library2 = NULL;
   {
-    FileBinI bi(data_filename);
+    FileIDO bi(data_filename);
     if ( !bi ) {
       // エラー
       cerr << "Could not open " << data_filename << endl;

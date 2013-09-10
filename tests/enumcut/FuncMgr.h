@@ -11,8 +11,8 @@
 
 #include "ym_networks/bdn.h"
 #include "ym_logic/TvFunc.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -69,16 +69,16 @@ public:
   /// @brief 内容をバイナリダンプする．
   /// @param[in] s 出力先のストリーム
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief 代表関数のみをバイナリダンプする．
   /// @param[in] s 出力先のストリーム
   void
-  dump_rep(BinO& s) const;
+  dump_rep(ODO& s) const;
 
   /// @brief バイナリダンプされたファイルを読み込む．
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 private:

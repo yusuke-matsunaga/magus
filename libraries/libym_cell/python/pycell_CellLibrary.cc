@@ -16,8 +16,8 @@
 #include "ym_cell/CellGroup.h"
 #include "ym_cell/Cell.h"
 #include "ym_utils/pyutils.h"
-#include "ym_utils/FileBinO.h"
-#include "ym_utils/FileBinI.h"
+#include "ym_utils/FileODO.h"
+#include "ym_utils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -210,7 +210,7 @@ CellLibrary_init(CellLibraryObject* self,
     self->mLibrary = library;
   }
   else if ( strcmp(type, "binary") == 0 ) {
-    FileBinI s(filename);
+    FileIDO s(filename);
     CellLibrary* library = CellLibrary::new_obj();
     library->restore(s);
     self->mLibrary = library;
@@ -580,7 +580,7 @@ PyObject*
 CellLibrary_dump(CellLibraryObject* self,
 		 PyObject* args)
 {
-  FileBinO* bp = parse_FileBinO(args);
+  FileODO* bp = parse_FileODO(args);
   if ( bp == NULL ) {
     return NULL;
   }
@@ -661,7 +661,7 @@ PyMethodDef CellLibrary_methods[] = {
   {"pg_edge", (PyCFunction)CellLibrary_pg_edge, METH_VARARGS,
    PyDoc_STR("return pattern edge infomation (int)")},
   {"dump", (PyCFunction)CellLibrary_dump, METH_VARARGS,
-   PyDoc_STR("dump (FileBinO)")},
+   PyDoc_STR("dump (FileODO)")},
   {NULL, NULL, 0, NULL} // end-marker
 };
 

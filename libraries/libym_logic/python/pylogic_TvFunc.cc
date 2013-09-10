@@ -10,8 +10,8 @@
 #include "ym_logic/pylogic.h"
 #include "ym_logic/TvFunc.h"
 #include "ym_utils/pyutils.h"
-#include "ym_utils/FileBinI.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -330,7 +330,7 @@ PyObject*
 TvFunc_dump(TvFuncObject* self,
 	    PyObject* args)
 {
-  FileBinO* bp = parse_FileBinO(args);
+  FileODO* bp = parse_FileODO(args);
   if ( bp == NULL ) {
     return NULL;
   }
@@ -346,7 +346,7 @@ PyObject*
 TvFunc_restore(TvFuncObject* self,
 	       PyObject* args)
 {
-  FileBinI* bp = parse_FileBinI(args);
+  FileIDO* bp = parse_FileIDO(args);
   if ( bp == NULL ) {
     return NULL;
   }
@@ -664,9 +664,9 @@ PyMethodDef TvFunc_methods[] = {
   {"check_sym", (PyCFunction)TvFunc_check_sup, METH_VARARGS,
    PyDoc_STR("check symmetry (VarId, VarId, Pol)")},
   {"dump", (PyCFunction)TvFunc_dump, METH_VARARGS,
-   PyDoc_STR("dump (FileBinO)")},
+   PyDoc_STR("dump (FileODO)")},
   {"restore", (PyCFunction)TvFunc_restore, METH_VARARGS,
-   PyDoc_STR("restore (FileBinI)")},
+   PyDoc_STR("restore (FileIDO)")},
   {NULL, NULL, 0, NULL} // end-marker
 };
 
