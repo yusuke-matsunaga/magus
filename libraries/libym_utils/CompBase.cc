@@ -92,6 +92,7 @@ CompO::CompO(ymuint bits) :
 // @brief デストラクタ
 CompO::~CompO()
 {
+  close();
 }
 
 // @brief ファイルをクローズする．
@@ -166,7 +167,7 @@ CompO::write(const ymuint8* wbuff,
     cl_hash(static_cast<count_int>(m_hsize_reg));
   }
 
-  for (code_int i = 0; -- count; ) {
+  for (code_int i = 0; count -- > 0; ) {
     int disp;
     ymuint8 c = *(bp ++ );
     ++ m_in_count;
