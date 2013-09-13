@@ -1,8 +1,8 @@
-#ifndef COMPO_H
-#define COMPO_H
+#ifndef COMPOUT_H
+#define COMPOUT_H
 
-/// @file CompO.h
-/// @brief ZState のヘッダファイル
+/// @file CompOut.h
+/// @brief CompOut のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -16,20 +16,20 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class CompO CompO.h "CompO.h"
-/// @brief compress 用の ZState
+/// @class CompOut CompOut.h "CompOut.h"
+/// @brief compress 用の CompBase
 //////////////////////////////////////////////////////////////////////
-class CompO :
+class CompOut :
   public CompBase
 {
 public:
 
   /// @brief コンストラクタ
   explicit
-  CompO(ymuint bits = 0);
+  CompOut(ymuint bits = 0);
 
   /// @brief デストラクタ
-  ~CompO();
+  ~CompOut();
 
 
 public:
@@ -114,18 +114,18 @@ private:
 
 inline
 CompBase::count_int&
-CompO::htabof(ymuint i)
+CompOut::htabof(ymuint i)
 {
   return m_htab[i];
 }
 
 inline
 u_short&
-CompO::codetabof(ymuint i)
+CompOut::codetabof(ymuint i)
 {
   return m_codetab[i];
 }
 
 END_NAMESPACE_YM
 
-#endif // COMPO_H
+#endif // COMPOUT_H

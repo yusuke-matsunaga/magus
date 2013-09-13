@@ -8,8 +8,8 @@
 
 
 #include "CompBase.h"
-#include "CompI.h"
-#include "CompO.h"
+#include "CompIn.h"
+#include "CompOut.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -79,7 +79,7 @@ CompBase::~CompBase()
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CompO::CompO(ymuint bits) :
+CompOut::CompOut(ymuint bits) :
   CompBase(bits)
 {
   m_hsize = k_HSIZE;			/* For dynamic table sizing. */
@@ -90,14 +90,14 @@ CompO::CompO(ymuint bits) :
 }
 
 // @brief デストラクタ
-CompO::~CompO()
+CompOut::~CompOut()
 {
   close();
 }
 
 // @brief ファイルをクローズする．
 void
-CompO::close()
+CompOut::close()
 {
   if ( output(m_ent) == -1 ) {
     goto end;
@@ -119,8 +119,8 @@ CompO::close()
 // @return 実際に処理したバイト数を返す．
 // @note エラーが起こったら -1 を返す．
 ssize_t
-CompO::write(const ymuint8* wbuff,
-	     ymuint64 num)
+CompOut::write(const ymuint8* wbuff,
+	       ymuint64 num)
 {
   if ( num == 0 ) {
     return 0;
@@ -226,7 +226,7 @@ CompO::write(const ymuint8* wbuff,
 
 // Table clear for block compress
 int
-CompO::cl_block()
+CompOut::cl_block()
 {
   m_checkpoint = m_in_count + k_CHECK_GAP;
 
@@ -260,7 +260,7 @@ CompO::cl_block()
 }
 
 void
-CompO::cl_hash(count_int cl_hsize)
+CompOut::cl_hash(count_int cl_hsize)
 {
   long m1 = -1;
   count_int* htab_p = m_htab + cl_hsize;
@@ -290,7 +290,7 @@ CompO::cl_hash(count_int cl_hsize)
 }
 
 int
-CompO::output(code_int ocode)
+CompOut::output(code_int ocode)
 {
   int r_off = m_offset;
   ymuint32 bits = m_n_bits;
@@ -383,20 +383,20 @@ CompO::output(code_int ocode)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CompI::CompI()
+CompIn::CompIn()
 {
   m_roffset = 0;
   m_size = 0;
 }
 
 // @brief デストラクタ
-CompI::~CompI()
+CompIn::~CompIn()
 {
 }
 
 ssize_t
-CompI::read(ymuint8* rbuff,
-	    ymuint64 num)
+CompIn::read(ymuint8* rbuff,
+	     ymuint64 num)
 {
   if ( num == 0 ) {
     cerr << "num == 0" << endl;
@@ -512,8 +512,8 @@ CompI::read(ymuint8* rbuff,
   return num - count;
 }
 
-CompI::code_int
-CompI::getcode()
+CompIn::code_int
+CompIn::getcode()
 {
   ymuint8* bp = m_gbuf;
   if ( m_clear_flg > 0 || m_roffset >= m_size || m_free_ent > m_maxcode ) {

@@ -10,6 +10,8 @@ noinst_HEADERS = \
 	Alloc.h \
 	Binder.h \
 	CombiGen.h \
+	CompIDO.h \
+	CompODO.h \
 	DlList.h \
 	File.h \
 	FileIDO.h \
@@ -19,7 +21,8 @@ noinst_HEADERS = \
 	FileRegion.h \
 	FileScanner.h \
 	GenBase.h \
-	GzIn.h \
+	GzIDO.h \
+	GzODO.h \
 	HeapTree.h \
 	IDO.h \
 	ItvlMgr.h \

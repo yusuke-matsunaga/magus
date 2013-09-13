@@ -14,8 +14,7 @@ libym_zstream_la_CPPFLAGS = \
 
 libym_zstream_la_SOURCES = \
 	zstream.cc \
-	GzIDO.cc \
-	GzIn.cc
+	GzIDO.cc
 
 libym_zstream_la_LIBADD =
 

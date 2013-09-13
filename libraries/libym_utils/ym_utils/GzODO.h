@@ -1,8 +1,8 @@
-#ifndef YM_UTILS_COMPODO_H
-#define YM_UTILS_COMPODO_H
+#ifndef YM_UTILS_GZODO_H
+#define YM_UTILS_GZODO_H
 
-/// @file ym_utils/CompODO.h
-/// @brief CompODO のヘッダファイル
+/// @file ym_utils/GzODO.h
+/// @brief GzODO のヘッダファイル
 /// @author Yusuke Matsunaga
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -14,14 +14,14 @@
 
 BEGIN_NAMESPACE_YM
 
-class CompOut;
+class GzOut;
 
 //////////////////////////////////////////////////////////////////////
-/// @class CompODO CompODO.h "ym_utils/CompODO.h"
+/// @class GzODO GzODO.h "ym_utils/GzODO.h"
 /// @ingroup YmUtils
-/// @brief Compress エンジンを用いた ODO の継承クラス
+/// @brief Gzress エンジンを用いた ODO の継承クラス
 //////////////////////////////////////////////////////////////////////
-class CompODO :
+class GzODO :
   public ODO
 {
 public:
@@ -29,30 +29,30 @@ public:
   /// @brief 空のコンストラクタ
   /// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
   explicit
-  CompODO(ymuint bits = 0);
+  GzODO(ymuint bits = 0);
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
   /// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
   explicit
-  CompODO(const char* filename,
+  GzODO(const char* filename,
 	  ymuint bits = 0);
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
   /// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
   explicit
-  CompODO(const string& filename,
+  GzODO(const string& filename,
 	  ymuint bits = 0);
 
   /// @brief デストラクタ
   virtual
-  ~CompODO();
+  ~GzODO();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // CompODO の関数
+  // GzODO の関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 書き込み可能なら true を返す．
@@ -98,11 +98,20 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 実際の処理を行うエンジン
-  CompOut* mZ;
+  // 出力用のバッファ
+  FileBuff* mBuff;
+
+  // zstream
+  zstream mZ;
+
+  // CRC コード
+  ymuint32 mCRC;
+
+  // 出力されたデータサイズ
+  ymuint32 mOutSize;
 
 };
 
 END_NAMESPACE_YM
 
-#endif // YM_UTILS_COMPODO_H
+#endif // YM_UTILS_GZODO_H

@@ -1,8 +1,8 @@
-#ifndef COMPI_H
-#define COMPI_H
+#ifndef COMPIN_H
+#define COMPIN_H
 
-/// @file ZState.h
-/// @brief ZState のヘッダファイル
+/// @file CompIn.h
+/// @brief CompIn のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -16,19 +16,19 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class CompI CompI.h "CompI.h"
-/// @brief uncompress 用の ZState
+/// @class CompIn CompIn.h "CompIn.h"
+/// @brief uncompress 用の CompBase
 //////////////////////////////////////////////////////////////////////
-class CompI :
+class CompIn :
   public CompBase
 {
 public:
 
   /// @brief コンストラクタ
-  CompI();
+  CompIn();
 
   /// @brief デストラクタ
-  ~CompI();
+  ~CompIn();
 
 
 public:
@@ -111,14 +111,14 @@ private:
 
 inline
 u_short&
-CompI::tab_prefixof(ymuint i)
+CompIn::tab_prefixof(ymuint i)
 {
   return mPrefix[i];
 }
 
 inline
 CompBase::char_type&
-CompI::tab_suffixof(ymuint i)
+CompIn::tab_suffixof(ymuint i)
 {
   return mSuffix[i];
 }
@@ -126,7 +126,7 @@ CompI::tab_suffixof(ymuint i)
 // @brief スタックを初期化する．
 inline
 void
-CompI::init_stack()
+CompIn::init_stack()
 {
   mStackPtr = &mStack[0];
 }
@@ -134,7 +134,7 @@ CompI::init_stack()
 // @brief スタックが空の時 true を返す．
 inline
 bool
-CompI::is_empty()
+CompIn::is_empty()
 {
   return mStackPtr == &mStack[0];
 }
@@ -142,7 +142,7 @@ CompI::is_empty()
 // @brief スタックにデータを積む．
 inline
 void
-CompI::push_stack(char_type data)
+CompIn::push_stack(char_type data)
 {
   assert_cond( mStackPtr < &mStack[8000], __FILE__, __LINE__);
   *(mStackPtr ++) = data;
@@ -150,12 +150,12 @@ CompI::push_stack(char_type data)
 
 // @brief スタックからデータを取り出す．
 inline
-CompI::char_type
-CompI::pop_stack()
+CompIn::char_type
+CompIn::pop_stack()
 {
   return *(-- mStackPtr);
 }
 
 END_NAMESPACE_YM
 
-#endif // COMPI_H
+#endif // COMPIN_H

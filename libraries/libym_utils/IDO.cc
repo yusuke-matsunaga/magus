@@ -20,8 +20,8 @@
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/FileRegion.h"
 
-#include "CompI.h"
-#include "CompO.h"
+#include "CompIn.h"
+#include "CompOut.h"
 
 #include "FileBuff.h"
 
@@ -235,7 +235,7 @@ FileIDO::read(ymuint8* buff,
 // @brief コンストラクタ
 CompIDO::CompIDO()
 {
-  mZ = new CompI();
+  mZ = new CompIn();
 }
 
 // @brief コンストラクタ
@@ -243,7 +243,7 @@ CompIDO::CompIDO()
 // @note 意味的にはコンストラクタ + open()
 CompIDO::CompIDO(const char* filename)
 {
-  mZ = new CompI();
+  mZ = new CompIn();
   open(filename);
 }
 
@@ -252,7 +252,7 @@ CompIDO::CompIDO(const char* filename)
 // @note 意味的にはコンストラクタ + open()
 CompIDO::CompIDO(const string& filename)
 {
-  mZ = new CompI();
+  mZ = new CompIn();
   open(filename);
 }
 
@@ -571,7 +571,7 @@ StreamODO::write(const ymuint8* buff,
 // @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
 CompODO::CompODO(ymuint bits)
 {
-  mZ = new CompO(bits);
+  mZ = new CompOut(bits);
 }
 
 // @brief コンストラクタ
@@ -580,7 +580,7 @@ CompODO::CompODO(ymuint bits)
 CompODO::CompODO(const char* filename,
 		 ymuint bits)
 {
-  mZ = new CompO(bits);
+  mZ = new CompOut(bits);
   open(filename);
 }
 
@@ -590,7 +590,7 @@ CompODO::CompODO(const char* filename,
 CompODO::CompODO(const string& filename,
 		 ymuint bits)
 {
-  mZ = new CompO(bits);
+  mZ = new CompOut(bits);
 }
 
 // @brief デストラクタ
