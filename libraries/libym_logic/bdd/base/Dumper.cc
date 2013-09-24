@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_BDD
 
 // @brief 内容のダンプ
 void
-Bdd::dump(BinO& s) const
+Bdd::dump(ODO& s) const
 {
   Dumper dumper(mMgr, s);
   BddEdge e(mRoot);
@@ -28,7 +28,7 @@ Bdd::dump(BinO& s) const
 // @brief 内容をダンプする．
 // @param[in] s 出力ストリーム
 void
-BddVector::dump(BinO& s) const
+BddVector::dump(ODO& s) const
 {
   // 今は array の中のBDDのマネージャがすべて同じと仮定している．
   BddMgrImpl* mgr = mMgr.mImpl;
@@ -47,7 +47,7 @@ BddVector::dump(BinO& s) const
 // @brief 内容をダンプする．
 // @param[in] s 出力ストリーム
 void
-BddList::dump(BinO& s) const
+BddList::dump(ODO& s) const
 {
   // 今は array の中のBDDのマネージャがすべて同じと仮定している．
   BddMgrImpl* mgr = mMgr.mImpl;
@@ -70,7 +70,7 @@ BddList::dump(BinO& s) const
 
 // コンストラクタ
 Dumper::Dumper(BddMgrImpl* mgr,
-	       BinO& s) :
+	       ODO& s) :
   mMgr(mgr),
   mStream(s)
 {

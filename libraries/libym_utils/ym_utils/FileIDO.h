@@ -1,48 +1,66 @@
-#ifndef YM_UTILS_FILEBINI_H
-#define YM_UTILS_FILEBINI_H
+#ifndef YM_UTILS_FILEIDO_H
+#define YM_UTILS_FILEIDO_H
 
-/// @file ym_utils/FileBinI.h
-/// @brief FileBinI のヘッダファイル
+/// @file ym_utils/FileIDO.h
+/// @brief FileIDO のヘッダファイル
 /// @author Yusuke Matsunaga
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/BinI.h"
+#include "ym_utils/IDO.h"
 
 
 BEGIN_NAMESPACE_YM
 
+class FileBuff;
+
 //////////////////////////////////////////////////////////////////////
-/// @class FileBinI FIleBinI.h "ym_utils/FileBinI.h"
+/// @class FileIDO FileIDO.h "ym_utils/FileIDO.h"
 /// @ingroup YmUtils
-/// @brief 通常のファイルを用いた BinI の継承クラス
+/// @brief 通常のファイルを用いた IDO の継承クラス
 //////////////////////////////////////////////////////////////////////
-class FileBinI :
-  public BinI
+class FileIDO :
+  public IDO
 {
+private:
+
+  static
+  const ymuint kDefaultBuffSize = 4096;
+
+
 public:
 
   /// @brief 空のコンストラクタ
-  FileBinI();
+  /// @param[in] buff_size バッファサイズ
+  explicit
+  FileIDO(ymuint buff_size = kDefaultBuffSize);
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
-  FileBinI(const char* filename);
+  /// @param[in] buff_size バッファサイズ
+  /// @note 意味的にはコンストラクタ + open()
+  explicit
+  FileIDO(const char* filename,
+	  ymuint buff_size = kDefaultBuffSize);
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
-  FileBinI(const string& filename);
+  /// @param[in] buff_size バッファサイズ
+  /// @note 意味的にはコンストラクタ + open()
+  explicit
+  FileIDO(const string& filename,
+	  ymuint buff_size = kDefaultBuffSize);
 
   /// @brief デストラクタ
   virtual
-  ~FileBinI();
+  ~FileIDO();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // FileBinI の関数
+  // FileIDO の関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 読み出し可能なら true を返す．
@@ -50,12 +68,14 @@ public:
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
-  void
+  /// @note 他のファイルを開いていたら強制的に close する．
+  bool
   open(const char* filename);
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
-  void
+  /// @note 他のファイルを開いていたら強制的に close する．
+  bool
   open(const string& filename);
 
   /// @brief ファイルを閉じる．
@@ -66,26 +86,18 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // BinI の仮想関数
+  // IDO の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief データを読み込む．
-  /// @param[in] n 読み込むデータサイズ
   /// @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
+  /// @param[in] n 読み込むデータサイズ
   /// @return 実際に読み込んだ量を返す．
+  /// @note エラーが起こったら負の数を返す．
   virtual
-  ymuint64
-  read(ymuint64 n,
-       ymuint8* buff);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる定数
-  //////////////////////////////////////////////////////////////////////
-
-  static
-  const ymuint16 BUFF_SIZE = 4096;
+  ssize_t
+  read(ymuint8* buff,
+       ymuint64 n);
 
 
 private:
@@ -93,17 +105,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ファイルディスクリプタ
-  int mFd;
-
-  // バッファ
-  ymuint8 mBuff[BUFF_SIZE];
-
-  // バッファ上の読み出し位置
-  ymuint16 mPos;
+  // ファイルバッファ
+  FileBuff* mFileBuff;
 
 };
 
 END_NAMESPACE_YM
 
-#endif // YM_UTILS_FILEBINI_H
+#endif // YM_UTILS_FILEIDO_H

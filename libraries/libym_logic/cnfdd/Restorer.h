@@ -10,7 +10,7 @@
 
 
 #include "CNFddMgrImpl.h"
-#include "ym_utils/BinI.h"
+#include "ym_utils/IDO.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
@@ -27,7 +27,7 @@ public:
   /// @param[in] mgr マネージャ
   /// @param[in] s 入力元のストリーム
   Restorer(CNFddMgrImpl* mgr,
-	   BinI& s);
+	   IDO& s);
 
   /// @brief デストラクタ
   ~Restorer();
@@ -67,7 +67,7 @@ private:
   CNFddMgrImpl* mMgr;
 
   // 入力用のストリーム
-  BinI& mStream;
+  IDO& mStream;
 
   // 根の枝を格納しておくベクタ
   vector<CNFddEdge> mRootVector;

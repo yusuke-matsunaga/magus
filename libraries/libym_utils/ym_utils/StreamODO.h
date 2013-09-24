@@ -1,51 +1,51 @@
-#ifndef YM_UTILS_STREAMBINO_H
-#define YM_UTILS_STREAMBINO_H
+#ifndef YM_UTILS_STREAMODO_H
+#define YM_UTILS_STREAMODO_H
 
-/// @file ym_utils/StreamBinO.h
-/// @brief StreamBinO のヘッダファイル
+/// @file ym_utils/StreamODO.h
+/// @brief StreamODO のヘッダファイル
 /// @author Yusuke Matsunaga
 ///
 /// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/BinO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class StreamBinO StreamBinO.h "ym_utils/StreamBinO.h"
+/// @class StreamODO StreamODO.h "ym_utils/StreamODO.h"
 /// @ingroup YmUtils
-/// @brief ostream を用いた BinO の継承クラス
+/// @brief ostream を用いた ODO の継承クラス
 //////////////////////////////////////////////////////////////////////
-class StreamBinO :
-  public BinO
+class StreamODO :
+  public ODO
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] s 出力先のストリーム
-  StreamBinO(ostream& s);
+  StreamODO(ostream& s);
 
   /// @brief デストラクタ
   virtual
-  ~StreamBinO();
+  ~StreamODO();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // BinO の仮想関数
+  // ODO の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief データを書き出す．
-  /// @param[in] n データサイズ
   /// @param[in] buff データを収めた領域のアドレス
+  /// @param[in] n データサイズ
   /// @return 実際に書き出した量を返す．
   virtual
-  ymuint64
-  write(ymuint64 n,
-	const ymuint8* buff);
+  ssize_t
+  write(const ymuint8* buff,
+	ymuint64 n);
 
 
 private:
@@ -60,4 +60,4 @@ private:
 
 END_NAMESPACE_YM
 
-#endif // YM_UTILS_STREAMBINO_H
+#endif // YM_UTILS_STREAMODO_H

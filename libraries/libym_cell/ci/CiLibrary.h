@@ -352,13 +352,13 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリダンプされた内容を読み込む．
   /// @param[in] s 入力元のストリーム
   virtual
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 public:
@@ -884,12 +884,12 @@ private:
 
   /// @brief LUT テンプレートを読み込む．
   void
-  restore_lut_template(BinI& s,
+  restore_lut_template(IDO& s,
 		       ymuint id);
 
   /// @brief LUT を読み込む．
   CellLut*
-  restore_lut(BinI& s);
+  restore_lut(IDO& s);
 
 
 public:

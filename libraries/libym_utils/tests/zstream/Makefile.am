@@ -20,7 +20,11 @@ distclean-local:
 	-rm -rf $(testsubdir)
 
 noinst_PROGRAMS = \
-	zstream_test
+	zstream_test \
+	GzIDO_test \
+	GzODO_test \
+	mygzip
+
 
 zstream_test_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
@@ -31,3 +35,37 @@ zstream_test_SOURCES = \
 
 zstream_test_LDADD = \
 	../../libym_utils.la
+
+
+GzIDO_test_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+GzIDO_test_SOURCES = \
+	GzIDO_test.cc
+
+GzIDO_test_LDADD = \
+	../../libym_utils.la
+
+GzODO_test_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+GzODO_test_SOURCES = \
+	GzODO_test.cc
+
+GzODO_test_LDADD = \
+	../../libym_utils.la
+
+
+mygzip_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+mygzip_SOURCES = \
+	mygzip.c
+
+mygzip_LDADD = \
+	../../libym_utils.la \
+	-lbz2 \
+	-lz

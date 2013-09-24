@@ -37,7 +37,7 @@ main(int argc,
 
 #if 0
   ostringstream buf;
-  BinOStream bos(buf);
+  ODOStream bos(buf);
   mgr.dump(bos);
 
   string str = buf.str();

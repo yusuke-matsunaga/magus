@@ -36,7 +36,7 @@ distclean-local:
 ############################################################
 
 noinst_PROGRAMS = \
-	binio_test \
+	IODO_test \
 	file_test \
 	namemgr_test \
 	combigen_test \
@@ -50,7 +50,10 @@ noinst_PROGRAMS = \
 	dllist_test \
 	heaptree_test \
 	mspg_test \
-	mscg_test
+	mscg_test \
+	CompIDO_test \
+	CompODO_test \
+	mycompress
 
 
 ############################################################
@@ -65,13 +68,13 @@ YMUTILS = ../libym_utils.la
 
 
 ############################################################
-## Variables for building binio_test
+## Variables for building IODO_test
 ############################################################
 
-binio_test_SOURCES = \
-	binio_test.cc
+IODO_test_SOURCES = \
+	IODO_test.cc
 
-binio_test_LDADD = \
+IODO_test_LDADD = \
 	$(YMUTILS)
 
 
@@ -230,3 +233,46 @@ mspg_test_LDFLAGS =
 
 mspg_test_LDADD = \
 	$(YMUTILS)
+
+
+############################################################
+## Variables for building CompIDO_test
+############################################################
+
+CompIDO_test_SOURCES = \
+	CompIDO_test.cc
+
+CompIDO_test_LDFLAGS =
+
+CompIDO_test_LDADD = \
+	$(YMUTILS)
+
+
+############################################################
+## Variables for building CompODO_test
+############################################################
+
+CompODO_test_SOURCES = \
+	CompODO_test.cc
+
+CompODO_test_LDFLAGS =
+
+CompODO_test_LDADD = \
+	$(YMUTILS)
+
+
+############################################################
+## Variables for building mycompress
+############################################################
+
+
+mycompress_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+mycompress_SOURCES = \
+	mycompress.c \
+	zopen.h \
+	zopen.c
+
+mycompress_LDADD =

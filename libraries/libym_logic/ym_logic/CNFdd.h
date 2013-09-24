@@ -13,8 +13,8 @@
 #include "ym_logic/cnfdd_nsdef.h"
 #include "ym_logic/VarId.h"
 #include "ym_logic/Literal.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 #include "gmpxx.h"
 
 
@@ -389,12 +389,12 @@ public:
   /// @brief CNFDD の内容をダンプする．
   /// @param[in] s 出力ストリーム
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリファイルに保存されたCNFDDを読み込む．
   /// @param[in] s 入力ストリーム
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
   /// @}
   //////////////////////////////////////////////////////////////////////

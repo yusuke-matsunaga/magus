@@ -232,21 +232,21 @@ PyTvMgr_AsTvMgrPtr(PyObject* py_obj);
 //////////////////////////////////////////////////////////////////////
 
 #if 0
-/// @brief 引数をパースして FileBinO を取り出す．
+/// @brief 引数をパースして FileODO を取り出す．
 /// @param[in] args 引数オブジェクト
-/// @return FileBinO のポインタを返す．
+/// @return FileODO のポインタを返す．
 /// @note エラーが起きたら NULL を返す．
 extern
-FileBinO*
-parse_FileBinO(PyObject* args);
+FileODO*
+parse_FileODO(PyObject* args);
 
-/// @brief 引数をパースして FileBinI を取り出す．
+/// @brief 引数をパースして FileIDO を取り出す．
 /// @param[in] args 引数オブジェクト
-/// @return FileBinI のポインタを返す．
+/// @return FileIDO のポインタを返す．
 /// @note エラーが起きたら NULL を返す．
 extern
-FileBinI*
-parse_FileBinI(PyObject* args);
+FileIDO*
+parse_FileIDO(PyObject* args);
 #endif
 
 END_NAMESPACE_YM_SATPG

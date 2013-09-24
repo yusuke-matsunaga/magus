@@ -302,8 +302,8 @@ operator<<(ostream& s,
 }
 
 // バイナリ出力
-BinO&
-operator<<(BinO& bos,
+ODO&
+operator<<(ODO& bos,
 	   const NpnMap& map)
 {
   ymuint32 ni = map.ni();
@@ -318,8 +318,8 @@ operator<<(BinO& bos,
 }
 
 // バイナリ入力
-BinI&
-operator>>(BinI& bis,
+IDO&
+operator>>(IDO& bis,
 	   NpnMap& map)
 {
   ymuint32 ni;

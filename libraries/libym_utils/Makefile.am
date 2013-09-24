@@ -30,11 +30,16 @@ libym_utils_la_CPPFLAGS = \
 
 libym_utils_la_SOURCES = \
 	Alloc.cc \
-	BinIO.cc \
 	Binder.cc \
 	CombiGen.cc \
+	CompBase.h \
+	CompBase.cc \
+	CompI.h \
+	CompO.h \
 	DlList.cc \
 	File.cc \
+	FileBuff.h \
+	FileBuff.cc \
 	FileInfo.h \
 	FileInfo.cc \
 	FileInfoMgr.h \
@@ -42,6 +47,7 @@ libym_utils_la_SOURCES = \
 	FileScanner.cc \
 	FragAlloc.cc \
 	GenBase.cc \
+	IDO.cc \
 	ItvlCell.h \
 	ItvlMgrImpl.h \
 	ItvlMgrImpl.cc \

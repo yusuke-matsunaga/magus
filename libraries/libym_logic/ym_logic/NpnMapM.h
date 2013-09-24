@@ -13,8 +13,8 @@
 #include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
 #include "ym_logic/NpnVmap.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_NPN
@@ -220,8 +220,8 @@ operator<<(ostream& s,
 /// @param[in] s 出力ストリーム
 /// @param[in] map 変換マップ
 /// @return s
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const NpnMapM& map);
 
 /// @relates NpnMapM
@@ -229,8 +229,8 @@ operator<<(BinO& s,
 /// @param[in] s 入力ストリーム
 /// @param[out] map 結果を格納する変数
 /// @return s
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   NpnMapM& map);
 
 

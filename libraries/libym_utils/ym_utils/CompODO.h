@@ -1,48 +1,58 @@
-#ifndef YM_UTILS_FILEBINO_H
-#define YM_UTILS_FILEBINO_H
+#ifndef YM_UTILS_COMPODO_H
+#define YM_UTILS_COMPODO_H
 
-/// @file ym_utils/FileBinO.h
-/// @brief FileBinO のヘッダファイル
+/// @file ym_utils/CompODO.h
+/// @brief CompODO のヘッダファイル
 /// @author Yusuke Matsunaga
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/BinO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM
 
+class CompOut;
+
 //////////////////////////////////////////////////////////////////////
-/// @class FileBinO FileBinO.h "ym_utils/FileBinO.h"
+/// @class CompODO CompODO.h "ym_utils/CompODO.h"
 /// @ingroup YmUtils
-/// @brief 通常のファイルを用いた BinO の継承クラス
+/// @brief Compress エンジンを用いた ODO の継承クラス
 //////////////////////////////////////////////////////////////////////
-class FileBinO :
-  public BinO
+class CompODO :
+  public ODO
 {
 public:
 
   /// @brief 空のコンストラクタ
-  FileBinO();
+  /// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
+  explicit
+  CompODO(ymuint bits = 0);
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
-  FileBinO(const char* filename);
+  /// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
+  explicit
+  CompODO(const char* filename,
+	  ymuint bits = 0);
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
-  FileBinO(const string& filename);
+  /// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
+  explicit
+  CompODO(const string& filename,
+	  ymuint bits = 0);
 
   /// @brief デストラクタ
   virtual
-  ~FileBinO();
+  ~CompODO();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // FileBinO の関数
+  // CompODO の関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 書き込み可能なら true を返す．
@@ -50,12 +60,16 @@ public:
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
-  void
+  /// @retval true オープンが成功した．
+  /// @retval false オープンが失敗した．
+  bool
   open(const char* filename);
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
-  void
+  /// @retval true オープンが成功した．
+  /// @retval false オープンが失敗した．
+  bool
   open(const string& filename);
 
   /// @brief ファイルを閉じる．
@@ -66,26 +80,17 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // BinO の仮想関数
+  // ODO の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief データを書き出す．
-  /// @param[in] n データサイズ
   /// @param[in] buff データを収めた領域のアドレス
+  /// @param[in] n データサイズ
   /// @return 実際に書き出した量を返す．
   virtual
-  ymuint64
-  write(ymuint64 n,
-	const ymuint8* buff);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる定数
-  //////////////////////////////////////////////////////////////////////
-
-  static
-  const ymuint16 BUFF_SIZE = 4096;
+  ssize_t
+  write(const ymuint8* buff,
+	ymuint64 n);
 
 
 private:
@@ -93,17 +98,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ファイルディスクリプタ
-  int mFd;
-
-  // バッファ
-  ymuint8 mBuff[BUFF_SIZE];
-
-  // バッファ上の書き込み位置
-  ymuint16 mPos;
+  // 実際の処理を行うエンジン
+  CompOut* mZ;
 
 };
 
 END_NAMESPACE_YM
 
-#endif // YM_UTILS_FILEBINO_H
+#endif // YM_UTILS_COMPODO_H

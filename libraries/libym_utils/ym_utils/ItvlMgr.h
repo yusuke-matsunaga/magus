@@ -5,13 +5,13 @@
 /// @brief ItvlMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ymtools.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -116,11 +116,11 @@ public:
 
   /// @brief バイナリファイルに書き出す．
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリファイルを読み込む．
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 private:
@@ -140,8 +140,8 @@ private:
 /// @param[in] itvlmgr 対象のオブジェクト
 /// @return s を返す．
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const ItvlMgr& itvlmgr)
 {
   itvlmgr.dump(s);
@@ -154,8 +154,8 @@ operator<<(BinO& s,
 /// @param[in] itvlmgr 読み込む先のオブジェクト
 /// @return s を返す．
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   ItvlMgr& itvlmgr)
 {
   itvlmgr.restore(s);

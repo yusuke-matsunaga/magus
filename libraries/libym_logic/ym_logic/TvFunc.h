@@ -12,8 +12,8 @@
 #include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
 #include "ym_logic/npn_nsdef.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -227,18 +227,18 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // BinIO 用の関数
+  // IDO/ODO 用の関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief バイナリファイルの書き出し
   /// @param[in] s 出力先のストリーム
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリファイルの読み込み
   /// @param[in] s 入力元のストリーム
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 public:
@@ -457,16 +457,16 @@ operator<<(ostream& s,
 /// @param[in] s 出力ストリーム
 /// @param[in] func 関数
 /// @return s
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const TvFunc& func);
 
 /// @brief バイナリ入力
 /// @param[in] s 入力ストリーム
 /// @param[out] func 関数
 /// @return s
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   TvFunc& func);
 
 
@@ -629,8 +629,8 @@ operator<<(ostream& s,
 // @param[in] func 関数
 // @return s
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const TvFunc& func)
 {
   func.dump(s);
@@ -642,8 +642,8 @@ operator<<(BinO& s,
 // @param[out] func 関数
 // @return s
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   TvFunc& func)
 {
   func.restore(s);

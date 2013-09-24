@@ -179,7 +179,7 @@ CutMgr::cut_list() const
 BEGIN_NONAMESPACE
 
 void
-dump_aig(BinO& s,
+dump_aig(ODO& s,
 	 Aig aig)
 {
   if ( aig.is_zero() ) {
@@ -212,7 +212,7 @@ END_NONAMESPACE
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CutMgr::dump(BinO& s) const
+CutMgr::dump(ODO& s) const
 {
   // カット数をダンプする．
   ymuint64 n = mCutList.size();
@@ -230,7 +230,7 @@ CutMgr::dump(BinO& s) const
 BEGIN_NONAMESPACE
 
 Aig
-restore_aig(BinI& s,
+restore_aig(IDO& s,
 	    AigMgr& aig_mgr)
 {
   ymuint8 type;
@@ -269,7 +269,7 @@ END_NONAMESPACE
 
 // @brief バイナリダンプされたファイルを読み込む．
 void
-CutMgr::restore(BinI& s)
+CutMgr::restore(IDO& s)
 {
   // 現在の内容をクリアする．
   clear();

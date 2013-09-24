@@ -179,8 +179,8 @@ CellLatchInfo::q_pos() const
 // @param[in] bos 出力先のストリーム
 // @param[in] latchinfo 対象の CellLatchInfo
 // @return ストリームを返す．
-BinO&
-operator<<(BinO& bos,
+ODO&
+operator<<(ODO& bos,
 	   const CellLatchInfo& latchinfo)
 {
   return bos << latchinfo.mBits;
@@ -190,8 +190,8 @@ operator<<(BinO& bos,
 // @param[in] bis 入力元のストリーム
 // @param[out] latchinfo 結果を格納する変数
 // @return ストリームを返す．
-BinI&
-operator>>(BinI& bis,
+IDO&
+operator>>(IDO& bis,
 	   CellLatchInfo& latchinfo)
 {
   return bis >> latchinfo.mBits;

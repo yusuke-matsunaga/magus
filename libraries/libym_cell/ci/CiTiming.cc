@@ -16,7 +16,7 @@ BEGIN_NAMESPACE_YM_CELL
 BEGIN_NONAMESPACE
 
 void
-dump_lut(BinO& s,
+dump_lut(ODO& s,
 	 const CellLut* lut)
 {
   if ( lut ) {
@@ -190,7 +190,7 @@ CiTiming::cell_fall() const
 // @param[in] s 出力先のストリーム
 // @param[in] type_id 型の ID
 void
-CiTiming::dump_common(BinO& s,
+CiTiming::dump_common(ODO& s,
 		      ymuint8 type_id) const
 {
   s << type_id
@@ -314,7 +314,7 @@ CiTimingGeneric::fall_resistance() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiTimingGeneric::dump(BinO& s) const
+CiTimingGeneric::dump(ODO& s) const
 {
   dump_common(s, 0);
 
@@ -394,7 +394,7 @@ CiTimingPiecewise::fall_delay_intercept() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiTimingPiecewise::dump(BinO& s) const
+CiTimingPiecewise::dump(ODO& s) const
 {
   dump_common(s, 1);
 
@@ -468,7 +468,7 @@ CiTimingLut1::fall_transition() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiTimingLut1::dump(BinO& s) const
+CiTimingLut1::dump(ODO& s) const
 {
   dump_common(s, 2);
 
@@ -542,7 +542,7 @@ CiTimingLut2::fall_propagation() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiTimingLut2::dump(BinO& s) const
+CiTimingLut2::dump(ODO& s) const
 {
   dump_common(s, 3);
 

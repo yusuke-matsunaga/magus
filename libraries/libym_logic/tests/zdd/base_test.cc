@@ -249,7 +249,7 @@ test_dump(ZddMgr& zddmgr)
       cout << "cannot open output file: " << fn << endl;
       return false;
     }
-    BinOStream bos(ofs);
+    ODOStream bos(ofs);
     zdd.dump(bos);
   }
   Zdd zdd2;
@@ -259,7 +259,7 @@ test_dump(ZddMgr& zddmgr)
       cout << "cannont open input file: " << fn << endl;
       return false;
     }
-    BinIStream bis(ifs);
+    IDOStream bis(ifs);
     zdd2 = zddmgr.restore(bis);
   }
   if ( zdd != zdd2 ) {

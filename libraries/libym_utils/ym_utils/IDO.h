@@ -1,11 +1,11 @@
-#ifndef YM_UTILS_BINI_H
-#define YM_UTILS_BINI_H
+#ifndef YM_UTILS_IDO_H
+#define YM_UTILS_IDO_H
 
-/// @file ym_utils/BinI.h
-/// @brief BinI のヘッダファイル
+/// @file ym_utils/IDO.h
+/// @brief IDO のヘッダファイル
 /// @author Yusuke Matsunaga
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,20 +15,20 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class BinI BinI.h "ym_utils/BinI.h"
+/// @class IDO IDO.h "ym_utils/IDO.h"
 /// @ingroup YmUtils
-/// @brief バイナリ入力ストリームの基底クラス
+/// @brief 入力データオブジェクト (Input Data Object)
 //////////////////////////////////////////////////////////////////////
-class BinI
+class IDO
 {
 public:
 
   /// @brief コンストラクタ
-  BinI() { }
+  IDO() { }
 
   /// @brief デストラクタ
   virtual
-  ~BinI() { }
+  ~IDO() { }
 
 
 public:
@@ -74,17 +74,17 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // BinI の仮想関数
+  // IDO の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief データを読み込む．
-  /// @param[in] n 読み込むデータサイズ
   /// @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
+  /// @param[in] n 読み込むデータサイズ
   /// @return 実際に読み込んだ量を返す．
   virtual
-  ymuint64
-  read(ymuint64 n,
-       ymuint8* buff) = 0;
+  ssize_t
+  read(ymuint8* buff,
+       ymuint64 n) = 0;
 
 
 private:
@@ -93,79 +93,82 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief read() を呼び出して結果をチェックする．
+  /// @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
+  /// @param[in] n 読み込むデータサイズ
+  /// @note n バイトの読み込みに失敗したらエラーメッセージを出力する．
   void
-  _read(ymuint64 n,
-	ymuint8* buff);
+  _read(ymuint8* buff,
+	ymuint64 n);
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-// BinI に対するストリーム入力演算子
+// IDO に対するストリーム入力演算子
 //////////////////////////////////////////////////////////////////////
 
 /// @brief ブール値の読み出し
 /// @param[in] s 入力元のストリーム
 /// @param[out] val 値を格納する変数
-/// @return BinI を返す．
-BinI&
-operator>>(BinI& s,
+/// @return IDO を返す．
+IDO&
+operator>>(IDO& s,
 	   bool& val);
 
 /// @brief 1バイトの読み出し
 /// @param[in] s 入力元のストリーム
 /// @param[out] val 値を格納する変数
-/// @return BinI を返す．
-BinI&
-operator>>(BinI& s,
+/// @return IDO を返す．
+IDO&
+operator>>(IDO& s,
 	   ymuint8& val);
 
 /// @brief 2バイトの読み出し
 /// @param[in] s 入力元のストリーム
 /// @param[out] val 値を格納する変数
-/// @return BinI を返す．
-BinI&
-operator>>(BinI& s,
+/// @return IDO を返す．
+IDO&
+operator>>(IDO& s,
 	   ymuint16& val);
 
 /// @brief 4バイトの読み出し
 /// @param[in] s 入力元のストリーム
 /// @param[out] val 値を格納する変数
-/// @return BinI を返す．
-BinI&
-operator>>(BinI& s,
+/// @return IDO を返す．
+IDO&
+operator>>(IDO& s,
 	   ymuint32& val);
 
 /// @brief 8バイトの読み出し
 /// @param[in] s 入力元のストリーム
 /// @param[out] val 値を格納する変数
-/// @return BinI を返す．
-BinI&
-operator>>(BinI& s,
+/// @return IDO を返す．
+IDO&
+operator>>(IDO& s,
 	   ymuint64& val);
 
 /// @brief 単精度不動週数点数の読み出し
 /// @param[in] s 入力元のストリーム
 /// @param[out] val 値を格納する変数
-/// @return BinI を返す．
-BinI&
-operator>>(BinI& s,
+/// @return IDO を返す．
+IDO&
+operator>>(IDO& s,
 	   float& val);
 
 /// @brief 倍精度不動週数点数の読み出し
 /// @param[in] s 入力元のストリーム
 /// @param[out] val 値を格納する変数
-/// @return BinI を返す．
-BinI&
-operator>>(BinI& s,
+/// @return IDO を返す．
+IDO&
+operator>>(IDO& s,
 	   double& val);
 
 /// @brief 文字列の読み出し
 /// @param[in] s 入力元のストリーム
 /// @param[out] val 値を格納する変数
-/// @return BinI を返す．
-BinI&
-operator>>(BinI& s,
+/// @return IDO を返す．
+IDO&
+operator>>(IDO& s,
 	   string& val);
 
 
@@ -176,10 +179,10 @@ operator>>(BinI& s,
 // @brief ブール値の読み出し
 // @param[in] s 入力元のストリーム
 // @param[out] val 値を格納する変数
-// @return BinI を返す．
+// @return IDO を返す．
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   bool& val)
 {
   val = s.read_8();
@@ -189,10 +192,10 @@ operator>>(BinI& s,
 // @brief 1バイトの読み出し
 // @param[in] s 入力元のストリーム
 // @param[out] val 値を格納する変数
-// @return BinI を返す．
+// @return IDO を返す．
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   ymuint8& val)
 {
   val = s.read_8();
@@ -202,10 +205,10 @@ operator>>(BinI& s,
 // @brief 2バイトの読み出し
 // @param[in] s 入力元のストリーム
 // @param[out] val 値を格納する変数
-// @return BinI を返す．
+// @return IDO を返す．
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   ymuint16& val)
 {
   val = s.read_16();
@@ -215,10 +218,10 @@ operator>>(BinI& s,
 // @brief 4バイトの読み出し
 // @param[in] s 入力元のストリーム
 // @param[out] val 値を格納する変数
-// @return BinI を返す．
+// @return IDO を返す．
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   ymuint32& val)
 {
   val = s.read_32();
@@ -228,10 +231,10 @@ operator>>(BinI& s,
 // @brief 8バイトの読み出し
 // @param[in] s 入力元のストリーム
 // @param[out] val 値を格納する変数
-// @return BinI を返す．
+// @return IDO を返す．
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   ymuint64& val)
 {
   val = s.read_64();
@@ -241,10 +244,10 @@ operator>>(BinI& s,
 // @brief 単精度不動週数点数の読み出し
 // @param[in] s 入力元のストリーム
 // @param[out] val 値を格納する変数
-// @return BinI を返す．
+// @return IDO を返す．
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   float& val)
 {
   val = s.read_float();
@@ -254,10 +257,10 @@ operator>>(BinI& s,
 // @brief 倍精度不動週数点数の読み出し
 // @param[in] s 入力元のストリーム
 // @param[out] val 値を格納する変数
-// @return BinI を返す．
+// @return IDO を返す．
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   double& val)
 {
   val = s.read_double();
@@ -267,10 +270,10 @@ operator>>(BinI& s,
 // @brief 文字列の読み出し
 // @param[in] s 入力元のストリーム
 // @param[out] val 値を格納する変数
-// @return BinI を返す．
+// @return IDO を返す．
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   string& val)
 {
   val = s.read_str();
@@ -279,4 +282,4 @@ operator>>(BinI& s,
 
 END_NAMESPACE_YM
 
-#endif // YM_UTILS_BINI_H
+#endif // YM_UTILS_IDO_H

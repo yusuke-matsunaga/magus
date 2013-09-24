@@ -118,12 +118,12 @@ public:
   /// @brief BDD の内容をダンプする．
   /// @param[in] s 出力ストリーム
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリファイルに保存されたBDDを読み込む．
   /// @param[in] s 入力ストリーム
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
   /// @}
   //////////////////////////////////////////////////////////////////////

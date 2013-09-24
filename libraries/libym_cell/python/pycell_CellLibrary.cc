@@ -16,8 +16,8 @@
 #include "ym_cell/CellGroup.h"
 #include "ym_cell/Cell.h"
 #include "ym_utils/pyutils.h"
-#include "ym_utils/FileBinO.h"
-#include "ym_utils/FileBinI.h"
+#include "ym_utils/FileODO.h"
+#include "ym_utils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -210,7 +210,7 @@ CellLibrary_init(CellLibraryObject* self,
     self->mLibrary = library;
   }
   else if ( strcmp(type, "binary") == 0 ) {
-    FileBinI s(filename);
+    FileIDO s(filename);
     CellLibrary* library = CellLibrary::new_obj();
     library->restore(s);
     self->mLibrary = library;
@@ -484,7 +484,6 @@ CellLibrary_group_list(CellLibraryObject* self,
     PyList_SetItem(list_obj, i, obj1);
   }
 
-  Py_INCREF(list_obj);
   return list_obj;
 }
 
@@ -501,8 +500,15 @@ CellLibrary_npn_class_list(CellLibraryObject* self,
     PyList_SetItem(list_obj, i, obj1);
   }
 
-  Py_INCREF(list_obj);
   return list_obj;
+}
+
+// パタンの要素数を返す．
+PyObject*
+CellLibrary_pg_pat_num(CellLibraryObject* self,
+		       PyObject*  args)
+{
+  return PyObject_FromYmuint32(self->mLibrary->pg_pat_num());
 }
 
 // パタンを返す．
@@ -510,30 +516,62 @@ PyObject*
 CellLibrary_pg_pat(CellLibraryObject* self,
 		   PyObject*  args)
 {
-  ymuint pos = 0;
-  if ( !PyArg_ParseTuple(args, "I", &pos) ) {
+  ymuint id = 0;
+  if ( !PyArg_ParseTuple(args, "I", &id) ) {
     return NULL;
   }
-
-  PyObject* result = self->mPatList[pos];
-
+  PyObject* result = self->mPatList[id];
   Py_INCREF(result);
+
   return result;
 }
 
-// 枝の情報を返す．
+// ノードの個数を返す．
+PyObject*
+CellLibrary_pg_node_num(CellLibraryObject* self,
+			PyObject* args)
+{
+  return PyObject_FromYmuint32(self->mLibrary->pg_node_num());
+}
+
+// ノードの情報を返す．
+PyObject*
+CellLibrary_pg_node(CellLibraryObject* self,
+		    PyObject* args)
+{
+  ymuint id = 0;
+  if ( !PyArg_ParseTuple(args, "I", &id) ) {
+    return NULL;
+  }
+  ymuint input_id = 0;
+  if ( self->mLibrary->pg_node_type(id) == kCellPatInput ) {
+    input_id = self->mLibrary->pg_input_id(id);
+  }
+
+  PyObject* type_obj = PyCellPatType_FromCellPatType(self->mLibrary->pg_node_type(id));
+  return Py_BuildValue("(OI)", type_obj, input_id);
+}
+
+// 枝の個数を返す．
+PyObject*
+CellLibrary_pg_edge_num(CellLibraryObject* self,
+			PyObject* args)
+{
+  return PyObject_FromYmuint32(self->mLibrary->pg_edge_num());
+}
+
+// 枝を返す．
 PyObject*
 CellLibrary_pg_edge(CellLibraryObject* self,
 		    PyObject* args)
 {
-  ymuint pos = 0;
-  if ( !PyArg_ParseTuple(args, "I", &pos) ) {
+  ymuint id = 0;
+  if ( !PyArg_ParseTuple(args, "I", &id) ) {
     return NULL;
   }
-
-  PyObject* result = self->mEdgeList[pos];
-
+  PyObject* result = self->mEdgeList[id];
   Py_INCREF(result);
+
   return result;
 }
 
@@ -542,7 +580,7 @@ PyObject*
 CellLibrary_dump(CellLibraryObject* self,
 		 PyObject* args)
 {
-  FileBinO* bp = parse_FileBinO(args);
+  FileODO* bp = parse_FileODO(args);
   if ( bp == NULL ) {
     return NULL;
   }
@@ -610,12 +648,20 @@ PyMethodDef CellLibrary_methods[] = {
    PyDoc_STR("return list of cell group (NONE)")},
   {"npn_class_list", (PyCFunction)CellLibrary_npn_class_list, METH_NOARGS,
    PyDoc_STR("return list of cell class (NONE)")},
+  {"pg_pat_num", (PyCFunction)CellLibrary_pg_pat_num, METH_NOARGS,
+   PyDoc_STR("return the number  of pattern graphs (NONE)")},
   {"pg_pat", (PyCFunction)CellLibrary_pg_pat, METH_VARARGS,
    PyDoc_STR("return pattern graph (int)")},
+  {"pg_node_num", (PyCFunction)CellLibrary_pg_node_num, METH_NOARGS,
+   PyDoc_STR("return the number of pattern nodes (NONE)")},
+  {"pg_node", (PyCFunction)CellLibrary_pg_node, METH_VARARGS,
+   PyDoc_STR("return pattenr node (int)")},
+  {"pg_edge_num", (PyCFunction)CellLibrary_pg_edge_num, METH_NOARGS,
+   PyDoc_STR("return the number of pattern edge (NONE)")},
   {"pg_edge", (PyCFunction)CellLibrary_pg_edge, METH_VARARGS,
-   PyDoc_STR("return edge infomation (int)")},
+   PyDoc_STR("return pattern edge infomation (int)")},
   {"dump", (PyCFunction)CellLibrary_dump, METH_VARARGS,
-   PyDoc_STR("dump (FileBinO)")},
+   PyDoc_STR("dump (FileODO)")},
   {NULL, NULL, 0, NULL} // end-marker
 };
 

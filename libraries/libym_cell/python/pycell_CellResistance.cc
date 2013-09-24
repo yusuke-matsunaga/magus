@@ -9,8 +9,8 @@
 
 #include "ym_cell/pycell.h"
 #include "ym_cell/CellResistance.h"
-#include "ym_utils/FileBinO.h"
-#include "ym_utils/FileBinI.h"
+#include "ym_utils/FileODO.h"
+#include "ym_utils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM

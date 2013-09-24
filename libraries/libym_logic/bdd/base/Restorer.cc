@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_BDD
 // @brief ダンプされた情報を BDD を読み込む．
 // @param[in] s 入力ストリーム
 void
-Bdd::restore(BinI& s)
+Bdd::restore(IDO& s)
 {
   Restorer restorer(mMgr, s);
   ymuint n = restorer.read();
@@ -37,7 +37,7 @@ Bdd::restore(BinI& s)
 // @brief ダンプされた情報を読み込む．
 // @param[in] s 入力ストリーム
 void
-BddVector::restore(BinI& s)
+BddVector::restore(IDO& s)
 {
   Restorer restorer(mMgr.mImpl, s);
   ymuint n = restorer.read();
@@ -52,7 +52,7 @@ BddVector::restore(BinI& s)
 // @brief ダンプされた情報を読み込む．
 // @param[in] s 入力ストリーム
 void
-BddList::restore(BinI& s)
+BddList::restore(IDO& s)
 {
   Restorer restorer(mMgr.mImpl, s);
   ymuint n = restorer.read();
@@ -69,7 +69,7 @@ BddList::restore(BinI& s)
 
 // コンストラクタ
 Restorer::Restorer(BddMgrImpl* mgr,
-		   BinI& s) :
+		   IDO& s) :
   mMgr(mgr),
   mStream(s)
 {

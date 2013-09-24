@@ -1,11 +1,11 @@
-#ifndef YM_UTILS_BINO_H
-#define YM_UTILS_BINO_H
+#ifndef YM_UTILS_ODO_H
+#define YM_UTILS_ODO_H
 
-/// @file ym_utils/BinO.h
-/// @brief BinO のヘッダファイル
+/// @file ym_utils/ODO.h
+/// @brief ODO のヘッダファイル
 /// @author Yusuke Matsunaga
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,25 +15,25 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class BinO BinO.h "ym_utils/BinO.h"
+/// @class ODO ODO.h "ym_utils/ODO.h"
 /// @ingroup YmUtils
 /// @brief バイナリ出力ストリームの基底クラス
 //////////////////////////////////////////////////////////////////////
-class BinO
+class ODO
 {
 public:
 
   /// @brief コンストラクタ
-  BinO() { }
+  ODO() { }
 
   /// @brief デストラクタ
   virtual
-  ~BinO() { }
+  ~ODO() { }
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // BinO の公開関数
+  // ODO の公開関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 1バイトの書き込み
@@ -79,17 +79,17 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // BinO の仮想関数
+  // ODO の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief nバイトのデータを書き出す．
-  /// @param[in] n データサイズ
   /// @param[in] buff データを収めた領域のアドレス
+  /// @param[in] n データサイズ
   /// @return 実際に書き出した量を返す．
   virtual
-  ymuint64
-  write(ymuint64 n,
-	const ymuint8* buff) = 0;
+  ssize_t
+  write(const ymuint8* buff,
+	ymuint64 n) = 0;
 
 
 private:
@@ -97,88 +97,90 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief write() を読み出して結果をチェックする．
+  /// @brief write() を呼び出して結果をチェックする．
+  /// @param[in] buff データを収めた領域のアドレス
+  /// @param[in] n データサイズ
   void
-  _write(ymuint64 n,
-	 const ymuint8* buff);
+  _write(const ymuint8* buff,
+	 ymuint64 n);
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-// BinO に対するストリーム出力演算子
+// ODO に対するストリーム出力演算子
 //////////////////////////////////////////////////////////////////////
 
 /// @brief ブール値の書き込み
 /// @param[in] s 出力先のストリーム
 /// @param[in] val 値
-/// @return BinO を返す．
-BinO&
-operator<<(BinO& s,
+/// @return ODO を返す．
+ODO&
+operator<<(ODO& s,
 	   bool val);
 
 /// @brief 1バイトの書き込み
 /// @param[in] s 出力先のストリーム
 /// @param[in] val 値
-/// @return BinO を返す．
-BinO&
-operator<<(BinO& s,
+/// @return ODO を返す．
+ODO&
+operator<<(ODO& s,
 	   ymuint8 val);
 
 /// @brief 2バイトの書き込み
 /// @param[in] s 出力先のストリーム
 /// @param[in] val 値
-/// @return BinO を返す．
-BinO&
-operator<<(BinO& s,
+/// @return ODO を返す．
+ODO&
+operator<<(ODO& s,
 	   ymuint16 val);
 
 /// @brief 4バイトの書き込み
 /// @param[in] s 出力先のストリーム
 /// @param[in] val 値
-/// @return BinO を返す．
-BinO&
-operator<<(BinO& s,
+/// @return ODO を返す．
+ODO&
+operator<<(ODO& s,
 	   ymuint32 val);
 
 /// @brief 8バイトの書き込み
 /// @param[in] s 出力先のストリーム
 /// @param[in] val 値
-/// @return BinO を返す．
-BinO&
-operator<<(BinO& s,
+/// @return ODO を返す．
+ODO&
+operator<<(ODO& s,
 	   ymuint64 val);
 
 /// @brief 単精度浮動小数点数の書き込み
 /// @param[in] s 出力先のストリーム
 /// @param[in] val 値
-/// @return BinO を返す．
-BinO&
-operator<<(BinO& s,
+/// @return ODO を返す．
+ODO&
+operator<<(ODO& s,
 	   float val);
 
 /// @brief 倍精度浮動小数点数の書き込み
 /// @param[in] s 出力先のストリーム
 /// @param[in] val 値
-/// @return BinO を返す．
-BinO&
-operator<<(BinO& s,
+/// @return ODO を返す．
+ODO&
+operator<<(ODO& s,
 	   double val);
 
 /// @brief 文字列の書き込み
 /// @param[in] s 出力先のストリーム
 /// @param[in] val 値
-/// @return BinO を返す．
-BinO&
-operator<<(BinO& s,
+/// @return ODO を返す．
+ODO&
+operator<<(ODO& s,
 	   const char* val);
 
 /// @brief 文字列の書き込み
 /// @param[in] s 出力先のストリーム
 /// @param[in] val 値
-/// @return BinO を返す．
-BinO&
-operator<<(BinO& s,
+/// @return ODO を返す．
+ODO&
+operator<<(ODO& s,
 	   const string& val);
 
 
@@ -191,7 +193,7 @@ operator<<(BinO& s,
 // @param[in] val 値
 inline
 void
-BinO::write_str(const string& val)
+ODO::write_str(const string& val)
 {
   write_str(val.c_str());
 }
@@ -199,10 +201,10 @@ BinO::write_str(const string& val)
 // @brief ブール値の書き込み
 // @param[in] s 出力先のストリーム
 // @param[in] val 値
-// @return BinO を返す．
+// @return ODO を返す．
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   bool val)
 {
   s.write_8(val);
@@ -212,10 +214,10 @@ operator<<(BinO& s,
 // @brief 1バイトの書き込み
 // @param[in] s 出力先のストリーム
 // @param[in] val 値
-// @return BinO を返す．
+// @return ODO を返す．
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   ymuint8 val)
 {
   s.write_8(val);
@@ -225,10 +227,10 @@ operator<<(BinO& s,
 // @brief 2バイトの書き込み
 // @param[in] s 出力先のストリーム
 // @param[in] val 値
-// @return BinO を返す．
+// @return ODO を返す．
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   ymuint16 val)
 {
   s.write_16(val);
@@ -238,10 +240,10 @@ operator<<(BinO& s,
 // @brief 4バイトの書き込み
 // @param[in] s 出力先のストリーム
 // @param[in] val 値
-// @return BinO を返す．
+// @return ODO を返す．
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   ymuint32 val)
 {
   s.write_32(val);
@@ -251,10 +253,10 @@ operator<<(BinO& s,
 // @brief 8バイトの書き込み
 // @param[in] s 出力先のストリーム
 // @param[in] val 値
-// @return BinO を返す．
+// @return ODO を返す．
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   ymuint64 val)
 {
   s.write_64(val);
@@ -264,10 +266,10 @@ operator<<(BinO& s,
 // @brief 単精度浮動小数点数の書き込み
 // @param[in] s 出力先のストリーム
 // @param[in] val 値
-// @return BinO を返す．
+// @return ODO を返す．
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   float val)
 {
   s.write_float(val);
@@ -277,10 +279,10 @@ operator<<(BinO& s,
 // @brief 倍精度浮動小数点数の書き込み
 // @param[in] s 出力先のストリーム
 // @param[in] val 値
-// @return BinO を返す．
+// @return ODO を返す．
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   double val)
 {
   s.write_double(val);
@@ -290,10 +292,10 @@ operator<<(BinO& s,
 // @brief 文字列の書き込み
 // @param[in] s 出力先のストリーム
 // @param[in] val 値
-// @return BinO を返す．
+// @return ODO を返す．
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const char* val)
 {
   s.write_str(val);
@@ -303,10 +305,10 @@ operator<<(BinO& s,
 // @brief 文字列の書き込み
 // @param[in] s 出力先のストリーム
 // @param[in] val 値
-// @return BinO を返す．
+// @return ODO を返す．
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const string& val)
 {
   s.write_str(val.c_str());
@@ -315,4 +317,4 @@ operator<<(BinO& s,
 
 END_NAMESPACE_YM
 
-#endif // YM_UTILS_BINO_H
+#endif // YM_UTILS_ODO_H

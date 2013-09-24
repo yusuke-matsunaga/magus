@@ -12,8 +12,8 @@
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddLitSet.h"
 #include "ym_logic/BddVarSet.h"
-#include "ym_utils/FileBinI.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -674,7 +674,7 @@ PyObject*
 Bdd_dump(BddObject* self,
 	 PyObject* args)
 {
-  FileBinO* bp = parse_FileBinO(args);
+  FileODO* bp = parse_FileODO(args);
   if ( bp == NULL ) {
     return NULL;
   }
@@ -690,7 +690,7 @@ PyObject*
 Bdd_restore(BddObject* self,
 	    PyObject* args)
 {
-  FileBinI* bp = parse_FileBinI(args);
+  FileIDO* bp = parse_FileIDO(args);
   if ( bp == NULL ) {
     return NULL;
   }
@@ -819,9 +819,9 @@ PyMethodDef Bdd_methods[] = {
   {"print", (PyCFunction)Bdd_print, METH_NOARGS,
    PyDoc_STR("print out the contents (NONE)")},
   {"dump", (PyCFunction)Bdd_dump, METH_VARARGS,
-   PyDoc_STR("dump (FileBinO)")},
+   PyDoc_STR("dump (FileODO)")},
   {"restore", (PyCFunction)Bdd_restore, METH_VARARGS,
-   PyDoc_STR("restore (FileBinI)")},
+   PyDoc_STR("restore (FileIDO)")},
   {NULL, NULL, 0, NULL}
 };
 

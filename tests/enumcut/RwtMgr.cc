@@ -319,7 +319,7 @@ END_NONAMESPACE
 
 // @brief 内容をバイナリダンプする．
 void
-RwtMgr::dump(BinO& s) const
+RwtMgr::dump(ODO& s) const
 {
 }
 
@@ -360,7 +360,7 @@ RwtMgr::copy(const RwtPatGen& pg)
 
 // @brief バイナリファイルを読み込んで内容を設定する．
 void
-RwtMgr::restore(BinI& s)
+RwtMgr::restore(IDO& s)
 {
   // 諸元を設定する．
   ymuint32 input_num;

@@ -9,7 +9,7 @@
 
 #include "DumpLibrary.h"
 #include "ym_cell/CellLibrary.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileODO.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -44,7 +44,7 @@ DumpLibrary::cmd_proc(TclObjVector& objv)
     // ファイル名文字列の中に誤り
     return TCL_ERROR;
   }
-  FileBinO bo(ex_name);
+  FileODO bo(ex_name);
   if ( !bo ) {
     // 開けなかった．
     TclObj errmsg;
