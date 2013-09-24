@@ -35,7 +35,7 @@ phf_sim1(const vector<const FuncVect*>& func_list)
 {
   PhfGen pg;
 
-  vector<vector<ymuint32>* > g_list;
+  vector<vector<ymuint32> > g_list;
   return pg.mapping(func_list, g_list);
 }
 
@@ -54,7 +54,7 @@ phf_sim3(const vector<const FuncVect*>& func_list)
   PhfGen pg;
 
   vector<ymuint> d_map;
-  return pg.displace_decomposition(func_list, d_map, false);
+  return pg.displace_decomposition(func_list[0], func_list[1], d_map, false);
 }
 
 bool
@@ -63,7 +63,7 @@ phf_sim4(const vector<const FuncVect*>& func_list)
   PhfGen pg;
 
   vector<ymuint> d_map;
-  return pg.displace_decomposition(func_list, d_map, true);
+  return pg.displace_decomposition(func_list[0], func_list[1], d_map, true);
 }
 
 END_NONAMESPACE
@@ -112,7 +112,7 @@ phf_sim(int argc,
     vector<const FuncVect*> func_list(m);
     // ランダムに関数を作る．
     for (ymuint j = 0; j < m; ++ j) {
-      FuncVect* fv = new FuncVect(k, n);
+      FuncVect* fv = new FuncVect(n, k);
       func_list[j] = fv;
       set_random_func(fv, rg);
     }

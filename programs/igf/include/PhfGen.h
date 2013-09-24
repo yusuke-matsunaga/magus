@@ -39,7 +39,7 @@ public:
   /// @param[out] g_list マッピングのリスト
   bool
   mapping(const vector<const FuncVect*>& func_list,
-	  vector<vector<ymuint32>* >& g_list);
+	  vector<vector<ymuint32> >& g_list);
 
   /// @brief collision free 分割を行う．
   /// @param[in] func_list 関数のリスト
@@ -50,7 +50,8 @@ public:
 
   /// @brief displace_decomposition を行う．
   bool
-  displace_decomposition(const vector<const FuncVect*>& func_list,
+  displace_decomposition(const FuncVect* func1,
+			 const FuncVect* func2,
 			 vector<ymuint>& displace_map,
 			 bool use_xor);
 

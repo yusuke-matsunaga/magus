@@ -37,7 +37,7 @@ PhfGen::~PhfGen()
 // @param[out] g_list マッピングのリスト
 bool
 PhfGen::mapping(const vector<const FuncVect*>& func_list,
-		vector<vector<ymuint32>* >& g_list)
+		vector<vector<ymuint32> >& g_list)
 {
   PhfGraph pg(func_list);
 
@@ -51,12 +51,9 @@ PhfGen::mapping(const vector<const FuncVect*>& func_list,
   }
 
   ymuint nf = func_list.size();
-  g_list.clear();
-  g_list.resize(nf);
   ymuint nv = func_list[0]->max_val();
-  for (ymuint i = 0; i < nf; ++ i) {
-    g_list[i] = new vector<ymuint32>(nv, 0U);
-  }
+  g_list.clear();
+  g_list.resize(nf, vector<ymuint32>(nv, 0U));
 
   ymuint d = func_list.size();
   ymuint ne = edge_list.size();
@@ -73,7 +70,7 @@ PhfGen::mapping(const vector<const FuncVect*>& func_list,
 	  }
 	}
 	node1->set_val(val);
-	vector<ymuint32>& g1 = *g_list[j];
+	vector<ymuint32>& g1 = g_list[j];
 	g1[node1->pat()] = val;
       }
     }
@@ -96,10 +93,14 @@ PhfGen::cf_partition(const vector<const FuncVect*>& func_list,
 
 // @brief displace_decomposition を行う．
 bool
-PhfGen::displace_decomposition(const vector<const FuncVect*>& func_list,
+PhfGen::displace_decomposition(const FuncVect* func1,
+			       const FuncVect* func2,
 			       vector<ymuint>& displace_map,
 			       bool use_xor)
 {
+  vector<const FuncVect*> func_list(2);
+  func_list[0] = func1;
+  func_list[1] = func2;
   PhfGraph pg(func_list);
 
   return pg.displace_decomposition(displace_map, use_xor);

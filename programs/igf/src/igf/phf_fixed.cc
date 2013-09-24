@@ -208,7 +208,7 @@ phf(int argc,
 	ymuint nv = vlist.size();
 
 	XorFunc f1(f1_vect);
-	FuncVect* fv1 = new FuncVect(exp_p, nv);
+	FuncVect* fv1 = new FuncVect(nv, exp_p);
 	func_list[0] = fv1;
 	for (ymuint i = 0; i < nv; ++ i) {
 	  const RegVect* rv = vlist[i];
@@ -216,7 +216,7 @@ phf(int argc,
 	}
 
 	XorFunc f2(f2_vect);
-	FuncVect* fv2 = new FuncVect(exp_p, nv);
+	FuncVect* fv2 = new FuncVect(nv, exp_p);
 	func_list[1] = fv2;
 	for (ymuint i = 0; i < nv; ++ i) {
 	  const RegVect* rv = vlist[i];
@@ -226,17 +226,12 @@ phf(int argc,
 
       PhfGen phfgen;
 
-      vector<vector<ymuint32>* > g_list(2);
-      for (ymuint i = 0; i < 2; ++ i) {
-	g_list[i] = new vector<ymuint32>(exp_p, 0U);
-      }
+      vector<vector<ymuint32> > g_list(2);
       bool stat1 = phfgen.mapping(func_list, g_list);
 
       {
 	delete func_list[0];
 	delete func_list[1];
-	delete g_list[0];
-	delete g_list[1];
       }
 
       if ( stat1 ) {
@@ -252,7 +247,7 @@ phf(int argc,
 	    ymuint32 val = 0;
 	    for (ymuint j = 0; j < 2; ++ j) {
 	      const FuncVect& f1 = *func_list[j];
-	      vector<ymuint32>& g1 = *g_list[j];
+	      vector<ymuint32>& g1 = g_list[j];
 	      ymuint32 v1 = f1.val(i);
 	      cout << comma << setw(6) << v1 << " = " << g1[v1];
 	      val ^= g1[v1];
