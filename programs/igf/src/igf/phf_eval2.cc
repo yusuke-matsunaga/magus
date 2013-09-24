@@ -110,7 +110,7 @@ phf(int argc,
 
 	  vector<ymuint> displace_map(nv);
 	  PhfGen pg;
-	  bool stat = pg.displace_decomposition(func_list, displace_map, false);
+	  bool stat = pg.displace_decomposition(func_list[0], func_list[1], displace_map, false);
 	  if ( stat ) {
 	    found = true;
 	    ymuint q = rvmgr.index_size();
@@ -149,7 +149,7 @@ phf(int argc,
 
 	  vector<ymuint> displace_map(nv);
 	  PhfGen pg;
-	  bool stat = pg.displace_decomposition(func_list, displace_map, true);
+	  bool stat = pg.displace_decomposition(func_list[0], func_list[1], displace_map, true);
 	  if ( stat ) {
 	    found = true;
 	    ymuint q = rvmgr.index_size();

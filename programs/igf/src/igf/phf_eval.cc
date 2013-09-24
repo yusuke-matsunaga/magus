@@ -164,10 +164,7 @@ phf(int argc,
 
 	    PhfGen phfgen;
 
-	    vector<vector<ymuint32>* > g_list(m);
-	    for (ymuint i = 0; i < m; ++ i) {
-	      g_list[i] = new vector<ymuint32>(exp_p, 0U);
-	    }
+	    vector<vector<ymuint32> > g_list(m);
 	    bool stat = phfgen.mapping(func_list, g_list);
 	    if ( stat ) {
 	      found = true;
@@ -180,7 +177,6 @@ phf(int argc,
 	    }
 	    for (ymuint i = 0; i < m; ++ i) {
 	      delete func_list[i];
-	      delete g_list[i];
 	    }
 	    if ( stat ) {
 	      break;
