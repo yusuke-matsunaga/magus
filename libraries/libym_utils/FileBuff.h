@@ -42,12 +42,15 @@ public:
   /// @param[in] mode モード
   /// @retval true オープンが成功した．
   /// @retval false オープンが失敗した．
+  /// @note open() システムコールのラッパ
   bool
   open(const char* filename,
        int flags,
        mode_t mode = 0);
 
   /// @brief ファイルをクローズする．
+  /// @note 基本的には close() システムコールを呼ぶだけだが，
+  /// 未処理のデータが残っていたら書き出す．
   void
   close();
 
@@ -82,6 +85,10 @@ public:
   bool
   prepare();
 
+  /// @brief バッファのデータを書き出す．
+  bool
+  flush();
+
   /// @brief バッファの現在位置を返す．
   ymuint8*
   buff_ptr() const;
@@ -92,9 +99,9 @@ public:
   ymuint64
   buff_size() const;
 
-  /// @brief バッファから num バイト読み出した事にする．
+  /// @brief バッファの最終位置を進める．
   void
-  peek(ymuint64 num);
+  seek(ymuint64 num);
 
 
 protected:
@@ -181,7 +188,7 @@ FileBuff::close()
 {
   if ( mFd >= 0 ) {
     if ( mNeedFlush ) {
-      ::write(mFd, reinterpret_cast<void*>(mBuff), mPos);
+      flush();
     }
     ::close(mFd);
   }
@@ -195,6 +202,21 @@ bool
 FileBuff::is_ready() const
 {
   return mFd >= 0;
+}
+
+// @brief バッファのデータを書き出す．
+inline
+bool
+FileBuff::flush()
+{
+  ssize_t n = ::write(mFd, mBuff, mPos);
+  if ( n < static_cast<ssize_t>(mPos) ) {
+    // 書き込みが失敗した．
+    return false;
+  }
+  mPos = 0;
+  mNeedFlush = false;
+  return true;
 }
 
 // @brief バッファの現在位置を返す．
@@ -215,10 +237,10 @@ FileBuff::buff_size() const
   return mDataSize - mPos;
 }
 
-// @brief バッファから num バイト読み出した事にする．
+// @brief バッファの最終位置を進める．
 inline
 void
-FileBuff::peek(ymuint64 num)
+FileBuff::seek(ymuint64 num)
 {
   assert_cond( mPos + num <= mDataSize, __FILE__, __LINE__);
   mPos += num;

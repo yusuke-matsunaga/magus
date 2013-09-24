@@ -22,6 +22,7 @@ distclean-local:
 noinst_PROGRAMS = \
 	zstream_test \
 	GzIDO_test \
+	GzODO_test \
 	mygzip
 
 
@@ -44,6 +45,16 @@ GzIDO_test_SOURCES = \
 	GzIDO_test.cc
 
 GzIDO_test_LDADD = \
+	../../libym_utils.la
+
+GzODO_test_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+GzODO_test_SOURCES = \
+	GzODO_test.cc
+
+GzODO_test_LDADD = \
 	../../libym_utils.la
 
 

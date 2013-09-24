@@ -914,6 +914,7 @@ gz_uncompress(int in, int out, char *pre, size_t prelen, off_t *gsizep,
 
 		case GZSTATE_READ:
 			error = inflate(&z, Z_FINISH);
+			fprintf(stderr, "inflate(Z_FINISH)\n");
 			switch (error) {
 			/* Z_BUF_ERROR goes with Z_FINISH... */
 			case Z_BUF_ERROR:

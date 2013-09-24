@@ -149,15 +149,15 @@ public:
   /// @param[in] buf バッファ本体
   /// @param[in] size バッファのサイズ
   void
-  set_inbuf(Bytef* buf,
-	    uInt size);
+  set_inbuf(const ymuint8* buf,
+	    ymuint64 size);
 
   /// @brief out バッファを設定する．
   /// @param[in] buf バッファ本体
   /// @param[in] size バッファのサイズ
   void
-  set_outbuf(Bytef* buf,
-	     uInt size);
+  set_outbuf(ymuint8* buf,
+	     ymuint64 size);
 
   /// @brief msg を得る．
   const char*
@@ -779,18 +779,18 @@ zstream::end()
 // @brief in バッファを設定する．
 inline
 void
-zstream::set_inbuf(Bytef* buf,
-		   uInt size)
+zstream::set_inbuf(const ymuint8* buf,
+		   ymuint64 size)
 {
-  mZ.next_in = buf;
+  mZ.next_in = const_cast<Bytef*>(buf);
   mZ.avail_in = size;
 }
 
 // @brief out バッファを設定する．
 inline
 void
-zstream::set_outbuf(Bytef* buf,
-		    uInt size)
+zstream::set_outbuf(ymuint8* buf,
+		    ymuint64 size)
 {
   mZ.next_out = buf;
   mZ.avail_out = size;

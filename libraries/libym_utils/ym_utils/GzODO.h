@@ -10,11 +10,12 @@
 
 
 #include "ym_utils/ODO.h"
+#include "ym_utils/zstream.h"
 
 
 BEGIN_NAMESPACE_YM
 
-class GzOut;
+class FileBuff;
 
 //////////////////////////////////////////////////////////////////////
 /// @class GzODO GzODO.h "ym_utils/GzODO.h"
@@ -27,23 +28,21 @@ class GzODO :
 public:
 
   /// @brief 空のコンストラクタ
-  /// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
-  explicit
-  GzODO(ymuint bits = 0);
+  GzODO();
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
-  /// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
+  /// @param[in] level 圧縮レベル (0 でデフォルト値を用いる)
   explicit
   GzODO(const char* filename,
-	  ymuint bits = 0);
+	ymuint level = 0);
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
-  /// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
+  /// @param[in] level 圧縮レベル (0 でデフォルト値を用いる)
   explicit
   GzODO(const string& filename,
-	  ymuint bits = 0);
+	ymuint level = 0);
 
   /// @brief デストラクタ
   virtual
@@ -60,17 +59,21 @@ public:
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
+  /// @param[in] level 圧縮レベル (0 でデフォルト値を用いる)
   /// @retval true オープンが成功した．
   /// @retval false オープンが失敗した．
   bool
-  open(const char* filename);
+  open(const char* filename,
+       ymuint level = 0);
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
+  /// @param[in] level 圧縮レベル (0 でデフォルト値を用いる)
   /// @retval true オープンが成功した．
   /// @retval false オープンが失敗した．
   bool
-  open(const string& filename);
+  open(const string& filename,
+       ymuint level = 0);
 
   /// @brief ファイルを閉じる．
   /// @note 以降の書き込みは行われない．
