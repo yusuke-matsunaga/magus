@@ -43,6 +43,14 @@ EufMgr_test(int argc,
 
   display(cout, tmp_list);
 
+  bool stat = euf_mgr.check_validity(node_f_eq_g);
+  if ( stat ) {
+    cout << "f == g" << endl;
+  }
+  else {
+    cout << "f != g" << endl;
+  }
+
   return 0;
 }
 

@@ -256,9 +256,11 @@ EufMgr::check_validity(EufNode* node)
       Bool3 val = model[eq_node->var_id().val()];
       if ( val == kB3True ) {
 	eq_list.push_back(eq_node);
+	cout << "#" << eq_node->id() << " is true" << endl;
       }
       else if ( val == kB3False ) {
 	neq_list.push_back(eq_node);
+	cout << "#" << eq_node->id() << " is false" << endl;
       }
     }
 
@@ -270,6 +272,80 @@ EufMgr::check_validity(EufNode* node)
       mfset.merge(eq_node->left()->id(), eq_node->right()->id());
     }
 
+    for ( ; ; ) {
+      bool change = false;
+      ymuint nf = mFuncList.size();
+      for (ymuint i = 0; i < nf; ++ i) {
+	EufNode* f1 = mFuncList[i];
+	ymuint n = f1->arg_num();
+	for (ymuint j = i + 1; j < nf; ++ j) {
+	  EufNode* f2 = mFuncList[j];
+	  if ( f2->arg_num() != n ) {
+	    continue;
+	  }
+	  if ( mfset.find(f1->id()) == mfset.find(f2->id()) ) {
+	    continue;
+	  }
+	  bool eq = true;
+	  for (ymuint k = 0; k < n; ++ k) {
+	    EufNode* a1 = f1->arg(k);
+	    EufNode* a2 = f2->arg(k);
+	    ymuint r1 = mfset.find(a1->id());
+	    ymuint r2 = mfset.find(a2->id());
+	    if ( r1 != r2 ) {
+	      eq = false;
+	      break;
+	    }
+	  }
+	  if ( eq ) {
+	    mfset.merge(f1->id(), f2->id());
+	    change = true;
+	  }
+	}
+      }
+      if ( !change ) {
+	break;
+      }
+    }
+
+    // 非等価なノードペアが同値類に含まれていたら矛盾
+    bool conflict = false;
+    for (vector<EufNode*>::iterator p = neq_list.begin();
+	 p != neq_list.end(); ++ p) {
+      EufNode* neq_node = *p;
+      ymuint r1 = mfset.find(neq_node->left()->id());
+      ymuint r2 = mfset.find(neq_node->right()->id());
+      cout << "#" << neq_node->id()
+	   << "->left() = "
+	   << r1 << endl
+	   << "  ->right() = "
+	   << r2 << endl;
+      if ( r1 == r2 ) {
+	cout << " conflict" << endl;
+	vector<Literal> tmp_list;
+	tmp_list.reserve(eq_list.size() + 1);
+	cout << " add ";
+	const char* plus = "";
+	for (vector<EufNode*>::iterator q = eq_list.begin();
+	     q != eq_list.end(); ++ q) {
+	  EufNode* eq_node = *q;
+	  Literal eq_lit(eq_node->var_id(), kPolPosi);
+	  tmp_list.push_back(~eq_lit);
+	  cout << plus << ~eq_lit;
+	  plus = " + ";
+	}
+	Literal neq_lit(neq_node->var_id(), kPolPosi);
+	tmp_list.push_back(neq_lit);
+	cout << " + " << neq_lit << endl;
+	mSolver.add_clause(tmp_list);
+	conflict = true;
+      }
+    }
+    if ( !conflict ) {
+      // 命題論理部分も等価式も矛盾がない．
+      cout << "Invalid" << endl;
+      return false;
+    }
   }
 }
 
