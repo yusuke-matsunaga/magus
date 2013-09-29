@@ -20,7 +20,10 @@ bin_PROGRAMS = \
 	phf \
 	phf_fixed \
 	phf_fixed3 \
-	phf_igu
+	phf_igu \
+	phf_eval \
+	phf_eval2 \
+	phf_eval3
 
 igf_SOURCES = \
 	igf.cc
@@ -95,6 +98,33 @@ phf_igu_SOURCES = \
 	phf_igu.cc
 
 phf_igu_LDADD = \
+	../libphf/libphf.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	@POPT_LIBS@
+
+phf_eval_SOURCES = \
+	phf_eval.cc
+
+phf_eval_LDADD = \
+	../libphf/libphf.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	@POPT_LIBS@
+
+phf_eval2_SOURCES = \
+	phf_eval2.cc
+
+phf_eval2_LDADD = \
+	../libphf/libphf.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	@POPT_LIBS@
+
+phf_eval3_SOURCES = \
+	phf_eval3.cc
+
+phf_eval3_LDADD = \
 	../libphf/libphf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
