@@ -39,4 +39,4 @@ libphf_la_SOURCES = \
 
 libphf_la_LDFLAGS =
 
-libphf_la_LIBADd =
+libphf_la_LIBADD =
