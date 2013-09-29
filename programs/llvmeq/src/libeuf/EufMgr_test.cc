@@ -43,7 +43,10 @@ EufMgr_test(int argc,
 
   display(cout, tmp_list);
 
-  bool stat = euf_mgr.check_validity(node_f_eq_g);
+  vector<EufNode*> assumption;
+  assumption.push_back(node_a_eq_b);
+  assumption.push_back(node_c_eq_d);
+  bool stat = euf_mgr.check_validity(assumption, node_f_eq_g);
   if ( stat ) {
     cout << "f == g" << endl;
   }

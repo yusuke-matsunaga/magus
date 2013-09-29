@@ -89,10 +89,12 @@ public:
   new_negation(EufNode* operand);
 
   /// @brief validity check を行う．
+  /// @param[in] assumption 仮定
   /// @param[in] node 対象のノード
   /// @note node->is_boolean() が true である必要がある．
   bool
-  check_validity(EufNode* node);
+  check_validity(const vector<EufNode*>& assumption,
+		 EufNode* node);
 
 
 private:

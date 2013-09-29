@@ -223,17 +223,26 @@ EufMgr::new_negation(EufNode* operand)
 }
 
 // @brief validity check を行う．
+// @param[in] assumption 仮定
 // @param[in] node 対象のノード
 // @note node->is_boolean() が true である必要がある．
 bool
-EufMgr::check_validity(EufNode* node)
+EufMgr::check_validity(const vector<EufNode*>& node_assumption,
+		       EufNode* node)
 {
   assert_cond( node->is_boolean(), __FILE__, __LINE__);
 
+  vector<Literal> assumption;
+  assumption.reserve(node_assumption.size() + 1);
+  for (vector<EufNode*>::const_iterator p = node_assumption.begin();
+       p != node_assumption.end(); ++ p) {
+    EufNode* node = *p;
+    assumption.push_back(Literal(node->var_id(), kPolPosi));
+  }
   Literal vlit(node->var_id(), kPolPosi);
-  vector<Literal> assumption(1, ~vlit);
-  vector<Bool3> model;
+  assumption.push_back(~vlit);
 
+  vector<Bool3> model;
   for ( ; ; ) {
     Bool3 sat_stat = mSolver.solve(assumption, model);
     if ( sat_stat == kB3False ) {
