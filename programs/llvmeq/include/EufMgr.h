@@ -14,6 +14,10 @@
 
 BEGIN_NAMESPACE_YM_LLVMEQ
 
+class EufVarMgr;
+class EufFuncMgr;
+class EufBinMgr;
+
 //////////////////////////////////////////////////////////////////////
 /// @class EufMgr EufMgr.h "EufMgr.h"
 /// @brief EUF 式を生成するための管理クラス
@@ -82,17 +86,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ID番号をキーにしてオブジェクトを格納した配列
-  vector<EufNode*> mObjArray;
-
   // 変数用のハッシュ
-  hash_map<string, EufNode*> mVarHash;
+  EufVarMgr* mVarMgr;
 
   // 関数用のハッシュ
-  FuncHash mFuncHash;
+  EufFuncMgr* mFuncMgr;
 
-  // 等価式用のハッシュ
-  EqHash mEqHash;
+  // 二項演算子用のハッシュ
+  EufBinMgr* mBinMgr;
+
+  // 次のID番号
+  ymuint32 mLastId;
 
 };
 

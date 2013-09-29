@@ -52,8 +52,7 @@ noinst_PROGRAMS = \
 	mspg_test \
 	mscg_test \
 	CompIDO_test \
-	CompODO_test \
-	mycompress
+	CompODO_test
 
 
 ############################################################

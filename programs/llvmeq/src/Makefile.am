@@ -3,6 +3,6 @@
 ## $Id: Makefile.am 2203 2009-04-16 05:04:40Z matsunaga $
 
 SUBDIRS = \
-	$(YM_EXTRA_SUBDIRS)
+	libeuf
 
 MAINTAINERCLEANFILES = Makefile.in

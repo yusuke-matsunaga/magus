@@ -34,11 +34,10 @@ EufVarMgr::~EufVarMgr()
   delete [] mTable;
 }
 
-// @brief 変数を生成する．
+// @brief 変数を探す．
 // @param[in] name 変数名
-// @note 同じ名前の変数が存在したらそれを返す．
-EufVar*
-EufVarMgr::new_variable(const string& name)
+EufNode*
+EufVarMgr::find(const string& name) const
 {
   ymuint h = hash(name);
   for (EufVar* var = mTable[h]; var != NULL; var = var->mLink) {
@@ -46,16 +45,29 @@ EufVarMgr::new_variable(const string& name)
       return var;
     }
   }
+  return NULL;
+}
 
+// @brief 変数を生成する．
+// @param[in] id ID番号
+// @param[in] name 変数名
+// @note 同じ名前の変数が存在したらそれを返す．
+EufNode*
+EufVarMgr::new_variable(ymuint id,
+			const string& name)
+{
   if ( mNum >= mNextLimit ) {
     expand(mTableSize * 2);
-    h = hash(name);
   }
 
-  EufVar* var = new EufVar(name);
-  ++ mNum;
+  void* p = mAlloc.get_memory(sizeof(EufVar));
+  EufVar* var = new (p) EufVar(id, name);
+
+  ymuint h = hash(name);
   var->mLink = mTable[h];
   mTable[h] = var;
+
+  ++ mNum;
 
   return var;
 }
@@ -87,6 +99,19 @@ EufVarMgr::expand(ymuint req_size)
     }
     delete [] old_table;
   }
+}
+
+// @brief 名前からハッシュ値を計算する．
+ymuint
+EufVarMgr::hash(const string& name) const
+{
+  ymuint h = 0;
+  for (string::const_iterator p = name.begin();
+       p != name.end(); ++ p) {
+    ymuint c = *p;
+    h = h * 37 + c;
+  }
+  return h % mTableSize;
 }
 
 END_NAMESPACE_YM_LLVMEQ

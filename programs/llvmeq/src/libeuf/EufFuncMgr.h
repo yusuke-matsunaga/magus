@@ -10,9 +10,12 @@
 
 
 #include "llvmeq_nsdef.h"
+#include "ym_utils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_LLVMEQ
+
+class EufFunc;
 
 //////////////////////////////////////////////////////////////////////
 /// @class EufFuncMgr EufFuncMgr.h "EufFuncMgr.h"
@@ -34,19 +37,48 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 関数を生成する．
+  /// @brief 関数を探す
   /// @param[in] name 関数名
   /// @param[in] arg_list 引数のリスト
-  /// @note 同じ関数名で同じ引数のインスタンスがあればそれを返す．
-  EufFunc*
-  new_function(const string& name,
+  /// @note 見つからなければ NULL を返す．
+  EufNode*
+  find(const string& name,
+       const vector<EufNode*>& arg_list) const;
+
+  /// @brief 関数を生成する．
+  /// @param[in] id ID番号
+  /// @param[in] name 関数名
+  /// @param[in] arg_list 引数のリスト
+  EufNode*
+  new_function(ymuint id,
+	       const string& name,
 	       const vector<EufNode*>& arg_list);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ハッシュテーブルを拡大する．
+  void
+  expand(ymuint req_size);
+
+  /// @brief ハッシュ値を計算する．
+  /// @param[in] name 関数名
+  /// @param[in] arg_list 引数のリスト
+  ymuint
+  hash(const string& name,
+       const vector<EufNode*>& arg_list) const;
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // EufFunc 用のアロケータ
+  UnitAlloc mAlloc;
 
   // ハッシュ中の要素数
   ymuint32 mNum;

@@ -30,21 +30,25 @@ public:
   /// @brief ノードのタイプを表す列挙型
   enum tType {
     /// @brief conjunction
-    kCon,
+    kCon  = 1,
     /// @brief disjunctoin
-    kDis,
+    kDis  = 2,
     /// @brief negation
-    kNeg,
+    kNeg  = 3,
     /// @brief equality
-    kEq,
+    kEq   = 4,
     /// @brief function
-    kFunc,
+    kFunc = 5,
     /// @brief variable
-    kVar
+    kVar  = 6
   };
 
 
 protected:
+
+  /// @brief コンストラクタ
+  /// @param[in] id ID番号
+  EufNode(ymuint id);
 
   /// @brief デストラクタ
   virtual
@@ -107,10 +111,36 @@ private:
 
 };
 
+/// @relates EufNode
+/// @brief EufNode の内容を出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] node 対象のノード
+extern
+void
+display(ostream& s,
+	const EufNode* node);
+
+/// @relates EufNode
+/// @brief 複数の EufNode の内容を出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] node_list 対象のノードのリスト
+extern
+void
+display(ostream& s,
+	const vector<const EufNode*>& node_list);
+
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] id ID番号
+inline
+EufNode::EufNode(ymuint id) :
+  mId(id)
+{
+}
 
 // @brief ユニークIDを得る．
 inline

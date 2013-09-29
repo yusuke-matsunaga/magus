@@ -21,13 +21,15 @@ BEGIN_NAMESPACE_YM_LLVMEQ
 class EufEq :
   public EufBin
 {
-  friend class EufMgr;
+  friend class EufBinMgr;
 
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] id ID番号
   /// @param[in] left, right 左辺と右辺の式
-  EufEq(EufNode* left,
+  EufEq(ymuint id,
+	EufNode* left,
 	EufNode* right);
 
   /// @brief デストラクタ

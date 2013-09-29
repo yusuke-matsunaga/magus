@@ -1,8 +1,8 @@
-#ifndef EUFVAR_H
-#define EUFVAR_H
+#ifndef EUFBIN_H
+#define EUFBIN_H
 
-/// @file EufVar.h
-/// @brief EufVar のヘッダファイル
+/// @file EufBin.h
+/// @brief EufBin のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -15,23 +15,26 @@
 BEGIN_NAMESPACE_YM_LLVMEQ
 
 //////////////////////////////////////////////////////////////////////
-/// @class EufVar EufVar.h "EufVar.h"
-/// @brief EUF 式の変数を表すクラス
+/// @class EufBin EufBin.h "EufBin.h"
+/// @brief EUF 式の二項演算子を表す基底クラス
 //////////////////////////////////////////////////////////////////////
-class EufVar :
+class EufBin :
   public EufNode
 {
-  friend class EufMgr;
+  friend class EufBinMgr;
 
-private:
+protected:
 
   /// @brief コンストラクタ
-  /// @param[in] name 変数名
-  EufVar(const string& name);
+  /// @param[in] id ID番号
+  /// @param[in] left, right 左辺と右辺の式
+  EufBin(ymuint id,
+	 EufNode* left,
+	 EufNode* right);
 
   /// @brief デストラクタ
   virtual
-  ~EufVar();
+  ~EufBin();
 
 
 public:
@@ -39,16 +42,17 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型を得る．
+  /// @brief 左辺の式を得る．
+  /// @note type() が kCon, kDis, kNeg, kEq の時のみ有効
   virtual
-  tType
-  type() const;
+  EufNode*
+  left() const;
 
-  /// @brief 識別子名を得る．
-  /// @note type() が kFunc, kVar の時のみ有効
+  /// @brief 右辺の式を得る．
+  /// @note type() が kCon, kDis, kEq の時のみ有効
   virtual
-  string
-  id_name() const;
+  EufNode*
+  right() const;
 
 
 private:
@@ -56,14 +60,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 名前
-  string mName;
+  // 左辺
+  EufNode* mLeft;
 
-  // ハッシュで用いるリンク
-  EufVar* mLink;
+  // 右辺
+  EufNode* mRight;
+
+  // ハッシュ用のリンクポインタ
+  EufBin* mLink;
 
 };
 
 END_NAMESPACE_YM_LLVMEQ
 
-#endif // EUFVAR_H
+#endif // EUFBIN_H

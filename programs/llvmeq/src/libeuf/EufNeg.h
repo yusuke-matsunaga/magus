@@ -1,8 +1,8 @@
-#ifndef EUFDIS_H
-#define EUFDIS_H
+#ifndef EUFNEG_H
+#define EUFNEG_H
 
-/// @file EufDis.h
-/// @brief EufDis のヘッダファイル
+/// @file EufNeg.h
+/// @brief EufNeg のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -15,24 +15,28 @@
 BEGIN_NAMESPACE_YM_LLVMEQ
 
 //////////////////////////////////////////////////////////////////////
-/// @class EufDis EufDis.h "EufDis.h"
-/// @brief disjunctive ノードを表すクラス
+/// @class EufNeg EufNeg.h "EufNeg.h"
+/// @brief EUF 式の否定演算子を表すクラス
+///
+/// ちょっと無駄だけどコードを簡単にするために二項演算子の
+/// 継承クラスとなっている．
 //////////////////////////////////////////////////////////////////////
-class EufDis :
+class EufNeg :
   public EufBin
 {
-  friend class EufMgr;
+  friend class EufBinMgr;
 
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] left, right 左辺と右辺の式
-  EufDis(EufNode* left,
-	 EufNode* right);
+  /// @param[in] id ID番号
+  /// @param[in] operand オペランド
+  EufNeg(ymuint id,
+	 EufNode* operand);
 
   /// @brief デストラクタ
   virtual
-  ~EufDis();
+  ~EufNeg();
 
 
 public:
@@ -49,4 +53,4 @@ public:
 
 END_NAMESPACE_YM_LLVMEQ
 
-#endif // EUFCON_H
+#endif // EUFNEG_H

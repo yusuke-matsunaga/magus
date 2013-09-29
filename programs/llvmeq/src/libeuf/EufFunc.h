@@ -21,14 +21,16 @@ BEGIN_NAMESPACE_YM_LLVMEQ
 class EufFunc :
   public EufNode
 {
-  friend class EufMgr;
+  friend class EufFuncMgr;
 
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] id ID番号
   /// @param[in] name 関数名
   /// @param[in] arg_list 引数のリスト
-  EufFunc(const string& name,
+  EufFunc(ymuint id,
+	  const string& name,
 	  const vector<EufNode*>& arg_list);
 
   /// @brief デストラクタ
