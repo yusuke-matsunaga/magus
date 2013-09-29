@@ -1,44 +1,41 @@
-#ifndef EUFNEG_H
-#define EUFNEG_H
+#ifndef EUFBVAR_H
+#define EUFBVAR_H
 
-/// @file EufNeg.h
-/// @brief EufNeg のヘッダファイル
+/// @file EufBVar.h
+/// @brief EufBVar のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "EufBin.h"
+#include "EufVar.h"
 
 
 BEGIN_NAMESPACE_YM_LLVMEQ
 
 //////////////////////////////////////////////////////////////////////
-/// @class EufNeg EufNeg.h "EufNeg.h"
-/// @brief EUF 式の否定演算子を表すクラス
-///
-/// ちょっと無駄だけどコードを簡単にするために二項演算子の
-/// 継承クラスとなっている．
+/// @class EufBVar EufBVar.h "EufBVar.h"
+/// @brief ブール変数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class EufNeg :
-  public EufBin
+class EufBVar :
+  public EufVar
 {
-  friend class EufBinMgr;
+  friend class EufVarMgr;
 
 private:
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
   /// @param[in] vid SatSolver 用の変数番号
-  /// @param[in] operand オペランド
-  EufNeg(ymuint id,
-	 VarId vid,
-	 EufNode* operand);
+  /// @param[in] name 変数名
+  EufBVar(ymuint id,
+	  VarId vid,
+	  const string& name);
 
   /// @brief デストラクタ
   virtual
-  ~EufNeg();
+  ~EufBVar();
 
 
 public:
@@ -61,4 +58,4 @@ public:
 
 END_NAMESPACE_YM_LLVMEQ
 
-#endif // EUFNEG_H
+#endif // EUFVAR_H

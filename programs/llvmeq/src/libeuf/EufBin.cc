@@ -18,11 +18,13 @@ BEGIN_NAMESPACE_YM_LLVMEQ
 
 // @brief コンストラクタ
 // @param[in] id ID番号
+// @param[in] vid SatSolver 用の変数番号
 // @param[in] left, right 左辺と右辺の式
 EufBin::EufBin(ymuint id,
+	       VarId vid,
 	       EufNode* left,
 	       EufNode* right) :
-  EufNode(id),
+  EufNode(id, vid),
   mLeft(left),
   mRight(right)
 {

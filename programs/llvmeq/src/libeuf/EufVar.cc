@@ -18,10 +18,12 @@ BEGIN_NAMESPACE_YM_LLVMEQ
 
 // @brief コンストラクタ
 // @param[in] id ID番号
+// @param[in] vid SatSolver 用の変数番号
 // @param[in] name 変数名
 EufVar::EufVar(ymuint id,
+	       VarId vid,
 	       const string& name) :
-  EufNode(id),
+  EufNode(id, vid),
   mName(name)
 {
   mLink = NULL;
@@ -37,6 +39,13 @@ EufNode::tType
 EufVar::type() const
 {
   return kVar;
+}
+
+// @brief Boolean 型の時 true を返す．
+bool
+EufVar::is_boolean() const
+{
+  return false;
 }
 
 // @brief 識別子名を得る．

@@ -19,21 +19,27 @@ EufMgr_test(int argc,
 {
   EufMgr euf_mgr;
 
-  EufNode* node_a = euf_mgr.new_variable("a");
-  EufNode* node_b = euf_mgr.new_variable("b");
+  EufNode* node_a = euf_mgr.new_variable("a", false);
+  EufNode* node_b = euf_mgr.new_variable("b", false);
+  EufNode* node_c = euf_mgr.new_variable("c", false);
+  EufNode* node_d = euf_mgr.new_variable("d", false);
   EufNode* node_a_eq_b = euf_mgr.new_equality(node_a, node_b);
-  EufNode* node_c = euf_mgr.new_variable("c");
-  EufNode* node_a_eq_c = euf_mgr.new_equality(node_a, node_c);
-  vector<EufNode*> arg_list(3);
+  EufNode* node_c_eq_d = euf_mgr.new_equality(node_c, node_d);
+  vector<EufNode*> arg_list(2);
   arg_list[0] = node_a;
-  arg_list[1] = node_b;
-  arg_list[2] = node_c;
+  arg_list[1] = node_c;
   EufNode* node_f = euf_mgr.new_function("f", arg_list);
+  arg_list[0] = node_b;
+  arg_list[1] = node_d;
+  EufNode* node_g = euf_mgr.new_function("g", arg_list);
+  EufNode* node_f_eq_g = euf_mgr.new_equality(node_f, node_g);
 
   vector<const EufNode*> tmp_list;
-  tmp_list.push_back(node_a_eq_b);
-  tmp_list.push_back(node_a_eq_c);
   tmp_list.push_back(node_f);
+  tmp_list.push_back(node_g);
+  tmp_list.push_back(node_a_eq_b);
+  tmp_list.push_back(node_c_eq_d);
+  tmp_list.push_back(node_f_eq_g);
 
   display(cout, tmp_list);
 

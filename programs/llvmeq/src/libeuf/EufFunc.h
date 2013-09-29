@@ -48,6 +48,12 @@ public:
   tType
   type() const;
 
+  /// @brief Boolean 型の時 true を返す．
+  /// @note 具体的には kCon, kDis, kNeg, kBVar の時 true を返す．
+  virtual
+  bool
+  is_boolean() const;
+
   /// @brief 識別子名を得る．
   /// @note type() が kFunc, kVar の時のみ有効
   virtual

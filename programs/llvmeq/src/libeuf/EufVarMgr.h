@@ -11,6 +11,7 @@
 
 #include "llvmeq_nsdef.h"
 #include "ym_utils/UnitAlloc.h"
+#include "ym_logic/VarId.h"
 
 
 BEGIN_NAMESPACE_YM_LLVMEQ
@@ -45,10 +46,14 @@ public:
 
   /// @brief 変数を生成する．
   /// @param[in] id ID番号
+  /// @param[in] vid SatSolver 用の変数番号
   /// @param[in] name 変数名
+  /// @param[in] bool_flag ブール変数の時 true にするフラグ
   EufNode*
   new_variable(ymuint id,
-	       const string& name);
+	       VarId vid,
+	       const string& name,
+	       bool bool_flag);
 
 
 private:

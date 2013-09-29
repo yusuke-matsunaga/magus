@@ -33,6 +33,7 @@ EufMgr_test_SOURCES = \
 
 EufMgr_test_LDADD = \
 	libeuf.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 
@@ -50,6 +51,8 @@ libeuf_la_SOURCES = \
 	EufBin.cc \
 	EufBinMgr.h \
 	EufBinMgr.cc \
+	EufBVar.h \
+	EufBVar.cc \
 	EufCon.h \
 	EufCon.cc \
 	EufDis.h \

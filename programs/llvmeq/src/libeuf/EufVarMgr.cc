@@ -9,6 +9,7 @@
 
 #include "EufVarMgr.h"
 #include "EufVar.h"
+#include "EufBVar.h"
 
 
 BEGIN_NAMESPACE_YM_LLVMEQ
@@ -50,18 +51,28 @@ EufVarMgr::find(const string& name) const
 
 // @brief 変数を生成する．
 // @param[in] id ID番号
+// @param[in] vid SatSolver 用の変数番号
 // @param[in] name 変数名
-// @note 同じ名前の変数が存在したらそれを返す．
+// @param[in] bool_flag ブール変数の時 true にするフラグ
 EufNode*
 EufVarMgr::new_variable(ymuint id,
-			const string& name)
+			VarId vid,
+			const string& name,
+			bool bool_flag)
 {
   if ( mNum >= mNextLimit ) {
     expand(mTableSize * 2);
   }
 
-  void* p = mAlloc.get_memory(sizeof(EufVar));
-  EufVar* var = new (p) EufVar(id, name);
+  EufVar* var;
+  if ( bool_flag ) {
+    void* p = mAlloc.get_memory(sizeof(EufBVar));
+    var = new (p) EufBVar(id, vid, name);
+  }
+  else {
+    void* p = mAlloc.get_memory(sizeof(EufVar));
+    var = new (p) EufVar(id, vid, name);
+  }
 
   ymuint h = hash(name);
   var->mLink = mTable[h];

@@ -11,6 +11,7 @@
 
 #include "llvmeq_nsdef.h"
 #include "ym_utils/UnitAlloc.h"
+#include "ym_logic/VarId.h"
 
 
 BEGIN_NAMESPACE_YM_LLVMEQ
@@ -66,33 +67,41 @@ public:
 
   /// @brief 等価式を生成する．
   /// @param[in] id ID番号
+  /// @param[in] vid SatSolver 用の変数番号
   /// @param[in] left, right 左辺式，右辺式
   EufNode*
   new_equality(ymuint id,
+	       VarId vid,
 	       EufNode* left,
 	       EufNode* right);
 
   /// @brief 連言(conjunction)を生成する．
   /// @param[in] id ID番号
+  /// @param[in] vid SatSolver 用の変数番号
   /// @param[in] left, right 左辺式，右辺式
   EufNode*
   new_conjunction(ymuint id,
+		  VarId vid,
 		  EufNode* left,
 		  EufNode* right);
 
   /// @brief 選言(disjunction)を生成する．
   /// @param[in] id ID番号
+  /// @param[in] vid SatSolver 用の変数番号
   /// @param[in] left, right 左辺式，右辺式
   EufNode*
   new_disjunction(ymuint id,
+		  VarId vid,
 		  EufNode* left,
 		  EufNode* right);
 
   /// @brief 否定(negation)を生成する．
   /// @param[in] id ID番号
+  /// @param[in] vid SatSolver 用の変数番号
   /// @param[in] left オペランド
   EufNode*
   new_negation(ymuint id,
+	       VarId vid,
 	       EufNode* left);
 
 

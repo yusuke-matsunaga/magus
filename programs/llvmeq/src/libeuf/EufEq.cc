@@ -18,11 +18,13 @@ BEGIN_NAMESPACE_YM_LLVMEQ
 
 // @brief コンストラクタ
 // @param[in] id ID番号
+// @param[in] vid SatSolver 用の変数番号
 // @param[in] left, right 左辺と右辺の式
 EufEq::EufEq(ymuint id,
+	     VarId vid,
 	     EufNode* left,
 	     EufNode* right) :
-  EufBin(id, left, right)
+  EufBin(id, vid, left, right)
 {
 }
 
@@ -36,6 +38,13 @@ EufNode::tType
 EufEq::type() const
 {
   return kEq;
+}
+
+// @brief Boolean 型の時 true を返す．
+bool
+EufEq::is_boolean() const
+{
+  return true;
 }
 
 END_NAMESPACE_YM_LLVMEQ

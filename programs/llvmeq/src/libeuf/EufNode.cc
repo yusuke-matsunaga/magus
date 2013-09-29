@@ -105,6 +105,7 @@ dfs(ostream& s,
   s << ": ";
   switch( node->type() ) {
   case EufNode::kCon:
+    s << "$" << node->var_id() << " ";
     s << "CON  (";
     disp_id(s, node->left());
     s << " ";
@@ -115,6 +116,7 @@ dfs(ostream& s,
     break;
 
   case EufNode::kDis:
+    s << "$" << node->var_id() << " ";
     s << "DIS  (";
     disp_id(s, node->left());
     s << " ";
@@ -125,6 +127,7 @@ dfs(ostream& s,
     break;
 
   case EufNode::kNeg:
+    s << "$" << node->var_id() << " ";
     s << "NOT  (";
     disp_id(s, node->left());
     s << ")" << endl;
@@ -132,6 +135,7 @@ dfs(ostream& s,
     break;
 
   case EufNode::kEq:
+    s << "$" << node->var_id() << " ";
     s << "EQ   (";
     disp_id(s, node->left());
     s << " ";
@@ -154,6 +158,11 @@ dfs(ostream& s,
 
   case EufNode::kVar:
     s << "VAR  [" << node->id_name() << "]" << endl;
+    break;
+
+  case EufNode::kBVar:
+    s << "$" << node->var_id() << " ";
+    s << "BVAR [" << node->id_name() << "]" << endl;
     break;
   }
 

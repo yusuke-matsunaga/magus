@@ -10,6 +10,7 @@
 
 
 #include "llvmeq_nsdef.h"
+#include "ym_logic/VarId.h"
 
 
 BEGIN_NAMESPACE_YM_LLVMEQ
@@ -40,7 +41,9 @@ public:
     /// @brief function
     kFunc = 5,
     /// @brief variable
-    kVar  = 6
+    kVar  = 6,
+    /// @brief boolean variable
+    kBVar = 7,
   };
 
 
@@ -48,7 +51,9 @@ protected:
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
-  EufNode(ymuint id);
+  /// @param[in] vid SatSolver 用の変数番号
+  EufNode(ymuint id,
+	  VarId vid);
 
   /// @brief デストラクタ
   virtual
@@ -64,10 +69,20 @@ public:
   ymuint
   id() const;
 
+  /// @biref SatSolver 用の変数番号を得る．
+  VarId
+  var_id() const;
+
   /// @brief 型を得る．
   virtual
   tType
   type() const = 0;
+
+  /// @brief Boolean 型の時 true を返す．
+  /// @note 具体的には kCon, kDis, kNeg, kEq, kBVar の時 true を返す．
+  virtual
+  bool
+  is_boolean() const = 0;
 
   /// @brief 左辺の式を得る．
   /// @note type() が kCon, kDis, kNeg, kEq の時のみ有効
@@ -109,6 +124,9 @@ private:
   // ID番号
   ymuint32 mId;
 
+  // SatSolver 用の変数番号
+  VarId mVarId;
+
 };
 
 /// @relates EufNode
@@ -136,9 +154,12 @@ display(ostream& s,
 
 // @brief コンストラクタ
 // @param[in] id ID番号
+// @param[in] vid SatSolver 用の変数番号
 inline
-EufNode::EufNode(ymuint id) :
-  mId(id)
+EufNode::EufNode(ymuint id,
+		 VarId vid) :
+  mId(id),
+  mVarId(vid)
 {
 }
 
@@ -148,6 +169,14 @@ ymuint
 EufNode::id() const
 {
   return mId;
+}
+
+// @biref SatSolver 用の変数番号を得る．
+inline
+VarId
+EufNode::var_id() const
+{
+  return mVarId;
 }
 
 END_NAMESPACE_YM_LLVMEQ

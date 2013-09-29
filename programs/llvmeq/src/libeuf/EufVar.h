@@ -23,12 +23,14 @@ class EufVar :
 {
   friend class EufVarMgr;
 
-private:
+protected:
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
+  /// @param[in] vid SatSolver 用の変数番号
   /// @param[in] name 変数名
   EufVar(ymuint id,
+	 VarId vid,
 	 const string& name);
 
   /// @brief デストラクタ
@@ -45,6 +47,12 @@ public:
   virtual
   tType
   type() const;
+
+  /// @brief Boolean 型の時 true を返す．
+  /// @note 具体的には kCon, kDis, kNeg, kBVar の時 true を返す．
+  virtual
+  bool
+  is_boolean() const;
 
   /// @brief 識別子名を得る．
   /// @note type() が kFunc, kVar の時のみ有効

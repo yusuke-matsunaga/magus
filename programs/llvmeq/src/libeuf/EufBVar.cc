@@ -1,48 +1,47 @@
 
-/// @file EufDis.cc
-/// @brief EufDis の実装ファイル
+/// @file EufBVar.cc
+/// @brief EufBVar の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "EufDis.h"
+#include "EufBVar.h"
 
 
 BEGIN_NAMESPACE_YM_LLVMEQ
 
 //////////////////////////////////////////////////////////////////////
-// クラス EufDis
+// クラス EufVar
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] id ID番号
 // @param[in] vid SatSolver 用の変数番号
-// @param[in] left, right 左辺と右辺の式
-EufDis::EufDis(ymuint id,
-	       VarId vid,
-	       EufNode* left,
-	       EufNode* right) :
-  EufBin(id, vid, left, right)
+// @param[in] name 変数名
+EufBVar::EufBVar(ymuint id,
+		 VarId vid,
+		 const string& name) :
+  EufVar(id, vid, name)
 {
 }
 
 // @brief デストラクタ
-EufDis::~EufDis()
+EufBVar::~EufBVar()
 {
 }
 
 // @brief 型を得る．
 EufNode::tType
-EufDis::type() const
+EufBVar::type() const
 {
-  return kDis;
+  return kBVar;
 }
 
 // @brief Boolean 型の時 true を返す．
 bool
-EufDis::is_boolean() const
+EufBVar::is_boolean() const
 {
   return true;
 }

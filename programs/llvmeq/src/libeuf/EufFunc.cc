@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_LLVMEQ
 EufFunc::EufFunc(ymuint id,
 		 const string& name,
 		 const vector<EufNode*>& arg_list) :
-  EufNode(id),
+  EufNode(id, VarId(0)),
   mName(name),
   mArgList(arg_list)
 {
@@ -39,6 +39,13 @@ EufNode::tType
 EufFunc::type() const
 {
   return kFunc;
+}
+
+// @brief Boolean 型の時 true を返す．
+bool
+EufFunc::is_boolean() const
+{
+  return false;
 }
 
 // @brief 識別子名を得る．

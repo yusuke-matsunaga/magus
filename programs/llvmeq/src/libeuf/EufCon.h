@@ -27,8 +27,10 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
+  /// @param[in] vid SatSolver 用の変数番号
   /// @param[in] left, right 左辺と右辺の式
   EufCon(ymuint id,
+	 VarId vid,
 	 EufNode* left,
 	 EufNode* right);
 
@@ -46,6 +48,12 @@ public:
   virtual
   tType
   type() const;
+
+  /// @brief Boolean 型の時 true を返す．
+  /// @note 具体的には kCon, kDis, kNeg, kBVar の時 true を返す．
+  virtual
+  bool
+  is_boolean() const;
 
 };
 
