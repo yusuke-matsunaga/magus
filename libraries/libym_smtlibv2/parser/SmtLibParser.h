@@ -39,12 +39,19 @@ public:
 
 public:
 
-  /// @brief smtlib ファイルを読み込んでライブラリを生成する．
+  /// @brief ファイルを開く
   /// @param[in] filename ファイル名
-  /// @return 生成したライブラリを返す．
-  /// @note 読み込みが失敗したら NULL を返す．
-  void
-  read(const string& filename);
+  /// @retval true 成功した．
+  /// @retval false 失敗した．
+  bool
+  open(const string& filename);
+
+  /// @brief S式を一つ読み込む．
+  /// @param[out] error エラーが起きたら true を格納する．
+  /// @return 読み込んだ S式を表すノードを返す．
+  /// @note 末尾まで読んでいたら NULL を返す．
+  SmtLibNode*
+  read(bool& error);
 
   /// @brief 今までに生成したすべてのオブジェクトを解放する．
   void
@@ -121,18 +128,6 @@ private:
   new_list(const FileRegion& loc,
 	   const list<SmtLibNode*>& child_list);
 
-  /// @brief エラーメッセージを出力する．
-  /// @note 副作用で mError が true にセットされる．
-  void
-  error(const FileRegion& loc,
-	const char* msg);
-
-  /// @brief S式の内容を出力する．
-  /// @note デバッグ用
-  void
-  dump(ostream& s,
-       const SmtLibNode* node);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -144,9 +139,6 @@ private:
 
   // 字句解析器
   SmtLibScanner mScanner;
-
-  // 読み込み時のエラーの有無を示すフラグ
-  bool mError;
 
 };
 

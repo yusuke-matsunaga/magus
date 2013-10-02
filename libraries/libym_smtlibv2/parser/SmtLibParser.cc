@@ -32,12 +32,12 @@ SmtLibParser::~SmtLibParser()
   clear();
 }
 
-// @brief smtlib ファイルを読み込んでライブラリを生成する．
+// @brief ファイルを開く
 // @param[in] filename ファイル名
-// @return 生成したライブラリを返す．
-// @note 読み込みが失敗したら NULL を返す．
-void
-SmtLibParser::read(const string& filename)
+// @retval true 成功した．
+// @retval false 失敗した．
+bool
+SmtLibParser::open(const string& filename)
 {
   if ( !mScanner.open_file(filename) ) {
     // エラー
@@ -47,45 +47,50 @@ SmtLibParser::read(const string& filename)
 		    FileRegion(),
 		    kMsgFailure,
 		    "SMTLIB_PARSER", buf.str());
-    return;
+    return false;
   }
 
   // 初期化
   clear();
-  mError = false;
 
+  return true;
+}
+
+// @brief S式を一つ読み込む．
+// @param[out] error エラーが起きたら true を格納する．
+// @return 読み込んだ S式を表すノードを返す．
+SmtLibNode*
+SmtLibParser::read(bool& error)
+{
   for ( ; ; ) {
     SmtLibNode* root = NULL;
     FileRegion loc;
     tTokenType type = read_sexp(root, loc);
     if ( type == kEofToken ) {
-      break;
+      // ファイルの末尾まで読んだ
+      return NULL;
+    }
+    else if ( type == kNlToken ) {
+      // 改行コードは無視する．
+      continue;
     }
     else if ( type == kErrorToken ) {
-      mError = true;
+      // 字句解析レベルでエラーが起きている．
+      error = true;
+      return NULL;
     }
     else if ( type == kRpToken ) {
+      // 対応する左括弧がない．
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      loc,
 		      kMsgError,
 		      "SMTLIB_PARSER",
 		      "Unexpected ')'.");
-      mError = true;
+      error = true;
+      return NULL;
     }
-    else if ( type == kNlToken ) {
-      ;
-    }
-    else {
-      dump(cout, root);
-    }
+    return root;
   }
-
-  if ( mError ) {
-    // 異常終了
-    return;
-  }
-
-  // 読み込みまではうまくいった．
 }
 
 // 今までに生成したすべてのオブジェクトを解放する．
@@ -162,13 +167,6 @@ SmtLibParser::read_sexp(SmtLibNode*& node,
     break;
 
   case kRpToken:
-    // kLpToken に対応していない kRpToken はエラー
-    MsgMgr::put_msg(__FILE__, __LINE__,
-		    loc,
-		    kMsgError,
-		    "SMTLIB_PARSER",
-		    "Unmatched ')'.");
-    type = kErrorToken;
     break;
 
   default:
@@ -274,39 +272,37 @@ SmtLibParser::new_list(const FileRegion& loc,
   return node;
 }
 
-// @brief エラーメッセージを出力する．
-// @note 副作用で mError が true にセットされる．
-void
-SmtLibParser::error(const FileRegion& loc,
-		    const char* msg)
-{
-  string buff;
-  const char* msg2;
-  // 好みの問題だけど "parse error" よりは "syntax error" の方が好き．
-  if ( !strncmp(msg, "parse error", 11) ) {
-    buff ="syntax error";
-    buff += (msg + 11);
-    msg2 = buff.c_str();
-  }
-  else {
-    msg2 = msg;
-  }
 
-  MsgMgr::put_msg(__FILE__, __LINE__,
-		  loc,
-		  kMsgError,
-		  "SMTLIB_PARSER",
-		  msg2);
-  mError = true;
+BEGIN_NONAMESPACE
+
+// 字下げ用の空白を出力する．
+void
+print_space(ostream& s,
+	    ymuint ident_level)
+{
+  for (ymuint i = 0; i < ident_level; ++ i) {
+    s << "  ";
+  }
 }
 
-// @brief S式の内容を出力する．
-// @note デバッグ用
+END_NONAMESPACE
+
+// @relates SmtLibNode
+// @brief SmbLitNode の内容を出力する(デバッグ用)．
+// @param[in] s 出力先のストリーム
+// @param[in] node 対象のノード
+// @param[in] ident_level 字下げのレベル
+// @param[in] print_loc ファイル位置の情報を出力するとき true にするフラグ
 void
-SmtLibParser::dump(ostream& s,
-		   const SmtLibNode* node)
+display(ostream& s,
+	const SmtLibNode* node,
+	ymuint ident_level,
+	bool print_loc)
 {
-  s << "Loc:  " << node->loc() << endl;
+  if ( print_loc ) {
+    print_space(s, ident_level);
+    s << "Loc:  " << node->loc() << endl;
+  }
   const char* type_str = NULL;
   switch ( node->type() ) {
   case kNumToken:     type_str = "Numeral"; break;
@@ -320,16 +316,20 @@ SmtLibParser::dump(ostream& s,
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
+  print_space(s, ident_level);
   s << "Type: " << type_str << endl;
   if ( node->type() == kListToken ) {
+    ymuint ident_level1 = ident_level + 1;
     ymuint n = node->child_num();
     for (ymuint i = 0; i < n; ++ i) {
       const SmtLibNode* node1 = node->child(i);
+      print_space(s, ident_level1);
       s << "Child#" << i << endl;
-      dump(s, node1);
+      display(s, node1, ident_level1, print_loc);
     }
   }
   else {
+    print_space(s, ident_level);
     s << "Value: " << node->value() << endl;
   }
 }

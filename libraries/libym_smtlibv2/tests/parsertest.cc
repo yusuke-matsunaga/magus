@@ -7,6 +7,7 @@
 /// All rights reserved.
 
 
+#include "ym_smtlibv2/SmtLibNode.h"
 #include "SmtLibParser.h"
 
 
@@ -17,7 +18,23 @@ parsertest(const string& filename)
 {
   SmtLibParser parser;
 
-  parser.read(filename);
+  if ( !parser.open(filename) ) {
+    cout << filename << ": No such file" << endl;
+    return;
+  }
+
+  for ( ; ; ) {
+    bool error = false;
+    const SmtLibNode* node = parser.read(error);
+    if ( error ) {
+      cout << "Error" << endl;
+      return;
+    }
+    if ( node == NULL ) {
+      break;
+    }
+    display(cout, node);
+  }
 
 }
 
