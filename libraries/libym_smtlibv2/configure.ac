@@ -113,7 +113,9 @@ AC_SUBST([YMTOOLS_BUILDDIR])
 # ===================================================================
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([ym_smtlibv2/Makefile])
+AC_CONFIG_FILES([include/Makefile])
 AC_CONFIG_FILES([parser/Makefile])
+AC_CONFIG_FILES([main/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 
 

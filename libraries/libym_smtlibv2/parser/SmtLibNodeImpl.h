@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_smtlibv2/SmtLibNode.h"
+#include "SmtLibNode.h"
 #include "ym_utils/ShString.h"
 
 

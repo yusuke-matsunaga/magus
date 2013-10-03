@@ -17,10 +17,13 @@
 #include "ym_utils/SimpleAlloc.h"
 #include "ym_utils/ShString.h"
 
+#include "TokenType.h"
 #include "SmtLibScanner.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
+
+class SmtLibNode;
 
 //////////////////////////////////////////////////////////////////////
 /// @class SmtLibParser SmtLibParser.h "SmtLibParser.h"

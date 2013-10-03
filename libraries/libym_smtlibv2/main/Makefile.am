@@ -13,24 +13,28 @@ MAINTAINERCLEANFILES = Makefile.in
 ## build targets
 ############################################################
 noinst_LTLIBRARIES = \
-	libym_smt_parser.la
+	libym_smt_main.la
 
 
 ############################################################
-## libym_smt_parser.la
+## libym_smt_main.la
 ############################################################
-libym_smt_parser_la_CPPFLAGS = \
+libym_smt_main_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
 
-libym_smt_parser_la_SOURCES = \
-	SmtLibScanner.h \
-	SmtLibScanner.cc \
-	SmtLibNodeImpl.h \
-	SmtLibNodeImpl.cc \
-	SmtLibParser.cc
+libym_smt_main_la_SOURCES = \
+	SmtExpr.cc \
+	SmtConstExpr.cc \
+	SmtKeywordExpr.cc \
+	SmtListExpr.cc \
+	SmtSymbolExpr.cc \
+	SmtTerm.cc \
+	SmtConstTerm.cc \
+	SmtIdTerm.cc \
+	SmtBodyTerm.cc
 
-libym_smt_parser_la_LIBADD =
+libym_smt_main_la_LIBADD =
 
-libym_smt_parser_la_LDFLAGS =
+libym_smt_main_la_LDFLAGS =

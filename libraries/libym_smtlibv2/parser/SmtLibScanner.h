@@ -16,6 +16,8 @@
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/StrBuff.h"
 
+#include "TokenType.h"
+
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 

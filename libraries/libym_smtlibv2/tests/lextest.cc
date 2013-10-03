@@ -14,8 +14,6 @@
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-
-
 void
 lextest(const string& filename)
 {

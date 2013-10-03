@@ -25,43 +25,37 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-/// @brief トークンの種類
-enum tTokenType {
-  /// @brief NUMERAL
-  kNumToken,
-  /// @brief DECIMAL
-  kDecToken,
-  /// @brief HEXADECIMAL
-  kHexToken,
-  /// @brief BINARY
-  kBinToken,
-  /// @brief STRING
-  kStringToken,
-  /// @brief SYMBOL
-  kSymbolToken,
-  /// @brief KEYWORD
-  kKeywordToken,
-  /// @brief LIST
-  kListToken,
-  /// @brief (
-  kLpToken,
-  /// @brief )
-  kRpToken,
-  /// @brief NL
-  kNlToken,
-  /// @brief ERROR
-  kErrorToken,
-  /// @brief EOF
-  kEofToken
+//////////////////////////////////////////////////////////////////////
+/// @brief SmtLib の処理結果を表す列挙型
+//////////////////////////////////////////////////////////////////////
+enum tSmtLibResponse {
+  /// @brief 成功
+  kSmtLibSuccess,
+  /// @brief エラー
+  kSmtLibError,
+  /// @brief 未サポート
+  kSmtLibUnsupported
 };
 
 
 // クラス名の宣言
-class SmtLibNode;
+class SmtAttr;
+class SmtConst;
+class SmtExpr;
+class SmtIdentifier;
+class SmtSort;
+class SmtTerm;
 
 END_NAMESPACE_YM_SMTLIBV2
 
 BEGIN_NAMESPACE_YM
+
+using nsSmtLibV2::SmtAttr;
+using nsSmtLibV2::SmtConst;
+using nsSmtLibV2::SmtExpr;
+using nsSmtLibV2::SmtIdentifier;
+using nsSmtLibV2::SmtSort;
+using nsSmtLibV2::SmtTerm;
 
 END_NAMESPACE_YM
 
