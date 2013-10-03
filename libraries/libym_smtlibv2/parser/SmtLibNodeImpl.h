@@ -16,51 +16,11 @@
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 //////////////////////////////////////////////////////////////////////
-/// @class SmtLibNodeBase SmtLibNodeImpl.h "SmtLibNodeImpl.h"
-/// @brief SmtLibNode の継承クラス
-//////////////////////////////////////////////////////////////////////
-class SmtLibNodeBase :
-  public SmtLibNode
-{
-protected:
-
-  /// @brief コンストラクタ
-  /// @param[in] loc ファイル上の位置
-  SmtLibNodeBase(const FileRegion& loc);
-
-  /// @brief デストラクタ
-  virtual
-  ~SmtLibNodeBase();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // SmtLibNode の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ファイル上の位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // ファイル上の位置
-  FileRegion mLoc;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class SmtLibTerminalNode SmtLibNodeImpl.h "SmtLibNodeImpl.h"
 /// @brief 終端ノードを表す SmtLibNode の継承クラス
 //////////////////////////////////////////////////////////////////////
 class SmtLibTerminalNode :
-  public SmtLibNodeBase
+  public SmtLibNode
 {
 protected:
 
@@ -84,17 +44,6 @@ public:
   virtual
   const char*
   value() const;
-
-  /// @brief LIST型の場合の子供のノードの要素数を返す．
-  virtual
-  ymuint
-  child_num() const;
-
-  /// @brief LIST型の場合の子供のノードを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
-  virtual
-  const SmtLibNode*
-  child(ymuint pos) const;
 
 
 private:
@@ -252,7 +201,7 @@ public:
 /// @class SmtLibStringNode SmtLibNodeImpl.h "SmtLibNodeImpl.h"
 /// @brief String を表す SmtLibNode の継承クラス
 //////////////////////////////////////////////////////////////////////
-class SmtLibStringNode :
+class SmtLibStrNode :
   public SmtLibTerminalNode
 {
   friend class SmtLibParser;
@@ -262,12 +211,12 @@ private:
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
-  SmtLibStringNode(const FileRegion& loc,
-		   const ShString& val);
+  SmtLibStrNode(const FileRegion& loc,
+		const ShString& val);
 
   /// @brief デストラクタ
   virtual
-  ~SmtLibStringNode();
+  ~SmtLibStrNode();
 
 
 public:
@@ -358,7 +307,7 @@ public:
 /// @brief 終端ノードを表す SmtLibNode の継承クラス
 //////////////////////////////////////////////////////////////////////
 class SmtLibListNode :
-  public SmtLibNodeBase
+  public SmtLibNode
 {
   friend class SmtLibParser;
 
@@ -366,7 +315,9 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
-  SmtLibListNode(const FileRegion& loc);
+  SmtLibListNode(const FileRegion& loc,
+		 ymuint num,
+		 const SmtLibNode* child);
 
   /// @brief デストラクタ
   virtual
@@ -383,21 +334,15 @@ public:
   tTokenType
   type() const;
 
-  /// @brief 終端型の場合の値を返す．
-  virtual
-  const char*
-  value() const;
-
   /// @brief LIST型の場合の子供のノードの要素数を返す．
   virtual
   ymuint
   child_num() const;
 
-  /// @brief LIST型の場合の子供のノードを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
+  /// @brief LIST型の場合の子供の先頭のノードを返す．
   virtual
   const SmtLibNode*
-  child(ymuint pos) const;
+  child() const;
 
 
 private:
@@ -408,8 +353,8 @@ private:
   // 子供の要素数
   ymuint32 mChildNum;
 
-  // 子供のノードの配列
-  SmtLibNode** mChildArray;
+  // 子供のノード
+  const SmtLibNode* mChild;
 
 };
 

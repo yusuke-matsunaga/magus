@@ -1,0 +1,50 @@
+#ifndef SMTLIBINTERPRETER_H
+#define SMTLIBINTERPRETER_H
+
+/// @file SmtLibInterpreter.h
+/// @brief SmtLibInterpreter のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2013 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "ym_smtlibv2/smtlibv2_nsdef.h"
+
+
+BEGIN_NAMESPACE_YM_SMTLIBV2
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtLibInterpreter SmtLibInterpreter.h "SmtLibInterpreter.h"
+/// @brief SmtLib フォーマットのファイルを解釈するインタプリタクラス
+//////////////////////////////////////////////////////////////////////
+SmtLibInterpreter
+{
+ public:
+
+  /// @brief コンストラクタ
+  SmtLibInterpreter();
+
+  /// @brief デストラクタ
+  ~SmtLibInterpreter();
+
+
+ public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+
+
+ private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+
+
+};
+
+END_NAMESPACE_YM_SMTLIBV2
+
+#endif // SMTLIBINTERPRETER_H

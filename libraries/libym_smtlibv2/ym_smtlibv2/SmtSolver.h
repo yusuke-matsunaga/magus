@@ -40,6 +40,34 @@ public:
   tSmtLibResponse
   set_logic(const ShString& val) = 0;
 
+  /// @brief get-option 文の処理を行なう．
+  /// @param[in] keyword オプションのキーワード
+  virtual
+  tSmtLibResponse
+  get_option(const ShString& keyword) = 0;
+
+  /// @brief set-option 文の処理を行なう．
+  /// @param[in] keyword オプションのキーワード
+  /// @param[in] attr 属性値を表すノード
+  virtual
+  tSmtLibResponse
+  set_option(const ShString& keyword,
+	     const SmtExpr* attr) = 0;
+
+  /// @brief get-info 文の処理を行なう．
+  /// @param[in] keyword オプションのキーワード
+  virtual
+  tSmtLibResponse
+  get_info(const ShString& keyword) = 0;
+
+  /// @brief set-info 文の処理を行なう．
+  /// @param[in] keyword オプションのキーワード
+  /// @param[in] attr 属性値を表すノード
+  virtual
+  tSmtLibResponse
+  set_info(const ShString& keyword,
+	   const SmtExpr* attr) = 0;
+
   /// @brief declare-sort 文の処理を行なう．
   /// @param[in] name 型名
   /// @param[in] arg_num 引数の数
@@ -122,34 +150,6 @@ public:
   virtual
   tSmtLibResponse
   pop(ymuint level) = 0;
-
-  /// @brief get-option 文の処理を行なう．
-  /// @param[in] keyword オプションのキーワード
-  virtual
-  tSmtLibResponse
-  get_option(const ShString& keyword) = 0;
-
-  /// @brief set-option 文の処理を行なう．
-  /// @param[in] keyword オプションのキーワード
-  /// @param[in] attr 属性値を表すノード
-  virtual
-  tSmtLibResponse
-  set_option(const ShString& keyword,
-	     const SmtExpr* attr) = 0;
-
-  /// @brief get-info 文の処理を行なう．
-  /// @param[in] keyword オプションのキーワード
-  virtual
-  tSmtLibResponse
-  get_info(const ShString& keyword) = 0;
-
-  /// @brief set-info 文の処理を行なう．
-  /// @param[in] keyword オプションのキーワード
-  /// @param[in] attr 属性値を表すノード
-  virtual
-  tSmtLibResponse
-  set_info(const ShString& keyword,
-	   const SmtExpr* attr) = 0;
 
 };
 

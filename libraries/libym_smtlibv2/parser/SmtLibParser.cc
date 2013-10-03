@@ -100,6 +100,11 @@ SmtLibParser::clear()
   mAlloc.destroy();
 }
 
+// @brief S式の読み込みを行う．
+// @param[out] node 読み込んだ S式を格納するノード
+// @param[out] loc S式のファイル上の位置
+// @return トークンの型を返す．
+// @note node は NULL の場合もある．
 tTokenType
 SmtLibParser::read_sexp(SmtLibNode*& node,
 			FileRegion& loc)
@@ -141,7 +146,9 @@ SmtLibParser::read_sexp(SmtLibNode*& node,
 
   case kLpToken:
     {
-      list<SmtLibNode*> child_list;
+      SmtLibNode* top = NULL;
+      SmtLibNode** last_ptr = &top;
+      ymuint num = 0;
       FileRegion last_loc;
       for ( ; ; ) {
 	SmtLibNode* node1;
@@ -155,10 +162,12 @@ SmtLibParser::read_sexp(SmtLibNode*& node,
 	  last_loc = loc1;
 	  break;
 	}
-	child_list.push_back(node1);
+	*last_ptr = node1;
+	last_ptr = &node1->mSibling;
+	++ num;
 	last_loc = loc1;
       }
-      node = new_list(FileRegion(loc, last_loc), child_list);
+      node = new_list(FileRegion(loc, last_loc), num, top);
     }
     type = kListToken;
     break;
@@ -226,8 +235,8 @@ SmtLibNode*
 SmtLibParser::new_string(const FileRegion& loc,
 			 const ShString& val)
 {
-  void* p = mAlloc.get_memory(sizeof(SmtLibStringNode));
-  return new (p) SmtLibStringNode(loc, val);
+  void* p = mAlloc.get_memory(sizeof(SmtLibStrNode));
+  return new (p) SmtLibStrNode(loc, val);
 }
 
 // @brief SYMBOL タイプのノードを生成する．
@@ -255,21 +264,11 @@ SmtLibParser::new_keyword(const FileRegion& loc,
 // @brief LIST タイプのノードを生成する．
 SmtLibNode*
 SmtLibParser::new_list(const FileRegion& loc,
-		       const list<SmtLibNode*>& child_list)
+		       ymuint num,
+		       const SmtLibNode* child)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibListNode));
-  SmtLibListNode* node = new (p) SmtLibListNode(loc);
-
-  ymuint n = child_list.size();
-  void* q = mAlloc.get_memory(sizeof(SmtLibNode*) * n);
-  node->mChildNum = n;
-  node->mChildArray = new (q) SmtLibNode*[n];
-  ymuint i = 0;
-  for (list<SmtLibNode*>::const_iterator p = child_list.begin();
-       p != child_list.end(); ++ p, ++ i) {
-    node->mChildArray[i] = *p;
-  }
-  return node;
+  return new (p) SmtLibListNode(loc, num, child);
 }
 
 
@@ -321,11 +320,11 @@ display(ostream& s,
   if ( node->type() == kListToken ) {
     ymuint ident_level1 = ident_level + 1;
     ymuint n = node->child_num();
-    for (ymuint i = 0; i < n; ++ i) {
-      const SmtLibNode* node1 = node->child(i);
+    const SmtLibNode* child = node->child();
+    for (ymuint i = 0; i < n; ++ i, child = child->sibling()) {
       print_space(s, ident_level1);
       s << "Child#" << i << endl;
-      display(s, node1, ident_level1, print_loc);
+      display(s, child, ident_level1, print_loc);
     }
   }
   else {

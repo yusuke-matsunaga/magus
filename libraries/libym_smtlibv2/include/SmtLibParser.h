@@ -126,10 +126,12 @@ private:
 
   /// @brief LIST タイプのノードを生成する．
   /// @param[in] loc ファイル上の位置
-  /// @param[in] child_list 子供のノードのリスト
+  /// @param[in] num 子供の数
+  /// @param[in] child 子供のノード
   SmtLibNode*
   new_list(const FileRegion& loc,
-	   const list<SmtLibNode*>& child_list);
+	   ymuint num,
+	   const SmtLibNode* child);
 
 
 private:

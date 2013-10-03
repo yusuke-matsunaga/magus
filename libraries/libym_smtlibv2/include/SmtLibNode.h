@@ -22,11 +22,15 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 //////////////////////////////////////////////////////////////////////
 class SmtLibNode
 {
-public:
+  friend class SmtLibParser;
+protected:
+
+  /// @brief コンストラクタ
+  SmtLibNode(const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~SmtLibNode() { }
+  ~SmtLibNode();
 
 
 public:
@@ -40,25 +44,39 @@ public:
   type() const = 0;
 
   /// @brief ファイル上の位置を返す．
-  virtual
   FileRegion
-  loc() const = 0;
+  loc() const;
 
   /// @brief 終端型の場合の値を返す．
   virtual
   const char*
-  value() const = 0;
+  value() const;
 
   /// @brief LIST型の場合の子供のノードの要素数を返す．
   virtual
   ymuint
-  child_num() const = 0;
+  child_num() const;
 
-  /// @brief LIST型の場合の子供のノードを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
+  /// @brief LIST型の場合の子供の先頭のノードを返す．
   virtual
   const SmtLibNode*
-  child(ymuint pos) const = 0;
+  child() const;
+
+  /// @brief LISTの要素の場合の次のノードを返す．
+  const SmtLibNode*
+  sibling() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ファイル上の位置
+  FileRegion mLoc;
+
+  // 次のノード
+  SmtLibNode* mSibling;
 
 };
 
@@ -75,6 +93,27 @@ display(ostream& s,
 	const SmtLibNode* node,
 	ymuint ident_level = 0,
 	bool print_loc = false);
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief ファイル上の位置を返す．
+inline
+FileRegion
+SmtLibNode::loc() const
+{
+  return mLoc;
+}
+
+// @brief LISTの要素の場合の次のノードを返す．
+inline
+const SmtLibNode*
+SmtLibNode::sibling() const
+{
+  return mSibling;
+}
 
 END_NAMESPACE_YM_SMTLIBV2
 

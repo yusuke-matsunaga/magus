@@ -13,26 +13,43 @@
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 //////////////////////////////////////////////////////////////////////
-// クラス SmtLibNodeBase
+// クラス SmtLibNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] loc ファイル上の位置
-SmtLibNodeBase::SmtLibNodeBase(const FileRegion& loc) :
-  mLoc(loc)
+SmtLibNode::SmtLibNode(const FileRegion& loc) :
+  mLoc(loc),
+  mSibling(NULL)
 {
 }
 
 // @brief デストラクタ
-SmtLibNodeBase::~SmtLibNodeBase()
+SmtLibNode::~SmtLibNode()
 {
 }
 
-// @brief ファイル上の位置を返す．
-FileRegion
-SmtLibNodeBase::loc() const
+// @brief 終端型の場合の値を返す．
+const char*
+SmtLibNode::value() const
 {
-  return mLoc;
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief LIST型の場合の子供のノードの要素数を返す．
+ymuint
+SmtLibNode::child_num() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
+}
+
+// @brief LIST型の場合の子供の先頭のノードを返す．
+const SmtLibNode*
+SmtLibNode::child() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
 }
 
 
@@ -45,7 +62,7 @@ SmtLibNodeBase::loc() const
 // @param[in] val 値
 SmtLibTerminalNode::SmtLibTerminalNode(const FileRegion& loc,
 				       const ShString& val) :
-  SmtLibNodeBase(loc),
+  SmtLibNode(loc),
   mVal(val)
 {
 }
@@ -60,21 +77,6 @@ const char*
 SmtLibTerminalNode::value() const
 {
   return mVal;
-}
-
-// @brief LIST型の場合の子供のノードの要素数を返す．
-ymuint
-SmtLibTerminalNode::child_num() const
-{
-  return 0;
-}
-
-// @brief LIST型の場合の子供のノードを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
-const SmtLibNode*
-SmtLibTerminalNode::child(ymuint pos) const
-{
-  return NULL;
 }
 
 
@@ -183,26 +185,26 @@ SmtLibBinNode::type() const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス SmtLibStringNode
+// クラス SmtLibStrNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
 // @param[in] val 値
-SmtLibStringNode::SmtLibStringNode(const FileRegion& loc,
-				   const ShString& val) :
+SmtLibStrNode::SmtLibStrNode(const FileRegion& loc,
+			     const ShString& val) :
   SmtLibTerminalNode(loc, val)
 {
 }
 
 // @brief デストラクタ
-SmtLibStringNode::~SmtLibStringNode()
+SmtLibStrNode::~SmtLibStrNode()
 {
 }
 
 // @brief 型を返す．
 tTokenType
-SmtLibStringNode::type() const
+SmtLibStrNode::type() const
 {
   return kStringToken;
 }
@@ -266,10 +268,12 @@ SmtLibKeywordNode::type() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
-SmtLibListNode::SmtLibListNode(const FileRegion& loc) :
-  SmtLibNodeBase(loc),
-  mChildNum(0),
-  mChildArray(NULL)
+SmtLibListNode::SmtLibListNode(const FileRegion& loc,
+			       ymuint num,
+			       const SmtLibNode* child) :
+  SmtLibNode(loc),
+  mChildNum(num),
+  mChild(child)
 {
 }
 
@@ -285,13 +289,6 @@ SmtLibListNode::type() const
   return kListToken;
 }
 
-// @brief 終端型の場合の値を返す．
-const char*
-SmtLibListNode::value() const
-{
-  return NULL;
-}
-
 // @brief LIST型の場合の子供のノードの要素数を返す．
 ymuint
 SmtLibListNode::child_num() const
@@ -300,11 +297,10 @@ SmtLibListNode::child_num() const
 }
 
 // @brief LIST型の場合の子供のノードを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
 const SmtLibNode*
-SmtLibListNode::child(ymuint pos) const
+SmtLibListNode::child() const
 {
-  return mChildArray[pos];
+  return mChild;
 }
 
 END_NAMESPACE_YM_SMTLIBV2
