@@ -102,3 +102,66 @@ Keyword:
 	'(' 'forall' '(' <sorted_var>+ ')' <term> ')' |
 	'(' 'exists '(' <sorted_var>+ ')' <term> ')' |
 	'(' '!' <term> <attribute>+ ')'
+
+
+3.7 Theory Declarations
+
+[省略]
+
+
+3.8 Logic Declarations
+
+[省略]
+
+
+3.9 Scripts
+
+command ::=
+	'(' set-logic <symbol> ')' |
+	'(' set-option <option> ')' |
+	'(' set-info <attribute> ')' |
+	'(' declare-sort <symbol> <numeral> ')' |
+	'(' define-sort <symbol> '(' <symbol>* ')' <sort> ')' |
+	'(' declare-fun <symbol> '(' <sort>* ')' <sort> ')' |
+	'(' define-fun <symbol> '(' <sorted_var>* ')' <sort> <term> ')' |
+	'(' push <numeral> ')' |
+	'(' pop <numeral> ')' |
+	'(' assert <term> ')' |
+	'(' check-sat ')' |
+	'(' get-assertions ')' |
+	'(' get-proof ')' |
+	'(' get-unsat-core ')' |
+	'(' get-value '(' <term>+ ')' ')' |
+	'(' get-assignment ')' |
+	'(' get-option <keyword> ')' |
+	'(' get-info <info_flag> ')' |
+	'(' exit ')'
+
+script ::= <command>*
+
+<b_value> ::= true | false
+
+<option> ::=
+	 :print-success <b_value> |
+	 :expand-definitions <b_value> |
+	 :interactive-mode <b_value> |
+	 :produce-proofs <b_value> |
+	 :produce-unsat-cores <b_value> |
+	 :produce-models <b_value> |
+	 :produce-models <b_value> |
+	 :produce-assignments <b_value> |
+	 :regular-output-channel <string> |
+	 :diagnostic-output-channel <string> |
+	 :random-seed <numeral> |
+	 :verbosity <numeral> |
+	 <attribute>
+
+<info_flag> ::=
+	 :error-behavior |
+	 :name |
+	 :authors |
+	 :version |
+	 :status |
+	 :reason-unknown |
+	 <keyword> |
+	 :all-statistics
