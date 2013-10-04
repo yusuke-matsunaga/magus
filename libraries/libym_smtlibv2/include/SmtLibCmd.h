@@ -1,0 +1,88 @@
+#ifndef SMTLIBCMD_H
+#define SMTLIBCMD_H
+
+/// @file SmtLibCmd.h
+/// @brief SmtLibCmd のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2013 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "ym_smtlibv2/smtlibv2_nsdef.h"
+
+
+BEGIN_NAMESPACE_YM_SMTLIBV2
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtLibCmd SmtLibCmd.h "SmtLibCmd.h"
+/// @brief SmtLibSh 用のコマンドの基底クラス
+//////////////////////////////////////////////////////////////////////
+class SmtLibCmd
+{
+public:
+
+  /// @brief コンストラクタ
+  SmtLibCmd(SmtLibMgr* mgr);
+
+  /// @brief デストラクタ
+  virtual
+  ~SmtLibCmd() { }
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief コマンドの実行を行う．
+  /// @param[in] arg_top 引数の先頭ノード
+  /// @return 実行結果を返す．
+  virtual
+  const SmtLibNode*
+  exec(const SmtLibNode* arg_top) = 0;
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 親のマネージャを得る．
+  SmtLibMgr*
+  mgr() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 親のマネージャ
+  SmtLibMgr* mMgr;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+inline
+SmtLibCmd::SmtLibCmd(SmtLibMgr* mgr) :
+  mMgr(mgr)
+{
+}
+
+// @brief 親のマネージャを得る．
+inline
+SmtLibMgr*
+SmtLibCmd::mgr() const
+{
+  return mMgr;
+}
+
+END_NAMESPACE_YM_SMTLIBV2
+
+#endif // SMTLIBCMD_H
