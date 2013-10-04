@@ -80,7 +80,7 @@ private:
   /// @param[in] val 値
   SmtLibNode*
   new_num(const FileRegion& loc,
-	  const ShString& val);
+	  ymint32 val);
 
   /// @brief DEC タイプのノードを生成する．
   /// @param[in] loc ファイル上の位置

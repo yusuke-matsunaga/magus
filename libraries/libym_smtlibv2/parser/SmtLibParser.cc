@@ -117,7 +117,7 @@ SmtLibParser::read_sexp(SmtLibNode*& node,
   node = NULL;
   switch ( type ) {
   case kNumToken:
-    node = new_num(loc, ShString(mScanner.cur_string()));
+    node = new_num(loc, atoi(mScanner.cur_string()));
     break;
 
   case kDecToken:
@@ -189,7 +189,7 @@ SmtLibParser::read_sexp(SmtLibNode*& node,
 // @param[in] val 値
 SmtLibNode*
 SmtLibParser::new_num(const FileRegion& loc,
-		      const ShString& val)
+		      ymint32 val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibNumNode));
   return new (p) SmtLibNumNode(loc, val);
@@ -326,6 +326,10 @@ display(ostream& s,
       s << "Child#" << i << endl;
       display(s, child, ident_level1, print_loc);
     }
+  }
+  else if ( node->type() == kNumToken ) {
+    print_space(s, ident_level);
+    s << "Value: " << node->int_value() << endl;
   }
   else {
     print_space(s, ident_level);

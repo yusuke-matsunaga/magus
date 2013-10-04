@@ -1,8 +1,8 @@
-#ifndef YM_SMTLIBV2_SMTSORT_H
-#define YM_SMTLIBV2_SMTSORT_H
+#ifndef YM_SMTLIBV2_SMTID_H
+#define YM_SMTLIBV2_SMTID_H
 
-/// @file ym_smtlibv2/SmtSort.h
-/// @brief SmtSort のヘッダファイル
+/// @file ym_smtlibv2/SmtId.h
+/// @brief SmtId のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -10,30 +10,32 @@
 
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
+#include "ym_utils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-class SmtId;
-
 //////////////////////////////////////////////////////////////////////
-/// @class SmtSort SmtSort.h "ym_smtlibv2/SmtSort.h"
-/// @brief 型を表すクラス
+/// @class SmtId SmtId.h "ym_smtlibv2/SmtId.h"
+/// @brief 識別子を表すクラス
+///
+/// シンタックスは <symbol> <numeral>*
+/// SmtId の中でユニークな ID 番号を持つ．
 //////////////////////////////////////////////////////////////////////
-class SmtSort
+class SmtId
 {
-  friend class SmtSortMgr;
+  friend class SmtIdMgr;
 
 protected:
 
-  /// @brief コンストラクタ
-  /// @param[in] name 型名
+  /// @brief 単純な形のコンストラクタ
+  /// @param[in] name 名前
   explicit
-  SmtSort(const SmtId* name);
+  SmtId(const ShString& name);
 
   /// @brief デストラクタ
   virtual
-  ~SmtSort();
+  ~SmtId();
 
 
 public:
@@ -46,20 +48,21 @@ public:
   id() const;
 
   /// @brief 名前を返す．
-  const SmtId*
+  ShString
   name() const;
 
-  /// @brief 複合型の場合の要素数を返す．
-  /// @note 単純な型の場合には 0 を返す．
+  /// @brief インデックスリストの要素数を返す．
+  /// @note インデックスリストを持たない場合は 0 を返す．
   virtual
   ymuint
-  elem_num() const;
+  index_size() const;
 
-  /// @brief 複合型の場合の要素の型を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < elem_num )
+  /// @brief インデックスを返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < index_size() )
+  /// @note インデックスを持たない場合や pos が index_size() より大きい場合はエラー(アボート)となる．
   virtual
-  const SmtSort*
-  elem(ymuint pos) const;
+  ymint32
+  index(ymuint pos) const;
 
 
 private:
@@ -71,7 +74,10 @@ private:
   ymuint32 mId;
 
   // 名前
-  const SmtId* mName;
+  ShString mName;
+
+  // ハッシュ表のためのリンクポインタ
+  SmtId* mLink;
 
 };
 
@@ -83,19 +89,19 @@ private:
 // @brief ID番号を返す．
 inline
 ymuint
-SmtSort::id() const
+SmtId::id() const
 {
   return mId;
 }
 
 // @brief 名前を返す．
 inline
-const SmtId*
-SmtSort::name() const
+ShString
+SmtId::name() const
 {
   return mName;
 }
 
 END_NAMESPACE_YM_SMTLIBV2
 
-#endif // YM_SMTLIBV2_SMTSORT_H
+#endif // YM_SMTLIBV2_SMTID_H

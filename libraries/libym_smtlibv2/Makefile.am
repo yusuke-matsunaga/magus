@@ -7,6 +7,7 @@ SUBDIRS = \
 	include \
 	parser \
 	main \
+	shell \
 	. \
 	tests
 

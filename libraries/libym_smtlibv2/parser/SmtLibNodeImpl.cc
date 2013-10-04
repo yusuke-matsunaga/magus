@@ -29,11 +29,19 @@ SmtLibNode::~SmtLibNode()
 }
 
 // @brief 終端型の場合の値を返す．
-const char*
+ShString
 SmtLibNode::value() const
 {
   assert_not_reached(__FILE__, __LINE__);
-  return NULL;
+  return ShString();
+}
+
+// @brief NUM型の場合の整数値を返す．
+ymint32
+SmtLibNode::int_value() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
 }
 
 // @brief LIST型の場合の子供のノードの要素数を返す．
@@ -73,7 +81,7 @@ SmtLibTerminalNode::~SmtLibTerminalNode()
 }
 
 // @brief 終端型の場合の値を返す．
-const char*
+ShString
 SmtLibTerminalNode::value() const
 {
   return mVal;
@@ -88,8 +96,9 @@ SmtLibTerminalNode::value() const
 // @param[in] loc ファイル上の位置
 // @param[in] val 値
 SmtLibNumNode::SmtLibNumNode(const FileRegion& loc,
-			     const ShString& val) :
-  SmtLibTerminalNode(loc, val)
+			     ymint32 val) :
+  SmtLibNode(loc),
+  mValue(val)
 {
 }
 
@@ -103,6 +112,13 @@ tTokenType
 SmtLibNumNode::type() const
 {
   return kNumToken;
+}
+
+// @brief NUM型の場合の整数値を返す．
+ymint32
+SmtLibNumNode::int_value() const
+{
+  return mValue;
 }
 
 

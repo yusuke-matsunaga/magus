@@ -42,7 +42,7 @@ public:
 
   /// @brief 終端型の場合の値を返す．
   virtual
-  const char*
+  ShString
   value() const;
 
 
@@ -59,10 +59,10 @@ private:
 
 //////////////////////////////////////////////////////////////////////
 /// @class SmtLibNumNode SmtLibNodeImpl.h "SmtLibNodeImpl.h"
-/// @brief Num を表す SmtLibNode の継承クラス
+/// @brief <numeral> を表す SmtLibNode の継承クラス
 //////////////////////////////////////////////////////////////////////
 class SmtLibNumNode :
-  public SmtLibTerminalNode
+  public SmtLibNode
 {
   friend class SmtLibParser;
 
@@ -72,7 +72,7 @@ private:
   /// @param[in] loc ファイル上の位置
   /// @param[in] val 値
   SmtLibNumNode(const FileRegion& loc,
-		const ShString& val);
+		ymint32 val);
 
   /// @brief デストラクタ
   virtual
@@ -88,6 +88,20 @@ public:
   virtual
   tTokenType
   type() const;
+
+  /// @brief NUM型の場合の整数値を返す．
+  virtual
+  ymint32
+  int_value() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 値
+  ymint32 mValue;
 
 };
 
