@@ -1,8 +1,8 @@
-#ifndef SMTSORTMGR_H
-#define SMTSORTMGR_H
+#ifndef SMTFUNMGR_H
+#define SMTFUNMGR_H
 
-/// @file SmtSortMgr.h
-/// @brief SmtSortMgr のヘッダファイル
+/// @file SmtFunMgr.h
+/// @brief SmtFunMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -15,22 +15,21 @@
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-class SmtId;
-class SmtSortImpl;
+class SmtFunImpl;
 
 //////////////////////////////////////////////////////////////////////
-/// @class SmtSortMgr SmtSortMgr.h "SmtSortMgr.h"
-/// @brief SmtSort を管理するクラス
+/// @class SmtFunMgr SMtFunMgr.h "SmtFunMgr.h"
+/// @brief SmtFun を管理するクラス
 //////////////////////////////////////////////////////////////////////
-class SmtSortMgr
+class SmtFunMgr
 {
 public:
 
   /// @brief コンストラクタ
-  SmtSortMgr();
+  SmtFunMgr();
 
   /// @brief デストラクタ
-  ~SmtSortMgr();
+  ~SmtFunMgr();
 
 
 public:
@@ -38,31 +37,32 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型名を登録する．
-  /// @param[in] name 型名
-  /// @param[in] arg_num 引数の数
-  /// @retval true 登録が成功した．
-  /// @retval false 登録が失敗した．同名で異なる宣言がすでに登録されている．
-  bool
-  reg_sort(const SmtId* name,
-	   ymuint arg_num);
+  /// @brief 宣言のみの関数を登録する．
+  /// @param[in] name 名前
+  /// @param[in] sort 出力の型
+  /// @param[in] input_list 入力の型のリスト
+  /// @return 登録した関数を返す．
+  const SmtFun*
+  reg_fun(const SmtId* name,
+	  const SmtSort* sort,
+	  const vector<const SmtSort*>& input_list);
 
-  /// @brief alias を登録する．
-  /// @param[in] name 型名
-  /// @param[in] sort 登録する型
-  /// @retval true 登録が成功した．
-  /// @retval false 登録が失敗した．同名で異なる alias が登録されている．
-  bool
-  reg_alias(const SmtId* name,
-	    const SmtSort* sort);
+  /// @brief 実体のある関数を登録する．
+  /// @param[in] name 名前
+  /// @param[in] sort 出力の型
+  /// @param[in] input_list 入力の型と変数のリスト
+  /// @param[in] body 本体
+  /// @return 登録した関数を返す．
+  const SmtFun*
+  reg_fun(const SmtId* name,
+	  const SmtSort* sort,
+	  const vector<SmtSortedVar>& input_list,
+	  const SmtTerm* body);
 
-  /// @brief SmtSort に変換する．
-  /// @param[in] name 型名
-  /// @param[in] elem_list 部品の型のリスト
-  /// @return 登録されていなければ NULL を返す．
-  const SmtSort*
-  new_sort(const SmtId* name,
-	   const vector<const SmtSort*>& elem_list);
+  /// @brief 関数を返す．
+  /// @param[in] name 名前
+  const SmtFun*
+  find_fun(const SmtId* name) const;
 
 
 private:
@@ -84,17 +84,14 @@ private:
   // メモリ確保用のオブジェクト
   SimpleAlloc mAlloc;
 
-  // 名前をキーにして引数の数を保持するハッシュ表
-  hash_map<ymuint32, ymuint32> mHash;
-
-  // 登録されている宣言の数
+  // 登録されている関数の数
   ymuint32 mNum;
 
   // ハッシュ表のサイズ
   ymuint32 mTableSize;
 
   // ハッシュ表
-  SmtSortImpl** mHashTable;
+  SmtFunImpl** mHashTable;
 
   // ハッシュ表を拡大する目安
   ymuint32 mNextLimit;
@@ -103,4 +100,4 @@ private:
 
 END_NAMESPACE_YM_SMTLIBV2
 
-#endif // SMTSORTMGR_H
+#endif // SMTFUNMGR_H

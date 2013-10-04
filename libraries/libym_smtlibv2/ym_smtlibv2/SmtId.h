@@ -28,14 +28,9 @@ class SmtId
 
 protected:
 
-  /// @brief 単純な形のコンストラクタ
-  /// @param[in] name 名前
-  explicit
-  SmtId(const ShString& name);
-
   /// @brief デストラクタ
   virtual
-  ~SmtId();
+  ~SmtId() { }
 
 
 public:
@@ -44,63 +39,29 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号を返す．
+  virtual
   ymuint
-  id() const;
+  id() const = 0;
 
   /// @brief 名前を返す．
+  virtual
   ShString
-  name() const;
+  name() const = 0;
 
   /// @brief インデックスリストの要素数を返す．
   /// @note インデックスリストを持たない場合は 0 を返す．
   virtual
   ymuint
-  index_size() const;
+  index_size() const = 0;
 
   /// @brief インデックスを返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < index_size() )
   /// @note インデックスを持たない場合や pos が index_size() より大きい場合はエラー(アボート)となる．
   virtual
   ymint32
-  index(ymuint pos) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // ID番号
-  ymuint32 mId;
-
-  // 名前
-  ShString mName;
-
-  // ハッシュ表のためのリンクポインタ
-  SmtId* mLink;
+  index(ymuint pos) const = 0;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief ID番号を返す．
-inline
-ymuint
-SmtId::id() const
-{
-  return mId;
-}
-
-// @brief 名前を返す．
-inline
-ShString
-SmtId::name() const
-{
-  return mName;
-}
 
 END_NAMESPACE_YM_SMTLIBV2
 

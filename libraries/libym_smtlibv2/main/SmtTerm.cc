@@ -25,7 +25,7 @@ SmtTerm::const_val() const
 }
 
 // @brief kQualIdentifier 型の場合に識別子を返す．
-const SmtIdentifier*
+const SmtId*
 SmtTerm::identifier() const
 {
   assert_not_reached(__FILE__, __LINE__);

@@ -17,7 +17,7 @@
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 class SmtLibNode;
-class SmtId;
+class SmtIdImpl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class SmtIdMgr SmtIdMgr.h "SmtIdMgr.h"
@@ -41,13 +41,10 @@ public:
 
   /// @brief 識別子を返す．
   /// @param[in] name 名前
-  /// @param[in] index_size インデックスの数．
-  /// @param[in] index_node インデックスリストの先頭のノード
-  /// @note index_node は正しい形をしていると仮定している．
+  /// @param[in] index_list インデックスリスト
   const SmtId*
   new_id(const ShString& name,
-	 ymuint index_size,
-	 const SmtLibNode* index_node);
+	 const vector<ymint32>& index_list);
 
 
 private:
@@ -59,20 +56,6 @@ private:
   /// @param[in] req_size 新しいサイズ
   void
   expand_table(ymuint req_size);
-
-  /// @brief ハッシュ値を計算する．
-  /// @param[in] name 名前
-  /// @param[in] index_node インデックスリストの先頭のノード
-  static
-  ymuint
-  hash(const ShString& name,
-       const SmtLibNode* index_node);
-
-  /// @brief ハッシュ値を計算する．
-  /// @param[in] id 識別子のインスタンス
-  static
-  ymuint
-  hash(const SmtId* id);
 
 
 private:
@@ -90,7 +73,7 @@ private:
   ymuint32 mTableSize;
 
   // ハッシュ表
-  SmtId** mHashTable;
+  SmtIdImpl** mHashTable;
 
   // ハッシュ表を拡大する目安
   ymuint32 mNextLimit;

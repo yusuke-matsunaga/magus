@@ -67,7 +67,7 @@ public:
 
   /// @brief kQualIdentifier 型の場合に識別子を返す．
   virtual
-  const SmtIdentifier*
+  const SmtId*
   identifier() const;
 
   /// @brief kQualIdentifier 型の場合に型を返す．

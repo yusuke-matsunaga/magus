@@ -26,14 +26,9 @@ class SmtSort
 
 protected:
 
-  /// @brief コンストラクタ
-  /// @param[in] name 型名
-  explicit
-  SmtSort(const SmtId* name);
-
   /// @brief デストラクタ
   virtual
-  ~SmtSort();
+  ~SmtSort() { }
 
 
 public:
@@ -42,59 +37,28 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号を返す．
+  virtual
   ymuint
-  id() const;
+  id() const = 0;
 
   /// @brief 名前を返す．
+  virtual
   const SmtId*
-  name() const;
+  name() const = 0;
 
   /// @brief 複合型の場合の要素数を返す．
   /// @note 単純な型の場合には 0 を返す．
   virtual
   ymuint
-  elem_num() const;
+  elem_num() const = 0;
 
   /// @brief 複合型の場合の要素の型を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < elem_num )
   virtual
   const SmtSort*
-  elem(ymuint pos) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // ID番号
-  ymuint32 mId;
-
-  // 名前
-  const SmtId* mName;
+  elem(ymuint pos) const = 0;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief ID番号を返す．
-inline
-ymuint
-SmtSort::id() const
-{
-  return mId;
-}
-
-// @brief 名前を返す．
-inline
-const SmtId*
-SmtSort::name() const
-{
-  return mName;
-}
 
 END_NAMESPACE_YM_SMTLIBV2
 

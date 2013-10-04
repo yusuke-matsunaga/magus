@@ -10,7 +10,7 @@
 #include "SmtIdMgr.h"
 #include "ym_smtlibv2/SmtId.h"
 #include "SmtLibNode.h"
-#include "SmtIndexId.h"
+#include "SmtIdImpl.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -50,36 +50,46 @@ BEGIN_NONAMESPACE
 // 等しければ true を返す．
 bool
 check_index(SmtId* id,
-	    const SmtLibNode* node)
+	    const vector<ymint32>& index_list)
 {
-  // サイズが等しいことはチェック済み
   ymuint index_size = id->index_size();
+  if ( index_list.size() != index_size ) {
+    return false;
+  }
   for (ymuint i = 0; i < index_size; ++ i) {
-    if ( id->index(i) != node->int_value() ) {
+    if ( id->index(i) != index_list[i] ) {
       return false;
     }
-    node = node->sibling();
   }
   return true;
+}
+
+// ハッシュ関数
+ymuint
+hash_func(const ShString& name,
+	  const vector<ymint32>& index_list)
+{
+  ymuint h = name.hash();
+  for (vector<ymint32>::const_iterator p = index_list.begin();
+       p != index_list.end(); ++ p) {
+    h = h * 127 + static_cast<ymuint>(*p);
+  }
+  return h;
 }
 
 END_NONAMESPACE
 
 // @brief 識別子に変換する．
 // @param[in] name 名前
-// @param[in] index_size インデックスの数．
-// @param[in] index_node インデックスリストの先頭のノード
-// @note index_node は正しい形をしていると仮定している．
+// @param[in] index_list インデックスリスト
 const SmtId*
 SmtIdMgr::new_id(const ShString& name,
-		 ymuint index_size,
-		 const SmtLibNode* index_node)
+		 const vector<ymint32>& index_list)
 {
-  ymuint h = hash(name, index_node);
+  ymuint h = hash_func(name, index_list);
   ymuint idx = h % mTableSize;
-  for (SmtId* id = mHashTable[idx]; id != NULL; id = id->mLink) {
-    if ( id->name() == name && id->index_size() == index_size &&
-	 check_index(id, index_node) ) {
+  for (SmtIdImpl* id = mHashTable[idx]; id != NULL; id = id->mLink) {
+    if ( id->name() == name && check_index(id, index_list) ) {
       return id;
     }
   }
@@ -89,18 +99,17 @@ SmtIdMgr::new_id(const ShString& name,
     idx = h % mTableSize;
   }
 
-  SmtId* id = NULL;
-  if ( index_node == NULL ) {
-    void* p = mAlloc.get_memory(sizeof(SmtId));
-    id = new (p) SmtId(name);
+  SmtIdImpl* id = NULL;
+  if ( index_list.empty() ) {
+    void* p = mAlloc.get_memory(sizeof(SmtIdImpl));
+    id = new (p) SmtIdImpl(name);
   }
   else {
+    ymuint index_size = index_list.size();
     void* p = mAlloc.get_memory(sizeof(SmtIndexId) + sizeof(ymint32) * (index_size - 1));
-    SmtIndexId* id1 = new (p) SmtIndexId(name);
-    id1->mIndexNum = index_size;
-    const SmtLibNode* node = index_node;
+    SmtIndexId* id1 = new (p) SmtIndexId(name, index_size);
     for (ymuint i = 0; i < index_size; ++ i) {
-      id1->mIndexList[i] = node->int_value();
+      id1->mIndexList[i] = index_list[i];
     }
   }
 
@@ -113,16 +122,32 @@ SmtIdMgr::new_id(const ShString& name,
   return id;
 }
 
+
+BEGIN_NONAMESPACE
+
+// ハッシュ関数
+ymuint
+hash_func(SmtId* id)
+{
+  ymuint h = id->name().hash();
+  for (ymuint i = 0; i < id->index_size(); ++ i) {
+    h = h * 127 + id->index(i);
+  }
+  return h;
+}
+
+END_NONAMESPACE
+
 // @brief ハッシュ表を拡大する．
 // @param[in] req_size 新しいサイズ
 void
 SmtIdMgr::expand_table(ymuint req_size)
 {
   ymuint old_size = mTableSize;
-  SmtId** old_table = mHashTable;
+  SmtIdImpl** old_table = mHashTable;
 
   mTableSize = req_size;
-  mHashTable = new SmtId*[mTableSize];
+  mHashTable = new SmtIdImpl*[mTableSize];
   for (ymuint i = 0; i < mTableSize; ++ i) {
     mHashTable[i] = NULL;
   }
@@ -130,43 +155,17 @@ SmtIdMgr::expand_table(ymuint req_size)
 
   if ( old_size > 0 ) {
     for (ymuint i = 0; i < old_size; ++ i) {
-      for (SmtId* id = old_table[i]; id != NULL; ) {
-	SmtId* tmp_id = id;
+      for (SmtIdImpl* id = old_table[i]; id != NULL; ) {
+	SmtIdImpl* tmp_id = id;
 	id = id->mLink;
 
-	ymuint h = hash(tmp_id);
+	ymuint h = hash_func(tmp_id) % mTableSize;
 	tmp_id->mLink = mHashTable[h];
 	mHashTable[h] = tmp_id;
       }
     }
     delete [] old_table;
   }
-}
-
-// @brief ハッシュ値を計算する．
-// @param[in] name 名前
-// @param[in] index_node インデックスリストの先頭のノード
-ymuint
-SmtIdMgr::hash(const ShString& name,
-	       const SmtLibNode* index_node)
-{
-  ymuint h = name.hash();
-  for (; index_node != NULL; index_node = index_node->sibling()) {
-    h = h * 127 + index_node->int_value();
-  }
-  return h;
-}
-
-// @brief ハッシュ値を計算する．
-// @param[in] id 識別子のインスタンス
-ymuint
-SmtIdMgr::hash(const SmtId* id)
-{
-  ymuint h = id->name().hash();
-  for (ymuint i = 0; i < id->index_size(); ++ i) {
-    h = h * 127 + id->index(i);
-  }
-  return h;
 }
 
 END_NAMESPACE_YM_SMTLIBV2

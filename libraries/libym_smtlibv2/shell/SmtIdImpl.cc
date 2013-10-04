@@ -7,33 +7,46 @@
 /// All rights reserved.
 
 
-#include "ym_smtlibv2/SmtId.h"
-#include "SmtIndexId.h"
+#include "SmtIdImpl.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 //////////////////////////////////////////////////////////////////////
-// クラス SmtId
+// クラス SmtIdImpl
 //////////////////////////////////////////////////////////////////////
 
 // @brief 単純な形のコンストラクタ
 // @param[in] name 名前
-SmtId::SmtId(const ShString& name) :
+SmtIdImpl::SmtIdImpl(const ShString& name) :
   mName(name)
 {
   mLink = NULL;
 }
 
 // @brief デストラクタ
-SmtId::~SmtId()
+SmtIdImpl::~SmtIdImpl()
 {
+}
+
+// @brief ID番号を返す．
+ymuint
+SmtIdImpl::id() const
+{
+  return mId;
+}
+
+// @brief 名前を返す．
+ShString
+SmtIdImpl::name() const
+{
+  return mName;
 }
 
 // @brief インデックスリストの要素数を返す．
 // @note インデックスリストを持たない場合は 0 を返す．
 ymuint
-SmtId::index_size() const
+SmtIdImpl::index_size() const
 {
   return 0;
 }
@@ -42,7 +55,7 @@ SmtId::index_size() const
 // @param[in] pos 位置番号 ( 0 <= pos < index_size() )
 // @note インデックスを持たない場合や pos が index_size() より大きい場合はエラー(アボート)となる．
 ymint32
-SmtId::index(ymuint pos) const
+SmtIdImpl::index(ymuint pos) const
 {
   assert_not_reached(__FILE__, __LINE__);
   return 0;
@@ -55,8 +68,11 @@ SmtId::index(ymuint pos) const
 
 // @brief コンストラクタ
 // @param[in] name 名前
-SmtIndexId::SmtIndexId(const ShString& name) :
-  SmtId(name)
+// @param[in] index_num インデックスの数
+SmtIndexId::SmtIndexId(const ShString& name,
+		       ymuint index_num) :
+  SmtIdImpl(name),
+  mIndexNum(index_num)
 {
   // mIndexList の確保は SmtIdMgr が行う．
 }

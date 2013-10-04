@@ -42,8 +42,10 @@ enum tSmtLibResponse {
 class SmtAttr;
 class SmtConst;
 class SmtExpr;
-class SmtIdentifier;
+class SmtFun;
+class SmtId;
 class SmtSort;
+class SmtSortedVar;
 class SmtTerm;
 
 END_NAMESPACE_YM_SMTLIBV2
@@ -53,8 +55,10 @@ BEGIN_NAMESPACE_YM
 using nsSmtLibV2::SmtAttr;
 using nsSmtLibV2::SmtConst;
 using nsSmtLibV2::SmtExpr;
-using nsSmtLibV2::SmtIdentifier;
+using nsSmtLibV2::SmtFun;
+using nsSmtLibV2::SmtId;
 using nsSmtLibV2::SmtSort;
+using nsSmtLibV2::SmtSortedVar;
 using nsSmtLibV2::SmtTerm;
 
 END_NAMESPACE_YM

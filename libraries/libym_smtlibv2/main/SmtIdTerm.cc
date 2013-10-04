@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 // @brief コンストラクタ
 // @param[in] id 識別子
 // @param[in] term_list 項のリスト
-SmtIdTerm::SmtIdTerm(const SmtIdentifier* id,
+SmtIdTerm::SmtIdTerm(const SmtId* id,
 		     const vector<const SmtTerm*>& term_list) :
   mId(id),
   mSort(NULL),
@@ -31,7 +31,7 @@ SmtIdTerm::SmtIdTerm(const SmtIdentifier* id,
 // @param[in] id 識別子
 // @param[in] sort 型
 // @param[in] term_list 項のリスト
-SmtIdTerm::SmtIdTerm(const SmtIdentifier* id,
+SmtIdTerm::SmtIdTerm(const SmtId* id,
 		     const SmtSort* sort,
 		     const vector<const SmtTerm*>& term_list) :
   mId(id),
@@ -53,7 +53,7 @@ SmtIdTerm::type() const
 }
 
 // @brief kQualIdentifier 型の場合に識別子を返す．
-const SmtIdentifier*
+const SmtId*
 SmtIdTerm::identifier() const
 {
   return mId;
