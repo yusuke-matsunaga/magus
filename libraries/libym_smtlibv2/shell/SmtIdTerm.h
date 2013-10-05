@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_smtlibv2/SmtTerm.h"
+#include "SmtTermImpl.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -19,24 +19,14 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 /// @brief 識別子を表す SmtTerm の派生クラス
 //////////////////////////////////////////////////////////////////////
 class SmtIdTerm :
-  public SmtTerm
+  public SmtTermImpl
 {
-public:
+  friend class SmtLibMgr;
+protected:
 
   /// @brief コンストラクタ
   /// @param[in] id 識別子
-  /// @param[in] term_list 項のリスト
-  explicit
-  SmtIdTerm(const SmtId* id,
-	    const vector<const SmtTerm*>& term_list = vector<const SmtTerm*>(0));
-
-  /// @brief コンストラクタ
-  /// @param[in] id 識別子
-  /// @param[in] sort 型
-  /// @param[in] term_list 項のリスト
-  SmtIdTerm(const SmtId* id,
-	    const SmtSort* sort,
-	    const vector<const SmtTerm*>& term_list = vector<const SmtTerm*>(0));
+  SmtIdTerm(const SmtId* id);
 
   /// @brief デストラクタ
   virtual
@@ -58,23 +48,6 @@ public:
   const SmtId*
   identifier() const;
 
-  /// @brief kQualId 型の場合に型を返す．
-  /// @note 型がついていない場合には NULL を返す．
-  virtual
-  const SmtSort*
-  identifier_sort() const;
-
-  /// @brief kQualId 型の場合にパラメータの項数を返す．
-  virtual
-  ymuint
-  identifier_term_num() const;
-
-  /// @brief kQualIdentifier 型の場合にパラメータを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < identifier_term_num() )
-  virtual
-  const SmtTerm*
-  identifier_term(ymuint pos) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -84,11 +57,52 @@ private:
   // 識別子
   const SmtId* mId;
 
+};
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtQualIdTerm SmtIdTerm.h "SmtIdTerm.h"
+/// @brief 型つき識別子を表す SmtTerm の派生クラス
+//////////////////////////////////////////////////////////////////////
+class SmtQualIdTerm :
+  public SmtIdTerm
+{
+  friend class SmtLibMgr;
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] id 識別子
+  /// @param[in] sort 型
+  SmtQualIdTerm(const SmtId* id,
+		const SmtSort* sort);
+
+  /// @brief デストラクタ
+  virtual
+  ~SmtQualIdTerm();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 型を返す．
+  virtual
+  tType
+  type() const;
+
+  /// @brief kQualIdentifier 型の場合に型を返す．
+  virtual
+  const SmtSort*
+  identifier_sort() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
   // 型
   const SmtSort* mSort;
-
-  // パラメータのリスト
-  vector<const SmtTerm*> mTermList;
 
 };
 

@@ -25,11 +25,6 @@ libym_smt_main_la_CPPFLAGS = \
 	-I$(top_srcdir)/include
 
 libym_smt_main_la_SOURCES = \
-	SmtExpr.cc \
-	SmtConstExpr.cc \
-	SmtKeywordExpr.cc \
-	SmtListExpr.cc \
-	SmtSymbolExpr.cc \
 	SmtTerm.cc \
 	SmtConstTerm.cc \
 	SmtIdTerm.cc \

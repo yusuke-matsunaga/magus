@@ -333,7 +333,7 @@ display(ostream& s,
   }
   else {
     print_space(s, ident_level);
-    s << "Value: " << node->value() << endl;
+    s << "Value: " << node->str_value() << endl;
   }
 }
 

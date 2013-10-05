@@ -43,7 +43,7 @@ public:
   /// @brief 終端型の場合の値を返す．
   virtual
   ShString
-  value() const;
+  str_value() const;
 
 
 private:

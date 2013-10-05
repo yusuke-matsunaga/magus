@@ -40,26 +40,24 @@ enum tSmtLibResponse {
 
 // クラス名の宣言
 class SmtAttr;
-class SmtConst;
-class SmtExpr;
 class SmtFun;
 class SmtId;
 class SmtSort;
 class SmtSortedVar;
 class SmtTerm;
+class SmtVarBinding;
 
 END_NAMESPACE_YM_SMTLIBV2
 
 BEGIN_NAMESPACE_YM
 
 using nsSmtLibV2::SmtAttr;
-using nsSmtLibV2::SmtConst;
-using nsSmtLibV2::SmtExpr;
 using nsSmtLibV2::SmtFun;
 using nsSmtLibV2::SmtId;
 using nsSmtLibV2::SmtSort;
 using nsSmtLibV2::SmtSortedVar;
 using nsSmtLibV2::SmtTerm;
+using nsSmtLibV2::SmtVarBinding;
 
 END_NAMESPACE_YM
 

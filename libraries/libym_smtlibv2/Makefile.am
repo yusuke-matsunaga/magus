@@ -6,7 +6,6 @@ SUBDIRS = \
 	ym_smtlibv2 \
 	include \
 	parser \
-	main \
 	shell \
 	. \
 	tests

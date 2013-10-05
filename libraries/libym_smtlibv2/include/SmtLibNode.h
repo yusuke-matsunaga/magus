@@ -48,15 +48,15 @@ public:
   FileRegion
   loc() const;
 
-  /// @brief 終端型の場合の値を返す．
-  virtual
-  ShString
-  value() const;
-
   /// @brief NUM型の場合の整数値を返す．
   virtual
   ymint32
   int_value() const;
+
+  /// @brief 終端型の場合の値を返す．
+  virtual
+  ShString
+  str_value() const;
 
   /// @brief LIST型の場合の子供のノードの要素数を返す．
   virtual

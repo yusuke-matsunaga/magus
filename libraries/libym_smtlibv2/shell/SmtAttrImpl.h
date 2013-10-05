@@ -1,0 +1,105 @@
+#ifndef SMTATTRIMPL_H
+#define SMTATTRIMPL_H
+
+/// @file SmtAttrImpl.h
+/// @brief SmtAttrImpl のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2013 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "ym_smtlibv2/SmtAttr.h"
+
+
+BEGIN_NAMESPACE_YM_SMTLIBV2
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtAttrImpl SmtAttrImpl.h "SmtAttrImpl.h"
+/// @brief SmtAttr の実装クラス
+//////////////////////////////////////////////////////////////////////
+class SmtAttrImpl :
+  public SmtAttr
+{
+  friend class SmtLibMgr;
+private:
+
+  /// @brief コンストラクタ
+  explicit
+  SmtAttrImpl(const ShString& keyword);
+
+  /// @brief デストラクタ
+  virtual
+  ~SmtAttrImpl();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief キーワードを表す文字列を返す．
+  virtual
+  ShString
+  keyword() const;
+
+  /// @brief 属性値を表す式を返す．
+  virtual
+  const SmtTerm*
+  value();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // キーワードを表す文字列
+  ShString mKeyword;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtAttrImpl2 SmtAttrImpl.h "SmtAttrImpl.h"
+/// @brief SmtAttr の実装クラス
+//////////////////////////////////////////////////////////////////////
+class SmtAttrImpl2 :
+  public SmtAttrImpl
+{
+  friend class SmtLibMgr;
+private:
+
+  /// @brief コンストラクタ
+  SmtAttrImpl2(const ShString& keyword,
+	       const SmtTerm* expr);
+
+  /// @brief デストラクタ
+  virtual
+  ~SmtAttrImpl2();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 属性値を表す式を返す．
+  virtual
+  const SmtTerm*
+  value();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // attribute value
+  const SmtTerm* mValue;
+
+};
+
+END_NAMESPACE_YM_SMTLIBV2
+
+#endif // SMTATTRIMPL_H

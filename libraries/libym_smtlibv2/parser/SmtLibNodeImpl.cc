@@ -30,7 +30,7 @@ SmtLibNode::~SmtLibNode()
 
 // @brief 終端型の場合の値を返す．
 ShString
-SmtLibNode::value() const
+SmtLibNode::str_value() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return ShString();
@@ -82,7 +82,7 @@ SmtLibTerminalNode::~SmtLibTerminalNode()
 
 // @brief 終端型の場合の値を返す．
 ShString
-SmtLibTerminalNode::value() const
+SmtLibTerminalNode::str_value() const
 {
   return mVal;
 }

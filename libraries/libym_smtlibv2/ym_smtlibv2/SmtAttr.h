@@ -10,6 +10,7 @@
 
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
+#include "ym_utils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -20,15 +21,11 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 //////////////////////////////////////////////////////////////////////
 class SmtAttr
 {
-public:
-
-  /// @brief コンストラクタ
-  explicit
-  SmtAttr(const ShString& keyword,
-	  const SmtExpr* value = NULL);
+protected:
 
   /// @brief デストラクタ
-  ~SmtAttr();
+  virtual
+  ~SmtAttr() { }
 
 
 public:
@@ -37,62 +34,16 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief キーワードを表す文字列を返す．
+  virtual
   ShString
-  keyword() const;
+  keyword() const = 0;
 
   /// @brief 属性値を表す式を返す．
-  const SmtExpr*
-  value();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // キーワードを表す文字列
-  ShString mKeyword;
-
-  // attribute value
-  const SmtExpr* mValue;
+  virtual
+  const SmtTerm*
+  value() = 0;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-inline
-SmtAttr::SmtAttr(const ShString& keyword,
-		 const SmtExpr* value) :
-  mKeyword(keyword),
-  mValue(value)
-{
-}
-
-// @brief デストラクタ
-inline
-SmtAttr::~SmtAttr()
-{
-}
-
-// @brief キーワードを表す文字列を返す．
-inline
-ShString
-SmtAttr::keyword() const
-{
-  return mKeyword;
-}
-
-// @brief 属性値を表す式を返す．
-inline
-const SmtExpr*
-SmtAttr::value()
-{
-  return mValue;
-}
 
 END_NAMESPACE_YM_SMTLIBV2
 
