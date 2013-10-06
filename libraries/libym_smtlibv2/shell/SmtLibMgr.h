@@ -45,6 +45,46 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief set-logic の処理を行う．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  set_logic(const SmtLibNode* arg_top);
+
+  /// @brief sort の宣言を行う．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  declare_sort(const SmtLibNode* arg_top);
+
+  /// @brief sort の alias を定義する．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  define_sort(const SmtLibNode* arg_top);
+
+  /// @brief 関数の宣言を行う．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  declare_fun(const SmtLibNode* arg_top);
+
+  /// @brief 関数の定義を行う．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  define_fun(const SmtLibNode* arg_top);
+
+  /// @brief assertion を追加する．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  assert(const SmtLibNode* arg_top);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief CORE theory の初期化を行う．
+  void
+  core_init();
+
   /// @brief S式を数値に変換する．
   /// @param[in] node S式を表すノード
   ymint32
@@ -69,6 +109,12 @@ public:
   /// @param[in] node S式を表すノード
   const SmtSort*
   eval_to_sort(const SmtLibNode* node);
+
+  /// @brief S式を sort に変換する．
+  /// @param[in] node S式を表すノード
+  const SmtSort*
+  eval_to_sort_template(const SmtLibNode* node,
+			const vector<const SmtId*>& param_list);
 
   /// @brief S式を term に変換する．
   /// @param[in] node S式を表すノード
@@ -115,11 +161,16 @@ public:
   const SmtFun*
   find_fun(const SmtId* name);
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
+  /// @brief 引数のリストをパーズする．
+  /// @param[in] arg_top 引数の先頭のノード
+  /// @param[in] arg_num 引数の数
+  /// @param[out] arg_list 引数を格納するリスト
+  /// @retval true 引数の数が arg_num と一致した．
+  /// @retval false 引数の数が arg_num と一致しなかった．
+  bool
+  parse_args(const SmtLibNode*  arg_top,
+	     ymuint arg_num,
+	     vector<const SmtLibNode*>& arg_list);
 
   /// @brief <numeric> を作る．
   /// @param[in] val 値
@@ -168,10 +219,12 @@ private:
   new_qual_identifier(const SmtId* id,
 		      const SmtSort* sort);
 
-  /// @brief term list を作る．
-  /// @param[in] term_list を項のリスト
+  /// @brief function term を作る．
+  /// @param[in] function 関数
+  /// @param[in] input_list 入力のリスト
   const SmtTerm*
-  new_term_list(const vector<const SmtTerm*>& term_list);
+  new_fun_term(const SmtFun* function,
+	       const vector<const SmtTerm*>& input_list);
 
   /// @brief let 文を作る．
   /// @param[in] var_binding 変数割り当てのリスト
@@ -201,6 +254,11 @@ private:
   new_attr_term(const SmtTerm* body,
 		const vector<const SmtAttr*>& attr_list);
 
+  /// @brief term list を作る．
+  /// @param[in] term_list 要素のリスト
+  const SmtTerm*
+  new_list_term(const vector<const SmtTerm*>& term_list);
+
   /// @brief attribute を作る．
   /// @param[in] keyword キーワード
   /// @param[in] expr 値
@@ -217,11 +275,17 @@ private:
   // メモリアロケータ
   SimpleAlloc mAlloc;
 
+  // SmtId を管理するクラス
   SmtIdMgr mIdMgr;
 
+  // SmtSort を管理するクラス
   SmtSortMgr mSortMgr;
 
+  // SmtFun を管理するクラス
   SmtFunMgr mFunMgr;
+
+  // logic
+  tSmtLogic mLogic;
 
 };
 

@@ -41,12 +41,20 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号を返す．
+  virtual
   ymuint
   id() const;
 
   /// @brief 名前を返す．
+  virtual
   const SmtId*
   name() const;
+
+  /// @brief パラメータ番号を返す．
+  /// @note 通常の型の場合は -1 を返す．
+  virtual
+  ymint
+  param_id() const;
 
   /// @brief 複合型の場合の要素数を返す．
   /// @note 単純な型の場合には 0 を返す．
@@ -60,11 +68,10 @@ public:
   const SmtSort*
   elem(ymuint pos) const;
 
-  /// @brief 実際の型を返す．
-  /// @note 通常は自分自身を返すが alias の場合は実体を返す．
+  /// @brief 型テンプレートを返す．
   virtual
   const SmtSort*
-  sort() const;
+  sort_template() const;
 
 
 private:
@@ -86,7 +93,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////
 /// @class SmtAliasSort SmtSortImpl.h "SmtSortImpl.h"
-/// @brief 複合型の SmtSort
+/// @brief alias 型の SmtSort
 //////////////////////////////////////////////////////////////////////
 class SmtAliasSort :
   public SmtSortImpl
@@ -111,11 +118,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 実際の型を返す．
-  /// @note 通常は自分自身を返すが alias の場合は実体を返す．
+  /// @brief 型テンプレートを返す．
   virtual
   const SmtSort*
-  sort() const;
+  sort_template() const;
 
 
 private:
@@ -123,8 +129,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 実際の sort
-  const SmtSort* mSort;
+  // 型テンプレート
+  const SmtSort* mSortTemplate;
 
 };
 
@@ -142,7 +148,9 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] name 名前
-  SmtCplxSort(const SmtId* name);
+  /// @param[in] elem_list 要素のリスト
+  SmtCplxSort(const SmtId* name,
+	      const vector<const SmtSort*>& elem_list);
 
   /// @brief デストラクタ
   virtual
@@ -178,6 +186,77 @@ private:
   // 要素の型の配列
   // 実際には必要な領域を確保する．
   const SmtSort* mElemList[1];
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtParamSort SmtSortImpl.h "SmtSortImpl.h"
+/// @brief 型パラメータを表すクラス
+//////////////////////////////////////////////////////////////////////
+class SmtParamSort :
+  public SmtSort
+{
+  friend class SmtSortMgr;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] pid パラメータ番号
+  explicit
+  SmtParamSort(ymuint pid);
+
+  /// @brief デストラクタ
+  virtual
+  ~SmtParamSort();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ID番号を返す．
+  virtual
+  ymuint
+  id() const;
+
+  /// @brief 名前を返す．
+  virtual
+  const SmtId*
+  name() const;
+
+  /// @brief パラメータ番号を返す．
+  /// @note 通常の型の場合は -1 を返す．
+  virtual
+  ymint
+  param_id() const;
+
+  /// @brief 複合型の場合の要素数を返す．
+  /// @note 単純な型の場合には 0 を返す．
+  virtual
+  ymuint
+  elem_num() const;
+
+  /// @brief 複合型の場合の要素の型を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < elem_num )
+  virtual
+  const SmtSort*
+  elem(ymuint pos) const;
+
+  /// @brief 型テンプレートを返す．
+  virtual
+  const SmtSort*
+  sort_template() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // パラメータ番号
+  ymint32 mParamId;
 
 };
 

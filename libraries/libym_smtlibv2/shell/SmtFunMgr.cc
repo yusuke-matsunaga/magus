@@ -19,8 +19,9 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SmtFunMgr::SmtFunMgr() :
-  mAlloc(4096)
+// @param[in] alloc メモリアロケータ
+SmtFunMgr::SmtFunMgr(Alloc& alloc) :
+  mAlloc(alloc)
 {
   mNum = 0;
   mTableSize = 0;
@@ -40,8 +41,8 @@ BEGIN_NONAMESPACE
 // 関数が等しいかチェックする
 bool
 check_fun(const SmtFun* fun,
-	  const SmtSort* sort,
-	  const vector<const SmtSort*>& input_list)
+	  const vector<const SmtSort*>& input_list,
+	  const SmtSort* sort)
 {
   if ( fun->body() != NULL ) {
     return false;
@@ -67,13 +68,13 @@ END_NONAMESPACE
 // @param[in] input_list 入力の型のリスト
 const SmtFun*
 SmtFunMgr::reg_fun(const SmtId* name,
-		   const SmtSort* sort,
-		   const vector<const SmtSort*>& input_list)
+		   const vector<const SmtSort*>& input_list,
+		   const SmtSort* sort)
 {
   {
     const SmtFun* fun = find_fun(name);
     if ( fun != NULL ) {
-      if ( check_fun(fun, sort, input_list) ) {
+      if ( check_fun(fun, input_list, sort) ) {
 	return fun;
       }
       // 同名で形の異なる関数が登録されている．
@@ -108,8 +109,8 @@ BEGIN_NONAMESPACE
 // 関数が等しいかチェックする
 bool
 check_fun(const SmtFun* fun,
-	  const SmtSort* sort,
 	  const vector<SmtSortedVar>& input_list,
+	  const SmtSort* sort,
 	  const SmtTerm* body)
 {
   if ( fun->body() != body ) {
@@ -140,14 +141,14 @@ END_NONAMESPACE
 // @note input_list と input_var_list のサイズは同じ
 const SmtFun*
 SmtFunMgr::reg_fun(const SmtId* name,
-		   const SmtSort* sort,
 		   const vector<SmtSortedVar>& input_list,
+		   const SmtSort* sort,
 		   const SmtTerm* body)
 {
   {
     const SmtFun* fun = find_fun(name);
     if ( fun != NULL ) {
-      if ( check_fun(fun, sort, input_list, body) ) {
+      if ( check_fun(fun, input_list, sort, body) ) {
 	return fun;
       }
       // 同名で形の異なる関数が登録されている．

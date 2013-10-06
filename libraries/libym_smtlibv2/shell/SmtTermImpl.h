@@ -38,12 +38,12 @@ public:
   /// @brief kNumConst 型の場合に整数値を返す．
   virtual
   ymint32
-  int_value();
+  int_value() const;
 
   /// @brief kDecConst, kHexConst, kBinConst, kStrConst 型の場合に文字列を返す．
   virtual
   ShString
-  str_value();
+  str_value() const;
 
   /// @brief kQualIdentifier 型の場合に識別子を返す．
   virtual
@@ -56,16 +56,21 @@ public:
   const SmtSort*
   identifier_sort() const;
 
-  /// @brief kTermList 型の場合に項数を返す．
+  /// @brief kFunTerm 型の場合に関数を返す．
+  virtual
+  const SmtFun*
+  function() const;
+
+  /// @brief kFunTerm 型の場合に入力数を返す．
   virtual
   ymuint
-  term_num() const;
+  input_num() const;
 
-  /// @brief kTermList 型の場合に項を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < identifier_term_num() )
+  /// @brief kFunTerm 型の場合に入力を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
   virtual
   const SmtTerm*
-  term(ymuint pos) const;
+  input(ymuint pos) const;
 
   /// @brief kLet 型の場合に変数バインディングリストの要素数を返す．
   virtual
@@ -104,6 +109,17 @@ public:
   virtual
   const SmtTerm*
   body() const;
+
+  /// @brief kList 型の場合に要素数を返す．
+  virtual
+  ymuint
+  elem_num() const;
+
+  /// @brief kList 型の場合に要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < elem_num() )
+  virtual
+  const SmtTerm*
+  elem(ymuint pos) const;
 
 };
 

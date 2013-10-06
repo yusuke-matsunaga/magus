@@ -1,13 +1,12 @@
 
-/// @file SmtSort.cc
-/// @brief SmtSort の実装ファイル
+/// @file SmtSortImpl.cc
+/// @brief SmtSortImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_smtlibv2/SmtSort.h"
 #include "SmtSortImpl.h"
 
 
@@ -44,6 +43,14 @@ SmtSortImpl::name() const
   return mName;
 }
 
+// @brief パラメータ番号を返す．
+// @note 通常の型の場合は -1 を返す．
+ymint
+SmtSortImpl::param_id() const
+{
+  return -1;
+}
+
 // @brief 複合型の場合の要素数を返す．
 // @note 単純な型の場合には 0 を返す．
 ymuint
@@ -61,12 +68,12 @@ SmtSortImpl::elem(ymuint pos) const
   return NULL;
 }
 
-// @brief 実際の型を返す．
-// @note 通常は自分自身を返すが alias の場合は実体を返す．
+// @brief 型テンプレートを返す．
 const SmtSort*
-SmtSortImpl::sort() const
+SmtSortImpl::sort_template() const
 {
-  return this;
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
 }
 
 
@@ -80,7 +87,7 @@ SmtSortImpl::sort() const
 SmtAliasSort::SmtAliasSort(const SmtId* name,
 			   const SmtSort* sort) :
   SmtSortImpl(name),
-  mSort(sort)
+  mSortTemplate(sort)
 {
 }
 
@@ -89,12 +96,11 @@ SmtAliasSort::~SmtAliasSort()
 {
 }
 
-// @brief 実際の型を返す．
-// @note 通常は自分自身を返すが alias の場合は実体を返す．
+// @brief 型テンプレートを返す．
 const SmtSort*
-SmtAliasSort::sort() const
+SmtAliasSort::sort_template() const
 {
-  return mSort;
+  return mSortTemplate;
 }
 
 
@@ -104,10 +110,16 @@ SmtAliasSort::sort() const
 
 // @brief コンストラクタ
 // @param[in] name 名前
-SmtCplxSort::SmtCplxSort(const SmtId* name) :
-  SmtSortImpl(name)
+// @param[in] elem_list 要素のリスト
+SmtCplxSort::SmtCplxSort(const SmtId* name,
+			 const vector<const SmtSort*>& elem_list) :
+  SmtSortImpl(name),
+  mElemNum(elem_list.size())
 {
   // mElemList は SmtSortMgr が確保する．
+  for (ymuint i = 0; i < mElemNum; ++ i) {
+    mElemList[i] = elem_list[i];
+  }
 }
 
 // @brief デストラクタ
@@ -131,6 +143,70 @@ SmtCplxSort::elem(ymuint pos) const
 {
   assert_cond( pos < elem_num(), __FILE__, __LINE__);
   return mElemList[pos];
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス SmtParamSort
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pid パラメータ番号
+SmtParamSort::SmtParamSort(ymuint pid) :
+  mParamId(pid)
+{
+}
+
+// @brief デストラクタ
+SmtParamSort::~SmtParamSort()
+{
+}
+
+// @brief ID番号を返す．
+ymuint
+SmtParamSort::id() const
+{
+  return 0;
+}
+
+// @brief 名前を返す．
+const SmtId*
+SmtParamSort::name() const
+{
+  return NULL;
+}
+
+// @brief パラメータ番号を返す．
+// @note 通常の型の場合は -1 を返す．
+ymint
+SmtParamSort::param_id() const
+{
+  return mParamId;
+}
+
+// @brief 複合型の場合の要素数を返す．
+// @note 単純な型の場合には 0 を返す．
+ymuint
+SmtParamSort::elem_num() const
+{
+  return 0;
+}
+
+// @brief 複合型の場合の要素の型を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < elem_num )
+const SmtSort*
+SmtParamSort::elem(ymuint pos) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief 型テンプレートを返す．
+const SmtSort*
+SmtParamSort::sort_template() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
 }
 
 END_NAMESPACE_YM_SMTLIBV2

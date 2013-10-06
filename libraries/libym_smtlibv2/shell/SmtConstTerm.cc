@@ -37,7 +37,7 @@ SmtNumTerm::type() const
 
 // @brief kNumConst 型の場合に整数値を返す．
 ymint32
-SmtNumTerm::int_value()
+SmtNumTerm::int_value() const
 {
   return mVal;
 }
@@ -68,7 +68,7 @@ SmtStrTerm::type() const
 
 // @brief kDecConst, kHexConst, kBinConst, kStrConst 型の場合に文字列を返す．
 ShString
-SmtStrTerm::str_value()
+SmtStrTerm::str_value() const
 {
   return mVal;
 }

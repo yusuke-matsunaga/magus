@@ -28,7 +28,7 @@ SmtTermImpl::~SmtTermImpl()
 
 // @brief kNumConst 型の場合に整数値を返す．
 ymint32
-SmtTermImpl::int_value()
+SmtTermImpl::int_value() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return 0;
@@ -36,7 +36,7 @@ SmtTermImpl::int_value()
 
 // @brief kDecConst, kHexConst, kBinConst, kStrConst 型の場合に文字列を返す．
 ShString
-SmtTermImpl::str_value()
+SmtTermImpl::str_value() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return ShString();
@@ -59,18 +59,26 @@ SmtTermImpl::identifier_sort() const
   return NULL;
 }
 
-// @brief kTermList 型の場合に項数を返す．
+// @brief kFunTerm 型の場合に関数を返す．
+const SmtFun*
+SmtTermImpl::function() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief kFunTerm 型の場合に入力数を返す．
 ymuint
-SmtTermImpl::term_num() const
+SmtTermImpl::input_num() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return 0;
 }
 
-// @brief kTermList 型の場合に項を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < identifier_term_num() )
+// @brief kFunTerm 型の場合に入力を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
 const SmtTerm*
-SmtTermImpl::term(ymuint pos) const
+SmtTermImpl::input(ymuint pos) const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -130,6 +138,23 @@ SmtTermImpl::attr(ymuint pos) const
 // @brief kLet/kForall/kExists/kAttr 型の場合に本体の項を返す．
 const SmtTerm*
 SmtTermImpl::body() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief kList 型の場合に要素数を返す．
+ymuint
+SmtTermImpl::elem_num() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
+}
+
+// @brief kList 型の場合に要素を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < elem_num() )
+const SmtTerm*
+SmtTermImpl::elem(ymuint pos) const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;

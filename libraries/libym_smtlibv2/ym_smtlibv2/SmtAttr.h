@@ -41,9 +41,15 @@ public:
   /// @brief 属性値を表す式を返す．
   virtual
   const SmtTerm*
-  value() = 0;
+  value() const = 0;
 
 };
+
+
+/// @relates SmtAttr
+/// @brief 内容を表す文字列を返す．
+string
+attr_str(const SmtAttr* attr);
 
 END_NAMESPACE_YM_SMTLIBV2
 

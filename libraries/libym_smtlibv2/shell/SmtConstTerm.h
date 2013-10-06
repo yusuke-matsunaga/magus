@@ -46,7 +46,7 @@ public:
   /// @brief kNumConst 型の場合に整数値を返す．
   virtual
   ymint32
-  int_value();
+  int_value() const;
 
 
 private:
@@ -92,7 +92,7 @@ public:
   /// @brief kDecConst, kHexConst, kBinConst, kStrConst 型の場合に文字列を返す．
   virtual
   ShString
-  str_value();
+  str_value() const;
 
 
 private:

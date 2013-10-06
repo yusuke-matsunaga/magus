@@ -36,7 +36,7 @@ SmtAttrImpl::keyword() const
 
 // @brief 属性値を表す式を返す．
 const SmtTerm*
-SmtAttrImpl::value()
+SmtAttrImpl::value() const
 {
   return NULL;
 }
@@ -61,7 +61,7 @@ SmtAttrImpl2::~SmtAttrImpl2()
 
 // @brief 属性値を表す式を返す．
 const SmtTerm*
-SmtAttrImpl2::value()
+SmtAttrImpl2::value() const
 {
   return mValue;
 }

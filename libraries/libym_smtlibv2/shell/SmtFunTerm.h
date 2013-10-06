@@ -1,8 +1,8 @@
-#ifndef SMTTERMLIST_H
-#define SMTTERMLIST_H
+#ifndef SMTFUNTERM_H
+#define SMTFUNTERM_H
 
-/// @file SmtTermList.h
-/// @brief SmtTermList のヘッダファイル
+/// @file SmtFunTerm.h
+/// @brief SmtFunTerm のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -15,22 +15,24 @@
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 //////////////////////////////////////////////////////////////////////
-/// @class SmtTermList SmtTermList.h "SmtTermList.h"
+/// @class SmtFunTerm SmtFunTerm.h "SmtFunTerm.h"
 /// @brief SmtTerm のリストを表すクラス
 //////////////////////////////////////////////////////////////////////
-class SmtTermList :
+class SmtFunTerm :
   public SmtTermImpl
 {
   friend class SmtLibMgr;
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] term_list SmtTerm のリスト
-  SmtTermList(const vector<const SmtTerm*>& term_list);
+  /// @param[in] fun 関数
+  /// @param[in] input_list 入力のリスト
+  SmtFunTerm(const SmtFun* fun,
+	     const vector<const SmtTerm*>& input_list);
 
   /// @brief デストラクタ
   virtual
-  ~SmtTermList();
+  ~SmtFunTerm();
 
 
 public:
@@ -43,16 +45,21 @@ public:
   tType
   type() const;
 
-  /// @brief kTermList 型の場合に項数を返す．
+  /// @brief kFunTerm 型の場合に関数を返す．
+  virtual
+  const SmtFun*
+  function() const;
+
+  /// @brief kFunTerm 型の場合に入力数を返す．
   virtual
   ymuint
-  term_num() const;
+  input_num() const;
 
-  /// @brief kTermList 型の場合に項を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < identifier_term_num() )
+  /// @brief kFunTerm 型の場合に入力を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
   virtual
   const SmtTerm*
-  term(ymuint pos) const;
+  input(ymuint pos) const;
 
 
 private:
@@ -60,15 +67,18 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 項数
-  ymuint32 mTermNum;
+  // 関数
+  const SmtFun* mFunction;
 
-  // 項の配列
+  // 入力数
+  ymuint32 mInputNum;
+
+  // 入力の配列
   // 実際には必要なサイズを確保する．
-  const SmtTerm* mTermList[1];
+  const SmtTerm* mInputList[1];
 
 };
 
 END_NAMESPACE_YM_SMTLIBV2
 
-#endif // SMTTERMLIST_H
+#endif // SMTFUNTERM_H

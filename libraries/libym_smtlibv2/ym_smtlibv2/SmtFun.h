@@ -76,6 +76,13 @@ public:
 
 };
 
+
+/// @relates SmtFun
+/// @brief 内容を表す文字列を返す．
+extern
+string
+fun_str(const SmtFun* fun);
+
 END_NAMESPACE_YM_SMTLIBV2
 
 #endif // YM_SMTLIBV2_SMTFUN_H

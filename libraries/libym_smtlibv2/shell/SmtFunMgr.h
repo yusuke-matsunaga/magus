@@ -10,7 +10,7 @@
 
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -26,7 +26,8 @@ class SmtFunMgr
 public:
 
   /// @brief コンストラクタ
-  SmtFunMgr();
+  /// @param[in] alloc メモリアロケータ
+  SmtFunMgr(Alloc& alloc);
 
   /// @brief デストラクタ
   ~SmtFunMgr();
@@ -44,8 +45,8 @@ public:
   /// @return 登録した関数を返す．
   const SmtFun*
   reg_fun(const SmtId* name,
-	  const SmtSort* sort,
-	  const vector<const SmtSort*>& input_list);
+	  const vector<const SmtSort*>& input_list,
+	  const SmtSort* sort);
 
   /// @brief 実体のある関数を登録する．
   /// @param[in] name 名前
@@ -55,8 +56,8 @@ public:
   /// @return 登録した関数を返す．
   const SmtFun*
   reg_fun(const SmtId* name,
-	  const SmtSort* sort,
 	  const vector<SmtSortedVar>& input_list,
+	  const SmtSort* sort,
 	  const SmtTerm* body);
 
   /// @brief 関数を返す．
@@ -82,7 +83,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // メモリ確保用のオブジェクト
-  SimpleAlloc mAlloc;
+  Alloc& mAlloc;
 
   // 登録されている関数の数
   ymuint32 mNum;

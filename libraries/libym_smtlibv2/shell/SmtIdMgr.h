@@ -11,7 +11,7 @@
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
 #include "ym_utils/ShString.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -28,7 +28,8 @@ class SmtIdMgr
 public:
 
   /// @brief コンストラクタ
-  SmtIdMgr();
+  /// @param[in] alloc メモリアロケータ
+  SmtIdMgr(Alloc& alloc);
 
   /// @brief デストラクタ
   ~SmtIdMgr();
@@ -44,7 +45,7 @@ public:
   /// @param[in] index_list インデックスリスト
   const SmtId*
   new_id(const ShString& name,
-	 const vector<ymint32>& index_list);
+	 const vector<ymint32>& index_list = vector<ymint32>(0));
 
 
 private:
@@ -64,7 +65,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // メモリ確保用のオブジェクト
-  SimpleAlloc mAlloc;
+  Alloc& mAlloc;
 
   // 登録されている要素数
   ymuint32 mNum;

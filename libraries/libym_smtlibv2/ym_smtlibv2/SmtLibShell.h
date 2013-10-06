@@ -15,7 +15,6 @@
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 class SmtLibMgr;
-class SmtLibCmd;
 
 //////////////////////////////////////////////////////////////////////
 /// @class SmtLibShell SmtLibShell.h "ym_smtlibv2/SmtLibShell.h"

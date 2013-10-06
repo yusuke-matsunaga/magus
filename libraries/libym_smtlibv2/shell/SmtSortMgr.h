@@ -10,7 +10,7 @@
 
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -27,7 +27,8 @@ class SmtSortMgr
 public:
 
   /// @brief コンストラクタ
-  SmtSortMgr();
+  /// @param[in] alloc メモリアロケータ
+  SmtSortMgr(Alloc& alloc);
 
   /// @brief デストラクタ
   ~SmtSortMgr();
@@ -49,11 +50,13 @@ public:
 
   /// @brief alias を登録する．
   /// @param[in] name 型名
+  /// @param[in] arg_num 引数の数
   /// @param[in] sort 登録する型
   /// @retval true 登録が成功した．
   /// @retval false 登録が失敗した．同名で異なる alias が登録されている．
   bool
   reg_alias(const SmtId* name,
+	    ymuint arg_num,
 	    const SmtSort* sort);
 
   /// @brief SmtSort に変換する．
@@ -64,11 +67,39 @@ public:
   new_sort(const SmtId* name,
 	   const vector<const SmtSort*>& elem_list);
 
+  /// @brief 型パラメータを作る．
+  /// @param[in] pid パラメータ番号
+  const SmtSort*
+  new_sort_param(ymuint pid);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief テンプレートから実際の型を作る．
+  /// @param[in] templ テンプレート
+  /// @param[in] param_list パラメータリスト
+  SmtSortImpl*
+  replace_param(const SmtSort* templ,
+		const vector<const SmtSort*>& param_list);
+
+  /// @brief replace_param の下請け関数
+  /// @param[in] templ テンプレート
+  /// @param[in] param_list パラメータリスト
+  const SmtSort*
+  replace_param_sub(const SmtSort* templ,
+		    const vector<const SmtSort*>& param_list);
+
+  /// @brief 単純な型を作る．
+  SmtSortImpl*
+  new_simple_sort(const SmtId* name);
+
+  /// @brief 複合型を作る．
+  SmtSortImpl*
+  new_complex_sort(const SmtId* name,
+		   const vector<const SmtSort*>& elem_list);
 
   /// @brief ハッシュ表を拡大する．
   /// @param[in] req_size 新しいサイズ
@@ -82,7 +113,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // メモリ確保用のオブジェクト
-  SimpleAlloc mAlloc;
+  Alloc& mAlloc;
 
   // 名前をキーにして引数の数を保持するハッシュ表
   hash_map<ymuint32, ymuint32> mHash;

@@ -22,7 +22,7 @@ class SmtAttrImpl :
   public SmtAttr
 {
   friend class SmtLibMgr;
-private:
+protected:
 
   /// @brief コンストラクタ
   explicit
@@ -46,7 +46,7 @@ public:
   /// @brief 属性値を表す式を返す．
   virtual
   const SmtTerm*
-  value();
+  value() const;
 
 
 private:
@@ -87,7 +87,7 @@ public:
   /// @brief 属性値を表す式を返す．
   virtual
   const SmtTerm*
-  value();
+  value() const;
 
 
 private:

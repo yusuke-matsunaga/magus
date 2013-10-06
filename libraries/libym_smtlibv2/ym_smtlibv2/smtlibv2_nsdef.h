@@ -26,6 +26,37 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 //////////////////////////////////////////////////////////////////////
+/// @brief logic を表す列挙型
+//////////////////////////////////////////////////////////////////////
+enum tSmtLogic {
+  kSmtLogic_NONE,
+  kSmtLogic_AUFLIA,
+  kSmtLogic_AUFLIRA,
+  kSmtLogic_AUFNIRA,
+  kSmtLogic_LRA,
+  kSmtLogic_QF_ABV,
+  kSmtLogic_QF_AUFBV,
+  kSmtLogic_QF_AUFLIA,
+  kSmtLogic_QF_AX,
+  kSmtLogic_QF_BV,
+  kSmtLogic_QF_IDL,
+  kSmtLogic_QF_LIA,
+  kSmtLogic_QF_LRA,
+  kSmtLogic_QF_NIA,
+  kSmtLogic_QF_NRA,
+  kSmtLogic_QF_RDL,
+  kSmtLogic_QF_UF,
+  kSmtLogic_QF_UFBV,
+  kSmtLogic_QF_UFIDL,
+  kSmtLogic_QF_UFLIA,
+  kSmtLogic_QF_UFLRA,
+  kSmtLogic_QF_UFNRA,
+  kSmtLogic_UFLRA,
+  kSmtLogic_UFNIA
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @brief SmtLib の処理結果を表す列挙型
 //////////////////////////////////////////////////////////////////////
 enum tSmtLibResponse {

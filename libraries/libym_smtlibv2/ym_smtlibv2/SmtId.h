@@ -63,6 +63,13 @@ public:
 
 };
 
+
+/// @relates SmtId
+/// @brief 内容を表す文字列を返す．
+extern
+string
+id_str(const SmtId* id);
+
 END_NAMESPACE_YM_SMTLIBV2
 
 #endif // YM_SMTLIBV2_SMTID_H

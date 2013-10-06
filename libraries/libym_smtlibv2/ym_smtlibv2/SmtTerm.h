@@ -48,8 +48,8 @@ public:
     kIdentifier,
     /// @brief <qual_identifier>
     kQualIdentifier,
-    /// @brief term list
-    kTermList,
+    /// @brief function
+    kFunTerm,
     /// @brief let
     kLet,
     /// @brief forall
@@ -57,7 +57,9 @@ public:
     /// @brief exists
     kExists,
     /// @brief !
-    kAttr
+    kAttr,
+    /// @brief list
+    kList
   };
 
 
@@ -81,14 +83,14 @@ public:
   /// @brief kNumConst 型の場合に整数値を返す．
   virtual
   ymint32
-  int_value() = 0;
+  int_value() const = 0;
 
-  /// @brief kDecConst, kHexConst, kBinConst, kStrConst 型の場合に文字列を返す．
+  /// @brief kDecConst/kHexConst/kBinConst/kStrConst/kKeyword/kSymbol 型の場合に文字列を返す．
   virtual
   ShString
-  str_value() = 0;
+  str_value() const = 0;
 
-  /// @brief kQualIdentifier 型の場合に識別子を返す．
+  /// @brief kIdentifier/kQualIdentifier 型の場合に識別子を返す．
   virtual
   const SmtId*
   identifier() const = 0;
@@ -99,16 +101,21 @@ public:
   const SmtSort*
   identifier_sort() const = 0;
 
-  /// @brief kTermList 型の場合に項数を返す．
+  /// @brief kFunTerm 型の場合に関数を返す．
+  virtual
+  const SmtFun*
+  function() const = 0;
+
+  /// @brief kFunTerm 型の場合に入力数を返す．
   virtual
   ymuint
-  term_num() const = 0;
+  input_num() const = 0;
 
-  /// @brief kTermList 型の場合に項を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < identifier_term_num() )
+  /// @brief kFunTerm 型の場合に入力を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
   virtual
   const SmtTerm*
-  term(ymuint pos) const = 0;
+  input(ymuint pos) const = 0;
 
   /// @brief kLet 型の場合に変数バインディングリストの要素数を返す．
   virtual
@@ -148,7 +155,25 @@ public:
   const SmtTerm*
   body() const = 0;
 
+  /// @brief kList 型の場合に要素数を返す．
+  virtual
+  ymuint
+  elem_num() const = 0;
+
+  /// @brief kList 型の場合に要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < elem_num() )
+  virtual
+  const SmtTerm*
+  elem(ymuint pos) const = 0;
+
 };
+
+
+/// @relates SmtTerm
+/// @brief 内容を表す文字列を返す．
+extern
+string
+term_str(const SmtTerm* term);
 
 END_NAMESPACE_YM_SMTLIBV2
 

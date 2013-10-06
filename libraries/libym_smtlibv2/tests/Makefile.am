@@ -26,7 +26,8 @@ bin_PROGRAMS =
 
 noinst_PROGRAMS = \
 	lextest \
-	parsertest
+	parsertest \
+	SmtLibMgr_test
 
 
 ############################################################
@@ -61,5 +62,25 @@ parsertest_SOURCES = \
 	parsertest.cc
 
 parsertest_LDADD = \
+	../parser/libym_smt_parser.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+
+############################################################
+## SmtLibMgr_test
+############################################################
+SmtLibMgr_test_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/parser \
+	-I$(top_builddir)/parser \
+	-I$(top_srcdir)/shell
+
+SmtLibMgr_test_SOURCES = \
+	SmtLibMgr_test.cc
+
+SmtLibMgr_test_LDADD = \
+	../shell/libym_smt_shell.la \
 	../parser/libym_smt_parser.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

@@ -25,6 +25,9 @@ libym_smt_shell_la_CPPFLAGS = \
 	-I$(top_srcdir)/include
 
 libym_smt_shell_la_SOURCES = \
+	print.cc \
+	SmtAttrImpl.h \
+	SmtAttrImpl.cc \
 	SmtCompTerm.h \
 	SmtCompTerm.cc \
 	SmtConstTerm.h \
@@ -33,6 +36,8 @@ libym_smt_shell_la_SOURCES = \
 	SmtFunImpl.cc \
 	SmtFunMgr.h \
 	SmtFunMgr.cc \
+	SmtFunTerm.h \
+	SmtFunTerm.cc \
 	SmtIdImpl.h \
 	SmtIdImpl.cc \
 	SmtIdMgr.cc \
@@ -40,15 +45,14 @@ libym_smt_shell_la_SOURCES = \
 	SmtIdTerm.cc \
 	SmtLibMgr.h \
 	SmtLibMgr.cc \
-	SmtLibShell.cc \
+	SmtListTerm.h \
+	SmtListTerm.cc \
 	SmtSortImpl.cc \
 	SmtSortImpl.h \
 	SmtSortMgr.h \
 	SmtSortMgr.cc \
 	SmtTermImpl.h \
-	SmtTermImpl.cc \
-	SmtTermList.h \
-	SmtTermList.cc
+	SmtTermImpl.cc
 
 libym_smt_shell_la_LIBADD =
 
