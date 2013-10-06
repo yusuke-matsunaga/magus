@@ -66,10 +66,14 @@ END_NONAMESPACE
 // @param[in] name 名前
 // @param[in] sort 出力の型
 // @param[in] input_list 入力の型のリスト
+// @param[in] attr 属性
+// @param[in] param_num パラメータの数
 const SmtFun*
 SmtFunMgr::reg_fun(const SmtId* name,
 		   const vector<const SmtSort*>& input_list,
-		   const SmtSort* sort)
+		   const SmtSort* sort,
+		   SmtFun::tAttr attr,
+		   ymuint param_num)
 {
   {
     const SmtFun* fun = find_fun(name);
@@ -88,7 +92,7 @@ SmtFunMgr::reg_fun(const SmtId* name,
 
   ymuint n = input_list.size();
   void* p = mAlloc.get_memory(sizeof(SmtFun1) + sizeof(const SmtSort*) * (n - 1));
-  SmtFun1* fun = new (p) SmtFun1(name, sort, n);
+  SmtFun1* fun = new (p) SmtFun1(name, sort, n, attr, param_num);
 
   fun->mId = mNum;
   ++ mNum;

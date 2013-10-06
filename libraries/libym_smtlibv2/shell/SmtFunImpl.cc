@@ -63,6 +63,20 @@ SmtFunImpl::input_num() const
   return mInputNum;
 }
 
+// @brief 属性を返す．
+SmtFun::tAttr
+SmtFunImpl::attr() const
+{
+  return kNone;
+}
+
+// @brief パラメータの数を返す．
+ymuint
+SmtFunImpl::param_num() const
+{
+  return 0;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス SmtFun1
@@ -72,10 +86,16 @@ SmtFunImpl::input_num() const
 // @param[in] name 名前
 // @param[in] sort 出力の型
 // @param[in] input_num 入力数
+// @param[in] attr 属性
+// @param[in] param_num パラメータの数
 SmtFun1::SmtFun1(const SmtId* name,
 		 const SmtSort* sort,
-		 ymuint input_num) :
-  SmtFunImpl(name, sort, input_num)
+		 ymuint input_num,
+		 tAttr attr,
+		 ymuint param_num) :
+  SmtFunImpl(name, sort, input_num),
+  mAttr(attr),
+  mParamNum(param_num)
 {
 }
 
@@ -109,6 +129,20 @@ const SmtTerm*
 SmtFun1::body() const
 {
   return NULL;
+}
+
+// @brief 属性を返す．
+SmtFun::tAttr
+SmtFun1::attr() const
+{
+  return mAttr;
+}
+
+// @brief パラメータの数を返す．
+ymuint
+SmtFun1::param_num() const
+{
+  return mParamNum;
 }
 
 

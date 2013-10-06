@@ -64,6 +64,16 @@ public:
   ymuint
   input_num() const;
 
+  /// @brief 属性を返す．
+  virtual
+  tAttr
+  attr() const;
+
+  /// @brief パラメータの数を返す．
+  virtual
+  ymuint
+  param_num() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -103,9 +113,13 @@ private:
   /// @param[in] name 名前
   /// @param[in] sort 出力の型
   /// @param[in] input_num 入力数
+  /// @param[in] attr 属性
+  /// @param[in] param_num パラメータの数
   SmtFun1(const SmtId* name,
 	  const SmtSort* sort,
-	  ymuint input_num);
+	  ymuint input_num,
+	  tAttr attr,
+	  ymuint param_num);
 
   /// @brief デストラクタ
   virtual
@@ -136,11 +150,27 @@ public:
   const SmtTerm*
   body() const;
 
+  /// @brief 属性を返す．
+  virtual
+  tAttr
+  attr() const;
+
+  /// @brief パラメータの数を返す．
+  virtual
+  ymuint
+  param_num() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 属性
+  tAttr mAttr;
+
+  // パラメータの数
+  ymuint32 mParamNum;
 
   // 入力の型の配列
   // 実際には必要な領域を確保する．

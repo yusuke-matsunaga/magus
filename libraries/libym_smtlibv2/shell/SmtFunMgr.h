@@ -10,6 +10,7 @@
 
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
+#include "ym_smtlibv2/SmtFun.h"
 #include "ym_utils/Alloc.h"
 
 
@@ -42,11 +43,15 @@ public:
   /// @param[in] name 名前
   /// @param[in] sort 出力の型
   /// @param[in] input_list 入力の型のリスト
+  /// @param[in] attr 属性
+  /// @param[in] param_num パラメータの数
   /// @return 登録した関数を返す．
   const SmtFun*
   reg_fun(const SmtId* name,
 	  const vector<const SmtSort*>& input_list,
-	  const SmtSort* sort);
+	  const SmtSort* sort,
+	  SmtFun::tAttr attr = SmtFun::kNone,
+	  ymuint param_num = 0);
 
   /// @brief 実体のある関数を登録する．
   /// @param[in] name 名前

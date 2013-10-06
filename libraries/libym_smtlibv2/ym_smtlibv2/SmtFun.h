@@ -23,6 +23,21 @@ class SmtFun
 {
   friend class SmtFunMgr;
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 型定義
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 任意のオペランドをとる関数の属性
+  enum tAttr {
+    kNone,       // なし
+    kRightAssoc, // 右方結合
+    kLeftAssoc,  // 左方結合
+    kChainable,  // chainable
+    kPairwise    // pairwise
+  };
+
+
 protected:
 
   /// @brief デストラクタ
@@ -73,6 +88,16 @@ public:
   virtual
   const SmtTerm*
   body() const = 0;
+
+  /// @brief 属性を返す．
+  virtual
+  tAttr
+  attr() const = 0;
+
+  /// @brief パラメータの数を返す．
+  virtual
+  ymuint
+  param_num() const = 0;
 
 };
 

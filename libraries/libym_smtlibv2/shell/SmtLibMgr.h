@@ -81,9 +81,13 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief CORE theory の初期化を行う．
+  /// @brief Core theory の初期化を行う．
   void
-  core_init();
+  Core_init();
+
+  /// @brief Ints theory の初期化を行う．
+  void
+  Ints_init();
 
   /// @brief S式を数値に変換する．
   /// @param[in] node S式を表すノード
