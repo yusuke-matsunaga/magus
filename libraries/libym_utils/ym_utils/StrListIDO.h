@@ -1,8 +1,8 @@
-#ifndef YM_UTILS_STREAMIDO_H
-#define YM_UTILS_STREAMIDO_H
+#ifndef YM_UTILS_STRLISTIDO_H
+#define YM_UTILS_STRLISTIDO_H
 
-/// @file ym_utils/StreamIDO.h
-/// @brief StreamIDO のヘッダファイル
+/// @file ym_utils/StrListIDO.h
+/// @brief StrListIDO のヘッダファイル
 /// @author Yusuke Matsunaga
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -16,22 +16,22 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class StreamIDO StreamIDO.h "ym_utils/StreamIDO.h"
+/// @class StrListIDO StrListIDO.h "ym_utils/StrListIDO.h"
 /// @ingroup YmUtils
-/// @brief istream を用いた IDO の継承クラス
+/// @brief 文字列のリストを用いた IDO の継承クラス
 //////////////////////////////////////////////////////////////////////
-class StreamIDO :
+class StrListIDO :
   public IDO
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] s 入力ストリーム
-  StreamIDO(istream& s);
+  /// @param[in] str_list 文字列のリスト
+  StrListIDO(const vector<string>& str_list);
 
   /// @brief デストラクタ
   virtual
-  ~StreamIDO();
+  ~StrListIDO();
 
 
 public:
@@ -75,11 +75,17 @@ private:
   // このクラスでは意味を持たない．
   FileInfo mFileInfo;
 
-  // 入力ストリーム
-  istream& mS;
+  // 文字列のリスト
+  vector<string> mStrList;
+
+  // 現在処理中の行番号
+  ymuint32 mLineNum;
+
+  // 次に読み出す位置
+  ymuint32 mColumnNum;
 
 };
 
 END_NAMESPACE_YM
 
-#endif // YM_UTILS_STREAMIDO_H
+#endif // YM_UTILS_STRLISTIDO_H

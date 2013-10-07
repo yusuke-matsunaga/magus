@@ -11,6 +11,7 @@
 #include "ym_utils/FileIDO.h"
 #include "ym_utils/StreamIDO.h"
 #include "ym_utils/CompIDO.h"
+#include "ym_utils/StrListIDO.h"
 
 #include "ym_utils/ODO.h"
 #include "ym_utils/FileODO.h"
@@ -156,6 +157,7 @@ IDO::read_str()
 //////////////////////////////////////////////////////////////////////
 
 // @brief 空のコンストラクタ
+// @param[in] buff_size バッファサイズ
 FileIDO::FileIDO(ymuint buff_size)
 {
   mFileBuff = new FileBuff(buff_size);
@@ -163,20 +165,26 @@ FileIDO::FileIDO(ymuint buff_size)
 
 // @brief コンストラクタ
 // @param[in] filename ファイル名
+// @param[in] parent_loc インクルード元の親ファイルの情報
+// @param[in] buff_size バッファサイズ
 FileIDO::FileIDO(const char* filename,
+		 const FileLoc& parent_loc,
 		 ymuint buff_size)
 {
   mFileBuff = new FileBuff(buff_size);
-  open(filename);
+  open(filename, parent_loc);
 }
 
 // @brief コンストラクタ
 // @param[in] filename ファイル名
+// @param[in] parent_loc インクルード元の親ファイルの情報
+// @param[in] buff_size バッファサイズ
 FileIDO::FileIDO(const string& filename,
+		 const FileLoc& parent_loc,
 		 ymuint buff_size)
 {
   mFileBuff = new FileBuff(buff_size);
-  open(filename);
+  open(filename.c_str(), parent_loc);
 }
 
 // @brief デストラクタ
@@ -186,26 +194,18 @@ FileIDO::~FileIDO()
   delete mFileBuff;
 }
 
-// @brief 読み出し可能なら true を返す．
-FileIDO::operator bool() const
-{
-  return mFileBuff->is_ready();
-}
-
 // @brief ファイルを開く
 // @param[in] filename ファイル名
+// @param[in] parent_loc インクルード元の親ファイルの情報
 bool
-FileIDO::open(const char* filename)
+FileIDO::open(const char* filename,
+	      const FileLoc& parent_loc)
 {
-  return mFileBuff->open(filename, O_RDONLY);
-}
-
-// @brief ファイルを開く
-// @param[in] filename ファイル名
-bool
-FileIDO::open(const string& filename)
-{
-  return open(filename.c_str());
+  bool stat = mFileBuff->open(filename, O_RDONLY);
+  if ( stat ) {
+    mFileInfo = FileInfo(filename, parent_loc);
+  }
+  return stat;
 }
 
 // @brief ファイルを閉じる．
@@ -214,6 +214,29 @@ void
 FileIDO::close()
 {
   mFileBuff->close();
+}
+
+// @brief 読み出し可能なら true を返す．
+FileIDO::operator bool() const
+{
+  return mFileBuff->is_ready();
+}
+
+// @brief オープン中のファイル情報を得る．
+const FileInfo&
+FileIDO::file_info() const
+{
+  return mFileInfo;
+}
+
+// @brief 現在のファイル情報を書き換える．
+// @param[in] new_info 新しいファイル情報
+// @note プリプロセッサのプラグマなどで用いることを想定している．
+// @note 通常は使わないこと．
+void
+FileIDO::set_file_info(const FileInfo& file_info)
+{
+  mFileInfo = file_info;
 }
 
 // @brief データを読み込む．
@@ -240,20 +263,24 @@ CompIDO::CompIDO()
 
 // @brief コンストラクタ
 // @param[in] filename ファイル名
+// @param[in] parent_loc インクルード元の親ファイルの情報
 // @note 意味的にはコンストラクタ + open()
-CompIDO::CompIDO(const char* filename)
+CompIDO::CompIDO(const char* filename,
+		 const FileLoc& parent_loc)
 {
   mZ = new CompIn();
-  open(filename);
+  open(filename, parent_loc);
 }
 
 // @brief コンストラクタ
 // @param[in] filename ファイル名
+// @param[in] parent_loc インクルード元の親ファイルの情報
 // @note 意味的にはコンストラクタ + open()
-CompIDO::CompIDO(const string& filename)
+CompIDO::CompIDO(const string& filename,
+		 const FileLoc& parent_loc)
 {
   mZ = new CompIn();
-  open(filename);
+  open(filename.c_str(), parent_loc);
 }
 
 // @brief デストラクタ
@@ -262,30 +289,20 @@ CompIDO::~CompIDO()
   delete mZ;
 }
 
-// @brief 読み出し可能なら true を返す．
-CompIDO::operator bool() const
-{
-  return mZ->is_ready();
-}
-
 // @brief ファイルをオープンする．
 // @param[in] filename ファイル名
+// @param[in] parent_loc インクルード元の親ファイルの情報
 // @retval true オープンが成功した．
 // @retval false オープンが失敗した．
 bool
-CompIDO::open(const char* filename)
+CompIDO::open(const char* filename,
+	      const FileLoc& parent_loc)
 {
-  return mZ->open(filename, O_RDONLY, 0);
-}
-
-// @brief ファイルをオープンする．
-// @param[in] filename ファイル名
-// @retval true オープンが成功した．
-// @retval false オープンが失敗した．
-bool
-CompIDO::open(const string& filename)
-{
-  return open(filename.c_str());
+  bool stat = mZ->open(filename, O_RDONLY, 0);
+  if ( stat ) {
+    mFileInfo = FileInfo(filename, parent_loc);
+  }
+  return stat;
 }
 
 // @brief ファイルをクローズする．
@@ -293,6 +310,29 @@ void
 CompIDO::close()
 {
   return mZ->close();
+}
+
+// @brief 読み出し可能なら true を返す．
+CompIDO::operator bool() const
+{
+  return mZ->is_ready();
+}
+
+// @brief オープン中のファイル情報を得る．
+const FileInfo&
+CompIDO::file_info() const
+{
+  return mFileInfo;
+}
+
+// @brief 現在のファイル情報を書き換える．
+// @param[in] new_info 新しいファイル情報
+// @note プリプロセッサのプラグマなどで用いることを想定している．
+// @note 通常は使わないこと．
+void
+CompIDO::set_file_info(const FileInfo& file_info)
+{
+  mFileInfo = file_info;
 }
 
 // @brief 圧縮されたデータを伸長してバッファに書き込む．
@@ -322,6 +362,29 @@ StreamIDO::StreamIDO(istream& s) :
 // @brief デストラクタ
 StreamIDO::~StreamIDO()
 {
+}
+
+// @brief 読み出し可能なら true を返す．
+StreamIDO::operator bool() const
+{
+  return mS;
+}
+
+// @brief オープン中のファイル情報を得る．
+const FileInfo&
+StreamIDO::file_info() const
+{
+  return mFileInfo;
+}
+
+// @brief 現在のファイル情報を書き換える．
+// @param[in] new_info 新しいファイル情報
+// @note プリプロセッサのプラグマなどで用いることを想定している．
+// @note 通常は使わないこと．
+void
+StreamIDO::set_file_info(const FileInfo& file_info)
+{
+  mFileInfo = file_info;
 }
 
 // @brief データを読み込む．
@@ -642,6 +705,88 @@ CompODO::write(const ymuint8* buff,
 	       ymuint64 n)
 {
   return mZ->write(buff, n);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス StrListIDO
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] str_list 文字列のリスト
+StrListIDO::StrListIDO(const vector<string>& str_list) :
+  mStrList(str_list)
+{
+  mLineNum = 0;
+  mColumnNum = 0;
+}
+
+// @brief デストラクタ
+StrListIDO::~StrListIDO()
+{
+}
+
+// @brief 読み出し可能なら true を返す．
+StrListIDO::operator bool() const
+{
+  if ( mLineNum < mStrList.size() ) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+// @brief オープン中のファイル情報を得る．
+const FileInfo&
+StrListIDO::file_info() const
+{
+  return mFileInfo;
+}
+
+// @brief 現在のファイル情報を書き換える．
+// @param[in] new_info 新しいファイル情報
+// @note プリプロセッサのプラグマなどで用いることを想定している．
+// @note 通常は使わないこと．
+void
+StrListIDO::set_file_info(const FileInfo& file_info)
+{
+  mFileInfo = file_info;
+}
+
+// @brief データを読み込む．
+// @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
+// @param[in] n 読み込むデータサイズ
+// @return 実際に読み込んだ量を返す．
+ssize_t
+StrListIDO::read(ymuint8* buff,
+		 ymuint64 n)
+{
+  ymuint count = 0;
+  while ( n > 0 ) {
+    const string& str = mStrList[mLineNum];
+    ymuint src_size = str.size() - mColumnNum;
+    if ( src_size <= n ) {
+      for (ymuint i = 0; i < src_size; ++ i, ++ mColumnNum) {
+	buff[i] = str[mColumnNum];
+      }
+      n -= src_size;
+      ++ mLineNum;
+      mColumnNum = 0;
+      count += src_size;
+      if ( mLineNum >= mStrList.size() ) {
+	break;
+      }
+    }
+    else {
+      for (ymuint i = 0; i < n; ++ i, ++ mColumnNum) {
+	buff[i] = str[mColumnNum];
+      }
+      n = 0;
+      count += n;
+    }
+  }
+  return count;
 }
 
 END_NAMESPACE_YM

@@ -11,6 +11,8 @@
 
 #include "ym_utils/IDO.h"
 #include "ym_utils/zstream.h"
+#include "ym_utils/FileLoc.h"
+#include "ym_utils/FileInfo.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -31,15 +33,19 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
+  /// @param[in] parent_loc インクルード元の親ファイルの情報
   /// @note 意味的にはコンストラクタ + open()
   explicit
-  GzIDO(const char* filename);
+  GzIDO(const char* filename,
+	const FileLoc& parent_loc = FileLoc());
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
+  /// @param[in] parent_loc インクルード元の親ファイルの情報
   /// @note 意味的にはコンストラクタ + open()
   explicit
-  GzIDO(const string& filename);
+  GzIDO(const string& filename,
+	const FileLoc& parent_loc = FileLoc());
 
   /// @brief デストラクタ
   ~GzIDO();
@@ -50,22 +56,14 @@ public:
   // 公開インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 読み出し可能なら true を返す．
-  operator bool() const;
-
   /// @brief ファイルをオープンする．
   /// @param[in] filename ファイル名
+  /// @param[in] parent_loc インクルード元の親ファイルの情報
   /// @retval true オープンが成功した．
   /// @retval false オープンが失敗した．
   bool
-  open(const char* filename);
-
-  /// @brief ファイルをオープンする．
-  /// @param[in] filename ファイル名
-  /// @retval true オープンが成功した．
-  /// @retval false オープンが失敗した．
-  bool
-  open(const string& filename);
+  open(const char* filename,
+       const FileLoc& parent_loc = FileLoc());
 
   /// @brief ファイルをクローズする．
   void
@@ -76,6 +74,23 @@ public:
   //////////////////////////////////////////////////////////////////////
   // IDO の仮想関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 読み出し可能なら true を返す．
+  virtual
+  operator bool() const;
+
+  /// @brief オープン中のファイル情報を得る．
+  virtual
+  const FileInfo&
+  file_info() const;
+
+  /// @brief 現在のファイル情報を書き換える．
+  /// @param[in] new_info 新しいファイル情報
+  /// @note プリプロセッサのプラグマなどで用いることを想定している．
+  /// @note 通常は使わないこと．
+  virtual
+  void
+  set_file_info(const FileInfo& file_info);
 
   /// @brief 圧縮されたデータを伸長してバッファに書き込む．
   /// @param[in] buff 伸長したデータを格納するバッファ
@@ -92,6 +107,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // ファイル情報
+  FileInfo mFileInfo;
 
   // 入力ファイル用のバッファ
   FileBuff* mBuff;

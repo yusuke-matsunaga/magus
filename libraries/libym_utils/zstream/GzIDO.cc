@@ -41,6 +41,28 @@ GzIDO::GzIDO()
   mBuff = new FileBuff();
 }
 
+// @brief コンストラクタ
+// @param[in] filename ファイル名
+// @param[in] parent_loc インクルード元の親ファイルの情報
+// @note 意味的にはコンストラクタ + open()
+GzIDO::GzIDO(const char* filename,
+	     const FileLoc& parent_loc)
+{
+  mBuff = new FileBuff();
+  open(filename, parent_loc);
+}
+
+// @brief コンストラクタ
+// @param[in] filename ファイル名
+// @param[in] parent_loc インクルード元の親ファイルの情報
+// @note 意味的にはコンストラクタ + open()
+GzIDO::GzIDO(const string& filename,
+	     const FileLoc& parent_loc)
+{
+  mBuff = new FileBuff();
+  open(filename.c_str(), parent_loc);
+}
+
 // @brief デストラクタ
 GzIDO::~GzIDO()
 {
@@ -48,33 +70,21 @@ GzIDO::~GzIDO()
   delete mBuff;
 }
 
-// @brief 読み出し可能なら true を返す．
-GzIDO::operator bool() const
-{
-  return mBuff->is_ready();
-}
-
 // @brief ファイルをオープンする．
 // @param[in] filename ファイル名
+// @param[in] parent_loc インクルード元の親ファイルの情報
 // @retval true オープンが成功した．
 // @retval false オープンが失敗した．
 bool
-GzIDO::open(const string& filename)
-{
-  return open(filename.c_str());
-}
-
-// @brief ファイルをオープンする．
-// @param[in] filename ファイル名
-// @retval true オープンが成功した．
-// @retval false オープンが失敗した．
-bool
-GzIDO::open(const char* filename)
+GzIDO::open(const char* filename,
+	    const FileLoc& parent_loc)
 {
   bool stat = mBuff->open(filename, O_RDONLY);
   if ( !stat ) {
     return false;
   }
+
+  mFileInfo = FileInfo(filename, parent_loc);
 
   // ヘッダを解釈する．
   ymuint8 header[10];
@@ -165,6 +175,30 @@ void
 GzIDO::close()
 {
   mBuff->close();
+  mFileInfo = FileInfo();
+}
+
+// @brief 読み出し可能なら true を返す．
+GzIDO::operator bool() const
+{
+  return mBuff->is_ready();
+}
+
+// @brief オープン中のファイル情報を得る．
+const FileInfo&
+GzIDO::file_info() const
+{
+  return mFileInfo;
+}
+
+// @brief 現在のファイル情報を書き換える．
+// @param[in] new_info 新しいファイル情報
+// @note プリプロセッサのプラグマなどで用いることを想定している．
+// @note 通常は使わないこと．
+void
+GzIDO::set_file_info(const FileInfo& file_info)
+{
+  mFileInfo = file_info;
 }
 
 BEGIN_NONAMESPACE
