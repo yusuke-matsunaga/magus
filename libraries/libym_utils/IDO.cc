@@ -763,24 +763,21 @@ StrListIDO::read(ymuint8* buff,
 		 ymuint64 n)
 {
   ymuint count = 0;
-  while ( n > 0 ) {
+  while ( n > 0 && mLineNum < mStrList.size() ) {
     const string& str = mStrList[mLineNum];
     ymuint src_size = str.size() - mColumnNum;
     if ( src_size <= n ) {
       for (ymuint i = 0; i < src_size; ++ i, ++ mColumnNum) {
-	buff[i] = str[mColumnNum];
+	buff[count + i] = str[mColumnNum];
       }
       n -= src_size;
       ++ mLineNum;
       mColumnNum = 0;
       count += src_size;
-      if ( mLineNum >= mStrList.size() ) {
-	break;
-      }
     }
     else {
       for (ymuint i = 0; i < n; ++ i, ++ mColumnNum) {
-	buff[i] = str[mColumnNum];
+	buff[count + i] = str[mColumnNum];
       }
       n = 0;
       count += n;

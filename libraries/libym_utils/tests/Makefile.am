@@ -52,7 +52,8 @@ noinst_PROGRAMS = \
 	mspg_test \
 	mscg_test \
 	CompIDO_test \
-	CompODO_test
+	CompODO_test \
+	StrListIDO_test
 
 
 ############################################################
@@ -257,6 +258,19 @@ CompODO_test_SOURCES = \
 CompODO_test_LDFLAGS =
 
 CompODO_test_LDADD = \
+	$(YMUTILS)
+
+
+############################################################
+## Variables for building StrListIDO_test
+############################################################
+
+StrListIDO_test_SOURCES = \
+	StrListIDO_test.cc
+
+StrListIDO_test_LDFLAGS =
+
+StrListIDO_test_LDADD = \
 	$(YMUTILS)
 
 
