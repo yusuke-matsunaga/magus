@@ -18,23 +18,24 @@ StrListIDO_test(int argc,
 {
   vector<string> src_list;
 
-  src_list.push_back(string("abcdefghijklmnopqrstuvwxyz"));
-  src_list.push_back(string("ABCDEFGHJIKJLMNOPQRSTUVWXYZ"));
-  src_list.push_back(string("12345678901234567890"));
-  src_list.push_back(string("12345678901234567890"));
-  src_list.push_back(string("12345678901234567890"));
-  src_list.push_back(string("12345678901234567890"));
-  src_list.push_back(string("12345678901234567890"));
-  src_list.push_back(string("12345678901234567890"));
-  src_list.push_back(string("12345678901234567890"));
-  src_list.push_back(string("12345678901234567890"));
-  src_list.push_back(string("12345678901234567890"));
-  src_list.push_back(string("12345678901234567890"));
-  src_list.push_back(string("12345678901234567890"));
-  src_list.push_back(string("12345678901234567890"));
-  src_list.push_back(string("12345678901234567890"));
-  src_list.push_back(string("12345678901234567890"));
-  src_list.push_back(string("12345678901234567890"));
+  src_list.push_back(string("abcdefghijklmnopqrstuvwxyz\n"));
+  src_list.push_back(string("ABCDEFGHJIKLMNOPQRSTUVWXYZ\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("12345678901234567890\n"));
+  src_list.push_back(string("end\n"));
 
   StrListIDO ido(src_list);
 
