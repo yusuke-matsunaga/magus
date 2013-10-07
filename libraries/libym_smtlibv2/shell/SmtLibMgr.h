@@ -50,6 +50,11 @@ public:
   bool
   set_logic(const SmtLibNode* arg_top);
 
+  /// @brief set-info の処理を行う．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  set_info(const SmtLibNode* arg_top);
+
   /// @brief sort の宣言を行う．
   /// @param[in] arg_top 引数の先頭ノード
   bool

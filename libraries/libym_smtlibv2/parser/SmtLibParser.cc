@@ -337,4 +337,40 @@ display(ostream& s,
   }
 }
 
+// @relates SmtLibNode
+// @brief SmtLibNode の内容をもとの形で出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] node 対象のノード
+void
+print(ostream& s,
+      const SmtLibNode* node)
+{
+  for ( ; node != NULL; node = node->sibling()) {
+    s << " ";
+    switch ( node->type() ) {
+    case kNumToken:
+      s << node->int_value();
+      break;
+
+    case kDecToken:
+    case kHexToken:
+    case kBinToken:
+    case kStringToken:
+    case kSymbolToken:
+    case kKeywordToken:
+      s << node->str_value();
+      break;
+
+    case kListToken:
+      s << "(";
+      print(s, node->child());
+      s << " )";
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+    }
+  }
+}
+
 END_NAMESPACE_YM_SMTLIBV2

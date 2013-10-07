@@ -77,157 +77,169 @@ SmtLibMgr::~SmtLibMgr()
 bool
 SmtLibMgr::set_logic(const SmtLibNode* arg_top)
 {
+  if ( debug ) {
+    cerr << "set-logic ";
+    print(cerr, arg_top);
+    cerr << endl;
+  }
+
+  ostringstream ebuf;
+
   // このコマンドは1度しか使えない．
   if ( mLogic != kSmtLogic_NONE ) {
-    if ( debug ) {
-      cerr << "set-logic failed: already set" << endl;
-    }
-    return false;
+    ebuf << "already set";
+    goto syntax_error;
   }
 
   // このコマンドは1つの引数をとる．
   if ( arg_top == NULL || arg_top->sibling() != NULL ||
        arg_top->type() != kSymbolToken ) {
-    if ( debug ) {
-      cerr << "set-logic failed: syntax error" << endl;
-    }
-    return false;
-  }
-
-  const char* str = arg_top->str_value();
-  if ( strcmp(str, "AUFLIA") == 0 ) {
-    mLogic = kSmtLogic_AUFLIA;
-
-    Core_init();
-    Ints_init();
-  }
-  else if ( strcmp(str, "AUFLIRA") == 0 ) {
-    mLogic = kSmtLogic_AUFLIRA;
-
-    Core_init();
-    Ints_init();
-  }
-  else if ( strcmp(str, "AUFNIRA") == 0 ) {
-    mLogic = kSmtLogic_AUFNIRA;
-
-    Core_init();
-    Ints_init();
-  }
-  else if ( strcmp(str, "LRA") == 0 ) {
-    mLogic = kSmtLogic_LRA;
-
-    Core_init();
-  }
-  else if ( strcmp(str, "QF_ABV") == 0 ) {
-    mLogic = kSmtLogic_QF_ABV;
-
-    Core_init();
-  }
-  else if ( strcmp(str, "QF_AUFBV") == 0 ) {
-    mLogic = kSmtLogic_QF_AUFBV;
-
-    Core_init();
-  }
-  else if ( strcmp(str, "QF_AUFLIA") == 0 ) {
-    mLogic = kSmtLogic_QF_AUFLIA;
-
-    Core_init();
-    Ints_init();
-  }
-  else if ( strcmp(str, "QF_AX") == 0 ) {
-    mLogic = kSmtLogic_QF_AX;
-
-    Core_init();
-  }
-  else if ( strcmp(str, "QF_BV") == 0 ) {
-    mLogic = kSmtLogic_QF_BV;
-
-    Core_init();
-  }
-  else if ( strcmp(str, "QF_IDL") == 0 ) {
-    mLogic = kSmtLogic_QF_IDL;
-
-    Core_init();
-    Ints_init();
-  }
-  else if ( strcmp(str, "QF_LIA") == 0 ) {
-    mLogic = kSmtLogic_QF_LIA;
-
-    Core_init();
-    Ints_init();
-  }
-  else if ( strcmp(str, "QF_LRA") == 0 ) {
-    mLogic = kSmtLogic_QF_LRA;
-
-    Core_init();
-  }
-  else if ( strcmp(str, "QF_NIA") == 0 ) {
-    mLogic = kSmtLogic_QF_NIA;
-
-    Core_init();
-    Ints_init();
-  }
-  else if ( strcmp(str, "QF_NRA") == 0 ) {
-    mLogic = kSmtLogic_QF_NRA;
-
-    Core_init();
-  }
-  else if ( strcmp(str, "QF_RDL") == 0 ) {
-    mLogic = kSmtLogic_QF_RDL;
-
-    Core_init();
-  }
-  else if ( strcmp(str, "QF_UF") == 0 ) {
-    mLogic = kSmtLogic_QF_UF;
-
-    Core_init();
-  }
-  else if ( strcmp(str, "QF_UFBF") == 0 ) {
-    mLogic = kSmtLogic_QF_UFBV;
-
-    Core_init();
-  }
-  else if ( strcmp(str, "QF_UFIDL") == 0 ) {
-    mLogic = kSmtLogic_QF_UFIDL;
-
-    Core_init();
-    Ints_init();
-  }
-  else if ( strcmp(str, "QF_UFLIA") == 0 ) {
-    mLogic = kSmtLogic_QF_UFLIA;
-
-    Core_init();
-    Ints_init();
-  }
-  else if ( strcmp(str, "QF_UFLRA") == 0 ) {
-    mLogic = kSmtLogic_QF_UFLRA;
-
-    Core_init();
-  }
-  else if ( strcmp(str, "QF_UFNRA") == 0 ) {
-    mLogic = kSmtLogic_QF_UFNRA;
-
-    Core_init();
-  }
-  else if ( strcmp(str, "UFLRA") == 0 ) {
-    mLogic = kSmtLogic_UFLRA;
-
-    Core_init();
-  }
-  else if ( strcmp(str, "UFNIA") == 0 ) {
-    mLogic = kSmtLogic_UFNIA;
-
-    Core_init();
-    Ints_init();
+    ebuf << "syntax_error";
+    goto syntax_error;
   }
   else {
-    if ( debug ) {
-      cerr << "set-logic failed: unknown logic: " << str << endl;
+    const char* str = arg_top->str_value();
+    if ( strcmp(str, "AUFLIA") == 0 ) {
+      mLogic = kSmtLogic_AUFLIA;
+
+      Core_init();
+      Ints_init();
     }
-    return false;
+    else if ( strcmp(str, "AUFLIRA") == 0 ) {
+      mLogic = kSmtLogic_AUFLIRA;
+
+      Core_init();
+      Ints_init();
+    }
+    else if ( strcmp(str, "AUFNIRA") == 0 ) {
+      mLogic = kSmtLogic_AUFNIRA;
+
+      Core_init();
+      Ints_init();
+    }
+    else if ( strcmp(str, "LRA") == 0 ) {
+      mLogic = kSmtLogic_LRA;
+
+      Core_init();
+    }
+    else if ( strcmp(str, "QF_ABV") == 0 ) {
+      mLogic = kSmtLogic_QF_ABV;
+
+      Core_init();
+    }
+    else if ( strcmp(str, "QF_AUFBV") == 0 ) {
+      mLogic = kSmtLogic_QF_AUFBV;
+
+      Core_init();
+    }
+    else if ( strcmp(str, "QF_AUFLIA") == 0 ) {
+      mLogic = kSmtLogic_QF_AUFLIA;
+
+      Core_init();
+      Ints_init();
+    }
+    else if ( strcmp(str, "QF_AX") == 0 ) {
+      mLogic = kSmtLogic_QF_AX;
+
+      Core_init();
+    }
+    else if ( strcmp(str, "QF_BV") == 0 ) {
+      mLogic = kSmtLogic_QF_BV;
+
+      Core_init();
+    }
+    else if ( strcmp(str, "QF_IDL") == 0 ) {
+      mLogic = kSmtLogic_QF_IDL;
+
+      Core_init();
+      Ints_init();
+    }
+    else if ( strcmp(str, "QF_LIA") == 0 ) {
+      mLogic = kSmtLogic_QF_LIA;
+
+      Core_init();
+      Ints_init();
+    }
+    else if ( strcmp(str, "QF_LRA") == 0 ) {
+      mLogic = kSmtLogic_QF_LRA;
+
+      Core_init();
+    }
+    else if ( strcmp(str, "QF_NIA") == 0 ) {
+      mLogic = kSmtLogic_QF_NIA;
+
+      Core_init();
+      Ints_init();
+    }
+    else if ( strcmp(str, "QF_NRA") == 0 ) {
+      mLogic = kSmtLogic_QF_NRA;
+
+      Core_init();
+    }
+    else if ( strcmp(str, "QF_RDL") == 0 ) {
+      mLogic = kSmtLogic_QF_RDL;
+
+      Core_init();
+    }
+    else if ( strcmp(str, "QF_UF") == 0 ) {
+      mLogic = kSmtLogic_QF_UF;
+
+      Core_init();
+    }
+    else if ( strcmp(str, "QF_UFBF") == 0 ) {
+      mLogic = kSmtLogic_QF_UFBV;
+
+      Core_init();
+    }
+    else if ( strcmp(str, "QF_UFIDL") == 0 ) {
+      mLogic = kSmtLogic_QF_UFIDL;
+
+      Core_init();
+      Ints_init();
+    }
+    else if ( strcmp(str, "QF_UFLIA") == 0 ) {
+      mLogic = kSmtLogic_QF_UFLIA;
+
+      Core_init();
+      Ints_init();
+    }
+    else if ( strcmp(str, "QF_UFLRA") == 0 ) {
+      mLogic = kSmtLogic_QF_UFLRA;
+
+      Core_init();
+    }
+    else if ( strcmp(str, "QF_UFNRA") == 0 ) {
+      mLogic = kSmtLogic_QF_UFNRA;
+
+      Core_init();
+    }
+    else if ( strcmp(str, "UFLRA") == 0 ) {
+      mLogic = kSmtLogic_UFLRA;
+
+      Core_init();
+    }
+    else if ( strcmp(str, "UFNIA") == 0 ) {
+      mLogic = kSmtLogic_UFNIA;
+
+      Core_init();
+      Ints_init();
+    }
+    else {
+      ebuf << str << ": unknown logic";
+      goto syntax_error;
+    }
   }
 
+  if ( debug ) {
+    cerr << "  ==> success" << endl;
+  }
   return true;
+
+ syntax_error:
+  if ( debug ) {
+    cerr << "  ==> error: " << ebuf.str() << endl;
+  }
+  return false;
 }
 
 // @brief Core theory の初期化を行う．
@@ -374,11 +386,54 @@ SmtLibMgr::Ints_init()
   mFunMgr.reg_fun(gt_id, i2_list, bool_sort, SmtFun::kChainable);
 }
 
+// @brief set-info の処理を行う．
+// @param[in] arg_top 引数の先頭ノード
+bool
+SmtLibMgr::set_info(const SmtLibNode* arg_top)
+{
+  if ( debug ) {
+    cerr << "set-info ";
+    print(cerr, arg_top);
+    cerr << endl;
+  }
+
+  vector<const SmtAttr*> attr_list;
+  const char* emsg = "";
+
+  if ( !eval_to_attr(arg_top, attr_list) ) {
+    emsg = "syntax_error";
+    goto syntax_error;
+  }
+  if ( attr_list.empty() || attr_list.size() > 1 ) {
+    emsg = "syntax_error";
+    goto syntax_error;
+  }
+
+  if ( debug ) {
+    cerr << "  ==> success" << endl;
+  }
+
+  return true;
+
+ syntax_error:
+  if ( debug ) {
+    cerr << "  ==> error: " << emsg << endl;
+  }
+
+  return false;
+}
+
 // @brief sort の宣言を行う．
 // @param[in] arg_top 引数の先頭ノード
 bool
 SmtLibMgr::declare_sort(const SmtLibNode* arg_top)
 {
+  if ( debug ) {
+    cerr << "declare-sort ";
+    print(cerr, arg_top);
+    cerr << endl;
+  }
+
   // このコマンドは2つの引数をとる．
   vector<const SmtLibNode*> arg_list;
   const SmtId* name = NULL;
@@ -405,21 +460,19 @@ SmtLibMgr::declare_sort(const SmtLibNode* arg_top)
   num = arg_list[1]->int_value();
 
   // 型を登録する．
-  {
-    bool stat = mSortMgr.reg_sort(name, num);
-
-    if ( debug ) {
-      cerr << "declare-sort " << id_str(name) << " " << num << endl
-	   << "  ==> " << stat_str(stat) << endl;
-    }
-
-    return stat;
+  if ( !mSortMgr.reg_sort(name, num) ) {
+    emsg = "already declared";
+    goto syntax_error;
   }
+
+  if ( debug ) {
+    cerr << "  ==> success" << endl;
+  }
+
+  return true;
 
  syntax_error:
   if ( debug ) {
-    cerr << "declare-sort " << endl;
-    display(cerr, arg_top, 1);
     cerr << "  ==> error: " << emsg << endl;
   }
 
@@ -431,6 +484,12 @@ SmtLibMgr::declare_sort(const SmtLibNode* arg_top)
 bool
 SmtLibMgr::define_sort(const SmtLibNode* arg_top)
 {
+  if ( debug ) {
+    cerr << "define-sort ";
+    print(cerr, arg_top);
+    cerr << endl;
+  }
+
   // このコマンドは3つの引数をとる．
   vector<const SmtLibNode*> arg_list;
   const SmtId* name = NULL;
@@ -468,28 +527,25 @@ SmtLibMgr::define_sort(const SmtLibNode* arg_top)
 
   // 3つめは型テンプレート
   sort = eval_to_sort_template(arg_list[2], param_list);
+  if ( sort == NULL ) {
+    emsg = "third argument is not a valid sort";
+    goto syntax_error;
+  }
 
   // 型テンプレートを登録する．
-  {
-    bool stat = mSortMgr.reg_alias(name, param_list.size(), sort);
-
-    if ( debug ) {
-      cerr << "define-sort " << id_str(name) << " (";
-      for (vector<const SmtId*>::const_iterator p = param_list.begin();
-	   p != param_list.end(); ++ p) {
-	const SmtId* id = *p;
-	cerr << " " << id_str(id);
-      }
-      cerr << " ) " << sort_str(sort) << endl
-	   << "  ==> " << stat_str(stat) << endl;
-    }
-    return stat;
+  if ( !mSortMgr.reg_alias(name, param_list.size(), sort) ) {
+    emsg = "already defined";
+    goto syntax_error;
   }
+
+  if ( debug ) {
+    cerr << "  ==> success" << endl;
+  }
+
+  return true;
 
  syntax_error:
   if ( debug ) {
-    cerr << "define-sort " << endl;
-    display(cerr, arg_top, 1);
     cerr << "  ==> error: " << emsg << endl;
   }
 
@@ -501,6 +557,12 @@ SmtLibMgr::define_sort(const SmtLibNode* arg_top)
 bool
 SmtLibMgr::declare_fun(const SmtLibNode* arg_top)
 {
+  if ( debug ) {
+    cerr << "declare-fun ";
+    print(cerr, arg_top);
+    cerr << endl;
+  }
+
   // このコマンドは3つの引数をとる．
   vector<const SmtLibNode*> arg_list;
   const SmtId* name = NULL;
@@ -531,7 +593,7 @@ SmtLibMgr::declare_fun(const SmtLibNode* arg_top)
     const SmtSort* sort = eval_to_sort(node);
     if ( sort == NULL ) {
       ostringstream buf;
-      display(buf, node, 0);
+      print(buf, node);
       buf << " is not a registered sort";
       emsg = buf.str().c_str();
       goto syntax_error;
@@ -542,32 +604,24 @@ SmtLibMgr::declare_fun(const SmtLibNode* arg_top)
   // 3つめは出力の型のリスト
   output_sort = eval_to_sort(arg_list[2]);
   if ( output_sort == NULL ) {
-    emsg = "third argument is not 'sort' type";
+    emsg = "third argument is not a valid sort";
     goto syntax_error;
   }
 
   // 関数を登録する．
-  {
-    bool stat = mFunMgr.reg_fun(name, input_sort_list, output_sort);
-
-    if ( debug ) {
-      cerr << "declare-fun " << id_str(name) << " (";
-      for (vector<const SmtSort*>::const_iterator p = input_sort_list.begin();
-	   p != input_sort_list.end(); ++ p) {
-	const SmtSort* sort = *p;
-	cerr << " " << sort_str(sort);
-      }
-      cerr << " ) " << sort_str(output_sort) << endl
-	   << "  ==> " << stat_str(stat) << endl;
-    }
-
-    return stat;
+  if ( !mFunMgr.reg_fun(name, input_sort_list, output_sort) ) {
+    emsg = "already declared";
+    goto syntax_error;
   }
+
+  if ( debug ) {
+    cerr << "  ==> success" << endl;
+  }
+
+  return true;
 
  syntax_error:
   if ( debug ) {
-    cerr << "declare-fun " << endl;
-    display(cerr, arg_top, 1);
     cerr << "  ==> error: " << emsg << endl;
   }
 
@@ -579,6 +633,12 @@ SmtLibMgr::declare_fun(const SmtLibNode* arg_top)
 bool
 SmtLibMgr::define_fun(const SmtLibNode* arg_top)
 {
+  if ( debug ) {
+    cerr << "define-fun ";
+    print(cerr, arg_top);
+    cerr << endl;
+  }
+
   // このコマンドは4つの引数をとる．
   vector<const SmtLibNode*> arg_list;
   const SmtId* name = NULL;
@@ -610,7 +670,7 @@ SmtLibMgr::define_fun(const SmtLibNode* arg_top)
        node != NULL; node = node->sibling()) {
     SmtSortedVar sorted_var;
     if ( !eval_to_sorted_var(node, sorted_var) ) {
-      emsg = "second argument is not a list of identifiers";
+      emsg = "sorted var is expected.";
       goto syntax_error;
     }
     var_list.push_back(sorted_var);
@@ -618,37 +678,32 @@ SmtLibMgr::define_fun(const SmtLibNode* arg_top)
 
   // 3つめは出力の型
   output_sort = eval_to_sort(arg_list[2]);
+  if ( output_sort == NULL ) {
+    emsg = "third argument is not a valid sort";
+    goto syntax_error;
+  }
 
   // 4つめは本体の式
   body = eval_to_term(arg_list[3]);
+  if ( body == NULL ) {
+    emsg = "forth argument is not a valid term";
+    goto syntax_error;
+  }
 
   // 関数を登録する．
-  {
-    bool stat = mFunMgr.reg_fun(name, var_list, output_sort, body);
-
-    if ( debug ) {
-      cerr << "define-fun " << id_str(name) << " (";
-      for (vector<SmtSortedVar>::const_iterator p = var_list.begin();
-	   p != var_list.end(); ++ p) {
-	const SmtSortedVar& sv = *p;
-	cerr << " (" << id_str(sv.mVar)
-	     << " " << sort_str(sv.mSort)
-	     << " )";
-      }
-      cerr << " ) "
-	   << sort_str(output_sort)
-	   << " " << term_str(body)
-	   << endl
-	   << "  ==> " << stat_str(stat) << endl;
-    }
-
-    return stat;
+  if ( !mFunMgr.reg_fun(name, var_list, output_sort, body) ) {
+    emsg = "already defined";
+    goto syntax_error;
   }
+
+  if ( debug ) {
+    cerr << "  ==> success" << endl;
+  }
+
+  return true;
 
  syntax_error:
   if ( debug ) {
-    cerr << "define-fun " << endl;
-    display(cerr, arg_top, 1);
     cerr << "  ==> error: " << emsg << endl;
   }
 
@@ -660,25 +715,39 @@ SmtLibMgr::define_fun(const SmtLibNode* arg_top)
 bool
 SmtLibMgr::assert(const SmtLibNode* arg_top)
 {
-  // このコマンドは1つの引数をとる．
-  if ( arg_top == NULL || arg_top->sibling() != NULL ) {
-    return false;
+  if ( debug ) {
+    cerr << "assert ";
+    print(cerr, arg_top);
+    cerr << endl;
   }
 
-  const SmtTerm* term = eval_to_term(arg_top);
-  if ( term == NULL ) {
-    if ( debug ) {
-      cerr << " syntax error in assert" << endl;
-      display(cerr, arg_top, 0);
+  const char* emsg = "";
+
+  // このコマンドは1つの引数をとる．
+  if ( arg_top == NULL || arg_top->sibling() != NULL ) {
+    emsg = "syntax error";
+    goto syntax_error;
+  }
+  else {
+    const SmtTerm* term = eval_to_term(arg_top);
+    if ( term == NULL ) {
+      // エラーメッセージは出力されている．
+      goto syntax_error;
     }
-    return false;
   }
 
   if ( debug ) {
-    cerr << "assert " << term_str(term) << endl;
+    cerr << "  ==> success" << endl;
   }
 
   return true;
+
+ syntax_error:
+  if ( debug ) {
+    cerr << "  ==> error: " << emsg << endl;
+  }
+
+  return false;
 }
 
 // @brief S式を識別子に変換する．
@@ -739,9 +808,12 @@ SmtLibMgr::eval_to_sort(const SmtLibNode* node)
 {
   const SmtId* id = eval_to_id(node);
   vector<const SmtSort*> elem_list;
+  const SmtSort* sort = NULL;
+  ostringstream ebuf;
+
   if ( id == NULL ) {
     if ( node->type() != kListToken ) {
-      // syntax error
+      ebuf << "syntax error : " << node->loc();
       goto syntax_error;
     }
 
@@ -750,7 +822,7 @@ SmtLibMgr::eval_to_sort(const SmtLibNode* node)
     const SmtLibNode* node1 = node->child();
     id = eval_to_id(node1);
     if ( id == NULL ) {
-      // syntax error
+      ebuf << "not an identifier: " << node1->loc();
       goto syntax_error;
     }
 
@@ -758,20 +830,29 @@ SmtLibMgr::eval_to_sort(const SmtLibNode* node)
 	 node2 != NULL; node2 = node2->sibling()) {
       const SmtSort* sort1 = eval_to_sort(node2);
       if ( sort1 == NULL ) {
-	// syntax error
+	ebuf << "not a registered sort: " << node2->loc();
 	goto syntax_error;
       }
       elem_list.push_back(sort1);
     }
     if ( elem_list.empty() ) {
-      // syntax error
+      ebuf << "at least one sort required: " << node1->loc();
       goto syntax_error;
     }
   }
 
-  return mSortMgr.new_sort(id, elem_list);
+  sort = mSortMgr.new_sort(id, elem_list);
+  if ( sort == NULL ) {
+    ebuf << id->name() << ": not registered";
+    goto syntax_error;
+  }
+  return sort;
 
  syntax_error:
+  if ( debug ) {
+    cerr << "eval_to_sort failed: " << ebuf.str() << endl;
+  }
+
   return NULL;
 }
 
@@ -832,47 +913,53 @@ SmtLibMgr::eval_to_sort_template(const SmtLibNode* node,
 const SmtTerm*
 SmtLibMgr::eval_to_term(const SmtLibNode* node)
 {
+  // 定数の場合
   switch ( node->type() ) {
-  case kNumToken: return new_numeric(node->int_value());
-  case kDecToken: return new_decimal(node->str_value());
-  case kHexToken: return new_hexadecimal(node->str_value());
-  case kBinToken: return new_binary(node->str_value());
+  case kNumToken:    return new_numeric(node->int_value());
+  case kDecToken:    return new_decimal(node->str_value());
+  case kHexToken:    return new_hexadecimal(node->str_value());
+  case kBinToken:    return new_binary(node->str_value());
   case kStringToken: return new_string(node->str_value());
   default: ;
   }
 
+  // qual_identifier の場合
   const SmtTerm* term = eval_to_qid(node);
   if ( term != NULL ) {
     return term;
   }
 
-  if ( node->type() == kListToken ) {
+  ostringstream ebuf;
+
+  // 残りは ( identifier term+ ) の形
+  if ( node->type() != kListToken ) {
+    ebuf << "syntax error at " << node->loc();
+    goto syntax_error;
+  }
+  else {
     ymuint n = node->child_num();
     const SmtLibNode* node1 = node->child();
     const SmtId* fid = eval_to_id(node1);
     if ( fid == NULL ) {
-      if ( debug ) {
-	cerr << "eval_to_term failed: undefined function: "
-	     << id_str(fid) << endl;
-      }
-      abort();
-      return NULL;
+      ebuf << "not an identifier: " << node1->loc();
+      goto syntax_error;
     }
     const SmtFun* fun = find_fun(fid);
     if ( fun != NULL ) {
       if ( fun->attr() == SmtFun::kNone && fun->input_num() != n - 1) {
 	// 引数の数が合わない．
-	if ( debug ) {
-	  cerr << "eval_to_term failed: # of args mismatch: " << endl;
-	}
-      abort();
-	return NULL;
+	ebuf << "# of args mismatch: " << node->loc();
+	goto syntax_error;
       }
       vector<const SmtTerm*> input_list;
       input_list.reserve(n - 1);
       for (const SmtLibNode* node2 = node1->sibling();
 	   node2 != NULL; node2 = node2->sibling()) {
 	const SmtTerm* term1 = eval_to_term(node2);
+	if ( term1 == NULL ) {
+	  // エラーメッセージは下位の呼び出しで出力されているはず
+	  return NULL;
+	}
 	input_list.push_back(term1);
       }
       return new_fun_term(fun, input_list);
@@ -880,15 +967,12 @@ SmtLibMgr::eval_to_term(const SmtLibNode* node)
     else if ( node1->type() != kSymbolToken ||
 	      strcmp("let", static_cast<const char*>(node1->str_value())) == 0 ) {
       if ( node->child_num() != 3 ) {
-	// syntax error
-	cerr << "eval_to_term failed: # of args mismatch: 3 expected: "
-	     << node->child_num() << endl;
+	ebuf << "# of args mismatch: " << node->loc();
 	goto syntax_error;
       }
       const SmtLibNode* node2 = node1->sibling();
       if ( node2->type() != kListToken ) {
-	// syntax error
-	cerr << "eval_to_term failed: LIST expected" << endl;
+	ebuf << "'list' type expected: " << node2->loc();
 	goto syntax_error;
       }
 
@@ -898,9 +982,8 @@ SmtLibMgr::eval_to_term(const SmtLibNode* node)
 	   node21 != NULL; node21 = node21->sibling()) {
 	SmtVarBinding var_binding;
 	if ( !eval_to_var_binding(node21, var_binding) ) {
-	  // syntax error
-	  cerr << "eval_to_var_binding failed:" << endl;
-	  goto syntax_error;
+	  // エラーメッセージは eval_to_var_binding() 中で出力されているはず
+	  return NULL;
 	}
 	var_binding_list.push_back(var_binding);
       }
@@ -908,22 +991,20 @@ SmtLibMgr::eval_to_term(const SmtLibNode* node)
       const SmtLibNode* node3 = node2->sibling();
       const SmtTerm* term3 = eval_to_term(node3);
       if ( term3 == NULL ) {
-	// syntax error
-	goto syntax_error;
+	// エラーメッセージは下位の呼び出しで出力されているはず
+	return NULL;
       }
       return new_let(var_binding_list, term3);
     }
     else if ( node1->type() != kSymbolToken ||
 	      strcmp("forall", static_cast<const char*>(node1->str_value())) == 0 ) {
       if ( node->child_num() != 3 ) {
-	// syntax error
-	cerr << "forall requires 2 operands" << endl;
+	ebuf << "# of args mismatch: " << node->loc();
 	goto syntax_error;
       }
       const SmtLibNode* node2 = node1->sibling();
       if ( node2->type() != kListToken ) {
-	// syntax error
-	cerr << "1st operand of forall is 'list'" << endl;
+	ebuf << "'list' type expected: " << node2->loc();
 	goto syntax_error;
       }
 
@@ -933,8 +1014,8 @@ SmtLibMgr::eval_to_term(const SmtLibNode* node)
 	   node21 != NULL; node21 = node21->sibling()) {
 	SmtSortedVar sorted_var;
 	if ( !eval_to_sorted_var(node21, sorted_var) ) {
-	  // syntax error
-	  goto syntax_error;
+	  // エラーメッセージは eval_to_sorted_var() 中で出力されているはず
+	  return NULL;
 	}
 	sorted_var_list.push_back(sorted_var);
       }
@@ -942,20 +1023,20 @@ SmtLibMgr::eval_to_term(const SmtLibNode* node)
       const SmtLibNode* node3 = node2->sibling();
       const SmtTerm* term3 = eval_to_term(node3);
       if ( term3 == NULL ) {
-	// syntax error
-	goto syntax_error;
+	// エラーメッセージは下位の呼び出しで出力されているはず
+	return NULL;
       }
       return new_forall(sorted_var_list, term3);
     }
     else if ( node1->type() != kSymbolToken ||
 	      strcmp("exists", static_cast<const char*>(node1->str_value())) == 0 ) {
       if ( node->child_num() != 3 ) {
-	// syntax error
+	ebuf << "# of args mismatch: " << node->loc();
 	goto syntax_error;
       }
       const SmtLibNode* node2 = node1->sibling();
       if ( node2->type() != kListToken ) {
-	// syntax error
+	ebuf << "'llist' type expected: " << node2->loc();
 	goto syntax_error;
       }
 
@@ -965,8 +1046,8 @@ SmtLibMgr::eval_to_term(const SmtLibNode* node)
 	   node21 != NULL; node21 = node21->sibling()) {
 	SmtSortedVar sorted_var;
 	if ( !eval_to_sorted_var(node21, sorted_var) ) {
-	  // syntax error
-	  goto syntax_error;
+	  // エラーメッセージは eval_to_sorted_var() 中で出力されているはず
+	  return NULL;
 	}
 	sorted_var_list.push_back(sorted_var);
       }
@@ -974,43 +1055,42 @@ SmtLibMgr::eval_to_term(const SmtLibNode* node)
       const SmtLibNode* node3 = node2->sibling();
       const SmtTerm* term3 = eval_to_term(node3);
       if ( term3 == NULL ) {
-	// syntax error
-	goto syntax_error;
+	// エラーメッセージは下位の呼び出しで出力されているはず
+	return NULL;
       }
       return new_exists(sorted_var_list, term3);
     }
     else if ( node1->type() != kSymbolToken ||
 	      strcmp("!", static_cast<const char*>(node1->str_value())) == 0 ) {
       if ( node->child_num() < 3 ) {
-	// syntax error
+	ebuf << "# of args mismatch: " << node->loc();
 	goto syntax_error;
       }
       const SmtLibNode* node2 = node1->sibling();
       const SmtTerm* term = eval_to_term(node2);
       if ( term == NULL ) {
-	// syntax error
-	goto syntax_error;
+	// エラーメッセージは下位の呼び出しで出力されているはず
+	return NULL;
       }
 
       vector<const SmtAttr*> attr_list;
       attr_list.reserve(node->child_num() - 2);
       if ( !eval_to_attr(node2->sibling(), attr_list) ) {
-	// syntax error
-	goto syntax_error;
+	// エラーメッセージは eval_to_attr() で出力されているはず
+	return NULL;
       }
       return new_attr_term(term, attr_list);
     }
     else {
-      // syntax error
-      cerr << "eval_to_term failed: " << node1->str_value()
-	   << " : undefined function" << endl;
+      ebuf << fid->name() << ": undefined: " << node1->loc();
       goto syntax_error;
     }
   }
 
  syntax_error:
-  cerr << "eval_to_term failed: syntax error" << endl;
-  abort();
+  if ( debug ) {
+    cerr << ebuf.str() << endl;
+  }
   return NULL;
 }
 
@@ -1020,28 +1100,47 @@ const SmtTerm*
 SmtLibMgr::eval_to_expr(const SmtLibNode* node)
 {
   switch ( node->type() ) {
-  case kNumToken: return new_numeric(node->int_value());
-  case kDecToken: return new_decimal(node->str_value());
-  case kHexToken: return new_hexadecimal(node->str_value());
-  case kBinToken: return new_binary(node->str_value());
-  case kStringToken: return new_string(node->str_value());
-  case kSymbolToken: return new_symbol(node->str_value());
-  case kKeywordToken: return new_keyword(node->str_value());
-  default: ;
-  }
+  case kNumToken:
+    return new_numeric(node->int_value());
 
-  if ( node->type() != kListToken ) {
-    return NULL;
-  }
+  case kDecToken:
+    return new_decimal(node->str_value());
 
-  vector<const SmtTerm*> expr_list;
-  expr_list.reserve(node->child_num());
-  for (const SmtLibNode* node1 = node->child();
-       node1 != NULL; node1 = node1->sibling()) {
-    const SmtTerm* expr1 = eval_to_expr(node1);
-    expr_list.push_back(expr1);
+  case kHexToken:
+    return new_hexadecimal(node->str_value());
+
+  case kBinToken:
+    return new_binary(node->str_value());
+
+  case kStringToken:
+    return new_string(node->str_value());
+
+  case kSymbolToken:
+    return new_symbol(node->str_value());
+
+  case kKeywordToken:
+    return new_keyword(node->str_value());
+
+  case kListToken:
+    {
+      vector<const SmtTerm*> expr_list;
+      expr_list.reserve(node->child_num());
+      for (const SmtLibNode* node1 = node->child();
+	   node1 != NULL; node1 = node1->sibling()) {
+	const SmtTerm* expr1 = eval_to_expr(node1);
+	if ( expr1 == NULL ) {
+	  return NULL;
+	}
+	expr_list.push_back(expr1);
+      }
+      return new_list_term(expr_list);
+    }
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
-  return new_list_term(expr_list);
+  return NULL;
 }
 
 // @brief S式を qual_identifier に変換する．
@@ -1049,32 +1148,31 @@ SmtLibMgr::eval_to_expr(const SmtLibNode* node)
 const SmtTerm*
 SmtLibMgr::eval_to_qid(const SmtLibNode* node)
 {
+  // ただの identifier の場合もある．
   const SmtId* id = eval_to_id(node);
   if ( id != NULL ) {
     return new_identifier(id);
   }
 
-  if ( node->type() != kListToken ||
-       node->child_num() != 3 ) {
+  // それ以外は ( 'as' <identifier> <sort> ) の形
+  vector<const SmtLibNode*> arg_list;
+  if ( !parse_args(node, 3, arg_list) ) {
     return NULL;
   }
 
-  const SmtLibNode* node1 = node->child();
-  if ( node1->type() != kSymbolToken ) {
+  if ( arg_list[0]->type() != kSymbolToken ) {
     return NULL;
   }
-  if ( strcmp("as", static_cast<const char*>(node1->str_value())) != 0 ) {
+  if ( strcmp("as", static_cast<const char*>(arg_list[0]->str_value())) != 0 ) {
     return NULL;
   }
 
-  const SmtLibNode* node2 = node1->sibling();
-  id = eval_to_id(node2);
+  id = eval_to_id(arg_list[1]);
   if ( id == NULL ) {
     return NULL;
   }
 
-  const SmtLibNode* node3 = node2->sibling();
-  const SmtSort* sort = eval_to_sort(node3);
+  const SmtSort* sort = eval_to_sort(arg_list[2]);
   if ( sort == NULL ) {
     return NULL;
   }
@@ -1091,22 +1189,24 @@ bool
 SmtLibMgr::eval_to_sorted_var(const SmtLibNode* node,
 			      SmtSortedVar& sorted_var)
 {
-  if ( node->type() != kListToken ||
-       node->child_num() != 2 ) {
-    return false;
+  // ( <identifier> <sort> ) の形
+  vector<const SmtLibNode*> arg_list;
+  const SmtId* id = NULL;
+  const SmtSort* sort = NULL;
+  ostringstream ebuf;
+  if ( !parse_args(node->child(), 2, arg_list) ) {
+    ebuf << "syntax error: " << node->loc();
+    goto syntax_error;
   }
 
-  const SmtLibNode* node1 = node->child();
-  const SmtId* id = eval_to_id(node1);
+  id = eval_to_id(arg_list[0]);
   if ( id == NULL ) {
-    cerr << "eval_to_sorted_var failed: id == NULL: " << node1->str_value() << endl;
-    return false;
+    ebuf << "not a valid identifier: " << arg_list[0]->loc();
+    goto syntax_error;
   }
 
-  const SmtLibNode* node2 = node1->sibling();
-  const SmtSort* sort = eval_to_sort(node2);
+  sort = eval_to_sort(arg_list[1]);
   if ( sort == NULL ) {
-    cerr << "eval_to_sorted_var failed: sort == NULL: " << node2->str_value() << endl;
     return false;
   }
 
@@ -1114,6 +1214,13 @@ SmtLibMgr::eval_to_sorted_var(const SmtLibNode* node,
   sorted_var.mSort = sort;
 
   return true;
+
+ syntax_error:
+  if ( debug ) {
+    cerr << "eval_to_sorted_var() failed: " << ebuf.str() << endl;
+  }
+
+  return false;
 }
 
 // @brief S式を var_binding に変換する．
@@ -1125,20 +1232,25 @@ bool
 SmtLibMgr::eval_to_var_binding(const SmtLibNode* node,
 			       SmtVarBinding& var_binding)
 {
-  if ( node->type() != kListToken ||
-       node->child_num() != 2 ) {
-    return false;
+  // ( <identifier> <term> ) の形
+  vector<const SmtLibNode*> arg_list;
+  const SmtId* id = NULL;
+  const SmtTerm* term = NULL;
+  ostringstream ebuf;
+  if ( !parse_args(node->child(), 2, arg_list) ) {
+    ebuf << "syntax error: " << node->loc();
+    goto syntax_error;
   }
 
-  const SmtLibNode* node1 = node->child();
-  const SmtId* id = eval_to_id(node1);
+  id = eval_to_id(arg_list[0]);
   if ( id == NULL ) {
-    return false;
+    ebuf << "not a valid identifier: " << arg_list[0]->loc();
+    goto syntax_error;
   }
 
-  const SmtLibNode* node2 = node1->sibling();
-  const SmtTerm* term = eval_to_term(node2);
+  term = eval_to_term(arg_list[1]);
   if ( term == NULL ) {
+    // エラーメッセージは eval_to_term() 中で出力されている．
     return false;
   }
 
@@ -1146,6 +1258,13 @@ SmtLibMgr::eval_to_var_binding(const SmtLibNode* node,
   var_binding.mExpr = term;
 
   return true;
+
+ syntax_error:
+  if ( debug ) {
+    cerr << "eval_to_var_binding() failed: " << ebuf.str() << endl;
+  }
+
+  return false;
 }
 
 // @brief S式を attribute に変換する．

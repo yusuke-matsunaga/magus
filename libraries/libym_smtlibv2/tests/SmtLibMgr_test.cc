@@ -52,7 +52,7 @@ SmtLibMgr_test(const string& filename)
       cout << "SET_OPTION" << endl;
     }
     else if ( strcmp("set-info", str1) == 0 ) {
-      cout << "SET_INFO" << endl;
+      mgr.set_info(node1->sibling());
     }
     else if ( strcmp("declare-sort", str1) == 0 ) {
       mgr.declare_sort(node1->sibling());

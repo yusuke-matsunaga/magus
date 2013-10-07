@@ -88,7 +88,7 @@ private:
 
 
 /// @relates SmtLibNode
-/// @brief SmbLitNode の内容を出力する(デバッグ用)．
+/// @brief SmtLibNode の内容を出力する(デバッグ用)．
 /// @param[in] s 出力先のストリーム
 /// @param[in] node 対象のノード
 /// @param[in] ident_level 字下げのレベル
@@ -99,6 +99,15 @@ display(ostream& s,
 	const SmtLibNode* node,
 	ymuint ident_level = 0,
 	bool print_loc = false);
+
+/// @relates SmtLibNode
+/// @brief SmtLibNode の内容をもとの形で出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] node 対象のノード
+extern
+void
+print(ostream& s,
+      const SmtLibNode* node);
 
 
 //////////////////////////////////////////////////////////////////////
