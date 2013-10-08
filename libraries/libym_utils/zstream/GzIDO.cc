@@ -36,12 +36,6 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GzIDO::GzIDO()
-{
-  mBuff = new FileBuff();
-}
-
-// @brief コンストラクタ
 // @param[in] filename ファイル名
 // @param[in] parent_loc インクルード元の親ファイルの情報
 // @note 意味的にはコンストラクタ + open()

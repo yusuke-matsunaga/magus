@@ -26,7 +26,7 @@ struct FileIDOObject
   PyObject_HEAD
 
   // FileIDO の本体
-  FileIDO mBody;
+  FileIDO* mBody;
 
 };
 
@@ -44,8 +44,7 @@ FileIDO_new(PyTypeObject* type)
     return NULL;
   }
 
-  // FileIDO の最低限の初期化を行う．
-  new (&self->mBody) FileIDO();
+  self->mBody = NULL;
 
   return self;
 }
@@ -55,7 +54,7 @@ void
 FileIDO_dealloc(FileIDOObject* self)
 {
   // FileIDO の後始末を行う．
-  self->mBody.close();
+  delete self->mBody;
 
   PyObject_Del(self);
 }
@@ -63,19 +62,16 @@ FileIDO_dealloc(FileIDOObject* self)
 // 初期化関数
 int
 FileIDO_init(FileIDOObject* self,
-	      PyObject* args)
+	     PyObject* args)
 {
   // 引数の形式は
-  // - ()
   // - (str) : ファイル名
   char* filename = NULL;
-  if ( !PyArg_ParseTuple(args, "|s", &filename) ) {
+  if ( !PyArg_ParseTuple(args, "s", &filename) ) {
     return -1;
   }
 
-  if ( filename != NULL ) {
-    self->mBody.open(filename);
-  }
+  self->mBody = new FileIDO(filename);
 
   // 正常に終了したら 0 を返す．
   return 0;
@@ -84,101 +80,74 @@ FileIDO_init(FileIDOObject* self,
 // ok 関数
 PyObject*
 FileIDO_ok(FileIDOObject* self,
-	    PyObject* args)
+	   PyObject* args)
 {
   // 奇妙な文
-  bool stat = self->mBody;
+  bool stat = *(self->mBody);
 
   return PyObject_FromBool(stat);
-}
-
-// open 関数
-PyObject*
-FileIDO_open(FileIDOObject* self,
-	      PyObject* args)
-{
-  char* filename = NULL;
-  if ( !PyArg_ParseTuple(args, "s", &filename) ) {
-    return NULL;
-  }
-
-  self->mBody.open(filename);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-// close 関数
-PyObject*
-FileIDO_close(FileIDOObject* self,
-	       PyObject* args)
-{
-  self->mBody.close();
-
-  Py_INCREF(Py_None);
-  return Py_None;
 }
 
 // read_8 関数
 PyObject*
 FileIDO_read_8(FileIDOObject* self,
-		PyObject* args)
+	       PyObject* args)
 {
-  ymuint8 val = self->mBody.read_8();
+  ymuint8 val = self->mBody->read_8();
   return PyObject_FromYmuint8(val);
 }
 
 // read_16 関数
 PyObject*
 FileIDO_read_16(FileIDOObject* self,
-		 PyObject* args)
+		PyObject* args)
 {
-  ymuint16 val = self->mBody.read_16();
+  ymuint16 val = self->mBody->read_16();
   return PyObject_FromYmuint16(val);
 }
 
 // read_32 関数
 PyObject*
 FileIDO_read_32(FileIDOObject* self,
-		 PyObject* args)
+		PyObject* args)
 {
-  ymuint32 val = self->mBody.read_32();
+  ymuint32 val = self->mBody->read_32();
   return PyObject_FromYmuint32(val);
 }
 
 // read_64 関数
 PyObject*
 FileIDO_read_64(FileIDOObject* self,
-		 PyObject* args)
+		PyObject* args)
 {
-  ymuint64 val = self->mBody.read_64();
+  ymuint64 val = self->mBody->read_64();
   return PyObject_FromYmuint64(val);
 }
 
 // read_float 関数
 PyObject*
 FileIDO_read_float(FileIDOObject* self,
-		    PyObject* args)
+		   PyObject* args)
 {
-  float val = self->mBody.read_float();
+  float val = self->mBody->read_float();
   return PyObject_FromFloat(val);
 }
 
 // read_double 関数
 PyObject*
 FileIDO_read_double(FileIDOObject* self,
-		     PyObject* args)
+		    PyObject* args)
 {
-  double val = self->mBody.read_double();
+  double val = self->mBody->read_double();
   return PyObject_FromDouble(val);
 }
 
 // read_str 関数
 PyObject*
 FileIDO_read_str(FileIDOObject* self,
-		  PyObject* args)
+		 PyObject* args)
 {
-  string val = self->mBody.read_str();
+  string val = self->mBody->read_str();
   return PyObject_FromString(val);
 }
 
@@ -203,10 +172,6 @@ PyMethodDef FileIDO_methods[] = {
   //  - METH_COEXIST
   {"ok", (PyCFunction)FileIDO_ok, METH_NOARGS,
    PyDoc_STR("check if writable (NONE)")},
-  {"open", (PyCFunction)FileIDO_open, METH_VARARGS,
-   PyDoc_STR("open file (str)")},
-  {"close", (PyCFunction)FileIDO_close, METH_NOARGS,
-   PyDoc_STR("close file (NONE)")},
   {"read_8", (PyCFunction)FileIDO_read_8, METH_NOARGS,
    PyDoc_STR("read 8bit data (NONE)")},
   {"read_16", (PyCFunction)FileIDO_read_16, METH_NOARGS,
@@ -332,7 +297,7 @@ PyFileIDO_AsFileIDOPtr(PyObject* py_obj)
 
   // 強制的にキャスト
   FileIDOObject* my_obj = (FileIDOObject*)py_obj;
-  return &my_obj->mBody;
+  return my_obj->mBody;
 }
 
 // @brief 引数をパースして FileIDO を取り出す．

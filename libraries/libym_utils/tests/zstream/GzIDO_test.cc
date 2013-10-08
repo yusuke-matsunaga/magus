@@ -16,14 +16,13 @@ int
 GzIDO_test(int argc,
 	   const char** argv)
 {
-  GzIDO ido;
-
   if ( argc != 2 ) {
     cerr << "USAGE: " << argv[0] << " <filename>" << endl;
     return 1;
   }
 
-  if ( !ido.open(argv[1]) ) {
+  GzIDO ido(argv[1]);
+  if ( !ido ) {
     cerr << argv[1] << ": No such file" << endl;
     return 2;
   }

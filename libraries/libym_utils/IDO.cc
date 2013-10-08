@@ -156,13 +156,6 @@ IDO::read_str()
 // クラス FileIDO
 //////////////////////////////////////////////////////////////////////
 
-// @brief 空のコンストラクタ
-// @param[in] buff_size バッファサイズ
-FileIDO::FileIDO(ymuint buff_size)
-{
-  mFileBuff = new FileBuff(buff_size);
-}
-
 // @brief コンストラクタ
 // @param[in] filename ファイル名
 // @param[in] parent_loc インクルード元の親ファイルの情報
@@ -256,12 +249,6 @@ FileIDO::read(ymuint8* buff,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CompIDO::CompIDO()
-{
-  mZ = new CompIn();
-}
-
-// @brief コンストラクタ
 // @param[in] filename ファイル名
 // @param[in] parent_loc インクルード元の親ファイルの情報
 // @note 意味的にはコンストラクタ + open()
@@ -286,6 +273,7 @@ CompIDO::CompIDO(const string& filename,
 // @brief デストラクタ
 CompIDO::~CompIDO()
 {
+  close();
   delete mZ;
 }
 

@@ -34,11 +34,6 @@ private:
 
 public:
 
-  /// @brief 空のコンストラクタ
-  /// @param[in] buff_size バッファサイズ
-  explicit
-  FileIDO(ymuint buff_size = kDefaultBuffSize);
-
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
   /// @param[in] parent_loc インクルード元の親ファイルの情報
@@ -62,25 +57,6 @@ public:
   /// @brief デストラクタ
   virtual
   ~FileIDO();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // FileIDO の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ファイルを開く
-  /// @param[in] filename ファイル名
-  /// @param[in] parent_loc インクルード元の親ファイルの情報
-  /// @note 他のファイルを開いていたら強制的に close する．
-  bool
-  open(const char* filename,
-       const FileLoc& parent_loc = FileLoc());
-
-  /// @brief ファイルを閉じる．
-  /// @note 以降の読み出しは行われない．
-  void
-  close();
 
 
 public:
@@ -114,6 +90,25 @@ public:
   ssize_t
   read(ymuint8* buff,
        ymuint64 n);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ファイルを開く
+  /// @param[in] filename ファイル名
+  /// @param[in] parent_loc インクルード元の親ファイルの情報
+  /// @note 他のファイルを開いていたら強制的に close する．
+  bool
+  open(const char* filename,
+       const FileLoc& parent_loc = FileLoc());
+
+  /// @brief ファイルを閉じる．
+  /// @note 以降の読み出しは行われない．
+  void
+  close();
 
 
 private:

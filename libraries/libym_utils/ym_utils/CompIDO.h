@@ -28,9 +28,6 @@ class CompIDO :
 public:
 
   /// @brief コンストラクタ
-  CompIDO();
-
-  /// @brief コンストラクタ
   /// @param[in] filename ファイル名
   /// @param[in] parent_loc インクルード元の親ファイルの情報
   /// @note 意味的にはコンストラクタ + open()
@@ -48,25 +45,6 @@ public:
 
   /// @brief デストラクタ
   ~CompIDO();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 公開インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ファイルをオープンする．
-  /// @param[in] filename ファイル名
-  /// @param[in] parent_loc インクルード元の親ファイルの情報
-  /// @retval true オープンが成功した．
-  /// @retval false オープンが失敗した．
-  bool
-  open(const char* filename,
-       const FileLoc& parent_loc = FileLoc());
-
-  /// @brief ファイルをクローズする．
-  void
-  close();
 
 
 public:
@@ -100,6 +78,25 @@ public:
   ssize_t
   read(ymuint8* buff,
        size_t size);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ファイルをオープンする．
+  /// @param[in] filename ファイル名
+  /// @param[in] parent_loc インクルード元の親ファイルの情報
+  /// @retval true オープンが成功した．
+  /// @retval false オープンが失敗した．
+  bool
+  open(const char* filename,
+       const FileLoc& parent_loc = FileLoc());
+
+  /// @brief ファイルをクローズする．
+  void
+  close();
 
 
 private:
