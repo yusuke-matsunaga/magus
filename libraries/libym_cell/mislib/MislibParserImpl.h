@@ -15,7 +15,7 @@
 
 #include "MislibMgrImpl.h"
 #include "MislibNodeImpl.h"
-#include "MislibLex.h"
+#include "MislibScanner.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB
@@ -176,7 +176,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 字句解析器
-  MislibLex mLex;
+  MislibScanner mScanner;
 
   // MislibNode を管理するオブジェクト
   MislibMgrImpl* mMislibMgr;

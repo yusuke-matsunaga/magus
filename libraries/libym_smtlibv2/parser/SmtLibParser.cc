@@ -11,6 +11,7 @@
 
 #include "SmtLibParser.h"
 #include "SmtLibNodeImpl.h"
+#include "ym_utils/FileIDO.h"
 #include "ym_utils/MsgMgr.h"
 
 
@@ -32,6 +33,7 @@ SmtLibParser::~SmtLibParser()
   clear();
 }
 
+#if 0
 // @brief ファイルを開く
 // @param[in] filename ファイル名
 // @retval true 成功した．
@@ -39,7 +41,8 @@ SmtLibParser::~SmtLibParser()
 bool
 SmtLibParser::open(const string& filename)
 {
-  if ( !mScanner.open_file(filename) ) {
+  FileIDO ido(filename);
+  if ( !ido ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";
@@ -53,8 +56,20 @@ SmtLibParser::open(const string& filename)
   // 初期化
   clear();
 
+  mScanner.attach(&ido);
+
   return true;
 }
+#else
+// @brief 初期化する．
+// @param[in] ido 入力データ
+void
+SmtLibParser::init(IDO* ido)
+{
+  clear();
+  mScanner.attach(ido);
+}
+#endif
 
 // @brief S式を一つ読み込む．
 // @param[out] error エラーが起きたら true を格納する．

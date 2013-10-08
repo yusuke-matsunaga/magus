@@ -1,67 +1,52 @@
 
-/// @file libym_utils/FileScanner.cc
-/// @brief FileScanner の実装ファイル
+/// @file libym_utils/Scanner.cc
+/// @brief Scanner の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: DotlibParser.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/FileScanner.h"
-#include <fcntl.h>
+#include "ym_utils/Scanner.h"
 
 
 BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
-FileScanner::FileScanner()
+Scanner::Scanner()
 {
-  init();
+  init(NULL);
 }
 
 // @brief デストラクタ
-FileScanner::~FileScanner()
+Scanner::~Scanner()
 {
-  close_file();
 }
 
-
-// @brief ファイルをオープンする．
-// @param[in] filename ファイル名
-// @param[in] parent_loc インクルード元のファイル位置
-// @return ファイルのオープンに失敗したら false を返す．
-// @note parent_loc を省略したら単独のオープンとみなす．
-bool
-FileScanner::open_file(const string& filename,
-		       const FileLoc& parent_loc)
-{
-  init();
-  mFd = open(filename.c_str(), O_RDONLY);
-  if ( mFd < 0 ) {
-    return false;
-  }
-  mFileInfo = FileInfo(filename, parent_loc);
-  return true;
-}
-
-// ファイルをクローズする．
+// @brief 入力データをアタッチする．
+// @param[in] ido 入力データ
 void
-FileScanner::close_file()
+Scanner::attach(IDO* ido)
 {
-  close(mFd);
-  mFd = -1;
-  mFileInfo = FileInfo();
+  init(ido);
 }
 
-// 初期化
-void
-FileScanner::init()
+// @brief 入力データをデタッチする．
+// @return デタッチした入力データを返す．
+IDO*
+Scanner::detach()
 {
-  mFd = -1;
-  // mFileInfo を無効化するためのコード
-  mFileInfo = FileInfo();
+  IDO* old_ido = mIDO;
+  mIDO = NULL;
+  return old_ido;
+}
+
+// @brief 初期化を行う．
+// @param[in] ido 入力データ
+void
+Scanner::init(IDO* ido)
+{
+  mIDO = ido;
   mReadPos = 0;
   mEndPos = 0;
   mCR = false;
@@ -76,24 +61,23 @@ FileScanner::init()
 
 // @brief peek() の下請け関数
 void
-FileScanner::update()
+Scanner::update()
 {
+  if ( mIDO == NULL ) {
+    return;
+  }
+
   int c = 0;
   for ( ; ; ) {
     if ( mReadPos >= mEndPos ) {
       mReadPos = 0;
-      if ( mFd >= 0 ) {
-	ssize_t n = read(mFd, mBuff, 4096);
-	if ( n < 0 ) {
-	  // ファイル読み込みエラー
-	  c = -1;
-	  break;
-	}
-	mEndPos = n;
+      ssize_t n = mIDO->read(mBuff, 4096);
+      if ( n < 0 ) {
+	// ファイル読み込みエラー
+	c = -1;
+	break;
       }
-      else {
-	mEndPos = 0;
-      }
+      mEndPos = n;
     }
     if ( mEndPos == 0 ) {
       c = EOF;
@@ -134,7 +118,7 @@ FileScanner::update()
 
 // @brief 直前の peek() を確定させる．
 void
-FileScanner::accept()
+Scanner::accept()
 {
   assert_cond( mNeedUpdate == false, __FILE__, __LINE__);
   mNeedUpdate = true;
@@ -151,7 +135,7 @@ FileScanner::accept()
 
 // @brief 現在の位置をトークンの最初の位置にセットする．
 void
-FileScanner::set_first_loc()
+Scanner::set_first_loc()
 {
   mFirstLine = mCurLine;
   mFirstColumn = mCurColumn;
@@ -161,7 +145,7 @@ FileScanner::set_first_loc()
 // @param[in] line 行番号
 // @note デフォルトではなにもしない．
 void
-FileScanner::check_line(ymuint line)
+Scanner::check_line(ymuint line)
 {
 }
 

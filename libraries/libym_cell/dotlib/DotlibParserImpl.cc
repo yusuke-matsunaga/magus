@@ -13,6 +13,7 @@
 #include "DotlibMgrImpl.h"
 #include "DotlibHandler.h"
 #include "HandlerFactory.h"
+#include "ym_utils/FileIDO.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/ShString.h"
 #include "DotlibNodeImpl.h"
@@ -51,7 +52,8 @@ DotlibParserImpl::read_file(const string& filename,
   mDebug = debug;
   mAllowNoSemi = allow_no_semi;
 
-  if ( !mScanner.open_file(filename) ) {
+  FileIDO ido(filename);
+  if ( !ido ) {
     ostringstream buf;
     buf << filename << ": Could not open.";
     MsgMgr::put_msg(__FILE__, __LINE__,
@@ -61,6 +63,8 @@ DotlibParserImpl::read_file(const string& filename,
 		    buf.str());
     return false;
   }
+
+  mScanner.attach(&ido);
 
   bool error = false;
   tTokenType type;
@@ -101,8 +105,6 @@ DotlibParserImpl::read_file(const string& filename,
   }
 
 last:
-  mScanner.close_file();
-
   if ( error ) {
     return false;
   }

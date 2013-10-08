@@ -11,6 +11,7 @@
 
 #include "ym_logic/DimacsParser.h"
 #include "DimacsParserImpl.h"
+#include "ym_utils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -153,9 +154,8 @@ DimacsParserImpl::read(const string& filename)
   // 実際に読み込んだ節の数
   int act_nc = 0;
 
-  vector<int> lits;
-
-  if ( !mScanner.open_file(filename) ) {
+  FileIDO ido(filename);
+  if ( !ido ) {
     // ファイルが開けなかった．
 #if 0
     ostringstream buf;
@@ -168,6 +168,10 @@ DimacsParserImpl::read(const string& filename)
 #endif
     return false;
   }
+
+  vector<int> lits;
+
+  mScanner.attach(&ido);
 
   bool stat = true;
   for (list<DimacsHandler*>::iterator p = mHandlerList.begin();

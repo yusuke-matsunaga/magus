@@ -45,12 +45,19 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
   /// @retval true 成功した．
   /// @retval false 失敗した．
   bool
   open(const string& filename);
+#else
+  /// @brief 初期化する．
+  /// @param[in] ido 入力データ
+  void
+  init(IDO* ido);
+#endif
 
   /// @brief S式を一つ読み込む．
   /// @param[out] error エラーが起きたら true を格納する．

@@ -10,7 +10,7 @@
 
 
 #include "ym_logic/sat_nsdef.h"
-#include "ym_utils/FileScanner.h"
+#include "ym_utils/Scanner.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -32,7 +32,7 @@ enum tToken {
 /// @brief DIMACS形式の CNFファイルを読み込む字句解析器
 //////////////////////////////////////////////////////////////////////
 class DimacsScanner :
-  public FileScanner
+  public Scanner
 {
 public:
 
@@ -44,6 +44,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief トークンの読込み
   /// @param[out] loc 対応するファイル上の位置情報を格納する変数

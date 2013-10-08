@@ -10,8 +10,9 @@
 
 
 #include "InputMgr.h"
-#include <fcntl.h>
+//#include <fcntl.h>
 
+#include "ym_utils/FileIDO.h"
 #include "ym_utils/FileInfo.h"
 
 
@@ -45,11 +46,11 @@ InputMgr::~InputMgr()
 void
 InputMgr::clear()
 {
-  delete mCurFile;
+  delete_file(mCurFile);
   mCurFile = NULL;
   for (vector<InputFile*>::iterator p = mFileStack.begin();
        p != mFileStack.end(); ++ p) {
-    delete *p;
+    delete_file(*p);
   }
   mFileStack.clear();
 }
@@ -95,7 +96,10 @@ InputMgr::open_file(const string& filename,
   string realname = pathname.str();
 
   InputFile* new_file = new InputFile(mLex);
-  if ( !new_file->open_file(realname, parent_file) ) {
+  FileIDO* ido = new FileIDO(realname, parent_file);
+  if ( !(*ido) ) {
+    delete new_file;
+    delete ido;
     return false;
   }
 
@@ -103,6 +107,7 @@ InputMgr::open_file(const string& filename,
     mFileStack.push_back(mCurFile);
   }
   mCurFile = new_file;
+  mCurFile->attach(ido);
 
   return true;
 }
@@ -173,12 +178,12 @@ bool
 InputMgr::wrap_up()
 {
   for ( ; ; ) {
-    mCurFile->close_file();
+    delete_file(mCurFile);
     if ( mFileStack.empty() ) {
       // もうファイルが残っていない．
       return false;
     }
-    delete mCurFile;
+
     mCurFile = mFileStack.back();
     mFileStack.pop_back();
 
@@ -206,6 +211,17 @@ InputMgr::check_file(const char* name) const
     }
   }
   return false;
+}
+
+// @brief InputFile を削除する．
+void
+InputMgr::delete_file(InputFile* file)
+{
+  if ( file != NULL ) {
+    IDO* ido = file->detach();
+    delete ido;
+    delete file;
+  }
 }
 
 END_NAMESPACE_YM_VERILOG

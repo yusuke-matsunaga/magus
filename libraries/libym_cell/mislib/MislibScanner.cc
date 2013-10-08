@@ -1,13 +1,13 @@
 
-/// @file libym_cell/mislib/MislibLex.cc
-/// @brief MislibLex の実装ファイル
+/// @file libym_cell/mislib/MislibScanner.cc
+/// @brief MislibScanner の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MislibLex.h"
+#include "MislibScanner.h"
 #include "ym_utils/MsgMgr.h"
 
 
@@ -20,19 +20,19 @@ class MislibParserImpl;
 
 
 // コンストラクタ
-MislibLex::MislibLex()
+MislibScanner::MislibScanner()
 {
 }
 
 // デストラクタ
-MislibLex::~MislibLex()
+MislibScanner::~MislibScanner()
 {
 }
 
 // トークンを一つとってくる．
 // @param[out] loc 対応するファイル上の位置を格納する変数
 int
-MislibLex::read_token(FileRegion& loc)
+MislibScanner::read_token(FileRegion& loc)
 {
   int token = scan();
   loc = cur_loc();
@@ -42,7 +42,7 @@ MislibLex::read_token(FileRegion& loc)
 // @brief read_token の下請け関数
 // @return トークンを返す．
 int
-MislibLex::scan()
+MislibScanner::scan()
 {
   int c = 0;
 

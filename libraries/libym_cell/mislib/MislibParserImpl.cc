@@ -9,12 +9,13 @@
 
 #include "MislibParserImpl.h"
 #include "MislibMgrImpl.h"
+#include "ym_utils/FileIDO.h"
 #include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NONAMESPACE
 
-// MislibLex::read_token() をデバッグする時に true にする．
+// MislibScanner::read_token() をデバッグする時に true にする．
 bool debug_read_token = false;
 
 END_NONAMESPACE
@@ -86,7 +87,8 @@ MislibParserImpl::read_file(const string& filename,
 {
   int yyparse(MislibParserImpl& parser);
 
-  if ( !mLex.open_file(filename) ) {
+  FileIDO ido(filename);
+  if ( !ido ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";
@@ -99,6 +101,7 @@ MislibParserImpl::read_file(const string& filename,
   }
 
   // 初期化
+  mScanner.attach(&ido);
   mMislibMgr = mgr;
   mMislibMgr->clear();
 
@@ -224,15 +227,15 @@ int
 MislibParserImpl::scan(MislibNodeImpl*& lval,
 		       FileRegion& lloc)
 {
-  int tok = mLex.read_token(lloc);
+  int tok = mScanner.read_token(lloc);
 
   switch ( tok ) {
   case STR:
-    lval = mMislibMgr->new_str(lloc, ShString(mLex.cur_string()));
+    lval = mMislibMgr->new_str(lloc, ShString(mScanner.cur_string()));
     break;
 
   case NUM:
-    lval = mMislibMgr->new_num(lloc, mLex.cur_num());
+    lval = mMislibMgr->new_num(lloc, mScanner.cur_num());
     break;
 
   case NONINV:
@@ -263,11 +266,11 @@ MislibParserImpl::scan(MislibNodeImpl*& lval,
     cout << "MislibParserImpl::scan(): ";
     switch ( tok ) {
     case STR:
-      cout << "STR(" << mLex.cur_string() << ")" << endl;
+      cout << "STR(" << mScanner.cur_string() << ")" << endl;
       break;
 
     case NUM:
-      cout << "NUM(" << mLex.cur_num() << ")" << endl;
+      cout << "NUM(" << mScanner.cur_num() << ")" << endl;
       break;
 
     case NONINV:

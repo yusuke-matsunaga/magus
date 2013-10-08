@@ -10,7 +10,7 @@
 
 
 #include "dotlib_int.h"
-#include "ym_utils/FileScanner.h"
+#include "ym_utils/Scanner.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/StrBuff.h"
 
@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 /// @brief dotlib フォーマットの字句解析器
 //////////////////////////////////////////////////////////////////////
 class DotlibScanner :
-  public FileScanner
+  public Scanner
 {
 public:
 
@@ -34,6 +34,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief トークンを一つ読み込む．
   /// @param[out] loc ファイル上の位置情報を格納する変数

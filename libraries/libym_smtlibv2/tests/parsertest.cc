@@ -9,6 +9,7 @@
 
 #include "SmtLibNode.h"
 #include "SmtLibParser.h"
+#include "ym_utils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -16,12 +17,14 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 void
 parsertest(const string& filename)
 {
-  SmtLibParser parser;
-
-  if ( !parser.open(filename) ) {
+  FileIDO ido(filename);
+  if ( !ido ) {
     cout << filename << ": No such file" << endl;
     return;
   }
+
+  SmtLibParser parser;
+  parser.init(&ido);
 
   for ( ; ; ) {
     bool error = false;

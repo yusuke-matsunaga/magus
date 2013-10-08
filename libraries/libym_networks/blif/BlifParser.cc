@@ -13,6 +13,7 @@
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
+#include "ym_utils/FileIDO.h"
 #include "ym_utils/MsgMgr.h"
 
 
@@ -68,7 +69,8 @@ BlifParser::read(const string& filename,
 		 const CellLibrary* cell_library)
 {
   // ファイルをオープンする．
-  if ( !mScanner.open_file(filename) ) {
+  FileIDO ido(filename);
+  if ( !ido ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";
@@ -80,6 +82,7 @@ BlifParser::read(const string& filename,
   mCellLibrary = cell_library;
 
   // 初期化を行う．
+  mScanner.attach(&ido);
   mIdHash.clear();
   mUngetToken = kTokenEOF;
 

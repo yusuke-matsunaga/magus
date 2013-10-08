@@ -9,6 +9,7 @@
 
 #include "Iscas89ParserImpl.h"
 #include "Iscas89Handler.h"
+#include "ym_utils/FileIDO.h"
 #include "ym_utils/MsgMgr.h"
 
 
@@ -43,7 +44,8 @@ Iscas89ParserImpl::read(const string& filename)
   int yyparse(Iscas89ParserImpl&);
 
   // ファイルをオープンする．
-  if ( !mScanner.open_file(filename) ) {
+  FileIDO ido(filename);
+  if ( !ido ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";
@@ -51,6 +53,8 @@ Iscas89ParserImpl::read(const string& filename)
 		    kMsgFailure, "BLIF_PARSER", buf.str());
     return false;
   }
+
+  mScanner.attach(&ido);
 
   for (list<Iscas89Handler*>::iterator p = mHandlerList.begin();
        p != mHandlerList.end(); ++ p) {

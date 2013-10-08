@@ -1,40 +1,42 @@
-#ifndef LIBYM_MISLIB_MISLIBLEX_H
-#define LIBYM_MISLIB_MISLIBLEX_H
+#ifndef LIBYM_MISLIB_MISLIBSCANNER_H
+#define LIBYM_MISLIB_MISLIBSCANNER_H
 
-/// @file libym_mislib/MislibLex.h
-/// @brief MislibLex のヘッダファイル
+/// @file libym_mislib/MislexScanner.h
+/// @brief MislexScanner のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "mislib_nsdef.h"
 
 #include "ym_utils/StrBuff.h"
-#include "ym_utils/FileScanner.h"
-#include "ym_utils/FileRegion.h"
+#include "ym_utils/Scanner.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class MislibLex MislibLex.h "MislibLex.h"
+/// @class MislibScanner MislibScanner.h "MislibScanner.h"
 /// @brief Mislib 用の LEX クラス
 //////////////////////////////////////////////////////////////////////
-class MislibLex :
-  public FileScanner
+class MislibScanner :
+  public Scanner
 {
 public:
 
   /// @brief コンストラクタ
-  MislibLex();
+  MislibScanner();
 
   /// @brief デストラクタ
-  ~MislibLex();
+  ~MislibScanner();
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief トークンを一つとってくる．
   /// @param[out] loc 対応するファイル上の位置を格納する変数
@@ -79,7 +81,7 @@ private:
 // 直前の read_token() に対応する文字列を返す．
 inline
 const char*
-MislibLex::cur_string() const
+MislibScanner::cur_string() const
 {
   return mCurString.c_str();
 }
@@ -87,11 +89,11 @@ MislibLex::cur_string() const
 // @brief cur_string() を double に変換したものを返す．
 inline
 double
-MislibLex::cur_num() const
+MislibScanner::cur_num() const
 {
   return strtod(cur_string(), static_cast<char**>(NULL));
 }
 
 END_NAMESPACE_YM_MISLIB
 
-#endif // LIBYM_MISLIB_MISLIBLEX_H
+#endif // LIBYM_MISLIB_MISLIBSCANNER_H

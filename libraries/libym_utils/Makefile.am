@@ -44,7 +44,6 @@ libym_utils_la_SOURCES = \
 	FileInfo.cc \
 	FileInfoMgr.h \
 	FileInfoMgr.cc \
-	FileScanner.cc \
 	FragAlloc.cc \
 	GenBase.cc \
 	IDO.cc \
@@ -68,6 +67,7 @@ libym_utils_la_SOURCES = \
 	PoptMainApp.cc \
 	RandGen.cc \
 	RefCount.cc \
+	Scanner.cc \
 	SimpleAlloc.cc \
 	StrBuff.cc \
 	StrPool.h \

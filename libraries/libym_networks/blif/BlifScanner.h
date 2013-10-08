@@ -10,7 +10,7 @@
 
 
 #include "ym_networks/blif_nsdef.h"
-#include "ym_utils/FileScanner.h"
+#include "ym_utils/Scanner.h"
 #include "ym_utils/StrBuff.h"
 #include "BlifDic.h"
 
@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 /// @brief blif 用の字句解析器
 //////////////////////////////////////////////////////////////////////
 class BlifScanner :
-  public FileScanner
+  public Scanner
 {
 public:
 
@@ -34,6 +34,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief トークンを一つ読み出す．
   /// @param[out] loc トークンの位置を格納する変数

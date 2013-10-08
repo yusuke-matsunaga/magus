@@ -1,15 +1,16 @@
-#ifndef YM_UTILS_FILESCANNER_H
-#define YM_UTILS_FILESCANNER_H
+#ifndef YM_UTILS_SCANNER_H
+#define YM_UTILS_SCANNER_H
 
-/// @file ym_utils/FileScanner.h
-/// @brief FileScanner のヘッダファイル
+/// @file ym_utils/Scanner.h
+/// @brief Scanner のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ymtools.h"
+#include "ym_utils/IDO.h"
 #include "ym_utils/FileInfo.h"
 #include "ym_utils/FileLoc.h"
 #include "ym_utils/FileRegion.h"
@@ -18,46 +19,43 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class FileScanner FileScanner.h "ym_utils/FileScanner.h"
-/// @brief 位置情報のトラッキング付きのファイル入力
+/// @class Scanner Scanner.h "ym_utils/Scanner.h"
+/// @brief 位置情報のトラッキング付きの入力データ読み出し器
 ///
 /// このクラスで行える処理は
-/// - ファイルのオープン (open_file)
-/// - ファイルのクローズ (close_file)
+/// - 入力データのアタッチ (attach)
+/// - 入力データのデタッチ (dettach)
 /// - 一文字読み出し     (get)
 /// - 一文字の先読み     (peek)
 /// - 先読みした文字の確定 (accept)
 /// これ以外にトークンの開始位置を set_first_loc() で記録して
 /// cur_loc() で現在の位置までの領域を求める．
 //////////////////////////////////////////////////////////////////////
-class FileScanner
+class Scanner
 {
 public:
 
   /// @brief コンストラクタ
-  FileScanner();
+  Scanner();
 
   /// @brief デストラクタ
-  ~FileScanner();
+  ~Scanner();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ファイル操作を行う関数
+  // 入力データ関連の操作を行う関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ファイルをオープンする．
-  /// @param[in] filename ファイル名
-  /// @param[in] parent_loc インクルード元のファイル位置
-  /// @return ファイルのオープンに失敗したら false を返す．
-  /// @note parent_loc を省略したら単独のオープンとみなす．
-  bool
-  open_file(const string& filename,
-	    const FileLoc& parent_loc = FileLoc());
-
-  /// @brief ファイルをクローズする．
+  /// @brief 入力データをアタッチする．
+  /// @param[in] ido 入力データ
   void
-  close_file();
+  attach(IDO* ido);
+
+  /// @brief 入力データをデタッチする．
+  /// @return デタッチした入力データを返す．
+  IDO*
+  detach();
 
   /// @brief オープン中のファイル情報を得る．
   const FileInfo&
@@ -112,8 +110,9 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化を行う．
+  /// @param[in] ido 入力データ
   void
-  init();
+  init(IDO* ido);
 
   /// @brief peek() の下請け関数
   void
@@ -125,14 +124,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // UNIX のファイル記述子
-  int mFd;
-
-  // ファイル情報
-  FileInfo mFileInfo;
+  // 入力データ
+  IDO* mIDO;
 
   // バッファ
-  char mBuff[4096];
+  ymuint8 mBuff[4096];
 
   // バッファ中の読み出し位置
   ymuint32 mReadPos;
@@ -177,9 +173,15 @@ private:
 // @brief オープン中のファイル情報を得る．
 inline
 const FileInfo&
-FileScanner::file_info() const
+Scanner::file_info() const
 {
-  return mFileInfo;
+  if ( mIDO != NULL ) {
+    return mIDO->file_info();
+  }
+  else {
+    static FileInfo dummy;
+    return dummy;
+  }
 }
 
 // @brief 現在のファイル情報を書き換える．
@@ -188,16 +190,18 @@ FileScanner::file_info() const
 // @note 通常は使わないこと．
 inline
 void
-FileScanner::set_file_info(const FileInfo& file_info)
+Scanner::set_file_info(const FileInfo& file_info)
 {
-  mFileInfo = file_info;
+  if ( mIDO != NULL ) {
+    mIDO->set_file_info(file_info);
+  }
 }
 
 // @brief 次の文字を読み出す．
 // @note ファイル位置の情報等は変わらない
 inline
 int
-FileScanner::peek()
+Scanner::peek()
 {
   if ( mNeedUpdate ) {
     update();
@@ -208,7 +212,7 @@ FileScanner::peek()
 // 一文字読み出す．
 inline
 int
-FileScanner::get()
+Scanner::get()
 {
   (void) peek();
   accept();
@@ -218,9 +222,9 @@ FileScanner::get()
 // @brief 直前の set_first_loc() から現在の位置までを返す．
 inline
 FileRegion
-FileScanner::cur_loc() const
+Scanner::cur_loc() const
 {
-  return FileRegion(mFileInfo, mFirstLine, mFirstColumn, mCurLine, mCurColumn);
+  return FileRegion(file_info(), mFirstLine, mFirstColumn, mCurLine, mCurColumn);
 }
 
 END_NAMESPACE_YM
