@@ -40,10 +40,17 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief ID番号を返す．
   virtual
   ymuint
   id() const;
+
+  /// @brief レベルを返す．
+  virtual
+  ymuint
+  level() const;
+#endif
 
   /// @brief 名前を返す．
   virtual
@@ -73,6 +80,11 @@ public:
   const SmtSort*
   sort_template() const;
 
+  /// @brief ハッシュ値を返す．
+  virtual
+  ymuint
+  hash() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -81,6 +93,9 @@ private:
 
   // ID番号
   ymuint32 mId;
+
+  // レベル
+  ymuint32 mLevel;
 
   // 名前
   const SmtId* mName;
@@ -216,10 +231,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief ID番号を返す．
   virtual
   ymuint
   id() const;
+#endif
 
   /// @brief 名前を返す．
   virtual
@@ -248,6 +265,11 @@ public:
   virtual
   const SmtSort*
   sort_template() const;
+
+  /// @brief ハッシュ値を返す．
+  virtual
+  ymuint
+  hash() const;
 
 
 private:

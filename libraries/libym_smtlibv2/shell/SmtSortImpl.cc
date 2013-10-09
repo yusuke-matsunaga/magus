@@ -29,12 +29,21 @@ SmtSortImpl::~SmtSortImpl()
 {
 }
 
+#if 0
 // @brief ID番号を返す．
 ymuint
 SmtSortImpl::id() const
 {
   return mId;
 }
+
+// @brief レベルを返す．
+ymuint
+SmtSortImpl::level() const
+{
+  return mLevel;
+}
+#endif
 
 // @brief 名前を返す．
 const SmtId*
@@ -74,6 +83,13 @@ SmtSortImpl::sort_template() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
+}
+
+// @brief ハッシュ値を返す．
+ymuint
+SmtSortImpl::hash() const
+{
+  return mId + mLevel * 2047;
 }
 
 
@@ -162,12 +178,14 @@ SmtParamSort::~SmtParamSort()
 {
 }
 
+#if 0
 // @brief ID番号を返す．
 ymuint
 SmtParamSort::id() const
 {
   return 0;
 }
+#endif
 
 // @brief 名前を返す．
 const SmtId*
@@ -207,6 +225,13 @@ SmtParamSort::sort_template() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
+}
+
+// @brief ハッシュ値を返す．
+ymuint
+SmtParamSort::hash() const
+{
+  return 0;
 }
 
 END_NAMESPACE_YM_SMTLIBV2

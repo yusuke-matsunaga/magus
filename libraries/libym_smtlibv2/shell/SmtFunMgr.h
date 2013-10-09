@@ -28,7 +28,11 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリアロケータ
-  SmtFunMgr(Alloc& alloc);
+  /// @param[in] level スタックレベル
+  /// @param[in] parent_mgr 上位のマネージャ
+  SmtFunMgr(Alloc& alloc,
+	    ymuint level,
+	    SmtFunMgr* parent_mgr);
 
   /// @brief デストラクタ
   ~SmtFunMgr();
@@ -89,6 +93,12 @@ private:
 
   // メモリ確保用のオブジェクト
   Alloc& mAlloc;
+
+  // スタックのレベル
+  ymuint32 mLevel;
+
+  // 親のマネージャ
+  SmtFunMgr* mParent;
 
   // 登録されている関数の数
   ymuint32 mNum;

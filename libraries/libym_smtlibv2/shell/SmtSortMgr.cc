@@ -20,8 +20,14 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 
 // @brief コンストラクタ
 // @param[in] alloc メモリアロケータ
-SmtSortMgr::SmtSortMgr(Alloc& alloc) :
-  mAlloc(alloc)
+// @param[in] level スタックレベル
+// @param[in] parent_mgr 上位のマネージャ
+SmtSortMgr::SmtSortMgr(Alloc& alloc,
+		       ymuint level,
+		       SmtSortMgr* parent_mgr) :
+  mAlloc(alloc),
+  mLevel(level),
+  mParent(parent_mgr)
 {
   mNum = 0;
   mTableSize = 0;
@@ -85,7 +91,7 @@ hash_func(const SmtId* name,
   for (vector<const SmtSort*>::const_iterator p = elem_list.begin();
        p != elem_list.end(); ++ p) {
     const SmtSort* sort = *p;
-    h = h * 127 + sort->id();
+    h = h * 127 + sort->hash();
   }
   return h;
 }
@@ -131,6 +137,7 @@ SmtSortMgr::reg_alias(const SmtId* name,
   SmtSortImpl* sort1 = new (q) SmtAliasSort(name, sort);
 
   sort1->mId = mNum;
+  sort1->mLevel = mLevel;
   ++ mNum;
 
   sort1->mLink = mHashTable[idx];
@@ -139,15 +146,23 @@ SmtSortMgr::reg_alias(const SmtId* name,
   return sort1;
 }
 
-
 // @brief SmtSort に変換する．
 // @param[in] name 型名
 // @param[in] elem_list 部品の型のリスト
-// @return 登録されていなければ NULL を返す．
+// @return 引数に合致する型を返す．
 const SmtSort*
 SmtSortMgr::new_sort(const SmtId* name,
 		     const vector<const SmtSort*>& elem_list)
 {
+  if ( mParent != NULL ) {
+    // 親を探す．
+    const SmtSort* sort = mParent->new_sort(name, elem_list);
+    if ( sort != NULL ) {
+      return sort;
+    }
+  }
+
+  // 型名を探す．
   hash_map<ymuint32, ymuint32>::iterator p = mHash.find(name->id());
   if ( p == mHash.end() ) {
     // name という型名は登録されていなかった．
@@ -202,6 +217,7 @@ SmtSortMgr::new_sort(const SmtId* name,
   }
 
   sort->mId = mNum;
+  sort->mLevel = mLevel;
   ++ mNum;
 
   sort->mLink = mHashTable[idx];
@@ -297,7 +313,8 @@ hash_func(SmtSortImpl* sort)
   ymuint h = sort->name()->id();
   ymuint n = sort->elem_num();
   for (ymuint i = 0; i < n; ++ i) {
-    h = h * 12 + sort->elem(i)->id();
+    const SmtSort* sort1 = sort->elem(i);
+    h = h * 127 + sort1->hash();
   }
   return h;
 }

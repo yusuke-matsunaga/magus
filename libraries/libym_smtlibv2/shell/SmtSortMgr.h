@@ -28,7 +28,11 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリアロケータ
-  SmtSortMgr(Alloc& alloc);
+  /// @param[in] level スタックレベル
+  /// @param[in] parent_mgr 上位のマネージャ
+  SmtSortMgr(Alloc& alloc,
+	     ymuint level,
+	     SmtSortMgr* parent_mgr);
 
   /// @brief デストラクタ
   ~SmtSortMgr();
@@ -62,7 +66,7 @@ public:
   /// @brief SmtSort に変換する．
   /// @param[in] name 型名
   /// @param[in] elem_list 部品の型のリスト
-  /// @return 登録されていなければ NULL を返す．
+  /// @return 引数に合致する型を返す．
   const SmtSort*
   new_sort(const SmtId* name,
 	   const vector<const SmtSort*>& elem_list);
@@ -77,6 +81,14 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 型を探す．
+  /// @param[in] name 型名
+  /// @param[in] elem_list 部品の型のリスト
+  /// @return 登録されていなければ NULL を返す．
+  const SmtSort*
+  find_sort(const SmtId* name,
+	    const vector<const SmtSort*>& elem_list);
 
   /// @brief テンプレートから実際の型を作る．
   /// @param[in] templ テンプレート
@@ -114,6 +126,12 @@ private:
 
   // メモリ確保用のオブジェクト
   Alloc& mAlloc;
+
+  // スタックのレベル
+  ymuint32 mLevel;
+
+  // 親のマネージャ
+  SmtSortMgr* mParent;
 
   // 名前をキーにして引数の数を保持するハッシュ表
   hash_map<ymuint32, ymuint32> mHash;

@@ -17,8 +17,7 @@
 #include "ym_smtlibv2/SmtVarBinding.h"
 
 #include "SmtIdMgr.h"
-#include "SmtSortMgr.h"
-#include "SmtFunMgr.h"
+#include "StackPage.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -79,6 +78,17 @@ public:
   /// @param[in] arg_top 引数の先頭ノード
   bool
   assert(const SmtLibNode* arg_top);
+
+  /// @brief assertion スタックにプッシュする．
+  /// @param[in] num プッシュするレベル．
+  void
+  push(ymuint num);
+
+  /// @brief assertion スタックからポップする．
+  /// @param[in] num ポップするレベル．
+  /// @return ポップが成功したら true を返す．
+  bool
+  pop(ymuint num);
 
 
 private:
@@ -275,6 +285,14 @@ private:
   new_attr(const ShString& keyword,
 	   const SmtTerm* expr = NULL);
 
+  /// @brief 現在の SortMgr を返す．
+  SmtSortMgr&
+  sort_mgr();
+
+  /// @brief 現在の FunMgr を返す．
+  SmtFunMgr&
+  fun_mgr();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -287,14 +305,11 @@ private:
   // SmtId を管理するクラス
   SmtIdMgr mIdMgr;
 
-  // SmtSort を管理するクラス
-  SmtSortMgr mSortMgr;
-
-  // SmtFun を管理するクラス
-  SmtFunMgr mFunMgr;
-
   // logic
   tSmtLogic mLogic;
+
+  // スタック
+  vector<StackPage*> mStack;
 
 };
 

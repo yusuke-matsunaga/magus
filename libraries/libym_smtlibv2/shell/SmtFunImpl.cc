@@ -35,12 +35,14 @@ SmtFunImpl::~SmtFunImpl()
 {
 }
 
+#if 0
 // @brief ID番号を返す．
 ymuint
 SmtFunImpl::id() const
 {
   return mId;
 }
+#endif
 
 // @brief 名前を返す．
 const SmtId*
@@ -75,6 +77,13 @@ ymuint
 SmtFunImpl::param_num() const
 {
   return 0;
+}
+
+// @brief ハッシュ値を返す．
+ymuint
+SmtFunImpl::hash() const
+{
+  return mId + mLevel * 2047;
 }
 
 

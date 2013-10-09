@@ -44,10 +44,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief ID番号を返す．
   virtual
   ymuint
   id() const;
+#endif
 
   /// @brief 名前を返す．
   virtual
@@ -74,6 +76,11 @@ public:
   ymuint
   param_num() const;
 
+  /// @brief ハッシュ値を返す．
+  virtual
+  ymuint
+  hash() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -82,6 +89,9 @@ private:
 
   // ID 番号
   ymuint32 mId;
+
+  // レベル
+  ymuint32 mLevel;
 
   // 名前
   const SmtId* mName;

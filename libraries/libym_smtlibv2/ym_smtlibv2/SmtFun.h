@@ -50,10 +50,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief ID番号を返す．
   virtual
   ymuint
   id() const = 0;
+#endif
 
   /// @brief 名前を返す．
   virtual
@@ -98,6 +100,11 @@ public:
   virtual
   ymuint
   param_num() const = 0;
+
+  /// @brief ハッシュ値を返す．
+  virtual
+  ymuint
+  hash() const = 0;
 
 };
 

@@ -20,8 +20,14 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 
 // @brief コンストラクタ
 // @param[in] alloc メモリアロケータ
-SmtFunMgr::SmtFunMgr(Alloc& alloc) :
-  mAlloc(alloc)
+// @param[in] level スタックレベル
+// @param[in] parent_mgr 上位のマネージャ
+SmtFunMgr::SmtFunMgr(Alloc& alloc,
+		     ymuint level,
+		     SmtFunMgr* parent_mgr) :
+  mAlloc(alloc),
+  mLevel(level),
+  mParent(parent_mgr)
 {
   mNum = 0;
   mTableSize = 0;
@@ -169,6 +175,7 @@ SmtFunMgr::reg_fun(const SmtId* name,
   SmtFun2* fun = new (p) SmtFun2(name, sort, n, body);
 
   fun->mId = mNum;
+  fun->mLevel = mLevel;
   ++ mNum;
 
   for (ymuint i = 0; i < n; ++ i) {
@@ -219,7 +226,7 @@ SmtFunMgr::expand_table(ymuint req_size)
 	SmtFunImpl* tmp_id = id;
 	id = id->mLink;
 
-	ymuint h = tmp_id->id() % mTableSize;
+	ymuint h = tmp_id->hash() % mTableSize;
 	tmp_id->mLink = mHashTable[h];
 	mHashTable[h] = tmp_id;
       }
