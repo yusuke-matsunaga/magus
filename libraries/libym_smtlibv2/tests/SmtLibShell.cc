@@ -1,32 +1,30 @@
 
-/// @file libym_smtlibv2/test/parsertest.cc
-/// @brief SmtLibParser のテストプログラム
+/// @file SmtLibShell.cc
+/// @brief SmtLibMgr を使った簡単なシェル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "SmtLibNode.h"
 #include "SmtLibParser.h"
 #include "SmtLibMgr.h"
-#include "ym_utils/FileIDO.h"
+#include "ym_utils/StrListIDO.h"
+
+#include <readline/readline.h>
+#include <readline/history.h>
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-void
-SmtLibMgr_test(const string& filename)
+int
+read_line(const vector<string>& str_list,
+	  SmtLibMgr& mgr)
 {
-  FileIDO ido(filename);
-  if ( !ido ) {
-    cout << filename << ": No such file" << endl;
-    return;
-  }
+  StrListIDO ido(str_list);
 
   SmtLibParser parser;
-  SmtLibMgr mgr;
-
   parser.init(&ido);
 
   for ( ; ; ) {
@@ -38,24 +36,23 @@ SmtLibMgr_test(const string& filename)
 
     case SmtLibParser::kError:
       cout << "Error" << endl;
-      return;
+      return -1;
 
     case SmtLibParser::kEOF:
-      return;
+      return 1;
 
     case SmtLibParser::kOpen:
-      cout << "unexpected EOF" << endl;
-      return;
+      return 2;
     }
 
     if ( node->type() != kListToken ) {
       cerr << "syntax error" << endl;
-      return;
+      return -1;
     }
     const SmtLibNode* node1 = node->child();
     if ( node1->type() != kSymbolToken ) {
       cerr << "syntax error" << endl;
-      return;
+      return -1;
     }
     const char* str1 = static_cast<const char*>(node1->str_value());
     if ( strcmp("set-logic", str1) == 0 ) {
@@ -114,32 +111,106 @@ SmtLibMgr_test(const string& filename)
     }
     else if ( strcmp("exit", str1) == 0 ) {
       cout << "EXIT" << endl;
-      return;
+      return 0;
     }
     else {
       cout << "undefined command " << str1 << endl;
+      return -1;
     }
   }
+}
 
+BEGIN_NONAMESPACE
+
+char*
+chop(char* line)
+{
+  char* s;
+  for (s = line; *s && isspace(*s); ++ s) ;
+  if ( *s == 0 ) {
+    return s;
+  }
+
+  char* t = line + strlen(line) - 1;
+  for ( ; t > s && isspace(*t); -- t) ;
+  ++ t;
+  *t = '\0';
+  return s;
+}
+
+END_NONAMESPACE
+
+void
+shell()
+{
+  const char* PROMPT1 = ">";
+  const char* PROMPT2 = "...>";
+
+  ymuint hist_num = 0;
+  ymuint max_history = 1000;
+
+  SmtLibMgr mgr;
+
+  vector<string> str_list;
+  const char* prompt = PROMPT1;
+  for (bool run = true; run; ) {
+    char* line = readline(prompt);
+    if ( line == NULL ) {
+      // EOF
+      run = false;
+      printf("\n");
+      continue;
+    }
+
+    // 無駄な空白を取り除く
+    char* str = chop(line);
+    if ( *str == '\0' ) {
+      continue;
+    }
+
+    // ヒストリに追加する．
+    add_history(str);
+    ++ hist_num;
+    if ( hist_num > max_history ) {
+      // あふれたヒストリを削除する．
+      HIST_ENTRY* hist = remove_history(0);
+      free(hist);
+      -- hist_num;
+    }
+
+    str_list.push_back(string(str));
+
+    int code = read_line(str_list, mgr);
+    if ( code == 2 ) {
+      prompt = PROMPT2;
+      continue;
+    }
+    else if ( code == 0 ) {
+      run = false;
+      break;
+    }
+    else if ( code == 1 ) {
+      str_list.clear();
+      prompt = PROMPT1;
+      continue;
+    }
+    else if ( code == -1 ) {
+      str_list.clear();
+      prompt = PROMPT1;
+      continue;
+    }
+  }
 }
 
 END_NAMESPACE_YM_SMTLIBV2
 
-
 int
 main(int argc,
-     char** argv)
+     const char** argv)
 {
-  using namespace std;
+  using namespace nsYm::nsSmtLibV2;
 
-  if ( argc != 2 ) {
-    cerr << "USAGE: " << argv[0] << " <filename>" << endl;
-    return 1;
-  }
-
-  string filename(argv[1]);
-
-  nsYm::nsSmtLibV2::SmtLibMgr_test(filename);
+  shell();
 
   return 0;
 }

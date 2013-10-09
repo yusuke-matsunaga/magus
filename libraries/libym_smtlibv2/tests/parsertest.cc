@@ -26,19 +26,29 @@ parsertest(const string& filename)
   SmtLibParser parser;
   parser.init(&ido);
 
-  for ( ; ; ) {
-    bool error = false;
-    const SmtLibNode* node = parser.read(error);
-    if ( error ) {
+  for (bool run = true; run; ) {
+    SmtLibNode* node;
+    SmtLibParser::tResult res = parser.read(node);
+    switch ( res ) {
+    case SmtLibParser::kOK:
+      display(cout, node);
+      break;
+
+    case SmtLibParser::kError:
       cout << "Error" << endl;
-      return;
-    }
-    if ( node == NULL ) {
+      run = false;
+      break;
+
+    case SmtLibParser::kEOF:
+      run = false;
+      break;
+
+    case SmtLibParser::kOpen:
+      cout << "unexpected EOF" << endl;
+      run = false;
       break;
     }
-    display(cout, node);
   }
-
 }
 
 END_NAMESPACE_YM_SMTLIBV2

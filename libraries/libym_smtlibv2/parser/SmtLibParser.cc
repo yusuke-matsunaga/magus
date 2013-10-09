@@ -3,9 +3,7 @@
 /// @brief SmtLibParser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SmtLibParser.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -33,34 +31,6 @@ SmtLibParser::~SmtLibParser()
   clear();
 }
 
-#if 0
-// @brief ファイルを開く
-// @param[in] filename ファイル名
-// @retval true 成功した．
-// @retval false 失敗した．
-bool
-SmtLibParser::open(const string& filename)
-{
-  FileIDO ido(filename);
-  if ( !ido ) {
-    // エラー
-    ostringstream buf;
-    buf << filename << " : No such file.";
-    MsgMgr::put_msg(__FILE__, __LINE__,
-		    FileRegion(),
-		    kMsgFailure,
-		    "SMTLIB_PARSER", buf.str());
-    return false;
-  }
-
-  // 初期化
-  clear();
-
-  mScanner.attach(&ido);
-
-  return true;
-}
-#else
 // @brief 初期化する．
 // @param[in] ido 入力データ
 void
@@ -69,43 +39,44 @@ SmtLibParser::init(IDO* ido)
   clear();
   mScanner.attach(ido);
 }
-#endif
 
 // @brief S式を一つ読み込む．
-// @param[out] error エラーが起きたら true を格納する．
-// @return 読み込んだ S式を表すノードを返す．
-SmtLibNode*
-SmtLibParser::read(bool& error)
+// @param[out] root 読んだS式の根のノード
+// @return 結果を返す．
+SmtLibParser::tResult
+SmtLibParser::read(SmtLibNode*& root)
 {
-  for ( ; ; ) {
-    SmtLibNode* root = NULL;
-    FileRegion loc;
-    tTokenType type = read_sexp(root, loc);
-    if ( type == kEofToken ) {
-      // ファイルの末尾まで読んだ
-      return NULL;
-    }
-    else if ( type == kNlToken ) {
-      // 改行コードは無視する．
-      continue;
-    }
-    else if ( type == kErrorToken ) {
-      // 字句解析レベルでエラーが起きている．
-      error = true;
-      return NULL;
-    }
-    else if ( type == kRpToken ) {
-      // 対応する左括弧がない．
-      MsgMgr::put_msg(__FILE__, __LINE__,
-		      loc,
-		      kMsgError,
-		      "SMTLIB_PARSER",
-		      "Unexpected ')'.");
-      error = true;
-      return NULL;
-    }
-    return root;
+  // ループを回るのは改行コードの場合のみ
+  FileRegion loc;
+  tTokenType type = read_sexp(root, loc);
+  switch ( type ) {
+  case kEofToken:
+    // ファイルの末尾まで読んだ
+    return kEOF;
+
+  case kUnexpEofToken:
+    // カッコが閉じられる前に末尾になった．
+    return kOpen;
+
+  case kErrorToken:
+    // 字句解析レベルでエラーが起きている．
+    return kError;
+
+  case kRpToken:
+    // 対応する左括弧がない．
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    loc,
+		    kMsgError,
+		    "SMTLIB_PARSER",
+		    "Unexpected ')'.");
+    return kError;
+
+  default:
+    // それ以外は正常終了
+    break;
   }
+
+  return kOK;
 }
 
 // 今までに生成したすべてのオブジェクトを解放する．
@@ -124,79 +95,87 @@ tTokenType
 SmtLibParser::read_sexp(SmtLibNode*& node,
 			FileRegion& loc)
 {
-  tTokenType type = mScanner.read_token(loc);
-  if ( type == kEofToken ) {
-    return kEofToken;
-  }
-
   node = NULL;
-  switch ( type ) {
-  case kNumToken:
-    node = new_num(loc, atoi(mScanner.cur_string()));
-    break;
+  for ( ; ; ) {
+    // ループを回るのは改行の場合だけ．
+    tTokenType type = mScanner.read_token(loc);
+    switch ( type ) {
+    case kNumToken:
+      node = new_num(loc, atoi(mScanner.cur_string()));
+      break;
 
-  case kDecToken:
-    node = new_dec(loc, ShString(mScanner.cur_string()));
-    break;
+    case kDecToken:
+      node = new_dec(loc, ShString(mScanner.cur_string()));
+      break;
 
-  case kHexToken:
-    node = new_hex(loc, ShString(mScanner.cur_string()));
-    break;
+    case kHexToken:
+      node = new_hex(loc, ShString(mScanner.cur_string()));
+      break;
 
-  case kBinToken:
-    node = new_bin(loc, ShString(mScanner.cur_string()));
-    break;
+    case kBinToken:
+      node = new_bin(loc, ShString(mScanner.cur_string()));
+      break;
 
-  case kStringToken:
-    node = new_string(loc, ShString(mScanner.cur_string()));
-    break;
+    case kStringToken:
+      node = new_string(loc, ShString(mScanner.cur_string()));
+      break;
 
-  case kSymbolToken:
-    node = new_symbol(loc, ShString(mScanner.cur_string()));
-    break;
+    case kSymbolToken:
+      node = new_symbol(loc, ShString(mScanner.cur_string()));
+      break;
 
-  case kKeywordToken:
-    node = new_keyword(loc, ShString(mScanner.cur_string()));
-    break;
+    case kKeywordToken:
+      node = new_keyword(loc, ShString(mScanner.cur_string()));
+      break;
 
-  case kLpToken:
-    {
-      SmtLibNode* top = NULL;
-      SmtLibNode** last_ptr = &top;
-      ymuint num = 0;
-      FileRegion last_loc;
-      for ( ; ; ) {
-	SmtLibNode* node1;
-	FileRegion loc1;
-	tTokenType type1 = read_sexp(node1, loc1);
-	if ( type1 == kErrorToken ) {
-	  // エラー
-	  return kErrorToken;
-	}
-	else if ( type1 == kRpToken ) {
+    case kLpToken:
+      {
+	SmtLibNode* top = NULL;
+	SmtLibNode** last_ptr = &top;
+	ymuint num = 0;
+	FileRegion last_loc;
+	for ( ; ; ) {
+	  SmtLibNode* node1;
+	  FileRegion loc1;
+	  tTokenType type1 = read_sexp(node1, loc1);
+	  if ( type1 == kErrorToken ) {
+	    // エラー
+	    return kErrorToken;
+	  }
+	  else if ( type1 == kRpToken ) {
+	    last_loc = loc1;
+	    break;
+	  }
+	  else if ( type1 == kEofToken ) {
+	    // 括弧が閉じられる前に末尾になった．
+	    return kUnexpEofToken;
+	  }
+	  *last_ptr = node1;
+	  last_ptr = &node1->mSibling;
+	  ++ num;
 	  last_loc = loc1;
-	  break;
 	}
-	*last_ptr = node1;
-	last_ptr = &node1->mSibling;
-	++ num;
-	last_loc = loc1;
+	node = new_list(FileRegion(loc, last_loc), num, top);
       }
-      node = new_list(FileRegion(loc, last_loc), num, top);
+      type = kListToken;
+      break;
+
+    case kNlToken:
+      break;
+
+    case kRpToken:
+      break;
+
+    case kEofToken:
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
     }
-    type = kListToken;
-    break;
-
-  case kNlToken:
-    break;
-
-  case kRpToken:
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
+    if ( type != kNlToken ) {
+      return type;
+    }
   }
-  return type;
 }
 
 // @brief NUM タイプのノードを生成する．

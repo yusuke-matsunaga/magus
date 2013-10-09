@@ -43,7 +43,9 @@ enum tTokenType {
   /// @brief ERROR
   kErrorToken,
   /// @brief EOF
-  kEofToken
+  kEofToken,
+  /// @brief unexpected EOF
+  kUnexpEofToken
 };
 
 END_NAMESPACE_YM_SMTLIBV2
