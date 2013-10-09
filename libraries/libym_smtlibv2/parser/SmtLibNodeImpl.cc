@@ -61,6 +61,108 @@ SmtLibNode::child() const
 }
 
 
+BEGIN_NONAMESPACE
+
+// 字下げ用の空白を出力する．
+void
+print_space(ostream& s,
+	    ymuint ident_level)
+{
+  for (ymuint i = 0; i < ident_level; ++ i) {
+    s << "  ";
+  }
+}
+
+END_NONAMESPACE
+
+// @relates SmtLibNode
+// @brief SmbLitNode の内容を出力する(デバッグ用)．
+// @param[in] s 出力先のストリーム
+// @param[in] node 対象のノード
+// @param[in] ident_level 字下げのレベル
+// @param[in] print_loc ファイル位置の情報を出力するとき true にするフラグ
+void
+display(ostream& s,
+	const SmtLibNode* node,
+	ymuint ident_level,
+	bool print_loc)
+{
+  if ( print_loc ) {
+    print_space(s, ident_level);
+    s << "Loc:  " << node->loc() << endl;
+  }
+  const char* type_str = NULL;
+  switch ( node->type() ) {
+  case kNumToken:     type_str = "Numeral"; break;
+  case kDecToken:     type_str = "Decimal"; break;
+  case kHexToken:     type_str = "Hexadecimal"; break;
+  case kBinToken:     type_str = "Binary"; break;
+  case kStringToken:  type_str = "String"; break;
+  case kSymbolToken:  type_str = "Symbol"; break;
+  case kKeywordToken: type_str = "Keyword"; break;
+  case kListToken:    type_str = "List"; break;
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+  }
+  print_space(s, ident_level);
+  s << "Type: " << type_str << endl;
+  if ( node->type() == kListToken ) {
+    ymuint ident_level1 = ident_level + 1;
+    ymuint n = node->child_num();
+    const SmtLibNode* child = node->child();
+    for (ymuint i = 0; i < n; ++ i, child = child->sibling()) {
+      print_space(s, ident_level1);
+      s << "Child#" << i << endl;
+      display(s, child, ident_level1, print_loc);
+    }
+  }
+  else if ( node->type() == kNumToken ) {
+    print_space(s, ident_level);
+    s << "Value: " << node->int_value() << endl;
+  }
+  else {
+    print_space(s, ident_level);
+    s << "Value: " << node->str_value() << endl;
+  }
+}
+
+// @relates SmtLibNode
+// @brief SmtLibNode の内容をもとの形で出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] node 対象のノード
+void
+print(ostream& s,
+      const SmtLibNode* node)
+{
+  for ( ; node != NULL; node = node->sibling()) {
+    s << " ";
+    switch ( node->type() ) {
+    case kNumToken:
+      s << node->int_value();
+      break;
+
+    case kDecToken:
+    case kHexToken:
+    case kBinToken:
+    case kStringToken:
+    case kSymbolToken:
+    case kKeywordToken:
+      s << node->str_value();
+      break;
+
+    case kListToken:
+      s << "(";
+      print(s, node->child());
+      s << " )";
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+    }
+  }
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // クラス SmtLibTerminalNode
 //////////////////////////////////////////////////////////////////////

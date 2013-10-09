@@ -1,7 +1,7 @@
-#ifndef YM_SMTLIBV2_SMTLIBNODE_H
-#define YM_SMTLIBV2_SMTLIBNODE_H
+#ifndef SMTLIBNODE_H
+#define SMTLIBNODE_H
 
-/// @file ym_smtlibv2/SmtLibNode.h
+/// @file SmtLibNode.h
 /// @brief SmtLibNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -53,7 +53,7 @@ public:
   ymint32
   int_value() const;
 
-  /// @brief 終端型の場合の値を返す．
+  /// @brief 終端型の場合の文字列値を返す．
   virtual
   ShString
   str_value() const;

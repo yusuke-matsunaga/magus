@@ -1,13 +1,11 @@
-#ifndef LIBYM_SMTLIBV2_PARSER_SMTLIBPARSER_H
-#define LIBYM_SMTLIBV2_PARSER_SMTLIBPARSER_H
+#ifndef SMTLIBPARSER_H
+#define SMTLIBPARSER_H
 
-/// @file libym_cell/mislib/MislibParser.h
-/// @brief MislibParser のヘッダファイル
+/// @file SmtLibParser.h
+/// @brief SmtLibParser のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MislibParser.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -65,19 +63,19 @@ public:
 
   /// @brief 初期化する．
   /// @param[in] ido 入力データ
-  /// @note この関数を呼ぶと以前のパース結果の SmtLibNode は破壊されるので注意
+  /// @note 内部で clear() を呼ぶ．
   void
   init(IDO* ido);
+
+  /// @brief 今までに生成したすべてのオブジェクトを解放する．
+  void
+  clear();
 
   /// @brief S式を一つ読み込む．
   /// @param[out] root 読んだS式の根のノード
   /// @return 結果を返す．
   tResult
   read(SmtLibNode*& root);
-
-  /// @brief 今までに生成したすべてのオブジェクトを解放する．
-  void
-  clear();
 
 
 private:
@@ -168,4 +166,4 @@ private:
 
 END_NAMESPACE_YM_SMTLIBV2
 
-#endif // LIBYM_SMTLIBV2_PARSER_SMTLIBPARSER_H
+#endif // SMTLIBPARSER_H
