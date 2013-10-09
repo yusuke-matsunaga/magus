@@ -65,6 +65,7 @@ public:
 
   /// @brief 初期化する．
   /// @param[in] ido 入力データ
+  /// @note この関数を呼ぶと以前のパース結果の SmtLibNode は破壊されるので注意
   void
   init(IDO* ido);
 
