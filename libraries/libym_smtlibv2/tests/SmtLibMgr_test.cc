@@ -80,10 +80,10 @@ SmtLibMgr_test(const string& filename)
       mgr.define_fun(node1->sibling());
     }
     else if ( strcmp("push", str1) == 0 ) {
-      cout << "PUSH " << node1->sibling()->int_value() << endl;
+      mgr.push(node1->sibling());
     }
     else if ( strcmp("pop", str1) == 0 ) {
-      cout << "POP " << node1->sibling()->int_value() << endl;
+      mgr.pop(node1->sibling());
     }
     else if ( strcmp("assert", str1) == 0 ) {
       mgr.assert(node1->sibling());

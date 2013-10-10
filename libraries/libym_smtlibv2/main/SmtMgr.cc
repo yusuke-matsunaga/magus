@@ -1,14 +1,13 @@
 
-/// @file SmtLibMgr.cc
-/// @brief SmtLibMgr の実装ファイル
+/// @file SmtMgr.cc
+/// @brief SmtMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SmtLibMgr.h"
-#include "SmtLibNode.h"
+#include "SmtMgr.h"
 
 #include "ym_smtlibv2/SmtId.h"
 #include "ym_smtlibv2/SmtSort.h"
@@ -54,22 +53,25 @@ END_NONAMESPACE
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 //////////////////////////////////////////////////////////////////////
-// クラス SmtLibMgr
+// クラス SmtMgr
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SmtLibMgr::SmtLibMgr() :
+SmtMgr::SmtMgr() :
   mAlloc(4096),
   mIdMgr(mAlloc),
   mLogic(kSmtLogic_NONE)
 {
+  // スタックの初期化
   StackPage* page = new StackPage();
   mStack.push_back(page);
 }
 
 // @brief デストラクタ
-SmtLibMgr::~SmtLibMgr()
+SmtMgr::~SmtMgr()
 {
+  // スタックの削除
+  // 順序は問題ないよね？
   for (vector<StackPage*>::iterator p = mStack.begin();
        p != mStack.end(); ++ p) {
     delete *p;
@@ -77,178 +79,134 @@ SmtLibMgr::~SmtLibMgr()
 }
 
 // @brief set-logic の処理を行う．
-// @param[in] arg_top 引数の先頭ノード
+// @param[in] logic tSmtLogic ロジック
+// @retval true 処理が成功した．
+// @retval false 処理が失敗した．
+//
+// エラーの原因は以下のとおり
+//  - set_logic が実行されていた．
 bool
-SmtLibMgr::set_logic(const SmtLibNode* arg_top)
+SmtMgr::set_logic(tSmtLogic logic)
 {
-  if ( debug ) {
-    cerr << "set-logic ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
-  ostringstream ebuf;
-
   // このコマンドは1度しか使えない．
   if ( mLogic != kSmtLogic_NONE ) {
-    ebuf << "already set";
-    goto syntax_error;
+    return false;
   }
 
-  // このコマンドは1つの引数をとる．
-  if ( arg_top == NULL || arg_top->sibling() != NULL ||
-       arg_top->type() != kSymbolToken ) {
-    ebuf << "syntax_error";
-    goto syntax_error;
-  }
-  else {
-    const char* str = arg_top->str_value();
-    if ( strcmp(str, "AUFLIA") == 0 ) {
-      mLogic = kSmtLogic_AUFLIA;
+  switch ( logic ) {
+  case kSmtLogic_AUFLIA:
+    Core_init();
+    Ints_init();
+    break;
 
-      Core_init();
-      Ints_init();
-    }
-    else if ( strcmp(str, "AUFLIRA") == 0 ) {
-      mLogic = kSmtLogic_AUFLIRA;
+  case kSmtLogic_AUFLIRA:
+    Core_init();
+    Ints_init();
+    break;
 
-      Core_init();
-      Ints_init();
-    }
-    else if ( strcmp(str, "AUFNIRA") == 0 ) {
-      mLogic = kSmtLogic_AUFNIRA;
+  case kSmtLogic_AUFNIRA:
+    Core_init();
+    Ints_init();
+    break;
 
-      Core_init();
-      Ints_init();
-    }
-    else if ( strcmp(str, "LRA") == 0 ) {
-      mLogic = kSmtLogic_LRA;
+  case kSmtLogic_LRA:
+    Core_init();
+    break;
 
-      Core_init();
-    }
-    else if ( strcmp(str, "QF_ABV") == 0 ) {
-      mLogic = kSmtLogic_QF_ABV;
+  case kSmtLogic_QF_ABV:
+    Core_init();
+    break;
 
-      Core_init();
-    }
-    else if ( strcmp(str, "QF_AUFBV") == 0 ) {
-      mLogic = kSmtLogic_QF_AUFBV;
+  case kSmtLogic_QF_AUFBV:
+    Core_init();
+    break;
 
-      Core_init();
-    }
-    else if ( strcmp(str, "QF_AUFLIA") == 0 ) {
-      mLogic = kSmtLogic_QF_AUFLIA;
+  case kSmtLogic_QF_AUFLIA:
+    Core_init();
+    Ints_init();
+    break;
 
-      Core_init();
-      Ints_init();
-    }
-    else if ( strcmp(str, "QF_AX") == 0 ) {
-      mLogic = kSmtLogic_QF_AX;
+  case kSmtLogic_QF_AX:
+    Core_init();
+    break;
 
-      Core_init();
-    }
-    else if ( strcmp(str, "QF_BV") == 0 ) {
-      mLogic = kSmtLogic_QF_BV;
+  case kSmtLogic_QF_BV:
+    Core_init();
+    break;
 
-      Core_init();
-    }
-    else if ( strcmp(str, "QF_IDL") == 0 ) {
-      mLogic = kSmtLogic_QF_IDL;
+  case kSmtLogic_QF_IDL:
+    Core_init();
+    Ints_init();
+    break;
 
-      Core_init();
-      Ints_init();
-    }
-    else if ( strcmp(str, "QF_LIA") == 0 ) {
-      mLogic = kSmtLogic_QF_LIA;
+  case kSmtLogic_QF_LIA:
+    Core_init();
+    Ints_init();
+    break;
 
-      Core_init();
-      Ints_init();
-    }
-    else if ( strcmp(str, "QF_LRA") == 0 ) {
-      mLogic = kSmtLogic_QF_LRA;
+  case kSmtLogic_QF_LRA:
+    Core_init();
+    break;
 
-      Core_init();
-    }
-    else if ( strcmp(str, "QF_NIA") == 0 ) {
-      mLogic = kSmtLogic_QF_NIA;
+  case kSmtLogic_QF_NIA:
+    Core_init();
+    Ints_init();
+    break;
 
-      Core_init();
-      Ints_init();
-    }
-    else if ( strcmp(str, "QF_NRA") == 0 ) {
-      mLogic = kSmtLogic_QF_NRA;
+  case kSmtLogic_QF_NRA:
+    Core_init();
+    break;
 
-      Core_init();
-    }
-    else if ( strcmp(str, "QF_RDL") == 0 ) {
-      mLogic = kSmtLogic_QF_RDL;
+  case kSmtLogic_QF_RDL:
+    Core_init();
+    break;
 
-      Core_init();
-    }
-    else if ( strcmp(str, "QF_UF") == 0 ) {
-      mLogic = kSmtLogic_QF_UF;
+  case kSmtLogic_QF_UF:
+    Core_init();
+    break;
 
-      Core_init();
-    }
-    else if ( strcmp(str, "QF_UFBF") == 0 ) {
-      mLogic = kSmtLogic_QF_UFBV;
+  case kSmtLogic_QF_UFBV:
+    Core_init();
+    break;
 
-      Core_init();
-    }
-    else if ( strcmp(str, "QF_UFIDL") == 0 ) {
-      mLogic = kSmtLogic_QF_UFIDL;
+  case kSmtLogic_QF_UFIDL:
+    Core_init();
+    Ints_init();
+    break;
 
-      Core_init();
-      Ints_init();
-    }
-    else if ( strcmp(str, "QF_UFLIA") == 0 ) {
-      mLogic = kSmtLogic_QF_UFLIA;
+  case kSmtLogic_QF_UFLIA:
+    Core_init();
+    Ints_init();
+    break;
 
-      Core_init();
-      Ints_init();
-    }
-    else if ( strcmp(str, "QF_UFLRA") == 0 ) {
-      mLogic = kSmtLogic_QF_UFLRA;
+  case kSmtLogic_QF_UFLRA:
+    Core_init();
+    break;
 
-      Core_init();
-    }
-    else if ( strcmp(str, "QF_UFNRA") == 0 ) {
-      mLogic = kSmtLogic_QF_UFNRA;
+  case kSmtLogic_QF_UFNRA:
+    Core_init();
+    break;
 
-      Core_init();
-    }
-    else if ( strcmp(str, "UFLRA") == 0 ) {
-      mLogic = kSmtLogic_UFLRA;
+  case kSmtLogic_UFLRA:
+    Core_init();
+    break;
 
-      Core_init();
-    }
-    else if ( strcmp(str, "UFNIA") == 0 ) {
-      mLogic = kSmtLogic_UFNIA;
+  case kSmtLogic_UFNIA:
+    Core_init();
+    Ints_init();
+    break;
 
-      Core_init();
-      Ints_init();
-    }
-    else {
-      ebuf << str << ": unknown logic";
-      goto syntax_error;
-    }
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
 
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
-  }
   return true;
-
- syntax_error:
-  if ( debug ) {
-    cerr << "  ==> error: " << ebuf.str() << endl;
-  }
-  return false;
 }
 
 // @brief Core theory の初期化を行う．
 void
-SmtLibMgr::Core_init()
+SmtMgr::Core_init()
 {
   // :sorts
   // (Bool 0)
@@ -330,7 +288,7 @@ SmtLibMgr::Core_init()
 
 // @brief Ints theory の初期化を行う．
 void
-SmtLibMgr::Ints_init()
+SmtMgr::Ints_init()
 {
   // :sorts
   // (Int 0)
@@ -391,433 +349,140 @@ SmtLibMgr::Ints_init()
 }
 
 // @brief set-info の処理を行う．
-// @param[in] arg_top 引数の先頭ノード
+// @param[in] attr 属性
+// @retval true 処理が成功した．
+// @retval false 処理が失敗した．
 bool
-SmtLibMgr::set_info(const SmtLibNode* arg_top)
+SmtMgr::set_info(const SmtAttr* attr)
 {
-  if ( debug ) {
-    cerr << "set-info ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
-  vector<const SmtAttr*> attr_list;
-  const char* emsg = "";
-
-  if ( !eval_to_attr(arg_top, attr_list) ) {
-    emsg = "syntax_error";
-    goto syntax_error;
-  }
-  if ( attr_list.empty() || attr_list.size() > 1 ) {
-    emsg = "syntax_error";
-    goto syntax_error;
-  }
-
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
-  }
-
+  // 未完
   return true;
-
- syntax_error:
-  if ( debug ) {
-    cerr << "  ==> error: " << emsg << endl;
-  }
-
-  return false;
 }
 
 // @brief sort の宣言を行う．
-// @param[in] arg_top 引数の先頭ノード
+// @param[in] name 型名を表す識別子
+// @param[in] param_num パラメータの数
+// @retval true 処理が成功した．
+// @retval false 処理が失敗した．
+//
+// エラーの原因は以下のとおり
+//  - 同名の型が別に宣言されている．
 bool
-SmtLibMgr::declare_sort(const SmtLibNode* arg_top)
+SmtMgr::declare_sort(const SmtId* name,
+		     ymuint param_num)
 {
-  if ( debug ) {
-    cerr << "declare-sort ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
-  // このコマンドは2つの引数をとる．
-  vector<const SmtLibNode*> arg_list;
-  const SmtId* name = NULL;
-  ymuint num = 0;
-  const char* emsg = "";
-
-  if ( !parse_args(arg_top, 2, arg_list) ) {
-    emsg = "syntax error";
-    goto syntax_error;
-  }
-
-  // 1つめは型名
-  name = eval_to_id(arg_list[0]);
-  if ( name == NULL ) {
-    emsg = "first argument is not an indentifier";
-    goto syntax_error;
-  }
-
-  // 2つめは引数の数
-  if ( arg_list[1]->type() != kNumToken ) {
-    emsg = "second argument is not a numeric";
-    goto syntax_error;
-  }
-  num = arg_list[1]->int_value();
-
   // 型を登録する．
-  if ( !sort_mgr().reg_sort(name, num) ) {
-    emsg = "already declared";
-    goto syntax_error;
-  }
+  bool stat = sort_mgr().reg_sort(name, num);
 
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
-  }
-
-  return true;
-
- syntax_error:
-  if ( debug ) {
-    cerr << "  ==> error: " << emsg << endl;
-  }
-
-  return false;
+  return stat;
 }
 
 // @brief sort の alias を定義する．
-// @param[in] arg_top 引数の先頭ノード
+// @param[in] name 型名を表す識別子
+// @param[in] param_num パラメータの数
+// @param[in] sort_tmpl 型テンプレート
+// @retval true 処理が成功した．
+// @retval false 処理が失敗した．
+//
+// エラーの原因は以下のとおり
+//  - 同名の型が既に宣言されている．
 bool
-SmtLibMgr::define_sort(const SmtLibNode* arg_top)
+SmtMgr::define_sort(const SmtId* name,
+		    ymuint param_num,
+		    const SmtSort* sort_tmpl)
 {
-  if ( debug ) {
-    cerr << "define-sort ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
-  // このコマンドは3つの引数をとる．
-  vector<const SmtLibNode*> arg_list;
-  const SmtId* name = NULL;
-  vector<const SmtId*> param_list;
-  const SmtSort* sort = NULL;
-  const char* emsg = "";
-
-  if ( !parse_args(arg_top, 3, arg_list) ) {
-    emsg = "syntax error";
-    goto syntax_error;
-  }
-
-  // 1つめは型名
-  name = eval_to_id(arg_list[0]);
-  if ( name == NULL ) {
-    emsg = "first argument is not an identifier";
-    goto syntax_error;
-  }
-
-  // 2つめはパラメータリスト
-  if ( arg_list[1]->type() != kListToken ) {
-    emsg = "second argument is not 'list' type";
-    goto syntax_error;
-  }
-  param_list.reserve(arg_list[1]->child_num());
-  for (const SmtLibNode* node1 = arg_list[1]->child();
-       node1 != NULL; node1 = node1->sibling()) {
-    const SmtId* id = eval_to_id(node1);
-    if ( id == NULL ) {
-      emsg = "second argument is not a list of identifiers";
-      goto syntax_error;
-    }
-    param_list.push_back(id);
-  }
-
-  // 3つめは型テンプレート
-  sort = eval_to_sort_template(arg_list[2], param_list);
-  if ( sort == NULL ) {
-    emsg = "third argument is not a valid sort";
-    goto syntax_error;
-  }
-
   // 型テンプレートを登録する．
-  if ( !sort_mgr().reg_alias(name, param_list.size(), sort) ) {
-    emsg = "already defined";
-    goto syntax_error;
-  }
+  bool stat = sort_mgr().reg_alias(name, param_name, sort_tmpl);
 
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
-  }
-
-  return true;
-
- syntax_error:
-  if ( debug ) {
-    cerr << "  ==> error: " << emsg << endl;
-  }
-
-  return false;
+  return stat;
 }
 
 // @brief 関数の宣言を行う．
-// @param[in] arg_top 引数の先頭ノード
+// @param[in] name 関数名を表す識別子
+// @param[in] input_sort_list 入力の型のリスト
+// @param[in] output_sort 出力の型
+// @retval true 処理が成功した．
+// @retval false 処理が失敗した．
+//
+// エラーの原因は以下のとおり
+//  - 同名の関数が既に宣言されている．
 bool
-SmtLibMgr::declare_fun(const SmtLibNode* arg_top)
+SmtMgr::declare_fun(const SmtId* name,
+		    const vector<const SmtSort*>& input_sort_list,
+		    const SmtSort* output_sort)
 {
-  if ( debug ) {
-    cerr << "declare-fun ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
-  // このコマンドは3つの引数をとる．
-  vector<const SmtLibNode*> arg_list;
-  const SmtId* name = NULL;
-  vector<const SmtSort*> input_sort_list;
-  const SmtSort* output_sort = NULL;
-  const char* emsg = "";
-
-  if ( !parse_args(arg_top, 3, arg_list) ) {
-    emsg = "syntax error";
-    goto syntax_error;
-  }
-
-  // 1つめは名前
-  name = eval_to_id(arg_list[0]);
-  if ( name == NULL ) {
-    emsg = "first argument is not an identifier";
-    goto syntax_error;
-  }
-
-  // 2つめは入力の型のリスト
-  if ( arg_list[1]->type() != kListToken ) {
-    emsg = "second argument is not 'list' type";
-    goto syntax_error;
-  }
-  input_sort_list.reserve(arg_list[1]->child_num());
-  for (const SmtLibNode* node = arg_list[1]->child();
-       node != NULL; node = node->sibling()) {
-    const SmtSort* sort = eval_to_sort(node);
-    if ( sort == NULL ) {
-      ostringstream buf;
-      print(buf, node);
-      buf << " is not a registered sort";
-      emsg = buf.str().c_str();
-      goto syntax_error;
-    }
-    input_sort_list.push_back(sort);
-  }
-
-  // 3つめは出力の型のリスト
-  output_sort = eval_to_sort(arg_list[2]);
-  if ( output_sort == NULL ) {
-    emsg = "third argument is not a valid sort";
-    goto syntax_error;
-  }
-
   // 関数を登録する．
-  if ( !fun_mgr().reg_fun(name, input_sort_list, output_sort) ) {
-    emsg = "already declared";
-    goto syntax_error;
-  }
+  bool stat = fun_mgr().reg_fun(name, input_sort_list, output_sort);
 
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
-  }
-
-  return true;
-
- syntax_error:
-  if ( debug ) {
-    cerr << "  ==> error: " << emsg << endl;
-  }
-
-  return false;
+  return stat;
 }
 
 // @brief 関数の定義を行う．
-// @param[in] arg_top 引数の先頭ノード
+// @param[in] name 関数名を表す識別子
+// @param[in] input_var_list 型つきの入力変数のリスト
+// @param[in] output_sort 出力の型
+// @param[in] body 本体の式
+// @retval true 処理が成功した．
+// @retval false 処理が失敗した．
+//
+// エラーの原因は以下のとおり
+//  - 同名の関数が既に定義されている．
 bool
-SmtLibMgr::define_fun(const SmtLibNode* arg_top)
+SmtMgr::define_fun(const SmtId* name,
+		   const vector<SmtSortedVar>& input_var_list,
+		   const SmtSort* output_sort,
+		   const SmtTerm* body)
 {
-  if ( debug ) {
-    cerr << "define-fun ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
-  // このコマンドは4つの引数をとる．
-  vector<const SmtLibNode*> arg_list;
-  const SmtId* name = NULL;
-  vector<SmtSortedVar> var_list;
-  const SmtSort* output_sort = NULL;
-  const SmtTerm* body = NULL;
-
-  const char* emsg = "";
-
-  if ( !parse_args(arg_top, 4, arg_list) ) {
-    emsg = "syntax error";
-    goto syntax_error;
-  }
-
-  // 1つめは名前
-  name = eval_to_id(arg_list[0]);
-  if ( name == NULL ) {
-    emsg = "first argument is not an identifier";
-    goto syntax_error;
-  }
-
-  // 2つめは変数のリスト
-  if ( arg_list[1]->type() != kListToken ) {
-    emsg = "second argument is not 'list' type";
-    goto syntax_error;
-  }
-  var_list.reserve(arg_list[1]->child_num());
-  for (const SmtLibNode* node = arg_list[1]->child();
-       node != NULL; node = node->sibling()) {
-    SmtSortedVar sorted_var;
-    if ( !eval_to_sorted_var(node, sorted_var) ) {
-      emsg = "sorted var is expected.";
-      goto syntax_error;
-    }
-    var_list.push_back(sorted_var);
-  }
-
-  // 3つめは出力の型
-  output_sort = eval_to_sort(arg_list[2]);
-  if ( output_sort == NULL ) {
-    emsg = "third argument is not a valid sort";
-    goto syntax_error;
-  }
-
-  // 4つめは本体の式
-  body = eval_to_term(arg_list[3]);
-  if ( body == NULL ) {
-    emsg = "forth argument is not a valid term";
-    goto syntax_error;
-  }
-
   // 関数を登録する．
-  if ( !fun_mgr().reg_fun(name, var_list, output_sort, body) ) {
-    emsg = "already defined";
-    goto syntax_error;
-  }
+  bool stat = fun_mgr().reg_fun(name, input_var_list, output_sort, body);
 
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
-  }
-
-  return true;
-
- syntax_error:
-  if ( debug ) {
-    cerr << "  ==> error: " << emsg << endl;
-  }
-
-  return false;
+  return stat;
 }
 
 // @brief assertion を追加する．
-// @param[in] arg_top 引数の先頭ノード
+// @param[in] term 式
+// @retval true 処理が成功した．
+// @retval false 処理が失敗した．
+//
+// この関数は通常は成功するはず．
 bool
-SmtLibMgr::assert(const SmtLibNode* arg_top)
+SmtMgr::assert(const SmtTerm* term)
 {
-  if ( debug ) {
-    cerr << "assert ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
-  const char* emsg = "";
-
-  // このコマンドは1つの引数をとる．
-  if ( arg_top == NULL || arg_top->sibling() != NULL ) {
-    emsg = "syntax error";
-    goto syntax_error;
-  }
-  else {
-    const SmtTerm* term = eval_to_term(arg_top);
-    if ( term == NULL ) {
-      // エラーメッセージは出力されている．
-      goto syntax_error;
-    }
-    assertion_list().push_back(term);
- }
-
-
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
-  }
+  assertion_list().push_back(term);
 
   return true;
-
- syntax_error:
-  if ( debug ) {
-    cerr << "  ==> error: " << emsg << endl;
-  }
-
-  return false;
 }
 
 // @brief assertion スタックにプッシュする．
-// @param[in] arg_top 引数の先頭ノード
+// @param[in] num プッシュするレベル
+// @retval true 処理が成功した．
+// @retval false 処理が失敗した．
+//
+// この関数は通常は成功するはず．
 bool
-SmtLibMgr::push(const SmtLibNode* arg_top)
+SmtMgr::push(ymuint num)
 {
-  if ( debug ) {
-    cerr << "push ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
-  // このコマンドは1つの整数値を引数にとる．
-  if ( arg_top == NULL ||
-       arg_top->sibling() != NULL ||
-       arg_top->type() != kNumToken ) {
-    if ( debug ) {
-      cerr << "  ==> error: syntax error" << endl;
-      return false;
-    }
-  }
-
-  ymuint num = arg_top->int_value();
   for (ymuint i = 0; i < num; ++ i) {
     StackPage* prev = mStack.back();
     StackPage* page = new StackPage(mStack.size(), prev);
     mStack.push_back(page);
   }
 
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
-  }
   return true;
 }
 
 // @brief assertion スタックからポップする．
-// @param[in] arg_top 引数の先頭ノード
-// @return ポップが成功したら true を返す．
+// @param[in] num ポップするレベル．
+// @retval true 処理が成功した．
+// @retval false 処理が失敗した．
+//
+// エラーの原因は以下のとおり
+//  - num がスタックのサイズと等しいか大きかった．
 bool
-SmtLibMgr::pop(const SmtLibNode* arg_top)
+SmtMgr::pop(ymuint num)
 {
-  if ( debug ) {
-    cerr << "pop ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
-  // このコマンドは1つの整数値を引数にとる．
-  if ( arg_top == NULL ||
-       arg_top->sibling() != NULL ||
-       arg_top->type() != kNumToken ) {
-    if ( debug ) {
-      cerr << "  ==> error: syntax error" << endl;
-      return false;
-    }
-  }
-
-  ymuint num = arg_top->int_value();
   if ( mStack.size() <= num ) {
     // スタックのサイズが小さすぎる．
-    if ( debug ) {
-      cerr << "  ==> error: arg is too large" << endl;
-    }
     return false;
   }
 
@@ -827,17 +492,13 @@ SmtLibMgr::pop(const SmtLibNode* arg_top)
     mStack.pop_back();
   }
 
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
-  }
-
   return true;
 }
 
 // @brief S式を識別子に変換する．
 // @param[in] node S式を表すノード
 const SmtId*
-SmtLibMgr::eval_to_id(const SmtLibNode* node)
+SmtMgr::eval_to_id(const SmtLibNode* node)
 {
   ShString name;
   vector<ymint32> index_list;
@@ -888,7 +549,7 @@ SmtLibMgr::eval_to_id(const SmtLibNode* node)
 // @brief S式を sort に変換する．
 // @param[in] node S式を表すノード
 const SmtSort*
-SmtLibMgr::eval_to_sort(const SmtLibNode* node)
+SmtMgr::eval_to_sort(const SmtLibNode* node)
 {
   const SmtId* id = eval_to_id(node);
   vector<const SmtSort*> elem_list;
@@ -943,7 +604,7 @@ SmtLibMgr::eval_to_sort(const SmtLibNode* node)
 // @brief S式を sort に変換する．
 // @param[in] node S式を表すノード
 const SmtSort*
-SmtLibMgr::eval_to_sort_template(const SmtLibNode* node,
+SmtMgr::eval_to_sort_template(const SmtLibNode* node,
 				 const vector<const SmtId*>& param_list)
 {
   const SmtId* id = eval_to_id(node);
@@ -995,7 +656,7 @@ SmtLibMgr::eval_to_sort_template(const SmtLibNode* node,
 // @brief S式を term に変換する．
 // @param[in] node S式を表すノード
 const SmtTerm*
-SmtLibMgr::eval_to_term(const SmtLibNode* node)
+SmtMgr::eval_to_term(const SmtLibNode* node)
 {
   // 定数の場合
   switch ( node->type() ) {
@@ -1181,7 +842,7 @@ SmtLibMgr::eval_to_term(const SmtLibNode* node)
 // @brief S式を s-expr に変換する．
 // @param[in] node S式を表すノード
 const SmtTerm*
-SmtLibMgr::eval_to_expr(const SmtLibNode* node)
+SmtMgr::eval_to_expr(const SmtLibNode* node)
 {
   switch ( node->type() ) {
   case kNumToken:
@@ -1230,7 +891,7 @@ SmtLibMgr::eval_to_expr(const SmtLibNode* node)
 // @brief S式を qual_identifier に変換する．
 // @param[in] node S式を表すノード
 const SmtTerm*
-SmtLibMgr::eval_to_qid(const SmtLibNode* node)
+SmtMgr::eval_to_qid(const SmtLibNode* node)
 {
   // ただの identifier の場合もある．
   const SmtId* id = eval_to_id(node);
@@ -1270,7 +931,7 @@ SmtLibMgr::eval_to_qid(const SmtLibNode* node)
 // @retval true 変換が成功した．
 // @retval false 変換が失敗した．
 bool
-SmtLibMgr::eval_to_sorted_var(const SmtLibNode* node,
+SmtMgr::eval_to_sorted_var(const SmtLibNode* node,
 			      SmtSortedVar& sorted_var)
 {
   // ( <identifier> <sort> ) の形
@@ -1313,7 +974,7 @@ SmtLibMgr::eval_to_sorted_var(const SmtLibNode* node,
 // @retval true 変換が成功した．
 // @retval false 変換が失敗した．
 bool
-SmtLibMgr::eval_to_var_binding(const SmtLibNode* node,
+SmtMgr::eval_to_var_binding(const SmtLibNode* node,
 			       SmtVarBinding& var_binding)
 {
   // ( <identifier> <term> ) の形
@@ -1355,7 +1016,7 @@ SmtLibMgr::eval_to_var_binding(const SmtLibNode* node,
 // @param[in] node S式を表すノード
 // @param[out] attr_list 結果の attribute のリストを格納する変数
 bool
-SmtLibMgr::eval_to_attr(const SmtLibNode* node,
+SmtMgr::eval_to_attr(const SmtLibNode* node,
 			vector<const SmtAttr*>& attr_list)
 {
   attr_list.clear();
@@ -1389,7 +1050,7 @@ SmtLibMgr::eval_to_attr(const SmtLibNode* node,
 // @retval true 引数の数が arg_num と一致した．
 // @retval false 引数の数が arg_num と一致しなかった．
 bool
-SmtLibMgr::parse_args(const SmtLibNode*  arg_top,
+SmtMgr::parse_args(const SmtLibNode*  arg_top,
 		      ymuint arg_num,
 		      vector<const SmtLibNode*>& arg_list)
 {
@@ -1412,7 +1073,7 @@ SmtLibMgr::parse_args(const SmtLibNode*  arg_top,
 // @brief <numeric> を作る．
 // @param[in] val 値
 const SmtTerm*
-SmtLibMgr::new_numeric(ymint32 val)
+SmtMgr::new_numeric(ymint32 val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtNumTerm));
   return new (p) SmtNumTerm(val);
@@ -1421,7 +1082,7 @@ SmtLibMgr::new_numeric(ymint32 val)
 // @brief <decimal> を作る．
 // @param[in] val 値
 const SmtTerm*
-SmtLibMgr::new_decimal(const ShString& val)
+SmtMgr::new_decimal(const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtDecTerm));
   return new (p) SmtDecTerm(val);
@@ -1430,7 +1091,7 @@ SmtLibMgr::new_decimal(const ShString& val)
 // @brief <hexadecimal> を作る．
 // @param[in] val 値
 const SmtTerm*
-SmtLibMgr::new_hexadecimal(const ShString& val)
+SmtMgr::new_hexadecimal(const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtHexTerm));
   return new (p) SmtHexTerm(val);
@@ -1439,7 +1100,7 @@ SmtLibMgr::new_hexadecimal(const ShString& val)
 // @brief <binary> を作る．
 // @param[in] val 値
 const SmtTerm*
-SmtLibMgr::new_binary(const ShString& val)
+SmtMgr::new_binary(const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtBinTerm));
   return new (p) SmtBinTerm(val);
@@ -1448,7 +1109,7 @@ SmtLibMgr::new_binary(const ShString& val)
 // @brief <string> を作る．
 // @param[in] val 値
 const SmtTerm*
-SmtLibMgr::new_string(const ShString& val)
+SmtMgr::new_string(const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtStrTerm));
   return new (p) SmtStrTerm(val);
@@ -1457,7 +1118,7 @@ SmtLibMgr::new_string(const ShString& val)
 // @brief <symbol> を作る．
 // @param[in] val 値
 const SmtTerm*
-SmtLibMgr::new_symbol(const ShString& val)
+SmtMgr::new_symbol(const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtSymbolTerm));
   return new (p) SmtSymbolTerm(val);
@@ -1466,7 +1127,7 @@ SmtLibMgr::new_symbol(const ShString& val)
 // @brief <keyword> を作る．
 // @param[in] val 値
 const SmtTerm*
-SmtLibMgr::new_keyword(const ShString& val)
+SmtMgr::new_keyword(const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtKeywordTerm));
   return new (p) SmtKeywordTerm(val);
@@ -1475,7 +1136,7 @@ SmtLibMgr::new_keyword(const ShString& val)
 // @brief identifier を作る．
 // @param[in] id 識別子
 const SmtTerm*
-SmtLibMgr::new_identifier(const SmtId* id)
+SmtMgr::new_identifier(const SmtId* id)
 {
   void* p = mAlloc.get_memory(sizeof(SmtIdTerm));
   return new (p) SmtIdTerm(id);
@@ -1485,7 +1146,7 @@ SmtLibMgr::new_identifier(const SmtId* id)
 // @param[in] id 識別子
 // @param[in] sort 型
 const SmtTerm*
-SmtLibMgr::new_qual_identifier(const SmtId* id,
+SmtMgr::new_qual_identifier(const SmtId* id,
 			       const SmtSort* sort)
 {
   void* p = mAlloc.get_memory(sizeof(SmtQualIdTerm));
@@ -1496,7 +1157,7 @@ SmtLibMgr::new_qual_identifier(const SmtId* id,
 // @param[in] function 関数
 // @param[in] input_list 入力のリスト
 const SmtTerm*
-SmtLibMgr::new_fun_term(const SmtFun* function,
+SmtMgr::new_fun_term(const SmtFun* function,
 			const vector<const SmtTerm*>& input_list)
 {
   ymuint n = input_list.size();
@@ -1508,7 +1169,7 @@ SmtLibMgr::new_fun_term(const SmtFun* function,
 // @param[in] var_binding 変数割り当てのリスト
 // @param[in] body 本体
 const SmtTerm*
-SmtLibMgr::new_let(const vector<SmtVarBinding>& var_binding,
+SmtMgr::new_let(const vector<SmtVarBinding>& var_binding,
 		   const SmtTerm* body)
 {
   ymuint n = var_binding.size();
@@ -1520,7 +1181,7 @@ SmtLibMgr::new_let(const vector<SmtVarBinding>& var_binding,
 // @param[in] var_list 変数リスト
 // @param[in] body 本体
 const SmtTerm*
-SmtLibMgr::new_forall(const vector<SmtSortedVar>& var_list,
+SmtMgr::new_forall(const vector<SmtSortedVar>& var_list,
 		      const SmtTerm* body)
 {
   ymuint n = var_list.size();
@@ -1532,7 +1193,7 @@ SmtLibMgr::new_forall(const vector<SmtSortedVar>& var_list,
 // @param[in] var_list 変数リスト
 // @param[in] body 本体
 const SmtTerm*
-SmtLibMgr::new_exists(const vector<SmtSortedVar>& var_list,
+SmtMgr::new_exists(const vector<SmtSortedVar>& var_list,
 		      const SmtTerm* body)
 {
   ymuint n = var_list.size();
@@ -1544,7 +1205,7 @@ SmtLibMgr::new_exists(const vector<SmtSortedVar>& var_list,
 // @param[in] body 本体
 // @param[in] attr_list 属性リスト
 const SmtTerm*
-SmtLibMgr::new_attr_term(const SmtTerm* body,
+SmtMgr::new_attr_term(const SmtTerm* body,
 			 const vector<const SmtAttr*>& attr_list)
 {
   ymuint n = attr_list.size();
@@ -1555,7 +1216,7 @@ SmtLibMgr::new_attr_term(const SmtTerm* body,
 // @brief term list を作る．
 // @param[in] term_list 要素のリスト
 const SmtTerm*
-SmtLibMgr::new_list_term(const vector<const SmtTerm*>& term_list)
+SmtMgr::new_list_term(const vector<const SmtTerm*>& term_list)
 {
   ymuint n = term_list.size();
   void* p = mAlloc.get_memory(sizeof(SmtListTerm) + sizeof(const SmtTerm*) * (n - 1));
@@ -1566,7 +1227,7 @@ SmtLibMgr::new_list_term(const vector<const SmtTerm*>& term_list)
 // @param[in] keyword キーワード
 // @param[in] expr 値
 const SmtAttr*
-SmtLibMgr::new_attr(const ShString& keyword,
+SmtMgr::new_attr(const ShString& keyword,
 		    const SmtTerm* expr)
 {
   SmtAttr* attr = NULL;
@@ -1584,14 +1245,14 @@ SmtLibMgr::new_attr(const ShString& keyword,
 // @brief 識別子から関数に変換する．
 // @param[in] name 関数名
 const SmtFun*
-SmtLibMgr::find_fun(const SmtId* name)
+SmtMgr::find_fun(const SmtId* name)
 {
   return fun_mgr().find_fun(name);
 }
 
 // @brief 現在の SortMgr を返す．
 SmtSortMgr&
-SmtLibMgr::sort_mgr()
+SmtMgr::sort_mgr()
 {
   assert_cond( !mStack.empty(), __FILE__, __LINE__);
   return mStack.back()->mSortMgr;
@@ -1599,7 +1260,7 @@ SmtLibMgr::sort_mgr()
 
 // @brief 現在の FunMgr を返す．
 SmtFunMgr&
-SmtLibMgr::fun_mgr()
+SmtMgr::fun_mgr()
 {
   assert_cond( !mStack.empty(), __FILE__, __LINE__);
   return mStack.back()->mFunMgr;
@@ -1607,7 +1268,7 @@ SmtLibMgr::fun_mgr()
 
 // @brief 現在の assertion リストを返す．
 vector<const SmtTerm*>&
-SmtLibMgr::assertion_list()
+SmtMgr::assertion_list()
 {
   assert_cond( !mStack.empty(), __FILE__, __LINE__);
   return mStack.back()->mTermList;

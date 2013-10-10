@@ -1,8 +1,8 @@
-#ifndef SMTLIBMGR_H
-#define SMTLIBMGR_H
+#ifndef YM_SMTLIBV2_SMTMGR_H
+#define YM_SMTLIBV2_SMTMGR_H
 
-/// @file SmtLibMgr.h
-/// @brief SmtLibMgr のヘッダファイル
+/// @file ym_smtlibv2/SmtMgr.h
+/// @brief SmtMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -22,21 +22,19 @@
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-class SmtLibNode;
-
 //////////////////////////////////////////////////////////////////////
-/// @class SmtLibMgr SmtLibMgr.h "SmtLibMgr.h"
-/// @brief SmtLib の S式の evaluation を行うクラス
+/// @class SmtMgr SmtMgr.h "ym_smtlibv2/SmtMgr.h"
+/// @brief SmtLib に対する操作を行うクラス
 //////////////////////////////////////////////////////////////////////
-class SmtLibMgr
+class SmtMgr
 {
 public:
 
   /// @brief コンストラクタ
-  SmtLibMgr();
+  SmtMgr();
 
   /// @brief デストラクタ
-  ~SmtLibMgr();
+  ~SmtMgr();
 
 
 public:
@@ -45,50 +43,105 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief set-logic の処理を行う．
-  /// @param[in] arg_top 引数の先頭ノード
+  /// @param[in] logic tSmtLogic ロジック
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - set_logic が実行されていた．
   bool
-  set_logic(const SmtLibNode* arg_top);
+  set_logic(tSmtLogic logic);
 
   /// @brief set-info の処理を行う．
-  /// @param[in] arg_top 引数の先頭ノード
+  /// @param[in] attr 属性
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
   bool
-  set_info(const SmtLibNode* arg_top);
+  set_info(const SmtAttr* attr);
 
   /// @brief sort の宣言を行う．
-  /// @param[in] arg_top 引数の先頭ノード
+  /// @param[in] name 型名を表す識別子
+  /// @param[in] param_num パラメータの数
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - 同名の型が別に宣言されている．
   bool
-  declare_sort(const SmtLibNode* arg_top);
+  declare_sort(const SmtId* name,
+	       ymuint param_num);
 
   /// @brief sort の alias を定義する．
-  /// @param[in] arg_top 引数の先頭ノード
+  /// @param[in] name 型名を表す識別子
+  /// @param[in] param_num パラメータの数
+  /// @param[in] sort_tmpl 型テンプレート
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - 同名の型が既に宣言されている．
   bool
-  define_sort(const SmtLibNode* arg_top);
+  define_sort(const SmtId* name,
+	      ymuint param_num,
+	      const SmtSort* sort_tmpl);
 
   /// @brief 関数の宣言を行う．
-  /// @param[in] arg_top 引数の先頭ノード
+  /// @param[in] name 関数名を表す識別子
+  /// @param[in] input_sort_list 入力の型のリスト
+  /// @param[in] output_sort 出力の型
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - 同名の関数が既に宣言されている．
   bool
-  declare_fun(const SmtLibNode* arg_top);
+  declare_fun(const SmtId* name,
+	      const vector<const SmtSort*>& input_sort_list,
+	      const SmtSort* output_sort);
 
   /// @brief 関数の定義を行う．
-  /// @param[in] arg_top 引数の先頭ノード
+  /// @param[in] name 関数名を表す識別子
+  /// @param[in] input_var_list 型つきの入力変数のリスト
+  /// @param[in] output_sort 出力の型
+  /// @param[in] body 本体の式
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - 同名の関数が既に定義されている．
   bool
-  define_fun(const SmtLibNode* arg_top);
+  define_fun(const SmtId* name,
+	     const vector<SmtSortedVar>& input_var_list,
+	     const SmtSort* output_sort,
+	     const SmtTerm* body);
 
   /// @brief assertion を追加する．
-  /// @param[in] arg_top 引数の先頭ノード
+  /// @param[in] term 式
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  ///
+  /// この関数は通常は成功するはず．
   bool
-  assert(const SmtLibNode* arg_top);
+  assert(const SmtTerm* term);
 
   /// @brief assertion スタックにプッシュする．
-  /// @param[in] arg_top 引数の先頭ノード
+  /// @param[in] num プッシュするレベル
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  ///
+  /// この関数は通常は成功するはず．
   bool
-  push(const SmtLibNode* arg_top);
+  push(ymuint num);
 
   /// @brief assertion スタックからポップする．
-  /// @param[in] arg_top 引数の先頭ノード
-  /// @return ポップが成功したら true を返す．
+  /// @param[in] num ポップするレベル．
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - num がスタックのサイズと等しいか大きかった．
   bool
-  pop(const SmtLibNode* arg_top);
+  pop(ymuint num);
 
 
 private:
@@ -104,92 +157,16 @@ private:
   void
   Ints_init();
 
-  /// @brief S式を数値に変換する．
-  /// @param[in] node S式を表すノード
-  ymint32
-  eval_to_int(const SmtLibNode* node);
-
-  /// @brief S式をシンボルに変換する．
-  /// @param[in] node S式を表すノード
-  ShString
-  eval_to_symbol(const SmtLibNode* node);
-
-  /// @brief S式をキーワードに変換する．
-  /// @param[in] node S式を表すノード
-  ShString
-  eval_to_keyword(const SmtLibNode* node);
-
-  /// @brief S式を識別子に変換する．
-  /// @param[in] node S式を表すノード
-  const SmtId*
-  eval_to_id(const SmtLibNode* node);
-
-  /// @brief S式を sort に変換する．
-  /// @param[in] node S式を表すノード
-  const SmtSort*
-  eval_to_sort(const SmtLibNode* node);
-
-  /// @brief S式を sort に変換する．
-  /// @param[in] node S式を表すノード
-  const SmtSort*
-  eval_to_sort_template(const SmtLibNode* node,
-			const vector<const SmtId*>& param_list);
-
-  /// @brief S式を term に変換する．
-  /// @param[in] node S式を表すノード
-  const SmtTerm*
-  eval_to_term(const SmtLibNode* node);
-
-  /// @brief S式を s-expr に変換する．
-  /// @param[in] node S式を表すノード
-  const SmtTerm*
-  eval_to_expr(const SmtLibNode* node);
-
-  /// @brief S式を qual_identifier に変換する．
-  /// @param[in] node S式を表すノード
-  const SmtTerm*
-  eval_to_qid(const SmtLibNode* node);
-
-  /// @brief S式を sorted_var に変換する．
-  /// @param[in] node S式を表すノード
-  /// @param[out] sorted_var 結果を格納する変数
-  /// @retval true 変換が成功した．
-  /// @retval false 変換が失敗した．
-  bool
-  eval_to_sorted_var(const SmtLibNode* node,
-		     SmtSortedVar& sorted_var);
-
-  /// @brief S式を var_binding に変換する．
-  /// @param[in] node S式を表すノード
-  /// @param[out] var_binding 結果を格納する変数
-  /// @retval true 変換が成功した．
-  /// @retval false 変換が失敗した．
-  bool
-  eval_to_var_binding(const SmtLibNode* node,
-		      SmtVarBinding& var_binding);
-
-  /// @brief S式を attribute に変換する．
-  /// @param[in] node S式を表すノード
-  /// @param[out] attr_list 結果の attribute のリストを格納する変数
-  bool
-  eval_to_attr(const SmtLibNode* node,
-	       vector<const SmtAttr*>& attr_list);
-
   /// @brief 識別子から関数に変換する．
   /// @param[in] name 関数名
   const SmtFun*
   find_fun(const SmtId* name);
 
-  /// @brief 引数のリストをパーズする．
-  /// @param[in] arg_top 引数の先頭のノード
-  /// @param[in] arg_num 引数の数
-  /// @param[out] arg_list 引数を格納するリスト
-  /// @retval true 引数の数が arg_num と一致した．
-  /// @retval false 引数の数が arg_num と一致しなかった．
-  bool
-  parse_args(const SmtLibNode*  arg_top,
-	     ymuint arg_num,
-	     vector<const SmtLibNode*>& arg_list);
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // SmtTerm/SmtAttr の継承クラスを生成する関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief <numeric> を作る．
   /// @param[in] val 値
@@ -284,6 +261,12 @@ private:
   const SmtAttr*
   new_attr(const ShString& keyword,
 	   const SmtTerm* expr = NULL);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // Sort/Fun を管理するための関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 現在の SortMgr を返す．
   SmtSortMgr&

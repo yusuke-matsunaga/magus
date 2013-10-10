@@ -194,6 +194,13 @@ SmtFunMgr::reg_fun(const SmtId* name,
 const SmtFun*
 SmtFunMgr::find_fun(const SmtId* name) const
 {
+  if ( mParent != NULL ) {
+    const SmtFun* fun = mParent->find_fun(name);
+    if ( fun != NULL ) {
+      return fun;
+    }
+  }
+
   ymuint h = name->id();
   ymuint idx = h % mTableSize;
   for (SmtFunImpl* fun = mHashTable[idx];
