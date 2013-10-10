@@ -302,7 +302,7 @@ SmtLibMgr::Core_init()
   assert_cond( imp_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(imp_id, b2_list, bool_sort, SmtFun::kRightAssoc);
 
-  const SmtSort* A_sort = sort_mgr().new_sort_param(0);
+  const SmtSort* A_sort = sort_mgr().new_param_sort(0);
   vector<const SmtSort*> a2_list(2);
   a2_list[0] = A_sort;
   a2_list[1] = A_sort;
@@ -952,7 +952,7 @@ SmtLibMgr::eval_to_sort_template(const SmtLibNode* node,
     ymuint n = param_list.size();
     for (ymuint i = 0; i < n; ++ i) {
       if ( id == param_list[i] ) {
-	return sort_mgr().new_sort_param(i);
+	return sort_mgr().new_param_sort(i);
       }
     }
   }

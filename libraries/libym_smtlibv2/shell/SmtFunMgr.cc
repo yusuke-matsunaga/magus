@@ -100,7 +100,6 @@ SmtFunMgr::reg_fun(const SmtId* name,
   void* p = mAlloc.get_memory(sizeof(SmtFun1) + sizeof(const SmtSort*) * (n - 1));
   SmtFun1* fun = new (p) SmtFun1(name, sort, n, attr, param_num);
 
-  fun->mId = mNum;
   ++ mNum;
 
   for (ymuint i = 0; i < n; ++ i) {
@@ -174,8 +173,6 @@ SmtFunMgr::reg_fun(const SmtId* name,
   void* p = mAlloc.get_memory(sizeof(SmtFun2) + sizeof(SmtSortedVar) * (n - 1));
   SmtFun2* fun = new (p) SmtFun2(name, sort, n, body);
 
-  fun->mId = mNum;
-  fun->mLevel = mLevel;
   ++ mNum;
 
   for (ymuint i = 0; i < n; ++ i) {
@@ -229,13 +226,13 @@ SmtFunMgr::expand_table(ymuint req_size)
 
   if ( old_size > 0 ) {
     for (ymuint i = 0; i < old_size; ++ i) {
-      for (SmtFunImpl* id = old_table[i]; id != NULL; ) {
-	SmtFunImpl* tmp_id = id;
-	id = id->mLink;
+      for (SmtFunImpl* fun = old_table[i]; fun != NULL; ) {
+	SmtFunImpl* tmp_fun = fun;
+	fun = fun->mLink;
 
-	ymuint h = tmp_id->hash() % mTableSize;
-	tmp_id->mLink = mHashTable[h];
-	mHashTable[h] = tmp_id;
+	ymuint h = tmp_fun->name()->id() % mTableSize;
+	tmp_fun->mLink = mHashTable[h];
+	mHashTable[h] = tmp_fun;
       }
     }
     delete [] old_table;

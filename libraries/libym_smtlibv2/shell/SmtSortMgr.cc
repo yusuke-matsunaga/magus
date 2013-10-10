@@ -54,10 +54,12 @@ SmtSortMgr::reg_sort(const SmtId* name,
   hash_map<ymuint32, ymuint32>::iterator p = mHash.find(name->id());
   if ( p != mHash.end() ) {
     if ( p->second != arg_num ) {
+      // 同名で異なる宣言が登録されている．
       return false;
     }
     return true;
   }
+  // 名前を登録する．
   mHash.insert(make_pair(name->id(), arg_num));
   return true;
 }
@@ -108,17 +110,13 @@ SmtSortMgr::reg_alias(const SmtId* name,
 		      ymuint arg_num,
 		      const SmtSort* sort)
 {
-  hash_map<ymuint32, ymuint32>::iterator p = mHash.find(name->id());
-  if ( p == mHash.end() ) {
-    mHash.insert(make_pair(name->id(), arg_num));
-  }
-  else {
-    if ( p->second != arg_num ) {
-      // 同名で異なる宣言が登録されている．
-      return false;
-    }
+  // 名前を登録する．
+  if ( !reg_sort(name, arg_num) ) {
+    // 同名で異なる宣言が登録されている．
+    return false;
   }
 
+  // alias(型テンプレート)はパラメータなしの型としてハッシュに登録する．
   ymuint h = hash_func(name, vector<const SmtSort*>(0));
   ymuint idx = h % mTableSize;
   for (SmtSortImpl* sort1 = mHashTable[idx]; sort1 != NULL; sort1 = sort1->mLink) {
@@ -133,8 +131,7 @@ SmtSortMgr::reg_alias(const SmtId* name,
     idx = h % mTableSize;
   }
 
-  void* q = mAlloc.get_memory(sizeof(SmtAliasSort));
-  SmtSortImpl* sort1 = new (q) SmtAliasSort(name, sort);
+  SmtSortImpl* sort1 = new_alias_sort(name, sort);
 
   sort1->mId = mNum;
   sort1->mLevel = mLevel;
@@ -143,7 +140,7 @@ SmtSortMgr::reg_alias(const SmtId* name,
   sort1->mLink = mHashTable[idx];
   mHashTable[idx] = sort1;
 
-  return sort1;
+  return true;
 }
 
 // @brief SmtSort に変換する．
@@ -203,6 +200,7 @@ SmtSortMgr::new_sort(const SmtId* name,
   }
 
   if ( sort == NULL ) {
+    // 合致するものがなかったので新たに作る．
     if ( elem_list.empty() ) {
       sort = new_simple_sort(name);
     }
@@ -276,7 +274,7 @@ SmtSortMgr::replace_param_sub(const SmtSort* templ,
 // @brief 型パラメータを作る．
 // @param[in] pid パラメータ番号
 const SmtSort*
-SmtSortMgr::new_sort_param(ymuint pid)
+SmtSortMgr::new_param_sort(ymuint pid)
 {
   void* p = mAlloc.get_memory(sizeof(SmtParamSort));
   SmtSort* sort = new (p) SmtParamSort(pid);
@@ -300,6 +298,18 @@ SmtSortMgr::new_complex_sort(const SmtId* name,
   ymuint n = elem_list.size();
   void* p = mAlloc.get_memory(sizeof(SmtCplxSort) + sizeof(const SmtSort*) * (n - 1));
   SmtCplxSort* sort = new (p) SmtCplxSort(name, elem_list);
+  return sort;
+}
+
+// @brief alias を作る．
+// @param[in] name 名前
+// @param[in] sort_tmpl 型テンプレート
+SmtSortImpl*
+SmtSortMgr::new_alias_sort(const SmtId* name,
+			   const SmtSort* sort_tmpl)
+{
+  void* q = mAlloc.get_memory(sizeof(SmtAliasSort));
+  SmtSortImpl* sort = new (q) SmtAliasSort(name, sort_tmpl);
   return sort;
 }
 

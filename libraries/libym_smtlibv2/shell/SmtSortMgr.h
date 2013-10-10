@@ -74,7 +74,7 @@ public:
   /// @brief 型パラメータを作る．
   /// @param[in] pid パラメータ番号
   const SmtSort*
-  new_sort_param(ymuint pid);
+  new_param_sort(ymuint pid);
 
 
 private:
@@ -105,13 +105,23 @@ private:
 		    const vector<const SmtSort*>& param_list);
 
   /// @brief 単純な型を作る．
+  /// @param[in] name 名前
   SmtSortImpl*
   new_simple_sort(const SmtId* name);
 
   /// @brief 複合型を作る．
+  /// @param[in] name 名前
+  /// @param[in] elem_list 要素のリスト
   SmtSortImpl*
   new_complex_sort(const SmtId* name,
 		   const vector<const SmtSort*>& elem_list);
+
+  /// @brief alias を作る．
+  /// @param[in] name 名前
+  /// @param[in] sort_tmpl 型テンプレート
+  SmtSortImpl*
+  new_alias_sort(const SmtId* name,
+		 const SmtSort* sort_tmpl);
 
   /// @brief ハッシュ表を拡大する．
   /// @param[in] req_size 新しいサイズ

@@ -29,22 +29,6 @@ SmtSortImpl::~SmtSortImpl()
 {
 }
 
-#if 0
-// @brief ID番号を返す．
-ymuint
-SmtSortImpl::id() const
-{
-  return mId;
-}
-
-// @brief レベルを返す．
-ymuint
-SmtSortImpl::level() const
-{
-  return mLevel;
-}
-#endif
-
 // @brief 名前を返す．
 const SmtId*
 SmtSortImpl::name() const
@@ -177,15 +161,6 @@ SmtParamSort::SmtParamSort(ymuint pid) :
 SmtParamSort::~SmtParamSort()
 {
 }
-
-#if 0
-// @brief ID番号を返す．
-ymuint
-SmtParamSort::id() const
-{
-  return 0;
-}
-#endif
 
 // @brief 名前を返す．
 const SmtId*

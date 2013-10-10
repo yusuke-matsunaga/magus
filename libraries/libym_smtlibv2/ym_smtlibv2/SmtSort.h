@@ -46,18 +46,6 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-#if 0
-  /// @brief ID番号を返す．
-  virtual
-  ymuint
-  id() const = 0;
-
-  /// @brief レベルを返す．
-  virtual
-  ymuint
-  level() const = 0;
-#endif
-
   /// @brief 名前を返す．
   virtual
   const SmtId*
