@@ -82,7 +82,7 @@ public:
 
   /// @brief kNumConst 型の場合に整数値を返す．
   virtual
-  ymint32
+  ymuint32
   int_value() const = 0;
 
   /// @brief kDecConst/kHexConst/kBinConst/kStrConst/kKeyword/kSymbol 型の場合に文字列を返す．

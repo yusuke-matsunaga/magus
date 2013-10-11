@@ -27,7 +27,7 @@ SmtTermImpl::~SmtTermImpl()
 }
 
 // @brief kNumConst 型の場合に整数値を返す．
-ymint32
+ymuint32
 SmtTermImpl::int_value() const
 {
   assert_not_reached(__FILE__, __LINE__);

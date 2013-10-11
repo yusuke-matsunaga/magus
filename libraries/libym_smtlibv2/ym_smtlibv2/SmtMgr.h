@@ -16,11 +16,13 @@
 #include "ym_smtlibv2/SmtSortedVar.h"
 #include "ym_smtlibv2/SmtVarBinding.h"
 
-#include "SmtIdMgr.h"
-#include "StackPage.h"
-
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
+
+class SmtIdMgr;
+class SmtSortMgr;
+class SmtFunMgr;
+class StackPage;
 
 //////////////////////////////////////////////////////////////////////
 /// @class SmtMgr SmtMgr.h "ym_smtlibv2/SmtMgr.h"
@@ -172,6 +174,11 @@ public:
   make_sort(const SmtId* name_id,
 	    const vector<const SmtSort*>& elem_list = vector<const SmtSort*>(0));
 
+  /// @brief 型パラメータを作る．
+  /// @param[in] pid パラメータ番号
+  const SmtSort*
+  make_param_sort(ymuint pid);
+
   /// @brief 関数を返す．
   /// @param[in] name_id 関数名
   /// @return 指定された名前の関数を返す．
@@ -182,6 +189,99 @@ public:
   const SmtFun*
   find_fun(const SmtId* name_id);
 
+  /// @brief <numeric> 型の term を作る．
+  /// @param[in] val 値
+  const SmtTerm*
+  make_numeric_term(ymuint32 val);
+
+  /// @brief <decimal> 型の term を作る．
+  /// @param[in] val 値
+  const SmtTerm*
+  make_decimal_term(const ShString& val);
+
+  /// @brief <hexadecimal> 型の term を作る．
+  /// @param[in] val 値
+  const SmtTerm*
+  make_hexadecimal_term(const ShString& val);
+
+  /// @brief <binary> 型の term を作る．
+  /// @param[in] val 値
+  const SmtTerm*
+  make_binary_term(const ShString& val);
+
+  /// @brief <string> 型の term を作る．
+  /// @param[in] val 値
+  const SmtTerm*
+  make_string_term(const ShString& val);
+
+  /// @brief <symbol> 型の term を作る．
+  /// @param[in] val 値
+  const SmtTerm*
+  make_symbol_term(const ShString& val);
+
+  /// @brief <keyword> 型の term を作る．
+  /// @param[in] val 値
+  const SmtTerm*
+  make_keyword_term(const ShString& val);
+
+  /// @brief <identifier> 型の term を作る．
+  /// @param[in] id 識別子
+  const SmtTerm*
+  make_identifier_term(const SmtId* id);
+
+  /// @brief <qualified identifier> 型の term を作る．
+  /// @param[in] id 識別子
+  /// @param[in] sort 型
+  const SmtTerm*
+  make_qual_identifier_term(const SmtId* id,
+			    const SmtSort* sort);
+
+  /// @brief function term を作る．
+  /// @param[in] function 関数
+  /// @param[in] input_list 入力のリスト
+  const SmtTerm*
+  make_fun_term(const SmtFun* function,
+		const vector<const SmtTerm*>& input_list);
+
+  /// @brief let 文を作る．
+  /// @param[in] var_binding 変数割り当てのリスト
+  /// @param[in] body 本体
+  const SmtTerm*
+  make_let_term(const vector<SmtVarBinding>& var_binding,
+		const SmtTerm* body);
+
+  /// @brief forall 文を作る．
+  /// @param[in] var_list 変数リスト
+  /// @param[in] body 本体
+  const SmtTerm*
+  make_forall_term(const vector<SmtSortedVar>& var_list,
+		   const SmtTerm* body);
+
+  /// @brief exists 文を作る．
+  /// @param[in] var_list 変数リスト
+  /// @param[in] body 本体
+  const SmtTerm*
+  make_exists_term(const vector<SmtSortedVar>& var_list,
+		   const SmtTerm* body);
+
+  /// @brief attr 文を作る．
+  /// @param[in] body 本体
+  /// @param[in] attr_list 属性リスト
+  const SmtTerm*
+  make_attr_term(const SmtTerm* body,
+		 const vector<const SmtAttr*>& attr_list);
+
+  /// @brief list term を作る．
+  /// @param[in] term_list 要素のリスト
+  const SmtTerm*
+  make_list_term(const vector<const SmtTerm*>& term_list);
+
+  /// @brief attribute を作る．
+  /// @param[in] keyword キーワード
+  /// @param[in] expr 値
+  const SmtAttr*
+  make_attr(const ShString& keyword,
+	    const SmtTerm* expr = NULL);
 
 
 private:
@@ -202,100 +302,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // SmtTerm/SmtAttr の継承クラスを生成する関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief <numeric> を作る．
-  /// @param[in] val 値
-  const SmtTerm*
-  new_numeric(ymint32 val);
-
-  /// @brief <decimal> を作る．
-  /// @param[in] val 値
-  const SmtTerm*
-  new_decimal(const ShString& val);
-
-  /// @brief <hexadecimal> を作る．
-  /// @param[in] val 値
-  const SmtTerm*
-  new_hexadecimal(const ShString& val);
-
-  /// @brief <binary> を作る．
-  /// @param[in] val 値
-  const SmtTerm*
-  new_binary(const ShString& val);
-
-  /// @brief <string> を作る．
-  /// @param[in] val 値
-  const SmtTerm*
-  new_string(const ShString& val);
-
-  /// @brief <symbol> を作る．
-  /// @param[in] val 値
-  const SmtTerm*
-  new_symbol(const ShString& val);
-
-  /// @brief <keyword> を作る．
-  /// @param[in] val 値
-  const SmtTerm*
-  new_keyword(const ShString& val);
-
-  /// @brief identifier を作る．
-  /// @param[in] id 識別子
-  const SmtTerm*
-  new_identifier(const SmtId* id);
-
-  /// @brief qualified identifier を作る．
-  /// @param[in] id 識別子
-  /// @param[in] sort 型
-  const SmtTerm*
-  new_qual_identifier(const SmtId* id,
-		      const SmtSort* sort);
-
-  /// @brief function term を作る．
-  /// @param[in] function 関数
-  /// @param[in] input_list 入力のリスト
-  const SmtTerm*
-  new_fun_term(const SmtFun* function,
-	       const vector<const SmtTerm*>& input_list);
-
-  /// @brief let 文を作る．
-  /// @param[in] var_binding 変数割り当てのリスト
-  /// @param[in] body 本体
-  const SmtTerm*
-  new_let(const vector<SmtVarBinding>& var_binding,
-	  const SmtTerm* body);
-
-  /// @brief forall 文を作る．
-  /// @param[in] var_list 変数リスト
-  /// @param[in] body 本体
-  const SmtTerm*
-  new_forall(const vector<SmtSortedVar>& var_list,
-	     const SmtTerm* body);
-
-  /// @brief exists 文を作る．
-  /// @param[in] var_list 変数リスト
-  /// @param[in] body 本体
-  const SmtTerm*
-  new_exists(const vector<SmtSortedVar>& var_list,
-	     const SmtTerm* body);
-
-  /// @brief attr 文を作る．
-  /// @param[in] body 本体
-  /// @param[in] attr_list 属性リスト
-  const SmtTerm*
-  new_attr_term(const SmtTerm* body,
-		const vector<const SmtAttr*>& attr_list);
-
-  /// @brief term list を作る．
-  /// @param[in] term_list 要素のリスト
-  const SmtTerm*
-  new_list_term(const vector<const SmtTerm*>& term_list);
-
-  /// @brief attribute を作る．
-  /// @param[in] keyword キーワード
-  /// @param[in] expr 値
-  const SmtAttr*
-  new_attr(const ShString& keyword,
-	   const SmtTerm* expr = NULL);
 
 
 private:
@@ -325,7 +331,7 @@ private:
   SimpleAlloc mAlloc;
 
   // SmtId を管理するクラス
-  SmtIdMgr mIdMgr;
+  SmtIdMgr* mIdMgr;
 
   // logic
   tSmtLogic mLogic;

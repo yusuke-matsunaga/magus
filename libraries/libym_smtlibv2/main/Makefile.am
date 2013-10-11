@@ -25,10 +25,33 @@ libym_smt_main_la_CPPFLAGS = \
 	-I$(top_srcdir)/include
 
 libym_smt_main_la_SOURCES = \
-	SmtTerm.cc \
+	print.cc \
+	SmtAttrImpl.h \
+	SmtAttrImpl.cc \
+	SmtCompTerm.h \
+	SmtCompTerm.cc \
+	SmtConstTerm.h \
 	SmtConstTerm.cc \
+	SmtFunImpl.h \
+	SmtFunImpl.cc \
+	SmtFunMgr.h \
+	SmtFunMgr.cc \
+	SmtFunTerm.h \
+	SmtFunTerm.cc \
+	SmtIdImpl.h \
+	SmtIdImpl.cc \
+	SmtIdMgr.cc \
+	SmtIdTerm.h \
 	SmtIdTerm.cc \
-	SmtBodyTerm.cc
+	SmtMgr.cc \
+	SmtListTerm.h \
+	SmtListTerm.cc \
+	SmtSortImpl.cc \
+	SmtSortImpl.h \
+	SmtSortMgr.h \
+	SmtSortMgr.cc \
+	SmtTermImpl.h \
+	SmtTermImpl.cc
 
 libym_smt_main_la_LIBADD =
 

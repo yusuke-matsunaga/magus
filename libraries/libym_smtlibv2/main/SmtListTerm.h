@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 class SmtListTerm :
   public SmtTermImpl
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 private:
 
   /// @brief コンストラクタ

@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 class SmtCompTerm :
   public SmtTermImpl
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 protected:
 
   /// @brief コンストラクタ
@@ -64,7 +64,7 @@ private:
 class SmtLet :
   public SmtCompTerm
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 private:
 
   /// @brief コンストラクタ
@@ -122,7 +122,7 @@ private:
 class SmtQualTerm :
   public SmtCompTerm
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 protected:
 
   /// @brief コンストラクタ
@@ -175,7 +175,7 @@ private:
 class SmtForall :
   public SmtQualTerm
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 private:
 
   /// @brief コンストラクタ
@@ -209,7 +209,7 @@ public:
 class SmtExists :
   public SmtQualTerm
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 private:
 
   /// @brief コンストラクタ
@@ -243,7 +243,7 @@ public:
 class SmtAttrTerm :
   public SmtCompTerm
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 private:
 
   /// @brief コンストラクタ

@@ -10,17 +10,17 @@
 
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
-#include "ym_utils/MsgHandler.h"
+#include "ym_utils/IDO.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/SimpleAlloc.h"
 #include "ym_utils/ShString.h"
 
 #include "TokenType.h"
-#include "SmtLibScanner.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
+class SmtLibScanner;
 class SmtLibNode;
 
 //////////////////////////////////////////////////////////////////////
@@ -160,7 +160,7 @@ private:
   SimpleAlloc mAlloc;
 
   // 字句解析器
-  SmtLibScanner mScanner;
+  SmtLibScanner* mScanner;
 
 };
 

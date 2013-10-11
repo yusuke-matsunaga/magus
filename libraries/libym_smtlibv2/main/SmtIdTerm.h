@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 class SmtIdTerm :
   public SmtTermImpl
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 protected:
 
   /// @brief コンストラクタ
@@ -66,7 +66,7 @@ private:
 class SmtQualIdTerm :
   public SmtIdTerm
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 private:
 
   /// @brief コンストラクタ

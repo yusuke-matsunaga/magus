@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 
 // @brief コンストラクタ
 // @param[in] val 値
-SmtNumTerm::SmtNumTerm(ymint32 val) :
+SmtNumTerm::SmtNumTerm(ymuint32 val) :
   mVal(val)
 {
 }
@@ -36,7 +36,7 @@ SmtNumTerm::type() const
 }
 
 // @brief kNumConst 型の場合に整数値を返す．
-ymint32
+ymuint32
 SmtNumTerm::int_value() const
 {
   return mVal;

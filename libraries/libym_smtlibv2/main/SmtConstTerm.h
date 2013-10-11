@@ -21,12 +21,12 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 class SmtNumTerm :
   public SmtTermImpl
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 private:
 
   /// @brief コンストラクタ
   /// @param[in] val 値
-  SmtNumTerm(ymint32 val);
+  SmtNumTerm(ymuint32 val);
 
   /// @brief デストラクタ
   virtual
@@ -45,7 +45,7 @@ public:
 
   /// @brief kNumConst 型の場合に整数値を返す．
   virtual
-  ymint32
+  ymuint32
   int_value() const;
 
 
@@ -55,7 +55,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  ymint32 mVal;
+  ymuint32 mVal;
 
 };
 
@@ -67,7 +67,7 @@ private:
 class SmtStrTerm :
   public SmtTermImpl
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 protected:
 
   /// @brief コンストラクタ
@@ -113,7 +113,7 @@ private:
 class SmtDecTerm :
   public SmtStrTerm
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 private:
 
   /// @brief コンストラクタ
@@ -145,7 +145,7 @@ public:
 class SmtHexTerm :
   public SmtStrTerm
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 private:
 
   /// @brief コンストラクタ
@@ -177,7 +177,7 @@ public:
 class SmtBinTerm :
   public SmtStrTerm
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 private:
 
   /// @brief コンストラクタ
@@ -209,7 +209,7 @@ public:
 class SmtKeywordTerm :
   public SmtStrTerm
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 private:
 
   /// @brief コンストラクタ
@@ -241,7 +241,7 @@ public:
 class SmtSymbolTerm :
   public SmtStrTerm
 {
-  friend class SmtLibMgr;
+  friend class SmtMgr;
 private:
 
   /// @brief コンストラクタ

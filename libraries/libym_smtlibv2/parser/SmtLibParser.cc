@@ -8,6 +8,7 @@
 
 
 #include "SmtLibParser.h"
+#include "SmtLibScanner.h"
 #include "SmtLibNodeImpl.h"
 #include "ym_utils/FileIDO.h"
 #include "ym_utils/MsgMgr.h"
@@ -23,6 +24,7 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 SmtLibParser::SmtLibParser() :
   mAlloc(4096)
 {
+  mScanner = new SmtLibScanner();
 }
 
 // デストラクタ
@@ -37,7 +39,7 @@ void
 SmtLibParser::init(IDO* ido)
 {
   clear();
-  mScanner.attach(ido);
+  mScanner->attach(ido);
 }
 
 // @brief S式を一つ読み込む．
@@ -98,34 +100,34 @@ SmtLibParser::read_sexp(SmtLibNode*& node,
   node = NULL;
   for ( ; ; ) {
     // ループを回るのは改行の場合だけ．
-    tTokenType type = mScanner.read_token(loc);
+    tTokenType type = mScanner->read_token(loc);
     switch ( type ) {
     case kNumToken:
-      node = new_num(loc, atoi(mScanner.cur_string()));
+      node = new_num(loc, atoi(mScanner->cur_string()));
       break;
 
     case kDecToken:
-      node = new_dec(loc, ShString(mScanner.cur_string()));
+      node = new_dec(loc, ShString(mScanner->cur_string()));
       break;
 
     case kHexToken:
-      node = new_hex(loc, ShString(mScanner.cur_string()));
+      node = new_hex(loc, ShString(mScanner->cur_string()));
       break;
 
     case kBinToken:
-      node = new_bin(loc, ShString(mScanner.cur_string()));
+      node = new_bin(loc, ShString(mScanner->cur_string()));
       break;
 
     case kStringToken:
-      node = new_string(loc, ShString(mScanner.cur_string()));
+      node = new_string(loc, ShString(mScanner->cur_string()));
       break;
 
     case kSymbolToken:
-      node = new_symbol(loc, ShString(mScanner.cur_string()));
+      node = new_symbol(loc, ShString(mScanner->cur_string()));
       break;
 
     case kKeywordToken:
-      node = new_keyword(loc, ShString(mScanner.cur_string()));
+      node = new_keyword(loc, ShString(mScanner->cur_string()));
       break;
 
     case kLpToken:
