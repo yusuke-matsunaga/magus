@@ -48,6 +48,8 @@ SmtLibParser::init(IDO* ido)
 SmtLibParser::tResult
 SmtLibParser::read(SmtLibNode*& root)
 {
+  clear();
+
   // ループを回るのは改行コードの場合のみ
   FileRegion loc;
   tTokenType type = read_sexp(root, loc);

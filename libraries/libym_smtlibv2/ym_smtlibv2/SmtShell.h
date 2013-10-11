@@ -11,7 +11,7 @@
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
 #include "ym_smtlibv2/SmtMgr.h"
-#include "ym_utils/ShString.h"
+#include "ym_utils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -54,7 +54,12 @@ private:
   bool
   set_logic(const SmtLibNode* arg_top);
 
-  /// @brief set-info の処理を行う．
+  /// @brief オプションを設定する．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  set_option(const SmtLibNode* arg_top);
+
+  /// @brief 情報を設定する．
   /// @param[in] arg_top 引数の先頭ノード
   bool
   set_info(const SmtLibNode* arg_top);
@@ -94,6 +99,46 @@ private:
   /// @return ポップが成功したら true を返す．
   bool
   pop(const SmtLibNode* arg_top);
+
+  /// @brief 充足可能性判定を行なう．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  check_sat(const SmtLibNode* arg_top);
+
+  /// @brief assertion を得る．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  get_assertions(const SmtLibNode* arg_top);
+
+  /// @brief 証明を得る．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  get_proof(const SmtLibNode* arg_top);
+
+  /// @brief unsat core を得る．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  get_unsat_core(const SmtLibNode* arg_top);
+
+  /// @brief 値を得る．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  get_value(const SmtLibNode* arg_top);
+
+  /// @brief 割り当てを得る．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  get_assignment(const SmtLibNode* arg_top);
+
+  /// @brief オプションを得る．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  get_option(const SmtLibNode* arg_top);
+
+  /// @brief 情報を得る．
+  /// @param[in] arg_top 引数の先頭ノード
+  bool
+  get_info(const SmtLibNode* arg_top);
 
 
 private:
@@ -174,6 +219,9 @@ private:
   // readline 関係の関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 1行を評価する．
+  int
+  eval_line();
 
 
 private:
@@ -201,6 +249,9 @@ private:
 
   // ctrl-D で終了を許すかどうかのフラグ
   bool mAllowCtrlDExit;
+
+  // 行バッファ
+  vector<string> mStrList;
 
   // ループフラグ
   bool mLoop;

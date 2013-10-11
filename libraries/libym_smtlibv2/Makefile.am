@@ -20,9 +20,9 @@ noinst_LTLIBRARIES = libym_smtlibv2.la
 libym_smtlibv2_la_SOURCES =
 
 libym_smtlibv2_la_LIBADD = \
+	shell/libym_smt_shell.la \
 	parser/libym_smt_parser.la \
-	main/libym_smt_main.la \
-	shell/libym_smt_shell.la
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	main/libym_smt_main.la
 
-libym_smtlibv2_la_LDFLAGS =
+libym_smtlibv2_la_LDFLAGS = \
+	-lreadline -lncurses

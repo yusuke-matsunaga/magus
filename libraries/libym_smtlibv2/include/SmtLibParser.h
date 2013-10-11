@@ -74,6 +74,7 @@ public:
   /// @brief S式を一つ読み込む．
   /// @param[out] root 読んだS式の根のノード
   /// @return 結果を返す．
+  /// @note 先頭で clear() を呼ぶ．
   tResult
   read(SmtLibNode*& root);
 

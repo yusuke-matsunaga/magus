@@ -15,6 +15,11 @@
 #include "ym_smtlibv2/SmtSort.h"
 #include "ym_smtlibv2/SmtFun.h"
 
+#include <readline/readline.h>
+#include <readline/history.h>
+
+#include "ym_utils/StrListIDO.h"
+
 
 BEGIN_NONAMESPACE
 
@@ -44,6 +49,24 @@ stat_str(bool val)
   }
 }
 
+// line の先頭と末尾の空白を取り除く．
+// line 中の文字が書き換えられる可能性がある．
+char*
+chop(char* line)
+{
+  char* s;
+  for (s = line; *s && isspace(*s); ++ s) ;
+  if ( *s == 0 ) {
+    return s;
+  }
+
+  char* t = line + strlen(line) - 1;
+  for ( ; t > s && isspace(*t); -- t) ;
+  ++ t;
+  *t = '\0';
+  return s;
+}
+
 END_NONAMESPACE
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -56,22 +79,27 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 SmtShell::SmtShell()
 {
   mParser = new SmtLibParser();
+  mPrompt1 = ">";
+  mPrompt2 = "...>";
+  mAllowCtrlDExit = false;
 }
 
 // @brief デストラクタ
 SmtShell::~SmtShell()
 {
+  delete mParser;
 }
 
 // @brief 実行する．
 void
 SmtShell::run()
 {
+  const char* prompt = mPrompt1.c_str();
   for (mLoop = true; mLoop; ) {
-    char* line = readline(mPrompt1.c_str());
+    char* line = readline(prompt);
     if ( line == NULL ) {
       // EOF が入力された．
-      if ( mAllowCtrlExit ) {
+      if ( mAllowCtrlDExit ) {
 	mLoop = false;
       }
       printf("\n");
@@ -82,6 +110,7 @@ SmtShell::run()
     char* str = chop(line);
     if ( *str == '\0' ) {
       // 空行ならスキップする．
+      free(line);
       continue;
     }
 
@@ -96,9 +125,137 @@ SmtShell::run()
       -- mHistoryNum;
     }
 
-    str_list.push_back(string(str));
+    mStrList.push_back(string(str));
 
+    // 1行を評価する．
+    int code = eval_line();
+    switch ( code ) {
+    case 0:
+      // exit
+      mLoop = false;
+      break;
+
+    case 1:
+      // 通常の終了
+      mStrList.clear();
+      prompt = mPrompt1.c_str();
+      break;
+
+    case 2:
+      // 継続行
+      prompt = mPrompt2.c_str();
+      break;
+    }
+
+    // line で確保された領域を開放する．
+    free(line);
   }
+}
+
+// @brief 1行を評価する．
+int
+SmtShell::eval_line()
+{
+  StrListIDO ido(mStrList);
+  mParser->init(&ido);
+
+  for ( ; ; ) {
+    SmtLibNode* node = NULL;
+    const SmtLibNode* node1 = NULL;
+    const SmtLibNode* node2 = NULL;
+    const char* str1 = NULL;
+
+    SmtLibParser::tResult res = mParser->read(node);
+    switch ( res ) {
+    case SmtLibParser::kOK:
+      break;
+
+    case SmtLibParser::kError:
+      goto syntax_error;
+
+    case SmtLibParser::kEOF:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+
+    case SmtLibParser::kOpen:
+      // 継続行
+      return 2;
+    }
+
+    if ( node->type() != kListToken ) {
+      goto syntax_error;
+    }
+
+    node1 = node->child();
+    if ( node1->type() != kSymbolToken ) {
+      goto syntax_error;
+    }
+    str1 = static_cast<const char*>(node1->str_value());
+    node2 = node1->sibling();
+    if ( strcmp("set-logic", str1) == 0 ) {
+      set_logic(node2);
+    }
+    else if ( strcmp("set-option", str1) == 0 ) {
+      set_option(node2);
+    }
+    else if ( strcmp("set-info", str1) == 0 ) {
+      set_info(node2);
+    }
+    else if ( strcmp("declare-sort", str1) == 0 ) {
+      declare_sort(node2);
+    }
+    else if ( strcmp("define-sort", str1) == 0 ) {
+      define_sort(node2);
+    }
+    else if ( strcmp("declare-fun", str1) == 0 ) {
+      declare_fun(node2);
+    }
+    else if ( strcmp("define-fun", str1) == 0 ) {
+      define_fun(node2);
+    }
+    else if ( strcmp("push", str1) == 0 ) {
+      push(node2);
+    }
+    else if ( strcmp("pop", str1) == 0 ) {
+      pop(node2);
+    }
+    else if ( strcmp("assert", str1) == 0 ) {
+      assert(node2);
+    }
+    else if ( strcmp("check-sat", str1) == 0 ) {
+      check_sat(node2);
+    }
+    else if ( strcmp("get-assertions", str1) == 0 ) {
+      get_assertions(node2);
+    }
+    else if ( strcmp("get-proof", str1) == 0 ) {
+      get_proof(node2);
+    }
+    else if ( strcmp("get-unsat-core", str1) == 0 ) {
+      get_unsat_core(node2);
+    }
+    else if ( strcmp("get-value", str1) == 0 ) {
+      get_value(node2);
+    }
+    else if ( strcmp("get-assignment", str1) == 0 ) {
+      get_assignment(node2);
+    }
+    else if ( strcmp("get-option", str1) == 0 ) {
+      get_option(node2);
+    }
+    else if ( strcmp("get-info", str1) == 0 ) {
+      get_info(node2);
+    }
+    else if ( strcmp("exit", str1) == 0 ) {
+      return 0;
+    }
+    else {
+      goto syntax_error;
+    }
+  }
+
+ syntax_error:
+  return 1;
 }
 
 // @brief set-logic の処理を行う．
@@ -216,7 +373,24 @@ SmtShell::set_logic(const SmtLibNode* arg_top)
   return false;
 }
 
-// @brief set-info の処理を行う．
+// @brief オプションを設定する．
+// @param[in] arg_top 引数の先頭ノード
+bool
+SmtShell::set_option(const SmtLibNode* arg_top)
+{
+  if ( debug ) {
+    cerr << "set-option ";
+    print(cerr, arg_top);
+    cerr << endl;
+  }
+
+  if ( debug ) {
+    cerr << "  ==> OK" << endl;
+  }
+  return true;
+}
+
+// @brief 情報を設定する．
 // @param[in] arg_top 引数の先頭ノード
 bool
 SmtShell::set_info(const SmtLibNode* arg_top)
@@ -672,6 +846,80 @@ SmtShell::pop(const SmtLibNode* arg_top)
   }
 
   return false;
+}
+
+// @brief 充足可能性判定を行なう．
+// @param[in] arg_top 引数の先頭ノード
+bool
+SmtShell::check_sat(const SmtLibNode* arg_top)
+{
+  if ( debug ) {
+    cerr << "check_sat ";
+    print(cerr, arg_top);
+    cerr << endl;
+  }
+
+  if ( debug ) {
+    cerr << "  ==> success" << endl;
+  }
+
+  return true;
+}
+
+// @brief assertion を得る．
+// @param[in] arg_top 引数の先頭ノード
+bool
+SmtShell::get_assertions(const SmtLibNode* arg_top)
+{
+  return true;
+}
+
+// @brief 証明を得る．
+// @param[in] arg_top 引数の先頭ノード
+bool
+SmtShell::get_proof(const SmtLibNode* arg_top)
+{
+  return true;
+}
+
+// @brief unsat core を得る．
+// @param[in] arg_top 引数の先頭ノード
+bool
+SmtShell::get_unsat_core(const SmtLibNode* arg_top)
+{
+  return true;
+}
+
+// @brief 値を得る．
+// @param[in] arg_top 引数の先頭ノード
+bool
+SmtShell::get_value(const SmtLibNode* arg_top)
+{
+  return true;
+}
+
+// @brief 割り当てを得る．
+// @param[in] arg_top 引数の先頭ノード
+bool
+SmtShell::get_assignment(const SmtLibNode* arg_top)
+{
+  return true;
+}
+
+// @brief オプションを得る．
+// @param[in] arg_top 引数の先頭ノード
+bool
+SmtShell::get_option(const SmtLibNode* arg_top)
+{
+  return true;
+}
+
+// @brief 情報を得る．
+// @param[in] arg_top 引数の先頭ノード
+bool
+SmtShell::get_info(const SmtLibNode* arg_top)
+{
+  return true;
 }
 
 // @brief S式を識別子に変換する．
