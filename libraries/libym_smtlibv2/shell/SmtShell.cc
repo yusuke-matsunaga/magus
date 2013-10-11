@@ -159,99 +159,97 @@ SmtShell::eval_line()
   StrListIDO ido(mStrList);
   mParser->init(&ido);
 
-  for ( ; ; ) {
-    SmtLibNode* node = NULL;
-    const SmtLibNode* node1 = NULL;
-    const SmtLibNode* node2 = NULL;
-    const char* str1 = NULL;
+  SmtLibNode* node = NULL;
+  const SmtLibNode* node1 = NULL;
+  const SmtLibNode* node2 = NULL;
+  const char* str1 = NULL;
 
-    SmtLibParser::tResult res = mParser->read(node);
-    switch ( res ) {
-    case SmtLibParser::kOK:
-      break;
+  SmtLibParser::tResult res = mParser->read(node);
+  switch ( res ) {
+  case SmtLibParser::kOK:
+    break;
 
-    case SmtLibParser::kError:
-      goto syntax_error;
+  case SmtLibParser::kError:
+    goto syntax_error;
 
-    case SmtLibParser::kEOF:
-      assert_not_reached(__FILE__, __LINE__);
-      break;
+  case SmtLibParser::kEOF:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
 
-    case SmtLibParser::kOpen:
-      // 継続行
-      return 2;
-    }
+  case SmtLibParser::kOpen:
+    // 継続行
+    return 2;
+  }
 
-    if ( node->type() != kListToken ) {
-      goto syntax_error;
-    }
+  if ( node->type() != kListToken ) {
+    goto syntax_error;
+  }
 
-    node1 = node->child();
-    if ( node1->type() != kSymbolToken ) {
-      goto syntax_error;
-    }
-    str1 = static_cast<const char*>(node1->str_value());
-    node2 = node1->sibling();
-    if ( strcmp("set-logic", str1) == 0 ) {
-      set_logic(node2);
-    }
-    else if ( strcmp("set-option", str1) == 0 ) {
-      set_option(node2);
-    }
-    else if ( strcmp("set-info", str1) == 0 ) {
-      set_info(node2);
-    }
-    else if ( strcmp("declare-sort", str1) == 0 ) {
-      declare_sort(node2);
-    }
-    else if ( strcmp("define-sort", str1) == 0 ) {
-      define_sort(node2);
-    }
-    else if ( strcmp("declare-fun", str1) == 0 ) {
-      declare_fun(node2);
-    }
-    else if ( strcmp("define-fun", str1) == 0 ) {
-      define_fun(node2);
-    }
-    else if ( strcmp("push", str1) == 0 ) {
-      push(node2);
-    }
-    else if ( strcmp("pop", str1) == 0 ) {
-      pop(node2);
-    }
-    else if ( strcmp("assert", str1) == 0 ) {
-      assert(node2);
-    }
-    else if ( strcmp("check-sat", str1) == 0 ) {
-      check_sat(node2);
-    }
-    else if ( strcmp("get-assertions", str1) == 0 ) {
-      get_assertions(node2);
-    }
-    else if ( strcmp("get-proof", str1) == 0 ) {
-      get_proof(node2);
-    }
-    else if ( strcmp("get-unsat-core", str1) == 0 ) {
-      get_unsat_core(node2);
-    }
-    else if ( strcmp("get-value", str1) == 0 ) {
-      get_value(node2);
-    }
-    else if ( strcmp("get-assignment", str1) == 0 ) {
-      get_assignment(node2);
-    }
-    else if ( strcmp("get-option", str1) == 0 ) {
-      get_option(node2);
-    }
-    else if ( strcmp("get-info", str1) == 0 ) {
-      get_info(node2);
-    }
-    else if ( strcmp("exit", str1) == 0 ) {
-      return 0;
-    }
-    else {
-      goto syntax_error;
-    }
+  node1 = node->child();
+  if ( node1->type() != kSymbolToken ) {
+    goto syntax_error;
+  }
+  str1 = static_cast<const char*>(node1->str_value());
+  node2 = node1->sibling();
+  if ( strcmp("set-logic", str1) == 0 ) {
+    set_logic(node2);
+  }
+  else if ( strcmp("set-option", str1) == 0 ) {
+    set_option(node2);
+  }
+  else if ( strcmp("set-info", str1) == 0 ) {
+    set_info(node2);
+  }
+  else if ( strcmp("declare-sort", str1) == 0 ) {
+    declare_sort(node2);
+  }
+  else if ( strcmp("define-sort", str1) == 0 ) {
+    define_sort(node2);
+  }
+  else if ( strcmp("declare-fun", str1) == 0 ) {
+    declare_fun(node2);
+  }
+  else if ( strcmp("define-fun", str1) == 0 ) {
+    define_fun(node2);
+  }
+  else if ( strcmp("push", str1) == 0 ) {
+    push(node2);
+  }
+  else if ( strcmp("pop", str1) == 0 ) {
+    pop(node2);
+  }
+  else if ( strcmp("assert", str1) == 0 ) {
+    assert(node2);
+  }
+  else if ( strcmp("check-sat", str1) == 0 ) {
+    check_sat(node2);
+  }
+  else if ( strcmp("get-assertions", str1) == 0 ) {
+    get_assertions(node2);
+  }
+  else if ( strcmp("get-proof", str1) == 0 ) {
+    get_proof(node2);
+  }
+  else if ( strcmp("get-unsat-core", str1) == 0 ) {
+    get_unsat_core(node2);
+  }
+  else if ( strcmp("get-value", str1) == 0 ) {
+    get_value(node2);
+  }
+  else if ( strcmp("get-assignment", str1) == 0 ) {
+    get_assignment(node2);
+  }
+  else if ( strcmp("get-option", str1) == 0 ) {
+    get_option(node2);
+  }
+  else if ( strcmp("get-info", str1) == 0 ) {
+    get_info(node2);
+  }
+  else if ( strcmp("exit", str1) == 0 ) {
+    return 0;
+  }
+  else {
+    goto syntax_error;
   }
 
  syntax_error:
