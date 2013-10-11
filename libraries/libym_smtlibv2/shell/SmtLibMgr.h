@@ -104,11 +104,6 @@ private:
   void
   Ints_init();
 
-  /// @brief S式を数値に変換する．
-  /// @param[in] node S式を表すノード
-  ymint32
-  eval_to_int(const SmtLibNode* node);
-
   /// @brief S式をシンボルに変換する．
   /// @param[in] node S式を表すノード
   ShString
@@ -194,7 +189,7 @@ private:
   /// @brief <numeric> を作る．
   /// @param[in] val 値
   const SmtTerm*
-  new_numeric(ymint32 val);
+  new_numeric(ymuint32 val);
 
   /// @brief <decimal> を作る．
   /// @param[in] val 値

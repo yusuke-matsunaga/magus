@@ -15,15 +15,60 @@
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
+BEGIN_NONAMESPACE
+
+// インデックスが等しいかチェックする．
+// 等しければ true を返す．
+bool
+check_index(SmtId* id,
+	    const vector<ymuint32>& index_list)
+{
+  ymuint index_size = id->index_size();
+  if ( index_list.size() != index_size ) {
+    return false;
+  }
+  for (ymuint i = 0; i < index_size; ++ i) {
+    if ( id->index(i) != index_list[i] ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// ハッシュ関数
+ymuint
+hash_func(const ShString& name,
+	  const vector<ymuint32>& index_list)
+{
+  ymuint h = name.hash();
+  for (vector<ymuint32>::const_iterator p = index_list.begin();
+       p != index_list.end(); ++ p) {
+    h = h * 127 + (*p);
+  }
+  return h;
+}
+
+// ハッシュ関数
+ymuint
+hash_func(SmtId* id)
+{
+  ymuint h = id->name().hash();
+  for (ymuint i = 0; i < id->index_size(); ++ i) {
+    h = h * 127 + id->index(i);
+  }
+  return h;
+}
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス SmtIdMgr
 //
 // よくあるハッシュ表の実装だが，面倒くさいのはハッシュ値の計算方法
-// SmtId になる前は SmtLibNode のリストの形でインデックスが与えられる．
+// SmtId になる前は vector<ymuint32> の形でインデックスが与えられる．
 // これに対してハッシュ表を拡大する時の再ハッシュ時にはインデックスは
 // 配列に入っている．
-// 結局，名前のみ，名前＋SmtLibNodeのリスト，名前＋インデックスの配列
-// の3種類の計算方法がある．
+// これらが同じハッシュ値を生成するように気をつける必要がある．
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
@@ -45,47 +90,12 @@ SmtIdMgr::~SmtIdMgr()
 }
 
 
-BEGIN_NONAMESPACE
-
-// インデックスが等しいかチェックする．
-// 等しければ true を返す．
-bool
-check_index(SmtId* id,
-	    const vector<ymint32>& index_list)
-{
-  ymuint index_size = id->index_size();
-  if ( index_list.size() != index_size ) {
-    return false;
-  }
-  for (ymuint i = 0; i < index_size; ++ i) {
-    if ( id->index(i) != index_list[i] ) {
-      return false;
-    }
-  }
-  return true;
-}
-
-// ハッシュ関数
-ymuint
-hash_func(const ShString& name,
-	  const vector<ymint32>& index_list)
-{
-  ymuint h = name.hash();
-  for (vector<ymint32>::const_iterator p = index_list.begin();
-       p != index_list.end(); ++ p) {
-    h = h * 127 + static_cast<ymuint>(*p);
-  }
-  return h;
-}
-
-END_NONAMESPACE
-
 // @brief 識別子に変換する．
 // @param[in] name 名前
 // @param[in] index_list インデックスリスト
 const SmtId*
-SmtIdMgr::new_id(const ShString& name,
-		 const vector<ymint32>& index_list)
+SmtIdMgr::make_id(const ShString& name,
+		  const vector<ymuint32>& index_list)
 {
   ymuint h = hash_func(name, index_list);
   ymuint idx = h % mTableSize;
@@ -107,7 +117,7 @@ SmtIdMgr::new_id(const ShString& name,
   }
   else {
     ymuint index_size = index_list.size();
-    void* p = mAlloc.get_memory(sizeof(SmtIndexId) + sizeof(ymint32) * (index_size - 1));
+    void* p = mAlloc.get_memory(sizeof(SmtIndexId) + sizeof(ymuint32) * (index_size - 1));
     SmtIndexId* id1 = new (p) SmtIndexId(name, index_size);
     for (ymuint i = 0; i < index_size; ++ i) {
       id1->mIndexList[i] = index_list[i];
@@ -122,22 +132,6 @@ SmtIdMgr::new_id(const ShString& name,
 
   return id;
 }
-
-
-BEGIN_NONAMESPACE
-
-// ハッシュ関数
-ymuint
-hash_func(SmtId* id)
-{
-  ymuint h = id->name().hash();
-  for (ymuint i = 0; i < id->index_size(); ++ i) {
-    h = h * 127 + id->index(i);
-  }
-  return h;
-}
-
-END_NONAMESPACE
 
 // @brief ハッシュ表を拡大する．
 // @param[in] req_size 新しいサイズ

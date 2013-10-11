@@ -252,21 +252,21 @@ SmtLibMgr::Core_init()
 {
   // :sorts
   // (Bool 0)
-  const SmtId* bool_id = mIdMgr.new_id(ShString("Bool"));
+  const SmtId* bool_id = mIdMgr.make_id(ShString("Bool"));
   assert_cond( bool_id != NULL, __FILE__, __LINE__);
   sort_mgr().reg_sort(bool_id, 0);
 
-  const SmtSort* bool_sort = sort_mgr().new_sort(bool_id, vector<const SmtSort*>(0));
+  const SmtSort* bool_sort = sort_mgr().make_sort(bool_id);
   assert_cond( bool_sort != NULL, __FILE__, __LINE__);
 
   // :funs
   // (true Bool)
-  const SmtId* true_id = mIdMgr.new_id(ShString("true"));
+  const SmtId* true_id = mIdMgr.make_id(ShString("true"));
   assert_cond( true_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(true_id, vector<const SmtSort*>(0), bool_sort);
 
   // (false Bool)
-  const SmtId* false_id = mIdMgr.new_id(ShString("false"));
+  const SmtId* false_id = mIdMgr.make_id(ShString("false"));
   assert_cond( false_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(false_id, vector<const SmtSort*>(0), bool_sort);
 
@@ -274,7 +274,7 @@ SmtLibMgr::Core_init()
   b1_list[0] = bool_sort;
 
   // (not Bool Bool)
-  const SmtId* not_id = mIdMgr.new_id(ShString("not"));
+  const SmtId* not_id = mIdMgr.make_id(ShString("not"));
   assert_cond( not_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(not_id, b1_list, bool_sort);
 
@@ -283,37 +283,37 @@ SmtLibMgr::Core_init()
   b2_list[1] = bool_sort;
 
   // (and Bool Bool Bool :right-assoc)
-  const SmtId* and_id = mIdMgr.new_id(ShString("and"));
+  const SmtId* and_id = mIdMgr.make_id(ShString("and"));
   assert_cond( and_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(and_id, b2_list, bool_sort, SmtFun::kRightAssoc);
 
   // (or Bool Bool Bool :right-assoc)
-  const SmtId* or_id = mIdMgr.new_id(ShString("or"));
+  const SmtId* or_id = mIdMgr.make_id(ShString("or"));
   assert_cond( or_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(or_id, b2_list, bool_sort, SmtFun::kRightAssoc);
 
   // (xor Bool Bool Bool :right-assoc)
-  const SmtId* xor_id = mIdMgr.new_id(ShString("xor"));
+  const SmtId* xor_id = mIdMgr.make_id(ShString("xor"));
   assert_cond( xor_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(xor_id, b2_list, bool_sort, SmtFun::kRightAssoc);
 
   // (=> Bool Bool Bool :right-assoc)
-  const SmtId* imp_id = mIdMgr.new_id(ShString("=>"));
+  const SmtId* imp_id = mIdMgr.make_id(ShString("=>"));
   assert_cond( imp_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(imp_id, b2_list, bool_sort, SmtFun::kRightAssoc);
 
-  const SmtSort* A_sort = sort_mgr().new_param_sort(0);
+  const SmtSort* A_sort = sort_mgr().make_param_sort(0);
   vector<const SmtSort*> a2_list(2);
   a2_list[0] = A_sort;
   a2_list[1] = A_sort;
 
   // (par (A) (= A A Bool :chainable))
-  const SmtId* eq_id = mIdMgr.new_id(ShString("="));
+  const SmtId* eq_id = mIdMgr.make_id(ShString("="));
   assert_cond( eq_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(eq_id, a2_list, bool_sort, SmtFun::kChainable, 1);
 
   // (par (A) (distinct A A Bool :pairwise))
-  const SmtId* dis_id = mIdMgr.new_id(ShString("distinct"));
+  const SmtId* dis_id = mIdMgr.make_id(ShString("distinct"));
   assert_cond( dis_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(dis_id, a2_list, bool_sort, SmtFun::kPairwise, 1);
 
@@ -323,7 +323,7 @@ SmtLibMgr::Core_init()
   ite_list[2] = A_sort;
 
   // (par (A) (ite Bool A A A)
-  const SmtId* ite_id = mIdMgr.new_id(ShString("ite"));
+  const SmtId* ite_id = mIdMgr.make_id(ShString("ite"));
   assert_cond( ite_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(ite_id, ite_list, A_sort, SmtFun::kNone, 1);
 }
@@ -334,16 +334,16 @@ SmtLibMgr::Ints_init()
 {
   // :sorts
   // (Int 0)
-  const SmtId* int_id = mIdMgr.new_id(ShString("Int"));
+  const SmtId* int_id = mIdMgr.make_id(ShString("Int"));
   assert_cond( int_id != NULL, __FILE__, __LINE__);
   sort_mgr().reg_sort(int_id, 0);
 
-  const SmtSort* int_sort = sort_mgr().new_sort(int_id, vector<const SmtSort*>(0));
+  const SmtSort* int_sort = sort_mgr().make_sort(int_id, vector<const SmtSort*>(0));
   assert_cond( int_sort != NULL, __FILE__, __LINE__);
 
   // :funs
   // (- Int Int)
-  const SmtId* minus_id = mIdMgr.new_id(ShString("-"));
+  const SmtId* minus_id = mIdMgr.make_id(ShString("-"));
   assert_cond( minus_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(minus_id, vector<const SmtSort*>(1, int_sort), int_sort);
 
@@ -355,37 +355,37 @@ SmtLibMgr::Ints_init()
   fun_mgr().reg_fun(minus_id, i2_list, int_sort, SmtFun::kLeftAssoc);
 
   // (+ Int Int Int :left-assoc)
-  const SmtId* plus_id = mIdMgr.new_id(ShString("+"));
+  const SmtId* plus_id = mIdMgr.make_id(ShString("+"));
   assert_cond( plus_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(plus_id, i2_list, int_sort, SmtFun::kLeftAssoc);
 
   // (* Int Int Int :left-assoc)
-  const SmtId* star_id = mIdMgr.new_id(ShString("*"));
+  const SmtId* star_id = mIdMgr.make_id(ShString("*"));
   assert_cond( star_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(star_id, i2_list, int_sort, SmtFun::kLeftAssoc);
 
-  const SmtId* bool_id = mIdMgr.new_id(ShString("Bool"));
+  const SmtId* bool_id = mIdMgr.make_id(ShString("Bool"));
   assert_cond( bool_id != NULL, __FILE__, __LINE__);
-  const SmtSort* bool_sort = sort_mgr().new_sort(bool_id, vector<const SmtSort*>(0));
+  const SmtSort* bool_sort = sort_mgr().make_sort(bool_id, vector<const SmtSort*>(0));
   assert_cond( bool_sort != NULL, __FILE__, __LINE__);
 
   // (<= Int Int Bool :chainable)
-  const SmtId* le_id = mIdMgr.new_id(ShString("<="));
+  const SmtId* le_id = mIdMgr.make_id(ShString("<="));
   assert_cond( le_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(le_id, i2_list, bool_sort, SmtFun::kChainable);
 
   // (< Int Int Bool :chainable)
-  const SmtId* lt_id = mIdMgr.new_id(ShString("<"));
+  const SmtId* lt_id = mIdMgr.make_id(ShString("<"));
   assert_cond( lt_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(lt_id, i2_list, bool_sort, SmtFun::kChainable);
 
   // (>= Int Int Bool :chainable)
-  const SmtId* ge_id = mIdMgr.new_id(ShString(">="));
+  const SmtId* ge_id = mIdMgr.make_id(ShString(">="));
   assert_cond( ge_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(ge_id, i2_list, bool_sort, SmtFun::kChainable);
 
   // (> Int Int Bool :chainable)
-  const SmtId* gt_id = mIdMgr.new_id(ShString(">"));
+  const SmtId* gt_id = mIdMgr.make_id(ShString(">"));
   assert_cond( gt_id != NULL, __FILE__, __LINE__);
   fun_mgr().reg_fun(gt_id, i2_list, bool_sort, SmtFun::kChainable);
 }
@@ -840,7 +840,7 @@ const SmtId*
 SmtLibMgr::eval_to_id(const SmtLibNode* node)
 {
   ShString name;
-  vector<ymint32> index_list;
+  vector<ymuint32> index_list;
   if ( node->type() == kSymbolToken ) {
     // 単純な形式の場合
     name = node->str_value();
@@ -879,7 +879,7 @@ SmtLibMgr::eval_to_id(const SmtLibNode* node)
     }
   }
 
-  return mIdMgr.new_id(name, index_list);
+  return mIdMgr.make_id(name, index_list);
 
  syntax_error:
   return NULL;
@@ -925,7 +925,7 @@ SmtLibMgr::eval_to_sort(const SmtLibNode* node)
     }
   }
 
-  sort = sort_mgr().new_sort(id, elem_list);
+  sort = sort_mgr().make_sort(id, elem_list);
   if ( sort == NULL ) {
     ebuf << id->name() << ": not registered";
     goto syntax_error;
@@ -952,7 +952,7 @@ SmtLibMgr::eval_to_sort_template(const SmtLibNode* node,
     ymuint n = param_list.size();
     for (ymuint i = 0; i < n; ++ i) {
       if ( id == param_list[i] ) {
-	return sort_mgr().new_param_sort(i);
+	return sort_mgr().make_param_sort(i);
       }
     }
   }
@@ -986,7 +986,7 @@ SmtLibMgr::eval_to_sort_template(const SmtLibNode* node,
     }
   }
 
-  return sort_mgr().new_sort(id, elem_list);
+  return sort_mgr().make_sort(id, elem_list);
 
  syntax_error:
   return NULL;
@@ -1412,7 +1412,7 @@ SmtLibMgr::parse_args(const SmtLibNode*  arg_top,
 // @brief <numeric> を作る．
 // @param[in] val 値
 const SmtTerm*
-SmtLibMgr::new_numeric(ymint32 val)
+SmtLibMgr::new_numeric(ymuint32 val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtNumTerm));
   return new (p) SmtNumTerm(val);

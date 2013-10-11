@@ -20,6 +20,7 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 /// @brief 識別子を表すクラス
 ///
 /// シンタックスは <symbol> <numeral>*
+/// <numeral> は正の整数なので ymuint32 で表す．
 /// SmtId の中でユニークな ID 番号を持つ．
 //////////////////////////////////////////////////////////////////////
 class SmtId
@@ -58,7 +59,7 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < index_size() )
   /// @note インデックスを持たない場合や pos が index_size() より大きい場合はエラー(アボート)となる．
   virtual
-  ymint32
+  ymuint32
   index(ymuint pos) const = 0;
 
 };

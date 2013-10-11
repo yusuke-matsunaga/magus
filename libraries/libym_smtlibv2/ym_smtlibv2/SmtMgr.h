@@ -39,7 +39,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
+  // コマンド処理関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief set-logic の処理を行う．
@@ -60,7 +60,7 @@ public:
   set_info(const SmtAttr* attr);
 
   /// @brief sort の宣言を行う．
-  /// @param[in] name 型名を表す識別子
+  /// @param[in] name_id 型名を表す識別子
   /// @param[in] param_num パラメータの数
   /// @retval true 処理が成功した．
   /// @retval false 処理が失敗した．
@@ -68,11 +68,11 @@ public:
   /// エラーの原因は以下のとおり
   ///  - 同名の型が別に宣言されている．
   bool
-  declare_sort(const SmtId* name,
+  declare_sort(const SmtId* name_id,
 	       ymuint param_num);
 
   /// @brief sort の alias を定義する．
-  /// @param[in] name 型名を表す識別子
+  /// @param[in] name_id 型名を表す識別子
   /// @param[in] param_num パラメータの数
   /// @param[in] sort_tmpl 型テンプレート
   /// @retval true 処理が成功した．
@@ -81,12 +81,12 @@ public:
   /// エラーの原因は以下のとおり
   ///  - 同名の型が既に宣言されている．
   bool
-  define_sort(const SmtId* name,
+  define_sort(const SmtId* name_id,
 	      ymuint param_num,
 	      const SmtSort* sort_tmpl);
 
   /// @brief 関数の宣言を行う．
-  /// @param[in] name 関数名を表す識別子
+  /// @param[in] name_id 関数名を表す識別子
   /// @param[in] input_sort_list 入力の型のリスト
   /// @param[in] output_sort 出力の型
   /// @retval true 処理が成功した．
@@ -95,12 +95,12 @@ public:
   /// エラーの原因は以下のとおり
   ///  - 同名の関数が既に宣言されている．
   bool
-  declare_fun(const SmtId* name,
+  declare_fun(const SmtId* name_id,
 	      const vector<const SmtSort*>& input_sort_list,
 	      const SmtSort* output_sort);
 
   /// @brief 関数の定義を行う．
-  /// @param[in] name 関数名を表す識別子
+  /// @param[in] name_id 関数名を表す識別子
   /// @param[in] input_var_list 型つきの入力変数のリスト
   /// @param[in] output_sort 出力の型
   /// @param[in] body 本体の式
@@ -110,7 +110,7 @@ public:
   /// エラーの原因は以下のとおり
   ///  - 同名の関数が既に定義されている．
   bool
-  define_fun(const SmtId* name,
+  define_fun(const SmtId* name_id,
 	     const vector<SmtSortedVar>& input_var_list,
 	     const SmtSort* output_sort,
 	     const SmtTerm* body);
@@ -144,6 +144,46 @@ public:
   pop(ymuint num);
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // データ構造を作る関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 識別子を返す．
+  /// @param[in] name 名前
+  /// @param[in] index_list インデックスのリスト
+  /// @return 同じ識別子があればそれを返す．なければ作る．
+  ///
+  /// この関数は通常は成功するはず．
+  const SmtId*
+  make_id(const ShString& name,
+	  const vector<ymuint32>& index_list = vector<ymuint32>(0));
+
+  /// @brief 型を返す．
+  /// @param[in] name_id 名前を表す識別子
+  /// @param[in] elem_list 要素のリスト
+  /// @return 同じ型があればそれを返す．なければ作る．
+  /// @note エラーの場合には NULL を返す．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - name_id という名の型が登録されていなかった．
+  ///  - 登録されている型と elem_list のサイズが異なった．
+  const SmtSort*
+  make_sort(const SmtId* name_id,
+	    const vector<const SmtSort*>& elem_list = vector<const SmtSort*>(0));
+
+  /// @brief 関数を返す．
+  /// @param[in] name_id 関数名
+  /// @return 指定された名前の関数を返す．
+  /// @note エラーの場合には NULL を返す．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - name_id という名の関数が登録されていなかった．
+  const SmtFun*
+  find_fun(const SmtId* name_id);
+
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
@@ -156,11 +196,6 @@ private:
   /// @brief Ints theory の初期化を行う．
   void
   Ints_init();
-
-  /// @brief 識別子から関数に変換する．
-  /// @param[in] name 関数名
-  const SmtFun*
-  find_fun(const SmtId* name);
 
 
 private:

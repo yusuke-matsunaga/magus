@@ -21,6 +21,8 @@ class SmtFunImpl;
 //////////////////////////////////////////////////////////////////////
 /// @class SmtFunMgr SMtFunMgr.h "SmtFunMgr.h"
 /// @brief SmtFun を管理するクラス
+///
+/// 関数は名前によって区別され，同名の関数は存在しない．
 //////////////////////////////////////////////////////////////////////
 class SmtFunMgr
 {
@@ -44,35 +46,45 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 宣言のみの関数を登録する．
-  /// @param[in] name 名前
+  /// @param[in] name_id 名前を表す識別子
   /// @param[in] sort 出力の型
   /// @param[in] input_list 入力の型のリスト
   /// @param[in] attr 属性
   /// @param[in] param_num パラメータの数
   /// @return 登録した関数を返す．
+  /// @note エラーが起きたら NULL を返す．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - name_id と同名の関数がすでに存在している．
   const SmtFun*
-  reg_fun(const SmtId* name,
+  reg_fun(const SmtId* name_id,
 	  const vector<const SmtSort*>& input_list,
 	  const SmtSort* sort,
 	  SmtFun::tAttr attr = SmtFun::kNone,
 	  ymuint param_num = 0);
 
   /// @brief 実体のある関数を登録する．
-  /// @param[in] name 名前
+  /// @param[in] name_id 名前を表す識別子
   /// @param[in] sort 出力の型
   /// @param[in] input_list 入力の型と変数のリスト
   /// @param[in] body 本体
   /// @return 登録した関数を返す．
+  /// @note エラーが起きたら NULL を返す．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - name_id と同名の関数がすでに存在している．
   const SmtFun*
-  reg_fun(const SmtId* name,
+  reg_fun(const SmtId* name_id,
 	  const vector<SmtSortedVar>& input_list,
 	  const SmtSort* sort,
 	  const SmtTerm* body);
 
   /// @brief 関数を返す．
-  /// @param[in] name 名前
+  /// @param[in] name_id 名前を表す識別子
+  /// @return name_id という名の関数を返す．
+  /// @note 存在しなければ NULL を返す．
   const SmtFun*
-  find_fun(const SmtId* name) const;
+  find_fun(const SmtId* name_id) const;
 
 
 private:

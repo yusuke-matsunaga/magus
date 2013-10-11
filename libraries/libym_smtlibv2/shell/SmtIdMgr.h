@@ -22,6 +22,11 @@ class SmtIdImpl;
 //////////////////////////////////////////////////////////////////////
 /// @class SmtIdMgr SmtIdMgr.h "SmtIdMgr.h"
 /// @brief SmtId を管理するクラス
+///
+/// 識別子は <symbol> <numeral>* の形をとる．
+/// 同じ表現が同じインスタンスになるようにハッシュ表を用いて管理する．
+/// SmtId::id() は識別子のなかでユニークになるようにしているので
+/// SmtId::id() を用いて同一かどうかのチェックが行える．
 //////////////////////////////////////////////////////////////////////
 class SmtIdMgr
 {
@@ -44,8 +49,8 @@ public:
   /// @param[in] name 名前
   /// @param[in] index_list インデックスリスト
   const SmtId*
-  new_id(const ShString& name,
-	 const vector<ymint32>& index_list = vector<ymint32>(0));
+  make_id(const ShString& name,
+	  const vector<ymuint32>& index_list = vector<ymuint32>(0));
 
 
 private:

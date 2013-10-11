@@ -58,7 +58,7 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < index_size() )
   /// @note インデックスを持たない場合や pos が index_size() より大きい場合はエラー(アボート)となる．
   virtual
-  ymint32
+  ymuint32
   index(ymuint pos) const;
 
 
@@ -116,7 +116,7 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < index_size() )
   /// @note インデックスを持たない場合や pos が index_size() より大きい場合はエラー(アボート)となる．
   virtual
-  ymint32
+  ymuint32
   index(ymuint pos) const;
 
 
@@ -130,7 +130,7 @@ private:
 
   // インデックスの配列
   // 実際には必要なサイズを確保する．
-  ymint32 mIndexList[1];
+  ymuint32 mIndexList[1];
 
 };
 

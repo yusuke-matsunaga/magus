@@ -54,7 +54,7 @@ SmtIdImpl::index_size() const
 // @brief インデックスを返す．
 // @param[in] pos 位置番号 ( 0 <= pos < index_size() )
 // @note インデックスを持たない場合や pos が index_size() より大きい場合はエラー(アボート)となる．
-ymint32
+ymuint32
 SmtIdImpl::index(ymuint pos) const
 {
   assert_not_reached(__FILE__, __LINE__);
@@ -94,7 +94,7 @@ SmtIndexId::index_size() const
 // @brief インデックスを返す．
 // @param[in] pos 位置番号 ( 0 <= pos < index_size() )
 // @note インデックスを持たない場合や pos が index_size() より大きい場合はエラー(アボート)となる．
-ymint32
+ymuint32
 SmtIndexId::index(ymuint pos) const
 {
   assert_cond( pos < index_size(), __FILE__, __LINE__);

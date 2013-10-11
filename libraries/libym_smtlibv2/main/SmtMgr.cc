@@ -360,7 +360,7 @@ SmtMgr::set_info(const SmtAttr* attr)
 }
 
 // @brief sort の宣言を行う．
-// @param[in] name 型名を表す識別子
+// @param[in] name_id 型名を表す識別子
 // @param[in] param_num パラメータの数
 // @retval true 処理が成功した．
 // @retval false 処理が失敗した．
@@ -368,17 +368,17 @@ SmtMgr::set_info(const SmtAttr* attr)
 // エラーの原因は以下のとおり
 //  - 同名の型が別に宣言されている．
 bool
-SmtMgr::declare_sort(const SmtId* name,
+SmtMgr::declare_sort(const SmtId* name_id,
 		     ymuint param_num)
 {
   // 型を登録する．
-  bool stat = sort_mgr().reg_sort(name, num);
+  bool stat = sort_mgr().reg_sort(name_id, num);
 
   return stat;
 }
 
 // @brief sort の alias を定義する．
-// @param[in] name 型名を表す識別子
+// @param[in] name_id 型名を表す識別子
 // @param[in] param_num パラメータの数
 // @param[in] sort_tmpl 型テンプレート
 // @retval true 処理が成功した．
@@ -387,18 +387,18 @@ SmtMgr::declare_sort(const SmtId* name,
 // エラーの原因は以下のとおり
 //  - 同名の型が既に宣言されている．
 bool
-SmtMgr::define_sort(const SmtId* name,
+SmtMgr::define_sort(const SmtId* name_id,
 		    ymuint param_num,
 		    const SmtSort* sort_tmpl)
 {
   // 型テンプレートを登録する．
-  bool stat = sort_mgr().reg_alias(name, param_name, sort_tmpl);
+  bool stat = sort_mgr().reg_alias(name_id, param_nnum, sort_tmpl);
 
   return stat;
 }
 
 // @brief 関数の宣言を行う．
-// @param[in] name 関数名を表す識別子
+// @param[in] name_id 関数名を表す識別子
 // @param[in] input_sort_list 入力の型のリスト
 // @param[in] output_sort 出力の型
 // @retval true 処理が成功した．
@@ -407,18 +407,18 @@ SmtMgr::define_sort(const SmtId* name,
 // エラーの原因は以下のとおり
 //  - 同名の関数が既に宣言されている．
 bool
-SmtMgr::declare_fun(const SmtId* name,
+SmtMgr::declare_fun(const SmtId* name_id,
 		    const vector<const SmtSort*>& input_sort_list,
 		    const SmtSort* output_sort)
 {
   // 関数を登録する．
-  bool stat = fun_mgr().reg_fun(name, input_sort_list, output_sort);
+  bool stat = fun_mgr().reg_fun(name_id, input_sort_list, output_sort);
 
   return stat;
 }
 
 // @brief 関数の定義を行う．
-// @param[in] name 関数名を表す識別子
+// @param[in] name_id 関数名を表す識別子
 // @param[in] input_var_list 型つきの入力変数のリスト
 // @param[in] output_sort 出力の型
 // @param[in] body 本体の式
@@ -428,13 +428,13 @@ SmtMgr::declare_fun(const SmtId* name,
 // エラーの原因は以下のとおり
 //  - 同名の関数が既に定義されている．
 bool
-SmtMgr::define_fun(const SmtId* name,
+SmtMgr::define_fun(const SmtId* name_id,
 		   const vector<SmtSortedVar>& input_var_list,
 		   const SmtSort* output_sort,
 		   const SmtTerm* body)
 {
   // 関数を登録する．
-  bool stat = fun_mgr().reg_fun(name, input_var_list, output_sort, body);
+  bool stat = fun_mgr().reg_fun(name_id, input_var_list, output_sort, body);
 
   return stat;
 }
@@ -495,110 +495,46 @@ SmtMgr::pop(ymuint num)
   return true;
 }
 
-// @brief S式を識別子に変換する．
-// @param[in] node S式を表すノード
+// @brief 識別子を返す．
+// @param[in] name 名前
+// @param[in] index_list インデックスのリスト
+// @return 同じ識別子があればそれを返す．なければ作る．
+//
+// この関数は通常は成功するはず．
 const SmtId*
-SmtMgr::eval_to_id(const SmtLibNode* node)
+SmtMgr::make_id(const ShString& name,
+		const vector<ymuint32>& index_list)
 {
-  ShString name;
-  vector<ymint32> index_list;
-  if ( node->type() == kSymbolToken ) {
-    // 単純な形式の場合
-    name = node->str_value();
-  }
-  else if ( node->type() == kListToken ) {
-    // 最初は '_'
-    const SmtLibNode* node1 = node->child();
-    if ( node1->type() != kSymbolToken ||
-	 strcmp("_", static_cast<const char*>(node1->str_value())) != 0 ) {
-      // syntax error
-      goto syntax_error;
-    }
-
-    // 2番めが名前
-    const SmtLibNode* node2 = node1->sibling();
-    if ( node2 == NULL ||
-	 node2->type() != kSymbolToken ) {
-      // syntax error
-      goto syntax_error;
-    }
-    name = node2->str_value();
-
-    // 3番め以降にインデックス
-    index_list.reserve(node->child_num() - 2);
-    for (const SmtLibNode* node3 = node2->sibling();
-	 node3 != NULL; node3 = node3->sibling()) {
-      if ( node3->type() != kNumToken ) {
-	// syntax error
-	goto syntax_error;
-      }
-      index_list.push_back(node3->int_value());
-    }
-    if ( index_list.empty() ) {
-      // syntax error
-      goto syntax_error;
-    }
-  }
-
-  return mIdMgr.new_id(name, index_list);
-
- syntax_error:
-  return NULL;
+  return mIdMgr.make_id(name, index_list);
 }
 
-// @brief S式を sort に変換する．
-// @param[in] node S式を表すノード
+// @brief 型を返す．
+// @param[in] name_id 名前を表す識別子
+// @param[in] elem_list 要素のリスト
+// @return 同じ型があればそれを返す．なければ作る．
+// @note エラーの場合には NULL を返す．
+//
+// エラーの原因は以下のとおり
+//  - name_id という名の型が登録されていなかった．
+//  - 登録されている型と elem_list のサイズが異なった．
 const SmtSort*
-SmtMgr::eval_to_sort(const SmtLibNode* node)
+SmtMgr::make_sort(const SmtId* name_id,
+		  const vector<const SmtSort*>& elem_list)
 {
-  const SmtId* id = eval_to_id(node);
-  vector<const SmtSort*> elem_list;
-  const SmtSort* sort = NULL;
-  ostringstream ebuf;
+  return sort_mgr().new_sort(name_id, elem_list);
+}
 
-  if ( id == NULL ) {
-    if ( node->type() != kListToken ) {
-      ebuf << "syntax error : " << node->loc();
-      goto syntax_error;
-    }
-
-    elem_list.reserve(node->child_num() - 1);
-
-    const SmtLibNode* node1 = node->child();
-    id = eval_to_id(node1);
-    if ( id == NULL ) {
-      ebuf << "not an identifier: " << node1->loc();
-      goto syntax_error;
-    }
-
-    for (const SmtLibNode* node2 = node1->sibling();
-	 node2 != NULL; node2 = node2->sibling()) {
-      const SmtSort* sort1 = eval_to_sort(node2);
-      if ( sort1 == NULL ) {
-	ebuf << "not a registered sort: " << node2->loc();
-	goto syntax_error;
-      }
-      elem_list.push_back(sort1);
-    }
-    if ( elem_list.empty() ) {
-      ebuf << "at least one sort required: " << node1->loc();
-      goto syntax_error;
-    }
-  }
-
-  sort = sort_mgr().new_sort(id, elem_list);
-  if ( sort == NULL ) {
-    ebuf << id->name() << ": not registered";
-    goto syntax_error;
-  }
-  return sort;
-
- syntax_error:
-  if ( debug ) {
-    cerr << "eval_to_sort failed: " << ebuf.str() << endl;
-  }
-
-  return NULL;
+// @brief 関数を返す．
+// @param[in] name_id 関数名
+// @return 指定された名前の関数を返す．
+// @note エラーの場合には NULL を返す．
+//
+// エラーの原因は以下のとおり
+//  - name_id という名の関数が登録されていなかった．
+const SmtFun*
+SmtMgr::find_fun(const SmtId* name_id)
+{
+  return fun_mgr().find_fun(name_id);
 }
 
 // @brief S式を sort に変換する．
@@ -1240,14 +1176,6 @@ SmtMgr::new_attr(const ShString& keyword,
     attr = new (p) SmtAttrImpl2(keyword, expr);
   }
   return attr;
-}
-
-// @brief 識別子から関数に変換する．
-// @param[in] name 関数名
-const SmtFun*
-SmtMgr::find_fun(const SmtId* name)
-{
-  return fun_mgr().find_fun(name);
 }
 
 // @brief 現在の SortMgr を返す．

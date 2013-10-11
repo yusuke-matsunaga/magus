@@ -42,54 +42,22 @@ SmtFunMgr::~SmtFunMgr()
   delete [] mHashTable;
 }
 
-BEGIN_NONAMESPACE
-
-// 関数が等しいかチェックする
-bool
-check_fun(const SmtFun* fun,
-	  const vector<const SmtSort*>& input_list,
-	  const SmtSort* sort)
-{
-  if ( fun->body() != NULL ) {
-    return false;
-  }
-  ymuint n = input_list.size();
-  if ( fun->sort() != sort ||
-       fun->input_num() != n ) {
-    return false;
-  }
-  for (ymuint i = 0; i < n; ++ i) {
-    if ( fun->input_sort(i) != input_list[i] ) {
-      return false;
-    }
-  }
-  return true;
-}
-
-END_NONAMESPACE
-
 // @brief 宣言のみの関数を返す．
-// @param[in] name 名前
+// @param[in] name_id 名前を表す識別子
 // @param[in] sort 出力の型
 // @param[in] input_list 入力の型のリスト
 // @param[in] attr 属性
 // @param[in] param_num パラメータの数
 const SmtFun*
-SmtFunMgr::reg_fun(const SmtId* name,
+SmtFunMgr::reg_fun(const SmtId* name_id,
 		   const vector<const SmtSort*>& input_list,
 		   const SmtSort* sort,
 		   SmtFun::tAttr attr,
 		   ymuint param_num)
 {
-  {
-    const SmtFun* fun = find_fun(name);
-    if ( fun != NULL ) {
-      if ( check_fun(fun, input_list, sort) ) {
-	return fun;
-      }
-      // 同名で形の異なる関数が登録されている．
-      return NULL;
-    }
+  if ( find_fun(name_id) != NULL ) {
+    // 同名の関数が登録されている．
+    return NULL;
   }
 
   if ( mNum >= mNextLimit ) {
@@ -98,7 +66,7 @@ SmtFunMgr::reg_fun(const SmtId* name,
 
   ymuint n = input_list.size();
   void* p = mAlloc.get_memory(sizeof(SmtFun1) + sizeof(const SmtSort*) * (n - 1));
-  SmtFun1* fun = new (p) SmtFun1(name, sort, n, attr, param_num);
+  SmtFun1* fun = new (p) SmtFun1(name_id, sort, n, attr, param_num);
 
   ++ mNum;
 
@@ -106,63 +74,28 @@ SmtFunMgr::reg_fun(const SmtId* name,
     fun->mInputList[i] = input_list[i];
   }
 
-  ymuint h = name->id() % mTableSize;
+  ymuint h = name_id->id() % mTableSize;
   fun->mLink = mHashTable[h];
   mHashTable[h] = fun;
 
   return fun;
 }
 
-BEGIN_NONAMESPACE
-
-// 関数が等しいかチェックする
-bool
-check_fun(const SmtFun* fun,
-	  const vector<SmtSortedVar>& input_list,
-	  const SmtSort* sort,
-	  const SmtTerm* body)
-{
-  if ( fun->body() != body ) {
-    return false;
-  }
-
-  ymuint n = input_list.size();
-  if ( fun->sort() != sort ||
-       fun->input_num() != n ) {
-    return false;
-  }
-  for (ymuint i = 0; i < n; ++ i) {
-    if ( fun->input_sort(i) != input_list[i].mSort ||
-	 fun->input_var(i) != input_list[i].mVar ) {
-      return false;
-    }
-  }
-  return true;
-}
-
-END_NONAMESPACE
-
 // @brief 宣言のみの関数を返す．
-// @param[in] name 名前
+// @param[in] name 名前を表す識別子
 // @param[in] sort 出力の型
 // @param[in] input_list 入力の型と変数のリスト
 // @param[in] body 本体
 // @note input_list と input_var_list のサイズは同じ
 const SmtFun*
-SmtFunMgr::reg_fun(const SmtId* name,
+SmtFunMgr::reg_fun(const SmtId* name_id,
 		   const vector<SmtSortedVar>& input_list,
 		   const SmtSort* sort,
 		   const SmtTerm* body)
 {
-  {
-    const SmtFun* fun = find_fun(name);
-    if ( fun != NULL ) {
-      if ( check_fun(fun, input_list, sort, body) ) {
-	return fun;
-      }
-      // 同名で形の異なる関数が登録されている．
-      return NULL;
-    }
+  if ( find_fun(name_id) != NULL ) {
+    // 同名の関数が登録されている．
+    return NULL;
   }
 
   if ( mNum >= mNextLimit ) {
@@ -171,7 +104,7 @@ SmtFunMgr::reg_fun(const SmtId* name,
 
   ymuint n = input_list.size();
   void* p = mAlloc.get_memory(sizeof(SmtFun2) + sizeof(SmtSortedVar) * (n - 1));
-  SmtFun2* fun = new (p) SmtFun2(name, sort, n, body);
+  SmtFun2* fun = new (p) SmtFun2(name_id, sort, n, body);
 
   ++ mNum;
 
@@ -179,7 +112,7 @@ SmtFunMgr::reg_fun(const SmtId* name,
     fun->mInputList[i] = input_list[i];
   }
 
-  ymuint h = name->id() % mTableSize;
+  ymuint h = name_id->id() % mTableSize;
   fun->mLink = mHashTable[h];
   mHashTable[h] = fun;
 
@@ -189,20 +122,21 @@ SmtFunMgr::reg_fun(const SmtId* name,
 // @brief 関数を返す．
 // @param[in] name 名前
 const SmtFun*
-SmtFunMgr::find_fun(const SmtId* name) const
+SmtFunMgr::find_fun(const SmtId* name_id) const
 {
   if ( mParent != NULL ) {
-    const SmtFun* fun = mParent->find_fun(name);
+    // 親のレベルで探す．
+    const SmtFun* fun = mParent->find_fun(name_id);
     if ( fun != NULL ) {
       return fun;
     }
   }
 
-  ymuint h = name->id();
+  ymuint h = name_id->id();
   ymuint idx = h % mTableSize;
   for (SmtFunImpl* fun = mHashTable[idx];
        fun != NULL; fun = fun->mLink) {
-    if ( fun->name() == name ) {
+    if ( fun->name() == name_id ) {
       return fun;
     }
   }

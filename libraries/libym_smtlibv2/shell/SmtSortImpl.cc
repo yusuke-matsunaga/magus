@@ -78,33 +78,6 @@ SmtSortImpl::hash() const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス SmtAliasSort
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] name 名前
-// @param[in] sort alias 先の型
-SmtAliasSort::SmtAliasSort(const SmtId* name,
-			   const SmtSort* sort) :
-  SmtSortImpl(name),
-  mSortTemplate(sort)
-{
-}
-
-// @brief デストラクタ
-SmtAliasSort::~SmtAliasSort()
-{
-}
-
-// @brief 型テンプレートを返す．
-const SmtSort*
-SmtAliasSort::sort_template() const
-{
-  return mSortTemplate;
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス SmtCplxSort
 //////////////////////////////////////////////////////////////////////
 
