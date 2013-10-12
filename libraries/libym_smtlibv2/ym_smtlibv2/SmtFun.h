@@ -80,11 +80,6 @@ public:
   const SmtId*
   name() const = 0;
 
-  /// @brief 出力の型を返す．
-  virtual
-  const SmtSort*
-  sort() const = 0;
-
   /// @brief 入力数を返す．
   virtual
   ymuint
@@ -102,6 +97,11 @@ public:
   virtual
   const SmtId*
   input_var(ymuint pos) const = 0;
+
+  /// @brief 出力の型を返す．
+  virtual
+  const SmtSort*
+  output_sort() const = 0;
 
   /// @brief 本体の式を返す．
   /// @note uninterpreted function の場合は NULL を返す．

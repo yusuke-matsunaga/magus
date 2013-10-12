@@ -28,11 +28,9 @@ protected:
 
   /// @brief コンストラクタ
   /// @param[in] name 名前
-  /// @param[in] sort 出力の型
-  /// @param[in] input_num 入力数
+  /// @param[in] output_sort 出力の型
   SmtFunImpl(const SmtId* name,
-	     const SmtSort* sort,
-	     ymuint input_num);
+	     const SmtSort* output_sort);
 
   /// @brief デストラクタ
   virtual
@@ -52,12 +50,31 @@ public:
   /// @brief 出力の型を返す．
   virtual
   const SmtSort*
-  sort() const;
+  output_sort() const;
 
   /// @brief 入力数を返す．
   virtual
   ymuint
   input_num() const;
+
+  /// @brief 入力の型を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  virtual
+  const SmtSort*
+  input_sort(ymuint pos) const;
+
+  /// @brief 入力変数を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  /// @note uninterpreted function の場合は NULL を返す．
+  virtual
+  const SmtId*
+  input_var(ymuint pos) const;
+
+  /// @brief 本体の式を返す．
+  /// @note uninterpreted function の場合は NULL を返す．
+  virtual
+  const SmtTerm*
+  body() const;
 
   /// @brief 属性を返す．
   virtual
@@ -79,7 +96,7 @@ private:
   const SmtId* mName;
 
   // 出力の型
-  const SmtSort* mSort;
+  const SmtSort* mOutputSort;
 
   // 入力数
   ymuint32 mInputNum;
@@ -92,10 +109,34 @@ private:
 
 //////////////////////////////////////////////////////////////////////
 /// @class SmtFun1 SmtFunImpl.h "SmtFunImpl.h"
+/// @brief 宣言のみで引数がない関数
+//////////////////////////////////////////////////////////////////////
+class SmtDeclFun1 :
+  public SmtFunImpl
+{
+  friend class SmtFunMgr;
+
+protected:
+
+  /// @brief コンストラクタ
+  /// @param[in] name 名前
+  /// @param[in] output_sort 出力の型
+  SmtDeclFun1(const SmtId* name,
+	      const SmtSort* output_sort);
+
+  /// @brief デストラクタ
+  virtual
+  ~SmtDeclFun1();
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtFun1 SmtFunImpl.h "SmtFunImpl.h"
 /// @brief 宣言のみの関数
 //////////////////////////////////////////////////////////////////////
-class SmtFun1 :
-  public SmtFunImpl
+class SmtDeclFun2 :
+  public SmtDeclFun1
 {
   friend class SmtFunMgr;
 
@@ -103,25 +144,30 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] name 名前
-  /// @param[in] sort 出力の型
-  /// @param[in] input_num 入力数
+  /// @param[in] output_sort 出力の型
+  /// @param[in] input_list 入力の型のリスト
   /// @param[in] attr 属性
   /// @param[in] param_num パラメータの数
-  SmtFun1(const SmtId* name,
-	  const SmtSort* sort,
-	  ymuint input_num,
-	  tAttr attr,
-	  ymuint param_num);
+  SmtDeclFun2(const SmtId* name,
+	      const SmtSort* output_sort,
+	      const vector<const SmtSort*>& input_list,
+	      tAttr attr,
+	      ymuint param_num);
 
   /// @brief デストラクタ
   virtual
-  ~SmtFun1();
+  ~SmtDeclFun2();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入力数を返す．
+  virtual
+  ymuint
+  input_num() const;
 
   /// @brief 入力の型を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
@@ -135,12 +181,6 @@ public:
   virtual
   const SmtId*
   input_var(ymuint pos) const;
-
-  /// @brief 本体の式を返す．
-  /// @note uninterpreted function の場合は NULL を返す．
-  virtual
-  const SmtTerm*
-  body() const;
 
   /// @brief 属性を返す．
   virtual
@@ -164,6 +204,9 @@ private:
   // パラメータの数
   ymuint32 mParamNum;
 
+  // 入力数
+  ymuint32 mInputNum;
+
   // 入力の型の配列
   // 実際には必要な領域を確保する．
   const SmtSort* mInputList[1];
@@ -172,48 +215,33 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SmtFun2 SmtFunImpl.h "SmtFunImpl.h"
-/// @brief 定義を持つ関数
+/// @class SmtDefFun1 SmtFunImpl.h "SmtFunImpl.h"
+/// @brief 定義を持つ引数のない関数
 //////////////////////////////////////////////////////////////////////
-class SmtFun2 :
+class SmtDefFun1 :
   public SmtFunImpl
 {
   friend class SmtFunMgr;
 
-private:
+protected:
 
   /// @brief コンストラクタ
   /// @param[in] name 名前
-  /// @param[in] sort 出力の型
-  /// @param[in] input_num 入力数
+  /// @param[in] output_sort 出力の型
   /// @param[in] body 本体
-  SmtFun2(const SmtId* name,
-	  const SmtSort* sort,
-	  ymuint input_num,
-	  const SmtTerm* body);
+  SmtDefFun1(const SmtId* name,
+	     const SmtSort* output_sort,
+	     const SmtTerm* body);
 
   /// @brief デストラクタ
   virtual
-  ~SmtFun2();
+  ~SmtDefFun1();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 入力の型を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
-  virtual
-  const SmtSort*
-  input_sort(ymuint pos) const;
-
-  /// @brief 入力変数を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
-  /// @note uninterpreted function の場合は NULL を返す．
-  virtual
-  const SmtId*
-  input_var(ymuint pos) const;
 
   /// @brief 本体の式を返す．
   /// @note uninterpreted function の場合は NULL を返す．
@@ -229,6 +257,67 @@ private:
 
   // 本体
   const SmtTerm* mBody;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtDefFun2 SmtFunImpl.h "SmtFunImpl.h"
+/// @brief 定義を持つ関数
+//////////////////////////////////////////////////////////////////////
+class SmtDefFun2 :
+  public SmtDefFun1
+{
+  friend class SmtFunMgr;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] name 名前
+  /// @param[in] output_sort 出力の型
+  /// @param[in] input_var_list 型つき入力変数のリスト
+  /// @param[in] body 本体
+  SmtDefFun2(const SmtId* name,
+	     const SmtSort* output_sort,
+	     const vector<SmtSortedVar>& input_var_list,
+	     const SmtTerm* body);
+
+  /// @brief デストラクタ
+  virtual
+  ~SmtDefFun2();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入力数を返す．
+  virtual
+  ymuint
+  input_num() const;
+
+  /// @brief 入力の型を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  virtual
+  const SmtSort*
+  input_sort(ymuint pos) const;
+
+  /// @brief 入力変数を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  /// @note uninterpreted function の場合は NULL を返す．
+  virtual
+  const SmtId*
+  input_var(ymuint pos) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 入力数
+  ymuint32 mInputNum;
 
   // 入力の変数と型の配列
   // 実際には必要な領域を確保する．

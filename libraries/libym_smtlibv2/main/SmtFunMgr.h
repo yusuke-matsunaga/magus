@@ -47,8 +47,8 @@ public:
 
   /// @brief 宣言のみの関数を登録する．
   /// @param[in] name_id 名前を表す識別子
-  /// @param[in] sort 出力の型
   /// @param[in] input_list 入力の型のリスト
+  /// @param[in] output_sort 出力の型
   /// @param[in] attr 属性
   /// @param[in] param_num パラメータの数
   /// @return 登録した関数を返す．
@@ -59,14 +59,14 @@ public:
   const SmtFun*
   reg_fun(const SmtId* name_id,
 	  const vector<const SmtSort*>& input_list,
-	  const SmtSort* sort,
+	  const SmtSort* output_sort,
 	  SmtFun::tAttr attr = SmtFun::kNone,
 	  ymuint param_num = 0);
 
   /// @brief 実体のある関数を登録する．
   /// @param[in] name_id 名前を表す識別子
-  /// @param[in] sort 出力の型
   /// @param[in] input_list 入力の型と変数のリスト
+  /// @param[in] output_sort 出力の型
   /// @param[in] body 本体
   /// @return 登録した関数を返す．
   /// @note エラーが起きたら NULL を返す．
@@ -76,7 +76,7 @@ public:
   const SmtFun*
   reg_fun(const SmtId* name_id,
 	  const vector<SmtSortedVar>& input_list,
-	  const SmtSort* sort,
+	  const SmtSort* output_sort,
 	  const SmtTerm* body);
 
   /// @brief 関数を返す．

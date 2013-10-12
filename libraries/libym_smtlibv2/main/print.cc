@@ -75,7 +75,7 @@ fun_str(const SmtFun* fun)
     buf << " " << sort_str(sort);
   }
   buf << ") "
-      << sort_str(fun->sort());
+      << sort_str(fun->output_sort());
 
   if ( fun->body() ) {
     buf << " (";

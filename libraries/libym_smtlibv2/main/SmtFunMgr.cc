@@ -42,16 +42,21 @@ SmtFunMgr::~SmtFunMgr()
   delete [] mHashTable;
 }
 
-// @brief 宣言のみの関数を返す．
+// @brief 宣言のみの関数を登録する．
 // @param[in] name_id 名前を表す識別子
-// @param[in] sort 出力の型
 // @param[in] input_list 入力の型のリスト
+// @param[in] output_sort 出力の型
 // @param[in] attr 属性
 // @param[in] param_num パラメータの数
+// @return 登録した関数を返す．
+// @note エラーが起きたら NULL を返す．
+//
+// エラーの原因は以下のとおり
+//  - name_id と同名の関数がすでに存在している．
 const SmtFun*
 SmtFunMgr::reg_fun(const SmtId* name_id,
 		   const vector<const SmtSort*>& input_list,
-		   const SmtSort* sort,
+		   const SmtSort* output_sort,
 		   SmtFun::tAttr attr,
 		   ymuint param_num)
 {
@@ -64,15 +69,18 @@ SmtFunMgr::reg_fun(const SmtId* name_id,
     expand_table(mTableSize * 2);
   }
 
+  SmtFunImpl* fun = NULL;
   ymuint n = input_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtFun1) + sizeof(const SmtSort*) * (n - 1));
-  SmtFun1* fun = new (p) SmtFun1(name_id, sort, n, attr, param_num);
+  if ( n == 0 ) {
+    void* p = mAlloc.get_memory(sizeof(SmtDeclFun1));
+    fun = new (p) SmtDeclFun1(name_id, output_sort);
+  }
+  else {
+    void* p = mAlloc.get_memory(sizeof(SmtDeclFun1) + sizeof(const SmtSort*) * (n - 1));
+    fun = new (p) SmtDeclFun2(name_id, output_sort, input_list, attr, param_num);
+  }
 
   ++ mNum;
-
-  for (ymuint i = 0; i < n; ++ i) {
-    fun->mInputList[i] = input_list[i];
-  }
 
   ymuint h = name_id->id() % mTableSize;
   fun->mLink = mHashTable[h];
@@ -81,16 +89,20 @@ SmtFunMgr::reg_fun(const SmtId* name_id,
   return fun;
 }
 
-// @brief 宣言のみの関数を返す．
-// @param[in] name 名前を表す識別子
-// @param[in] sort 出力の型
+// @brief 実体のある関数を登録する．
+// @param[in] name_id 名前を表す識別子
+// @param[in] output_sort 出力の型
 // @param[in] input_list 入力の型と変数のリスト
 // @param[in] body 本体
-// @note input_list と input_var_list のサイズは同じ
+// @return 登録した関数を返す．
+// @note エラーが起きたら NULL を返す．
+//
+// エラーの原因は以下のとおり
+//  - name_id と同名の関数がすでに存在している．
 const SmtFun*
 SmtFunMgr::reg_fun(const SmtId* name_id,
 		   const vector<SmtSortedVar>& input_list,
-		   const SmtSort* sort,
+		   const SmtSort* output_sort,
 		   const SmtTerm* body)
 {
   if ( find_fun(name_id) != NULL ) {
@@ -102,15 +114,17 @@ SmtFunMgr::reg_fun(const SmtId* name_id,
     expand_table(mTableSize * 2);
   }
 
+  SmtFunImpl* fun = NULL;
   ymuint n = input_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtFun2) + sizeof(SmtSortedVar) * (n - 1));
-  SmtFun2* fun = new (p) SmtFun2(name_id, sort, n, body);
-
-  ++ mNum;
-
-  for (ymuint i = 0; i < n; ++ i) {
-    fun->mInputList[i] = input_list[i];
+  if ( n == 0 ) {
+    void* p = mAlloc.get_memory(sizeof(SmtDefFun1));
+    fun = new (p) SmtDefFun1(name_id, output_sort, body);
   }
+  else {
+    void* p = mAlloc.get_memory(sizeof(SmtDefFun2) + sizeof(SmtSortedVar) * (n - 1));
+    fun = new (p) SmtDefFun2(name_id, output_sort, input_list, body);
+  }
+  ++ mNum;
 
   ymuint h = name_id->id() % mTableSize;
   fun->mLink = mHashTable[h];
@@ -148,6 +162,8 @@ SmtFunMgr::find_fun(const SmtId* name_id) const
 void
 SmtFunMgr::expand_table(ymuint req_size)
 {
+  cerr << "SmtFunMgr::expand_table(" << req_size << ")" << endl;
+
   ymuint old_size = mTableSize;
   SmtFunImpl** old_table = mHashTable;
 
