@@ -4,9 +4,14 @@
 
 SUBDIRS =
 
-INCLUDES =
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
-	smtlibv2_nsdef.h
+	smtlibv2_nsdef.h \
+	SmtAttr.h \
+	SmtFun.h \
+	SmtId.h \
+	SmtMgr.h \
+	SmtShell.h \
+	SmtSort.h \
+	SmtTerm.h
