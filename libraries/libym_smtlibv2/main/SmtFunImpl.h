@@ -98,9 +98,6 @@ private:
   // 出力の型
   const SmtSort* mOutputSort;
 
-  // 入力数
-  ymuint32 mInputNum;
-
   // ハッシュ用のリンクポインタ
   SmtFunImpl* mLink;
 
@@ -144,13 +141,13 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] name 名前
-  /// @param[in] output_sort 出力の型
   /// @param[in] input_list 入力の型のリスト
+  /// @param[in] output_sort 出力の型
   /// @param[in] attr 属性
   /// @param[in] param_num パラメータの数
   SmtDeclFun2(const SmtId* name,
-	      const SmtSort* output_sort,
 	      const vector<const SmtSort*>& input_list,
+	      const SmtSort* output_sort,
 	      tAttr attr,
 	      ymuint param_num);
 
@@ -278,8 +275,8 @@ private:
   /// @param[in] input_var_list 型つき入力変数のリスト
   /// @param[in] body 本体
   SmtDefFun2(const SmtId* name,
-	     const SmtSort* output_sort,
 	     const vector<SmtSortedVar>& input_var_list,
+	     const SmtSort* output_sort,
 	     const SmtTerm* body);
 
   /// @brief デストラクタ

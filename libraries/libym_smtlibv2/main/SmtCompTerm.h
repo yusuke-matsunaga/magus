@@ -12,6 +12,7 @@
 #include "SmtTermImpl.h"
 #include "ym_smtlibv2/SmtVarBinding.h"
 #include "ym_smtlibv2/SmtSortedVar.h"
+#include "ym_smtlibv2/SmtAttr.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -250,7 +251,7 @@ private:
   /// @param[in] body 本体
   /// @param[in] attr_list 属性のリスト
   SmtAttrTerm(const SmtTerm* body,
-	      const vector<const SmtAttr*>& attr_list);
+	      const vector<SmtAttr>& attr_list);
 
   /// @brief デストラクタ
   virtual
@@ -272,11 +273,17 @@ public:
   ymuint
   attr_num() const;
 
-  /// @brief attr 型の場合に属性を返す．
+  /// @brief attr 型の場合に属性キーを返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
   virtual
-  const SmtAttr*
-  attr(ymuint pos) const;
+  ShString
+  attr_keyword(ymuint pos) const;
+
+  /// @brief attr 型の場合に属性値を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
+  virtual
+  const SmtTerm*
+  attr_value(ymuint pos) const;
 
 
 private:
@@ -289,7 +296,7 @@ private:
 
   // 属性の配列
   // 実際には必要なサイズが確保される．
-  const SmtAttr* mAttrList[1];
+  SmtAttr mAttrList[1];
 
 };
 

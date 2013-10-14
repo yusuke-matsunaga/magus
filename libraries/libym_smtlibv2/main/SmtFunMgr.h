@@ -92,6 +92,11 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief reg_fun() の下請け関数
+  /// @param[in] fun 登録する関数
+  void
+  reg_sub(SmtFunImpl* fun);
+
   /// @brief ハッシュ表を拡大する．
   /// @param[in] req_size 新しいサイズ
   void

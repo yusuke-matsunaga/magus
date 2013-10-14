@@ -51,20 +51,18 @@ public:
   /// @param[in] name_id 型名
   /// @param[in] param_num 引数の数
   /// @retval true 登録が成功した．
-  /// @retval false 登録が失敗した．同名で異なる宣言がすでに登録されている．
+  /// @retval false 登録が失敗した．すでに同名の型が登録されている
   bool
   reg_sort(const SmtId* name_id,
 	   ymuint param_num);
 
   /// @brief alias を登録する．
   /// @param[in] name_id 型名
-  /// @param[in] param_num 引数の数
   /// @param[in] sort 登録する型
   /// @retval true 登録が成功した．
-  /// @retval false 登録が失敗した．同名で異なる alias が登録されている．
+  /// @retval false 登録が失敗した．すでに同名の型が登録されている
   bool
   reg_alias(const SmtId* name_id,
-	    ymuint param_num,
 	    const SmtSort* sort);
 
   /// @brief SmtSort に変換する．
@@ -85,6 +83,17 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief reg_sort/reg_alias の下請け関数
+  /// @param[in] name_id 型名
+  /// @param[in] sort 登録する型
+  /// @param[in] param_num 引数の数
+  /// @retval true 登録が成功した．
+  /// @retval false 登録が失敗した．すでに同名の型が登録されている
+  bool
+  reg_sub(const SmtId* name_id,
+	  const SmtSort* sort,
+	  ymuint param_num);
 
   /// @brief 型宣言を探す．
   /// @param[in] name_id 型名

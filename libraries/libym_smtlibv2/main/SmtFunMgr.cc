@@ -65,10 +65,6 @@ SmtFunMgr::reg_fun(const SmtId* name_id,
     return NULL;
   }
 
-  if ( mNum >= mNextLimit ) {
-    expand_table(mTableSize * 2);
-  }
-
   SmtFunImpl* fun = NULL;
   ymuint n = input_list.size();
   if ( n == 0 ) {
@@ -76,15 +72,11 @@ SmtFunMgr::reg_fun(const SmtId* name_id,
     fun = new (p) SmtDeclFun1(name_id, output_sort);
   }
   else {
-    void* p = mAlloc.get_memory(sizeof(SmtDeclFun1) + sizeof(const SmtSort*) * (n - 1));
-    fun = new (p) SmtDeclFun2(name_id, output_sort, input_list, attr, param_num);
+    void* p = mAlloc.get_memory(sizeof(SmtDeclFun2) + sizeof(const SmtSort*) * (n - 1));
+    fun = new (p) SmtDeclFun2(name_id, input_list, output_sort, attr, param_num);
   }
 
-  ++ mNum;
-
-  ymuint h = name_id->id() % mTableSize;
-  fun->mLink = mHashTable[h];
-  mHashTable[h] = fun;
+  reg_sub(fun);
 
   return fun;
 }
@@ -110,10 +102,6 @@ SmtFunMgr::reg_fun(const SmtId* name_id,
     return NULL;
   }
 
-  if ( mNum >= mNextLimit ) {
-    expand_table(mTableSize * 2);
-  }
-
   SmtFunImpl* fun = NULL;
   ymuint n = input_list.size();
   if ( n == 0 ) {
@@ -122,13 +110,10 @@ SmtFunMgr::reg_fun(const SmtId* name_id,
   }
   else {
     void* p = mAlloc.get_memory(sizeof(SmtDefFun2) + sizeof(SmtSortedVar) * (n - 1));
-    fun = new (p) SmtDefFun2(name_id, output_sort, input_list, body);
+    fun = new (p) SmtDefFun2(name_id, input_list, output_sort, body);
   }
-  ++ mNum;
 
-  ymuint h = name_id->id() % mTableSize;
-  fun->mLink = mHashTable[h];
-  mHashTable[h] = fun;
+  reg_sub(fun);
 
   return fun;
 }
@@ -157,13 +142,27 @@ SmtFunMgr::find_fun(const SmtId* name_id) const
   return NULL;
 }
 
+// @brief reg_fun() の下請け関数
+// @param[in] fun 登録する関数
+void
+SmtFunMgr::reg_sub(SmtFunImpl* fun)
+{
+  if ( mNum >= mNextLimit ) {
+    expand_table(mTableSize * 2);
+  }
+
+  ++ mNum;
+
+  ymuint h = fun->name()->id() % mTableSize;
+  fun->mLink = mHashTable[h];
+  mHashTable[h] = fun;
+}
+
 // @brief ハッシュ表を拡大する．
 // @param[in] req_size 新しいサイズ
 void
 SmtFunMgr::expand_table(ymuint req_size)
 {
-  cerr << "SmtFunMgr::expand_table(" << req_size << ")" << endl;
-
   ymuint old_size = mTableSize;
   SmtFunImpl** old_table = mHashTable;
 

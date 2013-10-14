@@ -36,12 +36,19 @@ SmtSortImpl::name() const
   return mName;
 }
 
+// @brief パラメータ型のときに true を返す．
+bool
+SmtSortImpl::is_param() const
+{
+  return false;
+}
+
 // @brief パラメータ番号を返す．
-// @note 通常の型の場合は -1 を返す．
-ymint
+ymuint
 SmtSortImpl::param_id() const
 {
-  return -1;
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
 }
 
 // @brief 複合型の場合の要素数を返す．
@@ -142,9 +149,16 @@ SmtParamSort::name() const
   return NULL;
 }
 
+// @brief パラメータ型のときに true を返す．
+bool
+SmtParamSort::is_param() const
+{
+  return true;
+}
+
 // @brief パラメータ番号を返す．
 // @note 通常の型の場合は -1 を返す．
-ymint
+ymuint
 SmtParamSort::param_id() const
 {
   return mParamId;

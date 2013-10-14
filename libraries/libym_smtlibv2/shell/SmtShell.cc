@@ -14,6 +14,7 @@
 #include "ym_smtlibv2/SmtId.h"
 #include "ym_smtlibv2/SmtSort.h"
 #include "ym_smtlibv2/SmtFun.h"
+#include "ym_smtlibv2/SmtAttr.h"
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -399,7 +400,7 @@ SmtShell::set_info(const SmtLibNode* arg_top)
     cerr << endl;
   }
 
-  vector<const SmtAttr*> attr_list;
+  vector<SmtAttr> attr_list;
   const char* emsg = "";
 
   if ( !eval_to_attr(arg_top, attr_list) ) {
@@ -411,7 +412,7 @@ SmtShell::set_info(const SmtLibNode* arg_top)
     goto syntax_error;
   }
 
-  if ( !mMgr.set_info(attr_list[0]) ) {
+  if ( !mMgr.set_info(attr_list[0].mKeyword, attr_list[0].mValue) ) {
     goto syntax_error;
   }
 
@@ -538,7 +539,7 @@ SmtShell::define_sort(const SmtLibNode* arg_top)
   }
 
   // 型テンプレートを登録する．
-  if ( !mMgr.define_sort(name, param_list.size(), sort) ) {
+  if ( !mMgr.define_sort(name, sort) ) {
     emsg = "already defined";
     goto syntax_error;
   }
@@ -1119,7 +1120,9 @@ SmtShell::eval_to_term(const SmtLibNode* node)
     if ( fun != NULL ) {
       if ( fun->attr() == SmtFun::kNone && fun->input_num() != n - 1) {
 	// 引数の数が合わない．
-	ebuf << "# of args mismatch: " << node->loc();
+	ebuf << "# of args for function '" << fun->name()->name() << "' mismatch: " << node->loc();
+	ebuf << " fun->input_num() = " << fun->input_num()
+	     << ", n = " << n;
 	goto syntax_error;
       }
       vector<const SmtTerm*> input_list;
@@ -1138,7 +1141,7 @@ SmtShell::eval_to_term(const SmtLibNode* node)
     else if ( node1->type() != kSymbolToken ||
 	      strcmp("let", static_cast<const char*>(node1->str_value())) == 0 ) {
       if ( node->child_num() != 3 ) {
-	ebuf << "# of args mismatch: " << node->loc();
+	ebuf << "# of args for 'let' mismatch: " << node->loc();
 	goto syntax_error;
       }
       const SmtLibNode* node2 = node1->sibling();
@@ -1170,7 +1173,7 @@ SmtShell::eval_to_term(const SmtLibNode* node)
     else if ( node1->type() != kSymbolToken ||
 	      strcmp("forall", static_cast<const char*>(node1->str_value())) == 0 ) {
       if ( node->child_num() != 3 ) {
-	ebuf << "# of args mismatch: " << node->loc();
+	ebuf << "# of args for 'forall' mismatch: " << node->loc();
 	goto syntax_error;
       }
       const SmtLibNode* node2 = node1->sibling();
@@ -1202,7 +1205,7 @@ SmtShell::eval_to_term(const SmtLibNode* node)
     else if ( node1->type() != kSymbolToken ||
 	      strcmp("exists", static_cast<const char*>(node1->str_value())) == 0 ) {
       if ( node->child_num() != 3 ) {
-	ebuf << "# of args mismatch: " << node->loc();
+	ebuf << "# of args for 'exists' mismatch: " << node->loc();
 	goto syntax_error;
       }
       const SmtLibNode* node2 = node1->sibling();
@@ -1244,7 +1247,7 @@ SmtShell::eval_to_term(const SmtLibNode* node)
 	return NULL;
       }
 
-      vector<const SmtAttr*> attr_list;
+      vector<SmtAttr> attr_list;
       attr_list.reserve(node->child_num() - 2);
       if ( !eval_to_attr(node2->sibling(), attr_list) ) {
 	// エラーメッセージは eval_to_attr() で出力されているはず
@@ -1408,6 +1411,10 @@ SmtShell::eval_to_var_binding(const SmtLibNode* node,
   const SmtId* id = NULL;
   const SmtTerm* term = NULL;
   ostringstream ebuf;
+  if ( node->type() != kListToken ) {
+    ebuf << "syntax error: " << node->loc();
+    goto syntax_error;
+  }
   if ( !parse_args(node->child(), 2, arg_list) ) {
     ebuf << "syntax error: " << node->loc();
     goto syntax_error;
@@ -1443,7 +1450,7 @@ SmtShell::eval_to_var_binding(const SmtLibNode* node,
 // @param[out] attr_list 結果の attribute のリストを格納する変数
 bool
 SmtShell::eval_to_attr(const SmtLibNode* node,
-		       vector<const SmtAttr*>& attr_list)
+		       vector<SmtAttr>& attr_list)
 {
   attr_list.clear();
   for (const SmtLibNode* node1 = node; node1 != NULL; node1 = node1->sibling()) {
@@ -1456,14 +1463,12 @@ SmtShell::eval_to_attr(const SmtLibNode* node,
       if ( expr == NULL ) {
 	return false;
       }
-      const SmtAttr* attr = mMgr.make_attr(node1->str_value(), expr);
-      attr_list.push_back(attr);
+      attr_list.push_back(SmtAttr(node1->str_value(), expr));
 
       node1 = node2;
     }
     else {
-      const SmtAttr* attr = mMgr.make_attr(node1->str_value());
-      attr_list.push_back(attr);
+      attr_list.push_back(SmtAttr(node1->str_value()));
     }
   }
   return true;

@@ -166,8 +166,8 @@ term_str(const SmtTerm* term)
   case SmtTerm::kAttr:
     buf << "( ! " << term_str(term->body());
     for (ymuint i = 0; i < term->attr_num(); ++ i) {
-      const SmtAttr* attr = term->attr(i);
-      buf << " " << attr_str(attr);
+      buf << " " << term->attr_keyword(i)
+	  << " " << term->attr_value(i);
     }
     buf << " )";
     break;
@@ -185,23 +185,6 @@ term_str(const SmtTerm* term)
     break;
   }
 
-  return buf.str();
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス SmtAttr
-//////////////////////////////////////////////////////////////////////
-
-// @brief 内容を表す文字列を返す．
-string
-attr_str(const SmtAttr* attr)
-{
-  ostringstream buf;
-  buf << attr->keyword();
-  if ( attr->value() ) {
-    buf << " " << term_str(attr->value());
-  }
   return buf.str();
 }
 

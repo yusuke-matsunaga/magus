@@ -50,16 +50,27 @@ public:
   /// @retval false 処理が失敗した．
   ///
   /// エラーの原因は以下のとおり
-  ///  - set_logic が実行されていた．
+  ///  - 以前に set_logic が実行されていた．
   bool
   set_logic(tSmtLogic logic);
 
-  /// @brief set-info の処理を行う．
-  /// @param[in] attr 属性
+  /// @brief オプションを設定する．
+  /// @param[in] keyword キーワード
+  /// @param[in] value 属性値
   /// @retval true 処理が成功した．
   /// @retval false 処理が失敗した．
   bool
-  set_info(const SmtAttr* attr);
+  set_option(const ShString& keyword,
+	     const SmtTerm* value);
+
+  /// @brief set-info の処理を行う．
+  /// @param[in] keyword キーワード
+  /// @param[in] value 属性値
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  bool
+  set_info(const ShString& keyword,
+	   const SmtTerm* value);
 
   /// @brief sort の宣言を行う．
   /// @param[in] name_id 型名を表す識別子
@@ -75,16 +86,25 @@ public:
 
   /// @brief sort の alias を定義する．
   /// @param[in] name_id 型名を表す識別子
-  /// @param[in] param_num パラメータの数
   /// @param[in] sort_tmpl 型テンプレート
   /// @retval true 処理が成功した．
   /// @retval false 処理が失敗した．
   ///
   /// エラーの原因は以下のとおり
   ///  - 同名の型が既に宣言されている．
+  ///  - sort_tmpl のパラメータに不備がある．
+  ///
+  /// 型テンプレートは見かけは SmtSort だが，
+  /// 要素の型として `パラメータ型' を一つ以上
+  /// 含んでいる．
+  /// sort_tmpl 中に現れるパラメータ型の番号
+  /// に空きがある場合，例えば，2つの要素型を
+  /// 持つ複合型の定義で2つの要素型が，
+  /// それぞれパラメータ番号0 とパラメータ番号2
+  /// だった場合，パラメータ番号1が抜けているので
+  /// エラーとなる．
   bool
   define_sort(const SmtId* name_id,
-	      ymuint param_num,
 	      const SmtSort* sort_tmpl);
 
   /// @brief 関数の宣言を行う．
@@ -144,6 +164,57 @@ public:
   ///  - num がスタックのサイズと等しいか大きかった．
   bool
   pop(ymuint num);
+
+  /// @brief 充足可能性判定を行なう．
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  bool
+  check_sat();
+
+  /// @brief assertion を得る．
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  bool
+  get_assertions();
+
+  /// @brief 証明を得る．
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  bool
+  get_proof();
+
+  /// @brief unsat core を得る．
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  bool
+  get_unsat_core();
+
+  /// @brief 値を得る．
+  /// @param[in] term_list 項のリスト
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  bool
+  get_value(const vector<const SmtTerm*>& term_list);
+
+  /// @brief 割り当てを得る．
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  bool
+  get_assignment();
+
+  /// @brief オプションを得る．
+  /// @param[in] keyword キーワード
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  bool
+  get_option(const ShString& keyword);
+
+  /// @brief 情報を得る．
+  /// @param[in] keyword キーワード
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  bool
+  get_info(const ShString& keyword);
 
 
 public:
@@ -269,19 +340,12 @@ public:
   /// @param[in] attr_list 属性リスト
   const SmtTerm*
   make_attr_term(const SmtTerm* body,
-		 const vector<const SmtAttr*>& attr_list);
+		 const vector<SmtAttr>& attr_list);
 
   /// @brief list term を作る．
   /// @param[in] term_list 要素のリスト
   const SmtTerm*
   make_list_term(const vector<const SmtTerm*>& term_list);
-
-  /// @brief attribute を作る．
-  /// @param[in] keyword キーワード
-  /// @param[in] expr 値
-  const SmtAttr*
-  make_attr(const ShString& keyword,
-	    const SmtTerm* expr = NULL);
 
 
 private:
@@ -296,12 +360,6 @@ private:
   /// @brief Ints theory の初期化を行う．
   void
   Ints_init();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // SmtTerm/SmtAttr の継承クラスを生成する関数
-  //////////////////////////////////////////////////////////////////////
 
 
 private:

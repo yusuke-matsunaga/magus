@@ -8,6 +8,8 @@
 
 
 #include "ym_smtlibv2/SmtShell.h"
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -17,12 +19,11 @@ SmtShell_test()
 {
   SmtShell shell;
 
-  try {
-    shell.run();
-  }
-  catch (AssertError& ae) {
-    cerr << ae << endl;
-  }
+  StreamMsgHandler mh(&cerr);
+
+  MsgMgr::reg_handler(&mh);
+
+  shell.run();
 }
 
 END_NAMESPACE_YM_SMTLIBV2

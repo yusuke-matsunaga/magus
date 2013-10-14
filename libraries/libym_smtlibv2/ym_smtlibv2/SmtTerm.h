@@ -144,11 +144,17 @@ public:
   ymuint
   attr_num() const = 0;
 
-  /// @brief attr 型の場合に属性を返す．
+  /// @brief attr 型の場合に属性キーを返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
   virtual
-  const SmtAttr*
-  attr(ymuint pos) const = 0;
+  ShString
+  attr_keyword(ymuint pos) const = 0;
+
+  /// @brief attr 型の場合に属性値を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
+  virtual
+  const SmtTerm*
+  attr_value(ymuint pos) const = 0;
 
   /// @brief kLet/kForall/kExists/kAttr 型の場合に本体の項を返す．
   virtual

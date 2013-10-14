@@ -95,24 +95,75 @@ SmtSortMgr::~SmtSortMgr()
 // @param[in] name_id 型名
 // @param[in] param_num 引数の数
 // @retval true 登録が成功した．
-// @retval false 登録が失敗した．同名で異なる宣言がすでに登録されている．
+// @retval false 登録が失敗した．すでに同名の型が登録されている
 bool
 SmtSortMgr::reg_sort(const SmtId* name_id,
 		     ymuint param_num)
 {
-  return reg_alias(name_id, param_num, NULL);
+  return reg_sub(name_id, NULL, param_num);
 }
+
+
+BEGIN_NONAMESPACE
+
+// @brief sort に含まれるパラメータ番号を得る．
+// @param[in] sort 対象の型
+// @param[out] param_array パラメータ番号を収める配列
+// @note param_array[i] = true なら i 番めのパラメータが使われている．
+void
+get_param(const SmtSort* sort,
+	  vector<bool>& param_array)
+{
+  if ( sort->is_param() ) {
+    ymuint pid = sort->param_id();
+    while ( param_array.size() <= pid ) {
+      param_array.push_back(false);
+    }
+    param_array[pid] = true;
+  }
+  else {
+    ymuint n = sort->elem_num();
+    for (ymuint i = 0; i < n; ++ i) {
+      const SmtSort* sort1 = sort->elem(i);
+      get_param(sort1, param_array);
+    }
+  }
+}
+
+END_NONAMESPACE
 
 // @brief alias を登録する．
 // @param[in] name_id 型名
-// @param[in] param_num 引数の数
 // @param[in] sort 登録する型
 // @retval true 登録が成功した．
-// @retval false 登録が失敗した．同名で異なる alias が登録されている．
+// @retval false 登録が失敗した．すでに同名の型が登録されている
 bool
 SmtSortMgr::reg_alias(const SmtId* name_id,
-		      ymuint param_num,
 		      const SmtSort* sort)
+{
+  vector<bool> param_array;
+  get_param(sort, param_array);
+  ymuint param_num = param_array.size();
+  for (ymuint i = 0; i < param_num; ++ i) {
+    if ( !param_array[i] ) {
+      // 歯抜け状態だった．
+      return false;
+    }
+  }
+
+  return reg_sub(name_id, sort, param_num);
+}
+
+// @brief reg_sort/reg_alias の下請け関数
+// @param[in] name_id 型名
+// @param[in] sort 登録する型
+// @param[in] param_num 引数の数
+// @retval true 登録が成功した．
+// @retval false 登録が失敗した．すでに同名の型が登録されている
+bool
+SmtSortMgr::reg_sub(const SmtId* name_id,
+		    const SmtSort* sort,
+		    ymuint param_num)
 {
   hash_map<ymuint32, pair<const SmtSort*, ymuint32> >::iterator p = mHash.find(name_id->id());
   if ( p != mHash.end() ) {
@@ -169,9 +220,11 @@ SmtSortMgr::make_sort(const SmtId* name_id,
     sort = new_complex_sort(sort_tmpl->name(), param_list);
   }
   else if ( param_list.empty() ) {
+    // 単純な型
     sort = new_simple_sort(name_id);
   }
   else {
+    // 複合型
     sort = new_complex_sort(name_id, param_list);
   }
 
@@ -200,17 +253,19 @@ SmtSortMgr::replace_param(const SmtSort* templ,
 {
   ymuint n = templ->elem_num();
   if ( n == 0 ) {
-    ymint pid = templ->param_id();
-    if ( pid >= 0 ) {
-      if ( static_cast<ymuint>(pid) >= param_list.size() ) {
-	// エラー
-	return NULL;
-      }
+    if ( templ->is_param() ) {
+      // パラメータ型
+      ymuint pid = templ->param_id();
+      assert_cond( pid < param_list.size(), __FILE__, __LINE__);
       return param_list[pid];
     }
-    return templ;
+    else {
+      // 通常の型
+      return templ;
+    }
   }
   else {
+    // 複合型
     vector<const SmtSort*> elem_list(n);
     for (ymuint i = 0; i < n; ++ i) {
       elem_list[i] = replace_param(templ->elem(i), param_list);

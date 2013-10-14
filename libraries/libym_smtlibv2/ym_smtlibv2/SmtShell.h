@@ -200,7 +200,7 @@ private:
   /// @param[out] attr_list 結果の attribute のリストを格納する変数
   bool
   eval_to_attr(const SmtLibNode* node,
-	       vector<const SmtAttr*>& attr_list);
+	       vector<SmtAttr>& attr_list);
 
   /// @brief 引数のリストをパーズする．
   /// @param[in] arg_top 引数の先頭のノード

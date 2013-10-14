@@ -26,8 +26,6 @@ libym_smt_main_la_CPPFLAGS = \
 
 libym_smt_main_la_SOURCES = \
 	print.cc \
-	SmtAttrImpl.h \
-	SmtAttrImpl.cc \
 	SmtCompTerm.h \
 	SmtCompTerm.cc \
 	SmtConstTerm.h \

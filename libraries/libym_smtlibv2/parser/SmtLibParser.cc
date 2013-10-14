@@ -173,6 +173,9 @@ SmtLibParser::read_sexp(SmtLibNode*& node,
     case kEofToken:
       break;
 
+    case kErrorToken:
+      break;
+
     default:
       assert_not_reached(__FILE__, __LINE__);
     }

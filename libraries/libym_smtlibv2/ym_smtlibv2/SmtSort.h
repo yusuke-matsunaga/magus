@@ -27,8 +27,8 @@ class SmtId;
 /// というコマンド中に現れる (Pair X X) は実際の型ではなく，
 /// X という型パラメータを使ったパラメータ付きの型である．
 /// 実装としては型パラメータを表す型の場合には
-/// 非負の param_id() を返すようにする．
-/// この値が declare_sort 中のパラメータの位置番号となる．
+/// is_param() が true を返すようにする．
+/// また，param_id() が declare_sort 中のパラメータの位置番号となる．
 //////////////////////////////////////////////////////////////////////
 class SmtSort
 {
@@ -51,11 +51,16 @@ public:
   const SmtId*
   name() const = 0;
 
-  /// @brief パラメータ番号を返す．
-  /// @note 通常の型の場合は -1 を返す．
+  /// @brief パラメータ型のときに true を返す．
   /// 詳しくは上のコメント参照
   virtual
-  ymint
+  bool
+  is_param() const = 0;
+
+  /// @brief パラメータ番号を返す．
+  /// 詳しくは上のコメント参照
+  virtual
+  ymuint
   param_id() const = 0;
 
   /// @brief 複合型の場合の要素数を返す．

@@ -181,7 +181,7 @@ SmtExists::type() const
 // @param[in] body 本体
 // @param[in] attr_list 属性のリスト
 SmtAttrTerm::SmtAttrTerm(const SmtTerm* body,
-			 const vector<const SmtAttr*>& attr_list) :
+			 const vector<SmtAttr>& attr_list) :
   SmtCompTerm(body),
   mAttrNum(attr_list.size())
 {
@@ -209,13 +209,22 @@ SmtAttrTerm::attr_num() const
   return mAttrNum;
 }
 
-// @brief attr 型の場合に属性を返す．
+// @brief attr 型の場合に属性キーを返す．
 // @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
-const SmtAttr*
-SmtAttrTerm::attr(ymuint pos) const
+ShString
+SmtAttrTerm::attr_keyword(ymuint pos) const
 {
   assert_cond( pos < attr_num(), __FILE__, __LINE__);
-  return mAttrList[pos];
+  return mAttrList[pos].mKeyword;
+}
+
+// @brief attr 型の場合に属性値を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
+const SmtTerm*
+SmtAttrTerm::attr_value(ymuint pos) const
+{
+  assert_cond( pos < attr_num(), __FILE__, __LINE__);
+  return mAttrList[pos].mValue;
 }
 
 END_NAMESPACE_YM_SMTLIBV2

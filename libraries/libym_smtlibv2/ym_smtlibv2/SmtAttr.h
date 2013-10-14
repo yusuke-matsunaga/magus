@@ -19,37 +19,25 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 /// @class SmtAttr SmtAttr.h "ym_smtlibv2/SmtAttr.h"
 /// @brief attribute を表すクラス
 //////////////////////////////////////////////////////////////////////
-class SmtAttr
+struct SmtAttr
 {
-protected:
 
-  /// @brief デストラクタ
-  virtual
-  ~SmtAttr() { }
+  /// @brief コンストラクタ
+  explicit
+  SmtAttr(const ShString& keyword = ShString(),
+	  const SmtTerm* value = NULL) :
+    mKeyword(keyword),
+    mValue(value)
+  {
+  }
 
+  /// @brief キーワード
+  ShString mKeyword;
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief キーワードを表す文字列を返す．
-  virtual
-  ShString
-  keyword() const = 0;
-
-  /// @brief 属性値を表す式を返す．
-  virtual
-  const SmtTerm*
-  value() const = 0;
+  /// @brief 属性値
+  const SmtTerm* mValue;
 
 };
-
-
-/// @relates SmtAttr
-/// @brief 内容を表す文字列を返す．
-string
-attr_str(const SmtAttr* attr);
 
 END_NAMESPACE_YM_SMTLIBV2
 

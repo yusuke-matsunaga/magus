@@ -126,10 +126,19 @@ SmtTermImpl::attr_num() const
   return 0;
 }
 
-// @brief attr 型の場合に属性を返す．
+// @brief attr 型の場合に属性キーを返す．
 // @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
-const SmtAttr*
-SmtTermImpl::attr(ymuint pos) const
+ShString
+SmtTermImpl::attr_keyword(ymuint pos) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return ShString();
+}
+
+// @brief attr 型の場合に属性値を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
+const SmtTerm*
+SmtTermImpl::attr_value(ymuint pos) const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;

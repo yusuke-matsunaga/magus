@@ -19,7 +19,6 @@
 #include "SmtCompTerm.h"
 #include "SmtFunTerm.h"
 #include "SmtListTerm.h"
-#include "SmtAttrImpl.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -325,7 +324,8 @@ SmtMgr::Ints_init()
 // @retval true 処理が成功した．
 // @retval false 処理が失敗した．
 bool
-SmtMgr::set_info(const SmtAttr* attr)
+SmtMgr::set_info(const ShString& keyword,
+		 const SmtTerm* value)
 {
   // 未完
   return true;
@@ -351,20 +351,29 @@ SmtMgr::declare_sort(const SmtId* name_id,
 
 // @brief sort の alias を定義する．
 // @param[in] name_id 型名を表す識別子
-// @param[in] param_num パラメータの数
 // @param[in] sort_tmpl 型テンプレート
 // @retval true 処理が成功した．
 // @retval false 処理が失敗した．
 //
 // エラーの原因は以下のとおり
 //  - 同名の型が既に宣言されている．
+//  - sort_tmpl のパラメータに不備がある．
+//
+// 型テンプレートは見かけは SmtSort だが，
+// 要素の型として `パラメータ型' を一つ以上
+// 含んでいる．
+// sort_tmpl 中に現れるパラメータ型の番号
+// に空きがある場合，例えば，2つの要素型を
+// 持つ複合型の定義で2つの要素型が，
+// それぞれパラメータ番号0 とパラメータ番号2
+// だった場合，パラメータ番号1が抜けているので
+// エラーとなる．
 bool
 SmtMgr::define_sort(const SmtId* name_id,
-		    ymuint param_num,
 		    const SmtSort* sort_tmpl)
 {
   // 型テンプレートを登録する．
-  bool stat = sort_mgr().reg_alias(name_id, param_num, sort_tmpl);
+  bool stat = sort_mgr().reg_alias(name_id, sort_tmpl);
 
   return stat;
 }
@@ -653,10 +662,10 @@ SmtMgr::make_exists_term(const vector<SmtSortedVar>& var_list,
 // @param[in] attr_list 属性リスト
 const SmtTerm*
 SmtMgr::make_attr_term(const SmtTerm* body,
-		       const vector<const SmtAttr*>& attr_list)
+		       const vector<SmtAttr>& attr_list)
 {
   ymuint n = attr_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtAttrTerm) + sizeof(const SmtAttr*) * (n - 1));
+  void* p = mAlloc.get_memory(sizeof(SmtAttrTerm) + sizeof(SmtAttr) * (n - 1));
   return new (p) SmtAttrTerm(body, attr_list);
 }
 
@@ -668,25 +677,6 @@ SmtMgr::make_list_term(const vector<const SmtTerm*>& term_list)
   ymuint n = term_list.size();
   void* p = mAlloc.get_memory(sizeof(SmtListTerm) + sizeof(const SmtTerm*) * (n - 1));
   return new (p) SmtListTerm(term_list);
-}
-
-// @brief attribute を作る．
-// @param[in] keyword キーワード
-// @param[in] expr 値
-const SmtAttr*
-SmtMgr::make_attr(const ShString& keyword,
-		  const SmtTerm* expr)
-{
-  SmtAttr* attr = NULL;
-  if ( expr == NULL ) {
-    void* p = mAlloc.get_memory(sizeof(SmtAttrImpl));
-    attr = new (p) SmtAttrImpl(keyword);
-  }
-  else {
-    void* p = mAlloc.get_memory(sizeof(SmtAttrImpl2));
-    attr = new (p) SmtAttrImpl2(keyword, expr);
-  }
-  return attr;
 }
 
 // @brief 現在の SortMgr を返す．

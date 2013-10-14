@@ -45,10 +45,14 @@ public:
   const SmtId*
   name() const;
 
-  /// @brief パラメータ番号を返す．
-  /// @note 通常の型の場合は -1 を返す．
+  /// @brief パラメータ型のときに true を返す．
   virtual
-  ymint
+  bool
+  is_param() const;
+
+  /// @brief パラメータ番号を返す．
+  virtual
+  ymuint
   param_id() const;
 
   /// @brief 複合型の場合の要素数を返す．
@@ -180,10 +184,15 @@ public:
   const SmtId*
   name() const;
 
-  /// @brief パラメータ番号を返す．
-  /// @note 通常の型の場合は -1 を返す．
+  /// @brief パラメータ型のときに true を返す．
+  /// 詳しくは上のコメント参照
   virtual
-  ymint
+  bool
+  is_param() const;
+
+  /// @brief パラメータ番号を返す．
+  virtual
+  ymuint
   param_id() const;
 
   /// @brief 複合型の場合の要素数を返す．
@@ -215,7 +224,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // パラメータ番号
-  ymint32 mParamId;
+  ymuint32 mParamId;
 
 };
 
