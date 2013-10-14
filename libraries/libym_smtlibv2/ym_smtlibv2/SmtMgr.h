@@ -11,7 +11,7 @@
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
 #include "ym_utils/ShString.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "ym_utils/Alloc.h"
 
 #include "ym_smtlibv2/SmtSortedVar.h"
 #include "ym_smtlibv2/SmtVarBinding.h"
@@ -375,6 +375,10 @@ private:
   SmtFunMgr&
   fun_mgr();
 
+  /// @brief 現在のアロケータを返す．
+  Alloc&
+  alloc();
+
   /// @brief 現在の assertion リストを返す．
   vector<const SmtTerm*>&
   assertion_list();
@@ -384,9 +388,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // メモリアロケータ
-  SimpleAlloc mAlloc;
 
   // SmtId を管理するクラス
   SmtIdMgr* mIdMgr;

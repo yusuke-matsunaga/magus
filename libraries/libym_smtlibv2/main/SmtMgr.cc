@@ -29,8 +29,7 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 
 // @brief コンストラクタ
 SmtMgr::SmtMgr() :
-  mAlloc(4096),
-  mIdMgr(new SmtIdMgr(mAlloc)),
+  mIdMgr(new SmtIdMgr()),
   mLogic(kSmtLogic_NONE)
 {
   // スタックの初期化
@@ -531,7 +530,7 @@ SmtMgr::find_fun(const SmtId* name_id)
 const SmtTerm*
 SmtMgr::make_numeric_term(ymuint32 val)
 {
-  void* p = mAlloc.get_memory(sizeof(SmtNumTerm));
+  void* p = alloc().get_memory(sizeof(SmtNumTerm));
   return new (p) SmtNumTerm(val);
 }
 
@@ -540,7 +539,7 @@ SmtMgr::make_numeric_term(ymuint32 val)
 const SmtTerm*
 SmtMgr::make_decimal_term(const ShString& val)
 {
-  void* p = mAlloc.get_memory(sizeof(SmtDecTerm));
+  void* p = alloc().get_memory(sizeof(SmtDecTerm));
   return new (p) SmtDecTerm(val);
 }
 
@@ -549,7 +548,7 @@ SmtMgr::make_decimal_term(const ShString& val)
 const SmtTerm*
 SmtMgr::make_hexadecimal_term(const ShString& val)
 {
-  void* p = mAlloc.get_memory(sizeof(SmtHexTerm));
+  void* p = alloc().get_memory(sizeof(SmtHexTerm));
   return new (p) SmtHexTerm(val);
 }
 
@@ -558,7 +557,7 @@ SmtMgr::make_hexadecimal_term(const ShString& val)
 const SmtTerm*
 SmtMgr::make_binary_term(const ShString& val)
 {
-  void* p = mAlloc.get_memory(sizeof(SmtBinTerm));
+  void* p = alloc().get_memory(sizeof(SmtBinTerm));
   return new (p) SmtBinTerm(val);
 }
 
@@ -567,7 +566,7 @@ SmtMgr::make_binary_term(const ShString& val)
 const SmtTerm*
 SmtMgr::make_string_term(const ShString& val)
 {
-  void* p = mAlloc.get_memory(sizeof(SmtStrTerm));
+  void* p = alloc().get_memory(sizeof(SmtStrTerm));
   return new (p) SmtStrTerm(val);
 }
 
@@ -576,7 +575,7 @@ SmtMgr::make_string_term(const ShString& val)
 const SmtTerm*
 SmtMgr::make_symbol_term(const ShString& val)
 {
-  void* p = mAlloc.get_memory(sizeof(SmtSymbolTerm));
+  void* p = alloc().get_memory(sizeof(SmtSymbolTerm));
   return new (p) SmtSymbolTerm(val);
 }
 
@@ -585,7 +584,7 @@ SmtMgr::make_symbol_term(const ShString& val)
 const SmtTerm*
 SmtMgr::make_keyword_term(const ShString& val)
 {
-  void* p = mAlloc.get_memory(sizeof(SmtKeywordTerm));
+  void* p = alloc().get_memory(sizeof(SmtKeywordTerm));
   return new (p) SmtKeywordTerm(val);
 }
 
@@ -594,7 +593,7 @@ SmtMgr::make_keyword_term(const ShString& val)
 const SmtTerm*
 SmtMgr::make_identifier_term(const SmtId* id)
 {
-  void* p = mAlloc.get_memory(sizeof(SmtIdTerm));
+  void* p = alloc().get_memory(sizeof(SmtIdTerm));
   return new (p) SmtIdTerm(id);
 }
 
@@ -605,7 +604,7 @@ const SmtTerm*
 SmtMgr::make_qual_identifier_term(const SmtId* id,
 				  const SmtSort* sort)
 {
-  void* p = mAlloc.get_memory(sizeof(SmtQualIdTerm));
+  void* p = alloc().get_memory(sizeof(SmtQualIdTerm));
   return new (p) SmtQualIdTerm(id, sort);
 }
 
@@ -617,7 +616,7 @@ SmtMgr::make_fun_term(const SmtFun* function,
 		      const vector<const SmtTerm*>& input_list)
 {
   ymuint n = input_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtFunTerm) + sizeof(const SmtTerm*) * ( n - 1));
+  void* p = alloc().get_memory(sizeof(SmtFunTerm) + sizeof(const SmtTerm*) * ( n - 1));
   return new (p) SmtFunTerm(function, input_list);
 }
 
@@ -629,7 +628,7 @@ SmtMgr::make_let_term(const vector<SmtVarBinding>& var_binding,
 		      const SmtTerm* body)
 {
   ymuint n = var_binding.size();
-  void* p = mAlloc.get_memory(sizeof(SmtLet) + sizeof(SmtVarBinding) * (n - 1));
+  void* p = alloc().get_memory(sizeof(SmtLet) + sizeof(SmtVarBinding) * (n - 1));
   return new (p) SmtLet(var_binding, body);
 }
 
@@ -641,7 +640,7 @@ SmtMgr::make_forall_term(const vector<SmtSortedVar>& var_list,
 			 const SmtTerm* body)
 {
   ymuint n = var_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtForall) + sizeof(SmtSortedVar) * (n - 1));
+  void* p = alloc().get_memory(sizeof(SmtForall) + sizeof(SmtSortedVar) * (n - 1));
   return new (p) SmtForall(var_list, body);
 }
 
@@ -653,7 +652,7 @@ SmtMgr::make_exists_term(const vector<SmtSortedVar>& var_list,
 			 const SmtTerm* body)
 {
   ymuint n = var_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtExists) + sizeof(SmtSortedVar) * (n - 1));
+  void* p = alloc().get_memory(sizeof(SmtExists) + sizeof(SmtSortedVar) * (n - 1));
   return new (p) SmtExists(var_list, body);
 }
 
@@ -665,7 +664,7 @@ SmtMgr::make_attr_term(const SmtTerm* body,
 		       const vector<SmtAttr>& attr_list)
 {
   ymuint n = attr_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtAttrTerm) + sizeof(SmtAttr) * (n - 1));
+  void* p = alloc().get_memory(sizeof(SmtAttrTerm) + sizeof(SmtAttr) * (n - 1));
   return new (p) SmtAttrTerm(body, attr_list);
 }
 
@@ -675,7 +674,7 @@ const SmtTerm*
 SmtMgr::make_list_term(const vector<const SmtTerm*>& term_list)
 {
   ymuint n = term_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtListTerm) + sizeof(const SmtTerm*) * (n - 1));
+  void* p = alloc().get_memory(sizeof(SmtListTerm) + sizeof(const SmtTerm*) * (n - 1));
   return new (p) SmtListTerm(term_list);
 }
 
@@ -693,6 +692,14 @@ SmtMgr::fun_mgr()
 {
   assert_cond( !mStack.empty(), __FILE__, __LINE__);
   return mStack.back()->mFunMgr;
+}
+
+// @brief 現在のアロケータを返す．
+Alloc&
+SmtMgr::alloc()
+{
+  assert_cond( !mStack.empty(), __FILE__, __LINE__);
+  return mStack.back()->mAlloc;
 }
 
 // @brief 現在の assertion リストを返す．
