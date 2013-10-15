@@ -217,7 +217,7 @@ SmtSortMgr::make_sort(const SmtId* name_id,
     for (ymuint i = 0; i < n; ++ i) {
       elem_list[i] = replace_param(sort_tmpl->elem(i), param_list);
     }
-    sort = new_complex_sort(sort_tmpl->name(), param_list);
+    sort = new_complex_sort(sort_tmpl->name(), elem_list);
   }
   else if ( param_list.empty() ) {
     // 単純な型

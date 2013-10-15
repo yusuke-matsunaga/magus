@@ -75,12 +75,6 @@ public:
   const SmtSort*
   elem(ymuint pos) const = 0;
 
-  /// @brief 型テンプレートを返す．
-  /// @note 通常は自分自身を返すが alias の場合は実体を返す．
-  virtual
-  const SmtSort*
-  sort_template() const = 0;
-
   /// @brief ハッシュ値を返す．
   virtual
   ymuint

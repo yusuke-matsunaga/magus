@@ -26,22 +26,25 @@ bin_PROGRAMS =
 
 
 noinst_PROGRAMS = \
-	SmtIdMgrTest
+	run_all_test
 
 ############################################################
-## SmtIdMgrTest
+## run_all_test
 ############################################################
-SmtIdMgrTest_CPPFLAGS = \
+run_all_test_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/main \
 	$(CPPUTEST_INCLUDES)
 
-SmtIdMgrTest_SOURCES = \
-	SmtIdMgrTest.cc
+run_all_test_SOURCES = \
+	SmtIdMgrTest.cc \
+	SmtFunMgrTest.cc \
+	SmtSortMgrTest.cc \
+	main.cc
 
-SmtIdMgrTest_LDADD = \
-	../../libym_smtlibv2.la \
+run_all_test_LDADD = \
+	$(top_builddir)/libym_smtlibv2.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(CPPUTEST_LIBS)

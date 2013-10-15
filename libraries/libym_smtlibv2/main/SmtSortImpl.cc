@@ -68,14 +68,6 @@ SmtSortImpl::elem(ymuint pos) const
   return NULL;
 }
 
-// @brief 型テンプレートを返す．
-const SmtSort*
-SmtSortImpl::sort_template() const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
 // @brief ハッシュ値を返す．
 ymuint
 SmtSortImpl::hash() const
@@ -176,14 +168,6 @@ SmtParamSort::elem_num() const
 // @param[in] pos 位置番号 ( 0 <= pos < elem_num )
 const SmtSort*
 SmtParamSort::elem(ymuint pos) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
-// @brief 型テンプレートを返す．
-const SmtSort*
-SmtParamSort::sort_template() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;

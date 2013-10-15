@@ -42,8 +42,8 @@ string
 sort_str(const SmtSort* sort)
 {
   ostringstream buf;
-  ymint pid = sort->param_id();
-  if ( pid >= 0 ) {
+  if ( sort->is_param() ) {
+    ymuint pid = sort->param_id();
     buf << "#" << pid;
   }
   else {

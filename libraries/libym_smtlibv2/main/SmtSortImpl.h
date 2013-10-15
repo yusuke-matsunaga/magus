@@ -67,11 +67,6 @@ public:
   const SmtSort*
   elem(ymuint pos) const;
 
-  /// @brief 型テンプレートを返す．
-  virtual
-  const SmtSort*
-  sort_template() const;
-
   /// @brief ハッシュ値を返す．
   virtual
   ymuint
@@ -206,11 +201,6 @@ public:
   virtual
   const SmtSort*
   elem(ymuint pos) const;
-
-  /// @brief 型テンプレートを返す．
-  virtual
-  const SmtSort*
-  sort_template() const;
 
   /// @brief ハッシュ値を返す．
   virtual

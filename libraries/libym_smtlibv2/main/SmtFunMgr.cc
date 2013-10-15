@@ -10,6 +10,7 @@
 #include "SmtFunMgr.h"
 #include "SmtFunImpl.h"
 #include "ym_smtlibv2/SmtId.h"
+#include "ym_smtlibv2/SmtSort.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -47,7 +48,6 @@ SmtFunMgr::~SmtFunMgr()
 // @param[in] input_list 入力の型のリスト
 // @param[in] output_sort 出力の型
 // @param[in] attr 属性
-// @param[in] param_num パラメータの数
 // @return 登録した関数を返す．
 // @note エラーが起きたら NULL を返す．
 //
@@ -57,8 +57,7 @@ const SmtFun*
 SmtFunMgr::reg_fun(const SmtId* name_id,
 		   const vector<const SmtSort*>& input_list,
 		   const SmtSort* output_sort,
-		   SmtFun::tAttr attr,
-		   ymuint param_num)
+		   SmtFun::tAttr attr)
 {
   if ( find_fun(name_id) != NULL ) {
     // 同名の関数が登録されている．
@@ -72,6 +71,33 @@ SmtFunMgr::reg_fun(const SmtId* name_id,
     fun = new (p) SmtDeclFun1(name_id, output_sort);
   }
   else {
+    // input_list/output_sort をスキャンしてパラメータの数を数える．
+    vector<bool> param_array;
+    param_array.reserve(n);
+    for (ymuint i = 0; i < n; ++ i) {
+      const SmtSort* sort = input_list[i];
+      if ( sort->is_param() ) {
+	ymuint pid = sort->param_id();
+	while ( param_array.size() <= pid ) {
+	  param_array.push_back(false);
+	}
+	param_array[pid] = true;
+      }
+    }
+    if ( output_sort->is_param() ) {
+      ymuint pid = output_sort->param_id();
+      while ( param_array.size() <= pid ) {
+	param_array.push_back(false);
+      }
+      param_array[pid] = true;
+    }
+    ymuint param_num = param_array.size();
+    for (ymuint i = 0; i < param_num; ++ i) {
+      if ( !param_array[i] ) {
+	// 歯抜けなのでエラー
+	return NULL;
+      }
+    }
     void* p = mAlloc.get_memory(sizeof(SmtDeclFun2) + sizeof(const SmtSort*) * (n - 1));
     fun = new (p) SmtDeclFun2(name_id, input_list, output_sort, attr, param_num);
   }

@@ -238,12 +238,12 @@ SmtMgr::Core_init()
   // (par (A) (= A A Bool :chainable))
   const SmtId* eq_id = mIdMgr->make_id(ShString("="));
   assert_cond( eq_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(eq_id, a2_list, bool_sort, SmtFun::kChainable, 1);
+  fun_mgr().reg_fun(eq_id, a2_list, bool_sort, SmtFun::kChainable);
 
   // (par (A) (distinct A A Bool :pairwise))
   const SmtId* dis_id = mIdMgr->make_id(ShString("distinct"));
   assert_cond( dis_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(dis_id, a2_list, bool_sort, SmtFun::kPairwise, 1);
+  fun_mgr().reg_fun(dis_id, a2_list, bool_sort, SmtFun::kPairwise);
 
   vector<const SmtSort*> ite_list(3);
   ite_list[0] = bool_sort;
@@ -253,7 +253,7 @@ SmtMgr::Core_init()
   // (par (A) (ite Bool A A A)
   const SmtId* ite_id = mIdMgr->make_id(ShString("ite"));
   assert_cond( ite_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(ite_id, ite_list, A_sort, SmtFun::kNone, 1);
+  fun_mgr().reg_fun(ite_id, ite_list, A_sort, SmtFun::kNone);
 }
 
 // @brief Ints theory の初期化を行う．
