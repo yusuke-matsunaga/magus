@@ -48,6 +48,10 @@ StrPool::~StrPool()
 const char*
 StrPool::reg(const char* str)
 {
+  if ( mTableSize == 0 ) {
+    alloc_table(1024);
+  }
+
   // まず str と同一の文字列が登録されていないか調べる．
   ymuint32 hash_value = hash_func(str);
   ymuint32 pos = hash_value & mHashMask;
@@ -96,6 +100,17 @@ StrPool::accum_alloc_size() const
   return mCellAlloc.allocated_size();
 }
 
+// @brief メモリを全部開放する．
+// @note 非常に破壊的なのでメモリリーク検査時の終了直前などの場合のみに使う．
+void
+StrPool::destroy()
+{
+  delete [] mTable;
+  mCellAlloc.destroy();
+  mTableSize = 0;
+  mTable = NULL;
+}
+
 // テーブルを確保して初期化する．
 void
 StrPool::alloc_table(ymuint32 new_size)
@@ -132,6 +147,14 @@ ymuint
 ShString::allocated_size()
 {
   return thePool.accum_alloc_size();
+}
+
+// @brief ShString 関連でアロケートされたメモリをすべて開放する．
+// @note 非常に破壊的なのでメモリリーク検査時の終了直前などの場合のみに使う．
+void
+ShString::free_all_memory()
+{
+  thePool.destroy();
 }
 
 // ShString 用ストリーム出力演算子
