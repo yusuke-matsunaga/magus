@@ -121,6 +121,7 @@ SmtIdMgr::make_id(const ShString& name,
     for (ymuint i = 0; i < index_size; ++ i) {
       id1->mIndexList[i] = index_list[i];
     }
+    id = id1;
   }
 
   id->mId = mNum;

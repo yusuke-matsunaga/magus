@@ -14,7 +14,8 @@ TESTS_ENVIRONMENT = \
 	top_builddir=$(top_builddir) \
 	top_srcdir=$(top_srcdir)
 
-TESTS =
+TESTS = \
+	SmtIdMgrTest
 
 testsubdir = testSubDir
 
@@ -24,4 +25,23 @@ distclean-local:
 bin_PROGRAMS =
 
 
-noinst_PROGRAMS =
+noinst_PROGRAMS = \
+	SmtIdMgrTest
+
+############################################################
+## SmtIdMgrTest
+############################################################
+SmtIdMgrTest_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/main \
+	$(CPPUTEST_INCLUDES)
+
+SmtIdMgrTest_SOURCES = \
+	SmtIdMgrTest.cc
+
+SmtIdMgrTest_LDADD = \
+	../../libym_smtlibv2.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(CPPUTEST_LIBS)
