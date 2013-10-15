@@ -73,7 +73,7 @@ TEST(SmtFunMgrTestGroup, simple_decl1)
 
   // fun_str() のチェック
   string s = fun_str(fun_f);
-  STRCMP_EQUAL( "f () a", s.c_str() );
+  STRCMP_EQUAL( "f ( ) a", s.c_str() );
 
   // find_fun() のチェック
   const SmtFun* f2 = FunMgr->find_fun(id_f);
@@ -123,7 +123,7 @@ TEST(SmtFunMgrTestGroup, simple_decl2)
   LONGS_EQUAL( 0, fun_f->param_num() );
 
   string s = fun_str(fun_f);
-  STRCMP_EQUAL( "f ( b b) a", s.c_str() );
+  STRCMP_EQUAL( "f ( b b ) a", s.c_str() );
 }
 
 // 関数を宣言するテスト3
@@ -240,7 +240,7 @@ TEST(SmtFunMgrTestGroup, param_decl1)
   LONGS_EQUAL( 1, fun_eq->param_num() );
 
   string s = fun_str(fun_eq);
-  STRCMP_EQUAL( "= ( #0 #0) a", s.c_str() );
+  STRCMP_EQUAL( "= ( #0 #0 ) a", s.c_str() );
 }
 
 // パラメータ付きの関数の宣言のテスト2
