@@ -29,6 +29,7 @@ TEST_GROUP(SmtIdMgrTestGroup)
   void teardown()
   {
     delete IdMgr;
+    ShString::free_all_memory();
   }
 };
 
@@ -51,7 +52,6 @@ TEST(SmtIdMgrTestGroup, make_id_simple)
   LONGS_EQUAL( 0, id1->index_size() );
 }
 
-#if 0
 TEST(SmtIdMgrTestGroup, make_id_identity)
 {
   // 単純な形式の識別子を作る．
@@ -81,12 +81,11 @@ TEST(SmtIdMgrTestGroup, make_id_complex1)
   // インデックスをチェック
   LONGS_EQUAL( 0, id1->index(0) );
 }
-#endif
+
 
 int
 main(int argc,
      char** argv)
 {
-  //MemoryLeakWarningPlugin::turnOffNewDeleteOverloads();
   RUN_ALL_TESTS(argc, argv);
 }
