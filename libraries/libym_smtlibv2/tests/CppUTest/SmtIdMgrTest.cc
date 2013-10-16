@@ -20,12 +20,12 @@ TEST_GROUP(SmtIdMgrTestGroup)
 {
   SmtIdMgr* IdMgr;
 
-  void setup()
+  TEST_SETUP()
   {
     IdMgr = new SmtIdMgr;
   }
 
-  void teardown()
+  TEST_TEARDOWN()
   {
     delete IdMgr;
     ShString::free_all_memory();
@@ -42,6 +42,9 @@ TEST(SmtIdMgrTestGroup, make_id_simple)
 {
   // 単純な形式の識別子を作る．
   const SmtId* id1 = IdMgr->make_id(ShString("a"));
+
+  // これは成功するはず．
+  CHECK( id1 != NULL );
 
   // 名前が等しいかチェック
   STRCMP_EQUAL( "a", static_cast<const char*>(id1->name()) );
@@ -63,8 +66,14 @@ TEST(SmtIdMgrTestGroup, make_id_identity)
   // 単純な形式の識別子を作る．
   const SmtId* id1 = IdMgr->make_id(ShString("a"));
 
+  // これは成功するはず．
+  CHECK( id1 != NULL );
+
   // 同じ名前の識別子を作る．
   const SmtId* id2 = IdMgr->make_id(ShString("a"));
+
+  // これは成功するはず．
+  CHECK( id2 != NULL );
 
   // id1 と id2 は同じもののはず．
   LONGS_EQUAL( id1->id(), id2->id() );
@@ -75,6 +84,9 @@ TEST(SmtIdMgrTestGroup, make_id_complex1)
 {
   // インデックス付きの識別子を作る．
   const SmtId* id1 = IdMgr->make_id(ShString("x"), vector<ymuint32>(1, 0));
+
+  // これは成功するはず．
+  CHECK( id1 != NULL );
 
   // 名前が等しいかチェック
   STRCMP_EQUAL( "x", static_cast<const char*>(id1->name()) );
@@ -104,6 +116,9 @@ TEST(SmtIdMgrTestGroup, make_id_complex2)
   index_list[0] = index0;
   index_list[1] = index1;
   const SmtId* id1 = IdMgr->make_id(ShString("x"), index_list);
+
+  // これは成功するはず．
+  CHECK( id1 != NULL );
 
   // 名前が等しいかチェック
   STRCMP_EQUAL( "x", static_cast<const char*>(id1->name()) );
@@ -135,16 +150,25 @@ TEST(SmtIdMgrTestGroup, make_id_identity2)
   index_list[1] = index1;
   const SmtId* id1 = IdMgr->make_id(ShString("x"), index_list);
 
+  // これは成功するはず．
+  CHECK( id1 != NULL );
+
   vector<ymuint32> index_list2(index_size);
   index_list2[0] = index0;
   index_list2[1] = index1;
   const SmtId* id2 = IdMgr->make_id(ShString("x"), index_list2);
+
+  // これは成功するはず．
+  CHECK( id2 != NULL );
 
   // id1 と id2 は同じもののはず．
   LONGS_EQUAL( id1->id(), id2->id() );
 
   // 別の識別子を作る．
   const SmtId* id3 = IdMgr->make_id(ShString("x"));
+
+  // これは成功するはず．
+  CHECK( id3 != NULL );
 
   // id1 と id3 は別のもののはず
   CHECK( id1->id() != id3->id() );
@@ -154,6 +178,9 @@ TEST(SmtIdMgrTestGroup, make_id_identity2)
   index_list3[0] = 0;
   index_list3[1] = 1;
   const SmtId* id4 = IdMgr->make_id(ShString("x"), index_list3);
+
+  // これは成功するはず．
+  CHECK( id4 != NULL );
 
   // id1 と id4 は別のもののはず
   CHECK( id1->id() != id4->id() );
