@@ -5,7 +5,6 @@
 
 SUBDIRS = \
 	ym_utils \
-	$(YM_EXTRA_SUBDIRS) \
 	. \
 	tests
 
@@ -76,8 +75,12 @@ libym_utils_la_SOURCES = \
 	UnitAlloc.cc \
 	random.cc
 
+if YM_HAVE_ZLIB
+libym_utils_la_SOURCES += zstream.cc GzIDO.cc
+endif
+
 libym_utils_la_LIBADD = \
-	$(YM_EXTRA_LIBADD) \
 	@POPT_LIBS@
 
-libym_utils_la_LDFLAGS =
+libym_utils_la_LDFLAGS = \
+	-lz

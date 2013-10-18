@@ -9,7 +9,8 @@
 
 #include "ym_utils/GzIDO.h"
 #include "ym_utils/GzODO.h"
-#include "../FileBuff.h"
+
+#include "FileBuff.h"
 #include <sys/cdefs.h>
 
 

@@ -4,7 +4,7 @@
 
 SUBDIRS = \
 	. \
-	$(YM_EXTRA_SUBDIRS)
+	$(YM_EXTRA_TESTS_SUBDIRS)
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -54,6 +54,13 @@ noinst_PROGRAMS = \
 	CompIDO_test \
 	CompODO_test \
 	StrListIDO_test
+
+if YM_HAVE_ZLIB
+noinst_PROGRAMS += \
+	GzIDO_test \
+	GzODO_test \
+	zstream_test
+endif
 
 
 ############################################################
@@ -275,17 +282,39 @@ StrListIDO_test_LDADD = \
 
 
 ############################################################
-## Variables for building mycompress
+## Variables for building GzIDO_test
 ############################################################
 
+GzIDO_test_SOURCES = \
+	GzIDO_test.cc
 
-mycompress_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+GzIDO_test_LDFLAGS =
 
-mycompress_SOURCES = \
-	mycompress.c \
-	zopen.h \
-	zopen.c
+GzIDO_test_LDADD = \
+	$(YMUTILS)
 
-mycompress_LDADD =
+
+############################################################
+## Variables for building GzODO_test
+############################################################
+
+GzODO_test_SOURCES = \
+	GzODO_test.cc
+
+GzODO_test_LDFLAGS =
+
+GzODO_test_LDADD = \
+	$(YMUTILS)
+
+
+############################################################
+## Variables for building zstream_test
+############################################################
+
+zstream_test_SOURCES = \
+	zstream_test.cc
+
+zstream_test_LDFLAGS =
+
+zstream_test_LDADD = \
+	$(YMUTILS)
