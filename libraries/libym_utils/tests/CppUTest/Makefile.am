@@ -37,6 +37,12 @@ run_all_test_CPPFLAGS = \
 	$(CPPUTEST_INCLUDES)
 
 run_all_test_SOURCES = \
+	SimpleAllocTest.cc \
+	FragAllocTest.cc \
+	UnitAllocTest.cc \
+	FileTest.cc \
+	CombiGenTest.cc \
+	PermGenTest.cc \
 	main.cc
 
 run_all_test_LDADD = \
