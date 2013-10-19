@@ -72,8 +72,9 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SmtIdMgr::SmtIdMgr() :
-  mAlloc(4096)
+// @param[in] alloc メモリアロケータ
+SmtIdMgr::SmtIdMgr(Alloc& alloc) :
+  mAlloc(alloc)
 {
   mNum = 0;
   mTableSize = 0;

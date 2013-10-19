@@ -21,13 +21,13 @@ using namespace nsYm::nsSmtLibV2;
 
 TEST_GROUP(SmtSortMgrTestGroup)
 {
-  SmtIdMgr* IdMgr;
   SimpleAlloc* alloc;
+  SmtIdMgr* IdMgr;
   SmtSortMgr* SortMgr;
 
   TEST_SETUP() {
-    IdMgr = new SmtIdMgr;
     alloc = new SimpleAlloc(4096);
+    IdMgr = new SmtIdMgr(*alloc);
     SortMgr = new SmtSortMgr(*alloc, 0, NULL);
   }
 

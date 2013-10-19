@@ -20,6 +20,7 @@
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 class SmtIdMgr;
+class SmtTermMgr;
 class SmtSortMgr;
 class SmtFunMgr;
 class StackPage;
@@ -389,17 +390,20 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // SmtId を管理するクラス
-  SmtIdMgr* mIdMgr;
-
   // logic
   tSmtLogic mLogic;
 
   // スタック
   vector<StackPage*> mStack;
 
+  // SmtId を管理するクラス
+  SmtIdMgr* mIdMgr;
+
+  // SmtTerm を管理するクラス
+  SmtTermMgr* mTermMgr;
+
 };
 
 END_NAMESPACE_YM_SMTLIBV2
 
-#endif // SMTLIBMGR_H
+#endif // YM_SMTLIBV2_SMTMGR_H

@@ -11,6 +11,7 @@
 
 #include "ym_smtlibv2/SmtId.h"
 #include "SmtIdMgr.h"
+#include "ym_utils/SimpleAlloc.h"
 
 
 using namespace nsYm;
@@ -18,16 +19,18 @@ using namespace nsYm::nsSmtLibV2;
 
 TEST_GROUP(SmtIdMgrTestGroup)
 {
+  SimpleAlloc* alloc;
   SmtIdMgr* IdMgr;
 
-  TEST_SETUP()
-  {
-    IdMgr = new SmtIdMgr;
+  TEST_SETUP() {
+    alloc = new SimpleAlloc(4096);
+    IdMgr = new SmtIdMgr(*alloc);
   }
 
   TEST_TEARDOWN()
   {
     delete IdMgr;
+    delete alloc;
     ShString::free_all_memory();
   }
 };

@@ -12,9 +12,11 @@
 #include "ym_smtlibv2/SmtId.h"
 #include "ym_smtlibv2/SmtSort.h"
 #include "ym_smtlibv2/SmtFun.h"
+#include "ym_smtlibv2/SmtTerm.h"
 #include "SmtIdMgr.h"
 #include "SmtSortMgr.h"
 #include "SmtFunMgr.h"
+#include "SmtTermMgr.h"
 #include "ym_utils/SimpleAlloc.h"
 
 
@@ -23,22 +25,25 @@ using namespace nsYm::nsSmtLibV2;
 
 TEST_GROUP(SmtFunMgrTestGroup)
 {
-  SmtIdMgr* IdMgr;
   SimpleAlloc* alloc;
+  SmtIdMgr* IdMgr;
   SmtSortMgr* SortMgr;
   SmtFunMgr* FunMgr;
+  SmtTermMgr* TermMgr;
 
   TEST_SETUP() {
-    IdMgr = new SmtIdMgr;
     alloc = new SimpleAlloc(4096);
+    IdMgr = new SmtIdMgr(*alloc);
     SortMgr = new SmtSortMgr(*alloc, 0, NULL);
     FunMgr = new SmtFunMgr(*alloc, 0, NULL);
+    TermMgr = new SmtTermMgr(*alloc);
   }
 
   TEST_TEARDOWN() {
     delete IdMgr;
     delete SortMgr;
     delete FunMgr;
+    delete TermMgr;
     delete alloc;
     ShString::free_all_memory();
   }
@@ -264,4 +269,34 @@ TEST(SmtFunMgrTestGroup, param_decl2)
   const SmtFun* fun_eq = FunMgr->reg_fun(id_eq, eq_list, sort_a);
   // パラメータ0番が抜けているのでエラー
   CHECK( fun_eq == NULL );
+}
+
+// 関数定義のテスト
+TEST(SmtFunMgrTestGroup, fun_def)
+{
+  // (declare-sort a 0)
+  const SmtId* id_a = IdMgr->make_id(ShString("a"));
+  bool stat0 = SortMgr->reg_sort(id_a, 0);
+  CHECK( stat0 );
+  const SmtSort* sort_a = SortMgr->make_sort(id_a);
+  CHECK( sort_a != NULL );
+
+  const SmtTerm* body = TermMgr->make_numeric(0);
+  CHECK( body != NULL );
+
+  // (define-fun (f () a 0 ) )
+  const SmtId* id_f = IdMgr->make_id(ShString("f"));
+  CHECK( id_f != NULL );
+
+  const SmtFun* fun = FunMgr->reg_fun(id_f, vector<SmtSortedVar>(0), sort_a, body);
+  CHECK( fun != NULL );
+
+  LONGS_EQUAL( id_f->id(), fun->name()->id() );
+  LONGS_EQUAL( 0, fun->input_num() );
+  CHECK( sort_a == fun->output_sort() );
+
+  const SmtTerm* fbody = fun->body();
+  CHECK( fbody != NULL );
+  string sbody = term_str(fbody);
+  STRCMP_EQUAL( "0", sbody.c_str() );
 }

@@ -13,6 +13,7 @@
 #include "ym_smtlibv2/SmtSort.h"
 #include "ym_smtlibv2/SmtFun.h"
 #include "SmtIdMgr.h"
+#include "SmtTermMgr.h"
 #include "StackPage.h"
 #include "SmtConstTerm.h"
 #include "SmtIdTerm.h"
@@ -29,12 +30,14 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 
 // @brief コンストラクタ
 SmtMgr::SmtMgr() :
-  mIdMgr(new SmtIdMgr()),
   mLogic(kSmtLogic_NONE)
 {
   // スタックの初期化
   StackPage* page = new StackPage();
   mStack.push_back(page);
+
+  mIdMgr = new SmtIdMgr(alloc());
+  mTermMgr = new SmtTermMgr(alloc());
 }
 
 // @brief デストラクタ
@@ -46,6 +49,8 @@ SmtMgr::~SmtMgr()
        p != mStack.end(); ++ p) {
     delete *p;
   }
+  delete mIdMgr;
+  delete mTermMgr;
 }
 
 // @brief set-logic の処理を行う．
@@ -530,8 +535,7 @@ SmtMgr::find_fun(const SmtId* name_id)
 const SmtTerm*
 SmtMgr::make_numeric_term(ymuint32 val)
 {
-  void* p = alloc().get_memory(sizeof(SmtNumTerm));
-  return new (p) SmtNumTerm(val);
+  return mTermMgr->make_numeric(val);
 }
 
 // @brief <decimal> 型の term を作る．
@@ -539,8 +543,7 @@ SmtMgr::make_numeric_term(ymuint32 val)
 const SmtTerm*
 SmtMgr::make_decimal_term(const ShString& val)
 {
-  void* p = alloc().get_memory(sizeof(SmtDecTerm));
-  return new (p) SmtDecTerm(val);
+  return mTermMgr->make_decimal(val);
 }
 
 // @brief <hexadecimal> 型の term を作る．
@@ -548,8 +551,7 @@ SmtMgr::make_decimal_term(const ShString& val)
 const SmtTerm*
 SmtMgr::make_hexadecimal_term(const ShString& val)
 {
-  void* p = alloc().get_memory(sizeof(SmtHexTerm));
-  return new (p) SmtHexTerm(val);
+  return mTermMgr->make_hexadecimal(val);
 }
 
 // @brief <binary> 型の term を作る．
@@ -557,8 +559,7 @@ SmtMgr::make_hexadecimal_term(const ShString& val)
 const SmtTerm*
 SmtMgr::make_binary_term(const ShString& val)
 {
-  void* p = alloc().get_memory(sizeof(SmtBinTerm));
-  return new (p) SmtBinTerm(val);
+  return mTermMgr->make_binary(val);
 }
 
 // @brief <string> 型の term を作る．
@@ -566,8 +567,7 @@ SmtMgr::make_binary_term(const ShString& val)
 const SmtTerm*
 SmtMgr::make_string_term(const ShString& val)
 {
-  void* p = alloc().get_memory(sizeof(SmtStrTerm));
-  return new (p) SmtStrTerm(val);
+  return mTermMgr->make_string(val);
 }
 
 // @brief <symbol> 型の term を作る．
@@ -575,8 +575,7 @@ SmtMgr::make_string_term(const ShString& val)
 const SmtTerm*
 SmtMgr::make_symbol_term(const ShString& val)
 {
-  void* p = alloc().get_memory(sizeof(SmtSymbolTerm));
-  return new (p) SmtSymbolTerm(val);
+  return mTermMgr->make_symbol(val);
 }
 
 // @brief <keyword> 型の term を作る．
@@ -584,8 +583,7 @@ SmtMgr::make_symbol_term(const ShString& val)
 const SmtTerm*
 SmtMgr::make_keyword_term(const ShString& val)
 {
-  void* p = alloc().get_memory(sizeof(SmtKeywordTerm));
-  return new (p) SmtKeywordTerm(val);
+  return mTermMgr->make_keyword(val);
 }
 
 // @brief <identifier> 型の term を作る．
@@ -593,8 +591,7 @@ SmtMgr::make_keyword_term(const ShString& val)
 const SmtTerm*
 SmtMgr::make_identifier_term(const SmtId* id)
 {
-  void* p = alloc().get_memory(sizeof(SmtIdTerm));
-  return new (p) SmtIdTerm(id);
+  return mTermMgr->make_identifier(id);
 }
 
 // @brief <qualified identifier> 型の term を作る．
@@ -604,8 +601,7 @@ const SmtTerm*
 SmtMgr::make_qual_identifier_term(const SmtId* id,
 				  const SmtSort* sort)
 {
-  void* p = alloc().get_memory(sizeof(SmtQualIdTerm));
-  return new (p) SmtQualIdTerm(id, sort);
+  return mTermMgr->make_qual_identifier(id, sort);
 }
 
 // @brief function term を作る．
@@ -615,9 +611,7 @@ const SmtTerm*
 SmtMgr::make_fun_term(const SmtFun* function,
 		      const vector<const SmtTerm*>& input_list)
 {
-  ymuint n = input_list.size();
-  void* p = alloc().get_memory(sizeof(SmtFunTerm) + sizeof(const SmtTerm*) * ( n - 1));
-  return new (p) SmtFunTerm(function, input_list);
+  return mTermMgr->make_fun(function, input_list);
 }
 
 // @brief let 文を作る．
@@ -627,9 +621,7 @@ const SmtTerm*
 SmtMgr::make_let_term(const vector<SmtVarBinding>& var_binding,
 		      const SmtTerm* body)
 {
-  ymuint n = var_binding.size();
-  void* p = alloc().get_memory(sizeof(SmtLet) + sizeof(SmtVarBinding) * (n - 1));
-  return new (p) SmtLet(var_binding, body);
+  return mTermMgr->make_let(var_binding, body);
 }
 
 // @brief forall 文を作る．
@@ -639,9 +631,7 @@ const SmtTerm*
 SmtMgr::make_forall_term(const vector<SmtSortedVar>& var_list,
 			 const SmtTerm* body)
 {
-  ymuint n = var_list.size();
-  void* p = alloc().get_memory(sizeof(SmtForall) + sizeof(SmtSortedVar) * (n - 1));
-  return new (p) SmtForall(var_list, body);
+  return mTermMgr->make_forall(var_list, body);
 }
 
 // @brief exists 文を作る．
@@ -651,9 +641,7 @@ const SmtTerm*
 SmtMgr::make_exists_term(const vector<SmtSortedVar>& var_list,
 			 const SmtTerm* body)
 {
-  ymuint n = var_list.size();
-  void* p = alloc().get_memory(sizeof(SmtExists) + sizeof(SmtSortedVar) * (n - 1));
-  return new (p) SmtExists(var_list, body);
+  return mTermMgr->make_exists(var_list, body);
 }
 
 // @brief attr 文を作る．
@@ -663,9 +651,7 @@ const SmtTerm*
 SmtMgr::make_attr_term(const SmtTerm* body,
 		       const vector<SmtAttr>& attr_list)
 {
-  ymuint n = attr_list.size();
-  void* p = alloc().get_memory(sizeof(SmtAttrTerm) + sizeof(SmtAttr) * (n - 1));
-  return new (p) SmtAttrTerm(body, attr_list);
+  return mTermMgr->make_attr(body, attr_list);
 }
 
 // @brief list term を作る．
@@ -673,9 +659,7 @@ SmtMgr::make_attr_term(const SmtTerm* body,
 const SmtTerm*
 SmtMgr::make_list_term(const vector<const SmtTerm*>& term_list)
 {
-  ymuint n = term_list.size();
-  void* p = alloc().get_memory(sizeof(SmtListTerm) + sizeof(const SmtTerm*) * (n - 1));
-  return new (p) SmtListTerm(term_list);
+  return mTermMgr->make_list(term_list);
 }
 
 // @brief 現在の SortMgr を返す．

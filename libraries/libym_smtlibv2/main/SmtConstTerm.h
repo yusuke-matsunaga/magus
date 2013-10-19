@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 class SmtNumTerm :
   public SmtTermImpl
 {
-  friend class SmtMgr;
+  friend class SmtTermMgr;
 private:
 
   /// @brief コンストラクタ
@@ -67,7 +67,7 @@ private:
 class SmtStrTerm :
   public SmtTermImpl
 {
-  friend class SmtMgr;
+  friend class SmtTermMgr;
 protected:
 
   /// @brief コンストラクタ
@@ -113,7 +113,7 @@ private:
 class SmtDecTerm :
   public SmtStrTerm
 {
-  friend class SmtMgr;
+  friend class SmtTermMgr;
 private:
 
   /// @brief コンストラクタ
@@ -145,7 +145,7 @@ public:
 class SmtHexTerm :
   public SmtStrTerm
 {
-  friend class SmtMgr;
+  friend class SmtTermMgr;
 private:
 
   /// @brief コンストラクタ
@@ -177,7 +177,7 @@ public:
 class SmtBinTerm :
   public SmtStrTerm
 {
-  friend class SmtMgr;
+  friend class SmtTermMgr;
 private:
 
   /// @brief コンストラクタ
@@ -209,7 +209,7 @@ public:
 class SmtKeywordTerm :
   public SmtStrTerm
 {
-  friend class SmtMgr;
+  friend class SmtTermMgr;
 private:
 
   /// @brief コンストラクタ
@@ -241,7 +241,7 @@ public:
 class SmtSymbolTerm :
   public SmtStrTerm
 {
-  friend class SmtMgr;
+  friend class SmtTermMgr;
 private:
 
   /// @brief コンストラクタ

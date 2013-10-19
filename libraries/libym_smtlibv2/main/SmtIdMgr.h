@@ -11,7 +11,7 @@
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
 #include "ym_utils/ShString.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -33,7 +33,8 @@ class SmtIdMgr
 public:
 
   /// @brief コンストラクタ
-  SmtIdMgr();
+  /// @param[in] alloc メモリアロケータ
+  SmtIdMgr(Alloc& alloc);
 
   /// @brief デストラクタ
   ~SmtIdMgr();
@@ -69,7 +70,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // メモリ確保用のオブジェクト
-  SimpleAlloc mAlloc;
+  Alloc& mAlloc;
 
   // 登録されている要素数
   ymuint32 mNum;

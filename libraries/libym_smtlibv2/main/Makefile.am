@@ -49,7 +49,9 @@ libym_smt_main_la_SOURCES = \
 	SmtSortMgr.h \
 	SmtSortMgr.cc \
 	SmtTermImpl.h \
-	SmtTermImpl.cc
+	SmtTermImpl.cc \
+	SmtTermMgr.h \
+	SmtTermMgr.cc
 
 libym_smt_main_la_LIBADD =
 
