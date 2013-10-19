@@ -9,11 +9,6 @@
 
 #include "SmtTermMgr.h"
 
-//#include "ym_smtlibv2/SmtId.h"
-//#include "ym_smtlibv2/SmtSort.h"
-//#include "ym_smtlibv2/SmtFun.h"
-//#include "SmtIdMgr.h"
-//#include "StackPage.h"
 #include "SmtConstTerm.h"
 #include "SmtIdTerm.h"
 #include "SmtCompTerm.h"
@@ -130,8 +125,13 @@ SmtTermMgr::make_fun(const SmtFun* function,
 		     const vector<const SmtTerm*>& input_list)
 {
   ymuint n = input_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtFunTerm) + sizeof(const SmtTerm*) * ( n - 1));
-  return new (p) SmtFunTerm(function, input_list);
+  if ( n == 0 ) {
+    return NULL;
+  }
+  else {
+    void* p = mAlloc.get_memory(sizeof(SmtFunTerm) + sizeof(const SmtTerm*) * ( n - 1));
+    return new (p) SmtFunTerm(function, input_list);
+  }
 }
 
 // @brief let 文を作る．
@@ -142,8 +142,13 @@ SmtTermMgr::make_let(const vector<SmtVarBinding>& var_binding,
 		     const SmtTerm* body)
 {
   ymuint n = var_binding.size();
-  void* p = mAlloc.get_memory(sizeof(SmtLet) + sizeof(SmtVarBinding) * (n - 1));
-  return new (p) SmtLet(var_binding, body);
+  if ( n == 0 ) {
+    return NULL;
+  }
+  else {
+    void* p = mAlloc.get_memory(sizeof(SmtLet) + sizeof(SmtVarBinding) * (n - 1));
+    return new (p) SmtLet(var_binding, body);
+  }
 }
 
 // @brief forall 文を作る．
@@ -154,8 +159,13 @@ SmtTermMgr::make_forall(const vector<SmtSortedVar>& var_list,
 			const SmtTerm* body)
 {
   ymuint n = var_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtForall) + sizeof(SmtSortedVar) * (n - 1));
-  return new (p) SmtForall(var_list, body);
+  if ( n == 0 ) {
+    return NULL;
+  }
+  else {
+    void* p = mAlloc.get_memory(sizeof(SmtForall) + sizeof(SmtSortedVar) * (n - 1));
+    return new (p) SmtForall(var_list, body);
+  }
 }
 
 // @brief exists 文を作る．
@@ -166,8 +176,13 @@ SmtTermMgr::make_exists(const vector<SmtSortedVar>& var_list,
 			const SmtTerm* body)
 {
   ymuint n = var_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtExists) + sizeof(SmtSortedVar) * (n - 1));
-  return new (p) SmtExists(var_list, body);
+  if ( n == 0 ) {
+    return NULL;
+  }
+  else {
+    void* p = mAlloc.get_memory(sizeof(SmtExists) + sizeof(SmtSortedVar) * (n - 1));
+    return new (p) SmtExists(var_list, body);
+  }
 }
 
 // @brief attr 文を作る．
@@ -178,8 +193,13 @@ SmtTermMgr::make_attr(const SmtTerm* body,
 		      const vector<SmtAttr>& attr_list)
 {
   ymuint n = attr_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtAttrTerm) + sizeof(SmtAttr) * (n - 1));
-  return new (p) SmtAttrTerm(body, attr_list);
+  if ( n == 0 ) {
+    return NULL;
+  }
+  else {
+    void* p = mAlloc.get_memory(sizeof(SmtAttrTerm) + sizeof(SmtAttr) * (n - 1));
+    return new (p) SmtAttrTerm(body, attr_list);
+  }
 }
 
 // @brief list term を作る．
@@ -188,8 +208,13 @@ const SmtTerm*
 SmtTermMgr::make_list(const vector<const SmtTerm*>& term_list)
 {
   ymuint n = term_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtListTerm) + sizeof(const SmtTerm*) * (n - 1));
-  return new (p) SmtListTerm(term_list);
+  if ( n == 0 ) {
+    return NULL;
+  }
+  else {
+    void* p = mAlloc.get_memory(sizeof(SmtListTerm) + sizeof(const SmtTerm*) * (n - 1));
+    return new (p) SmtListTerm(term_list);
+  }
 }
 
 END_NAMESPACE_YM_SMTLIBV2

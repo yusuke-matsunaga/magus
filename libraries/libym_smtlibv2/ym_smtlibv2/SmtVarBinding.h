@@ -21,6 +21,23 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 struct SmtVarBinding
 {
 
+  /// @brief 空のコンストラクタ
+  SmtVarBinding() :
+    mVar(NULL),
+    mExpr(NULL)
+  {
+  }
+
+  /// @brief コンストラクタ
+  /// @param[in] var 変数
+  /// @param[in] expr 割り当て式
+  SmtVarBinding(const SmtId* var,
+		const SmtTerm* expr) :
+    mVar(var),
+    mExpr(expr)
+  {
+  }
+
   /// @brief 変数
   const SmtId* mVar;
 

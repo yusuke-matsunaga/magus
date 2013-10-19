@@ -42,6 +42,7 @@ run_all_test_SOURCES = \
 	SmtIdMgrTest.cc \
 	SmtFunMgrTest.cc \
 	SmtSortMgrTest.cc \
+	SmtTermMgrTest.cc \
 	main.cc
 
 run_all_test_LDADD = \

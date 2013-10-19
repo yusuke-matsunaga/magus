@@ -21,6 +21,23 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 struct SmtSortedVar
 {
 
+  /// @brief 空のコンストラクタ
+  SmtSortedVar():
+    mSort(NULL),
+    mVar(NULL)
+  {
+  }
+
+  /// @brief コンストラクタ
+  /// @param[in] sort 型
+  /// @param[in] var 変数
+  SmtSortedVar(const SmtSort* sort,
+	       const SmtId* var) :
+    mSort(sort),
+    mVar(var)
+  {
+  }
+
   /// @brief 型
   const SmtSort* mSort;
 

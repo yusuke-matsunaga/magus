@@ -22,10 +22,23 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 struct SmtAttr
 {
 
+  /// @brief 空のコンストラクタ
+  SmtAttr() :
+    mValue(NULL)
+  {
+  }
+
   /// @brief コンストラクタ
   explicit
-  SmtAttr(const ShString& keyword = ShString(),
-	  const SmtTerm* value = NULL) :
+  SmtAttr(const ShString& keyword) :
+    mKeyword(keyword),
+    mValue(NULL)
+  {
+  }
+
+  /// @brief コンストラクタ
+  SmtAttr(const ShString& keyword,
+	  const SmtTerm* value) :
     mKeyword(keyword),
     mValue(value)
   {

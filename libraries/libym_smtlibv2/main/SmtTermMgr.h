@@ -90,6 +90,7 @@ public:
   /// @brief function term を作る．
   /// @param[in] function 関数
   /// @param[in] input_list 入力のリスト
+  /// @note input_list のサイズは 1 以上
   const SmtTerm*
   make_fun(const SmtFun* function,
 	   const vector<const SmtTerm*>& input_list);
@@ -97,6 +98,7 @@ public:
   /// @brief let 文を作る．
   /// @param[in] var_binding 変数割り当てのリスト
   /// @param[in] body 本体
+  /// @note var_binding のサイズは 1 以上
   const SmtTerm*
   make_let(const vector<SmtVarBinding>& var_binding,
 	   const SmtTerm* body);
@@ -104,6 +106,7 @@ public:
   /// @brief forall 文を作る．
   /// @param[in] var_list 変数リスト
   /// @param[in] body 本体
+  /// @note var_list のサイズは 1 以上
   const SmtTerm*
   make_forall(const vector<SmtSortedVar>& var_list,
 	      const SmtTerm* body);
@@ -111,6 +114,7 @@ public:
   /// @brief exists 文を作る．
   /// @param[in] var_list 変数リスト
   /// @param[in] body 本体
+  /// @note var_list のサイズは 1 以上
   const SmtTerm*
   make_exists(const vector<SmtSortedVar>& var_list,
 	      const SmtTerm* body);
@@ -118,6 +122,7 @@ public:
   /// @brief attr 文を作る．
   /// @param[in] body 本体
   /// @param[in] attr_list 属性リスト
+  /// @note attr_list のサイズは 1 以上
   const SmtTerm*
   make_attr(const SmtTerm* body,
 	    const vector<SmtAttr>& attr_list);
