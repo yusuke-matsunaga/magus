@@ -25,7 +25,9 @@ libym_smt_shell_la_CPPFLAGS = \
 	-I$(top_srcdir)/include
 
 libym_smt_shell_la_SOURCES = \
-	SmtShell.cc
+	ShellImpl.h \
+	ShellImpl.cc \
+	SmtLibShell.cc
 
 libym_smt_shell_la_LIBADD =
 

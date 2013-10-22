@@ -1,13 +1,13 @@
 
-/// @file libym_smtlibv2/test/SmtShell_test.cc
-/// @brief SmtShell のテストプログラム
+/// @file libym_smtlibv2/test/SmtLibShell_test.cc
+/// @brief SmtLibShell のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_smtlibv2/SmtShell.h"
+#include "ym_smtlibv2/SmtLibShell.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
@@ -15,9 +15,9 @@
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 void
-SmtShell_test()
+SmtLibShell_test()
 {
-  SmtShell shell;
+  SmtLibShell shell;
 
   StreamMsgHandler mh(&cerr);
 
@@ -35,7 +35,7 @@ main(int argc,
 {
   using namespace std;
 
-  nsYm::nsSmtLibV2::SmtShell_test();
+  nsYm::nsSmtLibV2::SmtLibShell_test();
 
   return 0;
 }

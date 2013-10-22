@@ -11,7 +11,7 @@ noinst_HEADERS = \
 	SmtAttr.h \
 	SmtFun.h \
 	SmtId.h \
+	SmtLibShell.h \
 	SmtMgr.h \
-	SmtShell.h \
 	SmtSort.h \
 	SmtTerm.h

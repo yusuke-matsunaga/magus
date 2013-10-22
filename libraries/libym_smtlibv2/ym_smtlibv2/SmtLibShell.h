@@ -1,7 +1,7 @@
-#ifndef YM_SMTLIBV2_SMTLIBSHELL_H
-#define YM_SMTLIBV2_SMTLIBSHELL_H
+#ifndef YM_SMTLiBV2_SMTLIBSHELL_H
+#define YM_SMTLiBV2_SMTLIBSHELL_H
 
-/// @file ym_smtlibv2/SmtLibShell.h
+/// @file SmtLibShell.h
 /// @brief SmtLibShell のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -14,11 +14,11 @@
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-class SmtLibMgr;
+class ShellImpl;
 
 //////////////////////////////////////////////////////////////////////
-/// @class SmtLibShell SmtLibShell.h "ym_smtlibv2/SmtLibShell.h"
-/// @brief SmtLib 用のシェルを実現するクラス
+/// @class SmtLibShell SmtLibShell.h "SmtLibShell.h"
+/// @brief SmtLib の S式の evaluation を行うクラス
 //////////////////////////////////////////////////////////////////////
 class SmtLibShell
 {
@@ -36,12 +36,9 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief コマンドを登録する．
-  /// @param[in] cmd_name コマンド名
-  /// @param[in] cmd コマンドオブジェクト
+  /// @brief 実行する．
   void
-  reg_command(const string& cmd_name,
-	      SmtLibCmd* cmd);
+  run();
 
 
 private:
@@ -49,11 +46,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 実際の処理を行うクラス
-  SmtLibMgr* mMgr;
+  // 実際の処理を行なうクラス
+  ShellImpl* mImpl;
 
 };
 
 END_NAMESPACE_YM_SMTLIBV2
 
-#endif // YM_SMTLIBV2_SMTLIBSHELL_H
+#endif //  YM_SMTLiBV2_SMTLIBSHELL_H

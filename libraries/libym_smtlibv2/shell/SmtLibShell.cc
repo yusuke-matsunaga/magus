@@ -8,7 +8,7 @@
 
 
 #include "ym_smtlibv2/SmtLibShell.h"
-#include "SmtLibMgr.h"
+#include "ShellImpl.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -20,13 +20,20 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 // @brief コンストラクタ
 SmtLibShell::SmtLibShell()
 {
-  mMgr = new SmtLibMgr;
+  mImpl = new ShellImpl();
 }
 
 // @brief デストラクタ
 SmtLibShell::~SmtLibShell()
 {
-  delete mMgr;
+  delete mImpl;
+}
+
+// @brief 実行する．
+void
+SmtLibShell::run()
+{
+  mImpl->run();
 }
 
 END_NAMESPACE_YM_SMTLIBV2

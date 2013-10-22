@@ -1,8 +1,8 @@
-#ifndef YM_SMTLiBV2_SMTSHELL_H
-#define YM_SMTLiBV2_SMTSHELL_H
+#ifndef SHELLIMPL_H
+#define SHELLIMPL_H
 
-/// @file SmtLibMgr.h
-/// @brief SmtLibMgr のヘッダファイル
+/// @file ShellImpl.h
+/// @brief ShellImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -20,18 +20,18 @@ class SmtLibParser;
 class SmtLibNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class SmtShell SmtShell.h "SmtShell.h"
+/// @class ShellImpl ShellImpl.h "ShellImpl.h"
 /// @brief SmtLib の S式の evaluation を行うクラス
 //////////////////////////////////////////////////////////////////////
-class SmtShell
+class ShellImpl
 {
 public:
 
   /// @brief コンストラクタ
-  SmtShell();
+  ShellImpl();
 
   /// @brief デストラクタ
-  ~SmtShell();
+  ~ShellImpl();
 
 
 public:
@@ -146,6 +146,26 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief let 文の処理を行なう．
+  /// @param[in] node 引数の先頭ノード
+  const SmtTerm*
+  eval_to_let(const SmtLibNode* node);
+
+  /// @brief forall 文の処理を行なう．
+  /// @param[in] node 引数の先頭ノード
+  const SmtTerm*
+  eval_to_forall(const SmtLibNode* node);
+
+  /// @brief exists 文の処理を行なう．
+  /// @param[in] node 引数の先頭ノード
+  const SmtTerm*
+  eval_to_exists(const SmtLibNode* node);
+
+  /// @brief attr 文の処理を行なう．
+  /// @param[in] node 引数の先頭ノード
+  const SmtTerm*
+  eval_to_attr_term(const SmtLibNode* node);
+
   /// @brief S式を識別子に変換する．
   /// @param[in] node S式を表すノード
   const SmtId*
@@ -188,19 +208,14 @@ private:
 
   /// @brief S式を var_binding に変換する．
   /// @param[in] node S式を表すノード
-  /// @param[out] var_binding 結果を格納する変数
+  /// @param[out] id 変数のID番号
+  /// @param[out] term 置き換える式
   /// @retval true 変換が成功した．
   /// @retval false 変換が失敗した．
   bool
   eval_to_var_binding(const SmtLibNode* node,
-		      SmtVarBinding& var_binding);
-
-  /// @brief S式を attribute に変換する．
-  /// @param[in] node S式を表すノード
-  /// @param[out] attr_list 結果の attribute のリストを格納する変数
-  bool
-  eval_to_attr(const SmtLibNode* node,
-	       vector<SmtAttr>& attr_list);
+		      ymuint32& id,
+		      const SmtTerm*& term);
 
   /// @brief 引数のリストをパーズする．
   /// @param[in] arg_top 引数の先頭のノード
@@ -256,8 +271,11 @@ private:
   // ループフラグ
   bool mLoop;
 
+  // エラーメッセージ用のバッファ
+  ostringstream mErrBuf;
+
 };
 
 END_NAMESPACE_YM_SMTLIBV2
 
-#endif //  YM_SMTLiBV2_SMTSHELL_H
+#endif //  SHELLIMPL_H

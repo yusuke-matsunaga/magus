@@ -81,7 +81,7 @@ TEST(SmtTermMgrTestGroup, make_decimal)
 // make_hexadecimal テスト
 TEST(SmtTermMgrTestGroup, make_hexadecimal)
 {
-  const char* STR_VAL = "";
+  const char* STR_VAL = "#x0Ae9";
   const SmtTerm* term = TermMgr->make_hexadecimal(ShString(STR_VAL));
   CHECK( term != NULL );
 
@@ -92,7 +92,7 @@ TEST(SmtTermMgrTestGroup, make_hexadecimal)
 // make_binary テスト
 TEST(SmtTermMgrTestGroup, make_binary)
 {
-  const char* STR_VAL = "";
+  const char* STR_VAL = "#b0110";
   const SmtTerm* term = TermMgr->make_binary(ShString(STR_VAL));
   CHECK( term != NULL );
 
@@ -103,7 +103,7 @@ TEST(SmtTermMgrTestGroup, make_binary)
 // make_string テスト
 TEST(SmtTermMgrTestGroup, make_string)
 {
-  const char* STR_VAL = "";
+  const char* STR_VAL = "string ";
   const SmtTerm* term = TermMgr->make_string(ShString(STR_VAL));
   CHECK( term != NULL );
 
