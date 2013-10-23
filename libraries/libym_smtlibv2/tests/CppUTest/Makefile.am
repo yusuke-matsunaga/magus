@@ -35,10 +35,12 @@ run_all_test_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/parser \
 	-I$(top_srcdir)/main \
 	$(CPPUTEST_INCLUDES)
 
 run_all_test_SOURCES = \
+	SmtLibScannerTest.cc \
 	SmtIdMgrTest.cc \
 	SmtFunMgrTest.cc \
 	SmtSortMgrTest.cc \

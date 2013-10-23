@@ -251,15 +251,15 @@ public:
   const SmtSort*
   make_param_sort(ymuint pid);
 
-  /// @brief 関数を返す．
-  /// @param[in] name_id 関数名
-  /// @return 指定された名前の関数を返す．
+  /// @brief 名前から変数か関数を探す
+  /// @param[in] name_id 名前を表す識別子
+  /// @return 指定された名前の変数または関数を返す．
   /// @note エラーの場合には NULL を返す．
   ///
   /// エラーの原因は以下のとおり
   ///  - name_id という名の関数が登録されていなかった．
-  const SmtFun*
-  find_fun(const SmtId* name_id);
+  const SmtVarFun*
+  find_obj(const SmtId* name_id);
 
   /// @brief <numeric> 型の term を作る．
   /// @param[in] val 値
@@ -312,7 +312,7 @@ public:
   /// @param[in] function 関数
   /// @param[in] input_list 入力のリスト
   const SmtTerm*
-  make_fun_term(const SmtFun* function,
+  make_fun_term(const SmtVarFun* function,
 		const vector<const SmtTerm*>& input_list);
 
   /// @brief let 文を作る．

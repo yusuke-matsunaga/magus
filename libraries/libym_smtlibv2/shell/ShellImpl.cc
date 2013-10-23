@@ -1131,7 +1131,7 @@ ShellImpl::eval_to_term(const SmtLibNode* node)
   case kSymbolToken:
     {
       ShString name = node->str_value();
-      cosnt SmtId* id = mMgr.make_id(name);
+      const SmtId* id = mMgr.make_id(name);
       // id が置き換え対象ならそれを返す．
       return mMgr.make_identifier(id);
     }
