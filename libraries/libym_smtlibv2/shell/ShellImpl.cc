@@ -11,10 +11,10 @@
 #include "SmtLibParser.h"
 #include "SmtLibNode.h"
 
+#include "ym_smtlibv2/SmtAttr.h"
 #include "ym_smtlibv2/SmtId.h"
 #include "ym_smtlibv2/SmtSort.h"
-#include "ym_smtlibv2/SmtFun.h"
-#include "ym_smtlibv2/SmtAttr.h"
+#include "ym_smtlibv2/SmtVarFun.h"
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -653,57 +653,55 @@ ShellImpl::define_fun(const SmtLibNode* arg_top)
   // このコマンドは4つの引数をとる．
   vector<const SmtLibNode*> arg_list;
   const SmtId* name = NULL;
-  vector<SmtSortedVar> var_list;
+  vector<const SmtVarFun*> var_list;
   const SmtSort* output_sort = NULL;
   const SmtTerm* body = NULL;
 
-  const char* emsg = "";
-
   if ( !parse_args(arg_top, 4, arg_list) ) {
-    emsg = "syntax error";
+    mErrBuf << "syntax error";
     goto syntax_error;
   }
 
   // 1つめは名前
   name = eval_to_id(arg_list[0]);
   if ( name == NULL ) {
-    emsg = "first argument is not an identifier";
+    mErrBuf << "first argument is not an identifier";
     goto syntax_error;
   }
 
   // 2つめは変数のリスト
   if ( arg_list[1]->type() != kListToken ) {
-    emsg = "second argument is not 'list' type";
+    mErrBuf <<  "second argument is not 'list' type";
     goto syntax_error;
   }
   var_list.reserve(arg_list[1]->child_num());
   for (const SmtLibNode* node = arg_list[1]->child();
        node != NULL; node = node->sibling()) {
-    SmtSortedVar sorted_var;
-    if ( !eval_to_sorted_var(node, sorted_var) ) {
-      emsg = "sorted var is expected.";
+    const SmtVarFun* var = eval_to_sorted_var(node);
+    if ( var == NULL ) {
+      mErrBuf << "sorted var is expected.";
       goto syntax_error;
     }
-    var_list.push_back(sorted_var);
+    var_list.push_back(var);
   }
 
   // 3つめは出力の型
   output_sort = eval_to_sort(arg_list[2]);
   if ( output_sort == NULL ) {
-    emsg = "third argument is not a valid sort";
+    mErrBuf << "third argument is not a valid sort";
     goto syntax_error;
   }
 
   // 4つめは本体の式
   body = eval_to_term(arg_list[3]);
   if ( body == NULL ) {
-    emsg = "forth argument is not a valid term";
+    mErrBuf << "forth argument is not a valid term";
     goto syntax_error;
   }
 
   // 関数を登録する．
   if ( !mMgr.define_fun(name, var_list, output_sort, body) ) {
-    emsg = "already defined";
+    mErrBuf << "already defined";
     goto syntax_error;
   }
 
@@ -715,7 +713,7 @@ ShellImpl::define_fun(const SmtLibNode* arg_top)
 
  syntax_error:
   if ( debug ) {
-    cerr << "  ==> error: " << emsg << endl;
+    cerr << "  ==> error: " << mErrBuf.str() << endl;
   }
 
   return false;
@@ -732,11 +730,9 @@ ShellImpl::assert(const SmtLibNode* arg_top)
     cerr << endl;
   }
 
-  const char* emsg = "";
-
   // このコマンドは1つの引数をとる．
   if ( arg_top == NULL || arg_top->sibling() != NULL ) {
-    emsg = "syntax error";
+    mErrBuf <<  "syntax error";
     goto syntax_error;
   }
   else {
@@ -758,7 +754,7 @@ ShellImpl::assert(const SmtLibNode* arg_top)
 
  syntax_error:
   if ( debug ) {
-    cerr << "  ==> error: " << emsg << endl;
+    cerr << "  ==> error: " << mErrBuf.str() << endl;
   }
 
   return false;
@@ -775,13 +771,11 @@ ShellImpl::push(const SmtLibNode* arg_top)
     cerr << endl;
   }
 
-  const char* emsg = "";
-
   // このコマンドは1つの整数値を引数にとる．
   if ( arg_top == NULL ||
        arg_top->sibling() != NULL ||
        arg_top->type() != kNumToken ) {
-    emsg = "syntax error";
+    mErrBuf <<  "syntax error";
     goto syntax_error;
   }
 
@@ -801,7 +795,7 @@ ShellImpl::push(const SmtLibNode* arg_top)
  syntax_error:
 
   if ( debug ) {
-    cerr << "  ==> error: " << emsg << endl;
+    cerr << "  ==> error: " << mErrBuf.str() << endl;
   }
 
   return false;
@@ -819,20 +813,18 @@ ShellImpl::pop(const SmtLibNode* arg_top)
     cerr << endl;
   }
 
-  const char* emsg = "";
-
   // このコマンドは1つの整数値を引数にとる．
   if ( arg_top == NULL ||
        arg_top->sibling() != NULL ||
        arg_top->type() != kNumToken ) {
-    emsg = "syntax error";
+    mErrBuf <<  "syntax error";
     goto syntax_error;
   }
 
   {
     ymuint num = arg_top->int_value();
     if ( !mMgr.pop(num) ) {
-      emsg = "arg is too large";
+      mErrBuf <<  "arg is too large";
       goto syntax_error;
     }
   }
@@ -846,7 +838,7 @@ ShellImpl::pop(const SmtLibNode* arg_top)
  syntax_error:
 
   if ( debug ) {
-    cerr << "  ==> error: " << emsg << endl;
+    cerr << "  ==> error: " << mErrBuf.str() << endl;
   }
 
   return false;
@@ -1133,7 +1125,20 @@ ShellImpl::eval_to_term(const SmtLibNode* node)
       ShString name = node->str_value();
       const SmtId* id = mMgr.make_id(name);
       // id が置き換え対象ならそれを返す．
-      return mMgr.make_identifier(id);
+
+      const SmtVarFun* obj = mMgr.find_obj(id);
+      if ( obj != NULL ) {
+	if ( obj->is_var() ) {
+	  return mMgr.make_var_term(obj);
+	}
+	else {
+	  return mMgr.make_fun_term(obj, vector<const SmtTerm*>(0));
+	}
+      }
+      else {
+	const SmtVarFun* obj = mMgr.make_var(id, NULL);
+	return mMgr.make_var_term(obj);
+      }
     }
 
   case kListToken:
@@ -1145,15 +1150,15 @@ ShellImpl::eval_to_term(const SmtLibNode* node)
   }
 
   // ここに来ているということは node->type() == kListToken
+  {
+    const SmtLibNode* node1 = node->child();
+    assert_cond( node1 != NULL, __FILE__, __LINE__);
 
-  const SmtLibNode* node1 = node->child();
-  assert_cond( node1 != NULL, __FILE__, __LINE__);
-
-  if (
-  // qual_identifier の場合
-  const SmtTerm* term = eval_to_qid(node);
-  if ( term != NULL ) {
-    return term;
+    // qual_identifier の場合
+    const SmtTerm* term = eval_to_qid(node);
+    if ( term != NULL ) {
+      return term;
+    }
   }
 
   // 残りは ( identifier term+ ) の形
@@ -1184,32 +1189,38 @@ ShellImpl::eval_to_term(const SmtLibNode* node)
       mErrBuf << "not an identifier: " << node1->loc();
       goto syntax_error;
     }
-    const SmtFun* fun = mMgr.find_fun(fid);
-    if ( fun != NULL ) {
-      if ( fun->attr() == SmtFun::kNone && fun->input_num() != n - 1) {
-	// 引数の数が合わない．
-	mErrBuf << "# of args for function '" << fun->name()->name()
-		<< "' mismatch: " << node->loc();
-	mErrBuf << " fun->input_num() = " << fun->input_num()
-		<< ", n = " << n;
+    else {
+      const SmtVarFun* fun = mMgr.find_obj(fid);
+      if ( fun != NULL ) {
+	if ( !fun->is_fun() ) {
+	  mErrBuf << fun->name()->name() << " is not a function";
+	  goto syntax_error;
+	}
+	if ( fun->fun_attr() == SmtVarFun::kNone && fun->input_num() != n - 1) {
+	  // 引数の数が合わない．
+	  mErrBuf << "# of args for function '" << fun->name()->name()
+		  << "' mismatch: " << node->loc();
+	  mErrBuf << " fun->input_num() = " << fun->input_num()
+		  << ", n = " << n;
+	  goto syntax_error;
+	}
+	vector<const SmtTerm*> input_list;
+	input_list.reserve(n - 1);
+	for (const SmtLibNode* node2 = node1->sibling();
+	     node2 != NULL; node2 = node2->sibling()) {
+	  const SmtTerm* term1 = eval_to_term(node2);
+	  if ( term1 == NULL ) {
+	    // エラーメッセージは下位の呼び出しで出力されているはず
+	    return NULL;
+	  }
+	  input_list.push_back(term1);
+	}
+	return mMgr.make_fun_term(fun, input_list);
+      }
+      else {
+	mErrBuf << fid->name() << ": undefined: " << node1->loc();
 	goto syntax_error;
       }
-      vector<const SmtTerm*> input_list;
-      input_list.reserve(n - 1);
-      for (const SmtLibNode* node2 = node1->sibling();
-	   node2 != NULL; node2 = node2->sibling()) {
-	const SmtTerm* term1 = eval_to_term(node2);
-	if ( term1 == NULL ) {
-	  // エラーメッセージは下位の呼び出しで出力されているはず
-	  return NULL;
-	}
-	input_list.push_back(term1);
-      }
-      return mMgr.make_fun_term(fun, input_list);
-    }
-    else {
-      mErrBuf << fid->name() << ": undefined: " << node1->loc();
-      goto syntax_error;
     }
   }
 
@@ -1275,16 +1286,16 @@ ShellImpl::eval_to_forall(const SmtLibNode* node)
     return NULL;
   }
 
-  vector<SmtSortedVar> sorted_var_list;
-  sorted_var_list.reserve(node2->child_num());
+  vector<const SmtVarFun*> var_list;
+  var_list.reserve(node2->child_num());
   for (const SmtLibNode* node21 = node2->child();
        node21 != NULL; node21 = node21->sibling()) {
-    SmtSortedVar sorted_var;
-    if ( !eval_to_sorted_var(node21, sorted_var) ) {
+    const SmtVarFun* var = eval_to_sorted_var(node21);
+    if ( var == NULL ) {
       // エラーメッセージは eval_to_sorted_var() 中で出力されているはず
       return NULL;
     }
-    sorted_var_list.push_back(sorted_var);
+    var_list.push_back(var);
   }
 
   const SmtLibNode* node3 = arg_list[1];
@@ -1293,7 +1304,7 @@ ShellImpl::eval_to_forall(const SmtLibNode* node)
     // エラーメッセージは下位の呼び出しで出力されているはず
     return NULL;
   }
-  return mMgr.make_forall_term(sorted_var_list, body);
+  return mMgr.make_forall_term(var_list, body);
 }
 
 // @brief exists 文の処理を行なう．
@@ -1313,16 +1324,16 @@ ShellImpl::eval_to_exists(const SmtLibNode* node)
     return NULL;
   }
 
-  vector<SmtSortedVar> sorted_var_list;
-  sorted_var_list.reserve(node2->child_num());
+  vector<const SmtVarFun*> var_list;
+  var_list.reserve(node2->child_num());
   for (const SmtLibNode* node21 = node2->child();
        node21 != NULL; node21 = node21->sibling()) {
-    SmtSortedVar sorted_var;
-    if ( !eval_to_sorted_var(node21, sorted_var) ) {
+    const SmtVarFun* var = eval_to_sorted_var(node21);
+    if ( var == NULL ) {
       // エラーメッセージは eval_to_sorted_var() 中で出力されているはず
       return NULL;
     }
-    sorted_var_list.push_back(sorted_var);
+    var_list.push_back(var);
   }
 
   const SmtLibNode* node3 = arg_list[1];
@@ -1331,7 +1342,7 @@ ShellImpl::eval_to_exists(const SmtLibNode* node)
     // エラーメッセージは下位の呼び出しで出力されているはず
     return NULL;
   }
-  return mMgr.make_exists_term(sorted_var_list, body);
+  return mMgr.make_exists_term(var_list, body);
 }
 
 // @brief attr 文の処理を行なう．
@@ -1424,26 +1435,18 @@ ShellImpl::eval_to_expr(const SmtLibNode* node)
 const SmtTerm*
 ShellImpl::eval_to_qid(const SmtLibNode* node)
 {
-  // ただの identifier の場合もある．
-  const SmtId* id = eval_to_id(node);
-  if ( id != NULL ) {
-    return mMgr.make_identifier_term(id);
-  }
-
-  // それ以外は ( 'as' <identifier> <sort> ) の形
+  // ( 'as' <identifier> <sort> ) の形かどうか調べる．
   vector<const SmtLibNode*> arg_list;
   if ( !parse_args(node, 3, arg_list) ) {
     return NULL;
   }
 
-  if ( arg_list[0]->type() != kSymbolToken ) {
-    return NULL;
-  }
-  if ( strcmp("as", static_cast<const char*>(arg_list[0]->str_value())) != 0 ) {
+  if ( arg_list[0]->type() != kSymbolToken ||
+       strcmp("as", static_cast<const char*>(arg_list[0]->str_value())) != 0 ) {
     return NULL;
   }
 
-  id = eval_to_id(arg_list[1]);
+  const SmtId* id = eval_to_id(arg_list[1]);
   if ( id == NULL ) {
     return NULL;
   }
@@ -1453,17 +1456,17 @@ ShellImpl::eval_to_qid(const SmtLibNode* node)
     return NULL;
   }
 
-  return mMgr.make_qual_identifier_term(id, sort);
+  const SmtVarFun* obj = mMgr.make_var(id, sort);
+  if ( obj == NULL ) {
+    return NULL;
+  }
+  return mMgr.make_var_term(obj);
 }
 
 // @brief S式を sorted_var に変換する．
 // @param[in] node S式を表すノード
-// @param[out] sorted_var 結果を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．
-bool
-ShellImpl::eval_to_sorted_var(const SmtLibNode* node,
-			      SmtSortedVar& sorted_var)
+const SmtVarFun*
+ShellImpl::eval_to_sorted_var(const SmtLibNode* node)
 {
   // ( <identifier> <sort> ) の形
   vector<const SmtLibNode*> arg_list;
@@ -1486,10 +1489,7 @@ ShellImpl::eval_to_sorted_var(const SmtLibNode* node,
     return false;
   }
 
-  sorted_var.mVar = id;
-  sorted_var.mSort = sort;
-
-  return true;
+  return mMgr.make_var(id, sort);
 
  syntax_error:
   if ( debug ) {

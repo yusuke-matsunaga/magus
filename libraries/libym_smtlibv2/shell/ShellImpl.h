@@ -199,12 +199,8 @@ private:
 
   /// @brief S式を sorted_var に変換する．
   /// @param[in] node S式を表すノード
-  /// @param[out] sorted_var 結果を格納する変数
-  /// @retval true 変換が成功した．
-  /// @retval false 変換が失敗した．
-  bool
-  eval_to_sorted_var(const SmtLibNode* node,
-		     SmtSortedVar& sorted_var);
+  const SmtVarFun*
+  eval_to_sorted_var(const SmtLibNode* node);
 
   /// @brief S式を var_binding に変換する．
   /// @param[in] node S式を表すノード

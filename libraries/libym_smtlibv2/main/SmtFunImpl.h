@@ -8,6 +8,7 @@
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
+#error "obsolete"
 
 #include "ym_smtlibv2/SmtFun.h"
 #include "ym_smtlibv2/SmtSortedVar.h"

@@ -42,7 +42,7 @@ run_all_test_CPPFLAGS = \
 run_all_test_SOURCES = \
 	SmtLibScannerTest.cc \
 	SmtIdMgrTest.cc \
-	SmtFunMgrTest.cc \
+	SmtNameMgrTest.cc \
 	SmtSortMgrTest.cc \
 	SmtTermMgrTest.cc \
 	main.cc

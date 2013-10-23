@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 // @brief コンストラクタ
 // @param[in] fun 関数
 // @param[in] input_list 入力のリスト
-SmtFunTerm::SmtFunTerm(const SmtFun* fun,
+SmtFunTerm::SmtFunTerm(const SmtVarFun* fun,
 		       const vector<const SmtTerm*>& input_list) :
   mFunction(fun),
   mInputNum(input_list.size())
@@ -42,7 +42,7 @@ SmtFunTerm::type() const
 }
 
 // @brief kFunTerm 型の場合に関数を返す．
-const SmtFun*
+const SmtVarFun*
 SmtFunTerm::function() const
 {
   return mFunction;

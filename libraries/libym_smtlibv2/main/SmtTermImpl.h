@@ -45,6 +45,7 @@ public:
   ShString
   str_value() const;
 
+#if 0
   /// @brief kQualIdentifier 型の場合に識別子を返す．
   virtual
   const SmtId*
@@ -55,10 +56,16 @@ public:
   virtual
   const SmtSort*
   identifier_sort() const;
+#else
+  /// @brief kVarTerm 型の場合に関数を返す．
+  virtual
+  const SmtVarFun*
+  var() const;
+#endif
 
   /// @brief kFunTerm 型の場合に関数を返す．
   virtual
-  const SmtFun*
+  const SmtVarFun*
   function() const;
 
   /// @brief kFunTerm 型の場合に入力数を返す．
@@ -72,27 +79,16 @@ public:
   const SmtTerm*
   input(ymuint pos) const;
 
-  /// @brief kLet 型の場合に変数バインディングリストの要素数を返す．
-  virtual
-  ymuint
-  let_binding_num() const;
-
-  /// @brief kLet 型の場合に変数バインディングリストの要素を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < let_binding_num() )
-  virtual
-  SmtVarBinding
-  let_binding(ymuint pos) const;
-
   /// @brief kForall/kExists 型の場合に変数リストの要素数を返す．
   virtual
   ymuint
   var_num() const;
 
   /// @brief kForall/kExists 型の場合に変数を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < forall_var_num() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < var_num() )
   virtual
-  SmtSortedVar
-  sorted_var(ymuint pos) const;
+  const SmtVarFun*
+  bound_var(ymuint pos) const;
 
   /// @brief attr 型の場合に属性リストの要素数を返す．
   virtual

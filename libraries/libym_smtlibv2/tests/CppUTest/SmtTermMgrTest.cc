@@ -1,6 +1,6 @@
 
 /// @file SmtTermMgrTest.cc
-/// @brief SmtFunMgr のテストプログラム
+/// @brief SmtTermMgr のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -9,14 +9,14 @@
 
 #include "CppUTest/TestHarness.h"
 
+#include "ym_smtlibv2/SmtAttr.h"
 #include "ym_smtlibv2/SmtId.h"
 #include "ym_smtlibv2/SmtSort.h"
-#include "ym_smtlibv2/SmtFun.h"
 #include "ym_smtlibv2/SmtTerm.h"
-#include "ym_smtlibv2/SmtAttr.h"
+#include "ym_smtlibv2/SmtVarFun.h"
 #include "SmtIdMgr.h"
 #include "SmtSortMgr.h"
-#include "SmtFunMgr.h"
+#include "SmtNameMgr.h"
 #include "SmtTermMgr.h"
 #include "ym_utils/SimpleAlloc.h"
 
@@ -29,21 +29,21 @@ TEST_GROUP(SmtTermMgrTestGroup)
   SimpleAlloc* alloc;
   SmtIdMgr* IdMgr;
   SmtSortMgr* SortMgr;
-  SmtFunMgr* FunMgr;
+  SmtNameMgr* NameMgr;
   SmtTermMgr* TermMgr;
 
   TEST_SETUP() {
     alloc = new SimpleAlloc(4096);
     IdMgr = new SmtIdMgr(*alloc);
     SortMgr = new SmtSortMgr(*alloc, 0, NULL);
-    FunMgr = new SmtFunMgr(*alloc, 0, NULL);
+    NameMgr = new SmtNameMgr(*alloc, 0, NULL);
     TermMgr = new SmtTermMgr(*alloc);
   }
 
   TEST_TEARDOWN() {
     delete IdMgr;
     delete SortMgr;
-    delete FunMgr;
+    delete NameMgr;
     delete TermMgr;
     delete alloc;
     ShString::free_all_memory();
@@ -133,6 +133,7 @@ TEST(SmtTermMgrTestGroup, make_keyword)
   STRCMP_EQUAL( STR_VAL, term->str_value() );
 }
 
+#if 0
 // make_identifier テスト
 TEST(SmtTermMgrTestGroup, make_identifier)
 {
@@ -166,6 +167,7 @@ TEST(SmtTermMgrTestGroup, make_qual_identifier)
   LONGS_EQUAL( id_a->id(), term->identifier()->id() );
   CHECK( sort_b == term->identifier_sort() );
 }
+#endif
 
 // make_fun テスト1
 TEST(SmtTermMgrTestGroup, make_fun1)
@@ -180,7 +182,7 @@ TEST(SmtTermMgrTestGroup, make_fun1)
   // (declare-fun f () a)
   const SmtId* id_f = IdMgr->make_id(ShString("f"));
   vector<const SmtSort*> input_list0(0);
-  const SmtFun* fun_f = FunMgr->reg_fun(id_f, input_list0, sort_a);
+  const SmtVarFun* fun_f = NameMgr->reg_fun(id_f, input_list0, sort_a);
   CHECK( fun_f != NULL );
 
   // 引数なしの関数呼び出しは失敗する．
@@ -211,7 +213,7 @@ TEST(SmtTermMgrTestGroup, make_fun2)
   input_list0[0] = sort_b;
   input_list0[1] = sort_b;
 
-  const SmtFun* fun_f = FunMgr->reg_fun(id_f, input_list0, sort_a);
+  const SmtVarFun* fun_f = NameMgr->reg_fun(id_f, input_list0, sort_a);
   CHECK( fun_f != NULL );
 
   const SmtTerm* i0 = TermMgr->make_numeric(0);
@@ -232,6 +234,7 @@ TEST(SmtTermMgrTestGroup, make_fun2)
   }
 }
 
+#if 0
 // make_let テスト1
 TEST(SmtTermMgrTestGroup, make_let1)
 {
@@ -255,7 +258,7 @@ TEST(SmtTermMgrTestGroup, make_let1)
   input_list0[0] = sort_b;
   input_list0[1] = sort_b;
 
-  const SmtFun* fun_f = FunMgr->reg_fun(id_f, input_list0, sort_a);
+  const SmtVarFun* fun_f = NameMgr->reg_fun(id_f, input_list0, sort_a);
   CHECK( fun_f != NULL );
 
   const SmtTerm* i0 = TermMgr->make_numeric(0);
@@ -296,7 +299,7 @@ TEST(SmtTermMgrTestGroup, make_let2)
   input_list0[0] = sort_b;
   input_list0[1] = sort_b;
 
-  const SmtFun* fun_f = FunMgr->reg_fun(id_f, input_list0, sort_a);
+  const SmtVarFun* fun_f = NameMgr->reg_fun(id_f, input_list0, sort_a);
   CHECK( fun_f != NULL );
 
   const SmtId* id_x = IdMgr->make_id(ShString("x"));
@@ -336,6 +339,7 @@ TEST(SmtTermMgrTestGroup, make_let2)
   CHECK( vb1.mVar == id_y );
   CHECK( vb1.mExpr == i1 );
 }
+#endif
 
 // make_forall テスト1
 TEST(SmtTermMgrTestGroup, make_forall1)
@@ -360,7 +364,7 @@ TEST(SmtTermMgrTestGroup, make_forall1)
   input_list0[0] = sort_b;
   input_list0[1] = sort_b;
 
-  const SmtFun* fun_f = FunMgr->reg_fun(id_f, input_list0, sort_a);
+  const SmtVarFun* fun_f = NameMgr->reg_fun(id_f, input_list0, sort_a);
   CHECK( fun_f != NULL );
 
   const SmtTerm* i0 = TermMgr->make_numeric(0);
@@ -373,8 +377,8 @@ TEST(SmtTermMgrTestGroup, make_forall1)
   const SmtTerm* fun_term = TermMgr->make_fun(fun_f, input_list);
   CHECK( fun_term != NULL );
 
-  // sorted_var が空ならエラー
-  const SmtTerm* term = TermMgr->make_forall(vector<SmtSortedVar>(0), fun_term);
+  // var_list が空ならエラー
+  const SmtTerm* term = TermMgr->make_forall(vector<const SmtVarFun*>(0), fun_term);
   CHECK( term == NULL );
 }
 
@@ -401,16 +405,20 @@ TEST(SmtTermMgrTestGroup, make_forall2)
   input_list0[0] = sort_b;
   input_list0[1] = sort_b;
 
-  const SmtFun* fun_f = FunMgr->reg_fun(id_f, input_list0, sort_a);
+  const SmtVarFun* fun_f = NameMgr->reg_fun(id_f, input_list0, sort_a);
   CHECK( fun_f != NULL );
 
   const SmtId* id_x = IdMgr->make_id(ShString("x"));
   CHECK( id_x != NULL );
-  const SmtTerm* x_term = TermMgr->make_identifier(id_x);
+  const SmtVarFun* var_x = NameMgr->reg_var(id_x);
+  CHECK( var_x != NULL);
+  const SmtTerm* x_term = TermMgr->make_var(var_x);
   CHECK( x_term != NULL );
   const SmtId* id_y = IdMgr->make_id(ShString("y"));
   CHECK( id_y != NULL );
-  const SmtTerm* y_term = TermMgr->make_identifier(id_y);
+  const SmtVarFun* var_y = NameMgr->reg_var(id_y);
+  CHECK( var_y != NULL );
+  const SmtTerm* y_term = TermMgr->make_var(var_y);
   CHECK( y_term != NULL );
 
   vector<const SmtTerm*> input_list(2);
@@ -424,18 +432,19 @@ TEST(SmtTermMgrTestGroup, make_forall2)
   const SmtTerm* i1 = TermMgr->make_numeric(1);
   CHECK( i1 != NULL );
 
-  vector<SmtSortedVar> var_list;
+  vector<const SmtVarFun*> var_list;
   var_list.reserve(1);
-  var_list.push_back(SmtSortedVar(sort_b, id_x));
+  const SmtVarFun* var = NameMgr->reg_var(id_x, sort_b);
+  var_list.push_back(var);
   const SmtTerm* term = TermMgr->make_forall(var_list, fun_term);
   CHECK( term != NULL );
 
   LONGS_EQUAL( SmtTerm::kForall, term->type() );
   CHECK( fun_term == term->body() );
   LONGS_EQUAL( var_list.size(), term->var_num() );
-  SmtSortedVar sv = term->sorted_var(0);
-  CHECK( sv.mSort == sort_b );
-  LONGS_EQUAL( id_x->id(), sv.mVar->id() );
+  const SmtVarFun* sv = term->bound_var(0);
+  CHECK( sv->var_sort() == sort_b );
+  LONGS_EQUAL( id_x->id(), sv->name()->id() );
 }
 
 // make_exists テスト1
@@ -461,7 +470,7 @@ TEST(SmtTermMgrTestGroup, make_exists1)
   input_list0[0] = sort_b;
   input_list0[1] = sort_b;
 
-  const SmtFun* fun_f = FunMgr->reg_fun(id_f, input_list0, sort_a);
+  const SmtVarFun* fun_f = NameMgr->reg_fun(id_f, input_list0, sort_a);
   CHECK( fun_f != NULL );
 
   const SmtTerm* i0 = TermMgr->make_numeric(0);
@@ -474,8 +483,8 @@ TEST(SmtTermMgrTestGroup, make_exists1)
   const SmtTerm* fun_term = TermMgr->make_fun(fun_f, input_list);
   CHECK( fun_term != NULL );
 
-  // sorted_var が空ならエラー
-  const SmtTerm* term = TermMgr->make_exists(vector<SmtSortedVar>(0), fun_term);
+  // var_list が空ならエラー
+  const SmtTerm* term = TermMgr->make_exists(vector<const SmtVarFun*>(0), fun_term);
   CHECK( term == NULL );
 }
 
@@ -502,16 +511,20 @@ TEST(SmtTermMgrTestGroup, make_exists2)
   input_list0[0] = sort_b;
   input_list0[1] = sort_b;
 
-  const SmtFun* fun_f = FunMgr->reg_fun(id_f, input_list0, sort_a);
+  const SmtVarFun* fun_f = NameMgr->reg_fun(id_f, input_list0, sort_a);
   CHECK( fun_f != NULL );
 
   const SmtId* id_x = IdMgr->make_id(ShString("x"));
   CHECK( id_x != NULL );
-  const SmtTerm* x_term = TermMgr->make_identifier(id_x);
+  const SmtVarFun* var_x = NameMgr->reg_var(id_x);
+  CHECK( var_x != NULL );
+  const SmtTerm* x_term = TermMgr->make_var(var_x);
   CHECK( x_term != NULL );
   const SmtId* id_y = IdMgr->make_id(ShString("y"));
   CHECK( id_y != NULL );
-  const SmtTerm* y_term = TermMgr->make_identifier(id_y);
+  const SmtVarFun* var_y = NameMgr->reg_var(id_y);
+  CHECK( var_y != NULL );
+  const SmtTerm* y_term = TermMgr->make_var(var_y);
   CHECK( y_term != NULL );
 
   vector<const SmtTerm*> input_list(2);
@@ -525,18 +538,20 @@ TEST(SmtTermMgrTestGroup, make_exists2)
   const SmtTerm* i1 = TermMgr->make_numeric(1);
   CHECK( i1 != NULL );
 
-  vector<SmtSortedVar> var_list;
+  vector<const SmtVarFun*> var_list;
   var_list.reserve(1);
-  var_list.push_back(SmtSortedVar(sort_b, id_x));
+  const SmtVarFun* var = NameMgr->reg_var(id_x, sort_b);
+  var_list.push_back(var);
   const SmtTerm* term = TermMgr->make_exists(var_list, fun_term);
   CHECK( term != NULL );
 
   LONGS_EQUAL( SmtTerm::kExists, term->type() );
   CHECK( fun_term == term->body() );
   LONGS_EQUAL( var_list.size(), term->var_num() );
-  SmtSortedVar sv = term->sorted_var(0);
-  CHECK( sv.mSort == sort_b );
-  LONGS_EQUAL( id_x->id(), sv.mVar->id() );
+  const SmtVarFun* sv = term->bound_var(0);
+  CHECK( sv != NULL );
+  CHECK( sv->var_sort() == sort_b );
+  LONGS_EQUAL( id_x->id(), sv->name()->id() );
 }
 
 // make_attr テスト1
@@ -562,7 +577,7 @@ TEST(SmtTermMgrTestGroup, make_attr1)
   input_list0[0] = sort_b;
   input_list0[1] = sort_b;
 
-  const SmtFun* fun_f = FunMgr->reg_fun(id_f, input_list0, sort_a);
+  const SmtVarFun* fun_f = NameMgr->reg_fun(id_f, input_list0, sort_a);
   CHECK( fun_f != NULL );
 
   const SmtTerm* i0 = TermMgr->make_numeric(0);
@@ -603,7 +618,7 @@ TEST(SmtTermMgrTestGroup, make_attr2)
   input_list0[0] = sort_b;
   input_list0[1] = sort_b;
 
-  const SmtFun* fun_f = FunMgr->reg_fun(id_f, input_list0, sort_a);
+  const SmtVarFun* fun_f = NameMgr->reg_fun(id_f, input_list0, sort_a);
   CHECK( fun_f != NULL );
 
   const SmtTerm* i0 = TermMgr->make_numeric(0);

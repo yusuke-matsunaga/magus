@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 class SmtVarFunImpl :
   public SmtVarFun
 {
-  friend class SmtFunMgr;
+  friend class SmtNameMgr;
 
 protected:
 
@@ -414,7 +414,7 @@ private:
 class SmtDeclFun1 :
   public SmtFunBase
 {
-  friend class SmtFunMgr;
+  friend class SmtNameMgr;
 
 protected:
 
@@ -438,7 +438,7 @@ protected:
 class SmtDeclFun2 :
   public SmtDeclFun1
 {
-  friend class SmtFunMgr;
+  friend class SmtNameMgr;
 
 private:
 
@@ -521,7 +521,7 @@ private:
 class SmtDefFun1 :
   public SmtFunBase
 {
-  friend class SmtFunMgr;
+  friend class SmtNameMgr;
 
 protected:
 
@@ -568,7 +568,7 @@ private:
 class SmtDefFun2 :
   public SmtDefFun1
 {
-  friend class SmtFunMgr;
+  friend class SmtNameMgr;
 
 private:
 

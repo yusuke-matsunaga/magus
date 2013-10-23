@@ -9,11 +9,11 @@
 
 #include "SmtTermMgr.h"
 
-#include "SmtConstTerm.h"
-#include "SmtIdTerm.h"
 #include "SmtCompTerm.h"
+#include "SmtConstTerm.h"
 #include "SmtFunTerm.h"
 #include "SmtListTerm.h"
+#include "SmtVarTerm.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -97,6 +97,7 @@ SmtTermMgr::make_keyword(const ShString& val)
   return new (p) SmtKeywordTerm(val);
 }
 
+#if 0
 // @brief <identifier> 型の term を作る．
 // @param[in] id 識別子
 const SmtTerm*
@@ -116,12 +117,22 @@ SmtTermMgr::make_qual_identifier(const SmtId* id,
   void* p = mAlloc.get_memory(sizeof(SmtQualIdTerm));
   return new (p) SmtQualIdTerm(id, sort);
 }
+#else
+// @brief 変数型の term を作る．
+// @param[in] var 変数
+const SmtTerm*
+SmtTermMgr::make_var(const SmtVarFun* var)
+{
+  void* p = mAlloc.get_memory(sizeof(SmtVarTerm));
+  return new (p) SmtVarTerm(var);
+}
+#endif
 
 // @brief function term を作る．
 // @param[in] function 関数
 // @param[in] input_list 入力のリスト
 const SmtTerm*
-SmtTermMgr::make_fun(const SmtFun* function,
+SmtTermMgr::make_fun(const SmtVarFun* function,
 		     const vector<const SmtTerm*>& input_list)
 {
   ymuint n = input_list.size();
@@ -134,28 +145,11 @@ SmtTermMgr::make_fun(const SmtFun* function,
   }
 }
 
-// @brief let 文を作る．
-// @param[in] var_binding 変数割り当てのリスト
-// @param[in] body 本体
-const SmtTerm*
-SmtTermMgr::make_let(const vector<SmtVarBinding>& var_binding,
-		     const SmtTerm* body)
-{
-  ymuint n = var_binding.size();
-  if ( n == 0 ) {
-    return NULL;
-  }
-  else {
-    void* p = mAlloc.get_memory(sizeof(SmtLet) + sizeof(SmtVarBinding) * (n - 1));
-    return new (p) SmtLet(var_binding, body);
-  }
-}
-
 // @brief forall 文を作る．
 // @param[in] var_list 変数リスト
 // @param[in] body 本体
 const SmtTerm*
-SmtTermMgr::make_forall(const vector<SmtSortedVar>& var_list,
+SmtTermMgr::make_forall(const vector<const SmtVarFun*>& var_list,
 			const SmtTerm* body)
 {
   ymuint n = var_list.size();
@@ -163,7 +157,7 @@ SmtTermMgr::make_forall(const vector<SmtSortedVar>& var_list,
     return NULL;
   }
   else {
-    void* p = mAlloc.get_memory(sizeof(SmtForall) + sizeof(SmtSortedVar) * (n - 1));
+    void* p = mAlloc.get_memory(sizeof(SmtForall) + sizeof(const SmtVarFun*) * (n - 1));
     return new (p) SmtForall(var_list, body);
   }
 }
@@ -172,7 +166,7 @@ SmtTermMgr::make_forall(const vector<SmtSortedVar>& var_list,
 // @param[in] var_list 変数リスト
 // @param[in] body 本体
 const SmtTerm*
-SmtTermMgr::make_exists(const vector<SmtSortedVar>& var_list,
+SmtTermMgr::make_exists(const vector<const SmtVarFun*>& var_list,
 			const SmtTerm* body)
 {
   ymuint n = var_list.size();
@@ -180,7 +174,7 @@ SmtTermMgr::make_exists(const vector<SmtSortedVar>& var_list,
     return NULL;
   }
   else {
-    void* p = mAlloc.get_memory(sizeof(SmtExists) + sizeof(SmtSortedVar) * (n - 1));
+    void* p = mAlloc.get_memory(sizeof(SmtExists) + sizeof(const SmtVarFun*) * (n - 1));
     return new (p) SmtExists(var_list, body);
   }
 }

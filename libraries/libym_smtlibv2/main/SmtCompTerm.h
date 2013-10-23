@@ -10,8 +10,6 @@
 
 
 #include "SmtTermImpl.h"
-#include "ym_smtlibv2/SmtVarBinding.h"
-#include "ym_smtlibv2/SmtSortedVar.h"
 #include "ym_smtlibv2/SmtAttr.h"
 
 
@@ -59,64 +57,6 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SmtLet SmtCompTerm.h "SmtCompTerm.h"
-/// @brief let 文を表すクラス
-//////////////////////////////////////////////////////////////////////
-class SmtLet :
-  public SmtCompTerm
-{
-  friend class SmtTermMgr;
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] var_binding 変数割り当てのリスト
-  /// @param[in] body 本体
-  SmtLet(const vector<SmtVarBinding>& var_binding,
-	 const SmtTerm* body);
-
-  /// @brief デストラクタ
-  virtual
-  ~SmtLet();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 型を返す．
-  virtual
-  tType
-  type() const;
-
-  /// @brief kLet 型の場合に変数バインディングリストの要素数を返す．
-  virtual
-  ymuint
-  let_binding_num() const;
-
-  /// @brief kLet 型の場合に変数バインディングリストの要素を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < let_binding_num() )
-  virtual
-  SmtVarBinding
-  let_binding(ymuint pos) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 変数割り当ての数
-  ymuint32 mBindingNum;
-
-  // 変数割り当ての配列
-  // 実際には必要な領域が確保される．
-  SmtVarBinding mBindingList[1];
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class SmtQualTerm SmtCompTerm.h "SmtCompTerm.h"
 /// @brief forall/exists の共通の基底クラス
 //////////////////////////////////////////////////////////////////////
@@ -129,7 +69,7 @@ protected:
   /// @brief コンストラクタ
   /// @param[in] var_list 変数のリスト
   /// @param[in] body 本体
-  SmtQualTerm(const vector<SmtSortedVar>& var_list,
+  SmtQualTerm(const vector<const SmtVarFun*>& var_list,
 	      const SmtTerm* body);
 
   /// @brief デストラクタ
@@ -148,10 +88,10 @@ public:
   var_num() const;
 
   /// @brief kForall/kExists 型の場合に変数を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < forall_var_num() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < var_num() )
   virtual
-  SmtSortedVar
-  sorted_var(ymuint pos) const;
+  const SmtVarFun*
+  bound_var(ymuint pos) const;
 
 
 private:
@@ -164,7 +104,7 @@ private:
 
   // 変数の配列
   // 実際には必要なサイズを確保する．
-  SmtSortedVar mVarList[1];
+  const SmtVarFun* mVarList[1];
 
 };
 
@@ -182,7 +122,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] var_list 変数のリスト
   /// @param[in] body 本体
-  SmtForall(const vector<SmtSortedVar>& var_list,
+  SmtForall(const vector<const SmtVarFun*>& var_list,
 	    const SmtTerm* body);
 
   /// @brief デストラクタ
@@ -216,7 +156,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] var_list 変数のリスト
   /// @param[in] body 本体
-  SmtExists(const vector<SmtSortedVar>& var_list,
+  SmtExists(const vector<const SmtVarFun*>& var_list,
 	    const SmtTerm* body);
 
   /// @brief デストラクタ

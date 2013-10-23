@@ -27,7 +27,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] fun 関数
   /// @param[in] input_list 入力のリスト
-  SmtFunTerm(const SmtFun* fun,
+  SmtFunTerm(const SmtVarFun* fun,
 	     const vector<const SmtTerm*>& input_list);
 
   /// @brief デストラクタ
@@ -47,7 +47,7 @@ public:
 
   /// @brief kFunTerm 型の場合に関数を返す．
   virtual
-  const SmtFun*
+  const SmtVarFun*
   function() const;
 
   /// @brief kFunTerm 型の場合に入力数を返す．
@@ -68,7 +68,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数
-  const SmtFun* mFunction;
+  const SmtVarFun* mFunction;
 
   // 入力数
   ymuint32 mInputNum;

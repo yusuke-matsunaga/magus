@@ -9,7 +9,7 @@
 
 #include "ym_smtlibv2/SmtId.h"
 #include "ym_smtlibv2/SmtSort.h"
-#include "ym_smtlibv2/SmtFun.h"
+#include "ym_smtlibv2/SmtVarFun.h"
 #include "ym_smtlibv2/SmtTerm.h"
 #include "ym_smtlibv2/SmtAttr.h"
 
@@ -61,30 +61,41 @@ sort_str(const SmtSort* sort)
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス SmtFun
+// クラス SmtVarFun
 //////////////////////////////////////////////////////////////////////
 
 // @brief 内容を表す文字列を返す．
 string
-fun_str(const SmtFun* fun)
+varfun_str(const SmtVarFun* obj)
 {
   ostringstream buf;
-  buf << id_str(fun->name()) << " (";
-  for (ymuint i = 0; i < fun->input_num(); ++ i) {
-    const SmtSort* sort = fun->input_sort(i);
-    buf << " " << sort_str(sort);
+  if ( obj->is_var() ) {
+    const SmtSort* sort = obj->var_sort();
+    if ( sort == NULL ) {
+      buf << id_str(obj->name());
+    }
+    else {
+      buf << "( as " << id_str(obj->name()) << " " << sort_str(sort) << " )";
+    }
   }
-  buf << " ) "
-      << sort_str(fun->output_sort());
-
-  if ( fun->body() ) {
-    buf << " (";
-    for (ymuint i = 0; i < fun->input_num(); ++ i) {
-      const SmtId* id = fun->input_var(i);
-      buf << " " << id_str(id);
+  else {
+    buf << id_str(obj->name()) << " (";
+    for (ymuint i = 0; i < obj->input_num(); ++ i) {
+      const SmtSort* sort = obj->input_sort(i);
+      buf << " " << sort_str(sort);
     }
     buf << " ) "
-	<< term_str(fun->body());
+	<< sort_str(obj->output_sort());
+
+    if ( obj->fun_body() ) {
+      buf << " (";
+      for (ymuint i = 0; i < obj->input_num(); ++ i) {
+	const SmtVarFun* var = obj->input_var(i);
+	buf << " " << id_str(var->name());
+      }
+      buf << " ) "
+	  << term_str(obj->fun_body());
+    }
   }
   return buf.str();
 }
@@ -117,6 +128,7 @@ term_str(const SmtTerm* term)
     buf << "\"" << term->str_value() << "\"";
     break;
 
+#if 0
   case SmtTerm::kIdentifier:
     buf << id_str(term->identifier());
     break;
@@ -127,6 +139,12 @@ term_str(const SmtTerm* term)
 	<< " )";
     break;
 
+#else
+  case SmtTerm::kVarTerm:
+    buf << varfun_str(term->var());
+    break;
+#endif
+
   case SmtTerm::kFunTerm:
     buf << "( " << id_str(term->function()->name());
     for (ymuint i = 0; i < term->input_num(); ++ i) {
@@ -135,21 +153,11 @@ term_str(const SmtTerm* term)
     buf << " )";
     break;
 
-  case SmtTerm::kLet:
-    buf << "( let (";
-    for (ymuint i = 0; i < term->let_binding_num(); ++ i) {
-      SmtVarBinding vb = term->let_binding(i);
-      buf << " (" << id_str(vb.mVar) << " " << term_str(vb.mExpr)
-	  << " )";
-    }
-    buf << " ) " << term_str(term->body());
-    break;
-
   case SmtTerm::kForall:
     buf << "( forall (";
     for (ymuint i = 0; i < term->var_num(); ++ i) {
-      SmtSortedVar sv = term->sorted_var(i);
-      buf << " (" << id_str(sv.mVar) << " " << sort_str(sv.mSort) << " )";
+      const SmtVarFun* var = term->bound_var(i);
+      buf << " (" << id_str(var->name()) << " " << sort_str(var->var_sort()) << " )";
     }
     buf << " ) " << term_str(term->body());
     break;
@@ -157,8 +165,8 @@ term_str(const SmtTerm* term)
   case SmtTerm::kExists:
     buf << "( exists (";
     for (ymuint i = 0; i < term->var_num(); ++ i) {
-      SmtSortedVar sv = term->sorted_var(i);
-      buf << " (" << id_str(sv.mVar) << " " << sort_str(sv.mSort) << " )";
+      const SmtVarFun* var = term->bound_var(i);
+      buf << " (" << id_str(var->name()) << " " << sort_str(var->var_sort()) << " )";
     }
     buf << " ) " << term_str(term->body());
     break;

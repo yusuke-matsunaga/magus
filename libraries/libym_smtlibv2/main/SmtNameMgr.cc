@@ -8,8 +8,7 @@
 
 
 #include "SmtNameMgr.h"
-#include "SmtFunImpl.h"
-#include "SmtNameObj.h"
+#include "SmtVarFunImpl.h"
 #include "ym_smtlibv2/SmtId.h"
 #include "ym_smtlibv2/SmtSort.h"
 
@@ -44,28 +43,53 @@ SmtNameMgr::~SmtNameMgr()
   delete [] mHashTable;
 }
 
-// @brief 宣言のみの関数を登録する．
+// @brief 変数を登録する．
 // @param[in] name_id 名前を表す識別子
-// @param[in] input_list 入力の型のリスト
-// @param[in] output_sort 出力の型
-// @param[in] attr 属性
-// @return 登録した関数を返す．
+// @param[in] sort 型
+// @return 登録した変数を返す．
 // @note エラーが起きたら NULL を返す．
 //
 // エラーの原因は以下のとおり
-//  - name_id と同名の関数がすでに存在している．
-const SmtFun*
-SmtNameMgr::reg_fun(const SmtId* name_id,
-		    const vector<const SmtSort*>& input_list,
-		    const SmtSort* output_sort,
-		    SmtFun::tAttr attr)
+//  - name_id と同名の定義が既に存在している．
+const SmtVarFun*
+SmtNameMgr::reg_var(const SmtId* name_id,
+		    const SmtSort* sort)
 {
   if ( find_obj(name_id) != NULL ) {
     // 同名のオブジェクトが登録されている．
     return NULL;
   }
 
-  SmtFunImpl* fun = NULL;
+  void* p = mAlloc.get_memory(sizeof(SmtGlobalVar));
+  SmtVarFunImpl* var = new (p) SmtGlobalVar(name_id, sort);
+
+  reg_sub(var);
+
+  return var;
+}
+
+// @brief 宣言のみの関数を登録する．
+// @param[in] name_id 名前を表す識別子
+// @param[in] input_list 入力の型のリスト
+// @param[in] output_sort 出力の型
+// @param[in] fun_attr 属性
+// @return 登録した関数を返す．
+// @note エラーが起きたら NULL を返す．
+//
+// エラーの原因は以下のとおり
+//  - name_id と同名の関数がすでに存在している．
+const SmtVarFun*
+SmtNameMgr::reg_fun(const SmtId* name_id,
+		    const vector<const SmtSort*>& input_list,
+		    const SmtSort* output_sort,
+		    SmtVarFun::tFunAttr fun_attr)
+{
+  if ( find_obj(name_id) != NULL ) {
+    // 同名のオブジェクトが登録されている．
+    return NULL;
+  }
+
+  SmtVarFunImpl* fun = NULL;
   ymuint n = input_list.size();
   if ( n == 0 ) {
     void* p = mAlloc.get_memory(sizeof(SmtDeclFun1));
@@ -100,7 +124,7 @@ SmtNameMgr::reg_fun(const SmtId* name_id,
       }
     }
     void* p = mAlloc.get_memory(sizeof(SmtDeclFun2) + sizeof(const SmtSort*) * (n - 1));
-    fun = new (p) SmtDeclFun2(name_id, input_list, output_sort, attr, param_num);
+    fun = new (p) SmtDeclFun2(name_id, input_list, output_sort, fun_attr, param_num);
   }
 
   reg_sub(fun);
@@ -118,9 +142,9 @@ SmtNameMgr::reg_fun(const SmtId* name_id,
 //
 // エラーの原因は以下のとおり
 //  - name_id と同名の関数がすでに存在している．
-const SmtFun*
+const SmtVarFun*
 SmtNameMgr::reg_fun(const SmtId* name_id,
-		    const vector<SmtSortedVar>& input_list,
+		    const vector<const SmtVarFun*>& input_list,
 		    const SmtSort* output_sort,
 		    const SmtTerm* body)
 {
@@ -129,14 +153,14 @@ SmtNameMgr::reg_fun(const SmtId* name_id,
     return NULL;
   }
 
-  SmtFunImpl* fun = NULL;
+  SmtVarFunImpl* fun = NULL;
   ymuint n = input_list.size();
   if ( n == 0 ) {
     void* p = mAlloc.get_memory(sizeof(SmtDefFun1));
     fun = new (p) SmtDefFun1(name_id, output_sort, body);
   }
   else {
-    void* p = mAlloc.get_memory(sizeof(SmtDefFun2) + sizeof(SmtSortedVar) * (n - 1));
+    void* p = mAlloc.get_memory(sizeof(SmtDefFun2) + sizeof(const SmtVarFun*) * (n - 1));
     fun = new (p) SmtDefFun2(name_id, input_list, output_sort, body);
   }
 
@@ -145,36 +169,16 @@ SmtNameMgr::reg_fun(const SmtId* name_id,
   return fun;
 }
 
-// @brief 変数を登録する．
-// @param[in] name_id 名前を表す識別子
-// @param[in] sort 型
-// @return 登録した変数を返す．
-// @note エラーが起きたら NULL を返す．
-//
-// エラーの原因は以下のとおり
-//  - name_id と同名の定義が既に存在している．
-const SmtVar*
-SmtNameMgr::reg_var(const SmtId* name_id,
-		    const SmtSort* sort)
-{
-  if ( find_obj(name_id) != NULL ) {
-    // 同名のオブジェクトが登録されている．
-    return NULL;
-  }
-
-
-}
-
 // @brief 名前からオブジェクトを探す．
 // @param[in] name_id 名前を表す識別子
 // @return name_id という名のオブジェクトを返す．
 // @note 存在しなければ NULL を返す．
-const SmtNameObj*
+const SmtVarFun*
 SmtNameMgr::find_obj(const SmtId* name_id) const
 {
   if ( mParent != NULL ) {
     // 親のレベルで探す．
-    const SmtNameObj* obj = mParent->find_obj(name_id);
+    const SmtVarFun* obj = mParent->find_obj(name_id);
     if ( obj != NULL ) {
       return obj;
     }
@@ -182,7 +186,7 @@ SmtNameMgr::find_obj(const SmtId* name_id) const
 
   ymuint h = name_id->id();
   ymuint idx = h % mTableSize;
-  for (SmtNameObj* obj = mHashTable[idx];
+  for (SmtVarFunImpl* obj = mHashTable[idx];
        obj != NULL; obj = obj->mLink) {
     if ( obj->name() == name_id ) {
       return obj;
@@ -194,7 +198,7 @@ SmtNameMgr::find_obj(const SmtId* name_id) const
 // @brief reg_fun() の下請け関数
 // @param[in] obj 登録するオブジェクト
 void
-SmtNameMgr::reg_sub(SmtNameObj* obj)
+SmtNameMgr::reg_sub(SmtVarFunImpl* obj)
 {
   if ( mNum >= mNextLimit ) {
     expand_table(mTableSize * 2);
@@ -204,7 +208,7 @@ SmtNameMgr::reg_sub(SmtNameObj* obj)
 
   ymuint h = obj->name()->id() % mTableSize;
   obj->mLink = mHashTable[h];
-  mHashTable[h] = fun;
+  mHashTable[h] = obj;
 }
 
 // @brief ハッシュ表を拡大する．
@@ -213,10 +217,10 @@ void
 SmtNameMgr::expand_table(ymuint req_size)
 {
   ymuint old_size = mTableSize;
-  SmtNameObj** old_table = mHashTable;
+  SmtVarFunImpl** old_table = mHashTable;
 
   mTableSize = req_size;
-  mHashTable = new SmtNameObj*[mTableSize];
+  mHashTable = new SmtVarFunImpl*[mTableSize];
   for (ymuint i = 0; i < mTableSize; ++ i) {
     mHashTable[i] = NULL;
   }
@@ -224,8 +228,8 @@ SmtNameMgr::expand_table(ymuint req_size)
 
   if ( old_size > 0 ) {
     for (ymuint i = 0; i < old_size; ++ i) {
-      for (SmtNameObj* obj = old_table[i]; obj != NULL; ) {
-	SmtNameObj* tmp_obj = obj;
+      for (SmtVarFunImpl* obj = old_table[i]; obj != NULL; ) {
+	SmtVarFunImpl* tmp_obj = obj;
 	obj = obj->mLink;
 
 	ymuint h = tmp_obj->name()->id() % mTableSize;

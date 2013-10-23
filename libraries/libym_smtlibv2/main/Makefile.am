@@ -30,16 +30,14 @@ libym_smt_main_la_SOURCES = \
 	SmtCompTerm.cc \
 	SmtConstTerm.h \
 	SmtConstTerm.cc \
-	SmtFunMgr.h \
-	SmtFunMgr.cc \
 	SmtFunTerm.h \
 	SmtFunTerm.cc \
 	SmtIdImpl.h \
 	SmtIdImpl.cc \
 	SmtIdMgr.cc \
-	SmtIdTerm.h \
-	SmtIdTerm.cc \
 	SmtMgr.cc \
+	SmtNameMgr.h \
+	SmtNameMgr.cc \
 	SmtListTerm.h \
 	SmtListTerm.cc \
 	SmtSortImpl.cc \
@@ -51,7 +49,9 @@ libym_smt_main_la_SOURCES = \
 	SmtTermMgr.h \
 	SmtTermMgr.cc \
 	SmtVarFunImpl.h \
-	SmtVarFunImpl.cc
+	SmtVarFunImpl.cc \
+	SmtVarTerm.h \
+	SmtVarTerm.cc
 
 libym_smt_main_la_LIBADD =
 

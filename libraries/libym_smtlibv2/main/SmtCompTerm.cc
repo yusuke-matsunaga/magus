@@ -37,59 +37,13 @@ SmtCompTerm::body() const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス SmtLet
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] var_binding 変数割り当てのリスト
-// @param[in] body 本体
-SmtLet::SmtLet(const vector<SmtVarBinding>& var_binding,
-	       const SmtTerm* body) :
-  SmtCompTerm(body),
-  mBindingNum(var_binding.size())
-{
-  for (ymuint i = 0; i < mBindingNum; ++ i) {
-    mBindingList[i] = var_binding[i];
-  }
-}
-
-// @brief デストラクタ
-SmtLet::~SmtLet()
-{
-}
-
-// @brief 型を返す．
-SmtTerm::tType
-SmtLet::type() const
-{
-  return kLet;
-}
-
-// @brief kLet 型の場合に変数バインディングリストの要素数を返す．
-ymuint
-SmtLet::let_binding_num() const
-{
-  return mBindingNum;
-}
-
-// @brief kLet 型の場合に変数バインディングリストの要素を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < let_binding_num() )
-SmtVarBinding
-SmtLet::let_binding(ymuint pos) const
-{
-  assert_cond( pos < let_binding_num(), __FILE__, __LINE__);
-  return mBindingList[pos];
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス SmtQualTerm
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] var_list 変数のリスト
 // @param[in] body 本体
-SmtQualTerm::SmtQualTerm(const vector<SmtSortedVar>& var_list,
+SmtQualTerm::SmtQualTerm(const vector<const SmtVarFun*>& var_list,
 			 const SmtTerm* body) :
   SmtCompTerm(body),
   mVarNum(var_list.size())
@@ -112,9 +66,9 @@ SmtQualTerm::var_num() const
 }
 
 // @brief kForall/kExists 型の場合に変数を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < forall_var_num() )
-SmtSortedVar
-SmtQualTerm::sorted_var(ymuint pos) const
+// @param[in] pos 位置番号 ( 0 <= pos < var_num() )
+const SmtVarFun*
+SmtQualTerm::bound_var(ymuint pos) const
 {
   assert_cond( pos < var_num(), __FILE__, __LINE__);
   return mVarList[pos];
@@ -128,7 +82,7 @@ SmtQualTerm::sorted_var(ymuint pos) const
 // @brief コンストラクタ
 // @param[in] var_list 変数のリスト
 // @param[in] body 本体
-SmtForall::SmtForall(const vector<SmtSortedVar>& var_list,
+SmtForall::SmtForall(const vector<const SmtVarFun*>& var_list,
 		     const SmtTerm* body) :
   SmtQualTerm(var_list, body)
 {
@@ -154,7 +108,7 @@ SmtForall::type() const
 // @brief コンストラクタ
 // @param[in] var_list 変数のリスト
 // @param[in] body 本体
-SmtExists::SmtExists(const vector<SmtSortedVar>& var_list,
+SmtExists::SmtExists(const vector<const SmtVarFun*>& var_list,
 		     const SmtTerm* body) :
   SmtQualTerm(var_list, body)
 {

@@ -11,16 +11,17 @@
 
 #include "ym_smtlibv2/SmtId.h"
 #include "ym_smtlibv2/SmtSort.h"
-#include "ym_smtlibv2/SmtFun.h"
+#include "ym_smtlibv2/SmtVarFun.h"
 #include "SmtIdMgr.h"
 #include "SmtTermMgr.h"
 #include "StackPage.h"
+#if 0
 #include "SmtConstTerm.h"
 #include "SmtIdTerm.h"
 #include "SmtCompTerm.h"
 #include "SmtFunTerm.h"
 #include "SmtListTerm.h"
-
+#endif
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
@@ -196,12 +197,12 @@ SmtMgr::Core_init()
   // (true Bool)
   const SmtId* true_id = mIdMgr->make_id(ShString("true"));
   assert_cond( true_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(true_id, vector<const SmtSort*>(0), bool_sort);
+  name_mgr().reg_fun(true_id, vector<const SmtSort*>(0), bool_sort);
 
   // (false Bool)
   const SmtId* false_id = mIdMgr->make_id(ShString("false"));
   assert_cond( false_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(false_id, vector<const SmtSort*>(0), bool_sort);
+  name_mgr().reg_fun(false_id, vector<const SmtSort*>(0), bool_sort);
 
   vector<const SmtSort*> b1_list(1);
   b1_list[0] = bool_sort;
@@ -209,7 +210,7 @@ SmtMgr::Core_init()
   // (not Bool Bool)
   const SmtId* not_id = mIdMgr->make_id(ShString("not"));
   assert_cond( not_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(not_id, b1_list, bool_sort);
+  name_mgr().reg_fun(not_id, b1_list, bool_sort);
 
   vector<const SmtSort*> b2_list(2);
   b2_list[0] = bool_sort;
@@ -218,22 +219,22 @@ SmtMgr::Core_init()
   // (and Bool Bool Bool :right-assoc)
   const SmtId* and_id = mIdMgr->make_id(ShString("and"));
   assert_cond( and_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(and_id, b2_list, bool_sort, SmtFun::kRightAssoc);
+  name_mgr().reg_fun(and_id, b2_list, bool_sort, SmtVarFun::kRightAssoc);
 
   // (or Bool Bool Bool :right-assoc)
   const SmtId* or_id = mIdMgr->make_id(ShString("or"));
   assert_cond( or_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(or_id, b2_list, bool_sort, SmtFun::kRightAssoc);
+  name_mgr().reg_fun(or_id, b2_list, bool_sort, SmtVarFun::kRightAssoc);
 
   // (xor Bool Bool Bool :right-assoc)
   const SmtId* xor_id = mIdMgr->make_id(ShString("xor"));
   assert_cond( xor_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(xor_id, b2_list, bool_sort, SmtFun::kRightAssoc);
+  name_mgr().reg_fun(xor_id, b2_list, bool_sort, SmtVarFun::kRightAssoc);
 
   // (=> Bool Bool Bool :right-assoc)
   const SmtId* imp_id = mIdMgr->make_id(ShString("=>"));
   assert_cond( imp_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(imp_id, b2_list, bool_sort, SmtFun::kRightAssoc);
+  name_mgr().reg_fun(imp_id, b2_list, bool_sort, SmtVarFun::kRightAssoc);
 
   const SmtSort* A_sort = sort_mgr().make_param_sort(0);
   vector<const SmtSort*> a2_list(2);
@@ -243,12 +244,12 @@ SmtMgr::Core_init()
   // (par (A) (= A A Bool :chainable))
   const SmtId* eq_id = mIdMgr->make_id(ShString("="));
   assert_cond( eq_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(eq_id, a2_list, bool_sort, SmtFun::kChainable);
+  name_mgr().reg_fun(eq_id, a2_list, bool_sort, SmtVarFun::kChainable);
 
   // (par (A) (distinct A A Bool :pairwise))
   const SmtId* dis_id = mIdMgr->make_id(ShString("distinct"));
   assert_cond( dis_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(dis_id, a2_list, bool_sort, SmtFun::kPairwise);
+  name_mgr().reg_fun(dis_id, a2_list, bool_sort, SmtVarFun::kPairwise);
 
   vector<const SmtSort*> ite_list(3);
   ite_list[0] = bool_sort;
@@ -258,7 +259,7 @@ SmtMgr::Core_init()
   // (par (A) (ite Bool A A A)
   const SmtId* ite_id = mIdMgr->make_id(ShString("ite"));
   assert_cond( ite_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(ite_id, ite_list, A_sort, SmtFun::kNone);
+  name_mgr().reg_fun(ite_id, ite_list, A_sort, SmtVarFun::kNone);
 }
 
 // @brief Ints theory の初期化を行う．
@@ -278,24 +279,24 @@ SmtMgr::Ints_init()
   // (- Int Int)
   const SmtId* minus_id = mIdMgr->make_id(ShString("-"));
   assert_cond( minus_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(minus_id, vector<const SmtSort*>(1, int_sort), int_sort);
+  name_mgr().reg_fun(minus_id, vector<const SmtSort*>(1, int_sort), int_sort);
 
   vector<const SmtSort*> i2_list(2);
   i2_list[0] = int_sort;
   i2_list[1] = int_sort;
 
   // (- Int Int Int :left-assoc)
-  fun_mgr().reg_fun(minus_id, i2_list, int_sort, SmtFun::kLeftAssoc);
+  name_mgr().reg_fun(minus_id, i2_list, int_sort, SmtVarFun::kLeftAssoc);
 
   // (+ Int Int Int :left-assoc)
   const SmtId* plus_id = mIdMgr->make_id(ShString("+"));
   assert_cond( plus_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(plus_id, i2_list, int_sort, SmtFun::kLeftAssoc);
+  name_mgr().reg_fun(plus_id, i2_list, int_sort, SmtVarFun::kLeftAssoc);
 
   // (* Int Int Int :left-assoc)
   const SmtId* star_id = mIdMgr->make_id(ShString("*"));
   assert_cond( star_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(star_id, i2_list, int_sort, SmtFun::kLeftAssoc);
+  name_mgr().reg_fun(star_id, i2_list, int_sort, SmtVarFun::kLeftAssoc);
 
   const SmtId* bool_id = mIdMgr->make_id(ShString("Bool"));
   assert_cond( bool_id != NULL, __FILE__, __LINE__);
@@ -305,22 +306,22 @@ SmtMgr::Ints_init()
   // (<= Int Int Bool :chainable)
   const SmtId* le_id = mIdMgr->make_id(ShString("<="));
   assert_cond( le_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(le_id, i2_list, bool_sort, SmtFun::kChainable);
+  name_mgr().reg_fun(le_id, i2_list, bool_sort, SmtVarFun::kChainable);
 
   // (< Int Int Bool :chainable)
   const SmtId* lt_id = mIdMgr->make_id(ShString("<"));
   assert_cond( lt_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(lt_id, i2_list, bool_sort, SmtFun::kChainable);
+  name_mgr().reg_fun(lt_id, i2_list, bool_sort, SmtVarFun::kChainable);
 
   // (>= Int Int Bool :chainable)
   const SmtId* ge_id = mIdMgr->make_id(ShString(">="));
   assert_cond( ge_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(ge_id, i2_list, bool_sort, SmtFun::kChainable);
+  name_mgr().reg_fun(ge_id, i2_list, bool_sort, SmtVarFun::kChainable);
 
   // (> Int Int Bool :chainable)
   const SmtId* gt_id = mIdMgr->make_id(ShString(">"));
   assert_cond( gt_id != NULL, __FILE__, __LINE__);
-  fun_mgr().reg_fun(gt_id, i2_list, bool_sort, SmtFun::kChainable);
+  name_mgr().reg_fun(gt_id, i2_list, bool_sort, SmtVarFun::kChainable);
 }
 
 // @brief set-info の処理を行う．
@@ -397,7 +398,7 @@ SmtMgr::declare_fun(const SmtId* name_id,
 		    const SmtSort* output_sort)
 {
   // 関数を登録する．
-  bool stat = fun_mgr().reg_fun(name_id, input_sort_list, output_sort);
+  bool stat = name_mgr().reg_fun(name_id, input_sort_list, output_sort);
 
   return stat;
 }
@@ -414,12 +415,12 @@ SmtMgr::declare_fun(const SmtId* name_id,
 //  - 同名の関数が既に定義されている．
 bool
 SmtMgr::define_fun(const SmtId* name_id,
-		   const vector<SmtSortedVar>& input_var_list,
+		   const vector<const SmtVarFun*>& input_var_list,
 		   const SmtSort* output_sort,
 		   const SmtTerm* body)
 {
   // 関数を登録する．
-  bool stat = fun_mgr().reg_fun(name_id, input_var_list, output_sort, body);
+  bool stat = name_mgr().reg_fun(name_id, input_var_list, output_sort, body);
 
   return stat;
 }
@@ -517,6 +518,28 @@ SmtMgr::make_param_sort(ymuint pid)
   return sort_mgr().make_param_sort(pid);
 }
 
+// @brief 変数を返す．
+const SmtVarFun*
+SmtMgr::make_var(const SmtId* name_id,
+		 const SmtSort* sort)
+{
+  const SmtVarFun* obj = find_obj(name_id);
+  if ( obj != NULL ) {
+    if ( !obj->is_var() ) {
+      // 同じ名前の関数があったらエラー
+      return NULL;
+    }
+    if ( obj->var_sort() != sort &&
+	 obj->var_sort() != NULL &&
+	 sort != NULL ) {
+      // 型が異なっていたらエラー
+      return NULL;
+    }
+    return obj;
+  }
+  return name_mgr().reg_var(name_id, sort);
+}
+
 // @brief 関数を返す．
 // @param[in] name_id 関数名
 // @return 指定された名前の関数を返す．
@@ -524,10 +547,10 @@ SmtMgr::make_param_sort(ymuint pid)
 //
 // エラーの原因は以下のとおり
 //  - name_id という名の関数が登録されていなかった．
-const SmtFun*
-SmtMgr::find_fun(const SmtId* name_id)
+const SmtVarFun*
+SmtMgr::find_obj(const SmtId* name_id)
 {
-  return fun_mgr().find_fun(name_id);
+  return name_mgr().find_obj(name_id);
 }
 
 // @brief <numeric> 型の term を作る．
@@ -586,6 +609,7 @@ SmtMgr::make_keyword_term(const ShString& val)
   return mTermMgr->make_keyword(val);
 }
 
+#if 0
 // @brief <identifier> 型の term を作る．
 // @param[in] id 識別子
 const SmtTerm*
@@ -603,17 +627,28 @@ SmtMgr::make_qual_identifier_term(const SmtId* id,
 {
   return mTermMgr->make_qual_identifier(id, sort);
 }
+#else
+// @brief 変数型の term を作る．
+// @param[in] var 変数
+// @note 実は引数なしの関数もこの形
+const SmtTerm*
+SmtMgr::make_var_term(const SmtVarFun* var)
+{
+  return mTermMgr->make_var(var);
+}
+#endif
 
 // @brief function term を作る．
 // @param[in] function 関数
 // @param[in] input_list 入力のリスト
 const SmtTerm*
-SmtMgr::make_fun_term(const SmtFun* function,
+SmtMgr::make_fun_term(const SmtVarFun* function,
 		      const vector<const SmtTerm*>& input_list)
 {
   return mTermMgr->make_fun(function, input_list);
 }
 
+#if 0
 // @brief let 文を作る．
 // @param[in] var_binding 変数割り当てのリスト
 // @param[in] body 本体
@@ -623,12 +658,13 @@ SmtMgr::make_let_term(const vector<SmtVarBinding>& var_binding,
 {
   return mTermMgr->make_let(var_binding, body);
 }
+#endif
 
 // @brief forall 文を作る．
 // @param[in] var_list 変数リスト
 // @param[in] body 本体
 const SmtTerm*
-SmtMgr::make_forall_term(const vector<SmtSortedVar>& var_list,
+SmtMgr::make_forall_term(const vector<const SmtVarFun*>& var_list,
 			 const SmtTerm* body)
 {
   return mTermMgr->make_forall(var_list, body);
@@ -638,7 +674,7 @@ SmtMgr::make_forall_term(const vector<SmtSortedVar>& var_list,
 // @param[in] var_list 変数リスト
 // @param[in] body 本体
 const SmtTerm*
-SmtMgr::make_exists_term(const vector<SmtSortedVar>& var_list,
+SmtMgr::make_exists_term(const vector<const SmtVarFun*>& var_list,
 			 const SmtTerm* body)
 {
   return mTermMgr->make_exists(var_list, body);
@@ -670,12 +706,12 @@ SmtMgr::sort_mgr()
   return mStack.back()->mSortMgr;
 }
 
-// @brief 現在の FunMgr を返す．
-SmtFunMgr&
-SmtMgr::fun_mgr()
+// @brief 現在の NameMgr を返す．
+SmtNameMgr&
+SmtMgr::name_mgr()
 {
   assert_cond( !mStack.empty(), __FILE__, __LINE__);
-  return mStack.back()->mFunMgr;
+  return mStack.back()->mNameMgr;
 }
 
 // @brief 現在のアロケータを返す．

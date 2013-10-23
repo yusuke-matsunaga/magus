@@ -1,6 +1,8 @@
 #ifndef YM_SMTLIBV2_SMTFUN_H
 #define YM_SMTLIBV2_SMTFUN_H
 
+#error "obsolete"
+
 /// @file ym_smtlibv2/SmtFun.h
 /// @brief SmtFun のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)

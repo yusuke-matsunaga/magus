@@ -13,9 +13,6 @@
 #include "ym_utils/ShString.h"
 #include "ym_utils/Alloc.h"
 
-#include "ym_smtlibv2/SmtSortedVar.h"
-#include "ym_smtlibv2/SmtVarBinding.h"
-
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
@@ -75,6 +72,7 @@ public:
   const SmtTerm*
   make_keyword(const ShString& val);
 
+#if 0
   /// @brief <identifier> 型の term を作る．
   /// @param[in] id 識別子
   const SmtTerm*
@@ -86,15 +84,22 @@ public:
   const SmtTerm*
   make_qual_identifier(const SmtId* id,
 		       const SmtSort* sort);
+#else
+  /// @brief 変数型の term を作る．
+  /// @param[in] var 変数
+  const SmtTerm*
+  make_var(const SmtVarFun* var);
+#endif
 
   /// @brief function term を作る．
   /// @param[in] function 関数
   /// @param[in] input_list 入力のリスト
   /// @note input_list のサイズは 1 以上
   const SmtTerm*
-  make_fun(const SmtFun* function,
+  make_fun(const SmtVarFun* function,
 	   const vector<const SmtTerm*>& input_list);
 
+#if 0
   /// @brief let 文を作る．
   /// @param[in] var_binding 変数割り当てのリスト
   /// @param[in] body 本体
@@ -102,13 +107,14 @@ public:
   const SmtTerm*
   make_let(const vector<SmtVarBinding>& var_binding,
 	   const SmtTerm* body);
+#endif
 
   /// @brief forall 文を作る．
   /// @param[in] var_list 変数リスト
   /// @param[in] body 本体
   /// @note var_list のサイズは 1 以上
   const SmtTerm*
-  make_forall(const vector<SmtSortedVar>& var_list,
+  make_forall(const vector<const SmtVarFun*>& var_list,
 	      const SmtTerm* body);
 
   /// @brief exists 文を作る．
@@ -116,7 +122,7 @@ public:
   /// @param[in] body 本体
   /// @note var_list のサイズは 1 以上
   const SmtTerm*
-  make_exists(const vector<SmtSortedVar>& var_list,
+  make_exists(const vector<const SmtVarFun*>& var_list,
 	      const SmtTerm* body);
 
   /// @brief attr 文を作る．

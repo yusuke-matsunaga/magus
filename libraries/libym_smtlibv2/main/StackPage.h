@@ -12,7 +12,7 @@
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
 #include "ym_utils/SimpleAlloc.h"
 #include "SmtSortMgr.h"
-#include "SmtFunMgr.h"
+#include "SmtNameMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -39,8 +39,8 @@ struct StackPage
   // SmtSort を管理するクラス
   SmtSortMgr mSortMgr;
 
-  // SmtFun を管理するクラス
-  SmtFunMgr mFunMgr;
+  // SmtVarFun を管理するクラス
+  SmtNameMgr mNameMgr;
 
   // assert されている term のリスト
   vector<const SmtTerm*> mTermList;
@@ -57,7 +57,7 @@ inline
 StackPage::StackPage() :
   mAlloc(4096),
   mSortMgr(mAlloc, 0, NULL),
-  mFunMgr(mAlloc, 0, NULL)
+  mNameMgr(mAlloc, 0, NULL)
 {
 }
 
@@ -69,7 +69,7 @@ StackPage::StackPage(ymuint level,
 		     StackPage* prev) :
   mAlloc(4096),
   mSortMgr(mAlloc, level, &prev->mSortMgr),
-  mFunMgr(mAlloc, level, &prev->mFunMgr)
+  mNameMgr(mAlloc, level, &prev->mNameMgr)
 {
 }
 

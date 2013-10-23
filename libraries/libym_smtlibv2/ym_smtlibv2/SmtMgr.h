@@ -13,16 +13,13 @@
 #include "ym_utils/ShString.h"
 #include "ym_utils/Alloc.h"
 
-#include "ym_smtlibv2/SmtSortedVar.h"
-#include "ym_smtlibv2/SmtVarBinding.h"
-
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 class SmtIdMgr;
 class SmtTermMgr;
 class SmtSortMgr;
-class SmtFunMgr;
+class SmtNameMgr;
 class StackPage;
 
 //////////////////////////////////////////////////////////////////////
@@ -134,7 +131,7 @@ public:
   ///  - 同名の関数が既に定義されている．
   bool
   define_fun(const SmtId* name_id,
-	     const vector<SmtSortedVar>& input_var_list,
+	     const vector<const SmtVarFun*>& input_var_list,
 	     const SmtSort* output_sort,
 	     const SmtTerm* body);
 
@@ -261,6 +258,11 @@ public:
   const SmtVarFun*
   find_obj(const SmtId* name_id);
 
+  /// @brief 変数を返す．
+  const SmtVarFun*
+  make_var(const SmtId* name_id,
+	  const SmtSort* sort = NULL);
+
   /// @brief <numeric> 型の term を作る．
   /// @param[in] val 値
   const SmtTerm*
@@ -296,6 +298,7 @@ public:
   const SmtTerm*
   make_keyword_term(const ShString& val);
 
+#if 0
   /// @brief <identifier> 型の term を作る．
   /// @param[in] id 識別子
   const SmtTerm*
@@ -307,6 +310,12 @@ public:
   const SmtTerm*
   make_qual_identifier_term(const SmtId* id,
 			    const SmtSort* sort);
+#else
+  /// @brief 変数型の term を作る．
+  /// @param[in] var 変数
+  const SmtTerm*
+  make_var_term(const SmtVarFun* var);
+#endif
 
   /// @brief function term を作る．
   /// @param[in] function 関数
@@ -315,25 +324,27 @@ public:
   make_fun_term(const SmtVarFun* function,
 		const vector<const SmtTerm*>& input_list);
 
+#if 0
   /// @brief let 文を作る．
   /// @param[in] var_binding 変数割り当てのリスト
   /// @param[in] body 本体
   const SmtTerm*
   make_let_term(const vector<SmtVarBinding>& var_binding,
 		const SmtTerm* body);
+#endif
 
   /// @brief forall 文を作る．
   /// @param[in] var_list 変数リスト
   /// @param[in] body 本体
   const SmtTerm*
-  make_forall_term(const vector<SmtSortedVar>& var_list,
+  make_forall_term(const vector<const SmtVarFun*>& var_list,
 		   const SmtTerm* body);
 
   /// @brief exists 文を作る．
   /// @param[in] var_list 変数リスト
   /// @param[in] body 本体
   const SmtTerm*
-  make_exists_term(const vector<SmtSortedVar>& var_list,
+  make_exists_term(const vector<const SmtVarFun*>& var_list,
 		   const SmtTerm* body);
 
   /// @brief attr 文を作る．
@@ -372,9 +383,9 @@ private:
   SmtSortMgr&
   sort_mgr();
 
-  /// @brief 現在の FunMgr を返す．
-  SmtFunMgr&
-  fun_mgr();
+  /// @brief 現在の NameMgr を返す．
+  SmtNameMgr&
+  name_mgr();
 
   /// @brief 現在のアロケータを返す．
   Alloc&
