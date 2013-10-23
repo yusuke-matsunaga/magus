@@ -6,7 +6,6 @@ SUBDIRS = \
 	ym_smtlibv2 \
 	include \
 	parser \
-	main \
 	shell \
 	. \
 	tests
@@ -21,8 +20,7 @@ libym_smtlibv2_la_SOURCES =
 
 libym_smtlibv2_la_LIBADD = \
 	shell/libym_smt_shell.la \
-	parser/libym_smt_parser.la \
-	main/libym_smt_main.la
+	parser/libym_smt_parser.la
 
 libym_smtlibv2_la_LDFLAGS = \
 	-lreadline -lncurses

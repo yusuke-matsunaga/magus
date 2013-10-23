@@ -1,7 +1,7 @@
-#ifndef YM_SMTLIBV2_SMTSOLVER_H
-#define YM_SMTLIBV2_SMTSOLVER_H
+#ifndef YM_LOGIC_SMTSOLVER_H
+#define YM_LOGIC_SMTSOLVER_H
 
-/// @file ym_smtlibv2/SmtSolver.h
+/// @file ym_logic/SmtSolver.h
 /// @brief SmtSolver のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,13 +9,14 @@
 /// All rights reserved.
 
 
-#include "ym_smtlibv2/smtlibv2_nsdef.h"
+#include "ym_logic/smt_nsdef.h"
+#include "ym_utils/ShString.h"
 
 
-BEGIN_NAMESPACE_YM_SMTLIBV2
+BEGIN_NAMESPACE_YM_SMT
 
 //////////////////////////////////////////////////////////////////////
-/// @class SmtSolver SmtSolver.h "ym_smtlibv2/SmtSolver.h"
+/// @class SmtSolver SmtSolver.h "ym_logic/SmtSolver.h"
 /// @brief SMT ソルバの雛形基底クラス
 ///
 /// 実際にはここで定義されている仮想関数を実装したクラスを作る必要がある．
@@ -82,12 +83,14 @@ public:
   /// @brief <numeric> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
+  virtual
   const SmtTerm*
   make_numeric_term(ymuint32 val) = 0;
 
   /// @brief <decimal> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
+  virtual
   const SmtTerm*
   make_decimal_term(const ShString& val) = 0;
 
@@ -189,6 +192,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_SMTLIBV2
+END_NAMESPACE_YM_SMT
 
-#endif // YM_SMTLIBV2_SMTSOLVER_H
+#endif // YM_LOGIC_SMTSOLVER_H

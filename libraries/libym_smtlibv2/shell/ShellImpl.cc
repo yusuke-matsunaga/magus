@@ -11,10 +11,11 @@
 #include "SmtLibParser.h"
 #include "SmtLibNode.h"
 
-#include "ym_smtlibv2/SmtAttr.h"
+#include "ym_logic/SmtAttr.h"
+#include "ym_logic/SmtSort.h"
+#include "ym_logic/SmtVar.h"
+
 #include "ym_smtlibv2/SmtId.h"
-#include "ym_smtlibv2/SmtSort.h"
-#include "ym_smtlibv2/SmtVarFun.h"
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -351,10 +352,12 @@ ShellImpl::set_logic(const SmtLibNode* arg_top)
       goto syntax_error;
     }
 
+#if 0
     if ( !mMgr.set_logic(logic) ) {
       mErrBuf << "already set";
       goto syntax_error;
     }
+#endif
 
     if ( debug ) {
       cerr << "  ==> success" << endl;
@@ -416,9 +419,11 @@ ShellImpl::set_info(const SmtLibNode* arg_top)
       }
     }
 
+#if 0
     if ( !mMgr.set_info(arg_top->str_value(), expr) ) {
       goto syntax_error;
     }
+#endif
   }
 
   if ( debug ) {
@@ -471,10 +476,12 @@ ShellImpl::declare_sort(const SmtLibNode* arg_top)
   }
   num = arg_list[1]->int_value();
 
+#if 0
   // 型を登録する．
   if ( !mMgr.declare_sort(name, num) ) {
     goto syntax_error;
   }
+#endif
 
   if ( debug ) {
     cerr << "  ==> success" << endl;
@@ -543,11 +550,13 @@ ShellImpl::define_sort(const SmtLibNode* arg_top)
     goto syntax_error;
   }
 
+#if 0
   // 型テンプレートを登録する．
   if ( !mMgr.define_sort(name, sort) ) {
     emsg = "already defined";
     goto syntax_error;
   }
+#endif
 
   if ( debug ) {
     cerr << "  ==> success" << endl;
@@ -619,11 +628,13 @@ ShellImpl::declare_fun(const SmtLibNode* arg_top)
     goto syntax_error;
   }
 
+#if 0
   // 関数を登録する．
   if ( !mMgr.declare_fun(name, input_sort_list, output_sort) ) {
     emsg = "already declared";
     goto syntax_error;
   }
+#endif
 
   if ( debug ) {
     cerr << "  ==> success" << endl;
@@ -653,7 +664,7 @@ ShellImpl::define_fun(const SmtLibNode* arg_top)
   // このコマンドは4つの引数をとる．
   vector<const SmtLibNode*> arg_list;
   const SmtId* name = NULL;
-  vector<const SmtVarFun*> var_list;
+  vector<const SmtVar*> var_list;
   const SmtSort* output_sort = NULL;
   const SmtTerm* body = NULL;
 
@@ -677,7 +688,7 @@ ShellImpl::define_fun(const SmtLibNode* arg_top)
   var_list.reserve(arg_list[1]->child_num());
   for (const SmtLibNode* node = arg_list[1]->child();
        node != NULL; node = node->sibling()) {
-    const SmtVarFun* var = eval_to_sorted_var(node);
+    const SmtVar* var = eval_to_sorted_var(node);
     if ( var == NULL ) {
       mErrBuf << "sorted var is expected.";
       goto syntax_error;
@@ -699,11 +710,13 @@ ShellImpl::define_fun(const SmtLibNode* arg_top)
     goto syntax_error;
   }
 
+#if 0
   // 関数を登録する．
   if ( !mMgr.define_fun(name, var_list, output_sort, body) ) {
     mErrBuf << "already defined";
     goto syntax_error;
   }
+#endif
 
   if ( debug ) {
     cerr << "  ==> success" << endl;
@@ -741,9 +754,11 @@ ShellImpl::assert(const SmtLibNode* arg_top)
       // エラーメッセージは出力されている．
       goto syntax_error;
     }
+#if 0
     if ( !mMgr.assert(term) ) {
       goto syntax_error;
     }
+#endif
   }
 
   if ( debug ) {
@@ -781,7 +796,7 @@ ShellImpl::push(const SmtLibNode* arg_top)
 
   {
     ymuint num = arg_top->int_value();
-    if ( !mMgr.push(num) ) {
+    if ( !push(num) ) {
       goto syntax_error;
     }
   }
@@ -823,7 +838,7 @@ ShellImpl::pop(const SmtLibNode* arg_top)
 
   {
     ymuint num = arg_top->int_value();
-    if ( !mMgr.pop(num) ) {
+    if ( !pop(num) ) {
       mErrBuf <<  "arg is too large";
       goto syntax_error;
     }
@@ -963,7 +978,7 @@ ShellImpl::eval_to_id(const SmtLibNode* node)
     }
   }
 
-  return mMgr.make_id(name, index_list);
+  return mIdMgr->make_id(name, index_list);
 
  syntax_error:
   return NULL;
@@ -1008,7 +1023,7 @@ ShellImpl::eval_to_sort(const SmtLibNode* node)
     }
   }
 
-  sort = mMgr.make_sort(id, elem_list);
+  sort = make_sort(id, elem_list);
   if ( sort == NULL ) {
     mErrBuf << id->name() << ": not registered";
     goto syntax_error;
@@ -1035,7 +1050,7 @@ ShellImpl::eval_to_sort_template(const SmtLibNode* node,
     ymuint n = param_list.size();
     for (ymuint i = 0; i < n; ++ i) {
       if ( id == param_list[i] ) {
-	return mMgr.make_param_sort(i);
+	return mSolver->make_param_sort(i);
       }
     }
   }
@@ -1069,7 +1084,7 @@ ShellImpl::eval_to_sort_template(const SmtLibNode* node,
     }
   }
 
-  return mMgr.make_sort(id, elem_list);
+  return mSolver->make_sort(elem_list);
 
  syntax_error:
 
@@ -1102,42 +1117,42 @@ ShellImpl::eval_to_term(const SmtLibNode* node)
   switch ( node->type() ) {
   case kNumToken:
     // numeric
-    return mMgr.make_numeric_term(node->int_value());
+    return mSolver->make_numeric_term(node->int_value());
 
   case kDecToken:
     // decimal
-    return mMgr.make_decimal_term(node->str_value());
+    return mSolver->make_decimal_term(node->str_value());
 
   case kHexToken:
     // hexadecimal
-    return mMgr.make_hexadecimal_term(node->str_value());
+    return mSolver->make_hexadecimal_term(node->str_value());
 
   case kBinToken:
     // binary
-    return mMgr.make_binary_term(node->str_value());
+    return mSolver->make_binary_term(node->str_value());
 
   case kStringToken:
     // string
-    return mMgr.make_string_term(node->str_value());
+    return mSolver->make_string_term(node->str_value());
 
   case kSymbolToken:
     {
       ShString name = node->str_value();
-      const SmtId* id = mMgr.make_id(name);
+      const SmtId* id = mIdMgr->make_id(name);
       // id が置き換え対象ならそれを返す．
 
       const SmtVarFun* obj = mMgr.find_obj(id);
       if ( obj != NULL ) {
 	if ( obj->is_var() ) {
-	  return mMgr.make_var_term(obj);
+	  return mSolver->make_var_term(obj);
 	}
 	else {
-	  return mMgr.make_fun_term(obj, vector<const SmtTerm*>(0));
+	  return mSolver->make_fun_term(obj, vector<const SmtTerm*>(0));
 	}
       }
       else {
-	const SmtVarFun* obj = mMgr.make_var(id, NULL);
-	return mMgr.make_var_term(obj);
+	const SmtVar* var = mSolver->make_var(NULL);
+	return mSolver->make_var_term(var);
       }
     }
 
@@ -1215,7 +1230,7 @@ ShellImpl::eval_to_term(const SmtLibNode* node)
 	  }
 	  input_list.push_back(term1);
 	}
-	return mMgr.make_fun_term(fun, input_list);
+	return mSolver->make_fun_term(fun, input_list);
       }
       else {
 	mErrBuf << fid->name() << ": undefined: " << node1->loc();
@@ -1304,7 +1319,7 @@ ShellImpl::eval_to_forall(const SmtLibNode* node)
     // エラーメッセージは下位の呼び出しで出力されているはず
     return NULL;
   }
-  return mMgr.make_forall_term(var_list, body);
+  return mSolver->make_forall_term(var_list, body);
 }
 
 // @brief exists 文の処理を行なう．
@@ -1342,7 +1357,7 @@ ShellImpl::eval_to_exists(const SmtLibNode* node)
     // エラーメッセージは下位の呼び出しで出力されているはず
     return NULL;
   }
-  return mMgr.make_exists_term(var_list, body);
+  return mSolver->make_exists_term(var_list, body);
 }
 
 // @brief attr 文の処理を行なう．
@@ -1378,7 +1393,7 @@ ShellImpl::eval_to_attr_term(const SmtLibNode* node)
       attr_list.push_back(SmtAttr(node1->str_value()));
     }
   }
-  return mMgr.make_attr_term(body, attr_list);
+  return mSolver->make_attr_term(body, attr_list);
 }
 
 // @brief S式を s-expr に変換する．
@@ -1388,25 +1403,25 @@ ShellImpl::eval_to_expr(const SmtLibNode* node)
 {
   switch ( node->type() ) {
   case kNumToken:
-    return mMgr.make_numeric_term(node->int_value());
+    return mSolver->make_numeric_term(node->int_value());
 
   case kDecToken:
-    return mMgr.make_decimal_term(node->str_value());
+    return mSolver->make_decimal_term(node->str_value());
 
   case kHexToken:
-    return mMgr.make_hexadecimal_term(node->str_value());
+    return mSolver->make_hexadecimal_term(node->str_value());
 
   case kBinToken:
-    return mMgr.make_binary_term(node->str_value());
+    return mSolver->make_binary_term(node->str_value());
 
   case kStringToken:
-    return mMgr.make_string_term(node->str_value());
+    return mSolver->make_string_term(node->str_value());
 
   case kSymbolToken:
-    return mMgr.make_symbol_term(node->str_value());
+    return mSolver->make_symbol_term(node->str_value());
 
   case kKeywordToken:
-    return mMgr.make_keyword_term(node->str_value());
+    return mSolver->make_keyword_term(node->str_value());
 
   case kListToken:
     {
@@ -1420,7 +1435,7 @@ ShellImpl::eval_to_expr(const SmtLibNode* node)
 	}
 	expr_list.push_back(expr1);
       }
-      return mMgr.make_list_term(expr_list);
+      return mSolver->make_list_term(expr_list);
     }
 
   default:
@@ -1456,11 +1471,11 @@ ShellImpl::eval_to_qid(const SmtLibNode* node)
     return NULL;
   }
 
-  const SmtVarFun* obj = mMgr.make_var(id, sort);
+  const SmtVar* obj = mSolver->make_var(sort);
   if ( obj == NULL ) {
     return NULL;
   }
-  return mMgr.make_var_term(obj);
+  return mSolver->make_var_term(obj);
 }
 
 // @brief S式を sorted_var に変換する．
@@ -1489,7 +1504,7 @@ ShellImpl::eval_to_sorted_var(const SmtLibNode* node)
     return false;
   }
 
-  return mMgr.make_var(id, sort);
+  return mSolver->make_var(sort);
 
  syntax_error:
   if ( debug ) {

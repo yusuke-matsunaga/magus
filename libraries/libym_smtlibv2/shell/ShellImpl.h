@@ -10,12 +10,17 @@
 
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
-#include "ym_smtlibv2/SmtMgr.h"
+#include "ym_logic/SmtSolver.h"
 #include "ym_utils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
+class SmtId;
+class SmtIdMgr;
+class NameMgr;
+class NameObj;
+class StackPage;
 class SmtLibParser;
 class SmtLibNode;
 
@@ -146,6 +151,39 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 識別子を返す．
+  /// @param[in] name 名前
+  /// @param[in] index_list インデックスのリスト
+  /// @return 同じ識別子があればそれを返す．なければ作る．
+  ///
+  /// この関数は通常は成功するはず．
+  const SmtId*
+  make_id(const ShString& name,
+	  const vector<ymuint32>& index_list = vector<ymuint32>(0));
+
+  /// @brief 型を返す．
+  /// @param[in] name_id 名前を表す識別子
+  /// @param[in] elem_list 要素のリスト
+  /// @return 同じ型があればそれを返す．なければ作る．
+  /// @note エラーの場合には NULL を返す．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - name_id という名の型が登録されていなかった．
+  ///  - 登録されている型と elem_list のサイズが異なった．
+  const SmtSort*
+  make_sort(const SmtId* name_id,
+	    const vector<const SmtSort*>& elem_list = vector<const SmtSort*>(0));
+
+  /// @brief 名前から変数か関数を探す
+  /// @param[in] name_id 名前を表す識別子
+  /// @return 指定された名前の変数または関数を返す．
+  /// @note エラーの場合には NULL を返す．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - name_id という名の関数が登録されていなかった．
+  const NameObj*
+  find_obj(const SmtId* name_id);
+
   /// @brief let 文の処理を行なう．
   /// @param[in] node 引数の先頭ノード
   const SmtTerm*
@@ -199,7 +237,7 @@ private:
 
   /// @brief S式を sorted_var に変換する．
   /// @param[in] node S式を表すノード
-  const SmtVarFun*
+  const SmtVar*
   eval_to_sorted_var(const SmtLibNode* node);
 
   /// @brief S式を var_binding に変換する．
@@ -237,14 +275,33 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // Sort/Fun を管理するための関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 現在の SortMgr を返す．
+  SortMgr&
+  sort_mgr();
+
+  /// @brief 現在の NameMgr を返す．
+  NameMgr&
+  name_mgr();
+
+  /// @brief 現在のアロケータを返す．
+  Alloc&
+  alloc();
+
+  /// @brief 現在の assertion リストを返す．
+  vector<const SmtTerm*>&
+  assertion_list();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // パーサー
   SmtLibParser* mParser;
-
-  // 処理を行う本体
-  SmtMgr mMgr;
 
   // 通常のプロンプト文字列
   StrBuff mPrompt1;
@@ -269,6 +326,18 @@ private:
 
   // エラーメッセージ用のバッファ
   ostringstream mErrBuf;
+
+  // SMT ソルバ
+  SmtSolver* mSolver;
+
+  // スタック
+  vector<StackPage*> mStack;
+
+  // SmtId を管理するクラス
+  SmtIdMgr* mIdMgr;
+
+  // SmtTerm を管理するクラス
+  SmtTermMgr* mTermMgr;
 
 };
 

@@ -25,6 +25,11 @@ libym_smt_shell_la_CPPFLAGS = \
 	-I$(top_srcdir)/include
 
 libym_smt_shell_la_SOURCES = \
+	NameMgr.h \
+	NameMgr.cc \
+	NameObj.h \
+	NameObjImpl.h \
+	NameObjImpl.cc \
 	ShellImpl.h \
 	ShellImpl.cc \
 	SmtLibShell.cc
