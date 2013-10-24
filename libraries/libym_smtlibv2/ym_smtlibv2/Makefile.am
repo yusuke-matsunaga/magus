@@ -8,10 +8,5 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	smtlibv2_nsdef.h \
-	SmtAttr.h \
-	SmtFun.h \
 	SmtId.h \
-	SmtLibShell.h \
-	SmtMgr.h \
-	SmtSort.h \
-	SmtTerm.h
+	SmtLibShell.h

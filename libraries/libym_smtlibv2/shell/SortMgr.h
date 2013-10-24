@@ -10,20 +10,19 @@
 
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
+#include "ym_logic/smt_nsdef.h"
 #include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-class SmtId;
+class SortElem;
 
 //////////////////////////////////////////////////////////////////////
 /// @class SortMgr SortMgr.h "SortMgr.h"
 /// @brief SmtSort を管理するクラス
 ///
-/// 内部には2つのハッシュ表がある．
-/// 一つは型名をキーにして，型テンプレートとパラメータ数を保持するもの．
-/// もう一つは型名と要素リストをキーにして型インスタンスを保持するもの．
+/// 型名と要素リストをキーにして型インスタンスを保持する
 //////////////////////////////////////////////////////////////////////
 class SortMgr
 {
@@ -31,9 +30,11 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリアロケータ
+  /// @param[in] solver ソルバ
   /// @param[in] level スタックレベル
   /// @param[in] parent_mgr 上位のマネージャ
   SortMgr(Alloc& alloc,
+	  SmtSolver& solver,
 	  ymuint level,
 	  SortMgr* parent_mgr);
 
@@ -46,36 +47,64 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型名を登録する．
+  /// @brief 型名を宣言する．
   /// @param[in] name_id 型名
   /// @param[in] param_num 引数の数
   /// @retval true 登録が成功した．
   /// @retval false 登録が失敗した．すでに同名の型が登録されている
   bool
-  reg_sort(const SmtId* name_id,
-	   ymuint param_num);
+  declare_sort(const SmtId* name_id,
+	       ymuint param_num);
 
-  /// @brief alias を登録する．
-  /// @param[in] name_id 型名
-  /// @param[in] sort 登録する型
+  /// @breif パラメータ型のテンプレートを生成する．
+  /// @param[in] param_id パラメータ番号
+  const SortElem*
+  make_param_sort_templ(ymuint param_id);
+
+  /// @brief 単純な型のテンプレートを生成する．
+  /// @param[in] name_id 名前を表す識別子
+  const SortElem*
+  make_simple_sort_templ(const SmtId* name_id);
+
+  /// @brief 複合型のテンプレートを生成する．
+  /// @param[in] name_id 名前を表す識別子
+  /// @param[in] elem_list 要素のリスト
+  const SortElem*
+  make_complex_sort_templ(const SmtId* name_id,
+			  const vector<const SortElem*>& elem_list);
+
+  /// @brief 型名を定義する．
+  /// @param[in] name_id 型名を表す識別子
+  /// @param[in] sort 登録する型テンプレート
   /// @retval true 登録が成功した．
   /// @retval false 登録が失敗した．すでに同名の型が登録されている
   bool
-  reg_alias(const SmtId* name_id,
-	    const SmtSort* sort);
+  define_sort(const SmtId* name_id,
+	      const SortElem* sort);
 
-  /// @brief SmtSort に変換する．
-  /// @param[in] name 型名
-  /// @param[in] elem_list 部品の型のリスト
-  /// @return 引数に合致する型を返す．
+  /// @brief 単純な型を作る．
+  /// @param[in] name_id 型名を表す識別子
+  /// @return 生成した型を返す．
+  /// @note エラーが起こったら NULL を返す．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - name_id という名の型が定義されていなかった．
+  ///  - name_id という名の型のパラメータ数が0ではなかった．
+  const SmtSort*
+  make_sort(const SmtId* name_id);
+
+  /// @brief 複合型を作る．
+  /// @param[in] name_id 型名を表す識別子
+  /// @param[in] param_list 要素の型のリスト
+  /// @return 生成した型を返す．
+  /// @note エラーが起こったら NULL を返す．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - name_id という名の型が定義されていなかった．
+  ///  - name_id という名の型のパラメータ数が param_list のサイズと異なった．
   const SmtSort*
   make_sort(const SmtId* name_id,
-	    const vector<const SmtSort*>& elem_list = vector<const SmtSort*>(0));
-
-  /// @brief 型パラメータを作る．
-  /// @param[in] pid パラメータ番号
-  const SmtSort*
-  make_param_sort(ymuint pid);
+	    const vector<const SmtSort*>& param_list);
 
 
 private:
@@ -83,27 +112,28 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief reg_sort/reg_alias の下請け関数
+  /// @brief 型テンプレートを登録する．
+  /// @param[in] sort 登録する型テンプレート
+  /// @param[in] param_num パラメータ数
+  void
+  reg_templ(const SortElem* sort,
+	    ymuint param_num);
+
+  /// @brief 型テンプレートを探す．
+  /// @param[in] name_id 型名
+  /// @param[out] param_num パラメータ数
+  /// @return name_id という名の型テンプレートを返す．
+  /// @note なければ NULL を返す．
+  const SortElem*
+  find_templ(const SmtId* name_id,
+	     ymuint& param_num);
+
+  /// @brief 型を登録する．
   /// @param[in] name_id 型名
   /// @param[in] sort 登録する型
-  /// @param[in] param_num 引数の数
-  /// @retval true 登録が成功した．
-  /// @retval false 登録が失敗した．すでに同名の型が登録されている
-  bool
-  reg_sub(const SmtId* name_id,
-	  const SmtSort* sort,
-	  ymuint param_num);
-
-  /// @brief 型宣言を探す．
-  /// @param[in] name_id 型名
-  /// @param[out] sort_tmpl 型テンプレート
-  /// @param[out] param_num パラメータ数
-  /// @retval true name_id とういう名の型テンプレートが見つかった．
-  /// @retval false name_id という名の型テンプレートは登録されていなかった．
-  bool
-  find_sort_decl(const SmtId* name_id,
-		 const SmtSort*& sort_tmpl,
-		 ymuint& param_num);
+  void
+  reg_sort(const SmtId* name_id,
+	   const SmtSort* sort);
 
   /// @brief 型を探す．
   /// @param[in] name_id 型名
@@ -114,28 +144,21 @@ private:
 	    const vector<const SmtSort*>& elem_list);
 
   /// @brief テンプレートから実際の型を作る．
-  /// @param[in] templ テンプレート
+  /// @param[in] sort_templ テンプレート
   /// @param[in] param_list パラメータリスト
   const SmtSort*
-  replace_param(const SmtSort* templ,
+  replace_param(const SortElem* sort_templ,
 		const vector<const SmtSort*>& param_list);
 
-  /// @brief 単純な型を作る．
-  /// @param[in] name_id 名前
-  SmtSortImpl*
-  new_simple_sort(const SmtId* name_id);
-
-  /// @brief 複合型を作る．
-  /// @param[in] name 名前
-  /// @param[in] elem_list 要素のリスト
-  SmtSortImpl*
-  new_complex_sort(const SmtId* name,
-		   const vector<const SmtSort*>& elem_list);
-
-  /// @brief ハッシュ表を拡大する．
+  /// @brief 型テンプレート用のハッシュ表を拡大する．
   /// @param[in] req_size 新しいサイズ
   void
-  expand_table(ymuint req_size);
+  expand_table1(ymuint req_size);
+
+  /// @brief 型用のハッシュ表を拡大する．
+  /// @param[in] req_size 新しいサイズ
+  void
+  expand_table2(ymuint req_size);
 
 
 private:
@@ -143,14 +166,32 @@ private:
   // 内部で用いられるデータ構造
   //////////////////////////////////////////////////////////////////////
 
-  // ハッシュ用のセル
-  struct Cell
+  // 型テンプレート用のハッシュ表の要素
+  struct Cell1
   {
+    // 型
+    const SortElem* mSort;
+
+    // パラメータ数
+    ymuint32 mParamNum;
+
+    // 次の要素を指すリンクポインタ
+    Cell1* mLink;
+
+  };
+
+  // 型用のハッシュ用のセル
+  struct Cell2
+  {
+    // 名前を表す識別子
     const SmtId* mId;
 
+    // 型
     const SmtSort* mSort;
 
-    Cell* mLink;
+    // 次の要素を指すリンクポインタ
+    Cell2* mLink;
+
   };
 
 
@@ -162,26 +203,41 @@ private:
   // メモリ確保用のオブジェクト
   Alloc& mAlloc;
 
+  // SMT ソルバ
+  SmtSolver& mSolver;
+
   // スタックのレベル
   ymuint32 mLevel;
 
   // 親のマネージャ
   SortMgr* mParent;
 
-  // 名前をキーにして型テンプレートと引数の数を保持するハッシュ表
-  hash_map<ymuint32, pair<const SmtSort*, ymuint32> > mHash;
-
-  // 登録されている宣言の数
-  ymuint32 mNum;
+  // 登録されている型テンプレートの数
+  ymuint32 mNum1;
 
   // ハッシュ表のサイズ
-  ymuint32 mTableSize;
+  ymuint32 mTableSize1;
 
   // ハッシュ表
-  Cell** mHashTable;
+  Cell1** mHashTable1;
 
   // ハッシュ表を拡大する目安
-  ymuint32 mNextLimit;
+  ymuint32 mNextLimit1;
+
+  // 登録されている宣言の数
+  ymuint32 mNum2;
+
+  // ハッシュ表のサイズ
+  ymuint32 mTableSize2;
+
+  // ハッシュ表
+  Cell2** mHashTable2;
+
+  // ハッシュ表を拡大する目安
+  ymuint32 mNextLimit2;
+
+  // パラメータ型を保持しておく配列
+  vector<const SortElem*> mParamArray;
 
 };
 

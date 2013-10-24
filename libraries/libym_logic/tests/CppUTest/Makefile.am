@@ -14,7 +14,8 @@ TESTS_ENVIRONMENT = \
 	top_builddir=$(top_builddir) \
 	top_srcdir=$(top_srcdir)
 
-TESTS =
+TESTS = \
+	SmtIdMgrTest
 
 testsubdir = testSubDir
 
@@ -35,17 +36,18 @@ run_all_test_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/parser \
-	-I$(top_srcdir)/shell \
+	-I$(top_srcdir)/main \
 	$(CPPUTEST_INCLUDES)
 
 run_all_test_SOURCES = \
 	SmtLibScannerTest.cc \
-	IdMgrTest.cc \
-	SortMgrTest.cc \
+	SmtIdMgrTest.cc \
+	SmtNameMgrTest.cc \
+	SmtSortMgrTest.cc \
+	SmtTermMgrTest.cc \
 	main.cc
 
 run_all_test_LDADD = \
 	$(top_builddir)/libym_smtlibv2.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(CPPUTEST_LIBS)

@@ -25,6 +25,11 @@ class SmtSolver
 {
 public:
 
+  /// @brief インスタンスを生成する静的関数
+  static
+  SmtSolver*
+  new_solver();
+
   /// @brief デストラクタ
   virtual
   ~SmtSolver() { }
@@ -47,13 +52,6 @@ public:
   virtual
   const SmtSort*
   make_sort(const vector<const SmtSort*>& elem_list) = 0;
-
-  /// @brief 型テンプレート用のパラメータ型を作る．
-  /// @param[in] param_id パラメータID
-  /// @return 作成した型を返す．
-  virtual
-  const SmtSort*
-  make_param_sort(ymuint param_id) = 0;
 
   /// @brief 変数を作る．
   /// @param[in] sort 変数の型

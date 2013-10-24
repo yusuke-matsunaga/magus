@@ -8,7 +8,10 @@
 
 
 #include "SortMgr.h"
+#include "SortElem.h"
 #include "ym_smtlibv2/SmtId.h"
+#include "ym_logic/SmtSolver.h"
+#include "ym_logic/SmtSort.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -49,9 +52,10 @@ hash_func(const SmtId* name,
 
 // ハッシュ関数
 ymuint
-hash_func(const SmtSort* sort)
+hash_func(const SmtId* name,
+	  const SmtSort* sort)
 {
-  ymuint h = sort->name()->id();
+  ymuint h = name->id();
   ymuint n = sort->elem_num();
   for (ymuint i = 0; i < n; ++ i) {
     const SmtSort* sort1 = sort->elem(i);
@@ -69,112 +73,245 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 // @param[in] alloc メモリアロケータ
+// @param[in] solver ソルバ
 // @param[in] level スタックレベル
 // @param[in] parent_mgr 上位のマネージャ
 SortMgr::SortMgr(Alloc& alloc,
+		 SmtSolver& solver,
 		 ymuint level,
 		 SortMgr* parent_mgr) :
   mAlloc(alloc),
+  mSolver(solver),
   mLevel(level),
   mParent(parent_mgr)
 {
-  mNum = 0;
-  mTableSize = 0;
-  mHashTable = NULL;
+  mNum1 = 0;
+  mTableSize1 = 0;
+  mHashTable1 = NULL;
+  expand_table1(1024);
 
-  expand_table(1024);
+  mNum2 = 0;
+  mTableSize2 = 0;
+  mHashTable2 = NULL;
+  expand_table2(1024);
 }
 
 // @brief デストラクタ
 SortMgr::~SortMgr()
 {
-  delete [] mHashTable;
+  delete [] mHashTable1;
+  delete [] mHashTable2;
 }
 
-// @brief 型名を登録する．
+// @brief 型名を宣言する．
 // @param[in] name_id 型名
 // @param[in] param_num 引数の数
 // @retval true 登録が成功した．
 // @retval false 登録が失敗した．すでに同名の型が登録されている
 bool
-SortMgr::reg_sort(const SmtId* name_id,
-		  ymuint param_num)
+SortMgr::declare_sort(const SmtId* name_id,
+		      ymuint param_num)
 {
-  return reg_sub(name_id, NULL, param_num);
+  ymuint dummy;
+  if ( find_templ(name_id, dummy) != NULL ) {
+    // 同じ名前の型が登録されている．
+    return false;
+  }
+
+  vector<const SortElem*> elem_list(param_num);
+  for (ymuint i = 0; i < param_num; ++ i) {
+    elem_list[i] = make_param_sort_templ(i);
+  }
+  const SortElem* sort = make_complex_sort_templ(name_id, elem_list);
+
+  reg_templ(sort, param_num);
+
+  return true;
 }
 
+// @breif パラメータ型のテンプレートを生成する．
+// @param[in] param_id パラメータ番号
+const SortElem*
+SortMgr::make_param_sort_templ(ymuint param_id)
+{
+  while ( mParamArray.size() <= param_id ) {
+    ymuint pid = mParamArray.size();
+    void* p = mAlloc.get_memory(sizeof(ParamSort));
+    ParamSort* sort = new (p) ParamSort(pid);
+    mParamArray.push_back(sort);
+  }
+  return mParamArray[param_id];
+}
+
+// @brief 単純な型のテンプレートを生成する．
+// @param[in] name_id 名前を表す識別子
+const SortElem*
+SortMgr::make_simple_sort_templ(const SmtId* name_id)
+{
+  void* p = mAlloc.get_memory(sizeof(SimpleSort));
+  SimpleSort* sort = new (p) SimpleSort(name_id);
+  return sort;
+}
+
+// @brief 複合型のテンプレートを生成する．
+// @param[in] name_id 名前を表す識別子
+// @param[in] elem_list 要素のリスト
+const SortElem*
+SortMgr::make_complex_sort_templ(const SmtId* name_id,
+				 const vector<const SortElem*>& elem_list)
+{
+  ymuint n = elem_list.size();
+  void* p = mAlloc.get_memory(sizeof(ComplexSort) + sizeof(const SortElem*) * (n - 1));
+  ComplexSort* sort = new (p) ComplexSort(name_id, elem_list);
+  return sort;
+}
 
 BEGIN_NONAMESPACE
 
-// @brief sort に含まれるパラメータ番号を得る．
-// @param[in] sort 対象の型
-// @param[out] param_array パラメータ番号を収める配列
-// @note param_array[i] = true なら i 番めのパラメータが使われている．
 void
-get_param(const SmtSort* sort,
-	  vector<bool>& param_array)
+get_param_num(const SortElem* sort,
+	      vector<bool>& param_map)
 {
   if ( sort->is_param() ) {
     ymuint pid = sort->param_id();
-    while ( param_array.size() <= pid ) {
-      param_array.push_back(false);
+    while ( param_map.size() <= pid ) {
+      param_map.push_back(false);
     }
-    param_array[pid] = true;
+    param_map[pid] = true;
   }
   else {
     ymuint n = sort->elem_num();
     for (ymuint i = 0; i < n; ++ i) {
-      const SmtSort* sort1 = sort->elem(i);
-      get_param(sort1, param_array);
+      get_param_num(sort->elem(i), param_map);
     }
   }
 }
 
 END_NONAMESPACE
 
-// @brief alias を登録する．
-// @param[in] name_id 型名
-// @param[in] sort 登録する型
+// @brief 型名を定義する．
+// @param[in] name_id 型名を表す識別子
+// @param[in] sort 登録する型テンプレート
 // @retval true 登録が成功した．
 // @retval false 登録が失敗した．すでに同名の型が登録されている
 bool
-SortMgr::reg_alias(const SmtId* name_id,
-		   const SmtSort* sort)
+SortMgr::define_sort(const SmtId* name_id,
+		     const SortElem* sort)
 {
-  vector<bool> param_array;
-  get_param(sort, param_array);
-  ymuint param_num = param_array.size();
+  ymuint dummy;
+  if ( find_templ(name_id, dummy) != NULL ) {
+    // 同じ名前の型が登録されている．
+    return false;
+  }
+
+  vector<bool> param_map;
+  get_param_num(sort, param_map);
+  ymuint param_num = param_map.size();
   for (ymuint i = 0; i < param_num; ++ i) {
-    if ( !param_array[i] ) {
-      // 歯抜け状態だった．
+    if ( !param_map[i] ) {
+      // パラメータが歯抜けだった．
       return false;
     }
   }
 
-  return reg_sub(name_id, sort, param_num);
-}
-
-// @brief reg_sort/reg_alias の下請け関数
-// @param[in] name_id 型名
-// @param[in] sort 登録する型
-// @param[in] param_num 引数の数
-// @retval true 登録が成功した．
-// @retval false 登録が失敗した．すでに同名の型が登録されている
-bool
-SortMgr::reg_sub(const SmtId* name_id,
-		 const SmtSort* sort,
-		 ymuint param_num)
-{
-  hash_map<ymuint32, pair<const SmtSort*, ymuint32> >::iterator p = mHash.find(name_id->id());
-  if ( p != mHash.end() ) {
-    // 同名の宣言が登録されている．
-    return false;
-  }
-
-  // 名前を登録する．
-  mHash.insert(make_pair(name_id->id(), make_pair(sort, param_num)));
+  reg_templ(sort, param_num);
 
   return true;
+}
+
+// @brief 型を登録する．
+// @param[in] sort 登録する型テンプレート
+// @param[in] param_num パラメータ数
+void
+SortMgr::reg_templ(const SortElem* sort,
+		   ymuint param_num)
+{
+  if ( mNum1 >= mNextLimit1 ) {
+    expand_table1(mTableSize1 * 2);
+  }
+
+  ymuint idx = sort->name()->id() % mTableSize1;
+
+  void* p = mAlloc.get_memory(sizeof(Cell1));
+  Cell1* cell = new (p) Cell1;
+  cell->mSort = sort;
+  cell->mParamNum = param_num;
+
+  cell->mLink = mHashTable1[idx];
+  mHashTable1[idx] = cell;
+
+  ++ mNum1;
+}
+
+// @brief 型テンプレートを探す．
+// @param[in] name_id 型名を表す識別子
+// @param[out] param_num パラメータ数
+// @return 対象の型テンプレートを返す．
+// @note 見つからなかったら NULL を返す．
+const SortElem*
+SortMgr::find_templ(const SmtId* name_id,
+		    ymuint& param_num)
+{
+  if ( mParent != NULL ) {
+    // 親のレベルで探す
+    const SortElem* sort = mParent->find_templ(name_id, param_num);
+    if ( sort != NULL ) {
+      return sort;
+    }
+  }
+
+  ymuint h = name_id->id();
+  ymuint idx = h % mTableSize1;
+  for (Cell1* cell = mHashTable1[idx];
+       cell != NULL; cell = cell->mLink) {
+    const SortElem* sort = cell->mSort;
+    if ( sort->name() == name_id ) {
+      param_num = cell->mParamNum;
+      return sort;
+    }
+  }
+
+  return NULL;
+}
+
+// @brief 単純な型を作る．
+// @param[in] name_id 型名を表す識別子
+// @return 生成した型を返す．
+// @note エラーが起こったら NULL を返す．
+//
+// エラーの原因は以下のとおり
+//  - name_id という名の型が定義されていなかった．
+//  - name_id という名の型のパラメータ数が0ではなかった．
+const SmtSort*
+SortMgr::make_sort(const SmtId* name_id)
+{
+  // 型のインスタンスを探す．
+  {
+    const SmtSort* sort = find_sort(name_id, vector<const SmtSort*>(0));
+    if ( sort != NULL ) {
+      // 見つかった．
+      return sort;
+    }
+  }
+
+  // 型宣言を探す．
+  ymuint param_num = 0;
+  const SortElem* sort_tmpl = find_templ(name_id, param_num);
+  if ( sort_tmpl == NULL ) {
+    // name_id という型は登録されていなかった．
+    return NULL;
+  }
+  if ( param_num != 0 ) {
+    // 引数の数が合わない．
+    return NULL;
+  }
+
+  const SmtSort* sort = mSolver.make_sort(vector<const SmtSort*>(0));
+
+  // 登録する．
+  reg_sort(name_id, sort);
+
+  return sort;
 }
 
 // @brief SmtSort に変換する．
@@ -195,125 +332,57 @@ SortMgr::make_sort(const SmtId* name_id,
   }
 
   // 型宣言を探す．
-  const SmtSort* sort_tmpl = NULL;
   ymuint param_num = 0;
-  if ( !find_sort_decl(name_id, sort_tmpl, param_num) ) {
+  const SortElem* sort_templ = find_templ(name_id, param_num);
+  if ( sort_templ == NULL ) {
     // name_id という型は登録されていなかった．
     return NULL;
   }
-
   if ( param_num != param_list.size() ) {
     // 引数の数が合わない．
     return NULL;
   }
 
-  SmtSortImpl* sort = NULL;
-  if ( sort_tmpl != NULL ) {
-    // テンプレートから実際の型を作る．
-    ymuint n = sort_tmpl->elem_num();
-    assert_cond( n > 0, __FILE__, __LINE__);
-
-    vector<const SmtSort*> elem_list(n);
-    for (ymuint i = 0; i < n; ++ i) {
-      elem_list[i] = replace_param(sort_tmpl->elem(i), param_list);
-    }
-    sort = new_complex_sort(sort_tmpl->name(), elem_list);
-  }
-  else if ( param_list.empty() ) {
-    // 単純な型
-    sort = new_simple_sort(name_id);
+  const SmtSort* sort = NULL;
+  if ( param_num > 0 ) {
+    // パラメータを置き換えて実際の型を作る．
+    sort = replace_param(sort_templ, param_list);
   }
   else {
-    // 複合型
-    sort = new_complex_sort(name_id, param_list);
+    // パラメータはないのでそのまま実際の型を作る．
+    sort = mSolver.make_sort(param_list);
   }
 
-  if ( mNum >= mNextLimit ) {
-    expand_table(mTableSize * 2);
-  }
-  ymuint h = hash_func(sort);
-  ymuint idx = h % mTableSize;
-
-  sort->mId = mNum;
-  sort->mLevel = mLevel;
-  ++ mNum;
-
-  sort->mLink = mHashTable[idx];
-  mHashTable[idx] = sort;
+  // 登録する．
+  reg_sort(name_id, sort);
 
   return sort;
 }
 
-// @brief テンプレートから実際の型を作る．
-// @param[in] templ テンプレート
-// @param[in] param_list パラメータリスト
-const SmtSort*
-SortMgr::replace_param(const SmtSort* templ,
-		       const vector<const SmtSort*>& param_list)
-{
-  ymuint n = templ->elem_num();
-  if ( n == 0 ) {
-    if ( templ->is_param() ) {
-      // パラメータ型
-      ymuint pid = templ->param_id();
-      assert_cond( pid < param_list.size(), __FILE__, __LINE__);
-      return param_list[pid];
-    }
-    else {
-      // 通常の型
-      return templ;
-    }
-  }
-  else {
-    // 複合型
-    vector<const SmtSort*> elem_list(n);
-    for (ymuint i = 0; i < n; ++ i) {
-      elem_list[i] = replace_param(templ->elem(i), param_list);
-    }
-    return new_complex_sort(templ->name(), elem_list);
-  }
-}
-
-// @brief 型パラメータを作る．
-// @param[in] pid パラメータ番号
-const SmtSort*
-SortMgr::make_param_sort(ymuint pid)
-{
-  void* p = mAlloc.get_memory(sizeof(SmtParamSort));
-  SmtSort* sort = new (p) SmtParamSort(pid);
-  return sort;
-}
-
-// @brief 型宣言を探す．
+// @brief 型を登録する．
 // @param[in] name_id 型名
-// @param[out] sort_tmpl 型テンプレート
-// @param[out] param_num パラメータ数
-// @retval true name_id とういう名の型テンプレートが見つかった．
-// @retval false name_id という名の型テンプレートは登録されていなかった．
-bool
-SortMgr::find_sort_decl(const SmtId* name_id,
-			const SmtSort*& sort_tmpl,
-			ymuint& param_num)
+// @param[in] sort 登録する型
+void
+SortMgr::reg_sort(const SmtId* name_id,
+		  const SmtSort* sort)
 {
-  if ( mParent != NULL ) {
-    // 親のレベルで探す．
-    bool stat = mParent->find_sort_decl(name_id, sort_tmpl, param_num);
-    if ( stat ) {
-      return true;
-    }
+  // ハッシュ表に登録する．
+  if ( mNum2 >= mNextLimit2 ) {
+    expand_table2(mTableSize2 * 2);
   }
 
-  // 型名を探す．
-  hash_map<ymuint32, pair<const SmtSort*, ymuint32> >::iterator p = mHash.find(name_id->id());
-  if ( p == mHash.end() ) {
-    // name という型名は登録されていなかった．
-    return false;
-  }
+  void* p = mAlloc.get_memory(sizeof(Cell2));
+  Cell2* cell = new (p) Cell2;
+  cell->mId = name_id;
+  cell->mSort = sort;
 
-  // 見つかった．
-  sort_tmpl = p->second.first;
-  param_num = p->second.second;
-  return true;
+  ymuint h = hash_func(name_id, sort);
+  ymuint idx = h % mTableSize2;
+
+  cell->mLink = mHashTable2[idx];
+  mHashTable2[idx] = cell;
+
+  ++ mNum2;
 }
 
 // @brief 型を探す．
@@ -334,9 +403,10 @@ SortMgr::find_sort(const SmtId* name_id,
 
   // 同じ型が存在するか調べる．
   ymuint h = hash_func(name_id, elem_list);
-  ymuint idx = h % mTableSize;
-  for (SmtSortImpl* sort = mHashTable[idx]; sort != NULL; sort = sort->mLink) {
-    if ( sort->name() == name_id && check_elem(sort, elem_list) ) {
+  ymuint idx = h % mTableSize2;
+  for (Cell2* cell = mHashTable2[idx]; cell != NULL; cell = cell->mLink) {
+    const SmtSort* sort = cell->mSort;
+    if ( cell->mId == name_id && check_elem(sort, elem_list) ) {
       // 見つかった．
       return sort;
     }
@@ -346,50 +416,91 @@ SortMgr::find_sort(const SmtId* name_id,
   return NULL;
 }
 
-// @brief 単純な型を作る．
-SmtSortImpl*
-SortMgr::new_simple_sort(const SmtId* name)
+// @brief テンプレートから実際の型を作る．
+// @param[in] templ テンプレート
+// @param[in] param_list パラメータリスト
+const SmtSort*
+SortMgr::replace_param(const SortElem* templ,
+		       const vector<const SmtSort*>& param_list)
 {
-  void* p = mAlloc.get_memory(sizeof(SmtSortImpl));
-  SmtSortImpl* sort = new (p) SmtSortImpl(name);
-  return sort;
+  if ( templ->is_param() ) {
+    // パラメータ型
+    ymuint pid = templ->param_id();
+    assert_cond( pid < param_list.size(), __FILE__, __LINE__);
+    return param_list[pid];
+  }
+
+  ymuint n = templ->elem_num();
+  if ( n == 0 ) {
+    // 通常の型
+    return make_sort(templ->name());
+  }
+  else {
+    // 複合型
+    vector<const SmtSort*> elem_list(n);
+    for (ymuint i = 0; i < n; ++ i) {
+      elem_list[i] = replace_param(templ->elem(i), param_list);
+    }
+    return make_sort(templ->name(), elem_list);
+  }
 }
 
-// @brief 複合型を作る．
-SmtSortImpl*
-SortMgr::new_complex_sort(const SmtId* name,
-			  const vector<const SmtSort*>& elem_list)
+// @brief 型テンプレート用のハッシュ表を拡大する．
+// @param[in] req_size 新しいサイズ
+void
+SortMgr::expand_table1(ymuint req_size)
 {
-  ymuint n = elem_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtCplxSort) + sizeof(const SmtSort*) * (n - 1));
-  SmtCplxSort* sort = new (p) SmtCplxSort(name, elem_list);
-  return sort;
+  ymuint old_size = mTableSize1;
+  Cell1** old_table = mHashTable1;
+
+  mTableSize1 = req_size;
+  mHashTable1 = new Cell1*[mTableSize1];
+  for (ymuint i = 0; i < mTableSize1; ++ i) {
+    mHashTable1[i] = NULL;
+  }
+  mNextLimit1 = static_cast<ymuint32>(mTableSize1 * 1.8);
+
+  if ( old_size > 0 ) {
+    for (ymuint i = 0; i < old_size; ++ i) {
+      for (Cell1* cell = old_table[i]; cell != NULL; ) {
+	Cell1* tmp_cell = cell;
+	cell = cell->mLink;
+
+	ymuint idx = tmp_cell->mSort->name()->id() % mTableSize1;
+	tmp_cell->mLink = mHashTable1[idx];
+	mHashTable1[idx] = tmp_cell;
+      }
+    }
+    delete [] old_table;
+  }
 }
 
 // @brief ハッシュ表を拡大する．
 // @param[in] req_size 新しいサイズ
 void
-SortMgr::expand_table(ymuint req_size)
+SortMgr::expand_table2(ymuint req_size)
 {
-  ymuint old_size = mTableSize;
-  Cell** old_table = mHashTable;
+  ymuint old_size = mTableSize2;
+  Cell2** old_table = mHashTable2;
 
-  mTableSize = req_size;
-  mHashTable = new Cell*[mTableSize];
-  for (ymuint i = 0; i < mTableSize; ++ i) {
-    mHashTable[i] = NULL;
+  mTableSize2 = req_size;
+  mHashTable2 = new Cell2*[mTableSize2];
+  for (ymuint i = 0; i < mTableSize2; ++ i) {
+    mHashTable2[i] = NULL;
   }
-  mNextLimit = static_cast<ymuint32>(mTableSize * 1.8);
+  mNextLimit2 = static_cast<ymuint32>(mTableSize2 * 1.8);
 
   if ( old_size > 0 ) {
     for (ymuint i = 0; i < old_size; ++ i) {
-      for (Cell* sort = old_table[i]; sort != NULL; ) {
-	Cell* tmp_sort = sort;
-	sort = sort->mLink;
+      for (Cell2* cell = old_table[i]; cell != NULL; ) {
+	Cell2* tmp_cell = cell;
+	cell = cell->mLink;
 
-	ymuint h = hash_func(tmp_sort) % mTableSize;
-	tmp_sort->mLink = mHashTable[h];
-	mHashTable[h] = tmp_sort;
+	const SmtId* id = cell->mId;
+	const SmtSort* sort = cell->mSort;
+	ymuint h = hash_func(id, sort) % mTableSize2;
+	tmp_cell->mLink = mHashTable2[h];
+	mHashTable2[h] = tmp_cell;
       }
     }
     delete [] old_table;

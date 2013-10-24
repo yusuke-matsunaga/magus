@@ -10,7 +10,7 @@
 
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
-#include "ym_smtlibv2/SmtId.h"
+#include "ym_logic/smt_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2

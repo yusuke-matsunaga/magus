@@ -70,11 +70,7 @@ enum tSmtLibResponse {
 
 
 // クラス名の宣言
-class SmtAttr;
-class SmtFun;
-class SmtSort;
-class SmtTerm;
-class SmtVar;
+class SmtId;
 
 END_NAMESPACE_YM_SMTLIBV2
 

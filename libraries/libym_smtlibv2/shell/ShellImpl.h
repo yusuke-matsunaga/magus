@@ -11,18 +11,22 @@
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
 #include "ym_logic/SmtSolver.h"
+#include "ym_utils/Alloc.h"
 #include "ym_utils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 class SmtId;
-class SmtIdMgr;
+class IdMgr;
+class SortElem;
+class SortMgr;
 class NameMgr;
 class NameObj;
 class StackPage;
 class SmtLibParser;
 class SmtLibNode;
+class SmtTermMgr;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ShellImpl ShellImpl.h "ShellImpl.h"
@@ -216,7 +220,7 @@ private:
 
   /// @brief S式を sort に変換する．
   /// @param[in] node S式を表すノード
-  const SmtSort*
+  const SortElem*
   eval_to_sort_template(const SmtLibNode* node,
 			const vector<const SmtId*>& param_list);
 
@@ -334,7 +338,7 @@ private:
   vector<StackPage*> mStack;
 
   // SmtId を管理するクラス
-  SmtIdMgr* mIdMgr;
+  IdMgr* mIdMgr;
 
   // SmtTerm を管理するクラス
   SmtTermMgr* mTermMgr;

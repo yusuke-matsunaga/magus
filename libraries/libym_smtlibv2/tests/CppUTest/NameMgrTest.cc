@@ -1,6 +1,6 @@
 
-/// @file SmtNameMgrTest.cc
-/// @brief SmtNameMgr のテストプログラム
+/// @file NameMgrTest.cc
+/// @brief NameMgr のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -10,62 +10,63 @@
 #include "CppUTest/TestHarness.h"
 
 #include "ym_smtlibv2/SmtId.h"
-#include "ym_smtlibv2/SmtSort.h"
-#include "ym_smtlibv2/SmtTerm.h"
-#include "ym_smtlibv2/SmtVarFun.h"
-#include "SmtIdMgr.h"
-#include "SmtNameMgr.h"
-#include "SmtSortMgr.h"
-#include "SmtTermMgr.h"
+#include "ym_logic/SmtSort.h"
+#include "ym_logic/SmtTerm.h"
+#include "ym_logic/SmtVar.h"
+#include "ym_logic/SmtFun.h"
+#include "IdMgr.h"
+#include "NameMgr.h"
+#include "SortTemplMgr.h"
+//#include "SmtTermMgr.h"
 #include "ym_utils/SimpleAlloc.h"
 
 
 using namespace nsYm;
 using namespace nsYm::nsSmtLibV2;
 
-TEST_GROUP(SmtNameMgrTestGroup)
+TEST_GROUP(NameMgrTestGroup)
 {
   SimpleAlloc* alloc;
-  SmtIdMgr* IdMgr;
-  SmtSortMgr* SortMgr;
-  SmtNameMgr* NameMgr;
-  SmtTermMgr* TermMgr;
+  IdMgr* mIdMgr;
+  SortTemplMgr* mSortMgr;
+  NameMgr* mNameMgr;
+  //SmtTermMgr* mTermMgr;
 
   TEST_SETUP() {
     alloc = new SimpleAlloc(4096);
-    IdMgr = new SmtIdMgr(*alloc);
-    SortMgr = new SmtSortMgr(*alloc, 0, NULL);
-    NameMgr = new SmtNameMgr(*alloc, 0, NULL);
-    TermMgr = new SmtTermMgr(*alloc);
+    mIdMgr = new IdMgr(*alloc);
+    mSortMgr = new SortTemplMgr(*alloc, 0, NULL);
+    mNameMgr = new NameMgr(*alloc, 0, NULL);
+    //mTermMgr = new SmtTermMgr(*alloc);
   }
 
   TEST_TEARDOWN() {
-    delete IdMgr;
-    delete SortMgr;
-    delete NameMgr;
-    delete TermMgr;
+    delete mIdMgr;
+    delete mSortMgr;
+    delete mNameMgr;
+    //delete mTermMgr;
     delete alloc;
     ShString::free_all_memory();
   }
 };
 
 // setup(), teardown() でメモリリークが発生していないことを確認するためのテスト
-TEST(SmtNameMgrTestGroup, empty)
+TEST(NameMgrTestGroup, empty)
 {
 }
 
 // 関数を宣言するテスト1
-TEST(SmtNameMgrTestGroup, simple_decl1)
+TEST(NameMgrTestGroup, simple_decl1)
 {
   // (declare-sort a 0)
-  const SmtId* id_a = IdMgr->make_id(ShString("a"));
-  bool stat0 = SortMgr->reg_sort(id_a, 0);
+  const SmtId* id_a = mIdMgr->make_id(ShString("a"));
+  bool stat0 = mSortMgr->reg_sort(id_a, 0);
   CHECK( stat0 );
-  const SmtSort* sort_a = SortMgr->make_sort(id_a);
+  const SmtSort* sort_a = mSortMgr->make_sort(id_a);
   CHECK( sort_a != NULL );
 
   // (declare-fun f () a)
-  const SmtId* id_f = IdMgr->make_id(ShString("f"));
+  const SmtId* id_f = mIdMgr->make_id(ShString("f"));
   vector<const SmtSort*> input_list0(0);
   const SmtVarFun* fun_f = NameMgr->reg_fun(id_f, input_list0, sort_a);
   CHECK( fun_f != NULL );
@@ -93,24 +94,24 @@ TEST(SmtNameMgrTestGroup, simple_decl1)
 }
 
 // 関数を宣言するテスト2
-TEST(SmtNameMgrTestGroup, simple_decl2)
+TEST(NameMgrTestGroup, simple_decl2)
 {
   // (declare-sort a 0)
-  const SmtId* id_a = IdMgr->make_id(ShString("a"));
-  bool stat0 = SortMgr->reg_sort(id_a, 0);
+  const SmtId* id_a = mIdMgr->make_id(ShString("a"));
+  bool stat0 = mSortMgr->reg_sort(id_a, 0);
   CHECK( stat0 );
-  const SmtSort* sort_a = SortMgr->make_sort(id_a);
+  const SmtSort* sort_a = mSortMgr->make_sort(id_a);
   CHECK( sort_a != NULL );
 
   // (declare-sort b 0)
-  const SmtId* id_b = IdMgr->make_id(ShString("b"));
-  bool stat1 = SortMgr->reg_sort(id_b, 0);
+  const SmtId* id_b = mIdMgr->make_id(ShString("b"));
+  bool stat1 = mSortMgr->reg_sort(id_b, 0);
   CHECK( stat1 );
-  const SmtSort* sort_b = SortMgr->make_sort(id_b);
+  const SmtSort* sort_b = mSortMgr->make_sort(id_b);
   CHECK( sort_b != NULL );
 
   // (declare-fun f (b b) a)
-  const SmtId* id_f = IdMgr->make_id(ShString("f"));
+  const SmtId* id_f = mIdMgr->make_id(ShString("f"));
   vector<const SmtSort*> input_list0(2);
   input_list0[0] = sort_b;
   input_list0[1] = sort_b;
@@ -133,17 +134,17 @@ TEST(SmtNameMgrTestGroup, simple_decl2)
 }
 
 // 関数を宣言するテスト3
-TEST(SmtNameMgrTestGroup, simple_decl3)
+TEST(NameMgrTestGroup, simple_decl3)
 {
   // (decl-sort a 0)
-  const SmtId* id_a = IdMgr->make_id(ShString("a"));
-  bool stat0 = SortMgr->reg_sort(id_a, 0);
+  const SmtId* id_a = mIdMgr->make_id(ShString("a"));
+  bool stat0 = mSortMgr->reg_sort(id_a, 0);
   CHECK( stat0 );
-  const SmtSort* sort_a = SortMgr->make_sort(id_a);
+  const SmtSort* sort_a = mSortMgr->make_sort(id_a);
   CHECK( sort_a != NULL );
 
   // (declare-fun f1 ( a a ) a :right_assoc)
-  const SmtId* id_f1 = IdMgr->make_id(ShString("f1"));
+  const SmtId* id_f1 = mIdMgr->make_id(ShString("f1"));
   vector<const SmtSort*> input_list1(2);
   input_list1[0] = sort_a;
   input_list1[1] = sort_a;
@@ -161,7 +162,7 @@ TEST(SmtNameMgrTestGroup, simple_decl3)
   LONGS_EQUAL( 0, fun_f1->param_num() );
 
   // (declare-fun f2 ( a a ) a :left_assoc)
-  const SmtId* id_f2 = IdMgr->make_id(ShString("f2"));
+  const SmtId* id_f2 = mIdMgr->make_id(ShString("f2"));
   vector<const SmtSort*> input_list2(2);
   input_list2[0] = sort_a;
   input_list2[1] = sort_a;
@@ -179,7 +180,7 @@ TEST(SmtNameMgrTestGroup, simple_decl3)
   LONGS_EQUAL( 0, fun_f2->param_num() );
 
   // (declare-fun f3 ( a a ) a :left_assoc)
-  const SmtId* id_f3 = IdMgr->make_id(ShString("f3"));
+  const SmtId* id_f3 = mIdMgr->make_id(ShString("f3"));
   vector<const SmtSort*> input_list3(2);
   input_list3[0] = sort_a;
   input_list3[1] = sort_a;
@@ -197,7 +198,7 @@ TEST(SmtNameMgrTestGroup, simple_decl3)
   LONGS_EQUAL( 0, fun_f3->param_num() );
 
   // (declare-fun f4 ( a a ) a :left_assoc)
-  const SmtId* id_f4 = IdMgr->make_id(ShString("f4"));
+  const SmtId* id_f4 = mIdMgr->make_id(ShString("f4"));
   vector<const SmtSort*> input_list4(2);
   input_list4[0] = sort_a;
   input_list4[1] = sort_a;
@@ -216,20 +217,20 @@ TEST(SmtNameMgrTestGroup, simple_decl3)
 }
 
 // パラメータ付きの関数の宣言のテスト1
-TEST(SmtNameMgrTestGroup, param_decl1)
+TEST(NameMgrTestGroup, param_decl1)
 {
   // パラメータ0
-  const SmtSort* param0 = SortMgr->make_param_sort(0);
+  const SmtSort* param0 = mSortMgr->make_param_sort(0);
 
   // (declare-sort a 0)
-  const SmtId* id_a = IdMgr->make_id(ShString("a"));
-  bool stat = SortMgr->reg_sort(id_a, 0);
+  const SmtId* id_a = mIdMgr->make_id(ShString("a"));
+  bool stat = mSortMgr->reg_sort(id_a, 0);
   CHECK( stat );
-  const SmtSort* sort_a = SortMgr->make_sort(id_a);
+  const SmtSort* sort_a = mSortMgr->make_sort(id_a);
   CHECK( sort_a != NULL );
 
   // par (p0) (= p0 p0 a)
-  const SmtId* id_eq = IdMgr->make_id(ShString("="));
+  const SmtId* id_eq = mIdMgr->make_id(ShString("="));
   vector<const SmtSort*> eq_list(2);
   eq_list[0] = param0;
   eq_list[1] = param0;
@@ -250,20 +251,20 @@ TEST(SmtNameMgrTestGroup, param_decl1)
 }
 
 // パラメータ付きの関数の宣言のテスト2
-TEST(SmtNameMgrTestGroup, param_decl2)
+TEST(NameMgrTestGroup, param_decl2)
 {
   // パラメータ1
-  const SmtSort* param1 = SortMgr->make_param_sort(1);
+  const SmtSort* param1 = mSortMgr->make_param_sort(1);
 
   // (declare-sort a 0)
-  const SmtId* id_a = IdMgr->make_id(ShString("a"));
-  bool stat = SortMgr->reg_sort(id_a, 0);
+  const SmtId* id_a = mIdMgr->make_id(ShString("a"));
+  bool stat = mSortMgr->reg_sort(id_a, 0);
   CHECK( stat );
-  const SmtSort* sort_a = SortMgr->make_sort(id_a);
+  const SmtSort* sort_a = mSortMgr->make_sort(id_a);
   CHECK( sort_a != NULL );
 
   // par (p1) (= p1 p1 a)
-  const SmtId* id_eq = IdMgr->make_id(ShString("="));
+  const SmtId* id_eq = mIdMgr->make_id(ShString("="));
   vector<const SmtSort*> eq_list(2);
   eq_list[0] = param1;
   eq_list[1] = param1;
@@ -273,20 +274,20 @@ TEST(SmtNameMgrTestGroup, param_decl2)
 }
 
 // 関数定義のテスト
-TEST(SmtNameMgrTestGroup, fun_def)
+TEST(NameMgrTestGroup, fun_def)
 {
   // (declare-sort a 0)
-  const SmtId* id_a = IdMgr->make_id(ShString("a"));
-  bool stat0 = SortMgr->reg_sort(id_a, 0);
+  const SmtId* id_a = mIdMgr->make_id(ShString("a"));
+  bool stat0 = mSortMgr->reg_sort(id_a, 0);
   CHECK( stat0 );
-  const SmtSort* sort_a = SortMgr->make_sort(id_a);
+  const SmtSort* sort_a = mSortMgr->make_sort(id_a);
   CHECK( sort_a != NULL );
 
   const SmtTerm* body = TermMgr->make_numeric(0);
   CHECK( body != NULL );
 
   // (define-fun (f () a 0 ) )
-  const SmtId* id_f = IdMgr->make_id(ShString("f"));
+  const SmtId* id_f = mIdMgr->make_id(ShString("f"));
   CHECK( id_f != NULL );
 
   const SmtVarFun* fun = NameMgr->reg_fun(id_f, vector<const SmtVarFun*>(0), sort_a, body);
