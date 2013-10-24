@@ -12,6 +12,24 @@
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
+
+//////////////////////////////////////////////////////////////////////
+// クラス SmtId
+//////////////////////////////////////////////////////////////////////
+
+// @brief 内容を表す文字列を返す．
+string
+id_str(const SmtId* id)
+{
+  ostringstream buf;
+  buf << id->name();
+  for (ymuint i = 0; i < id->index_size(); ++ i) {
+    buf << "[" << id->index(i) << "]";
+  }
+  return buf.str();
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // クラス IdImpl
 //////////////////////////////////////////////////////////////////////
@@ -63,13 +81,13 @@ IdImpl::index(ymuint pos) const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス SmtIndexId
+// クラス IndexId
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] name 名前
 // @param[in] index_num インデックスの数
-SmtIndexId::SmtIndexId(const ShString& name,
+IndexId::IndexId(const ShString& name,
 		       ymuint index_num) :
   IdImpl(name),
   mIndexNum(index_num)
@@ -78,7 +96,7 @@ SmtIndexId::SmtIndexId(const ShString& name,
 }
 
 // @brief デストラクタ
-SmtIndexId::~SmtIndexId()
+IndexId::~IndexId()
 {
   // mIndexList の開放は SmtIdMgr が行う．
 }
@@ -86,7 +104,7 @@ SmtIndexId::~SmtIndexId()
 // @brief インデックスリストの要素数を返す．
 // @note インデックスリストを持たない場合は 0 を返す．
 ymuint
-SmtIndexId::index_size() const
+IndexId::index_size() const
 {
   return mIndexNum;
 }
@@ -95,7 +113,7 @@ SmtIndexId::index_size() const
 // @param[in] pos 位置番号 ( 0 <= pos < index_size() )
 // @note インデックスを持たない場合や pos が index_size() より大きい場合はエラー(アボート)となる．
 ymuint32
-SmtIndexId::index(ymuint pos) const
+IndexId::index(ymuint pos) const
 {
   assert_cond( pos < index_size(), __FILE__, __LINE__);
   return mIndexList[pos];

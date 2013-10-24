@@ -22,12 +22,13 @@ BEGIN_NAMESPACE_YM_SMT
 class SmtSortImpl :
   public SmtSort
 {
-  friend class SmtSortMgr;
+  friend class SmtSolverImpl;
 
 protected:
 
   /// @brief コンストラクタ
-  SmtSortImpl();
+  /// @param[in] id ID番号
+  SmtSortImpl(ymuint id);
 
   /// @brief デストラクタ
   virtual
@@ -62,6 +63,42 @@ public:
   const SmtSort*
   elem(ymuint pos) const;
 
+  /// @brief ハッシュ値を返す．
+  virtual
+  ymuint
+  hash() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ID番号
+  ymuint32 mId;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtSimpleSort SmtSortImpl.h "SmtSortImpl.h"
+/// @brief 単純な型を表すクラス
+//////////////////////////////////////////////////////////////////////
+class SmtSimpleSort :
+  public SmtSortImpl
+{
+  friend class SmtSolverImpl;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] id ID番号
+  SmtSimpleSort(ymuint id);
+
+  /// @brief デストラクタ
+  virtual
+  ~SmtSimpleSort();
+
 };
 
 
@@ -72,13 +109,15 @@ public:
 class SmtComplexSort :
   public SmtSortImpl
 {
-  friend class SmtSortMgr;
+  friend class SmtSolverImpl;
 
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] id ID番号
   /// @param[in] elem_list 要素の型のリスト
-  SmtComplexSort(const vector<const SmtSort*>& elem_list);
+  SmtComplexSort(ymuint id,
+		 const vector<const SmtSort*>& elem_list);
 
   /// @brief デストラクタ
   virtual
@@ -113,54 +152,6 @@ private:
 
   // 要素の型の配列
   const SmtSort* mElemList[1];
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class SmtParamSort SmtSortImpl.h "SmtSortImpl.h"
-/// @brief パラメータ型を表すクラス
-//////////////////////////////////////////////////////////////////////
-class SmtParamSort :
-  public SmtSortImpl
-{
-  friend class SmtSortMgr;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] param_id パラメータ番号
-  SmtParamSort(ymuint param_id);
-
-  /// @brief デストラクタ
-  virtual
-  ~SmtParamSort();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief パラメータ型のときに true を返す．
-  virtual
-  bool
-  is_param() const;
-
-  /// @brief パラメータ番号を返す．
-  /// is_param() == false の場合にはエラーとなる．
-  virtual
-  ymuint
-  param_id() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // パラメータ番号
-  ymuint32 mParamId;
 
 };
 

@@ -11,9 +11,9 @@
 #include "SmtLibParser.h"
 #include "SmtLibNode.h"
 
+#include "StackPage.h"
 #include "IdMgr.h"
-#include "NameMgr.h"
-#include "SortMgr.h"
+#include "NameObj.h"
 
 #include "ym_logic/SmtAttr.h"
 #include "ym_logic/SmtSort.h"
@@ -21,7 +21,6 @@
 #include "ym_logic/SmtVar.h"
 
 #include "ym_smtlibv2/SmtId.h"
-#include "NameObj.h"
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -90,12 +89,26 @@ ShellImpl::ShellImpl()
   mPrompt1 = ">";
   mPrompt2 = "...>";
   mAllowCtrlDExit = false;
+
+  // スタックの初期化
+  StackPage* page0 = new StackPage(*mSolver);
+  mStack.push_back(page0);
+
+  mIdMgr = new IdMgr(alloc());
 }
 
 // @brief デストラクタ
 ShellImpl::~ShellImpl()
 {
   delete mParser;
+
+  // スタックの削除
+  // 順序は問題ないよね？
+  for (vector<StackPage*>::iterator p = mStack.begin();
+       p != mStack.end(); ++ p) {
+    delete *p;
+  }
+  delete mIdMgr;
 }
 
 // @brief 実行する．
@@ -359,7 +372,7 @@ ShellImpl::set_logic(const SmtLibNode* arg_top)
     }
 
 #if 0
-    if ( !mMgr.set_logic(logic) ) {
+    if ( !mSolver.set_logic(logic) ) {
       mErrBuf << "already set";
       goto syntax_error;
     }
@@ -482,12 +495,10 @@ ShellImpl::declare_sort(const SmtLibNode* arg_top)
   }
   num = arg_list[1]->int_value();
 
-#if 0
   // 型を登録する．
-  if ( !mMgr.declare_sort(name, num) ) {
+  if ( !sort_mgr().declare_sort(name, num) ) {
     goto syntax_error;
   }
-#endif
 
   if ( debug ) {
     cerr << "  ==> success" << endl;
@@ -799,12 +810,12 @@ ShellImpl::push(const SmtLibNode* arg_top)
   }
 
   {
-#if 0
     ymuint num = arg_top->int_value();
-    if ( !push(num) ) {
-      goto syntax_error;
+    for (ymuint i = 0; i < num; ++ i) {
+      StackPage* prev = mStack.back();
+      StackPage* page = new StackPage(*mSolver, mStack.size(), prev);
+      mStack.push_back(page);
     }
-#endif
   }
 
   if ( debug ) {
@@ -843,13 +854,17 @@ ShellImpl::pop(const SmtLibNode* arg_top)
   }
 
   {
-#if 0
     ymuint num = arg_top->int_value();
-    if ( !pop(num) ) {
+    if ( mStack.size() <= num ) {
+      // スタックのサイズが小さすぎる．
       mErrBuf <<  "arg is too large";
       goto syntax_error;
     }
-#endif
+    for (ymuint i = 0; i < num; ++ i) {
+      StackPage* page = mStack.back();
+      delete page;
+      mStack.pop_back();
+    }
   }
 
   if ( debug ) {
@@ -939,6 +954,35 @@ bool
 ShellImpl::get_info(const SmtLibNode* arg_top)
 {
   return true;
+}
+
+// @brief 識別子を返す．
+// @param[in] name 名前
+// @param[in] index_list インデックスのリスト
+// @return 同じ識別子があればそれを返す．なければ作る．
+//
+// この関数は通常は成功するはず．
+const SmtId*
+ShellImpl::make_id(const ShString& name,
+		   const vector<ymuint32>& index_list)
+{
+  return mIdMgr->make_id(name, index_list);
+}
+
+// @brief 型を返す．
+// @param[in] name_id 名前を表す識別子
+// @param[in] elem_list 要素のリスト
+// @return 同じ型があればそれを返す．なければ作る．
+// @note エラーの場合には NULL を返す．
+//
+// エラーの原因は以下のとおり
+//  - name_id という名の型が登録されていなかった．
+//  - 登録されている型と elem_list のサイズが異なった．
+const SmtSort*
+ShellImpl::make_sort(const SmtId* name_id,
+		     const vector<const SmtSort*>& elem_list)
+{
+  return sort_mgr().make_sort(name_id, elem_list);
 }
 
 // @brief S式を識別子に変換する．
@@ -1099,6 +1143,19 @@ ShellImpl::eval_to_sort_template(const SmtLibNode* node,
   return NULL;
 }
 
+// @brief 名前から変数か関数を探す
+// @param[in] name_id 名前を表す識別子
+// @return 指定された名前の変数または関数を返す．
+// @note エラーの場合には NULL を返す．
+//
+// エラーの原因は以下のとおり
+//  - name_id という名の関数が登録されていなかった．
+const NameObj*
+ShellImpl::find_obj(const SmtId* name_id)
+{
+  return name_mgr().find_obj(name_id);
+}
+
 // @brief S式を term に変換する．
 // @param[in] node S式を表すノード
 const SmtTerm*
@@ -1149,7 +1206,7 @@ ShellImpl::eval_to_term(const SmtLibNode* node)
       const SmtId* id = mIdMgr->make_id(name);
       // id が置き換え対象ならそれを返す．
 
-      const NameObj* obj = name_mgr().find_obj(id);
+      const NameObj* obj = find_obj(id);
       if ( obj != NULL ) {
 	if ( obj->is_var() ) {
 	  return mSolver->make_var_term(obj->var());
@@ -1214,7 +1271,7 @@ ShellImpl::eval_to_term(const SmtLibNode* node)
       goto syntax_error;
     }
     else {
-      const NameObj* obj = name_mgr().find_obj(fid);
+      const NameObj* obj = find_obj(fid);
       if ( obj != NULL ) {
 	if ( !obj->is_fun() ) {
 	  mErrBuf << obj->name()->name() << " is not a function";
@@ -1395,9 +1452,10 @@ ShellImpl::eval_to_attr_term(const SmtLibNode* node)
 	mErrBuf << "syntax error: s-expression expected at " << node2->loc();
 	return NULL;
       }
+#if 0
       ShString tmp_str(term_str(expr));
       attr_list.push_back(SmtAttr(node1->str_value(), tmp_str));
-
+#endif
       node1 = node2;
     }
     else {
@@ -1600,6 +1658,38 @@ ShellImpl::parse_args(const SmtLibNode*  arg_top,
     return false;
   }
   return true;
+}
+
+// @brief 現在の SortMgr を返す．
+SortMgr&
+ShellImpl::sort_mgr()
+{
+  assert_cond( !mStack.empty(), __FILE__, __LINE__);
+  return mStack.back()->mSortMgr;
+}
+
+// @brief 現在の NameMgr を返す．
+NameMgr&
+ShellImpl::name_mgr()
+{
+  assert_cond( !mStack.empty(), __FILE__, __LINE__);
+  return mStack.back()->mNameMgr;
+}
+
+// @brief 現在のアロケータを返す．
+Alloc&
+ShellImpl::alloc()
+{
+  assert_cond( !mStack.empty(), __FILE__, __LINE__);
+  return mStack.back()->mAlloc;
+}
+
+// @brief 現在の assertion リストを返す．
+vector<const SmtTerm*>&
+ShellImpl::assertion_list()
+{
+  assert_cond( !mStack.empty(), __FILE__, __LINE__);
+  return mStack.back()->mTermList;
 }
 
 END_NAMESPACE_YM_SMTLIBV2

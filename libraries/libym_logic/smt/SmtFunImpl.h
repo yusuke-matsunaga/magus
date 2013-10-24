@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_SMT
 class SmtFunImpl :
   public SmtFun
 {
-  friend class SmtFunMgr;
+  friend class SmtSolverImpl;
 
 protected:
 
@@ -97,7 +97,7 @@ private:
 class SmtDeclFun1 :
   public SmtFunImpl
 {
-  friend class SmtFunMgr;
+  friend class SmtSolverImpl;
 
 protected:
 
@@ -119,7 +119,7 @@ protected:
 class SmtDeclFun2 :
   public SmtDeclFun1
 {
-  friend class SmtFunMgr;
+  friend class SmtSolverImpl;
 
 protected:
 
@@ -200,7 +200,7 @@ private:
 class SmtDefFun1 :
   public SmtFunImpl
 {
-  friend class SmtFunMgr;
+  friend class SmtSolverImpl;
 
 protected:
 
@@ -245,7 +245,7 @@ private:
 class SmtDefFun2 :
   public SmtDefFun1
 {
-  friend class SmtFunMgr;
+  friend class SmtSolverImpl;
 
 private:
 

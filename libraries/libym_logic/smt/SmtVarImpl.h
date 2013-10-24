@@ -21,13 +21,15 @@ BEGIN_NAMESPACE_YM_SMT
 class SmtVarImpl :
   public SmtVar
 {
-  friend class SmtVarMgr;
+  friend class SmtSolverImpl;
 
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] id ID番号
   /// @param[in] sort 変数の型
-  SmtVarImpl(const SmtSort* sort);
+  SmtVarImpl(ymuint id,
+	     const SmtSort* sort);
 
   /// @brief デストラクタ
   virtual
@@ -65,6 +67,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ID番号
+  ymuint32 mId;
+
   // 型
   const SmtSort* mSort;
 
@@ -78,13 +83,15 @@ private:
 class SmtGlobalVar :
   public SmtVarImpl
 {
-  friend class SmtVarMgr;
+  friend class SmtSolverImpl;
 
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] id ID番号
   /// @param[in] sort 変数の型
-  SmtGlobalVar(const SmtSort* sort);
+  SmtGlobalVar(ymuint id,
+	       const SmtSort* sort);
 
   /// @brief デストラクタ
   virtual
@@ -95,6 +102,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 変数の種類を返す．
+  virtual
+  tType
+  type() const;
 
   /// @brief global 変数の場合に true を返す．
   virtual
@@ -111,13 +123,15 @@ public:
 class SmtForallVar :
   public SmtVarImpl
 {
-  friend class SmtVarMgr;
+  friend class SmtSolverImpl;
 
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] id ID番号
   /// @param[in] sort 変数の型
-  SmtForallVar(const SmtSort* sort);
+  SmtForallVar(ymuint id,
+	       const SmtSort* sort);
 
   /// @brief デストラクタ
   virtual
@@ -128,6 +142,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 変数の種類を返す．
+  virtual
+  tType
+  type() const;
 
   /// @brief forall 変数の場合に true を返す．
   virtual
@@ -144,13 +163,15 @@ public:
 class SmtExistsVar :
   public SmtVarImpl
 {
-  friend class SmtVarMgr;
+  friend class SmtSolverImpl;
 
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] id ID番号
   /// @param[in] sort 変数の型
-  SmtExistsVar(const SmtSort* sort);
+  SmtExistsVar(ymuint id,
+	       const SmtSort* sort);
 
   /// @brief デストラクタ
   virtual
@@ -161,6 +182,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 変数の種類を返す．
+  virtual
+  tType
+  type() const;
 
   /// @brief exists 変数の場合に true を返す．
   virtual

@@ -17,7 +17,9 @@ BEGIN_NAMESPACE_YM_SMT
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SmtSortImpl::SmtSortImpl()
+// @param[in] id ID番号
+SmtSortImpl::SmtSortImpl(ymuint id) :
+  mId(id)
 {
 }
 
@@ -59,14 +61,41 @@ SmtSortImpl::elem(ymuint pos) const
   return NULL;
 }
 
+// @brief ハッシュ値を返す．
+ymuint
+SmtSortImpl::hash() const
+{
+  return mId;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス SmtSimpleSort
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] id ID番号
+SmtSimpleSort::SmtSimpleSort(ymuint id) :
+  SmtSortImpl(id)
+{
+}
+
+// @brief デストラクタ
+SmtSimpleSort::~SmtSimpleSort()
+{
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス SmtComplexSort
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] id ID番号
 // @param[in] elem_list 要素の型のリスト
-SmtComplexSort::SmtComplexSort(const vector<const SmtSort*>& elem_list) :
+SmtComplexSort::SmtComplexSort(ymuint id,
+			       const vector<const SmtSort*>& elem_list) :
+  SmtSortImpl(id),
   mElemNum(elem_list.size())
 {
   for (ymuint i = 0; i < mElemNum; ++ i) {
@@ -94,38 +123,6 @@ SmtComplexSort::elem(ymuint pos) const
 {
   assert_cond( pos < elem_num(), __FILE__, __LINE__);
   return mElemList[pos];
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス SmtParamSort
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] param_id パラメータ番号
-SmtParamSort::SmtParamSort(ymuint param_id) :
-  mParamId(param_id)
-{
-}
-
-// @brief デストラクタ
-SmtParamSort::~SmtParamSort()
-{
-}
-
-// @brief パラメータ型のときに true を返す．
-bool
-SmtParamSort::is_param() const
-{
-  return true;
-}
-
-// @brief パラメータ番号を返す．
-// is_param() == false の場合にはエラーとなる．
-ymuint
-SmtParamSort::param_id() const
-{
-  return mParamId;
 }
 
 END_NAMESPACE_YM_SMT

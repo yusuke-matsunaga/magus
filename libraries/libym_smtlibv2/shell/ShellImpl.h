@@ -13,11 +13,11 @@
 #include "ym_logic/SmtSolver.h"
 #include "ym_utils/Alloc.h"
 #include "ym_utils/StrBuff.h"
+#include "IdMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-class SmtId;
 class IdMgr;
 class SortElem;
 class SortMgr;

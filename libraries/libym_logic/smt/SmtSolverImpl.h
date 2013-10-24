@@ -1,58 +1,54 @@
-#ifndef YM_LOGIC_SMTSOLVER_H
-#define YM_LOGIC_SMTSOLVER_H
+#ifndef SMTSOLVERIMPL_H
+#define SMTSOLVERIMPL_H
 
-/// @file ym_logic/SmtSolver.h
-/// @brief SmtSolver のヘッダファイル
+/// @file SmtSolverImpl.h
+/// @brief SmtSolverImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_logic/smt_nsdef.h"
-#include "ym_logic/SmtVar.h"
-#include "ym_utils/ShString.h"
+#include "ym_logic/SmtSolver.h"
+#include "ym_utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SMT
 
 //////////////////////////////////////////////////////////////////////
-/// @class SmtSolver SmtSolver.h "ym_logic/SmtSolver.h"
-/// @brief SMT ソルバの雛形基底クラス
-///
-/// 実際にはここで定義されている仮想関数を実装したクラスを作る必要がある．
+/// @class SmtSolverImpl SmtSolverImpl.h "SmtSolverImpl.h"
+/// @brief SmtSolver の実装ファイル
 //////////////////////////////////////////////////////////////////////
-class SmtSolver
+class SmtSolverImpl :
+  public SmtSolver
 {
 public:
 
-  /// @brief インスタンスを生成する静的関数
-  static
-  SmtSolver*
-  new_solver();
+  /// @brief コンストラクタ
+  SmtSolverImpl();
 
   /// @brief デストラクタ
   virtual
-  ~SmtSolver() { }
+  ~SmtSolverImpl();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 継承クラスが実装する仮想関数
+  // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 使用するロジックを設定する
   /// @param[in] logic 設定するロジック
   virtual
   tSmtLibResponse
-  set_logic(tSmtLogic logic) = 0;
+  set_logic(tSmtLogic logic);
 
   /// @brief 型を作る．
   /// @param[in] elem_list 要素の型のリスト
   /// @return 作成した型を返す．
   virtual
   const SmtSort*
-  make_sort(const vector<const SmtSort*>& elem_list) = 0;
+  make_sort(const vector<const SmtSort*>& elem_list);
 
   /// @brief 変数を作る．
   /// @param[in] sort 変数の型
@@ -61,7 +57,7 @@ public:
   virtual
   const SmtVar*
   make_var(const SmtSort* sort,
-	   SmtVar::tType type = SmtVar::kGlobal) = 0;
+	   SmtVar::tType type);
 
   /// @brief 関数を作る．
   /// @param[in] input_sort_list 入力の型のリスト
@@ -70,7 +66,7 @@ public:
   virtual
   const SmtFun*
   make_fun(const vector<const SmtSort*>& input_sort_list,
-	   const SmtSort* output_sort) = 0;
+	   const SmtSort* output_sort);
 
   /// @brief 内容を持った関数を作る．
   /// @param[in] input_var_list 入力の変数のリスト
@@ -79,49 +75,49 @@ public:
   virtual
   const SmtFun*
   make_fun(const vector<const SmtVar*>& input_var_list,
-	   const SmtTerm* body) = 0;
+	   const SmtTerm* body);
 
   /// @brief <numeric> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
   virtual
   const SmtTerm*
-  make_numeric_term(ymuint32 val) = 0;
+  make_numeric_term(ymuint32 val);
 
   /// @brief <decimal> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
   virtual
   const SmtTerm*
-  make_decimal_term(const ShString& val) = 0;
+  make_decimal_term(const ShString& val);
 
   /// @brief <hexadecimal> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
   virtual
   const SmtTerm*
-  make_hexadecimal_term(const ShString& val) = 0;
+  make_hexadecimal_term(const ShString& val);
 
   /// @brief <binary> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
   virtual
   const SmtTerm*
-  make_binary_term(const ShString& val) = 0;
+  make_binary_term(const ShString& val);
 
   /// @brief <string> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
   virtual
   const SmtTerm*
-  make_string_term(const ShString& val) = 0;
+  make_string_term(const ShString& val);
 
   /// @brief 変数型の term を作る．
   /// @param[in] var 変数
   /// @return 作成した式を返す．
   virtual
   const SmtTerm*
-  make_var_term(const SmtVar* var) = 0;
+  make_var_term(const SmtVar* var);
 
   /// @brief 関数呼び出しの term を作る．
   /// @param[in] fun 関数
@@ -130,7 +126,7 @@ public:
   virtual
   const SmtTerm*
   make_fun_term(const SmtFun* fun,
-		const vector<const SmtTerm*>& arg_list) = 0;
+		const vector<const SmtTerm*>& arg_list);
 
   /// @brief forall の term を作る．
   /// @param[in] var_list 束縛変数のリスト
@@ -139,7 +135,7 @@ public:
   virtual
   const SmtTerm*
   make_forall_term(const vector<const SmtVar*>& var_list,
-		   const SmtTerm* body) = 0;
+		   const SmtTerm* body);
 
   /// @brief exists の term を作る．
   /// @param[in] var_list 束縛変数のリスト
@@ -148,7 +144,7 @@ public:
   virtual
   const SmtTerm*
   make_exists_term(const vector<const SmtVar*>& var_list,
-		   const SmtTerm* body) = 0;
+		   const SmtTerm* body);
 
   /// @brief 属性付きの term を作る．
   /// @param[in] body 本体の式
@@ -157,26 +153,26 @@ public:
   virtual
   const SmtTerm*
   make_annotated_term(const SmtTerm* body,
-		      const vector<SmtAttr>& attr_list) = 0;
+		      const vector<SmtAttr>& attr_list);
 
   /// @brief 充足可能性を調べる．
   /// @param[in] assert_list 仮定する式のリスト
   virtual
   tSmtLibResponse
-  check_sat(const vector<const SmtTerm*>& assert_list) = 0;
+  check_sat(const vector<const SmtTerm*>& assert_list);
 
   /// @brief 直前の check_sat() の証明を得る．
   /// @note check_sat() の結果が UNSAT の時のみ意味を持つ．
   virtual
   tSmtLibResponse
-  get_proof() = 0;
+  get_proof();
 
   /// @brief 直前の check_sat() の unsat-core を得る．
   /// @param[out] term_list unsat-core の式を格納するリスト
   /// @note check_sat() の結果が UNSAT の時のみ意味を持つ．
   virtual
   tSmtLibResponse
-  get_unsat_core(vector<const SmtTerm*>& term_list) = 0;
+  get_unsat_core(vector<const SmtTerm*>& term_list);
 
   /// @brief 直前の check_sat() の値割り当てを得る．
   /// @param[in] expr_list expr 式のリスト
@@ -184,15 +180,33 @@ public:
   /// @note expr_list[i] に対応する値が value_list[i] に格納される．
   virtual
   tSmtLibResponse
-  get_value(const vector<const SmtTerm*>& expr_list) = 0;
+  get_value(const vector<const SmtTerm*>& expr_list);
 
   /// @brief 直前の check_sat() の値割り当てを得る．
   virtual
   tSmtLibResponse
-  get_assignment() = 0;
+  get_assignment();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // メモリアロケータ
+  SimpleAlloc mAlloc;
+
+  // ロジック
+  tSmtLogic mLogic;
+
+  // SmtSort の次の ID番号
+  ymuint32 mSortId;
+
+  // SmtVar の次の ID番号
+  ymuint32 mVarId;
 
 };
 
 END_NAMESPACE_YM_SMT
 
-#endif // YM_LOGIC_SMTSOLVER_H
+#endif // SMTSOLVERIMPL_H

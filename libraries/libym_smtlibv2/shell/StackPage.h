@@ -11,7 +11,7 @@
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
 #include "ym_utils/SimpleAlloc.h"
-#include "SortTemplMgr.h"
+#include "SortMgr.h"
 #include "NameMgr.h"
 
 
@@ -25,21 +25,24 @@ struct StackPage
 {
 
   /// @brief コンストラクタ(レベル0用)
-  StackPage();
+  /// @param[in] solver SMT ソルバ
+  StackPage(SmtSolver& solver);
 
   /// @brief コンストラクタ
+  /// @param[in] solver SMT ソルバ
   /// @param[in] level レベル
   /// @param[in] prev 前のページ
-  StackPage(ymuint level,
+  StackPage(SmtSolver& solver,
+	    ymuint level,
 	    StackPage* prev);
 
   // メモリアロケータ
   SimpleAlloc mAlloc;
 
-  // SortTempl を管理するクラス
-  SortTemplMgr mSortTemplMgr;
+  // SmtSort を管理するクラス
+  SortMgr mSortMgr;
 
-  // SmtVarFun を管理するクラス
+  // SmtVar/SmtFun を管理するクラス
   NameMgr mNameMgr;
 
   // assert されている term のリスト
@@ -53,22 +56,25 @@ struct StackPage
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ(レベル0用)
+// @param[in] solver SMT ソルバ
 inline
-StackPage::StackPage() :
+StackPage::StackPage(SmtSolver& solver) :
   mAlloc(4096),
-  mSortTemplMgr(mAlloc, 0, NULL),
+  mSortMgr(mAlloc, solver, 0, NULL),
   mNameMgr(mAlloc, 0, NULL)
 {
 }
 
 // @brief コンストラクタ
+// @param[in] solver SMT ソルバ
 // @param[in] level レベル
 // @param[in] prev 前のページ
 inline
-StackPage::StackPage(ymuint level,
+StackPage::StackPage(SmtSolver& solver,
+		     ymuint level,
 		     StackPage* prev) :
   mAlloc(4096),
-  mSortTemplMgr(mAlloc, level, &prev->mSortMgr),
+  mSortMgr(mAlloc, solver, level, &prev->mSortMgr),
   mNameMgr(mAlloc, level, &prev->mNameMgr)
 {
 }

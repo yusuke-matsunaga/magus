@@ -80,10 +80,10 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SmtIndexId IdImpl.h "IdImpl.h"
+/// @class IndexId IdImpl.h "IdImpl.h"
 /// @brief インデックス付きの識別子を表すクラス
 //////////////////////////////////////////////////////////////////////
-class SmtIndexId :
+class IndexId :
   public IdImpl
 {
   friend class IdMgr;
@@ -93,12 +93,12 @@ private:
   /// @brief コンストラクタ
   /// @param[in] name 名前
   /// @param[in] index_num インデックスの数
-  SmtIndexId(const ShString& name,
+  IndexId(const ShString& name,
 	     ymuint index_num);
 
   /// @brief デストラクタ
   virtual
-  ~SmtIndexId();
+  ~IndexId();
 
 
 public:

@@ -115,8 +115,8 @@ IdMgr::make_id(const ShString& name,
   }
   else {
     ymuint index_size = index_list.size();
-    void* p = mAlloc.get_memory(sizeof(SmtIndexId) + sizeof(ymuint32) * (index_size - 1));
-    SmtIndexId* id1 = new (p) SmtIndexId(name, index_size);
+    void* p = mAlloc.get_memory(sizeof(IndexId) + sizeof(ymuint32) * (index_size - 1));
+    IndexId* id1 = new (p) IndexId(name, index_size);
     for (ymuint i = 0; i < index_size; ++ i) {
       id1->mIndexList[i] = index_list[i];
     }

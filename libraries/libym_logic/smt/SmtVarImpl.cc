@@ -17,8 +17,11 @@ BEGIN_NAMESPACE_YM_SMT
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] id ID番号
 // @param[in] sort 変数の型
-SmtVarImpl::SmtVarImpl(const SmtSort* sort) :
+SmtVarImpl::SmtVarImpl(ymuint id,
+		       const SmtSort* sort) :
+  mId(id),
   mSort(sort)
 {
 }
@@ -62,15 +65,24 @@ SmtVarImpl::is_exists() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] id ID番号
 // @param[in] sort 変数の型
-SmtGlobalVar::SmtGlobalVar(const SmtSort* sort) :
-  SmtVarImpl(sort)
+SmtGlobalVar::SmtGlobalVar(ymuint id,
+			   const SmtSort* sort) :
+  SmtVarImpl(id, sort)
 {
 }
 
 // @brief デストラクタ
 SmtGlobalVar::~SmtGlobalVar()
 {
+}
+
+// @brief 変数の種類を返す．
+SmtVar::tType
+SmtGlobalVar::type() const
+{
+  return kGlobal;
 }
 
 // @brief global 変数の場合に true を返す．
@@ -86,15 +98,24 @@ SmtGlobalVar::is_global() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] id ID番号
 // @param[in] sort 変数の型
-SmtForallVar::SmtForallVar(const SmtSort* sort) :
-  SmtVarImpl(sort)
+SmtForallVar::SmtForallVar(ymuint id,
+			   const SmtSort* sort) :
+  SmtVarImpl(id, sort)
 {
 }
 
 // @brief デストラクタ
 SmtForallVar::~SmtForallVar()
 {
+}
+
+// @brief 変数の種類を返す．
+SmtVar::tType
+SmtForallVar::type() const
+{
+  return kForall;
 }
 
 // @brief forall 変数の場合に true を返す．
@@ -110,15 +131,24 @@ SmtForallVar::is_forall() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] id ID番号
 // @param[in] sort 変数の型
-SmtExistsVar::SmtExistsVar(const SmtSort* sort) :
-  SmtVarImpl(sort)
+SmtExistsVar::SmtExistsVar(ymuint id,
+			   const SmtSort* sort) :
+  SmtVarImpl(id, sort)
 {
 }
 
 // @brief デストラクタ
 SmtExistsVar::~SmtExistsVar()
 {
+}
+
+// @brief 変数の種類を返す．
+SmtVar::tType
+SmtExistsVar::type() const
+{
+  return kExists;
 }
 
 // @brief exists 変数の場合に true を返す．
