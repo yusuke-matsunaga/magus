@@ -51,8 +51,10 @@ NameObjImpl::is_var() const
 }
 
 // @brief SmtFun を返す．
+// @param[in] input_sort_list 入力の型のリスト
+// @note input_sort_list に合致する関数がない場合 NULL を返す．
 const SmtFun*
-NameObjImpl::fun() const
+NameObjImpl::fun(const vector<const SmtSort*>& input_sort_list) const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -94,8 +96,10 @@ FunObj::is_fun() const
 }
 
 // @brief SmtFun を返す．
+// @param[in] input_sort_list 入力の型のリスト
+// @note input_sort_list に合致する関数がない場合 NULL を返す．
 const SmtFun*
-FunObj::fun() const
+FunObj::fun(const vector<const SmtSort*>& input_sort_list) const
 {
   return mFun;
 }

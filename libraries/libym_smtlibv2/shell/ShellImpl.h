@@ -300,11 +300,11 @@ private:
   /// @brief 組み込み関数と名前を結びつける．
   /// @param[in] name 名前
   /// @param[in] fun_type 組み込み関数の型
-  /// @param[in] sort 補助的な型
+  /// @param[in] input_sort_list 入力の型のリスト
   void
   bind_builtin_fun(const char* name,
 		   tSmtFun fun_type,
-		   const SmtSort* sort = NULL);
+		   const vector<const SmtSort*>& input_sort_list = vector<const SmtSort*>(0));
 
   /// @brief 現在の SortMgr を返す．
   SortMgr&

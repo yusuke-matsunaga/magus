@@ -55,9 +55,11 @@ public:
   is_var() const;
 
   /// @brief SmtFun を返す．
+  /// @param[in] input_sort_list 入力の型のリスト
+  /// @note input_sort_list に合致する関数がない場合 NULL を返す．
   virtual
   const SmtFun*
-  fun() const;
+  fun(const vector<const SmtSort*>& input_sort_list) const;
 
   /// @brief SmtVar を返す．
   virtual
@@ -113,9 +115,11 @@ public:
   is_fun() const;
 
   /// @brief SmtFun を返す．
+  /// @param[in] input_sort_list 入力の型のリスト
+  /// @note input_sort_list に合致する関数がない場合 NULL を返す．
   virtual
   const SmtFun*
-  fun() const;
+  fun(const vector<const SmtSort*>& input_sort_list) const;
 
 
 private:

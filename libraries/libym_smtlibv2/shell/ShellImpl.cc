@@ -497,29 +497,36 @@ ShellImpl::INTS_init()
 
   const SmtSort* int_sort = mSolver->make_builtin_sort(kSmtSort_Int);
 
+  vector<const SmtSort*> i1_list(1);
+  i1_list[0] = int_sort;
+
   // (- Int Int)
-  bind_builtin_fun("-", kSmtFun_Uminus, int_sort);
+  bind_builtin_fun("-", kSmtFun_Uminus, i1_list);
+
+  vector<const SmtSort*> i2_list(2);
+  i2_list[0] = int_sort;
+  i2_list[1] = int_sort;
 
   // (- Int Int Int :left-assoc)
-  bind_builtin_fun("-", kSmtFun_Sub, int_sort);
+  bind_builtin_fun("-", kSmtFun_Sub, i2_list);
 
   // (+ Int Int Int :left-assoc)
-  bind_builtin_fun("+", kSmtFun_Add, int_sort);
+  bind_builtin_fun("+", kSmtFun_Add, i2_list);
 
   // (* Int Int Int :left-assoc)
-  bind_builtin_fun("*", kSmtFun_Mul, int_sort);
+  bind_builtin_fun("*", kSmtFun_Mul, i2_list);
 
   // (<= Int Int Bool :chainable)
-  bind_builtin_fun("<=", kSmtFun_Le, int_sort);
+  bind_builtin_fun("<=", kSmtFun_Le, i2_list);
 
   // (< Int Int Bool :chainable)
-  bind_builtin_fun("<", kSmtFun_Lt, int_sort);
+  bind_builtin_fun("<", kSmtFun_Lt, i2_list);
 
   // (>= Int Int Bool :chainable)
-  bind_builtin_fun(">=", kSmtFun_Ge, int_sort);
+  bind_builtin_fun(">=", kSmtFun_Ge, i2_list);
 
   // (> Int Int Bool :chainable)
-  bind_builtin_fun(">", kSmtFun_Gt, int_sort);
+  bind_builtin_fun(">", kSmtFun_Gt, i2_list);
 }
 
 
@@ -699,7 +706,7 @@ ShellImpl::declare_fun(const SmtLibNode* arg_top)
   // 同名のオブジェクトが登録されていないか調べる．
   const NameObj* obj = name_mgr().find_obj(name);
   if ( obj != NULL ) {
-    mErrBuf << name->name() << "already declared";
+    mErrBuf << name->name() << ": already declared";
     return false;
   }
 
@@ -1192,8 +1199,9 @@ ShellImpl::eval_to_term(const SmtLibNode* node)
 	if ( obj->is_var() ) {
 	  return mSolver->make_var_term(obj->var());
 	}
-	else {
-	  return mSolver->make_fun_term(obj->fun(), vector<const SmtTerm*>(0));
+	else if ( obj->is_fun() ) {
+	  const SmtFun* fun = obj->fun(vector<const SmtSort*>(0));
+	  return mSolver->make_fun_term(fun, vector<const SmtTerm*>(0));
 	}
       }
       else {
@@ -1258,17 +1266,10 @@ ShellImpl::eval_to_term(const SmtLibNode* node)
 	  mErrBuf << obj->name()->name() << " is not a function";
 	  goto syntax_error;
 	}
-	const SmtFun* fun = obj->fun();
-	if ( fun->attr() == kSmtFunAttr_None && fun->input_num() != n - 1) {
-	  // 引数の数が合わない．
-	  mErrBuf << "# of args for function '" << obj->name()->name()
-		  << "' mismatch: " << node->loc();
-	  mErrBuf << " fun->input_num() = " << fun->input_num()
-		  << ", n = " << n;
-	  goto syntax_error;
-	}
 	vector<const SmtTerm*> input_list;
+	vector<const SmtSort*> input_sort_list;
 	input_list.reserve(n - 1);
+	input_sort_list.reserve(n - 1);
 	for (const SmtLibNode* node2 = node1->sibling();
 	     node2 != NULL; node2 = node2->sibling()) {
 	  const SmtTerm* term1 = eval_to_term(node2);
@@ -1277,6 +1278,20 @@ ShellImpl::eval_to_term(const SmtLibNode* node)
 	    return NULL;
 	  }
 	  input_list.push_back(term1);
+#if 0
+	  const SmtSort* sort1 = sort(term1);
+#else
+	  const SmtSort* sort1 = NULL;
+#endif
+	  input_sort_list.push_back(sort1);
+	}
+	const SmtFun* fun = obj->fun(input_sort_list);
+	if ( fun == NULL ) {
+	  // 引数の数か型が合わない．
+	  mErrBuf << "# of args / types of args for function '"
+		  << obj->name()->name()
+		  << "' mismatch: " << node->loc();
+	  goto syntax_error;
 	}
 	return mSolver->make_fun_term(fun, input_list);
       }
@@ -1660,12 +1675,13 @@ ShellImpl::bind_builtin_sort(const char* name,
 // @brief 組み込み関数と名前を結びつける．
 // @param[in] name 名前
 // @param[in] fun_type 組み込み関数の型
+// @param[in] input_sort_list 入力の型のリスト
 void
 ShellImpl::bind_builtin_fun(const char* name,
 			    tSmtFun fun_type,
-			    const SmtSort* sort)
+			    const vector<const SmtSort*>& input_sort_list)
 {
-  const SmtFun* fun = mSolver->make_builtin_fun(fun_type, sort);
+  const SmtFun* fun = mSolver->make_builtin_fun(fun_type, input_sort_list);
   assert_cond( fun != NULL, __FILE__, __LINE__);
 
   const SmtId* id = mIdMgr->make_id(ShString(name));
