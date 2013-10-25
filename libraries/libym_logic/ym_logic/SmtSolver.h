@@ -10,7 +10,9 @@
 
 
 #include "ym_logic/smt_nsdef.h"
+#include "ym_logic/SmtSort.h"
 #include "ym_logic/SmtVar.h"
+#include "ym_logic/SmtFun.h"
 #include "ym_utils/ShString.h"
 
 
@@ -52,7 +54,13 @@ public:
   /// @return 作成した型を返す．
   virtual
   const SmtSort*
-  make_sort(const vector<const SmtSort*>& elem_list) = 0;
+  make_sort(const vector<const SmtSort*>& elem_list = vector<const SmtSort*>(0)) = 0;
+
+  /// @brief 組み込み型を作る．
+  /// @param[in] type 型の種類
+  virtual
+  const SmtSort*
+  make_builtin_sort(SmtSort::tType type) = 0;
 
   /// @brief 変数を作る．
   /// @param[in] sort 変数の型
@@ -82,6 +90,15 @@ public:
   make_fun(const vector<const SmtVar*>& input_var_list,
 	   const SmtSort* output_sort,
 	   const SmtTerm* body) = 0;
+
+  /// @brief 組み込み関数を作る．
+  /// @param[in] fun_type 関数の種類
+  /// @param[in] sort 型
+  /// @note 関数によっては sor が必要ない場合もある．
+  virtual
+  const SmtFun*
+  make_builtin_fun(SmtFun::tType fun_type,
+		   const SmtSort* sort = NULL) = 0;
 
   /// @brief <numeric> 型の term を作る．
   /// @param[in] val 値

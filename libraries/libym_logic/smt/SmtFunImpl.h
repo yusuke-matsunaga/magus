@@ -259,7 +259,7 @@ public:
 class SmtAndFun :
   public SmtLogBinFun
 {
-  friend class SmtSolverImpnl;
+  friend class SmtSolverImpl;
 
 private:
 
@@ -294,7 +294,7 @@ public:
 class SmtOrFun :
   public SmtLogBinFun
 {
-  friend class SmtSolverImpnl;
+  friend class SmtSolverImpl;
 
 private:
 
@@ -329,7 +329,7 @@ public:
 class SmtXorFun :
   public SmtLogBinFun
 {
-  friend class SmtSolverImpnl;
+  friend class SmtSolverImpl;
 
 private:
 
@@ -364,7 +364,7 @@ public:
 class SmtImpFun :
   public SmtLogBinFun
 {
-  friend class SmtSolverImpnl;
+  friend class SmtSolverImpl;
 
 private:
 

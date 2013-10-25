@@ -52,6 +52,12 @@ public:
   const SmtSort*
   make_sort(const vector<const SmtSort*>& elem_list);
 
+  /// @brief 組み込み型を作る．
+  /// @param[in] type 型の種類
+  virtual
+  const SmtSort*
+  make_builtin_sort(SmtSort::tType type);
+
   /// @brief 変数を作る．
   /// @param[in] sort 変数の型
   /// @param[in] type 変数の種類
@@ -80,6 +86,15 @@ public:
   make_fun(const vector<const SmtVar*>& input_var_list,
 	   const SmtSort* output_sort,
 	   const SmtTerm* body);
+
+  /// @brief 組み込み関数を作る．
+  /// @param[in] fun_type 関数の種類
+  /// @param[in] sort 型
+  /// @note 関数によっては sor が必要ない場合もある．
+  virtual
+  const SmtFun*
+  make_builtin_fun(SmtFun::tType fun_type,
+		   const SmtSort* sort = NULL);
 
   /// @brief <numeric> 型の term を作る．
   /// @param[in] val 値
@@ -205,29 +220,6 @@ private:
   void
   Ints_init();
 
-  /// @brief 組み込み型を作る．
-  const SmtSort*
-  make_builtin_sort(SmtSort::tType type);
-
-  /// @brief 組み込み関数を作る．
-  const SmtFun*
-  make_builtin_fun(SmtFun::tType type);
-
-  /// @brief Bool 型を得る．
-  /// @note 適切な logic が設定されている必要がある．
-  const SmtSort*
-  bool_sort();
-
-  /// @brief Int 型を得る．
-  /// @note 適切な logic が設定されている必要がある．
-  const SmtSort*
-  int_sort();
-
-  /// @brief Real 型を得る．
-  /// @note 適切な logic が設定されている必要がある．
-  const SmtSort*
-  real_sort();
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -256,6 +248,61 @@ private:
   const SmtSort* mRealSort;
 
   // true 関数
+  const SmtFun* mTrueFun;
+
+  // false 関数
+  const SmtFun* mFalseFun;
+
+  // not 関数
+  const SmtFun* mNotFun;
+
+  // and 関数
+  const SmtFun* mAndFun;
+
+  // or 関数
+  const SmtFun* mOrFun;
+
+  // xor 関数
+  const SmtFun* mXorFun;
+
+  // => 関数
+  const SmtFun* mImpFun;
+
+  // = 関数を保持するハッシュ表
+  // 入力の型の ID 番号をキーにする．
+  hash_map<ymuint32, const SmtFun*> mEqFunMap;
+
+  // distinct 関数を保持するハッシュ表
+  // 入力の型の ID 番号をキーにする．
+  hash_map<ymuint32, const SmtFun*> mDiseqFunMap;
+
+  // ite 関数を保持するハッシュ表
+  // データの型のID番号をキーにする．
+  hash_map<ymuint32, const SmtFun*> mIteFunMap;
+
+  // 整数の単項マイナス
+  const SmtFun* mIntUminusFun;
+
+  // 整数の加算
+  const SmtFun* mIntAddFun;
+
+  // 整数の減算
+  const SmtFun* mIntSubFun;
+
+  // 整数の乗算
+  const SmtFun* mIntMulFun;
+
+  // 整数の <= 演算子
+  const SmtFun* mIntLeFun;
+
+  // 整数の < 演算子
+  const SmtFun* mIntLtFun;
+
+  // 整数の >= 演算子
+  const SmtFun* mIntGeFun;
+
+  // 整数の > 演算子
+  const SmtFun* mIntGtFun;
 
 };
 
