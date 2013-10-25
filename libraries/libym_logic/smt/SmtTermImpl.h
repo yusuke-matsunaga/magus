@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_SMT
 class SmtTermImpl :
   public SmtTerm
 {
-  friend class SmtTermMgr;
+  friend class SmtSolverImpl;
 
 protected:
 
@@ -110,7 +110,7 @@ public:
 class SmtNumTerm :
   public SmtTermImpl
 {
-  friend class SmtTermMgr;
+  friend class SmtSolverImpl;
 
 private:
 
@@ -157,7 +157,7 @@ private:
 class SmtStrTerm :
   public SmtTermImpl
 {
-  friend class SmtTermMgr;
+  friend class SmtSolverImpl;
 
 protected:
 
@@ -204,7 +204,7 @@ private:
 class SmtDecTerm :
   public SmtStrTerm
 {
-  friend class SmtTermMgr;
+  friend class SmtSolverImpl;
 
 private:
 
@@ -237,7 +237,7 @@ public:
 class SmtHexTerm :
   public SmtStrTerm
 {
-  friend class SmtTermMgr;
+  friend class SmtSolverImpl;
 
 private:
 
@@ -270,7 +270,7 @@ public:
 class SmtBinTerm :
   public SmtStrTerm
 {
-  friend class SmtTermMgr;
+  friend class SmtSolverImpl;
 
 private:
 
@@ -303,7 +303,7 @@ public:
 class SmtVarTerm :
   public SmtTermImpl
 {
-  friend class SmtTermMgr;
+  friend class SmtSolverImpl;
 
 private:
 
@@ -350,7 +350,7 @@ private:
 class SmtFunTerm1 :
   public SmtTermImpl
 {
-  friend class SmtTermMgr;
+  friend class SmtSolverImpl;
 
 protected:
 
@@ -408,7 +408,7 @@ private:
 class SmtFunTerm2 :
   public SmtFunTerm1
 {
-  friend class SmtTermMgr;
+  friend class SmtSolverImpl;
 
 private:
 
@@ -416,7 +416,7 @@ private:
   /// @param[in] fun 関数
   /// @param[in] arg_list 引数のリスト
   SmtFunTerm2(const SmtFun* fun,
-	      const vector<SmtTerm*>& arg_list);
+	      const vector<const SmtTerm*>& arg_list);
 
   /// @brief デストラクタ
   virtual
@@ -461,7 +461,7 @@ private:
 class SmtQualTerm :
   public SmtTermImpl
 {
-  friend class SmtTermMgr;
+  friend class SmtSolverImpl;
 
 protected:
 
@@ -517,7 +517,7 @@ private:
 class SmtForallTerm :
   public SmtQualTerm
 {
-  friend class SmtTermMgr;
+  friend class SmtSolverImpl;
 
 private:
 
@@ -552,7 +552,7 @@ public:
 class SmtExistsTerm :
   public SmtQualTerm
 {
-  friend class SmtTermMgr;
+  friend class SmtSolverImpl;
 
 private:
 
@@ -587,7 +587,7 @@ public:
 class SmtAnnotatedTerm :
   public SmtTermImpl
 {
-  friend class SmtTermMgr;
+  friend class SmtSolverImpl;
 
 private:
 

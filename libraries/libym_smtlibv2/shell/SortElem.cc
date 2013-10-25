@@ -47,17 +47,14 @@ SortElem::name() const
 }
 
 // @brief 要素数を返す．
-// @note is_param() == false の時のみ意味を持つ．
 ymuint
 SortElem::elem_num() const
 {
-  assert_not_reached(__FILE__, __LINE__);
   return 0;
 }
 
 // @brief 要素の型を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < elem_num() )
-// @note is_param() == false の時のみ意味を持つ．
 const SortElem*
 SortElem::elem(ymuint pos) const
 {
@@ -122,24 +119,6 @@ SimpleSort::name() const
   return mName;
 }
 
-// @brief 要素数を返す．
-// @note is_param() == false の時のみ意味を持つ．
-ymuint
-SimpleSort::elem_num() const
-{
-  return 0;
-}
-
-// @brief 要素の型を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < elem_num() )
-// @note is_param() == false の時のみ意味を持つ．
-const SortElem*
-SimpleSort::elem(ymuint pos) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス ComplexSort
@@ -164,7 +143,6 @@ ComplexSort::~ComplexSort()
 }
 
 // @brief 要素数を返す．
-// @note is_param() == false の時のみ意味を持つ．
 ymuint
 ComplexSort::elem_num() const
 {
@@ -173,7 +151,6 @@ ComplexSort::elem_num() const
 
 // @brief 要素の型を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < elem_num() )
-// @note is_param() == false の時のみ意味を持つ．
 const SortElem*
 ComplexSort::elem(ymuint pos) const
 {

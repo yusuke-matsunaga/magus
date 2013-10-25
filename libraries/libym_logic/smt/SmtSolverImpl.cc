@@ -12,6 +12,7 @@
 #include "SmtSortImpl.h"
 #include "SmtVarImpl.h"
 #include "SmtFunImpl.h"
+#include "SmtTermImpl.h"
 
 
 BEGIN_NAMESPACE_YM_SMT
@@ -156,6 +157,10 @@ SmtSolverImpl::make_fun(const vector<const SmtVar*>& input_var_list,
 const SmtTerm*
 SmtSolverImpl::make_numeric_term(ymuint32 val)
 {
+  void* p = mAlloc.get_memory(sizeof(SmtNumTerm));
+  const SmtTerm* term = new (p) SmtNumTerm(val);
+
+  return term;
 }
 
 // @brief <decimal> 型の term を作る．
@@ -164,6 +169,10 @@ SmtSolverImpl::make_numeric_term(ymuint32 val)
 const SmtTerm*
 SmtSolverImpl::make_decimal_term(const ShString& val)
 {
+  void* p = mAlloc.get_memory(sizeof(SmtDecTerm));
+  const SmtTerm* term = new (p) SmtDecTerm(val);
+
+  return term;
 }
 
 // @brief <hexadecimal> 型の term を作る．
@@ -172,6 +181,10 @@ SmtSolverImpl::make_decimal_term(const ShString& val)
 const SmtTerm*
 SmtSolverImpl::make_hexadecimal_term(const ShString& val)
 {
+  void* p = mAlloc.get_memory(sizeof(SmtHexTerm));
+  const SmtTerm* term = new (p) SmtHexTerm(val);
+
+  return term;
 }
 
 // @brief <binary> 型の term を作る．
@@ -180,6 +193,10 @@ SmtSolverImpl::make_hexadecimal_term(const ShString& val)
 const SmtTerm*
 SmtSolverImpl::make_binary_term(const ShString& val)
 {
+  void* p = mAlloc.get_memory(sizeof(SmtBinTerm));
+  const SmtTerm* term = new (p) SmtBinTerm(val);
+
+  return term;
 }
 
 // @brief <string> 型の term を作る．
@@ -188,6 +205,10 @@ SmtSolverImpl::make_binary_term(const ShString& val)
 const SmtTerm*
 SmtSolverImpl::make_string_term(const ShString& val)
 {
+  void* p = mAlloc.get_memory(sizeof(SmtStrTerm));
+  const SmtTerm* term = new (p) SmtStrTerm(val);
+
+  return term;
 }
 
 // @brief 変数型の term を作る．
@@ -196,6 +217,10 @@ SmtSolverImpl::make_string_term(const ShString& val)
 const SmtTerm*
 SmtSolverImpl::make_var_term(const SmtVar* var)
 {
+  void* p = mAlloc.get_memory(sizeof(SmtVarTerm));
+  const SmtTerm* term = new (p) SmtVarTerm(var);
+
+  return term;
 }
 
 // @brief 関数呼び出しの term を作る．
@@ -206,6 +231,18 @@ const SmtTerm*
 SmtSolverImpl::make_fun_term(const SmtFun* fun,
 			     const vector<const SmtTerm*>& arg_list)
 {
+  ymuint n = arg_list.size();
+  const SmtTerm* term;
+  if ( n == 0 ) {
+    void* p = mAlloc.get_memory(sizeof(SmtFunTerm1));
+    term = new (p) SmtFunTerm1(fun);
+  }
+  else {
+    void* p = mAlloc.get_memory(sizeof(SmtFunTerm2) + sizeof(const SmtTerm*) * (n - 1));
+    term = new (p) SmtFunTerm2(fun, arg_list);
+  }
+
+  return term;
 }
 
 // @brief forall の term を作る．
@@ -216,6 +253,11 @@ const SmtTerm*
 SmtSolverImpl::make_forall_term(const vector<const SmtVar*>& var_list,
 				const SmtTerm* body)
 {
+  ymuint n = var_list.size();
+  void* p = mAlloc.get_memory(sizeof(SmtForallTerm) + sizeof(const SmtVar*) * (n - 1));
+  const SmtTerm* term = new (p) SmtForallTerm(var_list, body);
+
+  return term;
 }
 
 // @brief exists の term を作る．
@@ -226,6 +268,11 @@ const SmtTerm*
 SmtSolverImpl::make_exists_term(const vector<const SmtVar*>& var_list,
 				const SmtTerm* body)
 {
+  ymuint n = var_list.size();
+  void* p = mAlloc.get_memory(sizeof(SmtExistsTerm) + sizeof(const SmtVar*) * (n - 1));
+  const SmtTerm* term = new (p) SmtExistsTerm(var_list, body);
+
+  return term;
 }
 
 // @brief 属性付きの term を作る．
@@ -236,6 +283,11 @@ const SmtTerm*
 SmtSolverImpl::make_annotated_term(const SmtTerm* body,
 				   const vector<SmtAttr>& attr_list)
 {
+  ymuint n = attr_list.size();
+  void* p = mAlloc.get_memory(sizeof(SmtAnnotatedTerm) + sizeof(SmtAttr) * (n - 1));
+  const SmtTerm* term = new (p) SmtAnnotatedTerm(body, attr_list);
+
+  return term;
 }
 
 // @brief 充足可能性を調べる．

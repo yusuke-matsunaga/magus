@@ -52,14 +52,12 @@ public:
   name() const;
 
   /// @brief 要素数を返す．
-  /// @note is_param() == false の時のみ意味を持つ．
   virtual
   ymuint
   elem_num() const;
 
   /// @brief 要素の型を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < elem_num() )
-  /// @note is_param() == false の時のみ意味を持つ．
   virtual
   const SortElem*
   elem(ymuint pos) const;
@@ -146,19 +144,6 @@ public:
   const SmtId*
   name() const;
 
-  /// @brief 要素数を返す．
-  /// @note is_param() == false の時のみ意味を持つ．
-  virtual
-  ymuint
-  elem_num() const;
-
-  /// @brief 要素の型を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < elem_num() )
-  /// @note is_param() == false の時のみ意味を持つ．
-  virtual
-  const SortElem*
-  elem(ymuint pos) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -199,14 +184,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 要素数を返す．
-  /// @note is_param() == false の時のみ意味を持つ．
   virtual
   ymuint
   elem_num() const;
 
   /// @brief 要素の型を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < elem_num() )
-  /// @note is_param() == false の時のみ意味を持つ．
   virtual
   const SortElem*
   elem(ymuint pos) const;

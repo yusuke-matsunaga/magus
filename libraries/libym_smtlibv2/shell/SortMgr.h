@@ -82,18 +82,7 @@ public:
   define_sort(const SmtId* name_id,
 	      const SortElem* sort);
 
-  /// @brief 単純な型を作る．
-  /// @param[in] name_id 型名を表す識別子
-  /// @return 生成した型を返す．
-  /// @note エラーが起こったら NULL を返す．
-  ///
-  /// エラーの原因は以下のとおり
-  ///  - name_id という名の型が定義されていなかった．
-  ///  - name_id という名の型のパラメータ数が0ではなかった．
-  const SmtSort*
-  make_sort(const SmtId* name_id);
-
-  /// @brief 複合型を作る．
+  /// @brief 型を作る．
   /// @param[in] name_id 型名を表す識別子
   /// @param[in] param_list 要素の型のリスト
   /// @return 生成した型を返す．
@@ -104,7 +93,7 @@ public:
   ///  - name_id という名の型のパラメータ数が param_list のサイズと異なった．
   const SmtSort*
   make_sort(const SmtId* name_id,
-	    const vector<const SmtSort*>& param_list);
+	    const vector<const SmtSort*>& param_list = vector<const SmtSort*>(0));
 
 
 private:
@@ -149,6 +138,14 @@ private:
   const SmtSort*
   replace_param(const SortElem* sort_templ,
 		const vector<const SmtSort*>& param_list);
+
+  /// @brief 型を作る．
+  /// @param[in] name_id 型名を表す識別子
+  /// @param[in] param_list 要素の型のリスト
+  /// @return 生成した型を返す．
+  const SmtSort*
+  _make_sort(const SmtId* name_id,
+	     const vector<const SmtSort*>& param_list = vector<const SmtSort*>(0));
 
   /// @brief 型テンプレート用のハッシュ表を拡大する．
   /// @param[in] req_size 新しいサイズ

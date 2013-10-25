@@ -342,7 +342,7 @@ SmtFunTerm1::input(ymuint pos) const
 // @param[in] fun 関数
 // @param[in] arg_list 引数のリスト
 SmtFunTerm2::SmtFunTerm2(const SmtFun* fun,
-			 const vector<SmtTerm*>& arg_list) :
+			 const vector<const SmtTerm*>& arg_list) :
   SmtFunTerm1(fun),
   mInputNum(arg_list.size())
 {

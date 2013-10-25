@@ -161,6 +161,9 @@ SortMgr::make_complex_sort_templ(const SmtId* name_id,
 				 const vector<const SortElem*>& elem_list)
 {
   ymuint n = elem_list.size();
+  if ( n == 0 ) {
+    return make_simple_sort_templ(name_id);
+  }
   void* p = mAlloc.get_memory(sizeof(ComplexSort) + sizeof(const SortElem*) * (n - 1));
   ComplexSort* sort = new (p) ComplexSort(name_id, elem_list);
   return sort;
@@ -274,47 +277,7 @@ SortMgr::find_templ(const SmtId* name_id,
   return NULL;
 }
 
-// @brief 単純な型を作る．
-// @param[in] name_id 型名を表す識別子
-// @return 生成した型を返す．
-// @note エラーが起こったら NULL を返す．
-//
-// エラーの原因は以下のとおり
-//  - name_id という名の型が定義されていなかった．
-//  - name_id という名の型のパラメータ数が0ではなかった．
-const SmtSort*
-SortMgr::make_sort(const SmtId* name_id)
-{
-  // 型のインスタンスを探す．
-  {
-    const SmtSort* sort = find_sort(name_id, vector<const SmtSort*>(0));
-    if ( sort != NULL ) {
-      // 見つかった．
-      return sort;
-    }
-  }
-
-  // 型宣言を探す．
-  ymuint param_num = 0;
-  const SortElem* sort_tmpl = find_templ(name_id, param_num);
-  if ( sort_tmpl == NULL ) {
-    // name_id という型は登録されていなかった．
-    return NULL;
-  }
-  if ( param_num != 0 ) {
-    // 引数の数が合わない．
-    return NULL;
-  }
-
-  const SmtSort* sort = mSolver.make_sort(vector<const SmtSort*>(0));
-
-  // 登録する．
-  reg_sort(name_id, sort);
-
-  return sort;
-}
-
-// @brief SmtSort に変換する．
+// @brief 型を作る．
 // @param[in] name_id 型名
 // @param[in] param_list 部品の型のリスト
 // @return 引数に合致する型を返す．
@@ -322,15 +285,6 @@ const SmtSort*
 SortMgr::make_sort(const SmtId* name_id,
 		   const vector<const SmtSort*>& param_list)
 {
-  // 型のインスタンスを探す．
-  {
-    const SmtSort* sort = find_sort(name_id, param_list);
-    if ( sort != NULL ) {
-      // 見つかった．
-      return sort;
-    }
-  }
-
   // 型宣言を探す．
   ymuint param_num = 0;
   const SortElem* sort_templ = find_templ(name_id, param_num);
@@ -343,15 +297,29 @@ SortMgr::make_sort(const SmtId* name_id,
     return NULL;
   }
 
-  const SmtSort* sort = NULL;
-  if ( param_num > 0 ) {
-    // パラメータを置き換えて実際の型を作る．
-    sort = replace_param(sort_templ, param_list);
+  // パラメータを置き換えて実際の型を作る．
+  const SmtSort* sort = replace_param(sort_templ, param_list);
+
+  return sort;
+}
+
+// @brief 型を作る．
+// @param[in] name_id 型名を表す識別子
+// @param[in] param_list 要素の型のリスト
+// @return 生成した型を返す．
+const SmtSort*
+SortMgr::_make_sort(const SmtId* name_id,
+		    const vector<const SmtSort*>& param_list)
+{
+  // 型のインスタンスを探す．
+  const SmtSort* sort = find_sort(name_id, param_list);
+  if ( sort != NULL ) {
+    // 見つかった．
+    return sort;
   }
-  else {
-    // パラメータはないのでそのまま実際の型を作る．
-    sort = mSolver.make_sort(param_list);
-  }
+
+  // 型を作る．
+  sort = mSolver.make_sort(param_list);
 
   // 登録する．
   reg_sort(name_id, sort);
@@ -431,18 +399,11 @@ SortMgr::replace_param(const SortElem* templ,
   }
 
   ymuint n = templ->elem_num();
-  if ( n == 0 ) {
-    // 通常の型
-    return make_sort(templ->name());
+  vector<const SmtSort*> elem_list(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    elem_list[i] = replace_param(templ->elem(i), param_list);
   }
-  else {
-    // 複合型
-    vector<const SmtSort*> elem_list(n);
-    for (ymuint i = 0; i < n; ++ i) {
-      elem_list[i] = replace_param(templ->elem(i), param_list);
-    }
-    return make_sort(templ->name(), elem_list);
-  }
+  return _make_sort(templ->name(), elem_list);
 }
 
 // @brief 型テンプレート用のハッシュ表を拡大する．
