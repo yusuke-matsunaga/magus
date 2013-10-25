@@ -10,6 +10,8 @@
 
 
 #include "ym_logic/SmtSolver.h"
+#include "ym_logic/SmtSort.h"
+#include "ym_logic/SmtFun.h"
 #include "ym_utils/SimpleAlloc.h"
 
 
@@ -203,6 +205,29 @@ private:
   void
   Ints_init();
 
+  /// @brief 組み込み型を作る．
+  const SmtSort*
+  make_builtin_sort(SmtSort::tType type);
+
+  /// @brief 組み込み関数を作る．
+  const SmtFun*
+  make_builtin_fun(SmtFun::tType type);
+
+  /// @brief Bool 型を得る．
+  /// @note 適切な logic が設定されている必要がある．
+  const SmtSort*
+  bool_sort();
+
+  /// @brief Int 型を得る．
+  /// @note 適切な logic が設定されている必要がある．
+  const SmtSort*
+  int_sort();
+
+  /// @brief Real 型を得る．
+  /// @note 適切な logic が設定されている必要がある．
+  const SmtSort*
+  real_sort();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -220,6 +245,17 @@ private:
 
   // SmtVar の次の ID番号
   ymuint32 mVarId;
+
+  // Bool 型
+  const SmtSort* mBoolSort;
+
+  // Int 型
+  const SmtSort* mIntSort;
+
+  // Real 型
+  const SmtSort* mRealSort;
+
+  // true 関数
 
 };
 

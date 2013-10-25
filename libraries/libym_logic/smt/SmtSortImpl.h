@@ -40,16 +40,17 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief パラメータ型のときに true を返す．
+  /// @brief 組み込み型を返す．
+  /// @note 普通の型は kNone を返す．
   virtual
-  bool
-  is_param() const;
+  tType
+  type() const;
 
-  /// @brief パラメータ番号を返す．
-  /// is_param() == false の場合にはエラーとなる．
+  /// @brief ID 番号を返す．
+  /// @note ID 番号はすべての型の中で唯一のもの
   virtual
   ymuint
-  param_id() const;
+  id() const;
 
   /// @brief 複合型の場合の要素数を返す．
   /// @note 単純な型の場合には 0 を返す．
@@ -76,6 +77,108 @@ private:
 
   // ID番号
   ymuint32 mId;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtBoolSort SmtSortImpl.h "SmtSortImpl.h"
+/// @brief Bool 型を表すクラス
+//////////////////////////////////////////////////////////////////////
+class SmtBoolSort :
+  public SmtSortImpl
+{
+  friend class SmtSolverImpl;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] id ID 番号
+  SmtBoolSort(ymuint id);
+
+  /// @brief デストラクタ
+  virtual
+  ~SmtBoolSort();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 組み込み型を返す．
+  /// @note 普通の型は kNone を返す．
+  virtual
+  tType
+  type() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtIntSort SmtSortImpl.h "SmtSortImpl.h"
+/// @brief Int 型を表すクラス
+//////////////////////////////////////////////////////////////////////
+class SmtIntSort :
+  public SmtSortImpl
+{
+  friend class SmtSolverImpl;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] id ID 番号
+  SmtIntSort(ymuint id);
+
+  /// @brief デストラクタ
+  virtual
+  ~SmtIntSort();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 組み込み型を返す．
+  /// @note 普通の型は kNone を返す．
+  virtual
+  tType
+  type() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtRealSort SmtSortImpl.h "SmtSortImpl.h"
+/// @brief Real 型を表すクラス
+//////////////////////////////////////////////////////////////////////
+class SmtRealSort :
+  public SmtSortImpl
+{
+  friend class SmtSolverImpl;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] id ID 番号
+  SmtRealSort(ymuint id);
+
+  /// @brief デストラクタ
+  virtual
+  ~SmtRealSort();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 組み込み型を返す．
+  /// @note 普通の型は kNone を返す．
+  virtual
+  tType
+  type() const;
 
 };
 

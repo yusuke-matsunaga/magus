@@ -28,20 +28,20 @@ SmtSortImpl::~SmtSortImpl()
 {
 }
 
-// @brief パラメータ型のときに true を返す．
-bool
-SmtSortImpl::is_param() const
+// @brief 組み込み型を返す．
+// @note 普通の型は kNone を返す．
+SmtSort::tType
+SmtSortImpl::type() const
 {
-  return false;
+  return kNone;
 }
 
-// @brief パラメータ番号を返す．
-// is_param() == false の場合にはエラーとなる．
+// @brief ID 番号を返す．
+// @note ID 番号はすべての型の中で唯一のもの
 ymuint
-SmtSortImpl::param_id() const
+SmtSortImpl::id() const
 {
-  assert_not_reached(__FILE__, __LINE__);
-  return 0;
+  return mId;
 }
 
 // @brief 複合型の場合の要素数を返す．
@@ -66,6 +66,81 @@ ymuint
 SmtSortImpl::hash() const
 {
   return mId;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス SmtBoolSort
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] id ID 番号
+SmtBoolSort::SmtBoolSort(ymuint id) :
+  SmtSortImpl(id)
+{
+}
+
+// @brief デストラクタ
+SmtBoolSort::~SmtBoolSort()
+{
+}
+
+// @brief 組み込み型を返す．
+// @note 普通の型は kNone を返す．
+SmtSort::tType
+SmtBoolSort::type() const
+{
+  return kBool;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス SmtIntSort
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] id ID 番号
+SmtIntSort::SmtIntSort(ymuint id) :
+  SmtSortImpl(id)
+{
+}
+
+// @brief デストラクタ
+SmtIntSort::~SmtIntSort()
+{
+}
+
+// @brief 組み込み型を返す．
+// @note 普通の型は kNone を返す．
+SmtSort::tType
+SmtIntSort::type() const
+{
+  return kInt;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス SmtRealSort
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] id ID 番号
+SmtRealSort::SmtRealSort(ymuint id) :
+  SmtSortImpl(id)
+{
+}
+
+// @brief デストラクタ
+SmtRealSort::~SmtRealSort()
+{
+}
+
+// @brief 組み込み型を返す．
+// @note 普通の型は kNone を返す．
+SmtSort::tType
+SmtRealSort::type() const
+{
+  return kReal;
 }
 
 

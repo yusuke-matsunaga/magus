@@ -40,6 +40,9 @@ SmtSolverImpl::SmtSolverImpl() :
 {
   mSortId = 0;
   mVarId = 0;
+  mBoolSort = NULL;
+  mIntSort = NULL;
+  mRealSort = NULL;
 }
 
 // @brief デストラクタ
@@ -172,25 +175,16 @@ SmtSolverImpl::set_logic(tSmtLogic logic)
 void
 SmtSolverImpl::Core_init()
 {
+  mBoolSort = make_builtin_sort(SmtSort::kBool);
+
 #if 0
-  mBoolSort = make_sort();
-
-  mTrueFun = make_fun(vector<const SmtSort*>(0), mBoolSort);
-  mFalseFun = make_fun(vector<const SmtSort*>(0), mBoolSort);
-
-  vector<const SmtSort*> b1_list(1);
-  b1_list[0] = mBoolSort;
-
-  mNotFun = make_fun(b1_list, mBoolSort);
-
-  vector<const SmtSort*> b2_list(2);
-  b2_list[0] = mBoolSort;
-  b2_list[1] = mBoolSort;
-
-  mAndFun = make_fun(b2_list, mBoolSort, SmtFun::kRightAssoc);
-  mOrFun = make_fun(b2_list, mBoolSort, SmtFun::kRightAssoc);
-  mXorFun = make_fun(b2_list, mBoolSort, SmtFun::kRightAssoc);
-  mImpFun = make_fun(b2_list, mBoolSort, SmtFun::kRightAssoc);
+  mTrueFun = make_builtin_fun(SmtFun::kTrue);
+  mFalseFun = make_builtin_fun(SmtFun::kFalse);
+  mNotFun = make_builtin_fun(SmtFun::kNot);
+  mAndFun = make_builtin_fun(SmtFun::kAnd);
+  mOrFun = make_builtin_fun(SmtFun::kOr);
+  mXorFun = make_builtin_fun(SmtFun::kXor);
+  mImpFun = make_builtin_fun(SmtFun::kImp);
 #endif
 }
 
@@ -198,6 +192,19 @@ SmtSolverImpl::Core_init()
 void
 SmtSolverImpl::Ints_init()
 {
+  mIntSort = make_builtin_sort(SmtSort::kInt);
+
+#if 0
+  mUminusFun = make_builtin_fun(SmtFun::kUminus);
+  mAddFun = make_builtin_fun(SmtFun::kAdd);
+  mSubFun = make_builtin_fun(SmtFun::kSub);
+  mMulFun = make_builtin_fun(SmtFun::kMul);
+  mDivFun = make_builtin_fun(SmtFun::kDiv);
+  mLeFun = make_builtin_fun(SmtFun::kLe);
+  mLtFun = make_builtin_fun(SmtFun::kLt);
+  mGeFun = make_builtin_fun(SmtFun::kGe);
+  mGtFun = make_builtin_fun(SmtFun::kGt);
+#endif
 }
 
 // @brief 型を作る．
@@ -268,7 +275,7 @@ SmtSolverImpl::make_fun(const vector<const SmtSort*>& input_sort_list,
   }
   else {
     void* p = mAlloc.get_memory(sizeof(SmtDeclFun2) + sizeof(const SmtSort*) * (n - 1));
-    fun = new (p) SmtDeclFun2(input_sort_list, output_sort, SmtFun::kNone, 0);
+    fun = new (p) SmtDeclFun2(input_sort_list, output_sort);
   }
 
   return fun;
@@ -472,6 +479,61 @@ SmtSolverImpl::get_value(const vector<const SmtTerm*>& expr_list)
 tSmtLibResponse
 SmtSolverImpl::get_assignment()
 {
+}
+
+// @brief 組み込み型を作る．
+const SmtSort*
+SmtSolverImpl::make_builtin_sort(SmtSort::tType type)
+{
+  void* p;
+  const SmtSort* sort = NULL;
+  switch ( type ) {
+  case SmtSort::kBool:
+    p = mAlloc.get_memory(sizeof(SmtBoolSort));
+    sort = new (p) SmtBoolSort(mSortId);
+    break;
+
+  case SmtSort::kInt:
+    p = mAlloc.get_memory(sizeof(SmtIntSort));
+    sort = new (p) SmtIntSort(mSortId);
+    break;
+
+  case SmtSort::kReal:
+    p = mAlloc.get_memory(sizeof(SmtRealSort));
+    sort = new (p) SmtRealSort(mSortId);
+    break;
+  }
+  assert_cond( sort != NULL, __FILE__, __LINE__);
+  ++ mSortId;
+
+  return sort;
+}
+
+// @brief Bool 型を得る．
+// @note 適切な logic が設定されている必要がある．
+const SmtSort*
+SmtSolverImpl::bool_sort()
+{
+  assert_cond( mBoolSort != NULL, __FILE__, __LINE__);
+  return mBoolSort;
+}
+
+// @brief Int 型を得る．
+// @note 適切な logic が設定されている必要がある．
+const SmtSort*
+SmtSolverImpl::int_sort()
+{
+  assert_cond( mIntSort != NULL, __FILE__, __LINE__);
+  return mIntSort;
+}
+
+// @brief Real 型を得る．
+// @note 適切な logic が設定されている必要がある．
+const SmtSort*
+SmtSolverImpl::real_sort()
+{
+  assert_cond( mRealSort != NULL, __FILE__, __LINE__);
+  return mRealSort;
 }
 
 END_NAMESPACE_YM_SMT

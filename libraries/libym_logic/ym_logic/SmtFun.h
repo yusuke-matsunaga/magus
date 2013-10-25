@@ -53,6 +53,30 @@ public:
   // 型定義
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 組み込み関数を表す型
+  enum tType {
+    kUserDefined, // 一般の関数
+    kTrue,        // logical TRUE
+    kFalse,       // logical FALSE
+    kNot,         // logical NOT
+    kAnd,         // logical AND
+    kOr,          // logical OR
+    kXor,         // logical XOR
+    kImp,         // logical IMPLICATAION (=>)
+    kEq,          // equality (=)
+    kDiseq,       // disequalit (distinct)
+    kIte,         // if-then-else
+    kUminus,      // arithmetic unary minus (-)
+    kAdd,         // arithmetic binary addition (+)
+    kSub,         // arifthmetic binary subtraction (-)
+    kMul,         // arithmetic binary multiplication (*)
+    kDiv,         // arithmetic binary division (/)
+    kLe,          // less than or equal (<=)
+    kLt,          // less than (<)
+    kGe,          // greater than or equal (>=)
+    kGt           // greater than (>)
+  };
+
   /// @brief 任意のオペランドをとる関数の属性
   enum tAttr {
     kNone,       // なし
@@ -74,6 +98,12 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 組み込み関数の場合に型を返す．
+  /// @note 普通の関数は kUserDefined を返す．
+  virtual
+  tType
+  type() const = 0;
 
   /// @brief 入力数を返す．
   virtual
@@ -109,19 +139,7 @@ public:
   tAttr
   attr() const = 0;
 
-  /// @brief パラメータの数を返す．
-  virtual
-  ymuint
-  param_num() const = 0;
-
 };
-
-
-/// @relates SmtFun
-/// @brief 内容を表す文字列を返す．
-extern
-string
-fun_str(const SmtFun* fun);
 
 END_NAMESPACE_YM_SMT
 
