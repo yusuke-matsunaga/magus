@@ -42,6 +42,7 @@ run_all_test_SOURCES = \
 	SmtLibScannerTest.cc \
 	IdMgrTest.cc \
 	SortMgrTest.cc \
+	NameMgrTest.cc \
 	main.cc
 
 run_all_test_LDADD = \

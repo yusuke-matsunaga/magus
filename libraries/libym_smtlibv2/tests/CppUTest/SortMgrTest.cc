@@ -69,7 +69,11 @@ TEST(SortMgrTestGroup, simple_sort)
 {
   // a という単純な型を作る．
   const SmtId* id = mIdMgr->make_id(ShString("a"));
-  (void) mSortMgr->declare_sort(id, 0);
+  CHECK( id != NULL );
+
+  bool stat1 = mSortMgr->declare_sort(id, 0);
+  CHECK( stat1 );
+
   const SmtSort* sort = mSortMgr->make_sort(id);
 
   // sort は NULL ではないはず
@@ -79,8 +83,13 @@ TEST(SortMgrTestGroup, simple_sort)
   LONGS_EQUAL( 0, sort->elem_num() );
 
   const SmtId* id2 = mIdMgr->make_id(ShString("b"));
-  (void) mSortMgr->declare_sort(id2, 0);
+  CHECK( id2 != NULL );
+  bool stat2 = mSortMgr->declare_sort(id2, 0);
+  CHECK( stat2 );
+
   const SmtSort* sort1 = mSortMgr->make_sort(id2);
+  CHECK( sort1 != NULL );
+
   vector<const SmtSort*> elem_list(1);
   elem_list[0] = sort1;
   // (a (b)) という型を作る．
@@ -94,11 +103,20 @@ TEST(SortMgrTestGroup, complex_sort)
 {
   // b という単純な型を作る．
   const SmtId* id_b = mIdMgr->make_id(ShString("b"));
-  (void) mSortMgr->declare_sort(id_b, 0);
+  CHECK( id_b != NULL );
+
+  bool stat1 = mSortMgr->declare_sort(id_b, 0);
+  CHECK( stat1 );
+
   const SmtSort* sort_b = mSortMgr->make_sort(id_b);
+  CHECK( sort_b != NULL );
 
   const SmtId* id_a = mIdMgr->make_id(ShString("a"));
-  (void) mSortMgr->declare_sort(id_a, 1);
+  CHECK( id_a != NULL );
+
+  bool stat2 = mSortMgr->declare_sort(id_a, 1);
+  CHECK( stat2 );
+
   vector<const SmtSort*> elem_list(1);
   elem_list[0] = sort_b;
   // a (b) という型を作る．
@@ -119,11 +137,17 @@ TEST(SortMgrTestGroup, simple_identity)
 {
   // a という単純な型を作る．
   const SmtId* id_a = mIdMgr->make_id(ShString("a"));
-  (void) mSortMgr->declare_sort(id_a, 0);
+  CHECK( id_a != NULL );
+
+  bool stat1 = mSortMgr->declare_sort(id_a, 0);
+  CHECK( stat1 );
+
   const SmtSort* sort_a = mSortMgr->make_sort(id_a);
+  CHECK( sort_a != NULL );
 
   // もう一回 a という単純な型を作る．
   const SmtSort* sort_a1 = mSortMgr->make_sort(id_a);
+  CHECK( sort_a1 != NULL );
 
   // この2つは同一のはず．
   CHECK( sort_a == sort_a1 );
@@ -134,20 +158,31 @@ TEST(SortMgrTestGroup, complex_identity)
 {
   // b という単純な型を作る．
   const SmtId* id_b = mIdMgr->make_id(ShString("b"));
-  (void) mSortMgr->declare_sort(id_b, 0);
+  CHECK( id_b != NULL );
+
+  bool stat1 = mSortMgr->declare_sort(id_b, 0);
+  CHECK( stat1 );
+
   const SmtSort* sort_b = mSortMgr->make_sort(id_b);
+  CHECK( sort_b != NULL );
 
   // a (b) という型を作る．
   const SmtId* id_a = mIdMgr->make_id(ShString("a"));
-  (void) mSortMgr->declare_sort(id_a, 1);
+  CHECK( id_a != NULL );
+
+  bool stat2 = mSortMgr->declare_sort(id_a, 1);
+  CHECK( stat2 );
+
   vector<const SmtSort*> elem_list(1);
   elem_list[0] = sort_b;
   const SmtSort* sort_a = mSortMgr->make_sort(id_a, elem_list);
+  CHECK( sort_a != NULL );
 
   // もう一回 a(b) という型を作る．
   vector<const SmtSort*> elem_list1(1);
   elem_list1[0] = sort_b;
   const SmtSort* sort_a1 = mSortMgr->make_sort(id_a, elem_list1);
+  CHECK( sort_a1 != NULL );
 
   // この2つは同一のはず．
   CHECK( sort_a == sort_a1 );
@@ -157,6 +192,7 @@ TEST(SortMgrTestGroup, complex_identity)
 TEST(SortMgrTestGroup, param)
 {
   const SortElem* sort = mSortMgr->make_param_sort_templ(0);
+  CHECK( sort != NULL );
 
   // パラメータ型のはず．
   CHECK( sort->is_param() );
@@ -168,6 +204,7 @@ TEST(SortMgrTestGroup, param)
   LONGS_EQUAL( 0, sort->param_id() );
 
   const SortElem* sort1 = mSortMgr->make_param_sort_templ(1);
+  CHECK( sort1 != NULL );
 
   // パラメータ型のはず．
   CHECK( sort1->is_param() );
@@ -184,11 +221,16 @@ TEST(SortMgrTestGroup, alias1)
 {
   // パラメータ型の生成
   const SortElem* param0 = mSortMgr->make_param_sort_templ(0);
+  CHECK( param0 != NULL );
 
   // 型テンプレートを作る．
   // a (p0, p0)
   const SmtId* id_a = mIdMgr->make_id(ShString("a"));
-  (void) mSortMgr->declare_sort(id_a, 2);
+  CHECK( id_a != NULL );
+
+  bool stat1 = mSortMgr->declare_sort(id_a, 2);
+  CHECK( stat1 );
+
   vector<const SortElem*> elem_list(2);
   elem_list[0] = param0;
   elem_list[1] = param0;
@@ -200,6 +242,8 @@ TEST(SortMgrTestGroup, alias1)
   // エイリアスを登録する．
   // (define-sort b (p0) (a p0 p0))
   const SmtId* id_b = mIdMgr->make_id(ShString("b"));
+  CHECK( id_b != NULL );
+
   bool stat = mSortMgr->define_sort(id_b, sort_tmpl);
 
   // これは成功するはず．
@@ -208,8 +252,13 @@ TEST(SortMgrTestGroup, alias1)
   // sort_tmpl を実体化する．
   // ( b  x ) = (a x x )
   const SmtId* id_x = mIdMgr->make_id(ShString("x"));
-  (void) mSortMgr->declare_sort(id_x, 0);
+  CHECK( id_x != NULL );
+
+  bool stat2 = mSortMgr->declare_sort(id_x, 0);
+  CHECK( stat2 );
+
   const SmtSort* sort_x = mSortMgr->make_sort(id_x);
+  CHECK( sort_x != NULL );
 
   vector<const SmtSort*> elem_list1(1);
   elem_list1[0] = sort_x;
@@ -234,11 +283,16 @@ TEST(SortMgrTestGroup, alias2)
 {
   // パラメータ型の生成
   const SortElem* param1 = mSortMgr->make_param_sort_templ(1);
+  CHECK( param1 != NULL );
 
   // 型テンプレートを作る．
   // a (p1)
   const SmtId* id_a = mIdMgr->make_id(ShString("a"));
-  (void) mSortMgr->declare_sort(id_a, 1);
+  CHECK( id_a != NULL );
+
+  bool stat1 = mSortMgr->declare_sort(id_a, 1);
+  CHECK( stat1 );
+
   vector<const SortElem*> elem_list(1);
   elem_list[0] = param1;
   const SortElem* sort_tmpl = mSortMgr->make_complex_sort_templ(id_a, elem_list);
@@ -252,11 +306,16 @@ TEST(SortMgrTestGroup, alias3)
 {
   // パラメータ型の生成
   const SortElem* param0 = mSortMgr->make_param_sort_templ(0);
+  CHECK( param0 != NULL );
 
   // 型テンプレートを作る．
   // a (p0 p0)
   const SmtId* id_a = mIdMgr->make_id(ShString("a"));
-  (void) mSortMgr->declare_sort(id_a, 2);
+  CHECK( id_a != NULL );
+
+  bool stat1 = mSortMgr->declare_sort(id_a, 2);
+  CHECK( stat1 );
+
   vector<const SortElem*> elem_list(2);
   elem_list[0] = param0;
   elem_list[1] = param0;
@@ -267,6 +326,8 @@ TEST(SortMgrTestGroup, alias3)
 
   // エイリアスの登録
   const SmtId* id_b = mIdMgr->make_id(ShString("b"));
+  CHECK( id_b != NULL );
+
   bool stat = mSortMgr->define_sort(id_b, sort_tmpl);
 
   // これは成功するはず

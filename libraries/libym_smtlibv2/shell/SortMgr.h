@@ -102,10 +102,12 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 型テンプレートを登録する．
+  /// @param[in] name_id 型名
   /// @param[in] sort 登録する型テンプレート
   /// @param[in] param_num パラメータ数
   void
-  reg_templ(const SortElem* sort,
+  reg_templ(const SmtId* name_id,
+	    const SortElem* sort,
 	    ymuint param_num);
 
   /// @brief 型テンプレートを探す．
@@ -166,6 +168,9 @@ private:
   // 型テンプレート用のハッシュ表の要素
   struct Cell1
   {
+    // 名前を表す識別子
+    const SmtId* mId;
+
     // 型
     const SortElem* mSort;
 

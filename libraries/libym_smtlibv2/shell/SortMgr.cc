@@ -124,7 +124,7 @@ SortMgr::declare_sort(const SmtId* name_id,
   }
   const SortElem* sort = make_complex_sort_templ(name_id, elem_list);
 
-  reg_templ(sort, param_num);
+  reg_templ(name_id, sort, param_num);
 
   return true;
 }
@@ -217,26 +217,29 @@ SortMgr::define_sort(const SmtId* name_id,
     }
   }
 
-  reg_templ(sort, param_num);
+  reg_templ(name_id, sort, param_num);
 
   return true;
 }
 
 // @brief 型を登録する．
+// @param[in] name_id 型名
 // @param[in] sort 登録する型テンプレート
 // @param[in] param_num パラメータ数
 void
-SortMgr::reg_templ(const SortElem* sort,
+SortMgr::reg_templ(const SmtId* name_id,
+		   const SortElem* sort,
 		   ymuint param_num)
 {
   if ( mNum1 >= mNextLimit1 ) {
     expand_table1(mTableSize1 * 2);
   }
 
-  ymuint idx = sort->name()->id() % mTableSize1;
+  ymuint idx = name_id->id() % mTableSize1;
 
   void* p = mAlloc.get_memory(sizeof(Cell1));
   Cell1* cell = new (p) Cell1;
+  cell->mId = name_id;
   cell->mSort = sort;
   cell->mParamNum = param_num;
 
@@ -267,10 +270,9 @@ SortMgr::find_templ(const SmtId* name_id,
   ymuint idx = h % mTableSize1;
   for (Cell1* cell = mHashTable1[idx];
        cell != NULL; cell = cell->mLink) {
-    const SortElem* sort = cell->mSort;
-    if ( sort->name() == name_id ) {
+    if ( cell->mId == name_id ) {
       param_num = cell->mParamNum;
-      return sort;
+      return cell->mSort;
     }
   }
 
