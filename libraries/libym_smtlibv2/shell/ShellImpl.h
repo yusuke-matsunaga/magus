@@ -155,6 +155,14 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief CORE theory の初期化を行う．
+  void
+  CORE_init();
+
+  /// @brief INTS theory の初期化を行う．
+  void
+  INTS_init();
+
   /// @brief 識別子を返す．
   /// @param[in] name 名前
   /// @param[in] index_list インデックスのリスト

@@ -90,6 +90,8 @@ ShellImpl::ShellImpl()
   mPrompt2 = "...>";
   mAllowCtrlDExit = false;
 
+  mSolver = SmtSolver::new_solver();
+
   // スタックの初期化
   StackPage* page0 = new StackPage(*mSolver);
   mStack.push_back(page0);
@@ -101,6 +103,8 @@ ShellImpl::ShellImpl()
 ShellImpl::~ShellImpl()
 {
   delete mParser;
+
+  delete mSolver;
 
   // スタックの削除
   // 順序は問題ないよね？
@@ -184,6 +188,7 @@ ShellImpl::eval_line()
   const SmtLibNode* node1 = NULL;
   const SmtLibNode* node2 = NULL;
   const char* str1 = NULL;
+  bool result = false;
 
   SmtLibParser::tResult res = mParser->read(node);
   switch ( res ) {
@@ -202,6 +207,13 @@ ShellImpl::eval_line()
     return 2;
   }
 
+  if ( debug ) {
+    print(cerr, node);
+    cerr << endl;
+  }
+  mErrBuf.str("");
+  mErrBuf.clear();
+
   if ( node->type() != kListToken ) {
     goto syntax_error;
   }
@@ -213,58 +225,58 @@ ShellImpl::eval_line()
   str1 = static_cast<const char*>(node1->str_value());
   node2 = node1->sibling();
   if ( strcmp("set-logic", str1) == 0 ) {
-    set_logic(node2);
+    result = set_logic(node2);
   }
   else if ( strcmp("set-option", str1) == 0 ) {
-    set_option(node2);
+    result = set_option(node2);
   }
   else if ( strcmp("set-info", str1) == 0 ) {
-    set_info(node2);
+    result = set_info(node2);
   }
   else if ( strcmp("declare-sort", str1) == 0 ) {
-    declare_sort(node2);
+    result = declare_sort(node2);
   }
   else if ( strcmp("define-sort", str1) == 0 ) {
-    define_sort(node2);
+    result = define_sort(node2);
   }
   else if ( strcmp("declare-fun", str1) == 0 ) {
-    declare_fun(node2);
+    result = declare_fun(node2);
   }
   else if ( strcmp("define-fun", str1) == 0 ) {
-    define_fun(node2);
+    result = define_fun(node2);
   }
   else if ( strcmp("push", str1) == 0 ) {
-    push(node2);
+    result = push(node2);
   }
   else if ( strcmp("pop", str1) == 0 ) {
-    pop(node2);
+    result = pop(node2);
   }
   else if ( strcmp("assert", str1) == 0 ) {
-    assert(node2);
+    result = assert(node2);
   }
   else if ( strcmp("check-sat", str1) == 0 ) {
-    check_sat(node2);
+    result = check_sat(node2);
   }
   else if ( strcmp("get-assertions", str1) == 0 ) {
-    get_assertions(node2);
+    result = get_assertions(node2);
   }
   else if ( strcmp("get-proof", str1) == 0 ) {
-    get_proof(node2);
+    result = get_proof(node2);
   }
   else if ( strcmp("get-unsat-core", str1) == 0 ) {
-    get_unsat_core(node2);
+    result = get_unsat_core(node2);
   }
   else if ( strcmp("get-value", str1) == 0 ) {
-    get_value(node2);
+    result = get_value(node2);
   }
   else if ( strcmp("get-assignment", str1) == 0 ) {
-    get_assignment(node2);
+    result = get_assignment(node2);
   }
   else if ( strcmp("get-option", str1) == 0 ) {
-    get_option(node2);
+    result = get_option(node2);
   }
   else if ( strcmp("get-info", str1) == 0 ) {
-    get_info(node2);
+    result = get_info(node2);
   }
   else if ( strcmp("exit", str1) == 0 ) {
     return 0;
@@ -272,8 +284,18 @@ ShellImpl::eval_line()
   else {
     goto syntax_error;
   }
+  if ( result ) {
+    if ( debug ) {
+      cerr << "  ==> success" << endl;
+    }
+    return 1;
+  }
+  // result == false の時は syntax_error に続く
 
  syntax_error:
+  if ( debug ) {
+    cerr << "  ==> error: " << mErrBuf.str() << endl;
+  }
   return 1;
 }
 
@@ -282,130 +304,340 @@ ShellImpl::eval_line()
 bool
 ShellImpl::set_logic(const SmtLibNode* arg_top)
 {
-  if ( debug ) {
-    cerr << "set-logic ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
   // このコマンドは1つの引数をとる．
   if ( arg_top == NULL || arg_top->sibling() != NULL ||
        arg_top->type() != kSymbolToken ) {
     mErrBuf << "syntax_error";
-    goto syntax_error;
+    return false;
+  }
+
+  const char* str = arg_top->str_value();
+  tSmtLogic logic = kSmtLogic_NONE;
+  if ( strcmp(str, "AUFLIA") == 0 ) {
+    logic = kSmtLogic_AUFLIA;
+    CORE_init();
+  }
+  else if ( strcmp(str, "AUFLIRA") == 0 ) {
+    logic = kSmtLogic_AUFLIRA;
+    CORE_init();
+  }
+  else if ( strcmp(str, "AUFNIRA") == 0 ) {
+    logic = kSmtLogic_AUFNIRA;
+    CORE_init();
+  }
+  else if ( strcmp(str, "LRA") == 0 ) {
+    logic = kSmtLogic_LRA;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_ABV") == 0 ) {
+    logic = kSmtLogic_QF_ABV;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_AUFBV") == 0 ) {
+    logic = kSmtLogic_QF_AUFBV;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_AUFLIA") == 0 ) {
+    logic = kSmtLogic_QF_AUFLIA;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_AX") == 0 ) {
+    logic = kSmtLogic_QF_AX;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_BV") == 0 ) {
+    logic = kSmtLogic_QF_BV;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_IDL") == 0 ) {
+    logic = kSmtLogic_QF_IDL;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_LIA") == 0 ) {
+    logic = kSmtLogic_QF_LIA;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_LRA") == 0 ) {
+    logic = kSmtLogic_QF_LRA;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_NIA") == 0 ) {
+    logic = kSmtLogic_QF_NIA;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_NRA") == 0 ) {
+    logic = kSmtLogic_QF_NRA;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_RDL") == 0 ) {
+    logic = kSmtLogic_QF_RDL;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_UF") == 0 ) {
+    logic = kSmtLogic_QF_UF;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_UFBF") == 0 ) {
+    logic = kSmtLogic_QF_UFBV;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_UFIDL") == 0 ) {
+    logic = kSmtLogic_QF_UFIDL;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_UFLIA") == 0 ) {
+    logic = kSmtLogic_QF_UFLIA;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_UFLRA") == 0 ) {
+    logic = kSmtLogic_QF_UFLRA;
+    CORE_init();
+  }
+  else if ( strcmp(str, "QF_UFNRA") == 0 ) {
+    logic = kSmtLogic_QF_UFNRA;
+    CORE_init();
+  }
+  else if ( strcmp(str, "UFLRA") == 0 ) {
+    logic = kSmtLogic_UFLRA;
+    CORE_init();
+  }
+  else if ( strcmp(str, "UFNIA") == 0 ) {
+    logic = kSmtLogic_UFNIA;
+    CORE_init();
   }
   else {
-    const char* str = arg_top->str_value();
-    tSmtLogic logic = kSmtLogic_NONE;
-    if ( strcmp(str, "AUFLIA") == 0 ) {
-      logic = kSmtLogic_AUFLIA;
-    }
-    else if ( strcmp(str, "AUFLIRA") == 0 ) {
-      logic = kSmtLogic_AUFLIRA;
-    }
-    else if ( strcmp(str, "AUFNIRA") == 0 ) {
-      logic = kSmtLogic_AUFNIRA;
-    }
-    else if ( strcmp(str, "LRA") == 0 ) {
-      logic = kSmtLogic_LRA;
-    }
-    else if ( strcmp(str, "QF_ABV") == 0 ) {
-      logic = kSmtLogic_QF_ABV;
-    }
-    else if ( strcmp(str, "QF_AUFBV") == 0 ) {
-      logic = kSmtLogic_QF_AUFBV;
-    }
-    else if ( strcmp(str, "QF_AUFLIA") == 0 ) {
-      logic = kSmtLogic_QF_AUFLIA;
-    }
-    else if ( strcmp(str, "QF_AX") == 0 ) {
-      logic = kSmtLogic_QF_AX;
-    }
-    else if ( strcmp(str, "QF_BV") == 0 ) {
-      logic = kSmtLogic_QF_BV;
-    }
-    else if ( strcmp(str, "QF_IDL") == 0 ) {
-      logic = kSmtLogic_QF_IDL;
-    }
-    else if ( strcmp(str, "QF_LIA") == 0 ) {
-      logic = kSmtLogic_QF_LIA;
-    }
-    else if ( strcmp(str, "QF_LRA") == 0 ) {
-      logic = kSmtLogic_QF_LRA;
-    }
-    else if ( strcmp(str, "QF_NIA") == 0 ) {
-      logic = kSmtLogic_QF_NIA;
-    }
-    else if ( strcmp(str, "QF_NRA") == 0 ) {
-      logic = kSmtLogic_QF_NRA;
-    }
-    else if ( strcmp(str, "QF_RDL") == 0 ) {
-      logic = kSmtLogic_QF_RDL;
-    }
-    else if ( strcmp(str, "QF_UF") == 0 ) {
-      logic = kSmtLogic_QF_UF;
-    }
-    else if ( strcmp(str, "QF_UFBF") == 0 ) {
-      logic = kSmtLogic_QF_UFBV;
-    }
-    else if ( strcmp(str, "QF_UFIDL") == 0 ) {
-      logic = kSmtLogic_QF_UFIDL;
-    }
-    else if ( strcmp(str, "QF_UFLIA") == 0 ) {
-      logic = kSmtLogic_QF_UFLIA;
-    }
-    else if ( strcmp(str, "QF_UFLRA") == 0 ) {
-      logic = kSmtLogic_QF_UFLRA;
-    }
-    else if ( strcmp(str, "QF_UFNRA") == 0 ) {
-      logic = kSmtLogic_QF_UFNRA;
-    }
-    else if ( strcmp(str, "UFLRA") == 0 ) {
-      logic = kSmtLogic_UFLRA;
-    }
-    else if ( strcmp(str, "UFNIA") == 0 ) {
-      logic = kSmtLogic_UFNIA;
-    }
-    else {
-      mErrBuf << str << ": unknown logic";
-      goto syntax_error;
-    }
+    mErrBuf << str << ": unknown logic";
+    return false;
+  }
+
+  if ( !mSolver->set_logic(logic) ) {
+    mErrBuf << "already set";
+    return false;
+  }
+
+  return true;
+}
+
+// @brief CORE theory の初期化を行う．
+void
+ShellImpl::CORE_init()
+{
+  // :sorts
+  // (Bool 0)
+  const SmtId* bool_id = mIdMgr->make_id(ShString("Bool"));
+  assert_cond( bool_id != NULL, __FILE__, __LINE__);
+  sort_mgr().declare_sort(bool_id, 0);
+
+  const SmtSort* bool_sort = sort_mgr().make_sort(bool_id);
+  assert_cond( bool_sort != NULL, __FILE__, __LINE__);
+
+  // :funs
+  vector<const SmtSort*> b0_list(0);
+
+  // (true Bool)
+  const SmtFun* true_fun = mSolver->make_fun(b0_list, bool_sort);
+  assert_cond( true_fun != NULL, __FILE__, __LINE__);
+
+  const SmtId* true_id = mIdMgr->make_id(ShString("true"));
+  assert_cond( true_id != NULL, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(true_id, true_fun);
+
+  // (false Bool)
+  const SmtFun* false_fun = mSolver->make_fun(b0_list, bool_sort);
+  assert_cond( false_fun != NULL, __FILE__, __LINE__);
+
+  const SmtId* false_id = mIdMgr->make_id(ShString("false"));
+  assert_cond( false_id != NULL, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(false_id, false_fun);
+
+  vector<const SmtSort*> b1_list(1);
+  b1_list[0] = bool_sort;
+
+  // (not Bool Bool)
+  const SmtFun* not_fun = mSolver->make_fun(b1_list, bool_sort);
+  assert_cond( not_fun, __FILE__, __LINE__);
+
+  const SmtId* not_id = mIdMgr->make_id(ShString("not"));
+  assert_cond( not_id != NULL, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(not_id, not_fun);
+
+  vector<const SmtSort*> b2_list(2);
+  b2_list[0] = bool_sort;
+  b2_list[1] = bool_sort;
+
+  // (and Bool Bool Bool :right-assoc)
+  const SmtFun* and_fun = mSolver->make_fun(b2_list, bool_sort);
+  assert_cond( and_fun, __FILE__, __LINE__);
+
+  const SmtId* and_id = mIdMgr->make_id(ShString("and"));
+  assert_cond( and_id != NULL, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(and_id, and_fun);
+
+  // (or Bool Bool Bool :right-assoc)
+  const SmtFun* or_fun = mSolver->make_fun(b2_list, bool_sort);
+  assert_cond( or_fun, __FILE__, __LINE__);
+
+  const SmtId* or_id = mIdMgr->make_id(ShString("or"));
+  assert_cond( or_id != NULL, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(or_id, or_fun);
+
+  // (xor Bool Bool Bool :right-assoc)
+  const SmtFun* xor_fun = mSolver->make_fun(b2_list, bool_sort);
+  assert_cond( xor_fun, __FILE__, __LINE__);
+
+  const SmtId* xor_id = mIdMgr->make_id(ShString("xor"));
+  assert_cond( xor_id != NULL, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(xor_id, xor_fun);
+
+  // (=> Bool Bool Bool :right-assoc)
+  const SmtFun* imp_fun = mSolver->make_fun(b2_list, bool_sort);
+  assert_cond( imp_fun, __FILE__, __LINE__);
+
+  const SmtId* imp_id = mIdMgr->make_id(ShString("=>"));
+  assert_cond( imp_id != NULL, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(imp_id, imp_fun);
 
 #if 0
-    if ( !mSolver.set_logic(logic) ) {
-      mErrBuf << "already set";
-      goto syntax_error;
-    }
+  const SmtSort* A_sort = sort_mgr().make_param_sort_templ(0);
+  vector<const SmtSort*> a2_list(2);
+  a2_list[0] = A_sort;
+  a2_list[1] = A_sort;
+
+  // (par (A) (= A A Bool :chainable))
+  const SmtId* eq_id = mIdMgr->make_id(ShString("="));
+  assert_cond( eq_id != NULL, __FILE__, __LINE__);
+  name_mgr().reg_fun(eq_id, a2_list, bool_sort, SmtVarFun::kChainable);
+
+  // (par (A) (distinct A A Bool :pairwise))
+  const SmtId* dis_id = mIdMgr->make_id(ShString("distinct"));
+  assert_cond( dis_id != NULL, __FILE__, __LINE__);
+  name_mgr().reg_fun(dis_id, a2_list, bool_sort, SmtVarFun::kPairwise);
+
+  vector<const SmtSort*> ite_list(3);
+  ite_list[0] = bool_sort;
+  ite_list[1] = A_sort;
+  ite_list[2] = A_sort;
+
+  // (par (A) (ite Bool A A A)
+  const SmtId* ite_id = mIdMgr->make_id(ShString("ite"));
+  assert_cond( ite_id != NULL, __FILE__, __LINE__);
+  name_mgr().reg_fun(ite_id, ite_list, A_sort, SmtVarFun::kNone);
 #endif
-
-    if ( debug ) {
-      cerr << "  ==> success" << endl;
-    }
-
-    return true;
-  }
-
- syntax_error:
-  if ( debug ) {
-    cerr << "  ==> error: " << mErrBuf.str() << endl;
-  }
-  return false;
 }
+
+// @brief INTS theory の初期化を行う．
+void
+ShellImpl::INTS_init()
+{
+  // :sorts
+  // (Int 0)
+  const SmtId* int_id = mIdMgr->make_id(ShString("Int"));
+  assert_cond( int_id != NULL, __FILE__, __LINE__);
+
+  sort_mgr().declare_sort(int_id, 0);
+
+  const SmtSort* int_sort = sort_mgr().make_sort(int_id);
+  assert_cond( int_sort != NULL, __FILE__, __LINE__);
+
+  // :funs
+
+  vector<const SmtSort*> i1_list(1);
+  i1_list[0] = int_sort;
+
+  // (- Int Int)
+  const SmtFun* uminus_fun = mSolver->make_fun(i1_list, int_sort);
+  assert_cond( uminus_fun, __FILE__, __LINE__);
+
+  const SmtId* minus_id = mIdMgr->make_id(ShString("-"));
+  assert_cond( minus_id != NULL, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(minus_id, uminus_fun);
+
+  vector<const SmtSort*> i2_list(2);
+  i2_list[0] = int_sort;
+  i2_list[1] = int_sort;
+
+  // (- Int Int Int :left-assoc)
+  const SmtFun* minus_fun = mSolver->make_fun(i2_list, int_sort);
+  assert_cond( minus_fun, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(minus_id, minus_fun);
+
+  // (+ Int Int Int :left-assoc)
+  const SmtFun* plus_fun = mSolver->make_fun(i2_list, int_sort);
+  assert_cond( plus_fun, __FILE__, __LINE__);
+
+  const SmtId* plus_id = mIdMgr->make_id(ShString("+"));
+  assert_cond( plus_id != NULL, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(plus_id, plus_fun);
+
+  // (* Int Int Int :left-assoc)
+  const SmtFun* star_fun = mSolver->make_fun(i2_list, int_sort);
+  assert_cond( star_fun, __FILE__, __LINE__);
+
+  const SmtId* star_id = mIdMgr->make_id(ShString("*"));
+  assert_cond( star_id != NULL, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(star_id, star_fun);
+
+  const SmtId* bool_id = mIdMgr->make_id(ShString("Bool"));
+  assert_cond( bool_id != NULL, __FILE__, __LINE__);
+
+  const SmtSort* bool_sort = sort_mgr().make_sort(bool_id, vector<const SmtSort*>(0));
+  assert_cond( bool_sort != NULL, __FILE__, __LINE__);
+
+  // (<= Int Int Bool :chainable)
+  const SmtFun* le_fun = mSolver->make_fun(i2_list, bool_sort);
+  assert_cond( le_fun, __FILE__, __LINE__);
+
+  const SmtId* le_id = mIdMgr->make_id(ShString("<="));
+  assert_cond( le_id != NULL, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(le_id, le_fun);
+
+  // (< Int Int Bool :chainable)
+  const SmtFun* lt_fun = mSolver->make_fun(i2_list, bool_sort);
+  assert_cond( lt_fun, __FILE__, __LINE__);
+
+  const SmtId* lt_id = mIdMgr->make_id(ShString("<"));
+  assert_cond( lt_id != NULL, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(lt_id, lt_fun);
+
+  // (>= Int Int Bool :chainable)
+  const SmtFun* ge_fun = mSolver->make_fun(i2_list, bool_sort);
+  assert_cond( ge_fun, __FILE__, __LINE__);
+
+  const SmtId* ge_id = mIdMgr->make_id(ShString(">="));
+  assert_cond( ge_id != NULL, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(ge_id, ge_fun);
+
+  // (> Int Int Bool :chainable)
+  const SmtFun* gt_fun = mSolver->make_fun(i2_list, bool_sort);
+  assert_cond( gt_fun, __FILE__, __LINE__);
+
+  const SmtId* gt_id = mIdMgr->make_id(ShString(">"));
+  assert_cond( gt_id != NULL, __FILE__, __LINE__);
+
+  name_mgr().reg_fun(gt_id, gt_fun);
+}
+
 
 // @brief オプションを設定する．
 // @param[in] arg_top 引数の先頭ノード
 bool
 ShellImpl::set_option(const SmtLibNode* arg_top)
 {
-  if ( debug ) {
-    cerr << "set-option ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
-  if ( debug ) {
-    cerr << "  ==> OK" << endl;
-  }
+  // 未完
   return true;
 }
 
@@ -414,49 +646,31 @@ ShellImpl::set_option(const SmtLibNode* arg_top)
 bool
 ShellImpl::set_info(const SmtLibNode* arg_top)
 {
-  if ( debug ) {
-    cerr << "set-info ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
   if ( arg_top->type() != kKeywordToken ) {
     mErrBuf << "syntx error: keyword expected at " << arg_top->loc();
-    goto syntax_error;
+    return false;
   }
-  else {
-    const SmtTerm* expr = NULL;
-    const SmtLibNode* node2 = arg_top->sibling();
-    if ( node2 != NULL ) {
-      if ( node2->sibling() != NULL ) {
-	mErrBuf << "syntax error: too many tokens at " << node2->sibling()->loc();
-	goto syntax_error;
-      }
-      expr = eval_to_expr(node2);
-      if ( expr == NULL ) {
-	goto syntax_error;
-      }
+
+  const SmtTerm* expr = NULL;
+  const SmtLibNode* node2 = arg_top->sibling();
+  if ( node2 != NULL ) {
+    if ( node2->sibling() != NULL ) {
+      mErrBuf << "syntax error: too many tokens at " << node2->sibling()->loc();
+      return false;
     }
+    expr = eval_to_expr(node2);
+    if ( expr == NULL ) {
+      return false;
+    }
+  }
 
 #if 0
-    if ( !mMgr.set_info(arg_top->str_value(), expr) ) {
-      goto syntax_error;
-    }
+  if ( !mMgr.set_info(arg_top->str_value(), expr) ) {
+    return false;
+  }
 #endif
-  }
-
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
-  }
 
   return true;
-
- syntax_error:
-  if ( debug ) {
-    cerr << "  ==> error: " << mErrBuf.str() << endl;
-  }
-
-  return false;
 }
 
 // @brief sort の宣言を行う．
@@ -464,54 +678,34 @@ ShellImpl::set_info(const SmtLibNode* arg_top)
 bool
 ShellImpl::declare_sort(const SmtLibNode* arg_top)
 {
-  if ( debug ) {
-    cerr << "declare-sort ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
   // このコマンドは2つの引数をとる．
   vector<const SmtLibNode*> arg_list;
-  const SmtId* name = NULL;
-  ymuint num = 0;
-  const char* emsg = "";
-
   if ( !parse_args(arg_top, 2, arg_list) ) {
-    emsg = "syntax error";
-    goto syntax_error;
+    mErrBuf << "syntax error";
+    return false;
   }
 
   // 1つめは型名
-  name = eval_to_id(arg_list[0]);
+  const SmtId* name = eval_to_id(arg_list[0]);
   if ( name == NULL ) {
-    emsg = "first argument is not an indentifier";
-    goto syntax_error;
+    mErrBuf << "first argument is not an indentifier";
+    return false;
   }
 
   // 2つめは引数の数
   if ( arg_list[1]->type() != kNumToken ) {
-    emsg = "second argument is not a numeric";
-    goto syntax_error;
+    mErrBuf << "second argument is not a numeric";
+    return false;
   }
-  num = arg_list[1]->int_value();
+  ymuint num = arg_list[1]->int_value();
 
   // 型を登録する．
   if ( !sort_mgr().declare_sort(name, num) ) {
-    goto syntax_error;
-  }
-
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
+    mErrBuf << name->name() << "already declared";
+    return false;
   }
 
   return true;
-
- syntax_error:
-  if ( debug ) {
-    cerr << "  ==> error: " << emsg << endl;
-  }
-
-  return false;
 }
 
 // @brief sort の alias を定義する．
@@ -519,72 +713,51 @@ ShellImpl::declare_sort(const SmtLibNode* arg_top)
 bool
 ShellImpl::define_sort(const SmtLibNode* arg_top)
 {
-  if ( debug ) {
-    cerr << "define-sort ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
   // このコマンドは3つの引数をとる．
   vector<const SmtLibNode*> arg_list;
-  const SmtId* name = NULL;
-  vector<const SmtId*> param_list;
-  const SortElem* sort = NULL;
-  const char* emsg = "";
-
   if ( !parse_args(arg_top, 3, arg_list) ) {
-    emsg = "syntax error";
-    goto syntax_error;
+    mErrBuf << "syntax error";
+    return false;
   }
 
   // 1つめは型名
-  name = eval_to_id(arg_list[0]);
+  const SmtId* name = eval_to_id(arg_list[0]);
   if ( name == NULL ) {
-    emsg = "first argument is not an identifier";
-    goto syntax_error;
+    mErrBuf << "first argument is not an identifier";
+    return false;
   }
 
   // 2つめはパラメータリスト
   if ( arg_list[1]->type() != kListToken ) {
-    emsg = "second argument is not 'list' type";
-    goto syntax_error;
+    mErrBuf << "second argument is not 'list' type";
+    return false;
   }
+  vector<const SmtId*> param_list;
   param_list.reserve(arg_list[1]->child_num());
   for (const SmtLibNode* node1 = arg_list[1]->child();
        node1 != NULL; node1 = node1->sibling()) {
     const SmtId* id = eval_to_id(node1);
     if ( id == NULL ) {
-      emsg = "second argument is not a list of identifiers";
-      goto syntax_error;
+      mErrBuf << "second argument is not a list of identifiers";
+      return false;
     }
     param_list.push_back(id);
   }
 
   // 3つめは型テンプレート
-  sort = eval_to_sort_template(arg_list[2], param_list);
+  const SortElem* sort = eval_to_sort_template(arg_list[2], param_list);
   if ( sort == NULL ) {
-    emsg = "third argument is not a valid sort";
-    goto syntax_error;
+    mErrBuf << "third argument is not a valid sort";
+    return false;
   }
 
   // 型テンプレートを登録する．
   if ( !sort_mgr().define_sort(name, sort) ) {
-    emsg = "already defined";
-    goto syntax_error;
-  }
-
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
+    mErrBuf << name->name() << "already defined";
+    return false;
   }
 
   return true;
-
- syntax_error:
-  if ( debug ) {
-    cerr << "  ==> error: " << emsg << endl;
-  }
-
-  return false;
 }
 
 // @brief 関数の宣言を行う．
@@ -592,77 +765,62 @@ ShellImpl::define_sort(const SmtLibNode* arg_top)
 bool
 ShellImpl::declare_fun(const SmtLibNode* arg_top)
 {
-  if ( debug ) {
-    cerr << "declare-fun ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
   // このコマンドは3つの引数をとる．
   vector<const SmtLibNode*> arg_list;
-  const SmtId* name = NULL;
-  vector<const SmtSort*> input_sort_list;
-  const SmtSort* output_sort = NULL;
-  const char* emsg = "";
-
   if ( !parse_args(arg_top, 3, arg_list) ) {
-    emsg = "syntax error";
-    goto syntax_error;
+    mErrBuf << "syntax error";
+    return false;
   }
 
   // 1つめは名前
-  name = eval_to_id(arg_list[0]);
+  const SmtId* name = eval_to_id(arg_list[0]);
   if ( name == NULL ) {
-    emsg = "first argument is not an identifier";
-    goto syntax_error;
+    mErrBuf << "first argument is not an identifier";
+    return false;
   }
 
   // 2つめは入力の型のリスト
   if ( arg_list[1]->type() != kListToken ) {
-    emsg = "second argument is not 'list' type";
-    goto syntax_error;
+    mErrBuf << "second argument is not 'list' type";
+    return false;
   }
+
+  vector<const SmtSort*> input_sort_list;
   input_sort_list.reserve(arg_list[1]->child_num());
   for (const SmtLibNode* node = arg_list[1]->child();
        node != NULL; node = node->sibling()) {
     const SmtSort* sort = eval_to_sort(node);
     if ( sort == NULL ) {
-      ostringstream buf;
-      print(buf, node);
-      buf << " is not a registered sort";
-      emsg = buf.str().c_str();
-      goto syntax_error;
+      print(mErrBuf, node);
+      mErrBuf << " is not a registered sort";
+      return false;
     }
     input_sort_list.push_back(sort);
   }
 
   // 3つめは出力の型のリスト
-  output_sort = eval_to_sort(arg_list[2]);
+  const SmtSort* output_sort = eval_to_sort(arg_list[2]);
   if ( output_sort == NULL ) {
-    emsg = "third argument is not a valid sort";
-    goto syntax_error;
+    mErrBuf << "third argument is not a valid sort";
+    return false;
   }
 
-#if 0
+  // 同名のオブジェクトが登録されていないか調べる．
+  const NameObj* obj = name_mgr().find_obj(name);
+  if ( obj != NULL ) {
+    mErrBuf << name->name() << "already declared";
+    return false;
+  }
+
+  // 関数を作る．
+  const SmtFun* fun = mSolver->make_fun(input_sort_list, output_sort);
+  assert_cond( fun != NULL, __FILE__, __LINE__);
+
   // 関数を登録する．
-  if ( !mMgr.declare_fun(name, input_sort_list, output_sort) ) {
-    emsg = "already declared";
-    goto syntax_error;
-  }
-#endif
-
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
-  }
+  bool stat = name_mgr().reg_fun(name, fun);
+  assert_cond( stat, __FILE__, __LINE__);
 
   return true;
-
- syntax_error:
-  if ( debug ) {
-    cerr << "  ==> error: " << emsg << endl;
-  }
-
-  return false;
 }
 
 // @brief 関数の定義を行う．
@@ -670,81 +828,67 @@ ShellImpl::declare_fun(const SmtLibNode* arg_top)
 bool
 ShellImpl::define_fun(const SmtLibNode* arg_top)
 {
-  if ( debug ) {
-    cerr << "define-fun ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
   // このコマンドは4つの引数をとる．
   vector<const SmtLibNode*> arg_list;
-  const SmtId* name = NULL;
-  vector<const SmtVar*> var_list;
-  const SmtSort* output_sort = NULL;
-  const SmtTerm* body = NULL;
-
   if ( !parse_args(arg_top, 4, arg_list) ) {
     mErrBuf << "syntax error";
-    goto syntax_error;
+    return false;
   }
 
   // 1つめは名前
-  name = eval_to_id(arg_list[0]);
+  const SmtId* name = eval_to_id(arg_list[0]);
   if ( name == NULL ) {
     mErrBuf << "first argument is not an identifier";
-    goto syntax_error;
+    return false;
   }
 
   // 2つめは変数のリスト
   if ( arg_list[1]->type() != kListToken ) {
     mErrBuf <<  "second argument is not 'list' type";
-    goto syntax_error;
+    return false;
   }
+  vector<const SmtVar*> var_list;
   var_list.reserve(arg_list[1]->child_num());
   for (const SmtLibNode* node = arg_list[1]->child();
        node != NULL; node = node->sibling()) {
     const SmtVar* var = eval_to_sorted_var(node);
     if ( var == NULL ) {
       mErrBuf << "sorted var is expected.";
-      goto syntax_error;
+      return false;
     }
     var_list.push_back(var);
   }
 
   // 3つめは出力の型
-  output_sort = eval_to_sort(arg_list[2]);
+  const SmtSort* output_sort = eval_to_sort(arg_list[2]);
   if ( output_sort == NULL ) {
     mErrBuf << "third argument is not a valid sort";
-    goto syntax_error;
+    return false;
   }
 
   // 4つめは本体の式
-  body = eval_to_term(arg_list[3]);
+  const SmtTerm* body = eval_to_term(arg_list[3]);
   if ( body == NULL ) {
     mErrBuf << "forth argument is not a valid term";
-    goto syntax_error;
+    return false;
   }
 
-#if 0
+  // 同名のオブジェクトが存在しないか確かめる．
+  const NameObj* obj = name_mgr().find_obj(name);
+  if ( obj != NULL ) {
+    mErrBuf << name->name() << ": already exists";
+    return false;
+  }
+
+  // 関数を作る．
+  const SmtFun* fun = mSolver->make_fun(var_list, output_sort, body);
+  assert_cond( fun != NULL, __FILE__, __LINE__);
+
   // 関数を登録する．
-  if ( !mMgr.define_fun(name, var_list, output_sort, body) ) {
-    mErrBuf << "already defined";
-    goto syntax_error;
-  }
-#endif
-
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
-  }
+  bool stat = name_mgr().reg_fun(name, fun);
+  assert_cond( stat, __FILE__, __LINE__);
 
   return true;
-
- syntax_error:
-  if ( debug ) {
-    cerr << "  ==> error: " << mErrBuf.str() << endl;
-  }
-
-  return false;
 }
 
 // @brief assertion を追加する．
@@ -752,42 +896,24 @@ ShellImpl::define_fun(const SmtLibNode* arg_top)
 bool
 ShellImpl::assert(const SmtLibNode* arg_top)
 {
-  if ( debug ) {
-    cerr << "assert ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
   // このコマンドは1つの引数をとる．
   if ( arg_top == NULL || arg_top->sibling() != NULL ) {
     mErrBuf <<  "syntax error";
-    goto syntax_error;
-  }
-  else {
-    const SmtTerm* term = eval_to_term(arg_top);
-    if ( term == NULL ) {
-      // エラーメッセージは出力されている．
-      goto syntax_error;
-    }
-#if 0
-    if ( !mMgr.assert(term) ) {
-      goto syntax_error;
-    }
-#endif
+    return false;
   }
 
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
+  const SmtTerm* term = eval_to_term(arg_top);
+  if ( term == NULL ) {
+    // エラーメッセージは出力されている．
+    return false;
   }
+#if 0
+  if ( !mMgr.assert(term) ) {
+    return false;
+  }
+#endif
 
   return true;
-
- syntax_error:
-  if ( debug ) {
-    cerr << "  ==> error: " << mErrBuf.str() << endl;
-  }
-
-  return false;
 }
 
 // @brief assertion スタックにプッシュする．
@@ -795,42 +921,22 @@ ShellImpl::assert(const SmtLibNode* arg_top)
 bool
 ShellImpl::push(const SmtLibNode* arg_top)
 {
-  if ( debug ) {
-    cerr << "push ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
   // このコマンドは1つの整数値を引数にとる．
   if ( arg_top == NULL ||
        arg_top->sibling() != NULL ||
        arg_top->type() != kNumToken ) {
     mErrBuf <<  "syntax error";
-    goto syntax_error;
+    return false;
   }
 
-  {
-    ymuint num = arg_top->int_value();
-    for (ymuint i = 0; i < num; ++ i) {
-      StackPage* prev = mStack.back();
-      StackPage* page = new StackPage(*mSolver, mStack.size(), prev);
-      mStack.push_back(page);
-    }
-  }
-
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
+  ymuint num = arg_top->int_value();
+  for (ymuint i = 0; i < num; ++ i) {
+    StackPage* prev = mStack.back();
+    StackPage* page = new StackPage(*mSolver, mStack.size(), prev);
+    mStack.push_back(page);
   }
 
   return true;
-
- syntax_error:
-
-  if ( debug ) {
-    cerr << "  ==> error: " << mErrBuf.str() << endl;
-  }
-
-  return false;
 }
 
 // @brief assertion スタックからポップする．
@@ -839,47 +945,28 @@ ShellImpl::push(const SmtLibNode* arg_top)
 bool
 ShellImpl::pop(const SmtLibNode* arg_top)
 {
-  if ( debug ) {
-    cerr << "pop ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
   // このコマンドは1つの整数値を引数にとる．
   if ( arg_top == NULL ||
        arg_top->sibling() != NULL ||
        arg_top->type() != kNumToken ) {
     mErrBuf <<  "syntax error";
-    goto syntax_error;
+    return false;
   }
 
-  {
-    ymuint num = arg_top->int_value();
-    if ( mStack.size() <= num ) {
-      // スタックのサイズが小さすぎる．
-      mErrBuf <<  "arg is too large";
-      goto syntax_error;
-    }
-    for (ymuint i = 0; i < num; ++ i) {
-      StackPage* page = mStack.back();
-      delete page;
-      mStack.pop_back();
-    }
+  ymuint num = arg_top->int_value();
+  if ( mStack.size() <= num ) {
+    // スタックのサイズが小さすぎる．
+    mErrBuf <<  "arg is too large";
+    return false;
   }
 
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
+  for (ymuint i = 0; i < num; ++ i) {
+    StackPage* page = mStack.back();
+    delete page;
+    mStack.pop_back();
   }
 
   return true;
-
- syntax_error:
-
-  if ( debug ) {
-    cerr << "  ==> error: " << mErrBuf.str() << endl;
-  }
-
-  return false;
 }
 
 // @brief 充足可能性判定を行なう．
@@ -887,16 +974,7 @@ ShellImpl::pop(const SmtLibNode* arg_top)
 bool
 ShellImpl::check_sat(const SmtLibNode* arg_top)
 {
-  if ( debug ) {
-    cerr << "check_sat ";
-    print(cerr, arg_top);
-    cerr << endl;
-  }
-
-  if ( debug ) {
-    cerr << "  ==> success" << endl;
-  }
-
+  // 未完
   return true;
 }
 
@@ -905,6 +983,7 @@ ShellImpl::check_sat(const SmtLibNode* arg_top)
 bool
 ShellImpl::get_assertions(const SmtLibNode* arg_top)
 {
+  // 未完
   return true;
 }
 
@@ -913,6 +992,7 @@ ShellImpl::get_assertions(const SmtLibNode* arg_top)
 bool
 ShellImpl::get_proof(const SmtLibNode* arg_top)
 {
+  // 未完
   return true;
 }
 
@@ -921,6 +1001,7 @@ ShellImpl::get_proof(const SmtLibNode* arg_top)
 bool
 ShellImpl::get_unsat_core(const SmtLibNode* arg_top)
 {
+  // 未完
   return true;
 }
 
@@ -929,6 +1010,7 @@ ShellImpl::get_unsat_core(const SmtLibNode* arg_top)
 bool
 ShellImpl::get_value(const SmtLibNode* arg_top)
 {
+  // 未完
   return true;
 }
 
@@ -937,6 +1019,7 @@ ShellImpl::get_value(const SmtLibNode* arg_top)
 bool
 ShellImpl::get_assignment(const SmtLibNode* arg_top)
 {
+  // 未完
   return true;
 }
 
@@ -945,6 +1028,7 @@ ShellImpl::get_assignment(const SmtLibNode* arg_top)
 bool
 ShellImpl::get_option(const SmtLibNode* arg_top)
 {
+  // 未完
   return true;
 }
 
@@ -953,6 +1037,7 @@ ShellImpl::get_option(const SmtLibNode* arg_top)
 bool
 ShellImpl::get_info(const SmtLibNode* arg_top)
 {
+  // 未完
   return true;
 }
 

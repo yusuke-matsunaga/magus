@@ -82,4 +82,5 @@ SmtLibShell_test_SOURCES = \
 
 SmtLibShell_test_LDADD = \
 	../libym_smtlibv2.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

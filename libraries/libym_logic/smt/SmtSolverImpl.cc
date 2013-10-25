@@ -52,6 +52,152 @@ SmtSolverImpl::~SmtSolverImpl()
 tSmtLibResponse
 SmtSolverImpl::set_logic(tSmtLogic logic)
 {
+  // このコマンドは1度しか使えない．
+  if ( mLogic != kSmtLogic_NONE ) {
+    return kSmtLibError;
+  }
+
+  switch ( logic ) {
+  case kSmtLogic_AUFLIA:
+    Core_init();
+    Ints_init();
+    break;
+
+  case kSmtLogic_AUFLIRA:
+    Core_init();
+    Ints_init();
+    break;
+
+  case kSmtLogic_AUFNIRA:
+    Core_init();
+    Ints_init();
+    break;
+
+  case kSmtLogic_LRA:
+    Core_init();
+    break;
+
+  case kSmtLogic_QF_ABV:
+    Core_init();
+    break;
+
+  case kSmtLogic_QF_AUFBV:
+    Core_init();
+    break;
+
+  case kSmtLogic_QF_AUFLIA:
+    Core_init();
+    Ints_init();
+    break;
+
+  case kSmtLogic_QF_AX:
+    Core_init();
+    break;
+
+  case kSmtLogic_QF_BV:
+    Core_init();
+    break;
+
+  case kSmtLogic_QF_IDL:
+    Core_init();
+    Ints_init();
+    break;
+
+  case kSmtLogic_QF_LIA:
+    Core_init();
+    Ints_init();
+    break;
+
+  case kSmtLogic_QF_LRA:
+    Core_init();
+    break;
+
+  case kSmtLogic_QF_NIA:
+    Core_init();
+    Ints_init();
+    break;
+
+  case kSmtLogic_QF_NRA:
+    Core_init();
+    break;
+
+  case kSmtLogic_QF_RDL:
+    Core_init();
+    break;
+
+  case kSmtLogic_QF_UF:
+    Core_init();
+    break;
+
+  case kSmtLogic_QF_UFBV:
+    Core_init();
+    break;
+
+  case kSmtLogic_QF_UFIDL:
+    Core_init();
+    Ints_init();
+    break;
+
+  case kSmtLogic_QF_UFLIA:
+    Core_init();
+    Ints_init();
+    break;
+
+  case kSmtLogic_QF_UFLRA:
+    Core_init();
+    break;
+
+  case kSmtLogic_QF_UFNRA:
+    Core_init();
+    break;
+
+  case kSmtLogic_UFLRA:
+    Core_init();
+    break;
+
+  case kSmtLogic_UFNIA:
+    Core_init();
+    Ints_init();
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+
+  return kSmtLibSuccess;
+}
+
+// @brief CORE logic の初期化を行う．
+void
+SmtSolverImpl::Core_init()
+{
+#if 0
+  mBoolSort = make_sort();
+
+  mTrueFun = make_fun(vector<const SmtSort*>(0), mBoolSort);
+  mFalseFun = make_fun(vector<const SmtSort*>(0), mBoolSort);
+
+  vector<const SmtSort*> b1_list(1);
+  b1_list[0] = mBoolSort;
+
+  mNotFun = make_fun(b1_list, mBoolSort);
+
+  vector<const SmtSort*> b2_list(2);
+  b2_list[0] = mBoolSort;
+  b2_list[1] = mBoolSort;
+
+  mAndFun = make_fun(b2_list, mBoolSort, SmtFun::kRightAssoc);
+  mOrFun = make_fun(b2_list, mBoolSort, SmtFun::kRightAssoc);
+  mXorFun = make_fun(b2_list, mBoolSort, SmtFun::kRightAssoc);
+  mImpFun = make_fun(b2_list, mBoolSort, SmtFun::kRightAssoc);
+#endif
+}
+
+// @brief INTS logic の初期化を行う．
+void
+SmtSolverImpl::Ints_init()
+{
 }
 
 // @brief 型を作る．
@@ -130,13 +276,14 @@ SmtSolverImpl::make_fun(const vector<const SmtSort*>& input_sort_list,
 
 // @brief 内容を持った関数を作る．
 // @param[in] input_var_list 入力の変数のリスト
+// @param[in] output_sort 出力の型
 // @param[in] body 本体を式
 // @return 作成した関数を返す．
 const SmtFun*
 SmtSolverImpl::make_fun(const vector<const SmtVar*>& input_var_list,
+			const SmtSort* output_sort,
 			const SmtTerm* body)
 {
-  const SmtSort* output_sort = NULL; // 実際には body から得る．
   ymuint n = input_var_list.size();
   const SmtFun* fun;
   if ( n == 0 ) {

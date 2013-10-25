@@ -90,6 +90,32 @@ END_NAMESPACE_YM_SMT
 
 BEGIN_NAMESPACE_YM
 
+using nsSmt::tSmtLogic;
+using nsSmt::kSmtLogic_NONE;
+using nsSmt::kSmtLogic_AUFLIA;
+using nsSmt::kSmtLogic_AUFLIRA;
+using nsSmt::kSmtLogic_AUFNIRA;
+using nsSmt::kSmtLogic_LRA;
+using nsSmt::kSmtLogic_QF_ABV;
+using nsSmt::kSmtLogic_QF_AUFBV;
+using nsSmt::kSmtLogic_QF_AUFLIA;
+using nsSmt::kSmtLogic_QF_AX;
+using nsSmt::kSmtLogic_QF_BV;
+using nsSmt::kSmtLogic_QF_IDL;
+using nsSmt::kSmtLogic_QF_LIA;
+using nsSmt::kSmtLogic_QF_LRA;
+using nsSmt::kSmtLogic_QF_NIA;
+using nsSmt::kSmtLogic_QF_NRA;
+using nsSmt::kSmtLogic_QF_RDL;
+using nsSmt::kSmtLogic_QF_UF;
+using nsSmt::kSmtLogic_QF_UFBV;
+using nsSmt::kSmtLogic_QF_UFIDL;
+using nsSmt::kSmtLogic_QF_UFLIA;
+using nsSmt::kSmtLogic_QF_UFLRA;
+using nsSmt::kSmtLogic_QF_UFNRA;
+using nsSmt::kSmtLogic_UFLRA;
+using nsSmt::kSmtLogic_UFNIA;
+
 using nsSmt::SmtAttr;
 using nsSmt::SmtFun;
 using nsSmt::SmtSolver;

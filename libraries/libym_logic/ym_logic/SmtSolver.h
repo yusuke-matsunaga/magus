@@ -74,11 +74,13 @@ public:
 
   /// @brief 内容を持った関数を作る．
   /// @param[in] input_var_list 入力の変数のリスト
+  /// @param[in] output_sort 出力の型
   /// @param[in] body 本体を式
   /// @return 作成した関数を返す．
   virtual
   const SmtFun*
   make_fun(const vector<const SmtVar*>& input_var_list,
+	   const SmtSort* output_sort,
 	   const SmtTerm* body) = 0;
 
   /// @brief <numeric> 型の term を作る．
