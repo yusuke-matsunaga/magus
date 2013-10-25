@@ -122,7 +122,7 @@ SortMgr::declare_sort(const SmtId* name_id,
   for (ymuint i = 0; i < param_num; ++ i) {
     elem_list[i] = make_param_sort_templ(i);
   }
-  const SortElem* sort = make_complex_sort_templ(name_id, elem_list);
+  const SortElem* sort = make_sort_templ(name_id, elem_list);
 
   reg_templ(name_id, sort, param_num);
 
@@ -143,30 +143,24 @@ SortMgr::make_param_sort_templ(ymuint param_id)
   return mParamArray[param_id];
 }
 
-// @brief 単純な型のテンプレートを生成する．
-// @param[in] name_id 名前を表す識別子
-const SortElem*
-SortMgr::make_simple_sort_templ(const SmtId* name_id)
-{
-  void* p = mAlloc.get_memory(sizeof(SimpleSort));
-  SimpleSort* sort = new (p) SimpleSort(name_id);
-  return sort;
-}
-
-// @brief 複合型のテンプレートを生成する．
+// @brief 型テンプレートを生成する．
 // @param[in] name_id 名前を表す識別子
 // @param[in] elem_list 要素のリスト
 const SortElem*
-SortMgr::make_complex_sort_templ(const SmtId* name_id,
-				 const vector<const SortElem*>& elem_list)
+SortMgr::make_sort_templ(const SmtId* name_id,
+			 const vector<const SortElem*>& elem_list)
 {
   ymuint n = elem_list.size();
   if ( n == 0 ) {
-    return make_simple_sort_templ(name_id);
+    void* p = mAlloc.get_memory(sizeof(SimpleSort));
+    SimpleSort* sort = new (p) SimpleSort(name_id);
+    return sort;
   }
-  void* p = mAlloc.get_memory(sizeof(ComplexSort) + sizeof(const SortElem*) * (n - 1));
-  ComplexSort* sort = new (p) ComplexSort(name_id, elem_list);
-  return sort;
+  else {
+    void* p = mAlloc.get_memory(sizeof(ComplexSort) + sizeof(const SortElem*) * (n - 1));
+    ComplexSort* sort = new (p) ComplexSort(name_id, elem_list);
+    return sort;
+  }
 }
 
 BEGIN_NONAMESPACE

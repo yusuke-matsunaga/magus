@@ -31,11 +31,11 @@ SmtFunImpl::~SmtFunImpl()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtFunImpl::type() const
 {
-  return kUserDefined;
+  return kSmtFun_UserDef;
 }
 
 // @brief 入力数を返す．
@@ -80,10 +80,10 @@ SmtFunImpl::body() const
 }
 
 // @brief 属性を返す．
-SmtFun::tAttr
+tSmtFunAttr
 SmtFunImpl::attr() const
 {
-  return kNone;
+  return kSmtFunAttr_None;
 }
 
 
@@ -97,7 +97,7 @@ SmtFunImpl::attr() const
 SmtTrueFun::SmtTrueFun(const SmtSort* output_sort) :
   SmtFunImpl(output_sort)
 {
-  assert_cond( output_sort->type() == SmtSort::kBool, __FILE__, __LINE__);
+  assert_cond( output_sort->type() == kSmtSort_Bool, __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -106,11 +106,11 @@ SmtTrueFun::~SmtTrueFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtTrueFun::type() const
 {
-  return kTrue;
+  return kSmtFun_True;
 }
 
 
@@ -124,7 +124,7 @@ SmtTrueFun::type() const
 SmtFalseFun::SmtFalseFun(const SmtSort* output_sort) :
   SmtFunImpl(output_sort)
 {
-  assert_cond( output_sort->type() == SmtSort::kBool, __FILE__, __LINE__);
+  assert_cond( output_sort->type() == kSmtSort_Bool, __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -133,11 +133,11 @@ SmtFalseFun::~SmtFalseFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtFalseFun::type() const
 {
-  return kFalse;
+  return kSmtFun_False;
 }
 
 
@@ -151,7 +151,7 @@ SmtFalseFun::type() const
 SmtNotFun::SmtNotFun(const SmtSort* bool_sort) :
   SmtFunImpl(bool_sort)
 {
-  assert_cond( bool_sort->type() == SmtSort::kBool, __FILE__, __LINE__);
+  assert_cond( bool_sort->type() == kSmtSort_Bool, __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -160,11 +160,11 @@ SmtNotFun::~SmtNotFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtNotFun::type() const
 {
-  return kNot;
+  return kSmtFun_Not;
 }
 
 // @brief 入力数を返す．
@@ -194,7 +194,7 @@ SmtNotFun::input_sort(ymuint pos) const
 SmtLogBinFun::SmtLogBinFun(const SmtSort* bool_sort) :
   SmtFunImpl(bool_sort)
 {
-  assert_cond( bool_sort->type() == SmtSort::kBool, __FILE__, __LINE__);
+  assert_cond( bool_sort->type() == kSmtSort_Bool, __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -219,10 +219,10 @@ SmtLogBinFun::input_sort(ymuint pos) const
 }
 
 // @brief 属性を返す．
-SmtFun::tAttr
+tSmtFunAttr
 SmtLogBinFun::attr() const
 {
-  return kRightAssoc;
+  return kSmtFunAttr_RightAssoc;
 }
 
 
@@ -244,11 +244,11 @@ SmtAndFun::~SmtAndFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtAndFun::type() const
 {
-  return kAnd;
+  return kSmtFun_And;
 }
 
 
@@ -270,11 +270,11 @@ SmtOrFun::~SmtOrFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtOrFun::type() const
 {
-  return kOr;
+  return kSmtFun_Or;
 }
 
 
@@ -296,11 +296,11 @@ SmtXorFun::~SmtXorFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtXorFun::type() const
 {
-  return kXor;
+  return kSmtFun_Xor;
 }
 
 
@@ -322,11 +322,11 @@ SmtImpFun::~SmtImpFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtImpFun::type() const
 {
-  return kImp;
+  return kSmtFun_Imp;
 }
 
 
@@ -342,7 +342,7 @@ SmtCompFun::SmtCompFun(const SmtSort* input_sort,
   SmtFunImpl(bool_sort),
   mInputSort(input_sort)
 {
-  assert_cond( bool_sort->type() == SmtSort::kBool, __FILE__, __LINE__);
+  assert_cond( bool_sort->type() == kSmtSort_Bool, __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -386,18 +386,18 @@ SmtEqFun::~SmtEqFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtEqFun::type() const
 {
-  return kEq;
+  return kSmtFun_Eq;
 }
 
 // @brief 属性を返す．
-SmtFun::tAttr
+tSmtFunAttr
 SmtEqFun::attr() const
 {
-  return kChainable;
+  return kSmtFunAttr_Chainable;
 }
 
 
@@ -420,18 +420,18 @@ SmtDiseqFun::~SmtDiseqFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtDiseqFun::type() const
 {
-  return kDiseq;
+  return kSmtFun_Diseq;
 }
 
 // @brief 属性を返す．
-SmtFun::tAttr
+tSmtFunAttr
 SmtDiseqFun::attr() const
 {
-  return kPairwise;
+  return kSmtFunAttr_Pairwise;
 }
 
 
@@ -447,7 +447,7 @@ SmtIteFun::SmtIteFun(const SmtSort* data_sort,
   SmtFunImpl(data_sort),
   mBoolSort(bool_sort)
 {
-  assert_cond( bool_sort->type() == SmtSort::kBool, __FILE__, __LINE__);
+  assert_cond( bool_sort->type() == kSmtSort_Bool, __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -456,11 +456,11 @@ SmtIteFun::~SmtIteFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtIteFun::type() const
 {
-  return kIte;
+  return kSmtFun_Ite;
 }
 
 // @brief 入力数を返す．
@@ -496,7 +496,7 @@ SmtIteFun::input_sort(ymuint pos) const
 SmtUminusFun::SmtUminusFun(const SmtSort* output_sort) :
   SmtFunImpl(output_sort)
 {
-  assert_cond( output_sort->type() == SmtSort::kInt || output_sort->type() == SmtSort::kReal, __FILE__, __LINE__);
+  assert_cond( output_sort->type() == kSmtSort_Int || output_sort->type() == kSmtSort_Real, __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -505,11 +505,11 @@ SmtUminusFun::~SmtUminusFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtUminusFun::type() const
 {
-  return kUminus;
+  return kSmtFun_Uminus;
 }
 
 // @brief 入力数を返す．
@@ -539,7 +539,7 @@ SmtUminusFun::input_sort(ymuint pos) const
 SmtArithBinFun::SmtArithBinFun(const SmtSort* output_sort) :
   SmtFunImpl(output_sort)
 {
-  assert_cond( output_sort->type() == SmtSort::kInt || output_sort->type() == SmtSort::kReal, __FILE__, __LINE__);
+  assert_cond( output_sort->type() == kSmtSort_Int || output_sort->type() == kSmtSort_Real, __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -564,10 +564,10 @@ SmtArithBinFun::input_sort(ymuint pos) const
 }
 
 // @brief 属性を返す．
-SmtFun::tAttr
+tSmtFunAttr
 SmtArithBinFun::attr() const
 {
-  return kLeftAssoc;
+  return kSmtFunAttr_LeftAssoc;
 }
 
 
@@ -589,11 +589,11 @@ SmtAddFun::~SmtAddFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtAddFun::type() const
 {
-  return kAdd;
+  return kSmtFun_Add;
 }
 
 
@@ -615,11 +615,11 @@ SmtSubFun::~SmtSubFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtSubFun::type() const
 {
-  return kSub;
+  return kSmtFun_Sub;
 }
 
 
@@ -641,11 +641,11 @@ SmtMulFun::~SmtMulFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtMulFun::type() const
 {
-  return kMul;
+  return kSmtFun_Mul;
 }
 
 
@@ -659,7 +659,7 @@ SmtMulFun::type() const
 SmtDivFun::SmtDivFun(const SmtSort* output_sort) :
   SmtArithBinFun(output_sort)
 {
-  assert_cond( output_sort->type() == SmtSort::kReal, __FILE__, __LINE__);
+  assert_cond( output_sort->type() == kSmtSort_Real, __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -668,11 +668,11 @@ SmtDivFun::~SmtDivFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtDivFun::type() const
 {
-  return kDiv;
+  return kSmtFun_Div;
 }
 
 
@@ -689,8 +689,8 @@ SmtArithCompFun::SmtArithCompFun(const SmtSort* input_sort,
   SmtFunImpl(output_sort),
   mInputSort(input_sort)
 {
-  assert_cond( output_sort->type() == SmtSort::kBool, __FILE__, __LINE__);
-  assert_cond( input_sort->type() == SmtSort::kInt || input_sort->type() == SmtSort::kReal, __FILE__, __LINE__);
+  assert_cond( output_sort->type() == kSmtSort_Bool, __FILE__, __LINE__);
+  assert_cond( input_sort->type() == kSmtSort_Int || input_sort->type() == kSmtSort_Real, __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -715,10 +715,10 @@ SmtArithCompFun::input_sort(ymuint pos) const
 }
 
 // @brief 属性を返す．
-SmtFun::tAttr
+tSmtFunAttr
 SmtArithCompFun::attr() const
 {
-  return kChainable;
+  return kSmtFunAttr_Chainable;
 }
 
 
@@ -742,11 +742,11 @@ SmtLeFun::~SmtLeFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtLeFun::type() const
 {
-  return kLe;
+  return kSmtFun_Le;
 }
 
 
@@ -770,11 +770,11 @@ SmtLtFun::~SmtLtFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtLtFun::type() const
 {
-  return kLt;
+  return kSmtFun_Lt;
 }
 
 
@@ -798,11 +798,11 @@ SmtGeFun::~SmtGeFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtGeFun::type() const
 {
-  return kGe;
+  return kSmtFun_Ge;
 }
 
 
@@ -826,11 +826,11 @@ SmtGtFun::~SmtGtFun()
 }
 
 // @brief 組み込み関数の場合に型を返す．
-// @note 普通の関数は kUserDefined を返す．
-SmtFun::tType
+// @note 普通の関数は kSmtFun_UserDef を返す．
+tSmtFun
 SmtGtFun::type() const
 {
-  return kGt;
+  return kSmtFun_Gt;
 }
 
 

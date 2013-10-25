@@ -316,14 +316,17 @@ ShellImpl::set_logic(const SmtLibNode* arg_top)
   if ( strcmp(str, "AUFLIA") == 0 ) {
     logic = kSmtLogic_AUFLIA;
     CORE_init();
+    INTS_init();
   }
   else if ( strcmp(str, "AUFLIRA") == 0 ) {
     logic = kSmtLogic_AUFLIRA;
     CORE_init();
+    INTS_init();
   }
   else if ( strcmp(str, "AUFNIRA") == 0 ) {
     logic = kSmtLogic_AUFNIRA;
     CORE_init();
+    INTS_init();
   }
   else if ( strcmp(str, "LRA") == 0 ) {
     logic = kSmtLogic_LRA;
@@ -340,6 +343,7 @@ ShellImpl::set_logic(const SmtLibNode* arg_top)
   else if ( strcmp(str, "QF_AUFLIA") == 0 ) {
     logic = kSmtLogic_QF_AUFLIA;
     CORE_init();
+    INTS_init();
   }
   else if ( strcmp(str, "QF_AX") == 0 ) {
     logic = kSmtLogic_QF_AX;
@@ -356,6 +360,7 @@ ShellImpl::set_logic(const SmtLibNode* arg_top)
   else if ( strcmp(str, "QF_LIA") == 0 ) {
     logic = kSmtLogic_QF_LIA;
     CORE_init();
+    INTS_init();
   }
   else if ( strcmp(str, "QF_LRA") == 0 ) {
     logic = kSmtLogic_QF_LRA;
@@ -364,6 +369,7 @@ ShellImpl::set_logic(const SmtLibNode* arg_top)
   else if ( strcmp(str, "QF_NIA") == 0 ) {
     logic = kSmtLogic_QF_NIA;
     CORE_init();
+    INTS_init();
   }
   else if ( strcmp(str, "QF_NRA") == 0 ) {
     logic = kSmtLogic_QF_NRA;
@@ -384,10 +390,12 @@ ShellImpl::set_logic(const SmtLibNode* arg_top)
   else if ( strcmp(str, "QF_UFIDL") == 0 ) {
     logic = kSmtLogic_QF_UFIDL;
     CORE_init();
+    INTS_init();
   }
   else if ( strcmp(str, "QF_UFLIA") == 0 ) {
     logic = kSmtLogic_QF_UFLIA;
     CORE_init();
+    INTS_init();
   }
   else if ( strcmp(str, "QF_UFLRA") == 0 ) {
     logic = kSmtLogic_QF_UFLRA;
@@ -404,6 +412,7 @@ ShellImpl::set_logic(const SmtLibNode* arg_top)
   else if ( strcmp(str, "UFNIA") == 0 ) {
     logic = kSmtLogic_UFNIA;
     CORE_init();
+    INTS_init();
   }
   else {
     mErrBuf << str << ": unknown logic";
@@ -424,85 +433,29 @@ ShellImpl::CORE_init()
 {
   // :sorts
   // (Bool 0)
-  const SmtId* bool_id = mIdMgr->make_id(ShString("Bool"));
-  assert_cond( bool_id != NULL, __FILE__, __LINE__);
-  sort_mgr().declare_sort(bool_id, 0);
-
-  const SmtSort* bool_sort = sort_mgr().make_sort(bool_id);
-  assert_cond( bool_sort != NULL, __FILE__, __LINE__);
+  bind_builtin_sort("Bool", kSmtSort_Bool);
 
   // :funs
-  vector<const SmtSort*> b0_list(0);
-
   // (true Bool)
-  const SmtFun* true_fun = mSolver->make_fun(b0_list, bool_sort);
-  assert_cond( true_fun != NULL, __FILE__, __LINE__);
-
-  const SmtId* true_id = mIdMgr->make_id(ShString("true"));
-  assert_cond( true_id != NULL, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(true_id, true_fun);
+  bind_builtin_fun("true", kSmtFun_True);
 
   // (false Bool)
-  const SmtFun* false_fun = mSolver->make_fun(b0_list, bool_sort);
-  assert_cond( false_fun != NULL, __FILE__, __LINE__);
-
-  const SmtId* false_id = mIdMgr->make_id(ShString("false"));
-  assert_cond( false_id != NULL, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(false_id, false_fun);
-
-  vector<const SmtSort*> b1_list(1);
-  b1_list[0] = bool_sort;
+  bind_builtin_fun("false", kSmtFun_False);
 
   // (not Bool Bool)
-  const SmtFun* not_fun = mSolver->make_fun(b1_list, bool_sort);
-  assert_cond( not_fun, __FILE__, __LINE__);
-
-  const SmtId* not_id = mIdMgr->make_id(ShString("not"));
-  assert_cond( not_id != NULL, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(not_id, not_fun);
-
-  vector<const SmtSort*> b2_list(2);
-  b2_list[0] = bool_sort;
-  b2_list[1] = bool_sort;
+  bind_builtin_fun("not", kSmtFun_Not);
 
   // (and Bool Bool Bool :right-assoc)
-  const SmtFun* and_fun = mSolver->make_fun(b2_list, bool_sort);
-  assert_cond( and_fun, __FILE__, __LINE__);
-
-  const SmtId* and_id = mIdMgr->make_id(ShString("and"));
-  assert_cond( and_id != NULL, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(and_id, and_fun);
+  bind_builtin_fun("and", kSmtFun_And);
 
   // (or Bool Bool Bool :right-assoc)
-  const SmtFun* or_fun = mSolver->make_fun(b2_list, bool_sort);
-  assert_cond( or_fun, __FILE__, __LINE__);
-
-  const SmtId* or_id = mIdMgr->make_id(ShString("or"));
-  assert_cond( or_id != NULL, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(or_id, or_fun);
+  bind_builtin_fun("or", kSmtFun_Or);
 
   // (xor Bool Bool Bool :right-assoc)
-  const SmtFun* xor_fun = mSolver->make_fun(b2_list, bool_sort);
-  assert_cond( xor_fun, __FILE__, __LINE__);
-
-  const SmtId* xor_id = mIdMgr->make_id(ShString("xor"));
-  assert_cond( xor_id != NULL, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(xor_id, xor_fun);
+  bind_builtin_fun("xor", kSmtFun_Or);
 
   // (=> Bool Bool Bool :right-assoc)
-  const SmtFun* imp_fun = mSolver->make_fun(b2_list, bool_sort);
-  assert_cond( imp_fun, __FILE__, __LINE__);
-
-  const SmtId* imp_id = mIdMgr->make_id(ShString("=>"));
-  assert_cond( imp_id != NULL, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(imp_id, imp_fun);
+  bind_builtin_fun("=>", kSmtFun_Or);
 
 #if 0
   const SmtSort* A_sort = sort_mgr().make_param_sort_templ(0);
@@ -538,97 +491,35 @@ ShellImpl::INTS_init()
 {
   // :sorts
   // (Int 0)
-  const SmtId* int_id = mIdMgr->make_id(ShString("Int"));
-  assert_cond( int_id != NULL, __FILE__, __LINE__);
-
-  sort_mgr().declare_sort(int_id, 0);
-
-  const SmtSort* int_sort = sort_mgr().make_sort(int_id);
-  assert_cond( int_sort != NULL, __FILE__, __LINE__);
+  bind_builtin_sort("Int", kSmtSort_Int);
 
   // :funs
 
-  vector<const SmtSort*> i1_list(1);
-  i1_list[0] = int_sort;
+  const SmtSort* int_sort = mSolver->make_builtin_sort(kSmtSort_Int);
 
   // (- Int Int)
-  const SmtFun* uminus_fun = mSolver->make_fun(i1_list, int_sort);
-  assert_cond( uminus_fun, __FILE__, __LINE__);
-
-  const SmtId* minus_id = mIdMgr->make_id(ShString("-"));
-  assert_cond( minus_id != NULL, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(minus_id, uminus_fun);
-
-  vector<const SmtSort*> i2_list(2);
-  i2_list[0] = int_sort;
-  i2_list[1] = int_sort;
+  bind_builtin_fun("-", kSmtFun_Uminus, int_sort);
 
   // (- Int Int Int :left-assoc)
-  const SmtFun* minus_fun = mSolver->make_fun(i2_list, int_sort);
-  assert_cond( minus_fun, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(minus_id, minus_fun);
+  bind_builtin_fun("-", kSmtFun_Sub, int_sort);
 
   // (+ Int Int Int :left-assoc)
-  const SmtFun* plus_fun = mSolver->make_fun(i2_list, int_sort);
-  assert_cond( plus_fun, __FILE__, __LINE__);
-
-  const SmtId* plus_id = mIdMgr->make_id(ShString("+"));
-  assert_cond( plus_id != NULL, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(plus_id, plus_fun);
+  bind_builtin_fun("+", kSmtFun_Add, int_sort);
 
   // (* Int Int Int :left-assoc)
-  const SmtFun* star_fun = mSolver->make_fun(i2_list, int_sort);
-  assert_cond( star_fun, __FILE__, __LINE__);
-
-  const SmtId* star_id = mIdMgr->make_id(ShString("*"));
-  assert_cond( star_id != NULL, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(star_id, star_fun);
-
-  const SmtId* bool_id = mIdMgr->make_id(ShString("Bool"));
-  assert_cond( bool_id != NULL, __FILE__, __LINE__);
-
-  const SmtSort* bool_sort = sort_mgr().make_sort(bool_id, vector<const SmtSort*>(0));
-  assert_cond( bool_sort != NULL, __FILE__, __LINE__);
+  bind_builtin_fun("*", kSmtFun_Mul, int_sort);
 
   // (<= Int Int Bool :chainable)
-  const SmtFun* le_fun = mSolver->make_fun(i2_list, bool_sort);
-  assert_cond( le_fun, __FILE__, __LINE__);
-
-  const SmtId* le_id = mIdMgr->make_id(ShString("<="));
-  assert_cond( le_id != NULL, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(le_id, le_fun);
+  bind_builtin_fun("<=", kSmtFun_Le, int_sort);
 
   // (< Int Int Bool :chainable)
-  const SmtFun* lt_fun = mSolver->make_fun(i2_list, bool_sort);
-  assert_cond( lt_fun, __FILE__, __LINE__);
-
-  const SmtId* lt_id = mIdMgr->make_id(ShString("<"));
-  assert_cond( lt_id != NULL, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(lt_id, lt_fun);
+  bind_builtin_fun("<", kSmtFun_Lt, int_sort);
 
   // (>= Int Int Bool :chainable)
-  const SmtFun* ge_fun = mSolver->make_fun(i2_list, bool_sort);
-  assert_cond( ge_fun, __FILE__, __LINE__);
-
-  const SmtId* ge_id = mIdMgr->make_id(ShString(">="));
-  assert_cond( ge_id != NULL, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(ge_id, ge_fun);
+  bind_builtin_fun(">=", kSmtFun_Ge, int_sort);
 
   // (> Int Int Bool :chainable)
-  const SmtFun* gt_fun = mSolver->make_fun(i2_list, bool_sort);
-  assert_cond( gt_fun, __FILE__, __LINE__);
-
-  const SmtId* gt_id = mIdMgr->make_id(ShString(">"));
-  assert_cond( gt_id != NULL, __FILE__, __LINE__);
-
-  name_mgr().reg_fun(gt_id, gt_fun);
+  bind_builtin_fun(">", kSmtFun_Gt, int_sort);
 }
 
 
@@ -1067,6 +958,11 @@ const SmtSort*
 ShellImpl::make_sort(const SmtId* name_id,
 		     const vector<const SmtSort*>& elem_list)
 {
+  hash_map<ymuint32, const SmtSort*>::iterator p = mBuiltinSortMap.find(name_id->id());
+  if ( p != mBuiltinSortMap.end() ) {
+    return p->second;
+  }
+
   return sort_mgr().make_sort(name_id, elem_list);
 }
 
@@ -1221,7 +1117,7 @@ ShellImpl::eval_to_sort_template(const SmtLibNode* node,
     }
   }
 
-  return sort_mgr().make_complex_sort_templ(id, elem_list);
+  return sort_mgr().make_sort_templ(id, elem_list);
 
  syntax_error:
 
@@ -1363,7 +1259,7 @@ ShellImpl::eval_to_term(const SmtLibNode* node)
 	  goto syntax_error;
 	}
 	const SmtFun* fun = obj->fun();
-	if ( fun->attr() == SmtFun::kNone && fun->input_num() != n - 1) {
+	if ( fun->attr() == kSmtFunAttr_None && fun->input_num() != n - 1) {
 	  // 引数の数が合わない．
 	  mErrBuf << "# of args for function '" << obj->name()->name()
 		  << "' mismatch: " << node->loc();
@@ -1571,10 +1467,10 @@ ShellImpl::eval_to_expr(const SmtLibNode* node)
   case kStringToken:
     return mSolver->make_string_term(node->str_value());
 
-#if 0
   case kSymbolToken:
-    return mSolver->make_symbol_term(node->str_value());
+    return mSolver->make_string_term(node->str_value());
 
+#if 0
   case kKeywordToken:
     return mSolver->make_keyword_term(node->str_value());
 
@@ -1743,6 +1639,39 @@ ShellImpl::parse_args(const SmtLibNode*  arg_top,
     return false;
   }
   return true;
+}
+
+// @brief 組み込み型と名前を結びつける．
+// @param[in] name 名前
+// @param[in] sort_type 組み込み型
+void
+ShellImpl::bind_builtin_sort(const char* name,
+			     tSmtSort sort_type)
+{
+  const SmtSort* sort = mSolver->make_builtin_sort(sort_type);
+  assert_cond( sort != NULL, __FILE__, __LINE__);
+
+  const SmtId* id = mIdMgr->make_id(ShString(name));
+  assert_cond( id != NULL, __FILE__, __LINE__);
+
+  mBuiltinSortMap.insert(make_pair(id->id(), sort));
+}
+
+// @brief 組み込み関数と名前を結びつける．
+// @param[in] name 名前
+// @param[in] fun_type 組み込み関数の型
+void
+ShellImpl::bind_builtin_fun(const char* name,
+			    tSmtFun fun_type,
+			    const SmtSort* sort)
+{
+  const SmtFun* fun = mSolver->make_builtin_fun(fun_type, sort);
+  assert_cond( fun != NULL, __FILE__, __LINE__);
+
+  const SmtId* id = mIdMgr->make_id(ShString(name));
+  assert_cond( id != NULL, __FILE__, __LINE__);
+
+  mBuiltinFunMap.insert(make_pair(id->id(), fun));
 }
 
 // @brief 現在の SortMgr を返す．

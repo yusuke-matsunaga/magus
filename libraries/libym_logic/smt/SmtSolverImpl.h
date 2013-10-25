@@ -42,7 +42,7 @@ public:
   /// @brief 使用するロジックを設定する
   /// @param[in] logic 設定するロジック
   virtual
-  tSmtLibResponse
+  bool
   set_logic(tSmtLogic logic);
 
   /// @brief 型を作る．
@@ -56,7 +56,7 @@ public:
   /// @param[in] type 型の種類
   virtual
   const SmtSort*
-  make_builtin_sort(SmtSort::tType type);
+  make_builtin_sort(tSmtSort type);
 
   /// @brief 変数を作る．
   /// @param[in] sort 変数の型
@@ -65,7 +65,7 @@ public:
   virtual
   const SmtVar*
   make_var(const SmtSort* sort,
-	   SmtVar::tType type);
+	   tSmtVar type);
 
   /// @brief 関数を作る．
   /// @param[in] input_sort_list 入力の型のリスト
@@ -89,12 +89,12 @@ public:
 
   /// @brief 組み込み関数を作る．
   /// @param[in] fun_type 関数の種類
-  /// @param[in] sort 型
-  /// @note 関数によっては sor が必要ない場合もある．
+  /// @param[in] input_sort_list 入力の型のリスト
+  /// @note 関数によっては input_sort_list が必要ない場合もある．
   virtual
   const SmtFun*
-  make_builtin_fun(SmtFun::tType fun_type,
-		   const SmtSort* sort = NULL);
+  make_builtin_fun(tSmtFun fun_type,
+		   const vector<const SmtSort*>& input_sort_list = vector<const SmtSort*>(0));
 
   /// @brief <numeric> 型の term を作る．
   /// @param[in] val 値

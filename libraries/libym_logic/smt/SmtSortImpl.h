@@ -41,9 +41,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み型を返す．
-  /// @note 普通の型は kNone を返す．
+  /// @note 普通の型は kSmtSort_UserDef を返す．
   virtual
-  tType
+  tSmtSort
   type() const;
 
   /// @brief ID 番号を返す．
@@ -107,9 +107,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み型を返す．
-  /// @note 普通の型は kNone を返す．
+  /// @note 普通の型は kSmtSort_UserDef を返す．
   virtual
-  tType
+  tSmtSort
   type() const;
 
 };
@@ -141,9 +141,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み型を返す．
-  /// @note 普通の型は kNone を返す．
+  /// @note 普通の型は kSmtSort_UserDef を返す．
   virtual
-  tType
+  tSmtSort
   type() const;
 
 };
@@ -175,9 +175,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み型を返す．
-  /// @note 普通の型は kNone を返す．
+  /// @note 普通の型は kSmtSort_UserDef を返す．
   virtual
-  tType
+  tSmtSort
   type() const;
 
 };

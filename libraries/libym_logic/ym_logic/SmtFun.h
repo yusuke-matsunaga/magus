@@ -24,68 +24,10 @@ BEGIN_NAMESPACE_YM_SMT
 ///  - 出力の型
 ///  - 本体の式 (オプショナル)
 ///  - 属性
-///  - パラメータ数
-///
-/// 関数の属性は以下のとおり
-///  - right assoc: 右方結合性．マルチオペランドのときに右から対にする．
-///      cf) (R a b c d e) は (R a (R b (R c (R d e)))) と等価
-///  - left assoc: 左方結合性．マルチオペランドのときに左から対にする．
-///      cf) (L a b c d e) は (L (L (L (L a b) c) d) e) と等価
-///  - chainable: マルチオペランドのときに各オペランドの間に演算子を挿入する．
-///      cf) (C a b c d e) は (and (C a b) (C b c) (C c d) (C d e)) と等価
-///          ちなに and は left assoc
-///  - pairwise: マルチオペランドのときに全ての対を考える．
-///      cf) (P a b c d e) は (and (P a b) (P a c) (P a d) (P a e)
-///                                (P b c) (P b d) (P b e)
-///                                (P c d) (P c e)
-///                                (P d e)
-///           と等価
-///
-/// 入力及び出力の型がパラメータ型になっている場合がある．
-/// param_num() は全パラメータ数を返す．
 //////////////////////////////////////////////////////////////////////
 class SmtFun
 {
-  friend class SmtFunMgr;
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 型定義
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 組み込み関数を表す型
-  enum tType {
-    kUserDefined, // 一般の関数
-    kTrue,        // logical TRUE
-    kFalse,       // logical FALSE
-    kNot,         // logical NOT
-    kAnd,         // logical AND
-    kOr,          // logical OR
-    kXor,         // logical XOR
-    kImp,         // logical IMPLICATAION (=>)
-    kEq,          // equality (=)
-    kDiseq,       // disequalit (distinct)
-    kIte,         // if-then-else
-    kUminus,      // arithmetic unary minus (-)
-    kAdd,         // arithmetic binary addition (+)
-    kSub,         // arifthmetic binary subtraction (-)
-    kMul,         // arithmetic binary multiplication (*)
-    kDiv,         // arithmetic binary division (/)
-    kLe,          // less than or equal (<=)
-    kLt,          // less than (<)
-    kGe,          // greater than or equal (>=)
-    kGt           // greater than (>)
-  };
-
-  /// @brief 任意のオペランドをとる関数の属性
-  enum tAttr {
-    kNone,       // なし
-    kRightAssoc, // 右方結合
-    kLeftAssoc,  // 左方結合
-    kChainable,  // chainable
-    kPairwise    // pairwise
-  };
-
+  friend class SmtSolverImpl;
 
 protected:
 
@@ -100,9 +42,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const = 0;
 
   /// @brief 入力数を返す．
@@ -136,7 +78,7 @@ public:
 
   /// @brief 属性を返す．
   virtual
-  tAttr
+  tSmtFunAttr
   attr() const = 0;
 
 };

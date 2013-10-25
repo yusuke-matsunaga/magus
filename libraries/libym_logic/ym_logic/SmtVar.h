@@ -22,16 +22,6 @@ class SmtVar
 {
 public:
 
-  /// @brief 変数の種類を表す列挙型
-  enum tType {
-    kGlobal,
-    kForall,
-    kExists
-  };
-
-
-public:
-
   /// @brief デストラクタ
   virtual
   ~SmtVar() { }
@@ -49,7 +39,7 @@ public:
 
   /// @brief 変数の種類を返す．
   virtual
-  tType
+  tSmtVar
   type() const = 0;
 
   /// @brief global 変数の場合に true を返す．

@@ -234,7 +234,7 @@ TEST(SortMgrTestGroup, alias1)
   vector<const SortElem*> elem_list(2);
   elem_list[0] = param0;
   elem_list[1] = param0;
-  const SortElem* sort_tmpl = mSortMgr->make_complex_sort_templ(id_a, elem_list);
+  const SortElem* sort_tmpl = mSortMgr->make_sort_templ(id_a, elem_list);
 
   // これは成功するはず
   CHECK( sort_tmpl != NULL );
@@ -295,7 +295,7 @@ TEST(SortMgrTestGroup, alias2)
 
   vector<const SortElem*> elem_list(1);
   elem_list[0] = param1;
-  const SortElem* sort_tmpl = mSortMgr->make_complex_sort_templ(id_a, elem_list);
+  const SortElem* sort_tmpl = mSortMgr->make_sort_templ(id_a, elem_list);
 
   // これは歯抜けなので失敗するはず．
   CHECK( sort_tmpl != NULL );
@@ -319,7 +319,7 @@ TEST(SortMgrTestGroup, alias3)
   vector<const SortElem*> elem_list(2);
   elem_list[0] = param0;
   elem_list[1] = param0;
-  const SortElem* sort_tmpl = mSortMgr->make_complex_sort_templ(id_a, elem_list);
+  const SortElem* sort_tmpl = mSortMgr->make_sort_templ(id_a, elem_list);
 
   // これは成功するはず．
   CHECK( sort_tmpl != NULL );

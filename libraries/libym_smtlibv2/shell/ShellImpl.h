@@ -290,6 +290,22 @@ private:
   // Sort/Fun を管理するための関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 組み込み型と名前を結びつける．
+  /// @param[in] name 名前
+  /// @param[in] sort_type 組み込み型
+  void
+  bind_builtin_sort(const char* name,
+		    tSmtSort sort_type);
+
+  /// @brief 組み込み関数と名前を結びつける．
+  /// @param[in] name 名前
+  /// @param[in] fun_type 組み込み関数の型
+  /// @param[in] sort 補助的な型
+  void
+  bind_builtin_fun(const char* name,
+		   tSmtFun fun_type,
+		   const SmtSort* sort = NULL);
+
   /// @brief 現在の SortMgr を返す．
   SortMgr&
   sort_mgr();
@@ -341,6 +357,12 @@ private:
 
   // SMT ソルバ
   SmtSolver* mSolver;
+
+  // 組み込み型を保持するハッシュ表
+  hash_map<ymuint32, const SmtSort*> mBuiltinSortMap;
+
+  // 組み込み関数を保持するハッシュ表
+  hash_map<ymuint32, const SmtFun*> mBuiltinFunMap;
 
   // スタック
   vector<StackPage*> mStack;

@@ -34,6 +34,19 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_SMT
 
+
+// クラス名の宣言
+class SmtAttr;
+class SmtFun;
+class SmtSolver;
+class SmtSort;
+class SmtTerm;
+class SmtVar;
+
+END_NAMESPACE_YM_SMT
+
+BEGIN_NAMESPACE_YM
+
 //////////////////////////////////////////////////////////////////////
 /// @brief logic を表す列挙型
 //////////////////////////////////////////////////////////////////////
@@ -66,6 +79,82 @@ enum tSmtLogic {
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class 組み込み型を表す列挙型
+//////////////////////////////////////////////////////////////////////
+enum tSmtSort {
+  kSmtSort_UserDef,    // 一般の型
+  kSmtSort_Bool,       // Bool 型
+  kSmtSort_Int,        // 整数型
+  kSmtSort_Real        // 実数型
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @brief 組み込み関数を表す型
+//////////////////////////////////////////////////////////////////////
+enum tSmtFun {
+  kSmtFun_UserDef,     // 一般の関数
+  kSmtFun_True,        // logical TRUE
+  kSmtFun_False,       // logical FALSE
+  kSmtFun_Not,         // logical NOT
+  kSmtFun_And,         // logical AND
+  kSmtFun_Or,          // logical OR
+  kSmtFun_Xor,         // logical XOR
+  kSmtFun_Imp,         // logical IMPLICATAION (=>)
+  kSmtFun_Eq,          // equality (=)
+  kSmtFun_Diseq,       // disequalit (distinct)
+  kSmtFun_Ite,         // if-then-else
+  kSmtFun_Uminus,      // arithmetic unary minus (-)
+  kSmtFun_Add,         // arithmetic binary addition (+)
+  kSmtFun_Sub,         // arifthmetic binary subtraction (-)
+  kSmtFun_Mul,         // arithmetic binary multiplication (*)
+  kSmtFun_Div,         // arithmetic binary division (/)
+  kSmtFun_Le,          // less than or equal (<=)
+  kSmtFun_Lt,          // less than (<)
+  kSmtFun_Ge,          // greater than or equal (>=)
+  kSmtFun_Gt           // greater than (>)
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @brief 任意のオペランドをとる関数の属性
+///
+/// 関数の属性は以下のとおり
+///  - right assoc: 右方結合性．マルチオペランドのときに右から対にする．
+///      cf) (R a b c d e) は (R a (R b (R c (R d e)))) と等価
+///  - left assoc: 左方結合性．マルチオペランドのときに左から対にする．
+///      cf) (L a b c d e) は (L (L (L (L a b) c) d) e) と等価
+///  - chainable: マルチオペランドのときに各オペランドの間に演算子を挿入する．
+///      cf) (C a b c d e) は (and (C a b) (C b c) (C c d) (C d e)) と等価
+///          ちなに and は left assoc
+///  - pairwise: マルチオペランドのときに全ての対を考える．
+///      cf) (P a b c d e) は (and (P a b) (P a c) (P a d) (P a e)
+///                                (P b c) (P b d) (P b e)
+///                                (P c d) (P c e)
+///                                (P d e)
+///          と等価
+//////////////////////////////////////////////////////////////////////
+enum tSmtFunAttr {
+  kSmtFunAttr_None,       // なし
+  kSmtFunAttr_RightAssoc, // 右方結合
+  kSmtFunAttr_LeftAssoc,  // 左方結合
+  kSmtFunAttr_Chainable,  // chainable
+  kSmtFunAttr_Pairwise    // pairwise
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @brief 変数の種類を表す型
+//////////////////////////////////////////////////////////////////////
+enum tSmtVar {
+  kSmtVar_Global,
+  kSmtVar_Forall,
+  kSmtVar_Exists
+};
+
+
+
+//////////////////////////////////////////////////////////////////////
 /// @brief SmtLib の処理結果を表す列挙型
 //////////////////////////////////////////////////////////////////////
 enum tSmtLibResponse {
@@ -76,45 +165,6 @@ enum tSmtLibResponse {
   /// @brief 未サポート
   kSmtLibUnsupported
 };
-
-
-// クラス名の宣言
-class SmtAttr;
-class SmtFun;
-class SmtSolver;
-class SmtSort;
-class SmtTerm;
-class SmtVar;
-
-END_NAMESPACE_YM_SMT
-
-BEGIN_NAMESPACE_YM
-
-using nsSmt::tSmtLogic;
-using nsSmt::kSmtLogic_NONE;
-using nsSmt::kSmtLogic_AUFLIA;
-using nsSmt::kSmtLogic_AUFLIRA;
-using nsSmt::kSmtLogic_AUFNIRA;
-using nsSmt::kSmtLogic_LRA;
-using nsSmt::kSmtLogic_QF_ABV;
-using nsSmt::kSmtLogic_QF_AUFBV;
-using nsSmt::kSmtLogic_QF_AUFLIA;
-using nsSmt::kSmtLogic_QF_AX;
-using nsSmt::kSmtLogic_QF_BV;
-using nsSmt::kSmtLogic_QF_IDL;
-using nsSmt::kSmtLogic_QF_LIA;
-using nsSmt::kSmtLogic_QF_LRA;
-using nsSmt::kSmtLogic_QF_NIA;
-using nsSmt::kSmtLogic_QF_NRA;
-using nsSmt::kSmtLogic_QF_RDL;
-using nsSmt::kSmtLogic_QF_UF;
-using nsSmt::kSmtLogic_QF_UFBV;
-using nsSmt::kSmtLogic_QF_UFIDL;
-using nsSmt::kSmtLogic_QF_UFLIA;
-using nsSmt::kSmtLogic_QF_UFLRA;
-using nsSmt::kSmtLogic_QF_UFNRA;
-using nsSmt::kSmtLogic_UFLRA;
-using nsSmt::kSmtLogic_UFNIA;
 
 using nsSmt::SmtAttr;
 using nsSmt::SmtFun;

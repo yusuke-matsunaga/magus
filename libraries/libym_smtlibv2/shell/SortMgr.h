@@ -61,17 +61,12 @@ public:
   const SortElem*
   make_param_sort_templ(ymuint param_id);
 
-  /// @brief 単純な型のテンプレートを生成する．
-  /// @param[in] name_id 名前を表す識別子
-  const SortElem*
-  make_simple_sort_templ(const SmtId* name_id);
-
-  /// @brief 複合型のテンプレートを生成する．
+  /// @brief 型テンプレートを生成する．
   /// @param[in] name_id 名前を表す識別子
   /// @param[in] elem_list 要素のリスト
   const SortElem*
-  make_complex_sort_templ(const SmtId* name_id,
-			  const vector<const SortElem*>& elem_list);
+  make_sort_templ(const SmtId* name_id,
+		  const vector<const SortElem*>& elem_list = vector<const SortElem*>(0));
 
   /// @brief 型名を定義する．
   /// @param[in] name_id 型名を表す識別子

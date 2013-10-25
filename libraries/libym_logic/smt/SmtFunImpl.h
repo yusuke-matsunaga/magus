@@ -40,9 +40,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
   /// @brief 入力数を返す．
@@ -76,7 +76,7 @@ public:
 
   /// @brief 属性を返す．
   virtual
-  tAttr
+  tSmtFunAttr
   attr() const;
 
 
@@ -118,9 +118,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
 };
@@ -153,9 +153,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
 };
@@ -188,9 +188,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
   /// @brief 入力数を返す．
@@ -246,7 +246,7 @@ public:
 
   /// @brief 属性を返す．
   virtual
-  tAttr
+  tSmtFunAttr
   attr() const;
 
 };
@@ -279,9 +279,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
 };
@@ -314,9 +314,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
 };
@@ -349,9 +349,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
 };
@@ -384,9 +384,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
 };
@@ -470,14 +470,14 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
   /// @brief 属性を返す．
   virtual
-  tAttr
+  tSmtFunAttr
   attr() const;
 
 };
@@ -511,14 +511,14 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
   /// @brief 属性を返す．
   virtual
-  tAttr
+  tSmtFunAttr
   attr() const;
 
 };
@@ -552,9 +552,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
   /// @brief 入力数を返す．
@@ -607,9 +607,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
   /// @brief 入力数を返す．
@@ -665,7 +665,7 @@ public:
 
   /// @brief 属性を返す．
   virtual
-  tAttr
+  tSmtFunAttr
   attr() const;
 
 };
@@ -698,9 +698,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
 };
@@ -733,9 +733,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
 };
@@ -768,9 +768,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
 };
@@ -803,9 +803,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
 };
@@ -852,7 +852,7 @@ public:
 
   /// @brief 属性を返す．
   virtual
-  tAttr
+  tSmtFunAttr
   attr() const;
 
 
@@ -896,9 +896,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
 };
@@ -933,9 +933,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
 };
@@ -970,9 +970,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
 };
@@ -1007,9 +1007,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kUserDefined を返す．
+  /// @note 普通の関数は kSmtFun_UserDef を返す．
   virtual
-  tType
+  tSmtFun
   type() const;
 
 };

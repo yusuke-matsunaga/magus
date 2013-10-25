@@ -17,30 +17,10 @@ BEGIN_NAMESPACE_YM_SMT
 //////////////////////////////////////////////////////////////////////
 /// @class SmtSort SmtSort.h "ym_logic/SmtSort.h"
 /// @brief 型を表すクラス
-///
-/// 通常，型そのものに意味はないが，いくつかの型は特定の Theory に
-/// 関して特別な意味を持つ．
-///
-///  - Bool : すべての Theory において定義される．
-///  - Int  : INTS Theory において定義される．
-///  - Real : REALS Theory において定義される．
 //////////////////////////////////////////////////////////////////////
 class SmtSort
 {
-  friend class SmtSortMgr;
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 型の定義
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 組み込み型を表す列挙型
-  enum tType {
-    kNone,
-    kBool,
-    kInt,
-    kReal
-  };
+  friend class SmtSolverImpl;
 
 protected:
 
@@ -55,9 +35,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み型を返す．
-  /// @note 普通の型は kNone を返す．
+  /// @note 普通の型は kSmtSort_None を返す．
   virtual
-  tType
+  tSmtSort
   type() const = 0;
 
   /// @brief ID 番号を返す．

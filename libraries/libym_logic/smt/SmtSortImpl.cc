@@ -29,11 +29,11 @@ SmtSortImpl::~SmtSortImpl()
 }
 
 // @brief 組み込み型を返す．
-// @note 普通の型は kNone を返す．
-SmtSort::tType
+// @note 普通の型は kSmtSort_UserDef を返す．
+tSmtSort
 SmtSortImpl::type() const
 {
-  return kNone;
+  return kSmtSort_UserDef;
 }
 
 // @brief ID 番号を返す．
@@ -86,11 +86,11 @@ SmtBoolSort::~SmtBoolSort()
 }
 
 // @brief 組み込み型を返す．
-// @note 普通の型は kNone を返す．
-SmtSort::tType
+// @note 普通の型は kSmtSort_UserDef を返す．
+tSmtSort
 SmtBoolSort::type() const
 {
-  return kBool;
+  return kSmtSort_Bool;
 }
 
 
@@ -111,11 +111,11 @@ SmtIntSort::~SmtIntSort()
 }
 
 // @brief 組み込み型を返す．
-// @note 普通の型は kNone を返す．
-SmtSort::tType
+// @note 普通の型は kSmtSort_UserDef を返す．
+tSmtSort
 SmtIntSort::type() const
 {
-  return kInt;
+  return kSmtSort_Int;
 }
 
 
@@ -136,11 +136,11 @@ SmtRealSort::~SmtRealSort()
 }
 
 // @brief 組み込み型を返す．
-// @note 普通の型は kNone を返す．
-SmtSort::tType
+// @note 普通の型は kSmtSort_UserDef を返す．
+tSmtSort
 SmtRealSort::type() const
 {
-  return kReal;
+  return kSmtSort_Real;
 }
 
 
