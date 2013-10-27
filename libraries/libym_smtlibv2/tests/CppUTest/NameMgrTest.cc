@@ -87,7 +87,7 @@ TEST(NameMgrTestGroup, reg_fun)
   const NameObj* obj = mNameMgr->find_obj(id_f);
   CHECK( obj != NULL );
   CHECK( obj->is_fun() );
-  CHECK( obj->fun(vector<const SmtSort*>(0)) == fun_f );
+  CHECK( obj->fun() == fun_f );
 
   // (declare-fun f () a)
   bool stat2 = mNameMgr->reg_fun(id_f, fun_f);

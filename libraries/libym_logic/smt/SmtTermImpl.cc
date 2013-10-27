@@ -45,6 +45,14 @@ SmtTermImpl::var() const
   return NULL;
 }
 
+// @brief kFunTerm 型の場合に関数の型を返す．
+tSmtFun
+SmtTermImpl::function_type() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return kSmtFun_UserDef;
+}
+
 // @brief kFunTerm 型の場合に関数を返す．
 const SmtFun*
 SmtTermImpl::function() const
@@ -310,6 +318,13 @@ SmtFunTerm1::type() const
   return kFunTerm;
 }
 
+// @brief kFunTerm 型の場合に関数の型を返す．
+tSmtFun
+SmtFunTerm1::function_type() const
+{
+  return kSmtFun_UserDef;
+}
+
 // @brief kFunTerm 型の場合に関数を返す．
 const SmtFun*
 SmtFunTerm1::function() const
@@ -367,6 +382,100 @@ SmtFunTerm2::input_num() const
 // @param[in] pos 位置番号 ( 0 <= pos < input_num() )
 const SmtTerm*
 SmtFunTerm2::input(ymuint pos) const
+{
+  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  return mInputList[pos];
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス SmtFunTerm3
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] fun_type 関数の型
+SmtFunTerm3::SmtFunTerm3(tSmtFun fun_type) :
+  mFunType(fun_type)
+{
+}
+
+// @brief デストラクタ
+SmtFunTerm3::~SmtFunTerm3()
+{
+}
+
+// @brief 型を返す．
+SmtTerm::tType
+SmtFunTerm3::type() const
+{
+  return kFunTerm;
+}
+
+// @brief kFunTerm 型の場合に関数の型を返す．
+tSmtFun
+SmtFunTerm3::function_type() const
+{
+  return mFunType;
+}
+
+// @brief kFunTerm 型の場合に関数を返す．
+// @note 組み込み関数の場合には NULL を返す．
+const SmtFun*
+SmtFunTerm3::function() const
+{
+  return NULL;
+}
+
+// @brief kFunTerm 型の場合に入力数を返す．
+ymuint
+SmtFunTerm3::input_num() const
+{
+  return 0;
+}
+
+// @brief kFunTerm 型の場合に入力を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+const SmtTerm*
+SmtFunTerm3::input(ymuint pos) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス SmtFunTerm4
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] fun_type 関数の型
+// @param[in] arg_list 引数のリスト
+SmtFunTerm4::SmtFunTerm4(tSmtFun fun_type,
+			 const vector<const SmtTerm*>& arg_list) :
+  SmtFunTerm3(fun_type),
+  mInputNum(arg_list.size())
+{
+  for (ymuint i = 0; i < mInputNum; ++ i) {
+    mInputList[i] = arg_list[i];
+  }
+}
+
+// @brief デストラクタ
+SmtFunTerm4::~SmtFunTerm4()
+{
+}
+
+// @brief kFunTerm 型の場合に入力数を返す．
+ymuint
+SmtFunTerm4::input_num() const
+{
+  return mInputNum;
+}
+
+// @brief kFunTerm 型の場合に入力を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+const SmtTerm*
+SmtFunTerm4::input(ymuint pos) const
 {
   assert_cond( pos < input_num(), __FILE__, __LINE__);
   return mInputList[pos];

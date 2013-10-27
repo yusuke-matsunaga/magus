@@ -44,6 +44,11 @@ public:
   const SmtId*
   name() const;
 
+  /// @brief 組み込み関数の時 true を返す．
+  virtual
+  bool
+  is_builtin_fun() const;
+
   /// @brief SmtFun を持っているとき true を返す．
   virtual
   bool
@@ -54,14 +59,20 @@ public:
   bool
   is_var() const;
 
+  /// @brief tSumFun を返す．
+  /// @note is_builtin_fun() == true の時のみ意味がある．
+  virtual
+  tSmtFun
+  fun_type() const;
+
   /// @brief SmtFun を返す．
-  /// @param[in] input_sort_list 入力の型のリスト
-  /// @note input_sort_list に合致する関数がない場合 NULL を返す．
+  /// @note is_fun() == true の時のみ意味がある．
   virtual
   const SmtFun*
-  fun(const vector<const SmtSort*>& input_sort_list) const;
+  fun() const;
 
   /// @brief SmtVar を返す．
+  /// @note is_var() == true の時のみ意味がある．
   virtual
   const SmtVar*
   var() const;
@@ -78,6 +89,56 @@ private:
 
   // ハッシュ表で用いるリンクポインタ
   NameObjImpl* mLink;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class BuiltinFunObj NameObjImpl.h "NameObjImpl.h"
+/// @brief tSmtFun を表す NameObj の派生クラス
+//////////////////////////////////////////////////////////////////////
+class BuiltinFunObj :
+  public NameObjImpl
+{
+  friend class NameMgr;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] name_id 名前を表す識別子
+  /// @param[in] fun_type 関数の型
+  BuiltinFunObj(const SmtId* name_id,
+		tSmtFun fun_type);
+
+  /// @brief デストラクタ
+  virtual
+  ~BuiltinFunObj();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 組み込み関数の時 true を返す．
+  virtual
+  bool
+  is_builtin_fun() const;
+
+  /// @brief tSumFun を返す．
+  /// @note is_builtin_fun() == true の時のみ意味がある．
+  virtual
+  tSmtFun
+  fun_type() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 関数の型
+  tSmtFun mFunType;
 
 };
 
@@ -115,11 +176,10 @@ public:
   is_fun() const;
 
   /// @brief SmtFun を返す．
-  /// @param[in] input_sort_list 入力の型のリスト
-  /// @note input_sort_list に合致する関数がない場合 NULL を返す．
+  /// @note is_fun() == true の時のみ意味がある．
   virtual
   const SmtFun*
-  fun(const vector<const SmtSort*>& input_sort_list) const;
+  fun() const;
 
 
 private:
@@ -166,6 +226,7 @@ public:
   is_var() const;
 
   /// @brief SmtVar を返す．
+  /// @note is_var() == true の時のみ意味がある．
   virtual
   const SmtVar*
   var() const;

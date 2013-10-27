@@ -43,25 +43,25 @@ NameMgr::~NameMgr()
   delete [] mHashTable;
 }
 
-// @brief 変数を登録する．
+// @brief 組み込み関数を登録する．
 // @param[in] name_id 名前を表す識別子
-// @param[in] var 変数
+// @param[in] fun_type 関数の型
 // @retval true 処理が成功した．
 // @retval false 処理が失敗した．
 //
 // エラーの原因は以下のとおり
-//  - name_id と同名の定義が既に存在している．
+//  - name_id と同名の関数がすでに存在している．
 bool
-NameMgr::reg_var(const SmtId* name_id,
-		 const SmtVar* var)
+NameMgr::reg_builtin_fun(const SmtId* name_id,
+			 tSmtFun fun_type)
 {
   if ( find_obj(name_id) != NULL ) {
     // 同名のオブジェクトが登録されている．
     return false;
   }
 
-  void* p = mAlloc.get_memory(sizeof(VarObj));
-  NameObjImpl* obj = new (p) VarObj(name_id, var);
+  void* p = mAlloc.get_memory(sizeof(BuiltinFunObj));
+  NameObjImpl* obj = new (p) BuiltinFunObj(name_id, fun_type);
 
   reg_sub(obj);
 
@@ -87,6 +87,31 @@ NameMgr::reg_fun(const SmtId* name_id,
 
   void* p = mAlloc.get_memory(sizeof(FunObj));
   NameObjImpl* obj = new (p) FunObj(name_id, fun);
+
+  reg_sub(obj);
+
+  return true;
+}
+
+// @brief 変数を登録する．
+// @param[in] name_id 名前を表す識別子
+// @param[in] var 変数
+// @retval true 処理が成功した．
+// @retval false 処理が失敗した．
+//
+// エラーの原因は以下のとおり
+//  - name_id と同名の定義が既に存在している．
+bool
+NameMgr::reg_var(const SmtId* name_id,
+		 const SmtVar* var)
+{
+  if ( find_obj(name_id) != NULL ) {
+    // 同名のオブジェクトが登録されている．
+    return false;
+  }
+
+  void* p = mAlloc.get_memory(sizeof(VarObj));
+  NameObjImpl* obj = new (p) VarObj(name_id, var);
 
   reg_sub(obj);
 

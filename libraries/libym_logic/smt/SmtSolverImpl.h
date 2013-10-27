@@ -87,15 +87,6 @@ public:
 	   const SmtSort* output_sort,
 	   const SmtTerm* body);
 
-  /// @brief 組み込み関数を作る．
-  /// @param[in] fun_type 関数の種類
-  /// @param[in] input_sort_list 入力の型のリスト
-  /// @note 関数によっては input_sort_list が必要ない場合もある．
-  virtual
-  const SmtFun*
-  make_builtin_fun(tSmtFun fun_type,
-		   const vector<const SmtSort*>& input_sort_list = vector<const SmtSort*>(0));
-
   /// @brief <numeric> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
@@ -145,6 +136,15 @@ public:
   virtual
   const SmtTerm*
   make_fun_term(const SmtFun* fun,
+		const vector<const SmtTerm*>& arg_list);
+
+  /// @brief 関数呼び出しの term を作る．(組み込み関数)
+  /// @param[in] fun_type 関数の型
+  /// @param[in] arg_list 引数のリスト
+  /// @return 作成した式を返す．
+  virtual
+  const SmtTerm*
+  make_fun_term(tSmtFun fun_type,
 		const vector<const SmtTerm*>& arg_list);
 
   /// @brief forall の term を作る．
@@ -246,63 +246,6 @@ private:
 
   // Real 型
   const SmtSort* mRealSort;
-
-  // true 関数
-  const SmtFun* mTrueFun;
-
-  // false 関数
-  const SmtFun* mFalseFun;
-
-  // not 関数
-  const SmtFun* mNotFun;
-
-  // and 関数
-  const SmtFun* mAndFun;
-
-  // or 関数
-  const SmtFun* mOrFun;
-
-  // xor 関数
-  const SmtFun* mXorFun;
-
-  // => 関数
-  const SmtFun* mImpFun;
-
-  // = 関数を保持するハッシュ表
-  // 入力の型の ID 番号をキーにする．
-  hash_map<ymuint32, const SmtFun*> mEqFunMap;
-
-  // distinct 関数を保持するハッシュ表
-  // 入力の型の ID 番号をキーにする．
-  hash_map<ymuint32, const SmtFun*> mDiseqFunMap;
-
-  // ite 関数を保持するハッシュ表
-  // データの型のID番号をキーにする．
-  hash_map<ymuint32, const SmtFun*> mIteFunMap;
-
-  // 整数の単項マイナス
-  const SmtFun* mIntUminusFun;
-
-  // 整数の加算
-  const SmtFun* mIntAddFun;
-
-  // 整数の減算
-  const SmtFun* mIntSubFun;
-
-  // 整数の乗算
-  const SmtFun* mIntMulFun;
-
-  // 整数の <= 演算子
-  const SmtFun* mIntLeFun;
-
-  // 整数の < 演算子
-  const SmtFun* mIntLtFun;
-
-  // 整数の >= 演算子
-  const SmtFun* mIntGeFun;
-
-  // 整数の > 演算子
-  const SmtFun* mIntGtFun;
 
 };
 

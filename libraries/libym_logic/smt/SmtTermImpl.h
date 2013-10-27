@@ -51,6 +51,11 @@ public:
   const SmtVar*
   var() const;
 
+  /// @brief kFunTerm 型の場合に関数の型を返す．
+  virtual
+  tSmtFun
+  function_type() const;
+
   /// @brief kFunTerm 型の場合に関数を返す．
   virtual
   const SmtFun*
@@ -373,6 +378,11 @@ public:
   tType
   type() const;
 
+  /// @brief kFunTerm 型の場合に関数の型を返す．
+  virtual
+  tSmtFun
+  function_type() const;
+
   /// @brief kFunTerm 型の場合に関数を返す．
   virtual
   const SmtFun*
@@ -421,6 +431,123 @@ private:
   /// @brief デストラクタ
   virtual
   ~SmtFunTerm2();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief kFunTerm 型の場合に入力数を返す．
+  virtual
+  ymuint
+  input_num() const;
+
+  /// @brief kFunTerm 型の場合に入力を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  virtual
+  const SmtTerm*
+  input(ymuint pos) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 入力数
+  ymuint32 mInputNum;
+
+  // 引数のリスト
+  const SmtTerm* mInputList[1];
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtFunTerm3 SmtTermImpl.h "SmtTermImpl.h"
+/// @brief 組み込み関数呼び出しを表す term のクラス(引数なし)
+//////////////////////////////////////////////////////////////////////
+class SmtFunTerm3 :
+  public SmtTermImpl
+{
+  friend class SmtSolverImpl;
+
+protected:
+
+  /// @brief コンストラクタ
+  /// @param[in] fun_type 関数の型
+  SmtFunTerm3(tSmtFun fun_type);
+
+  /// @brief デストラクタ
+  virtual
+  ~SmtFunTerm3();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 型を返す．
+  virtual
+  tType
+  type() const;
+
+  /// @brief kFunTerm 型の場合に関数の型を返す．
+  virtual
+  tSmtFun
+  function_type() const;
+
+  /// @brief kFunTerm 型の場合に関数を返す．
+  /// @note 組み込み関数の場合には NULL を返す．
+  virtual
+  const SmtFun*
+  function() const;
+
+  /// @brief kFunTerm 型の場合に入力数を返す．
+  virtual
+  ymuint
+  input_num() const;
+
+  /// @brief kFunTerm 型の場合に入力を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  virtual
+  const SmtTerm*
+  input(ymuint pos) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 関数の型
+  tSmtFun mFunType;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtFunTerm4 SmtTermImpl.h "SmtTermImpl.h"
+/// @brief 組み込み関数呼び出しを表す term のクラス(引数あり)
+//////////////////////////////////////////////////////////////////////
+class SmtFunTerm4 :
+  public SmtFunTerm3
+{
+  friend class SmtSolverImpl;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] fun_type 関数の型
+  /// @param[in] arg_list 引数のリスト
+  SmtFunTerm4(tSmtFun fun_type,
+	      const vector<const SmtTerm*>& arg_list);
+
+  /// @brief デストラクタ
+  virtual
+  ~SmtFunTerm4();
 
 
 public:

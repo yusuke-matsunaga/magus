@@ -48,17 +48,17 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 変数を登録する．
+  /// @brief 組み込み関数を登録する．
   /// @param[in] name_id 名前を表す識別子
-  /// @param[in] var 変数
+  /// @param[in] fun_type 関数の型
   /// @retval true 処理が成功した．
   /// @retval false 処理が失敗した．
   ///
   /// エラーの原因は以下のとおり
-  ///  - name_id と同名の定義が既に存在している．
+  ///  - name_id と同名の関数がすでに存在している．
   bool
-  reg_var(const SmtId* name_id,
-	  const SmtVar* var);
+  reg_builtin_fun(const SmtId* name_id,
+		  tSmtFun fun_type);
 
   /// @brief 関数を登録する．
   /// @param[in] name_id 名前を表す識別子
@@ -71,6 +71,18 @@ public:
   bool
   reg_fun(const SmtId* name_id,
 	  const SmtFun* fun);
+
+  /// @brief 変数を登録する．
+  /// @param[in] name_id 名前を表す識別子
+  /// @param[in] var 変数
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - name_id と同名の定義が既に存在している．
+  bool
+  reg_var(const SmtId* name_id,
+	  const SmtVar* var);
 
   /// @brief 名前からオブジェクトを探す．
   /// @param[in] name_id 名前を表す識別子

@@ -196,6 +196,10 @@ private:
   const NameObj*
   find_obj(const SmtId* name_id);
 
+  /// @brief name_id という名前が登録されているか調べる．
+  bool
+  check_obj(const SmtId* name_id);
+
   /// @brief let 文の処理を行なう．
   /// @param[in] node 引数の先頭ノード
   const SmtTerm*
@@ -300,11 +304,9 @@ private:
   /// @brief 組み込み関数と名前を結びつける．
   /// @param[in] name 名前
   /// @param[in] fun_type 組み込み関数の型
-  /// @param[in] input_sort_list 入力の型のリスト
   void
   bind_builtin_fun(const char* name,
-		   tSmtFun fun_type,
-		   const vector<const SmtSort*>& input_sort_list = vector<const SmtSort*>(0));
+		   tSmtFun fun_type);
 
   /// @brief 現在の SortMgr を返す．
   SortMgr&
@@ -360,9 +362,6 @@ private:
 
   // 組み込み型を保持するハッシュ表
   hash_map<ymuint32, const SmtSort*> mBuiltinSortMap;
-
-  // 組み込み関数を保持するハッシュ表
-  hash_map<ymuint32, const SmtFun*> mBuiltinFunMap;
 
   // スタック
   vector<StackPage*> mStack;

@@ -83,7 +83,13 @@ public:
   const SmtVar*
   var() const = 0;
 
+  /// @brief kFunTerm 型の場合に関数の型を返す．
+  virtual
+  tSmtFun
+  function_type() const = 0;
+
   /// @brief kFunTerm 型の場合に関数を返す．
+  /// @note 組み込み関数の場合には NULL を返す．
   virtual
   const SmtFun*
   function() const = 0;

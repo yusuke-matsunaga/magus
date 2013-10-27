@@ -40,6 +40,11 @@ public:
   const SmtId*
   name() const = 0;
 
+  /// @brief 組み込み関数の時 true を返す．
+  virtual
+  bool
+  is_builtin_fun() const = 0;
+
   /// @brief SmtFun を持っているとき true を返す．
   virtual
   bool
@@ -50,14 +55,20 @@ public:
   bool
   is_var() const = 0;
 
+  /// @brief tSumFun を返す．
+  /// @note is_builtin_fun() == true の時のみ意味がある．
+  virtual
+  tSmtFun
+  fun_type() const = 0;
+
   /// @brief SmtFun を返す．
-  /// @param[in] input_sort_list 入力の型のリスト
-  /// @note input_sort_list に合致する関数がない場合 NULL を返す．
+  // @note is_fun() == true の時のみ意味がある．
   virtual
   const SmtFun*
-  fun(const vector<const SmtSort*>& input_sort_list) const = 0;
+  fun() const = 0;
 
   /// @brief SmtVar を返す．
+  /// @note is_var() == true の時のみ意味がある．
   virtual
   const SmtVar*
   var() const = 0;

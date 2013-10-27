@@ -46,23 +46,6 @@ SmtSolverImpl::SmtSolverImpl() :
   mBoolSort = NULL;
   mIntSort = NULL;
   mRealSort = NULL;
-
-  mTrueFun = NULL;
-  mFalseFun = NULL;
-  mNotFun = NULL;
-  mAndFun = NULL;
-  mOrFun = NULL;
-  mXorFun = NULL;
-  mImpFun = NULL;
-
-  mIntUminusFun = NULL;
-  mIntAddFun = NULL;
-  mIntSubFun = NULL;
-  mIntMulFun = NULL;
-  mIntLeFun = NULL;
-  mIntLtFun = NULL;
-  mIntGeFun = NULL;
-  mIntGtFun = NULL;
 }
 
 // @brief デストラクタ
@@ -338,340 +321,6 @@ SmtSolverImpl::make_fun(const vector<const SmtVar*>& input_var_list,
   return fun;
 }
 
-BEGIN_NONAMESPACE
-
-/// @brief Eq/Diseq 用の input_sort_list のチェックを行う．
-/// @param[in] input_sort_list 入力の型のリスト
-const SmtSort*
-check1(const vector<const SmtSort*>& input_sort_list)
-{
-  if ( input_sort_list.size() != 2 ) {
-    return NULL;
-  }
-
-  const SmtSort* sort0 = input_sort_list[0];
-  const SmtSort* sort1 = input_sort_list[1];
-
-  if ( sort0 != sort1 ) {
-    return NULL;
-  }
-
-  return sort0;
-}
-
-/// @brief Ite 用の input_sort_list のチェックを行う．
-/// @param[in] input_sort_list 入力の型のリスト
-const SmtSort*
-check2(const vector<const SmtSort*>& input_sort_list)
-{
-  if ( input_sort_list.size() != 3 ) {
-    return NULL;
-  }
-
-  const SmtSort* sort0 = input_sort_list[0];
-  const SmtSort* sort1 = input_sort_list[1];
-  const SmtSort* sort2 = input_sort_list[2];
-
-  if ( sort0->type() != kSmtSort_Bool ) {
-    return NULL;
-  }
-  if ( sort1 != sort2 ) {
-    return NULL;
-  }
-
-  return sort1;
-}
-
-/// @brief Uminus 用の input_sort_list のチェックを行う．
-/// @param[in] input_sort_list 入力の型のリスト
-const SmtSort*
-check3(const vector<const SmtSort*>& input_sort_list)
-{
-  if ( input_sort_list.size() != 1 ) {
-    return NULL;
-  }
-
-  return input_sort_list[0];
-}
-
-/// @brief 算術二項演算子用の input_sort_list のチェックを行う．
-/// @param[in] input_sort_list 入力の型のリスト
-const SmtSort*
-check4(const vector<const SmtSort*>& input_sort_list)
-{
-  ymuint n = input_sort_list.size();
-
-  if ( n < 2 ) {
-    return NULL;
-  }
-
-  const SmtSort* sort0 = input_sort_list[0];
-  for (ymuint i = 1; i < n; ++ i) {
-    const SmtSort* sort1 = input_sort_list[i];
-    if ( sort0 != sort1 ) {
-      return NULL;
-    }
-  }
-
-  return sort0;
-}
-
-/// @brief 比較演算子用の input_sort_list のチェックを行う．
-/// @param[in] input_sort_list 入力の型のリスト
-const SmtSort*
-check5(const vector<const SmtSort*>& input_sort_list)
-{
-  if ( input_sort_list.size() != 2 ) {
-    return NULL;
-  }
-
-  const SmtSort* sort0 = input_sort_list[0];
-  const SmtSort* sort1 = input_sort_list[1];
-  if ( sort0 != sort1 ) {
-    return NULL;
-  }
-
-  return sort0;
-}
-
-END_NONAMESPACE
-
-// @brief 組み込み関数を作る．
-// @param[in] fun_type 関数の種類
-// @param[in] input_sort_list 入力の型のリスト
-// @note 関数によっては input_sort_list が必要ない場合もある．
-const SmtFun*
-SmtSolverImpl::make_builtin_fun(tSmtFun fun_type,
-				const vector<const SmtSort*>& input_sort_list)
-{
-  switch ( fun_type ) {
-  case kSmtFun_True:
-    if ( mTrueFun == NULL ) {
-      void* p = mAlloc.get_memory(sizeof(SmtTrueFun));
-      mTrueFun = new (p) SmtTrueFun(make_builtin_sort(kSmtSort_Bool));
-    }
-    return mTrueFun;
-
-  case kSmtFun_False:
-    if ( mFalseFun == NULL ) {
-      void* p = mAlloc.get_memory(sizeof(SmtTrueFun));
-      mFalseFun = new (p) SmtTrueFun(make_builtin_sort(kSmtSort_Bool));
-    }
-    return mFalseFun;
-
-  case kSmtFun_Not:
-    if ( mNotFun == NULL ) {
-      void* p = mAlloc.get_memory(sizeof(SmtNotFun));
-      mNotFun = new (p) SmtNotFun(make_builtin_sort(kSmtSort_Bool));
-    }
-    return mNotFun;
-
-  case kSmtFun_And:
-    if ( mAndFun == NULL ) {
-      void* p = mAlloc.get_memory(sizeof(SmtAndFun));
-      mAndFun = new (p) SmtAndFun(make_builtin_sort(kSmtSort_Bool));
-    }
-    return mAndFun;
-
-  case kSmtFun_Or:
-    if ( mOrFun == NULL ) {
-      void* p = mAlloc.get_memory(sizeof(SmtOrFun));
-      mOrFun = new (p) SmtOrFun(make_builtin_sort(kSmtSort_Bool));
-    }
-    return mOrFun;
-
-  case kSmtFun_Xor:
-    if ( mXorFun == NULL ) {
-      void* p = mAlloc.get_memory(sizeof(SmtXorFun));
-      mXorFun = new (p) SmtXorFun(make_builtin_sort(kSmtSort_Bool));
-    }
-    return mXorFun;
-
-  case kSmtFun_Imp:
-    if ( mImpFun == NULL ) {
-      void* p = mAlloc.get_memory(sizeof(SmtImpFun));
-      mImpFun = new (p) SmtImpFun(make_builtin_sort(kSmtSort_Bool));
-    }
-    return mImpFun;
-
-  case kSmtFun_Eq:
-    {
-      const SmtSort* sort = check1(input_sort_list);
-      if ( sort == NULL ) {
-	return NULL;
-      }
-      if ( mEqFunMap.count(sort->id()) == 0 ) {
-	void* p = mAlloc.get_memory(sizeof(SmtEqFun));
-	const SmtFun* fun = new (p) SmtEqFun(sort, make_builtin_sort(kSmtSort_Bool));
-	mEqFunMap.insert(make_pair(sort->id(), fun));
-      }
-      return mEqFunMap[sort->id()];
-    }
-
-  case kSmtFun_Diseq:
-    {
-      const SmtSort* sort = check1(input_sort_list);
-      if ( sort == NULL ) {
-	return NULL;
-      }
-      if ( mDiseqFunMap.count(sort->id()) == 0 ) {
-	void* p = mAlloc.get_memory(sizeof(SmtDiseqFun));
-	const SmtFun* fun = new (p) SmtDiseqFun(sort, make_builtin_sort(kSmtSort_Bool));
-	mDiseqFunMap.insert(make_pair(sort->id(), fun));
-      }
-      return mDiseqFunMap[sort->id()];
-    }
-
-  case kSmtFun_Ite:
-    {
-      const SmtSort* sort = check2(input_sort_list);
-      if ( sort == NULL ) {
-	return NULL;
-      }
-      if ( mIteFunMap.count(sort->id()) == 0 ) {
-	void* p = mAlloc.get_memory(sizeof(SmtIteFun));
-	const SmtFun* fun = new (p) SmtIteFun(sort, make_builtin_sort(kSmtSort_Bool));
-	mIteFunMap.insert(make_pair(sort->id(), fun));
-      }
-      return mIteFunMap[sort->id()];
-    }
-
-  case kSmtFun_Uminus:
-    {
-      const SmtSort* sort = check3(input_sort_list);
-      if ( sort == NULL ) {
-	return NULL;
-      }
-      if ( sort->type() == kSmtSort_Int ) {
-	if ( mIntUminusFun == NULL ) {
-	  void* p = mAlloc.get_memory(sizeof(SmtUminusFun));
-	  mIntUminusFun = new (p) SmtUminusFun(sort);
-	}
-	return mIntUminusFun;
-      }
-    }
-    break;
-
-  case kSmtFun_Add:
-    {
-      const SmtSort* sort = check4(input_sort_list);
-      if ( sort == NULL ) {
-	return NULL;
-      }
-      if ( sort->type() == kSmtSort_Int ) {
-	if ( mIntAddFun == NULL ) {
-	  void* p = mAlloc.get_memory(sizeof(SmtAddFun));
-	  mIntAddFun = new (p) SmtAddFun(sort);
-	}
-	return mIntAddFun;
-      }
-    }
-    break;
-
-  case kSmtFun_Sub:
-    {
-      const SmtSort* sort = check4(input_sort_list);
-      if ( sort == NULL ) {
-	return NULL;
-      }
-      if ( sort->type() == kSmtSort_Int ) {
-	if ( mIntSubFun == NULL ) {
-	  void* p = mAlloc.get_memory(sizeof(SmtSubFun));
-	  mIntSubFun = new (p) SmtSubFun(sort);
-	}
-	return mIntSubFun;
-      }
-    }
-    break;
-
-  case kSmtFun_Mul:
-    {
-      const SmtSort* sort = check4(input_sort_list);
-      if ( sort == NULL ) {
-	return NULL;
-      }
-      if ( sort->type() == kSmtSort_Int ) {
-	if ( mIntMulFun == NULL ) {
-	  void* p = mAlloc.get_memory(sizeof(SmtMulFun));
-	  mIntMulFun = new (p) SmtMulFun(sort);
-	}
-	return mIntMulFun;
-      }
-    }
-    break;
-
-  case kSmtFun_Le:
-    {
-      const SmtSort* sort = check5(input_sort_list);
-      if ( sort == NULL ) {
-	return NULL;
-      }
-      if ( sort->type() == kSmtSort_Int ) {
-	if ( mIntLeFun == NULL ) {
-	  void* p = mAlloc.get_memory(sizeof(SmtLeFun));
-	  mIntLeFun = new (p) SmtLeFun(sort, make_builtin_sort(kSmtSort_Bool));
-	}
-	return mIntLeFun;
-      }
-    }
-    break;
-
-  case kSmtFun_Lt:
-    {
-      const SmtSort* sort = check5(input_sort_list);
-      if ( sort == NULL ) {
-	return NULL;
-      }
-      if ( sort->type() == kSmtSort_Int ) {
-	if ( mIntLtFun == NULL ) {
-	  void* p = mAlloc.get_memory(sizeof(SmtLtFun));
-	  mIntLtFun = new (p) SmtLtFun(sort, make_builtin_sort(kSmtSort_Bool));
-	}
-	return mIntLtFun;
-      }
-    }
-    break;
-
-  case kSmtFun_Ge:
-    {
-      const SmtSort* sort = check5(input_sort_list);
-      if ( sort == NULL ) {
-	return NULL;
-      }
-      if ( sort->type() == kSmtSort_Int ) {
-	if ( mIntGeFun == NULL ) {
-	  void* p = mAlloc.get_memory(sizeof(SmtGeFun));
-	  mIntGeFun = new (p) SmtGeFun(sort, make_builtin_sort(kSmtSort_Bool));
-	}
-	return mIntGeFun;
-      }
-    }
-    break;
-
-  case kSmtFun_Gt:
-    {
-      const SmtSort* sort = check5(input_sort_list);
-      if ( sort == NULL ) {
-	return NULL;
-      }
-      if ( sort->type() == kSmtSort_Int ) {
-	if ( mIntGtFun == NULL ) {
-	  void* p = mAlloc.get_memory(sizeof(SmtGtFun));
-	  mIntGtFun = new (p) SmtGtFun(sort, make_builtin_sort(kSmtSort_Bool));
-	}
-	return mIntGtFun;
-      }
-    }
-    break;
-
-  default:
-    break;
-  }
-
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
 // @brief <numeric> 型の term を作る．
 // @param[in] val 値
 // @return 作成した式を返す．
@@ -761,6 +410,28 @@ SmtSolverImpl::make_fun_term(const SmtFun* fun,
   else {
     void* p = mAlloc.get_memory(sizeof(SmtFunTerm2) + sizeof(const SmtTerm*) * (n - 1));
     term = new (p) SmtFunTerm2(fun, arg_list);
+  }
+
+  return term;
+}
+
+// @brief 関数呼び出しの term を作る．(組み込み関数)
+// @param[in] fun_type 関数の型
+// @param[in] arg_list 引数のリスト
+// @return 作成した式を返す．
+const SmtTerm*
+SmtSolverImpl::make_fun_term(tSmtFun fun_type,
+			     const vector<const SmtTerm*>& arg_list)
+{
+  ymuint n = arg_list.size();
+  const SmtTerm* term;
+  if ( n == 0 ) {
+    void* p = mAlloc.get_memory(sizeof(SmtFunTerm3));
+    term = new (p) SmtFunTerm3(fun_type);
+  }
+  else {
+    void* p = mAlloc.get_memory(sizeof(SmtFunTerm4) + sizeof(const SmtTerm*) * (n - 1));
+    term = new (p) SmtFunTerm4(fun_type, arg_list);
   }
 
   return term;

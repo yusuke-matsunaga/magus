@@ -35,7 +35,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 組み込み型を返す．
-  /// @note 普通の型は kSmtSort_None を返す．
+  /// @note 普通の型は kSmtSort_UserDef を返す．
   virtual
   tSmtSort
   type() const = 0;

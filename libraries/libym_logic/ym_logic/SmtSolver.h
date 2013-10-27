@@ -88,15 +88,6 @@ public:
 	   const SmtSort* output_sort,
 	   const SmtTerm* body) = 0;
 
-  /// @brief 組み込み関数を作る．
-  /// @param[in] fun_type 関数の種類
-  /// @param[in] input_sort_list 入力の型のリスト
-  /// @note 関数によっては input_sort_list が必要ない場合もある．
-  virtual
-  const SmtFun*
-  make_builtin_fun(tSmtFun fun_type,
-		   const vector<const SmtSort*>& input_sort_list) = 0;
-
   /// @brief <numeric> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
@@ -146,6 +137,15 @@ public:
   virtual
   const SmtTerm*
   make_fun_term(const SmtFun* fun,
+		const vector<const SmtTerm*>& arg_list) = 0;
+
+  /// @brief 関数呼び出しの term を作る．(組み込み関数)
+  /// @param[in] fun_type 関数の型
+  /// @param[in] arg_list 引数のリスト
+  /// @return 作成した式を返す．
+  virtual
+  const SmtTerm*
+  make_fun_term(tSmtFun fun_type,
 		const vector<const SmtTerm*>& arg_list) = 0;
 
   /// @brief forall の term を作る．

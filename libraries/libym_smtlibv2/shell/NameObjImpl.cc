@@ -36,6 +36,13 @@ NameObjImpl::name() const
   return mName;
 }
 
+// @brief 組み込み関数の時 true を返す．
+bool
+NameObjImpl::is_builtin_fun() const
+{
+  return false;
+}
+
 // @brief SmtFun を持っているとき true を返す．
 bool
 NameObjImpl::is_fun() const
@@ -50,22 +57,66 @@ NameObjImpl::is_var() const
   return false;
 }
 
+// @brief tSumFun を返す．
+// @note is_builtin_fun() == true の時のみ意味がある．
+tSmtFun
+NameObjImpl::fun_type() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return kSmtFun_UserDef;
+}
+
 // @brief SmtFun を返す．
-// @param[in] input_sort_list 入力の型のリスト
-// @note input_sort_list に合致する関数がない場合 NULL を返す．
+// @note is_fun() == true の時のみ意味がある．
 const SmtFun*
-NameObjImpl::fun(const vector<const SmtSort*>& input_sort_list) const
+NameObjImpl::fun() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
 
 // @brief SmtVar を返す．
+// @note is_var() == true の時のみ意味がある．
 const SmtVar*
 NameObjImpl::var() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス BuiltinFunObj
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] name_id 名前を表す識別子
+// @param[in] fun_type 関数の型
+BuiltinFunObj::BuiltinFunObj(const SmtId* name_id,
+			     tSmtFun fun_type) :
+  NameObjImpl(name_id),
+  mFunType(fun_type)
+{
+}
+
+// @brief デストラクタ
+BuiltinFunObj::~BuiltinFunObj()
+{
+}
+
+// @brief 組み込み関数の時 true を返す．
+bool
+BuiltinFunObj::is_builtin_fun() const
+{
+  return true;
+}
+
+// @brief tSumFun を返す．
+// @note is_builtin_fun() == true の時のみ意味がある．
+tSmtFun
+BuiltinFunObj::fun_type() const
+{
+  return mFunType;
 }
 
 
@@ -96,10 +147,9 @@ FunObj::is_fun() const
 }
 
 // @brief SmtFun を返す．
-// @param[in] input_sort_list 入力の型のリスト
-// @note input_sort_list に合致する関数がない場合 NULL を返す．
+// @note is_fun() == true の時のみ意味がある．
 const SmtFun*
-FunObj::fun(const vector<const SmtSort*>& input_sort_list) const
+FunObj::fun() const
 {
   return mFun;
 }
