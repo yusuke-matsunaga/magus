@@ -467,21 +467,6 @@ SmtSolverImpl::make_exists_term(const vector<const SmtVar*>& var_list,
   return term;
 }
 
-// @brief 属性付きの term を作る．
-// @param[in] body 本体の式
-// @param[in] attr_list 属性リスト
-// @return 作成した式を返す．
-const SmtTerm*
-SmtSolverImpl::make_annotated_term(const SmtTerm* body,
-				   const vector<SmtAttr>& attr_list)
-{
-  ymuint n = attr_list.size();
-  void* p = mAlloc.get_memory(sizeof(SmtAnnotatedTerm) + sizeof(SmtAttr) * (n - 1));
-  const SmtTerm* term = new (p) SmtAnnotatedTerm(body, attr_list);
-
-  return term;
-}
-
 // @brief 充足可能性を調べる．
 // @param[in] assert_list 仮定する式のリスト
 tSmtLibResponse

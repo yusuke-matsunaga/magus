@@ -1266,7 +1266,7 @@ ShellImpl::eval_as_term(const SmtLibNode* node)
 
   const NameObj* obj = find_obj(fid);
   if ( obj == NULL ) {
-    mErrBuf << obj->name()->name() << " : No such function";
+    mErrBuf << fid->name() << " : No such function";
     return NULL;
   }
 
@@ -1519,31 +1519,39 @@ ShellImpl::eval_as_attr_term(const SmtLibNode* node)
     return NULL;
   }
 
-  vector<SmtAttr> attr_list;
-  for (const SmtLibNode* node1 = node->sibling();
-       node1 != NULL; node1 = node1->sibling()) {
-    if ( node1->type() != kKeywordToken ) {
-      mErrBuf << "syntax error: keyword expected at " << node1->loc();
-      return NULL;
-    }
-    const SmtLibNode* node2 = node1->sibling();
-    if ( node2 != NULL && node2->type() != kKeywordToken ) {
-      const SmtTerm* expr = eval_as_expr(node2);
-      if ( expr == NULL ) {
-	mErrBuf << "syntax error: s-expression expected at " << node2->loc();
-	return NULL;
-      }
-#if 0
-      ShString tmp_str(term_str(expr));
-      attr_list.push_back(SmtAttr(node1->str_value(), tmp_str));
-#endif
-      node1 = node2;
-    }
-    else {
-      attr_list.push_back(SmtAttr(node1->str_value()));
-    }
+  // 現時点では ( ! <term> :named <symbol> ) の形式だけが許された形式
+  const SmtLibNode* node1 = node->sibling();
+  if ( node1 == NULL ) {
+    mErrBuf << "syntax error at " << node->loc();
+    return NULL;
   }
-  return mSolver->make_annotated_term(body, attr_list);
+
+  const SmtLibNode* node2 = node1->sibling();
+  if ( node1->type() != kKeywordToken ||
+       strcmp(":named", static_cast<const char*>(node1->str_value())) != 0 ||
+       node2 == NULL ||
+       node2->type() != kSymbolToken ) {
+    mErrBuf << "syntax error at " << node->loc();
+    return NULL;
+  }
+
+  // 関連付ける名前をとってくる．
+  const SmtId* name = mIdMgr->make_id(node1->str_value());
+
+  if ( check_obj(name) ) {
+    mErrBuf << name->name() << ": already exists";
+    return NULL;
+  }
+
+  // 関数を作る．
+  const SmtFun* fun = mSolver->make_fun(vector<const SmtVar*>(0), NULL, body);
+  assert_cond( fun != NULL, __FILE__, __LINE__);
+
+  // 関数を登録する．
+  bool stat = name_mgr().reg_fun(name, fun);
+  assert_cond( stat, __FILE__, __LINE__);
+
+  return body;
 }
 
 // @brief S式を s-expr に変換する．

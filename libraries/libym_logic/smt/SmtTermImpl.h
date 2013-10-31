@@ -10,7 +10,6 @@
 
 
 #include "ym_logic/SmtTerm.h"
-#include "ym_logic/SmtAttr.h"
 
 
 BEGIN_NAMESPACE_YM_SMT
@@ -703,73 +702,6 @@ public:
   virtual
   tType
   type() const;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class SmtAnnotatedTerm SmtTermImpl.h "SmtTermImpl.h"
-/// @brief annotated 型の term を表すクラス
-//////////////////////////////////////////////////////////////////////
-class SmtAnnotatedTerm :
-  public SmtTermImpl
-{
-  friend class SmtSolverImpl;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] body 本体の式
-  /// @param[in] attr_list 属性リスト
-  SmtAnnotatedTerm(const SmtTerm* body,
-		   const vector<SmtAttr>& attr_list);
-
-  /// @brief デストラクタ
-  virtual
-  ~SmtAnnotatedTerm();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 型を返す．
-  virtual
-  tType
-  type() const;
-
-  /// @brief annotated 型の場合に属性リストの要素数を返す．
-  virtual
-  ymuint
-  attr_num() const;
-
-  /// @brief attr 型の場合に属性キーを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
-  virtual
-  ShString
-  attr_keyword(ymuint pos) const;
-
-  /// @brief attr 型の場合に属性値を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
-  virtual
-  ShString
-  attr_value(ymuint pos) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 本体の式
-  const SmtTerm* mBody;
-
-  // 属性リストの要素数
-  ymuint32 mAttrNum;
-
-  // 属性リスト
-  SmtAttr mAttrList[1];
 
 };
 
