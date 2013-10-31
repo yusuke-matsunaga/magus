@@ -59,6 +59,11 @@ public:
   bool
   is_var() const;
 
+  /// @brief SmtTerm を持っているとき true を返す．
+  virtual
+  bool
+  is_term() const;
+
   /// @brief tSumFun を返す．
   /// @note is_builtin_fun() == true の時のみ意味がある．
   virtual
@@ -77,6 +82,11 @@ public:
   const SmtVar*
   var() const;
 
+  /// @brief SmtTerm を返す．
+  /// @note is_term() == true の時のみ意味がある．
+  virtual
+  const SmtTerm*
+  term() const;
 
 
 private:
@@ -239,6 +249,56 @@ private:
 
   // 変数
   const SmtVar* mVar;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class TermObj NameObjImpl.h "NameObjImpl.h"
+/// @brief SmtTerm を表す NameObj の派生クラス
+//////////////////////////////////////////////////////////////////////
+class TermObj :
+  public NameObjImpl
+{
+  friend class NameMgr;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] name_id 名前を表す識別子
+  /// @param[in] term 式
+  TermObj(const SmtId* name_id,
+	  const SmtTerm* term);
+
+  /// @brief デストラクタ
+  virtual
+  ~TermObj();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief SmtTerm を持っているとき true を返す．
+  virtual
+  bool
+  is_term() const;
+
+  /// @brief SmtTerm を返す．
+  /// @note is_term() == true の時のみ意味がある．
+  virtual
+  const SmtTerm*
+  term() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 式
+  const SmtTerm* mTerm;
 
 };
 

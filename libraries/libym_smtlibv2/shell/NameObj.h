@@ -55,6 +55,11 @@ public:
   bool
   is_var() const = 0;
 
+  /// @brief SmtTerm を持っているとき true を返す．
+  virtual
+  bool
+  is_term() const = 0;
+
   /// @brief tSumFun を返す．
   /// @note is_builtin_fun() == true の時のみ意味がある．
   virtual
@@ -72,6 +77,12 @@ public:
   virtual
   const SmtVar*
   var() const = 0;
+
+  /// @brief SmtTerm を返す．
+  /// @note is_term() == true の時のみ意味がある．
+  virtual
+  const SmtTerm*
+  term() const = 0;
 
 };
 

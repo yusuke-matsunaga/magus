@@ -84,6 +84,19 @@ public:
   reg_var(const SmtId* name_id,
 	  const SmtVar* var);
 
+  /// @brief 式を登録する．
+  /// @param[in] name_id 名前を表す識別子
+  /// @param[in] term 式
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  /// @note let 文の置き換えで用いる．
+  ///
+  /// エラーの原因は以下のとおり
+  ///  - name_id と同名の定義が既に存在している．
+  bool
+  reg_term(const SmtId* name_id,
+	   const SmtTerm* term);
+
   /// @brief 名前からオブジェクトを探す．
   /// @param[in] name_id 名前を表す識別子
   /// @return name_id という名のオブジェクトを返す．

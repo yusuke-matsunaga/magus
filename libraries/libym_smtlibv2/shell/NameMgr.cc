@@ -118,6 +118,32 @@ NameMgr::reg_var(const SmtId* name_id,
   return true;
 }
 
+// @brief 式を登録する．
+// @param[in] name_id 名前を表す識別子
+// @param[in] term 式
+// @retval true 処理が成功した．
+// @retval false 処理が失敗した．
+// @note let 文の置き換えで用いる．
+//
+// エラーの原因は以下のとおり
+//  - name_id と同名の定義が既に存在している．
+bool
+NameMgr::reg_term(const SmtId* name_id,
+		  const SmtTerm* term)
+{
+  if ( find_obj(name_id) != NULL ) {
+    // 同名のオブジェクトが登録されている．
+    return false;
+  }
+
+  void* p = mAlloc.get_memory(sizeof(TermObj));
+  NameObjImpl* obj = new (p) TermObj(name_id, term);
+
+  reg_sub(obj);
+
+  return true;
+}
+
 // @brief 名前からオブジェクトを探す．
 // @param[in] name_id 名前を表す識別子
 // @return name_id という名のオブジェクトを返す．

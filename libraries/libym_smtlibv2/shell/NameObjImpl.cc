@@ -57,6 +57,13 @@ NameObjImpl::is_var() const
   return false;
 }
 
+// @brief SmtTerm を持っているとき true を返す．
+bool
+NameObjImpl::is_term() const
+{
+  return false;
+}
+
 // @brief tSumFun を返す．
 // @note is_builtin_fun() == true の時のみ意味がある．
 tSmtFun
@@ -79,6 +86,15 @@ NameObjImpl::fun() const
 // @note is_var() == true の時のみ意味がある．
 const SmtVar*
 NameObjImpl::var() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief SmtTerm を返す．
+// @note is_term() == true の時のみ意味がある．
+const SmtTerm*
+NameObjImpl::term() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -186,6 +202,41 @@ const SmtVar*
 VarObj::var() const
 {
   return mVar;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス TermObj
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] name_id 名前を表す識別子
+// @param[in] term 式
+TermObj::TermObj(const SmtId* name_id,
+		 const SmtTerm* term) :
+  NameObjImpl(name_id),
+  mTerm(term)
+{
+}
+
+// @brief デストラクタ
+TermObj::~TermObj()
+{
+}
+
+// @brief SmtTerm を持っているとき true を返す．
+bool
+TermObj::is_term() const
+{
+  return true;
+}
+
+// @brief SmtTerm を返す．
+// @note is_term() == true の時のみ意味がある．
+const SmtTerm*
+TermObj::term() const
+{
+  return mTerm;
 }
 
 END_NAMESPACE_YM_SMTLIBV2

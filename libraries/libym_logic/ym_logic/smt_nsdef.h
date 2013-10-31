@@ -147,9 +147,10 @@ enum tSmtFunAttr {
 /// @brief 変数の種類を表す型
 //////////////////////////////////////////////////////////////////////
 enum tSmtVar {
-  kSmtVar_Global,
-  kSmtVar_Forall,
-  kSmtVar_Exists
+  kSmtVar_Global, // グローバル変数
+  kSmtVar_FunArg, // 関数の引数
+  kSmtVar_Forall, // forall の束縛変数
+  kSmtVar_Exists  // exists の束縛変数
 };
 
 

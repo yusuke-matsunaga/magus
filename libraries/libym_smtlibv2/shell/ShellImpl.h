@@ -200,72 +200,88 @@ private:
   bool
   check_obj(const SmtId* name_id);
 
-  /// @brief let 文の処理を行なう．
-  /// @param[in] node 引数の先頭ノード
-  const SmtTerm*
-  eval_to_let(const SmtLibNode* node);
-
-  /// @brief forall 文の処理を行なう．
-  /// @param[in] node 引数の先頭ノード
-  const SmtTerm*
-  eval_to_forall(const SmtLibNode* node);
-
-  /// @brief exists 文の処理を行なう．
-  /// @param[in] node 引数の先頭ノード
-  const SmtTerm*
-  eval_to_exists(const SmtLibNode* node);
-
-  /// @brief attr 文の処理を行なう．
-  /// @param[in] node 引数の先頭ノード
-  const SmtTerm*
-  eval_to_attr_term(const SmtLibNode* node);
-
   /// @brief S式を識別子に変換する．
   /// @param[in] node S式を表すノード
   const SmtId*
-  eval_to_id(const SmtLibNode* node);
+  eval_as_id(const SmtLibNode* node);
 
   /// @brief S式を sort に変換する．
   /// @param[in] node S式を表すノード
+  /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
   const SmtSort*
-  eval_to_sort(const SmtLibNode* node);
+  eval_as_sort(const SmtLibNode* node);
 
   /// @brief S式を sort に変換する．
   /// @param[in] node S式を表すノード
+  /// @param[in] param_list パラメータを表す ID のリスト
+  /// @note param_list[i] に一致するIDは i 番めのパラメータに置き換えられる．
+  /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
   const SortElem*
-  eval_to_sort_template(const SmtLibNode* node,
+  eval_as_sort_template(const SmtLibNode* node,
 			const vector<const SmtId*>& param_list);
 
   /// @brief S式を term に変換する．
   /// @param[in] node S式を表すノード
+  /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
   const SmtTerm*
-  eval_to_term(const SmtLibNode* node);
+  eval_as_term(const SmtLibNode* node);
+
+  /// @brief S式を qual_identifier に変換する．
+  /// @param[in] node S式を表すノード
+  /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
+  const SmtTerm*
+  eval_as_qual_id(const SmtLibNode* node);
+
+  /// @brief let 文の処理を行なう．
+  /// @param[in] node 引数の先頭ノード
+  /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
+  const SmtTerm*
+  eval_as_let(const SmtLibNode* node);
+
+  /// @brief forall 文の処理を行なう．
+  /// @param[in] node 引数の先頭ノード
+  /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
+  const SmtTerm*
+  eval_as_forall(const SmtLibNode* node);
+
+  /// @brief exists 文の処理を行なう．
+  /// @param[in] node 引数の先頭ノード
+  /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
+  const SmtTerm*
+  eval_as_exists(const SmtLibNode* node);
+
+  /// @brief attr 文の処理を行なう．
+  /// @param[in] node 引数の先頭ノード
+  /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
+  const SmtTerm*
+  eval_as_attr_term(const SmtLibNode* node);
+
+  /// @brief S式を var_binding に変換する．
+  /// @param[in] node S式を表すノード
+  /// @param[out] id 変数名を表す識別子
+  /// @param[out] term 置き換える式
+  /// @retval true 変換が成功した．
+  /// @retval false 変換が失敗した．
+  /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して false を返す．
+  bool
+  eval_as_var_binding(const SmtLibNode* node,
+		      const SmtId*& id,
+		      const SmtTerm*& term);
+
+  /// @brief S式を sorted_var に変換する．
+  /// @param[in] node S式を表すノード
+  /// @param[out] id 変数名を表す識別子
+  /// @param[out] sort 変数の型
+  /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して false を返す．
+  bool
+  eval_as_sorted_var(const SmtLibNode* node,
+		     const SmtId*& id,
+		     const SmtSort*& sort);
 
   /// @brief S式を s-expr に変換する．
   /// @param[in] node S式を表すノード
   const SmtTerm*
-  eval_to_expr(const SmtLibNode* node);
-
-  /// @brief S式を qual_identifier に変換する．
-  /// @param[in] node S式を表すノード
-  const SmtTerm*
-  eval_to_qid(const SmtLibNode* node);
-
-  /// @brief S式を sorted_var に変換する．
-  /// @param[in] node S式を表すノード
-  const SmtVar*
-  eval_to_sorted_var(const SmtLibNode* node);
-
-  /// @brief S式を var_binding に変換する．
-  /// @param[in] node S式を表すノード
-  /// @param[out] id 変数のID番号
-  /// @param[out] term 置き換える式
-  /// @retval true 変換が成功した．
-  /// @retval false 変換が失敗した．
-  bool
-  eval_to_var_binding(const SmtLibNode* node,
-		      ymuint32& id,
-		      const SmtTerm*& term);
+  eval_as_expr(const SmtLibNode* node);
 
   /// @brief 引数のリストをパーズする．
   /// @param[in] arg_top 引数の先頭のノード
@@ -371,6 +387,9 @@ private:
 
   // SmtTerm を管理するクラス
   SmtTermMgr* mTermMgr;
+
+  // 現在の NameMgr
+  NameMgr* mCurNameMgr;
 
 };
 
