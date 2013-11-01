@@ -51,6 +51,11 @@ public:
   bool
   is_global() const;
 
+  /// @brief local 変数(関数の引数)の場合に true を返す．
+  virtual
+  bool
+  is_fun_arg() const;
+
   /// @brief forall 変数の場合に true を返す．
   virtual
   bool
@@ -112,6 +117,46 @@ public:
   virtual
   bool
   is_global() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class SmtFunArgVar SmtVarImpl.h "SmtVarImpl.h"
+/// @brief ローカル変数を表すクラス
+//////////////////////////////////////////////////////////////////////
+class SmtFunArgVar :
+  public SmtVarImpl
+{
+  friend class SmtSolverImpl;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] id ID番号
+  /// @param[in] sort 変数の型
+  SmtFunArgVar(ymuint id,
+	       const SmtSort* sort);
+
+  /// @brief デストラクタ
+  virtual
+  ~SmtFunArgVar();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 変数の種類を返す．
+  virtual
+  tSmtVar
+  type() const;
+
+  /// @brief local 変数(関数の引数)の場合に true を返す．
+  virtual
+  bool
+  is_fun_arg() const;
 
 };
 

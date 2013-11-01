@@ -82,24 +82,7 @@ public:
   const SmtVar*
   bound_var(ymuint pos) const;
 
-  /// @brief annotated 型の場合に属性リストの要素数を返す．
-  virtual
-  ymuint
-  attr_num() const;
-
-  /// @brief attr 型の場合に属性キーを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
-  virtual
-  ShString
-  attr_keyword(ymuint pos) const;
-
-  /// @brief attr 型の場合に属性値を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
-  virtual
-  ShString
-  attr_value(ymuint pos) const;
-
-  /// @brief kForall/kExists/kAnnotated 型の場合に本体の項を返す．
+  /// @brief kForall/kExists 型の場合に本体の項を返す．
   virtual
   const SmtTerm*
   body() const;
@@ -109,7 +92,7 @@ public:
 
 //////////////////////////////////////////////////////////////////////
 /// @class SmtNumTerm SmtTermImpl.h "SmtTermImpl.h"
-/// @brief <numeric> 型の term を表すクラス
+/// @brief <numeral> 型の term を表すクラス
 //////////////////////////////////////////////////////////////////////
 class SmtNumTerm :
   public SmtTermImpl

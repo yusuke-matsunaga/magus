@@ -458,7 +458,7 @@ SmtLibMgr::declare_sort(const SmtLibNode* arg_top)
 
   // 2つめは引数の数
   if ( arg_list[1]->type() != kNumToken ) {
-    emsg = "second argument is not a numeric";
+    emsg = "second argument is not a numeral";
     goto syntax_error;
   }
   num = arg_list[1]->int_value();
@@ -999,7 +999,7 @@ SmtLibMgr::eval_to_term(const SmtLibNode* node)
 {
   // 定数の場合
   switch ( node->type() ) {
-  case kNumToken:    return new_numeric(node->int_value());
+  case kNumToken:    return new_numeral(node->int_value());
   case kDecToken:    return new_decimal(node->str_value());
   case kHexToken:    return new_hexadecimal(node->str_value());
   case kBinToken:    return new_binary(node->str_value());
@@ -1185,7 +1185,7 @@ SmtLibMgr::eval_to_expr(const SmtLibNode* node)
 {
   switch ( node->type() ) {
   case kNumToken:
-    return new_numeric(node->int_value());
+    return new_numeral(node->int_value());
 
   case kDecToken:
     return new_decimal(node->str_value());
@@ -1409,10 +1409,10 @@ SmtLibMgr::parse_args(const SmtLibNode*  arg_top,
   return true;
 }
 
-// @brief <numeric> を作る．
+// @brief <numeral> を作る．
 // @param[in] val 値
 const SmtTerm*
-SmtLibMgr::new_numeric(ymuint32 val)
+SmtLibMgr::new_numeral(ymuint32 val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtNumTerm));
   return new (p) SmtNumTerm(val);

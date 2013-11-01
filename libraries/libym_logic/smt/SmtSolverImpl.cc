@@ -63,6 +63,8 @@ SmtSolverImpl::set_logic(tSmtLogic logic)
     return false;
   }
 
+  mLogic = logic;
+
   switch ( logic ) {
   case kSmtLogic_AUFLIA:
     Core_init();
@@ -260,6 +262,11 @@ SmtSolverImpl::make_var(const SmtSort* sort,
     var = new (p) SmtGlobalVar(mVarId, sort);
     break;
 
+  case kSmtVar_FunArg:
+    p = mAlloc.get_memory(sizeof(SmtFunArgVar));
+    var = new (p) SmtFunArgVar(mVarId, sort);
+    break;
+
   case kSmtVar_Forall:
     p = mAlloc.get_memory(sizeof(SmtForallVar));
     var = new (p) SmtForallVar(mVarId, sort);
@@ -269,10 +276,26 @@ SmtSolverImpl::make_var(const SmtSort* sort,
     p = mAlloc.get_memory(sizeof(SmtExistsVar));
     var = new (p) SmtExistsVar(mVarId, sort);
     break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
   ++ mVarId;
 
   return var;
+}
+
+// @brief 関数を作る．(引数なし)
+// @param[in] output_sort 出力の型
+// @return 作成した関数を返す．
+const SmtFun*
+SmtSolverImpl::make_fun(const SmtSort* output_sort)
+{
+  void* p = mAlloc.get_memory(sizeof(SmtDeclFun1));
+  const SmtFun* fun = new (p) SmtDeclFun1(output_sort);
+
+  return fun;
 }
 
 // @brief 関数を作る．
@@ -284,15 +307,26 @@ SmtSolverImpl::make_fun(const vector<const SmtSort*>& input_sort_list,
 			const SmtSort* output_sort)
 {
   ymuint n = input_sort_list.size();
-  const SmtFun* fun;
   if ( n == 0 ) {
-    void* p = mAlloc.get_memory(sizeof(SmtDeclFun1));
-    fun = new (p) SmtDeclFun1(output_sort);
+    return make_fun(output_sort);
   }
-  else {
-    void* p = mAlloc.get_memory(sizeof(SmtDeclFun2) + sizeof(const SmtSort*) * (n - 1));
-    fun = new (p) SmtDeclFun2(input_sort_list, output_sort);
-  }
+
+  void* p = mAlloc.get_memory(sizeof(SmtDeclFun2) + sizeof(const SmtSort*) * (n - 1));
+  const SmtFun* fun = new (p) SmtDeclFun2(input_sort_list, output_sort);
+
+  return fun;
+}
+
+// @brief 内容を持った関数を作る．(引数なし)
+// @param[in] output_sort 出力の型
+// @param[in] body 本体を式
+// @return 作成した関数を返す．
+const SmtFun*
+SmtSolverImpl::make_fun(const SmtSort* output_sort,
+			const SmtTerm* body)
+{
+  void* p = mAlloc.get_memory(sizeof(SmtDefFun1));
+  const SmtFun* fun = new (p) SmtDefFun1(output_sort, body);
 
   return fun;
 }
@@ -308,24 +342,21 @@ SmtSolverImpl::make_fun(const vector<const SmtVar*>& input_var_list,
 			const SmtTerm* body)
 {
   ymuint n = input_var_list.size();
-  const SmtFun* fun;
   if ( n == 0 ) {
-    void* p = mAlloc.get_memory(sizeof(SmtDefFun1));
-    fun = new (p) SmtDefFun1(output_sort, body);
+    return make_fun(output_sort, body);
   }
-  else {
-    void* p = mAlloc.get_memory(sizeof(SmtDefFun2) + sizeof(const SmtVar*) * (n - 1));
-    fun = new (p) SmtDefFun2(input_var_list, output_sort, body);
-  }
+
+  void* p = mAlloc.get_memory(sizeof(SmtDefFun2) + sizeof(const SmtVar*) * (n - 1));
+  const SmtFun* fun = new (p) SmtDefFun2(input_var_list, output_sort, body);
 
   return fun;
 }
 
-// @brief <numeric> 型の term を作る．
+// @brief <numeral> 型の term を作る．
 // @param[in] val 値
 // @return 作成した式を返す．
 const SmtTerm*
-SmtSolverImpl::make_numeric_term(ymuint32 val)
+SmtSolverImpl::make_numeral_term(ymuint32 val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtNumTerm));
   const SmtTerm* term = new (p) SmtNumTerm(val);

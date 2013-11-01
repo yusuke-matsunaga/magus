@@ -553,12 +553,12 @@ SmtMgr::find_obj(const SmtId* name_id)
   return name_mgr().find_obj(name_id);
 }
 
-// @brief <numeric> 型の term を作る．
+// @brief <numeral> 型の term を作る．
 // @param[in] val 値
 const SmtTerm*
-SmtMgr::make_numeric_term(ymuint32 val)
+SmtMgr::make_numeral_term(ymuint32 val)
 {
-  return mTermMgr->make_numeric(val);
+  return mTermMgr->make_numeral(val);
 }
 
 // @brief <decimal> 型の term を作る．

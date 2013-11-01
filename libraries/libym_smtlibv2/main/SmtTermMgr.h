@@ -37,10 +37,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief <numeric> 型の term を作る．
+  /// @brief <numeral> 型の term を作る．
   /// @param[in] val 値
   const SmtTerm*
-  make_numeric(ymuint32 val);
+  make_numeral(ymuint32 val);
 
   /// @brief <decimal> 型の term を作る．
   /// @param[in] val 値

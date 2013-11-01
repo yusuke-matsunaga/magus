@@ -562,7 +562,7 @@ ShellImpl::declare_sort(const SmtLibNode* arg_top)
 
   // 2つめは引数の数
   if ( arg_list[1]->type() != kNumToken ) {
-    mErrBuf << "second argument is not a numeric";
+    mErrBuf << "second argument is not a numeral";
     return false;
   }
   ymuint num = arg_list[1]->int_value();
@@ -1162,7 +1162,7 @@ ShellImpl::eval_as_term(const SmtLibNode* node)
   switch ( node->type() ) {
   case kNumToken:
     // numeral
-    return mSolver->make_numeric_term(node->int_value());
+    return mSolver->make_numeral_term(node->int_value());
 
   case kDecToken:
     // decimal

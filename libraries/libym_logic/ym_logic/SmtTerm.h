@@ -28,7 +28,7 @@ public:
 
   /// @brief 種類を表す型
   enum tType {
-    /// @brief <numeric>
+    /// @brief <numeral>
     kNumConst,
     /// @brief <decimal>
     kDecConst,
@@ -45,9 +45,7 @@ public:
     /// @brief forall term
     kForall,
     /// @brief exists term
-    kExists,
-    /// @brief annotated term
-    kAnnotated
+    kExists
   };
 
 
@@ -116,36 +114,12 @@ public:
   const SmtVar*
   bound_var(ymuint pos) const = 0;
 
-  /// @brief annotated 型の場合に属性リストの要素数を返す．
-  virtual
-  ymuint
-  attr_num() const = 0;
-
-  /// @brief attr 型の場合に属性キーを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
-  virtual
-  ShString
-  attr_keyword(ymuint pos) const = 0;
-
-  /// @brief attr 型の場合に属性値を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
-  virtual
-  ShString
-  attr_value(ymuint pos) const = 0;
-
-  /// @brief kForall/kExists/kAnnotated 型の場合に本体の項を返す．
+  /// @brief kForall/kExists 型の場合に本体の項を返す．
   virtual
   const SmtTerm*
   body() const = 0;
 
 };
-
-
-/// @relates SmtTerm
-/// @brief 内容を表す文字列を返す．
-extern
-string
-term_str(const SmtTerm* term);
 
 END_NAMESPACE_YM_SMT
 

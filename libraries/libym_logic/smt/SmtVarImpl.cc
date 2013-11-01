@@ -45,6 +45,13 @@ SmtVarImpl::is_global() const
   return false;
 }
 
+// @brief local 変数(関数の引数)の場合に true を返す．
+bool
+SmtVarImpl::is_fun_arg() const
+{
+  return false;
+}
+
 // @brief forall 変数の場合に true を返す．
 bool
 SmtVarImpl::is_forall() const
@@ -88,6 +95,39 @@ SmtGlobalVar::type() const
 // @brief global 変数の場合に true を返す．
 bool
 SmtGlobalVar::is_global() const
+{
+  return true;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス SmtFunArgVar
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] id ID番号
+// @param[in] sort 変数の型
+SmtFunArgVar::SmtFunArgVar(ymuint id,
+			   const SmtSort* sort) :
+  SmtVarImpl(id, sort)
+{
+}
+
+// @brief デストラクタ
+SmtFunArgVar::~SmtFunArgVar()
+{
+}
+
+// @brief 変数の種類を返す．
+tSmtVar
+SmtFunArgVar::type() const
+{
+  return kSmtVar_FunArg;
+}
+
+// @brief local 変数(関数の引数)の場合に true を返す．
+bool
+SmtFunArgVar::is_fun_arg() const
 {
   return true;
 }

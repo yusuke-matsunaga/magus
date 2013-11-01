@@ -41,12 +41,6 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 組み込み関数の場合に型を返す．
-  /// @note 普通の関数は kSmtFun_UserDef を返す．
-  virtual
-  tSmtFun
-  type() const = 0;
-
   /// @brief 入力数を返す．
   virtual
   ymuint
@@ -75,11 +69,6 @@ public:
   virtual
   const SmtTerm*
   body() const = 0;
-
-  /// @brief 属性を返す．
-  virtual
-  tSmtFunAttr
-  attr() const = 0;
 
 };
 

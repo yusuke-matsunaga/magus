@@ -95,33 +95,7 @@ SmtTermImpl::bound_var(ymuint pos) const
   return NULL;
 }
 
-// @brief annotated 型の場合に属性リストの要素数を返す．
-ymuint
-SmtTermImpl::attr_num() const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return 0;
-}
-
-// @brief attr 型の場合に属性キーを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
-ShString
-SmtTermImpl::attr_keyword(ymuint pos) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return ShString();
-}
-
-// @brief attr 型の場合に属性値を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < attr_attr_num() )
-ShString
-SmtTermImpl::attr_value(ymuint pos) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return ShString();
-}
-
-// @brief kForall/kExists/kAnnotated 型の場合に本体の項を返す．
+// @brief kForall/kExists 型の場合に本体の項を返す．
 const SmtTerm*
 SmtTermImpl::body() const
 {

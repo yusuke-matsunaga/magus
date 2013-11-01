@@ -34,10 +34,10 @@ SmtTermMgr::~SmtTermMgr()
 {
 }
 
-// @brief <numeric> 型の term を作る．
+// @brief <numeral> 型の term を作る．
 // @param[in] val 値
 const SmtTerm*
-SmtTermMgr::make_numeric(ymuint32 val)
+SmtTermMgr::make_numeral(ymuint32 val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtNumTerm));
   return new (p) SmtNumTerm(val);

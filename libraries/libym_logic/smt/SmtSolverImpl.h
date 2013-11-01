@@ -67,6 +67,13 @@ public:
   make_var(const SmtSort* sort,
 	   tSmtVar type);
 
+  /// @brief 関数を作る．(引数なし)
+  /// @param[in] output_sort 出力の型
+  /// @return 作成した関数を返す．
+  virtual
+  const SmtFun*
+  make_fun(const SmtSort* output_sort);
+
   /// @brief 関数を作る．
   /// @param[in] input_sort_list 入力の型のリスト
   /// @param[in] output_sort 出力の型
@@ -75,6 +82,15 @@ public:
   const SmtFun*
   make_fun(const vector<const SmtSort*>& input_sort_list,
 	   const SmtSort* output_sort);
+
+  /// @brief 内容を持った関数を作る．(引数なし)
+  /// @param[in] output_sort 出力の型
+  /// @param[in] body 本体を式
+  /// @return 作成した関数を返す．
+  virtual
+  const SmtFun*
+  make_fun(const SmtSort* output_sort,
+	   const SmtTerm* body);
 
   /// @brief 内容を持った関数を作る．
   /// @param[in] input_var_list 入力の変数のリスト
@@ -87,12 +103,12 @@ public:
 	   const SmtSort* output_sort,
 	   const SmtTerm* body);
 
-  /// @brief <numeric> 型の term を作る．
+  /// @brief <numeral> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
   virtual
   const SmtTerm*
-  make_numeric_term(ymuint32 val);
+  make_numeral_term(ymuint32 val);
 
   /// @brief <decimal> 型の term を作る．
   /// @param[in] val 値

@@ -186,10 +186,10 @@ private:
 	     ymuint arg_num,
 	     vector<const SmtLibNode*>& arg_list);
 
-  /// @brief <numeric> を作る．
+  /// @brief <numeral> を作る．
   /// @param[in] val 値
   const SmtTerm*
-  new_numeric(ymuint32 val);
+  new_numeral(ymuint32 val);
 
   /// @brief <decimal> を作る．
   /// @param[in] val 値

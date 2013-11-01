@@ -106,6 +106,12 @@ AC_LANG_CPLUSPLUS
 
 
 # ===================================================================
+# Check for CppUTest
+# ===================================================================
+YM_CHECK_CPPUTEST([ym_have_cpputest=1], [ym_have_cpputest=0])
+
+
+# ===================================================================
 # Local definitions
 # ===================================================================
 
@@ -115,6 +121,7 @@ AC_SUBST([YMTOOLS_SRCDIR])
 AC_SUBST([YMTOOLS_BUILDDIR])
 
 YM_EXTRA_SUBDIRS=""
+YM_EXTRA_TESTS_SUBDIRS=""
 YM_EXTRA_LIBADD=""
 
 if test "$ym_have_python" = 1; then
@@ -123,7 +130,13 @@ if test "$ym_have_python" = 1; then
    AC_CONFIG_FILES([tests/python/Makefile])
 fi
 
+if test $ym_have_cpputest = 1; then
+   YM_EXTRA_TESTS_SUBDIRS="$YM_EXTRA_TESTS_SUBDIRS CppUTest"
+   AC_CONFIG_FILES([tests/CppUTest/Makefile])
+fi
+
 AC_SUBST([YM_EXTRA_SUBDIRS])
+AC_SUBST([YM_EXTRA_TESTS_SUBDIRS])
 AC_SUBST([YM_EXTRA_LIBADD])
 
 

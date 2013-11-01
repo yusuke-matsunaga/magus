@@ -263,10 +263,10 @@ public:
   make_var(const SmtId* name_id,
 	  const SmtSort* sort = NULL);
 
-  /// @brief <numeric> 型の term を作る．
+  /// @brief <numeral> 型の term を作る．
   /// @param[in] val 値
   const SmtTerm*
-  make_numeric_term(ymuint32 val);
+  make_numeral_term(ymuint32 val);
 
   /// @brief <decimal> 型の term を作る．
   /// @param[in] val 値

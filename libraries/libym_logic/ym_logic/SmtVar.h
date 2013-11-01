@@ -47,6 +47,11 @@ public:
   bool
   is_global() const = 0;
 
+  /// @brief local 変数(関数の引数)の場合に true を返す．
+  virtual
+  bool
+  is_fun_arg() const = 0;
+
   /// @brief forall 変数の場合に true を返す．
   virtual
   bool

@@ -40,14 +40,10 @@ run_all_test_CPPFLAGS = \
 	$(CPPUTEST_INCLUDES)
 
 run_all_test_SOURCES = \
-	SmtLibScannerTest.cc \
-	SmtIdMgrTest.cc \
-	SmtNameMgrTest.cc \
-	SmtSortMgrTest.cc \
-	SmtTermMgrTest.cc \
+	SmtSolverTest.cc \
 	main.cc
 
 run_all_test_LDADD = \
-	$(top_builddir)/libym_smtlibv2.la \
+	$(top_builddir)/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(CPPUTEST_LIBS)
