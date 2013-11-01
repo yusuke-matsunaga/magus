@@ -278,11 +278,6 @@ private:
 		     const SmtId*& id,
 		     const SmtSort*& sort);
 
-  /// @brief S式を s-expr に変換する．
-  /// @param[in] node S式を表すノード
-  const SmtTerm*
-  eval_as_expr(const SmtLibNode* node);
-
   /// @brief 引数のリストをパーズする．
   /// @param[in] arg_top 引数の先頭のノード
   /// @param[in] arg_num 引数の数

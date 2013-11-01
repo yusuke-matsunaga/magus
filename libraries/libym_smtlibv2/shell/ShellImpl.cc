@@ -524,24 +524,19 @@ ShellImpl::set_info(const SmtLibNode* arg_top)
     return false;
   }
 
-  const SmtTerm* expr = NULL;
   const SmtLibNode* node2 = arg_top->sibling();
   if ( node2 != NULL ) {
     if ( node2->sibling() != NULL ) {
       mErrBuf << "syntax error: too many tokens at " << node2->sibling()->loc();
       return false;
     }
-    expr = eval_as_expr(node2);
-    if ( expr == NULL ) {
-      return false;
-    }
   }
 
-#if 0
-  if ( !mMgr.set_info(arg_top->str_value(), expr) ) {
-    return false;
+  const char* keyword = arg_top->str_value();
+  if ( strcmp(keyword, "") == 0 ) {
   }
-#endif
+  else if ( strcmp(keyword, "") == 0 ) {
+  }
 
   return true;
 }
@@ -1566,57 +1561,6 @@ ShellImpl::eval_as_attr_term(const SmtLibNode* node)
   assert_cond( stat, __FILE__, __LINE__);
 
   return body;
-}
-
-// @brief S式を s-expr に変換する．
-// @param[in] node S式を表すノード
-const SmtTerm*
-ShellImpl::eval_as_expr(const SmtLibNode* node)
-{
-  switch ( node->type() ) {
-  case kNumToken:
-    return mSolver->make_numeric_term(node->int_value());
-
-  case kDecToken:
-    return mSolver->make_decimal_term(node->str_value());
-
-  case kHexToken:
-    return mSolver->make_hexadecimal_term(node->str_value());
-
-  case kBinToken:
-    return mSolver->make_binary_term(node->str_value());
-
-  case kStringToken:
-    return mSolver->make_string_term(node->str_value());
-
-  case kSymbolToken:
-    return mSolver->make_string_term(node->str_value());
-
-#if 0
-  case kKeywordToken:
-    return mSolver->make_keyword_term(node->str_value());
-
-  case kListToken:
-    {
-      vector<const SmtTerm*> expr_list;
-      expr_list.reserve(node->child_num());
-      for (const SmtLibNode* node1 = node->child();
-	   node1 != NULL; node1 = node1->sibling()) {
-	const SmtTerm* expr1 = eval_as_expr(node1);
-	if ( expr1 == NULL ) {
-	  return NULL;
-	}
-	expr_list.push_back(expr1);
-      }
-      return mSolver->make_list_term(expr_list);
-    }
-#endif
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
-  }
-  return NULL;
 }
 
 // @brief S式を var_binding に変換する．
