@@ -166,15 +166,6 @@ public:
   make_exists_term(const vector<const SmtVar*>& var_list,
 		   const SmtTerm* body) = 0;
 
-  /// @brief 属性付きの term を作る．
-  /// @param[in] body 本体の式
-  /// @param[in] attr_list 属性リスト
-  /// @return 作成した式を返す．
-  virtual
-  const SmtTerm*
-  make_annotated_term(const SmtTerm* body,
-		      const vector<SmtAttr>& attr_list) = 0;
-
   /// @brief 充足可能性を調べる．
   /// @param[in] assert_list 仮定する式のリスト
   virtual

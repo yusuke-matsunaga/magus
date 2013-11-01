@@ -36,7 +36,6 @@ BEGIN_NAMESPACE_YM_SMT
 
 
 // クラス名の宣言
-class SmtAttr;
 class SmtFun;
 class SmtSolver;
 class SmtSort;
@@ -167,7 +166,6 @@ enum tSmtLibResponse {
   kSmtLibUnsupported
 };
 
-using nsSmt::SmtAttr;
 using nsSmt::SmtFun;
 using nsSmt::SmtSolver;
 using nsSmt::SmtSort;
