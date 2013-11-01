@@ -1341,6 +1341,8 @@ ShellImpl::eval_as_qual_id(const SmtLibNode* node)
 const SmtTerm*
 ShellImpl::eval_as_let(const SmtLibNode* node)
 {
+  assert_cond( node != NULL, __FILE__, __LINE__);
+
   vector<const SmtLibNode*> arg_list(2);
   if ( !parse_args(node, 2, arg_list) ) {
     mErrBuf << "# of args for 'let' mismatch: " << node->loc();
@@ -1393,6 +1395,8 @@ ShellImpl::eval_as_let(const SmtLibNode* node)
 const SmtTerm*
 ShellImpl::eval_as_forall(const SmtLibNode* node)
 {
+  assert_cond( node != NULL, __FILE__, __LINE__);
+
   vector<const SmtLibNode*> arg_list(2);
   if ( !parse_args(node, 2, arg_list) ) {
     mErrBuf << "# of args for 'forall' mismatch: " << node->loc();
@@ -1453,6 +1457,8 @@ ShellImpl::eval_as_forall(const SmtLibNode* node)
 const SmtTerm*
 ShellImpl::eval_as_exists(const SmtLibNode* node)
 {
+  assert_cond( node != NULL, __FILE__, __LINE__);
+
   vector<const SmtLibNode*> arg_list(2);
   if ( !parse_args(node, 2, arg_list) ) {
     mErrBuf << "# of args for 'exists' mismatch: " << node->loc();
@@ -1513,6 +1519,14 @@ ShellImpl::eval_as_exists(const SmtLibNode* node)
 const SmtTerm*
 ShellImpl::eval_as_attr_term(const SmtLibNode* node)
 {
+  assert_cond( node != NULL, __FILE__, __LINE__);
+
+  const SmtLibNode* attr_top = node->sibling();
+  if ( attr_top == NULL ) {
+    mErrBuf << "syntax error at " << node->loc();
+    return NULL;
+  }
+
   const SmtTerm* body = eval_as_term(node);
   if ( body == NULL ) {
     // エラーメッセージは下位の呼び出しで出力されているはず
