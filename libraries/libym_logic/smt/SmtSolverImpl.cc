@@ -59,7 +59,7 @@ bool
 SmtSolverImpl::set_logic(tSmtLogic logic)
 {
   // このコマンドは1度しか使えない．
-  if ( mLogic != kSmtLogic_NONE ) {
+  if ( check_logic() ) {
     return false;
   }
 
@@ -180,64 +180,93 @@ SmtSolverImpl::set_logic(tSmtLogic logic)
 void
 SmtSolverImpl::Core_init()
 {
+  {
+    void* p = mAlloc.get_memory(sizeof(SmtBoolSort));
+    mBoolSort = new (p) SmtBoolSort(new_sort_id());
+  }
 }
 
 // @brief INTS logic の初期化を行う．
 void
 SmtSolverImpl::Ints_init()
 {
+  {
+    void* p = mAlloc.get_memory(sizeof(SmtIntSort));
+    mIntSort = new (p) SmtIntSort(new_sort_id());
+  }
 }
 
-// @brief 型を作る．
+// @brief REALS logic の初期化を行う．
+void
+SmtSolverImpl::Reals_init()
+{
+  {
+    void* p = mAlloc.get_memory(sizeof(SmtRealSort));
+    mRealSort = new (p) SmtRealSort(new_sort_id());
+  }
+ }
+
+// @brief 型を作る．(単純型)
 // @param[in] elem_list 要素の型のリスト
 // @return 作成した型を返す．
+//
+// エラーが起きた場合には NULL を返す．
+// エラーとなる原因は以下のとおり
+//  - set_logic() が呼ばれていない．
+const SmtSort*
+SmtSolverImpl::make_sort()
+{
+  if ( !check_logic() ) {
+    return NULL;
+  }
+
+  void* p = mAlloc.get_memory(sizeof(SmtSimpleSort));
+  const SmtSort* sort = new (p) SmtSimpleSort(new_sort_id());
+
+  return sort;
+}
+
+// @brief 型を作る．(複合型)
+// @param[in] elem_list 要素の型のリスト
+// @return 作成した型を返す．
+//
+// エラーが起きた場合には NULL を返す．
+// エラーとなる原因は以下のとおり
+//  - set_logic() が呼ばれていない．
 const SmtSort*
 SmtSolverImpl::make_sort(const vector<const SmtSort*>& elem_list)
 {
+  if ( !check_logic() ) {
+    return NULL;
+  }
+
   ymuint n = elem_list.size();
-  const SmtSort* sort;
   if ( n == 0 ) {
-    void* p = mAlloc.get_memory(sizeof(SmtSimpleSort));
-    sort = new (p) SmtSimpleSort(mSortId);
+    return make_sort();
   }
-  else {
-    void* p = mAlloc.get_memory(sizeof(SmtComplexSort) + sizeof(const SmtSort*) * (n - 1));
-    sort = new (p) SmtComplexSort(mSortId, elem_list);
-  }
-  ++ mSortId;
+
+  void* p = mAlloc.get_memory(sizeof(SmtComplexSort) + sizeof(const SmtSort*) * (n - 1));
+  const SmtSort* sort = new (p) SmtComplexSort(new_sort_id(), elem_list);
 
   return sort;
 }
 
 // @brief 組み込み型を作る．
+// @param[in] type 型の種類
+// @return 作成した型を返す．
+//
+// エラーが起きた場合には NULL を返す．
+// エラーとなる原因は以下のとおり
+//  - set_logic() が呼ばれていない．
+//  - set_logic() で使える組み込み型ではない．
 const SmtSort*
 SmtSolverImpl::make_builtin_sort(tSmtSort type)
 {
+  // set_logic() によってセットされているはず．
   switch ( type ) {
-  case kSmtSort_Bool:
-    if ( mBoolSort == NULL ) {
-      void* p = mAlloc.get_memory(sizeof(SmtBoolSort));
-      mBoolSort = new (p) SmtBoolSort(mSortId);
-      ++ mSortId;
-    }
-    return mBoolSort;
-
-  case kSmtSort_Int:
-    if ( mIntSort == NULL ) {
-      void* p = mAlloc.get_memory(sizeof(SmtIntSort));
-      mIntSort = new (p) SmtIntSort(mSortId);
-      ++ mSortId;
-    }
-    return mIntSort;
-
-  case kSmtSort_Real:
-    if ( mRealSort == NULL ) {
-      void* p = mAlloc.get_memory(sizeof(SmtRealSort));
-      mRealSort = new (p) SmtRealSort(mSortId);
-      ++ mSortId;
-    }
-    return mRealSort;
-
+  case kSmtSort_Bool: return mBoolSort;
+  case kSmtSort_Int:  return mIntSort;
+  case kSmtSort_Real: return mRealSort;
   default:
     break;
   }
@@ -250,38 +279,45 @@ SmtSolverImpl::make_builtin_sort(tSmtSort type)
 // @param[in] sort 変数の型
 // @param[in] type 変数の種類
 // @return 作成した変数を返す．
+//
+// エラーが起きた場合には NULL を返す．
+// エラーとなる原因は以下のとおり
+//  - set_logic() が呼ばれていない．
 const SmtVar*
 SmtSolverImpl::make_var(const SmtSort* sort,
 			tSmtVar type)
 {
+  if ( !check_logic() ) {
+    return NULL;
+  }
+
   void* p;
   const SmtVar* var;
   switch ( type ) {
   case kSmtVar_Global:
     p = mAlloc.get_memory(sizeof(SmtGlobalVar));
-    var = new (p) SmtGlobalVar(mVarId, sort);
+    var = new (p) SmtGlobalVar(new_var_id(), sort);
     break;
 
   case kSmtVar_FunArg:
     p = mAlloc.get_memory(sizeof(SmtFunArgVar));
-    var = new (p) SmtFunArgVar(mVarId, sort);
+    var = new (p) SmtFunArgVar(new_var_id(), sort);
     break;
 
   case kSmtVar_Forall:
     p = mAlloc.get_memory(sizeof(SmtForallVar));
-    var = new (p) SmtForallVar(mVarId, sort);
+    var = new (p) SmtForallVar(new_var_id(), sort);
     break;
 
   case kSmtVar_Exists:
     p = mAlloc.get_memory(sizeof(SmtExistsVar));
-    var = new (p) SmtExistsVar(mVarId, sort);
+    var = new (p) SmtExistsVar(new_var_id(), sort);
     break;
 
   default:
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
-  ++ mVarId;
 
   return var;
 }
@@ -289,9 +325,17 @@ SmtSolverImpl::make_var(const SmtSort* sort,
 // @brief 関数を作る．(引数なし)
 // @param[in] output_sort 出力の型
 // @return 作成した関数を返す．
+//
+// エラーが起きた場合には NULL を返す．
+// エラーとなる原因は以下のとおり
+//  - set_logic() が呼ばれていない．
 const SmtFun*
 SmtSolverImpl::make_fun(const SmtSort* output_sort)
 {
+  if ( !check_logic() ) {
+    return NULL;
+  }
+
   void* p = mAlloc.get_memory(sizeof(SmtDeclFun1));
   const SmtFun* fun = new (p) SmtDeclFun1(output_sort);
 
@@ -302,10 +346,18 @@ SmtSolverImpl::make_fun(const SmtSort* output_sort)
 // @param[in] input_sort_list 入力の型のリスト
 // @param[in] output_sort 出力の型
 // @return 作成した関数を返す．
+//
+// エラーが起きた場合には NULL を返す．
+// エラーとなる原因は以下のとおり
+//  - set_logic() が呼ばれていない．
 const SmtFun*
 SmtSolverImpl::make_fun(const vector<const SmtSort*>& input_sort_list,
 			const SmtSort* output_sort)
 {
+  if ( !check_logic() ) {
+    return NULL;
+  }
+
   ymuint n = input_sort_list.size();
   if ( n == 0 ) {
     return make_fun(output_sort);
@@ -321,10 +373,18 @@ SmtSolverImpl::make_fun(const vector<const SmtSort*>& input_sort_list,
 // @param[in] output_sort 出力の型
 // @param[in] body 本体を式
 // @return 作成した関数を返す．
+//
+// エラーが起きた場合には NULL を返す．
+// エラーとなる原因は以下のとおり
+//  - set_logic() が呼ばれていない．
 const SmtFun*
 SmtSolverImpl::make_fun(const SmtSort* output_sort,
 			const SmtTerm* body)
 {
+  if ( !check_logic() ) {
+    return NULL;
+  }
+
   void* p = mAlloc.get_memory(sizeof(SmtDefFun1));
   const SmtFun* fun = new (p) SmtDefFun1(output_sort, body);
 
@@ -336,11 +396,19 @@ SmtSolverImpl::make_fun(const SmtSort* output_sort,
 // @param[in] output_sort 出力の型
 // @param[in] body 本体を式
 // @return 作成した関数を返す．
+//
+// エラーが起きた場合には NULL を返す．
+// エラーとなる原因は以下のとおり
+//  - set_logic() が呼ばれていない．
 const SmtFun*
 SmtSolverImpl::make_fun(const vector<const SmtVar*>& input_var_list,
 			const SmtSort* output_sort,
 			const SmtTerm* body)
 {
+  if ( !check_logic() ) {
+    return NULL;
+  }
+
   ymuint n = input_var_list.size();
   if ( n == 0 ) {
     return make_fun(output_sort, body);
@@ -424,6 +492,18 @@ SmtSolverImpl::make_var_term(const SmtVar* var)
   return term;
 }
 
+// @brief 関数呼び出しの term を作る．(引数なし)
+// @param[in] fun 関数
+// @return 作成した式を返す．
+const SmtTerm*
+SmtSolverImpl::make_fun_term(const SmtFun* fun)
+{
+  void* p = mAlloc.get_memory(sizeof(SmtFunTerm1));
+  const SmtTerm* term = new (p) SmtFunTerm1(fun);
+
+  return term;
+}
+
 // @brief 関数呼び出しの term を作る．
 // @param[in] fun 関数
 // @param[in] arg_list 引数のリスト
@@ -433,15 +513,24 @@ SmtSolverImpl::make_fun_term(const SmtFun* fun,
 			     const vector<const SmtTerm*>& arg_list)
 {
   ymuint n = arg_list.size();
-  const SmtTerm* term;
   if ( n == 0 ) {
-    void* p = mAlloc.get_memory(sizeof(SmtFunTerm1));
-    term = new (p) SmtFunTerm1(fun);
+    return make_fun_term(fun);
   }
-  else {
-    void* p = mAlloc.get_memory(sizeof(SmtFunTerm2) + sizeof(const SmtTerm*) * (n - 1));
-    term = new (p) SmtFunTerm2(fun, arg_list);
-  }
+
+  void* p = mAlloc.get_memory(sizeof(SmtFunTerm2) + sizeof(const SmtTerm*) * (n - 1));
+  const SmtTerm* term = new (p) SmtFunTerm2(fun, arg_list);
+
+  return term;
+}
+
+// @brief 関数呼び出しの term を作る．(組み込み関数，引数なし)
+// @param[in] fun_type 関数の型
+// @return 作成した式を返す．
+const SmtTerm*
+SmtSolverImpl::make_fun_term(tSmtFun fun_type)
+{
+  void* p = mAlloc.get_memory(sizeof(SmtFunTerm3));
+  const SmtTerm* term = new (p) SmtFunTerm3(fun_type);
 
   return term;
 }
@@ -455,15 +544,12 @@ SmtSolverImpl::make_fun_term(tSmtFun fun_type,
 			     const vector<const SmtTerm*>& arg_list)
 {
   ymuint n = arg_list.size();
-  const SmtTerm* term;
   if ( n == 0 ) {
-    void* p = mAlloc.get_memory(sizeof(SmtFunTerm3));
-    term = new (p) SmtFunTerm3(fun_type);
+    return make_fun_term(fun_type);
   }
-  else {
-    void* p = mAlloc.get_memory(sizeof(SmtFunTerm4) + sizeof(const SmtTerm*) * (n - 1));
-    term = new (p) SmtFunTerm4(fun_type, arg_list);
-  }
+
+  void* p = mAlloc.get_memory(sizeof(SmtFunTerm4) + sizeof(const SmtTerm*) * (n - 1));
+  const SmtTerm* term = new (p) SmtFunTerm4(fun_type, arg_list);
 
   return term;
 }
@@ -533,6 +619,36 @@ SmtSolverImpl::get_value(const vector<const SmtTerm*>& expr_list)
 tSmtLibResponse
 SmtSolverImpl::get_assignment()
 {
+}
+
+// @brief set_logic() のチェックを行う．
+bool
+SmtSolverImpl::check_logic()
+{
+  if ( mLogic != kSmtLogic_NONE ) {
+    return true;
+  }
+  return false;
+}
+
+// @brief SmtSort のID番号を得る．
+ymuint32
+SmtSolverImpl::new_sort_id()
+{
+  ymuint32 id = mSortId;
+  ++ mSortId;
+
+  return id;
+}
+
+// @brief SmtVar のID番号を得る．
+ymuint32
+SmtSolverImpl::new_var_id()
+{
+  ymuint32 id = mVarId;
+  ++ mVarId;
+
+  return id;
 }
 
 END_NAMESPACE_YM_SMT

@@ -120,6 +120,10 @@ public:
   tType
   type() const;
 
+  /// @brief 関連付けられている SmtSort を返す．
+  const SmtSort*
+  sort() const;
+
   /// @brief kNumConst 型の場合に整数値を返す．
   virtual
   ymuint32
@@ -166,6 +170,10 @@ public:
   virtual
   tType
   type() const;
+
+  /// @brief 関連付けられている SmtSort を返す．
+  const SmtSort*
+  sort() const;
 
   /// @brief kDecConst/kHexConst/kBinConst/kStrConst 型の場合に文字列を返す．
   virtual
@@ -214,6 +222,10 @@ public:
   tType
   type() const;
 
+  /// @brief 関連付けられている SmtSort を返す．
+  const SmtSort*
+  sort() const;
+
 };
 
 
@@ -246,6 +258,10 @@ public:
   virtual
   tType
   type() const;
+
+  /// @brief 関連付けられている SmtSort を返す．
+  const SmtSort*
+  sort() const;
 
 };
 
@@ -280,6 +296,10 @@ public:
   tType
   type() const;
 
+  /// @brief 関連付けられている SmtSort を返す．
+  const SmtSort*
+  sort() const;
+
 };
 
 
@@ -312,6 +332,10 @@ public:
   virtual
   tType
   type() const;
+
+  /// @brief 関連付けられている SmtSort を返す．
+  const SmtSort*
+  sort() const;
 
   /// @brief kVarTerm 型の場合に関数を返す．
   virtual
@@ -359,6 +383,10 @@ public:
   virtual
   tType
   type() const;
+
+  /// @brief 関連付けられている SmtSort を返す．
+  const SmtSort*
+  sort() const;
 
   /// @brief kFunTerm 型の場合に関数の型を返す．
   virtual
@@ -476,6 +504,10 @@ public:
   tType
   type() const;
 
+  /// @brief 関連付けられている SmtSort を返す．
+  const SmtSort*
+  sort() const;
+
   /// @brief kFunTerm 型の場合に関数の型を返す．
   virtual
   tSmtFun
@@ -590,6 +622,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 関連付けられている SmtSort を返す．
+  const SmtSort*
+  sort() const;
+
   /// @brief kForall/kExists 型の場合に変数リストの要素数を返す．
   virtual
   ymuint
@@ -600,6 +636,11 @@ public:
   virtual
   const SmtVar*
   bound_var(ymuint pos) const;
+
+  /// @brief kForall/kExists 型の場合に本体の項を返す．
+  virtual
+  const SmtTerm*
+  body() const;
 
 
 private:

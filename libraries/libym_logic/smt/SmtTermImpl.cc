@@ -8,6 +8,8 @@
 
 
 #include "SmtTermImpl.h"
+#include "ym_logic/SmtVar.h"
+#include "ym_logic/SmtFun.h"
 
 
 BEGIN_NAMESPACE_YM_SMT
@@ -127,6 +129,13 @@ SmtNumTerm::type() const
   return kNumConst;
 }
 
+// @brief 関連付けられている SmtSort を返す．
+const SmtSort*
+SmtNumTerm::sort() const
+{
+  return NULL;
+}
+
 // @brief kNumConst 型の場合に整数値を返す．
 ymuint32
 SmtNumTerm::int_value() const
@@ -156,6 +165,13 @@ SmtTerm::tType
 SmtStrTerm::type() const
 {
   return kStrConst;
+}
+
+// @brief 関連付けられている SmtSort を返す．
+const SmtSort*
+SmtStrTerm::sort() const
+{
+  return NULL;
 }
 
 // @brief kDecConst/kHexConst/kBinConst/kStrConst 型の場合に文字列を返す．
@@ -189,6 +205,13 @@ SmtDecTerm::type() const
   return kDecConst;
 }
 
+// @brief 関連付けられている SmtSort を返す．
+const SmtSort*
+SmtDecTerm::sort() const
+{
+  return NULL;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス SmtHexTerm
@@ -213,6 +236,13 @@ SmtHexTerm::type() const
   return kHexConst;
 }
 
+// @brief 関連付けられている SmtSort を返す．
+const SmtSort*
+SmtHexTerm::sort() const
+{
+  return NULL;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス SmtBinTerm
@@ -235,6 +265,13 @@ SmtTerm::tType
 SmtBinTerm::type() const
 {
   return kBinConst;
+}
+
+// @brief 関連付けられている SmtSort を返す．
+const SmtSort*
+SmtBinTerm::sort() const
+{
+  return NULL;
 }
 
 
@@ -268,6 +305,13 @@ SmtVarTerm::var() const
   return mVar;
 }
 
+// @brief 関連付けられている SmtSort を返す．
+const SmtSort*
+SmtVarTerm::sort() const
+{
+  return mVar->sort();
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス SmtFunTerm1
@@ -290,6 +334,13 @@ SmtTerm::tType
 SmtFunTerm1::type() const
 {
   return kFunTerm;
+}
+
+// @brief 関連付けられている SmtSort を返す．
+const SmtSort*
+SmtFunTerm1::sort() const
+{
+  return mFun->output_sort();
 }
 
 // @brief kFunTerm 型の場合に関数の型を返す．
@@ -385,6 +436,44 @@ SmtFunTerm3::type() const
   return kFunTerm;
 }
 
+// @brief 関連付けられている SmtSort を返す．
+const SmtSort*
+SmtFunTerm3::sort() const
+{
+  switch ( function_type() ) {
+  case kSmtFun_True:
+  case kSmtFun_False:
+  case kSmtFun_Not:
+  case kSmtFun_And:
+  case kSmtFun_Or:
+  case kSmtFun_Xor:
+  case kSmtFun_Imp:
+  case kSmtFun_Eq:
+  case kSmtFun_Diseq:
+  case kSmtFun_Le:
+  case kSmtFun_Lt:
+  case kSmtFun_Ge:
+  case kSmtFun_Gt: // bool
+    return NULL;
+
+  case kSmtFun_Uminus:
+  case kSmtFun_Add:
+  case kSmtFun_Sub:
+  case kSmtFun_Mul:
+  case kSmtFun_Div:
+    return input(0)->sort();
+
+  case kSmtFun_Ite:
+    return input(1)->sort();
+
+  default:
+    break;
+  }
+
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
 // @brief kFunTerm 型の場合に関数の型を返す．
 tSmtFun
 SmtFunTerm3::function_type() const
@@ -478,6 +567,13 @@ SmtQualTerm::~SmtQualTerm()
 {
 }
 
+// @brief 関連付けられている SmtSort を返す．
+const SmtSort*
+SmtQualTerm::sort() const
+{
+  return mBody->sort();
+}
+
 // @brief kForall/kExists 型の場合に変数リストの要素数を返す．
 ymuint
 SmtQualTerm::var_num() const
@@ -492,6 +588,13 @@ SmtQualTerm::bound_var(ymuint pos) const
 {
   assert_cond( pos < var_num(), __FILE__, __LINE__);
   return mVarList[pos];
+}
+
+// @brief kForall/kExists 型の場合に本体の項を返す．
+const SmtTerm*
+SmtQualTerm::body() const
+{
+  return mBody;
 }
 
 

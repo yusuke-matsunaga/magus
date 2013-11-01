@@ -41,19 +41,46 @@ public:
 
   /// @brief 使用するロジックを設定する
   /// @param[in] logic 設定するロジック
+  /// @retval true 処理が成功した．
+  /// @retval false 処理が失敗した．
+  ///
+  /// エラーとなる原因は以下のとおり
+  ///  - 既に set_logic() が呼ばれていた．
+  ///  - (unspported) サポートしていないロジックだった．
   virtual
   bool
   set_logic(tSmtLogic logic);
 
-  /// @brief 型を作る．
+  /// @brief 型を作る．(単純型)
   /// @param[in] elem_list 要素の型のリスト
   /// @return 作成した型を返す．
+  ///
+  /// エラーが起きた場合には NULL を返す．
+  /// エラーとなる原因は以下のとおり
+  ///  - set_logic() が呼ばれていない．
+  virtual
+  const SmtSort*
+  make_sort();
+
+  /// @brief 型を作る．(複合型)
+  /// @param[in] elem_list 要素の型のリスト
+  /// @return 作成した型を返す．
+  ///
+  /// エラーが起きた場合には NULL を返す．
+  /// エラーとなる原因は以下のとおり
+  ///  - set_logic() が呼ばれていない．
   virtual
   const SmtSort*
   make_sort(const vector<const SmtSort*>& elem_list);
 
   /// @brief 組み込み型を作る．
   /// @param[in] type 型の種類
+  /// @return 作成した型を返す．
+  ///
+  /// エラーが起きた場合には NULL を返す．
+  /// エラーとなる原因は以下のとおり
+  ///  - set_logic() が呼ばれていない．
+  ///  - set_logic() で使える組み込み型ではない．
   virtual
   const SmtSort*
   make_builtin_sort(tSmtSort type);
@@ -62,14 +89,22 @@ public:
   /// @param[in] sort 変数の型
   /// @param[in] type 変数の種類
   /// @return 作成した変数を返す．
+  ///
+  /// エラーが起きた場合には NULL を返す．
+  /// エラーとなる原因は以下のとおり
+  ///  - set_logic() が呼ばれていない．
   virtual
   const SmtVar*
   make_var(const SmtSort* sort,
-	   tSmtVar type);
+	   tSmtVar type = kSmtVar_Global);
 
   /// @brief 関数を作る．(引数なし)
   /// @param[in] output_sort 出力の型
   /// @return 作成した関数を返す．
+  ///
+  /// エラーが起きた場合には NULL を返す．
+  /// エラーとなる原因は以下のとおり
+  ///  - set_logic() が呼ばれていない．
   virtual
   const SmtFun*
   make_fun(const SmtSort* output_sort);
@@ -78,6 +113,10 @@ public:
   /// @param[in] input_sort_list 入力の型のリスト
   /// @param[in] output_sort 出力の型
   /// @return 作成した関数を返す．
+  ///
+  /// エラーが起きた場合には NULL を返す．
+  /// エラーとなる原因は以下のとおり
+  ///  - set_logic() が呼ばれていない．
   virtual
   const SmtFun*
   make_fun(const vector<const SmtSort*>& input_sort_list,
@@ -87,6 +126,10 @@ public:
   /// @param[in] output_sort 出力の型
   /// @param[in] body 本体を式
   /// @return 作成した関数を返す．
+  ///
+  /// エラーが起きた場合には NULL を返す．
+  /// エラーとなる原因は以下のとおり
+  ///  - set_logic() が呼ばれていない．
   virtual
   const SmtFun*
   make_fun(const SmtSort* output_sort,
@@ -97,6 +140,10 @@ public:
   /// @param[in] output_sort 出力の型
   /// @param[in] body 本体を式
   /// @return 作成した関数を返す．
+  ///
+  /// エラーが起きた場合には NULL を返す．
+  /// エラーとなる原因は以下のとおり
+  ///  - set_logic() が呼ばれていない．
   virtual
   const SmtFun*
   make_fun(const vector<const SmtVar*>& input_var_list,
@@ -145,6 +192,13 @@ public:
   const SmtTerm*
   make_var_term(const SmtVar* var);
 
+  /// @brief 関数呼び出しの term を作る．(引数なし)
+  /// @param[in] fun 関数
+  /// @return 作成した式を返す．
+  virtual
+  const SmtTerm*
+  make_fun_term(const SmtFun* fun);
+
   /// @brief 関数呼び出しの term を作る．
   /// @param[in] fun 関数
   /// @param[in] arg_list 引数のリスト
@@ -153,6 +207,13 @@ public:
   const SmtTerm*
   make_fun_term(const SmtFun* fun,
 		const vector<const SmtTerm*>& arg_list);
+
+  /// @brief 関数呼び出しの term を作る．(組み込み関数，引数なし)
+  /// @param[in] fun_type 関数の型
+  /// @return 作成した式を返す．
+  virtual
+  const SmtTerm*
+  make_fun_term(tSmtFun fun_type);
 
   /// @brief 関数呼び出しの term を作る．(組み込み関数)
   /// @param[in] fun_type 関数の型
@@ -226,6 +287,22 @@ private:
   /// @brief INTS logic の初期化を行う．
   void
   Ints_init();
+
+  /// @brief REALS logic の初期化を行う．
+  void
+  Reals_init();
+
+  /// @brief set_logic() のチェックを行う．
+  bool
+  check_logic();
+
+  /// @brief SmtSort のID番号を得る．
+  ymuint32
+  new_sort_id();
+
+  /// @brief SmtVar のID番号を得る．
+  ymuint32
+  new_var_id();
 
 
 private:
