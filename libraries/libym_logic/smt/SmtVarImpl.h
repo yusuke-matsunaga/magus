@@ -29,7 +29,7 @@ protected:
   /// @param[in] id ID番号
   /// @param[in] sort 変数の型
   SmtVarImpl(ymuint id,
-	     const SmtSort* sort);
+	     tSmtSortId sort);
 
   /// @brief デストラクタ
   virtual
@@ -43,7 +43,7 @@ public:
 
   /// @brief 型を返す．
   virtual
-  const SmtSort*
+  tSmtSortId
   sort() const;
 
   /// @brief global 変数の場合に true を返す．
@@ -76,7 +76,7 @@ private:
   ymuint32 mId;
 
   // 型
-  const SmtSort* mSort;
+  tSmtSortId mSort;
 
 };
 
@@ -96,7 +96,7 @@ private:
   /// @param[in] id ID番号
   /// @param[in] sort 変数の型
   SmtGlobalVar(ymuint id,
-	       const SmtSort* sort);
+	       tSmtSortId sort);
 
   /// @brief デストラクタ
   virtual
@@ -136,7 +136,7 @@ private:
   /// @param[in] id ID番号
   /// @param[in] sort 変数の型
   SmtFunArgVar(ymuint id,
-	       const SmtSort* sort);
+	       tSmtSortId sort);
 
   /// @brief デストラクタ
   virtual
@@ -176,7 +176,7 @@ private:
   /// @param[in] id ID番号
   /// @param[in] sort 変数の型
   SmtForallVar(ymuint id,
-	       const SmtSort* sort);
+	       tSmtSortId sort);
 
   /// @brief デストラクタ
   virtual
@@ -216,7 +216,7 @@ private:
   /// @param[in] id ID番号
   /// @param[in] sort 変数の型
   SmtExistsVar(ymuint id,
-	       const SmtSort* sort);
+	       tSmtSortId sort);
 
   /// @brief デストラクタ
   virtual

@@ -653,12 +653,12 @@ ShellImpl::declare_fun(const SmtLibNode* arg_top)
     return false;
   }
 
-  vector<const SmtSort*> input_sort_list;
+  vector<tSmtSortId> input_sort_list;
   input_sort_list.reserve(arg_list[1]->child_num());
   for (const SmtLibNode* node = arg_list[1]->child();
        node != NULL; node = node->sibling()) {
-    const SmtSort* sort = eval_as_sort(node);
-    if ( sort == NULL ) {
+    tSmtSortId sort = eval_as_sort(node);
+    if ( sort == kSmtSort_None ) {
       print(mErrBuf, node);
       mErrBuf << " is not a registered sort";
       return false;
@@ -667,8 +667,8 @@ ShellImpl::declare_fun(const SmtLibNode* arg_top)
   }
 
   // 3つめは出力の型のリスト
-  const SmtSort* output_sort = eval_as_sort(arg_list[2]);
-  if ( output_sort == NULL ) {
+  tSmtSortId output_sort = eval_as_sort(arg_list[2]);
+  if ( output_sort == kSmtSort_None ) {
     mErrBuf << "third argument is not a valid sort";
     return false;
   }
@@ -724,7 +724,7 @@ ShellImpl::define_fun(const SmtLibNode* arg_top)
   for (const SmtLibNode* node = arg_list[1]->child();
        node != NULL; node = node->sibling()) {
     const SmtId* id;
-    const SmtSort* sort;
+    tSmtSortId sort;
     if ( !eval_as_sorted_var(node, id, sort) ) {
       return false;
     }
@@ -735,8 +735,8 @@ ShellImpl::define_fun(const SmtLibNode* arg_top)
   }
 
   // 3つめは出力の型
-  const SmtSort* output_sort = eval_as_sort(arg_list[2]);
-  if ( output_sort == NULL ) {
+  tSmtSortId output_sort = eval_as_sort(arg_list[2]);
+  if ( output_sort == kSmtSort_None ) {
     mErrBuf << "third argument is not a valid sort";
     return false;
   }
@@ -747,6 +747,11 @@ ShellImpl::define_fun(const SmtLibNode* arg_top)
 
   // 4つめは本体の式
   const SmtTerm* body = eval_as_term(arg_list[3]);
+
+  if ( output_sort != body->sort() ) {
+    mErrBuf << "body expression's sort does not match with the output sort";
+    return false;
+  }
 
   // 新しい辞書をスタックから取り除く
   // temp_name_mgr は自動変数なので自動的に開放される．
@@ -764,7 +769,7 @@ ShellImpl::define_fun(const SmtLibNode* arg_top)
   }
 
   // 関数を作る．
-  const SmtFun* fun = mSolver->make_fun(var_list, output_sort, body);
+  const SmtFun* fun = mSolver->make_fun(var_list, body);
   assert_cond( fun != NULL, __FILE__, __LINE__);
 
   // 関数を登録する．
@@ -948,11 +953,11 @@ ShellImpl::make_id(const ShString& name,
 // エラーの原因は以下のとおり
 //  - name_id という名の型が登録されていなかった．
 //  - 登録されている型と elem_list のサイズが異なった．
-const SmtSort*
+tSmtSortId
 ShellImpl::make_sort(const SmtId* name_id,
-		     const vector<const SmtSort*>& elem_list)
+		     const vector<tSmtSortId>& elem_list)
 {
-  hash_map<ymuint32, const SmtSort*>::iterator p = mBuiltinSortMap.find(name_id->id());
+  hash_map<ymuint32, tSmtSortId>::iterator p = mBuiltinSortMap.find(name_id->id());
   if ( p != mBuiltinSortMap.end() ) {
     return p->second;
   }
@@ -1037,13 +1042,13 @@ ShellImpl::eval_as_id(const SmtLibNode* node)
 // @brief S式を sort に変換する．
 // @param[in] node S式を表すノード
 // @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
-const SmtSort*
+tSmtSortId
 ShellImpl::eval_as_sort(const SmtLibNode* node)
 {
   // - <identifier>
   // - ( <identifier> <sort>+ )
   const SmtId* id = eval_as_id(node);
-  vector<const SmtSort*> elem_list;
+  vector<tSmtSortId> elem_list;
   if ( id == NULL ) {
     if ( node->type() != kListToken ) {
       mErrBuf << "syntax error : " << node->loc();
@@ -1061,8 +1066,8 @@ ShellImpl::eval_as_sort(const SmtLibNode* node)
 
     for (const SmtLibNode* node2 = node1->sibling();
 	 node2 != NULL; node2 = node2->sibling()) {
-      const SmtSort* sort1 = eval_as_sort(node2);
-      if ( sort1 == NULL ) {
+      tSmtSortId sort1 = eval_as_sort(node2);
+      if ( sort1 == kSmtSort_None ) {
 	mErrBuf << "not a registered sort: " << node2->loc();
 	return NULL;
       }
@@ -1074,8 +1079,8 @@ ShellImpl::eval_as_sort(const SmtLibNode* node)
     }
   }
 
-  const SmtSort* sort = make_sort(id, elem_list);
-  if ( sort == NULL ) {
+  tSmtSortId sort = make_sort(id, elem_list);
+  if ( sort == kSmtSort_None ) {
     mErrBuf << id->name() << ": not registered";
   }
   return sort;
@@ -1316,8 +1321,8 @@ ShellImpl::eval_as_qual_id(const SmtLibNode* node)
     return NULL;
   }
 
-  const SmtSort* sort = eval_as_sort(arg_list[1]);
-  if ( sort == NULL ) {
+  tSmtSortId sort = eval_as_sort(arg_list[1]);
+  if ( sort == kSmtSort_None ) {
     // 型名が未定義だった．
     return NULL;
   }
@@ -1414,7 +1419,7 @@ ShellImpl::eval_as_forall(const SmtLibNode* node)
   for (const SmtLibNode* node21 = node2->child();
        node21 != NULL; node21 = node21->sibling()) {
     const SmtId* id;
-    const SmtSort* sort;
+    tSmtSortId sort;
     if ( !eval_as_sorted_var(node21, id, sort) ) {
       // エラーメッセージは eval_as_sorted_var() 中で出力されているはず
       return NULL;
@@ -1476,7 +1481,7 @@ ShellImpl::eval_as_exists(const SmtLibNode* node)
   for (const SmtLibNode* node21 = node2->child();
        node21 != NULL; node21 = node21->sibling()) {
     const SmtId* id;
-    const SmtSort* sort;
+    tSmtSortId sort;
     if ( !eval_as_sorted_var(node21, id, sort) ) {
       // エラーメッセージは eval_as_sorted_var() 中で出力されているはず
       return NULL;
@@ -1553,7 +1558,7 @@ ShellImpl::eval_as_attr_term(const SmtLibNode* node)
   }
 
   // 関数を作る．
-  const SmtFun* fun = mSolver->make_fun(vector<const SmtVar*>(0), NULL, body);
+  const SmtFun* fun = mSolver->make_fun(vector<const SmtVar*>(0), body);
   assert_cond( fun != NULL, __FILE__, __LINE__);
 
   // 関数を登録する．
@@ -1609,7 +1614,7 @@ ShellImpl::eval_as_var_binding(const SmtLibNode* node,
 bool
 ShellImpl::eval_as_sorted_var(const SmtLibNode* node,
 			      const SmtId*& id,
-			      const SmtSort*& sort)
+			      tSmtSortId& sort)
 {
   // ( <identifier> <sort> ) の形
   vector<const SmtLibNode*> arg_list;
@@ -1625,7 +1630,7 @@ ShellImpl::eval_as_sorted_var(const SmtLibNode* node,
   }
 
   sort = eval_as_sort(arg_list[1]);
-  if ( sort == NULL ) {
+  if ( sort == kSmtSort_None ) {
     // エラーメッセージは eval_as_sort() 中で出力されている．
     return false;
   }
@@ -1665,15 +1670,12 @@ ShellImpl::parse_args(const SmtLibNode*  arg_top,
 // @param[in] sort_type 組み込み型
 void
 ShellImpl::bind_builtin_sort(const char* name,
-			     tSmtSort sort_type)
+			     tSmtSortId sort_id)
 {
-  const SmtSort* sort = mSolver->make_builtin_sort(sort_type);
-  assert_cond( sort != NULL, __FILE__, __LINE__);
-
   const SmtId* id = mIdMgr->make_id(ShString(name));
   assert_cond( id != NULL, __FILE__, __LINE__);
 
-  mBuiltinSortMap.insert(make_pair(id->id(), sort));
+  mBuiltinSortMap.insert(make_pair(id->id(), sort_id));
 }
 
 // @brief 組み込み関数と名前を結びつける．

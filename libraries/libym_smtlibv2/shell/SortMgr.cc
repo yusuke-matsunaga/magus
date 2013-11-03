@@ -22,7 +22,7 @@ BEGIN_NONAMESPACE
 // 等しいときに true を返す．
 bool
 check_elem(const SmtSort* sort,
-	   const vector<const SmtSort*>& elem_list)
+	   const vector<tSmtSortId>& elem_list)
 {
   ymuint n = elem_list.size();
   if ( sort->elem_num() != n ) {
@@ -39,13 +39,13 @@ check_elem(const SmtSort* sort,
 // ハッシュ関数
 ymuint
 hash_func(const SmtId* name,
-	  const vector<const SmtSort*>& elem_list)
+	  const vector<tSmtSortId>& elem_list)
 {
   ymuint h = name->id();
-  for (vector<const SmtSort*>::const_iterator p = elem_list.begin();
+  for (vector<tSmtSortId>::const_iterator p = elem_list.begin();
        p != elem_list.end(); ++ p) {
-    const SmtSort* sort1 = *p;
-    h = h * 127 + sort1->hash();
+    tSmtSortId sort1 = *p;
+    h = h * 127 + sort1;
   }
   return h;
 }
@@ -58,8 +58,8 @@ hash_func(const SmtId* name,
   ymuint h = name->id();
   ymuint n = sort->elem_num();
   for (ymuint i = 0; i < n; ++ i) {
-    const SmtSort* sort1 = sort->elem(i);
-    h = h * 127 + sort1->hash();
+    tSmtSortId sort1 = sort->elem(i);
+    h = h * 127 + sort1;
   }
   return h;
 }
@@ -277,24 +277,24 @@ SortMgr::find_templ(const SmtId* name_id,
 // @param[in] name_id 型名
 // @param[in] param_list 部品の型のリスト
 // @return 引数に合致する型を返す．
-const SmtSort*
+tSmtSortId
 SortMgr::make_sort(const SmtId* name_id,
-		   const vector<const SmtSort*>& param_list)
+		   const vector<tSmtSortId>& param_list)
 {
   // 型宣言を探す．
   ymuint param_num = 0;
   const SortElem* sort_templ = find_templ(name_id, param_num);
   if ( sort_templ == NULL ) {
     // name_id という型は登録されていなかった．
-    return NULL;
+    return kSmtSort_None;
   }
   if ( param_num != param_list.size() ) {
     // 引数の数が合わない．
-    return NULL;
+    return kSmtSort_None;
   }
 
   // パラメータを置き換えて実際の型を作る．
-  const SmtSort* sort = replace_param(sort_templ, param_list);
+  tSmtSortId sort = replace_param(sort_templ, param_list);
 
   return sort;
 }
@@ -303,24 +303,29 @@ SortMgr::make_sort(const SmtId* name_id,
 // @param[in] name_id 型名を表す識別子
 // @param[in] param_list 要素の型のリスト
 // @return 生成した型を返す．
-const SmtSort*
+tSmtSortId
 SortMgr::_make_sort(const SmtId* name_id,
-		    const vector<const SmtSort*>& param_list)
+		    const vector<tSmtSortId>& param_list)
 {
   // 型のインスタンスを探す．
   const SmtSort* sort = find_sort(name_id, param_list);
   if ( sort != NULL ) {
     // 見つかった．
-    return sort;
+    return sort->id();
   }
 
   // 型を作る．
-  sort = mSolver.make_sort(param_list);
+  tSmtSortId sort_id = mSolver.make_sort(param_list);
+  if ( sort_id == kSmtSort_None ) {
+    return kSmtSort_None;
+  }
+
+  sort = mSolver.get_sort(sort_id);
 
   // 登録する．
   reg_sort(name_id, sort);
 
-  return sort;
+  return sort_id;
 }
 
 // @brief 型を登録する．
@@ -355,7 +360,7 @@ SortMgr::reg_sort(const SmtId* name_id,
 // @return 登録されていなければ NULL を返す．
 const SmtSort*
 SortMgr::find_sort(const SmtId* name_id,
-		   const vector<const SmtSort*>& elem_list)
+		   const vector<tSmtSortId>& elem_list)
 {
   if ( mParent != NULL ) {
     // 親のレベルで探す．
@@ -383,9 +388,9 @@ SortMgr::find_sort(const SmtId* name_id,
 // @brief テンプレートから実際の型を作る．
 // @param[in] templ テンプレート
 // @param[in] param_list パラメータリスト
-const SmtSort*
+tSmtSortId
 SortMgr::replace_param(const SortElem* templ,
-		       const vector<const SmtSort*>& param_list)
+		       const vector<tSmtSortId>& param_list)
 {
   if ( templ->is_param() ) {
     // パラメータ型
@@ -395,7 +400,7 @@ SortMgr::replace_param(const SortElem* templ,
   }
 
   ymuint n = templ->elem_num();
-  vector<const SmtSort*> elem_list(n);
+  vector<tSmtSortId> elem_list(n);
   for (ymuint i = 0; i < n; ++ i) {
     elem_list[i] = replace_param(templ->elem(i), param_list);
   }

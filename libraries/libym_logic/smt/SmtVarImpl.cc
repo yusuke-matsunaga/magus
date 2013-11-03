@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_SMT
 // @param[in] id ID番号
 // @param[in] sort 変数の型
 SmtVarImpl::SmtVarImpl(ymuint id,
-		       const SmtSort* sort) :
+		       tSmtSortId sort) :
   mId(id),
   mSort(sort)
 {
@@ -32,7 +32,7 @@ SmtVarImpl::~SmtVarImpl()
 }
 
 // @brief 型を返す．
-const SmtSort*
+tSmtSortId
 SmtVarImpl::sort() const
 {
   return mSort;
@@ -75,7 +75,7 @@ SmtVarImpl::is_exists() const
 // @param[in] id ID番号
 // @param[in] sort 変数の型
 SmtGlobalVar::SmtGlobalVar(ymuint id,
-			   const SmtSort* sort) :
+			   tSmtSortId sort) :
   SmtVarImpl(id, sort)
 {
 }
@@ -108,7 +108,7 @@ SmtGlobalVar::is_global() const
 // @param[in] id ID番号
 // @param[in] sort 変数の型
 SmtFunArgVar::SmtFunArgVar(ymuint id,
-			   const SmtSort* sort) :
+			   tSmtSortId sort) :
   SmtVarImpl(id, sort)
 {
 }
@@ -141,7 +141,7 @@ SmtFunArgVar::is_fun_arg() const
 // @param[in] id ID番号
 // @param[in] sort 変数の型
 SmtForallVar::SmtForallVar(ymuint id,
-			   const SmtSort* sort) :
+			   tSmtSortId sort) :
   SmtVarImpl(id, sort)
 {
 }
@@ -174,7 +174,7 @@ SmtForallVar::is_forall() const
 // @param[in] id ID番号
 // @param[in] sort 変数の型
 SmtExistsVar::SmtExistsVar(ymuint id,
-			   const SmtSort* sort) :
+			   tSmtSortId sort) :
   SmtVarImpl(id, sort)
 {
 }

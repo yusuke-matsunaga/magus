@@ -66,9 +66,9 @@ public:
   tType
   type() const = 0;
 
-  /// @brief 関連付けられている SmtSort を返す．
+  /// @brief 関連付けられている型を返す．
   virtual
-  const SmtSort*
+  tSmtSortId
   sort() const = 0;
 
   /// @brief kNumConst 型の場合に整数値を返す．

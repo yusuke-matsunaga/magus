@@ -27,8 +27,7 @@ class SmtSortImpl :
 protected:
 
   /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  SmtSortImpl(ymuint id);
+  SmtSortImpl();
 
   /// @brief デストラクタ
   virtual
@@ -40,16 +39,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 組み込み型を返す．
-  /// @note 普通の型は kSmtSort_UserDef を返す．
-  virtual
-  tSmtSort
-  type() const;
-
   /// @brief ID 番号を返す．
   /// @note ID 番号はすべての型の中で唯一のもの
   virtual
-  ymuint
+  tSmtSortId
   id() const;
 
   /// @brief 複合型の場合の要素数を返す．
@@ -58,15 +51,15 @@ public:
   ymuint
   elem_num() const;
 
-  /// @brief 複合型の場合の要素の型を返す．
+  /// @brief 複合型の場合の要素の型番号を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < elem_num )
   virtual
-  const SmtSort*
+  tSmtSortId
   elem(ymuint pos) const;
 
   /// @brief ハッシュ値を返す．
   virtual
-  ymuint
+  ymuint32
   hash() const;
 
 
@@ -76,109 +69,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ID番号
-  ymuint32 mId;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class SmtBoolSort SmtSortImpl.h "SmtSortImpl.h"
-/// @brief Bool 型を表すクラス
-//////////////////////////////////////////////////////////////////////
-class SmtBoolSort :
-  public SmtSortImpl
-{
-  friend class SmtSolverImpl;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] id ID 番号
-  SmtBoolSort(ymuint id);
-
-  /// @brief デストラクタ
-  virtual
-  ~SmtBoolSort();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 組み込み型を返す．
-  /// @note 普通の型は kSmtSort_UserDef を返す．
-  virtual
-  tSmtSort
-  type() const;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class SmtIntSort SmtSortImpl.h "SmtSortImpl.h"
-/// @brief Int 型を表すクラス
-//////////////////////////////////////////////////////////////////////
-class SmtIntSort :
-  public SmtSortImpl
-{
-  friend class SmtSolverImpl;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] id ID 番号
-  SmtIntSort(ymuint id);
-
-  /// @brief デストラクタ
-  virtual
-  ~SmtIntSort();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 組み込み型を返す．
-  /// @note 普通の型は kSmtSort_UserDef を返す．
-  virtual
-  tSmtSort
-  type() const;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class SmtRealSort SmtSortImpl.h "SmtSortImpl.h"
-/// @brief Real 型を表すクラス
-//////////////////////////////////////////////////////////////////////
-class SmtRealSort :
-  public SmtSortImpl
-{
-  friend class SmtSolverImpl;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] id ID 番号
-  SmtRealSort(ymuint id);
-
-  /// @brief デストラクタ
-  virtual
-  ~SmtRealSort();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 組み込み型を返す．
-  /// @note 普通の型は kSmtSort_UserDef を返す．
-  virtual
-  tSmtSort
-  type() const;
+  tSmtSortId mId;
 
 };
 
@@ -195,8 +86,7 @@ class SmtSimpleSort :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  SmtSimpleSort(ymuint id);
+  SmtSimpleSort();
 
   /// @brief デストラクタ
   virtual
@@ -217,10 +107,8 @@ class SmtComplexSort :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] id ID番号
   /// @param[in] elem_list 要素の型のリスト
-  SmtComplexSort(ymuint id,
-		 const vector<const SmtSort*>& elem_list);
+  SmtComplexSort(const vector<tSmtSortId>& elem_list);
 
   /// @brief デストラクタ
   virtual
@@ -241,7 +129,7 @@ public:
   /// @brief 複合型の場合の要素の型を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < elem_num )
   virtual
-  const SmtSort*
+  tSmtSortId
   elem(ymuint pos) const;
 
 
@@ -254,7 +142,7 @@ private:
   ymuint32 mElemNum;
 
   // 要素の型の配列
-  const SmtSort* mElemList[1];
+  tSmtSortId mElemList[1];
 
 };
 

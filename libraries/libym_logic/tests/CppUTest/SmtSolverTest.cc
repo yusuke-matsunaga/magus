@@ -33,13 +33,22 @@ TEST_GROUP(SmtSolverTestGroup)
     ShString::free_all_memory();
   }
 
+  // tSmtSortId が適正かテストする関数
+  void sortid_test(tSmtSortId sort)
+  {
+    CHECK( sort != kSmtSort_None );
+    CHECK( sort != kSmtSort_Bool );
+    CHECK( sort != kSmtSort_Int );
+    CHECK( sort != kSmtSort_Real );
+  }
+
   // SmtVar のテスト関数
   void var_test(const SmtVar* var,
-		const SmtSort* sort,
+		tSmtSortId sort,
 		tSmtVar var_type)
   {
     CHECK( var != NULL );
-    CHECK( var->sort() == sort );
+    LONGS_EQUAL( sort, var->sort() );
     LONGS_EQUAL( var_type, var->type() );
     switch ( var_type ) {
     case kSmtVar_Global:
@@ -74,8 +83,8 @@ TEST_GROUP(SmtSolverTestGroup)
 
   // SmtFun のテスト関数
   void fun_test(const SmtFun* fun,
-		const vector<const SmtSort*>& input_sort_list,
-		const SmtSort* output_sort,
+		const vector<tSmtSortId>& input_sort_list,
+		tSmtSortId output_sort,
 		const SmtTerm* body)
   {
     CHECK( fun != NULL );
@@ -106,7 +115,7 @@ TEST_GROUP(SmtSolverTestGroup)
 
   // 1引数の builtin function term のテスト
   void builtin_fun_test1(tSmtFun fun_type,
-			 const SmtSort* input_sort1,
+			 tSmtSortId input_sort1,
 			 bool exp)
   {
     const SmtVar* var1 = mSolver->make_var(input_sort1);
@@ -132,8 +141,8 @@ TEST_GROUP(SmtSolverTestGroup)
 
   // 2引数の builtin function term のテスト
   void builtin_fun_test2(tSmtFun fun_type,
-			 const SmtSort* input_sort1,
-			 const SmtSort* input_sort2,
+			 tSmtSortId input_sort1,
+			 tSmtSortId input_sort2,
 			 bool exp)
   {
     const SmtVar* var1 = mSolver->make_var(input_sort1);
@@ -166,9 +175,9 @@ TEST_GROUP(SmtSolverTestGroup)
 
   // 3引数の builtin function term のテスト
   void builtin_fun_test3(tSmtFun fun_type,
-			 const SmtSort* input_sort1,
-			 const SmtSort* input_sort2,
-			 const SmtSort* input_sort3,
+			 tSmtSortId input_sort1,
+			 tSmtSortId input_sort2,
+			 tSmtSortId input_sort3,
 			 bool exp)
   {
     const SmtVar* var1 = mSolver->make_var(input_sort1);
@@ -225,93 +234,103 @@ TEST(SmtSolverTestGroup, set_logic)
   CHECK( !stat2 );
 }
 
-// make_sort テスト
-TEST(SmtSolverTestGroup, make_sort)
+// make_sort テスト0
+TEST(SmtSolverTestGroup, make_sort0)
+{
+  // set_logic() を呼ばないと失敗する．
+
+  // 空の引数
+  tSmtSortId sort_id = mSolver->make_sort();
+  LONGS_EQUAL( kSmtSort_None, sort_id );
+}
+
+// make_sort テスト1
+TEST(SmtSolverTestGroup, make_sort1)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
 
   // 空の引数
-  const SmtSort* sort = mSolver->make_sort();
+  tSmtSortId sort_id = mSolver->make_sort();
+  sortid_test( sort_id );
+  const SmtSort* sort = mSolver->get_sort(sort_id);
   CHECK( sort != NULL );
-  LONGS_EQUAL( kSmtSort_UserDef, sort->type() );
+  LONGS_EQUAL( sort_id, sort->id() );
   LONGS_EQUAL( 0, sort->elem_num() );
 
   // 引数を持つ型
-  vector<const SmtSort*> elem_list(1);
-  elem_list[0] = sort;
-  const SmtSort* sort2 = mSolver->make_sort(elem_list);
+  vector<tSmtSortId> elem_list(1);
+  elem_list[0] = sort_id;
+  tSmtSortId sort_id2 = mSolver->make_sort(elem_list);
+  sortid_test(sort_id2 );
+  const SmtSort* sort2 = mSolver->get_sort(sort_id2);
   CHECK( sort2 != NULL );
-  LONGS_EQUAL( kSmtSort_UserDef, sort2->type() );
+  LONGS_EQUAL( sort_id2, sort2->id() );
   LONGS_EQUAL( 1, sort2->elem_num() );
-  CHECK( sort == sort2->elem(0) );
-
-  // 組み込み型
-  const SmtSort* bool_sort = mSolver->make_builtin_sort(kSmtSort_Bool);
-  LONGS_EQUAL( kSmtSort_Bool, bool_sort->type() );
-
-  const SmtSort* int_sort = mSolver->make_builtin_sort(kSmtSort_Int);
-  LONGS_EQUAL( kSmtSort_Int, int_sort->type() );
-
-  const SmtSort* real_sort = mSolver->make_builtin_sort(kSmtSort_Real);
-  LONGS_EQUAL( kSmtSort_Real, real_sort->type() );
+  LONGS_EQUAL( sort_id, sort2->elem(0) );
 }
 
-// make_var テスト
-TEST(SmtSolverTestGroup, make_var)
+// make_var テスト0
+TEST(SmtSolverTestGroup, make_var0)
+{
+  // set_logic() を呼ばないと失敗する．
+
+  const SmtVar* var1 = mSolver->make_var(kSmtSort_Int);
+  CHECK( var1 == NULL );
+}
+
+// make_var テスト1
+TEST(SmtSolverTestGroup, make_var1)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
 
-  const SmtSort* int_sort = mSolver->make_builtin_sort(kSmtSort_Int);
-  CHECK( int_sort != NULL );
+  tSmtSortId sort_id1 = mSolver->make_sort();
+  sortid_test( sort_id1 );
 
-  const SmtSort* bool_sort = mSolver->make_builtin_sort(kSmtSort_Bool);
-  CHECK( bool_sort );
+  const SmtVar* var1 = mSolver->make_var(kSmtSort_Int);
+  var_test( var1, kSmtSort_Int, kSmtVar_Global);
 
-  const SmtSort* sort1 = mSolver->make_sort();
-  CHECK( sort1 != NULL);
+  const SmtVar* var2 = mSolver->make_var(sort_id1, kSmtVar_FunArg);
+  var_test( var2, sort_id1, kSmtVar_FunArg);
 
-  const SmtVar* var1 = mSolver->make_var(int_sort);
-  var_test( var1, int_sort, kSmtVar_Global);
+  const SmtVar* var3 = mSolver->make_var(kSmtSort_Bool, kSmtVar_Forall);
+  var_test( var3, kSmtSort_Bool, kSmtVar_Forall);
 
-  const SmtVar* var2 = mSolver->make_var(sort1, kSmtVar_FunArg);
-  var_test( var2, sort1, kSmtVar_FunArg);
-
-  const SmtVar* var3 = mSolver->make_var(bool_sort, kSmtVar_Forall);
-  var_test( var3, bool_sort, kSmtVar_Forall);
-
-  const SmtVar* var4 = mSolver->make_var(bool_sort, kSmtVar_Exists);
-  var_test( var4, bool_sort, kSmtVar_Exists);
+  const SmtVar* var4 = mSolver->make_var(kSmtSort_Bool, kSmtVar_Exists);
+  var_test( var4, kSmtSort_Bool, kSmtVar_Exists);
 
 }
 
-// make_fun テスト
-TEST(SmtSolverTestGroup, make_fun)
+// make_fun テスト0
+TEST(SmtSolverTestGroup, make_fun0)
+{
+  // set_logic() を呼ばないと失敗する．
+
+  const SmtFun* fun1 = mSolver->make_fun(kSmtSort_Int);
+  CHECK( fun1 == NULL );
+}
+
+// make_fun テスト1
+TEST(SmtSolverTestGroup, make_fun1)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
 
-  const SmtSort* int_sort = mSolver->make_builtin_sort(kSmtSort_Int);
-  CHECK( int_sort != NULL );
+  tSmtSortId sort_id1 = mSolver->make_sort();
+  sortid_test( sort_id1 );
 
-  const SmtSort* bool_sort = mSolver->make_builtin_sort(kSmtSort_Bool);
-  CHECK( bool_sort );
+  const SmtFun* fun1 = mSolver->make_fun(kSmtSort_Int);
+  fun_test( fun1, vector<tSmtSortId>(0), kSmtSort_Int, NULL);
 
-  const SmtSort* sort1 = mSolver->make_sort();
-  CHECK( sort1 != NULL);
+  const SmtFun* fun2 = mSolver->make_fun(vector<tSmtSortId>(0), kSmtSort_Int);
+  fun_test( fun2, vector<tSmtSortId>(0), kSmtSort_Int, NULL);
 
-  const SmtFun* fun1 = mSolver->make_fun(int_sort);
-  fun_test( fun1, vector<const SmtSort*>(0), int_sort, NULL);
-
-  const SmtFun* fun2 = mSolver->make_fun(vector<const SmtSort*>(0), int_sort);
-  fun_test( fun2, vector<const SmtSort*>(0), int_sort, NULL);
-
-  vector<const SmtSort*> input_sort_list1(2);
-  input_sort_list1[0] = bool_sort;
-  input_sort_list1[1] = bool_sort;
-  const SmtFun* fun3 = mSolver->make_fun(input_sort_list1, bool_sort);
-  fun_test( fun3, input_sort_list1, bool_sort, NULL);
+  vector<tSmtSortId> input_sort_list1(2);
+  input_sort_list1[0] = kSmtSort_Bool;
+  input_sort_list1[1] = kSmtSort_Bool;
+  const SmtFun* fun3 = mSolver->make_fun(input_sort_list1, kSmtSort_Bool);
+  fun_test( fun3, input_sort_list1, kSmtSort_Bool, NULL);
 }
 
 // make_numeral_term テスト
@@ -385,10 +404,7 @@ TEST(SmtSolverTestGroup, make_var_term)
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
 
-  const SmtSort* bool_sort = mSolver->make_builtin_sort(kSmtSort_Bool);
-  CHECK( bool_sort );
-
-  const SmtVar* var1 = mSolver->make_var(bool_sort);
+  const SmtVar* var1 = mSolver->make_var(kSmtSort_Bool);
   CHECK( var1 != NULL );
 
   const SmtTerm* term1 = mSolver->make_var_term(var1);
@@ -403,10 +419,7 @@ TEST(SmtSolverTestGroup, make_fun_term1)
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
 
-  const SmtSort* bool_sort = mSolver->make_builtin_sort(kSmtSort_Bool);
-  CHECK( bool_sort );
-
-  const SmtFun* fun0 = mSolver->make_fun(bool_sort);
+  const SmtFun* fun0 = mSolver->make_fun(kSmtSort_Bool);
   CHECK( fun0 != NULL );
   const SmtTerm* term0 = mSolver->make_fun_term(fun0);
   CHECK( term0 != NULL );
@@ -418,16 +431,16 @@ TEST(SmtSolverTestGroup, make_fun_term1)
   LONGS_EQUAL( SmtTerm::kFunTerm, term1->type() );
   CHECK( fun0 == term1->function() );
 
-  vector<const SmtSort*> input_sort_list1(2);
-  input_sort_list1[0] = bool_sort;
-  input_sort_list1[1] = bool_sort;
-  const SmtFun* fun1 = mSolver->make_fun(input_sort_list1, bool_sort);
+  vector<tSmtSortId> input_sort_list1(2);
+  input_sort_list1[0] = kSmtSort_Bool;
+  input_sort_list1[1] = kSmtSort_Bool;
+  const SmtFun* fun1 = mSolver->make_fun(input_sort_list1, kSmtSort_Bool);
   CHECK( fun1 != NULL );
 
-  const SmtVar* var1 = mSolver->make_var(bool_sort);
+  const SmtVar* var1 = mSolver->make_var(kSmtSort_Bool);
   CHECK( var1 != NULL );
 
-  const SmtVar* var2 = mSolver->make_var(bool_sort);
+  const SmtVar* var2 = mSolver->make_var(kSmtSort_Bool);
   CHECK( var2 != NULL );
 
   vector<const SmtTerm*> arg_list(2);
@@ -485,38 +498,29 @@ TEST(SmtSolverTestGroup, make_fun_term3)
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
 
-  const SmtSort* bool_sort = mSolver->make_builtin_sort(kSmtSort_Bool);
-  CHECK( bool_sort != NULL );
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
 
-  const SmtSort* int_sort = mSolver->make_builtin_sort(kSmtSort_Int);
-  CHECK( int_sort != NULL );
-
-  const SmtSort* real_sort = mSolver->make_builtin_sort(kSmtSort_Real);
-  CHECK( real_sort != NULL );
-
-  const SmtSort* sort1 = mSolver->make_sort();
-  CHECK( sort1 != NULL);
-
-  const SmtSort* sort2 = mSolver->make_sort();
-  CHECK( sort2 != NULL);
+  tSmtSortId sort2 = mSolver->make_sort();
+  sortid_test( sort2 );
 
   // まずは成功する例
-  builtin_fun_test1(kSmtFun_Not, bool_sort, true);
-  builtin_fun_test1(kSmtFun_Uminus, int_sort, true);
-  builtin_fun_test1(kSmtFun_Uminus, real_sort, true);
+  builtin_fun_test1(kSmtFun_Not, kSmtSort_Bool, true);
+  builtin_fun_test1(kSmtFun_Uminus, kSmtSort_Int, true);
+  builtin_fun_test1(kSmtFun_Uminus, kSmtSort_Real, true);
 
 #if 0
   // 型が合わなくて失敗する例
-  builtin_fun_test1(kSmtFun_Not, int_sort, false);
-  builtin_fun_test1(kSmtFun_Not, real_sort, false);
+  builtin_fun_test1(kSmtFun_Not, kSmtSort_Int, false);
+  builtin_fun_test1(kSmtFun_Not, kSmtSort_Real, false);
   builtin_fun_test1(kSmtFun_Not, sort1, false);
 
-  builtin_fun_test1(kSmtFun_Uminus, bool_sort, false);
+  builtin_fun_test1(kSmtFun_Uminus, kSmtSort_Bool, false);
   builtin_fun_test1(kSmtFun_Uminus, sort1, false);
 
   // 引数の数が合わなくて失敗する例
-  builtin_fun_test1(kSmtFun_True, bool_sort, false);
-  builtin_fun_test1(kSmtFun_False, bool_sort, false);
+  builtin_fun_test1(kSmtFun_True, kSmtSort_Bool, false);
+  builtin_fun_test1(kSmtFun_False, kSmtSort_Bool, false);
 #endif
 }
 
@@ -526,47 +530,38 @@ TEST(SmtSolverTestGroup, make_fun_term4)
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LRA);
   CHECK( stat1 );
 
-  const SmtSort* bool_sort = mSolver->make_builtin_sort(kSmtSort_Bool);
-  CHECK( bool_sort != NULL );
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
 
-  const SmtSort* int_sort = mSolver->make_builtin_sort(kSmtSort_Int);
-  CHECK( int_sort != NULL );
-
-  const SmtSort* real_sort = mSolver->make_builtin_sort(kSmtSort_Real);
-  CHECK( real_sort != NULL );
-
-  const SmtSort* sort1 = mSolver->make_sort();
-  CHECK( sort1 != NULL);
-
-  const SmtSort* sort2 = mSolver->make_sort();
-  CHECK( sort2 != NULL);
+  tSmtSortId sort2 = mSolver->make_sort();
+  sortid_test( sort2 );
 
 
-  builtin_fun_test2(kSmtFun_And, bool_sort, bool_sort, true);
-  builtin_fun_test2(kSmtFun_Or, bool_sort, bool_sort, true);
-  builtin_fun_test2(kSmtFun_Xor, bool_sort, bool_sort, true);
-  builtin_fun_test2(kSmtFun_Imp, bool_sort, bool_sort, true);
+  builtin_fun_test2(kSmtFun_And, kSmtSort_Bool, kSmtSort_Bool, true);
+  builtin_fun_test2(kSmtFun_Or, kSmtSort_Bool, kSmtSort_Bool, true);
+  builtin_fun_test2(kSmtFun_Xor, kSmtSort_Bool, kSmtSort_Bool, true);
+  builtin_fun_test2(kSmtFun_Imp, kSmtSort_Bool, kSmtSort_Bool, true);
 
   builtin_fun_test2(kSmtFun_Eq, sort1, sort1, true);
   builtin_fun_test2(kSmtFun_Diseq, sort1, sort1, true);
 
-  builtin_fun_test3(kSmtFun_Ite, bool_sort, sort1, sort1, true);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, sort1, sort1, true);
 
-  builtin_fun_test2(kSmtFun_Add, int_sort, int_sort, true);
-  builtin_fun_test2(kSmtFun_Sub, int_sort, int_sort, true);
-  builtin_fun_test2(kSmtFun_Mul, int_sort, int_sort, true);
-  builtin_fun_test2(kSmtFun_Le, int_sort, int_sort, true);
-  builtin_fun_test2(kSmtFun_Lt, int_sort, int_sort, true);
-  builtin_fun_test2(kSmtFun_Ge, int_sort, int_sort, true);
-  builtin_fun_test2(kSmtFun_Gt, int_sort, int_sort, true);
+  builtin_fun_test2(kSmtFun_Add, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test2(kSmtFun_Sub, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test2(kSmtFun_Mul, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test2(kSmtFun_Le, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test2(kSmtFun_Lt, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Int, kSmtSort_Int, true);
 
-  builtin_fun_test2(kSmtFun_Add, real_sort, real_sort, true);
-  builtin_fun_test2(kSmtFun_Sub, real_sort, real_sort, true);
-  builtin_fun_test2(kSmtFun_Mul, real_sort, real_sort, true);
-  builtin_fun_test2(kSmtFun_Div, real_sort, real_sort, true);
-  builtin_fun_test2(kSmtFun_Le, real_sort, real_sort, true);
-  builtin_fun_test2(kSmtFun_Lt, real_sort, real_sort, true);
-  builtin_fun_test2(kSmtFun_Ge, real_sort, real_sort, true);
-  builtin_fun_test2(kSmtFun_Gt, real_sort, real_sort, true);
+  builtin_fun_test2(kSmtFun_Add, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test2(kSmtFun_Sub, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test2(kSmtFun_Mul, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test2(kSmtFun_Div, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test2(kSmtFun_Le, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test2(kSmtFun_Lt, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Real, kSmtSort_Real, true);
 
 }

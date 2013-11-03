@@ -130,10 +130,10 @@ SmtNumTerm::type() const
 }
 
 // @brief 関連付けられている SmtSort を返す．
-const SmtSort*
+tSmtSortId
 SmtNumTerm::sort() const
 {
-  return NULL;
+  return kSmtSort_Int;
 }
 
 // @brief kNumConst 型の場合に整数値を返す．
@@ -168,10 +168,10 @@ SmtStrTerm::type() const
 }
 
 // @brief 関連付けられている SmtSort を返す．
-const SmtSort*
+tSmtSortId
 SmtStrTerm::sort() const
 {
-  return NULL;
+  return kSmtSort_None;
 }
 
 // @brief kDecConst/kHexConst/kBinConst/kStrConst 型の場合に文字列を返す．
@@ -206,10 +206,10 @@ SmtDecTerm::type() const
 }
 
 // @brief 関連付けられている SmtSort を返す．
-const SmtSort*
+tSmtSortId
 SmtDecTerm::sort() const
 {
-  return NULL;
+  return kSmtSort_Real;
 }
 
 
@@ -237,10 +237,10 @@ SmtHexTerm::type() const
 }
 
 // @brief 関連付けられている SmtSort を返す．
-const SmtSort*
+tSmtSortId
 SmtHexTerm::sort() const
 {
-  return NULL;
+  return kSmtSort_Int;
 }
 
 
@@ -268,10 +268,10 @@ SmtBinTerm::type() const
 }
 
 // @brief 関連付けられている SmtSort を返す．
-const SmtSort*
+tSmtSortId
 SmtBinTerm::sort() const
 {
-  return NULL;
+  return kSmtSort_Int;
 }
 
 
@@ -306,7 +306,7 @@ SmtVarTerm::var() const
 }
 
 // @brief 関連付けられている SmtSort を返す．
-const SmtSort*
+tSmtSortId
 SmtVarTerm::sort() const
 {
   return mVar->sort();
@@ -337,7 +337,7 @@ SmtFunTerm1::type() const
 }
 
 // @brief 関連付けられている SmtSort を返す．
-const SmtSort*
+tSmtSortId
 SmtFunTerm1::sort() const
 {
   return mFun->output_sort();
@@ -437,7 +437,7 @@ SmtFunTerm3::type() const
 }
 
 // @brief 関連付けられている SmtSort を返す．
-const SmtSort*
+tSmtSortId
 SmtFunTerm3::sort() const
 {
   switch ( function_type() ) {
@@ -454,7 +454,7 @@ SmtFunTerm3::sort() const
   case kSmtFun_Lt:
   case kSmtFun_Ge:
   case kSmtFun_Gt: // bool
-    return NULL;
+    return kSmtSort_Bool;
 
   case kSmtFun_Uminus:
   case kSmtFun_Add:
@@ -568,7 +568,7 @@ SmtQualTerm::~SmtQualTerm()
 }
 
 // @brief 関連付けられている SmtSort を返す．
-const SmtSort*
+tSmtSortId
 SmtQualTerm::sort() const
 {
   return mBody->sort();

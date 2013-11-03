@@ -32,6 +32,7 @@ TEST_GROUP(SortMgrTestGroup)
   TEST_SETUP() {
     alloc = new SimpleAlloc(4096);
     mSolver = SmtSolver::new_solver();
+    mSolver->set_logic(kSmtLogic_QF_LIA);
     mIdMgr = new IdMgr(*alloc);
     mSortMgr = new SortMgr(*alloc, *mSolver, 0, NULL);
   }
@@ -74,7 +75,10 @@ TEST(SortMgrTestGroup, simple_sort)
   bool stat1 = mSortMgr->declare_sort(id, 0);
   CHECK( stat1 );
 
-  const SmtSort* sort = mSortMgr->make_sort(id);
+  tSmtSortId sort_id = mSortMgr->make_sort(id);
+  CHECK( sort_id != kSmtSort_None );
+
+  const SmtSort* sort = mSolver->get_sort(sort_id);
 
   // sort は NULL ではないはず
   CHECK( sort != NULL );
@@ -87,15 +91,18 @@ TEST(SortMgrTestGroup, simple_sort)
   bool stat2 = mSortMgr->declare_sort(id2, 0);
   CHECK( stat2 );
 
-  const SmtSort* sort1 = mSortMgr->make_sort(id2);
+  tSmtSortId sort_id1 = mSortMgr->make_sort(id2);
+  CHECK( sort_id1 != kSmtSort_None );
+
+  const SmtSort* sort1 = mSolver->get_sort(sort_id1);
   CHECK( sort1 != NULL );
 
-  vector<const SmtSort*> elem_list(1);
-  elem_list[0] = sort1;
+  vector<tSmtSortId> elem_list(1);
+  elem_list[0] = sort_id1;
   // (a (b)) という型を作る．
-  const SmtSort* sort2 = mSortMgr->make_sort(id, elem_list);
+  tSmtSortId sort_id2 = mSortMgr->make_sort(id, elem_list);
   // もちろん失敗するはず．
-  CHECK( sort2 == NULL );
+  CHECK( sort_id2 == kSmtSort_None );
 }
 
 // 複雑な型を作るテスト
@@ -108,7 +115,9 @@ TEST(SortMgrTestGroup, complex_sort)
   bool stat1 = mSortMgr->declare_sort(id_b, 0);
   CHECK( stat1 );
 
-  const SmtSort* sort_b = mSortMgr->make_sort(id_b);
+  tSmtSortId sort_b_id = mSortMgr->make_sort(id_b);
+  CHECK( sort_b_id != kSmtSort_None );
+  const SmtSort* sort_b = mSolver->get_sort(sort_b_id);
   CHECK( sort_b != NULL );
 
   const SmtId* id_a = mIdMgr->make_id(ShString("a"));
@@ -117,19 +126,20 @@ TEST(SortMgrTestGroup, complex_sort)
   bool stat2 = mSortMgr->declare_sort(id_a, 1);
   CHECK( stat2 );
 
-  vector<const SmtSort*> elem_list(1);
-  elem_list[0] = sort_b;
+  vector<tSmtSortId> elem_list(1);
+  elem_list[0] = sort_b_id;
   // a (b) という型を作る．
-  const SmtSort* sort_a = mSortMgr->make_sort(id_a, elem_list);
-
+  tSmtSortId sort_a_id = mSortMgr->make_sort(id_a, elem_list);
   // これは成功するはず
+  CHECK( sort_a_id != kSmtSort_None );
+  const SmtSort* sort_a = mSolver->get_sort(sort_a_id);
   CHECK( sort_a != NULL );
 
   // 要素数は 1
   LONGS_EQUAL( 1, sort_a->elem_num() );
 
   // 0 番目の要素型は sort_b のはず．
-  CHECK( sort_b = sort_a->elem(0) );
+  CHECK( sort_b_id = sort_a->elem(0) );
 }
 
 // 単純な型の同一性テスト
@@ -142,15 +152,17 @@ TEST(SortMgrTestGroup, simple_identity)
   bool stat1 = mSortMgr->declare_sort(id_a, 0);
   CHECK( stat1 );
 
-  const SmtSort* sort_a = mSortMgr->make_sort(id_a);
+  tSmtSortId sort_a_id = mSortMgr->make_sort(id_a);
+  CHECK( sort_a_id != kSmtSort_None );
+  const SmtSort* sort_a = mSolver->get_sort(sort_a_id);
   CHECK( sort_a != NULL );
 
   // もう一回 a という単純な型を作る．
-  const SmtSort* sort_a1 = mSortMgr->make_sort(id_a);
-  CHECK( sort_a1 != NULL );
+  tSmtSortId sort_a1_id = mSortMgr->make_sort(id_a);
+  CHECK( sort_a1_id != kSmtSort_None );
 
   // この2つは同一のはず．
-  CHECK( sort_a == sort_a1 );
+  CHECK( sort_a_id == sort_a1_id );
 }
 
 // 複雑な型の同一性テスト
@@ -163,7 +175,9 @@ TEST(SortMgrTestGroup, complex_identity)
   bool stat1 = mSortMgr->declare_sort(id_b, 0);
   CHECK( stat1 );
 
-  const SmtSort* sort_b = mSortMgr->make_sort(id_b);
+  tSmtSortId sort_b_id = mSortMgr->make_sort(id_b);
+  CHECK( sort_b_id != kSmtSort_None );
+  const SmtSort* sort_b = mSolver->get_sort(sort_b_id);
   CHECK( sort_b != NULL );
 
   // a (b) という型を作る．
@@ -173,19 +187,20 @@ TEST(SortMgrTestGroup, complex_identity)
   bool stat2 = mSortMgr->declare_sort(id_a, 1);
   CHECK( stat2 );
 
-  vector<const SmtSort*> elem_list(1);
-  elem_list[0] = sort_b;
-  const SmtSort* sort_a = mSortMgr->make_sort(id_a, elem_list);
+  vector<tSmtSortId> elem_list(1);
+  elem_list[0] = sort_b_id;
+  tSmtSortId sort_a_id = mSortMgr->make_sort(id_a, elem_list);
+  CHECK( sort_a_id != kSmtSort_None );
+  const SmtSort* sort_a = mSolver->get_sort(sort_a_id);
   CHECK( sort_a != NULL );
 
   // もう一回 a(b) という型を作る．
-  vector<const SmtSort*> elem_list1(1);
-  elem_list1[0] = sort_b;
-  const SmtSort* sort_a1 = mSortMgr->make_sort(id_a, elem_list1);
-  CHECK( sort_a1 != NULL );
-
+  vector<tSmtSortId> elem_list1(1);
+  elem_list1[0] = sort_b_id;
+  tSmtSortId sort_a1_id = mSortMgr->make_sort(id_a, elem_list1);
+  CHECK( sort_a1_id != kSmtSort_None );
   // この2つは同一のはず．
-  CHECK( sort_a == sort_a1 );
+  CHECK( sort_a_id == sort_a1_id );
 }
 
 // 型パラメータの生成テスト
@@ -257,12 +272,16 @@ TEST(SortMgrTestGroup, alias1)
   bool stat2 = mSortMgr->declare_sort(id_x, 0);
   CHECK( stat2 );
 
-  const SmtSort* sort_x = mSortMgr->make_sort(id_x);
+  tSmtSortId sort_x_id = mSortMgr->make_sort(id_x);
+  CHECK( sort_x_id != kSmtSort_None );
+  const SmtSort* sort_x = mSolver->get_sort(sort_x_id);
   CHECK( sort_x != NULL );
 
-  vector<const SmtSort*> elem_list1(1);
-  elem_list1[0] = sort_x;
-  const SmtSort* sort_bx = mSortMgr->make_sort(id_b, elem_list1);
+  vector<tSmtSortId> elem_list1(1);
+  elem_list1[0] = sort_x_id;
+  tSmtSortId sort_bx_id = mSortMgr->make_sort(id_b, elem_list1);
+  CHECK( sort_bx_id != kSmtSort_None );
+  const SmtSort* sort_bx = mSolver->get_sort(sort_bx_id);
 
   // これは成功するはず．
   CHECK( sort_bx != NULL );
@@ -271,10 +290,10 @@ TEST(SortMgrTestGroup, alias1)
   LONGS_EQUAL( 2, sort_bx->elem_num() );
 
   // sort_bx の0番めの要素は sort_x
-  CHECK( sort_bx->elem(0) == sort_x );
+  CHECK( sort_bx->elem(0) == sort_x_id );
 
   // sort_bx の1番目の要素は sort_x
-  CHECK( sort_bx->elem(1) == sort_x );
+  CHECK( sort_bx->elem(1) == sort_x_id );
 
 }
 

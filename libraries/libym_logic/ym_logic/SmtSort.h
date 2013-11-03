@@ -34,16 +34,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 組み込み型を返す．
-  /// @note 普通の型は kSmtSort_UserDef を返す．
-  virtual
-  tSmtSort
-  type() const = 0;
-
   /// @brief ID 番号を返す．
   /// @note ID 番号はすべての型の中で唯一のもの
   virtual
-  ymuint
+  tSmtSortId
   id() const = 0;
 
   /// @brief 複合型の場合の要素数を返す．
@@ -52,15 +46,15 @@ public:
   ymuint
   elem_num() const = 0;
 
-  /// @brief 複合型の場合の要素の型を返す．
+  /// @brief 複合型の場合の要素の型番号を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < elem_num )
   virtual
-  const SmtSort*
+  tSmtSortId
   elem(ymuint pos) const = 0;
 
   /// @brief ハッシュ値を返す．
   virtual
-  ymuint
+  ymuint32
   hash() const = 0;
 
 };

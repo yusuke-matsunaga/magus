@@ -121,7 +121,7 @@ public:
   type() const;
 
   /// @brief 関連付けられている SmtSort を返す．
-  const SmtSort*
+  tSmtSortId
   sort() const;
 
   /// @brief kNumConst 型の場合に整数値を返す．
@@ -172,7 +172,7 @@ public:
   type() const;
 
   /// @brief 関連付けられている SmtSort を返す．
-  const SmtSort*
+  tSmtSortId
   sort() const;
 
   /// @brief kDecConst/kHexConst/kBinConst/kStrConst 型の場合に文字列を返す．
@@ -223,7 +223,7 @@ public:
   type() const;
 
   /// @brief 関連付けられている SmtSort を返す．
-  const SmtSort*
+  tSmtSortId
   sort() const;
 
 };
@@ -260,7 +260,7 @@ public:
   type() const;
 
   /// @brief 関連付けられている SmtSort を返す．
-  const SmtSort*
+  tSmtSortId
   sort() const;
 
 };
@@ -297,7 +297,7 @@ public:
   type() const;
 
   /// @brief 関連付けられている SmtSort を返す．
-  const SmtSort*
+  tSmtSortId
   sort() const;
 
 };
@@ -334,7 +334,7 @@ public:
   type() const;
 
   /// @brief 関連付けられている SmtSort を返す．
-  const SmtSort*
+  tSmtSortId
   sort() const;
 
   /// @brief kVarTerm 型の場合に関数を返す．
@@ -385,7 +385,7 @@ public:
   type() const;
 
   /// @brief 関連付けられている SmtSort を返す．
-  const SmtSort*
+  tSmtSortId
   sort() const;
 
   /// @brief kFunTerm 型の場合に関数の型を返す．
@@ -505,7 +505,7 @@ public:
   type() const;
 
   /// @brief 関連付けられている SmtSort を返す．
-  const SmtSort*
+  tSmtSortId
   sort() const;
 
   /// @brief kFunTerm 型の場合に関数の型を返す．
@@ -623,7 +623,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 関連付けられている SmtSort を返す．
-  const SmtSort*
+  tSmtSortId
   sort() const;
 
   /// @brief kForall/kExists 型の場合に変数リストの要素数を返す．

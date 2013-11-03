@@ -77,15 +77,23 @@ enum tSmtLogic {
 };
 
 
-//////////////////////////////////////////////////////////////////////
-/// @class 組み込み型を表す列挙型
-//////////////////////////////////////////////////////////////////////
-enum tSmtSort {
-  kSmtSort_UserDef,    // 一般の型
-  kSmtSort_Bool,       // Bool 型
-  kSmtSort_Int,        // 整数型
-  kSmtSort_Real        // 実数型
-};
+/// @brief 型番号の型
+typedef ymuint32 tSmtSortId;
+
+/// @brief tSmtSortId の不適切な値
+const tSmtSortId kSmtSort_None = 0;
+
+/// @brief Bool 型を表す定数
+const tSmtSortId kSmtSort_Bool = 1;
+
+/// @brief 整数型を表す定数
+const tSmtSortId kSmtSort_Int = 2;
+
+/// @brief 実数型を表す定数
+const tSmtSortId kSmtSort_Real = 3;
+
+/// @brief ユーザー定義型の定数の最初の値
+const tSmtSortId kSmtSort_User1 = 4;
 
 
 //////////////////////////////////////////////////////////////////////

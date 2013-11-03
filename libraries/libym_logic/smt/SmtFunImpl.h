@@ -27,7 +27,7 @@ protected:
 
   /// @brief コンストラクタ
   /// @param[in] output_sort 出力の型
-  SmtFunImpl(const SmtSort* output_sort);
+  SmtFunImpl(tSmtSortId output_sort);
 
   /// @brief デストラクタ
   virtual
@@ -47,7 +47,7 @@ public:
   /// @brief 入力の型を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
   virtual
-  const SmtSort*
+  tSmtSortId
   input_sort(ymuint pos) const;
 
   /// @brief 入力変数を返す．
@@ -59,7 +59,7 @@ public:
 
   /// @brief 出力の型を返す．
   virtual
-  const SmtSort*
+  tSmtSortId
   output_sort() const;
 
   /// @brief 本体の式を返す．
@@ -75,7 +75,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 出力の型
-  const SmtSort* mOutputSort;
+  tSmtSortId mOutputSort;
 
 };
 
@@ -93,7 +93,7 @@ protected:
 
   /// @brief コンストラクタ
   /// @param[in] output_sort 出力の型
-  SmtDeclFun1(const SmtSort* output_sort);
+  SmtDeclFun1(tSmtSortId output_sort);
 
   /// @brief デストラクタ
   virtual
@@ -116,8 +116,8 @@ protected:
   /// @brief コンストラクタ
   /// @param[in] input_sort_list 入力の型のリスト
   /// @param[in] output_sort 出力の型
-  SmtDeclFun2(const vector<const SmtSort*>& input_sort_list,
-	      const SmtSort* output_sort);
+  SmtDeclFun2(const vector<tSmtSortId>& input_sort_list,
+	      tSmtSortId output_sort);
 
   /// @brief デストラクタ
   virtual
@@ -137,7 +137,7 @@ public:
   /// @brief 入力の型を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
   virtual
-  const SmtSort*
+  tSmtSortId
   input_sort(ymuint pos) const;
 
   /// @brief 入力変数を返す．
@@ -158,7 +158,7 @@ private:
 
   // 入力の型の配列
   // 実際には必要な領域を確保する．
-  const SmtSort* mInputList[1];
+  tSmtSortId mInputList[1];
 
 };
 
@@ -177,7 +177,7 @@ protected:
   /// @brief コンストラクタ
   /// @param[in] output_sort 出力の型
   /// @param[in] body 本体
-  SmtDefFun1(const SmtSort* output_sort,
+  SmtDefFun1(tSmtSortId output_sort,
 	     const SmtTerm* body);
 
   /// @brief デストラクタ
@@ -224,7 +224,7 @@ private:
   /// @param[in] output_sort 出力の型
   /// @param[in] body 本体
   SmtDefFun2(const vector<const SmtVar*>& input_var_list,
-	     const SmtSort* output_sort,
+	     tSmtSortId output_sort,
 	     const SmtTerm* body);
 
   /// @brief デストラクタ
@@ -245,7 +245,7 @@ public:
   /// @brief 入力の型を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
   virtual
-  const SmtSort*
+  tSmtSortId
   input_sort(ymuint pos) const;
 
   /// @brief 入力変数を返す．

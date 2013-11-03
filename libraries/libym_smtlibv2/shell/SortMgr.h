@@ -86,9 +86,9 @@ public:
   /// エラーの原因は以下のとおり
   ///  - name_id という名の型が定義されていなかった．
   ///  - name_id という名の型のパラメータ数が param_list のサイズと異なった．
-  const SmtSort*
+  tSmtSortId
   make_sort(const SmtId* name_id,
-	    const vector<const SmtSort*>& param_list = vector<const SmtSort*>(0));
+	    const vector<tSmtSortId>& param_list = vector<tSmtSortId>(0));
 
 
 private:
@@ -127,22 +127,22 @@ private:
   /// @return 登録されていなければ NULL を返す．
   const SmtSort*
   find_sort(const SmtId* name_id,
-	    const vector<const SmtSort*>& elem_list);
+	    const vector<tSmtSortId>& elem_list);
 
   /// @brief テンプレートから実際の型を作る．
   /// @param[in] sort_templ テンプレート
   /// @param[in] param_list パラメータリスト
-  const SmtSort*
+  tSmtSortId
   replace_param(const SortElem* sort_templ,
-		const vector<const SmtSort*>& param_list);
+		const vector<tSmtSortId>& param_list);
 
   /// @brief 型を作る．
   /// @param[in] name_id 型名を表す識別子
   /// @param[in] param_list 要素の型のリスト
   /// @return 生成した型を返す．
-  const SmtSort*
+  tSmtSortId
   _make_sort(const SmtId* name_id,
-	     const vector<const SmtSort*>& param_list = vector<const SmtSort*>(0));
+	     const vector<tSmtSortId>& param_list = vector<tSmtSortId>(0));
 
   /// @brief 型テンプレート用のハッシュ表を拡大する．
   /// @param[in] req_size 新しいサイズ

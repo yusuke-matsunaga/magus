@@ -10,7 +10,6 @@
 #include "CppUTest/TestHarness.h"
 
 #include "ym_logic/SmtSolver.h"
-#include "ym_logic/SmtSort.h"
 #include "ym_logic/SmtTerm.h"
 #include "ym_logic/SmtVar.h"
 #include "ym_logic/SmtFun.h"
@@ -39,6 +38,7 @@ TEST_GROUP(NameMgrTestGroup)
   TEST_SETUP() {
     alloc = new SimpleAlloc(4096);
     mSolver = SmtSolver::new_solver();
+    mSolver->set_logic(kSmtLogic_QF_LIA);
     mIdMgr = new IdMgr(*alloc);
     mSortMgr = new SortMgr(*alloc, *mSolver, 0, NULL);
     mNameMgr = new NameMgr(*alloc, 0, NULL);
@@ -69,14 +69,14 @@ TEST(NameMgrTestGroup, reg_fun)
   bool stat0 = mSortMgr->declare_sort(id_a, 0);
   CHECK( stat0 );
 
-  const SmtSort* sort_a = mSortMgr->make_sort(id_a);
-  CHECK( sort_a != NULL );
+  tSmtSortId sort_a = mSortMgr->make_sort(id_a);
+  CHECK( sort_a != kSmtSort_None );
 
   // (declare-fun f () a)
   const SmtId* id_f = mIdMgr->make_id(ShString("f"));
   CHECK( id_f != NULL );
 
-  vector<const SmtSort*> input_list0(0);
+  vector<tSmtSortId> input_list0(0);
   const SmtFun* fun_f = mSolver->make_fun(input_list0, sort_a);
   CHECK( fun_f != NULL );
 
@@ -112,8 +112,8 @@ TEST(NameMgrTestGroup, reg_var)
   bool stat0 = mSortMgr->declare_sort(id_a, 0);
   CHECK( stat0 );
 
-  const SmtSort* sort_a = mSortMgr->make_sort(id_a);
-  CHECK( sort_a != NULL );
+  tSmtSortId sort_a = mSortMgr->make_sort(id_a);
+  CHECK( sort_a != kSmtSort_None );
 
   const SmtVar* var = mSolver->make_var(sort_a);
   CHECK( var != NULL );
@@ -132,7 +132,7 @@ TEST(NameMgrTestGroup, reg_var)
   // 二度目はエラーとなる．
   CHECK( !stat2 );
 
-  vector<const SmtSort*> input_list0(0);
+  vector<tSmtSortId> input_list0(0);
   const SmtFun* fun_f = mSolver->make_fun(input_list0, sort_a);
   CHECK( fun_f != NULL );
 

@@ -182,9 +182,9 @@ private:
   /// エラーの原因は以下のとおり
   ///  - name_id という名の型が登録されていなかった．
   ///  - 登録されている型と elem_list のサイズが異なった．
-  const SmtSort*
+  tSmtSortId
   make_sort(const SmtId* name_id,
-	    const vector<const SmtSort*>& elem_list = vector<const SmtSort*>(0));
+	    const vector<tSmtSortId>& elem_list = vector<tSmtSortId>(0));
 
   /// @brief 名前から変数か関数を探す
   /// @param[in] name_id 名前を表す識別子
@@ -208,7 +208,7 @@ private:
   /// @brief S式を sort に変換する．
   /// @param[in] node S式を表すノード
   /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
-  const SmtSort*
+  tSmtSortId
   eval_as_sort(const SmtLibNode* node);
 
   /// @brief S式を sort に変換する．
@@ -276,7 +276,7 @@ private:
   bool
   eval_as_sorted_var(const SmtLibNode* node,
 		     const SmtId*& id,
-		     const SmtSort*& sort);
+		     tSmtSortId& sort);
 
   /// @brief 引数のリストをパーズする．
   /// @param[in] arg_top 引数の先頭のノード
@@ -307,10 +307,10 @@ private:
 
   /// @brief 組み込み型と名前を結びつける．
   /// @param[in] name 名前
-  /// @param[in] sort_type 組み込み型
+  /// @param[in] sort_id 組み込み型の番号
   void
   bind_builtin_sort(const char* name,
-		    tSmtSort sort_type);
+		    tSmtSortId sort_id);
 
   /// @brief 組み込み関数と名前を結びつける．
   /// @param[in] name 名前
@@ -372,7 +372,7 @@ private:
   SmtSolver* mSolver;
 
   // 組み込み型を保持するハッシュ表
-  hash_map<ymuint32, const SmtSort*> mBuiltinSortMap;
+  hash_map<ymuint32, tSmtSortId> mBuiltinSortMap;
 
   // スタック
   vector<StackPage*> mStack;

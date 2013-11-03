@@ -49,7 +49,7 @@ public:
   /// @brief 入力の型を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
   virtual
-  const SmtSort*
+  tSmtSortId
   input_sort(ymuint pos) const = 0;
 
   /// @brief 入力変数を返す．
@@ -61,7 +61,7 @@ public:
 
   /// @brief 出力の型を返す．
   virtual
-  const SmtSort*
+  tSmtSortId
   output_sort() const = 0;
 
   /// @brief 本体の式を返す．

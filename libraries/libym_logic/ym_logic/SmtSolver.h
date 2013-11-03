@@ -53,38 +53,38 @@ public:
   set_logic(tSmtLogic logic) = 0;
 
   /// @brief 型を作る．(単純型)
-  /// @param[in] elem_list 要素の型のリスト
-  /// @return 作成した型を返す．
+  /// @return 作成した型番号を返す．
   ///
-  /// エラーが起きた場合には NULL を返す．
+  /// エラーが起きた場合には kSmtSort_None を返す．
   /// エラーとなる原因は以下のとおり
   ///  - set_logic() が呼ばれていない．
   virtual
-  const SmtSort*
+  tSmtSortId
   make_sort() = 0;
 
   /// @brief 型を作る．(複合型)
   /// @param[in] elem_list 要素の型のリスト
   /// @return 作成した型を返す．
   ///
-  /// エラーが起きた場合には NULL を返す．
+  /// エラーが起きた場合には kSmtSort_None を返す．
   /// エラーとなる原因は以下のとおり
   ///  - set_logic() が呼ばれていない．
   virtual
-  const SmtSort*
-  make_sort(const vector<const SmtSort*>& elem_list) = 0;
+  tSmtSortId
+  make_sort(const vector<tSmtSortId>& elem_list) = 0;
 
-  /// @brief 組み込み型を作る．
-  /// @param[in] type 型の種類
-  /// @return 作成した型を返す．
+  /// @brief 型番号から SmtSort を得る．
+  /// @param[in] id 型番号
+  /// @return SmtSort を返す．
   ///
   /// エラーが起きた場合には NULL を返す．
   /// エラーとなる原因は以下のとおり
   ///  - set_logic() が呼ばれていない．
   ///  - set_logic() で使える組み込み型ではない．
+  ///  - 存在しない型番号だった．
   virtual
   const SmtSort*
-  make_builtin_sort(tSmtSort type) = 0;
+  get_sort(tSmtSortId id) = 0;
 
   /// @brief 変数を作る．
   /// @param[in] sort 変数の型
@@ -96,7 +96,7 @@ public:
   ///  - set_logic() が呼ばれていない．
   virtual
   const SmtVar*
-  make_var(const SmtSort* sort,
+  make_var(tSmtSortId sort,
 	   tSmtVar type = kSmtVar_Global) = 0;
 
   /// @brief 関数を作る．(引数なし)
@@ -108,7 +108,7 @@ public:
   ///  - set_logic() が呼ばれていない．
   virtual
   const SmtFun*
-  make_fun(const SmtSort* output_sort) = 0;
+  make_fun(tSmtSortId output_sort) = 0;
 
   /// @brief 関数を作る．
   /// @param[in] input_sort_list 入力の型のリスト
@@ -120,11 +120,10 @@ public:
   ///  - set_logic() が呼ばれていない．
   virtual
   const SmtFun*
-  make_fun(const vector<const SmtSort*>& input_sort_list,
-	   const SmtSort* output_sort) = 0;
+  make_fun(const vector<tSmtSortId>& input_sort_list,
+	   tSmtSortId output_sort) = 0;
 
   /// @brief 内容を持った関数を作る．(引数なし)
-  /// @param[in] output_sort 出力の型
   /// @param[in] body 本体を式
   /// @return 作成した関数を返す．
   ///
@@ -133,12 +132,10 @@ public:
   ///  - set_logic() が呼ばれていない．
   virtual
   const SmtFun*
-  make_fun(const SmtSort* output_sort,
-	   const SmtTerm* body) = 0;
+  make_fun(const SmtTerm* body) = 0;
 
   /// @brief 内容を持った関数を作る．
   /// @param[in] input_var_list 入力の変数のリスト
-  /// @param[in] output_sort 出力の型
   /// @param[in] body 本体を式
   /// @return 作成した関数を返す．
   ///
@@ -148,7 +145,6 @@ public:
   virtual
   const SmtFun*
   make_fun(const vector<const SmtVar*>& input_var_list,
-	   const SmtSort* output_sort,
 	   const SmtTerm* body) = 0;
 
   /// @brief <numeral> 型の term を作る．
