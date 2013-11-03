@@ -523,7 +523,7 @@ TEST(SmtSolverTestGroup, make_fun_term3)
 // make_fun_term テスト4
 TEST(SmtSolverTestGroup, make_fun_term4)
 {
-  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LRA);
   CHECK( stat1 );
 
   const SmtSort* bool_sort = mSolver->make_builtin_sort(kSmtSort_Bool);

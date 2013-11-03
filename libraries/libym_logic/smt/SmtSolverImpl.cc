@@ -118,6 +118,7 @@ SmtSolverImpl::set_logic(tSmtLogic logic)
 
   case kSmtLogic_QF_LRA:
     Core_init();
+    Reals_init();
     break;
 
   case kSmtLogic_QF_NIA:
@@ -127,10 +128,12 @@ SmtSolverImpl::set_logic(tSmtLogic logic)
 
   case kSmtLogic_QF_NRA:
     Core_init();
+    Reals_init();
     break;
 
   case kSmtLogic_QF_RDL:
     Core_init();
+    Reals_init();
     break;
 
   case kSmtLogic_QF_UF:
@@ -153,14 +156,17 @@ SmtSolverImpl::set_logic(tSmtLogic logic)
 
   case kSmtLogic_QF_UFLRA:
     Core_init();
+    Reals_init();
     break;
 
   case kSmtLogic_QF_UFNRA:
     Core_init();
+    Reals_init();
     break;
 
   case kSmtLogic_UFLRA:
     Core_init();
+    Reals_init();
     break;
 
   case kSmtLogic_UFNIA:
