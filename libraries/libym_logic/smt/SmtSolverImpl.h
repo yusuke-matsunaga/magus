@@ -10,7 +10,6 @@
 
 
 #include "ym_logic/SmtSolver.h"
-#include "ym_logic/SmtSort.h"
 #include "ym_logic/SmtFun.h"
 #include "ym_utils/SimpleAlloc.h"
 
@@ -84,7 +83,7 @@ public:
   ///  - set_logic() で使える組み込み型ではない．
   ///  - 存在しない型番号だった．
   virtual
-  const SmtSort*
+  const SmtSortInfo*
   get_sort(tSmtSortId id);
 
   /// @brief 変数を作る．
@@ -322,8 +321,8 @@ private:
   // mSortArray のサイズ
   ymuint32 mSortArraySize;
 
-  // SmtSort のポインタ配列
-  const SmtSort** mSortArray;
+  // SmtSortInfo のポインタ配列
+  const SmtSortInfo** mSortArray;
 
   // SmtVar の次の ID番号
   ymuint32 mVarId;

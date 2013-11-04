@@ -38,7 +38,7 @@ BEGIN_NAMESPACE_YM_SMT
 // クラス名の宣言
 class SmtFun;
 class SmtSolver;
-class SmtSort;
+class SmtSortInfo;
 class SmtTerm;
 class SmtVar;
 
@@ -176,7 +176,7 @@ enum tSmtLibResponse {
 
 using nsSmt::SmtFun;
 using nsSmt::SmtSolver;
-using nsSmt::SmtSort;
+using nsSmt::SmtSortInfo;
 using nsSmt::SmtTerm;
 using nsSmt::SmtVar;
 

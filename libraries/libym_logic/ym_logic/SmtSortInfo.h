@@ -1,5 +1,5 @@
-#ifndef YM_LOGIC_SMTSORT_H
-#define YM_LOGIC_SMTSORT_H
+#ifndef YM_LOGIC_SMTSORTINFO_H
+#define YM_LOGIC_SMTSORTINFO_H
 
 /// @file ym_logic/SmtSort.h
 /// @brief SmtSort のヘッダファイル
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_SMT
 
 //////////////////////////////////////////////////////////////////////
-/// @class SmtSort SmtSort.h "ym_logic/SmtSort.h"
+/// @class SmtSortInfo SmtSortInfo.h "ym_logic/SmtSortInfo.h"
 /// @brief 型を表すクラス
 //////////////////////////////////////////////////////////////////////
-class SmtSort
+class SmtSortInfo
 {
   friend class SmtSolverImpl;
 
@@ -26,7 +26,7 @@ protected:
 
   /// @brief デストラクタ
   virtual
-  ~SmtSort() { }
+  ~SmtSortInfo() { }
 
 
 public:
@@ -61,4 +61,4 @@ public:
 
 END_NAMESPACE_YM_SMT
 
-#endif // YM_LOGIC_SMTSORT_H
+#endif // YM_LOGIC_SMTSORTINFO_H

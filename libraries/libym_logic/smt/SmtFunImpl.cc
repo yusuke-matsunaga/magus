@@ -8,7 +8,6 @@
 
 
 #include "SmtFunImpl.h"
-#include "ym_logic/SmtSort.h"
 #include "ym_logic/SmtVar.h"
 
 

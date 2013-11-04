@@ -15,8 +15,6 @@
 #include "IdMgr.h"
 #include "NameObj.h"
 
-#include "ym_logic/SmtAttr.h"
-#include "ym_logic/SmtSort.h"
 #include "ym_logic/SmtTerm.h"
 #include "ym_logic/SmtVar.h"
 

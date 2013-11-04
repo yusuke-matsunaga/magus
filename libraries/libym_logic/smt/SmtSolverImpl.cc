@@ -42,7 +42,7 @@ SmtSolverImpl::SmtSolverImpl() :
 
   mSortId = kSmtSort_User1;
   mSortArraySize = 32;
-  mSortArray = new const SmtSort*[mSortArraySize];
+  mSortArray = new const SmtSortInfo*[mSortArraySize];
   for (ymuint i = 0; i < mSortArraySize; ++ i) {
     mSortArray[i] = NULL;
   }
@@ -277,7 +277,7 @@ SmtSolverImpl::make_sort(const vector<tSmtSortId>& elem_list)
 //  - set_logic() が呼ばれていない．
 //  - set_logic() で使える組み込み型ではない．
 //  - 存在しない型番号だった．
-const SmtSort*
+const SmtSortInfo*
 SmtSolverImpl::get_sort(tSmtSortId id)
 {
   if ( id < mSortId ) {
@@ -647,9 +647,9 @@ SmtSolverImpl::reg_sort(SmtSortImpl* sort)
   if ( mSortArraySize <= mSortId ) {
     // mSortArray の大きさを2倍にする．
     ymuint32 old_size = mSortArraySize;
-    const SmtSort** old_array = mSortArray;
+    const SmtSortInfo** old_array = mSortArray;
     mSortArraySize = old_size * 2;
-    mSortArray = new const SmtSort*[mSortArraySize];
+    mSortArray = new const SmtSortInfo*[mSortArraySize];
     for (ymuint i = 0; i < old_size; ++ i) {
       mSortArray[i] = old_array[i];
     }

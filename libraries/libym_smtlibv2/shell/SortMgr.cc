@@ -11,7 +11,7 @@
 #include "SortElem.h"
 #include "ym_smtlibv2/SmtId.h"
 #include "ym_logic/SmtSolver.h"
-#include "ym_logic/SmtSort.h"
+#include "ym_logic/SmtSortInfo.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -21,7 +21,7 @@ BEGIN_NONAMESPACE
 // elem_list が等しいかチェックする．
 // 等しいときに true を返す．
 bool
-check_elem(const SmtSort* sort,
+check_elem(const SmtSortInfo* sort,
 	   const vector<tSmtSortId>& elem_list)
 {
   ymuint n = elem_list.size();
@@ -53,7 +53,7 @@ hash_func(const SmtId* name,
 // ハッシュ関数
 ymuint
 hash_func(const SmtId* name,
-	  const SmtSort* sort)
+	  const SmtSortInfo* sort)
 {
   ymuint h = name->id();
   ymuint n = sort->elem_num();
@@ -308,7 +308,7 @@ SortMgr::_make_sort(const SmtId* name_id,
 		    const vector<tSmtSortId>& param_list)
 {
   // 型のインスタンスを探す．
-  const SmtSort* sort = find_sort(name_id, param_list);
+  const SmtSortInfo* sort = find_sort(name_id, param_list);
   if ( sort != NULL ) {
     // 見つかった．
     return sort->id();
@@ -333,7 +333,7 @@ SortMgr::_make_sort(const SmtId* name_id,
 // @param[in] sort 登録する型
 void
 SortMgr::reg_sort(const SmtId* name_id,
-		  const SmtSort* sort)
+		  const SmtSortInfo* sort)
 {
   // ハッシュ表に登録する．
   if ( mNum2 >= mNextLimit2 ) {
@@ -358,13 +358,13 @@ SortMgr::reg_sort(const SmtId* name_id,
 // @param[in] name_id 型名
 // @param[in] elem_list 部品の型のリスト
 // @return 登録されていなければ NULL を返す．
-const SmtSort*
+const SmtSortInfo*
 SortMgr::find_sort(const SmtId* name_id,
 		   const vector<tSmtSortId>& elem_list)
 {
   if ( mParent != NULL ) {
     // 親のレベルで探す．
-    const SmtSort* sort = mParent->find_sort(name_id, elem_list);
+    const SmtSortInfo* sort = mParent->find_sort(name_id, elem_list);
     if ( sort != NULL ) {
       return sort;
     }
@@ -374,7 +374,7 @@ SortMgr::find_sort(const SmtId* name_id,
   ymuint h = hash_func(name_id, elem_list);
   ymuint idx = h % mTableSize2;
   for (Cell2* cell = mHashTable2[idx]; cell != NULL; cell = cell->mLink) {
-    const SmtSort* sort = cell->mSort;
+    const SmtSortInfo* sort = cell->mSort;
     if ( cell->mId == name_id && check_elem(sort, elem_list) ) {
       // 見つかった．
       return sort;
@@ -459,7 +459,7 @@ SortMgr::expand_table2(ymuint req_size)
 	cell = cell->mLink;
 
 	const SmtId* id = cell->mId;
-	const SmtSort* sort = cell->mSort;
+	const SmtSortInfo* sort = cell->mSort;
 	ymuint h = hash_func(id, sort) % mTableSize2;
 	tmp_cell->mLink = mHashTable2[h];
 	mHashTable2[h] = tmp_cell;

@@ -20,7 +20,7 @@ class SortElem;
 
 //////////////////////////////////////////////////////////////////////
 /// @class SortMgr SortMgr.h "SortMgr.h"
-/// @brief SmtSort を管理するクラス
+/// @brief SmtSortInfo を管理するクラス
 ///
 /// 型名と要素リストをキーにして型インスタンスを保持する
 //////////////////////////////////////////////////////////////////////
@@ -119,13 +119,13 @@ private:
   /// @param[in] sort 登録する型
   void
   reg_sort(const SmtId* name_id,
-	   const SmtSort* sort);
+	   const SmtSortInfo* sort);
 
   /// @brief 型を探す．
   /// @param[in] name_id 型名
   /// @param[in] elem_list 部品の型のリスト
   /// @return 登録されていなければ NULL を返す．
-  const SmtSort*
+  const SmtSortInfo*
   find_sort(const SmtId* name_id,
 	    const vector<tSmtSortId>& elem_list);
 
@@ -184,7 +184,7 @@ private:
     const SmtId* mId;
 
     // 型
-    const SmtSort* mSort;
+    const SmtSortInfo* mSort;
 
     // 次の要素を指すリンクポインタ
     Cell2* mLink;

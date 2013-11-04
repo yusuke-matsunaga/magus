@@ -9,18 +9,17 @@
 /// All rights reserved.
 
 
-#include "ym_logic/SmtSort.h"
+#include "ym_logic/SmtSortInfo.h"
 
 
 BEGIN_NAMESPACE_YM_SMT
 
 //////////////////////////////////////////////////////////////////////
 /// @class SmtSortImpl SmtSortImpl.h "SmtSortImpl.h"
-/// @brief SmtSort の実装クラス
-/// @note 単純な型を表すクラスでもある．
+/// @brief SmtSortInfo の実装クラス
 //////////////////////////////////////////////////////////////////////
 class SmtSortImpl :
-  public SmtSort
+  public SmtSortInfo
 {
   friend class SmtSolverImpl;
 

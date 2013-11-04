@@ -83,7 +83,7 @@ public:
   ///  - set_logic() で使える組み込み型ではない．
   ///  - 存在しない型番号だった．
   virtual
-  const SmtSort*
+  const SmtSortInfo*
   get_sort(tSmtSortId id) = 0;
 
   /// @brief 変数を作る．

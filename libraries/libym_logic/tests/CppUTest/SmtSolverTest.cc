@@ -10,7 +10,7 @@
 #include "CppUTest/TestHarness.h"
 
 #include "ym_logic/SmtSolver.h"
-#include "ym_logic/SmtSort.h"
+#include "ym_logic/SmtSortInfo.h"
 #include "ym_logic/SmtVar.h"
 #include "ym_logic/SmtFun.h"
 #include "ym_logic/SmtTerm.h"
@@ -253,7 +253,7 @@ TEST(SmtSolverTestGroup, make_sort1)
   // 空の引数
   tSmtSortId sort_id = mSolver->make_sort();
   sortid_test( sort_id );
-  const SmtSort* sort = mSolver->get_sort(sort_id);
+  const SmtSortInfo* sort = mSolver->get_sort(sort_id);
   CHECK( sort != NULL );
   LONGS_EQUAL( sort_id, sort->id() );
   LONGS_EQUAL( 0, sort->elem_num() );
@@ -263,7 +263,7 @@ TEST(SmtSolverTestGroup, make_sort1)
   elem_list[0] = sort_id;
   tSmtSortId sort_id2 = mSolver->make_sort(elem_list);
   sortid_test(sort_id2 );
-  const SmtSort* sort2 = mSolver->get_sort(sort_id2);
+  const SmtSortInfo* sort2 = mSolver->get_sort(sort_id2);
   CHECK( sort2 != NULL );
   LONGS_EQUAL( sort_id2, sort2->id() );
   LONGS_EQUAL( 1, sort2->elem_num() );
