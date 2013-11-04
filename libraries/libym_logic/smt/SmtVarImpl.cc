@@ -86,7 +86,7 @@ SmtGlobalVar::~SmtGlobalVar()
 }
 
 // @brief 変数の種類を返す．
-tSmtVar
+tSmtVarType
 SmtGlobalVar::type() const
 {
   return kSmtVar_Global;
@@ -119,7 +119,7 @@ SmtFunArgVar::~SmtFunArgVar()
 }
 
 // @brief 変数の種類を返す．
-tSmtVar
+tSmtVarType
 SmtFunArgVar::type() const
 {
   return kSmtVar_FunArg;
@@ -152,7 +152,7 @@ SmtForallVar::~SmtForallVar()
 }
 
 // @brief 変数の種類を返す．
-tSmtVar
+tSmtVarType
 SmtForallVar::type() const
 {
   return kSmtVar_Forall;
@@ -185,7 +185,7 @@ SmtExistsVar::~SmtExistsVar()
 }
 
 // @brief 変数の種類を返す．
-tSmtVar
+tSmtVarType
 SmtExistsVar::type() const
 {
   return kSmtVar_Exists;

@@ -45,7 +45,7 @@ TEST_GROUP(SmtSolverTestGroup)
   // SmtVar のテスト関数
   void var_test(const SmtVar* var,
 		tSmtSortId sort,
-		tSmtVar var_type)
+		tSmtVarType var_type)
   {
     CHECK( var != NULL );
     LONGS_EQUAL( sort, var->sort() );

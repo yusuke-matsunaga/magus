@@ -110,7 +110,7 @@ public:
 
   /// @brief 変数の種類を返す．
   virtual
-  tSmtVar
+  tSmtVarType
   type() const;
 
   /// @brief global 変数の場合に true を返す．
@@ -150,7 +150,7 @@ public:
 
   /// @brief 変数の種類を返す．
   virtual
-  tSmtVar
+  tSmtVarType
   type() const;
 
   /// @brief local 変数(関数の引数)の場合に true を返す．
@@ -190,7 +190,7 @@ public:
 
   /// @brief 変数の種類を返す．
   virtual
-  tSmtVar
+  tSmtVarType
   type() const;
 
   /// @brief forall 変数の場合に true を返す．
@@ -230,7 +230,7 @@ public:
 
   /// @brief 変数の種類を返す．
   virtual
-  tSmtVar
+  tSmtVarType
   type() const;
 
   /// @brief exists 変数の場合に true を返す．

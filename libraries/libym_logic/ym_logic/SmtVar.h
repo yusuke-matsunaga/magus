@@ -39,7 +39,7 @@ public:
 
   /// @brief 変数の種類を返す．
   virtual
-  tSmtVar
+  tSmtVarType
   type() const = 0;
 
   /// @brief global 変数の場合に true を返す．

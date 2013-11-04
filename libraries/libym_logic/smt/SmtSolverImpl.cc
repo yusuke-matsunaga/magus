@@ -296,7 +296,7 @@ SmtSolverImpl::get_sort(tSmtSortId id)
 //  - set_logic() が呼ばれていない．
 const SmtVar*
 SmtSolverImpl::make_var(tSmtSortId sort,
-			tSmtVar type)
+			tSmtVarType type)
 {
   if ( !check_logic() ) {
     return NULL;

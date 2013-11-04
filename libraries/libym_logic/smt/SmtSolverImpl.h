@@ -97,7 +97,7 @@ public:
   virtual
   const SmtVar*
   make_var(tSmtSortId sort,
-	   tSmtVar type = kSmtVar_Global);
+	   tSmtVarType type);
 
   /// @brief 関数を作る．(引数なし)
   /// @param[in] output_sort 出力の型
