@@ -67,7 +67,7 @@ public:
   /// @brief tSumFun を返す．
   /// @note is_builtin_fun() == true の時のみ意味がある．
   virtual
-  tSmtFun
+  tSmtFunType
   fun_type() const;
 
   /// @brief SmtFun を返す．
@@ -105,7 +105,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////
 /// @class BuiltinFunObj NameObjImpl.h "NameObjImpl.h"
-/// @brief tSmtFun を表す NameObj の派生クラス
+/// @brief tSmtFunType を表す NameObj の派生クラス
 //////////////////////////////////////////////////////////////////////
 class BuiltinFunObj :
   public NameObjImpl
@@ -118,7 +118,7 @@ private:
   /// @param[in] name_id 名前を表す識別子
   /// @param[in] fun_type 関数の型
   BuiltinFunObj(const SmtId* name_id,
-		tSmtFun fun_type);
+		tSmtFunType fun_type);
 
   /// @brief デストラクタ
   virtual
@@ -138,7 +138,7 @@ public:
   /// @brief tSumFun を返す．
   /// @note is_builtin_fun() == true の時のみ意味がある．
   virtual
-  tSmtFun
+  tSmtFunType
   fun_type() const;
 
 
@@ -148,7 +148,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数の型
-  tSmtFun mFunType;
+  tSmtFunType mFunType;
 
 };
 

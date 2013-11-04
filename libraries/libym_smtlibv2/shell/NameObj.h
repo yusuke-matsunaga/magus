@@ -63,7 +63,7 @@ public:
   /// @brief tSumFun を返す．
   /// @note is_builtin_fun() == true の時のみ意味がある．
   virtual
-  tSmtFun
+  tSmtFunType
   fun_type() const = 0;
 
   /// @brief SmtFun を返す．

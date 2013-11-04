@@ -52,7 +52,7 @@ public:
 
   /// @brief kFunTerm 型の場合に関数の型を返す．
   virtual
-  tSmtFun
+  tSmtFunType
   function_type() const;
 
   /// @brief kFunTerm 型の場合に関数を返す．
@@ -390,7 +390,7 @@ public:
 
   /// @brief kFunTerm 型の場合に関数の型を返す．
   virtual
-  tSmtFun
+  tSmtFunType
   function_type() const;
 
   /// @brief kFunTerm 型の場合に関数を返す．
@@ -487,7 +487,7 @@ protected:
 
   /// @brief コンストラクタ
   /// @param[in] fun_type 関数の型
-  SmtFunTerm3(tSmtFun fun_type);
+  SmtFunTerm3(tSmtFunType fun_type);
 
   /// @brief デストラクタ
   virtual
@@ -510,7 +510,7 @@ public:
 
   /// @brief kFunTerm 型の場合に関数の型を返す．
   virtual
-  tSmtFun
+  tSmtFunType
   function_type() const;
 
   /// @brief kFunTerm 型の場合に関数を返す．
@@ -537,7 +537,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数の型
-  tSmtFun mFunType;
+  tSmtFunType mFunType;
 
 };
 
@@ -556,7 +556,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] fun_type 関数の型
   /// @param[in] arg_list 引数のリスト
-  SmtFunTerm4(tSmtFun fun_type,
+  SmtFunTerm4(tSmtFunType fun_type,
 	      const vector<const SmtTerm*>& arg_list);
 
   /// @brief デストラクタ

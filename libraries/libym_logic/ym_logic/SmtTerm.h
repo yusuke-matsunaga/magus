@@ -88,7 +88,7 @@ public:
 
   /// @brief kFunTerm 型の場合に関数の型を返す．
   virtual
-  tSmtFun
+  tSmtFunType
   function_type() const = 0;
 
   /// @brief kFunTerm 型の場合に関数を返す．

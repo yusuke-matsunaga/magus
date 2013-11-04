@@ -1202,7 +1202,7 @@ ShellImpl::eval_as_term(const SmtLibNode* node)
 	}
 	else if ( obj->is_builtin_fun() ) {
 	  // id が組み込み関数だった．
-	  tSmtFun fun_type = obj->fun_type();
+	  tSmtFunType fun_type = obj->fun_type();
 	  return mSolver->make_fun_term(fun_type, vector<const SmtTerm*>(0));
 	}
 	else if ( obj->is_term() ) {
@@ -1291,7 +1291,7 @@ ShellImpl::eval_as_term(const SmtLibNode* node)
     return mSolver->make_fun_term(fun, input_list);
   }
   if ( obj->is_builtin_fun() ) {
-    tSmtFun fun_type = obj->fun_type();
+    tSmtFunType fun_type = obj->fun_type();
     return mSolver->make_fun_term(fun_type, input_list);
   }
 
@@ -1681,7 +1681,7 @@ ShellImpl::bind_builtin_sort(const char* name,
 // @param[in] fun_type 組み込み関数の型
 void
 ShellImpl::bind_builtin_fun(const char* name,
-			    tSmtFun fun_type)
+			    tSmtFunType fun_type)
 {
   const SmtId* id = mIdMgr->make_id(ShString(name));
   assert_cond( id != NULL, __FILE__, __LINE__);

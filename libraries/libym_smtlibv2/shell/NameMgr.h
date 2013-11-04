@@ -58,7 +58,7 @@ public:
   ///  - name_id と同名の関数がすでに存在している．
   bool
   reg_builtin_fun(const SmtId* name_id,
-		  tSmtFun fun_type);
+		  tSmtFunType fun_type);
 
   /// @brief 関数を登録する．
   /// @param[in] name_id 名前を表す識別子

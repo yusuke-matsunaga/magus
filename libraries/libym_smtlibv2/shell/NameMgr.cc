@@ -53,7 +53,7 @@ NameMgr::~NameMgr()
 //  - name_id と同名の関数がすでに存在している．
 bool
 NameMgr::reg_builtin_fun(const SmtId* name_id,
-			 tSmtFun fun_type)
+			 tSmtFunType fun_type)
 {
   if ( find_obj(name_id) != NULL ) {
     // 同名のオブジェクトが登録されている．

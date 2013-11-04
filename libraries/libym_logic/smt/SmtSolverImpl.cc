@@ -502,9 +502,18 @@ SmtSolverImpl::make_var_term(const SmtVar* var)
 // @brief 関数呼び出しの term を作る．(引数なし)
 // @param[in] fun 関数
 // @return 作成した式を返す．
+//
+// エラーが起きたら NULL を返す．
+// エラーとなる原因は以下のとおり
+//  - fun の引数の数か型が arg_list と合わない．
 const SmtTerm*
 SmtSolverImpl::make_fun_term(const SmtFun* fun)
 {
+  if ( fun->input_num() != 0 ) {
+    // fun は引数をとる関数だった．
+    return NULL;
+  }
+
   void* p = mAlloc.get_memory(sizeof(SmtFunTerm1));
   const SmtTerm* term = new (p) SmtFunTerm1(fun);
 
@@ -515,6 +524,10 @@ SmtSolverImpl::make_fun_term(const SmtFun* fun)
 // @param[in] fun 関数
 // @param[in] arg_list 引数のリスト
 // @return 作成した式を返す．
+//
+// エラーが起きたら NULL を返す．
+// エラーとなる原因は以下のとおり
+//  - fun の引数の数か型が arg_list と合わない．
 const SmtTerm*
 SmtSolverImpl::make_fun_term(const SmtFun* fun,
 			     const vector<const SmtTerm*>& arg_list)
@@ -524,18 +537,148 @@ SmtSolverImpl::make_fun_term(const SmtFun* fun,
     return make_fun_term(fun);
   }
 
+  if ( fun->input_num() != n ) {
+    // fun の引数の数と arg_list のサイズが異なる．
+    return NULL;
+  }
+  for (ymuint i = 0; i < n; ++ i) {
+    if ( fun->input_sort(i) != arg_list[i]->sort() ) {
+      // i 番めの入力の型が i 番目の引数の型と異なる．
+      return NULL;
+    }
+  }
+
   void* p = mAlloc.get_memory(sizeof(SmtFunTerm2) + sizeof(const SmtTerm*) * (n - 1));
   const SmtTerm* term = new (p) SmtFunTerm2(fun, arg_list);
 
   return term;
 }
 
+
+BEGIN_NONAMESPACE
+
+// @brief Int 型か Real 型の場合に true を返す．
+inline
+bool
+check_I_or_R(tSmtSortId sort)
+{
+  return sort == kSmtSort_Int || sort == kSmtSort_Real;
+}
+
+// @brief 組み込み関数の引数の型のチェックを行う．
+// @param[in] fun_type 関数の型
+// @param[in] arg_sort_list 引数の型のリスト
+// @retval true 適切な引数だった．
+// @retval false 引数の数か型が fun_type と合わなかった．
+bool
+check_args(tSmtFunType fun_type,
+	   const vector<tSmtSortId>& arg_sort_list)
+{
+  ymuint n = arg_sort_list.size();
+  switch ( fun_type ) {
+  case kSmtFun_True:
+  case kSmtFun_False:
+    // 引数なし
+    return n == 0;
+
+  case kSmtFun_Not:
+    // 引数は1つで，Bool 型
+    return ( n == 1 && arg_sort_list[0] == kSmtSort_Bool );
+
+  case kSmtFun_And:
+  case kSmtFun_Or:
+  case kSmtFun_Xor:
+  case kSmtFun_Imp:
+    // 引数は2つ以上で，Bool 型
+    if ( n < 2 ) {
+      return false;
+    }
+    for (ymuint i = 0; i < n; ++ i) {
+      if ( arg_sort_list[i] != kSmtSort_Bool ) {
+	return false;
+      }
+    }
+    return true;
+
+  case kSmtFun_Eq:
+  case kSmtFun_Diseq:
+    // 引数は2つ以上で，すべて同じ
+    if ( n < 2 ) {
+      return false;
+    }
+    for (ymuint i = 1; i < n; ++ i) {
+      if ( arg_sort_list[i] != arg_sort_list[0] ) {
+	return false;
+      }
+    }
+    return true;
+
+  case kSmtFun_Ite:
+    // 引数は3つで，最初が Bool，残り2つは同じ
+    return ( n == 3 && arg_sort_list[0] == kSmtSort_Bool && arg_sort_list[1] == arg_sort_list[2] );
+
+  case kSmtFun_Uminus:
+    // 引数は1つで，Int か Real
+    return ( n == 1 && check_I_or_R(arg_sort_list[0]) );
+
+  case kSmtFun_Add:
+  case kSmtFun_Sub:
+  case kSmtFun_Mul:
+  case kSmtFun_Le:
+  case kSmtFun_Lt:
+  case kSmtFun_Ge:
+  case kSmtFun_Gt:
+    // 引数は2つ以上で，Int か Real で同じ
+    if ( n < 2 ) {
+      return false;
+    }
+    if ( !check_I_or_R(arg_sort_list[0]) ) {
+      return false;
+    }
+    for (ymuint i = 1; i < n; ++ i) {
+      if ( arg_sort_list[i] != arg_sort_list[0] ) {
+	return false;
+      }
+    }
+    return true;
+
+  case kSmtFun_Div:
+    // 引数は2つ以上で，Real
+    if ( n < 2 ) {
+      return false;
+    }
+    for (ymuint i = 0; i < n; ++ i) {
+      if ( arg_sort_list[i] != kSmtSort_Real ) {
+	return false;
+      }
+    }
+    return true;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+  return false;
+}
+
+END_NONAMESPACE
+
+
 // @brief 関数呼び出しの term を作る．(組み込み関数，引数なし)
 // @param[in] fun_type 関数の型
 // @return 作成した式を返す．
+//
+// エラーが起きたら NULL を返す．
+// エラーとなる原因は以下のとおり
+//  - fun の引数の数か型が arg_list と合わない．
 const SmtTerm*
-SmtSolverImpl::make_fun_term(tSmtFun fun_type)
+SmtSolverImpl::make_fun_term(tSmtFunType fun_type)
 {
+  if ( !check_args(fun_type, vector<tSmtSortId>(0)) ) {
+    // 引数の数が合わない．
+    return NULL;
+  }
+
   void* p = mAlloc.get_memory(sizeof(SmtFunTerm3));
   const SmtTerm* term = new (p) SmtFunTerm3(fun_type);
 
@@ -546,13 +689,28 @@ SmtSolverImpl::make_fun_term(tSmtFun fun_type)
 // @param[in] fun_type 関数の型
 // @param[in] arg_list 引数のリスト
 // @return 作成した式を返す．
+//
+// エラーが起きたら NULL を返す．
+// エラーとなる原因は以下のとおり
+//  - fun の引数の数か型が arg_list と合わない．
 const SmtTerm*
-SmtSolverImpl::make_fun_term(tSmtFun fun_type,
+SmtSolverImpl::make_fun_term(tSmtFunType fun_type,
 			     const vector<const SmtTerm*>& arg_list)
 {
   ymuint n = arg_list.size();
   if ( n == 0 ) {
     return make_fun_term(fun_type);
+  }
+
+  { // チェックのための引数の型のリストを作る．
+    vector<tSmtSortId> arg_sort_list(n);
+    for (ymuint i = 0; i < n; ++ i) {
+      arg_sort_list[i] = arg_list[i]->sort();
+    }
+    if ( !check_args(fun_type, arg_sort_list) ) {
+      // 引数の数か型が合わない．
+      return NULL;
+    }
   }
 
   void* p = mAlloc.get_memory(sizeof(SmtFunTerm4) + sizeof(const SmtTerm*) * (n - 1));

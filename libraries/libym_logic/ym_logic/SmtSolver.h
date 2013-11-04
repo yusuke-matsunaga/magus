@@ -192,6 +192,10 @@ public:
   /// @brief 関数呼び出しの term を作る．(引数なし)
   /// @param[in] fun 関数
   /// @return 作成した式を返す．
+  ///
+  /// エラーが起きたら NULL を返す．
+  /// エラーとなる原因は以下のとおり
+  ///  - fun の引数の数か型が arg_list と合わない．
   virtual
   const SmtTerm*
   make_fun_term(const SmtFun* fun) = 0;
@@ -200,6 +204,10 @@ public:
   /// @param[in] fun 関数
   /// @param[in] arg_list 引数のリスト
   /// @return 作成した式を返す．
+  ///
+  /// エラーが起きたら NULL を返す．
+  /// エラーとなる原因は以下のとおり
+  ///  - fun の引数の数か型が arg_list と合わない．
   virtual
   const SmtTerm*
   make_fun_term(const SmtFun* fun,
@@ -208,17 +216,25 @@ public:
   /// @brief 関数呼び出しの term を作る．(組み込み関数，引数なし)
   /// @param[in] fun_type 関数の型
   /// @return 作成した式を返す．
+  ///
+  /// エラーが起きたら NULL を返す．
+  /// エラーとなる原因は以下のとおり
+  ///  - fun の引数の数か型が arg_list と合わない．
   virtual
   const SmtTerm*
-  make_fun_term(tSmtFun fun_type) = 0;
+  make_fun_term(tSmtFunType fun_type) = 0;
 
   /// @brief 関数呼び出しの term を作る．(組み込み関数)
   /// @param[in] fun_type 関数の型
   /// @param[in] arg_list 引数のリスト
   /// @return 作成した式を返す．
+  ///
+  /// エラーが起きたら NULL を返す．
+  /// エラーとなる原因は以下のとおり
+  ///  - fun の引数の数か型が arg_list と合わない．
   virtual
   const SmtTerm*
-  make_fun_term(tSmtFun fun_type,
+  make_fun_term(tSmtFunType fun_type,
 		const vector<const SmtTerm*>& arg_list) = 0;
 
   /// @brief forall の term を作る．

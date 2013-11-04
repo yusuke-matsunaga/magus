@@ -317,7 +317,7 @@ private:
   /// @param[in] fun_type 組み込み関数の型
   void
   bind_builtin_fun(const char* name,
-		   tSmtFun fun_type);
+		   tSmtFunType fun_type);
 
   /// @brief 現在の SortMgr を返す．
   SortMgr&

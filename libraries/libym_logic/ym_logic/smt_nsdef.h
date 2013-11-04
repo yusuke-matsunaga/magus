@@ -99,7 +99,7 @@ const tSmtSortId kSmtSort_User1 = 4;
 //////////////////////////////////////////////////////////////////////
 /// @brief 組み込み関数を表す型
 //////////////////////////////////////////////////////////////////////
-enum tSmtFun {
+enum tSmtFunType {
   kSmtFun_UserDef,     // 一般の関数
   kSmtFun_True,        // logical TRUE
   kSmtFun_False,       // logical FALSE
@@ -148,6 +148,14 @@ enum tSmtFunAttr {
   kSmtFunAttr_Chainable,  // chainable
   kSmtFunAttr_Pairwise    // pairwise
 };
+
+
+/// @brief 関数の型から属性を得る．
+/// @param[in] fun_type 関数の型
+/// @return 属性を返す．
+extern
+tSmtFunAttr
+fun_attr(tSmtFunType fun_type);
 
 
 //////////////////////////////////////////////////////////////////////

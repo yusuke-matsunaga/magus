@@ -98,7 +98,7 @@ TEST_GROUP(SmtSolverTestGroup)
   }
 
   // 引数なしの builtin function term のテスト
-  void builtin_fun_test0(tSmtFun fun_type,
+  void builtin_fun_test0(tSmtFunType fun_type,
 			 bool exp)
   {
     const SmtTerm* term = mSolver->make_fun_term(fun_type);
@@ -114,7 +114,7 @@ TEST_GROUP(SmtSolverTestGroup)
   }
 
   // 1引数の builtin function term のテスト
-  void builtin_fun_test1(tSmtFun fun_type,
+  void builtin_fun_test1(tSmtFunType fun_type,
 			 tSmtSortId input_sort1,
 			 bool exp)
   {
@@ -140,7 +140,7 @@ TEST_GROUP(SmtSolverTestGroup)
   }
 
   // 2引数の builtin function term のテスト
-  void builtin_fun_test2(tSmtFun fun_type,
+  void builtin_fun_test2(tSmtFunType fun_type,
 			 tSmtSortId input_sort1,
 			 tSmtSortId input_sort2,
 			 bool exp)
@@ -174,7 +174,7 @@ TEST_GROUP(SmtSolverTestGroup)
   }
 
   // 3引数の builtin function term のテスト
-  void builtin_fun_test3(tSmtFun fun_type,
+  void builtin_fun_test3(tSmtFunType fun_type,
 			 tSmtSortId input_sort1,
 			 tSmtSortId input_sort2,
 			 tSmtSortId input_sort3,
@@ -469,7 +469,6 @@ TEST(SmtSolverTestGroup, make_fun_term2)
   builtin_fun_test0(kSmtFun_True, true);
 
   // 失敗する例
-#if 0
   builtin_fun_test0(kSmtFun_Not, false);
   builtin_fun_test0(kSmtFun_And, false);
   builtin_fun_test0(kSmtFun_Or, false);
@@ -487,7 +486,6 @@ TEST(SmtSolverTestGroup, make_fun_term2)
   builtin_fun_test0(kSmtFun_Lt, false);
   builtin_fun_test0(kSmtFun_Ge, false);
   builtin_fun_test0(kSmtFun_Gt, false);
-#endif
 }
 
 // make_fun_term テスト3
@@ -509,7 +507,6 @@ TEST(SmtSolverTestGroup, make_fun_term3)
   builtin_fun_test1(kSmtFun_Uminus, kSmtSort_Int, true);
   builtin_fun_test1(kSmtFun_Uminus, kSmtSort_Real, true);
 
-#if 0
   // 型が合わなくて失敗する例
   builtin_fun_test1(kSmtFun_Not, kSmtSort_Int, false);
   builtin_fun_test1(kSmtFun_Not, kSmtSort_Real, false);
@@ -521,7 +518,6 @@ TEST(SmtSolverTestGroup, make_fun_term3)
   // 引数の数が合わなくて失敗する例
   builtin_fun_test1(kSmtFun_True, kSmtSort_Bool, false);
   builtin_fun_test1(kSmtFun_False, kSmtSort_Bool, false);
-#endif
 }
 
 // make_fun_term テスト4

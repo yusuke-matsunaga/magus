@@ -66,7 +66,7 @@ NameObjImpl::is_term() const
 
 // @brief tSumFun を返す．
 // @note is_builtin_fun() == true の時のみ意味がある．
-tSmtFun
+tSmtFunType
 NameObjImpl::fun_type() const
 {
   assert_not_reached(__FILE__, __LINE__);
@@ -109,7 +109,7 @@ NameObjImpl::term() const
 // @param[in] name_id 名前を表す識別子
 // @param[in] fun_type 関数の型
 BuiltinFunObj::BuiltinFunObj(const SmtId* name_id,
-			     tSmtFun fun_type) :
+			     tSmtFunType fun_type) :
   NameObjImpl(name_id),
   mFunType(fun_type)
 {
@@ -129,7 +129,7 @@ BuiltinFunObj::is_builtin_fun() const
 
 // @brief tSumFun を返す．
 // @note is_builtin_fun() == true の時のみ意味がある．
-tSmtFun
+tSmtFunType
 BuiltinFunObj::fun_type() const
 {
   return mFunType;

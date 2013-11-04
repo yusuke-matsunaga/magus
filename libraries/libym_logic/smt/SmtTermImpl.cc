@@ -48,7 +48,7 @@ SmtTermImpl::var() const
 }
 
 // @brief kFunTerm 型の場合に関数の型を返す．
-tSmtFun
+tSmtFunType
 SmtTermImpl::function_type() const
 {
   assert_not_reached(__FILE__, __LINE__);
@@ -344,7 +344,7 @@ SmtFunTerm1::sort() const
 }
 
 // @brief kFunTerm 型の場合に関数の型を返す．
-tSmtFun
+tSmtFunType
 SmtFunTerm1::function_type() const
 {
   return kSmtFun_UserDef;
@@ -419,7 +419,7 @@ SmtFunTerm2::input(ymuint pos) const
 
 // @brief コンストラクタ
 // @param[in] fun_type 関数の型
-SmtFunTerm3::SmtFunTerm3(tSmtFun fun_type) :
+SmtFunTerm3::SmtFunTerm3(tSmtFunType fun_type) :
   mFunType(fun_type)
 {
 }
@@ -475,7 +475,7 @@ SmtFunTerm3::sort() const
 }
 
 // @brief kFunTerm 型の場合に関数の型を返す．
-tSmtFun
+tSmtFunType
 SmtFunTerm3::function_type() const
 {
   return mFunType;
@@ -513,7 +513,7 @@ SmtFunTerm3::input(ymuint pos) const
 // @brief コンストラクタ
 // @param[in] fun_type 関数の型
 // @param[in] arg_list 引数のリスト
-SmtFunTerm4::SmtFunTerm4(tSmtFun fun_type,
+SmtFunTerm4::SmtFunTerm4(tSmtFunType fun_type,
 			 const vector<const SmtTerm*>& arg_list) :
   SmtFunTerm3(fun_type),
   mInputNum(arg_list.size())
