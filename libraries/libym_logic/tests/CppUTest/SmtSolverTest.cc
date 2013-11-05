@@ -456,42 +456,44 @@ TEST(SmtSolverTestGroup, make_fun_term1)
   }
 }
 
-// make_fun_term テスト2
-TEST(SmtSolverTestGroup, make_fun_term2)
+// make_fun_term テスト (true)
+TEST(SmtSolverTestGroup, make_fun_term_true)
 {
-  // 引数なしの組み込み関数
+  // true 関数
 
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
 
   // まずは成功する例
   builtin_fun_test0(kSmtFun_True, true);
-  builtin_fun_test0(kSmtFun_True, true);
 
   // 失敗する例
-  builtin_fun_test0(kSmtFun_Not, false);
-  builtin_fun_test0(kSmtFun_And, false);
-  builtin_fun_test0(kSmtFun_Or, false);
-  builtin_fun_test0(kSmtFun_Xor, false);
-  builtin_fun_test0(kSmtFun_Imp, false);
-  builtin_fun_test0(kSmtFun_Eq, false);
-  builtin_fun_test0(kSmtFun_Diseq, false);
-  builtin_fun_test0(kSmtFun_Ite, false);
-  builtin_fun_test0(kSmtFun_Uminus, false);
-  builtin_fun_test0(kSmtFun_Add, false);
-  builtin_fun_test0(kSmtFun_Sub, false);
-  builtin_fun_test0(kSmtFun_Mul, false);
-  builtin_fun_test0(kSmtFun_Div, false);
-  builtin_fun_test0(kSmtFun_Le, false);
-  builtin_fun_test0(kSmtFun_Lt, false);
-  builtin_fun_test0(kSmtFun_Ge, false);
-  builtin_fun_test0(kSmtFun_Gt, false);
+  builtin_fun_test1(kSmtFun_True, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_True, kSmtSort_Bool, kSmtSort_Bool, false);
+  builtin_fun_test3(kSmtFun_True, kSmtSort_Bool, kSmtSort_Bool, kSmtSort_Bool, false);
 }
 
-// make_fun_term テスト3
-TEST(SmtSolverTestGroup, make_fun_term3)
+// make_fun_term テスト (false)
+TEST(SmtSolverTestGroup, make_fun_term_false)
 {
-  // 1引数の組み込み関数
+  // false 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  // まずは成功する例
+  builtin_fun_test0(kSmtFun_False, true);
+
+  // 失敗する例
+  builtin_fun_test1(kSmtFun_False, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_False, kSmtSort_Bool, kSmtSort_Bool, false);
+  builtin_fun_test3(kSmtFun_False, kSmtSort_Bool, kSmtSort_Bool, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (not)
+TEST(SmtSolverTestGroup, make_fun_term_not)
+{
+  // not 関数
 
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
@@ -499,31 +501,274 @@ TEST(SmtSolverTestGroup, make_fun_term3)
   tSmtSortId sort1 = mSolver->make_sort();
   sortid_test( sort1 );
 
-  tSmtSortId sort2 = mSolver->make_sort();
-  sortid_test( sort2 );
-
   // まずは成功する例
   builtin_fun_test1(kSmtFun_Not, kSmtSort_Bool, true);
-  builtin_fun_test1(kSmtFun_Uminus, kSmtSort_Int, true);
-  builtin_fun_test1(kSmtFun_Uminus, kSmtSort_Real, true);
 
   // 型が合わなくて失敗する例
   builtin_fun_test1(kSmtFun_Not, kSmtSort_Int, false);
   builtin_fun_test1(kSmtFun_Not, kSmtSort_Real, false);
   builtin_fun_test1(kSmtFun_Not, sort1, false);
 
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Not, false);
+  builtin_fun_test2(kSmtFun_Not, kSmtSort_Bool, kSmtSort_Bool, false);
+  builtin_fun_test3(kSmtFun_Not, kSmtSort_Bool, kSmtSort_Bool, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (uminus)
+TEST(SmtSolverTestGroup, make_fun_term_uminus)
+{
+  // uminus 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  // まずは成功する例
+  builtin_fun_test1(kSmtFun_Uminus, kSmtSort_Int, true);
+  builtin_fun_test1(kSmtFun_Uminus, kSmtSort_Real, true);
+
+  // 型が合わなくて失敗する例
   builtin_fun_test1(kSmtFun_Uminus, kSmtSort_Bool, false);
   builtin_fun_test1(kSmtFun_Uminus, sort1, false);
 
   // 引数の数が合わなくて失敗する例
-  builtin_fun_test1(kSmtFun_True, kSmtSort_Bool, false);
-  builtin_fun_test1(kSmtFun_False, kSmtSort_Bool, false);
+  builtin_fun_test0(kSmtFun_Uminus, false);
+  builtin_fun_test2(kSmtFun_Uminus, kSmtSort_Int, kSmtSort_Int, false);
+  builtin_fun_test3(kSmtFun_Uminus, kSmtSort_Int, kSmtSort_Int, kSmtSort_Int, false);
 }
 
-// make_fun_term テスト4
-TEST(SmtSolverTestGroup, make_fun_term4)
+// make_fun_term テスト (and)
+TEST(SmtSolverTestGroup, make_fun_term_and)
 {
-  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LRA);
+  // and 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  // まずは成功する例
+  builtin_fun_test2(kSmtFun_And, kSmtSort_Bool, kSmtSort_Bool, true);
+  builtin_fun_test3(kSmtFun_And, kSmtSort_Bool, kSmtSort_Bool, kSmtSort_Bool, true);
+
+  // 型が合わなくて失敗する例
+  builtin_fun_test2(kSmtFun_And, kSmtSort_Bool, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_And, kSmtSort_Int, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_And, kSmtSort_Int, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_And, kSmtSort_Real, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_And, sort1, sort1, false);
+
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_And, false);
+  builtin_fun_test1(kSmtFun_And, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (or)
+TEST(SmtSolverTestGroup, make_fun_term_or)
+{
+  // or 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  // まずは成功する例
+  builtin_fun_test2(kSmtFun_Or, kSmtSort_Bool, kSmtSort_Bool, true);
+  builtin_fun_test3(kSmtFun_Or, kSmtSort_Bool, kSmtSort_Bool, kSmtSort_Bool, true);
+
+  // 型が合わなくて失敗する例
+  builtin_fun_test2(kSmtFun_Or, kSmtSort_Bool, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Or, kSmtSort_Int, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Or, kSmtSort_Int, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Or, kSmtSort_Real, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Or, sort1, sort1, false);
+
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Or, false);
+  builtin_fun_test1(kSmtFun_Or, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (xor)
+TEST(SmtSolverTestGroup, make_fun_term_xor)
+{
+  // xor 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  // まずは成功する例
+  builtin_fun_test2(kSmtFun_Xor, kSmtSort_Bool, kSmtSort_Bool, true);
+  builtin_fun_test3(kSmtFun_Xor, kSmtSort_Bool, kSmtSort_Bool, kSmtSort_Bool, true);
+
+  // 型が合わなくて失敗する例
+  builtin_fun_test2(kSmtFun_Xor, kSmtSort_Bool, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Xor, kSmtSort_Int, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Xor, kSmtSort_Int, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Xor, kSmtSort_Real, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Xor, sort1, sort1, false);
+
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Xor, false);
+  builtin_fun_test1(kSmtFun_Xor, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (imp)
+TEST(SmtSolverTestGroup, make_fun_term_imp)
+{
+  // imp 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  // まずは成功する例
+  builtin_fun_test2(kSmtFun_Imp, kSmtSort_Bool, kSmtSort_Bool, true);
+  builtin_fun_test3(kSmtFun_Imp, kSmtSort_Bool, kSmtSort_Bool, kSmtSort_Bool, true);
+
+  // 型が合わなくて失敗する例
+  builtin_fun_test2(kSmtFun_Imp, kSmtSort_Bool, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Imp, kSmtSort_Int, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Imp, kSmtSort_Int, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Imp, kSmtSort_Real, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Imp, sort1, sort1, false);
+
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Imp, false);
+  builtin_fun_test1(kSmtFun_Imp, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (add)
+TEST(SmtSolverTestGroup, make_fun_term_add)
+{
+  // add 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  // まずは成功する例
+  builtin_fun_test2(kSmtFun_Add, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test2(kSmtFun_Add, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test3(kSmtFun_Add, kSmtSort_Int, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test3(kSmtFun_Add, kSmtSort_Real, kSmtSort_Real, kSmtSort_Real, true);
+
+  // 型が合わなくて失敗する例
+  builtin_fun_test2(kSmtFun_Add, kSmtSort_Bool, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Add, kSmtSort_Int, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Add, kSmtSort_Bool, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Add, kSmtSort_Real, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Add, sort1, sort1, false);
+
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Add, false);
+  builtin_fun_test1(kSmtFun_Add, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (sub)
+TEST(SmtSolverTestGroup, make_fun_term_sub)
+{
+  // sub 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  // まずは成功する例
+  builtin_fun_test2(kSmtFun_Sub, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test2(kSmtFun_Sub, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test3(kSmtFun_Sub, kSmtSort_Int, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test3(kSmtFun_Sub, kSmtSort_Real, kSmtSort_Real, kSmtSort_Real, true);
+
+  // 型が合わなくて失敗する例
+  builtin_fun_test2(kSmtFun_Sub, kSmtSort_Bool, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Sub, kSmtSort_Int, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Sub, kSmtSort_Bool, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Sub, kSmtSort_Real, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Sub, sort1, sort1, false);
+
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Sub, false);
+  builtin_fun_test1(kSmtFun_Sub, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (mul)
+TEST(SmtSolverTestGroup, make_fun_term_mul)
+{
+  // mul 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  // まずは成功する例
+  builtin_fun_test2(kSmtFun_Mul, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test2(kSmtFun_Mul, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test3(kSmtFun_Mul, kSmtSort_Int, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test3(kSmtFun_Mul, kSmtSort_Real, kSmtSort_Real, kSmtSort_Real, true);
+
+  // 型が合わなくて失敗する例
+  builtin_fun_test2(kSmtFun_Mul, kSmtSort_Bool, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Mul, kSmtSort_Int, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Mul, kSmtSort_Bool, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Mul, kSmtSort_Real, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Mul, sort1, sort1, false);
+
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Mul, false);
+  builtin_fun_test1(kSmtFun_Mul, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (div)
+TEST(SmtSolverTestGroup, make_fun_term_div)
+{
+  // div 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  // まずは成功する例
+  builtin_fun_test2(kSmtFun_Div, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test3(kSmtFun_Div, kSmtSort_Real, kSmtSort_Real, kSmtSort_Real, true);
+
+  // 型が合わなくて失敗する例
+  builtin_fun_test2(kSmtFun_Div, kSmtSort_Int, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Div, kSmtSort_Bool, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Div, kSmtSort_Real, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Div, kSmtSort_Bool, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Div, kSmtSort_Real, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Div, sort1, sort1, false);
+
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Div, false);
+  builtin_fun_test1(kSmtFun_Div, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (eq)
+TEST(SmtSolverTestGroup, make_fun_term_eq)
+{
+  // eq 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
 
   tSmtSortId sort1 = mSolver->make_sort();
@@ -532,32 +777,286 @@ TEST(SmtSolverTestGroup, make_fun_term4)
   tSmtSortId sort2 = mSolver->make_sort();
   sortid_test( sort2 );
 
-
-  builtin_fun_test2(kSmtFun_And, kSmtSort_Bool, kSmtSort_Bool, true);
-  builtin_fun_test2(kSmtFun_Or, kSmtSort_Bool, kSmtSort_Bool, true);
-  builtin_fun_test2(kSmtFun_Xor, kSmtSort_Bool, kSmtSort_Bool, true);
-  builtin_fun_test2(kSmtFun_Imp, kSmtSort_Bool, kSmtSort_Bool, true);
-
+  // まずは成功する例
+  builtin_fun_test2(kSmtFun_Eq, kSmtSort_Bool, kSmtSort_Bool, true);
+  builtin_fun_test2(kSmtFun_Eq, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test2(kSmtFun_Eq, kSmtSort_Real, kSmtSort_Real, true);
   builtin_fun_test2(kSmtFun_Eq, sort1, sort1, true);
+  builtin_fun_test3(kSmtFun_Eq, kSmtSort_Bool, kSmtSort_Bool, kSmtSort_Bool, true);
+  builtin_fun_test3(kSmtFun_Eq, kSmtSort_Int, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test3(kSmtFun_Eq, kSmtSort_Real, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test3(kSmtFun_Eq, sort1, sort1, sort1, true);
+
+  // 型が合わなくて失敗する例
+  builtin_fun_test2(kSmtFun_Eq, kSmtSort_Bool, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Eq, kSmtSort_Bool, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Eq, kSmtSort_Bool, sort1, false);
+  builtin_fun_test2(kSmtFun_Eq, kSmtSort_Int, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Eq, kSmtSort_Int, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Eq, kSmtSort_Int, sort1, false);
+  builtin_fun_test2(kSmtFun_Eq, kSmtSort_Real, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Eq, kSmtSort_Real, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Eq, kSmtSort_Real, sort1, false);
+  builtin_fun_test2(kSmtFun_Eq, sort1, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Eq, sort1, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Eq, sort1, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Eq, sort1, sort2, false);
+
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Eq, false);
+  builtin_fun_test1(kSmtFun_Eq, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (diseq)
+TEST(SmtSolverTestGroup, make_fun_term_diseq)
+{
+  // diseq 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  tSmtSortId sort2 = mSolver->make_sort();
+  sortid_test( sort2 );
+
+  // まずは成功する例
+  builtin_fun_test2(kSmtFun_Diseq, kSmtSort_Bool, kSmtSort_Bool, true);
+  builtin_fun_test2(kSmtFun_Diseq, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test2(kSmtFun_Diseq, kSmtSort_Real, kSmtSort_Real, true);
   builtin_fun_test2(kSmtFun_Diseq, sort1, sort1, true);
+  builtin_fun_test3(kSmtFun_Diseq, kSmtSort_Bool, kSmtSort_Bool, kSmtSort_Bool, true);
+  builtin_fun_test3(kSmtFun_Diseq, kSmtSort_Int, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test3(kSmtFun_Diseq, kSmtSort_Real, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test3(kSmtFun_Diseq, sort1, sort1, sort1, true);
 
-  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, sort1, sort1, true);
+  // 型が合わなくて失敗する例
+  builtin_fun_test2(kSmtFun_Diseq, kSmtSort_Bool, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Diseq, kSmtSort_Bool, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Diseq, kSmtSort_Bool, sort1, false);
+  builtin_fun_test2(kSmtFun_Diseq, kSmtSort_Int, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Diseq, kSmtSort_Int, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Diseq, kSmtSort_Int, sort1, false);
+  builtin_fun_test2(kSmtFun_Diseq, kSmtSort_Real, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Diseq, kSmtSort_Real, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Diseq, kSmtSort_Real, sort1, false);
+  builtin_fun_test2(kSmtFun_Diseq, sort1, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Diseq, sort1, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Diseq, sort1, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Diseq, sort1, sort2, false);
 
-  builtin_fun_test2(kSmtFun_Add, kSmtSort_Int, kSmtSort_Int, true);
-  builtin_fun_test2(kSmtFun_Sub, kSmtSort_Int, kSmtSort_Int, true);
-  builtin_fun_test2(kSmtFun_Mul, kSmtSort_Int, kSmtSort_Int, true);
-  builtin_fun_test2(kSmtFun_Le, kSmtSort_Int, kSmtSort_Int, true);
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Diseq, false);
+  builtin_fun_test1(kSmtFun_Diseq, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (lt)
+TEST(SmtSolverTestGroup, make_fun_term_lt)
+{
+  // lt 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  tSmtSortId sort2 = mSolver->make_sort();
+  sortid_test( sort2 );
+
+  // まずは成功する例
   builtin_fun_test2(kSmtFun_Lt, kSmtSort_Int, kSmtSort_Int, true);
-  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Int, kSmtSort_Int, true);
-  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Int, kSmtSort_Int, true);
-
-  builtin_fun_test2(kSmtFun_Add, kSmtSort_Real, kSmtSort_Real, true);
-  builtin_fun_test2(kSmtFun_Sub, kSmtSort_Real, kSmtSort_Real, true);
-  builtin_fun_test2(kSmtFun_Mul, kSmtSort_Real, kSmtSort_Real, true);
-  builtin_fun_test2(kSmtFun_Div, kSmtSort_Real, kSmtSort_Real, true);
-  builtin_fun_test2(kSmtFun_Le, kSmtSort_Real, kSmtSort_Real, true);
   builtin_fun_test2(kSmtFun_Lt, kSmtSort_Real, kSmtSort_Real, true);
-  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Real, kSmtSort_Real, true);
-  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test3(kSmtFun_Lt, kSmtSort_Int, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test3(kSmtFun_Lt, kSmtSort_Real, kSmtSort_Real, kSmtSort_Real, true);
 
+  // 型が合わなくて失敗する例
+  builtin_fun_test2(kSmtFun_Lt, kSmtSort_Bool, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Lt, kSmtSort_Bool, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Lt, kSmtSort_Bool, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Lt, kSmtSort_Bool, sort1, false);
+  builtin_fun_test2(kSmtFun_Lt, kSmtSort_Int, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Lt, kSmtSort_Int, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Lt, kSmtSort_Int, sort1, false);
+  builtin_fun_test2(kSmtFun_Lt, kSmtSort_Real, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Lt, kSmtSort_Real, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Lt, kSmtSort_Real, sort1, false);
+  builtin_fun_test2(kSmtFun_Lt, sort1, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Lt, sort1, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Lt, sort1, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Lt, sort1, sort1, false);
+  builtin_fun_test2(kSmtFun_Lt, sort1, sort2, false);
+
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Lt, false);
+  builtin_fun_test1(kSmtFun_Lt, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (le)
+TEST(SmtSolverTestGroup, make_fun_term_le)
+{
+  // le 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  tSmtSortId sort2 = mSolver->make_sort();
+  sortid_test( sort2 );
+
+  // まずは成功する例
+  builtin_fun_test2(kSmtFun_Le, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test2(kSmtFun_Le, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test3(kSmtFun_Le, kSmtSort_Int, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test3(kSmtFun_Le, kSmtSort_Real, kSmtSort_Real, kSmtSort_Real, true);
+
+  // 型が合わなくて失敗する例
+  builtin_fun_test2(kSmtFun_Le, kSmtSort_Bool, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Le, kSmtSort_Bool, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Le, kSmtSort_Bool, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Le, kSmtSort_Bool, sort1, false);
+  builtin_fun_test2(kSmtFun_Le, kSmtSort_Int, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Le, kSmtSort_Int, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Le, kSmtSort_Int, sort1, false);
+  builtin_fun_test2(kSmtFun_Le, kSmtSort_Real, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Le, kSmtSort_Real, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Le, kSmtSort_Real, sort1, false);
+  builtin_fun_test2(kSmtFun_Le, sort1, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Le, sort1, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Le, sort1, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Le, sort1, sort1, false);
+  builtin_fun_test2(kSmtFun_Le, sort1, sort2, false);
+
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Le, false);
+  builtin_fun_test1(kSmtFun_Le, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (gt)
+TEST(SmtSolverTestGroup, make_fun_term_gt)
+{
+  // gt 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  tSmtSortId sort2 = mSolver->make_sort();
+  sortid_test( sort2 );
+
+  // まずは成功する例
+  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test3(kSmtFun_Gt, kSmtSort_Int, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test3(kSmtFun_Gt, kSmtSort_Real, kSmtSort_Real, kSmtSort_Real, true);
+
+  // 型が合わなくて失敗する例
+  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Bool, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Bool, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Bool, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Bool, sort1, false);
+  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Int, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Int, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Int, sort1, false);
+  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Real, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Real, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Gt, kSmtSort_Real, sort1, false);
+  builtin_fun_test2(kSmtFun_Gt, sort1, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Gt, sort1, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Gt, sort1, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Gt, sort1, sort1, false);
+  builtin_fun_test2(kSmtFun_Gt, sort1, sort2, false);
+
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Gt, false);
+  builtin_fun_test1(kSmtFun_Gt, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (ge)
+TEST(SmtSolverTestGroup, make_fun_term_ge)
+{
+  // ge 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  tSmtSortId sort2 = mSolver->make_sort();
+  sortid_test( sort2 );
+
+  // まずは成功する例
+  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test3(kSmtFun_Ge, kSmtSort_Int, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test3(kSmtFun_Ge, kSmtSort_Real, kSmtSort_Real, kSmtSort_Real, true);
+
+  // 型が合わなくて失敗する例
+  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Bool, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Bool, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Bool, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Bool, sort1, false);
+  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Int, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Int, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Int, sort1, false);
+  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Real, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Real, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Ge, kSmtSort_Real, sort1, false);
+  builtin_fun_test2(kSmtFun_Ge, sort1, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Ge, sort1, kSmtSort_Int, false);
+  builtin_fun_test2(kSmtFun_Ge, sort1, kSmtSort_Real, false);
+  builtin_fun_test2(kSmtFun_Ge, sort1, sort1, false);
+  builtin_fun_test2(kSmtFun_Ge, sort1, sort2, false);
+
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Ge, false);
+  builtin_fun_test1(kSmtFun_Ge, kSmtSort_Bool, false);
+}
+
+// make_fun_term テスト (ite)
+TEST(SmtSolverTestGroup, make_fun_term_ite)
+{
+  // ite 関数
+
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  tSmtSortId sort1 = mSolver->make_sort();
+  sortid_test( sort1 );
+
+  tSmtSortId sort2 = mSolver->make_sort();
+  sortid_test( sort2 );
+
+  // まずは成功する例
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, kSmtSort_Bool, kSmtSort_Bool, true);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, kSmtSort_Int, kSmtSort_Int, true);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, kSmtSort_Real, kSmtSort_Real, true);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, sort1, sort1, true);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, sort2, sort2, true);
+
+  // 型が合わなくて失敗する例
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, kSmtSort_Bool, kSmtSort_Int, false);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, kSmtSort_Bool, kSmtSort_Real, false);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, kSmtSort_Bool, sort1, false);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, kSmtSort_Int, kSmtSort_Bool, false);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, kSmtSort_Int, kSmtSort_Real, false);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, kSmtSort_Int, sort1, false);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, kSmtSort_Real, kSmtSort_Bool, false);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, kSmtSort_Real, kSmtSort_Int, false);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, kSmtSort_Real, sort1, false);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, sort1, kSmtSort_Bool, false);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, sort1, kSmtSort_Int, false);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, sort1, kSmtSort_Real, false);
+  builtin_fun_test3(kSmtFun_Ite, kSmtSort_Bool, sort1, sort2, false);
+
+  // 引数の数が合わなくて失敗する例
+  builtin_fun_test0(kSmtFun_Ite, false);
+  builtin_fun_test1(kSmtFun_Ite, kSmtSort_Bool, false);
+  builtin_fun_test2(kSmtFun_Ite, kSmtSort_Bool, kSmtSort_Int, false);
 }
