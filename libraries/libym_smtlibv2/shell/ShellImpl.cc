@@ -1214,7 +1214,7 @@ ShellImpl::eval_as_term(const SmtLibNode* node)
       else {
 	// 未定義だったので変数を作る．
 	// もちろん型は分からない．
-	const SmtVar* var = mSolver->make_var(NULL);
+	const SmtVar* var = mSolver->make_var(kSmtSort_None);
 	name_mgr().reg_var(id, var);
 	return mSolver->make_var_term(var);
       }
@@ -1288,6 +1288,26 @@ ShellImpl::eval_as_term(const SmtLibNode* node)
 
   if ( obj->is_fun() ) {
     const SmtFun* fun = obj->fun();
+    ymuint input_num = fun->input_num();
+    if ( input_num != input_list.size() ) {
+      // 引数の数が合わない．
+      mErrBuf << "# of args mismatch at " << node->loc();
+      return NULL;
+    }
+    for (ymuint i = 0; i < input_num; ++ i) {
+      tSmtSortId sort = input_list[i]->sort();
+      if ( sort != kSmtSort_None ) {
+	if ( sort != fun->input_sort(i) ) {
+	  // 引数の型が合わない．
+	  mErrBuf << "arg[" << i << "]'s sort mismatch at " << node->loc();
+	  return NULL;
+	}
+      }
+      else {
+	// input_list[i]のタイプを fun->input_sort(i) に設定する．
+      }
+    }
+
     return mSolver->make_fun_term(fun, input_list);
   }
   if ( obj->is_builtin_fun() ) {
