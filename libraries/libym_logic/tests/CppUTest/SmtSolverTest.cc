@@ -426,10 +426,24 @@ TEST(SmtSolverTestGroup, make_fun_term1)
   LONGS_EQUAL( SmtTerm::kFunTerm, term0->type() );
   CHECK( fun0 == term0->function() );
 
+  // 成功する例
   const SmtTerm* term1 = mSolver->make_fun_term(fun0, vector<const SmtTerm*>(0));
   CHECK( term1 != NULL );
   LONGS_EQUAL( SmtTerm::kFunTerm, term1->type() );
   CHECK( fun0 == term1->function() );
+
+  // 引数の数が異なるので失敗する例
+  vector<const SmtTerm*> input_term_list1(1);
+  input_term_list1[0] = term1;
+  const SmtTerm* term2 = mSolver->make_fun_term(fun0, input_term_list1);
+  CHECK( term2 == NULL );
+}
+
+// make_fun_term テスト2
+TEST(SmtSolverTestGroup, make_fun_term2)
+{
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
 
   vector<tSmtSortId> input_sort_list1(2);
   input_sort_list1[0] = kSmtSort_Bool;
@@ -443,6 +457,7 @@ TEST(SmtSolverTestGroup, make_fun_term1)
   const SmtVar* var2 = mSolver->make_var(kSmtSort_Bool);
   CHECK( var2 != NULL );
 
+  // 成功する例
   vector<const SmtTerm*> arg_list(2);
   arg_list[0] = mSolver->make_var_term(var1);
   arg_list[1] = mSolver->make_var_term(var2);
@@ -454,6 +469,23 @@ TEST(SmtSolverTestGroup, make_fun_term1)
   for (ymuint i = 0; i < arg_list.size(); ++ i) {
     CHECK( arg_list[i] == term2->input(i) );
   }
+
+  // 引数の数が異なるので失敗する例
+  const SmtTerm* term3 = mSolver->make_fun_term(fun1, vector<const SmtTerm*>(0));
+  CHECK( term3 == NULL);
+
+  vector<const SmtTerm*> arg_list1(1);
+  arg_list1[0] = mSolver->make_var_term(var1);
+  const SmtTerm* term4 = mSolver->make_fun_term(fun1, arg_list1);
+  CHECK( term4 == NULL);
+
+  // 引数の型が異なるので失敗する例
+  vector<const SmtTerm*> arg_list2(2);
+  const SmtVar* var3 = mSolver->make_var(kSmtSort_Int);
+  arg_list2[0] = mSolver->make_var_term(var3);
+  arg_list2[1] = mSolver->make_var_term(var2);
+  const SmtTerm* term5 = mSolver->make_fun_term(fun1, arg_list2);
+  CHECK( term5 == NULL );
 }
 
 // make_fun_term テスト (true)
