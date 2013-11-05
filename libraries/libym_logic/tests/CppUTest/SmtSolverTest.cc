@@ -1092,3 +1092,67 @@ TEST(SmtSolverTestGroup, make_fun_term_ite)
   builtin_fun_test1(kSmtFun_Ite, kSmtSort_Bool, false);
   builtin_fun_test2(kSmtFun_Ite, kSmtSort_Bool, kSmtSort_Int, false);
 }
+
+// make_forall_term テスト
+TEST(SmtSolverTestGroup, make_forall_term)
+{
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  const SmtVar* var1 = mSolver->make_var(kSmtSort_Bool);
+  CHECK( var1 != NULL );
+  const SmtTerm* term1 = mSolver->make_var_term(var1);
+  CHECK( term1 != NULL );
+
+  const SmtVar* var2 = mSolver->make_var(kSmtSort_Bool);
+  CHECK( var1 != NULL );
+  const SmtTerm* term2 = mSolver->make_var_term(var2);
+  CHECK( term2 != NULL );
+
+  vector<const SmtTerm*> arg_list(2);
+  arg_list[0] = term1;
+  arg_list[1] = term2;
+  const SmtTerm* term3 = mSolver->make_fun_term(kSmtFun_And, arg_list);
+  CHECK( term3 != NULL );
+
+  vector<const SmtVar*> var_list(1);
+  var_list[0] = var1;
+  const SmtTerm* term4 = mSolver->make_forall_term(var_list, term3);
+  CHECK( term4 != NULL );
+  LONGS_EQUAL( SmtTerm::kForall, term4->type() );
+  LONGS_EQUAL( 1, term4->var_num() );
+  CHECK( var1 == term4->bound_var(0) );
+  CHECK( term3 == term4->body() );
+}
+
+// make_exists_term テスト
+TEST(SmtSolverTestGroup, make_exists_term)
+{
+  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  CHECK( stat1 );
+
+  const SmtVar* var1 = mSolver->make_var(kSmtSort_Bool);
+  CHECK( var1 != NULL );
+  const SmtTerm* term1 = mSolver->make_var_term(var1);
+  CHECK( term1 != NULL );
+
+  const SmtVar* var2 = mSolver->make_var(kSmtSort_Bool);
+  CHECK( var1 != NULL );
+  const SmtTerm* term2 = mSolver->make_var_term(var2);
+  CHECK( term2 != NULL );
+
+  vector<const SmtTerm*> arg_list(2);
+  arg_list[0] = term1;
+  arg_list[1] = term2;
+  const SmtTerm* term3 = mSolver->make_fun_term(kSmtFun_And, arg_list);
+  CHECK( term3 != NULL );
+
+  vector<const SmtVar*> var_list(1);
+  var_list[0] = var1;
+  const SmtTerm* term4 = mSolver->make_exists_term(var_list, term3);
+  CHECK( term4 != NULL );
+  LONGS_EQUAL( SmtTerm::kExists, term4->type() );
+  LONGS_EQUAL( 1, term4->var_num() );
+  CHECK( var1 == term4->bound_var(0) );
+  CHECK( term3 == term4->body() );
+}

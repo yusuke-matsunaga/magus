@@ -241,6 +241,9 @@ public:
   /// @param[in] var_list 束縛変数のリスト
   /// @param[in] body 本体の式
   /// @return 作成した式を返す．
+  ///
+  /// エラーとなることはないはず．
+  /// body 中に現れない変数が var_list に含まれていても問題ない．
   virtual
   const SmtTerm*
   make_forall_term(const vector<const SmtVar*>& var_list,
@@ -250,6 +253,9 @@ public:
   /// @param[in] var_list 束縛変数のリスト
   /// @param[in] body 本体の式
   /// @return 作成した式を返す．
+  ///
+  /// エラーとなることはないはず．
+  /// body 中に現れない変数が var_list に含まれていても問題ない．
   virtual
   const SmtTerm*
   make_exists_term(const vector<const SmtVar*>& var_list,
