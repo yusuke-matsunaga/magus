@@ -744,12 +744,7 @@ ShellImpl::define_fun(const SmtLibNode* arg_top)
   mCurNameMgr = &temp_name_mgr;
 
   // 4つめは本体の式
-  const SmtTerm* body = eval_as_term(arg_list[3]);
-
-  if ( output_sort != body->sort() ) {
-    mErrBuf << "body expression's sort does not match with the output sort";
-    return false;
-  }
+  const SmtTerm* body = eval_as_term(arg_list[3], output_sort);
 
   // 新しい辞書をスタックから取り除く
   // temp_name_mgr は自動変数なので自動的に開放される．
@@ -788,7 +783,7 @@ ShellImpl::assert(const SmtLibNode* arg_top)
     return false;
   }
 
-  const SmtTerm* term = eval_as_term(arg_top);
+  const SmtTerm* term = eval_as_term(arg_top, kSmtSort_Bool);
   if ( term == NULL ) {
     // エラーメッセージは出力されている．
     return false;
@@ -1138,11 +1133,25 @@ ShellImpl::eval_as_sort_template(const SmtLibNode* node,
   return sort_mgr().make_sort_templ(id, elem_list);
 }
 
+BEGIN_NONAMESPACE
+
+tSmtSortId
+funtype_to_input_sort(tSmtFunType fun_type,
+		      ymuint pos)
+{
+  switch ( fun_type ) {
+  }
+}
+
+END_NONAMESPACE
+
 // @brief S式を term に変換する．
 // @param[in] node S式を表すノード
+// @param[in] req_sort 要求される型
 // @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
 const SmtTerm*
-ShellImpl::eval_as_term(const SmtLibNode* node)
+ShellImpl::eval_as_term(const SmtLibNode* node,
+			tSmtSortId req_sort)
 {
   // <term> ::= <spec_constant> |
   //            <qual_identifier> |
@@ -1193,28 +1202,60 @@ ShellImpl::eval_as_term(const SmtLibNode* node)
       if ( obj != NULL ) {
 	if ( obj->is_var() ) {
 	  // id が変数だった．
+	  const SmtVar* var = obj->var();
+	  if ( req_sort != kSmtSort_None ) {
+	    if ( var->sort() != kSmtSort_None ) {
+	      if ( req_sort != var->sort() ) {
+		// 型が合わない．
+		mErrBuf << "sort type mismatch at " << node->loc();
+		return NULL;
+	      }
+	    }
+	    else {
+	      // var の型を設定する．
+	      //var->set_sort(req_sort);
+	    }
+	  }
 	  return mSolver->make_var_term(obj->var());
 	}
 	else if ( obj->is_fun() ) {
 	  // id が関数だった．
 	  const SmtFun* fun = obj->fun();
+	  if ( req_sort != kSmtSort_None &&
+	       req_sort != fun->output_sort() ) {
+	    // 型が合わない．
+	    mErrBuf << "sort type mismatch at " << node->loc();
+	    return NULL;
+	  }
 	  return mSolver->make_fun_term(fun, vector<const SmtTerm*>(0));
 	}
 	else if ( obj->is_builtin_fun() ) {
-	  // id が組み込み関数だった．
+	  // id が組み込み関数だった．(引数なし)
+	  // 今のところ true/false しかないはず．
 	  tSmtFunType fun_type = obj->fun_type();
+	  if ( req_sort != kSmtSort_None &&
+	       req_sort != kSmtSort_Bool ) {
+	    // 型が合わない．
+	    mErrBuf << "sort type mismatch at " << node->loc();
+	    return NULL;
+	  }
 	  return mSolver->make_fun_term(fun_type, vector<const SmtTerm*>(0));
 	}
 	else if ( obj->is_term() ) {
 	  // id が式だった．(let 文の置き換え)
 	  const SmtTerm* term = obj->term();
+	  if ( req_sort != kSmtSort_None &&
+	       req_sort != term->sort() ) {
+	    // 型が合わない．
+	    mErrBuf << "sort type mismatch at " << node->loc();
+	    return NULL;
+	  }
 	  return term;
 	}
       }
       else {
 	// 未定義だったので変数を作る．
-	// もちろん型は分からない．
-	const SmtVar* var = mSolver->make_var(kSmtSort_None);
+	const SmtVar* var = mSolver->make_var(req_sort);
 	name_mgr().reg_var(id, var);
 	return mSolver->make_var_term(var);
       }
@@ -1240,19 +1281,19 @@ ShellImpl::eval_as_term(const SmtLibNode* node)
   if ( node1->type() == kSymbolToken ) {
     const char* name = static_cast<const char*>(node1->str_value());
     if ( strcmp("as", name) == 0 ) {
-      return eval_as_qual_id(node1->sibling());
+      return eval_as_qual_id(node1->sibling(), req_sort);
     }
     if ( strcmp("let", name) == 0 ) {
-      return eval_as_let(node1->sibling());
+      return eval_as_let(node1->sibling(), req_sort);
     }
     else if ( strcmp("forall", name) == 0 ) {
-      return eval_as_forall(node1->sibling());
+      return eval_as_forall(node1->sibling(), req_sort);
     }
     else if ( strcmp("exists", name) == 0 ) {
-      return eval_as_exists(node1->sibling());
+      return eval_as_exists(node1->sibling(), req_sort);
     }
     else if ( strcmp("!", name) == 0 ) {
-      return eval_as_attr_term(node1->sibling());
+      return eval_as_attr_term(node1->sibling(), req_sort);
     }
   }
 
@@ -1269,22 +1310,11 @@ ShellImpl::eval_as_term(const SmtLibNode* node)
   }
 
   if ( !obj->is_builtin_fun() && !obj->is_fun() ) {
-    mErrBuf << obj->name()->name() << " is not a function";
-    return NULL;
   }
 
   ymuint n = node->child_num();
   vector<const SmtTerm*> input_list;
   input_list.reserve(n - 1);
-  for (const SmtLibNode* node2 = node1->sibling();
-       node2 != NULL; node2 = node2->sibling()) {
-    const SmtTerm* term1 = eval_as_term(node2);
-    if ( term1 == NULL ) {
-      // エラーメッセージは下位の呼び出しで出力されているはず
-      return NULL;
-    }
-    input_list.push_back(term1);
-  }
 
   if ( obj->is_fun() ) {
     const SmtFun* fun = obj->fun();
@@ -1294,37 +1324,46 @@ ShellImpl::eval_as_term(const SmtLibNode* node)
       mErrBuf << "# of args mismatch at " << node->loc();
       return NULL;
     }
-    for (ymuint i = 0; i < input_num; ++ i) {
-      tSmtSortId sort = input_list[i]->sort();
-      if ( sort != kSmtSort_None ) {
-	if ( sort != fun->input_sort(i) ) {
-	  // 引数の型が合わない．
-	  mErrBuf << "arg[" << i << "]'s sort mismatch at " << node->loc();
-	  return NULL;
-	}
+    for (const SmtLibNode* node2 = node1->sibling();
+	 node2 != NULL; node2 = node2->sibling()) {
+      const SmtTerm* term1 = eval_as_term(node2, fun->input_sort(input_list.size()));
+      if ( term1 == NULL ) {
+	// エラーメッセージは下位の呼び出しで出力されているはず
+	return NULL;
       }
-      else {
-	// input_list[i]のタイプを fun->input_sort(i) に設定する．
-      }
+      input_list.push_back(term1);
     }
 
     return mSolver->make_fun_term(fun, input_list);
   }
+
   if ( obj->is_builtin_fun() ) {
     tSmtFunType fun_type = obj->fun_type();
+    for (const SmtLibNode* node2 = node1->sibling();
+	 node2 != NULL; node2 = node2->sibling()) {
+      tSmtSortId input_sort = funtype_to_input_sort(fun_type, input_list.size());
+      const SmtTerm* term1 = eval_as_term(node2, input_sort);
+      if ( term1 == NULL ) {
+	// エラーメッセージは下位の呼び出しで出力されているはず
+	return NULL;
+      }
+      input_list.push_back(term1);
+    }
     return mSolver->make_fun_term(fun_type, input_list);
   }
 
-  assert_not_reached(__FILE__, __LINE__);
-
+  // obj はユーザー定義関数でも組み込み関数でもなかった．
+  mErrBuf << obj->name()->name() << " is not a function";
   return NULL;
 }
 
 // @brief S式を qual_identifier に変換する．
 // @param[in] node S式を表すノード
+// @param[in] req_sort 要求される型
 // @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
 const SmtTerm*
-ShellImpl::eval_as_qual_id(const SmtLibNode* node)
+ShellImpl::eval_as_qual_id(const SmtLibNode* node,
+			   tSmtSortId req_sort)
 {
   vector<const SmtLibNode*> arg_list(2);
   if ( !parse_args(node, 2, arg_list) ) {
@@ -1344,6 +1383,11 @@ ShellImpl::eval_as_qual_id(const SmtLibNode* node)
     // 型名が未定義だった．
     return NULL;
   }
+  if ( req_sort != kSmtSort_None && req_sort != sort ) {
+    // 要求される型と異なっていた．
+    mErrBuf << "sort type mismatch at " << node->loc();
+    return NULL;
+  }
 
   const SmtVar* obj = mSolver->make_var(sort);
   if ( obj == NULL ) {
@@ -1355,9 +1399,11 @@ ShellImpl::eval_as_qual_id(const SmtLibNode* node)
 
 // @brief let 文の処理を行なう．
 // @param[in] node 引数の先頭ノード
+// @param[in] req_sort 要求される型
 // @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
 const SmtTerm*
-ShellImpl::eval_as_let(const SmtLibNode* node)
+ShellImpl::eval_as_let(const SmtLibNode* node,
+		       tSmtSortId req_sort)
 {
   assert_cond( node != NULL, __FILE__, __LINE__);
 
@@ -1394,7 +1440,7 @@ ShellImpl::eval_as_let(const SmtLibNode* node)
   mCurNameMgr = &temp_name_mgr;
 
   const SmtLibNode* node3 = arg_list[1];
-  const SmtTerm* body = eval_as_term(node3);
+  const SmtTerm* body = eval_as_term(node3, req_sort);
 
   // temp_name_mgr をスタックから取り去る．
   // 自動変数なので自動的に開放される．
@@ -1409,9 +1455,11 @@ ShellImpl::eval_as_let(const SmtLibNode* node)
 
 // @brief forall 文の処理を行なう．
 // @param[in] node 引数の先頭ノード
+// @param[in] req_sort 要求される型
 // @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
 const SmtTerm*
-ShellImpl::eval_as_forall(const SmtLibNode* node)
+ShellImpl::eval_as_forall(const SmtLibNode* node,
+			  tSmtSortId req_sort)
 {
   assert_cond( node != NULL, __FILE__, __LINE__);
 
@@ -1455,7 +1503,7 @@ ShellImpl::eval_as_forall(const SmtLibNode* node)
   mCurNameMgr = &temp_name_mgr;
 
   const SmtLibNode* node3 = arg_list[1];
-  const SmtTerm* body = eval_as_term(node3);
+  const SmtTerm* body = eval_as_term(node3, req_sort);
 
   // 新しい辞書をスタックから取り除く
   // temp_name_mgr は自動変数なので自動的に開放される．
@@ -1471,9 +1519,11 @@ ShellImpl::eval_as_forall(const SmtLibNode* node)
 
 // @brief exists 文の処理を行なう．
 // @param[in] node 引数の先頭ノード
+// @param[in] req_sort 要求される型
 // @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
 const SmtTerm*
-ShellImpl::eval_as_exists(const SmtLibNode* node)
+ShellImpl::eval_as_exists(const SmtLibNode* node,
+			  tSmtSortId req_sort)
 {
   assert_cond( node != NULL, __FILE__, __LINE__);
 
@@ -1517,7 +1567,7 @@ ShellImpl::eval_as_exists(const SmtLibNode* node)
   mCurNameMgr = &temp_name_mgr;
 
   const SmtLibNode* node3 = arg_list[1];
-  const SmtTerm* body = eval_as_term(node3);
+  const SmtTerm* body = eval_as_term(node3, req_sort);
 
   // 新しい辞書をスタックから取り除く
   // temp_name_mgr は自動変数なので自動的に開放される．
@@ -1533,9 +1583,11 @@ ShellImpl::eval_as_exists(const SmtLibNode* node)
 
 // @brief attr 文の処理を行なう．
 // @param[in] node 引数の先頭ノード
+// @param[in] req_sort 要求される型
 // @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
 const SmtTerm*
-ShellImpl::eval_as_attr_term(const SmtLibNode* node)
+ShellImpl::eval_as_attr_term(const SmtLibNode* node,
+			     tSmtSortId req_sort)
 {
   assert_cond( node != NULL, __FILE__, __LINE__);
 
@@ -1545,7 +1597,7 @@ ShellImpl::eval_as_attr_term(const SmtLibNode* node)
     return NULL;
   }
 
-  const SmtTerm* body = eval_as_term(node);
+  const SmtTerm* body = eval_as_term(node, req_sort);
   if ( body == NULL ) {
     // エラーメッセージは下位の呼び出しで出力されているはず
     return NULL;
@@ -1616,7 +1668,7 @@ ShellImpl::eval_as_var_binding(const SmtLibNode* node,
     return false;
   }
 
-  term = eval_as_term(arg_list[1]);
+  term = eval_as_term(arg_list[1], kSmtSort_None);
   if ( term == NULL ) {
     // エラーメッセージは eval_as_term() 中で出力されている．
     return false;

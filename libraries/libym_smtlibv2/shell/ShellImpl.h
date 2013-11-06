@@ -222,39 +222,51 @@ private:
 
   /// @brief S式を term に変換する．
   /// @param[in] node S式を表すノード
+  /// @param[in] req_sort 要求される型
   /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
   const SmtTerm*
-  eval_as_term(const SmtLibNode* node);
+  eval_as_term(const SmtLibNode* node,
+	       tSmtSortId req_sort);
 
   /// @brief S式を qual_identifier に変換する．
   /// @param[in] node S式を表すノード
+  /// @param[in] req_sort 要求される型
   /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
   const SmtTerm*
-  eval_as_qual_id(const SmtLibNode* node);
+  eval_as_qual_id(const SmtLibNode* node,
+		  tSmtSortId req_sort);
 
   /// @brief let 文の処理を行なう．
   /// @param[in] node 引数の先頭ノード
+  /// @param[in] req_sort 要求される型
   /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
   const SmtTerm*
-  eval_as_let(const SmtLibNode* node);
+  eval_as_let(const SmtLibNode* node,
+	      tSmtSortId req_sort);
 
   /// @brief forall 文の処理を行なう．
   /// @param[in] node 引数の先頭ノード
+  /// @param[in] req_sort 要求される型
   /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
   const SmtTerm*
-  eval_as_forall(const SmtLibNode* node);
+  eval_as_forall(const SmtLibNode* node,
+		 tSmtSortId req_sort);
 
   /// @brief exists 文の処理を行なう．
   /// @param[in] node 引数の先頭ノード
+  /// @param[in] req_sort 要求される型
   /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
   const SmtTerm*
-  eval_as_exists(const SmtLibNode* node);
+  eval_as_exists(const SmtLibNode* node,
+		 tSmtSortId req_sort);
 
   /// @brief attr 文の処理を行なう．
   /// @param[in] node 引数の先頭ノード
+  /// @param[in] req_sort 要求される型
   /// @note エラーが起こったら mErrBuf にエラーメッセージを出力して NULL を返す．
   const SmtTerm*
-  eval_as_attr_term(const SmtLibNode* node);
+  eval_as_attr_term(const SmtLibNode* node,
+		    tSmtSortId req_sort);
 
   /// @brief S式を var_binding に変換する．
   /// @param[in] node S式を表すノード
