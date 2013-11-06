@@ -1135,12 +1135,89 @@ ShellImpl::eval_as_sort_template(const SmtLibNode* node,
 
 BEGIN_NONAMESPACE
 
+// 組み込み関数の入力の型を返す．
 tSmtSortId
 funtype_to_input_sort(tSmtFunType fun_type,
 		      ymuint pos)
 {
   switch ( fun_type ) {
+  case kSmtFun_True:
+  case kSmtFun_False:
+    // 引数なしなのでエラー
+    return kSmtSort_None;
+
+  case kSmtFun_Not:
+    // 引数は一つで Bool 型
+    if ( pos == 0 ) {
+      return kSmtSort_Bool;
+    }
+    return kSmtSort_None;
+
+  case kSmtFun_And:
+  case kSmtFun_Or:
+  case kSmtFun_Xor:
+  case kSmtFun_Imp:
+    // 引数は2つ以上で Bool 型
+    return kSmtSort_Bool;
+
+  case kSmtFun_Eq:
+  case kSmtFun_Diseq:
+    // 引数は2つ以上で任意の型
+    return kSmtSort_Any;
+
+  case kSmtFun_Ite:
+    // 引数は3つで，最初が Bool，残り2つは任意
+    if ( pos == 0 ) {
+      return kSmtSort_Bool;
+    }
+    if ( pos == 1 || pos == 2 ) {
+      return kSmtSort_Any;
+    }
+    return kSmtSort_None;
+
+  case kSmtFun_Uminus:
+    // 引数は1つで数値型
+    if ( pos == 0 ) {
+      return kSmtSort_Num;
+    }
+    return kSmtSort_None;
+
+  case kSmtFun_Add:
+  case kSmtFun_Sub:
+  case kSmtFun_Mul:
+  case kSmtFun_Le:
+  case kSmtFun_Lt:
+  case kSmtFun_Ge:
+  case kSmtFun_Gt:
+    // 引数は2つ以上で数値型
+    return kSmtSort_Num;
+
+  case kSmtFun_Div:
+    // 引数は2つ以上で実数型
+    return kSmtSort_Real;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
   }
+  return kSmtSort_None;
+}
+
+// 2つの型が等しいかチェックする．
+inline
+bool
+check_sort(tSmtSortId sort,
+	   tSmtSortId req_sort)
+{
+  if ( req_sort == kSmtSort_Any ) {
+    // 任意の型ならいつでもOK
+    return true;
+  }
+  if ( req_sort == kSmtSort_Num ) {
+    // 数値型は Int か Real
+    return sort == kSmtSort_Int || sort == kSmtSort_Real;
+  }
+  // 残りは本当に等しいか調べる．
+  return sort == req_sort;
 }
 
 END_NONAMESPACE
@@ -1203,15 +1280,15 @@ ShellImpl::eval_as_term(const SmtLibNode* node,
 	if ( obj->is_var() ) {
 	  // id が変数だった．
 	  const SmtVar* var = obj->var();
-	  if ( req_sort != kSmtSort_None ) {
-	    if ( var->sort() != kSmtSort_None ) {
-	      if ( req_sort != var->sort() ) {
-		// 型が合わない．
-		mErrBuf << "sort type mismatch at " << node->loc();
-		return NULL;
-	      }
+	  if ( var->sort() != kSmtSort_None ) {
+	    if ( !check_sort(var->sort(), req_sort) ) {
+	      // 型が合わない．
+	      mErrBuf << "sort type mismatch at " << node->loc();
+	      return NULL;
 	    }
-	    else {
+	  }
+	  else {
+	    if ( req_sort != kSmtSort_Any && req_sort != kSmtSort_Num ) {
 	      // var の型を設定する．
 	      //var->set_sort(req_sort);
 	    }
@@ -1221,8 +1298,7 @@ ShellImpl::eval_as_term(const SmtLibNode* node,
 	else if ( obj->is_fun() ) {
 	  // id が関数だった．
 	  const SmtFun* fun = obj->fun();
-	  if ( req_sort != kSmtSort_None &&
-	       req_sort != fun->output_sort() ) {
+	  if ( !check_sort(fun->output_sort(), req_sort) ) {
 	    // 型が合わない．
 	    mErrBuf << "sort type mismatch at " << node->loc();
 	    return NULL;
@@ -1233,8 +1309,7 @@ ShellImpl::eval_as_term(const SmtLibNode* node,
 	  // id が組み込み関数だった．(引数なし)
 	  // 今のところ true/false しかないはず．
 	  tSmtFunType fun_type = obj->fun_type();
-	  if ( req_sort != kSmtSort_None &&
-	       req_sort != kSmtSort_Bool ) {
+	  if ( !check_sort(kSmtSort_Bool, req_sort) ) {
 	    // 型が合わない．
 	    mErrBuf << "sort type mismatch at " << node->loc();
 	    return NULL;
@@ -1244,8 +1319,7 @@ ShellImpl::eval_as_term(const SmtLibNode* node,
 	else if ( obj->is_term() ) {
 	  // id が式だった．(let 文の置き換え)
 	  const SmtTerm* term = obj->term();
-	  if ( req_sort != kSmtSort_None &&
-	       req_sort != term->sort() ) {
+	  if ( !check_sort(term->sort(), req_sort) ) {
 	    // 型が合わない．
 	    mErrBuf << "sort type mismatch at " << node->loc();
 	    return NULL;
@@ -1255,6 +1329,10 @@ ShellImpl::eval_as_term(const SmtLibNode* node,
       }
       else {
 	// 未定義だったので変数を作る．
+	if ( req_sort == kSmtSort_Any ||
+	     req_sort == kSmtSort_Num ) {
+	  cerr << "Warning: " << name << "'s sort is undetermined" << endl;
+	}
 	const SmtVar* var = mSolver->make_var(req_sort);
 	name_mgr().reg_var(id, var);
 	return mSolver->make_var_term(var);
@@ -1319,9 +1397,9 @@ ShellImpl::eval_as_term(const SmtLibNode* node,
   if ( obj->is_fun() ) {
     const SmtFun* fun = obj->fun();
     ymuint input_num = fun->input_num();
-    if ( input_num != input_list.size() ) {
+    if ( input_num != n - 1 ) {
       // 引数の数が合わない．
-      mErrBuf << "# of args mismatch at " << node->loc();
+      mErrBuf << "# of args for " << obj->name()->name() << " mismatch at " << node->loc();
       return NULL;
     }
     for (const SmtLibNode* node2 = node1->sibling();
@@ -1383,7 +1461,7 @@ ShellImpl::eval_as_qual_id(const SmtLibNode* node,
     // 型名が未定義だった．
     return NULL;
   }
-  if ( req_sort != kSmtSort_None && req_sort != sort ) {
+  if ( !check_sort(sort, req_sort) ) {
     // 要求される型と異なっていた．
     mErrBuf << "sort type mismatch at " << node->loc();
     return NULL;

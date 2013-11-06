@@ -92,8 +92,14 @@ const tSmtSortId kSmtSort_Int = 2;
 /// @brief 実数型を表す定数
 const tSmtSortId kSmtSort_Real = 3;
 
+/// @brief 任意の型を表す定数
+const tSmtSortId kSmtSort_Any = 4;
+
+/// @brief 整数型か実数型を表す定数
+const tSmtSortId kSmtSort_Num = 5;
+
 /// @brief ユーザー定義型の定数の最初の値
-const tSmtSortId kSmtSort_User1 = 4;
+const tSmtSortId kSmtSort_User1 = 6;
 
 
 //////////////////////////////////////////////////////////////////////
