@@ -193,7 +193,7 @@ SmtLibParser::new_num(const FileRegion& loc,
 		      ymint32 val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibNumNode));
-  return new (p) SmtLibNumNode(loc, val);
+  return new (p) SmtLibNumNode(loc, new_id(), val);
 }
 
 // @brief DEC タイプのノードを生成する．
@@ -204,7 +204,7 @@ SmtLibParser::new_dec(const FileRegion& loc,
 		      const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibDecNode));
-  return new (p) SmtLibDecNode(loc, val);
+  return new (p) SmtLibDecNode(loc, new_id(), val);
 }
 
 // @brief HEX タイプのノードを生成する．
@@ -215,7 +215,7 @@ SmtLibParser::new_hex(const FileRegion& loc,
 		      const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibHexNode));
-  return new (p) SmtLibHexNode(loc, val);
+  return new (p) SmtLibHexNode(loc, new_id(), val);
 }
 
 // @brief BIN タイプのノードを生成する．
@@ -226,7 +226,7 @@ SmtLibParser::new_bin(const FileRegion& loc,
 		      const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibBinNode));
-  return new (p) SmtLibBinNode(loc, val);
+  return new (p) SmtLibBinNode(loc, new_id(), val);
 }
 
 // @brief STRING タイプのノードを生成する．
@@ -237,7 +237,7 @@ SmtLibParser::new_string(const FileRegion& loc,
 			 const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibStrNode));
-  return new (p) SmtLibStrNode(loc, val);
+  return new (p) SmtLibStrNode(loc, new_id(), val);
 }
 
 // @brief SYMBOL タイプのノードを生成する．
@@ -248,7 +248,7 @@ SmtLibParser::new_symbol(const FileRegion& loc,
 			 const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibSymbolNode));
-  return new (p) SmtLibSymbolNode(loc, val);
+  return new (p) SmtLibSymbolNode(loc, new_id(), val);
 }
 
 // @brief KEYWORD タイプのノードを生成する．
@@ -259,7 +259,7 @@ SmtLibParser::new_keyword(const FileRegion& loc,
 			  const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibKeywordNode));
-  return new (p) SmtLibKeywordNode(loc, val);
+  return new (p) SmtLibKeywordNode(loc, new_id(), val);
 }
 
 // @brief LIST タイプのノードを生成する．
@@ -269,7 +269,16 @@ SmtLibParser::new_list(const FileRegion& loc,
 		       const SmtLibNode* child)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibListNode));
-  return new (p) SmtLibListNode(loc, num, child);
+  return new (p) SmtLibListNode(loc, new_id(), num, child);
+}
+
+// @brief SmtLibNode の次のID番号を返す．
+ymuint
+SmtLibParser::new_id()
+{
+  ymuint val = mLastId;
+  ++ mLastId;
+  return val;
 }
 
 END_NAMESPACE_YM_SMTLIBV2

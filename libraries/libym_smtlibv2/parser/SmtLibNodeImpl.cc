@@ -17,8 +17,12 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SmtLibNode::SmtLibNode(const FileRegion& loc) :
+// @param[in] loc ファイル上の位置
+// @param[in] id ID番号
+SmtLibNode::SmtLibNode(const FileRegion& loc,
+		       ymuint id) :
   mLoc(loc),
+  mId(id),
   mSibling(NULL)
 {
 }
@@ -169,10 +173,12 @@ print(ostream& s,
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibTerminalNode::SmtLibTerminalNode(const FileRegion& loc,
+				       ymuint id,
 				       const ShString& val) :
-  SmtLibNode(loc),
+  SmtLibNode(loc, id),
   mVal(val)
 {
 }
@@ -196,10 +202,12 @@ SmtLibTerminalNode::str_value() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibNumNode::SmtLibNumNode(const FileRegion& loc,
+			     ymuint id,
 			     ymint32 val) :
-  SmtLibNode(loc),
+  SmtLibNode(loc, id),
   mValue(val)
 {
 }
@@ -230,10 +238,12 @@ SmtLibNumNode::int_value() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibDecNode::SmtLibDecNode(const FileRegion& loc,
+			     ymuint id,
 			     const ShString& val) :
-  SmtLibTerminalNode(loc, val)
+  SmtLibTerminalNode(loc, id, val)
 {
 }
 
@@ -256,10 +266,12 @@ SmtLibDecNode::type() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibHexNode::SmtLibHexNode(const FileRegion& loc,
+			     ymuint id,
 			     const ShString& val) :
-  SmtLibTerminalNode(loc, val)
+  SmtLibTerminalNode(loc, id, val)
 {
 }
 
@@ -282,10 +294,12 @@ SmtLibHexNode::type() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibBinNode::SmtLibBinNode(const FileRegion& loc,
+			     ymuint id,
 			     const ShString& val) :
-  SmtLibTerminalNode(loc, val)
+  SmtLibTerminalNode(loc, id, val)
 {
 }
 
@@ -308,10 +322,12 @@ SmtLibBinNode::type() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibStrNode::SmtLibStrNode(const FileRegion& loc,
+			     ymuint id,
 			     const ShString& val) :
-  SmtLibTerminalNode(loc, val)
+  SmtLibTerminalNode(loc, id, val)
 {
 }
 
@@ -334,10 +350,12 @@ SmtLibStrNode::type() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibSymbolNode::SmtLibSymbolNode(const FileRegion& loc,
+				   ymuint id,
 				   const ShString& val) :
-  SmtLibTerminalNode(loc, val)
+  SmtLibTerminalNode(loc, id, val)
 {
 }
 
@@ -360,10 +378,12 @@ SmtLibSymbolNode::type() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibKeywordNode::SmtLibKeywordNode(const FileRegion& loc,
+				     ymuint id,
 				     const ShString& val) :
-  SmtLibTerminalNode(loc, val)
+  SmtLibTerminalNode(loc, id, val)
 {
 }
 
@@ -386,10 +406,12 @@ SmtLibKeywordNode::type() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 SmtLibListNode::SmtLibListNode(const FileRegion& loc,
+			       ymuint id,
 			       ymuint num,
 			       const SmtLibNode* child) :
-  SmtLibNode(loc),
+  SmtLibNode(loc, id),
   mChildNum(num),
   mChild(child)
 {

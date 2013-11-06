@@ -151,6 +151,10 @@ private:
 	   ymuint num,
 	   const SmtLibNode* child);
 
+  /// @brief SmtLibNode の次のID番号を返す．
+  ymuint
+  new_id();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -162,6 +166,9 @@ private:
 
   // 字句解析器
   SmtLibScanner* mScanner;
+
+  // SmtLibNode の次の ID番号
+  ymuint32 mLastId;
 
 };
 

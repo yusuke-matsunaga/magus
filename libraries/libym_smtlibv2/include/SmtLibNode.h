@@ -27,7 +27,10 @@ class SmtLibNode
 protected:
 
   /// @brief コンストラクタ
-  SmtLibNode(const FileRegion& loc);
+  /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
+  SmtLibNode(const FileRegion& loc,
+	     ymuint id);
 
   /// @brief デストラクタ
   virtual
@@ -47,6 +50,10 @@ public:
   /// @brief ファイル上の位置を返す．
   FileRegion
   loc() const;
+
+  /// @brief ID番号を返す．
+  ymuint
+  id() const;
 
   /// @brief NUM型の場合の整数値を返す．
   virtual
@@ -80,6 +87,9 @@ private:
 
   // ファイル上の位置
   FileRegion mLoc;
+
+  // ID 番号
+  ymuint32 mId;
 
   // 次のノード
   SmtLibNode* mSibling;
@@ -120,6 +130,14 @@ FileRegion
 SmtLibNode::loc() const
 {
   return mLoc;
+}
+
+// @brief ID番号を返す．
+inline
+ymuint
+SmtLibNode::id() const
+{
+  return mId;
 }
 
 // @brief LISTの要素の場合の次のノードを返す．

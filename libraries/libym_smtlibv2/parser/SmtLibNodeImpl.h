@@ -26,8 +26,10 @@ protected:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibTerminalNode(const FileRegion& loc,
+		     ymuint id,
 		     const ShString& val);
 
   /// @brief デストラクタ
@@ -70,8 +72,10 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibNumNode(const FileRegion& loc,
+		ymuint id,
 		ymint32 val);
 
   /// @brief デストラクタ
@@ -119,8 +123,10 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibDecNode(const FileRegion& loc,
+		ymuint id,
 		const ShString& val);
 
   /// @brief デストラクタ
@@ -154,8 +160,10 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibHexNode(const FileRegion& loc,
+		ymuint id,
 		const ShString& val);
 
   /// @brief デストラクタ
@@ -189,8 +197,10 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibBinNode(const FileRegion& loc,
+		ymuint id,
 		const ShString& val);
 
   /// @brief デストラクタ
@@ -224,8 +234,10 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibStrNode(const FileRegion& loc,
+		ymuint id,
 		const ShString& val);
 
   /// @brief デストラクタ
@@ -259,8 +271,10 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibSymbolNode(const FileRegion& loc,
+		   ymuint id,
 		   const ShString& val);
 
   /// @brief デストラクタ
@@ -294,8 +308,10 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibKeywordNode(const FileRegion& loc,
+		    ymuint id,
 		    const ShString& val);
 
   /// @brief デストラクタ
@@ -329,7 +345,11 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
+  /// @param[in] num 要素数
+  /// pparam[in] child 先頭の子供のノード
   SmtLibListNode(const FileRegion& loc,
+		 ymuint id,
 		 ymuint num,
 		 const SmtLibNode* child);
 
