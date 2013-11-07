@@ -27,8 +27,7 @@ lextest(const string& filename)
     return;
   }
 
-  SmtLibScanner lex;
-  lex.attach(&ido);
+  SmtLibScanner lex(ido);
 
   for ( ; ; ) {
     FileRegion loc;

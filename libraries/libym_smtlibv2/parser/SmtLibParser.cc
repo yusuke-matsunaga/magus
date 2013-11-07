@@ -24,22 +24,24 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 SmtLibParser::SmtLibParser() :
   mAlloc(4096)
 {
-  mScanner = new SmtLibScanner();
+  mScanner = NULL;
 }
 
 // デストラクタ
 SmtLibParser::~SmtLibParser()
 {
   clear();
+  delete mScanner;
 }
 
 // @brief 初期化する．
 // @param[in] ido 入力データ
 void
-SmtLibParser::init(IDO* ido)
+SmtLibParser::init(IDO& ido)
 {
   clear();
-  mScanner->attach(ido);
+  delete mScanner;
+  mScanner = new SmtLibScanner(ido);
 }
 
 // @brief S式を一つ読み込む．

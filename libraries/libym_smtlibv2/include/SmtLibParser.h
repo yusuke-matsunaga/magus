@@ -65,7 +65,7 @@ public:
   /// @param[in] ido 入力データ
   /// @note 内部で clear() を呼ぶ．
   void
-  init(IDO* ido);
+  init(IDO& ido);
 
   /// @brief 今までに生成したすべてのオブジェクトを解放する．
   void

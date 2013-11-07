@@ -13,40 +13,10 @@
 BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
-Scanner::Scanner()
-{
-  init(NULL);
-}
-
-// @brief デストラクタ
-Scanner::~Scanner()
-{
-}
-
-// @brief 入力データをアタッチする．
 // @param[in] ido 入力データ
-void
-Scanner::attach(IDO* ido)
+Scanner::Scanner(IDO& ido) :
+  mIDO(ido)
 {
-  init(ido);
-}
-
-// @brief 入力データをデタッチする．
-// @return デタッチした入力データを返す．
-IDO*
-Scanner::detach()
-{
-  IDO* old_ido = mIDO;
-  mIDO = NULL;
-  return old_ido;
-}
-
-// @brief 初期化を行う．
-// @param[in] ido 入力データ
-void
-Scanner::init(IDO* ido)
-{
-  mIDO = ido;
   mReadPos = 0;
   mEndPos = 0;
   mCR = false;
@@ -59,19 +29,20 @@ Scanner::init(IDO* ido)
   mNeedUpdate = true;
 }
 
+// @brief デストラクタ
+Scanner::~Scanner()
+{
+}
+
 // @brief peek() の下請け関数
 void
 Scanner::update()
 {
-  if ( mIDO == NULL ) {
-    return;
-  }
-
   int c = 0;
   for ( ; ; ) {
     if ( mReadPos >= mEndPos ) {
       mReadPos = 0;
-      ssize_t n = mIDO->read(mBuff, 4096);
+      ssize_t n = mIDO.read(mBuff, 4096);
       if ( n < 0 ) {
 	// ファイル読み込みエラー
 	c = -1;

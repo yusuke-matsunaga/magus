@@ -27,7 +27,8 @@ class MislibScanner :
 public:
 
   /// @brief コンストラクタ
-  MislibScanner();
+  /// @param[in] ido 入力データ
+  MislibScanner(IDO& ido);
 
   /// @brief デストラクタ
   ~MislibScanner();

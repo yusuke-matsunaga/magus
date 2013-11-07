@@ -182,7 +182,7 @@ int
 ShellImpl::eval_line()
 {
   StrListIDO ido(mStrList);
-  mParser->init(&ido);
+  mParser->init(ido);
 
   SmtLibNode* node = NULL;
   const SmtLibNode* node1 = NULL;

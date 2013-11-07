@@ -27,7 +27,9 @@ BEGIN_NAMESPACE_YM_ISCAS89
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-Iscas89Scanner::Iscas89Scanner()
+// @param[in] ido 入力データ
+Iscas89Scanner::Iscas89Scanner(IDO& ido) :
+  Scanner(ido)
 {
 }
 

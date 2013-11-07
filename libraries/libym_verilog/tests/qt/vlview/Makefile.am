@@ -4,15 +4,15 @@
 
 include $(top_srcdir)/../../etc/autotroll.mk
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 EXTRA_DIST =
 
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 bin_PROGRAMS = \
 	vlview
@@ -63,4 +63,3 @@ vlview_LDADD = \
 BUILT_SOURCES = \
 	VlView.moc.cc \
 	VerilogView.moc.cc
-

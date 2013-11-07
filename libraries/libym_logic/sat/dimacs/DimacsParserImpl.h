@@ -52,9 +52,6 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 字句解析器
-  DimacsScanner mScanner;
-
   // イベントハンドラのリスト
   list<DimacsHandler*> mHandlerList;
 

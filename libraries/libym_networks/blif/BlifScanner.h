@@ -27,7 +27,8 @@ class BlifScanner :
 public:
 
   /// @brief コンストラクタ
-  BlifScanner();
+  /// @param[in] ido 入力データ
+  BlifScanner(IDO& ido);
 
   /// @brief デストラクタ
   ~BlifScanner();

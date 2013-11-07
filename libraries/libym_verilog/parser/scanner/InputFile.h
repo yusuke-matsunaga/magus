@@ -39,8 +39,10 @@ class InputFile :
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] ido 入力データ
   /// @param[in] lex 親の Lex
-  InputFile(RawLex* lex);
+  InputFile(IDO& ido,
+	    RawLex* lex);
 
   /// @brief デストラクタ
   ~InputFile();

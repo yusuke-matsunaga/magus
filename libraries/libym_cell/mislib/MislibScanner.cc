@@ -20,7 +20,8 @@ class MislibParserImpl;
 
 
 // コンストラクタ
-MislibScanner::MislibScanner()
+MislibScanner::MislibScanner(IDO& ido) :
+  Scanner(ido)
 {
 }
 

@@ -27,7 +27,8 @@ class DotlibScanner :
 public:
 
   /// @brief コンストラクタ
-  DotlibScanner();
+  /// @param[in] ido 入力データ
+  DotlibScanner(IDO& ido);
 
   /// @brief デストラクタ
   ~DotlibScanner();

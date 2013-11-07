@@ -176,7 +176,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 字句解析器
-  MislibScanner mScanner;
+  MislibScanner* mScanner;
 
   // MislibNode を管理するオブジェクト
   MislibMgrImpl* mMislibMgr;

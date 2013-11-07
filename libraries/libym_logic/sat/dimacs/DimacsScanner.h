@@ -37,7 +37,8 @@ class DimacsScanner :
 public:
 
   /// @brief コンストラクタ
-  DimacsScanner();
+  /// @param[in] ido 入力データ
+  DimacsScanner(IDO& ido);
 
   /// @brief デストラクタ
   ~DimacsScanner();

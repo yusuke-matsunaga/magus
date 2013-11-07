@@ -26,7 +26,8 @@ class Iscas89Scanner :
 public:
 
   /// @brief コンストラクタ
-  Iscas89Scanner();
+  /// @param[in] ido 入力データ
+  Iscas89Scanner(IDO& ido);
 
   /// @brief デストラクタ
   ~Iscas89Scanner();

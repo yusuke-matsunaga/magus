@@ -31,7 +31,8 @@ class SmtLibScanner :
 public:
 
   /// @brief コンストラクタ
-  SmtLibScanner();
+  /// @param[in] ido 入力データ
+  SmtLibScanner(IDO& ido);
 
   /// @brief デストラクタ
   ~SmtLibScanner();

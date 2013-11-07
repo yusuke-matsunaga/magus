@@ -47,7 +47,6 @@ main(int argc,
   if ( spath ) {
     splist = SearchPathList(spath);
   }
-
   // トークンリストを作る．
   lex.set_searchpath(splist);
   if ( !lex.open_file(argv[1]) ) {
@@ -65,12 +64,14 @@ main(int argc,
     token_model->add_token(id, lex.cur_token_loc(), lex.cur_string());
   }
 
+#if 0
   // パース木を作る．
   if ( !vl_mgr.read_file(argv[1], splist) ) {
     return 1;
   }
   ParseTreeModel* pt_model = new ParseTreeModel;
   pt_model->set_pt(vl_mgr);
+#endif
 
   // 表示用ウィジェットを作る．
   VerilogView* vlview = new VerilogView;
@@ -86,10 +87,12 @@ main(int argc,
   splitter->setStretchFactor(2, 2);
   splitter->resize(1024, 760);
 
+  token_view->setModel(token_model);
+
+#if 0
   if ( !vlview->open(argv[1]) ) {
     return 2;
   }
-  token_view->setModel(token_model);
   pt_view->setModel(pt_model);
 
   QObject::connect(token_view, SIGNAL(select_token(int, int, int, int)),
@@ -97,9 +100,11 @@ main(int argc,
 
   QObject::connect(pt_view, SIGNAL(select_token(int, int, int, int)),
 		   vlview, SLOT(hilight(int, int, int, int)));
+#endif
 
   splitter->show();
 
+#if 0
   GoToLine* goto_line = new GoToLine;
   QObject::connect(goto_line, SIGNAL(on_goto(int)),
 		   vlview, SLOT(hilight(int)));
@@ -108,6 +113,7 @@ main(int argc,
   goto_line->set_maximum(100000);
 
   goto_line->show();
+#endif
 
   return app.exec();
 }

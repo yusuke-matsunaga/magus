@@ -171,7 +171,7 @@ DimacsParserImpl::read(const string& filename)
 
   vector<int> lits;
 
-  mScanner.attach(&ido);
+  DimacsScanner scanner(ido);
 
   bool stat = true;
   for (list<DimacsHandler*>::iterator p = mHandlerList.begin();
@@ -187,7 +187,7 @@ DimacsParserImpl::read(const string& filename)
 
   for ( ; ; ) {
     FileRegion loc;
-    tToken tk = mScanner.read_token(loc);
+    tToken tk = scanner.read_token(loc);
     if ( tk == kERR ) {
       return false;
     }
@@ -207,7 +207,7 @@ DimacsParserImpl::read(const string& filename)
       if ( tk != kNUM ) {
 	goto p_error;
       }
-      dec_nv = mScanner.cur_val();
+      dec_nv = scanner.cur_val();
       state = ST_P2;
       break;
 
@@ -215,7 +215,7 @@ DimacsParserImpl::read(const string& filename)
       if ( tk != kNUM ) {
 	goto p_error;
       }
-      dec_nc = mScanner.cur_val();
+      dec_nc = scanner.cur_val();
       state = ST_P3;
       break;
 
@@ -255,7 +255,7 @@ DimacsParserImpl::read(const string& filename)
 	continue;
       }
       if ( tk == kNUM ) {
-	int v = mScanner.cur_val();
+	int v = scanner.cur_val();
 	lits.clear();
 	lits.push_back(v);
 	if ( v < 0 ) {
@@ -278,7 +278,7 @@ DimacsParserImpl::read(const string& filename)
 	continue;
       }
       else if ( tk == kNUM ) {
-	int v = mScanner.cur_val();
+	int v = scanner.cur_val();
 	lits.push_back(v);
 	if ( v < 0 ) {
 	  v = - v;

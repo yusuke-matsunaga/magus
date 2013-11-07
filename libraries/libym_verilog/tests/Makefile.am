@@ -2,14 +2,9 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS = . vltest
-if WITH_QT
-SUBDIRS += ptview vlview
-endif
-
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+SUBDIRS = . \
+	vltest \
+	$(YM_EXTRA_TESTS_SUBDIRS)
 
 YFLAGS=-d -v
 
@@ -39,6 +34,10 @@ noinst_PROGRAMS = \
 	scalarval_test \
 	udpval_test \
 	valuetype_test
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 
 #############################################################

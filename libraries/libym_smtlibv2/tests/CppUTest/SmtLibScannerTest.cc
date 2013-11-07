@@ -20,7 +20,8 @@ TEST_GROUP(SmtLibScannerTestGroup)
   SmtLibScanner* mScanner;
 
   TEST_SETUP() {
-    mScanner = new SmtLibScanner;
+    //mScanner = new SmtLibScanner;
+    mScanner = NULL;
   }
 
   TEST_TEARDOWN() {

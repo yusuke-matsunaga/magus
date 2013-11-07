@@ -36,7 +36,8 @@ class Scanner
 public:
 
   /// @brief コンストラクタ
-  Scanner();
+  /// @param[in] ido 入力データ
+  Scanner(IDO& ido);
 
   /// @brief デストラクタ
   ~Scanner();
@@ -46,16 +47,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 入力データ関連の操作を行う関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 入力データをアタッチする．
-  /// @param[in] ido 入力データ
-  void
-  attach(IDO* ido);
-
-  /// @brief 入力データをデタッチする．
-  /// @return デタッチした入力データを返す．
-  IDO*
-  detach();
 
   /// @brief オープン中のファイル情報を得る．
   const FileInfo&
@@ -109,11 +100,6 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 初期化を行う．
-  /// @param[in] ido 入力データ
-  void
-  init(IDO* ido);
-
   /// @brief peek() の下請け関数
   void
   update();
@@ -125,7 +111,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入力データ
-  IDO* mIDO;
+  IDO& mIDO;
 
   // バッファ
   ymuint8 mBuff[4096];
@@ -175,13 +161,7 @@ inline
 const FileInfo&
 Scanner::file_info() const
 {
-  if ( mIDO != NULL ) {
-    return mIDO->file_info();
-  }
-  else {
-    static FileInfo dummy;
-    return dummy;
-  }
+  return mIDO.file_info();
 }
 
 // @brief 現在のファイル情報を書き換える．
@@ -192,9 +172,7 @@ inline
 void
 Scanner::set_file_info(const FileInfo& file_info)
 {
-  if ( mIDO != NULL ) {
-    mIDO->set_file_info(file_info);
-  }
+  mIDO.set_file_info(file_info);
 }
 
 // @brief 次の文字を読み出す．

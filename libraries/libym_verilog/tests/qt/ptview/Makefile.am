@@ -4,18 +4,18 @@
 
 include $(top_srcdir)/../../etc/autotroll.mk
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/parser/include \
-	-I$(top_srcdir)/parser/scanner \
-	-I$(top_builddir)/parser/main
-
 EXTRA_DIST =
 
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/parser/include \
+	-I$(top_srcdir)/parser/scanner \
+	-I$(top_builddir)/parser/main
 
 bin_PROGRAMS = \
 	ptview
@@ -80,4 +80,3 @@ BUILT_SOURCES = \
 	TokenView.moc.cc \
 	ParseTreeView.moc.cc \
 	GoToLine.moc.cc
-

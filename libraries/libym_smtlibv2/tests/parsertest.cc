@@ -24,7 +24,7 @@ parsertest(const string& filename)
   }
 
   SmtLibParser parser;
-  parser.init(&ido);
+  parser.init(ido);
 
   for (bool run = true; run; ) {
     SmtLibNode* node;

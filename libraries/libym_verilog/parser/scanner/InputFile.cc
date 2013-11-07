@@ -41,8 +41,11 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] ido 入力データ
 // @param[in] lex 親の Lex
-InputFile::InputFile(RawLex* lex) :
+InputFile::InputFile(IDO& ido,
+		     RawLex* lex) :
+  Scanner(ido),
   mLex(lex)
 {
 }

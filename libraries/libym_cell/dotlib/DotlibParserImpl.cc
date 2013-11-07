@@ -26,12 +26,14 @@ DotlibParserImpl::DotlibParserImpl() :
   mDotlibMgr(NULL),
   mLibraryHandler( HandlerFactory::new_library(*this) )
 {
+  mScanner = NULL;
 }
 
 // デストラクタ
 DotlibParserImpl::~DotlibParserImpl()
 {
   delete mLibraryHandler;
+  delete mScanner;
 }
 
 // @brief ファイルを読み込む．
@@ -64,7 +66,7 @@ DotlibParserImpl::read_file(const string& filename,
     return false;
   }
 
-  mScanner.attach(&ido);
+  mScanner = new DotlibScanner(ido);
 
   bool error = false;
   tTokenType type;
@@ -104,7 +106,10 @@ DotlibParserImpl::read_file(const string& filename,
 		    "contents after library group are ignored.");
   }
 
-last:
+ last:
+  delete mScanner;
+  mScanner = NULL;
+
   if ( error ) {
     return false;
   }
