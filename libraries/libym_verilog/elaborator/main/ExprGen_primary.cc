@@ -674,30 +674,35 @@ ExprGen::check_decl(const ElbEnv& env,
       error_select_in_force(pt_expr);
       return false;
     }
-    if ( decl_type != kVpiNet &
-	 decl_type != kVpiReg &
-	 decl_type != kVpiIntegerVar &
-	 decl_type != kVpiRealVar &
+    if ( decl_type != kVpiNet &&
+	 decl_type != kVpiReg &&
+	 decl_type != kVpiIntegerVar &&
+	 decl_type != kVpiRealVar &&
 	 decl_type != kVpiTimeVar) {
       // net/reg/変数以外はダメ
       error_illegal_object(pt_expr);
       return false;
     }
   }
-  else if ( env.is_net_lhs() &&
-       decl_type != kVpiNet ) {
-    // net 以外はダメ
-    error_illegal_object(pt_expr);
-    return false;
+  else if ( env.is_net_lhs() ) {
+    if ( decl_type != kVpiNet &&
+	 (decl_type != kVpiNetArray || !is_array) ) {
+      // net 以外はダメ
+      error_illegal_object(pt_expr);
+      return false;
+    }
   }
-  else if ( env.is_var_lhs() &&
-       ( decl_type != kVpiReg &&
+  else if ( env.is_var_lhs() ) {
+    if ( decl_type != kVpiReg &&
+	 (decl_type != kVpiRegArray || !is_array) &&
 	 decl_type != kVpiIntegerVar &&
 	 decl_type != kVpiRealVar &&
-	 decl_type != kVpiTimeVar ) ) {
-    // reg/変数以外はダメ
-    error_illegal_object(pt_expr);
-    return false;
+	 decl_type != kVpiTimeVar &&
+	 decl_type != kVpiVarSelect ) {
+      // reg/変数以外はダメ
+      error_illegal_object(pt_expr);
+      return false;
+    }
   }
   else {
     // 右辺系の環境
