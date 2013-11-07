@@ -109,15 +109,23 @@ AC_SUBST([YMTOOLS_SRCDIR])
 AC_SUBST([YMTOOLS_BUILDDIR])
 
 YM_EXTRA_SUBDIRS=""
+YM_EXTRA_TESTS_SUBDIRS=""
 YM_EXTRA_LIBADD=""
 
 if test "$ym_have_python" = 1; then
    YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS python"
+   YM_EXTRA_TESTS_SUBDIRS="$YM_EXTRA_TESTS_SUBDIRS python"
    AC_CONFIG_FILES([python/Makefile])
    AC_CONFIG_FILES([tests/python/Makefile])
 fi
 
+if test "x$qt" = xtrue; then
+   YM_EXTRA_TESTS_SUBDIRS="$YM_EXTRA_TESTS_SUBDIRS qt"
+   AC_CONFIG_FILES([tests/qt/Makefile])
+fi
+
 AC_SUBST([YM_EXTRA_SUBDIRS])
+AC_SUBST([YM_EXTRA_TESTS_SUBDIRS])
 AC_SUBST([YM_EXTRA_LIBADD])
 
 
@@ -131,7 +139,6 @@ AC_CONFIG_FILES([mislib/Makefile])
 AC_CONFIG_FILES([dotlib/Makefile])
 AC_CONFIG_FILES([libcomp/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
-AC_CONFIG_FILES([tests/dotlib_ptview/Makefile])
 
 
 # ===================================================================

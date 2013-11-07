@@ -126,11 +126,13 @@ YMTOOLS_BUILDDIR="\$(top_builddir)/../.."
 AC_SUBST([YMTOOLS_SRCDIR])
 AC_SUBST([YMTOOLS_BUILDDIR])
 
+YM_EXTRA_SUBDIRS=""
 YM_EXTRA_TESTS_SUBDIRS=""
 
 AM_CONDITIONAL([YM_HAVE_ZLIB], [test $ym_have_zlib = 1])
 
 if test "$ym_have_python" = 1; then
+   YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS python"
    YM_EXTRA_TESTS_SUBDIRS="$YM_EXTRA_TESTS_SUBDIRS python"
    AC_CONFIG_FILES([python/Makefile])
    AC_CONFIG_FILES([tests/python/Makefile])
@@ -141,6 +143,7 @@ if test "$ym_have_cpputest" = 1; then
    AC_CONFIG_FILES([tests/CppUTest/Makefile])
 fi
 
+AC_SUBST([YM_EXTRA_SUBDIRS])
 AC_SUBST([YM_EXTRA_TESTS_SUBDIRS])
 
 

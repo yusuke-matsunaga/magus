@@ -54,10 +54,11 @@ vs_sub(ostream& s,
     s << " )";
   }
   else if ( node->is_list() ) {
+    ymuint n = node->list_size();
     const char* comma = "";
     s << "(";
-    for (const DotlibNode* node1 = node->top(); node1;
-	 node1 = node1->next()) {
+    for (ymuint i = 0; i < n; ++ i) {
+      const DotlibNode* node1 = node->list_elem(i);
       s << comma;
       vs_sub(s, node1);
       comma = ", ";
@@ -251,6 +252,7 @@ PtBaseNode::data(int column,
 	return QVariant(str.c_str());
       }
     }
+#if 0
     else if ( mNode->is_attr() ) {
       if ( column == 0 ) {
 	return (const char*)mNode->attr_name();
@@ -260,6 +262,7 @@ PtBaseNode::data(int column,
 	return QVariant(str.c_str());
       }
     }
+#endif
   }
   return QVariant();
 }
@@ -288,8 +291,8 @@ PtBaseNode::expand() const
   else if ( mNode->is_list() ) {
     ymuint n = mNode->list_size();
     mChildren.resize(n);
-    ymuint i = 0;
-    for (const DotlibNode* node = mNode->top(); node; node = node->next()) {
+    for (ymuint i = 0; i < n; ++ i) {
+      const DotlibNode* node = mNode->list_elem(i);
       mChildren[i] = new PtBaseNode(node);
       ++ i;
     }
@@ -298,6 +301,7 @@ PtBaseNode::expand() const
     mChildren.resize(1);
     mChildren[0] = new PtBaseNode(mNode->group_value());
   }
+#if 0
   else if ( mNode->is_attr() ) {
     const DotlibNode* value = mNode->attr_value();
     if ( value->is_group() ) {
@@ -320,6 +324,7 @@ PtBaseNode::expand() const
       mChildren[0] = new PtBaseNode(value);
     }
   }
+#endif
   mExpanded = true;
 }
 
