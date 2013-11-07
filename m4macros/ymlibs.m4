@@ -136,10 +136,10 @@ fi
 
 # ==================================================================
 # YM_INIT_LIBRARIES_SUBDIRS
-# 
+#
 # Description: Initialize 'YM_LIBRARIES_SUBDIRS'
 # ==================================================================
-AC_DEFUN([YM_INIT_LIBRARIES_SUBDIRS], 
+AC_DEFUN([YM_INIT_LIBRARIES_SUBDIRS],
 [
 ym_libraries_subdirs=""
 ])
@@ -150,7 +150,7 @@ ym_libraries_subdirs=""
 #
 # Description: add <dirname> to 'YM_LIBRARIES_SUBDIRS'
 # ==================================================================
-AC_DEFUN([YM_ADD_LIBRARIES_SUBDIRS], 
+AC_DEFUN([YM_ADD_LIBRARIES_SUBDIRS],
 [
 ym_libraries_subdirs="$ym_libraries_subdirs $1"
 ])
@@ -195,12 +195,12 @@ fi
 
 # ==================================================================
 # YM_INIT_PROGRAMS_SUBDIRS
-# 
+#
 # Description: Initialize 'YM_PROGRAMS_SUBDIRS'
 # ==================================================================
-AC_DEFUN([YM_INIT_PROGRAMS_SUBDIRS], 
+AC_DEFUN([YM_INIT_PROGRAMS_SUBDIRS],
 [
-ym_pgorams_subdirs=""
+ym_programs_subdirs=""
 ])
 
 
@@ -209,7 +209,7 @@ ym_pgorams_subdirs=""
 #
 # Description: add <dirname> to 'YM_PROGRAMS_SUBDIRS'
 # ==================================================================
-AC_DEFUN([YM_ADD_PROGRAMS_SUBDIRS], 
+AC_DEFUN([YM_ADD_PROGRAMS_SUBDIRS],
 [
 ym_programs_subdirs="$ym_programs_subdirs $1"
 ])
@@ -222,4 +222,68 @@ ym_programs_subdirs="$ym_programs_subdirs $1"
 # ==================================================================
 AC_DEFUN([YM_FINISH_PROGRAMS_SUBDIRS], [
 AC_SUBST([YM_PROGRAMS_SUBDIRS], $ym_programs_subdirs)
+])
+
+
+# ==================================================================
+# YM_INIT_EXTRA_SUBDIRS
+#
+# Description: Initialize 'YM_EXTRA_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_INIT_EXTRA_SUBDIRS],
+[
+ym_extra_subdirs=""
+])
+
+
+# ==================================================================
+# YM_ADD_EXTRA_SUBDIRS(dirname)
+#
+# Description: add <dirname> to 'YM_EXTRA_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_ADD_EXTRA_SUBDIRS],
+[
+ym_extra_subdirs="$ym_extra_subdirs $1"
+])
+
+
+# ==================================================================
+# YM_FINISH_EXTRA_SUBDIRS
+#
+# Description: finalize 'YM_EXTRA_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_FINISH_EXTRA_SUBDIRS], [
+AC_SUBST([YM_EXTRA_SUBDIRS], $ym_extra_subdirs)
+])
+
+
+# ==================================================================
+# YM_INIT_EXTRA_TESTS_SUBDIRS
+#
+# Description: Initialize 'YM_EXTRA_TESTS_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_INIT_EXTRA_TESTS_SUBDIRS],
+[
+ym_extra_tests_subdirs=""
+])
+
+
+# ==================================================================
+# YM_ADD_EXTRA_TESTS_SUBDIRS(dirname)
+#
+# Description: add <dirname> to 'YM_EXTRA_TESTS_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_ADD_EXTRA_TESTS_SUBDIRS],
+[
+ym_extra_tests_subdirs="$ym_extra_tests_subdirs $1"
+])
+
+
+# ==================================================================
+# YM_FINISH_EXTRA_TESTS_SUBDIRS
+#
+# Description: finalize 'YM_EXTRA_TESTS_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_FINISH_EXTRA_TESTS_SUBDIRS], [
+AC_SUBST([YM_EXTRA_TESTS_SUBDIRS], $ym_extra_tests_subdirs)
 ])

@@ -108,25 +108,23 @@ YMTOOLS_BUILDDIR="\$(top_builddir)/../.."
 AC_SUBST([YMTOOLS_SRCDIR])
 AC_SUBST([YMTOOLS_BUILDDIR])
 
-YM_EXTRA_SUBDIRS=""
-YM_EXTRA_TESTS_SUBDIRS=""
-YM_EXTRA_LIBADD=""
+YM_INIT_EXTRA_SUBDIRS
+YM_INIT_EXTRA_TESTS_SUBDIRS
 
 if test "$ym_have_python" = 1; then
-   YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS python"
-   YM_EXTRA_TESTS_SUBDIRS="$YM_EXTRA_TESTS_SUBDIRS python"
+   YM_ADD_EXTRA_SUBDIRS([python])
+   YM_ADD_EXTRA_TESTS_SUBDIRS([python])
    AC_CONFIG_FILES([python/Makefile])
    AC_CONFIG_FILES([tests/python/Makefile])
 fi
 
 if test "x$qt" = xtrue; then
-   YM_EXTRA_TESTS_SUBDIRS="$YM_EXTRA_TESTS_SUBDIRS qt"
+   YM_ADD_EXTRA_TESTS_SUBDIRS([qt])
    AC_CONFIG_FILES([tests/qt/Makefile])
 fi
 
-AC_SUBST([YM_EXTRA_SUBDIRS])
-AC_SUBST([YM_EXTRA_TESTS_SUBDIRS])
-AC_SUBST([YM_EXTRA_LIBADD])
+YM_FINISH_EXTRA_SUBDIRS
+YM_FINISH_EXTRA_TESTS_SUBDIRS
 
 
 # ===================================================================
