@@ -772,7 +772,7 @@ TEST(SmtSolverTestGroup, make_fun_term_div)
 {
   // div 関数
 
-  bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
+  bool stat1 = mSolver->set_logic(kSmtLogic_AUFLIRA);
   CHECK( stat1 );
 
   tSmtSortId sort1 = mSolver->make_sort();

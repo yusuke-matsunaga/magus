@@ -20,9 +20,7 @@ BEGIN_NAMESPACE_YM_SMT
 //////////////////////////////////////////////////////////////////////
 class SmtSortInfo
 {
-  friend class SmtSolverImpl;
-
-protected:
+public:
 
   /// @brief デストラクタ
   virtual

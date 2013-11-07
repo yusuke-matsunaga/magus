@@ -12,6 +12,7 @@
 #include "SmtSortImpl.h"
 #include "SmtVarImpl.h"
 #include "SmtFunImpl.h"
+#include "SmtFunValidatorImpl.h"
 #include "SmtTermImpl.h"
 
 
@@ -77,15 +78,18 @@ SmtSolverImpl::set_logic(tSmtLogic logic)
   case kSmtLogic_AUFLIRA:
     Core_init();
     Ints_init();
+    Reals_init();
     break;
 
   case kSmtLogic_AUFNIRA:
     Core_init();
     Ints_init();
+    Reals_init();
     break;
 
   case kSmtLogic_LRA:
     Core_init();
+    Reals_init();
     break;
 
   case kSmtLogic_QF_ABV:
@@ -191,11 +195,47 @@ SmtSolverImpl::Core_init()
 {
   assert_cond( kSmtSort_Bool < mSortArraySize, __FILE__, __LINE__);
 
+  // Bool 型の生成
   void* p = mAlloc.get_memory(sizeof(SmtSimpleSort));
   SmtSortImpl* sort = new (p) SmtSimpleSort();
 
   mSortArray[kSmtSort_Bool] = sort;
   sort->mId = kSmtSort_Bool;
+
+  // true/false 関数用 validator の生成
+  void* q = mAlloc.get_memory(sizeof(SmtBool0Validator));
+  SmtFunValidator* fv0 = new (q) SmtBool0Validator();
+
+  mFunValidatorMap.insert(make_pair(kSmtFun_True, fv0));
+  mFunValidatorMap.insert(make_pair(kSmtFun_False, fv0));
+
+  // not 関数用の validator の生成
+  void* r = mAlloc.get_memory(sizeof(SmtBool1Validator));
+  SmtFunValidator* fv1 = new (r) SmtBool1Validator();
+
+  mFunValidatorMap.insert(make_pair(kSmtFun_Not, fv1));
+
+  // and/or/xor/=> 用の validator の生成
+  void* s = mAlloc.get_memory(sizeof(SmtBool2Validator));
+  SmtFunValidator* fv2 = new (s) SmtBool2Validator();
+
+  mFunValidatorMap.insert(make_pair(kSmtFun_And, fv2));
+  mFunValidatorMap.insert(make_pair(kSmtFun_Or, fv2));
+  mFunValidatorMap.insert(make_pair(kSmtFun_Xor, fv2));
+  mFunValidatorMap.insert(make_pair(kSmtFun_Imp, fv2));
+
+  // ite 用の validator の生成
+  void* t = mAlloc.get_memory(sizeof(SmtIteValidator));
+  SmtFunValidator* fv3 = new (t) SmtIteValidator();
+
+  mFunValidatorMap.insert(make_pair(kSmtFun_Ite, fv3));
+
+  // eq/distinct 用の validator の生成
+  void* u = mAlloc.get_memory(sizeof(SmtEqValidator));
+  SmtFunValidator* fv4 = new (u) SmtEqValidator();
+
+  mFunValidatorMap.insert(make_pair(kSmtFun_Eq, fv4));
+  mFunValidatorMap.insert(make_pair(kSmtFun_Diseq, fv4));
 }
 
 // @brief INTS logic の初期化を行う．
@@ -204,11 +244,35 @@ SmtSolverImpl::Ints_init()
 {
   assert_cond( kSmtSort_Int < mSortArraySize, __FILE__, __LINE__);
 
+  // Int 型の生成
   void* p = mAlloc.get_memory(sizeof(SmtSimpleSort));
   SmtSortImpl* sort = new (p) SmtSimpleSort();
 
   mSortArray[kSmtSort_Int] = sort;
   sort->mId = kSmtSort_Int;
+
+  // 単項マイナス用の validator の生成
+  void* q = mAlloc.get_memory(sizeof(SmtUminusValidator));
+  SmtFunValidator* fv1 = new (q) SmtUminusValidator();
+
+  mFunValidatorMap.insert(make_pair(kSmtFun_Uminus, fv1));
+
+  // 2項演算用の validator の生成
+  void* r = mAlloc.get_memory(sizeof(SmtArithValidator));
+  SmtFunValidator* fv2 = new (r) SmtArithValidator();
+
+  mFunValidatorMap.insert(make_pair(kSmtFun_Add, fv2));
+  mFunValidatorMap.insert(make_pair(kSmtFun_Sub, fv2));
+  mFunValidatorMap.insert(make_pair(kSmtFun_Mul, fv2));
+
+  // 比較演算用の validator の生成
+  void* s = mAlloc.get_memory(sizeof(SmtCompValidator));
+  SmtFunValidator* fv3 = new (s) SmtCompValidator();
+
+  mFunValidatorMap.insert(make_pair(kSmtFun_Le, fv3));
+  mFunValidatorMap.insert(make_pair(kSmtFun_Lt, fv3));
+  mFunValidatorMap.insert(make_pair(kSmtFun_Ge, fv3));
+  mFunValidatorMap.insert(make_pair(kSmtFun_Gt, fv3));
 }
 
 // @brief REALS logic の初期化を行う．
@@ -217,11 +281,18 @@ SmtSolverImpl::Reals_init()
 {
   assert_cond( kSmtSort_Real < mSortArraySize, __FILE__, __LINE__);
 
+  // Real 型の生成
   void* p = mAlloc.get_memory(sizeof(SmtSimpleSort));
   SmtSortImpl* sort = new (p) SmtSimpleSort();
 
   mSortArray[kSmtSort_Real] = sort;
   sort->mId = kSmtSort_Real;
+
+  // 除算用の validator の生成
+  void* q = mAlloc.get_memory(sizeof(SmtDivValidator));
+  SmtFunValidator* fv1 = new (q) SmtDivValidator();
+
+  mFunValidatorMap.insert(make_pair(kSmtFun_Div, fv1));
 }
 
 // @brief 型を作る．(単純型)
@@ -427,6 +498,18 @@ SmtSolverImpl::make_fun(const vector<const SmtVar*>& input_var_list,
   return fun;
 }
 
+// @brief 組み込み関数用のチェッカーを得る．
+// @param[in] fun_type 関数の型
+const SmtFunValidator*
+SmtSolverImpl::get_fun_validator(tSmtFunType fun_type)
+{
+  hash_map<ymuint32, const SmtFunValidator*>::const_iterator p = mFunValidatorMap.find(fun_type);
+  if ( p == mFunValidatorMap.end() ) {
+    return NULL;
+  }
+  return p->second;
+}
+
 // @brief <numeral> 型の term を作る．
 // @param[in] val 値
 // @return 作成した式を返す．
@@ -554,116 +637,6 @@ SmtSolverImpl::make_fun_term(const SmtFun* fun,
   return term;
 }
 
-
-BEGIN_NONAMESPACE
-
-// @brief Int 型か Real 型の場合に true を返す．
-inline
-bool
-check_I_or_R(tSmtSortId sort)
-{
-  return sort == kSmtSort_Int || sort == kSmtSort_Real;
-}
-
-// @brief 組み込み関数の引数の型のチェックを行う．
-// @param[in] fun_type 関数の型
-// @param[in] arg_sort_list 引数の型のリスト
-// @retval true 適切な引数だった．
-// @retval false 引数の数か型が fun_type と合わなかった．
-bool
-check_args(tSmtFunType fun_type,
-	   const vector<tSmtSortId>& arg_sort_list)
-{
-  ymuint n = arg_sort_list.size();
-  switch ( fun_type ) {
-  case kSmtFun_True:
-  case kSmtFun_False:
-    // 引数なし
-    return n == 0;
-
-  case kSmtFun_Not:
-    // 引数は1つで，Bool 型
-    return ( n == 1 && arg_sort_list[0] == kSmtSort_Bool );
-
-  case kSmtFun_And:
-  case kSmtFun_Or:
-  case kSmtFun_Xor:
-  case kSmtFun_Imp:
-    // 引数は2つ以上で，Bool 型
-    if ( n < 2 ) {
-      return false;
-    }
-    for (ymuint i = 0; i < n; ++ i) {
-      if ( arg_sort_list[i] != kSmtSort_Bool ) {
-	return false;
-      }
-    }
-    return true;
-
-  case kSmtFun_Eq:
-  case kSmtFun_Diseq:
-    // 引数は2つ以上で，すべて同じ
-    if ( n < 2 ) {
-      return false;
-    }
-    for (ymuint i = 1; i < n; ++ i) {
-      if ( arg_sort_list[i] != arg_sort_list[0] ) {
-	return false;
-      }
-    }
-    return true;
-
-  case kSmtFun_Ite:
-    // 引数は3つで，最初が Bool，残り2つは同じ
-    return ( n == 3 && arg_sort_list[0] == kSmtSort_Bool && arg_sort_list[1] == arg_sort_list[2] );
-
-  case kSmtFun_Uminus:
-    // 引数は1つで，Int か Real
-    return ( n == 1 && check_I_or_R(arg_sort_list[0]) );
-
-  case kSmtFun_Add:
-  case kSmtFun_Sub:
-  case kSmtFun_Mul:
-  case kSmtFun_Le:
-  case kSmtFun_Lt:
-  case kSmtFun_Ge:
-  case kSmtFun_Gt:
-    // 引数は2つ以上で，Int か Real で同じ
-    if ( n < 2 ) {
-      return false;
-    }
-    if ( !check_I_or_R(arg_sort_list[0]) ) {
-      return false;
-    }
-    for (ymuint i = 1; i < n; ++ i) {
-      if ( arg_sort_list[i] != arg_sort_list[0] ) {
-	return false;
-      }
-    }
-    return true;
-
-  case kSmtFun_Div:
-    // 引数は2つ以上で，Real
-    if ( n < 2 ) {
-      return false;
-    }
-    for (ymuint i = 0; i < n; ++ i) {
-      if ( arg_sort_list[i] != kSmtSort_Real ) {
-	return false;
-      }
-    }
-    return true;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
-  }
-  return false;
-}
-
-END_NONAMESPACE
-
-
 // @brief 関数呼び出しの term を作る．(組み込み関数，引数なし)
 // @param[in] fun_type 関数の型
 // @return 作成した式を返す．
@@ -674,7 +647,13 @@ END_NONAMESPACE
 const SmtTerm*
 SmtSolverImpl::make_fun_term(tSmtFunType fun_type)
 {
-  if ( !check_args(fun_type, vector<tSmtSortId>(0)) ) {
+  const SmtFunValidator* fv = get_fun_validator(fun_type);
+  if ( fv == NULL ) {
+    // ?? 関数が登録されていない．
+    return NULL;
+  }
+
+  if ( !fv->check_inputs(vector<tSmtSortId>(0)) ) {
     // 引数の数が合わない．
     return NULL;
   }
@@ -702,12 +681,17 @@ SmtSolverImpl::make_fun_term(tSmtFunType fun_type,
     return make_fun_term(fun_type);
   }
 
+  const SmtFunValidator* fv1 = get_fun_validator(fun_type);
+  if ( fv1 == NULL ) {
+    // ?? 関数が登録されていない．
+    return NULL;
+  }
   { // チェックのための引数の型のリストを作る．
     vector<tSmtSortId> arg_sort_list(n);
     for (ymuint i = 0; i < n; ++ i) {
       arg_sort_list[i] = arg_list[i]->sort();
     }
-    if ( !check_args(fun_type, arg_sort_list) ) {
+    if ( !fv1->check_inputs(arg_sort_list) ) {
       // 引数の数か型が合わない．
       return NULL;
     }

@@ -147,6 +147,12 @@ public:
   make_fun(const vector<const SmtVar*>& input_var_list,
 	   const SmtTerm* body) = 0;
 
+  /// @brief 組み込み関数用のチェッカーを得る．
+  /// @param[in] fun_type 関数の型
+  virtual
+  const SmtFunValidator*
+  get_fun_validator(tSmtFunType fun_type) = 0;
+
   /// @brief <numeral> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．

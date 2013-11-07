@@ -37,6 +37,7 @@ noinst_HEADERS = \
 	SatSolver.h \
 	SatStats.h \
 	SmtFun.h \
+	SmtFunValidator.h \
 	SmtSolver.h \
 	SmtVar.h \
 	TvFunc.h \

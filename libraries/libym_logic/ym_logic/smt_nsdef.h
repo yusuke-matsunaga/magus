@@ -37,6 +37,7 @@ BEGIN_NAMESPACE_YM_SMT
 
 // クラス名の宣言
 class SmtFun;
+class SmtFunValidator;
 class SmtSolver;
 class SmtSortInfo;
 class SmtTerm;
@@ -106,26 +107,27 @@ const tSmtSortId kSmtSort_User1 = 6;
 /// @brief 組み込み関数を表す型
 //////////////////////////////////////////////////////////////////////
 enum tSmtFunType {
-  kSmtFun_UserDef,     // 一般の関数
-  kSmtFun_True,        // logical TRUE
-  kSmtFun_False,       // logical FALSE
-  kSmtFun_Not,         // logical NOT
-  kSmtFun_And,         // logical AND
-  kSmtFun_Or,          // logical OR
-  kSmtFun_Xor,         // logical XOR
-  kSmtFun_Imp,         // logical IMPLICATAION (=>)
-  kSmtFun_Eq,          // equality (=)
-  kSmtFun_Diseq,       // disequalit (distinct)
-  kSmtFun_Ite,         // if-then-else
-  kSmtFun_Uminus,      // arithmetic unary minus (-)
-  kSmtFun_Add,         // arithmetic binary addition (+)
-  kSmtFun_Sub,         // arifthmetic binary subtraction (-)
-  kSmtFun_Mul,         // arithmetic binary multiplication (*)
-  kSmtFun_Div,         // arithmetic binary division (/)
-  kSmtFun_Le,          // less than or equal (<=)
-  kSmtFun_Lt,          // less than (<)
-  kSmtFun_Ge,          // greater than or equal (>=)
-  kSmtFun_Gt           // greater than (>)
+  kSmtFun_UserDef =  0,        // 一般の関数
+  kSmtFun_True    =  1,        // logical TRUE
+  kSmtFun_False   =  2,        // logical FALSE
+  kSmtFun_Not     =  3,        // logical NOT
+  kSmtFun_And     =  4,        // logical AND
+  kSmtFun_Or      =  5,        // logical OR
+  kSmtFun_Xor     =  6,        // logical XOR
+  kSmtFun_Imp     =  7,        // logical IMPLICATAION (=>)
+  kSmtFun_Eq      =  8,        // equality (=)
+  kSmtFun_Diseq   =  9,        // disequalit (distinct)
+  kSmtFun_Ite     = 10,        // if-then-else
+  kSmtFun_Uminus  = 11,        // arithmetic unary minus (-)
+  kSmtFun_Add     = 12,        // arithmetic binary addition (+)
+  kSmtFun_Sub     = 13,        // arifthmetic binary subtraction (-)
+  kSmtFun_Mul     = 14,        // arithmetic binary multiplication (*)
+  kSmtFun_Div     = 15,        // arithmetic binary division (/)
+  kSmtFun_Le      = 16,        // less than or equal (<=)
+  kSmtFun_Lt      = 17,        // less than (<)
+  kSmtFun_Ge      = 18,        // greater than or equal (>=)
+  kSmtFun_Gt      = 19,        // greater than (>)
+  kSmtFun_Last    = kSmtFun_Gt // end-marker
 };
 
 
@@ -189,6 +191,7 @@ enum tSmtLibResponse {
 };
 
 using nsSmt::SmtFun;
+using nsSmt::SmtFunValidator;
 using nsSmt::SmtSolver;
 using nsSmt::SmtSortInfo;
 using nsSmt::SmtTerm;

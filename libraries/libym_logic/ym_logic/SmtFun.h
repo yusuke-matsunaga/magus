@@ -27,10 +27,7 @@ BEGIN_NAMESPACE_YM_SMT
 //////////////////////////////////////////////////////////////////////
 class SmtFun
 {
-  friend class SmtSolverImpl;
-
-protected:
-
+public:
   /// @brief デストラクタ
   virtual
   ~SmtFun() { }

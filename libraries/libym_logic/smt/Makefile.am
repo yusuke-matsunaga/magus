@@ -15,6 +15,8 @@ libym_logic_smt_la_CPPFLAGS = \
 libym_logic_smt_la_SOURCES = \
 	SmtFunImpl.h \
 	SmtFunImpl.cc \
+	SmtFunValidatorImpl.h \
+	SmtFunValidatorImpl.cc \
 	SmtSolverImpl.h \
 	SmtSolverImpl.cc \
 	SmtSortImpl.h \
