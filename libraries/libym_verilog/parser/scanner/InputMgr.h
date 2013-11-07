@@ -35,7 +35,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] lex 親の Lex
-  InputMgr(RawLex* lex);
+  InputMgr(RawLex& lex);
 
   /// @brief デストラクタ
   ~InputMgr();
@@ -125,7 +125,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 親の Lex
-  RawLex* mLex;
+  RawLex& mLex;
 
   // サーチパス
   SearchPathList mSearchPathList;

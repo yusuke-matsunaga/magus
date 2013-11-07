@@ -41,8 +41,9 @@ private:
   /// @brief コンストラクタ
   /// @param[in] ido 入力データ
   /// @param[in] lex 親の Lex
-  InputFile(IDO& ido,
-	    RawLex* lex);
+  /// @note ido はこのクラスが管理する．(デストラクタで破壊する)
+  InputFile(IDO* ido,
+	    RawLex& lex);
 
   /// @brief デストラクタ
   ~InputFile();
@@ -170,8 +171,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 入力データ
+  // Scanner() と二重に持つことになるけどまあいいか．
+  IDO* mIDO;
+
   // 親の Lex
-  RawLex* mLex;
+  RawLex& mLex;
 
 };
 

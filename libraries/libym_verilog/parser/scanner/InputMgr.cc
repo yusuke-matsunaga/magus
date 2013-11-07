@@ -28,7 +28,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 // @brief コンストラクタ
 // @param[in] lex 親の Lex
-InputMgr::InputMgr(RawLex* lex) :
+InputMgr::InputMgr(RawLex& lex) :
   mLex(lex),
   mCurFile(NULL)
 {
@@ -101,7 +101,7 @@ InputMgr::open_file(const string& filename,
     return false;
   }
 
-  InputFile* new_file = new InputFile(*ido, mLex);
+  InputFile* new_file = new InputFile(ido, mLex);
 
   if ( mCurFile ) {
     mFileStack.push_back(mCurFile);
@@ -180,6 +180,7 @@ InputMgr::wrap_up()
     delete_file(mCurFile);
     if ( mFileStack.empty() ) {
       // もうファイルが残っていない．
+      mCurFile = NULL;
       return false;
     }
 
@@ -216,13 +217,7 @@ InputMgr::check_file(const char* name) const
 void
 InputMgr::delete_file(InputFile* file)
 {
-  if ( file != NULL ) {
-#if 0
-    IDO* ido = file->detach();
-    delete ido;
-#endif
-    delete file;
-  }
+  delete file;
 }
 
 END_NAMESPACE_YM_VERILOG
