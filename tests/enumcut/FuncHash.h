@@ -1,35 +1,33 @@
-#ifndef FUNCMGR_H
-#define FUNCMGR_H
+#ifndef FUNCHASH_H
+#define FUNCHASH_H
 
-/// @file FuncMgr.h
-/// @brief FuncMgr のヘッダファイル
+/// @file FuncHash.h
+/// @brief FuncHash のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/bdn.h"
 #include "ym_logic/TvFunc.h"
-#include "ym_utils/IDO.h"
-#include "ym_utils/ODO.h"
+#include "ym_utils/UnitAlloc.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class FuncMgr FuncMgr.h "FuncMgr.h"
-/// @brief 論理関数を管理するためのクラス
+/// @class FuncHash FuncHash.h "FuncHash.h"
+/// @brief 論理関数(TvFunc)のハッシュ表を表すクラス
 //////////////////////////////////////////////////////////////////////
-class FuncMgr
+class FuncHash
 {
 public:
 
   /// @brief コンストラクタ
-  FuncMgr();
+  FuncHash();
 
   /// @brief デストラクタ
-  ~FuncMgr();
+  ~FuncHash();
 
 
 public:
@@ -46,11 +44,6 @@ public:
   void
   reg_func(const TvFunc& f);
 
-  /// @brief マージする．
-  /// @param[in] src マージする他のマネージャ
-  void
-  merge(const FuncMgr& src);
-
   /// @brief 関数のリストを取り出す．
   void
   func_list(vector<TvFunc>& func_list) const;
@@ -59,35 +52,6 @@ public:
   void
   func_list(ymuint ni,
 	    vector<TvFunc>& func_list) const;
-
-  /// @brief 代表関数のリストを取り出す．
-  void
-  rep_func_list(vector<TvFunc>& func_list) const;
-
-  /// @brief 指定された入力数の代表関数のリストを取り出す．
-  void
-  rep_func_list(ymuint ni,
-		vector<TvFunc>& func_list) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // バイナリダンプ
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 内容をバイナリダンプする．
-  /// @param[in] s 出力先のストリーム
-  void
-  dump(ODO& s) const;
-
-  /// @brief 代表関数のみをバイナリダンプする．
-  /// @param[in] s 出力先のストリーム
-  void
-  dump_rep(ODO& s) const;
-
-  /// @brief バイナリダンプされたファイルを読み込む．
-  void
-  restore(IDO& s);
 
 
 private:
@@ -125,6 +89,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // メモリアロケータ
+  UnitAlloc mAlloc;
+
   // ハッシュテーブルサイズ
   ymuint32 mTableSize;
 
@@ -137,11 +104,8 @@ private:
   // ハッシュ表
   FuncData** mTable;
 
-  // 代表関数のハッシュ
-  hash_set<TvFunc> mRepHash;
-
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM
 
-#endif // FUNCMGR_H
+#endif // FUNCHASH_H

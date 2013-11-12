@@ -66,6 +66,8 @@ rec_CPPFLAGS = \
 rec_SOURCES = \
 	EnumCut.h \
 	EnumCut.cc \
+	FuncHash.h \
+	FuncHash.cc \
 	FuncMgr.h \
 	FuncMgr.cc \
 	FuncRec.h \

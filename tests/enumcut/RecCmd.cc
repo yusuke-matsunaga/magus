@@ -486,6 +486,15 @@ PrintCmd::cmd_proc(TclObjVector& objv)
     *osp << "Total " << setw(12) << func_list.size() << " " << setw(2) << i << " input functions" << endl;
   }
   *osp << "Total " << setw(12) << func_list.size() << "          functions" << endl;
+
+  vector<TvFunc> rep_func_list;
+  mgr().rep_func_list(rep_func_list);
+  for (ymuint i = min_n; i <= max_n; ++ i) {
+    vector<TvFunc> func_list;
+    mgr().rep_func_list(i, func_list);
+    *osp << "Total " << setw(12) << func_list.size() << " " << setw(2) << i << " input representative functions" << endl;
+  }
+  *osp << "Total " << setw(12) << rep_func_list.size() << "          representative functions" << endl;
 #endif
 
   return TCL_OK;
