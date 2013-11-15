@@ -72,6 +72,11 @@ rec_SOURCES = \
 	FuncMgr.cc \
 	FuncRec.h \
 	FuncRec.cc \
+	GbmMgr.h \
+	GbmMgr.cc \
+	GbmNode.h \
+	GbmNodeImpl.h \
+	GbmNodeImpl.cc \
 	TopDown.h \
 	TopDown.cc \
 	RecCmd.h \

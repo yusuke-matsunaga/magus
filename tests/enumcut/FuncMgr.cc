@@ -72,7 +72,6 @@ FuncMgr::reg_func(const TvFunc& f)
     }
   }
 
-#if 0
   NpnMgr npn_mgr;
   NpnMap cmap;
   npn_mgr.cannonical(f, cmap);
@@ -80,7 +79,6 @@ FuncMgr::reg_func(const TvFunc& f)
   if ( mRepHash.count(rep) == 0 ) {
     mRepHash.insert(rep);
   }
-#endif
 
   new_data(f);
 }
