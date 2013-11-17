@@ -97,7 +97,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 字句解析器
-  DotlibScanner mScanner;
+  DotlibScanner* mScanner;
 
   // DotlibNode を管理するオブジェクト
   DotlibMgrImpl* mDotlibMgr;
@@ -127,7 +127,7 @@ tTokenType
 DotlibParserImpl::read_token(FileRegion& loc,
 			     bool symbol_mode)
 {
-  return mScanner.read_token(loc, symbol_mode);
+  return mScanner->read_token(loc, symbol_mode);
 }
 
 // @brief 直前の read_token() に対応する文字列を返す．
@@ -135,7 +135,7 @@ inline
 const char*
 DotlibParserImpl::cur_string() const
 {
-  return mScanner.cur_string();
+  return mScanner->cur_string();
 }
 
 // @brief 直前の read_token() に対応する整数値を返す．
@@ -144,7 +144,7 @@ inline
 int
 DotlibParserImpl::cur_int() const
 {
-  return mScanner.cur_int();
+  return mScanner->cur_int();
 }
 
 // @brief 直前の read_token() に対応する実数値を返す．
@@ -153,7 +153,7 @@ inline
 double
 DotlibParserImpl::cur_float() const
 {
-  return mScanner.cur_float();
+  return mScanner->cur_float();
 }
 
 // @brief DotlibMgrImpl* を返す．

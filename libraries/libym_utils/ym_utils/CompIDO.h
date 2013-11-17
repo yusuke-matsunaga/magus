@@ -10,6 +10,8 @@
 
 
 #include "ym_utils/IDO.h"
+#include "ym_utils/FileLoc.h"
+#include "ym_utils/FileInfo.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -26,19 +28,20 @@ class CompIDO :
 public:
 
   /// @brief コンストラクタ
-  CompIDO();
+  /// @param[in] filename ファイル名
+  /// @param[in] parent_loc インクルード元の親ファイルの情報
+  /// @note 意味的にはコンストラクタ + open()
+  explicit
+  CompIDO(const char* filename,
+	  const FileLoc& parent_loc = FileLoc());
 
   /// @brief コンストラクタ
   /// @param[in] filename ファイル名
+  /// @param[in] parent_loc インクルード元の親ファイルの情報
   /// @note 意味的にはコンストラクタ + open()
   explicit
-  CompIDO(const char* filename);
-
-  /// @brief コンストラクタ
-  /// @param[in] filename ファイル名
-  /// @note 意味的にはコンストラクタ + open()
-  explicit
-  CompIDO(const string& filename);
+  CompIDO(const string& filename,
+	  const FileLoc& parent_loc = FileLoc());
 
   /// @brief デストラクタ
   ~CompIDO();
@@ -46,35 +49,25 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 公開インターフェイス
+  // IDO の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 読み出し可能なら true を返す．
+  virtual
   operator bool() const;
 
-  /// @brief ファイルをオープンする．
-  /// @param[in] filename ファイル名
-  /// @retval true オープンが成功した．
-  /// @retval false オープンが失敗した．
-  bool
-  open(const char* filename);
+  /// @brief オープン中のファイル情報を得る．
+  virtual
+  const FileInfo&
+  file_info() const;
 
-  /// @brief ファイルをオープンする．
-  /// @param[in] filename ファイル名
-  /// @retval true オープンが成功した．
-  /// @retval false オープンが失敗した．
-  bool
-  open(const string& filename);
-
-  /// @brief ファイルをクローズする．
+  /// @brief 現在のファイル情報を書き換える．
+  /// @param[in] new_info 新しいファイル情報
+  /// @note プリプロセッサのプラグマなどで用いることを想定している．
+  /// @note 通常は使わないこと．
+  virtual
   void
-  close();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // IDO の仮想関数
-  //////////////////////////////////////////////////////////////////////
+  set_file_info(const FileInfo& file_info);
 
   /// @brief 圧縮されたデータを伸長してバッファに書き込む．
   /// @param[in] buff 伸長したデータを格納するバッファ
@@ -89,8 +82,30 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ファイルをオープンする．
+  /// @param[in] filename ファイル名
+  /// @param[in] parent_loc インクルード元の親ファイルの情報
+  /// @retval true オープンが成功した．
+  /// @retval false オープンが失敗した．
+  bool
+  open(const char* filename,
+       const FileLoc& parent_loc = FileLoc());
+
+  /// @brief ファイルをクローズする．
+  void
+  close();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // ファイル情報
+  FileInfo mFileInfo;
 
   // 実際の処理を行なうエンジン
   CompIn* mZ;

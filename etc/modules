@@ -19,3 +19,4 @@ programs/matpg
 programs/satpg
 programs/seal
 programs/igf
+programs/llvmeq

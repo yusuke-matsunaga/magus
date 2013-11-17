@@ -11,8 +11,8 @@
 
 #include "ym_networks/blif_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
-#include "BlifScanner.h"
 #include "IdHash.h"
+#include "BlifScanner.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF
@@ -102,7 +102,7 @@ private:
   const CellLibrary* mCellLibrary;
 
   // 字句解析器
-  BlifScanner mScanner;
+  BlifScanner* mScanner;
 
   // 読み戻されたトークン
   tToken mUngetToken;

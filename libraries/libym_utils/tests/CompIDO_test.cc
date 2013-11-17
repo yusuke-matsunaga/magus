@@ -16,13 +16,12 @@ int
 CompIDO_test(int argc,
 	     const char** argv)
 {
-  CompIDO ido;
-
   if ( argc != 2 ) {
     return 1;
   }
 
-  if ( !ido.open(argv[1]) ) {
+  CompIDO ido(argv[1]);
+  if ( !ido ) {
     cerr << argv[1] << ": No such file" << endl;
     return -1;
   }

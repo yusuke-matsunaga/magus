@@ -576,6 +576,14 @@ EiConstArrayElemPrimary::is_constant_select() const
   return true;
 }
 
+// @brief 宣言要素もしくは配列型宣言要素への参照を返す．
+// @note それ以外では NULL を返す．
+const VlDeclBase*
+EiConstArrayElemPrimary::decl_base() const
+{
+  return mObj;
+}
+
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 // @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
 const VlDeclArray*

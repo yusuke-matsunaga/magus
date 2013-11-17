@@ -9,65 +9,27 @@
 /// All rights reserved.
 
 
-#include "ym_smtlibv2/SmtLibNode.h"
+#include "SmtLibNode.h"
 #include "ym_utils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 //////////////////////////////////////////////////////////////////////
-/// @class SmtLibNodeBase SmtLibNodeImpl.h "SmtLibNodeImpl.h"
-/// @brief SmtLibNode の継承クラス
+/// @class SmtLibTerminalNode SmtLibNodeImpl.h "SmtLibNodeImpl.h"
+/// @brief 終端ノードを表す SmtLibNode の継承クラス
 //////////////////////////////////////////////////////////////////////
-class SmtLibNodeBase :
+class SmtLibTerminalNode :
   public SmtLibNode
 {
 protected:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
-  SmtLibNodeBase(const FileRegion& loc);
-
-  /// @brief デストラクタ
-  virtual
-  ~SmtLibNodeBase();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // SmtLibNode の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ファイル上の位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // ファイル上の位置
-  FileRegion mLoc;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class SmtLibTerminalNode SmtLibNodeImpl.h "SmtLibNodeImpl.h"
-/// @brief 終端ノードを表す SmtLibNode の継承クラス
-//////////////////////////////////////////////////////////////////////
-class SmtLibTerminalNode :
-  public SmtLibNodeBase
-{
-protected:
-
-  /// @brief コンストラクタ
-  /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibTerminalNode(const FileRegion& loc,
+		     ymuint id,
 		     const ShString& val);
 
   /// @brief デストラクタ
@@ -82,19 +44,8 @@ public:
 
   /// @brief 終端型の場合の値を返す．
   virtual
-  const char*
-  value() const;
-
-  /// @brief LIST型の場合の子供のノードの要素数を返す．
-  virtual
-  ymuint
-  child_num() const;
-
-  /// @brief LIST型の場合の子供のノードを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
-  virtual
-  const SmtLibNode*
-  child(ymuint pos) const;
+  ShString
+  str_value() const;
 
 
 private:
@@ -110,10 +61,10 @@ private:
 
 //////////////////////////////////////////////////////////////////////
 /// @class SmtLibNumNode SmtLibNodeImpl.h "SmtLibNodeImpl.h"
-/// @brief Num を表す SmtLibNode の継承クラス
+/// @brief <numeral> を表す SmtLibNode の継承クラス
 //////////////////////////////////////////////////////////////////////
 class SmtLibNumNode :
-  public SmtLibTerminalNode
+  public SmtLibNode
 {
   friend class SmtLibParser;
 
@@ -121,9 +72,11 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibNumNode(const FileRegion& loc,
-		const ShString& val);
+		ymuint id,
+		ymint32 val);
 
   /// @brief デストラクタ
   virtual
@@ -139,6 +92,20 @@ public:
   virtual
   tTokenType
   type() const;
+
+  /// @brief NUM型の場合の整数値を返す．
+  virtual
+  ymint32
+  int_value() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 値
+  ymint32 mValue;
 
 };
 
@@ -156,8 +123,10 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibDecNode(const FileRegion& loc,
+		ymuint id,
 		const ShString& val);
 
   /// @brief デストラクタ
@@ -191,8 +160,10 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibHexNode(const FileRegion& loc,
+		ymuint id,
 		const ShString& val);
 
   /// @brief デストラクタ
@@ -226,8 +197,10 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibBinNode(const FileRegion& loc,
+		ymuint id,
 		const ShString& val);
 
   /// @brief デストラクタ
@@ -252,7 +225,7 @@ public:
 /// @class SmtLibStringNode SmtLibNodeImpl.h "SmtLibNodeImpl.h"
 /// @brief String を表す SmtLibNode の継承クラス
 //////////////////////////////////////////////////////////////////////
-class SmtLibStringNode :
+class SmtLibStrNode :
   public SmtLibTerminalNode
 {
   friend class SmtLibParser;
@@ -261,13 +234,15 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
-  SmtLibStringNode(const FileRegion& loc,
-		   const ShString& val);
+  SmtLibStrNode(const FileRegion& loc,
+		ymuint id,
+		const ShString& val);
 
   /// @brief デストラクタ
   virtual
-  ~SmtLibStringNode();
+  ~SmtLibStrNode();
 
 
 public:
@@ -296,8 +271,10 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibSymbolNode(const FileRegion& loc,
+		   ymuint id,
 		   const ShString& val);
 
   /// @brief デストラクタ
@@ -331,8 +308,10 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
+  /// @param[in] id ID番号
   /// @param[in] val 値
   SmtLibKeywordNode(const FileRegion& loc,
+		    ymuint id,
 		    const ShString& val);
 
   /// @brief デストラクタ
@@ -358,7 +337,7 @@ public:
 /// @brief 終端ノードを表す SmtLibNode の継承クラス
 //////////////////////////////////////////////////////////////////////
 class SmtLibListNode :
-  public SmtLibNodeBase
+  public SmtLibNode
 {
   friend class SmtLibParser;
 
@@ -366,7 +345,13 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
-  SmtLibListNode(const FileRegion& loc);
+  /// @param[in] id ID番号
+  /// @param[in] num 要素数
+  /// pparam[in] child 先頭の子供のノード
+  SmtLibListNode(const FileRegion& loc,
+		 ymuint id,
+		 ymuint num,
+		 const SmtLibNode* child);
 
   /// @brief デストラクタ
   virtual
@@ -383,21 +368,15 @@ public:
   tTokenType
   type() const;
 
-  /// @brief 終端型の場合の値を返す．
-  virtual
-  const char*
-  value() const;
-
   /// @brief LIST型の場合の子供のノードの要素数を返す．
   virtual
   ymuint
   child_num() const;
 
-  /// @brief LIST型の場合の子供のノードを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
+  /// @brief LIST型の場合の子供の先頭のノードを返す．
   virtual
   const SmtLibNode*
-  child(ymuint pos) const;
+  child() const;
 
 
 private:
@@ -408,8 +387,8 @@ private:
   // 子供の要素数
   ymuint32 mChildNum;
 
-  // 子供のノードの配列
-  SmtLibNode** mChildArray;
+  // 子供のノード
+  const SmtLibNode* mChild;
 
 };
 

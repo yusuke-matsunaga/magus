@@ -40,7 +40,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 // @brief コンストラクタ
 RawLex::RawLex() :
-  mInputMgr(new InputMgr(this)),
+  mInputMgr(new InputMgr(*this)),
   mDic(RsrvWordDic::the_dic()),
   mDebug(false)
 {
@@ -73,6 +73,7 @@ RawLex::~RawLex()
        p != mStates.end(); ++ p) {
     delete *p;
   }
+  delete mInputMgr;
 }
 
 // @brief 初期状態に戻す．

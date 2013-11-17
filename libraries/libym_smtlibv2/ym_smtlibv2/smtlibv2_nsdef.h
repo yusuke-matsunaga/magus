@@ -5,7 +5,7 @@
 /// @brief smtlibv2 の共通定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -25,39 +25,8 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-/// @brief トークンの種類
-enum tTokenType {
-  /// @brief NUMERAL
-  kNumToken,
-  /// @brief DECIMAL
-  kDecToken,
-  /// @brief HEXADECIMAL
-  kHexToken,
-  /// @brief BINARY
-  kBinToken,
-  /// @brief STRING
-  kStringToken,
-  /// @brief SYMBOL
-  kSymbolToken,
-  /// @brief KEYWORD
-  kKeywordToken,
-  /// @brief LIST
-  kListToken,
-  /// @brief (
-  kLpToken,
-  /// @brief )
-  kRpToken,
-  /// @brief NL
-  kNlToken,
-  /// @brief ERROR
-  kErrorToken,
-  /// @brief EOF
-  kEofToken
-};
-
-
 // クラス名の宣言
-class SmtLibNode;
+class SmtId;
 
 END_NAMESPACE_YM_SMTLIBV2
 

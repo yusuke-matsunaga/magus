@@ -126,7 +126,6 @@ IODO_test()
       ++ nerr;
     }
   }
-  bi.close();
 
   if ( nerr ) {
     cerr << "Total " << nerr << "error";

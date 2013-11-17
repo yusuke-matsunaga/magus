@@ -12,9 +12,11 @@
 
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
-#include "ym_utils/FileScanner.h"
+#include "ym_utils/Scanner.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/StrBuff.h"
+
+#include "TokenType.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -24,18 +26,22 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 /// @brief SmtLib 用の字句解析器クラス
 //////////////////////////////////////////////////////////////////////
 class SmtLibScanner :
-  public FileScanner
+  public Scanner
 {
 public:
 
   /// @brief コンストラクタ
-  SmtLibScanner();
+  /// @param[in] ido 入力データ
+  SmtLibScanner(IDO& ido);
 
   /// @brief デストラクタ
   ~SmtLibScanner();
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief トークンを一つとってくる．
   /// @param[out] loc トークンのファイル位置

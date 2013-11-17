@@ -37,8 +37,8 @@ libym_cell_mislib_la_SOURCES = \
 	CellMislibReader.cc \
 	mislib_nsdef.h \
 	mislib_grammer.yy \
-	MislibLex.h \
-	MislibLex.cc \
+	MislibScanner.h \
+	MislibScanner.cc \
 	MislibMgr.h \
 	MislibMgr.cc \
 	MislibMgrImpl.h \

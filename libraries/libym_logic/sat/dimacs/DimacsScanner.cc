@@ -24,7 +24,8 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-DimacsScanner::DimacsScanner()
+DimacsScanner::DimacsScanner(IDO& ido) :
+  Scanner(ido)
 {
 }
 

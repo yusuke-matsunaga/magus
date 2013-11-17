@@ -89,6 +89,9 @@ FileBuff::read(ymuint8* buff,
     if ( !prepare() ) {
       return -1;
     }
+    if ( mDataSize == 0 ) {
+      break;
+    }
 
     // 一度に読み出せるサイズを num1 に入れる．
     ymuint64 num1 = num;

@@ -19,7 +19,6 @@ noinst_HEADERS = \
 	FileLoc.h \
 	FileODO.h \
 	FileRegion.h \
-	FileScanner.h \
 	GenBase.h \
 	GzIDO.h \
 	GzODO.h \
@@ -45,6 +44,7 @@ noinst_HEADERS = \
 	RandPermGen.h \
 	RefCount.h \
 	USTime.h \
+	Scanner.h \
 	ShString.h \
 	StopWatch.h \
 	StrBuff.h \
