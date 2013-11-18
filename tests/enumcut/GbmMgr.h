@@ -80,6 +80,13 @@ public:
   GbmNodeHandle
   new_lut(const vector<GbmNodeHandle>& inputs);
 
+  /// @brief MUXを作る．
+  /// @param[in] inputs ファンインのハンドルのリスト
+  /// @return 作成したノードのハンドルを返す．
+  /// @note inputs のサイズが2のべき乗でないときは0でパディングされる．
+  GbmNodeHandle
+  new_mux(const vector<GbmNodeHandle>& inputs);
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -123,6 +130,19 @@ public:
   const GbmNode*
   lut_node(ymuint pos) const;
 
+  /// @brief MUXノード数を返す．
+  ymuint
+  mux_num() const;
+
+  /// @brief MUXノードを返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < mux_num() )
+  const GbmNode*
+  mux_node(ymuint pos) const;
+
+  /// @brief configuration 変数の数を返す．
+  ymuint
+  conf_var_num() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -149,6 +169,12 @@ private:
 
   // LUTノードを格納するベクタ
   vector<GbmNode*> mLutList;
+
+  // MUXノードを格納するベクタ
+  vector<GbmNode*> mMuxList;
+
+  // 次の configuration 変数番号
+  ymuint32 mNextConfVar;
 
 };
 

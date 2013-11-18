@@ -21,6 +21,7 @@ BEGIN_NAMESPACE_YM
 GbmMgr::GbmMgr() :
   mAlloc(4096)
 {
+  mNextConfVar =0;
 }
 
 // @brief デストラクタ
@@ -70,9 +71,28 @@ GbmMgr::new_lut(const vector<GbmNodeHandle>& inputs)
 
   ymuint n = inputs.size();
   void* p = mAlloc.get_memory(sizeof(GbmLutNode) + sizeof(GbmNodeHandle) * (n - 1));
-  GbmNode* node = new (p) GbmLutNode(id, inputs);
+  GbmNode* node = new (p) GbmLutNode(id, mNextConfVar, inputs);
   mNodeList.push_back(node);
   mLutList.push_back(node);
+  mNextConfVar += node->conf_size();
+  return GbmNodeHandle(node->id(), false);
+}
+
+// @brief MUXを作る．
+// @param[in] inputs ファンインのハンドルのリスト
+// @return 作成したノードのハンドルを返す．
+// @note inputs のサイズが2のべき乗でないときは0でパディングされる．
+GbmNodeHandle
+GbmMgr::new_mux(const vector<GbmNodeHandle>& inputs)
+{
+  ymuint id = mNodeList.size();
+
+  ymuint n = inputs.size();
+  void* p = mAlloc.get_memory(sizeof(GbmMuxNode) + sizeof(GbmNodeHandle) * (n - 1));
+  GbmNode* node = new (p) GbmMuxNode(id, mNextConfVar, inputs);
+  mNodeList.push_back(node);
+  mMuxList.push_back(node);
+  mNextConfVar += node->conf_size();
   return GbmNodeHandle(node->id(), false);
 }
 
@@ -139,6 +159,29 @@ GbmMgr::lut_node(ymuint pos) const
 {
   assert_cond( pos < lut_num(), __FILE__, __LINE__);
   return mLutList[pos];
+}
+
+// @brief MUXノード数を返す．
+ymuint
+GbmMgr::mux_num() const
+{
+  return mMuxList.size();
+}
+
+// @brief MUXノードを返す．
+// @param[in] pos 位置番号 ( 0 <= pos < mux_num() )
+const GbmNode*
+GbmMgr::mux_node(ymuint pos) const
+{
+  assert_cond( pos < mux_num(), __FILE__, __LINE__);
+  return mMuxList[pos];
+}
+
+// @brief configuration 変数の数を返す．
+ymuint
+GbmMgr::conf_var_num() const
+{
+  return mNextConfVar;
 }
 
 END_NAMESPACE_YM

@@ -80,6 +80,9 @@ rec_SOURCES = \
 	GbmVar.h \
 	GbmEngine.h \
 	GbmEngine.cc \
+	GbmSolver.h \
+	GbmNaive.h \
+	GbmNaive.cc \
 	TopDown.h \
 	TopDown.cc \
 	RecCmd.h \

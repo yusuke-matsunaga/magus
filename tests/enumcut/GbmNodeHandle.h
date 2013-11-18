@@ -29,6 +29,16 @@ public:
   GbmNodeHandle(ymuint id,
 		bool inv);
 
+  /// @brief 定数0を返す．
+  static
+  GbmNodeHandle
+  make_zero();
+
+  /// @brief 定数1を返す．
+  static
+  GbmNodeHandle
+  make_one();
+
   /// @brief デストラクタ
   ~GbmNodeHandle();
 
@@ -51,7 +61,20 @@ public:
   GbmNodeHandle
   operator~() const;
 
+  /// @brief 定数の時に true を返す．
+  bool
+  is_const() const;
+
+  /// @brief 定数0の時に true を返す．
+  bool
+  is_zero() const;
+
+  /// @brief 定数1の時に true を返す．
+  bool
+  is_one() const;
+
   /// @brief ID番号を返す．
+  /// @note is_const() == true の時は意味を持たない．
   ymuint
   id() const;
 
@@ -62,6 +85,16 @@ public:
   /// @brief パックした値を返す．
   ymuint
   data() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容を直接指定したコンストラクタ
+  /// @param[in] data 設定するデータ
+  GbmNodeHandle(ymuint data);
 
 
 private:
@@ -94,6 +127,29 @@ GbmNodeHandle::GbmNodeHandle(ymuint id,
   set(id, inv);
 }
 
+// @brief 内容を直接指定したコンストラクタ
+// @param[in] data 設定するデータ
+inline
+GbmNodeHandle::GbmNodeHandle(ymuint data) :
+  mData(data)
+{
+}
+
+// @brief 定数0を返す．
+inline
+GbmNodeHandle
+GbmNodeHandle::make_zero()
+{
+  return GbmNodeHandle(0U);
+}
+
+// @brief 定数1を返す．
+inline
+GbmNodeHandle
+GbmNodeHandle::make_one()
+{
+  return GbmNodeHandle(1U);
+}
 
 // @brief デストラクタ
 inline
@@ -107,7 +163,7 @@ void
 GbmNodeHandle::set(ymuint id,
 		   bool inv)
 {
-  mData = (id << 1) | static_cast<ymuint32>(inv);
+  mData = ((id << 1) + 2) | static_cast<ymuint32>(inv);
 }
 
 // @brief 反転属性を反転する
@@ -128,12 +184,37 @@ GbmNodeHandle::operator~() const
   return GbmNodeHandle(*this).negate();
 }
 
+// @brief 定数の時に true を返す．
+inline
+bool
+GbmNodeHandle::is_const() const
+{
+  return mData < 2;
+}
+
+// @brief 定数0の時に true を返す．
+inline
+bool
+GbmNodeHandle::is_zero() const
+{
+  return mData == 0;
+}
+
+// @brief 定数1の時に true を返す．
+inline
+bool
+GbmNodeHandle::is_one() const
+{
+  return mData == 1;
+}
+
 // @brief ID番号を返す．
 inline
 ymuint
 GbmNodeHandle::id() const
 {
-  return mData >> 1;
+  assert_cond( !is_const(), __FILE__, __LINE__);
+  return (mData - 2) >> 1;
 }
 
 // @brief 反転属性を返す．

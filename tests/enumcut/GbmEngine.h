@@ -10,7 +10,7 @@
 
 
 #include "ymtools.h"
-#include "GbmVar.h"
+#include "GbmLit.h"
 #include "ym_logic/SatSolver.h"
 
 
@@ -25,12 +25,7 @@ class GbmEngine
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] sat_type SAT-solver の種類を表す文字列
-  /// @param[in] sat_opt SAT-solver に渡すオプション文字列
-  /// @param[in] sat_log ログの出力用ストリーム
-  GbmEngine(const string& sat_type,
-	    const string& sat_opt,
-	    ostream* sat_log);
+  GbmEngine();
 
   /// @brief デストラクタ
   ~GbmEngine();
@@ -42,41 +37,41 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief AND ゲートを表す節を追加する．
+  /// @param[in] solver SATソルバ
   /// @param[in] input_vars 入力変数のリスト
   /// @param[in] output_var 出力変数
+  /// @return 割り当てが矛盾を起こしたら false を返す．
   bool
-  make_AND(const vector<GbmVar>& input_vars,
-	   GbmVar output_var);
+  make_AND(SatSolver& solver,
+	   const vector<GbmLit>& input_vars,
+	   GbmLit output_var);
 
   /// @brief LUT を表す節を追加する．
+  /// @param[in] solver SATソルバ
   /// @param[in] input_vars 入力変数のリスト
   /// @param[in] lut_vars LUT変数のリスト
   /// @param[in] output_var 出力変数
   /// @note lut_vars のサイズは input_vars のサイズの指数乗
+  /// @return 割り当てが矛盾を起こしたら false を返す．
   bool
-  make_LUT(const vector<GbmVar>& input_vars,
-	   const vector<GbmVar>& lut_vars,
-	   GbmVar output_var);
+  make_LUT(SatSolver& solver,
+	   const vector<GbmLit>& input_vars,
+	   const vector<GbmLit>& lut_vars,
+	   GbmLit output_var);
 
   /// @brief MUX を表す節を追加する．
+  /// @param[in] solver SATソルバ
   /// @param[in] d_vars データ入力変数のリスト
   /// @param[in] s_vars 選択信号変数のリスト
   /// @param[in] output_var 出力変数
   /// @note d_vars のサイズは s_vars のサイズの指数乗
   /// @note 実は make_LUT() と同じことをやっている．
+  /// @return 割り当てが矛盾を起こしたら false を返す．
   bool
-  make_MUX(const vector<GbmVar>& d_vars,
-	   const vector<GbmVar>& s_vars,
-	   GbmVar output_var);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // SAT ソルバ
-  SatSolver mSolver;
+  make_MUX(SatSolver& solver,
+	   const vector<GbmLit>& d_vars,
+	   const vector<GbmLit>& s_vars,
+	   GbmLit output_var);
 
 };
 

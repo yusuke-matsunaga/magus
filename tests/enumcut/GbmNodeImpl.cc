@@ -56,6 +56,13 @@ GbmNodeImpl::is_lut() const
   return false;
 }
 
+// @brief MUX ノードの時 true を返す．
+bool
+GbmNodeImpl::is_mux() const
+{
+  return false;
+}
+
 // @brief 外部入力番号を返す．
 // @note is_input() == true の時のみ意味を持つ．
 ymuint
@@ -81,6 +88,21 @@ GbmNodeImpl::fanin(ymuint pos) const
 {
   assert_not_reached(__FILE__, __LINE__);
   return GbmNodeHandle();
+}
+
+// @brief LUT/MUX ノードの時の configuration 変数の最初の番号を得る．
+ymuint
+GbmNodeImpl::conf_base() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
+}
+
+// @brief LUT/MUX ノードの時の configuration 変数の数を得る．
+ymuint
+GbmNodeImpl::conf_size() const
+{
+  return 0;
 }
 
 
@@ -172,10 +194,13 @@ GbmAndNode::fanin(ymuint pos) const
 
 // @brief コンストラクタ
 // @param[in] id ID番号
+// @param[in] conf_base configuration 変数の基底
 // @param[in] fanin_list ファンインのリスト
 GbmLutNode::GbmLutNode(ymuint id,
+		       ymuint conf_base,
 		       const vector<GbmNodeHandle>& fanin_list) :
   GbmNodeImpl(id),
+  mConfBase(conf_base),
   mFaninNum(fanin_list.size())
 {
   for (ymuint i = 0; i < mFaninNum; ++ i) {
@@ -211,6 +236,87 @@ GbmLutNode::fanin(ymuint pos) const
 {
   assert_cond( pos < mFaninNum, __FILE__, __LINE__);
   return mFanin[pos];
+}
+
+// @brief LUT/MUX ノードの時の configuration 変数の最初の番号を得る．
+ymuint
+GbmLutNode::conf_base() const
+{
+  return mConfBase;
+}
+
+// @brief LUT/MUX ノードの時の configuration 変数の数を得る．
+ymuint
+GbmLutNode::conf_size() const
+{
+  return (1U << mFaninNum);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス GbmMuxNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] id ID番号
+// @param[in] conf_base configuration 変数の基底
+// @param[in] fanin_list ファンインのリスト
+GbmMuxNode::GbmMuxNode(ymuint id,
+		       ymuint conf_base,
+		       const vector<GbmNodeHandle>& fanin_list) :
+  GbmNodeImpl(id),
+  mConfBase(conf_base),
+  mFaninNum(fanin_list.size())
+{
+  for (ymuint i = 0; i < mFaninNum; ++ i) {
+    mFanin[i] = fanin_list[i];
+  }
+
+  for (ymuint tmp = 1U, mConfSize = 0; tmp < mFaninNum; ++ mConfSize, tmp <<= 1) ;
+}
+
+// @brief デストラクタ
+GbmMuxNode::~GbmMuxNode()
+{
+}
+
+// @brief MUX ノードの時 true を返す．
+bool
+GbmMuxNode::is_mux() const
+{
+  return true;
+}
+
+// @brief ファンイン数を返す．
+// @note 外部入力ノードの場合は常に0
+// @note AND ノードの場合は常に2
+ymuint
+GbmMuxNode::fanin_num() const
+{
+  return mFaninNum;
+}
+
+// @brief ファンインのハンドルを返す．
+// @param[in] pos ファンイン番号 ( 0 <= pos < fanin_num() )
+GbmNodeHandle
+GbmMuxNode::fanin(ymuint pos) const
+{
+  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
+  return mFanin[pos];
+}
+
+// @brief LUT/MUX ノードの時の configuration 変数の最初の番号を得る．
+ymuint
+GbmMuxNode::conf_base() const
+{
+  return mConfBase;
+}
+
+// @brief LUT/MUX ノードの時の configuration 変数の数を得る．
+ymuint
+GbmMuxNode::conf_size() const
+{
+  return mConfSize;
 }
 
 END_NAMESPACE_YM

@@ -52,6 +52,11 @@ public:
   bool
   is_lut() const = 0;
 
+  /// @brief MUX ノードの時 true を返す．
+  virtual
+  bool
+  is_mux() const = 0;
+
   /// @brief 外部入力番号を返す．
   /// @note is_input() == true の時のみ意味を持つ．
   virtual
@@ -70,6 +75,16 @@ public:
   virtual
   GbmNodeHandle
   fanin(ymuint pos) const = 0;
+
+  /// @brief LUT/MUX ノードの時の configuration 変数の最初の番号を得る．
+  virtual
+  ymuint
+  conf_base() const = 0;
+
+  /// @brief LUT/MUX ノードの時の configuration 変数の数を得る．
+  virtual
+  ymuint
+  conf_size() const = 0;
 
 };
 
