@@ -77,6 +77,9 @@ rec_SOURCES = \
 	GbmNode.h \
 	GbmNodeImpl.h \
 	GbmNodeImpl.cc \
+	GbmVar.h \
+	GbmEngine.h \
+	GbmEngine.cc \
 	TopDown.h \
 	TopDown.cc \
 	RecCmd.h \
