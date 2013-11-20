@@ -63,6 +63,13 @@ GbmNodeImpl::is_mux() const
   return false;
 }
 
+// @brief 関数ノードの時 true を返す．
+bool
+GbmNodeImpl::is_func() const
+{
+  return false;
+}
+
 // @brief 外部入力番号を返す．
 // @note is_input() == true の時のみ意味を持つ．
 ymuint
@@ -103,6 +110,15 @@ ymuint
 GbmNodeImpl::conf_size() const
 {
   return 0;
+}
+
+// @brief 関数ノードの時に関数を返す．
+const TvFunc&
+GbmNodeImpl::func() const
+{
+  static TvFunc dummy;
+  assert_not_reached(__FILE__, __LINE__);
+  return dummy;
 }
 
 
@@ -317,6 +333,64 @@ ymuint
 GbmMuxNode::conf_size() const
 {
   return mConfSize;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス GbmFuncNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] id ID番号
+// @param[in] func 関数
+// @param[in] fanin_list ファンインのリスト
+GbmFuncNode::GbmFuncNode(ymuint id,
+			 const TvFunc& func,
+			 const vector<GbmNodeHandle>& fanin_list) :
+  GbmNodeImpl(id),
+  mFunc(func),
+  mFaninNum(fanin_list.size())
+{
+  for (ymuint i = 0; i < mFaninNum; ++ i) {
+    mFanin[i] = fanin_list[i];
+  }
+}
+
+// @brief デストラクタ
+GbmFuncNode::~GbmFuncNode()
+{
+}
+
+// @brief 関数ノードの時 true を返す．
+bool
+GbmFuncNode::is_func() const
+{
+  return true;
+}
+
+// @brief ファンイン数を返す．
+// @note 外部入力ノードの場合は常に0
+// @note AND ノードの場合は常に2
+ymuint
+GbmFuncNode::fanin_num() const
+{
+  return mFaninNum;
+}
+
+// @brief ファンインのハンドルを返す．
+// @param[in] pos ファンイン番号 ( 0 <= pos < fanin_num() )
+GbmNodeHandle
+GbmFuncNode::fanin(ymuint pos) const
+{
+  assert_cond( pos < fanin_num(), __FILE__, __LINE__);
+  return mFanin[pos];
+}
+
+// @brief 関数ノードの時に関数を返す．
+const TvFunc&
+GbmFuncNode::func() const
+{
+  return mFunc;
 }
 
 END_NAMESPACE_YM

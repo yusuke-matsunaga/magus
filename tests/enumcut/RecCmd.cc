@@ -442,7 +442,7 @@ PrintCmd::cmd_proc(TclObjVector& objv)
   for (vector<TvFunc>::const_iterator p = func_list.begin();
        p != func_list.end(); ++ p) {
     const TvFunc& func = *p;
-    ymuint ni = func.ni();
+    ymuint ni = func.input_num();
     if ( max_n < ni ) {
       max_n = ni;
     }

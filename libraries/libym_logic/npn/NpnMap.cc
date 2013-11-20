@@ -43,7 +43,7 @@ NpnMap::NpnMap(ymuint ni,
 NpnMap::NpnMap(const NpnMap& src) :
   mNiPol(src.mNiPol)
 {
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     mImap[i] = src.mImap[i];
   }
 }
@@ -53,7 +53,7 @@ const NpnMap&
 NpnMap::operator=(const NpnMap& src)
 {
   mNiPol = src.mNiPol;
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     mImap[i] = src.mImap[i];
   }
   return *this;
@@ -71,7 +71,7 @@ void
 NpnMap::clear()
 {
   mNiPol &= ~(1UL);
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     mImap[i] = NpnVmap::invalid();
   }
 }
@@ -105,7 +105,7 @@ NpnMap::set(VarId var,
 	    NpnVmap imap)
 {
   ymuint src_pos = var.val();
-  if ( src_pos < ni() ) {
+  if ( src_pos < input_num() ) {
     mImap[src_pos] = imap;
   }
 }
@@ -129,7 +129,7 @@ NpnMap::operator==(const NpnMap& src) const
   if ( mNiPol != src.mNiPol ) {
     return false;
   }
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     if ( mImap[i] != src.mImap[i] ) {
       return false;
     }
@@ -147,7 +147,7 @@ inverse(const NpnMap& src)
 	 << endl;
   }
 
-  ymuint src_ni = src.ni();
+  ymuint src_ni = src.input_num();
   NpnMap dst_map(src_ni, src.opol());
   for (ymuint i = 0; i < src_ni; ++ i) {
     VarId src_var(i);
@@ -190,7 +190,7 @@ operator*(const NpnMap& src1,
 	 << endl;
   }
 
-  ymuint ni1 = src1.ni();
+  ymuint ni1 = src1.input_num();
   NpnMap dst_map(ni1, src1.opol() * src2.opol());
   for (ymuint i1 = 0; i1 < ni1; ++ i1) {
     VarId var1(i1);
@@ -273,7 +273,7 @@ operator<<(ostream& s,
 {
   const char* comma = "";
   s << "INPUT(";
-  for (ymuint i = 0; i < map.ni(); ++ i) {
+  for (ymuint i = 0; i < map.input_num(); ++ i) {
     s << comma;
     comma = ", ";
     s << i << " ==> ";
@@ -306,7 +306,7 @@ ODO&
 operator<<(ODO& bos,
 	   const NpnMap& map)
 {
-  ymuint32 ni = map.ni();
+  ymuint32 ni = map.input_num();
   bos << ni;
   for (ymuint i = 0; i < ni; ++ i) {
     NpnVmap vmap = map.imap(VarId(i));

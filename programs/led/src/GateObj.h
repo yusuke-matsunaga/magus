@@ -53,37 +53,48 @@ public:
 
   /// @brief 位置を設定する．
   /// @param[in] loc 設定する位置
-  void set_location(const Point& loc);
+  void
+  set_location(const Point& loc);
 
   /// @brief 位置を設定する．
   /// @param[in] x 位置のX座標
   /// @param[in] y 位置のY座標
-  void set_location(GLdouble x,
-		    GLdouble y);
-  
+  void
+  set_location(GLdouble x,
+	       GLdouble y);
+
   /// @brief 位置を取得する．
-  Point location() const;
+  Point
+  location() const;
 
 
 public:
 
   /// @brief 入力数を得る．
-  size_t ni() const;
+  ymuint
+  input_num() const;
 
   /// @brief 出力数を得る．
-  size_t no() const;
+  ymuint
+  output_num() const;
 
   /// @brief このゲートを囲む最小の矩形を表す左上と右下の点を得る．
-  DiagPoints bounding_box() const;
+  DiagPoints
+  bounding_box() const;
 
   /// @brief pos 番目の入力ピン位置を得る．
-  Point ipin_location(size_t pos) const;
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  Point
+  ipin_location(ymuint pos) const;
 
   /// @brief pos 番目の出力ピン位置を得る．
-  Point opin_location(size_t pos) const;
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  Point
+  opin_location(ymuint pos) const;
 
   // @brief ディスプレイリストを取り出す．
-  GLuint id() const;
+  GLuint
+  id() const;
 
 
 private:
@@ -98,7 +109,7 @@ private:
   Point mLocation;
 
   // オブジェクト管理用の番号
-  size_t mObjId;
+  ymuint32 mObjId;
 
 };
 

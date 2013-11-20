@@ -82,7 +82,7 @@ sort_nodes(const BNetwork* network,
   network->tsort(node_vec);
   for (ymuint i = 0; i < n; i ++) {
     BNode* node = node_vec[i];
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     int level = 0;
     for (ymuint j = 0; j < ni; j ++) {
       BNode* fanin = node->fanin(j);

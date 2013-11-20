@@ -108,6 +108,39 @@ GbmNaive::solve(const GbmMgr& mgr,
     }
   }
 
+  GbmLit var1 = handle_to_lit(output1, node_var_array);
+  GbmLit var2 = handle_to_lit(output2, node_var_array);
+  if ( var1.is_zero() ) {
+    if ( var2.is_one() ) {
+      // 矛盾
+      return false;
+    }
+    if ( var2.is_zero() ) {
+      return true;
+    }
+    solver.add_clause(~var2.literal());
+  }
+  else if ( var1.is_one() ) {
+    if ( var2.is_one() ) {
+      return true;
+    }
+    if ( var2.is_zero() ) {
+      // 矛盾
+      return false;
+    }
+    solver.add_clause(var2.literal());
+  }
+  else if ( var2.is_zero() ) {
+    solver.add_clause(~var1.literal());
+  }
+  else if ( var2.is_one() ) {
+    solver.add_clause(var1.literal());
+  }
+  else {
+    solver.add_clause(var1.literal(), ~var2.literal());
+    solver.add_clause(~var1.literal(), var2.literal());
+  }
+
   vector<Bool3> model;
   Bool3 stat = solver.solve(model);
 
@@ -175,21 +208,28 @@ GbmNaive::make_inputs(const GbmNode* node,
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     GbmNodeHandle ih = node->fanin(i);
-    if ( ih.is_zero() ) {
-      inputs[i] = GbmLit::make_zero();
-    }
-    else if ( ih.is_one() ) {
-      inputs[i] = GbmLit::make_one();
-    }
-    else {
-      ymuint iid = ih.id();
-      GbmLit ivar = node_var_array[iid];
-      if ( ih.inv() ) {
-	ivar.negate();
-      }
-      inputs[i] = ivar;
-    }
+    inputs[i] = handle_to_lit(ih, node_var_array);
   }
+}
+
+// @brief GbmNodeHandle から GbmLit を作る．
+// @param[in] handle ハンドル
+// @param[in] node_var_array ノードの変数番号の配列
+GbmLit
+GbmNaive::handle_to_lit(GbmNodeHandle handle,
+			const vector<GbmLit>& node_var_array)
+{
+  if ( handle.is_zero() ) {
+    return GbmLit::make_zero();
+  }
+  if ( handle.is_one() ) {
+    return GbmLit::make_one();
+  }
+  GbmLit lit = node_var_array[handle.id()];
+  if ( handle.inv() ) {
+    lit.negate();
+  }
+  return lit;
 }
 
 END_NAMESPACE_YM

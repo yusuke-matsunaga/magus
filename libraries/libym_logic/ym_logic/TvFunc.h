@@ -135,10 +135,10 @@ public:
 
   /// @brief 入力数を得る．
   ymuint
-  ni() const;
+  input_num() const;
 
   /// @brief 入力値を2進数と見なしたときの pos 番目の値を得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < 2^(ni()) )
+  /// @param[in] pos 位置番号 ( 0 <= pos < 2^(input_num()) )
   /// 答は 0 か 1 だが int 型
   int
   value(ymuint pos) const;
@@ -354,10 +354,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入力数
-  ymuint32 mNi;
+  ymuint32 mInputNum;
 
   // ブロック数
-  ymuint32 mNblk;
+  ymuint32 mBlockNum;
 
   // パックされた真理値ベクトル
   ymulong* mVector;
@@ -477,9 +477,9 @@ operator>>(IDO& s,
 // 入力数を得る．
 inline
 ymuint
-TvFunc::ni() const
+TvFunc::input_num() const
 {
-  return mNi;
+  return mInputNum;
 }
 
 // 入力値を2進数と見なしたときの pos 番目の値を得る．
@@ -496,7 +496,7 @@ inline
 ymuint
 TvFunc::nblk() const
 {
-  return mNblk;
+  return mBlockNum;
 }
 
 // 生のデータを得る．

@@ -191,12 +191,12 @@ TvFunc_nega_literal(PyTypeObject* type,
   return PyTvFunc_FromTvFunc(TvFunc::nega_literal(ni, vid));
 }
 
-// ni 関数
+// input_num 関数
 PyObject*
-TvFunc_ni(TvFuncObject* self,
-	  PyObject* args)
+TvFunc_input_num(TvFuncObject* self,
+		 PyObject* args)
 {
-  return PyObject_FromYmuint32(self->mBody->ni());
+  return PyObject_FromYmuint32(self->mBody->input_num());
 }
 
 // value 関数
@@ -209,9 +209,9 @@ TvFunc_value(TvFuncObject* self,
     return NULL;
   }
 
-  ymuint ni = self->mBody->ni();
+  ymuint ni = self->mBody->input_num();
   if ( pos >= (1U << ni) ) {
-    PyErr_SetString(PyExc_ValueError, "parameter must be less then 2^ni()");
+    PyErr_SetString(PyExc_ValueError, "parameter must be less then 2^input_num()");
     return NULL;
   }
 
@@ -645,7 +645,7 @@ PyMethodDef TvFunc_methods[] = {
    PyDoc_STR("cofactor (VarId, Pol)")},
   {"xform", (PyCFunction)TvFunc_xform, METH_VARARGS,
    PyDoc_STR("NPN transform (NpnMap)")},
-  {"ni", (PyCFunction)TvFunc_ni, METH_NOARGS,
+  {"input_num", (PyCFunction)TvFunc_input_num, METH_NOARGS,
    PyDoc_STR("return input number (NONE")},
   {"value", (PyCFunction)TvFunc_value, METH_VARARGS,
    PyDoc_STR("return truth value (int)")},

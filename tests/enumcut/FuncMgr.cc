@@ -119,7 +119,7 @@ FuncMgr::func_list(ymuint ni,
   {
     for (ymuint i = 0; i < mTableSize; ++ i) {
       for (FuncData* data = mTable[i]; data; data = data->mLink) {
-	if ( data->mFunc.ni() == ni) {
+	if ( data->mFunc.input_num() == ni) {
 	  ++ n;
 	}
       }
@@ -128,7 +128,7 @@ FuncMgr::func_list(ymuint ni,
   func_list.reserve(n);
   for (ymuint i = 0; i < mTableSize; ++ i) {
     for (FuncData* data = mTable[i]; data; data = data->mLink) {
-      if ( data->mFunc.ni() == ni ) {
+      if ( data->mFunc.input_num() == ni ) {
 	func_list.push_back(data->mFunc);
       }
     }
@@ -157,7 +157,7 @@ FuncMgr::rep_func_list(ymuint ni,
   for (hash_set<TvFunc>::const_iterator p = mRepHash.begin();
        p != mRepHash.end(); ++ p) {
     const TvFunc& f = *p;
-    if ( f.ni() == ni ) {
+    if ( f.input_num() == ni ) {
       ++ n;
     }
   }
@@ -166,7 +166,7 @@ FuncMgr::rep_func_list(ymuint ni,
   for (hash_set<TvFunc>::const_iterator p = mRepHash.begin();
        p != mRepHash.end(); ++ p) {
     const TvFunc& f = *p;
-    if ( f.ni() == ni ) {
+    if ( f.input_num() == ni ) {
       func_list.push_back(f);
     }
   }

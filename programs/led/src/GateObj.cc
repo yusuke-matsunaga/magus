@@ -19,17 +19,17 @@
 BEGIN_NAMESPACE_YM_GLV
 
 // @brief 入力数を得る．
-size_t
-GateObj::ni() const
+ymuint
+GateObj::input_num() const
 {
-  return mGateTemplate->ni();
+  return mGateTemplate->input_num();
 }
 
 // @brief 出力数を得る．
-size_t
-GateObj::no() const
+ymuint
+GateObj::output_num() const
 {
-  return mGateTemplate->no();
+  return mGateTemplate->output_num();
 }
 
 // @brief このゲートを囲む最小の矩形を表す左上と右下の点を得る．
@@ -38,20 +38,22 @@ GateObj::bounding_box() const
 {
   DiagPoints tmp = mGateTemplate->bounding_box();
   return tmp.move(mLocation);
-} 
+}
 
 // @brief pos 番目の入力ピン位置を得る．
 Point
-GateObj::ipin_location(size_t pos) const
+GateObj::ipin_location(ymuint pos) const
 {
+  assert_cond( pos < input_num(), __FILE__, __LINE__);
   Point tmp = mGateTemplate->ipin_location(pos);
   return tmp.move(mLocation);
 }
 
 // @brief pos 番目の出力ピン位置を得る．
 Point
-GateObj::opin_location(size_t pos) const
+GateObj::opin_location(ymuint pos) const
 {
+  assert_cond( pos < output_num(), __FILE__, __LINE__);
   Point tmp = mGateTemplate->opin_location(pos);
   return tmp.move(mLocation);
 }

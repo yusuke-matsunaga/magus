@@ -34,7 +34,7 @@ public:
 
   /// @brief 入力数を得る．
   ymuint
-  ni() const;
+  input_num() const;
 
   /// @brief pos 番めの値を得る．
   /// @param[in] pos 入力の位置番号
@@ -213,7 +213,7 @@ operator<<(ostream& s,
 // @brief 入力数を得る．
 inline
 ymuint
-TestVector::ni() const
+TestVector::input_num() const
 {
   return mNi;
 }

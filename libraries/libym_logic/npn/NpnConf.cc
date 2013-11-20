@@ -28,7 +28,7 @@ NpnConf::NpnConf(const NpnBaseConf& base_conf)
 {
   mBaseConf = &base_conf;
   mOpol = base_conf.opol();
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     mIpols[i] = base_conf.ipol(i);
   }
   mGroupNum = 0;
@@ -71,7 +71,7 @@ NpnConf::NpnConf(const NpnConf& src,
   copy(src);
   mOpol = pol;
   if ( pol == 2 ) {
-    for (ymuint i = 0; i < ni(); ++ i) {
+    for (ymuint i = 0; i < input_num(); ++ i) {
       if ( mBaseConf->walsh_1(i) != 0 ) {
 	switch ( mIpols[i] ) {
 	case 1:
@@ -95,7 +95,7 @@ NpnConf::NpnConf(const NpnConf& src,
 {
   mBaseConf = src.mBaseConf;
   mOpol = src.mOpol;
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     mIpols[i] = src.mIpols[i];
   }
   mIorderValid = false;
@@ -140,7 +140,7 @@ NpnConf::copy(const NpnConf& src)
 {
   mBaseConf = src.mBaseConf;
   mOpol = src.mOpol;
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     mIpols[i] = src.mIpols[i];
   }
   mIorderValid = false;
@@ -174,7 +174,7 @@ NpnConf::validate_iorder() const
     ++ k;
     rep = mBaseConf->ic_link(rep);
   }
-  assert_cond( k == ni(), __FILE__, __LINE__);
+  assert_cond( k == input_num(), __FILE__, __LINE__);
   mIorderValid = true;
 }
 
@@ -208,7 +208,7 @@ NpnConf::walsh_w0(ymuint w) const
 {
   tPol op = (opol() == 2) ? kPolNega : kPolPosi;
   ymuint32 ibits = 0UL;
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     if ( ipol(i) == 2 ) {
       ibits |= (1UL << i);
     }
@@ -253,7 +253,7 @@ NpnConf::set_ic_pol(ymuint pos,
 void
 NpnConf::set_map(NpnMap& map) const
 {
-  map.resize(mBaseConf->ni());
+  map.resize(mBaseConf->input_num());
   tPol op = (opol() == 2) ? kPolNega : kPolPosi;
   map.set_opol(op);
 
@@ -275,7 +275,7 @@ NpnConf::set_map(NpnMap& map) const
     ++ k;
     rep = mBaseConf->ic_link(rep);
   }
-  assert_cond( k == ni(), __FILE__, __LINE__);
+  assert_cond( k == input_num(), __FILE__, __LINE__);
 }
 
 // @brief 内容を出力する．
@@ -292,7 +292,7 @@ NpnConf::print(ostream& s) const
   }
   s << endl;
   s << "ipol:";
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     s << " ";
     switch ( ipol(i) ) {
     case 0: s << "-"; break;

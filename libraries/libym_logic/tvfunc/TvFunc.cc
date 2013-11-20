@@ -162,11 +162,11 @@ BEGIN_NAMESPACE_YM
 // 入力数のみ指定したコンストラクタ
 // 中身は恒偽関数
 TvFunc::TvFunc(ymuint ni) :
-  mNi(ni),
-  mNblk(nblock(ni)),
-  mVector(new ymulong[mNblk])
+  mInputNum(ni),
+  mBlockNum(nblock(ni)),
+  mVector(new ymulong[mBlockNum])
 {
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     mVector[i] = 0UL;
   }
 }
@@ -175,11 +175,11 @@ TvFunc::TvFunc(ymuint ni) :
 // 2番目の引数はダミー
 TvFunc::TvFunc(ymuint ni,
 	       int dummy) :
-  mNi(ni),
-  mNblk(nblock(ni)),
-  mVector(new ymulong[mNblk])
+  mInputNum(ni),
+  mBlockNum(nblock(ni)),
+  mVector(new ymulong[mBlockNum])
 {
-  switch ( mNi ) {
+  switch ( mInputNum ) {
   case 0:
     mVector[0] = 0x1;
     break;
@@ -211,7 +211,7 @@ TvFunc::TvFunc(ymuint ni,
 #endif
 
   default:
-    for (ymuint i = 0; i < mNblk; ++ i) {
+    for (ymuint i = 0; i < mBlockNum; ++ i) {
       mVector[i] = ~(0UL);
     }
   }
@@ -221,9 +221,9 @@ TvFunc::TvFunc(ymuint ni,
 TvFunc::TvFunc(ymuint ni,
 	       VarId varid,
 	       tPol pol) :
-  mNi(ni),
-  mNblk(nblock(ni)),
-  mVector(new ymulong[mNblk])
+  mInputNum(ni),
+  mBlockNum(nblock(ni)),
+  mVector(new ymulong[mBlockNum])
 {
   assert_cond( varid.val() < ni, __FILE__, __LINE__);
   switch ( ni ) {
@@ -467,7 +467,7 @@ TvFunc::TvFunc(ymuint ni,
       else {
 	pat = ~c_masks[varid.val()];
       }
-      for (ymuint b = 0; b < mNblk; ++ b) {
+      for (ymuint b = 0; b < mBlockNum; ++ b) {
 	mVector[b] = pat;
       }
     }
@@ -482,7 +482,7 @@ TvFunc::TvFunc(ymuint ni,
 	pat0 = 0UL;
       }
       ymulong pat1 = ~pat0;
-      for (ymuint b = 0; b < mNblk; ++ b) {
+      for (ymuint b = 0; b < mBlockNum; ++ b) {
 	if ( b & check ) {
 	  mVector[b] = pat0;
 	}
@@ -498,9 +498,9 @@ TvFunc::TvFunc(ymuint ni,
 // 入力数と真理値を指定したコンストラクタ
 TvFunc::TvFunc(ymuint ni,
 	       const vector<int>& values) :
-  mNi(ni),
-  mNblk(nblock(ni)),
-  mVector(new ymulong[mNblk])
+  mInputNum(ni),
+  mBlockNum(nblock(ni)),
+  mVector(new ymulong[mBlockNum])
 {
   ymuint ni_pow = 1U << ni;
   assert_cond(values.size() == ni_pow, __FILE__, __LINE__);
@@ -516,7 +516,7 @@ TvFunc::TvFunc(ymuint ni,
   else {
     ymuint nipb_pow = 1U << NIPW;
     ymuint base = 0;
-    for (ymuint i = 0; i < mNblk; ++ i, base += nipb_pow) {
+    for (ymuint i = 0; i < mBlockNum; ++ i, base += nipb_pow) {
       ymulong pat = 0UL;
       for (ymuint j = 0; j < nipb_pow; ++ j) {
 	if ( values[base + j] ) {
@@ -530,11 +530,11 @@ TvFunc::TvFunc(ymuint ni,
 
 // コピーコンストラクタ
 TvFunc::TvFunc(const TvFunc& src) :
-  mNi(src.mNi),
-  mNblk(src.mNblk),
-  mVector(new ymulong[mNblk])
+  mInputNum(src.mInputNum),
+  mBlockNum(src.mBlockNum),
+  mVector(new ymulong[mBlockNum])
 {
-  for (ymuint b = 0; b < mNblk; ++ b) {
+  for (ymuint b = 0; b < mBlockNum; ++ b) {
     mVector[b] = src.mVector[b];
   }
 }
@@ -543,14 +543,14 @@ TvFunc::TvFunc(const TvFunc& src) :
 const TvFunc&
 TvFunc::operator=(const TvFunc& src)
 {
-  if ( mNblk != src.mNblk ) {
+  if ( mBlockNum != src.mBlockNum ) {
     delete [] mVector;
-    mNblk = src.mNblk;
-    mVector = new ymulong[mNblk];
+    mBlockNum = src.mBlockNum;
+    mVector = new ymulong[mBlockNum];
   }
-  mNi = src.mNi;
+  mInputNum = src.mInputNum;
 
-  for (ymuint b = 0; b < mNblk; ++ b) {
+  for (ymuint b = 0; b < mBlockNum; ++ b) {
     mVector[b] = src.mVector[b];
   }
 
@@ -597,7 +597,7 @@ TvFunc::nega_literal(ymuint ni,
 const TvFunc&
 TvFunc::negate()
 {
-  switch ( mNi ) {
+  switch ( mInputNum ) {
   case 0:
     mVector[0] ^= 0x1;
     break;
@@ -629,7 +629,7 @@ TvFunc::negate()
 #endif
 
   default:
-    for (ymuint b = 0; b < mNblk; ++ b) {
+    for (ymuint b = 0; b < mBlockNum; ++ b) {
       mVector[b] ^= ~(0UL);
     }
     break;
@@ -641,7 +641,7 @@ TvFunc::negate()
 const TvFunc&
 TvFunc::operator&=(const TvFunc& src1)
 {
-  for (ymuint b = 0; b < mNblk; ++ b) {
+  for (ymuint b = 0; b < mBlockNum; ++ b) {
     mVector[b] &= src1.mVector[b];
   }
   return *this;
@@ -651,7 +651,7 @@ TvFunc::operator&=(const TvFunc& src1)
 const TvFunc&
 TvFunc::operator|=(const TvFunc& src1)
 {
-  for (ymuint b = 0; b < mNblk; ++ b) {
+  for (ymuint b = 0; b < mBlockNum; ++ b) {
     mVector[b] |= src1.mVector[b];
   }
   return *this;
@@ -661,7 +661,7 @@ TvFunc::operator|=(const TvFunc& src1)
 const TvFunc&
 TvFunc::operator^=(const TvFunc& src1)
 {
-  for (ymuint b = 0; b < mNblk; ++ b) {
+  for (ymuint b = 0; b < mBlockNum; ++ b) {
     mVector[b] ^= src1.mVector[b];
   }
   return *this;
@@ -682,7 +682,7 @@ TvFunc::set_cofactor(VarId varid,
       mask = ~mask;
     }
     int shift = 1 << pos;
-    for (ymuint b = 0; b < mNblk; ++ b) {
+    for (ymuint b = 0; b < mBlockNum; ++ b) {
       ymulong pat = mVector[b] & mask;
       if ( pol == kPolPosi ) {
 	pat |= (pat >> shift);
@@ -696,7 +696,7 @@ TvFunc::set_cofactor(VarId varid,
   else {
     pos -= NIPW;
     ymuint bit = 1U << pos;
-    for (ymuint i = 0; i < mNblk; ++ i) {
+    for (ymuint i = 0; i < mBlockNum; ++ i) {
       if ( pol == kPolPosi ) {
 	if ( (i & bit) == 0U ) {
 	  mVector[i] = mVector[i ^ bit];
@@ -853,7 +853,7 @@ END_NONAMESPACE
 ymuint
 TvFunc::count_zero() const
 {
-  switch ( ni() ) {
+  switch ( input_num() ) {
   case 0: return (1 << 0) - count_onebits_0(mVector[0]);
   case 1: return (1 << 1) - count_onebits_1(mVector[0]);
   case 2: return (1 << 2) - count_onebits_2(mVector[0]);
@@ -870,17 +870,17 @@ TvFunc::count_zero() const
   }
 
   ymuint ans = 0U;
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     ans += count_onebits(mVector[i]);
   }
-  return (1U << ni()) - ans;
+  return (1U << input_num()) - ans;
 }
 
 // 1 の数を数える．
 ymuint
 TvFunc::count_one() const
 {
-  switch ( ni() ) {
+  switch ( input_num() ) {
   case 0: return count_onebits_0(mVector[0]);
   case 1: return count_onebits_1(mVector[0]);
   case 2: return count_onebits_2(mVector[0]);
@@ -897,7 +897,7 @@ TvFunc::count_one() const
   }
 
   ymuint ans = 0UL;
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     ans += count_onebits(mVector[i]);
   }
   return ans;
@@ -907,7 +907,7 @@ TvFunc::count_one() const
 ymint
 TvFunc::walsh_0() const
 {
-  switch ( ni() ) {
+  switch ( input_num() ) {
   case 0: return (1 << 0) - count_onebits_0(mVector[0]) * 2;
   case 1: return (1 << 1) - count_onebits_1(mVector[0]) * 2;
   case 2: return (1 << 2) - count_onebits_2(mVector[0]) * 2;
@@ -924,10 +924,10 @@ TvFunc::walsh_0() const
   }
 
   ymint ans = 0;
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     ans += count_onebits(mVector[i]);
   }
-  return (1 << ni()) - ans * 2;
+  return (1 << input_num()) - ans * 2;
 }
 
 // 1次の Walsh 係数を求める．
@@ -935,7 +935,7 @@ ymint
 TvFunc::walsh_1(VarId varid) const
 {
   ymuint pos = varid.val();
-  switch ( ni() ) {
+  switch ( input_num() ) {
   case 0: assert_not_reached(__FILE__, __LINE__);
   case 1: return (1 << 1) - count_onebits_1(mVector[0] ^ c_masks[pos]) * 2;
   case 2: return (1 << 2) - count_onebits_2(mVector[0] ^ c_masks[pos]) * 2;
@@ -953,24 +953,24 @@ TvFunc::walsh_1(VarId varid) const
 
   // n > 5
   int c = 0;
-  int n = 1 << ni();
+  int n = 1 << input_num();
   if ( pos < NIPW ) {
     ymulong mask = c_masks[pos];
-    for (ymuint i = 0; i < mNblk; ++ i) {
+    for (ymuint i = 0; i < mBlockNum; ++ i) {
       c += count_onebits(mVector[i] ^ mask);
     }
   }
   else {
     ymuint i5 = pos - NIPW;
     // size_t check = 1 << i5;
-    // for (size_t b = 0; b < mNblk; ++ b) {
+    // for (size_t b = 0; b < mBlockNum; ++ b) {
     //   if ( b & check ) {
     //     c += count_onebits(~mVector[b]);
     //   } else {
     //     c += count_onebits(mVector[b]);
     //   }
     // }
-    for (ymuint b = 0; b < mNblk; ++ b) {
+    for (ymuint b = 0; b < mBlockNum; ++ b) {
       ymulong mask = 0UL - ((b >> i5) & 1UL);
       c += count_onebits(mVector[b] ^ mask);
     }
@@ -990,7 +990,7 @@ TvFunc::walsh_2(VarId var1,
     return 0;
   }
 
-  switch ( ni() ) {
+  switch ( input_num() ) {
   case 0:
   case 1:
     assert_not_reached(__FILE__, __LINE__);
@@ -1027,7 +1027,7 @@ TvFunc::walsh_2(VarId var1,
   ymint c = 0;
   if ( i < NIPW ) {
     ymulong mask = c_masks[i] ^ c_masks[j];
-    for (ymuint i = 0; i < mNblk; ++ i) {
+    for (ymuint i = 0; i < mBlockNum; ++ i) {
       c += count_onebits(mVector[i] ^ mask);
     }
   }
@@ -1035,7 +1035,7 @@ TvFunc::walsh_2(VarId var1,
     // size_t check = 1 << (i - 5);
     // size_t mask1 = c_masks[j];
     // size_t mask0 = ~mask1;
-    // for (size_t b = 0; b < mNblk; ++ b) {
+    // for (size_t b = 0; b < mBlockNum; ++ b) {
     //   if ( b & check ) {
     //     c += count_onebits(mVector[b] ^ mask0);
     //   } else {
@@ -1044,7 +1044,7 @@ TvFunc::walsh_2(VarId var1,
     // }
     ymuint i5 = i - NIPW;
     ymulong mask = c_masks[j];
-    for (ymuint i = 0; i < mNblk; ++ i) {
+    for (ymuint i = 0; i < mBlockNum; ++ i) {
       ymulong mask1 = 0UL - ((i >> i5) & 1UL);
       c += count_onebits(mVector[i] ^ mask ^ mask1);
     }
@@ -1053,7 +1053,7 @@ TvFunc::walsh_2(VarId var1,
     // size_t check1 = 1 << (i - 5);
     // size_t check2 = 1 << (j - 5);
     // size_t check = check1 | check2;
-    // for (size_t b = 0; b < mNblk; ++ b) {
+    // for (size_t b = 0; b < mBlockNum; ++ b) {
     //   size_t tmp = b & check;
     //   if ( tmp == check1 || tmp == check2 ) {
     //     c += count_onebits(~mVector[b]);
@@ -1063,12 +1063,12 @@ TvFunc::walsh_2(VarId var1,
     // }
     ymuint i5 = i - NIPW;
     ymuint j5 = j - NIPW;
-    for (ymuint i = 0; i < mNblk; ++ i) {
+    for (ymuint i = 0; i < mBlockNum; ++ i) {
       ymulong mask = 0UL - (((i >> i5) ^ (i >> j5)) & 1UL);
       c += count_onebits(mVector[i] ^ mask);
     }
   }
-  return (1 << ni()) - c * 2;
+  return (1 << input_num()) - c * 2;
 }
 
 BEGIN_NONAMESPACE
@@ -1897,7 +1897,7 @@ END_NONAMESPACE
 ymint
 TvFunc::walsh_01(ymint vec[]) const
 {
-  switch ( ni() ) {
+  switch ( input_num() ) {
   case  1: return walsh_01_1(mVector, vec);
   case  2: return walsh_01_2(mVector, vec);
   case  3: return walsh_01_3(mVector, vec);
@@ -3453,7 +3453,7 @@ int
 TvFunc::walsh_012(int vec1[],
 		  int vec2[]) const
 {
-  switch ( ni() ) {
+  switch ( input_num() ) {
   case  2: return walsh_012_2(mVector, vec1, vec2);
   case  3: return walsh_012_3(mVector, vec1, vec2);
   case  4: return walsh_012_4(mVector, vec1, vec2);
@@ -4704,7 +4704,7 @@ TvFunc::walsh_w0(ymuint w,
 		 tPol opol,
 		 ymuint ibits) const
 {
-  switch ( ni() ) {
+  switch ( input_num() ) {
   case  2: return walsh_w0_2(mVector, opol, ibits, w);
   case  3: return walsh_w0_3(mVector, opol, ibits, w);
   case  4: return walsh_w0_4(mVector, opol, ibits, w);
@@ -4941,7 +4941,7 @@ TvFunc::walsh_w0(ymuint w,
     assert_not_reached(__FILE__, __LINE__);
     break;
 #endif
-  default: // ni() > 5
+  default: // input_num() > 5
     ;
   }
   int nall = 0;
@@ -4967,7 +4967,7 @@ TvFunc::walsh_w0(ymuint w,
     ymuint* endp1 = &plist[end1];
     for (ymuint* p1 = &plist[start1]; p1 != endp1; ++ p1) {
       ymuint pos0 = *p1;
-      if ( pos0 >= mNblk ) break;
+      if ( pos0 >= mBlockNum ) break;
       ymuint pos1 = pos0 ^ ibits1;
       c += count_onebits(mVector[pos1] & pat);
       nall += n2;
@@ -4989,7 +4989,7 @@ TvFunc::walsh_w1(VarId var,
 		 ymuint ibits) const
 {
   ymuint idx = var.val();
-  switch ( ni() ) {
+  switch ( input_num() ) {
   case 2:
     {
       int tmp = mVector[0];
@@ -5159,7 +5159,7 @@ TvFunc::walsh_w1(VarId var,
       return nall - c * 2;
     }
     break;
-  default: // ni() > 5
+  default: // input_num() > 5
     ;
   }
 
@@ -5194,7 +5194,7 @@ TvFunc::walsh_w1(VarId var,
       ymuint* endp1 = &plist[end1];
       for (ymuint* p1 = &plist[start1]; p1 != endp1; ++ p1) {
 	ymuint pos0 = *p1;
-	if ( pos0 >= mNblk ) break;
+	if ( pos0 >= mBlockNum ) break;
 	ymuint pos1 = pos0 ^ ibits1;
 	c += count_onebits((mVector[pos1] ^ mask2) & pat);
 	n += n2;
@@ -5222,7 +5222,7 @@ TvFunc::walsh_w1(VarId var,
       ymuint* endp1 = &plist[end1];
       for (ymuint* p1 = &plist[start1]; p1 != endp1; ++ p1) {
 	ymuint pos0 = *p1;
-	if ( pos0 >= mNblk ) break;
+	if ( pos0 >= mBlockNum ) break;
 	ymuint pos1 = pos0 ^ ibits1;
 	// 2行下の式は1行下の式と同じ意味
 	// ymuint mask3 = (pos0 & (1 << var5)) ? 0xFFFFFFFF : 0x00000000;
@@ -5250,7 +5250,7 @@ TvFunc::check_sup(VarId var) const
     // ブロックごとにチェック
     ymuint dist = 1 << i;
     ymulong mask = c_masks[i];
-    for (ymuint b = 0; b < mNblk; ++ b) {
+    for (ymuint b = 0; b < mBlockNum; ++ b) {
       ymulong word = mVector[b];
       if ( (word ^ (word << dist)) & mask ) {
 	return true;
@@ -5261,7 +5261,7 @@ TvFunc::check_sup(VarId var) const
     // ブロック単位でチェック
     ymuint i5 = i - NIPW;
     ymuint check = 1 << i5;
-    for (ymuint b = 0; b < mNblk; ++ b) {
+    for (ymuint b = 0; b < mBlockNum; ++ b) {
       if ( (b & check) && (mVector[b] != mVector[b ^ check]) ) {
 	return true;
       }
@@ -5302,7 +5302,7 @@ TvFunc::check_sym(VarId var1,
     else {
       cond = 0UL;
     }
-    for (ymuint v = 0; v < mNblk; ++ v) {
+    for (ymuint v = 0; v < mBlockNum; ++ v) {
       if ( (v & mask_all) == cond &&
 	   mVector[v] != mVector[v ^ mask_all] ) {
 	ans = false;
@@ -5323,7 +5323,7 @@ TvFunc::check_sym(VarId var1,
     }
     ymulong mask2 = ~c_masks[j];
     ymuint s = 1 << j;
-    for (ymuint v = 0; v < mNblk; ++ v) {
+    for (ymuint v = 0; v < mBlockNum; ++ v) {
       if ( (v & mask_i) == cond &&
 	   (mVector[v] ^ (mVector[v ^ mask_i] >> s)) & mask2 ) {
 	ans = false;
@@ -5337,7 +5337,7 @@ TvFunc::check_sym(VarId var1,
     if ( pol == kPolPosi ) {
       ymulong mask = sym_masks2[(i * (i - 1)) / 2 + j];
       ymuint s = (1 << i) - (1 << j);
-      for (ymuint b = 0; b < mNblk; ++ b) {
+      for (ymuint b = 0; b < mBlockNum; ++ b) {
 	ymulong word = mVector[b];
 	if ( ((word >> s) ^ word) & mask ) {
 	  ans = false;
@@ -5348,7 +5348,7 @@ TvFunc::check_sym(VarId var1,
     else {
       ymulong mask = sym_masks3[(i * (i - 1)) / 2 + j];
       ymuint s = (1 << i) + (1 << j);
-      for (ymuint b = 0; b < mNblk; ++ b) {
+      for (ymuint b = 0; b < mBlockNum; ++ b) {
 	ymulong word = mVector[b];
 	if ( ((word >> s) ^ word) & mask ) {
 	  ans = false;
@@ -5364,7 +5364,7 @@ TvFunc::check_sym(VarId var1,
 TvFunc
 TvFunc::xform(const NpnMap& npnmap) const
 {
-  ymuint ni_pow = 1UL << mNi;
+  ymuint ni_pow = 1UL << mInputNum;
 
 #if defined(DEBUG)
   cout << "xform" << endl
@@ -5374,7 +5374,7 @@ TvFunc::xform(const NpnMap& npnmap) const
 
   ymuint imask = 0UL;
   ymuint ipat[kMaxNi];
-  for (ymuint i = 0; i < mNi; ++ i) {
+  for (ymuint i = 0; i < mInputNum; ++ i) {
     VarId src_var(i);
     NpnVmap imap = npnmap.imap(src_var);
     if ( imap.pol() == kPolNega ) {
@@ -5386,11 +5386,11 @@ TvFunc::xform(const NpnMap& npnmap) const
   }
   ymuint omask = npnmap.opol() == kPolPosi ? 0U : 1U;
 
-  TvFunc ans(mNi);
+  TvFunc ans(mInputNum);
   for (ymuint i = 0; i < ni_pow; ++ i) {
     ymuint new_i = 0;
     ymuint tmp = i;
-    for (ymuint b = 0; b < mNi; ++ b, tmp >>= 1) {
+    for (ymuint b = 0; b < mInputNum; ++ b, tmp >>= 1) {
       if ( tmp & 1 ) {
 	new_i |= ipat[b];
       }
@@ -5411,10 +5411,10 @@ ymuint
 TvFunc::hash() const
 {
   ymulong ans = 0;
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     ans ^= mVector[i];
   }
-  return ans + mNi;
+  return ans + mInputNum;
 }
 
 // 等価比較
@@ -5422,10 +5422,10 @@ bool
 operator==(const TvFunc& func1,
 	   const TvFunc& func2)
 {
-  if ( func1.mNi != func2.mNi ) {
+  if ( func1.mInputNum != func2.mInputNum ) {
     return false;
   }
-  ymuint n = func1.mNblk;
+  ymuint n = func1.mBlockNum;
   for (ymuint i = 0; i < n; ++ i) {
     if ( func1.mVector[i] != func2.mVector[i] ) {
       return false;
@@ -5439,10 +5439,10 @@ bool
 operator<(const TvFunc& func1,
 	  const TvFunc& func2)
 {
-  if ( func1.mNi != func2.mNi ) {
+  if ( func1.mInputNum != func2.mInputNum ) {
     return false;
   }
-  ymuint n = func1.mNblk;
+  ymuint n = func1.mBlockNum;
   for (ymuint i = 0; i < n; ++ i) {
     ymulong w1 = func1.mVector[n - i - 1];
     ymulong w2 = func2.mVector[n - i - 1];
@@ -5462,10 +5462,10 @@ bool
 operator&&(const TvFunc& func1,
 	   const TvFunc& func2)
 {
-  if ( func1.mNi != func2.mNi ) {
+  if ( func1.mInputNum != func2.mInputNum ) {
     return false;
   }
-  ymuint n = func1.mNblk;
+  ymuint n = func1.mBlockNum;
   for (ymuint i = 0; i < n; ++ i) {
     ymulong w1 = func1.mVector[n - i - 1];
     ymulong w2 = func2.mVector[n - i - 1];
@@ -5482,7 +5482,7 @@ void
 TvFunc::print(ostream& s,
 	      int mode) const
 {
-  ymuint ni_pow = 1UL << mNi;
+  ymuint ni_pow = 1UL << mInputNum;
   const ymuint wordsize = SIZEOF_SIZE_T * 8;
   if ( mode == 2 ) {
     ymulong* bp = mVector;
@@ -5531,9 +5531,9 @@ TvFunc::print(ostream& s,
 void
 TvFunc::dump(ODO& s) const
 {
-  s << mNi
-    << mNblk;
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  s << mInputNum
+    << mBlockNum;
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     s << mVector[i];
   }
 }
@@ -5544,14 +5544,14 @@ void
 TvFunc::restore(IDO& s)
 {
   ymuint32 nblk;
-  s >> mNi
+  s >> mInputNum
     >> nblk;
-  if ( mNblk != nblk ) {
+  if ( mBlockNum != nblk ) {
     delete [] mVector;
-    mNblk = nblk;
-    mVector = new ymulong[mNblk];
+    mBlockNum = nblk;
+    mVector = new ymulong[mBlockNum];
   }
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     s >> mVector[i];
   }
 }

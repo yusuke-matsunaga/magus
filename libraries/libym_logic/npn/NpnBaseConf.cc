@@ -59,24 +59,24 @@ void
 NpnBaseConf::normalize(const TvFunc& func)
 {
   mFunc = func;
-  mNi = mFunc.ni();
+  mInputNum = mFunc.input_num();
 
 #if USE_MALLOC
-  mW1 = new ymint32[mNi];
-  mW2 = new ymint32[mNi * mNi];
-  mW2flag = new ymuint8[mNi * mNi];
-  mIpols = new ymuint8[mNi];
-  mIcRep = new ymuint32[mNi];
-  mIcNum = new ymuint32[mNi];
-  mIcLink = new ymuint32[mNi];
+  mW1 = new ymint32[mInputNum];
+  mW2 = new ymint32[mInputNum * mInputNum];
+  mW2flag = new ymuint8[mInputNum * mInputNum];
+  mIpols = new ymuint8[mInputNum];
+  mIcRep = new ymuint32[mInputNum];
+  mIcNum = new ymuint32[mInputNum];
+  mIcLink = new ymuint32[mInputNum];
 #endif
-  for (ymuint i = 0; i < mNi; ++ i) {
-    ymuint base = i * mNi;
-    for (ymuint j = 0; j < mNi; ++ j) {
+  for (ymuint i = 0; i < mInputNum; ++ i) {
+    ymuint base = i * mInputNum;
+    for (ymuint j = 0; j < mInputNum; ++ j) {
       mW2flag[base + j] = 0;
     }
   }
-  for (ymuint i = 0; i < mNi; ++ i) {
+  for (ymuint i = 0; i < mInputNum; ++ i) {
     mIcNum[i] = 0;
     mIcLink[i] = static_cast<ymuint>(-1);
   }
@@ -94,7 +94,7 @@ NpnBaseConf::normalize(const TvFunc& func)
   if ( mW0 < 0 ) {
     mOpol = 2;
     mW0 = -mW0;
-    for (ymuint i = 0; i < mNi; ++ i) {
+    for (ymuint i = 0; i < mInputNum; ++ i) {
       mW1[i] = -mW1[i];
     }
   }
@@ -109,7 +109,7 @@ NpnBaseConf::normalize(const TvFunc& func)
   // 同時に等価入力クラスをつくる．
   mNc = 0;
   mIndepNum = 0;
-  for (ymuint i = 0; i < mNi; ++ i) {
+  for (ymuint i = 0; i < mInputNum; ++ i) {
     // w1 が非負になるように調整する．
     // w1 が 0 の時には実際のサポートかどうかも調べる．
     if ( mW1[i] < 0 ) {
@@ -202,7 +202,7 @@ NpnBaseConf::walsh_w0(ymuint w,
     opol = ~opol;
   }
   ymuint32 ibits = 0UL;
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     tPol ip = ipol[i];
     if ( mIpols[i] == -1 ) {
       ip = ~ip;
@@ -221,15 +221,15 @@ NpnBaseConf::print_walsh(ostream& s) const
 {
   s << "W0: " << mW0 << endl
     << "w1:";
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     s << " " << mW1[i];
   }
   s << endl;
 
   s << "W2:" << endl;
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     s << "   ";
-    for (ymuint j = 0; j < ni(); ++ j) {
+    for (ymuint j = 0; j < input_num(); ++ j) {
       int w2 = func().walsh_2(VarId(i), VarId(j));
       if ( ipol(i) == 2 ) {
 	w2 = -w2;
@@ -260,7 +260,7 @@ NpnBaseConf::print_pols(ostream& s) const
   }
   s << endl
     << "ipol:";
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     s << " ";
     switch ( ipol(i) ) {
     case 0: s << "-"; break;

@@ -62,7 +62,7 @@ bnet2aig(const BNetwork& network,
   ymuint nv = network.logic_node_num();
   for (size_t i = 0; i < nv; ++ i) {
     BNode* bnode = node_list[i];
-    ymuint ni = bnode->ni();
+    ymuint ni = bnode->fanin_num();
     hash_map<VarId, Aig> input_map;
     for (ymuint pos = 0; pos < ni; ++ pos) {
       Aig iaig = find_node(bnode->fanin(pos), assoc);

@@ -96,6 +96,24 @@ GbmMgr::new_mux(const vector<GbmNodeHandle>& inputs)
   return GbmNodeHandle(node->id(), false);
 }
 
+// @brief 関数ノードを作る．
+// @param[in] f 関数
+// @param[in] inputs ファンインのハンドルのリスト
+GbmNodeHandle
+GbmMgr::new_func(const TvFunc& f,
+		 const vector<GbmNodeHandle>& inputs)
+{
+  ymuint id = mNodeList.size();
+
+  ymuint n = f.input_num();
+  assert_cond( inputs.size() == n, __FILE__, __LINE__);
+  void* p = mAlloc.get_memory(sizeof(GbmFuncNode) + sizeof(GbmNodeHandle) * (n - 1));
+  GbmNode* node = new (p) GbmFuncNode(id, f, inputs);
+  mNodeList.push_back(node);
+
+  return GbmNodeHandle(node->id(), false);
+}
+
 // @brief 全ノード数を返す．
 // @note ノードIDの最大値 + 1 と一致する．
 ymuint

@@ -28,7 +28,7 @@ walsh_0(const TvFunc& func,
   sw.stop();
 
   double usec = sw.time().usr_time() / mag;
-  cout << "Result of walsh_0(ni = " << func.ni()
+  cout << "Result of walsh_0(ni = " << func.input_num()
        << ", mag = " << mag << ")"
        << endl
        << "CPU time(avr.): " << usec << endl;
@@ -40,7 +40,7 @@ walsh_1(const TvFunc& func,
 {
   StopWatch sw;
 
-  ymuint ni = func.ni();
+  ymuint ni = func.input_num();
   sw.start();
   for (ymuint j = 0; j < ni; ++ j) {
     VarId var(j);
@@ -51,7 +51,7 @@ walsh_1(const TvFunc& func,
   sw.stop();
 
   double usec = sw.time().usr_time() / mag / ni;
-  cout << "Result of walsh_1(ni = " << func.ni()
+  cout << "Result of walsh_1(ni = " << func.input_num()
        << ", mag = " << mag << ")"
        << endl
        << "CPU time(avr.): " << usec << endl;
@@ -63,7 +63,7 @@ walsh_2(const TvFunc& func,
 {
   StopWatch sw;
 
-  ymuint ni = func.ni();
+  ymuint ni = func.input_num();
   sw.start();
   for (ymuint j = 0; j < ni; ++ j) {
     VarId var1(j);
@@ -77,7 +77,7 @@ walsh_2(const TvFunc& func,
   sw.stop();
 
   double usec = sw.time().usr_time() / mag / (ni * ni);
-  cout << "Result of walsh_0(ni = " << func.ni()
+  cout << "Result of walsh_0(ni = " << func.input_num()
        << ", mag = " << mag << ")"
        << endl
        << "CPU time(avr.): " << usec << endl;
@@ -98,7 +98,7 @@ walsh_01(const TvFunc& func,
   sw.stop();
 
   double usec = sw.time().usr_time() / mag;
-  cout << "Result of walsh_01(ni = " << func.ni()
+  cout << "Result of walsh_01(ni = " << func.input_num()
        << ", mag = " << mag << ")"
        << endl
        << "CPU time(avr.): " << usec << endl;
@@ -120,7 +120,7 @@ walsh_012(const TvFunc& func,
   sw.stop();
 
   double usec = sw.time().usr_time() / mag;
-  cout << "Result of walsh_012(ni = " << func.ni()
+  cout << "Result of walsh_012(ni = " << func.input_num()
        << ", mag = " << mag << ")"
        << endl
        << "CPU time(avr.): " << usec << endl;

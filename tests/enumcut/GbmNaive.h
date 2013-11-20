@@ -72,6 +72,13 @@ private:
 	      const vector<GbmLit>& node_var_array,
 	      vector<GbmLit>& inputs);
 
+  /// @brief GbmNodeHandle から GbmLit を作る．
+  /// @param[in] handle ハンドル
+  /// @param[in] node_var_array ノードの変数番号の配列
+  GbmLit
+  handle_to_lit(GbmNodeHandle handle,
+		const vector<GbmLit>& node_var_array);
+
 };
 
 END_NAMESPACE_YM

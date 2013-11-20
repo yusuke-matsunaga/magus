@@ -324,7 +324,7 @@ MapRecord::back_trace(const BdnNode* node,
   const Cut* cut = node_info.mCut;
 
   // その入力に対応するノードを再帰的に生成する．
-  ymuint ni = cut->ni();
+  ymuint ni = cut->input_num();
   for (ymuint i = 0; i < ni; ++ i) {
     const BdnNode* inode = cut->input(i);
     back_trace(inode, false, mapnetwork);
@@ -427,7 +427,7 @@ MapRecord::back_trace2(const BdnNode* node,
   const Cut* cut = node_info.mCut;
 
   // cut のカバーしているノードの mCovCount を1つ増やす．
-  for (ymuint i = 0; i < cut->ni(); ++ i) {
+  for (ymuint i = 0; i < cut->input_num(); ++ i) {
     const BdnNode* leaf = cut->input(i);
     mNodeInfo[leaf->id()].mTmpFlag = true;
   }
@@ -436,7 +436,7 @@ MapRecord::back_trace2(const BdnNode* node,
 
   int lut_num = 1;
   // その入力に対応するノードを再帰的に生成する．
-  ymuint ni = cut->ni();
+  ymuint ni = cut->input_num();
   for (ymuint i = 0; i < ni; ++ i) {
     const BdnNode* inode = cut->input(i);
     lut_num += back_trace2(inode, false);

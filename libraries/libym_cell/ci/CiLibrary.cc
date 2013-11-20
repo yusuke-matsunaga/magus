@@ -1389,7 +1389,7 @@ CiLibrary::compile()
       CiGroup* cgroup = &mGroupArray[gid];
       NpnMapM map = cgroup->map();
       ymuint pos_array[6] = { 0, 0, 0, 0, 0, 0 };
-      ymuint ni = map.ni() - 2;
+      ymuint ni = map.input_num() - 2;
       assert_cond( ni <= 4, __FILE__, __LINE__);
       for (ymuint i = 0; i < ni; ++ i) {
 	NpnVmap imap = map.imap(VarId(i));
@@ -1412,7 +1412,7 @@ CiLibrary::compile()
       CiGroup* cgroup = &mGroupArray[gid];
       NpnMapM map = cgroup->map();
       ymuint pos_array[5] = { 0, 0, 0, 0, 0 };
-      ymuint ni = map.ni() - 2;
+      ymuint ni = map.input_num() - 2;
       assert_cond( ni <= 4, __FILE__, __LINE__);
       for (ymuint i = 0; i < ni; ++ i) {
 	NpnVmap imap = map.imap(VarId(i));

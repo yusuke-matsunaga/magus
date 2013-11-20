@@ -10,6 +10,7 @@
 
 
 #include "GbmNodeHandle.h"
+#include "ym_logic/TvFunc.h"
 #include "ym_utils/SimpleAlloc.h"
 
 
@@ -86,6 +87,13 @@ public:
   /// @note inputs のサイズが2のべき乗でないときは0でパディングされる．
   GbmNodeHandle
   new_mux(const vector<GbmNodeHandle>& inputs);
+
+  /// @brief 関数ノードを作る．
+  /// @param[in] f 関数
+  /// @param[in] inputs ファンインのハンドルのリスト
+  GbmNodeHandle
+  new_func(const TvFunc& f,
+	   const vector<GbmNodeHandle>& inputs);
 
 
 public:

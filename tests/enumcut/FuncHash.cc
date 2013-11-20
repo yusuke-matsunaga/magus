@@ -109,7 +109,7 @@ FuncHash::func_list(ymuint ni,
   {
     for (ymuint i = 0; i < mTableSize; ++ i) {
       for (FuncData* data = mTable[i]; data; data = data->mLink) {
-	if ( data->mFunc.ni() == ni) {
+	if ( data->mFunc.input_num() == ni) {
 	  ++ n;
 	}
       }
@@ -118,7 +118,7 @@ FuncHash::func_list(ymuint ni,
   func_list.reserve(n);
   for (ymuint i = 0; i < mTableSize; ++ i) {
     for (FuncData* data = mTable[i]; data; data = data->mLink) {
-      if ( data->mFunc.ni() == ni ) {
+      if ( data->mFunc.input_num() == ni ) {
 	func_list.push_back(data->mFunc);
       }
     }

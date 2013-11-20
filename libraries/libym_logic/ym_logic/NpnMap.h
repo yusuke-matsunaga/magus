@@ -110,7 +110,7 @@ public:
   /// @brief 入力数を得る．
   /// @return 入力数
   ymuint
-  ni() const;
+  input_num() const;
 
   /// @brief 入力の変換情報の取得
   /// @param[in] var 入力変数
@@ -203,7 +203,7 @@ operator>>(IDO& s,
 // 入力数を得る．
 inline
 ymuint
-NpnMap::ni() const
+NpnMap::input_num() const
 {
   return mNiPol >> 1;
 }
@@ -214,7 +214,7 @@ NpnVmap
 NpnMap::imap(VarId var) const
 {
   ymuint idx = var.val();
-  if ( idx < ni() ) {
+  if ( idx < input_num() ) {
     return mImap[idx];
   }
   else {
