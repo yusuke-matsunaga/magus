@@ -120,7 +120,7 @@ AC_DEFUN([YM_BUILD_LIBRARY],
 AC_ARG_ENABLE([$1],
 	[AS_HELP_STRING([--enable-$1],
 	                [build $1 (default is $2)])],
-        [ym_[]$1[]_enable=yes],
+        [ym_[]$1[]_enable=$enableval],
 	[ym_[]$1[]_enable=$2])
 ym_tmp_enable=${ym_[]$1[]_enable}
 m4_ifval([$3], [
@@ -184,7 +184,7 @@ AC_DEFUN([YM_BUILD_PROGRAM],
 AC_ARG_ENABLE([$1],
 	[AS_HELP_STRING([--enable-$1],
 	                [build $1 (default is $2)])],
-        [ym_[]$1[]_enable=yes],
+        [ym_[]$1[]_enable=$enableval],
 	[ym_[]$1[]_enable=$2])
 ym_tmp_enable=${ym_[]$1[]_enable}
 m4_ifval([$3], [
