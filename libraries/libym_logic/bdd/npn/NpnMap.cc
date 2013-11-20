@@ -32,7 +32,7 @@ NpnMap::NpnMap() :
   mPol(kPolPosi)
 {
 }
-  
+
 // 入力数(と出力極性)を指定したコンストラクタ
 // 各入力の変換内容は kImapBad になっている．
 NpnMap::NpnMap(size_t ni,
@@ -48,7 +48,7 @@ NpnMap::NpnMap(size_t ni,
 void
 NpnMap::clear()
 {
-  for (size_t i = 0; i < ni(); ++ i) {
+  for (size_t i = 0; i < input_num(); ++ i) {
     mImap[i] = kImapBad;
   }
   mPol = kPolPosi;
@@ -69,7 +69,7 @@ NpnMap::clear(size_t ni)
 void
 NpnMap::set_identity()
 {
-  for (size_t i = 0; i < ni(); ++ i) {
+  for (size_t i = 0; i < input_num(); ++ i) {
     mImap[i] = npn_pack(i, kPolPosi);
   }
   mPol = kPolPosi;
@@ -81,7 +81,7 @@ NpnMap::set(tVarId pos,
 	    tVarId dst_pos,
 	    tPol pol)
 {
-  if ( pos < ni() ) {
+  if ( pos < input_num() ) {
     mImap[pos] = npn_pack(dst_pos, pol);
   }
 }
@@ -90,7 +90,7 @@ void
 NpnMap::set(tVarId pos,
 	    tNpnImap imap)
 {
-  if ( pos < ni() ) {
+  if ( pos < input_num() ) {
     mImap[pos] = imap;
   }
 }

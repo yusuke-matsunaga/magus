@@ -148,7 +148,7 @@ learning()
       continue;
     }
     source_gate->set_learned();
-    if (source_gate->get_ni() <= 1) {
+    if (source_gate->get_fanin_num() <= 1) {
       continue;
     }
     if (setjmp(env) == 0) {
@@ -188,8 +188,8 @@ mark_tfi(gate_t* gate)
   }
   gate->set_mark();
   lvlq_put(gate);
-  for (int i = gate->get_ni(); -- i >= 0; ) {
-    mark_tfi(gate->get_figate(i));
+  for (int i = gate->get_fanin_num(); -- i >= 0; ) {
+    mark_tfi(gate->get_fanin_gate(i));
   }
 }
 
@@ -202,10 +202,10 @@ mark_tfi_tfo(gate_t* gate)
     lvlq_put(gate);
     int i;
     for (i = gate->get_no(); -- i >= 0; ) {
-      mark_tfi_tfo(gate->get_fogate(i));
+      mark_tfi_tfo(gate->get_fanout_gate(i));
     }
-    for (i = gate->get_ni(); -- i >= 0; ) {
-      mark_tfi(gate->get_figate(i));
+    for (i = gate->get_fanin_num(); -- i >= 0; ) {
+      mark_tfi(gate->get_fanin_gate(i));
     }
   }
 }
@@ -257,7 +257,7 @@ C0_gate_t::l_bwd_imp(val3 val,
   used_gate_add(this);
   set_gval(val_0);
   for (int i = get_no(); -- i >= 0; ) {
-    gate_t* o_gate = get_fogate(i);
+    gate_t* o_gate = get_fanout_gate(i);
     if (o_gate != from) {
       o_gate->l_fwd_imp(val);
     }
@@ -277,7 +277,7 @@ C1_gate_t::l_bwd_imp(val3 val,
   used_gate_add(this);
   set_gval(val_1);
   for (int i = get_no(); -- i >= 0; ) {
-    gate_t* o_gate = get_fogate(i);
+    gate_t* o_gate = get_fanout_gate(i);
     if (o_gate != from) {
       o_gate->l_fwd_imp(val);
     }
@@ -294,7 +294,7 @@ BUF_gate_t::l_fwd_imp(val3 val)
     used_gate_add(this);
     set_gval(val);
     for (int i = get_no(); -- i >= 0; ) {
-      get_fogate(i)->l_fwd_imp(val);
+      get_fanout_gate(i)->l_fwd_imp(val);
     }
   }
   else if (val != get_gval()) {
@@ -310,7 +310,7 @@ BUF_gate_t::l_bwd_imp(val3 val,
     used_gate_add(this);
     set_gval(val);
     for (int i = get_no(); -- i >= 0; ) {
-      gate_t* o_gate = get_fogate(i);
+      gate_t* o_gate = get_fanout_gate(i);
       if (o_gate != from) {
 	o_gate->l_fwd_imp(val);
       }
@@ -318,7 +318,7 @@ BUF_gate_t::l_bwd_imp(val3 val,
     if (get_gtype() == kTgGateNot) {
       val = neg3(val);
     }
-    get_figate(0)->l_bwd_imp(val, this);
+    get_fanin_gate(0)->l_bwd_imp(val, this);
   }
   else if (val != get_gval()) {
     longjmp(env, 1);
@@ -333,7 +333,7 @@ SIMPLE_gate_t::l_fwd_imp(val3 val)
       used_gate_add(this);
       set_gval(o_val);
       for (int i = get_no(); -- i >= 0; ) {
-	get_fogate(i)->l_fwd_imp(o_val);
+	get_fanout_gate(i)->l_fwd_imp(o_val);
       }
       l_gl_imp(this, o_val);
     }
@@ -346,8 +346,8 @@ SIMPLE_gate_t::l_fwd_imp(val3 val)
     val3 no_val = neg3(o_val);
     if (get_gval() == val_X) {
       int i;
-      for (i = get_ni(); -- i >= 0; ) {
-	if (get_figate(i)->get_gval() != nc_val) {
+      for (i = get_fanin_num(); -- i >= 0; ) {
+	if (get_fanin_gate(i)->get_gval() != nc_val) {
 	  break;
 	}
       }
@@ -356,7 +356,7 @@ SIMPLE_gate_t::l_fwd_imp(val3 val)
 	set_gval(no_val);
 	record_implication(this, no_val);
 	for (i = get_no(); -- i >= 0; ) {
-	  get_fogate(i)->l_fwd_imp(no_val);
+	  get_fanout_gate(i)->l_fwd_imp(no_val);
 	}
 	l_gl_imp(this, no_val);
       }
@@ -365,8 +365,8 @@ SIMPLE_gate_t::l_fwd_imp(val3 val)
       int u_num = 0;
       gate_t* last = NULL;
       int i;
-      for (i = get_ni(); -- i >= 0; ) {
-	gate_t* i_gate = get_figate(i);
+      for (i = get_fanin_num(); -- i >= 0; ) {
+	gate_t* i_gate = get_fanin_gate(i);
 	val3 i_val = i_gate->get_gval();
 	if (i_val == val_X) {
 	  u_num ++;
@@ -399,7 +399,7 @@ SIMPLE_gate_t::l_bwd_imp(val3 val,
       record_implication(this, val);
     }
     for (int i = get_no(); -- i >= 0; ) {
-      gate_t* o_gate = get_fogate(i);
+      gate_t* o_gate = get_fanout_gate(i);
       if (o_gate != from) {
 	o_gate->l_fwd_imp(val);
       }
@@ -412,8 +412,8 @@ SIMPLE_gate_t::l_bwd_imp(val3 val,
       int u_num = 0;
       gate_t* last = NULL;
       int i;
-      for (i = get_ni(); -- i >= 0; ) {
-	gate_t* i_gate = get_figate(i);
+      for (i = get_fanin_num(); -- i >= 0; ) {
+	gate_t* i_gate = get_fanin_gate(i);
 	val3 i_val = i_gate->get_gval();
 	if (i_val == val_X) {
 	  u_num ++;
@@ -434,8 +434,8 @@ SIMPLE_gate_t::l_bwd_imp(val3 val,
     }
     else {
       val3 nc_val = neg3(c_val);
-      for (int i = get_ni(); -- i >= 0; ) {
-	get_figate(i)->l_bwd_imp(nc_val, this);
+      for (int i = get_fanin_num(); -- i >= 0; ) {
+	get_fanin_gate(i)->l_bwd_imp(nc_val, this);
       }
     }
   }
@@ -455,8 +455,8 @@ XOR_gate_t::l_fwd_imp(val3 val)
   }
   int u_num = 0;
   gate_t* last = NULL;
-  for (int i = get_ni(); -- i >= 0; ) {
-    gate_t* i_gate = get_figate(i);
+  for (int i = get_fanin_num(); -- i >= 0; ) {
+    gate_t* i_gate = get_fanin_gate(i);
     val3 i_val = i_gate->get_gval();
     if (i_val == val_X) {
       u_num ++;
@@ -473,7 +473,7 @@ XOR_gate_t::l_fwd_imp(val3 val)
       set_gval(val);
       record_implication(this, val);
       for (int i = get_no(); -- i >= 0; ) {
-	get_fogate(i)->l_fwd_imp(val);
+	get_fanout_gate(i)->l_fwd_imp(val);
       }
       l_gl_imp(this, val);
     }
@@ -499,7 +499,7 @@ XOR_gate_t::l_bwd_imp(val3 val,
     set_gval(val);
     record_implication(this, val);
     for (int i = get_no(); -- i >= 0; ) {
-      gate_t* o_gate = get_fogate(i);
+      gate_t* o_gate = get_fanout_gate(i);
       if (o_gate != from) {
 	o_gate->l_fwd_imp(val);
       }
@@ -513,8 +513,8 @@ XOR_gate_t::l_bwd_imp(val3 val,
     if (get_gtype() == kTgGateXnor) {
       val = neg3(val);
     }
-    for (int i = get_ni(); -- i >= 0; ) {
-      gate_t* i_gate = get_figate(i);
+    for (int i = get_fanin_num(); -- i >= 0; ) {
+      gate_t* i_gate = get_fanin_gate(i);
       val3 i_val = i_gate->get_gval();
       if (i_val == val_X) {
 	u_num ++;

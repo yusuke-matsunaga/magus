@@ -60,6 +60,15 @@ public:
   func_list(ymuint ni,
 	    vector<TvFunc>& func_list) const;
 
+  /// @brief 代表関数のリストを取り出す．
+  void
+  rep_func_list(vector<TvFunc>& func_list) const;
+
+  /// @brief 指定された入力数の代表関数のリストを取り出す．
+  void
+  rep_func_list(ymuint ni,
+		vector<TvFunc>& func_list) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -127,6 +136,9 @@ private:
 
   // ハッシュ表
   FuncData** mTable;
+
+  // 代表関数のハッシュ
+  hash_set<TvFunc> mRepHash;
 
 };
 

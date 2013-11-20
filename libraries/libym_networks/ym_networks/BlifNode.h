@@ -89,7 +89,7 @@ public:
   fanin_num() const = 0;
 
   /// @brief ファンインのノードIDを返す．
-  /// @param[in] pos 入力位置 ( 0 <= pos < ni() )
+  /// @param[in] pos 入力位置 ( 0 <= pos < fanin_num() )
   virtual
   ymuint32
   fanin_id(ymuint32 pos) const = 0;
@@ -107,7 +107,7 @@ public:
 
   /// @brief 入力キューブのパタンを得る．
   /// @param[in] c_pos キューブの位置 ( 0 <= c_pos < nc() )
-  /// @param[in] i_pos 入力位置 ( 0 <= i_pos < ni() )
+  /// @param[in] i_pos 入力位置 ( 0 <= i_pos < fanin_num() )
   /// @note 意味のあるパタンは '0' '1' '-'
   virtual
   char

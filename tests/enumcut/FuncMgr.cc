@@ -72,6 +72,14 @@ FuncMgr::reg_func(const TvFunc& f)
     }
   }
 
+  NpnMgr npn_mgr;
+  NpnMap cmap;
+  npn_mgr.cannonical(f, cmap);
+  TvFunc rep = f.xform(cmap);
+  if ( mRepHash.count(rep) == 0 ) {
+    mRepHash.insert(rep);
+  }
+
   new_data(f);
 }
 
@@ -111,7 +119,7 @@ FuncMgr::func_list(ymuint ni,
   {
     for (ymuint i = 0; i < mTableSize; ++ i) {
       for (FuncData* data = mTable[i]; data; data = data->mLink) {
-	if ( data->mFunc.ni() == ni) {
+	if ( data->mFunc.input_num() == ni) {
 	  ++ n;
 	}
       }
@@ -120,9 +128,46 @@ FuncMgr::func_list(ymuint ni,
   func_list.reserve(n);
   for (ymuint i = 0; i < mTableSize; ++ i) {
     for (FuncData* data = mTable[i]; data; data = data->mLink) {
-      if ( data->mFunc.ni() == ni ) {
+      if ( data->mFunc.input_num() == ni ) {
 	func_list.push_back(data->mFunc);
       }
+    }
+  }
+}
+
+// @brief 代表関数のリストを取り出す．
+void
+FuncMgr::rep_func_list(vector<TvFunc>& func_list) const
+{
+  func_list.clear();
+  func_list.reserve(mRepHash.size());
+  for (hash_set<TvFunc>::const_iterator p = mRepHash.begin();
+       p != mRepHash.end(); ++ p) {
+    func_list.push_back(*p);
+  }
+}
+
+// @brief 指定された入力数の代表関数のリストを取り出す．
+void
+FuncMgr::rep_func_list(ymuint ni,
+		       vector<TvFunc>& func_list) const
+{
+  // 数を数える．
+  ymuint n = 0;
+  for (hash_set<TvFunc>::const_iterator p = mRepHash.begin();
+       p != mRepHash.end(); ++ p) {
+    const TvFunc& f = *p;
+    if ( f.input_num() == ni ) {
+      ++ n;
+    }
+  }
+  func_list.clear();
+  func_list.reserve(n);
+  for (hash_set<TvFunc>::const_iterator p = mRepHash.begin();
+       p != mRepHash.end(); ++ p) {
+    const TvFunc& f = *p;
+    if ( f.input_num() == ni ) {
+      func_list.push_back(f);
     }
   }
 }
@@ -145,6 +190,7 @@ FuncMgr::dump(ODO& s) const
 void
 FuncMgr::dump_rep(ODO& s) const
 {
+#if 0
   NpnMgr npn_mgr;
   hash_set<TvFunc> rep_hash;
   for (ymuint i = 0; i < mTableSize; ++ i) {
@@ -166,6 +212,15 @@ FuncMgr::dump_rep(ODO& s) const
     const TvFunc& f = *p;
     s << f;
   }
+#else
+  ymuint32 n = mRepHash.size();
+  s << n;
+  for (hash_set<TvFunc>::iterator p = mRepHash.begin();
+       p != mRepHash.end(); ++ p) {
+    const TvFunc& f = *p;
+    s << f;
+  }
+#endif
 }
 
 // @brief バイナリダンプされたファイルを読み込む．

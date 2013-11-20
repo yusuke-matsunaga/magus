@@ -262,7 +262,7 @@ distribute_pins(size_t ni,
 // y_off : Y 軸のオフセット
 // pos   : 入力ピン位置(上が0)
 // n     : 入力ピン数
-// or_xor: OR/XOR の時 true 
+// or_xor: OR/XOR の時 true
 static
 Point
 ipos(double x_off,
@@ -340,7 +340,7 @@ draw_and(double uy,
   glVertex2d(kAndL, kGateUY);
   glVertex2d(0.0,   kGateUY);
   glEnd();
-    
+
   // 上側に延ばす辺
   if ( uy != kGateUY ) {
     glBegin(GL_LINE_STRIP);
@@ -348,7 +348,7 @@ draw_and(double uy,
     glVertex2d(0.0, kGateUY);
     glEnd();
   }
-    
+
   // 下側に延ばす辺
   if ( ly != kGateLY ) {
     glBegin(GL_LINE_STRIP);
@@ -401,7 +401,7 @@ draw_or(double uy,
       glVertex2d(x0, uy);
       glEnd();
     }
-    
+
     // 下側に延ばす辺
     if ( ly != kGateLY ) {
       glBegin(GL_LINE_STRIP);
@@ -521,7 +521,7 @@ LedScene::initialize()
     xnor_gate(i);
   }
 #endif
-  
+
 #if 0
   new_obj(input(), 50.0, 20.0);
   new_obj(output(), 50.0, 100.0);
@@ -611,7 +611,7 @@ LedScene::input()
     const double buy = uy + kHmargin;
     // 下外周の Y座標
     const double bly = ly - kHmargin;
-    
+
     // 周りの矩形の設定
     mInput->mBoundingBox.mLeft  = blx;
     mInput->mBoundingBox.mUpper = buy;
@@ -626,7 +626,7 @@ LedScene::input()
     // ディスプレイリストの生成
     mInput->mId = glGenLists(1);
     glNewList(mInput->mId, GL_COMPILE);
-    
+
     // 配線の描画
     glLineWidth(wire_line_width());
     glColor4fv(wire_line_color());
@@ -681,7 +681,7 @@ LedScene::output()
     const double buy = uy + kHmargin;
     // 下外周の Y座標
     const double bly = ly - kHmargin;
-    
+
     // 周りの矩形の設定
     mInput->mBoundingBox.mLeft  = blx;
     mInput->mBoundingBox.mUpper = buy;
@@ -717,7 +717,7 @@ LedScene::output()
     glVertex2d(mx, ly);
     glVertex2d(lx, ly);
     glEnd();
-    
+
     glEndList();
   }
   return mOutput;
@@ -749,7 +749,7 @@ LedScene::buf_gate()
     const double buy = uy + kHmargin;
     // 下外周の Y座標
     const double bly = ly - kHmargin;
-    
+
     // 周りの矩形の設定
     mInput->mBoundingBox.mLeft  = blx;
     mInput->mBoundingBox.mUpper = buy;
@@ -761,7 +761,7 @@ LedScene::buf_gate()
 
     // 出力ピン位置の設定
     mBuf->mOpinLocations[0] = Point(brx, cy);
-    
+
     // ディスプレイリストの生成
     mBuf->mId = glGenLists(1);
     glNewList(mBuf->mId, GL_COMPILE);
@@ -789,7 +789,7 @@ LedScene::buf_gate()
     glVertex2d(lx, ly);
     glVertex2d(rx, cy);
     glEnd();
-    
+
     glEndList();
   }
   return mBuf;
@@ -815,7 +815,7 @@ LedScene::not_gate()
 
     // ドットの右端の X座標
     double rx = gx + kDotW;
-    
+
     // 右外周の X座標
     double brx = rx + kOmargin;
     // 左外周の X座標
@@ -824,19 +824,19 @@ LedScene::not_gate()
     double buy = uy + kHmargin;
     // 下外周の Y座標
     double bly = ly - kHmargin;
-    
+
     // 周りの矩形の設定
     mInput->mBoundingBox.mLeft  = blx;
     mInput->mBoundingBox.mUpper = buy;
     mInput->mBoundingBox.mRight = brx;
     mInput->mBoundingBox.mLower = bly;
-    
+
     // 入力ピン位置の設定
     mNot->mIpinLocations[0] = Point(blx, cy);
-    
+
     // 出力ピン位置の設定
     mNot->mOpinLocations[0] = Point(brx, cy);
-    
+
     // ディスプレイリストの生成
     mNot->mId = glGenLists(1);
     glNewList(mNot->mId, GL_COMPILE);
@@ -866,7 +866,7 @@ LedScene::not_gate()
     glEnd();
 
     draw_dot(gx, 0.0);
-    
+
     glEndList();
   }
   return mNot;
@@ -903,7 +903,7 @@ LedScene::and_gate(size_t ni)
     double buy = uy + kHmargin;
     // 下外周の Y座標
     double bly = ly - kHmargin;
-    
+
     // 周りの矩形の設定
     gate->mBoundingBox.mLeft  = blx;
     gate->mBoundingBox.mUpper = buy;
@@ -996,13 +996,13 @@ LedScene::nand_gate(size_t ni)
     double buy = uy + kHmargin;
     // 下外周の Y座標
     double bly = ly - kHmargin;
-    
+
     // 周りの矩形の設定
     gate->mBoundingBox.mLeft  = blx;
     gate->mBoundingBox.mUpper = buy;
     gate->mBoundingBox.mRight = brx;
     gate->mBoundingBox.mLower = bly;
-    
+
     // 入力ピンの位置を設定する．
     // まず各セグメント内の入力数を決める．
     vector<size_t> npins(nseg);
@@ -1019,7 +1019,7 @@ LedScene::nand_gate(size_t ni)
       }
       pos += n;
     }
-    
+
     // 出力ピンの位置を設定する．
     gate->mOpinLocations[0] = Point(brx, oy);
 
@@ -1087,13 +1087,13 @@ LedScene::or_gate(size_t ni)
     double buy = uy + kHmargin;
     // 下外周の Y座標
     double bly = ly - kHmargin;
-    
+
     // 周りの矩形の設定
     gate->mBoundingBox.mLeft  = blx;
     gate->mBoundingBox.mUpper = buy;
     gate->mBoundingBox.mRight = brx;
     gate->mBoundingBox.mLower = bly;
-    
+
     // 入力ピンの位置を設定する．
     // まず各セグメント内の入力数を決める．
     vector<size_t> npins(nseg);
@@ -1110,10 +1110,10 @@ LedScene::or_gate(size_t ni)
       }
       pos += n;
     }
-    
+
     // 出力ピンの位置を設定する．
     gate->mOpinLocations[0] = Point(rx, oy);
-    
+
     // ディスプレイリストの生成
     gate->mId = glGenLists(1);
     glNewList(gate->mId, GL_COMPILE);
@@ -1180,7 +1180,7 @@ LedScene::nor_gate(size_t ni)
     double buy = uy + kHmargin;
     // 下外周の Y座標
     double bly = ly - kHmargin;
-    
+
     // 周りの矩形の設定
     gate->mBoundingBox.mLeft  = blx;
     gate->mBoundingBox.mUpper = buy;
@@ -1203,7 +1203,7 @@ LedScene::nor_gate(size_t ni)
       }
       pos += n;
     }
-    
+
     // 出力ピンの位置を設定する．
     gate->mOpinLocations[0] = Point(brx, 0.0);
 
@@ -1271,13 +1271,13 @@ LedScene::xor_gate(size_t ni)
     double buy = uy + kHmargin;
     // 下外周の Y座標
     double bly = ly - kHmargin;
-    
+
     // 周りの矩形の設定
     gate->mBoundingBox.mLeft  = blx;
     gate->mBoundingBox.mUpper = buy;
     gate->mBoundingBox.mRight = brx;
     gate->mBoundingBox.mLower = bly;
-    
+
     // 入力ピンの位置を設定する．
     // まず各セグメント内の入力数を決める．
     vector<size_t> npins(nseg);
@@ -1294,10 +1294,10 @@ LedScene::xor_gate(size_t ni)
       }
       pos += n;
     }
-    
+
     // 出力ピンの位置を設定する．
     gate->mOpinLocations[0] = Point(brx, oy);
-    
+
     // ディスプレイリストの生成
     gate->mId = glGenLists(1);
     glNewList(gate->mId, GL_COMPILE);
@@ -1364,7 +1364,7 @@ LedScene::xnor_gate(size_t ni)
     double buy = uy + kHmargin;
     // 下外周の Y座標
     double bly = ly - kHmargin;
-    
+
     // 周りの矩形の設定
     gate->mBoundingBox.mLeft  = blx;
     gate->mBoundingBox.mUpper = buy;
@@ -1390,7 +1390,7 @@ LedScene::xnor_gate(size_t ni)
 
     // 出力ピンの位置を設定する．
     gate->mOpinLocations[0] = Point(rx, oy);
-    
+
     // ディスプレイリストの生成
     gate->mId = glGenLists(1);
     glNewList(gate->mId, GL_COMPILE);
@@ -1632,14 +1632,14 @@ LedScene::draw_obj(GateObj* obj)
     double uy = dp.mUpper;
     double lx = dp.mLeft;
     double ly = dp.mLower;
-  
+
     glLineWidth(bbox_line_width());
     glColor4fv(bbox_line_color());
 
     glEnable(GL_LINE_STIPPLE);
     glPushAttrib(GL_LINE_BIT);
     glLineStipple(2, 0xaaaa);
-  
+
     glBegin(GL_LINE_LOOP);
     glVertex2d(rx, uy);
     glVertex2d(lx, uy);
@@ -1650,7 +1650,7 @@ LedScene::draw_obj(GateObj* obj)
     glPopAttrib();
     glDisable(GL_LINE_STIPPLE);
   }
-  
+
   glPopMatrix();
 }
 
@@ -1975,7 +1975,7 @@ GateTemplate::create_or(bool xor)
   create_arc(cx, 0.0, kOrR, ndiv, 1.0 / 6.0, -1.0 / 6.0, points);
   points.push_back(Point(0.0, kGateUY));
   mPolygonTemplates.push_back(points);
-  
+
   make_arc(0.0);
 
   if ( xor ) {
@@ -2047,7 +2047,7 @@ void
 GateTemplate::copy_from_tree(GtTree* node)
 {
   GateTemplate* templ = node->gate_template();
-  size_t ni = templ->ni();
+  size_t ni = templ->input_num();
   if ( node->is_leaf_node() ) {
     for (size_t i = 0; i < ni; i ++) {
       mIpinLocations.push_back(node->ipin_location(i));
@@ -2121,7 +2121,7 @@ GateTemplate::copy_with_offset(const list<Points>& src,
 
 // 入力数を得る．
 size_t
-GateTemplate::ni() const
+GateTemplate::input_num() const
 {
   return mNi;
 }

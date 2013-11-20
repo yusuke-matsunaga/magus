@@ -70,8 +70,8 @@ BlifNodeImpl::cube_num() const
 }
 
 // @brief 入力キューブのパタンを得る．
-// @param[in] c_pos キューブの位置 ( 0 <= c_pos < nc() )
-// @param[in] i_pos 入力位置 ( 0 <= i_pos < ni() )
+// @param[in] c_pos キューブの位置 ( 0 <= c_pos < cube_num() )
+// @param[in] i_pos 入力位置 ( 0 <= i_pos < fanin_num() )
 // @note 意味のあるパタンは '0' '1' '-'
 char
 BlifNodeImpl::cube_pat(ymuint32 c_pos,
@@ -180,8 +180,8 @@ BlifNodeImpl2::fanin_num() const
   return mFaninNum;
 }
 
-// @brief ファンインを求める．
-// @param[in] pos 入力位置 ( 0 <= pos < ni() )
+// @brief ファンインを求める．n
+// @param[in] pos 入力位置 ( 0 <= pos < fanin_num() )
 ymuint32
 BlifNodeImpl2::fanin_id(ymuint32 pos) const
 {
@@ -243,8 +243,8 @@ BlifLogicNode::cube_num() const
 }
 
 // @brief 入力キューブのパタンを得る．
-// @param[in] c_pos キューブの位置 ( 0 <= c_pos < nc() )
-// @param[in] i_pos 入力位置 ( 0 <= i_pos < ni() )
+// @param[in] c_pos キューブの位置 ( 0 <= c_pos < cube_num() )
+// @param[in] i_pos 入力位置 ( 0 <= i_pos < fanin_num() )
 // @note 意味のあるパタンは '0' '1' '-'
 char
 BlifLogicNode::cube_pat(ymuint32 c_pos,

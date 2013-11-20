@@ -75,61 +75,61 @@ SealCmd::after_set_network()
     case kTgInput:
     case kTgOutput:
       break;
-      
+
     case kTgBuff:
       ++ n_buff;
       break;
-      
+
     case kTgNot:
       ++ n_not;
       break;
-      
+
     case kTgAnd:
       ++ n_and;
-      switch ( node->ni() ) {
+      switch ( node->fanin_num() ) {
       case 2: ++ n_and2; break;
       case 3: ++ n_and3; break;
       case 4: ++ n_and4; break;
       }
       break;
-      
+
     case kTgNand:
       ++ n_nand;
-      switch ( node->ni() ) {
+      switch ( node->fanin_num() ) {
       case 2: ++ n_nand2; break;
       case 3: ++ n_nand3; break;
       case 4: ++ n_nand4; break;
       }
       break;
-      
+
     case kTgOr:
       ++ n_or;
-      switch ( node->ni() ) {
+      switch ( node->fanin_num() ) {
       case 2: ++ n_or2; break;
       case 3: ++ n_or3; break;
       case 4: ++ n_or4; break;
       }
       break;
-      
+
     case kTgNor:
       ++ n_nor;
-      switch ( node->ni() ) {
+      switch ( node->fanin_num() ) {
       case 2: ++ n_nor2; break;
       case 3: ++ n_nor3; break;
       case 4: ++ n_nor4; break;
       }
       break;
-      
+
     case kTgXor:
       ++ n_xor;
-      switch ( node->ni() ) {
+      switch ( node->fanin_num() ) {
       case 2: ++ n_xor2; break;
       }
       break;
-      
+
     case kTgXnor:
       ++ n_xnor;
-      switch ( node->ni() ) {
+      switch ( node->fanin_num() ) {
       case 2: ++ n_xnor2; break;
       }
       break;

@@ -2,7 +2,7 @@
 /// @file calc_svf/SuperNode.cc
 /// @brief SuperNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: SuperNode.cc 1920 2008-12-20 15:52:42Z matsunaga $
 ///
 /// Copyright (C) 2005-2008 Yusuke Matsunaga
@@ -62,11 +62,11 @@ SuperNode::calc_cost()
   for (vector<SuperNode*>::iterator p = mFanouts.begin();
        p != mFanouts.end(); ++ p) {
     SuperNode* onode = *p;
-    size_t delta = ni();
-    size_t oni = onode->ni();
+    size_t delta = input_num();
+    size_t oni = onode->input_num();
     for (size_t i = 0; i < oni; ++ i) {
       SuperNode* inode = onode->input(i);
-      for (size_t j = 0; j < ni(); ++ j) {
+      for (size_t j = 0; j < input_num(); ++ j) {
 	if ( inode == input(j) ) {
 	  -- delta;
 	}
@@ -84,16 +84,16 @@ SuperNode::calc_cost()
     }
   }
 }
-  
+
 // @brief 自分自身をファンアウト先にマージする．
 void
 SuperNode::eliminate(NodeHeap& node_heap)
 {
   vector<SuperNode*> tmp;
-  for (size_t i = 0; i < ni(); ++ i) {
+  for (size_t i = 0; i < input_num(); ++ i) {
     SuperNode* inode = input(i);
     // inode のファンアウトから this をとりのぞく．
-    size_t ino = inode->nfo();
+    size_t ino = inode->fanout_num();
     size_t wpos = 0;
     for (size_t rpos = 0; rpos < ino; ++ rpos) {
       SuperNode* onode = inode->fanout(rpos);
@@ -112,7 +112,7 @@ SuperNode::eliminate(NodeHeap& node_heap)
       tmp.push_back(inode);
     }
   }
-  
+
   for (vector<SuperNode*>::iterator p = mFanouts.begin();
        p != mFanouts.end(); ++ p) {
     SuperNode* onode = *p;
@@ -121,7 +121,7 @@ SuperNode::eliminate(NodeHeap& node_heap)
       tmp.push_back(onode);
     }
 
-    size_t oni = onode->ni();
+    size_t oni = onode->input_num();
     size_t first_pos = oni;
     for (size_t i = 0; i < oni; ++ i) {
       SuperNode* oinode = onode->input(i);
@@ -136,15 +136,15 @@ SuperNode::eliminate(NodeHeap& node_heap)
       }
     }
     assert_cond(first_pos < oni, __FILE__, __LINE__);
-    
-    for (size_t i = 0; i < ni(); ++ i) {
+
+    for (size_t i = 0; i < input_num(); ++ i) {
       SuperNode* inode0 = input(i);
       // 基本的には inode0 のファンアウトから this を取り除き
       // 代わりに onode を加える処理と
       // onode の入力から this をとりのぞき inode0 を加える処理
       // を行えばよいが，inode0 がすでに onode の入力に含まれて
       // いるときに注意が必要となる．
-      
+
       bool found = false;
       for (size_t j = 0; j < oni; ++ j) {
 	SuperNode* inode = onode->input(j);

@@ -99,7 +99,7 @@ inline
 ymuint
 Cut::input_num() const
 {
-  return mFunc.ni();
+  return mFunc.input_num();
 }
 
 // @brief 論理関数を返す．
