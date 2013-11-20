@@ -201,7 +201,7 @@ mark_tfi_tfo(gate_t* gate)
     gate->set_mark();
     lvlq_put(gate);
     int i;
-    for (i = gate->get_no(); -- i >= 0; ) {
+    for (i = gate->get_fanout_num(); -- i >= 0; ) {
       mark_tfi_tfo(gate->get_fanout_gate(i));
     }
     for (i = gate->get_fanin_num(); -- i >= 0; ) {
@@ -256,7 +256,7 @@ C0_gate_t::l_bwd_imp(val3 val,
   }
   used_gate_add(this);
   set_gval(val_0);
-  for (int i = get_no(); -- i >= 0; ) {
+  for (int i = get_fanout_num(); -- i >= 0; ) {
     gate_t* o_gate = get_fanout_gate(i);
     if (o_gate != from) {
       o_gate->l_fwd_imp(val);
@@ -276,7 +276,7 @@ C1_gate_t::l_bwd_imp(val3 val,
   }
   used_gate_add(this);
   set_gval(val_1);
-  for (int i = get_no(); -- i >= 0; ) {
+  for (int i = get_fanout_num(); -- i >= 0; ) {
     gate_t* o_gate = get_fanout_gate(i);
     if (o_gate != from) {
       o_gate->l_fwd_imp(val);
@@ -293,7 +293,7 @@ BUF_gate_t::l_fwd_imp(val3 val)
   if (get_gval() == val_X) {
     used_gate_add(this);
     set_gval(val);
-    for (int i = get_no(); -- i >= 0; ) {
+    for (int i = get_fanout_num(); -- i >= 0; ) {
       get_fanout_gate(i)->l_fwd_imp(val);
     }
   }
@@ -309,7 +309,7 @@ BUF_gate_t::l_bwd_imp(val3 val,
   if (get_gval() == val_X) {
     used_gate_add(this);
     set_gval(val);
-    for (int i = get_no(); -- i >= 0; ) {
+    for (int i = get_fanout_num(); -- i >= 0; ) {
       gate_t* o_gate = get_fanout_gate(i);
       if (o_gate != from) {
 	o_gate->l_fwd_imp(val);
@@ -332,7 +332,7 @@ SIMPLE_gate_t::l_fwd_imp(val3 val)
     if (get_gval() == val_X) {
       used_gate_add(this);
       set_gval(o_val);
-      for (int i = get_no(); -- i >= 0; ) {
+      for (int i = get_fanout_num(); -- i >= 0; ) {
 	get_fanout_gate(i)->l_fwd_imp(o_val);
       }
       l_gl_imp(this, o_val);
@@ -355,7 +355,7 @@ SIMPLE_gate_t::l_fwd_imp(val3 val)
 	used_gate_add(this);
 	set_gval(no_val);
 	record_implication(this, no_val);
-	for (i = get_no(); -- i >= 0; ) {
+	for (i = get_fanout_num(); -- i >= 0; ) {
 	  get_fanout_gate(i)->l_fwd_imp(no_val);
 	}
 	l_gl_imp(this, no_val);
@@ -398,7 +398,7 @@ SIMPLE_gate_t::l_bwd_imp(val3 val,
     if (val != o_val) {
       record_implication(this, val);
     }
-    for (int i = get_no(); -- i >= 0; ) {
+    for (int i = get_fanout_num(); -- i >= 0; ) {
       gate_t* o_gate = get_fanout_gate(i);
       if (o_gate != from) {
 	o_gate->l_fwd_imp(val);
@@ -472,7 +472,7 @@ XOR_gate_t::l_fwd_imp(val3 val)
       used_gate_add(this);
       set_gval(val);
       record_implication(this, val);
-      for (int i = get_no(); -- i >= 0; ) {
+      for (int i = get_fanout_num(); -- i >= 0; ) {
 	get_fanout_gate(i)->l_fwd_imp(val);
       }
       l_gl_imp(this, val);
@@ -498,7 +498,7 @@ XOR_gate_t::l_bwd_imp(val3 val,
     used_gate_add(this);
     set_gval(val);
     record_implication(this, val);
-    for (int i = get_no(); -- i >= 0; ) {
+    for (int i = get_fanout_num(); -- i >= 0; ) {
       gate_t* o_gate = get_fanout_gate(i);
       if (o_gate != from) {
 	o_gate->l_fwd_imp(val);

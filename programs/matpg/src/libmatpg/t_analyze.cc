@@ -121,17 +121,17 @@ t_analyze()
       continue;
     }
 
-    size_t no = gate->get_no();
+    size_t no = gate->get_fanout_num();
     if ( no == 0 ) {
       set_ob(gate, 0);
       continue;
     }
 
     vector<ymuint> obs(no);
-    obs[0] = gate->get_fogate(0)->calc_O(gate->get_fogate_ipos(0));
+    obs[0] = gate->get_fanout_gate(0)->calc_O(gate->get_fanout_gate_ipos(0));
     for (size_t j = 1; j < no; ++ j) {
-      gate_t* ogate = gate->get_fogate(j);
-      int ipos = gate->get_fogate_ipos(j);
+      gate_t* ogate = gate->get_fanout_gate(j);
+      int ipos = gate->get_fanout_gate_ipos(j);
       ymuint ob = obs[j] = ogate->calc_O(ipos);
       size_t k;
       for (k = 0; k < j; ++ k) {
@@ -141,10 +141,10 @@ t_analyze()
       }
       if ( k < j ) {
 	for (size_t l = k; l <= j; ++ l) {
-	  gate_t* ogate2 = gate->get_fogate(l);
-	  int ipos2 = gate->get_fogate_ipos(l);
+	  gate_t* ogate2 = gate->get_fanout_gate(l);
+	  int ipos2 = gate->get_fanout_gate_ipos(l);
 	  ymuint ob2 = obs[l];
-	  gate->set_fogate(l, ogate, ipos);
+	  gate->set_fanout_gate(l, ogate, ipos);
 	  obs[l] = ob;
 	  ogate = ogate2;
 	  ipos = ipos2;
@@ -196,8 +196,8 @@ C1_gate_t::calc_C()
 void
 BUF_gate_t::calc_C()
 {
-  set_c0(this, get_c0(get_figate(0)));
-  set_c1(this, get_c1(get_figate(0)));
+  set_c0(this, get_c0(get_fanin_gate(0)));
+  set_c1(this, get_c1(get_fanin_gate(0)));
 
 #ifdef DEBUG
   fprintf(stderr, "%s::calc_C = (%d, %d)\n",
@@ -219,8 +219,8 @@ BUF_gate_t::calc_O(int)
 void
 NOT_gate_t::calc_C()
 {
-  set_c0(this, get_c1(get_figate(0)));
-  set_c1(this, get_c0(get_figate(0)));
+  set_c0(this, get_c1(get_fanin_gate(0)));
+  set_c1(this, get_c0(get_fanin_gate(0)));
 
 #ifdef DEBUG
   fprintf(stderr, "%s::calc_C = (%d, %d)\n",
@@ -259,15 +259,15 @@ SIMPLE_gate_t::calc_C()
   ymuint min_0;
   ymuint sum_1;
   if ( and_flag ) {
-    sum_1 = get_c1(get_sorted_figate(0));
+    sum_1 = get_c1(get_sorted_fanin_gate(0));
     for (int i = 1; i < ni; ++ i) {
       int pos = get_sorted_pos(i);
-      gate_t* gate = get_figate(pos);
+      gate_t* gate = get_fanin_gate(pos);
       ymuint c0 = get_c0(gate);
       sum_1 += get_c1(gate);
       int j;
       for (j = 0; j < i; j ++) {
-	if ( get_c0(get_sorted_figate(j)) > c0 ) {
+	if ( get_c0(get_sorted_fanin_gate(j)) > c0 ) {
 	  break;
 	}
       }
@@ -279,18 +279,18 @@ SIMPLE_gate_t::calc_C()
 	}
       }
     }
-    min_0 = get_c0(get_sorted_figate(0));
+    min_0 = get_c0(get_sorted_fanin_gate(0));
   }
   else {
-    sum_1 = get_c0(get_sorted_figate(0));
+    sum_1 = get_c0(get_sorted_fanin_gate(0));
     for (int i = 1; i < ni; ++ i) {
       int pos = get_sorted_pos(i);
-      gate_t* gate = get_figate(pos);
+      gate_t* gate = get_fanin_gate(pos);
       ymuint c0 = get_c1(gate);
       sum_1 += get_c0(gate);
       int j;
       for (j = 0; j < i; j ++) {
-	if (get_c1(get_sorted_figate(j)) > c0) {
+	if (get_c1(get_sorted_fanin_gate(j)) > c0) {
 	  break;
 	}
       }
@@ -302,7 +302,7 @@ SIMPLE_gate_t::calc_C()
 	}
       }
     }
-    min_0 = get_c1(get_sorted_figate(0));
+    min_0 = get_c1(get_sorted_fanin_gate(0));
   }
   if ( get_o_val() == val_0 ) {
     set_c0(this, min_0);
@@ -331,10 +331,10 @@ SIMPLE_gate_t::calc_O(int pos)
     o_c = get_c1(this);
   }
   if ( get_nc_val() == val_0 ) {
-    i_c = get_c0(get_figate(pos));
+    i_c = get_c0(get_fanin_gate(pos));
   }
   else {
-    i_c = get_c1(get_figate(pos));
+    i_c = get_c1(get_fanin_gate(pos));
   }
 
 #ifdef DEBUG
@@ -361,10 +361,10 @@ XOR_gate_t::calc_C()
     ymuint sum = 0;
     for (int i = 0; i < ni; ++ i) {
       if ( (bitpat & mask) == 0 ) {
-	sum += get_c0(get_figate(i));
+	sum += get_c0(get_fanin_gate(i));
       }
       else {
-	sum += get_c1(get_figate(i));
+	sum += get_c1(get_fanin_gate(i));
 	p ^= 1;
       }
       mask <<= 1;
@@ -411,10 +411,10 @@ XOR_gate_t::calc_O(int pos)
 	continue;
       }
       if ( (bitpat & mask) == 0 ) {
-	sum += get_c0(get_figate(i));
+	sum += get_c0(get_fanin_gate(i));
       }
       else {
-	sum += get_c1(get_figate(i));
+	sum += get_c1(get_fanin_gate(i));
       }
       mask <<= 1;
     }
