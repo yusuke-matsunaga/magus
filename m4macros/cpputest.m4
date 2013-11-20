@@ -23,13 +23,15 @@ if test "X$arch" = "Xx86_64"; then
 fi
 # --with-CppUTest-prefix
 AC_ARG_WITH([CppUTest-prefix],
-[  --with-CppUTest-prefix=DIR  CppUTestConfig.h is in $DIR/include/CppUTest],
+[AS_HELP_STRING([--with-CppUTest-prefix=DIR],
+		[CppUTestConfig.h is in DIR/include/CppUTest])],
 [CppUTest_list="$withval"],
 [CppUTest_list="$prefix $ac_default_prefix /usr /usr/local"])
 #
 # --with-CppUTest-libdir
 AC_ARG_WITH([CppUTest-libdir],
-[  --with-CppUTest-libdir=DIR  libCppUTest is in $DIR],
+[AS_HELP_STRING([--with-CppUTest-libdir=DIR],
+		[libCppUTest is in DIR])],
 [CppUTest_libdir="$withval"],
 [CppUTest_libdir=""])
 

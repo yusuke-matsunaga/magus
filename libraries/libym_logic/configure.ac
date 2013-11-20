@@ -5,7 +5,7 @@
 # ===================================================================
 # Initial block
 # ===================================================================
-AC_INIT([libym_lexp], [1.0],
+AC_INIT([libym_logic], [1.0],
         [yusuke_matsunaga@ieee.org],
         [libym_lexp])dnl
 
@@ -14,7 +14,7 @@ AC_REVISION($Rev: 2507 $)dnl
 AC_PREREQ(2.57)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2005-2011 Yusuke Matsunaga
+Copyright (C) 2005-2013 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 

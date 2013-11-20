@@ -108,7 +108,7 @@ fi
 
 
 #==================================================================
-# YM_BUILD_LIBRARY(libname, required-conditions)
+# YM_BUILD_LIBRARY(libname, default_valu, required-conditions)
 #
 # Description: libname をビルドするかどうかを判断し，設定する．
 #              required-conditions にはカンマで区切られた shell 変数
@@ -117,9 +117,14 @@ fi
 #==================================================================
 AC_DEFUN([YM_BUILD_LIBRARY],
 [
+AC_ARG_ENABLE([$1],
+	[AS_HELP_STRING([--enable-$1],
+	                [build $1 (default is $2)])],
+        [ym_[]$1[]_enable=yes],
+	[ym_[]$1[]_enable=$2])
 ym_tmp_enable=${ym_[]$1[]_enable}
-m4_ifval([$2], [
-    m4_foreach([XXX], [$2], [
+m4_ifval([$3], [
+    m4_foreach([XXX], [$3], [
        if test "$ym_tmp_enable" = "1" -a "$XXX" != "1"; then
            ym_tmp_enable=0
 	   AC_MSG_NOTICE(['$1' will be disabled because 'XXX' is disabled])
@@ -167,7 +172,7 @@ AC_SUBST([YM_LIBRARIES_SUBDIRS], $ym_libraries_subdirs)
 
 
 #==================================================================
-# YM_BUILD_PROGRAM(progname, required-conditions)
+# YM_BUILD_PROGRAM(progname, default_val, required-conditions)
 #
 # Description: progname をビルドするかどうかを判断し，設定する．
 #              required-conditions にはカンマで区切られた shell 変数
@@ -176,16 +181,21 @@ AC_SUBST([YM_LIBRARIES_SUBDIRS], $ym_libraries_subdirs)
 #==================================================================
 AC_DEFUN([YM_BUILD_PROGRAM],
 [
+AC_ARG_ENABLE([$1],
+	[AS_HELP_STRING([--enable-$1],
+	                [build $1 (default is $2)])],
+        [ym_[]$1[]_enable=yes],
+	[ym_[]$1[]_enable=$2])
 ym_tmp_enable=${ym_[]$1[]_enable}
-m4_ifval([$2], [
-    m4_foreach([XXX], [$2], [
-       if test "$ym_tmp_enable" = "1" -a "$XXX" != "1"; then
-           ym_tmp_enable=0
+m4_ifval([$3], [
+    m4_foreach([XXX], [$3], [
+       if test "$ym_tmp_enable" = "yes" -a "$XXX" != "yes"; then
+           ym_tmp_enable=no
 	   AC_MSG_NOTICE(['$1' will be disabled because 'XXX' is disabled])
        fi
     ])
 ])
-if test "$ym_tmp_enable" = "1"; then
+if test "$ym_tmp_enable" = "yes"; then
     YM_ADD_PROGRAMS_SUBDIRS([$1])
     AC_CONFIG_SUBDIRS([programs/$1])
     AC_MSG_NOTICE(['$1' is enabled])
