@@ -111,7 +111,7 @@ set_program
 AUTOGEN_COMMON="./autogen.common"
 
 # サブモジュールのディレクトリ名
-SUBMODULE=`cat $BASEDIR/modules`
+SUBMODULE=`cat $BASEDIR/etc/modules`
 
 # 第1引数に応じた処理を行う．
  case $# in
