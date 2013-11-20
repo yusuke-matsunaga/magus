@@ -9,19 +9,21 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	Alloc.h \
 	Binder.h \
-	BinI.h \
-	BinO.h \
 	CombiGen.h \
+	CompIDO.h \
+	CompODO.h \
 	DlList.h \
 	File.h \
-	FileBinI.h \
-	FileBinO.h \
+	FileIDO.h \
 	FileInfo.h \
 	FileLoc.h \
+	FileODO.h \
 	FileRegion.h \
-	FileScanner.h \
 	GenBase.h \
+	GzIDO.h \
+	GzODO.h \
 	HeapTree.h \
+	IDO.h \
 	ItvlMgr.h \
 	MFSet.h \
 	MsgHandler.h \
@@ -34,6 +36,7 @@ noinst_HEADERS = \
 	MultiSetGenBase.h \
 	MultiSetPermGen.h \
 	NameMgr.h \
+	ODO.h \
 	PermGen.h \
 	PoptMainApp.h \
 	RandGen.h \
@@ -41,10 +44,12 @@ noinst_HEADERS = \
 	RandPermGen.h \
 	RefCount.h \
 	USTime.h \
+	Scanner.h \
 	ShString.h \
 	StopWatch.h \
 	StrBuff.h \
-	StreamBinI.h \
-	StreamBinO.h \
+	StreamIDO.h \
+	StreamODO.h \
 	msg_type.h \
-	random.h
+	random.h \
+	zstream.h

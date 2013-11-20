@@ -5,11 +5,8 @@
 ## $Revision: 1.1.1.1 $
 ## $Date: 2005/12/11 17:07:26 $
 
-SUBDIRS = $(YM_EXTRA_SUBDIRS)
-
-if WITH_QT
-SUBDIRS += dotlib_ptview
-endif
+SUBDIRS = . \
+	  $(YM_EXTRA_TESTS_SUBDIRS)
 
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \

@@ -25,13 +25,15 @@ if test "X$arch" = "Xx86_64"; then
 fi
 # --with-popt-prefix
 AC_ARG_WITH([popt-prefix],
-[  --with-popt-prefix=DIR  popt.h is in $DIR/include],
+[AS_HELP_STRING([--with-popt-prefix=DIR],
+		[popt.h is in DIR/include])],
 [popt_list="$withval"],
 [popt_list="$prefix $ac_default_prefix /usr /usr/local"])
 #
 # --with-popt-libdir
 AC_ARG_WITH([popt-libdir],
-[  --with-popt-libdir=DIR  libpopt is in $DIR],
+[AS_HELP_STRING([--with-popt-libdir=DIR],
+		[libpopt is in DIR])],
 [popt_libdir="$withval"],
 [popt_libdir=""])
 

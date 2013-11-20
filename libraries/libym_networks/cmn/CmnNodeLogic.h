@@ -53,7 +53,7 @@ public:
   /// @brief 入力数を得る．
   virtual
   ymuint
-  ni() const;
+  fanin_num() const;
 
   /// @brief ファンインのノードを得る．
   /// @param[in] pos 入力番号

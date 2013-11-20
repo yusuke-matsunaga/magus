@@ -41,8 +41,12 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] ido 入力データ
 // @param[in] lex 親の Lex
-InputFile::InputFile(RawLex* lex) :
+InputFile::InputFile(IDO* ido,
+		     RawLex& lex) :
+  Scanner(*ido),
+  mIDO(ido),
   mLex(lex)
 {
 }
@@ -50,6 +54,7 @@ InputFile::InputFile(RawLex* lex) :
 // @brief デストラクタ
 InputFile::~InputFile()
 {
+  delete mIDO;
 }
 
 // @brief トークンの読み出しを行う．
@@ -75,7 +80,7 @@ InputFile::_read_token(StrBuff& buff)
     return SPACE;
   }
 
-  switch ( mLex->context() ) {
+  switch ( mLex.context() ) {
   case RawLex::kBin:
     // 2進数モード
     return read_bin_str(c, buff);
@@ -1067,7 +1072,7 @@ InputFile::read_comment(StrBuff& buff)
 void
 InputFile::check_line(ymuint line)
 {
-  mLex->check_line(line);
+  mLex.check_line(line);
 }
 
 END_NAMESPACE_YM_VERILOG

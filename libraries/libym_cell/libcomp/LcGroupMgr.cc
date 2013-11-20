@@ -124,7 +124,7 @@ BEGIN_NONAMESPACE
 ymuint32
 gen_support(const TvFunc& f)
 {
-  ymuint ni = f.ni();
+  ymuint ni = f.input_num();
   ymuint32 ans = 0U;
   for (ymuint i = 0; i < ni; ++ i) {
     VarId var(i);
@@ -141,8 +141,8 @@ gen_maxmap(const TvFuncM& f,
 	   ymuint offset,
 	   NpnMapM& xmap)
 {
-  ymuint ni = f.ni();
-  ymuint no = f.no();
+  ymuint ni = f.input_num();
+  ymuint no = f.output_num();
 
   vector<VarId> i_list;
   i_list.reserve(ni);
@@ -200,8 +200,8 @@ LcGroupMgr::default_repfunc(const TvFuncM& f,
 			    TvFuncM& repfunc,
 			    NpnMapM& xmap)
 {
-  ymuint ni = f.ni();
-  ymuint no = f.no();
+  ymuint ni = f.input_num();
+  ymuint no = f.output_num();
 
   // 各出力のサポートをビットベクタの形で求める．
   vector<ymuint32> sup_array(no);
@@ -253,7 +253,7 @@ LcGroupMgr::default_repfunc(const TvFuncM& f,
 // @brief 内容をバイナリダンプする．
 // @param[in] bos 出力先のストリーム
 void
-LcGroupMgr::dump(BinO& bos) const
+LcGroupMgr::dump(ODO& bos) const
 {
   // セルグループの情報をダンプする．
   ymuint32 ng = group_num();
@@ -264,7 +264,7 @@ LcGroupMgr::dump(BinO& bos) const
 
     // 論理クラスに対する変換マップをダンプする．
     const NpnMapM& map = group->map();
-    ymuint32 ni = map.ni();
+    ymuint32 ni = map.input_num();
     bos << ni;
     for (ymuint i = 0; i < ni; ++ i) {
       NpnVmap imap = map.imap(i);
@@ -276,7 +276,7 @@ LcGroupMgr::dump(BinO& bos) const
       }
       bos << v;
     }
-    ymuint32 no = map.no();
+    ymuint32 no = map.output_num();
     bos << no;
     for (ymuint i = 0; i < no; ++ i) {
       NpnVmap omap = map.omap(i);

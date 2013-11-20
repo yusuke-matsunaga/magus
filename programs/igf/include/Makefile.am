@@ -8,5 +8,14 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	igf_nsdef.h \
+	IguGen.h \
+	IguGen2.h \
+	InputFunc.h \
+	PhfGen.h \
 	RegVect.h \
-	RvMgr.h
+	RvMgr.h \
+	IGU.h \
+	VarFunc.h \
+	Variable.h \
+	XorFunc.h \
+	RandHashGen.h

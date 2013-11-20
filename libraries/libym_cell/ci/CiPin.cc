@@ -190,7 +190,7 @@ CiPin::internal_id() const
 
 // @brief dump 用の共通情報を出力する．
 void
-CiPin::dump_common(BinO& s) const
+CiPin::dump_common(ODO& s) const
 {
   s << name()
     << pin_id();
@@ -270,7 +270,7 @@ CiInputPin::fall_capacitance() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiInputPin::dump(BinO& s) const
+CiInputPin::dump(ODO& s) const
 {
   dump_common(s);
 
@@ -469,7 +469,7 @@ CiOutputPin::is_output() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiOutputPin::dump(BinO& s) const
+CiOutputPin::dump(ODO& s) const
 {
   dump_common(s);
 
@@ -577,7 +577,7 @@ CiInoutPin::fall_capacitance() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiInoutPin::dump(BinO& s) const
+CiInoutPin::dump(ODO& s) const
 {
   dump_common(s);
 
@@ -636,7 +636,7 @@ CiInternalPin::internal_id() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiInternalPin::dump(BinO& s) const
+CiInternalPin::dump(ODO& s) const
 {
   dump_common(s);
 

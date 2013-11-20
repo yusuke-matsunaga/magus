@@ -22,14 +22,14 @@ class PhfNode;
 //////////////////////////////////////////////////////////////////////
 class PhfEdge
 {
+  friend class PhfGraph;
+
 public:
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
-  /// @param[in] node_list ノードのリスト
   /// @param[in] val 値
   PhfEdge(ymuint id,
-	  const vector<PhfNode*>& node_list,
 	  ymuint val);
 
   /// @brief デストラクタ
@@ -45,12 +45,8 @@ public:
   ymuint
   id() const;
 
-  /// @brief ノード数を返す．
-  ymuint
-  node_num() const;
-
   /// @brief ノードを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < node_num() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < PhfGraph::mDegree )
   PhfNode*
   node(ymuint pos) const;
 
@@ -67,11 +63,17 @@ private:
   // ID 番号
   ymuint32 mId;
 
-  // ノードのリスト
-  vector<PhfNode*> mNodeList;
-
   // 値
   ymuint32 mVal;
+
+  // アクティブフラグ
+  bool mActive;
+
+  // ノードのポインタ配列
+  // 実際には必要な領域が確保される．
+  PhfNode* mNodeList[1];
+
+  // ここにメンバ変数を定義してはいけない．
 
 };
 
@@ -82,14 +84,11 @@ private:
 
 // @brief コンストラクタ
 // @param[in] id ID番号
-// @param[in] node_list ノードのリスト
 // @param[in] val 値
 inline
 PhfEdge::PhfEdge(ymuint id,
-		 const vector<PhfNode*>& node_list,
 		 ymuint val) :
   mId(id),
-  mNodeList(node_list),
   mVal(val)
 {
 }
@@ -108,21 +107,12 @@ PhfEdge::id() const
   return mId;
 }
 
-// @brief ノード数を返す．
-inline
-ymuint
-PhfEdge::node_num() const
-{
-  return mNodeList.size();
-}
-
 // @brief ノードを返す．
 // @param[in] pos 位置番号 ( 0 <= pos < node_num() )
 inline
 PhfNode*
 PhfEdge::node(ymuint pos) const
 {
-  assert_cond( pos < mNodeList.size(), __FILE__, __LINE__);
   return mNodeList[pos];
 }
 

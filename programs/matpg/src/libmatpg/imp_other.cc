@@ -12,15 +12,15 @@
  * Final , Final revision
  *
  * Revision 2.2  91/12/24  14:40:48  yusuke
- * 
+ *
  * a little bit modification
- * 
+ *
  * Revision 2.1  91/12/23  23:11:24  yusuke
  * a slightly speed-up
- * 
+ *
  * Revision 2.0  91/12/21  18:51:52  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.6  1991/10/17  02:55:53  yusuke
  * made a new function eq_imp()
  *
@@ -250,8 +250,8 @@ C0_gate_t::bwd_imp_h(val3 val,
     if (from != NULL && from->chk_fcone() == true) {
       from = NULL;
     }
-    for ( int i = get_act_no(); -- i >= 0; ) {
-      gate_t* o_gate = get_act_fogate(i);
+    for ( int i = get_act_fanout_num(); -- i >= 0; ) {
+      gate_t* o_gate = get_act_fanout_gate(i);
       if (o_gate != from) {
 	if (o_gate->chk_fcone() == true) {
 	  o_gate->fwd_imp_g(val_0);
@@ -281,8 +281,8 @@ C1_gate_t::bwd_imp_h(val3 val,
     if (from != NULL && from->chk_fcone() == true) {
       from = NULL;
     }
-    for ( int i = get_act_no(); -- i >= 0; ) {
-      gate_t* o_gate = get_act_fogate(i);
+    for ( int i = get_act_fanout_num(); -- i >= 0; ) {
+      gate_t* o_gate = get_act_fanout_gate(i);
       if (o_gate != from) {
 	if (o_gate->chk_fcone() == true) {
 	  o_gate->fwd_imp_g(val_1);

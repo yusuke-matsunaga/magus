@@ -122,7 +122,7 @@ BUF_gate_t::bwd_imp_h(val3 o_val,
   if (val == val_X) {
     refl_h(o_val, from);
     val3 i_val = (get_gtype() == kTgGateBuff) ? o_val : neg3(o_val);
-    get_figate(0)->bwd_imp_h(i_val, this);
+    get_fanin_gate(0)->bwd_imp_h(i_val, this);
   }
   else if (val != o_val) {
 #ifdef DEBUG
@@ -149,7 +149,7 @@ BUF_gate_t::bwd_imp_g(val3 o_val,
   if (val == val_X) {
     refl_g(o_val, from);
     val3 i_val = (get_gtype() == kTgGateBuff) ? o_val : neg3(o_val);
-    gate_t* i_gate = get_figate(0);
+    gate_t* i_gate = get_fanin_gate(0);
     if (i_gate->chk_fcone() == true) {
       i_gate->bwd_imp_g(i_val, this);
     }
@@ -181,7 +181,7 @@ BUF_gate_t::bwd_imp_f(val3 o_val,
   if (val == val_X) {
     refl_f(o_val, from);
     val3 i_val = (get_gtype() == kTgGateBuff) ? o_val : neg3(o_val);
-    gate_t* i_gate = get_figate(0);
+    gate_t* i_gate = get_fanin_gate(0);
     if (i_gate->chk_fcone() == true) {
       i_gate->bwd_imp_f(i_val, this);
     }

@@ -38,7 +38,7 @@ BEGIN_NAMESPACE_YM_MATPG
 sa_node::sa_node() :
   gate_t(NULL, 1)
 {
-  init_fogate(NULL, 0);
+  init_fanout_gate(NULL, 0);
 }
 
 bool
@@ -52,26 +52,26 @@ sa_node::insert(gate_t* i_gate)
 {
   i_gate->rst_po();
   set_po();
-  int no = i_gate->get_act_no();
-  i_gate->set_act_fogate(no, this, 0);
-  i_gate->set_act_no(no + 1);
-  set_figate(0, i_gate);
-  set_act_no(0);
+  int no = i_gate->get_act_fanout_num();
+  i_gate->set_act_fanout_gate(no, this, 0);
+  i_gate->set_act_fanout_num(no + 1);
+  set_fanin_gate(0, i_gate);
+  set_act_fanout_num(0);
 }
 
 void
 sa_node::insert(gate_t* o_gate,
 		int ipos)
 {
-  gate_t* i_gate = o_gate->get_figate(ipos);
-  for (int i = i_gate->get_act_no(); -- i >= 0; ) {
-    if ( i_gate->get_act_fogate(i) == o_gate &&
-	 i_gate->get_act_fogate_ipos(i) == ipos ) {
-      i_gate->set_act_fogate(i, this, 0);
-      set_figate(0, i_gate);
-      set_act_fogate(0, o_gate, ipos);
-      o_gate->set_figate(ipos, this);
-      set_act_no(1);
+  gate_t* i_gate = o_gate->get_fanin_gate(ipos);
+  for (int i = i_gate->get_act_fanout_num(); -- i >= 0; ) {
+    if ( i_gate->get_act_fanout_gate(i) == o_gate &&
+	 i_gate->get_act_fanout_gate_ipos(i) == ipos ) {
+      i_gate->set_act_fanout_gate(i, this, 0);
+      set_fanin_gate(0, i_gate);
+      set_act_fanout_gate(0, o_gate, ipos);
+      o_gate->set_fanin_gate(ipos, this);
+      set_act_fanout_num(1);
       return;
     }
   }
@@ -81,18 +81,18 @@ sa_node::insert(gate_t* o_gate,
 void
 sa_node::remove()
 {
-  gate_t* i_gate = get_figate(0);
-  if (get_act_no() == 0) {
+  gate_t* i_gate = get_fanin_gate(0);
+  if (get_act_fanout_num() == 0) {
     rst_po();
     i_gate->set_po();
-    i_gate->set_act_no(i_gate->get_act_no() - 1);
+    i_gate->set_act_fanout_num(i_gate->get_act_fanout_num() - 1);
   }
   else {
-    gate_t* o_gate = get_act_fogate(0);
-    int ipos = get_act_fogate_ipos(0);
+    gate_t* o_gate = get_act_fanout_gate(0);
+    int ipos = get_act_fanout_gate_ipos(0);
     int i;
-    for (i = i_gate->get_act_no(); -- i >= 0; ) {
-      if (i_gate->get_act_fogate(i) == this) {
+    for (i = i_gate->get_act_fanout_num(); -- i >= 0; ) {
+      if (i_gate->get_act_fanout_gate(i) == this) {
 	break;
       }
     }
@@ -100,9 +100,9 @@ sa_node::remove()
       fputs("sa_node::remove(): Internal error!\n", stderr);
       exit(1);
     }
-    i_gate->set_act_fogate(i, o_gate, ipos);
-    o_gate->set_figate(ipos, i_gate);
-    set_act_no(0);
+    i_gate->set_act_fanout_gate(i, o_gate, ipos);
+    o_gate->set_fanin_gate(ipos, i_gate);
+    set_act_fanout_num(0);
   }
 }
 

@@ -78,7 +78,7 @@ CiPatGraph::edge(ymuint pos) const
 // @brief バイナリダンプを行う．
 // @param[in] bos 出力先のストリーム
 void
-CiPatGraph::dump(BinO& bos) const
+CiPatGraph::dump(ODO& bos) const
 {
   bos << mRepId
       << mInputNum
@@ -91,7 +91,7 @@ CiPatGraph::dump(BinO& bos) const
 // @brief バイナリファイルを読み込む．
 // @param[in] bis 入力元のストリーム
 void
-CiPatGraph::restore(BinI& bis,
+CiPatGraph::restore(IDO& bis,
 		    Alloc& alloc)
 {
   bis >> mRepId

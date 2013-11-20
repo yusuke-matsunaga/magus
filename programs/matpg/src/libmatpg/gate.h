@@ -205,32 +205,32 @@ public:
 
   /// @brief 入力数を得る．
   int
-  get_ni() const;
+  get_fanin_num() const;
 
   /// @brief ファンアウト数を得る．
   int
-  get_no() const;
+  get_fanout_num() const;
 
   /// @brief アクティブなファンアウト数を得る．
   int
-  get_act_no() const;
+  get_act_fanout_num() const;
 
   /// @brief アクティブなファンアウト数を設定する．
   void
-  set_act_no(int no);
+  set_act_fanout_num(int no);
 
   /// @brief ファンインを取り出す．
   gate_t*
-  get_figate(int pos) const;
+  get_fanin_gate(int pos) const;
 
   /// @brief ファンインを設定する．
   void
-  set_figate(int pos,
-	     gate_t* input);
+  set_fanin_gate(int pos,
+		 gate_t* input);
 
   /// @brief ソート順にファンインを取り出す．
   gate_t*
-  get_sorted_figate(int pos) const;
+  get_sorted_fanin_gate(int pos) const;
 
   /// @brief ソート順を取り出す．
   int
@@ -243,41 +243,41 @@ public:
 
   /// @brief 通常のファンインの設定を行う．
   void
-  init_figate(int pos,
-	      gate_t* input);
+  init_fanin_gate(int pos,
+		  gate_t* input);
 
   /// @brief ファンアウトのゲートを得る．
   gate_t*
-  get_fogate(int pos) const;
+  get_fanout_gate(int pos) const;
 
   /// @brief ファンアウトの入力位置を得る．
   int
-  get_fogate_ipos(int pos) const;
+  get_fanout_gate_ipos(int pos) const;
 
   /// @brief ファンアウトを設定する．
   void
-  set_fogate(int pos,
-	     gate_t* output,
-	     int ipos);
+  set_fanout_gate(int pos,
+		  gate_t* output,
+		  int ipos);
 
   /// @brief 通常のファンアウトの設定を行う．
   void
-  init_fogate(gate_t* output,
-	      int pos);
+  init_fanout_gate(gate_t* output,
+		   int pos);
 
   /// @brief アクティブなファンアウトのゲートを得る．
   gate_t*
-  get_act_fogate(int pos) const;
+  get_act_fanout_gate(int pos) const;
 
   /// @brief アクティブなファンアウトの入力位置を得る．
   int
-  get_act_fogate_ipos(int pos) const;
+  get_act_fanout_gate_ipos(int pos) const;
 
   /// @brief アクティブなファンアウトを設定する．
   void
-  set_act_fogate(int pos,
-		 gate_t* output,
-		 int ipos);
+  set_act_fanout_gate(int pos,
+		      gate_t* output,
+		      int ipos);
 
 
 public:
@@ -302,7 +302,8 @@ public:
   is_pi() const;
 
   virtual
-  int get_pi_id() const;
+  int
+  get_pi_id() const;
 
   /* Values/Flags */
   val3
@@ -1567,7 +1568,7 @@ new_gate_t(tTgGateType id,
 // @brief 入力数を得る．
 inline
 int
-gate_t::get_ni() const
+gate_t::get_fanin_num() const
 {
   return ni;
 }
@@ -1575,7 +1576,7 @@ gate_t::get_ni() const
 // @brief ファンアウト数を得る．
 inline
 int
-gate_t::get_no() const
+gate_t::get_fanout_num() const
 {
   return no;
 }
@@ -1583,7 +1584,7 @@ gate_t::get_no() const
 // @brief アクティブなファンアウト数を得る．
 inline
 int
-gate_t::get_act_no() const
+gate_t::get_act_fanout_num() const
 {
   return act_no;
 }
@@ -1591,7 +1592,7 @@ gate_t::get_act_no() const
 // @brief アクティブなファンアウト数を設定する．
 inline
 void
-gate_t::set_act_no(int no)
+gate_t::set_act_fanout_num(int no)
 {
   act_no = no;
 }
@@ -1599,7 +1600,7 @@ gate_t::set_act_no(int no)
 // @brief ファンインを取り出す．
 inline
 gate_t*
-gate_t::get_figate(int pos) const
+gate_t::get_fanin_gate(int pos) const
 {
   return igate[pos];
 }
@@ -1607,8 +1608,8 @@ gate_t::get_figate(int pos) const
 // @brief ファンインを設定する．
 inline
 void
-gate_t::set_figate(int pos,
-		   gate_t* input)
+gate_t::set_fanin_gate(int pos,
+		       gate_t* input)
 {
   igate[pos] = input;
 }
@@ -1616,7 +1617,7 @@ gate_t::set_figate(int pos,
 // @brief ソート順にファンインを取り出す．
 inline
 gate_t*
-gate_t::get_sorted_figate(int pos) const
+gate_t::get_sorted_fanin_gate(int pos) const
 {
   return igate[sorted_pos[pos]];
 }
@@ -1641,7 +1642,7 @@ gate_t::set_sorted_pos(int pos,
 // @brief ファンアウトのゲートを得る．
 inline
 gate_t*
-gate_t::get_fogate(int pos) const
+gate_t::get_fanout_gate(int pos) const
 {
   return outputs[pos].gate;
 }
@@ -1649,7 +1650,7 @@ gate_t::get_fogate(int pos) const
 // @brief ファンアウトの入力位置を得る．
 inline
 int
-gate_t::get_fogate_ipos(int pos) const
+gate_t::get_fanout_gate_ipos(int pos) const
 {
   return outputs[pos].pos;
 }
@@ -1657,9 +1658,9 @@ gate_t::get_fogate_ipos(int pos) const
 // @brief ファンアウトを設定する．
 inline
 void
-gate_t::set_fogate(int pos,
-		   gate_t* output,
-		   int ipos)
+gate_t::set_fanout_gate(int pos,
+			gate_t* output,
+			int ipos)
 {
   outputs[pos].gate = output;
   outputs[pos].pos = ipos;
@@ -1668,7 +1669,7 @@ gate_t::set_fogate(int pos,
 // @brief アクティブなファンアウトのゲートを得る．
 inline
 gate_t*
-gate_t::get_act_fogate(int pos) const
+gate_t::get_act_fanout_gate(int pos) const
 {
   return act_outputs[pos].gate;
 }
@@ -1676,7 +1677,7 @@ gate_t::get_act_fogate(int pos) const
 // @brief アクティブなファンアウトの入力位置を得る．
 inline
 int
-gate_t::get_act_fogate_ipos(int pos) const
+gate_t::get_act_fanout_gate_ipos(int pos) const
 {
   return act_outputs[pos].pos;
 }
@@ -1684,9 +1685,9 @@ gate_t::get_act_fogate_ipos(int pos) const
 // @brief アクティブなファンアウトを設定する．
 inline
 void
-gate_t::set_act_fogate(int pos,
-		       gate_t* output,
-		       int ipos)
+gate_t::set_act_fanout_gate(int pos,
+			    gate_t* output,
+			    int ipos)
 {
   act_outputs[pos].gate = output;
   act_outputs[pos].pos = ipos;

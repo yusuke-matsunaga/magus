@@ -19,7 +19,8 @@ AC_DEFUN([YM_CHECK_PYTHON],[dnl
 #
 # --with-python-cflags
 AC_ARG_WITH([python-cflags],
-[  --with-python-cflags=CFLAGS  Specify CFLAGS for Python],
+[AS_HELP_STRING([--with-python-cflags=CFLAGS],
+		[Specify CFLAGS for Python])],
 [py_cflags="$withval"],
 [dnl
   if test -x `which python-config`; then
@@ -30,7 +31,8 @@ AC_ARG_WITH([python-cflags],
 ])
 # --with-python-ldflags
 AC_ARG_WITH([python-ldflags],
-[  --with-python-ldflags=LDFLAGS  Specify LDFLAGS for Python],
+[AS_HELP_STRING([--with-python-ldflags=LDFLAGS],
+		[Specify LDFLAGS for Python])],
 [py_ldflags="$withval"],
 [dnl
   if test -x `which python-config`; then

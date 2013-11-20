@@ -113,7 +113,7 @@ Iscas89BdnConv::make_node(const Iscas89Node* iscas89_node)
   BdnNodeHandle node_handle;
   if ( !get_node(iscas89_node, node_handle) ) {
     assert_cond( iscas89_node->type() == Iscas89Node::kGate, __FILE__, __LINE__);
-    ymuint ni = iscas89_node->ni();
+    ymuint ni = iscas89_node->fanin_num();
     vector<BdnNodeHandle> fanins(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       fanins[i] = make_node(iscas89_node->fanin(i));

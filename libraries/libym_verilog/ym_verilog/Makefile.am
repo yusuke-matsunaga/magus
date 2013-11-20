@@ -4,8 +4,6 @@
 
 SUBDIRS = pt vl
 
-INCLUDES =
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \

@@ -1389,7 +1389,7 @@ CiLibrary::compile()
       CiGroup* cgroup = &mGroupArray[gid];
       NpnMapM map = cgroup->map();
       ymuint pos_array[6] = { 0, 0, 0, 0, 0, 0 };
-      ymuint ni = map.ni() - 2;
+      ymuint ni = map.input_num() - 2;
       assert_cond( ni <= 4, __FILE__, __LINE__);
       for (ymuint i = 0; i < ni; ++ i) {
 	NpnVmap imap = map.imap(VarId(i));
@@ -1412,7 +1412,7 @@ CiLibrary::compile()
       CiGroup* cgroup = &mGroupArray[gid];
       NpnMapM map = cgroup->map();
       ymuint pos_array[5] = { 0, 0, 0, 0, 0 };
-      ymuint ni = map.ni() - 2;
+      ymuint ni = map.input_num() - 2;
       assert_cond( ni <= 4, __FILE__, __LINE__);
       for (ymuint i = 0; i < ni; ++ i) {
 	NpnVmap imap = map.imap(VarId(i));
@@ -1470,7 +1470,7 @@ CiLibrary::add_cell(ymuint id,
 /// @brief 内容をバイナリダンプする．
 /// @param[in] s 出力先のストリーム
 void
-CiLibrary::dump(BinO& s) const
+CiLibrary::dump(ODO& s) const
 {
   // 名前
   s << name();
@@ -1562,7 +1562,7 @@ CiLibrary::dump(BinO& s) const
 }
 
 void
-CiLibrary::restore(BinI& s)
+CiLibrary::restore(IDO& s)
 {
   string name;
   s >> name;
@@ -2020,7 +2020,7 @@ CiLibrary::get_pin(const CiCell* cell,
 
 // @brief LUT テンプレートを読み込む．
 void
-CiLibrary::restore_lut_template(BinI& s,
+CiLibrary::restore_lut_template(IDO& s,
 				ymuint id)
 {
   string name;
@@ -2128,7 +2128,7 @@ CiLibrary::restore_lut_template(BinI& s,
 
 // @brief LUT を読み込む．
 CellLut*
-CiLibrary::restore_lut(BinI& s)
+CiLibrary::restore_lut(IDO& s)
 {
   string template_name;
   s >> template_name;

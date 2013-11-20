@@ -14,8 +14,8 @@
 #include "ym_logic/VarId.h"
 #include "ym_logic/LogExpr.h"
 #include "ym_utils/Binder.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 #include "gmpxx.h"
 
 
@@ -243,14 +243,14 @@ public:
   /// @param[in] s 入力ストリーム
   /// @param[out] array 生成された BDD を格納するベクタ
   void
-  restore(BinI& s,
+  restore(IDO& s,
 	  BddVector& array);
 
   /// @brief 保存されたBDDをリストに読み込む．
   /// @param[in] s 入力ストリーム
   /// @param[out] array 生成された BDD を格納するリスト
   void
-  restore(BinI& s,
+  restore(IDO& s,
 	  BddList& array);
 
   /// @}

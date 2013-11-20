@@ -175,7 +175,7 @@ protected:
   /// @param[in] s 出力先のストリーム
   /// @param[in] type_id 型の ID
   void
-  dump_common(BinO& s,
+  dump_common(ODO& s,
 	      ymuint8 type_id) const;
 
 
@@ -333,7 +333,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
 
 private:
@@ -419,7 +419,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
 
 private:
@@ -502,7 +502,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
 
 private:
@@ -593,7 +593,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
 
 private:

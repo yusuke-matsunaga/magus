@@ -99,7 +99,7 @@ CutResub::operator()(const BdnMgr& sbjgraph,
       // crnode のレベルを求める．
       ymuint level = 0;
       const Cut* cut = crnode->cut();
-      ymuint ni = cut->ni();
+      ymuint ni = cut->input_num();
       for (ymuint i = 0; i < ni; ++ i) {
 	CrNode* inode = cut_input(cut, i);
 	if ( inode->is_input() ) continue;
@@ -122,7 +122,7 @@ CutResub::operator()(const BdnMgr& sbjgraph,
 	if ( cut1 == cut ) continue;
 
 	bool ok = true;
-	ymuint ni = cut1->ni();
+	ymuint ni = cut1->input_num();
 	for (ymuint i = 0; i < ni; ++ i) {
 	  CrNode* inode = cut_input(cut1, i);
 	  if ( inode == NULL ) {
@@ -252,7 +252,7 @@ CutResub::back_trace(const BdnNode* sbjnode,
 
     // ファンインのノードのカットを選ぶ．
     // 同時にファンアウトリストを構築する．
-    for (ymuint i = 0; i < cut->ni(); ++ i) {
+    for (ymuint i = 0; i < cut->input_num(); ++ i) {
       const BdnNode* inode = cut->input(i);
       if ( !inode->is_input() ) {
 	back_trace(inode, maprec, node);
@@ -271,7 +271,7 @@ CutResub::calc_gain(CrNode* node)
   if ( node->is_output() ) return 0;
 
   const Cut* cut = node->cut();
-  ymuint ni = cut->ni();
+  ymuint ni = cut->input_num();
   ymuint gain = 1;
   for (ymuint i = 0; i < ni; ++ i) {
     CrNode* inode = cut_input(cut, i);
@@ -299,7 +299,7 @@ CutResub::check_structure(CrNode* node)
     for (vector<const Cut*>::const_iterator p = cut_list.begin();
 	 p != cut_list.end(); ++ p) {
       const Cut* cut = *p;
-      ymuint ni = cut->ni();
+      ymuint ni = cut->input_num();
       bool ok = true;
       for (ymuint i = 0; i < ni; ++ i) {
 	CrNode* inode = cut_input(cut, i);
@@ -335,7 +335,7 @@ CutResub::find_subst(CrNode* node,
     for (vector<const Cut*>::const_iterator p = cut_list.begin();
 	 p != cut_list.end(); ++ p) {
       const Cut* cut = *p;
-      ymuint ni = cut->ni();
+      ymuint ni = cut->input_num();
       bool ok = true;
       for (ymuint i = 0; i < ni; ++ i) {
 	CrNode* inode = cut_input(cut, i);
@@ -401,7 +401,7 @@ CutResub::find_subst2(CrNode* node,
     for (vector<const Cut*>::const_iterator p = cut_list.begin();
 	 p != cut_list.end(); ++ p) {
       const Cut* cut = *p;
-      ymuint ni = cut->ni();
+      ymuint ni = cut->input_num();
       bool ok = true;
       ymuint level = 0;
       for (ymuint i = 0; i < ni; ++ i) {
@@ -486,7 +486,7 @@ CutResub::update(CrNode* node,
   for (vector<const Cut*>::iterator p = mDeletedCuts.begin();
        p != mDeletedCuts.end(); ++ p ){
     const Cut* cut = *p;
-    ymuint ni = cut->ni();
+    ymuint ni = cut->input_num();
     for (ymuint i = 0; i < ni; ++ i) {
       CrNode* inode = cut_input(cut, i);
       if ( inode->is_input() ) continue;
@@ -507,7 +507,7 @@ CutResub::update(CrNode* node,
 #endif
 
     const Cut* cut = crnode->cut();
-    ymuint ni = cut->ni();
+    ymuint ni = cut->input_num();
     for ( ymuint i = 0; i < ni; ++ i) {
       CrNode* inode = cut_input(cut, i);
       if ( inode->is_input() ) continue;
@@ -548,7 +548,7 @@ CutResub::update(CrNode* node,
       CrNode* node = get_lq();
       const Cut* cut = node->cut();
       ymuint max_level = 0;
-      ymuint ni = cut->ni();
+      ymuint ni = cut->input_num();
       for (ymuint i = 0; i < ni; ++ i) {
 	CrNode* inode = cut_input(cut, i);
 	ymuint level = inode->level();
@@ -591,7 +591,7 @@ CutResub::update(CrNode* node,
       if ( node->req_level() != min_req ) {
 	node->set_req_level(min_req);
 	const Cut* cut = node->cut();
-	ymuint ni = cut->ni();
+	ymuint ni = cut->input_num();
 	for (ymuint i = 0; i < ni; ++ i) {
 	  CrNode* inode = cut_input(cut, i);
 	  if ( !inode->is_input() ) {
@@ -613,8 +613,8 @@ CutResub::subst_cut_fanouts(CrNode* node,
 			    const Cut* old_cut,
 			    const Cut* new_cut)
 {
-  ymuint old_ni = old_cut->ni();
-  ymuint new_ni = new_cut->ni();
+  ymuint old_ni = old_cut->input_num();
+  ymuint new_ni = new_cut->input_num();
 
   // old/new フラグをつける．
   for (ymuint i = 0; i < old_ni; ++ i) {

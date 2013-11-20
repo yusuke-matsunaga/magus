@@ -8,13 +8,12 @@
 
 
 #include "SmtLibScanner.h"
+#include "ym_utils/FileIDO.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
-
-
 
 void
 lextest(const string& filename)
@@ -22,12 +21,13 @@ lextest(const string& filename)
   MsgHandler* handler = new StreamMsgHandler(&cerr);
   MsgMgr::reg_handler(handler);
 
-  SmtLibScanner lex;
-
-  if ( !lex.open_file(filename) ) {
+  FileIDO ido(filename);
+  if ( !ido ) {
     cerr << "Counld not open " << filename << endl;
     return;
   }
+
+  SmtLibScanner lex(ido);
 
   for ( ; ; ) {
     FileRegion loc;

@@ -447,6 +447,8 @@ YmSat::solve(const vector<Literal>& assumptions,
     mTimer.start();
   }
 
+  alloc_var();
+
   // 自明な簡単化を行う．
   simplifyDB();
   if ( !mSane ) {

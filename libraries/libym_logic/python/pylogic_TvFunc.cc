@@ -10,8 +10,8 @@
 #include "ym_logic/pylogic.h"
 #include "ym_logic/TvFunc.h"
 #include "ym_utils/pyutils.h"
-#include "ym_utils/FileBinI.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -191,12 +191,12 @@ TvFunc_nega_literal(PyTypeObject* type,
   return PyTvFunc_FromTvFunc(TvFunc::nega_literal(ni, vid));
 }
 
-// ni 関数
+// input_num 関数
 PyObject*
-TvFunc_ni(TvFuncObject* self,
-	  PyObject* args)
+TvFunc_input_num(TvFuncObject* self,
+		 PyObject* args)
 {
-  return PyObject_FromYmuint32(self->mBody->ni());
+  return PyObject_FromYmuint32(self->mBody->input_num());
 }
 
 // value 関数
@@ -209,9 +209,9 @@ TvFunc_value(TvFuncObject* self,
     return NULL;
   }
 
-  ymuint ni = self->mBody->ni();
+  ymuint ni = self->mBody->input_num();
   if ( pos >= (1U << ni) ) {
-    PyErr_SetString(PyExc_ValueError, "parameter must be less then 2^ni()");
+    PyErr_SetString(PyExc_ValueError, "parameter must be less then 2^input_num()");
     return NULL;
   }
 
@@ -330,7 +330,7 @@ PyObject*
 TvFunc_dump(TvFuncObject* self,
 	    PyObject* args)
 {
-  FileBinO* bp = parse_FileBinO(args);
+  FileODO* bp = parse_FileODO(args);
   if ( bp == NULL ) {
     return NULL;
   }
@@ -346,7 +346,7 @@ PyObject*
 TvFunc_restore(TvFuncObject* self,
 	       PyObject* args)
 {
-  FileBinI* bp = parse_FileBinI(args);
+  FileIDO* bp = parse_FileIDO(args);
   if ( bp == NULL ) {
     return NULL;
   }
@@ -645,7 +645,7 @@ PyMethodDef TvFunc_methods[] = {
    PyDoc_STR("cofactor (VarId, Pol)")},
   {"xform", (PyCFunction)TvFunc_xform, METH_VARARGS,
    PyDoc_STR("NPN transform (NpnMap)")},
-  {"ni", (PyCFunction)TvFunc_ni, METH_NOARGS,
+  {"input_num", (PyCFunction)TvFunc_input_num, METH_NOARGS,
    PyDoc_STR("return input number (NONE")},
   {"value", (PyCFunction)TvFunc_value, METH_VARARGS,
    PyDoc_STR("return truth value (int)")},
@@ -664,9 +664,9 @@ PyMethodDef TvFunc_methods[] = {
   {"check_sym", (PyCFunction)TvFunc_check_sup, METH_VARARGS,
    PyDoc_STR("check symmetry (VarId, VarId, Pol)")},
   {"dump", (PyCFunction)TvFunc_dump, METH_VARARGS,
-   PyDoc_STR("dump (FileBinO)")},
+   PyDoc_STR("dump (FileODO)")},
   {"restore", (PyCFunction)TvFunc_restore, METH_VARARGS,
-   PyDoc_STR("restore (FileBinI)")},
+   PyDoc_STR("restore (FileIDO)")},
   {NULL, NULL, 0, NULL} // end-marker
 };
 

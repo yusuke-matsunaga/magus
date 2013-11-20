@@ -16,7 +16,9 @@
 BEGIN_NAMESPACE_YM_DOTLIB
 
 // @brief コンストラクタ
-DotlibScanner::DotlibScanner()
+// @param[in] ido 入力データ
+DotlibScanner::DotlibScanner(IDO& ido) :
+  Scanner(ido)
 {
 }
 

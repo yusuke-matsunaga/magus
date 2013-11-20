@@ -141,11 +141,11 @@ public:
 
   /// @brief 入力数を得る．
   ymuint
-  ni() const;
+  input_num() const;
 
   /// @brief 出力数を得る．
   ymuint
-  no() const;
+  output_num() const;
 
   /// @brief 1出力の論理関数を切り出す．
   /// @param[in] ovar 出力番号
@@ -154,7 +154,7 @@ public:
 
   /// @brief 入力値を2進数と見なしたときの pos 番目の値を得る．
   /// @param[in] ovar 出力番号
-  /// @param[in] pos 位置番号 ( 0 <= pos < 2^(ni()) )
+  /// @param[in] pos 位置番号 ( 0 <= pos < 2^(input_num()) )
   /// 答は 0 か 1 だが int 型
   int
   value(VarId ovar,
@@ -194,18 +194,18 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // BinIO 用の関数
+  // IDOO 用の関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief バイナリファイルの書き出し
   /// @param[in] s 出力先のストリーム
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリファイルの読み込み
   /// @param[in] s 入力元のストリーム
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 public:
@@ -328,16 +328,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入力数
-  ymuint32 mNi;
+  ymuint32 mInputNum;
 
   // 出力数
-  ymuint32 mNo;
+  ymuint32 mOutputNum;
 
   // 1出力分のブロック数
-  ymuint32 mNblk1;
+  ymuint32 mBlockNum1;
 
   // ブロック数
-  ymuint32 mNblk;
+  ymuint32 mBlockNum;
 
   // パックされた真理値ベクトル
   ymulong* mVector;
@@ -437,16 +437,16 @@ operator<<(ostream& s,
 /// @param[in] s 出力ストリーム
 /// @param[in] func 関数
 /// @return s
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const TvFuncM& func);
 
 /// @brief バイナリ入力
 /// @param[in] s 入力ストリーム
 /// @param[out] func 関数
 /// @return s
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   TvFuncM& func);
 
 
@@ -457,17 +457,17 @@ operator>>(BinI& s,
 // 入力数を得る．
 inline
 ymuint
-TvFuncM::ni() const
+TvFuncM::input_num() const
 {
-  return mNi;
+  return mInputNum;
 }
 
 // @brief 出力数を得る．
 inline
 ymuint
-TvFuncM::no() const
+TvFuncM::output_num() const
 {
-  return mNo;
+  return mOutputNum;
 }
 
 // 入力値を2進数と見なしたときの (ovar, pos) 番目の値を得る．
@@ -478,7 +478,7 @@ TvFuncM::value(VarId ovar,
 	       ymuint pos) const
 {
   ymuint opos = ovar.val();
-  return (mVector[block(pos) + opos * mNblk1] >> shift(pos)) & 1;
+  return (mVector[block(pos) + opos * mBlockNum1] >> shift(pos)) & 1;
 }
 
 // ブロック数を得る．
@@ -486,7 +486,7 @@ inline
 ymuint
 TvFuncM::nblk() const
 {
-  return mNblk;
+  return mBlockNum;
 }
 
 // 生のデータを得る．
@@ -503,7 +503,7 @@ bool
 TvFuncM::check_nio(const TvFuncM& f1,
 		   const TvFuncM& f2)
 {
-  return  (f1.mNi == f2.mNi) && (f1.mNo == f2.mNo);
+  return  (f1.mInputNum == f2.mInputNum) && (f1.mOutputNum == f2.mOutputNum);
 }
 
 // 入力数 ni, 出力数 no のベクタを納めるのに必要なブロック数を計算する．
@@ -648,8 +648,8 @@ operator<<(ostream& s,
 // @param[in] func 関数
 // @return s
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const TvFuncM& func)
 {
   func.dump(s);
@@ -661,8 +661,8 @@ operator<<(BinO& s,
 // @param[out] func 関数
 // @return s
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   TvFuncM& func)
 {
   func.restore(s);

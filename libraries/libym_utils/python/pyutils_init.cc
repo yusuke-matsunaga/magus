@@ -67,10 +67,10 @@ void
 NameMgrObject_init(PyObject* module);
 
 void
-FileBinIObject_init(PyObject* module);
+FileIDOObject_init(PyObject* module);
 
 void
-FileBinOObject_init(PyObject* module);
+FileODOObject_init(PyObject* module);
 
 void
 CombiGenObject_init(PyObject* module);
@@ -140,9 +140,9 @@ utils_init()
 
   NameMgrObject_init(m);
 
-  FileBinIObject_init(m);
+  FileIDOObject_init(m);
 
-  FileBinOObject_init(m);
+  FileODOObject_init(m);
 
   CombiGenObject_init(m);
 

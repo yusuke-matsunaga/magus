@@ -12,8 +12,8 @@
 #include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
 #include "ym_logic/npn_nsdef.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -135,10 +135,10 @@ public:
 
   /// @brief 入力数を得る．
   ymuint
-  ni() const;
+  input_num() const;
 
   /// @brief 入力値を2進数と見なしたときの pos 番目の値を得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < 2^(ni()) )
+  /// @param[in] pos 位置番号 ( 0 <= pos < 2^(input_num()) )
   /// 答は 0 か 1 だが int 型
   int
   value(ymuint pos) const;
@@ -227,18 +227,18 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // BinIO 用の関数
+  // IDO/ODO 用の関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief バイナリファイルの書き出し
   /// @param[in] s 出力先のストリーム
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリファイルの読み込み
   /// @param[in] s 入力元のストリーム
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 public:
@@ -354,10 +354,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入力数
-  ymuint32 mNi;
+  ymuint32 mInputNum;
 
   // ブロック数
-  ymuint32 mNblk;
+  ymuint32 mBlockNum;
 
   // パックされた真理値ベクトル
   ymulong* mVector;
@@ -457,16 +457,16 @@ operator<<(ostream& s,
 /// @param[in] s 出力ストリーム
 /// @param[in] func 関数
 /// @return s
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const TvFunc& func);
 
 /// @brief バイナリ入力
 /// @param[in] s 入力ストリーム
 /// @param[out] func 関数
 /// @return s
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   TvFunc& func);
 
 
@@ -477,9 +477,9 @@ operator>>(BinI& s,
 // 入力数を得る．
 inline
 ymuint
-TvFunc::ni() const
+TvFunc::input_num() const
 {
-  return mNi;
+  return mInputNum;
 }
 
 // 入力値を2進数と見なしたときの pos 番目の値を得る．
@@ -496,7 +496,7 @@ inline
 ymuint
 TvFunc::nblk() const
 {
-  return mNblk;
+  return mBlockNum;
 }
 
 // 生のデータを得る．
@@ -629,8 +629,8 @@ operator<<(ostream& s,
 // @param[in] func 関数
 // @return s
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const TvFunc& func)
 {
   func.dump(s);
@@ -642,8 +642,8 @@ operator<<(BinO& s,
 // @param[out] func 関数
 // @return s
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   TvFunc& func)
 {
   func.restore(s);

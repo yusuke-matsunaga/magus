@@ -12,7 +12,7 @@ AC_REVISION($Rev: 2507 $)dnl
 AC_PREREQ(2.57)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2005-2012 Yusuke Matsunaga
+Copyright (C) 2005-2013 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
@@ -54,85 +54,70 @@ AC_CONFIG_SUBDIRS([tests])
 # Declare files in 'libraries' subdirectories
 # ===================================================================
 
-ym_libym_utils_enable=1
-ym_libym_logic_enable=1
-ym_libym_smtlibv2_enable=0
-ym_libym_cell_enable=1
-ym_libym_verilog_enable=1
-ym_libym_networks_enable=1
-ym_libym_gds_enable=0
-ym_libym_cec_enable=1
-ym_libym_techmap_enable=1
-ym_libym_gbm_enable=0
-ym_libym_seal_enable=1
-ym_libym_tclpp_enable=1
-ym_libym_ymsh_enable=0
-
-
 YM_INIT_LIBRARIES_SUBDIRS
 
 # libym_utils
-YM_BUILD_LIBRARY([libym_utils],
+YM_BUILD_LIBRARY([libym_utils], [yes],
 		 [])
 
 # libym_logic
-YM_BUILD_LIBRARY([libym_logic],
+YM_BUILD_LIBRARY([libym_logic], [yes],
 		 [ym_libym_utils_enable])
 
 # libym_smtlibv2
-YM_BUILD_LIBRARY([libym_smtlibv2],
+YM_BUILD_LIBRARY([libym_smtlibv2], [yes],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable])
 
 # libym_mincov
-YM_BUILD_LIBRARY([libym_mincov],
+YM_BUILD_LIBRARY([libym_mincov], [yes],
 		 [ym_libym_utils_enable])
 
 # libym_cell
-YM_BUILD_LIBRARY([libym_cell],
+YM_BUILD_LIBRARY([libym_cell], [yes],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable])
 
 # libym_verilog
-YM_BUILD_LIBRARY([libym_verilog],
+YM_BUILD_LIBRARY([libym_verilog], [yes],
 		 [ym_libym_utils_enable])
 
 # libym_networks
-YM_BUILD_LIBRARY([libym_networks],
+YM_BUILD_LIBRARY([libym_networks], [yes],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable,
 		  ym_libym_verilog_enable])
 
 # libym_gds
-YM_BUILD_LIBRARY([libym_gds],
+YM_BUILD_LIBRARY([libym_gds], [no],
 		 [])
 
 # libym_cec
-YM_BUILD_LIBRARY([libym_cec],
+YM_BUILD_LIBRARY([libym_cec], [yes],
 		 [ym_libym_networks_enable,
 		  ym_libym_logic_enable])
 
 # libym_techmap
-YM_BUILD_LIBRARY([libym_techmap],
+YM_BUILD_LIBRARY([libym_techmap], [yes],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable])
 
 # libym_gbm
-YM_BUILD_LIBRARY([libym_gbm],
+YM_BUILD_LIBRARY([libym_gbm], [no],
 		 [ym_libym_networks_enable,
 		  ym_libym_logic_enable])
 
 # libym_seal
-YM_BUILD_LIBRARY([libym_seal],
+YM_BUILD_LIBRARY([libym_seal], [no],
 		 [ym_libym_logic_enable,
 		  ym_libym_networks_enable])
 
 # libym_tclpp
-YM_BUILD_LIBRARY([libym_tclpp],
+YM_BUILD_LIBRARY([libym_tclpp], [yes],
 		 [])
 
 # libym_ymsh
-YM_BUILD_LIBRARY([libym_ymsh],
+YM_BUILD_LIBRARY([libym_ymsh], [no],
 		 [])
 
 
@@ -143,40 +128,40 @@ YM_FINISH_LIBRARIES_SUBDIRS
 # Declare files in 'programs' subdirectories
 # ===================================================================
 
-ym_magus_tclsh_enable=1
-ym_atpg_enable=0
-ym_matpg_enable=0
-ym_satpg_enable=0
-ym_igf_enable=1
-
 YM_INIT_PROGRAMS_SUBDIRS
 
 # magus_tclsh
-YM_BUILD_PROGRAM([magus_tclsh],
+YM_BUILD_PROGRAM([magus_tclsh], [yes],
 		 [ym_libym_tclpp_enable])
 
 # atpg
-YM_BUILD_PROGRAM([atpg],
+YM_BUILD_PROGRAM([atpg], [no],
 		 [ym_libym_utils_enable,
 		  ym_libym_networks_enable,
 		  ym_libym_tclpp_enable])
 
 # matpg
-YM_BUILD_PROGRAM([matpg],
+YM_BUILD_PROGRAM([matpg], [no],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable,
 		  ym_libym_networks_enable,
 		  ym_libym_tclpp_enable])
 
 # satpg
-YM_BUILD_PROGRAM([satpg],
+YM_BUILD_PROGRAM([satpg], [no],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable,
 		  ym_libym_networks_enable,
 		  ym_libym_tclpp_enable])
 
 # igf
-YM_BUILD_PROGRAM([igf],
+YM_BUILD_PROGRAM([igf], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_tclpp_enable])
+
+# llvmeq
+YM_BUILD_PROGRAM([llvmeq], [no],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable,
 		  ym_libym_tclpp_enable])

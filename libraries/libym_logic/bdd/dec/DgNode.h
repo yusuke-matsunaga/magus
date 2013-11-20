@@ -51,14 +51,14 @@ public:
   // 入力の部分集合のみを考えたときの関数を計算する．
   // 例外的に空集合で全集合を表す．
   Bdd
-  partial_func(const vector<size_t>& iset) const;
+  partial_func(const vector<ymuint32>& iset) const;
 
   // サポートリストを得る．
   BddVarSet
   support() const;
 
   // サポートの要素数を得る．
-  size_t
+  ymuint
   support_size() const;
 
   // グローバル関数が1となるパタンを得る．
@@ -74,20 +74,20 @@ public:
   top_var() const;
 
   // 入力数を得る．
-  size_t
-  ni() const;
+  ymuint
+  input_num() const;
 
   // pos 番目の入力を得る．
   tDgEdge
-  input(size_t pos) const;
+  input(ymuint pos) const;
 
   // pos 番目の入力のノードを得る．
   DgNode*
-  input_node(size_t pos) const;
+  input_node(ymuint pos) const;
 
   // pos 番目の入力の極性を得る．
   tPol
-  input_pol(size_t pos) const;
+  input_pol(ymuint pos) const;
 
   // リテラル番号を得る．
   tVarId
@@ -122,7 +122,7 @@ private:
   DgNode(const Bdd& f,
 	 const BddVarSet& support,
 	 tType type,
-	 size_t ni);
+	 ymuint ni);
 
   // デストラクタ
   ~DgNode();
@@ -157,12 +157,12 @@ private:
 
   // 入力の枝に印を付ける．
   void
-  input_flag(size_t pos,
+  input_flag(ymuint pos,
 	     int mark);
 
   // 入力の枝の印を取り出す．
   int
-  input_flag(size_t pos) const;
+  input_flag(ymuint pos) const;
 
 
 private:
@@ -196,7 +196,7 @@ private:
   tVarId mTopVarId;
 
   // 入力数
-  size_t mNi;
+  ymuint32 mInputNum;
 
   // 入力枝の配列
   // ORタイプの時のみ否定属性が付くことがある．
@@ -271,7 +271,7 @@ inv_edge(tDgEdge& e,
 void
 display(tDgEdge edge,
 	ostream& s,
-	size_t col = 0);
+	ymuint col = 0);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -343,7 +343,7 @@ DgNode::bmark() const
 // 入力の枝に印を付ける．
 inline
 void
-DgNode::input_flag(size_t pos,
+DgNode::input_flag(ymuint pos,
 		   int mark)
 {
   mInputFlags[pos] = mark;
@@ -352,7 +352,7 @@ DgNode::input_flag(size_t pos,
 // 入力の枝の印を取り出す．
 inline
 int
-DgNode::input_flag(size_t pos) const
+DgNode::input_flag(ymuint pos) const
 {
   return mInputFlags[pos];
 }
@@ -399,7 +399,7 @@ DgNode::support() const
 
 // サポートの要素数を得る．
 inline
-size_t
+ymuint
 DgNode::support_size() const
 {
   return mSupport.size();
@@ -431,16 +431,16 @@ DgNode::top_var() const
 
 // 入力数を得る．
 inline
-size_t
-DgNode::ni() const
+ymuint
+DgNode::input_num() const
 {
-  return mNi;
+  return mInputNum;
 }
 
 // pos 番目の入力を得る．
 inline
 tDgEdge
-DgNode::input(size_t pos) const
+DgNode::input(ymuint pos) const
 {
   return mInputs[pos];
 }
@@ -448,7 +448,7 @@ DgNode::input(size_t pos) const
 // pos 番目の入力のノードを得る．
 inline
 DgNode*
-DgNode::input_node(size_t pos) const
+DgNode::input_node(ymuint pos) const
 {
   return edge2node(mInputs[pos]);
 }
@@ -456,7 +456,7 @@ DgNode::input_node(size_t pos) const
 // pos 番目の入力の極性を得る．
 inline
 tPol
-DgNode::input_pol(size_t pos) const
+DgNode::input_pol(ymuint pos) const
 {
   return edge2pol(mInputs[pos]);
 }

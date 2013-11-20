@@ -48,7 +48,7 @@ public:
 
   /// @brief 入力数を得る．
   ymuint
-  ni() const;
+  input_num() const;
 
 #if 0
   /// @brief 重み別 Walsh の 0次係数を得る．
@@ -59,12 +59,12 @@ public:
 #endif
 
   /// @brief Walsh の 1次係数を得る．
-  /// @param[in] pos 入力番号 ( 0 <= pos < ni() )
+  /// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
   int
   walsh_1(ymuint pos) const;
 
   /// @brief Walsh の 2次係数を得る．
-  /// @param[in] pos1, pos2 入力番号 ( 0 <= pos1, pos2 < ni() )
+  /// @param[in] pos1, pos2 入力番号 ( 0 <= pos1, pos2 < input_num() )
   /// @return pos1 番めと pos2 番めの入力に対応する Walsh の 2次係数を返す．
   int
   walsh_2(ymuint pos1,
@@ -84,7 +84,7 @@ public:
   opol() const;
 
   /// @brief 入力極性を得る．
-  /// @param[in] pos 入力番号 ( 0 <= pos < ni() )
+  /// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
   /// @retval  0 未定
   /// @retval  1 正極性
   /// @retval  2 負極性
@@ -107,12 +107,12 @@ public:
   ic_rep(ymuint cid) const;
 
   /// @brief 等価入力クラスの要素数を返す．
-  /// @param[in] pos 先頭の入力番号 ( 0 <= pos < ni() )
+  /// @param[in] pos 先頭の入力番号 ( 0 <= pos < input_num() )
   ymuint
   ic_num(ymuint pos) const;
 
   /// @brief 等価入力クラスの bisym マークを返す．
-  /// @param[in] pos 先頭の入力番号 ( 0 <= pos < ni() )
+  /// @param[in] pos 先頭の入力番号 ( 0 <= pos < input_num() )
   bool
   bisym(ymuint pos) const;
 
@@ -126,7 +126,7 @@ public:
   indep_rep() const;
 
   /// @brief 等価入力クラスの pos の次の要素を返す．
-  /// @param[in] pos 入力番号 ( 0 <= pos < ni() )
+  /// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
   ymuint
   ic_link(ymuint pos) const;
 
@@ -166,14 +166,14 @@ private:
   new_ic(ymuint pos);
 
   /// @brief 等価入力クラスに要素を足す．
-  /// @param[in] rep 入力クラスの先頭の入力番号 ( 0 <= rep < ni() )
-  /// @param[in] pos 入力番号 ( 0 <= pos < ni() )
+  /// @param[in] rep 入力クラスの先頭の入力番号 ( 0 <= rep < input_num() )
+  /// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
   void
   add_elem(ymuint rep,
 	   ymuint pos);
 
   /// @brief 等価入力クラスに bisym マークをつける．
-  /// @param[in] rep 入力クラスの先頭の入力番号 ( 0 <= rep < ni() )
+  /// @param[in] rep 入力クラスの先頭の入力番号 ( 0 <= rep < input_num() )
   void
   set_bisym(ymuint rep);
 
@@ -192,13 +192,13 @@ private:
   TvFunc mFunc;
 
   // 関数の入力数
-  ymuint32 mNi;
+  ymuint32 mInputNum;
 
   // Walsh の 0次係数
   ymint32 mW0;
 
   // Walsh の 1次係数
-  // 大きさ mNi の配列へのポインタ
+  // 大きさ mInputNum の配列へのポインタ
 #if USE_MALLOC
   ymint32* mW1;
 #else
@@ -206,7 +206,7 @@ private:
 #endif
 
   // Walsh の 2次係数
-  // 大きさ mNi * mNi の配列へのポインタ
+  // 大きさ mInputNum * mInputNum の配列へのポインタ
   mutable
 #if USE_MALLOC
   ymint32* mW2;
@@ -215,7 +215,7 @@ private:
 #endif
 
   // mW2 が計算済みかどうかを記録するフラグ
-  // 大きさ mNi * mNi の配列へのポインタ
+  // 大きさ mInputNum * mInputNum の配列へのポインタ
   // 最下位ビットが計算済みかどうかのフラグ
   // 1ビット目が極性反転を表すフラグ
   mutable
@@ -229,7 +229,7 @@ private:
   ymuint8 mOpol;
 
   // 入力極性を表す配列
-  // 大きさ mNi の配列へのポインタ
+  // 大きさ mInputNum の配列へのポインタ
   // インデックスは入力番号
 #if USE_MALLOC
   ymuint8* mIpols;
@@ -288,9 +288,9 @@ NpnBaseConf::func() const
 // 入力数を得る．
 inline
 ymuint
-NpnBaseConf::ni() const
+NpnBaseConf::input_num() const
 {
-  return mNi;
+  return mInputNum;
 }
 
 // @brief Walsh の 1次係数を得る．
@@ -314,7 +314,7 @@ NpnBaseConf::walsh_2(ymuint pos1,
     pos1 = pos2;
     pos2 = tmp;
   }
-  ymuint index = pos1 * ni() + pos2;
+  ymuint index = pos1 * input_num() + pos2;
   if ( mW2flag[index] == 0 ) {
     mW2[index] = mFunc.walsh_2(VarId(pos1), VarId(pos2));
     mW2flag[index] = 1;
@@ -356,7 +356,7 @@ NpnBaseConf::ic_rep(ymuint cid) const
 }
 
 // @brief 等価入力クラスの要素数を返す．
-// @param[in] pos 先頭の入力番号 ( 0 <= pos < ni() )
+// @param[in] pos 先頭の入力番号 ( 0 <= pos < input_num() )
 inline
 ymuint
 NpnBaseConf::ic_num(ymuint pos) const
@@ -365,7 +365,7 @@ NpnBaseConf::ic_num(ymuint pos) const
 }
 
 // @brief 等価入力クラスの bisym マークを返す．
-// @param[in] pos 先頭の入力番号 ( 0 <= pos < ni() )
+// @param[in] pos 先頭の入力番号 ( 0 <= pos < input_num() )
 inline
 bool
 NpnBaseConf::bisym(ymuint pos) const

@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_CNFDD
 
 // @brief 内容のダンプ
 void
-CNFdd::dump(BinO& s) const
+CNFdd::dump(ODO& s) const
 {
   Dumper dumper(mMgr, s);
   CNFddEdge e(mRoot);
@@ -30,7 +30,7 @@ CNFdd::dump(BinO& s) const
 // @brief ZDD ベクタの内容をダンプする．
 // @param[in] s 出力ストリーム
 void
-CNFddVector::dump(BinO& s) const
+CNFddVector::dump(ODO& s) const
 {
   if ( empty() ) {
     return;
@@ -52,7 +52,7 @@ CNFddVector::dump(BinO& s) const
 // @brief ZDD リストの内容をダンプする．
 // @param[in] s 出力ストリーム
 void
-CNFddList::dump(BinO& s) const
+CNFddList::dump(ODO& s) const
 {
   if ( empty() ) {
     return;
@@ -79,7 +79,7 @@ CNFddList::dump(BinO& s) const
 
 // コンストラクタ
 Dumper::Dumper(CNFddMgrImpl* mgr,
-	       BinO& s) :
+	       ODO& s) :
   mMgr(mgr),
   mStream(s)
 {

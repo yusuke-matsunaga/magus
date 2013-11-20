@@ -260,7 +260,7 @@ C1_gate_t::just_cfna(val3 val)
 bool
 BUF_gate_t::just_cfna(val3 val)
 {
-  gate_t* i_gate = get_figate(0);
+  gate_t* i_gate = get_fanin_gate(0);
   if ( rf_gate(i_gate) == 1 ) {
     return false;
   }
@@ -280,7 +280,7 @@ SIMPLE_gate_t::just_cfna(val3 val)
 {
   if ( val == o_val ) {
     for (int i = 0; i < ni; i ++) {
-      gate_t* i_gate = get_figate(i);
+      gate_t* i_gate = get_fanin_gate(i);
       if ( rf_gate(i_gate) == 1 ) {
 	continue;
       }
@@ -294,7 +294,7 @@ SIMPLE_gate_t::just_cfna(val3 val)
   else {
     val3 nc_val = neg3(c_val);
     for (int i = 0; i < ni; i ++) {
-      gate_t* i_gate = get_figate(i);
+      gate_t* i_gate = get_fanin_gate(i);
       if ( rf_gate(i_gate) == 1 ) {
 	return false;
       }
@@ -304,7 +304,7 @@ SIMPLE_gate_t::just_cfna(val3 val)
       }
     }
     for (int i = 0; i < ni; i ++) {
-      get_pat(get_figate(i), nc_val);
+      get_pat(get_fanin_gate(i), nc_val);
     }
     return true;
   }
@@ -321,7 +321,7 @@ XOR_gate_t::just_cfna(val3 val)
   bool slack = false;
   gate_t* slack_gate = NULL;
   for (int i = 0; i < ni; ++ i) {
-    gate_t* i_gate = get_figate(i);
+    gate_t* i_gate = get_fanin_gate(i);
     if ( rf_gate(i_gate) == 1 ) {
       return false;
     }
@@ -344,7 +344,7 @@ XOR_gate_t::just_cfna(val3 val)
     slack_gate = NULL;
   }
   for (int i = 0; i < ni; ++ i) {
-    gate_t* i_gate = get_figate(i);
+    gate_t* i_gate = get_fanin_gate(i);
     if ( i_gate != slack_gate && i_gate->chk_term0() ) {
       get_pat(i_gate, val_0);
     }
@@ -384,8 +384,8 @@ rf_chk_dfs(gate_t* gate,
   }
   gate->set_mark();
   br_mark(gate) = mark;
-  for (int i = gate->get_no(); -- i >= 0; ) {
-    bool stat = rf_chk_dfs(gate->get_fogate(i), mark);
+  for (int i = gate->get_fanout_num(); -- i >= 0; ) {
+    bool stat = rf_chk_dfs(gate->get_fanout_gate(i), mark);
     if ( stat ) {
       return true;
     }
@@ -398,7 +398,7 @@ static
 bool
 rf_chk(gate_t* gate0)
 {
-  int no = gate0->get_no();
+  int no = gate0->get_fanout_num();
 
   if ( no < 2 ) {
     return false;
@@ -406,7 +406,7 @@ rf_chk(gate_t* gate0)
 
   gn_clr_mark();
   for (int i = no; -- i >= 0; ) {
-    bool stat = rf_chk_dfs(gate0->get_fogate(i), i);
+    bool stat = rf_chk_dfs(gate0->get_fanout_gate(i), i);
     if ( stat ) {
       return true;
     }
@@ -425,8 +425,8 @@ basis_just(gate_t* jnode,
   dont_use_learning();
 
   // jnode のファンアウトも一時的に切っておく
-  int jnode_no = jnode->get_act_no();
-  jnode->set_act_no(0);
+  int jnode_no = jnode->get_act_fanout_num();
+  jnode->set_act_fanout_num(0);
 
   // 一連の初期化
   maq_clr(true);
@@ -473,7 +473,7 @@ basis_just(gate_t* jnode,
 
   // post-processing
   restore_value();
-  jnode->set_act_no(jnode_no);
+  jnode->set_act_fanout_num(jnode_no);
   pop_learn_flag();
 
   return flag;

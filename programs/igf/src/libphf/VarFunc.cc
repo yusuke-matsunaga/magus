@@ -29,6 +29,13 @@ VarFunc::~VarFunc()
 {
 }
 
+// @brief 出力数を返す．
+ymuint
+VarFunc::output_num() const
+{
+  return mVarList.size();
+}
+
 // @brief 関数値を求める．
 ymuint32
 VarFunc::eval(const RegVect* rv) const

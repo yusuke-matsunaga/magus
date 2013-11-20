@@ -33,8 +33,8 @@ class USTime;
 class MFSet;
 class ItvlMgr;
 class NameMgr;
-class FileBinI;
-class FileBinO;
+class FileIDO;
+class FileODO;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -476,59 +476,59 @@ PyNameMgr_AsNameMgrPtr(PyObject* py_obj);
 
 
 //////////////////////////////////////////////////////////////////////
-// PyFileBinI: バイナリ形式の入力ファイルオブジェクトを表す型
+// PyFileIDO: バイナリ形式の入力ファイルオブジェクトを表す型
 //////////////////////////////////////////////////////////////////////
 
-/// @brief FileBinI を表す型
+/// @brief FileIDO を表す型
 extern
-PyTypeObject PyFileBinI_Type;
+PyTypeObject PyFileIDO_Type;
 
-/// @brief PyFileBinI の型チェック
+/// @brief PyFileIDO の型チェック
 /// @param[in] obj Python オブジェクト
-/// @retval true obj が PyFileBinI_Type だった．
+/// @retval true obj が PyFileIDO_Type だった．
 /// @retval false obj が他の型だった．
 inline
 bool
-PyFileBinI_Check(PyObject* obj)
+PyFileIDO_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &PyFileBinI_Type;
+  return Py_TYPE(obj) == &PyFileIDO_Type;
 }
 
-/// @brief PyObject から FileBinI へのポインタを取り出す．
+/// @brief PyObject から FileIDO へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト
-/// @return FileBinI へのポインタを返す．
+/// @return FileIDO へのポインタを返す．
 /// @note 変換が失敗したら TypeError を送出し，NULL を返す．
 extern
-FileBinI*
-PyFileBinI_AsFileBinIPtr(PyObject* py_obj);
+FileIDO*
+PyFileIDO_AsFileIDOPtr(PyObject* py_obj);
 
 
 //////////////////////////////////////////////////////////////////////
-// PyFileBinO: バイナリ形式の出力ファイルオブジェクトを表す型
+// PyFileODO: バイナリ形式の出力ファイルオブジェクトを表す型
 //////////////////////////////////////////////////////////////////////
 
-/// @brief FileBinO を表す型
+/// @brief FileODO を表す型
 extern
-PyTypeObject PyFileBinO_Type;
+PyTypeObject PyFileODO_Type;
 
-/// @brief PyFileBinO の型チェック
+/// @brief PyFileODO の型チェック
 /// @param[in] obj Python オブジェクト
-/// @retval true obj が PyFileBinO_Type だった．
+/// @retval true obj が PyFileODO_Type だった．
 /// @retval false obj が他の型だった．
 inline
 bool
-PyFileBinO_Check(PyObject* obj)
+PyFileODO_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &PyFileBinO_Type;
+  return Py_TYPE(obj) == &PyFileODO_Type;
 }
 
-/// @brief PyObject から FileBinO へのポインタを取り出す．
+/// @brief PyObject から FileODO へのポインタを取り出す．
 /// @param[in] py_obj Python オブジェクト
-/// @return FileBinO へのポインタを返す．
+/// @return FileODO へのポインタを返す．
 /// @note 変換が失敗したら TypeError を送出し，NULL を返す．
 extern
-FileBinO*
-PyFileBinO_AsFileBinOPtr(PyObject* py_obj);
+FileODO*
+PyFileODO_AsFileODOPtr(PyObject* py_obj);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -703,21 +703,21 @@ PyMultiSetPermGen_AsMultiSetPermGenPtr(PyObject* py_obj);
 // 引数のパース用便利関数
 //////////////////////////////////////////////////////////////////////
 
-/// @brief 引数をパースして FileBinO を取り出す．
+/// @brief 引数をパースして FileODO を取り出す．
 /// @param[in] args 引数オブジェクト
-/// @return FileBinO のポインタを返す．
+/// @return FileODO のポインタを返す．
 /// @note エラーが起きたら NULL を返す．
 extern
-FileBinO*
-parse_FileBinO(PyObject* args);
+FileODO*
+parse_FileODO(PyObject* args);
 
-/// @brief 引数をパースして FileBinI を取り出す．
+/// @brief 引数をパースして FileIDO を取り出す．
 /// @param[in] args 引数オブジェクト
-/// @return FileBinI のポインタを返す．
+/// @return FileIDO のポインタを返す．
 /// @note エラーが起きたら NULL を返す．
 extern
-FileBinI*
-parse_FileBinI(PyObject* args);
+FileIDO*
+parse_FileIDO(PyObject* args);
 
 
 END_NAMESPACE_YM

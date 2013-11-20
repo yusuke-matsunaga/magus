@@ -16,7 +16,10 @@
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 // コンストラクタ
-SmtLibScanner::SmtLibScanner()
+// @brief コンストラクタ
+// @param[in] ido 入力データ
+SmtLibScanner::SmtLibScanner(IDO& ido) :
+  Scanner(ido)
 {
 }
 

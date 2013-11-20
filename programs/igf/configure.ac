@@ -84,6 +84,12 @@ AC_DEFINE_UNQUOTED(ALIGNOF_DOUBLE, $ym_alignof_double, [Alignment of double])
 
 
 # ===================================================================
+# Check for gmp
+# ===================================================================
+YM_CHECK_GMP
+
+
+# ===================================================================
 # Check for popt
 # ===================================================================
 YM_CHECK_POPT
@@ -153,12 +159,12 @@ AC_CONFIG_FILES([
 
 YM_EXTRA_SUBDIRS=""
 
-#if test "$ym_have_python" = 1; then
-#  YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS python"
-#  AC_CONFIG_FILES([
-#	src/python/Makefile
-#	])
-#fi
+if test "$ym_have_python" = 1; then
+  YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS python"
+  AC_CONFIG_FILES([
+	src/python/Makefile
+	])
+fi
 
 AC_SUBST([YM_EXTRA_SUBDIRS])
 

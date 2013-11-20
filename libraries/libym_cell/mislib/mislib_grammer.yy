@@ -13,7 +13,7 @@
 #include "ym_utils/FileRegion.h"
 #include "MislibParserImpl.h"
 #include "MislibNodeImpl.h"
-#include "MislibLex.h"
+#include "MislibScanner.h"
 
 
 // より詳細なエラー情報を出力させる．
@@ -224,7 +224,7 @@ phase
 //////////////////////////////////////////////////////////////////////
 
 // 字句解析器
-// 実際には MislibLex が仕事をしている．
+// 実際には MislibScanner が仕事をしている．
 int
 yylex(YYSTYPE* lvalp,
       YYLTYPE* llocp,

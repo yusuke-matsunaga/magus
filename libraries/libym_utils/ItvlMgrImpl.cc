@@ -799,7 +799,7 @@ ItvlMgrImpl::print_tree_cell(ostream& s,
 
 // @brief バイナリファイルに書き出す．
 void
-ItvlMgrImpl::dump(BinO& s) const
+ItvlMgrImpl::dump(ODO& s) const
 {
   dump_cell(s, mRoot);
 }
@@ -808,7 +808,7 @@ ItvlMgrImpl::dump(BinO& s) const
 // @param[in] s 出力先のストリーム
 // @param[in] cell 対象のセル
 void
-ItvlMgrImpl::dump_cell(BinO& s,
+ItvlMgrImpl::dump_cell(ODO& s,
 		       ItvlCell* cell) const
 {
   if ( cell ) {
@@ -825,7 +825,7 @@ ItvlMgrImpl::dump_cell(BinO& s,
 
 // @brief バイナリファイルを読み込む．
 void
-ItvlMgrImpl::restore(BinI& s)
+ItvlMgrImpl::restore(IDO& s)
 {
   mRoot = restore_cell(s);
 }
@@ -834,7 +834,7 @@ ItvlMgrImpl::restore(BinI& s)
 // @param[in] s 入力元のストリーム
 // @return 作成したセルを返す．
 ItvlCell*
-ItvlMgrImpl::restore_cell(BinI& s)
+ItvlMgrImpl::restore_cell(IDO& s)
 {
   ymuint8 balance;
   s >> balance;

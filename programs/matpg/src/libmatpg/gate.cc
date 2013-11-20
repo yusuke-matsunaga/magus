@@ -118,16 +118,16 @@ gate_t::~gate_t()
 }
 
 void
-gate_t::init_figate(int pos,
-		    gate_t* input)
+gate_t::init_fanin_gate(int pos,
+			gate_t* input)
 {
-  set_figate(pos, input);
+  set_fanin_gate(pos, input);
   ++ input->no;
 }
 
 void
-gate_t::init_fogate(gate_t* output,
-		    int pos)
+gate_t::init_fanout_gate(gate_t* output,
+			 int pos)
 {
   if (outputs == NULL) {
     outputs = new net_t[no];
@@ -139,13 +139,13 @@ gate_t::init_fogate(gate_t* output,
   if (output != NULL) {
     int i;
     for (i = 0; i < no; i ++) {
-      if (get_fogate(i) == NULL) {
-	set_fogate(i, output, pos);
+      if (get_fanout_gate(i) == NULL) {
+	set_fanout_gate(i, output, pos);
 	break;
       }
     }
     if (i >= no) {
-      fputs("init_fogate: ERROR!\n", stderr);
+      fputs("init_fanout_gate: ERROR!\n", stderr);
       exit(1);
     }
   }
@@ -283,7 +283,7 @@ BUF_gate_t::dump(FILE* fp) const
 {
   fputs(get_name(), fp);
   fputs(" = BUF(", fp);
-  fputs(get_figate(0)->get_name(), fp);
+  fputs(get_fanin_gate(0)->get_name(), fp);
   fputs(")\n", fp);
 }
 
@@ -299,7 +299,7 @@ NOT_gate_t::dump(FILE* fp) const
 {
   fputs(get_name(), fp);
   fputs(" = NOT(", fp);
-  fputs(get_figate(0)->get_name(), fp);
+  fputs(get_fanin_gate(0)->get_name(), fp);
   fputs(")\n", fp);
 }
 
@@ -341,11 +341,11 @@ AND_gate_t::dump(FILE* fp) const
   fputs(" = AND(", fp);
   for ( int i = 0; i < ni; i ++) {
     if (i > 0) fputs(", ", fp);
-    if (get_figate(i)->get_name()) {
-      fputs(get_figate(i)->get_name(), fp);
+    if (get_fanin_gate(i)->get_name()) {
+      fputs(get_fanin_gate(i)->get_name(), fp);
     }
     else {
-      get_figate(i)->dump(fp);
+      get_fanin_gate(i)->dump(fp);
     }
   }
   fputs(")\n", fp);
@@ -365,11 +365,11 @@ NAND_gate_t::dump(FILE* fp) const
   fputs(" = NAND(", fp);
   for ( int i = 0; i < ni; i ++) {
     if (i > 0) fputs(", ", fp);
-    if (get_figate(i)->get_name()) {
-      fputs(get_figate(i)->get_name(), fp);
+    if (get_fanin_gate(i)->get_name()) {
+      fputs(get_fanin_gate(i)->get_name(), fp);
     }
     else {
-      get_figate(i)->dump(fp);
+      get_fanin_gate(i)->dump(fp);
     }
   }
   fputs(")\n", fp);
@@ -389,11 +389,11 @@ OR_gate_t::dump(FILE* fp) const
   fputs(" = OR(", fp);
   for ( int i = 0; i < ni; i ++) {
     if (i > 0) fputs(", ", fp);
-    if (get_figate(i)->get_name()) {
-      fputs(get_figate(i)->get_name(), fp);
+    if (get_fanin_gate(i)->get_name()) {
+      fputs(get_fanin_gate(i)->get_name(), fp);
     }
     else {
-      get_figate(i)->dump(fp);
+      get_fanin_gate(i)->dump(fp);
     }
   }
   fputs(")\n", fp);
@@ -413,11 +413,11 @@ NOR_gate_t::dump(FILE* fp) const
   fputs(" = NOR(", fp);
   for ( int i = 0; i < ni; i ++) {
     if (i > 0) fputs(", ", fp);
-    if (get_figate(i)->get_name()) {
-      fputs(get_figate(i)->get_name(), fp);
+    if (get_fanin_gate(i)->get_name()) {
+      fputs(get_fanin_gate(i)->get_name(), fp);
     }
     else {
-      get_figate(i)->dump(fp);
+      get_fanin_gate(i)->dump(fp);
     }
   }
   fputs(")\n", fp);
@@ -437,11 +437,11 @@ XOR_gate_t::dump(FILE* fp) const
   fputs(" = XOR(", fp);
   for ( int i = 0; i < ni; i ++) {
     if (i > 0) fputs(", ", fp);
-    if (get_figate(i)->get_name()) {
-      fputs(get_figate(i)->get_name(), fp);
+    if (get_fanin_gate(i)->get_name()) {
+      fputs(get_fanin_gate(i)->get_name(), fp);
     }
     else {
-      get_figate(i)->dump(fp);
+      get_fanin_gate(i)->dump(fp);
     }
   }
   fputs(")\n", fp);
@@ -461,11 +461,11 @@ XNOR_gate_t::dump(FILE* fp) const
   fputs(" = XNOR(", fp);
   for ( int i = 0; i < ni; i ++) {
     if (i > 0) fputs(", ", fp);
-    if (get_figate(i)->get_name()) {
-      fputs(get_figate(i)->get_name(), fp);
+    if (get_fanin_gate(i)->get_name()) {
+      fputs(get_fanin_gate(i)->get_name(), fp);
     }
     else {
-      get_figate(i)->dump(fp);
+      get_fanin_gate(i)->dump(fp);
     }
   }
   fputs(")\n", fp);

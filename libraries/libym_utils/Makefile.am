@@ -5,8 +5,8 @@
 
 SUBDIRS = \
 	ym_utils \
-	$(YM_EXTRA_SUBDIRS) \
 	. \
+	$(YM_EXTRA_SUBDIRS) \
 	tests
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -30,18 +30,23 @@ libym_utils_la_CPPFLAGS = \
 
 libym_utils_la_SOURCES = \
 	Alloc.cc \
-	BinIO.cc \
 	Binder.cc \
 	CombiGen.cc \
+	CompBase.h \
+	CompBase.cc \
+	CompI.h \
+	CompO.h \
 	DlList.cc \
 	File.cc \
+	FileBuff.h \
+	FileBuff.cc \
 	FileInfo.h \
 	FileInfo.cc \
 	FileInfoMgr.h \
 	FileInfoMgr.cc \
-	FileScanner.cc \
 	FragAlloc.cc \
 	GenBase.cc \
+	IDO.cc \
 	ItvlCell.h \
 	ItvlMgrImpl.h \
 	ItvlMgrImpl.cc \
@@ -62,6 +67,7 @@ libym_utils_la_SOURCES = \
 	PoptMainApp.cc \
 	RandGen.cc \
 	RefCount.cc \
+	Scanner.cc \
 	SimpleAlloc.cc \
 	StrBuff.cc \
 	StrPool.h \
@@ -70,8 +76,12 @@ libym_utils_la_SOURCES = \
 	UnitAlloc.cc \
 	random.cc
 
+if YM_HAVE_ZLIB
+libym_utils_la_SOURCES += zstream.cc GzIDO.cc
+endif
+
 libym_utils_la_LIBADD = \
-	$(YM_EXTRA_LIBADD) \
 	@POPT_LIBS@
 
-libym_utils_la_LDFLAGS =
+libym_utils_la_LDFLAGS = \
+	-lz

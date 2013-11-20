@@ -118,7 +118,7 @@ LcLogicMgr::find_repfunc(const TvFuncM& f,
 			 TvFuncM& repfunc,
 			 NpnMapM& xmap)
 {
-  ymuint no = f.no();
+  ymuint no = f.output_num();
 
   if ( no == 1 ) {
     TvFunc f1 = f.output(VarId(0));
@@ -145,8 +145,8 @@ LcLogicMgr::find_idmap_list(const TvFuncM& func,
 {
   idmap_list.clear();
 
-  ymuint ni = func.ni();
-  ymuint no = func.no();
+  ymuint ni = func.input_num();
+  ymuint no = func.output_num();
   if ( no == 1 ) {
     NpnMap xmap1;
     TvFunc f1 = func.output(VarId(0));

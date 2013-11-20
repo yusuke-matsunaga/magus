@@ -13,7 +13,7 @@
  *
  * Revision 2.0  91/12/21  18:50:54  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.5  1991/10/05  08:18:18  yusuke
  * add Log and RCSid for RCS
  *
@@ -46,56 +46,56 @@ private:
   val3 fval;
   testpat_t* det_pat;
   FTYPE ftype;
-  
+
 public:
   pckval fpckval;
-  
+
   fault_t(val3 v,
 	  gate_t* gate,
 	  int ipos);
-  
+
   ~fault_t();
-  
+
   val3
   get_fval() const { return fval; }
-  
+
   void
   print(FILE* fp,
 	bool nl_sw = true) const;
-  
+
   FTYPE
   get_ftype() const { return ftype; }
-  
+
   bool
   is_undetected() const { return bool(ftype == FTYPE_U); }
-  
+
   bool
   is_detected() const { return bool(ftype == FTYPE_D); }
-  
+
   bool
   is_redundant() const { return bool(ftype == FTYPE_R); }
-  
+
   bool
   is_aborted() const { return bool(ftype == FTYPE_A); }
-  
+
   void
   set_undetected() { ftype = FTYPE_U; }
-  
+
   void
   set_detected(testpat_t* const pat) { ftype = FTYPE_D; det_pat = pat; }
-  
+
   void
   set_redundant() { ftype = FTYPE_R; }
-  
+
   void
   set_aborted() { ftype = FTYPE_A; }
-  
+
   gate_t*
   get_gate() const { return (gate_t*) gate; }
-  
+
   int
   get_ipos() const { return ipos; }
-  
+
   gate_t*
   get_input_gate() const
   {
@@ -103,39 +103,39 @@ public:
       return (gate_t*) gate;
     }
     else {
-      return gate->get_figate(ipos);
+      return gate->get_fanin_gate(ipos);
     }
   }
-  
+
   bool
   is_active() const { return gate->is_active(); }
-  
+
   bool
   chk_scope() const { return gate->chk_scope(); }
-  
+
   friend
   void
   fault_add(val3 v,
 	    gate_t* gate,
 	    int ipos);
-  
+
   friend
   void
   fault_sweep();
-  
+
   friend
   void
   fault_retryP();
-  
+
   friend
   void
   fault_retryD();
-  
+
   friend
   void
   fault_print(FILE* fp,
 	      FTYPE ftype);
-  
+
 };
 
 extern

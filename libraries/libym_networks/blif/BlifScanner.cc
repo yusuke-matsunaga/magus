@@ -25,7 +25,9 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-BlifScanner::BlifScanner()
+// @param[in] ido 入力データ
+BlifScanner::BlifScanner(IDO& ido) :
+  Scanner(ido)
 {
 }
 

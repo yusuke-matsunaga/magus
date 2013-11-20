@@ -21,7 +21,10 @@ MAINTAINERCLEANFILES = Makefile.in
 
 bin_PROGRAMS = \
 	rvgen \
-	tseconv
+	tseconv \
+	k_of_n_gen \
+	dist_sim \
+	phf_sim
 
 rvgen_SOURCES = \
 	rvgen.cc
@@ -39,4 +42,30 @@ tseconv_SOURCES = \
 
 tseconv_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	@POPT_LIBS@
+
+k_of_n_gen_SOURCES = \
+	k_of_n_gen.cc
+
+k_of_n_gen_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	@GMP_LIBS@ \
+	@POPT_LIBS@
+
+dist_sim_SOURCES = \
+	dist_sim.cc
+
+dist_sim_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	@GMP_LIBS@ \
+	@POPT_LIBS@
+
+phf_sim_SOURCES = \
+	phf_sim.cc
+
+phf_sim_LDADD = \
+	../libphf/libphf.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	@GMP_LIBS@ \
 	@POPT_LIBS@

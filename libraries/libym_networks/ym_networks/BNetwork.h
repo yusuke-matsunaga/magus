@@ -360,7 +360,7 @@ public:
 
   /// @brief ファンイン数を取り出す．
   ymuint
-  ni() const;
+  fanin_num() const;
 
   /// @brief i番目のファンインを取り出す．
   /// @note 範囲外の場合には 0 を返す．
@@ -483,13 +483,9 @@ private:
   void
   flags_clr_temp();
 
-  // 入力数を得る．
-  ymuint
-  flags_get_ni() const;
-
   // 入力数をセットする．
   void
-  flags_set_ni(ymuint ni);
+  flags_set_fanin_num(ymuint ni);
 
 
 private:
@@ -1311,9 +1307,9 @@ BNode::name() const
 // ファンイン数を取り出す．
 inline
 ymuint
-BNode::ni() const
+BNode::fanin_num() const
 {
-  return flags_get_ni();
+  return (mFlags >> kShiftNI);
 }
 
 // i番目のファンインを取り出す．範囲外の場合には 0 を返す．
@@ -1321,7 +1317,7 @@ inline
 BNode*
 BNode::fanin(ymuint pos) const
 {
-  return (pos < ni()) ? mFaninEdgeArray[pos].from() : 0;
+  return (pos < fanin_num()) ? mFaninEdgeArray[pos].from() : 0;
 }
 
 // i番めのファンインの枝を取り出す．範囲外の場合には 0 を返す．
@@ -1329,7 +1325,7 @@ inline
 BNodeEdge*
 BNode::fanin_edge(ymuint pos) const
 {
-  return (pos < ni()) ? &mFaninEdgeArray[pos] : 0;
+  return (pos < fanin_num()) ? &mFaninEdgeArray[pos] : 0;
 }
 
 // ファンアウト数を取り出す．
@@ -1454,18 +1450,10 @@ BNode::flags_clr_temp()
   mFlags &= ~kMaskTemp;
 }
 
-// ファンイン数を取り出す．
-inline
-ymuint
-BNode::flags_get_ni() const
-{
-  return (mFlags >> kShiftNI);
-}
-
 // 入力数をセットする．
 inline
 void
-BNode::flags_set_ni(ymuint ni)
+BNode::flags_set_fanin_num(ymuint ni)
 {
   mFlags &= kMaskNI;
   mFlags |= (ni << kShiftNI);

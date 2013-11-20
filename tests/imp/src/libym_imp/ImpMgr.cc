@@ -78,7 +78,7 @@ ImpMgr::set(const BNetwork& src_network)
        p != node_list.end(); ++ p) {
     const BNode* bnode = *p;
     ymuint id = bnode->id();
-    ymuint ni = bnode->ni();
+    ymuint ni = bnode->fanin_num();
     vector<ImpNodeHandle> fanins(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       const BNode* ibnode = bnode->fanin(i);

@@ -41,7 +41,7 @@ disp_sub(tDgEdge edge,
   if ( mark.count(node) == 0 ) {
     mark.insert(node);
     Bdd F = node->global_func();
-    size_t ni = node->ni();
+    size_t ni = node->input_num();
     for (size_t i = 0; i < col; ++ i) {
       s << " ";
     }
@@ -180,7 +180,7 @@ DgNode::mark_recur(int label_val)
 {
   if ( (mark() & label_val) == 0 ) {
     mark(label_val);
-    for (size_t i = 0; i < ni(); ++ i) {
+    for (size_t i = 0; i < input_num(); ++ i) {
       DgNode* inode = input_node(i);
       inode->mark_recur(label_val);
     }
@@ -194,7 +194,7 @@ DgNode::chdmark_recur()
   int val = chdmark();
   if ( val == 0 ) {
     val = mark();
-    for (size_t i = 0; i < ni(); ++ i) {
+    for (size_t i = 0; i < input_num(); ++ i) {
       DgNode* inode = input_node(i);
       val |= inode->chdmark_recur();
     }
@@ -220,7 +220,7 @@ DgNode::get_boundary(vector<DgNode*>& or_list,
       bmark(2);
       // 境界ノードの数．
       size_t c = 0;
-      for (size_t i = 0; i < ni(); ++ i) {
+      for (size_t i = 0; i < input_num(); ++ i) {
 	DgNode* inode = input_node(i);
 	int val1 = inode->get_boundary(or_list, xor_list);
 	if ( val1 == 1 ) {
@@ -246,7 +246,7 @@ DgNode::clear_mark()
 {
   if ( mWork != 0 ) {
     mWork = 0;
-    for (size_t i = 0; i < ni(); ++ i) {
+    for (size_t i = 0; i < input_num(); ++ i) {
       DgNode* inode = input_node(i);
       inode->clear_mark();
     }

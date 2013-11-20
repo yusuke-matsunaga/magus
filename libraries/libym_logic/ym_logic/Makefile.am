@@ -4,7 +4,7 @@
 
 SUBDIRS =
 
-INCLUDES =
+AM_CPPFLAGS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -36,6 +36,10 @@ noinst_HEADERS = \
 	SatMsgHandler.h \
 	SatSolver.h \
 	SatStats.h \
+	SmtFun.h \
+	SmtFunValidator.h \
+	SmtSolver.h \
+	SmtVar.h \
 	TvFunc.h \
 	TvFuncM.h \
 	bdd_nsdef.h \
@@ -44,4 +48,5 @@ noinst_HEADERS = \
 	logicpy.h \
 	npn_nsdef.h \
 	sat_nsdef.h \
+	smt_nsdef.h \
 	zdd_nsdef.h

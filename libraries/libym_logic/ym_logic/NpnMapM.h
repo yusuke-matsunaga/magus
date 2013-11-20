@@ -13,8 +13,8 @@
 #include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
 #include "ym_logic/NpnVmap.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_NPN
@@ -128,11 +128,11 @@ public:
   /// @brief 入力数を得る．
   /// @return 入力数
   ymuint
-  ni() const;
+  input_num() const;
 
   /// @brief 出力数を得る．
   ymuint
-  no() const;
+  output_num() const;
 
   /// @brief 入力の変換情報の取得
   /// @param[in] var 入力番号
@@ -173,10 +173,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入力数
-  ymuint32 mNi;
+  ymuint32 mInputNum;
 
   // 出力数
-  ymuint32 mNo;
+  ymuint32 mOutputNum;
 
   // 入力と出力のマッピング情報
   NpnVmap* mMapArray;
@@ -220,8 +220,8 @@ operator<<(ostream& s,
 /// @param[in] s 出力ストリーム
 /// @param[in] map 変換マップ
 /// @return s
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const NpnMapM& map);
 
 /// @relates NpnMapM
@@ -229,8 +229,8 @@ operator<<(BinO& s,
 /// @param[in] s 入力ストリーム
 /// @param[out] map 結果を格納する変数
 /// @return s
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   NpnMapM& map);
 
 
@@ -241,17 +241,17 @@ operator>>(BinI& s,
 // 入力数を得る．
 inline
 ymuint
-NpnMapM::ni() const
+NpnMapM::input_num() const
 {
-  return mNi;
+  return mInputNum;
 }
 
 // @brief 出力数を得る．
 inline
 ymuint
-NpnMapM::no() const
+NpnMapM::output_num() const
 {
-  return mNo;
+  return mOutputNum;
 }
 
 // var に対応するマッピング情報を得る．
@@ -260,7 +260,7 @@ NpnVmap
 NpnMapM::imap(VarId var) const
 {
   ymuint idx = var.val();
-  if ( idx < ni() ) {
+  if ( idx < input_num() ) {
     return mMapArray[idx];
   }
   return NpnVmap::invalid();
@@ -277,8 +277,8 @@ NpnVmap
 NpnMapM::omap(VarId var) const
 {
   ymuint idx = var.val();
-  if ( idx < no() ) {
-    return mMapArray[idx + ni()];
+  if ( idx < output_num() ) {
+    return mMapArray[idx + input_num()];
   }
   return NpnVmap::invalid();
 }

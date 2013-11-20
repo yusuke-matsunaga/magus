@@ -11,15 +11,10 @@
 #include "ym_utils/PoptMainApp.h"
 #include "RvMgr.h"
 #include "RegVect.h"
-
-#include "VarFunc.h"
+#include "FuncVect.h"
 #include "PhfGen.h"
-
-#include "Variable.h"
-#include "IguGen.h"
-#include "ym_utils/CombiGen.h"
-#include "ym_utils/RandGen.h"
-#include "ym_utils/RandCombiGen.h"
+#include "RandHashGen.h"
+#include "InputFunc.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -30,15 +25,20 @@ phf(int argc,
 {
   PoptMainApp app;
 
+  // xor オプション
+  PoptUint popt_xor("xor", 'x',
+		    "specify XOR complexity", "<INT>");
+  app.add_option(&popt_xor);
+
   // m オプション
   PoptUint popt_m("mult", 'm',
 		  "specify the number of hash functions", "<INT>");
   app.add_option(&popt_m);
 
-  // p オプション
-  PoptUint popt_p(NULL, 'p',
-		  "specify the number of inputs", "<INT>");
-  app.add_option(&popt_p);
+  // d オプション
+  PoptNone popt_d("display", 'd',
+		  "display the result");
+  app.add_option(&popt_d);
 
   // count オプション
   PoptUint popt_count("count", 'c',
@@ -53,17 +53,19 @@ phf(int argc,
     return -1;
   }
 
+  ymuint32 comp = 1;
+  if ( popt_xor.is_specified() ) {
+    comp = popt_xor.val();
+  }
+
   ymuint32 m = 2;
   if ( popt_m.is_specified() ) {
     m = popt_m.val();
   }
 
-  ymuint32 p = 0;
-  if ( popt_p.is_specified() ) {
-    p = popt_p.val();
-  }
+  bool disp = popt_d.is_specified();
 
-  ymuint32 count_limit = 10000;
+  ymuint32 count_limit = 1000;
   if ( popt_count.is_specified() ) {
     count_limit = popt_count.val();
   }
@@ -92,51 +94,67 @@ phf(int argc,
 
   ymuint n = rvmgr.vect_size();
 
-  RandGen rg;
-  for (ymuint count = 0; count < count_limit; ++ count) {
-    RandCombiGen rpg2(n, p);
-    vector<const InputFunc*> func_list(m);
-    for (ymuint i = 0; i < m; ++ i) {
-      rpg2.generate(rg);
-      vector<ymuint> f1_vect(p);
-      for (ymuint k = 0; k < p; ++ k) {
-	f1_vect[k] = rpg2.elem(k);
-      }
-      VarFunc* f = new VarFunc(f1_vect);
-      func_list[i] = f;
+  ymuint p = rvmgr.index_size();
+  {
+    for (ymuint tmp_m = 1; tmp_m < m; ) {
+      -- p;
+      tmp_m <<= 1;
     }
+  }
 
-    PhfGen phfgen;
-
-    const vector<RegVect*>& vlist = rvmgr.vect_list();
-    ymuint np = 1U << p;
-    vector<vector<ymuint32>* > g_list(m);
-    for (ymuint i = 0; i < m; ++ i) {
-      g_list[i] = new vector<ymuint32>(np, 0U);
-    }
-    bool stat = phfgen.mapping(vlist, func_list, g_list);
-    if ( stat ) {
+  RandHashGen rhg;
+  for (bool found = false; !found ; ++ p) {
+    for (ymuint count = 0; count < count_limit; ++ count) {
+      const vector<const RegVect*>& vlist = rvmgr.vect_list();
       ymuint nv = vlist.size();
-      for (ymuint i = 0; i < nv; ++ i) {
-	RegVect* rv = vlist[i];
-	cout << "#" << i << ": ";
-	const char* comma = "";
-	ymuint32 val = 0;
-	for (ymuint j = 0; j < m; ++ j) {
-	  const InputFunc& f1 = *func_list[j];
-	  vector<ymuint32>& g1 = *g_list[j];
-	  ymuint32 v1 = f1.eval(rv);
-	  cout << comma << setw(6) << v1 << " = " << g1[v1];
-	  val ^= g1[v1];
-	  comma = ", ";
+      ymuint exp_p = 1U << p;
+
+      vector<const FuncVect*> func_list(m);
+      for (ymuint i = 0; i < m; ++ i) {
+	InputFunc* f = rhg.gen_func(n, p, comp);
+	FuncVect* fv = new FuncVect(nv, exp_p);
+	func_list[i] = fv;
+	for (ymuint v = 0; v < nv; ++ v) {
+	  const RegVect* rv = vlist[v];
+	  fv->set_val(v, f->eval(rv));
 	}
-	cout << ": " << val << endl;
+	delete f;
       }
-      break;
-    }
-    for (ymuint i = 0; i < m; ++ i) {
-      delete func_list[i];
-      delete g_list[i];
+
+      PhfGen phfgen;
+
+      vector<vector<ymuint32> > g_list(m);
+      bool stat = phfgen.mapping(func_list, g_list);
+      if ( stat ) {
+	found = true;
+	cout << "p = " << p << endl;
+	ymuint q = rvmgr.index_size();
+	cout << "Total memory size = "
+	     << (exp_p * q * m + vlist.size() * n) << endl;
+	if ( disp ) {
+	  ymuint nv = vlist.size();
+	  for (ymuint i = 0; i < nv; ++ i) {
+	    cout << "#" << i << ": ";
+	    const char* comma = "";
+	    ymuint32 val = 0;
+	    for (ymuint j = 0; j < m; ++ j) {
+	      const FuncVect& f1 = *func_list[j];
+	      vector<ymuint32>& g1 = g_list[j];
+	      ymuint32 v1 = f1.val(i);
+	      cout << comma << setw(6) << v1 << " = " << g1[v1];
+	      val ^= g1[v1];
+	      comma = ", ";
+	    }
+	    cout << ": " << val << endl;
+	  }
+	}
+      }
+      for (ymuint i = 0; i < m; ++ i) {
+	delete func_list[i];
+      }
+      if ( stat ) {
+	break;
+      }
     }
   }
 

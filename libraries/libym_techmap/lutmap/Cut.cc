@@ -78,7 +78,7 @@ Cut::expr() const
   }
 
   hash_map<ymuint, LogExpr> logmap;
-  for (ymuint i = 0; i < ni(); i ++) {
+  for (ymuint i = 0; i < input_num(); i ++) {
     const BdnNode* node = mInputs[i];
     ymuint id = node->id();
     logmap.insert(make_pair(id, LogExpr::make_posiliteral(VarId(i))));
@@ -96,7 +96,7 @@ Cut::dump(ostream& s) const
   else {
     s << "Node[" << root()->id() << "] : ";
     string comma = "";
-    for (ymuint i = 0; i < ni(); i ++) {
+    for (ymuint i = 0; i < input_num(); i ++) {
       const BdnNode* node = mInputs[i];
       s << comma << "Node[" << node->id() << "]";
       comma = ", ";

@@ -28,8 +28,8 @@ LogExpr
 xform_expr(const LogExpr& expr,
 	   const NpnMapM& map)
 {
-  ymuint ni = map.ni();
-  ymuint no = map.no();
+  ymuint ni = map.input_num();
+  ymuint no = map.output_num();
   assert_cond( no == 1, __FILE__, __LINE__);
   VarLogExprMap vlm;
   for (ymuint i = 0; i < ni; ++ i) {
@@ -308,7 +308,7 @@ LibComp::reg_expr(const LogExpr& expr,
   // fclass->rep_func() を用いる理由は論理式に現れる変数が
   // 真のサポートとは限らないから
 
-  ymuint ni = fclass->repfunc().ni();
+  ymuint ni = fclass->repfunc().input_num();
 
   if ( ni <= 1 ) {
     // 定数関数およびバッファ，インバータは別に処理する．

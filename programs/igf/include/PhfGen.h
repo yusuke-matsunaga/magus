@@ -14,10 +14,6 @@
 
 BEGIN_NAMESPACE_YM_IGF
 
-class InputFunc;
-class PhfNode;
-class PhfEdge;
-
 //////////////////////////////////////////////////////////////////////
 /// @class PhfGen PhfGen.h "PhfGen.h"
 /// @brief PHF を作るクラス
@@ -39,42 +35,25 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief マッピングを求める．
+  /// @param[in] func_list 関数のリスト
+  /// @param[out] g_list マッピングのリスト
   bool
-  mapping(const vector<RegVect*>& vector_list,
-	  const vector<const InputFunc*>& f_list,
-	  vector<vector<ymuint32>* >& g_list);
+  mapping(const vector<const FuncVect*>& func_list,
+	  vector<vector<ymuint32> >& g_list);
 
+  /// @brief collision free 分割を行う．
+  /// @param[in] func_list 関数のリスト
+  /// @param[out] block_map 分割を表す配列
+  bool
+  cf_partition(const vector<const FuncVect*>& func_list,
+	       vector<ymuint>& block_map);
 
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 下請け関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ノードを枝を開放する．
-  void
-  clear();
-
-  /// @brief ノードを生成する．
-  PhfNode*
-  new_node(ymuint32 pat);
-
-  /// @brief 枝を生成する．
-  PhfEdge*
-  new_edge(ymuint id,
-	   const vector<PhfNode*>& node_list,
-	   ymuint32 val);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 生成したノードを入れておくリスト
-  vector<PhfNode*> mNodeList;
-
-  // 生成した枝を入れておくリスト
-  vector<PhfEdge*> mEdgeList;
+  /// @brief displace_decomposition を行う．
+  bool
+  displace_decomposition(const FuncVect* func1,
+			 const FuncVect* func2,
+			 vector<ymuint>& displace_map,
+			 bool use_xor);
 
 };
 

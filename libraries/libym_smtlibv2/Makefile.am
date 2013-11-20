@@ -4,7 +4,9 @@
 
 SUBDIRS = \
 	ym_smtlibv2 \
+	include \
 	parser \
+	shell \
 	. \
 	tests
 
@@ -17,7 +19,8 @@ noinst_LTLIBRARIES = libym_smtlibv2.la
 libym_smtlibv2_la_SOURCES =
 
 libym_smtlibv2_la_LIBADD = \
-	parser/libym_smt_parser.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	shell/libym_smt_shell.la \
+	parser/libym_smt_parser.la
 
-libym_smtlibv2_la_LDFLAGS =
+libym_smtlibv2_la_LDFLAGS = \
+	-lreadline -lncurses

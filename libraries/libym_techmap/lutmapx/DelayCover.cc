@@ -157,7 +157,7 @@ DelayCover::record(const BdnNode* node)
   for (CutListIterator p = cut_list.begin();
        p != cut_list.end(); ++ p) {
     const Cut* cut = *p;
-    ymuint ni = cut->ni();
+    ymuint ni = cut->input_num();
 
     if ( mMode & 1 ) {
       // ファンアウトモード
@@ -232,7 +232,7 @@ DelayCover::calc_weight(const BdnNode* node,
 			double cur_weight)
 {
   for ( ; ; ) {
-    for (ymuint i = 0; i < cut->ni(); ++ i) {
+    for (ymuint i = 0; i < cut->input_num(); ++ i) {
       if ( cut->input(i) == node ) {
 	if  ( !node->pomark() ) {
 	  mWeight[i] += cur_weight;
@@ -270,7 +270,7 @@ DelayCover::select(const BdnNode* node,
   assert_cond(cut, __FILE__, __LINE__);
   maprec.set_cut(node, cut);
   -- rd;
-  for (ymuint i = 0; i < cut->ni(); ++ i) {
+  for (ymuint i = 0; i < cut->input_num(); ++ i) {
     const BdnNode* inode = cut->input(i);
     NodeInfo& u = mNodeInfo[inode->id()];
     if ( u.mReqDepth == 0 || u.mReqDepth > rd ) {

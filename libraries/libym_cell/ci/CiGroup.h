@@ -12,8 +12,8 @@
 #include "ym_cell/CellGroup.h"
 #include "ym_logic/NpnMapM.h"
 #include "ym_utils/Alloc.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -235,14 +235,14 @@ public:
   /// @brief バイナリダンプを行う．
   /// @param[in] bos 出力先のストリーム
   void
-  dump(BinO& bos) const;
+  dump(ODO& bos) const;
 
   /// @brief バイナリファイルを読み込む．
   /// @param[in] bis 入力元のストリーム
   /// @param[in] library セルライブラリ
   /// @param[in] alloc メモリアロケータ
   void
-  restore(BinI& bis,
+  restore(IDO& bis,
 	  CellLibrary& library,
 	  Alloc& alloc);
 

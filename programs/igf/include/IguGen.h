@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM_IGF
 
+class VectSetList;
+
 //////////////////////////////////////////////////////////////////////
 /// @class IguGen IguGen.h "IguGen.h"
 /// @brief IGU の入力を求めるクラス
@@ -34,24 +36,24 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ベクタのリストをセットする．
+  void
+  set_vector_list(const vector<const RegVect*>& vector_list);
+
   /// @brief 変数を求める．
-  /// @param[in] vector_list ベクタのリスト
   /// @param[in] multi 多重度
   /// @param[in] variable_list 変数のリスト
   /// @param[in] best_so_far 今までに求められている最適解
   /// @param[in] solution 解として選ばれた変数を格納するリスト
   void
-  solve(const vector<RegVect*>& vector_list,
-	ymuint multi,
-	const vector<Variable*>& variable_list,
+  solve(ymuint multi,
+	const vector<const Variable*>& variable_list,
 	ymuint best_so_far,
-	vector<Variable*>& solution);
+	vector<const Variable*>& solution);
 
-  /// @brief 分岐制限を設定する．
-  /// @param[in] limit 分岐制限
-  /// @note limit = 0 の場合には制限なし
+  /// @brief 再帰呼び出しの回数制限を設定する．
   void
-  set_branch_limit(ymuint limit);
+  set_recur_limit(ymuint limit);
 
   /// @brief 時間制限を設定する．
   /// @param[in] limit_min 制限の分の部分
@@ -80,8 +82,8 @@ public:
   /// @param[in] var_end 使用可能な変数のリストの末尾の反復子
   void
   solve_recur(const VectSetList& vector_list,
-	      vector<Variable*>::const_iterator var_begin,
-	      vector<Variable*>::const_iterator var_end);
+	      vector<const Variable*>::const_iterator var_begin,
+	      vector<const Variable*>::const_iterator var_end);
 
   /// @brief 下界を計算する．
   /// @param[in] num 要素数
@@ -97,20 +99,32 @@ private:
   // 多重度
   ymuint32 mMulti;
 
+  // 現在のビットベクタ長
+  ymuint32 mVectorLength;
+
+  // 現在のベクターリスト
+  vector<const RegVect*> mVectorList;
+
   // 現時点の最適値
   ymuint32 mBestSoFar;
 
   // mBestSorFar がセットされた．
   bool mBeforeHasSolution;
 
+  // mBestSoFar が更新されていない回数
+  ymuint32 mNoChangeCount;
+
+  // mNoChangeCount の制限値
+  ymuint32 mNoChangeLimit;
+
+  // mNoChangeCount の最大値
+  ymuint32 mMaxNoChangeCount;
+
   // 現時点の解
-  vector<Variable*> mSolutionSoFar;
+  vector<const Variable*> mSolutionSoFar;
 
   // 現時点で選ばれている変数のリスト
-  vector<Variable*> mSelectedVariables;
-
-  // いくつの分岐を試すかを制御するパラメータ
-  ymuint32 mBranchLimit;
+  vector<const Variable*> mSelectedVariables;
 
   // 順序づけのヒューリスティック
   ymuint32 mOrderingMode;
