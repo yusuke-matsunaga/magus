@@ -115,7 +115,7 @@ mk_autogen() {
     esac
 
     if test "x$AUTOGEN_COMMON" = x; then
-	AUTOGEN_COMMON=/dev/null
+	AUTOGEN_COMMON="../autogen.common"
     fi
 
     sed -e s!__YM__SRC__DIRECTORY__!$srcdir! \
