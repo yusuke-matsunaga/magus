@@ -125,13 +125,13 @@ AC_ARG_ENABLE([$1],
 ym_tmp_enable=${ym_[]$1[]_enable}
 m4_ifval([$3], [
     m4_foreach([XXX], [$3], [
-       if test "$ym_tmp_enable" = "1" -a "$XXX" != "1"; then
-           ym_tmp_enable=0
+       if test "$ym_tmp_enable" = "yes" -a "$XXX" != "yes"; then
+           ym_tmp_enable=no
 	   AC_MSG_NOTICE(['$1' will be disabled because 'XXX' is disabled])
        fi
     ])
 ])
-if test "$ym_tmp_enable" = "1"; then
+if test "$ym_tmp_enable" = "yes"; then
     YM_ADD_LIBRARIES_SUBDIRS([$1])
     AC_CONFIG_SUBDIRS([libraries/$1])
     AC_MSG_NOTICE(['$1' is enabled])
