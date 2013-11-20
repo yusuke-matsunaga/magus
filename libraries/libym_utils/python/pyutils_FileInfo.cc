@@ -3,7 +3,7 @@
 /// @brief FileInfo の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -12,7 +12,7 @@
 #include "ym_utils/FileLoc.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -71,16 +71,15 @@ FileInfo_init(FileInfoObject* self,
   // - (string, FileLoc)
   char* filename = NULL;
   PyObject* obj1 = NULL;
-  if ( !PyArg_ParseTuple(args, "|sO!", &filename, &FileLocType, &obj1) ) {
+  if ( !PyArg_ParseTuple(args, "|sO!",
+			 &filename,
+			 &PyFileLoc_Type, &obj1) ) {
     return -1;
   }
 
   if ( obj1 != NULL ) {
     assert_cond( filename != NULL, __FILE__, __LINE__);
-    FileLoc parent_loc;
-    if ( !conv_from_pyobject(obj1, parent_loc) ) {
-      return -1;
-    }
+    FileLoc parent_loc = PyFileLoc_AsFileLoc(obj1);
     self->mFileInfo = FileInfo(filename, parent_loc);
   }
   else if ( filename != NULL ) {
@@ -99,7 +98,7 @@ FileInfo_str(FileInfoObject* self)
 {
   ostringstream buf;
   buf << self->mFileInfo;
-  return conv_to_pyobject(buf.str());
+  return PyObject_FromString(buf.str());
 }
 
 // is_valid 関数
@@ -107,7 +106,7 @@ PyObject*
 FileInfo_is_valid(FileInfoObject* self,
 		  PyObject* args)
 {
-  return conv_to_pyobject(self->mFileInfo.is_valid());
+  return PyObject_FromBool(self->mFileInfo.is_valid());
 }
 
 // id 関数
@@ -115,7 +114,7 @@ PyObject*
 FileInfo_id(FileInfoObject* self,
 	    PyObject* args)
 {
-  return conv_to_pyobject(self->mFileInfo.id());
+  return PyObject_FromYmuint32(self->mFileInfo.id());
 }
 
 // filename 関数
@@ -123,7 +122,7 @@ PyObject*
 FileInfo_filename(FileInfoObject* self,
 		  PyObject* args)
 {
-  return conv_to_pyobject(self->mFileInfo.filename());
+  return PyObject_FromString(self->mFileInfo.filename());
 }
 
 // parent_loc 関数
@@ -131,7 +130,7 @@ PyObject*
 FileInfo_parent_loc(FileInfoObject* self,
 		    PyObject* args)
 {
-  return FileLoc_FromFileLoc(self->mFileInfo.parent_loc());
+  return PyFileLoc_FromFileLoc(self->mFileInfo.parent_loc());
 }
 
 // parent_loc_list 関数
@@ -147,7 +146,7 @@ FileInfo_parent_loc_list(FileInfoObject* self,
   ymuint i = 0;
   for (list<FileLoc>::iterator p = loc_list.begin();
        p != loc_list.end(); ++ p, ++ i) {
-    PyObject* obj = FileLoc_FromFileLoc(*p);
+    PyObject* obj = PyFileLoc_FromFileLoc(*p);
     PyList_SetItem(obj, i, obj);
   }
   return ans_list;
@@ -175,7 +174,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // FileInfoObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject FileInfoType = {
+PyTypeObject PyFileInfo_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -226,34 +225,12 @@ PyTypeObject FileInfoType = {
 // PyObject と FileInfo 間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から FileInfo を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj FileInfo を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が FileInfoObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   FileInfo& obj)
-{
-  // 型のチェック
-  if ( !FileInfoObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  FileInfoObject* fileinfo_obj = (FileInfoObject*)py_obj;
-
-  obj = fileinfo_obj->mFileInfo;
-
-  return true;
-}
-
 // @brief FileInfo から PyObject を生成する．
 // @param[in] obj FileInfo オブジェクト
 PyObject*
-FileInfo_FromFileInfo(const FileInfo& obj)
+PyFileInfo_FromFileInfo(const FileInfo& obj)
 {
-  FileInfoObject* py_obj = FileInfo_new(&FileInfoType);
+  FileInfoObject* py_obj = FileInfo_new(&PyFileInfo_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -264,17 +241,36 @@ FileInfo_FromFileInfo(const FileInfo& obj)
   return (PyObject*)py_obj;
 }
 
+// @brief PyObject から FileInfo を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return FileInfo を返す．
+// @note 変換が失敗したら TypeError を送出し，不正な値を返す．
+FileInfo
+PyFileInfo_AsFileInfo(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyFileInfo_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.FileInfo is expected");
+    return FileInfo();
+  }
+
+  // 強制的にキャスト
+  FileInfoObject* fileinfo_obj = (FileInfoObject*)py_obj;
+
+  return fileinfo_obj->mFileInfo;
+}
+
 // FileInfoObject 関係の初期化を行う．
 void
 FileInfoObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&FileInfoType) < 0 ) {
+  if ( PyType_Ready(&PyFileInfo_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録を行う．
-  PyModule_AddObject(m, "FileInfo", (PyObject*)&FileInfoType);
+  PyModule_AddObject(m, "FileInfo", (PyObject*)&PyFileInfo_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

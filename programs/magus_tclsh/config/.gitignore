@@ -10,3 +10,4 @@ config.guess
 config.sub
 depcomp
 ylwrap
+compile

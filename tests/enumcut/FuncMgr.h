@@ -11,8 +11,8 @@
 
 #include "ym_networks/bdn.h"
 #include "ym_logic/TvFunc.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -60,6 +60,15 @@ public:
   func_list(ymuint ni,
 	    vector<TvFunc>& func_list) const;
 
+  /// @brief 代表関数のリストを取り出す．
+  void
+  rep_func_list(vector<TvFunc>& func_list) const;
+
+  /// @brief 指定された入力数の代表関数のリストを取り出す．
+  void
+  rep_func_list(ymuint ni,
+		vector<TvFunc>& func_list) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -69,16 +78,16 @@ public:
   /// @brief 内容をバイナリダンプする．
   /// @param[in] s 出力先のストリーム
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief 代表関数のみをバイナリダンプする．
   /// @param[in] s 出力先のストリーム
   void
-  dump_rep(BinO& s) const;
+  dump_rep(ODO& s) const;
 
   /// @brief バイナリダンプされたファイルを読み込む．
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 private:
@@ -127,6 +136,9 @@ private:
 
   // ハッシュ表
   FuncData** mTable;
+
+  // 代表関数のハッシュ
+  hash_set<TvFunc> mRepHash;
 
 };
 

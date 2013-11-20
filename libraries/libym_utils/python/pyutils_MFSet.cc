@@ -11,7 +11,7 @@
 #include "ym_utils/MFSet.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -68,7 +68,7 @@ MFSet_init(MFSetObject* self,
   // 引数の形式は
   // - (uint)
   ymuint n;
-  if ( !PyArg_ParseTuple(args, "k", &n) ) {
+  if ( !PyArg_ParseTuple(args, "I", &n) ) {
     return NULL;
   }
 
@@ -89,7 +89,7 @@ MFSet_find(MFSetObject* self,
   // 引数の形式は
   // - (uint)
   ymuint x;
-  if ( !PyArg_ParseTuple(args, "k", &x) ) {
+  if ( !PyArg_ParseTuple(args, "I", &x) ) {
     return NULL;
   }
 
@@ -99,7 +99,7 @@ MFSet_find(MFSetObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(y);
+  return PyObject_FromYmuint32(y);
 }
 
 // merge 関数
@@ -111,7 +111,7 @@ MFSet_merge(MFSetObject* self,
   // - (uint, uint)
   ymuint x;
   ymuint y;
-  if ( !PyArg_ParseTuple(args, "ii", &x, &y) ) {
+  if ( !PyArg_ParseTuple(args, "II", &x, &y) ) {
     return NULL;
   }
 
@@ -122,7 +122,7 @@ MFSet_merge(MFSetObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(z);
+  return PyObject_FromYmuint32(z);
 }
 
 
@@ -158,7 +158,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // MFSetObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject MFSetType = {
+PyTypeObject PyMFSet_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -245,38 +245,35 @@ PyTypeObject MFSetType = {
 // PyObject と MFSet の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から MFSet を取り出す．
+// @brief PyObject から MFSet へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] obj MFSet を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が MFSetObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   MFSet*& p_obj)
+// @return MFSet へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+MFSet*
+PyMFSet_AsMFSetPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !MFSetObject_Check(py_obj) ) {
-    return false;
+  if ( !PyMFSet_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.MFSet is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   MFSetObject* my_obj = (MFSetObject*)py_obj;
 
-  p_obj = my_obj->mBody;
-
-  return true;
+  return my_obj->mBody;
 }
 
 // MFSetObject 関係の初期化を行う．
 void
 MFSetObject_init(PyObject* m)
 {
-  if ( PyType_Ready(&MFSetType) < 0 ) {
+  if ( PyType_Ready(&PyMFSet_Type) < 0 ) {
     return;
   }
 
   // タイプモジュールの登録を行う．
-  PyModule_AddObject(m, "MFSet", (PyObject*)&MFSetType);
+  PyModule_AddObject(m, "MFSet", (PyObject*)&PyMFSet_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

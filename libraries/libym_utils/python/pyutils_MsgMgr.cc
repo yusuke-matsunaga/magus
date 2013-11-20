@@ -3,7 +3,7 @@
 /// @brief MsgMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,7 +13,7 @@
 #include "PyMsgHandler.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -34,7 +34,7 @@ struct MsgMgrObject
 
 // 唯一のオブジェクト
 MsgMgrObject Py_kMsgMgrStruct = {
-  PyObject_HEAD_INIT(&MsgMgrType)
+  PyObject_HEAD_INIT(&PyMsgMgr_Type)
   NULL
 };
 
@@ -69,8 +69,8 @@ MsgMgr_reg_handler(PyTypeObject* type,
 		   PyObject* args)
 {
   PyObject* obj = NULL;
-  ymuint32 mask = kMaskAll;
-  if ( !PyArg_ParseTuple(args, "O|k", &obj, &mask) ) {
+  ymuint mask = kMaskAll;
+  if ( !PyArg_ParseTuple(args, "O|I", &obj, &mask) ) {
     return NULL;
   }
 
@@ -148,21 +148,14 @@ MsgMgr_put_msg(PyTypeObject* type_obj,
   char* msg;
   if ( !PyArg_ParseTuple(args, "siO!O!ss",
 			 &src_file, &src_line,
-			 &FileRegionType, &obj1,
-			 &MsgTypeType, &obj2,
+			 &PyFileRegion_Type, &obj1,
+			 &PyMsgType_Type, &obj2,
 			 &label, &msg) ) {
     return NULL;
   }
 
-  FileRegion fr;
-  if ( !conv_from_pyobject(obj1, fr) ) {
-    return NULL;
-  }
-
-  tMsgType type;
-  if ( !conv_from_pyobject(obj2, type) ) {
-    return NULL;
-  }
+  FileRegion fr = PyFileRegion_AsFileRegion(obj1);
+  tMsgType type = PyMsgType_AsMsgType(obj2);
 
   MsgMgr::put_msg(src_file, src_line, fr, type, label, msg);
 
@@ -204,7 +197,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // MsgMgrObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject MsgMgrType = {
+PyTypeObject PyMsgMgr_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -292,12 +285,12 @@ void
 MsgMgrObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&MsgMgrType) < 0 ) {
+  if ( PyType_Ready(&PyMsgMgr_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "MsgMgr", (PyObject*)&MsgMgrType);
+  PyModule_AddObject(m, "MsgMgr", (PyObject*)&PyMsgMgr_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

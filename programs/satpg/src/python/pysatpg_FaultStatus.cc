@@ -11,7 +11,7 @@
 #include "FaultStatus.h"
 
 
-BEGIN_NAMESPACE_YM_PYSATPG
+BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
@@ -43,39 +43,30 @@ PyObject* Py_kFsDetected;
 // kFsUntestable を表すオブジェクト
 PyObject* Py_kFsUntestable;
 
-// kFsPartiallyUntestable を表すオブジェクト
-PyObject* Py_kFsPartiallyUntestable;
-
 // kFsAborted を表すオブジェクト
 PyObject* Py_kFsAborted;
 
 // Py_kFsUndetected の実体
 FaultStatusObject Py_kFsUndetectedStruct = {
-  PyObject_HEAD_INIT(&FaultStatusType)
+  PyObject_HEAD_INIT(&PyFaultStatus_Type)
   kFsUndetected
 };
 
 // Py_kFsDetected の実体
 FaultStatusObject Py_kFsDetectedStruct = {
-  PyObject_HEAD_INIT(&FaultStatusType)
+  PyObject_HEAD_INIT(&PyFaultStatus_Type)
   kFsDetected
 };
 
 // Py_kFsUntestable の実体
 FaultStatusObject Py_kFsUntestableStruct = {
-  PyObject_HEAD_INIT(&FaultStatusType)
+  PyObject_HEAD_INIT(&PyFaultStatus_Type)
   kFsUntestable
-};
-
-// Py_kFsPartiallyUntestable の実体
-FaultStatusObject Py_kFsPartiallyUntestableStruct = {
-  PyObject_HEAD_INIT(&FaultStatusType)
-  kFsPartiallyUntestable
 };
 
 // Py_kFsAborted の実体
 FaultStatusObject Py_kFsAbortedStruct = {
-  PyObject_HEAD_INIT(&FaultStatusType)
+  PyObject_HEAD_INIT(&PyFaultStatus_Type)
   kFsAborted
 };
 
@@ -83,7 +74,6 @@ FaultStatusObject Py_kFsAbortedStruct = {
 PyObject* Py_kFsUndetectedString = NULL;
 PyObject* Py_kFsDetectedString = NULL;
 PyObject* Py_kFsUntestableString = NULL;
-PyObject* Py_kFsPartiallyUntestableString = NULL;
 PyObject* Py_kFsAbortedString = NULL;
 
 
@@ -99,7 +89,7 @@ FaultStatus_new(PyTypeObject* type,
 {
   // 引数は
   // - ()
-  // - (str) {"undetected"|"detected"|"untestable"|"parially untestable"|"aborted"}
+  // - (str) {"undetected"|"detected"|"untestable"|"skipped"|"aborted"}
   ymuint n = PyTuple_GET_SIZE(args);
   if ( n == 0 ) {
     // デフォルトは kFsUndetected
@@ -110,7 +100,7 @@ FaultStatus_new(PyTypeObject* type,
     PyObject* obj = PyTuple_GET_ITEM(args, 0);
     if ( PyString_Check(obj) ) {
       char* str = PyString_AsString(obj);
-      return (FaultStatusObject*)FaultStatus_FromString(str);
+      return (FaultStatusObject*)PyFaultStatus_FromString(str);
     }
   }
 }
@@ -119,16 +109,18 @@ FaultStatus_new(PyTypeObject* type,
 PyObject*
 FaultStatus_repr(FaultStatusObject* self)
 {
+  PyObject* result = NULL;
   switch ( self->mVal ) {
-  case kFsUndetected:          return Py_kFsUndetectedString;
-  case kFsDetected:            return Py_kFsDetectedString;
-  case kFsUntestable:          return Py_kFsUntestableString;
-  case kFsPartiallyUntestable: return Py_kFsPartiallyUntestableString;
-  case kFsAborted:             return Py_kFsAbortedString;
-  default: break;
+  case kFsUndetected: result = Py_kFsUndetectedString; break;
+  case kFsDetected:   result = Py_kFsDetectedString; break;
+  case kFsUntestable: result = Py_kFsUntestableString; break;
+  case kFsAborted:    result = Py_kFsAbortedString; break;
+  default:
+    assert_not_reached(__FILE__, __LINE__);
   }
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
+
+  Py_INCREF(result);
+  return result;
 }
 
 
@@ -145,7 +137,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // FaultStatusObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject FaultStatusType = {
+PyTypeObject PyFaultStatus_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -234,16 +226,16 @@ PyTypeObject FaultStatusType = {
 
 // FaultStatus からの変換関数
 PyObject*
-FaultStatus_FromFaultStatus(FaultStatus val)
+PyFaultStatus_FromFaultStatus(FaultStatus val)
 {
   PyObject* result = NULL;
   switch ( val ) {
-  case kFsUndetected:          result = Py_kFsUndetected; break;
-  case kFsDetected:            result = Py_kFsDetected; break;
-  case kFsUntestable:          result = Py_kFsUntestable; break;
-  case kFsPartiallyUntestable: result = Py_kFsPartiallyUntestable; break;
-  case kFsAborted:             result = Py_kFsAborted; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  case kFsUndetected: result = Py_kFsUndetected; break;
+  case kFsDetected:   result = Py_kFsDetected; break;
+  case kFsUntestable: result = Py_kFsUntestable; break;
+  case kFsAborted:    result = Py_kFsAborted; break;
+  default:
+    assert_not_reached(__FILE__, __LINE__);
   }
 
   Py_INCREF(result);
@@ -252,7 +244,7 @@ FaultStatus_FromFaultStatus(FaultStatus val)
 
 // 文字列からの変換関数
 PyObject*
-FaultStatus_FromString(const char* str)
+PyFaultStatus_FromString(const char* str)
 {
   if ( str == NULL ) {
     PyErr_SetString(PyExc_ValueError,
@@ -270,15 +262,12 @@ FaultStatus_FromString(const char* str)
   else if ( strcmp(str, "untestable") == 0 ) {
     result = Py_kFsUntestable;
   }
-  else if ( strcmp(str, "partially untestable") == 0 ) {
-    result = Py_kFsPartiallyUntestable;
-  }
   else if ( strcmp(str, "aborted") == 0 ) {
     result = Py_kFsAborted;
   }
   else {
     PyErr_SetString(PyExc_ValueError,
-		    "Only 'undetected', 'detected', 'untestable', 'partially untestable' and 'aborted' are allowed here");
+		    "Only 'undetected', 'detected', 'untestable', 'skipped' and 'aborted' are allowed here");
     return NULL;
   }
 
@@ -286,28 +275,31 @@ FaultStatus_FromString(const char* str)
   return result;
 }
 
-// PyObject から FaultStatus を取り出す．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   FaultStatus& obj)
+// @brief PyObject から FaultStatus を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return FaultStatus を返す．
+// @note 変換が失敗したら TypeError を送出し，kFsUndetected を返す．
+FaultStatus
+PyFaultStatus_AsFaultStatus(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !FaultStatusObject_Check(py_obj) ) {
-    return false;
+  if ( !PyFaultStatus_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "satpg.FaultStatus is expected");
+    return kFsUndetected;
   }
 
   // 強制的にキャスト
   FaultStatusObject* my_obj = (FaultStatusObject*)py_obj;
 
-  obj = my_obj->mVal;
-
-  return true;
+  return my_obj->mVal;
 }
 
 
 //////////////////////////////////////////////////////////////////////
 // 初期化用の関数
 //////////////////////////////////////////////////////////////////////
+
+BEGIN_NONAMESPACE
 
 // FaultStatus の定数を設定する関数
 inline
@@ -332,24 +324,26 @@ new_string(const char* str)
   return py_obj;
 }
 
+END_NONAMESPACE
+
+
 // FaultStatusObject 関係の初期化を行う．
 void
 FaultStatusObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&FaultStatusType) < 0 ) {
+  if ( PyType_Ready(&PyFaultStatus_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "FaultStatus", (PyObject*)&FaultStatusType);
+  PyModule_AddObject(m, "FaultStatus", (PyObject*)&PyFaultStatus_Type);
 
   // 定数オブジェクトの生成と登録
   FaultStatus_set(Py_kFsUndetectedStruct, Py_kFsUndetected, m, "kFsUndetected");
   FaultStatus_set(Py_kFsDetectedStruct,   Py_kFsDetected,   m, "kFsDetected");
   FaultStatus_set(Py_kFsUntestableStruct, Py_kFsUntestable, m, "kFsUntestable");
-  FaultStatus_set(Py_kFsPartiallyUntestableStruct, Py_kFsPartiallyUntestable, m, "kFsPariallyUntestable");
   FaultStatus_set(Py_kFsAbortedStruct,    Py_kFsAborted,    m, "kFsAborted");
 }
 
-END_NAMESPACE_YM_PYSATPG
+END_NAMESPACE_YM_SATPG

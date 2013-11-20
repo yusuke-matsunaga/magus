@@ -3,7 +3,7 @@
 /// @brief CellCapacitance の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -11,7 +11,7 @@
 #include "ym_cell/CellCapacitance.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // CellCapacitanceObject の外部変数
@@ -40,7 +40,7 @@ struct CellCapacitanceObject
 
 // Py_kCellCapacitanceInf の本体
 CellCapacitanceObject Py_kCellCapacitanceInfStruct = {
-  PyObject_HEAD_INIT(&CellCapacitanceType)
+  PyObject_HEAD_INIT(&PyCellCapacitance_Type)
   DBL_MAX
 };
 
@@ -77,7 +77,7 @@ CellCapacitance_dealloc(CellCapacitanceObject* self)
 // 初期化関数
 int
 CellCapacitance_init(CellCapacitanceObject* self,
-	      PyObject* args)
+		     PyObject* args)
 {
   // args をパーズして初期化を行なう．
   // エラーが起きたらエラーメッセージをセットして -1 を返す．
@@ -104,13 +104,13 @@ CellCapacitance_repr(CellCapacitanceObject* self)
 
   ostringstream buf;
   buf << self->mVal;
-  return conv_to_pyobject(buf.str());
+  return PyObject_FromString(buf.str());
 }
 
 // 比較関数
 int
 CellCapacitance_compare(CellCapacitanceObject* left,
-		 CellCapacitanceObject* right)
+			CellCapacitanceObject* right)
 {
   double diff = left->mVal - right->mVal;
   if ( diff < 0.0 ) {
@@ -125,56 +125,66 @@ CellCapacitance_compare(CellCapacitanceObject* left,
 // value 関数
 PyObject*
 CellCapacitance_value(CellCapacitanceObject* self,
-	       PyObject* args)
+		      PyObject* args)
 {
-  return Py_BuildValue("d", self->mVal);
+  return PyObject_FromDouble(self->mVal);
 }
 
 // add 関数
 PyObject*
 CellCapacitance_add(PyObject* left,
-	     PyObject* right)
+		    PyObject* right)
 {
-  if ( CellCapacitanceObject_Check(left) &&
-       CellCapacitanceObject_Check(right) ) {
-    CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
-    CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
-    return CellCapacitance_FromDouble(obj1->mVal + obj2->mVal);
+  if ( !PyCellCapacitance_Check(left) ||
+       !PyCellCapacitance_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError,
+		    "both parameters must be cell_lib.Capacitance");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellCapacitance");
-  return NULL;
+
+  CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
+  CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
+
+  return PyCellCapacitance_FromDouble(obj1->mVal + obj2->mVal);
 }
 
 // sub 関数
 PyObject*
 CellCapacitance_sub(PyObject* left,
-	     PyObject* right)
+		    PyObject* right)
 {
-  if ( CellCapacitanceObject_Check(left) &&
-       CellCapacitanceObject_Check(right) ) {
-    CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
-    CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
-    return CellCapacitance_FromDouble(obj1->mVal - obj2->mVal);
+  if ( !PyCellCapacitance_Check(left) ||
+       !PyCellCapacitance_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError,
+		    "both parameters must be cell_lib.Capacitance");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellCapacitance");
-  return NULL;
+
+  CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
+  CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
+
+  return PyCellCapacitance_FromDouble(obj1->mVal - obj2->mVal);
 }
 
 // inplace add 関数
 PyObject*
 CellCapacitance_iadd(PyObject* left,
-	      PyObject* right)
+		     PyObject* right)
 {
-  if ( CellCapacitanceObject_Check(left) &&
-       CellCapacitanceObject_Check(right) ) {
-    CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
-    CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
-    obj1->mVal += obj2->mVal;
-    Py_INCREF(left);
-    return left;
+  if ( !PyCellCapacitance_Check(left) ||
+       !PyCellCapacitance_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError,
+		    "both parameters must be cell_lib.Capacitance");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellCapacitance");
-  return NULL;
+
+  CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
+  CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
+
+  obj1->mVal += obj2->mVal;
+
+  Py_INCREF(left);
+  return left;
 }
 
 // inplace sub 関数
@@ -182,16 +192,20 @@ PyObject*
 CellCapacitance_isub(PyObject* left,
 	      PyObject* right)
 {
-  if ( CellCapacitanceObject_Check(left) &&
-       CellCapacitanceObject_Check(right) ) {
-    CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
-    CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
-    obj1->mVal += obj2->mVal;
-    Py_INCREF(left);
-    return left;
+  if ( !PyCellCapacitance_Check(left) ||
+       !PyCellCapacitance_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError,
+		    "both parameters must be cell_lib.Capacitance");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "both parameters must be cell.CellCapacitance");
-  return NULL;
+
+  CellCapacitanceObject* obj1 = (CellCapacitanceObject*)left;
+  CellCapacitanceObject* obj2 = (CellCapacitanceObject*)right;
+
+  obj1->mVal += obj2->mVal;
+
+  Py_INCREF(left);
+  return left;
 }
 
 
@@ -276,86 +290,86 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // CellCapacitanceObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject CellCapacitanceType = {
+PyTypeObject PyCellCapacitance_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "cell.CellCapacitance",                 // tp_name
+  "cell_lib.Capacitance",                     // tp_name
   sizeof(CellCapacitanceObject),          // tp_basicsize
-  (int)0,                          // tp_itemsize
+  (int)0,                                 // tp_itemsize
 
   // Methods to implement standard operations
 
   (destructor)CellCapacitance_dealloc,    // tp_dealloc
-  (printfunc)0,                    // tp_print
-  (getattrfunc)0,                  // tp_getattr
-  (setattrfunc)0,                  // tp_setattr
+  (printfunc)0,                           // tp_print
+  (getattrfunc)0,                         // tp_getattr
+  (setattrfunc)0,                         // tp_setattr
   (cmpfunc)CellCapacitance_compare,       // tp_compare
   (reprfunc)CellCapacitance_repr,         // tp_repr
 
   // Method suites for standard classes
   &CellCapacitance_nbmethods,             // tp_as_number
-  0,                               // tp_as_sequence
-  0,                               // tp_as_mapping
+  0,                                      // tp_as_sequence
+  0,                                      // tp_as_mapping
 
   // More standard operations (here for binary compatibility)
-  (hashfunc)0,                     // tp_hash
-  (ternaryfunc)0,                  // tp_call
-  (reprfunc)0,                     // tp_str
-  (getattrofunc)0,                 // tp_getattro
-  (setattrofunc)0,                 // tp_setattro
+  (hashfunc)0,                            // tp_hash
+  (ternaryfunc)0,                         // tp_call
+  (reprfunc)0,                            // tp_str
+  (getattrofunc)0,                        // tp_getattro
+  (setattrofunc)0,                        // tp_setattro
 
   // Functions to access object as input/output buffer
-  0,                               // tp_as_buffer
+  0,                                      // tp_as_buffer
 
   // Flags to define presence of optional/expanded features
-  Py_TPFLAGS_DEFAULT,              // tp_flags
+  Py_TPFLAGS_DEFAULT,                     // tp_flags
 
   // Documentation string
-  "Cell Area",                     // tp_doc
+  "Cell Capacitance",                     // tp_doc
 
   // Assigned meaning in release 2.0
 
   // call function for all accesible objects
-  (traverseproc)0,                 // tp_traverse
+  (traverseproc)0,                        // tp_traverse
 
   // delete references to contained objects
-  (inquiry)0,                      // tp_clear
+  (inquiry)0,                             // tp_clear
 
   // Assigned meaning in release 2.1
 
   // rich comparisons
-  (richcmpfunc)0,                  // tp_richcompare
+  (richcmpfunc)0,                         // tp_richcompare
 
   // weak reference enabler
-  (long)0,                         // tp_weaklistoffset
+  (long)0,                                // tp_weaklistoffset
 
   // Added in release 2.2
 
   // Iterators
-  (getiterfunc)0,                  // tp_iter
-  (iternextfunc)0,                 // tp_iternext
+  (getiterfunc)0,                         // tp_iter
+  (iternextfunc)0,                        // tp_iternext
 
   // Attribute descriptor and subclassing stuff
   CellCapacitance_methods,                // tp_methods
-  0,                               // tp_members
-  0,                               // tp_getset
-  (struct _typeobject*)0,          // tp_base
-  (PyObject*)0,                    // tp_dict
-  (descrgetfunc)0,                 // tp_descr_get
-  (descrsetfunc)0,                 // tp_descr_set
-  (long)0,                         // tp_dictoffset
+  0,                                      // tp_members
+  0,                                      // tp_getset
+  (struct _typeobject*)0,                 // tp_base
+  (PyObject*)0,                           // tp_dict
+  (descrgetfunc)0,                        // tp_descr_get
+  (descrsetfunc)0,                        // tp_descr_set
+  (long)0,                                // tp_dictoffset
   (initproc)CellCapacitance_init,         // tp_init
-  (allocfunc)0,                    // tp_alloc
+  (allocfunc)0,                           // tp_alloc
   (newfunc)CellCapacitance_new,           // tp_new
-  (freefunc)0,                     // tp_free
-  (inquiry)0,                      // tp_is_gc
+  (freefunc)0,                            // tp_free
+  (inquiry)0,                             // tp_is_gc
 
-  (PyObject*)0,                    // tp_bases
-  (PyObject*)0,                    // tp_mro (method resolution order)
-  (PyObject*)0,                    // tp_cache
-  (PyObject*)0,                    // tp_subclasses
-  (PyObject*)0                     // tp_weaklist
+  (PyObject*)0,                           // tp_bases
+  (PyObject*)0,                           // tp_mro (method resolution order)
+  (PyObject*)0,                           // tp_cache
+  (PyObject*)0,                           // tp_subclasses
+  (PyObject*)0                            // tp_weaklist
 };
 
 
@@ -363,34 +377,12 @@ PyTypeObject CellCapacitanceType = {
 // PyObject と CellCapacitance の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から CellCapacitance を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj CellCapacitance を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が CellCapacitanceObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   CellCapacitance& obj)
-{
-  // 型のチェック
-  if ( !CellCapacitanceObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  CellCapacitanceObject* my_obj = (CellCapacitanceObject*)py_obj;
-
-  obj = CellCapacitance(my_obj->mVal);
-
-  return true;
-}
-
 // @brief CellCapacitance から CellCapacitanceObject を生成する．
 // @param[in] obj CellCapacitance オブジェクト
 PyObject*
-CellCapacitance_FromCellCapacitance(const CellCapacitance& obj)
+PyCellCapacitance_FromCellCapacitance(const CellCapacitance& obj)
 {
-  CellCapacitanceObject* py_obj = CellCapacitance_new(&CellCapacitanceType);
+  CellCapacitanceObject* py_obj = CellCapacitance_new(&PyCellCapacitance_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -404,9 +396,9 @@ CellCapacitance_FromCellCapacitance(const CellCapacitance& obj)
 // @brief double から CellCapacitanceObject を生成する．
 // @param[in] val 値
 PyObject*
-CellCapacitance_FromDouble(double val)
+PyCellCapacitance_FromDouble(double val)
 {
-  CellCapacitanceObject* py_obj = CellCapacitance_new(&CellCapacitanceType);
+  CellCapacitanceObject* py_obj = CellCapacitance_new(&PyCellCapacitance_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -417,26 +409,64 @@ CellCapacitance_FromDouble(double val)
   return (PyObject*)py_obj;
 }
 
+// @brief PyObject から CellCapacitance を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return CellCapacitance を返す．
+// @note 変換が失敗したら TypeError を送出し，CellCapacitance(0.0) を返す．
+CellCapacitance
+PyCellCapacitance_AsCellCapacitance(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyCellCapacitance_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "cell_lib.Capacitance is expected");
+    return CellCapacitance(0.0);
+  }
+
+  // 強制的にキャスト
+  CellCapacitanceObject* my_obj = (CellCapacitanceObject*)py_obj;
+
+  return CellCapacitance(my_obj->mVal);
+}
+
+// @brief PyObject から double を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return doubleを返す．
+// @note 変換が失敗したら TypeError を送出し，0.0 を返す．
+double
+PyCellCapacitance_AsDouble(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyCellCapacitance_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "cell_lib.Capacitance is expected");
+    return 0.0;
+  }
+
+  // 強制的にキャスト
+  CellCapacitanceObject* my_obj = (CellCapacitanceObject*)py_obj;
+
+  return my_obj->mVal;
+}
+
 // CellCapacitanceObject 関係の初期化を行う．
 void
 CellCapacitanceObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&CellCapacitanceType) < 0 ) {
+  if ( PyType_Ready(&PyCellCapacitance_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "CellCapacitance", (PyObject*)&CellCapacitanceType);
+  PyModule_AddObject(m, "Capacitance", (PyObject*)&PyCellCapacitance_Type);
 
   // 定数オブジェクトの生成
   Py_kCellCapacitanceInf = (PyObject*)&Py_kCellCapacitanceInfStruct;
   Py_XINCREF(Py_kCellCapacitanceInf);
-  PyModule_AddObject(m, "kCellCapacitanceInf", Py_kCellCapacitanceInf);
+  PyModule_AddObject(m, "kCapacitanceInf", Py_kCellCapacitanceInf);
 
   // 定数オブジェクト用の文字列オブジェクトの生成
   Py_kCellCapacitanceInfString = PyString_InternFromString("infinity");
   Py_INCREF(Py_kCellCapacitanceInfString);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

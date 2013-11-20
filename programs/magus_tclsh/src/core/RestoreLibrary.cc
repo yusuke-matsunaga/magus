@@ -9,7 +9,7 @@
 
 #include "RestoreLibrary.h"
 #include "ym_cell/CellLibrary.h"
-#include "ym_utils/FileBinI.h"
+#include "ym_utils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -35,7 +35,7 @@ RestoreLibrary::~RestoreLibrary()
 const CellLibrary*
 RestoreLibrary::read_library(const string& filename)
 {
-  FileBinI bi(filename);
+  FileIDO bi(filename);
   if ( !bi ) {
     TclObj emsg;
     emsg << "Could not open " << filename;

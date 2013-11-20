@@ -11,6 +11,7 @@
 
 #include "ym_logic/DimacsParser.h"
 #include "DimacsParserImpl.h"
+#include "ym_utils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -153,9 +154,8 @@ DimacsParserImpl::read(const string& filename)
   // 実際に読み込んだ節の数
   int act_nc = 0;
 
-  vector<int> lits;
-
-  if ( !mScanner.open_file(filename) ) {
+  FileIDO ido(filename);
+  if ( !ido ) {
     // ファイルが開けなかった．
 #if 0
     ostringstream buf;
@@ -168,6 +168,10 @@ DimacsParserImpl::read(const string& filename)
 #endif
     return false;
   }
+
+  vector<int> lits;
+
+  DimacsScanner scanner(ido);
 
   bool stat = true;
   for (list<DimacsHandler*>::iterator p = mHandlerList.begin();
@@ -183,7 +187,7 @@ DimacsParserImpl::read(const string& filename)
 
   for ( ; ; ) {
     FileRegion loc;
-    tToken tk = mScanner.read_token(loc);
+    tToken tk = scanner.read_token(loc);
     if ( tk == kERR ) {
       return false;
     }
@@ -203,7 +207,7 @@ DimacsParserImpl::read(const string& filename)
       if ( tk != kNUM ) {
 	goto p_error;
       }
-      dec_nv = mScanner.cur_val();
+      dec_nv = scanner.cur_val();
       state = ST_P2;
       break;
 
@@ -211,7 +215,7 @@ DimacsParserImpl::read(const string& filename)
       if ( tk != kNUM ) {
 	goto p_error;
       }
-      dec_nc = mScanner.cur_val();
+      dec_nc = scanner.cur_val();
       state = ST_P3;
       break;
 
@@ -251,7 +255,7 @@ DimacsParserImpl::read(const string& filename)
 	continue;
       }
       if ( tk == kNUM ) {
-	int v = mScanner.cur_val();
+	int v = scanner.cur_val();
 	lits.clear();
 	lits.push_back(v);
 	if ( v < 0 ) {
@@ -274,7 +278,7 @@ DimacsParserImpl::read(const string& filename)
 	continue;
       }
       else if ( tk == kNUM ) {
-	int v = mScanner.cur_val();
+	int v = scanner.cur_val();
 	lits.push_back(v);
 	if ( v < 0 ) {
 	  v = - v;

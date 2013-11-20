@@ -9,8 +9,7 @@
 /// All rights reserved.
 
 #include "satpg_nsdef.h"
-#include "SaFault.h"
-#include "ym_networks/tgnet.h"
+#include "TpgFault.h"
 #include "ym_utils/SimpleAlloc.h"
 #include "ym_utils/UnitAlloc.h"
 
@@ -37,69 +36,43 @@ public:
   // read-only のメソッド
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 全ての故障のリストを得る．
-  const vector<SaFault*>&
-  all_list() const;
-
   /// @brief すべての故障数を得る．
   ymuint
   all_num() const;
 
-  /// @brief 全ての代表故障のリストを得る．
-  const vector<SaFault*>&
-  all_rep_list() const;
+  /// @brief 故障を取り出す．
+  /// @param[in] id 故障番号 ( 0 <= id < all_num() )
+  TpgFault*
+  fault(ymuint id);
 
   /// @brief すべての代表故障数を得る．
   ymuint
-  all_rep_num() const;
+  rep_num() const;
+
+  /// @brief 代表故障を取り出す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < rep_num() )
+  TpgFault*
+  rep_fault(ymuint pos);
 
   /// @brief 検出済みの代表故障のリストを得る．
-  const vector<SaFault*>&
-  det_list() const;
-
-  /// @brief 検出済みの代表故障数を得る．
-  ymuint
-  det_num() const;
+  const vector<TpgFault*>&
+  det_list();
 
   /// @brief 未検出の代表故障のリストを得る．
-  const vector<SaFault*>&
-  remain_list() const;
+  const vector<TpgFault*>&
+  remain_list();
 
   /// @brief 未検出の代表故障数を得る．
   ymuint
-  remain_num() const;
+  remain_num();
 
   /// @brief 検出不能故障のリストを得る．
-  const vector<SaFault*>&
-  untest_list() const;
+  const vector<TpgFault*>&
+  untest_list();
 
   /// @brief 検出不能故障数を得る．
   ymuint
-  untest_num() const;
-
-  /// @brief 代表故障を返す．
-  SaFault*
-  find_rep_fault(SaFault* f) const;
-
-  /// @brief 出力の故障を取り出す．
-  /// @param[in] node 対象のノード
-  /// @param[in] val 縮退している値
-  SaFault*
-  find_output_fault(const TgNode* node,
-		    int val);
-
-  /// @brief 入力の故障を取り出す．
-  /// @param[in] node 対象のノード
-  /// @param[in] pos 入力の故障の時に入力番号を表す
-  /// @param[in] val 縮退している値
-  SaFault*
-  find_input_fault(const TgNode* node,
-		   ymuint pos,
-		   int val);
-
-  /// @brief 同じ箇所で反対の故障値を持つ故障を返す．
-  SaFault*
-  find_alternative_fault(SaFault* f);
+  untest_num();
 
 
 public:
@@ -113,31 +86,11 @@ public:
 
   /// @brief network の全ての単一縮退故障を設定する．
   void
-  set_ssa_fault(const TgNetwork& network);
-
-  /// @brief 出力の故障を追加する．
-  /// @param[in] node 対象のノード
-  /// @param[in] val 縮退している値
-  /// @param[in] rep 代表故障
-  SaFault*
-  add_ofault(const TgNode* node,
-	     int val,
-	     SaFault* rep = NULL);
-
-  /// @brief 入力の故障を追加する．
-  /// @param[in] node 対象のノード
-  /// @param[in] pos 入力の故障の時に入力番号を表す
-  /// @param[in] val 縮退している値
-  /// @param[in] rep 代表故障
-  SaFault*
-  add_ifault(const TgNode* node,
-	     ymuint pos,
-	     int val,
-	     SaFault* rep = NULL);
+  set_ssa_fault(TpgNetwork& network);
 
   /// @brief fault の状態を変更する．
   void
-  set_status(SaFault* fault,
+  set_status(TpgFault* fault,
 	     FaultStatus stat);
 
   /// @brief 故障リストをスキャンして未検出リストを更新する．
@@ -150,49 +103,47 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief node に関する故障を登録する．
-  void
-  reg_faults(const TgNode* node);
+  /// @brief 出力の故障を生成する．
+  /// @param[in] node 対象のノード
+  /// @param[in] val 縮退している値
+  /// @param[in] rep 代表故障
+  /// @param[inout] fid 故障のID番号
+  /// @note fid はこの関数呼び出し後に1つインクリメントされる．
+  TpgFault*
+  new_ofault(TpgNode* node,
+	     int val,
+	     TpgFault* rep,
+	     ymuint& fid);
+
+  /// @brief 入力の故障を生成する．
+  /// @param[in] node 対象のノード
+  /// @param[in] pos 入力番号を表す
+  /// @param[in] val 縮退している値
+  /// @param[in] rep 代表故障
+  /// @param[inout] fid 故障のID番号
+  /// @note fid はこの関数呼び出し後に1つインクリメントされる．
+  TpgFault*
+  new_ifault(TpgNode* node,
+	     ymuint pos,
+	     int val,
+	     TpgFault* rep,
+	     ymuint& fid);
 
   /// @brief 故障を生成する．
   /// @param[in] node 対象のノード
   /// @param[in] is_output 出力の故障のときに true とするフラグ
   /// @param[in] pos 入力の故障の時に入力番号を表す
   /// @param[in] val 縮退している値
-  SaFault*
-  new_fault(const TgNode* node,
-	    bool is_output,
-	    ymuint pos,
-	    int val);
-
-  /// @brief 故障を追加する．
-  /// @param[in] node 対象のノード
-  /// @param[in] is_output 出力の故障のときに true とするフラグ
-  /// @param[in] pos 入力の故障の時に入力番号を表す
-  /// @param[in] val 縮退している値
   /// @param[in] rep 代表故障
-  SaFault*
-  add_fault(const TgNode* node,
+  /// @param[inout] fid 故障のID番号
+  /// @note fid はこの関数呼び出し後に1つインクリメントされる．
+  TpgFault*
+  new_fault(TpgNode* node,
 	    bool is_output,
 	    ymuint pos,
 	    int val,
-	    SaFault* rep);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造の定義
-  //////////////////////////////////////////////////////////////////////
-
-  // ノード1つあたりの故障の情報を表すクラス
-  struct Fnode
-  {
-    // 出力の故障(01/)
-    SaFault* mOfault[2];
-
-    // 入力の故障(各ファンイン x 0/1)
-    SaFault** mIfaults;
-  };
+	    TpgFault* rep,
+	    ymuint& fid);
 
 
 private:
@@ -200,35 +151,29 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // SaFault の確保用のアロケータ
-  UnitAlloc mFaultAlloc;
-
-  // Finfo の確保用アロケータ
-  UnitAlloc mFinfoAlloc;
-
-  // Fnode.mIfaults の確保用アロケータ
-  SimpleAlloc mIfaultsAlloc;
-
   // 関連付けられているネットワーク
-  const TgNetwork* mNetwork;
+  TpgNetwork* mNetwork;
 
-  // ノードごとの故障の情報
-  vector<Fnode> mFnodeArray;
+  // 全故障数
+  ymuint32 mAllNum;
 
-  // 全ての故障を保持しておくリスト
-  vector<SaFault*> mAllList;
+  // 全ての故障をまとめて確保したもの
+  TpgFault* mFaultChunk;
 
-  // 全ての代表故障を保持しておくリスト
-  vector<SaFault*> mAllRepList;
+  // 代表故障数
+  ymuint32 mRepNum;
+
+  // 代表故障のポインタの配列
+  TpgFault** mRepArray;
 
   // 検出済みの故障を保持しておくリスト
-  vector<SaFault*> mDetList;
+  vector<TpgFault*> mDetList;
 
   // 未検出の故障を保持しておくリスト
-  vector<SaFault*> mRemainList;
+  vector<TpgFault*> mRemainList;
 
   // 検出不能故障を保持しておくリスト
-  vector<SaFault*> mUntestList;
+  vector<TpgFault*> mUntestList;
 
   // 故障リストに変化があったことを記録するフラグ
   bool mChanged;
@@ -240,105 +185,119 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 全ての故障のリストを得る．
-inline
-const vector<SaFault*>&
-FaultMgr::all_list() const
-{
-  return mAllList;
-}
-
 // @brief すべての故障数を得る．
 inline
 ymuint
 FaultMgr::all_num() const
 {
-  return mAllList.size();
+  return mAllNum;
 }
 
-// @brief 全ての代表故障のリストを得る．
+// @brief 故障を取り出す．
+// @param[in] id 故障番号 ( 0 <= id < all_num() )
 inline
-const vector<SaFault*>&
-FaultMgr::all_rep_list() const
+TpgFault*
+FaultMgr::fault(ymuint id)
 {
-  return mAllRepList;
+  assert_cond( id < all_num(), __FILE__, __LINE__);
+  return &mFaultChunk[id];
 }
 
 // @brief すべての代表故障数を得る．
 inline
 ymuint
-FaultMgr::all_rep_num() const
+FaultMgr::rep_num() const
 {
-  return mAllRepList.size();
+  return mRepNum;
+}
+
+// @brief 代表故障を取り出す．
+// @param[in] pos 位置番号 ( 0 <= pos < rep_num() )
+inline
+TpgFault*
+FaultMgr::rep_fault(ymuint pos)
+{
+  assert_cond( pos < rep_num(), __FILE__, __LINE__);
+  return mRepArray[pos];
 }
 
 // @brief 検出済みの代表故障のリストを得る．
 inline
-const vector<SaFault*>&
-FaultMgr::det_list() const
+const vector<TpgFault*>&
+FaultMgr::det_list()
 {
+  update();
   return mDetList;
-}
-
-// @brief 検出済みの代表故障数を得る．
-inline
-ymuint
-FaultMgr::det_num() const
-{
-  return mDetList.size();
 }
 
 // @brief 未検出の故障のリストを得る．
 inline
-const vector<SaFault*>&
-FaultMgr::remain_list() const
+const vector<TpgFault*>&
+FaultMgr::remain_list()
 {
+  update();
   return mRemainList;
 }
 
 // @brief 未検出の代表故障数を得る．
 inline
 ymuint
-FaultMgr::remain_num() const
+FaultMgr::remain_num()
 {
+  update();
   return mRemainList.size();
 }
 
 // @brief 検出不能故障のリストを得る．
 inline
-const vector<SaFault*>&
-FaultMgr::untest_list() const
+const vector<TpgFault*>&
+FaultMgr::untest_list()
 {
+  update();
   return mUntestList;
 }
 
 // @brief 検出不能故障数を得る．
 inline
 ymuint
-FaultMgr::untest_num() const
+FaultMgr::untest_num()
 {
+  update();
   return mUntestList.size();
 }
 
-// @brief 出力の故障を追加する．
+// @brief 出力の故障を生成する．
+// @param[in] node 対象のノード
+// @param[in] val 縮退している値
+// @param[in] rep 代表故障
+// @param[inout] fid 故障のID番号
+// @note fid はこの関数呼び出し後に1つインクリメントされる．
 inline
-SaFault*
-FaultMgr::add_ofault(const TgNode* node,
+TpgFault*
+FaultMgr::new_ofault(TpgNode* node,
 		     int val,
-		     SaFault* rep)
+		     TpgFault* rep,
+		     ymuint& fid)
 {
-  return add_fault(node, true, 0, val, rep);
+  return new_fault(node, true, 0, val, rep, fid);
 }
 
-// @brief 入力の故障を追加する．
+// @brief 入力の故障を生成する．
+// @param[in] node 対象のノード
+// @param[in] pos 入力番号を表す
+// @param[in] val 縮退している値
+// @param[in] rep 代表故障
+// @param[inout] fid 故障のID番号
+// @note fid はこの関数呼び出し後に1つインクリメントされる．
 inline
-SaFault*
-FaultMgr::add_ifault(const TgNode* node,
+TpgFault*
+FaultMgr::new_ifault(TpgNode* node,
 		     ymuint pos,
 		     int val,
-		     SaFault* rep)
+		     TpgFault* rep,
+		     ymuint& fid)
 {
-  return add_fault(node, false, pos, val, rep);
+  return new_fault(node, false, pos, val, rep, fid);
 }
 
 END_NAMESPACE_YM_SATPG

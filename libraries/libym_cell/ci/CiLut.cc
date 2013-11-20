@@ -38,7 +38,7 @@ CiLutTemplate::name() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiLutTemplate::dump(BinO& s) const
+CiLutTemplate::dump(ODO& s) const
 {
   ymuint8 d = dimension();
   s << name()
@@ -312,7 +312,7 @@ CiLut::index_num(ymuint32 var) const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiLut::dump(BinO& s) const
+CiLut::dump(ODO& s) const
 {
   s << template_name();
   ymuint d = dimension();

@@ -12,10 +12,9 @@
 #include "AtpgMgr.h"
 #include "AtpgCmd.h"
 #include "NtwkIoCmd.h"
-#include "FaultCmd.h"
 #include "RtpgCmd.h"
-#include "RfsimCmd.h"
 #include "DtpgCmd.h"
+#include "MinPatCmd.h"
 #include "PrintFaultCmd.h"
 #include "PrintPatCmd.h"
 #include "PrintPatStatsCmd.h"
@@ -43,14 +42,13 @@ atpg_init(Tcl_Interp* interp)
 
   TclCmdBinder1<ReadBlif, AtpgMgr*>::reg(interp, mgr, "::atpg::read_blif");
   TclCmdBinder1<ReadIscas89, AtpgMgr*>::reg(interp, mgr, "::atpg::read_iscas89");
-  TclCmdBinder1<SetFault, AtpgMgr*>::reg(interp, mgr, "::atpg::set_fault");
   TclCmdBinder1<PrintFaultCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::print_fault");
   TclCmdBinder1<PrintStatsCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::print_stats");
   TclCmdBinder1<PrintPatCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::print_pat");
   TclCmdBinder1<PrintPatStatsCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::print_pat_stats");
   TclCmdBinder1<RtpgCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::rtpg");
-  TclCmdBinder1<RfsimCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::rfsim");
   TclCmdBinder1<DtpgCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::dtpg");
+  TclCmdBinder1<MinPatCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::minpat");
 
 
   //////////////////////////////////////////////////////////////////////
@@ -62,14 +60,13 @@ atpg_init(Tcl_Interp* interp)
       << "namespace eval atpg {" << endl
       << "proc complete(read_blif) { t s e l p m } { return \"\" }" << endl
       << "proc complete(read_iscas89) { t s e l p m } { return \"\" }" << endl
-      << "proc complete(set_fault) { t s e l p m } { return \"\" }" << endl
       << "proc complete(print_fault) { t s e l p m } { return \"\" }" << endl
       << "proc complete(print_stats) { t s e l p m } { return \"\" }" << endl
       << "proc complete(print_pat) { t s e l p m } { return \"\" }" << endl
       << "proc complete(print_pat_stats) { t s e l p m } { return \"\" }" << endl
       << "proc complete(rtpg) { t s e l p m } { return \"\" }" << endl
-      << "proc complete(rfsim) { t s e l p m } { return \"\" }" << endl
       << "proc complete(dtpg) { t s e l p m } { return \"\" }" << endl
+      << "proc complete(minpat) { t s e l p m } { return \"\" }" << endl
       << "}" << endl
       << "}" << endl;
   string str = buf.str();

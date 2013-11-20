@@ -9,9 +9,10 @@
 
 #include "ym_cell/pycell.h"
 #include "ym_cell/CellClass.h"
+#include "ym_cell/CellGroup.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -25,8 +26,14 @@ struct CellClassObject
   // Python のお約束
   PyObject_HEAD
 
-  // CellClass の本体
-  const CellClass* mBody;
+  // CellClass のポインタ
+  const CellClass* mClass;
+
+  // 同位体変換のリスト
+  PyObject* mIdMapList;
+
+  // セルグループのリスト
+  PyObject* mCellGroupList;
 
 };
 
@@ -39,6 +46,8 @@ struct CellClassObject
 void
 CellClass_dealloc(CellClassObject* self)
 {
+  Py_DECREF(self->mIdMapList);
+  Py_DECREF(self->mCellGroupList);
 
   PyObject_Del(self);
 }
@@ -48,7 +57,29 @@ PyObject*
 CellClass_id(CellClassObject* self,
 	     PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->id());
+  return PyObject_FromYmuint32(self->mClass->id());
+}
+
+// idmap_list 関数
+PyObject*
+CellClass_idmap_list(CellClassObject* self,
+		     PyObject* args)
+{
+  PyObject* result = self->mIdMapList;
+
+  Py_INCREF(result);
+  return result;
+}
+
+// group_list 関数
+PyObject*
+CellClass_group_list(CellClassObject* self,
+		     PyObject* args)
+{
+  PyObject* result = self->mCellGroupList;
+
+  Py_INCREF(result);
+  return result;
 }
 
 
@@ -70,6 +101,12 @@ PyMethodDef CellClass_methods[] = {
   //  - METH_CLASS
   //  - METH_STATIC
   //  - METH_COEXIST
+  {"id", (PyCFunction)CellClass_id, METH_NOARGS,
+   PyDoc_STR("return ID")},
+  {"idmap_list", (PyCFunction)CellClass_idmap_list, METH_NOARGS,
+   PyDoc_STR("return ident map list")},
+  {"cell_group_list", (PyCFunction)CellClass_group_list, METH_NOARGS,
+   PyDoc_STR("return group list")},
 
   {NULL, NULL, 0, NULL} // end-marker
 };
@@ -80,11 +117,11 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // CellClassObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject CellClassType = {
+PyTypeObject PyCellClass_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "cell.CellClass",                 // tp_name
+  "cell_lib.CellClass",             // tp_name
   sizeof(CellClassObject),          // tp_basicsize
   (int)0,                           // tp_itemsize
 
@@ -167,26 +204,54 @@ PyTypeObject CellClassType = {
 // PyObject と CellClass の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から CellClass を取り出す．
+// @brief CellClass から CellClassObject を生成する．
+// @param[in] cell_class セルクラス
+PyObject*
+PyCellClass_FromCellClass(const CellClass* cell_class,
+			  PyObject* group_list[])
+{
+  CellClassObject* self = PyObject_New(CellClassObject, &PyCellClass_Type);
+  if ( self == NULL ) {
+    return NULL;
+  }
+
+  self->mClass = cell_class;
+
+  ymuint n1 = cell_class->idmap_num();
+  self->mIdMapList = PyList_New(n1);
+  for (ymuint i = 0; i < n1; ++ i) {
+    // 未完
+  }
+
+  ymuint n2 = cell_class->group_num();
+  self->mCellGroupList = PyList_New(n2);
+  for (ymuint i = 0; i < n2; ++ i) {
+    const CellGroup* group = cell_class->cell_group(i);
+    PyObject* obj = group_list[group->id()];
+    Py_INCREF(obj);
+    PyList_SetItem(self->mCellGroupList, i, obj);
+  }
+
+  return (PyObject*)self;
+}
+
+// @brief PyObject から CellClass へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] p_obj CellClass のポインタを格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が CellClassObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   const CellClass*& p_obj)
+// @return CellClass へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+const CellClass*
+PyCellClass_AsCellClassPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !CellClassObject_Check(py_obj) ) {
-    return false;
+  if ( !PyCellClass_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "cell_lib.CellClass is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   CellClassObject* my_obj = (CellClassObject*)py_obj;
 
-  p_obj = my_obj->mBody;
-
-  return true;
+  return my_obj->mClass;
 }
 
 // CellClassObject 関係の初期化を行う．
@@ -194,12 +259,12 @@ void
 CellClassObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&CellClassType) < 0 ) {
+  if ( PyType_Ready(&PyCellClass_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "CellClass", (PyObject*)&CellClassType);
+  PyModule_AddObject(m, "CellClass", (PyObject*)&PyCellClass_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

@@ -117,11 +117,11 @@ CiCell::CiCell(CiLibrary* library,
   for (ymuint i = 0; i < no2; ++ i) {
     ymuint8 val = 0U;
     if ( output_array[i] ) {
-      if ( tristate_array[i].is_zero() ) {
-	val = 1U;
+      if ( !tristate_array[i].is_zero() ) {
+	val = 2U;
       }
       else {
-	val = 2U;
+	val = 1U;
       }
     }
     mLTArray[i] = val;
@@ -554,7 +554,7 @@ CiCell::clear_preset_var2() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiCell::dump(BinO& s) const
+CiCell::dump(ODO& s) const
 {
   ymuint8 tid = 0;
   if ( is_logic() ) {
@@ -669,6 +669,13 @@ CiCell::dump(BinO& s) const
       }
     }
   }
+}
+
+// @brief セルグループを設定する．
+void
+CiCell::set_group(const CellGroup* group)
+{
+  mCellGroup = group;
 }
 
 END_NAMESPACE_YM_CELL

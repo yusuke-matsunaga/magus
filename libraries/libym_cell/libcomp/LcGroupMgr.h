@@ -43,13 +43,15 @@ public:
   /// @brief セルを追加する．
   /// @param[in] cell セル
   void
-  add_cell(const Cell* cell);
+  add_cell(Cell* cell);
 
   /// @brief f に対応する LcGroup を求める．
   /// @param[in] f 関数
+  /// @param[in] builtin 組み込みクラスの時 true にするフラグ
   /// @note なければ新規に作る．
   LcGroup*
-  find_group(const TvFuncM& f);
+  find_group(const TvFuncM& f,
+	     bool builtin);
 
 
 private:

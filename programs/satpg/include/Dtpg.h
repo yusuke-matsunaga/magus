@@ -23,6 +23,12 @@ BEGIN_NAMESPACE_YM_SATPG
 class Dtpg
 {
 public:
+
+  /// @brief デストラクタ
+  virtual
+  ~Dtpg() {}
+
+public:
   //////////////////////////////////////////////////////////////////////
   // パタン生成を行う関数
   //////////////////////////////////////////////////////////////////////
@@ -34,45 +40,37 @@ public:
 	   const string& option = string(),
 	   ostream* outp = NULL) = 0;
 
-  /// @brief get_pat フラグを設定する．
-  virtual
-  void
-  set_get_pat(ymuint val) = 0;
-
-  /// @brief dry-run フラグを設定する．
-  virtual
-  void
-  set_dry_run(bool flag) = 0;
-
   /// @brief 回路と故障リストを設定する．
-  /// @param[in] tgnetwork 対象のネットワーク
-  /// @param[in] fault_list 故障リスト
+  /// @param[in] tpgnetwork 対象のネットワーク
   virtual
   void
-  set_network(const TgNetwork& tgnetwork,
-	      const vector<SaFault*>& fault_list) = 0;
+  set_network(TpgNetwork& tgnetwork) = 0;
 
-  /// @brief モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  /// @param[in] option オプション文字列
+  /// @brief テスト生成を行なう．
+  /// @param[in] mode メインモード
+  /// @param[in] po_mode PO分割モード
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop_list DetectOp のリスト
+  /// @param[in] uop_list UntestOp のリスト
+  /// @param[in] stats 結果を格納する構造体
   virtual
   void
-  run(DtpgOperator& op,
-      const string& option = string()) = 0;
+  run(tDtpgMode mode,
+      tDtpgPoMode po_mode,
+      BackTracer& bt,
+      const vector<DetectOp*>& dop_list,
+      const vector<UntestOp*>& uop_list,
+      DtpgStats& stats) = 0;
 
-  /// @brief 統計情報をクリアする．
+  /// @breif 時間計測を制御する．
   virtual
   void
-  clear_stats() = 0;
-
-  /// @brief 統計情報を得る．
-  virtual
-  void
-  get_stats() const = 0;
+  timer_enable(bool enable) = 0;
 
 };
 
 
+/// @brief DtpgSat のインスタンスを生成する．
 extern
 Dtpg*
 new_DtpgSat();

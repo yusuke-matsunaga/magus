@@ -131,7 +131,7 @@ BddsimCmd::cmd_proc(TclObjVector& objv)
       return TCL_ERROR;
     }
   }
-  
+
   size_t objc = objv.size();
 
   // このコマンドは引数をとらない．
@@ -148,7 +148,7 @@ BddsimCmd::cmd_proc(TclObjVector& objv)
   size_t nl = network.logic_num();
   size_t nn = network.node_num();
   mNodeArray.resize(nn);
-  
+
   double dtotal = 0;
 
   // 正常回路の論理関数を計算する．
@@ -181,7 +181,7 @@ BddsimCmd::cmd_proc(TclObjVector& objv)
     }
     mNodeArray[node->gid()]->set_fanout_list(fanout_list);
   }
-  
+
   // 可観測性を表す論理関数を計算する．
   switch ( method ) {
   case 1:
@@ -200,7 +200,7 @@ BddsimCmd::cmd_proc(TclObjVector& objv)
     calc_obs_fast();
     break;
   }
-  
+
   for (size_t i = 0; i < ni; ++ i) {
     const TgNode* node = network.input(i);
     SimNode* simnode = mNodeArray[node->gid()];
@@ -243,7 +243,7 @@ BddsimCmd::cmd_proc(TclObjVector& objv)
   out << "ave.\t" << cave << endl;
   TclObj msg = out.str();
   set_result(msg);
-  
+
   return TCL_OK;
 }
 
@@ -294,7 +294,7 @@ BddsimCmd::calc_obs_ffr()
   size_t ni = network.input_num();
   size_t no = network.output_num();
   size_t nl = network.logic_num();
-  
+
   for (size_t i = 0; i < nn; ++ i) {
     const TgNode* node = network.node(i);
     mSimEngine->set_obs(node, 0UL);
@@ -339,7 +339,7 @@ BddsimCmd::calc_obs_ffr()
 void
 BddsimCmd::calc_obs_ffr_sub(const TgNode* node)
 {
-  size_t nfi = node->ni();
+  size_t nfi = node->fanin_num();
   vector<ymulong> iobs(nfi);
   mSimEngine->calc_iobs2(node, iobs);
   for (size_t i = 0; i < nfi; ++ i) {
@@ -367,7 +367,7 @@ BddsimCmd::calc_obs_fast()
   size_t nn = network.node_num();
   size_t no = network.output_num();
   size_t nl = network.logic_num();
-  
+
   for (size_t i = 0; i < nn; ++ i) {
     const TgNode* node = network.node(i);
     mSimEngine->set_obs(node, 0UL);
@@ -379,7 +379,7 @@ BddsimCmd::calc_obs_fast()
 
   for (size_t i = 0; i < nl; ++ i) {
     const TgNode* node = network.sorted_logic(nl - i - 1);
-    size_t nfi = node->ni();
+    size_t nfi = node->fanin_num();
     vector<ymulong> iobs(nfi);
     mSimEngine->calc_iobs2(node, iobs);
     for (size_t i = 0; i < nfi; ++ i) {
@@ -421,7 +421,7 @@ BddsimCmd::calc_ffunc(SimNode* simnode,
       }
     }
   }
-    
+
   // 今の故障シミュレーションで値の変わったノードを元にもどしておく
   for (vector<SimNode*>::iterator p = mClearArray.begin();
        p != mClearArray.end(); ++ p) {
@@ -452,7 +452,7 @@ BddsimCmd::make_logic(const TgNode* node)
 {
   ymuint32 id = node->gid();
   SimNode* simnode = NULL;
-  size_t ni = node->ni();
+  size_t ni = node->fanin_num();
   vector<SimNode*> inputs(ni);
   for (size_t i = 0; i < ni; ++ i) {
     const TgNode* inode = node->fanin(i);

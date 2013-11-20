@@ -3,7 +3,7 @@
 /// @brief CompTbl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -24,7 +24,8 @@ CompTbl::CompTbl(BddMgrImpl* mgr,
 		 const char* name) :
   mMgr(mgr),
   mName(name),
-  mTableSize(0)
+  mTableSize(0),
+  mMaxSize(0)
 {
 }
 

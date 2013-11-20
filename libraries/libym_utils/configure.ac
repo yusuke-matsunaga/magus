@@ -14,7 +14,7 @@ AC_REVISION($Rev: 2507 $)dnl
 AC_PREREQ(2.57)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2005-2011 Yusuke Matsunaga
+Copyright (C) 2005-2013 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
@@ -100,9 +100,21 @@ AC_CACHE_SAVE
 
 
 # ===================================================================
+# Check for popt
+# ===================================================================
+YM_CHECK_POPT
+
+
+# ===================================================================
 # Check for C++ language
 # ===================================================================
 AC_LANG_CPLUSPLUS
+
+
+# ===================================================================
+# Check for CppUTest
+# ===================================================================
+YM_CHECK_CPPUTEST([ym_have_cpputest=1], [ym_have_cpputest=0])
 
 
 # ===================================================================
@@ -114,24 +126,25 @@ YMTOOLS_BUILDDIR="\$(top_builddir)/../.."
 AC_SUBST([YMTOOLS_SRCDIR])
 AC_SUBST([YMTOOLS_BUILDDIR])
 
-YM_EXTRA_SUBDIRS=""
-YM_EXTRA_LIBADD=""
+YM_INIT_EXTRA_SUBDIRS
+YM_INIT_EXTRA_TESTS_SUBDIRS
 
-if test "$ym_have_zlib" = 1; then
-   YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS zstream"
-   YM_EXTRA_LIBADD="$YM_EXTRA_LIBADD zstream/libym_zstream.la"
-   AC_CONFIG_FILES([zstream/Makefile])
-   AC_CONFIG_FILES([tests/zstream/Makefile])
-fi
+AM_CONDITIONAL([YM_HAVE_ZLIB], [test $ym_have_zlib = 1])
 
 if test "$ym_have_python" = 1; then
-   YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS python"
+   YM_ADD_EXTRA_SUBDIRS([python])
+   YM_ADD_EXTRA_TESTS_SUBDIRS([python])
    AC_CONFIG_FILES([python/Makefile])
    AC_CONFIG_FILES([tests/python/Makefile])
 fi
 
-AC_SUBST([YM_EXTRA_SUBDIRS])
-AC_SUBST([YM_EXTRA_LIBADD])
+if test "$ym_have_cpputest" = 1; then
+   YM_ADD_EXTRA_TESTS_SUBDIRS([CppUTest])
+   AC_CONFIG_FILES([tests/CppUTest/Makefile])
+fi
+
+YM_FINISH_EXTRA_SUBDIRS
+YM_FINISH_EXTRA_TESTS_SUBDIRS
 
 
 # ===================================================================

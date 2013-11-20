@@ -5,7 +5,7 @@
 /// @brief TestVector のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "satpg_nsdef.h"
@@ -44,6 +44,33 @@ public:
   /// @brief X の個数を得る．
   ymuint
   x_num() const;
+
+  /// @brief 2つのベクタが両立しないとき true を返す．
+  static
+  bool
+  is_conflict(const TestVector& tv1,
+	      const TestVector& tv2);
+
+  /// @brief 等価関係の比較を行なう．
+  /// @param[in] right オペランド
+  /// @return 自分自身と right が等しいとき true を返す．
+  bool
+  operator==(const TestVector& right) const;
+
+  /// @brief 包含関係の比較を行なう
+  /// @param[in] right オペランド
+  /// @return minterm の集合として right が自分自身を含んでいたら true を返す．
+  /// @note false だからといって逆に自分自身が right を含むとは限らない．
+  bool
+  operator<(const TestVector& right) const;
+
+  /// @brief 包含関係の比較を行なう
+  /// @param[in] right オペランド
+  /// @return minterm の集合として right が自分自身を含んでいたら true を返す．
+  /// @note こちらは等しい場合も含む．
+  /// @note false だからといって逆に自分自身が right を含むとは限らない．
+  bool
+  operator<=(const TestVector& right) const;
 
   /// @brief 内容を BIN 形式で出力する．
   /// @param[in] s 出力先のストリーム
@@ -92,11 +119,21 @@ public:
   void
   set_from_random(RandGen& randgen);
 
+  /// @brief X の部分を乱数で 0/1 に設定する．
+  /// @param[in] randgen 乱数生成器
+  void
+  fix_x_from_random(RandGen& randgen);
+
   /// @brief テストベクタをコピーする．
   /// @param[in] src コピー元のテストベクタ
   /// @note X の部分はコピーしない．
   void
   copy(const TestVector& src);
+
+  /// @breif テストベクタをマージする．
+  /// @note X 以外で相異なるビットがあったら false を返す．
+  bool
+  merge(const TestVector& src);
 
 
 private:
@@ -167,6 +204,9 @@ private:
   // 入力数
   ymuint32 mInputNum;
 
+  // 最後のブロックのマスク
+  PackedVal mMask;
+
   // ベクタ本体(ただしサイズは可変)
   PackedVal mPat[1];
 
@@ -181,6 +221,42 @@ private:
   const ymuint32 HPW = kPvBitLen / 4;
 
 };
+
+/// @brief 等価関係の比較を行なう．
+/// @param[in] left, right オペランド
+/// @return left と right が等しくないとき true を返す．
+inline
+bool
+operator!=(const TestVector& left,
+	   const TestVector& right)
+{
+  return !left.operator==(right);
+}
+
+/// @brief 包含関係の比較を行なう．
+/// @param[in] left, right オペランド
+/// @return minterm の集合として left が right を含んでいたら true を返す．
+/// @note false だからといって逆に right が left を含むとは限らない．
+inline
+bool
+operator>(const TestVector& left,
+	  const TestVector& right)
+{
+  return right.operator<(left);
+}
+
+/// @brief 包含関係の比較を行なう
+/// @param[in] left, right オペランド
+/// @return minterm の集合として left が right を含んでいたら true を返す．
+/// @note こちらは等しい場合も含む．
+/// @note false だからといって逆に right が left を含むとは限らない．
+inline
+bool
+operator>=(const TestVector& left,
+	   const TestVector& right)
+{
+  return right.operator<=(left);
+}
 
 
 /// @brief 内容を出力する．

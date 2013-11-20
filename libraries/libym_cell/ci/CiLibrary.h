@@ -64,7 +64,7 @@ public:
   /// @brief テクノロジの取得
   /// このクラスは常に kTechAsic を返す．
   virtual
-  tTechnology
+  tCellTechnology
   technology() const;
 
   /// @brief 遅延モデルの取得
@@ -275,72 +275,72 @@ public:
   /// @brief 総パタン数を返す．
   virtual
   ymuint
-  pat_num() const;
+  pg_pat_num() const;
 
   /// @brief パタンを返す．
-  /// @param[in] id パタン番号 ( 0 <= id < pat_num() )
+  /// @param[in] id パタン番号 ( 0 <= id < pg_pat_num() )
   virtual
   const CellPatGraph&
-  pat(ymuint id) const;
+  pg_pat(ymuint id) const;
 
   /// @brief パタンの最大の入力数を得る．
   virtual
   ymuint
-  max_input() const;
+  pg_max_input() const;
 
   /// @brief 総ノード数を返す．
   virtual
   ymuint
-  node_num() const;
+  pg_node_num() const;
 
   /// @brief ノードの種類を返す．
-  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  /// @param[in] id ノード番号 ( 0 <= id < pg_node_num() )
   virtual
   tCellPatType
-  node_type(ymuint id) const;
+  pg_node_type(ymuint id) const;
 
   /// @brief ノードが入力ノードの時に入力番号を返す．
-  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  /// @param[in] id ノード番号 ( 0 <= id < pg_node_num() )
   /// @note 入力ノードでない場合の返り値は不定
   virtual
   ymuint
-  input_id(ymuint id) const;
+  pg_input_id(ymuint id) const;
 
   /// @brief 入力のノード番号を返す．
-  /// @param[in] input_id 入力番号 ( 0 <= input_id < input_num() )
+  /// @param[in] input_id 入力番号 ( 0 <= input_id < pg_input_num() )
   /// @return input_id の入力に対応するノードのノード番号
   virtual
   ymuint
-  input_node(ymuint input_id) const;
+  pg_input_node(ymuint input_id) const;
 
   /// @brief 総枝数を返す．
   virtual
   ymuint
-  edge_num() const;
+  pg_edge_num() const;
 
   /// @brief 枝のファンイン元のノード番号を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  /// @param[in] id 枝番号 ( 0 <= id < pg_edge_num() )
   virtual
   ymuint
-  edge_from(ymuint id) const;
+  pg_edge_from(ymuint id) const;
 
   /// @brief 枝のファンアウト先のノード番号を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  /// @param[in] id 枝番号 ( 0 <= id < pg_edge_num() )
   virtual
   ymuint
-  edge_to(ymint id) const;
+  pg_edge_to(ymint id) const;
 
   /// @brief 枝のファンアウト先の入力位置( 0 or 1 ) を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  /// @param[in] id 枝番号 ( 0 <= id < pg_edge_num() )
   virtual
   ymuint
-  edge_pos(ymuint id) const;
+  pg_edge_pos(ymuint id) const;
 
   /// @brief 枝の反転属性を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  /// @param[in] id 枝番号 ( 0 <= id < pg_edge_num() )
   virtual
   bool
-  edge_inv(ymuint id) const;
+  pg_edge_inv(ymuint id) const;
 
 
 public:
@@ -352,13 +352,13 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリダンプされた内容を読み込む．
   /// @param[in] s 入力元のストリーム
   virtual
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 public:
@@ -375,7 +375,7 @@ public:
   /// @brief 'technology' を設定する．
   virtual
   void
-  set_technology(tTechnology technology);
+  set_technology(tCellTechnology technology);
 
   /// @brief 遅延モデルを設定する．
   /// @param[in] delay_model 遅延モデル．
@@ -465,6 +465,12 @@ public:
   virtual
   void
   set_cell_num(ymuint num);
+
+  /// @brief セルを取り出す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < cell_num() )
+  virtual
+  Cell*
+  cell(ymuint pos);
 
   /// @brief 論理セルを生成する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
@@ -643,6 +649,9 @@ public:
 		  ymuint pin_id,
 		  ymuint output_id,
 		  const string& name,
+		  bool has_logic,
+		  const LogExpr& logic_expr,
+		  const LogExpr& tristate_expr,
 		  CellCapacitance max_fanout,
 		  CellCapacitance min_fanout,
 		  CellCapacitance max_capacitance,
@@ -672,6 +681,9 @@ public:
 		 ymuint input_id,
 		 ymuint output_id,
 		 const string& name,
+		 bool has_logic,
+		 const LogExpr& logic_expr,
+		 const LogExpr& tristate_expr,
 		 CellCapacitance capacitance,
 		 CellCapacitance rise_capacitance,
 		 CellCapacitance fall_capacitance,
@@ -872,12 +884,12 @@ private:
 
   /// @brief LUT テンプレートを読み込む．
   void
-  restore_lut_template(BinI& s,
+  restore_lut_template(IDO& s,
 		       ymuint id);
 
   /// @brief LUT を読み込む．
   CellLut*
-  restore_lut(BinI& s);
+  restore_lut(IDO& s);
 
 
 public:
@@ -910,7 +922,7 @@ private:
   string mName;
 
   // テクノロジ
-  tTechnology mTechnology;
+  tCellTechnology mTechnology;
 
   // バス命名規則
   string mBusNamingStyle;

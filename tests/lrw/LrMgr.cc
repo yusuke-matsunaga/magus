@@ -116,7 +116,7 @@ int
 calc_gain(const AigCut* cut,
 	  vector<ymuint32>& marks)
 {
-  for (size_t i = 0; i < cut->ni(); ++ i) {
+  for (size_t i = 0; i < cut->input_num(); ++ i) {
     AigNode* inode = cut->input(i);
     marks[inode->id()] |= 2U;
   }
@@ -214,7 +214,7 @@ mark_dnode(const AigCut* cut,
 	   AigNode* new_node,
 	   vector<ymuint32>& marks)
 {
-  for (ymuint i = 0; i < cut->ni(); ++ i) {
+  for (ymuint i = 0; i < cut->input_num(); ++ i) {
     AigNode* inode = cut->input(i);
     marks[inode->id()] |= 2U;
   }
@@ -253,7 +253,7 @@ LrMgr::local_rewrite(AigMgr& aig_mgr)
 	 p != clist.end(); ++ p) {
       const AigCut* cut = *p;
       bool ok = true;
-      for (size_t i = 0; i < cut->ni(); ++ i) {
+      for (size_t i = 0; i < cut->input_num(); ++ i) {
 	AigNode* inode = cut->input(i);
 	if ( marks[inode->id()] & 1U ) {
 	  // inode は削除されている．
@@ -267,7 +267,7 @@ LrMgr::local_rewrite(AigMgr& aig_mgr)
 
       ymuint32 pat = cut->lf_vector();
       AigTemplate templ;
-      bool stat = find_aig(cut->ni(), pat, templ);
+      bool stat = find_aig(cut->input_num(), pat, templ);
       assert_cond(stat, __FILE__, __LINE__);
       int gain = calc_gain(cut, marks) - templ.cost();
       if ( best_gain < gain ) {
@@ -286,8 +286,8 @@ LrMgr::local_rewrite(AigMgr& aig_mgr)
 	best_templ.dump(cout);
 	cout << endl;
       }
-      vector<AigHandle> inputs(best_cut->ni());
-      for (size_t i = 0; i < best_cut->ni(); ++ i) {
+      vector<AigHandle> inputs(best_cut->input_num());
+      for (size_t i = 0; i < best_cut->input_num(); ++ i) {
 	inputs[i] = AigHandle(best_cut->input(i), false);
       }
 

@@ -28,14 +28,18 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
+  /// @param[in] builtin 組み込みクラスの時 true にするフラグ
   /// @param[in] repfunc 代表関数
   LcClass(ymuint id,
+	  bool builtin,
 	  const TvFunc& repfunc);
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
+  /// @param[in] builtin 組み込みクラスの時 true にするフラグ
   /// @param[in] repfunc 代表関数
   LcClass(ymuint id,
+	  bool builtin,
 	  const TvFuncM& repfunc);
 
   /// @brief デストラクタ
@@ -43,10 +47,17 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号を返す．
   ymuint
   id() const;
+
+  /// @brief 組み込みクラスの時 true を返す．
+  bool
+  builtin() const;
 
   /// @brief 代表関数を返す．
   TvFuncM

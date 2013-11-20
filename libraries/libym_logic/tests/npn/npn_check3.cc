@@ -10,7 +10,7 @@
 #endif
 
 #include "ym_utils/random.h"
-#include "ym_utils/Generator.h"
+#include "ym_utils/PermGen.h"
 #include "ym_logic/TvFunc.h"
 #include "ym_logic/NpnMgr.h"
 
@@ -407,11 +407,10 @@ verify(ymuint ni,
 	}
       }
 
-      PermGen pg(ni, ni);
-      for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+      for (PermGen pg(ni, ni); !pg.is_end(); ++ pg) {
 	NpnMap perm_map(ni);
 	for (ymuint i = 0; i < ni; ++ i) {
-	  ymuint j = p(i);
+	  ymuint j = pg(i);
 	  perm_map.set(VarId(i), VarId(j), kPolPosi);
 	}
 

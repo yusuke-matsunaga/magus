@@ -3,7 +3,7 @@
 /// @brief FaultMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -11,7 +11,7 @@
 #include "FaultMgr.h"
 
 
-BEGIN_NAMESPACE_YM_PYSATPG
+BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
@@ -37,7 +37,6 @@ struct FaultMgrObject
 //////////////////////////////////////////////////////////////////////
 // Python 用のメソッド関数定義
 //////////////////////////////////////////////////////////////////////
-
 
 // FaultMgrObject の生成関数
 FaultMgrObject*
@@ -76,12 +75,12 @@ FaultMgr_init(FaultMgrObject* self,
 
 // 故障に対応する Python オブジェクトを得る．
 PyObject*
-fobject(SaFault* f,
+fobject(TpgFault* f,
 	hash_map<ymuint, PyObject*>& fmap)
 {
   hash_map<ymuint, PyObject*>::iterator p = fmap.find(f->id());
   if ( p == fmap.end() ) {
-    PyObject* obj = SaFault_FromSaFault(f);
+    PyObject* obj = PyTpgFault_FromTpgFault(f);
     fmap.insert(make_pair(f->id(), obj));
     return obj;
   }
@@ -92,13 +91,13 @@ fobject(SaFault* f,
 
 // 故障のリストを表す Python オブジェクトを得る．
 PyObject*
-flist(const vector<SaFault*>& fault_list,
+flist(const vector<TpgFault*>& fault_list,
       hash_map<ymuint, PyObject*>& fmap)
 {
   ymuint n = fault_list.size();
   PyObject* list_obj = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
-    SaFault* f = fault_list[i];
+    TpgFault* f = fault_list[i];
     PyObject* obj1 = fobject(f, fmap);
     PyList_SetItem(list_obj, i, obj1);
   }
@@ -110,7 +109,15 @@ PyObject*
 FaultMgr_all_list(FaultMgrObject* self,
 		  PyObject* args)
 {
-  return flist(self->mPtr->all_list(), *self->mFaultMap);
+  FaultMgr* fmgr = self->mPtr;
+  ymuint n = fmgr->all_num();
+  PyObject* list_obj = PyList_New(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    TpgFault* f = fmgr->fault(i);
+    PyObject* obj1 = fobject(f, *self->mFaultMap);
+    PyList_SetItem(list_obj, i, obj1);
+  }
+  return list_obj;
 }
 
 // 全ての代表故障のリストを得る．
@@ -118,7 +125,15 @@ PyObject*
 FaultMgr_rep_list(FaultMgrObject* self,
 		  PyObject* args)
 {
-  return flist(self->mPtr->all_rep_list(), *self->mFaultMap);
+  FaultMgr* fmgr = self->mPtr;
+  ymuint n = fmgr->rep_num();
+  PyObject* list_obj = PyList_New(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    TpgFault* f = fmgr->rep_fault(i);
+    PyObject* obj1 = fobject(f, *self->mFaultMap);
+    PyList_SetItem(list_obj, i, obj1);
+  }
+  return list_obj;
 }
 
 // 検出済みの代表故障のリストを得る．
@@ -209,7 +224,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // FaultMgr 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject FaultMgrType = {
+PyTypeObject PyFaultMgr_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -260,34 +275,12 @@ PyTypeObject FaultMgrType = {
 // PyObject と FaultMgr 間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から FaultMgr を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] pobj FaultMgr を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が FaultMgrObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   FaultMgr*& pobj)
-{
-  // 型のチェック
-  if ( !FaultMgrObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  FaultMgrObject* fileloc_obj = (FaultMgrObject*)py_obj;
-
-  pobj = fileloc_obj->mPtr;
-
-  return true;
-}
-
 // @brief FaultMgr から PyObject を生成する．
 // @param[in] obj FaultMgr オブジェクト
 PyObject*
-FaultMgr_FromFaultMgr(FaultMgr* obj)
+PyFaultMgr_FromFaultMgr(FaultMgr* obj)
 {
-  FaultMgrObject* py_obj = FaultMgr_new(&FaultMgrType);
+  FaultMgrObject* py_obj = FaultMgr_new(&PyFaultMgr_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -298,18 +291,37 @@ FaultMgr_FromFaultMgr(FaultMgr* obj)
   return (PyObject*)py_obj;
 }
 
+// @brief PyObject から FaultMgr へのポインタを取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return FaultMgr へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+FaultMgr*
+PyFaultMgr_AsFaultMgrPtr(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyFaultMgr_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "satpg.FaultMgr is expected");
+    return NULL;
+  }
+
+  // 強制的にキャスト
+  FaultMgrObject* my_obj = (FaultMgrObject*)py_obj;
+
+  return my_obj->mPtr;
+}
+
 // FaultMgrObject 関係の初期化を行う．
 void
 FaultMgrObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&FaultMgrType) < 0 ) {
+  if ( PyType_Ready(&PyFaultMgr_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "FaultMgr", (PyObject*)&FaultMgrType);
+  PyModule_AddObject(m, "FaultMgr", (PyObject*)&PyFaultMgr_Type);
 }
 
 
-END_NAMESPACE_YM_PYSATPG
+END_NAMESPACE_YM_SATPG

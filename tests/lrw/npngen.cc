@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_utils/Generator.h"
+#include "ym_utils/PermGen.h"
 #include "NpnXform.h"
 
 
@@ -16,13 +16,11 @@ BEGIN_NAMESPACE_YM
 void
 npngen()
 {
-  PermGen pg(4, 4);
-
   const char* comma0 = "";
-  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+  for (PermGen pg(4, 4); !pg.is_end(); ++ pg) {
     ymuint perm[4];
     for (ymuint i = 0; i < 4; ++ i) {
-      perm[i] = p(i);
+      perm[i] = pg(i);
     }
     ymuint pid = NpnXform::perm_id(perm);
     for (ymuint pols = 0; pols < 32; ++ pols) {

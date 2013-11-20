@@ -3,7 +3,7 @@
 /// @brief RandCombiGen の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -11,7 +11,7 @@
 #include "ym_utils/RandCombiGen.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -69,8 +69,8 @@ RandCombiGen_init(RandCombiGenObject* self,
   // - (uint, uint)
   ymuint n = 0;
   ymuint k = 0;
-  if ( !PyArg_ParseTuple(args, "kk", &n, &k) ) {
-    return NULL;
+  if ( !PyArg_ParseTuple(args, "II", &n, &k) ) {
+    return -1;
   }
 
   if ( self->mBody != NULL ) {
@@ -86,7 +86,7 @@ PyObject*
 RandCombiGen_num(RandCombiGenObject* self,
 		 PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->num());
+  return PyObject_FromYmuint32(self->mBody->num());
 }
 
 // combi_num 関数
@@ -94,7 +94,7 @@ PyObject*
 RandCombiGen_combi_num(RandCombiGenObject* self,
 		       PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->combi_num());
+  return PyObject_FromYmuint32(self->mBody->combi_num());
 }
 
 // generate 関数
@@ -105,13 +105,11 @@ RandCombiGen_generate(RandCombiGenObject* self,
   // 引数の形式は
   // - (RandGen)
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &RandGenType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyRandGen_Type, &obj) ) {
     return NULL;
   }
-  RandGen* p_rg;
-  if ( !conv_from_pyobject(obj, p_rg) ) {
-    return NULL;
-  }
+  RandGen* p_rg = PyRandGen_AsRandGenPtr(obj);
 
   self->mBody->generate(*p_rg);
 
@@ -127,11 +125,11 @@ RandCombiGen_elem(RandCombiGenObject* self,
   // 引数の形式は
   // - (uint)
   ymuint pos = 0;
-  if ( !PyArg_ParseTuple(args, "k", &pos) ) {
+  if ( !PyArg_ParseTuple(args, "I", &pos) ) {
     return NULL;
   }
 
-  return conv_to_pyobject(self->mBody->elem(pos));
+  return PyObject_FromYmuint32(self->mBody->elem(pos));
 }
 
 
@@ -170,7 +168,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // RandCombiGenObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject RandCombiGenType = {
+PyTypeObject PyTypeRandCombiGen = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -257,12 +255,12 @@ void
 RandCombiGenObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&RandCombiGenType) < 0 ) {
+  if ( PyType_Ready(&PyTypeRandCombiGen) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "RandCombiGen", (PyObject*)&RandCombiGenType);
+  PyModule_AddObject(m, "RandCombiGen", (PyObject*)&PyTypeRandCombiGen);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

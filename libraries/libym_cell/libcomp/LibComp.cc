@@ -28,8 +28,8 @@ LogExpr
 xform_expr(const LogExpr& expr,
 	   const NpnMapM& map)
 {
-  ymuint ni = map.ni();
-  ymuint no = map.no();
+  ymuint ni = map.input_num();
+  ymuint no = map.output_num();
   assert_cond( no == 1, __FILE__, __LINE__);
   VarLogExprMap vlm;
   for (ymuint i = 0; i < ni; ++ i) {
@@ -59,7 +59,6 @@ LibComp::LibComp() :
   mFFMgr(*this),
   mLatchMgr(*this)
 {
-  mMux4Id = 0xFFFFFFFFU;
 }
 
 // @brief デストラクタ
@@ -105,7 +104,7 @@ LibComp::pat_mgr() const
 
 // @brief セルのグループ化，クラス化を行う．
 void
-LibComp::compile(const CellLibrary& library)
+LibComp::compile(CellLibrary& library)
 {
   mGroupList.clear();
   mClassList.clear();
@@ -114,24 +113,34 @@ LibComp::compile(const CellLibrary& library)
   mFFMgr.init();
   mLatchMgr.init();
   mPatMgr.init();
-  mMux4Id = 0xFFFFFFFFU;
 
-  // XOR のパタンを登録しておく．
-  // これはちょっとしたハック
-  {
-    LogExpr lit0 = LogExpr::make_posiliteral(VarId(0));
-    LogExpr lit1 = LogExpr::make_posiliteral(VarId(1));
-    LogExpr xor_ex = lit0 ^ lit1;
-    reg_expr(xor_ex);
+  // AND2 〜 AND8 のパタンを登録しておく．
+  for (ymuint ni = 2; ni <= 8; ++ ni) {
+    LogExpr and_expr = LogExpr::make_posiliteral(VarId(0));
+    for (ymuint i = 1; i < ni; ++ i) {
+      and_expr &= LogExpr::make_posiliteral(VarId(i));
+    }
+    reg_expr(and_expr, true);
   }
+
+  // XOR2 〜 XOR4 のパタンを登録しておく．
+  for (ymuint ni = 2; ni <= 4; ++ ni) {
+    LogExpr xor_expr = LogExpr::make_posiliteral(VarId(0));
+    for (ymuint i = 1; i < ni; ++ i) {
+      xor_expr ^= LogExpr::make_posiliteral(VarId(i));
+    }
+    reg_expr(xor_expr, true);
+  }
+
   // MUX2 のパタンを登録しておく．
   {
     LogExpr lit0 = LogExpr::make_posiliteral(VarId(0));
     LogExpr lit1 = LogExpr::make_posiliteral(VarId(1));
     LogExpr lit2 = LogExpr::make_posiliteral(VarId(2));
     LogExpr mux2_ex = lit0 & ~lit2 | lit1 & lit2;
-    reg_expr(mux2_ex);
+    reg_expr(mux2_ex, true);
   }
+
   // MUX4 のパタンを登録しておく．
   {
     LogExpr lit0 = LogExpr::make_posiliteral(VarId(0));
@@ -140,32 +149,48 @@ LibComp::compile(const CellLibrary& library)
     LogExpr lit3 = LogExpr::make_posiliteral(VarId(3));
     LogExpr lit4 = LogExpr::make_posiliteral(VarId(4));
     LogExpr lit5 = LogExpr::make_posiliteral(VarId(5));
-    LogExpr mux4_ex = lit0 & ~lit4 & ~lit5 |
-      lit1 & lit4 & ~lit5 |
-      lit2 & ~lit4 & lit5 |
-      lit3 & lit4 & lit5;
-    reg_expr(mux4_ex);
+    LogExpr mux4_ex =
+      lit0 & ~lit4 & ~lit5 |
+      lit1 &  lit4 & ~lit5 |
+      lit2 & ~lit4 &  lit5 |
+      lit3 &  lit4 &  lit5;
+    reg_expr(mux4_ex, true);
+  }
 
-    TvFunc f = mux4_ex.make_tv();
-    LcGroup* fgroup = mLogicMgr.find_group(TvFuncM(f));
-    const LcClass* fclass = fgroup->parent();
-    mMux4Id = fclass->id();
+  // MUX8 のパタンを登録しておく．
+  if ( 0 ) {
+    LogExpr lit0 = LogExpr::make_posiliteral(VarId(0));
+    LogExpr lit1 = LogExpr::make_posiliteral(VarId(1));
+    LogExpr lit2 = LogExpr::make_posiliteral(VarId(2));
+    LogExpr lit3 = LogExpr::make_posiliteral(VarId(3));
+    LogExpr lit4 = LogExpr::make_posiliteral(VarId(4));
+    LogExpr lit5 = LogExpr::make_posiliteral(VarId(5));
+    LogExpr lit6 = LogExpr::make_posiliteral(VarId(6));
+    LogExpr lit7 = LogExpr::make_posiliteral(VarId(7));
+    LogExpr lit8 = LogExpr::make_posiliteral(VarId(8));
+    LogExpr lit9 = LogExpr::make_posiliteral(VarId(9));
+    LogExpr lit10 = LogExpr::make_posiliteral(VarId(10));
+    LogExpr mux8_ex =
+      lit0 & ~lit8 & ~lit9 & ~lit10 |
+      lit1 &  lit8 & ~lit9 & ~lit10 |
+      lit2 & ~lit8 &  lit9 & ~lit10 |
+      lit3 &  lit8 &  lit9 & ~lit10 |
+      lit4 & ~lit8 & ~lit9 &  lit10 |
+      lit5 &  lit8 & ~lit9 &  lit10 |
+      lit6 & ~lit8 &  lit9 &  lit10 |
+      lit7 &  lit8 &  lit9 &  lit10;
+    reg_expr(mux8_ex, true);
   }
 
   ymuint nc = library.cell_num();
   for (ymuint i = 0; i < nc; ++ i) {
-    const Cell* cell = library.cell(i);
+    Cell* cell = library.cell(i);
 
     if ( cell->is_logic() ) {
       mLogicMgr.add_cell(cell);
 
       // パタンを作る．
-      ymuint ni2 = cell->input_num2();
       ymuint no2 = cell->output_num2();
-      if ( ni2 > 8 ) {
-	// 入力ピンが8つ以上のセルは対象外
-	continue;
-      }
       if ( no2 != 1 ) {
 	// 出力ピンが複数あるセルは対象外
 	continue;
@@ -180,7 +205,7 @@ LibComp::compile(const CellLibrary& library)
       }
 
       LogExpr expr = cell->logic_expr(0);
-      reg_expr(expr);
+      reg_expr(expr, false);
     }
     else if ( cell->is_ff() ) {
       mFFMgr.add_cell(cell);
@@ -188,6 +213,10 @@ LibComp::compile(const CellLibrary& library)
     else if ( cell->is_latch() ) {
       mLatchMgr.add_cell(cell);
     }
+  }
+
+  if ( 0 ) {
+    display(cout);
   }
 }
 
@@ -260,27 +289,41 @@ LibComp::latch_class(ymuint id) const
 }
 
 // @brief expr から生成されるパタンを登録する．
+// @param[in] expr 論理式
+// @param[in] builtin 組み込みクラスの時 true にするフラグ
 void
-LibComp::reg_expr(const LogExpr& expr)
+LibComp::reg_expr(const LogExpr& expr,
+		  bool builtin)
 {
   // expr に対応する LcGroup を求める．
   TvFunc f = expr.make_tv();
-  LcGroup* fgroup = mLogicMgr.find_group(TvFuncM(f));
+  LcGroup* fgroup = mLogicMgr.find_group(TvFuncM(f), builtin);
   const LcClass* fclass = fgroup->parent();
 
-  if ( fclass->id() == mMux4Id ) {
-    // かなり苦しいハック
+  // 組み込みクラスなら新たなパタンの登録は行わない．
+  if ( !builtin && fclass->builtin() ) {
     return;
   }
 
   // fclass->rep_func() を用いる理由は論理式に現れる変数が
   // 真のサポートとは限らないから
-  if ( fclass->repfunc().ni() > 1 ) {
-    // expr を変換したパタンを登録する．
-    LogExpr cexpr = xform_expr(expr, fgroup->map());
-    assert_cond( !cexpr.is_constant(), __FILE__, __LINE__);
 
+  ymuint ni = fclass->repfunc().input_num();
+
+  if ( ni <= 1 ) {
+    // 定数関数およびバッファ，インバータは別に処理する．
+    return;
+  }
+
+  // expr を変換したパタンを登録する．
+  LogExpr cexpr = xform_expr(expr, fgroup->map());
+  assert_cond( !cexpr.is_constant(), __FILE__, __LINE__);
+
+  if ( ni <= 8 ) {
     mPatMgr.reg_pat(cexpr, fclass->id());
+  }
+  else {
+    // 登録できなかったことを通知する？
   }
 }
 
@@ -296,11 +339,14 @@ LibComp::new_group()
 }
 
 // @brief 新しいクラスを作る．
+// @param[in] repfunc 代表関数
+// @param[in] builtin 組み込みクラスの時 true にするフラグ
 LcClass*
-LibComp::new_class(const TvFuncM& repfunc)
+LibComp::new_class(const TvFuncM& repfunc,
+		   bool builtin)
 {
   ymuint new_id = mClassList.size();
-  LcClass* fclass = new LcClass(new_id, repfunc);
+  LcClass* fclass = new LcClass(new_id, builtin, repfunc);
   mClassList.push_back(fclass);
 
   return fclass;
@@ -321,8 +367,8 @@ LibComp::display(ostream& s) const
       << ": " << group->map()
       << endl;
     s << "  CELL:";
-    const vector<const Cell*>& cell_list = group->cell_list();
-    for (vector<const Cell*>::const_iterator p = cell_list.begin();
+    const vector<Cell*>& cell_list = group->cell_list();
+    for (vector<Cell*>::const_iterator p = cell_list.begin();
 	 p != cell_list.end(); ++ p) {
       const Cell* cell = *p;
       s << " " << cell->name();
@@ -349,26 +395,6 @@ LibComp::display(ostream& s) const
   }
   s << "*** NPN Class END ***" << endl
     << endl;
-
-#if 0
-  // 論理セルグループの情報を出力する．
-  s << "*** LogicGroupMgr BEGIN ***" << endl;
-  mLogicMgr.display(s);
-  s << "*** LogicGroupMgr END ***" << endl
-    << endl;
-
-  // FFグループの情報を出力する．
-  s << "*** FFGroupMgr BEGIN ***" << endl;
-  mFFMgr.display(s);
-  s << "*** FFGroupMgr END ***" << endl
-    << endl;
-
-  // ラッチグループの情報を出力する．
-  s << "*** LatchGroupMgr BEGIN ***" << endl;
-  mLatchMgr.display(s);
-  s << "*** LatchGroupMgr END ***" << endl
-    << endl;
-#endif
 
   // パタングラフの情報を出力する．
   mPatMgr.display(s);

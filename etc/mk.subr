@@ -25,6 +25,21 @@ clean() {
     echo "  done" | tee -a $MK_LOG
 }
 
+# チェックアウトした状態に戻す．
+# 生成されるファイルを指定しているのでツールのバージョンが上がると
+# 変更しなければならないかも
+clean_root() {
+    dirname=$1
+    echo "Cleaning source tree in $dirname ..." | tee -a $MK_LOG
+
+    for dir in . include libraries programs; do
+	for file in Makefile.in *~ *.bak aclocal.m4 autom4te.cache configure; do
+	    $RM -r -f $dirname/$dir/$file 2>> $MK_LOG
+	done
+    done
+    echo "  done" | tee -a $MK_LOG
+}
+
 # config ディレクトリを削除する．
 # 生成されるファイルを指定しているのでツールのバージョンが上がると
 # 変更しなければならないかも
@@ -100,7 +115,7 @@ mk_autogen() {
     esac
 
     if test "x$AUTOGEN_COMMON" = x; then
-	AUTOGEN_COMMON=/dev/null
+	AUTOGEN_COMMON="../autogen.common"
     fi
 
     sed -e s!__YM__SRC__DIRECTORY__!$srcdir! \

@@ -10,16 +10,12 @@
 /// All rights reserved.
 
 
-#include "dtpg_nsdef.h"
 #include "Dtpg.h"
-#include "ym_networks/tgnet.h"
-#include "ym_logic/Literal.h"
-#include "ym_logic/Bool3.h"
-#include "ym_logic/sat_nsdef.h"
-#include "ym_utils/StopWatch.h"
+#include "TpgFault.h"
+#include "SatEngine.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_DTPG
+BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
 /// @class DtpgSat DtpgSat.h "DtpgSat.h"
@@ -50,39 +46,50 @@ public:
 	   const string& option = string(),
 	   ostream* outp = NULL);
 
-  /// @brief get_pat フラグを設定する．
-  virtual
-  void
-  set_get_pat(ymuint val);
-
-  /// @brief dry-run フラグを設定する．
-  virtual
-  void
-  set_dry_run(bool flag);
-
   /// @brief 回路と故障リストを設定する．
-  /// @param[in] tgnetwork 対象のネットワーク
-  /// @param[in] fault_list 故障リスト
+  /// @param[in] tpgnetwork 対象のネットワーク
   virtual
   void
-  set_network(const TgNetwork& tgnetwork,
-	      const vector<SaFault*>& fault_list);
+  set_network(TpgNetwork& tgnetwork);
 
-  /// @brief モードでテスト生成を行なう．
-  /// @param[in] op テスト生成後に呼ばれるファンクター
-  /// @param[in] option オプション文字列
+  /// @brief テスト生成を行なう．
+  /// @param[in] mode メインモード
+  /// @param[in] po_mode PO分割モード
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop_list DetectOp のリスト
+  /// @param[in] uop_list UntestOp のリスト
+  /// @param[in] stats 結果を格納する構造体
   virtual
   void
-  run(DtpgOperator& op,
-      const string& option = string());
+  run(tDtpgMode mode,
+      tDtpgPoMode po_mode,
+      BackTracer& bt,
+      const vector<DetectOp*>& dop_list,
+      const vector<UntestOp*>& uop_list,
+      DtpgStats& stats);
 
-  /// @brief 統計情報をクリアする．
+  /// @breif 時間計測を制御する．
+  virtual
   void
-  clear_stats();
+  timer_enable(bool enable);
 
-  /// @brief 統計情報を得る．
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 一つの故障に対する処理が終わったときに呼ばれる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief テストパタンが見つかった場合に呼ばれる関数
+  /// @param[in] f 故障
+  /// @param[in] tv テストパタン
   void
-  get_stats() const;
+  set_detected(TpgFault* f,
+	       TestVector* tv);
+
+  /// @brief 検出不能のときに呼ばれる関数
+  /// @param[in] f 故障
+  void
+  set_untestable(TpgFault* f);
 
 
 private:
@@ -90,152 +97,92 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief single モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  void
+  single_mode(BackTracer& bt);
+
+  /// @brief dual モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  void
+  dual_mode(BackTracer& bt);
+
+  /// @brief node モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  void
+  node_mode(BackTracer& bt);
+
+  /// @brief ffr モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  void
+  ffr_mode(BackTracer& bt);
+
+  /// @brief mffc モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  void
+  mffc_mode(BackTracer& bt);
+
+  /// @brief all モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  void
+  all_mode(BackTracer& bt);
+
   /// @brief single モードの共通処理
   void
-  single_sub(DtpgOperator& op);
+  single_sub(BackTracer& bt);
 
   /// @brief dual モードの共通処理
   void
-  dual_sub(DtpgOperator& op);
+  dual_sub(BackTracer& bt);
 
   /// @brief ffr モードの共通処理
   void
-  ffr_sub(DtpgOperator& op);
+  ffr_sub(BackTracer& bt);
 
   /// @brief mffc モードの共通処理
   void
-  mffc_sub(DtpgOperator& op);
+  mffc_sub(BackTracer& bt);
 
   /// @brief all モードの共通処理
   void
-  all_sub(DtpgOperator& op);
-
-  /// @brief 一つの FFR に対してテストパタン生成を行う．
-  /// @param[in] ffr 対象の FFR
-  void
-  ffr_mode(DtpgFFR* ffr,
-	   DtpgOperator& op);
-
-  /// @brief スキップフラグを解除する．
-  void
-  clear_skip();
+  all_sub(BackTracer& bt);
 
   /// @brief 一つの故障に対してテストパタン生成を行う．
   /// @param[in] f 故障
   /// @param[in] op テスト生成の結果を処理するファンクター
   void
-  dtpg_single(DtpgFault* f,
-	      DtpgOperator& op);
+  dtpg_single(TpgFault* f,
+	      BackTracer& bt);
 
   /// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
   /// @param[in] f0 0縮退故障
   /// @param[in] f1 1縮退故障
   /// @param[in] op テスト生成の結果を処理するファンクター
   void
-  dtpg_dual(DtpgFault* f0,
-	    DtpgFault* f1,
-	    DtpgOperator& op);
+  dtpg_dual(TpgFault* f0,
+	    TpgFault* f1,
+	    BackTracer& bt);
 
-  /// @brief 複数の故障に対してテストパタン生成を行なう．
-  /// @param[in] flist 故障リスト
-  /// @param[in] root FFR の根のノード
-  /// @param[in] node_list FFR 内のノードリスト
-  /// @param[in] op テスト生成の結果を処理するファンクター
+  /// @brief DFS で FFR を求める．
   void
-  dtpg_group(const vector<DtpgFault*>& flist,
-	     DtpgOperator& op);
+  dfs_ffr(TpgNode* node);
 
-  /// @brief 統計情報を得る．
-  /// @param[in] solver SatSolver
+  /// @brief DFS で MFFC を求める．
   void
-  update_stats(SatSolver& solver,
-	       ymuint n);
+  dfs_mffc(TpgNode* node,
+	   vector<bool>& mark);
 
-  /// @brief 一つの SAT問題を解く．
+  /// @brief ノードの故障を追加する．
   void
-  solve(SatSolver& solver,
-	DtpgFault* f,
-	DtpgOperator& op);
+  add_node_faults(TpgNode* node);
 
-  /// @brief テストパタンを求める．
-  /// @param[in] fnode 故障のあるノード
-  /// @note 結果は mValList に格納される．
+  /// @brief 故障を追加する．
   void
-  get_pat(DtpgNode* fnode);
+  add_fault(TpgFault* fault);
 
-  /// @brief テストパタンを求める．
-  /// @param[in] fnode 故障のあるノード
-  /// @note 結果は mValList に格納される．
+  /// @brief テストパタン生成を行なう．
   void
-  get_pat2(DtpgNode* fnode);
-
-  /// @brief solve 中で故障差を持つノードをたどる．
-  /// @param[in] node 対象のノード
-  /// @retval true node を通って外部出力まで故障差が伝搬している．
-  /// @retval false 故障差が伝搬していない．
-  /// @note 故障差の伝搬経路上のノードは mDiffNodeList に格納される．
-  /// @note 一旦調べたノードはすべて mark1 がつく．
-  /// @note 故障差が伝搬しているノードは mark2 がつく．
-  /// @note マークがついたノードは mBwdNodeList に格納される．
-  bool
-  fwd_dfs(DtpgNode* node);
-
-  /// @brief solve 中で変数割り当ての正当化を行なう．
-  /// @param[in] node 対象のノード
-  /// @note node の値割り当てを正当化する．
-  /// @note 正当化に用いられているノードには mark3 がつく．
-  /// @note mark3 がついたノードは mBwdNodeList に格納される．
-  void
-  justify(DtpgNode* node);
-
-  /// @brief すべてのファンインに対して justify() を呼ぶ．
-  /// @param[in] node 対象のノード
-  void
-  just_sub1(DtpgNode* node);
-
-  /// @brief 指定した値を持つのファンインに対して justify() を呼ぶ．
-  /// @param[in] node 対象のノード
-  /// @param[in] val 値
-  void
-  just_sub2(DtpgNode* node,
-	    Bool3 val);
-
-  /// @brief justify の下請け関数
-  /// @param[in] prim 対象のプリミティブ
-  /// @param[in] node 対象のノード
-  /// @note node の値割り当てを正当化する．
-  /// @note 正当化に用いられているノードには mark3 がつく．
-  /// @note mark3 がついたノードは mBwdNodeList に格納される．
-  void
-  justify_primitive(DtpgPrimitive* prim,
-		    DtpgNode* node);
-
-  /// @brief すべてのファンインに対して justify_primitive() を呼ぶ．
-  /// @param[in] prim 対象のプリミティブ
-  /// @param[in] node 対象のノード
-  void
-  jp_sub1(DtpgPrimitive* prim,
-	  DtpgNode* node);
-
-  /// @brief 指定した値を持つファンインに対して justify_primitive() を呼ぶ．
-  /// @param[in] prim 対象のプリミティブ
-  /// @param[in] node 対象のノード
-  /// @param[in] val 値
-  void
-  jp_sub2(DtpgPrimitive* prim,
-	  DtpgNode* node,
-	  Bool3 val);
-
-  /// @brief 入力ノードの値を記録する．
-  /// @param[in] node 対象の外部入力ノード
-  /// @note node の値を mValList に記録する．
-  /// @note 単純だが mModel 上のインデックスと mValList の符号化は異なる．
-  void
-  record_value(DtpgNode* node);
-
-  /// @brief ノードの変数割り当てフラグを消す．
-  void
-  clear_node_mark();
+  do_dtpg(BackTracer& bt);
 
 
 private:
@@ -243,83 +190,23 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // SAT solver のタイプ
-  string mType;
-
-  // SAT solver のオプション
-  string mOption;
-
-  // SAT solver の記録用ストリーム
-  ostream* mOutP;
-
-  // get_pat フラグ
-  ymuint32 mGetPatFlag;
-
-  // SAT 用の assumption を格納するベクタ
-  vector<Literal> mAssumptions;
-
-  // SAT 用の model を格納するベクタ
-  vector<Bool3> mModel;
-
-  // SAT 用の割り当てリスト
-  vector<ymuint> mValList;
+  // SAT エンジン
+  SatEngine* mSatEngine;
 
   // 対象の回路
-  DtpgNetwork* mNetwork;
+  TpgNetwork* mNetwork;
 
-  // 変数を割り当てたノードを格納するリスト
-  vector<DtpgNode*> mUsedNodeList;
+  // mNetwork のノード数
+  ymuint32 mMaxId;
 
-  // 現在の故障に関係のありそうな外部入力のリスト
-  vector<DtpgNode*> mInputList;
+  // do_dtpg() で用いる対象の故障リスト
+  vector<TpgFault*> mFaultList;
 
-  // 現在の故障に関係ありそうな外部出力のリスト
-  vector<DtpgNode*> mOutputList;
+  // テストパタンが求められたときに実行するファンクタのリスト
+  vector<DetectOp*> mDetectOpList;
 
-  // 故障差が伝搬しているノードを格納するリスト
-  vector<DtpgNode*> mDiffNodeList;
-
-  // バックトレースに用いたノードを格納するリスト
-  vector<DtpgNode*> mBwdNodeList;
-
-  // skip フラグ
-  bool mSkip;
-
-  // dry-run フラグ
-  bool mDryRun;
-
-  // CNF の生成回数
-  ymuint32 mRunCount;
-
-  // SAT の実行回数
-  ymuint32 mSatCount;
-
-  // restart の回数の総和
-  ymuint64 mRestart;
-
-  // 変数の数の総和
-  ymuint64 mVarNum;
-
-  // 制約節の数の総和
-  ymuint64 mConstrClauseNum;
-
-  // 制約節のリテラル数の総和
-  ymuint64 mConstrLitNum;
-
-  // 学習節の数の総和
-  ymuint64 mLearntClauseNum;
-
-  // 学習節のリテラル数の総和
-  ymuint64 mLearntLitNum;
-
-  // コンフリクト数の総和
-  ymuint64 mConflictNum;
-
-  // decision 数の総和
-  ymuint64 mDecisionNum;
-
-  // implication数の総和
-  ymuint64 mPropagationNum;
+  // 検出不能と判定されたときに実行するファンクタのリスト
+  vector<UntestOp*> mUntestOpList;
 
 };
 
@@ -328,36 +215,37 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-
-// @brief 一つの故障に対してテストパタン生成を行う．
-// @param[in] f 故障
-// @param[in] op テスト生成の結果を処理するファンクター
+// @breif 時間計測を制御する．
 inline
 void
-DtpgSat::dtpg_single(DtpgFault* f,
-		     DtpgOperator& op)
+DtpgSat::timer_enable(bool enable)
 {
-  vector<DtpgFault*> flist(1);
-  flist[0] = f;
-  dtpg_group(flist, op);
+  mSatEngine->timer_enable(enable);
 }
 
-// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
-// @param[in] f0 0縮退故障
-// @param[in] f1 1縮退故障
-// @param[in] op テスト生成の結果を処理するファンクター
+// @brief 故障を追加する．
 inline
 void
-DtpgSat::dtpg_dual(DtpgFault* f0,
-		   DtpgFault* f1,
-		   DtpgOperator& op)
+DtpgSat::add_fault(TpgFault* fault)
 {
-  vector<DtpgFault*> flist(2);
-  flist[0] = f0;
-  flist[1] = f1;
-  dtpg_group(flist, op);
+  if ( fault != NULL &&
+       fault->is_rep() &&
+       fault->status() != kFsDetected &&
+       !fault->is_skip() ) {
+    mFaultList.push_back(fault);
+  }
 }
 
-END_NAMESPACE_YM_SATPG_DTPG
+// @brief テストパタン生成を行なう．
+inline
+void
+DtpgSat::do_dtpg(BackTracer& bt)
+{
+  if ( !mFaultList.empty() ) {
+    mSatEngine->run(mFaultList, mMaxId, bt);
+  }
+}
+
+END_NAMESPACE_YM_SATPG
 
 #endif // DTPGSAT_H

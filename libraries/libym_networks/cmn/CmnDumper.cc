@@ -132,7 +132,7 @@ CmnDumper::operator()(ostream& s,
     s << "CELL(" << node->id_str() << ") = "
       << cell->name() << "(";
     const char* comma = "";
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       const CmnNode* inode = node->fanin(i);
       s << comma << inode->id_str();

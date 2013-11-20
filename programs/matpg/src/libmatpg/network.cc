@@ -177,12 +177,12 @@ gn_gen(const TgNetwork& tgnetwork)
   }
   for (size_t i = 0; i < nl; ++ i) {
     const TgNode* node = tgnetwork.sorted_logic(i);
-    size_t ni = node->ni();
+    size_t ni = node->fanin_num();
     gate_t* gate =  new_gate_t(node->gate_type(), node, ni);
     for (size_t j = 0; j < ni; ++ j) {
       const TgNode* inode = node->fanin(j);
       gate_t* igate = gate_map[inode->gid()];
-      gate->init_figate(j, igate);
+      gate->init_fanin_gate(j, igate);
     }
     gate->id = gate_id;
     gates[gate_id] = gate;
@@ -207,20 +207,20 @@ gn_gen(const TgNetwork& tgnetwork)
   // Connect output
   for (size_t i = npi; i < ngate; ++ i) {
     gate_t* gate = gn_get_gate(i);
-    size_t ni = gate->get_ni();
+    size_t ni = gate->get_fanin_num();
     for (size_t j = 0; j < ni; ++ j) {
-      gate->get_figate(j)->init_fogate(gate, j);
+      gate->get_fanin_gate(j)->init_fanout_gate(gate, j);
     }
   }
   for (size_t i = 0; i < npo; ++ i) {
-    gn_get_po(i)->init_fogate(NULL, -1);
+    gn_get_po(i)->init_fanout_gate(NULL, -1);
   }
 
   // find fanout stems
   for (int i = ngate; -- i >= 0; ) {
     gate_t* gate = gn_get_gate(i);
-    if (gate->get_no() == 1 && gate->is_po() == false) {
-      gate->set_fos(gate->get_fogate(0)->get_fos());
+    if (gate->get_fanout_num() == 1 && gate->is_po() == false) {
+      gate->set_fos(gate->get_fanout_gate(0)->get_fos());
     }
     else {
       gate->set_fos(gate);
@@ -230,10 +230,10 @@ gn_gen(const TgNetwork& tgnetwork)
   // set level and ordering in FFR
   for (size_t i = 0; i < ngate; ++ i) {
     gate_t* gate = gn_get_gate(i);
-    int ni = gate->get_ni();
+    int ni = gate->get_fanin_num();
     int level = -1;
     for (int j = ni; -- j >= 0; ) {
-      int level1 = gate->get_figate(j)->lvl_i;
+      int level1 = gate->get_fanin_gate(j)->lvl_i;
       if ( level < level1 ) {
 	level = level1;
       }
@@ -242,7 +242,7 @@ gn_gen(const TgNetwork& tgnetwork)
     if ( gate->is_fos() ) {
       next_ptr = &(gate->next_eval);
       for (int j = 0; j < ni; ++ j) {
-	ord_ffr(gate->get_figate(j));
+	ord_ffr(gate->get_fanin_gate(j));
       }
       *next_ptr = gate;
     }
@@ -261,10 +261,10 @@ gn_gen(const TgNetwork& tgnetwork)
       gate->min_lvl_i = gate->lvl_i;
     }
     else {
-      int j = gate->get_no();
+      int j = gate->get_fanout_num();
       int level = max_level + 1;
       for ( ; -- j >= 0; ) {
-	int level1 = gate->get_fogate(j)->min_lvl_i;
+	int level1 = gate->get_fanout_gate(j)->min_lvl_i;
 	if ( level > level1 ) {
 	  level = level1;
 	}
@@ -295,8 +295,8 @@ ord_ffr(gate_t* gate)
   if ( !gate->is_fos() && !gate->is_pi() ) {
     *next_ptr = gate;
     next_ptr = &(gate->next_eval);
-    for (int i = 0; i < gate->get_ni(); ++ i) {
-      ord_ffr(gate->get_figate(i));
+    for (int i = 0; i < gate->get_fanin_num(); ++ i) {
+      ord_ffr(gate->get_fanin_gate(i));
     }
   }
 }
@@ -311,22 +311,22 @@ set_eq_gate()
       continue;
     }
     int lvl_i = gate->lvl_i;
-    int ni = gate->get_ni();
+    int ni = gate->get_fanin_num();
     if (ni == 0) {
       continue;
     }
     tTgGateType gtype = gate->get_gtype();
-    gate_t* igate0 = gate->get_figate(0);
+    gate_t* igate0 = gate->get_fanin_gate(0);
     gate_t* igate = igate0;
-    if (igate->eq_gate == igate && igate->get_no() == 1) {
+    if (igate->eq_gate == igate && igate->get_fanout_num() == 1) {
       continue;
     }
     do {
-      for (int j = igate->get_no(); -- j >= 0; ) {
-	gate_t* ogate = igate->get_fogate(j);
+      for (int j = igate->get_fanout_num(); -- j >= 0; ) {
+	gate_t* ogate = igate->get_fanout_gate(j);
 	if (ogate != gate && ogate->lvl_i == lvl_i
 	    && ogate->eq_gate == ogate
-	    && ogate->get_gtype() == gtype && ogate->get_ni() == ni) {
+	    && ogate->get_gtype() == gtype && ogate->get_fanin_num() == ni) {
 	  if (ni == 1 || eq(gate, ogate) == true) {
 	    gate_t* top = gate->eq_gate;
 	    gate->eq_gate = ogate;
@@ -339,12 +339,12 @@ set_eq_gate()
   }
   for (size_t i = ngate; -- i >= npi; ) {
     gate_t* gate = gn_get_gate(i);
-    if (gate->get_ni() == 1 || gate->eq_gate == gate) {
+    if (gate->get_fanin_num() == 1 || gate->eq_gate == gate) {
       gate->eq_gate = NULL;
     }
     int j;
-    for (j = gate->get_ni(); -- j >= 0; ) {
-      if (gate->get_figate(j)->eq_gate == NULL) {
+    for (j = gate->get_fanin_num(); -- j >= 0; ) {
+      if (gate->get_fanin_gate(j)->eq_gate == NULL) {
 	break;
       }
     }
@@ -359,14 +359,14 @@ bool
 eq(gate_t* gate1,
    gate_t* gate2)
 {
-  int ni = gate1->get_ni();
+  int ni = gate1->get_fanin_num();
   vector<int> match_bits(ni, 0);
   for (int i = ni; -- i >= 0; ) {
-    gate_t* igate1 = gate1->get_figate(i);
+    gate_t* igate1 = gate1->get_fanin_gate(i);
     int lvl1 = igate1->lvl_i;
     int j;
     for (j = ni; -- j >= 0; ) {
-      gate_t* igate2 = gate2->get_figate(j);
+      gate_t* igate2 = gate2->get_fanin_gate(j);
       if (igate2->lvl_i != lvl1) {
 	continue;
       }
@@ -389,11 +389,11 @@ eq(gate_t* gate1,
     if (match_bits[i] == 1) {
       continue;
     }
-    gate_t* igate2 = gate2->get_figate(i);
+    gate_t* igate2 = gate2->get_fanin_gate(i);
     int lvl2 = igate2->lvl_i;
     int j;
     for (j = ni; -- j >= 0; ) {
-      gate_t* igate1 = gate1->get_figate(j);
+      gate_t* igate1 = gate1->get_fanin_gate(j);
       if (igate1->lvl_i != lvl2) {
 	continue;
       }
@@ -484,12 +484,12 @@ calc_basis()
 
   for (i = nn; -- i >= 0; ) {
     gate_t* gate = gn_get_gate(i);
-    int no = gate->get_no();
+    int no = gate->get_fanout_num();
     gate_t* d = NULL;
     if (no > 0 && gate->is_po() == false) {
-      d = gate->get_fogate(0);
+      d = gate->get_fanout_gate(0);
       for (j = 1; j < no; j ++) {
-	if ((d = cap_dom(d, gate->get_fogate(j))) == NULL) {
+	if ((d = cap_dom(d, gate->get_fanout_gate(j))) == NULL) {
 	  break;
 	}
       }
@@ -499,18 +499,18 @@ calc_basis()
 
   for (i = 0; i < nn; i ++) {
     gate_t* gate = gn_get_gate(i);
-    int ni = gate->get_ni();
+    int ni = gate->get_fanin_num();
     gate_t* d;
     if (ni > 1) {
-      d = d_intsct(gate->get_figate(0));
+      d = d_intsct(gate->get_fanin_gate(0));
       for (j = 1; j < ni; j ++) {
-	if ((d = cap_dom(d, d_intsct(gate->get_figate(j)))) == NULL) {
+	if ((d = cap_dom(d, d_intsct(gate->get_fanin_gate(j)))) == NULL) {
 	  break;
 	}
       }
     }
     else if (ni == 1) {
-      d = gate->get_figate(0);
+      d = gate->get_fanin_gate(0);
       if (d_intsct(d) == d) {
 	d = dominator(d);
       }
@@ -523,7 +523,7 @@ calc_basis()
     }
     d_intsct(gate) = d;
     if (d == gate || (d != NULL && dominator(d) == gate)) {
-      if (gate->is_po() == false || gate->get_no() > 0) {
+      if (gate->is_po() == false || gate->get_fanout_num() > 0) {
 	gate->set_basis();
       }
     }
@@ -594,15 +594,15 @@ gn_activate_all()
   for (int i = ngate; -- i >= 0; ) {
     gate_t* gate = act_gates[i] = gates[i];
     gate->set_active();
-    int no = gate->get_no();
+    int no = gate->get_fanout_num();
     int k = 0;
     for (int j = 0; j < no; j ++) {
-      gate_t* ogate = gate->get_fogate(j);
+      gate_t* ogate = gate->get_fanout_gate(j);
       if (ogate->is_active() == true) {
-	gate->set_act_fogate(k ++, ogate, gate->get_fogate_ipos(j));
+	gate->set_act_fanout_gate(k ++, ogate, gate->get_fanout_gate_ipos(j));
       }
     }
-    gate->set_act_no(k);
+    gate->set_act_fanout_num(k);
   }
 }
 
@@ -619,8 +619,8 @@ mark_tfo(gate_t* gate)
       reach_to_po = true;
     }
     lvlq_put(gate);
-    for ( int i = gate->get_no(); -- i >= 0; ) {
-      mark_tfo(gate->get_fogate(i));
+    for ( int i = gate->get_fanout_num(); -- i >= 0; ) {
+      mark_tfo(gate->get_fanout_gate(i));
     }
   }
 }
@@ -640,11 +640,11 @@ gn_activate_1fault(gate_t* f_gate)
   while ( (gate = lvlq_get_from_top()) ) {
     int k = 0;
     bool sc_flag = true;
-    int no = gate->get_no();
+    int no = gate->get_fanout_num();
     for (i = 0; i < no; i ++) {
-      gate_t* o_gate = gate->get_fogate(i);
+      gate_t* o_gate = gate->get_fanout_gate(i);
       if (o_gate->is_active() == true) {
-	gate->set_act_fogate(k ++, o_gate, gate->get_fogate_ipos(i));
+	gate->set_act_fanout_gate(k ++, o_gate, gate->get_fanout_gate_ipos(i));
 	if (o_gate->chk_scope() == false) {
 	  sc_flag = false;
 	}
@@ -656,10 +656,10 @@ gn_activate_1fault(gate_t* f_gate)
     if (sc_flag == true) {
       gate->set_scope();
     }
-    gate->set_act_no(k);
+    gate->set_act_fanout_num(k);
     act_gates[act_ngate ++] = gate;
-    for (i = gate->get_ni(); -- i >= 0; ) {
-      gate_t* i_gate = gate->get_figate(i);
+    for (i = gate->get_fanin_num(); -- i >= 0; ) {
+      gate_t* i_gate = gate->get_fanin_gate(i);
       if (i_gate->is_active() == false) {
 	i_gate->set_active();
 	lvlq_put(i_gate);
@@ -678,7 +678,7 @@ gn_deactivate()
     gate_t* gate = (*ptr ++);
     gate->rst_active();
     gate->rst_scope();
-    gate->set_act_no(0);
+    gate->set_act_fanout_num(0);
   }
   act_ngate = 0;
 }

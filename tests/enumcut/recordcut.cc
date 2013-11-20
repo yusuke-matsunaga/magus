@@ -27,8 +27,8 @@
 
 #include "ym_utils/StopWatch.h"
 
-#include "ym_utils/FileBinI.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -91,7 +91,7 @@ rec_func(FuncMgr& func_mgr,
       cerr << "Could not create " << datafile << endl;
       return;
     }
-    BinOStream bos(os);
+    ODOStream bos(os);
 
     cut_mgr.dump(bos);
   }
@@ -104,7 +104,7 @@ rec_func(FuncMgr& func_mgr,
       cerr << "Could not open " << datafile << endl;
       return;
     }
-    BinIStream bis(is);
+    IDOStream bis(is);
     cut_mgr2.restore(bis);
   }
   cout << "cut_mgr2:: total " << cut_mgr2.cut_list().size() << " unique cuts" << endl;
@@ -115,7 +115,7 @@ void
 dump_func(FuncMgr& func_mgr,
 	  const char* filename)
 {
-  FileBinO bo(filename);
+  FileODO bo(filename);
   if ( !bo ) {
     cerr << "Could not create " << filename << endl;
     return;
@@ -128,7 +128,7 @@ void
 restore_func(FuncMgr& func_mgr,
 	     const char* filename)
 {
-  FileBinI bi(filename);
+  FileIDO bi(filename);
   if ( !bi ) {
     cerr << "Could not create " << filename << endl;
     return;

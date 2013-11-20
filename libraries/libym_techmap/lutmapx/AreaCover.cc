@@ -103,7 +103,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	 p != cut_list.end(); ++ p) {
       const Cut* cut = *p;
 
-      ymuint ni = cut->ni();
+      ymuint ni = cut->input_num();
       bool ng = false;
       for (ymuint i = 0; i < ni; ++ i) {
 	const BdnNode* inode = cut->input(i);
@@ -153,7 +153,7 @@ AreaCover::calc_weight(const BdnNode* node,
 		       double cur_weight)
 {
   for ( ; ; ) {
-    for (ymuint i = 0; i < cut->ni(); ++ i) {
+    for (ymuint i = 0; i < cut->input_num(); ++ i) {
       if ( cut->input(i) == node ) {
 	// node は cut の葉だった．
 	if  ( !node->pomark() ) {

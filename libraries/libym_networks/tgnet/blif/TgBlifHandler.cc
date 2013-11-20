@@ -158,7 +158,7 @@ TgBlifHandler::names(ymuint32 onode_id,
 
   mNetwork->set_to_logic(node, expr);
 
-  if ( ni != node->ni() ) {
+  if ( ni != node->fanin_num() ) {
     // .names の後の要素数とパタンの列数が異なる．
     ostringstream buf;
     buf << node->name() << ": illegal cover" << endl;

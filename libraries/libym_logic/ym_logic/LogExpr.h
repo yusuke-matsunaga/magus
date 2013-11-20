@@ -11,8 +11,8 @@
 
 #include "ym_logic/lexp_nsdef.h"
 #include "ym_logic/Literal.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -605,8 +605,8 @@ operator<<(ostream& s,
 /// @param[in] s 出力ストリーム
 /// @param[in] expr 論理式
 /// @return s
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const LogExpr& expr);
 
 /// @relates LogExpr
@@ -614,8 +614,8 @@ operator<<(BinO& s,
 /// @param[in] s 入力ストリーム
 /// @param[out] expr 論理式
 /// @return s
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   LogExpr& expr);
 
 

@@ -5,7 +5,7 @@
 /// @brief FaultStatus のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2007, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2007, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "satpg_nsdef.h"
@@ -23,8 +23,6 @@ enum FaultStatus {
   kFsDetected,
   /// @brief テスト不能 (冗長)
   kFsUntestable,
-  /// @brief 部分的なテスト不能
-  kFsPartiallyUntestable,
   /// @brief アボート
   kFsAborted
 };
@@ -36,11 +34,10 @@ const char*
 str(FaultStatus fs)
 {
   switch ( fs ) {
-  case kFsUndetected:          return "undetected";
-  case kFsDetected:            return "detected";
-  case kFsUntestable:          return "untestable";
-  case kFsPartiallyUntestable: return "parially untestable";
-  case kFsAborted:             return "aborted";
+  case kFsUndetected: return "undetected";
+  case kFsDetected:   return "detected";
+  case kFsUntestable: return "untestable";
+  case kFsAborted:    return "aborted";
   default: break;
   }
   assert_not_reached(__FILE__, __LINE__);

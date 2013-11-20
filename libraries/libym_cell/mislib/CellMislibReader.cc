@@ -145,6 +145,8 @@ gen_library(const string& lib_name,
     }
     // 出力ピンの設定
     library->new_cell_output(cell_id, ni, 0, opin_name,
+			     true, function,
+			     LogExpr::make_zero(),
 			     CellCapacitance::infty(),
 			     CellCapacitance(0.0),
 			     CellCapacitance::infty(),

@@ -3,7 +3,7 @@
 /// @brief Bdd の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -12,11 +12,11 @@
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddLitSet.h"
 #include "ym_logic/BddVarSet.h"
-#include "ym_utils/FileBinI.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -71,7 +71,8 @@ Bdd_init(BddObject* self,
 	 PyObject* args)
 {
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "|O!", &BddMgrType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "|O!",
+			 &PyBddMgr_Type, &obj) ) {
     return NULL;
   }
 
@@ -80,10 +81,7 @@ Bdd_init(BddObject* self,
   }
 
   if ( obj != NULL ) {
-    BddMgr* mgr_p;
-    if ( !conv_from_pyobject(obj, mgr_p) ) {
-      return NULL;
-    }
+    BddMgr* mgr_p = PyBddMgr_AsBddMgrPtr(obj);
     self->mBdd = new Bdd(*mgr_p);
   }
   else {
@@ -104,12 +102,13 @@ Bdd_hash(BddObject* self)
 PyObject*
 Bdd_inv(PyObject* left)
 {
-  if ( BddObject_Check(left) ) {
-    BddObject* obj1 = (BddObject*)left;
-    return Bdd_FromBdd(~(*obj1->mBdd));
+  if ( !PyBdd_Check(left) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
-  return NULL;
+
+  Bdd bdd = PyBdd_AsBdd(left);
+  return PyBdd_FromBdd(~bdd);
 }
 
 // and 演算
@@ -117,13 +116,15 @@ PyObject*
 Bdd_and(PyObject* left,
 	PyObject* right)
 {
-  if ( BddObject_Check(left) && BddObject_Check(right) ) {
-    BddObject* obj1 = (BddObject*)left;
-    BddObject* obj2 = (BddObject*)right;
-    return Bdd_FromBdd(*obj1->mBdd & *obj2->mBdd);
+  if ( !PyBdd_Check(left) || !PyBdd_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
-  return NULL;
+
+  Bdd bdd1 = PyBdd_AsBdd(left);
+  Bdd bdd2 = PyBdd_AsBdd(right);
+
+  return PyBdd_FromBdd(bdd1 & bdd2);
 }
 
 // or 演算
@@ -131,13 +132,15 @@ PyObject*
 Bdd_or(PyObject* left,
        PyObject* right)
 {
-  if ( BddObject_Check(left) && BddObject_Check(right) ) {
-    BddObject* obj1 = (BddObject*)left;
-    BddObject* obj2 = (BddObject*)right;
-    return Bdd_FromBdd(*obj1->mBdd | *obj2->mBdd);
+  if ( !PyBdd_Check(left) || !PyBdd_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
-  return NULL;
+
+  Bdd bdd1 = PyBdd_AsBdd(left);
+  Bdd bdd2 = PyBdd_AsBdd(right);
+
+  return PyBdd_FromBdd(bdd1 | bdd2);
 }
 
 // xor 演算
@@ -145,13 +148,15 @@ PyObject*
 Bdd_xor(PyObject* left,
 	PyObject* right)
 {
-  if ( BddObject_Check(left) && BddObject_Check(right) ) {
-    BddObject* obj1 = (BddObject*)left;
-    BddObject* obj2 = (BddObject*)right;
-    return Bdd_FromBdd(*obj1->mBdd ^ *obj2->mBdd);
+  if ( !PyBdd_Check(left) || !PyBdd_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
-  return NULL;
+
+  Bdd bdd1 = PyBdd_AsBdd(left);
+  Bdd bdd2 = PyBdd_AsBdd(right);
+
+  return PyBdd_FromBdd(bdd1 ^ bdd2);
 }
 
 // inplace and 演算
@@ -159,15 +164,17 @@ PyObject*
 Bdd_iand(PyObject* left,
 	 PyObject* right)
 {
-  if ( BddObject_Check(left) && BddObject_Check(right) ) {
-    BddObject* obj1 = (BddObject*)left;
-    BddObject* obj2 = (BddObject*)right;
-    *obj1->mBdd &= *obj2->mBdd;
-    Py_INCREF(left);
-    return left;
+  if ( !PyBdd_Check(left) || !PyBdd_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
-  return NULL;
+
+  BddObject* obj1 = (BddObject*)left;
+  Bdd bdd2 = PyBdd_AsBdd(right);
+  *obj1->mBdd &= bdd2;
+
+  Py_INCREF(left);
+  return left;
 }
 
 // inplace xor 演算
@@ -175,15 +182,17 @@ PyObject*
 Bdd_ixor(PyObject* left,
 	 PyObject* right)
 {
-  if ( BddObject_Check(left) && BddObject_Check(right) ) {
-    BddObject* obj1 = (BddObject*)left;
-    BddObject* obj2 = (BddObject*)right;
-    *obj1->mBdd ^= *obj2->mBdd;
-    Py_INCREF(left);
-    return left;
+  if ( !PyBdd_Check(left) || !PyBdd_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
-  return NULL;
+
+  BddObject* obj1 = (BddObject*)left;
+  Bdd bdd2 = PyBdd_AsBdd(right);
+  *obj1->mBdd ^= bdd2;
+
+  Py_INCREF(left);
+  return left;
 }
 
 // inplace or 演算
@@ -191,15 +200,17 @@ PyObject*
 Bdd_ior(PyObject* left,
 	PyObject* right)
 {
-  if ( BddObject_Check(left) && BddObject_Check(right) ) {
-    BddObject* obj1 = (BddObject*)left;
-    BddObject* obj2 = (BddObject*)right;
-    *obj1->mBdd |= *obj2->mBdd;
-    Py_INCREF(left);
-    return left;
+  if ( !PyBdd_Check(left) || !PyBdd_Check(right) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+    return NULL;
   }
-  PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
-  return NULL;
+
+  BddObject* obj1 = (BddObject*)left;
+  Bdd bdd2 = PyBdd_AsBdd(right);
+  *obj1->mBdd |= bdd2;
+
+  Py_INCREF(left);
+  return left;
 }
 
 // is_zero 関数
@@ -207,7 +218,7 @@ PyObject*
 Bdd_is_zero(BddObject* self,
 	    PyObject* args)
 {
-  return conv_to_pyobject(self->mBdd->is_zero());
+  return PyObject_FromBool(self->mBdd->is_zero());
 }
 
 // is_one 関数
@@ -215,7 +226,7 @@ PyObject*
 Bdd_is_one(BddObject* self,
 	   PyObject* args)
 {
-  return conv_to_pyobject(self->mBdd->is_one());
+  return PyObject_FromBool(self->mBdd->is_one());
 }
 
 // is_const 関数
@@ -223,7 +234,7 @@ PyObject*
 Bdd_is_const(BddObject* self,
 	     PyObject* args)
 {
-  return conv_to_pyobject(self->mBdd->is_const());
+  return PyObject_FromBool(self->mBdd->is_const());
 }
 
 // is_overflow 関数
@@ -231,7 +242,7 @@ PyObject*
 Bdd_is_overflow(BddObject* self,
 		PyObject* args)
 {
-  return conv_to_pyobject(self->mBdd->is_overflow());
+  return PyObject_FromBool(self->mBdd->is_overflow());
 }
 
 // is_error 関数
@@ -239,7 +250,7 @@ PyObject*
 Bdd_is_error(BddObject* self,
 	     PyObject* args)
 {
-  return conv_to_pyobject(self->mBdd->is_error());
+  return PyObject_FromBool(self->mBdd->is_error());
 }
 
 // is_invalid 関数
@@ -247,7 +258,7 @@ PyObject*
 Bdd_is_invalid(BddObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mBdd->is_invalid());
+  return PyObject_FromBool(self->mBdd->is_invalid());
 }
 
 // is_leaf 関数
@@ -255,7 +266,7 @@ PyObject*
 Bdd_is_leaf(BddObject* self,
 	    PyObject* args)
 {
-  return conv_to_pyobject(self->mBdd->is_leaf());
+  return PyObject_FromBool(self->mBdd->is_leaf());
 }
 
 // is_posi_cube 関数
@@ -263,7 +274,7 @@ PyObject*
 Bdd_is_posi_cube(BddObject* self,
 		 PyObject* args)
 {
-  return conv_to_pyobject(self->mBdd->is_posi_cube());
+  return PyObject_FromBool(self->mBdd->is_posi_cube());
 }
 
 // is_cube 関数
@@ -271,7 +282,7 @@ PyObject*
 Bdd_is_cube(BddObject* self,
 	    PyObject* args)
 {
-  return conv_to_pyobject(self->mBdd->is_cube());
+  return PyObject_FromBool(self->mBdd->is_cube());
 }
 
 // check_symmetry 関数
@@ -282,29 +293,23 @@ Bdd_check_symmetry(BddObject* self,
   PyObject* obj1 = NULL;
   PyObject* obj2 = NULL;
   PyObject* obj3 = NULL;
-  if ( !PyArg_ParseTuple(args, "O!O!|O!", &VarIdType, &obj1, &VarIdType, &obj2, &PolType, &obj3) ) {
+  if ( !PyArg_ParseTuple(args, "O!O!|O!",
+			 &PyVarId_Type, &obj1,
+			 &PyVarId_Type, &obj2,
+			 &PyPol_Type, &obj3) ) {
     return NULL;
   }
 
-  VarId vid1;
-  if ( !conv_from_pyobject(obj1, vid1) ) {
-    return NULL;
-  }
-
-  VarId vid2;
-  if ( !conv_from_pyobject(obj2, vid2) ) {
-    return NULL;
-  }
-
+  VarId vid1 = PyVarId_AsVarId(obj1);
+  VarId vid2 = PyVarId_AsVarId(obj2);
   tPol pol = kPolPosi;
   if ( obj3 != NULL ) {
-    if ( !conv_from_pyobject(obj3, pol) ) {
-      return NULL;
-    }
+    pol = PyPol_AsPol(obj3);
   }
 
   bool stat = self->mBdd->check_symmetry(vid1, vid2, pol);
-  return conv_to_pyobject(stat);
+
+  return PyObject_FromBool(stat);
 }
 
 // root_decomp 関数
@@ -315,9 +320,9 @@ Bdd_root_decomp(BddObject* self,
   Bdd f0;
   Bdd f1;
   VarId vid = self->mBdd->root_decomp(f0, f1);
-  PyObject* obj1 = VarId_FromVarId(vid);
-  PyObject* obj2 = Bdd_FromBdd(f0);
-  PyObject* obj3 = Bdd_FromBdd(f1);
+  PyObject* obj1 = PyVarId_FromVarId(vid);
+  PyObject* obj2 = PyBdd_FromBdd(f0);
+  PyObject* obj3 = PyBdd_FromBdd(f1);
   return Py_BuildValue("OOO", obj1, obj2, obj3);
 }
 
@@ -326,7 +331,7 @@ PyObject*
 Bdd_root_var(BddObject* self,
 	     PyObject* args)
 {
-  return VarId_FromVarId(self->mBdd->root_var());
+  return PyVarId_FromVarId(self->mBdd->root_var());
 }
 
 // edge0 関数
@@ -334,7 +339,7 @@ PyObject*
 Bdd_edge0(BddObject* self,
 	  PyObject* args)
 {
-  return Bdd_FromBdd(self->mBdd->edge0());
+  return PyBdd_FromBdd(self->mBdd->edge0());
 }
 
 // edge1 関数
@@ -342,7 +347,7 @@ PyObject*
 Bdd_edge1(BddObject* self,
 	  PyObject* args)
 {
-  return Bdd_FromBdd(self->mBdd->edge1());
+  return PyBdd_FromBdd(self->mBdd->edge1());
 }
 
 // cofactor 関数
@@ -360,24 +365,24 @@ Bdd_cofactor(BddObject* self,
   Literal lit;
   if ( obj2 != NULL ) {
     // obj1 は VarId, obj2 は Pol でなければならない．
-    VarId vid;
-    if ( !conv_from_pyobject(obj1, vid) ) {
-      PyErr_SetString(ErrorObject, "must be logic.VarId");
+    if ( !PyVarId_Check(obj1) || !PyPol_Check(obj2) ) {
+      PyErr_SetString(PyExc_TypeError, "(logic.VarId, logic.Pol) is expected");
       return NULL;
     }
-    tPol pol;
-    if ( !conv_from_pyobject(obj2, pol) ) {
-      PyErr_SetString(ErrorObject, "must be logic.Pol");
-      return NULL;
-    }
+    VarId vid = PyVarId_AsVarId(obj1);
+    tPol pol = PyPol_AsPol(obj2);
     lit.set(vid, pol);
   }
-  else if ( !conv_from_pyobject(obj1, lit) ) {
-    PyErr_SetString(ErrorObject, "must be logic.Literal");
-    return NULL;
+  else {
+    // obj1 は Literal でなければならない．
+    if ( !PyLiteral_Check(obj1 ) ) {
+      PyErr_SetString(PyExc_TypeError, "logic.Literal is expected");
+      return NULL;
+    }
+    lit = PyLiteral_AsLiteral(obj1);
   }
 
-  return Bdd_FromBdd(self->mBdd->cofactor(lit));
+  return PyBdd_FromBdd(self->mBdd->cofactor(lit));
 }
 
 // xor_moment 関数
@@ -387,16 +392,14 @@ Bdd_xor_moment(BddObject* self,
 	       PyObject* args)
 {
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &VarIdType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyVarId_Type, &obj) ) {
     return NULL;
   }
 
-  VarId vid;
-  if ( !conv_from_pyobject(obj, vid) ) {
-    return NULL;
-  }
+  VarId vid = PyVarId_AsVarId(obj);
 
-  return Bdd_FromBdd(self->mBdd->xor_moment(vid));
+  return PyBdd_FromBdd(self->mBdd->xor_moment(vid));
 }
 
 // SCC 関数
@@ -404,7 +407,7 @@ PyObject*
 Bdd_SCC(BddObject* self,
 	PyObject* args)
 {
-  return Bdd_FromBdd(self->mBdd->SCC());
+  return PyBdd_FromBdd(self->mBdd->SCC());
 }
 
 // compose 関数
@@ -414,21 +417,16 @@ Bdd_compose(BddObject* self,
 {
   PyObject* obj1 = NULL;
   PyObject* obj2 = NULL;
-  if ( !PyArg_ParseTuple(args, "O!O!", &VarIdType, &obj1, &BddType, &obj2) ) {
+  if ( !PyArg_ParseTuple(args, "O!O!",
+			 &PyVarId_Type, &obj1,
+			 &PyBdd_Type, &obj2) ) {
     return NULL;
   }
 
-  VarId vid;
-  if ( !conv_from_pyobject(obj1, vid) ) {
-    return NULL;
-  }
+  VarId vid = PyVarId_AsVarId(obj1);
+  Bdd sub_bdd = PyBdd_AsBdd(obj2);
 
-  Bdd sub_bdd;
-  if ( !conv_from_pyobject(obj2, sub_bdd) ) {
-    return NULL;
-  }
-
-  return Bdd_FromBdd(self->mBdd->compose(vid, sub_bdd));
+  return PyBdd_FromBdd(self->mBdd->compose(vid, sub_bdd));
 }
 
 // multi_compose 関数
@@ -437,7 +435,8 @@ Bdd_multi_compose(BddObject* self,
 		  PyObject* args)
 {
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &PyDict_Type, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyDict_Type, &obj) ) {
     return NULL;
   }
 
@@ -448,23 +447,18 @@ Bdd_multi_compose(BddObject* self,
     PyObject* item = PyList_GET_ITEM(item_list, i);
     PyObject* vid_obj = NULL;
     PyObject* sub_obj = NULL;
-    if ( !PyArg_ParseTuple(item, "O!O!", &VarIdType, &vid_obj, &BddType, &sub_obj) ) {
+    if ( !PyArg_ParseTuple(item, "O!O!",
+			   &PyVarId_Type, &vid_obj,
+			   &PyBdd_Type, &sub_obj) ) {
       return NULL;
     }
 
-    VarId vid;
-    if ( !conv_from_pyobject(vid_obj, vid) ) {
-      return NULL;
-    }
-
-    Bdd sub_func;
-    if ( !conv_from_pyobject(sub_obj, sub_func) ) {
-      return NULL;
-    }
+    VarId vid = PyVarId_AsVarId(vid_obj);
+    Bdd sub_func = PyBdd_AsBdd(sub_obj);
     comp_map.insert(make_pair(vid, sub_func));
   }
 
-  return Bdd_FromBdd(self->mBdd->compose(comp_map));
+  return PyBdd_FromBdd(self->mBdd->compose(comp_map));
 
 }
 
@@ -474,7 +468,8 @@ Bdd_remap_var(BddObject* self,
 	      PyObject* args)
 {
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &PyDict_Type, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyDict_Type, &obj) ) {
     return NULL;
   }
 
@@ -485,23 +480,18 @@ Bdd_remap_var(BddObject* self,
     PyObject* item = PyList_GET_ITEM(item_list, i);
     PyObject* obj1 = NULL;
     PyObject* obj2 = NULL;
-    if ( !PyArg_ParseTuple(item, "O!O!", &VarIdType, &obj1, &VarIdType, &obj2) ) {
+    if ( !PyArg_ParseTuple(item, "O!O!",
+			   &PyVarId_Type, &obj1,
+			   &PyVarId_Type, &obj2) ) {
       return NULL;
     }
 
-    VarId vid;
-    if ( !conv_from_pyobject(obj1, vid) ) {
-      return NULL;
-    }
-
-    VarId new_vid;
-    if ( !conv_from_pyobject(obj2, new_vid) ) {
-      return NULL;
-    }
+    VarId vid = PyVarId_AsVarId(obj1);
+    VarId new_vid = PyVarId_AsVarId(obj2);
     var_map.insert(make_pair(vid, new_vid));
   }
 
-  return Bdd_FromBdd(self->mBdd->remap_var(var_map));
+  return PyBdd_FromBdd(self->mBdd->remap_var(var_map));
 }
 
 // esmooth 関数
@@ -516,14 +506,13 @@ Bdd_esmooth(BddObject* self,
     for (ymuint i = 0; i < n; ++ i) {
       PyObject* obj = PyList_GET_ITEM(list_obj, i);
       PyObject* vid_obj = NULL;
-      if ( !PyArg_ParseTuple(obj, "O!", &VarIdType, &vid_obj) ) {
+      if ( !PyArg_ParseTuple(obj, "O!",
+			     &PyVarId_Type, &vid_obj) ) {
 	return NULL;
       }
 
-      VarId vid;
-      if ( !conv_from_pyobject(vid_obj, vid) ) {
-	return NULL;
-      }
+      VarId vid = PyVarId_AsVarId(vid_obj);
+#warning "TODO: 未完"
     }
   }
   else {
@@ -531,19 +520,17 @@ Bdd_esmooth(BddObject* self,
     for (ymuint i = 0; i < n; ++ i) {
       PyObject* obj = PyTuple_GET_ITEM(args, i);
       PyObject* vid_obj = NULL;
-      if ( !PyArg_ParseTuple(obj, "O!", &VarIdType, &vid_obj) ) {
+      if ( !PyArg_ParseTuple(obj, "O!",
+			     &PyVarId_Type, &vid_obj) ) {
 	return NULL;
       }
 
-      VarId vid;
-      if ( !conv_from_pyobject(vid_obj, vid) ) {
-	return NULL;
-      }
-
+      VarId vid = PyVarId_AsVarId(vid_obj);
+#warning "TODO: 未完"
     }
   }
 
-  return Bdd_FromBdd(self->mBdd->esmooth(vset));
+  return PyBdd_FromBdd(self->mBdd->esmooth(vset));
 }
 
 // asmooth 関数
@@ -551,6 +538,8 @@ PyObject*
 Bdd_asmooth(BddObject* self,
 	    PyObject* args)
 {
+#warning "TODO: 未完"
+  return NULL;
 }
 
 // push_down 関数
@@ -561,18 +550,18 @@ Bdd_push_down(BddObject* self,
   ymuint x_level;
   ymuint y_level;
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "kk|O!", &x_level, &y_level, &PolType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "kk|O!",
+			 &x_level, &y_level,
+			 &PyPol_Type, &obj) ) {
     return NULL;
   }
 
   tPol pol = kPolPosi;
   if ( obj != NULL ) {
-    if ( !conv_from_pyobject(obj, pol) ) {
-      return NULL;
-    }
+    pol = PyPol_AsPol(obj);
   }
 
-  return Bdd_FromBdd(self->mBdd->push_down(x_level, y_level, pol));
+  return PyBdd_FromBdd(self->mBdd->push_down(x_level, y_level, pol));
 }
 
 // sop 関数
@@ -580,7 +569,7 @@ PyObject*
 Bdd_sop(BddObject* self,
 	PyObject* args)
 {
-  return LogExpr_FromLogExpr(self->mBdd->sop());
+  return PyLogExpr_FromLogExpr(self->mBdd->sop());
 }
 
 // node_count 関数
@@ -588,7 +577,7 @@ PyObject*
 Bdd_node_count(BddObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mBdd->node_count());
+  return PyObject_FromYmuint64(self->mBdd->node_count());
 }
 
 // density 関数
@@ -601,7 +590,7 @@ Bdd_density(BddObject* self,
     return NULL;
   }
 
-  return conv_to_pyobject(self->mBdd->density(nvar));
+  return PyObject_FromDouble(self->mBdd->density(nvar));
 }
 
 // onepath 関数
@@ -616,7 +605,7 @@ Bdd_onepath(BddObject* self,
   for (BddLitSet::iterator p = bdd_litset.begin();
        p != bdd_litset.end(); ++ p, ++ i) {
     Literal lit = *p;
-    PyObject* obj = Literal_FromLiteral(lit);
+    PyObject* obj = PyLiteral_FromLiteral(lit);
     PyList_SetItem(ans_list, i, obj);
   }
 
@@ -635,7 +624,7 @@ Bdd_shortest_onepath(BddObject* self,
   for (BddLitSet::iterator p = bdd_litset.begin();
        p != bdd_litset.end(); ++ p, ++ i) {
     Literal lit = *p;
-    PyObject* obj = Literal_FromLiteral(lit);
+    PyObject* obj = PyLiteral_FromLiteral(lit);
     PyList_SetItem(ans_list, i, obj);
   }
 
@@ -647,7 +636,7 @@ PyObject*
 Bdd_shortest_onepath_len(BddObject* self,
 			 PyObject* args)
 {
-  return conv_to_pyobject(self->mBdd->shortest_onepath_len());
+  return PyObject_FromYmuint64(self->mBdd->shortest_onepath_len());
 }
 
 // support 関数
@@ -661,7 +650,7 @@ Bdd_support(BddObject* self,
   PyObject* ans_list = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
     VarId vid = sup[i];
-    PyObject* obj = VarId_FromVarId(vid);
+    PyObject* obj = PyVarId_FromVarId(vid);
     PyList_SetItem(ans_list, i, obj);
   }
 
@@ -685,7 +674,7 @@ PyObject*
 Bdd_dump(BddObject* self,
 	 PyObject* args)
 {
-  FileBinO* bp = parse_FileBinO(args);
+  FileODO* bp = parse_FileODO(args);
   if ( bp == NULL ) {
     return NULL;
   }
@@ -701,7 +690,7 @@ PyObject*
 Bdd_restore(BddObject* self,
 	    PyObject* args)
 {
-  FileBinI* bp = parse_FileBinI(args);
+  FileIDO* bp = parse_FileIDO(args);
   if ( bp == NULL ) {
     return NULL;
   }
@@ -830,16 +819,17 @@ PyMethodDef Bdd_methods[] = {
   {"print", (PyCFunction)Bdd_print, METH_NOARGS,
    PyDoc_STR("print out the contents (NONE)")},
   {"dump", (PyCFunction)Bdd_dump, METH_VARARGS,
-   PyDoc_STR("dump (FileBinO)")},
+   PyDoc_STR("dump (FileODO)")},
   {"restore", (PyCFunction)Bdd_restore, METH_VARARGS,
-   PyDoc_STR("restore (FileBinI)")},
+   PyDoc_STR("restore (FileIDO)")},
   {NULL, NULL, 0, NULL}
 };
+
 
 END_NONAMESPACE
 
 // BddObject 用のタイプオブジェクト
-PyTypeObject BddType = {
+PyTypeObject PyBdd_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -885,34 +875,12 @@ PyTypeObject BddType = {
   0,                          /*tp_is_gc*/
 };
 
-// @brief PyObject から Bdd を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj Bdd を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が BddObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   Bdd& obj)
-{
-  // 型のチェック
-  if ( !BddObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  BddObject* bdd_obj = (BddObject*)py_obj;
-
-  obj = *(bdd_obj->mBdd);
-
-  return true;
-}
-
 // @brief Bdd から PyObject を生成する．
 // @param[in] obj Bdd オブジェクト
 PyObject*
-Bdd_FromBdd(const Bdd& obj)
+PyBdd_FromBdd(const Bdd& obj)
 {
-  BddObject* bdd_obj = Bdd_new(&BddType);
+  BddObject* bdd_obj = Bdd_new(&PyBdd_Type);
   if ( bdd_obj == NULL ) {
     return NULL;
   }
@@ -923,17 +891,36 @@ Bdd_FromBdd(const Bdd& obj)
   return (PyObject*)bdd_obj;
 }
 
+// @brief PyObject から Bdd を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return Bdd を返す．
+// @note 変換が失敗したら TypeError を送出し，0のBDD を返す．
+Bdd
+PyBdd_AsBdd(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyBdd_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.Bdd is expected");
+    return Bdd();
+  }
+
+  // 強制的にキャスト
+  BddObject* bdd_obj = (BddObject*)py_obj;
+
+  return *(bdd_obj->mBdd);
+}
+
 // BddObject 関係の初期化
 void
 BddObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&BddType) < 0 ) {
+  if ( PyType_Ready(&PyBdd_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "Bdd", (PyObject*)&BddType);
+  PyModule_AddObject(m, "Bdd", (PyObject*)&PyBdd_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

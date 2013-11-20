@@ -14,7 +14,7 @@
 #include "pysatpg.h"
 
 
-BEGIN_NAMESPACE_YM_PYSATPG
+BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
@@ -32,10 +32,12 @@ void
 FaultStatusObject_init(PyObject* module);
 
 void
-SaFaultObject_init(PyObject* module);
+TpgFaultObject_init(PyObject* module);
 
+#if 0
 void
 FaultMgrObject_init(PyObject* module);
+#endif
 
 void
 TestVectorObject_init(PyObject* module);
@@ -43,13 +45,13 @@ TestVectorObject_init(PyObject* module);
 void
 TvMgrObject_init(PyObject* module);
 
-END_NAMESPACE_YM_PYSATPG
+END_NAMESPACE_YM_SATPG
 
 
 PyMODINIT_FUNC
 satpg_init()
 {
-  using namespace nsYm::nsSatpg::nsPython;
+  using namespace nsYm::nsSatpg;
 
   //////////////////////////////////////////////////////////////////////
   // モジュールオブジェクトの生成
@@ -69,9 +71,9 @@ satpg_init()
 
   FaultStatusObject_init(m);
 
-  SaFaultObject_init(m);
+  TpgFaultObject_init(m);
 
-  FaultMgrObject_init(m);
+  //FaultMgrObject_init(m);
 
   TestVectorObject_init(m);
 

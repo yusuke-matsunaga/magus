@@ -9,8 +9,6 @@ SUBDIRS = \
 	ei \
 	.
 
-INCLUDES =
-
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in

@@ -4,11 +4,12 @@
 
 SUBDIRS = \
 	base \
-	fsim2 \
-	fsim3 \
-	fsimx \
-	dtpg \
 	main \
+	fsim \
+	fsim_old \
+	dtpg \
+	rtpg \
+	minpat \
 	atpg_tclsh \
 	$(YM_EXTRA_SUBDIRS)
 

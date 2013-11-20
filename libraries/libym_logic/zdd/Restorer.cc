@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_ZDD
 // @brief ダンプされた情報を ZDD を読み込む．
 // @param[in] s 入力ストリーム
 void
-Zdd::restore(BinI& s)
+Zdd::restore(IDO& s)
 {
   Restorer restorer(mMgr, s);
   ymuint n = restorer.read();
@@ -38,7 +38,7 @@ Zdd::restore(BinI& s)
 // @param[in] s 入力ストリーム
 // @param[in] array 読み込み先の ZDD ベクタ
 void
-ZddVector::restore(BinI& s)
+ZddVector::restore(IDO& s)
 {
   Restorer restorer(mMgr.mImpl, s);
   ymuint n = restorer.read();
@@ -53,7 +53,7 @@ ZddVector::restore(BinI& s)
 // @brief ダンプされた情報を ZDD リストに読み込む．
 // @param[in] s 入力ストリーム
 void
-ZddList::restore(BinI& s)
+ZddList::restore(IDO& s)
 {
   Restorer restorer(mMgr.mImpl, s);
   ymuint n = restorer.read();
@@ -70,7 +70,7 @@ ZddList::restore(BinI& s)
 
 // コンストラクタ
 Restorer::Restorer(ZddMgrImpl* mgr,
-		   BinI& s) :
+		   IDO& s) :
   mMgr(mgr),
   mStream(s)
 {

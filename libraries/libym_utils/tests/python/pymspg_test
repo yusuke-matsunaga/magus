@@ -1,0 +1,5 @@
+import utils
+cg = utils.MultiSetPermGen((3, 2, 2),3) 
+while not cg.is_end() :
+    print cg.get()
+    cg.next()

@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_CNFDD
 // @brief ダンプされた情報を ZDD を読み込む．
 // @param[in] s 入力ストリーム
 void
-CNFdd::restore(BinI& s)
+CNFdd::restore(IDO& s)
 {
   Restorer restorer(mMgr, s);
   ymuint n = restorer.read();
@@ -39,7 +39,7 @@ CNFdd::restore(BinI& s)
 // @param[in] s 入力ストリーム
 // @param[in] array 読み込み先の ZDD ベクタ
 void
-CNFddVector::restore(BinI& s)
+CNFddVector::restore(IDO& s)
 {
   Restorer restorer(mMgr.mImpl, s);
   ymuint n = restorer.read();
@@ -54,7 +54,7 @@ CNFddVector::restore(BinI& s)
 // @brief ダンプされた情報を ZDD リストに読み込む．
 // @param[in] s 入力ストリーム
 void
-CNFddList::restore(BinI& s)
+CNFddList::restore(IDO& s)
 {
   Restorer restorer(mMgr.mImpl, s);
   ymuint n = restorer.read();
@@ -71,7 +71,7 @@ CNFddList::restore(BinI& s)
 
 // コンストラクタ
 Restorer::Restorer(CNFddMgrImpl* mgr,
-		   BinI& s) :
+		   IDO& s) :
   mMgr(mgr),
   mStream(s)
 {

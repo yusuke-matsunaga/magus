@@ -8,6 +8,8 @@
 
 
 #include "RtpgCmd.h"
+#include "AtpgMgr.h"
+#include "RtpgStats.h"
 #include "ym_tclpp/TclPopt.h"
 
 
@@ -19,8 +21,7 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
 RtpgCmd::RtpgCmd(AtpgMgr* mgr) :
-  AtpgCmd(mgr),
-  mRtpg(mgr)
+  AtpgCmd(mgr)
 {
   mPoptNpat = new TclPoptInt(this, "npat",
 			     "specify number of patterns to be simulated");
@@ -34,6 +35,8 @@ RtpgCmd::RtpgCmd(AtpgMgr* mgr) :
 			     "specify the file name containg patterns");
   mPoptPrintStats = new TclPopt(this, "print_stats",
 				"print statistics");
+  mPoptOld = new TclPopt(this, "old",
+			 "old mode");
 }
 
 // @brief デストラクタ
@@ -52,7 +55,7 @@ RtpgCmd::cmd_proc(TclObjVector& objv)
   }
 
   bool n_flag = false;
-  ymuint max_pat = 10000;
+  ymuint max_pat = 100000;
   ymuint max_i = 4;
   ymuint min_f = 0;
 
@@ -70,7 +73,7 @@ RtpgCmd::cmd_proc(TclObjVector& objv)
   }
 
   if ( mPoptSeed->is_specified() ) {
-    // 未実装
+    mgr().rtpg_init(mPoptSeed->val());
   }
 
   if ( mPoptFile->is_specified() ) {
@@ -84,12 +87,18 @@ RtpgCmd::cmd_proc(TclObjVector& objv)
     max_i = 0;
   }
 
-  mRtpg(min_f, max_i, max_pat);
+  RtpgStats stats;
+
+  if ( mPoptOld->is_specified() ) {
+    mgr().rtpg_old(min_f, max_i, max_pat, stats);
+  }
+  else {
+    mgr().rtpg(min_f, max_i, max_pat, stats);
+  }
 
   after_update_faults();
 
   if ( print_stats ) {
-    const RtpgStats& stats = mRtpg.stats();
     cout << "********** rtpg **********" << endl
 	 << setw(10) << stats.detected_faults()
 	 << ": # of detected faults" << endl

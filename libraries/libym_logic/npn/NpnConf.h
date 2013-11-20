@@ -73,7 +73,7 @@ public:
 
   /// @brief 入力数を得る．
   ymuint
-  ni() const;
+  input_num() const;
 
   /// @brief 完全な正規形になっているとき true を返す．
   /// @param[in] g0 調べ始める最初のグループ番号
@@ -318,9 +318,9 @@ NpnConf::func() const
 // @brief 入力数を得る．
 inline
 ymuint
-NpnConf::ni() const
+NpnConf::input_num() const
 {
-  return mBaseConf->ni();
+  return mBaseConf->input_num();
 }
 
 // @brief 出力極性が確定のときに true を返す．

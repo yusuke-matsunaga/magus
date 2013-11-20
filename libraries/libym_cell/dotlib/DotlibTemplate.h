@@ -45,17 +45,17 @@ public:
   dimension() const;
 
   /// @brief 'variable_1' を返す．
-  /// @note 未定義なら kVarNone を返す．
+  /// @note 未定義なら kCellVarNone を返す．
   tCellVarType
   variable_1() const;
 
   /// @brief 'variable_2' を返す．
-  /// @note 未定義なら kVarNone を返す．
+  /// @note 未定義なら kCellVarNone を返す．
   tCellVarType
   variable_2() const;
 
   /// @brief 'variable_3' を返す．
-  /// @note 未定義なら kVarNone を返す．
+  /// @note 未定義なら kCellVarNone を返す．
   tCellVarType
   variable_3() const;
 

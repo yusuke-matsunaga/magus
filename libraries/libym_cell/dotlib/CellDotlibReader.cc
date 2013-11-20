@@ -215,7 +215,10 @@ gen_expr(const DotlibPin& pin_info,
 void
 gen_pin(CellLibrary* library,
 	const vector<DotlibPin>& pin_info_array,
-	ymuint cell_id)
+	ymuint cell_id,
+	const vector<bool>& output_array,
+	const vector<LogExpr>& logic_array,
+	const vector<LogExpr>& tristate_array)
 {
   ymuint i_pos = 0;
   ymuint o_pos = 0;
@@ -257,6 +260,9 @@ gen_pin(CellLibrary* library,
 	CellTime min_transition(pin_info.min_transition());
 	library->new_cell_output(cell_id, pin_pos, o_pos,
 				 pin_info.name(i),
+				 output_array[i],
+				 logic_array[i],
+				 tristate_array[i],
 				 max_fanout, min_fanout,
 				 max_capacitance, min_capacitance,
 				 max_transition, min_transition);
@@ -281,6 +287,9 @@ gen_pin(CellLibrary* library,
 	ymuint o_pos2 = io_pos + no;
 	library->new_cell_inout(cell_id, pin_pos, i_pos2, o_pos2,
 				pin_info.name(i),
+				output_array[i],
+				logic_array[i],
+				tristate_array[i],
 				cap, rise_cap, fall_cap,
 				max_fanout, min_fanout,
 				max_capacitance, min_capacitance,
@@ -901,7 +910,10 @@ gen_library(const DotlibNode* dt_library)
     }
 
     // ピンの生成
-    gen_pin(library, pin_info_array, cell_id);
+    gen_pin(library, pin_info_array, cell_id,
+	    output_array,
+	    logic_array,
+	    tristate_array);
 
     // タイミング情報の生成
     ymuint nt = 0;

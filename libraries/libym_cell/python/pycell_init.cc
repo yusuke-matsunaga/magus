@@ -14,7 +14,7 @@
 #include "ym_cell/pycell.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -27,10 +27,16 @@ END_NONAMESPACE
 
 
 void
+CellPinDirObject_init(PyObject* m);
+
+void
 CellAreaObject_init(PyObject* m);
 
 void
 CellCapacitanceObject_init(PyObject* m);
+
+void
+CellResistanceObject_init(PyObject* m);
 
 void
 CellTimeObject_init(PyObject* m);
@@ -38,21 +44,64 @@ CellTimeObject_init(PyObject* m);
 void
 CellLibraryObject_init(PyObject* m);
 
-END_NAMESPACE_YM_PYTHON
+void
+CellClassObject_init(PyObject* m);
+
+void
+CellGroupObject_init(PyObject* m);
+
+void
+CellObject_init(PyObject* m);
+
+void
+CellPinObject_init(PyObject* m);
+
+void
+CellTechnologyObject_init(PyObject* m);
+
+void
+CellDelayModelObject_init(PyObject* m);
+
+void
+CellTimingObject_init(PyObject* m);
+
+void
+CellTimingSenseObject_init(PyObject* m);
+
+void
+CellTimingTypeObject_init(PyObject* m);
+
+void
+CellVarTypeObject_init(PyObject* m);
+
+void
+CellPatTypeObject_init(PyObject* m);
+
+void
+CellPatGraphObject_init(PyObject* m);
+
+void
+CellLutObject_init(PyObject* m);
+
+
+END_NAMESPACE_YM
 
 
 PyMODINIT_FUNC
 cell_init()
 {
-  using namespace nsYm::nsPython;
+  using namespace nsYm;
 
   // モジュールオブジェクトの生成
   PyDoc_STRVAR(module_doc,
 	       "Module for libym_cell");
-  PyObject* m = Py_InitModule3("cell", cell_methods, module_doc);
+  PyObject* m = Py_InitModule3("cell_lib", cell_methods, module_doc);
   if ( m == NULL ) {
     return;
   }
+
+  // CellPinDirObject 関係の初期化
+  CellPinDirObject_init(m);
 
   // CellAreaObject 関係の初期化
   CellAreaObject_init(m);
@@ -63,7 +112,49 @@ cell_init()
   // CellTimeObject 関係の初期化
   CellTimeObject_init(m);
 
+  // CellResistanceObject 関係の初期化
+  CellResistanceObject_init(m);
+
   // CellLibraryObject 関係の初期化
   CellLibraryObject_init(m);
+
+  // CellClassObject 関係の初期化
+  CellClassObject_init(m);
+
+  // CellGroupObject 関係の初期化
+  CellGroupObject_init(m);
+
+  // CellObject 関係の初期化
+  CellObject_init(m);
+
+  // CellPinObject 関係の初期化
+  CellPinObject_init(m);
+
+  // CellTechnologyObject 関係の初期化
+  CellTechnologyObject_init(m);
+
+  // CellDelayModelObject 関係の初期化
+  CellDelayModelObject_init(m);
+
+  // CellTimingObject 関係の初期化
+  CellTimingObject_init(m);
+
+  // CellTimingSenseObject 関係の初期化
+  CellTimingSenseObject_init(m);
+
+  // CellTimingTypeObject 関係の初期化
+  CellTimingTypeObject_init(m);
+
+  // CellPatType 関係の初期化
+  CellPatTypeObject_init(m);
+
+  // CellPatGraph 関係の初期化
+  CellPatGraphObject_init(m);
+
+  // CelLut 関係の初期化
+  CellLutObject_init(m);
+
+  // CellVarType 関係の初期化
+  CellVarTypeObject_init(m);
 
 }

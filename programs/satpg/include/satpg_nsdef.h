@@ -64,15 +64,62 @@ enum tSimMode {
 
 
 //////////////////////////////////////////////////////////////////////
+/// @brief DTPG モード
+//////////////////////////////////////////////////////////////////////
+enum tDtpgMode {
+  /// @brief single モード
+  kDtpgSingle,
+  /// @brief dual モード
+  kDtpgDual,
+  /// @brief node モード
+  kDtpgNode,
+  /// @brief ffr モード
+  kDtpgFFR,
+  /// @brief mffc モード
+  kDtpgMFFC,
+  /// @brief all モード
+  kDtpgAll
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @brief PO モード
+//////////////////////////////////////////////////////////////////////
+enum tDtpgPoMode {
+  /// @brief 分割なし
+  kDtpgPoNone,
+  /// @brief 分割あり(サイズの昇順)
+  kDtpgPoInc,
+  /// @brief 分割あり(サイズの降順)
+  kDtpgPoDec
+};
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス名の宣言
 //////////////////////////////////////////////////////////////////////
 
-class SaFault;
+class AtpgMgr;
+class TpgFault;
 class FaultMgr;
+class TpgNetwork;
+class TpgNode;
+class TpgPrimitive;
+class BackTracer;
+class DetectOp;
+class UntestOp;
 class TestVector;
 class TvMgr;
-class DtpgOperator;
+class Dtpg;
+class DtpgStats;
+class Rtpg;
+class RtpgStats;
+class MinPat;
+class MinPatStats;
 class Fsim;
+class FsimOld;
+class FsimOp1;
+class FsimOp2;
 
 END_NAMESPACE_YM_SATPG
 

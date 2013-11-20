@@ -10,8 +10,8 @@
 
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -155,16 +155,16 @@ operator<<(ostream& s,
 /// @param[in] s 出力先のストリーム
 /// @param[in] val 値
 /// @relates CellCapacitance
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const CellCapacitance& val);
 
 /// @brief バイナリリストア
 /// @param[in] s 入力元のストリーム
 /// @param[out] val 値を格納する変数
 /// @relates CellCapacitance
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   CellCapacitance& val);
 
 
@@ -334,8 +334,8 @@ operator<<(ostream& s,
 // @param[in] val 値
 // @relates CellCapacitance
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const CellCapacitance& val)
 {
   return s << val.value();
@@ -346,8 +346,8 @@ operator<<(BinO& s,
 // @param[out] val 値を格納する変数
 // @relates CellCapacitance
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   CellCapacitance& val)
 {
   double tmp_val;

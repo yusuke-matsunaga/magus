@@ -13,7 +13,7 @@
 #include "ym_logic/LogExpr.h"
 #include "ym_utils/ShString.h"
 #include "ym_utils/Alloc.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -407,7 +407,18 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 設定用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief セルグループを設定する．
+  virtual
+  void
+  set_group(const CellGroup* group);
 
 
 private:
@@ -477,7 +488,7 @@ private:
   CiTimingArray** mTimingMap;
 
   // セルグループ
-  CellGroup* mCellGroup;
+  const CellGroup* mCellGroup;
 
   // 出力の情報を格納する配列
   // サイズは output_num2()

@@ -50,7 +50,7 @@ LcFFMgr::init()
     f_list.push_back(TvFunc::posi_literal(4, VarId(3)));
     f_list.push_back(TvFunc::const_zero(4));
     TvFuncM f(f_list);
-    LcGroup* group = find_group(f);
+    LcGroup* group = find_group(f, false);
     LcClass* cclass = group->parent();
     mFFClass[0] = cclass->id();
   }
@@ -65,7 +65,7 @@ LcFFMgr::init()
     f_list.push_back(TvFunc::posi_literal(5, VarId(4)));
     f_list.push_back(TvFunc::const_zero(5));
     TvFuncM f(f_list);
-    LcGroup* group = find_group(f);
+    LcGroup* group = find_group(f, false);
     LcClass* cclass = group->parent();
     mFFClass[1] = cclass->id();
   }
@@ -80,7 +80,7 @@ LcFFMgr::init()
     f_list.push_back(TvFunc::posi_literal(5, VarId(4)));
     f_list.push_back(TvFunc::const_zero(5));
     TvFuncM f(f_list);
-    LcGroup* group = find_group(f);
+    LcGroup* group = find_group(f, false);
     LcClass* cclass = group->parent();
     mFFClass[2] = cclass->id();
   }
@@ -95,7 +95,7 @@ LcFFMgr::init()
     f_list.push_back(TvFunc::posi_literal(6, VarId(5)));
     f_list.push_back(TvFunc::const_zero(6));
     TvFuncM f(f_list);
-    LcGroup* group = find_group(f);
+    LcGroup* group = find_group(f, false);
     LcClass* cclass = group->parent();
     mFFClass[3] = cclass->id();
   }

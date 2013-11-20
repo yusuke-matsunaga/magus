@@ -6,12 +6,11 @@
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "satpg_nsdef.h"
-#include "ym_networks/tgnet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -28,37 +27,50 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ネットワークをセットする．
+  /// @param[in] network ネットワーク
+  /// @param[in] fault_mgr 故障マネージャ
   virtual
   void
-  set_network(const TgNetwork& network,
-	      const vector<SaFault*>& flist) = 0;
+  set_network(const TpgNetwork& network,
+	      FaultMgr& fault_mgr) = 0;
 
-  /// @brief 故障シミュレーションを行う．
+  /// @brief 故障にスキップマークをつける．
+  virtual
+  void
+  set_skip(TpgFault* f) = 0;
+
+  /// @brief ひとつのパタンで故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
-  /// @param[out] det_faults 検出された故障を格納するリスト
+  /// @param[in] op_list FsimOp1 のリスト
   virtual
   void
-  run(TestVector* tv,
-      vector<SaFault*>& det_faults) = 0;
+  sppfp(TestVector* tv,
+	const vector<FsimOp1*>& op_list) = 0;
 
-  /// @brief 故障シミュレーションを行う．
+  /// @brief 複数のパタンで故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
-  /// @param[out] det_faults 検出された故障を格納するリストの配列
+  /// @param[in] op_list FsimOp2 のリスト
   virtual
   void
-  run(const vector<TestVector*>& tv_array,
-      vector<vector<SaFault*> >& det_faults) = 0;
+  ppsfp(const vector<TestVector*>& tv_array,
+	const vector<FsimOp2*>& dop_list) = 0;
 
-  /// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
+  /// @brief SPSFP故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
   /// @param[in] f 対象の故障
+  /// @retval true 故障の検出が行えた．
+  /// @retval false 故障の検出が行えなかった．
   virtual
   bool
-  run(TestVector* tv,
-      SaFault* f) = 0;
+  spsfp(TestVector* tv,
+	TpgFault* f) = 0;
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+// Fsim の派生クラスのインスタンスを生成する関数
+//////////////////////////////////////////////////////////////////////
 
 extern
 Fsim*
@@ -71,6 +83,10 @@ new_Fsim3();
 extern
 Fsim*
 new_FsimX();
+
+extern
+Fsim*
+new_FsimX2();
 
 END_NAMESPACE_YM_SATPG
 

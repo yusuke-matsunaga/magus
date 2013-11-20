@@ -61,7 +61,7 @@ private:
   DotlibNodeImpl*
   read_primary2();
 
-  /// @brief prudct を読み込む．
+  /// @brief product を読み込む．
   DotlibNodeImpl*
   read_product();
 

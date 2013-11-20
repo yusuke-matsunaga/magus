@@ -10,8 +10,8 @@
 
 
 #include "ym_utils/UnitAlloc.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -99,11 +99,11 @@ public:
 
   /// @brief バイナリファイルに書き出す．
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリファイルを読み込む．
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 private:
@@ -191,14 +191,14 @@ private:
   /// @param[in] s 出力先のストリーム
   /// @param[in] cell 対象のセル
   void
-  dump_cell(BinO& s,
+  dump_cell(ODO& s,
 	    ItvlCell* cell) const;
 
   /// @brief restore() の下請け関数
   /// @param[in] s 入力元のストリーム
   /// @return 作成したセルを返す．
   ItvlCell*
-  restore_cell(BinI& s);
+  restore_cell(IDO& s);
 
 
 private:

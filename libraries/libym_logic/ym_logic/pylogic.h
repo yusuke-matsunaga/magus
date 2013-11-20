@@ -5,7 +5,7 @@
 /// @brief libym_logic の Python 用の拡張モジュールの定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -21,35 +21,138 @@
 #include "ym_logic/sat_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// 型を表すタイプオブジェクト
+// PyBool3: 3値の論理値を表す型
 //////////////////////////////////////////////////////////////////////
 
-/// @brief Bool3 を表す型
+/// @brief Bool3 を表すタイプオブジェクト
 extern
-PyTypeObject Bool3Type;
+PyTypeObject PyBool3_Type;
 
-/// @brief kB3True を表すオブジェクト
+/// @brief PyBool3 の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyBool3_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyBool3_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyBool3_Type;
+}
+
+/// @brief Bool3 から PyObject を生成する．
+/// @param[in] obj Bool3 オブジェクト
+extern
+PyObject*
+PyBool3_FromBool3(Bool3 obj);
+
+/// @brief 文字列から Bool3Object への変換関数
+/// @param[in] str 値を表す文字列("true"|"false"|"x")
+/// @note 不正な文字列が与えられた場合には NULL を返す．
+PyObject*
+PyBool3_FromString(const char* str);
+
+/// @brief long から Bool3Object への変換関数
+/// @param[in] val 値
+/// @note 0 を kB3False, それ以外を kB3True に対応させる．
+PyObject*
+PyBool3_FromLong(ymlong val);
+
+/// @brief PyObject から Bool3 を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return Bool3 を返す．
+/// @note 変換が失敗したら TypeError を送出し，kB3X を返す．
+extern
+Bool3
+PyBool3_AsBool3(PyObject* py_obj);
+
+/// @brief kB3True を表す定数オブジェクト
 extern
 PyObject* Py_kB3True;
 
-/// @brief kB3False を表すオブジェクト
+/// @brief kB3False を表す定数オブジェクト
 extern
 PyObject* Py_kB3False;
 
-/// @brief kB3X を表すオブジェクト
+/// @brief kB3X を表す定数オブジェクト
 extern
 PyObject* Py_kB3X;
 
-/// @brief VarId を表す型
-extern
-PyTypeObject VarIdType;
 
-/// @brief tPol を表す型
+//////////////////////////////////////////////////////////////////////
+// PyVarId: 変数番号を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief VarId を表すタイプオブジェクト
 extern
-PyTypeObject PolType;
+PyTypeObject PyVarId_Type;
+
+/// @brief PyVarId の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyVarId_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyVarId_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyVarId_Type;
+}
+
+/// @brief VarId から PyObject を生成する．
+/// @param[in] obj VarId オブジェクト
+extern
+PyObject*
+PyVarId_FromVarId(VarId obj);
+
+/// @brief PyObject から VarId を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return VarId を返す．
+/// @note 変換が失敗したら TypeError を送出し，VarId(0) を返す．
+extern
+VarId
+PyVarId_AsVarId(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyPol: 極性を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief tPol を表すタイプオブジェクト
+extern
+PyTypeObject PyPol_Type;
+
+/// @brief PyPol の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyPol_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyPol_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyPol_Type;
+}
+
+/// @brief tPol から PyObject を生成する．
+/// @param[in] obj tPol オブジェクト
+extern
+PyObject*
+PyPol_FromPol(tPol obj);
+
+/// @brief 文字列から PolObject への変換関数
+/// @param[in] str 極性を表す文字列("positive"|"negative")
+/// @note 不正な文字列が与えられた場合には NULL を返す．
+PyObject*
+PyPol_FromString(const char* str);
+
+/// @brief PyObject から tPol を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return tPol を返す．
+/// @note 変換が失敗したら TypeError を送出し，kPolPosi を返す．
+extern
+tPol
+PyPol_AsPol(PyObject* py_obj);
 
 /// @brief kPolPosi を表すオブジェクト
 extern
@@ -59,17 +162,73 @@ PyObject* Py_kPolPosi;
 extern
 PyObject* Py_kPolNega;
 
-/// @brief Literal を表す型
-extern
-PyTypeObject LiteralType;
 
-/// @brief TvFunc を表す型
-extern
-PyTypeObject TvFuncType;
+//////////////////////////////////////////////////////////////////////
+// PyLiteral: リテラルを表す型
+//////////////////////////////////////////////////////////////////////
 
-/// @brief LogExpr を表す型
+/// @brief Literal を表すタイプオブジェクト
 extern
-PyTypeObject LogExprType;
+PyTypeObject PyLiteral_Type;
+
+/// @brief PyLiteral の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyLiteral_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyLiteral_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyLiteral_Type;
+}
+
+/// @brief Literal から PyObject を生成する．
+/// @param[in] obj Literal オブジェクト
+extern
+PyObject*
+PyLiteral_FromLiteral(Literal obj);
+
+/// @brief PyObject から Literal を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return Literal を返す．
+/// @note 変換が失敗したら TypeError を送出し，Literal(VarId(0), kPolPosi) を返す．
+extern
+Literal
+PyLiteral_AsLiteral(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyLogExpr: 論理式を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief LogExpr を表すタイプオブジェクト
+extern
+PyTypeObject PyLogExpr_Type;
+
+/// @brief PyLogExpr の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyLogExpr_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyLogExpr_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyLogExpr_Type;
+}
+
+/// @brief LogExpr から PyObject を生成する．
+/// @param[in] obj LogExpr オブジェクト
+extern
+PyObject*
+PyLogExpr_FromLogExpr(const LogExpr& obj);
+
+/// @brief PyObject から LogExpr へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return LogExpr へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+LogExpr*
+PyLogExpr_AsLogExprPtr(PyObject* py_obj);
 
 /// @brief 定数0の式
 extern
@@ -79,339 +238,193 @@ PyObject* Py_kLogExprConst0;
 extern
 PyObject* Py_kLogExprConst1;
 
-/// @brief BddMgr を表す型
-extern
-PyTypeObject BddMgrType;
-
-/// @brief Bdd を表す型
-extern
-PyTypeObject BddType;
-
-/// @brief AigMgr を表す型
-extern
-PyTypeObject AigMgrType;
-
-/// @brief Aig を表す型
-extern
-PyTypeObject AigType;
-
-/// @brief SatSolver を表す型
-extern
-PyTypeObject SatSolverType;
-
 
 //////////////////////////////////////////////////////////////////////
-// 型をチェックする関数
+// PyTvFunc: 真理値表形式の関数を表す型
 //////////////////////////////////////////////////////////////////////
 
-/// @brief Bool3Type の型チェック
+/// @brief TvFunc を表すタイプオブジェクト
+extern
+PyTypeObject PyTvFunc_Type;
+
+/// @brief PyTvFunc の型チェック
 /// @param[in] obj Python オブジェクト
-/// @retval true obj が Bool3Type だった．
+/// @retval true obj が PyTvFunc_Type だった．
 /// @retval false obj が他の型だった．
 inline
 bool
-Bool3Object_Check(PyObject* obj)
+PyTvFunc_Check(PyObject* obj)
 {
-  return Py_TYPE(obj) == &Bool3Type;
+  return Py_TYPE(obj) == &PyTvFunc_Type;
 }
-
-/// @brief VarIdType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が VarIdType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-VarIdObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &VarIdType;
-}
-
-/// @brief PolType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が PolType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-PolObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &PolType;
-}
-
-/// @brief LiteralType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が LiteralType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-LiteralObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &LiteralType;
-}
-
-/// @brief TvFuncType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が TvFuncType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-TvFuncObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &TvFuncType;
-}
-
-/// @brief LogExprType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が LogExprType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-LogExprObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &LogExprType;
-}
-
-/// @brief BddMgrType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が BddMgrType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-BddMgrObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &BddMgrType;
-}
-
-/// @brief BddType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が BddType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-BddObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &BddType;
-}
-
-/// @brief AigMgrType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が AigMgrType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-AigMgrObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &AigMgrType;
-}
-
-/// @brief AigType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が AigType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-AigObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &AigType;
-}
-
-/// @brief SatSolverType の型チェック
-/// @param[in] obj Python オブジェクト
-/// @retval true obj が SatSolverType だった．
-/// @retval false obj が他の型だった．
-inline
-bool
-SatSolverObject_Check(PyObject* obj)
-{
-  return Py_TYPE(obj) == &SatSolverType;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// PyObject からの型変換
-//////////////////////////////////////////////////////////////////////
-
-/// @brief PyObject から Bool3 を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] obj Bool3 を格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した．py_obj が Bool3Object ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   Bool3& obj);
-
-/// @brief PyObject から VarId を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] obj VarId を格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した．py_obj が VarIdObject ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   VarId& obj);
-
-/// @brief PyObject から tPol を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] obj tPol を格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した．py_obj が PolObject ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   tPol& obj);
-
-/// @brief PyObject から Literal を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] obj Literal を格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した．py_obj が LiteralObject ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   Literal& obj);
-
-/// @brief PyObject から TvFunc を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] obj TvFunc を格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した．py_obj が TvFuncObject ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   TvFunc& obj);
-
-/// @brief PyObject から LogExpr を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] obj LogExpr を格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した．py_obj が LogExprObject ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   LogExpr& obj);
-
-/// @brief PyObject から BddMgr を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] obj BddMgr を格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した．py_obj が BddMgrObject ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   BddMgr*& obj_p);
-
-/// @brief PyObject から Bdd を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] obj Bdd を格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した．py_obj が BddObject ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   Bdd& obj);
-
-/// @brief PyObject から AigMgr を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] obj AigMgr を格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した．py_obj が AigMgrObject ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   AigMgr*& obj);
-
-/// @brief PyObject から Aig を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] obj Aig を格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した．py_obj が AigObject ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   Aig& obj);
-
-/// @brief PyObject から SatSolver を取り出す．
-/// @param[in] py_obj Python オブジェクト
-/// @param[out] p_obj SatSolver のポインタを格納する変数
-/// @retval true 変換が成功した．
-/// @retval false 変換が失敗した．py_obj が SatSolverObject ではなかった．
-extern
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   SatSolver*& p_obj);
-
-
-//////////////////////////////////////////////////////////////////////
-// PyObject への型変換
-//////////////////////////////////////////////////////////////////////
-
-/// @brief Bool3 から PyObject を生成する．
-/// @param[in] obj Bool3 オブジェクト
-extern
-PyObject*
-Bool3_FromBool3(Bool3 obj);
-
-/// @brief 文字列から Bool3Object への変換関数
-/// @param[in] str 値を表す文字列("true"|"false"|"x")
-/// @note 不正な文字列が与えられた場合には NULL を返す．
-PyObject*
-Bool3_FromString(const char* str);
-
-/// @brief long から Bool3Object への変換関数
-/// @param[in] val 値
-/// @note 0 を kB3False, それ以外を kB3True に対応させる．
-PyObject*
-Bool3_FromLong(ymlong val);
-
-/// @brief VarId から PyObject を生成する．
-/// @param[in] obj VarId オブジェクト
-extern
-PyObject*
-VarId_FromVarId(VarId obj);
-
-/// @brief tPol から PyObject を生成する．
-/// @param[in] obj tPol オブジェクト
-extern
-PyObject*
-Pol_FromPol(tPol obj);
-
-/// @brief 文字列から PolObject への変換関数
-/// @param[in] str 極性を表す文字列("positive"|"negative")
-/// @note 不正な文字列が与えられた場合には NULL を返す．
-PyObject*
-Pol_FromString(const char* str);
-
-/// @brief Literal から PyObject を生成する．
-/// @param[in] obj Literal オブジェクト
-extern
-PyObject*
-Literal_FromLiteral(Literal obj);
 
 /// @brief TvFunc から PyObject を生成する．
 /// @param[in] obj TvFunc オブジェクト
 extern
 PyObject*
-TvFunc_FromTvFunc(const TvFunc& obj);
+PyTvFunc_FromTvFunc(const TvFunc& obj);
 
-/// @brief LogExpr から PyObject を生成する．
-/// @param[in] obj LogExpr オブジェクト
+/// @brief PyObject から TvFunc へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return TvFunc へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
 extern
-PyObject*
-LogExpr_FromLogExpr(const LogExpr& obj);
+TvFunc*
+PyTvFunc_AsTvFuncPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyBdd: BDD を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief Bdd を表すタイプオブジェクト
+extern
+PyTypeObject PyBdd_Type;
+
+/// @brief PyBdd の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyBdd_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyBdd_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyBdd_Type;
+}
 
 /// @brief Bdd から PyObject を生成する．
 /// @param[in] obj Bdd オブジェクト
 extern
 PyObject*
-Bdd_FromBdd(const Bdd& obj);
+PyBdd_FromBdd(const Bdd& obj);
+
+/// @brief PyObject から Bdd を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return Bdd を返す．
+/// @note 変換が失敗したら TypeError を送出し，0のBDD を返す．
+extern
+Bdd
+PyBdd_AsBdd(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyBddMgr: BDD マネージャを表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief BddMgr を表すタイプオブジェクト
+extern
+PyTypeObject PyBddMgr_Type;
+
+/// @brief PyBddMgr の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyBddMgr_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyBddMgr_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyBddMgr_Type;
+}
+
+/// @brief PyObject から BddMgr へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return BddMgr へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+BddMgr*
+PyBddMgr_AsBddMgrPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyAig: AIG を表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief Aig を表すタイプオブジェクト
+extern
+PyTypeObject PyAig_Type;
+
+/// @brief PyAig の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyAig_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyAig_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyAig_Type;
+}
 
 /// @brief Aig から PyObject を生成する．
 /// @param[in] obj Aig オブジェクト
 extern
 PyObject*
-Aig_FromAig(const Aig& obj);
+PyAig_FromAig(const Aig& obj);
 
-END_NAMESPACE_YM_PYTHON
+/// @brief PyObject から Aig を取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return Aig を返す．
+/// @note 変換が失敗したら TypeError を送出し，適当な値を返す．
+extern
+Aig
+PyAig_AsAig(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PyAigMgr: AIG マネージャを表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief AigMgr を表すタイプオブジェクト
+extern
+PyTypeObject PyAigMgr_Type;
+
+/// @brief PyAigMgr の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PyAigMgr_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PyAigMgr_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PyAigMgr_Type;
+}
+
+/// @brief PyObject から AigMgr へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return AigMgr へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+AigMgr*
+PyAigMgr_AsAigMgrPtr(PyObject* py_obj);
+
+
+//////////////////////////////////////////////////////////////////////
+// PySatSolver: SAT ソルバを表す型
+//////////////////////////////////////////////////////////////////////
+
+/// @brief SatSolver を表すタイプオブジェクト
+extern
+PyTypeObject PySatSolver_Type;
+
+/// @brief PySatSolver の型チェック
+/// @param[in] obj Python オブジェクト
+/// @retval true obj が PySatSolver_Type だった．
+/// @retval false obj が他の型だった．
+inline
+bool
+PySatSolver_Check(PyObject* obj)
+{
+  return Py_TYPE(obj) == &PySatSolver_Type;
+}
+
+/// @brief PyObject から SatSolver へのポインタを取り出す．
+/// @param[in] py_obj Python オブジェクト
+/// @return SatSolver へのポインタを返す．
+/// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+extern
+SatSolver*
+PySatSolver_AsSatSolverPtr(PyObject* py_obj);
+
+END_NAMESPACE_YM
 
 
 //////////////////////////////////////////////////////////////////////

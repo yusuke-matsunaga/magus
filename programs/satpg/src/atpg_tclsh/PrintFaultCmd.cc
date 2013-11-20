@@ -9,8 +9,8 @@
 
 #include "PrintFaultCmd.h"
 #include "AtpgMgr.h"
+#include "TpgFault.h"
 #include "FaultMgr.h"
-#include "SaFault.h"
 #include "ym_tclpp/TclPopt.h"
 
 
@@ -46,8 +46,8 @@ PrintFaultCmd::cmd_proc(TclObjVector& objv)
 
   FaultMgr& fmgr = _fault_mgr();
 
-  vector<SaFault*>::const_iterator b = fmgr.remain_list().begin();
-  vector<SaFault*>::const_iterator e = fmgr.remain_list().end();
+  vector<TpgFault*>::const_iterator b = fmgr.remain_list().begin();
+  vector<TpgFault*>::const_iterator e = fmgr.remain_list().end();
 
   if ( mPoptType->is_specified() ) {
     string tmp = mPoptType->val();
@@ -68,8 +68,8 @@ PrintFaultCmd::cmd_proc(TclObjVector& objv)
     }
   }
 
-  for (vector<SaFault*>::const_iterator p = b; p != e; ++ p) {
-    SaFault* f = *p;
+  for (vector<TpgFault*>::const_iterator p = b; p != e; ++ p) {
+    TpgFault* f = *p;
     cout << f->str() << endl;
   }
 

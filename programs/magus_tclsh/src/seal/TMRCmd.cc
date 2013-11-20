@@ -62,7 +62,7 @@ TMRCmd::cmd_proc(TclObjVector& objv)
   for (BNodeVector::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     BNode* node = *p;
-    size_t ni = node->ni();
+    size_t ni = node->fanin_num();
     fanins.resize(ni);
     LogExpr lexp = node->func();
 
@@ -94,7 +94,7 @@ TMRCmd::cmd_proc(TclObjVector& objv)
     BNode* ibnode = obnode->fanin(0);
 
     // ibnode の複製をもう一つ作る．
-    size_t ni = ibnode->ni();
+    size_t ni = ibnode->fanin_num();
     fanins.resize(ni);
     for (size_t i = 0; i < ni; ++ i) {
       fanins[i] = ibnode->fanin(i);

@@ -34,7 +34,7 @@ DotlibLibrary::set_data(const DotlibNode* lib_node)
 {
   init();
 
-  mTechnology = CellLibrary::kTechCmos;
+  mTechnology = kCellTechCmos;
   mDelayModel = kCellDelayGenericCmos;
   mBusNamingStyle = NULL;
   mComment = NULL;
@@ -77,10 +77,10 @@ DotlibLibrary::set_data(const DotlibNode* lib_node)
   if ( tech_node ) {
     ShString str = tech_node->get_string_from_value_list();
     if ( str == "cmos" ) {
-      mTechnology = CellLibrary::kTechCmos;
+      mTechnology = kCellTechCmos;
     }
     else if ( str == "fpga" ) {
-      mTechnology = CellLibrary::kTechFpga;
+      mTechnology = kCellTechFpga;
     }
     else {
       MsgMgr::put_msg(__FILE__, __LINE__,
@@ -230,7 +230,7 @@ DotlibLibrary::name() const
 }
 
 // @brief "technology" を返す．
-CellLibrary::tTechnology
+tCellTechnology
 DotlibLibrary::technology() const
 {
   return mTechnology;

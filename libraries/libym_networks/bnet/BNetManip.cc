@@ -41,7 +41,7 @@ BNetManip::eliminate_node(BNode* node)
   // ファンアウトリストの複製を作る．
   BNodeEdgeList fanouts(node->fanouts());
 
-  size_t old_ni = node->ni();
+  size_t old_ni = node->fanin_num();
   const LogExpr& orig_f = node->func();
   for (BNodeEdgeList::const_iterator it = fanouts.begin();
        it != fanouts.end(); it ++) {
@@ -51,7 +51,7 @@ BNetManip::eliminate_node(BNode* node)
       // 中間ノードの場合
 
       // node の論理式を併合した新しい論理式を作る．
-      size_t oni = fo_node->ni();
+      size_t oni = fo_node->fanin_num();
       VarVarMap vvmap;
       for (size_t i = 0; i < old_ni; i ++) {
 	vvmap.insert(make_pair(VarId(i), VarId(i + oni)));
@@ -178,7 +178,7 @@ BNetManip::replace_node(BNode* old_node,
     BNode* fo_node = edge->to();
 
     bool found = false;
-    size_t ni = fo_node->ni();
+    size_t ni = fo_node->fanin_num();
     for (size_t i = 0; i < ni; ++ i) {
       if ( fo_node->fanin(i) == new_node ) {
 	found = true;
@@ -227,7 +227,7 @@ BNetManip::change_output(BNode* onode,
     return false;
   }
 
-  if ( onode->ni() == 1 && onode->fanin(0) == node ) {
+  if ( onode->fanin_num() == 1 && onode->fanin(0) == node ) {
     // 変わらないので何もしない．
     return true;
   }
@@ -463,7 +463,7 @@ bool
 BNetManip::change_logic(BNode* node,
 			const LogExpr& expr)
 {
-  size_t ni = node->ni();
+  size_t ni = node->fanin_num();
   vector<BNode*> fanins(ni);
   for (size_t i = 0; i < ni; ++ i) {
     fanins[i] = node->fanin(i);

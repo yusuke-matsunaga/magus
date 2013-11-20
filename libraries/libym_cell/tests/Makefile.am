@@ -5,11 +5,8 @@
 ## $Revision: 1.1.1.1 $
 ## $Date: 2005/12/11 17:07:26 $
 
-SUBDIRS = $(YM_EXTRA_SUBDIRS)
-
-if WITH_QT
-SUBDIRS += dotlib_ptview
-endif
+SUBDIRS = . \
+	  $(YM_EXTRA_TESTS_SUBDIRS)
 
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
@@ -44,7 +41,8 @@ bin_PROGRAMS = \
 	dump_restore_test \
 	cell_mgr_test \
 	cell_dump_test \
-	luttest
+	luttest \
+	lcpatmgr_test
 
 mislib_parser_test_SOURCES = \
 	mislib_parser_test.cc
@@ -79,6 +77,21 @@ luttest_SOURCES = \
 luttest_LDFLAGS =
 
 luttest_LDADD = \
+	$(YM_CELL)
+
+
+lcpatmgr_test_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell/libcomp
+
+lcpatmgr_test_SOURCES = \
+	lcpatmgr_test.cc
+
+lcpatmgr_test_LDFLAGS =
+
+lcpatmgr_test_LDADD = \
 	$(YM_CELL)
 
 

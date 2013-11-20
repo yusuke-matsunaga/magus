@@ -10,7 +10,6 @@
 
 
 #include "AtpgCmd.h"
-#include "Rtpg.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -62,8 +61,8 @@ private:
   // print_stats オプションの解析用オブジェクト
   TclPopt* mPoptPrintStats;
 
-  // 故障シミュレーションを行うクラス
-  Rtpg mRtpg;
+  // old オプションの解析用オブジェクト
+  TclPopt* mPoptOld;
 
 };
 

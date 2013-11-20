@@ -5,7 +5,7 @@
 # ===================================================================
 # Initial block
 # ===================================================================
-AC_INIT([libym_lexp], [1.0],
+AC_INIT([libym_logic], [1.0],
         [yusuke_matsunaga@ieee.org],
         [libym_lexp])dnl
 
@@ -14,7 +14,7 @@ AC_REVISION($Rev: 2507 $)dnl
 AC_PREREQ(2.57)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2005-2011 Yusuke Matsunaga
+Copyright (C) 2005-2013 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
@@ -106,6 +106,12 @@ AC_LANG_CPLUSPLUS
 
 
 # ===================================================================
+# Check for CppUTest
+# ===================================================================
+YM_CHECK_CPPUTEST([ym_have_cpputest=1], [ym_have_cpputest=0])
+
+
+# ===================================================================
 # Local definitions
 # ===================================================================
 
@@ -114,17 +120,23 @@ YMTOOLS_BUILDDIR="\$(top_builddir)/../.."
 AC_SUBST([YMTOOLS_SRCDIR])
 AC_SUBST([YMTOOLS_BUILDDIR])
 
-YM_EXTRA_SUBDIRS=""
-YM_EXTRA_LIBADD=""
+YM_INIT_EXTRA_SUBDIRS
+YM_INIT_EXTRA_TESTS_SUBDIRS
 
 if test "$ym_have_python" = 1; then
-   YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS python"
+   YM_ADD_EXTRA_SUBDIRS([python])
+   YM_ADD_EXTRA_TESTS_SUBDIRS([python])
    AC_CONFIG_FILES([python/Makefile])
    AC_CONFIG_FILES([tests/python/Makefile])
 fi
 
-AC_SUBST([YM_EXTRA_SUBDIRS])
-AC_SUBST([YM_EXTRA_LIBADD])
+if test $ym_have_cpputest = 1; then
+   YM_ADD_EXTRA_TESTS_SUBDIRS([CppUTest])
+   AC_CONFIG_FILES([tests/CppUTest/Makefile])
+fi
+
+YM_FINISH_EXTRA_SUBDIRS
+YM_FINISH_EXTRA_TESTS_SUBDIRS
 
 
 # ===================================================================
@@ -148,6 +160,7 @@ AC_CONFIG_FILES([sat/Makefile])
 AC_CONFIG_FILES([sat/ymsat/Makefile])
 AC_CONFIG_FILES([sat/MiniSat/Makefile])
 AC_CONFIG_FILES([sat/dimacs/Makefile])
+AC_CONFIG_FILES([smt/Makefile])
 AC_CONFIG_FILES([aig/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([tests/expr/Makefile])

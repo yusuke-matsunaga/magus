@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_utils/Generator.h"
+#include "ym_utils/PermGen.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -17,10 +17,9 @@ npngen(ymuint ni)
 {
   assert_cond( ni == 3 || ni == 4, __FILE__, __LINE__);
 
-  PermGen pg(ni, ni);
 
   const char* comma0 = "";
-  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+  for (PermGen pg(ni, ni); !pg.is_end(); ++ pg) {
     ymuint8 np = 1U << (ni + 1);
     for (ymuint8 pols = 0U; pols < np; ++ pols) {
       if ( comma0[0] != '\0' ) {
@@ -29,7 +28,7 @@ npngen(ymuint ni)
       cout << "  {";
       const char* comma = "";
       for (ymuint i = 0; i < ni; ++ i) {
-	cout << comma << p(i);
+	cout << comma << pg(i);
 	comma = ", ";
       }
       cout << comma << static_cast<ymuint>(pols) << "}";

@@ -359,7 +359,18 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const = 0;
+  dump(ODO& s) const = 0;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 設定用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief セルグループを設定する．
+  virtual
+  void
+  set_group(const CellGroup* group) = 0;
 
 };
 

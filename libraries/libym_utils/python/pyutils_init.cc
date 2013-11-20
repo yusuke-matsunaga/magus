@@ -13,7 +13,7 @@
 
 #include "ym_utils/pyutils.h"
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -67,18 +67,36 @@ void
 NameMgrObject_init(PyObject* module);
 
 void
-FileBinIObject_init(PyObject* module);
+FileIDOObject_init(PyObject* module);
 
 void
-FileBinOObject_init(PyObject* module);
+FileODOObject_init(PyObject* module);
 
-END_NAMESPACE_YM_PYTHON
+void
+CombiGenObject_init(PyObject* module);
+
+void
+PermGenObject_init(PyObject* module);
+
+void
+MultiCombiGenObject_init(PyObject* module);
+
+void
+MultiPermGenObject_init(PyObject* module);
+
+void
+MultiSetCombiGenObject_init(PyObject* module);
+
+void
+MultiSetPermGenObject_init(PyObject* module);
+
+END_NAMESPACE_YM
 
 
 PyMODINIT_FUNC
 utils_init()
 {
-  using namespace nsYm::nsPython;
+  using namespace nsYm;
 
   //////////////////////////////////////////////////////////////////////
   // モジュールオブジェクトの生成
@@ -122,8 +140,20 @@ utils_init()
 
   NameMgrObject_init(m);
 
-  FileBinIObject_init(m);
+  FileIDOObject_init(m);
 
-  FileBinOObject_init(m);
+  FileODOObject_init(m);
+
+  CombiGenObject_init(m);
+
+  PermGenObject_init(m);
+
+  MultiCombiGenObject_init(m);
+
+  MultiPermGenObject_init(m);
+
+  MultiSetCombiGenObject_init(m);
+
+  MultiSetPermGenObject_init(m);
 
 }

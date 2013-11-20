@@ -3,7 +3,7 @@
 /// @brief Aig の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -11,7 +11,7 @@
 #include "ym_logic/Aig.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -81,7 +81,7 @@ PyObject*
 Aig_negate(AigObject* self,
 	   PyObject* args)
 {
-  return Aig_FromAig(~self->mAig);
+  return PyAig_FromAig(~self->mAig);
 }
 
 // normalize 関数
@@ -89,7 +89,7 @@ PyObject*
 Aig_normalize(AigObject* self,
 	      PyObject* args)
 {
-  return Aig_FromAig(self->mAig.normalize());
+  return PyAig_FromAig(self->mAig.normalize());
 }
 
 // node_id 関数
@@ -97,7 +97,7 @@ PyObject*
 Aig_node_id(AigObject* self,
 	    PyObject* args)
 {
-  return conv_to_pyobject(self->mAig.node_id());
+  return PyObject_FromYmuint32(self->mAig.node_id());
 }
 
 // inv 関数
@@ -105,7 +105,7 @@ PyObject*
 Aig_inv(AigObject* self,
 	PyObject* args)
 {
-  return conv_to_pyobject(self->mAig.inv());
+  return PyObject_FromBool(self->mAig.inv());
 }
 
 // is_zero 関数
@@ -113,7 +113,7 @@ PyObject*
 Aig_is_zero(AigObject* self,
 	    PyObject* args)
 {
-  return conv_to_pyobject(self->mAig.is_zero());
+  return PyObject_FromBool(self->mAig.is_zero());
 }
 
 // is_one 関数
@@ -121,7 +121,7 @@ PyObject*
 Aig_is_one(AigObject* self,
 	   PyObject* args)
 {
-  return conv_to_pyobject(self->mAig.is_one());
+  return PyObject_FromBool(self->mAig.is_one());
 }
 
 // is_const 関数
@@ -129,7 +129,7 @@ PyObject*
 Aig_is_const(AigObject* self,
 	     PyObject* args)
 {
-  return conv_to_pyobject(self->mAig.is_const());
+  return PyObject_FromBool(self->mAig.is_const());
 }
 
 // is_input 関数
@@ -137,7 +137,7 @@ PyObject*
 Aig_is_input(AigObject* self,
 	     PyObject* args)
 {
-  return conv_to_pyobject(self->mAig.is_input());
+  return PyObject_FromBool(self->mAig.is_input());
 }
 
 // input_id 関数
@@ -145,7 +145,7 @@ PyObject*
 Aig_input_id(AigObject* self,
 	     PyObject* args)
 {
-  return VarId_FromVarId(self->mAig.input_id());
+  return PyVarId_FromVarId(self->mAig.input_id());
 }
 
 // is_and 関数
@@ -153,7 +153,7 @@ PyObject*
 Aig_is_and(AigObject* self,
 	   PyObject* args)
 {
-  return conv_to_pyobject(self->mAig.is_and());
+  return PyObject_FromBool(self->mAig.is_and());
 }
 
 // fanin 関数
@@ -166,7 +166,7 @@ Aig_fanin(AigObject* self,
     return NULL;
   }
 
-  return Aig_FromAig(self->mAig.fanin(pos));
+  return PyAig_FromAig(self->mAig.fanin(pos));
 }
 
 // fanin0 関数
@@ -174,7 +174,7 @@ PyObject*
 Aig_fanin0(AigObject* self,
 	   PyObject* args)
 {
-  return Aig_FromAig(self->mAig.fanin0());
+  return PyAig_FromAig(self->mAig.fanin0());
 }
 
 // fanin1 関数
@@ -182,7 +182,7 @@ PyObject*
 Aig_fanin1(AigObject* self,
 	   PyObject* args)
 {
-  return Aig_FromAig(self->mAig.fanin1());
+  return PyAig_FromAig(self->mAig.fanin1());
 }
 
 
@@ -221,7 +221,7 @@ END_NONAMESPACE
 
 
 // AigObject 用のタイプオブジェクト
-PyTypeObject AigType = {
+PyTypeObject PyAig_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -267,34 +267,12 @@ PyTypeObject AigType = {
   0,                          /*tp_is_gc*/
 };
 
-// @brief PyObject から Aig を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj Aig を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が PolObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   Aig& obj)
-{
-  // 型のチェック
-  if ( !AigObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  AigObject* aig_obj = (AigObject*)py_obj;
-
-  obj = aig_obj->mAig;
-
-  return true;
-}
-
 // @brief Aig から PyObject を生成する．
 // @param[in] obj Aig オブジェクト
 PyObject*
-Aig_FromAig(const Aig& obj)
+PyAig_FromAig(const Aig& obj)
 {
-  AigObject* aig_obj = Aig_new(&AigType);
+  AigObject* aig_obj = Aig_new(&PyAig_Type);
   if ( aig_obj == NULL ) {
     return NULL;
   }
@@ -305,17 +283,36 @@ Aig_FromAig(const Aig& obj)
   return (PyObject*)aig_obj;
 }
 
+// @brief PyObject から Aig を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return Aig を返す．
+// @note 変換が失敗したら TypeError を送出し，適当な値を返す．
+Aig
+PyAig_AsAig(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyAig_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "logic.Aig type is expected");
+    return Aig();
+  }
+
+  // 強制的にキャスト
+  AigObject* aig_obj = (AigObject*)py_obj;
+
+  return aig_obj->mAig;
+}
+
 // AigObject 関係の初期化を行う．
 void
 AigObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&AigType) < 0 ) {
+  if ( PyType_Ready(&PyAig_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "Aig", (PyObject*)&AigType);
+  PyModule_AddObject(m, "Aig", (PyObject*)&PyAig_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

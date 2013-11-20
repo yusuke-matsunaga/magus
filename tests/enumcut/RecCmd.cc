@@ -18,8 +18,8 @@
 
 #include "ym_logic/NpnMgr.h"
 
-#include "ym_utils/FileBinI.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
 
 #include "TopDown.h"
 #include "FuncMgr.h"
@@ -273,7 +273,7 @@ DumpCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  FileBinO bo(ex_file_name);
+  FileODO bo(ex_file_name);
   if ( !bo ) {
     TclObj emsg;
     emsg << "Could not create " << file_name;
@@ -326,7 +326,7 @@ DumpRepCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  FileBinO bo(ex_file_name);
+  FileODO bo(ex_file_name);
   if ( !bo ) {
     TclObj emsg;
     emsg << "Could not create " << file_name;
@@ -378,7 +378,7 @@ RestoreCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  FileBinI bi(ex_file_name);
+  FileIDO bi(ex_file_name);
   if ( !bi ) {
     TclObj emsg;
     emsg << "Could not open " << file_name;
@@ -442,7 +442,7 @@ PrintCmd::cmd_proc(TclObjVector& objv)
   for (vector<TvFunc>::const_iterator p = func_list.begin();
        p != func_list.end(); ++ p) {
     const TvFunc& func = *p;
-    ymuint ni = func.ni();
+    ymuint ni = func.input_num();
     if ( max_n < ni ) {
       max_n = ni;
     }
@@ -486,6 +486,15 @@ PrintCmd::cmd_proc(TclObjVector& objv)
     *osp << "Total " << setw(12) << func_list.size() << " " << setw(2) << i << " input functions" << endl;
   }
   *osp << "Total " << setw(12) << func_list.size() << "          functions" << endl;
+
+  vector<TvFunc> rep_func_list;
+  mgr().rep_func_list(rep_func_list);
+  for (ymuint i = min_n; i <= max_n; ++ i) {
+    vector<TvFunc> func_list;
+    mgr().rep_func_list(i, func_list);
+    *osp << "Total " << setw(12) << func_list.size() << " " << setw(2) << i << " input representative functions" << endl;
+  }
+  *osp << "Total " << setw(12) << rep_func_list.size() << "          representative functions" << endl;
 #endif
 
   return TCL_OK;

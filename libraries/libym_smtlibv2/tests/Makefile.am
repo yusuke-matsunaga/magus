@@ -2,11 +2,9 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS =
+SUBDIRS = $(YM_EXTRA_TESTS_SUBDIRS)
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+CLEANFILES =
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -28,12 +26,20 @@ bin_PROGRAMS =
 
 noinst_PROGRAMS = \
 	lextest \
-	parsertest
+	parsertest \
+	SmtLibShell_test
 
 
 ############################################################
 ## lextest
 ############################################################
+lextest_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/parser \
+	-I$(top_builddir)/parser
+
 lextest_SOURCES = \
 	lextest.cc
 
@@ -41,14 +47,17 @@ lextest_LDADD = \
 	../parser/libym_smt_parser.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-lextest_CXXFLAGS = \
-	-I$(top_srcdir)/parser \
-	-I$(top_builddir)/parser
-
 
 ############################################################
 ## parsertest
 ############################################################
+parsertest_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/parser \
+	-I$(top_builddir)/parser
+
 parsertest_SOURCES = \
 	parsertest.cc
 
@@ -56,6 +65,22 @@ parsertest_LDADD = \
 	../parser/libym_smt_parser.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-parsertest_CXXFLAGS = \
+
+############################################################
+## SmtLibShell_test
+############################################################
+SmtLibShell_test_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/parser \
-	-I$(top_builddir)/parser
+	-I$(top_builddir)/parser \
+	-I$(top_srcdir)/shell
+
+SmtLibShell_test_SOURCES = \
+	SmtLibShell_test.cc
+
+SmtLibShell_test_LDADD = \
+	../libym_smtlibv2.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

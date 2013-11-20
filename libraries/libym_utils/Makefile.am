@@ -5,8 +5,8 @@
 
 SUBDIRS = \
 	ym_utils \
-	$(YM_EXTRA_SUBDIRS) \
 	. \
+	$(YM_EXTRA_SUBDIRS) \
 	tests
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -25,21 +25,28 @@ noinst_LTLIBRARIES = libym_utils.la
 
 libym_utils_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(YMTOOLS_BUILDDIR)/include \
+	@POPT_INCLUDES@
 
 libym_utils_la_SOURCES = \
 	Alloc.cc \
-	BinIO.cc \
 	Binder.cc \
+	CombiGen.cc \
+	CompBase.h \
+	CompBase.cc \
+	CompI.h \
+	CompO.h \
 	DlList.cc \
 	File.cc \
+	FileBuff.h \
+	FileBuff.cc \
 	FileInfo.h \
 	FileInfo.cc \
 	FileInfoMgr.h \
 	FileInfoMgr.cc \
-	FileScanner.cc \
 	FragAlloc.cc \
-	Generator.cc \
+	GenBase.cc \
+	IDO.cc \
 	ItvlCell.h \
 	ItvlMgrImpl.h \
 	ItvlMgrImpl.cc \
@@ -49,9 +56,18 @@ libym_utils_la_SOURCES = \
 	MsgMgr.cc \
 	MsgMgrImpl.h \
 	MsgMgrImpl.cc \
+	MultiCombiGen.cc \
+	MultiGenBase.cc \
+	MultiSetCombiGen.cc \
+	MultiSetGenBase.cc \
+	MultiSetPermGen.cc \
+	MultiPermGen.cc \
 	NameMgr.cc \
+	PermGen.cc \
+	PoptMainApp.cc \
 	RandGen.cc \
 	RefCount.cc \
+	Scanner.cc \
 	SimpleAlloc.cc \
 	StrBuff.cc \
 	StrPool.h \
@@ -60,7 +76,12 @@ libym_utils_la_SOURCES = \
 	UnitAlloc.cc \
 	random.cc
 
-libym_utils_la_LIBADD = \
-	$(YM_EXTRA_LIBADD)
+if YM_HAVE_ZLIB
+libym_utils_la_SOURCES += zstream.cc GzIDO.cc
+endif
 
-libym_utils_la_LDFLAGS =
+libym_utils_la_LIBADD = \
+	@POPT_LIBS@
+
+libym_utils_la_LDFLAGS = \
+	-lz

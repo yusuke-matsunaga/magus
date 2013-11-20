@@ -3,7 +3,7 @@
 /// @brief NameMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -11,7 +11,7 @@
 #include "ym_utils/NameMgr.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -114,7 +114,7 @@ PyObject*
 NameMgr_prefix(NameMgrObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->prefix());
+  return PyObject_FromString(self->mBody->prefix());
 }
 
 // suffix 関数
@@ -122,7 +122,7 @@ PyObject*
 NameMgr_suffix(NameMgrObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->suffix());
+  return PyObject_FromString(self->mBody->suffix());
 }
 
 // new_name 関数
@@ -137,7 +137,7 @@ NameMgr_new_name(NameMgrObject* self,
 
   bool add_name = b ? true : false;
   string result = self->mBody->new_name(add_name);
-  return conv_to_pyobject(result);
+  return PyObject_FromString(result);
 }
 
 // add 関数
@@ -212,7 +212,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // NameMgrObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject NameMgrType = {
+PyTypeObject PyNameMgr_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -299,26 +299,23 @@ PyTypeObject NameMgrType = {
 // PyObject と NameMgr の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から NameMgr を取り出す．
+// @brief PyObject から NameMgr へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] p_obj NameMgr のポインタを格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が NameMgrObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   NameMgr*& p_obj)
+// @return NameMgr へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+NameMgr*
+PyNameMgr_AsNameMgrPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !NameMgrObject_Check(py_obj) ) {
-    return false;
+  if ( !PyNameMgr_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.NameMgr is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   NameMgrObject* my_obj = (NameMgrObject*)py_obj;
 
-  p_obj = my_obj->mBody;
-
-  return true;
+  return my_obj->mBody;
 }
 
 // NameMgrobject 関係の初期化を行なう．
@@ -326,12 +323,12 @@ void
 NameMgrObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&NameMgrType) < 0 ) {
+  if ( PyType_Ready(&PyNameMgr_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "NameMgr", (PyObject*)&NameMgrType);
+  PyModule_AddObject(m, "NameMgr", (PyObject*)&PyNameMgr_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

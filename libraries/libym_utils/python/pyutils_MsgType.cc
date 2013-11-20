@@ -3,7 +3,7 @@
 /// @brief tMsgType の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -11,7 +11,7 @@
 #include "ym_utils/msg_type.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 
 //////////////////////////////////////////////////////////////////////
@@ -53,31 +53,31 @@ struct MsgTypeObject
 
 // Py_kMsgError の実体
 MsgTypeObject Py_kMsgErrorStruct = {
-  PyObject_HEAD_INIT(&MsgTypeType)
+  PyObject_HEAD_INIT(&PyMsgType_Type)
   kMsgError
 };
 
 // Py_kMsgWarning の実体
 MsgTypeObject Py_kMsgWarningStruct = {
-  PyObject_HEAD_INIT(&MsgTypeType)
+  PyObject_HEAD_INIT(&PyMsgType_Type)
   kMsgWarning
 };
 
 // Py_kMsgFailure の実体
 MsgTypeObject Py_kMsgFailureStruct = {
-  PyObject_HEAD_INIT(&MsgTypeType)
+  PyObject_HEAD_INIT(&PyMsgType_Type)
   kMsgFailure
 };
 
 // Py_kMsgInfo の実体
 MsgTypeObject Py_kMsgInfoStruct = {
-  PyObject_HEAD_INIT(&MsgTypeType)
+  PyObject_HEAD_INIT(&PyMsgType_Type)
   kMsgInfo
 };
 
 // Py_kMsgDebug の実体
 MsgTypeObject Py_kMsgDebugStruct = {
-  PyObject_HEAD_INIT(&MsgTypeType)
+  PyObject_HEAD_INIT(&PyMsgType_Type)
   kMsgDebug
 };
 
@@ -113,11 +113,11 @@ MsgType_new(PyTypeObject* type,
     PyObject* obj = PyTuple_GET_ITEM(args, 0);
     if ( PyString_Check(obj) ) {
       char* str = PyString_AsString(obj);
-      return (MsgTypeObject*)MsgType_FromString(str);
+      return (MsgTypeObject*)PyMsgType_FromString(str);
     }
     if ( PyInt_Check(obj) ) {
       ymlong val = PyInt_AS_LONG(obj);
-      return (MsgTypeObject*)MsgType_FromLong(val);
+      return (MsgTypeObject*)PyMsgType_FromLong(val);
     }
   }
 
@@ -147,7 +147,7 @@ MsgType_str(MsgTypeObject* self)
 {
   ostringstream buf;
   buf << self->mType;
-  return conv_to_pyobject(buf.str());
+  return PyObject_FromString(buf.str());
 }
 
 // bitmask 関数
@@ -156,7 +156,7 @@ MsgType_bitmask(MsgTypeObject* self,
 		PyObject* args)
 {
   ymuint32 val = (1U << static_cast<ymuint32>(self->mType));
-  return conv_to_pyobject(val);
+  return PyObject_FromYmuint32(val);
 }
 
 
@@ -189,7 +189,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // MsgTypeObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject MsgTypeType = {
+PyTypeObject PyMsgType_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -278,7 +278,7 @@ PyTypeObject MsgTypeType = {
 
 // tMsgType からの変換関数
 PyObject*
-MsgType_FromMsgType(tMsgType type)
+PyMsgType_FromMsgType(tMsgType type)
 {
   PyObject* result = NULL;
   switch ( type ) {
@@ -296,7 +296,7 @@ MsgType_FromMsgType(tMsgType type)
 
 // 文字列からの変換関数
 PyObject*
-MsgType_FromString(const char* str)
+PyMsgType_FromString(const char* str)
 {
   if ( str == NULL ) {
     PyErr_SetString(PyExc_ValueError,
@@ -345,7 +345,7 @@ MsgType_FromString(const char* str)
 
 // long からの変換関数
 PyObject*
-MsgType_FromLong(long val)
+PyMsgType_FromLong(long val)
 {
   PyObject* result = NULL;
   switch ( val ) {
@@ -364,27 +364,27 @@ MsgType_FromLong(long val)
   return result;
 }
 
-// @brief PyObject から MsgType を取り出す．
+// @brief PyObject から tMsgType を取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] obj MsgType を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が MsgTypeObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   tMsgType& obj)
+// @return tMsgType を返す．
+// @note 変換が失敗したら TypeError を送出し，kMsgError を返す．
+tMsgType
+PyMsgType_AsMsgType(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !MsgTypeObject_Check(py_obj) ) {
-    return false;
+  if ( !PyMsgType_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.MsgType is expected");
+    return kMsgError;
   }
 
   // 強制的にキャスト
   MsgTypeObject* my_obj = (MsgTypeObject*)py_obj;
 
-  obj = my_obj->mType;
-
-  return true;
+  return my_obj->mType;
 }
+
+
+BEGIN_NONAMESPACE
 
 // MsgType の定数を設定する関数
 inline
@@ -409,17 +409,20 @@ new_string(const char* str)
   return py_obj;
 }
 
+END_NONAMESPACE
+
+
 // MsgTypeObject 関係の初期化を行う．
 void
 MsgTypeObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&MsgTypeType) < 0 ) {
+  if ( PyType_Ready(&PyMsgType_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "MsgType", (PyObject*)&MsgTypeType);
+  PyModule_AddObject(m, "MsgType", (PyObject*)&PyMsgType_Type);
 
   // 定数オブジェクトの生成と登録
   MsgType_set(Py_kMsgErrorStruct,   Py_kMsgError,   m, "kMsgError");
@@ -436,4 +439,4 @@ MsgTypeObject_init(PyObject* m)
   Py_kMsgDebugString   = new_string("debug");
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

@@ -2,30 +2,33 @@
 
 ## $Id: Makefile.am 2203 2009-04-16 05:04:40Z matsunaga $
 
-SUBDIRS =
+SUBDIRS = \
+	sat_engine \
+	bt \
+	dop \
+	uop
 
 MAINTAINERCLEANFILES = Makefile.in
+
 
 noinst_LTLIBRARIES = libatpg_dtpg.la
 
 libatpg_dtpg_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src \
+	$(GMP_INCLUDES)
 
 libatpg_dtpg_la_SOURCES = \
-	dtpg_nsdef.h \
-	DtpgNode.h \
-	DtpgNode.cc \
-	DtpgFault.h \
-	DtpgFFR.h \
-	DtpgNetwork.h \
-	DtpgNetwork.cc \
 	DtpgSat.h \
 	DtpgSat.cc \
-	InputLiteral.h \
-	InputLiteral.cc
-
-libatpg_dtpg_la_LIBADD =
+	SatEngine.h
 
 libatpg_dtpg_la_LDFLAGS =
+
+libatpg_dtpg_la_LIBADD = \
+	sat_engine/libatpg_sat_engine.la \
+	bt/libatpg_bt.la \
+	dop/libatpg_dop.la \
+	uop/libatpg_uop.la

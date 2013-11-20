@@ -38,6 +38,12 @@ public:
   // 共通の属性
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ID番号の取得
+  /// @note timing = cell->timing(id); の時，timing->id() = id となる．
+  virtual
+  ymuint
+  id() const = 0;
+
   /// @brief 型の取得
   virtual
   tCellTimingType
@@ -163,7 +169,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const = 0;
+  dump(ODO& s) const = 0;
 
 };
 

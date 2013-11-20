@@ -97,7 +97,7 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
       continue;
     }
 
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     assert_cond(expr.child_num() == ni, __FILE__, __LINE__);
 
     ymuint best_cost = ni + 2;

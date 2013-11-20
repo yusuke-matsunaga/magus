@@ -11,8 +11,8 @@
 
 #include "ym_cell/cell_nsdef.h"
 #include "ym_logic/lexp_nsdef.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -23,16 +23,6 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class CellLibrary
 {
-public:
-  //////////////////////////////////////////////////////////////////////
-  /// @brief テクノロジを表す列挙型
-  //////////////////////////////////////////////////////////////////////
-  enum tTechnology {
-    kTechCmos,
-    kTechFpga
-  };
-
-
 public:
 
   /// @brief コンストラクタ
@@ -64,7 +54,7 @@ public:
   /// - kTechFpga
   /// のどちらか
   virtual
-  tTechnology
+  tCellTechnology
   technology() const = 0;
 
   /// @brief 遅延モデルの取得
@@ -275,72 +265,72 @@ public:
   /// @brief 総パタン数を返す．
   virtual
   ymuint
-  pat_num() const = 0;
+  pg_pat_num() const = 0;
 
   /// @brief パタンを返す．
-  /// @param[in] id パタン番号 ( 0 <= id < pat_num() )
+  /// @param[in] id パタン番号 ( 0 <= id < pg_pat_num() )
   virtual
   const CellPatGraph&
-  pat(ymuint id) const = 0;
+  pg_pat(ymuint id) const = 0;
 
   /// @brief パタンの最大の入力数を得る．
   virtual
   ymuint
-  max_input() const = 0;
+  pg_max_input() const = 0;
 
   /// @brief 総ノード数を返す．
   virtual
   ymuint
-  node_num() const = 0;
+  pg_node_num() const = 0;
 
   /// @brief ノードの種類を返す．
-  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  /// @param[in] id ノード番号 ( 0 <= id < pg_node_num() )
   virtual
   tCellPatType
-  node_type(ymuint id) const = 0;
+  pg_node_type(ymuint id) const = 0;
 
   /// @brief ノードが入力ノードの時に入力番号を返す．
-  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  /// @param[in] id ノード番号 ( 0 <= id < pg_node_num() )
   /// @note 入力ノードでない場合の返り値は不定
   virtual
   ymuint
-  input_id(ymuint id) const = 0;
+  pg_input_id(ymuint id) const = 0;
 
   /// @brief 入力のノード番号を返す．
-  /// @param[in] input_id 入力番号 ( 0 <= input_id < input_num() )
+  /// @param[in] input_id 入力番号 ( 0 <= input_id < pg_input_num() )
   /// @return input_id の入力に対応するノードのノード番号
   virtual
   ymuint
-  input_node(ymuint input_id) const = 0;
+  pg_input_node(ymuint input_id) const = 0;
 
   /// @brief 総枝数を返す．
   virtual
   ymuint
-  edge_num() const = 0;
+  pg_edge_num() const = 0;
 
   /// @brief 枝のファンイン元のノード番号を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  /// @param[in] id 枝番号 ( 0 <= id < edge_num() )
   virtual
   ymuint
-  edge_from(ymuint id) const = 0;
+  pg_edge_from(ymuint id) const = 0;
 
   /// @brief 枝のファンアウト先のノード番号を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  /// @param[in] id 枝番号 ( 0 <= id < edge_num() )
   virtual
   ymuint
-  edge_to(ymint id) const = 0;
+  pg_edge_to(ymint id) const = 0;
 
   /// @brief 枝のファンアウト先の入力位置( 0 or 1 ) を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  /// @param[in] id 枝番号 ( 0 <= id < edge_num() )
   virtual
   ymuint
-  edge_pos(ymuint id) const = 0;
+  pg_edge_pos(ymuint id) const = 0;
 
   /// @brief 枝の反転属性を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  /// @param[in] id 枝番号 ( 0 <= id < edge_num() )
   virtual
   bool
-  edge_inv(ymuint id) const = 0;
+  pg_edge_inv(ymuint id) const = 0;
 
 
 public:
@@ -352,13 +342,13 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const = 0;
+  dump(ODO& s) const = 0;
 
   /// @brief バイナリダンプされた内容を読み込む．
   /// @param[in] s 入力元のストリーム
   virtual
   void
-  restore(BinI& s) = 0;
+  restore(IDO& s) = 0;
 
 
 public:
@@ -375,7 +365,7 @@ public:
   /// @brief 'technology' を設定する．
   virtual
   void
-  set_technology(tTechnology technology) = 0;
+  set_technology(tCellTechnology technology) = 0;
 
   /// @brief 遅延モデルを設定する．
   /// @param[in] delay_model 遅延モデル．
@@ -465,6 +455,12 @@ public:
   virtual
   void
   set_cell_num(ymuint num) = 0;
+
+  /// @brief セルを取り出す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < cell_num() )
+  virtual
+  Cell*
+  cell(ymuint pos) = 0;
 
   /// @brief 論理セルを生成する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
@@ -631,6 +627,9 @@ public:
   /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
   /// @param[in] output_id 出力ピン番号 ( 0 <= output_id < cell->output_num2() )
   /// @param[in] name 出力ピン名
+  /// @param[in] has_logic 論理式を持つとき true にするフラグ
+  /// @param[in] logic_expr 論理式
+  /// @param[in] tristate_expr tristate 条件式
   /// @param[in] max_fanout 最大ファンアウト容量
   /// @param[in] min_fanout 最小ファンアウト容量
   /// @param[in] max_capacitance 最大負荷容量
@@ -643,6 +642,9 @@ public:
 		  ymuint pin_id,
 		  ymuint output_id,
 		  const string& name,
+		  bool has_logic,
+		  const LogExpr& logic_expr,
+		  const LogExpr& tristate_expr,
 		  CellCapacitance max_fanout,
 		  CellCapacitance min_fanout,
 		  CellCapacitance max_capacitance,
@@ -656,6 +658,9 @@ public:
   /// @param[in] input_id 入力ピン番号 ( 0 <= input_id < cell->input_num2() )
   /// @param[in] output_id 出力ピン番号 ( 0 <= output_id < cell->output_num2() )
   /// @param[in] name 入出力ピン名
+  /// @param[in] has_logic 論理式を持つとき true にするフラグ
+  /// @param[in] logic_expr 論理式
+  /// @param[in] tristate_expr tristate 条件式
   /// @param[in] capacitance 入力ピンの負荷容量
   /// @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
   /// @param[in] fall_capacitance 入力ピンの立ち下がり負荷容量
@@ -672,6 +677,9 @@ public:
 		 ymuint input_id,
 		 ymuint output_id,
 		 const string& name,
+		 bool has_logic,
+		 const LogExpr& logic_expr,
+		 const LogExpr& tristate_expr,
 		 CellCapacitance capacitance,
 		 CellCapacitance rise_capacitance,
 		 CellCapacitance fall_capacitance,

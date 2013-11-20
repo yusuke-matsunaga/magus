@@ -174,7 +174,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 {
   ymuint n = sbjgraph.max_node_id();
   mCostArray.resize(n * 2);
-  ymuint max_input = cell_library.max_input();
+  ymuint max_input = cell_library.pg_max_input();
   mWeight.resize(max_input);
   mLeafNum.clear();
   mLeafNum.resize(n, -1);
@@ -208,7 +208,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 
   // 論理ノードのコストを入力側から計算
   PatMatcher pat_match(cell_library);
-  ymuint np = cell_library.pat_num();
+  ymuint np = cell_library.pg_pat_num();
   vector<const BdnNode*> snode_list;
   sbjgraph.sort(snode_list);
   for (vector<const BdnNode*>::const_iterator p = snode_list.begin();
@@ -223,9 +223,10 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
     p_cost = DBL_MAX;
     n_cost = DBL_MAX;
     for (ymuint pat_id = 0; pat_id < np; ++ pat_id) {
-      const CellPatGraph& pat = cell_library.pat(pat_id);
+      const CellPatGraph& pat = cell_library.pg_pat(pat_id);
       ymuint ni = pat.input_num();
-      if ( pat_match(node, pat) ) {
+      Match match(ni);
+      if ( pat_match(node, pat, match) ) {
 	ymuint rep_id = pat.rep_id();
 	if ( debug ) {
 	  cout << "Match with Pat#" << pat_id
@@ -241,8 +242,8 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	    NpnVmap imap = npn_map.imap(VarId(i));
 	    VarId dst_var = imap.var();
 	    ymuint pos = dst_var.val();
-	    const BdnNode* inode = pat_match.leaf_node(pos);
-	    bool iinv = pat_match.leaf_inv(pos);
+	    const BdnNode* inode = match.leaf_node(pos);
+	    bool iinv = match.leaf_inv(pos);
 	    if ( imap.pol() == kPolNega ) {
 	      iinv = !iinv;
 	    }

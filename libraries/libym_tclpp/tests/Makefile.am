@@ -2,7 +2,7 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	$(TCLRL_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/include \

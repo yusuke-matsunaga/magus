@@ -39,10 +39,6 @@ public:
   ymuint
   id() const;
 
-  /// @brief 'lock' 状態を得る．
-  bool
-  is_locked() const;
-
   /// @brief 入力の時 true を返す．
   bool
   is_input() const;
@@ -91,36 +87,6 @@ public:
   bool
   fanin_inv1() const;
 
-  /// @brief シグネチャを返す．
-  const string&
-  signature() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 設定用の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 入力に設定する．
-  /// @param[in] input_id 入力番号
-  void
-  set_input(ymuint input_id);
-
-  /// @brief ANDに設定する．
-  /// @param[in] inv0, inv1 ファンインの反転属性
-  void
-  set_and(bool inv0,
-	  bool inv1);
-
-  /// @brief XORに設定する．
-  void
-  set_xor();
-
-  /// @brief 'lock' する．
-  /// @note ファンインに再帰する．
-  void
-  set_locked();
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -149,12 +115,6 @@ private:
   //  + ファンインの極性 ( 1bit x 2)
   ymuint32 mType;
 
-  // シグネチャ
-  string mSignature;
-
-  // lock ビット
-  bool mLocked;
-
   // ファンインのノード
   LcPatNode* mFanin[2];
 
@@ -168,20 +128,27 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+inline
+LcPatNode::LcPatNode() :
+  mType(0U)
+{
+  mFanin[0] = NULL;
+  mFanin[1] = NULL;
+}
+
+// @brief デストラクタ
+inline
+LcPatNode::~LcPatNode()
+{
+}
+
 // @brief ノード番号を返す．
 inline
 ymuint
 LcPatNode::id() const
 {
   return mId;
-}
-
-// @brief 'lock' 状態を得る．
-inline
-bool
-LcPatNode::is_locked() const
-{
-  return mLocked;
 }
 
 // @brief 入力の時 true を返す．
@@ -270,14 +237,6 @@ bool
 LcPatNode::fanin_inv1() const
 {
   return static_cast<bool>((mType >> 3) & 1U);
-}
-
-// @brief シグネチャを返す．
-inline
-const string&
-LcPatNode::signature() const
-{
-  return mSignature;
 }
 
 END_NAMESPACE_YM_CELL_LIBCOMP

@@ -9,14 +9,25 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	satpg_nsdef.h \
 	AtpgMgr.h \
-	DtpgOperator.h \
+	BackTracer.h \
+	DetectOp.h \
+	Dtpg.h \
+	DtpgStats.h \
 	FaultMgr.h \
 	FaultStatus.h \
+	Fsim.h \
+	FsimOld.h \
 	PackedVal.h \
-	PackedVal3.h \
 	Rtpg.h \
-	SaFault.h \
-	TestVector.h
-	TvBuff.h \
+	RtpgStats.h \
+	MinPat.h \
+	MinPatStats.h \
+	TestVector.h \
+	TpgFault.h \
+	TpgNetwork.h \
+	TpgNode.h \
+	TpgPrimitive.h \
 	TvMgr.h \
-	Val3.h
+	UntestOp.h \
+	Val3.h \
+	pysatpg.h

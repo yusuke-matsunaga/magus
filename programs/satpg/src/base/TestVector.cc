@@ -19,6 +19,8 @@ BEGIN_NAMESPACE_YM_SATPG
 TestVector::TestVector(ymuint input_num) :
   mInputNum(input_num)
 {
+  ymuint k = input_num % kPvBitLen;
+  mMask = kPvAll1 << (kPvBitLen - k);
 }
 
 // @brief デストラクタ
@@ -39,6 +41,84 @@ TestVector::x_num() const
     n += count_ones(v);
   }
   return ni - n;
+}
+
+// @brief 2つのベクタが両立しないとき true を返す．
+bool
+TestVector::is_conflict(const TestVector& tv1,
+			const TestVector& tv2)
+{
+  assert_cond( tv1.input_num() == tv2.input_num(), __FILE__, __LINE__);
+  ymuint nb = block_num(tv1.input_num());
+  for (ymuint i = 0; i < nb; i += 2) {
+    ymuint i0 = i;
+    ymuint i1 = i + 1;
+    PackedVal diff0 = (tv1.mPat[i0] ^ tv2.mPat[i0]);
+    PackedVal diff1 = (tv1.mPat[i1] ^ tv2.mPat[i1]);
+    if ( (diff0 & diff1) != kPvAll0 ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// @brief 等価関係の比較を行なう．
+// @param[in] right オペランド
+// @return 自分自身と right が等しいとき true を返す．
+bool
+TestVector::operator==(const TestVector& right) const
+{
+  assert_cond( input_num() == right.input_num(), __FILE__, __LINE__);
+  ymuint nb = block_num(input_num());
+  for (ymuint i = 0; i < nb; ++ i) {
+    if ( mPat[i] != right.mPat[i] ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// @brief 包含関係の比較を行なう
+// @param[in] right オペランド
+// @return minterm の集合として right が自分自身を含んでいたら true を返す．
+// @note false だからといって逆に自分自身が right を含むとは限らない．
+bool
+TestVector::operator<(const TestVector& right) const
+{
+  assert_cond( input_num() == right.input_num(), __FILE__, __LINE__);
+  ymuint nb = block_num(input_num());
+  bool diff = false;
+  for (ymuint i = 0; i < nb; ++ i) {
+    PackedVal val1 = mPat[i];
+    PackedVal val2 = right.mPat[i];
+    if ( (~val1 & val2) != kPvAll0 ) {
+      return false;
+    }
+    if ( val1 != val2 ) {
+      diff = true;
+    }
+  }
+  return diff;
+}
+
+// @brief 包含関係の比較を行なう
+// @param[in] right オペランド
+// @return minterm の集合として right が自分自身を含んでいたら true を返す．
+// @note こちらは等しい場合も含む．
+// @note false だからといって逆に自分自身が right を含むとは限らない．
+bool
+TestVector::operator<=(const TestVector& right) const
+{
+  assert_cond( input_num() == right.input_num(), __FILE__, __LINE__);
+  ymuint nb = block_num(input_num());
+  for (ymuint i = 0; i < nb; ++ i) {
+    PackedVal val1 = mPat[i];
+    PackedVal val2 = right.mPat[i];
+    if ( (~val1 & val2) != kPvAll0 ) {
+      return false;
+    }
+  }
+  return true;
 }
 
 // @brief すべて未定(X) で初期化する．
@@ -108,8 +188,38 @@ TestVector::set_from_random(RandGen& randgen)
   ymuint nb = block_num(input_num());
   for (ymuint i = 0; i < nb; i += 2) {
     PackedVal v = randgen.ulong();
-    mPat[i] = ~v;
-    mPat[i + 1] = v;
+    ymuint i0 = i;
+    ymuint i1 = i + 1;
+    if ( i == nb - 2 ) {
+      mPat[i0] = ~v & mMask;
+      mPat[i1] =  v & mMask;
+    }
+    else {
+      mPat[i0] = ~v;
+      mPat[i1] =  v;
+    }
+  }
+}
+
+// @brief X の部分を乱数で 0/1 に設定する．
+// @param[in] randgen 乱数生成器
+void
+TestVector::fix_x_from_random(RandGen& randgen)
+{
+  ymuint nb = block_num(input_num());
+  for (ymuint i = 0; i < nb; i += 2) {
+    ymuint i0 = i;
+    ymuint i1 = i + 1;
+    PackedVal mask = ~(mPat[i0] | mPat[i1]);
+    if ( i == nb - 2 ) {
+      mask &= mMask;
+    }
+    if ( mask == kPvAll0 ) {
+      continue;
+    }
+    PackedVal v = randgen.ulong();
+    mPat[i0] |= ~v & mask;
+    mPat[i1] |=  v & mask;
   }
 }
 
@@ -129,6 +239,34 @@ TestVector::copy(const TestVector& src)
     mPat[i1] &= ~mask;
     mPat[i1] |= src.mPat[i1];
   }
+}
+
+// @breif テストベクタをマージする．
+// @note X 以外で相異なるビットがあったら false を返す．
+bool
+TestVector::merge(const TestVector& src)
+{
+  ymuint nb = block_num(input_num());
+
+  // コンフリクトチェック
+  for (ymuint i = 0; i < nb; i += 2) {
+    ymuint i0 = i;
+    ymuint i1 = i + 1;
+    PackedVal diff0 = (mPat[i0] ^ src.mPat[i0]);
+    PackedVal diff1 = (mPat[i1] ^ src.mPat[i1]);
+    if ( (diff0 & diff1) != kPvAll0 ) {
+      return false;
+    }
+  }
+
+  // 実際のマージ
+  for (ymuint i = 0; i < nb; i += 2) {
+    ymuint i0 = i;
+    ymuint i1 = i + 1;
+    mPat[i0] |= src.mPat[i0];
+    mPat[i1] |= src.mPat[i1];
+  }
+  return true;
 }
 
 // @brief 内容を BIN 形式で出力する．

@@ -3,17 +3,17 @@
 /// @brief ItvlMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_utils/pyutils.h"
 #include "ym_utils/ItvlMgr.h"
-#include "ym_utils/FileBinI.h"
-#include "ym_utils/FileBinO.h"
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -78,7 +78,7 @@ PyObject*
 ItvlMgr_avail_num(ItvlMgrObject* self,
 		  PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->avail_num());
+  return PyObject_FromYmuint32(self->mBody->avail_num());
 }
 
 // erase 関数
@@ -138,7 +138,7 @@ ItvlMgr_check(ItvlMgrObject* self,
 
   bool result = self->mBody->check(d1, d2);
 
-  return conv_to_pyobject(result);
+  return PyObject_FromBool(result);
 }
 
 // min_id 関数
@@ -146,7 +146,7 @@ PyObject*
 ItvlMgr_min_id(ItvlMgrObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->min_id());
+  return PyObject_FromYmint32(self->mBody->min_id());
 }
 
 // max_id 関数
@@ -154,7 +154,7 @@ PyObject*
 ItvlMgr_max_id(ItvlMgrObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->max_id());
+  return PyObject_FromYmint32(self->mBody->max_id());
 }
 
 // dump 関数
@@ -162,7 +162,7 @@ PyObject*
 ItvlMgr_dump(ItvlMgrObject* self,
 	     PyObject* args)
 {
-  FileBinO* bp = parse_FileBinO(args);
+  FileODO* bp = parse_FileODO(args);
   if ( bp == NULL ) {
     return NULL;
   }
@@ -178,7 +178,7 @@ PyObject*
 ItvlMgr_restore(ItvlMgrObject* self,
 		PyObject* args)
 {
-  FileBinI* bp = parse_FileBinI(args);
+  FileIDO* bp = parse_FileIDO(args);
   if ( bp == NULL ) {
     return NULL;
   }
@@ -223,9 +223,9 @@ PyMethodDef ItvlMgr_methods[] = {
   {"max_id", (PyCFunction)ItvlMgr_max_id, METH_NOARGS,
    PyDoc_STR("return the maximum number (NONE)")},
   {"dump", (PyCFunction)ItvlMgr_dump, METH_VARARGS,
-   PyDoc_STR("dump (FileBinO)")},
+   PyDoc_STR("dump (FileODO)")},
   {"restore", (PyCFunction)ItvlMgr_restore, METH_VARARGS,
-   PyDoc_STR("restore (FileBinI)")},
+   PyDoc_STR("restore (FileIDO)")},
   {NULL, NULL, 0, NULL} // end-marker
 };
 
@@ -235,7 +235,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // ItvlMgrObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject ItvlMgrType = {
+PyTypeObject PyItvlMgr_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -322,26 +322,23 @@ PyTypeObject ItvlMgrType = {
 // PyObject と ItvlMgr の間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から ItvlMgr を取り出す．
+// @brief PyObject から ItvlMgr へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] obj ItvlMgr を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が ItvlMgrObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   ItvlMgr*& p_obj)
+// @return ItvlMgr へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+ItvlMgr*
+PyItvlMgr_AsItvlMgrPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !ItvlMgrObject_Check(py_obj) ) {
-    return false;
+  if ( !PyItvlMgr_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.ItvlMgr is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   ItvlMgrObject* my_obj = (ItvlMgrObject*)py_obj;
 
-  p_obj = my_obj->mBody;
-
-  return true;
+  return my_obj->mBody;
 }
 
 // ItvlMgrObject 関係の初期化を行なう．
@@ -349,12 +346,12 @@ void
 ItvlMgrObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&ItvlMgrType) < 0 ) {
+  if ( PyType_Ready(&PyItvlMgr_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "ItvlMgr", (PyObject*)&ItvlMgrType);
+  PyModule_AddObject(m, "ItvlMgr", (PyObject*)&PyItvlMgr_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

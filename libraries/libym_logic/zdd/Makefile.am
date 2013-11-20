@@ -62,6 +62,8 @@ libym_logic_zdd_la_SOURCES = \
 	NeOp.cc \
 	MsOp.h \
 	MsOp.cc \
+	Ms2Op.h \
+	Ms2Op.cc \
 	count.cc \
 	IdMgr.h \
 	IdMgr.cc \
@@ -77,4 +79,3 @@ libym_logic_zdd_la_SOURCES = \
 libym_logic_zdd_la_LIBADD =
 
 libym_logic_zdd_la_LDFLAGS =
-

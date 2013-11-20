@@ -5,7 +5,7 @@
 /// @brief CompTbl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -135,7 +135,7 @@ inline
 bool
 CompTbl::check_tablesize(ymuint64 num) const
 {
-  return num > mNextLimit && mTableSize < mMaxSize;
+  return num > mNextLimit && (mMaxSize == 0 || mTableSize < mMaxSize);
 }
 
 END_NAMESPACE_YM_BDD

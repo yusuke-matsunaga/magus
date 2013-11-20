@@ -12,7 +12,10 @@
 #include "LcPatHandle.h"
 
 #include "ym_logic/LogExpr.h"
-#include "ym_utils/Generator.h"
+#include "ym_utils/MFSet.h"
+#include "ym_utils/PermGen.h"
+#include "ym_utils/MultiCombiGen.h"
+#include "ym_utils/MultiSetPermGen.h"
 
 
 BEGIN_NONAMESPACE
@@ -122,39 +125,25 @@ LcPatMgr::reg_pat(const LogExpr& expr,
   vector<LcPatHandle> tmp_pat_list;
   pg_sub(expr, tmp_pat_list);
 
-  // 重複チェック
-  hash_set<string> pg_hash;
-  ymuint n = mPatList.size();
-  for (ymuint i = 0; i < n; ++ i) {
-    if ( mRepList[i] != rep_id ) continue;
-    LcPatHandle pat1 = mPatList[i];
-    LcPatNode* node1 = pat1.node();
-    bool inv1 = pat1.inv();
-    string signature1 = node1->signature();
-    if ( inv1 ) {
-      signature1 = "~" + signature1;
-    }
-    pg_hash.insert(signature1);
-  }
-
   for (vector<LcPatHandle>::iterator p = tmp_pat_list.begin();
        p != tmp_pat_list.end(); ++ p) {
     LcPatHandle pat1 = *p;
-    LcPatNode* node1 = pat1.node();
-    bool inv1 = pat1.inv();
-    string signature2 = node1->signature();
-    if ( inv1 ) {
-      signature2 = "~" + signature2;
-    }
-    if ( pg_hash.find(signature2) == pg_hash.end() ) {
-      // pat1 を登録する．
-      mPatList.push_back(pat1);
-      mRepList.push_back(rep_id);
-      node1->set_locked();
-    }
+    mPatList.push_back(pat1);
+    mRepList.push_back(rep_id);
   }
 
-  sweep();
+  // 入力ノードの整列
+  for (ymuint i = 0; i < mNodeList.size(); ++ i) {
+    LcPatNode* node = mNodeList[i];
+    if ( !node->is_input() ) continue;
+    ymuint iid = node->input_id();
+    if ( iid == i ) continue;
+    LcPatNode* node1 = mNodeList[iid];
+    mNodeList[iid] = node;
+    node->mId = iid;
+    mNodeList[i] = node1;
+    node1->mId = i;
+  }
 }
 
 // @brief 2つの論理式が同形かどうか調べる．
@@ -209,11 +198,10 @@ LcPatMgr::check_equivalent(const LogExpr& expr1,
     return false;
   }
 
-  PermGen pg(n, n);
-  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+  for (PermGen pg(n, n); !pg.is_end(); ++ pg) {
     bool match = true;
     for (ymuint i = 0; i < n; ++ i) {
-      if ( !check_equivalent(expr1.child(i), expr2.child(p(i))) ) {
+      if ( !check_equivalent(expr1.child(i), expr2.child(pg(i))) ) {
 	match = false;
 	break;
       }
@@ -225,54 +213,67 @@ LcPatMgr::check_equivalent(const LogExpr& expr1,
   return false;
 }
 
-// @brief 使われていないパタンとノードを削除してID番号を詰める．
-void
-LcPatMgr::sweep()
+// @brief 2つのパタンが同型かどうか調べる．
+bool
+LcPatMgr::check_equivalent(LcPatHandle handle1,
+			   LcPatHandle handle2)
 {
-  // lock されていないノードの削除
-  ymuint wpos = 0;
-  for (ymuint i = 0; i < mNodeList.size(); ++ i) {
-    LcPatNode* node = mNodeList[i];
-    if ( node->is_locked() ) {
-      if ( wpos != i ) {
-	mNodeList[wpos] = node;
-	node->mId = wpos;
-      }
-      ++ wpos;
-    }
-    else {
-      if ( node->is_and() || node->is_xor() ) {
-	// ハッシュ表から取り除く
-	ymuint pos = hash_func(node->mType, node->mFanin[0], node->mFanin[1]);
-	ymuint idx = pos % mHashSize;
-	LcPatNode** p_prev = &mHashTable[idx];
-	for ( ; ; ) {
-	  LcPatNode* node1 = *p_prev;
-	  assert_cond( node1 != NULL, __FILE__, __LINE__);
-	  if ( node == node1 ) {
-	    *p_prev = node->mLink;
-	    break;
-	  }
-	  p_prev = &(node1->mLink);
-	}
-      }
-      delete_node(node);
-    }
+  if ( handle1.inv() != handle2.inv() ) {
+    return false;
   }
-  mNodeList.erase(mNodeList.begin() + wpos, mNodeList.end());
 
-  // 入力ノードの整列
-  for (ymuint i = 0; i < mNodeList.size(); ++ i) {
-    LcPatNode* node = mNodeList[i];
-    if ( !node->is_input() ) continue;
-    ymuint iid = node->input_id();
-    if ( iid == i ) continue;
-    LcPatNode* node1 = mNodeList[iid];
-    mNodeList[iid] = node;
-    node->mId = iid;
-    mNodeList[i] = node1;
-    node1->mId = i;
+  hash_map<ymuint, ymuint> map1;
+  hash_map<ymuint, ymuint> map2;
+
+  return ceq_sub(handle1.node(), handle2.node(), map1, map2);
+}
+
+// @brief check_equivalent の下請け関数
+bool
+LcPatMgr::ceq_sub(LcPatNode* node1,
+		  LcPatNode* node2,
+		  hash_map<ymuint, ymuint>& map1,
+		  hash_map<ymuint, ymuint>& map2)
+{
+  if ( node1->is_input() && node2->is_input() ) {
+    ymuint id1 = node1->input_id();
+    ymuint id2 = node2->input_id();
+    hash_map<ymuint, ymuint>::iterator p1 = map1.find(id1);
+    hash_map<ymuint, ymuint>::iterator p2 = map2.find(id2);
+    if ( p1 == map1.end() ) {
+      map1.insert(make_pair(id1, id2));
+    }
+    else if ( p1->second != id2 ) {
+      return false;
+    }
+    if ( p2 == map2.end() ) {
+      map2.insert(make_pair(id2, id1));
+    }
+    else if ( p2->second != id1 ) {
+      return false;
+    }
+    return true;
   }
+
+  if ( (!node1->is_and() || !node2->is_and()) &&
+       (!node1->is_xor() || !node2->is_xor()) ) {
+    return false;
+  }
+
+  if ( node1->fanin_inv0() != node2->fanin_inv0() ||
+       node1->fanin_inv1() != node2->fanin_inv1() ) {
+    return false;
+  }
+
+  if ( !ceq_sub(node1->fanin0(), node2->fanin0(), map1, map2) ) {
+    return false;
+  }
+
+  if ( !ceq_sub(node1->fanin1(), node2->fanin1(), map1, map2) ) {
+    return false;
+  }
+
+  return true;
 }
 
 // @brief パタングラフを生成する再帰関数
@@ -297,28 +298,63 @@ LcPatMgr::pg_sub(const LogExpr& expr,
       nk_array[i] = make_pair(input_pg_list[i].size(), 1);
     }
 
-    hash_set<string> pg_hash;
     // ファンインのパタンの組み合わせを列挙するオブジェクト
-    MultiCombiGen mcg(nk_array);
-    for (MultiCombiGen::iterator p = mcg.begin(); !p.is_end(); ++ p) {
+    for (MultiCombiGen mcg(nk_array); !mcg.is_end(); ++ mcg) {
+      // 各ファンインから1つずつパタンを取り出して tmp_input に入れる．
       vector<LcPatHandle> tmp_input(n);
       for (ymuint i = 0; i < n; ++ i) {
-	tmp_input[i] = input_pg_list[i][p(i, 0)];
+	tmp_input[i] = input_pg_list[i][mcg(i, 0)];
       }
 
-      // 入力の順列を列挙するオブジェクト
-      PermGen pg(n, n);
+      // tmp_input のなかで同形なパタンを求める．
+      MFSet mfset(n);
+      for (ymuint i1 = 1; i1 < n; ++ i1) {
+	LcPatHandle pat1 = tmp_input[i1];
+	for (ymuint i2 = 0; i2 < i1; ++ i2) {
+	  LcPatHandle pat2 = tmp_input[i2];
+	  if ( check_equivalent(pat1, pat2) ) {
+	    mfset.merge(i1, i2);
+	  }
+	}
+      }
+      vector<ymuint> rep_id;
+      rep_id.reserve(n);
+      vector<ymuint> rev_map(n);
+      for (ymuint i = 0; i < n; ++ i) {
+	ymuint x = mfset.find(i);
+	if ( x == i ) {
+	  rev_map[i] = rep_id.size();
+	  rep_id.push_back(x);
+	}
+      }
+      ymuint ng = rep_id.size();
+
+      // group_list[0〜(ng - 1)] に同形なパタンのリストを格納する．
+      vector<vector<ymuint> > group_list(ng);
+      for (ymuint i = 0; i < n; ++ i) {
+	ymuint x = mfset.find(i);
+	ymuint id = rev_map[x];
+	group_list[id].push_back(i);
+      }
+
+      vector<ymuint> num_array(ng);
+      for (ymuint g = 0; g < ng; ++ g) {
+	num_array[g] = group_list[g].size();
+      }
+
       vector<LcPatHandle> input(n);
-      for (PermGen::iterator q = pg.begin(); !q.is_end(); ++ q) {
+      for (MultiSetPermGen mspg(num_array, n); !mspg.is_end(); ++ mspg) {
+	vector<ymuint> count(ng, 0);
 	for (ymuint i = 0; i < n; ++ i) {
-	  ymuint j = q(i);
-	  input[j] = tmp_input[i];
+	  ymuint g = mspg(i);
+	  input[i] = tmp_input[group_list[g][count[g]]];
+	  ++ count[g];
 	}
 	switch ( n ) {
 	case 2:
 	  {
 	    LcPatHandle handle = make_node(expr, input[0], input[1]);
-	    add_pg_list(pg_list, pg_hash, handle);
+	    pg_list.push_back(handle);
 	  }
 	  break;
 
@@ -326,7 +362,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	  for (ymuint i = 0; i < n_pat3; ++ i) {
 	    ymuint pos = 0;
 	    LcPatHandle handle = make_bintree(expr, input, pat3[i], pos);
-	    add_pg_list(pg_list, pg_hash, handle);
+	    pg_list.push_back(handle);
 	  }
 	  break;
 
@@ -334,7 +370,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	  for (ymuint i = 0; i < n_pat4; ++ i) {
 	    ymuint pos = 0;
 	    LcPatHandle handle = make_bintree(expr, input, pat4[i], pos);
-	    add_pg_list(pg_list, pg_hash, handle);
+	    pg_list.push_back(handle);
 	  }
 	  break;
 
@@ -342,7 +378,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	  for (ymuint i = 0; i < n_pat5; ++ i) {
 	    ymuint pos = 0;
 	    LcPatHandle handle = make_bintree(expr, input, pat5[i], pos);
-	    add_pg_list(pg_list, pg_hash, handle);
+	    pg_list.push_back(handle);
 	  }
 	  break;
 
@@ -350,7 +386,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	  for (ymuint i = 0; i < n_pat6; ++ i) {
 	    ymuint pos = 0;
 	    LcPatHandle handle = make_bintree(expr, input, pat6[i], pos);
-	    add_pg_list(pg_list, pg_hash, handle);
+	    pg_list.push_back(handle);
 	  }
 	  break;
 
@@ -358,7 +394,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	  for (ymuint i = 0; i < n_pat7; ++ i) {
 	    ymuint pos = 0;
 	    LcPatHandle handle = make_bintree(expr, input, pat7[i], pos);
-	    add_pg_list(pg_list, pg_hash, handle);
+	    pg_list.push_back(handle);
 	  }
 	  break;
 
@@ -366,7 +402,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	  for (ymuint i = 0; i < n_pat8; ++ i) {
 	    ymuint pos = 0;
 	    LcPatHandle handle = make_bintree(expr, input, pat8[i], pos);
-	    add_pg_list(pg_list, pg_hash, handle);
+	    pg_list.push_back(handle);
 	  }
 	  break;
 
@@ -376,23 +412,6 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 	}
       }
     }
-  }
-}
-
-// pg_list に new_handle を追加する．
-// ただし，同形のパタンがすでにある場合には追加しない．
-void
-LcPatMgr::add_pg_list(vector<LcPatHandle>& pg_list,
-		      hash_set<string>& pg_hash,
-		      LcPatHandle new_handle)
-{
-  string signature = new_handle.node()->signature();
-  if ( new_handle.inv() ) {
-    signature = "~" + signature;
-  }
-  if ( pg_hash.find(signature) == pg_hash.end() ) {
-    pg_hash.insert(signature);
-    pg_list.push_back(new_handle);
   }
 }
 
@@ -431,14 +450,12 @@ LcPatMgr::make_input(VarId var)
   ymuint id = var.val();
   while ( mInputList.size() <= id ) {
     LcPatNode* node = new_node();
-    ymuint id1 = mInputList.size();
-    node->set_input(id1);
+    ymuint input_id = mInputList.size();
+    node->mType = (input_id << 2) | LcPatNode::kInput;
     mInputList.push_back(node);
   }
   LcPatNode* node = mInputList[id];
   assert_cond( node != NULL, __FILE__, __LINE__);
-
-  node->mSignature = "0";
 
   return node;
 }
@@ -453,6 +470,8 @@ LcPatMgr::make_node(const LogExpr& expr,
 {
   LcPatNode* l_node = l_handle.node();
   LcPatNode* r_node = r_handle.node();
+  assert_cond( l_node != NULL, __FILE__, __LINE__);
+  assert_cond( r_node != NULL, __FILE__, __LINE__);
   bool l_inv = l_handle.inv();
   bool r_inv = r_handle.inv();
 
@@ -500,10 +519,6 @@ LcPatMgr::make_node(const LogExpr& expr,
   node->mType = type;
   node->mFanin[0] = l_node;
   node->mFanin[1] = r_node;
-
-  ostringstream buf;
-  buf << type << l_node->mSignature << r_node->mSignature;
-  node->mSignature = buf.str();
 
   // ハッシュ表に登録する．
   if ( node_num() >= mNextLimit ) {
@@ -649,12 +664,7 @@ LcPatMgr::display(ostream& s) const
   ymuint n = node_num();
   for (ymuint i = 0; i < n; ++ i) {
     LcPatNode* node = this->node(i);
-    if ( node->is_locked() ) {
-      s << "*";
-    }
-    else {
-      s << " ";
-    }
+
     s << "Node#" << node->id() << ": ";
     if ( node->is_input() ) {
       s << "Input#" << node->input_id();

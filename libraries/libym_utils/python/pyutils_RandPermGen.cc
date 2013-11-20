@@ -3,7 +3,7 @@
 /// @brief RandPermGen の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -11,7 +11,7 @@
 #include "ym_utils/RandPermGen.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -68,7 +68,7 @@ RandPermGen_init(RandPermGenObject* self,
   // 引数の形式は
   // - (uint)
   ymuint n = 0;
-  if ( !PyArg_ParseTuple(args, "k", &n) ) {
+  if ( !PyArg_ParseTuple(args, "I", &n) ) {
     return NULL;
   }
 
@@ -85,7 +85,7 @@ PyObject*
 RandPermGen_num(RandPermGenObject* self,
 		PyObject* args)
 {
-  return conv_to_pyobject(self->mBody->num());
+  return PyObject_FromYmuint32(self->mBody->num());
 }
 
 // generate 関数
@@ -96,13 +96,11 @@ RandPermGen_generate(RandPermGenObject* self,
   // 引数の形式は
   // - (RandGen)
   PyObject* obj = NULL;
-  if ( !PyArg_ParseTuple(args, "O!", &RandGenType, &obj) ) {
+  if ( !PyArg_ParseTuple(args, "O!",
+			 &PyRandGen_Type, &obj) ) {
     return NULL;
   }
-  RandGen* p_rg = NULL;
-  if ( !conv_from_pyobject(obj, p_rg) ) {
-    return NULL;
-  }
+  RandGen* p_rg = PyRandGen_AsRandGenPtr(obj);
 
   self->mBody->generate(*p_rg);
 
@@ -118,11 +116,11 @@ RandPermGen_elem(RandPermGenObject* self,
   // 引数の形式は
   // - (uint)
   ymuint pos = 0;
-  if ( !PyArg_ParseTuple(args, "k", &pos) ) {
+  if ( !PyArg_ParseTuple(args, "I", &pos) ) {
     return NULL;
   }
 
-  return conv_to_pyobject(self->mBody->elem(pos));
+  return PyObject_FromYmuint32(self->mBody->elem(pos));
 }
 
 
@@ -159,7 +157,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // RandPermGenObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject RandPermGenType = {
+PyTypeObject PyTypeRandPermGen = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -247,12 +245,12 @@ void
 RandPermGenObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&RandPermGenType) < 0 ) {
+  if ( PyType_Ready(&PyTypeRandPermGen) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "RandPermGen", (PyObject*)&RandPermGenType);
+  PyModule_AddObject(m, "RandPermGen", (PyObject*)&PyTypeRandPermGen);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

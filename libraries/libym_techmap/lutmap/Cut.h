@@ -46,7 +46,7 @@ public:
 
   /// @brief 入力のサイズを得る．
   ymuint
-  ni() const;
+  input_num() const;
 
   /// @brief pos 番目の入力を得る．
   const BdnNode*
@@ -212,7 +212,7 @@ Cut::root() const
 // 入力のサイズを得る．
 inline
 ymuint
-Cut::ni() const
+Cut::input_num() const
 {
   return mNi;
 }

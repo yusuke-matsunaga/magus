@@ -227,7 +227,7 @@ enum_common_bidec(BddMgr& bddmgr,
   for (ymuint i = 0; i < nexp; ++ i) {
     const Dg& dg = dg_vector[i];
     if ( dg.is_bidecomp() ) {
-      ymuint ni = dg.ni();
+      ymuint ni = dg.input_num();
       for (ymuint j = 0; j < ni; ++ j) {
 	merge_vargroup(mfset, dg.input(j).support());
       }
@@ -292,7 +292,7 @@ enum_common_bidec(BddMgr& bddmgr,
       for (ymuint i = 0; i < nexp; ++ i) {
 	const Dg& dg = dg_vector[i];
 	if ( dg.is_bidecomp() ) {
-	  ymuint ni = dg.ni();
+	  ymuint ni = dg.input_num();
 	  Bdd g1 = bddmgr.make_zero();
 	  Bdd g2 = bddmgr.make_zero();
 	  for (ymuint j = 0; j < ni; ++ j) {

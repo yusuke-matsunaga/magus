@@ -109,7 +109,7 @@ write_names(const BNode* node,
 	    ostream& s)
 {
   s << ".names";
-  ymuint ni = node->ni();
+  ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; i ++) {
     BNode* inode = node->fanin(i);
     assert_cond(inode != NULL, __FILE__, __LINE__);

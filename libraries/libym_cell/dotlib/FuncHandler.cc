@@ -122,7 +122,7 @@ FuncHandler::read_primary2()
   return node;
 }
 
-// @brief prudct を読み込む．
+// @brief product を読み込む．
 DotlibNodeImpl*
 FuncHandler::read_product()
 {

@@ -5,9 +5,7 @@
 /// @brief InputMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: InputMgr.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -37,7 +35,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] lex 親の Lex
-  InputMgr(RawLex* lex);
+  InputMgr(RawLex& lex);
 
   /// @brief デストラクタ
   ~InputMgr();
@@ -113,11 +111,21 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief InputFile を削除する．
+  void
+  delete_file(InputFile* file);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // 親の Lex
-  RawLex* mLex;
+  RawLex& mLex;
 
   // サーチパス
   SearchPathList mSearchPathList;

@@ -3,7 +3,7 @@
 /// @brief StopWatch の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -12,7 +12,7 @@
 #include "ym_utils/StopWatch.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -105,7 +105,7 @@ PyObject*
 StopWatch_time(StopWatchObject* self,
 	       PyObject* args)
 {
-  return USTime_FromUSTime(self->mStopWatch.time());
+  return PyUSTime_FromUSTime(self->mStopWatch.time());
 }
 
 
@@ -130,7 +130,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // StopWatchObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject StopWatchType = {
+PyTypeObject PyStopWatch_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -177,26 +177,23 @@ PyTypeObject StopWatchType = {
 };
 
 
-// @brief PyObject から StopWatch を取り出す．
+// @brief PyObject から StopWatch へのポインタを取り出す．
 // @param[in] py_obj Python オブジェクト
-// @param[out] p_obj StopWatch のポインタを格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した． py_obj が StopWatchObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   StopWatch*& p_obj)
+// @return StopWatch へのポインタを返す．
+// @note 変換が失敗したら TypeError を送出し，NULL を返す．
+StopWatch*
+PyStopWatch_AsStopWatchPtr(PyObject* py_obj)
 {
   // 型のチェック
-  if ( !StopWatchObject_Check(py_obj) ) {
-    return false;
+  if ( !PyStopWatch_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.StopWatch is expected");
+    return NULL;
   }
 
   // 強制的にキャスト
   StopWatchObject* my_obj = (StopWatchObject*)py_obj;
 
-  p_obj = &my_obj->mStopWatch;
-
-  return true;
+  return &my_obj->mStopWatch;
 }
 
 // StopWatchObject 関係の初期化を行う．
@@ -204,12 +201,12 @@ void
 StopWatchObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&StopWatchType) < 0 ) {
+  if ( PyType_Ready(&PyStopWatch_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "StopWatch", (PyObject*)&StopWatchType);
+  PyModule_AddObject(m, "StopWatch", (PyObject*)&PyStopWatch_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

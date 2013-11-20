@@ -82,6 +82,9 @@ AC_DEFINE_UNQUOTED(ALIGNOF_DOUBLE, $ym_alignof_double, [Alignment of double])
 # Checks for library functions
 # ===================================================================
 
+# Check for gmp
+YM_CHECK_GMP
+
 
 # ===================================================================
 # Check for popt
@@ -144,14 +147,38 @@ AC_SUBST(ATPG_BINDIR)dnl
 # ===================================================================
 AC_CONFIG_FILES([
 	Makefile
+	old/Makefile
+	old/include/Makefile
+	old/src/Makefile
+	old/src/base/Makefile
+	old/src/fsim2/Makefile
+	old/src/fsim3/Makefile
+	old/src/fsimx/Makefile
+	old/src/dtpg/Makefile
+	old/src/dtpg.old/Makefile
+	old/src/main/Makefile
+	old/src/atpg_tclsh/Makefile
 	include/Makefile
 	src/Makefile
 	src/base/Makefile
-	src/fsim2/Makefile
-	src/fsim3/Makefile
-	src/fsimx/Makefile
-	src/dtpg/Makefile
 	src/main/Makefile
+	src/fsim/Makefile
+	src/fsim/fsim2/Makefile
+	src/fsim/fsim3/Makefile
+	src/fsim/fsimx/Makefile
+	src/fsim/fsimx2/Makefile
+	src/fsim_old/Makefile
+	src/fsim_old/fsim2/Makefile
+	src/fsim_old/fsim3/Makefile
+	src/fsim_old/fsimx/Makefile
+	src/fsim_old/fsimx2/Makefile
+	src/dtpg/Makefile
+	src/dtpg/sat_engine/Makefile
+	src/dtpg/bt/Makefile
+	src/dtpg/dop/Makefile
+	src/dtpg/uop/Makefile
+	src/rtpg/Makefile
+	src/minpat/Makefile
 	src/atpg_tclsh/Makefile
 	tclsrc/Makefile
 	])

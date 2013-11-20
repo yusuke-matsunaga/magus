@@ -187,7 +187,7 @@ protected:
 
   /// @brief dump 用の共通情報を出力する．
   void
-  dump_common(BinO& s) const;
+  dump_common(ODO& s) const;
 
 
 private:
@@ -245,7 +245,7 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tDirection
+  tCellPinDirection
   direction() const;
 
   /// @brief 入力ピンの時に true を返す．
@@ -290,7 +290,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
 
 private:
@@ -327,6 +327,9 @@ protected:
   /// @brief コンストラクタ
   /// @param[in] cell 親のセル
   /// @param[in] name ピン名
+  /// @param[in] has_logic 論理式を持つとき true にするフラグ
+  /// @param[in] logic_expr 論理式
+  /// @param[in] tristate_expr tristate 条件式
   /// @param[in] max_fanout 最大ファンアウト容量
   /// @param[in] min_fanout 最小ファンアウト容量
   /// @param[in] max_capacitance 最大負荷容量
@@ -335,6 +338,9 @@ protected:
   /// @param[in] min_transition 最小遷移時間
   CiOutputPinBase(CiCell* cell,
 		  const ShString& name,
+		  bool has_logic,
+		  const LogExpr& logic_expr,
+		  const LogExpr& tristate_expr,
 		  CellCapacitance max_fanout,
 		  CellCapacitance min_fanout,
 		  CellCapacitance max_capacitance,
@@ -411,23 +417,6 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 設定用の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 出力ピン(入出力ピン)の関数を設定する．
-  /// @param[in] function 関数を表す論理式
-  virtual
-  void
-  set_function(const LogExpr& function);
-
-  /// @brief 出力ピンの three_state() 属性を設定する．
-  virtual
-  void
-  set_three_state(const LogExpr& three_state);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -481,6 +470,9 @@ private:
   /// @brief コンストラクタ
   /// @param[in] cell 親のセル
   /// @param[in] name ピン名
+  /// @param[in] has_logic 論理式を持つとき true にするフラグ
+  /// @param[in] logic_expr 論理式
+  /// @param[in] tristate_expr tristate 条件式
   /// @param[in] max_fanout 最大ファンアウト容量
   /// @param[in] min_fanout 最小ファンアウト容量
   /// @param[in] max_capacitance 最大負荷容量
@@ -489,6 +481,9 @@ private:
   /// @param[in] min_transition 最小遷移時間
   CiOutputPin(CiCell* cell,
 	      const ShString& name,
+	      bool has_logic,
+	      const LogExpr& logic_expr,
+	      const LogExpr& tristate_expr,
 	      CellCapacitance max_fanout,
 	      CellCapacitance min_fanout,
 	      CellCapacitance max_capacitance,
@@ -508,7 +503,7 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tDirection
+  tCellPinDirection
   direction() const;
 
   /// @brief 出力ピンの時に true を返す．
@@ -526,7 +521,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
 };
 
@@ -546,6 +541,9 @@ private:
   /// @brief コンストラクタ
   /// @param[in] cell 親のセル
   /// @param[in] name ピン名
+  /// @param[in] has_logic 論理式を持つとき true にするフラグ
+  /// @param[in] logic_expr 論理式
+  /// @param[in] tristate_expr tristate 条件式
   /// @param[in] capacitance 負荷容量
   /// @param[in] rise_capacitance 立ち上がり時の負荷容量
   /// @param[in] fall_capacitance 立ち下がり時の負荷容量
@@ -557,6 +555,9 @@ private:
   /// @param[in] min_transition 最小遷移時間
   CiInoutPin(CiCell* cell,
 	     const ShString& name,
+	     bool has_logic,
+	     const LogExpr& logic_expr,
+	     const LogExpr& tristate_expr,
 	     CellCapacitance capacitance,
 	     CellCapacitance rise_capacitance,
 	     CellCapacitance fall_capacitance,
@@ -579,7 +580,7 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tDirection
+  tCellPinDirection
   direction() const;
 
   /// @brief 入出力ピンの時に true を返す．
@@ -624,7 +625,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
 
 private:
@@ -676,7 +677,7 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tDirection
+  tCellPinDirection
   direction() const;
 
   /// @brief 内部ピンの時に true を返す．
@@ -706,7 +707,7 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
 
 private:

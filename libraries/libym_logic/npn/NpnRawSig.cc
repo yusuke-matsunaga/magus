@@ -42,14 +42,14 @@ BEGIN_NAMESPACE_YM_NPN
 NpnRawSig::NpnRawSig(const TvFunc& func) :
   mFunc(func)
 {
-  mNi = mFunc.ni();
+  mInputNum = mFunc.input_num();
 
   // Walsh の0次と1次の係数を計算する．
   // 2次の係数はオンデマンドで計算する．
   mW0 = mFunc.walsh_01(mW1);
-  for (ymuint i = 0; i < mNi; ++ i) {
-    for (ymuint j = 0; j < mNi; ++ j) {
-      mW2flag[i * mNi + j] = 0;
+  for (ymuint i = 0; i < mInputNum; ++ i) {
+    for (ymuint j = 0; j < mInputNum; ++ j) {
+      mW2flag[i * mInputNum + j] = 0;
     }
   }
 }
@@ -83,7 +83,7 @@ NpnRawSig::normalize(NpnConf& conf)
   // 同時に等価入力クラスをつくる．
   mNc = 0;
   mIndepNum = 0;
-  for (ymuint i = 0; i < mNi; ++ i) {
+  for (ymuint i = 0; i < mInputNum; ++ i) {
     mIcNum[i] = 2;
     mIcLink[i] = static_cast<ymuint>(-1);
 
@@ -167,12 +167,12 @@ NpnRawSig::normalize(NpnConf& conf)
     int max = min;
     int sum = 0;
     bool valid = true;
-    for (ymuint i = 0; i < mNi; ++ i) {
+    for (ymuint i = 0; i < mInputNum; ++ i) {
       if ( walsh_1(i) == 0 ) {
 	valid = false;
 	break;
       }
-      for (ymuint j = 0; j < mNi; ++ j) {
+      for (ymuint j = 0; j < mInputNum; ++ j) {
 	int w2 = walsh_2(i, j);
 	if ( min > w2 ) {
 	  min = w2;
@@ -187,7 +187,7 @@ NpnRawSig::normalize(NpnConf& conf)
       if ( -min > max ) {
 	mOpol = -1;
 	// w1 を正にするには入力をすべて反転する必要がある．
-	for (ymuint i = 0; i < mNi; ++ i) {
+	for (ymuint i = 0; i < mInputNum; ++ i) {
 	  if ( walsh_1(i) != 0 ) {
 	    mIpols[i] *= -1;
 	  }
@@ -202,7 +202,7 @@ NpnRawSig::normalize(NpnConf& conf)
 	if ( sum < 0 ) {
 	  mOpol = -1;
 	  // w1 を正にするには入力をすべて反転する必要がある．
-	  for (ymuint i = 0; i < mNi; ++ i) {
+	  for (ymuint i = 0; i < mInputNum; ++ i) {
 	    if ( walsh_1(i) != 0 ) {
 	      mIpols[i] *= -1;
 	    }
@@ -246,7 +246,7 @@ void
 NpnRawSig::invert_all()
 {
   mW0 *= -1;
-  for (ymuint i = 0; i < mNi; ++ i) {
+  for (ymuint i = 0; i < mInputNum; ++ i) {
     mW1[i] *= -1;
   }
   invert_all_w2();
@@ -257,7 +257,7 @@ void
 NpnRawSig::invert_input(ymuint pos)
 {
   mW1[pos] *= -1;
-  for (ymuint i = 0; i < mNi; ++ i) {
+  for (ymuint i = 0; i < mInputNum; ++ i) {
     invert_w2(pos, i);
   }
 }
@@ -266,8 +266,8 @@ NpnRawSig::invert_input(ymuint pos)
 void
 NpnRawSig::invert_all_w2()
 {
-  for (ymuint i = 0; i < mNi; ++ i) {
-    for (ymuint j = i + 1; j < mNi; ++ j) {
+  for (ymuint i = 0; i < mInputNum; ++ i) {
+    for (ymuint j = i + 1; j < mInputNum; ++ j) {
       invert_w2(i, j);
     }
   }
@@ -283,7 +283,7 @@ NpnRawSig::invert_w2(ymuint pos1,
     pos1 = pos2;
     pos2 = tmp;
   }
-  ymuint base = pos1 * ni() + pos2;
+  ymuint base = pos1 * input_num() + pos2;
   if ( mW2flag[base] & 1 ) {
     mW2[base] *= -1;
   }
@@ -302,7 +302,7 @@ NpnRawSig::walsh_w0(ymuint w,
     opol = ~opol;
   }
   ymuint32 ibits = 0UL;
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     tPol ip = ipol[i];
     if ( mIpols[i] == -1 ) {
       ip = ~ip;
@@ -320,14 +320,14 @@ NpnRawSig::dump_walsh(ostream& s) const
 {
   s << "W0: " << walsh_0() << endl
     << "w1:";
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     s << " " << walsh_1(i);
   }
   s << endl;
   s << "W2:" << endl;
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     s << "   ";
-    for (ymuint j = 0; j < ni(); ++ j) {
+    for (ymuint j = 0; j < input_num(); ++ j) {
       s << " " << setw(4) << walsh_2(i, j);
     }
     s << endl;
@@ -351,7 +351,7 @@ NpnRawSig::dump_pols(ostream& s) const
   }
   s << endl
     << "ipol:";
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     s << " ";
     if ( mIpols[i] == -1 ) {
       s << "N";

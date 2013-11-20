@@ -66,10 +66,23 @@ rec_CPPFLAGS = \
 rec_SOURCES = \
 	EnumCut.h \
 	EnumCut.cc \
+	FuncHash.h \
+	FuncHash.cc \
 	FuncMgr.h \
 	FuncMgr.cc \
 	FuncRec.h \
 	FuncRec.cc \
+	GbmMgr.h \
+	GbmMgr.cc \
+	GbmNode.h \
+	GbmNodeImpl.h \
+	GbmNodeImpl.cc \
+	GbmVar.h \
+	GbmEngine.h \
+	GbmEngine.cc \
+	GbmSolver.h \
+	GbmNaive.h \
+	GbmNaive.cc \
 	TopDown.h \
 	TopDown.cc \
 	RecCmd.h \

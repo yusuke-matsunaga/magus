@@ -78,7 +78,7 @@ ord_ffr(const TgNode* node,
 {
   if ( !check_fos(node) && !node->is_input() ) {
     node_list.push_back(node);
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       ord_ffr(node->fanin(i), node_list);
     }
@@ -108,7 +108,7 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
     Fnode& fnode = mFnodeArray[i];
     fnode.mOfault[0] = new_fault(node, true, 0, 0);
     fnode.mOfault[1] = new_fault(node, true, 0, 1);
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     void* p = mIfaultsAlloc.get_memory(sizeof(SaFault*) * ni * 2);
     fnode.mIfaults = new (p) SaFault*[ni * 2];
     for (ymuint j = 0; j < ni; ++ j) {
@@ -134,7 +134,7 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
     }
     list<const TgNode*> node_list;
     node_list.push_back(node);
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
       ord_ffr(node->fanin(j), node_list);
     }
@@ -179,7 +179,7 @@ FaultMgr::reg_faults(const TgNode* node)
   SaFault* f1 = add_ofault(node, 1, rep1);
 
   tTgGateType type = node->gate_type();
-  ymuint ni = node->ni();
+  ymuint ni = node->fanin_num();
   switch ( type ) {
   case kTgGateBuff:
     add_ifault(node, 0, 0, f0);

@@ -192,7 +192,7 @@ DgMgr::new_edge(const Bdd& f,
 #if defined(DG_VERIFY)
   {
     BddVarSet support;
-    ymuint ni = node->ni();
+    ymuint ni = node->input_num();
     for (ymuint i = 0; i < ni; i ++) {
       DgNode* inode = node->input_node(i);
       BddVarSet support1 = inode->support();
@@ -579,8 +579,8 @@ DgMgr::merge(tVarId varid,
   tPol pol1 = edge2pol(r1);
   DgNode* v0 = edge2node(r0);
   DgNode* v1 = edge2node(r1);
-  ymuint n0 = v0->ni();
-  ymuint n1 = v1->ni();
+  ymuint n0 = v0->input_num();
+  ymuint n1 = v1->input_num();
   if ( v0->type() == kOr ) {
     for (ymuint i = 0; i < n0; ++ i) {
       if ( inv_pol(v0->input(i), pol0) == r1 ) {
@@ -815,7 +815,7 @@ DgMgr::merge(tVarId varid,
     if ( n0 == nc && n1 == nc ) {
       // 非常にレアなケース
       // どれかの入力を反転すると一致する場合．
-      ymuint ni0 = v0->ni();
+      ymuint ni0 = v0->input_num();
       for (ymuint i = 0; i < ni0; ++ i) {
 	DgNode* inode = v0->input_node(i);
 	if ( inode->type() == kLitP ) {
@@ -1034,8 +1034,8 @@ DgMgr::case1or(tVarId varid,
   ++ mProf.mCase1OrNum;
 #endif
 
-  ymuint ni0 = v0->ni();
-  ymuint ni1 = v1->ni();
+  ymuint ni0 = v0->input_num();
+  ymuint ni1 = v1->input_num();
   ymuint n0 = ni0 - nc;
   ymuint n1 = ni1 - nc;
   // 新しい入力をつくる．
@@ -1091,8 +1091,8 @@ DgMgr::case1xor(tVarId varid,
   ++ mProf.mCase1XorNum;
 #endif
 
-  ymuint ni0 = v0->ni();
-  ymuint ni1 = v1->ni();
+  ymuint ni0 = v0->input_num();
+  ymuint ni1 = v1->input_num();
   ymuint n0 = ni0 - nc;
   ymuint n1 = ni1 - nc;
   // 新しい入力をつくる．
@@ -1159,7 +1159,7 @@ DgMgr::case2or(tVarId varid,
 #endif
 
   // 新しい入力を作る．
-  ymuint ni = v0->ni();
+  ymuint ni = v0->input_num();
   tDgEdge tmp;
   if ( ni == 2 ) {
     int alt_pos = pos ^ 1;  // 0 なら 1，1 なら 0
@@ -1197,7 +1197,7 @@ DgMgr::case2xor(tVarId varid,
 #endif
 
   // 新しい入力を作る．
-  ymuint ni = v0->ni();
+  ymuint ni = v0->input_num();
   tDgEdge tmp;
   if ( ni == 2 ) {
     int alt_pos = pos ^ 1;  // 0 なら 1，1 なら 0
@@ -1258,7 +1258,7 @@ DgMgr::case1cplx(const Bdd& F,
   mtimer.change(old_id);
 #endif
 
-  ymuint ni0 = v0->ni();
+  ymuint ni0 = v0->input_num();
   vector<DgNode*> inputs;
   inputs.reserve(ni0);
   insert3(inputs, edge2node(new_input));
@@ -1287,7 +1287,7 @@ DgMgr::case1cplx2(const Bdd& F,
   tDgEdge iedge = v0->input(pos);
   tDgEdge new_input = make_litXor(varid, kPolPosi, iedge);
 
-  ymuint ni = v0->ni();
+  ymuint ni = v0->input_num();
   vector<DgNode*> inputs;
   inputs.reserve(ni);
   insert3(inputs, edge2node(new_input));
@@ -1320,7 +1320,7 @@ DgMgr::case2cplx(const Bdd& F,
   else {
     new_input = make_litAnd(varid, lit_pol, make_edge(c_node));
   }
-  ymuint ni = v->ni();
+  ymuint ni = v->input_num();
   vector<DgNode*> inputs;
   inputs.reserve(ni);
   insert3(inputs, edge2node(new_input));
@@ -1347,7 +1347,7 @@ DgMgr::find_disjoint_node(DgNode* node,
     insert3(inputs, node);
   }
   else if ( !(support >= node->support()) ) {
-    ymuint ni = node->ni();
+    ymuint ni = node->input_num();
     tType type = node->type();
     if ( type == kOr || type == kXor ) {
       vector<tDgEdge> others;
@@ -1389,7 +1389,7 @@ DgMgr::find_uncommon_inputs(const vector<DgNode*>& list1,
   for (vector<DgNode*>::const_iterator it = list1.begin();
        it != list1.end(); ++ it) {
     DgNode* node = *it;
-    ymuint n = node->ni();
+    ymuint n = node->input_num();
     vector<tDgEdge> tmp_inputs;
     tmp_inputs.reserve(n);
     for (ymuint i = 0; i < n; ++ i) {
@@ -1406,7 +1406,7 @@ DgMgr::find_uncommon_inputs(const vector<DgNode*>& list1,
       tDgEdge c_edge = make_node(node->type(), tmp_inputs);
       DgNode* c_node = edge2node(c_edge);
       insert3(inputs, c_node);
-      ymuint nuc = c_node->ni();
+      ymuint nuc = c_node->input_num();
       for (ymuint i = 0; i < nuc; ++ i) {
 	// c_node の入力はもはや境界ノードではない．
 	DgNode* inode = c_node->input_node(i);
@@ -1426,7 +1426,7 @@ DgMgr::find_common_inputs(const vector<DgNode*>& list0,
   for (vector<DgNode*>::const_iterator it0 = list0.begin();
        it0 != list0.end(); ++ it0) {
     DgNode* node0 = *it0;
-    ymuint n0 = node0->ni();
+    ymuint n0 = node0->input_num();
     hash_set<tDgEdge> set0;
     for (ymuint i = 0; i < n0; ++ i) {
       tDgEdge iedge = node0->input(i);
@@ -1440,7 +1440,7 @@ DgMgr::find_common_inputs(const vector<DgNode*>& list0,
     for (vector<DgNode*>::const_iterator it1 = list1.begin();
 	 it1 != list1.end(); ++ it1) {
       DgNode* node1 = *it1;
-      ymuint n1 = node1->ni();
+      ymuint n1 = node1->input_num();
       vector<tDgEdge> common;
       common.reserve(n1);
       for (ymuint i = 0; i < n1; ++ i) {
@@ -1491,7 +1491,7 @@ DgMgr::list_boundary(DgNode* node,
       insert3(inputs, node);
     }
     else {
-      ymuint ni = node->ni();
+      ymuint ni = node->input_num();
       for (ymuint i = 0; i < ni; ++ i) {
 	DgNode* inode = node->input_node(i);
 	list_boundary(inode, inputs);
@@ -1579,7 +1579,7 @@ DgMgr::make_or(const vector<tDgEdge>& inputs,
     support += inode->support();
     if ( ipol == kPolPosi && inode->type() == kOr ) {
       // inode の子供を inputs2 に追加する．
-      ymuint ni1 = inode->ni();
+      ymuint ni1 = inode->input_num();
       for (ymuint j = 0; j < ni1; ++ j) {
 	insert2(inputs2, inode->input(j));
       }
@@ -1604,7 +1604,7 @@ DgMgr::make_or(DgNode* v,
   // まずグローバル関数とサポートを求める．
   Bdd g = mBddMgr.make_zero();
   BddVarSet support(mBddMgr);
-  ymuint n = v->ni();
+  ymuint n = v->input_num();
   vector<tDgEdge> inputs;
   inputs.reserve(n);
   for (ymuint i = 0; i < n; ++ i) {
@@ -1665,7 +1665,7 @@ DgMgr::make_xor(const vector<tDgEdge>& inputs,
     support += inode->support();
     if ( inode->type() == kXor ) {
       // inode の子供を inputs2 に追加する．
-      ymuint ni1 = inode->ni();
+      ymuint ni1 = inode->input_num();
       for (ymuint j = 0; j < ni1; ++ j) {
 	// XOR の子供なので極性は付いていないはず
 	insert2(inputs2, inode->input(j));
@@ -1691,7 +1691,7 @@ DgMgr::make_xor(DgNode* v,
   // まず，グローバル関数とサポートを求める．
   Bdd g = mBddMgr.make_zero();
   BddVarSet support(mBddMgr);
-  ymuint n = v->ni();
+  ymuint n = v->input_num();
   vector<tDgEdge> inputs;
   inputs.reserve(n);
   for (ymuint i = 0; i < n; ++ i) {

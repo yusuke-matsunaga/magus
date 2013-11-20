@@ -13,7 +13,7 @@
 #include "ym_logic/pylogic.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 /// @class PySatMsgHandler PySatMsgHanlder.h "PySatMsgHandler.h"
@@ -52,6 +52,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM
 
 #endif // PYSATMSGHANDLER_H

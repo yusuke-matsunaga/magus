@@ -494,7 +494,7 @@ DtpgSat::make_cnf(SatSolver& solver,
     vector<const TgNode*> queue2;
     for (ymuint rpos = 0; rpos < queue.size(); ++ rpos) {
       const TgNode* node = queue[rpos];
-      ymuint ni = node->ni();
+      ymuint ni = node->fanin_num();
       for (ymuint i = 0; i < ni; ++ i) {
 	const TgNode* inode = node->fanin(i);
 	if ( mark(inode) == kNone ) {
@@ -506,7 +506,7 @@ DtpgSat::make_cnf(SatSolver& solver,
     }
     for (ymuint rpos2 = 0; rpos2 < queue2.size(); ++ rpos2) {
       const TgNode* node = queue2[rpos2];
-      ymuint ni = node->ni();
+      ymuint ni = node->fanin_num();
       for (ymuint i = 0; i < ni; ++ i) {
 	const TgNode* inode = node->fanin(i);
 	if ( mark(inode) == kNone ) {
@@ -544,7 +544,7 @@ DtpgSat::make_cnf(SatSolver& solver,
   for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* node = network.sorted_logic(i);
     if ( mark(node) == kNone ) continue;
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     vector<Literal> inputs(ni);
     for (ymuint j = 0; j < ni; ++ j) {
       const TgNode* inode = node->fanin(j);
@@ -569,7 +569,7 @@ DtpgSat::make_cnf(SatSolver& solver,
   //////////////////////////////////////////////////////////////////////
 
   if ( is_input_fault ) {
-    ymuint ni = fnode->ni();
+    ymuint ni = fnode->fanin_num();
     vector<Literal> inputs(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       const TgNode* inode = fnode->fanin(i);
@@ -596,7 +596,7 @@ DtpgSat::make_cnf(SatSolver& solver,
   odiff.reserve(npo);
   for (ymuint i = 1; i < queue.size(); ++ i) {
     const TgNode* node = queue[i];
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
 
     Literal glit(gvar(node), kPolPosi);
     Literal flit(fvar(node), kPolPosi);

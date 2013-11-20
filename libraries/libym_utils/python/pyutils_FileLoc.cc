@@ -3,7 +3,7 @@
 /// @brief FileLoc の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -11,7 +11,7 @@
 #include "ym_utils/FileLoc.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
@@ -62,7 +62,7 @@ FileLoc_dealloc(FileLocObject* self)
 // 初期化関数
 int
 FileLoc_init(FileLocObject* self,
-	      PyObject* args)
+	     PyObject* args)
 {
   // 引数の形式は
   // - ()
@@ -70,15 +70,14 @@ FileLoc_init(FileLocObject* self,
   PyObject* obj1 = NULL;
   ymuint line = 0;
   ymuint column = 0;
-  if ( !PyArg_ParseTuple(args, "|O!kk", &FileInfoType, &obj1, &line, &column) ) {
+  if ( !PyArg_ParseTuple(args, "|O!II",
+			 &PyFileInfo_Type, &obj1,
+			 &line, &column) ) {
     return -1;
   }
 
   if ( obj1 != NULL ) {
-    FileInfo file_info;
-    if ( !conv_from_pyobject(obj1, file_info) ) {
-      return -1;
-    }
+    FileInfo file_info = PyFileInfo_AsFileInfo(obj1);
     self->mFileLoc = FileLoc(file_info, line, column);
   }
   else {
@@ -94,7 +93,7 @@ FileLoc_str(FileLocObject* self)
 {
   ostringstream buf;
   buf << self->mFileLoc;
-  return conv_to_pyobject(buf.str());
+  return PyObject_FromString(buf.str());
 }
 
 // is_valid 関数
@@ -102,7 +101,7 @@ PyObject*
 FileLoc_is_valid(FileLocObject* self,
 		 PyObject* args)
 {
-  return conv_to_pyobject(self->mFileLoc.is_valid());
+  return PyObject_FromBool(self->mFileLoc.is_valid());
 }
 
 // filename 関数
@@ -110,7 +109,7 @@ PyObject*
 FileLoc_filename(FileLocObject* self,
 		 PyObject* args)
 {
-  return conv_to_pyobject(self->mFileLoc.filename());
+  return PyObject_FromString(self->mFileLoc.filename());
 }
 
 // parent_loc 関数
@@ -118,7 +117,7 @@ PyObject*
 FileLoc_parent_loc(FileLocObject* self,
 		   PyObject* args)
 {
-  return FileLoc_FromFileLoc(self->mFileLoc.parent_loc());
+  return PyFileLoc_FromFileLoc(self->mFileLoc.parent_loc());
 }
 
 // parent_loc_list 関数
@@ -134,7 +133,7 @@ FileLoc_parent_loc_list(FileLocObject* self,
   ymuint i = 0;
   for (list<FileLoc>::iterator p = loc_list.begin();
        p != loc_list.end(); ++ p, ++ i) {
-    PyObject* obj = FileLoc_FromFileLoc(*p);
+    PyObject* obj = PyFileLoc_FromFileLoc(*p);
     PyList_SetItem(obj, i, obj);
   }
   return ans_list;
@@ -145,7 +144,7 @@ PyObject*
 FileLoc_line(FileLocObject* self,
 	     PyObject* args)
 {
-  return conv_to_pyobject(self->mFileLoc.line());
+  return PyObject_FromYmuint32(self->mFileLoc.line());
 }
 
 // column 関数
@@ -153,7 +152,7 @@ PyObject*
 FileLoc_column(FileLocObject* self,
 	       PyObject* args)
 {
-  return conv_to_pyobject(self->mFileLoc.column());
+  return PyObject_FromYmuint32(self->mFileLoc.column());
 }
 
 
@@ -183,7 +182,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // FileLocObject 用のタイプオブジェクト
 //////////////////////////////////////////////////////////////////////
-PyTypeObject FileLocType = {
+PyTypeObject PyFileLoc_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
@@ -234,34 +233,12 @@ PyTypeObject FileLocType = {
 // PyObject と FileLoc 間の変換関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief PyObject から FileLoc を取り出す．
-// @param[in] py_obj Python オブジェクト
-// @param[out] obj FileLoc を格納する変数
-// @retval true 変換が成功した．
-// @retval false 変換が失敗した．py_obj が FileLocObject ではなかった．
-bool
-conv_from_pyobject(PyObject* py_obj,
-		   FileLoc& obj)
-{
-  // 型のチェック
-  if ( !FileLocObject_Check(py_obj) ) {
-    return false;
-  }
-
-  // 強制的にキャスト
-  FileLocObject* fileloc_obj = (FileLocObject*)py_obj;
-
-  obj = fileloc_obj->mFileLoc;
-
-  return true;
-}
-
 // @brief FileLoc から PyObject を生成する．
 // @param[in] obj FileLoc オブジェクト
 PyObject*
-FileLoc_FromFileLoc(const FileLoc& obj)
+PyFileLoc_FromFileLoc(const FileLoc& obj)
 {
-  FileLocObject* py_obj = FileLoc_new(&FileLocType);
+  FileLocObject* py_obj = FileLoc_new(&PyFileLoc_Type);
   if ( py_obj == NULL ) {
     return NULL;
   }
@@ -272,17 +249,36 @@ FileLoc_FromFileLoc(const FileLoc& obj)
   return (PyObject*)py_obj;
 }
 
+// @brief PyObject から FileLoc を取り出す．
+// @param[in] py_obj Python オブジェクト
+// @return FileLoc を返す．
+// @note 変換が失敗したら TypeError を送出し，不正な値を返す．
+FileLoc
+PyFileLoc_AsFileLoc(PyObject* py_obj)
+{
+  // 型のチェック
+  if ( !PyFileLoc_Check(py_obj) ) {
+    PyErr_SetString(PyExc_TypeError, "utils.FileLoc is expected");
+    return FileLoc();
+  }
+
+  // 強制的にキャスト
+  FileLocObject* fileloc_obj = (FileLocObject*)py_obj;
+
+  return fileloc_obj->mFileLoc;
+}
+
 // FileLocObject 関係の初期化を行う．
 void
 FileLocObject_init(PyObject* m)
 {
   // タイプオブジェクトの初期化
-  if ( PyType_Ready(&FileLocType) < 0 ) {
+  if ( PyType_Ready(&PyFileLoc_Type) < 0 ) {
     return;
   }
 
   // タイプオブジェクトの登録
-  PyModule_AddObject(m, "FileLoc", (PyObject*)&FileLocType);
+  PyModule_AddObject(m, "FileLoc", (PyObject*)&PyFileLoc_Type);
 }
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM

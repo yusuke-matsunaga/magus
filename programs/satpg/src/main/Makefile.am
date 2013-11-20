@@ -15,11 +15,7 @@ libatpg_main_la_CPPFLAGS = \
 	-I$(top_srcdir)/src
 
 libatpg_main_la_SOURCES = \
-	AtpgMgr.cc \
-	Op1.h \
-	Op1.cc \
-	Rtpg.cc \
-	TvBuff.cc
+	AtpgMgr.cc
 
 libatpg_main_la_LDFLAGS =
 

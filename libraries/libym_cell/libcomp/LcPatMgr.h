@@ -102,10 +102,19 @@ private:
   check_equivalent(const LogExpr& expr1,
 		   const LogExpr& expr2);
 
-  /// @brief 使われていないパタンとノードを削除してID番号を詰める．
-  /// @note 同時に入力ノードの入力番号とノード番号を一致させる．
-  void
-  sweep();
+  /// @brief 2つのパタンが同型かどうか調べる．
+  static
+  bool
+  check_equivalent(LcPatHandle handle1,
+		   LcPatHandle handle2);
+
+  /// @brief check_equivalent の下請け関数
+  static
+  bool
+  ceq_sub(LcPatNode* node1,
+	  LcPatNode* node2,
+	  hash_map<ymuint, ymuint>& map1,
+	  hash_map<ymuint, ymuint>& map2);
 
   /// @brief パタングラフを生成する再帰関数
   /// @param[in] expr 元になる論理式
@@ -113,14 +122,6 @@ private:
   void
   pg_sub(const LogExpr& expr,
 	 vector<LcPatHandle>& pg_list);
-
-  /// @brief pg_list に new_handle を追加する．
-  /// @note ただし，同形のパタンがすでにある場合には追加しない．
-  static
-  void
-  add_pg_list(vector<LcPatHandle>& pg_list,
-	      hash_set<string>& pg_hash,
-	      LcPatHandle new_handle);
 
   /// @brief テンプレートにしたがって2分木を作る．
   /// @param[in] expr 論理式 (演算の種類を表すのに用いる)

@@ -30,8 +30,6 @@ atpg_tclsh_SOURCES = \
 	AtpgMsgHandler.cc \
 	NtwkIoCmd.h \
 	NtwkIoCmd.cc \
-	FaultCmd.h \
-	FaultCmd.cc \
 	PrintFaultCmd.h \
 	PrintFaultCmd.cc \
 	PrintPatCmd.h \
@@ -40,19 +38,20 @@ atpg_tclsh_SOURCES = \
 	PrintPatStatsCmd.cc \
 	PrintStatsCmd.h \
 	PrintStatsCmd.cc \
-	RfsimCmd.h \
-	RfsimCmd.cc \
 	RtpgCmd.h \
 	RtpgCmd.cc \
 	DtpgCmd.h \
-	DtpgCmd.cc
+	DtpgCmd.cc \
+	MinPatCmd.h \
+	MinPatCmd.cc
 
 atpg_tclsh_LDADD = \
 	$(top_builddir)/src/main/libatpg_main.la \
 	$(top_builddir)/src/dtpg/libatpg_dtpg.la \
-	$(top_builddir)/src/fsim2/libatpg_fsim2.la \
-	$(top_builddir)/src/fsim3/libatpg_fsim3.la \
-	$(top_builddir)/src/fsimx/libatpg_fsimx.la \
+	$(top_builddir)/src/rtpg/libatpg_rtpg.la \
+	$(top_builddir)/src/minpat/libatpg_minpat.la \
+	$(top_builddir)/src/fsim/libatpg_fsim.la \
+	$(top_builddir)/src/fsim_old/libatpg_fsim_old.la \
 	$(top_builddir)/src/base/libatpg_base.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \

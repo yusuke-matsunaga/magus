@@ -114,7 +114,7 @@ CiPatMgr::copy(const LcPatMgr& src,
 // @brief バイナリダンプを行う．
 // @param[in] bos 出力先のストリーム
 void
-CiPatMgr::dump(BinO& bos) const
+CiPatMgr::dump(ODO& bos) const
 {
   // パタングラフのノード情報のダンプ
   bos << mNodeNum;
@@ -137,7 +137,7 @@ CiPatMgr::dump(BinO& bos) const
 // @retval true 読み込みが成功した．
 // @retval false 読み込みが失敗した．
 bool
-CiPatMgr::restore(BinI& bis,
+CiPatMgr::restore(IDO& bis,
 		  Alloc& alloc)
 {
   // ノードと枝の情報を読み込む．

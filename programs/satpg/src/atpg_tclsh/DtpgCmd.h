@@ -55,9 +55,6 @@ private:
   // minisat モードオプションの解析用オブジェクト
   TclPopt* mPoptMiniSat;
 
-  // fsim モードオプションの解析用オブジェクト
-  TclPoptStr* mPoptFsim;
-
   // print_stats オプションの解析用オブジェクト
   TclPopt* mPoptPrintStats;
 
@@ -66,6 +63,9 @@ private:
 
   // dual オプションの解析用オブジェクト
   TclPopt* mPoptDual;
+
+  // node オプションの解析用オブジェクト
+  TclPopt* mPoptNode;
 
   // ffr オプションの解析用オブジェクト
   TclPopt* mPoptFFR;
@@ -79,17 +79,23 @@ private:
   // po オプションの解析用オブジェクト
   TclPopt* mPoptPo;
 
+  // rpo オプションの解析用オブジェクト
+  TclPopt* mPoptRpo;
+
   // skip オプションの解析用オブジェクト
-  TclPopt* mPoptSkip;
+  TclPoptInt* mPoptSkip;
 
   // X抽出オプションの解析用オブジェクト
   TclPoptInt* mPoptX;
 
-  // dry runオプションの解析用オブジェクト
-  TclPopt* mPoptDryRun;
+  // drop オプションの解析用オブジェクト
+  TclPopt* mPoptDrop;
 
   // verify オプションの解析用オブジェクト
   TclPopt* mPoptVerify;
+
+  // timer オプションの解析用オブジェクト
+  TclPopt* mPoptTimer;
 
 };
 

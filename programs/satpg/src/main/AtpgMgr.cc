@@ -8,9 +8,19 @@
 
 
 #include "AtpgMgr.h"
-#include "Op1.h"
-#include "ym_networks/TgBlifReader.h"
-#include "ym_networks/TgIscas89Reader.h"
+#include "RtpgStats.h"
+#include "TpgNetwork.h"
+#include "TpgFault.h"
+#include "FaultMgr.h"
+#include "TvMgr.h"
+#include "Fsim.h"
+#include "FsimOld.h"
+#include "Dtpg.h"
+#include "Rtpg.h"
+#include "MinPat.h"
+#include "BackTracer.h"
+#include "DetectOp.h"
+#include "UntestOp.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -19,7 +29,7 @@ BEGIN_NAMESPACE_YM_SATPG
 // クラス FsimNetBinder
 //////////////////////////////////////////////////////////////////////
 class FsimNetBinder :
-  public T2Binder<const TgNetwork&, const vector<SaFault*>&>
+  public T2Binder<const TpgNetwork&, FaultMgr&>
 {
 public:
 
@@ -29,8 +39,8 @@ public:
   /// @brief イベント処理関数
   virtual
   void
-  event_proc(const TgNetwork& network,
-	     const vector<SaFault*>& fault_list);
+  event_proc(const TpgNetwork& network,
+	     FaultMgr& fault_mgr);
 
 
 private:
@@ -52,10 +62,54 @@ FsimNetBinder::FsimNetBinder(Fsim* fsim) :
 
 // @brief イベント処理関数
 void
-FsimNetBinder::event_proc(const TgNetwork& network,
-			  const vector<SaFault*>& fault_list)
+FsimNetBinder::event_proc(const TpgNetwork& network,
+			  FaultMgr& fault_mgr)
 {
-  mFsim->set_network(network, fault_list);
+  mFsim->set_network(network, fault_mgr);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス FsimOldNetBinder
+//////////////////////////////////////////////////////////////////////
+class FsimOldNetBinder :
+  public T2Binder<const TpgNetwork&, FaultMgr&>
+{
+public:
+
+  /// @brief コンストラクタ
+  FsimOldNetBinder(FsimOld* fsim);
+
+  /// @brief イベント処理関数
+  virtual
+  void
+  event_proc(const TpgNetwork& network,
+	     FaultMgr& fault_mgr);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // Fsim
+  FsimOld* mFsim;
+
+};
+
+
+// @brief コンストラクタ
+FsimOldNetBinder::FsimOldNetBinder(FsimOld* fsim) :
+  mFsim(fsim)
+{
+}
+
+// @brief イベント処理関数
+void
+FsimOldNetBinder::event_proc(const TpgNetwork& network,
+			     FaultMgr& fault_mgr)
+{
+  mFsim->set_network(network, fault_mgr);
 }
 
 
@@ -67,15 +121,26 @@ FsimNetBinder::event_proc(const TgNetwork& network,
 AtpgMgr::AtpgMgr() :
   mTimer(TM_SIZE, TM_MISC)
 {
+  mFaultMgr = new FaultMgr();
+  mTvMgr = new TvMgr();
+
   mFsim = new_Fsim2();
-  mFsim3 = new_Fsim3();
+  mFsim3 = new_FsimX2();
+  mFsimOld = new_FsimOld2();
+  mFsimOld3 = new_FsimOldX2();
 
+  mRtpg = new_Rtpg(*this);
+  mRtpgOld = new_RtpgOld(*this);
   mDtpg = new_DtpgSat();
+  mMinPat = new_MinPat(*this);
 
-  mDtpgVerify = false;
+  mNetwork = NULL;
 
   reg_network_handler(new FsimNetBinder(mFsim));
   reg_network_handler(new FsimNetBinder(mFsim3));
+
+  reg_network_handler(new FsimOldNetBinder(mFsimOld));
+  reg_network_handler(new FsimOldNetBinder(mFsimOld3));
 
   set_dtpg_mode();
 }
@@ -83,9 +148,17 @@ AtpgMgr::AtpgMgr() :
 // @brief デストラクタ
 AtpgMgr::~AtpgMgr()
 {
+  delete mFaultMgr;
+  delete mTvMgr;
   delete mFsim;
   delete mFsim3;
+  delete mFsimOld;
+  delete mFsimOld3;
+  delete mRtpg;
+  delete mRtpgOld;
   delete mDtpg;
+  delete mMinPat;
+  delete mNetwork;
 }
 
 // @brief blif 形式のファイルを読み込む．
@@ -100,15 +173,15 @@ AtpgMgr::read_blif(const string& filename,
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_READ);
 
-  TgBlifReader read;
-  bool stat = read(filename, mNetwork, cell_library);
-  if ( stat ) {
+  delete mNetwork;
+  mNetwork = TpgNetwork::read_blif(filename, cell_library);
+  if ( mNetwork != NULL ) {
     after_set_network();
   }
 
   mTimer.change(old_id);
 
-  return stat;
+  return mNetwork != NULL;
 }
 
 // @brief iscas89 形式のファイルを読み込む．
@@ -121,103 +194,60 @@ AtpgMgr::read_iscas89(const string& filename)
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_READ);
 
-  TgIscas89Reader read;
-  bool stat = read(filename, mNetwork);
-  if ( stat ) {
+  delete mNetwork;
+  mNetwork = TpgNetwork::read_iscas89(filename);
+  if ( mNetwork != NULL ) {
     after_set_network();
   }
 
   mTimer.change(old_id);
 
-  return stat;
+  return mNetwork != NULL;
 }
 
-// @brief 一つのテストベクタに対する故障シミュレーションを行なう．
-// @param[in] tv テストベクタ
-// @param[out] det_faults 検出された故障を格納するリスト
+// @brief 乱数生成器を初期化する．
 void
-AtpgMgr::fsim(TestVector* tv,
-	      vector<SaFault*>& det_faults)
+AtpgMgr::rtpg_init(ymuint32 seed)
 {
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_FSIM);
-
-  mFsim->run(tv, det_faults);
-
-  ymuint det_count = det_faults.size();
-  if ( det_count > 0 ) {
-    for (vector<SaFault*>::const_iterator p = det_faults.begin();
-	 p != det_faults.end(); ++ p) {
-      SaFault* f = *p;
-      if ( f->status() == kFsUndetected ) {
-	mFaultMgr.set_status(f, kFsDetected);
-      }
-    }
-    after_update_faults();
-  }
-
-  mTimer.change(old_id);
+  mRtpg->init(seed);
 }
 
-// @brief 複数のテストベクタに対する故障シミュレーションを行なう．
-// @param[in] tv_list テストベクタのリスト
-// @param[out] det_faults 検出された故障を格納するリストのリスト
+// @brief 乱数パタンを用いた故障シミュレーションを行なう．
+// @param[in] min_f 1回のシミュレーションで検出する故障数の下限
+// @param[in] max_i 故障検出できないシミュレーション回数の上限
+// @param[in] max_pat 最大のパタン数
+// @param[in] stats 実行結果の情報を格納する変数
 void
-AtpgMgr::fsim(const vector<TestVector*>& tv_list,
-	      vector<vector<SaFault*> >& det_faults_list)
+AtpgMgr::rtpg(ymuint min_f,
+	      ymuint max_i,
+	      ymuint max_pat,
+	      RtpgStats& stats)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_FSIM);
 
-  mFsim->run(tv_list, det_faults_list);
-
-  ymuint det_count = 0;
-  for (ymuint i = 0; i < tv_list.size(); ++ i) {
-    const vector<SaFault*>& det_faults = det_faults_list[i];
-    ymuint det_count1 = det_faults.size();
-    if ( det_count1 > 0 ) {
-      det_count += det_count1;
-      for (vector<SaFault*>::const_iterator p = det_faults.begin();
-	   p != det_faults.end(); ++ p) {
-	SaFault* f = *p;
-	if ( f->status() == kFsUndetected ) {
-	  mFaultMgr.set_status(f, kFsDetected);
-	}
-      }
-    }
-  }
-
-  if ( det_count > 0 ) {
-    after_update_faults();
-  }
+  mRtpg->run(min_f, max_i, max_pat, stats);
 
   mTimer.change(old_id);
 }
 
-// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
-// @param[in] tv テストベクタ
-// @param[in] f 対象の故障
-// @retval true tv で f の検出ができた．
-// @retval false tv では f の検出ができない．
-bool
-AtpgMgr::fsim(TestVector* tv,
-	      SaFault* f)
+// @brief 乱数パタンを用いた故障シミュレーションを行なう．
+// @param[in] min_f 1回のシミュレーションで検出する故障数の下限
+// @param[in] max_i 故障検出できないシミュレーション回数の上限
+// @param[in] max_pat 最大のパタン数
+// @param[in] stats 実行結果の情報を格納する変数
+void
+AtpgMgr::rtpg_old(ymuint min_f,
+		  ymuint max_i,
+		  ymuint max_pat,
+		  RtpgStats& stats)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_FSIM);
 
-  bool stat = mFsim->run(tv, f);
-  if ( stat ) {
-    if ( f->status() == kFsUndetected ) {
-      mFaultMgr.set_status(f, kFsDetected);
-
-      after_update_faults();
-    }
-  }
+  mRtpgOld->run(min_f, max_i, max_pat, stats);
 
   mTimer.change(old_id);
-
-  return stat;
 }
 
 // @brief 使用する SAT エンジンを指定する．
@@ -229,42 +259,35 @@ AtpgMgr::set_dtpg_mode(const string& type,
   mDtpg->set_mode(type, option, outp);
 }
 
-// @brief X抽出のモードを指定する．
+// @brief テストパタン生成時に時間計測を行なうかどうかを指定する．
 void
-AtpgMgr::set_dtpg_xmode(ymuint val)
+AtpgMgr::set_dtpg_timer(bool enable)
 {
-  mDtpg->set_get_pat(val);
-}
-
-// @brief dry-run フラグを設定する．
-void
-AtpgMgr::set_dtpg_dry_run(bool flag)
-{
-  mDtpg->set_dry_run(flag);
-}
-
-// @brief テストパタン生成時に故障シミュレーションを用いて検証するかを指定する．
-void
-AtpgMgr::set_dtpg_verify_mode(bool verify)
-{
-  mDtpgVerify = verify;
+  mDtpg->timer_enable(enable);
 }
 
 // @brief テストパタン生成を行なう．
 void
-AtpgMgr::dtpg(const string& option)
+AtpgMgr::dtpg(tDtpgMode mode,
+	      tDtpgPoMode po_mode,
+	      BackTracer& bt,
+	      const vector<DetectOp*>& dop_list,
+	      const vector<UntestOp*>& uop_list,
+	      DtpgStats& stats)
 {
-
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  Op1 op(mFaultMgr, mTvMgr, mTvList, *mFsim3, mDtpgVerify);
-
-  mDtpg->run(op, option);
-
-  after_update_faults();
+  mDtpg->run(mode, po_mode, bt, dop_list, uop_list, stats);
 
   mTimer.change(old_id);
+}
+
+// @brief テストパタン圧縮を行なう．
+void
+AtpgMgr::minpat(MinPatStats& stats)
+{
+  mMinPat->run(_tv_list(), stats);
 }
 
 // @brief ファイル読み込みに関わる時間を得る．
@@ -302,41 +325,18 @@ AtpgMgr::misc_time() const
   return mTimer.time(TM_MISC);
 }
 
-// @brief 統計情報をクリアする．
-void
-AtpgMgr::clear_stats()
-{
-  mDtpg->clear_stats();
-}
-
-// @brief 統計情報を得る．
-void
-AtpgMgr::get_stats()
-{
-  mDtpg->get_stats();
-}
-
 // @brief ネットワークをセットした後に呼ぶ関数
 void
 AtpgMgr::after_set_network()
 {
-  mFaultMgr.clear();
-  mFaultMgr.set_ssa_fault(mNetwork);
+  mFaultMgr->set_ssa_fault(*mNetwork);
 
-  mTvMgr.clear();
-  mTvMgr.init(mNetwork.input_num2());
+  mTvMgr->clear();
+  mTvMgr->init(mNetwork->input_num2());
 
-  mDtpg->set_network(mNetwork, mFaultMgr.remain_list());
+  mDtpg->set_network(*mNetwork);
 
-  mNtwkBindMgr.prop_event(mNetwork, mFaultMgr.remain_list());
-}
-
-// @brief 故障リストが変更された時に呼ばれる関数
-void
-AtpgMgr::after_update_faults()
-{
-  mFaultMgr.update();
-  mFaultBindMgr.prop_event(mFaultMgr.remain_list());
+  mNtwkBindMgr.prop_event(*mNetwork, *mFaultMgr);
 }
 
 END_NAMESPACE_YM_SATPG

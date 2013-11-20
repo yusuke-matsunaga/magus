@@ -92,7 +92,7 @@ ZddTopDown::operator()(BdnMgr& network,
     cut.swap(VarId(node->id()));
     cut = dfs(node, cut);
     cut = mMgr.n_element(cut, limit);
-    cut = mMgr.minimum_set(cut);
+    cut = mMgr.make_minimal(cut);
 
     VarVector sup_list;
     cut.support(sup_list);

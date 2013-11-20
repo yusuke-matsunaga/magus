@@ -10,8 +10,8 @@
 
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_utils/BinI.h"
-#include "ym_utils/BinO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -113,8 +113,8 @@ public:
   /// @param[in] ffinfo 対象の CellFFInfo
   /// @return ストリームを返す．
   friend
-  BinO&
-  operator<<(BinO& bos,
+  ODO&
+  operator<<(ODO& bos,
 	     const CellFFInfo& ffinfo);
 
   /// @brief バイナリファイルを読み込む．
@@ -122,8 +122,8 @@ public:
   /// @param[out] ffinfo 結果を格納する変数
   /// @return ストリームを返す．
   friend
-  BinI&
-  operator>>(BinI& bis,
+  IDO&
+  operator>>(IDO& bis,
 	     CellFFInfo& ffinfo);
 
 

@@ -10,7 +10,6 @@
 #include "PrintStatsCmd.h"
 #include "AtpgMgr.h"
 #include "FaultMgr.h"
-#include "TvMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -52,10 +51,10 @@ PrintStatsCmd::cmd_proc(TclObjVector& objv)
   FaultMgr& fmgr = _fault_mgr();
   ymuint num = mgr()._tv_list().size();
 
-  fprintf(stdout, "#A: # of total faults       = %7d\n", fmgr.all_rep_num());
-  fprintf(stdout, "#B: # of detected faults    = %7d\n", fmgr.det_num());
-  fprintf(stdout, "#C: # of redundant faults   = %7d\n", fmgr.untest_num());
-  fprintf(stdout, "#D: # of undetected faults  = %7d\n", fmgr.remain_num());
+  fprintf(stdout, "#A: # of total faults       = %7d\n", fmgr.rep_num());
+  fprintf(stdout, "#B: # of detected faults    = %7d\n", fmgr.det_list().size());
+  fprintf(stdout, "#C: # of redundant faults   = %7d\n", fmgr.untest_list().size());
+  fprintf(stdout, "#D: # of undetected faults  = %7d\n", fmgr.remain_list().size());
   fprintf(stdout, "#E: # of generated patterns = %7d\n", num);
   fprintf(stdout, "#F:   Total CPU time        = %7.2fu %7.2fs\n",
 	  lap.usr_time(), lap.sys_time());

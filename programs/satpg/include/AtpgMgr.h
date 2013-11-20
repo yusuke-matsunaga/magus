@@ -6,16 +6,12 @@
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "satpg_nsdef.h"
-#include "FaultMgr.h"
-#include "TvMgr.h"
-#include "Fsim.h"
-#include "Dtpg.h"
-#include "ym_networks/TgNetwork.h"
+
 #include "ym_cell/cell_nsdef.h"
 #include "ym_utils/Binder.h"
 #include "ym_utils/MStopWatch.h"
@@ -44,7 +40,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief TgNetwork を取り出す．
-  const TgNetwork&
+  TpgNetwork&
   _network();
 
   /// @brief FaultMgr を取り出す．
@@ -59,13 +55,21 @@ public:
   vector<TestVector*>&
   _tv_list();
 
-  /// @brief 統計情報をクリアする．
-  void
-  clear_stats();
+  /// @brief 2値の故障シミュレータを取り出す．
+  Fsim&
+  _fsim();
 
-  /// @brief 統計情報を得る．
-  void
-  get_stats();
+  /// @brief 3値の故障シミュレータを返す．
+  Fsim&
+  _fsimx();
+
+  /// @brief 2値の故障シミュレータを取り出す．
+  FsimOld&
+  _fsimold();
+
+  /// @brief 3値の故障シミュレータを返す．
+  FsimOld&
+  _fsimoldx();
 
 
 public:
@@ -95,28 +99,31 @@ public:
   // 故障シミュレーションを行なう関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 一つのテストベクタに対する故障シミュレーションを行なう．
-  /// @param[in] tv テストベクタ
-  /// @param[out] det_faults 検出された故障を格納するリスト
+  /// @brief 乱数生成器を初期化する．
   void
-  fsim(TestVector* tv,
-       vector<SaFault*>& det_faults);
+  rtpg_init(ymuint32 seed);
 
-  /// @brief 複数のテストベクタに対する故障シミュレーションを行なう．
-  /// @param[in] tv_list テストベクタのリスト
-  /// @param[out] det_faults 検出された故障を格納するリストのリスト
+  /// @brief 乱数パタンを用いた故障シミュレーションを行なう．
+  /// @param[in] min_f 1回のシミュレーションで検出する故障数の下限
+  /// @param[in] max_i 故障検出できないシミュレーション回数の上限
+  /// @param[in] max_pat 最大のパタン数
+  /// @param[in] stats 実行結果の情報を格納する変数
   void
-  fsim(const vector<TestVector*>& tv_list,
-       vector<vector<SaFault*> >& det_faults_list);
+  rtpg(ymuint min_f,
+       ymuint max_i,
+       ymuint max_pat,
+       RtpgStats& stats);
 
-  /// @brief 一つのパタンで一つの故障に対するシミュレーションを行う．
-  /// @param[in] tv テストベクタ
-  /// @param[in] f 対象の故障
-  /// @retval true tv で f の検出ができた．
-  /// @retval false tv では f の検出ができない．
-  bool
-  fsim(TestVector* tv,
-       SaFault* f);
+  /// @brief 乱数パタンを用いた故障シミュレーションを行なう．
+  /// @param[in] min_f 1回のシミュレーションで検出する故障数の下限
+  /// @param[in] max_i 故障検出できないシミュレーション回数の上限
+  /// @param[in] max_pat 最大のパタン数
+  /// @param[in] stats 実行結果の情報を格納する変数
+  void
+  rtpg_old(ymuint min_f,
+	   ymuint max_i,
+	   ymuint max_pat,
+	   RtpgStats& stats);
 
 
 public:
@@ -130,21 +137,34 @@ public:
 		const string& option = string(),
 		ostream* outp = NULL);
 
-  /// @brief X抽出のモードを指定する．
+  /// @brief テストパタン生成時に時間計測を行なうかどうかを指定する．
   void
-  set_dtpg_xmode(ymuint val);
-
-  /// @brief dry-run フラグを設定する．
-  void
-  set_dtpg_dry_run(bool flag);
-
-  /// @brief テストパタン生成時に故障シミュレーションを用いて検証するかを指定する．
-  void
-  set_dtpg_verify_mode(bool verify);
+  set_dtpg_timer(bool enable);
 
   /// @brief テストパタン生成を行なう．
+  /// @param[in] mode メインモード
+  /// @param[in] po_mode PO分割モード
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop_list DetectOp のリスト
+  /// @param[in] uop_list UntestOp のリスト
+  /// @param[in] stats 結果を格納する構造体
   void
-  dtpg(const string& option);
+  dtpg(tDtpgMode mode,
+       tDtpgPoMode po_mode,
+       BackTracer& bt,
+       const vector<DetectOp*>& dop_list,
+       const vector<UntestOp*>& uop_list,
+       DtpgStats& stats);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // テストパタン圧縮を行なう関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief テストパタン圧縮を行なう．
+  void
+  minpat(MinPatStats& stats);
 
 
 public:
@@ -154,11 +174,7 @@ public:
 
   /// @brief ネットワークの変更に関するハンドラを登録する．
   void
-  reg_network_handler(T2Binder<const TgNetwork&, const vector<SaFault*>&>* handler);
-
-  /// @brief 故障リストの変更に関するハンドラを登録する．
-  void
-  reg_fault_handler(T1Binder<const vector<SaFault*>& >* handler);
+  reg_network_handler(T2Binder<const TpgNetwork&, FaultMgr&>* handler);
 
 
 public:
@@ -196,10 +212,6 @@ private:
   void
   after_set_network();
 
-  /// @brief 故障リストが変更された時に呼ばれる関数
-  void
-  after_update_faults();
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -207,13 +219,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 対象のネットワーク
-  TgNetwork mNetwork;
+  TpgNetwork* mNetwork;
 
-  // 故障リスト
-  FaultMgr mFaultMgr;
+  // 故障マネージャ
+  FaultMgr* mFaultMgr;
 
   // テストベクタを管理するオブジェクト
-  TvMgr mTvMgr;
+  TvMgr* mTvMgr;
 
   // テストベクタのリスト
   vector<TestVector*> mTvList;
@@ -224,17 +236,26 @@ private:
   // 3値の故障シミュレータ
   Fsim* mFsim3;
 
+  // 故障シミュレータ
+  FsimOld* mFsimOld;
+
+  // 3値の故障シミュレータ
+  FsimOld* mFsimOld3;
+
+  // RTPG
+  Rtpg* mRtpg;
+
+  // RTPG
+  Rtpg* mRtpgOld;
+
   // テストパタン生成器
   Dtpg* mDtpg;
 
-  // テストパタン生成時に検証を行うときに true にする．
-  bool mDtpgVerify;
+  // パタン圧縮器
+  MinPat* mMinPat;
 
   // ネットワークが変更された時に呼ばれるイベントハンドラ
-  T2BindMgr<const TgNetwork&, const vector<SaFault*>&> mNtwkBindMgr;
-
-  // 故障リストが変更された時に呼ばれるイベントハンドラ
-  T1BindMgr<const vector<SaFault*>& > mFaultBindMgr;
+  T2BindMgr<const TpgNetwork&, FaultMgr&> mNtwkBindMgr;
 
   // タイマー
   MStopWatch mTimer;
@@ -248,10 +269,10 @@ private:
 
 // @brief TgNetwork を取り出す．
 inline
-const TgNetwork&
+TpgNetwork&
 AtpgMgr::_network()
 {
-  return mNetwork;
+  return *mNetwork;
 }
 
 // @brief FaultMgr を取り出す．
@@ -259,7 +280,7 @@ inline
 FaultMgr&
 AtpgMgr::_fault_mgr()
 {
-  return mFaultMgr;
+  return *mFaultMgr;
 }
 
 // @brief TvMgr を取り出す．
@@ -267,7 +288,7 @@ inline
 TvMgr&
 AtpgMgr::_tv_mgr()
 {
-  return mTvMgr;
+  return *mTvMgr;
 }
 
 // @brief テストベクタのリストを取り出す．
@@ -278,10 +299,42 @@ AtpgMgr::_tv_list()
   return mTvList;
 }
 
+// @brief 2値の故障シミュレータを取り出す．
+inline
+Fsim&
+AtpgMgr::_fsim()
+{
+  return *mFsim;
+}
+
+// @brief 3値の故障シミュレータを返す．
+inline
+Fsim&
+AtpgMgr::_fsimx()
+{
+  return *mFsim3;
+}
+
+// @brief 2値の故障シミュレータを取り出す．
+inline
+FsimOld&
+AtpgMgr::_fsimold()
+{
+  return *mFsimOld;
+}
+
+// @brief 3値の故障シミュレータを返す．
+inline
+FsimOld&
+AtpgMgr::_fsimoldx()
+{
+  return *mFsimOld3;
+}
+
 // @brief ネットワークの変更に関するハンドラを登録する．
 inline
 void
-AtpgMgr::reg_network_handler(T2Binder<const TgNetwork&, const vector<SaFault*>&>* handler)
+AtpgMgr::reg_network_handler(T2Binder<const TpgNetwork&, FaultMgr&>* handler)
 {
   mNtwkBindMgr.reg_binder(handler);
 }

@@ -52,7 +52,7 @@ CiLibrary::CiLibrary() :
   mLutHash(mAlloc),
   mCellHash(mAlloc)
 {
-  mTechnology = kTechCmos;
+  mTechnology = kCellTechCmos;
   mDelayModel = kCellDelayGenericCmos;
   mLutTemplateNum = 0;
   mLutTemplateArray = NULL;
@@ -77,7 +77,7 @@ CiLibrary::name() const
 }
 
 // @brief テクノロジの取得
-CellLibrary::tTechnology
+tCellTechnology
 CiLibrary::technology() const
 {
   return mTechnology;
@@ -343,94 +343,94 @@ CiLibrary::simple_latch_class(bool has_clear,
 
 // @brief 総パタン数を返す．
 ymuint
-CiLibrary::pat_num() const
+CiLibrary::pg_pat_num() const
 {
   return mPatMgr.pat_num();
 }
 
 // @brief パタンを返す．
-// @param[in] id パタン番号 ( 0 <= id < pat_num() )
+// @param[in] id パタン番号 ( 0 <= id < pg_pat_num() )
 const CellPatGraph&
-CiLibrary::pat(ymuint id) const
+CiLibrary::pg_pat(ymuint id) const
 {
   return mPatMgr.pat(id);
 }
 
 // @brief パタンの最大の入力数を得る．
 ymuint
-CiLibrary::max_input() const
+CiLibrary::pg_max_input() const
 {
   return mPatMgr.max_input();
 }
 
 // @brief 総ノード数を返す．
 ymuint
-CiLibrary::node_num() const
+CiLibrary::pg_node_num() const
 {
   return mPatMgr.node_num();
 }
 
 // @brief ノードの種類を返す．
-// @param[in] id ノード番号 ( 0 <= id < node_num() )
+// @param[in] id ノード番号 ( 0 <= id < pg_node_num() )
 tCellPatType
-CiLibrary::node_type(ymuint id) const
+CiLibrary::pg_node_type(ymuint id) const
 {
   return mPatMgr.node_type(id);
 }
 
 // @brief ノードが入力ノードの時に入力番号を返す．
-// @param[in] id ノード番号 ( 0 <= id < node_num() )
+// @param[in] id ノード番号 ( 0 <= id < pg_node_num() )
 // @note 入力ノードでない場合の返り値は不定
 ymuint
-CiLibrary::input_id(ymuint id) const
+CiLibrary::pg_input_id(ymuint id) const
 {
   return mPatMgr.input_id(id);
 }
 
 // @brief 入力のノード番号を返す．
-// @param[in] input_id 入力番号 ( 0 <= input_id < input_num() )
+// @param[in] input_id 入力番号 ( 0 <= input_id < pg_input_num() )
 // @return input_id の入力に対応するノードのノード番号
 ymuint
-CiLibrary::input_node(ymuint input_id) const
+CiLibrary::pg_input_node(ymuint input_id) const
 {
   return mPatMgr.input_node(input_id);
 }
 
 // @brief 総枝数を返す．
 ymuint
-CiLibrary::edge_num() const
+CiLibrary::pg_edge_num() const
 {
   return mPatMgr.edge_num();
 }
 
 // @brief 枝のファンイン元のノード番号を返す．
-// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+// @param[in] id 枝番号 ( 0 <= id < pg_edge_num() )
 ymuint
-CiLibrary::edge_from(ymuint id) const
+CiLibrary::pg_edge_from(ymuint id) const
 {
   return mPatMgr.edge_from(id);
 }
 
 // @brief 枝のファンアウト先のノード番号を返す．
-// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+// @param[in] id 枝番号 ( 0 <= id < pg_edge_num() )
 ymuint
-CiLibrary::edge_to(ymint id) const
+CiLibrary::pg_edge_to(ymint id) const
 {
   return mPatMgr.edge_to(id);
 }
 
 // @brief 枝のファンアウト先の入力位置( 0 or 1 ) を返す．
-// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+// @param[in] id 枝番号 ( 0 <= id < pg_edge_num() )
 ymuint
-CiLibrary::edge_pos(ymuint id) const
+CiLibrary::pg_edge_pos(ymuint id) const
 {
   return mPatMgr.edge_pos(id);
 }
 
 // @brief 枝の反転属性を返す．
-// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+// @param[in] id 枝番号 ( 0 <= id < pg_edge_num() )
 bool
-CiLibrary::edge_inv(ymuint id) const
+CiLibrary::pg_edge_inv(ymuint id) const
 {
   return mPatMgr.edge_inv(id);
 }
@@ -445,7 +445,7 @@ CiLibrary::set_name(const string& name)
 
 // @brief 'technology' を設定する．
 void
-CiLibrary::set_technology(tTechnology technology)
+CiLibrary::set_technology(tCellTechnology technology)
 {
   mTechnology = technology;
 }
@@ -662,6 +662,15 @@ CiLibrary::set_cell_num(ymuint num)
   mCellNum = num;
   void* p = mAlloc.get_memory(sizeof(CiCell*) * num);
   mCellArray = new (p) CiCell*[num];
+}
+
+// @brief セルを取り出す．
+// @param[in] pos 位置番号 ( 0 <= pos < cell_num() )
+Cell*
+CiLibrary::cell(ymuint pos)
+{
+  assert_cond( pos < mCellNum, __FILE__, __LINE__);
+  return mCellArray[pos];
 }
 
 // @brief 論理セルを生成する．
@@ -988,6 +997,9 @@ CiLibrary::new_cell_input(ymuint cell_id,
 // @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
 // @param[in] output_id 出力ピン番号 ( 0 <= output_id < cell->output_num2() )
 // @param[in] name 出力ピン名
+// @param[in] has_logic 論理式を持つとき true にするフラグ
+// @param[in] logic_expr 論理式
+// @param[in] tristate_expr tristate 条件式
 // @param[in] max_fanout 最大ファンアウト容量
 // @param[in] min_fanout 最小ファンアウト容量
 // @param[in] max_capacitance 最大負荷容量
@@ -999,6 +1011,9 @@ CiLibrary::new_cell_output(ymuint cell_id,
 			   ymuint pin_id,
 			   ymuint output_id,
 			   const string& name,
+			   bool has_logic,
+			   const LogExpr& logic_expr,
+			   const LogExpr& tristate_expr,
 			   CellCapacitance max_fanout,
 			   CellCapacitance min_fanout,
 			   CellCapacitance max_capacitance,
@@ -1009,6 +1024,8 @@ CiLibrary::new_cell_output(ymuint cell_id,
   CiCell* cell = mCellArray[cell_id];
   void* p = mAlloc.get_memory(sizeof(CiOutputPin));
   CiOutputPin* pin = new (p) CiOutputPin(cell, ShString(name),
+					 has_logic, logic_expr,
+					 tristate_expr,
 					 max_fanout, min_fanout,
 					 max_capacitance, min_capacitance,
 					 max_transition, min_transition);
@@ -1025,6 +1042,9 @@ CiLibrary::new_cell_output(ymuint cell_id,
 // @param[in] input_id 入力ピン番号 ( 0 <= input_id < cell->input_num2() )
 // @param[in] output_id 出力ピン番号 ( 0 <= output_id < cell->output_num2() )
 // @param[in] name 入出力ピン名
+// @param[in] has_logic 論理式を持つとき true にするフラグ
+// @param[in] logic_expr 論理式
+// @param[in] tristate_expr tristate 条件式
 // @param[in] capacitance 入力ピンの負荷容量
 // @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
 // @param[in] fall_capacitance 入力ピンの立ち下がり負荷容量
@@ -1040,6 +1060,9 @@ CiLibrary::new_cell_inout(ymuint cell_id,
 			  ymuint input_id,
 			  ymuint output_id,
 			  const string& name,
+			  bool has_logic,
+			  const LogExpr& logic_expr,
+			  const LogExpr& tristate_expr,
 			  CellCapacitance capacitance,
 			  CellCapacitance rise_capacitance,
 			  CellCapacitance fall_capacitance,
@@ -1053,6 +1076,8 @@ CiLibrary::new_cell_inout(ymuint cell_id,
   CiCell* cell = mCellArray[cell_id];
   void* p = mAlloc.get_memory(sizeof(CiInoutPin));
   CiInoutPin* pin =  new (p) CiInoutPin(cell, ShString(name),
+					has_logic, logic_expr,
+					tristate_expr,
 					capacitance,
 					rise_capacitance, fall_capacitance,
 					max_fanout, min_fanout,
@@ -1124,7 +1149,7 @@ CiLibrary::new_timing_generic(ymuint cell_id,
 			      CellResistance fall_resistance)
 {
   void* p = mAlloc.get_memory(sizeof(CiTimingGeneric));
-  CiTiming* timing = new (p) CiTimingGeneric(type, cond,
+  CiTiming* timing = new (p) CiTimingGeneric(tid, type, cond,
 					     intrinsic_rise,
 					     intrinsic_fall,
 					     slope_rise,
@@ -1157,7 +1182,7 @@ CiLibrary::new_timing_piecewise(ymuint cell_id,
 				CellResistance fall_pin_resistance)
 {
   void* p = mAlloc.get_memory(sizeof(CiTimingPiecewise));
-  CiTiming* timing = new (p) CiTimingPiecewise(timing_type, cond,
+  CiTiming* timing = new (p) CiTimingPiecewise(tid, timing_type, cond,
 					       intrinsic_rise,
 					       intrinsic_fall,
 					       slope_rise,
@@ -1186,7 +1211,7 @@ CiLibrary::new_timing_lut1(ymuint cell_id,
 			   CellLut* fall_transition)
 {
   void* p = mAlloc.get_memory(sizeof(CiTimingLut1));
-  CiTiming* timing = new (p) CiTimingLut1(timing_type, cond,
+  CiTiming* timing = new (p) CiTimingLut1(tid, timing_type, cond,
 					  cell_rise,
 					  cell_fall,
 					  rise_transition,
@@ -1215,7 +1240,7 @@ CiLibrary::new_timing_lut2(ymuint cell_id,
 			   CellLut* fall_propagation)
 {
   void* p = mAlloc.get_memory(sizeof(CiTimingLut2));
-  CiTiming* timing = new (p) CiTimingLut2(timing_type, cond,
+  CiTiming* timing = new (p) CiTimingLut2(tid, timing_type, cond,
 					  rise_transition,
 					  fall_transition,
 					  rise_propagation,
@@ -1333,7 +1358,7 @@ CiLibrary::compile()
     const LcGroup* src_group = libcomp.group(g);
     CiGroup& dst_group = mGroupArray[g];
     const CellClass* parent = npn_class(src_group->parent()->id());
-    const vector<const Cell*>& cell_list = src_group->cell_list();
+    const vector<Cell*>& cell_list = src_group->cell_list();
     dst_group.init(parent, src_group->map(), cell_list, mAlloc);
   }
 
@@ -1364,7 +1389,7 @@ CiLibrary::compile()
       CiGroup* cgroup = &mGroupArray[gid];
       NpnMapM map = cgroup->map();
       ymuint pos_array[6] = { 0, 0, 0, 0, 0, 0 };
-      ymuint ni = map.ni() - 2;
+      ymuint ni = map.input_num() - 2;
       assert_cond( ni <= 4, __FILE__, __LINE__);
       for (ymuint i = 0; i < ni; ++ i) {
 	NpnVmap imap = map.imap(VarId(i));
@@ -1387,7 +1412,7 @@ CiLibrary::compile()
       CiGroup* cgroup = &mGroupArray[gid];
       NpnMapM map = cgroup->map();
       ymuint pos_array[5] = { 0, 0, 0, 0, 0 };
-      ymuint ni = map.ni() - 2;
+      ymuint ni = map.input_num() - 2;
       assert_cond( ni <= 4, __FILE__, __LINE__);
       for (ymuint i = 0; i < ni; ++ i) {
 	NpnVmap imap = map.imap(VarId(i));
@@ -1445,7 +1470,7 @@ CiLibrary::add_cell(ymuint id,
 /// @brief 内容をバイナリダンプする．
 /// @param[in] s 出力先のストリーム
 void
-CiLibrary::dump(BinO& s) const
+CiLibrary::dump(ODO& s) const
 {
   // 名前
   s << name();
@@ -1537,7 +1562,7 @@ CiLibrary::dump(BinO& s) const
 }
 
 void
-CiLibrary::restore(BinI& s)
+CiLibrary::restore(IDO& s)
 {
   string name;
   s >> name;
@@ -1548,7 +1573,7 @@ CiLibrary::restore(BinI& s)
   ymuint8 tmp2;
   s >> tmp1
     >> tmp2;
-  tTechnology technology = static_cast<tTechnology>(tmp1);
+  tCellTechnology technology = static_cast<tCellTechnology>(tmp1);
   tCellDelayModel delay_model = static_cast<tCellDelayModel>(tmp2);
 
   set_technology(technology);
@@ -1764,6 +1789,8 @@ CiLibrary::restore(BinI& s)
 	>> max_t
 	>> min_t;
       new_cell_output(cell_id, pin_id, oid, name,
+		      has_logic[oid], logic_array[oid],
+		      tristate_array[oid],
 		      max_f, min_f,
 		      max_c, min_c,
 		      max_t, min_t);
@@ -1794,6 +1821,8 @@ CiLibrary::restore(BinI& s)
 	>> max_t
 	>> min_t;
       new_cell_inout(cell_id, pin_id, ioid + ni, ioid + no, name,
+		     has_logic[ioid], logic_array[ioid],
+		     tristate_array[ioid],
 		     cap, r_cap, f_cap,
 		     max_f, min_f,
 		     max_c, min_c,
@@ -1991,7 +2020,7 @@ CiLibrary::get_pin(const CiCell* cell,
 
 // @brief LUT テンプレートを読み込む．
 void
-CiLibrary::restore_lut_template(BinI& s,
+CiLibrary::restore_lut_template(IDO& s,
 				ymuint id)
 {
   string name;
@@ -2099,7 +2128,7 @@ CiLibrary::restore_lut_template(BinI& s,
 
 // @brief LUT を読み込む．
 CellLut*
-CiLibrary::restore_lut(BinI& s)
+CiLibrary::restore_lut(IDO& s)
 {
   string template_name;
   s >> template_name;

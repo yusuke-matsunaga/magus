@@ -5,7 +5,7 @@
 /// @brief PyMsgHandler.h のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,7 +13,7 @@
 #include "ym_utils/MsgHandler.h"
 
 
-BEGIN_NAMESPACE_YM_PYTHON
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 /// @class PyMsgHandler PyMsgHandler.h "PyMsgHandler.h"
@@ -67,6 +67,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_PYTHON
+END_NAMESPACE_YM
 
 #endif // PYMSGHANDLER_H

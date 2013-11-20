@@ -10,7 +10,7 @@
 
 
 #include "iscas89_nsdef.h"
-#include "ym_utils/FileScanner.h"
+#include "ym_utils/Scanner.h"
 #include "ym_utils/StrBuff.h"
 
 
@@ -21,18 +21,22 @@ BEGIN_NAMESPACE_YM_ISCAS89
 /// @brief iscas89 用の字句解析器
 //////////////////////////////////////////////////////////////////////
 class Iscas89Scanner :
-  public FileScanner
+  public Scanner
 {
 public:
 
   /// @brief コンストラクタ
-  Iscas89Scanner();
+  /// @param[in] ido 入力データ
+  Iscas89Scanner(IDO& ido);
 
   /// @brief デストラクタ
   ~Iscas89Scanner();
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief トークンを一つ読み出す．
   /// @param[out] loc トークンの位置を格納する変数

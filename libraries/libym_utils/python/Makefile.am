@@ -17,8 +17,8 @@ libym_utils_python_la_CPPFLAGS = \
 libym_utils_python_la_SOURCES = \
 	ympython.cc \
 	pyutils_init.cc \
-	pyutils_FileBinI.cc \
-	pyutils_FileBinO.cc \
+	pyutils_FileIDO.cc \
+	pyutils_FileODO.cc \
 	pyutils_FileInfo.cc \
 	pyutils_FileLoc.cc \
 	pyutils_FileRegion.cc \
@@ -32,6 +32,12 @@ libym_utils_python_la_SOURCES = \
 	pyutils_USTime.cc \
 	pyutils_StopWatch.cc \
 	pyutils_MStopWatch.cc \
+	pyutils_CombiGen.cc \
+	pyutils_PermGen.cc \
+	pyutils_MultiCombiGen.cc \
+	pyutils_MultiPermGen.cc \
+	pyutils_MultiSetCombiGen.cc \
+	pyutils_MultiSetPermGen.cc \
 	pyutils_RandGen.cc \
 	pyutils_RandPermGen.cc \
 	pyutils_RandCombiGen.cc

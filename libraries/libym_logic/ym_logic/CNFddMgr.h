@@ -122,41 +122,41 @@ public:
   /// @param[in] s 出力ストリーム
   /// @param[in] zdd 対象のCNFDD
   void
-  dump(BinO& s,
+  dump(ODO& s,
        const CNFdd& zdd);
 
   /// @brief CNFDDの配列の内容をバイナリファイルに書き出す
   /// @param[in] s 出力先のストリーム
   /// @param[in] array CNFDD を収めた配列
   void
-  dump(BinO& s,
+  dump(ODO& s,
        const CNFddVector& array);
 
   /// @brief CNFDDの配列の内容をバイナリファイルに書き出す
   /// @param[in] array CNFDD を収めた配列
   /// @param[in] s 出力先のストリーム
   void
-  dump(BinO& s,
+  dump(ODO& s,
        const CNFddList& array);
 
   /// @brief 保存されたCNFDDを読み込む．
   /// @param[in] s 入力ストリーム
   /// @return 生成された CNFDD
   CNFdd
-  restore(BinI& s);
+  restore(IDO& s);
 
   /// @brief 保存されたCNFDDをベクタに読み込む．
   /// @param[in] s 入力ストリーム
   /// @param[out] array 生成された CNFDD を格納するベクタ
   void
-  restore(BinI& s,
+  restore(IDO& s,
 	  CNFddVector& array);
 
   /// @brief 保存されたCNFDDをリストに読み込む．
   /// @param[in] s 入力ストリーム
   /// @param[out] array 生成された CNFDD を格納するリスト
   void
-  restore(BinI& s,
+  restore(IDO& s,
 	  CNFddList& array);
 #endif
   /// @}

@@ -16,7 +16,7 @@ BEGIN_NAMESPACE_YM_CELL
 BEGIN_NONAMESPACE
 
 void
-dump_lut(BinO& s,
+dump_lut(ODO& s,
 	 const CellLut* lut)
 {
   if ( lut ) {
@@ -34,10 +34,13 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] id ID番号
 // @param[in] type タイミング条件の型
 // @param[in] cond タイミング条件を表す式
-CiTiming::CiTiming(tCellTimingType type,
+CiTiming::CiTiming(ymuint id,
+		   tCellTimingType type,
 		   const LogExpr& cond) :
+  mId(id),
   mType(type),
   mCond(cond)
 {
@@ -46,6 +49,14 @@ CiTiming::CiTiming(tCellTimingType type,
 // @brief デストラクタ
 CiTiming::~CiTiming()
 {
+}
+
+// @brief ID番号の取得
+// @note timing = cell->timing(id); の時，timing->id() = id となる．
+ymuint
+CiTiming::id() const
+{
+  return mId;
 }
 
 // @brief 型の取得
@@ -179,7 +190,7 @@ CiTiming::cell_fall() const
 // @param[in] s 出力先のストリーム
 // @param[in] type_id 型の ID
 void
-CiTiming::dump_common(BinO& s,
+CiTiming::dump_common(ODO& s,
 		      ymuint8 type_id) const
 {
   s << type_id
@@ -193,19 +204,21 @@ CiTiming::dump_common(BinO& s,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] id ID番号
 // @param[in] timing_type タイミングの型
 // @param[in] cond タイミング条件を表す式
 // @param[in] intrinsic_rise 立ち上がり固有遅延
 // @param[in] intrinsic_fall 立ち下がり固有遅延
 // @param[in] slope_rise 立ち上がりスロープ遅延
 // @param[in] slope_fall 立ち下がりスロープ遅延
-CiTimingGP::CiTimingGP(tCellTimingType timing_type,
+CiTimingGP::CiTimingGP(ymuint id,
+		       tCellTimingType timing_type,
 		       const LogExpr& cond,
 		       CellTime intrinsic_rise,
 		       CellTime intrinsic_fall,
 		       CellTime slope_rise,
 		       CellTime slope_fall) :
-  CiTiming(timing_type, cond),
+  CiTiming(id, timing_type, cond),
   mIntrinsicRise(intrinsic_rise),
   mIntrinsicFall(intrinsic_fall),
   mSlopeRise(slope_rise),
@@ -252,6 +265,7 @@ CiTimingGP::slope_fall() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] id ID番号
 // @param[in] timing_type タイミングの型
 // @param[in] cond タイミング条件を表す式
 // @param[in] intrinsic_rise 立ち上がり固有遅延
@@ -260,7 +274,8 @@ CiTimingGP::slope_fall() const
 // @param[in] slope_fall 立ち下がりスロープ遅延
 // @param[in] rise_resistance 立ち上がり遷移遅延パラメータ
 // @param[in] fall_resistance 立ち下がり遷移遅延パラメータ
-CiTimingGeneric::CiTimingGeneric(tCellTimingType timing_type,
+CiTimingGeneric::CiTimingGeneric(ymuint id,
+				 tCellTimingType timing_type,
 				 const LogExpr& cond,
 				 CellTime intrinsic_rise,
 				 CellTime intrinsic_fall,
@@ -268,7 +283,7 @@ CiTimingGeneric::CiTimingGeneric(tCellTimingType timing_type,
 				 CellTime slope_fall,
 				 CellResistance rise_resistance,
 				 CellResistance fall_resistance) :
-  CiTimingGP(timing_type, cond,
+  CiTimingGP(id, timing_type, cond,
 	     intrinsic_rise, intrinsic_fall,
 	     slope_rise, slope_fall),
   mRiseResistance(rise_resistance),
@@ -299,7 +314,7 @@ CiTimingGeneric::fall_resistance() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiTimingGeneric::dump(BinO& s) const
+CiTimingGeneric::dump(ODO& s) const
 {
   dump_common(s, 0);
 
@@ -317,13 +332,15 @@ CiTimingGeneric::dump(BinO& s) const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] id ID番号
 // @param[in] timing_type タイミングの型
 // @param[in] cond タイミング条件を表す式
 // @param[in] intrinsic_rise 立ち上がり固有遅延
 // @param[in] intrinsic_fall 立ち下がり固有遅延
 // @param[in] slope_rise 立ち上がりスロープ遅延
 // @param[in] slope_fall 立ち下がりスロープ遅延
-CiTimingPiecewise::CiTimingPiecewise(tCellTimingType timing_type,
+CiTimingPiecewise::CiTimingPiecewise(ymuint id,
+				     tCellTimingType timing_type,
 				     const LogExpr& cond,
 				     CellTime intrinsic_rise,
 				     CellTime intrinsic_fall,
@@ -331,7 +348,7 @@ CiTimingPiecewise::CiTimingPiecewise(tCellTimingType timing_type,
 				     CellTime slope_fall,
 				     CellResistance rise_pin_resistance,
 				     CellResistance fall_pin_resistance) :
-  CiTimingGP(timing_type, cond,
+  CiTimingGP(id, timing_type, cond,
 	     intrinsic_rise, intrinsic_fall,
 	     slope_rise, slope_fall),
   mRisePinResistance(rise_pin_resistance),
@@ -377,7 +394,7 @@ CiTimingPiecewise::fall_delay_intercept() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiTimingPiecewise::dump(BinO& s) const
+CiTimingPiecewise::dump(ODO& s) const
 {
   dump_common(s, 1);
 
@@ -393,19 +410,21 @@ CiTimingPiecewise::dump(BinO& s) const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] id ID番号
 // @param[in] timing_type タイミングの型
 // @param[in] cond タイミング条件を表す式
 // @param[in] cell_rise 立ち上がりセル遅延テーブル
 // @param[in] cell_fall 立ち下がりセル遅延テーブル
 // @param[in] rise_transition 立ち上がり遷移遅延テーブル
 // @param[in] fall_transition 立ち下がり遷移遅延テーブル
-CiTimingLut1::CiTimingLut1(tCellTimingType timing_type,
+CiTimingLut1::CiTimingLut1(ymuint id,
+			   tCellTimingType timing_type,
 			   const LogExpr& cond,
 			   CellLut* cell_rise,
 			   CellLut* cell_fall,
 			   CellLut* rise_transition,
 			   CellLut* fall_transition) :
-  CiTiming(timing_type, cond),
+  CiTiming(id, timing_type, cond),
   mCellRise(cell_rise),
   mCellFall(cell_fall),
   mRiseTransition(rise_transition),
@@ -449,7 +468,7 @@ CiTimingLut1::fall_transition() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiTimingLut1::dump(BinO& s) const
+CiTimingLut1::dump(ODO& s) const
 {
   dump_common(s, 2);
 
@@ -465,19 +484,21 @@ CiTimingLut1::dump(BinO& s) const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] id ID番号
 // @param[in] timing_type タイミングの型
 // @param[in] cond タイミング条件を表す式
 // @param[in] rise_transition 立ち上がり遷移遅延テーブル
 // @param[in] fall_transition 立ち下がり遷移遅延テーブル
 // @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
 // @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
-CiTimingLut2::CiTimingLut2(tCellTimingType timing_type,
+CiTimingLut2::CiTimingLut2(ymuint id,
+			   tCellTimingType timing_type,
 			   const LogExpr& cond,
 			   CellLut* rise_transition,
 			   CellLut* fall_transition,
 			   CellLut* rise_propagation,
 			   CellLut* fall_propagation) :
-  CiTiming(timing_type, cond),
+  CiTiming(id, timing_type, cond),
   mRiseTransition(rise_transition),
   mFallTransition(fall_transition),
   mRisePropagation(rise_propagation),
@@ -521,7 +542,7 @@ CiTimingLut2::fall_propagation() const
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
-CiTimingLut2::dump(BinO& s) const
+CiTimingLut2::dump(ODO& s) const
 {
   dump_common(s, 3);
 

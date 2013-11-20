@@ -6,128 +6,64 @@
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "satpg_nsdef.h"
-#include "ym_utils/USTime.h"
-#include "ym_utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
-class AtpgMgr;
-
-//////////////////////////////////////////////////////////////////////
-/// @class RtpgStats Rtpg.h "Rtpg.h"
-/// @brief RTPG の statistics data を表すクラス
-//////////////////////////////////////////////////////////////////////
-class RtpgStats
-{
-  friend class Rtpg;
-
-public:
-
-  /// @brief コンストラクタ
-  RtpgStats();
-
-  /// @brief デストラクタ
-  ~RtpgStats();
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 情報を取得する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 検出した故障数を得る．
-  ymuint
-  detected_faults() const;
-
-  /// @brief シミュレーションしたパタン数を得る．
-  ymuint
-  simulated_patterns() const;
-
-  /// @brief 有効なパタン数を得る．
-  ymuint
-  effective_patterns() const;
-
-  /// @brief 計算時間を得る．
-  USTime
-  time() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 検出した故障数
-  ymuint32 mDetectNum;
-
-  // 総パタン数
-  ymuint32 mPatNum;
-
-  // 有効パタン数
-  ymuint32 mEfPatNum;
-
-  // 計算時間
-  USTime mTime;
-
-};
-
-
 //////////////////////////////////////////////////////////////////////
 /// @class Rtpg Rtpg.h "Rtpg.h"
-/// @brief random test pattern generation を行うクラス
+/// @brief RTPG を行う基底クラス
 //////////////////////////////////////////////////////////////////////
 class Rtpg
 {
 public:
 
-  /// @brief コンストラクタ
-  Rtpg(AtpgMgr* mgr);
-
   /// @brief デストラクタ
   virtual
-  ~Rtpg();
-
+  ~Rtpg() {}
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief ランダムパタンを用いた故障シミュレーションを行う．
+  /// @brief 乱数生成器を初期化する．
+  /// @param[in] seed 乱数の種
+  virtual
+  void
+  init(ymuint32 seed) = 0;
+
+  /// @brief RTPGを行なう．
   /// @param[in] min_f 1回のシミュレーションで検出する故障数の下限
   /// @param[in] max_i 故障検出できないシミュレーション回数の上限
   /// @param[in] max_pat 最大のパタン数
+  /// @param[in] stats 実行結果の情報を格納する変数
+  virtual
   void
-  operator()(ymuint min_f,
-	     ymuint max_i,
-	     ymuint max_pat);
-
-  /// @brief 直前の実行結果を得る．
-  const RtpgStats&
-  stats() const;
-
-  /// @brief パタン生成用の乱数発生器を取り出す．
-  RandGen&
-  randgen();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // AtpgMgr
-  AtpgMgr* mAtpgMgr;
-
-  // パタン生成用の乱数生成器
-  RandGen mPatGen;
-
-  // 実行結果
-  RtpgStats mStats;
+  run(ymuint min_f,
+      ymuint max_i,
+      ymuint max_pat,
+      RtpgStats& stats) = 0;
 
 };
+
+
+/// @brief RtpgOld のインスタンスを生成する．
+/// @param[in] mgr AtpgMgr
+extern
+Rtpg*
+new_RtpgOld(AtpgMgr& mgr);
+
+/// @brief Rtpg のインスタンスを生成する．
+/// @param[in] mgr AtpgMgr
+extern
+Rtpg*
+new_Rtpg(AtpgMgr& mgr);
 
 END_NAMESPACE_YM_SATPG
 

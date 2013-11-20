@@ -49,7 +49,7 @@ public:
 
   /// @brief 入力数を得る．
   ymuint
-  ni() const;
+  input_num() const;
 
   /// @brief Walsh の 0次係数を得る．
   /// @return Walsh の 0次係数を返す．
@@ -65,14 +65,14 @@ public:
   /// @brief Walsh の 1次係数を得る．
   /// @param[in] pos 入力番号
   /// @return pos 番めの入力に対応する Walsh の 1次係数を返す．
-  /// @note \f$0 \leq pos < ni()\f$
+  /// @note \f$0 \leq pos < input_num()\f$
   int
   walsh_1(ymuint pos) const;
 
   /// @brief Walsh の 2次係数を得る．
   /// @param[in] pos1, pos2 入力番号
   /// @return pos1 番めと pos2 番めの入力に対応する Walsh の 2次係数を返す．
-  /// @note \f$0 \leq pos1, pos2 < ni()\f$
+  /// @note \f$0 \leq pos1, pos2 < input_num()\f$
   int
   walsh_2(ymuint pos1,
 	  ymuint pos2) const;
@@ -181,7 +181,7 @@ private:
   const TvFunc& mFunc;
 
   // 関数の入力数
-  ymuint32 mNi;
+  ymuint32 mInputNum;
 
   // Walsh の 0次係数
   ymint32 mW0;
@@ -240,9 +240,9 @@ NpnRawSig::func() const
 // 入力数を得る．
 inline
 ymuint
-NpnRawSig::ni() const
+NpnRawSig::input_num() const
 {
-  return mNi;
+  return mInputNum;
 }
 
 // Walsh の 0次係数を得る．
@@ -272,7 +272,7 @@ NpnRawSig::walsh_2(ymuint pos1,
     pos1 = pos2;
     pos2 = tmp;
   }
-  ymuint base = pos1 * ni() + pos2;
+  ymuint base = pos1 * input_num() + pos2;
   if ( (mW2flag[base] & 1) == 0 ) {
     int w2 = mFunc.walsh_2(VarId(pos1), VarId(pos2));
     if ( mW2flag[base] & 2 ) {
