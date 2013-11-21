@@ -1,0 +1,56 @@
+## Process this file with automake to produce Makefile.in
+
+SUBDIRS =
+
+EXTRA_DIST = local_defs $(TESTS)
+
+MAINTAINERCLEANFILES = Makefile.in
+
+TESTS_ENVIRONMENT = \
+	top_builddir=$(top_builddir) \
+	top_srcdir=$(top_srcdir)
+
+TESTS = \
+	parser.test
+
+testsubdir = testSubDir
+
+distclean-local:
+	-rm -rf $(testsubdir)
+
+LIBYM_BLIF = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+noinst_PROGRAMS = \
+	parser_test \
+	lexptest \
+	reader_test
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/blif
+
+parser_test_SOURCES = \
+	parser_test.cc \
+	TestBlifHandler.h \
+	TestBlifHandler.cc \
+	NullBlifHandler.h \
+	NullBlifHandler.cc
+
+parser_test_LDADD = $(LIBYM_BLIF)
+
+
+lexptest_SOURCES = \
+	lexptest.cc
+
+lexptest_LDADD = $(LIBYM_BLIF)
+
+
+reader_test_SOURCES = \
+	reader_test.cc
+
+reader_test_LDADD = $(LIBYM_BLIF)

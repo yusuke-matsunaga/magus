@@ -5,9 +5,7 @@
 /// @brief EiModule のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiModule.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -344,7 +342,7 @@ public:
   init_port(ymuint index,
 	    const PtPort* pt_port,
 	    ElbExpr* low_conn,
-	    tVpiDirection dir);
+	    tVlDirection dir);
 
   /// @brief ポートの high_conn を接続する．
   /// @param[in] index ポート番号

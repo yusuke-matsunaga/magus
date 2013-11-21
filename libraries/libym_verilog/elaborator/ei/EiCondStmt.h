@@ -5,9 +5,7 @@
 /// @brief EiCondStmt のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiCondStmt.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 // ステートメントを表すクラス
@@ -633,13 +631,13 @@ public:
   /// @brief case item のリストの要素数を返す．
   virtual
   ymuint
-  case_item_num() const;
+  caseitem_num() const;
 
   /// @brief case item を返す．
   /// @param[in] pos 位置番号
   virtual
   const VlCaseItem*
-  case_item(ymuint pos) const;
+  caseitem(ymuint pos) const;
 
 
 public:

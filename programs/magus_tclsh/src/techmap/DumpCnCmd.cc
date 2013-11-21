@@ -1,16 +1,17 @@
 
-/// @file magus/techmap/DumpCnCmd.cc
+/// @file DumpCnCmd.cc
 /// @brief DumpCnCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: DumpLutCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "DumpCnCmd.h"
 #include "ym_tclpp/TclPopt.h"
+#include "ym_networks/CmnDumper.h"
+#include "ym_networks/CmnBlifWriter.h"
+#include "ym_networks/CmnVerilogWriter.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -21,14 +22,14 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 
 // @brief コンストラクタ
 DumpCnCmd::DumpCnCmd(MagMgr* mgr,
-		     TechmapData* data) :
-  TechmapCmd(mgr, data)
+		     CmnMgr& cmnmgr) :
+  TechmapCmd(mgr, cmnmgr)
 {
   mPoptVerilog = new TclPopt(this, "verilog",
 			     "verilog mode");
-  mPoptSpice = new TclPopt(this, "spice",
-			   "spice mode");
-  new_popt_group(mPoptVerilog, mPoptSpice);
+  mPoptBlif = new TclPopt(this, "blif",
+			  "blif mode");
+  new_popt_group(mPoptVerilog, mPoptBlif);
   set_usage_string("?<filename>");
 }
 
@@ -47,9 +48,11 @@ DumpCnCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
   bool verilog = mPoptVerilog->is_specified();
-  bool spice = mPoptSpice->is_specified();
+  bool blif = mPoptBlif->is_specified();
 
+#if !defined(YM_DEBUG)
   try {
+#endif
     ostream* outp = &cout;
     ofstream ofs;
     if ( objc == 2 ) {
@@ -61,15 +64,19 @@ DumpCnCmd::cmd_proc(TclObjVector& objv)
       outp = &ofs;
     }
     if ( verilog ) {
-      dump_verilog(*outp, cngraph());
+      CmnVerilogWriter dump;
+      dump(*outp, cmnmgr());
     }
-    else if ( spice ) {
-      dump_spice(*outp, cngraph());
+    else if ( blif ) {
+      CmnBlifWriter dump;
+      dump(*outp, cmnmgr());
     }
     else {
-      dump(*outp, cngraph());
+      CmnDumper dump;
+      dump(*outp, cmnmgr());
     }
     return TCL_OK;
+#if !defined(YM_DEBUG)
   }
   catch ( AssertError x ) {
     cerr << x << endl;
@@ -78,6 +85,7 @@ DumpCnCmd::cmd_proc(TclObjVector& objv)
     set_result(emsg);
     return TCL_ERROR;
   }
+#endif
 
   return TCL_OK;
 }

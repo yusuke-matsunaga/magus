@@ -7,7 +7,7 @@
 ///
 /// $Id: VlModule.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,7 +18,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlModuleArray VlModule.h <ym_verilog/vl/VlModule.h>
+/// @class VlModuleArray VlModule.h "ym_verilog/vl/VlModule.h"
 /// @brief elaboration 中の module 配列を表すクラス
 //////////////////////////////////////////////////////////////////////
 class VlModuleArray :
@@ -77,7 +77,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlModule VlModule.h <ym_verilog/vl/VlModule.h>
+/// @class VlModule VlModule.h "ym_verilog/vl/VlModule.h"
 /// @brief elaboration 中の module を表すクラス
 //////////////////////////////////////////////////////////////////////
 class VlModule :

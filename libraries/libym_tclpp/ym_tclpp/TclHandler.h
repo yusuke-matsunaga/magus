@@ -5,9 +5,7 @@
 /// @brief TclHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TclHandler.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM_TCLPP
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclHandler TclHandler.h <ym_tclpp/TclHandler.h>
+/// @class TclHandler TclHandler.h "ym_tclpp/TclHandler.h"
 /// @ingroup Tclpp
 /// @brief Tcl のさまざまなハンドラの基底クラス
 //////////////////////////////////////////////////////////////////////
@@ -27,17 +25,17 @@ public:
 
   /// @brief コンストラクタ
   TclHandler();
-  
+
   /// @brief デストラクタ
   /// @note 登録されているハンドラがあればそれを削除する．
   virtual
   ~TclHandler();
-  
+
   /// @brief 現在，ハンドラが登録されているかを調べる．
   /// @return 登録されていたら true を返す．
   bool
   is_registered() const;
-  
+
   /// @brief ハンドラを登録する共通関数．
   /// @note 実際の振舞いは仮想関数 create_handler() で定義する．
   /// 多くのハンドラは登録の際に引数を必要とするので，
@@ -45,7 +43,7 @@ public:
   virtual
   void
   reg_common();
-  
+
   /// @brief ハンドラを削除する．
   /// @note 実際の振舞いは仮想関数 delete_handler() で定義する．
   virtual
@@ -87,7 +85,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclFileHandler TclHandler.h <ym_tclpp/Tclpp.h>
+/// @class TclFileHandler TclHandler.h "ym_tclpp/TclHandler.h"
 /// @ingroup Tclpp
 /// @brief Tcl のファイルイベントハンドラの純粋仮想クラス
 ///
@@ -104,20 +102,20 @@ public:
   /// @brief コンストラクタ
   /// @note この時点では登録されていない．
   TclFileHandler();
-  
+
   /// @brief デストラクタ
   /// @note ハンドラが登録されていたら削除する．
   virtual
   ~TclFileHandler();
-  
+
   /// @brief ファイルハンドルを得る．
   int
   file() const;
-  
+
   /// @brief マスクを得る．
   int
   mask() const;
-  
+
   /// @brief ハンドラの登録を行う．
   /// @param[in] file ファイルハンドル
   /// @param[in] mask イベントマスク
@@ -125,7 +123,7 @@ public:
   void
   reg(int file,
       int mask);
-  
+
   /// @brief マスクを指定し直して再登録する．
   /// @param[in] mask イベントマスク
   /// mask = 0 とすればイベントを受けとらないようにすることができる．
@@ -134,7 +132,7 @@ public:
   virtual
   void
   change_mask(int mask);
-  
+
   // ハンドラの削除は TclHandler::unreg() で行なう．
   // といっても中で delete_handler() が呼ばれるんだけどね．
 
@@ -181,7 +179,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclIdleHandler TclHandler.h <ym_tclpp/Tclpp.h>
+/// @class TclIdleHandler TclHandler.h "ym_tclpp/Tclpp.h"
 /// @ingroup Tclpp
 /// @brief Tcl のアイドルコールバックハンドラの純粋仮想クラス
 ///
@@ -197,12 +195,12 @@ public:
   /// @brief コンストラクタ
   /// @note コールバックの登録はしない．
   TclIdleHandler();
-  
+
   /// @brief デストラクタ
   /// アイドルコールバックが登録されていたら削除する．
   virtual
   ~TclIdleHandler();
-  
+
   /// @brief 登録を行なう．
   void
   reg();
@@ -227,7 +225,7 @@ protected:
 
 
 private:
-  
+
   /// @brief Tcl に登録するみかけ上のイベント処理関数
   static
   void
@@ -237,7 +235,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclTimerHandler TclHandler.h <ym_tclpp/Tclpp.h>
+/// @class TclTimerHandler TclHandler.h "ym_tclpp/Tclpp.h"
 /// @ingroup Tclpp
 /// @brief Tcl のタイマハンドラを表す純粋仮想クラス
 ///
@@ -253,17 +251,17 @@ public:
   /// @brief コンストラクタ
   /// @note 登録はしない．
   TclTimerHandler();
-  
+
   /// @brief デストラクタ
   /// @note 未処理のイベントがあれば削除する．
   virtual
   ~TclTimerHandler();
-  
+
   /// @brief インターバルを得る．
   /// @note 一度も reg() を呼んでいなければ値は不定
   int
   interval() const;
-  
+
   /// @brief インターバルを指定して登録する．
   /// @param[in] interval イベントを駆動する間隔 (ミリ秒)
   void
@@ -289,7 +287,7 @@ protected:
 
 
 private:
-  
+
   /// @brief Tcl に登録するみかけ上のイベント処理関数
   static
   void
@@ -310,7 +308,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPeriodicTimerHandler TclHandler.h <ym_tclpp/Tclpp.h>
+/// @class TclPeriodicTimerHandler TclHandler.h "ym_tclpp/TclHandler.h"
 /// @ingroup Tclpp
 /// @brief 周期的にイベント処理を行なうハンドラの純粋仮想クラス
 ///
@@ -327,7 +325,7 @@ public:
 
   /// @brief コンストラクタ
   TclPeriodicTimerHandler();
-  
+
   /// @brief デストラクタ
   virtual
   ~TclPeriodicTimerHandler();
@@ -351,7 +349,7 @@ protected:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-  
+
 // 現在，ハンドラが登録されているかを調べる．
 inline
 bool
@@ -359,7 +357,7 @@ TclHandler::is_registered() const
 {
   return mRegFlag;
 }
-  
+
 // ファイルハンドルを得る．
 inline
 int
@@ -375,7 +373,7 @@ TclFileHandler::mask() const
 {
   return mMask;
 }
-  
+
 // 登録を行なう．
 inline
 void

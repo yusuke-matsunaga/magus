@@ -8,13 +8,21 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	cell_nsdef.h \
-	cell_type.h \
 	Cell.h \
+	CellArea.h \
 	CellBundle.h \
 	CellBus.h \
+	CellCapacitance.h \
+	CellClass.h \
+	CellDotlibReader.h \
+	CellFFInfo.h \
+	CellGroup.h \
+	CellLatchInfo.h \
 	CellLibrary.h \
 	CellLut.h \
-	CellDotlibReader.h \
 	CellMislibReader.h \
+	CellPatGraph.h \
 	CellPin.h \
+	CellResistance.h \
+	CellTime.h \
 	CellTiming.h

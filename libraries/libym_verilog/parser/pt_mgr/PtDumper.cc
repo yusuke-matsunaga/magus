@@ -20,8 +20,9 @@
 #include "ym_verilog/pt/PtExpr.h"
 #include "ym_verilog/pt/PtMisc.h"
 #include "ym_verilog/pt/PtArray.h"
+#include "ym_verilog/VlUdpVal.h"
 
-#include <ym_utils/StrBuff.h>
+#include "ym_utils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -176,7 +177,7 @@ PtDumper::put(const char* label,
   PtHeader x(*this, label, "UdpValue");
 
   put("mFileRegion", v->file_region());
-  put("mSymbol", symbol2string(v->symbol()).c_str());
+  put("mSymbol", v->symbol().to_string());
 }
 
 BEGIN_NONAMESPACE
@@ -340,6 +341,7 @@ PtDumper::put(const char* label,
     case kVpiVarReal:            nm = "Parameter(real)"; break;
     case kVpiVarTime:            nm = "Parameter(time)"; break;
     case kVpiVarRealtime:        nm = "Parameter(realtime)"; break;
+    default: assert_not_reached(__FILE__, __LINE__); break;
     }
     break;
   case kPtDecl_LocalParam:
@@ -349,6 +351,7 @@ PtDumper::put(const char* label,
     case kVpiVarReal:            nm = "Localparam(real)"; break;
     case kVpiVarTime:            nm = "Localparam(time)"; break;
     case kVpiVarRealtime:        nm = "Localparam(realtime)"; break;
+    default: assert_not_reached(__FILE__, __LINE__); break;
     }
     break;
   case kPtDecl_Reg:            nm = "Reg";        break;
@@ -358,8 +361,8 @@ PtDumper::put(const char* label,
     case kVpiVarReal:            nm = "Real";       break;
     case kVpiVarTime:            nm = "Time";       break;
     case kVpiVarRealtime:        nm = "Realtime";  break;
-    case kVpiVarNone:
-      assert_not_reached(__FILE__, __LINE__);
+    case kVpiVarNone: assert_not_reached(__FILE__, __LINE__);
+    default: assert_not_reached(__FILE__, __LINE__); break;
     }
     break;
   case kPtDecl_Genvar:         nm = "Genvar";     break;
@@ -379,8 +382,10 @@ PtDumper::put(const char* label,
     case kVpiWand:               nm = "Wand"; break;
     case kVpiWor:                nm = "Wor"; break;
     case kVpiNone:               nm = "None"; break;
+    default: assert_not_reached(__FILE__, __LINE__); break;
     }
     break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
   PtHeader x(*this, label, nm);
 
@@ -438,6 +443,7 @@ PtDumper::put(const char* label,
     case kVpiVarReal:            nm = "Function(real)"; break;
     case kVpiVarTime:            nm = "Function(time)"; break;
     case kVpiVarRealtime:        nm = "Function(realtime)"; break;
+    default: assert_not_reached(__FILE__, __LINE__); break;
     }
     break;
   case kPtItem_GateInst:        nm = "GateHeader"; break;
@@ -448,6 +454,7 @@ PtDumper::put(const char* label,
     case kVpiPulsestyleOnDetect: nm = "Pulse_ondetect"; break;
     case kVpiShowcancelled:      nm = "Showcancelled"; break;
     case kVpiNoshowcancelled:    nm = "Noshowcancelld"; break;
+    default: assert_not_reached(__FILE__, __LINE__); break;
     }
   case kPtItem_SpecPath:        nm = "SpecPath"; break;
   case kPtItem_Generate:        nm = "Generate"; break;
@@ -455,6 +462,7 @@ PtDumper::put(const char* label,
   case kPtItem_GenIf:           nm = "GenIf"; break;
   case kPtItem_GenCase:         nm = "GenCase"; break;
   case kPtItem_GenFor:          nm = "GenFor"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
   PtHeader x(*this, label, nm);
 
@@ -622,6 +630,7 @@ PtDumper::put(const char* label,
     put_decl_item("mBody", item->declhead_array(), item->item_array());
     break;
 
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }
 
@@ -747,6 +756,7 @@ PtDumper::put(const char* label,
   case kPtSeqBlockStmt:      nm = "Begin"; break;
   case kPtNamedParBlockStmt: nm = "Fork"; break;
   case kPtNamedSeqBlockStmt: nm = "Begin"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
   PtHeader x(*this, label, nm);
 
@@ -854,6 +864,8 @@ PtDumper::put(const char* label,
       put("mStatement", stmt1);
     }
     break;
+
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }
 
@@ -870,7 +882,7 @@ PtDumper::put(const char* label,
 
   switch ( expr->type() ) {
   case kPtOprExpr:
-    if ( expr->op_type() == kVpiNullOp ) {
+    if ( expr->op_type() == kVlNullOp ) {
       // '(' expression ')' なので無視
       return put(label, expr->operand(0));
     }
@@ -957,6 +969,8 @@ PtDumper::put(const char* label,
       }
     }
     break;
+
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }
 
@@ -1094,6 +1108,7 @@ PtDumper::put(const char* label,
   case kVpiAuxNet:  mStream << "net"; break;
   case kVpiAuxReg:  mStream << "reg"; break;
   case kVpiAuxVar:  mStream << "var"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }
 
@@ -1118,6 +1133,7 @@ PtDumper::put(const char* label,
   case kVpiWand:    mStream << "wand"; break;
   case kVpiWor:     mStream << "wor"; break;
   case kVpiNone:    mStream << "none"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }
 
@@ -1135,6 +1151,7 @@ PtDumper::put(const char* label,
   case kVpiVarTime:     mStream << "time"; break;
   case kVpiVarRealtime: mStream << "realtime"; break;
   case kVpiVarNone:     mStream << "none"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }
 
@@ -1143,16 +1160,10 @@ PtDumper::put(const char* label,
 // @param[in] direction 方向
 void
 PtDumper::put(const char* label,
-	      tVpiDirection direction)
+	      tVlDirection direction)
 {
   PtHeader x(*this, label, "direction", false);
-  switch ( direction ) {
-  case kVpiInput:       mStream << "input"; break;
-  case kVpiOutput:      mStream << "output"; break;
-  case kVpiInout:       mStream << "inout"; break;
-  case kVpiMixedIO:     mStream << "mixed IO"; break;
-  case kVpiNoDirection: mStream << "no direction"; break;
-  }
+  mStream << direction;
 }
 
 // @brief unconnected drive の出力
@@ -1167,6 +1178,7 @@ PtDumper::put(const char* label,
   case kVpiHighZ: mStream << "high-Z"; break;
   case kVpiPull1: mStream << "pull-1"; break;
   case kVpiPull0: mStream << "pull-0"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }
 
@@ -1185,6 +1197,7 @@ PtDumper::put(const char* label,
   case kVpiDelayModeUnit:    mStream << "unit"; break;
   case kVpiDelayModeZero:    mStream << "zero"; break;
   case kVpiDelayModeMTM:     mStream << "min-typ-max"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }
 
@@ -1225,6 +1238,7 @@ PtDumper::put(const char* label,
   case kVpiPulldownPrim: mStream << "pulldown"; break;
   case kVpiSeqPrim:      mStream << "seq"; break;
   case kVpiCombPrim:     mStream << "comb"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }
 
@@ -1233,53 +1247,54 @@ PtDumper::put(const char* label,
 // @param[in] op_type 演算子型
 void
 PtDumper::put(const char* label,
-	      tVpiOpType op_type)
+	      tVlOpType op_type)
 {
   PtHeader x(*this, label, "op_type", false);
   switch ( op_type ) {
-  case kVpiMinusOp:       mStream << "minus"; break;
-  case kVpiPlusOp:        mStream << "plus"; break;
-  case kVpiNotOp:         mStream << "not"; break;
-  case kVpiBitNegOp:      mStream << "bitneg"; break;
-  case kVpiUnaryAndOp:    mStream << "unary and"; break;
-  case kVpiUnaryNandOp:   mStream << "unary nand"; break;
-  case kVpiUnaryOrOp:     mStream << "unary or"; break;
-  case kVpiUnaryNorOp:    mStream << "unary nor"; break;
-  case kVpiUnaryXorOp:    mStream << "unary xor"; break;
-  case kVpiUnaryXNorOp:   mStream << "unary xnor"; break;
-  case kVpiSubOp:         mStream << "sub"; break;
-  case kVpiDivOp:         mStream << "div"; break;
-  case kVpiModOp:         mStream << "mod"; break;
-  case kVpiEqOp:          mStream << "eq"; break;
-  case kVpiNeqOp:         mStream << "neq"; break;
-  case kVpiCaseEqOp:      mStream << "caseeq"; break;
-  case kVpiCaseNeqOp:     mStream << "caseneq"; break;
-  case kVpiGtOp:          mStream << "gt"; break;
-  case kVpiGeOp:          mStream << "ge"; break;
-  case kVpiLtOp:          mStream << "lt"; break;
-  case kVpiLeOp:          mStream << "le"; break;
-  case kVpiLShiftOp:      mStream << "left shift"; break;
-  case kVpiRShiftOp:      mStream << "right shift"; break;
-  case kVpiAddOp:         mStream << "add"; break;
-  case kVpiMultOp:        mStream << "mult"; break;
-  case kVpiLogAndOp:      mStream << "logical and"; break;
-  case kVpiLogOrOp:       mStream << "logical or"; break;
-  case kVpiBitAndOp:      mStream << "bit and"; break;
-  case kVpiBitOrOp:       mStream << "bit or"; break;
-  case kVpiBitXorOp:      mStream << "bit xor"; break;
-  case kVpiBitXNorOp:     mStream << "bit xnor"; break;
-  case kVpiConditionOp:   mStream << "conditional"; break;
-  case kVpiConcatOp:      mStream << "concat"; break;
-  case kVpiMultiConcatOp: mStream << "multi concat"; break;
-  case kVpiEventOrOp:     mStream << "event or"; break;
-  case kVpiNullOp:        mStream << "null"; break;
-  case kVpiListOp:        mStream << "list"; break;
-  case kVpiMinTypMaxOp:   mStream << "min-typ-max"; break;
-  case kVpiPosedgeOp:     mStream << "posedge"; break;
-  case kVpiNegedgeOp:     mStream << "negedge"; break;
-  case kVpiArithLShiftOp: mStream << "arithmetic left shift"; break;
-  case kVpiArithRShiftOp: mStream << "arithmetic right shift"; break;
-  case kVpiPowerOp:       mStream << "power"; break;
+  case kVlMinusOp:       mStream << "minus"; break;
+  case kVlPlusOp:        mStream << "plus"; break;
+  case kVlNotOp:         mStream << "not"; break;
+  case kVlBitNegOp:      mStream << "bitneg"; break;
+  case kVlUnaryAndOp:    mStream << "unary and"; break;
+  case kVlUnaryNandOp:   mStream << "unary nand"; break;
+  case kVlUnaryOrOp:     mStream << "unary or"; break;
+  case kVlUnaryNorOp:    mStream << "unary nor"; break;
+  case kVlUnaryXorOp:    mStream << "unary xor"; break;
+  case kVlUnaryXNorOp:   mStream << "unary xnor"; break;
+  case kVlSubOp:         mStream << "sub"; break;
+  case kVlDivOp:         mStream << "div"; break;
+  case kVlModOp:         mStream << "mod"; break;
+  case kVlEqOp:          mStream << "eq"; break;
+  case kVlNeqOp:         mStream << "neq"; break;
+  case kVlCaseEqOp:      mStream << "caseeq"; break;
+  case kVlCaseNeqOp:     mStream << "caseneq"; break;
+  case kVlGtOp:          mStream << "gt"; break;
+  case kVlGeOp:          mStream << "ge"; break;
+  case kVlLtOp:          mStream << "lt"; break;
+  case kVlLeOp:          mStream << "le"; break;
+  case kVlLShiftOp:      mStream << "left shift"; break;
+  case kVlRShiftOp:      mStream << "right shift"; break;
+  case kVlAddOp:         mStream << "add"; break;
+  case kVlMultOp:        mStream << "mult"; break;
+  case kVlLogAndOp:      mStream << "logical and"; break;
+  case kVlLogOrOp:       mStream << "logical or"; break;
+  case kVlBitAndOp:      mStream << "bit and"; break;
+  case kVlBitOrOp:       mStream << "bit or"; break;
+  case kVlBitXorOp:      mStream << "bit xor"; break;
+  case kVlBitXNorOp:     mStream << "bit xnor"; break;
+  case kVlConditionOp:   mStream << "conditional"; break;
+  case kVlConcatOp:      mStream << "concat"; break;
+  case kVlMultiConcatOp: mStream << "multi concat"; break;
+  case kVlEventOrOp:     mStream << "event or"; break;
+  case kVlNullOp:        mStream << "null"; break;
+  case kVlListOp:        mStream << "list"; break;
+  case kVlMinTypMaxOp:   mStream << "min-typ-max"; break;
+  case kVlPosedgeOp:     mStream << "posedge"; break;
+  case kVlNegedgeOp:     mStream << "negedge"; break;
+  case kVlArithLShiftOp: mStream << "arithmetic left shift"; break;
+  case kVlArithRShiftOp: mStream << "arithmetic right shift"; break;
+  case kVlPowerOp:       mStream << "power"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }
 
@@ -1303,6 +1318,7 @@ PtDumper::put(const char* label,
   case kVpiSignedBinaryConst: mStream << "signed binary"; break;
   case kVpiSignedOctConst:    mStream << "signed oct"; break;
   case kVpiSignedHexConst:    mStream << "signed hex"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }
 
@@ -1324,6 +1340,7 @@ PtDumper::put(const char* label,
   case kVpiMediumCharge: mStream << "medium"; break;
   case kVpiSmallCharge:  mStream << "small"; break;
   case kVpiHiZ:          mStream << "high-Z"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }
 
@@ -1339,6 +1356,7 @@ PtDumper::put(const char* label,
   case kVpiVsNone:   mStream << "none"; break;
   case kVpiVectored: mStream << "vectored"; break;
   case kVpiScalared: mStream << "scalared"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }
 
@@ -1355,6 +1373,7 @@ PtDumper::put(const char* label,
   case kVpiConstRange: mStream << "constant range"; break;
   case kVpiPlusRange:  mStream << "plus range"; break;
   case kVpiMinusRange: mStream << "minus range"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }
 
@@ -1483,6 +1502,7 @@ PtDumper::put(const char* label,
   case kPtDelayControl:  nm = "DelayControl"; break;
   case kPtEventControl:  nm = "EventControl"; break;
   case kPtRepeatControl: nm = "RepeatControl"; break;
+  default: assert_not_reached(__FILE__, __LINE__); break;
   }
   PtHeader x(*this, label, nm);
 

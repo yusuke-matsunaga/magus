@@ -28,7 +28,7 @@ GateSa::GateSa() :
 GateSa::~GateSa()
 {
 }
-  
+
 bool
 GateSa::is_f_site() const
 {
@@ -121,7 +121,7 @@ GateSa0::name() const
 tTgGateType
 GateSa0::gate_type() const
 {
-  return kTgConst0;
+  return kTgGateConst0;
 }
 
 // @brief 名前とゲート型を表す文字列を返す．
@@ -157,7 +157,7 @@ GateSa1::name() const
 tTgGateType
 GateSa1::gate_type() const
 {
-  return kTgConst1;
+  return kTgGateConst1;
 }
 
 // @brief 名前とゲート型を表す文字列を返す．

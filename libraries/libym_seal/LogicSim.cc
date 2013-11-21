@@ -27,7 +27,7 @@ LogicSim::LogicSim(const BNetwork* bnetwork) :
 LogicSim::~LogicSim()
 {
 }
-  
+
 // @brief シミュレーションを行う．
 // @param[in] input_vector 入力ベクタを整数にしたもの
 // @param[in] cur_state 現状態
@@ -66,7 +66,7 @@ LogicSim::operator()(ymuint input_vector,
   for (BNodeVector::iterator p = mNodeArray.begin(); p != mNodeArray.end(); ++ p) {
     BNode* node = *p;
     LogExpr node_func = node->func();
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     vector<ymulong> fanin_vals(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       BNode* inode = node->fanin(i);
@@ -74,7 +74,7 @@ LogicSim::operator()(ymuint input_vector,
     }
     mValArray[node->id()] = node_func.eval(fanin_vals, 1UL);
   }
-  
+
   output_vector = 0U;
   var_num = 0;
   for (BNodeList::const_iterator p = mNetwork->outputs_begin();

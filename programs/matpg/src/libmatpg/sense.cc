@@ -10,13 +10,13 @@
  *
  * Revision 2.2  91/12/28  16:59:19  yusuke
  * Final , Final revision
- * 
+ *
  * Revision 2.1  91/12/26  19:57:47  yusuke
  * Final revision of version 2
- * 
+ *
  * Revision 2.0  91/12/21  18:56:49  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.5  1991/10/05  08:18:18  yusuke
  * add Log and RCSid for RCS
  *
@@ -96,9 +96,9 @@ get_df1(gate_t* gate)
       dfs.push_back(gate);
     }
     else if (gate->is_po() == false) {
-      int no = gate->get_act_no();
+      int no = gate->get_act_fanout_num();
       for ( int i = 0; i < no; ) {
-	get_df1(gate->get_act_fogate(i ++));
+	get_df1(gate->get_act_fanout_gate(i ++));
       }
     }
     else {
@@ -119,16 +119,16 @@ sensitize(gate_t* f_node)
   dfs.clear();
   reach_to_po = false;
   gn_clr_mark();
-  int f_no = f_node->get_act_no();
+  int f_no = f_node->get_act_fanout_num();
   for ( int i = 0; i < f_no; i ++) {
-    if (f_node->get_act_fogate(i)->is_f_site() == true) {
-      get_df1(f_node->get_act_fogate(i));
+    if (f_node->get_act_fanout_gate(i)->is_f_site() == true) {
+      get_df1(f_node->get_act_fanout_gate(i));
     }
   }
   if (dfs.empty() || reach_to_po == true) {
     return;
   }
-  
+
   /* mark 'primary path' */
   gn_clr_mark();
   int max_side_val = dfs[0]->lvl_i;
@@ -141,8 +141,8 @@ sensitize(gate_t* f_node)
   }
   gate_t* gate = dfs[0];
   for ( ; ; ) {
-    int ni = gate->get_ni();
-    int no = gate->get_act_no();
+    int ni = gate->get_fanin_num();
+    int no = gate->get_act_fanout_num();
     if (gate->lvl_i >= max_side_val) {
       /* gate is a single dominator */
       if (gate->get_gval() == val_X) {
@@ -156,7 +156,7 @@ sensitize(gate_t* f_node)
 	  val3 nc_val = gate->get_nc_val();
 	  if (nc_val != val_X) {
 	    for (int i = ni; -- i >= 0; ) {
-	      gate_t* i_gate = gate->get_figate(i);
+	      gate_t* i_gate = gate->get_fanin_gate(i);
 	      if (i_gate->get_gval() == val_X) {
 		if (i_gate->chk_fcone() == false) {
 		  maq_add(i_gate, nc_val, val_X);
@@ -182,7 +182,7 @@ sensitize(gate_t* f_node)
       /* finding path controller */
       if (ni >= 2 && gate->get_c_val() != val_X) {
 	for (int i = ni; -- i >= 0; ) {
-	  gate_t* i_gate = gate->get_figate(i);
+	  gate_t* i_gate = gate->get_fanin_gate(i);
 	  if (i_gate->chk_dif() == true
 	      || i_gate->get_gval() != val_X) {
 	    continue;
@@ -191,12 +191,12 @@ sensitize(gate_t* f_node)
 	  val3 root_ncval = gate->get_nc_val();
 	  val3 root_cval = gate->get_c_val();
 #ifndef NAIVE_SENSE
-	  while (root->get_ni() == 1) {
-	    if ( root->get_gtype() == kTgNot ) {
+	  while (root->get_fanin_num() == 1) {
+	    if ( root->get_gtype() == kTgGateNot ) {
 	      root_cval = neg3(root_cval);
 	      root_ncval = neg3(root_ncval);
 	    }
-	    root = root->get_figate(0);
+	    root = root->get_fanin_gate(0);
 	  }
 #endif
 	  max_p = -1;
@@ -235,7 +235,7 @@ sensitize(gate_t* f_node)
 
     /* find next primary path node */
     for (int i = 0; i < no; i ++) {
-      gate_t* o_gate = gate->get_act_fogate(i);
+      gate_t* o_gate = gate->get_act_fanout_gate(i);
       if (o_gate->chk_ppath() == true) {
 	gate = o_gate;
 	break;
@@ -257,9 +257,9 @@ mark_ppath(gate_t* gate)
   }
   gate_t* best_fo = NULL;
   int best_lvl = max_level + 1;
-  int no = gate->get_act_no();
+  int no = gate->get_act_fanout_num();
   for (int i = 0; i < no; i ++) {
-    gate_t* gate1 = gate->get_act_fogate(i);
+    gate_t* gate1 = gate->get_act_fanout_gate(i);
     if (gate1->chk_pg() == true) {
       if (gate1->min_lvl_i < best_lvl) {
 	best_lvl = gate1->min_lvl_i;
@@ -276,7 +276,7 @@ mark_ppath(gate_t* gate)
   }
   mark_ppath(best_fo);
   for (int i = 0; i < no; i ++) {
-    gate_t* gate1 = gate->get_act_fogate(i);
+    gate_t* gate1 = gate->get_act_fanout_gate(i);
     if (gate1->chk_pg() == true) {
       if (gate1 == best_fo) continue;
       int side_val1 = mark_spath(gate1);
@@ -311,9 +311,9 @@ mark_spath(gate_t* gate)
     return side_val(gate) = max_level;
   }
   int max_side_val = -1;
-  int no = gate->get_act_no();
+  int no = gate->get_act_fanout_num();
   for ( int i = 0; i < no; i ++) {
-    gate_t* gate1 = gate->get_act_fogate(i);
+    gate_t* gate1 = gate->get_act_fanout_gate(i);
     if (gate1->chk_pg() == true) {
       int side_val1 = mark_spath(gate1);
       if (side_val1 > max_side_val) {
@@ -330,17 +330,17 @@ set_block(gate_t* gate,
 	  val3 cval)
 {
   blocks.clear();
-  for (int i = gate->get_act_no(); -- i >= 0; ) {
-    gate_t* o_gate = gate->get_act_fogate(i);
+  for (int i = gate->get_act_fanout_num(); -- i >= 0; ) {
+    gate_t* o_gate = gate->get_act_fanout_gate(i);
     if (o_gate->chk_pg() == false) {
 #ifndef NAIVE_SENSE
-      if (o_gate->get_ni() != 1) {
+      if (o_gate->get_fanin_num() != 1) {
 	if (o_gate->get_c_val() == cval) {
 	  set_block(o_gate, o_gate->get_o_val());
 	}
       }
       else {
-	if ( o_gate->get_gtype() == kTgNot ) {
+	if ( o_gate->get_gtype() == kTgGateNot ) {
 	  set_block(o_gate, neg3(cval));
 	}
 	else {
@@ -406,9 +406,9 @@ chk_another_path(gate_t* gate)
       return true;
     }
   }
-  int no = gate->get_act_no();
+  int no = gate->get_act_fanout_num();
   for ( int i = 0; i < no; i ++) {
-    gate_t* o_gate = gate->get_act_fogate(i);
+    gate_t* o_gate = gate->get_act_fanout_gate(i);
     if (o_gate->chk_pg() == true) {
       if (chk_another_path(o_gate) == true) {
 	return true;

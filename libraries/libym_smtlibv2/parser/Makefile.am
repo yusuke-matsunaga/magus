@@ -4,14 +4,14 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## build targets
+############################################################
 noinst_LTLIBRARIES = \
 	libym_smt_parser.la
 
@@ -19,14 +19,18 @@ noinst_LTLIBRARIES = \
 ############################################################
 ## libym_smt_parser.la
 ############################################################
+libym_smt_parser_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include
+
 libym_smt_parser_la_SOURCES = \
-	SmtLibLex.cc \
+	SmtLibScanner.h \
+	SmtLibScanner.cc \
 	SmtLibNodeImpl.h \
 	SmtLibNodeImpl.cc \
-	SmtLibParser.h \
 	SmtLibParser.cc
 
-libym_smt_parser_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_smt_parser_la_LIBADD =
 
 libym_smt_parser_la_LDFLAGS =

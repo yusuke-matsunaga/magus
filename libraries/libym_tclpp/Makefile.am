@@ -5,25 +5,39 @@
 SUBDIRS = \
 	ym_tclpp \
 	. \
-	examples
+	tests
 
 MAINTAINERCLEANFILES = Makefile.in
 
-INCLUDES = $(TCL_INCLUDES) \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+
+############################################################
+## Variables for building targets
+############################################################
 
 noinst_LTLIBRARIES = libym_tclpp.la
 
-libym_tclpp_la_LIBADD = \
+
+############################################################
+## Variables for building libym_tclpp.la
+############################################################
+
+libym_tclpp_la_CPPFLAGS = \
+	$(TCL_INCLUDES) \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+libym_tclpp_la_LIBADD =
+
+libym_tclpp_la_LDFLAGS = \
 	$(TCL_LDADD)
-libym_tclpp_la_LDFLAGS = 
+
 libym_tclpp_la_SOURCES = \
 	StrBuf.h \
 	TclPoptGroup.h \
 	TclObj.cc \
 	TclBase.cc \
 	TclCmd.cc \
+	TclObjMsgHandler.cc \
 	TclPopt.cc \
 	TclVarTrace.cc \
 	TclHandler.cc

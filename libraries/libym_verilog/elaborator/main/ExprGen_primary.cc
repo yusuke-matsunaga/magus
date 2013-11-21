@@ -26,6 +26,8 @@
 #include "ElbExpr.h"
 #include "ElbGenvar.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -204,6 +206,17 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     bool stat1 = evaluate_int(parent, pt_expr1, index_val, false);
     if ( stat1 ) {
       // 固定インデックスだった．
+      ymuint offset;
+      bool stat2 = decl_base->calc_bit_offset(index_val, offset);
+      if ( !stat2 ) {
+	// インデックスが範囲外
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			pt_expr1->file_region(),
+			kMsgWarning,
+			"ELAB",
+			"Bit-Select index is out of range.");
+	// ただ値が X になるだけでエラーにはならないそうだ．
+      }
       return factory().new_BitSelect(pt_expr, primary, pt_expr1, index_val);
     }
     ElbExpr* index = instantiate_expr(parent, index_env, pt_expr1);
@@ -231,6 +244,27 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	  // 範囲の順番が逆
 	  error_range_order(pt_expr);
 	  return NULL;
+	}
+	ymuint offset;
+	bool stat3 = decl_base->calc_bit_offset(index1_val, offset);
+	if ( !stat3 ) {
+	  // 左のインデックスが範囲外
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_left->file_region(),
+			  kMsgWarning,
+			  "ELAB",
+			  "Left index is out of range.");
+	  // ただ値が X になるだけでエラーにはならないそうだ．
+	}
+	bool stat4 = decl_base->calc_bit_offset(index2_val, offset);
+	if ( !stat4 ) {
+	  // 右のインデックスが範囲外
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_right->file_region(),
+			  kMsgWarning,
+			  "ELAB",
+			  "Right index is out of range.");
+	  // ただ値が X になるだけでエラーにはならないそうだ．
 	}
 	return factory().new_PartSelect(pt_expr, primary,
 					pt_left, pt_right,
@@ -260,6 +294,18 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	  else {
 	    index1_val = base_val;
 	    index2_val = base_val + range_val - 1;
+	  }
+	  ymuint offset;
+	  bool stat3 = decl_base->calc_bit_offset(index1_val, offset);
+	  bool stat4 = decl_base->calc_bit_offset(index2_val, offset);
+	  if ( !stat3 || !stat4 ) {
+	    // 左か右のインデックスが範囲外
+	    MsgMgr::put_msg(__FILE__, __LINE__,
+			    pt_expr->file_region(),
+			    kMsgWarning,
+			    "ELAB",
+			    "Index is out of range.");
+	    // ただ値が X になるだけでエラーにはならないそうだ．
 	  }
 	  return factory().new_PartSelect(pt_expr, primary,
 					  pt_base, pt_range,
@@ -298,6 +344,18 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	  else {
 	    index1_val = base_val - range_val + 1;
 	    index2_val = base_val;
+	  }
+	  ymuint offset;
+	  bool stat3 = decl_base->calc_bit_offset(index1_val, offset);
+	  bool stat4 = decl_base->calc_bit_offset(index2_val, offset);
+	  if ( !stat3 || !stat4 ) {
+	    // 左か右のインデックスが範囲外
+	    MsgMgr::put_msg(__FILE__, __LINE__,
+			    pt_expr->file_region(),
+			    kMsgWarning,
+			    "ELAB",
+			    "Index is out of range.");
+	    // ただ値が X になるだけでエラーにはならないそうだ．
 	  }
 	  return factory().new_PartSelect(pt_expr, primary,
 					  pt_base, pt_range,
@@ -485,7 +543,7 @@ ExprGen::instantiate_primary_sub(ElbObjHandle* handle,
   ElbParameter* param = handle->parameter();
   ElbDecl* decl = handle->decl();
   ElbDeclArray* declarray = handle->declarray();
-  tVpiValueType value_type;
+  VlValueType value_type;
   if ( param != NULL ) {
     primary = factory().new_Primary(pt_expr, param);
     is_array = false;
@@ -566,7 +624,7 @@ ExprGen::instantiate_primary_sub(ElbObjHandle* handle,
   }
 
   if ( has_range_select || has_bit_select ) {
-    if ( value_type == kVpiValueReal ) {
+    if ( value_type.is_real_type() ) {
       error_select_for_real(pt_expr);
       return NULL;
     }
@@ -616,30 +674,35 @@ ExprGen::check_decl(const ElbEnv& env,
       error_select_in_force(pt_expr);
       return false;
     }
-    if ( decl_type != kVpiNet &
-	 decl_type != kVpiReg &
-	 decl_type != kVpiIntegerVar &
-	 decl_type != kVpiRealVar &
+    if ( decl_type != kVpiNet &&
+	 decl_type != kVpiReg &&
+	 decl_type != kVpiIntegerVar &&
+	 decl_type != kVpiRealVar &&
 	 decl_type != kVpiTimeVar) {
       // net/reg/変数以外はダメ
       error_illegal_object(pt_expr);
       return false;
     }
   }
-  else if ( env.is_net_lhs() &&
-       decl_type != kVpiNet ) {
-    // net 以外はダメ
-    error_illegal_object(pt_expr);
-    return false;
+  else if ( env.is_net_lhs() ) {
+    if ( decl_type != kVpiNet &&
+	 (decl_type != kVpiNetArray || !is_array) ) {
+      // net 以外はダメ
+      error_illegal_object(pt_expr);
+      return false;
+    }
   }
-  else if ( env.is_var_lhs() &&
-       ( decl_type != kVpiReg &&
+  else if ( env.is_var_lhs() ) {
+    if ( decl_type != kVpiReg &&
+	 (decl_type != kVpiRegArray || !is_array) &&
 	 decl_type != kVpiIntegerVar &&
 	 decl_type != kVpiRealVar &&
-	 decl_type != kVpiTimeVar ) ) {
-    // reg/変数以外はダメ
-    error_illegal_object(pt_expr);
-    return false;
+	 decl_type != kVpiTimeVar &&
+	 decl_type != kVpiVarSelect ) {
+      // reg/変数以外はダメ
+      error_illegal_object(pt_expr);
+      return false;
+    }
   }
   else {
     // 右辺系の環境
@@ -764,7 +827,7 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
     return VlValue();
   }
   VlValue val = param->get_value();
-  if ( param->value_type() == kVpiValueReal ) {
+  if ( param->value_type().is_real_type() ) {
     if ( has_bit_select || has_range_select ) {
       if ( put_error ) {
 	error_illegal_real_type(pt_expr);
@@ -781,7 +844,12 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
 	}
 	return VlValue();
       }
-      int offset = param->bit_offset(index1);
+      ymuint offset;
+      if ( !param->calc_bit_offset(index1, offset) ) {
+	// インデックスが範囲外だった．
+	// エラーではなく X になる．
+	return VlValue(VlScalarVal::x());
+      }
       return VlValue(val.bitvector_value().bit_select(offset));
     }
     else if ( has_range_select ) {
@@ -831,9 +899,21 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
 	assert_not_reached(__FILE__, __LINE__);
 	break;
       }
-      int msb_offset = param->bit_offset(index1);
-      int lsb_offset = param->bit_offset(index2);
-      return VlValue(val.bitvector_value().part_select(msb_offset, lsb_offset));
+      ymuint msb_offset;
+      bool stat1 = param->calc_bit_offset(index1, msb_offset);
+      ymuint lsb_offset;
+      bool stat2 = param->calc_bit_offset(index2, lsb_offset);
+      if ( stat1 && stat2 ) {
+	return VlValue(val.bitvector_value().part_select(msb_offset, lsb_offset));
+      }
+      ymuint bw;
+      if ( index1 < index2 ) {
+	bw = index2 - index1 + 1;
+      }
+      else {
+	bw = index1 - index2 + 1;
+      }
+      return VlValue(BitVector(VlScalarVal::x(), bw));
     }
   }
 

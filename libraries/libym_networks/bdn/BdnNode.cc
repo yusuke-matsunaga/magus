@@ -1,5 +1,5 @@
 
-/// @file libym_networks/BdnNode.cc
+/// @file BdnNode.cc
 /// @brief BdnNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,11 +11,12 @@
 #include "ym_networks/BdnPort.h"
 #include "ym_networks/BdnDff.h"
 #include "ym_networks/BdnLatch.h"
+#include "ym_networks/BdnNodeHandle.h"
+#include "ym_networks/BdnConstNodeHandle.h"
 #include "BdnAuxData.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
-
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 //////////////////////////////////////////////////////////////////////
 // クラス BdnPort
@@ -29,6 +30,31 @@ BdnPort::BdnPort()
 // @brief デストラクタ
 BdnPort::~BdnPort()
 {
+}
+
+// @brief ビットごとの方向を得る．
+// @param[out] iovect ビットごとの方向を収める配列
+// @note iovect の値の意味は以下の通り
+//  - 0 : なし
+//  - 1 : 入力のみ
+//  - 2 : 出力のみ
+//  - 3 : 入力と出力
+void
+BdnPort::get_iovect(vector<ymuint>& iovect) const
+{
+  ymuint nb = bit_width();
+  iovect.clear();
+  iovect.resize(nb);
+  for (ymuint i = 0; i < nb; ++ i) {
+    ymuint val = 0U;
+    if ( input(i) ) {
+      val |= 1U;
+    }
+    if ( output(i) ) {
+      val |= 2U;
+    }
+    iovect[i] = val;
+  }
 }
 
 
@@ -96,26 +122,6 @@ BdnNode::scan_po()
   }
 }
 
-// @brief ID を表す文字列の取得
-string
-BdnNode::id_str() const
-{
-  ostringstream buf;
-  if ( is_input() ) {
-    buf << "I" << id();
-  }
-  else if ( is_logic() ) {
-    buf << "L" << id();
-  }
-  else if ( is_output() ) {
-    buf << "O" << id();
-  }
-  else {
-    buf << "X" << id();
-  }
-  return buf.str();
-}
-
 // @brief 関連するポートを返す．
 // @note kINPUT および kOUTPUT の時に意味を持つ．
 // @note それ以外では NULL を返す．
@@ -165,6 +171,66 @@ const BdnLatch*
 BdnNode::latch() const
 {
   return mAuxData->latch();
+}
+
+// @brief ファンインのハンドルを得る．
+BdnConstNodeHandle
+BdnNode::output_fanin_handle() const
+{
+  return BdnConstNodeHandle(output_fanin(), output_fanin_inv());
+}
+
+// @brief ファンインのハンドルを得る．
+BdnNodeHandle
+BdnNode::output_fanin_handle()
+{
+  return BdnNodeHandle(output_fanin(), output_fanin_inv());
+}
+
+// @brief ファンインのハンドルを得る．
+// @param[in] pos 入力番号(0 or 1)
+// @return pos 番めのファンインのハンドルを返す．
+BdnConstNodeHandle
+BdnNode::fanin_handle(ymuint pos) const
+{
+  return BdnConstNodeHandle(fanin(pos), fanin_inv(pos));
+}
+
+// @brief ファンインのハンドルを得る．
+// @param[in] pos 入力番号(0 or 1)
+// @return pos 番めのファンインのハンドルを返す．
+BdnNodeHandle
+BdnNode::fanin_handle(ymuint pos)
+{
+  return BdnNodeHandle(fanin(pos), fanin_inv(pos));
+}
+
+// @brief ファンイン0のハンドルを得る．
+BdnConstNodeHandle
+BdnNode::fanin0_handle() const
+{
+  return BdnConstNodeHandle(fanin0(), fanin0_inv());
+}
+
+// @brief ファンイン0のハンドルを得る．
+BdnNodeHandle
+BdnNode::fanin0_handle()
+{
+  return BdnNodeHandle(fanin0(), fanin0_inv());
+}
+
+// @brief ファンイン0のハンドルを得る．
+BdnConstNodeHandle
+BdnNode::fanin1_handle() const
+{
+  return BdnConstNodeHandle(fanin1(), fanin1_inv());
+}
+
+// @brief ファンイン0のハンドルを得る．
+BdnNodeHandle
+BdnNode::fanin1_handle()
+{
+  return BdnNodeHandle(fanin1(), fanin1_inv());
 }
 
 
@@ -294,4 +360,4 @@ BdnLatchData::latch() const
   return mLatch;
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS_BDN

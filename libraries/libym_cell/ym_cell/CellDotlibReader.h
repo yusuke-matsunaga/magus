@@ -5,21 +5,14 @@
 /// @brief CellDotlibReader のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: CellDotlibReader.h 1978 2009-02-06 12:29:16Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_cell/cell_type.h"
+#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
-
-namespace nsDotlib {
-  class PtMgr;
-  class DotlibParser;
-}
 
 //////////////////////////////////////////////////////////////////////
 /// @class CellDotlibReader CellDotlibReader.h "ym_cell/CellDotlibReader.h"
@@ -44,19 +37,7 @@ public:
   /// @return 読み込んで作成したセルライブラリを返す．
   /// @note エラーが起きたら NULL を返す．
   const CellLibrary*
-  read(const string& filename);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // dotlib のパース木を管理するオブジェクト
-  nsDotlib::PtMgr* mPtMgr;
-
-  // dotlib のパーサー
-  nsDotlib::DotlibParser* mParser;
+  operator()(const string& filename);
 
 };
 

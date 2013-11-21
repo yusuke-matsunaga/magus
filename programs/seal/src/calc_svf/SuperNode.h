@@ -4,7 +4,7 @@
 /// @file calc_svf/SuperNode.h
 /// @brief SuperNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: SuperNode.h 1920 2008-12-20 15:52:42Z matsunaga $
 ///
 /// Copyright (C) 2005-2008 Yusuke Matsunaga
@@ -25,7 +25,7 @@ class NodeHeap;
 class SuperNode
 {
   friend class NodeHeap;
-  
+
 public:
 
   /// @brief コンストラクタ
@@ -34,16 +34,16 @@ public:
   /// @brief デストラクタ
   ~SuperNode();
 
-  
+
 public:
-  
+
   /// @brief ID番号を得る．
   size_t
   id() const;
-  
+
   /// @brief 入力数を得る．
   size_t
-  ni() const;
+  input_num() const;
 
   /// @brief pos 番めの入力を得る．
   SuperNode*
@@ -51,7 +51,7 @@ public:
 
   /// @brief ファンアウト数を得る．
   size_t
-  nfo() const;
+  fanout_num() const;
 
   /// @brief pos 番めのファンアウトを得る．
   SuperNode*
@@ -66,19 +66,19 @@ public:
        SuperNode* inode0,
        SuperNode* inode1,
        size_t max_ni);
-  
+
   /// @brief コストを返す．
   int
   cost();
-  
+
   /// @brief 自分自身をファンアウト先にマージする．
   void
   eliminate(NodeHeap& node_heap);
-  
+
   /// @brief コストを計算する．
   void
   calc_cost();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -91,18 +91,18 @@ private:
   // ヒープ中の位置
   // ヒープになければ -1
   int mPos;
-  
+
   // 入力の配列
   vector<SuperNode*> mInputs;
 
   // ファンアウトの配列
   vector<SuperNode*> mFanouts;
-  
+
   // 現在のコスト
   int mCost;
 
   bool mMark;
-  
+
 };
 
 
@@ -127,7 +127,7 @@ public:
   /// @brief 要素数を返す．
   size_t
   num() const;
-  
+
   /// @brief 要素を追加する．
   void
   put_node(SuperNode* node);
@@ -147,7 +147,7 @@ private:
   // そのノードを返す．
   SuperNode*
   delete_node(size_t pos);
-  
+
   // 適当な位置まで沈めて行く
   void
   move_down(size_t pos);
@@ -194,7 +194,7 @@ SuperNode::id() const
 // @brief 入力数を得る．
 inline
 size_t
-SuperNode::ni() const
+SuperNode::input_num() const
 {
   return mInputs.size();
 }
@@ -210,7 +210,7 @@ SuperNode::input(size_t pos) const
 // @brief ファンアウト数を得る．
 inline
 size_t
-SuperNode::nfo() const
+SuperNode::fanout_num() const
 {
   return mFanouts.size();
 }

@@ -1,11 +1,9 @@
 
-/// @file libym_networks/BNetBlifWriter.cc
-/// @brief ブーリアンネットワークの内容を出力する関数の実装ファイル
+/// @file BNetBlifWriter.cc
+/// @brief BNetBlifWriter の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetBlifWriter.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,13 +12,13 @@
 #include "ym_networks/BNetSopDecomp.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 BEGIN_NONAMESPACE
 
 // LogExpr から積和形論理式に変換し出力する．
 bool
-write_cover(size_t ni,
+write_cover(ymuint ni,
 	    const LogExpr& f,
 	    ostream& s)
 {
@@ -29,7 +27,7 @@ write_cover(size_t ni,
   }
   if ( f.is_one() ) {
     // 定数1の場合
-    for (size_t i = 0; i < ni; ++ i) {
+    for (ymuint i = 0; i < ni; ++ i) {
       s << '-';
     }
     s << " 1" << endl;
@@ -38,12 +36,11 @@ write_cover(size_t ni,
 
   if ( f.is_literal() ) {
     // リテラルの場合
-    tVarId pos = f.varid();
-    if ( pos >= ni ) {
-      return false;
-    }
-    for (size_t i = 0; i < ni; ++ i) {
-      if ( i == pos ) {
+    VarId var = f.varid();
+    bool found = false;
+    for (ymuint i = 0; i < ni; ++ i) {
+      if ( VarId(i) == var ) {
+	found = true;
 	if ( f.is_posiliteral() ) {
 	  s << '1';
 	}
@@ -56,23 +53,24 @@ write_cover(size_t ni,
       }
     }
     s << " 1" << endl;
-    return true;
+    return found;
   }
 
   if ( f.is_and() ) {
     static vector<char> buff;
     buff.clear();
     buff.resize(ni);
-    for (size_t i = 0; i < ni; ++ i) {
+    for (ymuint i = 0; i < ni; ++ i) {
       buff[i] = '-';
     }
-    size_t nc = f.child_num();
-    for (size_t i = 0; i < nc; i ++) {
+    ymuint nc = f.child_num();
+    for (ymuint i = 0; i < nc; i ++) {
       LogExpr opr1 = f.child(i);
       if ( !opr1.is_literal() ) {
 	return false;
       }
-      tVarId pos = opr1.varid();
+      VarId var = opr1.varid();
+      ymuint pos = var.val();
       if ( pos >= ni ) {
 	return false;
       }
@@ -83,7 +81,7 @@ write_cover(size_t ni,
 	buff[pos] = '0';
       }
     }
-    for (size_t i = 0; i < ni; ++ i) {
+    for (ymuint i = 0; i < ni; ++ i) {
       s << buff[i];
     }
     s << " 1" << endl;
@@ -91,8 +89,8 @@ write_cover(size_t ni,
   }
 
   if ( f.is_or() ) {
-    size_t nc = f.child_num();
-    for (size_t i = 0; i < nc; i ++) {
+    ymuint nc = f.child_num();
+    for (ymuint i = 0; i < nc; i ++) {
       LogExpr opr1 = f.child(i);
       bool stat = write_cover(ni, opr1, s);
       if ( !stat ) {
@@ -111,8 +109,8 @@ write_names(const BNode* node,
 	    ostream& s)
 {
   s << ".names";
-  size_t ni = node->ni();
-  for (size_t i = 0; i < ni; i ++) {
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; i ++) {
     BNode* inode = node->fanin(i);
     assert_cond(inode != NULL, __FILE__, __LINE__);
     s << " " << inode->name();
@@ -213,7 +211,7 @@ BNetBlifWriter::dump(ostream& s,
 	<< " 1 1" << endl;
     }
   }
-  
+
   // 各内部節点の .names文/ .gate文の処理
   for (BNodeList::const_iterator p = network.logic_nodes_begin();
        p != network.logic_nodes_end(); ++ p) {
@@ -225,4 +223,4 @@ BNetBlifWriter::dump(ostream& s,
   s << ".end" << endl;
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS_BNET

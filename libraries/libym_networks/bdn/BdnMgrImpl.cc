@@ -1,5 +1,5 @@
 
-/// @file libym_networks/BdnMgr.cc
+/// @file BdnMgr.cc
 /// @brief BdnMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -16,7 +16,7 @@
 #include "BdnAuxData.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 ///////////////////////////////////////////////////////////////////////
 // クラス BdnMgrImpl
@@ -51,17 +51,17 @@ BdnMgrImpl::copy(const BdnMgr& src)
   for (ymuint i = 0; i < np; ++ i) {
     const BdnPort* src_port = src.port(i);
     ymuint bw = src_port->bit_width();
-    BdnPort* dst_port = new_port(src_port->name(), bw);
+    vector<ymuint> iovect(bw);
+    src_port->get_iovect(iovect);
+    BdnPort* dst_port = new_port(src_port->name(), iovect);
     for (ymuint j = 0; j < bw; ++ j) {
       const BdnNode* src_input = src_port->input(j);
       if ( src_input ) {
-	BdnNode* dst_input = new_port_input(dst_port, j);
-	nodemap[src_input->id()] = dst_input;
+	nodemap[src_input->id()] = dst_port->_input(j);
       }
       const BdnNode* src_output = src_port->output(j);
       if ( src_output ) {
-	BdnNode* dst_output = new_port_output(dst_port, j);
-	nodemap[src_output->id()] = dst_output;
+	nodemap[src_output->id()] = dst_port->_output(j);
       }
     }
   }
@@ -74,23 +74,23 @@ BdnMgrImpl::copy(const BdnMgr& src)
     BdnDff* dst_dff = new_dff(src_dff->name());
 
     const BdnNode* src_output = src_dff->output();
-    BdnNode* dst_output = dst_dff->output();
+    BdnNode* dst_output = dst_dff->_output();
     nodemap[src_output->id()] = dst_output;
 
     const BdnNode* src_input = src_dff->input();
-    BdnNode* dst_input = dst_dff->input();
+    BdnNode* dst_input = dst_dff->_input();
     nodemap[src_input->id()] = dst_input;
 
     const BdnNode* src_clock = src_dff->clock();
-    BdnNode* dst_clock = dst_dff->clock();
+    BdnNode* dst_clock = dst_dff->_clock();
     nodemap[src_clock->id()] = dst_clock;
 
     const BdnNode* src_clear = src_dff->clear();
-    BdnNode* dst_clear = dst_dff->clear();
+    BdnNode* dst_clear = dst_dff->_clear();
     nodemap[src_clear->id()] = dst_clear;
 
     const BdnNode* src_preset = src_dff->preset();
-    BdnNode* dst_preset = dst_dff->preset();
+    BdnNode* dst_preset = dst_dff->_preset();
     nodemap[src_preset->id()] = dst_preset;
   }
 
@@ -102,36 +102,46 @@ BdnMgrImpl::copy(const BdnMgr& src)
     BdnLatch* dst_latch = new_latch(src_latch->name());
 
     const BdnNode* src_output = src_latch->output();
-    BdnNode* dst_output = dst_latch->output();
+    BdnNode* dst_output = dst_latch->_output();
     nodemap[src_output->id()] = dst_output;
 
     const BdnNode* src_input = src_latch->input();
-    BdnNode* dst_input = dst_latch->input();
+    BdnNode* dst_input = dst_latch->_input();
     nodemap[src_input->id()] = dst_input;
 
     const BdnNode* src_enable = src_latch->enable();
-    BdnNode* dst_enable = dst_latch->enable();
+    BdnNode* dst_enable = dst_latch->_enable();
     nodemap[src_enable->id()] = dst_enable;
+
+    const BdnNode* src_clear = src_latch->clear();
+    BdnNode* dst_clear = dst_latch->_clear();
+    nodemap[src_clear->id()] = dst_clear;
+
+    const BdnNode* src_preset = src_latch->preset();
+    BdnNode* dst_preset = dst_latch->_preset();
+    nodemap[src_preset->id()] = dst_preset;
   }
 
   // 論理ノードの生成
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   src.sort(node_list);
   ymuint nl = node_list.size();
   for (ymuint i = 0; i < nl; ++ i) {
-    BdnNode* src_node = node_list[i];
+    const BdnNode* src_node = node_list[i];
 
-    BdnNode* src_inode0 = src_node->fanin0();
+    const BdnNode* src_inode0 = src_node->fanin0();
     BdnNode* input0 = nodemap[src_inode0->id()];
     assert_cond(input0, __FILE__, __LINE__);
+    bool inv0 = src_node->fanin0_inv();
 
-    BdnNode* src_inode1 = src_node->fanin1();
+    const BdnNode* src_inode1 = src_node->fanin1();
     BdnNode* input1 = nodemap[src_inode1->id()];
     assert_cond(input1, __FILE__, __LINE__);
+    bool inv1 = src_node->fanin1_inv();
 
-    BdnNodeHandle tmp_h = set_logic(NULL, src_node->_fcode(),
-				    BdnNodeHandle(input0, false),
-				    BdnNodeHandle(input1, false));
+    BdnNodeHandle tmp_h = set_logic(NULL, src_node->is_xor(),
+				    BdnNodeHandle(input0, inv0),
+				    BdnNodeHandle(input1, inv1));
     assert_cond(tmp_h.inv() == false, __FILE__, __LINE__);
     BdnNode* dst_node = tmp_h.node();
     nodemap[src_node->id()] = dst_node;
@@ -178,6 +188,60 @@ BEGIN_NONAMESPACE
 // node のファンアウトのうち，すべてのファンインがマークされている
 // ノードを node_list に追加する．
 void
+sort_sub(const BdnNode* node,
+	 vector<bool>& marks,
+	 vector<const BdnNode*>& node_list)
+{
+  const BdnFanoutList& fo_list = node->fanout_list();
+  for (BdnFanoutList::const_iterator p = fo_list.begin();
+       p != fo_list.end(); ++ p) {
+    const BdnEdge* e = *p;
+    const BdnNode* onode = e->to();
+    if ( !marks[onode->id()] && onode->is_logic() &&
+	 marks[onode->fanin0()->id()] &&
+	 marks[onode->fanin1()->id()] ) {
+      marks[onode->id()] = true;
+      node_list.push_back(onode);
+    }
+  }
+}
+
+END_NONAMESPACE
+
+// @brief ソートされたノードのリストを得る．
+void
+BdnMgrImpl::sort(vector<const BdnNode*>& node_list) const
+{
+  node_list.clear();
+  node_list.reserve(lnode_num());
+
+  // 処理済みの印を表す配列
+  ymuint n = max_node_id();
+  vector<bool> marks(n, false);
+
+  // 外部入力のみをファンインにするノードを node_list に追加する．
+  for (BdnNodeList::const_iterator p = mInputList.begin();
+       p != mInputList.end(); ++ p) {
+    const BdnNode* node = *p;
+    marks[node->id()] = true;
+    sort_sub(node, marks, node_list);
+  }
+  // node_list のノードを一つずつとりだし，ファンアウトが node_list
+  // に積めるかチェックする．
+  for (ymuint rpos = 0; rpos < node_list.size(); ++ rpos) {
+    const BdnNode* node = node_list[rpos];
+    sort_sub(node, marks, node_list);
+  }
+  // うまくいっていれば全ての論理ノードが node_list に入っているはず．
+  assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
+}
+
+BEGIN_NONAMESPACE
+
+// sort() の下請け関数
+// node のファンアウトのうち，すべてのファンインがマークされている
+// ノードを node_list に追加する．
+void
 sort_sub(BdnNode* node,
 	 vector<bool>& marks,
 	 vector<BdnNode*>& node_list)
@@ -200,7 +264,7 @@ END_NONAMESPACE
 
 // @brief ソートされたノードのリストを得る．
 void
-BdnMgrImpl::sort(vector<BdnNode*>& node_list) const
+BdnMgrImpl::_sort(vector<BdnNode*>& node_list)
 {
   node_list.clear();
   node_list.reserve(lnode_num());
@@ -210,7 +274,7 @@ BdnMgrImpl::sort(vector<BdnNode*>& node_list) const
   vector<bool> marks(n, false);
 
   // 外部入力のみをファンインにするノードを node_list に追加する．
-  for (BdnNodeList::const_iterator p = mInputList.begin();
+  for (BdnNodeList::iterator p = mInputList.begin();
        p != mInputList.end(); ++ p) {
     BdnNode* node = *p;
     marks[node->id()] = true;
@@ -232,9 +296,9 @@ BEGIN_NONAMESPACE
 // rsort() の下請け関数
 // node のすべてのファンアウトがマークされていたら node_list に積む．
 void
-rsort_sub(BdnNode* node,
+rsort_sub(const BdnNode* node,
 	  vector<bool>& marks,
-	  vector<BdnNode*>& node_list)
+	  vector<const BdnNode*>& node_list)
 {
   if ( node == NULL ||
        !node->is_logic() ||
@@ -243,8 +307,8 @@ rsort_sub(BdnNode* node,
   const BdnFanoutList& fo_list = node->fanout_list();
   for (BdnFanoutList::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
-    BdnEdge* e = *p;
-    BdnNode* onode = e->to();
+    const BdnEdge* e = *p;
+    const BdnNode* onode = e->to();
     if ( !marks[onode->id()] ) {
       return;
     }
@@ -257,7 +321,7 @@ END_NONAMESPACE
 
 // @brief 逆順でソートされたノードのリストを得る．
 void
-BdnMgrImpl::rsort(vector<BdnNode*>& node_list) const
+BdnMgrImpl::rsort(vector<const BdnNode*>& node_list) const
 {
   node_list.clear();
   node_list.reserve(lnode_num());
@@ -269,15 +333,15 @@ BdnMgrImpl::rsort(vector<BdnNode*>& node_list) const
   // 外部出力のみをファンアウトにするノードを node_list に追加する．
   for (BdnNodeList::const_iterator p = mOutputList.begin();
        p != mOutputList.end(); ++ p) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
     marks[node->id()] = true;
-    BdnNode* inode = node->output_fanin();
+    const BdnNode* inode = node->output_fanin();
     rsort_sub(inode, marks, node_list);
   }
 
   // node_list からノードを取り出し，同様の処理を行う．
   for (ymuint rpos = 0; rpos < node_list.size(); ++ rpos) {
-    BdnNode* node = node_list[rpos];
+    const BdnNode* node = node_list[rpos];
     rsort_sub(node->fanin0(), marks, node_list);
     rsort_sub(node->fanin1(), marks, node_list);
   }
@@ -285,10 +349,31 @@ BdnMgrImpl::rsort(vector<BdnNode*>& node_list) const
   assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
 }
 
+// @brief 名前を設定する．
+void
+BdnMgrImpl::set_name(const string& name)
+{
+  mName = name;
+}
+
+// @brief どこにもファンアウトしていないノードを削除する．
+void
+BdnMgrImpl::clean_up()
+{
+#warning "TODO: 未完"
+}
+
 // @brief ポートを作る．
+// @param[in] name 名前
+// @param[in] iovect ビットごとの方向を指定する配列
+// @note iovect の要素の値の意味は以下の通り
+// - 0 : なし
+// - 1 : 入力のみ
+// - 2 : 出力のみ
+// - 3 : 入力と出力
 BdnPort*
 BdnMgrImpl::new_port(const string& name,
-		 ymuint bit_width)
+		     const vector<ymuint>& iovect)
 {
   void* p = mAlloc.get_memory(sizeof(BdnPort));
   BdnPort* port = new (p) BdnPort();
@@ -298,6 +383,7 @@ BdnMgrImpl::new_port(const string& name,
 
   port->mName = name;
 
+  ymuint bit_width = iovect.size();
   port->mBitWidth = bit_width;
 
   void* q = mAlloc.get_memory(sizeof(BdnNode*) * bit_width);
@@ -310,10 +396,27 @@ BdnMgrImpl::new_port(const string& name,
   port->mAuxDataArray = new (s) BdnAuxData*[bit_width];
 
   for (ymuint i = 0; i < bit_width; ++ i) {
-    port->mInputArray[i] = NULL;
-    port->mOutputArray[i] = NULL;
     void* t = mAlloc.get_memory(sizeof(BdnPortData));
-    port->mAuxDataArray[i] = new (t) BdnPortData(port, i);
+    BdnPortData* aux_data =  new (t) BdnPortData(port, i);
+    port->mAuxDataArray[i] = aux_data;
+
+    BdnNode* input = NULL;
+    BdnNode* output = NULL;
+    ymuint val = iovect[i];
+    if ( val & 1U ) {
+      input = alloc_node();
+      input->set_input_type(BdnNode::kPRIMARY_INPUT);
+      input->mAuxData = aux_data;
+      mInputList.push_back(input);
+    }
+    if ( val & 2U ) {
+      output = alloc_node();
+      output->set_output_type(BdnNode::kPRIMARY_OUTPUT);
+      output->mAuxData = aux_data;
+      mOutputList.push_back(output);
+    }
+    port->mInputArray[i] = input;
+    port->mOutputArray[i] = output;
   }
 
   return port;
@@ -393,15 +496,11 @@ BdnMgrImpl::delete_dff(BdnDff* dff)
 
   mDffList.erase(dff);
 
-  delete_node(dff->output());
-  delete_node(dff->input());
-  delete_node(dff->clock());
-  if ( dff->clear() ) {
-    delete_node(dff->clear());
-  }
-  if ( dff->preset() ) {
-    delete_node(dff->preset());
-  }
+  delete_node(dff->_output());
+  delete_node(dff->_input());
+  delete_node(dff->_clock());
+  delete_node(dff->_clear());
+  delete_node(dff->_preset());
 }
 
 // @brief ラッチを作る．
@@ -450,6 +549,18 @@ BdnMgrImpl::new_latch(const string& name)
   enable->mAuxData = latch->mAuxData;
   mOutputList.push_back(enable);
 
+  BdnNode* clear = alloc_node();
+  latch->mClear = clear;
+  clear->set_output_type(BdnNode::kLATCH_CLEAR);
+  clear->mAuxData = latch->mAuxData;
+  mOutputList.push_back(clear);
+
+  BdnNode* preset = alloc_node();
+  latch->mPreset = preset;
+  preset->set_output_type(BdnNode::kLATCH_PRESET);
+  preset->mAuxData = latch->mAuxData;
+  mOutputList.push_back(preset);
+
   mLatchList.push_back(latch);
 
   return latch;
@@ -465,57 +576,57 @@ BdnMgrImpl::delete_latch(BdnLatch* latch)
 
   mLatchList.erase(latch);
 
-  delete_node(latch->output());
-  delete_node(latch->input());
-  delete_node(latch->enable());
+  delete_node(latch->_output());
+  delete_node(latch->_input());
+  delete_node(latch->_enable());
+  delete_node(latch->_clear());
+  delete_node(latch->_preset());
 }
 
-// @brief 外部入力を作る．
-// @param[in] port ポート
-// @param[in] bitpos ビット位置
-// @return 作成したノードを返す．
-// @note エラー条件は以下の通り
-//  - bitpos が port のビット幅を越えている．
-//  - port の bitpos にすでにノードがある．
-BdnNode*
-BdnMgrImpl::new_port_input(BdnPort* port,
-			   ymuint bitpos)
+// @brief バランス木を作る．
+// @param[in] node 根のノード
+// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
+// @param[in] iinv 入力の反転属性
+// @param[in] start 開始位置
+// @param[in] num 要素数
+// @param[in] node_list 入力のノードのリスト
+// @note node が NULL の場合，新しいノードを確保する．
+BdnNodeHandle
+BdnMgrImpl::make_tree(BdnNode* node,
+		      bool is_xor,
+		      bool iinv,
+		      ymuint start,
+		      ymuint num,
+		      const vector<BdnNodeHandle>& node_list)
 {
-  assert_cond( bitpos < port->bit_width(), __FILE__, __LINE__);
-  assert_cond( port->mInputArray[bitpos] == NULL, __FILE__, __LINE__);
+  switch ( num ) {
+  case 0:
+    assert_not_reached(__FILE__, __LINE__);
 
-  BdnNode* node = alloc_node();
-  node->set_input_type(BdnNode::kPRIMARY_INPUT);
-  node->mAuxData = port->mAuxDataArray[bitpos];
-  port->mInputArray[bitpos] = node;
+  case 1:
+    if ( iinv ) {
+      return ~node_list[start];
+    }
+    else {
+      return node_list[start];
+    }
 
-  mInputList.push_back(node);
+  case 2:
+    if ( iinv ) {
+      return set_logic(node, is_xor, ~node_list[start], ~node_list[start + 1]);
+    }
+    else {
+      return set_logic(node, is_xor, node_list[start], node_list[start + 1]);
+    }
 
-  return node;
-}
+  default:
+    break;
+  }
 
-// @brief 外部出力ノードを作る．
-// @param[in] port ポート
-// @param[in] bitpos ビット位置
-// @return 作成したノードを返す．
-// @note エラー条件は以下の通り
-//  - bitpos が port のビット幅を越えている．
-//  - port の bitpos にすでにノードがある．
-BdnNode*
-BdnMgrImpl::new_port_output(BdnPort* port,
-			    ymuint bitpos)
-{
-  assert_cond( bitpos < port->bit_width(), __FILE__, __LINE__);
-  assert_cond( port->mOutputArray[bitpos] == NULL, __FILE__, __LINE__);
-
-  BdnNode* node = alloc_node();
-  node->set_output_type(BdnNode::kPRIMARY_OUTPUT);
-  node->mAuxData = port->mAuxDataArray[bitpos];
-  port->mOutputArray[bitpos] = node;
-
-  mOutputList.push_back(node);
-
-  return node;
+  ymuint nh = num / 2;
+  BdnNodeHandle l = make_tree(NULL, is_xor, iinv, start, nh, node_list);
+  BdnNodeHandle r = make_tree(NULL, is_xor, iinv, start + nh, num - nh, node_list);
+  return set_logic(node, is_xor, l, r);
 }
 
 // @brief 論理ノードの内容を変更する．
@@ -555,7 +666,7 @@ BdnMgrImpl::change_logic(BdnNode* node ,
       else {
 	inode2_handle = new_handle;
       }
-      BdnNodeHandle new_oh = set_logic(onode, onode->_fcode(),
+      BdnNodeHandle new_oh = set_logic(onode, onode->is_xor(),
 				       inode1_handle, inode2_handle);
       change_logic(onode, new_oh);
     }
@@ -598,113 +709,84 @@ hash_func(ymuint fcode,
 	  const BdnNode* node1,
 	  const BdnNode* node2)
 {
-  return (node1->id() * 3 + node2->id() << 3) | fcode;
+  return (node1->id() * 3 + node2->id() << 3) ^ fcode;
 }
 
 END_NONAMESPACE
 
 
-// 論理ノードの内容を設定する．
-BdnNodeHandle
-BdnMgrImpl::set_logic(BdnNode* node,
-		      ymuint fcode,
-		      BdnNodeHandle inode0_handle,
-		      BdnNodeHandle inode1_handle)
+// @brief 論理ノードを探す．
+// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @param[out] onode_handle 該当のノード+極性
+// @return 見つかったら true を返す．
+// @note fcode の各ビットの意味は以下のとおり，
+//  - 0bit: ファンイン0の反転属性
+//  - 1bit: ファンイン1の反転属性
+//  - 2bit: XOR/AND フラグ( 0: AND, 1: XOR)
+bool
+BdnMgrImpl::find_logic(bool is_xor,
+		       BdnNodeHandle inode1_handle,
+		       BdnNodeHandle inode2_handle,
+		       BdnNodeHandle& onode_handle)
 {
-  // 境界条件の検査
-  if ( fcode & 4U ) {
-    // XOR の場合
-    if ( inode0_handle.is_zero() ) {
-      // 入力0が定数0だった．
-      return inode1_handle;
-    }
-    else if ( inode0_handle.is_one() ) {
-      // 入力0が定数1だった．
-      return ~inode1_handle;
-    }
-    else if ( inode1_handle.is_zero() ) {
-      // 入力1が定数0だった．
-      return inode0_handle;
-    }
-    else if ( inode1_handle.is_one() ) {
-      // 入力1が定数1だった．
-      return ~inode0_handle;
-    }
-    else if ( inode0_handle == inode1_handle ) {
-      // 2つの入力が同一だった．
-      return inode0_handle;
-    }
-    else if ( inode0_handle == ~inode1_handle ) {
-      // 2つの入力が極性違いだった．
-      return BdnNodeHandle::make_zero();
-    }
-  }
-  else {
-    // AND の場合
-    if ( inode0_handle.is_zero() ) {
-      // 入力0が定数1だった．
-      return inode1_handle;
-    }
-    else if ( inode0_handle.is_one() ) {
-      // 入力0が定数0だった．
-      return BdnNodeHandle::make_zero();
-    }
-    else if ( inode1_handle.is_zero() ) {
-      // 入力1が定数1だった．
-      return inode0_handle;
-    }
-    else if ( inode1_handle.is_one() ) {
-      // 入力1が定数0だった．
-      return BdnNodeHandle::make_zero();
-    }
-    else if ( inode0_handle == inode1_handle ) {
-      // 2つの入力が同じだった．
-      return inode0_handle;
-    }
-    else if ( inode0_handle == ~inode1_handle ) {
-      // 2つの入力が極性違いだった．
-      return BdnNodeHandle::make_zero();
-    }
+  bool stat = is_trivial(is_xor, inode1_handle, inode2_handle, onode_handle);
+  if ( stat ) {
+    return true;
   }
 
-  // 入力の反転属性
-  bool inv0 = inode0_handle.inv() ^ static_cast<bool>(fcode & 1U);
-  bool inv1 = inode1_handle.inv() ^ static_cast<bool>((fcode >> 1) & 1U);
-
-  // 入力のノード
-  BdnNode* inode0 = inode0_handle.node();
-  BdnNode* inode1 = inode1_handle.node();
-
-  // ファンインの順番の正規化
-  if ( inode0->id() > inode1->id() ) {
-    BdnNode* tmp = inode0;
-    inode0 = inode1;
-    inode1 = tmp;
-    bool tmp_inv = inv0;
-    inv0 = inv1;
-    inv1 = tmp_inv;
-  }
-
-  // 出力の反転属性
-  bool oinv = static_cast<bool>((fcode >> 3) & 1U);
-
-  // fcode の正規化
-  if ( fcode & 4U ) {
-    // XOR の場合には入力に反転属性はつかない．
-    oinv = inv0 ^ inv1;
-    fcode = 4U;
-  }
-  else {
-    fcode = static_cast<ymuint>(inv0) | (static_cast<ymuint>(inv1) << 1);
-  }
+  BdnNode* inode1;
+  BdnNode* inode2;
+  bool oinv;
+  ymuint fcode = cannonicalize(is_xor, inode1_handle, inode2_handle,
+			       inode1, inode2, oinv);
 
   // 同じ構造を持つノードが既にないか調べる．
-  ymuint pos = hash_func(fcode, inode0, inode1);
+  BdnNode* node = find_node(fcode, inode1, inode2);
+  if ( node ) {
+    // 同じノードがあった．
+    onode_handle = BdnNodeHandle(node, oinv);
+    return true;
+  }
+
+  return false;
+}
+
+// @brief 論理ノードの内容を設定する．
+// @param[in] node 設定するノード
+// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @return ノード＋極性を返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+// @note なければ node に設定する．
+// @note node が NULL の場合，新しいノードを確保する．
+BdnNodeHandle
+BdnMgrImpl::set_logic(BdnNode* node,
+		      bool is_xor,
+		      BdnNodeHandle inode1_handle,
+		      BdnNodeHandle inode2_handle)
+{
+  BdnNodeHandle onode_handle;
+  bool found = is_trivial(is_xor, inode1_handle, inode2_handle, onode_handle);
+  if ( found ) {
+    return onode_handle;
+  }
+
+  BdnNode* inode1;
+  BdnNode* inode2;
+  bool oinv;
+  ymuint fcode = cannonicalize(is_xor, inode1_handle, inode2_handle,
+			       inode1, inode2, oinv);
+
+  // 同じ構造を持つノードが既にないか調べる．
+  ymuint pos = hash_func(fcode, inode1, inode2);
   ymuint idx = pos % mHashSize;
   for (BdnNode* node1 = mHashTable[idx]; node1; node1 = node1->mLink) {
     if ( node1->_fcode() == fcode &&
-	 node1->fanin0() == inode0 &&
-	 node1->fanin1() == inode1 ) {
+	 node1->fanin0() == inode1 &&
+	 node1->fanin1() == inode2 ) {
       // 同じノードがあった．
       return BdnNodeHandle(node1, oinv);
     }
@@ -741,8 +823,8 @@ BdnMgrImpl::set_logic(BdnNode* node,
   }
 
   node->set_logic_type(fcode);
-  connect(inode0, node, 0);
-  connect(inode1, node, 1);
+  connect(inode1, node, 0);
+  connect(inode2, node, 1);
 
   // ハッシュ表に登録する．
   node->mLink = mHashTable[idx];
@@ -774,6 +856,164 @@ BdnMgrImpl::connect(BdnNode* from,
 
   // 構造が変わったのでレベルの情報は無効化される．
   mLevel = 0U;
+}
+
+// @brief 論理ノードの自明な簡単化を行う．
+// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @param[out] onode_handle 該当のノード+極性
+// @return 見つかったら true を返す．
+bool
+BdnMgrImpl::is_trivial(bool is_xor,
+		       BdnNodeHandle inode1_handle,
+		       BdnNodeHandle inode2_handle,
+		       BdnNodeHandle& onode_handle)
+{
+  // 境界条件の検査
+  if ( is_xor ) {
+    // XOR の場合
+    if ( inode1_handle.is_zero() ) {
+      // 入力0が定数0だった．
+      onode_handle = inode2_handle;
+      return true;
+    }
+    else if ( inode1_handle.is_one() ) {
+      // 入力0が定数1だった．
+      onode_handle = ~inode2_handle;
+      return true;
+    }
+    else if ( inode2_handle.is_zero() ) {
+      // 入力1が定数0だった．
+      onode_handle = inode1_handle;
+      return true;
+    }
+    else if ( inode2_handle.is_one() ) {
+      // 入力1が定数1だった．
+      onode_handle = ~inode1_handle;
+      return true;
+    }
+    else if ( inode1_handle == inode2_handle ) {
+      // 2つの入力が同一だった．
+      onode_handle = inode1_handle;
+      return true;
+    }
+    else if ( inode1_handle == ~inode2_handle ) {
+      // 2つの入力が極性違いだった．
+      onode_handle = BdnNodeHandle::make_zero();
+      return true;
+    }
+  }
+  else {
+    // AND の場合
+    if ( inode1_handle.is_one() ) {
+      // 入力0が定数1だった．
+      onode_handle = inode2_handle;
+      return true;
+    }
+    else if ( inode1_handle.is_zero() ) {
+      // 入力0が定数0だった．
+      onode_handle = BdnNodeHandle::make_zero();
+      return true;
+    }
+    else if ( inode2_handle.is_one() ) {
+      // 入力1が定数1だった．
+      onode_handle = inode1_handle;
+      return true;
+    }
+    else if ( inode2_handle.is_zero() ) {
+      // 入力1が定数0だった．
+      onode_handle = BdnNodeHandle::make_zero();
+      return true;
+    }
+    else if ( inode1_handle == inode2_handle ) {
+      // 2つの入力が同じだった．
+      onode_handle = inode1_handle;
+      return true;
+    }
+    else if ( inode1_handle == ~inode2_handle ) {
+      // 2つの入力が極性違いだった．
+      onode_handle = BdnNodeHandle::make_zero();
+      return true;
+    }
+  }
+
+  // ここまで来たら自明な簡単化は行えなかったということ．
+  return false;
+}
+
+// @brief 論理ノードに設定する情報の正規化を行う．
+// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @param[out] inode1 正規化された1番めの入力ノード
+// @param[out] inode2 正規化された2番目の入力ノード
+// @param[out] oinv 出力極性
+// @return 機能コードを返す．
+// @note 機能コードの各ビットの意味は以下のとおり，
+//  - 0bit: ファンイン0の反転属性
+//  - 1bit: ファンイン1の反転属性
+//  - 2bit: XOR/AND フラグ( 0: AND, 1: XOR)
+ymuint
+BdnMgrImpl::cannonicalize(bool is_xor,
+			  BdnNodeHandle inode1_handle,
+			  BdnNodeHandle inode2_handle,
+			  BdnNode*& inode1,
+			  BdnNode*& inode2,
+			  bool& oinv)
+{
+  // 入力の反転属性
+  bool inv1 = inode1_handle.inv();
+  bool inv2 = inode2_handle.inv();
+
+  // 入力のノード
+  inode1 = inode1_handle.node();
+  inode2 = inode2_handle.node();
+
+  // ファンインの順番の正規化
+  if ( inode1->id() > inode2->id() ) {
+    BdnNode* tmp = inode1;
+    inode1 = inode2;
+    inode2 = tmp;
+    bool tmp_inv = inv1;
+    inv1 = inv2;
+    inv2 = tmp_inv;
+  }
+
+  // 出力の反転属性
+  oinv = false;
+
+  // fcode の正規化
+  if ( is_xor ) {
+    // XOR の場合には入力に反転属性はつかない．
+    oinv = inv1 ^ inv2;
+    return XOR_BIT;
+  }
+  else {
+    return static_cast<ymuint>(inv1) | (static_cast<ymuint>(inv2) << 1);
+  }
+}
+
+// @brief ノードを探索する．
+// @param[in] fcode 機能コード
+// @param[in] inode1 1番めのノード
+// @param[in] inode2 2番めのノード
+BdnNode*
+BdnMgrImpl::find_node(ymuint fcode,
+		      const BdnNode* inode1,
+		      const BdnNode* inode2) const
+{
+  ymuint idx = hash_func(fcode, inode1, inode2) % mHashSize;
+  for (BdnNode* node1 = mHashTable[idx]; node1; node1 = node1->mLink) {
+    if ( node1->_fcode() == fcode &&
+	 node1->fanin0() == inode1 &&
+	 node1->fanin1() == inode2 ) {
+      // 同じノードがあった．
+      return node1;
+    }
+  }
+  // 見つからなかった．
+  return NULL;
 }
 
 // @brief ノードを作成する．
@@ -836,14 +1076,14 @@ BdnMgrImpl::level() const
       node->mLevel = 0U;
     }
 
-    vector<BdnNode*> node_list;
+    vector<const BdnNode*> node_list;
     sort(node_list);
-    for (vector<BdnNode*>::const_iterator p = node_list.begin();
+    for (vector<const BdnNode*>::const_iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
-      BdnNode* node = *p;
-      BdnNode* inode0 = node->fanin0();
+      const BdnNode* node = *p;
+      const BdnNode* inode0 = node->fanin0();
       ymuint l = inode0->mLevel;
-      BdnNode* inode1 = node->fanin1();
+      const BdnNode* inode1 = node->fanin1();
       ymuint l1 = inode1->mLevel;
       if ( l < l1 ) {
 	l = l1;
@@ -854,8 +1094,8 @@ BdnMgrImpl::level() const
     ymuint max_l = 0;
     for (BdnNodeList::const_iterator p = mOutputList.begin();
 	 p != mOutputList.end(); ++ p) {
-      BdnNode* node = *p;
-      BdnNode* inode = node->fanin0();
+      const BdnNode* node = *p;
+      const BdnNode* inode = node->fanin0();
       if ( inode ) {
 	ymuint l1 = inode->mLevel;
 	if ( max_l < l1 ) {
@@ -901,4 +1141,4 @@ BdnMgrImpl::alloc_table(ymuint req_size)
   mNextLimit = static_cast<ymuint32>(mHashSize * 1.8);
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS_BDN

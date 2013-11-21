@@ -7,7 +7,7 @@
 ///
 /// $Id: verilog.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @namespace nsYm::nsVerilog
@@ -38,90 +38,22 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_VERILOG
 
+class BitVector;
 class VlLineWatcher;
 class VlMgr;
-class BitVector;
+class VlScalarVal;
 class VlTime;
+class VlUdpVal;
 class VlValue;
+class VlValueType;
 
+END_NAMESPACE_YM_VERILOG
+
+BEGIN_NAMESPACE_YM
 
 /// @defgroup VlCommon Verilog 用基本ユーティリティ
 /// @ingroup VlGroup
 /// @{
-
-//////////////////////////////////////////////////////////////////////
-/// @brief 1ビットの値
-//////////////////////////////////////////////////////////////////////
-enum tVpiScalarVal {
-  /// @brief 00: high-impedance
-  kVpiScalarZ = 0,
-  /// @brief 01: 普通の 0
-  kVpiScalar0 = 1,
-  /// @brief 10: 普通の 1
-  kVpiScalar1 = 2,
-  /// @brief 11: 0 か 1 か不明
-  kVpiScalarX = 3
-};
-
-/// @brief tVpiScalarVal から bool への変換
-bool
-conv_to_bool(tVpiScalarVal src);
-
-/// @brief tVpiScalarVal から論理値への変換
-/// @note kVpiScalarZ -> kVpiScalarX をやっている
-tVpiScalarVal
-conv_to_logic(tVpiScalarVal src);
-
-/// @brief tVpiScalarVal から int への変換
-/// @note kVpiScalar1 以外はすべての 0 にマッピングする．
-int
-conv_to_int(tVpiScalarVal src);
-
-/// @brief tVpiScalarVal から実数値への変換
-/// @note kVpiScalar1 を 1.0 に，それい以外はすべての 0.0 にマッピングする．
-double
-conv_to_real(tVpiScalarVal src);
-
-/// @brief int から tVpiScalarVal への変換
-/// @note 0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
-tVpiScalarVal
-conv_to_scalar(int src);
-
-/// @brief ymuint から tVpiScalarVal への変換
-/// @note 0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
-tVpiScalarVal
-conv_to_scalar(ymuint src);
-
-/// @brief 実数値から tVpiScalarVal への変換
-/// @note 0.0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
-tVpiScalarVal
-conv_to_scalar(double src);
-
-/// @brief tVpiScalarVal の否定
-/// @note kVpiScalarZ は kVpiScalarX と同様に扱われる．
-tVpiScalarVal
-operator!(tVpiScalarVal src);
-
-/// @brief tVpiScalarVal の AND
-tVpiScalarVal
-operator&&(tVpiScalarVal src1,
-	   tVpiScalarVal src2);
-
-/// @brief tVpiScalarVal の OR
-tVpiScalarVal
-operator||(tVpiScalarVal src1,
-	   tVpiScalarVal src2);
-
-/// @brief tVpiScalarVal の等価比較
-tVpiScalarVal
-eq(tVpiScalarVal src1,
-   tVpiScalarVal src2);
-
-/// @brief tVpiScalarVal の等価比較
-tVpiScalarVal
-neq(tVpiScalarVal src1,
-    tVpiScalarVal src2);
-
 
 //////////////////////////////////////////////////////////////////////
 // 列挙型の定義
@@ -255,13 +187,18 @@ enum tVpiDefDelayMode {
 /// @note この列挙型の値を強制的に int にキャストしても
 /// vpi_user.h の定義値として使える．
 //////////////////////////////////////////////////////////////////////
-enum tVpiDirection {
-  kVpiInput       = vpiInput,
-  kVpiOutput      = vpiOutput,
-  kVpiInout       = vpiInout,
-  kVpiMixedIO     = vpiMixedIO,
-  kVpiNoDirection = vpiNoDirection
+enum tVlDirection {
+  kVlInput       = vpiInput,
+  kVlOutput      = vpiOutput,
+  kVlInout       = vpiInout,
+  kVlMixedIO     = vpiMixedIO,
+  kVlNoDirection = vpiNoDirection
 };
+
+/// @brief tVlDirection のストリーム出力
+ostream&
+operator<<(ostream& s,
+	   tVlDirection dir);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -318,7 +255,10 @@ enum tVpiPrimType {
   kVpiPullupPrim    = vpiPullupPrim,
   kVpiPulldownPrim  = vpiPulldownPrim,
   kVpiSeqPrim       = vpiSeqPrim,
-  kVpiCombPrim      = vpiCombPrim
+  kVpiCombPrim      = vpiCombPrim,
+  // この値だけ vpi_user.h にはない
+  // 値の重複に注意すること．
+  kVpiCellPrim      = 29
 };
 
 
@@ -390,50 +330,50 @@ enum tVpiTchkType {
 /// @note この列挙型の値を強制的に int にキャストしても
 /// vpi_user.h の定義値として使える．
 //////////////////////////////////////////////////////////////////////
-enum tVpiOpType {
-  kVpiMinusOp        = vpiMinusOp,
-  kVpiPlusOp         = vpiPlusOp,
-  kVpiNotOp          = vpiNotOp,
-  kVpiBitNegOp       = vpiBitNegOp,
-  kVpiUnaryAndOp     = vpiUnaryAndOp,
-  kVpiUnaryNandOp    = vpiUnaryNandOp,
-  kVpiUnaryOrOp      = vpiUnaryOrOp,
-  kVpiUnaryNorOp     = vpiUnaryNorOp,
-  kVpiUnaryXorOp     = vpiUnaryXorOp,
-  kVpiUnaryXNorOp    = vpiUnaryXNorOp,
-  kVpiSubOp          = vpiSubOp,
-  kVpiDivOp          = vpiDivOp,
-  kVpiModOp          = vpiModOp,
-  kVpiEqOp           = vpiEqOp,
-  kVpiNeqOp          = vpiNeqOp,
-  kVpiCaseEqOp       = vpiCaseEqOp,
-  kVpiCaseNeqOp      = vpiCaseNeqOp,
-  kVpiGtOp           = vpiGtOp,
-  kVpiGeOp           = vpiGeOp,
-  kVpiLtOp           = vpiLtOp,
-  kVpiLeOp           = vpiLeOp,
-  kVpiLShiftOp       = vpiLShiftOp,
-  kVpiRShiftOp       = vpiRShiftOp,
-  kVpiAddOp          = vpiAddOp,
-  kVpiMultOp         = vpiMultOp,
-  kVpiLogAndOp       = vpiLogAndOp,
-  kVpiLogOrOp        = vpiLogOrOp,
-  kVpiBitAndOp       = vpiBitAndOp,
-  kVpiBitOrOp        = vpiBitOrOp,
-  kVpiBitXorOp       = vpiBitXorOp,
-  kVpiBitXNorOp      = vpiBitXNorOp,
-  kVpiConditionOp    = vpiConditionOp,
-  kVpiConcatOp       = vpiConcatOp,
-  kVpiMultiConcatOp  = vpiMultiConcatOp,
-  kVpiEventOrOp      = vpiEventOrOp,
-  kVpiNullOp         = vpiNullOp,
-  kVpiListOp         = vpiListOp,
-  kVpiMinTypMaxOp    = vpiMinTypMaxOp,
-  kVpiPosedgeOp      = vpiPosedgeOp,
-  kVpiNegedgeOp      = vpiNegedgeOp,
-  kVpiArithLShiftOp  = vpiArithLShiftOp,
-  kVpiArithRShiftOp  = vpiArithRShiftOp,
-  kVpiPowerOp        = vpiPowerOp
+enum tVlOpType {
+  kVlMinusOp        = vpiMinusOp,
+  kVlPlusOp         = vpiPlusOp,
+  kVlNotOp          = vpiNotOp,
+  kVlBitNegOp       = vpiBitNegOp,
+  kVlUnaryAndOp     = vpiUnaryAndOp,
+  kVlUnaryNandOp    = vpiUnaryNandOp,
+  kVlUnaryOrOp      = vpiUnaryOrOp,
+  kVlUnaryNorOp     = vpiUnaryNorOp,
+  kVlUnaryXorOp     = vpiUnaryXorOp,
+  kVlUnaryXNorOp    = vpiUnaryXNorOp,
+  kVlSubOp          = vpiSubOp,
+  kVlDivOp          = vpiDivOp,
+  kVlModOp          = vpiModOp,
+  kVlEqOp           = vpiEqOp,
+  kVlNeqOp          = vpiNeqOp,
+  kVlCaseEqOp       = vpiCaseEqOp,
+  kVlCaseNeqOp      = vpiCaseNeqOp,
+  kVlGtOp           = vpiGtOp,
+  kVlGeOp           = vpiGeOp,
+  kVlLtOp           = vpiLtOp,
+  kVlLeOp           = vpiLeOp,
+  kVlLShiftOp       = vpiLShiftOp,
+  kVlRShiftOp       = vpiRShiftOp,
+  kVlAddOp          = vpiAddOp,
+  kVlMultOp         = vpiMultOp,
+  kVlLogAndOp       = vpiLogAndOp,
+  kVlLogOrOp        = vpiLogOrOp,
+  kVlBitAndOp       = vpiBitAndOp,
+  kVlBitOrOp        = vpiBitOrOp,
+  kVlBitXorOp       = vpiBitXorOp,
+  kVlBitXNorOp      = vpiBitXNorOp,
+  kVlConditionOp    = vpiConditionOp,
+  kVlConcatOp       = vpiConcatOp,
+  kVlMultiConcatOp  = vpiMultiConcatOp,
+  kVlEventOrOp      = vpiEventOrOp,
+  kVlNullOp         = vpiNullOp,
+  kVlListOp         = vpiListOp,
+  kVlMinTypMaxOp    = vpiMinTypMaxOp,
+  kVlPosedgeOp      = vpiPosedgeOp,
+  kVlNegedgeOp      = vpiNegedgeOp,
+  kVlArithLShiftOp  = vpiArithLShiftOp,
+  kVlArithRShiftOp  = vpiArithRShiftOp,
+  kVlPowerOp        = vpiPowerOp
 };
 
 
@@ -531,97 +471,6 @@ enum tVpiVarType {
 
 
 //////////////////////////////////////////////////////////////////////
-/// @brief 式の型
-/// @note ちょっと紛らわしいのはサイズなしの情報とサイズ込みの情報
-/// をともに tVpiValueType と言っている．
-//////////////////////////////////////////////////////////////////////
-enum tVpiValueType {
-  /// @brief 型無し(エラー値)
-  kVpiValueNone      = 0,
-
-  /// @brief 符号つき型のビット
-  kVpiValueSigned    = 1,
-  /// @brief サイズつき型のビット
-  kVpiValueSized     = 2,
-  /// @brief ビットベクタ型のビット
-  kVpiValueBitVector = 4,
-  /// @brief 実数型のビット
-  kVpiValueRealBit   = 8,
-
-  /// @brief 符号無し，サイズ無しのビットベクタ
-  kVpiValueUU        = kVpiValueBitVector,
-  /// @brief 符号無し，サイズありのビットベクタ
-  kVpiValueUS        = kVpiValueBitVector | kVpiValueSized,
-  /// @brief 符号つき，サイズ無しのビットベクタ
-  kVpiValueSU        = kVpiValueBitVector | kVpiValueSigned,
-  /// @brief 符号つき，サイズありのビットベクタ
-  kVpiValueSS        = kVpiValueBitVector | kVpiValueSigned | kVpiValueSized,
-
-  /// @brief 実数型
-  kVpiValueRealType  = kVpiValueRealBit | kVpiValueSigned | kVpiValueSized
-};
-
-/// @brief ビットベクタ型を作る．
-/// @param[in] type 元となるタイプ
-/// @param[in] size サイズ
-tVpiValueType
-pack(tVpiValueType type,
-     ymuint size);
-
-/// @brief 2つの型をマージする．
-/// @param[in] vtype1, vtype2 型
-tVpiValueType
-merge(tVpiValueType vtype1,
-      tVpiValueType vtype2);
-
-/// @brief 型を取り出す．
-/// @param[in] packed_type 型とサイズをパックしたもの．
-tVpiValueType
-unpack_type(tVpiValueType packed_type);
-
-/// @brief サイズを取り出す．
-/// @param[in] packed_type 型とサイズをパックしたもの．
-ymuint
-unpack_size(tVpiValueType type);
-
-/// @brief 符号つきの型かどうかのチェック
-/// @param[in] type 型
-/// @return 符号つきの型の時 true を返す．
-bool
-is_signed_type(tVpiValueType type);
-
-/// @brief サイズつきの型かどうかのチェック
-/// @param[in] type 型
-/// @return サイズつきの型の時 true を返す．
-bool
-is_sized_type(tVpiValueType type);
-
-/// @brief ビットベクタ型かどうかのチェック
-/// @param[in] type 型
-/// @return ビットベクタ型の時 true を返す．
-bool
-is_bitvector_type(tVpiValueType type);
-
-/// @brief integer 型のサイズ
-const ymuint32 kVpiSizeInteger = 32U;
-
-/// @brief real 型のサイズ
-const ymuint32 kVpiSizeReal = 64U;
-
-/// @brief time 型のサイズ
-const ymuint32 kVpiSizeTime = 64U;
-
-/// @brief integer 型
-const tVpiValueType kVpiValueInteger = pack(kVpiValueSS, kVpiSizeInteger);
-
-/// @brief real 型
-const tVpiValueType kVpiValueReal = pack(kVpiValueRealType, kVpiSizeReal);
-
-/// @brief time 型
-const tVpiValueType kVpiValueTime = pack(kVpiValueUS, kVpiSizeTime);
-
-
-//////////////////////////////////////////////////////////////////////
 /// @brief 範囲指定のモード
 //////////////////////////////////////////////////////////////////////
 enum tVpiRangeMode {
@@ -684,342 +533,36 @@ enum tVpiSpecPathType {
   kVpiSpecPathIfnone = 2
 };
 
-
-//////////////////////////////////////////////////////////////////////
-/// @brief UDP のテーブルで使われる値
-//////////////////////////////////////////////////////////////////////
-enum tVpiUdpVal {
-  kVpiUdpVal0  = 1 << 0,
-  kVpiUdpVal1  = 1 << 1,
-  kVpiUdpValX  = 1 << 2,
-  kVpiUdpValB  = kVpiUdpVal0 | kVpiUdpVal1,
-  kVpiUdpValQ  = kVpiUdpValB | kVpiUdpValX,
-
-  kVpiUdpVal00 = kVpiUdpVal0 << 3,
-  kVpiUdpVal01 = kVpiUdpVal1 << 3,
-  kVpiUdpVal0X = kVpiUdpValX << 3,
-  kVpiUdpVal0B = kVpiUdpVal00 | kVpiUdpVal01,
-  kVpiUdpVal0Q = kVpiUdpVal0B | kVpiUdpVal0X,
-
-  kVpiUdpVal10 = kVpiUdpVal0 << 6,
-  kVpiUdpVal11 = kVpiUdpVal1 << 6,
-  kVpiUdpVal1X = kVpiUdpValX << 6,
-  kVpiUdpVal1B = kVpiUdpVal10 | kVpiUdpVal11,
-  kVpiUdpVal1Q = kVpiUdpVal1B | kVpiUdpVal1X,
-
-  kVpiUdpValX0 = kVpiUdpVal0 << 9,
-  kVpiUdpValX1 = kVpiUdpVal1 << 9,
-  kVpiUdpValXX = kVpiUdpValX << 9,
-  kVpiUdpValXB = kVpiUdpValX0 | kVpiUdpValX1,
-  kVpiUdpValXQ = kVpiUdpValXB | kVpiUdpValXX,
-
-  kVpiUdpValB0 = kVpiUdpVal00 | kVpiUdpVal10,
-  kVpiUdpValB1 = kVpiUdpVal01 | kVpiUdpVal11,
-  kVpiUdpValBX = kVpiUdpVal0X | kVpiUdpVal1X,
-  kVpiUdpValBB = kVpiUdpValB0 | kVpiUdpValB1,
-  kVpiUdpValBQ = kVpiUdpValBB | kVpiUdpValBX,
-
-  kVpiUdpValQ0 = kVpiUdpValB0 | kVpiUdpValX0,
-  kVpiUdpValQ1 = kVpiUdpValB1 | kVpiUdpValX1,
-  kVpiUdpValQX = kVpiUdpValBX | kVpiUdpValXX,
-  kVpiUdpValQB = kVpiUdpValQ0 | kVpiUdpValQ1,
-  kVpiUdpValQQ = kVpiUdpValQB | kVpiUdpValQX,
-
-  kVpiUdpValP  = kVpiUdpVal01 | kVpiUdpVal0X | kVpiUdpValX1,
-  kVpiUdpValN  = kVpiUdpVal10 | kVpiUdpVal1X | kVpiUdpValX0,
-
-  kVpiUdpValR  = kVpiUdpVal01,
-  kVpiUdpValF  = kVpiUdpVal10,
-
-  kVpiUdpValNC = 0
-};
-
-/// @brief 遷移シンボル (エッジシンボル) のチェック
-/// @param[in] val UDP テーブル中のシンボル値
-/// @return val が遷移シンボル(エッジシンボル)なら true を返す．
-bool
-is_edge_symbol(tVpiUdpVal val);
-
-/// @brief UDP テーブルのシンボルを表す文字列を得る．
-/// @param[in] val UDP テーブル中のシンボル値
-/// @return val を表す文字列
-string
-symbol2string(tVpiUdpVal val);
-
-// @brief UDP テーブルのシンボルを 2バイトの文字にする．
-// @param[in] val UDP テーブルのシンボル値
-// @return val を表す2バイトの文字
-int
-symbol2dbyte(tVpiUdpVal val);
-
-/// @brief シンボルのマージ
-/// @param[in] symbol1 シンボル1
-/// @param[in] symbol2 シンボル2
-/// @return symbol1 と symbol2 をあわせたシンボルを返す．
-/// @note symbol1, symbol2 ともにレベルシンボルでなければならない．
-tVpiUdpVal
-merge_udp_value(tVpiUdpVal symbol1,
-		tVpiUdpVal symbol2);
-
 /// @}
-
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief tVpiScalarVal から bool への変換
+// @brief tVlDirection のストリーム出力
 inline
-bool
-conv_to_bool(tVpiScalarVal src)
+ostream&
+operator<<(ostream& s,
+	   tVlDirection dir)
 {
-  return src == kVpiScalar1;
-}
-
-// @brief tVpiScalarVal から論理値への変換
-// @note kVpiScalarZ -> kVpiScalarX をやっている
-inline
-tVpiScalarVal
-conv_to_logic(tVpiScalarVal src)
-{
-  switch ( src ) {
-  case kVpiScalar0: return kVpiScalar0;
-  case kVpiScalar1: return kVpiScalar1;
-  case kVpiScalarX:
-  case kVpiScalarZ: return kVpiScalarX;
+  switch ( dir ) {
+  case kVlInput:       s << "Input"; break;
+  case kVlOutput:      s << "Output"; break;
+  case kVlInout:       s << "Inout"; break;
+  case kVlMixedIO:     s << "Mixed IO"; break;
+  case kVlNoDirection: s << "No Direction"; break;
   }
-  assert_not_reached(__FILE__, __LINE__);
-  // ダミー
-  return kVpiScalarX;
+  return s;
 }
 
-// @brief tVpiScalarVal から int への変換
-// @note kVpiScalar1 以外はすべての 0 にマッピングする．
-inline
-int
-conv_to_int(tVpiScalarVal src)
-{
-  if ( src == kVpiScalar1 ) {
-    return 1;
-  }
-  else {
-    return 0;
-  }
-}
 
-// @brief tVpiScalarVal から実数値への変換
-// @note kVpiScalar1 を 1.0 に，それい以外はすべての 0.0 にマッピングする．
-inline
-double
-conv_to_real(tVpiScalarVal src)
-{
-  if ( src == kVpiScalar1 ) {
-    return 1.0;
-  }
-  else {
-    return 0.0;
-  }
-}
-
-// @brief int から tVpiScalarVal への変換
-// @note 0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
-inline
-tVpiScalarVal
-conv_to_scalar(int src)
-{
-  if ( src == 0 ) {
-    return kVpiScalar0;
-  }
-  else {
-    return kVpiScalar1;
-  }
-}
-
-// @brief ymuint から tVpiScalarVal への変換
-// @note 0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
-inline
-tVpiScalarVal
-conv_to_scalar(ymuint src)
-{
-  return conv_to_scalar(static_cast<int>(src));
-}
-
-// @brief 実数値から tVpiScalarVal への変換
-// @note 0.0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
-inline
-tVpiScalarVal
-conv_to_scalar(double src)
-{
-  if ( src == 0.0 ) {
-    return kVpiScalar0;
-  }
-  else {
-    return kVpiScalar1;
-  }
-}
-
-// @brief tVpiScalarVal の否定
-// @note kVpiScalarZ は kVpiScalarX と同様に扱われる．
-inline
-tVpiScalarVal
-operator!(tVpiScalarVal src)
-{
-  switch ( src ) {
-  case kVpiScalar0: return kVpiScalar1;
-  case kVpiScalar1: return kVpiScalar0;
-  case kVpiScalarX:
-  case kVpiScalarZ: return kVpiScalarX;
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  // ダミー
-  return kVpiScalarX;
-}
-
-// @brief tVpiScalarVal の AND
-inline
-tVpiScalarVal
-operator&&(tVpiScalarVal src1,
-	   tVpiScalarVal src2)
-{
-  if ( src1 == kVpiScalar0 || src2 == kVpiScalar0 ) {
-    return kVpiScalar0;
-  }
-  if ( src1 == kVpiScalar1 && src2 == kVpiScalar1 ) {
-    return kVpiScalar1;
-  }
-  return kVpiScalarX;
-}
-
-// @brief tVpiScalarVal の OR
-inline
-tVpiScalarVal
-operator||(tVpiScalarVal src1,
-	   tVpiScalarVal src2)
-{
-  if ( src1 == kVpiScalar1 || src2 == kVpiScalar1 ) {
-    return kVpiScalar1;
-  }
-  if ( src1 == kVpiScalar0 && src2 == kVpiScalar0 ) {
-    return kVpiScalar0;
-  }
-  return kVpiScalarX;
-}
-
-// @brief tVpiScalarVal の等価比較
-inline
-tVpiScalarVal
-eq(tVpiScalarVal src1,
-   tVpiScalarVal src2)
-{
-  if ( src1 == kVpiScalarX || src1 == kVpiScalarZ ||
-       src2 == kVpiScalarX || src2 == kVpiScalarZ ) {
-    return kVpiScalarX;
-  }
-  if ( src1 == src2 ) {
-    return kVpiScalar1;
-  }
-  return kVpiScalar0;
-}
-
-// @brief tVpiScalarVal の等価比較
-inline
-tVpiScalarVal
-neq(tVpiScalarVal src1,
-    tVpiScalarVal src2)
-{
-  if ( src1 == kVpiScalarX || src1 == kVpiScalarZ ||
-       src2 == kVpiScalarX || src2 == kVpiScalarZ ) {
-    return kVpiScalarX;
-  }
-  if ( src1 != src2 ) {
-    return kVpiScalar1;
-  }
-  return kVpiScalar0;
-}
-
-// @brief ビットベクタ型を作る．
-inline
-tVpiValueType
-pack(tVpiValueType type,
-     ymuint size)
-{
-  ymuint tmp = type | (size << 4);
-  return static_cast<tVpiValueType>(tmp);
-}
-
-// @brief 2つの型をマージする．
-inline
-tVpiValueType
-merge(tVpiValueType vtype1,
-      tVpiValueType vtype2)
-{
-  ymuint tmp
-    = static_cast<ymuint>(vtype1) | static_cast<ymuint>(vtype2);
-  return static_cast<tVpiValueType>(tmp);
-}
-
-// @brief 型を取り出す．
-inline
-tVpiValueType
-unpack_type(tVpiValueType packed_type)
-{
-  ymuint tmp = static_cast<ymuint>(packed_type) & 0xF;
-  return static_cast<tVpiValueType>(tmp);
-}
-
-// @brief サイズを取り出す．
-inline
-ymuint
-unpack_size(tVpiValueType type)
-{
-  return (static_cast<ymuint>(type) >> 4);
-}
-
-// @brief 符号つきの型かどうかのチェック
-// @return 符号つきの型の時 true を返す．
-inline
-bool
-is_signed_type(tVpiValueType type)
-{
-  return (static_cast<ymuint>(type) & kVpiValueSigned) == kVpiValueSigned;
-}
-
-// @brief サイズつきの型かどうかのチェック
-// @return サイズつきの型の時 true を返す．
-inline
-bool
-is_sized_type(tVpiValueType type)
-{
-  return (static_cast<ymuint>(type) & kVpiValueSized) == kVpiValueSized;
-}
-
-// @brief ビットベクタ型かどうかのチェック
-// @return ビットベクタ型の時 true を返す．
-inline
-bool
-is_bitvector_type(tVpiValueType type)
-{
-  return (static_cast<ymuint>(type) & kVpiValueBitVector) == kVpiValueBitVector;
-}
-
-/// @brief 遷移シンボル (エッジシンボル) のチェック
-/// @param[in] val
-/// @return val が遷移シンボル(エッジシンボル)なら true を返す．
-inline
-bool
-is_edge_symbol(tVpiUdpVal val)
-{
-  return (val >= 8);
-}
-
-END_NAMESPACE_YM_VERILOG
-
-BEGIN_NAMESPACE_YM
-
+using nsVerilog::BitVector;
 using nsVerilog::VlLineWatcher;
 using nsVerilog::VlMgr;
+using nsVerilog::VlScalarVal;
 using nsVerilog::VlTime;
-using nsVerilog::BitVector;
+using nsVerilog::VlUdpVal;
+using nsVerilog::VlValueType;
 using nsVerilog::VlValue;
 
 END_NAMESPACE_YM

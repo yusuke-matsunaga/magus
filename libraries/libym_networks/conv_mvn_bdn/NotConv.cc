@@ -1,5 +1,5 @@
 
-/// @file libym_networks/NotConv.cc
+/// @file NotConv.cc
 /// @brief NotConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -14,7 +14,7 @@
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 // @brief コンストラクタ
 NotConv::NotConv()
@@ -39,10 +39,9 @@ NotConv::operator()(const MvnNode* node,
 {
   if ( node->type() == MvnNode::kNot ) {
     const MvnInputPin* ipin = node->input(0);
-    const MvnOutputPin* opin = ipin->src_pin();
-    const MvnNode* src_node = opin->node();
-    ymuint bw = opin->bit_width();
-    assert_cond( node->output(0)->bit_width(), __FILE__, __LINE__);
+    const MvnNode* src_node = ipin->src_node();
+    ymuint bw = src_node->bit_width();
+    assert_cond( node->bit_width(), __FILE__, __LINE__);
     for (ymuint i = 0; i < bw; ++ i) {
       BdnNodeHandle handle = nodemap.get(src_node, i);
       nodemap.put(node, i, ~handle);
@@ -52,4 +51,4 @@ NotConv::operator()(const MvnNode* node,
   return false;
 }
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV

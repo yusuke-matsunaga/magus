@@ -1,7 +1,7 @@
-#ifndef LIBYM_MVNBDNCONV_RORCONV_H
-#define LIBYM_MVNBDNCONV_RORCONV_H
+#ifndef RORCONV_H
+#define RORCONV_H
 
-/// @file libym_networks/RorConv.h
+/// @file RorConv.h
 /// @brief RorConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class RorConv RorConv.h "RorConv.h"
@@ -51,6 +51,6 @@ public:
 };
 
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_RORCONV_H
+#endif // RORCONV_H

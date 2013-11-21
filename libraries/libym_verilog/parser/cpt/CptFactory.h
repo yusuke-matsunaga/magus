@@ -30,7 +30,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のアロケータ
-  CptFactory(AllocBase& alloc);
+  CptFactory(Alloc& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -80,7 +80,17 @@ public:
   virtual
   const PtUdpValue*
   new_UdpValue(const FileRegion& fr,
-	       tVpiUdpVal symbol);
+	       char symbol);
+
+  /// @brief UDP のテーブルエントリの要素の値の生成
+  /// @param[in] fr ファイル位置の情報
+  /// @param[in] symbol1, symbol2 シンボル
+  /// @return 生成された値
+  virtual
+  const PtUdpValue*
+  new_UdpValue(const FileRegion& fr,
+	       char symbol1,
+	       char symbol2);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -1044,14 +1054,14 @@ public:
   virtual
   const PtExpr*
   new_Opr(const FileRegion& fr,
-	  tVpiOpType type,
+	  tVlOpType type,
 	  const PtExpr* opr);
 
   /// @brief 二項演算子の生成
   virtual
   const PtExpr*
   new_Opr(const FileRegion& fr,
-	  tVpiOpType type,
+	  tVlOpType type,
 	  const PtExpr* opr1,
 	  const PtExpr* opr2);
 
@@ -1059,7 +1069,7 @@ public:
   virtual
   const PtExpr*
   new_Opr(const FileRegion& fr,
-	  tVpiOpType type,
+	  tVlOpType type,
 	  const PtExpr* opr1,
 	  const PtExpr* opr2,
 	  const PtExpr* opr3);

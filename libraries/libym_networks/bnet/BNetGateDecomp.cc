@@ -1,11 +1,9 @@
 
-/// @file libym_networks/BNetGateDecomp.cc
+/// @file BNetGateDecomp.cc
 /// @brief BNetGateDecomp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetGateDecomp.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,7 +12,7 @@
 #include "ym_networks/BNetDecomp.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 // @brief コンストラクタ．
 BNetGateDecomp::BNetGateDecomp()
@@ -99,7 +97,7 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
       continue;
     }
 
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     assert_cond(expr.child_num() == ni, __FILE__, __LINE__);
 
     ymuint best_cost = ni + 2;
@@ -289,7 +287,7 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
 
     LogExprVector lit_array(ni);
     for (ymuint i = 0; i < ni;  ++ i) {
-      lit_array[i] = LogExpr::make_posiliteral(i);
+      lit_array[i] = LogExpr::make_posiliteral(VarId(i));
     }
     LogExpr new_expr;
     if ( best_type == kAnd ) {
@@ -344,7 +342,8 @@ BNetGateDecomp::count_inv(const LogExpr& expr,
   ymuint c = 0;
   for (ymuint i = 0; i < nc; ++ i) {
     LogExpr expr1 = expr.child(i);
-    tVarId pos = expr1.varid();
+    VarId var = expr1.varid();
+    ymuint pos = var.val();
     BNode* node1 = node->fanin(pos);
     bool inv = false;
     if ( phase & expr1.is_posiliteral() ||
@@ -371,4 +370,4 @@ BNetGateDecomp::node_map(BNode* node,
   return mNodeMap[node->id() * 2 + offset];
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS_BNET

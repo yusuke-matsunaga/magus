@@ -13,7 +13,7 @@
 
 #include "dtpgcl_nsdef.h"
 #include "Val3.h"
-#include "ym_networks/tgnet_nsdef.h"
+#include "ym_networks/tgnet.h"
 #include "ym_networks/TgNode.h"
 
 

@@ -1,0 +1,14 @@
+2011-07-07  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
+
+	* mvn/verilog/ReaderImpl_expr.cc (gen_expr):
+	右辺の可変ビットセレクトの index -> offset 変換がない．
+	TODO-2011-07-07-01
+
+	(gen_expr):
+	右辺の可変範囲セレクトの index -> offset 変換がない．
+	TODO-2011-07-07-02
+
+	(gen_primary):
+	可変インデックスの配列要素を扱えない．
+	TODO-2011-07-07-03
+

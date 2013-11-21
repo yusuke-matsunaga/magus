@@ -1,5 +1,5 @@
 
-/// @file libym_networks/ConcatConv.cc
+/// @file ConcatConv.cc
 /// @brief ConcatConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -14,7 +14,7 @@
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 // @brief コンストラクタ
 ConcatConv::ConcatConv()
@@ -38,14 +38,13 @@ ConcatConv::operator()(const MvnNode* node,
 		       MvnBdnMap& nodemap)
 {
   if ( node->type() == MvnNode::kConcat ) {
-    ymuint bw = node->output(0)->bit_width();
+    ymuint bw = node->bit_width();
     ymuint ni = node->input_num();
     ymuint offset = bw;
     for (ymuint i = 0; i < ni; ++ i) {
       const MvnInputPin* ipin = node->input(i);
-      const MvnOutputPin* opin = ipin->src_pin();
-      const MvnNode* src_node = opin->node();
-      ymuint bw1 = opin->bit_width();
+      const MvnNode* src_node = ipin->src_node();
+      ymuint bw1 = src_node->bit_width();
       offset -= bw1;
       for (ymuint j = 0; j < bw1; ++ j) {
 	ymuint index = offset + j;
@@ -59,4 +58,4 @@ ConcatConv::operator()(const MvnNode* node,
   return false;
 }
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV

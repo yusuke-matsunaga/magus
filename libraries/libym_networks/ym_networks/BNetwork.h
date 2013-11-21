@@ -1,22 +1,20 @@
-#ifndef YM_BNET_BNETWORK_H
-#define YM_BNET_BNETWORK_H
+#ifndef YM_NETWORKS_BNETWORK_H
+#define YM_NETWORKS_BNETWORK_H
 
 /// @file ym_networks/BNetwork.h
 /// @brief BNetwork のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetwork.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
+#include "ym_networks/bnet.h"
 #include "ym_utils/DlList.h"
 #include "ym_utils/ItvlMgr.h"
 #include "ym_utils/NameMgr.h"
 #include "ym_utils/Binder.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 
 // Glossary
 //   ネットワーク: 複数の入力，複数の出力を持つ論理ネットワーク
@@ -29,7 +27,7 @@
 //   記憶ノード:   記憶素子を表すノード latch ノードと呼ぶことにする．
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 class StrBNodeMap;
 
@@ -52,15 +50,15 @@ public:
   /// @brief ソースの節点を返す．
   BNode*
   from() const;
-  
+
   /// @brief シンクの節点を返す．
   BNode*
   to() const;
-  
+
   /// @brief シンクの何番目のファンインとなっているかを返す．
   ymuint
   pos() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -69,7 +67,7 @@ private:
 
   /// @brief コンストラクタ
   BNodeEdge();
-  
+
   /// @brief デストラクタ
   ~BNodeEdge();
 
@@ -81,10 +79,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // シンクノードを指すポインタ
   BNode* mTo;
-  
+
   // シンクノードの何番目のファンインかを示す番号
   ymuint32 mPos;
 
@@ -158,7 +156,7 @@ public:
     BNode* mNode;
 
   };
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -279,7 +277,7 @@ private:
 
   /// @brief コンストラクタ
   BNode();
-  
+
   /// @brief デストラクタ
   ~BNode();
 
@@ -288,19 +286,19 @@ public:
   //////////////////////////////////////////////////////////////////////
   /// @name ノードの型や属性を得る関数
   /// @{
-  
+
   /// @brief ノードの型を取り出す．
   tType
   type() const;
-  
+
   /// @brief 外部入力の時に真を返す．
   bool
   is_input() const;
-  
+
   /// @brief 外部出力の時に真を返す．
   bool
   is_output() const;
-  
+
   /// @brief 中間ノードの時に真を返す．
   bool
   is_logic() const;
@@ -312,34 +310,34 @@ public:
   /// @brief 定数0の論理を持つ時，真を返す．
   bool
   is_zero() const;
-  
+
   /// @brief 定数1の論理を持つ時，真を返す．
   bool
   is_one() const;
-  
+
   /// @brief バッファの論理を持つ時，真を返す．
   bool
   is_buffer() const;
-  
+
   /// @brief インバータの論理を持つ時，真を返す．
   bool
   is_inverter() const;
-  
+
   /// @brief ANDゲートの時, 真を返す．
   /// @note 入力が否定されている場合も含む．
   bool
   is_and() const;
-  
+
   /// @brief ORゲートの時, 真を返す．
   /// @note 入力が否定されている場合も含む．
   bool
   is_or() const;
-  
+
   /// @brief XORゲートの時, 真を返す．
   /// @note 入力が否定されている場合も含む．
   bool
   is_xor() const;
-  
+
   /// @brief SOP 形式の論理式の時 true を返す．
   bool
   is_sop() const;
@@ -355,15 +353,15 @@ public:
   /// @brief ID番号を取出す．
   tId
   id() const;
-  
+
   /// @brief 名前を取り出す．
   const char*
   name() const;
-  
+
   /// @brief ファンイン数を取り出す．
   ymuint
-  ni() const;
-  
+  fanin_num() const;
+
   /// @brief i番目のファンインを取り出す．
   /// @note 範囲外の場合には 0 を返す．
   BNode*
@@ -373,29 +371,29 @@ public:
   /// @note 範囲外の場合には 0 を返す．
   BNodeEdge*
   fanin_edge(ymuint pos) const;
-  
+
   /// @brief 引数の節点が何番目のファンインか調べる．
   /// @note ファンインではない場合には-1を返す．
   int
   fanin_pos(BNode* node) const;
-  
+
   /// @brief ファンアウト数を取り出す．
   ymuint
   fanout_num() const;
-  
+
   /// @brief ファンアウトリストを得る．
   /// @note この関数は呼ばれるたびにリストの複製を作る．
   BNodeEdgeList
   fanouts() const;
-  
+
   /// @brief ファンアウトリストの先頭の反復子を返す．
   BNodeFoList::const_iterator
   fanouts_begin() const;
-  
+
   /// @brief ファンアウトリストの末尾の反復子を返す．
   BNodeFoList::const_iterator
   fanouts_end() const;
-  
+
   /// @brief 論理式を取り出す．
   LogExpr
   func() const;
@@ -410,18 +408,18 @@ public:
   /// @brief ファクタードフォームのリテラル数を取り出す．
   ymuint
   litnum() const;
-  
+
   /// @brief SOP形式のリテラル数の見積りを得る．
   /// @note Boolean factored formの場合には実際よりも
   /// 多めの値になる場合がある．
   ymuint
   sop_litnum() const;
-  
+
   /// @brief ファクタードフォームに基づいて自分の価値を計算する．
   /// @note この値が低いほど，このノードの存在意義は薄い．
   int
   value() const;
-  
+
   /// @brief 親のネットワークを返す．
   BNetwork*
   parent() const;
@@ -434,10 +432,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   // プライベートメンバ関数
   //////////////////////////////////////////////////////////////////////
-  
+
   // コピーコンストラクタは使用禁止
   BNode(const BNode& src);
-  
+
 
   //////////////////////////////////////////////////////////////////////
   // ノードの型，論理式，ファンイン,ファンアウトを
@@ -451,7 +449,7 @@ private:
   void
   set_type(tType type);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // mFlags の操作だけをおこなう関数
@@ -460,7 +458,7 @@ private:
   // タイプを得る．
   tType
   flags_get_type() const;
-  
+
   // タイプをセットする．
   void
   flags_set_type(tType type);
@@ -468,7 +466,7 @@ private:
   // latch ノードの場合の初期値を得る．
   int
   flags_get_reset_value() const;
-  
+
   // latch ノードの場合の初期値を設定する．
   void
   flags_set_reset_value(int value);
@@ -484,16 +482,12 @@ private:
   // temporary マークをクリアする．
   void
   flags_clr_temp();
-  
-  // 入力数を得る．
-  ymuint
-  flags_get_ni() const;
 
   // 入力数をセットする．
   void
-  flags_set_ni(ymuint ni);
+  flags_set_fanin_num(ymuint ni);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // プライベートなデータメンバ
@@ -518,25 +512,25 @@ private:
   const ymuint32 kMaskTemp   = (1 << kShiftTemp);
   static
   const ymuint32 kMaskNI     = ((1 << kShiftNI) - 1);
-  
+
   // 節点の種類を表す番号 ＋ いくつかのフラグ．
   ymuint32 mFlags;
-  
+
   // ID番号
   tId mId;
-  
+
   // ファンインの枝の配列
   BNodeEdge* mFaninEdgeArray;
-  
+
   // ファンアウトの枝を入れるリスト
   DlList<BNodeEdge> mFanouts;
-  
+
   // 機能を表す論理式
   LogExpr mFunc;
-  
+
   // この節点の属しているネットワーク
   BNetwork* mParent;
-  
+
   // ネットワーク中のリスト用のリンク
   struct {
     BNode* mPrev;
@@ -685,14 +679,14 @@ public:
   /// @brief 普通のコンストラクタ．
   /// @note 空のネットワークを作る．
   BNetwork();
-  
+
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のネットワーク
   BNetwork(const BNetwork& src);
-  
+
   /// @brief デストラクタ
   ~BNetwork();
-  
+
   /// @brief 代入演算子
   /// @param[in] src コピー元のネットワーク
   /// @return 自分自身への定数参照を返す．
@@ -702,61 +696,61 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   /// @name 内部情報を得るためのメンバ関数
   /// @{
-  
+
   /// @brief モデル名を得る．
   const char*
   model_name() const;
-  
+
   /// @brief 入力数を得る．
   ymuint
   input_num() const;
-  
+
   /// @brief 入力ノードのリストを返す．
   const BNodeList&
   inputs() const;
-  
+
   /// @brief 入力ノードのリストの先頭の反復子を返す．
   BNodeList::const_iterator
   inputs_begin() const;
-  
+
   /// @brief 入力ノードのリストの末尾の反復子を返す．
   BNodeList::const_iterator
   inputs_end() const;
-  
+
   /// @brief 出力数を得る．
   ymuint
   output_num() const;
-  
+
   /// @brief 出力ノードのリストを返す．
   const BNodeList&
   outputs() const;
-  
+
   /// @brief 出力ノードのリストの先頭の反復子を返す．
   BNodeList::const_iterator
   outputs_begin() const;
-  
+
   /// @brief 出力ノードのリストの先頭の反復子を返す．
   BNodeList::const_iterator
   outputs_end() const;
-  
+
   /// @brief 中間節点の数を得る．
   ymuint
   logic_node_num() const;
-  
+
   /// @brief 中間節点のリストを返す．
   const BNodeList&
   logic_nodes() const;
-  
+
   /// @brief 中間節点のリストの先頭の反復子を返す．
   BNodeList::const_iterator
   logic_nodes_begin() const;
-  
+
   /// @brief 中間節点のリストの末尾の反復子を返す．
   BNodeList::const_iterator
   logic_nodes_end() const;
@@ -776,55 +770,55 @@ public:
   /// @brief latch ノードのリストの末尾の反復子を返す．
   BNodeList::const_iterator
   latch_nodes_end() const;
-  
+
   /// @brief nameという名前をもつノードを探す．
   /// @param[in] name 探索対象の名前
   /// @retval name という名前を持つノード
   /// @retval NULL 該当するノードがない場合
   BNode*
   find_node(const char* name) const;
-  
+
   /// @brief nameという名前をもつノードを探す．
   /// @param[in] name 探索対象の名前
   /// @retval name という名前を持つノード
   /// @retval NULL 該当するノードがない場合
   BNode*
   find_node(const string& name) const;
-  
+
   /// @brief name という名前を持つ外部出力節点を取出す．
   /// @param[in] name 探索対象の名前
   /// @retval name という名前を持つ外部出力ノード
   /// @retval NULL 該当する節点が無い場合
   BNode*
   find_ponode(const char* name) const;
-  
+
   /// @brief name という名前を持つ外部出力節点を取出す．
   /// @param[in] name 探索対象の名前
   /// @retval name という名前を持つ外部出力ノード
   /// @retval NULL 該当する節点が無い場合
   BNode*
   find_ponode(const string& name) const;
-  
+
   /// @brief すべてのノード数を得る．
   ymuint
   node_num() const;
-  
+
   /// @brief ノードの id 番号の最大値 + 1 を得る．
   ymuint
   max_node_id() const;
-  
+
   /// @brief すべてのノードのリストを返す．
   const BNodeList&
   nodes() const;
-  
+
   /// @brief すべてのノードのリストの先頭の反復子を返す．
   BNodeList::const_iterator
   nodes_begin() const;
-  
+
   /// @brief すべてのノードのリストの末尾の反復子を返す．
   BNodeList::const_iterator
   nodes_end() const;
-  
+
   /// @brief ID番号からノードを取出す．
   BNode*
   node(BNode::tId id) const;
@@ -839,11 +833,11 @@ public:
   /// @brief ノード名を取り出す．
   const char*
   node_name(const BNode* node) const;
-  
+
   /// @brief 全部のリテラル数を得る．
   ymuint
   litnum() const;
-  
+
   /// @brief SOP形式のリテラル数の見積りを得る．
   /// @note Boolean factored formの場合には実際よりも
   /// 多めの値になる場合がある．
@@ -853,7 +847,7 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name TFI/TFO 操作関係の関数
   /// @{
@@ -865,16 +859,16 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name ネットワーク名/モデル名を設定する関数
   /// @{
-  
+
   /// @brief モデル名を設定する．
   /// @param[in] name 設定するモデル名
   void
   set_model_name(const char* name);
-  
+
   /// @brief モデル名を設定する．
   /// @param[in] name 設定するモデル名
   void
@@ -882,7 +876,7 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name 自動生成名規則に関する関数
@@ -905,7 +899,7 @@ public:
   void
   change_name_rule(const string& prefix,
 		   const string& suffix);
-  
+
   /// @brief 自動生成名規則の prefix と suffix を得る．
   /// @param[out] prefix 現在のプリフィクス
   /// @param[out] suffix 現在のサフィックス
@@ -915,17 +909,17 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   /// @name ネットワークの構造を変更する関数
   /// @{
-  
+
   /// @brief 今までの内容を捨てて空のネットワークにする．
   void
   clear();
-  
+
   /// @brief 全てのノードの論理式を簡単化する．
   void
   lexp_simplify();
@@ -934,20 +928,20 @@ public:
   /// @param[in] node 対象のノード
   void
   lexp_simplify_node(BNode* node);
-  
+
   /// @brief どこにもファンアウトしていないノードを削除する．
   void
   clean_up();
-  
+
   /// @brief 定数ノード/バッファ/インバータ/使われていないノードの消去を行う．
   /// @note 副作用として clean_up() が呼び出される．
   void
   sweep();
-  
+
   /// @brief ファンアウト数が0の外部入力ノードを削除する．
   void
   delete_unused_input();
-  
+
   /// @brief 「価値」がしきい値以下のノードを削除する．
   /// @param[in] threshold しきい値
   /// @param[in] sop_limit SOP のリテラル数の増分の上限
@@ -958,13 +952,13 @@ public:
   eliminate(int threshold,
 	    ymuint sop_limit,
 	    bool auto_limit = true);
-  
+
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
 protected:
-  
+
   /// @brief 構造が変化した事を記録しておく関数
   void
   structure_changed();
@@ -975,7 +969,7 @@ private:
   /// @brief コピーを行なう
   void
   copy(const BNetwork& src);
-  
+
   /// @brief 型と名前を指定してノードを作成し，それを登録する．
   /// @param[in] type 型
   /// @param[in] name 名前
@@ -986,7 +980,7 @@ private:
   BNode*
   new_node(BNode::tType type,
 	   const char* name = NULL);
-  
+
   // @brief ノードの削除を行う．
   // @param[in] node 削除対象のノード
   // @retval true 削除が成功した．
@@ -1002,14 +996,14 @@ private:
   void
   set_node_type(BNode* node,
 		BNode::tType type);
-		
+
   // ノードに名前を設定して登録する
   // name が ""(空) の場合には名前を自動生成する．
   // 名前が重複していた場合には false を返す．
   bool
   set_node_name(BNode* node,
 		const char* name = NULL);
-  
+
   // ノードの名前をクリアする．
   // 実際には名前をキーにした連想配列から取り除く
   void
@@ -1058,44 +1052,44 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // blif ファイルに書き出すときのモデル名
   StrBuff mModelName;
 
   // ノードの名前の配列
   // node->id() をインデックスとする．
   vector<const char*> mNodeName;
-  
+
   // 外部入力節点のリスト
   BNodeList mPiList;
-  
+
   // 外部出力節点のリスト
   BNodeList mPoList;
-  
+
   // 中間節点のリスト
   BNodeList mLogicList;
 
   // latch 節点のリスト
   BNodeList mLatchList;
-  
+
   // すべての節点のリスト
   BNodeList mNodeList;
-  
+
   // 名前から入力/中間節点を得る連想配列
   StrBNodeMap* mNameMap;
-  
+
   // 名前から外部出力節点を取出すための連想配列
   StrBNodeMap* mPoMap;
-  
+
   // ID番号をキーにしたノードのベクタ
   BNodeVector mNodeVector;
-  
+
   // ノードのID番号管理用オブジェクト
   ItvlMgr mItvlMgr;
-  
+
   // 名前の自動生成用オブジェクト
   NameMgr mNameMgr;
-  
+
   // network trace を管理するオブジェクト
   T1BindMgr<BNetChg> mTraceMgr;
 
@@ -1116,25 +1110,25 @@ public:
   /// @brief コンストラクタ
   /// @note この時点ではネットワークに結び付いていない．
   BNetworkTrace();
-  
+
   /// @brief デストラクタ
   /// @note ネットワークにバインドしていたら解除する．
   virtual
   ~BNetworkTrace();
-  
+
   /// @brief ネットワークとのバインドを解除する．
   void
   unbind();
-  
+
   /// @brief ネットワークとバインドする．
   /// @param[in] network バインドするネットワーク
   void
   bind(BNetwork* network);
-  
+
   /// @brief ネットワークを取り出す．
   BNetwork*
   network() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -1313,9 +1307,9 @@ BNode::name() const
 // ファンイン数を取り出す．
 inline
 ymuint
-BNode::ni() const
+BNode::fanin_num() const
 {
-  return flags_get_ni();
+  return (mFlags >> kShiftNI);
 }
 
 // i番目のファンインを取り出す．範囲外の場合には 0 を返す．
@@ -1323,7 +1317,7 @@ inline
 BNode*
 BNode::fanin(ymuint pos) const
 {
-  return (pos < ni()) ? mFaninEdgeArray[pos].from() : 0;
+  return (pos < fanin_num()) ? mFaninEdgeArray[pos].from() : 0;
 }
 
 // i番めのファンインの枝を取り出す．範囲外の場合には 0 を返す．
@@ -1331,7 +1325,7 @@ inline
 BNodeEdge*
 BNode::fanin_edge(ymuint pos) const
 {
-  return (pos < ni()) ? &mFaninEdgeArray[pos] : 0;
+  return (pos < fanin_num()) ? &mFaninEdgeArray[pos] : 0;
 }
 
 // ファンアウト数を取り出す．
@@ -1456,18 +1450,10 @@ BNode::flags_clr_temp()
   mFlags &= ~kMaskTemp;
 }
 
-// ファンイン数を取り出す．
-inline
-ymuint
-BNode::flags_get_ni() const
-{
-  return (mFlags >> kShiftNI);
-}
-
 // 入力数をセットする．
 inline
 void
-BNode::flags_set_ni(ymuint ni)
+BNode::flags_set_fanin_num(ymuint ni)
 {
   mFlags &= kMaskNI;
   mFlags |= (ni << kShiftNI);
@@ -1488,7 +1474,7 @@ BNetChg::id() const
 {
   return mId;
 }
-  
+
 // クリアイベントを生成するクラスメソッド
 inline
 BNetChg
@@ -1554,7 +1540,7 @@ BNodeList::BNodeList(ymuint which) :
 {
   clear();
 }
-  
+
 // @brief デストラクタ
 inline
 BNodeList::~BNodeList()
@@ -1679,7 +1665,7 @@ operator!=(const BNodeList::const_iterator& a,
 {
   return !operator==(a, b);
 }
-      
+
 // モデル名を得る．
 inline
 const char*
@@ -1687,7 +1673,7 @@ BNetwork::model_name() const
 {
   return mModelName.c_str();
 }
-  
+
 // @brief nameという名前をもつノードを探す．
 inline
 BNode*
@@ -1695,7 +1681,7 @@ BNetwork::find_node(const string& name) const
 {
   return find_node(name.c_str());
 }
-  
+
 // @brief name という名前を持つ外部出力節点を取出す．
 inline
 BNode*
@@ -1703,7 +1689,7 @@ BNetwork::find_ponode(const string& name) const
 {
   return find_ponode(name.c_str());
 }
-      
+
 // 入力数を得る．
 inline
 ymuint
@@ -1711,7 +1697,7 @@ BNetwork::input_num() const
 {
   return mPiList.size();
 }
-      
+
 // 入力ノードのリストを返す．
 inline
 const BNodeList&
@@ -1735,7 +1721,7 @@ BNetwork::inputs_end() const
 {
   return mPiList.end();
 }
-      
+
 // 出力数を得る．
 inline
 ymuint
@@ -1743,7 +1729,7 @@ BNetwork::output_num() const
 {
   return mPoList.size();
 }
-      
+
 // 出力ノードのリストを返す．
 inline
 const BNodeList&
@@ -1767,7 +1753,7 @@ BNetwork::outputs_end() const
 {
   return mPoList.end();
 }
-      
+
 // 中間節点の数を得る．
 inline
 ymuint
@@ -1775,7 +1761,7 @@ BNetwork::logic_node_num() const
 {
   return mLogicList.size();
 }
-      
+
 // 中間節点のリストを返す．
 inline
 const BNodeList&
@@ -1799,7 +1785,7 @@ BNetwork::logic_nodes_end() const
 {
   return mLogicList.end();
 }
-      
+
 // latch 節点の数を得る．
 inline
 ymuint
@@ -1807,7 +1793,7 @@ BNetwork::latch_node_num() const
 {
   return mLatchList.size();
 }
-      
+
 // 中間節点のリストを返す．
 inline
 const BNodeList&
@@ -1847,7 +1833,7 @@ BNetwork::max_node_id() const
 {
   return static_cast<ymuint>(mItvlMgr.max_id() + 1);
 }
-      
+
 // すべてのノードのリストを返す．
 inline
 const BNodeList&
@@ -1934,19 +1920,19 @@ BNetworkTrace::network() const
   return mNetwork;
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS_BNET
 
 BEGIN_NAMESPACE_HASH
 // BNode へのポインタをキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsBnet::BNode*>
+struct hash<nsYm::nsNetworks::nsBnet::BNode*>
 {
   ymuint
-  operator()(nsYm::nsBnet::BNode* node) const
+  operator()(nsYm::nsNetworks::nsBnet::BNode* node) const
   {
     return reinterpret_cast<ympuint>(node)/sizeof(void*);
   }
 };
 END_NAMESPACE_HASH
 
-#endif // YM_BNET_BNETWORK_H
+#endif // YM_NETWORKS_BNETWORK_H

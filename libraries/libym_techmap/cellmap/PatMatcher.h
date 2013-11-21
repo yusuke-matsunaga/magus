@@ -1,7 +1,7 @@
-#ifndef LIBYM_TECHMAP_CELLMAP_PATMATCHER_H
-#define LIBYM_TECHMAP_CELLMAP_PATMATCHER_H
+#ifndef PATMATCHER_H
+#define PATMATCHER_H
 
-/// @file libym_techmap/cellmap/PatMatcher.h
+/// @file PatMatcher.h
 /// @brief PatMatcher のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,13 +10,12 @@
 
 
 #include "ym_techmap/cellmap_nsdef.h"
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/bdn.h"
+#include "ym_cell/cell_nsdef.h"
+#include "Match.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
-
-class PatMgr;
-class PatGraph;
 
 //////////////////////////////////////////////////////////////////////
 /// @class PatMatcher PatMatcher.h "PatMatcher.h"
@@ -27,8 +26,8 @@ class PatMatcher
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] pat_mgr パタンを管理するクラス
-  PatMatcher(const PatMgr& pat_mgr);
+  /// @param[in] library セルライブラリ
+  PatMatcher(const CellLibrary& library);
 
   /// @brief デストラクタ
   ~PatMatcher();
@@ -39,18 +38,15 @@ public:
   /// @brief パタンマッチングを行う．
   /// @param[in] sbj_root サブジェクトグラフの根のノード
   /// @param[in] pat_graph パタングラフ
-  /// @retval true マッチした．
-  /// @retval false マッチしなかった．
+  /// @param[in] match マッチング結果を格納する変数
+  /// @retval true マッチングが成功した
+  /// @retval false マッチングが失敗した．
   bool
   operator()(const BdnNode* sbj_root,
-	     const PatGraph& pat_graph);
+	     const CellPatGraph& pat_graph,
+	     Match& match);
 
-  /// @brief 直前のマッチングにおける出力の極性を得る．
-  /// @retval true 反転あり
-  /// @retval false 反転なし
-  bool
-  root_inv() const;
-
+#if 0
   /// @brief 直前のマッチングにおける入力のノードを得る．
   /// @param[in] pos 入力番号
   const BdnNode*
@@ -62,7 +58,7 @@ public:
   /// @retval false 反転なし
   bool
   leaf_inv(ymuint pos) const;
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -86,8 +82,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // パタングラフを管理するクラス
-  const PatMgr& mPatMgr;
+  // セルライブラリ
+  const CellLibrary& mLibrary;
 
   // パタンノードの ID をキーとしてサブジェクトノードを入れる配列
   vector<const BdnNode*> mSbjMap;
@@ -102,11 +98,13 @@ private:
   // mSbjMap と mInvMap のクリア用キュー
   vector<ymuint> mClearQueue;
 
+#if 0
   // 直前のマッチングにおけるパタンの入力ノードを記録する配列
   vector<const BdnNode*> mLeafNodeArray;
 
   // 直前のマッチングにおけるパタンの入力の極性を記録する配列
   vector<bool> mLeafInvArray;
+#endif
 
 };
 
@@ -115,6 +113,7 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+#if 0
 // @brief 直前のマッチングにおける入力のノードを得る．
 // @param[in] pos 入力番号
 inline
@@ -134,7 +133,8 @@ PatMatcher::leaf_inv(ymuint pos) const
 {
   return mLeafInvArray[pos];
 }
+#endif
 
 END_NAMESPACE_YM_CELLMAP
 
-#endif // LIBYM_TECHMAP_CELLMAP_PATMATCHER_H
+#endif // PATMATCHER_H

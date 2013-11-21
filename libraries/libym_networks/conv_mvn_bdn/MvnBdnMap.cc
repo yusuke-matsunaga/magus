@@ -1,9 +1,9 @@
 
-/// @file libym_networks/MvnBdnMap.cc
+/// @file MvnBdnMap.cc
 /// @brief MvnBdnMap の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,7 +14,7 @@
 #include "ym_networks/MvnNode.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 // @brief コンストラクタ
 MvnBdnMap::MvnBdnMap(ymuint n) :
@@ -48,8 +48,8 @@ MvnBdnMap::put(const MvnNode* mvnode,
 {
   assert_cond( mArray.size() > mvnode->id(), __FILE__, __LINE__);
   vector<BdnNodeHandle>& array = mArray[mvnode->id()];
-  if ( array.size() != mvnode->output(0)->bit_width() ) {
-    array.resize(mvnode->output(0)->bit_width());
+  if ( array.size() != mvnode->bit_width() ) {
+    array.resize(mvnode->bit_width());
   }
   array[index] = nodehandle;
 }
@@ -74,7 +74,7 @@ MvnBdnMap::get(const MvnNode* mvnode,
   if ( array.empty() ) {
     return BdnNodeHandle(NULL, false);
   }
-  assert_cond( array.size() == mvnode->output(0)->bit_width(),
+  assert_cond( array.size() == mvnode->bit_width(),
 	       __FILE__, __LINE__);
   return array[index];
 }
@@ -96,7 +96,7 @@ dump_nodehandle(ostream& s,
     if ( h.inv() ) {
       s << "~";
     }
-    s << h.node()->id_str();
+    s << "Node[" << h.node()->id() << "]";
   }
 }
 
@@ -111,8 +111,7 @@ dump_mvnode_map(ostream& s,
   for (ymuint i = 0; i < n; ++ i) {
     const MvnNode* node = mvmgr.node(i);
     if ( node == NULL ) continue;
-    const MvnOutputPin* opin = node->output(0);
-    ymuint bw = opin->bit_width();
+    ymuint bw = node->bit_width();
     if ( bw == 1 ) {
       BdnNodeHandle nodehandle = mvnode_map.get(node);
       s << "// node" << node->id() << " : ";
@@ -123,11 +122,11 @@ dump_mvnode_map(ostream& s,
       for (ymuint i = 0; i < bw; ++ i) {
 	BdnNodeHandle nodehandle = mvnode_map.get(node, i);
 	s << "// node" << node->id() << " [" << i << "] : ";
-	//dump_bdnhandle(s, nodehandle);
+	dump_nodehandle(s, nodehandle);
 	s << endl;
       }
     }
   }
 }
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV

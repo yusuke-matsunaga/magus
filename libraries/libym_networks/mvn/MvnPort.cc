@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnPort.cc
+/// @file MvnPort.cc
 /// @brief MvnPort の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,7 +11,7 @@
 #include "ym_networks/MvnNode.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvnPortRef
@@ -31,13 +31,13 @@ MvnPortRef::bit_width() const
   else {
     const MvnNode* n = node();
     if ( n->type() == MvnNode::kInput ) {
-      return n->output(0)->bit_width();
+      return n->bit_width();
     }
     else if ( n->type() == MvnNode::kOutput ) {
       return n->input(0)->bit_width();
     }
     else if ( n->type() == MvnNode::kInout ) {
-      return n->input(0)->bit_width();
+      return n->bit_width();
     }
   }
   assert_not_reached(__FILE__, __LINE__);
@@ -78,4 +78,4 @@ MvnPort::bit_width() const
   return ans;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN

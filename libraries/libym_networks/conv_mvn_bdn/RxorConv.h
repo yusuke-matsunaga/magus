@@ -1,7 +1,7 @@
-#ifndef LIBYM_MVNBDNCONV_RXORCONV_H
-#define LIBYM_MVNBDNCONV_RXORCONV_H
+#ifndef RXORCONV_H
+#define RXORCONV_H
 
-/// @file libym_networks/RxorConv.h
+/// @file RxorConv.h
 /// @brief RxorConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class RxorConv RxorConv.h "RxorConv.h"
@@ -51,6 +51,6 @@ public:
 };
 
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_RXORCONV_H
+#endif // RXORCONV_H

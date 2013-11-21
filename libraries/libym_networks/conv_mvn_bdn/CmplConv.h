@@ -1,7 +1,7 @@
-#ifndef LIBYM_MVNBDNCONV_CMPLCONV_H
-#define LIBYM_MVNBDNCONV_CMPLCONV_H
+#ifndef CMPLCONV_H
+#define CMPLCONV_H
 
-/// @file libym_networks/CmplConv.h
+/// @file CmplConv.h
 /// @brief CmplConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmplConv CmplConv.h "CmplConv.h"
@@ -51,6 +51,6 @@ public:
 };
 
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_CMPLCONV_H
+#endif // CMPLCONV_H

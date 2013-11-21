@@ -4,10 +4,8 @@
 /// @file libym_aig/FraigSig.h
 /// @brief FraigSig のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: FraigSig.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -26,18 +24,18 @@ BEGIN_NAMESPACE_YM_AIG
 class FraigSig
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] size サイズ
   explicit
   FraigSig(ymuint size);
-  
+
   /// @brief コピーコンストラクタ
   FraigSig(const FraigSig& src);
-  
+
   /// @brief デストラクタ
   ~FraigSig();
-  
+
 
 public:
 
@@ -48,7 +46,7 @@ public:
   /// @brief ハッシュ値の計算時に反転していたら true を返す．
   bool
   inv() const;
-  
+
   /// @brief 1 の数を返す．
   ymuint
   one_count() const;
@@ -56,12 +54,12 @@ public:
   /// @brief 0 の数を返す．
   ymuint
   zero_count() const;
-  
+
   /// @brief 内容を得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   ymuint32
   pat(ymuint pos) const;
-  
+
   /// @brief 内容を設定する．
   /// @note サイズがあっていることを前提としている．
   void
@@ -77,15 +75,15 @@ public:
        bool right_inv,
        const FraigSig& left,
        bool left_inv);
-  
+
   /// @brief 等価比較
   bool
   operator==(const FraigSig& right) const;
-  
+
   /// @brief 否定したものが等価かどうか調べる．
   bool
   ncomp(const FraigSig& right) const;
-  
+
   /// @brief 大小比較 (lt)
   bool
   operator<(const FraigSig& right) const;
@@ -93,44 +91,44 @@ public:
   /// @brief ハッシュ値を返す．
   ymuint
   hash() const;
-  
+
   /// @brief 内容を出力する．
   void
   dump(ostream& s) const;
-  
-  
+
+
 private:
 
   /// @brief ハッシュ値を計算する．
   void
   calc_hash();
-  
+
   /// @brief pat 中の 1 の数を数える．
   ymuint
   count_ones(ymuint32 pat);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // サイズ
   ymuint32 mSize;
 
   // 本体
   ymuint32* mBody;
-  
+
   // ハッシュ値
   ymuint32 mHash;
-  
+
   // 1 の数
   ymuint32 mOne;
-  
+
   // ハッシュ用の素数配列
   static
   ymuint32 mPrimes[128];
-  
+
 };
 
 /// @relates FraigSig
@@ -171,7 +169,7 @@ FraigSig::FraigSig(ymuint size) :
   mHash(0)
 {
 }
-  
+
 // @brief コピーコンストラクタ
 inline
 FraigSig::FraigSig(const FraigSig& src) :
@@ -183,7 +181,7 @@ FraigSig::FraigSig(const FraigSig& src) :
     mBody[i] = src.mBody[i];
   }
 }
-  
+
 // @brief デストラクタ
 inline
 FraigSig::~FraigSig()
@@ -206,7 +204,7 @@ FraigSig::inv() const
 {
   return static_cast<bool>(mSize & 1U);
 }
-  
+
 // @brief 1 の数を返す．
 inline
 ymuint
@@ -231,7 +229,7 @@ FraigSig::pat(ymuint pos) const
 {
   return mBody[pos];
 }
-  
+
 // @brief 内容を設定する．
 // @note サイズがあっていることを前提としている．
 inline
@@ -303,7 +301,7 @@ FraigSig::operator==(const FraigSig& right) const
   }
   return true;
 }
-  
+
 // @brief 否定したものが等価かどうか調べる．
 inline
 bool
@@ -348,7 +346,7 @@ operator>(const FraigSig& left,
 	  const FraigSig& right)
 {
   return right.operator<(left);
-} 
+}
 
 // @relates FraigSig
 // @brief 大小比較 (le)
@@ -400,7 +398,7 @@ FraigSig::calc_hash()
     }
   }
 }
-  
+
 // @brief pat 中の 1 の数を数える．
 inline
 ymuint
@@ -417,10 +415,10 @@ FraigSig::count_ones(ymuint32 pat)
   pat = (pat & mask4)  + ((pat >>  4) & mask4);
   pat = (pat & mask8)  + ((pat >>  8) & mask8);
   pat = (pat & mask16) + ((pat >> 16) & mask16);
-  
+
   return pat;
 }
-  
+
 // @brief 内容を出力する．
 inline
 void

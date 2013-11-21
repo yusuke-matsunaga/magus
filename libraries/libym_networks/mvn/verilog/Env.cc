@@ -1,19 +1,17 @@
 
-/// @file libym_networks/verilog/Env.cc
+/// @file Env.cc
 /// @brief Env の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "Env.h"
 #include "AsyncControl.h"
-#include "ym_verilog/vl/VlDecl.h"
-#include "ym_verilog/vl/VlRange.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 // @brief コンストラクタ
 // @param[in] decl_hash VlDecl 用のハッシュ表
@@ -305,4 +303,4 @@ AsyncControl::AsyncControl(const Env& global_env) :
 {
 }
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG

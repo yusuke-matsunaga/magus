@@ -22,6 +22,8 @@
 #include "ym_verilog/pt/PtItem.h"
 #include "ym_verilog/pt/PtMisc.h"
 
+#include "ym_cell/CellLibrary.h"
+
 #include "PtMgr.h"
 #include "ElbModule.h"
 
@@ -33,10 +35,13 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @brief コンストラクタ
 // @param[in] elb_mgr Elbオブジェクトを管理するクラス
 // @param[in] elb_factory Elbオブジェクトを生成するファクトリクラス
+// @param[in] cell_library セルライブラリ
 Elaborator::Elaborator(ElbMgr& elb_mgr,
-		       ElbFactory& elb_factory) :
+		       ElbFactory& elb_factory,
+		       const CellLibrary* cell_library) :
   mMgr(elb_mgr),
   mFactory(elb_factory),
+  mCellLibrary(cell_library),
   mAlloc(4096)
 {
   mAllowEmptyIORange = true;
@@ -306,6 +311,21 @@ Elaborator::reg_constant_function(const VlNamedObj* parent,
 				  ElbTaskFunc* func)
 {
   mCfDict.add(parent, name, func);
+}
+
+// @brief セルの探索
+// @param[in] name セル名
+// @return name という名のセルを返す．
+// @note なければ NULL を返す．
+const Cell*
+Elaborator::find_cell(const char* name) const
+{
+  if ( mCellLibrary ) {
+    return mCellLibrary->cell(name);
+  }
+  else {
+    return NULL;
+  }
 }
 
 END_NAMESPACE_YM_VERILOG

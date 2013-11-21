@@ -1,11 +1,9 @@
 #ifndef YM_UTILS_DLLIST_H
 #define YM_UTILS_DLLIST_H
 
-/// @file ym_utils/DlList.h 
+/// @file ym_utils/DlList.h
 /// @brief DlList のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: DlList.h 1143 2008-01-04 07:27:17Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
@@ -43,7 +41,7 @@ class DlListConstIter;
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DlElem DlList.h <ym_utils/DlList.h>
+/// @class DlElem DlList.h "ym_utils/DlList.h"
 /// @brief DlList の要素の基底クラス
 /// @ingroup DlListGroup
 /// @sa DlList DlListIter
@@ -57,15 +55,19 @@ public:
   /// @brief コンストラクタ
   DlElem();
 
+  /// @brief デストラクタ
+  virtual
+  ~DlElem() { }
+
   /// @brief 前の要素を得る．
   DlElem*
   prev() const;
-  
+
   /// @brief 次の要素を得る．
   DlElem*
   next() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -81,7 +83,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DlListBase DlList.h <ym_utils/DlList.h>
+/// @class DlListBase DlList.h "ym_utils/DlList.h"
 /// @brief DlElem のリスト
 /// @ingroup DlListGroup
 /// @sa DlElem
@@ -101,9 +103,9 @@ public:
   /// @brief 内容を空にする．
   void
   clear();
-  
+
   /// @brief 要素数の取得
-  size_t
+  ymuint
   size() const;
 
   /// @brief 空のとき true を返す．
@@ -116,7 +118,7 @@ protected:
   /// @brief 先頭に要素を追加する．
   void
   _push_front(DlElem* t);
-  
+
   /// @brief 末尾に要素を追加する．
   void
   _push_back(DlElem* t);
@@ -137,11 +139,11 @@ protected:
   /// @brief 末尾の要素を削除する．
   void
   _pop_back();
-  
+
   /// @brief 要素を削除する．
   void
   _erase(DlElem* t);
-  
+
   /// @brief 要素を削除する．
   /// @param[in] t 削除する要素
   /// @param[in] prev t の直前の要素
@@ -158,7 +160,7 @@ protected:
   /// @brief 末尾の要素を返す．
   DlElem*
   _back() const;
-  
+
   /// @brief 先頭の反復子を返す．
   DlElem*
   _begin() const;
@@ -190,13 +192,13 @@ private:
   DlElem mDummyTop;
 
   // 要素数
-  size_t mNum;
+  ymuint32 mNum;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DlListIter DlList.h <ym_utils/DlList.h>
+/// @class DlListIter DlList.h "ym_utils/DlList.h"
 /// @brief Doublly Linked List の反復子
 /// @ingroup DlListGroup
 /// @sa DlList DlElem
@@ -284,7 +286,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DlListConstIter DlList.h <ym_utils/DlList.h>
+/// @class DlListConstIter DlList.h "ym_utils/DlList.h"
 /// @brief Doublly Linked List の constant 反復子
 /// @ingroup DlListGroup
 /// @sa DlList DlElem
@@ -372,7 +374,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DlList DlList.h <ym_utils/DlList.h>
+/// @class DlList DlList.h "ym_utils/DlList.h"
 /// @brief Dl のリスト
 /// @ingroup DlListGroup
 /// @sa DlListIter
@@ -385,7 +387,7 @@ public:
 
   typedef DlListIter<T> iterator;
   typedef DlListConstIter<T> const_iterator;
-  
+
 public:
 
   /// @brief コンストラクタ
@@ -399,7 +401,7 @@ public:
   /// @brief 先頭に要素を追加する．
   void
   push_front(T* t);
-  
+
   /// @brief 末尾に要素を追加する．
   void
   push_back(T* t);
@@ -416,7 +418,7 @@ public:
   /// @brief 末尾の要素を削除する．
   void
   pop_back();
-  
+
   /// @brief 要素を削除する．
   void
   erase(T* t);
@@ -428,7 +430,7 @@ public:
   /// @brief 末尾の要素を返す．
   T*
   back() const;
-  
+
   /// @brief 先頭の反復子を返す．
   DlListIter<T>
   begin();
@@ -479,7 +481,7 @@ DlElem::prev() const
 {
   return mPrevLink;
 }
-  
+
 // @brief 次の要素を得る．
 inline
 DlElem*
@@ -492,10 +494,10 @@ DlElem::next() const
 //////////////////////////////////////////////////////////////////////
 // DlListBase のインライン関数
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief 要素数の取得
 inline
-size_t
+ymuint
 DlListBase::size() const
 {
   return mNum;
@@ -519,7 +521,7 @@ DlListBase::_push_front(DlElem* t)
   assert_cond(next->mPrevLink == prev, __FILE__, __LINE__);
   _insert(t, prev, next);
 }
-  
+
 // @brief 末尾に要素を追加する．
 inline
 void
@@ -575,7 +577,7 @@ DlListBase::_pop_back()
   assert_cond(prev->mNextLink == t, __FILE__, __LINE__);
   __erase(t, prev, next);
 }
-  
+
 // @brief 要素を削除する．
 inline
 void
@@ -589,7 +591,7 @@ DlListBase::_erase(DlElem* t)
   assert_cond(next->mPrevLink == t, __FILE__, __LINE__);
   __erase(t, prev, next);
 }
-  
+
 // @brief 要素を削除する．
 // @param[in] t 削除する要素
 // @param[in] prev t の直前の要素
@@ -622,7 +624,7 @@ DlListBase::_back() const
 {
   return mDummyTop.mPrevLink;
 }
-  
+
 // @brief 先頭の反復子を返す．
 inline
 DlElem*
@@ -950,7 +952,7 @@ DlList<T>::push_front(T* t)
 {
   _push_front(t);
 }
-  
+
 // @brief 末尾に要素を追加する．
 template<typename T>
 inline
@@ -990,7 +992,7 @@ DlList<T>::pop_back()
 {
   _pop_back();
 }
-  
+
 // @brief 要素を削除する．
 template<typename T>
 inline
@@ -1017,7 +1019,7 @@ DlList<T>::back() const
 {
   return reinterpret_cast<T*>(_back());
 }
-  
+
 // @brief 先頭の反復子を返す．
 template<typename T>
 inline

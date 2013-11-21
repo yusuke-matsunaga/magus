@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVNMGR_H
-#define YM_MVN_MVNMGR_H
+#ifndef YM_NETWORKS_MVNMGR_H
+#define YM_NETWORKS_MVNMGR_H
 
 /// @file ym_networks/MvnMgr.h
 /// @brief MvnMgr のヘッダファイル
@@ -9,13 +9,14 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_networks/MvnNode.h"
 #include "ym_utils/ItvlMgr.h"
 #include "ym_verilog/vl/VlFwd.h"
+#include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnMgr MvnMgr.h "ym_networks/MvnMgr.h"
@@ -81,20 +82,6 @@ public:
   /// @note NULL が還されることもある．
   MvnNode*
   _node(ymuint id);
-
-  /// @brief ネットの ID番号の最大値 + 1 を返す．
-  ymuint
-  max_net_id() const;
-
-  /// @brief ネットを得る．
-  /// @param[in] id ID番号 ( 0 <= id < max_net_id() )
-  const MvnNet*
-  net(ymuint id) const;
-
-  /// @brief ネットを得る．
-  /// @param[in] id ID番号 ( 0 <= id < max_net_id() )
-  MvnNet*
-  _net(ymuint id);
 
 
 public:
@@ -221,13 +208,15 @@ public:
   /// @brief フリップフロップノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] clock_pol クロックの極性
-  /// @param[in] control_array 非同期セットの極性を入れた配列
+  /// @param[in] pol_array 非同期セット信号の極性情報を入れた配列
+  /// @param[in] val_array 非同期セットの値を入れた配列
   /// @param[in] bit_width ビット幅
-  /// @note control_array の要素数が非同期セット信号数となる．
+  /// @note pol_array の要素数が非同期セット信号数となる．
   MvnNode*
   new_dff(MvnModule* module,
 	  ymuint clock_pol,
-	  const vector<ymuint>& control_array,
+	  const vector<ymuint>& pol_array,
+	  const vector<MvnNode*>& val_array,
 	  ymuint bit_width = 1);
 
   /// @brief ラッチノードを生成する．
@@ -314,6 +303,18 @@ public:
   MvnNode*
   new_equal(MvnModule* module,
 	    ymuint bit_width);
+
+  /// @brief case 文用の equal ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
+  /// @param[in] xmask Xマスク値
+  /// @return 生成したノードを返す．
+  /// @note 最初の入力が case expression
+  /// @note 残りの入力は caseitem expression
+  MvnNode*
+  new_caseeq(MvnModule* module,
+	     ymuint bit_width,
+	     const vector<ymuint32>& xmask);
 
   /// @brief less than ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -481,9 +482,9 @@ public:
 
   /// @brief part-select ノードを生成する．
   /// @param[in] module ノードが属するモジュール
-  /// @param[in] bit_width ビット幅
   /// @param[in] msb 範囲指定の MSB
   /// @param[in] lsb 範囲指定の LSB
+  /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvnNode*
   new_constpartselect(MvnModule* module,
@@ -521,6 +522,13 @@ public:
   new_const(MvnModule* module,
 	    ymuint bit_width,
 	    const vector<ymuint32>& val);
+
+  /// @brief セルノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] cell セル
+  MvnNode*
+  new_cell(MvnModule* module,
+	   const Cell* cell);
 
   /// @brief ノードを削除する．
   /// @param[in] node 対象のノード
@@ -687,12 +695,6 @@ private:
   // ノードのID番号を管理するためのオブジェクト
   ItvlMgr mNodeItvlMgr;
 
-  // 全ネットを ID 番号をキーにして格納する配列
-  vector<MvnNet*> mNetArray;
-
-  // ネットの ID番号を管理するためのオブジェクト
-  ItvlMgr mNetItvlMgr;
-
 };
 
 
@@ -702,6 +704,6 @@ dump_node_map(ostream& s,
 	      const MvnMgr& mgr,
 	      const MvnVlMap& node_map);
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // YM_MVN_MVNMGR_H
+#endif // YM_NETWORKS_MVNMGR_H

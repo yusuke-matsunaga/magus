@@ -1,5 +1,5 @@
 
-/// @file libym_networks/verilog/MvVlMap.cc
+/// @file MvVlMap.cc
 /// @brief MvVlMap の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,7 +11,7 @@
 #include "MapRec.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvnVlMap
@@ -314,4 +314,4 @@ ArrayMapRec::get_array_offset() const
   return mOffset;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN

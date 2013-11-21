@@ -1,19 +1,18 @@
-#ifndef LIBYM_VERILOG_ELB_OBJDICT_H
-#define LIBYM_VERILOG_ELB_OBJDICT_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_OBJDICT_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_OBJDICT_H
 
 /// @file libym_verilog/elaborator/include/ObjDict.h
 /// @brief ObjDict のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: ObjDict.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_verilog/verilog.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
 
 #include "ym_verilog/vl/VlFwd.h"
 #include "ElbFwd.h"
@@ -565,7 +564,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のアロケータ
-  ObjDict(AllocBase& alloc);
+  ObjDict(Alloc& alloc);
 
   /// @brief デストラクタ
   ~ObjDict();
@@ -677,4 +676,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_OBJDICT_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_OBJDICT_H

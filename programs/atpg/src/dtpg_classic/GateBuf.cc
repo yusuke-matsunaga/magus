@@ -34,7 +34,7 @@ GateBuf::~GateBuf()
 tTgGateType
 GateBuf::gate_type() const
 {
-  return kTgBuff;
+  return kTgGateBuff;
 }
 
 bool
@@ -142,7 +142,7 @@ GateNot::~GateNot()
 tTgGateType
 GateNot::gate_type() const
 {
-  return kTgNot;
+  return kTgGateNot;
 }
 
 bool

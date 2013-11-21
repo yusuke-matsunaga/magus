@@ -5,9 +5,7 @@
 /// @brief Tclpp サブモジュール関係のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: tclpp_nsdef.h 1417 2008-05-06 18:12:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup Tclpp Tcl++ サブモジュール
@@ -58,6 +56,7 @@ class TclBase;
 class TclObj;
 typedef vector<TclObj> TclObjVector;
 typedef list<TclObj> TclObjList;
+class TclObjMsgHandler;
 class TclCmd;
 class TclCmdCls;
 template<typename cmd>
@@ -125,6 +124,7 @@ using nsTclpp::TclBase;
 using nsTclpp::TclObj;
 using nsTclpp::TclObjVector;
 using nsTclpp::TclObjList;
+using nsTclpp::TclObjMsgHandler;
 using nsTclpp::TclCmd;
 using nsTclpp::TclCmdCls;
 using nsTclpp::TclCmdBinder;

@@ -7,7 +7,7 @@
 ///
 /// $Id: VlControl.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 // IEEE Std 1364-2001 26.6.29 Delay control
@@ -21,7 +21,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlControl VlControl.h <ym_verilog/vl/VlControl.h>
+/// @class VlControl VlControl.h "ym_verilog/vl/VlControl.h"
 /// @brief delay/event/repeat control statement を表すクラス
 /// IEEE Std 1364-2001 26.6.29 Delay control
 /// IEEE Std 1364-2001 26.6.30 Event control

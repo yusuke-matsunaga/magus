@@ -1,23 +1,21 @@
-#ifndef YM_UTILS_STRPOOL_H
-#define YM_UTILS_STRPOOL_H
+#ifndef STRPOOL_H
+#define STRPOOL_H
 
-/// @file ym_utils/StrPool.h
+/// @file StrPool.h
 /// @brief StrPool のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: StrPool.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class StrPool StrPool.h <ym_utils/StrPool.h>
+/// @class StrPool StrPool.h "StrPool.h"
 /// @ingroup YmUtils
 /// @brief 文字列を共有するためのプール
 ///
@@ -37,6 +35,12 @@ public:
   /// @note このオブジェクトが管理しているすべてのページが解放される．
   ~StrPool();
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 文字列を登録する．
   /// @param[in] str 入力となる文字列
   /// @return カノニカライズされた文字列を返す．
@@ -46,11 +50,19 @@ public:
   /// @brief 確保した文字列領域の総量を得る．
   /// @return 確保した文字列領域の総量を得る．
   /// @note デバッグ/解析用 -- 通常は使わない．
-  size_t
+  ymuint
   accum_alloc_size() const;
+
+  /// @brief メモリを全部開放する．
+  /// @note 非常に破壊的なのでメモリリーク検査時の終了直前などの場合のみに使う．
+  void
+  destroy();
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief ハッシュ関数
   /// @param[in] str ハッシュ対象の文字列
@@ -58,14 +70,17 @@ private:
   static
   ymuint32
   hash_func(const char* str);
-  
+
   /// @brief テーブルを確保して初期化する．
   /// @param[in] new_size 新しいテーブルサイズ
   void
   alloc_table(ymuint32 new_size);
-  
+
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief ハッシュ表の中で使われる要素
   struct
@@ -76,12 +91,12 @@ private:
 
     // 文字数 (末尾の \0 を含む)
     ymuint32 mSize;
-    
+
     // 文字列領域の先頭を指すダミー
     // 実際には必要なサイズの領域を確保する．
     char mStr[1];
   };
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -93,7 +108,7 @@ private:
 
   // ハッシュ表のサイズ
   ymuint32 mTableSize;
-  
+
   // ハッシュ表の実効サイズ
   ymuint32 mHashMask;
 
@@ -105,9 +120,9 @@ private:
 
   // Cell を確保するためのアロケータ
   SimpleAlloc mCellAlloc;
-  
+
 };
 
 END_NAMESPACE_YM
 
-#endif // YM_UTILS_STRPOOL_H
+#endif // STRPOOL_H

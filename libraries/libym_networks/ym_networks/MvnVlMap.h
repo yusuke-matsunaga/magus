@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVVLMAP_H
-#define YM_MVN_MVVLMAP_H
+#ifndef YM_NETWORKS_MVVLMAP_H
+#define YM_NETWORKS_MVVLMAP_H
 
 /// @file ym_networks/MvnVlMap.h
 /// @brief MvnVlMap のヘッダファイル
@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_verilog/vl/VlFwd.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 class MapRec;
 
@@ -137,6 +137,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // YM_MVN_MVVLMAP_H
+#endif // YM_NETWORKS_MVVLMAP_H

@@ -5,22 +5,18 @@
 ///
 /// $Id: VlDumperImpl_item.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
 #include "VlDumperImpl.h"
 
-#include <ym_verilog/VlMgr.h>
-#include <ym_verilog/vl/VlUdp.h>
-#include <ym_verilog/vl/VlPrimitive.h>
-#include <ym_verilog/vl/VlTaskFunc.h>
-#include <ym_verilog/vl/VlContAssign.h>
-#include <ym_verilog/vl/VlModule.h>
+#include "ym_verilog/VlMgr.h"
+#include "ym_verilog/vl/VlUdp.h"
+#include "ym_verilog/vl/VlPrimitive.h"
+#include "ym_verilog/vl/VlTaskFunc.h"
+#include "ym_verilog/vl/VlContAssign.h"
+#include "ym_verilog/vl/VlModule.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

@@ -14,6 +14,7 @@
 #include "NetCmd.h"
 
 #include "ym_networks/BNetIscas89Reader.h"
+#include "ym_networks/BdnIscas89Reader.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -48,8 +49,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // iscas89 ファイルを読み込むためのパーサ
-  BNetIscas89Reader mReader;
+  // BNetwork にiscas89 ファイルを読み込むためのパーサ
+  BNetIscas89Reader mBnetReader;
+
+  // Bdn にiscas89 ファイルを読み込むためのパーサ
+  BdnIscas89Reader mBdnReader;
 
 };
 

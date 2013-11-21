@@ -7,7 +7,7 @@
 ///
 /// $Id: VlExpr.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,7 +18,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlExpr VlExpr.h <ym_verilog/vl/VlExpr.h>
+/// @class VlExpr VlExpr.h "ym_verilog/vl/VlExpr.h"
 /// @brief エラボレーション中の expression を表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class VlExpr :
@@ -37,9 +37,17 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 式の値のタイプを返す．
+  /// @note このタイプで評価する．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const = 0;
+
+  /// @brief 要求された値のタイプを返す．
+  /// @note こちらは上位の式あるいは左辺の式から決まるタイプ
+  /// @note 評価後にこのタイプに変換する．
+  virtual
+  VlValueType
+  req_type() const = 0;
 
   /// @brief Verilog-HDL の文字列を得る．
   virtual
@@ -47,6 +55,7 @@ public:
   decompile() const = 0;
 
   /// @brief 式のビット幅を返す．
+  /// @note value_type().size() を同じ
   virtual
   ymuint
   bit_size() const = 0;
@@ -218,7 +227,7 @@ public:
   /// @note kVpiOperation の時，意味を持つ．
   /// @note それ以外では動作は不定
   virtual
-  tVpiOpType
+  tVlOpType
   op_type() const = 0;
 
   /// @brief オペランド数を返す．
@@ -238,6 +247,7 @@ public:
 
   /// @brief 繰り返し数を返す．
   /// @note multiple concatenation の時のみ意味を持つ．
+  /// @note multiple concatenation の時は operand(0) と等しい．
   virtual
   ymuint
   rep_num() const = 0;

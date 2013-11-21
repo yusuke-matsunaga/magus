@@ -1,20 +1,18 @@
-#ifndef YM_BNET_BNETBLIFWRITER_H
-#define YM_BNET_BNETBLIFWRITER_H
+#ifndef YM_NETWORKS_BNETBLIFWRITER_H
+#define YM_NETWORKS_BNETBLIFWRITER_H
 
 /// @file ym_networks/BNetBlifWriter.h
 /// @brief BNetBlifWriter のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetBlifWriter.h 1920 2008-12-20 15:52:42Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
+#include "ym_networks/bnet.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetBlifWriter BNetBlifWriter.h <ym_networks/BNetBlifWriter.h>
@@ -42,6 +40,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS_BNET
 
-#endif // YM_BNET_BNETBLIFWRITER_H
+#endif // YM_NETWORKS_BNETBLIFWRITER_H

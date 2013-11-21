@@ -5,9 +5,7 @@
 /// @brief StrBuff のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: StrBuff.h 958 2007-08-28 05:38:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class StrBuff StrBuff.h <ym_utils/StrBuff.h>
+/// @class StrBuff StrBuff.h "ym_utils/StrBuff.h"
 /// @ingroup YmUtils
 /// @brief 文字列バッファ
 ///
@@ -34,7 +32,7 @@ public:
   /// @brief 末尾を表す定数
   /// @note std::basic_string のまね
   static const size_type npos = static_cast<size_type>(-1);
-  
+
 
 public:
 
@@ -73,22 +71,24 @@ public:
   ~StrBuff();
 
 
+public:
   //////////////////////////////////////////////////////////////////////
   /// @name 制御用の関数
   /// @{
-  
+
   /// @brief クリアする．
   void
   clear();
 
   /// @brief 必要なサイズを指定する．
   void
-  reserve(size_t size);
+  reserve(ymuint size);
 
   /// @}
   //////////////////////////////////////////////////////////////////////
 
 
+public:
   //////////////////////////////////////////////////////////////////////
   /// @name 内容を追加する関数
   /// @{
@@ -120,7 +120,8 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
+public:
   //////////////////////////////////////////////////////////////////////
   /// @name 内容の取得
   /// @{
@@ -165,19 +166,19 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   // 内部で用いられるコンストラクタ
   // サイズを指定する．
   StrBuff(size_type size);
-  
-
-private:
 
   // src から dst にコピーする．
   void
   copy(const char* src,
        char* dst);
-  
+
   // バッファサイズを拡張する．
   void
   expand(size_type new_size);
@@ -196,7 +197,7 @@ private:
 
   // バッファ本体
   char* mBuffer;
-  
+
 };
 
 
@@ -324,7 +325,7 @@ StrBuff::clear()
 // @brief 必要なサイズを指定する．
 inline
 void
-StrBuff::reserve(size_t size)
+StrBuff::reserve(ymuint size)
 {
   if ( mSize < size ) {
     expand(size);
@@ -443,7 +444,7 @@ template <>
 struct hash<nsYm::StrBuff> {
   size_t
   operator()(const nsYm::StrBuff& __x) const {
-    unsigned long __h = 0; 
+    unsigned long __h = 0;
     for (const char* __s = __x.c_str(); *__s; ++ __s)
       __h = 37*__h + *__s;
     return size_t(__h);
@@ -454,7 +455,7 @@ template <>
 struct hash<const nsYm::StrBuff> {
   size_t
   operator()(const nsYm::StrBuff& __x) const {
-    unsigned long __h = 0; 
+    unsigned long __h = 0;
     for (const char* __s = __x.c_str(); *__s; ++ __s)
       __h = 37*__h + *__s;
     return size_t(__h);

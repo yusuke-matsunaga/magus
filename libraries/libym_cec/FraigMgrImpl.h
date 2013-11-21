@@ -4,18 +4,16 @@
 /// @file libym_cec/FraigMgrImpl.h
 /// @brief FraigMgrImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: FraigMgrImpl.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_cec/cec_nsdef.h"
 #include "FraigHandle.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
 #include "ym_utils/RandGen.h"
-#include "ym_sat/SatSolver.h"
+#include "ym_logic/SatSolver.h"
 #include "FraigHash.h"
 
 
@@ -43,13 +41,13 @@ public:
 
   /// @brief デストラクタ
   ~FraigMgrImpl();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // FraigMgr とのインターフェイス
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 入力ノード数を得る．
   ymuint
   input_num() const;
@@ -69,7 +67,7 @@ public:
   /// @note ANDノードの他に入力ノードも含まれる．
   FraigNode*
   node(ymuint pos) const;
-  
+
   /// @brief 定数0関数をつくる．
   FraigHandle
   make_zero();
@@ -81,32 +79,32 @@ public:
   /// @brief 外部入力を作る．
   FraigHandle
   make_input();
-  
+
   /// @brief 2つのノードの AND を取る．
   /// @param[in] handle1, handle2 入力の FRAIG ハンドル
   FraigHandle
   make_and(FraigHandle handle1,
 	   FraigHandle handle2);
-  
+
   /// @brief 2つのハンドルが等価かどうか調べる．
   Bool3
   check_equiv(FraigHandle aig1,
 	      FraigHandle aig2);
-  
+
   /// @brief sat_sweep() の後始末を行う．
   void
   finish();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // SAT-solver の制御
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief ログレベルを設定する．
   void
   set_loglevel(int level);
-  
+
   /// @brief ログ出力用ストリームを設定する．
   void
   set_logstream(ostream* out);
@@ -115,12 +113,12 @@ public:
   /// @param[in] loop_limit 変化のない状態がこの回数連続したら止める．
   void
   set_loop_limit(ymuint loop_limit);
-  
+
   /// @brief 統計情報を出力する．
   void
   dump_stats(ostream& s) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられるメンバ関数
@@ -143,7 +141,7 @@ private:
   /// @breif 直前の SAT の反例を加えて再ハッシュする．
   void
   add_pat(FraigNode* node);
-  
+
   /// @brief ノードが定数と等価かどうか調べる．
   /// @param[in] node 対象のノード
   /// @param[in] inv false で 0, true で 1 を表す．
@@ -158,7 +156,7 @@ private:
   check_equiv(FraigNode* node1,
 	      FraigNode* node2,
 	      bool inv);
-  
+
   /// @brief lit1 が成り立つか調べる．
   Bool3
   check_condition(Literal lit1);
@@ -167,16 +165,16 @@ private:
   Bool3
   check_condition(Literal lit1,
 		  Literal lit2);
-  
+
   /// @brief FraigHandle に対応するリテラルを返す．
   /// @note 定数の場合の返り値は未定
   Literal
   fraig2literal(FraigHandle aig);
-  
+
   /// @brief 等価候補グループの情報を出力する．
   void
   dump_eqgroup(ostream& s) const;
-  
+
   /// @brief 新しいノードを生成する．
   FraigNode*
   new_node();
@@ -186,7 +184,7 @@ private:
   ymuint
   hash_func(FraigHandle handle1,
 	    FraigHandle handle2);
-  
+
 
 private:
 
@@ -196,18 +194,18 @@ private:
 
     // 試行回数
     ymuint32 mTotalCount;
-    
+
     struct
     {
       // 回数
       ymuint32 mCount;
-      
+
       // 計算時間の総和
       double mTotalTime;
 
       // 計算時間の最大値
       double mMaxTime;
-      
+
       // restart 回数
       ymuint32 mRestart;
 
@@ -222,7 +220,7 @@ private:
 
       // 学習説のリテラル数
       ymuint64 mLearntLitNum;
-      
+
     } mTimeStat[3];
 
     // コンストラクタ
@@ -242,7 +240,7 @@ private:
 
   };
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -250,61 +248,61 @@ private:
 
   // ノードを確保するためのアロケータ
   SimpleAlloc mAlloc;
-  
+
   // ID 番号をキーにしたノードの配列
   vector<FraigNode*> mAllNodes;
 
   // 入力ノードの配列
   vector<FraigNode*> mInputNodes;
-  
+
   // 構造ハッシュ
   FraigHash mHashTable1;
-  
+
   // 各ノードのシミュレーションパタンのサイズ
   ymuint32 mPatSize;
-  
+
   // 初期パタン数
   ymuint32 mPatInit;
-  
+
   // 使用しているパタン数
   ymuint32 mPatUsed;
-  
+
   // パタンハッシュ
   FraigHash mHashTable2;
-  
+
   // 乱数発生器
   RandGen mRandGen;
 
   // SATソルバ
-  SatSolver* mSolver;
-  
+  SatSolver mSolver;
+
   // SAT 用の割り当て格納配列
   vector<Bool3> mModel;
-  
+
   // sat_sweep 中のシミュレーション回数
   ymuint32 mSimCount;
-  
+
   // シミュレーションに要した時間
   double mSimTime;
-  
+
   // check_const の統計情報
   SatStat mCheckConstInfo;
-  
+
   // check_equiv の統計情報
   SatStat mCheckEquivInfo;
 
   // recsolver 用のストリーム
   ostream* mOutP;
-  
+
   // ログレベル
   int mLogLevel;
 
   // ログ出力用のストリーム
   ostream* mLogStream;
-  
+
   // シミュレーションのループ回数
   ymuint32 mLoopLimit;
-  
+
 };
 
 

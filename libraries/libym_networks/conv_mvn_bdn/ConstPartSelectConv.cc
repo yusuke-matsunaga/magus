@@ -1,5 +1,5 @@
 
-/// @file libym_networks/ConstPartSelectConv.cc
+/// @file ConstPartSelectConv.cc
 /// @brief ConstPartSelectConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -14,7 +14,7 @@
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 // @brief コンストラクタ
 ConstPartSelectConv::ConstPartSelectConv()
@@ -39,10 +39,9 @@ ConstPartSelectConv::operator()(const MvnNode* node,
 {
   if ( node->type() == MvnNode::kConstPartSelect ) {
     const MvnInputPin* ipin = node->input(0);
-    const MvnOutputPin* src_pin = ipin->src_pin();
-    const MvnNode* src_node = src_pin->node();
+    const MvnNode* src_node = ipin->src_node();
 
-    ymuint bw = node->output(0)->bit_width();
+    ymuint bw = node->bit_width();
     ymuint msb = node->msb();
     ymuint lsb = node->lsb();
     assert_cond( bw == msb - lsb + 1, __FILE__, __LINE__);
@@ -55,4 +54,4 @@ ConstPartSelectConv::operator()(const MvnNode* node,
   return false;
 }
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV

@@ -24,12 +24,15 @@ libym_cec_la_SOURCES = \
 	FraigMgrImpl.cc \
 	FraigMgr.h \
 	FraigMgr.cc \
-	check_ceq.cc
+	check_ceq.cc \
+	CecHandle.h \
+	CecHash.h \
+	CecMgr.h \
+	CecMgr.cc \
+	CecNode.h \
+	check_ceq2.cc \
+	make_miter.cc
 
-libym_cec_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_aig/libym_aig.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_sat/libym_sat.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
+libym_cec_la_LIBADD =
 
 libym_cec_la_LDFLAGS =
-

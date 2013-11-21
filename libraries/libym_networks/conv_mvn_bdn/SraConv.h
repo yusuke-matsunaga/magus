@@ -1,7 +1,7 @@
-#ifndef LIBYM_MVNBDNCONV_SRACONV_H
-#define LIBYM_MVNBDNCONV_SRACONV_H
+#ifndef SRACONV_H
+#define SRACONV_H
 
-/// @file libym_networks/SraConv.h
+/// @file SraConv.h
 /// @brief SraConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class SraConv SraConv.h "SraConv.h"
@@ -51,6 +51,6 @@ public:
 };
 
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_SRACONV_H
+#endif // SRACONV_H

@@ -201,7 +201,7 @@ private:
   /// @param[in] direction 方向
   void
   put(const char* label,
-      tVpiDirection direction);
+      tVlDirection direction);
 
   /// @brief unconnected drive の出力
   /// @param[in] label ラベル
@@ -229,7 +229,7 @@ private:
   /// @param[in] op_type 演算子型
   void
   put(const char* label,
-      tVpiOpType op_type);
+      tVlOpType op_type);
 
   /// @brief 定数型の出力
   /// @param[in] label ラベル

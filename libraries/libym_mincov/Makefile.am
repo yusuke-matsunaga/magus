@@ -17,14 +17,13 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_mincov.la
 
-libym_mincov_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-
-libym_mincov_la_LDFLAGS = 
-
 libym_mincov_la_SOURCES = \
 	MincovCost.cc \
 	MincovMatrix.cc \
 	MaxClique.h \
 	MaxClique.cc \
 	MincovSolver.cc
+
+libym_mincov_la_LIBADD =
+
+libym_mincov_la_LDFLAGS =

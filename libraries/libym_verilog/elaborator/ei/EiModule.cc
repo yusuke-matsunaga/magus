@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/elb_impl/EiModule.cc
+/// @file libym_verilog/elaborator/ei/EiModule.cc
 /// @brief EiModule の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiModule.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -494,7 +492,7 @@ void
 EiModule::init_port(ymuint index,
 		    const PtPort* pt_port,
 		    ElbExpr* low_conn,
-		    tVpiDirection dir)
+		    tVlDirection dir)
 {
   mPortList[index].init(this, pt_port, index, low_conn, dir);
 }
@@ -765,8 +763,15 @@ EiModuleArray::elem_by_offset(ymuint offset) const
 const VlModule*
 EiModuleArray::elem_by_index(int index) const
 {
-  ymuint offset = mRange.offset(index);
-  return &mArray[offset];
+  ymuint offset;
+  if ( mRange.calc_offset(index, offset) ) {
+    return &mArray[offset];
+  }
+  else {
+    // index が範囲外だった．
+    assert_not_reached(__FILE__, __LINE__);
+    return NULL;
+  }
 }
 
 // @brief ヘッダ情報を返す．

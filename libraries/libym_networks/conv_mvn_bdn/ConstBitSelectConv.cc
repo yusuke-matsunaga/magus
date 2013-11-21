@@ -1,5 +1,5 @@
 
-/// @file libym_networks/ConstBitSelectConv.cc
+/// @file ConstBitSelectConv.cc
 /// @brief ConstBitSelectConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -14,7 +14,7 @@
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 // @brief コンストラクタ
 ConstBitSelectConv::ConstBitSelectConv()
@@ -39,8 +39,7 @@ ConstBitSelectConv::operator()(const MvnNode* node,
 {
   if ( node->type() == MvnNode::kConstBitSelect ) {
     const MvnInputPin* ipin = node->input(0);
-    const MvnOutputPin* src_pin = ipin->src_pin();
-    const MvnNode* src_node = src_pin->node();
+    const MvnNode* src_node = ipin->src_node();
 
     BdnNodeHandle handle0 = nodemap.get(src_node, node->bitpos());
     nodemap.put(node, handle0);
@@ -49,4 +48,4 @@ ConstBitSelectConv::operator()(const MvnNode* node,
   return false;
 }
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV

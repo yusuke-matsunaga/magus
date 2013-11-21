@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/elb_impl/EiStmt.cc
+/// @file libym_verilog/elaborator/ei/EiStmt.cc
 /// @brief EiStmt の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiStmt.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -36,7 +34,7 @@ EiStmtBase::EiStmtBase(const VlNamedObj* parent,
 EiStmtBase::~EiStmtBase()
 {
 }
-  
+
 // @brief ファイル位置を返す．
 FileRegion
 EiStmtBase::file_region() const

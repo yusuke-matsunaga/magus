@@ -1,9 +1,9 @@
 
-/// @file libym_networks/verilog/DeclMap.cc
+/// @file DeclMap.cc
 /// @brief DeclMap の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -12,7 +12,7 @@
 #include "ym_verilog/vl/VlDecl.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 BEGIN_NONAMESPACE
 
@@ -191,4 +191,4 @@ DeclMap::hash_func(const VlDecl* decl,
   return (reinterpret_cast<ympuint>(decl) * (offset + 1) + offset) % mSize;
 }
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG

@@ -1,21 +1,19 @@
-#ifndef LIBYM_TGNET_NAMEHASH_H
-#define LIBYM_TGNET_NAMEHASH_H
+#ifndef NAMEHASH_H
+#define NAMEHASH_H
 
-/// @file libym_networks/NameHash.h
+/// @file NameHash.h
 /// @brief NameHash のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: NameHash.h 1920 2008-12-20 15:52:42Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/tgnet_nsdef.h"
-#include "ym_utils/Alloc.h"
+#include "ym_networks/tgnet.h"
+#include "ym_utils/SimpleAlloc.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class NameHash NameHash.h "NameHash.h"
@@ -40,13 +38,13 @@ public:
   /// @brief 内容をクリアする．
   void
   clear();
-  
+
   /// @brief 名前からノードを検索する
   /// @param[in] name 検索対象の名前
   /// @return name という名前のノードを返す．なければ NULL を返す．
   TgNode*
   find_node(const char* name);
-  
+
   /// @brief ノードを登録する．
   /// @param[in] name 登録対象の名前
   /// @param[in] node 登録対象のノード
@@ -55,7 +53,7 @@ public:
   reg_node(const char* name,
 	   TgNode* node);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
@@ -78,7 +76,7 @@ private:
     // コンストラクタ
     StrIdCell(TgNode* node,
 	      const char* name);
-    
+
     // ノード
     TgNode* mNode;
     // 次のセルを指すリンク
@@ -92,24 +90,24 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ハッシュ用のアロケータ
   SimpleAlloc mAlloc;
-  
+
   // 名前をキーにして ID を納めたハッシュ表
   StrIdCell** mHashTable;
 
   // ハッシュ表のサイズ
   size_t mTableSize;
-  
+
   // ハッシュに登録されている要素数
   size_t mNum;
-  
+
   // ハッシュ表を拡張する目安
   size_t mNextLimit;
-  
+
 };
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS_TGNET
 
-#endif // LIBYM_TGNET_NAMEHASH_H
+#endif // NAMEHASH_H

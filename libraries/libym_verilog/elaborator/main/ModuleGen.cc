@@ -115,6 +115,10 @@ ModuleGen::phase1_module_item(ElbModule* module,
     phase1_decl(module, paramport_array, false);
   }
 
+  // parameter と genvar を実体化する．
+  PtDeclHeadArray declhead_array = pt_module->declhead_array();
+  phase1_decl(module, declhead_array, has_paramportdecl);
+
   // パラメータの割り当てを作る．
   if ( param_con ) {
     ymuint n = param_con->elem_num();
@@ -150,11 +154,24 @@ ModuleGen::phase1_module_item(ElbModule* module,
 
       // パラメータポートリストの名前を現れた順番に paramport_list に入れる．
       vector<const char*> paramport_list;
-      for (ymuint i = 0; i < paramport_array.size(); ++ i) {
-	const PtDeclHead* pt_param = paramport_array[i];
-	for (ymuint j = 0; j < pt_param->item_num(); ++ j) {
-	  const PtDeclItem* pt_item = pt_param->item(j);
-	  paramport_list.push_back(pt_item->name());
+      if ( has_paramportdecl ) {
+	for (ymuint i = 0; i < paramport_array.size(); ++ i) {
+	  const PtDeclHead* pt_param = paramport_array[i];
+	  for (ymuint j = 0; j < pt_param->item_num(); ++ j) {
+	    const PtDeclItem* pt_item = pt_param->item(j);
+	    paramport_list.push_back(pt_item->name());
+	  }
+	}
+      }
+      else {
+	for (ymuint i = 0; i < declhead_array.size(); ++ i) {
+	  const PtDeclHead* pt_decl = declhead_array[i];
+	  if ( pt_decl->type() == kPtDecl_Param ) {
+	    for (ymuint j = 0; j < pt_decl->item_num(); ++ j) {
+	      const PtDeclItem* pt_item = pt_decl->item(j);
+	      paramport_list.push_back(pt_item->name());
+	    }
+	  }
 	}
       }
       if ( paramport_list.size() < n ) {
@@ -184,9 +201,6 @@ ModuleGen::phase1_module_item(ElbModule* module,
       }
     }
   }
-
-  // parameter と genvar を実体化する．
-  phase1_decl(module, pt_module->declhead_array(), has_paramportdecl);
 
   // それ以外の要素を実体化する．
   phase1_item(module, pt_module->item_array());
@@ -227,7 +241,7 @@ ModuleGen::instantiate_port(ElbModule* module,
     ymuint n = pt_port->portref_size();
 
     ElbExpr* low_conn = NULL;
-    tVpiDirection dir = kVpiNoDirection;
+    tVlDirection dir = kVlNoDirection;
 
     const PtExpr* pt_portref = pt_port->portref();
     if ( n == 1 ) {
@@ -249,12 +263,12 @@ ModuleGen::instantiate_port(ElbModule* module,
 	expr_list[i] = portexpr;
 	lhs_elem_array[n - i - 1] = portexpr;
 
-	tVpiDirection dir1 = pt_port->portref_dir(i);
-	if ( dir == kVpiNoDirection ) {
+	tVlDirection dir1 = pt_port->portref_dir(i);
+	if ( dir == kVlNoDirection ) {
 	  dir = dir1;
 	}
 	else if ( dir != dir1 ) {
-	  dir = kVpiMixedIO;
+	  dir = kVlMixedIO;
 	}
       }
 
@@ -322,6 +336,16 @@ ModuleGen::instantiate_portref(ElbModule* module,
     if ( !stat ) {
       return NULL;
     }
+    ymuint offset;
+    bool stat2 = decl->calc_bit_offset(index_val, offset);
+    if ( !stat2 ) {
+      // 添字が範囲外
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_index->file_region(),
+		      kMsgWarning,
+		      "ELAB",
+		      "Index is out of range.");
+    }
     return factory().new_BitSelect(pt_portref, primary, pt_index, index_val);
   }
   if ( pt_left && pt_right ) {
@@ -329,6 +353,25 @@ ModuleGen::instantiate_portref(ElbModule* module,
     int right_val = 0;
     if ( !evaluate_range(module, pt_left, pt_right, left_val, right_val) ) {
       return NULL;
+    }
+    ymuint offset;
+    bool stat1 = decl->calc_bit_offset(left_val, offset);
+    if ( !stat1 ) {
+      // 左の添字が範囲外
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_left->file_region(),
+		      kMsgWarning,
+		      "ELAB",
+		      "Left index is out of range.");
+    }
+    bool stat2 = decl->calc_bit_offset(right_val, offset);
+    if ( !stat2 ) {
+      // 右の添字が範囲外
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_right->file_region(),
+		      kMsgWarning,
+		      "ELAB",
+		      "Right index is out of range.");
     }
     return factory().new_PartSelect(pt_portref, primary,
 				    pt_left, pt_right,

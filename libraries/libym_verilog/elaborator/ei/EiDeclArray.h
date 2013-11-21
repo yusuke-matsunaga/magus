@@ -5,9 +5,7 @@
 /// @brief EiDeclArray のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiDeclArray.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -20,7 +18,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiDeclArray EiDecl.h "EiDecl.h"
+/// @class EiDeclArray EiDeclArray.h "EiDeclArray.h"
 /// @brief 配列型の ElbDecl
 //////////////////////////////////////////////////////////////////////
 class EiDeclArray :
@@ -86,7 +84,7 @@ public:
   /// @breif 値の型を返す．
   /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 符号の取得
@@ -142,11 +140,13 @@ public:
 
   /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index に対するオフセット値 index が範囲内に入っている時．
-  /// @retval -1 index が範囲外の時
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
   virtual
-  int
-  bit_offset(int index) const;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset) const;
 
   /// @brief データ型の取得
   /// @retval データ型 kParam, kLocalParam, kVar の場合
@@ -226,19 +226,23 @@ public:
 
   /// @brief 1次元配列の場合にインデックスからオフセットを計算する．
   /// @param[in] index インデックス
-  /// @return index に対するオフセット値を返す．
-  /// @note index が範囲外の場合には -1 を返す．
+  /// @param[out] offset index に対するオフセット値
+  /// @retval true index が範囲内だった．
+  /// @retval false index が範囲外だった．
   virtual
-  int
-  array_offset(int index) const;
+  bool
+  calc_array_offset(int index,
+		    ymuint& offset) const;
 
   /// @brief 他次元配列の場合にインデックスのリストからオフセットを計算する．
   /// @param[in] index_list インデックスのリスト
-  /// @return index_list に対するオフセット値を返す．
-  /// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
+  /// @param[out] offset index_list に対するオフセット値
+  /// @retval true オフセットが正しく計算できた．
+  /// @retval false index_list のいずれかの値が範囲外だった．
   virtual
-  int
-  array_offset(const vector<int>& index_list) const;
+  bool
+  calc_array_offset(const vector<int>& index_list,
+		    ymuint& offset) const;
 
 
 protected:
@@ -275,7 +279,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiDeclArrayN EiDecl.h "EiDecl.h"
+/// @class EiDeclArrayN EiDeclArray.h "EiDeclArray.h"
 /// @brief 値を持たない EiDeclArray
 //////////////////////////////////////////////////////////////////////
 class EiDeclArrayN :
@@ -309,7 +313,7 @@ public:
   /// @brief スカラー値を返す．
   /// @param[in] offset 要素のオフセット
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_scalar(ymuint offset) const;
 
   /// @brief スカラー値を設定する．
@@ -318,12 +322,12 @@ public:
   virtual
   void
   set_scalar(ymuint offset,
-	     tVpiScalarVal val);
+	     const VlScalarVal& val);
 
   /// @brief 論理値を返す．
   /// @param[in] offset 要素のオフセット
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_logic(ymuint offset) const;
 
   /// @brief real 型の値を返す．
@@ -348,7 +352,7 @@ public:
   void
   get_bitvector(ymuint offset,
 		BitVector& val,
-		tVpiValueType req_type = kVpiValueNone) const;
+		const VlValueType& req_type = VlValueType()) const;
 
   /// @brief bitvector 型の値を設定する．
   /// @param[in] offset 要素のオフセット
@@ -362,7 +366,7 @@ public:
   /// @param[in] offset 要素のオフセット
   /// @param[in] index ビット位置
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_bitselect(ymuint offset,
 		int index) const;
 
@@ -374,7 +378,7 @@ public:
   void
   set_bitselect(ymuint offset,
 		int index,
-		tVpiScalarVal val);
+		const VlScalarVal& val);
 
   /// @brief 範囲選択値を返す．
   /// @param[in] offset 要素のオフセット
@@ -404,7 +408,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiDeclArrayS EiDecl.h "EiDecl.h"
+/// @class EiDeclArrayS EiDeclArray.h "EiDeclArray.h"
 /// @brief スカラー値を持つ EiDeclArray
 //////////////////////////////////////////////////////////////////////
 class EiDeclArrayS :
@@ -425,7 +429,7 @@ private:
 	       const PtNamedBase* pt_item,
 	       ymuint dim_size,
 	       EiRange* range_array,
-	       tVpiScalarVal* varray);
+	       VlScalarVal* varray);
 
   /// @brief デストラクタ
   virtual
@@ -440,7 +444,7 @@ public:
   /// @brief スカラー値を返す．
   /// @param[in] offset 要素のオフセット
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_scalar(ymuint offset) const;
 
   /// @brief スカラー値を設定する．
@@ -449,12 +453,12 @@ public:
   virtual
   void
   set_scalar(ymuint offset,
-	     tVpiScalarVal val);
+	     const VlScalarVal& val);
 
   /// @brief 論理値を返す．
   /// @param[in] offset 要素のオフセット
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_logic(ymuint offset) const;
 
   /// @brief real 型の値を返す．
@@ -479,7 +483,7 @@ public:
   void
   get_bitvector(ymuint offset,
 		BitVector& val,
-		tVpiValueType req_type = kVpiValueNone) const;
+		const VlValueType& req_type = VlValueType()) const;
 
   /// @brief bitvector 型の値を設定する．
   /// @param[in] offset 要素のオフセット
@@ -493,7 +497,7 @@ public:
   /// @param[in] offset 要素のオフセット
   /// @param[in] index ビット位置
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_bitselect(ymuint offset,
 		int index) const;
 
@@ -505,7 +509,7 @@ public:
   void
   set_bitselect(ymuint offset,
 		int index,
-		tVpiScalarVal val);
+		const VlScalarVal& val);
 
   /// @brief 範囲選択値を返す．
   /// @param[in] offset 要素のオフセット
@@ -538,13 +542,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  tVpiScalarVal* mValArray;
+  VlScalarVal* mValArray;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiDeclArrayR EiDecl.h "EiDecl.h"
+/// @class EiDeclArrayR EiDeclArray.h "EiDeclArray.h"
 /// @brief 実数値を持つ EiDeclArray
 //////////////////////////////////////////////////////////////////////
 class EiDeclArrayR :
@@ -580,7 +584,7 @@ public:
   /// @brief スカラー値を返す．
   /// @param[in] offset 要素のオフセット
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_scalar(ymuint offset) const;
 
   /// @brief スカラー値を設定する．
@@ -589,12 +593,12 @@ public:
   virtual
   void
   set_scalar(ymuint offset,
-	     tVpiScalarVal val);
+	     const VlScalarVal& val);
 
   /// @brief 論理値を返す．
   /// @param[in] offset 要素のオフセット
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_logic(ymuint offset) const;
 
   /// @brief real 型の値を返す．
@@ -619,7 +623,7 @@ public:
   void
   get_bitvector(ymuint offset,
 		BitVector& val,
-		tVpiValueType req_type = kVpiValueNone) const;
+		const VlValueType& req_type = VlValueType()) const;
 
   /// @brief bitvector 型の値を設定する．
   /// @param[in] offset 要素のオフセット
@@ -633,7 +637,7 @@ public:
   /// @param[in] offset 要素のオフセット
   /// @param[in] index ビット位置
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_bitselect(ymuint offset,
 		int index) const;
 
@@ -645,7 +649,7 @@ public:
   void
   set_bitselect(ymuint offset,
 		int index,
-		tVpiScalarVal val);
+		const VlScalarVal& val);
 
   /// @brief 範囲選択値を返す．
   /// @param[in] offset 要素のオフセット
@@ -684,7 +688,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiDeclArrayV EiDecl.h "EiDecl.h"
+/// @class EiDeclArrayV EiDeclArray.h "EiDeclArray.h"
 /// @brief ビットベクタ値を持つ EiDeclArray
 //////////////////////////////////////////////////////////////////////
 class EiDeclArrayV :
@@ -720,7 +724,7 @@ public:
   /// @brief スカラー値を返す．
   /// @param[in] offset 要素のオフセット
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_scalar(ymuint offset) const;
 
   /// @brief スカラー値を設定する．
@@ -729,12 +733,12 @@ public:
   virtual
   void
   set_scalar(ymuint offset,
-	     tVpiScalarVal val);
+	     const VlScalarVal& val);
 
   /// @brief 論理値を返す．
   /// @param[in] offset 要素のオフセット
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_logic(ymuint offset) const;
 
   /// @brief real 型の値を返す．
@@ -759,7 +763,7 @@ public:
   void
   get_bitvector(ymuint offset,
 		BitVector& val,
-		tVpiValueType req_type = kVpiValueNone) const;
+		const VlValueType& req_type = VlValueType()) const;
 
   /// @brief bitvector 型の値を設定する．
   /// @param[in] offset 要素のオフセット
@@ -773,7 +777,7 @@ public:
   /// @param[in] offset 要素のオフセット
   /// @param[in] index ビット位置
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_bitselect(ymuint offset,
 		int index) const;
 
@@ -785,7 +789,7 @@ public:
   void
   set_bitselect(ymuint offset,
 		int index,
-		tVpiScalarVal val);
+		const VlScalarVal& val);
 
   /// @brief 範囲選択値を返す．
   /// @param[in] offset 要素のオフセット

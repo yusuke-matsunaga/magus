@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnConstPartSelect.cc
+/// @file MvnConstPartSelect.cc
 /// @brief MvnConstPartSelect の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,7 +11,7 @@
 #include "ym_networks/MvnMgr.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_MVN
 MvnConstPartSelect::MvnConstPartSelect(MvnModule* module,
 				       ymuint msb,
 				       ymuint lsb) :
-  MvnNodeBase(module, MvnNode::kConstPartSelect, 1, 1),
+  MvnNodeBase(module, MvnNode::kConstPartSelect, 1),
   mMsb(msb),
   mLsb(lsb)
 {
@@ -65,9 +65,9 @@ MvnMgr::new_constpartselect(MvnModule* module,
   reg_node(node);
 
   node->_input(0)->mBitWidth = bit_width;
-  node->_output(0)->mBitWidth = msb - lsb + 1;
+  node->mBitWidth = msb - lsb + 1;
 
   return node;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN

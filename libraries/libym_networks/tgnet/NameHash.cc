@@ -1,11 +1,9 @@
 
-/// @file libym_networks/NameHash.cc
+/// @file NameHash.cc
 /// @brief NameHash の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NameHash.cc 1920 2008-12-20 15:52:42Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,7 +11,7 @@
 #include "ym_networks/TgNode.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 //////////////////////////////////////////////////////////////////////
 // クラス NameHash
@@ -76,7 +74,7 @@ NameHash::find_node(const char* name)
   }
   return NULL;
 }
-  
+
 // @brief ノードを登録する．
 const char*
 NameHash::reg_node(const char* name,
@@ -97,7 +95,7 @@ NameHash::reg_node(const char* name,
       }
     }
   }
-  
+
   // 新しいセルを確保する．
   size_t size = sizeof(StrIdCell) + strlen(name);
   void* p = mAlloc.get_memory(size);
@@ -134,4 +132,4 @@ NameHash::StrIdCell::StrIdCell(TgNode* node,
   while ( (*d ++ = *s ++) ) ;
 }
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS_TGNET

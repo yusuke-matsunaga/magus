@@ -10,15 +10,21 @@
 /// All rights reserved.
 
 
-#include <ym_verilog/BitVector.h>
+#include "ym_verilog/BitVector.h"
 
 using namespace std;
 using HASH_NAMESPACE::hash_map;
 using nsYm::nsVerilog::BitVector;
 
-extern int yylex();
-int yyerror(const char*);
-void print_value(const BitVector& v);
+extern
+int
+yylex();
+
+int
+yyerror(const char*);
+
+void
+print_value(const BitVector& v);
 
 extern string cur_text;
 
@@ -26,8 +32,11 @@ extern string cur_text;
 
 hash_map<string, BitVector> id_table;
 string lname;
+
 %}
 
+
+// トークンの定義
 %token NUMBER
 %token ID
 %token SEMI

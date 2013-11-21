@@ -1,29 +1,33 @@
-#ifndef YM_BNET_BNETISCAS89READER_H
-#define YM_BNET_BNETISCAS89READER_H
+#ifndef YM_NETWORKS_BNETISCAS89READER_H
+#define YM_NETWORKS_BNETISCAS89READER_H
 
 /// @file ym_networks/BNetIscas89Reader.h
 /// @brief BNetIscas89Reader のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetIscas89Reader.h 1978 2009-02-06 12:29:16Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
-#include "ym_iscas89/Iscas89Parser.h"
+#include "ym_networks/bnet.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
-class BNetIscas89Handler;
+namespace nsIscas89 {
+  class Iscas89Parser;
+  class BNetIscas89Handler;
+}
+
+END_NAMESPACE_YM_NETWORKS
+
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetIscas89Reader BNetIscas89Reader.h "ym_networks/BNetIscas89Reader.h"
 /// @ingroup BnetGroup
 /// @brief iscas89 形式のファイルを読み込んで BNetwork に設定するクラス
-/// @sa BNetwork nsYm::nsIscas89::Iscas89Parser
+/// @sa BNetwork
 //////////////////////////////////////////////////////////////////////
 class BNetIscas89Reader
 {
@@ -44,8 +48,8 @@ public:
   /// @retval true 正常に読み込めた
   /// @retval false 読み込み中にエラーが起こった．
   bool
-  read(const string& filename,
-       BNetwork& network);
+  operator()(const string& filename,
+	     BNetwork& network);
 
 
 private:
@@ -54,20 +58,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // iscas89 パーサー
-  Iscas89Parser mParser;
+  nsIscas89::Iscas89Parser* mParser;
 
   // ハンドラ
-  BNetIscas89Handler* mHandler;
+  nsIscas89::BNetIscas89Handler* mHandler;
 
 };
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS_BNET
 
-BEGIN_NAMESPACE_YM
-
-// クラス名をインポートしておく
-using nsBnet::BNetIscas89Reader;
-
-END_NAMESPACE_YM
-
-#endif // YM_BNET_BNETISCAS89READER_H
+#endif // YM_NETWORKS_BNETISCAS89READER_H

@@ -1,18 +1,16 @@
 
-/// @file libym_networks/tests/iscas89test.cc
+/// @file iscas89test.cc
 /// @brief iscas89 ファイルの読み書きのテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: iscas89test.cc 1978 2009-02-06 12:29:16Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_networks/BNetwork.h>
-#include <ym_networks/BNetIscas89Reader.h>
-#include <ym_networks/BNetBlifWriter.h>
-#include <ym_utils/MsgHandler.h>
+#include "ym_networks/BNetwork.h"
+#include "ym_networks/BNetIscas89Reader.h"
+#include "ym_networks/BNetBlifWriter.h"
+#include "ym_utils/MsgHandler.h"
 
 
 int
@@ -21,19 +19,19 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  
+
   if ( argc != 2 ) {
     cerr << "USAGE : " << argv[0] << " iscas89-file" << endl;
     return 2;
   }
   string filename = argv[1];
-  
+
   try {
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
     BNetIscas89Reader reader;
 
     reader.add_msg_handler(msg_handler);
-    
+
     BNetwork network;
 
     if ( !reader.read(filename, network) ) {

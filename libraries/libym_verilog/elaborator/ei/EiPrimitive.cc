@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/elb_impl/EiPrimitive.cc
+/// @file libym_verilog/elaborator/ei/EiPrimitive.cc
 /// @brief EiPrimitive の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiPrimitive.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,6 +15,8 @@
 
 #include "ym_verilog/pt/PtItem.h"
 #include "ym_verilog/pt/PtMisc.h"
+#include "ym_cell/Cell.h"
+#include "ym_cell/CellPin.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -66,6 +66,21 @@ EiFactory::new_UdpHead(const VlNamedObj* parent,
     void* p = mAlloc.get_memory(sizeof(EiPrimHeadU));
     head = new (p) EiPrimHeadU(parent, pt_header, udp);
   }
+  return head;
+}
+
+// @brief セルプリミティブのヘッダを生成する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_header パース木の定義
+// @param[in] cell セル
+ElbPrimHead*
+EiFactory::new_CellHead(const VlNamedObj* parent,
+			const PtItem* pt_header,
+			const Cell* cell)
+{
+  EiPrimHead* head = NULL;
+  void* p = mAlloc.get_memory(sizeof(EiPrimHeadC));
+  head = new (p) EiPrimHeadC(parent, pt_header, cell);
   return head;
 }
 
@@ -184,9 +199,11 @@ EiPrimHead::def_name() const
   case kVpiTranif1Prim:  nm = "tranif1"; break;
   case kVpiPullupPrim:   nm = "pullup"; break;
   case kVpiPulldownPrim: nm = "pulldown"; break;
+  case kVpiCellPrim:     nm = "cell"; break;
   case kVpiSeqPrim:
   case kVpiCombPrim:
     assert_not_reached(__FILE__, __LINE__);
+    break;
   }
   return nm;
 }
@@ -195,6 +212,13 @@ EiPrimHead::def_name() const
 // @note このクラスでは NULL を返す．
 const ElbUdpDefn*
 EiPrimHead::udp_defn() const
+{
+  return NULL;
+}
+
+// @brief セルを返す．
+const Cell*
+EiPrimHead::cell() const
 {
   return NULL;
 }
@@ -346,6 +370,49 @@ EiPrimHeadUD::set_delay(ElbDelay* expr)
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス EiPrimHeadC
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] parent 親のスコープ
+// @param[in] pt_header パース木の定義
+// @param[in] cell セル
+EiPrimHeadC::EiPrimHeadC(const VlNamedObj* parent,
+			 const PtItem* pt_header,
+			 const Cell* cell) :
+  EiPrimHead(parent, pt_header),
+  mCell(cell)
+{
+}
+
+// @brief デストラクタ
+EiPrimHeadC::~EiPrimHeadC()
+{
+}
+
+// @brief primitive type を返す．
+tVpiPrimType
+EiPrimHeadC::prim_type() const
+{
+  return kVpiCellPrim;
+}
+
+// @brief プリミティブの定義名を返す．
+const char*
+EiPrimHeadC::def_name() const
+{
+  return mCell->name().c_str();
+}
+
+// @brief セルを返す．
+const Cell*
+EiPrimHeadC::cell() const
+{
+  return mCell;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス EiPrimArray
 //////////////////////////////////////////////////////////////////////
 
@@ -416,42 +483,49 @@ EiPrimArray::name() const
 tVpiPrimType
 EiPrimArray::prim_type() const
 {
-  return mHead->prim_type();
+  return head()->prim_type();
 }
 
 // @brief プリミティブの定義名を返す．
 const char*
 EiPrimArray::def_name() const
 {
-  return mHead->def_name();
+  return head()->def_name();
 }
 
 // @brief UDP 定義を返す．
 const VlUdpDefn*
 EiPrimArray::udp_defn() const
 {
-  return mHead->udp_defn();
+  return head()->udp_defn();
+}
+
+// @brief セルを返す．
+const Cell*
+EiPrimArray::cell() const
+{
+  return head()->cell();
 }
 
 // @brief 0 の強さを得る．
 tVpiStrength
 EiPrimArray::drive0() const
 {
-  return mHead->drive0();
+  return head()->drive0();
 }
 
 // @brief 1 の強さを得る．
 tVpiStrength
 EiPrimArray::drive1() const
 {
-  return mHead->drive1();
+  return head()->drive1();
 }
 
 // @brief 遅延式を得る．
 const VlDelay*
 EiPrimArray::delay() const
 {
-  return mHead->delay();
+  return head()->delay();
 }
 
 // @brief 範囲の MSB の値を返す．
@@ -502,8 +576,15 @@ EiPrimArray::elem_by_offset(ymuint offset) const
 const VlPrimitive*
 EiPrimArray::elem_by_index(int index) const
 {
-  ymuint offset = mRange.offset(index);
-  return &mArray[offset];
+  ymuint offset;
+  if ( mRange.calc_offset(index, offset) ) {
+    return &mArray[offset];
+  }
+  else {
+    // 範囲外
+    assert_not_reached(__FILE__, __LINE__);
+    return NULL;
+  }
 }
 
 // @brief 要素のプリミティブを取り出す．
@@ -517,8 +598,15 @@ EiPrimArray::_primitive_by_offset(ymuint offset) const
 ElbPrimitive*
 EiPrimArray::_primitive_by_index(int index) const
 {
-  ymuint offset = mRange.offset(index);
-  return &mArray[offset];
+  ymuint offset;
+  if ( mRange.calc_offset(index, offset) ) {
+    return &mArray[offset];
+  }
+  else {
+    // 範囲外
+    assert_not_reached(__FILE__, __LINE__);
+    return NULL;
+  }
 }
 
 // @brief ヘッダを得る．
@@ -599,6 +687,13 @@ EiPrimitive::udp_defn() const
   return head()->udp_defn();
 }
 
+// @brief セルを返す．
+const Cell*
+EiPrimitive::cell() const
+{
+  return head()->cell();
+}
+
 // @brief 0 の強さを得る．
 tVpiStrength
 EiPrimitive::drive0() const
@@ -642,22 +737,45 @@ EiPrimitive::init_port(EiPrimTerm* term_array)
 {
   mPortArray = term_array;
 
-  ymuint output_num;
-  ymuint inout_num;
-  ymuint input_num;
-  int stat = get_port_size(prim_type(), port_num(),
-			   output_num, inout_num, input_num);
-  assert_cond(stat == 0, __FILE__, __LINE__);
+  const Cell* cell = this->cell();
+  if ( cell == NULL ) {
+    ymuint output_num;
+    ymuint inout_num;
+    ymuint input_num;
+    int stat = get_port_size(prim_type(), port_num(),
+			     output_num, inout_num, input_num);
+    assert_cond(stat == 0, __FILE__, __LINE__);
 
-  ymuint index = 0;
-  for (ymuint i = 0; i < output_num; ++ i, ++ index) {
-    mPortArray[index].set(this, index, kVpiOutput);
+    ymuint index = 0;
+    for (ymuint i = 0; i < output_num; ++ i, ++ index) {
+      mPortArray[index].set(this, index, kVlOutput);
+    }
+    for (ymuint i = 0; i < inout_num; ++ i, ++ index) {
+      mPortArray[index].set(this, index, kVlInout);
+    }
+    for (ymuint i = 0; i < input_num; ++ i, ++ index) {
+      mPortArray[index].set(this, index, kVlInput);
+    }
   }
-  for (ymuint i = 0; i < inout_num; ++ i, ++ index) {
-    mPortArray[index].set(this, index, kVpiInout);
-  }
-  for (ymuint i = 0; i < input_num; ++ i, ++ index) {
-    mPortArray[index].set(this, index, kVpiInput);
+  else {
+    ymuint n = cell->pin_num();
+    for (ymuint i = 0; i < n; ++ i) {
+      const CellPin* pin = cell->pin(i);
+      tVlDirection dir;
+      if ( pin->is_input() ) {
+	dir = kVlInput;
+      }
+      else if ( pin->is_output() ) {
+	dir = kVlOutput;
+      }
+      else if ( pin->is_inout() ) {
+	dir = kVlInout;
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      mPortArray[i].set(this, i, dir);
+    }
   }
 }
 
@@ -808,22 +926,17 @@ EiPrimTerm::primitive() const
 }
 
 // @brief 入出力の種類を返す．
-tVpiDirection
+tVlDirection
 EiPrimTerm::direction() const
 {
-  if ( mIndexDir & 1U ) {
-    return kVpiOutput;
-  }
-  else {
-    return kVpiInput;
-  }
+  return static_cast<tVlDirection>( (mIndexDir & 7U) );
 }
 
 // @brief 端子番号を返す．
 ymuint
 EiPrimTerm::term_index() const
 {
-  return (mIndexDir >> 1);
+  return (mIndexDir >> 3);
 }
 
 // @brief 接続しているネットを表す式を返す．
@@ -837,13 +950,10 @@ EiPrimTerm::expr() const
 void
 EiPrimTerm::set(ElbPrimitive* primitive,
 		ymuint index,
-		tVpiDirection dir)
+		tVlDirection dir)
 {
   mPrimitive = primitive;
-  mIndexDir = (index << 1);
-  if ( dir == kVpiOutput ) {
-    mIndexDir |= 1U;
-  }
+  mIndexDir = (index << 3) | static_cast<ymuint32>(dir);
 }
 
 END_NAMESPACE_YM_VERILOG

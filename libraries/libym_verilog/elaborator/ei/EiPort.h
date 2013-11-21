@@ -5,9 +5,7 @@
 /// @brief EiPort のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiPort.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -59,7 +57,7 @@ public:
 
   /// @brief 入出力の区別を得る．
   virtual
-  tVpiDirection
+  tVlDirection
   direction() const;
 
   /// @brief ビット幅を返す．
@@ -120,7 +118,7 @@ public:
        const PtPort* pt_port,
        ymuint index,
        ElbExpr* low_conn,
-       tVpiDirection dir);
+       tVlDirection dir);
 
   /// @brief high_conn を接続する．
   virtual
@@ -150,7 +148,7 @@ private:
   ElbExpr* mLowConn;
 
   // 向き
-  tVpiDirection mDirection;
+  tVlDirection mDirection;
 
   // 名前による結合の時 true となるフラグ
   bool mConnByName;

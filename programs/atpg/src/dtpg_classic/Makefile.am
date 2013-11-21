@@ -4,18 +4,18 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	$(TCLRL_INCLUDES) \
-	$(TCL_INCLUDES) \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 
 noinst_LTLIBRARIES = \
 	libatpg_dtpg_cl.la
+
+libatpg_dtpg_cl_la_CPPFLAGS = \
+	$(TCLRL_INCLUDES) \
+	$(TCL_INCLUDES) \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include
 
 libatpg_dtpg_cl_la_SOURCES = \
 	dtpg_opt.h \
@@ -54,8 +54,4 @@ libatpg_dtpg_cl_la_SOURCES = \
 	DtpgCl.h \
 	DtpgCl.cc
 
-libatpg_dtpg_cl_la_LIBADD = \
-	$(top_builddir)/src/base/libatpg_base.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tgnet/libym_tgnet.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libatpg_dtpg_cl_la_LIBADD =

@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/elaborator/AttrGen_main.cc
+/// @file libym_verilog/elaborator/main/AttrGen.cc
 /// @brief AttrGen の実装ファイル(メイン)
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: AttrGen.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 

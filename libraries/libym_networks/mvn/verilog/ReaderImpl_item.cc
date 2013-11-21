@@ -1,9 +1,9 @@
 
-/// @file libym_networks/verilog/ReaderImpl.cc
+/// @file ReaderImpl.cc
 /// @brief ReaderImpl の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -11,10 +11,12 @@
 #include "DeclMap.h"
 #include "Driver.h"
 #include "Env.h"
+#include "EnvMerger.h"
 #include "AsyncControl.h"
 #include "ym_networks/MvnMgr.h"
 #include "ym_networks/MvnNode.h"
 #include "ym_verilog/BitVector.h"
+#include "ym_verilog/VlValue.h"
 #include "ym_verilog/vl/VlModule.h"
 #include "ym_verilog/vl/VlPrimitive.h"
 #include "ym_verilog/vl/VlUdp.h"
@@ -24,11 +26,16 @@
 #include "ym_verilog/vl/VlStmt.h"
 #include "ym_verilog/vl/VlControl.h"
 #include "ym_verilog/vl/VlExpr.h"
+#include "ym_cell/Cell.h"
+#include "ym_cell/CellPin.h"
+#include "ym_utils/MsgMgr.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NONAMESPACE
+bool debug = false;
+END_NONAMESPACE
 
-using namespace nsYm::nsVerilog;
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 // @brief 要素を生成する．
 // @param[in] module モジュール
@@ -74,7 +81,12 @@ ReaderImpl::gen_item(MvnModule* module,
       for (vector<const VlPrimitive*>::iterator p = primitive_list.begin();
 	   p != primitive_list.end(); ++ p) {
 	const VlPrimitive* prim = *p;
-	gen_priminst(module, prim);
+	if ( prim->prim_type() == kVpiCellPrim ) {
+	  gen_cellinst(module, prim);
+	}
+	else {
+	  gen_priminst(module, prim);
+	}
       }
     }
   }
@@ -89,7 +101,12 @@ ReaderImpl::gen_item(MvnModule* module,
 	ymuint n = vl_primarray->elem_num();
 	for (ymuint i = 0; i < n; ++ i) {
 	  const VlPrimitive* prim = vl_primarray->elem_by_offset(i);
-	  gen_priminst(module, prim);
+	  if ( prim->type() == kVpiCellPrim ) {
+	    gen_cellinst(module, prim);
+	  }
+	  else {
+	    gen_priminst(module, prim);
+	  }
 	}
       }
     }
@@ -146,16 +163,28 @@ bool
 ReaderImpl::gen_process(MvnModule* parent_module,
 			const VlProcess* process)
 {
+  if ( debug ) {
+    cout << "gen_process " << process->file_region() << endl;
+  }
+
   if ( process->type() != kVpiAlways ) {
     // always 文以外(initial文)はダメ
-    cerr << "initial should not be used." << endl;
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    process->file_region(),
+		    kMsgError,
+		    "MVN_VL",
+		    "'initial' should not be used.");
     return false;
   }
 
   const VlStmt* stmt = process->stmt();
   if ( stmt->type() != kVpiEventControl ) {
     // always の直後は '@' でなければダメ
-    cerr << "only '@' is allowed here." << endl;
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    stmt->file_region(),
+		    kMsgError,
+		    "MVN_VL",
+		    "only '@' is allowed here.");
     return false;
   }
 
@@ -167,12 +196,16 @@ ReaderImpl::gen_process(MvnModule* parent_module,
   for (ymuint i = 0; i < ev_num; ++ i) {
     const VlExpr* expr = control->event(i);
     if ( expr->type() == kVpiOperation ) {
-      if ( expr->op_type() == kVpiPosedgeOp ||
-	   expr->op_type() == kVpiNegedgeOp ) {
+      if ( expr->op_type() == kVlPosedgeOp ||
+	   expr->op_type() == kVlNegedgeOp ) {
 	has_edge_event = true;
       }
       else {
-	cerr << "only edge descriptor should be used." << endl;
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			expr->file_region(),
+			kMsgError,
+			"MVN_VL",
+			"only edge descriptor should be used.");
 	return false;
       }
     }
@@ -180,7 +213,11 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       has_normal_event = true;
     }
     else {
-      cerr << "illegal type" << endl;
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      expr->file_region(),
+		      kMsgError,
+		      "MVN_VL",
+		      "Illegal expression type.");
       return false;
     }
   }
@@ -188,8 +225,12 @@ ReaderImpl::gen_process(MvnModule* parent_module,
   if ( has_edge_event ) {
     // edge 記述があったらすべて edge 記述でなければならない．
     if ( has_normal_event ) {
-      cerr << "edge-type events and normal events are "
-	   << "mutual exclusive." << endl;
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      control->file_region(),
+		      kMsgError,
+		      "MVN_VL",
+		      "edge-type events and normal events are "
+		      "mutual exclusive.");
       return false;
     }
 
@@ -199,7 +240,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       const VlExpr* expr = control->event(i);
       const VlExpr* opr1 = expr->operand(0);
       MvnNode* node1 = gen_primary(opr1, mGlobalEnv);
-      ymuint pol = (expr->op_type() == kVpiPosedgeOp) ? 1 : 0;
+      ymuint pol = (expr->op_type() == kVlPosedgeOp) ? 1 : 0;
       event_node_array[i] = make_pair(node1, pol);
     }
     vector<bool> event_map(ev_num, false);
@@ -214,43 +255,51 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       if ( stmt1->type() != kVpiIf && stmt1->type() != kVpiIfElse ) {
 	break;
       }
+
+      // リセット条件を表す条件式
       const VlExpr* cond = stmt1->expr();
+      // 極性(1 が正極性，0 が負極性)
       ymuint pol = 1;
+      // 対象のノード
       MvnNode* node = NULL;
-      if ( cond->type() == kVpiOperation &&
-	   (cond->op_type() == kVpiNotOp  ||
-	    cond->op_type() == kVpiBitNegOp) ) {
-	pol = 0;
-	node = gen_primary(cond->operand(0), mGlobalEnv);
+      if ( !parse_cond(cond, mGlobalEnv, node, pol) ) {
+	break;
       }
-      else {
-	node = gen_primary(cond, mGlobalEnv);
-      }
-      assert_cond( node != NULL, __FILE__, __LINE__);
 
       bool found = false;
       for (ymuint i = 0; i < ev_num; ++ i) {
 	MvnNode* node1 = event_node_array[i].first;
 	if ( node == node1 ) {
 	  if ( pol != event_node_array[i].second ) {
-	    cerr << "Polarity mismatch." << endl;
+	    MsgMgr::put_msg(__FILE__, __LINE__,
+			    cond->file_region(),
+			    kMsgError,
+			    "MVN_VL",
+			    "Polarity mismatch.");
 	    return false;
 	  }
 	  found = true;
 	  AsyncControl* ctrl = new AsyncControl(mGlobalEnv);
 	  ctrl->mNode = node;
 	  ctrl->mPol = pol;
-	  gen_stmt2(parent_module, stmt1->body_stmt(), ctrl->mEnv);
+	  EnvMerger2 merger(mMvnMgr, mGlobalEnv);
+	  gen_stmt(parent_module, stmt1->body_stmt(), ctrl->mEnv, merger);
 	  event_list.push_back(ctrl);
 	  event_map[i] = true;
 	  break;
 	}
       }
-      assert_cond( found , __FILE__, __LINE__);
+      if ( !found ) {
+	break;
+      }
       stmt1 = stmt1->else_stmt();
     }
     if ( event_list.size() != ev_num - 1 ) {
-      cerr << "Too few if branch against the event list" << endl;
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      stmt->body_stmt()->file_region(),
+		      kMsgError,
+		      "MVN_VL",
+		      "Too few 'if' branch against the event list.");
       return false;
     }
 
@@ -267,7 +316,8 @@ ReaderImpl::gen_process(MvnModule* parent_module,
     assert_cond( clock_node != NULL, __FILE__, __LINE__);
 
     ProcEnv top_env(mGlobalEnv);
-    gen_stmt2(parent_module, stmt1, top_env);
+    EnvMerger2 merger(mMvnMgr, mGlobalEnv);
+    gen_stmt(parent_module, stmt1, top_env, merger);
 
     ymuint n = mGlobalEnv.max_id();
     for (ymuint i = 0; i < n; ++ i) {
@@ -280,36 +330,37 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       MvnNode* node0 = mGlobalEnv.get_from_id(i);
       // FF を挿入
       // このノードに関係しているコントロールを調べる．
-      vector<ymuint32> pol_array;
+      vector<ymuint> pol_array;
+      vector<MvnNode*> val_array;
       vector<MvnNode*> control_array;
-      vector<MvnNode*> rhs_array;
-      pol_array.reserve(ev_num);
-      control_array.reserve(ev_num);
-      rhs_array.reserve(ev_num);
+      pol_array.reserve(ev_num - 1);
+      val_array.reserve(ev_num - 1);
+      control_array.reserve(ev_num - 1);
       for (ymuint j = 0; j < ev_num - 1; ++ j) {
 	AsyncControl* control = event_list[j];
 	MvnNode* rhs1 = control->mEnv.get_from_id(i).mRhs;
 	if ( rhs1 ) {
 	  pol_array.push_back(control->mPol);
+	  val_array.push_back(rhs1);
 	  control_array.push_back(control->mNode);
-	  rhs_array.push_back(rhs1);
 	}
       }
-      ymuint n = pol_array.size();
-      ymuint bw = node0->output(0)->bit_width();
-      MvnNode* ff = mMvnMgr->new_dff(parent_module, clock_pol, pol_array, bw);
+      ymuint n = val_array.size();
+      ymuint bw = node0->bit_width();
+      MvnNode* ff = mMvnMgr->new_dff(parent_module, clock_pol, pol_array,
+				     val_array, bw);
       mMvnMgr->connect(rhs, 0, ff, 0);
       mMvnMgr->connect(clock_node, 0, ff, 1);
       for (ymuint j = 0; j < n; ++ j) {
-	mMvnMgr->connect(control_array[j], 0, ff, (j * 2) + 2);
-	mMvnMgr->connect(rhs_array[j], 0, ff, (j * 2) + 3);
+	mMvnMgr->connect(control_array[j], 0, ff, j + 2);
       }
       mMvnMgr->connect(ff, 0, node0, 0);
     }
   }
   else {
     ProcEnv top_env(mGlobalEnv);
-    gen_stmt1(parent_module, stmt->body_stmt(), top_env);
+    EnvMerger1 merger(mMvnMgr);
+    gen_stmt(parent_module, stmt->body_stmt(), top_env, merger);
 
     ymuint n = mGlobalEnv.max_id();
     for (ymuint i = 0; i < n; ++ i) {
@@ -326,7 +377,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       }
       else {
 	// latch を挿入
-	ymuint bw = node0->output(0)->bit_width();
+	ymuint bw = node0->bit_width();
 	MvnNode* latch = mMvnMgr->new_latch(parent_module, bw);
 	mMvnMgr->connect(rhs, 0, latch, 0);
 	mMvnMgr->connect(cond, 0, latch, 1);
@@ -335,6 +386,116 @@ ReaderImpl::gen_process(MvnModule* parent_module,
     }
   }
 
+  return true;
+}
+
+// @brief 条件式からノードを生成する．
+// @param[in] cond 条件式
+// @param[in] env 環境
+// @param[out] node 対応するノード
+// @param[out] pol 極性(1 が正極性，0　が負極性)
+// パタンは
+// (1) 識別子
+// (2) ~識別子
+// (3) !識別子
+// (4) 識別子 == 定数
+// (5) 識別子 != 定数
+// (6) 定数 == 識別子
+// (7) 定数 != 識別子
+// 識別子は1ビットの reg か net
+// 定数は 0 か 1 (最下位ビットのみが意味を持つ)
+bool
+ReaderImpl::parse_cond(const VlExpr* cond,
+		       const Env& env,
+		       MvnNode*& node,
+		       ymuint& pol)
+{
+  if ( cond->is_primary() ) {
+    // (1)
+    node = gen_primary(cond, env);
+    pol = 1;
+    return true;
+  }
+
+  if ( cond->is_operation() ) {
+    if ( cond->op_type() == kVlNotOp ||
+	 cond->op_type() == kVlBitNegOp ) {
+      const VlExpr* opr1 = cond->operand(0);
+      if ( !opr1->is_primary() ) {
+	return false;
+      }
+      // (2)(3)
+      node = gen_primary(opr1, env);
+      pol = 0;
+      return true;
+    }
+
+    switch ( cond->op_type() ) {
+    case kVlEqOp:
+      {
+	const VlExpr* opr1 = cond->operand(0);
+	const VlExpr* opr2 = cond->operand(1);
+	if ( opr1->is_primary() && opr2->is_const() ) {
+	  // (4)
+	  return parse_cond_sub(opr1, opr2, env, 0, 1, node, pol);
+	}
+	if ( opr1->is_const() && opr2->is_primary() ) {
+	  // (6)
+	  return parse_cond_sub(opr2, opr1, env, 0, 1, node, pol);
+	}
+      }
+      break;
+
+    case kVlNeqOp:
+      {
+	const VlExpr* opr1 = cond->operand(0);
+	const VlExpr* opr2 = cond->operand(1);
+	if ( opr1->is_primary() && opr2->is_const() ) {
+	  // (5)
+	  return parse_cond_sub(opr1, opr2, env, 1, 0, node, pol);
+	}
+	if ( opr1->is_const() && opr2->is_primary() ) {
+	  // (7)
+	  return parse_cond_sub(opr2, opr1, env, 1, 0, node, pol);
+	}
+      }
+
+    default:
+      break;
+    }
+  }
+  return false;
+}
+
+// @brief parse_cond() の下請け関数
+// @param[in] opr_primary 識別子を表す式
+// @param[in] opr_const 定数を表す式
+// @param[in] env 環境
+// @param[in] pol0 値が0の時の極性値
+// @param[in] pol1 値が1の時の極性値
+// @param[out] node 対応するノード
+// @param[out] pol 極性(1 が正極性，0　が負極性)
+bool
+ReaderImpl::parse_cond_sub(const VlExpr* opr_primary,
+			   const VlExpr* opr_const,
+			   const Env& env,
+			   ymuint pol0,
+			   ymuint pol1,
+			   MvnNode*& node,
+			   ymuint& pol)
+{
+  node = gen_primary(opr_primary, env);
+  VlValue val = opr_const->constant_value();
+  VlScalarVal v = val.scalar_value();
+  if ( v.is_zero() ) {
+    pol = pol0;
+  }
+  else if ( v.is_one() ) {
+    pol = pol1;
+  }
+  else {
+    return false;
+  }
   return true;
 }
 
@@ -366,23 +527,23 @@ ReaderImpl::gen_moduleinst(MvnModule* parent_module,
     if ( hi == NULL ) continue;
     const VlExpr* lo = vl_port->low_conn();
     switch ( vl_port->direction() ) {
-    case kVpiInput:
+    case kVlInput:
       // hi は右辺式
       // lo は左辺式
       gen_cont_assign(parent_module, lo, hi);
       break;
 
-    case kVpiOutput:
+    case kVlOutput:
       // hi は左辺式
       // lo は右辺式
       gen_cont_assign(parent_module, hi, lo);
       break;
 
-    case kVpiInout:
+    case kVlInout:
       // hi は単純な参照か連結のみ
       break;
 
-    case kVpiMixedIO:
+    case kVlMixedIO:
       // hi は単純な参照か連結のみ
       //connect_port2(port, hi);
       // TODO: connect_port2 を作る
@@ -396,6 +557,37 @@ ReaderImpl::gen_moduleinst(MvnModule* parent_module,
   }
 }
 
+// @brief セルインスタンスの生成を行う．
+// @param[in] parent_module 親のモジュール
+// @param[in] prim プリミティブ
+void
+ReaderImpl::gen_cellinst(MvnModule* parent_module,
+			 const VlPrimitive* prim)
+{
+  const Cell* cell = prim->cell();
+  ymuint np = cell->pin_num();
+  ymuint ni = cell->input_num();
+  ymuint no = cell->output_num();
+  ymuint nio = cell->inout_num();
+
+  MvnNode* onode = mMvnMgr->new_cell(parent_module, cell);
+  for (ymuint pos = 0; pos < np; ++ pos) {
+    const VlPrimTerm* term = prim->prim_term(pos);
+    const VlExpr* expr = term->expr();
+    const CellPin* pin = cell->pin(pos);
+    if ( pin->is_input() ) {
+      ymuint input_id = pin->input_id();
+      MvnNode* node = gen_expr(parent_module, expr, mGlobalEnv);
+      mMvnMgr->connect(node, 0, onode, input_id);
+    }
+    else if ( pin->is_output() ) {
+      assert_cond( pin->output_id() == 0, __FILE__, __LINE__);
+      MvnNode* dst_node = gen_primary(expr, mGlobalEnv);
+      connect_lhs(dst_node, expr, onode, prim->file_region());
+    }
+  }
+}
+
 // @brief プリミティブインスタンスの生成を行う．
 // @param[in] parent_module 親のモジュール
 // @param[in] prim プリミティブ
@@ -404,6 +596,7 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
 			 const VlPrimitive* prim)
 {
   ymuint nt = prim->port_num();
+
   ymuint ni = 0;
   ymuint no = 0;
   if ( prim->prim_type() == kVpiBufPrim ) {
@@ -504,22 +697,28 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
     break;
 
   case kVpiCombPrim:
-    {
-#warning "TODO: エラーメッセージを出力する．"
-      assert_not_reached(__FILE__, __LINE__);
-    }
-    break;
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    prim->file_region(),
+		    kMsgError,
+		    "MVN_VL",
+		    "Combinational UDP should not be used.");
+    return;
 
   case kVpiSeqPrim:
-    {
-#warning "TODO: エラーメッセージを出力する．"
-      assert_not_reached(__FILE__, __LINE__);
-    }
-    break;
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    prim->file_region(),
+		    kMsgError,
+		    "MVN_VL",
+		    "Sequential UDP should not be used.");
+    return;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    prim->file_region(),
+		    kMsgError,
+		    "MVN_VL",
+		    "Illegal primitive type.");
+    return;
   }
 
   ymuint pos = 0;
@@ -528,7 +727,7 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
     ++ pos;
     const VlExpr* expr = term->expr();
     MvnNode* dst_node = gen_primary(expr, mGlobalEnv);
-    connect_lhs(dst_node, expr, outputs[i]);
+    connect_lhs(dst_node, expr, outputs[i], prim->file_region());
   }
   for (ymuint i = 0; i < ni; ++ i) {
     const VlPrimTerm* term = prim->prim_term(pos);
@@ -549,17 +748,18 @@ ReaderImpl::gen_cont_assign(MvnModule* parent_module,
 			    const VlExpr* lhs,
 			    const VlExpr* rhs)
 {
-  MvnNode* node = gen_expr(parent_module, rhs, mGlobalEnv);
+  MvnNode* rhs_node = gen_rhs(parent_module, lhs, rhs, mGlobalEnv);
+
   ymuint n = lhs->lhs_elem_num();
   ymuint offset = 0;
   for (ymuint i = 0; i < n; i ++ ) {
     const VlExpr* lhs_elem = lhs->lhs_elem(i);
     MvnNode* dst_node = gen_primary(lhs_elem, mGlobalEnv);
     ymuint dst_bw = lhs_elem->bit_size();
-    MvnNode* src_node = gen_rhs(parent_module, node, offset, dst_bw);
-    connect_lhs(dst_node, lhs_elem, src_node);
+    MvnNode* src_node = splice_rhs(parent_module, rhs_node, offset, dst_bw);
+    connect_lhs(dst_node, lhs_elem, src_node, rhs->file_region());
     offset += dst_bw;
   }
 }
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG

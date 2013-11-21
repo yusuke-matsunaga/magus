@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnConst.cc
+/// @file MvnConst.cc
 /// @brief MvnConst の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,14 +11,14 @@
 #include "ym_networks/MvnMgr.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
 // @param[in] val 値
 MvnConst::MvnConst(MvnModule* module,
 		   const vector<ymuint32>& val) :
-  MvnNodeBase(module, MvnNode::kConst, 0, 1),
+  MvnNodeBase(module, MvnNode::kConst, 0),
   mVal(val)
 {
 }
@@ -49,9 +49,9 @@ MvnMgr::new_const(MvnModule* module,
   MvnNode* node = new MvnConst(module, val);
   reg_node(node);
 
-  node->_output(0)->mBitWidth = bit_width;
+  node->mBitWidth = bit_width;
 
   return node;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN

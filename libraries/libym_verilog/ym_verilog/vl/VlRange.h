@@ -7,7 +7,7 @@
 ///
 /// $Id: VlRange.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,7 +18,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlRange VlRange.h <ym_verilog/vl/VlRange.h>
+/// @class VlRange VlRange.h "ym_verilog/vl/VlRange.h"
 /// @brief 範囲を表すクラス
 /// IEEE Std 1364-2001 26.6.10 Object range
 //////////////////////////////////////////////////////////////////////
@@ -76,19 +76,23 @@ public:
 
   /// @brief LSB からのオフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset index の LSB からのオフセット
+  /// @retval true index が範囲内に入っている．
+  /// @retval false index が範囲外
   virtual
-  int
-  offset(int index) const = 0;
+  bool
+  calc_offset(int index,
+	      ymuint& offset) const = 0;
 
   /// @brief MSB からのオフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の MSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset index の MSB からのオフセット
+  /// @retval true index が範囲内に入っている．
+  /// @retval false index が範囲外
   virtual
-  int
-  roffset(int index) const = 0;
+  bool
+  calc_roffset(int index,
+	       ymuint& offset) const = 0;
 
   /// @brief offset の逆関数
   /// @param[in] offset LSB からのオフセット値

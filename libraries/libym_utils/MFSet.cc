@@ -19,16 +19,15 @@ BEGIN_NAMESPACE_YM
 class MFSetCell
 {
   friend class MFSet;
-  typedef MFSet::id_type id_type;
 private:
 
   // コンストラクタ
   MFSetCell();
-  
+
   // この要素の属する集合の代表元を返す．
   MFSetCell*
   find();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -36,13 +35,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 一つの母集合の中でユニークなID番号
-  id_type mId;
+  ymuint32 mId;
 
   // 親を指すポインタ
   MFSetCell* mParent;
 
   // 根本までのレベル
-  int mRank;
+  ymint32 mRank;
 
 };
 
@@ -70,23 +69,12 @@ MFSetCell::find()
   return parent;
 }
 
-// x 番めのセルを取り出す．
-MFSetCell*
-MFSet::get(id_type id)
-{
-  if ( id >= mNum ) {
-    // 範囲外の場合はNULLを返す．
-    return NULL;
-  }
-  return &mCellArray[id];
-}
-
 // n 個の要素を持つ集合を作るコンストラクタ．
-MFSet::MFSet(size_t n) :
+MFSet::MFSet(ymuint n) :
   mNum(n),
   mCellArray(new MFSetCell[mNum])
 {
-  for (size_t i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mCellArray[i].mId = i;
   }
 }
@@ -97,10 +85,17 @@ MFSet::~MFSet()
   delete [] mCellArray;
 }
 
+// @brief 要素数を返す．
+ymuint
+MFSet::num() const
+{
+  return mNum;
+}
+
 // x を含む集合の代表元を返す．
 // x が存在しない時には 0 を返す．
-MFSet::id_type 
-MFSet::find(id_type id)
+ymuint
+MFSet::find(ymuint id)
 {
   MFSetCell* x = get(id);
   if ( x ) {
@@ -108,25 +103,25 @@ MFSet::find(id_type id)
     return x->mId;
   }
   else {
-    return 0;
+    return kBadID;
   }
 }
 
 // x_id を含む集合と y_id を含む集合を併合し，新しい集合の代表元を返す．
 // x_id や y_id が存在しない時には 0 を返す．
-MFSet::id_type
-MFSet::merge(id_type x_id,
-	     id_type y_id)
+ymuint
+MFSet::merge(ymuint x_id,
+	     ymuint y_id)
 {
   MFSetCell* x = get(x_id);
-  if ( !x ) return 0;
+  if ( !x ) return kBadID;
 
   MFSetCell* y = get(y_id);
-  if ( !y ) return 0;
+  if ( !y ) return kBadID;
 
   if ( x->mParent != x ) {
     // xは代表点ではない．
-    x = x->find(); 
+    x = x->find();
   }
 
   if ( y->mParent != y ) {
@@ -154,6 +149,17 @@ MFSet::merge(id_type x_id,
     x->mParent = y;
     return y->mId;
   }
+}
+
+// x 番めのセルを取り出す．
+MFSetCell*
+MFSet::get(ymuint id)
+{
+  if ( id >= mNum ) {
+    // 範囲外の場合はNULLを返す．
+    return NULL;
+  }
+  return &mCellArray[id];
 }
 
 END_NAMESPACE_YM

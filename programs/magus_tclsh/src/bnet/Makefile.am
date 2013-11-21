@@ -12,10 +12,6 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libmagus_bnet_tcl.la
 
-libmagus_bnet_tcl_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
-libmagus_bnet_tcl_la_LDFLAGS =
 libmagus_bnet_tcl_la_SOURCES = \
 	BNetCmd.cc \
 	BNetNodeCmd.h \
@@ -29,3 +25,7 @@ libmagus_bnet_tcl_la_SOURCES = \
 	BNetElimCmd.h \
 	BNetElimCmd.cc \
 	bnet_init.cc
+
+libmagus_bnet_tcl_la_LIBADD =
+
+libmagus_bnet_tcl_la_LDFLAGS =

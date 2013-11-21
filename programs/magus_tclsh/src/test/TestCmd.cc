@@ -11,9 +11,7 @@
 
 #include "TestCmd.h"
 #include "ym_networks/BNetwork.h"
-#include "ym_blif/BlifNetwork.h"
-#include "ym_blif/BlifNetworkReader.h"
-#include "ym_networks/BlifBNetConv.h"
+#include "ym_networks/BNetBlifReader.h"
 #include "ym_networks/BNetVerilogWriter.h"
 
 #include "ym_utils/MsgMgr.h"
@@ -51,15 +49,9 @@ TestCmd::cmd_proc(TclObjVector& objv)
   StreamMsgHandler msg_handler(&cerr);
   MsgMgr::reg_handler(&msg_handler);
 
-  BlifNetworkReader reader;
-  BlifNetwork blif_network;
-  if ( !reader.read(ex_file_name, blif_network) ) {
-    return TCL_ERROR;
-  }
-
+  BNetBlifReader read;
   BNetwork network;
-  BlifBNetConv conv;
-  if ( !conv(blif_network, network) ) {
+  if ( !read(ex_file_name, network) ) {
     return TCL_ERROR;
   }
 

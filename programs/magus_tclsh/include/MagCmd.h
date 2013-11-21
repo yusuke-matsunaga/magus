@@ -13,7 +13,9 @@
 
 
 #include "magus_nsdef.h"
+
 #include "ym_tclpp/TclCmd.h"
+#include "ym_cell/cell_nsdef.h"
 #include "NetHandle.h"
 
 
@@ -40,6 +42,16 @@ public:
   /// @brief デストラクタ
   virtual
   ~MagCmd();
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // セルライブラリ関係の処理
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief カレントセルライブラリの取得
+  const CellLibrary*
+  cur_cell_library();
 
 
 protected:

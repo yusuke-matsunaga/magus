@@ -1,20 +1,27 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1920 2008-12-20 15:52:42Z matsunaga $
-
 SUBDIRS = \
 	verilog \
 	.
-
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
 
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_mvn.la
 
+libym_mvn_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+libym_mvn_la_LDFLAGS =
+
+libym_mvn_la_LIBADD = \
+	verilog/libym_mvn_verilog.la
+
 libym_mvn_la_SOURCES = \
+	MvnCaseEq.h \
+	MvnCaseEq.cc \
+	MvnCellNode.h \
+	MvnCellNode.cc \
 	MvnConst.h \
 	MvnConst.cc \
 	MvnConstBitSelect.h \
@@ -30,11 +37,7 @@ libym_mvn_la_SOURCES = \
 	MvnNodeBase.h \
 	MvnNodeBase.cc \
 	MvnPort.cc \
-	MvnVerilogWriter.cc
-
-libym_mvn_la_LDFLAGS =
-
-libym_mvn_la_LIBADD = \
-	verilog/libym_mvn_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	MvnVerilogWriter.cc \
+	VerilogWriterImpl.h \
+	VerilogWriterImpl.cc
 

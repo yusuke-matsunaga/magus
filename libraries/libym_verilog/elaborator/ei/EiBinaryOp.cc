@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/elb_impl/EiBinaryOp.cc
+/// @file libym_verilog/elaborator/ei/EiBinaryOp.cc
 /// @brief EiBinaryOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiBinaryOp.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -28,57 +26,57 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] opr1 オペランド
 ElbExpr*
 EiFactory::new_BinaryOp(const PtExpr* pt_expr,
-			tVpiOpType op_type,
+			tVlOpType op_type,
 			ElbExpr* opr0,
 			ElbExpr* opr1)
 {
   ElbExpr* expr = NULL;
   void* p;
   switch( op_type ) {
-  case kVpiBitAndOp:
-  case kVpiBitOrOp:
-  case kVpiBitXNorOp:
-  case kVpiBitXorOp:
+  case kVlBitAndOp:
+  case kVlBitOrOp:
+  case kVlBitXNorOp:
+  case kVlBitXorOp:
     p = mAlloc.get_memory(sizeof(EiBinaryBitOp));
     expr = new (p) EiBinaryBitOp(pt_expr, opr0, opr1);
     break;
 
-  case kVpiAddOp:
-  case kVpiSubOp:
-  case kVpiMultOp:
-  case kVpiDivOp:
-  case kVpiModOp:
+  case kVlAddOp:
+  case kVlSubOp:
+  case kVlMultOp:
+  case kVlDivOp:
+  case kVlModOp:
     p = mAlloc.get_memory(sizeof(EiBinaryArithOp));
     expr = new (p) EiBinaryArithOp(pt_expr, opr0, opr1);
     break;
 
-  case kVpiPowerOp:
+  case kVlPowerOp:
     p = mAlloc.get_memory(sizeof(EiPowerOp));
     expr = new (p) EiPowerOp(pt_expr, opr0, opr1);
     break;
 
-  case kVpiLShiftOp:
-  case kVpiRShiftOp:
-  case kVpiArithLShiftOp:
-  case kVpiArithRShiftOp:
+  case kVlLShiftOp:
+  case kVlRShiftOp:
+  case kVlArithLShiftOp:
+  case kVlArithRShiftOp:
     p = mAlloc.get_memory(sizeof(EiShiftOp));
     expr = new (p) EiShiftOp(pt_expr, opr0, opr1);
     break;
 
-  case kVpiLogAndOp:
-  case kVpiLogOrOp:
+  case kVlLogAndOp:
+  case kVlLogOrOp:
     p = mAlloc.get_memory(sizeof(EiBinaryLogOp));
     expr = new (p) EiBinaryLogOp(pt_expr, opr0, opr1);
     break;
 
-  case kVpiCaseEqOp:
-  case kVpiCaseNeqOp:
-  case kVpiEqOp:
-  case kVpiNeqOp:
-  case kVpiGeOp:
-  case kVpiGtOp:
-  case kVpiLeOp:
-  case kVpiLtOp:
+  case kVlCaseEqOp:
+  case kVlCaseNeqOp:
+  case kVlEqOp:
+  case kVlNeqOp:
+  case kVlGeOp:
+  case kVlGtOp:
+  case kVlLeOp:
+  case kVlLtOp:
     p = mAlloc.get_memory(sizeof(EiCompareOp));
     expr = new (p) EiCompareOp(pt_expr, opr0, opr1);
     break;
@@ -151,8 +149,8 @@ EiCompareOp::EiCompareOp(const PtExpr* pt_expr,
   EiBinaryOp(pt_expr, opr1, opr2)
 {
   // 比較演算は大きい方の型を用いる．
-  tVpiValueType type1 = operand1()->value_type();
-  tVpiValueType type2 = operand2()->value_type();
+  VlValueType type1 = operand1()->value_type();
+  VlValueType type2 = operand2()->value_type();
 
   mOprType = calc_type(type1, type2);
 
@@ -166,18 +164,18 @@ EiCompareOp::~EiCompareOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiCompareOp::value_type() const
 {
   // 常に1ビット符号なし
-  return pack(kVpiValueUS, 1);
+  return VlValueType(false, true, 1);
 }
 
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiCompareOp::set_reqsize(tVpiValueType type)
+EiCompareOp::_set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }
@@ -211,18 +209,18 @@ EiBinaryLogOp::~EiBinaryLogOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiBinaryLogOp::value_type() const
 {
   // 常に1ビット符号なし
-  return pack(kVpiValueUS, 1);
+  return VlValueType(false, true, 1);
 }
 
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiBinaryLogOp::set_reqsize(tVpiValueType type)
+EiBinaryLogOp::_set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }
@@ -242,12 +240,12 @@ EiBinaryBitOp::EiBinaryBitOp(const PtExpr* pt_expr,
   EiBinaryOp(pt_expr, opr1, opr2)
 {
   // オペランドのサイズの大きい方で決まる．
-  tVpiValueType type1 = operand1()->value_type();
-  tVpiValueType type2 = operand2()->value_type();
+  VlValueType type1 = operand1()->value_type();
+  VlValueType type2 = operand2()->value_type();
 
   mType = calc_type(type1, type2);
 
-  assert_cond(mType != kVpiValueReal, __FILE__, __LINE__);
+  assert_cond( !mType.is_real_type(), __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -256,7 +254,7 @@ EiBinaryBitOp::~EiBinaryBitOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiBinaryBitOp::value_type() const
 {
   return mType;
@@ -266,7 +264,7 @@ EiBinaryBitOp::value_type() const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiBinaryBitOp::set_reqsize(tVpiValueType type)
+EiBinaryBitOp::_set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
   operand1()->set_reqsize(mType);
@@ -288,8 +286,8 @@ EiBinaryArithOp::EiBinaryArithOp(const PtExpr* pt_expr,
   EiBinaryOp(pt_expr, opr1, opr2)
 {
   // オペランドのサイズの大きい方で決まる．
-  tVpiValueType type1 = operand1()->value_type();
-  tVpiValueType type2 = operand2()->value_type();
+  VlValueType type1 = operand1()->value_type();
+  VlValueType type2 = operand2()->value_type();
 
   mType = calc_type(type1, type2);
 }
@@ -300,7 +298,7 @@ EiBinaryArithOp::~EiBinaryArithOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiBinaryArithOp::value_type() const
 {
   return mType;
@@ -310,7 +308,7 @@ EiBinaryArithOp::value_type() const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiBinaryArithOp::set_reqsize(tVpiValueType type)
+EiBinaryArithOp::_set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
   operand1()->set_reqsize(mType);
@@ -333,8 +331,8 @@ EiPowerOp::EiPowerOp(const PtExpr* pt_expr,
 {
   // 巾乗演算の場合, どちらかのオペランドが real, integer, signed
   // なら結果は real, どちらも unsigned の時のみ unsigned となる．
-  tVpiValueType type1 = operand1()->value_type();
-  tVpiValueType type2 = operand2()->value_type();
+  VlValueType type1 = operand1()->value_type();
+  VlValueType type2 = operand2()->value_type();
   mType = calc_type2(type1, type2);
 
   // ただし opr2 は self-determined
@@ -347,7 +345,7 @@ EiPowerOp::~EiPowerOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiPowerOp::value_type() const
 {
   return mType;
@@ -357,7 +355,7 @@ EiPowerOp::value_type() const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiPowerOp::set_reqsize(tVpiValueType type)
+EiPowerOp::_set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
 
@@ -383,10 +381,9 @@ EiShiftOp::EiShiftOp(const PtExpr* pt_expr,
 {
   // シフト演算子は第1オペランドの型とサイズをそのまま引き継ぐ
   mType = opr1->value_type();
-  assert_cond(mType != kVpiValueReal, __FILE__, __LINE__);
+  assert_cond( !mType.is_real_type(), __FILE__, __LINE__);
 
-  tVpiValueType type2 = opr2->value_type();
-  assert_cond(type2 != kVpiValueReal, __FILE__, __LINE__);
+  assert_cond( !opr2->value_type().is_real_type(), __FILE__, __LINE__);
 
   // 第2オペランドのサイズは self determined
   opr2->set_selfsize();
@@ -398,7 +395,7 @@ EiShiftOp::~EiShiftOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiShiftOp::value_type() const
 {
   return mType;
@@ -408,7 +405,7 @@ EiShiftOp::value_type() const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiShiftOp::set_reqsize(tVpiValueType type)
+EiShiftOp::_set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
 

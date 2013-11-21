@@ -1,20 +1,18 @@
 
-/// @file libym_networks/BNetEquWriter.cc
-/// @brief ブーリアンネットワークの内容を出力する関数の実装ファイル
+/// @file BNetEquWriter.cc
+/// @brief BNetEquWriter の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetEquWriter.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_networks/BNetEquWriter.h"
 #include "ym_networks/BNetwork.h"
-#include "ym_lexp/LogExprWriter.h"
+#include "ym_logic/LogExprWriter.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 BEGIN_NONAMESPACE
 
@@ -26,10 +24,10 @@ write_expr(const LogExpr& f,
 	   ostream& s)
 {
   VarStrMap fanins;
-  for (size_t i = 0; i < node->ni(); i ++) {
+  for (ymuint i = 0; i < node->fanin_num(); i ++) {
     BNode* inode = node->fanin(i);
     assert_cond(inode != 0, __FILE__, __LINE__);
-    fanins[i] = inode->name();
+    fanins.insert(make_pair(VarId(i), inode->name()));
   }
   writer.dump(s, f, fanins);
 }
@@ -119,4 +117,4 @@ BNetEquWriter::dump(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS_BNET

@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/elb_impl/EiIODecl.cc
+/// @file libym_verilog/elaborator/ei/EiIODecl.cc
 /// @brief EiIODecl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiIODecl.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -79,17 +77,17 @@ EiIOHead::~EiIOHead()
 }
 
 // @brief 方向を返す．
-tVpiDirection
+tVlDirection
 EiIOHead::direction() const
 {
   switch ( mPtHead->type() ) {
-  case kPtIO_Input:  return kVpiInput;
-  case kPtIO_Output: return kVpiOutput;
-  case kPtIO_Inout:  return kVpiInout;
+  case kPtIO_Input:  return kVlInput;
+  case kPtIO_Output: return kVlOutput;
+  case kPtIO_Inout:  return kVlInout;
   default: assert_not_reached(__FILE__, __LINE__);
   }
   // ダミー
-  return kVpiNoDirection;
+  return kVlNoDirection;
 }
 
 // @brief 親のモジュールの取得
@@ -245,7 +243,7 @@ EiIODecl::name() const
 }
 
 // @brief 方向を返す．
-tVpiDirection
+tVlDirection
 EiIODecl::direction() const
 {
   return mHead->direction();

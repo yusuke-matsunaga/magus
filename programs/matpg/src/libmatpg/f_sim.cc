@@ -11,27 +11,27 @@
  * Revision 2.6  92/01/03  17:40:24  yusuke
  * divide calc_gval
  * no differential version
- * 
+ *
  * Revision 2.5  92/01/01  20:15:41  yusuke
- * bug fixed 
- * 
+ * bug fixed
+ *
  * Revision 2.4  91/12/30  21:29:23  yusuke
  * change chk_EVENT_STRONG() and chk_EVENT_PROP() to
  * Ulong event = get_EVENT()
- * 
+ *
  * Revision 2.3  91/12/29  19:02:17  yusuke
- * 
+ *
  * add EVENT_WEAK
- * 
+ *
  * Revision 2.2  91/12/28  16:58:43  yusuke
  * Final , Final revision
- * 
+ *
  * Revision 2.1  91/12/23  23:11:05  yusuke
  * a slightly speed-up
- * 
+ *
  * Revision 2.0  91/12/21  18:50:28  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.7  1991/10/05  08:18:18  yusuke
  * add Log and RCSid for RCS
  *
@@ -111,7 +111,7 @@ fault_sim(testpat_t** tps,
       ++ i;
       continue;
     }
-    
+
     gate_t* fos = f->get_gate()->get_fos();
     size_t j;
     for (j = i; j < nf; ++ j) {
@@ -143,7 +143,7 @@ fault_sim(testpat_t** tps,
       i = j;
       continue;
     }
-    
+
     pckval obs_fos;
     if ( fos->is_po() ) {
       obs_fos = pckval_ALL1;
@@ -152,8 +152,8 @@ fault_sim(testpat_t** tps,
       set_min_level(fos->lvl_i);
       clr_array[ca_num ++] = fos;
       fos->f_pckval = fos->g_pckval ^ diff_all;
-      for (int k = fos->get_no(); -- k >= 0; ) {
-	event_queue_set(fos->get_fogate(k), EVENT_PROP);
+      for (int k = fos->get_fanout_num(); -- k >= 0; ) {
+	event_queue_set(fos->get_fanout_gate(k), EVENT_PROP);
       }
       obs_fos = event_queue_simulate();
     }
@@ -244,8 +244,8 @@ calc_ob(gate_t* gate)
     return obs(gate);
   }
   gate->set_mark();
-  gate_t* ogate = gate->get_fogate(0);
-  int ipos = gate->get_fogate_ipos(0);
+  gate_t* ogate = gate->get_fanout_gate(0);
+  int ipos = gate->get_fanout_gate_ipos(0);
   pckval tmp = calc_ob(ogate) & ogate->calc_obs(ipos);
   obs(gate) = tmp;
   return tmp;
@@ -275,7 +275,7 @@ event_queue_init()
   for (size_t i = 0; i < size; ++ i) {
     array[i] = NULL;
   }
-  
+
   size_t new_size2 = gn_get_ngate();
   if ( new_size2 < 128 ) {
     new_size2 = 128;
@@ -313,15 +313,15 @@ event_queue_simulate()
       if ( gate->is_po() ) {
 	diff_all |= val ^ gate->g_pckval;
       }
-      for ( int j = gate->get_no(); -- j >= 0; ) {
-	event_queue_set(gate->get_fogate(j), EVENT_PROP);
+      for ( int j = gate->get_fanout_num(); -- j >= 0; ) {
+	event_queue_set(gate->get_fanout_gate(j), EVENT_PROP);
       }
     }
     *ptr ++  = NULL;
   }
   event_num = 0;
   min_num = size + 1;
-  
+
   ptr = clr_array;
   end = clr_array + ca_num;
   while (ptr != end) {

@@ -10,8 +10,9 @@
 
 
 #include "InputMgr.h"
-#include <fcntl.h>
+//#include <fcntl.h>
 
+#include "ym_utils/FileIDO.h"
 #include "ym_utils/FileInfo.h"
 
 
@@ -27,7 +28,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 // @brief コンストラクタ
 // @param[in] lex 親の Lex
-InputMgr::InputMgr(RawLex* lex) :
+InputMgr::InputMgr(RawLex& lex) :
   mLex(lex),
   mCurFile(NULL)
 {
@@ -45,11 +46,11 @@ InputMgr::~InputMgr()
 void
 InputMgr::clear()
 {
-  delete mCurFile;
+  delete_file(mCurFile);
   mCurFile = NULL;
   for (vector<InputFile*>::iterator p = mFileStack.begin();
        p != mFileStack.end(); ++ p) {
-    delete *p;
+    delete_file(*p);
   }
   mFileStack.clear();
 }
@@ -92,15 +93,16 @@ InputMgr::open_file(const string& filename,
     return false;
   }
   // 本当のパス名
-  string realname_string = pathname.str();
-  const char* realname = realname_string.c_str();
+  string realname = pathname.str();
 
-  int fd = open(realname, O_RDONLY);
-  if ( fd < 0 ) {
+  FileIDO* ido = new FileIDO(realname, parent_file);
+  if ( !(*ido) ) {
+    delete ido;
     return false;
   }
-  FileInfo file_info = FileInfo(realname, parent_file);
-  InputFile* new_file = new InputFile(mLex, fd, file_info);
+
+  InputFile* new_file = new InputFile(ido, mLex);
+
   if ( mCurFile ) {
     mFileStack.push_back(mCurFile);
   }
@@ -126,7 +128,7 @@ InputMgr::set_file_loc(const char* new_filename,
     return;
   }
 
-  FileInfo cur_fi = mCurFile->mFileInfo;
+  FileInfo cur_fi = mCurFile->file_info();
   switch ( level ) {
   case 0: // レベルの変化無し
     if ( cur_fi.filename() != new_filename ) {
@@ -138,7 +140,7 @@ InputMgr::set_file_loc(const char* new_filename,
 
   case 1: // 新しいインクルードファイル．
     {
-      FileLoc parent_loc(cur_fi, cur_file()->cur_line(), 1);
+      FileLoc parent_loc(cur_fi, cur_file()->cur_loc().end_line(), 1);
       cur_fi = FileInfo(new_filename, parent_loc);
     }
     break;
@@ -152,7 +154,7 @@ InputMgr::set_file_loc(const char* new_filename,
     }
     break;
   }
-  mCurFile->mFileInfo = cur_fi;
+  mCurFile->set_file_info(cur_fi);
 }
 
 // @brief 現在のファイルを返す．
@@ -175,12 +177,13 @@ bool
 InputMgr::wrap_up()
 {
   for ( ; ; ) {
-    mCurFile->close();
+    delete_file(mCurFile);
     if ( mFileStack.empty() ) {
       // もうファイルが残っていない．
+      mCurFile = NULL;
       return false;
     }
-    delete mCurFile;
+
     mCurFile = mFileStack.back();
     mFileStack.pop_back();
 
@@ -203,11 +206,18 @@ InputMgr::check_file(const char* name) const
   }
   for (vector<InputFile*>::const_iterator p = mFileStack.begin();
        p != mFileStack.end(); ++ p) {
-    if ( (*p)->mFileInfo.filename() == name ) {
+    if ( (*p)->file_info().filename() == name ) {
       return true;
     }
   }
   return false;
+}
+
+// @brief InputFile を削除する．
+void
+InputMgr::delete_file(InputFile* file)
+{
+  delete file;
 }
 
 END_NAMESPACE_YM_VERILOG

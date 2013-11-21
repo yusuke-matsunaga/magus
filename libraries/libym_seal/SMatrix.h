@@ -5,14 +5,12 @@
 /// @brief SMatrix のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Matrix.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_seal/seal_nsdef.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL
@@ -43,7 +41,7 @@ public:
   SmCell*
   right() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -57,7 +55,7 @@ private:
 
   // 右方向のリンク
   SmCell* mRightLink;
-  
+
 };
 
 
@@ -86,7 +84,7 @@ public:
   /// @brief デストラクタ
   ~SMatrix();
 
-  
+
 public:
 
   /// @brief 変数の数を返す．
@@ -163,7 +161,7 @@ public:
   size_t
   allocated_mem() const;
 
-  
+
 private:
 
   /// @brief セルを確保する．
@@ -176,7 +174,7 @@ private:
   void
   delete_cell(SmCell* left,
 	      SmCell* cell);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -185,23 +183,23 @@ private:
 
   // セルの確保用アロケータ
   UnitAlloc mAlloc;
-  
+
   // サイズ
   ymuint32 mSize;
 
   // 行の先頭の配列
   SmCell* mRowArray;
-  
+
   // 定数項の配列
   double* mConstArray;
 
   // 使用中のセル数
   ymuint64 mCellNum;
-  
+
 #ifdef SANITY_CHECK
   double* mShadowArray;
 #endif
-  
+
 };
 
 

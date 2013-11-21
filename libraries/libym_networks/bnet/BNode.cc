@@ -1,18 +1,16 @@
 
-/// @file libym_networks/BNode.cc
+/// @file BNode.cc
 /// @brief BNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNode.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_networks/BNetwork.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 //////////////////////////////////////////////////////////////////////
 // ノードを表すクラス BNode
@@ -33,7 +31,7 @@ BNode::BNode() :
 BNode::~BNode()
 {
   assert_cond( fanout_num() == 0, __FILE__, __LINE__);
-  assert_cond( ni() == 0, __FILE__, __LINE__);
+  assert_cond( fanin_num() == 0, __FILE__, __LINE__);
 }
 
 // ノードタイプをセットする．
@@ -47,7 +45,7 @@ BNode::set_type(tType type)
   case kPI:
     break;
   case kPO:
-    mFunc = LogExpr::make_posiliteral(0);
+    mFunc = LogExpr::make_posiliteral(VarId(0));
     break;
   case kLO:
     break;
@@ -65,7 +63,7 @@ int
 BNode::fanin_pos(BNode* node) const
 {
   int i;
-  for (i = ni(); -- i >= 0; ) {
+  for (i = fanin_num(); -- i >= 0; ) {
     if ( mFaninEdgeArray[i].from() == node ) break;
   }
   // 範囲外の場合にも具合良く-1になっている．
@@ -97,7 +95,7 @@ BNode::value() const
       feed_to_outputs = true;
     }
     else {
-      c += onode->mFunc.litnum(edge->pos());
+      c += onode->mFunc.litnum(VarId(edge->pos()));
     }
   }
 
@@ -111,4 +109,4 @@ BNode::value() const
   }
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS_BNET

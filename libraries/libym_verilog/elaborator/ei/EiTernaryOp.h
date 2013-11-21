@@ -5,9 +5,7 @@
 /// @brief EiExpr の3項演算子の派生クラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiTernaryOp.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 //////////////////////////////////////////////////////////////////////
@@ -127,7 +125,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiConditionOp EiBinaryOp.h "EiBinaryOp.h"
+/// @class EiConditionOp EiTernaryOp.h "EiTernaryOp.h"
 /// @brief 条件演算子
 //////////////////////////////////////////////////////////////////////
 class EiConditionOp :
@@ -159,7 +157,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
 
@@ -173,7 +171,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type);
+  _set_reqsize(const VlValueType& type);
 
 
 private:
@@ -182,14 +180,14 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 式の型
-  tVpiValueType mType;
+  VlValueType mType;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiMinTypMaxOp EiBinaryOp.h "EiBinaryOp.h"
-/// @brief 条件演算子
+/// @class EiMinTypMaxOp EiTernaryOp.h "EiTernaryOp.h"
+/// @brief min-typ-max 演算子
 //////////////////////////////////////////////////////////////////////
 class EiMinTypMaxOp :
   public EiTernaryOp
@@ -220,7 +218,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
 
@@ -234,7 +232,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type);
+  _set_reqsize(const VlValueType& type);
 
 
 private:
@@ -243,7 +241,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 式の型
-  tVpiValueType mType;
+  VlValueType mType;
 
 };
 

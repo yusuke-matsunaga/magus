@@ -26,7 +26,20 @@ distclean-local:
 
 #LIBYM_NET = $(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
 
-#bin_PROGRAMS = \
-#	makenode \
-#	bliftest \
-#	iscas89test
+bin_PROGRAMS = \
+	cec_test
+
+cec_test_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+cec_test_SOURCES = \
+	cec_test.cc
+
+cec_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cec/libym_cec.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+cec_test_LDFLAGS =

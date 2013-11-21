@@ -5,9 +5,7 @@
 /// @brief EiFactory のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiFactory.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -27,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のアロケータ
-  EiFactory(AllocBase& alloc);
+  EiFactory(Alloc& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -403,6 +401,16 @@ public:
 	      const PtItem* pt_header,
 	      const ElbUdpDefn* udp,
 	      bool has_delay);
+
+  /// @brief セルプリミティブのヘッダを生成する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_header パース木の定義
+  /// @param[in] cell セル
+  virtual
+  ElbPrimHead*
+  new_CellHead(const VlNamedObj* parent,
+	       const PtItem* pt_header,
+	       const Cell* cell);
 
   /// @brief プリミティブインスタンスを生成する．
   /// @param[in] head ヘッダ
@@ -821,7 +829,7 @@ public:
   virtual
   ElbExpr*
   new_UnaryOp(const PtExpr* pt_expr,
-	      tVpiOpType op_type,
+	      tVlOpType op_type,
 	      ElbExpr* opr1);
 
   /// @brief 2項演算子を生成する．
@@ -832,7 +840,7 @@ public:
   virtual
   ElbExpr*
   new_BinaryOp(const PtExpr* pt_expr,
-	       tVpiOpType op_type,
+	       tVlOpType op_type,
 	       ElbExpr* opr1,
 	       ElbExpr* opr2);
 
@@ -845,7 +853,7 @@ public:
   virtual
   ElbExpr*
   new_TernaryOp(const PtExpr* pt_expr,
-		tVpiOpType op_type,
+		tVlOpType op_type,
 		ElbExpr* opr1,
 		ElbExpr* opr2,
 		ElbExpr* opr3);
@@ -869,8 +877,8 @@ public:
   virtual
   ElbExpr*
   new_MultiConcatOp(const PtExpr* pt_expr,
-		    const PtExpr* rep_expr,
 		    int rep_num,
+		    ElbExpr* rep_expr,
 		    ymuint opr_size,
 		    ElbExpr** opr_list);
 
@@ -1096,7 +1104,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // メモリアロケータ
-  AllocBase& mAlloc;
+  Alloc& mAlloc;
 
   ymuint32 mUdpDefnNum;
   ymuint32 mModuleArrayNum;

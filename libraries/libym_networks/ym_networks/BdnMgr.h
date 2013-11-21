@@ -1,20 +1,18 @@
-#ifndef YM_BDN_BDNMGR_H
-#define YM_BDN_BDNMGR_H
+#ifndef YM_NETWORKS_BDNMGR_H
+#define YM_NETWORKS_BDNMGR_H
 
 /// @file ym_networks/BdnMgr.h
 /// @brief BdnMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BdnMgr.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/bdn.h"
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 //////////////////////////////////////////////////////////////////////
 /// @class BdnMgr BdnMgr.h "ym_networks/BdnMgr.h"
@@ -60,6 +58,16 @@ public:
   const BdnPort*
   port(ymuint pos) const;
 
+  /// @brief D-FFのIDの最大値 + 1 の取得
+  ymuint
+  max_dff_id() const;
+
+  /// @brief ID番号から D-FF を得る．
+  /// @param[in] id ID番号 ( 0 <= id < max_dff_id() )
+  /// @note 該当するD-FFが無い場合には NULL を返す．
+  const BdnDff*
+  dff(ymuint id) const;
+
   /// @brief D-FF 数の取得
   ymuint
   dff_num() const;
@@ -67,6 +75,16 @@ public:
   /// @brief D-FF のリストの取得
   const BdnDffList&
   dff_list() const;
+
+  /// @brief ラッチのIDの最大値 + 1 の取得
+  ymuint
+  max_latch_id() const;
+
+  /// @brief ID番号からラッチを得る．
+  /// @param[in] id ID番号 ( 0 <= id < max_latch_id() )
+  /// @note 該当するラッチが無い場合には NULL を返す．
+  const BdnLatch*
+  latch(ymuint id) const;
 
   /// @brief ラッチ数の取得
   ymuint
@@ -89,6 +107,10 @@ public:
   /// @return ノードIDの最大値 + 1 を返す．
   ymuint
   max_node_id() const;
+
+  /// @brief ID 番号をキーにノードを取り出す．
+  const BdnNode*
+  node(ymuint id) const;
 
   /// @brief 入力ノード数の取得
   /// @return 入力ノード数を返す．
@@ -115,17 +137,43 @@ public:
   const BdnNodeList&
   lnode_list() const;
 
+  /// @brief 指定されたANDタイプの論理ノードが存在するか調べる．
+  /// @param[in] inode1_handle 1番目の入力ノード+極性
+  /// @param[in] inode2_handle 2番目の入力ノード+極性
+  /// @param[out] onode_handle 該当のノード+極性
+  /// @return 見つかったら true を返す．
+  bool
+  find_and(BdnNodeHandle inode1_handle,
+	   BdnNodeHandle inode2_handle,
+	   BdnNodeHandle& onode_handle);
+
+  /// @brief 指定されたXORタイプの論理ノードが存在するか調べる．
+  /// @param[in] inode1_handle 1番目の入力ノード+極性
+  /// @param[in] inode2_handle 2番目の入力ノード+極性
+  /// @param[out] onode_handle 該当のノード+極性
+  /// @return 見つかったら true を返す．
+  bool
+  find_xor(BdnNodeHandle inode1_handle,
+	   BdnNodeHandle inode2_handle,
+	   BdnNodeHandle& onode_handle);
+
   /// @brief ソートされた論理ノードのリストを得る．
   /// @param[out] node_list ノードのリストの格納先
   /// @note 入力ノードと出力ノード，ラッチノードは含まない．
   void
-  sort(vector<BdnNode*>& node_list) const;
+  sort(vector<const BdnNode*>& node_list) const;
+
+  /// @brief ソートされた論理ノードのリストを得る．
+  /// @param[out] node_list ノードのリストの格納先
+  /// @note 入力ノードと出力ノード，ラッチノードは含まない．
+  void
+  _sort(vector<BdnNode*>& node_list) const;
 
   /// @brief 逆順でソートされた論理ノードのリストを得る．
   /// @param[out] node_list ノードのリストの格納先
   /// @note 入力ノードと出力ノード，ラッチノードは含まない．
   void
-  rsort(vector<BdnNode*>& node_list) const;
+  rsort(vector<const BdnNode*>& node_list) const;
 
   /// @brief 最大段数を求める．
   /// @note 段数とは入力ノードから出力ノードへ至る経路中の論理ノードの数
@@ -141,25 +189,44 @@ public:
   /// @name ネットワーク全体の情報の設定を行う関数
   /// @{
 
+  /// @brief 空にする．
+  void
+  clear();
+
   /// @brief 名前を設定する．
   /// @param[in] name 新しい名前
   void
   set_name(const string& name);
 
-  /// @brief 空にする．
-  void
-  clear();
-
   /// @brief どこにもファンアウトしていないノードを削除する．
   void
   clean_up();
 
-  /// @brief ポートを作る．
+  /// @brief 入力ポートを作る．
   /// @param[in] name 名前
   /// @param[in] bit_width ビット幅
   BdnPort*
+  new_input_port(const string& name,
+		 ymuint bit_width);
+
+  /// @brief 出力ポートを作る．
+  /// @param[in] name 名前
+  /// @param[in] bit_width ビット幅
+  BdnPort*
+  new_output_port(const string& name,
+		  ymuint bit_width);
+
+  /// @brief ポートを作る．
+  /// @param[in] name 名前
+  /// @param[in] iovect ビットごとの方向を指定する配列
+  /// @note iovect の要素の値の意味は以下の通り
+  /// - 0 : なし
+  /// - 1 : 入力のみ
+  /// - 2 : 出力のみ
+  /// - 3 : 入力と出力
+  BdnPort*
   new_port(const string& name,
-	   ymuint bit_width);
+	   const vector<ymuint>& iovect);
 
   /// @brief D-FF を作る．
   /// @param[in] name 名前
@@ -181,42 +248,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   /// @name ノードの生成および変更を行う関数
   /// @{
-
-  /// @brief 外部入力を作る．
-  /// @param[in] port ポート
-  /// @param[in] bitpos ビット位置
-  /// @return 作成したノードを返す．
-  /// @note エラー条件は以下の通り
-  ///  - bitpos が port のビット幅を越えている．
-  ///  - port の bitpos にすでにノードがある．
-  BdnNode*
-  new_port_input(BdnPort* port,
-		 ymuint bitpos);
-
-  /// @brief 外部入力とポートを同時に作る．
-  /// @param[in] port_name ポート名
-  /// @return 作成したノードを返す．
-  /// @note ポートのビット幅は1ビットとなる．
-  BdnNode*
-  new_port_input(const string& port_name);
-
-  /// @brief 外部出力ノードを作る．
-  /// @param[in] port ポート
-  /// @param[in] bitpos ビット位置
-  /// @return 作成したノードを返す．
-  /// @note エラー条件は以下の通り
-  ///  - bitpos が port のビット幅を越えている．
-  ///  - port の bitpos にすでにノードがある．
-  BdnNode*
-  new_port_output(BdnPort* port,
-		  ymuint bitpos);
-
-  /// @brief 外部出力ノードとポートを同時にを作る．
-  /// @param[in] port_name ポート名
-  /// @return 作成したノードを返す．
-  /// @note ポートのビット幅は1ビットとなる．
-  BdnNode*
-  new_port_output(const string& port_name);
 
   /// @brief 出力ノードのファンインを変更する
   /// @param[in] node 変更対象の出力ノード
@@ -420,56 +451,6 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // プライベートメンバ関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief AND のバランス木を作る．
-  /// @param[in] node 根のノード
-  /// @param[in] node_list 入力のノードのリスト
-  /// @note node が NULL の場合，新しいノードを確保する．
-  BdnNodeHandle
-  make_and_tree(BdnNode* node,
-		const vector<BdnNodeHandle>& node_list);
-
-  /// @brief OR のバランス木を作る．
-  /// @param[in] node 根のノード
-  /// @param[in] node_list 入力のノードのリスト
-  /// @note node が NULL の場合，新しいノードを確保する．
-  BdnNodeHandle
-  make_or_tree(BdnNode* node,
-	       const vector<BdnNodeHandle>& node_list);
-
-  /// @brief XOR のバランス木を作る．
-  /// @param[in] node 根のノード
-  /// @param[in] node_list 入力のノードのリスト
-  /// @note node が NULL の場合，新しいノードを確保する．
-  BdnNodeHandle
-  make_xor_tree(BdnNode* node,
-		const vector<BdnNodeHandle>& node_list);
-
-  /// @brief バランス木を作る．
-  /// @param[in] node 根のノード
-  /// @param[in] fcode 機能コード
-  /// @param[in] start 開始位置
-  /// @param[in] num 要素数
-  /// @param[in] node_list 入力のノードのリスト
-  /// @note node が NULL の場合，新しいノードを確保する．
-  /// @note fcode の各ビットの意味は以下のとおり，
-  ///  - 0bit: ファンイン0の反転属性
-  ///  - 1bit: ファンイン1の反転属性
-  ///  - 2bit: XOR/AND フラグ( 0: AND, 1: XOR)
-  ///  - 3bit: 出力の反転属性
-  BdnNodeHandle
-  make_tree(BdnNode* node,
-	    ymuint fcode,
-	    ymuint start,
-	    ymuint num,
-	    const vector<BdnNodeHandle>& node_list);
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -480,101 +461,6 @@ private:
 
 };
 
+END_NAMESPACE_YM_NETWORKS_BDN
 
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief 外部入力とポートを同時に作る．
-// @param[in] port_name ポート名
-// @return 作成したノードを返す．
-// @note ポートのビット幅は1ビットとなる．
-inline
-BdnNode*
-BdnMgr::new_port_input(const string& port_name)
-{
-  BdnPort* port = new_port(port_name, 1);
-  return new_port_input(port, 0);
-}
-
-// @brief 外部出力ノードとポートを同時にを作る．
-// @param[in] port_name ポート名
-// @return 作成したノードを返す．
-// @note ポートのビット幅は1ビットとなる．
-inline
-BdnNode*
-BdnMgr::new_port_output(const string& port_name)
-{
-  BdnPort* port = new_port(port_name, 1);
-  return new_port_output(port, 0);
-}
-
-// @brief AND ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_and(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return make_and_tree(NULL, inode_handle_list);
-}
-
-// @brief NAND ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_nand(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return ~make_and_tree(NULL, inode_handle_list);
-}
-
-// @brief OR ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_or(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return make_or_tree(NULL, inode_handle_list);
-}
-
-// @brief NOR ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_nor(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return ~make_or_tree(NULL, inode_handle_list);
-}
-
-// @brief XOR ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_xor(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return make_xor_tree(NULL, inode_handle_list);
-}
-
-// @brief XNOR ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_xnor(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return ~make_xor_tree(NULL, inode_handle_list);
-}
-
-END_NAMESPACE_YM_BDN
-
-#endif // YM_BDN_BDNMGR_H
+#endif // YM_NETWORKS_BDNMGR_H

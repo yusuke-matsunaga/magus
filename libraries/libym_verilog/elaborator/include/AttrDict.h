@@ -1,18 +1,16 @@
-#ifndef LIBYM_VERILOG_ELABORATOR_ATTRDICT_H
-#define LIBYM_VERILOG_ELABORATOR_ATTRDICT_H
+#ifndef ATTRDICT_H
+#define ATTRDICT_H
 
-/// @file libym_verilog/elaborator/AttrDict.h
+/// @file AttrDict.h
 /// @brief AttrDict のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: AttrDict.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_verilog/verilog.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
 
 #include "ElbFwd.h"
 
@@ -120,4 +118,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELABORATOR_ATTRDICT_H
+#endif // ATTRDICT_H

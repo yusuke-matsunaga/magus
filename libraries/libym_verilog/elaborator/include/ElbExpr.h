@@ -1,24 +1,23 @@
-#ifndef LIBYM_VERILOG_ELB_ELBEXPR_H
-#define LIBYM_VERILOG_ELB_ELBEXPR_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBEXPR_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBEXPR_H
 
 /// @file libym_verilog/elaborator/include/ElbExpr.h
 /// @brief ElbExpr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: ElbExpr.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_verilog/vl/VlExpr.h"
+#include "ym_verilog/VlValueType.h"
 #include "ElbFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class ElbExpr ElbExpr.h <ym_verilog/vl/VlExpr.h>
+/// @class ElbExpr ElbExpr.h "ElbExpr.h"
 /// @brief エラボレーション中の expression を表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class ElbExpr :
@@ -36,20 +35,42 @@ protected:
 
 public:
   //////////////////////////////////////////////////////////////////////
+  // VlExpr の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 要求された値のタイプを返す．
+  virtual
+  VlValueType
+  req_type() const;
+
+  /// @brief 式のビット幅を返す．
+  virtual
+  ymuint
+  bit_size() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
   // ElbExpr の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 要求される式の型を計算してセットする．
   /// @param[in] type 要求される式の型
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
-  virtual
   void
-  set_reqsize(tVpiValueType type) = 0;
+  set_reqsize(const VlValueType& type);
 
   /// @brief 要求される式のサイズを自分で決めてセットする．
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   void
   set_selfsize();
+
+  /// @brief set_reqsize() の下請け関数
+  /// @param[in] type 要求される式の型
+  /// @note 必要であればオペランドに対して再帰的に処理を行なう．
+  virtual
+  void
+  _set_reqsize(const VlValueType& type) = 0;
 
   /// @brief オペランドを返す．
   /// @param[in] pos 位置番号
@@ -66,22 +87,31 @@ public:
 
   // 二項演算のタイプとサイズを決める．
   static
-  tVpiValueType
-  calc_type(tVpiValueType type0,
-	    tVpiValueType type1);
+  VlValueType
+  calc_type(const VlValueType& type0,
+	    const VlValueType& type1);
 
 
   // 巾乗演算のタイプとサイズを決める．
   static
-  tVpiValueType
-  calc_type2(tVpiValueType type0,
-	     tVpiValueType type1);
+  VlValueType
+  calc_type2(const VlValueType& type0,
+	     const VlValueType& type1);
 
   // 出力に要求されているサイズから自分のサイズを決める．
   static
-  tVpiValueType
-  update_size(tVpiValueType type,
-	      tVpiValueType req_type);
+  VlValueType
+  update_size(const VlValueType& type,
+	      const VlValueType& req_type);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 要求された値のタイプ
+  VlValueType mReqType;
 
 };
 
@@ -89,6 +119,17 @@ public:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief 要求される式の型を計算してセットする．
+// @param[in] type 要求される式の型
+// @note 必要であればオペランドに対して再帰的に処理を行なう．
+inline
+void
+ElbExpr::set_reqsize(const VlValueType& type)
+{
+  mReqType = type;
+  _set_reqsize(type);
+}
 
 // @brief 要求される式のサイズを自分で決めてセットする．
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -101,4 +142,4 @@ ElbExpr::set_selfsize()
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBEXPR_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBEXPR_H

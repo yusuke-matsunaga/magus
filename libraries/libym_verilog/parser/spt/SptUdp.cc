@@ -162,9 +162,18 @@ SptUdpEntry::output() const
 
 // コンストラクタ
 SptUdpValue::SptUdpValue(const FileRegion& file_region,
-			 tVpiUdpVal symbol1) :
+			 char symbol1) :
   mFileRegion(file_region),
   mSymbol(symbol1)
+{
+}
+
+// コンストラクタ
+SptUdpValue::SptUdpValue(const FileRegion& file_region,
+			 char symbol1,
+			 char symbol2) :
+  mFileRegion(file_region),
+  mSymbol(symbol1, symbol2)
 {
 }
 
@@ -181,7 +190,7 @@ SptUdpValue::file_region() const
 }
 
 // 1つめのシンボルを取り出す．
-tVpiUdpVal
+VlUdpVal
 SptUdpValue::symbol() const
 {
   return mSymbol;
@@ -284,10 +293,23 @@ SptFactory::new_UdpEntry(const FileRegion& file_region,
 // @return 生成された値
 const PtUdpValue*
 SptFactory::new_UdpValue(const FileRegion& file_region,
-			 tVpiUdpVal symbol)
+			 char symbol)
 {
   void* p = alloc().get_memory(sizeof(SptUdpValue));
   return new (p) SptUdpValue(file_region, symbol);
+}
+
+// @brief UDP のテーブルエントリの要素の値の生成
+// @param[in] fr ファイル位置の情報
+// @param[in] symbol1, symbol2 シンボル
+// @return 生成された値
+const PtUdpValue*
+SptFactory::new_UdpValue(const FileRegion& file_region,
+			 char symbol1,
+			 char symbol2)
+{
+  void* p = alloc().get_memory(sizeof(SptUdpValue));
+  return new (p) SptUdpValue(file_region, symbol1, symbol2);
 }
 
 END_NAMESPACE_YM_VERILOG

@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVNINPUTPIN_H
-#define YM_MVN_MVNINPUTPIN_H
+#ifndef YM_NETWORKS_MVNINPUTPIN_H
+#define YM_NETWORKS_MVNINPUTPIN_H
 
 /// @file ym_networks/MvnInputPin.h
 /// @brief MvnInputPin のヘッダファイル
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnInputPin MvPin.h "ym_networks/MvPin.h"
@@ -51,9 +51,9 @@ public:
   ymuint
   pos() const;
 
-  /// @brief 接続している出力ピンを得る．
-  MvnOutputPin*
-  src_pin() const;
+  /// @brief 接続しているノードを得る．
+  MvnNode*
+  src_node() const;
 
 
 private:
@@ -81,8 +81,8 @@ private:
   // ビット幅
   ymuint32 mBitWidth;
 
-  // 接続している出力ピン
-  MvnOutputPin* mSrcPin;
+  // 接続しているノード
+  MvnNode* mSrcNode;
 
 };
 
@@ -116,12 +116,12 @@ MvnInputPin::pos() const
   return mPos;
 }
 
-// @brief 接続している出力ピンを得る．
+// @brief 接続しているノードを得る．
 inline
-MvnOutputPin*
-MvnInputPin::src_pin() const
+MvnNode*
+MvnInputPin::src_node() const
 {
-  return mSrcPin;
+  return mSrcNode;
 }
 
 // @brief 設定用の関数
@@ -133,9 +133,9 @@ MvnInputPin::init(MvnNode* node,
   mNode = node;
   mPos = pos;
   mBitWidth = 1;
-  mSrcPin = NULL;
+  mSrcNode = NULL;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // YM_MVN_MVNINPUTPIN_H
+#endif // YM_NETWORKS_MVNINPUTPIN_H

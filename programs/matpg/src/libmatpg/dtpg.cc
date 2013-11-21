@@ -16,13 +16,13 @@
  *
  * Revision 2.2  91/12/26  19:56:59  yusuke
  * Final revision of version 2
- * 
+ *
  * Revision 2.1  91/12/23  23:11:02  yusuke
  * a slightly speed-up
- * 
+ *
  * Revision 2.0  91/12/21  18:50:09  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.7  1991/10/05  08:18:18  yusuke
  * add Log and RCSid for RCS
  *
@@ -142,19 +142,19 @@ dtpg(FSIM_MODE f_mode,
   }
 
   int old_tm_id = sw_timer.change(TM_DTPG);
-  
+
   StopWatch timer;
   timer.start();
-  
+
   total_btnum = 0;
   int d_num0 = fault_d_num();
   int r_num0 = fault_r_num();
   p_num = 0;
-  
+
   fsim_mode = f_mode;
-  
+
   dyn_mode = dyn;
-  
+
   for (size_t i = 0; i < pckval_bitlen; ++ i) {
     tps[i] = new testpat_t(gn_get_npi());
   }
@@ -217,7 +217,7 @@ dtpg(FSIM_MODE f_mode,
       gn_deactivate();
     }
   }
-  
+
   if ( f_num > 0 ) {
     vector<list<fault_t*> > det_faults(f_num);
     fault_sim(tps, f_num, det_faults);
@@ -233,13 +233,13 @@ dtpg(FSIM_MODE f_mode,
       tps[i] = new testpat_t(gn_get_npi());
     }
   }
-  
+
   fault_sweep();
-  
+
   for (size_t i = 0; i < pckval_bitlen; ++ i) {
     delete tps[i];
   }
-  
+
   if ( log_flag ) {
     int d_num = fault_d_num() - d_num0;
     int r_num = fault_r_num() - r_num0;
@@ -257,7 +257,7 @@ dtpg(FSIM_MODE f_mode,
     fprintf(log_fp, "%10d: # of total backtracks\n", total_btnum);
     fprintf(log_fp, "%10.2fu %10.2fs: CPU time\n", utime, stime);
   }
-  
+
   sw_timer.change(old_tm_id);
 }
 
@@ -266,7 +266,7 @@ dtpg_s()
 {
   for (size_t pos = 0; pos < cf_num; ++ pos) {
     fault_t* f = cur_faults[pos];
-    
+
     if ( !f->is_undetected() ) {
       // すでに検出済みになっていた．
       continue;
@@ -308,7 +308,7 @@ dtpg_p()
     tmp_faults[i] = cur_faults[i];
   }
   size_t tmp_num = cf_num;
-  
+
   while ( tmp_num > 0 ) {
     // ランダムに故障を抜き出す．
     size_t pos = size_t(randgen.int32() % tmp_num);
@@ -321,7 +321,7 @@ dtpg_p()
     if ( !f->is_undetected() ) {
       continue;
     }
-    
+
     ++ dtpg_num;
     cur_tp = tps[f_num];
     if ( !dtpg1(f, 0) ) {
@@ -359,15 +359,15 @@ dtpg1(fault_t* f,
     fprintf(ver_fp, "Target fault: ");
     f->print(ver_fp);
   }
-  
+
   gate_t* i_gate = f->get_input_gate();
-  
+
   bool dyn_flag = false;
   if ( dyn_mode != DYN_NONE ) {
     dyn_flag = true;
     set_ex_cands(i_gate);
   }
-  
+
   inject_fault(f);
   maq_clr(true);
   cfna_clr();
@@ -387,13 +387,13 @@ dtpg1(fault_t* f,
       }
       continue;
     }
-    
+
     // unique sensitization
     sensitize(i_gate);
     if ( maq_get() ) {
       continue;
     }
-    
+
     // dynamic implication
     if ( dyn_flag ) {
       examine_dyn_imp();
@@ -401,7 +401,7 @@ dtpg1(fault_t* f,
 	continue;
       }
     }
-    
+
     if ( dyn_mode == DYN_SINGLE ) {
       dyn_flag = false;
     }
@@ -433,7 +433,7 @@ dtpg1(fault_t* f,
   pgraph_destruct();
   remove_fault(f);
   total_btnum += get_backtrack_count();
-  
+
   if ( is_redundant() ) {
     f->set_redundant();
     if ( get_verbose_level() > 0 ) {
@@ -441,7 +441,7 @@ dtpg1(fault_t* f,
     }
     return false;
   }
-  
+
   if ( is_aborted() ) {
     f->set_aborted();
     if ( get_verbose_level() > 0 ) {
@@ -449,7 +449,7 @@ dtpg1(fault_t* f,
     }
     return false;
   }
-  
+
   if ( get_verbose_level() > 0 ) {
     fprintf(ver_fp, "... detected\n\n");
   }
@@ -479,10 +479,10 @@ inject_fault(fault_t* f)
       f_gate->insert(gate);
     }
     else {
-      for (int i = gate->get_act_no(); -- i >= 0; ) {
+      for (int i = gate->get_act_fanout_num(); -- i >= 0; ) {
 	f_gate = new_fault(f->get_fval());
-	f_gate->insert(gate->get_act_fogate(i),
-		       gate->get_act_fogate_ipos(i));
+	f_gate->insert(gate->get_act_fanout_gate(i),
+		       gate->get_act_fanout_gate_ipos(i));
       }
     }
   }
@@ -498,8 +498,8 @@ remove_fault(fault_t* f)
 {
   if ( f->get_ipos() == -1 ) {
     gate_t* gate = f->get_gate();
-    for (int i = gate->get_act_no(); -- i >= 0; ) {
-      gate_t* gate1 = gate->get_act_fogate(i);
+    for (int i = gate->get_act_fanout_num(); -- i >= 0; ) {
+      gate_t* gate1 = gate->get_act_fanout_gate(i);
       if ( gate1->is_f_site() ) {
 	sa_node* f_gate = dynamic_cast<sa_node*>(gate1);
 	assert_cond(f_gate, __FILE__, __LINE__);
@@ -557,7 +557,7 @@ new_fault(val3 fval)
   f_gate->set_active();
   f_gate->set_fcone();
   f_gate->state = 0L;
-  
+
   return f_gate;
 }
 
@@ -570,8 +570,8 @@ mark_tfi(gate_t* gate)
   }
   gate->set_mark();
   lvlq_put(gate);
-  for (int i = gate->get_ni(); -- i >= 0; ) {
-    mark_tfi(gate->get_figate(i));
+  for (int i = gate->get_fanin_num(); -- i >= 0; ) {
+    mark_tfi(gate->get_fanin_gate(i));
   }
 }
 
@@ -584,11 +584,11 @@ mark_tfi_tfo(gate_t* gate)
   }
   gate->set_mark();
   lvlq_put(gate);
-  for (int i = gate->get_act_no(); -- i >= 0; ) {
-    mark_tfi_tfo(gate->get_act_fogate(i));
+  for (int i = gate->get_act_fanout_num(); -- i >= 0; ) {
+    mark_tfi_tfo(gate->get_act_fanout_gate(i));
   }
-  for (int i = gate->get_ni(); -- i >= 0; ) {
-    mark_tfi(gate->get_figate(i));
+  for (int i = gate->get_fanin_num(); -- i >= 0; ) {
+    mark_tfi(gate->get_fanin_gate(i));
   }
 }
 
@@ -603,7 +603,7 @@ set_ex_cands(gate_t* gate)
   gn_clr_mark();
   mark_tfi_tfo(gate);
   for (gate_t* g; (g = lvlq_get_from_top()); ) {
-    if ( g->get_ni() >= 2 ) {
+    if ( g->get_fanin_num() >= 2 ) {
       ex_cands[num_ex_cands ++] = g;
     }
   }
@@ -686,7 +686,7 @@ drop_fault(fault_t* f0)
       break;
     }
   }
-  
+
   for ( ; i < cf_num; i ++) {
     fault_t* f = cur_faults[i];
     if ( f->get_gate()->get_fos() != fos ) {
@@ -695,7 +695,7 @@ drop_fault(fault_t* f0)
     if ( f == f0 ) {
       continue;
     }
-    gate_t* gate = f->get_gate();	
+    gate_t* gate = f->get_gate();
     int ipos = f->get_ipos();
     if ( f->get_fval() == val_0 ) {
       if ( f->get_input_gate()->get_gval() != val_1 ) {
@@ -718,8 +718,8 @@ drop_fault(fault_t* f0)
 	reached = true;
 	break;
       }
-      gate_t* ogate = gate->get_fogate(0);
-      int ipos = gate->get_fogate_ipos(0);
+      gate_t* ogate = gate->get_fanout_gate(0);
+      int ipos = gate->get_fanout_gate_ipos(0);
       if ( !ogate->calc_obs2(ipos) ) {
 	break;
       }
@@ -752,12 +752,12 @@ AND_gate_t::calc_obs2(int ipos) const
 {
   int i;
   for (i = ni; -- i > ipos; ) {
-    if ( get_figate(i)->get_gval() != val_1 ) {
+    if ( get_fanin_gate(i)->get_gval() != val_1 ) {
       return false;
     }
   }
   for ( ; -- i >= 0; ) {
-    if ( get_figate(i)->get_gval() != val_1 ) {
+    if ( get_fanin_gate(i)->get_gval() != val_1 ) {
       return false;
     }
   }
@@ -770,12 +770,12 @@ NAND_gate_t::calc_obs2(int ipos) const
 {
   int i;
   for (i = ni; -- i > ipos; ) {
-    if ( get_figate(i)->get_gval() != val_1 ) {
+    if ( get_fanin_gate(i)->get_gval() != val_1 ) {
       return false;
     }
   }
   for ( ; -- i >= 0; ) {
-    if ( get_figate(i)->get_gval() != val_1 ) {
+    if ( get_fanin_gate(i)->get_gval() != val_1 ) {
       return false;
     }
   }
@@ -788,12 +788,12 @@ OR_gate_t::calc_obs2(int ipos) const
 {
   int i;
   for (i = ni; -- i > ipos; ) {
-    if ( get_figate(i)->get_gval() != val_0 ) {
+    if ( get_fanin_gate(i)->get_gval() != val_0 ) {
       return false;
     }
   }
   for ( ; -- i >= 0; ) {
-    if ( get_figate(i)->get_gval() != val_0 ) {
+    if ( get_fanin_gate(i)->get_gval() != val_0 ) {
       return false;
     }
   }
@@ -806,12 +806,12 @@ NOR_gate_t::calc_obs2(int ipos) const
 {
   int i;
   for (i = ni; -- i > ipos; ) {
-    if ( get_figate(i)->get_gval() != val_0 ) {
+    if ( get_fanin_gate(i)->get_gval() != val_0 ) {
       return false;
     }
   }
   for ( ; -- i >= 0; ) {
-    if ( get_figate(i)->get_gval() != val_0 ) {
+    if ( get_fanin_gate(i)->get_gval() != val_0 ) {
       return false;
     }
   }
@@ -824,12 +824,12 @@ XOR_gate_t::calc_obs2(int ipos) const
 {
   int i;
   for (i = ni; -- i > ipos; ) {
-    if ( get_figate(i)->get_gval() == val_X ) {
+    if ( get_fanin_gate(i)->get_gval() == val_X ) {
       return false;
     }
   }
   for ( ; -- i >= 0; ) {
-    if ( get_figate(i)->get_gval() == val_X ) {
+    if ( get_fanin_gate(i)->get_gval() == val_X ) {
       return false;
     }
   }

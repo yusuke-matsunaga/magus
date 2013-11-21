@@ -1,5 +1,5 @@
-#ifndef YM_BDN_BDNNODE_H
-#define YM_BDN_BDNNODE_H
+#ifndef YM_NETWORKS_BDNNODE_H
+#define YM_NETWORKS_BDNNODE_H
 
 /// @file ym_networks/BdnNode.h
 /// @brief BdnNode のヘッダファイル
@@ -8,10 +8,10 @@
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 class BdnAuxData;
 
@@ -155,7 +155,7 @@ public:
   enum tInputType {
     /// @brief 外部入力
     kPRIMARY_INPUT  = 0,
-    /// @brief DFFの出力
+    /// @brief D-FFの出力
     kDFF_OUTPUT     = 1,
     /// @brief ラッチの出力
     kLATCH_OUTPUT   = 2
@@ -165,18 +165,22 @@ public:
   enum tOutputType {
     /// @brief 外部出力
     kPRIMARY_OUTPUT = 0,
-    /// @brief DFFのデータ
+    /// @brief D-FFのデータ
     kDFF_DATA       = 1,
-    /// @brief DFFのクロック
+    /// @brief D-FFのクロック
     kDFF_CLOCK      = 2,
-    /// @brief DFFのクリア信号
+    /// @brief D-FFのクリア信号
     kDFF_CLEAR      = 3,
-    /// @brief DFFのプリセット信号
+    /// @brief D-FFのプリセット信号
     kDFF_PRESET     = 4,
     /// @brief ラッチのデータ
     kLATCH_DATA     = 5,
     /// @brief ラッチのイネーブル
-    kLATCH_ENABLE   = 6
+    kLATCH_ENABLE   = 6,
+    /// @brief ラッチのクリア信号
+    kLATCH_CLEAR    = 7,
+    /// @brief ラッチのプリセット信号
+    kLATCH_PRESET   = 8
   };
 
 
@@ -200,11 +204,6 @@ public:
   /// @sa BdnMgr
   ymuint
   id() const;
-
-  /// @brief ID を表す文字列の取得
-  /// @note デバッグ時にしか意味を持たない
-  string
-  id_str() const;
 
   /// @brief タイプを得る．
   tType
@@ -297,6 +296,15 @@ public:
   bool
   output_fanin_inv() const;
 
+  /// @brief ファンインのハンドルを得る．
+  BdnConstNodeHandle
+  output_fanin_handle() const;
+
+  /// @brief ファンインのハンドルを得る．
+  BdnNodeHandle
+  output_fanin_handle();
+
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -333,10 +341,30 @@ public:
   bool
   fanin_inv(ymuint pos) const;
 
+  /// @brief ファンインのハンドルを得る．
+  /// @param[in] pos 入力番号(0 or 1)
+  /// @return pos 番めのファンインのハンドルを返す．
+  BdnConstNodeHandle
+  fanin_handle(ymuint pos) const;
+
+  /// @brief ファンインのハンドルを得る．
+  /// @param[in] pos 入力番号(0 or 1)
+  /// @return pos 番めのファンインのハンドルを返す．
+  BdnNodeHandle
+  fanin_handle(ymuint pos);
+
   /// @brief ファンイン0のノードを得る．
   /// @return 0番めのファンインのノード
   const BdnNode*
   fanin0() const;
+
+  /// @brief ファンイン0のハンドルを得る．
+  BdnConstNodeHandle
+  fanin0_handle() const;
+
+  /// @brief ファンイン0のハンドルを得る．
+  BdnNodeHandle
+  fanin0_handle();
 
   /// @brief ファンイン0のノードを得る．
   /// @return 0番めのファンインのノード
@@ -362,6 +390,14 @@ public:
   /// @brief ファンイン1の反転属性を得る．
   bool
   fanin1_inv() const;
+
+  /// @brief ファンイン1のハンドルを得る．
+  BdnConstNodeHandle
+  fanin1_handle() const;
+
+  /// @brief ファンイン1のハンドルを得る．
+  BdnNodeHandle
+  fanin1_handle();
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -415,7 +451,7 @@ private:
   ymuint32 mId;
 
   // 入力ノード  : タイプ(2bit) + POマーク(1bit) + サブタイプ(2bit)
-  // 出力ノード  :     〃       + 出力極性(1bit) + サブタイプ(3bit)
+  // 出力ノード  :     〃       + 出力極性(1bit) + サブタイプ(4bit)
   // 論理ノード  :     〃       + POマーク(1bit) + 機能コード(3bit)
   ymuint32 mFlags;
 
@@ -429,6 +465,7 @@ private:
   BdnNode* mLink;
 
   // レベル
+  mutable
   ymuint32 mLevel;
 
   // 補助的な情報を持つオブジェクト
@@ -458,10 +495,6 @@ private:
   const ymuint32 kPoMask = 1U << kPoShift;
   static
   const ymuint32 kOInvMask = 1U << kOInvShift;
-  static
-  const ymuint32 kIsubMask = 3U << kIsubShift;
-  static
-  const ymuint32 kOsubMask = 7U << kOsubShift;
 
 };
 
@@ -611,7 +644,7 @@ inline
 BdnNode::tOutputType
 BdnNode::output_type() const
 {
-  return static_cast<tOutputType>((mFlags >> kOsubShift) & 7U);
+  return static_cast<tOutputType>((mFlags >> kOsubShift) & 0xFU);
 }
 
 // @brief ファンインのノードを得る．
@@ -648,7 +681,7 @@ inline
 ymuint
 BdnNode::_fcode() const
 {
-  return (mFlags >> kFcodeShift) & 0x7;
+  return (mFlags >> kFcodeShift) & 07U;
 }
 
 // @brief AND タイプのときに true を返す．
@@ -821,6 +854,6 @@ BdnNode::set_output_fanin_inv(bool inv)
   }
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS_BDN
 
-#endif // YM_BDN_BDNNODE_H
+#endif // YM_NETWORKS_BDNNODE_H

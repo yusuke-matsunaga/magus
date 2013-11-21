@@ -5,9 +5,7 @@
 /// @brief LogicSim のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: LogicSim.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -36,7 +34,7 @@ public:
 
 
 public:
-  
+
   /// @brief シミュレーションを行う．
   /// @param[in] input_vector 入力ベクタを整数にしたもの
   /// @param[in] cur_state 現状態
@@ -48,7 +46,7 @@ public:
 	     ymuint& output_vector,
 	     State& next_state);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -59,10 +57,10 @@ private:
 
   // ノードをトポロジカル順に納めた配列
   BNodeVector mNodeArray;
-  
+
   // ノードの値を保持しておく作業領域
   vector<ymuint> mValArray;
-  
+
 };
 
 END_NAMESPACE_YM_SEAL

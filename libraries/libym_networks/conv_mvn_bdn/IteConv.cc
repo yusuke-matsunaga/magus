@@ -1,5 +1,5 @@
 
-/// @file libym_networks/IteConv.cc
+/// @file IteConv.cc
 /// @brief IteConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -14,7 +14,7 @@
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 // @brief コンストラクタ
 IteConv::IteConv()
@@ -39,20 +39,17 @@ IteConv::operator()(const MvnNode* node,
 {
   if ( node->type() == MvnNode::kIte ) {
     const MvnInputPin* ipin0 = node->input(0);
-    const MvnOutputPin* src_pin0 = ipin0->src_pin();
-    const MvnNode* src_node0 = src_pin0->node();
+    const MvnNode* src_node0 = ipin0->src_node();
 
     const MvnInputPin* ipin1 = node->input(1);
-    const MvnOutputPin* src_pin1 = ipin1->src_pin();
-    const MvnNode* src_node1 = src_pin1->node();
+    const MvnNode* src_node1 = ipin1->src_node();
 
     const MvnInputPin* ipin2 = node->input(2);
-    const MvnOutputPin* src_pin2 = ipin2->src_pin();
-    const MvnNode* src_node2 = src_pin2->node();
+    const MvnNode* src_node2 = ipin2->src_node();
 
-    ymuint bw = node->output(0)->bit_width();
-    assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
-    assert_cond( src_pin2->bit_width() == bw, __FILE__, __LINE__);
+    ymuint bw = node->bit_width();
+    assert_cond( src_node1->bit_width() == bw, __FILE__, __LINE__);
+    assert_cond( src_node2->bit_width() == bw, __FILE__, __LINE__);
     BdnNodeHandle handle0 = nodemap.get(src_node0);
 
     for (ymuint i = 0; i < bw; ++ i) {
@@ -68,4 +65,4 @@ IteConv::operator()(const MvnNode* node,
   return false;
 }
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV

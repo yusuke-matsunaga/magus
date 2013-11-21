@@ -2,7 +2,7 @@
 /// @file libym_cec/FraigMgrImpl.cc
 /// @brief FraigMgrImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: FraigMgrImpl.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -12,6 +12,8 @@
 #include "FraigMgrImpl.h"
 #include "FraigNode.h"
 #include "FraigMgr.h"
+#include "ym_utils/StopWatch.h"
+#include "ym_logic/SatStats.h"
 
 
 #if defined(YM_DEBUG)
@@ -45,20 +47,20 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // FraigHandle
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief ノードの通し番号を得る．
-ymuint
-FraigHandle::var_id() const
+VarId
+FraigHandle::varid() const
 {
   FraigNode* n = node();
   if ( n ) {
-    return n->var_id();
+    return n->varid();
   }
   else {
-    return 0;
+    return kVarIdIllegal;
   }
 }
-  
+
 // @brief 代表ハンドルを得る．
 FraigHandle
 FraigHandle::rep_handle() const
@@ -77,7 +79,7 @@ FraigHandle::rep_handle() const
     return *this;
   }
 }
-  
+
 // @brief 外部入力ノードへのハンドルのとき true を返す．
 bool
 FraigHandle::is_input() const
@@ -123,7 +125,7 @@ operator<<(ostream& s,
       s << "I" << src.input_id();
     }
     else {
-      s << "A" << src.var_id();
+      s << "A" << src.varid();
     }
   }
   return s;
@@ -149,27 +151,27 @@ FraigHash::~FraigHash()
 {
   delete [] mHashTable;
 }
-  
+
 // @brief ハッシュ表を確保する．
 void
 FraigHash::alloc_table(ymuint req_size)
 {
   delete [] mHashTable;
-  
+
   if ( mHashSize == 0 ) {
     mHashSize = 1024;
   }
   while ( mHashSize < req_size ) {
     mHashSize <<= 1;
   }
-  
+
   mHashTable = new FraigNode*[mHashSize];
   for (ymuint i = 0; i < mHashSize; ++ i) {
     mHashTable[i] = NULL;
   }
-  
+
   mNum = 0;
-  
+
   mNextLimit = static_cast<ymuint32>(mHashSize * 1.8);
 }
 
@@ -191,7 +193,7 @@ FraigMgrImpl::FraigMgrImpl(ymuint pat_size,
   mPatSize(pat_size * 2),
   mPatInit(pat_size),
   mPatUsed(pat_size),
-  mSolver(NULL),
+  mSolver(sat_type, sat_opt, sat_log),
   mSimCount(0),
   mSimTime(0.0),
   mOutP(sat_log),
@@ -199,34 +201,16 @@ FraigMgrImpl::FraigMgrImpl(ymuint pat_size,
   mLogStream(new ofstream("/dev/null")),
   mLoopLimit(1000)
 {
-  if ( sat_type == string() || sat_type == "ymsat" ) {
-    mSolver = SatSolverFactory::gen_solver(sat_opt);
-  }
-  else if ( sat_type == "satlog" ) {
-    if ( mOutP == NULL ) {
-      // 緊急避難
-      mOutP = &cout;
-    }
-    mSolver = SatSolverFactory::gen_recsolver(*mOutP, sat_opt);
-  }
-  else if ( sat_type == "minisat" ) {
-    mSolver = SatSolverFactory::gen_minisat();
-  }
-  else {
-    // default fall-back
-    mSolver = SatSolverFactory::gen_solver(sat_opt);
-  }
 }
 
 // @brief デストラクタ
 FraigMgrImpl::~FraigMgrImpl()
 {
-  delete mSolver;
   if ( mLogStream != &cout ) {
     delete mLogStream;
   }
 }
-  
+
 // @brief 定数0関数をつくる．
 FraigHandle
 FraigMgrImpl::make_zero()
@@ -256,7 +240,7 @@ FraigMgrImpl::make_input()
   node->set_pat(0, mPatUsed, tmp);
   return FraigHandle(node, false);
 }
-  
+
 // @brief 2つのノードの AND を取る．
 // @param[in] handle1, handle2 入力の FRAIG ハンドル
 FraigHandle
@@ -282,12 +266,12 @@ FraigMgrImpl::make_and(FraigHandle handle1,
   }
 
   // 順番の正規化
-  if ( handle1.var_id() < handle2.var_id() ) {
+  if ( handle1.varid().val() < handle2.varid().val() ) {
     FraigHandle tmp = handle1;
     handle1 = handle2;
     handle2 = tmp;
   }
-  
+
   // 同じ構造を持つノードが既にないか調べる．
   ymuint pos1 = hash_func(handle1, handle2);
   for (FraigNode* node1 = mHashTable1.elem(pos1);
@@ -308,7 +292,7 @@ FraigMgrImpl::make_and(FraigHandle handle1,
       mHashTable1.add_elem(pos1, node1, node1->mLink1);
     }
   }
-  
+
   // ノードを作る．
   FraigNode* node = new_node();
   node->set_fanin(handle1, handle2);
@@ -316,20 +300,20 @@ FraigMgrImpl::make_and(FraigHandle handle1,
 
   // 構造ハッシュ表に登録する．
   mHashTable1.add_elem(pos1, node, node->mLink1);
-  
+
   // 入出力の関係を表す CNF を作る．
-  ymuint id = node->var_id();
-  ymuint id0 = handle1.var_id();
-  ymuint id1 = handle2.var_id();
+  VarId id = node->varid();
+  VarId id0 = handle1.varid();
+  VarId id1 = handle2.varid();
   tPol pol0 = handle1.inv() ? kPolNega : kPolPosi;
   tPol pol1 = handle2.inv() ? kPolNega : kPolPosi;
   Literal lito(id, kPolPosi);
   Literal lit1(id0, pol0);
   Literal lit2(id1, pol1);
-  mSolver->add_clause(~lit1, ~lit2, lito);
-  mSolver->add_clause( lit1, ~lito);
-  mSolver->add_clause( lit2, ~lito);
-  
+  mSolver.add_clause(~lit1, ~lit2, lito);
+  mSolver.add_clause( lit1, ~lito);
+  mSolver.add_clause( lit2, ~lito);
+
   // パタンハッシュで等しいノードがないか調べる．
   bool inv0 = node->pat_hash_inv();
   for ( ; ; ) {
@@ -393,7 +377,7 @@ FraigMgrImpl::make_and(FraigHandle handle1,
       break;
     }
   }
-    
+
   // パタンハッシュ表に登録する．
   if ( mHashTable2.need_expand() ) {
     // 再ハッシュする．
@@ -406,7 +390,7 @@ FraigMgrImpl::make_and(FraigHandle handle1,
   }
   ymuint pos2 = node->pat_hash();
   mHashTable2.add_elem(pos2, node, node->mLink2);
-  
+
   return FraigHandle(node, false);
 }
 
@@ -418,7 +402,7 @@ FraigMgrImpl::add_pat(FraigNode* node)
     resize_pat(mPatSize * 2);
   }
   mHashTable2.clear();
-	
+
   // 反例をパタンに加える．
   vector<ymuint32> tmp(1);
   ymuint nn = node_num();
@@ -426,7 +410,7 @@ FraigMgrImpl::add_pat(FraigNode* node)
     FraigNode* node1 = mAllNodes[i];
     if ( node1->is_input() ) {
       ymuint32 pat = 0U;
-      if ( mModel[node1->var_id()] == kB3True ) {
+      if ( mModel[node1->varid().val()] == kB3True ) {
 	pat = ~0U;
       }
       else {
@@ -443,7 +427,7 @@ FraigMgrImpl::add_pat(FraigNode* node)
     else {
       node1->calc_pat(mPatUsed, mPatUsed + 1);
     }
-    
+
     if ( node1 != node ) {
       ymuint pos2 = node1->pat_hash();
       mHashTable2.add_elem(pos2, node1, node1->mLink2);
@@ -464,21 +448,21 @@ FraigMgrImpl::check_equiv(FraigHandle aig1,
 
   FraigNode* node1 = aig1.node();
   FraigNode* node2 = aig2.node();
-  
+
   if ( node1 == node2 ) {
     // ということは逆極性なので絶対に等価ではない．
     return kB3False;
   }
-  
+
   bool inv1 = aig1.inv();
   bool inv2 = aig2.inv();
-  
+
   if ( aig1.is_zero () ) {
     // 上のチェックで aig2 は定数でないことは明らか
     Bool3 stat = check_const(node2, inv2);
     return stat;
   }
-  
+
   if ( aig1.is_one() ) {
     // 上のチェックで aig2 は定数でないことは明らか
     Bool3 stat = check_const(node2, !inv2);
@@ -490,7 +474,7 @@ FraigMgrImpl::check_equiv(FraigHandle aig1,
     Bool3 stat = check_const(node1, inv1);
     return stat;
   }
-  
+
   if ( aig2.is_one() ) {
     // 上のチェックで aig1 は定数でないことは明らか
     Bool3 stat = check_const(node1, !inv1);
@@ -580,8 +564,8 @@ FraigMgrImpl::new_node()
 {
   void* p = mAlloc.get_memory(sizeof(FraigNode));
   FraigNode* node = new (p) FraigNode();
-  node->mVarId = mSolver->new_var();
-  assert_cond(node->mVarId == mAllNodes.size(), __FILE__, __LINE__);
+  node->mVarId = mSolver.new_var();
+  assert_cond(node->mVarId.val() == mAllNodes.size(), __FILE__, __LINE__);
   init_pat(node);
   mAllNodes.push_back(node);
   return node;
@@ -592,8 +576,8 @@ Bool3
 FraigMgrImpl::check_const(FraigNode* node,
 			  bool inv)
 {
-  ymuint id = node->var_id();
-  
+  VarId id = node->varid();
+
   if ( debug ) {
     cout << "CHECK CONST";
     if ( inv ) {
@@ -606,7 +590,7 @@ FraigMgrImpl::check_const(FraigNode* node,
 	 << "       ";
     cout.flush();
   }
-  
+
   StopWatch sw;
   sw.start();
 
@@ -615,12 +599,12 @@ FraigMgrImpl::check_const(FraigNode* node,
 
   // この関数の戻り値
   Bool3 code = kB3X;
-  
+
   // lit = 1 が成り立つか調べる
   Bool3 stat = check_condition(lit);
   if ( stat == kB3False ) {
     // 成り立たないということは lit = 0
-    mSolver->add_clause(~lit);
+    mSolver.add_clause(~lit);
     if ( debug ) {
       cout << "\tSUCCEED" << endl;
     }
@@ -649,9 +633,9 @@ FraigMgrImpl::check_equiv(FraigNode* node1,
 			  FraigNode* node2,
 			  bool inv)
 {
-  ymuint id1 = node1->var_id();
-  ymuint id2 = node2->var_id();
-  
+  VarId id1 = node1->varid();
+  VarId id2 = node2->varid();
+
   if ( debug ) {
     cout << "CHECK EQUIV  "
 	 << setw(6) << id1 << " "
@@ -661,10 +645,10 @@ FraigMgrImpl::check_equiv(FraigNode* node1,
     }
     cout.flush();
   }
-  
+
   StopWatch sw;
   sw.start();
-  
+
   Literal lit1(id1, kPolPosi);
   Literal lit2(id2, inv2pol(inv));
 
@@ -679,8 +663,8 @@ FraigMgrImpl::check_equiv(FraigNode* node1,
     stat = check_condition( lit1, ~lit2);
     if ( stat == kB3False ) {
       // どの条件も成り立たなかったので等しい
-      mSolver->add_clause(~lit1,  lit2);
-      mSolver->add_clause( lit1, ~lit2);
+      mSolver.add_clause(~lit1,  lit2);
+      mSolver.add_clause( lit1, ~lit2);
 
       if ( debug ) {
 	cout << "\tSUCCEED" << endl;
@@ -712,25 +696,25 @@ FraigMgrImpl::check_condition(Literal lit1)
 {
   vector<Literal> assumptions(1);
   assumptions[0] = lit1;
-  Bool3 ans1 = mSolver->solve(assumptions, mModel);
+  Bool3 ans1 = mSolver.solve(assumptions, mModel);
 
 #if defined(VERIFY_SATSOLVER)
-  SatSolver* solver = SatSolverFactory::gen_minisat();
+  SatSolver solver(NULL, "minisat");
   for (vector<FraigNode*>::iterator p = mAllNodes.begin();
        p != mAllNodes.end(); ++ p) {
     FraigNode* node = *p;
-    tVarId id = solver->new_var();
-    assert_cond(id == node->var_id(), __FILE__, __LINE__);
+    VarId id = solver.new_var();
+    assert_cond(id == node->varid(), __FILE__, __LINE__);
     if ( node->is_and() ) {
       Literal lito(id, kPolPosi);
-      Literal lit1(node->fanin0()->var_id(), inv2pol(node->fanin0_inv()));
-      Literal lit2(node->fanin1()->var_id(), inv2pol(node->fanin1_inv()));
-      solver->add_clause(~lit1, ~lit2, lito);
-      solver->add_clause( lit1, ~lito);
-      solver->add_clause( lit2, ~lito);
+      Literal lit1(node->fanin0()->varid(), inv2pol(node->fanin0_inv()));
+      Literal lit2(node->fanin1()->varid(), inv2pol(node->fanin1_inv()));
+      solver.add_clause(~lit1, ~lit2, lito);
+      solver.add_clause( lit1, ~lito);
+      solver.add_clause( lit2, ~lito);
     }
   }
-  Bool3 ans2 = solver->solve(assumptions, mModel);
+  Bool3 ans2 = solver.solve(assumptions, mModel);
   if ( ans1 != ans2 ) {
     cout << endl << "ERROR!" << endl;
     cout << "check_condition(" << lit1 << ")" << endl;
@@ -741,17 +725,16 @@ FraigMgrImpl::check_condition(Literal lit1)
 	 p != mAllNodes.end(); ++ p) {
       FraigNode* node = *p;
       if ( node->is_and() ) {
-	tVarId id = node->var_id();
+	VarId id = node->varid();
 	Literal lito(id, kPolPosi);
-	Literal lit1(node->fanin0()->var_id(), inv2pol(node->fanin0_inv()));
-	Literal lit2(node->fanin1()->var_id(), inv2pol(node->fanin1_inv()));
+	Literal lit1(node->fanin0()->varid(), inv2pol(node->fanin0_inv()));
+	Literal lit2(node->fanin1()->varid(), inv2pol(node->fanin1_inv()));
 	cout << "   " << ~lit1 << " + " << ~lit2 << " + " << lito << endl;
 	cout << "   " << lit1 << " + " << ~lito << endl;
 	cout << "   " << lit2 << " + " << ~lito << endl;
       }
     }
   }
-  delete solver;
 #endif
   return ans1;
 }
@@ -759,30 +742,30 @@ FraigMgrImpl::check_condition(Literal lit1)
 // lit1 & lit2 が成り立つか調べる．
 Bool3
 FraigMgrImpl::check_condition(Literal lit1,
-				Literal lit2)
+			      Literal lit2)
 {
   vector<Literal> assumptions(2);
   assumptions[0] = lit1;
   assumptions[1] = lit2;
-  Bool3 ans1 = mSolver->solve(assumptions, mModel);
+  Bool3 ans1 = mSolver.solve(assumptions, mModel);
 
 #if defined(VERIFY_SATSOLVER)
-  SatSolver* solver = SatSolverFactory::gen_minisat();
+  SatSolver solver(NULL, "minisat");
   for (vector<FraigNode*>::iterator p = mAllNodes.begin();
        p != mAllNodes.end(); ++ p) {
     FraigNode* node = *p;
-    tVarId id = solver->new_var();
-    assert_cond(id == node->var_id(), __FILE__, __LINE__);
+    VarId id = solver.new_var();
+    assert_cond(id == node->varid(), __FILE__, __LINE__);
     if ( node->is_and() ) {
       Literal lito(id, kPolPosi);
-      Literal lit1(node->fanin0()->var_id(), inv2pol(node->fanin0_inv()));
-      Literal lit2(node->fanin1()->var_id(), inv2pol(node->fanin1_inv()));
-      solver->add_clause(~lit1, ~lit2, lito);
-      solver->add_clause(lit1, ~lito);
-      solver->add_clause(lit2, ~lito);
+      Literal lit1(node->fanin0()->varid(), inv2pol(node->fanin0_inv()));
+      Literal lit2(node->fanin1()->varid(), inv2pol(node->fanin1_inv()));
+      solver.add_clause(~lit1, ~lit2, lito);
+      solver.add_clause(lit1, ~lito);
+      solver.add_clause(lit2, ~lito);
     }
   }
-  Bool3 ans2 = solver->solve(assumptions, mModel);
+  Bool3 ans2 = solver.solve(assumptions, mModel);
   if ( ans1 != ans2 ) {
     cout << endl << "ERROR!" << endl;
     cout << "check_condition("
@@ -794,30 +777,29 @@ FraigMgrImpl::check_condition(Literal lit1,
 	 p != mAllNodes.end(); ++ p) {
       FraigNode* node = *p;
       if ( node->is_and() ) {
-	tVarId id = node->var_id();
+	VarId id = node->varid();
 	Literal lito(id, kPolPosi);
-	Literal lit1(node->fanin0()->var_id(), inv2pol(node->fanin0_inv()));
-	Literal lit2(node->fanin1()->var_id(), inv2pol(node->fanin1_inv()));
+	Literal lit1(node->fanin0()->varid(), inv2pol(node->fanin0_inv()));
+	Literal lit2(node->fanin1()->varid(), inv2pol(node->fanin1_inv()));
 	cout << "   " << ~lit1 << " + " << ~lit2 << " + " << lito << endl;
 	cout << "   " << lit1 << " + " << ~lito << endl;
 	cout << "   " << lit2 << " + " << ~lito << endl;
       }
     }
   }
-  delete solver;
 #endif
   return ans1;
 }
-  
+
 // @brief FraigHandle に対応するリテラルを返す．
 // @note 定数の場合の返り値は未定
 Literal
 FraigMgrImpl::fraig2literal(FraigHandle aig)
 {
   if ( aig.is_const() ) {
-    return Literal(0, kPolPosi);
+    return Literal(VarId(0), kPolPosi);
   }
-  ymuint id = aig.node()->var_id();
+  VarId id = aig.node()->varid();
   if ( aig.inv() ) {
     return Literal(id, kPolNega);
   }
@@ -876,9 +858,9 @@ FraigMgrImpl::dump_stats(ostream& s) const
   s << "check_equiv:" << endl;
   mCheckEquivInfo.dump(s);
   s << endl;
-  
+
   SatStats stats;
-  mSolver->get_stats(stats);
+  mSolver.get_stats(stats);
   s << "----------------------------------" << endl;
   s << "sat stat:" << endl
     << "  restarts          : " << stats.mRestart << endl
@@ -903,7 +885,7 @@ FraigMgrImpl::SatStat::set_result(Bool3 code,
 				  double t)
 {
   ++ mTotalCount;
-  
+
   ymuint idx = 0;
   if ( code == kB3True ) {
     idx = 1;
@@ -911,7 +893,7 @@ FraigMgrImpl::SatStat::set_result(Bool3 code,
   else if ( code == kB3False ) {
     idx = 2;
   }
-  
+
   ++ mTimeStat[idx].mCount;
   mTimeStat[idx].mTotalTime += t;
   if ( mTimeStat[idx].mMaxTime < t ) {

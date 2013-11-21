@@ -1,15 +1,15 @@
-#ifndef LIBYM_MVN_VERILOG_READERIMPL_H
-#define LIBYM_MVN_VERILOG_READERIMPL_H
+#ifndef READERIMPL_H
+#define READERIMPL_H
 
-/// @file libym_networks/verilog/ReaderImpl.h
+/// @file ReaderImpl.h
 /// @brief ReaderImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_networks/MvnVlMap.h"
 #include "ym_verilog/VlMgr.h"
 #include "ym_verilog/vl/VlFwd.h"
@@ -19,7 +19,10 @@
 #include "Env.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+
+class EnvMerger;
+class Xmask;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ReaderImpl ReaderImpl.h "ReaderImpl.h"
@@ -55,11 +58,13 @@ public:
 
   /// @brief 今まで読み込んだ情報からネットワークを生成する．
   /// @param[in] mgr ネットワーク生成用のマネージャ
+  /// @param[in] cell_library セルライブラリ
   /// @param[out] node_map MvnNode と宣言要素の対応付けを保持する配列
   /// @retval true 正常に処理を行った．
   /// @retval false 生成中にエラーが起こった．
   bool
   gen_network(MvnMgr& mgr,
+	      const CellLibrary* cell_library,
 	      MvnVlMap& node_map);
 
 
@@ -134,6 +139,13 @@ private:
   gen_priminst(MvnModule* parent_module,
 	       const VlPrimitive* prim);
 
+  /// @brief セルインスタンスの生成を行う．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] prim プリミティブ
+  void
+  gen_cellinst(MvnModule* parent_module,
+	       const VlPrimitive* prim);
+
   /// @brief 継続的代入文の生成を行う．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] lhs 左辺式
@@ -143,23 +155,33 @@ private:
 		  const VlExpr* lhs,
 		  const VlExpr* rhs);
 
-  /// @brief ステートメントの中身を生成する(combinational always用)．
+  /// @brief ステートメントの中身を生成する．
   /// @param[in] module 親のモジュール
   /// @param[in] stmt 本体のステートメント
   /// @param[in] env 環境
+  /// @param[in] merge 環境をマージするオブジェクト
   bool
-  gen_stmt1(MvnModule* module,
-	    const VlStmt* stmt,
-	    ProcEnv& env);
+  gen_stmt(MvnModule* module,
+	   const VlStmt* stmt,
+	   ProcEnv& env,
+	   EnvMerger& merge);
 
-  /// @brief ステートメントの中身を生成する(sequential always用)．
+  /// @brief case 文の本体を生成する．
   /// @param[in] module 親のモジュール
-  /// @param[in] stmt 本体のステートメント
+  /// @param[in] stmt case 文のステートメント
+  /// @param[in] expr case 文の式を表すノード
+  /// @param[in] xmask case 文の式の Xマスク
+  /// @param[in] pos caseitem の位置番号
   /// @param[in] env 環境
+  /// @param[in] merge 環境をマージするオブジェクト
   bool
-  gen_stmt2(MvnModule* module,
-	    const VlStmt* stmt,
-	    ProcEnv& env);
+  gen_caseitem(MvnModule* module,
+	       const VlStmt* stmt,
+	       MvnNode* expr,
+	       const Xmask& xmask,
+	       ymuint pos,
+	       ProcEnv& env,
+	       EnvMerger& merge);
 
   /// @brief 代入文を生成する．
   /// @param[in] module 親のモジュール
@@ -170,43 +192,43 @@ private:
 	     const VlStmt* stmt,
 	     ProcEnv& env);
 
-  /// @brief 環境をマージする．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] env 対象の環境
-  /// @param[in] cond 条件を表すノード
-  /// @param[in] then_env 条件が成り立ったときに通るパスの環境
-  /// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
-  void
-  merge_env1(MvnModule* parent_module,
-	     ProcEnv& env,
-	     MvnNode* cond,
-	     const ProcEnv& then_env,
-	     const ProcEnv& else_env);
+  /// @brief 条件式からノードを生成する．
+  /// @param[in] cond 条件式
+  /// @param[in] env 環境
+  /// @param[out] node 対応するノード
+  /// @param[out] pol 極性(1 が正極性，0　が負極性)
+  /// パタンは
+  /// (1) 識別子
+  /// (2) ~識別子
+  /// (3) !識別子
+  /// (4) 識別子 == 定数
+  /// (5) 識別子 != 定数
+  /// (6) 定数 == 識別子
+  /// (7) 定数 != 識別子
+  /// 識別子は1ビットの reg か net
+  /// 定数は 0 か 1 (最下位ビットのみが意味を持つ)
+  bool
+  parse_cond(const VlExpr* cond,
+	     const Env& env,
+	     MvnNode*& node,
+	     ymuint& pol);
 
-  /// @brief 環境をマージする．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] env 対象の環境
-  /// @param[in] cond 条件を表すノード
-  /// @param[in] then_env 条件が成り立ったときに通るパスの環境
-  /// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
-  void
-  merge_env2(MvnModule* parent_module,
-	     ProcEnv& env,
-	     MvnNode* cond,
-	     const ProcEnv& then_env,
-	     const ProcEnv& else_env);
-
-  /// @brief 代入条件をマージする．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] cond 切り替え条件
-  /// @param[in] then_cond cond が成り立ったときの代入条件
-  /// @param[in] else_cond cond が成り立たなかったときの代入条件
-  /// @note 基本的には ITE(cond, then_cond, else_cond) だが，NULL の場合がある．
-  MvnNode*
-  merge_cond(MvnModule* parent_module,
-	     MvnNode* cond,
-	     MvnNode* then_cond,
-	     MvnNode* else_cond);
+  /// @brief parse_cond() の下請け関数
+  /// @param[in] opr_primary 識別子を表す式
+  /// @param[in] opr_const 定数を表す式
+  /// @param[in] env 環境
+  /// @param[in] pol0 値が0の時の極性値
+  /// @param[in] pol1 値が1の時の極性値
+  /// @param[out] node 対応するノード
+  /// @param[out] pol 極性(1 が正極性，0　が負極性)
+  bool
+  parse_cond_sub(const VlExpr* opr_primary,
+		 const VlExpr* opr_const,
+		 const Env& env,
+		 ymuint pol0,
+		 ymuint pol1,
+		 MvnNode*& node,
+		 ymuint& pol);
 
   /// @brief 式に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
@@ -217,16 +239,40 @@ private:
 	   const VlExpr* expr,
 	   const Env& env);
 
+  /// @brief case 文用の式に対応したノードの木を作る．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] expr 式
+  /// @param[in] case_type case 文の種類
+  /// @param[in] env 環境
+  /// @param[out] xmask Xマスク
+  MvnNode*
+  gen_expr(MvnModule* parent_module,
+	   const VlExpr* expr,
+	   tVpiCaseType case_type,
+	   const Env& env,
+	   Xmask& xmask);
+
+  /// @brief 定数値に対応したノードを作る．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] expr 式
+  /// @param[in] case_type case 文の種類
+  /// @param[out] xmask Xマスク
+  MvnNode*
+  gen_const(MvnModule* parent_module,
+	    const VlExpr* expr,
+	    tVpiCaseType case_type,
+	    Xmask& xmask);
+
   /// @brief 演算に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
-  /// @param[in] op_type 演算の種類
-  /// @param[in] operand_array オペランドに対応するノードの配列
-  /// @param[in] out_bw 出力のビット幅
+  /// @param[in] expr 式
+  /// @param[in] case_type case 文の種類
+  /// @param[in] env 環境
   MvnNode*
   gen_opr(MvnModule* parent_module,
-	  nsYm::nsVerilog::tVpiOpType op_type,
-	  const vector<MvnNode*>& operand_array,
-	  ymuint out_bw);
+	  const VlExpr* expr,
+	  tVpiCaseType case_type,
+	  const Env& env);
 
   /// @brief 宣言要素への参照に対応するノードを作る．
   /// @param[in] expr 式
@@ -235,28 +281,50 @@ private:
   gen_primary(const VlExpr* expr,
 	      const Env& env);
 
-  /// @brief 右辺式に対応するノードを返す．
+  /// @bief 右辺式に対応するノードを作る．
   /// @param[in] parent_module 親のモジュール
-  /// @param[in] node 右辺式のノード
-  /// @param[in] offset オフセット
-  /// @param[in] bit_width ビット幅
-  /// @note node から [offset: offset + bit_width - 1] の選択するノードを返す．
-  /// @note 全範囲を選択する場合には node を返す．
-  /// @note 範囲が合わなかったら NULL を返す．
+  /// @param[in] lhs 左辺式
+  /// @param[in] rhs 右辺式
+  /// @param[in] env 環境
   MvnNode*
   gen_rhs(MvnModule* parent_module,
-	  MvnNode* node,
-	  ymuint offset,
-	  ymuint bit_width);
+	  const VlExpr* lhs,
+	  const VlExpr* rhs,
+	  const Env& env);
+
+  /// @brief 式の型を補正する．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] src_node 元のノード
+  /// @param[in] value_type 要求されるデータ型
+  MvnNode*
+  coerce_expr(MvnModule* parent_module,
+	      MvnNode* src_node,
+	      VlValueType value_type);
+
+  /// @brief 右辺式から該当する部分を切り出す．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] rhs_node 右辺式のノード
+  /// @param[in] offset オフセット
+  /// @param[in] bit_width ビット幅
+  /// @note rhs_node から [offset: offset + bit_width - 1] の選択するノードを返す．
+  /// @note 全範囲を選択する場合には rhs_node を返す．
+  /// @note 範囲が合わなかったら NULL を返す．
+  MvnNode*
+  splice_rhs(MvnModule* parent_module,
+	     MvnNode* rhs_node,
+	     ymuint offset,
+	     ymuint bit_width);
 
   /// @brief 左辺式に接続する．
   /// @param[in] dst_node 左辺に対応するノード
   /// @param[in] expr 左辺式
   /// @param[in] src_node 右辺に対応するノード
+  /// @param[in] src_loc 右辺のファイル位置
   void
   connect_lhs(MvnNode* dst_node,
 	      const VlExpr* expr,
-	      MvnNode* src_node);
+	      MvnNode* src_node,
+	      const FileRegion& src_loc);
 
   /// @brief 宣言要素に対応するノードを登録する．
   /// @param[in] decl 宣言要素
@@ -329,6 +397,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
-#endif // LIBYM_MVN_VERILOG_READERIMPL_H
+#endif // READERIMPL_H

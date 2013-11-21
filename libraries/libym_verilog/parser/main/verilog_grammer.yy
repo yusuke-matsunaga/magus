@@ -37,7 +37,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 // yacc/bison が生成したヘッダファイル
-#include "verilog_grammer.h"
+#include "verilog_grammer.hh"
 
 
 // 字句解析関数
@@ -83,6 +83,7 @@ fr_merge(const FileRegion fr_array[],
 
 %}
 
+
 // "pure" parser にする．
 %define api.pure
 
@@ -106,12 +107,11 @@ fr_merge(const FileRegion fr_array[],
   tVpiVarType vartype;
   tVpiNetType nettype;
   tVpiPrimType primtype;
-  tVpiOpType optype;
   tVpiConstType consttype;
   tVpiStrength strengthtype;
   tVpiRangeMode rangemode;
   tVpiVsType vstype;
-  tVpiUdpVal udpsymbol;
+  char udpsymbol;
 
   PuHierName* hiername;
 
@@ -395,9 +395,9 @@ fr_merge(const FileRegion fr_array[],
 %type <iohead> input_declaration input_declhead
 %type <iohead> output_declaration output_declhead1 output_declhead2
 %type <iohead> io_declaration
-%type <iohead> tf_inout_declaration tf_inout_declhead
-%type <iohead> tf_input_declaration tf_input_declhead
-%type <iohead> tf_output_declaration tf_output_declhead
+%type <iohead> tf_inout_declhead
+%type <iohead> tf_input_declhead
+%type <iohead> tf_output_declhead
 %type <iohead> udp_input_declaration udp_input_declhead
 %type <iohead> udp_output_declaration udp_output_declhead1 udp_output_declhead2
 
@@ -2044,7 +2044,7 @@ delay_value
 }
 | '(' expression ')'
 {
-  $$ = parser.new_Opr(@$, kVpiNullOp, $2, NULL);
+  $$ = parser.new_Opr(@$, kVlNullOp, $2, NULL);
 }
 ;
 /*
@@ -2593,16 +2593,37 @@ tf_io_declaration
 //            |{ attribute_instance } tf_inout_declaration
 task_port_list
 : tf_input_declhead port_identifier_item
+{
+  parser.add_ioport_head($1, NULL);
+}
 | tf_output_declhead port_identifier_item
+{
+  parser.add_ioport_head($1, NULL);
+}
 | tf_inout_declhead port_identifier_item
+{
+  parser.add_ioport_head($1, NULL);
+}
 | task_port_list tf_ioitem_end tf_input_declhead port_identifier_item
+{
+  parser.add_ioport_head($3, NULL);
+}
 | task_port_list tf_ioitem_end tf_output_declhead port_identifier_item
+{
+  parser.add_ioport_head($3, NULL);
+}
 | task_port_list tf_ioitem_end tf_inout_declhead port_identifier_item
+{
+  parser.add_ioport_head($3, NULL);
+}
 | task_port_list ',' port_identifier_item
 ;
 
 tf_ioitem_end
 : ','
+{
+  parser.flush_io();
+}
 ;
 
 // [SPEC] tf_input_declaration ::=
@@ -2612,11 +2633,10 @@ tf_ioitem_end
 tf_input_declaration
 : tf_input_declhead list_of_port_identifiers ';'
 {
-  $$ = $1;
+  parser.add_io_head($1, NULL);
 }
 | tf_input_declhead error ';'
 {
-  $$ = NULL;
   yyerrok;
 }
 ;
@@ -2656,11 +2676,10 @@ tf_input_declhead
 tf_output_declaration
 : tf_output_declhead list_of_port_identifiers ';'
 {
-  $$ = $1;
+  parser.add_io_head($1, NULL);
 }
 | tf_output_declhead error ';'
 {
-  $$ = NULL;
   yyerrok;
 }
 ;
@@ -2700,11 +2719,10 @@ tf_output_declhead
 tf_inout_declaration
 : tf_inout_declhead list_of_port_identifiers ';'
 {
-  $$ = $1;
+  parser.add_io_head($1, NULL);
 }
 | tf_inout_declhead error ';'
 {
-  $$ = NULL;
   yyerrok;
 }
 ;
@@ -4297,7 +4315,7 @@ seq_input_list
 edge_indicator
 : '(' level_symbol level_symbol ')'
 {
-  parser.new_UdpValue(@$, merge_udp_value($2, $3));
+  parser.new_UdpValue(@$, $2, $3);
 }
 | edge_symbol
 {
@@ -4321,7 +4339,7 @@ next_state
 }
 | '-'
 {
-  $$ = kVpiUdpValNC;
+  $$ = '-';
 }
 ;
 
@@ -4329,15 +4347,15 @@ next_state
 output_symbol
 : '0'
 {
-  $$ = kVpiUdpVal0;
+  $$ = '0';
 }
 | '1'
 {
-  $$ = kVpiUdpVal1;
+  $$ = '1';
 }
 | 'x'
 {
-  $$ = kVpiUdpValX;
+  $$ = 'x';
 }
 ;
 
@@ -4349,11 +4367,11 @@ level_symbol
 }
 | '?'
 {
-  $$ = kVpiUdpValQ;
+  $$ = '?';
 }
 | 'b'
 {
-  $$ = kVpiUdpValB;
+  $$ = 'b';
 }
 ;
 
@@ -4361,23 +4379,23 @@ level_symbol
 edge_symbol
 : 'r'
 {
-  $$ = kVpiUdpValR;
+  $$ = 'r';
 }
 | 'f'
 {
-  $$ = kVpiUdpValF;
+  $$ = 'f';
 }
 | 'p'
 {
-  $$ = kVpiUdpValP;
+  $$ = 'p';
 }
 | 'n'
 {
-  $$ = kVpiUdpValN;
+  $$ = 'n';
 }
 | '*'
 {
-  $$ = kVpiUdpValQQ;
+  $$ = '*';
 }
 ;
 
@@ -4974,11 +4992,11 @@ event_primary
 }
 | POSEDGE expression
 {
-  $$ = parser.new_Opr(@$, kVpiPosedgeOp, $2, NULL);
+  $$ = parser.new_Opr(@$, kVlPosedgeOp, $2, NULL);
 }
 | NEGEDGE expression
 {
-  $$ = parser.new_Opr(@$, kVpiNegedgeOp, $2, NULL);
+  $$ = parser.new_Opr(@$, kVlNegedgeOp, $2, NULL);
 }
 ;
 
@@ -5696,11 +5714,11 @@ pol_colon
 edge
 : POSEDGE
 {
-  $$ = kVpiPosedgeOp;
+  $$ = vpiPosedgeOp;
 }
 | NEGEDGE
 {
-  $$ = kVpiNegedgeOp;
+  $$ = vpiNegedgeOp;
 }
 ;
 
@@ -5921,7 +5939,7 @@ opt_timing_check_condition
   $$ = 0; // ダミー
   @$ = FileRegion();
 }
-| timing_check_condition
+| ANDANDAND timing_check_condition
 {
   $$ = 0; // ダミー
 }
@@ -6188,7 +6206,7 @@ expression
 }
 | expr1 '?' ai_list expr1 ':' expression %prec COND
 {
-  $$ = parser.new_Opr(@$, kVpiConditionOp, $1, $4, $6, $3);
+  $$ = parser.new_Opr(@$, kVlConditionOp, $1, $4, $6, $3);
 }
 ;
 
@@ -6199,139 +6217,139 @@ expr1
 }
 | '+' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiPlusOp, $3, $2);
+  $$ = parser.new_Opr(@$, kVlPlusOp, $3, $2);
 }
 | '-' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiMinusOp, $3, $2);
+  $$ = parser.new_Opr(@$, kVlMinusOp, $3, $2);
 }
 | '!' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiNotOp, $3, $2);
+  $$ = parser.new_Opr(@$, kVlNotOp, $3, $2);
 }
 | '~' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiBitNegOp, $3, $2);
+  $$ = parser.new_Opr(@$, kVlBitNegOp, $3, $2);
 }
 | '&' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiUnaryAndOp, $3, $2);
+  $$ = parser.new_Opr(@$, kVlUnaryAndOp, $3, $2);
 }
 | '|' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiUnaryOrOp, $3, $2);
+  $$ = parser.new_Opr(@$, kVlUnaryOrOp, $3, $2);
 }
 | '^' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiUnaryXorOp, $3, $2);
+  $$ = parser.new_Opr(@$, kVlUnaryXorOp, $3, $2);
 }
 | TILDEAND ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiUnaryNandOp, $3, $2);
+  $$ = parser.new_Opr(@$, kVlUnaryNandOp, $3, $2);
 }
 | TILDEOR ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiUnaryNorOp, $3, $2);
+  $$ = parser.new_Opr(@$, kVlUnaryNorOp, $3, $2);
 }
 | TILDEXOR ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiUnaryXNorOp, $3, $2);
+  $$ = parser.new_Opr(@$, kVlUnaryXNorOp, $3, $2);
 }
 | expr1 STARSTAR ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiPowerOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlPowerOp, $1, $4, $3);
 }
 | expr1 '+' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiAddOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlAddOp, $1, $4, $3);
 }
 | expr1 '-' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiSubOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlSubOp, $1, $4, $3);
 }
 | expr1 '*' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiMultOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlMultOp, $1, $4, $3);
 }
 | expr1 '/' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiDivOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlDivOp, $1, $4, $3);
 }
 | expr1 '%' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiModOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlModOp, $1, $4, $3);
 }
 | expr1 EQEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiEqOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlEqOp, $1, $4, $3);
 }
 | expr1 NOTEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiNeqOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlNeqOp, $1, $4, $3);
 }
 | expr1 EQEQEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiCaseEqOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlCaseEqOp, $1, $4, $3);
 }
 | expr1 NOTEQEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiCaseNeqOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlCaseNeqOp, $1, $4, $3);
 }
 | expr1 ANDAND ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiLogAndOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlLogAndOp, $1, $4, $3);
 }
 | expr1 OROR ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiLogOrOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlLogOrOp, $1, $4, $3);
 }
 | expr1 '<' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiLtOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlLtOp, $1, $4, $3);
 }
 | expr1 '>' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiGtOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlGtOp, $1, $4, $3);
 }
 | expr1 LTEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiLeOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlLeOp, $1, $4, $3);
 }
 | expr1 GTEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiGeOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlGeOp, $1, $4, $3);
 }
 | expr1 '&' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiBitAndOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlBitAndOp, $1, $4, $3);
 }
 | expr1 '|' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiBitOrOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlBitOrOp, $1, $4, $3);
 }
 | expr1 '^' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiBitXorOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlBitXorOp, $1, $4, $3);
 }
 | expr1 TILDEXOR ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiBitXNorOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlBitXNorOp, $1, $4, $3);
 }
 | expr1 LTLT ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiLShiftOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlLShiftOp, $1, $4, $3);
 }
 | expr1 GTGT ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiRShiftOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlRShiftOp, $1, $4, $3);
 }
 | expr1 LTLTLT ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiArithLShiftOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlArithLShiftOp, $1, $4, $3);
 }
 | expr1 GTGTGT ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiArithRShiftOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlArithRShiftOp, $1, $4, $3);
 }
 | STRING
 {
@@ -6514,12 +6532,12 @@ primary
 | '(' expression ')'
 {
   // 括弧の位置を保持するためのトリック
-  $$ = parser.new_Opr(@$, kVpiNullOp, $2, NULL);
+  $$ = parser.new_Opr(@$, kVlNullOp, $2, NULL);
 }
 | '(' mintypmax_expression ')'
 {
   // 括弧の位置を保持するためのトリック
-  $$ = parser.new_Opr(@$, kVpiNullOp, $2, NULL);
+  $$ = parser.new_Opr(@$, kVlNullOp, $2, NULL);
 }
 ;
 

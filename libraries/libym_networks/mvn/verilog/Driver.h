@@ -1,18 +1,19 @@
-#ifndef LIBYM_MVN_VERILOG_DRIVER_H
-#define LIBYM_MVN_VERILOG_DRIVER_H
+#ifndef DRIVER_H
+#define DRIVER_H
 
-/// @file libym_networks/verilog/Driver.h
+/// @file Driver.h
 /// @brief Driver のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
+#include "ym_utils/FileRegion.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class Driver Driver.h "Driver.h"
@@ -23,21 +24,27 @@ class Driver
 public:
 
   /// @brief 単純な形式のコンストラクタ
+  /// @param[in] loc 対応する Verilog 記述のファイル位置
   /// @param[in] node 右辺のノード
   explicit
-  Driver(MvnNode* node = NULL);
+  Driver(const FileRegion& loc = FileRegion(),
+	 MvnNode* node = NULL);
 
   /// @brief ビット指定形式のコンストラクタ
+  /// @param[in] loc 対応する Verilog 記述のファイル位置
   /// @param[in] node 右辺のノード
   /// @param[in] index ビット指定位置
-  Driver(MvnNode* node,
+  Driver(const FileRegion& loc,
+	 MvnNode* node,
 	 ymuint index);
 
   /// @brief 範囲指定形式のコンストラクタ
+  /// @param[in] loc 対応する Verilog 記述のファイル位置
   /// @param[in] node 右辺のノード
   /// @param[in] msb 範囲指定の MSB
   /// @param[in] lsb 範囲指定の LSB
-  Driver(MvnNode* node,
+  Driver(const FileRegion& loc,
+	 MvnNode* node,
 	 ymuint msb,
 	 ymuint lsb);
 
@@ -54,6 +61,10 @@ public:
 
 
 public:
+
+  /// @brief ファイル位置を返す．
+  const FileRegion&
+  loc() const;
 
   /// @brief 右辺のノードを返す．
   MvnNode*
@@ -96,6 +107,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ファイル位置
+  FileRegion mLoc;
+
   // 右辺のノード
   MvnNode* mNode;
 
@@ -118,9 +132,12 @@ operator!=(const Driver& lhs,
 //////////////////////////////////////////////////////////////////////
 
 // @brief 単純な形式のコンストラクタ
+// @param[in] loc 対応する Verilog 記述のファイル位置
 // @param[in] node 右辺のノード
 inline
-Driver::Driver(MvnNode* node) :
+Driver::Driver(const FileRegion& loc,
+	       MvnNode* node) :
+  mLoc(loc),
   mNode(node),
   mMsb(0U),
   mLsb(0U)
@@ -128,11 +145,14 @@ Driver::Driver(MvnNode* node) :
 }
 
 // @brief ビット指定形式のコンストラクタ
+// @param[in] loc 対応する Verilog 記述のファイル位置
 // @param[in] node 右辺のノード
 // @param[in] index ビット指定位置
 inline
-Driver::Driver(MvnNode* node,
+Driver::Driver(const FileRegion& loc,
+	       MvnNode* node,
 	       ymuint index) :
+  mLoc(loc),
   mNode(node),
   mMsb((index << 1) | 1U),
   mLsb(0U)
@@ -140,13 +160,16 @@ Driver::Driver(MvnNode* node,
 }
 
 // @brief 範囲指定形式のコンストラクタ
+// @param[in] loc 対応する Verilog 記述のファイル位置
 // @param[in] node 右辺のノード
 // @param[in] msb 範囲指定の MSB
 // @param[in] lsb 範囲指定の LSB
 inline
-Driver::Driver(MvnNode* node,
+Driver::Driver(const FileRegion& loc,
+	       MvnNode* node,
 	       ymuint msb,
 	       ymuint lsb) :
+  mLoc(loc),
   mNode(node),
   mMsb((msb << 1)),
   mLsb((lsb << 1) | 1U)
@@ -157,6 +180,7 @@ Driver::Driver(MvnNode* node,
 // @param[in] src コピー元のオブジェクト
 inline
 Driver::Driver(const Driver& src) :
+  mLoc(src.mLoc),
   mNode(src.mNode),
   mMsb(src.mMsb),
   mLsb(src.mLsb)
@@ -168,6 +192,7 @@ inline
 const Driver&
 Driver::operator=(const Driver& src)
 {
+  mLoc = src.mLoc;
   mNode = src.mNode;
   mMsb = src.mMsb;
   mLsb = src.mLsb;
@@ -178,6 +203,14 @@ Driver::operator=(const Driver& src)
 inline
 Driver::~Driver()
 {
+}
+
+// @brief ファイル位置を返す．
+inline
+const FileRegion&
+Driver::loc() const
+{
+  return mLoc;
 }
 
 // @brief 右辺のノードを返す．
@@ -256,6 +289,6 @@ operator!=(const Driver& lhs,
   return !(lhs == rhs);
 }
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
-#endif // LIBYM_MVN_VERILOG_DRIVER_H
+#endif // DRIVER_H

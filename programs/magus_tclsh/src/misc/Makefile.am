@@ -21,7 +21,5 @@ libmagus_misc_tcl_la_SOURCES = \
 	RandCmd.cc \
 	misc_init.cc
 
-libmagus_misc_tcl_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libmagus_misc_tcl_la_LIBADD =
 

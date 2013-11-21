@@ -4,10 +4,8 @@
 /// @file PackedVal3.h
 /// @brief 3値のビットベクタ型の定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: PackedVal3.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "atpg_nsdef.h"
@@ -33,16 +31,19 @@ public:
   /// @param[in] pat1 1 を表すビットベクタ
   PackedVal3(PackedVal pat0,
 	     PackedVal pat1);
-  
+
   /// @brief PackedVal からのキャスト演算子
   explicit
   PackedVal3(PackedVal pat);
-  
+
   /// @brief デストラクタ
   ~PackedVal3();
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 値をセットする関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 値をセットする．
   /// @param[in] pat0 0 を表すビットベクタ
@@ -52,14 +53,24 @@ public:
       PackedVal pat1);
 
   /// @brief 2値の値からセットする．
+  /// @param[in] pat 2値のビットベクタ
   void
   set(PackedVal pat);
-  
+
   /// @brief マスク付きでセットする．
+  /// @param[in] src コピー元のパタン
+  /// @param[in] mask マスク
+  /// @note マスクの部分は X になる.
   void
   set_with_mask(const PackedVal3& src,
 		PackedVal mask);
-  
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 値を取り出す関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 0 を表すビットベクタを取り出す．
   PackedVal
   _pat0() const;
@@ -67,7 +78,7 @@ public:
   /// @brief 1 を表すビットベクタを取り出す．
   PackedVal
   _pat1() const;
-  
+
   /// @brief 0 の部分を取り出す．
   /// @note 要するに 0 -> 1, 1 -> 0, X -> 0 の変換を行う．
   PackedVal
@@ -87,9 +98,12 @@ public:
   /// @note 要するに 0 -> 1, 1 -> 1, X -> 0 の変換を行う．
   PackedVal
   extract_01() const;
-  
-  
+
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 演算の定義
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 否定代入演算子
   /// @return 自分自身を返す．
@@ -99,26 +113,26 @@ public:
   /// @brief opr と値の異なっているビットを求める．
   PackedVal
   diff(const PackedVal3& opr);
-  
+
   /// @brief AND代入演算子
   /// @param[in] opr オペランド
   /// @return 自分自身を返す．
   const PackedVal3&
   operator&=(const PackedVal3& opr);
-  
+
   /// @brief OR代入演算子
   /// @param[in] opr オペランド
   /// @return 自分自身を返す．
   const PackedVal3&
   operator|=(const PackedVal3& opr);
-  
+
   /// @brief XOR代入演算子
   /// @param[in] opr オペランド
   /// @return 自分自身を返す．
   const PackedVal3&
   operator^=(const PackedVal3& opr);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -129,7 +143,7 @@ private:
 
   // 1 を表すビットベクタ
   PackedVal mPat1;
-  
+
 };
 
 /// @relates PackedVal3
@@ -189,7 +203,7 @@ PackedVal3::PackedVal3(PackedVal pat0,
   mPat1(pat1)
 {
 }
-  
+
 // @brief PackedVal からのキャスト演算子
 inline
 PackedVal3::PackedVal3(PackedVal pat) :
@@ -197,7 +211,7 @@ PackedVal3::PackedVal3(PackedVal pat) :
   mPat1(pat)
 {
 }
-  
+
 // @brief デストラクタ
 inline
 PackedVal3::~PackedVal3()
@@ -224,7 +238,7 @@ PackedVal3::set(PackedVal pat)
   mPat0 = ~pat;
   mPat1 = pat;
 }
-  
+
 // @brief マスク付きでセットする．
 inline
 void
@@ -236,7 +250,7 @@ PackedVal3::set_with_mask(const PackedVal3& src,
   mPat1 &= ~mask;
   mPat1 |= src.mPat1 & mask;
 }
-  
+
 // @brief 0 を表すビットベクタを取り出す．
 inline
 PackedVal
@@ -252,7 +266,7 @@ PackedVal3::_pat1() const
 {
   return mPat1;
 }
- 
+
 // @brief 0 の部分を取り出す．
 // @note 要するに 0 -> 1, 1 -> 0, X -> 0 の変換を行う．
 inline
@@ -308,7 +322,7 @@ PackedVal3::diff(const PackedVal3& opr)
 {
   return (mPat0 ^ opr.mPat0) | (mPat1 ^ opr.mPat1);
 }
-  
+
 // @brief AND代入演算子
 // @param[in] opr オペランド
 // @return 自分自身を返す．
@@ -320,7 +334,7 @@ PackedVal3::operator&=(const PackedVal3& opr)
   mPat1 &= opr.mPat1;
   return *this;
 }
-  
+
 // @brief OR代入演算子
 // @param[in] opr オペランド
 // @return 自分自身を返す．
@@ -332,7 +346,7 @@ PackedVal3::operator|=(const PackedVal3& opr)
   mPat1 |= opr.mPat1;
   return *this;
 }
-  
+
 // @brief XOR代入演算子
 // @param[in] opr オペランド
 // @return 自分自身を返す．
@@ -349,7 +363,7 @@ PackedVal3::operator^=(const PackedVal3& opr)
   mPat0 = tmp0_0 & tmp1_0;
   mPat1 = tmp0_1 | tmp1_1;
   return *this;
-} 
+}
 
 // @relates PackedVal3
 // @brief 否定演算子

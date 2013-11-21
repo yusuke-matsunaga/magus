@@ -1,20 +1,20 @@
-#ifndef LIBYM_MVN_VERILOG_DECLHASH_H
-#define LIBYM_MVN_VERILOG_DECLHASH_H
+#ifndef DECLHASH_H
+#define DECLHASH_H
 
-/// @file libym_networks/verilog/DeclHash.h
+/// @file DeclHash.h
 /// @brief DeclHash のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_verilog/vl/VlFwd.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class DeclHash DeclHash.h "DeclHash.h"
@@ -126,6 +126,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
-#endif // LIBYM_MVN_VERILOG_DECLHASH_H
+#endif // DECLHASH_H

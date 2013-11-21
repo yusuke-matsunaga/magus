@@ -37,12 +37,12 @@ PrintStatsCmd::~PrintStatsCmd()
 int
 PrintStatsCmd::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
   if ( objc != 1 ) {
     print_usage();
     return TCL_ERROR;
   }
-  
+
   USTime lap = mStopWatch.time();
   MStopWatch timer = mgr()._timer();
   USTime r_time = timer.time(TM_READ) + timer.time(TM_MISC);
@@ -51,8 +51,8 @@ PrintStatsCmd::cmd_proc(TclObjVector& objv)
   USTime s_time = timer.time(TM_SAT);
 
   FaultMgr& fmgr = _fault_mgr();
-  size_t num = mgr()._tv_list().size();
-  
+  ymuint num = mgr()._tv_list().size();
+
   fprintf(stdout, "#A: # of total faults       = %7d\n", fmgr.all_rep_num());
   fprintf(stdout, "#B: # of detected faults    = %7d\n", fmgr.det_num());
   fprintf(stdout, "#C: # of redundant faults   = %7d\n", fmgr.untest_num());
@@ -68,7 +68,7 @@ PrintStatsCmd::cmd_proc(TclObjVector& objv)
 	  f_time.usr_time());
   fprintf(stdout, "#J:    (sat  time           = %7.2f)\n",
 	  s_time.usr_time());
-  
+
   return TCL_OK;
 }
 

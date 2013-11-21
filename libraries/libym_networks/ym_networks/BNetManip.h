@@ -1,20 +1,18 @@
-#ifndef YM_BNET_BNETMANIP_H
-#define YM_BNET_BNETMANIP_H
+#ifndef YM_NETWORKS_BNETMANIP_H
+#define YM_NETWORKS_BNETMANIP_H
 
 /// @file ym_networks/BNetManip.h
 /// @brief BNetManip のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetManip.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_networks/BNetwork.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetManip BNetManip.h <ym_networks/BNetManip.h>
@@ -34,27 +32,27 @@ public:
   /// @brief コンストラクタ．
   /// @param[in] network 操作対象のネットワーク
   BNetManip(BNetwork* network);
-  
+
   /// @brief デストラクタ
   virtual
   ~BNetManip();
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   /// @name データを設定/変更するための関数
   /// @{
-  
+
   /// @brief 外部入力節点を追加する．
   /// @param[in] name 名前
   /// @retval 生成されたノード
   /// @retval NULL 名前が重複していた場合(エラー)
   BNode*
   new_input(const char* name);
-  
+
   /// @brief 外部入力節点を追加する．
   /// @param[in] name 名前
   /// @retval 生成されたノード
@@ -83,7 +81,7 @@ public:
   /// 外部入力と同じ名前はエラーとなる．
   BNode*
   new_output(const string& name);
-  
+
   /// @brief 中間節点を追加する．
   /// @param[in] name 名前
   /// @retval 生成されたノード
@@ -91,7 +89,7 @@ public:
   /// @note 入力数無しの定数0節点の状態で初期化される．
   BNode*
   new_logic(const char* name = NULL);
-  
+
   /// @brief 中間節点を追加する．
   /// @param[in] name 名前
   /// @retval 生成されたノード
@@ -115,7 +113,7 @@ public:
   /// @note ファンインがつながっていない初期値0の状態で初期化される．
   BNode*
   new_latch(const string& name);
-  
+
   /// @brief ノードの消去(eliminate)を行う．
   /// @param[in] node 消去対象のノード
   /// @note node がファンアウトしているノードの論理式の中に
@@ -188,7 +186,7 @@ public:
   bool
   change_output(BNode* onode,
 		BNode* node);
-  
+
   /// @brief 中間ノードの変更
   /// @param[in] node 対象のノード
   /// @param[in] expr 新しい論理式
@@ -238,12 +236,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name データを設定/変更するための関数(その2)
   /// 上記の関数を組み合わせた簡便関数
   /// @{
-  
+
   /// @brief 定数ノードへの変更
   /// @param[in] node 対象のノード
   /// @param[in] cval 0の時，定数0ノードに設定する．
@@ -252,7 +250,7 @@ public:
   bool
   change_to_const(BNode* node,
 		  int cval);
-  
+
   /// @brief バッファ(恒等関数)ノードへの変更
   /// @param[in] node 対象のノード
   /// @param[in] src_node 入力ノード
@@ -288,7 +286,7 @@ public:
   bool
   change_to_nand(BNode* node,
 		 const BNodeVector& fanins);
-  
+
   /// @brief ORノードへの変更
   /// @param[in] node 対象のノード
   /// @param[in] fanins 入力ノードのベクタ
@@ -297,7 +295,7 @@ public:
   bool
   change_to_or(BNode* node,
 	       const BNodeVector& fanins);
-  
+
   /// @brief NORノードへの変更
   /// @param[in] node 対象のノード
   /// @param[in] fanins 入力ノードのベクタ
@@ -306,7 +304,7 @@ public:
   bool
   change_to_nor(BNode* node,
 		const BNodeVector& fanins);
-  
+
   /// @brief XORノードへの変更
   /// @param[in] node 対象のノード
   /// @param[in] fanins 入力ノードのベクタ
@@ -315,7 +313,7 @@ public:
   bool
   change_to_xor(BNode* node,
 		const BNodeVector& fanins);
-  
+
   /// @brief XNORノードへの変更
   /// @param[in] node 対象のノード
   /// @param[in] fanins 入力ノードのベクタ
@@ -324,7 +322,7 @@ public:
   bool
   change_to_xnor(BNode* node,
 		 const BNodeVector& fanins);
-  
+
   /// @brief 定数ノードの生成
   /// @param[in] dst_name 生成するノード名
   /// @param[in] cval 0の時，定数0ノードを生成する．
@@ -334,7 +332,7 @@ public:
   BNode*
   make_const(int cval,
 	     const char* dst_name = NULL);
-  
+
   /// @brief 定数ノードの生成
   /// @param[in] dst_name 生成するノード名
   /// @param[in] cval 0の時，定数0ノードを生成する．
@@ -366,7 +364,7 @@ public:
   BNode*
   make_buffer(BNode* src_node,
 	      const string& dst_name);
-  
+
   /// @brief インバータノードの生成
   /// @param[in] dst_name 生成するノード名
   /// @param[in] src_node 入力のノード
@@ -377,7 +375,7 @@ public:
   BNode*
   make_inverter(BNode* src_node,
 		const char* dst_name = NULL);
-  
+
   /// @brief インバータノードの生成
   /// @param[in] dst_name 生成するノード名
   /// @param[in] src_node 入力のノード
@@ -436,7 +434,7 @@ public:
   BNode*
   make_nand(const BNodeVector& fanins,
 	    const string& dst_name);
-  
+
   /// @brief ORノードの生成
   /// @param[in] dst_name 生成するノード名
   /// @param[in] fanins 入力ノードのベクタ
@@ -448,7 +446,7 @@ public:
   BNode*
   make_or(const BNodeVector& fanins,
 	  const char* dst_name = NULL);
-  
+
   /// @brief ORノードの生成
   /// @param[in] dst_name 生成するノード名
   /// @param[in] fanins 入力ノードのベクタ
@@ -460,7 +458,7 @@ public:
   BNode*
   make_or(const BNodeVector& fanins,
 	  const string& dst_name);
-  
+
   /// @brief NORノードの生成
   /// @param[in] dst_name 生成するノード名
   /// @param[in] fanins 入力ノードのベクタ
@@ -472,7 +470,7 @@ public:
   BNode*
   make_nor(const BNodeVector& fanins,
 	   const char* dst_name = NULL);
-  
+
   /// @brief NORノードの生成
   /// @param[in] dst_name 生成するノード名
   /// @param[in] fanins 入力ノードのベクタ
@@ -484,7 +482,7 @@ public:
   BNode*
   make_nor(const BNodeVector& fanins,
 	   const string& dst_name);
-  
+
   /// @brief XORノードの生成
   /// @param[in] dst_name 生成するノード名
   /// @param[in] fanins 入力ノードのベクタ
@@ -496,7 +494,7 @@ public:
   BNode*
   make_xor(const BNodeVector& fanins,
 	   const char* dst_name = NULL);
-  
+
   /// @brief XORノードの生成
   /// @param[in] dst_name 生成するノード名
   /// @param[in] fanins 入力ノードのベクタ
@@ -508,7 +506,7 @@ public:
   BNode*
   make_xor(const BNodeVector& fanins,
 	   const string& dst_name);
-  
+
   /// @brief XNORノードの生成
   /// @param[in] dst_name 生成するノード名
   /// @param[in] fanins 入力ノードのベクタ
@@ -520,7 +518,7 @@ public:
   BNode*
   make_xnor(const BNodeVector& fanins,
 	    const char* dst_name = NULL);
-  
+
   /// @brief XNORノードの生成
   /// @param[in] dst_name 生成するノード名
   /// @param[in] fanins 入力ノードのベクタ
@@ -541,55 +539,55 @@ public:
   //////////////////////////////////////////////////////////////////////
   /// @name BNetwork の同名の関数を呼び出すラッパ関数
   /// @{
-  
+
   /// @brief BNetwork そのものを得る．
   BNetwork*
   network();
-  
+
   /// @brief 入力数を得る．
   size_t
   input_num();
-  
+
   /// @brief 入力ノードのリストを返す．
   const BNodeList&
   inputs();
-  
+
   /// @brief 入力ノードのリストの先頭の反復子を返す．
   BNodeList::const_iterator
   inputs_begin();
-  
+
   /// @brief 入力ノードのリストの末尾の反復子を返す．
   BNodeList::const_iterator
   inputs_end();
-  
+
   /// @brief 出力数を得る．
   size_t
   output_num();
-  
+
   /// @brief 出力ノードのリストを返す．
   const BNodeList&
   outputs();
-  
+
   /// @brief 出力ノードのリストの先頭の反復子を返す．
   BNodeList::const_iterator
   outputs_begin();
-  
+
   /// @brief 出力ノードのリストの先頭の反復子を返す．
   BNodeList::const_iterator
   outputs_end();
-  
+
   /// @brief 中間節点の数を得る．
   size_t
   logic_node_num();
-  
+
   /// @brief 中間節点のリストを返す．
   const BNodeList&
   logic_nodes();
-  
+
   /// @brief 中間節点のリストの先頭の反復子を返す．
   BNodeList::const_iterator
   logic_nodes_begin();
-  
+
   /// @brief 中間節点のリストの末尾の反復子を返す．
   BNodeList::const_iterator
   logic_nodes_end();
@@ -609,41 +607,41 @@ public:
   /// @brief latch ノードのリストの末尾の反復子を返す．
   BNodeList::const_iterator
   latch_nodes_end();
-  
+
   /// @brief nameという名前をもつノードを探す．
   /// @param[in] name 探索対象の名前
   /// @retval name という名前を持つノード
   /// @retval NULL 該当するノードがない場合
   BNode*
   find_node(const char* name);
-  
+
   /// @brief name という名前を持つ外部出力節点を取出す．
   /// @param[in] name 探索対象の名前
   /// @retval name という名前を持つ外部出力ノード
   /// @retval NULL 該当する節点が無い場合
   BNode*
   find_ponode(const char* name);
-  
+
   /// @brief すべてのノード数を得る．
   size_t
   node_num();
-  
+
   /// @brief ノードの id 番号の最大値 + 1 を得る．
   size_t
   max_node_id();
-  
+
   /// @brief すべてのノードのリストを返す．
   const BNodeList&
   nodes();
-  
+
   /// @brief すべてのノードのリストの先頭の反復子を返す．
   BNodeList::const_iterator
   nodes_begin();
-  
+
   /// @brief すべてのノードのリストの末尾の反復子を返す．
   BNodeList::const_iterator
   nodes_end();
-  
+
   /// @brief ID番号からノードを取出す．
   BNode*
   node(BNode::tId id);
@@ -655,11 +653,11 @@ public:
   /// @brief ノード名を取り出す．
   const char*
   node_name(const BNode* node);
-  
+
   /// @brief 全部のリテラル数を得る．
   size_t
   litnum();
-  
+
   /// @brief SOP形式のリテラル数の見積りを得る．
   /// @note Boolean factored formの場合には実際よりも
   /// 多めの値になる場合がある．
@@ -674,7 +672,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
-  
+
   // TFO にマークをつける．
   void
   mark_TFO(BNode* node);
@@ -686,7 +684,7 @@ private:
   // TFO マークを得る．
   bool
   get_TFO(BNode* node);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -710,7 +708,7 @@ private:
 
   // TFO チェック用のカウンタ
   int mCurTmpMark;
-  
+
 };
 
 
@@ -771,7 +769,7 @@ BNetManip::rename_node(BNode* node,
 {
   return rename_node(node, name.c_str());
 }
-  
+
 // @brief 定数ノードの生成
 inline
 BNode*
@@ -852,7 +850,7 @@ BNetManip::make_xnor(const BNodeVector& fanins,
 {
   return make_xnor(fanins, dst_name.c_str());
 }
-  
+
 // @brief BNetwork そのものを得る．
 inline
 BNetwork*
@@ -860,7 +858,7 @@ BNetManip::network()
 {
   return mNetwork;
 }
-    
+
 // @brief 入力数を得る．
 inline
 size_t
@@ -868,7 +866,7 @@ BNetManip::input_num()
 {
   return mNetwork->input_num();
 }
-  
+
 // @brief 入力ノードのリストを返す．
 inline
 const BNodeList&
@@ -876,7 +874,7 @@ BNetManip::inputs()
 {
   return mNetwork->inputs();
 }
-  
+
 // @brief 入力ノードのリストの先頭の反復子を返す．
 inline
 BNodeList::const_iterator
@@ -884,7 +882,7 @@ BNetManip::inputs_begin()
 {
   return mNetwork->inputs_begin();
 }
-  
+
 // @brief 入力ノードのリストの末尾の反復子を返す．
 inline
 BNodeList::const_iterator
@@ -892,7 +890,7 @@ BNetManip::inputs_end()
 {
   return mNetwork->inputs_end();
 }
-  
+
 // @brief 出力数を得る．
 inline
 size_t
@@ -900,7 +898,7 @@ BNetManip::output_num()
 {
   return mNetwork->output_num();
 }
-  
+
 // @brief 出力ノードのリストを返す．
 inline
 const BNodeList&
@@ -908,7 +906,7 @@ BNetManip::outputs()
 {
   return mNetwork->outputs();
 }
-  
+
 // @brief 出力ノードのリストの先頭の反復子を返す．
 inline
 BNodeList::const_iterator
@@ -916,7 +914,7 @@ BNetManip::outputs_begin()
 {
   return mNetwork->outputs_begin();
 }
-  
+
 // @brief 出力ノードのリストの先頭の反復子を返す．
 inline
 BNodeList::const_iterator
@@ -924,7 +922,7 @@ BNetManip::outputs_end()
 {
   return mNetwork->outputs_end();
 }
-  
+
 // @brief 中間節点の数を得る．
 inline
 size_t
@@ -932,7 +930,7 @@ BNetManip::logic_node_num()
 {
   return mNetwork->logic_node_num();
 }
-  
+
 // @brief 中間節点のリストを返す．
 inline
 const BNodeList&
@@ -940,7 +938,7 @@ BNetManip::logic_nodes()
 {
   return mNetwork->logic_nodes();
 }
-  
+
 // @brief 中間節点のリストの先頭の反復子を返す．
 inline
 BNodeList::const_iterator
@@ -948,7 +946,7 @@ BNetManip::logic_nodes_begin()
 {
   return mNetwork->logic_nodes_begin();
 }
-  
+
 // @brief 中間節点のリストの末尾の反復子を返す．
 inline
 BNodeList::const_iterator
@@ -988,7 +986,7 @@ BNetManip::latch_nodes_end()
 {
   return mNetwork->latch_nodes_end();
 }
-  
+
 // @brief nameという名前をもつノードを探す．
 // @param[in] name 探索対象の名前
 // @retval name という名前を持つノード
@@ -999,7 +997,7 @@ BNetManip::find_node(const char* name)
 {
   return mNetwork->find_node(name);
 }
-  
+
 // @brief name という名前を持つ外部出力節点を取出す．
 // @param[in] name 探索対象の名前
 // @retval name という名前を持つ外部出力ノード
@@ -1010,7 +1008,7 @@ BNetManip::find_ponode(const char* name)
 {
   return mNetwork->find_ponode(name);
 }
-  
+
 // @brief すべてのノード数を得る．
 inline
 size_t
@@ -1018,7 +1016,7 @@ BNetManip::node_num()
 {
   return mNetwork->node_num();
 }
-  
+
 // @brief ノードの id 番号の最大値 + 1 を得る．
 inline
 size_t
@@ -1026,15 +1024,15 @@ BNetManip::max_node_id()
 {
   return mNetwork->max_node_id();
 }
-  
+
 // @brief すべてのノードのリストを返す．
 inline
 const BNodeList&
 BNetManip::nodes()
 {
   return mNetwork->nodes();
-} 
-  
+}
+
 // @brief すべてのノードのリストの先頭の反復子を返す．
 inline
 BNodeList::const_iterator
@@ -1042,7 +1040,7 @@ BNetManip::nodes_begin()
 {
   return mNetwork->nodes_begin();
 }
-  
+
 // @brief すべてのノードのリストの末尾の反復子を返す．
 inline
 BNodeList::const_iterator
@@ -1050,7 +1048,7 @@ BNetManip::nodes_end()
 {
   return mNetwork->nodes_end();
 }
-  
+
 // @brief ID番号からノードを取出す．
 inline
 BNode*
@@ -1074,7 +1072,7 @@ BNetManip::node_name(const BNode* node)
 {
   return mNetwork->node_name(node);
 }
-  
+
 // @brief 全部のリテラル数を得る．
 inline
 size_t
@@ -1082,7 +1080,7 @@ BNetManip::litnum()
 {
   return mNetwork->litnum();
 }
-  
+
 // @brief SOP形式のリテラル数の見積りを得る．
 // @note Boolean factored formの場合には実際よりも
 // 多めの値になる場合がある．
@@ -1093,6 +1091,6 @@ BNetManip::sop_litnum()
   return mNetwork->sop_litnum();
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS_BNET
 
-#endif // YM_BNET_BNETMANIP_H
+#endif // YM_NETWORKS_BNETMANIP_H

@@ -7,18 +7,19 @@
 ///
 /// $Id: VlPrimitive.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_verilog/vl/VlNamedObj.h"
 #include "ym_verilog/vl/VlFwd.h"
+#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlPrimArray VlPrimitive.h <ym_verilog/vl/VlPrimitive.h>
+/// @class VlPrimArray VlPrimitive.h "ym_verilog/vl/VlPrimitive.h"
 /// @brief gate/UDP instance の配列を表すクラス
 /// IEEE Std 1364-2001 26.6.13 Primitive, prim term
 //////////////////////////////////////////////////////////////////////
@@ -44,6 +45,11 @@ public:
   virtual
   const VlUdpDefn*
   udp_defn() const = 0;
+
+  /// @brief セルを返す．
+  virtual
+  const Cell*
+  cell() const = 0;
 
   /// @brief 0 の強さを得る．
   virtual
@@ -101,7 +107,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlPrimitive VlItem.h "VlItem.h"
+/// @class VlPrimitive VlPrimitive.h "ym_verilog/vl/VlPrimitive.h"
 /// @brief gate/UDP instance を表すクラス
 //////////////////////////////////////////////////////////////////////
 class VlPrimitive :
@@ -127,6 +133,11 @@ public:
   virtual
   const VlUdpDefn*
   udp_defn() const = 0;
+
+  /// @brief セルを返す．
+  virtual
+  const Cell*
+  cell() const = 0;
 
   /// @brief 0 の強さを得る．
   virtual
@@ -158,7 +169,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlPrimTerm VlPrimitive.h <ym_verilog/vl/VlPrimitive.h>
+/// @class VlPrimTerm VlPrimitive.h "ym_verilog/vl/VlPrimitive.h"
 /// @brief プリミティブインスタンスのポート端子を表すクラス
 /// IEEE Std 1364-2001 26.6.13 Primitive, prim term
 //////////////////////////////////////////////////////////////////////
@@ -184,7 +195,7 @@ public:
 
   /// @brief 入出力の種類を返す．
   virtual
-  tVpiDirection
+  tVlDirection
   direction() const = 0;
 
   /// @brief 端子番号を返す．

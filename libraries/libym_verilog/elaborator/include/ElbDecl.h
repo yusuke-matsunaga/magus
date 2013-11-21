@@ -1,16 +1,15 @@
-#ifndef LIBYM_VERILOG_ELB_ELBDECL_H
-#define LIBYM_VERILOG_ELB_ELBDECL_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBDECL_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBDECL_H
 
 /// @file libym_verilog/elaborator/include/ElbDecl.h
 /// @brief ElbDecl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: ElbDecl.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
+#include "ym_verilog/VlValueType.h"
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlDeclArray.h"
 #include "ElbFwd.h"
@@ -102,11 +101,13 @@ public:
 
   /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index に対するオフセット index が範囲内に入っている時．
-  /// @retval -1 index が範囲外の時
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
   virtual
-  int
-  bit_offset(int index) const = 0;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset) const = 0;
 
   /// @brief データ型の取得
   /// @retval データ型 kParam, kLocalParam, kVar の場合
@@ -298,7 +299,7 @@ public:
   /// @brief スカラー値を返す．
   /// @param[in] offset 要素のオフセット
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_scalar(ymuint offset) const = 0;
 
   /// @brief スカラー値を設定する．
@@ -307,12 +308,12 @@ public:
   virtual
   void
   set_scalar(ymuint offset,
-	     tVpiScalarVal val) = 0;
+	     const VlScalarVal& val) = 0;
 
   /// @brief 論理値を返す．
   /// @param[in] offset 要素のオフセット
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_logic(ymuint offset) const = 0;
 
   /// @brief real 型の値を返す．
@@ -337,7 +338,7 @@ public:
   void
   get_bitvector(ymuint offset,
 		BitVector& val,
-		tVpiValueType req_type = kVpiValueNone) const = 0;
+		const VlValueType& req_type = VlValueType()) const = 0;
 
   /// @brief bitvector 型の値を設定する．
   /// @param[in] offset 要素のオフセット
@@ -351,7 +352,7 @@ public:
   /// @param[in] offset 要素のオフセット
   /// @param[in] index ビット位置
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_bitselect(ymuint offset,
 		int index) const = 0;
 
@@ -363,7 +364,7 @@ public:
   void
   set_bitselect(ymuint offset,
 		int index,
-		tVpiScalarVal val) = 0;
+		const VlScalarVal& val) = 0;
 
   /// @brief 範囲選択値を返す．
   /// @param[in] offset 要素のオフセット
@@ -433,4 +434,4 @@ ElbDeclArray::next() const
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBDECL_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBDECL_H

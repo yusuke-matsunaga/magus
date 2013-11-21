@@ -1,24 +1,21 @@
-#ifndef YM_TGNET_TGNODE_H
-#define YM_TGNET_TGNODE_H
+#ifndef YM_NETWORKS_TGNODE_H
+#define YM_NETWORKS_TGNODE_H
 
 /// @file ym_networks/TgNode.h
 /// @brief TgNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: TgNode.h 1920 2008-12-20 15:52:42Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/tgnet_nsdef.h"
-#include "ym_networks/TgGateTemplate.h"
+#include "ym_networks/tgnet.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 //////////////////////////////////////////////////////////////////////
-/// @class TgEdge TgEdge.h <ym_networks/TgNode.h>
+/// @class TgEdge TgEdge.h "ym_networks/TgNode.h"
 /// @brief ゲート間の接続を表すクラス
 /// @note 具体的には
 ///  - destination のノードへのポインタ
@@ -29,7 +26,7 @@ class TgEdge
 {
   friend class TgNode;
   friend class TgNetwork;
-  
+
 private:
 
   // コンストラクタ
@@ -46,7 +43,7 @@ public:
   to_node() const;
 
   /// @brief ファンアウト先の入力ピン番号を得る．
-  size_t
+  ymuint
   to_ipos() const;
 
 
@@ -54,18 +51,18 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ファンアウト先のゲート
   TgNode* mTo;
 
   // ファンアウト先の入力ピン番号
-  size_t mIpos;
-  
+  ymuint32 mIpos;
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TgNode TgNode.h <ym_networks/TgNode.h>
+/// @class TgNode TgNode.h "ym_networks/TgNode.h"
 /// @brief ゲートを表すクラス
 /// @note 保持している情報は
 ///  - タイプID (32以下は予約タイプ)
@@ -78,25 +75,15 @@ private:
 class TgNode
 {
   friend class TgNetwork;
-  
+
 private:
   // このクラスは TgNetwork 内でしか生成／破壊できない．
-  
+
   // コンストラクタ
   TgNode(ymuint32 gid);
-  
+
   // デストラクタ
   ~TgNode();
-
-
-private:
-
-  // タイプをセットする．
-  void
-  set_type(ymuint32 lid,
-	   tTgGateType type,
-	   size_t ni,
-	   void* p);
 
 
 public:
@@ -104,37 +91,42 @@ public:
   // 内部情報を得る関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief タイプ id を得る．
-  tTgGateType
-  type() const;
-
-  /// @brief 未定義タイプの時 true を返す．
+  /// @brief ノードの型が未定義の時 true を返す．
   bool
   is_undef() const;
-  
-  /// @brief 外部入力タイプの時 true を返す．
+
+  /// @brief 外部入力ノードの時 true を返す．
   /// @note FF 出力もここに含まれる．
   bool
   is_input() const;
 
-  /// @brief 外部出力タイプの時 true を返す．
+  /// @brief 外部出力ノードの時 true を返す．
   /// @note FF 入力もここに含まれる．
   bool
   is_output() const;
-  
-  /// @brief logic タイプの時 true を返す．
+
+  /// @brief 論理ノードの時 true を返す．
+  /// @note cplx_logic を包含している．
   bool
   is_logic() const;
 
-  /// @brief 組み込み型でない logic タイプの時 true を返す．
+  /// @brief 組み込み型でない論理ノードの時 true を返す．
   bool
   is_cplx_logic() const;
-  
-  /// @brief ffin タイプの時 true を返す．
+
+  /// @brief 論理ノードの時の論理関数タイプを返す．
+  tTgGateType
+  gate_type() const;
+
+  /// @brief gate_type() == kTgGateCplx の時の関数IDを返す．
+  ymuint
+  func_id() const;
+
+  /// @brief FF入力の時 true を返す．
   bool
   is_ffin() const;
-  
-  /// @brief ffout タイプの時 true を返す．
+
+  /// @brief FF出力の時 true を返す．
   bool
   is_ffout() const;
 
@@ -151,29 +143,29 @@ public:
   name() const;
 
   /// @brief 入力数を得る．
-  size_t
-  ni() const;
+  ymuint
+  fanin_num() const;
 
   /// @brief pos 番めの入力のノードを得る．
   const TgNode*
-  fanin(size_t pos) const;
+  fanin(ymuint pos) const;
 
   /// @brief ファンアウト数を得る．
-  size_t
+  ymuint
   fanout_num() const;
-  
+
   /// @brief ファンアウトの枝を得る．
   const TgEdge*
-  fanout_edge(size_t pos) const;
-  
+  fanout_edge(ymuint pos) const;
+
   /// @brief ファンアウト先のノードを得る．
   const TgNode*
-  fanout(size_t pos) const;
-  
+  fanout(ymuint pos) const;
+
   /// @brief ファンアウト先のノードの入力位置を得る．
-  size_t
-  fanout_ipos(size_t pos) const;
-  
+  ymuint
+  fanout_ipos(ymuint pos) const;
+
   /// @brief ffin/ffout ノードの時に相方のノードを返す．
   TgNode*
   alt_node();
@@ -181,16 +173,58 @@ public:
   /// @brief ffin/ffout ノードの時に相方のノードを返す．
   const TgNode*
   alt_node() const;
-  
-  
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる定数の定義
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 未定義
+  static
+  const ymuint32 kUndefType = 0U;
+
+  /// @brief 外部入力ノード
+  static
+  const ymuint32 kInputType = 1U;
+
+  /// @brief 外部出力ノード
+  static
+  const ymuint32 kOutputType = 2U;
+
+  /// @brief 論理ノード
+  static
+  const ymuint32 kLogicType = 3U;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief タイプをセットする．
+  /// @param[in] lid ローカルID
+  /// @param[in] type ノードのタイプ
+  /// @param[in] ni 入力数
+  /// @param[in] p ファンインの配列用のメモリ領域
+  void
+  set_type(ymuint32 lid,
+	   ymuint type,
+	   ymuint ni,
+	   void* p);
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
-  // タイプ id
-  TgGateTemplate mTypeId;
-  
+
+  // ノードタイプ + 関数タイプ
+  ymuint32 mTypeId;
+
+  // 関数ID
+  ymuint32 mFuncId;
+
   // 全体での通し番号
   ymuint32 mGid;
 
@@ -199,19 +233,22 @@ private:
 
   // 名前
   const char* mName;
-  
+
+  // 入力数
+  ymuint32 mNi;
+
   // ファンインのノードの配列
   TgNode** mFanins;
 
   // ファンアウト数
-  size_t mFanoutNum;
+  ymuint32 mFanoutNum;
 
   // ファンアウトの枝の配列
   TgEdge* mFanouts;
-  
+
   // ffin/ffout ノードの時に相方のノードを保持する．
   TgNode* mAltNode;
-  
+
 };
 
 
@@ -243,7 +280,7 @@ TgEdge::to_node() const
 
 // @brief ファンアウト先の入力ピン番号を得る．
 inline
-size_t
+ymuint
 TgEdge::to_ipos() const
 {
   return mIpos;
@@ -254,60 +291,70 @@ TgEdge::to_ipos() const
 // TgNode のインライン関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief タイプ id を得る．
-inline
-tTgGateType
-TgNode::type() const
-{
-  return mTypeId.type();
-}
-
-// @brief 未定義タイプの時 true を返す．
+// @brief ノードの型が未定義の時 true を返す．
 inline
 bool
 TgNode::is_undef() const
 {
-  return type() == kTgUndef;
+  return (mTypeId & 3U) == kUndefType;
 }
 
-// @brief 外部入力タイプの時 true を返す．
+// @brief 外部入力ノードの時 true を返す．
+// @note FF 出力もここに含まれる．
 inline
 bool
 TgNode::is_input() const
 {
-  return type() == kTgInput;
+  return (mTypeId & 3U) == kInputType;
 }
 
-// @brief 外部出力タイプの時 true を返す．
+// @brief 外部出力ノードの時 true を返す．
+// @note FF 入力もここに含まれる．
 inline
 bool
 TgNode::is_output() const
 {
-  return type() == kTgOutput;
+  return (mTypeId & 3U) == kOutputType;
 }
 
-// @brief logic タイプの時 true を返す．
+// @brief 論理ノードの時 true を返す．
+// @note cplx_logic を包含している．
 inline
 bool
 TgNode::is_logic() const
 {
-  return static_cast<ymuint>(type()) >= static_cast<ymuint>(kTgBuff);
+  return (mTypeId & 3U) == kLogicType;
 }
 
-// @brief 組み込み型でない logic タイプの時 true を返す．
+// @brief 論理ノードの時の論理関数タイプを返す．
+inline
+tTgGateType
+TgNode::gate_type() const
+{
+  return static_cast<tTgGateType>((mTypeId >> 2) & 15U);
+}
+
+// @brief 組み込み型でない論理ノードの時 true を返す．
 inline
 bool
 TgNode::is_cplx_logic() const
 {
-  return static_cast<ymuint>(type()) >= static_cast<ymuint>(kTgUsrDef);
+  return gate_type() == kTgGateCplx;
 }
 
+// @brief gate_type() == kTgGateCplx の時の関数IDを返す．
+inline
+ymuint
+TgNode::func_id() const
+{
+  return mFuncId;
+}
 // @brief ffin タイプの時 true を返す．
 inline
 bool
 TgNode::is_ffin() const
 {
-  return type() == kTgOutput && mAltNode != NULL;
+  return is_output() && mAltNode != NULL;
 }
 
 // @brief ffout タイプの時 true を返す．
@@ -315,7 +362,7 @@ inline
 bool
 TgNode::is_ffout() const
 {
-  return type() == kTgInput && mAltNode != NULL;
+  return is_input() && mAltNode != NULL;
 }
 
 // @brief ノード全体での通し番号を得る．
@@ -344,23 +391,23 @@ TgNode::name() const
 
 // @brief 入力数を得る．
 inline
-size_t
-TgNode::ni() const
+ymuint
+TgNode::fanin_num() const
 {
-  return mTypeId.ni();
+  return mNi;
 }
 
 // @brief pos 番めの入力のノードを得る．
 inline
 const TgNode*
-TgNode::fanin(size_t pos) const
+TgNode::fanin(ymuint pos) const
 {
   return mFanins[pos];
 }
 
 // @brief ファンアウト数を得る．
 inline
-size_t
+ymuint
 TgNode::fanout_num() const
 {
   return mFanoutNum;
@@ -369,23 +416,23 @@ TgNode::fanout_num() const
 // @brief ファンアウトの枝を得る．
 inline
 const TgEdge*
-TgNode::fanout_edge(size_t pos) const
+TgNode::fanout_edge(ymuint pos) const
 {
   return &mFanouts[pos];
 }
-  
+
 // @brief ファンアウト先のノードを得る．
 inline
 const TgNode*
-TgNode::fanout(size_t pos) const
+TgNode::fanout(ymuint pos) const
 {
   return mFanouts[pos].mTo;
 }
 
 // @brief ファンアウト先のノードの入力位置を得る．
 inline
-size_t
-TgNode::fanout_ipos(size_t pos) const
+ymuint
+TgNode::fanout_ipos(ymuint pos) const
 {
   return mFanouts[pos].mIpos;
 }
@@ -406,6 +453,6 @@ TgNode::alt_node() const
   return mAltNode;
 }
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS_TGNET
 
-#endif // YM_TGNET_TGNODE_H
+#endif // YM_NETWORKS_TGNODE_H

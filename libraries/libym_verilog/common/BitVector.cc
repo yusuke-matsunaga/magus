@@ -5,7 +5,7 @@
 ///
 /// $Id: BitVector.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -279,7 +279,7 @@ BitVector::operator=(VlTime time)
 }
 
 // スカラ値からのキャスト用コンストラクタ
-BitVector::BitVector(tVpiScalarVal value,
+BitVector::BitVector(const VlScalarVal& value,
 		     ymuint32 size) :
   mSize(0),
   mVal0(NULL),
@@ -290,23 +290,25 @@ BitVector::BitVector(tVpiScalarVal value,
   ymuint32 n = block(size);
   ymuint32 val0 = kAll0;
   ymuint32 val1 = kAll1;
-  switch (value) {
-  case kVpiScalar0:
+
+  if ( value.is_zero() ) {
     val0 = kAll1;
     val1 = kAll0;
-    break;
-  case kVpiScalar1:
+  }
+  else if ( value.is_one() ) {
     val0 = kAll0;
     val1 = kAll1;
-    break;
-  case kVpiScalarX:
+  }
+  else if ( value.is_x() ) {
     val0 = kAll1;
     val1 = kAll1;
-    break;
-  case kVpiScalarZ:
+  }
+  else if ( value.is_z() ) {
     val0 = kAll0;
     val1 = kAll0;
-    break;
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
   }
   for (ymuint32 i = 0; i < n - 1; ++ i) {
     mVal0[i] = val0;
@@ -636,33 +638,35 @@ BitVector::BitVector(const BitVector& src,
 }
 
 // @brief スカラ値からの代入演算子
-// @param[in] value 値 (kVpiScalar{0, 1, X, Z}
+// @param[in] value 値 {0, 1, X, Z}
 // @note 結果の型は
 // - サイズはあり(1ビット)
 // - 符号なし
 // - 基数は2
 const BitVector&
-BitVector::operator=(tVpiScalarVal value)
+BitVector::operator=(const VlScalarVal& value)
 {
   resize(1);
   set_type(true, false, 2);
-  switch ( value ) {
-  case kVpiScalar0:
+
+  if ( value.is_zero() ) {
     mVal0[0] = 1;
     mVal1[0] = 0;
-    break;
-  case kVpiScalar1:
+  }
+  else if ( value.is_one() ) {
     mVal0[0] = 0;
     mVal1[0] = 1;
-    break;
-  case kVpiScalarX:
+  }
+  else if ( value.is_x() ) {
     mVal0[0] = 1;
     mVal1[0] = 1;
-    break;
-  case kVpiScalarZ:
+  }
+  else if ( value.is_z() ) {
     mVal0[0] = 0;
     mVal1[0] = 0;
-    break;
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
   }
   return *this;
 }
@@ -762,12 +766,12 @@ BitVector::set_from_verilog_string(const string& str)
 // @param[in] type 要求される型(サイズも含む)
 // @return 自分自身への参照を返す．
 const BitVector&
-BitVector::coerce(tVpiValueType type)
+BitVector::coerce(const VlValueType& type)
 {
-  if ( type != kVpiValueNone ) {
-    bool is_signed = is_signed_type(type);
-    bool is_sized = is_sized_type(type);
-    ymuint32 req_size = unpack_size(type);
+  if ( !type.is_no_type() ) {
+    bool is_signed = type.is_signed();
+    bool is_sized = type.is_sized();
+    ymuint32 req_size = type.size();
 
     if ( size() == req_size ) {
       set_type(is_sized, is_signed, base());
@@ -784,28 +788,28 @@ BitVector::coerce(tVpiValueType type)
 BitVector
 BitVector::zero(ymuint32 size)
 {
-  return BitVector(kVpiScalar0, size);
+  return BitVector(VlScalarVal::zero(), size);
 }
 
 // 1 を表すオブジェクトを生成する
 BitVector
 BitVector::one(ymuint32 size)
 {
-  return BitVector(kVpiScalar1, size);
+  return BitVector(VlScalarVal::one(), size);
 }
 
 // X を表すオブジェクトを生成する
 BitVector
 BitVector::x(ymuint32 size)
 {
-  return BitVector(kVpiScalarX, size);
+  return BitVector(VlScalarVal::x(), size);
 }
 
 // Z を表すオブジェクトを生成する
 BitVector
 BitVector::z(ymuint32 size)
 {
-  return BitVector(kVpiScalarZ, size);
+  return BitVector(VlScalarVal::z(), size);
 }
 
 // Verilog 形式の2進数から変換するための共通ルーティン
@@ -1361,10 +1365,10 @@ BitVector::operator/=(const BitVector& src)
   tmp1.set_type(tmp1.is_sized(), false, tmp1.base());
   tmp2.set_type(tmp2.is_sized(), false, tmp2.base());
 
-  BitVector p(kVpiScalar0, ans_size);
+  BitVector p(VlScalarVal::zero(), ans_size);
   for (ymuint32 i = ans_size; i -- > 0; ) {
     p <<= 1;
-    if ( tmp1.value(i) == kVpiScalar1 ) {
+    if ( tmp1.value(i).is_one() ) {
       p.mVal0[0] &= ~1U;
       p.mVal1[0] |= 1U;
     }
@@ -1415,11 +1419,11 @@ BitVector::operator%=(const BitVector& src)
   tmp2.set_type(tmp2.is_sized(), false, tmp2.base());
 
   set_type(ans_sized, ans_signed, ans_base);
-  *this = BitVector(kVpiScalar0, ans_size);
+  *this = BitVector(VlScalarVal::zero(), ans_size);
 
   for (ymuint32 i = ans_size; i -- > 0; ) {
     operator<<=(1);
-    if ( tmp1.value(i) == kVpiScalar1 ) {
+    if ( tmp1.value(i).is_one() ) {
       mVal0[0] &= ~1U;
       mVal1[0] |= 1U;
     }
@@ -1524,12 +1528,12 @@ BitVector::lt_base(const BitVector& src1,
 }
 
 // 小なり
-tVpiScalarVal
+VlScalarVal
 lt(const BitVector& src1,
    const BitVector& src2)
 {
   if ( src1.has_xz() || src2.has_xz() ) {
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
 
   bool ans = false;
@@ -1543,9 +1547,9 @@ lt(const BitVector& src1,
     ans = BitVector::lt_base(src1, src2);
   }
   if ( ans ) {
-    return kVpiScalar1;
+    return VlScalarVal::one();
   }
-  return kVpiScalar0;
+  return VlScalarVal::zero();
 }
 
 // 小なり
@@ -1643,12 +1647,12 @@ BitVector::eq_base(const BitVector& src1,
 // @retval 1 src1 == src2 の時
 // @retval 0 src1 != src2 の時
 // @retval X 比較不能の時
-tVpiScalarVal
+VlScalarVal
 eq(const BitVector& src1,
    const BitVector& src2)
 {
   if ( src1.has_xz() || src2.has_xz() ) {
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
 
   bool ans = false;
@@ -1662,9 +1666,9 @@ eq(const BitVector& src1,
     ans = BitVector::eq_base(src1, src2, 1);
   }
   if ( ans ) {
-    return kVpiScalar1;
+    return VlScalarVal::one();
   }
-  return kVpiScalar0;
+  return VlScalarVal::zero();
 }
 
 // @brief x が 0 および 1 と等価と見なせるとした場合の等価比較演算子
@@ -1732,29 +1736,29 @@ operator==(const BitVector& src1,
 //////////////////////////////////////////////////////////////////////
 
 // 否定
-tVpiScalarVal
+VlScalarVal
 operator!(const BitVector& src)
 {
   return !src.to_logic();
 }
 
 // 論理積
-tVpiScalarVal
+VlScalarVal
 operator&&(const BitVector& src1,
 	   const BitVector& src2)
 {
-  tVpiScalarVal v1 = src1.to_logic();
-  tVpiScalarVal v2 = src2.to_logic();
+  VlScalarVal v1 = src1.to_logic();
+  VlScalarVal v2 = src2.to_logic();
   return v1 && v2;
 }
 
 // 論理和
-tVpiScalarVal
+VlScalarVal
 operator||(const BitVector& src1,
 	   const BitVector& src2)
 {
-  tVpiScalarVal v1 = src1.to_logic();
-  tVpiScalarVal v2 = src2.to_logic();
+  VlScalarVal v1 = src1.to_logic();
+  VlScalarVal v2 = src2.to_logic();
   return v1 || v2;
 }
 
@@ -1952,11 +1956,11 @@ BitVector::operator^=(const BitVector& src)
 //////////////////////////////////////////////////////////////////////
 
 // リダクションAND
-tVpiScalarVal
+VlScalarVal
 BitVector::reduction_and() const
 {
   if ( has_xz() ) {
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
 
   ymuint32 n = block(size());
@@ -1964,22 +1968,22 @@ BitVector::reduction_and() const
   for (ymuint32 i = 0; i < n - 1; ++ i) {
     if ( mVal0[i] ) {
       // 1 ビットでも 0 のビットがあれば結果は0
-      return kVpiScalar0;
+      return VlScalarVal::zero();
     }
   }
   if ( mVal0[n - 1] & m ) {
     // 1 ビットでも 0 のビットがあれば結果は0
-    return kVpiScalar0;
+    return VlScalarVal::zero();
   }
-  return kVpiScalar1;
+  return VlScalarVal::one();
 }
 
 // リダクションNAND
-tVpiScalarVal
+VlScalarVal
 BitVector::reduction_nand() const
 {
   if ( has_xz() ) {
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
 
   ymuint32 n = block(size());
@@ -1987,66 +1991,66 @@ BitVector::reduction_nand() const
   for (ymuint32 i = 0; i < n - 1; ++ i) {
     if ( mVal0[i] ) {
       // 1 ビットでも 0 のビットがあれば結果は1
-      return kVpiScalar1;
+      return VlScalarVal::one();
     }
   }
   if ( mVal0[n - 1] & m ) {
     // 1 ビットでも 0 のビットがあれば結果は1
-    return kVpiScalar1;
+    return VlScalarVal::one();
   }
-  return kVpiScalar0;
+  return VlScalarVal::zero();
 }
 
 // リダクションOR
-tVpiScalarVal
+VlScalarVal
 BitVector::reduction_or() const
 {
   if ( has_xz() ) {
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
   ymuint32 n = block(size());
   ymuint32 m = mask(size());
   for (ymuint32 i = 0; i < n - 1; ++ i) {
     if ( mVal1[i] ) {
       // 1 ビットでも 1 のビットがあれば結果は1
-      return kVpiScalar1;
+      return VlScalarVal::one();
     }
   }
   if ( mVal1[n - 1] & m ) {
     // 1 ビットでも 1 のビットがあれば結果は1
-    return kVpiScalar1;
+    return VlScalarVal::one();
   }
-  return kVpiScalar0;
+  return VlScalarVal::zero();
 }
 
 // リダクションNOR
-tVpiScalarVal
+VlScalarVal
 BitVector::reduction_nor() const
 {
   if ( has_xz() ) {
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
   ymuint32 n = block(size());
   ymuint32 m = mask(size());
   for (ymuint32 i = 0; i < n - 1; ++ i) {
     if ( mVal1[i] ) {
       // 1 ビットでも 1 のビットがあれば結果は0
-      return kVpiScalar0;
+      return VlScalarVal::zero();
     }
   }
   if ( mVal1[n - 1] & m ) {
     // 1 ビットでも 1 のビットがあれば結果は0
-    return kVpiScalar0;
+    return VlScalarVal::zero();
   }
-  return kVpiScalar1;
+  return VlScalarVal::one();
 }
 
 // リダクションXOR
-tVpiScalarVal
+VlScalarVal
 BitVector::reduction_xor() const
 {
   if ( has_xz() ) {
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
   ymuint32 n = block(size());
   // xor は地道に数えるしかない
@@ -2066,19 +2070,19 @@ BitVector::reduction_xor() const
     }
   }
   if ( v ) {
-    return kVpiScalar1;
+    return VlScalarVal::one();
   }
   else {
-    return kVpiScalar0;
+    return VlScalarVal::zero();
   }
 }
 
 // リダクションXNOR
-tVpiScalarVal
+VlScalarVal
 BitVector::reduction_xnor() const
 {
   if ( has_xz() ) {
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
   ymuint32 n = block(size());
   // xor は地道に数えるしかない
@@ -2098,10 +2102,10 @@ BitVector::reduction_xnor() const
     }
   }
   if ( v ) {
-    return kVpiScalar0;
+    return VlScalarVal::zero();
   }
   else {
-    return kVpiScalar1;
+    return VlScalarVal::one();
   }
 }
 
@@ -2316,14 +2320,14 @@ ite(const BitVector& src1,
     size = src2.size();
   }
   bool has_sign = src1.is_signed() && src2.is_signed();
-  switch ( src1.to_logic() ) {
-  case kVpiScalar0:
+  VlScalarVal lval = src1.to_logic();
+  if ( lval.is_zero() ) {
     return BitVector(src3, size, has_size, has_sign, src3.base());
-  case kVpiScalar1:
-    return BitVector(src2, size, has_size, has_sign, src2.base());
-  default:
-    return BitVector(src2).merge(src3);
   }
+  if ( lval.is_one() ) {
+    return BitVector(src2, size, has_size, has_sign, src2.base());
+  }
+  return BitVector(src2).merge(src3);
 }
 
 
@@ -2424,7 +2428,7 @@ BitVector::part_select(int msb,
     return BitVector::x(new_size);
   }
 
-  BitVector ans(kVpiScalarX, new_size);
+  BitVector ans(VlScalarVal::x(), new_size);
   // とりあえず参照コードということでビット単位に転送してます．
   // 本当は part_select 書き込みのようなブロック転送のコードの方が速い
   ymuint32 start = 0;
@@ -2531,7 +2535,7 @@ BitVector::part_select(int msb,
 // 範囲外ならなにもしない．
 void
 BitVector::bit_select(int bpos,
-		      tVpiScalarVal val)
+		      const VlScalarVal& val)
 {
 # warning "TODO: 専用のコードを書く"
 
@@ -2590,11 +2594,11 @@ BitVector::merge(const BitVector& src)
 
 // pos ビット目の値を得る．
 // pos が範囲を越えていたら kX を返す．
-tVpiScalarVal
+VlScalarVal
 BitVector::value(int pos) const
 {
   if ( pos < 0 || pos >= static_cast<int>(size()) ) {
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
 
   ymuint32 blk = pos / kBlockSize;
@@ -2602,18 +2606,18 @@ BitVector::value(int pos) const
   ymuint32 msk = 1 << sft;
   if ( mVal1[blk] & msk ) {
     if ( mVal0[blk] & msk ) {
-      return kVpiScalarX;
+      return VlScalarVal::x();
     }
     else {
-      return kVpiScalar1;
+      return VlScalarVal::one();
     }
   }
   else {
     if ( mVal0[blk] & msk ) {
-      return kVpiScalar0;
+      return VlScalarVal::zero();
     }
     else {
-      return kVpiScalarZ;
+      return VlScalarVal::z();
     }
   }
 }
@@ -2622,7 +2626,7 @@ BitVector::value(int pos) const
 // pos が範囲を越えていたら何もしない
 void
 BitVector::set_value(int pos,
-		     tVpiScalarVal val)
+		     const VlScalarVal& val)
 {
   if ( pos < 0 || pos >= static_cast<int>(size()) ) {
     return;
@@ -2631,23 +2635,24 @@ BitVector::set_value(int pos,
   ymuint32 blk = pos / kBlockSize;
   ymuint32 sft = pos - blk * kBlockSize;
   ymuint32 msk = 1 << sft;
-  switch ( val ) {
-  case kVpiScalar0:
+  if ( val.is_zero() ) {
     mVal0[blk] |= msk;
     mVal1[blk] &= ~msk;
-    break;
-  case kVpiScalar1:
+  }
+  else if ( val.is_one() ) {
     mVal0[blk] &= ~msk;
     mVal1[blk] |= msk;
-    break;
-  case kVpiScalarX:
+  }
+  else if ( val.is_x() ) {
     mVal0[blk] |= msk;
     mVal1[blk] |= msk;
-    break;
-  case kVpiScalarZ:
+  }
+  else if ( val.is_z() ) {
     mVal0[blk] &= ~msk;
     mVal1[blk] &= ~msk;
-    break;
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
   }
 }
 
@@ -2759,10 +2764,10 @@ BitVector::to_real() const
 }
 
 // @brief 論理値として評価する．
-// @retval kVpiScalar0 0 の時
-// @retval kVpiScalar1 0 以外の確定値の時
-// @retval kVpiScalarX 不定値を1ビットでも含む場合
-tVpiScalarVal
+// @retval VlScalarVal::zero() 0 の時
+// @retval VlScalarVal::one() 0 以外の確定値の時
+// @retval VlScalarVal::x() 不定値を1ビットでも含む場合
+VlScalarVal
 BitVector::to_logic() const
 {
   ymuint32 n = block(size());
@@ -2771,10 +2776,10 @@ BitVector::to_logic() const
     ymuint32 pat_xor = pat0 ^ mVal1[i];
     if ( pat_xor != kAll1 ) {
       // X/Z のパタンがあった
-      return kVpiScalarX;
+      return VlScalarVal::x();
     }
     if ( pat0 != kAll0 ) {
-      return kVpiScalar1;
+      return VlScalarVal::one();
     }
   }
   ymuint32 m = mask(size());
@@ -2782,12 +2787,12 @@ BitVector::to_logic() const
   ymuint32 pat_xor = (pat0 ^ mVal1[n - 1]) | ~m;
   if ( pat_xor != kAll1 ) {
     // X/Z のパタンがあった
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
   if ( pat0 != kAll0 ) {
-    return kVpiScalar1;
+    return VlScalarVal::one();
   }
-  return kVpiScalar0;
+  return VlScalarVal::zero();
 }
 
 // 値をバイトベクターと見なして文字列に変換する．
@@ -2802,7 +2807,7 @@ BitVector::to_string() const
     char c = 0;
     ymuint32 base = i << 3;
     for (ymuint32 j = 0; j < 8; ++ j) {
-      if ( value(base + j) == kVpiScalar1 ) {
+      if ( value(base + j).is_one() ) {
 	c |= (1 << j);
       }
     }
@@ -2838,11 +2843,21 @@ BitVector::verilog_string(ymuint32 opt_base) const
 
   ymuint32 l = size();
   if ( l == 1 ) {
-    switch ( value(0) ) {
-    case kVpiScalar0: ans += '0'; break;
-    case kVpiScalar1: ans += '1'; break;
-    case kVpiScalarX: ans += 'X'; break;
-    case kVpiScalarZ: ans += 'Z'; break;
+    VlScalarVal v = value(0);
+    if ( v.is_zero() ) {
+      ans += '0';
+    }
+    else if ( v.is_one() ) {
+      ans += '1';
+    }
+    else if ( v.is_x() ) {
+      ans += 'X';
+    }
+    else if ( v.is_z() ) {
+      ans += 'Z';
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
     }
   }
   else {
@@ -2922,18 +2937,28 @@ BitVector::bin_str(bool skip_zeros) const
   bool first = true;
   string ans;
   for (ymuint32 i = l; i -- > 0; ) {
-    if ( skip_zeros && value(i) == kVpiScalar0 ) {
+    VlScalarVal v = value(i);
+    if ( skip_zeros && v.is_zero() ) {
       continue;
     }
     skip_zeros = false;
     if ( i % 4 == 3 && !first ) {
       ans += '_';
     }
-    switch ( value(i) ) {
-    case kVpiScalar0: ans += '0'; break;
-    case kVpiScalar1: ans += '1'; break;
-    case kVpiScalarX: ans += 'X'; break;
-    case kVpiScalarZ: ans += 'Z'; break;
+    if ( v.is_zero() ) {
+      ans += '0';
+    }
+    else if ( v.is_one() ) {
+      ans += '1';
+    }
+    else if ( v.is_x() ) {
+      ans += 'X';
+    }
+    else if ( v.is_z() ) {
+      ans += 'Z';
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
     }
     first = false;
   }

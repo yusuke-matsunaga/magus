@@ -7,14 +7,14 @@
 ///
 /// $Id: SptUdp.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/FileRegion.h"
-
 #include "ym_verilog/pt/PtUdp.h"
 #include "ym_verilog/pt/PtDecl.h"
+#include "ym_verilog/VlUdpVal.h"
+#include "ym_utils/FileRegion.h"
 #include "PtiFwd.h"
 
 
@@ -198,7 +198,12 @@ private:
 
   // コンストラクタ
   SptUdpValue(const FileRegion& file_region,
-	      tVpiUdpVal symbol);
+	      char symbol);
+
+  // コンストラクタ
+  SptUdpValue(const FileRegion& file_region,
+	      char symbol1,
+	      char symbol2);
 
   // デストラクタ
   virtual
@@ -217,7 +222,7 @@ public:
 
   // シンボルを取り出す．
   virtual
-  tVpiUdpVal
+  VlUdpVal
   symbol() const;
 
 
@@ -230,7 +235,7 @@ private:
   FileRegion mFileRegion;
 
   // シンボル
-  tVpiUdpVal mSymbol;
+  VlUdpVal mSymbol;
 
 };
 

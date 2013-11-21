@@ -1,21 +1,20 @@
-#ifndef LIBYM_VERILOG_ELABORATOR_ELABORATOR_H
-#define LIBYM_VERILOG_ELABORATOR_ELABORATOR_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELABORATOR_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELABORATOR_H
 
 /// @file libym_verilog/elaborator/include/Elaborator.h
 /// @brief Elaborator のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Elaborator.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_verilog/verilog.h"
 #include "ym_verilog/pt/PtP.h"
 #include "ym_verilog/vl/VlFwd.h"
+#include "ym_cell/cell_nsdef.h"
 
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
 
 #include "CfDict.h"
 #include "AttrDict.h"
@@ -55,8 +54,10 @@ public:
   /// @brief コンストラクタ
   /// @param[in] elb_mgr Elbオブジェクトを管理するクラス
   /// @param[in] elb_factory Elbオブジェクトを生成するファクトリクラス
+  /// @param[in] cell_library セルライブラリ
   Elaborator(ElbMgr& elb_mgr,
-	     ElbFactory& elb_factory);
+	     ElbFactory& elb_factory,
+	     const CellLibrary* cell_library = NULL);
 
   /// @brief デストラクタ
   ~Elaborator();
@@ -120,6 +121,13 @@ private:
   find_constant_function(const VlNamedObj* parent,
 			 const char* name) const;
 
+  /// @brief セルの探索
+  /// @param[in] name セル名
+  /// @return name という名のセルを返す．
+  /// @note なければ NULL を返す．
+  const Cell*
+  find_cell(const char* name) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -174,6 +182,9 @@ private:
 
   // オブジェクト生成用のファクトリクラス
   ElbFactory& mFactory;
+
+  // セルライブラリ
+  const CellLibrary* mCellLibrary;
 
   // ElbStub 用のメモリアロケータ
   SimpleAlloc mAlloc;
@@ -236,4 +247,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELABORATOR_ELABORATOR_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELABORATOR_H

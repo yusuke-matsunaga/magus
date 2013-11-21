@@ -40,7 +40,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 // @brief コンストラクタ
 RawLex::RawLex() :
-  mInputMgr(new InputMgr(this)),
+  mInputMgr(new InputMgr(*this)),
   mDic(RsrvWordDic::the_dic()),
   mDebug(false)
 {
@@ -73,6 +73,7 @@ RawLex::~RawLex()
        p != mStates.end(); ++ p) {
     delete *p;
   }
+  delete mInputMgr;
 }
 
 // @brief 初期状態に戻す．
@@ -496,9 +497,9 @@ RawLex::push_macro(const char* name,
 
 // @brief 改行文字を読み込んだときに呼ばれる関数
 void
-RawLex::check_line()
+RawLex::check_line(ymuint line)
 {
-  mWatcherMgr.prop_event(mInputMgr->cur_file()->cur_line());
+  mWatcherMgr.prop_event(line);
 }
 
 END_NAMESPACE_YM_VERILOG

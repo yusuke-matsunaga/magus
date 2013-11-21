@@ -1,23 +1,26 @@
 
-/// @file libym_networks/BdnVerilogWriter.cc
-/// @brief ブーリアンネットワークの内容を出力する関数の実装ファイル
+/// @file BdnVerilogWriter.cc
+/// @brief BdnVerilogWriter の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BdnVerilogWriter.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_networks/BdnVerilogWriter.h"
+
 #include "ym_networks/BdnMgr.h"
 #include "ym_networks/BdnPort.h"
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/BdnDff.h"
 #include "ym_utils/NameMgr.h"
 
+#include "../verilog/VlwModule.h"
+#include "../verilog/VlwModuleHeader.h"
+#include "../verilog/VlwIO.h"
 
-BEGIN_NAMESPACE_YM_BDN
+
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 
 // @brief コンストラクタ
@@ -62,38 +65,40 @@ verilog_name(const string& name)
 }
 
 string
-node_name(const BdnNode* node)
+node_name(const BdnNode* node,
+	  bool inv)
 {
   if ( node ) {
     ostringstream buf;
+    if ( inv ) {
+      buf << "!";
+    }
     buf << "N" << node->id();
     return buf.str();
+  }
+  else if ( inv ) {
+    return "1'b1";
   }
   else {
     return "1'b0";
   }
 }
 
-const char*
-inv_to_edge(bool inv)
+string
+edge_name(const BdnNode* node,
+	  bool inv)
 {
-  if ( inv ) {
-    return "negedge";
-  }
-  else {
-    return "posedge";
-  }
-}
+  assert_cond( node != NULL, __FILE__, __LINE__);
 
-const char*
-inv_to_symbol(bool inv)
-{
+  ostringstream buf;
   if ( inv ) {
-    return "!";
+    buf << "negedge";
   }
   else {
-    return "";
+    buf << "posedge";
   }
+  buf << " N" << node->id();
+  return buf.str();
 }
 
 void
@@ -102,73 +107,100 @@ dump_port(ostream& s,
 {
   s << "." << verilog_name(port->name()) << "(";
   ymuint n = port->bit_width();
+  const char* rcb = "";
+  if ( n > 1 ) {
+    s << "{";
+    rcb = "}";
+  }
   const char* comma = "";
   for (ymuint i = 0; i < n; ++ i) {
-    BdnNode* input = port->input(i);
-    BdnNode* output = port->output(i);
+    ymuint pos = n - i - 1;
+    const BdnNode* input = port->input(pos);
+    const BdnNode* output = port->output(pos);
     s << comma;
     comma = ", ";
     if ( input ) {
-      s << node_name(input);
+      s << node_name(input, false);
     }
     else if ( output ) {
-      s << node_name(output);
+      s << node_name(output, false);
     }
     else {
       assert_not_reached(__FILE__, __LINE__);
     }
   }
-  s << ")";
+  s << rcb << ")";
 }
 
 END_NONAMESPACE
 
 
-// ブーリアンネットワークをblif形式で表示
+// ブーリアンネットワークを Verilog 形式で表示
 void
 BdnVerilogWriter::operator()(ostream& s,
 			     const BdnMgr& network)
 {
-  s << "module " << verilog_name(network.name()) << "(";
-  ymuint np = network.port_num();
-  const char* comma = "";
-  for (ymuint i = 0; i < np; ++ i) {
-    s << comma;
-    comma = ", ";
-    const BdnPort* port = network.port(i);
-    dump_port(s, port);
-  }
-  s << ");" << endl;
+  VlWriter writer(s);
 
-  for (ymuint i = 0; i < np; ++ i) {
-    const BdnPort* port = network.port(i);
-    ymuint n = port->bit_width();
-    for (ymuint j = 0; j < n; ++ j) {
-      BdnNode* input = port->input(j);
-      BdnNode* output = port->output(j);
-      if ( input ) {
-	s << "  input " << node_name(input) << ";" << endl;
+  VlwModule vlw_module(writer, network.name());
+
+  {
+    VlwModuleHeader vlw_module_header(writer);
+    ymuint np = network.port_num();
+    const char* comma = "";
+    for (ymuint i = 0; i < np; ++ i) {
+      s << comma;
+      comma = ", ";
+      const BdnPort* port = network.port(i);
+      dump_port(s, port);
+    }
+  }
+
+  const BdnNodeList& input_list = network.input_list();
+  const BdnNodeList& output_list = network.output_list();
+  const BdnDffList& dff_list = network.dff_list();
+  const BdnLatchList& latch_list = network.latch_list();
+  const BdnNodeList& lnode_list = network.lnode_list();
+
+  for (BdnNodeList::const_iterator p = input_list.begin();
+       p != input_list.end(); ++ p) {
+    const BdnNode* node = *p;
+    if ( node->input_type() == BdnNode::kPRIMARY_INPUT ) {
+      if ( node->alt_node() ) {
+	VlwInout vlw_inout(writer);
+	writer.put_elem(node_name(node, false));
       }
-      else if ( output ) {
-	s << "  output " << node_name(output) << ";" << endl;
+      else {
+	VlwInput vlw_input(writer);
+	writer.put_elem(node_name(node, false));
       }
     }
   }
 
-  const BdnDffList& dff_list = network.dff_list();
-  const BdnNodeList& lnode_list = network.lnode_list();
+  for (BdnNodeList::const_iterator p = output_list.begin();
+       p != output_list.end(); ++ p) {
+    const BdnNode* node = *p;
+    if ( node->output_type() == BdnNode::kPRIMARY_OUTPUT ) {
+      if ( node->alt_node() == NULL ) {
+	VlwOutput vlw_output(writer);
+	writer.put_elem(node_name(node, false));
+      }
+    }
+  }
 
   for (BdnNodeList::const_iterator p = lnode_list.begin();
        p != lnode_list.end(); ++ p) {
     const BdnNode* node = *p;
-    s << "  wire " << node_name(node) << ";" << endl;
+    VlwWire vlw_wire(writer);
+    writer.put_elem(node_name(node, false));
   }
 
   for (BdnDffList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
     const BdnDff* dff = *p;
     const BdnNode* node = dff->output();
-    s << "  reg " << node_name(node) << ";" << endl;
+    VlwReg vlw_reg(writer);
+    writer.put_elem(node_name(node, false));
   }
 
   for (BdnDffList::const_iterator p = dff_list.begin();
@@ -193,27 +225,26 @@ BdnVerilogWriter::operator()(ostream& s,
     bool s_inv = preset->output_fanin_inv();
 
     s << "  always @ ( "
-      << inv_to_edge(c_inv) << " " << node_name(c_node);
+      << edge_name(c_node, c_inv);
     if ( s_node ) {
-      s << " or " << inv_to_edge(s_inv) << " " << node_name(s_node);
+      s << " or " << edge_name(s_node, s_inv);
     }
     if ( r_node ) {
-      s << " or " << inv_to_edge(r_inv) << " " << node_name(r_node);
+      s << " or " << edge_name(r_node, r_inv);
     }
-    s << ") begin" << endl;
+    s << " ) begin" << endl;
     bool has_clear_preset = false;
     const char* else_str = "";
     if ( s_node ) {
-      s << "    if (" << inv_to_symbol(s_inv) << node_name(s_node)
-	<< ")" << endl
-	<< "      " << node_name(node) << " <= 1'b1;" << endl;
+      s << "    if (" << node_name(s_node, s_inv) << ")" << endl
+	<< "      " << node_name(node, false) << " <= 1'b1;" << endl;
       has_clear_preset = true;
       else_str = "else ";
     }
     if ( r_node ) {
-      s << "    " << else_str << "if ("
-	<< inv_to_symbol(r_inv) << node_name(r_node) << ")" << endl
-	<< "      " << node_name(node) << " <= 1'b0;" << endl;
+      s << "    " << else_str
+	<< "if (" << node_name(r_node, r_inv) << ")" << endl
+	<< "      " << node_name(node, false) << " <= 1'b0;" << endl;
       has_clear_preset = true;
       else_str = "else";
     }
@@ -224,9 +255,24 @@ BdnVerilogWriter::operator()(ostream& s,
     else {
       s << "    ";
     }
-    s << node_name(node) << " <= "
-      << inv_to_symbol(i_inv) << node_name(i_node) << ";" << endl
+    s << node_name(node, false) << " <= "
+      << node_name(i_node, i_inv) << ";" << endl
       << "  end" << endl;
+  }
+
+  for (BdnNodeList::const_iterator p = output_list.begin();
+       p != output_list.end(); ++ p) {
+    const BdnNode* node = *p;
+    if ( node->output_type() != BdnNode::kPRIMARY_OUTPUT ) {
+      continue;
+    }
+    if ( node->alt_node() ) {
+      node = node->alt_node();
+    }
+    const BdnNode* input = node->output_fanin();
+    bool i_inv = node->output_fanin_inv();
+    s << "  assign " << node_name(node, false) << " = "
+      << node_name(input, i_inv) << ";" << endl;
   }
 
   for (BdnNodeList::const_iterator p = lnode_list.begin();
@@ -234,17 +280,15 @@ BdnVerilogWriter::operator()(ostream& s,
     const BdnNode* node = *p;
     const BdnNode* input0 = node->fanin0();
     const BdnNode* input1 = node->fanin1();
-    string i0_str = node_name(input0);
-    string i1_str = node_name(input1);
-    const char* i0_inv = node->fanin0_inv() ? "~" : "";
-    const char* i1_inv = node->fanin1_inv() ? "~" : "";
+    bool i0_inv = node->fanin0_inv();
+    bool i1_inv = node->fanin1_inv();
     const char* op_str = node->is_xor() ? "^" : "&";
-    s << "  assign " << node_name(node) << " = "
-      << i0_inv << i0_str
+    s << "  assign " << node_name(node, false) << " = "
+      << node_name(input0, i0_inv)
       << " " << op_str << " "
-      << i1_inv << i1_str << ";" << endl;
+      << node_name(input1, i1_inv)
+      << ";" << endl;
   }
-  s << "endmodule" << endl;
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS_BDN

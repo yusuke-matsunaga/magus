@@ -5,9 +5,7 @@
 /// @brief MFSet のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MFSet.h 958 2007-08-28 05:38:02Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -22,7 +20,7 @@ class MFSetCell;
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MFSet MFSet.h <ym_utils/MFSet.h>
+/// @class MFSet MFSet.h "ym_utils/MFSet.h"
 /// @ingroup YmUtils
 /// @brief Merge/Find set を実装したクラス
 ///
@@ -32,49 +30,71 @@ class MFSetCell;
 class MFSet
 {
 public:
-  typedef unsigned int id_type;
+  //////////////////////////////////////////////////////////////////////
+  // 定数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 範囲外を表す値
+  static
+  const ymuint kBadID = static_cast<ymuint>(-1);
 
 public:
 
   /// @brief コンストラクタ
   /// @param[in] n 確保したい要素の数．
-  MFSet(size_t n);
-  
+  MFSet(ymuint n);
+
   /// @brief デストラクタ
   ~MFSet();
-  
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 要素数を返す．
+  ymuint
+  num() const;
+
   /// @brief 代表元の検索 (Find)
-  /// @param[in] x 要素番号
+  /// @param[in] x 要素番号 ( 0 <= x < num() )
   /// @retval 要素 x の属する集合の代表元
-  /// @retval 0 要素 x が存在していない場合
-  id_type
-  find(id_type x);
+  /// @retval kBadID 要素 x が存在していない場合
+  ymuint
+  find(ymuint x);
 
   /// @brief 2つの集合の併合 (Merge)
-  /// @param[in] x, y 代表元
+  /// @param[in] x, y 代表元 ( 0 <= x, y < num() )
   /// @retval 新たな代表元を返す．
-  /// @retval 0 x か y が存在していなかった
+  /// @retval kBadID x か y が存在していなかった
   /// @note 2つの代表元 x, y の表す集合を併合する．
   /// @note 実は x, y が代表元でない場合，
   /// 内部で find(x), find(y)を呼ぶので処理は行えるが，
   /// 代表元が分かっている場合にはそれを使ったほうが処理は速い．
-  id_type
-  merge(id_type x,
-	id_type y);
-  
+  ymuint
+  merge(ymuint x,
+	ymuint y);
+
 
 private:
-  
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 番号 x の要素セルを取ってくる．
   /// そのような要素がない場合にはNULLを返す．
   MFSetCell*
-  get(id_type x);
-  
+  get(ymuint x);
+
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
 
   // 配列の要素数
-  size_t mNum;
+  ymuint32 mNum;
 
   // 要素の配列
   MFSetCell* mCellArray;

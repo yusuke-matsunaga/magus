@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVNPORT_H
-#define YM_MVN_MVNPORT_H
+#ifndef YM_NETWORKS_MVNPORT_H
+#define YM_NETWORKS_MVNPORT_H
 
 /// @file ym_networks/MvnPort.h
 /// @brief MvnPort のヘッダファイル
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnPortRef MvnPort.h "ym_networks/MvnPort.h"
@@ -340,6 +340,6 @@ MvnPort::port_ref(ymuint pos) const
   return &mPortRefArray[pos];
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // YM_MVN_MVNPORT_H
+#endif // YM_NETWORKS_MVNPORT_H

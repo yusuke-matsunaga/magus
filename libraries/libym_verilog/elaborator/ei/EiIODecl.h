@@ -5,9 +5,7 @@
 /// @brief EiIODecl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiIODecl.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -42,7 +40,7 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tVpiDirection
+  tVlDirection
   direction() const;
 
   /// @brief 親のモジュールの取得
@@ -251,7 +249,7 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tVpiDirection
+  tVlDirection
   direction() const;
 
   /// @brief 符号の取得

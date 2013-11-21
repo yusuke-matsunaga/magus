@@ -1,7 +1,7 @@
-#ifndef LIBYM_MVNBDNCONV_SUBCONV_H
-#define LIBYM_MVNBDNCONV_SUBCONV_H
+#ifndef SUBCONV_H
+#define SUBCONV_H
 
-/// @file libym_networks/SubConv.h
+/// @file SubConv.h
 /// @brief SubConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class SubConv SubConv.h "SubConv.h"
@@ -51,6 +51,6 @@ public:
 };
 
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_SUBCONV_H
+#endif // SUBCONV_H

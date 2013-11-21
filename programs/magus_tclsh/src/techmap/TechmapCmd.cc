@@ -1,19 +1,16 @@
 
-/// @file magus/techmap/TechmapCmd.cc
+/// @file TechmapCmd.cc
 /// @brief TechmapCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TechmapCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "TechmapCmd.h"
-#include "LoadPatCmd.h"
 #include "AreaMapCmd.h"
 #include "DumpCnCmd.h"
-#include "DumpPatCmd.h"
+#include "ym_networks/CmnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -24,9 +21,9 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 
 // @brief コンストラクタ
 TechmapCmd::TechmapCmd(MagMgr* mgr,
-		       TechmapData* data) :
+		       CmnMgr& cmnmgr) :
   MagCmd(mgr),
-  mData(data)
+  mCmnMgr(cmnmgr)
 {
 }
 
@@ -35,18 +32,11 @@ TechmapCmd::~TechmapCmd()
 {
 }
 
-// @brief CellMap を得る．
-CellMap&
-TechmapCmd::techmap()
-{
-  return mData->mCellMap;
-}
-
 // @brief セルネットワークを得る．
-CnGraph&
-TechmapCmd::cngraph()
+CmnMgr&
+TechmapCmd::cmnmgr()
 {
-  return mData->mCnGraph;
+  return mCmnMgr;
 }
 
 END_NAMESPACE_MAGUS_TECHMAP
@@ -59,15 +49,11 @@ techmap_init(Tcl_Interp* interp,
 {
   using namespace nsTechmap;
 
-  TechmapData* data = new TechmapData;
+  CmnMgr* cmnmgr = new CmnMgr;
 
-  TclCmdBinder2<LoadPatCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
-							"magus::techmap::load_pat");
-  TclCmdBinder2<DumpPatCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
-							"magus::techmap::dump_pat");
-  TclCmdBinder2<AreaMapCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<AreaMapCmd, MagMgr*, CmnMgr&>::reg(interp, mgr, *cmnmgr,
 						       "magus::techmap::area_map");
-  TclCmdBinder2<DumpCnCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<DumpCnCmd, MagMgr*, CmnMgr&>::reg(interp, mgr, *cmnmgr,
 						       "magus::techmap::dump_cngraph");
 
 

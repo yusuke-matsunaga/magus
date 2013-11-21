@@ -344,7 +344,7 @@ public:
   /// @param[in] direction 向き
   void
   put(const char* label,
-      tVpiDirection direction);
+      tVlDirection direction);
 
   /// @brief const type を出力する関数
   /// @param[in] label ラベル
@@ -372,7 +372,7 @@ public:
   /// @param[in] op_type 演算子の種類
   void
   put(const char* label,
-      tVpiOpType op_type);
+      tVlOpType op_type);
 
   /// @brief strength を出力する関数
   /// @param[in] label ラベル
@@ -430,7 +430,7 @@ public:
   /// @param[in] val スカラー値
   void
   put(const char* label,
-      tVpiScalarVal val);
+      const VlScalarVal& val);
 
   /// @brief time値の出力
   /// @param[in] label ラベル

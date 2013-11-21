@@ -1,7 +1,7 @@
-#ifndef LIBYM_MVNBDNCONV_CONSTBITSELECTCONV_H
-#define LIBYM_MVNBDNCONV_CONSTBITSELECTCONV_H
+#ifndef CONSTBITSELECTCONV_H
+#define CONSTBITSELECTCONV_H
 
-/// @file libym_networks/ConstBitSelectConv.h
+/// @file ConstBitSelectConv.h
 /// @brief ConstBitSelectConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class ConstBitSelectConv ConstBitSelectConv.h "ConstBitSelectConv.h"
@@ -50,6 +50,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_CONSTBITSELECTCONV_H
+#endif // CONSTBITSELECTCONV_H

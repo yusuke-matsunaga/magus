@@ -7,22 +7,68 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+AM_YFLAGS = -d -v
 
-CLEANFILES =
+CLEANFILES = \
+	mislib_grammer.cc \
+	mislib_grammer.hh \
+	y.output \
+	mislib_grammer.output
 
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## Variables for building targets
+############################################################
+
 noinst_LTLIBRARIES = libym_cell_mislib.la
 
-libym_cell_mislib_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_mislib/libym_mislib.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_cell_mislib_la_LDFLAGS =
+############################################################
+## Variables for building libym_cell_mislib.la
+############################################################
+
+libym_cell_mislib_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_cell_mislib_la_SOURCES = \
-	CellMislibReader.cc
+	CellMislibReader.cc \
+	mislib_nsdef.h \
+	mislib_grammer.yy \
+	MislibScanner.h \
+	MislibScanner.cc \
+	MislibMgr.h \
+	MislibMgr.cc \
+	MislibMgrImpl.h \
+	MislibMgrImpl.cc \
+	MislibParser.h \
+	MislibParser.cc \
+	MislibParserImpl.h \
+	MislibParserImpl.cc \
+	MislibNode.h \
+	MislibNodeImpl.h \
+	MislibNodeImpl.cc \
+	MislibNum.h \
+	MislibNum.cc \
+	MislibStr.h \
+	MislibStr.cc \
+	MislibSymbol.h \
+	MislibSymbol.cc \
+	MislibConst.h \
+	MislibConst.cc \
+	MislibList.h \
+	MislibList.cc \
+	MislibNot.h \
+	MislibNot.cc \
+	MislibBop.h \
+	MislibBop.cc \
+	MislibGate.h \
+	MislibGate.cc \
+	MislibPin.h \
+	MislibPin.cc
+
+libym_cell_mislib_la_LIBADD =
+
+libym_cell_mislib_la_LDFLAGS =

@@ -5,9 +5,7 @@
 /// @brief Dfs のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Matrix.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -44,19 +42,19 @@ struct DfsNode
 
   // 遷移元のリスト
   vector<DfsNode*> mFromList;
-  
+
   // 同じ強連結成分をつなぐリンク
   DfsNode* mLink;
 
   // ヒープ用の値
   ymuint32 mCost;
-  
+
   // ヒープ上の位置
   ymuint32 mHeapPos;
 
   // 選ばれたかどうかを表すフラグ
   bool mSelected;
-  
+
 };
 
 
@@ -75,7 +73,7 @@ public:
   /// @brief デストラクタ
   ~Dfs();
 
-  
+
 public:
 
   /// @biref ノードの接続関係を設定する．
@@ -123,13 +121,13 @@ private:
 
   // 代表ノードを収める配列
   vector<DfsNode*> mRepNodes;
-  
+
   // カウント値
   ymuint32 mCount;
 
   // ノードスタック
   vector<DfsNode*> mStack;
-  
+
 };
 
 
@@ -150,7 +148,7 @@ public:
 
 
 public:
-  
+
   /// @brief 要素が空の時 true を返す．
   bool
   empty() const;
@@ -189,7 +187,7 @@ private:
 
   // ヒープ木本体
   vector<DfsNode*> mArray;
-  
+
 };
 
 END_NAMESPACE_YM_SEAL

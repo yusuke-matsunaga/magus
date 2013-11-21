@@ -7,7 +7,7 @@
 ///
 /// $Id: VlStmt.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,7 +18,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlStmt VlStmt.h "VlStmt.h"
+/// @class VlStmt VlStmt.h "ym_verilog/vl/VlStmt.h"
 /// @brief エラボレーション中の statement を表す基底クラス
 /// IEEE Std 1364-2001 26.6.27 Process, block, statement, event statement
 /// IEEE Std 1364-2001 26.6.28 Assignment
@@ -193,9 +193,10 @@ public:
   caseitem_num() const = 0;
 
   /// @brief case item の取得
-  /// @param[in] pos 位置番号 (0 <= pos < caseitem_num())
+  /// @param[in] pos 位置番号 ( 0 <= pos < caseitem_num() )
   /// @note この関数が意味を持つオブジェクトの型
   ///  - kVpiCase
+  /// @note default caseitem がある場合には常に最後の要素となる．
   virtual
   const VlCaseItem*
   caseitem(ymuint pos) const = 0;
@@ -239,7 +240,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlCaseItem VlStmt.h "VlStmt.h"
+/// @class VlCaseItem VlStmt.h "ym_verilog/vl/VlStmt.h"
 /// @brief caes item を表すクラス
 /// IEEE Std 1364-2001 26.6.36 Case
 //////////////////////////////////////////////////////////////////////
@@ -258,12 +259,13 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 条件式のリストの要素数を返す．
+  /// @note 通常は1以上だが default caseitem の場合は0を返す．
   virtual
   ymuint
   expr_num() const = 0;
 
   /// @brief 条件式を返す．
-  /// @param[in] pos 位置番号
+  /// @param[in] pos 位置番号 ( 0 <= pos < expr_num() )
   virtual
   const VlExpr*
   expr(ymuint pos) const = 0;

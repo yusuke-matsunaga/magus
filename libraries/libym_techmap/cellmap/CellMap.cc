@@ -8,47 +8,23 @@
 
 
 #include "ym_techmap/CellMap.h"
-#include "CellMgr.h"
 #include "AreaCover.h"
-#include "libdump/LibDump.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
 
 // @brief コンストラクタ
-CellMap::CellMap() :
-  mCellMgr(new CellMgr)
+CellMap::CellMap()
 {
 }
 
 // @brief デストラクタ
 CellMap::~CellMap()
 {
-  delete mCellMgr;
-}
-
-// @brief セルライブラリのデータを読み込んでセットする．
-// @param[in] s 入力元のストリーム
-// @retval true 読み込みが成功した．
-// @retval false 読み込みが失敗した．
-bool
-CellMap::load_library(istream& s)
-{
-  return mCellMgr->load_library(s);
-}
-
-// @brief セルライブラリの内容(+パタングラフ)をバイナリファイルに書き出す．
-void
-CellMap::dump_library(ostream& s,
-		      const CellLibrary& library)
-{
-  using nsLibDump::LibDump;
-
-  LibDump libdump;
-  libdump.dump(s, library);
 }
 
 // @brief 面積最小化 DAG covering のヒューリスティック関数
+// @param[in] cell_library セルライブラリ
 // @param[in] sbjgraph サブジェクトグラフ
 // @param[in] mode モード
 //  - 0: fanout フロー, resub なし
@@ -57,13 +33,14 @@ CellMap::dump_library(ostream& s,
 //  - 3: weighted フロー, resub あり
 // @param[out] mapnetwork マッピング結果
 void
-CellMap::area_map(const BdnMgr& sbjgraph,
+CellMap::area_map(const CellLibrary& cell_library,
+		  const BdnMgr& sbjgraph,
 		  ymuint mode,
-		  CnGraph& mapnetwork)
+		  CmnMgr& mapnetwork)
 {
   AreaCover area_cover;
 
-  area_cover(sbjgraph, *mCellMgr, mapnetwork);
+  area_cover(sbjgraph, cell_library, mapnetwork);
 }
 
 END_NAMESPACE_YM_CELLMAP

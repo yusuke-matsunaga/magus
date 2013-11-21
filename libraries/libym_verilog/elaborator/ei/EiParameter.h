@@ -5,9 +5,7 @@
 /// @brief EiParameter のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiParameter.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -56,11 +54,13 @@ public:
   parent() const;
 
   /// @brief 符号の取得
+  /// @param[in] val 値
   /// @retval true 符号つき
   /// @retval false 符号なし
+  /// @note ヘッダに型指定がない時は値から情報を得る．
   virtual
   bool
-  is_signed() const;
+  is_signed(const VlValue& val) const;
 
   /// @brief 範囲指定を持つとき true を返す．
   virtual
@@ -102,28 +102,46 @@ public:
   is_little_endian() const;
 
   /// @brief ビット幅を返す．
+  /// @param[in] val 値
+  /// @note ヘッダに型指定がない時は値から情報を得る．
   virtual
   ymuint
-  bit_size() const;
+  bit_size(const VlValue& val) const;
 
-  /// @brief LSB からのオフセット値の取得
+  /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @param[in] val 値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
+  /// @note ヘッダに型指定がない時は値から情報を得る．
   virtual
-  int
-  bit_offset(int index) const;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset,
+		  const VlValue& val) const;
 
   /// @breif 値の型を返す．
-  /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
+  /// @param[in] val 値
+  /// @note ヘッダに型指定がない時は値から情報を得る．
   virtual
-  tVpiValueType
-  value_type() const;
+  VlValueType
+  value_type(const VlValue& val) const;
 
   /// @brief データ型の取得
   virtual
   tVpiVarType
   data_type() const;
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief パース木の宣言ヘッダを返す．
+  const PtDeclHead*
+  pt_head() const;
 
 
 private:
@@ -175,6 +193,15 @@ public:
   // 継承クラスに共通な仮想関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 符号の取得
+  /// @param[in] val 値
+  /// @retval true 符号つき
+  /// @retval false 符号なし
+  /// @note ヘッダに型指定がない時は値から情報を得る．
+  virtual
+  bool
+  is_signed(const VlValue& val) const;
+
   /// @brief 範囲指定を持つとき true を返す．
   virtual
   bool
@@ -215,22 +242,30 @@ public:
   is_little_endian() const;
 
   /// @brief ビット幅を返す．
+  /// @param[in] val 値
+  /// @note ヘッダに型指定がない時は値から情報を得る．
   ymuint
-  bit_size() const;
+  bit_size(const VlValue& val) const;
 
-  /// @brief LSB からのオフセット値の取得
+  /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @param[in] val 値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
+  /// @note ヘッダに型指定がない時は値から情報を得る．
   virtual
-  int
-  bit_offset(int index) const;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset,
+		  const VlValue& val) const;
 
   /// @breif 値の型を返す．
-  /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
+  /// @param[in] val 値
+  /// @note ヘッダに型指定がない時は値から情報を得る．
   virtual
-  tVpiValueType
-  value_type() const;
+  VlValueType
+  value_type(const VlValue& val) const;
 
 
 protected:
@@ -306,7 +341,7 @@ public:
   /// @breif 値の型を返す．
   /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 符号の取得
@@ -362,11 +397,13 @@ public:
 
   /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index のオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
   virtual
-  int
-  bit_offset(int index) const;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset) const;
 
   /// @brief データ型の取得
   /// @retval データ型 kParam, kLocalParam, kVar の場合

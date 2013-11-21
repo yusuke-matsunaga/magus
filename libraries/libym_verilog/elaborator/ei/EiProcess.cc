@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/elb_impl/EiProcess.cc
+/// @file libym_verilog/elaborator/ei/EiProcess.cc
 /// @brief EiProcess の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiProcess.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -21,7 +19,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief プロセス文を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_item パース木の要素定義

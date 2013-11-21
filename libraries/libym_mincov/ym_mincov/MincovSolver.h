@@ -4,10 +4,8 @@
 /// @file ym_mincov/MincovSolver.h
 /// @brief MincovSolver のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: MincovSolver.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,7 +17,7 @@ BEGIN_NAMESPACE_YM_MINCOV
 class MincovCost;
 
 //////////////////////////////////////////////////////////////////////
-/// @class MincovSolver MincovSolver.h <ym_mincov/MincovSolver.h>
+/// @class MincovSolver MincovSolver.h "ym_mincov/MincovSolver.h"
 /// @brief 最小被覆問題を解くクラス
 //////////////////////////////////////////////////////////////////////
 class MincovSolver
@@ -28,13 +26,13 @@ public:
 
   /// @brief コンストラクタ
   MincovSolver();
-  
+
   /// @brief デストラクタ
   ~MincovSolver();
 
 
 public:
-  
+
   /// @brief 最小被覆問題を解く．
   /// @param[in] matrix 対象の行列
   /// @param[out] solution 選ばれた列集合
@@ -43,9 +41,9 @@ public:
   operator()(const MincovMatrix& matrix,
 	     vector<ymuint32>& solution);
 
-  
+
 private:
-  
+
   /// @brief 解を求める再帰関数
   /// @param[in] matrix 対象の行列
   /// @param[in] best_sofar 現時点の最良解
@@ -61,14 +59,14 @@ private:
   /// @return 下限値
   MincovCost
   lower_bound(MincovMatrix& matrix);
-  
+
   /// @brief 簡単化を行う．
   /// @param[in] matrix 対象の行列
   /// @param[out] selected_cols 簡単化中で選択された列の集合
   void
   reduce(MincovMatrix& matrix,
 	 vector<ymuint32>& selected_cols);
-  
+
   /// @brief 行支配を探し，行を削除する．
   /// @param[in] matrix 対象の行列
   /// @return 削除された行があったら true を返す．
@@ -89,12 +87,12 @@ private:
   essential_col(MincovMatrix& matrix,
 		vector<ymuint32>& selected_cols);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
 };
 
 

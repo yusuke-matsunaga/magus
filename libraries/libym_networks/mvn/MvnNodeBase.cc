@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnNodeBase.cc
+/// @file MvnNodeBase.cc
 /// @brief MvnNodeBase の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,7 +11,7 @@
 #include "ym_networks/MvnMgr.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvnNodeBase
@@ -24,20 +24,14 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] output_num 出力数
 MvnNodeBase::MvnNodeBase(MvnModule* parent,
 			 tType type,
-			 ymuint input_num,
-			 ymuint output_num) :
+			 ymuint input_num) :
   MvnNode(parent),
   mType(type),
   mInputNum(input_num),
-  mInputArray(new MvnInputPin[input_num]),
-  mOutputNum(output_num),
-  mOutputArray(new MvnOutputPin[output_num])
+  mInputArray(new MvnInputPin[input_num])
 {
   for (ymuint i = 0; i < input_num; ++ i) {
     mInputArray[i].init(this, i);
-  }
-  for (ymuint i = 0; i < output_num; ++ i) {
-    mOutputArray[i].init(this, i);
   }
 }
 
@@ -78,29 +72,109 @@ MvnNodeBase::_input(ymuint pos)
   return mInputArray + pos;
 }
 
-// @brief 出力ピン数を得る．
+// @brief クロック信号の極性を得る．
+// @retval 1 正極性(posedge)
+// @retval 0 負極性(negedge)
+// @note type() が kDff の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
 ymuint
-MvnNodeBase::output_num() const
+MvnNodeBase::clock_pol() const
 {
-  return mOutputNum;
+  return 0;
 }
 
-// @brief 出力ピンを得る．
-// @param[in] pos 位置 ( 0 <= pos < output_num() )
-const MvnOutputPin*
-MvnNodeBase::output(ymuint pos) const
+// @brief 非同期セット信号の極性を得る．
+// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
+// @retval 1 正極性(posedge)
+// @retval 0 負極性(negedge)
+// @note type() が kDff の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvnNodeBase::control_pol(ymuint pos) const
 {
-  assert_cond( pos < mOutputNum, __FILE__, __LINE__);
-  return mOutputArray + pos;
+  return 0;
 }
 
-// @brief 出力ピンを得る．
-// @param[in] pos 位置 ( 0 <= pos < output_num() )
-MvnOutputPin*
-MvnNodeBase::_output(ymuint pos)
+// @brief 非同期セットの値を表す定数ノードを得る．
+// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
+// @note デフォルトの実装では NULL を返す．
+const MvnNode*
+MvnNodeBase::control_val(ymuint pos) const
 {
-  assert_cond( pos < mOutputNum, __FILE__, __LINE__);
-  return mOutputArray + pos;
+  return NULL;
+}
+
+// @brief ビット位置を得る．
+// @note type() が kConstBitSelect の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvnNodeBase::bitpos() const
+{
+  return 0;
+}
+
+// @brief 範囲指定の MSB を得る．
+// @note type() が kConstPartSelect の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvnNodeBase::msb() const
+{
+  return 0;
+}
+
+// @brief 範囲指定の LSB を得る．
+// @note type() が kConstPartSelect の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvnNodeBase::lsb() const
+{
+  return 0;
+}
+
+// @brief 定数値を得る．
+// @param[out] val 値を格納するベクタ
+// @note type() が kConst の時のみ意味を持つ．
+// @note デフォルトの実装ではなにもしない．
+void
+MvnNodeBase::const_value(vector<ymuint32>& val) const
+{
+}
+
+// @brief Xマスクを得る．
+// @param[out] val 値を格納するベクタ
+// @note type() が kEqX の時のみ意味を持つ．
+// @note デフォルトの実装ではなにもしない．
+void
+MvnNodeBase::xmask(vector<ymuint32>& val) const
+{
+}
+
+// @brief セルを得る．
+// @note type() が kCell の時のみ意味をモツ．
+// @note デフォルトの実装では NULL を返す．
+const Cell*
+MvnNodeBase::cell() const
+{
+  return NULL;
+}
+
+// @brief セルの出力ピン番号を返す．
+// @note type() が kCell の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvnNodeBase::cell_opin_pos() const
+{
+  return 0;
+}
+
+// @brief 多出力セルノードの場合の代表ノードを返す．
+// @note type() が kCell の時のみ意味を持つ．
+// @note 1出力セルノードの時には自分自身を返す．
+// @note デフォルトの実装では NULL を返す．
+const MvnNode*
+MvnNodeBase::cell_node() const
+{
+  return NULL;
 }
 
 
@@ -115,9 +189,9 @@ MvnNode*
 MvnMgr::new_input(MvnModule* module,
 		  ymuint bit_width)
 {
-  MvnNode* node = new MvnNodeBase(module, MvnNode::kInput, 0, 1);
+  MvnNode* node = new MvnNodeBase(module, MvnNode::kInput, 0);
   reg_node(node);
-  node->_output(0)->mBitWidth = bit_width;
+  node->mBitWidth = bit_width;
   return node;
 }
 
@@ -568,11 +642,11 @@ MvnMgr::new_unary_op(MvnModule* module,
 		     ymuint bit_width1,
 		     ymuint bit_width2)
 {
-  MvnNode* node = new MvnNodeBase(module, type, 1, 1);
+  MvnNode* node = new MvnNodeBase(module, type, 1);
   reg_node(node);
 
   node->_input(0)->mBitWidth = bit_width1;
-  node->_output(0)->mBitWidth = bit_width2;
+  node->mBitWidth = bit_width2;
 
   return node;
 }
@@ -590,12 +664,12 @@ MvnMgr::new_binary_op(MvnModule* module,
 		      ymuint bit_width2,
 		      ymuint bit_width3)
 {
-  MvnNode* node = new MvnNodeBase(module, type, 2, 1);
+  MvnNode* node = new MvnNodeBase(module, type, 2);
   reg_node(node);
 
   node->_input(0)->mBitWidth = bit_width1;
   node->_input(1)->mBitWidth = bit_width2;
-  node->_output(0)->mBitWidth = bit_width3;
+  node->mBitWidth = bit_width3;
 
   return node;
 }
@@ -615,13 +689,13 @@ MvnMgr::new_ternary_op(MvnModule* module,
 		       ymuint bit_width3,
 		       ymuint bit_width4)
 {
-  MvnNode* node = new MvnNodeBase(module, type, 3, 1);
+  MvnNode* node = new MvnNodeBase(module, type, 3);
   reg_node(node);
 
   node->_input(0)->mBitWidth = bit_width1;
   node->_input(1)->mBitWidth = bit_width2;
   node->_input(2)->mBitWidth = bit_width3;
-  node->_output(0)->mBitWidth = bit_width4;
+  node->mBitWidth = bit_width4;
 
   return node;
 }
@@ -638,16 +712,16 @@ MvnMgr::new_nary_op(MvnModule* module,
 		    ymuint obit_width)
 {
   ymuint ni = ibit_width_array.size();
-  MvnNode* node = new MvnNodeBase(module, type, ni, 1);
+  MvnNode* node = new MvnNodeBase(module, type, ni);
   reg_node(node);
 
   for (ymuint i = 0; i < ni; ++ i) {
     node->_input(i)->mBitWidth = ibit_width_array[i];
   }
-  node->_output(0)->mBitWidth = obit_width;
+  node->mBitWidth = obit_width;
 
   return node;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN
 

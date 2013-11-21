@@ -5,9 +5,7 @@
 /// @brief RandGen のヘッダファイル
 /// @author Yusuke Matsunaga
 ///
-/// $Id: RandGen.h 1978 2009-02-06 12:29:16Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -16,19 +14,18 @@
 
 BEGIN_NAMESPACE_YM
 
-
 //////////////////////////////////////////////////////////////////////
-/// @class RandGen RandGen.h <ym_utils/RandGen.h>
+/// @class RandGen RandGen.h "ym_utils/RandGen.h"
 /// @ingroup YmUtils
 /// @brief MT19937 を利用した乱数生成器
-/// 
+///
 /// @note もとは MT19937 のコードを流用している．
 /// 以下，原文
 ///
 /// A C-program for MT19937, with initialization improved 2002/1/26.
 /// Coded by Takuji Nishimura and Makoto Matsumoto.
 ///
-/// Before using, initialize the state by using init_genrand(seed)  
+/// Before using, initialize the state by using init_genrand(seed)
 /// or init_by_array(init_key, key_length).
 ///
 /// Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
@@ -47,8 +44,8 @@ BEGIN_NAMESPACE_YM
 ///      notice, this list of conditions and the following disclaimer in the
 ///      documentation and/or other materials provided with the distribution.
 ///
-///   3. The names of its contributors may not be used to endorse or promote 
-///      products derived from this software without specific prior written 
+///   3. The names of its contributors may not be used to endorse or promote
+///      products derived from this software without specific prior written
 ///      permission.
 ///
 /// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -78,6 +75,9 @@ public:
   /// @brief デストラクタ
   ~RandGen();
 
+
+public:
+
   /// @brief シードで初期化する．
   /// @param[in] s シード
   /// @note 以下，原文\n
@@ -95,8 +95,8 @@ public:
   /// slight change for C++, 2004/2/26
   void
   init_by_array(ymuint32 init_key[],
-		size_t key_length);
-  
+		ymuint key_length);
+
   /// @brief 32ビット符号無し整数の乱数を発生させる．
   /// @note 以下，原文\n
   /// generates a random number on [0,0xffffffff]-interval
@@ -112,7 +112,7 @@ public:
   /// @brief unsigned long の整数の乱数を発生させる．
   ymulong
   ulong();
-  
+
   /// @brief [0,1]の区間の実数の乱数を発生させる．
   /// @note 以下，原文\n
   /// These real versions are due to Isaku Wada, 2002/01/09 added
@@ -145,9 +145,9 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   static
-  const size_t N = 624;
+  const ymuint32 N = 624;
   static
-  const size_t M = 397;
+  const ymuint32 M = 397;
   static
   const ymuint32 MATRIX_A = 0x9908b0dfUL;   // constant vector a
   static
@@ -165,111 +165,8 @@ private:
   ymuint32 mV[N];
 
   // 状態ベクタのインデックス
-  size_t mIdx;
+  ymuint32 mIdx;
 
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class RandPermGen RandGen.h <ym_utils/RandGen.h>
-/// @brief ランダムな順列を作るクラス
-//////////////////////////////////////////////////////////////////////
-class RandPermGen
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] n 要素数
-  RandPermGen(size_t n);
-
-  /// @brief デストラクタ
-  ~RandPermGen();
-
-
-public:
-  
-  /// @brief 要素数を返す．
-  size_t
-  num() const;
-  
-  /// @brief ランダムな順列を生成する．
-  /// @param[in] randgen 乱数発生器
-  void
-  generate(RandGen& randgen);
-
-  /// @brief 順列の要素を取り出す．
-  /// @param[in] pos 要素の位置番号 ( 0 <= pos < num() )
-  ymuint32
-  elem(size_t pos) const;
-
-  
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-  
-  // 要素数
-  size_t mNum;
-  
-  // 現在の順列
-  ymuint32* mArray;
-  
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class RandCombiGen RandGen.h <ym_utils/RandGen.h>
-/// @brief ランダムな組み合わせを作るクラス
-//////////////////////////////////////////////////////////////////////
-class RandCombiGen
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] n 全要素数
-  /// @param[in] k 組み合わせの要素数
-  RandCombiGen(size_t n,
-	       size_t k);
-
-  /// @brief デストラクタ
-  ~RandCombiGen();
-
-
-public:
-  
-  /// @brief 全要素数を返す．
-  size_t
-  num() const;
-  
-  /// @brief 組み合わせの要素数を返す．
-  size_t
-  combi_num() const;
-  
-  /// @brief ランダムな組み合わせを生成する．
-  /// @param[in] randgen 乱数発生器
-  void
-  generate(RandGen& randgen);
-
-  /// @brief 組み合わせの要素を取り出す．
-  /// @param[in] pos 要素の位置番号 ( 0 <= pos < combi_num() )
-  ymuint32
-  elem(size_t pos) const;
-
-  
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-  
-  // 要素数
-  size_t mNum;
-  
-  // 組み合わせの要素数
-  size_t mCombiNum;
-  
-  // 現在の順列
-  ymuint32* mArray;
-  
 };
 
 
@@ -290,8 +187,8 @@ inline
 double
 RandGen::real1()
 {
-  return int32() * (1.0 / 4294967295.0); 
-  /* divided by 2^32-1 */ 
+  return int32() * (1.0 / 4294967295.0);
+  /* divided by 2^32-1 */
 }
 
 // @brief [0,1)の区間の実数の乱数を発生させる．
@@ -299,7 +196,7 @@ inline
 double
 RandGen::real2()
 {
-  return int32() * (1.0 / 4294967296.0); 
+  return int32() * (1.0 / 4294967296.0);
   /* divided by 2^32 */
 }
 
@@ -308,19 +205,19 @@ inline
 double
 RandGen::real3()
 {
-  return ((static_cast<double>(int32())) + 0.5) * (1.0 / 4294967296.0); 
+  return ((static_cast<double>(int32())) + 0.5) * (1.0 / 4294967296.0);
   /* divided by 2^32 */
 }
 
 // @brief [0,1)の区間の53ビットの実数の乱数を発生させる．
 inline
 double
-RandGen::res53() 
-{ 
+RandGen::res53()
+{
   unsigned long a = int32() >> 5;
-  unsigned long b = int32() >> 6; 
-  return (a * 67108864.0 + b) * (1.0 / 9007199254740992.0); 
-} 
+  unsigned long b = int32() >> 6;
+  return (a * 67108864.0 + b) * (1.0 / 9007199254740992.0);
+}
 
 END_NAMESPACE_YM
 

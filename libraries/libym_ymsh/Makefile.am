@@ -18,12 +18,6 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_ymsh.la
 
-libym_ymsh_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-
-libym_ymsh_la_LDFLAGS = \
-	-lreadline
-
 libym_ymsh_la_SOURCES = \
 	Ymsh.cc \
 	YmshImpl.h \
@@ -42,3 +36,7 @@ libym_ymsh_la_SOURCES = \
 	DirCmd.h \
 	DirCmd.cc
 
+libym_ymsh_la_LIBADD =
+
+libym_ymsh_la_LDFLAGS = \
+	-lreadline -lncurses

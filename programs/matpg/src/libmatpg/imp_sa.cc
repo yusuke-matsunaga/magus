@@ -12,15 +12,15 @@
  * Final , Final revision
  *
  * Revision 2.2  91/12/24  14:40:49  yusuke
- * 
+ *
  * a little bit modification
- * 
+ *
  * Revision 2.1  91/12/23  23:11:27  yusuke
  * a slightly speed-up
- * 
+ *
  * Revision 2.0  91/12/21  18:52:03  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.5  1991/10/05  08:18:18  yusuke
  * add Log and RCSid for RCS
  *
@@ -57,7 +57,7 @@ sa_node::fwd_imp_g(val3 i_val)
       pgraph_add_indif(this);
     }
     if (is_po() == false) {
-      get_act_fogate(0)->fwd_imp_g(i_val);
+      get_act_fanout_gate(0)->fwd_imp_g(i_val);
     }
   }
   else if (val != i_val) {
@@ -86,7 +86,7 @@ sa_node::fwd_imp_f(val3 i_val)
 #endif
     set_fjval(sa_val);
     if (is_po() == false) {
-      get_act_fogate(0)->fwd_imp_f(sa_val);
+      get_act_fanout_gate(0)->fwd_imp_f(sa_val);
     }
   }
 
@@ -112,7 +112,7 @@ sa_node::bwd_imp_g(val3 o_val,
 #endif
     save_value(this);
     set_gval(o_val);
-    get_figate(0)->bwd_imp_g(o_val, this);
+    get_fanin_gate(0)->bwd_imp_g(o_val, this);
     if (o_val == sa_val) {
       pgraph_add_indif(this);
     }

@@ -12,6 +12,8 @@
 #include "PtiDecl.h"
 #include "PtiExpr.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -44,7 +46,7 @@ Parser::new_Port1(const FileRegion& file_region)
     add_port( mFactory.new_Port(file_region, portref, name) );
   }
   else {
-    PtExprArray portref_array = to_array(&mPortRefList);
+    PtExprArray portref_array = mPortRefList.to_array(mAlloc);
     const PtExpr* portref = mFactory.new_Concat(file_region, portref_array);
     add_port( mFactory.new_Port(file_region, portref, portref_array, NULL) );
   }
@@ -72,7 +74,7 @@ Parser::new_Port3(const FileRegion& file_region,
     mPortRefList.clear();
   }
   else {
-    PtExprArray portref_array = to_array(&mPortRefList);
+    PtExprArray portref_array = mPortRefList.to_array(mAlloc);
     const PtExpr* portref = mFactory.new_Concat(file_region, portref_array);
     add_port( mFactory.new_Port(file_region, portref, portref_array, name) );
   }
@@ -90,6 +92,32 @@ Parser::add_port(PtiPort* port)
 //////////////////////////////////////////////////////////////////////
 // PtiPortArray の生成
 //////////////////////////////////////////////////////////////////////
+
+// @brief 入出力宣言中の重複チェックを行う．
+bool
+Parser::check_PortArray(PtIOHeadArray iohead_array)
+{
+  hash_set<string> portref_dic;
+  for (ymuint i = 0; i < iohead_array.size(); ++ i) {
+    const PtIOHead* head = iohead_array[i];
+    for (ymuint j = 0; j < head->item_num(); ++ j) {
+      const PtIOItem* elem = head->item(j);
+      string name = elem->name();
+      if ( portref_dic.count(name) > 0 ) {
+	ostringstream buf;
+	buf << "\"" << name << "\" is redefined.";
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			elem->file_region(),
+			kMsgError,
+			"ELAB",
+			buf.str());
+	return false;
+      }
+      portref_dic.insert(name);
+    }
+  }
+  return true;
+}
 
 // @brief 入出力宣言からポートを作る．
 PtiPortArray
@@ -111,7 +139,16 @@ Parser::new_PortArray(PtIOHeadArray iohead_array)
       const PtIOItem* elem = head->item(j);
       const char* name = elem->name();
       const PtExpr* portref = mFactory.new_Primary(elem->file_region(), name);
-      array[n] = mFactory.new_Port(elem->file_region(), portref, name);
+      PtiPort* port = mFactory.new_Port(elem->file_region(), portref, name);
+      tVlDirection dir;
+      switch ( head->type() ) {
+      case kPtIO_Input:  dir = kVlInput; break;
+      case kPtIO_Output: dir = kVlOutput; break;
+      case kPtIO_Inout:  dir = kVlInout; break;
+      default: assert_not_reached(__FILE__, __LINE__);
+      }
+      port->_set_portref_dir(0, dir);
+      array[n] = port;
       ++ n;
     }
   }

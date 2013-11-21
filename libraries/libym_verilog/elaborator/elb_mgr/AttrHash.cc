@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 // @brief コンストラクタ
 // @param[in] alloc メモリ確保用のアロケータ
-AttrHash::AttrHash(AllocBase& alloc) :
+AttrHash::AttrHash(Alloc& alloc) :
   mAlloc(alloc),
   mNum(0)
 {

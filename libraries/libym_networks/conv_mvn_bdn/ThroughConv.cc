@@ -1,9 +1,9 @@
 
-/// @file libym_networks/ThroughConv.cc
+/// @file ThroughConv.cc
 /// @brief ThroughConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,7 +14,7 @@
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 // @brief コンストラクタ
 ThroughConv::ThroughConv()
@@ -39,9 +39,9 @@ ThroughConv::operator()(const MvnNode* node,
 {
   if ( node->type() == MvnNode::kThrough ) {
     const MvnInputPin* ipin = node->input(0);
-    const MvnOutputPin* opin = ipin->src_pin();
-    const MvnNode* src_node = opin->node();
-    ymuint bw = opin->bit_width();
+    const MvnNode* src_node = ipin->src_node();
+    ymuint bw = src_node->bit_width();
+    assert_cond( node->bit_width(), __FILE__, __LINE__);
     for (ymuint i = 0; i < bw; ++ i) {
       BdnNodeHandle handle = nodemap.get(src_node, i);
       nodemap.put(node, i, handle);
@@ -51,4 +51,4 @@ ThroughConv::operator()(const MvnNode* node,
   return false;
 }
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV

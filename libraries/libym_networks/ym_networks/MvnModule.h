@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVNMODULE_H
-#define YM_MVN_MVNMODULE_H
+#ifndef YM_NETWORKS_MVNMODULE_H
+#define YM_NETWORKS_MVNMODULE_H
 
 /// @file ym_networks/MvnModule.h
 /// @brief MvnModule のヘッダファイル
@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_utils/ItvlMgr.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnModule MvnModule.h "ym_networks/MvnModule.h"
@@ -82,15 +82,15 @@ public:
   node_num() const;
 
   /// @brief 内部ノードのリストを得る．
-  const list<MvnNode*>&
+  const MvnNodeList&
   node_list() const;
 
   /// @brief 内部ノードのリストの先頭の反復子を得る．
-  list<MvnNode*>::const_iterator
+  MvnNodeList::const_iterator
   nodes_begin() const;
 
   /// @brief 内部ノードのリストの末尾の反復子を得る．
-  list<MvnNode*>::const_iterator
+  MvnNodeList::const_iterator
   nodes_end() const;
 
 
@@ -142,7 +142,7 @@ private:
   vector<MvnNode*> mInoutArray;
 
   // 内部ノードのリスト
-  list<MvnNode*> mNodeList;
+  MvnNodeList mNodeList;
 
 };
 
@@ -254,7 +254,7 @@ MvnModule::node_num() const
 
 // @brief 内部ノードのリストを得る．
 inline
-const list<MvnNode*>&
+const MvnNodeList&
 MvnModule::node_list() const
 {
   return mNodeList;
@@ -262,7 +262,7 @@ MvnModule::node_list() const
 
 // @brief 内部ノードのリストの先頭の反復子を得る．
 inline
-list<MvnNode*>::const_iterator
+MvnNodeList::const_iterator
 MvnModule::nodes_begin() const
 {
   return mNodeList.begin();
@@ -270,12 +270,12 @@ MvnModule::nodes_begin() const
 
 // @brief 内部ノードのリストの末尾の反復子を得る．
 inline
-list<MvnNode*>::const_iterator
+MvnNodeList::const_iterator
 MvnModule::nodes_end() const
 {
   return mNodeList.end();
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // YM_MVN_MVNMODULE_H
+#endif // YM_NETWORKS_MVNMODULE_H

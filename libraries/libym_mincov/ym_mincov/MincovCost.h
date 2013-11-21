@@ -4,10 +4,8 @@
 /// @file ym_mincov/MincovCost.h
 /// @brief MincovCost のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: MincovCost.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "ym_mincov/mincov_nsdef.h"
@@ -34,7 +32,7 @@
 BEGIN_NAMESPACE_YM_MINCOV
 
 //////////////////////////////////////////////////////////////////////
-/// @class MincovCost MincovCost.h <ym_mincov/MincovCost.h>
+/// @class MincovCost MincovCost.h "ym_mincov/MincovCost.h"
 /// @brief Mincov 用のコストを表すクラス
 //////////////////////////////////////////////////////////////////////
 class MincovCost
@@ -44,7 +42,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] size 次元
   MincovCost(ymuint size);
-  
+
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
   MincovCost(const MincovCost& src);
@@ -53,18 +51,18 @@ public:
   /// @param[in] src コピー元のオブジェクト
   const MincovCost&
   operator=(const MincovCost& src);
-  
+
   /// @brief ゼロを作るクラスメソッド
   static
   MincovCost
   zero(ymuint size);
-  
+
   /// @brief デストラクタ
   ~MincovCost();
-  
-  
+
+
 public:
-  
+
   /// @brief 次元を返す．
   ymuint
   size() const;
@@ -77,7 +75,7 @@ public:
   /// @brief 要素への参照を返す．
   double&
   operator[](ymuint pos);
-  
+
 
 public:
 
@@ -85,7 +83,7 @@ public:
   /// @param[in] right 右のオペランド
   const MincovCost&
   operator+=(const MincovCost& right);
-  
+
   /// @brief 減算付き代入演算子
   /// @param[in] right 右のオペランド
   const MincovCost&
@@ -113,19 +111,19 @@ public:
   /// @param[in] right 右のオペランド
   bool
   operator<(const MincovCost& right) const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // コストの次元
   ymuint32 mSize;
-  
+
   // コスト本体のベクタ
   double* mValArray;
-  
+
 };
 
 
@@ -193,7 +191,7 @@ operator>=(const MincovCost& left,
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief 次元を返す．
 inline
 ymuint

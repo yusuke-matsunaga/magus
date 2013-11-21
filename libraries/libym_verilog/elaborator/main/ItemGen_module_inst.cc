@@ -176,6 +176,27 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
     return;
   }
 
+  // 正式な仕様にはないが，セルライブラリを探す．
+  const Cell* cell = find_cell(defname);
+  if ( cell ) {
+    // ただしこの場合, mParamList は空でなければならない．
+    PtConnectionArray pa_array = pt_head->paramassign_array();
+    ymuint param_size = pa_array.size();
+    if ( param_size > 0 ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      fr,
+		      kMsgError,
+		      "ELAB",
+		      "Cell instance cannot have parameter list.");
+      return;
+    }
+
+    // 今すぐには処理できないのでキューに積む．
+    add_phase2stub(make_stub(this, &ItemGen::instantiate_cell,
+			     parent, pt_head, cell));
+    return;
+  }
+
   // どちらもなければエラー
   ostringstream buf;
   buf << defname << " : No such module or UDP.";
@@ -374,15 +395,15 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
     }
 
     ymuint port_size = port->bit_size();
-    if ( port->direction() == kVpiInput ) {
+    if ( port->direction() == kVlInput ) {
       // 入力ポートには任意の式を接続できる．
       ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
       if ( !tmp ) {
 	continue;
       }
 
-      tVpiValueType type = tmp->value_type();
-      if ( type == kVpiValueReal ) {
+      VlValueType type = tmp->value_type();
+      if ( type.is_real_type() ) {
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			tmp->file_region(),
 			kMsgError,
@@ -390,10 +411,10 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 			"Real expression cannot connect to module port.");
 	continue;
       }
-      ymuint expr_size = unpack_size(type);
+      ymuint expr_size = type.size();
       if ( expr_size == 0 ) {
 	// もともとサイズがなければ port_size に合わせる．
-	tmp->set_reqsize(pack(kVpiValueUS, port_size));
+	tmp->set_reqsize(VlValueType(false, true, port_size));
 	expr_size = port_size;
       }
 
@@ -437,8 +458,8 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
     else {
       // それ以外の場合には左辺式のみが接続できる．
       ElbExpr* tmp = instantiate_lhs(parent, env, pt_expr);
-      tVpiValueType type = tmp->value_type();
-      if ( type == kVpiValueReal ) {
+      VlValueType type = tmp->value_type();
+      if ( type.is_real_type() ) {
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			tmp->file_region(),
 			kMsgError,
@@ -446,7 +467,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 			"Real expression cannot connect to module port.");
 	continue;
       }
-      ymuint expr_size = unpack_size(type);
+      ymuint expr_size = type.size();
       if ( expr_size == port_size ) {
 	// 式のサイズとポートサイズが等しければ全部のモジュールに
 	// 同一の式を接続する．
@@ -591,15 +612,15 @@ ItemGen::link_module(ElbModule* module,
 
     ymuint port_size = port->bit_size();
 
-    if ( port->direction() == kVpiInput ) {
+    if ( port->direction() == kVlInput ) {
       // 入力ポートには任意の式を接続できる．
       ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
       if ( !tmp ) {
 	continue;
       }
 
-      tVpiValueType type = tmp->value_type();
-      if ( type == kVpiValueReal ) {
+      VlValueType type = tmp->value_type();
+      if ( type.is_real_type() ) {
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			tmp->file_region(),
 			kMsgError,
@@ -607,7 +628,7 @@ ItemGen::link_module(ElbModule* module,
 			"Real expression cannot connect to module port.");
 	continue;
       }
-      ymuint expr_size = unpack_size(type);
+      ymuint expr_size = type.size();
 
       // 単独のインスタンスの場合 expr のサイズは補正される．
       // ... でいいんだよね．
@@ -631,15 +652,15 @@ ItemGen::link_module(ElbModule* module,
 			  "ELAB",
 			  buf2.str());
 	}
-	tmp->set_reqsize(pack(kVpiValueUS, port_size));
+	tmp->set_reqsize(VlValueType(false, true, port_size));
       }
       module->set_port_high_conn(index, tmp, conn_by_name);
     }
     else {
       // それ以外のポートに接続できるのは左辺式だけ．
       ElbExpr* tmp = instantiate_lhs(parent, env, pt_expr);
-      tVpiValueType type = tmp->value_type();
-      if ( type == kVpiValueReal ) {
+      VlValueType type = tmp->value_type();
+      if ( type.is_real_type() ) {
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			tmp->file_region(),
 			kMsgError,

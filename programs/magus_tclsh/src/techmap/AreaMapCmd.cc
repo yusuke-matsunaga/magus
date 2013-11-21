@@ -1,9 +1,7 @@
 
-/// @file magus/techmap/AreaMapCmd.cc
+/// @file AreaMapCmd.cc
 /// @brief AreaMapCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: AreaMapCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -13,7 +11,7 @@
 #include "ym_tclpp/TclPopt.h"
 
 #include "ym_networks/BNetBdnConv.h"
-
+#include "ym_techmap/CellMap.h"
 #include "ym_networks/MvnMgr.h"
 #include "ym_networks/BdnMgr.h"
 #include "ym_networks/MvnBdnConv.h"
@@ -28,8 +26,8 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 
 // @brief コンストラクタ
 AreaMapCmd::AreaMapCmd(MagMgr* mgr,
-		       TechmapData* data) :
-  TechmapCmd(mgr, data)
+		       CmnMgr& cmnmgr) :
+  TechmapCmd(mgr, cmnmgr)
 {
   mPoptMethod = new TclPoptStr(this, "method",
 			       "specify covering method",
@@ -77,7 +75,15 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
+  if ( cur_cell_library() == NULL ) {
+    TclObj emsg;
+    emsg << "Cell Library is not set.";
+    set_result(emsg);
+    return TCL_ERROR;
+  }
+
   NetHandle* neth = cur_nethandle();
+  CellMap mapper;
   switch ( neth->type() ) {
   case NetHandle::kMagBNet:
     {
@@ -85,12 +91,13 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
 
       BdnMgr tmp_network;
       conv(*neth->bnetwork(), tmp_network);
-      techmap().area_map(tmp_network, 0, cngraph());
+
+      mapper.area_map(*cur_cell_library(), tmp_network, 0, cmnmgr());
     }
     break;
 
   case NetHandle::kMagBdn:
-    techmap().area_map(*neth->bdn(), 0, cngraph());
+    mapper.area_map(*cur_cell_library(), *neth->bdn(), 0, cmnmgr());
     break;
 
   case NetHandle::kMagMvn:
@@ -100,7 +107,8 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
       BdnMgr tmp_network;
       MvnBdnMap mvnode_map(mvn.max_node_id());
       conv(mvn, tmp_network, mvnode_map);
-      techmap().area_map(tmp_network, 0, cngraph());
+
+      mapper.area_map(*cur_cell_library(), tmp_network, 0, cmnmgr());
     }
     break;
   }

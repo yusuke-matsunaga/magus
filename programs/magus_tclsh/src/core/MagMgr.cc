@@ -1,15 +1,14 @@
 
-/// @file magus/logbase/MagMgr.cc
+/// @file MagMgr.cc
 /// @brief MagMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MagMgr.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "MagMgr.h"
+#include "ym_cell/CellLibrary.h"
 #include "NetHandle.h"
 #include "BNetHandle.h"
 #include "BdnHandle.h"
@@ -31,6 +30,8 @@ MagMgr::MagMgr() :
 {
   alloc_table(16);
 
+  mCellLibrary = NULL;
+
   // カレントネットワークは NULL
   mCurNet = NULL;
 }
@@ -39,6 +40,8 @@ MagMgr::MagMgr() :
 // 全てのネットワークを破壊する．
 MagMgr::~MagMgr()
 {
+  delete mCellLibrary;
+
   // このオブジェクトの管理しているネットワークを全て破棄する．
   // といってもこのループでは name_list にネットワーク名を入れている
   // だけ．
@@ -53,6 +56,24 @@ MagMgr::~MagMgr()
     bool stat = delete_nethandle(name);
     assert_cond(stat, __FILE__, __LINE__);
   }
+}
+
+// @brief カレントセルライブラリの設定
+// @param[in] library 設定するセルライブラリ
+// @note 以前のライブラリは破棄される．
+void
+MagMgr::set_cur_cell_library(const CellLibrary* library)
+{
+  delete mCellLibrary;
+
+  mCellLibrary = library;
+}
+
+// @brief カレントセルライブラリの取得
+const CellLibrary*
+MagMgr::cur_cell_library()
+{
+  return mCellLibrary;
 }
 
 // @brief 名前が適切かどうか調べる関数

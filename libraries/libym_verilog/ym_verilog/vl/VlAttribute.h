@@ -7,7 +7,7 @@
 ///
 /// $Id: VlAttribute.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,7 +17,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlAttribute VlAttribute.h <ym_verilog/vl/VlAttribute.h>
+/// @class VlAttribute VlAttribute.h "ym_verilog/vl/VlAttribute.h"
 /// @brief attribute instance を表すクラス
 //////////////////////////////////////////////////////////////////////
 class VlAttribute :
@@ -54,7 +54,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlAttrList VlAttribute.h <ym_verilog/vl/VlAttribute.h>
+/// @class VlAttrList VlAttribute.h "ym_verilog/vl/VlAttribute.h"
 /// @breif VlAttribute のリスト
 //////////////////////////////////////////////////////////////////////
 class VlAttrList

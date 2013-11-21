@@ -1,13 +1,11 @@
-#ifndef LIBYM_VERILOG_ELB_ELBPAREMETER_H
-#define LIBYM_VERILOG_ELB_ELBPARAMETER_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBPAREMETER_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBPARAMETER_H
 
 /// @file libym_verilog/elaborator/include/ElbParameter.h
 /// @brief ElbParameter のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: ElbParameter.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -50,11 +48,13 @@ public:
   parent() const = 0;
 
   /// @brief 符号の取得
+  /// @param[in] val 値
   /// @retval true 符号つき
   /// @retval false 符号なし
+  /// @note ヘッダに型指定がない時は値から情報を得る．
   virtual
   bool
-  is_signed() const = 0;
+  is_signed(const VlValue& val) const = 0;
 
   /// @brief 範囲指定を持つとき true を返す．
   virtual
@@ -96,24 +96,31 @@ public:
   is_little_endian() const = 0;
 
   /// @brief ビット幅を返す．
-  /// @note このクラスでは 1 を返す．
+  /// @param[in] val 値
+  /// @note ヘッダが型指定を持たない時には値から情報を得る．
   virtual
   ymuint
-  bit_size() const = 0;
+  bit_size(const VlValue& val) const = 0;
 
-  /// @brief LSB からのオフセット値の取得
+  /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @param[in] val 値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
+  /// @note ヘッダが型指定を持たない時には値から情報を得る．
   virtual
-  int
-  bit_offset(int index) const = 0;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset,
+		  const VlValue& val) const = 0;
 
   /// @breif 値の型を返す．
-  /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
+  /// @param[in] val 値
+  /// @note ヘッダが型指定を持たない時には値から情報を得る．
   virtual
-  tVpiValueType
-  value_type() const = 0;
+  VlValueType
+  value_type(const VlValue& val) const = 0;
 
   /// @brief データ型の取得
   virtual
@@ -284,4 +291,4 @@ ElbParameter::next() const
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBPARAMETER_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBPARAMETER_H

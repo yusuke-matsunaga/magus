@@ -1,0 +1,6 @@
+
+. ${top_srcdir}/../../etc/common_defs
+
+TEST_PATH=${top_builddir}/tests/blif
+TEST_SRC=${top_srcdir}/tests/data/blif-in
+TEST_OUT=${top_srcdir}/tests/data/blif-out

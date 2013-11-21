@@ -5,9 +5,7 @@
 /// @brief gds パッケージに共通な定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: gds_nsdef.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -49,7 +47,7 @@ END_NAMESPACE_YM_GDS
 BEGIN_NAMESPACE_YM_GDS
 
 //////////////////////////////////////////////////////////////////////
-// Record Types
+/// @brief Record Types
 //////////////////////////////////////////////////////////////////////
 enum tGdsRtype {
   kGdsHEADER = 0,
@@ -128,7 +126,7 @@ enum tGdsRtype {
 
 
 //////////////////////////////////////////////////////////////////////
-// Data Types
+/// @brief Data Types
 //////////////////////////////////////////////////////////////////////
 enum tGdsDtype {
   kGdsNodata = 0,
@@ -142,20 +140,26 @@ enum tGdsDtype {
 
 
 //////////////////////////////////////////////////////////////////////
-// 1バイトの単位
-//////////////////////////////////////////////////////////////////////
-
-typedef ymuint8 tGdsByte;
-
-
-//////////////////////////////////////////////////////////////////////
 // クラスの先行宣言
 //////////////////////////////////////////////////////////////////////
 
 class GdsRecord;
 class GdsRecMgr;
+class GdsParser;
 class GdsScanner;
 class GdsDumper;
+
+class GdsACL;
+class GdsData;
+class GdsDate;
+class GdsStruct;
+class GdsElement;
+class GdsFormat;
+class GdsProperty;
+class GdsStrans;
+class GdsString;
+class GdsUnits;
+class GdsXY;
 
 END_NAMESPACE_YM_GDS
 

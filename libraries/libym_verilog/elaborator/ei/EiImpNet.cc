@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/elb_impl/EiImpNet.cc
+/// @file libym_verilog/elaborator/ei/EiImpNet.cc
 /// @brief EiNet の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiImpNet.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -85,10 +83,10 @@ EiImpNet::name() const
 
 // @breif 値の型を返す．
 // @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
-tVpiValueType
+VlValueType
 EiImpNet::value_type() const
 {
-  return pack(kVpiValueUS, 1);
+  return VlValueType(false, true, 1);
 }
 
 // @brief 符号の取得
@@ -161,18 +159,21 @@ EiImpNet::bit_size() const
   return 1;
 }
 
-// @brief LSB からのオフセット値の取得
+// @brief オフセット値の取得
 // @param[in] index インデックス
-// @retval index の LSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiImpNet::bit_offset(int index) const
+// @param[out] offset インデックスに対するオフセット値
+// @retval true インデックスが範囲内に入っている時
+// @retval false インデックスが範囲外の時
+bool
+EiImpNet::calc_bit_offset(int index,
+			  ymuint& offset) const
 {
   if ( index == 0 ) {
-    return 0;
+    offset = 0;
+    return true;
   }
   else {
-    return -1;
+    return false;
   }
 }
 
@@ -257,7 +258,7 @@ EiImpNet::set_signed()
 }
 
 // @brief スカラー値を返す．
-tVpiScalarVal
+VlScalarVal
 EiImpNet::get_scalar() const
 {
   return mVal;
@@ -265,36 +266,36 @@ EiImpNet::get_scalar() const
 
 // @brief スカラー値を設定する．
 void
-EiImpNet::set_scalar(tVpiScalarVal val)
+EiImpNet::set_scalar(const VlScalarVal& val)
 {
   mVal = val;
 }
 
 // @brief 論理値を返す．
-tVpiScalarVal
+VlScalarVal
 EiImpNet::get_logic() const
 {
-  return conv_to_logic(mVal);
+  return mVal.to_logic();
 }
 
 // @brief real 型の値を返す．
 double
 EiImpNet::get_real() const
 {
-  return conv_to_real(mVal);
+  return mVal.to_real();
 }
 
 // @brief real 型の値を設定する．
 void
 EiImpNet::set_real(double val)
 {
-  mVal = conv_to_scalar(val);
+  mVal = VlScalarVal(val);
 }
 
 // @brief bitvector 型の値を返す．
 void
 EiImpNet::get_bitvector(BitVector& bitvector,
-			tVpiValueType req_type) const
+			const VlValueType& req_type) const
 {
   bitvector = mVal;
   bitvector.coerce(req_type);
@@ -309,14 +310,14 @@ EiImpNet::set_bitvector(const BitVector& val)
 
 // @brief ビット選択値を返す．
 // @param[in] index ビット位置
-tVpiScalarVal
+VlScalarVal
 EiImpNet::get_bitselect(int index) const
 {
   if ( index == 0 ) {
     return mVal;
   }
   else {
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
 }
 
@@ -325,7 +326,7 @@ EiImpNet::get_bitselect(int index) const
 // @param[in] val 値
 void
 EiImpNet::set_bitselect(int index,
-			tVpiScalarVal val)
+			const VlScalarVal& val)
 {
   if ( index == 0 ) {
     mVal = val;

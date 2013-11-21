@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/elb_impl/EiBitSelect.cc
+/// @file libym_verilog/elaborator/ei/EiBitSelect.cc
 /// @brief EiBitSelect の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiBitSelect.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -99,10 +97,10 @@ EiBitSelect::type() const
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiBitSelect::value_type() const
 {
-  return pack(kVpiValueUS, 1);
+  return VlValueType(false, true, 1);
 }
 
 // @brief 定数の時 true を返す．
@@ -193,7 +191,7 @@ EiBitSelect::lhs_elem(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiBitSelect::set_reqsize(tVpiValueType type)
+EiBitSelect::_set_reqsize(const VlValueType& type)
 {
 }
 

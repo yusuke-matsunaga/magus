@@ -1,13 +1,11 @@
 #ifndef LIBYM_TCLPP_TCLPOPTGROUP_H
 #define LIBYM_TCLPP_TCLPOPTGROUP_H
 
-/// @file ym_tclpp/TclPopt.h
-/// @brief TclPopt のヘッダファイル
+/// @file TclPoptGroup.h
+/// @brief TclPoptGroup のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TclPoptGroup.h 1978 2009-02-06 12:29:16Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,7 +17,7 @@ BEGIN_NAMESPACE_YM_TCLPP
 class TclPopt;
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptGroup TclPopt.h <ym_tclpp/TclPopt.h>
+/// @class TclPoptGroup TclPoptGroup.h "TclPoptGroup.h"
 /// @brief 排他的な TclPopt のグループを表すクラス
 //////////////////////////////////////////////////////////////////////
 class TclPoptGroup

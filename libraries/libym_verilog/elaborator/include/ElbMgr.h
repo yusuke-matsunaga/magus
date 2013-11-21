@@ -1,13 +1,11 @@
-#ifndef LIBYM_VERILOG_ELB_ELBMGR_H
-#define LIBYM_VERILOG_ELB_ELBMGR_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBMGR_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBMGR_H
 
 /// @file libym_verilog/elaborator/include/ElbMgr.h
 /// @brief ElbMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: ElbMgr.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -38,7 +36,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のオブジェクト
-  ElbMgr(AllocBase& alloc);
+  ElbMgr(Alloc& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -363,7 +361,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief アロケータを取り出す．
-  AllocBase&
+  Alloc&
   allocator();
 
   /// @brief このオブジェクトが確保したメモリの総量を返す．
@@ -390,7 +388,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // メモリ確保用のアロケータ
-  AllocBase& mAlloc;
+  Alloc& mAlloc;
 
   // UDP のリスト
   list<const VlUdpDefn*> mUdpList;
@@ -620,7 +618,7 @@ ElbMgr::find_attr(const VlObj* obj,
 
 // @brief アロケータを取り出す．
 inline
-AllocBase&
+Alloc&
 ElbMgr::allocator()
 {
   return mAlloc;
@@ -628,4 +626,4 @@ ElbMgr::allocator()
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBMGR_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBMGR_H

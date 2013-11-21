@@ -4,14 +4,15 @@
 
 SUBDIRS = pt vl
 
-INCLUDES =
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	verilog.h \
-	VlTime.h \
 	BitVector.h \
 	VlLineWatcher.h \
 	VlMgr.h \
-	VlValue.h
+	VlScalarVal.h \
+	VlTime.h \
+	VlUdpVal.h \
+	VlValue.h \
+	VlValueType.h

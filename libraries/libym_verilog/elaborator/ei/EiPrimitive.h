@@ -5,9 +5,7 @@
 /// @brief EiPrimitive のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiPrimitive.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -69,6 +67,11 @@ public:
   virtual
   const ElbUdpDefn*
   udp_defn() const;
+
+  /// @brief セルを返す．
+  virtual
+  const Cell*
+  cell() const;
 
   /// @brief 0 の強さを得る．
   virtual
@@ -263,6 +266,62 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class EiPrimHeadC EiPrimitive.h "EiPrimitive.h"
+/// @brief セル型の EiPrimHead
+//////////////////////////////////////////////////////////////////////
+class EiPrimHeadC :
+  public EiPrimHead
+{
+  friend class EiFactory;
+
+protected:
+
+  /// @brief コンストラクタ
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_header パース木の定義
+  /// @param[in] cell セル
+  EiPrimHeadC(const VlNamedObj* parent,
+	      const PtItem* pt_header,
+	      const Cell* cell);
+
+  /// @brief デストラクタ
+  virtual
+  ~EiPrimHeadC();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // EiPrimHead の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief primitive type を返す．
+  virtual
+  tVpiPrimType
+  prim_type() const;
+
+  /// @brief プリミティブの定義名を返す．
+  virtual
+  const char*
+  def_name() const;
+
+  /// @brief セルを返す．
+  virtual
+  const Cell*
+  cell() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // セル
+  const Cell* mCell;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class EiPrimitive EiPrimitive.h "EiPrimitive.h"
 /// @brief ElbPrimitive の実装クラス
 //////////////////////////////////////////////////////////////////////
@@ -327,6 +386,11 @@ public:
   virtual
   const VlUdpDefn*
   udp_defn() const;
+
+  /// @brief セルを返す．
+  virtual
+  const Cell*
+  cell() const;
 
   /// @brief 0 の強さを得る．
   virtual
@@ -632,6 +696,11 @@ public:
   const VlUdpDefn*
   udp_defn() const;
 
+  /// @brief セルを返す．
+  virtual
+  const Cell*
+  cell() const;
+
   /// @brief 0 の強さを得る．
   virtual
   tVpiStrength
@@ -775,7 +844,7 @@ public:
 
   /// @brief 入出力の種類を返す．
   virtual
-  tVpiDirection
+  tVlDirection
   direction() const;
 
   /// @brief 端子番号を返す．
@@ -798,7 +867,7 @@ public:
   void
   set(ElbPrimitive* primitive,
       ymuint index,
-      tVpiDirection dir);
+      tVlDirection dir);
 
 
 private:
@@ -809,7 +878,7 @@ private:
   // 親のプリミティブ
   ElbPrimitive* mPrimitive;
 
-  // インデックス + 方向
+  // インデックス + 方向(3bit)
   ymuint32 mIndexDir;
 
   // 接続している式

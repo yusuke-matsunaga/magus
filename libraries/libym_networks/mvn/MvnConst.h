@@ -1,18 +1,18 @@
-#ifndef LIBYM_MVN_MVNCONST_H
-#define LIBYM_MVN_MVNCONST_H
+#ifndef MVNCONST_H
+#define MVNCONST_H
 
-/// @file libym_networks/MvnConst.h
+/// @file MvnConst.h
 /// @brief MvnConst のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "MvnNodeBase.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnConst MvnConst.h "MvnConst.h"
@@ -62,6 +62,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // LIBYM_MVN_MVNCONST_H
+#endif // MVNCONST_H

@@ -2,7 +2,7 @@
 /// @file fsim/SimNode.cc
 /// @brief SimNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: SimNode.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -41,6 +41,13 @@ SimNode::~SimNode()
   delete [] mFanouts;
 }
 
+// @brief 外部入力ノードを生成するクラスメソッド
+SimNode*
+SimNode::new_input(ymuint32 id)
+{
+  return new SnInput(id);
+}
+
 // @brief ノードを生成するクラスメソッド
 SimNode*
 SimNode::new_node(ymuint32 id,
@@ -51,22 +58,17 @@ SimNode::new_node(ymuint32 id,
   SimNode* node = NULL;
   ymuint ni = inputs.size();
   switch ( type ) {
-  case kTgInput:
-    assert_cond(ni == 0, __FILE__, __LINE__);
-    node = new SnInput(id);
-    break;
-    
-  case kTgBuff:
+  case kTgGateBuff:
     assert_cond(ni == 1, __FILE__, __LINE__);
     node = new SnBuff(id, inputs);
     break;
 
-  case kTgNot:
+  case kTgGateNot:
     assert_cond(ni == 1, __FILE__, __LINE__);
     node = new SnNot(id, inputs);
     break;
 
-  case kTgAnd:
+  case kTgGateAnd:
     switch ( ni ) {
     case 2:  node = new SnAnd2(id, inputs); break;
     case 3:  node = new SnAnd3(id, inputs); break;
@@ -75,7 +77,7 @@ SimNode::new_node(ymuint32 id,
     }
     break;
 
-  case kTgNand:
+  case kTgGateNand:
     switch ( ni ) {
     case 2:  node = new SnNand2(id, inputs); break;
     case 3:  node = new SnNand3(id, inputs); break;
@@ -84,7 +86,7 @@ SimNode::new_node(ymuint32 id,
     }
     break;
 
-  case kTgOr:
+  case kTgGateOr:
     switch ( ni ) {
     case 2:  node = new SnOr2(id, inputs); break;
     case 3:  node = new SnOr3(id, inputs); break;
@@ -93,7 +95,7 @@ SimNode::new_node(ymuint32 id,
     }
     break;
 
-  case kTgNor:
+  case kTgGateNor:
     switch ( ni ) {
     case 2:  node = new SnNor2(id, inputs); break;
     case 3:  node = new SnNor3(id, inputs); break;
@@ -102,23 +104,26 @@ SimNode::new_node(ymuint32 id,
     }
     break;
 
-  case kTgXor:
+  case kTgGateXor:
     switch ( ni ) {
     case 2:  node = new SnXor2(id, inputs); break;
     default: node = new SnXor(id, inputs);  break;
     }
     break;
 
-  case kTgXnor:
+  case kTgGateXnor:
     switch ( ni ) {
     case 2:  node = new SnXnor2(id, inputs); break;
     default: node = new SnXnor(id, inputs);  break;
     }
     break;
 
-  default:
+  case kTgGateCplx:
     node = new SnCplx(id, lexp, inputs);
     break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
   }
   return node;
 }

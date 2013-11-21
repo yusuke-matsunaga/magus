@@ -1,20 +1,19 @@
 
-/// @file libym_networks/verilog/DeclHash.cc
+/// @file DeclHash.cc
 /// @brief DeclHash の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "DeclHash.h"
-#include "ym_networks/mvn_nsdef.h"
-//#include "ym_networks/MvnNode.h"
+#include "ym_networks/mvn.h"
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlDeclArray.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 // @brief コンストラクタ
 DeclHash::DeclHash() :
@@ -156,4 +155,4 @@ DeclHash::hash_func(const VlObj* decl) const
   return ((tmp * tmp) >> 10) % mSize;
 }
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG

@@ -5,9 +5,7 @@
 /// @brief TclObj のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TclObj.h 1417 2008-05-06 18:12:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM_TCLPP
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclObj TclObj.h <ym_tclpp/TclObj.h>
+/// @class TclObj TclObj.h "ym_tclpp/TclObj.h"
 /// @ingroup Tclpp
 /// @brief Tcl_Obj への(スマート)ポインタ
 ///
@@ -38,39 +36,39 @@ public:
   /// @param[in] obj Tcl_Obj の実体へのポインタ
   /// この時点で obj の参照回数は一つ増やされる．
   TclObj(Tcl_Obj* obj = NULL);
-  
+
   /// @brief int 型の値をセットするコンストラクタ
   /// @param[in] value 値
   TclObj(int value);
-  
+
   /// @brief unsigned int 型の値をセットするコンストラクタ
   /// @param[in] value 値
   TclObj(unsigned int value);
-  
+
   /// @brief long 型の値をセットするコンストラクタ．
   /// @param[in] value 値
   TclObj(long value);
-  
+
   /// @brief unsigned long 型の値をセットするコンストラクタ．
   /// @param[in] value 値
   TclObj(unsigned long value);
-  
+
   /// @brief bool 型の値をセットするコンストラクタ．
   /// @param[in] value 値
   TclObj(bool value);
-  
+
   /// @brief double 型の値をセットするコンストラクタ．
   /// @param[in] value 値
   TclObj(double value);
-  
+
   /// @brief 文字列型の値をセットするコンストラクタ．
   /// @param[in] value 値
   TclObj(const string& value);
-  
+
   /// @brief const char* の値をセットするコンストラクタ
   /// @param[in] value 値
   TclObj(const char* value);
-  
+
   /// @brief リスト型の値をセットするコンストラクタ
   /// @param[in] objc 要素数
   /// @param[in] objv 要素のC型配列
@@ -80,45 +78,45 @@ public:
   /// @brief リスト型の値をセットするコンストラクタ
   /// @param[in] objv 要素のベクタ
   TclObj(const TclObjVector& objv);
-  
+
   /// @brief リスト型の値をセットするコンストラクタ
   /// @param[in] objv 要素のリスト
   TclObj(const TclObjList& objv);
-  
+
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
   TclObj(const TclObj& src);
-  
+
   /// @brief 代入演算子
   /// @param[in] src コピー元のオブジェクト
   /// @return 自分自身
   const TclObj&
   operator=(const TclObj& src);
-  
+
   /// @brief Tcl_Obj* からの代入演算子
   /// @param[in] obj コピー元のオブジェクト
   /// @return 自分自身
   const TclObj&
   operator=(Tcl_Obj* obj);
-  
+
   /// @brief デストラクタ
   /// @note mPtr の参照回数は一つ減らされる．
   ~TclObj();
-  
+
   /// @brief 新しいオブジェクト(型無し)を作りセットする．
   ///
   /// もしもすでにオブジェクトを持っていた場合には，
   /// そのオブジェクトをまっさらにする．
   void
   clear();
-  
+
   /// @brief 現在のオブジェクトを捨ててポインタをNULLにする．
   ///
   /// といっても本当のTcl_Objの参照回数が1より大きければ
   /// 他のポインタが参照しているのでオブジェクトは破棄されない．
   void
   set_null();
-  
+
   /// @brief 自分のオブジェクトの複製を作る．
   ///
   /// コピーコンストラクタの場合には同一のオブジェクトを指す．
@@ -128,7 +126,7 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name 状態を取得する関数
@@ -149,7 +147,7 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name int/long/bool/double/string の値をセットする関数
   /// @{
@@ -159,43 +157,43 @@ public:
   /// もしもポインタがNULLなら新しいオブジェクトを生成する．
   void
   set_int(int value);
-  
+
   /// @brief unsigned int 型の値をセットする．
   /// @param[in] value 値
   /// もしもポインタがNULLなら新しいオブジェクトを生成する．
   void
   set_uint(unsigned int value);
-  
+
   /// @brief long 型の値をセットする．
   /// @param[in] value 値
   /// もしもポインタがNULLなら新しいオブジェクトを生成する．
   void
   set_long(long value);
-  
+
   /// @brief unsigned long 型の値をセットする．
   /// @param[in] value 値
   /// もしもポインタがNULLなら新しいオブジェクトを生成する．
   void
   set_ulong(unsigned long value);
-  
+
   /// @brief bool 型の値をセットする．
   /// @param[in] value 値
   /// もしもポインタがNULLなら新しいオブジェクトを生成する．
   void
   set_bool(bool value);
-  
+
   /// @brief double 型の値をセットする．
   /// @param[in] value 値
   /// もしもポインタがNULLなら新しいオブジェクトを生成する．
   void
   set_double(double value);
-  
+
   /// @brief 文字列型の値をセットする．
   /// @param[in] value 値
   /// もしもポインタがNULLなら新しいオブジェクトを生成する．
   void
   set_string(const string& value);
-  
+
   /// @brief 文字列型の値をセットする．
   /// @param[in] value 値
   /// もしもポインタがNULLなら新しいオブジェクトを生成する．
@@ -204,8 +202,8 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
-  
+
+
   //////////////////////////////////////////////////////////////////////
   /// @name 型変換をともなう代入演算子
   /// @{
@@ -215,43 +213,43 @@ public:
   /// @return 自分自身
   const TclObj&
   operator=(int value);
-  
+
   /// @brief unsigned int からの代入演算子
   /// @param[in] value 値
   /// @return 自分自身
   const TclObj&
   operator=(unsigned int value);
-  
+
   /// @brief long からの代入演算子
   /// @param[in] value 値
   /// @return 自分自身
   const TclObj&
   operator=(long value);
-  
+
   /// @brief unsigned long からの代入演算子
   /// @param[in] value 値
   /// @return 自分自身
   const TclObj&
   operator=(unsigned long value);
-  
+
   /// @brief long からの代入演算子
   /// @param[in] value 値
   /// @return 自分自身
   const TclObj&
   operator=(bool value);
-  
+
   /// @brief double からの代入演算子
   /// @param[in] value 値
   /// @return 自分自身
   const TclObj&
   operator=(double value);
-  
+
   /// @brief string からの代入演算子
   /// @param[in] value 値
   /// @return 自分自身
   const TclObj&
   operator=(const string& value);
-  
+
   /// @brief const char* からの代入演算子
   /// @param[in] value 値
   /// @return 自分自身
@@ -260,8 +258,8 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
-  
+
+
   //////////////////////////////////////////////////////////////////////
   /// @name int/long/bool/double への型変換
   /// @{
@@ -275,7 +273,7 @@ public:
   int
   get_int(int& value,
 	  Tcl_Interp* interp = NULL) const;
-  
+
   /// @brief unsigned int 型への変換
   /// @param[in] value 変換した値を格納する変数
   /// @param[in] interp NULL でなければエラーメッセージ
@@ -285,7 +283,7 @@ public:
   int
   get_uint(unsigned int& value,
 	   Tcl_Interp* interp = NULL) const;
-  
+
   /// @brief long 型への変換
   /// @param[in] value 変換した値を格納する変数
   /// @param[in] interp NULL でなければエラーメッセージ
@@ -295,7 +293,7 @@ public:
   int
   get_long(long& value,
 	   Tcl_Interp* interp = NULL) const;
-  
+
   /// @brief unsigned long 型への変換
   /// @param[in] value 変換した値を格納する変数
   /// @param[in] interp NULL でなければエラーメッセージ
@@ -305,7 +303,7 @@ public:
   int
   get_ulong(unsigned long& value,
 	    Tcl_Interp* interp = NULL) const;
-  
+
   /// @brief bool 型への変換
   /// @param[in] value 変換した値を格納する変数
   /// @param[in] interp NULL でなければエラーメッセージ
@@ -315,7 +313,7 @@ public:
   int
   get_bool(bool& value,
 	   Tcl_Interp* interp = NULL) const;
-  
+
   /// @brief double 型への変換
   /// @param[in] value 変換した値を格納する変数
   /// @param[in] interp NULL でなければエラーメッセージ
@@ -328,8 +326,8 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
-  
+
+
   //////////////////////////////////////////////////////////////////////
   /// @name 文字列操作関数
   /// @{
@@ -340,30 +338,30 @@ public:
   /// @note 他の型と異なりエラーとはならない．
   string
   get_string(int* lengthPtr = NULL) const;
-  
+
   /// @brief string へのキャスト演算子
   /// @return 変換された文字列を返す．
   /// @note get_string() の別名
   operator
   string() const;
-  
+
   /// @brief 文字列の追加
   /// @param[in] value 追加する文字列
   void
   append(const string& value);
-  
+
   /// @brief << 演算子
-  /// @param[in] value 追加する文字列 
+  /// @param[in] value 追加する文字列
   /// @note append() の別名
   TclObj&
   operator<<(const string& value);
-  
+
   /// @brief 文字列領域の大きさをセットする．
   /// @warning 結構乱暴な関数なので使い方に気をつけること．
   /// @param[in] newLength 設定するサイズ
   void
   set_length(size_t newLength);
-  
+
   /// @brief 複数のオブジェクトの連結
   ///
   /// 複数のオブジェクトをつなげたオブジェクトを作りセットする．
@@ -372,14 +370,14 @@ public:
   void
   concat(size_t objc,
 	 const TclObj objv[]);
-  
+
   /// @brief 複数のオブジェクトの連結
   ///
   /// 複数のオブジェクトをつなげたオブジェクトを作りセットする．
   /// @param objv 要素のベクタ
   void
   concat(const TclObjVector& objv);
-  
+
   /// @brief 複数のオブジェクトの連結
   ///
   /// 複数のオブジェクトをつなげたオブジェクトを作りセットする．
@@ -389,7 +387,7 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name リスト操作関数
@@ -404,7 +402,7 @@ public:
   int
   append_list(const TclObj& elemList,
 	      Tcl_Interp* interp = NULL);
-  
+
   /// @brief リストオブジェクトに一つの要素を追加する．
   /// @param[in] obj 追加するオブジェクト
   /// @param[in] interp NULL でなければエラーメッセージ
@@ -423,14 +421,14 @@ public:
   void
   set_list(size_t objc,
 	   const TclObj objv[]);
-  
+
   /// @brief リストオブジェクトの生成
   ///
   /// 複数のオブジェクトを要素とするリストオブジェクトを作りセットする．
   /// @param[in] objv 要素のベクタ
   void
   set_list(const TclObjVector& objv);
-  
+
   /// @brief リストオブジェクトの生成
   ///
   /// 複数のオブジェクトを要素とするリストオブジェクトを作りセットする．
@@ -438,7 +436,7 @@ public:
   /// 複数のオブジェクトを要素とするリストオブジェクトを作りセットする．
   void
   set_list(const TclObjList& objv);
-  
+
   /// @brief リストオブジェクトの要素の取得
   ///
   /// リストオブジェクトの要素を objv に格納する．
@@ -451,7 +449,7 @@ public:
   int
   list_elements(TclObjVector& objv,
 		Tcl_Interp* interp = NULL) const;
-  
+
   /// @brief リストオブジェクトの要素の取得
   ///
   /// リストオブジェクトの要素を objv に格納する．
@@ -503,7 +501,7 @@ public:
 	       size_t objc,
 	       const TclObj objv[],
 	       Tcl_Interp* interp = NULL);
-  
+
   /// @brief リストの部分置換
   /// @param[in] first 置き換え対象の最初の位置
   /// @param[in] count 置き換え対象の要素数
@@ -517,7 +515,7 @@ public:
 	       size_t count,
 	       const TclObjVector& objv,
 	       Tcl_Interp* interp = NULL);
-  
+
   /// @brief リストの部分置換
   /// @param[in] first 置き換え対象の最初の位置
   /// @param[in] count 置き換え対象の要素数
@@ -535,7 +533,7 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name 拡張型に対するアクセス
   /// @{
@@ -552,7 +550,7 @@ public:
   int
   convert_to_type(Tcl_ObjType* type,
 		  Tcl_Interp* interp = NULL) const;
-  
+
   /// @brief ポインタの中身を取り出す．
   /// @warning 通常は高位レベルメンバ関数を呼ぶようにして生の
   /// ポインタは極力使わないようにするのが賢明
@@ -567,22 +565,22 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
 protected:
 
   /// @brief mPtr の参照回数を一つ増やす．
   void
   inc();
-  
+
   /// @brief mPtr の参照回数を一つ減らす．
   void
   dec();
-  
+
   /// @brief 文字列表現を無効化(invalidate)する．
   void
   invalidate_stringrep();
-  
+
   /// @brief mPtr に新しいポインタをセットする．
   /// @param[in] obj セットする新しいオブジェクトへのポインタ
   /// obj の参照回数が増やされる．
@@ -590,14 +588,14 @@ protected:
   /// この関数を使うこと．
   void
   set_ptr(Tcl_Obj* obj);
-  
+
   /// @brief mPtr に対して修正を行なう時の前処理
   ///
   /// mPtr が NULL ポインタなら新規にオブジェクトを生成し，
   /// 共有されていたら複製を作る．
   void
   instanciate();
-  
+
 
 private:
 
@@ -606,28 +604,28 @@ private:
   set_array(size_t objc,
 	    const TclObj objv[],
 	    vector<Tcl_Obj*>& array);
-  
+
   // TclObjVector から vector<Tcl_Obj*> をつくる共通関数
   void
   set_array(const TclObjVector& src,
 	    vector<Tcl_Obj*>& array);
-  
+
   // TclObjList から vector<Tcl_Obj*> をつくる共通関数
   void
   set_array(const TclObjList& src,
 	    vector<Tcl_Obj*>& array);
-  
+
   // リストを作るための共通関数
   void
   set_list_sub(vector<Tcl_Obj*>& array);
-  
+
   // リストの部分を置き換えるための共通関数
   int
   replace_list_sub(size_t first,
 		   size_t count,
 		   vector<Tcl_Obj*>& array,
 		   Tcl_Interp* interp);
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // メンバ変数

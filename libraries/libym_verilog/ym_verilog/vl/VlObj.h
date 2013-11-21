@@ -7,7 +7,7 @@
 ///
 /// $Id: VlObj.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,7 +18,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlObj VlObj.h <ym_verilog/vl/VlObj.h>
+/// @class VlObj VlObj.h "ym_verilog/vl/VlObj.h"
 /// @brief エラボレーション中のオブジェクトを表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class VlObj
@@ -44,7 +44,7 @@ public:
   virtual
   FileRegion
   file_region() const = 0;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

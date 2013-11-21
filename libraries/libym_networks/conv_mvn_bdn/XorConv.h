@@ -1,7 +1,7 @@
-#ifndef LIBYM_MVNBDNCONV_XORCONV_H
-#define LIBYM_MVNBDNCONV_XORCONV_H
+#ifndef XORCONV_H
+#define XORCONV_H
 
-/// @file libym_networks/XorConv.h
+/// @file XorConv.h
 /// @brief XorConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class XorConv XorConv.h "XorConv.h"
@@ -51,6 +51,6 @@ public:
 };
 
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_XORCONV_H
+#endif // XORCONV_H

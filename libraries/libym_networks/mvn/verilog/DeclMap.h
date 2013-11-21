@@ -1,7 +1,7 @@
-#ifndef LIBYM_MVN_VERILOG_DECLMAP_H
-#define LIBYM_MVN_VERILOG_DECLMAP_H
+#ifndef DECLMAP_H
+#define DECLMAP_H
 
-/// @file libym_networks/verilog/DeclMap.h
+/// @file DeclMap.h
 /// @brief DeclMap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,14 +9,12 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_verilog/vl/VlFwd.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
-
-using nsYm::nsVerilog::VlDecl;
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class DeclMap DeclMap.h "DeclMap.h"
@@ -144,6 +142,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
-#endif // LIBYM_MVN_VERILOG_DECLMAP_H
+#endif // DECLMAP_H

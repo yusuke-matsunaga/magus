@@ -1,13 +1,11 @@
 #ifndef TECHMAP_AREAMAPCMD_H
 #define TECHMAP_AREAMAPCMD_H
 
-/// @file techmap/AreamapCmd.h
+/// @file AreamapCmd.h
 /// @brief AreamapCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TechmapCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -27,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   AreaMapCmd(MagMgr* mgr,
-	     TechmapData* data);
+	     CmnMgr& cmnmgr);
 
   /// @brief デストラクタ
   virtual

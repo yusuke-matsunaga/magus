@@ -1,13 +1,11 @@
-#ifndef LIBYM_VERILOG_ELB_ELBUDP_H
-#define LIBYM_VERILOG_ELB_ELBUDP_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBUDP_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBUDP_H
 
 /// @file libym_verilog/elaborator/include/ElbUdp.h
 /// @brief ElbUdp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: ElbUdp.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class ElbUdpDefn ElbUdp.h <ym_verilog/vl/VlUdp.h>
+/// @class ElbUdpDefn ElbUdp.h "ElbUdp.h"
 /// @brief UDP定義を表すクラス
 /// IEEE Std 1364-2001 26.6.14 UDP
 //////////////////////////////////////////////////////////////////////
@@ -56,7 +54,7 @@ public:
   virtual
   void
   set_initial(const PtExpr* init_expr,
-	      tVpiScalarVal init_val) = 0;
+	      const VlScalarVal& init_val) = 0;
 
   /// @brief table entry の内容を設定する．
   /// @param[in] pos 行番号
@@ -66,13 +64,13 @@ public:
   void
   set_tableentry(ymuint pos,
 		 const PtUdpEntry* pt_udp_entry,
-		 const vector<tVpiUdpVal>& vals) = 0;
+		 const vector<VlUdpVal>& vals) = 0;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class ElbTableEntry ElbUdp.h <ym_verilog/vl/VlUdp.h>
+/// @class ElbTableEntry ElbUdp.h "ElbUdp.h"
 /// @brief UDP の table entry を表すクラス
 //////////////////////////////////////////////////////////////////////
 class ElbTableEntry :
@@ -96,10 +94,10 @@ public:
   virtual
   void
   set(const PtUdpEntry* pt_entry,
-      const vector<tVpiUdpVal>& vals) = 0;
+      const vector<VlUdpVal>& vals) = 0;
 
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBUDP_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBUDP_H

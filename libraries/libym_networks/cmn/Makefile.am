@@ -1,0 +1,41 @@
+## Process this file with automake to produce Makefile.in
+
+SUBDIRS =
+
+MAINTAINERCLEANFILES = Makefile.in
+
+noinst_LTLIBRARIES = libym_cmn.la
+
+libym_cmn_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+libym_cmn_la_SOURCES = \
+	CmnDffCell.cc \
+	CmnDumper.cc \
+	CmnLatchCell.cc \
+	CmnMgr.cc \
+	CmnMgrImpl.h \
+	CmnMgrImpl.cc \
+	CmnNode.cc \
+	CmnNodeDffIn.h \
+	CmnNodeDffOut.h \
+	CmnNodeInput.h \
+	CmnNodeLatchIn.h \
+	CmnNodeLatchOut.h \
+	CmnNodeLogic.h \
+	CmnNodeOutput.h \
+	CmnNodePI.h \
+	CmnNodePO.h \
+	CmnPort.cc \
+	CmnBlifWriter.cc \
+	CmnVerilogWriter.cc \
+	BlifWriterImpl.h \
+	BlifWriterImpl.cc \
+	VerilogWriterImpl.h \
+	VerilogWriterImpl.cc
+
+libym_cmn_la_LIBADD =
+
+libym_cmn_la_LDFLAGS =
+

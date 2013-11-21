@@ -5,9 +5,7 @@
 /// @brief ファイル操作関係のクラスのヘッダファイル
 /// @author Yusuke Matsunaga
 ///
-/// $Id: File.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class PathName File.h <ym_utils/File.h>
+/// @class PathName File.h "ym_utils/File.h"
 /// @ingroup YmUtils
 /// @brief パス名を表すクラス
 ///
@@ -27,8 +25,11 @@ BEGIN_NAMESPACE_YM
 class PathName
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 定数の定義
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief パスの型
+  /// @brief パスの型を表す列挙型
   enum tType {
     /// @brief 絶対パス
     kAbsolute,
@@ -38,80 +39,88 @@ public:
     kRelative
   };
 
+
 public:
-  
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ/デストラクタ
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 空のコンストラクタ
   /// @note 結果は相対パスのカレントディレクトリを表すオブジェクトとなる
   PathName();
-  
+
   /// @brief 文字列からの変換コンストラクタ
   /// @param[in] path_str パスを表す文字列
   PathName(const string& path_str);
-  
+
   /// @brief 文字列からの変換コンストラクタ
   /// @param[in] path_str パスを表す文字列
   PathName(const char* path_str);
-  
+
   /// @brief デストラクタ
   ~PathName();
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief パス名の妥当性チェック
   /// @return 意味のある値を持っているとき true を返す．
   /// @note ここでは形式のみチェックする．
   /// そのパスが存在するか等は関係ない．
+  /// 空の場合は valid ではない．
   bool
   is_valid() const;
-  
+
   /// @brief パスの型を返す．
   /// @return パスの型
   tType
   type() const;
-  
+
   /// @brief パス名の文字列表現を返す．
   /// @return パス名の文字列表現
   string
   str() const;
-  
+
   /// @brief パス名のヘッダを返す．
   /// @return パス名のヘッダ (最後の名前を含まないもの)
   /// @note 元々が階層を含まない場合には空になる．
   PathName
   head() const;
-  
+
   /// @brief パス名のテイルを返す．
   /// @return パス名のテイル (ヘッダを含まないもの)
   /// @note パス名が '/' で終わっていたらテイルは空となる．
   string
   tail() const;
-  
+
   /// @brief パス名の本体(tail から "."と拡張子を除いた物)を返す
   /// @return パス名の本体(tail から "."と拡張子を除いた物)を返す．
   string
   body() const;
-  
+
   /// @brief パス名の拡張子を返す．
   /// @return パス名の拡張子
   /// @note "." を含まない場合には空になる．
   string
   ext() const;
-  
+
   /// @brief パス名の展開
   /// @return 展開したパス
   /// @note パスタイプが kHome と kRelative の時にフルパス形式に展開する．
   /// 結果は必ず kAbsolute になる．
   PathName
   expand() const;
-  
+
   /// @brief パスが存在しているか調べる．
   /// @param[out] sbp stat システムコールの結果を格納する構造体
   /// NULL ならどこにも結果を格納しない
   /// @return 存在していたら true を返す．
   bool
   stat(struct stat* sbp = NULL) const;
-  
+
   /// @brief 末尾にパスをつなげる．
   /// @param[in] src 追加するパス
   /// @return 結合したパス
@@ -121,10 +130,13 @@ public:
   /// - 自分自身が空の場合には src を代入する．
   const PathName&
   operator+=(const PathName& src);
-  
+
 
 private:
-  
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる下請け関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 文字列のリストからの変換コンストラクタ
   /// @param[in] path_list パスリスト
   /// @param[in] type パスタイプ
@@ -145,7 +157,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // タイプ
   tType mType;
 
@@ -185,7 +197,7 @@ user_home(const string& login);
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SearchPathList File.h <ym_utils/File.h>
+/// @class SearchPathList File.h "ym_utils/File.h"
 /// @ingroup YmUtils
 /// @brief サーチパス(のリスト)を表すクラス
 /// @sa PathName
@@ -205,7 +217,7 @@ public:
   /// また，末尾が '/' で終わっている場合にはそのサブディレクトリ
   /// も探索する．
   SearchPathList(const string& str);
-  
+
   /// @brief コピーコンストラクタ
   /// @param[in] src 代入元のオブジェクト
   SearchPathList(const SearchPathList& src);
@@ -214,13 +226,13 @@ public:
   /// @param[in] src 代入元のオブジェクト
   const SearchPathList&
   operator=(const SearchPathList& src);
-  
+
   /// @brief デストラクタ
   ~SearchPathList();
-  
+
 
 public:
-  
+
   /// @brief 以前の内容をクリアして文字列をセットする．
   /// @param[in] str セットするサーチパスを表す文字列
   /// @note サーチパス文字列は ':' で区切られた文字列で '.'

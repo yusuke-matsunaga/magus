@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/elb_impl/EiTernaryOp.cc
+/// @file libym_verilog/elaborator/ei/EiTernaryOp.cc
 /// @brief EiTernaryOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiTernaryOp.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -29,7 +27,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] opr2 オペランド
 ElbExpr*
 EiFactory::new_TernaryOp(const PtExpr* pt_expr,
-			 tVpiOpType op_type,
+			 tVlOpType op_type,
 			 ElbExpr* opr0,
 			 ElbExpr* opr1,
 			 ElbExpr* opr2)
@@ -37,12 +35,12 @@ EiFactory::new_TernaryOp(const PtExpr* pt_expr,
   ElbExpr* expr = NULL;
   void* p;
   switch ( op_type ) {
-  case kVpiConditionOp:
+  case kVlConditionOp:
     p = mAlloc.get_memory(sizeof(EiConditionOp));
     expr = new (p) EiConditionOp(pt_expr, opr0, opr1, opr2);
     break;
 
-  case kVpiMinTypMaxOp:
+  case kVlMinTypMaxOp:
     p = mAlloc.get_memory(sizeof(EiMinTypMaxOp));
     expr = new (p) EiMinTypMaxOp(pt_expr, opr0, opr1, opr2);
     break;
@@ -126,8 +124,8 @@ EiConditionOp::EiConditionOp(const PtExpr* pt_expr,
 
   operand1()->set_selfsize();
 
-  tVpiValueType type2 = operand2()->value_type();
-  tVpiValueType type3 = operand3()->value_type();
+  VlValueType type2 = operand2()->value_type();
+  VlValueType type3 = operand3()->value_type();
   mType = calc_type(type2, type3);
 }
 
@@ -137,7 +135,7 @@ EiConditionOp::~EiConditionOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiConditionOp::value_type() const
 {
   return mType;
@@ -147,7 +145,7 @@ EiConditionOp::value_type() const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiConditionOp::set_reqsize(tVpiValueType type)
+EiConditionOp::_set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
 
@@ -184,7 +182,7 @@ EiMinTypMaxOp::~EiMinTypMaxOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiMinTypMaxOp::value_type() const
 {
   return mType;
@@ -194,7 +192,7 @@ EiMinTypMaxOp::value_type() const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiMinTypMaxOp::set_reqsize(tVpiValueType type)
+EiMinTypMaxOp::_set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
 

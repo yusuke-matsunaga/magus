@@ -1,18 +1,17 @@
-#ifndef LIBYM_VERILOG_ELB_ELBFACTORY_H
-#define LIBYM_VERILOG_ELB_ELBFACTORY_H
+#ifndef ELBFACTORY_H
+#define ELBFACTORY_H
 
-/// @file libym_verilog/elaborator/include/ElbFactory.h
+/// @file ElbFactory.h
 /// @brief ElbFactory のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: ElbFactory.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_verilog/verilog.h"
 #include "ym_verilog/pt/PtP.h"
+#include "ym_cell/cell_nsdef.h"
 #include "ym_utils/Alloc.h"
 
 #include "ElbFwd.h"
@@ -401,6 +400,16 @@ public:
 	      const PtItem* pt_header,
 	      const ElbUdpDefn* udp,
 	      bool has_delay) = 0;
+
+  /// @brief セルプリミティブのヘッダを生成する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_header パース木の定義
+  /// @param[in] cell セル
+  virtual
+  ElbPrimHead*
+  new_CellHead(const VlNamedObj* parent,
+	       const PtItem* pt_header,
+	       const Cell* cell) = 0;
 
   /// @brief プリミティブインスタンスを生成する．
   /// @param[in] head ヘッダ
@@ -820,7 +829,7 @@ public:
   virtual
   ElbExpr*
   new_UnaryOp(const PtExpr* pt_expr,
-	      tVpiOpType op_type,
+	      tVlOpType op_type,
 	      ElbExpr* opr1) = 0;
 
   /// @brief 2項演算子を生成する．
@@ -831,7 +840,7 @@ public:
   virtual
   ElbExpr*
   new_BinaryOp(const PtExpr* pt_expr,
-	       tVpiOpType op_type,
+	       tVlOpType op_type,
 	       ElbExpr* opr1,
 	       ElbExpr* opr2) = 0;
 
@@ -844,7 +853,7 @@ public:
   virtual
   ElbExpr*
   new_TernaryOp(const PtExpr* pt_expr,
-		tVpiOpType op_type,
+		tVlOpType op_type,
 		ElbExpr* opr1,
 		ElbExpr* opr2,
 		ElbExpr* opr3) = 0;
@@ -868,8 +877,8 @@ public:
   virtual
   ElbExpr*
   new_MultiConcatOp(const PtExpr* pt_expr,
-		    const PtExpr* rep_expr,
 		    int rep_num,
+		    ElbExpr* rep_expr,
 		    ymuint opr_size,
 		    ElbExpr** opr_list) = 0;
 
@@ -1091,4 +1100,4 @@ public:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBFACTORY_H
+#endif // ELBFACTORY_H

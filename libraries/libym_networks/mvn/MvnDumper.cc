@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnDumper.cc
+/// @file MvnDumper.cc
 /// @brief MvnDumper の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -15,7 +15,6 @@
 #include "ym_networks/MvnPort.h"
 #include "ym_networks/MvnNode.h"
 #include "ym_networks/MvnInputPin.h"
-#include "ym_networks/MvnOutputPin.h"
 
 #include "ym_networks/MvnVlMap.h"
 
@@ -23,39 +22,45 @@
 #include "ym_verilog/vl/VlDeclArray.h"
 #include "ym_verilog/vl/VlRange.h"
 
+#include "ym_cell/Cell.h"
 
-BEGIN_NAMESPACE_YM_MVN
+
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 BEGIN_NONAMESPACE
+
+// ノードを表す文字列を返す．
+string
+node_idstr(const MvnNode* node)
+{
+  ostringstream buf;
+  buf << "Node[" << node->id() << "]";
+  return buf.str();
+}
+
+// MvnInputPin の内容を出力する．
+void
+dump_inputpin(ostream& s,
+	      const MvnInputPin* pin,
+	      const string& pin_name)
+{
+  s << "  " << pin_name
+    << "(" << pin->bit_width() << ")" << endl;
+  const MvnNode* onode = pin->src_node();
+  if ( onode ) {
+    s << "    <== Output@" << node_idstr(onode) << endl;
+  }
+}
 
 // MvnInputPin の内容を出力する．
 void
 dump_inputpin(ostream& s,
 	      const MvnInputPin* pin)
 {
-  s << "  InputPin#" << pin->pos()
-    << "(" << pin->bit_width() << ")" << endl;
-  const MvnOutputPin* opin = pin->src_pin();
-  if ( opin ) {
-    s << "    <== OutputPin#" << opin->pos()
-      << "@node#" << opin->node()->id() << endl;
-  }
-}
-
-// MvnOutputPin の内容を出力する．
-void
-dump_outputpin(ostream& s,
-	       const MvnOutputPin* pin)
-{
-  s << "  OutputPin#" << pin->pos()
-    << "(" << pin->bit_width() << ")" << endl;
-  const MvnInputPinList& fo_list = pin->dst_pin_list();
-  for (MvnInputPinList::const_iterator p = fo_list.begin();
-       p != fo_list.end(); ++ p) {
-    const MvnInputPin* ipin = *p;
-    s << "    ==> InputPin#" << ipin->pos()
-      << "@node#" << ipin->node()->id() << endl;
-  }
+  ostringstream buf;
+  buf << "InputPin#" << pin->pos();
+  string pin_name = buf.str();
+  dump_inputpin(s, pin, pin_name);
 }
 
 // MvnNode の内容を出力する．
@@ -63,8 +68,7 @@ void
 dump_node(ostream& s,
 	  const MvnNode* node)
 {
-  s << "Node#" << node->id()
-    << ":";
+  s << node_idstr(node) << " : ";
   switch ( node->type() ) {
   case MvnNode::kInput:      s << "Input"; break;
   case MvnNode::kInout:      s << "Inout"; break;
@@ -81,6 +85,26 @@ dump_node(ostream& s,
   case MvnNode::kRxor:       s << "Rxor"; break;
   case MvnNode::kEq:         s << "Eq"; break;
   case MvnNode::kLt:         s << "Lt"; break;
+  case MvnNode::kCaseEq:
+    {
+      s << "CaseEq[";
+      vector<ymuint32> xmask;
+      node->xmask(xmask);
+      ymuint bw = node->input(0)->bit_width();
+      for (ymuint i = 0; i < bw; ++ i) {
+	ymuint bitpos = bw - i - 1;
+	ymuint blk = bitpos / 32;
+	ymuint sft = bitpos % 32;
+	if ( xmask[blk] & (1U << sft) ) {
+	  s << "-";
+	}
+	else {
+	  s << "1";
+	}
+      }
+      s << "]";
+    }
+    break;
   case MvnNode::kSll:        s << "Sll"; break;
   case MvnNode::kSrl:        s << "Srl"; break;
   case MvnNode::kSla:        s << "Sla"; break;
@@ -107,8 +131,6 @@ dump_node(ostream& s,
     break;
   case MvnNode::kBitSelect:  s << "BitSelect"; break;
   case MvnNode::kPartSelect: s << "PartSelect"; break;
-  case MvnNode::kCombUdp:    s << "Combinational UDP"; break;
-  case MvnNode::kSeqUdp:     s << "Sequential UDP"; break;
   case MvnNode::kConst:
     {
       s << "Const(";
@@ -122,25 +144,38 @@ dump_node(ostream& s,
       s << dec << ")";
     }
     break;
+  case MvnNode::kCell:
+    {
+      s << "Cell(" << node->cell()->name() << ")";
+    }
+    break;
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
   s << endl;
-  ymuint ni = node->input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    const MvnInputPin* pin = node->input(i);
-    dump_inputpin(s, pin);
-  }
-  ymuint no = node->output_num();
-  for (ymuint i = 0; i < no; ++ i) {
-    const MvnOutputPin* pin = node->output(i);
-    dump_outputpin(s, pin);
-  }
+
   if ( node->type() == MvnNode::kDff ) {
-    ymuint nc = (ni - 2) / 2;
+    const MvnInputPin* input = node->input(0);
+    dump_inputpin(s, input, "DataInput");
+    const MvnInputPin* clock = node->input(1);
+    dump_inputpin(s, clock, "Clock");
+    s << "    ";
+    if ( node->clock_pol() ) {
+      s << "posedge";
+    }
+    else {
+      s << "negedge";
+    }
+    s << endl;
+    ymuint ni = node->input_num();
+    ymuint nc = ni - 2;
     for (ymuint i = 0; i < nc; ++ i) {
-      s << "  Control#" << i << "(InputPin#" << (i * 2) + 2 << ")" << endl
-	<< "    ";
+      const MvnInputPin* cpin = node->input(i + 2);
+      ostringstream buf;
+      buf << "Control#" << i;
+      string pin_name = buf.str();
+      dump_inputpin(s, cpin, pin_name);
+      s << "    ";
       if ( node->control_pol(i) ) {
 	s << "posedge";
       }
@@ -148,6 +183,26 @@ dump_node(ostream& s,
 	s << "negedge";
       }
       s << endl;
+      const MvnNode* dnode = node->control_val(i);
+      s << "  Data#" << i << " <== " << node_idstr(dnode) << endl;
+    }
+  }
+  else if ( node->type() == MvnNode::kLatch ) {
+    #warning "TODO: 未完"
+  }
+  else {
+    ymuint ni = node->input_num();
+    for (ymuint i = 0; i < ni; ++ i) {
+      const MvnInputPin* pin = node->input(i);
+      dump_inputpin(s, pin);
+    }
+    s << "  Output(" << node->bit_width() << ")" << endl;
+    const MvnInputPinList& fo_list = node->dst_pin_list();
+    for (MvnInputPinList::const_iterator p = fo_list.begin();
+	 p != fo_list.end(); ++ p) {
+      const MvnInputPin* ipin = *p;
+      s << "    ==> InputPin#" << ipin->pos()
+	<< "@" << node_idstr(ipin->node()) << endl;
     }
   }
   s << endl;
@@ -186,7 +241,7 @@ MvnDumper::operator()(ostream& s,
     const MvnNode* pnode = module->parent();
     if ( pnode ) {
       s << "  parent node: Module#" << pnode->parent()->id()
-	<< ":" << pnode->id() << endl;
+	<< ":" << node_idstr(pnode) << endl;
     }
     else {
       s << "  toplevel module" << endl;
@@ -199,7 +254,7 @@ MvnDumper::operator()(ostream& s,
       ymuint n = port->port_ref_num();
       for (ymuint k = 0; k < n; ++ k) {
 	const MvnPortRef* port_ref = port->port_ref(k);
-	s << "    node#" << port_ref->node()->id();
+	s << "    " << node_idstr(port_ref->node());
 	if ( port_ref->has_bitselect() ) {
 	  s << "[" << port_ref->bitpos() << "]";
 	}
@@ -222,7 +277,7 @@ MvnDumper::operator()(ostream& s,
     for (ymuint j = 0; j < nio; ++ j) {
       dump_node(s, module->inout(j));
     }
-    for (list<MvnNode*>::const_iterator p = module->nodes_begin();
+    for (MvnNodeList::const_iterator p = module->nodes_begin();
 	 p != module->nodes_end(); ++ p) {
       MvnNode* node = *p;
       dump_node(s, node);
@@ -232,4 +287,4 @@ MvnDumper::operator()(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN

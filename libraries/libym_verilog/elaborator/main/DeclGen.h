@@ -1,13 +1,11 @@
-#ifndef LIBYM_VERILOG_ELABORATOR_DECLGEN_H
-#define LIBYM_VERILOG_ELABORATOR_DECLGEN_H
+#ifndef LIBYM_VERILOG_ELABORATOR_MAIN_DECLGEN_H
+#define LIBYM_VERILOG_ELABORATOR_MAIN_DECLGEN_H
 
-/// @file libym_verilog/elaborator/DeclGen.h
+/// @file libym_verilog/elaborator/main/DeclGen.h
 /// @brief DeclGen のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: DeclGen.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -147,4 +145,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELABORATOR_DECLGEN_H
+#endif // LIBYM_VERILOG_ELABORATOR_MAIN_DECLGEN_H

@@ -134,7 +134,7 @@ EiConstant::is_const() const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiConstant::set_reqsize(tVpiValueType type)
+EiConstant::_set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }
@@ -170,10 +170,10 @@ EiIntConst::~EiIntConst()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiIntConst::value_type() const
 {
-  return kVpiValueInteger;
+  return VlValueType::int_type();
 }
 
 // @brief 定数の型を返す．
@@ -217,16 +217,12 @@ EiBitVectorConst::~EiBitVectorConst()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiBitVectorConst::value_type() const
 {
   ymuint size = mValue.size();
-  if ( static_cast<int>(mConstType) & 8 ) {
-    return pack(kVpiValueSS, size);
-  }
-  else {
-    return pack(kVpiValueUS, size);
-  }
+  bool sign = ( static_cast<int>(mConstType) & 8 ) == 8;
+  return VlValueType(sign, true, size);
 }
 
 // @brief 定数の型を返す．
@@ -267,10 +263,10 @@ EiRealConst::~EiRealConst()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiRealConst::value_type() const
 {
-  return kVpiValueReal;
+  return VlValueType::real_type();
 }
 
 // @brief 定数の型を返す．
@@ -311,11 +307,11 @@ EiStringConst::~EiStringConst()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiStringConst::value_type() const
 {
   ymuint size = mValue.size();
-  return pack(kVpiValueUS, size);
+  return VlValueType(false, true, size);
 }
 
 // @brief 定数の型を返す．

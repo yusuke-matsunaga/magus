@@ -350,7 +350,7 @@ Parser::new_Udp(const FileRegion& file_region,
 void
 Parser::new_UdpEntry(const FileRegion& fr,
 		     const FileRegion& output_loc,
-		     tVpiUdpVal output_symbol)
+		     char output_symbol)
 {
   const PtUdpValue* output = mFactory.new_UdpValue(output_loc, output_symbol);
   add_udp_entry( mFactory.new_UdpEntry(fr, get_udp_value_array(), output) );
@@ -365,9 +365,9 @@ Parser::new_UdpEntry(const FileRegion& fr,
 void
 Parser::new_UdpEntry(const FileRegion& fr,
 		     const FileRegion& current_loc,
-		     tVpiUdpVal current_symbol,
+		     char current_symbol,
 		     const FileRegion& output_loc,
-		     tVpiUdpVal output_symbol)
+		     char output_symbol)
 {
   const PtUdpValue* current = mFactory.new_UdpValue(current_loc,
 						    current_symbol);
@@ -399,9 +399,21 @@ Parser::get_udp_entry_array()
 // @return 生成された値
 void
 Parser::new_UdpValue(const FileRegion& fr,
-		     tVpiUdpVal symbol)
+		     char symbol)
 {
   add_udp_value( mFactory.new_UdpValue(fr, symbol) );
+}
+
+// @brief UDP のテーブルエントリの要素の値の生成
+// @param[in] fr ファイル位置の情報
+// @param[in] symbol1, symbol2 シンボル
+// @return 生成された値
+void
+Parser::new_UdpValue(const FileRegion& fr,
+		     char symbol1,
+		     char symbol2)
+{
+  add_udp_value( mFactory.new_UdpValue(fr, symbol1, symbol2) );
 }
 
 // @brief UdpValue のリストを初期化する．

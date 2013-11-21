@@ -15,17 +15,15 @@ SUBDIRS = \
 	test \
 	.
 
-AM_CXXFLAGS = \
-	-DMAGUS_LIBDIR='"$(MAGUS_LIBDIR)"' \
-	-DMAGUS_DATADIR='"$(MAGUS_DATADIR)"' \
-	-DMAGUS_BINDIR='"$(MAGUS_BINDIR)"'
-
-INCLUDES = \
+AM_CPPFLAGS = \
 	$(TCLRL_INCLUDES) \
 	$(TCL_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	-DMAGUS_LIBDIR='"$(MAGUS_LIBDIR)"' \
+	-DMAGUS_DATADIR='"$(MAGUS_DATADIR)"' \
+	-DMAGUS_BINDIR='"$(MAGUS_BINDIR)"'
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -45,6 +43,14 @@ magus_tclsh_LDADD = \
 	bnet/libmagus_bnet_tcl.la \
 	core/libmagus_core_tcl.la \
 	misc/libmagus_misc_tcl.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_seal/libym_seal.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cec/libym_cec.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LDADD)

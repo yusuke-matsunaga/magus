@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVNDUMPER_H
-#define YM_MVN_MVNDUMPER_H
+#ifndef YM_NETWORKS_MVNDUMPER_H
+#define YM_NETWORKS_MVNDUMPER_H
 
 /// @file ym_networks/MvnDumper.h
 /// @brief MvnDumper のヘッダファイル
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnDumper MvnDumper.h "ym_networks/MvnDumper.h"
@@ -43,6 +43,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // YM_MVN_MVNDUMPER_H
+#endif // YM_NETWORKS_MVNDUMPER_H

@@ -4,10 +4,8 @@
 /// @file ym_mincov/MincovMatrix.h
 /// @brief MincovMatrix のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: MincovMatrix.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -20,7 +18,7 @@ BEGIN_NAMESPACE_YM_MINCOV
 class MincovCost;
 
 //////////////////////////////////////////////////////////////////////
-/// @class MincovCell MincovMatrix.h <ym_mincov/MincovMatrix.h>
+/// @class MincovCell MincovMatrix.h "ym_mincov/MincovMatrix.h"
 /// @brief Mincov 用の行列要素を表すクラス
 //////////////////////////////////////////////////////////////////////
 class MincovCell
@@ -28,7 +26,7 @@ class MincovCell
   friend class MincovRowHead;
   friend class MincovColHead;
   friend class MincovMatrix;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -37,7 +35,7 @@ private:
   /// @brief デストラクタ
   ~MincovCell();
 
-  
+
 public:
 
   /// @brief 行番号を返す．
@@ -47,7 +45,7 @@ public:
   /// @brief 列番号を返す．
   ymuint32
   col_pos() const;
-  
+
   /// @brief 同じ行の直前の要素を返す．
   const MincovCell*
   row_prev() const;
@@ -63,7 +61,7 @@ public:
   /// @brief 同じ列の直後の要素を返す．
   const MincovCell*
   col_next() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -87,7 +85,7 @@ private:
 
   // 下の要素
   MincovCell* mDownLink;
-  
+
 };
 
 
@@ -110,7 +108,7 @@ MincovCell::col_pos() const
 {
   return mColPos;
 }
-  
+
 // @brief 同じ行の直前の要素を返す．
 inline
 const MincovCell*
@@ -145,7 +143,7 @@ MincovCell::col_next() const
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MincovRowHead MincovMatrix.h <ym_mincov/MincovMatrix.h>
+/// @class MincovRowHead MincovMatrix.h "ym_mincov/MincovMatrix.h"
 /// @brief Mincov 用の行の先頭要素を表すクラス
 //////////////////////////////////////////////////////////////////////
 class MincovRowHead
@@ -166,7 +164,7 @@ public:
   /// @brief 行番号を返す．
   ymuint32
   pos() const;
-  
+
   /// @brief 要素数を返す．
   ymuint32
   num() const;
@@ -192,14 +190,14 @@ public:
   /// @brief 直後の行を返す．
   const MincovRowHead*
   next() const;
-  
-  
+
+
 private:
 
   /// @brief 接続している要素をクリアする．
   void
   clear();
-  
+
   /// @brief 追加する要素の両脇を求める．
   /// @param[in] cell 対象の要素
   /// @retval true 正しく処理された．
@@ -207,7 +205,7 @@ private:
   /// @note cell の mRightLink, mLeftLink に結果がセットされる．
   bool
   search_insert_pos(MincovCell* cell);
-  
+
   /// @brief 要素を追加する．
   /// @param[in] cell 追加する要素
   /// @note cell の mRightLink, mLeftLink に適切な値がセットされているものとする．
@@ -218,8 +216,8 @@ private:
   /// @param[in] cell 削除する要素
   void
   delete_elem(MincovCell* cell);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -239,7 +237,7 @@ private:
 
   // 直後の列を指すリンク
   MincovRowHead* mNext;
-  
+
 };
 
 
@@ -254,7 +252,7 @@ MincovRowHead::pos() const
 {
   return mPos;
 }
-  
+
 // @brief 要素数を返す．
 inline
 ymuint32
@@ -346,7 +344,7 @@ MincovRowHead::delete_elem(MincovCell* cell)
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MincovColHead MincovMatrix.h <ym_mincov/MincovMatrix.h>
+/// @class MincovColHead MincovMatrix.h "ym_mincov/MincovMatrix.h"
 /// @brief Mincov 用の列の先頭要素を表すクラス
 //////////////////////////////////////////////////////////////////////
 class MincovColHead
@@ -367,7 +365,7 @@ public:
   /// @brief 列番号を返す．
   ymuint32
   pos() const;
-  
+
   /// @brief 要素数を返す．
   ymuint32
   num() const;
@@ -394,13 +392,13 @@ public:
   const MincovColHead*
   next() const;
 
-  
+
 private:
 
   /// @brief 接続している要素をクリアする．
   void
   clear();
-  
+
   /// @brief 追加する要素の両脇を求める．
   /// @param[in] cell 対象の要素
   /// @retval true 正しく処理された．
@@ -408,7 +406,7 @@ private:
   /// @note cell の mDownLink, mUpLink に結果がセットされる．
   bool
   search_insert_pos(MincovCell* cell);
-  
+
   /// @brief 要素を追加する．
   /// @param[in] cell 追加する要素
   /// @note cell の mDownLink, mUpLink に適切な値がセットされているものとする．
@@ -420,7 +418,7 @@ private:
   void
   delete_elem(MincovCell* cell);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -440,7 +438,7 @@ private:
 
   // 直後の列を指すリンク
   MincovColHead* mNext;
-  
+
 };
 
 
@@ -455,7 +453,7 @@ MincovColHead::pos() const
 {
   return mPos;
 }
-  
+
 // @brief 要素数を返す．
 inline
 ymuint32
@@ -547,7 +545,7 @@ MincovColHead::delete_elem(MincovCell* cell)
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MincovMatrix MincovMatrix.h <ym_mincov/MincovMatrix.h>
+/// @class MincovMatrix MincovMatrix.h "ym_mincov/MincovMatrix.h"
 /// @brief Mincov 用の行列を表すクラス
 //////////////////////////////////////////////////////////////////////
 class MincovMatrix
@@ -562,16 +560,16 @@ public:
   MincovMatrix(ymuint32 row_size,
 	       ymuint32 col_size,
 	       ymuint32 cost_size);
-  
+
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
   MincovMatrix(const MincovMatrix& src);
-  
+
   /// @brief 代入演算子
   /// @param[in] src コピー元のオブジェクト
   const MincovMatrix&
   operator=(const MincovMatrix& src);
-  
+
   /// @brief デストラクタ
   ~MincovMatrix();
 
@@ -588,11 +586,11 @@ public:
   /// @brief 列数を返す．
   ymuint32
   col_size() const;
-  
+
   /// @brief コストの次元を返す．
   ymuint32
   cost_size() const;
-  
+
   /// @brief 行を取り出す．
   /// @param[in] row_pos 行位置 ( 0 <= row_pos < row_size() )
   const MincovRowHead*
@@ -601,7 +599,7 @@ public:
   /// @brief 行の先頭を取り出す．
   const MincovRowHead*
   row_front() const;
-  
+
   /// @brief 行の末尾を取り出す．
   const MincovRowHead*
   row_back() const;
@@ -611,7 +609,7 @@ public:
   /// @return row が終端の時 true を返す．
   bool
   is_row_end(const MincovRowHead* row) const;
-  
+
   /// @brief 列を取り出す．
   /// @param[in] col_pos 列位置 ( 0 <= col_pos < col_size() )
   const MincovColHead*
@@ -620,7 +618,7 @@ public:
   /// @brief 列の先頭を取り出す．
   const MincovColHead*
   col_front() const;
-  
+
   /// @brief 列の末尾を取り出す．
   const MincovColHead*
   col_back() const;
@@ -630,23 +628,23 @@ public:
   /// @return col が終端の時 true を返す．
   bool
   is_col_end(const MincovColHead* col) const;
-  
+
   /// @brief 列のコストを取り出す．
   /// @param[in] col_pos 列位置 ( 0 <= col_pos < col_size() )
   const MincovCost&
   col_cost(ymuint32 col_pos) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 内容を設定する関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 内容をクリアする．
   /// @note 行/列のサイズは不変
   void
   clear();
-  
+
   /// @brief サイズを変更する．
   /// @param[in] row_size 行数
   /// @param[in] col_size 列数
@@ -656,7 +654,7 @@ public:
   resize(ymuint32 row_size,
 	 ymuint32 col_size,
 	 ymuint32 cost_size);
-  
+
   /// @brief 要素を追加する．
   /// @param[in] row_pos 追加する要素の行番号
   /// @param[in] col_pos 追加する要素の列番号
@@ -664,7 +662,7 @@ public:
   MincovCell*
   insert_elem(ymuint32 row_pos,
 	      ymuint32 col_pos);
-  
+
   /// @brief 列のコストを設定する．
   /// @param[in] col_pos 列番号
   /// @param[in] val_pos 値の位置番号
@@ -673,20 +671,20 @@ public:
   set_col_cost(ymuint32 col_pos,
 	       ymuint32 val_pos,
 	       double value);
-  
+
   /// @brief 列を選択し，被覆される行を削除する．
   /// @param[in] col_pos 選択した列
   void
   select_col(ymuint32 col_pos);
-  
+
   /// @brief 行を削除する．
   void
   delete_row(ymuint32 row_pos);
-  
+
   /// @brief 列を削除する．
   void
   delete_col(ymuint32 col_pos);
-  
+
   /// @brief 削除スタックにマーカーを書き込む．
   void
   backup();
@@ -695,7 +693,7 @@ public:
   void
   restore();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
@@ -704,7 +702,7 @@ private:
   /// @brief 内容をコピーする．
   void
   copy(const MincovMatrix& src);
-  
+
   /// @brief 行を復元する．
   void
   restore_row(ymuint32 row_pos);
@@ -712,7 +710,7 @@ private:
   /// @brief 列を復元する．
   void
   restore_col(ymuint32 col_pos);
-  
+
   /// @brief セルの生成
   MincovCell*
   alloc_cell();
@@ -721,42 +719,42 @@ private:
   void
   free_cell(MincovCell* cell);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // セルを確保するためのアロケータ
   UnitAlloc mCellAlloc;
-  
+
   // 行数
   ymuint32 mRowSize;
 
   // 列数
   ymuint32 mColSize;
-  
+
   // コストの次元
   ymuint32 mCostSize;
-  
+
   // 行の先頭の配列
   MincovRowHead* mRowArray;
-  
+
   // 行の先頭をつなぐリンクトリストのダミー
   MincovRowHead mRowHead;
-  
+
   // 列の先頭の配列
   MincovColHead* mColArray;
 
   // 列の先頭をつなぐリンクトリストのダミー
   MincovColHead mColHead;
-  
+
   // 列のコストの配列
   MincovCost** mColCostArray;
-  
+
   // 削除の履歴を覚えておくスタック
   vector<ymuint32> mDelStack;
-  
+
 };
 
 
@@ -779,7 +777,7 @@ MincovMatrix::col_size() const
 {
   return mColSize;
 }
-  
+
 // @brief コストの次元を返す．
 inline
 ymuint32

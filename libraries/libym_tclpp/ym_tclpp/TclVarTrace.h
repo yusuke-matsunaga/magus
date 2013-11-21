@@ -5,9 +5,7 @@
 /// @brief TclVarTrace のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TclVarTrace.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,7 +16,7 @@
 BEGIN_NAMESPACE_YM_TCLPP
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclVarTrace TclVarTrace.h <ym_tclpp/TclVarTrace.h>
+/// @class TclVarTrace TclVarTrace.h "ym_tclpp/TclVarTrace.h"
 /// @ingroup Tclpp
 /// @brief Tcl変数のトレースを実行するためのハンドラオブジェクト
 //////////////////////////////////////////////////////////////////////
@@ -31,28 +29,28 @@ public:
   /// @brief コンストラクタ
   /// @note この時点ではまだ特定のインタープリタには結び付いていない．
   TclVarTrace();
-  
+
   /// @brief デストラクタ
   /// @note まだ変数にバインドしていたらトレースを削除する．
   virtual
   ~TclVarTrace();
-  
+
   /// @brief 名前1を得る．
   string
   name1() const;
-  
+
   /// @brief 名前2を得る．
   string
   name2() const;
-  
+
   /// @brief フラグを得る．
   int
   flags() const;
-  
+
   /// @brief 変数にバインドしている時に true を返す．
   bool
   is_bound() const;
-  
+
   /// @brief 変数にバインドする．
   /// @param[in] interp Tclインタープリタ
   /// @param[in] name1 変数名
@@ -80,7 +78,7 @@ public:
        const string& name1,
        const string& name2,
        int flags);
-  
+
   /// @brief バインドを解く．
   /// @note 既にバインドがなければ何もしない．
   /// @note この関数呼び出しは常に成功する(はず)

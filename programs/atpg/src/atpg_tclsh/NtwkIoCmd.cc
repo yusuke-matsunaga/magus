@@ -39,7 +39,7 @@ ReadBlif::~ReadBlif()
 int
 ReadBlif::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
 
   // このコマンドはファイル名を引数としてとる．
   if ( objc != 2 ) {
@@ -93,7 +93,7 @@ ReadIscas89::~ReadIscas89()
 int
 ReadIscas89::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
 
   // このコマンドはファイル名を引数としてとる．
   if ( objc != 2 ) {
@@ -141,7 +141,7 @@ WriteNetwork::WriteNetwork(AtpgMgr* mgr) :
 int
 WriteNetwork::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
 
   // このコマンドはファイル名のみを引数に取る．
   // 引数がなければ標準出力に出す．

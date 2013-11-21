@@ -13,10 +13,10 @@
  *
  * Revision 2.1  91/12/23  23:11:31  yusuke
  * a slightly speed-up
- * 
+ *
  * Revision 2.0  91/12/21  18:52:26  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.6  1991/10/17  02:55:53  yusuke
  * made a new function eq_imp()
  *
@@ -43,12 +43,12 @@ XOR_gate_t::fwd_imp_h(val3 i_val)
   fprintf(stderr, "%s::fwd_imp_h(val_%c)\n", get_name(), value_name1(i_val));
 #endif
 
-  val3 xval = (get_gtype() == kTgXor) ? val_0 : val_1;
+  val3 xval = (get_gtype() == kTgGateXor) ? val_0 : val_1;
   val3 val = get_gval();
   if (val == val_X) {
     int i;
-    for (i = get_ni(); -- i >= 0; ) {
-      val3 i_val = get_figate(i)->get_gval();
+    for (i = get_fanin_num(); -- i >= 0; ) {
+      val3 i_val = get_fanin_gate(i)->get_gval();
       if (i_val == val_X) {
 	break;
       }
@@ -66,8 +66,8 @@ XOR_gate_t::fwd_imp_h(val3 i_val)
     }
     int ucount = 0;
     gate_t* last = NULL;
-    for (int i = get_ni(); -- i >= 0; ) {
-      gate_t* i_gate = get_figate(i);
+    for (int i = get_fanin_num(); -- i >= 0; ) {
+      gate_t* i_gate = get_fanin_gate(i);
       val3 i_val = i_gate->get_gval();
       if (i_val == val_X) {
 	ucount ++;
@@ -102,12 +102,12 @@ XOR_gate_t::fwd_imp_g(val3 i_val)
   fprintf(stderr, "%s::fwd_imp_g(val_%c)\n", get_name(), value_name1(i_val));
 #endif
 
-  val3 xval = (get_gtype() == kTgXor) ? val_0 : val_1;
+  val3 xval = (get_gtype() == kTgGateXor) ? val_0 : val_1;
   val3 val = get_gval();
   if (val == val_X) {
     int i;
-    for (i = get_ni(); -- i >= 0; ) {
-      val3 i_val = get_figate(i)->get_gval();
+    for (i = get_fanin_num(); -- i >= 0; ) {
+      val3 i_val = get_fanin_gate(i)->get_gval();
       if (i_val == val_X) {
 	break;
       }
@@ -125,8 +125,8 @@ XOR_gate_t::fwd_imp_g(val3 i_val)
     }
     int ucount = 0;
     gate_t* last = NULL;
-    for (int i = get_ni(); -- i >= 0; ) {
-      gate_t* i_gate = get_figate(i);
+    for (int i = get_fanin_num(); -- i >= 0; ) {
+      gate_t* i_gate = get_fanin_gate(i);
       val3 i_val = i_gate->get_gval();
       if (i_val == val_X) {
 	ucount ++;
@@ -166,12 +166,12 @@ XOR_gate_t::fwd_imp_f(val3 i_val)
   fprintf(stderr, "%s::fwd_imp_f(val_%c)\n", get_name(), value_name1(i_val));
 #endif
 
-  val3 xval = (get_gtype() == kTgXor) ? val_0 : val_1;
+  val3 xval = (get_gtype() == kTgGateXor) ? val_0 : val_1;
   val3 val = get_fval();
   if (val == val_X) {
     int i;
-    for (i = get_ni(); -- i >= 0; ) {
-      val3 i_val = get_figate(i)->get_fval();
+    for (i = get_fanin_num(); -- i >= 0; ) {
+      val3 i_val = get_fanin_gate(i)->get_fval();
       if (i_val == val_X) {
 	break;
       }
@@ -189,8 +189,8 @@ XOR_gate_t::fwd_imp_f(val3 i_val)
     }
     int ucount = 0;
     gate_t* last = NULL;
-    for (int i = get_ni(); -- i >= 0; ) {
-      gate_t* i_gate = get_figate(i);
+    for (int i = get_fanin_num(); -- i >= 0; ) {
+      gate_t* i_gate = get_fanin_gate(i);
       val3 i_val = i_gate->get_fval();
       if (i_val == val_X) {
 	ucount ++;
@@ -217,7 +217,7 @@ XOR_gate_t::fwd_imp_f(val3 i_val)
       }
     }
   }
-  
+
 #ifdef DEBUG
   fprintf(stderr, "%s::fwd_imp_f end\n", get_name());
 #endif
@@ -244,14 +244,14 @@ XOR_gate_t::bwd_imp_h(val3 o_val,
     }
     else {
       refl_h(o_val, from);
-      val3 xval = (get_gtype() == kTgXor) ? val_0 : val_1;
+      val3 xval = (get_gtype() == kTgGateXor) ? val_0 : val_1;
       if (o_val == val_1) {
 	xval = neg3(xval);
       }
       int ucount = 0;
       gate_t* last = NULL;
-      for (int i = get_ni(); -- i >= 0; ) {
-	gate_t* i_gate = get_figate(i);
+      for (int i = get_fanin_num(); -- i >= 0; ) {
+	gate_t* i_gate = get_fanin_gate(i);
 	val3 val1 = i_gate->get_gval();
 	if (val1 == val_X) {
 	  ucount ++;
@@ -293,14 +293,14 @@ XOR_gate_t::bwd_imp_g(val3 o_val,
   val3 val = get_gval();
   if (val == val_X) {
     refl_g(o_val, from);
-    val3 xval = (get_gtype() == kTgXor) ? val_0 : val_1;
+    val3 xval = (get_gtype() == kTgGateXor) ? val_0 : val_1;
     if (o_val == val_1) {
       xval = neg3(xval);
     }
     int ucount = 0;
     gate_t* last = NULL;
-    for (int i = get_ni(); -- i >= 0; ) {
-      gate_t* i_gate = get_figate(i);
+    for (int i = get_fanin_num(); -- i >= 0; ) {
+      gate_t* i_gate = get_fanin_gate(i);
       val3 val1 = i_gate->get_gval();
       if (val1 == val_X) {
 	ucount ++;
@@ -346,14 +346,14 @@ XOR_gate_t::bwd_imp_f(val3 o_val,
   val3 val = get_fval();
   if (val == val_X) {
     refl_f(o_val, from);
-    val3 xval = (get_gtype() == kTgXor) ? val_0 : val_1;
+    val3 xval = (get_gtype() == kTgGateXor) ? val_0 : val_1;
     if (o_val == val_1) {
       xval = neg3(xval);
     }
     int ucount = 0;
     gate_t* last = NULL;
-    for (int i = get_ni(); -- i >= 0; ) {
-      gate_t* i_gate = get_figate(i);
+    for (int i = get_fanin_num(); -- i >= 0; ) {
+      gate_t* i_gate = get_fanin_gate(i);
       val3 val1 = i_gate->get_fval();
       if (val1 == val_X) {
 	ucount ++;

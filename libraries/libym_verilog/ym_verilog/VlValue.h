@@ -63,7 +63,7 @@ public:
 
   /// @brief スカラー値からのコンストラクタ
   explicit
-  VlValue(tVpiScalarVal val);
+  VlValue(const VlScalarVal& val);
 
   /// @brief time からのコンストラクタ
   explicit
@@ -76,6 +76,10 @@ public:
   /// @brief ビットベクタからのコンストラクタ
   explicit
   VlValue(const BitVector& val);
+
+  /// @brief 型変換を伴うコンストラクタ
+  VlValue(const VlValue& src,
+	  const VlValueType& value_type);
 
   /// @brief デストラクタ
   ~VlValue();
@@ -96,7 +100,7 @@ public:
 
   /// @brief スカラー値をセットする．
   void
-  set(tVpiScalarVal val);
+  set(const VlScalarVal& val);
 
   /// @brief time の値をセットする．
   void
@@ -168,6 +172,18 @@ public:
   bool
   is_bitvector_conv() const;
 
+  /// @brief 符号付きの型の時に true を返す．
+  bool
+  is_signed() const;
+
+  /// @brief ビットサイズを返す．
+  ymuint
+  bit_size() const;
+
+  /// @brief 値の型を返す．
+  VlValueType
+  value_type() const;
+
   /// @brief 整数型の値を返す．
   /// @note 値が整数型に変換できない時の値は不定
   int
@@ -180,12 +196,12 @@ public:
 
   /// @brief スカラー型の値を返す．
   /// @note スカラー型には常に変換可能
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -201,7 +217,7 @@ public:
   /// @brief ビットベクタ型の値を返す．
   /// @param[in] req_type 要求されるデータの型
   BitVector
-  bitvector_value(tVpiValueType req_type = kVpiValueNone) const;
+  bitvector_value(const VlValueType& req_type = VlValueType()) const;
 
 
 private:
@@ -715,7 +731,7 @@ ite(const VlValue& src1,
 /// @param[in] src3 src1 が偽の時に選ばれる値
 /// @return 演算結果
 VlValue
-ite(tVpiScalarVal src1,
+ite(const VlScalarVal& src1,
     const VlValue& src2,
     const VlValue& src3);
 
@@ -825,12 +841,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const = 0;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const = 0;
 
   /// @brief 実数型の値を返す．
@@ -848,7 +864,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const = 0;
+  bitvector_value(const VlValueType& req_type) const = 0;
 
 };
 
@@ -961,6 +977,89 @@ VlValue::is_bitvector_conv() const
   return mRep->is_bitvector_conv();
 }
 
+// @brief 符号付きの型の時に true を返す．
+inline
+bool
+VlValue::is_signed() const
+{
+  switch ( type() ) {
+  case kIntType:
+  case kRealType:
+    return true;
+
+  case kUintType:
+  case kScalarType:
+  case kTimeType:
+  case kErrorType:
+    return false;
+
+  case kBitVectorType:
+    return bitvector_value().is_signed();
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
+}
+
+// @brief ビットサイズを返す．
+inline
+ymuint
+VlValue::bit_size() const
+{
+  switch ( type() ) {
+  case kIntType:
+  case kUintType:
+    return kVpiSizeInteger;
+
+  case kRealType:
+    return kVpiSizeReal;
+
+  case kScalarType:
+    return 1;
+
+  case kTimeType:
+    return kVpiSizeTime;
+
+  case kBitVectorType:
+    return bitvector_value().size();
+
+  case kErrorType:
+    return 0;
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
+}
+
+// @brief 値の型を返す．
+inline
+VlValueType
+VlValue::value_type() const
+{
+  switch ( type() ) {
+  case kIntType:
+    return VlValueType::int_type();
+
+  case kUintType:
+    return VlValueType(false, true, kVpiSizeInteger);
+
+  case kRealType:
+    return VlValueType::real_type();
+
+  case kScalarType:
+    return VlValueType(false, true, 1);
+
+  case kTimeType:
+    return VlValueType::time_type();
+
+  case kBitVectorType:
+    return bitvector_value().value_type();
+
+  case kErrorType:
+    return VlValueType();
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return VlValueType();
+}
+
 // @brief 整数型の値を返す．
 // @note 値が整数型に変換できない時の値は不定
 inline
@@ -982,7 +1081,7 @@ VlValue::uint_value() const
 // @brief スカラー型の値を返す．
 // @note スカラー型には常に変換可能
 inline
-tVpiScalarVal
+VlScalarVal
 VlValue::scalar_value() const
 {
   return mRep->scalar_value();
@@ -990,7 +1089,7 @@ VlValue::scalar_value() const
 
 // @brief 論理型の値を返す．
 inline
-tVpiScalarVal
+VlScalarVal
 VlValue::logic_value() const
 {
   return mRep->logic_value();
@@ -1019,7 +1118,7 @@ VlValue::time_value() const
 // @param[in] req_type 要求されるデータの型
 inline
 BitVector
-VlValue::bitvector_value(tVpiValueType req_type) const
+VlValue::bitvector_value(const VlValueType& req_type) const
 {
   return mRep->bitvector_value(req_type);
 }

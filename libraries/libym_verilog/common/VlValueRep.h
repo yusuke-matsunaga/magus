@@ -81,12 +81,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -104,7 +104,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const;
+  bitvector_value(const VlValueType& req_type) const;
 
 };
 
@@ -175,12 +175,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -198,7 +198,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const;
+  bitvector_value(const VlValueType& req_type) const;
 
 
 private:
@@ -278,12 +278,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -301,7 +301,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const;
+  bitvector_value(const VlValueType& req_type) const;
 
 
 private:
@@ -325,7 +325,7 @@ class VlValueScalar :
 public:
 
   /// @brief コンストラクタ
-  VlValueScalar(tVpiScalarVal val);
+  VlValueScalar(const VlScalarVal& val);
 
   /// @brief デストラクタ
   virtual
@@ -381,12 +381,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -404,7 +404,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const;
+  bitvector_value(const VlValueType& req_type) const;
 
 
 private:
@@ -413,7 +413,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  tVpiScalarVal mVal;
+  VlScalarVal mVal;
 
 };
 
@@ -484,12 +484,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -507,7 +507,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const;
+  bitvector_value(const VlValueType& req_type) const;
 
 
 private:
@@ -587,12 +587,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -610,7 +610,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const;
+  bitvector_value(const VlValueType& req_type) const;
 
 
 private:
@@ -690,12 +690,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -713,7 +713,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const;
+  bitvector_value(const VlValueType& req_type) const;
 
 
 private:

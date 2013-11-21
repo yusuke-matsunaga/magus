@@ -1,25 +1,23 @@
-#ifndef YM_BNET_BNETGATEDECOMP_H
-#define YM_BNET_BNETGATEDECOMP_H
+#ifndef YM_NETWORKS_BNETGATEDECOMP_H
+#define YM_NETWORKS_BNETGATEDECOMP_H
 
 /// @file ym_networks/BNetGateDecomp.h
 /// @brief BNetGateDecomp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetGateDecomp.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_networks/bnet.h"
+#include "ym_logic/LogExpr.h"
 #include "ym_utils/RandGen.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 //////////////////////////////////////////////////////////////////////
-/// @class BNetGateDecomp BNetGateDecomp.h <ym_networks/BNetGateDecomp.h>
+/// @class BNetGateDecomp BNetGateDecomp.h "ym_networks/BNetGateDecomp.h"
 /// @ingroup BnetGroup
 /// @brief BNetwork のノードの分解を行うクラス
 /// @sa BNetwork BNetManip
@@ -128,6 +126,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS_BNET
 
-#endif // YM_BNET_BNETDECOMP_H
+#endif // YM_NETWORKS_BNETDECOMP_H

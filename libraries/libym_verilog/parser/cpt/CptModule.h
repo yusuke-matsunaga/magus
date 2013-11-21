@@ -334,7 +334,7 @@ public:
   /// @brief 内部ポート結線の方向の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
   virtual
-  tVpiDirection
+  tVlDirection
   portref_dir(ymuint pos) const;
 
 
@@ -349,7 +349,7 @@ public:
   virtual
   void
   _set_portref_dir(ymuint pos,
-		   tVpiDirection dir);
+		   tVlDirection dir);
 
 
 private:
@@ -410,7 +410,7 @@ public:
   ///@brief 内部ポート結線の方向の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
   virtual
-  tVpiDirection
+  tVlDirection
   portref_dir(ymuint pos) const;
 
 
@@ -425,7 +425,7 @@ public:
   virtual
   void
   _set_portref_dir(ymuint pos,
-		   tVpiDirection dir);
+		   tVlDirection dir);
 
 
 private:
@@ -437,7 +437,7 @@ private:
   const PtExpr* mPortRef;
 
   // 方向
-  tVpiDirection mDir;
+  tVlDirection mDir;
 
 };
 
@@ -456,7 +456,7 @@ private:
   CptPort2(const FileRegion& file_region,
 	   const PtExpr* portref,
 	   PtExprArray portref_array,
-	   tVpiDirection* dir_array,
+	   tVlDirection* dir_array,
 	   const char* ext_name);
 
   /// @brief デストラクタ
@@ -483,7 +483,7 @@ public:
   ///@brief 内部ポート結線の方向の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
   virtual
-  tVpiDirection
+  tVlDirection
   portref_dir(ymuint pos) const;
 
 
@@ -498,7 +498,7 @@ public:
   virtual
   void
   _set_portref_dir(ymuint pos,
-		   tVpiDirection dir);
+		   tVlDirection dir);
 
 
 private:
@@ -513,7 +513,7 @@ private:
   PtExprArray mPortRefArray;
 
   // 方向の配列
-  tVpiDirection* mDirArray;
+  tVlDirection* mDirArray;
 
 };
 

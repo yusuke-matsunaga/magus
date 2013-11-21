@@ -2,14 +2,9 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS = . vltest 
-if WITH_QT
-SUBDIRS += ptview vlview
-endif
-
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+SUBDIRS = . \
+	vltest \
+	$(YM_EXTRA_TESTS_SUBDIRS)
 
 YFLAGS=-d -v
 
@@ -35,7 +30,14 @@ bin_PROGRAMS = \
 	bvcalc
 
 noinst_PROGRAMS = \
-	testgen
+	testgen \
+	scalarval_test \
+	udpval_test \
+	valuetype_test
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 
 #############################################################
@@ -59,3 +61,39 @@ testgen_SOURCES = \
 	testgen.cc
 
 testgen_LDADD =
+
+
+#############################################################
+# scalarval_test
+#############################################################
+
+scalarval_test_SOURCES = \
+	scalarval_test.cc
+
+scalarval_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+
+#############################################################
+# udpval_test
+#############################################################
+
+udpval_test_SOURCES = \
+	udpval_test.cc
+
+udpval_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+
+#############################################################
+# valuetype_test
+#############################################################
+
+valuetype_test_SOURCES = \
+	valuetype_test.cc
+
+valuetype_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

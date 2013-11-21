@@ -453,7 +453,7 @@ ElbGenvarHandle::genvar()
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ObjDict::ObjDict(AllocBase& alloc) :
+ObjDict::ObjDict(Alloc& alloc) :
   mAlloc(sizeof(ElbScopeHandle), 1024),
   mNum(0)
 {

@@ -1,21 +1,17 @@
 
-/// @file ymlibs/libym_networks/eliminate.cc
+/// @file eliminate.cc
 /// @brief eliminate() の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: eliminate.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
-
-// ネットワークの eliminate, sweep, clean-up, decomp を行うコマンド
 
 
 #include "ym_networks/BNetwork.h"
 #include "ym_networks/BNetManip.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 
 BEGIN_NONAMESPACE
@@ -33,7 +29,7 @@ struct ElimElem
 
   // ファンアウト先のリテラルの出現頻度
   int mOvalue;
-  
+
   // コンストラクタ
   ElimElem(BNode* node = NULL,
 	   int level = 0,
@@ -43,7 +39,7 @@ struct ElimElem
     mOvalue(ovalue)
   {
   }
-  
+
   // ソート用の比較関数
   friend
   bool
@@ -86,7 +82,7 @@ sort_nodes(const BNetwork* network,
   network->tsort(node_vec);
   for (ymuint i = 0; i < n; i ++) {
     BNode* node = node_vec[i];
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     int level = 0;
     for (ymuint j = 0; j < ni; j ++) {
       BNode* fanin = node->fanin(j);
@@ -109,7 +105,7 @@ sort_nodes(const BNetwork* network,
 	break;
       }
       // ファンアウト先のファクタードフォームでの出現頻度を求める．
-      int a = onode->func().litnum(edge->pos());
+      int a = onode->func().litnum(VarId(edge->pos()));
       ovalue += a;
     }
     work.push_back(ElimElem(node, level, ovalue));
@@ -145,7 +141,7 @@ BNetwork::eliminate(int threshold,
   }
 
   BNetManip manip(this);
-  
+
   // ノードを一時的に格納するベクタを確保する．
   // 現在のノード数よりも増えることはないので
   // 現在のノード数だけ確保しておく．
@@ -216,9 +212,9 @@ BNetwork::eliminate(int threshold,
 	}
 	const LogExpr& ofunc = onode->func();
 	// SOP形式で肯定のリテラルの現れる回数
-	ymuint pa = ofunc.sop_litnum(edge->pos(), kPolPosi);
+	ymuint pa = ofunc.sop_litnum(VarId(edge->pos()), kPolPosi);
 	// SOP形式で否定のリテラルの現れる回数
-	ymuint na = ofunc.sop_litnum(edge->pos(), kPolNega);
+	ymuint na = ofunc.sop_litnum(VarId(edge->pos()), kPolNega);
 	// それらに肯定および否定のSOPのキューブ数をかける．
 	ymuint c = pa * pc + na * nc;
 	if ( ofunc.sop_cubenum() + c > sop_limit ) {
@@ -236,4 +232,4 @@ BNetwork::eliminate(int threshold,
   } while ( eliminated );
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS_BNET

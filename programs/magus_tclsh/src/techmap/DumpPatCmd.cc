@@ -1,5 +1,5 @@
 
-/// @file magus/src/techmap/DumpPatCmd.cc
+/// @file DumpPatCmd.cc
 /// @brief DumpPatCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,15 +11,14 @@
 
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
-#include "ym_techmap/CellMap.h"
+#include "ym_cell/CellLibrary.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
 
 // @brief コンストラクタ
-DumpPatCmd::DumpPatCmd(MagMgr* mgr,
-		       TechmapData* data) :
-  TechmapCmd(mgr, data)
+DumpPatCmd::DumpPatCmd(MagMgr* mgr) :
+  MagCmd(mgr)
 {
   mMislibOpt = new TclPoptStr(this, "mislib",
 			      "read 'mislib' library file",
@@ -92,7 +91,7 @@ DumpPatCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  techmap().dump_library(os, *library);
+  library->dump(os);
 
   return TCL_OK;
 }

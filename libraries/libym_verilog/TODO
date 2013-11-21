@@ -1,14 +1,28 @@
+2011-07-01  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
+
+	* elaborator/main/ExprGen_primary.cc (evaluate_primary):
+	インデックスが範囲外の時には範囲外の部分だけ X にする必要がある．
+	TODO:2011-07-01-01
+
+	* 2011/07/02 対応済み
+	実際には全部 X にすればよい．
+
 2011-02-15  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
 
 	* parser/main/Parser_module.cc (new_Module2001):
 	IO の二重定義のチェックをしていない．
 	TODO:2011-02-15-01
 
+	* 2011/07/02 対応済み
+
 2011-02-14  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
 
 	* elaborator/ei/EiParameter.cc (set_expr):
 	もとのパラメータの型に合わせる必要がある．
 	TODO:2011-02-14-01
+
+	* 2011/07/02 一応対応
+	テストデータを作る必要がある．
 
 2011-02-09  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
 
@@ -30,6 +44,8 @@
 	* mine/bitvector_e.v : 範囲外の指定がエラーにならない．
 	それともこれは実行時/合成時にエラーにするの？
 	TODO:2011-02-09-02
+
+	* これは警告のみ．対応済み
 
 2011-02-09  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
 

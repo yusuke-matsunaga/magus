@@ -107,104 +107,38 @@ BASEDIR=`cd $basedir; pwd`
 # プログラム名の設定
 set_program
 
-# 必要な変数の設定
-AUTOGEN_COMMON="./autogen.common"
-
 # サブモジュールのディレクトリ名
-#SUBMODULE=`cat $BASEDIR/modules`
-LIBRARIES=\
-"libym_utils \
- libym_zstream \
- libym_lexp \
- libym_bdd \
- libym_npn \
- libym_sat \
- libym_smtlibv2 \
- libym_mincov \
- libym_blif \
- libym_iscas89 \
- libym_mislib \
- libym_dotlib \
- libym_cell \
- libym_verilog \
- libym_networks \
- libym_aig \
- libym_gds \
- libym_cec \
- libym_techmap \
- libym_seal \
- libym_tclpp \
- libym_ymsh"
-
-PROGRAMS=\
-"magus_tclsh \
- matpg \
- atpg \
- seal"
+SUBMODULE=`cat $BASEDIR/etc/modules`
 
 # 第1引数に応じた処理を行う．
-case "$1" in
-  ""|boot)
-    case $# in
-      0|1)
-	clean_config $BASEDIR/config
-	clean $BASEDIR
-	clean $BASEDIR/include
-	for lib in $LIBRARIES; do
-	    clean_config $BASEDIR/libraries/$lib
-	    clean $BASEDIR/libraries/$lib
-	done
-	for prog in $PROGRAMS; do
-	    clean_config $BASEDIR/programs/$prog
-	    clean $BASEDIR/programs/$prog
-	done
-        boot $BASEDIR
-	boot $BASEDIR/include
-	for lib in $LIBRARIES; do
-	    boot $BASEDIR/libraries/$lib
-	done
-	for prog in $PROGRAMS; do
-	    boot $BASEDIR/programs/$prog
-	done
-        ;;
-      2)
-	clean_config $2
-	clean $2
-        boot $2
-        ;;
-      *) usage;;
-    esac
-    ;;
-  clean)
-    case $# in
-      1)
-        clean_config $BASEDIR/config
-	clean $BASEDIR
-	clean $BASEDIR/include
-	for lib in $LIBRARIES; do
-	    clean_config $BASEDIR/libraries/$lib
-	    clean $BASEDIR/libraries/$lib
-	done
-	for prog in $PROGRAMS; do
-	    clean_config $BASEDIR/programs/$prog
-	    clean $BASEDIR/programs/$prog
-	done
-	;;
-      2)
-        clean_config $2
-	clean $2
-	;;
-      *) usage;;
-    esac
-    ;;
-  autogen)
-    case $# in
-      3|4)
-	mk_autogen $BASEDIR $2 $3 $4
-	;;
-      *) usage;;
-    esac
-    ;;
-  debug) display_version ;;
-  *) usage;;
-esac
+ case $# in
+     0)
+	 clean_config $BASEDIR/config
+	 clean_root $BASEDIR
+	 for module in $SUBMODULE; do
+	     clean_config $BASEDIR/$module
+	     clean $BASEDIR/$module
+	 done
+         boot $BASEDIR
+	 boot $BASEDIR/include
+	 for module in $SUBMODULE; do
+	     boot $BASEDIR/$module
+	 done
+         ;;
+     1)
+	 if test "x$1" = "xroot"; then
+	     clean_config $BASEDIR/config
+	     clean_root $BASEDIR
+	     boot $BASEDIR
+	     boot $BASEDIR/include
+	 else
+	     clean_config $1
+	     clean $1
+             boot $1
+	 fi
+         ;;
+     *)
+	 echo "Usage: $0 [<module-name>] : (re)generating configure script"
+	 exit 255
+	 ;;
+ esac

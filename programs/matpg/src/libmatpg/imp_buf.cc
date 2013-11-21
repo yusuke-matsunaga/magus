@@ -12,15 +12,15 @@
  * Final , Final revision
  *
  * Revision 2.2  91/12/24  14:40:46  yusuke
- * 
+ *
  * a little bit modification
- * 
+ *
  * Revision 2.1  91/12/23  23:11:21  yusuke
  * a slightly speed-up
- * 
+ *
  * Revision 2.0  91/12/21  18:51:41  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.5  1991/10/05  08:18:18  yusuke
  * add Log and RCSid for RCS
  *
@@ -44,7 +44,7 @@ BUF_gate_t::fwd_imp_h(val3 i_val)
   fprintf(stderr, "%s::fwd_imp_h(val_%c)\n", get_name(), value_name1(i_val));
 #endif
 
-  val3 o_val = (get_gtype() == kTgBuff) ? i_val : neg3(i_val);
+  val3 o_val = (get_gtype() == kTgGateBuff) ? i_val : neg3(i_val);
   val3 val = get_gval();
   if (val == val_X) {
     prop_h(o_val);
@@ -68,7 +68,7 @@ BUF_gate_t::fwd_imp_g(val3 i_val)
   fprintf(stderr, "%s::fwd_imp_g(val_%c)\n", get_name(), value_name1(i_val));
 #endif
 
-  val3 o_val = (get_gtype() == kTgBuff) ? i_val : neg3(i_val);
+  val3 o_val = (get_gtype() == kTgGateBuff) ? i_val : neg3(i_val);
   val3 val = get_gval();
   if (val == val_X) {
     prop_g(o_val);
@@ -79,7 +79,7 @@ BUF_gate_t::fwd_imp_g(val3 i_val)
 #endif
     imp_fail();
   }
-  
+
 #ifdef DEBUG
   fprintf(stderr, "%s::fwd_imp_g end\n", get_name());
 #endif
@@ -92,7 +92,7 @@ BUF_gate_t::fwd_imp_f(val3 i_val)
   fprintf(stderr, "%s::fwd_imp_f(val_%c)\n", get_name(), value_name1(i_val));
 #endif
 
-  val3 o_val = (get_gtype() == kTgBuff) ? i_val : neg3(i_val);
+  val3 o_val = (get_gtype() == kTgGateBuff) ? i_val : neg3(i_val);
   val3 val = get_fval();
   if (val == val_X) {
     prop_f(o_val);
@@ -121,8 +121,8 @@ BUF_gate_t::bwd_imp_h(val3 o_val,
   val3 val = get_gval();
   if (val == val_X) {
     refl_h(o_val, from);
-    val3 i_val = (get_gtype() == kTgBuff) ? o_val : neg3(o_val);
-    get_figate(0)->bwd_imp_h(i_val, this);
+    val3 i_val = (get_gtype() == kTgGateBuff) ? o_val : neg3(o_val);
+    get_fanin_gate(0)->bwd_imp_h(i_val, this);
   }
   else if (val != o_val) {
 #ifdef DEBUG
@@ -148,8 +148,8 @@ BUF_gate_t::bwd_imp_g(val3 o_val,
   val3 val = get_gval();
   if (val == val_X) {
     refl_g(o_val, from);
-    val3 i_val = (get_gtype() == kTgBuff) ? o_val : neg3(o_val);
-    gate_t* i_gate = get_figate(0);
+    val3 i_val = (get_gtype() == kTgGateBuff) ? o_val : neg3(o_val);
+    gate_t* i_gate = get_fanin_gate(0);
     if (i_gate->chk_fcone() == true) {
       i_gate->bwd_imp_g(i_val, this);
     }
@@ -163,7 +163,7 @@ BUF_gate_t::bwd_imp_g(val3 o_val,
 #endif
     imp_fail();
   }
-  
+
 #ifdef DEBUG
   fprintf(stderr, "%s::bwd_imp_g end\n", get_name());
 #endif
@@ -180,8 +180,8 @@ BUF_gate_t::bwd_imp_f(val3 o_val,
   val3 val = get_fval();
   if (val == val_X) {
     refl_f(o_val, from);
-    val3 i_val = (get_gtype() == kTgBuff) ? o_val : neg3(o_val);
-    gate_t* i_gate = get_figate(0);
+    val3 i_val = (get_gtype() == kTgGateBuff) ? o_val : neg3(o_val);
+    gate_t* i_gate = get_fanin_gate(0);
     if (i_gate->chk_fcone() == true) {
       i_gate->bwd_imp_f(i_val, this);
     }

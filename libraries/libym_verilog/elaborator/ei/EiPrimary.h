@@ -5,9 +5,7 @@
 /// @brief EiPrimary のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiPrimary.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -57,7 +55,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type);
+  _set_reqsize(const VlValueType& type);
 
   /// @brief オペランドを返す．
   /// @param[in] pos 位置番号
@@ -110,7 +108,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 定数の時 true を返す．
@@ -199,7 +197,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 定数の時 true を返す．
@@ -257,7 +255,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type);
+  _set_reqsize(const VlValueType& type);
 
   /// @brief オペランドを返す．
   /// @param[in] pos 位置番号
@@ -333,14 +331,21 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 定数の時 true を返す．
-  /// @note 参照している要素の型によって決まる．
+  /// @note このクラスでは true を返す．
   virtual
   bool
   is_const() const;
+
+  /// @brief 定数値を返す．
+  /// @note kVpiConstant の時，意味を持つ．
+  /// @note それ以外では動作は不定
+  virtual
+  VlValue
+  constant_value() const;
 
   /// @brief 宣言要素もしくは配列型宣言要素への参照を返す．
   /// @note それ以外では NULL を返す．
@@ -410,7 +415,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 定数の時 true を返す．
@@ -520,7 +525,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 定数の時 true を返す．
@@ -535,6 +540,12 @@ public:
   virtual
   bool
   is_constant_select() const;
+
+  /// @brief 宣言要素もしくは配列型宣言要素への参照を返す．
+  /// @note それ以外では NULL を返す．
+  virtual
+  const VlDeclBase*
+  decl_base() const;
 
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   /// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
@@ -632,7 +643,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 定数の時 true を返す．
@@ -698,7 +709,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 定数の時 true を返す．

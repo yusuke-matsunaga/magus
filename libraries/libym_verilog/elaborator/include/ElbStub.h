@@ -1,13 +1,11 @@
-#ifndef LIBYM_VERILOG_ELABORATOR_ELBSTUB_H
-#define LIBYM_VERILOG_ELABORATOR_ELBSTUB_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBSTUB_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBSTUB_H
 
-/// @file libym_verilog/elaborator/ElbStub.h
+/// @file libym_verilog/elaborator/include/ElbStub.h
 /// @brief ElbStub のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: ElbStub.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -39,7 +37,7 @@ public:
   virtual
   void
   eval() = 0;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -48,7 +46,7 @@ private:
 
   // 次の要素を指すリンク
   ElbStub* mNextLink;
-  
+
 };
 
 
@@ -65,10 +63,10 @@ public:
 
   /// @brief デストラクタ
   ~ElbStubList();
-  
+
 
 public:
-  
+
   /// @brief 末尾に要素を追加する．
   void
   push_back(ElbStub* elem);
@@ -91,7 +89,7 @@ public:
   /// @note 中の要素のメモリは開放されない．
   void
   clear();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -142,19 +140,19 @@ public:
   virtual
   void
   eval();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // T のオブジェクト
   T* mObj;
 
   // T のメンバ関数
   ElbFunc mMemFunc;
-  
+
   // mMemFunc に渡される引数
   A mA;
 
@@ -193,19 +191,19 @@ public:
   virtual
   void
   eval();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // T のオブジェクト
   T* mObj;
 
   // ElbMgrImpl のメンバ関数
   ElbFunc mMemFunc;
-  
+
   // mMemFunc に渡される引数
   A mA;
   B mB;
@@ -246,19 +244,19 @@ public:
   virtual
   void
   eval();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // T のオブジェクト
   T* mObj;
 
   // ElbMgrImpl のメンバ関数
   ElbFunc mMemFunc;
-  
+
   // mMemFunc に渡される引数
   A mA;
   B mB;
@@ -302,19 +300,19 @@ public:
   virtual
   void
   eval();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // T のオブジェクト
   T* mObj;
 
   // ElbMgrImpl のメンバ関数
   ElbFunc mMemFunc;
-  
+
   // mMemFunc に渡される引数
   A mA;
   B mB;
@@ -572,4 +570,4 @@ ElbStubT4<T, A, B, C, D>::eval()
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELABORATOR_ELBSTUB_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBSTUB_H

@@ -4,10 +4,8 @@
 /// @file libym_mincov/MaxClique.h
 /// @brief MaxClique のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: MaxClique.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "ym_mincov/mincov_nsdef.h"
@@ -28,7 +26,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] size ノード数
   MaxClique(ymuint size);
-  
+
   /// @brief デストラクタ
   ~MaxClique();
 
@@ -39,19 +37,19 @@ public:
   void
   set_cost(ymuint32 id,
 	   const MincovCost* cost);
-  
+
   /// @brief 2つのノードを隣接させる．
   /// @param[in] id1, id2 ノード番号
   void
   connect(ymuint32 id1,
 	  ymuint32 id2);
-  
+
   /// @brief 最大クリークを求める．
   /// @param[out] ans 解のノード番号を入れる配列
   MincovCost
   solve(vector<ymuint32>& ans);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -59,7 +57,7 @@ private:
 
   // コストの配列
   vector<const MincovCost*> mCostArray;
-  
+
   // 隣接ノードリストの配列
   vector<vector<ymuint32> > mNlistArray;
 

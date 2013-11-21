@@ -1,13 +1,11 @@
-#ifndef LIBYM_VERILOG_ELB_ATTRHASH_H
-#define LIBYM_VERILOG_ELB_ATTRHASH_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ATTRHASH_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ATTRHASH_H
 
 /// @file libym_verilog/elaborator/include/AttrHash.h
 /// @brief AttrHash のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: AttrHash.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -28,7 +26,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のアロケータ
-  AttrHash(AllocBase& alloc);
+  AttrHash(Alloc& alloc);
 
   /// @brief デストラクタ
   ~AttrHash();
@@ -107,7 +105,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // Cell の確保用アロケータ
-  AllocBase& mAlloc;
+  Alloc& mAlloc;
 
   // ハッシュ表のサイズ
   ymuint32 mSize;
@@ -125,4 +123,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ATTRHASH_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ATTRHASH_H

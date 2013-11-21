@@ -34,9 +34,10 @@ libym_seal_la_SOURCES = \
 	lu_decomp.cc \
 	MCAnalysis.cc
 
-libym_seal_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
+libym_seal_la_LIBADD =
+
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
 
 libym_seal_la_LDFLAGS = \
 	$(GMP_LIBS)

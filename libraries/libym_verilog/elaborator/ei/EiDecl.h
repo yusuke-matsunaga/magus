@@ -5,9 +5,7 @@
 /// @brief EiDecl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiDecl.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -80,7 +78,7 @@ public:
   /// @breif 値の型を返す．
   /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 符号の取得
@@ -136,11 +134,13 @@ public:
 
   /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index に対するオフセット値 index が範囲内に入っている時．
-  /// @retval -1 index が範囲外の時
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
   virtual
-  int
-  bit_offset(int index) const;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset) const;
 
   /// @brief データ型の取得
   /// @retval データ型 kParam, kLocalParam, kVar の場合
@@ -257,18 +257,18 @@ public:
 
   /// @brief スカラー値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_scalar() const;
 
   /// @brief スカラー値を設定する．
   /// @param[in] val 値
   virtual
   void
-  set_scalar(tVpiScalarVal val);
+  set_scalar(const VlScalarVal& val);
 
   /// @brief 論理値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_logic() const;
 
   /// @brief real 型の値を返す．
@@ -288,7 +288,7 @@ public:
   virtual
   void
   get_bitvector(BitVector& val,
-		tVpiValueType req_type = kVpiValueNone) const;
+		const VlValueType& req_type = VlValueType()) const;
 
   /// @brief bitvector 型の値を設定する．
   /// @param[in] val 値
@@ -299,7 +299,7 @@ public:
   /// @brief ビット選択値を返す．
   /// @param[in] index ビット位置
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_bitselect(int index) const;
 
   /// @brief ビット値を設定する．
@@ -308,7 +308,7 @@ public:
   virtual
   void
   set_bitselect(int index,
-		tVpiScalarVal val);
+		const VlScalarVal& val);
 
   /// @brief 範囲選択値を返す．
   /// @param[in] left 範囲の MSB
@@ -362,18 +362,18 @@ public:
 
   /// @brief スカラー値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_scalar() const;
 
   /// @brief スカラー値を設定する．
   /// @param[in] val 値
   virtual
   void
-  set_scalar(tVpiScalarVal val);
+  set_scalar(const VlScalarVal& val);
 
   /// @brief 論理値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_logic() const;
 
   /// @brief real 型の値を返す．
@@ -393,7 +393,7 @@ public:
   virtual
   void
   get_bitvector(BitVector& val,
-		tVpiValueType req_type = kVpiValueNone) const;
+		const VlValueType& req_type = VlValueType()) const;
 
   /// @brief bitvector 型の値を設定する．
   virtual
@@ -403,7 +403,7 @@ public:
   /// @brief ビット選択値を返す．
   /// @param[in] index ビット位置
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_bitselect(int index) const;
 
   /// @brief ビット値を設定する．
@@ -412,7 +412,7 @@ public:
   virtual
   void
   set_bitselect(int index,
-		tVpiScalarVal val);
+		const VlScalarVal& val);
 
   /// @brief 範囲選択値を返す．
   /// @param[in] left 範囲の MSB
@@ -441,7 +441,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  tVpiScalarVal mVal;
+  VlScalarVal mVal;
 
 };
 
@@ -475,18 +475,18 @@ public:
 
   /// @brief スカラー値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_scalar() const;
 
   /// @brief スカラー値を設定する．
   /// @param[in] val 値
   virtual
   void
-  set_scalar(tVpiScalarVal val);
+  set_scalar(const VlScalarVal& val);
 
   /// @brief 論理値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_logic() const;
 
   /// @brief real 型の値を返す．
@@ -506,7 +506,7 @@ public:
   virtual
   void
   get_bitvector(BitVector& val,
-		tVpiValueType req_type = kVpiValueNone) const;
+		const VlValueType& req_type = VlValueType()) const;
 
   /// @brief bitvector 型の値を設定する．
   /// @param[in] val 値
@@ -517,7 +517,7 @@ public:
   /// @brief ビット選択値を返す．
   /// @param[in] index ビット位置
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_bitselect(int index) const;
 
   /// @brief ビット値を設定する．
@@ -526,7 +526,7 @@ public:
   virtual
   void
   set_bitselect(int index,
-		tVpiScalarVal val);
+		const VlScalarVal& val);
 
   /// @brief 範囲選択値を返す．
   /// @param[in] left 範囲の MSB
@@ -589,18 +589,18 @@ public:
 
   /// @brief スカラー値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_scalar() const;
 
   /// @brief スカラー値を設定する．
   /// @param[in] val 値
   virtual
   void
-  set_scalar(tVpiScalarVal val);
+  set_scalar(const VlScalarVal& val);
 
   /// @brief 論理値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_logic() const;
 
   /// @brief real 型の値を返す．
@@ -620,7 +620,7 @@ public:
   virtual
   void
   get_bitvector(BitVector& val,
-		tVpiValueType req_type = kVpiValueNone) const;
+		const VlValueType& req_type = VlValueType()) const;
 
   /// @brief bitvector 型の値を設定する．
   /// @param[in] val 値
@@ -631,7 +631,7 @@ public:
   /// @brief ビット選択値を返す．
   /// @param[in] index ビット位置
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_bitselect(int index) const;
 
   /// @brief ビット値を設定する．
@@ -640,7 +640,7 @@ public:
   virtual
   void
   set_bitselect(int index,
-		tVpiScalarVal val);
+		const VlScalarVal& val);
 
   /// @brief 範囲選択値を返す．
   /// @param[in] left 範囲の MSB

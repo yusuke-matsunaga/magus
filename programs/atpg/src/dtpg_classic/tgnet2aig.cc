@@ -108,7 +108,7 @@ tgnet2aig(const TgNetwork& network,
   // 内部ノードの生成
   for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* node = network.sorted_logic(i);
-    ymuint nfi = node->ni();
+    ymuint nfi = node->fanin_num();
     vector<AigHandle> fanins(nfi);
     for (ymuint j = 0; j < nfi; ++ j) {
       const TgNode* inode = node->fanin(j);

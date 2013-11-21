@@ -89,7 +89,7 @@ Network::t_analyze()
   c1_array.resize(ngate(), 0);
   ob_array.clear();
   ob_array.resize(ngate(), 0);
-  
+
   // 可制御性の計算
   for (ymuint i = 0; i < ngate(); ++ i) {
     Gate* gate = mGateList[i];
@@ -116,7 +116,7 @@ Network::t_analyze()
       set_ob(gate, 0);
       continue;
     }
-    
+
     vector<ymuint> obs(no);
     obs[0] = gate->fanout(0)->calc_O(gate->fanout_ipos(0));
     for (ymuint j = 1; j < no; ++ j) {
@@ -335,7 +335,7 @@ GateAnd::calc_C_sub(ymuint& min_0,
 	ymuint pos2 = sorted_pos(k);
 	set_sorted_pos(k, pos);
 	pos = pos2;
-      }	
+      }
     }
   }
   min_0 = get_c0(sorted_fanin(0));
@@ -444,7 +444,7 @@ GateOr::calc_C_sub(ymuint& sum_0,
 	ymuint pos2 = sorted_pos(k);
 	set_sorted_pos(k, pos);
 	pos = pos2;
-      }	
+      }
     }
   }
   min_1 = get_c1(sorted_fanin(0));
@@ -530,7 +530,7 @@ GateXor::calc_C()
       }
     }
   }
-  if ( gate_type() == kTgXor ) {
+  if ( gate_type() == kTgGateXor ) {
     set_c0(this, min_0);
     set_c1(this, min_1);
   }
@@ -573,7 +573,7 @@ GateXor::calc_O(ymuint pos)
       min_ob = sum;
     }
   }
-  
+
 #ifdef DEBUG
   cerr << name() << "::calc_O(" << pos << ") = "
        << get_ob(this) + min_ob

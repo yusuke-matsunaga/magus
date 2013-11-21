@@ -4,15 +4,13 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/parser/include
-
-YFLAGS=-d -v
+AM_YFLAGS = -d -v
 
 CLEANFILES = \
-	verilog_grammer.cc verilog_grammer.h y.output verilog_grammer.output
+	verilog_grammer.cc \
+	verilog_grammer.h \
+	y.output \
+	verilog_grammer.output
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -23,6 +21,12 @@ noinst_LTLIBRARIES = \
 ############################################################
 ## libym_vl_parser_main.la
 ############################################################
+
+libym_vl_parser_main_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/parser/include
+
 libym_vl_parser_main_la_SOURCES = \
 	verilog_grammer.yy \
 	Parser.cc \
@@ -39,7 +43,6 @@ libym_vl_parser_main_la_SOURCES = \
 	Parser_udp.cc \c
 	PuHierName.h
 
-libym_vl_parser_main_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_vl_parser_main_la_LIBADD =
 
 libym_vl_parser_main_la_LDFLAGS =

@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/elb_impl/EiExpr.cc
+/// @file libym_verilog/elaborator/ei/EiExpr.cc
 /// @brief EiExpr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiExpr.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -39,13 +37,6 @@ FileRegion
 EiExpr::file_region() const
 {
   return pt_obj()->file_region();
-}
-
-// @brief 式のビット幅を返す．
-ymuint
-EiExpr::bit_size() const
-{
-  return unpack_size(value_type());
 }
 
 // @brief 定数の時 true を返す．
@@ -265,11 +256,11 @@ EiExpr::parent_expr() const
 
 // @brief 演算子のタイプを返す．
 // @note 演算子の時，意味を持つ．
-// @note このクラスでは kVpiNullOp を返す．
-tVpiOpType
+// @note このクラスでは kVlNullOp を返す．
+tVlOpType
 EiExpr::op_type() const
 {
-  return kVpiNullOp;
+  return kVlNullOp;
 }
 
 // @brief オペランド数を返す．
@@ -437,7 +428,7 @@ EiOperation::is_operation() const
 }
 
 // @brief 演算子のタイプを返す．
-tVpiOpType
+tVlOpType
 EiOperation::op_type() const
 {
   return pt_expr()->op_type();

@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELABORATOR_ELBPROXY_H
-#define LIBYM_VERILOG_ELABORATOR_ELBPROXY_H
+#ifndef ELBPROXY_H
+#define ELBPROXY_H
 
-/// @file libym_verilog/elaborator/ElbProxy.h
+/// @file ElbProxy.h
 /// @brief ElbProxy のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: ElbProxy.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
@@ -139,6 +137,13 @@ protected:
   /// @param[in] pt_attr パース木の属性定義
   ElbAttrList*
   find_attr_list(const PtAttrInst* pt_attr) const;
+
+  /// @brief セルの探索
+  /// @param[in] name セル名
+  /// @return name という名のセルを返す．
+  /// @note なければ NULL を返す．
+  const Cell*
+  find_cell(const char* name) const;
 
 
 protected:
@@ -565,7 +570,7 @@ protected:
   bool
   evaluate_scalar(const VlNamedObj* parent,
 		  const PtExpr* pt_expr,
-		  tVpiScalarVal& value,
+		  VlScalarVal& value,
 		  bool put_error);
 
   /// @brief PtExpr を評価し bool 値を返す．
@@ -720,6 +725,17 @@ ElbProxy::find_obj_up(const VlNamedObj* base_scope,
 		      const VlNamedObj* ulimit)
 {
   return mMgr.find_obj_up(base_scope, nb_array, name, ulimit);
+}
+
+// @brief セルの探索
+// @param[in] name セル名
+// @return name という名のセルを返す．
+// @note なければ NULL を返す．
+inline
+const Cell*
+ElbProxy::find_cell(const char* name) const
+{
+  return mElaborator.find_cell(name);
 }
 
 // @brief UDP を登録する．
@@ -1090,4 +1106,4 @@ ElbProxy::make_stub(T* obj,
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELABORATOR_ELBPROXY_H
+#endif // ELBPROXY_H

@@ -5,9 +5,7 @@
 /// @brief EiRange のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiRange.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -96,19 +94,23 @@ public:
 
   /// @brief LSB からのオフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset index の LSB からのオフセット
+  /// @retval true index が範囲内に入っている．
+  /// @retval false index が範囲外
   virtual
-  int
-  offset(int index) const;
+  bool
+  calc_offset(int index,
+	      ymuint& offset) const;
 
   /// @brief MSB からのオフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の MSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset index の MSB からのオフセット
+  /// @retval true index が範囲内に入っている．
+  /// @retval false index が範囲外
   virtual
-  int
-  roffset(int index) const;
+  bool
+  calc_roffset(int index,
+	       ymuint& offset) const;
 
   /// @brief offset の逆関数
   /// @param[in] offset LSB からのオフセット値
@@ -166,25 +168,29 @@ public:
   /// @param[in] left 範囲の MSB
   /// @param[in] right 範囲の LSB
   /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset index の LSB からのオフセット
+  /// @retval true index が範囲内に入っている．
+  /// @retval false index が範囲外
   static
-  int
-  offset(int left,
-	 int right,
-	 int index);
+  bool
+  calc_offset(int left,
+	      int right,
+	      int index,
+	      ymuint& offset);
 
   /// @brief MSB からのオフセット値の取得
   /// @param[in] left 範囲の MSB
   /// @param[in] right 範囲の LSB
   /// @param[in] index インデックス
-  /// @retval index の MSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset index の MSB からのオフセット
+  /// @retval true index が範囲内に入っている．
+  /// @retval false index が範囲外
   static
-  int
-  roffset(int left,
-	  int right,
-	  int index);
+  bool
+  calc_roffset(int left,
+	       int right,
+	       int index,
+	       ymuint& offset);
 
   /// @brief offset の逆関数
   /// @param[in] left 範囲の MSB
@@ -224,10 +230,10 @@ private:
   const PtExpr* mRightRange;
 
   // MSB の値
-  int mLeftVal;
+  ymint32 mLeftVal;
 
   // LSB の値
-  int mRightVal;
+  ymint32 mRightVal;
 
 };
 
@@ -308,17 +314,21 @@ public:
 
   /// @brief LSB からのオフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
-  int
-  offset(int index) const;
+  /// @param[out] offset index の LSB からのオフセット
+  /// @retval true index が範囲内に入っている．
+  /// @retval false index が範囲外
+  bool
+  calc_offset(int index,
+	      ymuint& offset) const;
 
   /// @brief MSB からのオフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の MSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
-  int
-  roffset(int index) const;
+  /// @param[out] offset index の MSB からのオフセット
+  /// @retval true index が範囲内に入っている．
+  /// @retval false index が範囲外
+  bool
+  calc_roffset(int index,
+	       ymuint& offset) const;
 
   /// @brief offset の逆関数
   /// @param[in] offset LSB からのオフセット値
@@ -345,10 +355,10 @@ private:
   const PtExpr* mRightRange;
 
   // MSB の値
-  int mLeftVal;
+  ymint32 mLeftVal;
 
   // LSB の値
-  int mRightVal;
+  ymint32 mRightVal;
 
 };
 
@@ -398,10 +408,12 @@ public:
 
   /// @brief インデックスのリストからオフセットを得る．
   /// @param[in] index_list インデックスのリスト
-  /// @return index_list の値に対応したオフセット値
-  /// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
-  int
-  offset(const vector<int>& index_list) const;
+  /// @param[out] offset index_list の値に対応したオフセット値
+  /// @retval true オフセットの計算が正しく行えた．
+  /// @retval false index_list のいずれかの値が範囲外だった．
+  bool
+  calc_offset(const vector<int>& index_list,
+	      ymuint& offset) const;
 
 
 private:
@@ -457,46 +469,62 @@ EiRange::is_in(int left,
   }
 }
 
-// index のLSBからのオフセットを返す．
-// 範囲外の時は -1 を返す。
+// @brief LSB からのオフセット値の取得
+// @param[in] left 範囲の MSB
+// @param[in] right 範囲の LSB
+// @param[in] index インデックス
+// @param[out] offset index の LSB からのオフセット
+// @retval true index が範囲内に入っている．
+// @retval false index が範囲外
 inline
-int
-EiRange::offset(int left,
-		int right,
-		int index)
+bool
+EiRange::calc_offset(int left,
+		     int right,
+		     int index,
+		     ymuint& offset)
 {
   if ( left >= right ) {
     if ( right <= index && index <= left ) {
-      return index - right;
+      offset = index - right;
+      return true;
     }
   }
   else {
     if ( right >= index && index >= left ) {
-      return right - index;
+      offset = right - index;
+      return true;
     }
   }
-  return -1;
+  return false;
 }
 
-// index のMSBからのオフセットを返す．
-// 範囲外の時は -1 を返す。
+// @brief MSB からのオフセット値の取得
+// @param[in] left 範囲の MSB
+// @param[in] right 範囲の LSB
+// @param[in] index インデックス
+// @param[out] offset index の MSB からのオフセット
+// @retval true index が範囲内に入っている．
+// @retval false index が範囲外
 inline
-int
-EiRange::roffset(int left,
-		 int right,
-		 int index)
+bool
+EiRange::calc_roffset(int left,
+		      int right,
+		      int index,
+		      ymuint& offset)
 {
   if ( left >= right ) {
     if ( right <= index && index <= left ) {
-      return left - index;
+      offset = left - index;
+      return true;
     }
   }
   else {
     if ( right >= index && index >= left ) {
-      return index - left;
+      offset = index - left;
+      return true;
     }
   }
-  return -1;
+  return false;
 }
 
 // offset の逆関数

@@ -27,7 +27,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のアロケータ
-  SptFactory(AllocBase& alloc);
+  SptFactory(Alloc& alloc);
 
   /// @brief デストラクタ
   /// @note このオブジェクトが生成したすべての Pt オブジェクトを破壊する．
@@ -104,7 +104,17 @@ public:
   virtual
   const PtUdpValue*
   new_UdpValue(const FileRegion& file_region,
-	       tVpiUdpVal symbol);
+	       char symbol);
+
+  /// @brief UDP のテーブルエントリの要素の値の生成
+  /// @param[in] fr ファイル位置の情報
+  /// @param[in] symbol1, symbol2 シンボル
+  /// @return 生成された値
+  virtual
+  const PtUdpValue*
+  new_UdpValue(const FileRegion& fr,
+	       char symbol1,
+	       char symbol2);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -218,7 +228,7 @@ public:
   PtiIOHead*
   new_IOHead(const FileRegion& file_region,
 	     tPtIOType type,
-	     bool sign) = 0;
+	     bool sign);
 
   /// @brief IO 宣言のヘッダの生成 (reg 型)
   /// @param[in] file_region ファイル位置の情報
@@ -229,7 +239,7 @@ public:
   PtiIOHead*
   new_RegIOHead(const FileRegion& file_region,
 		tPtIOType type,
-		bool sign) = 0;
+		bool sign);
 
   /// @brief IO 宣言のヘッダの生成 (ネット型)
   /// @param[in] file_region ファイル位置の情報
@@ -242,7 +252,7 @@ public:
   new_NetIOHead(const FileRegion& file_region,
 		tPtIOType type,
 		tVpiNetType net_type,
-		bool sign) = 0;
+		bool sign);
 
   /// @brief IO 宣言のヘッダの生成 (変数型)
   /// @param[in] file_region ファイル位置の情報
@@ -1558,7 +1568,7 @@ public:
   virtual
   const PtExpr*
   new_Opr(const FileRegion& file_region,
-	  tVpiOpType type,
+	  tVlOpType type,
 	  const PtExpr* opr);
 
   /// @brief 二項演算子の生成
@@ -1570,7 +1580,7 @@ public:
   virtual
   const PtExpr*
   new_Opr(const FileRegion& file_region,
-	  tVpiOpType type,
+	  tVlOpType type,
 	  const PtExpr* opr1,
 	  const PtExpr* opr2);
 
@@ -1584,7 +1594,7 @@ public:
   virtual
   const PtExpr*
   new_Opr(const FileRegion& file_region,
-	  tVpiOpType type,
+	  tVlOpType type,
 	  const PtExpr* opr1,
 	  const PtExpr* opr2,
 	  const PtExpr* opr3);

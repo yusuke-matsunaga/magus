@@ -1,5 +1,5 @@
-#ifndef YM_BDN_BDNLATCH_H
-#define YM_BDN_BDNLATCH_H
+#ifndef YM_NETWORKS_BDNLATCH_H
+#define YM_NETWORKS_BDNLATCH_H
 
 /// @file ym_networks/BdnLatch.h
 /// @brief BdnLatch のヘッダファイル
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 class BdnAuxData;
 
@@ -53,7 +53,7 @@ public:
 
   /// @brief データ出力ノードを返す．
   BdnNode*
-  output();
+  _output();
 
   /// @brief データ入力ノードを返す．
   const BdnNode*
@@ -61,7 +61,7 @@ public:
 
   /// @brief データ入力ノードを返す．
   BdnNode*
-  input();
+  _input();
 
   /// @brief ラッチイネーブルノードを返す．
   const BdnNode*
@@ -69,24 +69,27 @@ public:
 
   /// @brief ラッチイネーブルノードを返す．
   BdnNode*
-  enable();
+  _enable();
 
+  /// @brief クリア信号のノードを返す．
+  /// @note NULL の場合もある．
+  const BdnNode*
+  clear() const;
 
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を変更する関数
-  //////////////////////////////////////////////////////////////////////
+  /// @brief クリア信号のノードを返す．
+  /// @note NULL の場合もある．
+  BdnNode*
+  _clear();
 
-  /// @brief 内容を設定する．
-  /// @param[in] name 名前
-  /// @param[in] output 出力ノード
-  /// @param[in] input 入力ノード
-  /// @param[in] enable ラッチイネーブルノード
-  void
-  set(const string& name,
-      BdnNode* output,
-      BdnNode* input,
-      BdnNode* enable);
+  /// @brief プリセット信号のノードを返す．
+  /// @note NULL の場合もある．
+  const BdnNode*
+  preset() const;
+
+  /// @brief プリセット信号のノードを返す．
+  /// @note NULL の場合もある．
+  BdnNode*
+  _preset();
 
 
 private:
@@ -108,6 +111,12 @@ private:
 
   // ラッチイネーブルノード
   BdnNode* mEnable;
+
+  // クリア信号ノード
+  BdnNode* mClear;
+
+  // プリセット信号ノード
+  BdnNode* mPreset;
 
   // BdnNode の付加するデータ
   BdnAuxData* mAuxData;
@@ -149,7 +158,7 @@ BdnLatch::output() const
 // @brief データ出力ノードを返す．
 inline
 BdnNode*
-BdnLatch::output()
+BdnLatch::_output()
 {
   return mOutput;
 }
@@ -165,7 +174,7 @@ BdnLatch::input() const
 // @brief データ入力ノードを返す．
 inline
 BdnNode*
-BdnLatch::input()
+BdnLatch::_input()
 {
   return mInput;
 }
@@ -181,11 +190,43 @@ BdnLatch::enable() const
 // @brief ラッチイネーブルノードを返す．
 inline
 BdnNode*
-BdnLatch::enable()
+BdnLatch::_enable()
 {
   return mEnable;
 }
 
-END_NAMESPACE_YM_BDN
+// @brief クリア信号のノードを返す．
+inline
+const BdnNode*
+BdnLatch::clear() const
+{
+  return mClear;
+}
 
-#endif // YM_BDN_BDNLATCH_H
+// @brief クリア信号のノードを返す．
+inline
+BdnNode*
+BdnLatch::_clear()
+{
+  return mClear;
+}
+
+// @brief プリセット信号のノードを返す．
+inline
+const BdnNode*
+BdnLatch::preset() const
+{
+  return mPreset;
+}
+
+// @brief プリセット信号のノードを返す．
+inline
+BdnNode*
+BdnLatch::_preset()
+{
+  return mPreset;
+}
+
+END_NAMESPACE_YM_NETWORKS_BDN
+
+#endif // YM_NETWORKS_BDNLATCH_H

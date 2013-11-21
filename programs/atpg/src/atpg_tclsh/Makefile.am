@@ -50,10 +50,12 @@ atpg_tclsh_LDADD = \
 	$(top_builddir)/src/dtpg_classic/libatpg_dtpg_cl.la \
 	$(top_builddir)/src/dtpg_sat/libatpg_dtpg_sat.la \
 	$(top_builddir)/src/fsim/libatpg_fsim.la \
+	$(top_builddir)/src/fsim3/libatpg_fsim3.la \
 	$(top_builddir)/src/fsimx/libatpg_fsimx.la \
 	$(top_builddir)/src/base/libatpg_base.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tgnet/libym_tgnet.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LDADD)

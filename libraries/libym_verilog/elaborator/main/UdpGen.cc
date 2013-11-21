@@ -115,7 +115,7 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
     const FileRegion& ifr = pt_init_value->file_region();
 
-    tVpiScalarVal val;
+    VlScalarVal val;
     if ( !evaluate_scalar(NULL, pt_init_value, val, true) ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      ifr,
@@ -141,7 +141,7 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
     ymuint opos = row_size - 1;
 
     // 一行文のデータを保持しておくためのバッファ
-    vector<tVpiUdpVal> row_data(row_size);
+    vector<VlUdpVal> row_data(row_size);
 
     PtUdpEntryArray table = pt_udp->table_array();
     for (ymuint i = 0; i < table.size(); ++ i) {
@@ -161,12 +161,12 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
       // 入力
       for (ymuint j = 0; j < isize; ++ j) {
 	const PtUdpValue* pt_v = input_array[j];
-	tVpiUdpVal symbol = pt_v->symbol();
+	VlUdpVal symbol = pt_v->symbol();
 
-	if ( is_edge_symbol(symbol) ) {
+	if ( symbol.is_edge_symbol() ) {
 	  // 組合せ回路の場合にはエッジタイプの値は使えない．
 	  ostringstream buf;
-	  buf << symbol2string(symbol)
+	  buf << symbol.to_string()
 	      << " : transition symbol for combinational UDP";
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  pt_v->file_region(),
@@ -175,10 +175,10 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 			  buf.str());
 	  return;
 	}
-	if ( symbol == kVpiUdpValNC ) {
+	if ( symbol.is_nc_symbol() ) {
 	  // NC は状態出力にしか使えない
 	  ostringstream buf;
-	  buf << symbol2string(symbol) << " : illegal symbol for input field.";
+	  buf << symbol.to_string() << " : illegal symbol for input field.";
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  pt_v->file_region(),
 			  kMsgError,
@@ -204,12 +204,12 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
       { // 出力
 	const PtUdpValue* pt_v = pt_udp_entry->output();
-	tVpiUdpVal symbol = pt_v->symbol();
+	VlUdpVal symbol = pt_v->symbol();
 
-	if ( symbol == kVpiUdpValB || symbol == kVpiUdpValQ ) {
+	if ( symbol.is_composite_symbol() ) {
 	  // 出力には複合値は使えない
 	  ostringstream buf;
-	  buf << symbol2string(symbol) << " : illegal symbol for output field.";
+	  buf << symbol.to_string() << " : illegal symbol for output field.";
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  pt_v->file_region(),
 			  kMsgError,
@@ -238,7 +238,7 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
     ymuint opos = io_size;
 
     // 一行文のデータを保持しておくためのバッファ
-    vector<tVpiUdpVal> row_data(row_size);
+    vector<VlUdpVal> row_data(row_size);
 
     PtUdpEntryArray table = pt_udp->table_array();
     for (ymuint i = 0; i < table.size(); ++ i) {
@@ -262,9 +262,9 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
       // 入力
       for (ymuint j = 0; j < isize; ++ j) {
 	const PtUdpValue* pt_v = input_array[j];
-	tVpiUdpVal symbol = pt_v->symbol();
+	VlUdpVal symbol = pt_v->symbol();
 
-	if ( is_edge_symbol(symbol) ) {
+	if ( symbol.is_edge_symbol() ) {
 	  ++ nt;
 	  if ( nt > 1 ) {
 	    MsgMgr::put_msg(__FILE__, __LINE__,
@@ -292,12 +292,12 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 	  return;
 	}
 
-	tVpiUdpVal symbol = pt_v->symbol();
+	VlUdpVal symbol = pt_v->symbol();
 
-	if ( is_edge_symbol(symbol) ) {
+	if ( symbol.is_edge_symbol() ) {
 	  // エッジタイプの値は使えない．
 	  ostringstream buf;
-	  buf << symbol2string(symbol)
+	  buf << symbol.to_string()
 	      << " : transition symbol for current state field.";
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  pt_v->file_region(),
@@ -306,10 +306,10 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 			  buf.str());
 	  return;
 	}
-	if ( symbol == kVpiUdpValNC ) {
+	if ( symbol.is_nc_symbol() ) {
 	  // NC は状態出力にしか使えない
 	  ostringstream buf;
-	  buf << symbol2string(symbol)
+	  buf << symbol.to_string()
 	      << " : illegal symbol for current state field.";
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  pt_v->file_region(),
@@ -324,12 +324,12 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
       { // 出力
 	const PtUdpValue* pt_v = pt_udp_entry->output();
-	tVpiUdpVal symbol = pt_v->symbol();
+	VlUdpVal symbol = pt_v->symbol();
 
-	if ( is_edge_symbol(symbol) ) {
+	if ( !symbol.is_nc_symbol() && symbol.is_edge_symbol() ) {
 	  // エッジタイプの値は使えない．
 	  ostringstream buf;
-	  buf << symbol2string(symbol)
+	  buf << symbol.to_string()
 	      << " : transition symbol for output field.";
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  pt_v->file_region(),
@@ -338,10 +338,10 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 			  buf.str());
 	  return;
 	}
-	if ( symbol == kVpiUdpValB || symbol == kVpiUdpValQ ) {
+	if ( symbol.is_composite_symbol() ) {
 	  // 出力には複合値は使えない
 	  ostringstream buf;
-	  buf << symbol2string(symbol)
+	  buf << symbol.to_string()
 	      << " : illegal symbol for output field.";
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  pt_v->file_region(),

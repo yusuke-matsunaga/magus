@@ -1,5 +1,5 @@
 
-/// @file libym_networks/BdnMgr.cc
+/// @file BdnMgr.cc
 /// @brief BdnMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 ///////////////////////////////////////////////////////////////////////
 // クラス BdnMgr
@@ -73,6 +73,22 @@ BdnMgr::port(ymuint pos) const
   return mImpl->port(pos);
 }
 
+// @brief D-FFのIDの最大値 + 1 の取得
+ymuint
+BdnMgr::max_dff_id() const
+{
+  return mImpl->max_dff_id();
+}
+
+// @brief ID番号から D-FF を得る．
+// @param[in] id ID番号 ( 0 <= id < max_dff_id() )
+// @note 該当するD-FFが無い場合には NULL を返す．
+const BdnDff*
+BdnMgr::dff(ymuint id) const
+{
+  return mImpl->dff(id);
+}
+
 // @brief D-FF 数の取得
 ymuint
 BdnMgr::dff_num() const
@@ -85,6 +101,22 @@ const BdnDffList&
 BdnMgr::dff_list() const
 {
   return mImpl->dff_list();
+}
+
+// @brief ラッチのIDの最大値 + 1 の取得
+ymuint
+BdnMgr::max_latch_id() const
+{
+  return mImpl->max_latch_id();
+}
+
+// @brief ID番号からラッチを得る．
+// @param[in] id ID番号 ( 0 <= id < max_latch_id() )
+// @note 該当するラッチが無い場合には NULL を返す．
+const BdnLatch*
+BdnMgr::latch(ymuint id) const
+{
+  return mImpl->latch(id);
 }
 
 // @brief ラッチ数の取得
@@ -107,6 +139,13 @@ ymuint
 BdnMgr::max_node_id() const
 {
   return mImpl->max_node_id();
+}
+
+// @brief ID 番号をキーにノードを取り出す．
+const BdnNode*
+BdnMgr::node(ymuint id) const
+{
+  return mImpl->node(id);
 }
 
 // @brief 入力ノード数の取得
@@ -152,16 +191,53 @@ BdnMgr::lnode_list() const
   return mImpl->lnode_list();
 }
 
+// @brief 指定されたANDタイプの論理ノードが存在するか調べる．
+// @param[in] inode1_handle 1番目の入力ノード+極性
+// @param[in] inode2_handle 2番目の入力ノード+極性
+// @param[out] onode_handle 該当のノード+極性
+// @return 見つかったら true を返す．
+bool
+BdnMgr::find_and(BdnNodeHandle inode1_handle,
+		 BdnNodeHandle inode2_handle,
+		 BdnNodeHandle& onode_handle)
+{
+  return mImpl->find_logic(false, inode1_handle, inode2_handle,
+			   onode_handle);
+}
+
+// @brief 指定されたXORタイプの論理ノードが存在するか調べる．
+// @param[in] inode1_handle 1番目の入力ノード+極性
+// @param[in] inode2_handle 2番目の入力ノード+極性
+// @param[out] onode_handle 該当のノード+極性
+// @return 見つかったら true を返す．
+bool
+BdnMgr::find_xor(BdnNodeHandle inode1_handle,
+		 BdnNodeHandle inode2_handle,
+		 BdnNodeHandle& onode_handle)
+{
+  return mImpl->find_logic(true, inode1_handle, inode2_handle,
+			   onode_handle);
+}
+
 // @brief ソートされたノードのリストを得る．
 void
-BdnMgr::sort(vector<BdnNode*>& node_list) const
+BdnMgr::sort(vector<const BdnNode*>& node_list) const
 {
   mImpl->sort(node_list);
 }
 
+// @brief ソートされた論理ノードのリストを得る．
+// @param[out] node_list ノードのリストの格納先
+// @note 入力ノードと出力ノード，ラッチノードは含まない．
+void
+BdnMgr::_sort(vector<BdnNode*>& node_list) const
+{
+  mImpl->_sort(node_list);
+}
+
 // @brief 逆順でソートされたノードのリストを得る．
 void
-BdnMgr::rsort(vector<BdnNode*>& node_list) const
+BdnMgr::rsort(vector<const BdnNode*>& node_list) const
 {
   mImpl->rsort(node_list);
 }
@@ -173,6 +249,13 @@ BdnMgr::level() const
   return mImpl->level();
 }
 
+// 空にする．
+void
+BdnMgr::clear()
+{
+  mImpl->clear();
+}
+
 // @brief 名前を設定する．
 // @param[in] name 新しい名前
 void
@@ -181,19 +264,46 @@ BdnMgr::set_name(const string& name)
   mImpl->set_name(name);
 }
 
-// 空にする．
+// @brief どこにもファンアウトしていないノードを削除する．
 void
-BdnMgr::clear()
+BdnMgr::clean_up()
 {
-  mImpl->clear();
+  mImpl->clean_up();
+}
+
+// @brief 入力ポートを作る．
+// @param[in] name 名前
+// @param[in] bit_width ビット幅
+BdnPort*
+BdnMgr::new_input_port(const string& name,
+		       ymuint bit_width)
+{
+  return mImpl->new_port(name, vector<ymuint>(bit_width, 1U));
+}
+
+// @brief 出力ポートを作る．
+// @param[in] name 名前
+// @param[in] bit_width ビット幅
+BdnPort*
+BdnMgr::new_output_port(const string& name,
+			ymuint bit_width)
+{
+  return mImpl->new_port(name, vector<ymuint>(bit_width, 2U));
 }
 
 // @brief ポートを作る．
+// @param[in] name 名前
+// @param[in] iovect ビットごとの方向を指定する配列
+// @note iovect の要素の値の意味は以下の通り
+// - 0 : なし
+// - 1 : 入力のみ
+// - 2 : 出力のみ
+// - 3 : 入力と出力
 BdnPort*
 BdnMgr::new_port(const string& name,
-		 ymuint bit_width)
+		 const vector<ymuint>& iovect)
 {
-  return mImpl->new_port(name, bit_width);
+  return mImpl->new_port(name, iovect);
 }
 
 // @brief D-FF を作る．
@@ -214,34 +324,6 @@ BdnMgr::new_latch(const string& name)
   return mImpl->new_latch(name);
 }
 
-// @brief 外部入力を作る．
-// @param[in] port ポート
-// @param[in] bitpos ビット位置
-// @return 作成したノードを返す．
-// @note エラー条件は以下の通り
-//  - bitpos が port のビット幅を越えている．
-//  - port の bitpos にすでにノードがある．
-BdnNode*
-BdnMgr::new_port_input(BdnPort* port,
-		       ymuint bitpos)
-{
-  return mImpl->new_port_input(port, bitpos);
-}
-
-// @brief 外部出力ノードを作る．
-// @param[in] port ポート
-// @param[in] bitpos ビット位置
-// @return 作成したノードを返す．
-// @note エラー条件は以下の通り
-//  - bitpos が port のビット幅を越えている．
-//  - port の bitpos にすでにノードがある．
-BdnNode*
-BdnMgr::new_port_output(BdnPort* port,
-			ymuint bitpos)
-{
-  return mImpl->new_port_output(port, bitpos);
-}
-
 // @brief 出力ノードの内容を変更する
 // @param[in] 変更対象の出力ノード
 // @param[in] inode 入力のノード
@@ -252,42 +334,6 @@ BdnMgr::change_output_fanin(BdnNode* node,
   mImpl->change_output_fanin(node, inode_handle);
 }
 
-
-BEGIN_NONAMESPACE
-
-// new_logic 用の定数
-const ymuint I0_BIT  = 1U;
-const ymuint I1_BIT  = 2U;
-const ymuint AND_BIT = 0U;
-const ymuint XOR_BIT = 4U;
-const ymuint O_BIT   = 8U;
-
-const ymuint AND_00  = AND_BIT;
-const ymuint AND_01  = AND_BIT | I0_BIT;
-const ymuint AND_10  = AND_BIT | I1_BIT;
-const ymuint AND_11  = AND_BIT | I0_BIT | I1_BIT;
-
-const ymuint NAND_00 = AND_00 | O_BIT;
-const ymuint NAND_01 = AND_01 | O_BIT;
-const ymuint NAND_10 = AND_10 | O_BIT;
-const ymuint NAND_11 = AND_11 | O_BIT;
-
-const ymuint OR_00   = NAND_11;
-const ymuint OR_01   = NAND_10;
-const ymuint OR_10   = NAND_01;
-const ymuint OR_11   = NAND_00;
-
-const ymuint NOR_00  = OR_00 | O_BIT;
-const ymuint NOR_01  = OR_01 | O_BIT;
-const ymuint NOR_10  = OR_10 | O_BIT;
-const ymuint NOR_11  = OR_11 | O_BIT;
-
-const ymuint XOR     = XOR_BIT;
-
-const ymuint XNOR    = XOR_BIT | O_BIT;
-
-END_NONAMESPACE
-
 // @brief AND ノードを作る．
 // @param[in] inode1_handle 1番めの入力ノード+極性
 // @param[in] inode2_handle 2番めの入力ノード+極性
@@ -297,7 +343,17 @@ BdnNodeHandle
 BdnMgr::new_and(BdnNodeHandle inode1_handle,
 		BdnNodeHandle inode2_handle)
 {
-  return mImpl->set_logic(NULL, AND_00, inode1_handle, inode2_handle);
+  return mImpl->set_and(NULL, inode1_handle, inode2_handle);
+}
+
+// @brief AND ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdnMgr::new_and(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return mImpl->make_and_tree(NULL, inode_handle_list);
 }
 
 // @brief NAND ノードを作る．
@@ -310,7 +366,17 @@ BdnNodeHandle
 BdnMgr::new_nand(BdnNodeHandle inode1_handle,
 		 BdnNodeHandle inode2_handle)
 {
-  return mImpl->set_logic(NULL, NAND_00, inode1_handle, inode2_handle);
+  return ~mImpl->set_and(NULL, inode1_handle, inode2_handle);
+}
+
+// @brief NAND ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdnMgr::new_nand(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return ~mImpl->make_and_tree(NULL, inode_handle_list);
 }
 
 // @brief OR ノードを作る．
@@ -322,7 +388,17 @@ BdnNodeHandle
 BdnMgr::new_or(BdnNodeHandle inode1_handle,
 	       BdnNodeHandle inode2_handle)
 {
-  return mImpl->set_logic(NULL, OR_00, inode1_handle, inode2_handle);
+  return ~mImpl->set_and(NULL, ~inode1_handle, ~inode2_handle);
+}
+
+// @brief OR ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdnMgr::new_or(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return mImpl->make_or_tree(NULL, inode_handle_list);
 }
 
 // @brief NOR ノードを作る．
@@ -334,7 +410,17 @@ BdnNodeHandle
 BdnMgr::new_nor(BdnNodeHandle inode1_handle,
 		BdnNodeHandle inode2_handle)
 {
-  return mImpl->set_logic(NULL, NOR_00, inode1_handle, inode2_handle);
+  return mImpl->set_and(NULL, ~inode1_handle, ~inode2_handle);
+}
+
+// @brief NOR ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdnMgr::new_nor(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return ~mImpl->make_or_tree(NULL, inode_handle_list);
 }
 
 // @brief XOR ノードを作る．
@@ -346,7 +432,17 @@ BdnNodeHandle
 BdnMgr::new_xor(BdnNodeHandle inode1_handle,
 		BdnNodeHandle inode2_handle)
 {
-  return mImpl->set_logic(NULL, XOR, inode1_handle, inode2_handle);
+  return mImpl->set_xor(NULL, inode1_handle, inode2_handle);
+}
+
+// @brief XOR ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdnMgr::new_xor(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return mImpl->make_xor_tree(NULL, inode_handle_list);
 }
 
 // @brief XNOR ノードを作る．
@@ -358,7 +454,17 @@ BdnNodeHandle
 BdnMgr::new_xnor(BdnNodeHandle inode1_handle,
 		 BdnNodeHandle inode2_handle)
 {
-  return mImpl->set_logic(NULL, XNOR, inode1_handle, inode2_handle);
+  return ~mImpl->set_xor(NULL, inode1_handle, inode2_handle);
+}
+
+// @brief XNOR ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdnMgr::new_xnor(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return ~mImpl->make_xor_tree(NULL, inode_handle_list);
 }
 
 // @brief AND タイプに変更する．
@@ -370,8 +476,7 @@ BdnMgr::change_and(BdnNode* node,
 		   BdnNodeHandle inode1_handle,
 		   BdnNodeHandle inode2_handle)
 {
-  BdnNodeHandle new_handle = mImpl->set_logic(node, AND_00,
-					      inode1_handle, inode2_handle);
+  BdnNodeHandle new_handle = mImpl->set_and(node, inode1_handle, inode2_handle);
   mImpl->change_logic(node, new_handle);
 }
 
@@ -382,7 +487,7 @@ void
 BdnMgr::change_and(BdnNode* node,
 		   const vector<BdnNodeHandle>& inode_handle_list)
 {
-  BdnNodeHandle new_handle = make_and_tree(node, inode_handle_list);
+  BdnNodeHandle new_handle = mImpl->make_and_tree(node, inode_handle_list);
   mImpl->change_logic(node, new_handle);
 }
 
@@ -395,9 +500,8 @@ BdnMgr::change_nand(BdnNode* node,
 		    BdnNodeHandle inode1_handle,
 		    BdnNodeHandle inode2_handle)
 {
-  BdnNodeHandle new_handle = mImpl->set_logic(node, NAND_00,
-					      inode1_handle, inode2_handle);
-  mImpl->change_logic(node, new_handle);
+  BdnNodeHandle new_handle = mImpl->set_and(node, inode1_handle, inode2_handle);
+  mImpl->change_logic(node, ~new_handle);
 }
 
 // @brief NAND タイプに変更する．
@@ -407,7 +511,7 @@ void
 BdnMgr::change_nand(BdnNode* node,
 		    const vector<BdnNodeHandle>& inode_handle_list)
 {
-  BdnNodeHandle new_handle = make_and_tree(node, inode_handle_list);
+  BdnNodeHandle new_handle = mImpl->make_and_tree(node, inode_handle_list);
   mImpl->change_logic(node, ~new_handle);
 }
 
@@ -420,9 +524,8 @@ BdnMgr::change_or(BdnNode* node,
 		  BdnNodeHandle inode1_handle,
 		  BdnNodeHandle inode2_handle)
 {
-  BdnNodeHandle new_handle = mImpl->set_logic(node, OR_00,
-					      inode1_handle, inode2_handle);
-  mImpl->change_logic(node, new_handle);
+  BdnNodeHandle new_handle = mImpl->set_and(node, ~inode1_handle, ~inode2_handle);
+  mImpl->change_logic(node, ~new_handle);
 }
 
 // @brief OR タイプに変更する．
@@ -432,7 +535,7 @@ void
 BdnMgr::change_or(BdnNode* node,
 		  const vector<BdnNodeHandle>& inode_handle_list)
 {
-  BdnNodeHandle new_handle = make_or_tree(node, inode_handle_list);
+  BdnNodeHandle new_handle = mImpl->make_or_tree(node, inode_handle_list);
   mImpl->change_logic(node, new_handle);
 }
 
@@ -445,8 +548,7 @@ BdnMgr::change_nor(BdnNode* node,
 		   BdnNodeHandle inode1_handle,
 		   BdnNodeHandle inode2_handle)
 {
-  BdnNodeHandle new_handle = mImpl->set_logic(node, NOR_00,
-					      inode1_handle, inode2_handle);
+  BdnNodeHandle new_handle = mImpl->set_and(node, ~inode1_handle, ~inode2_handle);
   mImpl->change_logic(node, new_handle);
 }
 
@@ -457,7 +559,7 @@ void
 BdnMgr::change_nor(BdnNode* node,
 		   const vector<BdnNodeHandle>& inode_handle_list)
 {
-  BdnNodeHandle new_handle = make_or_tree(node, inode_handle_list);
+  BdnNodeHandle new_handle = mImpl->make_or_tree(node, inode_handle_list);
   mImpl->change_logic(node, ~new_handle);
 }
 
@@ -470,8 +572,7 @@ BdnMgr::change_xor(BdnNode* node,
 		   BdnNodeHandle inode1_handle,
 		   BdnNodeHandle inode2_handle)
 {
-  BdnNodeHandle new_handle = mImpl->set_logic(node, XOR,
-					      inode1_handle, inode2_handle);
+  BdnNodeHandle new_handle = mImpl->set_xor(node, inode1_handle, inode2_handle);
   mImpl->change_logic(node, new_handle);
 }
 
@@ -482,7 +583,7 @@ void
 BdnMgr::change_xor(BdnNode* node,
 		   const vector<BdnNodeHandle>& inode_handle_list)
 {
-  BdnNodeHandle new_handle = make_xor_tree(node, inode_handle_list);
+  BdnNodeHandle new_handle = mImpl->make_xor_tree(node, inode_handle_list);
   mImpl->change_logic(node, new_handle);
 }
 
@@ -495,9 +596,8 @@ BdnMgr::change_xnor(BdnNode* node,
 		    BdnNodeHandle inode1_handle,
 		    BdnNodeHandle inode2_handle)
 {
-  BdnNodeHandle new_handle = mImpl->set_logic(node, XNOR,
-					      inode1_handle, inode2_handle);
-  mImpl->change_logic(node, new_handle);
+  BdnNodeHandle new_handle = mImpl->set_xor(node, inode1_handle, inode2_handle);
+  mImpl->change_logic(node, ~new_handle);
 }
 
 // @brief XNOR タイプに変更する．
@@ -507,75 +607,8 @@ void
 BdnMgr::change_xnor(BdnNode* node,
 		    const vector<BdnNodeHandle>& inode_handle_list)
 {
-  BdnNodeHandle new_handle = make_xor_tree(node, inode_handle_list);
+  BdnNodeHandle new_handle = mImpl->make_xor_tree(node, inode_handle_list);
   mImpl->change_logic(node, ~new_handle);
 }
 
-// @brief AND のバランス木を作る．
-// @param[in] node 根のノード
-// @param[in] node_list 入力のノードのリスト
-// @note node が NULL の場合，新しいノードを確保する．
-BdnNodeHandle
-BdnMgr::make_and_tree(BdnNode* node,
-		      const vector<BdnNodeHandle>& node_list)
-{
-  return make_tree(node, AND_00, 0, node_list.size(), node_list);
-}
-
-// @brief OR のバランス木を作る．
-// @param[in] node 根のノード
-// @param[in] node_list 入力のノードのリスト
-// @note node が NULL の場合，新しいノードを確保する．
-BdnNodeHandle
-BdnMgr::make_or_tree(BdnNode* node,
-		     const vector<BdnNodeHandle>& node_list)
-{
-  return make_tree(node, OR_00, 0, node_list.size(), node_list);
-}
-
-// @brief XOR のバランス木を作る．
-// @param[in] node 根のノード
-// @param[in] node_list 入力のノードのリスト
-// @note node が NULL の場合，新しいノードを確保する．
-BdnNodeHandle
-BdnMgr::make_xor_tree(BdnNode* node,
-		      const vector<BdnNodeHandle>& node_list)
-{
-  return make_tree(node, XOR, 0, node_list.size(), node_list);
-}
-
-// @brief バランス木を作る．
-// @param[in] node 根のノード
-// @param[in] fcode 機能コード
-// @param[in] start 開始位置
-// @param[in] num 要素数
-// @param[in] node_list 入力のノードのリスト
-// @note node が NULL の場合，新しいノードを確保する．
-BdnNodeHandle
-BdnMgr::make_tree(BdnNode* node,
-		  ymuint fcode,
-		  ymuint start,
-		  ymuint num,
-		  const vector<BdnNodeHandle>& node_list)
-{
-  switch ( num ) {
-  case 0:
-    assert_not_reached(__FILE__, __LINE__);
-
-  case 1:
-    return node_list[start];
-
-  case 2:
-    return mImpl->set_logic(node, fcode, node_list[start], node_list[start + 1]);
-
-  default:
-    break;
-  }
-
-  ymuint nh = num / 2;
-  BdnNodeHandle l = make_tree(NULL, fcode, start, nh, node_list);
-  BdnNodeHandle r = make_tree(NULL, fcode, start + nh, num - nh, node_list);
-  return mImpl->set_logic(node, fcode, l, r);
-}
-
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS_BDN

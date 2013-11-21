@@ -29,9 +29,17 @@ class PtiFactory
 {
 public:
 
+  /// @brief PtiFactory の実装クラスのオブジェクトを作る関数
+  /// @param[in] type 実装クラスを指定する文字列
+  /// @param[in] alloc メモリアロケータ
+  static
+  PtiFactory*
+  make_obj(const string& type,
+	   Alloc& alloc);
+
   /// @brief コンストラクタ
   /// @param[in] alloc メモリアロケータ
-  PtiFactory(AllocBase& alloc);
+  PtiFactory(Alloc& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -106,7 +114,17 @@ public:
   virtual
   const PtUdpValue*
   new_UdpValue(const FileRegion& fr,
-	       tVpiUdpVal symbol) = 0;
+	       char symbol) = 0;
+
+  /// @brief UDP のテーブルエントリの要素の値の生成
+  /// @param[in] fr ファイル位置の情報
+  /// @param[in] symbol1, symbol2 シンボル
+  /// @return 生成された値
+  virtual
+  const PtUdpValue*
+  new_UdpValue(const FileRegion& fr,
+	       char symbol1,
+	       char symbol2) = 0;
 
 
   //////////////////////////////////////////////////////////////////////
@@ -1737,7 +1755,7 @@ public:
   virtual
   const PtExpr*
   new_Opr(const FileRegion& fr,
-	  tVpiOpType type,
+	  tVlOpType type,
 	  const PtExpr* opr) = 0;
 
   /// @brief 二項演算子の生成
@@ -1749,7 +1767,7 @@ public:
   virtual
   const PtExpr*
   new_Opr(const FileRegion& fr,
-	  tVpiOpType type,
+	  tVlOpType type,
 	  const PtExpr* opr1,
 	  const PtExpr* opr2) = 0;
 
@@ -1763,7 +1781,7 @@ public:
   virtual
   const PtExpr*
   new_Opr(const FileRegion& fr,
-	  tVpiOpType type,
+	  tVlOpType type,
 	  const PtExpr* opr1,
 	  const PtExpr* opr2,
 	  const PtExpr* opr3) = 0;
@@ -2315,7 +2333,7 @@ protected:
 
 
   /// @brief メモリアロケータを得る．
-  AllocBase&
+  Alloc&
   alloc();
 
 
@@ -2325,7 +2343,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // メモリアロケータ
-  AllocBase& mAlloc;
+  Alloc& mAlloc;
 
 };
 

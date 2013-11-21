@@ -13,10 +13,6 @@
 #include "ym_utils/MsgHandler.h"
 #include "ym_cell/CellDotlibReader.h"
 #include "ym_cell/CellLibrary.h"
-#include "ym_cell/Cell.h"
-#include "ym_cell/CellPin.h"
-#include "ym_cell/CellTiming.h"
-#include "ym_lexp/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -24,7 +20,7 @@ BEGIN_NAMESPACE_YM_CELL
 int
 dotlib_reader_test(const string& filename)
 {
-  CellDotlibReader reader;
+  CellDotlibReader read;
 
   MsgHandler* mh = new StreamMsgHandler(&cerr);
   mh->set_mask(kMaskAll);
@@ -32,7 +28,7 @@ dotlib_reader_test(const string& filename)
   mh->delete_mask(kMsgDebug);
   MsgMgr::reg_handler(mh);
 
-  const CellLibrary* library = reader.read(filename);
+  const CellLibrary* library = read(filename);
   if ( library == NULL) {
     return 1;
   }

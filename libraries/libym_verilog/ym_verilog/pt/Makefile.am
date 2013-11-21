@@ -4,8 +4,6 @@
 
 SUBDIRS =
 
-INCLUDES =
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \

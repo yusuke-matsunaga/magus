@@ -26,7 +26,9 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-LIBYM_YMSH = $(YMTOOLS_BUILDDIR)/libraries/libym_ymsh/libym_ymsh.la
+LIBYM_YMSH = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_ymsh/libym_ymsh.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 noinst_PROGRAMS = \
 	ymsh_test

@@ -1,5 +1,5 @@
-#ifndef YM_BDN_BDNPORT_H
-#define YM_BDN_BDNPORT_H
+#ifndef YM_NETWORKS_BDNPORT_H
+#define YM_NETWORKS_BDNPORT_H
 
 /// @file ym_networks/BdnPort.h
 /// @brief BdnPort のヘッダファイル
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 class BdnAuxData;
 
@@ -47,17 +47,39 @@ public:
   ymuint
   bit_width() const;
 
+  /// @brief ビットごとの方向を得る．
+  /// @param[out] iovect ビットごとの方向を収める配列
+  /// @note iovect の値の意味は以下の通り
+  ///  - 0 : なし
+  ///  - 1 : 入力のみ
+  ///  - 2 : 出力のみ
+  ///  - 3 : 入力と出力
+  void
+  get_iovect(vector<ymuint>& iovect) const;
+
   /// @brief 入力ノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
   /// @note 出力ポートの場合には NULL を返す．
-  BdnNode*
+  const BdnNode*
   input(ymuint pos) const;
 
   /// @brief 出力ノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
   /// @note 入力ポートの場合には NULL を返す．
-  BdnNode*
+  const BdnNode*
   output(ymuint pos) const;
+
+  /// @brief 入力ノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
+  /// @note 出力ポートの場合には NULL を返す．
+  BdnNode*
+  _input(ymuint pos);
+
+  /// @brief 出力ノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
+  /// @note 入力ポートの場合には NULL を返す．
+  BdnNode*
+  _output(ymuint pos);
 
 
 private:
@@ -74,7 +96,7 @@ private:
   // ビット幅
   ymuint32 mBitWidth;
 
-  // ノードの配列
+  // 入力ノードの配列
   BdnNode** mInputArray;
 
   // 出力ノードの配列
@@ -118,7 +140,7 @@ BdnPort::bit_width() const
 // @param[in] pos 位置番号 ( 0 <= pos < bit_width )
 // @note 出力ポートの場合には NULL を返す．
 inline
-BdnNode*
+const BdnNode*
 BdnPort::input(ymuint pos) const
 {
   return mInputArray[pos];
@@ -128,12 +150,32 @@ BdnPort::input(ymuint pos) const
 // @param[in] pos 位置番号 ( 0 <= pos < bit_width )
 // @note 入力ポートの場合には NULL を返す．
 inline
-BdnNode*
+const BdnNode*
 BdnPort::output(ymuint pos) const
 {
   return mOutputArray[pos];
 }
 
-END_NAMESPACE_YM_BDN
+// @brief 入力ノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
+// @note 出力ポートの場合には NULL を返す．
+inline
+BdnNode*
+BdnPort::_input(ymuint pos)
+{
+  return mInputArray[pos];
+}
 
-#endif // YM_BDN_BDNPORT_H
+// @brief 出力ノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
+// @note 入力ポートの場合には NULL を返す．
+inline
+BdnNode*
+BdnPort::_output(ymuint pos)
+{
+  return mOutputArray[pos];
+}
+
+END_NAMESPACE_YM_NETWORKS_BDN
+
+#endif // YM_NETWORKS_BDNPORT_H

@@ -1,11 +1,9 @@
 
-/// @file libym_bnetiscas89reader/BNetIscas89Handler.cc
+/// @file BNetIscas89Handler.cc
 /// @brief BNetIscas89Handler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetIscas89Reader.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,7 +12,7 @@
 #include "ym_networks/BNetManip.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_ISCAS89
 
 // @brief コンストラクタ
 BNetIscas89Handler::BNetIscas89Handler() :
@@ -34,14 +32,19 @@ void
 BNetIscas89Handler::set_network(BNetwork* network)
 {
   mNetwork = network;
-  mManip = new BNetManip(network);
 }
 
 // @brief 初期化
 bool
 BNetIscas89Handler::init()
 {
+  assert_cond( mManip == NULL, __FILE__, __LINE__);
+
+  mManip = new BNetManip(mNetwork);
   mNetwork->clear();
+
+  mNodeArray.clear();
+
   return true;
 }
 
@@ -194,4 +197,4 @@ BNetIscas89Handler::resize(ymuint32 id)
   }
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_ISCAS89

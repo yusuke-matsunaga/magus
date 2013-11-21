@@ -5,9 +5,7 @@
 /// @brief EiBitSelect のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiBitSelect.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -55,7 +53,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 定数の時 true を返す．
@@ -132,7 +130,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type);
+  _set_reqsize(const VlValueType& type);
 
   /// @brief オペランドを返す．
   /// @param[in] pos 位置番号

@@ -58,19 +58,23 @@ public:
 
   /// @brief 1次元配列の場合にインデックスからオフセットを計算する．
   /// @param[in] index インデックス
-  /// @return index に対するオフセット値を返す．
-  /// @note index が範囲外の場合には -1 を返す．
+  /// @param[out] offset index に対するオフセット値
+  /// @retval true index が範囲内だった．
+  /// @retval false index が範囲外だった．
   virtual
-  int
-  array_offset(int index) const = 0;
+  bool
+  calc_array_offset(int index,
+		    ymuint& offset) const = 0;
 
   /// @brief 他次元配列の場合にインデックスのリストからオフセットを計算する．
   /// @param[in] index_list インデックスのリスト
-  /// @return index_list に対するオフセット値を返す．
-  /// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
+  /// @param[out] offset index_list に対するオフセット値
+  /// @retval true オフセットが正しく計算できた．
+  /// @retval false index_list のいずれかの値が範囲外だった．
   virtual
-  int
-  array_offset(const vector<int>& index_list) const = 0;
+  bool
+  calc_array_offset(const vector<int>& index_list,
+		    ymuint& offset) const = 0;
 
 };
 

@@ -1,21 +1,21 @@
-#ifndef LIBYM_BNETBLIFREADER_BNETBLIFHANDLER_H
-#define LIBYM_BNETBLIFREADER_BNETBLIFHANDLER_H
+#ifndef BNETBLIFHANDLER_H
+#define BNETBLIFHANDLER_H
 
-/// @file libym_bnetblifreader/BNetBlifHandler.h
+/// @file BNetBlifHandler.h
 /// @brief BNetBlifHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetBlifReader.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
-#include "ym_blif/BlifHandler.h"
+#include "ym_networks/bnet.h"
+#include "ym_cell/cell_nsdef.h"
+
+#include "BlifHandler.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetBlifHandler read_blif.cc
@@ -36,9 +36,16 @@ public:
 
 public:
 
-  /// @brief 読み込む対象のネットワークを設定する．
+  /// @brief 対象のネットワークを設定する．
+  /// @param[in] network 読み込む対象のネットワークを設定する．
   void
   set_network(BNetwork* network);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // BlifHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化
   /// @retval true 処理が成功した．
@@ -46,7 +53,7 @@ public:
   virtual
   bool
   init();
-  
+
   /// @brief .model 文の処理
   /// @param[in] loc1 .model の位置情報
   /// @param[in] loc2 文字列の位置情報
@@ -76,7 +83,8 @@ public:
   outputs_elem(ymuint32 name_id);
 
   /// @brief .names 文の処理
-  /// @param[in] name_id_array 各識別子のID番号の配列
+  /// @param[in] onode_id 出力ノードのID番号
+  /// @param[in] inode_id_array 各識別子のID番号の配列
   /// @param[in] nc キューブ数
   /// @param[in] cover_pat 入力カバーを表す文字列
   /// @param[in] opat 出力の極性
@@ -87,53 +95,35 @@ public:
   /// @note opat は '0' か '1' のどちらか
   virtual
   bool
-  names(const vector<ymuint32>& name_id_array,
+  names(ymuint32 onode_id,
+	const vector<ymuint32>& inode_id_array,
 	ymuint32 nc,
 	const char* cover_pat,
 	char opat);
 
-  /// @brief .gate 文の開始
-  /// @param[in] loc1 .gate の位置情報
-  /// @param[in] loc2 セル名の位置情報
-  /// @param[in] name セル名
+  /// @brief .gate 文の処理
+  /// @param[in] onode_id 出力ノードのID番号
+  /// @param[in] inode_id_array 入力ノードのID番号の配列
+  /// @param[in] cell セル
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
-  gate_begin(const FileRegion& loc1,
-	     const FileRegion& loc2,
-	     const char* name);
-
-  /// @brief .gate 文中のピン割り当ての処理
-  /// @param[in] loc1 ピン名の位置情報
-  /// @param[in] f_name ピン名
-  /// @param[in] loc2 ノード名の位置情報
-  /// @param[in] a_name ノード名
-  /// @retval true 処理が成功した．
-  /// @retval false エラーが起こった．
-  virtual
-  bool
-  gate_assign(const FileRegion& loc1,
-	      const char* f_name,
-	      const FileRegion& loc2,
-	      const char* a_name);
-
-  /// @brief .gate 文の終了
-  virtual
-  bool
-  gate_end();
+  gate(ymuint32 onode_id,
+       const vector<ymuint32>& inode_id_array,
+       const Cell* cell);
 
   /// @brief .latch 文の処理
-  /// @param[in] name1_id 最初の識別子のID番号
-  /// @param[in] name2_id 次の識別子のID番号
+  /// @param[in] onode_id 出力ノードのID番号
+  /// @param[in] inode_id 入力ノードのID番号
   /// @param[in] loc4 リセット値の位置情報
   /// @param[in] rval リセット時の値('0'/'1') 未定義なら ' '
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
-  latch(ymuint32 name1_id,
-	ymuint32 name2_id,
+  latch(ymuint32 onode_id,
+	ymuint32 inode_id,
 	const FileRegion& loc4,
 	char rval);
 
@@ -170,7 +160,7 @@ private:
   void
   resize(ymuint32 id);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -184,9 +174,9 @@ private:
 
   // ID番号をキーにした BNode を納めた配列
   vector<BNode*> mNodeArray;
-  
+
 };
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS_BLIF
 
-#endif // LIBYM_BNETBLIFREADER_BNETBLIFHANDLER_H
+#endif // BNETBLIFHANDLER_H

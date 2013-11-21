@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnModule.cc
+/// @file MvnModule.cc
 /// @brief MvnModule の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,7 +10,7 @@
 #include "ym_networks/MvnModule.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 // @brief コンストラクタ
 // @param[in] name 名前
@@ -37,4 +37,4 @@ MvnModule::~MvnModule()
 {
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN

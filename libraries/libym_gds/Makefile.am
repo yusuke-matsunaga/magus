@@ -7,33 +7,64 @@ SUBDIRS = \
 	. \
 	tests
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
-YFLAGS = -d -v
+AM_YFLAGS = -d -v
 
 CLEANFILES = \
-	GdsParser.cc GdsParser.h y.output GdsParser.output
+	gds_grammer.cc \
+	gds_grammer.hh \
+	y.output \
+	gds_grammer.output
 
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## Variables for building targets
+############################################################
+
 noinst_LTLIBRARIES = libym_gds.la
 
-libym_gds_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-libym_gds_la_LDFLAGS = 
+
+############################################################
+## Variables for building libym_gds.la
+############################################################
+
+libym_gds_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
 libym_gds_la_SOURCES = \
+	gds_grammer.yy \
 	Msg.cc \
-	GdsParser.yy \
+	GdsDumper.cc \
+	GdsParser.cc \
 	GdsRecTable.h \
 	GdsRecTable.cc \
 	GdsRecMgr.cc \
 	GdsRecord.cc \
-	GdsData.h \
-	GdsData.cc \
 	GdsScanner.cc \
-	GdsDumper.cc
+	GdsAref.h \
+	GdsAref.cc \
+	GdsBoundary.h \
+	GdsBoundary.cc \
+	GdsBox.h \
+	GdsBox.cc \
+	GdsData.cc \
+	GdsElement.cc \
+	GdsFormat.cc \
+	GdsNode.h \
+	GdsNode.cc \
+	GdsRefBase.h \
+	GdsRefBase.cc \
+	GdsPath.h \
+	GdsPath.cc \
+	GdsSref.h \
+	GdsSref.cc \
+	GdsStruct.cc \
+	GdsText.h \
+	GdsText.cc
 
+libym_gds_la_LIBADD =
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-
+libym_gds_la_LDFLAGS =

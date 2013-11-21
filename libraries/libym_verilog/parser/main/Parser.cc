@@ -29,7 +29,7 @@ const int debug = 0;
 
 BEGIN_NAMESPACE_YM_VERILOG
 
-#include "verilog_grammer.h"
+#include "verilog_grammer.hh"
 
 // メモリリークのチェックを行うとき 1 にする．
 const int check_memory_leak = 0;
@@ -43,7 +43,7 @@ const int check_memory_leak = 0;
 // @param[in] alloc メモリアロケータ
 // @param[in] ptifactory パース木の要素を生成するファクトリクラス
 Parser::Parser(PtMgr& ptmgr,
-	       AllocBase& alloc,
+	       Alloc& alloc,
 	       PtiFactory& ptifactory) :
   mPtMgr(ptmgr),
   mAlloc(alloc),

@@ -1,11 +1,9 @@
 
-/// @file libym_networks/BNetManip.cc
+/// @file BNetManip.cc
 /// @brief BNetManip の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetManip.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,7 +11,7 @@
 #include "BNodeMgr.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 // @brief コンストラクタ．
 // @param[in] network 操作対象のネットワーク
@@ -43,7 +41,7 @@ BNetManip::eliminate_node(BNode* node)
   // ファンアウトリストの複製を作る．
   BNodeEdgeList fanouts(node->fanouts());
 
-  size_t old_ni = node->ni();
+  size_t old_ni = node->fanin_num();
   const LogExpr& orig_f = node->func();
   for (BNodeEdgeList::const_iterator it = fanouts.begin();
        it != fanouts.end(); it ++) {
@@ -53,13 +51,13 @@ BNetManip::eliminate_node(BNode* node)
       // 中間ノードの場合
 
       // node の論理式を併合した新しい論理式を作る．
-      size_t oni = fo_node->ni();
+      size_t oni = fo_node->fanin_num();
       VarVarMap vvmap;
       for (size_t i = 0; i < old_ni; i ++) {
-	vvmap[i] = i + oni;
+	vvmap.insert(make_pair(VarId(i), VarId(i + oni)));
       }
       LogExpr tmp = orig_f.remap_var(vvmap);
-      LogExpr new_expr = fo_node->func().compose(edge->pos(), tmp);
+      LogExpr new_expr = fo_node->func().compose(VarId(edge->pos()), tmp);
 
       // 新しいファンインの配列を作る．
       size_t new_ni = oni + old_ni;
@@ -154,13 +152,13 @@ BNetManip::replace_node(BNode* old_node,
   }
 
   if ( old_node->parent() != mNetwork ) {
-    // old_node はこのネットワークに属している節点ではない 
+    // old_node はこのネットワークに属している節点ではない
     BNET_ERROR("node is not a member of the network.");
     return false;
   }
 
   if ( new_node->parent() != mNetwork ) {
-    // new_node はこのネットワークに属している節点ではない 
+    // new_node はこのネットワークに属している節点ではない
     BNET_ERROR("node is not a member of the network.");
     return false;
   }
@@ -180,7 +178,7 @@ BNetManip::replace_node(BNode* old_node,
     BNode* fo_node = edge->to();
 
     bool found = false;
-    size_t ni = fo_node->ni();
+    size_t ni = fo_node->fanin_num();
     for (size_t i = 0; i < ni; ++ i) {
       if ( fo_node->fanin(i) == new_node ) {
 	found = true;
@@ -229,7 +227,7 @@ BNetManip::change_output(BNode* onode,
     return false;
   }
 
-  if ( onode->ni() == 1 && onode->fanin(0) == node ) {
+  if ( onode->fanin_num() == 1 && onode->fanin(0) == node ) {
     // 変わらないので何もしない．
     return true;
   }
@@ -288,7 +286,7 @@ BNetManip::change_logic(BNode* node,
     BNET_ERROR("node is not a logic node.");
     return false;
   }
-  
+
   // Phase-1: 重複したファンインを一つにまとめる処理を行う．
   size_t orig_ni = fanins.size();
   size_t new_ni = 0;
@@ -337,11 +335,11 @@ BNetManip::change_logic(BNode* node,
     // リテラルを付け替えたファクタードフォームを作る．
     new_expr = new_expr.remap_var(mTmpMap);
   }
-  
+
   // Phase-2: new_expr に現れないリテラルに対応したファンインは削除する．
   bool redundant = false;
-  for (size_t i = 0; i < new_ni; i ++) {
-    size_t lit = new_expr.litnum(i);
+  for (ymuint i = 0; i < new_ni; i ++) {
+    ymuint lit = new_expr.litnum(VarId(i));
     if ( lit == 0 ) {
       redundant = true;
       break;
@@ -350,13 +348,13 @@ BNetManip::change_logic(BNode* node,
   if ( redundant ) {
     mTmpMap.clear();
     size_t wpos = 0;
-    for (size_t i = 0; i < new_ni; i ++) {
-      size_t lit = new_expr.litnum(i);
+    for (ymuint i = 0; i < new_ni; i ++) {
+      ymuint lit = new_expr.litnum(VarId(i));
       if ( lit > 0 ) {
 	if ( wpos < i ) {
 	  BNode* node = mTmpNodes[i];
 	  mTmpNodes[wpos] = node;
-	  mTmpMap.insert(make_pair(i, wpos));
+	  mTmpMap.insert(make_pair(VarId(i), wpos));
 	}
 	++ wpos;
       }
@@ -373,7 +371,7 @@ BNetManip::change_logic(BNode* node,
     }
     mark_TFO(node);
   }
-    
+
   bool ans = true;
   for (size_t i = 0; i < new_ni; i ++) {
     BNode* inode = mTmpNodes[i];
@@ -400,11 +398,11 @@ BNetManip::change_logic(BNode* node,
   if ( tfo_check ) {
     clear_TFO(node);
   }
-  
+
   if ( !ans ) {
     return false;
   }
-  
+
   // 内容をセットしなおす．
   mNetwork->set_node_func(node, new_expr);
   mNetwork->set_node_fanins(node, mTmpNodes);
@@ -465,7 +463,7 @@ bool
 BNetManip::change_logic(BNode* node,
 			const LogExpr& expr)
 {
-  size_t ni = node->ni();
+  size_t ni = node->fanin_num();
   vector<BNode*> fanins(ni);
   for (size_t i = 0; i < ni; ++ i) {
     fanins[i] = node->fanin(i);
@@ -504,7 +502,7 @@ BNetManip::change_latch(BNode* node,
     BNET_ERROR("node is not a member of the network.");
     return false;
   }
-  
+
   if ( fanin->parent() != mNetwork ) {
     // このネットワークに属している節点ではない．
     BNET_ERROR("fanin is not a member of the network.");
@@ -526,7 +524,7 @@ BNetManip::change_latch(BNode* node,
   // 内容をセットしなおす．
   mNetwork->set_node_fanins(node, vector<BNode*>(1, fanin));
   mNetwork->set_node_reset_value(node, reset_value);
-  
+
   // 正常終了
   return true;
 }
@@ -552,7 +550,7 @@ BNetManip::change_to_buffer(BNode* node,
 			    BNode* src_node)
 {
   // BUF を表すファクタードフォームを作る．
-  LogExpr expr = LogExpr::make_posiliteral(0);
+  LogExpr expr = LogExpr::make_posiliteral(VarId(0));
 
   // ノードの内容を設定する．
   bool stat = change_logic(node, expr, vector<BNode*>(1, src_node));
@@ -566,7 +564,7 @@ BNetManip::change_to_inverter(BNode* node,
 			      BNode* src_node)
 {
   // NOT を表すファクタードフォームを作る．
-  LogExpr expr = LogExpr::make_negaliteral(0);
+  LogExpr expr = LogExpr::make_negaliteral(VarId(0));
 
   // ノードの内容を設定する．
   bool stat = change_logic(node, expr, vector<BNode*>(1, src_node));
@@ -583,7 +581,7 @@ BNetManip::change_to_and(BNode* node,
   size_t n = fanins.size();
   LogExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(i);
+    leaves[i] = LogExpr::make_posiliteral(VarId(i));
   }
   LogExpr expr = LogExpr::make_and(leaves);
 
@@ -602,7 +600,7 @@ BNetManip::change_to_nand(BNode* node,
   size_t n = fanins.size();
   LogExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(i);
+    leaves[i] = LogExpr::make_posiliteral(VarId(i));
   }
   LogExpr expr = ~LogExpr::make_and(leaves);
 
@@ -621,7 +619,7 @@ BNetManip::change_to_or(BNode* node,
   size_t n = fanins.size();
   LogExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(i);
+    leaves[i] = LogExpr::make_posiliteral(VarId(i));
   }
   LogExpr expr = LogExpr::make_or(leaves);
 
@@ -640,7 +638,7 @@ BNetManip::change_to_nor(BNode* node,
   size_t n = fanins.size();
   LogExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(i);
+    leaves[i] = LogExpr::make_posiliteral(VarId(i));
   }
   LogExpr expr = ~LogExpr::make_or(leaves);
 
@@ -659,7 +657,7 @@ BNetManip::change_to_xor(BNode* node,
   size_t n = fanins.size();
   LogExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(i);
+    leaves[i] = LogExpr::make_posiliteral(VarId(i));
   }
   LogExpr expr = LogExpr::make_xor(leaves);
 
@@ -678,7 +676,7 @@ BNetManip::change_to_xnor(BNode* node,
   size_t n = fanins.size();
   LogExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(i);
+    leaves[i] = LogExpr::make_posiliteral(VarId(i));
   }
   LogExpr expr = ~LogExpr::make_xor(leaves);
 
@@ -904,4 +902,4 @@ BNetManip::make_xnor(const BNodeVector& fanins,
   return node;
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS_BNET

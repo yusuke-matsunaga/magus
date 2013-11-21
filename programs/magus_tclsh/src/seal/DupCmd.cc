@@ -38,12 +38,12 @@ BEGIN_NONAMESPACE
 void
 add_fanin(BNetManip& manip,
 	  BNode* onode,
-	  size_t ipos,
+	  ymuint ipos,
 	  BNode* new_node)
 {
-  size_t ni = onode->ni();
+  ymuint ni = onode->fanin_num();
   vector<BNode*> fanins(ni + 1);
-  for (size_t i = 0; i < ni; ++ i) {
+  for (ymuint i = 0; i < ni; ++ i) {
     fanins[i] = onode->fanin(i);
   }
   fanins[ni] = new_node;
@@ -51,30 +51,32 @@ add_fanin(BNetManip& manip,
   LogExpr new_expr;
   if ( expr.is_posiliteral() ) {
     assert_cond(ipos == 0 && ni == 1, __FILE__, __LINE__);
-    new_expr = LogExpr::make_posiliteral(0) & LogExpr::make_posiliteral(1);
+    new_expr = LogExpr::make_posiliteral(VarId(0)) &
+      LogExpr::make_posiliteral(VarId(1));
   }
   else if ( expr.is_negaliteral() ) {
     assert_cond(ipos == 0 && ni == 1, __FILE__, __LINE__);
-    new_expr = LogExpr::make_negaliteral(0) & LogExpr::make_negaliteral(1);
+    new_expr = LogExpr::make_negaliteral(VarId(0)) &
+      LogExpr::make_negaliteral(VarId(1));
   }
   else if ( expr.is_and() ) {
     int phase = 0;
     new_expr = LogExpr::make_one();
-    for (size_t i = 0; i < ni; ++ i) {
+    for (ymuint i = 0; i < ni; ++ i) {
       LogExpr i_expr = expr.child(i);
       if ( i_expr.is_posiliteral() ) {
 	if ( phase == -1 ) {
 	  return;
 	}
 	phase = 1;
-	new_expr &= LogExpr::make_posiliteral(i);
+	new_expr &= LogExpr::make_posiliteral(VarId(i));
       }
       else if ( i_expr.is_negaliteral() ) {
 	if ( phase == 1 ) {
 	  return;
 	}
 	phase = -1;
-	new_expr &= LogExpr::make_negaliteral(i);
+	new_expr &= LogExpr::make_negaliteral(VarId(i));
       }
       else {
 	return;
@@ -82,30 +84,30 @@ add_fanin(BNetManip& manip,
     }
     assert_cond( phase != 0 , __FILE__, __LINE__);
     if ( phase > 0 ) {
-      new_expr &= LogExpr::make_posiliteral(ni);
+      new_expr &= LogExpr::make_posiliteral(VarId(ni));
     }
     else {
-      new_expr &= LogExpr::make_negaliteral(ni);
+      new_expr &= LogExpr::make_negaliteral(VarId(ni));
     }
   }
   else if ( expr.is_or() ) {
     int phase = 0;
     new_expr = LogExpr::make_zero();
-    for (size_t i = 0; i < ni; ++ i) {
+    for (ymuint i = 0; i < ni; ++ i) {
       LogExpr i_expr = expr.child(i);
       if ( i_expr.is_posiliteral() ) {
 	if ( phase == -1 ) {
 	  return;
 	}
 	phase = 1;
-	new_expr |= LogExpr::make_posiliteral(i);
+	new_expr |= LogExpr::make_posiliteral(VarId(i));
       }
       else if ( i_expr.is_negaliteral() ) {
 	if ( phase == 1 ) {
 	  return;
 	}
 	phase = -1;
-	new_expr |= LogExpr::make_negaliteral(i);
+	new_expr |= LogExpr::make_negaliteral(VarId(i));
       }
       else {
 	return;
@@ -113,10 +115,10 @@ add_fanin(BNetManip& manip,
     }
     assert_cond( phase != 0 , __FILE__, __LINE__);
     if ( phase > 0 ) {
-      new_expr |= LogExpr::make_posiliteral(ni);
+      new_expr |= LogExpr::make_posiliteral(VarId(ni));
     }
     else {
-      new_expr |= LogExpr::make_negaliteral(ni);
+      new_expr |= LogExpr::make_negaliteral(VarId(ni));
     }
   }
   else {
@@ -133,7 +135,7 @@ END_NONAMESPACE
 int
 DupCmd::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
   if ( objc != 2 ) {
     print_usage();
     return TCL_ERROR;
@@ -153,11 +155,11 @@ DupCmd::cmd_proc(TclObjVector& objv)
   network.tsort(node_list);
   { // node_list の順番をランダムに入れ替える．
 #if 0
-    size_t nv = network.logic_node_num();
+    ymuint nv = network.logic_node_num();
     RandGen rgen;
     vector<bool> mark(nv, false);
-    for (size_t i = 0; i < node_num; ++ i) {
-      size_t pos;
+    for (ymuint i = 0; i < node_num; ++ i) {
+      ymuint pos;
       do {
 	pos = rgen.int32() % nv;
       } while ( mark[pos] );
@@ -171,9 +173,9 @@ DupCmd::cmd_proc(TclObjVector& objv)
   for (vector<BNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     BNode* node = *p;
-    size_t ni = node->ni();
+    ymuint ni = node->fanin_num();
     vector<BNode*> fanins(ni);
-    for (size_t i = 0; i < ni; ++ i) {
+    for (ymuint i = 0; i < ni; ++ i) {
       fanins[i] = node->fanin(i);
     }
     LogExpr lexp = node->func();

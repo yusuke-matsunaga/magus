@@ -5,19 +5,16 @@
 /// @brief CellBundle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: CellBundle.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_cell/cell_type.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellBundle CellBundle.h <ym_cell/CellBundle.h>
+/// @class CellBundle CellBundle.h "ym_cell/CellBundle.h"
 /// @brief バンドルを表すクラス
 //////////////////////////////////////////////////////////////////////
 class CellBundle

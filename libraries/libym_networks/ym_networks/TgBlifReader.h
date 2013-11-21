@@ -1,26 +1,31 @@
-#ifndef YM_TGNET_TGBLIFREADER_H
-#define YM_TGNET_TGBLIFREADER_H
+#ifndef YM_NETWORKS_TGBLIFREADER_H
+#define YM_NETWORKS_TGBLIFREADER_H
 
 /// @file ym_networks/TgBlifReader.h
 /// @brief TgBlifReader のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TgBlifReader.h 1978 2009-02-06 12:29:16Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/tgnet_nsdef.h"
-#include "ym_blif/BlifParser.h"
+#include "ym_networks/tgnet.h"
+#include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
-class TgBlifHandler;
+namespace nsBlif {
+  class BlifParser;
+  class TgBlifHandler;
+}
+
+END_NAMESPACE_YM_NETWORKS
+
+BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 //////////////////////////////////////////////////////////////////////
-/// @class TgBlifReader TgBlifReader.h <ym_networks/TgBlifReader.h>
+/// @class TgBlifReader TgBlifReader.h "ym_networks/TgBlifReader.h"
 /// @brief blif 形式のファイルを読み込むためのクラス
 //////////////////////////////////////////////////////////////////////
 class TgBlifReader
@@ -41,7 +46,8 @@ public:
   /// @param[in] network 設定対象のネットワーク
   bool
   operator()(const string& filename,
-	     TgNetwork& network);
+	     TgNetwork& network,
+	     const CellLibrary* cell_library = NULL);
 
 
 private:
@@ -50,13 +56,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // Blif ファイルを読み込むためのパーサ
-  BlifParser mParser;
+  nsBlif::BlifParser* mParser;
 
   // Blif ファイルを TgNetwork に変換するためのハンドラ
-  TgBlifHandler* mHandler;
+  nsBlif::TgBlifHandler* mHandler;
 
 };
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS_TGNET
 
-#endif // YM_TGNET_TGBLIFREADER_H
+#endif // YM_NETWORKS_TGBLIFREADER_H

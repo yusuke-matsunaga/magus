@@ -1,15 +1,13 @@
 
-/// @file libym_utils/UnitAlloc.cc
+/// @file UnitAlloc.cc
 /// @brief UnitAlloc の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: UnitAlloc.cc 958 2007-08-28 05:38:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -19,15 +17,11 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-UnitAlloc::UnitAlloc(size_t unit_size,
-		     size_t block_size) :
+UnitAlloc::UnitAlloc(ymuint64 unit_size,
+		     ymuint64 block_size) :
   mUnitSize(unit_size),
   mBlockSize(block_size),
-  mAvailTop(NULL),
-  mUsedSize(0),
-  mMaxUsedSize(0),
-  mAllocSize(0),
-  mAllocCount(0)
+  mAvailTop(NULL)
 {
   if ( mUnitSize < sizeof(Block) ) {
     mUnitSize = sizeof(Block);
@@ -43,26 +37,20 @@ UnitAlloc::~UnitAlloc()
 
 // @brief n バイトの領域を確保する．
 void*
-UnitAlloc::get_memory(size_t n)
+UnitAlloc::_get_memory(ymuint64 n)
 {
-  mUsedSize += n;
-  if ( mMaxUsedSize < mUsedSize ) {
-    mMaxUsedSize = mUsedSize;
+  if ( n != mUnitSize ) {
+    // mUnitSize と異なっていたら普通のアロケータを使う．
+    return alloc(n);
   }
 
-  if ( n != mUnitSize ) {
-    mAllocSize += n;
-    return ::operator new(n);
-  }
-  
   if ( mAvailTop == NULL ) {
-    char* chunk = new char[mUnitSize * mBlockSize];
-    mAllocSize += mUnitSize * mBlockSize;
-    ++ mAllocCount;
+    void* chunk = alloc(mUnitSize * mBlockSize);
     mAllocList.push_back(chunk);
 
-    for (size_t i = 0; i < mBlockSize; ++ i, chunk += mUnitSize) {
-      Block* b = reinterpret_cast<Block*>(chunk);
+    char* p = static_cast<char*>(chunk);
+    for (ymuint64 i = 0; i < mBlockSize; ++ i, p += mUnitSize) {
+      Block* b = reinterpret_cast<Block*>(p);
       b->mLink = mAvailTop;
       mAvailTop = b;
     }
@@ -75,14 +63,11 @@ UnitAlloc::get_memory(size_t n)
 
 // @brief n バイトの領域を開放する．
 void
-UnitAlloc::put_memory(size_t n,
-		      void* block)
+UnitAlloc::_put_memory(ymuint64 n,
+		       void* block)
 {
-  mUsedSize -= n;
-
   if ( n != mUnitSize ) {
-    mAllocSize -= n;
-    ::operator delete(block);
+    free(n, block);
   }
   else {
     Block* b = reinterpret_cast<Block*>(block);
@@ -93,53 +78,15 @@ UnitAlloc::put_memory(size_t n,
 
 // @brief 今までに確保した全ての領域を破棄する．
 void
-UnitAlloc::destroy()
+UnitAlloc::_destroy()
 {
-  for (list<char*>::iterator p = mAllocList.begin();
+  for (list<void*>::iterator p = mAllocList.begin();
        p != mAllocList.end(); ++ p) {
-    delete [] *p;
+    void* chunk = *p;
+    free(mUnitSize * mBlockSize, chunk);
   }
   mAllocList.clear();
   mAvailTop = NULL;
-}
-
-// @brief 使用されているメモリ量を返す．
-size_t
-UnitAlloc::used_size() const
-{
-  return mUsedSize;
-}
-
-// @brief used_size() の最大値を返す．
-size_t
-UnitAlloc::max_used_size() const
-{
-  return mMaxUsedSize;
-}
-
-// @brief 実際に確保したメモリ量を返す．
-size_t
-UnitAlloc::allocated_size() const
-{
-  return mAllocSize;
-}
-
-// @brief 実際に確保した回数を返す．
-size_t
-UnitAlloc::allocated_count() const
-{
-  return mAllocCount;
-}
-
-// @brief 内部状態を出力する．
-void
-UnitAlloc::print_stats(ostream& s) const
-{
-  s << "maximum used size: " << max_used_size() << endl
-    << "current used size: " << used_size() << endl
-    << "allocated size:    " << allocated_size() << endl
-    << "allocated count:   " << allocated_count() << endl
-    << endl;
 }
 
 END_NAMESPACE_YM

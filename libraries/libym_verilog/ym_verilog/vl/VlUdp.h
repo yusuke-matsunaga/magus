@@ -7,18 +7,19 @@
 ///
 /// $Id: VlUdp.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_verilog/vl/VlObj.h"
 #include "ym_verilog/vl/VlFwd.h"
+#include "ym_verilog/VlUdpVal.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlUdpDefn VlUdp.h <ym_verilog/vl/VlUdp.h>
+/// @class VlUdpDefn VlUdp.h "ym_verilog/vl/VlUdp.h"
 /// @brief UDP定義を表すクラス
 /// IEEE Std 1364-2001 26.6.14 UDP
 //////////////////////////////////////////////////////////////////////
@@ -71,7 +72,7 @@ public:
   /// @brief 初期値を返す．
   /// @return 0/1/X を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   init_val() const = 0;
 
   /// @brief 初期値を表す文字列を返す．
@@ -94,7 +95,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlTableEntry VlUdp.h <ym_verilog/vl/VlUdp.h>
+/// @class VlTableEntry VlUdp.h "ym_verilog/vl/VlUdp.h"
 /// @brief UDP の table entry を表すクラス
 //////////////////////////////////////////////////////////////////////
 class VlTableEntry :
@@ -118,7 +119,7 @@ public:
 
   /// @brief pos 番目の位置の値を返す．
   virtual
-  tVpiUdpVal
+  VlUdpVal
   val(ymuint pos) const = 0;
 
   /// @brief 一行文の内容を表す文字列をつくる．

@@ -1,16 +1,14 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1920 2008-12-20 15:52:42Z matsunaga $
-
 SUBDIRS =
-
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
 
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_mvn_verilog.la
+
+libym_mvn_verilog_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_mvn_verilog_la_SOURCES = \
 	DeclHash.h \
@@ -18,6 +16,10 @@ libym_mvn_verilog_la_SOURCES = \
 	DeclMap.h \
 	DeclMap.cc \
 	Driver.h \
+	Env.h \
+	Env.cc \
+	EnvMerger.h \
+	EnvMerger.cc \
 	MapRec.h \
 	MvnVerilogReader.cc \
 	MvnVlMap.cc \
@@ -26,12 +28,10 @@ libym_mvn_verilog_la_SOURCES = \
 	ReaderImpl_item.cc \
 	ReaderImpl_stmt.cc \
 	ReaderImpl_expr.cc \
-	Env.h \
-	Env.cc
+	Xmask.h \
+	Xmask.cc
+
+libym_mvn_verilog_la_LIBADD =
 
 libym_mvn_verilog_la_LDFLAGS =
-
-libym_mvn_verilog_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 

@@ -1,7 +1,7 @@
-#ifndef LIBYM_MVNBDNCONV_SLACONV_H
-#define LIBYM_MVNBDnCONV_SLACONV_H
+#ifndef SLACONV_H
+#define SLACONV_H
 
-/// @file libym_networks/SlaConv.h
+/// @file SlaConv.h
 /// @brief SlaConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class SlaConv SlaConv.h "SlaConv.h"
@@ -51,6 +51,6 @@ public:
 };
 
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_SLACONV_H
+#endif // SLACONV_H

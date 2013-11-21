@@ -1,5 +1,8 @@
 //////////////////////////////////////////////////////////////////////
 // ymtools のビルドについて
+//						松永　裕介
+//                                             ????.??.?? Ver.1
+//                                             2013.11.20 Ver.2
 //////////////////////////////////////////////////////////////////////
 
 これには少々複雑な手順を必要とします．大まかには次のような4つのステッ
@@ -26,7 +29,7 @@
 
 ymtools のビルドに必要なツールは以下のとおりです．
 
-- gcc
+- gcc/g++
 - lex (flex)
 - yacc (bison)
 - autoconf
@@ -36,34 +39,35 @@ ymtools のビルドに必要なツールは以下のとおりです．
 - tclreadline
 - popt
 - gmp
+- python
+- Qt
+- CppUTest
 
 以下に個々のツールについて補足します．
 
-○ gcc
- 現在，FreeBSD-8.1 の gcc-4.2.1 でテストしています．たぶん，4.3 でも大
-丈夫だと思いますが，4.4, 4.5 はちょっとチェックが厳しくなっているので
-warning がでるかもしれません．現在は，他のツールとの兼ね合いで 4.4,
-4.5 対応はしていません．
+○ gcc/g++
+ 現在，FreeBSD-8 の gcc-4.2.1 および FreeBSD-9 の gcc-4.3 でテストしています．
  Linux (Cent-OS?) 上の gcc-3.4.6 でテスト済みです．
 
 ○ lex (flex)
  現在，flex-2.5.4 でテストしています．
 
 ○ yacc (bison)
- 現在，bison-2.4.3 でテストしています．
+ 現在，bison-2.4.3, bison-2.5 でテストしています．
 bison を yacc 互換で動かすためには bison -y とします．
 bison-1.X.X では %define api.pure ディレクティブを理解してくれないの
 で動きません．
 
 ○ autoconf
- 現在，autoconf-2.68 でテストしています．autoconf はバージョンが変わる
+ 現在，autoconf-2.68, autoconf-2.69 でテストしています．
+ autoconf はバージョンが変わる
 とマクロが結構変わるのでできる限り最新の autoconf を使う必要があります．
 
 ○ automake
- 現在，automake-1.11.1 でテストしています．autoconf と同様です．
+ 現在，automake-1.11.1, automake-1.12 でテストしています．autoconf と同様です．
 
 ○ libtool
- 現在，libtool-2.2.10 でテストしています．autoconf と同様です．
+ 現在，libtool-2.4.2 でテストしています．autoconf と同様です．
 
 ○ tcl
  現在，tcl-8.5 でテストしています．8.4 などでも動くと思います．
@@ -78,6 +82,15 @@ bison-1.X.X では %define api.pure ディレクティブを理解してくれ�
  現在，gmp-5.0.1 でテストしています．もしも gmp をソースからビルドして
  インストールする場合には，configure 時に --enable-cxx をつけるよう
  にしてください(*1)．
+
+○ python
+ 現在，python-2.7.3 でテストしています．
+
+○ Qt
+ 現在，Qt-4.7.4 でテストしています．
+
+○ CppUTest
+ 現在，cpputest-3.5 でテストしています．
 
 
 0.1 上記ツールがインストールされていない場合の対処
@@ -118,11 +131,12 @@ make install
 
 - ymtools の configure 時に必要なもの
  ymtools のビルドディレクトリ(2.1参照)で autogen を実行する時に必要と
-なるもので，tcl, tclreadline, gmp, popt がこれに当たります．
+なるもので，tcl, tclreadline, gmp, popt, python, Qt, CppUTest
+がこれに当たります．
 これらは ./configure に対するオプションの形でインストールされている場
-所を指定する必要があります．実際には autogen.local というファイルを作っ
- てそこに書いておけば，毎回，オプションを手で打ち込む必要はありません．
-具体的な方法は 2.1 を参照してください．
+所を指定する必要があります．実際には autogen.common もしくは
+ autogen.local というファイルを作ってそこに書いておけば，毎回，オプショ
+ ンを手で打ち込む必要はありません．具体的な方法は A-2 を参照してください．
 
 - ymtools のコンパイル時に必要なもの
  gcc, lex, yacc がこれに当たります．具体的には以下の環境変数を
@@ -135,9 +149,10 @@ YACC: yacc を指定します．
 
 指定の仕方は補足 A-2 にしたがって行います．
 
-たとえば，autogen.local に以下のような行を加えておけば，/project/ymtools
+たとえば，autogen.common/autogen.local に以下のような行を加えておけば，
+/project/ymtools
 以下にインストールしたツールを使うようになります(ちなみに
-autogen.local は bash スクリプトです)．
+autogen.common/autogen.local は bash スクリプトです)．
 
 export CC=/project/ymtools/bin/gcc-4.2.1
 export CXX=/project/ymtools/bin/g++-4.2.1
@@ -176,20 +191,38 @@ export YACC=/project/ymtools/bin/bison-2.4.3 -y
 
 ステップ1で生成されたファイルを消すには
 
-./boot.sh clean
+./clean.sh
 
 と打ち込んでください．
 
-ちなみにこれらの auto-tools のバージョンを確かめたいときには
 
-./boot.sh debug
+//////////////////////////////////////////////////////////////////////
+// 2.1 configure の実行 (その1)
+//////////////////////////////////////////////////////////////////////
 
-と打ち込んでください．各々のツールのバージョンが表示されます．それ以外
-の処理は行いません．
+ここではステップ1で生成された configure スクリプトを実行して Makefile
+を生成します．ただし，「ここ」ではそれを実行することはあまりおすすめで
+きません．
+ソースファイルのある場所でコンパイルすることも可能ですが，できればコン
+パイルするディレクトリを他に用意することをお勧めします．というのはソー
+スディレクトリはその後 git に登録することがあるので「きれいな」状態に
+しておくことが望ましいからです．また，同一のソースから FreeBSD,
+RedHat, Solaris などの異なるプラットフォーム用のバイナリを生成するとき
+にも複数のビルド用ディレクトリを用意したほうが便利です．
+
+それでもここでやりたいのであれば，
+
+cd $SRCDIR
+./configure <options>
+make
+make install
+
+で，一応はできるはずです．
+ただし，他のツールの場所などを <options> の中で指定する必要があります．
 
 
 //////////////////////////////////////////////////////////////////////
-// 2.1 autogen スクリプトの生成 (その1)
+// 2.2 configure の実行 (その2)
 //////////////////////////////////////////////////////////////////////
 
 ここではステップ1で生成された configure スクリプトを実行して Makefile
@@ -201,57 +234,20 @@ export YACC=/project/ymtools/bin/bison-2.4.3 -y
 RedHat, Solaris などの異なるプラットフォーム用のバイナリを生成するとき
 にも複数のビルド用ディレクトリを用意したほうが便利です．
 
+//////////////////////////////////////////////////////////////////////
+// 2.2.1 autogen スクリプトの生成
+//////////////////////////////////////////////////////////////////////
+
 で，このようにビルド用ディレクトリに Makefile を作るには 1 で生成し
 た configure スクリプトを走らせればよいのですが，これもいろいろと細々
 した設定オプションがあり，何度も手で修正しながら configure を走らせる
-のは手間がかかるし間違いのものなので，この作業を行う autogen というス
-クリプトを自動生成するようにしました．
-
-cd $SRCDIR
-./.boot.sh autogen $BUILDDIR $INSTALLDIR compile-mode
-
-で $BUILDDIR 直下に autogen というスクリプトが生成されます．
-
-$SRCDIR は ymtools のソースのあるディレクトリのことです．
-
-$BUILDDIR はコンパイルされたオブジェクトコードが置かれるビルド用ディレ
-クトリです．$HOME/build/ymtools とか，複数の環境でビルドするときは
-$HOME/build/ymtools-freebsd-gcc3 等としておくのが良いでしょう．
-
-$INSTALLDIR はインストール先のディレクトリです．
-本来なら，ここでビルドされたプログラムやヘッダファイル，ライブラリは
-/usr/{bin,include,lib} や /usr/local/{bin,include,lib} の下にインストー
-ルされるので，そのような場合には $INSTALLDIR は /usr か /usr/local で
-すが，プログラム開発中にはそのような場所には置かないのが普通です．
-$HOME/tmp-install/ymtools というようなディレクトリを用意してそこに仮イ
-ンストールすることをおすすめします．
-$BUILDDIR と同様に $HOME/tmp-install/ymtools-freebsd-gcc3 のような名前
-でもいいと思います．
-
-compile-mode は今のところ opt と debug と peof のみを受け付けるように
-なっています．(opt なら -O3 を debug なら -g を付けるだけ)
-
-autogen は簡単な sh スクリプトなので中をみれば何をしているかはすぐにわ
-かると思います．
-また，autogen は最後に autogen.local というファイルがあればそれをイン
-クルードしますので，そこに上書きしたい設定を書いておけばもともとの
-autogen に手を加えずに済みます．
-autogen は ./mk autogen で自動生成されるため，手で修正しても再度
-./mk autogen するとその修正が消えてしまうので autogen には手を加え
-ずに autogen.local に修正点を書いておく方が賢明です．
-詳しくは 「A-2 autogen.local の使用例」 を読んでください．
-
-
-//////////////////////////////////////////////////////////////////////
-// 2.2 autogen スクリプトの生成 (その2)
-//////////////////////////////////////////////////////////////////////
-
-$SRCDIR には mkautogen というスクリプトも用意されています．
+のは手間がかかるし間違いのものなので，この作業を行う mkautogen というス
+クリプトが用意されています．
 これは，opt/debug/prof の3つのモード用のビルドディレクトリを一編に作っ
 てくれるものです．使い方は
 
 cd $SRCDIR
-./mkautogen $PREFIX $ROOTNAME
+./mkautogen.sh $PREFIX $ROOTNAME
 
 です．結果として，
 
@@ -264,6 +260,15 @@ $PREFIX/test/$ROOTNAME/opt
 
 という6つのディレクトリを作成し，各ビルド用ディレクトリの下に autogen
 スクリプトを作ります．
+$PREFIX/build/$ROOTNAME 以下にコンパイル結果のオブジェクトファイルが格
+納されます．　
+$PREFIX/test/$ROOTNAME 以下には make install を実行した時にファイルが
+インストールされるディレクトリが作られます．
+本当に /usr/local 以下とかにインストールしたい場合には autogen 中の
+'dstdir' を書き換えればよいのですが，直接 autogen を書き換えずに
+autogen.common/autogen.local に distdir=XXXX という行を追加した方がよ
+いでしょう．詳しくは 「A-2 autogen.common/autogen.local の使用例」 を
+読んでください．
 また，$PREFIX/build/$ROOTNAME/Makefile というファイルも生成します．
 通常は，
 
@@ -289,10 +294,10 @@ make
 
 
 //////////////////////////////////////////////////////////////////////
-// 3 configure の実行
+// 2.2.2 autogen の実行
 //////////////////////////////////////////////////////////////////////
 
-これは簡単で $BUILDDIR において
+これは簡単で $PREFIX/build/$ROOTNAME/{opt,debug,prof} において
 
 ./autogen
 
@@ -303,6 +308,38 @@ make
 ので，なんか変だなとおもったら一回，ファイルを消して configure しなお
 してみてください．
 
+3つのディレクトリで個別に autogen を実行する代わりに
+
+cd $PREFIX/build/$ROOTNAME
+make configure
+
+でも同様のことができます．
+
+
+//////////////////////////////////////////////////////////////////////
+// 3 configure/autogen の再実行
+//////////////////////////////////////////////////////////////////////
+
+ソースファイルやディレクトリを追加した場合には Makefile などを作り直す
+必要があります．大まかには 1. configure の生成 と 2. configure の実行
+を繰り返せば良いのですが，結構，時間がかかります．
+たとえば libraries/libym_logic 以下のみが変更になった場合には
+
+cd $SRCDIR
+./boot.sh libraries/libym_logic
+
+cd $PREFIX/build/$ROOTNAME
+./update libraries/libym_logic
+
+で libraries/libym_logic 以下の Makefile だけ作り直せます．
+update スクリプトは mkautogen を実行すると生成されているはずです．
+
+こまかなことですが，./boot.sh の時は実際に libraries/libym_logic
+というディレクトリがあるので shell の completion が効きますが，
+./update の時は，実際には {opt,debug,prof}/libraries/libym_logic
+というディレクトリがあるので completion が効きません．指が completion
+で退化している人は気をつけてください．
+
 
 //////////////////////////////////////////////////////////////////////
 // 4 make の実行
@@ -310,8 +347,16 @@ make
 
 こちらも簡単で
 
-cd $BUILDDIR
+cd $PREFIX/build/$ROOTNAME/{opt,debug,prof}
 make
+
+でコンパイルできます．
+もしくは
+
+cd $PREFIX/build/$ROOTNAME
+make
+
+で3つのディレクトリに対して make を実行します．
 
 コンパイルが成功したら
 
@@ -328,26 +373,46 @@ mkdir しておく必要はありません．
 //////////////////////////////////////////////////////////////////////
 
 - configure の生成
- boot.sh
+  boot.sh
 
 - クリーンアップ
- boot.sh clean
+  clean.sh
 
 - autogen スクリプトの生成
 
- boot.sh autogen <build-dir> <install-dir> <compile-mode>
-
-- 使用するコマンドのバージョン確認
- boot.sh debug
+  mkautogen.sh <PREFIX> <ROOTNAME>
 
 
 //////////////////////////////////////////////////////////////////////
-// A-2 autogen.local 使用例
+// A-2 autogen.common/autogen.local 使用例
 //////////////////////////////////////////////////////////////////////
 
-よくある autogen.local の使い方としては tcl/tk のインストール先の指定
-や popt のインストール先の指定，マシン依存の最適化オプションの指定など
-があります．
+まず，autogen.common と autogen.local の違いですが，役割的には違いはあ
+りません．autogen をみれば分かりますが，autogen.common が先に読み込ま
+れて autogen.local が次に読み込まれます．
+もちろん，これらのファイルが存在しない時は読み込まれません．
+mkautogen.sh で opt, debug, prof の3つのディレクトリを作った場合，
+その上のディレクトリにある autogen.common が commonconf ファイルになり
+ます．
+つまり，opt, debug, prof ごとに必要な設定は autogen.local に書いて，共
+通な設定は autogen.common に書くのがよいでしょう．
+autogen.common と autogen.local の位置関係は以下のようになります．
+
+$PREFIX/build/autogen.common
+	     /opt/autogen.local
+             /debug/autogen.local
+	     /prof/autogen.local
+
+mkautogen.sh 実行時に環境変数 AUTOGEN_COMMON が設定されていればその内
+容が commonconf の値となります．例えば，/proj/ymtools/agcommon
+というファイルを作っておいて，
+export AUTOGEN_COMMON="/proj/ymtools/agcommon"
+のあとで mkautogen.sh を実行すれば，この .../agcommon というファイル共
+通の設定ファイルになります．
+
+よくある autogen.common/autogen.local の使い方としては tcl/tk のインス
+トール先の指定や popt のインストール先の指定，マシン依存の最適化オプショ
+ンの指定などがあります．
 
 これは configure のオプションとして指定します．たとえば
 
@@ -420,7 +485,7 @@ CXXFLAGS="$CXXFLAGS -march=pentium4"
 // A-3 環境変数について
 //////////////////////////////////////////////////////////////////////
 
-mk は内部で使うコマンド(autoconf, automakeなど)を勝手に推測します
+boot.sh は内部で使うコマンド(autoconf, automakeなど)を勝手に推測します
 が，特定のバージョンや特定のパスにあるプログラムを使いたいときには環境
 変数で指定することができます．以下にその環境変数とそのデフォルト値を示
 します．
@@ -510,48 +575,43 @@ magus その他のアプリケーションは libraries 以下のいくつかの
 libym_utils     汎用のユーティリティクラスライブラリ
 libym_tclpp     Tcl インターフェイス
 libym_verilog   Verilog フロントエンド
-libym_sat       SAT パッケージ(未完)
-libym_lexp      論理式を扱うクラスライブラリ
-libym_aig       AIG パッケージ
-libym_sbj       テクノロジマッピング用サブジェクトグラフ
-libym_blif      BLIF ファイルパーサー
-libym_bnet      boolean network を扱うクラスライブラリ
-libym_bdd       BDD を扱うクラスライブラリ
-libym_npn       NPN 同値類判定を行うクラスライブラリ
+libym_logic     論理関数処理
+libym_networks 	論理回路ネットワーク
 libym_gds       GDS-II ファイルパーサー
-libym_bdn       もう一つの boolean network
 libym_cec       組み合わせ回路の等価性検証
 libym_cell      セルライブラリを扱うクラスライブラリ
-libym_iscas89   ISCAS89 形式のファイルを読み込む
-libym_lutmap    LUT型FPGA用テクノロジマッパ
-libym_techmap   セルライブラリ用テクノロジマッパ
+libym_techmap   テクノロジマッパ
 libym_mincov    最小被覆問題ソルバ
-libym_mvn       MvNetwork (RTL用ネットリスト)
 libym_seal      ソフトエラー耐性評価用
-libym_tgnet     simple gate のネットリスト (あまり使い道なし ISCAS89用)
-libym_zstream   zlib を用いた圧縮/解凍を行う入出力ストリーム
 
 ほとんどの場合，libym_utils は必須ですが，それ以外は不要な場合がありま
 す．そこで，これらのライブラリは(libym_utilsも含めて) make するかどう
 かを選択できるようになっています．
-具体的には configure.ac 中の
+具体的には configure 時に
 
-ym_libym_utils_enable=1
+--enable-libym_utils
 
-のような行の右辺を 0 に変えればそのライブラリをビルドしなくなります．
+のようなオプションを加えることで libym_utils を生成する様に指示できま
+す．もっとも libym_utils はデフォルトで生成する様になっています．
 
 各ライブラリやプログラムは自分が依存しているライブラリの情報を
 configure.ac 中の YM_BUILD_LIBRARY マクロで判断します．
 たとえば，
 
-# libym_bdd
-YM_BUILD_LIBRARY([libym_bdd],
-		 [ym_libym_utils_enable,
-		  ym_libym_lexp_enable])
+# libym_logic
+YM_BUILD_LIBRARY([libym_logic], [yes],
+		 [ym_libym_utils_enable])
 
-この記述は libym_bdd 以下のディレクトリをビルドするためには
-ym_libym_utils_enable と ym_libym_lexp_enable が 1 である必要がある，
-という意味です．
+この記述は libym_logic 以下のディレクトリをビルドするためには
+ym_libym_utils_enable が yes である必要がある，という意味です．
+二番目の引数の [yes] はデフォルトでこのライブラリを生成する設定になっ
+ていることを指定しています．
+ここのライブラリを生成するかはこのパラメータでも制御できますが，
+autogen.local 中に
+
+optflags="$optflags --enable-libym_logic"
+
+という行を加えるやり方のほうがよいでしょう．
 
 
 //////////////////////////////////////////////////////////////////////
@@ -598,5 +658,21 @@ libtclreadline.la と tclreadline.h がある場合等，自動的に tclreadlin
 --without-tclreadline
 
 を指定します．
+
+
+//////////////////////////////////////////////////////////////////////
+// B-5 CppUTest
+//////////////////////////////////////////////////////////////////////
+
+部分的に CppUTest を用いたテストコードを導入しています．
+CppUTest がインストールされていれば，
+
+libym_logic/test/CppUTest/run_all_test
+
+のようなテストプログラムが生成されます．
+これを実行してエラーがでなければ，(ここでチェックした範囲においては)
+テストが通ったことになります．
+将来的には根元の tests/CppUTest の下に run_all_test をまとめて作って
+完全な regression test を行なえるようにする予定です．
 
 --END

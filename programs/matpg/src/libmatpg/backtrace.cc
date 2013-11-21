@@ -16,13 +16,13 @@
  *
  * Revision 2.2  91/12/26  19:56:04  yusuke
  * Final revision of version 2
- * 
+ *
  * Revision 2.1  91/12/23  23:09:49  yusuke
  * a slightly speed-up
- * 
+ *
  * Revision 2.0  91/12/21  18:30:08  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.5  1991/10/05  08:18:18  yusuke
  * add Log and RCSid for RCS
  *
@@ -68,7 +68,7 @@ set_backtrace_mode( BT_MODE bt_mode )
     chk_end_g = chk_end_D_g;
     chk_end_f = chk_end_D_f;
     break;
-    
+
   case BT_PODEM:
     chk_end_g = chk_end_PODEM_g;
     break;
@@ -142,13 +142,13 @@ bool
 O_decision( gate_t* gate )
 {
   for ( ; ; ) {
-    int no = gate->get_act_no();
+    int no = gate->get_act_fanout_num();
     if ( no == 0 ) {
       return false;
     }
     int i;
     for (i = 0; i < no; i ++) {
-      gate_t* o_gate = gate->get_act_fogate(i);
+      gate_t* o_gate = gate->get_act_fanout_gate(i);
       if ( o_gate->chk_pg() ) {
 	gate = o_gate;
 	break;
@@ -191,7 +191,7 @@ C_decision( gate_t* gate )
       // 値が決まっていなければ正当化しようがない．
       return false;
     }
-    
+
     gate->chk_just();
     if ( !gate->chk_gj() ) {
       // 正常値が正当化されていない．
@@ -206,10 +206,10 @@ C_decision( gate_t* gate )
     }
 
     // どちらの値も正当化されているのでファンアウトをたどる．
-    int no = gate->get_act_no();
+    int no = gate->get_act_fanout_num();
     int i;
     for ( i = 0; i < no; i ++ ) {
-      gate_t* o_gate = gate->get_act_fogate(i);
+      gate_t* o_gate = gate->get_act_fanout_gate(i);
       if ( o_gate->chk_pg() ) {
 	gate = o_gate;
 	break;
@@ -271,7 +271,7 @@ gate_t::chk_just()
     if ( gval == o_val ) {
       // 出力が制御値によって決まる値
       for (int i = 0; i < ni; ++ i) {
-	gate_t* i_gate = get_sorted_figate(i);
+	gate_t* i_gate = get_sorted_fanin_gate(i);
 	if ( i_gate->get_gval() == c_val ) {
 	  // 制御値の入力を正当化できるか調べる．
 	  i_gate->chk_just();
@@ -286,7 +286,7 @@ gate_t::chk_just()
       // 出力が非制御値で決まる値
       gj_flag = true;
       for (int i = 0; i < ni; ++ i) {
-	gate_t* i_gate = get_sorted_figate(i);
+	gate_t* i_gate = get_sorted_fanin_gate(i);
 	if ( i_gate->get_gval() == val_X ) {
 	  // 一つでも未定の入力があれば即アウト
 	  gj_flag = false;
@@ -308,7 +308,7 @@ gate_t::chk_just()
       if ( fval == o_val ) {
 	// 出力が制御値によって決まる値
 	for (int i = 0; i < ni; ++ i) {
-	  gate_t* i_gate = get_sorted_figate(i);
+	  gate_t* i_gate = get_sorted_fanin_gate(i);
 	  if ( i_gate->get_fval() == c_val ) {
 	    // 制御値の入力を正当化できるか調べる．
 	    i_gate->chk_just();
@@ -323,7 +323,7 @@ gate_t::chk_just()
 	// 出力が非制御値で決まる値
 	fj_flag = true;
 	for (int i = 0; i < ni; ++ i) {
-	  gate_t* i_gate = get_sorted_figate(i);
+	  gate_t* i_gate = get_sorted_fanin_gate(i);
 	  if ( i_gate->get_fval() == val_X ) {
 	    // 未定の入力があれば即アウト
 	    fj_flag = false;
@@ -372,7 +372,7 @@ BUF_gate_t::chk_just()
     return;
   }
 
-  gate_t* i_gate = get_figate(0);
+  gate_t* i_gate = get_fanin_gate(0);
   i_gate->chk_just();
   if ( i_gate->chk_gj() ) {
     save_value(this);
@@ -391,7 +391,7 @@ void
 BUF_gate_t::backtrace_g(val3 val)
 {
   if ( !chk_end_g(this, val) ) {
-    get_figate(0)->backtrace_g(val);
+    get_fanin_gate(0)->backtrace_g(val);
   }
 }
 
@@ -399,7 +399,7 @@ void
 BUF_gate_t::backtrace_f(val3 val)
 {
   if ( !chk_end_f(this, val) ) {
-    get_figate(0)->backtrace_f(val);
+    get_fanin_gate(0)->backtrace_f(val);
   }
 }
 
@@ -407,7 +407,7 @@ void
 NOT_gate_t::backtrace_g(val3 val)
 {
   if ( !chk_end_g(this, val) ) {
-    get_figate(0)->backtrace_g(neg3(val));
+    get_fanin_gate(0)->backtrace_g(neg3(val));
   }
 }
 
@@ -415,7 +415,7 @@ void
 NOT_gate_t::backtrace_f(val3 val)
 {
   if ( !chk_end_f(this, val) ) {
-    get_figate(0)->backtrace_f(neg3(val));
+    get_fanin_gate(0)->backtrace_f(neg3(val));
   }
 }
 
@@ -425,13 +425,13 @@ SIMPLE_gate_t::backtrace_g(val3 r_val)
   if ( chk_end_g(this, r_val) ) {
     return;
   }
-  
+
   val3 c_val = get_c_val();
   val3 nc_val = get_nc_val();
   val3 o_val = get_o_val();
   if ( r_val == o_val ) {
     for (int i = 0; i < ni; i ++) {
-      gate_t* i_gate = get_sorted_figate(i);
+      gate_t* i_gate = get_sorted_fanin_gate(i);
       if ( i_gate->get_gval() != nc_val ) {
 	i_gate->backtrace_g(c_val);
 	return;
@@ -440,7 +440,7 @@ SIMPLE_gate_t::backtrace_g(val3 r_val)
   }
   else {
     for (int i = 0; i < ni; i ++) {
-      gate_t* i_gate = get_sorted_figate(i);
+      gate_t* i_gate = get_sorted_fanin_gate(i);
       if ( !i_gate->chk_gj() ) {
 	i_gate->backtrace_g(nc_val);
 	return;
@@ -456,13 +456,13 @@ SIMPLE_gate_t::backtrace_f(val3 r_val)
   if ( chk_end_f(this, r_val) ) {
     return;
   }
-  
+
   val3 c_val = get_c_val();
   val3 nc_val = get_nc_val();
   val3 o_val = get_o_val();
   if (r_val == o_val) {
     for (int i = 0; i < ni; i ++) {
-      gate_t* i_gate = get_sorted_figate(i);
+      gate_t* i_gate = get_sorted_fanin_gate(i);
       if ( i_gate->get_fval() != nc_val ) {
 	i_gate->backtrace_f(c_val);
 	return;
@@ -471,7 +471,7 @@ SIMPLE_gate_t::backtrace_f(val3 r_val)
   }
   else {
     for (int i = 0; i < ni; i ++) {
-      gate_t* i_gate = get_sorted_figate(i);
+      gate_t* i_gate = get_sorted_fanin_gate(i);
       if ( !i_gate->chk_fj() ) {
 	i_gate->backtrace_f(nc_val);
 	return;
@@ -487,9 +487,9 @@ XOR_gate_t::backtrace_g(val3 r_val)
   if ( chk_end_g(this, r_val) ) {
     return;
   }
-  
+
   for (int i = 0; i < ni; i ++) {
-    gate_t* i_gate = get_sorted_figate(i);
+    gate_t* i_gate = get_sorted_fanin_gate(i);
     if ( !i_gate->chk_gj() ) {
       val3 i_val = i_gate->get_gval();
       if ( i_val == val_X ) {
@@ -510,7 +510,7 @@ XOR_gate_t::backtrace_f(val3 r_val)
   }
 
   for (int i = 0; i < ni; i ++) {
-    gate_t* i_gate = get_sorted_figate(i);
+    gate_t* i_gate = get_sorted_fanin_gate(i);
     if ( !i_gate->chk_fj() ) {
       val3 i_val = i_gate->get_fval();
       if ( i_val == val_X ) {

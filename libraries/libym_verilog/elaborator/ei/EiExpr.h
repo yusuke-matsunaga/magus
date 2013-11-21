@@ -5,14 +5,12 @@
 /// @brief EiExpr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiExpr.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ElbExpr.h"
-#include <ym_verilog/pt/PtP.h>
+#include "ym_verilog/pt/PtP.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -49,11 +47,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 式のビット幅を返す．
-  virtual
-  ymuint
-  bit_size() const;
 
   /// @brief 定数の時 true を返す．
   /// @note このクラスは false を返す．
@@ -216,9 +209,9 @@ public:
 
   /// @brief 演算子のタイプを返す．
   /// @note 演算子の時，意味を持つ．
-  /// @note このクラスでは kVpiNullOp を返す．
+  /// @note このクラスでは kVlNullOp を返す．
   virtual
-  tVpiOpType
+  tVlOpType
   op_type() const;
 
   /// @brief オペランド数を返す．

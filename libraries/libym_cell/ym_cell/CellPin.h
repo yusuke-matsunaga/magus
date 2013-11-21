@@ -5,21 +5,18 @@
 /// @brief CellPin のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: CellPin.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_cell/cell_type.h"
-#include "ym_lexp/lexp_nsdef.h"
+#include "ym_logic/lexp_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellPin CellPin.h <ym_cell/CellPin.h>
+/// @class CellPin CellPin.h "ym_cell/CellPin.h"
 /// @brief セルのピンを表すクラス
 //////////////////////////////////////////////////////////////////////
 class CellPin
@@ -42,7 +39,7 @@ public:
   /// @brief ピン番号を返す．
   virtual
   ymuint
-  id() const = 0;
+  pin_id() const = 0;
 
   /// @brief ピン名を返す．
   virtual
@@ -51,14 +48,44 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tCellDirection
+  tCellPinDirection
   direction() const = 0;
+
+  /// @brief 入力ピンの時に true を返す．
+  /// @note direction() == kInput と等価
+  virtual
+  bool
+  is_input() const = 0;
+
+  /// @brief 出力ピンの時に true を返す．
+  /// @note direction() == kOutput と等価
+  virtual
+  bool
+  is_output() const = 0;
+
+  /// @brief 入出力ピンの時に true を返す．
+  /// @note direction() == kInout と等価
+  virtual
+  bool
+  is_inout() const = 0;
+
+  /// @brief 内部ピンの時に true を返す．
+  /// @note direction() == kInternal と等価
+  virtual
+  bool
+  is_internal() const = 0;
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 入力ピンの属性
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入力ピン番号を返す．
+  /// @note 入力ピンもしくは入出力ピンの時のみ意味を持つ．
+  virtual
+  ymuint
+  input_id() const = 0;
 
   /// @brief 負荷容量を返す．
   virtual
@@ -80,6 +107,12 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 出力ピンの属性
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 出力ピン番号を返す．
+  /// @note 出力ピンもしくは入出力ピンの時のみ意味を持つ．
+  virtual
+  ymuint
+  output_id() const = 0;
 
   /// @brief 論理式を持っているときに true を返す．
   virtual
@@ -131,15 +164,29 @@ public:
   CellTime
   min_transition() const = 0;
 
-  /// @brief タイミング情報の取得
-  /// @param[in] ipos 開始ピン番号
-  /// @param[in] timing_sense タイミング情報の摘要条件
-  /// @return 条件に合致するタイミング情報を返す．
-  /// @note なければ NULL を返す．
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内部ピンの属性
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内部ピン番号を返す．
+  /// @note 内部ピンの時のみ意味を持つ．
   virtual
-  const CellTiming*
-  timing(ymuint ipos,
-	 tCellTimingSense sense) const = 0;
+  ymuint
+  internal_id() const = 0;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(ODO& s) const = 0;
 
 };
 

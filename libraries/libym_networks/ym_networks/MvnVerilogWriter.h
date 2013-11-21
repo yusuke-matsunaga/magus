@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVNVERILOGWRITER_H
-#define YM_MVN_MVNVERILOGWRITER_H
+#ifndef YM_NETWORKS_MVNVERILOGWRITER_H
+#define YM_NETWORKS_MVNVERILOGWRITER_H
 
 /// @file ym_networks/MvnVerilogWriter.h
 /// @brief MvnVerilogWriter のヘッダファイル
@@ -9,10 +9,12 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
+
+class VerilogWriterImpl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnVerilogWriter MvnVerilogWriter.h "ym_networks/MvnVerilogWriter.h"
@@ -50,8 +52,17 @@ public:
 	     const MvnMgr& mgr,
 	     const MvnVlMap& node_map);
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 実際に処理を行う実装クラス
+  VerilogWriterImpl* mImpl;
+
 };
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // YM_MVN_MVNVERILOGWRITER_H
+#endif // YM_NETWORKS_MVNVERILOGWRITER_H

@@ -1,11 +1,9 @@
 #ifndef LIBYM_UTILS_MSGMGRIMPL_H
 #define LIBYM_UTILS_MSGMGRIMPL_H
 
-/// @file ym_utils/MsgMgrImpl.h
+/// @file MsgMgrImpl.h
 /// @brief MsgHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: MsgMgrImpl.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class MsgMgrImpl MsgMgrImpl.h <ym_utils/MsgMgrImpl.h>
+/// @class MsgMgrImpl MsgMgrImpl.h "MsgMgrImpl.h"
 //////////////////////////////////////////////////////////////////////
 class MsgMgrImpl
 {

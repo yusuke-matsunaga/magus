@@ -1,26 +1,30 @@
-#ifndef LIBYM_TGNET_LOGICMGR_H
-#define LIBYM_TGNET_LOGICMGR_H
+#ifndef LOGICMGR_H
+#define LOGICMGR_H
 
-/// @file libym_networks/LogicMgr.h
+/// @file LogicMgr.h
 /// @brief LogicMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: LogicMgr.h 1920 2008-12-20 15:52:42Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/tgnet_nsdef.h"
-#include "ym_networks/TgGateTemplate.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_networks/tgnet.h"
+#include "ym_logic/LogExpr.h"
+#include "ym_logic/TvFunc.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class LogicMgr LogicMgr.h "LogicMgr.h"
 /// @brief logic ノードのタイプ番号を管理するクラス
+///
+/// 論理式を登録するが，内部で論理関数に変換している．
+/// 同一の論理関数を表す論理式が登録された場合には
+/// リテラル数の少ない論理式を記録する．
+/// BUF/NOTAND/NAND/OR/NOR/XOR/XNOR の関数はハッシュを調べる前に
+/// 決められたID番号を返す．
 //////////////////////////////////////////////////////////////////////
 class LogicMgr
 {
@@ -34,51 +38,50 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化する．
+  /// @note 登録されている関数がない状態になる．
   void
   clear();
 
   /// @brief 新しい論理式を登録する．
   /// @param[in] lexp 論理式
-  /// @return ゲートの型を返す．
-  TgGateTemplate
-  reg_logic(const LogExpr& lexp);
+  /// @param[out] id kTgGateCplx の場合はID番号を格納する．
+  /// @return 論理関数の型を返す．
+  tTgGateType
+  reg_logic(const LogExpr& lexp,
+	    ymuint32& id);
 
   /// @brief 登録されている論理式の数を返す．
-  size_t
-  num() const;
+  ymuint32
+  logic_num() const;
 
-  /// @brief 論理式を取り出す．
-  /// @param[in] gt_id ゲートテンプレート
+  /// @brief 論理式を返す．
+  /// @param[in] id ID番号 ( 0 <= id < logic_num() )
   LogExpr
-  get(TgGateTemplate gt_id) const;
+  get_expr(ymuint32 id) const;
+
+  /// @brief 論理関数を返す．
+  /// @param[in] id ID番号 ( 0 <= id < logic_num() )
+  const TvFunc&
+  get_func(ymuint32 id) const;
 
 
-public:
-
-  /// @brief デバッグ用の関数
-  /// @param[in] s 出力先のストリーム
-  void
-  dump(ostream& s) const;
-
-  
 private:
-
-  class Cell;
-  
-  // cell と現在の真理値ベクタが等価かどうか調べる．
-  bool
-  equiv(Cell* cell,
-	const vector<ymulong>& tv_array);
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   // ハッシュ表を拡大して再ハッシュする．
   void
   expand();
-  
+
   // ハッシュ表用の領域を確保する．
   void
-  alloc_table(size_t req_size);
+  alloc_table(ymuint req_size);
 
 
 private:
@@ -90,13 +93,13 @@ private:
   struct Cell
   {
     // ID番号
-    TgGateTemplate mId;
+    ymuint32 mId;
 
     // 論理式
     LogExpr mLexp;
 
     // 真理値表
-    vector<ymulong> mTvArray;
+    TvFunc mTvFunc;
 
     // 次のセルを指すリンク
     Cell* mLink;
@@ -112,24 +115,53 @@ private:
   static
   const double kHashCapacity = 1.8;
 
-  // 一般の論理関数のオフセット値
-  static
-  const ymuint32 kBase = static_cast<ymuint32>(kTgUsrDef);
-  
   // Cell の配列
   vector<Cell*> mCellArray;
-  
+
   // ハッシュ表のサイズ
-  size_t mHashSize;
+  ymuint32 mHashSize;
 
   // ハッシュ表
   Cell** mHashTable;
 
   // ハッシュ表を拡大する目安
-  size_t mNextLimit;
-  
+  ymuint32 mNextLimit;
+
 };
 
-END_NAMESPACE_YM_TGNET
 
-#endif // LIBYM_TGNET_LOGICMGR_H
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 登録されている論理式の数を返す．
+inline
+ymuint
+LogicMgr::logic_num() const
+{
+  return mCellArray.size();
+}
+
+// @brief 論理式を返す．
+// @param[in] id ID番号 ( 0 <= id < logic_num() )
+inline
+LogExpr
+LogicMgr::get_expr(ymuint32 id) const
+{
+  assert_cond( id < logic_num(), __FILE__, __LINE__);
+  return mCellArray[id]->mLexp;
+}
+
+// @brief 論理関数を返す．
+// @param[in] id ID番号 ( 0 <= id < logic_num() )
+inline
+const TvFunc&
+LogicMgr::get_func(ymuint32 id) const
+{
+  assert_cond( id < logic_num(), __FILE__, __LINE__);
+  return mCellArray[id]->mTvFunc;
+}
+
+END_NAMESPACE_YM_NETWORKS_TGNET
+
+#endif // LOGICMGR_H

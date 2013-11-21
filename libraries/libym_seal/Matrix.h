@@ -5,9 +5,7 @@
 /// @brief Matrix のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Matrix.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -30,18 +28,18 @@ public:
   /// @note 内容は不定
   Matrix(ymuint32 row_num,
 	 ymuint32 col_num);
-  
+
   /// @brief コピーコンストラクタ
   Matrix(const Matrix& src);
 
   /// @brief 代入演算子
   const Matrix&
   operator=(const Matrix& src);
-  
+
   /// @brief デストラクタ
   ~Matrix();
 
-  
+
 public:
 
   /// @brief 行数を返す．
@@ -51,14 +49,14 @@ public:
   /// @brief 列数を返す．
   ymuint32
   col_size() const;
-  
+
   /// @brief 要素に対するアクセス関数
   /// @param[in] r_pos 行位置
   /// @param[in] c_pos 列位置
   double&
   elem(ymuint32 r_pos,
        ymuint32 c_pos);
-  
+
   /// @brief 要素に対するアクセス関数
   /// @param[in] r_pos 行位置
   /// @param[in] c_pos 列位置
@@ -66,12 +64,12 @@ public:
   elem(ymuint32 r_pos,
        ymuint32 c_pos) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 行数
   ymuint32 mRowNum;
 
@@ -80,7 +78,7 @@ private:
 
   // 本体
   double* mBody;
-  
+
 };
 
 
@@ -138,7 +136,7 @@ Matrix::elem(ymuint32 r_pos,
 {
   return mBody[r_pos * mColNum + c_pos];
 }
-  
+
 // @brief 要素に対するアクセス関数
 // @param[in] r_pos 行位置
 // @param[in] c_pos 列位置

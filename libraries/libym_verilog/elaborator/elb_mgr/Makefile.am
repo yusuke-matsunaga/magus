@@ -4,11 +4,6 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/elaborator/include
-
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -20,6 +15,12 @@ noinst_LTLIBRARIES = \
 ############################################################
 ## libym_vl_elab_elb_mgr.la
 ############################################################
+
+libym_vl_elab_elb_mgr_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/elaborator/include
+
 libym_vl_elab_elb_mgr_la_SOURCES = \
 	AttrHash.cc \
 	ElbContAssign.cc \
@@ -39,7 +40,6 @@ libym_vl_elab_elb_mgr_la_SOURCES = \
 	VlNamedObj.cc
 
 
-libym_vl_elab_elb_mgr_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_vl_elab_elb_mgr_la_LIBADD =
 
 libym_vl_elab_elb_mgr_la_LDFLAGS =

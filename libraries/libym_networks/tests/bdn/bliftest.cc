@@ -1,18 +1,14 @@
 
-/// @file libym_networks/tests/bliftest.cc
+/// @file bliftest.cc
 /// @brief blif ファイルの読み書きのテスト
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bliftest.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_blif/BlifNetwork.h"
-#include "ym_blif/BlifNetworkReader.h"
 #include "ym_networks/BdnMgr.h"
-#include "ym_networks/BlifBdnConv.h"
+#include "ym_networks/BdnBlifReader.h"
 #include "ym_networks/BdnDumper.h"
 #include "ym_networks/BdnBlifWriter.h"
 #include "ym_networks/BdnVerilogWriter.h"
@@ -40,20 +36,11 @@ main(int argc,
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
     MsgMgr::reg_handler(msg_handler);
 
-    BlifNetworkReader reader;
-
-    BlifNetwork blif_network;
-
-    if ( !reader.read(filename, blif_network) ) {
-      cerr << "Error in reading " << filename << endl;
-      return 4;
-    }
+    BdnBlifReader read;
 
     BdnMgr network;
-    BlifBdnConv conv;
-    bool stat = conv(blif_network, network);
-    if ( !stat ) {
-      cerr << "Error in converting from BlifNetwork to BdnMgr" << endl;
+    if ( !read(filename, network) ) {
+      cerr << "Error in reading " << filename << endl;
       return 5;
     }
 

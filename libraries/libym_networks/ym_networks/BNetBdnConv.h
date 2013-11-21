@@ -1,18 +1,16 @@
-#ifndef YM_BNETBDNCONV_BNETBDNCONV_H
-#define YM_BNETBDNCONV_BNETBDNCONV_H
+#ifndef YM_NETWORKS_BNETBDNCONV_H
+#define YM_NETWORKS_BNETBDNCONV_H
 
 /// @file ym_networks/BNetBdnConv.h
 /// @brief BNetBdnConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BlifBdnConv.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/bnet.h"
+#include "ym_networks/bdn.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -83,4 +81,4 @@ private:
 
 END_NAMESPACE_YM
 
-#endif // YM_BNETBDNCONV_BNETBDNCONV_H
+#endif // YM_NETWORKS_BNETBDNCONV_H

@@ -1,20 +1,20 @@
-#ifndef LIBYM_MVN_VERILOG_ENV_H
-#define LIBYM_MVN_VERILOG_ENV_H
+#ifndef ENV_H
+#define ENV_H
 
-/// @file libym_networks/verilog/Env.h
+/// @file Env.h
 /// @brief Env のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_verilog/vl/VlFwd.h"
 #include "DeclHash.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class AssignInfo Env.h "Env.h"
@@ -234,7 +234,7 @@ public:
   /// オフセットが範囲外の場合には NULL を返す．
   AssignInfo
   get_info(const VlDeclArray* decl,
-      ymuint offset) const;
+	   ymuint offset) const;
 
   /// @brief ID番号に対応するノードを登録する．
   /// @param[in] id ID番号
@@ -265,6 +265,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
-#endif // LIBYM_MVN_VERILOG_ENV_H
+#endif // ENV_H

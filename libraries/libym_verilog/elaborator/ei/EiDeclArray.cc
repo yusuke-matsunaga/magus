@@ -1,9 +1,7 @@
 
-/// @file libym_verilog/elb_impl/EiDeclArray.cc
+/// @file libym_verilog/elaborator/ei/EiDeclArray.cc
 /// @brief EiDeclArray の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: EiDeclArray.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
@@ -51,8 +49,8 @@ EiFactory::new_DeclArray(ElbDeclHead* head,
   case kVpiReg:
   case kVpiNet:
     if ( head->bit_size() == 1 ) {
-      r = mAlloc.get_memory(sizeof(tVpiScalarVal) * elem_size);
-      tVpiScalarVal* varray = new (r) tVpiScalarVal[elem_size];
+      r = mAlloc.get_memory(sizeof(VlScalarVal) * elem_size);
+      VlScalarVal* varray = new (r) VlScalarVal[elem_size];
       p = mAlloc.get_memory(sizeof(EiDeclArrayS));
       decl = new (p) EiDeclArrayS(head, pt_item, dim_size, range_array,
 				  varray);
@@ -170,10 +168,10 @@ EiDeclArray::name() const
 
 // @breif 値の型を返す．
 // @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
-tVpiValueType
+VlValueType
 EiDeclArray::value_type() const
 {
-  return kVpiValueNone;
+  return VlValueType();
 }
 
 // @brief 符号の取得
@@ -247,12 +245,14 @@ EiDeclArray::bit_size() const
 
 // @brief オフセット値の取得
 // @param[in] index インデックス
-// @retval index に対するオフセット値 index が範囲内に入っている時．
-// @retval -1 index が範囲外の時
-int
-EiDeclArray::bit_offset(int index) const
+// @param[out] offset インデックスに対するオフセット値
+// @retval true インデックスが範囲内に入っている時
+// @retval false インデックスが範囲外の時
+bool
+EiDeclArray::calc_bit_offset(int index,
+			     ymuint& offset) const
 {
-  return mHead->bit_offset(index);
+  return mHead->calc_bit_offset(index, offset);
 }
 
 // @brief データ型の取得
@@ -357,25 +357,29 @@ EiDeclArray::array_size() const
 
 // @brief 1次元配列の場合にインデックスからオフセットを計算する．
 // @param[in] index インデックス
-// @return index に対するオフセット値を返す．
-// @note index が範囲外の場合には -1 を返す．
-int
-EiDeclArray::array_offset(int index) const
+// @param[out] offset index に対するオフセット値
+// @retval true index が範囲内だった．
+// @retval false index が範囲外だった．
+bool
+EiDeclArray::calc_array_offset(int index,
+			       ymuint& offset) const
 {
   if ( mRangeList.size() == 1 ) {
-    return mRangeList.range(0)->offset(index);
+    return mRangeList.range(0)->calc_offset(index, offset);
   }
-  return -1;
+  return false;
 }
 
 // @brief 他次元配列の場合にインデックスのリストからオフセットを計算する．
 // @param[in] index_list インデックスのリスト
-// @return index_list に対するオフセット値を返す．
-// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
-int
-EiDeclArray::array_offset(const vector<int>& index_list) const
+// @param[out] offset index_list に対するオフセット値
+// @retval true オフセットが正しく計算できた．
+// @retval false index_list のいずれかの値が範囲外だった．
+bool
+EiDeclArray::calc_array_offset(const vector<int>& index_list,
+			       ymuint& offset) const
 {
-  return mRangeList.offset(index_list);
+  return mRangeList.calc_offset(index_list, offset);
 }
 
 
@@ -404,11 +408,11 @@ EiDeclArrayN::~EiDeclArrayN()
 
 // @brief スカラー値を返す．
 // @param[in] offset 要素のオフセット
-tVpiScalarVal
+VlScalarVal
 EiDeclArrayN::get_scalar(ymuint offset) const
 {
   assert_not_reached(__FILE__, __LINE__);
-  return kVpiScalarX;
+  return VlScalarVal::x();
 }
 
 // @brief スカラー値を設定する．
@@ -416,18 +420,18 @@ EiDeclArrayN::get_scalar(ymuint offset) const
 // @param[in] val 値
 void
 EiDeclArrayN::set_scalar(ymuint offset,
-			 tVpiScalarVal val)
+			 const VlScalarVal& val)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // @brief 論理値を返す．
 // @param[in] offset 要素のオフセット
-tVpiScalarVal
+VlScalarVal
 EiDeclArrayN::get_logic(ymuint offset) const
 {
   assert_not_reached(__FILE__, __LINE__);
-  return kVpiScalarX;
+  return VlScalarVal::x();
 }
 
 // @brief real 型の値を返す．
@@ -454,7 +458,7 @@ EiDeclArrayN::set_real(ymuint offset,
 void
 EiDeclArrayN::get_bitvector(ymuint offset,
 			    BitVector& bitvector,
-			    tVpiValueType req_type) const
+			    const VlValueType& req_type) const
 {
   assert_not_reached(__FILE__, __LINE__);
 }
@@ -472,12 +476,12 @@ EiDeclArrayN::set_bitvector(ymuint offset,
 // @brief ビット選択値を返す．
 // @param[in] offset 要素のオフセット
 // @param[in] index ビット位置
-tVpiScalarVal
+VlScalarVal
 EiDeclArrayN::get_bitselect(ymuint offset,
 			    int index) const
 {
   assert_not_reached(__FILE__, __LINE__);
-  return kVpiScalarX;
+  return VlScalarVal::x();
 }
 
 // @brief ビット値を設定する．
@@ -487,7 +491,7 @@ EiDeclArrayN::get_bitselect(ymuint offset,
 void
 EiDeclArrayN::set_bitselect(ymuint offset,
 			    int index,
-			    tVpiScalarVal val)
+			    const VlScalarVal& val)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
@@ -536,7 +540,7 @@ EiDeclArrayS::EiDeclArrayS(ElbDeclHead* head,
 			   const PtNamedBase* pt_item,
 			   ymuint dim_size,
 			   EiRange* range_array,
-			   tVpiScalarVal* varray) :
+			   VlScalarVal* varray) :
   EiDeclArray(head, pt_item, dim_size, range_array),
   mValArray(varray)
 {
@@ -549,7 +553,7 @@ EiDeclArrayS::~EiDeclArrayS()
 
 // @brief スカラー値を返す．
 // @param[in] offset 要素のオフセット
-tVpiScalarVal
+VlScalarVal
 EiDeclArrayS::get_scalar(ymuint offset) const
 {
   return mValArray[offset];
@@ -560,17 +564,17 @@ EiDeclArrayS::get_scalar(ymuint offset) const
 // @param[in] val 値
 void
 EiDeclArrayS::set_scalar(ymuint offset,
-			 tVpiScalarVal val)
+			 const VlScalarVal& val)
 {
   mValArray[offset] = val;
 }
 
 // @brief 論理値を返す．
 // @param[in] offset 要素のオフセット
-tVpiScalarVal
+VlScalarVal
 EiDeclArrayS::get_logic(ymuint offset) const
 {
-  return conv_to_logic(get_scalar(offset));
+  return get_scalar(offset).to_logic();
 }
 
 // @brief real 型の値を返す．
@@ -578,7 +582,7 @@ EiDeclArrayS::get_logic(ymuint offset) const
 double
 EiDeclArrayS::get_real(ymuint offset) const
 {
-  return conv_to_real(mValArray[offset]);
+  return mValArray[offset].to_real();
 }
 
 // @brief real 型の値を設定する．
@@ -588,7 +592,7 @@ void
 EiDeclArrayS::set_real(ymuint offset,
 		       double val)
 {
-  mValArray[offset] = conv_to_scalar(val);
+  mValArray[offset] = VlScalarVal(val);
 }
 
 // @brief bitvector 型の値を返す．
@@ -596,7 +600,7 @@ EiDeclArrayS::set_real(ymuint offset,
 void
 EiDeclArrayS::get_bitvector(ymuint offset,
 			    BitVector& bitvector,
-			    tVpiValueType req_type) const
+			    const VlValueType& req_type) const
 {
   bitvector = mValArray[offset];
   bitvector.coerce(req_type);
@@ -615,17 +619,18 @@ EiDeclArrayS::set_bitvector(ymuint offset,
 // @brief ビット選択値を返す．
 // @param[in] offset 要素のオフセット
 // @param[in] index ビット位置
-tVpiScalarVal
+VlScalarVal
 EiDeclArrayS::get_bitselect(ymuint offset,
 			    int index) const
 {
-  int bpos = bit_offset(index);
-  if ( bpos == 0 ) {
+  ymuint bpos;
+  if ( calc_bit_offset(index, bpos) ) {
+    // bpos == 0 のはず
     return mValArray[offset];
   }
   else {
     // 範囲外は X
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
 }
 
@@ -636,10 +641,11 @@ EiDeclArrayS::get_bitselect(ymuint offset,
 void
 EiDeclArrayS::set_bitselect(ymuint offset,
 			    int index,
-			    tVpiScalarVal val)
+			    const VlScalarVal& val)
 {
-  int bpos = bit_offset(index);
-  if ( bpos == 0 ) {
+  ymuint bpos;
+  if ( calc_bit_offset(index, bpos) ) {
+    // bpos == 0 のはず．
     mValArray[offset] = val;
   }
 }
@@ -655,9 +661,11 @@ EiDeclArrayS::get_partselect(ymuint offset,
 			     int right,
 			     BitVector& val) const
 {
-  int bpos1 = bit_offset(left);
-  int bpos2 = bit_offset(right);
-  if ( bpos1 == 0 && bpos2 == 0 ) {
+  ymuint bpos1;
+  ymuint bpos2;
+  if ( calc_bit_offset(left, bpos1) &&
+       calc_bit_offset(right, bpos2) ) {
+    // bpos1 == bpos2 == 0 のはず
     val = mValArray[offset];
   }
 }
@@ -673,9 +681,11 @@ EiDeclArrayS::set_partselect(ymuint offset,
 			     int right,
 			     const BitVector& val)
 {
-  int bpos1 = bit_offset(left);
-  int bpos2 = bit_offset(right);
-  if ( bpos1 == 0 && bpos2 == 0 ) {
+  ymuint bpos1;
+  ymuint bpos2;
+  if ( calc_bit_offset(left, bpos1) &&
+       calc_bit_offset(right, bpos2) ) {
+    // bpos1 == bpos2 == 0 のはず
     mValArray[offset] = val.to_scalar();
   }
 }
@@ -709,10 +719,10 @@ EiDeclArrayR::~EiDeclArrayR()
 
 // @brief スカラー値を返す．
 // @param[in] offset 要素のオフセット
-tVpiScalarVal
+VlScalarVal
 EiDeclArrayR::get_scalar(ymuint offset) const
 {
-  return conv_to_scalar(mValArray[offset]);
+  return VlScalarVal(mValArray[offset]);
 }
 
 // @brief スカラー値を設定する．
@@ -720,17 +730,17 @@ EiDeclArrayR::get_scalar(ymuint offset) const
 // @param[in] val 値
 void
 EiDeclArrayR::set_scalar(ymuint offset,
-			 tVpiScalarVal val)
+			 const VlScalarVal& val)
 {
-  mValArray[offset] = conv_to_real(val);
+  mValArray[offset] = val.to_real();
 }
 
 // @brief 論理値を返す．
 // @param[in] offset 要素のオフセット
-tVpiScalarVal
+VlScalarVal
 EiDeclArrayR::get_logic(ymuint offset) const
 {
-  return conv_to_scalar(get_real(offset));
+  return VlScalarVal(get_real(offset));
 }
 
 // @brief real 型の値を返す．
@@ -756,7 +766,7 @@ EiDeclArrayR::set_real(ymuint offset,
 void
 EiDeclArrayR::get_bitvector(ymuint offset,
 			    BitVector& bitvector,
-			    tVpiValueType req_type) const
+			    const VlValueType& req_type) const
 {
   bitvector = mValArray[offset];
 }
@@ -774,12 +784,12 @@ EiDeclArrayR::set_bitvector(ymuint offset,
 // @brief ビット選択値を返す．
 // @param[in] offset 要素のオフセット
 // @param[in] index ビット位置
-tVpiScalarVal
+VlScalarVal
 EiDeclArrayR::get_bitselect(ymuint offset,
 			    int index) const
 {
   assert_not_reached(__FILE__, __LINE__);
-  return kVpiScalarX;
+  return VlScalarVal::x();
 }
 
 // @brief ビット値を設定する．
@@ -789,7 +799,7 @@ EiDeclArrayR::get_bitselect(ymuint offset,
 void
 EiDeclArrayR::set_bitselect(ymuint offset,
 			    int index,
-			    tVpiScalarVal val)
+			    const VlScalarVal& val)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
@@ -851,7 +861,7 @@ EiDeclArrayV::~EiDeclArrayV()
 
 // @brief スカラー値を返す．
 // @param[in] offset 要素のオフセット
-tVpiScalarVal
+VlScalarVal
 EiDeclArrayV::get_scalar(ymuint offset) const
 {
   return mValArray[offset].to_scalar();
@@ -862,14 +872,14 @@ EiDeclArrayV::get_scalar(ymuint offset) const
 // @param[in] val 値
 void
 EiDeclArrayV::set_scalar(ymuint offset,
-			 tVpiScalarVal val)
+			 const VlScalarVal& val)
 {
   mValArray[offset] = val;
 }
 
 // @brief 論理値を返す．
 // @param[in] offset 要素のオフセット
-tVpiScalarVal
+VlScalarVal
 EiDeclArrayV::get_logic(ymuint offset) const
 {
   return mValArray[offset].to_logic();
@@ -898,7 +908,7 @@ EiDeclArrayV::set_real(ymuint offset,
 void
 EiDeclArrayV::get_bitvector(ymuint offset,
 			    BitVector& bitvector,
-			    tVpiValueType req_type) const
+			    const VlValueType& req_type) const
 {
   bitvector = mValArray[offset];
   bitvector.coerce(req_type);
@@ -917,16 +927,16 @@ EiDeclArrayV::set_bitvector(ymuint offset,
 // @brief ビット選択値を返す．
 // @param[in] offset 要素のオフセット
 // @param[in] index ビット位置
-tVpiScalarVal
+VlScalarVal
 EiDeclArrayV::get_bitselect(ymuint offset,
 			    int index) const
 {
-  int bpos = bit_offset(index);
-  if ( bpos >= 0 ) {
+  ymuint bpos;
+  if ( calc_bit_offset(index, bpos) ) {
     return mValArray[offset].bit_select(bpos);
   }
   else {
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
 }
 
@@ -937,10 +947,10 @@ EiDeclArrayV::get_bitselect(ymuint offset,
 void
 EiDeclArrayV::set_bitselect(ymuint offset,
 			    int index,
-			    tVpiScalarVal val)
+			    const VlScalarVal& val)
 {
-  int bpos = bit_offset(index);
-  if ( bpos >= 0 ) {
+  ymuint bpos;
+  if ( calc_bit_offset(index, bpos) ) {
     mValArray[offset].bit_select(bpos, val);
   }
 }
@@ -956,9 +966,10 @@ EiDeclArrayV::get_partselect(ymuint offset,
 			     int right,
 			     BitVector& val) const
 {
-  int bpos1 = bit_offset(left);
-  int bpos2 = bit_offset(right);
-  if ( bpos1 >= 0 && bpos2 >= 0 ) {
+  ymuint bpos1;
+  ymuint bpos2;
+  if ( calc_bit_offset(left, bpos1) &&
+       calc_bit_offset(right, bpos2) ) {
     val = mValArray[offset].part_select(bpos1, bpos2);
   }
   else {
@@ -969,7 +980,7 @@ EiDeclArrayV::get_partselect(ymuint offset,
     else {
       w = right - left + 1;
     }
-    val = BitVector(kVpiScalarX, w);
+    val = BitVector(VlScalarVal::x(), w);
   }
 }
 
@@ -984,9 +995,10 @@ EiDeclArrayV::set_partselect(ymuint offset,
 			     int right,
 			     const BitVector& val)
 {
-  int bpos1 = bit_offset(left);
-  int bpos2 = bit_offset(right);
-  if ( bpos1 >= 0 && bpos2 >= 0 ) {
+  ymuint bpos1;
+  ymuint bpos2;
+  if ( calc_bit_offset(left, bpos1) &&
+       calc_bit_offset(right, bpos2) ) {
     mValArray[offset].part_select(bpos1, bpos2, val);
   }
 }

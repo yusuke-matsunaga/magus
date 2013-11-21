@@ -5,9 +5,7 @@
 /// @brief ElbUdpImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiUdp.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 // UDP定義を表すクラス
@@ -16,6 +14,7 @@
 
 #include "ElbUdp.h"
 #include "ElbIODecl.h"
+#include "ym_verilog/VlScalarVal.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -49,7 +48,7 @@ private:
 	    EiUdpIO* io_array,
 	    ymuint table_num,
 	    EiTableEntry* table,
-	    tVpiUdpVal* val_array);
+	    VlUdpVal* val_array);
 
   /// @brief デストラクタ
   virtual
@@ -111,7 +110,7 @@ public:
   /// @brief 初期値を返す．
   /// @return 0/1/X を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   init_val() const;
 
   /// @brief 初期値を表す文字列を返す．
@@ -151,7 +150,7 @@ public:
   /// @param[in] init_val 初期値
   void
   set_initial(const PtExpr* init_expr,
-	      tVpiScalarVal init_val);
+	      const VlScalarVal& init_val);
 
   /// @brief table entry の内容を設定する．
   /// @param[in] pos 行番号
@@ -160,7 +159,7 @@ public:
   void
   set_tableentry(ymuint pos,
 		 const PtUdpEntry* pt_udp_entry,
-		 const vector<tVpiUdpVal>& vals);
+		 const vector<VlUdpVal>& vals);
 
 
 private:
@@ -184,7 +183,7 @@ private:
   const PtExpr* mInitExpr;
 
   // 初期値
-  tVpiScalarVal mInitVal;
+  VlScalarVal mInitVal;
 
   // table entry のサイズ
   ymuint32 mTableEntrySize;
@@ -193,7 +192,7 @@ private:
   EiTableEntry* mTableEntryList;
 
   // table entry の値の配列
-  tVpiUdpVal* mValArray;
+  VlUdpVal* mValArray;
 
 };
 
@@ -245,7 +244,7 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tVpiDirection
+  tVlDirection
   direction() const;
 
   /// @brief 符号の属性の取得
@@ -398,7 +397,7 @@ public:
 
   /// @brief pos 番目の位置の値を返す．
   virtual
-  tVpiUdpVal
+  VlUdpVal
   val(ymuint pos) const;
 
   /// @brief 一行文の内容を表す文字列をつくる．
@@ -415,7 +414,7 @@ public:
   /// @brief 設定する．
   void
   set(const PtUdpEntry* pt_entry,
-      const vector<tVpiUdpVal>& vals);
+      const vector<VlUdpVal>& vals);
 
 
 private:
@@ -430,7 +429,7 @@ private:
   const PtUdpEntry* mPtUdpEntry;
 
   // 値の配列 (実体は EiUdpDefn が持っている)
-  tVpiUdpVal* mValArray;
+  VlUdpVal* mValArray;
 
 };
 

@@ -113,15 +113,15 @@ Parser::new_Module1995(const FileRegion& file_region,
   // 入出力ポート宣言に現れる名前を iodecl_names に入れる．
   // ポート宣言が型を持つ場合にはモジュール内部の宣言要素を生成する．
   // 持たない場合にはデフォルトタイプのネットを生成する．
-  hash_map<string, tVpiDirection> iodecl_dirs;
+  hash_map<string, tVlDirection> iodecl_dirs;
   for (ymuint i = 0; i < iohead_array.size(); ++ i) {
     const PtIOHead* io_head = iohead_array[i];
     // 名前をキーにして方向を記録しておく
-    tVpiDirection dir = kVpiNoDirection;
+    tVlDirection dir = kVlNoDirection;
     switch ( io_head->type() ) {
-    case kPtIO_Input:  dir = kVpiInput; break;
-    case kPtIO_Output: dir = kVpiOutput; break;
-    case kPtIO_Inout:  dir = kVpiInout; break;
+    case kPtIO_Input:  dir = kVlInput; break;
+    case kPtIO_Output: dir = kVlOutput; break;
+    case kPtIO_Inout:  dir = kVlInout; break;
     default:
       assert_not_reached(__FILE__, __LINE__);
     }
@@ -171,7 +171,7 @@ Parser::new_Module1995(const FileRegion& file_region,
     for (ymuint j = 0; j < n; ++ j) {
       const PtExpr* portref = port->portref_elem(j);
       const char* name = portref->name();
-      hash_map<string, tVpiDirection>::iterator p = iodecl_dirs.find(name);
+      hash_map<string, tVlDirection>::iterator p = iodecl_dirs.find(name);
       if ( p == iodecl_dirs.end() ) {
 	// name は IOH リストに存在しない．
 	ostringstream buf;
@@ -183,7 +183,7 @@ Parser::new_Module1995(const FileRegion& file_region,
 			buf.str());
       }
       else {
-	tVpiDirection dir = p->second;
+	tVlDirection dir = p->second;
 	port->_set_portref_dir(j, dir);
       }
     }
@@ -243,10 +243,12 @@ Parser::new_Module2001(const FileRegion& file_region,
   string library; // ?
   string cell;    // ?
 
+  if ( !check_PortArray(iohead_array) ) {
+    return;
+  }
+
   // iohead_array からポートの配列を作る．
   PtiPortArray port_array = new_PortArray(iohead_array);
-
-#warning "TODO:2011-02-15-01"
 
   const PtModule* module = mFactory.new_Module(file_region,
 					       module_name,

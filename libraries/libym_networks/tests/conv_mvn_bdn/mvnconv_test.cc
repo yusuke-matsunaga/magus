@@ -1,9 +1,9 @@
 
-/// @file libym_networks/tests/mvnconv_test.cc
+/// @file mvnconv_test.cc
 /// @brief mvnconv_test のソースファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 

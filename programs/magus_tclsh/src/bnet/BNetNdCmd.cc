@@ -11,7 +11,7 @@
 
 #include "BNetNdCmd.h"
 #include "ym_tclpp/TclPopt.h"
-#include "ym_lexp/LogExprWriter.h"
+#include "ym_logic/LogExprWriter.h"
 #include "ym_networks/BNetManip.h"
 
 
@@ -70,7 +70,7 @@ NodeInfo::cmd_proc(TclObjVector& objv)
     result = node->name();
   }
   else if ( attr == "input_num" || attr == "fanin_num" ) {
-    result = node->ni();
+    result = node->fanin_num();
   }
   else if ( attr == "fanout_num" ) {
     result = node->fanout_num();
@@ -83,7 +83,7 @@ NodeInfo::cmd_proc(TclObjVector& objv)
   }
   else if ( attr == "inputs" || attr == "fanins" ) {
     result.clear();
-    size_t ni = node->ni();
+    size_t ni = node->fanin_num();
     for (size_t i = 0; i < ni; i ++) {
       BNode* inode = node->fanin(i);
       result.append_element(inode->name());

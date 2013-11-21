@@ -4,13 +4,11 @@
 /// @file ymmath.h
 /// @brief 数値関係の定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: ymmath.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ymnsdef.h>
+#include "ymnsdef.h"
 
 
 BEGIN_NAMESPACE_YM

@@ -5,8 +5,6 @@
 /// @brief CellMislibReader のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: CellMislibReader.h 1978 2009-02-06 12:29:16Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellMislibReader CellMislibReader.h <ym_cell/CellMislibReader.h>
+/// @class CellMislibReader CellMislibReader.h "ym_cell/CellMislibReader.h"
 /// @brief mislib 形式のファイルを読み込んで CellLibrary に設定するクラス
 /// @sa CellLibrary Cell
 //////////////////////////////////////////////////////////////////////
@@ -39,7 +37,7 @@ public:
   /// @return 読み込んで作成したセルライブラリを返す．
   /// @note エラーが起きたら NULL を返す．
   const CellLibrary*
-  read(const string& filename);
+  operator()(const string& filename);
 
 };
 

@@ -5,9 +5,7 @@
 /// @brief EiExpr の単項演算子の派生クラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiUnaryOp.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 //////////////////////////////////////////////////////////////////////
@@ -79,7 +77,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
+  // ElbExpr の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief オペランドを返す．
@@ -143,7 +141,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
 
@@ -157,7 +155,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type);
+  _set_reqsize(const VlValueType& type);
 
 };
 
@@ -191,7 +189,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
 
@@ -205,7 +203,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type);
+  _set_reqsize(const VlValueType& type);
 
 
 private:
@@ -214,7 +212,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 式の型
-  tVpiValueType mType;
+  VlValueType mType;
 
 };
 
@@ -248,7 +246,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
 
@@ -262,7 +260,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type);
+  _set_reqsize(const VlValueType& type);
 
 };
 
@@ -295,7 +293,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
 
@@ -309,7 +307,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type);
+  _set_reqsize(const VlValueType& type);
 
 };
 
@@ -343,7 +341,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
 
@@ -357,7 +355,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type);
+  _set_reqsize(const VlValueType& type);
 
 };
 
